@@ -213,7 +213,7 @@ gtr_actions_init( GtkUIManager * ui_manager, gpointer callback_user_data )
     gtk_action_group_set_translation_domain( action_group, NULL );
 
 
-    match = pref_string_get( PREF_KEY_SORT_MODE );
+    match = gtr_pref_string_get( PREF_KEY_SORT_MODE );
     for( i = 0, n = G_N_ELEMENTS( sort_radio_entries ), active = -1;
          active == -1 && i < n; ++i )
         if( !strcmp( sort_radio_entries[i].name, match ) )
@@ -233,7 +233,7 @@ gtr_actions_init( GtkUIManager * ui_manager, gpointer callback_user_data )
 
     for( i = 0, n = G_N_ELEMENTS( pref_toggle_entries ); i < n; ++i )
         pref_toggle_entries[i].is_active =
-            pref_flag_get( pref_toggle_entries[i].name );
+            gtr_pref_flag_get( pref_toggle_entries[i].name );
 
     gtk_action_group_add_toggle_actions( action_group,
                                          pref_toggle_entries,

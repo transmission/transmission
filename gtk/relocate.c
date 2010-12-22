@@ -15,7 +15,7 @@
 #include <glib/gi18n.h>
 #include <gtk/gtk.h>
 
-#include "conf.h" /* pref_string_get */
+#include "conf.h" /* gtr_pref_string_get */
 #include "hig.h"
 #include "relocate.h"
 #include "util.h"
@@ -175,7 +175,7 @@ gtr_relocate_dialog_new( GtkWindow * parent,
     hig_workarea_add_section_title( t, &row, _( "Location" ) );
 
     if( previousLocation == NULL )
-        previousLocation = g_strdup( pref_string_get( TR_PREFS_KEY_DOWNLOAD_DIR ) );
+        previousLocation = g_strdup( gtr_pref_string_get( TR_PREFS_KEY_DOWNLOAD_DIR ) );
     w = gtk_file_chooser_button_new( _( "Set Torrent Location" ), GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER );
     gtk_file_chooser_set_current_folder( GTK_FILE_CHOOSER( w ), previousLocation );
     g_object_set_data( G_OBJECT( d ), "chooser", w );

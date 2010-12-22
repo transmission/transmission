@@ -1501,7 +1501,7 @@ setPeerViewColumns( GtkTreeView * peer_view )
 {
     int i;
     int n = 0;
-    const tr_bool more = pref_flag_get( PREF_KEY_SHOW_MORE_PEER_INFO );
+    const tr_bool more = gtr_pref_flag_get( PREF_KEY_SHOW_MORE_PEER_INFO );
     int view_columns[32];
     GtkTreeViewColumn * c;
     GtkCellRenderer *   r;
@@ -1738,7 +1738,7 @@ peer_page_new( struct DetailsImpl * di )
 
     w = gtk_check_button_new_with_mnemonic( _( "Show _more details" ) );
     di->more_peer_details_check = w;
-    b = pref_flag_get( PREF_KEY_SHOW_MORE_PEER_INFO );
+    b = gtr_pref_flag_get( PREF_KEY_SHOW_MORE_PEER_INFO );
     gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON( w ), b );
     g_signal_connect( w, "toggled", G_CALLBACK( onMorePeerInfoToggled ), di );
     gtk_box_pack_start( GTK_BOX( vbox ), w, FALSE, FALSE, 0 );
@@ -2257,7 +2257,7 @@ tracker_page_new( struct DetailsImpl * di )
 
       w = gtk_check_button_new_with_mnemonic( _( "Show _more details" ) );
       di->scrape_check = w;
-      b = pref_flag_get( PREF_KEY_SHOW_MORE_TRACKER_INFO );
+      b = gtr_pref_flag_get( PREF_KEY_SHOW_MORE_TRACKER_INFO );
       gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON( w ), b );
       g_signal_connect( w, "toggled", G_CALLBACK( onScrapeToggled ), di );
       gtk_box_pack_start( GTK_BOX( hbox ), w, FALSE, FALSE, 0 );
@@ -2272,7 +2272,7 @@ tracker_page_new( struct DetailsImpl * di )
 
     w = gtk_check_button_new_with_mnemonic( _( "Show _backup trackers" ) );
     di->all_check = w;
-    b = pref_flag_get( PREF_KEY_SHOW_BACKUP_TRACKERS );
+    b = gtr_pref_flag_get( PREF_KEY_SHOW_BACKUP_TRACKERS );
     gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON( w ), b );
     g_signal_connect( w, "toggled", G_CALLBACK( onBackupToggled ), di );
     gtk_box_pack_start( GTK_BOX( vbox ), w, FALSE, FALSE, 0 );
@@ -2355,7 +2355,7 @@ gtr_torrent_details_dialog_new( GtkWindow * parent, TrCore * core )
 
     {
         GtkWidget * v = gtk_vbox_new( FALSE, 0 );
-        di->file_list = file_list_new( core, 0 );
+        di->file_list = gtr_file_list_new( core, 0 );
         di->file_label = gtk_label_new( _( "File listing not available for combined torrent properties" ) );
         gtk_box_pack_start( GTK_BOX( v ), di->file_list, TRUE, TRUE, 0 );
         gtk_box_pack_start( GTK_BOX( v ), di->file_label, TRUE, TRUE, 0 );
@@ -2392,13 +2392,13 @@ gtr_torrent_details_dialog_set_torrents( GtkWidget * w, GSList * ids )
         const tr_info * inf = tr_torrentInfo( tor );
         g_snprintf( title, sizeof( title ), _( "%s Properties" ), inf->name );
 
-        file_list_set_torrent( di->file_list, id );
+        gtr_file_list_set_torrent( di->file_list, id );
         gtk_widget_show( di->file_list );
         gtk_widget_hide( di->file_label );
     }
    else
    {
-        file_list_clear( di->file_list );
+        gtr_file_list_clear( di->file_list );
         gtk_widget_hide( di->file_list );
         gtk_widget_show( di->file_label );
         g_snprintf( title, sizeof( title ), _( "%'d Torrent Properties" ), len );

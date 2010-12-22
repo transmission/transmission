@@ -365,7 +365,7 @@ debug_level_combo_new( void )
                                             _( "Information" ), TR_MSG_INF,
                                             _( "Debug" ),       TR_MSG_DBG,
                                             NULL );
-    gtr_combo_box_set_active_enum( GTK_COMBO_BOX( w ), pref_int_get( TR_PREFS_KEY_MSGLEVEL ) );
+    gtr_combo_box_set_active_enum( GTK_COMBO_BOX( w ), gtr_pref_int_get( TR_PREFS_KEY_MSGLEVEL ) );
     return w;
 }
 
@@ -374,7 +374,7 @@ debug_level_combo_new( void )
 **/
 
 GtkWidget *
-gtr_message_log_window_new( TrCore * core, GtkWindow * parent )
+gtr_message_log_window_new( GtkWindow * parent, TrCore * core )
 {
     GtkWidget *      win;
     GtkWidget *      vbox;
@@ -456,7 +456,7 @@ gtr_message_log_window_new( TrCore * core, GtkWindow * parent )
     gtk_tree_sortable_set_sort_column_id( GTK_TREE_SORTABLE( data->sort ),
                                           COL_SEQUENCE,
                                           GTK_SORT_ASCENDING );
-    data->maxLevel = pref_int_get( TR_PREFS_KEY_MSGLEVEL );
+    data->maxLevel = gtr_pref_int_get( TR_PREFS_KEY_MSGLEVEL );
     gtk_tree_model_filter_set_visible_func( GTK_TREE_MODEL_FILTER( data->
                                                                    filter ),
                                             isRowVisible, data, NULL );

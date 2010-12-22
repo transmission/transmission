@@ -229,13 +229,13 @@ getPrefs( void )
 ***/
 
 tr_benc*
-pref_get_all( void )
+gtr_pref_get_all( void )
 {
     return getPrefs( );
 }
 
 int64_t
-pref_int_get( const char * key )
+gtr_pref_int_get( const char * key )
 {
     int64_t i = 0;
 
@@ -244,13 +244,13 @@ pref_int_get( const char * key )
 }
 
 void
-pref_int_set( const char * key, int64_t value )
+gtr_pref_int_set( const char * key, int64_t value )
 {
     tr_bencDictAddInt( getPrefs( ), key, value );
 }
 
 double
-pref_double_get( const char * key )
+gtr_pref_double_get( const char * key )
 {
     double d = 0.0;
     tr_bencDictFindReal( getPrefs( ), key, &d );
@@ -258,7 +258,7 @@ pref_double_get( const char * key )
 }
 
 void
-pref_double_set( const char * key, double value )
+gtr_pref_double_set( const char * key, double value )
 {
     tr_bencDictAddReal( getPrefs( ), key, value );
 }
@@ -268,7 +268,7 @@ pref_double_set( const char * key, double value )
 ***/
 
 gboolean
-pref_flag_get( const char * key )
+gtr_pref_flag_get( const char * key )
 {
     tr_bool boolVal;
     tr_bencDictFindBool( getPrefs( ), key, &boolVal );
@@ -276,7 +276,7 @@ pref_flag_get( const char * key )
 }
 
 void
-pref_flag_set( const char * key, gboolean value )
+gtr_pref_flag_set( const char * key, gboolean value )
 {
     tr_bencDictAddBool( getPrefs( ), key, value );
 }
@@ -286,7 +286,7 @@ pref_flag_set( const char * key, gboolean value )
 ***/
 
 const char*
-pref_string_get( const char * key )
+gtr_pref_string_get( const char * key )
 {
     const char * str = NULL;
     tr_bencDictFindStr( getPrefs( ), key, &str );
@@ -294,7 +294,7 @@ pref_string_get( const char * key )
 }
 
 void
-pref_string_set( const char * key, const char * value )
+gtr_pref_string_set( const char * key, const char * value )
 {
     tr_bencDictAddStr( getPrefs( ), key, value );
 }
@@ -304,7 +304,7 @@ pref_string_set( const char * key, const char * value )
 ***/
 
 void
-pref_save( tr_session * session )
+gtr_pref_save( tr_session * session )
 {
     tr_sessionSaveSettings( session, gl_confdir, getPrefs( ) );
 }

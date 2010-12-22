@@ -241,7 +241,7 @@ refresh( FileData * data )
 
     if( tor == NULL )
     {
-        file_list_clear( data->top );
+        gtr_file_list_clear( data->top );
     }
     else
     {
@@ -400,9 +400,9 @@ getActiveFilesForPath( GtkTreeView * view, GtkTreePath * path )
 ***/
 
 void
-file_list_clear( GtkWidget * w )
+gtr_file_list_clear( GtkWidget * w )
 {
-    file_list_set_torrent( w, -1 );
+    gtr_file_list_set_torrent( w, -1 );
 }
 
 struct build_data
@@ -482,7 +482,7 @@ find_child( GNode* parent, const char * name )
 }
 
 void
-file_list_set_torrent( GtkWidget * w, int torrentId )
+gtr_file_list_set_torrent( GtkWidget * w, int torrentId )
 {
     GtkTreeStore * store;
     FileData * data = g_object_get_data( G_OBJECT( w ), "file-data" );
@@ -774,7 +774,7 @@ onViewButtonPressed( GtkWidget * w, GdkEventButton * event, gpointer gdata )
 }
 
 GtkWidget *
-file_list_new( TrCore * core, int torrentId )
+gtr_file_list_new( TrCore * core, int torrentId )
 {
     int width;
     GtkWidget * ret;
@@ -883,7 +883,7 @@ file_list_new( TrCore * core, int torrentId )
     data->view = view;
     data->top = scroll;
     g_object_set_data_full( G_OBJECT( ret ), "file-data", data, freeData );
-    file_list_set_torrent( ret, torrentId );
+    gtr_file_list_set_torrent( ret, torrentId );
 
     return ret;
 }

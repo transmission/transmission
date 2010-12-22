@@ -38,7 +38,7 @@ get_recent_destinations( void )
         char key[64];
         const char * val;
         g_snprintf( key, sizeof( key ), "recent-download-dir-%d", i+1 );
-        if(( val = pref_string_get( key )))
+        if(( val = gtr_pref_string_get( key )))
             list = g_slist_append( list, (void*)val );
     }
     return list;
@@ -62,7 +62,7 @@ save_recent_destination( TrCore * core, const char * dir  )
     list = g_slist_prepend( list, (void*)dir );
 
     /* make local copies of the strings that aren't
-     * invalidated by pref_string_set() */
+     * invalidated by gtr_pref_string_set() */
     for( l=list; l; l=l->next )
         l->data = g_strdup( l->data );
 
@@ -70,9 +70,9 @@ save_recent_destination( TrCore * core, const char * dir  )
     for( l=list, i=0; l && ( i<N_RECENT ); ++i, l=l->next ) {
         char key[64];
         g_snprintf( key, sizeof( key ), "recent-download-dir-%d", i + 1 );
-        pref_string_set( key, l->data );
+        gtr_pref_string_set( key, l->data );
     }
-    pref_save( tr_core_session( core ) );
+    gtr_pref_save( tr_core_session( core ) );
 
     /* cleanup */
     g_slist_foreach( list, (GFunc)g_free, NULL );
@@ -101,7 +101,7 @@ removeOldTorrent( struct AddData * data )
 {
     if( data->gtor )
     {
-        file_list_clear( data->file_list );
+        gtr_file_list_clear( data->file_list );
         tr_torrent_set_remove_flag( data->gtor, TRUE );
         g_object_unref( G_OBJECT( data->gtor ) );
         data->gtor = NULL;
@@ -154,7 +154,7 @@ updateTorrent( struct AddData * o )
 
     if( !o->gtor )
     {
-        file_list_clear( o->file_list );
+        gtr_file_list_clear( o->file_list );
         gtk_widget_set_sensitive( o->file_list, FALSE );
     }
     else
@@ -162,7 +162,7 @@ updateTorrent( struct AddData * o )
         tr_torrent * tor = tr_torrent_handle( o->gtor );
         tr_torrentSetDownloadDir( tor, o->downloadDir );
         gtk_widget_set_sensitive( o->file_list, tr_torrentHasMetadata( tor ) );
-        file_list_set_torrent( o->file_list, tr_torrentId( tor ) );
+        gtr_file_list_set_torrent( o->file_list, tr_torrentId( tor ) );
         tr_torrentVerify( tor );
     }
 }
@@ -291,7 +291,7 @@ gtr_torrent_options_dialog_new( GtkWindow * parent, TrCore * core, tr_ctor * cto
     data->ctor = ctor;
     data->filename = g_strdup( tr_ctorGetSourceFile( ctor ) );
     data->downloadDir = g_strdup( str );
-    data->file_list = file_list_new( core, 0 );
+    data->file_list = gtr_file_list_new( core, 0 );
     str = _( "Mo_ve .torrent file to the trash" );
     data->trash_check = gtk_check_button_new_with_mnemonic( str );
     str = _( "_Start when added" );
@@ -399,7 +399,7 @@ onAddDialogResponse( GtkDialog * dialog,
 
     /* remember this folder the next time we use this dialog */
     folder = gtk_file_chooser_get_current_folder( GTK_FILE_CHOOSER( dialog ) );
-    pref_string_set( PREF_KEY_OPEN_DIALOG_FOLDER, folder );
+    gtr_pref_string_set( PREF_KEY_OPEN_DIALOG_FOLDER, folder );
     g_free( folder );
 
     if( response == GTK_RESPONSE_ACCEPT )
@@ -407,7 +407,7 @@ onAddDialogResponse( GtkDialog * dialog,
         GtkFileChooser  * chooser = GTK_FILE_CHOOSER( dialog );
         GtkWidget       * w = gtk_file_chooser_get_extra_widget( chooser );
         GtkToggleButton * tb = GTK_TOGGLE_BUTTON( w );
-        const gboolean    doStart = pref_flag_get( TR_PREFS_KEY_START );
+        const gboolean    doStart = gtr_pref_flag_get( TR_PREFS_KEY_START );
         const gboolean    doPrompt = gtk_toggle_button_get_active( tb );
         const gboolean    doNotify = FALSE;
         GSList * l = gtk_file_chooser_get_filenames( chooser );
@@ -439,12 +439,12 @@ gtr_torrent_add_from_file_dialog_new( GtkWindow * parent, TrCore * core )
     g_signal_connect( w, "response", G_CALLBACK(
                           onAddDialogResponse ), core );
 
-    if( ( folder = pref_string_get( PREF_KEY_OPEN_DIALOG_FOLDER ) ) )
+    if( ( folder = gtr_pref_string_get( PREF_KEY_OPEN_DIALOG_FOLDER ) ) )
         gtk_file_chooser_set_current_folder( GTK_FILE_CHOOSER( w ), folder );
 
     c = gtk_check_button_new_with_mnemonic( _( "Show _options dialog" ) );
     gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON( c ),
-                                 pref_flag_get( PREF_KEY_OPTIONS_PROMPT ) );
+                                 gtr_pref_flag_get( PREF_KEY_OPTIONS_PROMPT ) );
     gtk_file_chooser_set_extra_widget( GTK_FILE_CHOOSER( w ), c );
     gtk_widget_show( c );
 

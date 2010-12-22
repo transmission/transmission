@@ -29,33 +29,27 @@
 #include <libtransmission/transmission.h>
 #include "util.h" /* gtr_lockfile */
 
-int64_t          pref_int_get           ( const char * key );
-void             pref_int_set           ( const char * key, int64_t value );
+int64_t          gtr_pref_int_get           ( const char * key );
+void             gtr_pref_int_set           ( const char * key, int64_t value );
 
-double           pref_double_get        ( const char * key );
-void             pref_double_set        ( const char * key, double value );
+double           gtr_pref_double_get        ( const char * key );
+void             gtr_pref_double_set        ( const char * key, double value );
 
-gboolean         pref_flag_get          ( const char * key );
-void             pref_flag_set          ( const char * key, gboolean value );
+gboolean         gtr_pref_flag_get          ( const char * key );
+void             gtr_pref_flag_set          ( const char * key, gboolean value );
 
-const char*      pref_string_get        ( const char * key );
-void             pref_string_set        ( const char * key, const char * value );
+const char*      gtr_pref_string_get        ( const char * key );
+void             gtr_pref_string_set        ( const char * key, const char * value );
 
-void             pref_save              ( tr_session * );
-struct tr_benc*  pref_get_all           ( void );
-
-/**
-***
-**/
+void             gtr_pref_save              ( tr_session * );
+struct tr_benc*  gtr_pref_get_all           ( void );
 
 /**
 ***
 **/
 
-gboolean cf_init( const char *confdir,
-                  char **     errstr );
+gboolean cf_init( const char *confdir, char ** errstr );
 
-gboolean cf_lock( gtr_lockfile_state_t  * tr_state,
-                  char                 ** errstr );
+gboolean cf_lock( gtr_lockfile_state_t * tr_state, char ** errstr );
 
 #endif /* GTR_CONFIG_H */

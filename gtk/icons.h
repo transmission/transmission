@@ -13,8 +13,8 @@
 
 const char * gtr_get_mime_type_from_filename( const char *file );
 
-GdkPixbuf * gtr_get_mime_type_icon( const char   * mime_type,
-                                    GtkIconSize    icon_size,
-                                    GtkWidget    * for_widget );
+GdkPixbuf  * gtr_get_mime_type_icon( const char   * mime_type,
+                                     GtkIconSize    icon_size,
+                                     GtkWidget    * for_widget );
 
 #endif

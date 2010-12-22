@@ -358,17 +358,17 @@ onMainWindowSizeAllocated( GtkWidget *            window,
                             && ( gdk_window_get_state( window->window )
                                  & GDK_WINDOW_STATE_MAXIMIZED );
 
-    pref_int_set( PREF_KEY_MAIN_WINDOW_IS_MAXIMIZED, isMaximized );
+    gtr_pref_int_set( PREF_KEY_MAIN_WINDOW_IS_MAXIMIZED, isMaximized );
 
     if( !isMaximized )
     {
         int x, y, w, h;
         gtk_window_get_position( GTK_WINDOW( window ), &x, &y );
         gtk_window_get_size( GTK_WINDOW( window ), &w, &h );
-        pref_int_set( PREF_KEY_MAIN_WINDOW_X, x );
-        pref_int_set( PREF_KEY_MAIN_WINDOW_Y, y );
-        pref_int_set( PREF_KEY_MAIN_WINDOW_WIDTH, w );
-        pref_int_set( PREF_KEY_MAIN_WINDOW_HEIGHT, h );
+        gtr_pref_int_set( PREF_KEY_MAIN_WINDOW_X, x );
+        gtr_pref_int_set( PREF_KEY_MAIN_WINDOW_Y, y );
+        gtr_pref_int_set( PREF_KEY_MAIN_WINDOW_WIDTH, w );
+        gtr_pref_int_set( PREF_KEY_MAIN_WINDOW_HEIGHT, h );
     }
 }
 
@@ -448,7 +448,7 @@ onRPCChanged( tr_session            * session,
             int i;
             tr_benc tmp;
             tr_benc * newval;
-            tr_benc * oldvals = pref_get_all( );
+            tr_benc * oldvals = gtr_pref_get_all( );
             const char * key;
             GSList * l;
             GSList * changed_keys = NULL;
@@ -727,7 +727,7 @@ main( int argc, char ** argv )
          * if that goes well, then our work is done. */
         GSList * l;
         gboolean delegated = FALSE;
-        const gboolean trash_originals = pref_flag_get( TR_PREFS_KEY_TRASH_ORIGINAL );
+        const gboolean trash_originals = gtr_pref_flag_get( TR_PREFS_KEY_TRASH_ORIGINAL );
 
         for( l=argfiles; l!=NULL; l=l->next )
         {
@@ -774,17 +774,17 @@ main( int argc, char ** argv )
         sighandler_cbdata = cbdata;
 
         /* ensure the directories are created */
-        if(( str = pref_string_get( TR_PREFS_KEY_DOWNLOAD_DIR )))
+        if(( str = gtr_pref_string_get( TR_PREFS_KEY_DOWNLOAD_DIR )))
             gtr_mkdir_with_parents( str, 0777 );
-        if(( str = pref_string_get( TR_PREFS_KEY_INCOMPLETE_DIR )))
+        if(( str = gtr_pref_string_get( TR_PREFS_KEY_INCOMPLETE_DIR )))
             gtr_mkdir_with_parents( str, 0777 );
 
         /* initialize the libtransmission session */
-        session = tr_sessionInit( "gtk", configDir, TRUE, pref_get_all( ) );
+        session = tr_sessionInit( "gtk", configDir, TRUE, gtr_pref_get_all( ) );
         tr_sessionSetWebConfigFunc( session, curlConfigFunc );
 
-        pref_flag_set( TR_PREFS_KEY_ALT_SPEED_ENABLED, tr_sessionUsesAltSpeed( session ) );
-        pref_int_set( TR_PREFS_KEY_PEER_PORT, tr_sessionGetPeerPort( session ) );
+        gtr_pref_flag_set( TR_PREFS_KEY_ALT_SPEED_ENABLED, tr_sessionUsesAltSpeed( session ) );
+        gtr_pref_int_set( TR_PREFS_KEY_PEER_PORT, tr_sessionGetPeerPort( session ) );
         cbdata->core = tr_core_new( session );
 
         /* init the ui manager */
@@ -802,9 +802,9 @@ main( int argc, char ** argv )
         tr_sessionSetRPCCallback( session, onRPCChanged, cbdata );
 
         /* on startup, check & see if it's time to update the blocklist */
-        if( pref_flag_get( TR_PREFS_KEY_BLOCKLIST_ENABLED ) ) {
-            if( pref_flag_get( PREF_KEY_BLOCKLIST_UPDATES_ENABLED ) ) {
-                const int64_t last_time = pref_int_get( "blocklist-date" );
+        if( gtr_pref_flag_get( TR_PREFS_KEY_BLOCKLIST_ENABLED ) ) {
+            if( gtr_pref_flag_get( PREF_KEY_BLOCKLIST_UPDATES_ENABLED ) ) {
+                const int64_t last_time = gtr_pref_int_get( "blocklist-date" );
                 const int SECONDS_IN_A_WEEK = 7 * 24 * 60 * 60;
                 const time_t now = time( NULL );
                 if( last_time + SECONDS_IN_A_WEEK < now )
@@ -844,8 +844,8 @@ appsetup( TrWindow *      wind,
           gboolean        forcepause,
           gboolean        isIconified )
 {
-    const gboolean doStart = pref_flag_get( TR_PREFS_KEY_START ) && !forcepause;
-    const gboolean doPrompt = pref_flag_get( PREF_KEY_OPTIONS_PROMPT );
+    const gboolean doStart = gtr_pref_flag_get( TR_PREFS_KEY_START ) && !forcepause;
+    const gboolean doPrompt = gtr_pref_flag_get( PREF_KEY_OPTIONS_PROMPT );
     const gboolean doNotify = TRUE;
 
     /* fill out cbdata */
@@ -860,7 +860,7 @@ appsetup( TrWindow *      wind,
     cbdata->isIconified  = isIconified;
 
     if( isIconified )
-        pref_flag_set( PREF_KEY_SHOW_TRAY_ICON, TRUE );
+        gtr_pref_flag_set( PREF_KEY_SHOW_TRAY_ICON, TRUE );
 
     gtr_actions_set_core( cbdata->core );
 
@@ -898,7 +898,7 @@ appsetup( TrWindow *      wind,
         gtr_action_set_toggled( "toggle-main-window", FALSE );
     }
 
-    if( !pref_flag_get( PREF_KEY_USER_HAS_GIVEN_INFORMED_CONSENT ) )
+    if( !gtr_pref_flag_get( PREF_KEY_USER_HAS_GIVEN_INFORMED_CONSENT ) )
     {
         GtkWidget * w = gtk_message_dialog_new( GTK_WINDOW( wind ),
                                                 GTK_DIALOG_DESTROY_WITH_PARENT,
@@ -912,7 +912,7 @@ appsetup( TrWindow *      wind,
         switch( gtk_dialog_run( GTK_DIALOG( w ) ) ) {
             case GTK_RESPONSE_ACCEPT:
                 /* only show it once */
-                pref_flag_set( PREF_KEY_USER_HAS_GIVEN_INFORMED_CONSENT, TRUE );
+                gtr_pref_flag_set( PREF_KEY_USER_HAS_GIVEN_INFORMED_CONSENT, TRUE );
                 gtk_widget_destroy( w );
                 break;
             default:
@@ -959,7 +959,7 @@ toggleMainWindow( struct cbdata * cbdata )
 static gboolean
 shouldConfirmBeforeExiting( struct cbdata * data )
 {
-    return pref_flag_get( PREF_KEY_ASKQUIT )
+    return gtr_pref_flag_get( PREF_KEY_ASKQUIT )
         && tr_core_get_active_torrent_count( data->core );
 }
 
@@ -1175,10 +1175,10 @@ wannaquit( gpointer vdata )
     /* ensure the window is in its previous position & size.
      * this seems to be necessary because changing the main window's
      * child seems to unset the size */
-    gtk_window_resize( cbdata->wind, pref_int_get( PREF_KEY_MAIN_WINDOW_WIDTH ),
-                                     pref_int_get( PREF_KEY_MAIN_WINDOW_HEIGHT ) );
-    gtk_window_move( cbdata->wind, pref_int_get( PREF_KEY_MAIN_WINDOW_X ),
-                                   pref_int_get( PREF_KEY_MAIN_WINDOW_Y ) );
+    gtk_window_resize( cbdata->wind, gtr_pref_int_get( PREF_KEY_MAIN_WINDOW_WIDTH ),
+                                     gtr_pref_int_get( PREF_KEY_MAIN_WINDOW_HEIGHT ) );
+    gtk_window_move( cbdata->wind, gtr_pref_int_get( PREF_KEY_MAIN_WINDOW_X ),
+                                   gtr_pref_int_get( PREF_KEY_MAIN_WINDOW_Y ) );
 
     /* shut down libT */
     g_thread_create( sessionCloseThreadFunc, vdata, TRUE, NULL );
@@ -1297,31 +1297,31 @@ prefschanged( TrCore * core UNUSED, const char * key, gpointer data )
 
     if( !strcmp( key, TR_PREFS_KEY_ENCRYPTION ) )
     {
-        tr_sessionSetEncryption( tr, pref_int_get( key ) );
+        tr_sessionSetEncryption( tr, gtr_pref_int_get( key ) );
     }
     else if( !strcmp( key, TR_PREFS_KEY_DOWNLOAD_DIR ) )
     {
-        tr_sessionSetDownloadDir( tr, pref_string_get( key ) );
+        tr_sessionSetDownloadDir( tr, gtr_pref_string_get( key ) );
     }
     else if( !strcmp( key, TR_PREFS_KEY_MSGLEVEL ) )
     {
-        tr_setMessageLevel( pref_int_get( key ) );
+        tr_setMessageLevel( gtr_pref_int_get( key ) );
     }
     else if( !strcmp( key, TR_PREFS_KEY_PEER_PORT ) )
     {
-        tr_sessionSetPeerPort( tr, pref_int_get( key ) );
+        tr_sessionSetPeerPort( tr, gtr_pref_int_get( key ) );
     }
     else if( !strcmp( key, TR_PREFS_KEY_BLOCKLIST_ENABLED ) )
     {
-        tr_blocklistSetEnabled( tr, pref_flag_get( key ) );
+        tr_blocklistSetEnabled( tr, gtr_pref_flag_get( key ) );
     }
     else if( !strcmp( key, TR_PREFS_KEY_BLOCKLIST_URL ) )
     {
-        tr_blocklistSetURL( tr, pref_string_get( key ) );
+        tr_blocklistSetURL( tr, gtr_pref_string_get( key ) );
     }
     else if( !strcmp( key, PREF_KEY_SHOW_TRAY_ICON ) )
     {
-        const int show = pref_flag_get( key );
+        const int show = gtr_pref_flag_get( key );
         if( show && !cbdata->icon )
             cbdata->icon = gtr_icon_new( cbdata->core );
         else if( !show && cbdata->icon ) {
@@ -1331,141 +1331,141 @@ prefschanged( TrCore * core UNUSED, const char * key, gpointer data )
     }
     else if( !strcmp( key, TR_PREFS_KEY_DSPEED_ENABLED ) )
     {
-        tr_sessionLimitSpeed( tr, TR_DOWN, pref_flag_get( key ) );
+        tr_sessionLimitSpeed( tr, TR_DOWN, gtr_pref_flag_get( key ) );
     }
     else if( !strcmp( key, TR_PREFS_KEY_DSPEED_KBps ) )
     {
-        tr_sessionSetSpeedLimit_KBps( tr, TR_DOWN, pref_int_get( key ) );
+        tr_sessionSetSpeedLimit_KBps( tr, TR_DOWN, gtr_pref_int_get( key ) );
     }
     else if( !strcmp( key, TR_PREFS_KEY_USPEED_ENABLED ) )
     {
-        tr_sessionLimitSpeed( tr, TR_UP, pref_flag_get( key ) );
+        tr_sessionLimitSpeed( tr, TR_UP, gtr_pref_flag_get( key ) );
     }
     else if( !strcmp( key, TR_PREFS_KEY_USPEED_KBps ) )
     {
-        tr_sessionSetSpeedLimit_KBps( tr, TR_UP, pref_int_get( key ) );
+        tr_sessionSetSpeedLimit_KBps( tr, TR_UP, gtr_pref_int_get( key ) );
     }
     else if( !strcmp( key, TR_PREFS_KEY_RATIO_ENABLED ) )
     {
-        tr_sessionSetRatioLimited( tr, pref_flag_get( key ) );
+        tr_sessionSetRatioLimited( tr, gtr_pref_flag_get( key ) );
     }
     else if( !strcmp( key, TR_PREFS_KEY_RATIO ) )
     {
-        tr_sessionSetRatioLimit( tr, pref_double_get( key ) );
+        tr_sessionSetRatioLimit( tr, gtr_pref_double_get( key ) );
     }
     else if( !strcmp( key, TR_PREFS_KEY_IDLE_LIMIT ) )
     {
-        tr_sessionSetIdleLimit( tr, pref_int_get( key ) );
+        tr_sessionSetIdleLimit( tr, gtr_pref_int_get( key ) );
     }
     else if( !strcmp( key, TR_PREFS_KEY_IDLE_LIMIT_ENABLED ) )
     {
-        tr_sessionSetIdleLimited( tr, pref_flag_get( key ) );
+        tr_sessionSetIdleLimited( tr, gtr_pref_flag_get( key ) );
     }
     else if( !strcmp( key, TR_PREFS_KEY_PORT_FORWARDING ) )
     {
-        tr_sessionSetPortForwardingEnabled( tr, pref_flag_get( key ) );
+        tr_sessionSetPortForwardingEnabled( tr, gtr_pref_flag_get( key ) );
     }
     else if( !strcmp( key, TR_PREFS_KEY_PEX_ENABLED ) )
     {
-        tr_sessionSetPexEnabled( tr, pref_flag_get( key ) );
+        tr_sessionSetPexEnabled( tr, gtr_pref_flag_get( key ) );
     }
     else if( !strcmp( key, TR_PREFS_KEY_RENAME_PARTIAL_FILES ) )
     {
-        tr_sessionSetIncompleteFileNamingEnabled( tr, pref_flag_get( key ) );
+        tr_sessionSetIncompleteFileNamingEnabled( tr, gtr_pref_flag_get( key ) );
     }
     else if( !strcmp( key, TR_PREFS_KEY_DHT_ENABLED ) )
     {
-        tr_sessionSetDHTEnabled( tr, pref_flag_get( key ) );
+        tr_sessionSetDHTEnabled( tr, gtr_pref_flag_get( key ) );
     }
     else if( !strcmp( key, TR_PREFS_KEY_LPD_ENABLED ) )
     {
-        tr_sessionSetLPDEnabled( tr, pref_flag_get( key ) );
+        tr_sessionSetLPDEnabled( tr, gtr_pref_flag_get( key ) );
     }
     else if( !strcmp( key, TR_PREFS_KEY_RPC_PORT ) )
     {
-        tr_sessionSetRPCPort( tr, pref_int_get( key ) );
+        tr_sessionSetRPCPort( tr, gtr_pref_int_get( key ) );
     }
     else if( !strcmp( key, TR_PREFS_KEY_RPC_ENABLED ) )
     {
-        tr_sessionSetRPCEnabled( tr, pref_flag_get( key ) );
+        tr_sessionSetRPCEnabled( tr, gtr_pref_flag_get( key ) );
     }
     else if( !strcmp( key, TR_PREFS_KEY_RPC_WHITELIST ) )
     {
-        tr_sessionSetRPCWhitelist( tr, pref_string_get( key ) );
+        tr_sessionSetRPCWhitelist( tr, gtr_pref_string_get( key ) );
     }
     else if( !strcmp( key, TR_PREFS_KEY_RPC_WHITELIST_ENABLED ) )
     {
-        tr_sessionSetRPCWhitelistEnabled( tr, pref_flag_get( key ) );
+        tr_sessionSetRPCWhitelistEnabled( tr, gtr_pref_flag_get( key ) );
     }
     else if( !strcmp( key, TR_PREFS_KEY_RPC_USERNAME ) )
     {
-        tr_sessionSetRPCUsername( tr, pref_string_get( key ) );
+        tr_sessionSetRPCUsername( tr, gtr_pref_string_get( key ) );
     }
     else if( !strcmp( key, TR_PREFS_KEY_RPC_PASSWORD ) )
     {
-        tr_sessionSetRPCPassword( tr, pref_string_get( key ) );
+        tr_sessionSetRPCPassword( tr, gtr_pref_string_get( key ) );
     }
     else if( !strcmp( key, TR_PREFS_KEY_RPC_AUTH_REQUIRED ) )
     {
-        tr_sessionSetRPCPasswordEnabled( tr, pref_flag_get( key ) );
+        tr_sessionSetRPCPasswordEnabled( tr, gtr_pref_flag_get( key ) );
     }
     else if( !strcmp( key, TR_PREFS_KEY_ALT_SPEED_UP_KBps ) )
     {
-        tr_sessionSetAltSpeed_KBps( tr, TR_UP, pref_int_get( key ) );
+        tr_sessionSetAltSpeed_KBps( tr, TR_UP, gtr_pref_int_get( key ) );
     }
     else if( !strcmp( key, TR_PREFS_KEY_ALT_SPEED_DOWN_KBps ) )
     {
-        tr_sessionSetAltSpeed_KBps( tr, TR_DOWN, pref_int_get( key ) );
+        tr_sessionSetAltSpeed_KBps( tr, TR_DOWN, gtr_pref_int_get( key ) );
     }
     else if( !strcmp( key, TR_PREFS_KEY_ALT_SPEED_ENABLED ) )
     {
-        const gboolean b = pref_flag_get( key );
+        const gboolean b = gtr_pref_flag_get( key );
         tr_sessionUseAltSpeed( tr, b );
         gtr_action_set_toggled( key, b );
     }
     else if( !strcmp( key, TR_PREFS_KEY_ALT_SPEED_TIME_BEGIN ) )
     {
-        tr_sessionSetAltSpeedBegin( tr, pref_int_get( key ) );
+        tr_sessionSetAltSpeedBegin( tr, gtr_pref_int_get( key ) );
     }
     else if( !strcmp( key, TR_PREFS_KEY_ALT_SPEED_TIME_END ) )
     {
-        tr_sessionSetAltSpeedEnd( tr, pref_int_get( key ) );
+        tr_sessionSetAltSpeedEnd( tr, gtr_pref_int_get( key ) );
     }
     else if( !strcmp( key, TR_PREFS_KEY_ALT_SPEED_TIME_ENABLED ) )
     {
-        tr_sessionUseAltSpeedTime( tr, pref_flag_get( key ) );
+        tr_sessionUseAltSpeedTime( tr, gtr_pref_flag_get( key ) );
     }
     else if( !strcmp( key, TR_PREFS_KEY_ALT_SPEED_TIME_DAY ) )
     {
-        tr_sessionSetAltSpeedDay( tr, pref_int_get( key ) );
+        tr_sessionSetAltSpeedDay( tr, gtr_pref_int_get( key ) );
     }
     else if( !strcmp( key, TR_PREFS_KEY_PEER_PORT_RANDOM_ON_START ) )
     {
-        tr_sessionSetPeerPortRandomOnStart( tr, pref_flag_get( key ) );
+        tr_sessionSetPeerPortRandomOnStart( tr, gtr_pref_flag_get( key ) );
     }
     else if( !strcmp( key, TR_PREFS_KEY_INCOMPLETE_DIR ) )
     {
-        tr_sessionSetIncompleteDir( tr, pref_string_get( key ) );
+        tr_sessionSetIncompleteDir( tr, gtr_pref_string_get( key ) );
     }
     else if( !strcmp( key, TR_PREFS_KEY_INCOMPLETE_DIR_ENABLED ) )
     {
-        tr_sessionSetIncompleteDirEnabled( tr, pref_flag_get( key ) );
+        tr_sessionSetIncompleteDirEnabled( tr, gtr_pref_flag_get( key ) );
     }
     else if( !strcmp( key, TR_PREFS_KEY_SCRIPT_TORRENT_DONE_ENABLED ) )
     {
-        tr_sessionSetTorrentDoneScriptEnabled( tr, pref_flag_get( key ) );
+        tr_sessionSetTorrentDoneScriptEnabled( tr, gtr_pref_flag_get( key ) );
     }
     else if( !strcmp( key, TR_PREFS_KEY_SCRIPT_TORRENT_DONE_FILENAME ) )
     {
-        tr_sessionSetTorrentDoneScript( tr, pref_string_get( key ) );
+        tr_sessionSetTorrentDoneScript( tr, gtr_pref_string_get( key ) );
     }
     else if( !strcmp( key, TR_PREFS_KEY_START) )
     {
-        tr_sessionSetPaused( tr, !pref_flag_get( key ) );
+        tr_sessionSetPaused( tr, !gtr_pref_flag_get( key ) );
     }
     else if( !strcmp( key, TR_PREFS_KEY_TRASH_ORIGINAL ) )
     {
-        tr_sessionSetDeleteSource( tr, pref_flag_get( key ) );
+        tr_sessionSetDeleteSource( tr, gtr_pref_flag_get( key ) );
     }
 }
 
@@ -1824,7 +1824,7 @@ gtr_actions_handler( const char * action_name, gpointer user_data )
     {
         if( !data->msgwin )
         {
-            GtkWidget * win = gtr_message_log_window_new( data->core, data->wind );
+            GtkWidget * win = gtr_message_log_window_new( data->wind, data->core );
             g_signal_connect( win, "destroy", G_CALLBACK( msgwinclosed ), NULL );
             data->msgwin = win;
         }
