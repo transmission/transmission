@@ -1185,21 +1185,18 @@ wannaquit( gpointer vdata )
 }
 
 static void
-flushAddTorrentErrors( GtkWindow *  window,
-                       const char * primary,
-                       GSList **    files )
+flushAddTorrentErrors( GtkWindow * window, const char * primary, GSList ** files )
 {
     GSList * l;
     GtkWidget * w;
     GString * s = g_string_new( NULL );
+    const char * leader = g_slist_length( *files ) > 1
+                        ? gtr_get_unicode_string( GTR_UNICODE_BULLET )
+                        : "";
 
-    if( g_slist_length( *files ) > 1 ) {
-        for( l=*files; l!=NULL; l=l->next )
-            g_string_append_printf( s, "\xE2\x88\x99 %s\n", (const char*)l->data );
-    } else {
-        for( l=*files; l!=NULL; l=l->next )
-            g_string_append_printf( s, "%s\n", (const char*)l->data );
-    }
+    for( l=*files; l!=NULL; l=l->next )
+        g_string_append_printf( s, "%s %s\n", leader, (const char*)l->data );
+
     w = gtk_message_dialog_new( window,
                                 GTK_DIALOG_DESTROY_WITH_PARENT,
                                 GTK_MESSAGE_ERROR,
