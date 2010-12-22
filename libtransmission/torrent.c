@@ -1592,6 +1592,13 @@ torrentStart( tr_torrent * tor )
     if( setLocalErrorIfFilesDisappeared( tor ) )
         return;
 
+    /* verifying right now... wait until that's done so
+     * we'll know what completeness to use/announce */
+    if( tor->verifyState != TR_VERIFY_NONE ) {
+        tor->startAfterVerify = TRUE;
+        return;
+    }
+
     /* otherwise, start it now... */
     tr_sessionLock( tor->session );
 
@@ -1600,8 +1607,6 @@ torrentStart( tr_torrent * tor )
         tr_torinf( tor, _( "Restarted manually -- disabling its seed ratio" ) );
         tr_torrentSetRatioMode( tor, TR_RATIOLIMIT_UNLIMITED );
     }
-
-    tr_verifyRemove( tor );
 
     /* corresponds to the peer_id sent as a tracker request parameter.
      * one tracker admin says: "When the same torrent is opened and
