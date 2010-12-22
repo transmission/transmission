@@ -2781,28 +2781,6 @@ struct LocationData
     tr_torrent * tor;
 };
 
-static tr_bool
-isSameLocation( const char * path1, const char * path2 )
-{
-    struct stat s1, s2;
-    const int err1 = stat( path1, &s1 );
-    const int err2 = stat( path2, &s2 );
-
-    if( !err1 && !err2 ) {
-        tr_dbg( "path1 dev:inode is %"PRIu64":%"PRIu64"; "
-                "path2 dev:inode is %"PRIu64":%"PRIu64,
-                (uint64_t)s1.st_dev, (uint64_t)s1.st_ino,
-                (uint64_t)s2.st_dev, (uint64_t)s2.st_ino );
-        return ( s1.st_dev == s2.st_dev )
-            && ( s1.st_ino == s2.st_ino );
-    }
-
-    /* either one, or the other, or both don't exist... */
-    tr_dbg( "stat(%s) returned %d\n", path1, err1 );
-    tr_dbg( "stat(%s) returned %d\n", path2, err2 );
-    return FALSE;
-}
-
 static void
 setLocation( void * vdata )
 {
@@ -2820,7 +2798,7 @@ setLocation( void * vdata )
 
     tr_mkdirp( location, 0777 );
 
-    if( !isSameLocation( location, tor->currentDir ) )
+    if( !tr_is_same_file( location, tor->currentDir ) )
     {
         tr_file_index_t i;
 

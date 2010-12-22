@@ -517,6 +517,9 @@ struct tm * tr_localtime_r( const time_t *_clock, struct tm *_result );
 int tr_moveFile( const char * oldpath, const char * newpath,
                  tr_bool * renamed ) TR_GNUC_NONNULL(1,2);
 
+/** @brief Test to see if the two filenames point to the same file. */
+tr_bool tr_is_same_file( const char * filename1, const char * filename2 );
+
 /** @brief convenience function to remove an item from an array */
 void tr_removeElementFromArray( void         * array,
                                 unsigned int   index_to_remove,

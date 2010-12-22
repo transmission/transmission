@@ -1587,6 +1587,17 @@ tr_moveFile( const char * oldpath, const char * newpath, tr_bool * renamed )
     return 0;
 }
 
+tr_bool
+tr_is_same_file( const char * filename1, const char * filename2 )
+{
+    struct stat sb1, sb2;
+
+    return !stat( filename1, &sb1 )
+        && !stat( filename2, &sb2 )
+        && ( sb1.st_dev == sb2.st_dev )
+        && ( sb1.st_ino == sb2.st_ino );
+}
+
 /***
 ****
 ***/
