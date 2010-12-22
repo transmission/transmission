@@ -7,6 +7,7 @@ Backport of bugfixes for a maintenance 2.0x release.
   * backport r11546 from #3838 "Unselected active torrents not counted for quit check"
   * backport r11545 from #3834 "'Origin' field in Torrent Properties dialog should be ellipsized"
   * backport r11511 from #3719 "handle API changes to libnotify"
+  * backport r11574 from #3844 "Error popup when adding a relative path"
 
 === Transmission 2.05 (2010/12/05) ===
 Backport of bugfixes for a maintenance 2.0x release.
