@@ -1,4 +1,4 @@
-/* $Id: connecthostport.c,v 1.2 2010/04/05 00:08:15 nanard Exp $ */
+/* $Id: connecthostport.c,v 1.3 2010/12/21 16:13:14 nanard Exp $ */
 /* Project : miniupnp
  * Author : Thomas Bernard
  * Copyright (c) 2010 Thomas Bernard
@@ -7,7 +7,9 @@
 
 /* use getaddrinfo() or gethostbyname()
  * uncomment the following line in order to use gethostbyname() */
-/* #define USE_GETHOSTBYNAME */
+#ifdef NO_GETADDRINFO
+#define USE_GETHOSTBYNAME
+#endif
 
 #include <string.h>
 #include <stdio.h>

@@ -1,4 +1,4 @@
-/* $Id: minisoap.c,v 1.19 2010/04/12 20:39:41 nanard Exp $ */
+/* $Id: minisoap.c,v 1.20 2010/12/11 17:56:51 nanard Exp $ */
 /* Project : miniupnp
  * Author : Thomas Bernard
  * Copyright (c) 2005-2009 Thomas Bernard
@@ -106,8 +106,12 @@ int soapPostSubmit(int fd,
 					   "\r\n",
 					   url, httpversion, host, portstr, bodysize, action);
 #ifdef DEBUG
-	printf("SOAP request : headersize=%d bodysize=%d\n",
+	/*printf("SOAP request : headersize=%d bodysize=%d\n",
 	       headerssize, bodysize);
+	*/
+	printf("SOAP request : POST %s HTTP/%s - Host: %s%s\n",
+	        url, httpversion, host, portstr);
+	printf("SOAPAction: \"%s\" - Content-Length: %d\n", action, bodysize);
 	/*printf("%s", headerbuf);*/
 #endif
 	return httpWrite(fd, body, bodysize, headerbuf, headerssize);

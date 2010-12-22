@@ -1,4 +1,4 @@
-/* $Id: miniupnpc.c,v 1.83 2010/12/09 16:11:32 nanard Exp $ */
+/* $Id: miniupnpc.c,v 1.85 2010/12/21 16:13:14 nanard Exp $ */
 /* Project : miniupnp
  * Author : Thomas BERNARD
  * copyright (c) 2005-2010 Thomas Bernard
@@ -298,6 +298,9 @@ static int simpleUPnPcommand2(int s, const char * url, const char * service,
 	buf = getHTTPResponse(s, &n);
 	if(n > 0 && buf)
 	{
+#ifdef DEBUG
+		printf("SOAP Response :\n%.*s\n", n, buf);
+#endif
 		if(*bufsize > n)
 		{
 			memcpy(buffer, buf, n);
@@ -438,8 +441,12 @@ LIBSPEC struct UPNPDev * upnpDiscover(int delay, const char * multicastif,
 	int n;
 	struct sockaddr sockudp_r;
 	unsigned int mx;
+#ifdef NO_GETADDRINFO
+	struct sockaddr_in sockudp_w;
+#else
 	int rv;
 	struct addrinfo hints, *servinfo, *p;
+#endif
 #ifdef WIN32
 	MIB_IPFORWARDROW ip_forward;
 #endif
@@ -484,13 +491,6 @@ LIBSPEC struct UPNPDev * upnpDiscover(int delay, const char * multicastif,
 			p->sin_port = htons(PORT);
 		p->sin_addr.s_addr = INADDR_ANY;
 	}
-#if 0
-	/* emission */
-	memset(&sockudp_w, 0, sizeof(struct sockaddr_in));
-	sockudp_w.sin_family = AF_INET;
-	sockudp_w.sin_port = htons(PORT);
-	sockudp_w.sin_addr.s_addr = inet_addr(UPNP_MCAST_ADDR);
-#endif
 #ifdef WIN32
 /* This code could help us to use the right Network interface for 
  * SSDP multicast traffic */
@@ -593,7 +593,13 @@ LIBSPEC struct UPNPDev * upnpDiscover(int delay, const char * multicastif,
 		n = snprintf(bufr, sizeof(bufr),
 		             MSearchMsgFmt, deviceList[deviceIndex++], mx);
 		/*printf("Sending %s", bufr);*/
-#if 0
+#ifdef NO_GETADDRINFO
+		/* the following code is not using getaddrinfo */
+		/* emission */
+		memset(&sockudp_w, 0, sizeof(struct sockaddr_in));
+		sockudp_w.sin_family = AF_INET;
+		sockudp_w.sin_port = htons(PORT);
+		sockudp_w.sin_addr.s_addr = inet_addr(UPNP_MCAST_ADDR);
 		n = sendto(sudp, bufr, n, 0,
 		           (struct sockaddr *)&sockudp_w, sizeof(struct sockaddr_in));
 		if (n < 0) {
@@ -601,7 +607,7 @@ LIBSPEC struct UPNPDev * upnpDiscover(int delay, const char * multicastif,
 			closesocket(sudp);
 			return devlist;
 		}
-#endif
+#else /* #ifdef NO_GETADDRINFO */
 		memset(&hints, 0, sizeof(hints));
 		hints.ai_family = AF_UNSPEC; // AF_INET6 or AF_INET
 		hints.ai_socktype = SOCK_DGRAM;
@@ -626,6 +632,7 @@ LIBSPEC struct UPNPDev * upnpDiscover(int delay, const char * multicastif,
 			closesocket(sudp);
 			return devlist;
 		}
+#endif /* #ifdef NO_GETADDRINFO */
 	}
 	/* Waiting for SSDP REPLY packet to M-SEARCH */
 	n = ReceiveData(sudp, bufr, sizeof(bufr), delay);

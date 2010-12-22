@@ -1,4 +1,4 @@
-/* $Id: igd_desc_parse.c,v 1.10 2010/04/05 20:36:59 nanard Exp $ */
+/* $Id: igd_desc_parse.c,v 1.11 2010/12/11 17:56:51 nanard Exp $ */
 /* Project : miniupnp
  * http://miniupnp.free.fr/
  * Author : Thomas Bernard
@@ -97,7 +97,7 @@ void printIGD(struct IGDdatas * d)
 	printf(" controlURL = '%s'\n", d->CIF.controlurl);
 	printf(" eventSubURL = '%s'\n", d->CIF.eventsuburl);
 	printf(" SCPDURL = '%s'\n", d->CIF.scpdurl);
-	printf("WAN Connection Device (IP or PPP Connection):\n");
+	printf("primary WAN Connection Device (IP or PPP Connection):\n");
 	/*printf(" deviceType = '%s'\n", d->first.devicetype);*/
 	printf(" servicetype = '%s'\n", d->first.servicetype);
 	printf(" controlURL = '%s'\n", d->first.controlurl);

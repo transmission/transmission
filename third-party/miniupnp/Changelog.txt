@@ -1,9 +1,16 @@
-$Id: Changelog.txt,v 1.122 2010/12/09 16:11:31 nanard Exp $
+$Id: Changelog.txt,v 1.125 2010/12/21 16:13:13 nanard Exp $
 miniUPnP client Changelog.
+
+2010/12/21:
+  use NO_GETADDRINFO macro to disable the use of getaddrinfo/freeaddrinfo
+
+2010/12/11:
+  Improvements on getHTTPResponse() code.
 
 2010/12/09:
   new code for miniwget that handle Chunked transfer encoding
   using getHTTPResponse() in SOAP call code
+  Adding MANIFEST.in for 'python setup.py bdist_rpm'
 
 2010/11/25:
   changes to minissdpc.c to compile under Win32.
