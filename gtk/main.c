@@ -1285,6 +1285,8 @@ onAddTorrent( TrCore * core, tr_ctor * ctor, gpointer gdata )
     if( cbdata->wind )
         gtk_window_set_urgency_hint( cbdata->wind, TRUE );
 #endif
+
+    gtk_widget_show( w );
 }
 
 static void
