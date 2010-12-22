@@ -844,9 +844,9 @@ appsetup( TrWindow *      wind,
           gboolean        forcepause,
           gboolean        isIconified )
 {
-    const pref_flag_t start =
-        forcepause ? PREF_FLAG_FALSE : PREF_FLAG_DEFAULT;
-    const pref_flag_t prompt = PREF_FLAG_DEFAULT;
+    const gboolean doStart = pref_flag_get( TR_PREFS_KEY_START ) && !forcepause;
+    const gboolean doPrompt = pref_flag_get( PREF_KEY_OPTIONS_PROMPT );
+    const gboolean doNotify = TRUE;
 
     /* fill out cbdata */
     cbdata->wind         = NULL;
@@ -873,7 +873,7 @@ appsetup( TrWindow *      wind,
 
     /* add torrents from command-line and saved state */
     tr_core_load( cbdata->core, forcepause );
-    tr_core_add_list( cbdata->core, torrentFiles, start, prompt, TRUE );
+    tr_core_add_list( cbdata->core, torrentFiles, doStart, doPrompt, doNotify );
     torrentFiles = NULL;
     tr_core_torrents_added( cbdata->core );
 

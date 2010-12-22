@@ -48,8 +48,7 @@ static char * gl_lockpath = NULL;
 
 /* errstr may be NULL, this might be called before GTK is initialized */
 gboolean
-cf_init( const char   * configDir,
-         char        ** errstr )
+cf_init( const char * configDir, char ** errstr )
 {
     if( errstr != NULL )
         *errstr = NULL;
@@ -74,9 +73,7 @@ cf_init( const char   * configDir,
 
 /* errstr may be NULL, this might be called before GTK is initialized */
 static gboolean
-lockfile( const char             * filename,
-          gtr_lockfile_state_t   * tr_state,
-          char                  ** errstr )
+lockfile( const char * filename, gtr_lockfile_state_t * tr_state, char ** errstr )
 {
     const gtr_lockfile_state_t state = gtr_lockfile( filename );
     const gboolean success = state == GTR_LOCKFILE_SUCCESS;
@@ -247,8 +244,7 @@ pref_int_get( const char * key )
 }
 
 void
-pref_int_set( const char * key,
-              int64_t      value )
+pref_int_set( const char * key, int64_t value )
 {
     tr_bencDictAddInt( getPrefs( ), key, value );
 }
@@ -262,8 +258,7 @@ pref_double_get( const char * key )
 }
 
 void
-pref_double_set( const char * key,
-                 double       value )
+pref_double_set( const char * key, double value )
 {
     tr_bencDictAddReal( getPrefs( ), key, value );
 }
@@ -280,26 +275,8 @@ pref_flag_get( const char * key )
     return boolVal != 0;
 }
 
-gboolean
-pref_flag_eval( pref_flag_t  val,
-                const char * key )
-{
-    switch( val )
-    {
-        case PREF_FLAG_TRUE:
-            return TRUE;
-
-        case PREF_FLAG_FALSE:
-            return FALSE;
-
-        default:
-            return pref_flag_get( key );
-    }
-}
-
 void
-pref_flag_set( const char * key,
-               gboolean     value )
+pref_flag_set( const char * key, gboolean value )
 {
     tr_bencDictAddBool( getPrefs( ), key, value );
 }
@@ -351,8 +328,7 @@ getCompat121PrefsFilename( void )
 }
 
 static void
-translate_keyfile_to_json( const char * old_file,
-                           const char * new_file )
+translate_keyfile_to_json( const char * old_file, const char * new_file )
 {
     tr_benc    dict;
     GKeyFile * keyfile;

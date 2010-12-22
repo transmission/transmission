@@ -21,6 +21,7 @@
 #include <libtransmission/utils.h> /* tr_free */
 
 #include "actions.h"
+#include "conf.h"
 #include "details.h"
 #include "favicon.h" /* gtr_get_favicon() */
 #include "file-list.h"

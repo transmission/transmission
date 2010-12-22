@@ -407,14 +407,12 @@ onAddDialogResponse( GtkDialog * dialog,
         GtkFileChooser  * chooser = GTK_FILE_CHOOSER( dialog );
         GtkWidget       * w = gtk_file_chooser_get_extra_widget( chooser );
         GtkToggleButton * tb = GTK_TOGGLE_BUTTON( w );
-        const gboolean    showOptions = gtk_toggle_button_get_active( tb );
-        const pref_flag_t start = PREF_FLAG_DEFAULT;
-        const pref_flag_t prompt = showOptions
-                                 ? PREF_FLAG_TRUE
-                                 : PREF_FLAG_FALSE;
+        const gboolean    doStart = pref_flag_get( TR_PREFS_KEY_START );
+        const gboolean    doPrompt = gtk_toggle_button_get_active( tb );
+        const gboolean    doNotify = FALSE;
         GSList * l = gtk_file_chooser_get_filenames( chooser );
 
-        tr_core_add_list( core, l, start, prompt, FALSE );
+        tr_core_add_list( core, l, doStart, doPrompt, doNotify );
     }
 
     gtk_widget_destroy( GTK_WIDGET( dialog ) );

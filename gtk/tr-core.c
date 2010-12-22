@@ -1189,15 +1189,13 @@ tr_core_present_window( TrCore      * core UNUSED,
 void
 tr_core_add_list( TrCore       * core,
                   GSList       * torrentFiles,
-                  pref_flag_t    start,
-                  pref_flag_t    prompt,
+                  gboolean       doStart,
+                  gboolean       doPrompt,
                   gboolean       doNotify )
 {
-    const gboolean doStart = pref_flag_eval( start, TR_PREFS_KEY_START );
-    const gboolean doPrompt = pref_flag_eval( prompt, PREF_KEY_OPTIONS_PROMPT );
     GSList * l;
 
-    for( l = torrentFiles; l != NULL; l = l->next )
+    for( l=torrentFiles; l!=NULL; l=l->next )
     {
         char * filename = l->data;
         add_filename( core, filename, doStart, doPrompt, doNotify );
@@ -1207,6 +1205,15 @@ tr_core_add_list( TrCore       * core,
     tr_core_torrents_added( core );
 
     g_slist_free( torrentFiles );
+}
+
+void
+tr_core_add_list_defaults( TrCore * core, GSList * torrentFiles, gboolean doNotify )
+{
+    const gboolean doStart = pref_flag_get( TR_PREFS_KEY_START );
+    const gboolean doPrompt = pref_flag_get( PREF_KEY_OPTIONS_PROMPT );
+
+    tr_core_add_list( core, torrentFiles, doStart, doPrompt, doNotify );
 }
 
 void

@@ -29,7 +29,6 @@
 #include <gtk/gtk.h>
 
 #include <libtransmission/transmission.h>
-#include "conf.h" /* pref_flag_t */
 #include "tr-torrent.h"
 
 #define TR_CORE_TYPE ( tr_core_get_type( ) )
@@ -104,14 +103,15 @@ void tr_core_load( TrCore * self, gboolean forcepaused );
  * May pop up dialogs for each torrent if that preference is enabled.
  * May trigger one or more "error" signals with TR_CORE_ERR_ADD_TORRENT
  */
-void     tr_core_add_list( TrCore *    self,
-                           GSList *    torrentFiles,
-                           pref_flag_t start,
-                           pref_flag_t prompt,
-                           gboolean    doNotify );
+void tr_core_add_list( TrCore *    self,
+                       GSList *    torrentFiles,
+                       gboolean    doStart,
+                       gboolean    doPrompt,
+                       gboolean    doNotify );
 
-#define tr_core_add_list_defaults( c, l, doNotify ) \
-    tr_core_add_list( c, l, PREF_FLAG_DEFAULT, PREF_FLAG_DEFAULT, doNotify )
+void tr_core_add_list_defaults( TrCore    * core,
+                                GSList    * torrentFiles,
+                                gboolean    doNotify );
 
 
 /** @brief Add a torrent. */
