@@ -752,6 +752,24 @@ gtr_widget_set_visible( GtkWidget * w, gboolean b )
 #endif
 }
 
+static GtkWidget*
+gtr_dialog_get_content_area( GtkDialog * dialog )
+{
+#if GTK_CHECK_VERSION( 2,14,0 )
+    return gtk_dialog_get_content_area( dialog );
+#else
+    return dialog->vbox;
+#endif
+}
+
+void
+gtr_dialog_set_content( GtkDialog * dialog, GtkWidget * content )
+{
+    GtkWidget * vbox = gtr_dialog_get_content_area( dialog );
+    gtk_box_pack_start( GTK_BOX( vbox ), content, TRUE, TRUE, 0 );
+    gtk_widget_show_all( content );
+}
+
 /***
 ****
 ***/

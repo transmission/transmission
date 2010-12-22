@@ -101,16 +101,13 @@ gtr_confirm_quit( GtkWindow *    parent,
     dontask = gtk_check_button_new_with_mnemonic( _( "_Don't ask me again" ) );
     stuff->dontask = dontask;
 
-    gtk_box_pack_start( GTK_BOX( GTK_DIALOG(
-                                     wind )->vbox ), dontask, FALSE, FALSE,
-                        GUI_PAD );
+    gtr_dialog_set_content( GTK_DIALOG( wind ), dontask );
 
     g_signal_connect( G_OBJECT( wind ), "response",
                       G_CALLBACK( quitresp ), stuff );
     gtk_widget_grab_focus( w );
 
-    gtk_widget_show_all( wind );
-
+    gtk_widget_show( wind );
     return wind;
 }
 

@@ -1270,8 +1270,7 @@ gtr_prefs_dialog_new( GtkWindow * parent, GObject * core )
                               gtk_label_new ( _( "Web" ) ) );
 
     g_signal_connect( d, "response", G_CALLBACK( response_cb ), core );
-    gtk_box_pack_start( GTK_BOX( GTK_DIALOG( d )->vbox ), n, TRUE, TRUE, 0 );
-    gtk_widget_show_all( GTK_DIALOG( d )->vbox );
+    gtr_dialog_set_content( GTK_DIALOG( d ), n );
     return d;
 }
 

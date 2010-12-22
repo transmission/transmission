@@ -157,7 +157,6 @@ gtr_stats_dialog_new( GtkWindow * parent, TrCore * core )
                                              TR_RESPONSE_RESET,
                                              -1 );
     t = hig_workarea_create( );
-    gtk_box_pack_start( GTK_BOX( GTK_DIALOG( d )->vbox ), t, TRUE, TRUE, 0 );
     ui->core = core;
 
     hig_workarea_add_section_title( t, &row, _( "Current Session" ) );
@@ -182,7 +181,7 @@ gtr_stats_dialog_new( GtkWindow * parent, TrCore * core )
     l = ui->all_time_lb = gtk_label_new( NULL );
     hig_workarea_add_row( t, &row, _( "Duration:" ), l, NULL );
     hig_workarea_finish( t, &row );
-    gtk_widget_show_all( t );
+    gtr_dialog_set_content( GTK_DIALOG( d ), t );
 
     updateStats( ui );
     g_object_set_data_full( G_OBJECT( d ), "data", ui, g_free );

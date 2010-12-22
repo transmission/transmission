@@ -1189,9 +1189,9 @@ flushAddTorrentErrors( GtkWindow *  window,
                        const char * primary,
                        GSList **    files )
 {
-    GString *   s = g_string_new( NULL );
-    GSList *    l;
+    GSList * l;
     GtkWidget * w;
+    GString * s = g_string_new( NULL );
 
     if( g_slist_length( *files ) > 1 ) {
         for( l=*files; l!=NULL; l=l->next )
@@ -1209,7 +1209,7 @@ flushAddTorrentErrors( GtkWindow *  window,
                                               "%s", s->str );
     g_signal_connect_swapped( w, "response",
                               G_CALLBACK( gtk_widget_destroy ), w );
-    gtk_widget_show_all( w );
+    gtk_widget_show( w );
     g_string_free( s, TRUE );
 
     g_slist_foreach( *files, (GFunc)g_free, NULL );
@@ -1534,7 +1534,7 @@ about( GtkWindow * parent )
                       NULL );
     gtk_window_set_transient_for( GTK_WINDOW( d ), parent );
     g_signal_connect_swapped( d, "response", G_CALLBACK (gtk_widget_destroy), d );
-    gtk_widget_show_all( d );
+    gtk_widget_show( d );
 }
 
 static void

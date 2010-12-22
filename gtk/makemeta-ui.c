@@ -197,8 +197,8 @@ makeProgressDialog( GtkWidget * parent, MakeMetaUI * ui )
     g_object_weak_ref( G_OBJECT( d ), onProgressDialogDestroyed, ui );
     onProgressDialogRefresh( ui );
 
-    gtk_box_pack_start( GTK_BOX( GTK_DIALOG( d )->vbox ), fr, TRUE, TRUE, 0 );
-    gtk_widget_show_all( d );
+    gtr_dialog_set_content( GTK_DIALOG( d ), fr );
+    gtk_widget_show( d );
 }
 
 static void
@@ -517,12 +517,11 @@ gtr_torrent_creation_dialog_new( GtkWindow  * parent, TrCore * core )
         ui->private_check = w;
 
     hig_workarea_finish( t, &row );
-    gtk_box_pack_start( GTK_BOX( GTK_DIALOG( d )->vbox ), t, TRUE, TRUE, 0 );
+    gtr_dialog_set_content( GTK_DIALOG( d ), t );
 
     gtk_drag_dest_set( d, GTK_DEST_DEFAULT_ALL, NULL, 0, GDK_ACTION_COPY );
     gtk_drag_dest_add_uri_targets( d );
     g_signal_connect( d, "drag-data-received", G_CALLBACK( on_drag_data_received ), ui );
 
-    gtk_widget_show_all( t );
     return d;
 }

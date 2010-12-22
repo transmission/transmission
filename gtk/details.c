@@ -2204,8 +2204,8 @@ onEditTrackers( GtkButton * button, gpointer data )
         hig_workarea_add_wide_tall_control( t, &row, fr );
 
     hig_workarea_finish( t, &row );
-    gtk_box_pack_start( GTK_BOX( GTK_DIALOG( d )->vbox ), t, TRUE, TRUE, GUI_PAD_SMALL );
-    gtk_widget_show_all( d );
+    gtr_dialog_set_content( GTK_DIALOG( d ), t );
+    gtk_widget_show( d );
 }
 
 static GtkWidget*
@@ -2367,11 +2367,9 @@ gtr_torrent_details_dialog_new( GtkWindow * parent, TrCore * core )
     l = gtk_label_new( _( "Options" ) );
     gtk_notebook_append_page( GTK_NOTEBOOK( n ), w, l );
 
-    gtk_box_pack_start( GTK_BOX( GTK_DIALOG( d )->vbox ), n, TRUE, TRUE, 0 );
-
+    gtr_dialog_set_content( GTK_DIALOG( d ), n );
     di->periodic_refresh_tag = gtr_timeout_add_seconds( SECONDARY_WINDOW_REFRESH_INTERVAL_SECONDS,
                                                         periodic_refresh, di );
-    gtk_widget_show_all( GTK_DIALOG( d )->vbox );
     return d;
 }
 
