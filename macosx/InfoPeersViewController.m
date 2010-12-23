@@ -185,7 +185,7 @@
         
         if (connected > 0)
         {
-            NSMutableArray * fromComponents = [NSMutableArray arrayWithCapacity: 6];
+            NSMutableArray * fromComponents = [NSMutableArray arrayWithCapacity: 7];
             if (tracker > 0)
                 [fromComponents addObject: [NSString stringWithFormat:
                                         NSLocalizedString(@"%d tracker", "Inspector -> Peers tab -> peers"), tracker]];
