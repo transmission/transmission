@@ -100,10 +100,10 @@ tr_strltime( char * buf, int seconds, size_t buflen )
     minutes = ( seconds % 3600 ) / 60;
     seconds = ( seconds % 3600 ) % 60;
 
-    tr_snprintf( d, sizeof( d ), "%'d %s", days, days==1?"day":"days" );
-    tr_snprintf( h, sizeof( h ), "%'d %s", hours, hours==1?"hour":"hours" );
-    tr_snprintf( m, sizeof( m ), "%'d %s", minutes, minutes==1?"minute":"minutes" );
-    tr_snprintf( s, sizeof( s ), "%'d %s", seconds, seconds==1?"seconds":"seconds" );
+    tr_snprintf( d, sizeof( d ), "%d %s", days, days==1?"day":"days" );
+    tr_snprintf( h, sizeof( h ), "%d %s", hours, hours==1?"hour":"hours" );
+    tr_snprintf( m, sizeof( m ), "%d %s", minutes, minutes==1?"minute":"minutes" );
+    tr_snprintf( s, sizeof( s ), "%d %s", seconds, seconds==1?"seconds":"seconds" );
 
     if( days )
     {
