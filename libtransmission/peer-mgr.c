@@ -1584,7 +1584,7 @@ ensureAtomExists( Torrent           * t,
     }
     else
     {
-        if (from < a->fromBest)
+        if( from < a->fromBest )
             a->fromBest = from;
         
         if( a->seedProbability == -1 )
