@@ -100,10 +100,10 @@ tr_strltime( char * buf, int seconds, size_t buflen )
     minutes = ( seconds % 3600 ) / 60;
     seconds = ( seconds % 3600 ) % 60;
 
-    tr_snprintf( d, sizeof( d ), "%'d day%s", days, days==1?"":"s" );
-    tr_snprintf( h, sizeof( h ), "%'d hour%s", hours, hours==1?"":"s" );
-    tr_snprintf( m, sizeof( m ), "%'d minute%s", minutes, minutes==1?"":"s" );
-    tr_snprintf( s, sizeof( s ), "%'d second%s", seconds, seconds==1?"":"s" );
+    tr_snprintf( d, sizeof( d ), "%'d %s", days, days==1?"day":"days" );
+    tr_snprintf( h, sizeof( h ), "%'d %s", hours, hours==1?"hour":"hours" );
+    tr_snprintf( m, sizeof( m ), "%'d %s", minutes, minutes==1?"minute":"minutes" );
+    tr_snprintf( s, sizeof( s ), "%'d %s", seconds, seconds==1?"seconds":"seconds" );
 
     if( days )
     {
@@ -1346,7 +1346,7 @@ printTrackersImpl( tr_benc * trackerStats )
                 {
                     tr_strltime( buf, now - lastAnnounceTime, sizeof( buf ) );
                     if( lastAnnounceSucceeded )
-                        printf( "  Got a list of %'d peers %s ago\n",
+                        printf( "  Got a list of %d peers %s ago\n",
                                 (int)lastAnnouncePeerCount, buf );
                     else if( lastAnnounceTimedOut )
                         printf( "  Peer list request timed out; will retry\n" );
@@ -1377,7 +1377,7 @@ printTrackersImpl( tr_benc * trackerStats )
                 {
                     tr_strltime( buf, now - lastScrapeTime, sizeof( buf ) );
                     if( lastScrapeSucceeded )
-                        printf( "  Tracker had %'d seeders and %'d leechers %s ago\n",
+                        printf( "  Tracker had %d seeders and %d leechers %s ago\n",
                                 (int)seederCount, (int)leecherCount, buf );
                     else if( lastScrapeTimedOut )
                         printf( "  Tracker scrape timed out; will retry\n" );
