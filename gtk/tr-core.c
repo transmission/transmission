@@ -65,7 +65,6 @@ enum
   BUSY_SIGNAL,
   PORT_SIGNAL,
   PREFS_SIGNAL,
-  QUIT_SIGNAL,
 
   LAST_SIGNAL
 };
@@ -177,16 +176,6 @@ tr_core_class_init( gpointer              g_class,
         g_cclosure_marshal_VOID__BOOLEAN,
         G_TYPE_NONE,
         1, G_TYPE_BOOLEAN );
-
-    core_signals[QUIT_SIGNAL] = g_signal_new(
-        "quit",
-        G_TYPE_FROM_CLASS( g_class ),
-        G_SIGNAL_RUN_LAST,
-        G_STRUCT_OFFSET(TrCoreClass, quit),
-        NULL, NULL,
-        g_cclosure_marshal_VOID__VOID,
-        G_TYPE_NONE,
-        0 );
 
     core_signals[PREFS_SIGNAL] = g_signal_new(
         "prefs-changed",
@@ -1375,12 +1364,6 @@ tr_core_update( TrCore * self )
 
     /* maybe inhibit hibernation */
     maybeInhibitHibernation( self );
-}
-
-void
-tr_core_quit( TrCore * core )
-{
-    g_signal_emit( core, core_signals[QUIT_SIGNAL], 0 );
 }
 
 /**

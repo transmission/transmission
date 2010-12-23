@@ -153,9 +153,6 @@ void  tr_core_remove_torrent_from_id( TrCore * self, int id, gboolean deleteFile
 /* update the model with current torrent status */
 void  tr_core_update( TrCore * self );
 
-/* emit the "quit" signal */
-void  tr_core_quit( TrCore * self );
-
 /**
 ***  Set a preference value, save the prefs file, and emit the "prefs-changed" signal
 **/
