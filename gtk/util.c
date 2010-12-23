@@ -819,16 +819,16 @@ gtr_thread_func( gpointer data )
 }
 #endif
 
-void
+guint
 gtr_idle_add( GSourceFunc function, gpointer data )
 {
 #if GTK_CHECK_VERSION( 2,12,0 )
-    gdk_threads_add_idle( function, data );
+    return gdk_threads_add_idle( function, data );
 #else
-    g_idle_add_full( G_PRIORITY_DEFAULT,
-                     gtr_thread_func,
-                     gtr_func_data_new( function, data ),
-                     gtr_func_data_free );
+    return g_idle_add_full( G_PRIORITY_DEFAULT,
+                            gtr_thread_func,
+                            gtr_func_data_new( function, data ),
+                            gtr_func_data_free );
 #endif
 }
 
