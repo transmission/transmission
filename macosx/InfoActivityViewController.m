@@ -142,6 +142,9 @@
         
         [fDateCompletedField setObjectValue: [torrent dateCompleted]];
         
+        [fDownloadTimeField setStringValue: [NSString timeString: [torrent secondsDownloading] showSeconds: YES]];
+        [fSeedTimeField setStringValue: [NSString timeString: [torrent secondsSeeding] showSeconds: YES]];
+        
         [fPiecesView updateView];
     }
     else if (numberSelected > 1)
@@ -189,6 +192,9 @@
         
         [fDateAddedField setStringValue: @""];
         [fDateCompletedField setStringValue: @""];
+        
+        [fDownloadTimeField setStringValue: @""];
+        [fSeedTimeField setStringValue: @""];
         
         [fPiecesControl setSelected: NO forSegment: PIECES_CONTROL_AVAILABLE];
         [fPiecesControl setSelected: NO forSegment: PIECES_CONTROL_PROGRESS];

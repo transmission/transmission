@@ -37,7 +37,8 @@
     IBOutlet NSTextField * fDateAddedField, * fDateCompletedField, * fDateActivityField,
                         * fStateField, * fProgressField,
                         * fHaveField, * fDownloadedTotalField, * fUploadedTotalField, * fFailedHashField,
-                        * fRatioField;
+                        * fRatioField,
+                        * fDownloadTimeField, * fSeedTimeField;
     
     IBOutlet NSTextView * fErrorMessageView;
     

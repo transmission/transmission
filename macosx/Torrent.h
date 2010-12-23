@@ -226,6 +226,9 @@
 - (NSDate *) dateActivity;
 - (NSDate *) dateActivityOrAdd;
 
+- (NSInteger) secondsDownloading;
+- (NSInteger) secondsSeeding;
+
 - (NSInteger) stalledMinutes;
 - (BOOL) isStalled;
 

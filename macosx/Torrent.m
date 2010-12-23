@@ -1509,6 +1509,16 @@ int trashDataFile(const char * filename)
     return date ? date : [self dateAdded];
 }
 
+- (NSInteger) secondsDownloading
+{
+    return fStat->secondsDownloading;
+}
+
+- (NSInteger) secondsSeeding
+{
+    return fStat->secondsSeeding;
+}
+
 - (NSInteger) stalledMinutes
 {
     if (fStat->idleSecs == -1)
