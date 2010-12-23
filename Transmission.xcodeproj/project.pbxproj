@@ -312,7 +312,6 @@
 		BEFC1E2B0C07861A00B0BB3C /* utils.c in Sources */ = {isa = PBXBuildFile; fileRef = BEFC1DF20C07861A00B0BB3C /* utils.c */; };
 		BEFC1E2C0C07861A00B0BB3C /* upnp.h in Headers */ = {isa = PBXBuildFile; fileRef = BEFC1DF30C07861A00B0BB3C /* upnp.h */; };
 		BEFC1E2D0C07861A00B0BB3C /* upnp.c in Sources */ = {isa = PBXBuildFile; fileRef = BEFC1DF40C07861A00B0BB3C /* upnp.c */; };
-		BEFC1E2E0C07861A00B0BB3C /* transmission.h in Headers */ = {isa = PBXBuildFile; fileRef = BEFC1DF50C07861A00B0BB3C /* transmission.h */; };
 		BEFC1E2F0C07861A00B0BB3C /* session.c in Sources */ = {isa = PBXBuildFile; fileRef = BEFC1DF60C07861A00B0BB3C /* session.c */; };
 		BEFC1E320C07861A00B0BB3C /* torrent.c in Sources */ = {isa = PBXBuildFile; fileRef = BEFC1DF90C07861A00B0BB3C /* torrent.c */; };
 		BEFC1E350C07861A00B0BB3C /* port-forwarding.h in Headers */ = {isa = PBXBuildFile; fileRef = BEFC1DFC0C07861A00B0BB3C /* port-forwarding.h */; };
@@ -1579,7 +1578,6 @@
 				BEFC1E2C0C07861A00B0BB3C /* upnp.h in Headers */,
 				A2AAB65D0DE0CF6200E04DDA /* rpcimpl.h in Headers */,
 				A2AAB65E0DE0CF6200E04DDA /* rpc-server.h in Headers */,
-				BEFC1E2E0C07861A00B0BB3C /* transmission.h in Headers */,
 				BEFC1E350C07861A00B0BB3C /* port-forwarding.h in Headers */,
 				BEFC1E390C07861A00B0BB3C /* ratecontrol.h in Headers */,
 				BEFC1E3B0C07861A00B0BB3C /* platform.h in Headers */,
@@ -2496,7 +2494,6 @@
 				GCC_DEBUGGING_SYMBOLS = full;
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					"third-party/shttpd",
 					"third-party/libevent/include",
 					"third-party/libevent",
 					"third-party",
@@ -2557,7 +2554,7 @@
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					.,
-					"third-party/",
+					"third-party/libevent/include",
 					"third-party/libevent",
 				);
 				OTHER_CFLAGS = (
@@ -2575,7 +2572,7 @@
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					.,
-					"third-party/",
+					"third-party/libevent/include",
 					"third-party/libevent",
 				);
 				OTHER_CFLAGS = "-DHAVE_LIBZ";
@@ -2695,7 +2692,6 @@
 			buildSettings = {
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					"third-party/shttpd",
 					"third-party/libevent/include",
 					"third-party/libevent",
 					"third-party",
@@ -2941,7 +2937,6 @@
 				GCC_DEBUGGING_SYMBOLS = full;
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					"third-party/shttpd",
 					"third-party/libevent/include",
 					"third-party/libevent",
 					"third-party",
@@ -2973,7 +2968,7 @@
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					.,
-					"third-party/",
+					"third-party/libevent/include",
 					"third-party/libevent",
 				);
 				OTHER_CFLAGS = (
@@ -2991,7 +2986,7 @@
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					.,
-					"third-party/",
+					"third-party/libevent/include",
 					"third-party/libevent",
 				);
 				OTHER_CFLAGS = "-DHAVE_LIBZ";
@@ -3082,7 +3077,7 @@
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					.,
-					"third-party/",
+					"third-party/libevent/include",
 					"third-party/libevent",
 				);
 				OTHER_CFLAGS = (
@@ -3099,7 +3094,7 @@
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					.,
-					"third-party/",
+					"third-party/libevent/include",
 					"third-party/libevent",
 				);
 				OTHER_CFLAGS = "-DHAVE_LIBZ";
