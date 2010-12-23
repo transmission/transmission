@@ -594,6 +594,10 @@ addField( const tr_torrent * tor, tr_benc * d, const char * key )
         tr_bencDictAddInt( d, key, st->startDate );
     else if( tr_streq( key, keylen, "status" ) )
         tr_bencDictAddInt( d, key, st->activity );
+    else if( tr_streq( key, keylen, "secondsDownloading" ) )
+        tr_bencDictAddInt( d, key, st->secondsDownloading );
+    else if( tr_streq( key, keylen, "secondsSeeding" ) )
+        tr_bencDictAddInt( d, key, st->secondsSeeding );
     else if( tr_streq( key, keylen, "trackers" ) )
         addTrackers( inf, tr_bencDictAddList( d, key, inf->trackerCount ) );
     else if( tr_streq( key, keylen, "trackerStats" ) ) {

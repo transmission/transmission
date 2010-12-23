@@ -546,10 +546,33 @@ onNowTimer( int foo UNUSED, short bar UNUSED, void * vsession )
     const int min = 100;
     const int max = 999999;
     struct timeval tv;
+    tr_torrent * tor = NULL;
     tr_session * session = vsession;
 
     assert( tr_isSession( session ) );
     assert( session->nowTimer != NULL );
+
+    /**
+    ***  tr_session things to do once per second
+    **/
+
+    tr_timeUpdate( time( NULL ) );
+
+    if( session->turtle.isClockEnabled )
+        turtleCheckClock( session, &session->turtle );
+
+    while(( tor = tr_torrentNext( session, tor ))) {
+        if( tor->isRunning ) {
+            if( tr_torrentIsSeed( tor ) )
+                ++tor->secondsSeeding;
+            else
+                ++tor->secondsDownloading;
+        }
+    }
+
+    /**
+    ***  Set the timer
+    **/
 
     /* schedule the next timer for right after the next second begins */
     gettimeofday( &tv, NULL );
@@ -558,11 +581,6 @@ onNowTimer( int foo UNUSED, short bar UNUSED, void * vsession )
     if( usec < min ) usec = min;
     tr_timerAdd( session->nowTimer, 0, usec );
     /* fprintf( stderr, "time %zu sec, %zu microsec\n", (size_t)tr_time(), (size_t)tv.tv_usec ); */
-
-    /* tr_session things to do once per second */
-    tr_timeUpdate( tv.tv_sec );
-    if( session->turtle.isClockEnabled )
-        turtleCheckClock( session, &session->turtle );
 }
 
 static void loadBlocklists( tr_session * session );

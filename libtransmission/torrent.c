@@ -1160,14 +1160,16 @@ tr_torrentStat( tr_torrent * tor )
     s->percentComplete = tr_cpPercentComplete ( &tor->completion );
     s->metadataPercentComplete = tr_torrentGetMetadataPercent( tor );
 
-    s->percentDone      = tr_cpPercentDone  ( &tor->completion );
-    s->leftUntilDone    = tr_cpLeftUntilDone( &tor->completion );
-    s->sizeWhenDone     = tr_cpSizeWhenDone ( &tor->completion );
-    s->recheckProgress  = s->activity == TR_STATUS_CHECK ? getVerifyProgress( tor ) : 0;
-    s->activityDate     = tor->activityDate;
-    s->addedDate        = tor->addedDate;
-    s->doneDate         = tor->doneDate;
-    s->startDate        = tor->startDate;
+    s->percentDone         = tr_cpPercentDone  ( &tor->completion );
+    s->leftUntilDone       = tr_cpLeftUntilDone( &tor->completion );
+    s->sizeWhenDone        = tr_cpSizeWhenDone ( &tor->completion );
+    s->recheckProgress     = s->activity == TR_STATUS_CHECK ? getVerifyProgress( tor ) : 0;
+    s->activityDate        = tor->activityDate;
+    s->addedDate           = tor->addedDate;
+    s->doneDate            = tor->doneDate;
+    s->startDate           = tor->startDate;
+    s->secondsSeeding      = tor->secondsSeeding;
+    s->secondsDownloading  = tor->secondsDownloading;
 
     if ((s->activity == TR_STATUS_DOWNLOAD || s->activity == TR_STATUS_SEED) && s->startDate != 0)
         s->idleSecs = difftime(tr_time(), MAX(s->startDate, s->activityDate));

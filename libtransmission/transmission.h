@@ -1873,6 +1873,12 @@ typedef struct tr_stat
         -1 if activity is not seeding or downloading. */
     int    idleSecs;
 
+    /** Cumulative seconds the torrent's ever spent downloading */
+    int    secondsDownloading;
+
+    /** Cumulative seconds the torrent's ever spent seeding */
+    int    secondsSeeding;
+
     /** A torrent is considered finished if it has met its seed ratio.
         As a result, only paused torrents can be finished. */
     tr_bool   finished;
