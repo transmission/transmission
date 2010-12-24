@@ -166,22 +166,31 @@ watchdir_free_impl( dtr_watchdir * w )
 {
     evbuffer_free( w->lastFiles );
 }
+
+static char*
+get_key_from_file( const char * filename, const size_t len )
+{
+    return tr_strdup_printf( "%c%*.*s%d", FILE_DELIMITER, (int)len, (int)len, filename, FILE_DELIMITER );
+}
+
 static void
 add_file_to_list( struct evbuffer * buf, const char * filename, size_t len )
 {
-    const char delimiter = FILE_DELIMITER;
-    evbuffer_add( buf, &delimiter, 1 );
-    evbuffer_add( buf, filename, len );
-    evbuffer_add( buf, &delimiter, 1 );
+    char * key = get_key_from_file( filename, len );
+    evbuffer_add( buf, key, strlen( key ) );
+    tr_free( key );
 }
 static tr_bool
 is_file_in_list( struct evbuffer * buf, const char * filename, size_t len )
 {
     tr_bool in_list;
-    struct evbuffer * test = evbuffer_new( );
-    add_file_to_list( test, filename, len );
-    in_list = evbuffer_find( buf, EVBUFFER_DATA( test ), EVBUFFER_LENGTH( test ) ) != NULL;
-    evbuffer_free( test );
+    struct evbuffer_ptr ptr;
+    char * key = get_key_from_file( filename, len );
+
+    ptr = evbuffer_search( buf, key, strlen( key ), NULL );
+    in_list = ptr.pos != -1;
+
+    tr_free( key );
     return in_list;
 }
 static void
