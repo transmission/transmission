@@ -400,21 +400,21 @@ registerMagnetLinkHandler( void )
 }
 
 static void
-onMainWindowSizeAllocated( GtkWidget *            window,
+onMainWindowSizeAllocated( GtkWidget      * gtk_window,
                            GtkAllocation  * alloc UNUSED,
                            gpointer         gdata UNUSED )
 {
-    const gboolean isMaximized = window->window
-                            && ( gdk_window_get_state( window->window )
-                                 & GDK_WINDOW_STATE_MAXIMIZED );
+    GdkWindow * gdk_window = gtr_widget_get_window( gtk_window );
+    const gboolean isMaximized = ( gdk_window != NULL )
+                              && ( gdk_window_get_state( gdk_window ) & GDK_WINDOW_STATE_MAXIMIZED );
 
     gtr_pref_int_set( PREF_KEY_MAIN_WINDOW_IS_MAXIMIZED, isMaximized );
 
     if( !isMaximized )
     {
         int x, y, w, h;
-        gtk_window_get_position( GTK_WINDOW( window ), &x, &y );
-        gtk_window_get_size( GTK_WINDOW( window ), &w, &h );
+        gtk_window_get_position( GTK_WINDOW( gtk_window ), &x, &y );
+        gtk_window_get_size( GTK_WINDOW( gtk_window ), &w, &h );
         gtr_pref_int_set( PREF_KEY_MAIN_WINDOW_X, x );
         gtr_pref_int_set( PREF_KEY_MAIN_WINDOW_Y, y );
         gtr_pref_int_set( PREF_KEY_MAIN_WINDOW_WIDTH, w );

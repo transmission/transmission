@@ -715,6 +715,16 @@ gtr_widget_set_tooltip_text( GtkWidget * w, const char * tip )
 #endif
 }
 
+GdkWindow*
+gtr_widget_get_window( GtkWidget * w )
+{
+#if GTK_CHECK_VERSION( 2,14,0 )
+    return gtk_widget_get_window( w );
+#else
+    return w->window;
+#endif
+}
+
 gboolean
 gtr_widget_get_realized( GtkWidget * w )
 {
@@ -750,6 +760,17 @@ gtr_widget_set_visible( GtkWidget * w, gboolean b )
         gtk_widget_show( w );
     else
         gtk_widget_hide( w );
+#endif
+}
+
+void
+gtr_cell_renderer_get_padding( GtkCellRenderer * cell, gint * xpad, gint * ypad )
+{
+#if GTK_CHECK_VERSION( 2,18,0 )
+    gtk_cell_renderer_get_padding( cell, xpad, ypad );
+#else
+    if( xpad != NULL ) *xpad = cell->xpad;
+    if( ypad != NULL ) *ypad = cell->ypad;
 #endif
 }
 
