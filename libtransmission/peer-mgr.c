@@ -16,7 +16,7 @@
 #include <string.h> /* memcpy, memcmp, strstr */
 #include <stdlib.h> /* qsort */
 
-#include <event.h>
+#include <event2/event.h>
 
 #include "transmission.h"
 #include "announcer.h"
@@ -503,8 +503,7 @@ deleteTimer( struct event ** t )
 {
     if( *t != NULL )
     {
-        evtimer_del( *t );
-        tr_free( *t );
+        event_free( *t );
         *t = NULL;
     }
 }
@@ -2042,10 +2041,9 @@ static void rechokePulse   ( int, short, void * );
 static void reconnectPulse ( int, short, void * );
 
 static struct event *
-createTimer( int msec, void (*callback)(int, short, void *), void * cbdata )
+createTimer( tr_session * session, int msec, void (*callback)(int, short, void *), void * cbdata )
 {
-    struct event * timer = tr_new0( struct event, 1 );
-    evtimer_set( timer, callback, cbdata );
+    struct event * timer = evtimer_new( session->event_base, callback, cbdata );
     tr_timerAddMsec( timer, msec );
     return timer;
 }
@@ -2054,16 +2052,16 @@ static void
 ensureMgrTimersExist( struct tr_peerMgr * m )
 {
     if( m->atomTimer == NULL )
-        m->atomTimer = createTimer( ATOM_PERIOD_MSEC, atomPulse, m );
+        m->atomTimer = createTimer( m->session, ATOM_PERIOD_MSEC, atomPulse, m );
 
     if( m->bandwidthTimer == NULL )
-        m->bandwidthTimer = createTimer( BANDWIDTH_PERIOD_MSEC, bandwidthPulse, m );
+        m->bandwidthTimer = createTimer( m->session, BANDWIDTH_PERIOD_MSEC, bandwidthPulse, m );
 
     if( m->rechokeTimer == NULL )
-        m->rechokeTimer = createTimer( RECHOKE_PERIOD_MSEC, rechokePulse, m );
+        m->rechokeTimer = createTimer( m->session, RECHOKE_PERIOD_MSEC, rechokePulse, m );
 
-   if( m->refillUpkeepTimer == NULL )
-        m->refillUpkeepTimer = createTimer( REFILL_UPKEEP_PERIOD_MSEC, refillUpkeep, m );
+    if( m->refillUpkeepTimer == NULL )
+        m->refillUpkeepTimer = createTimer( m->session, REFILL_UPKEEP_PERIOD_MSEC, refillUpkeep, m );
 }
 
 void

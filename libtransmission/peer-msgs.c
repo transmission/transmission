@@ -2334,7 +2334,7 @@ tr_peerMsgsNew( struct tr_torrent    * torrent,
     m->outMessagesBatchedAt = 0;
     m->outMessagesBatchPeriod = LOW_PRIORITY_INTERVAL_SECS;
     m->incoming.block = evbuffer_new( );
-    m->pexTimer = evtimer_new( NULL, pexPulse, m );
+    m->pexTimer = evtimer_new( torrent->session->event_base, pexPulse, m );
     peer->msgs = m;
     tr_timerAdd( m->pexTimer, PEX_INTERVAL_SECS, 0 );
 

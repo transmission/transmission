@@ -21,7 +21,7 @@
 #include <unistd.h> /* stat */
 #include <dirent.h> /* opendir */
 
-#include <event.h>
+#include <event2/event.h>
 
 //#define TR_SHOW_DEPRECATED
 #include "transmission.h"
@@ -143,7 +143,7 @@ struct tr_bindinfo
 {
     int socket;
     tr_address addr;
-    struct event ev;
+    struct event * ev;
 };
 
 
@@ -152,7 +152,8 @@ close_bindinfo( struct tr_bindinfo * b )
 {
     if( ( b != NULL ) && ( b->socket >=0 ) )
     {
-        event_del( &b->ev );
+        event_free( b->ev );
+        b->ev = NULL;
         tr_netCloseSocket( b->socket );
     }
 }
@@ -201,8 +202,8 @@ open_incoming_peer_port( tr_session * session )
     b = session->public_ipv4;
     b->socket = tr_netBindTCP( &b->addr, session->private_peer_port, FALSE );
     if( b->socket >= 0 ) {
-        event_set( &b->ev, b->socket, EV_READ | EV_PERSIST, accept_incoming_peer, session );
-        event_add( &b->ev, NULL );
+        b->ev = event_new( session->event_base, b->socket, EV_READ | EV_PERSIST, accept_incoming_peer, session );
+        event_add( b->ev, NULL );
     }
 
     /* and do the exact same thing for ipv6, if it's supported... */
@@ -210,8 +211,8 @@ open_incoming_peer_port( tr_session * session )
         b = session->public_ipv6;
         b->socket = tr_netBindTCP( &b->addr, session->private_peer_port, FALSE );
         if( b->socket >= 0 ) {
-            event_set( &b->ev, b->socket, EV_READ | EV_PERSIST, accept_incoming_peer, session );
-            event_add( &b->ev, NULL );
+            b->ev = event_new( session->event_base, b->socket, EV_READ | EV_PERSIST, accept_incoming_peer, session );
+            event_add( b->ev, NULL );
         }
     }
 }
@@ -603,8 +604,8 @@ tr_sessionInitImpl( void * vdata )
     tr_sessionGetDefaultSettings( data->configDir, &settings );
     tr_bencMergeDicts( &settings, clientSettings );
 
-    session->nowTimer = tr_new0( struct event, 1 );
-    evtimer_set( session->nowTimer, onNowTimer, session );
+    assert( session->event_base != NULL );
+    session->nowTimer = evtimer_new( session->event_base, onNowTimer, session );
     onNowTimer( 0, 0, session );
 
 #ifndef WIN32
@@ -633,8 +634,7 @@ tr_sessionInitImpl( void * vdata )
 
     assert( tr_isSession( session ) );
 
-    session->saveTimer = tr_new0( struct event, 1 );
-    evtimer_set( session->saveTimer, onSaveTimer, session );
+    session->saveTimer = evtimer_new( session->event_base, onSaveTimer, session );
     tr_timerAdd( session->saveTimer, SAVE_INTERVAL_SECS, 0 );
 
     tr_announcerInit( session );
@@ -1666,12 +1666,10 @@ sessionCloseImpl( void * vsession )
     if( session->isDHTEnabled )
         tr_dhtUninit( session );
 
-    evtimer_del( session->saveTimer );
-    tr_free( session->saveTimer );
+    event_free( session->saveTimer );
     session->saveTimer = NULL;
 
-    evtimer_del( session->nowTimer );
-    tr_free( session->nowTimer );
+    event_free( session->nowTimer );
     session->nowTimer = NULL;
 
     tr_verifyClose( session );
@@ -1755,7 +1753,7 @@ tr_sessionClose( tr_session * session )
         {
             dbgmsg( "calling event_loopbreak()" );
             forced = TRUE;
-            event_loopbreak( );
+            event_base_loopbreak( session->event_base );
         }
         if( deadlineReached( deadline+3 ) )
         {

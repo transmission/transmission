@@ -400,12 +400,12 @@ tr_dhtInit(tr_session *ss, const tr_address * tr_addr)
     cl->len6 = len6;
     tr_threadNew( dht_bootstrap, cl );
 
-    dht_event = event_new( NULL, dht_socket, EV_READ, event_callback, NULL );
+    dht_event = event_new( session->event_base, dht_socket, EV_READ, event_callback, NULL );
     tr_timerAdd( dht_event, 0, tr_cryptoWeakRandInt( 1000000 ) );
 
     if( dht6_socket >= 0 )
     {
-        dht6_event = event_new( NULL, dht6_socket, EV_READ, event_callback, NULL );
+        dht6_event = event_new( session->event_base, dht6_socket, EV_READ, event_callback, NULL );
         tr_timerAdd( dht6_event, 0, tr_cryptoWeakRandInt( 1000000 ) );
     }
 

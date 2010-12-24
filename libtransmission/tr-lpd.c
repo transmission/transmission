@@ -338,7 +338,7 @@ int tr_lpdInit( tr_session* ss, tr_address* tr_addr UNUSED )
     /* Note: lpd_unsolicitedMsgCounter remains 0 until the first timeout event, thus
      * any announcement received during the initial interval will be discarded. */
 
-    lpd_event = event_new( NULL, lpd_socket, EV_READ | EV_PERSIST, event_callback, NULL );
+    lpd_event = event_new( ss->event_base, lpd_socket, EV_READ | EV_PERSIST, event_callback, NULL );
     event_add( lpd_event, NULL );
 
     tr_ndbg( "LPD", "Local Peer Discovery initialised" );

@@ -18,7 +18,7 @@
 
 #include <signal.h>
 
-#include <event.h>
+#include <event2/event.h>
 
 #include "transmission.h"
 #include "net.h"
@@ -143,7 +143,7 @@ typedef struct tr_event_handle
     tr_session *  session;
     tr_thread *  thread;
     struct event_base * base;
-    struct event pipeEvent;
+    struct event * pipeEvent;
 }
 tr_event_handle;
 
@@ -198,7 +198,7 @@ readFromPipe( int    fd,
         case '\0': /* eof */
         {
             dbgmsg( "pipe eof reached... removing event listener" );
-            event_del( &eh->pipeEvent );
+            event_free( eh->pipeEvent );
             break;
         }
 
@@ -222,6 +222,7 @@ logFunc( int severity, const char * message )
 static void
 libeventThreadFunc( void * veh )
 {
+    struct event_base * base;
     tr_event_handle * eh = veh;
 
 #ifndef WIN32
@@ -229,21 +230,23 @@ libeventThreadFunc( void * veh )
     signal( SIGPIPE, SIG_IGN );
 #endif
 
-    eh->base = event_init( );
+    base = event_base_new( );
+    eh->base = base;
+    eh->session->event_base = base;
     eh->session->events = eh;
 
     /* listen to the pipe's read fd */
-    event_set( &eh->pipeEvent, eh->fds[0], EV_READ | EV_PERSIST, readFromPipe, veh );
-    event_add( &eh->pipeEvent, NULL );
+    eh->pipeEvent = event_new( base, eh->fds[0], EV_READ | EV_PERSIST, readFromPipe, veh );
+    event_add( eh->pipeEvent, NULL );
     event_set_log_callback( logFunc );
 
     /* loop until all the events are done */
     while( !eh->die )
-        event_dispatch( );
+        event_base_dispatch( base );
 
     /* shut down the thread */
     tr_lockFree( eh->lock );
-    event_base_free( eh->base );
+    event_base_free( base );
     eh->session->events = NULL;
     tr_free( eh );
     tr_dbg( "Closing libevent thread" );
@@ -319,12 +322,4 @@ tr_runInEventThread( tr_session * session,
         pipewrite( fd, &data, sizeof( data ) );
         tr_lockUnlock( lock );
     }
-}
-
-struct event_base *
-tr_eventGetBase( tr_session * session )
-{
-    assert( tr_isSession( session ) );
-
-    return session->events->base;
 }

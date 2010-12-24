@@ -264,7 +264,7 @@ tr_announcerInit( tr_session * session )
     a->session = session;
     a->slotsAvailable = MAX_CONCURRENT_TASKS;
     a->lpdHouseKeepingAt = relaxUntil;
-    a->upkeepTimer = evtimer_new( NULL, onUpkeepTimer, a );
+    a->upkeepTimer = evtimer_new( session->event_base, onUpkeepTimer, a );
     tr_timerAdd( a->upkeepTimer, UPKEEP_INTERVAL_SECS, 0 );
 
     session->announcer = a;

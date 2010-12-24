@@ -16,7 +16,7 @@
 
 #include <sys/types.h>
 
-#include <event.h>
+#include <event2/event.h>
 
 #include "transmission.h"
 #include "natpmp.h"
@@ -172,8 +172,7 @@ stop_timer( tr_shared * s )
 {
     if( s->timer != NULL )
     {
-        evtimer_del( s->timer );
-        tr_free( s->timer );
+        event_free( s->timer );
         s->timer = NULL;
     }
 }
@@ -209,8 +208,7 @@ tr_sharedClose( tr_session * session )
 static void
 start_timer( tr_shared * s )
 {
-    s->timer = tr_new0( struct event, 1 );
-    evtimer_set( s->timer, onTimer, s );
+    s->timer = evtimer_new( s->session->event_base, onTimer, s );
     set_evtimer_from_status( s );
 }
 

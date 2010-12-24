@@ -31,6 +31,4 @@ tr_bool   tr_amInEventThread( const tr_session * );
 
 void      tr_runInEventThread( tr_session *, void func( void* ), void * user_data );
 
-struct event_base * tr_eventGetBase( tr_session * );
-
 #endif

@@ -21,7 +21,7 @@
  #include <zlib.h>
 #endif
 
-#include <event.h> /* evbuffer */
+#include <event2/buffer.h>
 
 #include "transmission.h"
 #include "bencode.h"
