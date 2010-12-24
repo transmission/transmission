@@ -16,7 +16,7 @@
 #else
   #include <sys/types.h> /* stat */
   #include <sys/stat.h> /* stat */
-  #include <event.h> /* evbuffer */
+  #include <event2/buffer.h> /* evbuffer */
 #endif
 
 #include <errno.h>

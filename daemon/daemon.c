@@ -25,7 +25,7 @@
 #endif
 #include <unistd.h> /* daemon */
 
-#include <event.h>
+#include <event2/buffer.h>
 
 #include <libtransmission/transmission.h>
 #include <libtransmission/bencode.h>

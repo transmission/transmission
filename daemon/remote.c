@@ -24,7 +24,7 @@
  #include <unistd.h> /* getcwd */
 #endif
 
-#include <event.h>
+#include <event2/buffer.h>
 
 #define CURL_DISABLE_TYPECHECK /* otherwise -Wunreachable-code goes insane */
 #include <curl/curl.h>
@@ -1723,7 +1723,7 @@ flush( const char * rpcurl, tr_benc ** benc )
         curl_easy_getinfo( curl, CURLINFO_RESPONSE_CODE, &response );
         switch( response ) {
             case 200:
-                status |= processResponse( rpcurl, EVBUFFER_DATA(buf), EVBUFFER_LENGTH(buf) );
+                status |= processResponse( rpcurl, (const char*) evbuffer_pullup( buf, -1 ), evbuffer_get_length( buf ) );
                 break;
             case 409:
                 /* session id failed.  our curl header func has already
@@ -1735,7 +1735,7 @@ flush( const char * rpcurl, tr_benc ** benc )
                 benc = NULL;
                 break;
             default:
-                fprintf( stderr, "Unexpected response: %s\n", (char*)EVBUFFER_DATA(buf) );
+                fprintf( stderr, "Unexpected response: %s\n", evbuffer_pullup( buf, -1 ) );
                 status |= EXIT_FAILURE;
                 break;
         }
