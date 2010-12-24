@@ -2494,9 +2494,8 @@
 				GCC_DEBUGGING_SYMBOLS = full;
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					"third-party/libevent/include",
-					"third-party/libevent",
 					"third-party",
+					"third-party/libevent/include",
 				);
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
@@ -2573,7 +2572,6 @@
 					"$(inherited)",
 					.,
 					"third-party/libevent/include",
-					"third-party/libevent",
 				);
 				OTHER_CFLAGS = "-DHAVE_LIBZ";
 				PRODUCT_NAME = "transmission-remote";
@@ -2692,9 +2690,8 @@
 			buildSettings = {
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					"third-party/libevent/include",
-					"third-party/libevent",
 					"third-party",
+					"third-party/libevent/include",
 				);
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
@@ -2937,9 +2934,8 @@
 				GCC_DEBUGGING_SYMBOLS = full;
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					"third-party/libevent/include",
-					"third-party/libevent",
 					"third-party",
+					"third-party/libevent/include",
 				);
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
@@ -2987,7 +2983,6 @@
 					"$(inherited)",
 					.,
 					"third-party/libevent/include",
-					"third-party/libevent",
 				);
 				OTHER_CFLAGS = "-DHAVE_LIBZ";
 				PRODUCT_NAME = "transmission-remote";
@@ -3095,7 +3090,6 @@
 					"$(inherited)",
 					.,
 					"third-party/libevent/include",
-					"third-party/libevent",
 				);
 				OTHER_CFLAGS = "-DHAVE_LIBZ";
 				PRODUCT_NAME = "transmission-remote";
