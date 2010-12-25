@@ -2554,7 +2554,6 @@
 					"$(inherited)",
 					.,
 					"third-party/libevent/include",
-					"third-party/libevent",
 				);
 				OTHER_CFLAGS = (
 					"$(inherited)",
@@ -2965,7 +2964,6 @@
 					"$(inherited)",
 					.,
 					"third-party/libevent/include",
-					"third-party/libevent",
 				);
 				OTHER_CFLAGS = (
 					"$(inherited)",
@@ -3073,7 +3071,6 @@
 					"$(inherited)",
 					.,
 					"third-party/libevent/include",
-					"third-party/libevent",
 				);
 				OTHER_CFLAGS = (
 					"$(inherited)",
