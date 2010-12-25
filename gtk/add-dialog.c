@@ -273,8 +273,7 @@ gtr_torrent_options_dialog_new( GtkWindow * parent, TrCore * core, tr_ctor * cto
 
     /* make the dialog */
     d = gtk_dialog_new_with_buttons( _( "Torrent Options" ), parent,
-                                     GTK_DIALOG_DESTROY_WITH_PARENT |
-                                     GTK_DIALOG_NO_SEPARATOR,
+                                     GTK_DIALOG_DESTROY_WITH_PARENT,
                                      NULL );
     gtk_dialog_add_button( GTK_DIALOG( d ), GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL );
     grab = gtk_dialog_add_button( GTK_DIALOG( d ), GTK_STOCK_ADD, GTK_RESPONSE_ACCEPT );
@@ -523,7 +522,7 @@ gtr_torrent_add_from_url_dialog_new( GtkWindow * parent, TrCore * core )
     GtkWidget * w;
 
     w = gtk_dialog_new_with_buttons( _( "Add URL" ), parent,
-                                     GTK_DIALOG_DESTROY_WITH_PARENT | GTK_DIALOG_NO_SEPARATOR,
+                                     GTK_DIALOG_DESTROY_WITH_PARENT,
                                      GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
                                      GTK_STOCK_ADD, GTK_RESPONSE_ACCEPT,
                                      NULL );

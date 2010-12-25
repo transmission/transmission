@@ -157,8 +157,7 @@ gtr_relocate_dialog_new( GtkWindow * parent,
 
     d = gtk_dialog_new_with_buttons( _( "Set Torrent Location" ), parent,
                                      GTK_DIALOG_DESTROY_WITH_PARENT |
-                                     GTK_DIALOG_MODAL |
-                                     GTK_DIALOG_NO_SEPARATOR,
+                                     GTK_DIALOG_MODAL,
                                      GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
                                      GTK_STOCK_APPLY, GTK_RESPONSE_APPLY,
                                      NULL );

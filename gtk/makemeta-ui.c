@@ -433,8 +433,7 @@ gtr_torrent_creation_dialog_new( GtkWindow  * parent, TrCore * core )
 
     d = gtk_dialog_new_with_buttons( _( "New Torrent" ),
                                      parent,
-                                     GTK_DIALOG_DESTROY_WITH_PARENT |
-                                     GTK_DIALOG_NO_SEPARATOR,
+                                     GTK_DIALOG_DESTROY_WITH_PARENT,
                                      GTK_STOCK_CLOSE, GTK_RESPONSE_CLOSE,
                                      GTK_STOCK_NEW, GTK_RESPONSE_ACCEPT,
                                      NULL );
