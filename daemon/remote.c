@@ -667,6 +667,8 @@ static const char * details_keys[] = {
     "rateDownload",
     "rateUpload",
     "recheckProgress",
+    "secondsDownloading",
+    "secondsSeeding",
     "seedRatioMode",
     "seedRatioLimit",
     "sizeWhenDone",
@@ -845,6 +847,10 @@ printDetails( tr_benc * top )
 
             if( tr_bencDictFindInt( t, "eta", &i ) )
                 printf( "  ETA: %s\n", tr_strltime( buf, i, sizeof( buf ) ) );
+            if( tr_bencDictFindInt( t, "secondsDownloading", &i ) && ( i > 0 ) )
+                printf( "  Time Downloading: %s\n", tr_strltime( buf, i, sizeof( buf ) ) );
+            if( tr_bencDictFindInt( t, "secondsSeeding", &i ) && ( i > 0 ) )
+                printf( "  Time Seeding: %s\n", tr_strltime( buf, i, sizeof( buf ) ) );
             if( tr_bencDictFindInt( t, "rateDownload", &i ) )
                 printf( "  Download Speed: %s\n", tr_formatter_speed_KBps( buf, i/(double)tr_speed_K, sizeof( buf ) ) );
             if( tr_bencDictFindInt( t, "rateUpload", &i ) )

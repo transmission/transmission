@@ -185,6 +185,8 @@
    rateDownload (B/s)          | number                      | tr_stat
    rateUpload (B/s)            | number                      | tr_stat
    recheckProgress             | double                      | tr_stat
+   secondsDownloading          | number                      | tr_stat
+   secondsSeeding              | number                      | tr_stat
    seedIdleLimit               | number                      | tr_torrent
    seedIdleMode                | number                      | tr_inactvelimit
    seedRatioLimit              | double                      | tr_torrent
