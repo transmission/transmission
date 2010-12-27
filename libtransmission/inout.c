@@ -60,11 +60,11 @@ enum { TR_IO_READ, TR_IO_PREFETCH,
 /* returns 0 on success, or an errno on failure */
 static int
 readOrWriteBytes( tr_session       * session,
-                  const tr_torrent * tor,
+                  tr_torrent       * tor,
                   int                ioMode,
                   tr_file_index_t    fileIndex,
                   uint64_t           fileOffset,
-                  void *             buf,
+                  void             * buf,
                   size_t             buflen )
 {
     const tr_info * info = &tor->info;
@@ -138,6 +138,14 @@ readOrWriteBytes( tr_session       * session,
 
     if( !err )
     {
+        /* check & see if someone deleted the file while it was in our cache */
+        struct stat sb;
+        const tr_bool file_disappeared = fstat( fd, &sb ) || sb.st_nlink < 1;
+        if( file_disappeared ) {
+            tr_torrentSetLocalError( tor, "Please Verify Local Data! A file disappeared: \"%s\"", tor->info.files[fileIndex].name );
+            err = ENOENT;
+        }
+
         if( ioMode == TR_IO_READ ) {
             const int rc = tr_pread( fd, buf, buflen, fileOffset );
             if( rc < 0 ) {
@@ -238,7 +246,7 @@ readOrWritePiece( tr_torrent       * tor,
         ++fileIndex;
         fileOffset = 0;
 
-        if( ( err != 0 ) && (ioMode == TR_IO_WRITE ) )
+        if( ( err != 0 ) && (ioMode == TR_IO_WRITE ) && ( tor->error != TR_STAT_LOCAL_ERROR ) )
         {
             char * path = tr_buildPath( tor->downloadDir, file->name, NULL );
             tr_torrentSetLocalError( tor, "%s (%s)", tr_strerror( err ), path );
