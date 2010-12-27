@@ -847,10 +847,6 @@ printDetails( tr_benc * top )
 
             if( tr_bencDictFindInt( t, "eta", &i ) )
                 printf( "  ETA: %s\n", tr_strltime( buf, i, sizeof( buf ) ) );
-            if( tr_bencDictFindInt( t, "secondsDownloading", &i ) && ( i > 0 ) )
-                printf( "  Time Downloading: %s\n", tr_strltime( buf, i, sizeof( buf ) ) );
-            if( tr_bencDictFindInt( t, "secondsSeeding", &i ) && ( i > 0 ) )
-                printf( "  Time Seeding: %s\n", tr_strltime( buf, i, sizeof( buf ) ) );
             if( tr_bencDictFindInt( t, "rateDownload", &i ) )
                 printf( "  Download Speed: %s\n", tr_formatter_speed_KBps( buf, i/(double)tr_speed_K, sizeof( buf ) ) );
             if( tr_bencDictFindInt( t, "rateUpload", &i ) )
@@ -952,23 +948,27 @@ printDetails( tr_benc * top )
             if( tr_bencDictFindInt( t, "addedDate", &i ) && i )
             {
                 const time_t tt = i;
-                printf( "  Date added:      %s", ctime( &tt ) );
+                printf( "  Date added:       %s", ctime( &tt ) );
             }
             if( tr_bencDictFindInt( t, "doneDate", &i ) && i )
             {
                 const time_t tt = i;
-                printf( "  Date finished:   %s", ctime( &tt ) );
+                printf( "  Date finished:    %s", ctime( &tt ) );
             }
             if( tr_bencDictFindInt( t, "startDate", &i ) && i )
             {
                 const time_t tt = i;
-                printf( "  Date started:    %s", ctime( &tt ) );
+                printf( "  Date started:     %s", ctime( &tt ) );
             }
             if( tr_bencDictFindInt( t, "activityDate", &i ) && i )
             {
                 const time_t tt = i;
-                printf( "  Latest activity: %s", ctime( &tt ) );
+                printf( "  Latest activity:  %s", ctime( &tt ) );
             }
+            if( tr_bencDictFindInt( t, "secondsDownloading", &i ) && ( i > 0 ) )
+                printf( "  Downloading Time: %s\n", tr_strltime( buf, i, sizeof( buf ) ) );
+            if( tr_bencDictFindInt( t, "secondsSeeding", &i ) && ( i > 0 ) )
+                printf( "  Seeding Time:     %s\n", tr_strltime( buf, i, sizeof( buf ) ) );
             printf( "\n" );
 
             printf( "ORIGINS\n" );
