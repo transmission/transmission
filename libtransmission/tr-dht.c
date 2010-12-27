@@ -13,7 +13,7 @@ all copies or substantial portions of the Software.
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL THE
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
 AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
@@ -182,7 +182,7 @@ dht_bootstrap(void *closure)
         }
 
         /* Our DHT code is able to take up to 9 nodes in a row without
-           dropping any.  After that, it takes some time to split buckets.
+           dropping any. After that, it takes some time to split buckets.
            So ping the first 8 nodes quickly, then slow down. */
         if(i < 8)
             nap(2);
@@ -265,7 +265,7 @@ rebind_ipv6(tr_bool force)
     int one = 1;
 
     /* We currently have no way to enable or disable IPv6 once the DHT has
-       been initialised.  Oh, well. */
+       been initialised. Oh, well. */
     if(ipv6 == NULL || (!force && dht6_socket < 0)) {
         if(last_bound) {
             free(last_bound);
@@ -283,7 +283,7 @@ rebind_ipv6(tr_bool force)
 
 #ifdef IPV6_V6ONLY
         /* Since we always open an IPv4 socket on the same port, this
-           shouldn't matter.  But I'm superstitious. */
+           shouldn't matter. But I'm superstitious. */
         setsockopt(s, IPPROTO_IPV6, IPV6_V6ONLY, &one, sizeof(one));
 #endif
 
@@ -710,7 +710,7 @@ event_callback(int s, short type, void *ignore UNUSED )
         }
     }
 
-    /* Only do this once in a while.  Counting rather than measuring time
+    /* Only do this once in a while. Counting rather than measuring time
        avoids a system call. */
     count++;
     if(count >= 20) {

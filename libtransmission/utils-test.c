@@ -270,7 +270,7 @@ test_lowerbound( void )
         const int pos = tr_lowerBound( &i, A, N, sizeof(int), compareInts, &exact );
 
 #if 0
-        fprintf( stderr, "searching for %d.  ", i );
+        fprintf( stderr, "searching for %d. ", i );
         fprintf( stderr, "result: index = %d, ", pos );
         if( pos != N )
             fprintf( stderr, "A[%d] == %d\n", pos, A[pos] );

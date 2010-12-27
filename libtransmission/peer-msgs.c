@@ -1,7 +1,7 @@
 /*
  * This file Copyright (C) 2007-2010 Mnemosyne LLC
  *
- * This file is licensed by the GPL version 2.  Works owned by the
+ * This file is licensed by the GPL version 2. Works owned by the
  * Transmission project are granted a special exemption to clause 2(b)
  * so that the bulk of its code can remain under the MIT license.
  * This exemption does not extend to derived works not owned by
@@ -224,7 +224,7 @@ struct tr_peermsgs
     struct tr_incoming    incoming;
 
     /* if the peer supports the Extension Protocol in BEP 10 and
-       supplied a reqq argument, it's stored here.  otherwise the
+       supplied a reqq argument, it's stored here. Otherwise, the
        value is zero and should be ignored. */
     int64_t               reqq;
 
@@ -1907,10 +1907,14 @@ fillOutputBuffer( tr_peermsgs * msgs, time_t now )
             iovec[0].iov_len = req.length;
             evbuffer_commit_space( out, iovec, 1 );
 
+            /* if we couldn't load a piece we thought we could load... */
+            if( err )
+                tr_torrentSetLocalError( msgs->torrent, _( "Couldn't read piece #%zu from disk! Please Verify Local Data." ), (size_t)req.index );
+
             /* check the piece if it needs checking... */
             if( !err && tr_torrentPieceNeedsCheck( msgs->torrent, req.index ) )
                 if(( err = !tr_torrentCheckPiece( msgs->torrent, req.index )))
-                    tr_torrentSetLocalError( msgs->torrent, _( "Piece #%zu is corrupt!  Please Verify Local Data." ), (size_t)req.index );
+                    tr_torrentSetLocalError( msgs->torrent, _( "Piece #%zu is corrupt! Please Verify Local Data." ), (size_t)req.index );
 
             if( err )
             {

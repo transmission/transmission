@@ -1,7 +1,7 @@
 /*
  * This file Copyright (C) 2009-2010 Mnemosyne LLC
  *
- * This file is licensed by the GPL version 2.  Works owned by the
+ * This file is licensed by the GPL version 2. Works owned by the
  * Transmission project are granted a special exemption to clause 2(b)
  * so that the bulk of its code can remain under the MIT license.
  * This exemption does not extend to derived works not owned by
@@ -255,7 +255,7 @@ tr_convertAnnounceToScrape( const char * announce )
      * If the text immediately following that '/' isn't 'announce'
      * it will be taken as a sign that that tracker doesn't support
      * the scrape convention. If it does, substitute 'scrape' for
-     * 'announce' to find the scrape page.  */
+     * 'announce' to find the scrape page. */
     if( ( ( s = strrchr( announce, '/' ) ) ) && !strncmp( ++s, "announce", 8 ) )
     {
         const char * prefix = announce;

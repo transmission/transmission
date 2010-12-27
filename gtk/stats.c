@@ -1,7 +1,7 @@
 /*
  * This file Copyright (C) 2007-2010 Mnemosyne LLC
  *
- * This file is licensed by the GPL version 2.  Works owned by the
+ * This file is licensed by the GPL version 2. Works owned by the
  * Transmission project are granted a special exemption to clause 2(b)
  * so that the bulk of its code can remain under the MIT license.
  * This exemption does not extend to derived works not owned by
@@ -105,7 +105,7 @@ dialogResponse( GtkDialog * dialog,
     if( response == TR_RESPONSE_RESET )
     {
         const char * primary = _( "Reset your statistics?" );
-        const char * secondary = _( "These statistics are for your information only.  "
+        const char * secondary = _( "These statistics are for your information only. "
                                     "Resetting them doesn't affect the statistics logged by your BitTorrent trackers." );
         const int flags = GTK_DIALOG_DESTROY_WITH_PARENT
                         | GTK_DIALOG_MODAL;

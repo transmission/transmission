@@ -86,7 +86,7 @@ getUsage( void )
 static const struct tr_option options[] =
 {
 
-    { 'a', "allowed", "Allowed IP addresses.  (Default: " TR_DEFAULT_RPC_WHITELIST ")", "a", 1, "<list>" },
+    { 'a', "allowed", "Allowed IP addresses. (Default: " TR_DEFAULT_RPC_WHITELIST ")", "a", 1, "<list>" },
     { 'b', "blocklist", "Enable peer blocklists", "b", 0, NULL },
     { 'B', "no-blocklist", "Disable peer blocklists", "B", 0, NULL },
     { 'c', "watch-dir", "Where to watch for new .torrent files", "c", 1, "<directory>" },

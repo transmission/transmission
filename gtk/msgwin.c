@@ -1,7 +1,7 @@
 /*
  * This file Copyright (C) 2008-2010 Mnemosyne LLC
  *
- * This file is licensed by the GPL version 2.  Works owned by the
+ * This file is licensed by the GPL version 2. Works owned by the
  * Transmission project are granted a special exemption to clause 2(b)
  * so that the bulk of its code can remain under the MIT license.
  * This exemption does not extend to derived works not owned by
@@ -232,11 +232,11 @@ appendColumn( GtkTreeView * view,
         case COL_SEQUENCE:
             title = _( "Time" ); break;
 
-        /* noun.  column title for a list */
+        /* noun. column title for a list */
         case COL_NAME:
             title = _( "Name" ); break;
 
-        /* noun.  column title for a list */
+        /* noun. column title for a list */
         case COL_MESSAGE:
             title = _( "Message" ); break;
 

@@ -65,7 +65,7 @@ typedef struct JSON_parser_struct* JSON_parser;
 /*! \brief JSON parser callback 
 
     \param ctx The pointer passed to new_JSON_parser.
-    \param type An element of JSON_type but not JSON_T_NONE.    
+    \param type An element of JSON_type but not JSON_T_NONE.
     \param value A representation of the parsed value. This parameter is NULL for
         JSON_T_ARRAY_BEGIN, JSON_T_ARRAY_END, JSON_T_OBJECT_BEGIN, JSON_T_OBJECT_END,
         JSON_T_NULL, JSON_T_TRUE, and SON_T_FALSE. String values are always returned

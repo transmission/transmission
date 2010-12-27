@@ -1,7 +1,7 @@
 /*
  * This file Copyright (C) 2008-2010 Mnemosyne LLC
  *
- * This file is licensed by the GPL version 2.  Works owned by the
+ * This file is licensed by the GPL version 2. Works owned by the
  * Transmission project are granted a special exemption to clause 2(b)
  * so that the bulk of its code can remain under the MIT license.
  * This exemption does not extend to derived works not owned by
@@ -455,7 +455,7 @@ addPeers( const tr_torrent * tor,
     tr_torrentPeersFree( peers, peerCount );
 }
 
-/* faster-than-strcmp() optimization.  this is kind of clumsy,
+/* faster-than-strcmp() optimization. This is kind of clumsy,
    but addField() was in the profiler's top 10 list, and this
    makes it 4x faster... */
 #define tr_streq(a,alen,b) ((alen+1==sizeof(b)) && !memcmp(a,b,alen))

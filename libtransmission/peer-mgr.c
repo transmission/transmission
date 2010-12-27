@@ -1,7 +1,7 @@
 /*
  * This file Copyright (C) 2007-2010 Mnemosyne LLC
  *
- * This file is licensed by the GPL version 2.  Works owned by the
+ * This file is licensed by the GPL version 2. Works owned by the
  * Transmission project are granted a special exemption to clause 2(b)
  * so that the bulk of its code can remain under the MIT license.
  * This exemption does not extend to derived works not owned by
@@ -112,7 +112,7 @@ enum
 
 /**
  * Peer information that should be kept even before we've connected and
- * after we've disconnected.  These are kept in a pool of peer_atoms to decide
+ * after we've disconnected. These are kept in a pool of peer_atoms to decide
  * which ones would make good candidates for connecting to, and to watch out
  * for banned peers.
  *
@@ -524,7 +524,7 @@ tr_peerMgrFree( tr_peerMgr * manager )
 
     deleteTimers( manager );
 
-    /* free the handshakes.  Abort invokes handshakeDoneCB(), which removes
+    /* free the handshakes. Abort invokes handshakeDoneCB(), which removes
      * the item from manager->handshakes, so this is a little roundabout... */
     while( !tr_ptrArrayEmpty( &manager->incomingHandshakes ) )
         tr_handshakeAbort( tr_ptrArrayNth( &manager->incomingHandshakes, 0 ) );
@@ -640,7 +640,7 @@ tr_peerMgrPeerIsSeed( const tr_torrent  * tor,
 ***    for too long and (b) avoiding duplicate requests before endgame.
 ***
 *** 2. Torrent::pieces, an array of "struct weighted_piece" which lists the
-***    pieces that we want to request.  It's used to decide which blocks to
+***    pieces that we want to request. It's used to decide which blocks to
 ***    return next when tr_peerMgrGetBlockRequests() is called.
 **/
 
@@ -1477,7 +1477,7 @@ peerCallbackFunc( tr_peer * peer, const tr_peer_event * e, void * vt )
                         tr_file_index_t fileIndex;
 
                         /* only add this to downloadedCur if we got it from a peer --
-                         * webseeds shouldn't count against our ratio.  As one tracker
+                         * webseeds shouldn't count against our ratio. As one tracker
                          * admin put it, "Those pieces are downloaded directly from the
                          * content distributor, not the peers, it is the tracker's job
                          * to manage the swarms, not the web server and does not fit
@@ -2094,7 +2094,7 @@ stopTorrent( Torrent * t )
         peerDestructor( t, tr_ptrArrayNth( &t->peers, i ) );
     tr_ptrArrayClear( &t->peers );
 
-    /* disconnect the handshakes.  handshakeAbort calls handshakeDoneCB(),
+    /* disconnect the handshakes. handshakeAbort calls handshakeDoneCB(),
      * which removes the handshake from t->outgoingHandshakes... */
     while( !tr_ptrArrayEmpty( &t->outgoingHandshakes ) )
         tr_handshakeAbort( tr_ptrArrayNth( &t->outgoingHandshakes, 0 ) );
@@ -2960,7 +2960,7 @@ closePeer( Torrent * t, tr_peer * peer )
     atom = peer->atom;
 
     /* if we transferred piece data, then they might be good peers,
-       so reset their `numFails' weight to zero.  otherwise we connected
+       so reset their `numFails' weight to zero. otherwise we connected
        to them fruitlessly, so mark it as another fail */
     if( atom->piece_data_time ) {
         tordbg( t, "resetting atom %s numFails to 0", tr_atomAddrStr(atom) );
@@ -3374,7 +3374,7 @@ isPeerCandidate( const tr_torrent * tor, struct peer_atom * atom, const time_t n
         if( atomIsSeed( atom ) || ( atom->uploadOnly == UPLOAD_ONLY_YES ) )
             return FALSE;
 
-    /* not if we've already got a connection to them...  */
+    /* not if we've already got a connection to them... */
     if( peerIsInUse( tor->torrentPeers, atom ) )
         return FALSE;
 

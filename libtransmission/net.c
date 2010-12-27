@@ -483,7 +483,7 @@ tr_netClose( tr_session * session, int s )
    Please feel free to copy them into your software if it can help
    unbreaking the double-stack Internet. */
 
-/* Get the source address used for a given destination address.  Since
+/* Get the source address used for a given destination address. Since
    there is no official interface to get this information, we create
    a connected UDP socket (connected UDP... hmm...) and check its source
    address. */
@@ -668,7 +668,7 @@ isMartianAddr( const struct tr_address * a )
                    (memcmp(address, zeroes, 15) == 0 &&
                     (address[15] == 0 || address[15] == 1)) ||
                    /* Addresses outside of 2000::/3 are currently reserved,
-                      but might be allocated at some future time.  Since
+                      but might be allocated at some future time. Since
                       there are a lot of buggy peers pushing around such
                       addresses over PEX, we reject them until the end of
                       the 13th Baktun. */

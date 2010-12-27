@@ -1,7 +1,7 @@
 /*
  * This file Copyright (C) 2010 Mnemosyne LLC
  *
- * This file is licensed by the GPL version 2.  Works owned by the
+ * This file is licensed by the GPL version 2. Works owned by the
  * Transmission project are granted a special exemption to clause 2(b)
  * so that the bulk of its code can remain under the MIT license.
  * This exemption does not extend to derived works not owned by
@@ -425,7 +425,7 @@ TrOpenFile( tr_session             * session,
      * 1. Enable readahead for reasons described above w/POSIX_FADV_SEQUENTIAL.
      *
      * 2. Disable OS-level caching due to user reports of adverse effects of
-     *    excessive inactive memory.  However this is experimental because
+     *    excessive inactive memory. However this is experimental because
      *    previous attempts at this have *also* had adverse effects (see r8198)
      *
      * It's okay for this to fail silently, so don't let it affect errno
@@ -550,7 +550,7 @@ tr_fdFileCheckout( tr_session             * session,
         break;
     }
 
-    dbgmsg( "it's not already open.  looking for an open slot or an old file." );
+    dbgmsg( "it's not already open. looking for an open slot or an old file." );
     while( winner < 0 )
     {
         time_t date = tr_time( ) + 1;

@@ -1,7 +1,7 @@
 /*
  * This file Copyright (C) 2007-2010 Mnemosyne LLC
  *
- * This file is licensed by the GPL version 2.  Works owned by the
+ * This file is licensed by the GPL version 2. Works owned by the
  * Transmission project are granted a special exemption to clause 2(b)
  * so that the bulk of its code can remain under the MIT license.
  * This exemption does not extend to derived works not owned by
@@ -332,8 +332,8 @@ struct TorrentCellRendererPrivate
     GtkCellRenderer  * icon_renderer;
     int bar_height;
 
-    /* use this instead of tr_stat.pieceUploadSpeed so that the model can
-       control when the speed displays get updated.  this is done to keep
+    /* Use this instead of tr_stat.pieceUploadSpeed so that the model can
+       control when the speed displays get updated. This is done to keep
        the individual torrents' speeds and the status bar's overall speed
        in sync even if they refresh at slightly different times */
     double upload_speed_KBps;

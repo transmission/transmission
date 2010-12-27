@@ -1,7 +1,7 @@
 /*
  * This file Copyright (C) 2008-2010 Mnemosyne LLC
  *
- * This file is licensed by the GPL version 2.  Works owned by the
+ * This file is licensed by the GPL version 2. Works owned by the
  * Transmission project are granted a special exemption to clause 2(b)
  * so that the bulk of its code can remain under the MIT license.
  * This exemption does not extend to derived works not owned by
@@ -74,19 +74,19 @@ struct tr_band
  *   Underneath those are per-peer bandwidth objects owned by tr_peer.
  *
  *   tr_session also owns a tr_handshake's bandwidths, so that the handshake
- *   I/O can be counted in the global raw totals.  When the handshake is done,
+ *   I/O can be counted in the global raw totals. When the handshake is done,
  *   the bandwidth's ownership passes to a tr_peer.
  *
  * MEASURING
  *
  *   When you ask a bandwidth object for its speed, it gives the speed of the
- *   subtree underneath it as well.  So you can get Transmission's overall
+ *   subtree underneath it as well. So you can get Transmission's overall
  *   speed by quering tr_session's bandwidth, per-torrent speeds by asking
  *   tr_torrent's bandwidth, and per-peer speeds by asking tr_peer's bandwidth.
  *
  * CONSTRAINING
  *
- *   Call tr_bandwidthAllocate() periodically.  tr_bandwidth knows its current
+ *   Call tr_bandwidthAllocate() periodically. tr_bandwidth knows its current
  *   speed and will decide how many bytes to make available over the
  *   user-specified period to reach the user-specified desired speed.
  *   If appropriate, it notifies its peer-ios that new bandwidth is available.

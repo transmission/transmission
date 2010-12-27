@@ -1,7 +1,7 @@
 /*
  * This file Copyright (C) 2009-2010 Mnemosyne LLC
  *
- * This file is licensed by the GPL version 2.  Works owned by the
+ * This file is licensed by the GPL version 2. Works owned by the
  * Transmission project are granted a special exemption to clause 2(b)
  * so that the bulk of its code can remain under the MIT license.
  * This exemption does not extend to derived works not owned by
@@ -272,7 +272,7 @@ void tr_wait_msec( long int delay_milliseconds );
  * @brief make a copy of 'str' whose non-utf8 content has been corrected or stripped
  * @return a newly-allocated string that must be freed with tr_free()
  * @param str the string to make a clean copy of
- * @param len the length of the string to copy.  If -1, the entire string is used.
+ * @param len the length of the string to copy. If -1, the entire string is used.
  */
 char* tr_utf8clean( const char * str, int len ) TR_GNUC_MALLOC;
 
@@ -331,7 +331,7 @@ void* tr_valloc( size_t bufLen );
 /**
  * @brief make a newly-allocated copy of a substring
  * @param in is a void* so that callers can pass in both signed & unsigned without a cast
- * @param len length of the substring to copy.  if a length less than zero is passed in, strlen( len ) is used
+ * @param len length of the substring to copy. if a length less than zero is passed in, strlen( len ) is used
  * @return a newly-allocated copy of `in' that can be freed with tr_free()
  */
 char* tr_strndup( const void * in, int len ) TR_GNUC_MALLOC;
@@ -540,7 +540,7 @@ extern time_t transmission_now;
  * This function returns a second counter that is updated once per second.
  * If something blocks the libtransmission thread for more than a second,
  * that counter may be thrown off, so this function is not guaranteed
- * to always be accurate.  However, it is *much* faster when 100% accuracy
+ * to always be accurate. However, it is *much* faster when 100% accuracy
  * isn't needed
  */
 static inline time_t tr_time( void ) { return transmission_now; }

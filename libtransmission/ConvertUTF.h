@@ -29,14 +29,14 @@
 
 /* ---------------------------------------------------------------------
 
-    Conversions between UTF32, UTF-16, and UTF-8.  Header file.
+    Conversions between UTF32, UTF-16, and UTF-8. Header file.
 
     Several funtions are included here, forming a complete set of
-    conversions between the three formats.  UTF-7 is not included
+    conversions between the three formats. UTF-7 is not included
     here, but is handled in a separate source file.
 
     Each of these routines takes pointers to input buffers and output
-    buffers.  The input buffers are const.
+    buffers. The input buffers are const.
 
     Each routine converts the text between *sourceStart and sourceEnd,
     putting the result into the buffer between *targetStart and
@@ -61,7 +61,7 @@
 
     These conversion functions take a ConversionFlags argument. When this
     flag is set to strict, both irregular sequences and isolated surrogates
-    will cause an error.  When the flag is set to lenient, both irregular
+    will cause an error. When the flag is set to lenient, both irregular
     sequences and isolated surrogates are converted.
 
     Whether the flag is strict or lenient, all illegal sequences will cause
@@ -75,10 +75,10 @@
 
     Output parameters:
 	The value "sourceIllegal" is returned from some routines if the input
-	sequence is malformed.  When "sourceIllegal" is returned, the source
+	sequence is malformed. When "sourceIllegal" is returned, the source
 	value will point to the illegal value that caused the problem. E.g.,
 	in UTF-8 when a sequence is malformed, it points to the start of the
-	malformed sequence.  
+	malformed sequence. 
 
     Author: Mark E. Davis, 1994.
     Rev History: Rick McGowan, fixes & updates May 2001.

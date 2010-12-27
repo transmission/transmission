@@ -1,7 +1,7 @@
 /*
  * This file Copyright (C) 2009-2010 Mnemosyne LLC
  *
- * This file is licensed by the GPL version 2.  Works owned by the
+ * This file is licensed by the GPL version 2. Works owned by the
  * Transmission project are granted a special exemption to clause 2(b)
  * so that the bulk of its code can remain under the MIT license.
  * This exemption does not extend to derived works not owned by
@@ -771,7 +771,7 @@ createAnnounceURL( const tr_announcer     * announcer,
        and once over IPv6.
 
        To be safe, we should do both: add the "ipv6=" parameter and
-       announce twice.  At any rate, we're already computing our IPv6
+       announce twice. At any rate, we're already computing our IPv6
        address (for the LTEP handshake), so this comes for free. */
 
     ipv6 = tr_globalIPv6( );
@@ -1451,7 +1451,7 @@ onAnnounceDone( tr_session   * session,
         else if( ( responseCode == 404 ) || ( 500 <= responseCode && responseCode <= 599 ) )
         {
             /* 404: The requested resource could not be found but may be
-             * available again in the future.  Subsequent requests by
+             * available again in the future. Subsequent requests by
              * the client are permissible. */
 
             /* 5xx: indicate cases in which the server is aware that it
@@ -1889,7 +1889,7 @@ fprintf( stderr, "[%s] announce.c has %d requests ready to send (announce: %d, s
                 int rc;
                 rc = tr_dhtAnnounce(tor, AF_INET, 1);
                 if(rc == 0)
-                    /* The DHT is not ready yet.  Try again soon. */
+                    /* The DHT is not ready yet. Try again soon. */
                     tor->dhtAnnounceAt = now + 5 + tr_cryptoWeakRandInt( 5 );
                 else
                     /* We should announce at least once every 30 minutes. */

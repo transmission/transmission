@@ -1,7 +1,7 @@
 /*
  * This file Copyright (C) 2008-2010 Mnemosyne LLC
  *
- * This file is licensed by the GPL version 2.  Works owned by the
+ * This file is licensed by the GPL version 2. Works owned by the
  * Transmission project are granted a special exemption to clause 2(b)
  * so that the bulk of its code can remain under the MIT license.
  * This exemption does not extend to derived works not owned by
@@ -457,7 +457,7 @@ tr_sessionSaveSettings( tr_session    * session,
 
 /**
  * Periodically save the .resume files of any torrents whose
- * status has recently changed.  This prevents loss of metadata
+ * status has recently changed. This prevents loss of metadata
  * in the case of a crash, unclean shutdown, clumsy user, etc.
  */
 static void
@@ -1676,7 +1676,7 @@ sessionCloseImpl( void * vsession )
     tr_sharedClose( session );
     tr_rpcClose( &session->rpcServer );
 
-    /* close the torrents.  get the most active ones first so that
+    /* Close the torrents. Get the most active ones first so that
      * if we can't get them all closed in a reasonable amount of time,
      * at least we get the most important ones first. */
     tor = NULL;

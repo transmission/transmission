@@ -76,7 +76,7 @@ static const char * LICENSE =
 "The OS X client, CLI client, and parts of libtransmission are licensed under the terms of the MIT license.\n\n"
 "The Transmission daemon, GTK+ client, Qt client, Web client, and most of libtransmission are licensed under the terms of the GNU GPL version 2, with two special exceptions:\n\n"
 "1. The MIT-licensed portions of Transmission listed above are exempt from GPLv2 clause 2(b) and may retain their MIT license.\n\n"
-"2. Permission is granted to link the code in this release with the OpenSSL project's 'OpenSSL' library and to distribute the linked executables.  Works derived from Transmission may, at their authors' discretion, keep or delete this exception.";
+"2. Permission is granted to link the code in this release with the OpenSSL project's 'OpenSSL' library and to distribute the linked executables. Works derived from Transmission may, at their authors' discretion, keep or delete this exception.";
 #endif
 
 struct cbdata
@@ -437,7 +437,7 @@ signal_handler( int sig )
     {
         case SIGINT:
         case SIGTERM:
-            g_message( _( "Got signal %d; trying to shut down cleanly.  Do it again if it gets stuck." ), sig );
+            g_message( _( "Got signal %d; trying to shut down cleanly. Do it again if it gets stuck." ), sig );
             gtr_actions_handler( "quit", sighandler_cbdata );
             break;
 
@@ -588,7 +588,7 @@ applyDesktopProxySettings( CURL * easy, GConfClient * client, const char * host_
 
     /* Both libcurl and GNOME have hooks for proxy support.
      * If someone has set the http_proxy environment variable,
-     * don't apply the GNOME settings here.  That way libcurl can override GNOME. */
+     * don't apply the GNOME settings here. That way libcurl can override GNOME. */
     if( !env_checked ) {
         const char * str = g_getenv( "http_proxy" );
         env_set = str && *str;
@@ -807,7 +807,7 @@ main( int argc, char ** argv )
          * so tell it to present its window to the user */
         err = NULL;
         if( !gtr_dbus_present_window( ) )
-            err = g_strdup( _( "Transmission is already running, but is not responding.  To start a new session, you must first close the existing Transmission process." ) );
+            err = g_strdup( _( "Transmission is already running, but is not responding. To start a new session, you must first close the existing Transmission process." ) );
     }
 
     if( didlock && ( didinit || cf_init( configDir, &err ) ) )
@@ -945,7 +945,7 @@ appsetup( TrWindow      * wind,
                                                 GTK_MESSAGE_INFO,
                                                 GTK_BUTTONS_NONE,
                                                 "%s",
-             _( "Transmission is a file-sharing program.  When you run a torrent, its data will be made available to others by means of upload.  You and you alone are fully responsible for exercising proper judgement and abiding by your local laws." ) );
+             _( "Transmission is a file-sharing program. When you run a torrent, its data will be made available to others by means of upload. You and you alone are fully responsible for exercising proper judgement and abiding by your local laws." ) );
         gtk_dialog_add_button( GTK_DIALOG( w ), GTK_STOCK_QUIT, GTK_RESPONSE_REJECT );
         gtk_dialog_add_button( GTK_DIALOG( w ), _( "I _Accept" ), GTK_RESPONSE_ACCEPT );
         gtk_dialog_set_default_response( GTK_DIALOG( w ), GTK_RESPONSE_ACCEPT );

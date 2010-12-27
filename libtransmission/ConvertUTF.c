@@ -193,7 +193,7 @@ static const UTF32 offsetsFromUTF8[6] = { 0x00000000UL, 0x00003080UL, 0x000E2080
 
 /*
  * Once the bits are split out into bytes of UTF-8, this is a mask OR-ed
- * into the first byte, depending on how many bytes follow.  There are
+ * into the first byte, depending on how many bytes follow. There are
  * as many entries in this table as there are UTF-8 sequence types.
  * (I.e., one byte sequence, two byte... etc.). Remember that sequencs
  * for *legal* UTF-8 will be 4 or fewer bytes total.
@@ -289,7 +289,7 @@ ConversionResult ConvertUTF16toUTF8 (
  *  length = trailingBytesForUTF8[*source]+1;
  * and the sequence is illegal right away if there aren't that many bytes
  * available.
- * If presented with a length > 4, this returns false.  The Unicode
+ * If presented with a length > 4, this returns false. The Unicode
  * definition of UTF-8 goes up to 4-byte sequences.
  */
 
@@ -587,7 +587,7 @@ ConversionResult ConvertUTF8toUTF32 (
 
     Note A.
     The fall-through switches in UTF-8 reading code save a
-    temp variable, some decrements & conditionals.  The switches
+    temp variable, some decrements & conditionals. The switches
     are equivalent to the following loop:
 	{
 	    int tmpBytesToRead = extraBytesToRead+1;

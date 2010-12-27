@@ -1,7 +1,7 @@
 /*
  * This file Copyright (C) 2009-2010 Mnemosyne LLC
  *
- * This file is licensed by the GPL version 2.  Works owned by the
+ * This file is licensed by the GPL version 2. Works owned by the
  * Transmission project are granted a special exemption to clause 2(b)
  * so that the bulk of its code can remain under the MIT license.
  * This exemption does not extend to derived works not owned by
@@ -678,7 +678,7 @@ tr_buildPath( const char *first_element, ... )
     }
     va_end( vl );
 
-    /* terminate the string.  if nonempty, eat the unwanted trailing slash */
+    /* terminate the string. if nonempty, eat the unwanted trailing slash */
     if( pch != buf )
         --pch;
     *pch++ = '\0';
@@ -899,14 +899,12 @@ tr_snprintf( char * buf, size_t buflen, const char * fmt, ... )
 }
 
 /*
- * Copy src to string dst of size siz.  At most siz-1 characters
- * will be copied.  Always NUL terminates (unless siz == 0).
+ * Copy src to string dst of size siz. At most siz-1 characters
+ * will be copied. Always NUL terminates (unless siz == 0).
  * Returns strlen(src); if retval >= siz, truncation occurred.
  */
 size_t
-tr_strlcpy( char *       dst,
-            const void * src,
-            size_t       siz )
+tr_strlcpy( char * dst, const void * src, size_t siz )
 {
 #ifdef HAVE_STRLCPY
     return strlcpy( dst, src, siz );

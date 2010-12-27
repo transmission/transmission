@@ -1,7 +1,7 @@
 /*
  * This file Copyright (C) 2010 Mnemosyne LLC
  *
- * This file is licensed by the GPL version 2.  Works owned by the
+ * This file is licensed by the GPL version 2. Works owned by the
  * Transmission project are granted a special exemption to clause 2(b)
  * so that the bulk of its code can remain under the MIT license.
  * This exemption does not extend to derived works not owned by
@@ -137,8 +137,8 @@ category_filter_model_update( GtkTreeStore * store )
 
     g_object_steal_data( o, DIRTY_KEY );
 
-    /* walk through all the torrents, tallying how many matches there are
-     * for the various categories.  also make a sorted list of all tracker
+    /* Walk through all the torrents, tallying how many matches there are
+     * for the various categories. Also make a sorted list of all tracker
      * hosts s.t. we can merge it with the existing list */
     if( gtk_tree_model_get_iter_first( tmodel, &iter )) do
     {

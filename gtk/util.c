@@ -1,7 +1,7 @@
 /*
  * This file Copyright (C) 2008-2010 Mnemosyne LLC
  *
- * This file is licensed by the GPL version 2.  Works owned by the
+ * This file is licensed by the GPL version 2. Works owned by the
  * Transmission project are granted a special exemption to clause 2(b)
  * so that the bulk of its code can remain under the MIT license.
  * This exemption does not extend to derived works not owned by
@@ -905,7 +905,7 @@ gtr_unrecognized_url_dialog( GtkWidget * parent, const char * url )
     if( gtr_is_magnet_link( url ) && ( strstr( url, xt ) == NULL ) )
     {
         g_string_append_printf( gstr, "\n \n" );
-        g_string_append_printf( gstr, _( "This magnet link appears to be intended for something other than BitTorrent.  BitTorrent magnet links have a section containing \"%s\"." ), xt );
+        g_string_append_printf( gstr, _( "This magnet link appears to be intended for something other than BitTorrent. BitTorrent magnet links have a section containing \"%s\"." ), xt );
     }
 
     gtk_message_dialog_format_secondary_text( GTK_MESSAGE_DIALOG( w ), "%s", gstr->str );

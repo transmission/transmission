@@ -1,7 +1,7 @@
 /*
  * This file Copyright (C) 2007-2010 Mnemosyne LLC
  *
- * This file is licensed by the GPL version 2.  Works owned by the
+ * This file is licensed by the GPL version 2. Works owned by the
  * Transmission project are granted a special exemption to clause 2(b)
  * so that the bulk of its code can remain under the MIT license.
  * This exemption does not extend to derived works not owned by
@@ -196,8 +196,7 @@ tr_upnpPulse( tr_upnp * handle,
             handle->isMapped = !err;
         }
         tr_ninf( getKey( ),
-                 _(
-                     "Port forwarding through \"%s\", service \"%s\".  (local address: %s:%d)" ),
+                 _( "Port forwarding through \"%s\", service \"%s\". (local address: %s:%d)" ),
                  handle->urls.controlURL, handle->data.first.servicetype,
                  handle->lanaddr, port );
         if( handle->isMapped )

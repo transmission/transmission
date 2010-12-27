@@ -1,7 +1,7 @@
 /*
  * This file Copyright (C) 2007-2010 Mnemosyne LLC
  *
- * This file is licensed by the GPL version 2.  Works owned by the
+ * This file is licensed by the GPL version 2. Works owned by the
  * Transmission project are granted a special exemption to clause 2(b)
  * so that the bulk of its code can remain under the MIT license.
  * This exemption does not extend to derived works not owned by
@@ -126,7 +126,7 @@ refreshFilesForeach( GtkTreeModel * model,
         if( (priority!=old_priority) || (enabled!=old_enabled) || (have!=old_have) || (prog!=old_prog) )
         {
             /* Changing a value in the sort column can trigger a resort
-             * which breaks this foreach() call.  (See #3529)
+             * which breaks this foreach() call. (See #3529)
              * As a workaround: if that's about to happen, temporarily disable
              * sorting until we finish walking the tree. */
             if( !refresh_data->resort_needed )

@@ -1,7 +1,7 @@
 /*
  * This file Copyright (C) 2008-2010 Mnemosyne LLC
  *
- * This file is licensed by the GPL version 2.  Works owned by the
+ * This file is licensed by the GPL version 2. Works owned by the
  * Transmission project are granted a special exemption to clause 2(b)
  * so that the bulk of its code can remain under the MIT license.
  * This exemption does not extend to derived works not owned by
@@ -111,12 +111,12 @@ set_evtimer_from_status( tr_shared * s )
             break;
 
         case TR_PORT_ERROR:
-            /* some kind of an error.  wait 60 seconds and retry */
+            /* some kind of an error. wait 60 seconds and retry */
             sec = 60;
             break;
 
         default:
-            /* in progress.  pulse frequently. */
+            /* in progress. pulse frequently. */
             msec = 333000;
             break;
     }

@@ -1,7 +1,7 @@
 /*
  * This file Copyright (C) 2009-2010 Mnemosyne LLC
  *
- * This file is licensed by the GPL version 2.  Works owned by the
+ * This file is licensed by the GPL version 2. Works owned by the
  * Transmission project are granted a special exemption to clause 2(b)
  * so that the bulk of its code can remain under the MIT license.
  * This exemption does not extend to derived works not owned by
@@ -652,7 +652,7 @@ tr_torrentInitFilePieces( tr_torrent * tor )
 static void torrentStart( tr_torrent * tor );
 
 /**
- * Decide on a block size.  constraints:
+ * Decide on a block size. Constraints:
  * (1) most clients decline requests over 16 KiB
  * (2) pieceSize must be a multiple of block size
  */
@@ -765,7 +765,7 @@ setLocalErrorIfFilesDisappeared( tr_torrent * tor )
     if( disappeared )
     {
         tr_tordbg( tor, "%s", "[LAZY] uh oh, the files disappeared" );
-        tr_torrentSetLocalError( tor, "%s", _( "No data found!  Ensure your drives are connected or use \"Set Location\".  To re-download, remove the torrent and re-add it." ) );
+        tr_torrentSetLocalError( tor, "%s", _( "No data found! Ensure your drives are connected or use \"Set Location\". To re-download, remove the torrent and re-add it." ) );
     }
 
     return disappeared;
