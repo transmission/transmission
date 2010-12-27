@@ -399,7 +399,7 @@ get_size_compact( TorrentCellRenderer * cell,
     icon = get_icon( tor, COMPACT_ICON_SIZE, widget );
     name = tr_torrentInfo( tor )->name;
     status = getShortStatusString( tor, st, p->upload_speed_KBps, p->download_speed_KBps );
-    gtr_cell_renderer_get_padding( &cell->parent, &xpad, &ypad );
+    gtr_cell_renderer_get_padding( GTK_CELL_RENDERER( cell ), &xpad, &ypad );
 
     /* get the idealized cell dimensions */
     g_object_set( p->icon_renderer, "pixbuf", icon, NULL );
@@ -460,7 +460,7 @@ get_size_full( TorrentCellRenderer * cell,
     name = inf->name;
     status = getStatusString( tor, st, p->upload_speed_KBps, p->download_speed_KBps );
     progress = getProgressString( tor, inf, st );
-    gtr_cell_renderer_get_padding( &cell->parent, &xpad, &ypad );
+    gtr_cell_renderer_get_padding( GTK_CELL_RENDERER( cell ), &xpad, &ypad );
 
     /* get the idealized cell dimensions */
     g_object_set( p->icon_renderer, "pixbuf", icon, NULL );
@@ -565,7 +565,7 @@ render_compact( TorrentCellRenderer   * cell,
     icon = get_icon( tor, COMPACT_ICON_SIZE, widget );
     name = tr_torrentInfo( tor )->name;
     status = getShortStatusString( tor, st, p->upload_speed_KBps, p->download_speed_KBps );
-    gtr_cell_renderer_get_padding( &cell->parent, &xpad, &ypad );
+    gtr_cell_renderer_get_padding( GTK_CELL_RENDERER( cell ), &xpad, &ypad );
 
     fill_area = *background_area;
     fill_area.x += xpad;
@@ -643,7 +643,7 @@ render_full( TorrentCellRenderer   * cell,
     name = inf->name;
     status = getStatusString( tor, st, p->upload_speed_KBps, p->download_speed_KBps );
     progress = getProgressString( tor, inf, st );
-    gtr_cell_renderer_get_padding( &cell->parent, &xpad, &ypad );
+    gtr_cell_renderer_get_padding( GTK_CELL_RENDERER( cell ), &xpad, &ypad );
 
     /* get the idealized cell dimensions */
     g_object_set( p->icon_renderer, "pixbuf", icon, NULL );
