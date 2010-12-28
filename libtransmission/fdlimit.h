@@ -98,7 +98,7 @@ void tr_fdTorrentClose( tr_session * session, int torrentId );
 int      tr_fdSocketCreate( tr_session * session, int domain, int type );
 
 int      tr_fdSocketAccept( tr_session  * session,
-                            int           b,
+                            int           listening_sockfd,
                             tr_address  * addr,
                             tr_port     * port );
 
