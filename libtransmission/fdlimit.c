@@ -72,7 +72,7 @@
 #endif
 
 static tr_bool
-preallocateFileSparse( int fd, uint64_t length )
+preallocate_file_sparse( int fd, uint64_t length )
 {
     const char zero = '\0';
     tr_bool success = 0;
@@ -94,7 +94,7 @@ preallocateFileSparse( int fd, uint64_t length )
 }
 
 static tr_bool
-preallocateFileFull( const char * filename, uint64_t length )
+preallocate_file_full( const char * filename, uint64_t length )
 {
     tr_bool success = 0;
 
@@ -375,7 +375,7 @@ cached_file_open( struct tr_cached_file  * o,
     alreadyExisted = !stat( filename, &sb ) && S_ISREG( sb.st_mode );
 
     if( writable && !alreadyExisted && ( allocation == TR_PREALLOCATE_FULL ) )
-        if( preallocateFileFull( filename, file_size ) )
+        if( preallocate_file_full( filename, file_size ) )
             tr_dbg( "Preallocated file \"%s\"", filename );
 
     /* open the file */
@@ -408,7 +408,7 @@ cached_file_open( struct tr_cached_file  * o,
         ftruncate( o->fd, file_size );
 
     if( writable && !alreadyExisted && ( allocation == TR_PREALLOCATE_SPARSE ) )
-        preallocateFileSparse( o->fd, file_size );
+        preallocate_file_sparse( o->fd, file_size );
 
     /* Many (most?) clients request blocks in ascending order,
      * so increase the readahead buffer.
@@ -425,7 +425,7 @@ cached_file_open( struct tr_cached_file  * o,
 struct tr_fileset
 {
     struct tr_cached_file * begin;
-    struct tr_cached_file * end;
+    const struct tr_cached_file * end;
 };
 
 static void
@@ -457,7 +457,7 @@ fileset_destruct( struct tr_fileset * set )
 {
     fileset_close_all( set );
     tr_free( set->begin );
-    set->begin = set->end = NULL;
+    set->end = set->begin = NULL;
 }
 
 static void
@@ -501,6 +501,12 @@ fileset_get_empty_slot( struct tr_fileset * set )
             cull = o;
     cached_file_close( cull );
     return cull;
+}
+
+static int
+fileset_get_size( const struct tr_fileset * set )
+{
+    return set ? set->end - set->begin : 0;
 }
 
 /***
@@ -555,7 +561,7 @@ tr_fdFileCheckout( tr_session             * session,
                    tr_file_index_t          i,
                    const char             * filename,
                    tr_bool                  writable,
-                   tr_preallocation_mode    preallocation_mode,
+                   tr_preallocation_mode    allocation,
                    uint64_t                 file_size )
 {
     struct tr_fileset * set = get_fileset( session );
@@ -568,7 +574,7 @@ tr_fdFileCheckout( tr_session             * session,
 
     if( !cached_file_is_open( o ) )
     {
-        const int err = cached_file_open( o, filename, writable, preallocation_mode, file_size );
+        const int err = cached_file_open( o, filename, writable, allocation, file_size );
         if( err ) {
             errno = err;
             return -1;
@@ -737,10 +743,9 @@ tr_fdClose( tr_session * session )
 ***/
 
 int
-tr_fdGetFileLimit( const tr_session * session )
+tr_fdGetFileLimit( tr_session * session )
 {
-    const struct tr_fileset * set = session && session->fdInfo ? &session->fdInfo->fileset : NULL;
-    return set ? set->end - set->begin : 0;
+    return fileset_get_size( get_fileset( session ) );
 }
 
 void

@@ -24,7 +24,7 @@
 
 void tr_fdSetFileLimit( tr_session * session, int limit );
 
-int tr_fdGetFileLimit( const tr_session * session );
+int tr_fdGetFileLimit( tr_session * session );
 
 void tr_fdSetGlobalPeerLimit( tr_session * session, int limit );
 
