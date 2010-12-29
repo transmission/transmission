@@ -1689,8 +1689,6 @@ tr_bencToFile( const tr_benc * top, tr_fmt_mode mode, const char * filename )
             nleft = evbuffer_get_length( buffer );
             while( nleft > 0 ) {
                 const int n = evbuffer_write( buffer, fd );
-                if( n < nleft )
-                    fprintf( stderr, "wrote %d of %d to %s\n", n, nleft, tmp );
                 if( n >= 0 )
                     nleft -= n;
                 else if( errno != EAGAIN ) {
