@@ -1926,6 +1926,7 @@ torrentCallScript( const tr_torrent * tor, const char * script )
 
     if( script && *script )
     {
+        int i;
         char * cmd[] = { tr_strdup( script ), NULL };
         char * env[] = {
             tr_strdup_printf( "TR_APP_VERSION=%s", SHORT_VERSION_STRING ),
@@ -1944,6 +1945,9 @@ torrentCallScript( const tr_torrent * tor, const char * script )
             execve( script, cmd, env );
             _exit( 0 );
         }
+
+        for( i=0; cmd[i]; ++i ) tr_free( cmd[i] );
+        for( i=0; env[i]; ++i ) tr_free( env[i] );
     }
 }
 
