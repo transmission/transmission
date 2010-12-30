@@ -765,7 +765,7 @@ setLocalErrorIfFilesDisappeared( tr_torrent * tor )
     if( disappeared )
     {
         tr_tordbg( tor, "%s", "[LAZY] uh oh, the files disappeared" );
-        tr_torrentSetLocalError( tor, "%s", _( "This torrent's files are missing! (Did you unplug an external drive?)" ) );
+        tr_torrentSetLocalError( tor, "%s", _( "No data found! Ensure your drives are connected or use \"Set Location\". To re-download, remove the torrent and re-add it." ) );
     }
 
     return disappeared;
