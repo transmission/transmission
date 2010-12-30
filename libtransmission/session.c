@@ -218,16 +218,31 @@ open_incoming_peer_port( tr_session * session )
 }
 
 const tr_address*
-tr_sessionGetPublicAddress( const tr_session * session, int tr_af_type )
+tr_sessionGetPublicAddress( const tr_session * session, int tr_af_type, tr_bool * is_default_value )
 {
+    const char * default_value;
     const struct tr_bindinfo * bindinfo;
 
     switch( tr_af_type )
     {
-        case TR_AF_INET:  bindinfo = session->public_ipv4; break;
-        case TR_AF_INET6: bindinfo = session->public_ipv6; break;
-        default:          bindinfo = NULL;                 break;
+        case TR_AF_INET:
+            bindinfo = session->public_ipv4;
+            default_value = TR_DEFAULT_BIND_ADDRESS_IPV4;
+            break;
+
+        case TR_AF_INET6:
+            bindinfo = session->public_ipv6;
+            default_value = TR_DEFAULT_BIND_ADDRESS_IPV6;
+            break;
+
+        default:
+            bindinfo = NULL;
+            default_value = "";
+            break;
     }
+
+    if( is_default_value != NULL )
+        *is_default_value = !strcmp( default_value, tr_ntop_non_ts( &bindinfo->addr ) );
 
     return bindinfo ? &bindinfo->addr : NULL;
 }

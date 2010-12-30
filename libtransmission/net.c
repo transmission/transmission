@@ -315,7 +315,7 @@ tr_netOpenPeerSocket( tr_session        * session,
     addrlen = setup_sockaddr( addr, port, &sock );
 
     /* set source address */
-    source_addr = tr_sessionGetPublicAddress( session, addr->type );
+    source_addr = tr_sessionGetPublicAddress( session, addr->type, NULL );
     assert( source_addr );
     sourcelen = setup_sockaddr( source_addr, 0, &source_sock );
     if( bind( s, ( struct sockaddr * ) &source_sock, sourcelen ) )
