@@ -218,7 +218,10 @@ void         tr_sessionUnlock( tr_session * );
 
 tr_bool      tr_sessionIsLocked( const tr_session * );
 
-const struct tr_address*  tr_sessionGetPublicAddress( const tr_session *, int tr_af_type );
+const struct tr_address*  tr_sessionGetPublicAddress( const tr_session  * session,
+                                                      int                 tr_af_type,
+                                                      tr_bool           * is_default_value );
+
 
 struct tr_bindsockets * tr_sessionGetBindSockets( tr_session * );
 
