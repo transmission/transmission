@@ -641,6 +641,10 @@ handle_request( struct evhttp_request * req, void * arg )
         {
             handle_web_client( req, server );
         }
+        else if( !strncmp( req->uri + strlen( server->url ), "upload", 6 ) )
+        {
+            handle_upload( req, server );
+        }
 #ifdef REQUIRE_SESSION_ID
         else if( !test_session_id( server, req ) )
         {
@@ -665,10 +669,6 @@ handle_request( struct evhttp_request * req, void * arg )
         else if( !strncmp( req->uri + strlen( server->url ), "rpc", 3 ) )
         {
             handle_rpc( req, server );
-        }
-        else if( !strncmp( req->uri + strlen( server->url ), "upload", 6 ) )
-        {
-            handle_upload( req, server );
         }
         else
         {
