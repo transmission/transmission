@@ -62,9 +62,13 @@
 
 void completenessChangeCallback(tr_torrent * torrent, tr_completeness status, tr_bool wasRunning, void * torrentData)
 {
+    NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
+    
     NSDictionary * dict = [[NSDictionary alloc] initWithObjectsAndKeys: [NSNumber numberWithInt: status], @"Status",
                             [NSNumber numberWithBool: wasRunning], @"WasRunning", nil];
     [(Torrent *)torrentData performSelectorOnMainThread: @selector(completenessChange:) withObject: dict waitUntilDone: NO];
+    
+    [pool drain];
 }
 
 void ratioLimitHitCallback(tr_torrent * torrent, void * torrentData)

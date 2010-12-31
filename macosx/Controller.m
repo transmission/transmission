@@ -1911,8 +1911,6 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 
 - (void) torrentFinishedDownloading: (NSNotification *) notification
 {
-    NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
-    
     Torrent * torrent = [notification object];
     
     if ([[[notification userInfo] objectForKey: @"WasRunning"] boolValue])
@@ -1953,14 +1951,10 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     }
     
     [self updateTorrentsInQueue];
-    
-    [pool drain];
 }
 
 - (void) torrentRestartedDownloading: (NSNotification *) notification
 {
-    NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
-    
     Torrent * torrent = [notification object];
     if ([torrent isActive] && [fDefaults boolForKey: @"Queue"] && [self numToStartFromQueue: YES] == 0)
     {
@@ -1969,14 +1963,10 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     }
     
     [self updateTorrentsInQueue];
-    
-    [pool drain];
 }
 
 - (void) torrentFinishedSeeding: (NSNotification *) notification
 {
-    NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
-    
     Torrent * torrent = [notification object];
     
     [self updateTorrentsInQueue];
@@ -2007,8 +1997,6 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     [GrowlApplicationBridge notifyWithTitle: NSLocalizedString(@"Seeding Complete", "Growl notification title")
                         description: [torrent name] notificationName: GROWL_SEEDING_COMPLETE
                         iconData: nil priority: 0 isSticky: NO clickContext: clickContext];
-    
-    [pool drain];
 }
 
 - (void) updateTorrentHistory
