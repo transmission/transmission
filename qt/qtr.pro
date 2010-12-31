@@ -15,13 +15,17 @@ CONFIG += qt qdbus thread debug link_pkgconfig
 QT += network
 PKGCONFIG = fontconfig libcurl openssl dbus-1
 
+# if you have libevent2 installed in a custom path, specify it here
+EVENT_TOP = /usr
+INCLUDEPATH = $${EVENT_TOP}/include $${INCLUDEPATH}
+
 TRANSMISSION_TOP = ..
 INCLUDEPATH += $${TRANSMISSION_TOP}
 LIBS += $${TRANSMISSION_TOP}/libtransmission/libtransmission.a
 LIBS += $${TRANSMISSION_TOP}/third-party/dht/libdht.a
 LIBS += $${TRANSMISSION_TOP}/third-party/miniupnp/libminiupnp.a
 LIBS += $${TRANSMISSION_TOP}/third-party/libnatpmp/libnatpmp.a
-unix: LIBS += -levent -lz
+unix: LIBS += -L$${EVENT_TOP}/lib -levent -lz
 win32:DEFINES += QT_DBUS
 win32:LIBS += -levent -lws2_32 -lintl
 win32:LIBS += -lidn -liconv -lwldap32 -liphlpapi

@@ -30,6 +30,8 @@
 
 #include <curl/curl.h>
 
+#include <event2/buffer.h>
+
 #include <libtransmission/transmission.h>
 #include <libtransmission/bencode.h>
 #include <libtransmission/json.h>
@@ -662,11 +664,11 @@ Session :: exec( const tr_benc * request )
 }
 
 void
-Session :: localSessionCallback( tr_session * session, const char * json, size_t len, void * self )
+Session :: localSessionCallback( tr_session * session, struct evbuffer * json, void * self )
 {
     Q_UNUSED( session );
 
-    ((Session*)self)->parseResponse( json, len );
+    ((Session*)self)->parseResponse( (const char*) evbuffer_pullup( json, -1 ), evbuffer_get_length( json ) );
 }
 
 #define REQUEST_DATA_PROPERTY_KEY "requestData"
