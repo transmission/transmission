@@ -756,8 +756,6 @@ tr_msg_level;
 
 void tr_setMessageLevel( tr_msg_level );
 
-tr_msg_level tr_getMessageLevel( void );
-
 typedef struct tr_msg_list
 {
     /* TR_MSG_ERR, TR_MSG_INF, or TR_MSG_DBG */

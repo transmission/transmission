@@ -116,11 +116,16 @@ const char * tr_strip_positional_args( const char * fmt );
 
 #define TR_MAX_MSG_LOG 10000
 
-extern tr_msg_level messageLevel;
+extern tr_msg_level __tr_message_level;
+
+static inline tr_msg_level tr_getMessageLevel( void )
+{
+    return __tr_message_level;
+}
 
 static inline tr_bool tr_msgLoggingIsActive( tr_msg_level level )
 {
-    return messageLevel >= level;
+    return tr_getMessageLevel() >= level;
 }
 
 void tr_msg( const char * file, int line,
@@ -531,7 +536,7 @@ void tr_removeElementFromArray( void         * array,
 ***/
 
 /** @brief Private libtransmission variable that's visible only for inlining in tr_time() */
-extern time_t transmission_now;
+extern time_t __tr_current_time;
 
 /**
  * @brief very inexpensive form of time(NULL)
@@ -543,10 +548,10 @@ extern time_t transmission_now;
  * to always be accurate. However, it is *much* faster when 100% accuracy
  * isn't needed
  */
-static inline time_t tr_time( void ) { return transmission_now; }
+static inline time_t tr_time( void ) { return __tr_current_time; }
 
 /** @brief Private libtransmission function to update tr_time()'s counter */
-static inline void tr_timeUpdate( time_t now ) { transmission_now = now; }
+static inline void tr_timeUpdate( time_t now ) { __tr_current_time = now; }
 
 /** @brief Portability wrapper for realpath() that uses the system implementation if available */
 char* tr_realpath( const char *path, char * resolved_path );

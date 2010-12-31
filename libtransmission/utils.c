@@ -63,9 +63,9 @@
 #include "version.h"
 
 
-time_t transmission_now = 0;
+time_t       __tr_current_time   = 0;
+tr_msg_level __tr_message_level  = TR_MSG_ERR;
 
-tr_msg_level messageLevel = TR_MSG_ERR;
 static tr_bool        messageQueuing = FALSE;
 static tr_msg_list *  messageQueue = NULL;
 static tr_msg_list ** messageQueueTail = &messageQueue;
@@ -124,13 +124,7 @@ tr_getLog( void )
 void
 tr_setMessageLevel( tr_msg_level level )
 {
-    messageLevel = level;
-}
-
-tr_msg_level
-tr_getMessageLevel( void )
-{
-    return messageLevel;
+    __tr_message_level = level;
 }
 
 void
