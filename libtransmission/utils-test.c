@@ -293,9 +293,6 @@ test_memmem( void )
     check( tr_memmem( haystack, sizeof haystack, haystack, sizeof haystack) == haystack )
     check( tr_memmem( haystack, sizeof haystack, needle, sizeof needle) == haystack + 2 )
     check( tr_memmem( needle, sizeof needle, haystack, sizeof haystack) == NULL )
-    check( tr_memmem( haystack, sizeof haystack, "", 0) == haystack )
-    check( tr_memmem( haystack, sizeof haystack, NULL, 0) == haystack )
-    check( tr_memmem( haystack, 0, "", 0) == haystack )
 
     return 0;
 }
