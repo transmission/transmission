@@ -2,13 +2,13 @@
 <archive type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="7.10">
 	<data>
 		<int key="IBDocument.SystemTarget">1050</int>
-		<string key="IBDocument.SystemVersion">10F569</string>
-		<string key="IBDocument.InterfaceBuilderVersion">788</string>
-		<string key="IBDocument.AppKitVersion">1038.29</string>
+		<string key="IBDocument.SystemVersion">10H574</string>
+		<string key="IBDocument.InterfaceBuilderVersion">823</string>
+		<string key="IBDocument.AppKitVersion">1038.35</string>
 		<string key="IBDocument.HIToolboxVersion">461.00</string>
 		<object class="NSMutableDictionary" key="IBDocument.PluginVersions">
 			<string key="NS.key.0">com.apple.InterfaceBuilder.CocoaPlugin</string>
-			<string key="NS.object.0">788</string>
+			<string key="NS.object.0">823</string>
 		</object>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -20,13 +20,8 @@
 			<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 		</object>
 		<object class="NSMutableDictionary" key="IBDocument.Metadata">
-			<bool key="EncodedWithXMLCoder">YES</bool>
-			<object class="NSArray" key="dict.sortedKeys" id="0">
-				<bool key="EncodedWithXMLCoder">YES</bool>
-			</object>
-			<object class="NSMutableArray" key="dict.values">
-				<bool key="EncodedWithXMLCoder">YES</bool>
-			</object>
+			<string key="NS.key.0">PluginDependencyRecalculationVersion</string>
+			<integer value="1" key="NS.object.0"/>
 		</object>
 		<object class="NSMutableArray" key="IBDocument.RootObjects" id="179598352">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -59,7 +54,7 @@
 						<object class="NSPopUpButton" id="327116749">
 							<reference key="NSNextResponder" ref="303120456"/>
 							<int key="NSvFlags">292</int>
-							<string key="NSFrame">{{6, 2}, {36, 18}}</string>
+							<string key="NSFrame">{{6, 3}, {36, 18}}</string>
 							<reference key="NSSuperview" ref="303120456"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSPopUpButtonCell" key="NSCell" id="1063285887">
@@ -143,7 +138,7 @@
 						<object class="NSButton" id="673219624">
 							<reference key="NSNextResponder" ref="303120456"/>
 							<int key="NSvFlags">292</int>
-							<string key="NSFrame">{{45, 2}, {36, 18}}</string>
+							<string key="NSFrame">{{45, 3}, {36, 18}}</string>
 							<reference key="NSSuperview" ref="303120456"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSButtonCell" key="NSCell" id="109224088">
@@ -171,7 +166,7 @@
 						<object class="NSTextField" id="403739499">
 							<reference key="NSNextResponder" ref="303120456"/>
 							<int key="NSvFlags">258</int>
-							<string key="NSFrame">{{86, 4}, {339, 14}}</string>
+							<string key="NSFrame">{{86, 5}, {339, 14}}</string>
 							<reference key="NSSuperview" ref="303120456"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSTextFieldCell" key="NSCell" id="696487414">
@@ -217,7 +212,7 @@
 										<object class="NSOutlineView" id="675318801">
 											<reference key="NSNextResponder" ref="306237956"/>
 											<int key="NSvFlags">256</int>
-											<string key="NSFrameSize">{515, 225}</string>
+											<string key="NSFrameSize">{515, 224}</string>
 											<reference key="NSSuperview" ref="306237956"/>
 											<bool key="NSEnabled">YES</bool>
 											<object class="_NSCornerView" key="NSCornerView">
@@ -418,7 +413,7 @@ sls1vFyrKctYw9ttt1zZnRu9z08wltttzRStvct6MglluduZu5qNnNx9slZNyllJ8ds90FtRSt0dzl3N
 AAAAAQA+AAABAQADAAAAAQA+AAABAgADAAAABAAAJMwBAwADAAAAAQAFAAABBgADAAAAAQACAAABEQAE
 AAAAAQAAAAgBEgADAAAAAQABAAABFQADAAAAAQAEAAABFgADAAAAAQA+AAABFwAEAAAAAQAAJAkBHAAD
 AAAAAQABAAABPQADAAAAAQACAAABUgADAAAAAQABAAABUwADAAAABAAAJNSHcwAHAAAYmAAAJNwAAAAA
-AAgACAAIAAgAAQABAAEAAQAAGJhhcHBsAhAAAG1udHJSR0IgWFlaIAfaAAYAGgAKAB0ANWFjc3BBUFBM
+AAgACAAIAAgAAQABAAEAAQAAGJhhcHBsAhAAAG1udHJSR0IgWFlaIAfaAAsACgAXABAAI2Fjc3BBUFBM
 AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD21gABAAAAANMtYXBwbAAAAAAAAAAAAAAAAAAAAAAAAAAA
 AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEWRlc2MAAAFQAAAAYmRzY20AAAG0AAAA8GNwcnQAAAKk
 AAAA0Hd0cHQAAAN0AAAAFHJYWVoAAAOIAAAAFGdYWVoAAAOcAAAAFGJYWVoAAAOwAAAAFHJUUkMAAAPE
@@ -707,7 +702,7 @@ AAAAAAAAAAAAAAAAA</bytes>
 											<bool key="NSOutlineViewIndentationMarkerFollowsCellKey">NO</bool>
 										</object>
 									</object>
-									<string key="NSFrameSize">{515, 225}</string>
+									<string key="NSFrameSize">{515, 224}</string>
 									<reference key="NSSuperview" ref="87647552"/>
 									<reference key="NSNextKeyView" ref="675318801"/>
 									<reference key="NSDocView" ref="675318801"/>
@@ -734,7 +729,7 @@ AAAAAAAAAAAAAAAAA</bytes>
 									<double key="NSPercent">0.57142859999999995</double>
 								</object>
 							</object>
-							<string key="NSFrame">{{0, 23}, {515, 225}}</string>
+							<string key="NSFrame">{{0, 24}, {515, 224}}</string>
 							<reference key="NSSuperview" ref="303120456"/>
 							<reference key="NSNextKeyView" ref="306237956"/>
 							<int key="NSsFlags">528</int>
@@ -4999,7 +4994,9 @@ AAAAAAAAAAAAAAAAA</bytes>
 					<bool key="EncodedWithXMLCoder">YES</bool>
 					<object class="IBObjectRecord">
 						<int key="objectID">0</int>
-						<reference key="object" ref="0"/>
+						<object class="NSArray" key="object" id="0">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+						</object>
 						<reference key="children" ref="179598352"/>
 						<nil key="parent"/>
 					</object>
@@ -7479,6 +7476,7 @@ AAAAAAAAAAAAAAAAA</bytes>
 					<string>2564.IBPluginDependency</string>
 					<string>2564.ImportedFromIB2</string>
 					<string>2681.IBPluginDependency</string>
+					<string>2681.IBViewBoundsToFrameTransform</string>
 					<string>2681.ImportedFromIB2</string>
 					<string>2683.IBEditorWindowLastContentRect</string>
 					<string>2683.IBPluginDependency</string>
@@ -8090,6 +8088,9 @@ AAAAAAAAAAAAAAAAA</bytes>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="1"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<object class="NSAffineTransform">
+						<bytes key="NSTransformStruct">P4AAAL+AAABAwAAAwZgAAA</bytes>
+					</object>
 					<integer value="1"/>
 					<string>{{346, 449}, {108, 63}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
