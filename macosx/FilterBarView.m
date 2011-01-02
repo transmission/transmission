@@ -55,16 +55,13 @@
     NSColor * colorRects[2];
     
     NSRect lineBorderRect = NSMakeRect(NSMinX(rect), NSHeight([self bounds]) - 1.0, NSWidth(rect), 1.0);
-    if ([[self window] isMainWindow])
+    if (NSIntersectsRect(lineBorderRect, rect))
     {
-        if (NSIntersectsRect(lineBorderRect, rect))
-        {
-            gridRects[count] = lineBorderRect;
-            colorRects[count] = [NSColor whiteColor];
-            ++count;
-            
-            rect.size.height -= 1.0;
-        }
+        gridRects[count] = lineBorderRect;
+        colorRects[count] = [NSColor whiteColor];
+        ++count;
+        
+        rect.size.height -= 1.0;
     }
     
     lineBorderRect.origin.y = 0.0;
