@@ -40,6 +40,11 @@ AddData :: set( const QString& key )
         metainfo = file.readAll( );
         file.close( );
     }
+    else if( Utils::isHexHashcode( key ) )
+    {
+        magnet = QString("magnet:?xt=urn:btih:") + key;
+        type = MAGNET;
+    }
     else
     {
         int len;
