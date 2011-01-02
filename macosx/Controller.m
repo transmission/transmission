@@ -391,8 +391,6 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 
 - (void) awakeFromNib
 {
-    [fFilterBar setIsFilter: YES];
-    
     NSToolbar * toolbar = [[NSToolbar alloc] initWithIdentifier: @"TRMainToolbar"];
     [toolbar setDelegate: self];
     [toolbar setAllowsUserCustomization: YES];

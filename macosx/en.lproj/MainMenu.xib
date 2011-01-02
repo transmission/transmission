@@ -13,7 +13,7 @@
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
 			<integer value="2"/>
-			<integer value="1480"/>
+			<integer value="1603"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -2168,6 +2168,7 @@ AAAAAAAAAAAAAAAAA</bytes>
 						<int key="NSvFlags">257</int>
 						<string key="NSFrame">{{258, 4}, {64, 14}}</string>
 						<reference key="NSSuperview" ref="492482618"/>
+						<reference key="NSWindow"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSTextFieldCell" key="NSCell" id="7712611">
 							<int key="NSCellFlags">67239424</int>
@@ -2184,6 +2185,7 @@ AAAAAAAAAAAAAAAAA</bytes>
 						<int key="NSvFlags">257</int>
 						<string key="NSFrame">{{336, 4}, {64, 14}}</string>
 						<reference key="NSSuperview" ref="492482618"/>
+						<reference key="NSWindow"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSTextFieldCell" key="NSCell" id="551795479">
 							<int key="NSCellFlags">67239424</int>
@@ -2212,6 +2214,7 @@ AAAAAAAAAAAAAAAAA</bytes>
 						</object>
 						<string key="NSFrame">{{325, 5}, {8, 12}}</string>
 						<reference key="NSSuperview" ref="492482618"/>
+						<reference key="NSWindow"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSImageCell" key="NSCell" id="507285438">
 							<int key="NSCellFlags">130560</int>
@@ -2244,6 +2247,7 @@ AAAAAAAAAAAAAAAAA</bytes>
 						</object>
 						<string key="NSFrame">{{247, 5}, {8, 12}}</string>
 						<reference key="NSSuperview" ref="492482618"/>
+						<reference key="NSWindow"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSImageCell" key="NSCell" id="268918248">
 							<int key="NSCellFlags">130560</int>
@@ -2264,6 +2268,7 @@ AAAAAAAAAAAAAAAAA</bytes>
 						<int key="NSvFlags">268</int>
 						<string key="NSFrame">{{5, 2}, {103, 17}}</string>
 						<reference key="NSSuperview" ref="492482618"/>
+						<reference key="NSWindow"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSPopUpButtonCell" key="NSCell" id="9693266">
 							<int key="NSCellFlags">-2076049856</int>
@@ -2328,11 +2333,12 @@ AAAAAAAAAAAAAAAAA</bytes>
 				</object>
 				<string key="NSFrameSize">{400, 21}</string>
 				<reference key="NSSuperview"/>
+				<reference key="NSWindow"/>
 				<string key="NSClassName">StatusBarView</string>
 				<string key="NSExtension">NSView</string>
 			</object>
 			<object class="NSCustomView" id="793806362">
-				<nil key="NSNextResponder"/>
+				<reference key="NSNextResponder"/>
 				<int key="NSvFlags">266</int>
 				<object class="NSMutableArray" key="NSSubviews">
 					<bool key="EncodedWithXMLCoder">YES</bool>
@@ -2603,7 +2609,8 @@ AAAAAAAAAAAAAAAAA</bytes>
 					</object>
 				</object>
 				<string key="NSFrameSize">{457, 23}</string>
-				<string key="NSClassName">StatusBarView</string>
+				<reference key="NSSuperview"/>
+				<string key="NSClassName">FilterBarView</string>
 				<string key="NSExtension">NSView</string>
 			</object>
 			<object class="NSCustomObject" id="456998591">
@@ -7401,6 +7408,7 @@ AAAAAAAAAAAAAAAAA</bytes>
 					<string>2029.ImportedFromIB2</string>
 					<string>2031.IBPluginDependency</string>
 					<string>2031.ImportedFromIB2</string>
+					<string>2043.IBEditorWindowLastContentRect</string>
 					<string>2043.IBPluginDependency</string>
 					<string>2043.ImportedFromIB2</string>
 					<string>2044.IBPluginDependency</string>
@@ -8013,6 +8021,7 @@ AAAAAAAAAAAAAAAAA</bytes>
 					<integer value="1"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="1"/>
+					<string>{{0, 952}, {118, 43}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="1"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -9289,6 +9298,14 @@ AAAAAAAAAAAAAAAAA</bytes>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>
 						<string key="minorKey">macosx/FileOutlineView.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">FilterBarView</string>
+					<string key="superclassName">NSView</string>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">macosx/FilterBarView.h</string>
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">

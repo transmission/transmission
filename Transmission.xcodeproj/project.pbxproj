@@ -193,6 +193,7 @@
 		A2623B4E0D3DC6DF0045D19A /* ActionHover.png in Resources */ = {isa = PBXBuildFile; fileRef = A2623B4D0D3DC6DF0045D19A /* ActionHover.png */; };
 		A263CFC010DD67670038DE27 /* InfoTextField.m in Sources */ = {isa = PBXBuildFile; fileRef = A263CFBF10DD67670038DE27 /* InfoTextField.m */; };
 		A263D03E10DE6F010038DE27 /* Magnet.png in Resources */ = {isa = PBXBuildFile; fileRef = A263D03D10DE6F010038DE27 /* Magnet.png */; };
+		A2661D6112D0E8D9004F69D5 /* FilterBarView.m in Sources */ = {isa = PBXBuildFile; fileRef = A2661D3B12D0E51B004F69D5 /* FilterBarView.m */; };
 		A26AF21A0D2DA35A00FF7140 /* FileOutlineController.m in Sources */ = {isa = PBXBuildFile; fileRef = A26AF2190D2DA35A00FF7140 /* FileOutlineController.m */; };
 		A26AF27E0D2DBDDF00FF7140 /* AddWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = A26AF27C0D2DBDDF00FF7140 /* AddWindow.xib */; };
 		A26AF2840D2DC27C00FF7140 /* AddWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = A26AF2830D2DC27C00FF7140 /* AddWindowController.m */; };
@@ -697,6 +698,8 @@
 		A265A3BE0D25AE7800198AC8 /* es */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = es; path = macosx/es.lproj/Creator.xib; sourceTree = "<group>"; };
 		A265A3C00D25AE7800198AC8 /* es */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = es; path = macosx/es.lproj/MainMenu.xib; sourceTree = "<group>"; };
 		A265A3C20D25AE7800198AC8 /* es */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = es; path = macosx/es.lproj/PrefsWindow.xib; sourceTree = "<group>"; };
+		A2661D3A12D0E51A004F69D5 /* FilterBarView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FilterBarView.h; path = macosx/FilterBarView.h; sourceTree = "<group>"; };
+		A2661D3B12D0E51B004F69D5 /* FilterBarView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = FilterBarView.m; path = macosx/FilterBarView.m; sourceTree = "<group>"; };
 		A26AF1040D2855FC00FF7140 /* ru */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = ru; path = macosx/ru.lproj/Creator.xib; sourceTree = "<group>"; };
 		A26AF1050D2855FC00FF7140 /* ru */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = ru; path = macosx/ru.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		A26AF1070D2855FC00FF7140 /* ru */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = ru; path = macosx/ru.lproj/Localizable.strings; sourceTree = "<group>"; };
@@ -1061,6 +1064,8 @@
 				E138A9760C04D88F00C5426C /* ProgressGradients.m */,
 				A21282A50CA6C66800EAEE0F /* StatusBarView.h */,
 				A21282A60CA6C66800EAEE0F /* StatusBarView.m */,
+				A2661D3A12D0E51A004F69D5 /* FilterBarView.h */,
+				A2661D3B12D0E51B004F69D5 /* FilterBarView.m */,
 				A2ED7D8D0CEF431B00970975 /* FilterButton.h */,
 				A2ED7D8E0CEF431B00970975 /* FilterButton.m */,
 				A2C89D5F0CFCBF57004CC2BC /* ButtonToolbarItem.m */,
@@ -2166,6 +2171,7 @@
 				A209EBCE1142F2B4002B02D1 /* InfoFileViewController.m in Sources */,
 				A209EBF91142FEEE002B02D1 /* InfoOptionsViewController.m in Sources */,
 				A21F15AC11729A8B00CF5A9C /* AddMagnetWindowController.m in Sources */,
+				A2661D6112D0E8D9004F69D5 /* FilterBarView.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
