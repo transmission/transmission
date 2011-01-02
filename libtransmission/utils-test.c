@@ -404,7 +404,7 @@ test_truncd( void )
     check( !strcmp( buf, "3" ) );
 
     tr_snprintf( buf, sizeof( buf ), "%.2f", tr_truncd( nan, 2 ) );
-    check( !strcmp( buf, "nan" ) );
+    check( strstr( buf, "nan" ) != NULL );
 
     return 0;
 }
