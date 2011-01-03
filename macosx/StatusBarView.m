@@ -54,11 +54,6 @@
     [super dealloc];
 }
 
-- (BOOL) mouseDownCanMoveWindow
-{
-    return YES;
-}
-
 - (void) drawRect: (NSRect) rect
 {
     const BOOL active = [[self window] isMainWindow];
