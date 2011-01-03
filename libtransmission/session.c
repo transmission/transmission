@@ -242,7 +242,7 @@ tr_sessionGetPublicAddress( const tr_session * session, int tr_af_type, tr_bool 
     }
 
     if( is_default_value != NULL )
-        *is_default_value = !strcmp( default_value, tr_ntop_non_ts( &bindinfo->addr ) );
+        *is_default_value = !tr_strcmp0( default_value, tr_ntop_non_ts( &bindinfo->addr ) );
 
     return bindinfo ? &bindinfo->addr : NULL;
 }

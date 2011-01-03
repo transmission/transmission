@@ -774,6 +774,15 @@ tr_strerror( int i )
     return ret;
 }
 
+int
+tr_strcmp0( const char * str1, const char * str2 )
+{
+    if( str1 && str2 ) return strcmp( str1, str2 );
+    if( str1 ) return 1;
+    if( str2 ) return -1;
+    return 0;
+}
+
 /****
 *****
 ****/

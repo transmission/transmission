@@ -348,6 +348,12 @@ char* tr_strndup( const void * in, int len ) TR_GNUC_MALLOC;
  */
 char* tr_strdup( const void * in );
 
+/**
+ * @brief like strcmp() but gracefully handles NULL strings
+ */
+int tr_strcmp0( const char * str1, const char * str2 );
+
+
 
 struct evbuffer;
 
