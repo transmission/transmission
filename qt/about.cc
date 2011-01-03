@@ -87,7 +87,7 @@ void
 AboutDialog :: showCredits( )
 {
     QMessageBox::about( this, tr( "Credits" ),
-        "Charles Kerr (Backend; Daemon; GTK+; Qt)\n"
+        "Jordan Lee (Backend; Daemon; GTK+; Qt)\n"
         "Michell Livingston (Backend; OS X)\n"
         "Kevin Glowacz (Web client)" );
 }

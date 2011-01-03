@@ -1530,7 +1530,7 @@ about( GtkWindow * parent )
     GtkWidget * d;
     const char * website_uri = "http://www.transmissionbt.com/";
     const char * authors[] = {
-        "Charles Kerr (Backend; GTK+)",
+        "Jordan Lee (Backend; GTK+)",
         "Mitchell Livingston (Backend; OS X)",
         NULL
     };
