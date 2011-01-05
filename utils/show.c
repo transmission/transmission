@@ -127,7 +127,7 @@ showInfo( const tr_info * inf )
     **/
 
     printf( "\nTRACKERS\n" );
-    for( i=0; i<(int)inf->trackerCount; ++i )
+    for( i=0; i<inf->trackerCount; ++i )
     {
         if( prevTier != inf->trackers[i].tier )
         {
@@ -136,6 +136,18 @@ showInfo( const tr_info * inf )
         }
 
         printf( "  %s\n", inf->trackers[i].announce );
+    }
+
+    /**
+    ***
+    **/
+
+    if( inf->webseedCount > 0 )
+    {
+        printf( "\nWEBSEEDS\n\n" );
+
+        for( i=0; i<inf->webseedCount; ++i )
+            printf( "  %s\n", inf->webseeds[i] );
     }
 
     /**
