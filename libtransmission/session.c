@@ -241,7 +241,7 @@ tr_sessionGetPublicAddress( const tr_session * session, int tr_af_type, tr_bool 
             break;
     }
 
-    if( is_default_value != NULL )
+    if( is_default_value && bindinfo )
         *is_default_value = !tr_strcmp0( default_value, tr_ntop_non_ts( &bindinfo->addr ) );
 
     return bindinfo ? &bindinfo->addr : NULL;
