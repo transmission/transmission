@@ -882,6 +882,14 @@ tr_sessionGetDownloadDir( const tr_session * session )
     return session->downloadDir;
 }
 
+int64_t
+tr_sessionGetDownloadDirFreeSpace( const tr_session * session )
+{
+    assert( tr_isSession( session ) );
+
+    return tr_getFreeSpace( session->downloadDir );
+}
+
 /***
 ****
 ***/

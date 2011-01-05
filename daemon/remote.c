@@ -1460,6 +1460,8 @@ printSession( tr_benc * top )
             printf( "  Configuration directory: %s\n", str );
         if( tr_bencDictFindStr( args,  TR_PREFS_KEY_DOWNLOAD_DIR, &str ) )
             printf( "  Download directory: %s\n", str );
+        if( tr_bencDictFindInt( args,  "download-dir-free-space", &i ) )
+            printf( "  Download directory free space: %s\n",  strlsize( buf, i, sizeof buf ) );
         if( tr_bencDictFindInt( args, TR_PREFS_KEY_PEER_PORT, &i ) )
             printf( "  Listenport: %" PRId64 "\n", i );
         if( tr_bencDictFindBool( args, TR_PREFS_KEY_PORT_FORWARDING, &boolVal ) )

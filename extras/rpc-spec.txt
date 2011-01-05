@@ -417,6 +417,7 @@
    "cache-size-mb"                  | number     | maximum size of the disk cache (MB)
    "config-dir"                     | string     | location of transmission's configuration directory
    "download-dir"                   | string     | default path to download torrents
+   "download-dir-free-space"        | number     | number of free bytes available in download-dir, or -1 if it can't be calculated
    "dht-enabled"                    | boolean    | true means allow dht in public torrents
    "encryption"                     | string     | "required", "preferred", "tolerated"
    "idle-seeding-limit"             | number     | the default seed inactivity limit for torrents to use
@@ -468,8 +469,8 @@
 
    Method name: "session-set"
    Request arguments: one or more of 4.1's arguments, except: "blocklist-size",
-                      "config-dir", "rpc-version", "rpc-version-minimum",
-                      and "version"
+                      "config-dir", "download-dir-free-space", "rpc-version",
+                      "rpc-version-minimum", and "version"
    Response arguments: none
 
 4.1.2.  Accessors
@@ -642,3 +643,5 @@
    ------+---------+-----------+----------------+-------------------------------
    11    | 2.12    | yes       | session-get    | new arg "blocklist-url"
          |         | yes       | session-set    | new arg "blocklist-url"
+   ------+---------+-----------+----------------+-------------------------------
+   12    | 2.20    | yes       | session-get    | new arg "download-dir-free-space"

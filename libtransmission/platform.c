@@ -34,8 +34,16 @@
 #include <stdlib.h>
 #include <string.h>
 
+#ifdef SYS_DARWIN
+ #define HAVE_SYS_STATVFS_H
+ #define HAVE_STATVFS
+#endif
+
 #include <sys/stat.h>
 #include <sys/types.h>
+#ifdef HAVE_SYS_STATVFS_H
+ #include <sys/statvfs.h>
+#endif
 #ifdef WIN32
 #include <libgen.h>
 #endif
@@ -678,6 +686,27 @@ tr_getWebClientDir( const tr_session * session UNUSED )
 ****
 ***/
 
+int64_t
+tr_getFreeSpace( const char * path )
+{
+#ifdef WIN32
+    uint64_t freeBytesAvailable = 0;
+    return GetDiskFreeSpaceEx( path, &freeBytesAvailable, NULL, NULL)
+        ? (int64_t)freeBytesAvailable
+        : -1;
+#elif defined(HAVE_STATVFS)
+    struct statvfs buf;
+    return statvfs( path, &buf ) ? -1 : (int64_t)buf.f_bavail * (int64_t)buf.f_bsize;
+#else
+    #warning FIXME: not implemented
+    return -1;
+#endif
+}
+
+/***
+****
+***/
+
 #ifdef WIN32
 
 /* The following mmap functions are by Joerg Walter, and were taken from
@@ -797,4 +826,3 @@ munmap_exit:
 }
 
 #endif
-

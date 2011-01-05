@@ -338,6 +338,11 @@ void tr_sessionSetDownloadDir( tr_session * session, const char * downloadDir );
  */
 const char * tr_sessionGetDownloadDir( const tr_session * session );
 
+/**
+ * @brief Get available disk space (in bytes) for the default download folder.
+ * @return zero or positive integer on success, -1 in case of error.
+ */
+int64_t tr_sessionGetDownloadDirFreeSpace( const tr_session * session );
 
 /**
  * @brief Set the torrent's bandwidth priority.
