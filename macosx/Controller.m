@@ -99,6 +99,13 @@ typedef enum
     SORT_ACTIVITY_TAG = 6
 } sortTag;
 
+typedef enum
+{
+    SORT_ASC_TAG = 0,
+    SORT_DESC_TAG = 1
+} sortOrderTag;
+
+
 #define FILTER_NONE     @"None"
 #define FILTER_ACTIVE   @"Active"
 #define FILTER_DOWNLOAD @"Download"
@@ -2057,8 +2064,12 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 
 - (void) setSortReverse: (id) sender
 {
-    [fDefaults setBool: ![fDefaults boolForKey: @"SortReverse"] forKey: @"SortReverse"];
-    [self sortTorrents];
+    const BOOL setReverse = [sender tag] == SORT_DESC_TAG;
+    if (setReverse != [fDefaults boolForKey: @"SortReverse"])
+    {
+        [fDefaults setBool: setReverse forKey: @"SortReverse"];
+        [self sortTorrents];
+    }
 }
 
 - (void) sortTorrents
@@ -4021,7 +4032,8 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     //enable reverse sort item
     if (action == @selector(setSortReverse:))
     {
-        [menuItem setState: [fDefaults boolForKey: @"SortReverse"] ? NSOnState : NSOffState];
+        const BOOL isReverse = [menuItem tag] == SORT_DESC_TAG;
+        [menuItem setState: (isReverse == [fDefaults boolForKey: @"SortReverse"]) ? NSOnState : NSOffState];
         return ![[fDefaults stringForKey: @"Sort"] isEqualToString: SORT_ORDER];
     }
     
