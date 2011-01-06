@@ -394,7 +394,7 @@ cached_file_open( struct tr_cached_file  * o,
     if( o->fd == -1 )
     {
         const int err = errno;
-        tr_err( ( "Couldn't open \"%1$s\": %2$s" ), filename, tr_strerror( err ) );
+        tr_err( _( "Couldn't open \"%1$s\": %2$s" ), filename, tr_strerror( err ) );
         return err;
     }
 
