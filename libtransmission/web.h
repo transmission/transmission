@@ -50,13 +50,20 @@ typedef void ( tr_web_done_func )( tr_session       * session,
 
 const char * tr_webGetResponseStr( long response_code );
 
-void         tr_webRun( tr_session        * session,
-                        const char        * url,
-                        const char        * range,
-                        tr_web_done_func    done_func,
-                        void              * done_func_user_data );
+void tr_webRun( tr_session        * session,
+                const char        * url,
+                const char        * range,
+                tr_web_done_func    done_func,
+                void              * done_func_user_data );
 
 struct evbuffer;
+
+void tr_webRunWithBuffer( tr_session         * session,
+                          const char         * url,
+                          const char         * range,
+                          tr_web_done_func     done_func,
+                          void               * done_func_user_data,
+                          struct evbuffer    * buffer );
 
 void tr_http_escape( struct evbuffer *out, const char *str, int len, tr_bool escape_slashes );
 

@@ -73,8 +73,7 @@ tr_rcRate_Bps( const tr_ratecontrol * r, uint64_t now )
 ***/
 
 void
-tr_rcTransferred( tr_ratecontrol * r,
-                  size_t           size )
+tr_rcTransferred( tr_ratecontrol * r, size_t size )
 {
     const uint64_t now = tr_time_msec ( );
 

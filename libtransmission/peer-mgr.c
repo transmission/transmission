@@ -160,7 +160,7 @@ tr_isAtom( const struct peer_atom * atom )
 static const char*
 tr_atomAddrStr( const struct peer_atom * atom )
 {
-    return tr_peerIoAddrStr( &atom->addr, atom->port );
+    return atom ? tr_peerIoAddrStr( &atom->addr, atom->port ) : "[no atom]";
 }
 
 struct block_request
@@ -1199,7 +1199,7 @@ refillUpkeep( int foo UNUSED, short bar UNUSED, void * vmgr )
 
             for( it=t->requests, end=it+n; it!=end; ++it )
             {
-                if( ( it->sentAt <= too_old ) && !tr_peerMsgsIsReadingBlock( it->peer->msgs, it->block ) )
+                if( ( it->sentAt <= too_old ) && it->peer->msgs && !tr_peerMsgsIsReadingBlock( it->peer->msgs, it->block ) )
                     cancel[cancelCount++] = *it;
                 else
                 {
@@ -1407,7 +1407,7 @@ peerCallbackFunc( tr_peer * peer, const tr_peer_event * e, void * vt )
                 tr_statsAddDownloaded( tor->session, e->length );
 
             /* update our atom */
-            if( peer && e->wasPieceData )
+            if( peer && peer->atom && e->wasPieceData )
                 peer->atom->piece_data_time = now;
 
             break;
@@ -1434,7 +1434,7 @@ peerCallbackFunc( tr_peer * peer, const tr_peer_event * e, void * vt )
             requestListRemove( t, block, peer );
             pieceListRemoveRequest( t, block );
 
-            if( peer != NULL )
+            if( peer && peer->blocksSentToClient )
                 tr_historyAdd( peer->blocksSentToClient, tr_time( ), 1 );
 
             if( tr_cpBlockIsComplete( &tor->completion, block ) )
@@ -1482,7 +1482,7 @@ peerCallbackFunc( tr_peer * peer, const tr_peer_event * e, void * vt )
                          * content distributor, not the peers, it is the tracker's job
                          * to manage the swarms, not the web server and does not fit
                          * into the jurisdiction of the tracker." */
-                        if( peer != NULL ) {
+                        if( peer->msgs != NULL ) {
                             const uint32_t n = tr_torPieceCountBytes( tor, p );
                             tr_announcerAddBytes( tor, TR_ANN_DOWN, n );
                         }
