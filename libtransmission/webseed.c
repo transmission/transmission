@@ -1,5 +1,5 @@
 /*
- * This file Copyright (C) 2008-2010 Mnemosyne LLC
+ * This file Copyright (C) Mnemosyne LLC
  *
  * This file is licensed by the GPL version 2. Works owned by the
  * Transmission project are granted a special exemption to clause 2(b)
@@ -53,6 +53,11 @@ struct tr_webseed
     tr_bool              is_stopping;
 };
 
+enum
+{
+    TR_IDLE_TIMER_MSEC = 2000
+};
+
 static void
 webseed_free( struct tr_webseed * w )
 {
@@ -69,7 +74,7 @@ webseed_free( struct tr_webseed * w )
 ****
 ***/
 
-static const tr_peer_event blankEvent = { 0, 0, 0, 0, 0.0f, 0, 0, 0 };
+static const tr_peer_event blank_event = { 0, 0, 0, 0, 0.0f, 0, 0, 0 };
 
 static void
 publish( tr_webseed * w, tr_peer_event * e )
@@ -79,9 +84,9 @@ publish( tr_webseed * w, tr_peer_event * e )
 }
 
 static void
-fireClientGotBlock( tr_torrent * tor, tr_webseed * w, tr_block_index_t block )
+fire_client_got_block( tr_torrent * tor, tr_webseed * w, tr_block_index_t block )
 {
-    tr_peer_event e = blankEvent;
+    tr_peer_event e = blank_event;
     e.pieceIndex = tr_torBlockPiece( tor, block );
     e.offset = tor->blockSize * block - tor->info.pieceSize * e.pieceIndex;
     e.length = tr_torBlockCountBytes( tor, block );
@@ -90,9 +95,9 @@ fireClientGotBlock( tr_torrent * tor, tr_webseed * w, tr_block_index_t block )
 }
 
 static void
-fireClientGotData( tr_webseed * w, uint32_t length )
+fire_client_got_data( tr_webseed * w, uint32_t length )
 {
-    tr_peer_event e = blankEvent;
+    tr_peer_event e = blank_event;
     e.eventType = TR_PEER_CLIENT_GOT_DATA;
     e.length = length;
     e.wasPieceData = TRUE;
@@ -113,7 +118,7 @@ on_content_changed( struct evbuffer                * buf UNUSED,
     if( ( info->n_added > 0 ) && !w->is_stopping )
     {
         tr_rcTransferred( &w->download_rate, info->n_added );
-        fireClientGotData( w, info->n_added );
+        fire_client_got_data( w, info->n_added );
     }
 }
 
@@ -152,7 +157,7 @@ on_idle( tr_webseed * w )
             task->block = b;
             task->piece_index = tr_torBlockPiece( tor, b );
             task->piece_offset = ( tor->blockSize * b )
-                                   - ( tor->info.pieceSize * task->piece_index );
+                                - ( tor->info.pieceSize * task->piece_index );
             task->length = tr_torBlockCountBytes( tor, b );
             task->content = evbuffer_new( );
             evbuffer_add_cb( task->content, on_content_changed, w );
@@ -189,7 +194,7 @@ web_response_func( tr_session    * session,
             tr_cacheWriteBlock( session->cache, tor,
                                 t->piece_index, t->piece_offset, t->length,
                                 evbuffer_pullup( t->content, -1 ) );
-            fireClientGotBlock( tor, w, t->block );
+            fire_client_got_block( tor, w, t->block );
 
             tr_list_remove_data( &w->tasks, t );
             evbuffer_free( t->content );
@@ -230,7 +235,8 @@ task_request_next_chunk( struct tr_webseed_task * t )
                                     + t->piece_offset
                                     + evbuffer_get_length( t->content );
         const tr_piece_index_t step_piece = total_offset / inf->pieceSize;
-        const uint32_t step_piece_offset = total_offset - ( inf->pieceSize * step_piece );
+        const uint32_t step_piece_offset
+                               = total_offset - ( inf->pieceSize * step_piece );
 
         tr_file_index_t file_index;
         uint64_t file_offset;
@@ -274,7 +280,7 @@ webseed_timer_func( evutil_socket_t foo UNUSED, short bar UNUSED, void * vw )
 {
     tr_webseed * w = vw;
     on_idle( w );
-    tr_timerAddMsec( w->timer, 1000 );
+    tr_timerAddMsec( w->timer, TR_IDLE_TIMER_MSEC );
 }
 
 tr_webseed*
@@ -287,9 +293,6 @@ tr_webseedNew( struct tr_torrent * tor,
     tr_peer * peer = &w->parent;
 
     peer->peerIsChoked = TRUE;
-    peer->peerIsInterested = FALSE;
-    peer->clientIsChoked = FALSE;
-    peer->clientIsChoked = FALSE;
     peer->clientIsInterested = !tr_torrentIsSeed( tor );
     tr_bitsetConstructor( &peer->have, tor->info.pieceCount );
     tr_bitsetSetHaveAll( &peer->have );
@@ -305,7 +308,7 @@ tr_webseedNew( struct tr_torrent * tor,
     w->callback_data = callback_data;
     tr_rcConstruct( &w->download_rate );
     w->timer = evtimer_new( w->session->event_base, webseed_timer_func, w );
-    tr_timerAddMsec( w->timer, 1000 );
+    tr_timerAddMsec( w->timer, TR_IDLE_TIMER_MSEC );
     return w;
 }
 
