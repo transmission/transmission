@@ -278,7 +278,7 @@ myDebug( const char * file, int line,
         evbuffer_add_vprintf( buf, fmt, args );
         va_end( args );
         evbuffer_add_printf( buf, " (%s:%d)\n", base, line );
-        fwrite( evbuffer_pullup( buf, -1 ), 1, evbuffer_get_length( buf ), fp );
+        evbuffer_write( buf, fileno( fp ) );
 
         tr_free( base );
         evbuffer_free( buf );
