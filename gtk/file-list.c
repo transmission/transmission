@@ -43,6 +43,7 @@ enum
     FC_PROG,
     FC_INDEX,
     FC_SIZE,
+    FC_SIZE_STR,
     FC_HAVE,
     FC_PRIORITY,
     FC_ENABLED,
@@ -198,12 +199,17 @@ refreshFilesForeach( GtkTreeModel * model,
                              || (priority!=old_priority)
                              || (enabled!=old_enabled)
                              || (prog!=old_prog) )
+        {
+            char size_str[64];
+            tr_strlsize( size_str, sub_size, sizeof size_str );
             gtk_tree_store_set( data->store, iter, FC_SIZE, sub_size,
+                                                   FC_SIZE_STR, size_str,
                                                    FC_HAVE, have,
                                                    FC_PRIORITY, priority,
                                                    FC_ENABLED, enabled,
                                                    FC_PROG, prog,
                                                    -1 );
+        }
     }
 
     return FALSE; /* keep walking */
@@ -429,6 +435,7 @@ struct row_struct
 static void
 buildTree( GNode * node, gpointer gdata )
 {
+    char size_str[64];
     GtkTreeIter child_iter;
     struct build_data * build = gdata;
     struct row_struct *child_data = node->data;
@@ -439,11 +446,15 @@ buildTree( GNode * node, gpointer gdata )
     const tr_info * inf = tr_torrentInfo( build->tor );
     const int priority = isLeaf ? inf->files[ child_data->index ].priority : 0;
     const gboolean enabled = isLeaf ? !inf->files[ child_data->index ].dnd : TRUE;
+
+    tr_strlsize( size_str, child_data->length, sizeof size_str );
+
 #if GTK_CHECK_VERSION(2,10,0)
     gtk_tree_store_insert_with_values( build->store, &child_iter, build->iter, INT_MAX,
                                        FC_INDEX, child_data->index,
                                        FC_LABEL, child_data->name,
                                        FC_SIZE, child_data->length,
+                                       FC_SIZE_STR, size_str,
                                        FC_ICON, icon,
                                        FC_PRIORITY, priority,
                                        FC_ENABLED, enabled,
@@ -454,6 +465,7 @@ buildTree( GNode * node, gpointer gdata )
                         FC_INDEX, child_data->index,
                         FC_LABEL, child_data->name,
                         FC_SIZE, child_data->length,
+                        FC_SIZE_STR, size_str,
                         FC_ICON, icon,
                         FC_PRIORITY, priority,
                         FC_ENABLED, enabled,
@@ -503,6 +515,7 @@ gtr_file_list_set_torrent( GtkWidget * w, int torrentId )
                                  G_TYPE_INT,       /* prog [0..100] */
                                  G_TYPE_UINT,      /* index */
                                  G_TYPE_UINT64,    /* size */
+                                 G_TYPE_STRING,    /* size str */
                                  G_TYPE_UINT64,    /* have */
                                  G_TYPE_INT,       /* priority */
                                  G_TYPE_INT );     /* dl enabled */
@@ -576,28 +589,6 @@ gtr_file_list_set_torrent( GtkWidget * w, int torrentId )
 /***
 ****
 ***/
-
-static void
-renderFilename( GtkTreeViewColumn  * column UNUSED,
-                GtkCellRenderer    * renderer,
-                GtkTreeModel       * model,
-                GtkTreeIter        * iter,
-                gpointer             data UNUSED )
-{
-    char *   filename;
-    char *   str;
-    int64_t  size;
-    char     buf[64];
-
-    gtk_tree_model_get( model, iter, FC_LABEL, &filename,
-                                     FC_SIZE, &size,
-                                     -1 );
-    tr_strlsize( buf, size, sizeof( buf ) );
-    str = g_markup_printf_escaped( "<small>%s (%s)</small>", filename, buf );
-    g_object_set( renderer, "markup", str, NULL );
-    g_free( str );
-    g_free( filename );
-}
 
 static void
 renderDownload( GtkTreeViewColumn  * column UNUSED,
@@ -911,6 +902,7 @@ onViewPopupMenu( GtkWidget * w, gpointer gdata )
 GtkWidget *
 gtr_file_list_new( TrCore * core, int torrentId )
 {
+    int size;
     int width;
     GtkWidget * ret;
     GtkWidget * view;
@@ -921,6 +913,8 @@ gtr_file_list_new( TrCore * core, int torrentId )
     GtkTreeView * tree_view;
     const char * title;
     PangoLayout * pango_layout;
+    PangoContext * pango_context;
+    PangoFontDescription * pango_font_description;
     FileData * data = g_new0( FileData, 1 );
 
     data->core = core;
@@ -940,6 +934,12 @@ gtr_file_list_new( TrCore * core, int torrentId )
                       G_CALLBACK( on_tree_view_button_released ), NULL );
 
 
+    pango_context = gtk_widget_create_pango_context( view );
+    pango_font_description = pango_font_description_copy( pango_context_get_font_description( pango_context ) );
+    size = pango_font_description_get_size( pango_font_description );
+    pango_font_description_set_size( pango_font_description, size * 0.8 );
+    g_object_unref( G_OBJECT( pango_context ) );
+
     /* set up view */
     sel = gtk_tree_view_get_selection( tree_view );
     gtk_tree_selection_set_mode( sel, GTK_SELECTION_MULTIPLE );
@@ -947,10 +947,9 @@ gtr_file_list_new( TrCore * core, int torrentId )
     gtk_tree_view_set_search_column( tree_view, FC_LABEL );
 
     /* add file column */
-
     col = GTK_TREE_VIEW_COLUMN ( g_object_new ( GTK_TYPE_TREE_VIEW_COLUMN,
                                                 "expand", TRUE,
-                                                "title", _( "File" ),
+                                                "title", _( "Name" ),
                                                 NULL ) );
     gtk_tree_view_column_set_resizable( col, TRUE );
     rend = gtk_cell_renderer_pixbuf_new( );
@@ -958,14 +957,29 @@ gtr_file_list_new( TrCore * core, int torrentId )
     gtk_tree_view_column_add_attribute( col, rend, "pixbuf", FC_ICON );
     /* add text renderer */
     rend = gtk_cell_renderer_text_new( );
-    g_object_set( rend, "ellipsize", PANGO_ELLIPSIZE_END, NULL );
+    g_object_set( rend, "ellipsize", PANGO_ELLIPSIZE_END, "font-desc", pango_font_description, NULL );
     gtk_tree_view_column_pack_start( col, rend, TRUE );
-    gtk_tree_view_column_set_cell_data_func( col, rend, renderFilename, NULL, NULL );
+    gtk_tree_view_column_set_attributes( col, rend, "text", FC_LABEL, NULL );
     gtk_tree_view_column_set_sort_column_id( col, FC_LABEL );
     gtk_tree_view_append_column( tree_view, col );
 
+    /* add "size" column */
+    title = _( "Size" );
+    rend = gtk_cell_renderer_text_new( );
+    g_object_set( rend, "alignment", PANGO_ALIGN_RIGHT,
+                        "font-desc", pango_font_description,
+                        "xpad", GUI_PAD,
+                        "xalign", 1.0f,
+                        "yalign", 0.5f,
+                        NULL );
+    col = gtk_tree_view_column_new_with_attributes( title, rend, NULL );
+    gtk_tree_view_column_set_sizing( col, GTK_TREE_VIEW_COLUMN_GROW_ONLY );
+    gtk_tree_view_column_set_sort_column_id( col, FC_SIZE );
+    gtk_tree_view_column_set_attributes( col, rend, "text", FC_SIZE_STR, NULL );
+    gtk_tree_view_append_column( tree_view, col );
+
     /* add "progress" column */
-    title = _( "Progress" );
+    title = _( "Have" );
     pango_layout = gtk_widget_create_pango_layout( view, title );
     pango_layout_get_pixel_size( pango_layout, &width, NULL );
     width += 30; /* room for the sort indicator */
