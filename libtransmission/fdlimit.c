@@ -71,6 +71,15 @@
  #define O_LARGEFILE 0
 #endif
 
+#ifndef O_BINARY
+ #define O_BINARY 0
+#endif
+
+#ifndef O_SEQUENTIAL
+ #define O_SEQUENTIAL 0
+#endif
+
+
 static tr_bool
 preallocate_file_sparse( int fd, uint64_t length )
 {
@@ -253,44 +262,22 @@ tr_set_file_for_single_pass( int fd )
     }
 }
 
-int
-tr_open_file_for_writing( const char * filename )
+static int
+open_local_file( const char * filename, int flags )
 {
-    int fd;
-    int flags = O_WRONLY | O_CREAT;
-#ifdef O_BINARY
-    flags |= O_BINARY;
-#endif
-#ifdef O_LARGEFILE
-    flags |= O_LARGEFILE;
-#endif
-    fd = open( filename, flags, 0666 );
+    const int fd = open( filename, flags, 0666 );
     tr_set_file_for_single_pass( fd );
     return fd;
 }
-
+int
+tr_open_file_for_writing( const char * filename )
+{
+    return open_local_file( filename, O_LARGEFILE|O_BINARY|O_CREAT|O_WRONLY );
+}
 int
 tr_open_file_for_scanning( const char * filename )
 {
-    int fd;
-    int flags;
-
-    /* build the flags */
-    flags = O_RDONLY;
-#ifdef O_SEQUENTIAL
-    flags |= O_SEQUENTIAL;
-#endif
-#ifdef O_BINARY
-    flags |= O_BINARY;
-#endif
-#ifdef O_LARGEFILE
-    flags |= O_LARGEFILE;
-#endif
-
-    /* open the file */
-    fd = open( filename, flags, 0666 );
-    tr_set_file_for_single_pass( fd );
-    return fd;
+    return open_local_file( filename, O_LARGEFILE|O_BINARY|O_SEQUENTIAL|O_RDONLY );
 }
 
 void
@@ -380,15 +367,7 @@ cached_file_open( struct tr_cached_file  * o,
 
     /* open the file */
     flags = writable ? ( O_RDWR | O_CREAT ) : O_RDONLY;
-#ifdef O_SEQUENTIAL
-    flags |= O_SEQUENTIAL;
-#endif
-#ifdef O_LARGEFILE
-    flags |= O_LARGEFILE;
-#endif
-#ifdef WIN32
-    flags |= O_BINARY;
-#endif
+    flags |= O_LARGEFILE | O_BINARY | O_SEQUENTIAL;
     o->fd = open( filename, flags, 0666 );
 
     if( o->fd == -1 )
