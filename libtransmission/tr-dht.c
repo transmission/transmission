@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2009 by Juliusz Chroboczek
+Copyright (c) 2009-2010 by Juliusz Chroboczek
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -278,8 +278,10 @@ rebind_ipv6(tr_bool force)
         return 0;
 
     s = socket(PF_INET6, SOCK_DGRAM, 0);
-    if(s < 0)
+    if(s < 0) {
+        tr_ndbg( "DHT", "dht6_socket: %s", tr_strerror( errno ) );
         return -1;
+    }
 
 #ifdef IPV6_V6ONLY
         /* Since we always open an IPv4 socket on the same port, this
@@ -295,6 +297,7 @@ rebind_ipv6(tr_bool force)
     rc = bind(s, (struct sockaddr*)&sin6, sizeof(sin6));
 
     if(rc < 0) {
+        tr_nerr( "DHT", "bind(dht6_socket): %s", tr_strerror( errno ) );
         close(s);
         return -1;
     }
@@ -423,7 +426,7 @@ tr_dhtInit(tr_session *ss, const tr_address * tr_addr)
             close(dht6_socket);
         dht_socket = dht6_socket = -1;
         session = NULL;
-        tr_ndbg( "DHT", "DHT initialization failed (errno = %d)", save );
+        tr_ndbg( "DHT", "DHT initialization failed: %s", tr_strerror( save ) );
         errno = save;
     }
 
@@ -681,9 +684,10 @@ tr_dhtAnnounce(tr_torrent *tor, int af, tr_bool announce)
                 tor->dhtAnnounce6InProgress = TRUE;
             ret = 1;
         } else {
-            tr_torerr(tor, "%sDHT announce failed, errno = %d (%s, %d nodes)",
+            tr_torerr(tor, "%sDHT announce failed (%s, %d nodes): %s",
                       af == AF_INET6 ? "IPv6 " : "",
-                      errno, tr_dhtPrintableStatus(status), numnodes);
+                      tr_dhtPrintableStatus(status), numnodes,
+                      tr_strerror( errno ) );
         }
     } else {
         tr_tordbg(tor, "%sDHT not ready (%s, %d nodes)",
@@ -705,7 +709,7 @@ event_callback(int s, short type, void *ignore UNUSED )
         if(errno == EINTR) {
             tosleep = 0;
         } else {
-            tr_nerr("DHT", "dht_periodic failed (errno = %d)", errno);
+            tr_nerr( "DHT", "dht_periodic failed: %s", tr_strerror( errno ) );
             if(errno == EINVAL || errno == EFAULT)
                     abort();
             tosleep = 1;
