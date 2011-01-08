@@ -179,7 +179,7 @@
 + (NSString *) stringForFileSize: (uint64_t) size showUnitUnless: (NSString *) notAllowedUnit
     unitsUsed: (NSString **) unitUsed
 {
-    const double baseFloat = [NSApp isOnSnowLeopardOrBetter] ? 1000.0 : 1024.0;
+    const float baseFloat = [NSApp isOnSnowLeopardOrBetter] ? 1000.0 : 1024.0;
     const NSUInteger baseInt = [NSApp isOnSnowLeopardOrBetter] ? 1000 : 1024;
     
     double convertedSize;
@@ -216,7 +216,7 @@
     [numberFormatter setMinimumFractionDigits: 0];
     [numberFormatter setMaximumFractionDigits: decimals];
     
-    NSString * fileSizeString = [numberFormatter stringFromNumber: [NSNumber numberWithDouble: convertedSize]];
+    NSString * fileSizeString = [numberFormatter stringFromNumber: [NSNumber numberWithFloat: convertedSize]];
     
     if (!notAllowedUnit || ![unit isEqualToString: notAllowedUnit])
         fileSizeString = [fileSizeString stringByAppendingFormat: @" %@", unit];
