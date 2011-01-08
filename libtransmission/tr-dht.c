@@ -294,8 +294,10 @@ rebind_ipv6(tr_bool force)
     sin6.sin6_port = htons(dht_port);
     rc = bind(s, (struct sockaddr*)&sin6, sizeof(sin6));
 
-    if(rc < 0)
+    if(rc < 0) {
+        close(s);
         return -1;
+    }
 
     if(dht6_socket < 0) {
         dht6_socket = s;
