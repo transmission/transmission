@@ -32,6 +32,7 @@
 + (NSString *) formattedUInteger: (NSUInteger) value;
 
 + (NSString *) stringForFileSize: (uint64_t) size;
++ (NSString *) stringForFilePartialSize: (uint64_t) partialSize fullSize: (uint64_t) fullSize;
 
 + (NSString *) stringForSpeed: (CGFloat) speed;
 + (NSString *) stringForSpeedAbbrev: (CGFloat) speed;

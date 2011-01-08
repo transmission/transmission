@@ -76,8 +76,7 @@
     {
         [fProgressBar setIndeterminate: NO];
         
-        NSString * substring = [NSString stringWithFormat: NSLocalizedString(@"%@ of %@", "Blocklist -> message"),
-                                [NSString stringForFileSize: currentSize], [NSString stringForFileSize: expectedSize]];
+        NSString * substring = [NSString stringForFilePartialSize: currentSize fullSize: expectedSize];
         string = [string stringByAppendingFormat: @" (%@)",  substring];
         [fProgressBar setDoubleValue: (double)currentSize / expectedSize];
     }

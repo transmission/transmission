@@ -30,6 +30,9 @@
 
 @interface NSString (Private)
 
++ (NSString *) stringForFileSize: (uint64_t) size showUnitUnless: (NSString *) notAllowedUnit
+    unitsUsed: (NSString **) unitUsed;
+
 + (NSString *) stringForSpeed: (CGFloat) speed kb: (NSString *) kb mb: (NSString *) mb gb: (NSString *) gb;
 
 @end
@@ -57,44 +60,16 @@
 
 + (NSString *) stringForFileSize: (uint64_t) size
 {
-    const double baseFloat = [NSApp isOnSnowLeopardOrBetter] ? 1000.0 : 1024.0;
-    const NSUInteger baseInt = [NSApp isOnSnowLeopardOrBetter] ? 1000 : 1024;
+    return [self stringForFileSize: size showUnitUnless: nil unitsUsed: nil];
+}
+
++ (NSString *) stringForFilePartialSize: (uint64_t) partialSize fullSize: (uint64_t) fullSize
+{
+    NSString * units;
+    NSString * fullString = [self stringForFileSize: fullSize showUnitUnless: nil unitsUsed: &units];
+    NSString * partialString = [self stringForFileSize: partialSize showUnitUnless: units unitsUsed: nil];
     
-    double convertedSize;
-    NSString * unit;
-    NSUInteger decimals;
-    if (size < pow(baseInt, 2))
-    {
-        convertedSize = size / baseFloat;
-        unit = NSLocalizedString(@"KB", "File size - kilobytes");
-        decimals = 0;
-    }
-    else if (size < pow(baseInt, 3))
-    {
-        convertedSize = size / powf(baseFloat, 2);
-        unit = NSLocalizedString(@"MB", "File size - megabytes");
-        decimals = 1;
-    }
-    else if (size < pow(baseInt, 4))
-    {
-        convertedSize = size / powf(baseFloat, 3);
-        unit = NSLocalizedString(@"GB", "File size - gigabytes");
-        decimals = 2;
-    }
-    else
-    {
-        convertedSize = size / powf(baseFloat, 4);
-        unit = NSLocalizedString(@"TB", "File size - terabytes");
-        decimals = 3; //guessing on this one
-    }
-    
-    //match Finder's behavior
-    NSNumberFormatter * numberFormatter = [[[NSNumberFormatter alloc] init] autorelease];
-    [numberFormatter setNumberStyle: NSNumberFormatterDecimalStyle];
-    [numberFormatter setMinimumFractionDigits: 0];
-    [numberFormatter setMaximumFractionDigits: decimals];
-    
-    return [[numberFormatter stringFromNumber: [NSNumber numberWithDouble: convertedSize]] stringByAppendingFormat: @" %@", unit];
+    return [NSString stringWithFormat: NSLocalizedString(@"%@ of %@", "file size string"), partialString, fullString];
 }
 
 + (NSString *) stringForSpeed: (CGFloat) speed
@@ -200,6 +175,57 @@
 @end
 
 @implementation NSString (Private)
+
++ (NSString *) stringForFileSize: (uint64_t) size showUnitUnless: (NSString *) notAllowedUnit
+    unitsUsed: (NSString **) unitUsed
+{
+    const double baseFloat = [NSApp isOnSnowLeopardOrBetter] ? 1000.0 : 1024.0;
+    const NSUInteger baseInt = [NSApp isOnSnowLeopardOrBetter] ? 1000 : 1024;
+    
+    double convertedSize;
+    NSString * unit;
+    NSUInteger decimals;
+    if (size < pow(baseInt, 2))
+    {
+        convertedSize = size / baseFloat;
+        unit = NSLocalizedString(@"KB", "File size - kilobytes");
+        decimals = 0;
+    }
+    else if (size < pow(baseInt, 3))
+    {
+        convertedSize = size / powf(baseFloat, 2);
+        unit = NSLocalizedString(@"MB", "File size - megabytes");
+        decimals = 1;
+    }
+    else if (size < pow(baseInt, 4))
+    {
+        convertedSize = size / powf(baseFloat, 3);
+        unit = NSLocalizedString(@"GB", "File size - gigabytes");
+        decimals = 2;
+    }
+    else
+    {
+        convertedSize = size / powf(baseFloat, 4);
+        unit = NSLocalizedString(@"TB", "File size - terabytes");
+        decimals = 3; //guessing on this one
+    }
+    
+    //match Finder's behavior
+    NSNumberFormatter * numberFormatter = [[[NSNumberFormatter alloc] init] autorelease];
+    [numberFormatter setNumberStyle: NSNumberFormatterDecimalStyle];
+    [numberFormatter setMinimumFractionDigits: 0];
+    [numberFormatter setMaximumFractionDigits: decimals];
+    
+    NSString * fileSizeString = [numberFormatter stringFromNumber: [NSNumber numberWithDouble: convertedSize]];
+    
+    if (!notAllowedUnit || ![unit isEqualToString: notAllowedUnit])
+        fileSizeString = [fileSizeString stringByAppendingFormat: @" %@", unit];
+    
+    if (unitUsed)
+        *unitUsed = unit;
+    
+    return fileSizeString;
+}
 
 + (NSString *) stringForSpeed: (CGFloat) speed kb: (NSString *) kb mb: (NSString *) mb gb: (NSString *) gb
 {

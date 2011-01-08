@@ -977,14 +977,12 @@ int trashDataFile(const char * filename)
         CGFloat progress;
         if ([self isFolder] && [fDefaults boolForKey: @"DisplayStatusProgressSelected"])
         {
-            string = [NSString stringWithFormat: NSLocalizedString(@"%@ of %@ selected", "Torrent -> progress string"),
-                        [NSString stringForFileSize: [self haveTotal]], [NSString stringForFileSize: [self totalSizeSelected]]];
+            string = [NSString stringForFilePartialSize: [self haveTotal] fullSize: [self totalSizeSelected]];
             progress = [self progressDone];
         }
         else
         {
-            string = [NSString stringWithFormat: NSLocalizedString(@"%@ of %@", "Torrent -> progress string"),
-                        [NSString stringForFileSize: [self haveTotal]], [NSString stringForFileSize: [self size]]];
+            string = [NSString stringForFilePartialSize: [self haveTotal] fullSize: [self size]];
             progress = [self progress];
         }
         
@@ -1000,8 +998,7 @@ int trashDataFile(const char * filename)
                                     [NSString stringForFileSize: [self haveTotal]]];
             else
             {
-                downloadString = [NSString stringWithFormat: NSLocalizedString(@"%@ of %@", "Torrent -> progress string"),
-                                    [NSString stringForFileSize: [self haveTotal]], [NSString stringForFileSize: [self size]]];
+                downloadString = [NSString stringForFilePartialSize: [self haveTotal] fullSize: [self size]];
                 downloadString = [downloadString stringByAppendingFormat: @" (%@)",
                                     [NSString percentString: [self progress] longDecimals: YES]];
             }
