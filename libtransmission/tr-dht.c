@@ -378,7 +378,7 @@ tr_dhtUninit(tr_session *ss)
         tr_free( dat_file );
     }
 
-    dht_uninit( 1 );
+    dht_uninit();
     tr_ndbg("DHT", "Done uninitializing DHT");
 
     session = NULL;
