@@ -174,8 +174,8 @@ tr_udpInit(tr_session *ss, const tr_address * addr)
     ss->udp_event =
         event_new(NULL, ss->udp_socket, EV_READ | EV_PERSIST,
                   event_callback, ss);
-    tr_nerr("UDP", "Couldn't allocate IPv4 event");
-    /* Don't bother recovering for now. */
+    if( ss->udp_event == NULL )
+        tr_nerr("UDP", "Couldn't allocate IPv4 event");
 
  ipv6:
     if(tr_globalIPv6())
