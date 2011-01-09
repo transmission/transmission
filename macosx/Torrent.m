@@ -1203,6 +1203,10 @@ int trashDataFile(const char * filename)
 
         case TR_STATUS_SEED:
             return NSLocalizedString(@"Seeding", "Torrent -> status string");
+        
+        default:
+            NSAssert1(NO, @"Unknown activity %d for statis string", fStat->activity);
+            return nil;
     }
 }
 
