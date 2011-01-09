@@ -595,6 +595,10 @@ event_callback(int s, short type, void *ignore UNUSED )
 {
     struct event *event;
     time_t tosleep;
+    struct sockaddr_storage from;
+    socklen_t fromlen;
+    unsigned char *buf = NULL;
+    int rc;
 
     if (s == session->udp_socket)
         event =  &dht_event;
@@ -605,7 +609,24 @@ event_callback(int s, short type, void *ignore UNUSED )
         event = NULL;
     }
 
-    if( dht_periodic( type == EV_READ, &tosleep, callback, NULL) < 0 ) {
+    if( type == EV_READ ) {
+        buf = malloc(4096);
+        if(buf != NULL) {
+            fromlen = sizeof(from);
+            rc = recvfrom(s, buf, 4096 - 1, 0,
+                          (struct sockaddr*)&from, &fromlen);
+            if(rc < 0)
+                rc = 0;
+            else
+                buf[rc] = 0;
+        }
+    } else {
+        rc = 0;
+        fromlen = 0;
+    }
+
+    if( dht_periodic( buf, rc, (struct sockaddr*)&from, fromlen,
+                      &tosleep, callback, NULL) < 0 ) {
         if(errno == EINTR) {
             tosleep = 0;
         } else {
@@ -614,6 +635,11 @@ event_callback(int s, short type, void *ignore UNUSED )
                     abort();
             tosleep = 1;
         }
+    }
+
+    if(buf) {
+        free(buf);
+        buf = NULL;
     }
 
 #ifdef NOTYET
