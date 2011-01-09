@@ -59,7 +59,7 @@ THE SOFTWARE.
 #include "trevent.h" /* tr_runInEventThread() */
 #include "utils.h"
 
-static struct event dht_timer;
+static struct event *dht_timer = NULL;
 static unsigned char myid[20];
 static tr_session *session = NULL;
 
@@ -315,8 +315,8 @@ tr_dhtInit(tr_session *ss)
     cl->len6 = len6;
     tr_threadNew( dht_bootstrap, cl );
 
-    evtimer_set( &dht_timer, timer_callback, session );
-    tr_timerAdd( &dht_timer, 0, tr_cryptoWeakRandInt( 1000000 ) );
+    dht_timer = evtimer_new( NULL, timer_callback, session );
+    tr_timerAdd( dht_timer, 0, tr_cryptoWeakRandInt( 1000000 ) );
 
     tr_ndbg( "DHT", "DHT initialized" );
 
@@ -336,7 +336,8 @@ tr_dhtUninit(tr_session *ss)
 
     tr_ndbg( "DHT", "Uninitializing DHT" );
 
-    event_del( &dht_timer );
+    event_free( dht_timer );
+    dht_timer = NULL;
 
     /* Since we only save known good nodes, avoid erasing older data if we
        don't know enough nodes. */
@@ -611,7 +612,7 @@ tr_dhtCallback(unsigned char *buf, int buflen,
 
     /* Being slightly late is fine,
        and has the added benefit of adding some jitter. */
-    tr_timerAdd( &dht_timer, tosleep, tr_cryptoWeakRandInt( 1000000 ) );
+    tr_timerAdd( dht_timer, tosleep, tr_cryptoWeakRandInt( 1000000 ) );
 }
 
 static void

@@ -24,7 +24,7 @@ THE SOFTWARE.
 #include <unistd.h>
 #include <assert.h>
 
-#include <event.h>
+#include <event2/event.h>
 
 #include "transmission.h"
 #include "net.h"
@@ -160,14 +160,6 @@ tr_udpInit(tr_session *ss, const tr_address * addr)
         goto ipv6;
     }
 
-    ss->udp_event = tr_new0(struct event, 1);
-    if(ss->udp_event == NULL) {
-        tr_nerr("UDP", "Couldn't allocate IPv4 event");
-        close(ss->udp_socket);
-        ss->udp_socket = -1;
-        goto ipv6;
-    }
-
     memset(&sin, 0, sizeof(sin));
     sin.sin_family = AF_INET;
     memcpy(&sin.sin_addr, &addr->addr.addr4, sizeof (struct in_addr));
@@ -179,21 +171,21 @@ tr_udpInit(tr_session *ss, const tr_address * addr)
         ss->udp_socket = -1;
         goto ipv6;
     }
-
-    event_set(ss->udp_event, ss->udp_socket, EV_READ | EV_PERSIST,
-              event_callback, ss);
+    ss->udp_event =
+        event_new(NULL, ss->udp_socket, EV_READ | EV_PERSIST,
+                  event_callback, ss);
+    tr_nerr("UDP", "Couldn't allocate IPv4 event");
+    /* Don't bother recovering for now. */
 
  ipv6:
     if(tr_globalIPv6())
         rebind_ipv6(ss, TRUE);
     if(ss->udp6_socket >= 0) {
-        ss->udp6_event = tr_new0(struct event, 1);
-        if(ss->udp6_event == NULL) {
-            tr_nerr("UDP", "Couldn't allocate IPv6 event");
-        } else {
-            event_set(ss->udp6_event, ss->udp6_socket, EV_READ | EV_PERSIST,
+        ss->udp6_event =
+            event_new(NULL, ss->udp6_socket, EV_READ | EV_PERSIST,
                       event_callback, ss);
-        }
+        if(ss->udp6_event == NULL)
+            tr_nerr("UDP", "Couldn't allocate IPv6 event");
     }
 
     if(ss->isDHTEnabled)
@@ -216,8 +208,7 @@ tr_udpUninit(tr_session *ss)
     }
 
     if(ss->udp_event) {
-        event_del(ss->udp_event);
-        free(ss->udp_event);
+        event_free(ss->udp_event);
         ss->udp_event = NULL;
     }
 
@@ -227,8 +218,7 @@ tr_udpUninit(tr_session *ss)
     }
 
     if(ss->udp6_event) {
-        event_del(ss->udp6_event);
-        free(ss->udp6_event);
+        event_free(ss->udp6_event);
         ss->udp6_event = NULL;
     }
 
