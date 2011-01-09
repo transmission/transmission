@@ -24,6 +24,8 @@ THE SOFTWARE.
 #include <unistd.h>
 #include <assert.h>
 
+#include <event.h>
+
 #include "transmission.h"
 #include "net.h"
 #include "session.h"
@@ -103,6 +105,42 @@ rebind_ipv6(tr_session *ss, tr_bool force)
     }
 }
 
+static void
+event_callback(int s, short type, void *sv)
+{
+    tr_session *ss = (tr_session*)sv;
+    unsigned char *buf;
+    struct sockaddr_storage from;
+    socklen_t fromlen;
+    int rc;
+
+    assert(tr_isSession(ss));
+    assert(type == EV_READ);
+
+    buf = malloc(4096);
+    if(buf == NULL) {
+        tr_nerr("UDP", "Couldn't allocate buffer");
+        return;
+    }
+
+    fromlen = sizeof(from);
+    rc = recvfrom(s, buf, 4096 - 1, 0,
+                  (struct sockaddr*)&from, &fromlen);
+    if(rc <= 0)
+        return;
+
+    if(buf[0] == 'd') {
+        /* DHT packet. */
+        buf[rc] = '\0';
+        tr_dhtCallback(buf, rc, (struct sockaddr*)&from, fromlen, sv);
+    } else {
+        /* Probably a UTP packet. */
+        /* Nothing yet. */
+    }
+
+    free(buf);
+}    
+
 void
 tr_udpInit(tr_session *ss, const tr_address * addr)
 {
@@ -122,6 +160,14 @@ tr_udpInit(tr_session *ss, const tr_address * addr)
         goto ipv6;
     }
 
+    ss->udp_event = tr_new0(struct event, 1);
+    if(ss->udp_event == NULL) {
+        tr_nerr("UDP", "Couldn't allocate IPv4 event");
+        close(ss->udp_socket);
+        ss->udp_socket = -1;
+        goto ipv6;
+    }
+
     memset(&sin, 0, sizeof(sin));
     sin.sin_family = AF_INET;
     memcpy(&sin.sin_addr, &addr->addr.addr4, sizeof (struct in_addr));
@@ -134,12 +180,28 @@ tr_udpInit(tr_session *ss, const tr_address * addr)
         goto ipv6;
     }
 
+    event_set(ss->udp_event, ss->udp_socket, EV_READ | EV_PERSIST,
+              event_callback, ss);
+
  ipv6:
-    if(tr_globalIPv6())
-        rebind_ipv6(ss, TRUE);
+    ss->udp6_event = tr_new0(struct event, 1);
+    if(ss->udp6_event == NULL) {
+        tr_nerr("UDP", "Couldn't allocate IPv6 event");
+    } else {
+        if(tr_globalIPv6())
+            rebind_ipv6(ss, TRUE);
+        if(ss->udp6_socket >= 0)
+            event_set(ss->udp6_event, ss->udp6_socket, EV_READ | EV_PERSIST,
+                      event_callback, ss);
+    }
 
     if(ss->isDHTEnabled)
         tr_dhtInit(ss);
+
+    if(ss->udp_event)
+        event_add(ss->udp_event, NULL);
+    if(ss->udp6_event)
+        event_add(ss->udp6_event, NULL);
 }
 
 void
@@ -152,9 +214,21 @@ tr_udpUninit(tr_session *ss)
         ss->udp_socket = -1;
     }
 
+    if(ss->udp_event) {
+        event_del(ss->udp_event);
+        free(ss->udp_event);
+        ss->udp_event = NULL;
+    }
+
     if(ss->udp6_socket >= 0) {
         tr_netCloseSocket( ss->udp6_socket );
         ss->udp6_socket = -1;
+    }
+
+    if(ss->udp6_event) {
+        event_del(ss->udp6_event);
+        free(ss->udp6_event);
+        ss->udp6_event = NULL;
     }
 
     if(ss->udp6_bound) {

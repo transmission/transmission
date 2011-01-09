@@ -130,6 +130,8 @@ struct tr_session
     int                          udp_socket;
     int                          udp6_socket;
     unsigned char *              udp6_bound;
+    struct event                 *udp_event;
+    struct event                 *udp6_event;
 
     /* The open port on the local machine for incoming peer requests */
     tr_port                      private_peer_port;

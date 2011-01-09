@@ -44,3 +44,6 @@ int tr_dhtStatus( tr_session *, int af, int * setme_nodeCount );
 const char *tr_dhtPrintableStatus(int status);
 int tr_dhtAddNode( tr_session *, const tr_address *, tr_port, tr_bool bootstrap );
 int tr_dhtAnnounce( tr_torrent *, int af, tr_bool announce );
+void tr_dhtCallback(unsigned char *buf, int buflen,
+                    struct sockaddr *from, socklen_t fromlen,
+                    void *sv);
