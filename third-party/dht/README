@@ -86,9 +86,8 @@ dht_periodic should be called if no data is available is returned in the
 parameter tosleep.  (You do not need to be particularly accurate; actually,
 it is a good idea to be late by a random value.)
 
-The parameter available indicates whether any data is available on the
-socket.  If it is 0, dht_periodic will not try to read data; if it is 1, it
-will.
+The parameters buf, buflen, from and fromlen optionally carry a received
+message.  If buflen is 0, then no message was received.
 
 Dht_periodic also takes a callback, which will be called whenever something
 interesting happens (see below).

@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2009 by Juliusz Chroboczek
+Copyright (c) 2009, 2010 by Juliusz Chroboczek
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -36,8 +36,9 @@ extern FILE *dht_debug;
 int dht_init(int s, int s6, const unsigned char *id, const unsigned char *v);
 int dht_insert_node(const unsigned char *id, struct sockaddr *sa, int salen);
 int dht_ping_node(struct sockaddr *sa, int salen);
-int dht_periodic(int available, time_t *tosleep,
-                 dht_callback *callback, void *closure);
+int dht_periodic(const void *buf, size_t buflen,
+                 const struct sockaddr *from, int fromlen,
+                 time_t *tosleep, dht_callback *callback, void *closure);
 int dht_search(const unsigned char *id, int port, int af,
                dht_callback *callback, void *closure);
 int dht_nodes(int af,

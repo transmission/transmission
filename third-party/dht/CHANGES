@@ -1,3 +1,7 @@
+23 December 2010: dht-0.16:
+
+  * Change the interface to allow sharing of the UDP socket e.g. with uTP.
+
 1 July 2010: dht-0.15
 
   * Port to Windows, for the needs of Transmission.
