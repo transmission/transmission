@@ -43,7 +43,7 @@
 #include "session.h"
 #include "stats.h"
 #include "torrent.h"
-#include "tr-dht.h"
+#include "tr-udp.h"
 #include "tr-lpd.h"
 #include "trevent.h"
 #include "utils.h"
@@ -664,8 +664,7 @@ tr_sessionInitImpl( void * vdata )
 
     tr_sessionSet( session, &settings );
 
-    if( session->isDHTEnabled )
-        tr_dhtInit( session, &session->public_ipv4->addr );
+    tr_udpInit( session, &session->public_ipv4->addr );
 
     if( session->isLPDEnabled )
         tr_lpdInit( session, &session->public_ipv4->addr );
@@ -1686,8 +1685,7 @@ sessionCloseImpl( void * vsession )
     if( session->isLPDEnabled )
         tr_lpdUninit( session );
 
-    if( session->isDHTEnabled )
-        tr_dhtUninit( session );
+    tr_udpUninit( session );
 
     event_free( session->saveTimer );
     session->saveTimer = NULL;
@@ -1902,13 +1900,9 @@ toggleDHTImpl(  void * data )
     tr_session * session = data;
     assert( tr_isSession( session ) );
 
-    if( session->isDHTEnabled )
-        tr_dhtUninit( session );
-
+    tr_udpUninit( session );
     session->isDHTEnabled = !session->isDHTEnabled;
-
-    if( session->isDHTEnabled )
-        tr_dhtInit( session, &session->public_ipv4->addr );
+    tr_udpInit( session, &session->public_ipv4->addr );
 }
 
 void
