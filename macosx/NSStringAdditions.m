@@ -189,7 +189,7 @@
     {
         convertedSize = size / baseFloat;
         unit = NSLocalizedString(@"KB", "File size - kilobytes");
-        decimals = 0;
+        decimals = convertedSize >= 10.0 ? 0 : 1;
     }
     else if (size < pow(baseInt, 3))
     {

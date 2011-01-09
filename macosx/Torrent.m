@@ -1205,7 +1205,7 @@ int trashDataFile(const char * filename)
             return NSLocalizedString(@"Seeding", "Torrent -> status string");
         
         default:
-            NSAssert1(NO, @"Unknown activity %d for statis string", fStat->activity);
+            NSAssert1(NO, @"Unknown activity %d for state string", fStat->activity);
             return nil;
     }
 }
