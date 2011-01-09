@@ -184,15 +184,16 @@ tr_udpInit(tr_session *ss, const tr_address * addr)
               event_callback, ss);
 
  ipv6:
-    ss->udp6_event = tr_new0(struct event, 1);
-    if(ss->udp6_event == NULL) {
-        tr_nerr("UDP", "Couldn't allocate IPv6 event");
-    } else {
-        if(tr_globalIPv6())
-            rebind_ipv6(ss, TRUE);
-        if(ss->udp6_socket >= 0)
+    if(tr_globalIPv6())
+        rebind_ipv6(ss, TRUE);
+    if(ss->udp6_socket >= 0) {
+        ss->udp6_event = tr_new0(struct event, 1);
+        if(ss->udp6_event == NULL) {
+            tr_nerr("UDP", "Couldn't allocate IPv6 event");
+        } else {
             event_set(ss->udp6_event, ss->udp6_socket, EV_READ | EV_PERSIST,
                       event_callback, ss);
+        }
     }
 
     if(ss->isDHTEnabled)
