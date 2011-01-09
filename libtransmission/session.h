@@ -125,6 +125,12 @@ struct tr_session
 
     int                          uploadSlotsPerTorrent;
 
+    /* The UDP sockets used for the DHT and uTP. */
+    tr_port                      udp_port;
+    int                          udp_socket;
+    int                          udp6_socket;
+    unsigned char *              udp6_bound;
+
     /* The open port on the local machine for incoming peer requests */
     tr_port                      private_peer_port;
 

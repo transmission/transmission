@@ -36,7 +36,7 @@ enum
     TR_DHT_GOOD         = 4
 };
 
-int  tr_dhtInit( tr_session *, const tr_address * );
+int  tr_dhtInit( tr_session * );
 void tr_dhtUninit( tr_session * );
 tr_bool tr_dhtEnabled( const tr_session * );
 tr_port tr_dhtPort ( tr_session * );

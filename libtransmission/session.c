@@ -523,6 +523,8 @@ tr_sessionInit( const char  * tag,
 
     /* initialize the bare skeleton of the session object */
     session = tr_new0( tr_session, 1 );
+    session->udp_socket = -1;
+    session->udp6_socket = -1;
     session->bandwidth = tr_bandwidthNew( session, NULL );
     session->lock = tr_lockNew( );
     session->cache = tr_cacheNew( 1024*1024*2 );
