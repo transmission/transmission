@@ -592,10 +592,8 @@ tr_dhtCallback(unsigned char *buf, int buflen,
 
     assert(tr_isSession(ss));
 
-    if(sv != session) {
-        tr_nerr("DHT", "tr_dhtCallback called for unexpected session");
+    if(sv != session)
         return;
-    }
 
     rc = dht_periodic( buf, buflen, from, fromlen,
                        &tosleep, callback, NULL);
