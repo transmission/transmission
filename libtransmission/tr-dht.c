@@ -315,7 +315,7 @@ tr_dhtInit(tr_session *ss)
     cl->len6 = len6;
     tr_threadNew( dht_bootstrap, cl );
 
-    dht_timer = evtimer_new( NULL, timer_callback, session );
+    dht_timer = evtimer_new( session->event_base, timer_callback, session );
     tr_timerAdd( dht_timer, 0, tr_cryptoWeakRandInt( 1000000 ) );
 
     tr_ndbg( "DHT", "DHT initialized" );

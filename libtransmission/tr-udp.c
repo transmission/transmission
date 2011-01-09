@@ -172,7 +172,7 @@ tr_udpInit(tr_session *ss, const tr_address * addr)
         goto ipv6;
     }
     ss->udp_event =
-        event_new(NULL, ss->udp_socket, EV_READ | EV_PERSIST,
+        event_new(ss->event_base, ss->udp_socket, EV_READ | EV_PERSIST,
                   event_callback, ss);
     if( ss->udp_event == NULL )
         tr_nerr("UDP", "Couldn't allocate IPv4 event");
@@ -182,7 +182,7 @@ tr_udpInit(tr_session *ss, const tr_address * addr)
         rebind_ipv6(ss, TRUE);
     if(ss->udp6_socket >= 0) {
         ss->udp6_event =
-            event_new(NULL, ss->udp6_socket, EV_READ | EV_PERSIST,
+            event_new(ss->event_base, ss->udp6_socket, EV_READ | EV_PERSIST,
                       event_callback, ss);
         if(ss->udp6_event == NULL)
             tr_nerr("UDP", "Couldn't allocate IPv6 event");
