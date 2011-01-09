@@ -1,3 +1,8 @@
+9 January 2011: dht-0.17:
+
+  * Fix a bug that prevented calling dht_init after dht_uninit.
+  * Remove the "dofree" parameter to dht_uninit.
+
 23 December 2010: dht-0.16:
 
   * Change the interface to allow sharing of the UDP socket e.g. with uTP.

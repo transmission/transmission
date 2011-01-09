@@ -400,7 +400,7 @@ main(int argc, char **argv)
         printf("Found %d (%d + %d) good nodes.\n", i, num, num6);
     }
 
-    dht_uninit(1);
+    dht_uninit();
     return 0;
     
  usage:

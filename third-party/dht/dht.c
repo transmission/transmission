@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2009, 2010 by Juliusz Chroboczek
+Copyright (c) 2009-2011 by Juliusz Chroboczek
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -1659,19 +1659,30 @@ dht_init(int s, int s6, const unsigned char *id, const unsigned char *v)
 }
 
 int
-dht_uninit(int dofree)
+dht_uninit()
 {
-    if(dht_socket < 0) {
+    if(dht_socket < 0 && dht_socket6 < 0) {
         errno = EINVAL;
         return -1;
     }
 
-    if(!dofree)
-        return 1;
+    dht_socket = -1;
+    dht_socket6 = -1;
 
     while(buckets) {
         struct bucket *b = buckets;
         buckets = b->next;
+        while(b->nodes) {
+            struct node *n = b->nodes;
+            b->nodes = n->next;
+            free(n);
+        }
+        free(b);
+    }
+
+    while(buckets6) {
+        struct bucket *b = buckets6;
+        buckets6 = b->next;
         while(b->nodes) {
             struct node *n = b->nodes;
             b->nodes = n->next;

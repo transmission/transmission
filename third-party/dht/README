@@ -34,9 +34,7 @@ at client shutdown.
  
 * dht_uninit
 
-This may be called at the end of the session.  If dofree is true, it frees
-all the memory allocated for the DHT.  If dofree is false, this function
-currently does nothing.
+This may be called at the end of the session.
 
 Bootstrapping
 *************

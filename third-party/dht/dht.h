@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2009, 2010 by Juliusz Chroboczek
+Copyright (c) 2009-2011 by Juliusz Chroboczek
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -47,7 +47,7 @@ int dht_nodes(int af,
 void dht_dump_tables(FILE *f);
 int dht_get_nodes(struct sockaddr_in *sin, int *num,
                   struct sockaddr_in6 *sin6, int *num6);
-int dht_uninit(int dofree);
+int dht_uninit(void);
 
 /* This must be provided by the user. */
 void dht_hash(void *hash_return, int hash_size,
