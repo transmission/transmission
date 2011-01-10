@@ -1,3 +1,8 @@
+dht-0.18 (unreleased)
+
+  * Fix a bug that could cause parse_message to enter an infinite loop
+    on overflow.
+
 9 January 2011: dht-0.17:
 
   * Fix a bug that prevented calling dht_init after dht_uninit.

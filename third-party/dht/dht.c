@@ -2825,21 +2825,19 @@ parse_message(const unsigned char *buf, int buflen,
                 l = strtol((char*)buf + i, &q, 10);
                 if(q && *q == ':' && l > 0) {
                     CHECK(q + 1, l);
+                    i = q + 1 + l - (char*)buf;
                     if(l == 6) {
                         if(j + l > *values_len)
                             continue;
-                        i = q + 1 + l - (char*)buf;
                         memcpy((char*)values_return + j, q + 1, l);
                         j += l;
                     } else if(l == 18) {
                         if(j6 + l > *values6_len)
                             continue;
-                        i = q + 1 + l - (char*)buf;
                         memcpy((char*)values6_return + j6, q + 1, l);
                         j6 += l;
                     } else {
                         debugf("Received weird value -- %d bytes.\n", (int)l);
-                        i = q + 1 + l - (char*)buf;
                     }
                 } else {
                     break;
