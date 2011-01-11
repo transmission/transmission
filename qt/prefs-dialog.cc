@@ -658,7 +658,7 @@ void
 PrefsDialog :: updateBlocklistLabel( )
 {
     const int n = mySession.blocklistSize( );
-    myBlocklistLabel->setText( tr( "<i>Blocklist contains %Ln rules)", 0, n ) );
+    myBlocklistLabel->setText( tr( "<i>Blocklist contains %Ln rules</i>", 0, n ) );
 }
 
 void
