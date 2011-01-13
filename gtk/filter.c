@@ -608,7 +608,7 @@ activity_is_it_a_separator( GtkTreeModel * m, GtkTreeIter * i, gpointer d UNUSED
 static gboolean
 test_torrent_activity( tr_torrent * tor, int type )
 {
-    const tr_stat * st = tr_torrentStat( tor );
+    const tr_stat * st = tr_torrentStatCached( tor );
 
     switch( type )
     {
