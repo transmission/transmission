@@ -72,11 +72,6 @@ typedef struct tr_peerIo
     tr_bool               fastExtensionSupported;
     tr_bool               dhtSupported;
 
-    /* we create the socket in a nonblocking way, so this flag is initially
-     * false and then set to true when libevent says that the socket is ready
-     * for reading or writing */
-    tr_bool               hasFinishedConnecting;
-
     tr_priority_t         priority;
 
     short int             pendingEvents;
@@ -340,8 +335,7 @@ tr_peerIoHasBandwidthLeft( const tr_peerIo * io, tr_direction dir )
 {
     assert( tr_isPeerIo( io ) );
 
-    return !io->hasFinishedConnecting
-        || ( tr_bandwidthClamp( &io->bandwidth, dir, 1024 ) > 0 );
+    return tr_bandwidthClamp( &io->bandwidth, dir, 1024 ) > 0;
 }
 
 static inline unsigned int
