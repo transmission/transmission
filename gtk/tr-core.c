@@ -528,9 +528,8 @@ torrentTrackerString( tr_torrent * tor )
 }
 
 static gboolean
-isTorrentActive( tr_torrent * tor )
+isTorrentActive( const tr_stat * st )
 {
-    const tr_stat * st = tr_torrentStat( tor );
     return ( st->peersSendingToUs > 0 )
         || ( st->peersGettingFromUs > 0 )
         || ( st->activity == TR_STATUS_CHECK );
@@ -885,7 +884,7 @@ tr_core_add_torrent( TrCore     * self,
                                        MC_TORRENT_RAW,   tor,
                                        MC_SPEED_UP,      st->pieceUploadSpeed_KBps,
                                        MC_SPEED_DOWN,    st->pieceDownloadSpeed_KBps,
-                                       MC_ACTIVE,        isTorrentActive( tor ),
+                                       MC_ACTIVE,        isTorrentActive( st ),
                                        MC_ACTIVITY,      st->activity,
                                        MC_FINISHED,      st->finished,
                                        MC_PRIORITY,      tr_torrentGetPriority( tor ),
@@ -1306,7 +1305,7 @@ update_foreach( GtkTreeModel * model,
     /* get the new states */
     tor = tr_torrent_handle( gtor );
     st = tr_torrentStat( tor );
-    newActive = isTorrentActive( tor );
+    newActive = isTorrentActive( st );
     newActivity = st->activity;
     newFinished = st->finished;
     newPriority = tr_torrentGetPriority( tor );
