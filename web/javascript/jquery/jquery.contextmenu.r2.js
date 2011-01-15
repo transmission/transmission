@@ -122,7 +122,14 @@
     if( left + menu.width() > $(window).width() ) left = left - menu.width();
     menu.css({'left':left,'top':top}).show();
     if (cur.shadow) shadow.css({width:menu.width(),height:menu.height(),left:e.pageX+2,top:e.pageY+2}).show();
-    $(document).one('click', hide);
+    
+    setTimeout( function() { // Delay for Mozilla
+		$(document).click( function() {
+			$(document).unbind('click');
+			hide();
+			return false;
+		});
+	}, 0);
   }
 
   function hide() {
