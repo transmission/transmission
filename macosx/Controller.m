@@ -325,7 +325,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         
         //hidden pref
         if ([fDefaults objectForKey: @"PeerSocketTOS"])
-            tr_bencDictAddInt(&settings, TR_PREFS_KEY_PEER_SOCKET_TOS, [fDefaults integerForKey: @"PeerSocketTOS"]);
+            tr_bencDictAddStr(&settings, TR_PREFS_KEY_PEER_SOCKET_TOS, [[fDefaults stringForKey: @"PeerSocketTOS"] UTF8String]);
         
         tr_bencDictAddBool(&settings, TR_PREFS_KEY_PEX_ENABLED, [fDefaults boolForKey: @"PEXGlobal"]);
         tr_bencDictAddBool(&settings, TR_PREFS_KEY_PORT_FORWARDING, [fDefaults boolForKey: @"NatTraversal"]);
