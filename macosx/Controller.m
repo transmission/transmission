@@ -390,7 +390,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         [[UKKQueue sharedFileWatcher] setDelegate: self];
         
         [[SUUpdater sharedUpdater] setDelegate: self];
-        fUpdateInProgress = NO;
+        fQuitRequested = NO;
         
         fPauseOnLaunch = (GetCurrentKeyModifiers() & (optionKey | rightOptionKey)) != 0;
     }
@@ -677,7 +677,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 
 - (NSApplicationTerminateReply) applicationShouldTerminate: (NSApplication *) sender
 {
-    if (!fUpdateInProgress && [fDefaults boolForKey: @"CheckQuit"])
+    if (!fQuitRequested && [fDefaults boolForKey: @"CheckQuit"])
     {
         NSInteger active = 0, downloading = 0;
         for (Torrent * torrent  in fTorrents)
@@ -4358,7 +4358,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 
 - (void) updaterWillRelaunchApplication: (SUUpdater *) updater
 {
-    fUpdateInProgress = YES;
+    fQuitRequested = YES;
 }
 
 - (NSDictionary *) registrationDictionaryForGrowl
@@ -4438,6 +4438,11 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         
         case TR_RPC_SESSION_CHANGED:
             [fPrefsController performSelectorOnMainThread: @selector(rpcUpdatePrefs) withObject: nil waitUntilDone: NO];
+            break;
+        
+        case TR_RPC_SESSION_CLOSE:
+            fQuitRequested = YES;
+            [NSApp performSelectorOnMainThread: @selector(terminate:) withObject: self waitUntilDone: NO];
             break;
         
         default:

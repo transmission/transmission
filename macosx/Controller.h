@@ -103,8 +103,7 @@ typedef enum
     #warning change to QLPreviewPanel
     id                              fPreviewPanel;
     BOOL                            fQuitting;
-    
-    BOOL                            fUpdateInProgress;
+    BOOL                            fQuitRequested;
     BOOL                            fPauseOnLaunch;
     
     Badger                          * fBadger;
