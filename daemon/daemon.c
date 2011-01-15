@@ -323,6 +323,9 @@ pumpLogMessages( FILE * logfile )
     for( l=list; l!=NULL; l=l->next )
         printMessage( logfile, l->level, l->name, l->message, l->file, l->line );
 
+    if( logfile != NULL )
+        fflush( logfile );
+
     tr_freeMessageList( list );
 }
 
