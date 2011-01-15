@@ -141,13 +141,12 @@ tr_upnpPulse( tr_upnp * handle,
         char portStr[8];
         char intPort[8];
         char intClient[16];
-        int i;
 
         tr_snprintf( portStr, sizeof( portStr ), "%d", handle->port );
-        i = UPNP_GetSpecificPortMappingEntry( handle->urls.controlURL,
-                                              handle->data.first.servicetype, portStr,
-                                              "TCP", intClient, intPort );
-        if( i != UPNPCOMMAND_SUCCESS )
+        if( UPNP_GetSpecificPortMappingEntry( handle->urls.controlURL, handle->data.first.servicetype, 
+            portStr, "TCP", intClient, intPort ) != UPNPCOMMAND_SUCCESS  ||
+            UPNP_GetSpecificPortMappingEntry( handle->urls.controlURL, handle->data.first.servicetype, 
+            portStr, "UDP", intClient, intPort ) != UPNPCOMMAND_SUCCESS )
         {
             tr_ninf( getKey( ), _( "Port %d isn't forwarded" ), handle->port );
             handle->isMapped = FALSE;
@@ -161,6 +160,9 @@ tr_upnpPulse( tr_upnp * handle,
         UPNP_DeletePortMapping( handle->urls.controlURL,
                                 handle->data.first.servicetype,
                                 portStr, "TCP", NULL );
+        UPNP_DeletePortMapping( handle->urls.controlURL,
+                                handle->data.first.servicetype,
+                                portStr, "UDP", NULL );
         tr_ninf( getKey( ),
                  _(
                      "Stopping port forwarding through \"%s\", service \"%s\"" ),
@@ -178,7 +180,8 @@ tr_upnpPulse( tr_upnp * handle,
 
     if( handle->state == TR_UPNP_MAP )
     {
-        int  err = -1;
+        int  err_tcp = -1;
+        int  err_udp = -1;
         errno = 0;
 
         if( !handle->urls.controlURL || !handle->data.first.servicetype )
@@ -187,13 +190,30 @@ tr_upnpPulse( tr_upnp * handle,
         {
             char portStr[16];
             char desc[64];
+            const int prev_errno = errno;
             tr_snprintf( portStr, sizeof( portStr ), "%d", port );
             tr_snprintf( desc, sizeof( desc ), "%s at %d", TR_NAME, port );
-            err = UPNP_AddPortMapping( handle->urls.controlURL,
+
+            errno = 0;
+            err_tcp = UPNP_AddPortMapping( handle->urls.controlURL,
                                        handle->data.first.servicetype,
                                        portStr, portStr, handle->lanaddr,
                                        desc, "TCP", NULL );
-            handle->isMapped = !err;
+            if( err_tcp )
+                tr_ndbg( getKey( ), "TCP Port forwarding failed with error %d (errno %d - %s)",
+                         err_tcp, errno, tr_strerror( errno ) );
+
+            errno = 0;
+            err_udp = UPNP_AddPortMapping( handle->urls.controlURL,
+                                       handle->data.first.servicetype,
+                                       portStr, portStr, handle->lanaddr,
+                                       desc, "UDP", NULL );
+            if( err_udp )
+                tr_ndbg( getKey( ), "UDP Port forwarding failed with error %d (errno %d - %s)",
+                         err_udp, errno, tr_strerror( errno ) );
+
+            errno = prev_errno;
+            handle->isMapped = !err_tcp | !err_udp;
         }
         tr_ninf( getKey( ),
                  _( "Port forwarding through \"%s\", service \"%s\". (local address: %s:%d)" ),
@@ -207,13 +227,7 @@ tr_upnpPulse( tr_upnp * handle,
         }
         else
         {
-            tr_ndbg(
-                 getKey( ),
-                "Port forwarding failed with error %d (errno %d - %s)", err,
-                errno, tr_strerror( errno ) );
-            tr_ndbg(
-                getKey( ),
-                "If your router supports UPnP, please make sure UPnP is enabled!" );
+            tr_ndbg( getKey( ), "If your router supports UPnP, please make sure UPnP is enabled!" );
             handle->port = -1;
             handle->state = TR_UPNP_ERR;
         }
