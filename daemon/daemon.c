@@ -329,6 +329,17 @@ pumpLogMessages( FILE * logfile )
     tr_freeMessageList( list );
 }
 
+static tr_rpc_callback_status
+on_rpc_callback( tr_session            * session UNUSED,
+                 tr_rpc_callback_type    type,
+                 struct tr_torrent     * tor UNUSED,
+                 void                  * user_data UNUSED )
+{
+    if( type == TR_RPC_SESSION_CLOSE )
+        closing = TRUE;
+    return TR_RPC_OK;
+}
+
 int
 main( int argc, char ** argv )
 {
@@ -483,6 +494,7 @@ main( int argc, char ** argv )
     tr_formatter_size_init( DISK_K, DISK_K_STR, DISK_M_STR, DISK_G_STR, DISK_T_STR );
     tr_formatter_speed_init( SPEED_K, SPEED_K_STR, SPEED_M_STR, SPEED_G_STR, SPEED_T_STR );
     mySession = tr_sessionInit( "daemon", configDir, TRUE, &settings );
+    tr_sessionSetRPCCallback( mySession, on_rpc_callback, NULL );
     tr_ninf( NULL, "Using settings from \"%s\"", configDir );
     tr_sessionSaveSettings( mySession, configDir, &settings );
 

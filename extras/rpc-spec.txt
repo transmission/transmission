@@ -526,6 +526,14 @@
    Request arguments: none
    Response arguments: a bool, "port-is-open"
 
+4.5.  Session shutdown
+
+   This method tells the transmission session to shut down.
+
+   Method-name: "session-close"
+   Request arguments: none
+   Response arguments: none
+
 5.0.  Protocol Versions
 
   The following changes have been made to the RPC interface:
@@ -645,3 +653,4 @@
          |         | yes       | session-set    | new arg "blocklist-url"
    ------+---------+-----------+----------------+-------------------------------
    12    | 2.20    | yes       | session-get    | new arg "download-dir-free-space"
+         |         | yes       | session-close  | new method

@@ -481,6 +481,10 @@ onRPCChanged( tr_session            * session,
 
     switch( type )
     {
+        case TR_RPC_SESSION_CLOSE:
+            gtr_action_activate( "quit" );
+            break;
+
         case TR_RPC_TORRENT_ADDED:
             tr_core_add_torrent( cbdata->core, tr_torrent_new_preexisting( tor ), TRUE );
             break;

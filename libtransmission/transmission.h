@@ -498,7 +498,8 @@ typedef enum
     TR_RPC_TORRENT_REMOVING,
     TR_RPC_TORRENT_CHANGED, /* catch-all for the "torrent-set" rpc method */
     TR_RPC_TORRENT_MOVED,
-    TR_RPC_SESSION_CHANGED
+    TR_RPC_SESSION_CHANGED,
+    TR_RPC_SESSION_CLOSE
 }
 tr_rpc_callback_type;
 

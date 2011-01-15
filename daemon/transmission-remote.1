@@ -23,6 +23,7 @@ and
 .Op Fl d Ar number | Fl D
 .Op Fl e Ar size
 .Op Fl er | ep | et
+.Op Fl -exit
 .Op Fl f
 .Op Fl g Ar files
 .Op Fl G Ar files
@@ -134,6 +135,8 @@ Encrypt all peer connections.
 Prefer encrypted peer connections.
 .It Fl et Fl -encryption-tolerated
 Prefer unencrypted peer connections.
+.It Fl -exit
+Tell the Transmission to initiate a shutdown.
 .It Fl f Fl -files
 Get a file list for the current torrent(s)
 .It Fl g Fl -get Ar all | file-index | files
