@@ -257,6 +257,47 @@ tr_sessionGetPublicAddress( const tr_session * session, int tr_af_type, tr_bool 
  #define TR_DEFAULT_ENCRYPTION   TR_ENCRYPTION_PREFERRED
 #endif
 
+static int
+parse_tos(const char *string)
+{
+    char *p;
+    int value;
+
+    if(strcasecmp(string, "") == 0 || strcasecmp(string, "default") == 0)
+        return 0;
+    else if(strcasecmp(string, "lowcost") == 0 ||
+            strcasecmp(string, "mincost") == 0)
+        return 0x10;
+    else if(strcasecmp(string, "throughput") == 0)
+        return 0x08;
+    else if(strcasecmp(string, "reliability") == 0)
+        return 0x04;
+    else if(strcasecmp(string, "lowdelay") == 0)
+        return 0x02;
+
+    value = strtol(string, &p, 0);
+    if(p == NULL || p == string)
+        return 0;
+
+    return value;
+}
+
+static const char *
+format_tos(int value)
+{
+    static char buf[8];
+    switch(value) {
+    case 0: return "default";
+    case 0x10: return "lowcost";
+    case 0x08: return "throughput";
+    case 0x04: return "reliability";
+    case 0x02: return "lowdelay";
+    default:
+        snprintf(buf, 8, "%d", value);
+        return buf;
+    }
+}
+
 void
 tr_sessionGetDefaultSettings( const char * configDir UNUSED, tr_benc * d )
 {
@@ -285,7 +326,7 @@ tr_sessionGetDefaultSettings( const char * configDir UNUSED, tr_benc * d )
     tr_bencDictAddBool( d, TR_PREFS_KEY_PEER_PORT_RANDOM_ON_START, FALSE );
     tr_bencDictAddInt ( d, TR_PREFS_KEY_PEER_PORT_RANDOM_LOW,     49152 );
     tr_bencDictAddInt ( d, TR_PREFS_KEY_PEER_PORT_RANDOM_HIGH,    65535 );
-    tr_bencDictAddInt ( d, TR_PREFS_KEY_PEER_SOCKET_TOS,          atoi( TR_DEFAULT_PEER_SOCKET_TOS_STR ) );
+    tr_bencDictAddStr ( d, TR_PREFS_KEY_PEER_SOCKET_TOS,          TR_DEFAULT_PEER_SOCKET_TOS_STR );
     tr_bencDictAddBool( d, TR_PREFS_KEY_PEX_ENABLED,              TRUE );
     tr_bencDictAddBool( d, TR_PREFS_KEY_PORT_FORWARDING,          TRUE );
     tr_bencDictAddInt ( d, TR_PREFS_KEY_PREALLOCATION,            TR_PREALLOCATE_SPARSE );
@@ -348,7 +389,7 @@ tr_sessionGetSettings( tr_session * s, struct tr_benc * d )
     tr_bencDictAddBool( d, TR_PREFS_KEY_PEER_PORT_RANDOM_ON_START, s->isPortRandom );
     tr_bencDictAddInt ( d, TR_PREFS_KEY_PEER_PORT_RANDOM_LOW,     s->randomPortLow );
     tr_bencDictAddInt ( d, TR_PREFS_KEY_PEER_PORT_RANDOM_HIGH,    s->randomPortHigh );
-    tr_bencDictAddInt ( d, TR_PREFS_KEY_PEER_SOCKET_TOS,          s->peerSocketTOS );
+    tr_bencDictAddStr ( d, TR_PREFS_KEY_PEER_SOCKET_TOS,          format_tos(s->peerSocketTOS) );
     tr_bencDictAddStr ( d, TR_PREFS_KEY_PEER_CONGESTION_ALGORITHM, s->peer_congestion_algorithm );
     tr_bencDictAddBool( d, TR_PREFS_KEY_PEX_ENABLED,              s->isPexEnabled );
     tr_bencDictAddBool( d, TR_PREFS_KEY_PORT_FORWARDING,          tr_sessionIsPortForwardingEnabled( s ) );
@@ -718,8 +759,8 @@ sessionSetImpl( void * vdata )
         tr_sessionSetLPDEnabled( session, boolVal );
     if( tr_bencDictFindInt( settings, TR_PREFS_KEY_ENCRYPTION, &i ) )
         tr_sessionSetEncryption( session, i );
-    if( tr_bencDictFindInt( settings, TR_PREFS_KEY_PEER_SOCKET_TOS, &i ) )
-        session->peerSocketTOS = i;
+    if( tr_bencDictFindStr( settings, TR_PREFS_KEY_PEER_SOCKET_TOS, &str ) )
+        session->peerSocketTOS = parse_tos( str );
     if( tr_bencDictFindStr( settings, TR_PREFS_KEY_PEER_CONGESTION_ALGORITHM, &str ) )
         session->peer_congestion_algorithm = tr_strdup(str);
     else
