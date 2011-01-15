@@ -44,6 +44,7 @@
 #import "ToolbarSegmentedCell.h"
 #import "BlocklistDownloader.h"
 #import "StatusBarView.h"
+#import "FilterBarView.h"
 #import "FilterButton.h"
 #import "BonjourController.h"
 #import "Badger.h"
