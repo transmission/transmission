@@ -1588,6 +1588,8 @@ ensureAtomExists( Torrent           * t,
         
         if( a->seedProbability == -1 )
             atomSetSeedProbability( a, seedProbability );
+
+        a->flags |= flags;
     }
 }
 
