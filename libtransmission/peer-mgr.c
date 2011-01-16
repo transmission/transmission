@@ -1766,12 +1766,6 @@ tr_peerMgrAddIncoming( tr_peerMgr * manager,
     managerUnlock( manager );
 }
 
-static tr_bool
-tr_isPex( const tr_pex * pex )
-{
-    return pex && tr_isAddress( &pex->addr );
-}
-
 void
 tr_peerMgrAddPex( tr_torrent * tor, uint8_t from,
                   const tr_pex * pex, int8_t seedProbability )

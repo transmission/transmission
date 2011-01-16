@@ -103,13 +103,6 @@ savePeers( tr_benc * dict, const tr_torrent * tor )
     tr_free( pex );
 }
 
-static tr_bool
-tr_isPex( const tr_pex * pex )
-{
-    return tr_isAddress( &pex->addr )
-        && ( pex->flags & 3 ) == pex->flags;
-}
-
 static int
 addPeers( tr_torrent * tor, const uint8_t * buf, int buflen )
 {

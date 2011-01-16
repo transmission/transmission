@@ -131,6 +131,12 @@ typedef struct tr_peer
 }
 tr_peer;
 
+static inline tr_bool
+tr_isPex( const tr_pex * pex )
+{
+    return pex && tr_isAddress( &pex->addr );
+}
+
 const tr_address * tr_peerAddress( const tr_peer * );
 
 int tr_pexCompare( const void * a, const void * b );
