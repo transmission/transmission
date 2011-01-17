@@ -835,7 +835,7 @@ refreshInfo( struct DetailsImpl * di, tr_torrent ** torrents, int n )
             else if( !haveUnchecked )
                 g_snprintf( buf, sizeof( buf ), _( "%1$s (%2$s%% of %3$s%% Available)" ), total, buf2, avail );
             else
-                g_snprintf( buf, sizeof( buf ), _( "%1$s (%2$s%% of %3$s%% Available) + %4$s Unverified" ), total, buf2, avail, unver );
+                g_snprintf( buf, sizeof( buf ), _( "%1$s (%2$s%% of %3$s%% Available); %4$s Unverified" ), total, buf2, avail, unver );
             str = buf;
         }
     }
