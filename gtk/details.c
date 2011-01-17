@@ -1104,7 +1104,7 @@ enum
     PEER_COL_REQS_CANCELLED_BY_PEER_COUNT_INT,
     PEER_COL_REQS_CANCELLED_BY_PEER_COUNT_STRING,
     PEER_COL_ENCRYPTION_STOCK_ID,
-    PEER_COL_STATUS,
+    PEER_COL_FLAGS,
     N_PEER_COLS
 };
 
@@ -1132,7 +1132,7 @@ getPeerColumnName( int column )
         case PEER_COL_REQS_CANCELLED_BY_CLIENT_COUNT_STRING: return _( "We Cancelled" );
         case PEER_COL_REQS_CANCELLED_BY_PEER_COUNT_INT:
         case PEER_COL_REQS_CANCELLED_BY_PEER_COUNT_STRING: return _( "They Cancelled" );
-        case PEER_COL_STATUS: return _( "Status" );
+        case PEER_COL_FLAGS: return _( "Flags" );
         default: return "";
     }
 }
@@ -1243,7 +1243,7 @@ refreshPeerRow( GtkListStore        * store,
                         PEER_COL_DOWNLOAD_RATE_STRING, down_speed,
                         PEER_COL_UPLOAD_RATE_DOUBLE, peer->rateToPeer_KBps,
                         PEER_COL_UPLOAD_RATE_STRING, up_speed,
-                        PEER_COL_STATUS, peer->flagStr,
+                        PEER_COL_FLAGS, peer->flagStr,
                         PEER_COL_WAS_UPDATED, TRUE,
                         PEER_COL_BLOCKS_DOWNLOADED_COUNT_INT, (int)peer->blocksToClient,
                         PEER_COL_BLOCKS_DOWNLOADED_COUNT_STRING, blocks_to_client,
@@ -1465,7 +1465,7 @@ onPeerViewQueryTooltip( GtkWidget   * widget,
         const char * pch;
         char *       str = NULL;
         GString *    gstr = g_string_new( NULL );
-        gtk_tree_model_get( model, &iter, PEER_COL_STATUS, &str, -1 );
+        gtk_tree_model_get( model, &iter, PEER_COL_FLAGS, &str, -1 );
         for( pch = str; pch && *pch; ++pch )
         {
             const char * s = NULL;
@@ -1518,7 +1518,7 @@ setPeerViewColumns( GtkTreeView * peer_view )
     if( more ) view_columns[n++] = PEER_COL_REQS_CANCELLED_BY_CLIENT_COUNT_STRING;
     if( more ) view_columns[n++] = PEER_COL_REQS_CANCELLED_BY_PEER_COUNT_STRING;
     view_columns[n++] = PEER_COL_PROGRESS;
-    view_columns[n++] = PEER_COL_STATUS;
+    view_columns[n++] = PEER_COL_FLAGS;
     view_columns[n++] = PEER_COL_ADDRESS;
     view_columns[n++] = PEER_COL_CLIENT;
 
@@ -1611,7 +1611,7 @@ setPeerViewColumns( GtkTreeView * peer_view )
                 sort_col = PEER_COL_UPLOAD_RATE_DOUBLE;
                 break;
 
-            case PEER_COL_STATUS:
+            case PEER_COL_FLAGS:
                 r = gtk_cell_renderer_text_new( );
                 c = gtk_tree_view_column_new_with_attributes( t, r, "text", col, NULL );
                 break;
