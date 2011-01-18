@@ -621,6 +621,7 @@ test_torrent_activity( tr_torrent * tor, int type )
         case ACTIVITY_FILTER_ACTIVE:
             return ( st->peersSendingToUs > 0 )
                 || ( st->peersGettingFromUs > 0 )
+                || ( st->webseedsSendingToUs > 0 )
                 || ( st->activity == TR_STATUS_CHECK );
 
         case ACTIVITY_FILTER_PAUSED:
