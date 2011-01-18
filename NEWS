@@ -1,20 +1,23 @@
 === Transmission 2.20 (2011/xx/yy) ===
 [http://trac.transmissionbt.com/query?milestone=2.20&group=component&order=severity All tickets closed by this release]
 ==== All Platforms ====
-  * Don't forget downloaded files when a drive is unplugged
-  * File reverification is no longer needed in some situations
+  * Remember downloaded files when a drive is unplugged
+  * File re-verification is no longer needed in some situations
   * Fix "Too many open files" error
   * Show the total downloading and seeding time per torrent
   * Fix webseeds
   * Better support for IPv6-only trackers
   * Add the ability to shut down Transmission sessions via RPC
+  * NAT-PMP and UPnP now also maps the UDP port
   * Improve support for running scripts when a torrent finishes downloading
   * Fix checksum error on platforms running uClibc 0.9.27 or older
   * Fix memmem() errors on Solaris
 ==== Mac ====
+  * Fix issues in the German and Spanish localizations
+  * Interface tweaks
 ==== GTK+ ====
-  * Added "Add" and "Remove" buttons to the tracker list
-  * Added filesize column to the files list
+  * Add "Add" and "Remove" buttons to the tracker list
+  * Add filesize column to the files list
   * Minor fixes
 ==== Qt ====
   * Accept info_hash values in the "Add url..." dialog
