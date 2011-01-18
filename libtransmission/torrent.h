@@ -297,6 +297,11 @@ static inline void tr_torrentLock( const tr_torrent * tor )
     tr_sessionLock( tor->session );
 }
 
+static inline tr_bool tr_torrentIsLocked( const tr_torrent * tor )
+{
+    return tr_sessionIsLocked( tor->session );
+}
+
 static inline void tr_torrentUnlock( const tr_torrent * tor )
 {
     tr_sessionUnlock( tor->session );

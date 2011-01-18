@@ -1398,40 +1398,56 @@ tr_torrentFilesFree( tr_file_stat *            files,
 double*
 tr_torrentWebSpeeds_KBps( const tr_torrent * tor )
 {
-    return tr_isTorrent( tor ) ? tr_peerMgrWebSpeeds_KBps( tor ) : NULL;
+    double * ret = NULL;
+
+    if( tr_isTorrent( tor ) )
+    {
+        tr_torrentLock( tor );
+        ret = tr_peerMgrWebSpeeds_KBps( tor );
+        tr_torrentUnlock( tor );
+    }
+
+    return ret;
 }
 
 tr_peer_stat *
-tr_torrentPeers( const tr_torrent * tor,
-                 int *              peerCount )
+tr_torrentPeers( const tr_torrent * tor, int * peerCount )
 {
     tr_peer_stat * ret = NULL;
 
     if( tr_isTorrent( tor ) )
+    {
+        tr_torrentLock( tor );
         ret = tr_peerMgrPeerStats( tor, peerCount );
+        tr_torrentUnlock( tor );
+    }
 
     return ret;
 }
 
 void
-tr_torrentPeersFree( tr_peer_stat * peers,
-                     int peerCount  UNUSED )
+tr_torrentPeersFree( tr_peer_stat * peers, int peerCount UNUSED )
 {
     tr_free( peers );
 }
 
 tr_tracker_stat *
-tr_torrentTrackers( const tr_torrent * torrent,
-                    int              * setmeTrackerCount )
+tr_torrentTrackers( const tr_torrent * torrent, int * setmeTrackerCount )
 {
-    assert( tr_isTorrent( torrent ) );
+    tr_tracker_stat * ret = NULL;
 
-    return tr_announcerStats( torrent, setmeTrackerCount );
+    if( tr_isTorrent( torrent ) )
+    {
+        tr_torrentLock( torrent );
+        ret = tr_announcerStats( torrent, setmeTrackerCount );
+        tr_torrentUnlock( torrent );
+    }
+
+    return ret;
 }
 
 void
-tr_torrentTrackersFree( tr_tracker_stat * trackers,
-                        int trackerCount )
+tr_torrentTrackersFree( tr_tracker_stat * trackers, int trackerCount )
 {
     tr_announcerStatsFree( trackers, trackerCount );
 }
@@ -1722,6 +1738,8 @@ stopTorrent( void * vtor )
 
     assert( tr_isTorrent( tor ) );
 
+    tr_torrentLock( tor );
+
     tr_verifyRemove( tor );
     tr_peerMgrStopTorrent( tor );
     tr_announcerTorrentStopped( tor );
@@ -1731,6 +1749,8 @@ stopTorrent( void * vtor )
 
     if( !tor->isDeleting )
         tr_torrentSave( tor );
+
+    tr_torrentUnlock( tor );
 }
 
 void

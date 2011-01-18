@@ -1956,6 +1956,7 @@ tr_announcerStats( const tr_torrent * torrent,
     const time_t now = tr_time( );
 
     assert( tr_isTorrent( torrent ) );
+    assert( tr_torrentIsLocked( torrent ) );
 
     /* count the trackers... */
     for( i=n=0, tierCount=tr_ptrArraySize( &torrent->tiers->tiers ); i<tierCount; ++i ) {

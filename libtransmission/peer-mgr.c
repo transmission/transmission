@@ -2065,23 +2065,21 @@ tr_peerMgrStartTorrent( tr_torrent * tor )
 {
     Torrent * t = tor->torrentPeers;
 
-    assert( t != NULL );
-    managerLock( t->manager );
+    assert( tr_isTorrent( tor ) );
+    assert( tr_torrentIsLocked( tor ) );
+
     ensureMgrTimersExist( t->manager );
 
     t->isRunning = TRUE;
     t->maxPeers = t->tor->maxConnectedPeers;
 
     rechokePulse( 0, 0, t->manager );
-    managerUnlock( t->manager );
 }
 
 static void
 stopTorrent( Torrent * t )
 {
     int i, n;
-
-    assert( torrentIsLocked( t ) );
 
     t->isRunning = FALSE;
 
@@ -2099,38 +2097,30 @@ stopTorrent( Torrent * t )
 void
 tr_peerMgrStopTorrent( tr_torrent * tor )
 {
-    Torrent * t = tor->torrentPeers;
+    assert( tr_isTorrent( tor ) );
+    assert( tr_torrentIsLocked( tor ) );
 
-    managerLock( t->manager );
-
-    stopTorrent( t );
-
-    managerUnlock( t->manager );
+    stopTorrent( tor->torrentPeers );
 }
 
 void
-tr_peerMgrAddTorrent( tr_peerMgr * manager,
-                      tr_torrent * tor )
+tr_peerMgrAddTorrent( tr_peerMgr * manager, tr_torrent * tor )
 {
-    managerLock( manager );
-
-    assert( tor );
+    assert( tr_isTorrent( tor ) );
+    assert( tr_torrentIsLocked( tor ) );
     assert( tor->torrentPeers == NULL );
 
     tor->torrentPeers = torrentConstructor( manager, tor );
-
-    managerUnlock( manager );
 }
 
 void
 tr_peerMgrRemoveTorrent( tr_torrent * tor )
 {
-    tr_torrentLock( tor );
+    assert( tr_isTorrent( tor ) );
+    assert( tr_torrentIsLocked( tor ) );
 
     stopTorrent( tor->torrentPeers );
     torrentDestructor( tor->torrentPeers );
-
-    tr_torrentUnlock( tor );
 }
 
 void
@@ -2172,38 +2162,35 @@ tr_bitfield*
 tr_peerMgrGetAvailable( const tr_torrent * tor )
 {
     int i;
-    int peerCount;
     Torrent * t = tor->torrentPeers;
-    const tr_peer ** peers;
-    tr_bitfield * pieces;
-    managerLock( t->manager );
+    const int peerCount = tr_ptrArraySize( &t->peers );
+    const tr_peer ** peers = (const tr_peer**) tr_ptrArrayBase( &t->peers );
+    tr_bitfield * pieces = tr_bitfieldNew( t->tor->info.pieceCount );
 
-    pieces = tr_bitfieldNew( t->tor->info.pieceCount );
-    peerCount = tr_ptrArraySize( &t->peers );
-    peers = (const tr_peer**) tr_ptrArrayBase( &t->peers );
+    assert( tr_torrentIsLocked( tor ) );
+
     for( i=0; i<peerCount; ++i )
         tr_bitsetOr( pieces, &peers[i]->have );
 
-    managerUnlock( t->manager );
     return pieces;
 }
 
 void
-tr_peerMgrTorrentStats( tr_torrent       * tor,
-                        int              * setmePeersKnown,
-                        int              * setmePeersConnected,
-                        int              * setmeSeedsConnected,
-                        int              * setmeWebseedsSendingToUs,
-                        int              * setmePeersSendingToUs,
-                        int              * setmePeersGettingFromUs,
-                        int              * setmePeersFrom )
+tr_peerMgrTorrentStats( tr_torrent  * tor,
+                        int         * setmePeersKnown,
+                        int         * setmePeersConnected,
+                        int         * setmeSeedsConnected,
+                        int         * setmeWebseedsSendingToUs,
+                        int         * setmePeersSendingToUs,
+                        int         * setmePeersGettingFromUs,
+                        int         * setmePeersFrom )
 {
     int i, size;
     const Torrent * t = tor->torrentPeers;
     const tr_peer ** peers;
     const tr_webseed ** webseeds;
 
-    managerLock( t->manager );
+    assert( tr_torrentIsLocked( tor ) );
 
     peers = (const tr_peer **) tr_ptrArrayBase( &t->peers );
     size = tr_ptrArraySize( &t->peers );
@@ -2245,8 +2232,6 @@ tr_peerMgrTorrentStats( tr_torrent       * tor,
     for( i=0; i<size; ++i )
         if( tr_webseedIsActive( webseeds[i] ) )
             ++*setmeWebseedsSendingToUs;
-
-    managerUnlock( t->manager );
 }
 
 int
@@ -2271,21 +2256,17 @@ tr_peerMgrGetWebseedSpeed_Bps( const tr_torrent * tor, uint64_t now )
 double*
 tr_peerMgrWebSpeeds_KBps( const tr_torrent * tor )
 {
-    const Torrent * t = tor->torrentPeers;
-    const tr_webseed ** webseeds;
     int i;
-    int webseedCount;
-    double * ret;
-    uint64_t now;
+    const Torrent * t = tor->torrentPeers;
+    const int webseedCount = tr_ptrArraySize( &t->webseeds );
+    const tr_webseed ** webseeds = (const tr_webseed**) tr_ptrArrayBase( &t->webseeds );
+    const uint64_t now = tr_time_msec( );
+    double * ret = tr_new0( double, webseedCount );
 
-    assert( t->manager );
-    managerLock( t->manager );
-
-    webseeds = (const tr_webseed**) tr_ptrArrayBase( &t->webseeds );
-    webseedCount = tr_ptrArraySize( &t->webseeds );
+    assert( tr_isTorrent( tor ) );
+    assert( tr_torrentIsLocked( tor ) );
+    assert( t->manager != NULL );
     assert( webseedCount == tor->info.webseedCount );
-    ret = tr_new0( double, webseedCount );
-    now = tr_time_msec( );
 
     for( i=0; i<webseedCount; ++i ) {
         int Bps;
@@ -2295,7 +2276,6 @@ tr_peerMgrWebSpeeds_KBps( const tr_torrent * tor )
             ret[i] = -1.0;
     }
 
-    managerUnlock( t->manager );
     return ret;
 }
 
@@ -2307,24 +2287,19 @@ tr_peerGetPieceSpeed_Bps( const tr_peer * peer, uint64_t now, tr_direction direc
 
 
 struct tr_peer_stat *
-tr_peerMgrPeerStats( const tr_torrent    * tor,
-                     int                 * setmeCount )
+tr_peerMgrPeerStats( const tr_torrent * tor, int * setmeCount )
 {
-    int i, size;
+    int i;
     const Torrent * t = tor->torrentPeers;
-    const tr_peer ** peers;
-    tr_peer_stat * ret;
-    uint64_t now_msec;
-    time_t now;
+    const int size = tr_ptrArraySize( &t->peers );
+    const tr_peer ** peers = (const tr_peer**) tr_ptrArrayBase( &t->peers );
+    const uint64_t now_msec = tr_time_msec( );
+    const time_t now = tr_time();
+    tr_peer_stat * ret = tr_new0( tr_peer_stat, size );
 
+    assert( tr_isTorrent( tor ) );
+    assert( tr_torrentIsLocked( tor ) );
     assert( t->manager );
-    managerLock( t->manager );
-
-    size = tr_ptrArraySize( &t->peers );
-    peers = (const tr_peer**) tr_ptrArrayBase( &t->peers );
-    ret = tr_new0( tr_peer_stat, size );
-    now_msec = tr_time_msec( );
-    now = tr_time();
 
     for( i=0; i<size; ++i )
     {
@@ -2376,7 +2351,6 @@ tr_peerMgrPeerStats( const tr_torrent    * tor,
 
     *setmeCount = size;
 
-    managerUnlock( t->manager );
     return ret;
 }
 
@@ -2388,24 +2362,17 @@ void
 tr_peerMgrClearInterest( tr_torrent * tor )
 {
     int i;
-    Torrent * t;
-    int peerCount;
+    Torrent * t = tor->torrentPeers;
+    const int peerCount = tr_ptrArraySize( &t->peers );
 
     assert( tr_isTorrent( tor ) );
-
-    t = tor->torrentPeers;
-
-    torrentLock( t );
-
-    peerCount = tr_ptrArraySize( &t->peers );
+    assert( tr_torrentIsLocked( tor ) );
 
     for( i=0; i<peerCount; ++i )
     {
         const tr_peer * peer = tr_ptrArrayNth( &t->peers, i );
         tr_peerMsgsSetInterested( peer->msgs, FALSE );
     }
-
-    torrentUnlock( t );
 }
 
 /* do we still want this piece and does the peer have it? */
