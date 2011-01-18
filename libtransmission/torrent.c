@@ -53,6 +53,16 @@
 ****
 ***/
 
+#define tr_deeplog_tor( tor, ... ) \
+    do { \
+        if( tr_deepLoggingIsActive( ) ) \
+            tr_deepLog( __FILE__, __LINE__, tr_torrentName( tor ), __VA_ARGS__ ); \
+    } while( 0 )
+
+/***
+****
+***/
+
 int
 tr_torrentId( const tr_torrent * tor )
 {
@@ -764,7 +774,7 @@ setLocalErrorIfFilesDisappeared( tr_torrent * tor )
 
     if( disappeared )
     {
-        tr_tordbg( tor, "%s", "[LAZY] uh oh, the files disappeared" );
+        tr_deeplog_tor( tor, "%s", "[LAZY] uh oh, the files disappeared" );
         tr_torrentSetLocalError( tor, "%s", _( "No data found! Ensure your drives are connected or use \"Set Location\". To re-download, remove the torrent and re-add it." ) );
     }
 
@@ -2338,7 +2348,7 @@ tr_torrentCheckPiece( tr_torrent * tor, tr_piece_index_t pieceIndex )
 {
     const tr_bool pass = tr_ioTestPiece( tor, pieceIndex );
 
-    tr_tordbg( tor, "[LAZY] tr_torrentCheckPiece tested piece %zu, pass==%d", (size_t)pieceIndex, (int)pass );
+    tr_deeplog_tor( tor, "[LAZY] tr_torrentCheckPiece tested piece %zu, pass==%d", (size_t)pieceIndex, (int)pass );
     tr_torrentSetHasPiece( tor, pieceIndex, pass );
     tr_torrentSetPieceChecked( tor, pieceIndex );
     tor->anyDate = tr_time( );
