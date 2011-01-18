@@ -451,10 +451,11 @@ onComboEnumChanged( GtkComboBox * combo_box, struct DetailsImpl * di )
 static GtkWidget*
 ratio_combo_new( void )
 {
-    GtkWidget * w = gtr_combo_box_new_enum( _( "Use global settings" ),       TR_RATIOLIMIT_GLOBAL,
-                                            _( "Seed regardless of ratio" ),  TR_RATIOLIMIT_UNLIMITED,
-                                            _( "Stop seeding at ratio:" ),    TR_RATIOLIMIT_SINGLE,
-                                            NULL );
+    GtkWidget * w = gtr_combo_box_new_enum(
+        _( "Use global settings" ),       TR_RATIOLIMIT_GLOBAL,
+        _( "Seed regardless of ratio" ),  TR_RATIOLIMIT_UNLIMITED,
+        _( "Stop seeding at ratio:" ),    TR_RATIOLIMIT_SINGLE,
+        NULL );
     g_object_set_data_full( G_OBJECT( w ), ARG_KEY, g_strdup( "seedRatioMode" ), g_free );
     return w;
 }
@@ -462,10 +463,11 @@ ratio_combo_new( void )
 static GtkWidget*
 idle_combo_new( void )
 {
-    GtkWidget * w = gtr_combo_box_new_enum ( _( "Use global settings" ),                 TR_IDLELIMIT_GLOBAL,
-                                             _( "Seed regardless of activity" ),         TR_IDLELIMIT_UNLIMITED,
-                                             _( "Stop seeding if idle for N minutes:" ), TR_IDLELIMIT_SINGLE,
-                                             NULL );
+    GtkWidget * w = gtr_combo_box_new_enum (
+        _( "Use global settings" ),                 TR_IDLELIMIT_GLOBAL,
+        _( "Seed regardless of activity" ),         TR_IDLELIMIT_UNLIMITED,
+        _( "Stop seeding if idle for N minutes:" ), TR_IDLELIMIT_SINGLE,
+        NULL );
     g_object_set_data_full( G_OBJECT( w ), ARG_KEY, g_strdup( "seedIdleMode" ), g_free );
     return w;
 }
@@ -866,10 +868,10 @@ refreshInfo( struct DetailsImpl * di, tr_torrent ** torrents, int n )
     if( n <= 0 )
         str = no_torrent;
     else {
-        uint64_t up = 0;
-        uint64_t down = 0;
         char upstr[64];
         char ratiostr[64];
+        uint64_t up = 0;
+        uint64_t down = 0;
         for( i=0; i<n; ++i ) {
             up += stats[i]->uploadedEver;
             down += stats[i]->downloadedEver;
@@ -1234,26 +1236,26 @@ refreshPeerRow( GtkListStore        * store,
         g_snprintf( cancelled_by_peer, sizeof( cancelled_by_peer ), "%"PRIu32, peer->cancelsToClient );
 
     gtk_list_store_set( store, iter,
-                        PEER_COL_PROGRESS, (int)( 100.0 * peer->progress ),
-                        PEER_COL_UPLOAD_REQUEST_COUNT_INT, peer->pendingReqsToClient,
-                        PEER_COL_UPLOAD_REQUEST_COUNT_STRING, up_count,
-                        PEER_COL_DOWNLOAD_REQUEST_COUNT_INT, peer->pendingReqsToPeer,
-                        PEER_COL_DOWNLOAD_REQUEST_COUNT_STRING, down_count,
-                        PEER_COL_DOWNLOAD_RATE_DOUBLE, peer->rateToClient_KBps,
-                        PEER_COL_DOWNLOAD_RATE_STRING, down_speed,
-                        PEER_COL_UPLOAD_RATE_DOUBLE, peer->rateToPeer_KBps,
-                        PEER_COL_UPLOAD_RATE_STRING, up_speed,
-                        PEER_COL_FLAGS, peer->flagStr,
-                        PEER_COL_WAS_UPDATED, TRUE,
-                        PEER_COL_BLOCKS_DOWNLOADED_COUNT_INT, (int)peer->blocksToClient,
-                        PEER_COL_BLOCKS_DOWNLOADED_COUNT_STRING, blocks_to_client,
-                        PEER_COL_BLOCKS_UPLOADED_COUNT_INT, (int)peer->blocksToPeer,
-                        PEER_COL_BLOCKS_UPLOADED_COUNT_STRING, blocks_to_peer,
-                        PEER_COL_REQS_CANCELLED_BY_CLIENT_COUNT_INT, (int)peer->cancelsToPeer,
-                        PEER_COL_REQS_CANCELLED_BY_CLIENT_COUNT_STRING, cancelled_by_client,
-                        PEER_COL_REQS_CANCELLED_BY_PEER_COUNT_INT, (int)peer->cancelsToClient,
-                        PEER_COL_REQS_CANCELLED_BY_PEER_COUNT_STRING, cancelled_by_peer,
-                        -1 );
+        PEER_COL_PROGRESS, (int)( 100.0 * peer->progress ),
+        PEER_COL_UPLOAD_REQUEST_COUNT_INT, peer->pendingReqsToClient,
+        PEER_COL_UPLOAD_REQUEST_COUNT_STRING, up_count,
+        PEER_COL_DOWNLOAD_REQUEST_COUNT_INT, peer->pendingReqsToPeer,
+        PEER_COL_DOWNLOAD_REQUEST_COUNT_STRING, down_count,
+        PEER_COL_DOWNLOAD_RATE_DOUBLE, peer->rateToClient_KBps,
+        PEER_COL_DOWNLOAD_RATE_STRING, down_speed,
+        PEER_COL_UPLOAD_RATE_DOUBLE, peer->rateToPeer_KBps,
+        PEER_COL_UPLOAD_RATE_STRING, up_speed,
+        PEER_COL_FLAGS, peer->flagStr,
+        PEER_COL_WAS_UPDATED, TRUE,
+        PEER_COL_BLOCKS_DOWNLOADED_COUNT_INT, (int)peer->blocksToClient,
+        PEER_COL_BLOCKS_DOWNLOADED_COUNT_STRING, blocks_to_client,
+        PEER_COL_BLOCKS_UPLOADED_COUNT_INT, (int)peer->blocksToPeer,
+        PEER_COL_BLOCKS_UPLOADED_COUNT_STRING, blocks_to_peer,
+        PEER_COL_REQS_CANCELLED_BY_CLIENT_COUNT_INT, (int)peer->cancelsToPeer,
+        PEER_COL_REQS_CANCELLED_BY_CLIENT_COUNT_STRING, cancelled_by_client,
+        PEER_COL_REQS_CANCELLED_BY_PEER_COUNT_INT, (int)peer->cancelsToClient,
+        PEER_COL_REQS_CANCELLED_BY_PEER_COUNT_STRING, cancelled_by_peer,
+        -1 );
 }
 
 static void
@@ -1402,10 +1404,11 @@ refreshWebseedList( struct DetailsImpl * di, tr_torrent ** torrents, int n )
                 tr_formatter_speed_KBps( buf, speeds_KBps[j], sizeof( buf ) );
             else
                 *buf = '\0';
-            gtk_list_store_set( store, &iter, WEBSEED_COL_DOWNLOAD_RATE_DOUBLE, speeds_KBps[j],
-                                              WEBSEED_COL_DOWNLOAD_RATE_STRING, buf,
-                                              WEBSEED_COL_WAS_UPDATED, TRUE,
-                                              -1 );
+            gtk_list_store_set( store, &iter,
+                WEBSEED_COL_DOWNLOAD_RATE_DOUBLE, speeds_KBps[j],
+                WEBSEED_COL_DOWNLOAD_RATE_STRING, buf,
+                WEBSEED_COL_WAS_UPDATED, TRUE,
+                -1 );
             gtk_tree_path_free( p );
         }
         tr_free( speeds_KBps );
@@ -1431,7 +1434,7 @@ refreshWebseedList( struct DetailsImpl * di, tr_torrent ** torrents, int n )
     }
 
     /* most of the time there are no webseeds...
-       if that's the case, don't waste space showing an empty list */
+       don't waste space showing an empty list */
     if( total > 0 )
         gtk_widget_show( di->webseed_view );
     else
@@ -1479,8 +1482,8 @@ onPeerViewQueryTooltip( GtkWidget   * widget,
                 case 'K': s = _( "Peer has unchoked us, but we're not interested" ); break;
                 case '?': s = _( "We unchoked this peer, but they're not interested" ); break;
                 case 'E': s = _( "Encrypted connection" ); break;
-                case 'X': s = _( "Peer was discovered through Peer Exchange (PEX)" ); break;
-                case 'H': s = _( "Peer was discovered through DHT" ); break;
+                case 'X': s = _( "Peer was found through Peer Exchange (PEX)" ); break;
+                case 'H': s = _( "Peer was found through DHT" ); break;
                 case 'I': s = _( "Peer is an incoming connection" ); break;
             }
             if( s )
@@ -1523,13 +1526,8 @@ setPeerViewColumns( GtkTreeView * peer_view )
     view_columns[n++] = PEER_COL_CLIENT;
 
     /* remove any existing columns */
-    {
-        GList * l;
-        GList * columns = gtk_tree_view_get_columns( peer_view );
-        for( l=columns; l!=NULL; l=l->next )
-            gtk_tree_view_remove_column( peer_view, l->data );
-        g_list_free( columns );
-    }
+    while(( c = gtk_tree_view_get_column( peer_view, 0 )))
+        gtk_tree_view_remove_column( peer_view, c );
 
     for( i=0; i<n; ++i )
     {
@@ -2196,10 +2194,10 @@ on_edit_trackers( GtkButton * button, gpointer data )
         char * title = g_strdup_printf( _( "%s - Edit Trackers" ), tr_torrentInfo( tor )->name );
 
         d = gtk_dialog_new_with_buttons( title, win,
-                                         GTK_DIALOG_MODAL|GTK_DIALOG_DESTROY_WITH_PARENT,
-                                         GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
-                                         GTK_STOCK_SAVE, GTK_RESPONSE_ACCEPT,
-                                         NULL );
+                GTK_DIALOG_MODAL|GTK_DIALOG_DESTROY_WITH_PARENT,
+                GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
+                GTK_STOCK_SAVE, GTK_RESPONSE_ACCEPT,
+                NULL );
         g_signal_connect( d, "response", G_CALLBACK( on_edit_trackers_response ), data );
 
         row = 0;
@@ -2559,9 +2557,9 @@ gtr_torrent_details_dialog_new( GtkWindow * parent, TrCore * core )
 void
 gtr_torrent_details_dialog_set_torrents( GtkWidget * w, GSList * ids )
 {
-    struct DetailsImpl * di = g_object_get_data( G_OBJECT( w ), DETAILS_KEY );
-    const int len = g_slist_length( ids );
     char title[256];
+    const int len = g_slist_length( ids );
+    struct DetailsImpl * di = g_object_get_data( G_OBJECT( w ), DETAILS_KEY );
 
     g_slist_free( di->ids );
     di->ids = g_slist_copy( ids );
