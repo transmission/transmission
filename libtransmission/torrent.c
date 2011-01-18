@@ -1437,11 +1437,17 @@ tr_torrentTrackersFree( tr_tracker_stat * trackers,
 }
 
 void
-tr_torrentAvailability( const tr_torrent * tor,
-                        int8_t *           tab,
-                        int                size )
+tr_torrentAvailability( const tr_torrent * tor, int8_t * tab, int size )
 {
+    assert( tr_isTorrent( tor ) );
+    assert( tab != NULL );
+    assert( size > 0 );
+
+    tr_torrentLock( tor );
+
     tr_peerMgrTorrentAvailability( tor, tab, size );
+
+    tr_torrentUnlock( tor );
 }
 
 void

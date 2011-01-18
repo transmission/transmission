@@ -2134,42 +2134,37 @@ tr_peerMgrRemoveTorrent( tr_torrent * tor )
 }
 
 void
-tr_peerMgrTorrentAvailability( const tr_torrent * tor,
-                               int8_t           * tab,
-                               unsigned int       tabCount )
+tr_peerMgrTorrentAvailability( const tr_torrent * tor, int8_t * tab, unsigned int tabCount )
 {
-    tr_piece_index_t   i;
-    const Torrent *    t;
-    float              interval;
-    tr_bool            isSeed;
-    int                peerCount;
-    const tr_peer **   peers;
-    tr_torrentLock( tor );
-
-    t = tor->torrentPeers;
-    tor = t->tor;
-    interval = tor->info.pieceCount / (float)tabCount;
-    isSeed = tor && ( tr_cpGetStatus ( &tor->completion ) == TR_SEED );
-    peers = (const tr_peer **) tr_ptrArrayBase( &t->peers );
-    peerCount = tr_ptrArraySize( &t->peers );
+    assert( tr_isTorrent( tor ) );
+    assert( torrentIsLocked( tor->torrentPeers ) );
+    assert( tab != NULL );
+    assert( tabCount > 0 );
 
     memset( tab, 0, tabCount );
 
-    for( i = 0; tor && i < tabCount; ++i )
+    if( tr_torrentHasMetadata( tor ) )
     {
-        const int piece = i * interval;
+        tr_piece_index_t i;
+        const int peerCount = tr_ptrArraySize( &tor->torrentPeers->peers );
+        const tr_peer ** peers = (const tr_peer**) tr_ptrArrayBase( &tor->torrentPeers->peers );
+        const float interval = tor->info.pieceCount / (float)tabCount;
+        const tr_bool isSeed = tr_cpGetStatus( &tor->completion ) == TR_SEED;
 
-        if( isSeed || tr_cpPieceIsComplete( &tor->completion, piece ) )
-            tab[i] = -1;
-        else if( peerCount ) {
-            int j;
-            for( j = 0; j < peerCount; ++j )
-                if( tr_bitsetHas( &peers[j]->have, piece ) )
-                    ++tab[i];
+        for( i=0; i<tabCount; ++i )
+        {
+            const int piece = i * interval;
+
+            if( isSeed || tr_cpPieceIsComplete( &tor->completion, piece ) )
+                tab[i] = -1;
+            else if( peerCount ) {
+                int j;
+                for( j=0; j<peerCount; ++j )
+                    if( tr_bitsetHas( &peers[j]->have, piece ) )
+                        ++tab[i];
+            }
         }
     }
-
-    tr_torrentUnlock( tor );
 }
 
 /* Returns the pieces that are available from peers */
