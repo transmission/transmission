@@ -2164,7 +2164,7 @@ tr_peerMgrTorrentAvailability( const tr_torrent * tor,
         else if( peerCount ) {
             int j;
             for( j = 0; j < peerCount; ++j )
-                if( tr_bitsetHas( &peers[j]->have, i ) )
+                if( tr_bitsetHas( &peers[j]->have, piece ) )
                     ++tab[i];
         }
     }
