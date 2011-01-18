@@ -8,7 +8,7 @@
   * Fix webseeds
   * Better support for IPv6-only trackers
   * Add the ability to shut down Transmission sessions via RPC
-  * NAT-PMP and UPnP now also maps the UDP port
+  * NAT-PMP and UPnP now also map the UDP port
   * Improve support for running scripts when a torrent finishes downloading
   * Fix checksum error on platforms running uClibc 0.9.27 or older
   * Fix memmem() errors on Solaris
