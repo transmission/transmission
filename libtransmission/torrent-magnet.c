@@ -358,7 +358,7 @@ tr_torrentGetMetadataPercent( const tr_torrent * tor )
         ret = 1.0;
     else {
         const struct tr_incomplete_metadata * m = tor->incompleteMetadata;
-        if( m == NULL )
+        if( !m || !m->pieceCount )
             ret = 0.0;
         else
             ret = (m->pieceCount - m->piecesNeededCount) / (double)m->pieceCount;
