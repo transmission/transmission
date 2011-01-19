@@ -231,13 +231,15 @@ Torrent.prototype =
 	hash: function() { return this._hashString; },
 	id: function() { return this._id; },
 	isActiveFilter: function() { return this.peersGettingFromUs() > 0
-					|| this.peersSendingToUs() > 0
-					|| this.state() == Torrent._StatusChecking; },
+					 || this.peersSendingToUs() > 0
+					 || this.webseedsSendingToUs() > 0
+					 || this.state() == Torrent._StatusChecking; },
 	isActive: function() { return this.state() != Torrent._StatusPaused; },
 	isDownloading: function() { return this.state() == Torrent._StatusDownloading; },
 	isFinished: function() { return this._isFinishedSeeding; },
 	isSeeding: function() { return this.state() == Torrent._StatusSeeding; },
 	name: function() { return this._name; },
+	webseedsSendingToUs: function() { return this._webseeds_sending_to_us; },
 	peersSendingToUs: function() { return this._peers_sending_to_us; },
 	peersGettingFromUs: function() { return this._peers_getting_from_us; },
 	needsMetaData: function(){ return this._metadataPercentComplete < 1 },
@@ -395,6 +397,7 @@ Torrent.prototype =
 		this._peers_connected         = data.peersConnected;
 		this._peers_getting_from_us   = data.peersGettingFromUs;
 		this._peers_sending_to_us     = data.peersSendingToUs;
+		this._webseeds_sending_to_us  = data.webseedsSendingToUs;
 		this._sizeWhenDone            = data.sizeWhenDone;
 		this._recheckProgress         = data.recheckProgress;
 		this._error                   = data.error;
