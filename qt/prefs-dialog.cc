@@ -619,7 +619,8 @@ PrefsDialog :: PrefsDialog( Session& session, Prefs& prefs, QWidget * parent ):
          << Prefs :: DIR_WATCH
          << Prefs :: DOWNLOAD_DIR
          << Prefs :: INCOMPLETE_DIR
-         << Prefs :: INCOMPLETE_DIR_ENABLED;
+         << Prefs :: INCOMPLETE_DIR_ENABLED
+         << Prefs :: SCRIPT_TORRENT_DONE_FILENAME;
     foreach( int key, keys )
         refreshPref( key );
 
@@ -693,6 +694,12 @@ PrefsDialog :: refreshPref( int key )
         case Prefs :: DIR_WATCH:
             myWatchButton->setText( QFileInfo(myPrefs.getString(Prefs::DIR_WATCH)).fileName() );
             break;
+
+        case Prefs :: SCRIPT_TORRENT_DONE_FILENAME: {
+            const QString path( myPrefs.getString( key ) );
+            myTorrentDoneScriptButton->setText( QFileInfo(path).fileName() );
+            break;
+        }
 
         case Prefs :: PEER_PORT:
             myPortLabel->setText( tr( "Status unknown" ) );
