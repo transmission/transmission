@@ -1031,7 +1031,7 @@ info_page_new( struct DetailsImpl * di )
         fr = gtk_frame_new( NULL );
         gtk_frame_set_shadow_type( GTK_FRAME( fr ), GTK_SHADOW_IN );
         gtk_container_add( GTK_CONTAINER( fr ), sw );
-        w = hig_workarea_add_row( t, &row, _( "Comment:" ), fr, NULL );
+        w = hig_workarea_add_tall_row( t, &row, _( "Comment:" ), fr, NULL );
         gtk_misc_set_alignment( GTK_MISC( w ), 0.0f, 0.0f );
 
     hig_workarea_add_section_divider( t, &row );
