@@ -35,10 +35,7 @@
 **/
 
 void
-tr_sha1( uint8_t *    setme,
-         const void * content1,
-         int          content1_len,
-         ... )
+tr_sha1( uint8_t * setme, const void * content1, int content1_len, ... )
 {
     va_list vl;
     SHA_CTX sha;
@@ -47,10 +44,10 @@ tr_sha1( uint8_t *    setme,
     SHA1_Update( &sha, content1, content1_len );
 
     va_start( vl, content1_len );
-    for( ; ; )
+    for( ;; )
     {
-        const void * content = (const void*) va_arg( vl, const void* );
-        const int    content_len = content ? (int) va_arg( vl, int ) : -1;
+        const void * content = va_arg( vl, const void* );
+        const int    content_len = content ? va_arg( vl, int ) : -1;
         if( content == NULL || content_len < 1 )
             break;
         SHA1_Update( &sha, content, content_len );
