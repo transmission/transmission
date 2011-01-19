@@ -2503,7 +2503,7 @@ details_free( gpointer gdata )
 GtkWidget*
 gtr_torrent_details_dialog_new( GtkWindow * parent, TrCore * core )
 {
-    GtkWidget * d, * n, * w, * l;
+    GtkWidget *d, *n, *v, *w, *l;
     struct DetailsImpl * di = g_new0( struct DetailsImpl, 1 );
 
     /* create the dialog */
@@ -2533,16 +2533,14 @@ gtr_torrent_details_dialog_new( GtkWindow * parent, TrCore * core )
     l = gtk_label_new( _( "Trackers" ) );
     gtk_notebook_append_page( GTK_NOTEBOOK( n ), w, l );
 
-    {
-        GtkWidget * v = gtk_vbox_new( FALSE, 0 );
-        di->file_list = gtr_file_list_new( core, 0 );
-        di->file_label = gtk_label_new( _( "File listing not available for combined torrent properties" ) );
-        gtk_box_pack_start( GTK_BOX( v ), di->file_list, TRUE, TRUE, 0 );
-        gtk_box_pack_start( GTK_BOX( v ), di->file_label, TRUE, TRUE, 0 );
-        gtk_container_set_border_width( GTK_CONTAINER( v ), GUI_PAD_BIG );
-        l = gtk_label_new( _( "Files" ) );
-        gtk_notebook_append_page( GTK_NOTEBOOK( n ), v, l );
-    }
+    v = gtk_vbox_new( FALSE, 0 );
+    di->file_list = gtr_file_list_new( core, 0 );
+    di->file_label = gtk_label_new( _( "File listing not available for combined torrent properties" ) );
+    gtk_box_pack_start( GTK_BOX( v ), di->file_list, TRUE, TRUE, 0 );
+    gtk_box_pack_start( GTK_BOX( v ), di->file_label, TRUE, TRUE, 0 );
+    gtk_container_set_border_width( GTK_CONTAINER( v ), GUI_PAD_BIG );
+    l = gtk_label_new( _( "Files" ) );
+    gtk_notebook_append_page( GTK_NOTEBOOK( n ), v, l );
 
     w = options_page_new( di );
     l = gtk_label_new( _( "Options" ) );
