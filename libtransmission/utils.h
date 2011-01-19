@@ -585,13 +585,13 @@ extern unsigned int tr_size_K;
 char* tr_formatter_speed_KBps( char * buf, double KBps, size_t buflen );
 
 /* format a memory size from bytes into a user-readable string. */
-char* tr_formatter_mem_B( char * buf, uint64_t bytes, size_t buflen );
+char* tr_formatter_mem_B( char * buf, int64_t bytes, size_t buflen );
 
 /* format a memory size from MB into a user-readable string. */
 static inline char* tr_formatter_mem_MB( char * buf, double MBps, size_t buflen ) { return tr_formatter_mem_B( buf, MBps * tr_mem_K * tr_mem_K, buflen ); }
 
 /* format a file size from bytes into a user-readable string. */
-char* tr_formatter_size_B( char * buf, uint64_t bytes, size_t buflen );
+char* tr_formatter_size_B( char * buf, int64_t bytes, size_t buflen );
 
 void tr_formatter_get_units( struct tr_benc * dict );
 

@@ -172,7 +172,9 @@ strlmem( char * buf, int64_t bytes, size_t buflen )
 static char*
 strlsize( char * buf, int64_t bytes, size_t buflen )
 {
-    if( !bytes )
+    if( bytes < 1 )
+        tr_strlcpy( buf, "Unknown", buflen );
+    else if( !bytes )
         tr_strlcpy( buf, "None", buflen );
     else
         tr_formatter_size_B( buf, bytes, buflen );

@@ -1659,7 +1659,7 @@ tr_realpath( const char * path, char * resolved_path )
 struct formatter_unit
 {
     char * name;
-    uint64_t value;
+    int64_t value;
 };
 
 struct formatter_units
@@ -1694,7 +1694,7 @@ formatter_init( struct formatter_units * units,
 
 static char*
 formatter_get_size_str( const struct formatter_units * u,
-                        char * buf, uint64_t bytes, size_t buflen )
+                        char * buf, int64_t bytes, size_t buflen )
 {
     int precision;
     double value;
@@ -1729,7 +1729,7 @@ tr_formatter_size_init( unsigned int kilo,
 }
 
 char*
-tr_formatter_size_B( char * buf, uint64_t bytes, size_t buflen )
+tr_formatter_size_B( char * buf, int64_t bytes, size_t buflen )
 {
     return formatter_get_size_str( &size_units, buf, bytes, buflen );
 }
@@ -1784,7 +1784,7 @@ tr_formatter_mem_init( unsigned int kilo,
 }
 
 char*
-tr_formatter_mem_B( char * buf, uint64_t bytes_per_second, size_t buflen )
+tr_formatter_mem_B( char * buf, int64_t bytes_per_second, size_t buflen )
 {
     return formatter_get_size_str( &mem_units, buf, bytes_per_second, buflen );
 }
