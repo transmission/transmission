@@ -1,7 +1,7 @@
-dht-0.18 (unreleased)
+20 January 2011: dht-0.18
 
   * Fix a bug that could cause parse_message to enter an infinite loop
-    on overflow.
+    on overflow.  Thanks to Jordan Lee.
 
 9 January 2011: dht-0.17:
 
