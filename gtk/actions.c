@@ -106,7 +106,7 @@ static GtkActionEntry entries[] =
     { "sort-menu", NULL, N_( "_Sort Torrents By" ), NULL, NULL, NULL },
     { "edit-menu", NULL, N_( "_Edit" ), NULL, NULL, NULL },
     { "help-menu", NULL, N_( "_Help" ), NULL, NULL, NULL },
-    { "copy-magnet-link-to-clipboard",  GTK_STOCK_COPY, N_("Copy _Magnet Link to Clipboard" ), "<control>M", NULL,  G_CALLBACK( action_cb ) },
+    { "copy-magnet-link-to-clipboard",  GTK_STOCK_COPY, N_("Copy _Magnet Link to Clipboard" ), "", NULL,  G_CALLBACK( action_cb ) },
     { "open-torrent-from-url",  GTK_STOCK_OPEN, N_("Open _URL..." ), "<control>U", N_( "Open URL..." ),  G_CALLBACK( action_cb ) },
     { "open-torrent-toolbar",  GTK_STOCK_OPEN, NULL, NULL, N_( "Open a torrent" ),  G_CALLBACK( action_cb ) },
     { "open-torrent-menu", GTK_STOCK_OPEN, NULL, NULL, N_( "Open a torrent" ), G_CALLBACK( action_cb ) },
