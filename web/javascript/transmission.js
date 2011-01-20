@@ -1043,6 +1043,12 @@ Transmission.prototype =
 					$('div#stats_container h2.dialog_heading').show();
 					tr.showStatsDialog( );
 				}
+				else if ($element[0].id == 'homepage') {
+					window.open('http://www.transmissionbt.com/');
+				}
+				else if ($element[0].id == 'tipjar') {
+					window.open('http://www.transmissionbt.com/donate.php');
+				}
 				break;
 			
 			// Limit the download rate
@@ -1117,12 +1123,6 @@ Transmission.prototype =
 	setLastTorrentClicked: function( torrent )
 	{
 		this._last_torrent_clicked = torrent;
-				}
-				else if ($element[0].id == 'homepage') {
-					window.open('http://www.transmissionbt.com/');
-				}
-				else if ($element[0].id == 'tipjar') {
-					window.open('http://www.transmissionbt.com/donate.php');
 	},
 
 	/*
