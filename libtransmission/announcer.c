@@ -308,6 +308,8 @@ typedef struct
     int downloadCount;
     int downloaderCount;
 
+    int consecutiveAnnounceFailures;
+
     uint32_t id;
 
     /* sent as the "key" argument in tracker requests
@@ -1094,17 +1096,22 @@ tierIsNotResponding( const tr_tier * tier, const time_t now )
 }
 
 static int
-getRetryInterval( const tr_host * host )
+getRetryInterval( const tr_tracker_item * t )
 {
-    int interval;
-    const int jitter = tr_cryptoWeakRandInt( 120 );
-    const time_t timeSinceLastSuccess = tr_time() - host->lastSuccessfulRequest;
-         if( timeSinceLastSuccess < 15*60 ) interval = 0;
-    else if( timeSinceLastSuccess < 30*60 ) interval = 60*4;
-    else if( timeSinceLastSuccess < 45*60 ) interval = 60*8;
-    else if( timeSinceLastSuccess < 60*60 ) interval = 60*16;
-    else                                    interval = 60*32;
-    return interval + jitter;
+    int minutes;
+    const int jitter_seconds = tr_cryptoWeakRandInt( 120 );
+
+    switch( t->consecutiveAnnounceFailures ) {
+        case 0:  minutes =  0; break;
+        case 1:  minutes =  1; break;
+        case 2:  minutes =  2; break;
+        case 3:  minutes =  4; break;
+        case 4:  minutes =  8; break;
+        case 5:  minutes = 16; break;
+        default: minutes = 32; break;
+    }
+
+    return ( minutes * 60 ) + jitter_seconds;
 }
 
 static int
@@ -1365,6 +1372,7 @@ onAnnounceDone( tr_session   * session,
 
         if( responseCode == HTTP_OK )
         {
+            tier->currentTracker->consecutiveAnnounceFailures = 0;
             success = parseAnnounceResponse( tier, response, responseLen, &gotScrape );
             dbgmsg( tier, "success is %d", success );
 
@@ -1389,6 +1397,8 @@ onAnnounceDone( tr_session   * session,
 
             tr_strlcpy( tier->lastAnnounceStr, buf,
                         sizeof( tier->lastAnnounceStr ) );
+
+            ++tier->currentTracker->consecutiveAnnounceFailures;
 
             /* if the response is serious, *and* if the response may require
              * human intervention, then notify the user... otherwise just log it */
@@ -1415,7 +1425,7 @@ onAnnounceDone( tr_session   * session,
 
         if( responseCode == 0 )
         {
-            const int interval = getRetryInterval( tier->currentTracker->host );
+            const int interval = getRetryInterval( tier->currentTracker );
             dbgmsg( tier, "No response from tracker... retrying in %d seconds.", interval );
             tier->manualAnnounceAllowedAt = ~(time_t)0;
             tierAddAnnounce( tier, announceEvent, now + interval );
@@ -1458,7 +1468,7 @@ onAnnounceDone( tr_session   * session,
              * has erred or is incapable of performing the request.
              * So we pause a bit and try again. */
 
-            const int interval = getRetryInterval( tier->currentTracker->host );
+            const int interval = getRetryInterval( tier->currentTracker );
             tier->manualAnnounceAllowedAt = ~(time_t)0;
             tierAddAnnounce( tier, announceEvent, now + interval );
         }
@@ -1724,7 +1734,7 @@ onScrapeDone( tr_session   * session,
         }
         else
         {
-            const int interval = getRetryInterval( tier->currentTracker->host );
+            const int interval = getRetryInterval( tier->currentTracker );
 
             /* Don't retry on a 4xx.
              * Retry at growing intervals on a 5xx */
