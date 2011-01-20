@@ -13,11 +13,7 @@ man.files = transmission-qt.1
 
 CONFIG += qt qdbus thread debug link_pkgconfig
 QT += network
-PKGCONFIG = fontconfig libcurl openssl dbus-1
-
-# if you have libevent2 installed in a custom path, specify it here
-EVENT_TOP = /home/charles/opt/libevent
-INCLUDEPATH = $${EVENT_TOP}/include $${INCLUDEPATH}
+PKGCONFIG = fontconfig libcurl openssl libevent
 
 TRANSMISSION_TOP = ..
 INCLUDEPATH += $${TRANSMISSION_TOP}
