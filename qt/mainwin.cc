@@ -1056,8 +1056,8 @@ TrMainWindow :: openURL( QString url )
 {
     bool ok;
     const QString key = QInputDialog::getText( this,
-                                               tr( "Add URL or Magnet Link" ),
-                                               tr( "Add URL or Magnet Link" ),
+                                               tr( "Open URL or Magnet Link" ),
+                                               tr( "Open URL or Magnet Link" ),
                                                QLineEdit::Normal,
                                                url,
                                                &ok );
