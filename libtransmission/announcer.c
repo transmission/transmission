@@ -1711,7 +1711,7 @@ onScrapeDone( tr_session   * session,
                 tr_snprintf( tier->lastScrapeStr, sizeof( tier->lastScrapeStr ),
                              _( "tracker gave HTTP Response Code %1$ld (%2$s)" ),
                              responseCode, tr_webGetResponseStr( responseCode ) );
-            tr_tordbg( tier->tor, "%s", tier->lastScrapeStr );
+            dbgmsg( tier, "%s", tier->lastScrapeStr );
         }
         else if( 300 <= responseCode && responseCode <= 399 )
         {
@@ -1720,7 +1720,7 @@ onScrapeDone( tr_session   * session,
             tier->scrapeAt = now + interval;
             tr_snprintf( tier->lastScrapeStr, sizeof( tier->lastScrapeStr ),
                          "Got a redirect. Retrying in %d seconds", interval );
-            tr_tordbg( tier->tor, "%s", tier->lastScrapeStr );
+            dbgmsg( tier, "%s", tier->lastScrapeStr );
         }
         else
         {
