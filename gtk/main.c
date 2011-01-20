@@ -49,7 +49,6 @@
 #include <libtransmission/web.h>
 
 #include "actions.h"
-#include "add-dialog.h"
 #include "conf.h"
 #include "details.h"
 #include "dialogs.h"
@@ -57,6 +56,7 @@
 #include "makemeta-ui.h"
 #include "msgwin.h"
 #include "notify.h"
+#include "open-dialog.h"
 #include "relocate.h"
 #include "stats.h"
 #include "tr-core.h"

@@ -18,10 +18,10 @@
 #include <libtransmission/transmission.h>
 #include <libtransmission/utils.h> /* tr_is_same_file() */
 
-#include "add-dialog.h"
 #include "conf.h"
 #include "file-list.h"
 #include "hig.h"
+#include "open-dialog.h"
 #include "tr-prefs.h"
 
 /****
