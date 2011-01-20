@@ -11,6 +11,7 @@
   * NAT-PMP and UPnP now also map the UDP port
   * Update the DHT code to dht-0.18
   * Improve support for running scripts when a torrent finishes downloading
+  * Fix reannounce interval when trackers return a 404 error
   * Fix checksum error on platforms running uClibc 0.9.27 or older
   * Fix memmem() errors on Solaris
 ==== Mac ====
