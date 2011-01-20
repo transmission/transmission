@@ -126,7 +126,7 @@
     <property name="title">
      <string>&amp;File</string>
     </property>
-    <addaction name="action_AddFile"/>
+    <addaction name="action_OpenFile"/>
     <addaction name="action_AddURL"/>
     <addaction name="action_New"/>
     <addaction name="separator"/>
@@ -169,22 +169,22 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
-   <addaction name="action_AddFile"/>
+   <addaction name="action_OpenFile"/>
    <addaction name="action_Start"/>
    <addaction name="action_Pause"/>
    <addaction name="action_Remove"/>
    <addaction name="separator"/>
    <addaction name="action_Properties"/>
   </widget>
-  <action name="action_AddFile">
+  <action name="action_OpenFile">
    <property name="text">
-    <string>&amp;Add File...</string>
+    <string>&amp;Open...</string>
    </property>
    <property name="iconText">
-    <string>Add</string>
+    <string>Open</string>
    </property>
    <property name="toolTip">
-    <string>Add a torrent</string>
+    <string>Open a torrent</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+D</string>
@@ -265,6 +265,9 @@
    </property>
    <property name="toolTip">
     <string>Verify local data</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+V</string>
    </property>
   </action>
   <action name="action_Remove">
@@ -573,7 +576,10 @@
   </action>
   <action name="action_AddURL">
    <property name="text">
-    <string>Add &amp;URL...</string>
+    <string>Open &amp;URL...</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+U</string>
    </property>
   </action>
   <action name="action_Donate">

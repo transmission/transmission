@@ -104,7 +104,7 @@ TrMainWindow :: TrMainWindow( Session& session, Prefs& prefs, TorrentModel& mode
     const QSize smallIconSize( i, i );
 
     // icons
-    ui.action_AddFile->setIcon( getStockIcon( "list-add", QStyle::SP_DialogOpenButton ) );
+    ui.action_OpenFile->setIcon( getStockIcon( "folder-open", QStyle::SP_DialogOpenButton ) );
     ui.action_New->setIcon( getStockIcon( "document-new", QStyle::SP_DesktopIcon ) );
     ui.action_Properties->setIcon( getStockIcon( "document-properties", QStyle::SP_DesktopIcon ) );
     ui.action_OpenFolder->setIcon( getStockIcon( "folder-open", QStyle::SP_DirOpenIcon ) );
@@ -144,7 +144,7 @@ TrMainWindow :: TrMainWindow( Session& session, Prefs& prefs, TorrentModel& mode
     connect( ui.action_Announce, SIGNAL(triggered()), this, SLOT(reannounceSelected()) );
     connect( ui.action_StartAll, SIGNAL(triggered()), this, SLOT(startAll()));
     connect( ui.action_PauseAll, SIGNAL(triggered()), this, SLOT(pauseAll()));
-    connect( ui.action_AddFile, SIGNAL(triggered()), this, SLOT(openTorrent()));
+    connect( ui.action_OpenFile, SIGNAL(triggered()), this, SLOT(openTorrent()));
     connect( ui.action_AddURL, SIGNAL(triggered()), this, SLOT(openURL()));
     connect( ui.action_New, SIGNAL(triggered()), this, SLOT(newTorrent()));
     connect( ui.action_Preferences, SIGNAL(triggered()), this, SLOT(openPreferences()));
@@ -214,7 +214,7 @@ TrMainWindow :: TrMainWindow( Session& session, Prefs& prefs, TorrentModel& mode
     actionGroup->addAction( ui.action_SortByState );
 
     QMenu * menu = new QMenu( );
-    menu->addAction( ui.action_AddFile );
+    menu->addAction( ui.action_OpenFile );
     menu->addAction( ui.action_AddURL );
     menu->addSeparator( );
     menu->addAction( ui.action_ShowMainWindow );
@@ -1027,7 +1027,7 @@ TrMainWindow :: openTorrent( )
 {
     QFileDialog * myFileDialog;
     myFileDialog = new QFileDialog( this,
-                                    tr( "Add Torrent" ),
+                                    tr( "Open Torrent" ),
                                     myPrefs.getString( Prefs::OPEN_DIALOG_FOLDER ),
                                     tr( "Torrent Files (*.torrent);;All Files (*.*)" ) );
     myFileDialog->setFileMode( QFileDialog::ExistingFiles );

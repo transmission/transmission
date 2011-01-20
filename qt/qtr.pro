@@ -16,7 +16,7 @@ QT += network
 PKGCONFIG = fontconfig libcurl openssl dbus-1
 
 # if you have libevent2 installed in a custom path, specify it here
-EVENT_TOP = /usr
+EVENT_TOP = /home/charles/opt/libevent
 INCLUDEPATH = $${EVENT_TOP}/include $${INCLUDEPATH}
 
 TRANSMISSION_TOP = ..

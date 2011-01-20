@@ -87,7 +87,7 @@ Options :: Options( Session& session, const Prefs& prefs, const AddData& addme, 
     myVerifyHash( QCryptographicHash::Sha1 )
 
 {
-    setWindowTitle( tr( "Add Torrent" ) );
+    setWindowTitle( tr( "Open Torrent" ) );
     QFontMetrics fontMetrics( font( ) );
     QGridLayout * layout = new QGridLayout( this );
     int row = 0;
@@ -159,7 +159,7 @@ Options :: Options( Session& session, const Prefs& prefs, const AddData& addme, 
     c->setChecked( prefs.getBool( Prefs :: TRASH_ORIGINAL ) );
     layout->addWidget( c, ++row, 0, 1, 2, Qt::AlignLeft );
 
-    QDialogButtonBox * b = new QDialogButtonBox( QDialogButtonBox::Ok|QDialogButtonBox::Cancel, Qt::Horizontal, this );
+    QDialogButtonBox * b = new QDialogButtonBox( QDialogButtonBox::Open|QDialogButtonBox::Cancel, Qt::Horizontal, this );
     connect( b, SIGNAL(rejected()), this, SLOT(deleteLater()) );
     connect( b, SIGNAL(accepted()), this, SLOT(onAccepted()) );
     layout->addWidget( b, ++row, 0, 1, 2 );
@@ -401,7 +401,7 @@ Options :: onFilenameClicked( )
     if( myAdd.type == AddData::FILENAME )
     {
         QFileDialog * d = new QFileDialog( this,
-                                           tr( "Add Torrent" ),
+                                           tr( "Open Torrent" ),
                                            QFileInfo(myAdd.filename).absolutePath(),
                                            tr( "Torrent Files (*.torrent);;All Files (*.*)" ) );
         d->setFileMode( QFileDialog::ExistingFile );
