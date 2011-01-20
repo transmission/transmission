@@ -146,21 +146,23 @@ canReadWrapper( tr_peerIo * io )
             size_t piece = 0;
             const size_t oldLen = evbuffer_get_length( io->inbuf );
             const int ret = io->canRead( io, io->userData, &piece );
-
             const size_t used = oldLen - evbuffer_get_length( io->inbuf );
+            const unsigned int overhead = guessPacketOverhead( used );
+            const uint64_t now = tr_time_msec( );
 
             assert( tr_isPeerIo( io ) );
 
             if( piece || (piece!=used) )
             {
-                const uint64_t now = tr_time_msec( );
-
                 if( piece )
                     tr_bandwidthUsed( &io->bandwidth, TR_DOWN, piece, TRUE, now );
 
                 if( used != piece )
                     tr_bandwidthUsed( &io->bandwidth, TR_DOWN, used - piece, FALSE, now );
             }
+
+            if( overhead > 0 )
+                tr_bandwidthUsed( &io->bandwidth, TR_UP, overhead, FALSE, now );
 
             switch( ret )
             {
