@@ -45,6 +45,19 @@
    since the port and path may be changed to allow mapping and/or multiple
    daemons to run on a single server.
 
+2.4.  CSRF Protection
+
+   Most Transmission RPC servers require a X-Transmission-Session-Id
+   header to be sent with requests, to prevent CSRF attacks.
+
+   When your request has the wrong id -- such as when you send your first
+   request, or when the server expires the CSRF token -- the
+   Transmission RPC server will return an HTTP 409 error with the
+   right X-Transmission-Session-Id in its own headers.
+
+   So, the correct way to handle a 409 response is to update your
+   X-Transmission-Session-Id and to resend the previous request.
+
 3.  Torrent Requests
 
 3.1.  Torrent Action Requests
