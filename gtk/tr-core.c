@@ -323,16 +323,6 @@ compareByName( GtkTreeModel * m, GtkTreeIter * a, GtkTreeIter * b, gpointer user
         g_free( ca );
     }
 
-    if( !ret ) {
-        tr_torrent * t;
-        const tr_info *ia, *ib;
-        gtk_tree_model_get( m, a, MC_TORRENT_RAW, &t, -1 );
-        ia = tr_torrentInfo( t );
-        gtk_tree_model_get( m, b, MC_TORRENT_RAW, &t, -1 );
-        ib = tr_torrentInfo( t );
-        ret = memcmp( ia->hash, ib->hash, SHA_DIGEST_LENGTH );
-    }
-
     return ret;
 }
 
@@ -866,6 +856,15 @@ tr_core_session( TrCore * core )
     return isDisposed( core ) ? NULL : core->priv->session;
 }
 
+static char*
+get_collated_name( const tr_info * inf )
+{
+    char * down = g_utf8_strdown( inf->name ? inf->name : "", -1 );
+    char * collated = g_strdup_printf( "%s\t%s", down, inf->hashString );
+    g_free( down );
+    return collated;
+}
+
 void
 tr_core_add_torrent( TrCore     * self,
                      TrTorrent  * gtor,
@@ -874,7 +873,7 @@ tr_core_add_torrent( TrCore     * self,
     const tr_info * inf = tr_torrent_info( gtor );
     const tr_stat * st = tr_torrent_stat( gtor );
     tr_torrent * tor = tr_torrent_handle( gtor );
-    char *  collated = g_utf8_strdown( inf->name ? inf->name : "", -1 );
+    char *  collated = get_collated_name( inf );
     char *  trackers = torrentTrackerString( tor );
     GtkListStore *  store = GTK_LIST_STORE( tr_core_model( self ) );
     GtkTreeIter  unused;
@@ -1292,7 +1291,6 @@ update_foreach( GtkTreeModel * model,
     double oldDownSpeed, newDownSpeed;
     gboolean oldActive, newActive;
     const tr_stat * st;
-    const tr_info * inf;
     TrTorrent * gtor;
     tr_torrent * tor;
 
@@ -1323,8 +1321,7 @@ update_foreach( GtkTreeModel * model,
     newDownSpeed = st->pieceDownloadSpeed_KBps;
     newActivePeerCount = st->peersSendingToUs + st->peersGettingFromUs + st->webseedsSendingToUs;
     newError = st->error;
-    inf = tr_torrent_info( gtor );
-    newCollatedName = g_utf8_strdown( inf->name ? inf->name : "", -1 );
+    newCollatedName = get_collated_name( tr_torrent_info( gtor ) );
 
     /* updating the model triggers off resort/refresh,
        so don't do it unless something's actually changed... */
