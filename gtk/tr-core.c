@@ -1282,17 +1282,20 @@ update_foreach( GtkTreeModel * model,
     int oldActivity, newActivity;
     tr_bool oldFinished, newFinished;
     tr_priority_t oldPriority, newPriority;
+    char * oldCollatedName, * newCollatedName;
     char * oldTrackers, * newTrackers;
     double oldUpSpeed, newUpSpeed;
     double oldDownSpeed, newDownSpeed;
     gboolean oldActive, newActive;
     const tr_stat * st;
+    const tr_info * inf;
     TrTorrent * gtor;
     tr_torrent * tor;
 
     /* get the old states */
     gtk_tree_model_get( model, iter,
                         MC_TORRENT, &gtor,
+                        MC_NAME_COLLATED, &oldCollatedName,
                         MC_ACTIVE, &oldActive,
                         MC_ACTIVITY, &oldActivity,
                         MC_FINISHED, &oldFinished,
@@ -1312,6 +1315,8 @@ update_foreach( GtkTreeModel * model,
     newTrackers = torrentTrackerString( tor );
     newUpSpeed = st->pieceUploadSpeed_KBps;
     newDownSpeed = st->pieceDownloadSpeed_KBps;
+    inf = tr_torrent_info( gtor );
+    newCollatedName = g_utf8_strdown( inf->name ? inf->name : "", -1 );
 
     /* updating the model triggers off resort/refresh,
        so don't do it unless something's actually changed... */
@@ -1320,12 +1325,14 @@ update_foreach( GtkTreeModel * model,
         || ( newFinished != oldFinished )
         || ( newPriority != oldPriority )
         || gtr_strcmp0( oldTrackers, newTrackers )
+        || gtr_strcmp0( oldCollatedName, newCollatedName )
         || gtr_compare_double( newUpSpeed, oldUpSpeed, 3 )
         || gtr_compare_double( newDownSpeed, oldDownSpeed, 3 ) )
     {
         gtk_list_store_set( GTK_LIST_STORE( model ), iter,
                             MC_ACTIVE, newActive,
                             MC_ACTIVITY, newActivity,
+                            MC_NAME_COLLATED, &newCollatedName,
                             MC_FINISHED, newFinished,
                             MC_PRIORITY, newPriority,
                             MC_TRACKERS, newTrackers,
@@ -1336,6 +1343,8 @@ update_foreach( GtkTreeModel * model,
 
     /* cleanup */
     g_object_unref( gtor );
+    g_free( newCollatedName );
+    g_free( oldCollatedName );
     g_free( newTrackers );
     g_free( oldTrackers );
     return FALSE;
