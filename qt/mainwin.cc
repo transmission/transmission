@@ -20,6 +20,7 @@
 #include <libtransmission/version.h>
 
 #include "about.h"
+#include "add-data.h"
 #include "app.h"
 #include "details.h"
 #include "filterbar.h"
@@ -1047,8 +1048,15 @@ TrMainWindow :: openTorrent( )
 void
 TrMainWindow :: openURL( )
 {
-    QString tmp;
-    openURL( tmp );
+    QString str = QApplication::clipboard()->text( QClipboard::Selection );
+
+    if( !AddData::isSupported( str ) )
+        str = QApplication::clipboard()->text( QClipboard::Clipboard );
+
+    if( !AddData::isSupported( str ) )
+        str.clear();
+
+    openURL( str );
 }
 
 void

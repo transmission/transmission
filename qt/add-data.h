@@ -40,6 +40,10 @@ class AddData
         QByteArray toBase64( ) const;
 
         QString readableName( ) const;
+
+    public:
+
+        static bool isSupported( const QString& str ) { return AddData(str).type != NONE; }
 };
 
 #endif
