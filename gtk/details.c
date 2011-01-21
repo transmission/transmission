@@ -939,34 +939,42 @@ info_page_new( struct DetailsImpl * di )
 
         /* size */
         l = di->size_lb = gtk_label_new( NULL );
+        gtk_label_set_single_line_mode( GTK_LABEL( l ), TRUE );
         hig_workarea_add_row( t, &row, _( "Torrent size:" ), l, NULL );
 
         /* have */
         l = di->have_lb = gtk_label_new( NULL );
+        gtk_label_set_single_line_mode( GTK_LABEL( l ), TRUE );
         hig_workarea_add_row( t, &row, _( "Have:" ), l, NULL );
 
         /* downloaded */
         l = di->dl_lb = gtk_label_new( NULL );
+        gtk_label_set_single_line_mode( GTK_LABEL( l ), TRUE );
         hig_workarea_add_row( t, &row, _( "Downloaded:" ), l, NULL );
 
         /* uploaded */
         l = di->ul_lb = gtk_label_new( NULL );
+        gtk_label_set_single_line_mode( GTK_LABEL( l ), TRUE );
         hig_workarea_add_row( t, &row, _( "Uploaded:" ), l, NULL );
 
         /* state */
         l = di->state_lb = gtk_label_new( NULL );
+        gtk_label_set_single_line_mode( GTK_LABEL( l ), TRUE );
         hig_workarea_add_row( t, &row, _( "State:" ), l, NULL );
 
         /* running for */
         l = di->date_started_lb = gtk_label_new( NULL );
+        gtk_label_set_single_line_mode( GTK_LABEL( l ), TRUE );
         hig_workarea_add_row( t, &row, _( "Running time:" ), l, NULL );
 
         /* eta */
         l = di->eta_lb = gtk_label_new( NULL );
+        gtk_label_set_single_line_mode( GTK_LABEL( l ), TRUE );
         hig_workarea_add_row( t, &row, _( "Remaining time:" ), l, NULL );
 
         /* last activity */
         l = di->last_activity_lb = gtk_label_new( NULL );
+        gtk_label_set_single_line_mode( GTK_LABEL( l ), TRUE );
         hig_workarea_add_row( t, &row, _( "Last activity:" ), l, NULL );
 
         /* error */
@@ -996,6 +1004,7 @@ info_page_new( struct DetailsImpl * di )
 
         /* privacy */
         l = gtk_label_new( NULL );
+        gtk_label_set_single_line_mode( GTK_LABEL( l ), TRUE );
         hig_workarea_add_row( t, &row, _( "Privacy:" ), l, NULL );
         di->privacy_lb = l;
 

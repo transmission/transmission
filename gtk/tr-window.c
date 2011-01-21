@@ -656,6 +656,7 @@ gtr_window_new( GtkUIManager * ui_mgr, TrCore * core )
         gtk_box_pack_start( GTK_BOX( h ), w, 0, 0, 0 );
 
         w = p->gutter_lb = gtk_label_new( "N Torrents" );
+        gtk_label_set_single_line_mode( GTK_LABEL( w ), TRUE );
         gtk_box_pack_start( GTK_BOX( h ), w, 1, 1, GUI_PAD );
 
         hbox = gtk_hbox_new( FALSE, GUI_PAD );
@@ -663,6 +664,7 @@ gtr_window_new( GtkUIManager * ui_mgr, TrCore * core )
             gtk_widget_set_size_request( w, GUI_PAD, 0u );
             gtk_box_pack_start( GTK_BOX( hbox ), w, FALSE, FALSE, 0 );
             w = p->ul_lb = gtk_label_new( NULL );
+            gtk_label_set_single_line_mode( GTK_LABEL( w ), TRUE );
             gtk_box_pack_start( GTK_BOX( hbox ), w, FALSE, FALSE, 0 );
             w = gtk_image_new_from_stock( GTK_STOCK_GO_UP, GTK_ICON_SIZE_MENU );
             gtk_box_pack_start( GTK_BOX( hbox ), w, FALSE, FALSE, 0 );
@@ -673,6 +675,7 @@ gtr_window_new( GtkUIManager * ui_mgr, TrCore * core )
             gtk_widget_set_size_request( w, GUI_PAD, 0u );
             gtk_box_pack_start( GTK_BOX( hbox ), w, FALSE, FALSE, 0 );
             w = p->dl_lb = gtk_label_new( NULL );
+            gtk_label_set_single_line_mode( GTK_LABEL( w ), TRUE );
             gtk_box_pack_start( GTK_BOX( hbox ), w, FALSE, FALSE, 0 );
             w = gtk_image_new_from_stock( GTK_STOCK_GO_DOWN, GTK_ICON_SIZE_MENU );
             gtk_box_pack_start( GTK_BOX( hbox ), w, FALSE, FALSE, 0 );
@@ -686,6 +689,7 @@ gtr_window_new( GtkUIManager * ui_mgr, TrCore * core )
             g_signal_connect( w, "clicked", G_CALLBACK( onYinYangReleased ), p );
             gtk_box_pack_start( GTK_BOX( hbox ), w, FALSE, FALSE, 0 );
             w = p->stats_lb = gtk_label_new( NULL );
+            gtk_label_set_single_line_mode( GTK_LABEL( w ), TRUE );
             gtk_box_pack_end( GTK_BOX( hbox ), w, FALSE, FALSE, 0 );
         gtk_box_pack_end( GTK_BOX( h ), hbox, FALSE, FALSE, 0 );
 
