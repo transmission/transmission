@@ -851,7 +851,6 @@ gtr_window_refresh( TrWindow * self )
         updateSpeeds( p );
         updateTorrentCount( p );
         updateStats( p );
-        gtk_tree_model_filter_refilter( GTK_TREE_MODEL_FILTER( p->filter_model ) );
     }
 }
 

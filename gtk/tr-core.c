@@ -766,7 +766,9 @@ tr_core_init( GTypeInstance *  instance,
                       G_TYPE_INT,       /* tr_stat.activity */
                       G_TYPE_UCHAR,     /* tr_stat.finished */
                       G_TYPE_CHAR,      /* tr_priority_t */
-                      G_TYPE_STRING };  /* concatenated trackers string */
+                      G_TYPE_STRING,    /* concatenated trackers string */
+                      G_TYPE_INT,       /* MC_ERROR */
+                      G_TYPE_INT };     /* MC_ACTIVE_PEER_COUNT */
 
     p = self->priv = G_TYPE_INSTANCE_GET_PRIVATE( self,
                                                   TR_CORE_TYPE,
@@ -1280,6 +1282,8 @@ update_foreach( GtkTreeModel * model,
                 gpointer       data UNUSED )
 {
     int oldActivity, newActivity;
+    int oldActivePeerCount, newActivePeerCount;
+    int oldError, newError;
     tr_bool oldFinished, newFinished;
     tr_priority_t oldPriority, newPriority;
     char * oldCollatedName, * newCollatedName;
@@ -1297,6 +1301,8 @@ update_foreach( GtkTreeModel * model,
                         MC_TORRENT, &gtor,
                         MC_NAME_COLLATED, &oldCollatedName,
                         MC_ACTIVE, &oldActive,
+                        MC_ACTIVE_PEER_COUNT, &oldActivePeerCount,
+                        MC_ERROR, &oldError,
                         MC_ACTIVITY, &oldActivity,
                         MC_FINISHED, &oldFinished,
                         MC_PRIORITY, &oldPriority,
@@ -1315,6 +1321,8 @@ update_foreach( GtkTreeModel * model,
     newTrackers = torrentTrackerString( tor );
     newUpSpeed = st->pieceUploadSpeed_KBps;
     newDownSpeed = st->pieceDownloadSpeed_KBps;
+    newActivePeerCount = st->peersSendingToUs + st->peersGettingFromUs + st->webseedsSendingToUs;
+    newError = st->error;
     inf = tr_torrent_info( gtor );
     newCollatedName = g_utf8_strdown( inf->name ? inf->name : "", -1 );
 
@@ -1324,6 +1332,8 @@ update_foreach( GtkTreeModel * model,
         || ( newActivity  != oldActivity )
         || ( newFinished != oldFinished )
         || ( newPriority != oldPriority )
+        || ( newError != oldError )
+        || ( newActivePeerCount != oldActivePeerCount )
         || gtr_strcmp0( oldTrackers, newTrackers )
         || gtr_strcmp0( oldCollatedName, newCollatedName )
         || gtr_compare_double( newUpSpeed, oldUpSpeed, 3 )
@@ -1331,6 +1341,8 @@ update_foreach( GtkTreeModel * model,
     {
         gtk_list_store_set( GTK_LIST_STORE( model ), iter,
                             MC_ACTIVE, newActive,
+                            MC_ACTIVE_PEER_COUNT, newActivePeerCount,
+                            MC_ERROR, newError,
                             MC_ACTIVITY, newActivity,
                             MC_NAME_COLLATED, newCollatedName,
                             MC_FINISHED, newFinished,
