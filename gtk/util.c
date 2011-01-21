@@ -930,7 +930,8 @@ gtr_paste_clipboard_url_into_entry( GtkWidget * e )
 
   for( i=0; i<G_N_ELEMENTS(text); ++i ) {
       char * s = text[i];
-      if( s && ( gtr_is_supported_url( s ) || gtr_is_magnet_link( s ) ) ) {
+      if( s && ( gtr_is_supported_url( s ) || gtr_is_magnet_link( s )
+                                           || gtr_is_hex_hashcode( s ) ) ) {
           gtk_entry_set_text( GTK_ENTRY( e ), s );
           break;
       }
