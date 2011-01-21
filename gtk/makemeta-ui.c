@@ -90,7 +90,7 @@ onProgressDialogRefresh( gpointer data )
         g_assert_not_reached( );
 
     if( str != NULL ) {
-        gtk_label_set_text( GTK_LABEL( ui->progress_label ), str );
+        gtr_label_set_text( GTK_LABEL( ui->progress_label ), str );
         g_free( str );
     }
 

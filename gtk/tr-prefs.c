@@ -1104,7 +1104,7 @@ onCorePrefsChanged( TrCore * core UNUSED, const char *  key, gpointer gdata )
     {
         struct network_page_data * data = gdata;
         gdk_threads_enter();
-        gtk_label_set_text( GTK_LABEL( data->portLabel ), _( "Status unknown" ) );
+        gtr_label_set_text( GTK_LABEL( data->portLabel ), _( "Status unknown" ) );
         gtk_widget_set_sensitive( data->portButton, TRUE );
         gtk_widget_set_sensitive( data->portSpin, TRUE );
         gdk_threads_leave();

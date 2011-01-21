@@ -40,7 +40,7 @@ static void
 setLabel( GtkWidget *  w,
           const char * str )
 {
-    gtk_label_set_text( GTK_LABEL( w ), str );
+    gtr_label_set_text( GTK_LABEL( w ), str );
 }
 
 static void

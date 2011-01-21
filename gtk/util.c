@@ -940,3 +940,15 @@ gtr_paste_clipboard_url_into_entry( GtkWidget * e )
     g_free( text[i] );
 }
 
+/***
+****
+***/
+
+void
+gtr_label_set_text( GtkLabel * lb, const char * newstr )
+{
+    const char * oldstr = gtk_label_get_text( lb );
+
+    if( ( oldstr == NULL ) || strcmp( oldstr, newstr ) )
+        gtk_label_set_text( lb, newstr );
+}

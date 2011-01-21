@@ -574,17 +574,6 @@ activityString( int activity, tr_bool finished )
     return "";
 }
 
-/* Only call gtk_label_set_text() if the new text differs from the old.
- * This way if the user has text selected, refreshing won't deselect it */
-static void
-gtr_label_set_text( GtkLabel * lb, const char * newstr )
-{
-    const char * oldstr = gtk_label_get_text( lb );
-
-    if( ( oldstr == NULL ) || strcmp( oldstr, newstr ) )
-        gtk_label_set_text( lb, newstr );
-}
-
 /* Only call gtk_text_buffer_set_text() if the new text differs from the old.
  * This way if the user has text selected, refreshing won't deselect it */
 static void

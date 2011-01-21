@@ -536,7 +536,7 @@ onOptionsClicked( GtkButton * button UNUSED, gpointer vp )
 
     w = p->speedlimit_on_item[TR_DOWN];
     tr_formatter_speed_KBps( buf1, gtr_pref_int_get( TR_PREFS_KEY_DSPEED_KBps ), sizeof( buf1 ) );
-    gtk_label_set_text( GTK_LABEL( gtk_bin_get_child( GTK_BIN( w ) ) ), buf1 );
+    gtr_label_set_text( GTK_LABEL( gtk_bin_get_child( GTK_BIN( w ) ) ), buf1 );
 
     b = gtr_pref_flag_get( TR_PREFS_KEY_DSPEED_ENABLED );
     w = b ? p->speedlimit_on_item[TR_DOWN] : p->speedlimit_off_item[TR_DOWN];
@@ -544,7 +544,7 @@ onOptionsClicked( GtkButton * button UNUSED, gpointer vp )
 
     w = p->speedlimit_on_item[TR_UP];
     tr_formatter_speed_KBps( buf1, gtr_pref_int_get( TR_PREFS_KEY_USPEED_KBps ), sizeof( buf1 ) );
-    gtk_label_set_text( GTK_LABEL( gtk_bin_get_child( GTK_BIN( w ) ) ), buf1 );
+    gtr_label_set_text( GTK_LABEL( gtk_bin_get_child( GTK_BIN( w ) ) ), buf1 );
 
     b = gtr_pref_flag_get( TR_PREFS_KEY_USPEED_ENABLED );
     w = b ? p->speedlimit_on_item[TR_UP] : p->speedlimit_off_item[TR_UP];
@@ -552,7 +552,7 @@ onOptionsClicked( GtkButton * button UNUSED, gpointer vp )
 
     tr_strlratio( buf1, gtr_pref_double_get( TR_PREFS_KEY_RATIO ), sizeof( buf1 ) );
     g_snprintf( buf2, sizeof( buf2 ), _( "Stop at Ratio (%s)" ), buf1 );
-    gtk_label_set_text( GTK_LABEL( gtk_bin_get_child( GTK_BIN( p->ratio_on_item ) ) ), buf2 );
+    gtr_label_set_text( GTK_LABEL( gtk_bin_get_child( GTK_BIN( p->ratio_on_item ) ) ), buf2 );
 
     b = gtr_pref_flag_get( TR_PREFS_KEY_RATIO_ENABLED );
     gtk_check_menu_item_set_active( GTK_CHECK_MENU_ITEM( b ? p->ratio_on_item : p->ratio_off_item ), TRUE );
@@ -759,7 +759,7 @@ updateTorrentCount( PrivateData * p )
             g_snprintf( buf, sizeof( buf ),
                         gtr_ngettext( "%'d Torrent", "%'d Torrents", torrentCount ),
                         torrentCount );
-        gtk_label_set_text( GTK_LABEL( p->gutter_lb ), buf );
+        gtr_label_set_text( GTK_LABEL( p->gutter_lb ), buf );
     }
 }
 
@@ -807,7 +807,7 @@ updateStats( PrivateData * p )
         tr_strlratio( ratio, stats.ratio, sizeof( ratio ) );
         g_snprintf( buf, sizeof( buf ), _( "Ratio: %s" ), ratio );
     }
-    gtk_label_set_text( GTK_LABEL( p->stats_lb ), buf );
+    gtr_label_set_text( GTK_LABEL( p->stats_lb ), buf );
 }
 
 static void
@@ -834,10 +834,10 @@ updateSpeeds( PrivateData * p )
         while( gtk_tree_model_iter_next( model, &iter ) );
 
         tr_formatter_speed_KBps( buf, down, sizeof( buf ) );
-        gtk_label_set_text( GTK_LABEL( p->dl_lb ), buf );
+        gtr_label_set_text( GTK_LABEL( p->dl_lb ), buf );
 
         tr_formatter_speed_KBps( buf, up, sizeof( buf ) );
-        gtk_label_set_text( GTK_LABEL( p->ul_lb ), buf );
+        gtr_label_set_text( GTK_LABEL( p->ul_lb ), buf );
     }
 }
 
