@@ -35,6 +35,8 @@ typedef enum
 }
 TrackerEventType;
 
+struct tr_pex;
+
 /** @brief Notification object to tell listeners about announce or scrape occurences */
 typedef struct
 {
@@ -46,8 +48,8 @@ typedef struct
     const char * tracker;
 
     /* for TR_TRACKER_PEERS */
-    const uint8_t *  compact;
-    int              compactLen;
+    const struct tr_pex * pex;
+    size_t pexCount;
 
     /* [0...100] for probability a peer is a seed. calculated by the leecher/seeder ratio */
     int8_t           seedProbability;
