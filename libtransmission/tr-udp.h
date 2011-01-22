@@ -25,6 +25,6 @@ THE SOFTWARE.
  #error only libtransmission should #include this header.
 #endif
 
-void tr_udpInit( tr_session *, const tr_address *);
+void tr_udpInit( tr_session * );
 void tr_udpUninit( tr_session * );
 

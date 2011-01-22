@@ -706,7 +706,7 @@ tr_sessionInitImpl( void * vdata )
 
     tr_sessionSet( session, &settings );
 
-    tr_udpInit( session, &session->public_ipv4->addr );
+    tr_udpInit( session );
 
     if( session->isLPDEnabled )
         tr_lpdInit( session, &session->public_ipv4->addr );
@@ -1946,7 +1946,7 @@ toggleDHTImpl(  void * data )
 
     tr_udpUninit( session );
     session->isDHTEnabled = !session->isDHTEnabled;
-    tr_udpInit( session, &session->public_ipv4->addr );
+    tr_udpInit( session );
 }
 
 void
