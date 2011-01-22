@@ -38,6 +38,8 @@ THE SOFTWARE.
 static void
 rebind_ipv6(tr_session *ss, tr_bool force)
 {
+    tr_bool is_default;
+    const struct tr_address * public_addr;
     struct sockaddr_in6 sin6;
     const unsigned char *ipv6 = tr_globalIPv6();
     int s = -1, rc;
@@ -71,6 +73,10 @@ rebind_ipv6(tr_session *ss, tr_bool force)
     if(ipv6)
         memcpy(&sin6.sin6_addr, ipv6, 16);
     sin6.sin6_port = htons(ss->udp_port);
+    public_addr = tr_sessionGetPublicAddress(ss, TR_AF_INET6, &is_default);
+    if(public_addr && !is_default)
+        sin6.sin6_addr = public_addr->addr.addr6;
+
     rc = bind(s, (struct sockaddr*)&sin6, sizeof(sin6));
     if(rc < 0)
         goto fail;
