@@ -1455,15 +1455,12 @@ tr_torrentTrackersFree( tr_tracker_stat * trackers, int trackerCount )
 void
 tr_torrentAvailability( const tr_torrent * tor, int8_t * tab, int size )
 {
-    assert( tr_isTorrent( tor ) );
-    assert( tab != NULL );
-    assert( size > 0 );
-
-    tr_torrentLock( tor );
-
-    tr_peerMgrTorrentAvailability( tor, tab, size );
-
-    tr_torrentUnlock( tor );
+    if( tr_isTorrent( tor ) && ( tab != NULL ) && ( size > 0 ) )
+    {
+        tr_torrentLock( tor );
+        tr_peerMgrTorrentAvailability( tor, tab, size );
+        tr_torrentUnlock( tor );
+    }
 }
 
 void
