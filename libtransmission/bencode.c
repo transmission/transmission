@@ -1684,19 +1684,20 @@ tr_bencToFile( const tr_benc * top, tr_fmt_mode mode, const char * filename )
 
         /* save the benc to a temporary file */
         {
-            struct evbuffer * buffer = evbuffer_new( );
-            tr_bencToBuf( top, mode, buffer );
-            nleft = evbuffer_get_length( buffer );
+            char * buf = tr_bencToStr( top, mode, &nleft );
+            const char * walk = buf;
             while( nleft > 0 ) {
-                const int n = evbuffer_write( buffer, fd );
-                if( n >= 0 )
+                const int n = write( fd, walk, nleft );
+                if( n >= 0 ) {
                     nleft -= n;
+                    walk += n;
+                }
                 else if( errno != EAGAIN ) {
                     err = errno;
                     break;
                 }
             }
-            evbuffer_free( buffer );
+            tr_free( buf );
         }
 
         if( nleft > 0 )

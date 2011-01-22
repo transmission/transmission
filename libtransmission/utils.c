@@ -244,7 +244,7 @@ tr_deepLog( const char  * file,
         /* FIXME(libevent2) ifdef this out for nonwindows platforms */
         OutputDebugString( evbuffer_pullup( buf, -1 ) );
         if( fp )
-            evbuffer_write( buf, fileno( fp ) );
+            fputs( (const char*)evbuffer_pullup( buf, -1 ), fp );
 
         tr_free( base );
         evbuffer_free( buf );
