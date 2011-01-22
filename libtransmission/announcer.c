@@ -922,8 +922,7 @@ tr_announcerResetTorrent( tr_announcer * announcer, tr_torrent * tor )
 static tr_bool
 tierCanManualAnnounce( const tr_tier * tier )
 {
-    return tier->isRunning
-        && tier->manualAnnounceAllowedAt <= tr_time( );
+    return tier->manualAnnounceAllowedAt <= tr_time( );
 }
 
 tr_bool
@@ -935,6 +934,9 @@ tr_announcerCanManualAnnounce( const tr_torrent * tor )
 
     assert( tr_isTorrent( tor ) );
     assert( tor->tiers != NULL );
+
+    if( !tor->isRunning )
+        return FALSE;
 
     n = tr_ptrArraySize( &tor->tiers->tiers );
     tiers = (const tr_tier**) tr_ptrArrayBase( &tor->tiers->tiers );
@@ -1378,12 +1380,12 @@ onAnnounceDone( tr_session   * session,
     if( tier )
     {
         tier->isAnnouncing = FALSE;
+        tier->manualAnnounceAllowedAt = now + tier->announceMinIntervalSec;
 
         if( responseCode == 0 )
         {
             const int interval = getRetryInterval( tier->currentTracker );
             dbgmsg( tier, "No response from tracker... retrying in %d seconds.", interval );
-            tier->manualAnnounceAllowedAt = ~(time_t)0;
             tierAddAnnounce( tier, announceEvent, now + interval );
         }
         else if( 200 <= responseCode && responseCode <= 299 )
@@ -1398,8 +1400,6 @@ onAnnounceDone( tr_session   * session,
                 tier->scrapeAt = now + tier->scrapeIntervalSec;
             }
 
-            tier->manualAnnounceAllowedAt = now + tier->announceMinIntervalSec;
-
             /* if we're running and the queue is empty, add the next update */
             if( !isStopped && !tr_ptrArraySize( &tier->announceEvents ) )
             {
@@ -1412,7 +1412,6 @@ onAnnounceDone( tr_session   * session,
             const int interval = 5;
             dbgmsg( tier, "got a redirect. retrying in %d seconds", interval );
             tierAddAnnounce( tier, announceEvent, now + interval );
-            tier->manualAnnounceAllowedAt = now + tier->announceMinIntervalSec;
         }
         else if( ( responseCode == 404 ) || ( 500 <= responseCode && responseCode <= 599 ) )
         {
@@ -1424,9 +1423,7 @@ onAnnounceDone( tr_session   * session,
              * has erred or is incapable of performing the request.
              * So we pause a bit and try again. */
 
-            const int interval = getRetryInterval( tier->currentTracker );
-            tier->manualAnnounceAllowedAt = ~(time_t)0;
-            tierAddAnnounce( tier, announceEvent, now + interval );
+            tierAddAnnounce( tier, announceEvent, now + getRetryInterval( tier->currentTracker ) );
         }
         else if( 400 <= responseCode && responseCode <= 499 )
         {
@@ -1443,7 +1440,6 @@ onAnnounceDone( tr_session   * session,
             /* WTF did we get?? */
             const int interval = 120;
             dbgmsg( tier, "Invalid response from tracker... retrying in two minutes." );
-            tier->manualAnnounceAllowedAt = ~(time_t)0;
             tierAddAnnounce( tier, announceEvent, now + interval );
         }
 
