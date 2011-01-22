@@ -325,7 +325,6 @@ struct TorrentCellRendererPrivate
 {
     tr_torrent       * tor;
     GtkCellRenderer  * text_renderer;
-    GtkCellRenderer  * text_renderer_err;
     GtkCellRenderer  * progress_renderer;
     GtkCellRenderer  * icon_renderer;
     int bar_height;
@@ -364,12 +363,6 @@ get_icon( const tr_torrent * tor, GtkIconSize icon_size, GtkWidget * for_widget 
     return gtr_get_mime_type_icon( mime_type, icon_size, for_widget );
 }
 
-static GtkCellRenderer*
-get_text_renderer( const tr_stat * st, TorrentCellRenderer * r )
-{
-    return st->error ? r->priv->text_renderer_err : r->priv->text_renderer;
-}
-
 /***
 ****
 ***/
@@ -388,7 +381,6 @@ get_size_compact( TorrentCellRenderer * cell,
     const char * name;
     char * status;
     GdkPixbuf * icon;
-    GtkCellRenderer * text_renderer;
 
     struct TorrentCellRendererPrivate * p = cell->priv;
     const tr_torrent * tor = p->tor;
@@ -404,13 +396,12 @@ get_size_compact( TorrentCellRenderer * cell,
     gtk_cell_renderer_get_size( p->icon_renderer, widget, NULL, NULL, NULL, &w, &h );
     icon_area.width = w;
     icon_area.height = h;
-    text_renderer = get_text_renderer( st, cell );
-    g_object_set( text_renderer, "text", name, "ellipsize", PANGO_ELLIPSIZE_NONE,  "scale", 1.0, NULL );
-    gtk_cell_renderer_get_size( text_renderer, widget, NULL, NULL, NULL, &w, &h );
+    g_object_set( p->text_renderer, "text", name, "ellipsize", PANGO_ELLIPSIZE_NONE,  "scale", 1.0, NULL );
+    gtk_cell_renderer_get_size( p->text_renderer, widget, NULL, NULL, NULL, &w, &h );
     name_area.width = w;
     name_area.height = h;
-    g_object_set( text_renderer, "text", status, "scale", SMALL_SCALE, NULL );
-    gtk_cell_renderer_get_size( text_renderer, widget, NULL, NULL, NULL, &w, &h );
+    g_object_set( p->text_renderer, "text", status, "scale", SMALL_SCALE, NULL );
+    gtk_cell_renderer_get_size( p->text_renderer, widget, NULL, NULL, NULL, &w, &h );
     stat_area.width = w;
     stat_area.height = h;
 
@@ -447,7 +438,6 @@ get_size_full( TorrentCellRenderer * cell,
     char * status;
     char * progress;
     GdkPixbuf * icon;
-    GtkCellRenderer * text_renderer;
 
     struct TorrentCellRendererPrivate * p = cell->priv;
     const tr_torrent * tor = p->tor;
@@ -465,17 +455,16 @@ get_size_full( TorrentCellRenderer * cell,
     gtk_cell_renderer_get_size( p->icon_renderer, widget, NULL, NULL, NULL, &w, &h );
     icon_area.width = w;
     icon_area.height = h;
-    text_renderer = get_text_renderer( st, cell );
-    g_object_set( text_renderer, "text", name, "weight", PANGO_WEIGHT_BOLD, "scale", 1.0, "ellipsize", PANGO_ELLIPSIZE_NONE, NULL );
-    gtk_cell_renderer_get_size( text_renderer, widget, NULL, NULL, NULL, &w, &h );
+    g_object_set( p->text_renderer, "text", name, "weight", PANGO_WEIGHT_BOLD, "scale", 1.0, "ellipsize", PANGO_ELLIPSIZE_NONE, NULL );
+    gtk_cell_renderer_get_size( p->text_renderer, widget, NULL, NULL, NULL, &w, &h );
     name_area.width = w;
     name_area.height = h;
-    g_object_set( text_renderer, "text", progress, "weight", PANGO_WEIGHT_NORMAL, "scale", SMALL_SCALE, NULL );
-    gtk_cell_renderer_get_size( text_renderer, widget, NULL, NULL, NULL, &w, &h );
+    g_object_set( p->text_renderer, "text", progress, "weight", PANGO_WEIGHT_NORMAL, "scale", SMALL_SCALE, NULL );
+    gtk_cell_renderer_get_size( p->text_renderer, widget, NULL, NULL, NULL, &w, &h );
     prog_area.width = w;
     prog_area.height = h;
-    g_object_set( text_renderer, "text", status, NULL );
-    gtk_cell_renderer_get_size( text_renderer, widget, NULL, NULL, NULL, &w, &h );
+    g_object_set( p->text_renderer, "text", status, NULL );
+    gtk_cell_renderer_get_size( p->text_renderer, widget, NULL, NULL, NULL, &w, &h );
     stat_area.width = w;
     stat_area.height = h;
 
@@ -534,6 +523,19 @@ torrent_cell_renderer_get_size( GtkCellRenderer  * cell,
 }
 
 static void
+get_text_color( GtkWidget * w, const tr_stat * st, GdkColor * setme )
+{
+    static const GdkColor red = { 0, 65535, 0, 0 };
+
+    if( st->error )
+        *setme = red;
+    else if( st->activity == TR_STATUS_STOPPED )
+        *setme = gtk_widget_get_style(w)->text[GTK_STATE_INSENSITIVE];
+    else
+        *setme = gtk_widget_get_style(w)->text[GTK_STATE_NORMAL];
+}
+
+static void
 render_compact( TorrentCellRenderer   * cell,
                 GdkDrawable           * window,
                 GtkWidget             * widget,
@@ -551,7 +553,7 @@ render_compact( TorrentCellRenderer   * cell,
     const char * name;
     char * status;
     GdkPixbuf * icon;
-    GtkCellRenderer * text_renderer;
+    GdkColor text_color;
 
     struct TorrentCellRendererPrivate * p = cell->priv;
     const tr_torrent * tor = p->tor;
@@ -564,6 +566,7 @@ render_compact( TorrentCellRenderer   * cell,
     name = tr_torrentInfo( tor )->name;
     status = getShortStatusString( tor, st, p->upload_speed_KBps, p->download_speed_KBps );
     gtr_cell_renderer_get_padding( GTK_CELL_RENDERER( cell ), &xpad, &ypad );
+    get_text_color( widget, st, &text_color );
 
     fill_area = *background_area;
     fill_area.x += xpad;
@@ -574,11 +577,10 @@ render_compact( TorrentCellRenderer   * cell,
 
     g_object_set( p->icon_renderer, "pixbuf", icon, NULL );
     gtk_cell_renderer_get_size( p->icon_renderer, widget, NULL, NULL, NULL, &icon_area.width, NULL );
-    text_renderer = get_text_renderer( st, cell );
-    g_object_set( text_renderer, "text", name, "ellipsize", PANGO_ELLIPSIZE_NONE, "scale", 1.0, NULL );
-    gtk_cell_renderer_get_size( text_renderer, widget, NULL, NULL, NULL, &name_area.width, NULL );
-    g_object_set( text_renderer, "text", status, "scale", SMALL_SCALE, NULL );
-    gtk_cell_renderer_get_size( text_renderer, widget, NULL, NULL, NULL, &stat_area.width, NULL );
+    g_object_set( p->text_renderer, "text", name, "ellipsize", PANGO_ELLIPSIZE_NONE, "scale", 1.0, NULL );
+    gtk_cell_renderer_get_size( p->text_renderer, widget, NULL, NULL, NULL, &name_area.width, NULL );
+    g_object_set( p->text_renderer, "text", status, "scale", SMALL_SCALE, NULL );
+    gtk_cell_renderer_get_size( p->text_renderer, widget, NULL, NULL, NULL, &stat_area.width, NULL );
 
     icon_area.x = fill_area.x;
     prog_area.x = fill_area.x + fill_area.width - BAR_WIDTH;
@@ -596,10 +598,10 @@ render_compact( TorrentCellRenderer   * cell,
     gtk_cell_renderer_render( p->icon_renderer, window, widget, &icon_area, &icon_area, &icon_area, flags );
     g_object_set( p->progress_renderer, "value", (int)(percentDone*100.0), "text", NULL, "sensitive", sensitive, NULL );
     gtk_cell_renderer_render( p->progress_renderer, window, widget, &prog_area, &prog_area, &prog_area, flags );
-    g_object_set( text_renderer, "text", status, "scale", SMALL_SCALE, "sensitive", sensitive, "ellipsize", PANGO_ELLIPSIZE_END, NULL );
-    gtk_cell_renderer_render( text_renderer, window, widget, &stat_area, &stat_area, &stat_area, flags );
-    g_object_set( text_renderer, "text", name, "scale", 1.0, NULL );
-    gtk_cell_renderer_render( text_renderer, window, widget, &name_area, &name_area, &name_area, flags );
+    g_object_set( p->text_renderer, "text", status, "scale", SMALL_SCALE, "ellipsize", PANGO_ELLIPSIZE_END, "foreground-gdk", &text_color, NULL );
+    gtk_cell_renderer_render( p->text_renderer, window, widget, &stat_area, &stat_area, &stat_area, flags );
+    g_object_set( p->text_renderer, "text", name, "scale", 1.0, NULL );
+    gtk_cell_renderer_render( p->text_renderer, window, widget, &name_area, &name_area, &name_area, flags );
 
     /* cleanup */
     g_free( status );
@@ -627,7 +629,7 @@ render_full( TorrentCellRenderer   * cell,
     char * status;
     char * progress;
     GdkPixbuf * icon;
-    GtkCellRenderer * text_renderer;
+    GdkColor text_color;
 
     struct TorrentCellRendererPrivate * p = cell->priv;
     const tr_torrent * tor = p->tor;
@@ -642,23 +644,23 @@ render_full( TorrentCellRenderer   * cell,
     status = getStatusString( tor, st, p->upload_speed_KBps, p->download_speed_KBps );
     progress = getProgressString( tor, inf, st );
     gtr_cell_renderer_get_padding( GTK_CELL_RENDERER( cell ), &xpad, &ypad );
+    get_text_color( widget, st, &text_color );
 
     /* get the idealized cell dimensions */
     g_object_set( p->icon_renderer, "pixbuf", icon, NULL );
     gtk_cell_renderer_get_size( p->icon_renderer, widget, NULL, NULL, NULL, &w, &h );
     icon_area.width = w;
     icon_area.height = h;
-    text_renderer = get_text_renderer( st, cell );
-    g_object_set( text_renderer, "text", name, "weight", PANGO_WEIGHT_BOLD, "ellipsize", PANGO_ELLIPSIZE_NONE, "scale", 1.0, NULL );
-    gtk_cell_renderer_get_size( text_renderer, widget, NULL, NULL, NULL, &w, &h );
+    g_object_set( p->text_renderer, "text", name, "weight", PANGO_WEIGHT_BOLD, "ellipsize", PANGO_ELLIPSIZE_NONE, "scale", 1.0, NULL );
+    gtk_cell_renderer_get_size( p->text_renderer, widget, NULL, NULL, NULL, &w, &h );
     name_area.width = w;
     name_area.height = h;
-    g_object_set( text_renderer, "text", progress, "weight", PANGO_WEIGHT_NORMAL, "scale", SMALL_SCALE, NULL );
-    gtk_cell_renderer_get_size( text_renderer, widget, NULL, NULL, NULL, &w, &h );
+    g_object_set( p->text_renderer, "text", progress, "weight", PANGO_WEIGHT_NORMAL, "scale", SMALL_SCALE, NULL );
+    gtk_cell_renderer_get_size( p->text_renderer, widget, NULL, NULL, NULL, &w, &h );
     prog_area.width = w;
     prog_area.height = h;
-    g_object_set( text_renderer, "text", status, NULL );
-    gtk_cell_renderer_get_size( text_renderer, widget, NULL, NULL, NULL, &w, &h );
+    g_object_set( p->text_renderer, "text", status, NULL );
+    gtk_cell_renderer_get_size( p->text_renderer, widget, NULL, NULL, NULL, &w, &h );
     stat_area.width = w;
     stat_area.height = h;
 
@@ -703,14 +705,14 @@ render_full( TorrentCellRenderer   * cell,
 
     g_object_set( p->icon_renderer, "pixbuf", icon, "sensitive", sensitive, NULL );
     gtk_cell_renderer_render( p->icon_renderer, window, widget, &icon_area, &icon_area, &icon_area, flags );
-    g_object_set( text_renderer, "text", name, "scale", 1.0, "sensitive", sensitive, "ellipsize", PANGO_ELLIPSIZE_END, "weight", PANGO_WEIGHT_BOLD, NULL );
-    gtk_cell_renderer_render( text_renderer, window, widget, &name_area, &name_area, &name_area, flags );
-    g_object_set( text_renderer, "text", progress, "scale", SMALL_SCALE, "weight", PANGO_WEIGHT_NORMAL, NULL );
-    gtk_cell_renderer_render( text_renderer, window, widget, &prog_area, &prog_area, &prog_area, flags );
+    g_object_set( p->text_renderer, "text", name, "scale", 1.0, "foreground-gdk", &text_color, "ellipsize", PANGO_ELLIPSIZE_END, "weight", PANGO_WEIGHT_BOLD, NULL );
+    gtk_cell_renderer_render( p->text_renderer, window, widget, &name_area, &name_area, &name_area, flags );
+    g_object_set( p->text_renderer, "text", progress, "scale", SMALL_SCALE, "weight", PANGO_WEIGHT_NORMAL, NULL );
+    gtk_cell_renderer_render( p->text_renderer, window, widget, &prog_area, &prog_area, &prog_area, flags );
     g_object_set( p->progress_renderer, "value", (int)(percentDone*100.0), "text", "", "sensitive", sensitive, NULL );
     gtk_cell_renderer_render( p->progress_renderer, window, widget, &prct_area, &prct_area, &prct_area, flags );
-    g_object_set( text_renderer, "text", status, NULL );
-    gtk_cell_renderer_render( text_renderer, window, widget, &stat_area, &stat_area, &stat_area, flags );
+    g_object_set( p->text_renderer, "text", status, NULL );
+    gtk_cell_renderer_render( p->text_renderer, window, widget, &stat_area, &stat_area, &stat_area, flags );
 
     /* cleanup */
     g_free( status );
@@ -797,7 +799,6 @@ torrent_cell_renderer_dispose( GObject * o )
     if( r && r->priv )
     {
         g_object_unref( G_OBJECT( r->priv->text_renderer ) );
-        g_object_unref( G_OBJECT( r->priv->text_renderer_err ) );
         g_object_unref( G_OBJECT( r->priv->progress_renderer ) );
         g_object_unref( G_OBJECT( r->priv->icon_renderer ) );
         r->priv = NULL;
@@ -872,13 +873,9 @@ torrent_cell_renderer_init( GTypeInstance *  instance,
     p->tor = NULL;
     p->text_renderer = gtk_cell_renderer_text_new( );
     g_object_set( p->text_renderer, "xpad", 0, "ypad", 0, NULL );
-    p->text_renderer_err = gtk_cell_renderer_text_new(  );
-    g_object_set( p->text_renderer_err, "xpad", 0, "ypad", 0, NULL );
     p->progress_renderer = gtk_cell_renderer_progress_new(  );
     p->icon_renderer = gtk_cell_renderer_pixbuf_new(  );
-    g_object_set( p->text_renderer_err, "foreground", "red", NULL );
     gtr_object_ref_sink( p->text_renderer );
-    gtr_object_ref_sink( p->text_renderer_err );
     gtr_object_ref_sink( p->progress_renderer );
     gtr_object_ref_sink( p->icon_renderer );
 
