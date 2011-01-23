@@ -1674,11 +1674,6 @@ tr_sessionGetPieceSpeed_Bps( const tr_session * session, tr_direction dir )
 {
     return tr_isSession( session ) ? tr_bandwidthGetPieceSpeed_Bps( session->bandwidth, 0, dir ) : 0;
 }
-double
-tr_sessionGetPieceSpeed_KBps( const tr_session * session, tr_direction dir )
-{
-    return toSpeedKBps( tr_sessionGetPieceSpeed_Bps( session, dir ) );
-}
 
 int
 tr_sessionGetRawSpeed_Bps( const tr_session * session, tr_direction dir )

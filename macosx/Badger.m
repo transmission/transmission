@@ -38,9 +38,6 @@
         BadgeView * view = [[BadgeView alloc] initWithFrame: [[[NSApp dockTile] contentView] frame] lib: lib];
         [[NSApp dockTile] setContentView: view];
         [view release];
-        
-        //change that just impacts the dock badge
-        [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(updateBadge) name: @"DockBadgeChange" object: nil];
     }
     
     return self;
@@ -53,15 +50,15 @@
     [super dealloc];
 }
 
-- (void) updateBadge
+- (void) updateBadgeWithDownload: (CGFloat) downloadRate upload: (CGFloat) uploadRate
 {
-    const double downloadRate = [[NSUserDefaults standardUserDefaults] boolForKey: @"BadgeDownloadRate"]
-                                ? tr_sessionGetPieceSpeed_KBps(fLib, TR_DOWN) : 0.0;
-    const double uploadRate = [[NSUserDefaults standardUserDefaults] boolForKey: @"BadgeUploadRate"]
-                                ? tr_sessionGetPieceSpeed_KBps(fLib, TR_UP) : 0.0;
+    const CGFloat displayDlRate = [[NSUserDefaults standardUserDefaults] boolForKey: @"BadgeDownloadRate"]
+                                ? downloadRate : 0.0;
+    const CGFloat displayUlRate = [[NSUserDefaults standardUserDefaults] boolForKey: @"BadgeUploadRate"]
+                                ? uploadRate : 0.0;
     
     //only update if the badged values change
-    if ([(BadgeView *)[[NSApp dockTile] contentView] setRatesWithDownload: downloadRate upload: uploadRate])
+    if ([(BadgeView *)[[NSApp dockTile] contentView] setRatesWithDownload: displayDlRate upload: displayUlRate])
         [[NSApp dockTile] display];
 }
 

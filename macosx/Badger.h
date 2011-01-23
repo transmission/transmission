@@ -34,7 +34,7 @@
 
 - (id) initWithLib: (tr_session *) lib;
 
-- (void) updateBadge;
+- (void) updateBadgeWithDownload: (CGFloat) downloadRate upload: (CGFloat) uploadRate;
 - (void) incrementCompleted;
 - (void) clearCompleted;
 - (void) setQuitting;

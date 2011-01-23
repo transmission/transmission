@@ -690,7 +690,6 @@ tr_bool  tr_sessionGetActiveSpeedLimit_KBps( const tr_session  * session,
 ***/
 
 double     tr_sessionGetRawSpeed_KBps  ( const tr_session *, tr_direction );
-double     tr_sessionGetPieceSpeed_KBps( const tr_session *, tr_direction );
 
 void       tr_sessionSetRatioLimited  ( tr_session *, tr_bool isLimited );
 tr_bool    tr_sessionIsRatioLimited   ( const tr_session * );

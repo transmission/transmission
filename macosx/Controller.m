@@ -1717,6 +1717,14 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 {
     [fTorrents makeObjectsPerformSelector: @selector(update)];
     
+    //pull the upload and download speeds - most consistent by using current stats
+    CGFloat dlRate = 0.0, ulRate = 0.0;
+    for (Torrent * torrent in fTorrents)
+    {
+        dlRate += [torrent downloadRate];
+        ulRate += [torrent uploadRate];
+    }
+    
     if (![NSApp isHidden])
     {
         if ([fWindow isVisible])
@@ -1727,8 +1735,8 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
             if (![fStatusBar isHidden])
             {
                 //set rates
-                [fTotalDLField setStringValue: [NSString stringForSpeed: tr_sessionGetPieceSpeed_KBps(fLib, TR_DOWN)]];
-                [fTotalULField setStringValue: [NSString stringForSpeed: tr_sessionGetPieceSpeed_KBps(fLib, TR_UP)]];
+                [fTotalDLField setStringValue: [NSString stringForSpeed: dlRate]];
+                [fTotalULField setStringValue: [NSString stringForSpeed: ulRate]];
                 
                 //set status button text
                 NSString * statusLabel = [fDefaults stringForKey: @"StatusLabel"], * statusString;
@@ -1770,7 +1778,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     }
     
     //badge dock
-    [fBadger updateBadge];
+    [fBadger updateBadgeWithDownload: dlRate upload: ulRate];
 }
 
 - (void) resizeStatusButton
