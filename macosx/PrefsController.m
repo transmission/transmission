@@ -703,7 +703,7 @@ tr_session * fHandle;
 
 - (void) setBadge: (id) sender
 {
-    [[NSNotificationCenter defaultCenter] postNotificationName: @"DockBadgeChange" object: self];
+    [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateUI" object: self];
 }
 
 - (void) resetWarnings: (id) sender
