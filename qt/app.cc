@@ -136,14 +136,13 @@ MyApp :: MyApp( int& argc, char ** argv ):
     }
 
     // set the fallback config dir
-    if( configDir == 0 ) {
+    if( configDir == 0 )
         configDir = tr_getDefaultConfigDir( MY_CONFIG_NAME );
 
-        // ensure the config directory exists
-        QDir dir( configDir );
-        if( !dir.exists() )
-            dir.mkpath( configDir );
-    }
+    // ensure our config directory exists
+    QDir dir( configDir );
+    if( !dir.exists() )
+        dir.mkpath( configDir );
 
     // is this the first time we've run transmission?
     const bool firstTime = !QFile(QDir(configDir).absoluteFilePath("settings.json")).exists();
