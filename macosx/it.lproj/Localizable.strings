@@ -1,21 +1,35 @@
-﻿/* Prefs -> blocklist -> message */
+﻿/* Inspector -> selected torrents
+   stats -> bytes */
+
+"%@ bytes" = "%@ byte";
+
+/* Add torrent -> info
+   Create torrent -> info
+   Drag overlay -> torrents
+   Inspector -> selected torrents */
+
+
+
+"%@ files" = "%@ file";
+
+/* Prefs -> blocklist -> message */
 "%@ IP address rules in list" = "%@ regole indirizzi IP nella lista";
 
-/* Blocklist -> message
+/* Inspector -> selected torrents */
+"%@ magnetized transfers" = "%@ trasferimenti magnetici";
+
+/* file size string
    Inspector -> Files tab -> file status string
-   Torrent -> progress string */
+   Status bar transfer count */
 
 
 "%@ of %@" = "%1$@ su %2$@";
 
 /* Torrent -> progress string */
-"%@ of %@ selected" = "selezionati %1$@ su %2$@";
-
-/* Torrent -> progress string */
 "%@ of torrent metadata retrieved" = "recuperati %@ metadati del torrent";
 
 /* Torrent -> eta string */
-"%@ remaining" = "tempo richiesto %@";
+"%@ remaining" = "tempo rimanente %@";
 
 /* Add torrent -> info
    Inspector -> Activity tab -> progress
@@ -24,10 +38,23 @@
 
 "%@ selected" = "selezionati %@";
 
+/* Drag overlay -> torrents */
+"%@ Torrent Files" = "%@ file torrent";
+
+/* Inspector -> selected torrents */
+"%@ Torrents Selected" = "%@ torrent selezionati";
+
 /* Inspector -> selected torrents
    stats total */
 
 "%@ total" = "totale %@";
+
+/* Filter Bar Button -> tool tip
+   Status bar transfer count
+   Torrent table -> group row -> tooltip */
+
+
+"%@ transfers" = "%@ trasferimenti";
 
 /* Inspector -> Activity tab -> have */
 "%@ verified" = "verificati %@";
@@ -43,15 +70,6 @@
 
 /* Dock item - Downloading */
 "%d Downloading" = "%d in download";
-
-/* Add torrent -> info
-   Create torrent -> info
-   Drag overlay -> torrents
-   Inspector -> selected torrents */
-
-
-
-"%@ files" = "%@ file";
 
 /* Inspector -> Peers tab -> peers */
 "%d incoming" = "%d in arrivo";
@@ -70,12 +88,6 @@
 /* Inspector -> Peers tab -> peers */
 "%d LTEP" = "%d LTEP";
 
-/* Inspector -> selected torrents */
-"%@ magnetized transfers" = "%@ trasferimenti magnetici";
-
-/* Status bar transfer count */
-"%d of %@" = "%1$d su %2$@";
-
 /* Inspector -> Peers tab -> peers */
 "%d PEX" = "%d PEX";
 
@@ -85,29 +97,11 @@
 /* Dock item - Seeding */
 "%d Seeding" = "%d in seed";
 
-/* Drag overlay -> torrents */
-"%@ Torrent Files" = "%@ file torrent";
-
-/* Inspector -> selected torrents */
-"%@ Torrents Selected" = "%@ torrent selezionati";
-
 /* Inspector -> Peers tab -> peers */
 "%d tracker" = "%d tracker";
 
-/* Filter Bar Button -> tool tip
-   Status bar transfer count
-   Torrent table -> group row -> tooltip */
-
-
-"%@ transfers" = "%@ trasferimenti";
-
 /* Torrent -> status string */
 "%d web seeds" = "%d seed web";
-
-/* Inspector -> selected torrents
-   stats -> bytes */
-
-"%@ bytes" = "%@ byte";
 
 /* stats window -> times opened */
 "%llu times" = "%llu volte";
@@ -123,9 +117,6 @@
 
 /* time string */
 "%u sec" = "%u sec";
-
-/* File size - bytes */
-"1 byte" = "1 byte";
 
 /* time string */
 "1 day" = "1 giorno";
@@ -195,9 +186,6 @@
 /* Groups -> Button */
 "All Groups" = "Tutti i gruppi";
 
-/* blocklist fail message */
-"An address of a blocklist is needed." = "Occorre un indirizzo di una blocklist.";
-
 /* Create torrent -> failed -> warning */
 "An unknown error has occurred." = "Si è verificato un errore sconosciuto.";
 
@@ -257,9 +245,6 @@
 
 /* Groups -> Name */
 "Blue" = "Blu";
-
-/* File size - bytes */
-"bytes" = "byte";
 
 /* Add torrent -> same name -> button
    Blocklist -> cancel button
