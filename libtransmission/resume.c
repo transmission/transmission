@@ -63,6 +63,7 @@
 #define KEY_IDLELIMIT_MODE         "idle-mode"
 
 #define KEY_PROGRESS_CHECKTIME "time-checked"
+#define KEY_PROGRESS_MTIMES    "mtimes"
 #define KEY_PROGRESS_BITFIELD  "bitfield"
 #define KEY_PROGRESS_HAVE      "have"
 
@@ -451,11 +452,43 @@ loadProgress( tr_benc *    dict,
         tr_benc *       m;
         int64_t  timeChecked;
 
-        /* load in the timestamp of when we last checked each piece */
         if( tr_bencDictFindList( p, KEY_PROGRESS_CHECKTIME, &m ) )
+        {
+            /* This key was added in 2.20.
+               Load in the timestamp of when we last checked each piece */
             for( i=0, n=tor->info.pieceCount; i<n; ++i )
                 if( tr_bencGetInt( tr_bencListChild( m, i ), &timeChecked ) )
                     tor->info.pieces[i].timeChecked = (time_t)timeChecked;
+        }
+        else if( tr_bencDictFindList( p, KEY_PROGRESS_MTIMES, &m ) )
+        {
+            /* This is how it was done pre-2.20... per file. */
+            for( i=0, n=tr_bencListSize(m); i<n; ++i )
+            {
+                /* get the timestamp of file #i */
+                if( tr_bencGetInt( tr_bencListChild( m, i ), &timeChecked ) )
+                {
+                    /* walk through all the pieces that are in that file... */
+                    tr_piece_index_t j;
+                    tr_file * file = &tor->info.files[i];
+                    for( j=file->firstPiece; j<=file->lastPiece; ++j )
+                    {
+                        tr_piece * piece = &tor->info.pieces[j];
+
+                        /* If the piece's timestamp is unset from earlier,
+                         * set it here. */
+                        if( piece->timeChecked == 0 ) 
+                            piece->timeChecked = timeChecked;
+
+                        /* If the piece's timestamp is *newer* timeChecked,
+                         * the piece probably spans more than one file.
+                         * To be safe, let's use the older timestamp. */
+                        if( piece->timeChecked > timeChecked )
+                            piece->timeChecked = timeChecked;
+                    }
+                }
+            }
+        }
 
         err = NULL;
         if( tr_bencDictFindStr( p, KEY_PROGRESS_HAVE, &str ) )
