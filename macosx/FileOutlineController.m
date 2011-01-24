@@ -351,7 +351,7 @@ typedef enum
     {
         NSIndexSet * indexSet = [fOutline selectedRowIndexes];
         for (NSInteger i = [indexSet firstIndex]; i != NSNotFound; i = [indexSet indexGreaterThanIndex: i])
-            if ([fTorrent fileLocation: [fFileList objectAtIndex: i]] != nil)
+            if ([fTorrent fileLocation: [fOutline itemAtRow: i]] != nil)
                 return YES;
         return NO;
     }
