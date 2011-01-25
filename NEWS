@@ -17,6 +17,7 @@
 ==== Mac ====
   * Fix issues in the German and Spanish localizations
   * Interface tweaks
+  * Support ZIP and other compression formats in the blocklist downloader
 ==== GTK+ ====
   * Add "Add" and "Remove" buttons to the tracker list
   * Add filesize column to the files list
