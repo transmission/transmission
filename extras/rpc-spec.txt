@@ -45,7 +45,7 @@
    since the port and path may be changed to allow mapping and/or multiple
    daemons to run on a single server.
 
-2.4.  CSRF Protection
+2.3.1.  CSRF Protection
 
    Most Transmission RPC servers require a X-Transmission-Session-Id
    header to be sent with requests, to prevent CSRF attacks.
