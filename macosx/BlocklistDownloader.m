@@ -243,8 +243,8 @@ BlocklistDownloader * fDownloader = nil;
     //process data
     NSAssert(fDestination != nil, @"the blocklist file destination has not been specified");
     
-	[self decompressBlocklist];
-	
+    [self decompressBlocklist];
+    
     const int count = tr_blocklistSetContent([PrefsController handle], [fDestination UTF8String]);
     
     //delete downloaded file
