@@ -476,7 +476,6 @@ AC_CONFIG_FILES([Makefile
                  web/stylesheets/Makefile
                  po/Makefile.in])
 
-ac_configure_args="$ac_configure_args --enable-static --disable-shared -q"
 AC_OUTPUT
 
 echo "
