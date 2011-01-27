@@ -2,17 +2,16 @@
 <archive type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="7.10">
 	<data>
 		<int key="IBDocument.SystemTarget">1050</int>
-		<string key="IBDocument.SystemVersion">10D578</string>
-		<string key="IBDocument.InterfaceBuilderVersion">762</string>
-		<string key="IBDocument.AppKitVersion">1038.29</string>
-		<string key="IBDocument.HIToolboxVersion">460.00</string>
+		<string key="IBDocument.SystemVersion">10J567</string>
+		<string key="IBDocument.InterfaceBuilderVersion">788</string>
+		<string key="IBDocument.AppKitVersion">1038.35</string>
+		<string key="IBDocument.HIToolboxVersion">462.00</string>
 		<object class="NSMutableDictionary" key="IBDocument.PluginVersions">
 			<string key="NS.key.0">com.apple.InterfaceBuilder.CocoaPlugin</string>
-			<string key="NS.object.0">762</string>
+			<string key="NS.object.0">788</string>
 		</object>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
-			<integer value="2"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -49,7 +48,7 @@
 				<string key="NSWindowContentMaxSize">{3.40282e+38, 3.40282e+38}</string>
 				<string key="NSWindowContentMinSize">{470, 300}</string>
 				<object class="NSView" key="NSWindowView" id="1006">
-					<reference key="NSNextResponder"/>
+					<nil key="NSNextResponder"/>
 					<int key="NSvFlags">256</int>
 					<object class="NSMutableArray" key="NSSubviews">
 						<bool key="EncodedWithXMLCoder">YES</bool>
@@ -155,7 +154,7 @@
 								<reference key="NSControlView" ref="999003967"/>
 								<int key="NSButtonFlags">1211912703</int>
 								<int key="NSButtonFlags2">2</int>
-								<object class="NSCustomResource" key="NSNormalImage" id="519925756">
+								<object class="NSCustomResource" key="NSNormalImage" id="648601366">
 									<string key="NSClassName">NSImage</string>
 									<string key="NSResourceName">NSSwitch</string>
 								</object>
@@ -313,6 +312,7 @@
 														<reference key="NSControlView" ref="591175582"/>
 														<int key="NSButtonFlags">1211912703</int>
 														<int key="NSButtonFlags2">2</int>
+														<reference key="NSNormalImage" ref="648601366"/>
 														<reference key="NSAlternateImage" ref="240636852"/>
 														<string key="NSAlternateContents"/>
 														<string key="NSKeyEquivalent"/>
@@ -421,7 +421,7 @@
 								<reference key="NSControlView" ref="46983627"/>
 								<int key="NSButtonFlags">1211912703</int>
 								<int key="NSButtonFlags2">2</int>
-								<reference key="NSNormalImage" ref="519925756"/>
+								<reference key="NSNormalImage" ref="648601366"/>
 								<reference key="NSAlternateImage" ref="240636852"/>
 								<string key="NSAlternateContents"/>
 								<string key="NSKeyEquivalent"/>
@@ -456,26 +456,26 @@
 												<string key="NSKeyEquivalent"/>
 												<int key="NSPeriodicDelay">400</int>
 												<int key="NSPeriodicInterval">75</int>
-												<object class="NSMenuItem" key="NSMenuItem" id="347354464">
+												<object class="NSMenuItem" key="NSMenuItem" id="914442461">
 													<reference key="NSMenu" ref="842244290"/>
-													<string key="NSTitle">Нормальный</string>
+													<string key="NSTitle">Низкий</string>
 													<string key="NSKeyEquiv"/>
 													<int key="NSMnemonicLoc">2147483647</int>
 													<int key="NSState">1</int>
 													<object class="NSCustomResource" key="NSImage">
 														<string key="NSClassName">NSImage</string>
-														<string key="NSResourceName">PriorityNormal</string>
+														<string key="NSResourceName">PriorityLow</string>
 													</object>
-													<object class="NSCustomResource" key="NSOnImage" id="354125941">
+													<object class="NSCustomResource" key="NSOnImage" id="104623380">
 														<string key="NSClassName">NSImage</string>
 														<string key="NSResourceName">NSMenuCheckmark</string>
 													</object>
-													<object class="NSCustomResource" key="NSMixedImage" id="257864062">
+													<object class="NSCustomResource" key="NSMixedImage" id="362275358">
 														<string key="NSClassName">NSImage</string>
 														<string key="NSResourceName">NSMenuMixedState</string>
 													</object>
 													<string key="NSAction">_popUpItemAction:</string>
-													<int key="NSTag">1</int>
+													<int key="NSTag">2</int>
 													<reference key="NSTarget" ref="664513336"/>
 												</object>
 												<bool key="NSMenuItemRespectAlignment">YES</bool>
@@ -492,30 +492,30 @@
 																<string key="NSClassName">NSImage</string>
 																<string key="NSResourceName">PriorityHigh</string>
 															</object>
-															<reference key="NSOnImage" ref="354125941"/>
-															<reference key="NSMixedImage" ref="257864062"/>
+															<reference key="NSOnImage" ref="104623380"/>
+															<reference key="NSMixedImage" ref="362275358"/>
 															<string key="NSAction">_popUpItemAction:</string>
 															<reference key="NSTarget" ref="664513336"/>
 														</object>
-														<reference ref="347354464"/>
-														<object class="NSMenuItem" id="914442461">
+														<object class="NSMenuItem" id="347354464">
 															<reference key="NSMenu" ref="842244290"/>
-															<string key="NSTitle">Низкий</string>
+															<string key="NSTitle">Нормальный</string>
 															<string key="NSKeyEquiv"/>
 															<int key="NSMnemonicLoc">2147483647</int>
 															<object class="NSCustomResource" key="NSImage">
 																<string key="NSClassName">NSImage</string>
-																<string key="NSResourceName">PriorityLow</string>
+																<string key="NSResourceName">PriorityNormal</string>
 															</object>
-															<reference key="NSOnImage" ref="354125941"/>
-															<reference key="NSMixedImage" ref="257864062"/>
+															<reference key="NSOnImage" ref="104623380"/>
+															<reference key="NSMixedImage" ref="362275358"/>
 															<string key="NSAction">_popUpItemAction:</string>
-															<int key="NSTag">2</int>
+															<int key="NSTag">1</int>
 															<reference key="NSTarget" ref="664513336"/>
 														</object>
+														<reference ref="914442461"/>
 													</object>
 												</object>
-												<int key="NSSelectedIndex">1</int>
+												<int key="NSSelectedIndex">2</int>
 												<int key="NSPreferredEdge">1</int>
 												<bool key="NSUsesItemFromMenu">YES</bool>
 												<bool key="NSAltersState">YES</bool>
@@ -735,7 +735,6 @@
 						</object>
 					</object>
 					<string key="NSFrameSize">{470, 526}</string>
-					<reference key="NSSuperview"/>
 				</object>
 				<string key="NSScreenRect">{{0, 0}, {1680, 1028}}</string>
 				<string key="NSMinSize">{470, 322}</string>
@@ -964,11 +963,11 @@
 							<reference ref="382094510"/>
 							<reference ref="471778487"/>
 							<reference ref="999003967"/>
+							<reference ref="636183414"/>
+							<reference ref="533609783"/>
 							<reference ref="399642967"/>
 							<reference ref="46983627"/>
 							<reference ref="501735897"/>
-							<reference ref="636183414"/>
-							<reference ref="533609783"/>
 						</object>
 						<reference key="parent" ref="1005"/>
 					</object>
@@ -1159,12 +1158,12 @@
 							<reference ref="224369214"/>
 							<reference ref="711151157"/>
 							<reference ref="485847244"/>
+							<reference ref="38073450"/>
+							<reference ref="1065995789"/>
 							<reference ref="1059202456"/>
 							<reference ref="726814345"/>
 							<reference ref="698797028"/>
 							<reference ref="744550600"/>
-							<reference ref="38073450"/>
-							<reference ref="1065995789"/>
 						</object>
 						<reference key="parent" ref="1006"/>
 					</object>
@@ -1436,9 +1435,9 @@
 				<object class="NSMutableArray" key="dict.values">
 					<bool key="EncodedWithXMLCoder">YES</bool>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>{{428, 263}, {470, 526}}</string>
+					<string>{{81, 330}, {433, 526}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>{{428, 263}, {470, 526}}</string>
+					<string>{{81, 330}, {433, 526}}</string>
 					<integer value="1"/>
 					<string>{196, 240}</string>
 					<string>{{186, 418}, {414, 493}}</string>
@@ -1514,7 +1513,7 @@
 					<integer value="1"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>{{716, 314}, {159, 63}}</string>
+					<string>{{342, 456}, {125, 63}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>{{465, 481}, {173, 33}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -1568,6 +1567,40 @@
 							<string>id</string>
 						</object>
 					</object>
+					<object class="NSMutableDictionary" key="actionInfosByName">
+						<bool key="EncodedWithXMLCoder">YES</bool>
+						<object class="NSArray" key="dict.sortedKeys">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>add:</string>
+							<string>cancelAdd:</string>
+							<string>changePriority:</string>
+							<string>setDestination:</string>
+							<string>verifyLocalData:</string>
+						</object>
+						<object class="NSMutableArray" key="dict.values">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<object class="IBActionInfo">
+								<string key="name">add:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">cancelAdd:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">changePriority:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">setDestination:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">verifyLocalData:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+						</object>
+					</object>
 					<object class="NSMutableDictionary" key="outlets">
 						<bool key="EncodedWithXMLCoder">YES</bool>
 						<object class="NSArray" key="dict.sortedKeys">
@@ -1599,6 +1632,70 @@
 							<string>NSProgressIndicator</string>
 						</object>
 					</object>
+					<object class="NSMutableDictionary" key="toOneOutletInfosByName">
+						<bool key="EncodedWithXMLCoder">YES</bool>
+						<object class="NSArray" key="dict.sortedKeys">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>fDeleteCheck</string>
+							<string>fFileController</string>
+							<string>fGroupPopUp</string>
+							<string>fIconView</string>
+							<string>fLocationField</string>
+							<string>fLocationImageView</string>
+							<string>fNameField</string>
+							<string>fPriorityPopUp</string>
+							<string>fStartCheck</string>
+							<string>fStatusField</string>
+							<string>fVerifyIndicator</string>
+						</object>
+						<object class="NSMutableArray" key="dict.values">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<object class="IBToOneOutletInfo">
+								<string key="name">fDeleteCheck</string>
+								<string key="candidateClassName">NSButton</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">fFileController</string>
+								<string key="candidateClassName">FileOutlineController</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">fGroupPopUp</string>
+								<string key="candidateClassName">NSPopUpButton</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">fIconView</string>
+								<string key="candidateClassName">NSImageView</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">fLocationField</string>
+								<string key="candidateClassName">NSTextField</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">fLocationImageView</string>
+								<string key="candidateClassName">NSImageView</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">fNameField</string>
+								<string key="candidateClassName">NSTextField</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">fPriorityPopUp</string>
+								<string key="candidateClassName">NSPopUpButton</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">fStartCheck</string>
+								<string key="candidateClassName">NSButton</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">fStatusField</string>
+								<string key="candidateClassName">NSTextField</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">fVerifyIndicator</string>
+								<string key="candidateClassName">NSProgressIndicator</string>
+							</object>
+						</object>
+					</object>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>
 						<string key="minorKey">macosx/AddWindowController.h</string>
@@ -1624,9 +1721,45 @@
 							<string>id</string>
 						</object>
 					</object>
+					<object class="NSMutableDictionary" key="actionInfosByName">
+						<bool key="EncodedWithXMLCoder">YES</bool>
+						<object class="NSArray" key="dict.sortedKeys">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>revealFile:</string>
+							<string>setCheck:</string>
+							<string>setOnlySelectedCheck:</string>
+							<string>setPriority:</string>
+						</object>
+						<object class="NSMutableArray" key="dict.values">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<object class="IBActionInfo">
+								<string key="name">revealFile:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">setCheck:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">setOnlySelectedCheck:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">setPriority:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+						</object>
+					</object>
 					<object class="NSMutableDictionary" key="outlets">
 						<string key="NS.key.0">fOutline</string>
 						<string key="NS.object.0">FileOutlineView</string>
+					</object>
+					<object class="NSMutableDictionary" key="toOneOutletInfosByName">
+						<string key="NS.key.0">fOutline</string>
+						<object class="IBToOneOutletInfo" key="NS.object.0">
+							<string key="name">fOutline</string>
+							<string key="candidateClassName">FileOutlineView</string>
+						</object>
 					</object>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>
@@ -2279,6 +2412,13 @@
 					<object class="NSMutableDictionary" key="actions">
 						<string key="NS.key.0">showWindow:</string>
 						<string key="NS.object.0">id</string>
+					</object>
+					<object class="NSMutableDictionary" key="actionInfosByName">
+						<string key="NS.key.0">showWindow:</string>
+						<object class="IBActionInfo" key="NS.object.0">
+							<string key="name">showWindow:</string>
+							<string key="candidateClassName">id</string>
+						</object>
 					</object>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBFrameworkSource</string>
