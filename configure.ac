@@ -406,6 +406,14 @@ case $host_os in
 
 esac
 
+AC_ARG_ENABLE([lightweight],
+              AS_HELP_STRING([--enable-lightweight],[optimize libtransmission for low-resource systems: smaller cache size, prefer unencrypted peer connections, etc.]),
+              [enable_lightweight=${enableval}],
+              [enable_lightweight="no"])
+if test "x$enable_lightweight" = "xyes" ; then 
+  AC_DEFINE([TR_LIGHTWEIGHT],[1],[optimize libtransmission for low-resource systems])
+fi 
+
 AC_ARG_ENABLE([cli],
               [AS_HELP_STRING([--enable-cli],[build command-line client])],
               [build_cli=${enableval}],
@@ -484,6 +492,10 @@ Configuration:
 
    Source code location:                              ${srcdir}
    Compiler:                                          ${CXX}
+
+   Build libtransmission:                             yes
+
+      * optimized for low-resource systems:           ${enable_lightweight}
 
    Build Command-Line client:                         ${build_cli}
 

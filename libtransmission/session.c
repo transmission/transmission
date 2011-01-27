@@ -55,7 +55,11 @@ enum
 {
     SAVE_INTERVAL_SECS = 360,
 
+#ifdef TR_LIGHTWEIGHT
+    DEFAULT_CACHE_SIZE_MB = 2
+#else
     DEFAULT_CACHE_SIZE_MB = 4
+#endif
 };
 
 
@@ -251,7 +255,7 @@ tr_sessionGetPublicAddress( const tr_session * session, int tr_af_type, tr_bool 
 ****
 ***/
 
-#ifdef TR_EMBEDDED
+#ifdef TR_LIGHTWEIGHT
  #define TR_DEFAULT_ENCRYPTION   TR_CLEAR_PREFERRED
 #else
  #define TR_DEFAULT_ENCRYPTION   TR_ENCRYPTION_PREFERRED

@@ -101,7 +101,7 @@ const char * tr_strip_positional_args( const char * fmt );
 
 /* #define DISABLE_GETTEXT */
 #ifndef DISABLE_GETTEXT
- #if defined(WIN32) || defined(TR_EMBEDDED)
+ #if defined(WIN32) || defined(TR_LIGHTWEIGHT)
    #define DISABLE_GETTEXT
  #endif
 #endif
