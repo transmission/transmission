@@ -422,7 +422,7 @@ tr_strip_positional_args( const char* str )
     const char * in = str;
     static size_t bufsize = 0;
     static char * buf = NULL;
-    const size_t  len = strlen( str );
+    const size_t  len = str ? strlen( str ) : 0;
     char *        out;
 
     if( !buf || ( bufsize < len ) )
