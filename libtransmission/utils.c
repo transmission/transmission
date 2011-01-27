@@ -431,7 +431,7 @@ tr_strip_positional_args( const char* str )
         buf = tr_renew( char, buf, bufsize );
     }
 
-    for( out = buf; *str; ++str )
+    for( out = buf; str && *str; ++str )
     {
         *out++ = *str;
 
@@ -450,7 +450,7 @@ tr_strip_positional_args( const char* str )
     }
     *out = '\0';
 
-    return strcmp( buf, in ) ? buf : in;
+    return !in || strcmp( buf, in ) ? buf : in;
 }
 
 /**
