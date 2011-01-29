@@ -12,6 +12,7 @@
 
 #include <assert.h>
 #include <limits.h>
+#include <math.h> /* powl() */
 
 #include <event2/buffer.h>
 #include <event2/event.h>
@@ -607,14 +608,6 @@ publishErrorClear( tr_tier * tier )
 }
 
 static void
-publishErrorMessageAndStop( tr_tier * tier, const char * msg )
-{
-    tier->isRunning = FALSE;
-
-    publishMessage( tier, msg, TR_TRACKER_ERROR );
-}
-
-static void
 publishWarning( tr_tier * tier, const char * msg )
 {
     publishMessage( tier, msg, TR_TRACKER_WARNING );
@@ -1096,20 +1089,9 @@ tierIsNotResponding( const tr_tier * tier, const time_t now )
 static int
 getRetryInterval( const tr_tracker_item * t )
 {
-    int minutes;
-    const int jitter_seconds = tr_cryptoWeakRandInt( 120 );
-
-    switch( t->consecutiveAnnounceFailures ) {
-        case 0:  minutes =  0; break;
-        case 1:  minutes =  1; break;
-        case 2:  minutes =  2; break;
-        case 3:  minutes =  4; break;
-        case 4:  minutes =  8; break;
-        case 5:  minutes = 16; break;
-        default: minutes = 32; break;
-    }
-
-    return ( minutes * 60 ) + jitter_seconds;
+    const int jitter_seconds = tr_cryptoWeakRandInt( 60 );
+    const int minutes = powl( t->consecutiveAnnounceFailures, 2 );
+    return ( MIN( minutes, 128 ) * 60 ) + jitter_seconds;
 }
 
 static int
@@ -1311,28 +1293,55 @@ onAnnounceDone( tr_session   * session,
     tr_announcer * announcer = session->announcer;
     struct announce_data * data = vdata;
     tr_tier * tier = getTier( announcer, data->torrentId, data->tierId );
-    tr_bool gotScrape = FALSE;
-    tr_bool success = FALSE;
-    const time_t now = time ( NULL );
+    const time_t now = tr_time( );
     const char * announceEvent = data->event;
-    const tr_bool isStopped = !strcmp( announceEvent, "stopped" );
 
-    if( announcer && tier )
+    if( tier )
     {
-        if( tier->currentTracker->host )
-        {
-            tr_host * host = tier->currentTracker->host;
-            host->lastRequestTime = data->timeSent;
-            host->lastResponseInterval = now - data->timeSent;
-        }
+        tr_tracker_item * tracker;
 
         tier->lastAnnounceTime = now;
+        tier->lastAnnounceTimedOut = responseCode == 0;
+        tier->lastAnnounceSucceeded = FALSE;
+        tier->isAnnouncing = FALSE;
+        tier->manualAnnounceAllowedAt = now + tier->announceMinIntervalSec;
+
+        if(( tracker = tier->currentTracker ))
+        {
+            ++tracker->consecutiveAnnounceFailures;
+
+            if( tracker->host )
+            {
+                tracker->host->lastRequestTime = data->timeSent;
+                tracker->host->lastResponseInterval = now - data->timeSent;
+            }
+        }
 
         if( responseCode == HTTP_OK )
         {
-            tier->currentTracker->consecutiveAnnounceFailures = 0;
-            success = parseAnnounceResponse( tier, response, responseLen, &gotScrape );
-            dbgmsg( tier, "success is %d", success );
+            tr_bool gotScrape;
+            const tr_bool isStopped = !strcmp( announceEvent, "stopped" );
+
+            if( parseAnnounceResponse( tier, response, responseLen, &gotScrape ) )
+            {
+                tier->lastAnnounceSucceeded = TRUE;
+                tier->isRunning = data->isRunningOnSuccess;
+
+                if(( tracker = tier->currentTracker ))
+                {
+                    tracker->consecutiveAnnounceFailures = 0;
+    
+                    if( tracker->host )
+                        tracker->host->lastSuccessfulRequest = now;
+                }
+
+                if( gotScrape )
+                {
+                    tier->lastScrapeTime = now;
+                    tier->lastScrapeSucceeded = TRUE;
+                    tier->scrapeAt = now + tier->scrapeIntervalSec;
+                }
+            }
 
             if( isStopped )
             {
@@ -1343,128 +1352,48 @@ onAnnounceDone( tr_session   * session,
                 tier->byteCounts[ TR_ANN_DOWN ] = 0;
                 tier->byteCounts[ TR_ANN_CORRUPT ] = 0;
             }
-        }
-        else if( responseCode )
-        {
-            /* %1$ld - http status code, such as 404
-             * %2$s - human-readable explanation of the http status code */
-            char * buf = tr_strdup_printf(
-                _( "tracker gave HTTP Response Code %1$ld (%2$s)" ),
-                responseCode,
-                tr_webGetResponseStr( responseCode ) );
 
-            tr_strlcpy( tier->lastAnnounceStr, buf,
-                        sizeof( tier->lastAnnounceStr ) );
-
-            ++tier->currentTracker->consecutiveAnnounceFailures;
-
-            /* if the response is serious, *and* if the response may require
-             * human intervention, then notify the user... otherwise just log it */
-            if( responseCode >= 400 )
-                if( tr_torrentIsPrivate( tier->tor ) || ( tier->tor->info.trackerCount < 2 ) )
-                    publishWarning( tier, buf );
-            tr_torinf( tier->tor, "%s", buf );
-            dbgmsg( tier, "%s", buf );
-
-            tr_free( buf );
-        }
-        else
-        {
-            tr_strlcpy( tier->lastAnnounceStr,
-                        _( "tracker did not respond" ),
-                        sizeof( tier->lastAnnounceStr ) );
-            dbgmsg( tier, "%s", tier->lastAnnounceStr );
-        }
-    }
-
-    if( tier )
-    {
-        tier->isAnnouncing = FALSE;
-        tier->manualAnnounceAllowedAt = now + tier->announceMinIntervalSec;
-
-        if( responseCode == 0 )
-        {
-            const int interval = getRetryInterval( tier->currentTracker );
-            dbgmsg( tier, "No response from tracker... retrying in %d seconds.", interval );
-            tierAddAnnounce( tier, announceEvent, now + interval );
-        }
-        else if( 200 <= responseCode && responseCode <= 299 )
-        {
-            const int interval = tier->announceIntervalSec;
-            dbgmsg( tier, "request succeeded. reannouncing in %d seconds", interval );
-
-            if( gotScrape )
-            {
-                tier->lastScrapeTime = now;
-                tier->lastScrapeSucceeded = 1;
-                tier->scrapeAt = now + tier->scrapeIntervalSec;
-            }
-
-            /* if we're running and the queue is empty, add the next update */
             if( !isStopped && !tr_ptrArraySize( &tier->announceEvents ) )
             {
+                /* the queue is empty, so enqueue a perodic update */
+                const int interval = tier->announceIntervalSec;
+                dbgmsg( tier, "Sending periodic reannounce in %d seconds", interval );
                 tierAddAnnounce( tier, "", now + interval );
             }
         }
-        else if( 300 <= responseCode && responseCode <= 399 )
-        {
-            /* how did this get here?  libcurl handles this */
-            const int interval = 5;
-            dbgmsg( tier, "got a redirect. retrying in %d seconds", interval );
-            tierAddAnnounce( tier, announceEvent, now + interval );
-        }
-        else if( ( responseCode == 404 ) || ( 500 <= responseCode && responseCode <= 599 ) )
-        {
-            /* 404: The requested resource could not be found but may be
-             * available again in the future. Subsequent requests by
-             * the client are permissible. */
-
-            /* 5xx: indicate cases in which the server is aware that it
-             * has erred or is incapable of performing the request.
-             * So we pause a bit and try again. */
-
-            tierAddAnnounce( tier, announceEvent, now + getRetryInterval( tier->currentTracker ) );
-        }
-        else if( 400 <= responseCode && responseCode <= 499 )
-        {
-            /* The request could not be understood by the server due to
-             * malformed syntax. The client SHOULD NOT repeat the
-             * request without modifications. */
-            if( tr_torrentIsPrivate( tier->tor ) || ( tier->tor->info.trackerCount < 2 ) )
-                publishErrorMessageAndStop( tier, _( "Tracker returned a 4xx message" ) );
-            tier->announceAt = 0;
-            tier->manualAnnounceAllowedAt = ~(time_t)0;
-        }
         else
         {
-            /* WTF did we get?? */
-            const int interval = 120;
-            dbgmsg( tier, "Invalid response from tracker... retrying in two minutes." );
-            tierAddAnnounce( tier, announceEvent, now + interval );
-        }
+            int interval;
 
-        tier->lastAnnounceSucceeded = success;
-        tier->lastAnnounceTimedOut = responseCode == 0;
+            if( !responseCode )
+                tr_strlcpy( tier->lastAnnounceStr,
+                            _( "Tracker did not respond" ),
+                            sizeof( tier->lastAnnounceStr ) );
+            else {
+                /* %1$ld - http status code, such as 404
+                 * %2$s - human-readable explanation of the http status code */
+                tr_snprintf( tier->lastAnnounceStr, sizeof( tier->lastAnnounceStr ),
+                             _( "Tracker gave HTTP response code %1$ld (%2$s)" ),
+                             responseCode,
+                             tr_webGetResponseStr( responseCode ) );
+                if( responseCode >= 400 )
+                    if( tr_torrentIsPrivate( tier->tor ) || ( tier->tor->info.trackerCount == 1 ) )
+                        publishWarning( tier, tier->lastAnnounceStr );
+            }
+            dbgmsg( tier, "%s", tier->lastAnnounceStr );
+            tr_torinf( tier->tor, "%s", tier->lastAnnounceStr );
 
-        if( success )
-        {
-            tier->isRunning = data->isRunningOnSuccess;
-
-            if( tier->currentTracker->host )
-                tier->currentTracker->host->lastSuccessfulRequest = now;
-        }
-        else if( responseCode != HTTP_OK )
-        {
             tierIncrementTracker( tier );
 
-            tr_ptrArrayInsert( &tier->announceEvents, (void*)announceEvent, 0 );
+            /* schedule the next announce */
+            interval = getRetryInterval( tier->currentTracker );
+            dbgmsg( tier, "Retrying announce in %d seconds.", interval );
+            tierAddAnnounce( tier, announceEvent, now + interval );
         }
     }
 
-    if( announcer != NULL )
-    {
+    if( announcer )
         ++announcer->slotsAvailable;
-    }
 
     tr_free( data );
 }
