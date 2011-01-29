@@ -200,7 +200,7 @@ web_response_func( tr_session    * session,
 
             tr_cacheWriteBlock( session->cache, tor,
                                 t->piece_index, t->piece_offset, t->length,
-                                evbuffer_pullup( t->content, -1 ) );
+                                t->content );
             fire_client_got_block( tor, w, t->block );
 
             tr_list_remove_data( &w->tasks, t );

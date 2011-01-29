@@ -17,6 +17,8 @@
 #ifndef TR_CACHE_H
 #define TR_CACHE_H
 
+struct evbuffer;
+
 typedef struct tr_cache tr_cache;
 
 /***
@@ -40,7 +42,7 @@ int tr_cacheWriteBlock( tr_cache         * cache,
                         tr_piece_index_t   piece,
                         uint32_t           offset,
                         uint32_t           len,
-                        const uint8_t    * writeme );
+                        struct evbuffer  * writeme );
 
 int tr_cacheReadBlock( tr_cache         * cache,
                        tr_torrent       * torrent,

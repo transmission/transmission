@@ -1279,7 +1279,7 @@ messageLengthIsCorrect( const tr_peermsgs * msg, uint8_t id, uint32_t len )
 }
 
 static int clientGotBlock( tr_peermsgs *               msgs,
-                           const uint8_t *             block,
+                           struct evbuffer *           block,
                            const struct peer_request * req );
 
 static int
@@ -1335,7 +1335,7 @@ readBtPiece( tr_peermsgs      * msgs,
             return READ_LATER;
 
         /* we've got the whole block ... process it */
-        err = clientGotBlock( msgs, evbuffer_pullup( msgs->incoming.block, -1 ), req );
+        err = clientGotBlock( msgs, msgs->incoming.block, req );
 
         /* cleanup */
         evbuffer_free( msgs->incoming.block );
@@ -1562,7 +1562,7 @@ addPeerToBlamefield( tr_peermsgs * msgs, uint32_t index )
 /* returns 0 on success, or an errno on failure */
 static int
 clientGotBlock( tr_peermsgs *               msgs,
-                const uint8_t *             data,
+                struct evbuffer *           data,
                 const struct peer_request * req )
 {
     int err;

@@ -10,6 +10,8 @@
  * $Id$
  */
 
+#include <event2/buffer.h>
+
 #include "transmission.h"
 #include "cache.h"
 #include "inout.h"
@@ -42,7 +44,7 @@ struct cache_block
     time_t time;
     tr_block_index_t block;
 
-    uint8_t * buf;
+    struct evbuffer * evbuf;
 };
 
 struct tr_cache
@@ -170,9 +172,9 @@ flushContiguous( tr_cache * cache, int pos, int n )
 
     for( i=pos; i<pos+n; ++i ) {
         b = blocks[i];
-        memcpy( walk, b->buf, b->length );
+        evbuffer_copyout( b->evbuf, walk, b->length );
         walk += b->length;
-        tr_free( b->buf );
+        evbuffer_free( b->evbuf );
         tr_free( b );
     }
     tr_ptrArrayErase( &cache->blocks, pos, pos+n );
@@ -319,7 +321,7 @@ tr_cacheWriteBlock( tr_cache         * cache,
                     tr_piece_index_t   piece,
                     uint32_t           offset,
                     uint32_t           length,
-                    const uint8_t    * writeme )
+                    struct evbuffer  * writeme )
 {
     struct cache_block * cb = findBlock( cache, torrent, piece, offset );
 
@@ -331,14 +333,15 @@ tr_cacheWriteBlock( tr_cache         * cache,
         cb->offset = offset;
         cb->length = length;
         cb->block = _tr_block( torrent, piece, offset );
-        cb->buf = NULL;
+        cb->evbuf = evbuffer_new( );
         tr_ptrArrayInsertSorted( &cache->blocks, cb, cache_block_compare );
     }
 
     cb->time = tr_time();
 
-    tr_free( cb->buf );
-    cb->buf = tr_memdup( writeme, cb->length );
+    assert( cb->length == length );
+    evbuffer_drain( cb->evbuf, evbuffer_get_length( cb->evbuf ) );
+    evbuffer_remove_buffer( writeme, cb->evbuf, cb->length );
 
     ++cache->cache_writes;
     cache->cache_write_bytes += cb->length;
@@ -358,7 +361,7 @@ tr_cacheReadBlock( tr_cache         * cache,
     struct cache_block * cb = findBlock( cache, torrent, piece, offset );
 
     if( cb )
-        memcpy( setme, cb->buf, len );
+        evbuffer_copyout( cb->evbuf, setme, len );
     else
         err = tr_ioRead( torrent, piece, offset, len, setme );
 
