@@ -2348,24 +2348,6 @@ tr_sessionSetTorrentFile( tr_session * session,
         tr_bencDictAddStr( session->metainfoLookup, hashString, filename );
 }
 
-tr_torrent*
-tr_torrentNext( tr_session * session,
-                tr_torrent * tor )
-{
-    tr_torrent * ret;
-
-    assert( !session || tr_isSession( session ) );
-
-    if( !session )
-        ret = NULL;
-    else if( !tor )
-        ret = session->torrentList;
-    else
-        ret = tor->next;
-
-    return ret;
-}
-
 /***
 ****
 ***/

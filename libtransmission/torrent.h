@@ -91,9 +91,6 @@ void             tr_torrentSetPieceChecked( tr_torrent       * tor,
 
 void             tr_torrentSetChecked( tr_torrent * tor, time_t when );
 
-tr_torrent*      tr_torrentNext( tr_session  * session,
-                                 tr_torrent  * current );
-
 void             tr_torrentCheckSeedLimit( tr_torrent * tor );
 
 /** save a torrent's .resume file if it's changed since the last time it was saved */
@@ -251,6 +248,12 @@ struct tr_torrent
     tr_idlelimit               idleLimitMode;
     tr_bool                    finishedSeedingByIdle;
 };
+
+static inline tr_torrent*
+tr_torrentNext( tr_session * session, tr_torrent * current )
+{
+    return current ? current->next : session->torrentList;
+}
 
 /* get the index of this piece's first block */
 static inline tr_block_index_t
