@@ -942,35 +942,45 @@ struct SaveNode
 };
 
 static void
-nodeInitDict( struct SaveNode * node, const tr_benc * val )
+nodeInitDict( struct SaveNode * node, const tr_benc * val, tr_bool sort_dicts )
 {
-    int               i, j;
-    int               nKeys;
-    struct KeyIndex * indices;
+    int nKeys;
+    const int n = val->val.l.count;
 
     assert( tr_bencIsDict( val ) );
 
-    nKeys = val->val.l.count / 2;
+    nKeys = n / 2;
     node->val = val;
     node->children = tr_new0( int, nKeys * 2 );
 
-    /* ugh, a dictionary's children have to be sorted by key... */
-    indices = tr_new( struct KeyIndex, nKeys );
-    for( i = j = 0; i < ( nKeys * 2 ); i += 2, ++j )
+    if( sort_dicts )
     {
-        indices[j].key = getStr(&val->val.l.vals[i]);
-        indices[j].index = i;
+        int i, j;
+        struct KeyIndex * indices = tr_new( struct KeyIndex, nKeys );
+        for( i=j=0; i<n; i+=2, ++j )
+        {
+            indices[j].key = getStr(&val->val.l.vals[i]);
+            indices[j].index = i;
+        }
+        qsort( indices, j, sizeof( struct KeyIndex ), compareKeyIndex );
+        for( i = 0; i < j; ++i )
+        {
+            const int index = indices[i].index;
+            node->children[node->childCount++] = index;
+            node->children[node->childCount++] = index + 1;
+        }
+
+        tr_free( indices );
     }
-    qsort( indices, j, sizeof( struct KeyIndex ), compareKeyIndex );
-    for( i = 0; i < j; ++i )
+    else
     {
-        const int index = indices[i].index;
-        node->children[node->childCount++] = index;
-        node->children[node->childCount++] = index + 1;
+        int i ;
+
+        for( i=0; i<n; ++i )
+            node->children[node->childCount++] = i;
     }
 
-    assert( node->childCount == nKeys * 2 );
-    tr_free( indices );
+    assert( node->childCount == n );
 }
 
 static void
@@ -997,13 +1007,13 @@ nodeInitLeaf( struct SaveNode * node, const tr_benc * val )
 }
 
 static void
-nodeInit( struct SaveNode * node, const tr_benc * val )
+nodeInit( struct SaveNode * node, const tr_benc * val, tr_bool sort_dicts )
 {
     static const struct SaveNode INIT_NODE = { NULL, 0, 0, 0, NULL };
     *node = INIT_NODE;
 
          if( tr_bencIsList( val ) ) nodeInitList( node, val );
-    else if( tr_bencIsDict( val ) ) nodeInitDict( node, val );
+    else if( tr_bencIsDict( val ) ) nodeInitDict( node, val, sort_dicts );
     else                            nodeInitLeaf( node, val );
 }
 
@@ -1028,13 +1038,14 @@ struct WalkFuncs
 static void
 bencWalk( const tr_benc          * top,
           const struct WalkFuncs * walkFuncs,
-          void                   * user_data )
+          void                   * user_data,
+          tr_bool                  sort_dicts )
 {
     int stackSize = 0;
     int stackAlloc = 64;
     struct SaveNode * stack = tr_new( struct SaveNode, stackAlloc );
 
-    nodeInit( &stack[stackSize++], top );
+    nodeInit( &stack[stackSize++], top, sort_dicts );
 
     while( stackSize > 0 )
     {
@@ -1086,7 +1097,7 @@ bencWalk( const tr_benc          * top,
                             stackAlloc *= 2;
                             stack = tr_renew( struct SaveNode, stack, stackAlloc );
                         }
-                        nodeInit( &stack[stackSize++], val );
+                        nodeInit( &stack[stackSize++], val, sort_dicts );
                     }
                     break;
 
@@ -1098,7 +1109,7 @@ bencWalk( const tr_benc          * top,
                             stackAlloc *= 2;
                             stack = tr_renew( struct SaveNode, stack, stackAlloc );
                         }
-                        nodeInit( &stack[stackSize++], val );
+                        nodeInit( &stack[stackSize++], val, sort_dicts );
                     }
                     break;
 
@@ -1215,7 +1226,7 @@ void
 tr_bencFree( tr_benc * val )
 {
     if( isSomething( val ) )
-        bencWalk( val, &freeWalkFuncs, NULL );
+        bencWalk( val, &freeWalkFuncs, NULL, FALSE );
 }
 
 /***
@@ -1605,7 +1616,7 @@ tr_bencToBuf( const tr_benc * top, tr_fmt_mode mode, struct evbuffer * buf )
     switch( mode )
     {
         case TR_FMT_BENC:
-            bencWalk( top, &saveFuncs, buf );
+            bencWalk( top, &saveFuncs, buf, TRUE );
             break;
 
         case TR_FMT_JSON:
@@ -1614,7 +1625,7 @@ tr_bencToBuf( const tr_benc * top, tr_fmt_mode mode, struct evbuffer * buf )
             data.doIndent = mode==TR_FMT_JSON;
             data.out = buf;
             data.parents = NULL;
-            bencWalk( top, &jsonWalkFuncs, &data );
+            bencWalk( top, &jsonWalkFuncs, &data, TRUE );
             if( evbuffer_get_length( buf ) )
                 evbuffer_add_printf( buf, "\n" );
             break;
