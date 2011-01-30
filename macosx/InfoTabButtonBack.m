@@ -26,17 +26,53 @@
 
 @implementation InfoTabButtonBack
 
+- (id) initWithFrame: (NSRect) rect
+{
+    if ((self = [super initWithFrame: rect]))
+    {
+        NSColor * lightColor = [NSColor colorWithCalibratedRed: 255.0/255.0 green: 255.0/255.0 blue: 255.0/255.0 alpha: 1.0];
+        NSColor * darkColor = [NSColor colorWithCalibratedRed: 225.0/255.0 green: 225.0/255.0 blue: 225.0/255.0 alpha: 1.0];
+        fGradient = [[NSGradient alloc] initWithStartingColor: lightColor endingColor: darkColor];
+    }
+    return self;
+}
+
+- (void) dealloc
+{
+    [fGradient release];
+    [super dealloc];
+}
+
 - (void) drawRect: (NSRect) rect
 {
-    NSColor * lightColor = [NSColor colorWithCalibratedRed: 255.0/255.0 green: 255.0/255.0 blue: 255.0/255.0 alpha: 1.0];
-    NSColor * darkColor = [NSColor colorWithCalibratedRed: 225.0/255.0 green: 225.0/255.0 blue: 225.0/255.0 alpha: 1.0];
-    NSGradient * gradient = [[NSGradient alloc] initWithStartingColor: darkColor endingColor: lightColor];
-    [gradient drawInRect: rect angle: 90.0];
-    [gradient release];
+    NSInteger count = 0;
+    NSRect gridRects[2];
+    NSColor * colorRects[2];
     
-    [[NSColor grayColor] set];
-    NSRectFill(NSMakeRect(0.0, 0.0, NSWidth(rect), 1.0));
-    NSRectFill(NSMakeRect(0.0, NSHeight(rect) - 1.0, NSWidth(rect), 1.0));
+    NSRect lineBorderRect = NSMakeRect(NSMinX(rect), NSHeight([self bounds]) - 1.0, NSWidth(rect), 1.0);
+    if (NSIntersectsRect(lineBorderRect, rect))
+    {
+        gridRects[count] = lineBorderRect;
+        colorRects[count] = [NSColor grayColor];
+        ++count;
+        
+        rect.size.height -= 1.0;
+    }
+    
+    lineBorderRect.origin.y = 0.0;
+    if (NSIntersectsRect(lineBorderRect, rect))
+    {
+        gridRects[count] = lineBorderRect;
+        colorRects[count] = [NSColor grayColor];
+        ++count;
+        
+        rect.origin.y += 1.0;
+        rect.size.height -= 1.0;
+    }
+    
+    NSRectFillListWithColors(gridRects, colorRects, count);
+    
+    [fGradient drawInRect: rect angle: 270.0];
 }
 
 @end
