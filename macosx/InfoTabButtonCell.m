@@ -96,8 +96,9 @@
                                             iconSize.width, iconSize.height);
         
         [fIcon drawInRect: iconRect fromRect: NSZeroRect operation: NSCompositeSourceOver fraction: 1.0];
-        [tabImage unlockFocus];
     }
+    
+    [tabImage unlockFocus];
     
     [self setImage: tabImage];
     [tabImage release];
