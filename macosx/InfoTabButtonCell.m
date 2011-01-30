@@ -29,11 +29,7 @@
 - (void) awakeFromNib
 {
     [(NSMatrix *)[self controlView] setToolTip: [self title] forCell: self];
-    
-    NSNotificationCenter * nc = [NSNotificationCenter defaultCenter];
-    [nc addObserver: self selector: @selector(updateControlTint:)
-        name: NSControlTintDidChangeNotification object: NSApp];
-    
+        
     fSelected = NO;
     
     //expects the icon to currently be set as the image
@@ -43,8 +39,6 @@
 
 - (void) dealloc
 {
-    [[NSNotificationCenter defaultCenter] removeObserver: self];
-    
     [fIcon release];
     [super dealloc];
 }
@@ -53,34 +47,51 @@
 {
     fSelected = selected;
     
-    NSImage * tabImage;
-    if (fSelected)
-        tabImage = [NSColor currentControlTint] == NSGraphiteControlTint
-                    ? [[NSImage imageNamed: @"InfoTabBackGraphite.png"] copy] : [[NSImage imageNamed: @"InfoTabBackBlue.png"] copy];
+    NSInteger row, col;
+    [(NSMatrix *)[self controlView] getRow: &row column: &col ofCell: self];
+    const NSSize tabSize = [(NSMatrix *)[self controlView] cellFrameAtRow: row column: col].size;
+    const NSRect tabRect = NSMakeRect(0.0, 0.0, tabSize.width, tabSize.height);
+    
+    NSImage * tabImage = [[NSImage alloc] initWithSize: tabSize];
+        
+    [tabImage lockFocus];
+    
+    if (!fSelected)
+    {
+        NSColor * lightColor = [NSColor colorWithCalibratedRed: 255.0/255.0 green: 255.0/255.0 blue: 255.0/255.0 alpha: 1.0];
+        NSColor * darkColor = [NSColor colorWithCalibratedRed: 225.0/255.0 green: 225.0/255.0 blue: 225.0/255.0 alpha: 1.0];
+        NSGradient * gradient = [[NSGradient alloc] initWithStartingColor: darkColor endingColor: lightColor];
+        [gradient drawInRect: tabRect angle: 90.0];
+        [gradient release];
+    }
     else
-        tabImage = [[NSImage imageNamed: @"InfoTabBack.png"] copy];
+    {
+        NSColor * lightColor = [NSColor colorWithCalibratedRed: 160.0/255.0 green: 160.0/255.0 blue: 160.0/255.0 alpha: 1.0];
+        NSColor * darkColor = [NSColor colorWithCalibratedRed: 150.0/255.0 green: 150.0/255.0 blue: 150.0/255.0 alpha: 1.0];
+        NSGradient * gradient = [[NSGradient alloc] initWithStartingColor: darkColor endingColor: lightColor];
+        [gradient drawInRect: tabRect angle: 90.0];
+        [gradient release];
+    }
+    
+    [[NSColor grayColor] set];
+    NSRectFill(NSMakeRect(0.0, 0.0, NSWidth(tabRect), 1.0));
+    NSRectFill(NSMakeRect(0.0, NSHeight(tabRect) - 1.0, NSWidth(tabRect), 1.0));
+    NSRectFill(NSMakeRect(NSWidth(tabRect) - 1.0, 1.0, NSWidth(tabRect) - 1.0, NSHeight(tabRect) - 2.0));
     
     if (fIcon)
     {
-        const NSSize iconSize = [fIcon size], tabSize = [tabImage size];
+        const NSSize iconSize = [fIcon size];
         
         const NSRect iconRect = NSMakeRect(floor((tabSize.width - iconSize.width) * 0.5),
                                             floor((tabSize.height - iconSize.height) * 0.5),
                                             iconSize.width, iconSize.height);
         
-        [tabImage lockFocus];
         [fIcon drawInRect: iconRect fromRect: NSZeroRect operation: NSCompositeSourceOver fraction: 1.0];
         [tabImage unlockFocus];
     }
     
     [self setImage: tabImage];
     [tabImage release];
-}
-
-- (void) updateControlTint: (NSNotification *) notification
-{
-    if (fSelected)
-        [self setSelectedTab: YES];
 }
 
 @end

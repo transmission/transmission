@@ -1691,7 +1691,7 @@ int trashDataFile(const char * filename)
     
     if ([self isFolder])
     {
-        NSInteger count = [self fileCount];
+        const NSInteger count = [self fileCount];
         NSMutableArray * fileList = [NSMutableArray arrayWithCapacity: count],
                     * flatFileList = [NSMutableArray arrayWithCapacity: count];
         

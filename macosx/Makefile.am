@@ -81,6 +81,8 @@ EXTRA_DIST = \
     GroupsPrefsController.m \
     GroupToolbarItem.h \
     GroupToolbarItem.m \
+    InfoTabButtonBack.h \
+    InfoTabButtonBack.m \
     InfoTabButtonCell.h \
     InfoTabButtonCell.m \
     InfoTextField.h \
