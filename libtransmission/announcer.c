@@ -12,7 +12,6 @@
 
 #include <assert.h>
 #include <limits.h>
-#include <math.h> /* powl() */
 
 #include <event2/buffer.h>
 #include <event2/event.h>
@@ -1089,9 +1088,19 @@ tierIsNotResponding( const tr_tier * tier, const time_t now )
 static int
 getRetryInterval( const tr_tracker_item * t )
 {
-    const int jitter_seconds = tr_cryptoWeakRandInt( 60 );
-    const int minutes = powl( t->consecutiveAnnounceFailures, 2 );
-    return ( MIN( minutes, 128 ) * 60 ) + jitter_seconds;
+    int minutes;
+    const unsigned int jitter_seconds = tr_cryptoWeakRandInt( 60 );
+    switch( t->consecutiveAnnounceFailures ) {
+        case 0:  minutes =   1; break;
+        case 1:  minutes =   2; break;
+        case 2:  minutes =   4; break;
+        case 3:  minutes =   8; break;
+        case 4:  minutes =  16; break;
+        case 5:  minutes =  32; break;
+        case 6:  minutes =  64; break;
+        default: minutes = 128; break;
+    }
+    return ( minutes * 60 ) + jitter_seconds;
 }
 
 static int
