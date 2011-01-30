@@ -63,27 +63,29 @@
         
     [tabImage lockFocus];
     
+    NSGradient * gradient;
     if (fSelected)
     {
         NSColor * lightColor = [NSColor colorForControlTint: [NSColor currentControlTint]];
         NSColor * darkColor = [lightColor blendedColorWithFraction: 0.2 ofColor: [NSColor blackColor]];
-        NSGradient * gradient = [[NSGradient alloc] initWithStartingColor: lightColor endingColor: darkColor];
-        [gradient drawInRect: tabRect angle: 270.0];
-        [gradient release];
+        gradient = [[NSGradient alloc] initWithStartingColor: lightColor endingColor: darkColor];
     }
     else
     {
         NSColor * lightColor = [NSColor colorWithCalibratedRed: 245.0/255.0 green: 245.0/255.0 blue: 245.0/255.0 alpha: 1.0];
         NSColor * darkColor = [NSColor colorWithCalibratedRed: 215.0/255.0 green: 215.0/255.0 blue: 215.0/255.0 alpha: 1.0];
-        NSGradient * gradient = [[NSGradient alloc] initWithStartingColor: lightColor endingColor: darkColor];
-        [gradient drawInRect: tabRect angle: 270.0];
-        [gradient release];
+        gradient = [[NSGradient alloc] initWithStartingColor: lightColor endingColor: darkColor];
     }
     
     [[NSColor grayColor] set];
     NSRectFill(NSMakeRect(0.0, 0.0, NSWidth(tabRect), 1.0));
     NSRectFill(NSMakeRect(0.0, NSHeight(tabRect) - 1.0, NSWidth(tabRect), 1.0));
     NSRectFill(NSMakeRect(NSWidth(tabRect) - 1.0, 1.0, NSWidth(tabRect) - 1.0, NSHeight(tabRect) - 2.0));
+    
+    tabRect = NSMakeRect(0.0, 1.0, NSWidth(tabRect) - 1.0, NSHeight(tabRect) - 2.0);
+    
+    [gradient drawInRect: tabRect angle: 270.0];
+    [gradient release];
     
     if (fIcon)
     {
