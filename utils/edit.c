@@ -156,6 +156,8 @@ replaceSubstr( const char * str, const char * in, const char * out )
         str = walk + inlen;
     }
 
+    evbuffer_add( buf, str, strlen( str ) );
+
     return evbuffer_free_to_str( buf );
 }
 
