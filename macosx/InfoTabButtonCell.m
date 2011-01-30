@@ -91,8 +91,8 @@
     {
         const NSSize iconSize = [fIcon size];
         
-        const NSRect iconRect = NSMakeRect(floor((NSWidth(tabRect) - iconSize.width) * 0.5),
-                                            floor((NSHeight(tabRect) - iconSize.height) * 0.5),
+        const NSRect iconRect = NSMakeRect(NSMinX(tabRect) + floor((NSWidth(tabRect) - iconSize.width) * 0.5),
+                                            NSMinY(tabRect) + floor((NSHeight(tabRect) - iconSize.height) * 0.5),
                                             iconSize.width, iconSize.height);
         
         [fIcon drawInRect: iconRect fromRect: NSZeroRect operation: NSCompositeSourceOver fraction: 1.0];
