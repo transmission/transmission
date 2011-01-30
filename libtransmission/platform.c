@@ -369,12 +369,18 @@ moveFiles( const char * oldDir,
     }
 }
 
+/**
+ * This function is for transmission-gtk users to migrate the config files
+ * from $HOME/.transmission/ (where they were kept before Transmission 1.30)
+ * to $HOME/.config/$appname as per the XDG directory spec.
+ */
 static void
 migrateFiles( const tr_session * session )
 {
     static int migrated = FALSE;
+    const tr_bool should_migrate = strstr( getOldConfigDir(), ".transmission" ) != NULL;
 
-    if( !migrated )
+    if( !migrated && should_migrate )
     {
         const char * oldDir;
         const char * newDir;
