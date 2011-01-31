@@ -417,8 +417,8 @@ main( void )
     /* base64 */
     out = tr_base64_encode( "YOYO!", -1, &len );
     check( out );
-    check( !strcmp( out, "WU9ZTyE=\n" ) );
-    check( len == 9 );
+    check( !strcmp( out, "WU9ZTyE=" ) );
+    check( len == 8 );
     in = tr_base64_decode( out, -1, &len );
     check( in );
     check( !strcmp( in, "YOYO!" ) );

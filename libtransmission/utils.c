@@ -1154,6 +1154,7 @@ tr_base64_encode( const void * input, int length, int * setme_len )
 
         bmem = BIO_new( BIO_s_mem( ) );
         b64 = BIO_new( BIO_f_base64( ) );
+        BIO_set_flags( b64, BIO_FLAGS_BASE64_NO_NL );
         b64 = BIO_push( b64, bmem );
         BIO_write( b64, input, length );
         (void) BIO_flush( b64 );
