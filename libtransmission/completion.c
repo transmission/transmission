@@ -345,15 +345,53 @@ tr_cpFileIsComplete( const tr_completion * cp, tr_file_index_t fileIndex )
 
     const tr_torrent * tor = cp->tor;
     const tr_file * file = &tor->info.files[fileIndex];
-    const tr_block_index_t firstBlock = file->offset / tor->blockSize;
-    const tr_block_index_t lastBlock = file->length ? ( ( file->offset + file->length - 1 ) / tor->blockSize ) : firstBlock;
 
-    assert( tr_torBlockPiece( tor, firstBlock ) == file->firstPiece );
-    assert( tr_torBlockPiece( tor, lastBlock ) == file->lastPiece );
+    if( file->firstPiece == file->lastPiece )
+    {
+        const tr_block_index_t firstBlock = file->offset / tor->blockSize;
+        const tr_block_index_t lastBlock = file->length ? ( ( file->offset + file->length - 1 ) / tor->blockSize ) : firstBlock;
+        for( block=firstBlock; block<=lastBlock; ++block )
+            if( !tr_cpBlockIsCompleteFast( cp, block ) )
+                return FALSE;
+    }
+    else
+    {
+        tr_piece_index_t piece;
+        tr_block_index_t firstBlock;
+        tr_block_index_t firstBlockInLastPiece;
+        tr_block_index_t lastBlock;
+        tr_block_index_t lastBlockInFirstPiece;
+        uint64_t lastByteInFirstPiece;
+        uint64_t firstByteInLastPiece;
 
-    for( block=firstBlock; block<=lastBlock; ++block )
-        if( !tr_cpBlockIsCompleteFast( cp, block ) )
-            return FALSE;
+        /* go piece-by-piece in the middle pieces... it's faster than block-by-block */
+        for( piece=file->firstPiece+1; piece<file->lastPiece; ++piece )
+            if( !tr_cpPieceIsComplete( cp, piece ) )
+                return FALSE;
+
+        /* go block-by-block in the first piece */
+        firstBlock = file->offset / tor->blockSize;
+        lastByteInFirstPiece = ( (uint64_t)(file->firstPiece+1) * tor->info.pieceSize ) - 1;
+        lastBlockInFirstPiece = lastByteInFirstPiece / tor->blockSize;
+        assert( lastBlockInFirstPiece >= firstBlock );
+        assert( lastBlockInFirstPiece - firstBlock <= tr_torPieceCountBlocks( tor, file->firstPiece ) );
+        for( block=firstBlock; block<=lastBlockInFirstPiece; ++block )
+            if( !tr_cpBlockIsCompleteFast( cp, block ) )
+                return FALSE;
+
+        /* go block-by-block in the last piece */
+        lastBlock = file->length ? ( ( file->offset + file->length - 1 ) / tor->blockSize ) : firstBlock;
+        firstByteInLastPiece = (uint64_t)file->lastPiece * tor->info.pieceSize;
+        firstBlockInLastPiece = firstByteInLastPiece / tor->blockSize;
+        assert( firstBlockInLastPiece <= lastBlock );
+        assert( firstBlockInLastPiece >= firstBlock );
+        assert( firstBlockInLastPiece >= lastBlockInFirstPiece );
+        assert( lastBlock - firstBlockInLastPiece <= tr_torPieceCountBlocks( tor, file->lastPiece ) );
+        for( block=firstBlockInLastPiece; block<=lastBlock; ++block )
+            if( !tr_cpBlockIsCompleteFast( cp, block ) )
+                return FALSE;
+    }
 
     return TRUE;
+
 }
