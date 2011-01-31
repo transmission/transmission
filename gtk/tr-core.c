@@ -90,7 +90,8 @@ struct TrCorePrivate
     gboolean        dbus_error;
     guint           inhibit_cookie;
     gint            busy_count;
-    GtkTreeModel *  model;
+    GtkTreeModel *  raw_model;
+    GtkTreeModel *  sorted_model;
     tr_session *    session;
 };
 
@@ -214,6 +215,28 @@ tr_core_class_init( gpointer              g_class,
         }
     }
 #endif
+}
+
+/***
+****
+***/
+
+static GtkTreeModel *
+tr_core_raw_model( TrCore * core )
+{
+    return isDisposed( core ) ? NULL : core->priv->raw_model;
+}
+
+GtkTreeModel *
+tr_core_model( TrCore * core )
+{
+    return isDisposed( core ) ? NULL : core->priv->sorted_model;
+}
+
+tr_session *
+tr_core_session( TrCore * core )
+{
+    return isDisposed( core ) ? NULL : core->priv->session;
 }
 
 /***
@@ -446,16 +469,12 @@ compareByState( GtkTreeModel * m, GtkTreeIter * a, GtkTreeIter * b, gpointer use
 }
 
 static void
-setSort( TrCore *     core,
-         const char * mode,
-         gboolean     isReversed  )
+setSort( TrCore * core, const char * mode, gboolean isReversed  )
 {
-    const int              col = MC_TORRENT_RAW;
+    const int col = MC_TORRENT_RAW;
     GtkTreeIterCompareFunc sort_func;
-    GtkSortType            type =
-        isReversed ? GTK_SORT_ASCENDING : GTK_SORT_DESCENDING;
-    GtkTreeSortable *      sortable =
-        GTK_TREE_SORTABLE( tr_core_model( core ) );
+    GtkSortType type = isReversed ? GTK_SORT_ASCENDING : GTK_SORT_DESCENDING;
+    GtkTreeSortable * sortable = GTK_TREE_SORTABLE( tr_core_model( core ) );
 
     if( !strcmp( mode, "sort-by-activity" ) )
         sort_func = compareByActivity;
@@ -768,7 +787,8 @@ tr_core_init( GTypeInstance *  instance,
     g_assert( G_N_ELEMENTS( types ) == MC_ROW_COUNT );
     store = gtk_list_store_newv( MC_ROW_COUNT, types );
 
-    p->model    = GTK_TREE_MODEL( store );
+    p->raw_model = GTK_TREE_MODEL( store );
+    p->sorted_model = gtk_tree_model_sort_new_with_model( p->raw_model );
 
 #ifdef HAVE_DBUS_GLIB
     if( our_instance_adds_remote_torrents )
@@ -844,18 +864,6 @@ tr_core_close( TrCore * core )
     }
 }
 
-GtkTreeModel *
-tr_core_model( TrCore * core )
-{
-    return isDisposed( core ) ? NULL : core->priv->model;
-}
-
-tr_session *
-tr_core_session( TrCore * core )
-{
-    return isDisposed( core ) ? NULL : core->priv->session;
-}
-
 static char*
 get_collated_name( const tr_info * inf )
 {
@@ -866,16 +874,14 @@ get_collated_name( const tr_info * inf )
 }
 
 void
-tr_core_add_torrent( TrCore     * self,
-                     TrTorrent  * gtor,
-                     gboolean     doNotify )
+tr_core_add_torrent( TrCore * self, TrTorrent * gtor, gboolean doNotify )
 {
     const tr_info * inf = tr_torrent_info( gtor );
     const tr_stat * st = tr_torrent_stat( gtor );
     tr_torrent * tor = tr_torrent_handle( gtor );
     char *  collated = get_collated_name( inf );
     char *  trackers = torrentTrackerString( tor );
-    GtkListStore *  store = GTK_LIST_STORE( tr_core_model( self ) );
+    GtkListStore *  store = GTK_LIST_STORE( tr_core_raw_model( self ) );
     GtkTreeIter  unused;
 
     gtk_list_store_insert_with_values( store, &unused, 0,
@@ -1213,21 +1219,19 @@ tr_core_torrents_added( TrCore * self )
 }
 
 static gboolean
-findTorrentInModel( TrCore *      core,
-                    int           id,
-                    GtkTreeIter * setme )
+findTorrentInRawModel( TrCore * core, int id, GtkTreeIter * setme )
 {
-    int            match = 0;
-    GtkTreeIter    iter;
-    GtkTreeModel * model = tr_core_model( core );
+    int match = 0;
+    GtkTreeIter iter;
+    GtkTreeModel * model = tr_core_raw_model( core );
 
     if( gtk_tree_model_iter_children( model, &iter, NULL ) ) do
-        {
-            tr_torrent * tor;
-            gtk_tree_model_get( model, &iter, MC_TORRENT_RAW, &tor, -1 );
-            match = tr_torrentId( tor ) == id;
-        }
-        while( !match && gtk_tree_model_iter_next( model, &iter ) );
+    {
+        tr_torrent * tor;
+        gtk_tree_model_get( model, &iter, MC_TORRENT_RAW, &tor, -1 );
+        match = tr_torrentId( tor ) == id;
+    }
+    while( !match && gtk_tree_model_iter_next( model, &iter ) );
 
     if( match )
         *setme = iter;
@@ -1249,11 +1253,11 @@ tr_core_remove_torrent_from_id( TrCore * core, int id, gboolean deleteFiles )
 {
     GtkTreeIter iter;
 
-    if( findTorrentInModel( core, id, &iter ) )
+    if( findTorrentInRawModel( core, id, &iter ) )
     {
         TrTorrent * gtor = NULL;
         tr_torrent * tor = NULL;
-        GtkTreeModel * model = tr_core_model( core );
+        GtkTreeModel * model = tr_core_raw_model( core );
 
         gtk_tree_model_get( model, &iter, MC_TORRENT, &gtor,
                                           MC_TORRENT_RAW, &tor,
@@ -1360,27 +1364,13 @@ update_foreach( GtkTreeModel * model,
 }
 
 void
-tr_core_update( TrCore * self )
+tr_core_update( TrCore * core )
 {
-    int               column;
-    GtkSortType       order;
-    GtkTreeSortable * sortable;
-    GtkTreeModel *    model = tr_core_model( self );
-
-    /* pause sorting */
-    sortable = GTK_TREE_SORTABLE( model );
-    gtk_tree_sortable_get_sort_column_id( sortable, &column, &order );
-    gtk_tree_sortable_set_sort_column_id(
-        sortable, GTK_TREE_SORTABLE_UNSORTED_SORT_COLUMN_ID, order );
-
     /* refresh the model */
-    gtk_tree_model_foreach( model, update_foreach, NULL );
-
-    /* resume sorting */
-    gtk_tree_sortable_set_sort_column_id( sortable, column, order );
+    gtk_tree_model_foreach( tr_core_raw_model( core ), update_foreach, NULL );
 
     /* maybe inhibit hibernation */
-    maybeInhibitHibernation( self );
+    maybeInhibitHibernation( core );
 }
 
 /**
@@ -1747,7 +1737,7 @@ void
 tr_core_torrent_changed( TrCore * core, int id )
 {
     GtkTreeIter iter;
-    GtkTreeModel * model = tr_core_model( core );
+    GtkTreeModel * model = tr_core_raw_model( core );
 
     if( gtk_tree_model_get_iter_first( model, &iter ) ) do
     {
@@ -1767,15 +1757,15 @@ tr_core_torrent_changed( TrCore * core, int id )
 size_t
 tr_core_get_torrent_count( TrCore * core )
 {
-    return gtk_tree_model_iter_n_children( tr_core_model( core ), NULL );
+    return gtk_tree_model_iter_n_children( tr_core_raw_model( core ), NULL );
 }
 
 size_t
 tr_core_get_active_torrent_count( TrCore * core )
 {
     GtkTreeIter iter;
-    GtkTreeModel * model = tr_core_model( core );
     size_t activeCount = 0;
+    GtkTreeModel * model = tr_core_raw_model( core );
 
     if( gtk_tree_model_get_iter_first( model, &iter ) ) do
     {
