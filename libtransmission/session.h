@@ -91,6 +91,7 @@ struct tr_session
     tr_bool                      isDHTEnabled;
     tr_bool                      isLPDEnabled;
     tr_bool                      isBlocklistEnabled;
+    tr_bool                      isPrefetchEnabled;
     tr_bool                      isTorrentDoneScriptEnabled;
     tr_bool                      isClosed;
     tr_bool                      useLazyBitfield;

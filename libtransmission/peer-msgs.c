@@ -1196,6 +1196,9 @@ prefetchPieces( tr_peermsgs *msgs )
 {
     int i;
 
+    if( !getSession(msgs)->isPrefetchEnabled )
+        return;
+
     /* Maintain 12 prefetched blocks per unchoked peer */
     for( i=msgs->prefetchCount; i<msgs->peer->pendingReqsToClient && i<12; ++i )
     {
