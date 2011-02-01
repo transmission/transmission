@@ -70,10 +70,12 @@ get_name_from_host( const char * host )
     char * name;
     const char * dot = strrchr( host, '.' );
 
-    if( dot == NULL )
+    if( tr_addressIsIP( host ) )
         name = g_strdup( host );
-    else
+    else if( dot )
         name = g_strndup( host, dot - host );
+    else
+        name = g_strdup( host );
 
     *name = g_ascii_toupper( *name );
 
