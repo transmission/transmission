@@ -1200,7 +1200,7 @@ wannaquit( gpointer vdata )
     gtk_widget_grab_focus( w );
 
     /* clear the UI */
-    gtk_list_store_clear( GTK_LIST_STORE( tr_core_model( cbdata->core ) ) );
+    tr_core_clear( cbdata->core );
 
     /* ensure the window is in its previous position & size.
      * this seems to be necessary because changing the main window's

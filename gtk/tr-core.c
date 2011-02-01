@@ -929,6 +929,12 @@ tr_core_load( TrCore * self, gboolean forcePaused )
     tr_ctorFree( ctor );
 }
 
+void
+tr_core_clear( TrCore * self )
+{
+    gtk_list_store_clear( GTK_LIST_STORE( tr_core_raw_model( self ) ) );
+}
+
 /***
 ****
 ***/
