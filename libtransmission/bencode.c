@@ -944,14 +944,13 @@ struct SaveNode
 static void
 nodeInitDict( struct SaveNode * node, const tr_benc * val, tr_bool sort_dicts )
 {
-    int nKeys;
     const int n = val->val.l.count;
+    const int nKeys = n / 2;
 
     assert( tr_bencIsDict( val ) );
 
-    nKeys = n / 2;
     node->val = val;
-    node->children = tr_new0( int, nKeys * 2 );
+    node->children = tr_new0( int, n );
 
     if( sort_dicts )
     {
@@ -974,7 +973,7 @@ nodeInitDict( struct SaveNode * node, const tr_benc * val, tr_bool sort_dicts )
     }
     else
     {
-        int i ;
+        int i;
 
         for( i=0; i<n; ++i )
             node->children[node->childCount++] = i;
