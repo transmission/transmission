@@ -1040,5 +1040,6 @@ gtr_file_list_new( TrCore * core, int torrentId )
     g_object_set_data_full( G_OBJECT( ret ), "file-data", data, freeData );
     gtr_file_list_set_torrent( ret, torrentId );
 
+    pango_font_description_free( pango_font_description );
     return ret;
 }
