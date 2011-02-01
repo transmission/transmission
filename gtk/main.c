@@ -396,6 +396,8 @@ registerMagnetLinkHandler( void )
         gconf_client_set_bool( client, "/desktop/gnome/url-handlers/magnet/enabled", TRUE, NULL );
         tr_inf( "Transmission registered as default magnet link handler" );
     }
+
+    g_object_unref( G_OBJECT( client ) );
 #endif
 }
 
@@ -604,9 +606,11 @@ applyDesktopProxySettings( CURL * easy, GConfClient * client, const char * host_
     if(( value = gconf_client_get( client, host_key, NULL )))
     {
         const char * url = gconf_value_get_string( value );
+
         if( url && *url )
         {
             char * scheme = NULL;
+            GConfValue * port_value;
 
             if( !tr_urlParse( url, strlen( url ), &scheme, NULL, NULL, NULL ) )
             {
@@ -621,12 +625,20 @@ applyDesktopProxySettings( CURL * easy, GConfClient * client, const char * host_
             curl_easy_setopt( easy, CURLOPT_PROXY, url );
 
             if( port_key != NULL )
-                if(( value = gconf_client_get( client, port_key, NULL )))
+            {
+                if(( port_value = gconf_client_get( client, port_key, NULL )))
+                {
                     if(( port = gconf_value_get_int( value )))
                         curl_easy_setopt( easy, CURLOPT_PROXYPORT, (long)port );
 
+                    gconf_value_free( port_value );
+                }
+            }
+
             tr_free( scheme );
         }
+
+        gconf_value_free( value );
     }
 }
 #endif
@@ -635,7 +647,6 @@ static void
 curlConfigFunc( tr_session * session UNUSED, void * vcurl UNUSED, const char * destination )
 {
 #ifdef HAVE_GCONF2
-    const char * str;
     GConfValue * value;
     CURL * easy = vcurl;
     gboolean use_http_proxy = TRUE;
@@ -644,7 +655,7 @@ curlConfigFunc( tr_session * session UNUSED, void * vcurl UNUSED, const char * d
     /* get GNOME's proxy mode */
     if(( value = gconf_client_get( client, "/system/proxy/mode", NULL )))
     {
-        char * mode = g_strdup( gconf_value_get_string( value ) );
+        const char * mode = gconf_value_get_string( value );
 
         if( !gtr_strcmp0( mode, "auto" ) )
         {
@@ -670,36 +681,48 @@ curlConfigFunc( tr_session * session UNUSED, void * vcurl UNUSED, const char * d
             tr_free( scheme );
         }
 
-        g_free( mode );
+        gconf_value_free( value );
     }
 
     /* if this the proxy hasn't been handled yet and "use_http_proxy" is disabled, then don't use a proxy */
-    if( use_http_proxy )
-        if(( value = gconf_client_get( client, "/system/http_proxy/use_http_proxy", NULL )))
+    if( use_http_proxy ) {
+        if(( value = gconf_client_get( client, "/system/http_proxy/use_http_proxy", NULL ))) {
             use_http_proxy = gconf_value_get_bool( value ) != 0;
+            gconf_value_free( value );
+        }
+    }
 
     if( use_http_proxy )
     {
+        gboolean auth = FALSE;
         applyDesktopProxySettings( easy, client, "/system/http_proxy/host", "/system/http_proxy/port" );
 
-        if((( value = gconf_client_get( client, "/system/http_proxy/use_authentication", NULL ))) &&  gconf_value_get_bool( value ))
+        if(( value = gconf_client_get( client, "/system/http_proxy/use_authentication", NULL )))
         {
-            const char * user = NULL;
-            const char * pass = NULL;
+            auth = gconf_value_get_bool( value );
+            gconf_value_free( value );
+        }
 
-            if(( value = gconf_client_get( client, "/system/http_proxy/authentication_user", NULL )))
-                user = str = gconf_value_get_string( value );
-            if(( value = gconf_client_get( client, "/system/http_proxy/authentication_password", NULL )))
-                pass = str = gconf_value_get_string( value );
+        if( auth )
+        {
+            GConfValue * user_value = gconf_client_get( client, "/system/http_proxy/authentication_user", NULL );
+            const char * user = ( user_value != NULL ) ? gconf_value_get_string( user_value ) : NULL;
+            GConfValue * pass_value = gconf_client_get( client, "/system/http_proxy/authentication_password", NULL );
+            const char * pass = ( pass_value != NULL ) ? gconf_value_get_string( pass_value ) : NULL;
 
-           if( ( user != NULL ) && ( pass != NULL ) )
-           {
-               char * userpass = g_strdup_printf( "%s:%s", user, pass );
-               curl_easy_setopt( easy, CURLOPT_PROXYUSERPWD, userpass );
-               g_free( userpass );
-           }
-       }
+            if( ( user != NULL ) && ( pass != NULL ) )
+            {
+                char * userpass = g_strdup_printf( "%s:%s", user, pass );
+                curl_easy_setopt( easy, CURLOPT_PROXYUSERPWD, userpass );
+                g_free( userpass );
+            }
+
+            if( pass_value ) gconf_value_free( pass_value );
+            if( user_value ) gconf_value_free( user_value );
+        }
     }
+
+    g_object_unref( G_OBJECT( client ) );
 #endif
 }
 
