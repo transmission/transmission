@@ -771,6 +771,7 @@ tr_core_init( GTypeInstance *  instance,
                       G_TYPE_POINTER,   /* tr_torrent* */
                       G_TYPE_DOUBLE,    /* tr_stat.pieceUploadSpeed_KBps */
                       G_TYPE_DOUBLE,    /* tr_stat.pieceDownloadSpeed_KBps */
+                      G_TYPE_DOUBLE,    /* tr_stat.recheckProgress */
                       G_TYPE_BOOLEAN,   /* filter.c:ACTIVITY_FILTER_ACTIVE */
                       G_TYPE_INT,       /* tr_stat.activity */
                       G_TYPE_UCHAR,     /* tr_stat.finished */
@@ -885,18 +886,19 @@ tr_core_add_torrent( TrCore * self, TrTorrent * gtor, gboolean doNotify )
     GtkTreeIter  unused;
 
     gtk_list_store_insert_with_values( store, &unused, 0,
-                                       MC_NAME,          inf->name,
-                                       MC_NAME_COLLATED, collated,
-                                       MC_TORRENT,       gtor,
-                                       MC_TORRENT_RAW,   tor,
-                                       MC_SPEED_UP,      st->pieceUploadSpeed_KBps,
-                                       MC_SPEED_DOWN,    st->pieceDownloadSpeed_KBps,
-                                       MC_ACTIVE,        isTorrentActive( st ),
-                                       MC_ACTIVITY,      st->activity,
-                                       MC_FINISHED,      st->finished,
-                                       MC_PRIORITY,      tr_torrentGetPriority( tor ),
-                                       MC_TRACKERS,      trackers,
-                                       -1 );
+        MC_NAME,              inf->name,
+        MC_NAME_COLLATED,     collated,
+        MC_TORRENT,           gtor,
+        MC_TORRENT_RAW,       tor,
+        MC_SPEED_UP,          st->pieceUploadSpeed_KBps,
+        MC_SPEED_DOWN,        st->pieceDownloadSpeed_KBps,
+        MC_RECHECK_PROGRESS,  st->recheckProgress,
+        MC_ACTIVE,            isTorrentActive( st ),
+        MC_ACTIVITY,          st->activity,
+        MC_FINISHED,          st->finished,
+        MC_PRIORITY,          tr_torrentGetPriority( tor ),
+        MC_TRACKERS,          trackers,
+        -1 );
 
     if( doNotify )
         gtr_notify_added( inf->name );
@@ -1299,6 +1301,7 @@ update_foreach( GtkTreeModel * model,
     char * oldTrackers, * newTrackers;
     double oldUpSpeed, newUpSpeed;
     double oldDownSpeed, newDownSpeed;
+    double oldRecheckProgress, newRecheckProgress;
     gboolean oldActive, newActive;
     const tr_stat * st;
     TrTorrent * gtor;
@@ -1316,6 +1319,7 @@ update_foreach( GtkTreeModel * model,
                         MC_PRIORITY, &oldPriority,
                         MC_TRACKERS, &oldTrackers,
                         MC_SPEED_UP, &oldUpSpeed,
+                        MC_RECHECK_PROGRESS, &oldRecheckProgress,
                         MC_SPEED_DOWN, &oldDownSpeed,
                         -1 );
 
@@ -1329,6 +1333,7 @@ update_foreach( GtkTreeModel * model,
     newTrackers = torrentTrackerString( tor );
     newUpSpeed = st->pieceUploadSpeed_KBps;
     newDownSpeed = st->pieceDownloadSpeed_KBps;
+    newRecheckProgress = st->recheckProgress;
     newActivePeerCount = st->peersSendingToUs + st->peersGettingFromUs + st->webseedsSendingToUs;
     newError = st->error;
     newCollatedName = get_collated_name( tr_torrent_info( gtor ) );
@@ -1344,7 +1349,8 @@ update_foreach( GtkTreeModel * model,
         || gtr_strcmp0( oldTrackers, newTrackers )
         || gtr_strcmp0( oldCollatedName, newCollatedName )
         || gtr_compare_double( newUpSpeed, oldUpSpeed, 3 )
-        || gtr_compare_double( newDownSpeed, oldDownSpeed, 3 ) )
+        || gtr_compare_double( newDownSpeed, oldDownSpeed, 3 )
+        || gtr_compare_double( newRecheckProgress, oldRecheckProgress, 2 ) )
     {
         gtk_list_store_set( GTK_LIST_STORE( model ), iter,
                             MC_ACTIVE, newActive,
@@ -1357,6 +1363,7 @@ update_foreach( GtkTreeModel * model,
                             MC_TRACKERS, newTrackers,
                             MC_SPEED_UP, newUpSpeed,
                             MC_SPEED_DOWN, newDownSpeed,
+                            MC_RECHECK_PROGRESS, newRecheckProgress,
                             -1 );
     }
 
