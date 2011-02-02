@@ -586,11 +586,10 @@ tr_dhtCallback(unsigned char *buf, int buflen,
                struct sockaddr *from, socklen_t fromlen,
                void *sv )
 {
-    tr_session *ss = (tr_session*)sv;
     time_t tosleep;
     int rc;
 
-    assert(tr_isSession(ss));
+    assert(tr_isSession(sv));
 
     if(sv != session)
         return;

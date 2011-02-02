@@ -112,15 +112,14 @@ rebind_ipv6(tr_session *ss, tr_bool force)
 }
 
 static void
-event_callback(int s, short type, void *sv)
+event_callback(int s, short type UNUSED, void *sv)
 {
-    tr_session *ss = (tr_session*)sv;
     unsigned char *buf;
     struct sockaddr_storage from;
     socklen_t fromlen;
     int rc;
 
-    assert(tr_isSession(ss));
+    assert(tr_isSession(sv));
     assert(type == EV_READ);
 
     buf = malloc(4096);
