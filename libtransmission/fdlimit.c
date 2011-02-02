@@ -180,6 +180,19 @@ preallocate_file_full( const char * filename, uint64_t length )
     return success;
 }
 
+
+/* portability wrapper for fsync(). */
+int
+tr_fsync( int fd )
+{
+#ifdef WIN32
+    return _commit( fd );
+#else
+    return fsync( fd );
+#endif
+}
+
+
 /* Like pread and pwrite, except that the position is undefined afterwards.
    And of course they are not thread-safe. */
 
@@ -295,7 +308,7 @@ tr_close_file( int fd )
      * but it couldn't hurt... */
     fcntl( fd, F_NOCACHE, 1 );
 #endif
-    fsync( fd );
+    tr_fsync( fd );
     close( fd );
 }
 

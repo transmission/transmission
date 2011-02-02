@@ -1660,17 +1660,6 @@ tr_mkstemp( char * template )
 #endif
 }
 
-/* portability wrapper for fsync(). */
-static void
-tr_fsync( int fd )
-{
-#ifdef WIN32
-    _commit( fd );
-#else
-    fsync( fd );
-#endif
-}
-
 int
 tr_bencToFile( const tr_benc * top, tr_fmt_mode mode, const char * filename )
 {
