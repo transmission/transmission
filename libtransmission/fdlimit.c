@@ -308,7 +308,6 @@ tr_close_file( int fd )
      * but it couldn't hurt... */
     fcntl( fd, F_NOCACHE, 1 );
 #endif
-    tr_fsync( fd );
     close( fd );
 }
 
@@ -526,7 +525,14 @@ tr_fdFileClose( tr_session * s, const tr_torrent * tor, tr_file_index_t i )
     struct tr_cached_file * o;
 
     if(( o = fileset_lookup( get_fileset( s ), tr_torrentId( tor ), i )))
+    {
+        /* flush writable files so that their mtimes will be
+         * up-to-date when this function returns to the caller... */
+        if( o->is_writable )
+            tr_fsync( o->fd );
+
         cached_file_close( o );
+    }
 }
 
 int
