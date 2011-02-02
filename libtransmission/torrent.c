@@ -2951,21 +2951,30 @@ tr_torrentFileCompleted( tr_torrent * tor, tr_file_index_t fileNum )
 {
     char * sub;
     const char * base;
+    const tr_info * inf = &tor->info;
+    const tr_file * f = &inf->files[fileNum];
+    tr_piece * p;
+    const tr_piece * pend;
+    const time_t now = tr_time( );
 
     /* close the file so that we can reopen in read-only mode as needed */
     tr_fdFileClose( tor->session, tor, fileNum );
+
+    /* now that the file is complete and closed, we can start watching its
+     * mtime timestamp for changes to know if we need to reverify pieces */
+    fprintf( stderr, "file %d completed.. setting all files' timestamps to %zu (%s)\n", (int)fileNum, (size_t)now, f->name );
+    for( p=&inf->pieces[f->firstPiece], pend=&inf->pieces[f->lastPiece]; p!=pend; ++p )
+        p->timeChecked = now;
 
     /* if the torrent's current filename isn't the same as the one in the
      * metadata -- for example, if it had the ".part" suffix appended to
      * it until now -- then rename it to match the one in the metadata */
     if( tr_torrentFindFile2( tor, fileNum, &base, &sub ) )
     {
-        const tr_file * file = &tor->info.files[fileNum];
-
-        if( strcmp( sub, file->name ) )
+        if( strcmp( sub, f->name ) )
         {
             char * oldpath = tr_buildPath( base, sub, NULL );
-            char * newpath = tr_buildPath( base, file->name, NULL );
+            char * newpath = tr_buildPath( base, f->name, NULL );
 
             if( rename( oldpath, newpath ) )
                 tr_torerr( tor, "Error moving \"%s\" to \"%s\": %s", oldpath, newpath, tr_strerror( errno ) );

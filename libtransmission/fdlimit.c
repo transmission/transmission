@@ -295,6 +295,7 @@ tr_close_file( int fd )
      * but it couldn't hurt... */
     fcntl( fd, F_NOCACHE, 1 );
 #endif
+    fsync( fd );
     close( fd );
 }
 
