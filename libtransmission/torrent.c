@@ -2388,8 +2388,8 @@ tr_torrentCheckPiece( tr_torrent * tor, tr_piece_index_t pieceIndex )
     return pass;
 }
 
-static time_t
-getFileMTime( const tr_torrent * tor, tr_file_index_t i )
+time_t
+tr_torrentGetFileMTime( const tr_torrent * tor, tr_file_index_t i )
 {
     struct stat sb;
     time_t mtime = 0;
@@ -2425,7 +2425,7 @@ tr_torrentPieceNeedsCheck( const tr_torrent * tor, tr_piece_index_t p )
     tr_ioFindFileLocation( tor, p, 0, &f, &unused );
     for( ; f < inf->fileCount && pieceHasFile( p, &inf->files[f] ); ++f )
         if( tr_cpFileIsComplete( &tor->completion, f ) )
-            if( getFileMTime( tor, f ) > inf->pieces[p].timeChecked )
+            if( tr_torrentGetFileMTime( tor, f ) > inf->pieces[p].timeChecked )
                 return TRUE;
 
     return FALSE;

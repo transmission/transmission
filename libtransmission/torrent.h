@@ -429,6 +429,8 @@ tr_bool tr_torrentPieceNeedsCheck( const tr_torrent * tor, tr_piece_index_t piec
  */
 tr_bool tr_torrentCheckPiece( tr_torrent * tor, tr_piece_index_t pieceIndex );
 
+time_t tr_torrentGetFileMTime( const tr_torrent * tor, tr_file_index_t i );
+
 uint64_t tr_torrentGetCurrentSizeOnDisk( const tr_torrent * tor );
 
 
