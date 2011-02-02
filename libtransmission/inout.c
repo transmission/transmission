@@ -136,16 +136,20 @@ readOrWriteBytes( tr_session       * session,
         tr_free( subpath );
     }
 
-    if( !err )
+    /* check that the file corresponding to 'fd' still exists */
+    if( fd >= 0 )
     {
-        /* check & see if someone deleted the file while it was in our cache */
         struct stat sb;
-        const tr_bool file_disappeared = fstat( fd, &sb ) || sb.st_nlink < 1;
-        if( file_disappeared ) {
-            tr_torrentSetLocalError( tor, "Please Verify Local Data! A file disappeared: \"%s\"", tor->info.files[fileIndex].name );
+
+        if( !fstat( fd, &sb ) && sb.st_nlink < 1 )
+        {
+            tr_torrentSetLocalError( tor, "Please Verify Local Data! A file disappeared: \"%s\"", file->name );
             err = ENOENT;
         }
+    }
 
+    if( !err )
+    {
         if( ioMode == TR_IO_READ ) {
             const int rc = tr_pread( fd, buf, buflen, fileOffset );
             if( rc < 0 ) {
