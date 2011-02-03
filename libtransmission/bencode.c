@@ -14,8 +14,7 @@
 #include <ctype.h> /* isdigit() */
 #include <errno.h>
 #include <math.h> /* fabs() */
-#include <stdio.h>
-#include <stdlib.h> /* realpath() */
+#include <stdio.h> /* rename() */
 #include <string.h>
 
 #ifdef WIN32 /* tr_mkstemp() */
@@ -24,10 +23,8 @@
  #define _S_IWRITE 128
 #endif
 
-#include <sys/types.h> /* stat() */
-#include <sys/stat.h> /* stat() */
-#include <locale.h>
-#include <unistd.h> /* stat() */
+#include <locale.h> /* setlocale() */
+#include <unistd.h> /* write(), unlink() */
 
 #include <event2/buffer.h>
 
