@@ -192,7 +192,7 @@ void
 MakeDialog :: onFolderClicked( )
 {
     QFileDialog * d = new QFileDialog( this, tr( "Select Folder" ) );
-    d->setFileMode( QFileDialog::Directory );
+    d->setFileMode( QFileDialog::DirectoryOnly );
     connect( d, SIGNAL(filesSelected(const QStringList&)),
              this, SLOT(onFolderSelected(const QStringList&)) );
     d->show( );
@@ -215,7 +215,7 @@ void
 MakeDialog :: onDestinationClicked( )
 {
     QFileDialog * d = new QFileDialog( this, tr( "Select Folder" ) );
-    d->setFileMode( QFileDialog::Directory );
+    d->setFileMode( QFileDialog::DirectoryOnly );
     connect( d, SIGNAL(filesSelected(const QStringList&)),
              this, SLOT(onDestinationSelected(const QStringList&)) );
     d->show( );
