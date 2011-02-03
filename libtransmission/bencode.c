@@ -1707,24 +1707,12 @@ tr_bencToFile( const tr_benc * top, tr_fmt_mode mode, const char * filename )
         }
         else
         {
-            struct stat sb;
-            const tr_bool already_exists = !stat( filename, &sb ) && S_ISREG( sb.st_mode );
-
             tr_fsync( fd );
             tr_close_file( fd );
 
-            if( !already_exists || !unlink( filename ) )
+            if( !rename( tmp, filename ) )
             {
-                if( !rename( tmp, filename ) )
-                {
-                    tr_inf( _( "Saved \"%s\"" ), filename );
-                }
-                else
-                {
-                    err = errno;
-                    tr_err( _( "Couldn't save file \"%1$s\": %2$s" ), filename, tr_strerror( err ) );
-                    unlink( tmp );
-                }
+                tr_inf( _( "Saved \"%s\"" ), filename );
             }
             else
             {
