@@ -335,7 +335,6 @@ appendColumn( GtkTreeView * view,
             break;
     }
 
-    gtk_tree_view_column_set_sort_column_id( c, col );
     gtk_tree_view_append_column( view, c );
 }
 
