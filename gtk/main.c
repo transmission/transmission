@@ -449,20 +449,36 @@ signal_handler( int sig )
     }
 }
 
-struct remove_torrent_idle_data
+struct torrent_idle_data
 {
     TrCore * core;
     int id;
 };
 
 static gboolean
-remove_torrent_idle( gpointer gdata )
+rpc_torrent_remove_idle( gpointer gdata )
 {
-    struct remove_torrent_idle_data * data = gdata;
+    struct torrent_idle_data * data = gdata;
+
     tr_core_remove_torrent_from_id( data->core, data->id, FALSE );
+
     g_free( data );
     return FALSE; /* tell g_idle not to call this func twice */
 }
+
+static gboolean
+rpc_torrent_add_idle( gpointer gdata )
+{
+    tr_torrent * tor;
+    struct torrent_idle_data * data = gdata;
+
+    if(( tor = tr_torrentFindFromId( tr_core_session( data->core ), data->id )))
+        tr_core_add_torrent( data->core, tr_torrent_new_preexisting( tor ), TRUE );
+
+    g_free( data );
+    return FALSE; /* tell g_idle not to call this func twice */
+}
+
 
 static void
 setupsighandlers( void )
@@ -487,15 +503,19 @@ onRPCChanged( tr_session            * session,
             gtr_action_activate( "quit" );
             break;
 
-        case TR_RPC_TORRENT_ADDED:
-            tr_core_add_torrent( cbdata->core, tr_torrent_new_preexisting( tor ), TRUE );
-            break;
-
-        case TR_RPC_TORRENT_REMOVING: {
-            struct remove_torrent_idle_data * data = g_new0( struct remove_torrent_idle_data, 1 );
+        case TR_RPC_TORRENT_ADDED: {
+            struct torrent_idle_data * data = g_new0( struct torrent_idle_data, 1 );
             data->id = tr_torrentId( tor );
             data->core = cbdata->core;
-            gtr_idle_add( remove_torrent_idle, data );
+            gtr_idle_add( rpc_torrent_add_idle, data );
+            break;
+        }
+
+        case TR_RPC_TORRENT_REMOVING: {
+            struct torrent_idle_data * data = g_new0( struct torrent_idle_data, 1 );
+            data->id = tr_torrentId( tor );
+            data->core = cbdata->core;
+            gtr_idle_add( rpc_torrent_remove_idle, data );
             status = TR_RPC_NOREMOVE;
             break;
         }
