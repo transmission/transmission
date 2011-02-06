@@ -1,4 +1,4 @@
-=== Transmission 2.20 (2011/xx/yy) ===
+=== Transmission 2.20 (2011/02/06) ===
 [http://trac.transmissionbt.com/query?milestone=2.20&group=component&order=severity All tickets closed by this release]
 ==== All Platforms ====
   * Remember downloaded files when a drive is unplugged
