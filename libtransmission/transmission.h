@@ -497,6 +497,7 @@ typedef enum
     TR_RPC_TORRENT_STARTED,
     TR_RPC_TORRENT_STOPPED,
     TR_RPC_TORRENT_REMOVING,
+    TR_RPC_TORRENT_TRASHING, /* _REMOVING + delete local data */
     TR_RPC_TORRENT_CHANGED, /* catch-all for the "torrent-set" rpc method */
     TR_RPC_TORRENT_MOVED,
     TR_RPC_SESSION_CHANGED,

@@ -453,6 +453,7 @@ struct torrent_idle_data
 {
     TrCore * core;
     int id;
+    gboolean delete_files;
 };
 
 static gboolean
@@ -460,7 +461,7 @@ rpc_torrent_remove_idle( gpointer gdata )
 {
     struct torrent_idle_data * data = gdata;
 
-    tr_core_remove_torrent_from_id( data->core, data->id, FALSE );
+    tr_core_remove_torrent_from_id( data->core, data->id, data->delete_files );
 
     g_free( data );
     return FALSE; /* tell g_idle not to call this func twice */
@@ -511,10 +512,12 @@ onRPCChanged( tr_session            * session,
             break;
         }
 
-        case TR_RPC_TORRENT_REMOVING: {
+        case TR_RPC_TORRENT_REMOVING:
+        case TR_RPC_TORRENT_TRASHING: {
             struct torrent_idle_data * data = g_new0( struct torrent_idle_data, 1 );
             data->id = tr_torrentId( tor );
             data->core = cbdata->core;
+            data->delete_files = type == TR_RPC_TORRENT_TRASHING;
             gtr_idle_add( rpc_torrent_remove_idle, data );
             status = TR_RPC_NOREMOVE;
             break;

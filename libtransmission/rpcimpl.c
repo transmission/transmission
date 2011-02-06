@@ -244,20 +244,22 @@ torrentRemove( tr_session               * session,
 {
     int i;
     int torrentCount;
+    tr_rpc_callback_type type;
+    tr_bool deleteFlag = FALSE;
     tr_torrent ** torrents = getTorrents( session, args_in, &torrentCount );
 
     assert( idle_data == NULL );
 
+    tr_bencDictFindBool( args_in, "delete-local-data", &deleteFlag );
+    type = deleteFlag ? TR_RPC_TORRENT_TRASHING
+                      : TR_RPC_TORRENT_REMOVING;
+
     for( i=0; i<torrentCount; ++i )
     {
         tr_torrent * tor = torrents[i];
-        const tr_rpc_callback_status status = notify( session, TR_RPC_TORRENT_REMOVING, tor );
+        const tr_rpc_callback_status status = notify( session, type, tor );
         if( !( status & TR_RPC_NOREMOVE ) )
-        {
-            tr_bool deleteFlag = FALSE;
-            tr_bencDictFindBool( args_in, "delete-local-data", &deleteFlag );
             tr_torrentRemove( tor, deleteFlag, NULL );
-        }
     }
 
     tr_free( torrents );
