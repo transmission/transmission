@@ -4436,6 +4436,10 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
             [self performSelectorOnMainThread: @selector(rpcRemoveTorrent:) withObject: torrent waitUntilDone: NO];
             break;
         
+        case TR_RPC_TORRENT_TRASHING:
+            [self performSelectorOnMainThread: @selector(rpcRemoveTorrentDeleteData:) withObject: torrent waitUntilDone: NO];
+            break;
+        
         case TR_RPC_TORRENT_CHANGED:
             [self performSelectorOnMainThread: @selector(rpcChangedTorrent:) withObject: torrent waitUntilDone: NO];
             break;
@@ -4482,6 +4486,12 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 - (void) rpcRemoveTorrent: (Torrent *) torrent
 {
     [self confirmRemoveTorrents: [[NSArray arrayWithObject: torrent] retain] deleteData: NO];
+    [torrent release];
+}
+
+- (void) rpcRemoveTorrentDeleteData: (Torrent *) torrent
+{
+    [self confirmRemoveTorrents: [[NSArray arrayWithObject: torrent] retain] deleteData: YES];
     [torrent release];
 }
 

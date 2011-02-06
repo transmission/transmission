@@ -274,6 +274,7 @@ typedef enum
 - (void) rpcCallback: (tr_rpc_callback_type) type forTorrentStruct: (struct tr_torrent *) torrentStruct;
 - (void) rpcAddTorrentStruct: (NSValue *) torrentStructPtr;
 - (void) rpcRemoveTorrent: (Torrent *) torrent;
+- (void) rpcRemoveTorrentDeleteData: (Torrent *) torrent;
 - (void) rpcStartedStoppedTorrent: (Torrent *) torrent;
 - (void) rpcChangedTorrent: (Torrent *) torrent;
 - (void) rpcMovedTorrent: (Torrent *) torrent;
