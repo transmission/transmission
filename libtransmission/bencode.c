@@ -1707,7 +1707,11 @@ tr_bencToFile( const tr_benc * top, tr_fmt_mode mode, const char * filename )
             tr_fsync( fd );
             tr_close_file( fd );
 
+#ifdef WIN32
+            if( MoveFileEx( tmp, filename, MOVEFILE_REPLACE_EXISTING ) )
+#else
             if( !rename( tmp, filename ) )
+#endif
             {
                 tr_inf( _( "Saved \"%s\"" ), filename );
             }
