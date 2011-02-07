@@ -72,8 +72,7 @@ void tr_announcerClose( tr_session * );
 ***  For torrent customers
 **/
 
-struct tr_torrent_tiers * tr_announcerAddTorrent( struct tr_announcer *,
-                                                  tr_torrent          * torrent,
+struct tr_torrent_tiers * tr_announcerAddTorrent( tr_torrent          * torrent,
                                                   tr_tracker_callback * cb,
                                                   void                * cbdata );
 

@@ -698,12 +698,12 @@ addTorrentToTier( tr_torrent_tiers  * tiers,
 }
 
 tr_torrent_tiers *
-tr_announcerAddTorrent( tr_announcer * announcer, tr_torrent * tor,
-                        tr_tracker_callback * callback, void * callbackData )
+tr_announcerAddTorrent( tr_torrent           * tor,
+                        tr_tracker_callback  * callback,
+                        void                 * callbackData )
 {
     tr_torrent_tiers * tiers;
 
-    assert( announcer != NULL );
     assert( tr_isTorrent( tor ) );
 
     tiers = tiersNew( );

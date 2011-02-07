@@ -894,7 +894,7 @@ torrentInit( tr_torrent * tor, const tr_ctor * ctor )
         }
     }
 
-    tor->tiers = tr_announcerAddTorrent( tor->session->announcer, tor, onTrackerResponse, NULL );
+    tor->tiers = tr_announcerAddTorrent( tor, onTrackerResponse, NULL );
 
     if( isNewTorrent )
     {
