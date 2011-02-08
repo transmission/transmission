@@ -772,7 +772,8 @@ evbuffer_peek_all( struct evbuffer * buf, size_t * setme_vecCount )
     const size_t byteCount = evbuffer_get_length( buf );
     const int vecCount = evbuffer_peek( buf, byteCount, NULL, NULL, 0 );
     struct evbuffer_iovec * iovec = tr_new0( struct evbuffer_iovec, vecCount );
-    assert( vecCount == evbuffer_peek( buf, byteCount, NULL, iovec, vecCount ) );
+    const int n = evbuffer_peek( buf, byteCount, NULL, iovec, vecCount );
+    assert( n == vecCount );
     *setme_vecCount = vecCount;
     return iovec;
 }
