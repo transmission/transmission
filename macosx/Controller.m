@@ -3449,6 +3449,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         [item setImage: [NSImage imageNamed: @"ToolbarRemoveTemplate.png"]];
         [item setTarget: self];
         [item setAction: @selector(removeNoDelete:)];
+        [item setVisibilityPriority: NSToolbarItemVisibilityPriorityHigh];
         
         return item;
     }
@@ -3503,6 +3504,9 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
                                         NSLocalizedString(@"Resume All", "All toolbar item -> label"), nil]];
         
         [segmentedControl release];
+        
+        [groupItem setVisibilityPriority: NSToolbarItemVisibilityPriorityHigh];
+        
         return [groupItem autorelease];
     }
     else if ([ident isEqualToString: TOOLBAR_PAUSE_RESUME_SELECTED])
@@ -3542,6 +3546,9 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
                                         NSLocalizedString(@"Resume Selected", "Selected toolbar item -> label"), nil]];
         
         [segmentedControl release];
+        
+        [groupItem setVisibilityPriority: NSToolbarItemVisibilityPriorityHigh];
+        
         return [groupItem autorelease];
     }
     else if ([ident isEqualToString: TOOLBAR_FILTER])
@@ -3569,6 +3576,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         [item setImage: [NSImage imageNamed: NSImageNameQuickLookTemplate]];
         [item setTarget: self];
         [item setAction: @selector(toggleQuickLook:)];
+        [item setVisibilityPriority: NSToolbarItemVisibilityPriorityLow];
         
         return item;
     }
