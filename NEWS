@@ -1,3 +1,11 @@
+=== Transmission 2.21 (2011/02/08) ===
+==== All Platforms ====
+  * Fix compile error in the the 2.20 tarball
+==== GTK+ ====
+  * Several updated translations
+==== Qt ====
+  * Updated Spanish translation
+
 === Transmission 2.20 (2011/02/06) ===
 [http://trac.transmissionbt.com/query?milestone=2.20&group=component&order=severity All tickets closed by this release]
 ==== All Platforms ====
