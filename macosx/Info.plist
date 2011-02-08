@@ -60,6 +60,8 @@
 	</array>
 	<key>CFBundleVersion</key>
 	<string>SVN_REVISION_NUM</string>
+	<key>LSApplicationCategoryType</key>
+	<string>public.app-category.utilities</string>
 	<key>LSMinimumSystemVersion</key>
 	<string>10.5.0</string>
 	<key>NSAppleScriptEnabled</key>
