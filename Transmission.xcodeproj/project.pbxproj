@@ -2507,6 +2507,7 @@
 					"\"$(SRCROOT)/build/Debug\"",
 				);
 				OTHER_CFLAGS = (
+					"$(inherited)",
 					"-DSYS_DARWIN",
 					"-DHAVE_OPENSSL",
 					"-D__TRANSMISSION__",
@@ -2702,6 +2703,7 @@
 					"\"$(SRCROOT)/build/Debug\"",
 				);
 				OTHER_CFLAGS = (
+					"$(inherited)",
 					"-DSYS_DARWIN",
 					"-DHAVE_OPENSSL",
 					"-D__TRANSMISSION__",
@@ -2790,6 +2792,7 @@
 					"third-party/openssl/lib",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.5;
+				OTHER_CFLAGS = "-DNDEBUG";
 				OTHER_LDFLAGS = "";
 				PREBINDING = NO;
 				RUN_CLANG_STATIC_ANALYZER = NO;
@@ -2946,6 +2949,7 @@
 					"\"$(SRCROOT)/build/Debug\"",
 				);
 				OTHER_CFLAGS = (
+					"$(inherited)",
 					"-DSYS_DARWIN",
 					"-DHAVE_OPENSSL",
 					"-D__TRANSMISSION__",
