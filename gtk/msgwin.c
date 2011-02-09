@@ -58,7 +58,7 @@ static struct tr_msg_list * myHead = NULL;
 static gboolean
 is_pinned_to_new( struct MsgData * data )
 {
-    gboolean pinned_to_new;
+    gboolean pinned_to_new = FALSE;
 
     if( data->view == NULL )
     {
