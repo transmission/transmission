@@ -196,8 +196,8 @@ tr_session * fLib;
     if (statsAll.sessionCount == 1)
         [fNumOpenedField setStringValue: NSLocalizedString(@"1 time", "stats window -> times opened")];
     else
-        [fNumOpenedField setStringValue: [NSString stringWithFormat: NSLocalizedString(@"%llu times", "stats window -> times opened"),
-                                            statsAll.sessionCount]];
+        [fNumOpenedField setStringValue: [NSString stringWithFormat: NSLocalizedString(@"%@ times", "stats window -> times opened"),
+                                            [NSString formattedUInteger: statsAll.sessionCount]]];
 }
 
 - (void) performResetStats
