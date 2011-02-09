@@ -816,6 +816,12 @@ tr_peerIoWriteBytes( tr_peerIo * io, const void * bytes, size_t byteCount, tr_bo
 ***/
 
 void
+evbuffer_add_uint8( struct evbuffer * outbuf, uint8_t byte )
+{
+    evbuffer_add( outbuf, &byte, 1 );
+}
+
+void
 evbuffer_add_uint16( struct evbuffer * outbuf, uint16_t addme_hs )
 {
     const uint16_t ns = htons( addme_hs );
