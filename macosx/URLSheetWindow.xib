@@ -165,6 +165,7 @@
 				<string key="NSScreenRect">{{0, 0}, {1680, 1028}}</string>
 				<string key="NSMinSize">{400, 199}</string>
 				<string key="NSMaxSize">{1.79769e+308, 1.79769e+308}</string>
+				<string key="NSFrameAutosaveName">URLSheetWindow</string>
 			</object>
 		</object>
 		<object class="IBObjectContainer" key="IBDocument.Objects">
