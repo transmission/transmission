@@ -36,6 +36,7 @@
 #import "PrefsController.h"
 #import "GroupsController.h"
 #import "AboutWindowController.h"
+#import "URLSheetWindowController.h"
 #import "AddWindowController.h"
 #import "AddMagnetWindowController.h"
 #import "MessageWindowController.h"
@@ -1225,49 +1226,17 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 
 - (void) openURLShowSheet: (id) sender
 {
-    [NSApp beginSheet: fURLSheetWindow modalForWindow: fWindow modalDelegate: self
-            didEndSelector: @selector(urlSheetDidEnd:returnCode:contextInfo:) contextInfo: nil];
+    [[[URLSheetWindowController alloc] initWithController: self] beginSheetForWindow: fWindow];
 }
 
-- (void) openURLEndSheet: (id) sender
+#warning need to remember sheet text between runs
+- (void) urlSheetDidEnd: (URLSheetWindowController *) controller url: (NSString *) urlString returnCode: (NSInteger) returnCode
 {
-    [fURLSheetWindow orderOut: sender];
-    [NSApp endSheet: fURLSheetWindow returnCode: 1];
-}
-
-- (void) openURLCancelEndSheet: (id) sender
-{
-    [fURLSheetWindow orderOut: sender];
-    [NSApp endSheet: fURLSheetWindow returnCode: 0];
-}
-
-- (void) controlTextDidChange: (NSNotification *) notification
-{
-    if ([notification object] != fURLSheetTextField)
-        return;
-    
-    NSString * string = [fURLSheetTextField stringValue];
-    BOOL enable = YES;
-    if ([string isEqualToString: @""])
-        enable = NO;
-    else
-    {
-        NSRange prefixRange = [string rangeOfString: @"://"];
-        if (prefixRange.location != NSNotFound && [string length] == NSMaxRange(prefixRange))
-            enable = NO;
-    }
-    
-    [fURLSheetOpenButton setEnabled: enable];
-}
-
-- (void) urlSheetDidEnd: (NSWindow *) sheet returnCode: (NSInteger) returnCode contextInfo: (void *) contextInfo
-{
-    [fURLSheetTextField selectText: self];
     if (returnCode != 1)
         return;
     
-    NSString * urlString = [fURLSheetTextField stringValue];
     [self performSelectorOnMainThread: @selector(openURL:) withObject: urlString waitUntilDone: NO];
+    [controller release];
 }
 
 - (void) createFile: (id) sender

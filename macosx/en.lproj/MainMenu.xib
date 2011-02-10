@@ -2620,110 +2620,6 @@ AAAAAAAAAAAAAAAAA</bytes>
 			<object class="NSUserDefaultsController" id="171637775">
 				<bool key="NSSharedInstance">YES</bool>
 			</object>
-			<object class="NSWindowTemplate" id="992647214">
-				<int key="NSWindowStyleMask">15</int>
-				<int key="NSWindowBacking">2</int>
-				<string key="NSWindowRect">{{168, 356}, {400, 177}}</string>
-				<int key="NSWTFlags">1886912512</int>
-				<string key="NSWindowTitle">Window</string>
-				<string key="NSWindowClass">NSWindow</string>
-				<object class="NSMutableString" key="NSViewClass">
-					<characters key="NS.bytes">View</characters>
-				</object>
-				<string key="NSWindowContentMaxSize">{1.79769e+308, 1.79769e+308}</string>
-				<string key="NSWindowContentMinSize">{400, 177}</string>
-				<object class="NSView" key="NSWindowView" id="13427666">
-					<nil key="NSNextResponder"/>
-					<int key="NSvFlags">256</int>
-					<object class="NSMutableArray" key="NSSubviews">
-						<bool key="EncodedWithXMLCoder">YES</bool>
-						<object class="NSTextField" id="188853779">
-							<reference key="NSNextResponder" ref="13427666"/>
-							<int key="NSvFlags">274</int>
-							<string key="NSFrame">{{20, 50}, {360, 80}}</string>
-							<reference key="NSSuperview" ref="13427666"/>
-							<bool key="NSEnabled">YES</bool>
-							<object class="NSTextFieldCell" key="NSCell" id="1061347416">
-								<int key="NSCellFlags">-1805517311</int>
-								<int key="NSCellFlags2">272630272</int>
-								<string key="NSContents"/>
-								<reference key="NSSupport" ref="622385820"/>
-								<reference key="NSControlView" ref="188853779"/>
-								<bool key="NSDrawsBackground">YES</bool>
-								<reference key="NSBackgroundColor" ref="570792161"/>
-								<object class="NSColor" key="NSTextColor">
-									<int key="NSColorSpace">6</int>
-									<string key="NSCatalogName">System</string>
-									<string key="NSColorName">textColor</string>
-									<reference key="NSColor" ref="438270934"/>
-								</object>
-							</object>
-						</object>
-						<object class="NSButton" id="1001733131">
-							<reference key="NSNextResponder" ref="13427666"/>
-							<int key="NSvFlags">289</int>
-							<string key="NSFrame">{{304, 12}, {82, 32}}</string>
-							<reference key="NSSuperview" ref="13427666"/>
-							<bool key="NSEnabled">YES</bool>
-							<object class="NSButtonCell" key="NSCell" id="172529900">
-								<int key="NSCellFlags">604110336</int>
-								<int key="NSCellFlags2">134217728</int>
-								<string key="NSContents">Open</string>
-								<reference key="NSSupport" ref="622385820"/>
-								<reference key="NSControlView" ref="1001733131"/>
-								<int key="NSButtonFlags">-2038284033</int>
-								<int key="NSButtonFlags2">1</int>
-								<reference key="NSAlternateImage" ref="622385820"/>
-								<string key="NSAlternateContents"/>
-								<string type="base64-UTF8" key="NSKeyEquivalent">DQ</string>
-								<int key="NSPeriodicDelay">200</int>
-								<int key="NSPeriodicInterval">25</int>
-							</object>
-						</object>
-						<object class="NSButton" id="868942125">
-							<reference key="NSNextResponder" ref="13427666"/>
-							<int key="NSvFlags">289</int>
-							<string key="NSFrame">{{222, 12}, {82, 32}}</string>
-							<reference key="NSSuperview" ref="13427666"/>
-							<bool key="NSEnabled">YES</bool>
-							<object class="NSButtonCell" key="NSCell" id="376796441">
-								<int key="NSCellFlags">67239424</int>
-								<int key="NSCellFlags2">134217728</int>
-								<string key="NSContents">Cancel</string>
-								<reference key="NSSupport" ref="622385820"/>
-								<reference key="NSControlView" ref="868942125"/>
-								<int key="NSButtonFlags">-2038284033</int>
-								<int key="NSButtonFlags2">1</int>
-								<reference key="NSAlternateImage" ref="622385820"/>
-								<string key="NSAlternateContents"/>
-								<string type="base64-UTF8" key="NSKeyEquivalent">Gw</string>
-								<int key="NSPeriodicDelay">200</int>
-								<int key="NSPeriodicInterval">25</int>
-							</object>
-						</object>
-						<object class="NSTextField" id="38988792">
-							<reference key="NSNextResponder" ref="13427666"/>
-							<int key="NSvFlags">268</int>
-							<string key="NSFrame">{{17, 140}, {200, 17}}</string>
-							<reference key="NSSuperview" ref="13427666"/>
-							<bool key="NSEnabled">YES</bool>
-							<object class="NSTextFieldCell" key="NSCell" id="116883959">
-								<int key="NSCellFlags">67239424</int>
-								<int key="NSCellFlags2">272629760</int>
-								<string key="NSContents">Internet address of torrent file:</string>
-								<reference key="NSSupport" ref="622385820"/>
-								<reference key="NSControlView" ref="38988792"/>
-								<reference key="NSBackgroundColor" ref="969793804"/>
-								<reference key="NSTextColor" ref="911300388"/>
-							</object>
-						</object>
-					</object>
-					<string key="NSFrameSize">{400, 177}</string>
-				</object>
-				<string key="NSScreenRect">{{0, 0}, {1680, 1028}}</string>
-				<string key="NSMinSize">{400, 199}</string>
-				<string key="NSMaxSize">{1.79769e+308, 1.79769e+308}</string>
-			</object>
 			<object class="NSMenu" id="354817592">
 				<string key="NSTitle">ActionMenu</string>
 				<object class="NSMutableArray" key="NSMenuItems">
@@ -4039,38 +3935,6 @@ AAAAAAAAAAAAAAAAA</bytes>
 					<int key="connectionID">1847</int>
 				</object>
 				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">fURLSheetWindow</string>
-						<reference key="source" ref="30116300"/>
-						<reference key="destination" ref="992647214"/>
-					</object>
-					<int key="connectionID">1853</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">fURLSheetTextField</string>
-						<reference key="source" ref="30116300"/>
-						<reference key="destination" ref="188853779"/>
-					</object>
-					<int key="connectionID">1854</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
-						<string key="label">openURLEndSheet:</string>
-						<reference key="source" ref="30116300"/>
-						<reference key="destination" ref="1001733131"/>
-					</object>
-					<int key="connectionID">1855</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
-						<string key="label">openURLCancelEndSheet:</string>
-						<reference key="source" ref="30116300"/>
-						<reference key="destination" ref="868942125"/>
-					</object>
-					<int key="connectionID">1856</int>
-				</object>
-				<object class="IBConnectionRecord">
 					<object class="IBActionConnection" key="connection">
 						<string key="label">openURLShowSheet:</string>
 						<reference key="source" ref="30116300"/>
@@ -4829,22 +4693,6 @@ AAAAAAAAAAAAAAAAA</bytes>
 						<reference key="destination" ref="508355629"/>
 					</object>
 					<int key="connectionID">3154</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">fURLSheetOpenButton</string>
-						<reference key="source" ref="30116300"/>
-						<reference key="destination" ref="1001733131"/>
-					</object>
-					<int key="connectionID">3156</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">delegate</string>
-						<reference key="source" ref="188853779"/>
-						<reference key="destination" ref="30116300"/>
-					</object>
-					<int key="connectionID">3157</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBActionConnection" key="connection">
@@ -6362,64 +6210,6 @@ AAAAAAAAAAAAAAAAA</bytes>
 						<string key="objectName">Shared Defaults</string>
 					</object>
 					<object class="IBObjectRecord">
-						<int key="objectID">1848</int>
-						<reference key="object" ref="992647214"/>
-						<object class="NSMutableArray" key="children">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-							<reference ref="13427666"/>
-						</object>
-						<reference key="parent" ref="0"/>
-						<string key="objectName">URLSheetWindow</string>
-					</object>
-					<object class="IBObjectRecord">
-						<int key="objectID">1849</int>
-						<reference key="object" ref="13427666"/>
-						<object class="NSMutableArray" key="children">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-							<reference ref="188853779"/>
-							<reference ref="1001733131"/>
-							<reference ref="868942125"/>
-							<reference ref="38988792"/>
-						</object>
-						<reference key="parent" ref="992647214"/>
-					</object>
-					<object class="IBObjectRecord">
-						<int key="objectID">1850</int>
-						<reference key="object" ref="188853779"/>
-						<object class="NSMutableArray" key="children">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-							<reference ref="1061347416"/>
-						</object>
-						<reference key="parent" ref="13427666"/>
-					</object>
-					<object class="IBObjectRecord">
-						<int key="objectID">1851</int>
-						<reference key="object" ref="1001733131"/>
-						<object class="NSMutableArray" key="children">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-							<reference ref="172529900"/>
-						</object>
-						<reference key="parent" ref="13427666"/>
-					</object>
-					<object class="IBObjectRecord">
-						<int key="objectID">1852</int>
-						<reference key="object" ref="868942125"/>
-						<object class="NSMutableArray" key="children">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-							<reference ref="376796441"/>
-						</object>
-						<reference key="parent" ref="13427666"/>
-					</object>
-					<object class="IBObjectRecord">
-						<int key="objectID">1857</int>
-						<reference key="object" ref="38988792"/>
-						<object class="NSMutableArray" key="children">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-							<reference ref="116883959"/>
-						</object>
-						<reference key="parent" ref="13427666"/>
-					</object>
-					<object class="IBObjectRecord">
 						<int key="objectID">1936</int>
 						<reference key="object" ref="588646173"/>
 						<object class="NSMutableArray" key="children">
@@ -6724,26 +6514,6 @@ AAAAAAAAAAAAAAAAA</bytes>
 						<int key="objectID">3063</int>
 						<reference key="object" ref="745428997"/>
 						<reference key="parent" ref="128892418"/>
-					</object>
-					<object class="IBObjectRecord">
-						<int key="objectID">3064</int>
-						<reference key="object" ref="1061347416"/>
-						<reference key="parent" ref="188853779"/>
-					</object>
-					<object class="IBObjectRecord">
-						<int key="objectID">3065</int>
-						<reference key="object" ref="172529900"/>
-						<reference key="parent" ref="1001733131"/>
-					</object>
-					<object class="IBObjectRecord">
-						<int key="objectID">3066</int>
-						<reference key="object" ref="376796441"/>
-						<reference key="parent" ref="868942125"/>
-					</object>
-					<object class="IBObjectRecord">
-						<int key="objectID">3067</int>
-						<reference key="object" ref="116883959"/>
-						<reference key="parent" ref="38988792"/>
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">2683</int>
@@ -7341,24 +7111,6 @@ AAAAAAAAAAAAAAAAA</bytes>
 					<string>1815.ImportedFromIB2</string>
 					<string>1846.IBPluginDependency</string>
 					<string>1846.ImportedFromIB2</string>
-					<string>1848.IBEditorWindowLastContentRect</string>
-					<string>1848.IBPluginDependency</string>
-					<string>1848.IBWindowTemplateEditedContentRect</string>
-					<string>1848.ImportedFromIB2</string>
-					<string>1848.windowTemplate.hasMaxSize</string>
-					<string>1848.windowTemplate.hasMinSize</string>
-					<string>1848.windowTemplate.maxSize</string>
-					<string>1848.windowTemplate.minSize</string>
-					<string>1849.IBPluginDependency</string>
-					<string>1849.ImportedFromIB2</string>
-					<string>1850.IBPluginDependency</string>
-					<string>1850.ImportedFromIB2</string>
-					<string>1851.IBPluginDependency</string>
-					<string>1851.ImportedFromIB2</string>
-					<string>1852.IBPluginDependency</string>
-					<string>1852.ImportedFromIB2</string>
-					<string>1857.IBPluginDependency</string>
-					<string>1857.ImportedFromIB2</string>
 					<string>1858.IBPluginDependency</string>
 					<string>1858.ImportedFromIB2</string>
 					<string>1860.IBPluginDependency</string>
@@ -7607,10 +7359,6 @@ AAAAAAAAAAAAAAAAA</bytes>
 					<string>3061.IBPluginDependency</string>
 					<string>3062.IBPluginDependency</string>
 					<string>3063.IBPluginDependency</string>
-					<string>3064.IBPluginDependency</string>
-					<string>3065.IBPluginDependency</string>
-					<string>3066.IBPluginDependency</string>
-					<string>3067.IBPluginDependency</string>
 					<string>3077.IBPluginDependency</string>
 					<string>3078.IBPluginDependency</string>
 					<string>3078.ImportedFromIB2</string>
@@ -7959,24 +7707,6 @@ AAAAAAAAAAAAAAAAA</bytes>
 					<integer value="1"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="1"/>
-					<string>{{0, 818}, {400, 177}}</string>
-					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>{{0, 818}, {400, 177}}</string>
-					<integer value="1"/>
-					<integer value="0"/>
-					<integer value="1"/>
-					<string>{3.40282e+38, 3.40282e+38}</string>
-					<string>{400, 177}</string>
-					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<integer value="1"/>
-					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<integer value="1"/>
-					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<integer value="1"/>
-					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<integer value="1"/>
-					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<integer value="1"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="1"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -8229,10 +7959,6 @@ AAAAAAAAAAAAAAAAA</bytes>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="1"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="1"/>
@@ -8390,8 +8116,6 @@ AAAAAAAAAAAAAAAAA</bytes>
 							<string>linkTrac:</string>
 							<string>moveDataFilesSelected:</string>
 							<string>openShowSheet:</string>
-							<string>openURLCancelEndSheet:</string>
-							<string>openURLEndSheet:</string>
 							<string>openURLShowSheet:</string>
 							<string>removeDeleteData:</string>
 							<string>removeNoDelete:</string>
@@ -8489,8 +8213,6 @@ AAAAAAAAAAAAAAAAA</bytes>
 							<string>id</string>
 							<string>id</string>
 							<string>id</string>
-							<string>id</string>
-							<string>id</string>
 						</object>
 					</object>
 					<object class="NSMutableDictionary" key="actionInfosByName">
@@ -8509,8 +8231,6 @@ AAAAAAAAAAAAAAAAA</bytes>
 							<string>linkTrac:</string>
 							<string>moveDataFilesSelected:</string>
 							<string>openShowSheet:</string>
-							<string>openURLCancelEndSheet:</string>
-							<string>openURLEndSheet:</string>
 							<string>openURLShowSheet:</string>
 							<string>removeDeleteData:</string>
 							<string>removeNoDelete:</string>
@@ -8601,14 +8321,6 @@ AAAAAAAAAAAAAAAAA</bytes>
 							</object>
 							<object class="IBActionInfo">
 								<string key="name">openShowSheet:</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBActionInfo">
-								<string key="name">openURLCancelEndSheet:</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBActionInfo">
-								<string key="name">openURLEndSheet:</string>
 								<string key="candidateClassName">id</string>
 							</object>
 							<object class="IBActionInfo">
@@ -8814,9 +8526,6 @@ AAAAAAAAAAAAAAAAA</bytes>
 							<string>fTotalDLImageView</string>
 							<string>fTotalTorrentsField</string>
 							<string>fTotalULField</string>
-							<string>fURLSheetOpenButton</string>
-							<string>fURLSheetTextField</string>
-							<string>fURLSheetWindow</string>
 							<string>fUploadLimitItem</string>
 							<string>fUploadMenu</string>
 							<string>fUploadNoLimitItem</string>
@@ -8857,9 +8566,6 @@ AAAAAAAAAAAAAAAAA</bytes>
 							<string>NSImageView</string>
 							<string>NSTextField</string>
 							<string>NSTextField</string>
-							<string>NSButton</string>
-							<string>NSTextField</string>
-							<string>NSWindow</string>
 							<string>NSMenuItem</string>
 							<string>NSMenu</string>
 							<string>NSMenuItem</string>
@@ -8903,9 +8609,6 @@ AAAAAAAAAAAAAAAAA</bytes>
 							<string>fTotalDLImageView</string>
 							<string>fTotalTorrentsField</string>
 							<string>fTotalULField</string>
-							<string>fURLSheetOpenButton</string>
-							<string>fURLSheetTextField</string>
-							<string>fURLSheetWindow</string>
 							<string>fUploadLimitItem</string>
 							<string>fUploadMenu</string>
 							<string>fUploadNoLimitItem</string>
@@ -9044,18 +8747,6 @@ AAAAAAAAAAAAAAAAA</bytes>
 							<object class="IBToOneOutletInfo">
 								<string key="name">fTotalULField</string>
 								<string key="candidateClassName">NSTextField</string>
-							</object>
-							<object class="IBToOneOutletInfo">
-								<string key="name">fURLSheetOpenButton</string>
-								<string key="candidateClassName">NSButton</string>
-							</object>
-							<object class="IBToOneOutletInfo">
-								<string key="name">fURLSheetTextField</string>
-								<string key="candidateClassName">NSTextField</string>
-							</object>
-							<object class="IBToOneOutletInfo">
-								<string key="name">fURLSheetWindow</string>
-								<string key="candidateClassName">NSWindow</string>
 							</object>
 							<object class="IBToOneOutletInfo">
 								<string key="name">fUploadLimitItem</string>
