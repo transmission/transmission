@@ -44,6 +44,8 @@ NSString * urlString = @"";
     
     [fTextField setStringValue: urlString];
     [fTextField selectText: self];
+    
+    [fOpenButton setEnabled: ![urlString isEqualToString: @""]];
 }
 
 - (IBAction) beginSheetForWindow: (NSWindow *) window
