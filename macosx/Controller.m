@@ -1229,7 +1229,6 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     [[[URLSheetWindowController alloc] initWithController: self] beginSheetForWindow: fWindow];
 }
 
-#warning need to remember sheet text between runs
 - (void) urlSheetDidEnd: (URLSheetWindowController *) controller url: (NSString *) urlString returnCode: (NSInteger) returnCode
 {
     if (returnCode != 1)

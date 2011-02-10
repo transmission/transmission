@@ -27,6 +27,8 @@
 
 @implementation URLSheetWindowController
 
+NSString * urlString = @"";
+
 - (id) initWithController: (Controller *) controller
 {
     if ((self = [self initWithWindowNibName: @"URLSheetWindow"]))
@@ -39,6 +41,9 @@
 - (void) awakeFromNib
 {
     [fLabelField setStringValue: NSLocalizedString(@"Internet address of torrent file:", "URL sheet label")];
+    
+    [fTextField setStringValue: urlString];
+    [fTextField selectText: self];
 }
 
 - (IBAction) beginSheetForWindow: (NSWindow *) window
@@ -61,7 +66,8 @@
 
 - (void) sheetDidEnd: (NSWindow *) sheet returnCode: (NSInteger) returnCode contextInfo: (void *) contextInfo
 {
-    [fController urlSheetDidEnd: self url: [fTextField stringValue] returnCode: returnCode];
+    urlString = [fTextField stringValue];
+    [fController urlSheetDidEnd: self url: urlString returnCode: returnCode];
 }
 
 - (void) controlTextDidChange: (NSNotification *) notification
