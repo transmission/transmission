@@ -30,7 +30,7 @@
 {
 	IBOutlet NSTextField * fLabelField;
     IBOutlet NSTextField * fTextField;
-    IBOutlet NSButton * fOpenButton;
+    IBOutlet NSButton * fOpenButton, * fCancelButton;
     
     Controller * fController;
 }
