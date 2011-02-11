@@ -1231,10 +1231,9 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 
 - (void) urlSheetDidEnd: (URLSheetWindowController *) controller url: (NSString *) urlString returnCode: (NSInteger) returnCode
 {
-    if (returnCode != 1)
-        return;
+    if (returnCode == 1)
+        [self performSelectorOnMainThread: @selector(openURL:) withObject: urlString waitUntilDone: NO];
     
-    [self performSelectorOnMainThread: @selector(openURL:) withObject: urlString waitUntilDone: NO];
     [controller release];
 }
 
