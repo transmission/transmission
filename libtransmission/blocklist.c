@@ -46,7 +46,7 @@
 ****  PRIVATE
 ***/
 
-struct tr_ip_range
+struct tr_ipv4_range
 {
     uint32_t    begin;
     uint32_t    end;
@@ -54,12 +54,12 @@ struct tr_ip_range
 
 struct tr_blocklist
 {
-    tr_bool               isEnabled;
-    int                   fd;
-    size_t                ruleCount;
-    size_t                byteCount;
-    char *                filename;
-    struct tr_ip_range *  rules;
+    tr_bool                isEnabled;
+    int                    fd;
+    size_t                 ruleCount;
+    size_t                 byteCount;
+    char *                 filename;
+    struct tr_ipv4_range * rules;
 };
 
 static void
@@ -107,7 +107,7 @@ blocklistLoad( tr_blocklist * b )
 
     b->fd = fd;
     b->byteCount = byteCount;
-    b->ruleCount = byteCount / sizeof( struct tr_ip_range );
+    b->ruleCount = byteCount / sizeof( struct tr_ipv4_range );
 
     {
         char * base = tr_basename( b->filename );
@@ -127,8 +127,8 @@ static int
 compareAddressToRange( const void * va,
                        const void * vb )
 {
-    const uint32_t *           a = va;
-    const struct tr_ip_range * b = vb;
+    const uint32_t *             a = va;
+    const struct tr_ipv4_range * b = vb;
 
     if( *a < b->begin ) return -1;
     if( *a > b->end ) return 1;
@@ -206,8 +206,8 @@ int
 _tr_blocklistHasAddress( tr_blocklist     * b,
                          const tr_address * addr )
 {
-    uint32_t                   needle;
-    const struct tr_ip_range * range;
+    uint32_t                     needle;
+    const struct tr_ipv4_range * range;
 
     assert( tr_isAddress( addr ) );
 
@@ -224,7 +224,7 @@ _tr_blocklistHasAddress( tr_blocklist     * b,
     range = bsearch( &needle,
                      b->rules,
                      b->ruleCount,
-                     sizeof( struct tr_ip_range ),
+                     sizeof( struct tr_ipv4_range ),
                      compareAddressToRange );
 
     return range != NULL;
@@ -236,7 +236,7 @@ _tr_blocklistHasAddress( tr_blocklist     * b,
  * http://en.wikipedia.org/wiki/PeerGuardian#P2P_plaintext_format
  */
 static tr_bool
-parseLine1( const char * line, struct tr_ip_range * range )
+parseLine1( const char * line, struct tr_ipv4_range * range )
 {
     char * walk;
     int b[4];
@@ -272,7 +272,7 @@ parseLine1( const char * line, struct tr_ip_range * range )
  * http://wiki.phoenixlabs.org/wiki/DAT_Format
  */
 static tr_bool
-parseLine2( const char * line, struct tr_ip_range * range )
+parseLine2( const char * line, struct tr_ipv4_range * range )
 {
     int unk;
     int a[4];
@@ -300,7 +300,7 @@ parseLine2( const char * line, struct tr_ip_range * range )
 }
 
 static int
-parseLine( const char * line, struct tr_ip_range * range )
+parseLine( const char * line, struct tr_ipv4_range * range )
 {
     return parseLine1( line, range )
         || parseLine2( line, range );
@@ -343,7 +343,7 @@ _tr_blocklistSetContent( tr_blocklist * b,
     while( fgets( line, sizeof( line ), in ) != NULL )
     {
         char * walk;
-        struct tr_ip_range range;
+        struct tr_ipv4_range range;
 
         ++inCount;
 
@@ -358,7 +358,7 @@ _tr_blocklistSetContent( tr_blocklist * b,
             continue;
         }
 
-        if( fwrite( &range, sizeof( struct tr_ip_range ), 1, out ) != 1 )
+        if( fwrite( &range, sizeof( struct tr_ipv4_range ), 1, out ) != 1 )
         {
             tr_err( _( "Couldn't save file \"%1$s\": %2$s" ), b->filename,
                    tr_strerror( errno ) );
