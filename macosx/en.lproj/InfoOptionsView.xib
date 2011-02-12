@@ -2,13 +2,13 @@
 <archive type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="7.10">
 	<data>
 		<int key="IBDocument.SystemTarget">1060</int>
-		<string key="IBDocument.SystemVersion">10F569</string>
-		<string key="IBDocument.InterfaceBuilderVersion">788</string>
-		<string key="IBDocument.AppKitVersion">1038.29</string>
-		<string key="IBDocument.HIToolboxVersion">461.00</string>
+		<string key="IBDocument.SystemVersion">10J567</string>
+		<string key="IBDocument.InterfaceBuilderVersion">823</string>
+		<string key="IBDocument.AppKitVersion">1038.35</string>
+		<string key="IBDocument.HIToolboxVersion">462.00</string>
 		<object class="NSMutableDictionary" key="IBDocument.PluginVersions">
 			<string key="NS.key.0">com.apple.InterfaceBuilder.CocoaPlugin</string>
-			<string key="NS.object.0">788</string>
+			<string key="NS.object.0">823</string>
 		</object>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -19,13 +19,8 @@
 			<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 		</object>
 		<object class="NSMutableDictionary" key="IBDocument.Metadata">
-			<bool key="EncodedWithXMLCoder">YES</bool>
-			<object class="NSArray" key="dict.sortedKeys" id="0">
-				<bool key="EncodedWithXMLCoder">YES</bool>
-			</object>
-			<object class="NSMutableArray" key="dict.values">
-				<bool key="EncodedWithXMLCoder">YES</bool>
-			</object>
+			<string key="NS.key.0">PluginDependencyRecalculationVersion</string>
+			<integer value="1" key="NS.object.0"/>
 		</object>
 		<object class="NSMutableArray" key="IBDocument.RootObjects" id="1000">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -95,9 +90,11 @@
 								</object>
 								<object class="NSAttributedString" key="NS.nan">
 									<string key="NSString">NaN</string>
-									<object class="NSDictionary" key="NSAttributes" id="1014964092">
+									<object class="NSDictionary" key="NSAttributes" id="331954539">
 										<bool key="EncodedWithXMLCoder">YES</bool>
-										<reference key="dict.sortedKeys" ref="0"/>
+										<object class="NSArray" key="dict.sortedKeys" id="0">
+											<bool key="EncodedWithXMLCoder">YES</bool>
+										</object>
 										<object class="NSMutableArray" key="dict.values">
 											<bool key="EncodedWithXMLCoder">YES</bool>
 										</object>
@@ -297,7 +294,7 @@
 								<nil key="NS.nil"/>
 								<object class="NSAttributedString" key="NS.nan">
 									<string key="NSString">NaN</string>
-									<reference key="NSAttributes" ref="1014964092"/>
+									<reference key="NSAttributes" ref="331954539"/>
 								</object>
 								<integer value="0" key="NS.min"/>
 								<real value="10000" key="NS.max"/>
@@ -411,7 +408,7 @@
 								<nil key="NS.nil"/>
 								<object class="NSAttributedString" key="NS.nan">
 									<string key="NSString">NaN</string>
-									<reference key="NSAttributes" ref="1014964092"/>
+									<reference key="NSAttributes" ref="331954539"/>
 								</object>
 								<integer value="0" key="NS.min"/>
 								<real value="10000" key="NS.max"/>
@@ -489,7 +486,7 @@
 								<nil key="NS.nil"/>
 								<object class="NSAttributedString" key="NS.nan">
 									<string key="NSString">NaN</string>
-									<reference key="NSAttributes" ref="1014964092"/>
+									<reference key="NSAttributes" ref="331954539"/>
 								</object>
 								<integer value="0" key="NS.min"/>
 								<real value="10000" key="NS.max"/>
@@ -509,6 +506,44 @@
 							<bool key="NSDrawsBackground">YES</bool>
 							<reference key="NSBackgroundColor" ref="246996512"/>
 							<reference key="NSTextColor" ref="648134242"/>
+						</object>
+					</object>
+					<object class="NSTextField" id="760004836">
+						<reference key="NSNextResponder" ref="617828785"/>
+						<int key="NSvFlags">266</int>
+						<string key="NSFrame">{{214, 79}, {120, 14}}</string>
+						<reference key="NSSuperview" ref="617828785"/>
+						<bool key="NSEnabled">YES</bool>
+						<object class="NSTextFieldCell" key="NSCell" id="635385194">
+							<int key="NSCellFlags">67239488</int>
+							<int key="NSCellFlags2">272631808</int>
+							<string key="NSContents">global info here</string>
+							<reference key="NSSupport" ref="26"/>
+							<reference key="NSControlView" ref="760004836"/>
+							<reference key="NSBackgroundColor" ref="874092629"/>
+							<object class="NSColor" key="NSTextColor">
+								<int key="NSColorSpace">3</int>
+								<bytes key="NSWhite">MC40MgA</bytes>
+							</object>
+						</object>
+					</object>
+					<object class="NSTextField" id="620344525">
+						<reference key="NSNextResponder" ref="617828785"/>
+						<int key="NSvFlags">266</int>
+						<string key="NSFrame">{{214, 57}, {120, 14}}</string>
+						<reference key="NSSuperview" ref="617828785"/>
+						<bool key="NSEnabled">YES</bool>
+						<object class="NSTextFieldCell" key="NSCell" id="583484016">
+							<int key="NSCellFlags">67239488</int>
+							<int key="NSCellFlags2">272631808</int>
+							<string key="NSContents">global info here</string>
+							<reference key="NSSupport" ref="26"/>
+							<reference key="NSControlView" ref="620344525"/>
+							<reference key="NSBackgroundColor" ref="874092629"/>
+							<object class="NSColor" key="NSTextColor">
+								<int key="NSColorSpace">3</int>
+								<bytes key="NSWhite">MC40MgA</bytes>
+							</object>
 						</object>
 					</object>
 					<object class="NSTextField" id="706967535">
@@ -715,7 +750,7 @@
 								<nil key="NS.nil"/>
 								<object class="NSAttributedString" key="NS.nan">
 									<string key="NSString">NaN</string>
-									<reference key="NSAttributes" ref="1014964092"/>
+									<reference key="NSAttributes" ref="331954539"/>
 								</object>
 								<integer value="1" key="NS.min"/>
 								<real value="3000" key="NS.max"/>
@@ -1172,6 +1207,22 @@
 					</object>
 					<int key="connectionID">106</int>
 				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">fIdleLimitGlobalLabel</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="620344525"/>
+					</object>
+					<int key="connectionID">111</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">fRatioLimitGlobalLabel</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="760004836"/>
+					</object>
+					<int key="connectionID">112</int>
+				</object>
 			</object>
 			<object class="IBMutableOrderedSet" key="objectRecords">
 				<object class="NSArray" key="orderedObjects">
@@ -1228,6 +1279,8 @@
 							<reference ref="110760088"/>
 							<reference ref="317277208"/>
 							<reference ref="706967535"/>
+							<reference ref="620344525"/>
+							<reference ref="760004836"/>
 						</object>
 						<reference key="parent" ref="0"/>
 						<string key="objectName">Options</string>
@@ -1689,6 +1742,34 @@
 						<reference key="object" ref="38211108"/>
 						<reference key="parent" ref="706967535"/>
 					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">107</int>
+						<reference key="object" ref="620344525"/>
+						<object class="NSMutableArray" key="children">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<reference ref="583484016"/>
+						</object>
+						<reference key="parent" ref="617828785"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">108</int>
+						<reference key="object" ref="583484016"/>
+						<reference key="parent" ref="620344525"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">109</int>
+						<reference key="object" ref="760004836"/>
+						<object class="NSMutableArray" key="children">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<reference ref="635385194"/>
+						</object>
+						<reference key="parent" ref="617828785"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">110</int>
+						<reference key="object" ref="635385194"/>
+						<reference key="parent" ref="760004836"/>
+					</object>
 				</object>
 			</object>
 			<object class="NSMutableDictionary" key="flattenedProperties">
@@ -1698,9 +1779,17 @@
 					<string>-3.IBPluginDependency</string>
 					<string>10.IBPluginDependency</string>
 					<string>10.ImportedFromIB2</string>
+					<string>107.IBPluginDependency</string>
+					<string>107.IBViewBoundsToFrameTransform</string>
+					<string>107.ImportedFromIB2</string>
+					<string>108.IBPluginDependency</string>
+					<string>109.IBPluginDependency</string>
+					<string>109.IBViewBoundsToFrameTransform</string>
+					<string>109.ImportedFromIB2</string>
 					<string>11.CustomClassName</string>
 					<string>11.IBPluginDependency</string>
 					<string>11.ImportedFromIB2</string>
+					<string>110.IBPluginDependency</string>
 					<string>12.IBPluginDependency</string>
 					<string>12.ImportedFromIB2</string>
 					<string>13.IBPluginDependency</string>
@@ -1800,6 +1889,7 @@
 					<string>9.IBPluginDependency</string>
 					<string>9.ImportedFromIB2</string>
 					<string>97.IBPluginDependency</string>
+					<string>97.IBViewBoundsToFrameTransform</string>
 					<string>97.ImportedFromIB2</string>
 					<string>98.IBPluginDependency</string>
 				</object>
@@ -1808,9 +1898,21 @@
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="1"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<object class="NSAffineTransform">
+						<bytes key="NSTransformStruct">P4AAAL+AAABDVgAAwooAAA</bytes>
+					</object>
+					<integer value="1"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<object class="NSAffineTransform">
+						<bytes key="NSTransformStruct">P4AAAL+AAABDWwAAwoAAAA</bytes>
+					</object>
+					<integer value="1"/>
 					<string>ColorTextField</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="1"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="1"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -1910,6 +2012,9 @@
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="1"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<object class="NSAffineTransform">
+						<bytes key="NSTransformStruct">P4AAAL+AAABDhYAAwooAAA</bytes>
+					</object>
 					<integer value="1"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 				</object>
@@ -1930,7 +2035,7 @@
 				</object>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">106</int>
+			<int key="maxID">112</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -2036,12 +2141,14 @@
 							<string>fDownloadLimitLabel</string>
 							<string>fGlobalLimitCheck</string>
 							<string>fIdleLimitField</string>
+							<string>fIdleLimitGlobalLabel</string>
 							<string>fIdleLimitLabel</string>
 							<string>fIdlePopUp</string>
 							<string>fPeersConnectField</string>
 							<string>fPeersConnectLabel</string>
 							<string>fPriorityPopUp</string>
 							<string>fRatioLimitField</string>
+							<string>fRatioLimitGlobalLabel</string>
 							<string>fRatioPopUp</string>
 							<string>fUploadLimitCheck</string>
 							<string>fUploadLimitField</string>
@@ -2055,10 +2162,12 @@
 							<string>NSButton</string>
 							<string>NSTextField</string>
 							<string>NSTextField</string>
+							<string>NSTextField</string>
 							<string>NSPopUpButton</string>
 							<string>NSTextField</string>
 							<string>NSTextField</string>
 							<string>NSPopUpButton</string>
+							<string>NSTextField</string>
 							<string>NSTextField</string>
 							<string>NSPopUpButton</string>
 							<string>NSButton</string>
@@ -2075,12 +2184,14 @@
 							<string>fDownloadLimitLabel</string>
 							<string>fGlobalLimitCheck</string>
 							<string>fIdleLimitField</string>
+							<string>fIdleLimitGlobalLabel</string>
 							<string>fIdleLimitLabel</string>
 							<string>fIdlePopUp</string>
 							<string>fPeersConnectField</string>
 							<string>fPeersConnectLabel</string>
 							<string>fPriorityPopUp</string>
 							<string>fRatioLimitField</string>
+							<string>fRatioLimitGlobalLabel</string>
 							<string>fRatioPopUp</string>
 							<string>fUploadLimitCheck</string>
 							<string>fUploadLimitField</string>
@@ -2109,6 +2220,10 @@
 								<string key="candidateClassName">NSTextField</string>
 							</object>
 							<object class="IBToOneOutletInfo">
+								<string key="name">fIdleLimitGlobalLabel</string>
+								<string key="candidateClassName">NSTextField</string>
+							</object>
+							<object class="IBToOneOutletInfo">
 								<string key="name">fIdleLimitLabel</string>
 								<string key="candidateClassName">NSTextField</string>
 							</object>
@@ -2130,6 +2245,10 @@
 							</object>
 							<object class="IBToOneOutletInfo">
 								<string key="name">fRatioLimitField</string>
+								<string key="candidateClassName">NSTextField</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">fRatioLimitGlobalLabel</string>
 								<string key="candidateClassName">NSTextField</string>
 							</object>
 							<object class="IBToOneOutletInfo">

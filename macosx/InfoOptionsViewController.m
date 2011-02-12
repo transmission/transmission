@@ -23,6 +23,7 @@
  *****************************************************************************/
 
 #import "InfoOptionsViewController.h"
+#import "NSStringAdditions.h"
 #import "Torrent.h"
 
 #define OPTION_POPUP_GLOBAL 0
@@ -182,6 +183,15 @@
     else
         [fRatioLimitField setStringValue: @""];
     
+    [fRatioLimitGlobalLabel setHidden: checkRatio != TR_RATIOLIMIT_GLOBAL];
+    if (checkRatio == TR_RATIOLIMIT_GLOBAL)
+    {
+        NSString * global = [[NSUserDefaults standardUserDefaults] boolForKey: @"RatioCheck"]
+            ? [NSString stringForRatio: [[NSUserDefaults standardUserDefaults] floatForKey: @"RatioLimit"]]
+            : NSLocalizedString(@"disabled", "Info options -> global setting");
+        [fRatioLimitGlobalLabel setStringValue: global];
+    }
+    
     //set idle view
     if (checkIdle == TR_IDLELIMIT_SINGLE)
         index = OPTION_POPUP_LIMIT;
@@ -200,6 +210,21 @@
     else
         [fIdleLimitField setStringValue: @""];
     [fIdleLimitLabel setHidden: checkIdle != TR_IDLELIMIT_SINGLE];
+    
+    [fIdleLimitGlobalLabel setHidden: checkIdle != TR_IDLELIMIT_GLOBAL];
+    if (checkIdle == TR_IDLELIMIT_GLOBAL)
+    {
+        NSString * global;
+        if ([[NSUserDefaults standardUserDefaults] boolForKey: @"IdleLimitCheck"])
+        {
+            const NSInteger globalMin = [[NSUserDefaults standardUserDefaults] integerForKey: @"IdleLimitMinutes"];
+            global = globalMin == 1 ? NSLocalizedString(@"1 minute", "Info options -> global setting")
+                : [NSString stringWithFormat: NSLocalizedString(@"%d minutes", "Info options -> global setting"), globalMin];
+        }
+        else
+            global = NSLocalizedString(@"disabled", "Info options -> global setting");
+        [fIdleLimitGlobalLabel setStringValue: global];
+    }
     
     //get priority info
     enumerator = [fTorrents objectEnumerator];
@@ -294,7 +319,7 @@
 - (void) setRatioSetting: (id) sender
 {
     NSInteger setting;
-    bool single = NO;
+    BOOL single = NO;
     switch ([sender indexOfSelectedItem])
     {
         case OPTION_POPUP_LIMIT:
@@ -321,6 +346,8 @@
         [fRatioLimitField selectText: self];
         [[[self view] window] makeKeyAndOrderFront: self];
     }
+    
+    [self updateOptions]; //heavy-handed reload of global settings
 }
 
 - (void) setRatioLimit: (id) sender
@@ -334,7 +361,7 @@
 - (void) setIdleSetting: (id) sender
 {
     NSInteger setting;
-    bool single = NO;
+    BOOL single = NO;
     switch ([sender indexOfSelectedItem])
     {
         case OPTION_POPUP_LIMIT:
@@ -362,6 +389,8 @@
         [fIdleLimitField selectText: self];
         [[[self view] window] makeKeyAndOrderFront: self];
     }
+    
+    [self updateOptions]; //heavy-handed reload of global settings
 }
 
 - (void) setIdleLimit: (id) sender
@@ -455,12 +484,14 @@
         [fRatioPopUp selectItemAtIndex: -1];
         [fRatioLimitField setHidden: YES];
         [fRatioLimitField setStringValue: @""];
+        [fRatioLimitGlobalLabel setHidden: YES];
         
         [fIdlePopUp setEnabled: NO];
         [fIdlePopUp selectItemAtIndex: -1];
         [fIdleLimitField setHidden: YES];
         [fIdleLimitField setStringValue: @""];
         [fIdleLimitLabel setHidden: YES];
+        [fIdleLimitGlobalLabel setHidden: YES];
         
         [fPeersConnectField setEnabled: NO];
         [fPeersConnectField setStringValue: @""];

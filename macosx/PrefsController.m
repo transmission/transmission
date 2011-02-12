@@ -597,6 +597,9 @@ tr_session * fHandle;
 {
     tr_sessionSetRatioLimited(fHandle, [fDefaults boolForKey: @"RatioCheck"]);
     tr_sessionSetRatioLimit(fHandle, [fDefaults floatForKey: @"RatioLimit"]);
+    
+    //reload global settings in inspector
+    [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateOptions" object: nil];
 }
 
 - (void) setRatioStop: (id) sender
@@ -618,6 +621,9 @@ tr_session * fHandle;
 {
     tr_sessionSetIdleLimited(fHandle, [fDefaults boolForKey: @"IdleLimitCheck"]);
     tr_sessionSetIdleLimit(fHandle, [fDefaults integerForKey: @"IdleLimitMinutes"]);
+    
+    //reload global settings in inspector
+    [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateOptions" object: nil];
 }
 
 - (void) setIdleStop: (id) sender
@@ -1238,6 +1244,9 @@ tr_session * fHandle;
     }
     
     [[NSNotificationCenter defaultCenter] postNotificationName: @"SpeedLimitUpdate" object: nil];
+    
+    //reload global settings in inspector
+    [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateOptions" object: nil];
 }
 
 @end
