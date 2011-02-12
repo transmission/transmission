@@ -59,8 +59,8 @@
 							<object class="NSTextFieldCell" key="NSCell" id="585844623">
 								<int key="NSCellFlags">67239488</int>
 								<int key="NSCellFlags2">4196864</int>
-								<string key="NSContents">No Torrent Selected</string>
-								<object class="NSFont" key="NSSupport">
+								<string key="NSContents">title</string>
+								<object class="NSFont" key="NSSupport" id="821159006">
 									<string key="NSName">LucidaGrande-Bold</string>
 									<double key="NSSize">13</double>
 									<int key="NSfFlags">2072</int>
@@ -84,6 +84,22 @@
 										<bytes key="NSWhite">MAA</bytes>
 									</object>
 								</object>
+							</object>
+						</object>
+						<object class="NSTextField" id="858898992">
+							<reference key="NSNextResponder" ref="429007171"/>
+							<int key="NSvFlags">266</int>
+							<string key="NSFrame">{{47, 42}, {349, 17}}</string>
+							<reference key="NSSuperview" ref="429007171"/>
+							<bool key="NSEnabled">YES</bool>
+							<object class="NSTextFieldCell" key="NSCell" id="600353689">
+								<int key="NSCellFlags">67239488</int>
+								<int key="NSCellFlags2">4196352</int>
+								<string key="NSContents">No Torrents Selected</string>
+								<reference key="NSSupport" ref="821159006"/>
+								<reference key="NSControlView" ref="858898992"/>
+								<reference key="NSBackgroundColor" ref="339856346"/>
+								<reference key="NSTextColor" ref="534079857"/>
 							</object>
 						</object>
 						<object class="NSImageView" id="40615128">
@@ -476,6 +492,14 @@ AAB0ZXh0AAAAAENvcHlyaWdodCBBcHBsZSBDb21wdXRlciwgSW5jLiwgMjAwNQAAAAA</bytes>
 					</object>
 					<int key="connectionID">1479</int>
 				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">fNoneSelectedField</string>
+						<reference key="source" ref="1016287627"/>
+						<reference key="destination" ref="858898992"/>
+					</object>
+					<int key="connectionID">1834</int>
+				</object>
 			</object>
 			<object class="IBMutableOrderedSet" key="objectRecords">
 				<object class="NSArray" key="orderedObjects">
@@ -522,10 +546,11 @@ AAB0ZXh0AAAAAENvcHlyaWdodCBBcHBsZSBDb21wdXRlciwgSW5jLiwgMjAwNQAAAAA</bytes>
 						<object class="NSMutableArray" key="children">
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<reference ref="974784210"/>
-							<reference ref="40615128"/>
 							<reference ref="1020839921"/>
-							<reference ref="843033231"/>
 							<reference ref="9173479"/>
+							<reference ref="843033231"/>
+							<reference ref="40615128"/>
+							<reference ref="858898992"/>
 						</object>
 						<reference key="parent" ref="571546118"/>
 					</object>
@@ -535,24 +560,6 @@ AAB0ZXh0AAAAAENvcHlyaWdodCBBcHBsZSBDb21wdXRlciwgSW5jLiwgMjAwNQAAAAA</bytes>
 						<object class="NSMutableArray" key="children">
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<reference ref="585844623"/>
-						</object>
-						<reference key="parent" ref="429007171"/>
-					</object>
-					<object class="IBObjectRecord">
-						<int key="objectID">28</int>
-						<reference key="object" ref="40615128"/>
-						<object class="NSMutableArray" key="children">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-							<reference ref="1001933557"/>
-						</object>
-						<reference key="parent" ref="429007171"/>
-					</object>
-					<object class="IBObjectRecord">
-						<int key="objectID">29</int>
-						<reference key="object" ref="843033231"/>
-						<object class="NSMutableArray" key="children">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-							<reference ref="615989236"/>
 						</object>
 						<reference key="parent" ref="429007171"/>
 					</object>
@@ -602,16 +609,6 @@ AAB0ZXh0AAAAAENvcHlyaWdodCBBcHBsZSBDb21wdXRlciwgSW5jLiwgMjAwNQAAAAA</bytes>
 						<reference key="parent" ref="974784210"/>
 					</object>
 					<object class="IBObjectRecord">
-						<int key="objectID">1482</int>
-						<reference key="object" ref="1001933557"/>
-						<reference key="parent" ref="40615128"/>
-					</object>
-					<object class="IBObjectRecord">
-						<int key="objectID">1483</int>
-						<reference key="object" ref="615989236"/>
-						<reference key="parent" ref="843033231"/>
-					</object>
-					<object class="IBObjectRecord">
 						<int key="objectID">1562</int>
 						<reference key="object" ref="645033959"/>
 						<reference key="parent" ref="1020839921"/>
@@ -626,6 +623,48 @@ AAB0ZXh0AAAAAENvcHlyaWdodCBBcHBsZSBDb21wdXRlciwgSW5jLiwgMjAwNQAAAAA</bytes>
 						<reference key="object" ref="9173479"/>
 						<reference key="parent" ref="429007171"/>
 					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">29</int>
+						<reference key="object" ref="843033231"/>
+						<object class="NSMutableArray" key="children">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<reference ref="615989236"/>
+						</object>
+						<reference key="parent" ref="429007171"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">1483</int>
+						<reference key="object" ref="615989236"/>
+						<reference key="parent" ref="843033231"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">28</int>
+						<reference key="object" ref="40615128"/>
+						<object class="NSMutableArray" key="children">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<reference ref="1001933557"/>
+						</object>
+						<reference key="parent" ref="429007171"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">1482</int>
+						<reference key="object" ref="1001933557"/>
+						<reference key="parent" ref="40615128"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">1832</int>
+						<reference key="object" ref="858898992"/>
+						<object class="NSMutableArray" key="children">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<reference ref="600353689"/>
+						</object>
+						<reference key="parent" ref="429007171"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">1833</int>
+						<reference key="object" ref="600353689"/>
+						<reference key="parent" ref="858898992"/>
+					</object>
 				</object>
 			</object>
 			<object class="NSMutableDictionary" key="flattenedProperties">
@@ -639,16 +678,23 @@ AAB0ZXh0AAAAAENvcHlyaWdodCBBcHBsZSBDb21wdXRlciwgSW5jLiwgMjAwNQAAAAA</bytes>
 					<string>1483.IBPluginDependency</string>
 					<string>15.CustomClassName</string>
 					<string>15.IBPluginDependency</string>
+					<string>15.IBViewBoundsToFrameTransform</string>
 					<string>15.ImportedFromIB2</string>
 					<string>1562.IBPluginDependency</string>
 					<string>1726.CustomClassName</string>
 					<string>1726.IBPluginDependency</string>
 					<string>1830.IBPluginDependency</string>
 					<string>1830.IBViewBoundsToFrameTransform</string>
+					<string>1832.CustomClassName</string>
+					<string>1832.IBPluginDependency</string>
+					<string>1832.IBViewBoundsToFrameTransform</string>
+					<string>1832.ImportedFromIB2</string>
+					<string>1833.IBPluginDependency</string>
 					<string>28.IBPluginDependency</string>
 					<string>28.ImportedFromIB2</string>
 					<string>29.CustomClassName</string>
 					<string>29.IBPluginDependency</string>
+					<string>29.IBViewBoundsToFrameTransform</string>
 					<string>29.ImportedFromIB2</string>
 					<string>5.IBEditorWindowLastContentRect</string>
 					<string>5.IBPluginDependency</string>
@@ -688,6 +734,9 @@ AAB0ZXh0AAAAAENvcHlyaWdodCBBcHBsZSBDb21wdXRlciwgSW5jLiwgMjAwNQAAAAA</bytes>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>InfoTextField</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<object class="NSAffineTransform">
+						<bytes key="NSTransformStruct">P4AAAL+AAABCPAAAwngAAA</bytes>
+					</object>
 					<integer value="1"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>InfoTabButtonCell</string>
@@ -696,10 +745,20 @@ AAB0ZXh0AAAAAENvcHlyaWdodCBBcHBsZSBDb21wdXRlciwgSW5jLiwgMjAwNQAAAAA</bytes>
 					<object class="NSAffineTransform">
 						<bytes key="NSTransformStruct">AUOLAAAAAAAAA</bytes>
 					</object>
+					<string>InfoTextField</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<object class="NSAffineTransform">
+						<bytes key="NSTransformStruct">P4AAAL+AAABA4AAAwmgAAA</bytes>
+					</object>
+					<integer value="1"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="1"/>
 					<string>InfoTextField</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<object class="NSAffineTransform">
+						<bytes key="NSTransformStruct">P4AAAL+AAABCPAAAwjQAAA</bytes>
+					</object>
 					<integer value="1"/>
 					<string>{{500, 881}, {403, 75}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -747,7 +806,7 @@ AAB0ZXh0AAAAAENvcHlyaWdodCBBcHBsZSBDb21wdXRlciwgSW5jLiwgMjAwNQAAAAA</bytes>
 				</object>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">1830</int>
+			<int key="maxID">1834</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -813,12 +872,14 @@ AAB0ZXh0AAAAAENvcHlyaWdodCBBcHBsZSBDb21wdXRlciwgSW5jLiwgMjAwNQAAAAA</bytes>
 							<string>fBasicInfoField</string>
 							<string>fImageView</string>
 							<string>fNameField</string>
+							<string>fNoneSelectedField</string>
 							<string>fTabMatrix</string>
 						</object>
 						<object class="NSMutableArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<string>NSTextField</string>
 							<string>NSImageView</string>
+							<string>NSTextField</string>
 							<string>NSTextField</string>
 							<string>NSMatrix</string>
 						</object>
@@ -830,6 +891,7 @@ AAB0ZXh0AAAAAENvcHlyaWdodCBBcHBsZSBDb21wdXRlciwgSW5jLiwgMjAwNQAAAAA</bytes>
 							<string>fBasicInfoField</string>
 							<string>fImageView</string>
 							<string>fNameField</string>
+							<string>fNoneSelectedField</string>
 							<string>fTabMatrix</string>
 						</object>
 						<object class="NSMutableArray" key="dict.values">
@@ -844,6 +906,10 @@ AAB0ZXh0AAAAAENvcHlyaWdodCBBcHBsZSBDb21wdXRlciwgSW5jLiwgMjAwNQAAAAA</bytes>
 							</object>
 							<object class="IBToOneOutletInfo">
 								<string key="name">fNameField</string>
+								<string key="candidateClassName">NSTextField</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">fNoneSelectedField</string>
 								<string key="candidateClassName">NSTextField</string>
 							</object>
 							<object class="IBToOneOutletInfo">
