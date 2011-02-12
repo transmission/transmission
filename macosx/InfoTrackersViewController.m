@@ -60,6 +60,11 @@
 
 - (void) awakeFromNib
 {
+    [[fTrackerAddRemoveControl cell] setToolTip: NSLocalizedString(@"Add a tracker", "Inspector view -> tracker buttons")
+        forSegment: TRACKER_ADD_TAG];
+    [[fTrackerAddRemoveControl cell] setToolTip: NSLocalizedString(@"Remove selected trackers", "Inspector view -> tracker buttons")
+        forSegment: TRACKER_REMOVE_TAG];
+    
     const CGFloat height = [[NSUserDefaults standardUserDefaults] floatForKey: @"InspectorContentHeightTracker"];
     if (height != 0.0)
     {

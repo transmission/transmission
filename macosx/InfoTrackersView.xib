@@ -12,7 +12,7 @@
 		</object>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
-			<integer value="3"/>
+			<integer value="2"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -51,7 +51,7 @@
 									<object class="NSTableView" id="842054994">
 										<reference key="NSNextResponder" ref="267914516"/>
 										<int key="NSvFlags">256</int>
-										<string key="NSFrameSize">{360, 315}</string>
+										<string key="NSFrameSize">{360, 318}</string>
 										<reference key="NSSuperview" ref="267914516"/>
 										<bool key="NSEnabled">YES</bool>
 										<object class="_NSCornerView" key="NSCornerView">
@@ -144,7 +144,7 @@
 										<int key="NSTableViewDraggingDestinationStyle">0</int>
 									</object>
 								</object>
-								<string key="NSFrame">{{1, 1}, {360, 315}}</string>
+								<string key="NSFrame">{{1, 1}, {360, 318}}</string>
 								<reference key="NSSuperview" ref="277351025"/>
 								<reference key="NSNextKeyView" ref="842054994"/>
 								<reference key="NSDocView" ref="842054994"/>
@@ -173,7 +173,7 @@
 								<double key="NSPercent">0.99731899999999996</double>
 							</object>
 						</object>
-						<string key="NSFrame">{{10, 30}, {362, 317}}</string>
+						<string key="NSFrame">{{10, 27}, {362, 320}}</string>
 						<reference key="NSSuperview" ref="843078550"/>
 						<reference key="NSNextKeyView" ref="267914516"/>
 						<int key="NSsFlags">530</int>
@@ -185,7 +185,7 @@
 					<object class="NSSegmentedControl" id="337035856">
 						<reference key="NSNextResponder" ref="843078550"/>
 						<int key="NSvFlags">292</int>
-						<string key="NSFrame">{{10, 9}, {67, 19}}</string>
+						<string key="NSFrame">{{8, 8}, {71, 18}}</string>
 						<reference key="NSSuperview" ref="843078550"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSSegmentedCell" key="NSCell" id="488496278">
@@ -220,7 +220,7 @@
 								</object>
 							</object>
 							<int key="NSTrackingMode">2</int>
-							<int key="NSSegmentStyle">6</int>
+							<int key="NSSegmentStyle">3</int>
 						</object>
 					</object>
 				</object>
@@ -396,6 +396,9 @@
 					<string>2.editorWindowContentRectSynchronizationRect</string>
 					<string>3.IBPluginDependency</string>
 					<string>4.IBPluginDependency</string>
+					<string>4.IBSegmentedControlTracker.RoundRobinState</string>
+					<string>4.IBSegmentedControlTracker.WasGrowing</string>
+					<string>4.IBViewBoundsToFrameTransform</string>
 					<string>5.IBPluginDependency</string>
 					<string>6.CustomClassName</string>
 					<string>6.IBPluginDependency</string>
@@ -407,12 +410,17 @@
 					<bool key="EncodedWithXMLCoder">YES</bool>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>{{315, 335}, {382, 352}}</string>
+					<string>{{319, 548}, {382, 352}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="1"/>
 					<string>{{476, 437}, {380, 275}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<integer value="0"/>
+					<integer value="0"/>
+					<object class="NSAffineTransform">
+						<bytes key="NSTransformStruct">P4AAAL+AAABBAAAAwdAAAA</bytes>
+					</object>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>TrackerTableView</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
