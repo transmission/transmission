@@ -39,6 +39,7 @@
 @interface InfoOptionsViewController (Private)
 
 - (void) setupInfo;
+- (void) setGlobalLabels;
 
 @end
 
@@ -54,8 +55,18 @@
     return self;
 }
 
+- (void) awakeFromNib
+{
+    [self setGlobalLabels];
+    
+    [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(setGlobalLabels) name: @"UpdateGlobalOptions"
+        object: nil];
+}
+
 - (void) dealloc
 {
+    [[NSNotificationCenter defaultCenter] removeObserver: self];
+    
     [fTorrents release];
     
     [super dealloc];
@@ -184,13 +195,6 @@
         [fRatioLimitField setStringValue: @""];
     
     [fRatioLimitGlobalLabel setHidden: checkRatio != TR_RATIOLIMIT_GLOBAL];
-    if (checkRatio == TR_RATIOLIMIT_GLOBAL)
-    {
-        NSString * global = [[NSUserDefaults standardUserDefaults] boolForKey: @"RatioCheck"]
-            ? [NSString stringForRatio: [[NSUserDefaults standardUserDefaults] floatForKey: @"RatioLimit"]]
-            : NSLocalizedString(@"disabled", "Info options -> global setting");
-        [fRatioLimitGlobalLabel setStringValue: global];
-    }
     
     //set idle view
     if (checkIdle == TR_IDLELIMIT_SINGLE)
@@ -212,19 +216,6 @@
     [fIdleLimitLabel setHidden: checkIdle != TR_IDLELIMIT_SINGLE];
     
     [fIdleLimitGlobalLabel setHidden: checkIdle != TR_IDLELIMIT_GLOBAL];
-    if (checkIdle == TR_IDLELIMIT_GLOBAL)
-    {
-        NSString * global;
-        if ([[NSUserDefaults standardUserDefaults] boolForKey: @"IdleLimitCheck"])
-        {
-            const NSInteger globalMin = [[NSUserDefaults standardUserDefaults] integerForKey: @"IdleLimitMinutes"];
-            global = globalMin == 1 ? NSLocalizedString(@"1 minute", "Info options -> global setting")
-                : [NSString stringWithFormat: NSLocalizedString(@"%d minutes", "Info options -> global setting"), globalMin];
-        }
-        else
-            global = NSLocalizedString(@"disabled", "Info options -> global setting");
-        [fIdleLimitGlobalLabel setStringValue: global];
-    }
     
     //get priority info
     enumerator = [fTorrents objectEnumerator];
@@ -347,7 +338,7 @@
         [[[self view] window] makeKeyAndOrderFront: self];
     }
     
-    [self updateOptions]; //heavy-handed reload of global settings
+    [fRatioLimitGlobalLabel setHidden: setting != TR_RATIOLIMIT_GLOBAL];
 }
 
 - (void) setRatioLimit: (id) sender
@@ -390,7 +381,7 @@
         [[[self view] window] makeKeyAndOrderFront: self];
     }
     
-    [self updateOptions]; //heavy-handed reload of global settings
+    [fIdleLimitGlobalLabel setHidden: setting != TR_IDLELIMIT_GLOBAL];
 }
 
 - (void) setIdleLimit: (id) sender
@@ -499,6 +490,26 @@
     }
     else
         [self updateOptions];
+}
+
+- (void) setGlobalLabels
+{
+    NSString * global = [[NSUserDefaults standardUserDefaults] boolForKey: @"RatioCheck"]
+        ? [NSString stringForRatio: [[NSUserDefaults standardUserDefaults] floatForKey: @"RatioLimit"]]
+        : NSLocalizedString(@"disabled", "Info options -> global setting");
+    [fRatioLimitGlobalLabel setStringValue: global];
+    
+    //idle field
+    NSString * globalIdle;
+    if ([[NSUserDefaults standardUserDefaults] boolForKey: @"IdleLimitCheck"])
+    {
+        const NSInteger globalMin = [[NSUserDefaults standardUserDefaults] integerForKey: @"IdleLimitMinutes"];
+        globalIdle = globalMin == 1 ? NSLocalizedString(@"1 minute", "Info options -> global setting")
+            : [NSString stringWithFormat: NSLocalizedString(@"%d minutes", "Info options -> global setting"), globalMin];
+    }
+    else
+        globalIdle = NSLocalizedString(@"disabled", "Info options -> global setting");
+    [fIdleLimitGlobalLabel setStringValue: globalIdle];
 }
 
 @end
