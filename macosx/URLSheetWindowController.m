@@ -27,7 +27,7 @@
 
 @interface URLSheetWindowController (Private)
 
-- (BOOL) updateOpenButtonForURL: (NSString *) string;
+- (void) updateOpenButtonForURL: (NSString *) string;
 
 @end
 
@@ -74,7 +74,6 @@ NSString * urlString = nil;
         openFrame.size.width = NSWidth(cancelFrame);
     
     openFrame.origin.x = NSWidth([[self window] frame]) - NSWidth(openFrame) - 20.0 + 6.0; //I don't know why the extra 6.0 is needed
-    
     [fOpenButton setFrame: openFrame];
     
     cancelFrame.origin.x = NSMinX(openFrame) - NSWidth(cancelFrame);
@@ -115,7 +114,7 @@ NSString * urlString = nil;
 
 @implementation URLSheetWindowController (Private)
 
-- (BOOL) updateOpenButtonForURL: (NSString *) string
+- (void) updateOpenButtonForURL: (NSString *) string
 {
     BOOL enable = YES;
     if ([string isEqualToString: @""])
