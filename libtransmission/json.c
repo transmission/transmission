@@ -91,7 +91,7 @@ callback( void *             vdata,
 
         case JSON_T_FLOAT:
             data->hasContent = TRUE;
-            tr_bencInitReal( getNode( data ), (double)value->vu.float_value );
+            tr_bencInitReal( getNode( data ), value->vu.float_value );
             break;
 
         case JSON_T_NULL:

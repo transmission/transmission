@@ -2277,7 +2277,7 @@ processArgs( const char * rpcurl, int argc, const char ** argv )
             }
             default:
             {
-                fprintf( stderr, "got opt [%d]\n", (int)c );
+                fprintf( stderr, "got opt [%d]\n", c );
                 showUsage( );
                 break;
             }
