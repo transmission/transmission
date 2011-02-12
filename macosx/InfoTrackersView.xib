@@ -185,7 +185,7 @@
 					<object class="NSSegmentedControl" id="337035856">
 						<reference key="NSNextResponder" ref="843078550"/>
 						<int key="NSvFlags">292</int>
-						<string key="NSFrame">{{8, 8}, {71, 18}}</string>
+						<string key="NSFrame">{{9, 8}, {71, 18}}</string>
 						<reference key="NSSuperview" ref="843078550"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSSegmentedCell" key="NSCell" id="488496278">
