@@ -139,7 +139,7 @@
 					<object class="NSPopUpButton" id="110760088">
 						<reference key="NSNextResponder" ref="617828785"/>
 						<int key="NSvFlags">268</int>
-						<string key="NSFrame">{{68, 52}, {144, 22}}</string>
+						<string key="NSFrame">{{71, 53}, {138, 22}}</string>
 						<reference key="NSSuperview" ref="617828785"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSPopUpButtonCell" key="NSCell" id="669284794">
@@ -148,7 +148,7 @@
 							<reference key="NSSupport" ref="26"/>
 							<reference key="NSControlView" ref="110760088"/>
 							<int key="NSButtonFlags">-2038284033</int>
-							<int key="NSButtonFlags2">1</int>
+							<int key="NSButtonFlags2">36</int>
 							<object class="NSFont" key="NSAlternateImage" id="292875478">
 								<string key="NSName">LucidaGrande</string>
 								<double key="NSSize">11</double>
@@ -581,7 +581,7 @@
 					<object class="NSPopUpButton" id="705594185">
 						<reference key="NSNextResponder" ref="617828785"/>
 						<int key="NSvFlags">268</int>
-						<string key="NSFrame">{{68, 74}, {144, 22}}</string>
+						<string key="NSFrame">{{71, 75}, {138, 22}}</string>
 						<reference key="NSSuperview" ref="617828785"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSPopUpButtonCell" key="NSCell" id="931579513">
@@ -590,7 +590,7 @@
 							<reference key="NSSupport" ref="26"/>
 							<reference key="NSControlView" ref="705594185"/>
 							<int key="NSButtonFlags">-2038284033</int>
-							<int key="NSButtonFlags2">1</int>
+							<int key="NSButtonFlags2">36</int>
 							<reference key="NSAlternateImage" ref="292875478"/>
 							<string key="NSAlternateContents"/>
 							<object class="NSMutableString" key="NSKeyEquivalent">
@@ -862,7 +862,7 @@
 					<object class="NSPopUpButton" id="529271757">
 						<reference key="NSNextResponder" ref="617828785"/>
 						<int key="NSvFlags">268</int>
-						<string key="NSFrame">{{107, 199}, {101, 22}}</string>
+						<string key="NSFrame">{{110, 200}, {98, 22}}</string>
 						<reference key="NSSuperview" ref="617828785"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSPopUpButtonCell" key="NSCell" id="545585394">
@@ -870,8 +870,9 @@
 							<int key="NSCellFlags2">133120</int>
 							<reference key="NSSupport" ref="26"/>
 							<reference key="NSControlView" ref="529271757"/>
-							<int key="NSButtonFlags">109199615</int>
-							<int key="NSButtonFlags2">129</int>
+							<int key="NSButtonFlags">-2038284033</int>
+							<int key="NSButtonFlags2">164</int>
+							<reference key="NSAlternateImage" ref="26"/>
 							<string key="NSAlternateContents"/>
 							<string key="NSKeyEquivalent"/>
 							<int key="NSPeriodicDelay">400</int>
@@ -1978,7 +1979,7 @@
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>{{379, 759}, {102, 54}}</string>
+					<string>{{355, 757}, {117, 54}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="1"/>
