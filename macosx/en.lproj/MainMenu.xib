@@ -12,9 +12,9 @@
 		</object>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
-			<integer value="21"/>
+			<integer value="29"/>
 			<integer value="589"/>
-			<integer value="1400"/>
+			<integer value="21"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -1657,7 +1657,7 @@ AAAAAAAAAAAAAAAAA</bytes>
 								</object>
 								<object class="NSMenuItem" id="96633809">
 									<reference key="NSMenu" ref="335948734"/>
-									<string key="NSTitle">Clear Completed</string>
+									<string key="NSTitle">Cleanup Completed</string>
 									<string key="NSKeyEquiv"/>
 									<int key="NSMnemonicLoc">2147483647</int>
 									<reference key="NSOnImage" ref="322614661"/>
