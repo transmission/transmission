@@ -1324,10 +1324,10 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 - (void) removeTorrents: (NSArray *) torrents deleteData: (BOOL) deleteData
 {
     [torrents retain];
-    NSInteger active = 0, downloading = 0;
 
     if ([fDefaults boolForKey: @"CheckRemove"])
     {
+        NSInteger active = 0, downloading = 0;
         for (Torrent * torrent in torrents)
             if ([torrent isActive])
             {
@@ -1433,6 +1433,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         [torrent closeRemoveTorrent: deleteData];
     }
     
+    #warning why do we need them retained?
     [torrents release];
     
     [fTableView deselectAll: nil];
@@ -1448,6 +1449,17 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 - (void) removeDeleteData: (id) sender
 {
     [self removeTorrents: [fTableView selectedTorrents] deleteData: YES];
+}
+
+- (void) clearCompleted: (id) sender
+{
+    NSMutableArray * torrents = [[NSMutableArray alloc] init];
+    
+    for (Torrent * torrent in fTorrents)
+        if ([torrent isFinishedSeeding])
+            [torrents addObject: torrent];
+    
+    [self confirmRemoveTorrents: torrents deleteData: NO];
 }
 
 - (void) moveDataFilesSelected: (id) sender
@@ -3901,6 +3913,15 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         }
         
         return canUseTable && [fTableView numberOfSelectedRows] > 0;
+    }
+    
+    //clear completed transfers item
+    if (action == @selector(clearCompleted:))
+    {
+        for (Torrent * torrent in fTorrents)
+            if ([torrent isFinishedSeeding])
+                return YES;
+        return NO;
     }
 
     //enable pause all item

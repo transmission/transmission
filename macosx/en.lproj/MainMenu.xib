@@ -12,6 +12,9 @@
 		</object>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
+			<integer value="21"/>
+			<integer value="589"/>
+			<integer value="1400"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -45,7 +48,7 @@
 				<string key="NSWindowContentMaxSize">{1.79769e+308, 1.79769e+308}</string>
 				<string key="NSWindowContentMinSize">{350, 5}</string>
 				<object class="NSView" key="NSWindowView" id="303120456">
-					<nil key="NSNextResponder"/>
+					<reference key="NSNextResponder"/>
 					<int key="NSvFlags">256</int>
 					<object class="NSMutableArray" key="NSSubviews">
 						<bool key="EncodedWithXMLCoder">YES</bool>
@@ -738,6 +741,7 @@ AAAAAAAAAAAAAAAAA</bytes>
 						</object>
 					</object>
 					<string key="NSFrameSize">{515, 248}</string>
+					<reference key="NSSuperview"/>
 				</object>
 				<string key="NSScreenRect">{{0, 0}, {1680, 1028}}</string>
 				<string key="NSMinSize">{350, 27}</string>
@@ -1611,7 +1615,7 @@ AAAAAAAAAAAAAAAAA</bytes>
 										</object>
 									</object>
 								</object>
-								<object class="NSMenuItem" id="250837515">
+								<object class="NSMenuItem" id="349340971">
 									<reference key="NSMenu" ref="335948734"/>
 									<bool key="NSIsDisabled">YES</bool>
 									<bool key="NSIsSeparator">YES</bool>
@@ -1636,6 +1640,25 @@ AAAAAAAAAAAAAAAAA</bytes>
 									<string key="NSTitle">Verify Local Data</string>
 									<string key="NSKeyEquiv"/>
 									<int key="NSKeyEquivModMask">1048576</int>
+									<int key="NSMnemonicLoc">2147483647</int>
+									<reference key="NSOnImage" ref="322614661"/>
+									<reference key="NSMixedImage" ref="3851078"/>
+								</object>
+								<object class="NSMenuItem" id="250837515">
+									<reference key="NSMenu" ref="335948734"/>
+									<bool key="NSIsDisabled">YES</bool>
+									<bool key="NSIsSeparator">YES</bool>
+									<string key="NSTitle"/>
+									<string key="NSKeyEquiv"/>
+									<int key="NSKeyEquivModMask">1048576</int>
+									<int key="NSMnemonicLoc">2147483647</int>
+									<reference key="NSOnImage" ref="322614661"/>
+									<reference key="NSMixedImage" ref="3851078"/>
+								</object>
+								<object class="NSMenuItem" id="96633809">
+									<reference key="NSMenu" ref="335948734"/>
+									<string key="NSTitle">Clear Completed</string>
+									<string key="NSKeyEquiv"/>
 									<int key="NSMnemonicLoc">2147483647</int>
 									<reference key="NSOnImage" ref="322614661"/>
 									<reference key="NSMixedImage" ref="3851078"/>
@@ -4870,6 +4893,14 @@ AAAAAAAAAAAAAAAAA</bytes>
 					</object>
 					<int key="connectionID">3406</int>
 				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">clearCompleted:</string>
+						<reference key="source" ref="30116300"/>
+						<reference key="destination" ref="96633809"/>
+					</object>
+					<int key="connectionID">3409</int>
+				</object>
 			</object>
 			<object class="IBMutableOrderedSet" key="objectRecords">
 				<object class="NSArray" key="orderedObjects">
@@ -5442,12 +5473,14 @@ AAAAAAAAAAAAAAAAA</bytes>
 							<reference ref="117698132"/>
 							<reference ref="522160989"/>
 							<reference ref="765645684"/>
-							<reference ref="245039314"/>
 							<reference ref="219482367"/>
 							<reference ref="321002146"/>
 							<reference ref="562631300"/>
 							<reference ref="1063637453"/>
+							<reference ref="349340971"/>
+							<reference ref="245039314"/>
 							<reference ref="250837515"/>
+							<reference ref="96633809"/>
 						</object>
 						<reference key="parent" ref="249425108"/>
 					</object>
@@ -5519,11 +5552,6 @@ AAAAAAAAAAAAAAAAA</bytes>
 					<object class="IBObjectRecord">
 						<int key="objectID">1804</int>
 						<reference key="object" ref="765645684"/>
-						<reference key="parent" ref="335948734"/>
-					</object>
-					<object class="IBObjectRecord">
-						<int key="objectID">1805</int>
-						<reference key="object" ref="245039314"/>
 						<reference key="parent" ref="335948734"/>
 					</object>
 					<object class="IBObjectRecord">
@@ -6877,6 +6905,21 @@ AAAAAAAAAAAAAAAAA</bytes>
 						<reference key="object" ref="254573946"/>
 						<reference key="parent" ref="188604546"/>
 					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">3407</int>
+						<reference key="object" ref="96633809"/>
+						<reference key="parent" ref="335948734"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">3408</int>
+						<reference key="object" ref="349340971"/>
+						<reference key="parent" ref="335948734"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">1805</int>
+						<reference key="object" ref="245039314"/>
+						<reference key="parent" ref="335948734"/>
+					</object>
 				</object>
 			</object>
 			<object class="NSMutableDictionary" key="flattenedProperties">
@@ -7424,6 +7467,9 @@ AAAAAAAAAAAAAAAAA</bytes>
 					<string>3403.ImportedFromIB2</string>
 					<string>3405.IBPluginDependency</string>
 					<string>3405.ImportedFromIB2</string>
+					<string>3407.IBPluginDependency</string>
+					<string>3408.IBPluginDependency</string>
+					<string>3408.ImportedFromIB2</string>
 					<string>418.IBPluginDependency</string>
 					<string>418.ImportedFromIB2</string>
 					<string>456.IBEditorWindowLastContentRect</string>
@@ -7453,6 +7499,7 @@ AAAAAAAAAAAAAAAAA</bytes>
 					<string>582.ImportedFromIB2</string>
 					<string>583.IBPluginDependency</string>
 					<string>583.ImportedFromIB2</string>
+					<string>589.IBEditorWindowLastContentRect</string>
 					<string>589.IBPluginDependency</string>
 					<string>589.ImportedFromIB2</string>
 					<string>589.editorWindowContentRectSynchronizationRect</string>
@@ -7554,7 +7601,7 @@ AAAAAAAAAAAAAAAAA</bytes>
 					<integer value="1"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="1"/>
-					<string>{{637, 548}, {290, 333}}</string>
+					<string>{{468, 378}, {290, 363}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="1"/>
 					<string>{{446, 528}, {293, 373}}</string>
@@ -7908,7 +7955,7 @@ AAAAAAAAAAAAAAAAA</bytes>
 					<integer value="1"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="1"/>
-					<string>{{71, 664}, {479, 20}}</string>
+					<string>{{203, 741}, {479, 20}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="1"/>
 					<string>{{468, 888}, {479, 20}}</string>
@@ -8023,6 +8070,9 @@ AAAAAAAAAAAAAAAAA</bytes>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="1"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<integer value="1"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="1"/>
 					<string>{{586, 242}, {291, 313}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -8051,6 +8101,7 @@ AAAAAAAAAAAAAAAAA</bytes>
 					<integer value="1"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="1"/>
+					<string>{{0, 902}, {231, 93}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="1"/>
 					<string>{{0, 902}, {234, 93}}</string>
@@ -8092,7 +8143,7 @@ AAAAAAAAAAAAAAAAA</bytes>
 				</object>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">3406</int>
+			<int key="maxID">3409</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -8107,6 +8158,7 @@ AAAAAAAAAAAAAAAAA</bytes>
 							<string>allToolbarClicked:</string>
 							<string>announceSelectedTorrents:</string>
 							<string>applyFilter:</string>
+							<string>clearCompleted:</string>
 							<string>copyMagnetLinks:</string>
 							<string>copyTorrentFiles:</string>
 							<string>createFile:</string>
@@ -8213,6 +8265,7 @@ AAAAAAAAAAAAAAAAA</bytes>
 							<string>id</string>
 							<string>id</string>
 							<string>id</string>
+							<string>id</string>
 						</object>
 					</object>
 					<object class="NSMutableDictionary" key="actionInfosByName">
@@ -8222,6 +8275,7 @@ AAAAAAAAAAAAAAAAA</bytes>
 							<string>allToolbarClicked:</string>
 							<string>announceSelectedTorrents:</string>
 							<string>applyFilter:</string>
+							<string>clearCompleted:</string>
 							<string>copyMagnetLinks:</string>
 							<string>copyTorrentFiles:</string>
 							<string>createFile:</string>
@@ -8285,6 +8339,10 @@ AAAAAAAAAAAAAAAAA</bytes>
 							</object>
 							<object class="IBActionInfo">
 								<string key="name">applyFilter:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">clearCompleted:</string>
 								<string key="candidateClassName">id</string>
 							</object>
 							<object class="IBActionInfo">

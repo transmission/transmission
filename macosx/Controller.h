@@ -156,6 +156,8 @@ typedef enum
 - (void) removeNoDelete:                (id) sender;
 - (void) removeDeleteData:              (id) sender;
 
+- (void) clearCompleted: (id) sender;
+
 - (void) moveDataFilesSelected: (id) sender;
 - (void) moveDataFiles: (NSArray *) torrents;
 - (void) moveDataFileChoiceClosed: (NSOpenPanel *) panel returnCode: (NSInteger) code contextInfo: (NSArray *) torrents;
