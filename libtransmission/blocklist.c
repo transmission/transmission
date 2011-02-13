@@ -11,7 +11,7 @@
  */
 
 #include <stdio.h>
-#include <stdlib.h> /* free() */
+#include <stdlib.h> /* qsort(), free() */
 #include <string.h>
 
 #ifdef WIN32
@@ -306,16 +306,27 @@ parseLine( const char * line, struct tr_ipv4_range * range )
         || parseLine2( line, range );
 }
 
+static int
+compareAddressRangesByFirstAddress( const void * va, const void * vb )
+{
+    const struct tr_ipv4_range * a = va;
+    const struct tr_ipv4_range * b = vb;
+    if( a->begin != b->begin )
+        return a->begin < b->begin ? -1 : 1;
+    return 0;
+}
+
 int
-_tr_blocklistSetContent( tr_blocklist * b,
-                         const char *   filename )
+_tr_blocklistSetContent( tr_blocklist * b, const char * filename )
 {
     FILE * in;
     FILE * out;
     int inCount = 0;
-    int outCount = 0;
     char line[2048];
     const char * err_fmt = _( "Couldn't read \"%1$s\": %2$s" );
+    struct tr_ipv4_range * ranges = NULL;
+    size_t ranges_alloc = 0;
+    size_t ranges_count = 0;
 
     if( !filename )
     {
@@ -340,6 +351,7 @@ _tr_blocklistSetContent( tr_blocklist * b,
         return 0;
     }
 
+    /* load the rules into memory */
     while( fgets( line, sizeof( line ), in ) != NULL )
     {
         char * walk;
@@ -358,27 +370,63 @@ _tr_blocklistSetContent( tr_blocklist * b,
             continue;
         }
 
-        if( fwrite( &range, sizeof( struct tr_ipv4_range ), 1, out ) != 1 )
+        if( ranges_alloc == ranges_count )
         {
-            tr_err( _( "Couldn't save file \"%1$s\": %2$s" ), b->filename,
-                   tr_strerror( errno ) );
-            break;
+            ranges_alloc += 4096; /* arbitrary */
+            ranges = tr_renew( struct tr_ipv4_range, ranges, ranges_alloc );
         }
 
-        ++outCount;
+        ranges[ranges_count++] = range;
     }
 
+    if( ranges_count > 0 ) /* sort and merge */
     {
+        struct tr_ipv4_range * r;
+        struct tr_ipv4_range * keep = ranges;
+        const struct tr_ipv4_range * end;
+
+        /* sort */
+        qsort( ranges, ranges_count, sizeof( struct tr_ipv4_range ),
+               compareAddressRangesByFirstAddress );
+
+        /* merge */
+        for( r=ranges+1, end=ranges+ranges_count; r!=end; ++r ) {
+            if( keep->end < r->begin )
+                *++keep = *r;
+            else if( keep->end < r->end )
+                keep->end = r->end;
+        }
+
+        ranges_count = keep + 1 - ranges;
+
+#ifndef NDEBUG
+        /* sanity checks: make sure the rules are sorted
+         * in ascending order and don't overlap */
+        {
+            size_t i;
+
+            for( i=0; i<ranges_count; ++i )
+                assert( ranges[i].begin <= ranges[i].end );
+
+            for( i=1; i<ranges_count; ++i )
+                assert( ranges[i-1].end < ranges[i].begin );
+        }
+#endif
+    }
+
+    if( fwrite( ranges, sizeof( struct tr_ipv4_range ), ranges_count, out ) != ranges_count )
+        tr_err( _( "Couldn't save file \"%1$s\": %2$s" ), b->filename, tr_strerror( errno ) );
+    else {
         char * base = tr_basename( b->filename );
-        tr_inf( _( "Blocklist \"%s\" updated with %d entries" ), base, outCount );
+        tr_inf( _( "Blocklist \"%s\" updated with %zu entries" ), base, ranges_count );
         tr_free( base );
     }
 
+    tr_free( ranges );
     fclose( out );
     fclose( in );
 
     blocklistLoad( b );
 
-    return outCount;
+    return ranges_count;
 }
-
