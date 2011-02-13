@@ -1407,6 +1407,9 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 
 - (void) confirmRemoveTorrents: (NSArray *) torrents deleteData: (BOOL) deleteData
 {
+    NSMutableArray * selectedValues = [NSMutableArray arrayWithArray: [fTableView selectedValues]];
+    [selectedValues removeObjectsInArray: torrents];
+    
     //don't want any of these starting then stopping
     for (Torrent * torrent in torrents)
         [torrent setWaitToStart: NO];
@@ -1436,7 +1439,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     #warning why do we need them retained?
     [torrents release];
     
-    [fTableView deselectAll: nil];
+    [fTableView selectValues: selectedValues];
     
     [self updateTorrentsInQueue];
 }
