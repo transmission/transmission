@@ -1088,6 +1088,10 @@ tr_torrent* tr_torrentFindFromHash( tr_session * session, const uint8_t * hash )
 /** @brief Convenience function similar to tr_torrentFindFromHash() */
 tr_torrent* tr_torrentFindFromMagnetLink( tr_session * session, const char * link );
 
+/**
+ * @return this torrent's name.
+ */
+const char* tr_torrentName( const tr_torrent * );
 
 /**
  * @brief find the location of a torrent's file by looking with and without

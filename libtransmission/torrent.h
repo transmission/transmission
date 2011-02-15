@@ -372,14 +372,6 @@ void tr_torrentSetDirty( tr_torrent * tor )
     tor->isDirty = TRUE;
 }
 
-static inline
-const char * tr_torrentName( const tr_torrent * tor )
-{
-    assert( tr_isTorrent( tor ) );
-
-    return tor->info.name;
-}
-
 uint32_t tr_getBlockSize( uint32_t pieceSize );
 
 /**

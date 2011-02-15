@@ -2024,7 +2024,7 @@ refreshTracker( struct DetailsImpl * di, tr_torrent ** torrents, int n )
     for( i=0; i<n; ++i ) {
         int j;
         const tr_torrent * tor = torrents[i];
-        const char * summary_name = n>1 ? tr_torrentInfo( tor )->name : NULL;
+        const char * summary_name = n>1 ? tr_torrentName( tor ) : NULL;
         for( j=0; j<statCount[i]; ++j ) {
             const tr_tracker_stat * st = &stats[i][j];
             char * summary = buildTrackerSummary( summary_name, st, showScrape );
@@ -2189,7 +2189,7 @@ on_edit_trackers( GtkButton * button, gpointer data )
         GtkWindow * win = GTK_WINDOW( gtk_widget_get_toplevel( GTK_WIDGET( button ) ) );
         char * text = get_editable_tracker_list( tor );
         const int torrent_id = tr_torrentId( tor );
-        char * title = g_strdup_printf( _( "%s - Edit Trackers" ), tr_torrentInfo( tor )->name );
+        char * title = g_strdup_printf( _( "%s - Edit Trackers" ), tr_torrentName( tor ) );
 
         d = gtk_dialog_new_with_buttons( title, win,
                 GTK_DIALOG_MODAL|GTK_DIALOG_DESTROY_WITH_PARENT,
@@ -2299,7 +2299,7 @@ on_tracker_list_add_button_clicked( GtkButton * button UNUSED, gpointer gdi )
         GtkWidget * e;
         GtkWidget * t;
         GtkWidget * w;
-        char * title = g_strdup_printf( _( "%s - Add Tracker" ), tr_torrentInfo( tor )->name );
+        char * title = g_strdup_printf( _( "%s - Add Tracker" ), tr_torrentName( tor ) );
 
         w = gtk_dialog_new_with_buttons( title, GTK_WINDOW( di->dialog ),
                                          GTK_DIALOG_DESTROY_WITH_PARENT,

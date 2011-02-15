@@ -68,6 +68,14 @@
 ****
 ***/
 
+const char *
+tr_torrentName( const tr_torrent * tor )
+{
+    assert( tr_isTorrent( tor ) );
+
+    return tor->info.name;
+}
+
 int
 tr_torrentId( const tr_torrent * tor )
 {

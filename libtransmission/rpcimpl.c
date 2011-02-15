@@ -533,7 +533,7 @@ addField( const tr_torrent * tor, tr_benc * d, const char * key )
     else if( tr_streq( key, keylen, "metadataPercentComplete" ) )
         tr_bencDictAddReal( d, key, st->metadataPercentComplete );
     else if( tr_streq( key, keylen, "name" ) )
-        tr_bencDictAddStr( d, key, inf->name );
+        tr_bencDictAddStr( d, key, tr_torrentName( tor ) );
     else if( tr_streq( key, keylen, "percentDone" ) )
         tr_bencDictAddReal( d, key, st->percentDone );
     else if( tr_streq( key, keylen, "peer-limit" ) )

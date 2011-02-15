@@ -387,7 +387,7 @@ get_size_compact( TorrentCellRenderer * cell,
     const tr_stat * st = tr_torrentStatCached( (tr_torrent*)tor );
 
     icon = get_icon( tor, COMPACT_ICON_SIZE, widget );
-    name = tr_torrentInfo( tor )->name;
+    name = tr_torrentName( tor );
     status = getShortStatusString( tor, st, p->upload_speed_KBps, p->download_speed_KBps );
     gtr_cell_renderer_get_padding( GTK_CELL_RENDERER( cell ), &xpad, &ypad );
 
@@ -445,7 +445,7 @@ get_size_full( TorrentCellRenderer * cell,
     const tr_info * inf = tr_torrentInfo( tor );
 
     icon = get_icon( tor, FULL_ICON_SIZE, widget );
-    name = inf->name;
+    name = tr_torrentName( tor );
     status = getStatusString( tor, st, p->upload_speed_KBps, p->download_speed_KBps );
     progress = getProgressString( tor, inf, st );
     gtr_cell_renderer_get_padding( GTK_CELL_RENDERER( cell ), &xpad, &ypad );
@@ -563,7 +563,7 @@ render_compact( TorrentCellRenderer   * cell,
     const gboolean sensitive = active || st->error;
 
     icon = get_icon( tor, COMPACT_ICON_SIZE, widget );
-    name = tr_torrentInfo( tor )->name;
+    name = tr_torrentName( tor );
     status = getShortStatusString( tor, st, p->upload_speed_KBps, p->download_speed_KBps );
     gtr_cell_renderer_get_padding( GTK_CELL_RENDERER( cell ), &xpad, &ypad );
     get_text_color( widget, st, &text_color );
@@ -640,7 +640,7 @@ render_full( TorrentCellRenderer   * cell,
     const gboolean sensitive = active || st->error;
 
     icon = get_icon( tor, FULL_ICON_SIZE, widget );
-    name = inf->name;
+    name = tr_torrentName( tor );
     status = getStatusString( tor, st, p->upload_speed_KBps, p->download_speed_KBps );
     progress = getProgressString( tor, inf, st );
     gtr_cell_renderer_get_padding( GTK_CELL_RENDERER( cell ), &xpad, &ypad );

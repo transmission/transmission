@@ -866,9 +866,11 @@ tr_core_close( TrCore * core )
 }
 
 static char*
-get_collated_name( const tr_info * inf )
+get_collated_name( const tr_torrent * tor )
 {
-    char * down = g_utf8_strdown( inf->name ? inf->name : "", -1 );
+    const char * name = tr_torrentName( tor );
+    const tr_info * inf = tr_torrentInfo( tor );
+    char * down = g_utf8_strdown( name ? name : "", -1 );
     char * collated = g_strdup_printf( "%s\t%s", down, inf->hashString );
     g_free( down );
     return collated;
@@ -877,16 +879,16 @@ get_collated_name( const tr_info * inf )
 void
 tr_core_add_torrent( TrCore * self, TrTorrent * gtor, gboolean doNotify )
 {
-    const tr_info * inf = tr_torrent_info( gtor );
     const tr_stat * st = tr_torrent_stat( gtor );
     tr_torrent * tor = tr_torrent_handle( gtor );
-    char *  collated = get_collated_name( inf );
+    const char * name = tr_torrentName( tor );
+    char * collated = get_collated_name( tor );
     char *  trackers = torrentTrackerString( tor );
     GtkListStore *  store = GTK_LIST_STORE( tr_core_raw_model( self ) );
     GtkTreeIter  unused;
 
     gtk_list_store_insert_with_values( store, &unused, 0,
-        MC_NAME,              inf->name,
+        MC_NAME,              name,
         MC_NAME_COLLATED,     collated,
         MC_TORRENT,           gtor,
         MC_TORRENT_RAW,       tor,
@@ -901,7 +903,7 @@ tr_core_add_torrent( TrCore * self, TrTorrent * gtor, gboolean doNotify )
         -1 );
 
     if( doNotify )
-        gtr_notify_added( inf->name );
+        gtr_notify_added( name );
 
     /* cleanup */
     g_object_unref( G_OBJECT( gtor ) );
@@ -1336,7 +1338,7 @@ update_foreach( GtkTreeModel * model,
     newRecheckProgress = st->recheckProgress;
     newActivePeerCount = st->peersSendingToUs + st->peersGettingFromUs + st->webseedsSendingToUs;
     newError = st->error;
-    newCollatedName = get_collated_name( tr_torrent_info( gtor ) );
+    newCollatedName = get_collated_name( tor );
 
     /* updating the model triggers off resort/refresh,
        so don't do it unless something's actually changed... */
