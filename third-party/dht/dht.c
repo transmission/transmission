@@ -310,7 +310,7 @@ static struct timeval now;
 static time_t mybucket_grow_time, mybucket6_grow_time;
 static time_t expire_stuff_time;
 
-#define MAX_TOKEN_BUCKET_TOKENS 40
+#define MAX_TOKEN_BUCKET_TOKENS 4000
 static time_t token_bucket_time;
 static int token_bucket_tokens;
 
@@ -1714,7 +1714,7 @@ token_bucket(void)
 {
     if(token_bucket_tokens == 0) {
         token_bucket_tokens = MIN(MAX_TOKEN_BUCKET_TOKENS,
-                                  4 * (now.tv_sec - token_bucket_time));
+                                  100 * (now.tv_sec - token_bucket_time));
         token_bucket_time = now.tv_sec;
     }
 
