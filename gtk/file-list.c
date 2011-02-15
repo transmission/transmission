@@ -680,100 +680,6 @@ onRowActivated( GtkTreeView * view, GtkTreePath * path,
     return handled;
 }
 
-#if 0
-static void
-fileMenuSetDownload( GtkWidget * item, gpointer gdata )
-{
-    tr_torrent * tor;
-    FileData * data = gdata;
-
-    if(( tor = tr_torrentFindFromId( tr_core_session( data->core ), data->torrentId )))
-    {
-        const tr_bool download_flag = g_object_get_data( G_OBJECT( item ), TR_DOWNLOAD_KEY ) != NULL;
-        GArray * indices = getSelectedFilesAndDescendants( GTK_TREE_VIEW( data->view ) );
-
-        tr_torrentSetFileDLs( tor,
-                              (tr_file_index_t *) indices->data,
-                              (tr_file_index_t) indices->len,
-                              download_flag );
-
-        refresh( data );
-        g_array_free( indices, TRUE );
-    }
-}
-
-static void
-fileMenuSetPriority( GtkWidget * item, gpointer gdata )
-{
-    tr_torrent * tor;
-    FileData * data = gdata;
-
-    if(( tor = tr_torrentFindFromId( tr_core_session( data->core ), data->torrentId )))
-    {
-        const int priority = GPOINTER_TO_INT( g_object_get_data( G_OBJECT( item ), TR_PRIORITY_KEY ) );
-        GArray * indices = getSelectedFilesAndDescendants( GTK_TREE_VIEW( data->view ) );
-        tr_torrentSetFilePriorities( tor,
-                                     (tr_file_index_t *) indices->data,
-                                     (tr_file_index_t) indices->len,
-                                     priority );
-        refresh( data );
-        g_array_free( indices, TRUE );
-    }
-}
-
-static void
-fileMenuPopup( GtkWidget * w, GdkEventButton * event, gpointer filedata )
-{
-    GtkWidget * item;
-    GtkWidget * menu;
-
-    menu = gtk_menu_new( );
-    item = gtk_menu_item_new_with_label( _( "Set Priority High" ) );
-    g_object_set_data( G_OBJECT( item ), TR_PRIORITY_KEY,
-                       GINT_TO_POINTER( TR_PRI_HIGH ) );
-    g_signal_connect( item, "activate",
-                      G_CALLBACK( fileMenuSetPriority ), filedata );
-    gtk_menu_shell_append( GTK_MENU_SHELL( menu ), item );
-
-    item = gtk_menu_item_new_with_label( _( "Set Priority Normal" ) );
-    g_object_set_data( G_OBJECT( item ), TR_PRIORITY_KEY,
-                       GINT_TO_POINTER( TR_PRI_NORMAL ) );
-    g_signal_connect( item, "activate",
-                      G_CALLBACK( fileMenuSetPriority ), filedata );
-    gtk_menu_shell_append( GTK_MENU_SHELL( menu ), item );
-
-    item = gtk_menu_item_new_with_label( _( "Set Priority Low" ) );
-    g_object_set_data( G_OBJECT( item ), TR_PRIORITY_KEY,
-                       GINT_TO_POINTER( TR_PRI_LOW ) );
-    g_signal_connect( item, "activate",
-                      G_CALLBACK( fileMenuSetPriority ), filedata );
-    gtk_menu_shell_append( GTK_MENU_SHELL( menu ), item );
-
-    item = gtk_separator_menu_item_new( );
-    gtk_menu_shell_append( GTK_MENU_SHELL( menu ), item );
-
-    item = gtk_menu_item_new_with_label( _( "Download" ) );
-    g_object_set_data( G_OBJECT( item ), TR_DOWNLOAD_KEY,
-                       GINT_TO_POINTER( TRUE ) );
-    g_signal_connect( item, "activate",
-                      G_CALLBACK( fileMenuSetDownload ), filedata );
-    gtk_menu_shell_append( GTK_MENU_SHELL( menu ), item );
-
-    item = gtk_menu_item_new_with_label( _( "Do Not Download" ) );
-    g_object_set_data( G_OBJECT( item ), TR_DOWNLOAD_KEY,
-                       GINT_TO_POINTER( FALSE ) );
-    g_signal_connect( item, "activate",
-                      G_CALLBACK( fileMenuSetDownload ), filedata );
-    gtk_menu_shell_append( GTK_MENU_SHELL( menu ), item );
-
-    gtk_widget_show_all( menu );
-    gtk_menu_attach_to_widget( GTK_MENU( menu ), w, NULL );
-    gtk_menu_popup( GTK_MENU( menu ), NULL, NULL, NULL, NULL,
-                    event ? event->button : 0,
-                    event ? event->time : gtk_get_current_event_time( ) );
-}
-#endif
-
 static gboolean
 onViewPathToggled( GtkTreeView       * view,
                    GtkTreeViewColumn * col,
@@ -879,31 +785,10 @@ onViewButtonPressed( GtkWidget * w, GdkEventButton * event, gpointer gdata )
     {
         handled = onViewPathToggled( treeview, col, path, data );
     }
-#if 0
-    else if( event->type == GDK_BUTTON_PRESS && event->button == 3
-             && getAndSelectEventPath( treeview, event, &col, &path ) )
-    {
-        GtkTreeSelection * sel = gtk_tree_view_get_selection( treeview );
-        if( gtk_tree_selection_count_selected_rows( sel ) > 0 )
-        {
-            fileMenuPopup( w, event, data );
-            handled = TRUE;
-        }
-    }
-#endif
 
     gtk_tree_path_free( path );
     return handled;
 }
-
-#if 0
-static gboolean
-onViewPopupMenu( GtkWidget * w, gpointer gdata )
-{
-    fileMenuPopup( w, NULL, gdata );
-    return TRUE;
-}
-#endif
 
 GtkWidget *
 gtr_file_list_new( TrCore * core, int torrentId )
@@ -932,10 +817,6 @@ gtr_file_list_new( TrCore * core, int torrentId )
     gtk_container_set_border_width( GTK_CONTAINER( view ), GUI_PAD_BIG );
     g_signal_connect( view, "button-press-event",
                       G_CALLBACK( onViewButtonPressed ), data );
-#if 0
-    g_signal_connect( view, "popup-menu",
-                      G_CALLBACK( onViewPopupMenu ), data );
-#endif
     g_signal_connect( view, "row_activated",
                       G_CALLBACK( onRowActivated ), data );
     g_signal_connect( view, "button-release-event",
