@@ -1206,10 +1206,9 @@ tr_incrReplicationFromBitfield( Torrent * t, const tr_bitfield * b )
     assert( n == t->pieceReplicationSize );
     assert( tr_bitfieldTestFast( b, n-1 ) );
 
-    if( tr_bitfieldTestFast( b, n-1 ) )
-        for( i=0; i<n; ++i )
-            if( tr_bitfieldHasFast( b, i ) )
-                ++rep[i];
+    for( i=0; i<n; ++i )
+        if( tr_bitfieldHas( b, i ) )
+            ++rep[i];
 
     if( t->pieceSortState == PIECES_SORTED_BY_WEIGHT )
         invalidatePieceSorting( t );
@@ -1252,10 +1251,9 @@ tr_decrReplicationFromBitset( Torrent * t, const tr_bitset * bitset )
     {
         const tr_bitfield * const b = &bitset->bitfield;
 
-        if( tr_bitfieldTestFast( b, n-1 ) )
-            for( i=0; i<n; ++i )
-                if( tr_bitfieldHasFast( b, i ) )
-                    --t->pieceReplication[i];
+        for( i=0; i<n; ++i )
+            if( tr_bitfieldHas( b, i ) )
+                --t->pieceReplication[i];
 
         if( t->pieceSortState == PIECES_SORTED_BY_WEIGHT )
             invalidatePieceSorting( t );
