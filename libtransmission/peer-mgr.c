@@ -965,7 +965,7 @@ pieceListSort( Torrent * t, enum piece_sort_state state )
  * These functions are useful for testing, but too expensive for nightly builds.
  * let's leave it disabled but add an easy hook to compile it back in
  */
-#if 0
+#if 1
 #define assertWeightedPiecesAreSorted(t)
 #define assertReplicationCountIsExact(t)
 #else
