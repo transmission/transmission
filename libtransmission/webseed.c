@@ -77,8 +77,6 @@ webseed_free( struct tr_webseed * w )
 ****
 ***/
 
-static const tr_peer_event blank_event = { 0, 0, 0, 0, 0.0f, 0, 0, 0 };
-
 static void
 publish( tr_webseed * w, tr_peer_event * e )
 {
@@ -89,7 +87,7 @@ publish( tr_webseed * w, tr_peer_event * e )
 static void
 fire_client_got_rej( tr_torrent * tor, tr_webseed * w, tr_block_index_t block )
 {
-    tr_peer_event e = blank_event;
+    tr_peer_event e = TR_PEER_EVENT_INIT;
     e.eventType = TR_PEER_CLIENT_GOT_REJ;
     e.pieceIndex = tr_torBlockPiece( tor, block );
     e.offset = tor->blockSize * block - tor->info.pieceSize * e.pieceIndex;
@@ -100,7 +98,7 @@ fire_client_got_rej( tr_torrent * tor, tr_webseed * w, tr_block_index_t block )
 static void
 fire_client_got_block( tr_torrent * tor, tr_webseed * w, tr_block_index_t block )
 {
-    tr_peer_event e = blank_event;
+    tr_peer_event e = TR_PEER_EVENT_INIT;
     e.eventType = TR_PEER_CLIENT_GOT_BLOCK;
     e.pieceIndex = tr_torBlockPiece( tor, block );
     e.offset = tor->blockSize * block - tor->info.pieceSize * e.pieceIndex;
@@ -111,7 +109,7 @@ fire_client_got_block( tr_torrent * tor, tr_webseed * w, tr_block_index_t block 
 static void
 fire_client_got_data( tr_webseed * w, uint32_t length )
 {
-    tr_peer_event e = blank_event;
+    tr_peer_event e = TR_PEER_EVENT_INIT;
     e.eventType = TR_PEER_CLIENT_GOT_DATA;
     e.length = length;
     e.wasPieceData = TRUE;
