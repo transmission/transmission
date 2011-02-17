@@ -171,7 +171,6 @@ struct tr_incoming
  */
 struct tr_peermsgs
 {
-    tr_bool         got_a_bitfield_or_have_all_or_have_none;
     tr_bool         peerSupportsPex;
     tr_bool         peerSupportsMetadataXfer;
     tr_bool         clientSentLtepHandshake;
@@ -1455,8 +1454,6 @@ readBtMessage( tr_peermsgs * msgs, struct evbuffer * inbuf, size_t inlen )
             const size_t bitCount = tr_torrentHasMetadata( msgs->torrent )
                                   ? msgs->torrent->info.pieceCount
                                   : msglen * 8;
-assert( !msgs->got_a_bitfield_or_have_all_or_have_none );
-msgs->got_a_bitfield_or_have_all_or_have_none = TRUE;
             dbgmsg( msgs, "got a bitfield" );
             tr_bitsetReserve( &msgs->peer->have, bitCount );
             tr_peerIoReadBytes( msgs->peer->io, inbuf,
@@ -1537,8 +1534,6 @@ msgs->got_a_bitfield_or_have_all_or_have_none = TRUE;
         case BT_FEXT_HAVE_ALL:
             dbgmsg( msgs, "Got a BT_FEXT_HAVE_ALL" );
             if( fext ) {
-assert( !msgs->got_a_bitfield_or_have_all_or_have_none );
-msgs->got_a_bitfield_or_have_all_or_have_none = TRUE;
                 tr_bitsetSetHaveAll( &msgs->peer->have );
                 fireClientGotHaveAll( msgs );
                 updatePeerProgress( msgs );
@@ -1551,8 +1546,6 @@ msgs->got_a_bitfield_or_have_all_or_have_none = TRUE;
         case BT_FEXT_HAVE_NONE:
             dbgmsg( msgs, "Got a BT_FEXT_HAVE_NONE" );
             if( fext ) {
-assert( !msgs->got_a_bitfield_or_have_all_or_have_none );
-msgs->got_a_bitfield_or_have_all_or_have_none = TRUE;
                 tr_bitsetSetHaveNone( &msgs->peer->have );
                 fireClientGotHaveNone( msgs );
                 updatePeerProgress( msgs );
