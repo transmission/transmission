@@ -196,6 +196,8 @@ on_idle( tr_webseed * w )
 
 static void
 web_response_func( tr_session    * session,
+                   tr_bool         did_connect UNUSED,
+                   tr_bool         did_timeout UNUSED,
                    long            response_code,
                    const void    * response UNUSED,
                    size_t          response_byte_count UNUSED,

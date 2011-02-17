@@ -1066,6 +1066,8 @@ torrentSetLocation( tr_session               * session,
 
 static void
 portTested( tr_session       * session UNUSED,
+            tr_bool            did_connect UNUSED,
+            tr_bool            did_timeout UNUSED,
             long               response_code,
             const void       * response,
             size_t             response_byte_count,
@@ -1108,6 +1110,8 @@ portTest( tr_session               * session,
 
 static void
 gotNewBlocklist( tr_session       * session,
+                 tr_bool            did_connect UNUSED,
+                 tr_bool            did_timeout UNUSED,
                  long               response_code,
                  const void       * response,
                  size_t             response_byte_count,
@@ -1252,6 +1256,8 @@ struct add_torrent_idle_data
 
 static void
 gotMetadataFromURL( tr_session       * session UNUSED,
+                    tr_bool            did_connect UNUSED,
+                    tr_bool            did_timeout UNUSED,
                     long               response_code,
                     const void       * response,
                     size_t             response_byte_count,

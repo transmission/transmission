@@ -72,6 +72,9 @@ struct tr_web
 struct tr_web_task
 {
     long code;
+    long timeout_secs;
+    tr_bool did_connect;
+    tr_bool did_timeout;
     struct evbuffer * response;
     struct evbuffer * freebuf;
     char * url;
@@ -150,6 +153,8 @@ createEasy( tr_session * s, struct tr_web_task * task )
     const long verbose = getenv( "TR_CURL_VERBOSE" ) != NULL;
     char * cookie_filename = tr_buildPath( s->configDir, "cookies.txt", NULL );
 
+    task->timeout_secs = getTimeoutFromURL( task );
+
     curl_easy_setopt( e, CURLOPT_AUTOREFERER, 1L );
     curl_easy_setopt( e, CURLOPT_COOKIEFILE, cookie_filename );
     curl_easy_setopt( e, CURLOPT_ENCODING, "gzip;q=1.0, deflate, identity" );
@@ -163,7 +168,7 @@ createEasy( tr_session * s, struct tr_web_task * task )
 #endif
     curl_easy_setopt( e, CURLOPT_SSL_VERIFYHOST, 0L );
     curl_easy_setopt( e, CURLOPT_SSL_VERIFYPEER, 0L );
-    curl_easy_setopt( e, CURLOPT_TIMEOUT, getTimeoutFromURL( task ) );
+    curl_easy_setopt( e, CURLOPT_TIMEOUT, task->timeout_secs );
     curl_easy_setopt( e, CURLOPT_URL, task->url );
     curl_easy_setopt( e, CURLOPT_USERAGENT, TR_NAME "/" SHORT_VERSION_STRING );
     curl_easy_setopt( e, CURLOPT_VERBOSE, verbose );
@@ -197,6 +202,8 @@ task_finish_func( void * vtask )
 
     if( task->done_func != NULL )
         task->done_func( task->session,
+                         task->did_connect,
+                         task->did_timeout,
                          task->code,
                          evbuffer_pullup( task->response, -1 ),
                          evbuffer_get_length( task->response ),
@@ -364,10 +371,16 @@ tr_webThreadFunc( void * vsession )
         {
             if(( msg->msg == CURLMSG_DONE ) && ( msg->easy_handle != NULL ))
             {
+                double total_time;
                 struct tr_web_task * task;
+                long req_bytes_sent;
                 CURL * e = msg->easy_handle;
                 curl_easy_getinfo( e, CURLINFO_PRIVATE, (void*)&task );
                 curl_easy_getinfo( e, CURLINFO_RESPONSE_CODE, &task->code );
+                curl_easy_getinfo( e, CURLINFO_REQUEST_SIZE, &req_bytes_sent );
+                curl_easy_getinfo( e, CURLINFO_TOTAL_TIME, &total_time );
+                task->did_connect = task->code>0 || req_bytes_sent>0;
+                task->did_timeout = !task->code && ( total_time >= task->timeout_secs );
                 curl_multi_remove_handle( multi, e );
                 curl_easy_cleanup( e );
 /*fprintf( stderr, "removing a completed task.. taskCount is now %d (response code: %d, response len: %d)\n", taskCount, (int)task->code, (int)evbuffer_get_length(task->response) );*/

@@ -131,6 +131,8 @@ static tr_bool waitingOnWeb;
 
 static void
 onTorrentFileDownloaded( tr_session   * session UNUSED,
+                         tr_bool        did_connect UNUSED,
+                         tr_bool        did_timeout UNUSED,
                          long           response_code UNUSED,
                          const void   * response,
                          size_t         response_byte_count,
