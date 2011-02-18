@@ -96,12 +96,12 @@ tr_utpPacket(const unsigned char *buf, size_t buflen,
              tr_session *ss)
 {
     if(utp_timer == NULL) {
-        utp_timer = tr_new0(struct event, 1);
+        utp_timer = evtimer_new( ss->event_base, timer_callback, NULL);
         if(utp_timer == NULL)
             return -1;
-        evtimer_set(utp_timer, timer_callback, NULL);
         tr_timerAdd(utp_timer, 0,
-                    UTP_INTERVAL_US / 2 + tr_cryptoWeakRandInt(UTP_INTERVAL_US));
+                    UTP_INTERVAL_US / 2 +
+                    tr_cryptoWeakRandInt(UTP_INTERVAL_US));
     }
 
     return UTP_IsIncomingUTP(incoming, send_to, ss,
