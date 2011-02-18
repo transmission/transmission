@@ -407,11 +407,7 @@ utp_get_rb_size(void *closure)
     size_t bytes;
     assert( tr_isPeerIo( io ) );
 
-    if( io->read_enabled )
-        bytes =
-            tr_bandwidthClamp( &io->bandwidth, TR_DOWN, UTP_READ_BUFFER_SIZE );
-    else
-        bytes = 0;
+    bytes = tr_bandwidthClamp( &io->bandwidth, TR_DOWN, UTP_READ_BUFFER_SIZE );
 
     return UTP_READ_BUFFER_SIZE - bytes;
 }
