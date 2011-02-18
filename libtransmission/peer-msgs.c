@@ -939,6 +939,13 @@ parseLtepHandshake( tr_peermsgs *     msgs,
             msgs->ut_metadata_id = (uint8_t) i;
             dbgmsg( msgs, "msgs->ut_metadata_id is %d", (int)msgs->ut_metadata_id );
         }
+        if( tr_bencDictFindInt( sub, "ut_holepunch", &i ) ) {
+            /* Mysterious µTorrent extension that we don't grok.  However,
+               it implies support for µTP, so use it to indicate that. */
+            tr_peerMgrSetUtpFailed( msgs->torrent,
+                                    tr_peerIoGetAddress( msgs->peer->io, NULL ),
+                                    FALSE );
+        }
     }
 
     /* look for metainfo size (BEP 9) */
