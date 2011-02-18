@@ -398,6 +398,8 @@ utp_on_write(void *closure, unsigned char *buf, size_t buflen)
     if( rc < (long)buflen ) {
         tr_nerr( "UTP", "Short write: %d < %ld", rc, (long)buflen);
     }
+
+    didWriteWrapper( io, buflen );
 }
 
 static size_t
