@@ -3853,6 +3853,12 @@ initiateConnection( tr_peerMgr * mgr, Torrent * t, struct peer_atom * atom )
     const time_t now = tr_time( );
     tr_bool utp = tr_sessionIsUTPEnabled(mgr->session) && !atom->utp_failed;
 
+    if( atom->fromFirst == TR_PEER_FROM_PEX )
+        /* PEX has explicit signalling for uTP support.  If an atom
+           originally came from PEX and doesn't have the uTP flag, skip the
+           uTP connection attempt.  Are we being optimistic here? */
+        utp = utp && (atom->flags & ADDED_F_UTP_FLAGS);
+
     tordbg( t, "Starting an OUTGOING%s connection with %s",
             utp ? " µTP" : "",
             tr_atomAddrStr( atom ) );
