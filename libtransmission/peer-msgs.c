@@ -2247,10 +2247,11 @@ sendPex( tr_peermsgs * msgs )
                 tr_bencDictAddRaw( &val, "added", tmp, walk - tmp );
                 tr_free( tmp );
 
-                /* "added.f" */
+                /* "added.f"
+                 * unset each holepunch flag because we don't support it. */
                 tmp = walk = tr_new( uint8_t, diffs.addedCount );
                 for( i = 0; i < diffs.addedCount; ++i )
-                    *walk++ = diffs.added[i].flags;
+                    *walk++ = diffs.added[i].flags & ~ADDED_F_HOLEPUNCH;
                 assert( ( walk - tmp ) == diffs.addedCount );
                 tr_bencDictAddRaw( &val, "added.f", tmp, walk - tmp );
                 tr_free( tmp );
@@ -2283,10 +2284,11 @@ sendPex( tr_peermsgs * msgs )
                 tr_bencDictAddRaw( &val, "added6", tmp, walk - tmp );
                 tr_free( tmp );
 
-                /* "added6.f" */
+                /* "added6.f"
+                 * unset each holepunch flag because we don't support it. */
                 tmp = walk = tr_new( uint8_t, diffs6.addedCount );
                 for( i = 0; i < diffs6.addedCount; ++i )
-                    *walk++ = diffs6.added[i].flags;
+                    *walk++ = diffs6.added[i].flags & ~ADDED_F_HOLEPUNCH;
                 assert( ( walk - tmp ) == diffs6.addedCount );
                 tr_bencDictAddRaw( &val, "added6.f", tmp, walk - tmp );
                 tr_free( tmp );
