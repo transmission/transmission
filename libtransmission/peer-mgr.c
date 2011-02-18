@@ -3851,16 +3851,7 @@ initiateConnection( tr_peerMgr * mgr, Torrent * t, struct peer_atom * atom )
 {
     tr_peerIo * io;
     const time_t now = tr_time( );
-    tr_bool utp = FALSE;
-
-    /* Eventually, we'll want this to do something smart, like trying µTP
-       first and eventually falling back to TCP.  For now, only open µTP
-       connections if we have good reasons to believe the peer knows about
-       µTP. */
-
-    utp =
-        tr_sessionIsUTPEnabled(mgr->session) &&
-        (atom->flags & ADDED_F_UTP_FLAGS);
+    tr_bool utp = tr_sessionIsUTPEnabled(mgr->session) && !atom->utp_failed;
 
     tordbg( t, "Starting an OUTGOING%s connection with %s",
             utp ? " µTP" : "",
