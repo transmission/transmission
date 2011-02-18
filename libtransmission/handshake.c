@@ -1128,6 +1128,7 @@ gotError( tr_peerIo  * io,
           short        what,
           void       * vhandshake )
 {
+    int errcode = errno;
     tr_handshake * handshake = vhandshake;
 
     if( io->utp_socket && !io->isIncoming && handshake->state == AWAITING_YB ) {
@@ -1137,14 +1138,13 @@ gotError( tr_peerIo  * io,
             tr_torrentFindFromHash( handshake->session,
                                     tr_peerIoGetTorrentHash( io ) ) :
             NULL;
-        if( tor ) {
+        /* Don't mark a peer as non-uTP unless it's really a connect failure. */
+        if( tor && ( errcode == ETIMEDOUT || errcode == ECONNREFUSED ) ) {
             tr_torrentLock( tor );
             tr_peerMgrSetUtpFailed( tor,
                                     tr_peerIoGetAddress( io, NULL ),
                                     TRUE );
             tr_torrentUnlock( tor );
-        } else {
-            tr_nerr( "UTP", "Eek -- couldn't find torrent for outgoing I/O." );
         }
 
         if( !tr_peerIoReconnect( handshake->io ) ) {
