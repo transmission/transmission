@@ -2615,7 +2615,6 @@
 					"$(inherited)",
 					"-DSYS_DARWIN",
 					"-DWITH_UTP",
-					"-DWITH_UTP",
 					"-DHAVE_OPENSSL",
 					"-D__TRANSMISSION__",
 					"-DHAVE_STRLCPY",
@@ -2812,6 +2811,7 @@
 				OTHER_CFLAGS = (
 					"$(inherited)",
 					"-DSYS_DARWIN",
+					"-DWITH_UTP",
 					"-DHAVE_OPENSSL",
 					"-D__TRANSMISSION__",
 					"-DHAVE_STRLCPY",
