@@ -903,7 +903,7 @@ int trashDataFile(const char * filename)
     for (int i = 0; i < totalPeers; i++)
     {
         tr_peer_stat * peer = &peers[i];
-        NSMutableDictionary * dict = [NSMutableDictionary dictionaryWithCapacity: 11];
+        NSMutableDictionary * dict = [NSMutableDictionary dictionaryWithCapacity: 12];
         
         [dict setObject: [self name] forKey: @"Name"];
         [dict setObject: [NSNumber numberWithInt: peer->from] forKey: @"From"];
@@ -912,6 +912,7 @@ int trashDataFile(const char * filename)
         [dict setObject: [NSNumber numberWithFloat: peer->progress] forKey: @"Progress"];
         [dict setObject: [NSNumber numberWithBool: peer->isSeed] forKey: @"Seed"];
         [dict setObject: [NSNumber numberWithBool: peer->isEncrypted] forKey: @"Encryption"];
+        [dict setObject: [NSNumber numberWithBool: peer->isUTP] forKey: @"uTP"];
         [dict setObject: [NSString stringWithUTF8String: peer->client] forKey: @"Client"];
         [dict setObject: [NSString stringWithUTF8String: peer->flagStr] forKey: @"Flags"];
         
