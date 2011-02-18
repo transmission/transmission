@@ -15,9 +15,6 @@
 #include <stdlib.h> /* exit, atoi */
 #include <string.h> /* strcmp */
 
-#include <sys/types.h> /* umask*/
-#include <sys/stat.h> /* umask*/
-
 #include <fcntl.h> /* open */
 #include <signal.h>
 #ifdef HAVE_SYSLOG
