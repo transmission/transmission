@@ -544,13 +544,14 @@ io_dtor( void * vio )
 
     dbgmsg( io, "in tr_peerIo destructor" );
     event_disable( io, EV_READ | EV_WRITE );
-    event_free( io->event_read );
-    event_free( io->event_write );
     tr_bandwidthDestruct( &io->bandwidth );
     evbuffer_free( io->outbuf );
     evbuffer_free( io->inbuf );
-    if( io->socket >= 0 )
+    if( io->socket >= 0 ) {
+        event_free( io->event_read );
+        event_free( io->event_write );
         tr_netClose( io->session, io->socket );
+    }
     if( io->utp_socket != NULL )
         UTP_Close( io->utp_socket );
     tr_cryptoFree( io->crypto );
