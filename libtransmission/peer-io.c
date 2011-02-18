@@ -636,10 +636,9 @@ tr_peerIoNewOutgoing( tr_session        * session,
     assert( tr_isAddress( addr ) );
     assert( torrentHash );
 
-#ifdef WITH_UTP
     if( utp )
         utp_socket = tr_netOpenPeerUTPSocket( session, addr, port, isSeed );
-#endif
+
     if( !utp_socket ) {
         fd = tr_netOpenPeerSocket( session, addr, port, isSeed );
         dbgmsg( NULL, "tr_netOpenPeerSocket returned fd %d", fd );

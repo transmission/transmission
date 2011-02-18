@@ -102,13 +102,11 @@ int  tr_netOpenPeerSocket( tr_session       * session,
                            tr_port            port,
                            tr_bool            clientIsSeed );
 
-#ifdef WITH_UTP
 struct UTPSocket *
 tr_netOpenPeerUTPSocket( tr_session        * session,
                          const tr_address  * addr,
                          tr_port             port,
                          tr_bool             clientIsSeed);
-#endif
 
 int  tr_netBindTCP( const tr_address * addr,
                     tr_port            port,

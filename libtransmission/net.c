@@ -351,7 +351,6 @@ tr_netOpenPeerSocket( tr_session        * session,
     return s;
 }
 
-#ifdef WITH_UTP
 struct UTPSocket *
 tr_netOpenPeerUTPSocket( tr_session        * session,
                          const tr_address  * addr,
@@ -365,7 +364,6 @@ tr_netOpenPeerUTPSocket( tr_session        * session,
     return UTP_Create( tr_utpSendTo, (void*)session,
                        (struct sockaddr*)&ss, sslen );
 }
-#endif
 
 static int
 tr_netBindTCPImpl( const tr_address * addr, tr_port port, tr_bool suppressMsgs, int * errOut )

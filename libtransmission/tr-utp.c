@@ -75,6 +75,15 @@ int tr_utpPacket(const unsigned char *buf UNUSED, size_t buflen UNUSED,
                  const struct sockaddr *from UNUSED, socklen_t fromlen UNUSED,
                  tr_session *ss UNUSED) { return -1; }
 
+struct UTPSocket *UTP_Create(SendToProc *send_to_proc UNUSED,
+                             void *send_to_userdata UNUSED,
+                             const struct sockaddr *addr UNUSED,
+                             socklen_t addrlen UNUSED)
+{
+    errno = ENOSYS;
+    return NULL;
+}
+
 void tr_utpClose( tr_session * ss UNUSED ) { }
 
 void tr_utpSendTo(void *closure UNUSED,
