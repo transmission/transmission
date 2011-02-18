@@ -120,7 +120,7 @@ tr_utpPacket(const unsigned char *buf, size_t buflen,
 }
 
 void
-tr_utpClose( tr_session * session )
+tr_utpClose( tr_session * session UNUSED )
 {
     if( utp_timer )
     {
