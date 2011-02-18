@@ -44,6 +44,7 @@
 #include "stats.h"
 #include "torrent.h"
 #include "tr-udp.h"
+#include "tr-utp.h"
 #include "tr-lpd.h"
 #include "trevent.h"
 #include "utils.h"
@@ -314,6 +315,7 @@ tr_sessionGetDefaultSettings( const char * configDir UNUSED, tr_benc * d )
     tr_bencDictAddStr ( d, TR_PREFS_KEY_BLOCKLIST_URL,            "http://www.example.com/blocklist" );
     tr_bencDictAddInt ( d, TR_PREFS_KEY_MAX_CACHE_SIZE_MB,        DEFAULT_CACHE_SIZE_MB );
     tr_bencDictAddBool( d, TR_PREFS_KEY_DHT_ENABLED,              TRUE );
+    tr_bencDictAddBool( d, TR_PREFS_KEY_UTP_ENABLED,              FALSE );
     tr_bencDictAddBool( d, TR_PREFS_KEY_LPD_ENABLED,              FALSE );
     tr_bencDictAddStr ( d, TR_PREFS_KEY_DOWNLOAD_DIR,             tr_getDefaultDownloadDir( ) );
     tr_bencDictAddInt ( d, TR_PREFS_KEY_DSPEED_KBps,              100 );
@@ -378,6 +380,7 @@ tr_sessionGetSettings( tr_session * s, struct tr_benc * d )
     tr_bencDictAddStr ( d, TR_PREFS_KEY_BLOCKLIST_URL,            tr_blocklistGetURL( s ) );
     tr_bencDictAddInt ( d, TR_PREFS_KEY_MAX_CACHE_SIZE_MB,        tr_sessionGetCacheLimit_MB( s ) );
     tr_bencDictAddBool( d, TR_PREFS_KEY_DHT_ENABLED,              s->isDHTEnabled );
+    tr_bencDictAddBool( d, TR_PREFS_KEY_UTP_ENABLED,              s->isUTPEnabled );
     tr_bencDictAddBool( d, TR_PREFS_KEY_LPD_ENABLED,              s->isLPDEnabled );
     tr_bencDictAddStr ( d, TR_PREFS_KEY_DOWNLOAD_DIR,             s->downloadDir );
     tr_bencDictAddInt ( d, TR_PREFS_KEY_DSPEED_KBps,              tr_sessionGetSpeedLimit_KBps( s, TR_DOWN ) );
@@ -763,6 +766,8 @@ sessionSetImpl( void * vdata )
         tr_sessionSetPexEnabled( session, boolVal );
     if( tr_bencDictFindBool( settings, TR_PREFS_KEY_DHT_ENABLED, &boolVal ) )
         tr_sessionSetDHTEnabled( session, boolVal );
+    if( tr_bencDictFindBool( settings, TR_PREFS_KEY_UTP_ENABLED, &boolVal ) )
+        tr_sessionSetUTPEnabled( session, boolVal );
     if( tr_bencDictFindBool( settings, TR_PREFS_KEY_LPD_ENABLED, &boolVal ) )
         tr_sessionSetLPDEnabled( session, boolVal );
     if( tr_bencDictFindInt( settings, TR_PREFS_KEY_ENCRYPTION, &i ) )
@@ -1734,6 +1739,7 @@ sessionCloseImpl( void * vsession )
     if( session->isLPDEnabled )
         tr_lpdUninit( session );
 
+    tr_utpClose( session );
     tr_udpUninit( session );
 
     event_free( session->saveTimer );
@@ -1963,6 +1969,44 @@ tr_sessionSetDHTEnabled( tr_session * session, tr_bool enabled )
     if( ( enabled != 0 ) != ( session->isDHTEnabled != 0 ) )
         tr_runInEventThread( session, toggleDHTImpl, session );
 }
+
+/***
+****
+***/
+
+tr_bool
+tr_sessionIsUTPEnabled( const tr_session * session )
+{
+    assert( tr_isSession( session ) );
+
+    return session->isUTPEnabled;
+}
+
+static void
+toggle_utp(  void * data )
+{
+    tr_session * session = data;
+    assert( tr_isSession( session ) );
+
+    session->isUTPEnabled = !session->isUTPEnabled;
+
+    if( !session->isUTPEnabled )
+        tr_utpClose( session );
+}
+
+void
+tr_sessionSetUTPEnabled( tr_session * session, tr_bool enabled )
+{
+    assert( tr_isSession( session ) );
+    assert( tr_isBool( enabled ) );
+
+    if( ( enabled != 0 ) != ( session->isUTPEnabled != 0 ) )
+        tr_runInEventThread( session, toggle_utp, session );
+}
+
+/***
+****
+***/
 
 static void
 toggleLPDImpl(  void * data )

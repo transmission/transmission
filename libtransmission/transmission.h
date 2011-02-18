@@ -161,6 +161,7 @@ const char* tr_getDefaultDownloadDir( void );
 #define TR_PREFS_KEY_BLOCKLIST_URL                 "blocklist-url"
 #define TR_PREFS_KEY_MAX_CACHE_SIZE_MB             "cache-size-mb"
 #define TR_PREFS_KEY_DHT_ENABLED                   "dht-enabled"
+#define TR_PREFS_KEY_UTP_ENABLED                   "utp-enabled"
 #define TR_PREFS_KEY_LPD_ENABLED                   "lpd-enabled"
 #define TR_PREFS_KEY_PREFETCH_ENABLED              "prefetch-enabled"
 #define TR_PREFS_KEY_DOWNLOAD_DIR                  "download-dir"
@@ -571,6 +572,9 @@ tr_bool  tr_sessionIsPexEnabled( const tr_session * session );
 
 tr_bool  tr_sessionIsDHTEnabled( const tr_session * session );
 void     tr_sessionSetDHTEnabled( tr_session * session, tr_bool );
+
+tr_bool  tr_sessionIsUTPEnabled( const tr_session * session );
+void     tr_sessionSetUTPEnabled( tr_session * session, tr_bool );
 
 tr_bool  tr_sessionIsLPDEnabled( const tr_session * session );
 void     tr_sessionSetLPDEnabled( tr_session * session, tr_bool enabled );

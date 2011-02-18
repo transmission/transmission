@@ -83,11 +83,18 @@ send_to(void *closure, const unsigned char *buf, size_t buflen,
 }
 
 static void
+reset_timer( void )
+{
+    int sec = 0;
+    int usec = UTP_INTERVAL_US / 2 + tr_cryptoWeakRandInt(UTP_INTERVAL_US);
+    tr_timerAdd( utp_timer, sec, usec );
+}
+
+static void
 timer_callback(int s UNUSED, short type UNUSED, void *closure UNUSED)
 {
     UTP_CheckTimeouts();
-    tr_timerAdd(utp_timer, 0,
-                UTP_INTERVAL_US / 2 + tr_cryptoWeakRandInt(UTP_INTERVAL_US));
+    reset_timer();
 }
 
 int
@@ -95,17 +102,24 @@ tr_utpPacket(const unsigned char *buf, size_t buflen,
              const struct sockaddr *from, socklen_t fromlen,
              tr_session *ss)
 {
-    if(utp_timer == NULL) {
-        utp_timer = evtimer_new( ss->event_base, timer_callback, NULL);
+    if(utp_timer == NULL)
+    {
+        utp_timer = evtimer_new( ss->event_base, timer_callback, NULL );
         if(utp_timer == NULL)
             return -1;
-        tr_timerAdd(utp_timer, 0,
-                    UTP_INTERVAL_US / 2 +
-                    tr_cryptoWeakRandInt(UTP_INTERVAL_US));
+        reset_timer();
     }
 
     return UTP_IsIncomingUTP(incoming, send_to, ss,
                              buf, buflen, from, fromlen);
 }
 
-    
+void
+tr_utpClose( tr_session * session )
+{
+    if( utp_timer )
+    {
+        evtimer_del( utp_timer );
+        utp_timer = NULL;
+    }
+}
