@@ -132,6 +132,7 @@ struct peer_atom
     int8_t      blocklisted;        /* -1 for unknown, TRUE for blocklisted, FALSE for not blocklisted */
 
     tr_port     port;
+    tr_bool     utp_failed;         /* We recently failed to connect over uTP */
     uint16_t    numFails;
     time_t      time;               /* when the peer's connection status last changed */
     time_t      piece_data_time;
@@ -678,6 +679,15 @@ tr_peerMgrSetUtpSupported( tr_torrent * tor, const tr_address * addr )
 
     if( atom )
         atom->flags |= ADDED_F_UTP_FLAGS;
+}
+
+void
+tr_peerMgrSetUtpFailed( tr_torrent *tor, const tr_address *addr, tr_bool failed )
+{
+    struct peer_atom * atom = getExistingAtom( tor->torrentPeers, addr );
+
+    if( atom )
+        atom->utp_failed = failed;
 }
 
 
