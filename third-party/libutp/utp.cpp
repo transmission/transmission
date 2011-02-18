@@ -244,10 +244,14 @@ struct PacketFormatExtensions {
 };
 
 struct PacketFormatV1 {
-	// protocol version
-	byte version:4;
-	// type (formerly flags)
-	byte type:4;
+	// packet_type (4 high bits)
+	// protocol version (4 low bits)
+	byte ver_type;
+	byte version() const { return ver_type & 0xf; }
+	byte type() const { return ver_type >> 4; }
+	void set_version(byte v) { ver_type = (ver_type & 0xf0) | (v & 0xf); }
+	void set_type(byte t) { ver_type = (ver_type & 0xf) | (t << 4); }
+
 	// Type of the first extension header
 	byte ext;
 	// connection ID
@@ -429,7 +433,7 @@ struct DelayHist {
 	void shift(const uint32 offset)
 	{
 		// the offset should never be "negative"
-		assert(offset < 0x10000000);
+		// assert(offset < 0x10000000);
 
 		// increase all of our base delays by this amount
 		// this is used to take clock skew into account
@@ -844,7 +848,7 @@ void UTPSocket::send_data(PacketFormat* b, size_t length, bandwidth_type_t type)
 		func.on_overhead(userdata, true, n, type);
 	}
 #if g_log_utp_verbose
-	int flags = version == 0 ? b->flags : b1->type;
+	int flags = version == 0 ? b->flags : b1->type();
 	uint16 seq_nr = version == 0 ? b->seq_nr : b1->seq_nr;
 	uint16 ack_nr = version == 0 ? b->ack_nr : b1->ack_nr;
 	LOG_UTPV("0x%08x: send %s len:%u id:%u timestamp:"I64u" reply_micro:%u flags:%s seq_nr:%u ack_nr:%u",
@@ -873,8 +877,8 @@ void UTPSocket::send_ack(bool synack)
 		pfa.pf.windowsize = (byte)DIV_ROUND_UP(last_rcv_win, PACKET_SIZE);
 		len = sizeof(PacketFormat);
 	} else {
-		pfa1.pf.version = 1;
-		pfa1.pf.type = ST_STATE;
+		pfa1.pf.set_version(1);
+		pfa1.pf.set_type(ST_STATE);
 		pfa1.pf.ext = 0;
 		pfa1.pf.connid = conn_id_send;
 		pfa1.pf.ack_nr = ack_nr;
@@ -977,8 +981,8 @@ void UTPSocket::send_rst(SendToProc *send_to_proc, void *send_to_userdata,
 		pf.windowsize = 0;
 		len = sizeof(PacketFormat);
 	} else {
-		pf1.version = 1;
-		pf1.type= ST_RESET;
+		pf1.set_version(1);
+		pf1.set_type(ST_RESET);
 		pf1.ext = 0;
 		pf1.connid = conn_id_send;
 		pf1.ack_nr = ack_nr;
@@ -1171,8 +1175,8 @@ void UTPSocket::write_outgoing_packet(size_t payload, uint flags)
 			p->ack_nr = ack_nr;
 			p->flags = flags;
 		} else {
-			p1->version = 1;
-			p1->type = flags;
+			p1->set_version(1);
+			p1->set_type(flags);
 			p1->ext = 0;
 			p1->connid = conn_id_send;
 			p1->windowsize = (uint32)last_rcv_win;
@@ -1767,7 +1771,7 @@ size_t UTP_ProcessIncoming(UTPSocket *conn, const byte *packet, size_t len, bool
 	} else {
 		pk_seq_nr = pf1->seq_nr;
 		pk_ack_nr = pf1->ack_nr;
-		pk_flags = pf1->type;
+		pk_flags = pf1->type();
 	}
 
 	if (pk_flags >= ST_NUM_STATES) return 0;
@@ -1965,6 +1969,13 @@ size_t UTP_ProcessIncoming(UTPSocket *conn, const byte *packet, size_t len, bool
 		}
 	}
 */
+
+	// if the delay estimate exceeds the RTT, adjust the base_delay to
+	// compensate
+	if (conn->our_hist.get_value() > uint32(min_rtt)) {
+		conn->our_hist.shift(conn->our_hist.get_value() - min_rtt);
+	}
+
 	// only apply the congestion controller on acks
 	// if we don't have a delay measurement, there's
 	// no point in invoking the congestion control
@@ -2058,10 +2069,13 @@ size_t UTP_ProcessIncoming(UTPSocket *conn, const byte *packet, size_t len, bool
 		// Fast timeout-retry
 		if (conn->fast_timeout) {
 			LOG_UTPV("Fast timeout %u,%u,%u?", (uint)conn->cur_window, conn->seq_nr - conn->timeout_seq_nr, conn->timeout_seq_nr);
-			if (((conn->fast_resend_seq_nr - conn->timeout_seq_nr) & ACK_NR_MASK) >= 0 ||
-				((conn->seq_nr - conn->cur_window_packets) & ACK_NR_MASK) != conn->fast_resend_seq_nr) {
+			// if the fast_resend_seq_nr is not pointing to the oldest outstanding packet, it suggests that we've already
+			// resent the packet that timed out, and we should leave the fast-timeout mode.
+			if (((conn->seq_nr - conn->cur_window_packets) & ACK_NR_MASK) != conn->fast_resend_seq_nr) {
 				conn->fast_timeout = false;
 			} else {
+				// resend the oldest packet and increment fast_resend_seq_nr
+				// to not allow another fast resend on it again
 				OutgoingPacket *pkt = (OutgoingPacket*)conn->outbuf.get(conn->seq_nr - conn->cur_window_packets);
 				if (pkt && pkt->transmissions > 0) {
 					LOG_UTPV("0x%08x: Packet %u fast timeout-retry.", conn, conn->seq_nr - conn->cur_window_packets);
@@ -2263,7 +2277,7 @@ size_t UTP_ProcessIncoming(UTPSocket *conn, const byte *packet, size_t len, bool
 
 inline bool UTP_IsV1(PacketFormatV1 const* pf)
 {
-	return pf->version == 1 && pf->type < ST_NUM_STATES && pf->ext < 3;
+	return pf->version() == 1 && pf->type() < ST_NUM_STATES && pf->ext < 3;
 }
 
 void UTP_Free(UTPSocket *conn)
@@ -2467,8 +2481,8 @@ void UTP_Connect(UTPSocket *conn)
 		p->ext_len = 8;
 		memset(p->extensions, 0, 8);
 	} else {
-		p1->pf.version = 1;
-		p1->pf.type = ST_SYN;
+		p1->pf.set_version(1);
+		p1->pf.set_type(ST_SYN);
 		p1->pf.ext = 2;
 		p1->pf.connid = conn->conn_id_recv;
 		p1->pf.windowsize = (uint32)conn->last_rcv_win;
@@ -2531,7 +2545,7 @@ bool UTP_IsIncomingUTP(UTPGotIncomingConnection *incoming_proc,
 		LOG_UTPV("recv id:%u seq_nr:%u ack_nr:%u", id, (uint)pf1->seq_nr, (uint)pf1->ack_nr);
 	}
 
-	const byte flags = version == 0 ? pf->flags : pf1->type;
+	const byte flags = version == 0 ? pf->flags : pf1->type();
 
 	for (size_t i = 0; i < g_utp_sockets.GetCount(); i++) {
 		UTPSocket *conn = g_utp_sockets[i];
