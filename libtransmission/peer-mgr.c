@@ -2624,6 +2624,7 @@ tr_peerMgrPeerStats( const tr_torrent * tor, int * setmeCount )
         stat->port                = ntohs( peer->atom->port );
         stat->from                = atom->fromFirst;
         stat->progress            = peer->progress;
+        stat->isUTP               = peer->io->utp_socket != NULL;
         stat->isEncrypted         = tr_peerIoIsEncrypted( peer->io ) ? 1 : 0;
         stat->rateToPeer_KBps     = toSpeedKBps( tr_peerGetPieceSpeed_Bps( peer, now_msec, TR_CLIENT_TO_PEER ) );
         stat->rateToClient_KBps   = toSpeedKBps( tr_peerGetPieceSpeed_Bps( peer, now_msec, TR_PEER_TO_CLIENT ) );
@@ -2645,7 +2646,7 @@ tr_peerMgrPeerStats( const tr_torrent * tor, int * setmeCount )
         stat->pendingReqsToClient = peer->pendingReqsToClient;
 
         pch = stat->flagStr;
-        if( peer->io->utp_socket != NULL) *pch++ = 'T';
+        if( stat->isUTP ) *pch++ = 'T';
         if( t->optimistic == peer ) *pch++ = 'O';
         if( stat->isDownloadingFrom ) *pch++ = 'D';
         else if( stat->clientIsInterested ) *pch++ = 'd';

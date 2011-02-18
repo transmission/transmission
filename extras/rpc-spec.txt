@@ -231,6 +231,7 @@
                       | isEncrypted             | boolean    | tr_peer_stat
                       | isIncoming              | boolean    | tr_peer_stat
                       | isUploadingTo           | boolean    | tr_peer_stat
+                      | isUTP                   | boolean    | tr_peer_stat
                       | peerIsChoked            | boolean    | tr_peer_stat
                       | peerIsInterested        | boolean    | tr_peer_stat
                       | port                    | number     | tr_peer_stat
@@ -653,3 +654,5 @@
    ------+---------+-----------+----------------+-------------------------------
    12    | 2.20    | yes       | session-get    | new arg "download-dir-free-space"
          |         | yes       | session-close  | new method
+   ------+---------+-----------+----------------+-------------------------------
+   13    | 2.30    | yes       | session-get    | new arg "isUTP" to the "peers" list

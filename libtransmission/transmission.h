@@ -1394,6 +1394,8 @@ tr_bool tr_torrentCanManualUpdate( const tr_torrent * torrent );
 
 typedef struct tr_peer_stat
 {
+    tr_bool  isUTP;
+
     tr_bool  isEncrypted;
     tr_bool  isDownloadingFrom;
     tr_bool  isUploadingTo;

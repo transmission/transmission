@@ -36,7 +36,7 @@
 #include "version.h"
 #include "web.h"
 
-#define RPC_VERSION     11
+#define RPC_VERSION     13
 #define RPC_VERSION_MIN 1
 
 #define RECENTLY_ACTIVE_SECONDS 60
@@ -446,6 +446,7 @@ addPeers( const tr_torrent * tor,
         tr_bencDictAddBool( d, "isEncrypted", peer->isEncrypted );
         tr_bencDictAddBool( d, "isIncoming", peer->isIncoming );
         tr_bencDictAddBool( d, "isUploadingTo", peer->isUploadingTo );
+        tr_bencDictAddBool( d, "isUTP", peer->isUTP );
         tr_bencDictAddBool( d, "peerIsChoked", peer->peerIsChoked );
         tr_bencDictAddBool( d, "peerIsInterested", peer->peerIsInterested );
         tr_bencDictAddInt ( d, "port", peer->port );
