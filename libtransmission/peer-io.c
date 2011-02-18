@@ -360,6 +360,78 @@ maybeSetCongestionAlgorithm( int socket, const char * algorithm )
     }
 }
 
+/* UTP callbacks */
+
+static void
+utp_on_read(void *closure, const unsigned char *buf, size_t buflen)
+{
+    tr_peerIo *io = (tr_peerIo *)closure;
+    assert( tr_isPeerIo( io ) );
+    tr_ndbg( "UTP", "On read: %ld", (long)buflen );
+}
+
+static void
+utp_on_write(void *closure, unsigned char *buf, size_t buflen)
+{
+    tr_peerIo *io = (tr_peerIo *)closure;
+    assert( tr_isPeerIo( io ) );
+    tr_ndbg( "UTP", "On write: %ld", (long)buflen );
+}
+
+static size_t
+utp_get_rb_size(void *closure)
+{
+    tr_peerIo *io = (tr_peerIo *)closure;
+    assert( tr_isPeerIo( io ) );
+
+    tr_ndbg( "UTP", "Get RB size" );
+    return 0;
+}
+
+static void
+utp_on_state_change(void *closure, int state)
+{
+    tr_peerIo *io;
+    /* This can be called after UTP_Close, in which case closure can point
+       to an already-destroyed peerIo. */
+    if( state == UTP_STATE_DESTROYING ) {
+        tr_ndbg( "UTP", "Connection destroyed" );
+        return;
+    }
+
+    io = (tr_peerIo *)closure;
+    assert( tr_isPeerIo( io ) );
+
+    tr_ndbg( "UTP", "On state change: %d", state );
+}
+
+static void
+utp_on_error(void *closure, int errcode)
+{
+    tr_peerIo *io = (tr_peerIo *)closure;
+    assert( tr_isPeerIo( io ) );
+
+    tr_ndbg( "UTP", "Error callback: %s", tr_strerror( errcode ) );
+}
+
+static void
+utp_on_overhead(void *closure, bool send, size_t count, int type)
+{
+    tr_peerIo *io = (tr_peerIo *)closure;
+    assert( tr_isPeerIo( io ) );
+
+    tr_ndbg( "UTP", "On overhead: %d %ld %d", (int)send, (long)count, type );
+}
+
+static struct UTPFunctionTable utp_function_table = {
+    .on_read = utp_on_read,
+    .on_write = utp_on_write,
+    .get_rb_size = utp_get_rb_size,
+    .on_state = utp_on_state_change,
+    .on_error = utp_on_error,
+    .on_overhead = utp_on_overhead
+};
+
 static tr_peerIo*
 tr_peerIoNew( tr_session       * session,
               tr_bandwidth     * parent,
@@ -408,6 +480,12 @@ tr_peerIoNew( tr_session       * session,
                                     io->socket, EV_READ, event_read_cb, io );
         io->event_write = event_new( session->event_base,
                                      io->socket, EV_WRITE, event_write_cb, io );
+    } else {
+        tr_ndbg( "UTP", "New %s connection",
+                 isIncoming ? "incoming" : "outgoing" );
+        UTP_SetCallbacks( utp_socket,
+                          &utp_function_table,
+                          io );
     }
 
     return io;
@@ -552,8 +630,10 @@ io_dtor( void * vio )
         event_free( io->event_write );
         tr_netClose( io->session, io->socket );
     }
-    if( io->utp_socket != NULL )
+    if( io->utp_socket != NULL ) {
+        tr_ndbg( "UTP", "Destroying connection");
         UTP_Close( io->utp_socket );
+    }
     tr_cryptoFree( io->crypto );
     tr_list_free( &io->outbuf_datatypes, tr_free );
 
