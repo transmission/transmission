@@ -427,7 +427,7 @@ utp_on_state_change(void *closure, int state)
 
     if( state == UTP_STATE_CONNECT ) {
         dbgmsg( io, "utp_on_state_change -- changed to connected" );
-        io->dhtSupported = TRUE;
+        io->utpSupported = TRUE;
     } else if( state == UTP_STATE_WRITABLE ) {
         dbgmsg( io, "utp_on_state_change -- changed to writable" );
     } else if( state == UTP_STATE_EOF ) {
