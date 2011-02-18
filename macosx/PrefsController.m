@@ -452,6 +452,11 @@ tr_session * fHandle;
         [sound play];
 }
 
+- (void) setUTP: (id) sender
+{
+    tr_sessionSetUTPEnabled(fHandle, [fDefaults boolForKey: @"UTPGlobal"]);
+}
+
 - (void) setPeersGlobal: (id) sender
 {
     const int count = [sender intValue];
@@ -474,11 +479,6 @@ tr_session * fHandle;
 - (void) setDHT: (id) sender
 {
     tr_sessionSetDHTEnabled(fHandle, [fDefaults boolForKey: @"DHTGlobal"]);
-}
-
-- (void) setUTP: (id) sender
-{
-    tr_sessionSetUTPEnabled(fHandle, [fDefaults boolForKey: @"UTPGlobal"]);
 }
 
 - (void) setLPD: (id) sender
@@ -1099,6 +1099,10 @@ tr_session * fHandle;
     const BOOL usePartialFileRanaming = tr_sessionIsIncompleteFileNamingEnabled(fHandle);
     [fDefaults setBool: usePartialFileRanaming forKey: @"RenamePartialFiles"];
     
+    //utp
+    const BOOL utp = tr_sessionIsUTPEnabled(fHandle);
+    [fDefaults setBool: utp forKey: @"UTPGlobal"];
+    
     //peers
     const uint16_t peersTotal = tr_sessionGetPeerLimit(fHandle);
     [fDefaults setInteger: peersTotal forKey: @"PeersTotal"];
@@ -1113,10 +1117,6 @@ tr_session * fHandle;
     //dht
     const BOOL dht = tr_sessionIsDHTEnabled(fHandle);
     [fDefaults setBool: dht forKey: @"DHTGlobal"];
-    
-    //utp
-    const BOOL utp = tr_sessionIsUTPEnabled(fHandle);
-    [fDefaults setBool: utp forKey: @"UTPGlobal"];
     
     //lpd
     const BOOL lpd = tr_sessionIsLPDEnabled(fHandle);
@@ -1214,14 +1214,14 @@ tr_session * fHandle;
         
         //download directory handled by bindings
         
+        //utp handled by bindings
+        
         [fPeersGlobalField setIntValue: peersTotal];
         [fPeersTorrentField setIntValue: peersTorrent];
         
         //pex handled by bindings
         
         //dht handled by bindings
-        
-        //utp handled by bindings
         
         //lpd handled by bindings
         

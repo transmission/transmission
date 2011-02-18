@@ -80,12 +80,13 @@
 - (NSArray *) sounds;
 - (void) setSound: (id) sender;
 
+- (void) setUTP: (id) sender;
+
 - (void) setPeersGlobal: (id) sender;
 - (void) setPeersTorrent: (id) sender;
 
 - (void) setPEX: (id) sender;
 - (void) setDHT: (id) sender;
-- (void) setUTP: (id) sender;
 - (void) setLPD: (id) sender;
 
 - (void) setEncryptionMode: (id) sender;
