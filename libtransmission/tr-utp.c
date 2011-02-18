@@ -30,14 +30,40 @@ THE SOFTWARE.
 #include "net.h"
 #include "session.h"
 #include "crypto.h"
+#include "peer-io.h"
+#include "peer-mgr.h"
 #include "tr-utp.h"
 
 static struct event *utp_timer = NULL;
 
 static void
-incoming(void *closure UNUSED, struct UTPSocket *s)
+incoming(void *closure, struct UTPSocket *s)
 {
-    UTP_Close(s);
+    tr_session *ss = (tr_session*)closure;
+    struct sockaddr_storage from_storage;
+    struct sockaddr *from = (struct sockaddr*)&from_storage;
+    socklen_t fromlen = sizeof(from_storage);
+    tr_address addr;
+    tr_port port;
+    
+    UTP_GetPeerName(s, from, &fromlen);
+    if(from->sa_family == AF_INET) {
+        struct sockaddr_in *sin = (struct sockaddr_in*)from;
+        addr.type = TR_AF_INET;
+        addr.addr.addr4.s_addr = sin->sin_addr.s_addr;
+        port = sin->sin_port;
+    } else if(from->sa_family == AF_INET6) {
+        struct sockaddr_in6 *sin6 = (struct sockaddr_in6*)from;
+        addr.type = TR_AF_INET6;
+        addr.addr.addr6 = sin6->sin6_addr;
+        port = sin6->sin6_port;
+    } else {
+        tr_nerr("UTP", "Unknown socket family");
+        UTP_Close(s);
+        return;
+    }
+
+    tr_peerMgrAddIncoming(ss->peerMgr, &addr, port, -1, s);
 }
 
 static void
