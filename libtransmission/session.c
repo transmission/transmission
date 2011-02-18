@@ -1990,8 +1990,8 @@ toggle_utp(  void * data )
 
     session->isUTPEnabled = !session->isUTPEnabled;
 
-    if( !session->isUTPEnabled )
-        tr_utpClose( session );
+    /* But don't call tr_utpClose -- see reset_timer in tr-utp.c for an
+       explanation. */
 }
 
 void
