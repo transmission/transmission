@@ -195,6 +195,9 @@
 		A263CFC010DD67670038DE27 /* InfoTextField.m in Sources */ = {isa = PBXBuildFile; fileRef = A263CFBF10DD67670038DE27 /* InfoTextField.m */; };
 		A263D03E10DE6F010038DE27 /* Magnet.png in Resources */ = {isa = PBXBuildFile; fileRef = A263D03D10DE6F010038DE27 /* Magnet.png */; };
 		A2661D6112D0E8D9004F69D5 /* FilterBarView.m in Sources */ = {isa = PBXBuildFile; fileRef = A2661D3B12D0E51B004F69D5 /* FilterBarView.m */; };
+		A267927C130DFF2700CB7464 /* libutp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A2E38544130DFEE3001F501B /* libutp.a */; };
+		A2679294130E00A000CB7464 /* tr-utp.c in Sources */ = {isa = PBXBuildFile; fileRef = A2679292130E00A000CB7464 /* tr-utp.c */; };
+		A2679295130E00A000CB7464 /* tr-utp.h in Headers */ = {isa = PBXBuildFile; fileRef = A2679293130E00A000CB7464 /* tr-utp.h */; };
 		A26AF21A0D2DA35A00FF7140 /* FileOutlineController.m in Sources */ = {isa = PBXBuildFile; fileRef = A26AF2190D2DA35A00FF7140 /* FileOutlineController.m */; };
 		A26AF27E0D2DBDDF00FF7140 /* AddWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = A26AF27C0D2DBDDF00FF7140 /* AddWindow.xib */; };
 		A26AF2840D2DC27C00FF7140 /* AddWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = A26AF2830D2DC27C00FF7140 /* AddWindowController.m */; };
@@ -266,6 +269,15 @@
 		A2DF58590DE4B2B1000795D5 /* JSON_parser.h in Headers */ = {isa = PBXBuildFile; fileRef = A2DF576B0DE468C6000795D5 /* JSON_parser.h */; };
 		A2E23AC60CB5E1930002BB25 /* InfoTabButtonCell.m in Sources */ = {isa = PBXBuildFile; fileRef = A2E23AC40CB5E1930002BB25 /* InfoTabButtonCell.m */; };
 		A2E2EA920EE321C200EB6308 /* Groups.png in Resources */ = {isa = PBXBuildFile; fileRef = A2E2EA910EE321C200EB6308 /* Groups.png */; };
+		A2E384DA130DFB3A001F501B /* templates.h in Headers */ = {isa = PBXBuildFile; fileRef = A2E384D2130DFB3A001F501B /* templates.h */; };
+		A2E384DC130DFB3A001F501B /* utp_config.h in Headers */ = {isa = PBXBuildFile; fileRef = A2E384D4130DFB3A001F501B /* utp_config.h */; };
+		A2E384DD130DFB3A001F501B /* utp_utils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2E384D5130DFB3A001F501B /* utp_utils.cpp */; };
+		A2E384DE130DFB3A001F501B /* utp_utils.h in Headers */ = {isa = PBXBuildFile; fileRef = A2E384D6130DFB3A001F501B /* utp_utils.h */; };
+		A2E384DF130DFB3A001F501B /* utp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2E384D7130DFB3A001F501B /* utp.cpp */; };
+		A2E384E0130DFB3A001F501B /* utp.h in Headers */ = {isa = PBXBuildFile; fileRef = A2E384D8130DFB3A001F501B /* utp.h */; };
+		A2E384E1130DFB3A001F501B /* utypes.h in Headers */ = {isa = PBXBuildFile; fileRef = A2E384D9130DFB3A001F501B /* utypes.h */; };
+		A2E3850C130DFCCB001F501B /* StdAfx.h in Headers */ = {isa = PBXBuildFile; fileRef = A2E3850B130DFCCB001F501B /* StdAfx.h */; };
+		A2E38540130DFECD001F501B /* libminiupnp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BE1183480CE160960002D0F3 /* libminiupnp.a */; };
 		A2E669790F5B8E5A00B4251A /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2E669780F5B8E5A00B4251A /* Security.framework */; };
 		A2E9AA760C249AF400085DCF /* ToolbarCreateTemplate.png in Resources */ = {isa = PBXBuildFile; fileRef = A2E9AA750C249AF400085DCF /* ToolbarCreateTemplate.png */; };
 		A2ED7D8F0CEF431B00970975 /* FilterButton.m in Sources */ = {isa = PBXBuildFile; fileRef = A2ED7D8E0CEF431B00970975 /* FilterButton.m */; };
@@ -366,19 +378,19 @@
 			remoteGlobalIDString = 3C7A118C0D0B2EB800B5701F;
 			remoteInfo = natpmp;
 		};
-		A22CFCBE0FC24F780009BD3E /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = BE75C3480C729E9500DBEFE0;
-			remoteInfo = event;
-		};
 		A22CFCC60FC24F990009BD3E /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = A22CFCB90FC24F710009BD3E;
 			remoteInfo = DHT;
+		};
+		A2E384E3130DFB51001F501B /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = A2E384CD130DFB1D001F501B;
+			remoteInfo = libutp;
 		};
 		BE1183750CE161040002D0F3 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -703,6 +715,8 @@
 		A265A3C20D25AE7800198AC8 /* es */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = es; path = macosx/es.lproj/PrefsWindow.xib; sourceTree = "<group>"; };
 		A2661D3A12D0E51A004F69D5 /* FilterBarView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FilterBarView.h; path = macosx/FilterBarView.h; sourceTree = "<group>"; };
 		A2661D3B12D0E51B004F69D5 /* FilterBarView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = FilterBarView.m; path = macosx/FilterBarView.m; sourceTree = "<group>"; };
+		A2679292130E00A000CB7464 /* tr-utp.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "tr-utp.c"; path = "libtransmission/tr-utp.c"; sourceTree = "<group>"; };
+		A2679293130E00A000CB7464 /* tr-utp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "tr-utp.h"; path = "libtransmission/tr-utp.h"; sourceTree = "<group>"; };
 		A26AF1040D2855FC00FF7140 /* ru */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = ru; path = macosx/ru.lproj/Creator.xib; sourceTree = "<group>"; };
 		A26AF1050D2855FC00FF7140 /* ru */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = ru; path = macosx/ru.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		A26AF1070D2855FC00FF7140 /* ru */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = ru; path = macosx/ru.lproj/Localizable.strings; sourceTree = "<group>"; };
@@ -834,6 +848,16 @@
 		A2E23AC30CB5E1930002BB25 /* InfoTabButtonCell.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = InfoTabButtonCell.h; path = macosx/InfoTabButtonCell.h; sourceTree = "<group>"; };
 		A2E23AC40CB5E1930002BB25 /* InfoTabButtonCell.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = InfoTabButtonCell.m; path = macosx/InfoTabButtonCell.m; sourceTree = "<group>"; };
 		A2E2EA910EE321C200EB6308 /* Groups.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Groups.png; path = macosx/Images/Groups.png; sourceTree = "<group>"; };
+		A2E384D2130DFB3A001F501B /* templates.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = templates.h; path = "third-party/libutp/templates.h"; sourceTree = "<group>"; };
+		A2E384D3130DFB3A001F501B /* utp_config_example.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = utp_config_example.h; path = "third-party/libutp/utp_config_example.h"; sourceTree = "<group>"; };
+		A2E384D4130DFB3A001F501B /* utp_config.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = utp_config.h; path = "third-party/libutp/utp_config.h"; sourceTree = "<group>"; };
+		A2E384D5130DFB3A001F501B /* utp_utils.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = utp_utils.cpp; path = "third-party/libutp/utp_utils.cpp"; sourceTree = "<group>"; };
+		A2E384D6130DFB3A001F501B /* utp_utils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = utp_utils.h; path = "third-party/libutp/utp_utils.h"; sourceTree = "<group>"; };
+		A2E384D7130DFB3A001F501B /* utp.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = utp.cpp; path = "third-party/libutp/utp.cpp"; sourceTree = "<group>"; };
+		A2E384D8130DFB3A001F501B /* utp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = utp.h; path = "third-party/libutp/utp.h"; sourceTree = "<group>"; };
+		A2E384D9130DFB3A001F501B /* utypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = utypes.h; path = "third-party/libutp/utypes.h"; sourceTree = "<group>"; };
+		A2E3850B130DFCCB001F501B /* StdAfx.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = StdAfx.h; path = "third-party/libutp/StdAfx.h"; sourceTree = "<group>"; };
+		A2E38544130DFEE3001F501B /* libutp.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libutp.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		A2E669780F5B8E5A00B4251A /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = /System/Library/Frameworks/Security.framework; sourceTree = "<absolute>"; };
 		A2E9AA750C249AF400085DCF /* ToolbarCreateTemplate.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = ToolbarCreateTemplate.png; path = macosx/Images/ToolbarCreateTemplate.png; sourceTree = "<group>"; };
 		A2EA8E3C0CC3C9830081201C /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = macosx/fr.lproj/InfoPlist.strings; sourceTree = "<group>"; };
@@ -954,6 +978,7 @@
 				A2E669790F5B8E5A00B4251A /* Security.framework in Frameworks */,
 				A22CFB820FB66EF30009BD3E /* Carbon.framework in Frameworks */,
 				A221DCC8104B3660008A642D /* Quartz.framework in Frameworks */,
+				A2E38540130DFECD001F501B /* libminiupnp.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -962,6 +987,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				A22CFCCD0FC250480009BD3E /* libevent.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A2E384CC130DFB1D001F501B /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -984,6 +1016,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				A22CFCCB0FC24FDA0009BD3E /* libdht.a in Frameworks */,
+				A267927C130DFF2700CB7464 /* libutp.a in Frameworks */,
 				BE75C38A0C72A1ED00DBEFE0 /* libevent.a in Frameworks */,
 				BE1183780CE161390002D0F3 /* libminiupnp.a in Frameworks */,
 				A226FDAC0D0CDF20005A7F71 /* libnatpmp.a in Frameworks */,
@@ -1108,6 +1141,7 @@
 				BE1183480CE160960002D0F3 /* libminiupnp.a */,
 				3C7A118D0D0B2EB800B5701F /* libnatpmp.a */,
 				A22CFCBA0FC24F710009BD3E /* libdht.a */,
+				A2E38544130DFEE3001F501B /* libutp.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1121,6 +1155,7 @@
 				BEFC1C0B0C07754700B0BB3C /* daemon */,
 				4DDBB71509E16B3F00284745 /* Libraries */,
 				A22CFCB50FC24F630009BD3E /* dht */,
+				A2E384BF130DFA49001F501B /* libutp */,
 				BE75C3570C72A0D600DBEFE0 /* libevent */,
 				BE1183410CE15DF00002D0F3 /* libminiupnp */,
 				3C7A11880D0B2E6700B5701F /* libnatpmp */,
@@ -1271,6 +1306,8 @@
 				A22CFCA70FC24ED80009BD3E /* tr-dht.h */,
 				A284214212DA663E00FBDDBB /* tr-udp.c */,
 				A284214312DA663E00FBDDBB /* tr-udp.h */,
+				A2679292130E00A000CB7464 /* tr-utp.c */,
+				A2679293130E00A000CB7464 /* tr-utp.h */,
 				A220EC59118C8A060022B4BE /* tr-lpd.c */,
 				A220EC5A118C8A060022B4BE /* tr-lpd.h */,
 				A2AAB65B0DE0CF6200E04DDA /* rpcimpl.c */,
@@ -1423,6 +1460,22 @@
 				35F373010C2DA88F00DAA8F2 /* FilePriorityCell.m */,
 			);
 			name = "File Outline View";
+			sourceTree = "<group>";
+		};
+		A2E384BF130DFA49001F501B /* libutp */ = {
+			isa = PBXGroup;
+			children = (
+				A2E384D2130DFB3A001F501B /* templates.h */,
+				A2E384D3130DFB3A001F501B /* utp_config_example.h */,
+				A2E384D4130DFB3A001F501B /* utp_config.h */,
+				A2E384D5130DFB3A001F501B /* utp_utils.cpp */,
+				A2E384D6130DFB3A001F501B /* utp_utils.h */,
+				A2E384D7130DFB3A001F501B /* utp.cpp */,
+				A2E384D8130DFB3A001F501B /* utp.h */,
+				A2E384D9130DFB3A001F501B /* utypes.h */,
+				A2E3850B130DFCCB001F501B /* StdAfx.h */,
+			);
+			name = libutp;
 			sourceTree = "<group>";
 		};
 		BE1183410CE15DF00002D0F3 /* libminiupnp */ = {
@@ -1632,6 +1685,7 @@
 				A220EC5C118C8A060022B4BE /* tr-lpd.h in Headers */,
 				A23547E311CD0B090046EAE6 /* cache.h in Headers */,
 				A284214512DA663E00FBDDBB /* tr-udp.h in Headers */,
+				A2679295130E00A000CB7464 /* tr-utp.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1640,6 +1694,19 @@
 			buildActionMask = 2147483647;
 			files = (
 				A22CFCC20FC24F890009BD3E /* dht.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A2E384CA130DFB1D001F501B /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A2E384DA130DFB3A001F501B /* templates.h in Headers */,
+				A2E384DC130DFB3A001F501B /* utp_config.h in Headers */,
+				A2E384DE130DFB3A001F501B /* utp_utils.h in Headers */,
+				A2E384E0130DFB3A001F501B /* utp.h in Headers */,
+				A2E384E1130DFB3A001F501B /* utypes.h in Headers */,
+				A2E3850C130DFCCB001F501B /* StdAfx.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1706,6 +1773,7 @@
 				BE1183760CE161040002D0F3 /* PBXTargetDependency */,
 				BE75C34F0C729ED300DBEFE0 /* PBXTargetDependency */,
 				A22CFCC70FC24F990009BD3E /* PBXTargetDependency */,
+				A2E384E4130DFB51001F501B /* PBXTargetDependency */,
 			);
 			name = libtransmission;
 			productName = transmission;
@@ -1760,11 +1828,27 @@
 			buildRules = (
 			);
 			dependencies = (
-				A22CFCBF0FC24F780009BD3E /* PBXTargetDependency */,
 			);
 			name = dht;
 			productName = DHT;
 			productReference = A22CFCBA0FC24F710009BD3E /* libdht.a */;
+			productType = "com.apple.product-type.library.static";
+		};
+		A2E384CD130DFB1D001F501B /* utp */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A2E384E2130DFB3A001F501B /* Build configuration list for PBXNativeTarget "utp" */;
+			buildPhases = (
+				A2E384CA130DFB1D001F501B /* Headers */,
+				A2E384CB130DFB1D001F501B /* Sources */,
+				A2E384CC130DFB1D001F501B /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = utp;
+			productName = libutp;
+			productReference = A2E38544130DFEE3001F501B /* libutp.a */;
 			productType = "com.apple.product-type.library.static";
 		};
 		BE1183470CE160960002D0F3 /* miniupnp */ = {
@@ -1885,6 +1969,7 @@
 				BEFC1BFF0C07750000B0BB3C /* transmission-daemon */,
 				BEFC1CEA0C07822400B0BB3C /* transmission-remote */,
 				A22CFCB90FC24F710009BD3E /* dht */,
+				A2E384CD130DFB1D001F501B /* utp */,
 				BE75C3480C729E9500DBEFE0 /* event */,
 				BE1183470CE160960002D0F3 /* miniupnp */,
 				3C7A118C0D0B2EB800B5701F /* natpmp */,
@@ -2101,6 +2186,7 @@
 				A220EC5B118C8A060022B4BE /* tr-lpd.c in Sources */,
 				A23547E211CD0B090046EAE6 /* cache.c in Sources */,
 				A284214412DA663E00FBDDBB /* tr-udp.c in Sources */,
+				A2679294130E00A000CB7464 /* tr-utp.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2191,6 +2277,15 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		A2E384CB130DFB1D001F501B /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A2E384DD130DFB3A001F501B /* utp_utils.cpp in Sources */,
+				A2E384DF130DFB3A001F501B /* utp.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		BE1183450CE160960002D0F3 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -2267,15 +2362,15 @@
 			target = 3C7A118C0D0B2EB800B5701F /* natpmp */;
 			targetProxy = A226FDB00D0CDF6E005A7F71 /* PBXContainerItemProxy */;
 		};
-		A22CFCBF0FC24F780009BD3E /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = BE75C3480C729E9500DBEFE0 /* event */;
-			targetProxy = A22CFCBE0FC24F780009BD3E /* PBXContainerItemProxy */;
-		};
 		A22CFCC70FC24F990009BD3E /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = A22CFCB90FC24F710009BD3E /* dht */;
 			targetProxy = A22CFCC60FC24F990009BD3E /* PBXContainerItemProxy */;
+		};
+		A2E384E4130DFB51001F501B /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = A2E384CD130DFB1D001F501B /* utp */;
+			targetProxy = A2E384E3130DFB51001F501B /* PBXContainerItemProxy */;
 		};
 		BE1183760CE161040002D0F3 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -3015,6 +3110,64 @@
 			};
 			name = "Release - Debug";
 		};
+		A2E384CF130DFB1D001F501B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_MODEL_TUNING = G5;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					POSIX,
+					MACOSX,
+				);
+				INSTALL_PATH = /usr/local/lib;
+				PREBINDING = NO;
+				PRODUCT_NAME = utp;
+			};
+			name = Debug;
+		};
+		A2E384D0130DFB1D001F501B /* Release - Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_MODEL_TUNING = G5;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					POSIX,
+					MACOSX,
+				);
+				INSTALL_PATH = /usr/local/lib;
+				PREBINDING = NO;
+				PRODUCT_NAME = utp;
+			};
+			name = "Release - Debug";
+		};
+		A2E384D1130DFB1D001F501B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				GCC_MODEL_TUNING = G5;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					POSIX,
+					MACOSX,
+					NS_BLOCK_ASSERTIONS,
+				);
+				INSTALL_PATH = /usr/local/lib;
+				PREBINDING = NO;
+				PRODUCT_NAME = utp;
+				ZERO_LINK = NO;
+			};
+			name = Release;
+		};
 		BE1183490CE160960002D0F3 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -3157,6 +3310,16 @@
 				A22CFCBB0FC24F720009BD3E /* Debug */,
 				A22CFCBC0FC24F720009BD3E /* Release - Debug */,
 				A22CFCBD0FC24F720009BD3E /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		A2E384E2130DFB3A001F501B /* Build configuration list for PBXNativeTarget "utp" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A2E384CF130DFB1D001F501B /* Debug */,
+				A2E384D0130DFB1D001F501B /* Release - Debug */,
+				A2E384D1130DFB1D001F501B /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
