@@ -71,6 +71,7 @@ typedef struct tr_peerIo
     tr_bool               extendedProtocolSupported;
     tr_bool               fastExtensionSupported;
     tr_bool               dhtSupported;
+    tr_bool               utpSupported;
 
     tr_priority_t         priority;
 
@@ -173,6 +174,11 @@ static inline void tr_peerIoEnableDHT( tr_peerIo * io, tr_bool flag )
     io->dhtSupported = flag;
 }
 static inline tr_bool tr_peerIoSupportsDHT( const tr_peerIo * io )
+{
+    return io->dhtSupported;
+}
+
+static inline tr_bool tr_peerIoSupportsUTP( const tr_peerIo * io )
 {
     return io->dhtSupported;
 }

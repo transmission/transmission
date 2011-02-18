@@ -671,6 +671,16 @@ tr_peerMgrPeerIsSeed( const tr_torrent  * tor,
     return isSeed;
 }
 
+void
+tr_peerMgrSetUtpSupported( tr_torrent * tor, const tr_address * addr )
+{
+    struct peer_atom * atom = getExistingAtom( tor->torrentPeers, addr );
+
+    if( atom )
+        atom->flags |= ADDED_F_UTP_FLAGS;
+}
+
+
 /**
 ***  REQUESTS
 ***

@@ -2376,6 +2376,11 @@ tr_peerMsgsNew( struct tr_torrent    * torrent,
     peer->msgs = m;
     tr_timerAdd( m->pexTimer, PEX_INTERVAL_SECS, 0 );
 
+    if( tr_peerIoSupportsUTP( peer->io ) ) {
+        const tr_address * addr = tr_peerIoGetAddress( peer->io, NULL );
+        tr_peerMgrSetUtpSupported( torrent, addr );
+    }
+
     if( tr_peerIoSupportsLTEP( peer->io ) )
         sendLtepHandshake( m );
 
