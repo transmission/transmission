@@ -173,48 +173,36 @@ static int
 tr_daemon( int nochdir, int noclose )
 {
 #if defined(USE_OS_DAEMON)
+
     return daemon( nochdir, noclose );
+
 #elif defined(USE_TR_DAEMON)
-    pid_t pid = fork( );
-    if( pid < 0 )
-        return -1;
-    else if( pid > 0 )
-        _exit( 0 );
-    else {
-        pid = setsid( );
-        if( pid < 0 )
-            return -1;
 
-        pid = fork( );
-        if( pid < 0 )
-            return -1;
-        else if( pid > 0 )
-            _exit( 0 );
-        else {
+    /* this is loosely based off of glibc's daemon() implementation
+     * http://sourceware.org/git/?p=glibc.git;a=blob_plain;f=misc/daemon.c */
 
-            if( !nochdir )
-                if( chdir( "/" ) < 0 )
-                    return -1;
-
-            umask( (mode_t)0 );
-
-            if( !noclose ) {
-                /* send stdin, stdout, and stderr to /dev/null */
-                int i;
-                int fd = open( "/dev/null", O_RDWR, 0 );
-                if( fd < 0 )
-                    fprintf( stderr, "unable to open /dev/null: %s\n", tr_strerror(errno) );
-                for( i=0; i<3; ++i ) {
-                    if( close( i ) )
-                        return -1;
-                    dup2( fd, i );
-                }
-                close( fd );
-            }
-
-            return 0;
-        }
+    switch( fork( ) ) {
+        case -1: return -1;
+        case 0: break;
+        default: _exit(0);
     }
+
+    if( setsid( ) == -1 )
+        return -1;
+
+    if( !nochdir )
+        chdir( "/" );
+
+    if( !noclose ) {
+        int fd = open( "/dev/null", O_RDWR, 0 );
+        dup2( fd, STDIN_FILENO );
+        dup2( fd, STDOUT_FILENO );
+        dup2( fd, STDERR_FILENO );
+        close( fd );
+    }
+
+    return 0;
+
 #else /* USE_NO_DAEMON */
     return 0;
 #endif
