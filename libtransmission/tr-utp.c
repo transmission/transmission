@@ -88,18 +88,31 @@ tr_utpSendTo(void *closure, const unsigned char *buf, size_t buflen,
 }
 
 static void
-reset_timer( void )
+reset_timer(tr_session *ss)
 {
-    int sec = 0;
-    int usec = UTP_INTERVAL_US / 2 + tr_cryptoWeakRandInt(UTP_INTERVAL_US);
+    int sec;
+    int usec;
+    if( tr_sessionIsUTPEnabled( ss ) ) {
+        sec = 0;
+        usec = UTP_INTERVAL_US / 2 + tr_cryptoWeakRandInt(UTP_INTERVAL_US);
+    } else {
+        /* If somebody has disabled uTP, then we still want to run
+           UTP_CheckTimeouts, in order to let closed sockets finish
+           gracefully and so on.  However, since we're not particularly
+           interested in that happening in a timely manner, we might as
+           well use a large timeout. */
+        sec = 2;
+        usec = tr_cryptoWeakRandInt( 1000000 );
+    }
     tr_timerAdd( utp_timer, sec, usec );
 }
 
 static void
-timer_callback(int s UNUSED, short type UNUSED, void *closure UNUSED)
+timer_callback(int s UNUSED, short type UNUSED, void *closure)
 {
+    tr_session *ss = closure;
     UTP_CheckTimeouts();
-    reset_timer();
+    reset_timer( ss );
 }
 
 int
@@ -109,10 +122,10 @@ tr_utpPacket(const unsigned char *buf, size_t buflen,
 {
     if(utp_timer == NULL)
     {
-        utp_timer = evtimer_new( ss->event_base, timer_callback, NULL );
+        utp_timer = evtimer_new( ss->event_base, timer_callback, ss );
         if(utp_timer == NULL)
             return -1;
-        reset_timer();
+        reset_timer( ss );
     }
 
     return UTP_IsIncomingUTP(incoming, tr_utpSendTo, ss,
