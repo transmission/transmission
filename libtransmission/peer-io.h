@@ -83,6 +83,7 @@ typedef struct tr_peerIo
 
     tr_port               port;
     int                   socket;
+    struct UTPSocket      *utp_socket;
 
     int                   refCount;
 
@@ -125,7 +126,8 @@ tr_peerIo*  tr_peerIoNewIncoming( tr_session              * session,
                                   struct tr_bandwidth     * parent,
                                   const struct tr_address * addr,
                                   tr_port                   port,
-                                  int                       socket );
+                                  int                       socket,
+                                  struct UTPSocket *        utp_socket );
 
 void tr_peerIoRefImpl           ( const char              * file,
                                   int                       line,

@@ -194,7 +194,8 @@ accept_incoming_peer( int fd, short what UNUSED, void * vsession )
     if( clientSocket > 0 ) {
         tr_deepLog( __FILE__, __LINE__, NULL, "new incoming connection %d (%s)",
                    clientSocket, tr_peerIoAddrStr( &clientAddr, clientPort ) );
-        tr_peerMgrAddIncoming( session->peerMgr, &clientAddr, clientPort, clientSocket );
+        tr_peerMgrAddIncoming( session->peerMgr, &clientAddr, clientPort,
+                               clientSocket, NULL );
     }
 }
 

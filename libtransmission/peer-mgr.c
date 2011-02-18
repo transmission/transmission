@@ -17,6 +17,7 @@
 #include <stdlib.h> /* qsort */
 
 #include <event2/event.h>
+#include "utp.h"
 
 #include "transmission.h"
 #include "announcer.h"
@@ -2007,7 +2008,8 @@ void
 tr_peerMgrAddIncoming( tr_peerMgr * manager,
                        tr_address * addr,
                        tr_port      port,
-                       int          socket )
+                       int          socket,
+                       struct UTPSocket * utp_socket )
 {
     tr_session * session;
 
@@ -2019,18 +2021,24 @@ tr_peerMgrAddIncoming( tr_peerMgr * manager,
     if( tr_sessionIsAddressBlocked( session, addr ) )
     {
         tr_dbg( "Banned IP address \"%s\" tried to connect to us", tr_ntop_non_ts( addr ) );
-        tr_netClose( session, socket );
+        if(socket >= 0)
+            tr_netClose( session, socket );
+        else
+            UTP_Close( utp_socket );
     }
     else if( getExistingHandshake( &manager->incomingHandshakes, addr ) )
     {
-        tr_netClose( session, socket );
+        if(socket >= 0)
+            tr_netClose( session, socket );
+        else
+            UTP_Close( utp_socket );
     }
     else /* we don't have a connection to them yet... */
     {
         tr_peerIo *    io;
         tr_handshake * handshake;
 
-        io = tr_peerIoNewIncoming( session, session->bandwidth, addr, port, socket );
+        io = tr_peerIoNewIncoming( session, session->bandwidth, addr, port, socket, utp_socket );
 
         handshake = tr_handshakeNew( io,
                                      session->encryptionMode,
@@ -2612,6 +2620,7 @@ tr_peerMgrPeerStats( const tr_torrent * tor, int * setmeCount )
         stat->pendingReqsToClient = peer->pendingReqsToClient;
 
         pch = stat->flagStr;
+        if( peer->io->utp_socket != NULL) *pch++ = 'T';
         if( t->optimistic == peer ) *pch++ = 'O';
         if( stat->isDownloadingFrom ) *pch++ = 'D';
         else if( stat->clientIsInterested ) *pch++ = 'd';

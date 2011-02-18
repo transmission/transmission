@@ -25,6 +25,7 @@
 
 #include <event2/event.h>
 #include <event2/bufferevent.h>
+#include "utp.h"
 
 #include "transmission.h"
 #include "session.h"
@@ -367,7 +368,8 @@ tr_peerIoNew( tr_session       * session,
               const uint8_t    * torrentHash,
               tr_bool            isIncoming,
               tr_bool            isSeed,
-              int                socket )
+              int                socket,
+              struct UTPSocket * utp_socket)
 {
     tr_peerIo * io;
 
@@ -376,6 +378,7 @@ tr_peerIoNew( tr_session       * session,
     assert( tr_isBool( isIncoming ) );
     assert( tr_isBool( isSeed ) );
     assert( tr_amInEventThread( session ) );
+    assert( (socket < 0) == (utp_socket != NULL) );
 
     if( socket >= 0 ) {
         tr_netSetTOS( socket, session->peerSocketTOS );
@@ -391,15 +394,21 @@ tr_peerIoNew( tr_session       * session,
     io->isSeed = isSeed;
     io->port = port;
     io->socket = socket;
+    io->utp_socket = utp_socket;
     io->isIncoming = isIncoming != 0;
     io->timeCreated = tr_time( );
     io->inbuf = evbuffer_new( );
     io->outbuf = evbuffer_new( );
-    io->event_read = event_new( session->event_base, io->socket, EV_READ, event_read_cb, io );
-    io->event_write = event_new( session->event_base, io->socket, EV_WRITE, event_write_cb, io );
     tr_bandwidthConstruct( &io->bandwidth, session, parent );
     tr_bandwidthSetPeer( &io->bandwidth, io );
     dbgmsg( io, "bandwidth is %p; its parent is %p", &io->bandwidth, parent );
+
+    if( io->socket >= 0 ) {
+        io->event_read = event_new( session->event_base,
+                                    io->socket, EV_READ, event_read_cb, io );
+        io->event_write = event_new( session->event_base,
+                                     io->socket, EV_WRITE, event_write_cb, io );
+    }
 
     return io;
 }
@@ -409,13 +418,14 @@ tr_peerIoNewIncoming( tr_session        * session,
                       tr_bandwidth      * parent,
                       const tr_address  * addr,
                       tr_port             port,
-                      int                 fd )
+                      int                 fd,
+                      struct UTPSocket  * utp_socket )
 {
     assert( session );
     assert( tr_isAddress( addr ) );
-    assert( fd >= 0 );
 
-    return tr_peerIoNew( session, parent, addr, port, NULL, TRUE, FALSE, fd );
+    return tr_peerIoNew( session, parent, addr, port, NULL, TRUE, FALSE, 
+                         fd, utp_socket );
 }
 
 tr_peerIo*
@@ -436,7 +446,8 @@ tr_peerIoNewOutgoing( tr_session        * session,
     dbgmsg( NULL, "tr_netOpenPeerSocket returned fd %d", fd );
 
     return fd < 0 ? NULL
-                  : tr_peerIoNew( session, parent, addr, port, torrentHash, FALSE, isSeed, fd );
+                  : tr_peerIoNew( session, parent, addr, port,
+                                  torrentHash, FALSE, isSeed, fd, NULL );
 }
 
 /***
@@ -449,11 +460,13 @@ event_enable( tr_peerIo * io, short event )
     assert( tr_amInEventThread( io->session ) );
     assert( io->session != NULL );
     assert( io->session->events != NULL );
-    assert( event_initialized( io->event_read ) );
-    assert( event_initialized( io->event_write ) );
 
     if( io->socket < 0 )
         return;
+
+    assert( io->session->events != NULL );
+    assert( event_initialized( io->event_read ) );
+    assert( event_initialized( io->event_write ) );
 
     if( ( event & EV_READ ) && ! ( io->pendingEvents & EV_READ ) )
     {
@@ -475,6 +488,10 @@ event_disable( struct tr_peerIo * io, short event )
 {
     assert( tr_amInEventThread( io->session ) );
     assert( io->session != NULL );
+
+    if( io->socket < 0 )
+        return;
+
     assert( io->session->events != NULL );
     assert( event_initialized( io->event_read ) );
     assert( event_initialized( io->event_write ) );
@@ -532,7 +549,10 @@ io_dtor( void * vio )
     tr_bandwidthDestruct( &io->bandwidth );
     evbuffer_free( io->outbuf );
     evbuffer_free( io->inbuf );
-    tr_netClose( io->session, io->socket );
+    if( io->socket >= 0 )
+        tr_netClose( io->session, io->socket );
+    if( io->utp_socket != NULL )
+        UTP_Close( io->utp_socket );
     tr_cryptoFree( io->crypto );
     tr_list_free( &io->outbuf_datatypes, tr_free );
 
@@ -639,8 +659,14 @@ tr_peerIoReconnect( tr_peerIo * io )
     pendingEvents = io->pendingEvents;
     event_disable( io, EV_READ | EV_WRITE );
 
-    if( io->socket >= 0 )
+    if( io->socket >= 0 ) {
         tr_netClose( session, io->socket );
+        io->socket = -1;
+    }
+    if( io->utp_socket != NULL ) {
+        UTP_Close(io->utp_socket);
+        io->utp_socket = NULL;
+    }
 
     event_free( io->event_read );
     event_free( io->event_write );
