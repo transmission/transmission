@@ -1214,6 +1214,7 @@ networkPage( GObject * core )
     w = new_spin_button( TR_PREFS_KEY_PEER_LIMIT_GLOBAL, core, 1, 3000, 5 );
     hig_workarea_add_row( t, &row, _( "Maximum peers _overall:" ), w, NULL );
 
+#ifdef WITH_UTP
     hig_workarea_add_section_divider( t, &row );
     hig_workarea_add_section_title( t, &row, _( "Options" ) );
 
@@ -1222,6 +1223,7 @@ networkPage( GObject * core )
     s = _( "uTP is a tool for reducing network congestion." );
     gtr_widget_set_tooltip_text( w, s );
     hig_workarea_add_wide_control( t, &row, w );
+#endif
 
     w = gtk_button_new_with_mnemonic( _( "Edit GNOME Proxy Settings" ) );
     g_signal_connect( w, "clicked", G_CALLBACK( onGNOMEClicked ), data );
