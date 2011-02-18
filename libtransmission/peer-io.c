@@ -860,6 +860,8 @@ tr_peerIoReconnect( tr_peerIo * io )
     if( io->socket >= 0 ) {
         tr_netClose( session, io->socket );
         io->socket = -1;
+        event_free( io->event_read );
+        event_free( io->event_write );
     }
     if( io->utp_socket != NULL ) {
         UTP_SetCallbacks( io->utp_socket,
@@ -869,8 +871,6 @@ tr_peerIoReconnect( tr_peerIo * io )
         io->utp_socket = NULL;
     }
 
-    event_free( io->event_read );
-    event_free( io->event_write );
     io->socket = tr_netOpenPeerSocket( session, &io->addr, io->port, io->isSeed );
     io->event_read = event_new( session->event_base, io->socket, EV_READ, event_read_cb, io );
     io->event_write = event_new( session->event_base, io->socket, EV_WRITE, event_write_cb, io );
