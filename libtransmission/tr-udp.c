@@ -135,11 +135,11 @@ event_callback(int s, short type UNUSED, void *sv)
     if(rc <= 0)
         return;
 
-    if((buf[0] == 'd') && tr_sessionIsDHTEnabled(ss)) {
+    if( buf[0] == 'd' ) {
         /* DHT packet. */
         buf[rc] = '\0';
         tr_dhtCallback(buf, rc, (struct sockaddr*)&from, fromlen, sv);
-    } else if(tr_sessionIsUTPEnabled(ss)){
+    } else {
         rc = tr_utpPacket(buf, rc, (struct sockaddr*)&from, fromlen, ss);
         if(!rc)
             tr_ndbg("UDP", "Unexpected UDP packet");

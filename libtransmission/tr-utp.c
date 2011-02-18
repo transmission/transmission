@@ -49,6 +49,11 @@ incoming(void *closure, struct UTPSocket *s)
     socklen_t fromlen = sizeof(from_storage);
     tr_address addr;
     tr_port port;
+
+    if( !tr_sessionIsUTPEnabled(ss) ) {
+        UTP_Close(s);
+        return;
+    }
     
     UTP_GetPeerName(s, from, &fromlen);
     if(from->sa_family == AF_INET) {
