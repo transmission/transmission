@@ -470,13 +470,18 @@ static struct UTPFunctionTable utp_function_table = {
 static void
 dummy_read(void *closure, const unsigned char *buf, size_t buflen)
 {
-    abort();
+    /* This cannot happen, as far as I'm aware. */
+    tr_nerr("UTP", "On_read called on closed socket");
+
 }
 
 static void
 dummy_write(void *closure, unsigned char *buf, size_t buflen)
 {
-    abort();
+    /* This can very well happen if we've shut down a peer connection that
+       had unflushed buffers.  Complain and send zeroes. */
+    tr_ndbg("UTP", "On_write called on closed socket");
+    memset(buf, 0, buflen);
 }
 
 static size_t
@@ -500,6 +505,7 @@ dummy_on_error(void *closure, int errcode)
 static void
 dummy_on_overhead(void *closure, bool send, size_t count, int type)
 {
+    return;
 }
 
 static struct UTPFunctionTable dummy_utp_function_table = {
