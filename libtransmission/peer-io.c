@@ -378,6 +378,8 @@ utp_on_read(void *closure, const unsigned char *buf, size_t buflen)
     assert( tr_isPeerIo( io ) );
 
     rc = evbuffer_add( io->inbuf, buf, buflen );
+    dbgmsg( io, "utp_on_read got %zu bytes", buflen );
+
     if( rc < 0 ) {
         tr_nerr( "UTP", "On read evbuffer_add" );
         return;
@@ -395,6 +397,7 @@ utp_on_write(void *closure, unsigned char *buf, size_t buflen)
     assert( tr_isPeerIo( io ) );
 
     rc = evbuffer_remove( io->outbuf, buf, buflen );
+    dbgmsg( io, "utp_on_write sending %zu bytes... evbuffer_remove returned %d", buflen, rc );
     assert( rc == (int)buflen ); /* if this fails, we've corrupted our bookkeeping somewhere */
     if( rc < (long)buflen ) {
         tr_nerr( "UTP", "Short write: %d < %ld", rc, (long)buflen);
@@ -412,6 +415,7 @@ utp_get_rb_size(void *closure)
 
     bytes = tr_bandwidthClamp( &io->bandwidth, TR_DOWN, UTP_READ_BUFFER_SIZE );
 
+    dbgmsg( io, "utp_get_rb_size is saying it's ready to read %zu bytes", bytes );
     return UTP_READ_BUFFER_SIZE - bytes;
 }
 
@@ -421,8 +425,10 @@ utp_on_state_change(void *closure, int state)
     tr_peerIo *io = (tr_peerIo *)closure;
     assert( tr_isPeerIo( io ) );
 
-    if( state == UTP_STATE_CONNECT || state == UTP_STATE_WRITABLE ) {
-        /* noop */
+    if( state == UTP_STATE_CONNECT ) {
+        dbgmsg( io, "utp_on_state_change -- changed to readable" );
+    } else if( state == UTP_STATE_WRITABLE ) {
+        dbgmsg( io, "utp_on_state_change -- changed to writable" );
     } else if( state == UTP_STATE_EOF ) {
         if( io->gotError )
             io->gotError( io, BEV_EVENT_EOF, io->userData );
@@ -440,6 +446,8 @@ utp_on_error(void *closure, int errcode)
     tr_peerIo *io = (tr_peerIo *)closure;
     assert( tr_isPeerIo( io ) );
 
+    dbgmsg( io, "utp_on_error -- errcode is %d", errcode );
+
     if( io->gotError ) {
         errno = errcode;
         io->gotError( io, BEV_EVENT_ERROR, io->userData );
@@ -451,6 +459,8 @@ utp_on_overhead(void *closure, bool send, size_t count, int type UNUSED)
 {
     tr_peerIo *io = (tr_peerIo *)closure;
     assert( tr_isPeerIo( io ) );
+
+    dbgmsg( io, "utp_on_overhead -- count is %zu", count );
 
     tr_bandwidthUsed( &io->bandwidth, send ? TR_UP : TR_DOWN,
                       count, FALSE, tr_time_msec() );
@@ -561,6 +571,7 @@ tr_peerIoNew( tr_session       * session,
     tr_bandwidthConstruct( &io->bandwidth, session, parent );
     tr_bandwidthSetPeer( &io->bandwidth, io );
     dbgmsg( io, "bandwidth is %p; its parent is %p", &io->bandwidth, parent );
+    dbgmsg( io, "socket is %d, utp_socket is %p", socket, utp_socket );
 
     if( io->socket >= 0 ) {
         io->event_read = event_new( session->event_base,
@@ -569,11 +580,14 @@ tr_peerIoNew( tr_session       * session,
                                      io->socket, EV_WRITE, event_write_cb, io );
     } else {
         UTP_SetSockopt( utp_socket, SO_RCVBUF, UTP_READ_BUFFER_SIZE );
+        dbgmsg( io, "%s", "calling UTP_SetCallbacks &utp_function_table" );
         UTP_SetCallbacks( utp_socket,
                           &utp_function_table,
                           io );
-        if( !isIncoming )
+        if( !isIncoming ) {
+            dbgmsg( io, "%s", "calling UTP_Connect" );
             UTP_Connect( utp_socket );
+        }
     }
 
     return io;
