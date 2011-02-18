@@ -100,7 +100,9 @@ didWriteWrapper( tr_peerIo * io, unsigned int bytes_transferred )
         struct tr_datatype * next = io->outbuf_datatypes->data;
 
         const unsigned int payload = MIN( next->length, bytes_transferred );
-        const unsigned int overhead = guessPacketOverhead( payload );
+        /* For uTP sockets, the overhead is computed in utp_on_overhead. */
+        const unsigned int overhead =
+            io->socket ? guessPacketOverhead( payload ) : 0;
         const uint64_t now = tr_sessionGetTimeMsec( io->session );
 
         tr_bandwidthUsed( &io->bandwidth, TR_UP, payload, next->isPieceData, now );
@@ -452,6 +454,8 @@ utp_on_overhead(void *closure, bool send, size_t count, int type)
     assert( tr_isPeerIo( io ) );
 
     tr_ndbg( "UTP", "On overhead: %d %ld %d", (int)send, (long)count, type );
+    tr_bandwidthUsed( &io->bandwidth, send ? TR_UP : TR_DOWN,
+                      count, FALSE, tr_time_msec() );
 }
 
 static struct UTPFunctionTable utp_function_table = {
