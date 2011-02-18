@@ -27,4 +27,4 @@ THE SOFTWARE.
 
 void tr_udpInit( tr_session * );
 void tr_udpUninit( tr_session * );
-
+void tr_udpSetSocketBuffers(tr_session *);

@@ -33,6 +33,77 @@ THE SOFTWARE.
 #include "tr-utp.h"
 #include "tr-udp.h"
 
+/* Since we use a single UDP socket in order to implement multiple
+   uTP sockets, try to set up huge buffers. */
+
+#define RECV_BUFFER_SIZE (4 * 1024 * 1024)
+#define SEND_BUFFER_SIZE (1 * 1024 * 1024)
+#define SMALL_BUFFER_SIZE (32 * 1024)
+
+static void
+set_socket_buffers(int fd, int large)
+{
+    int size, rbuf, sbuf, rc;
+    socklen_t rbuf_len = sizeof(rbuf), sbuf_len = sizeof(sbuf);
+
+    size = large ? RECV_BUFFER_SIZE : SMALL_BUFFER_SIZE;
+    rc = setsockopt(fd, SOL_SOCKET, SO_RCVBUF, &size, sizeof(size));
+    if(rc < 0)
+        tr_nerr("UDP", "Failed to set receive buffer: %s",
+                tr_strerror(errno));
+
+    size = large ? SEND_BUFFER_SIZE : SMALL_BUFFER_SIZE;
+    rc = setsockopt(fd, SOL_SOCKET, SO_SNDBUF, &size, sizeof(size));
+    if(rc < 0)
+        tr_nerr("UDP", "Failed to set send buffer: %s",
+                tr_strerror(errno));
+
+    if(large) {
+        rc = getsockopt(fd, SOL_SOCKET, SO_RCVBUF, &rbuf, &rbuf_len);
+        if(rc < 0)
+            rbuf = 0;
+
+        rc = getsockopt(fd, SOL_SOCKET, SO_SNDBUF, &sbuf, &sbuf_len);
+        if(rc < 0)
+            sbuf = 0;
+
+        if(rbuf < RECV_BUFFER_SIZE) {
+            tr_nerr("UDP", "Failed to set receive buffer: requested %d, got %d",
+                    RECV_BUFFER_SIZE, rbuf);
+#ifdef __linux__
+            tr_ninf("UDP",
+                    "Please add the line "
+                    "\"net.core.rmem_max = %d\" to /etc/sysctl.conf",
+                    RECV_BUFFER_SIZE);
+#endif
+        }
+
+        if(sbuf < SEND_BUFFER_SIZE) {
+            tr_nerr("UDP", "Failed to set send buffer: requested %d, got %d",
+                    SEND_BUFFER_SIZE, sbuf);
+#ifdef __linux__
+            tr_ninf("UDP",
+                    "Please add the line "
+                    "\"net.core.wmem_max = %d\" to /etc/sysctl.conf",
+                    SEND_BUFFER_SIZE);
+#endif
+        }
+    }
+}
+
+void
+tr_udpSetSocketBuffers(tr_session *session)
+{
+    tr_bool utp = tr_sessionIsUTPEnabled(session);
+    if(session->udp_socket >= 0)
+        set_socket_buffers(session->udp_socket, utp);
+    if(session->udp6_socket >= 0)
+        set_socket_buffers(session->udp6_socket, utp);
+}
+
+
+
+
 /* BEP-32 has a rather nice explanation of why we need to bind to one
    IPv6 address, if I may say so myself. */
 
@@ -198,6 +269,8 @@ tr_udpInit(tr_session *ss)
         if(ss->udp6_event == NULL)
             tr_nerr("UDP", "Couldn't allocate IPv6 event");
     }
+
+    tr_udpSetSocketBuffers(ss);
 
     if(ss->isDHTEnabled)
         tr_dhtInit(ss);
