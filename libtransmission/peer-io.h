@@ -105,6 +105,9 @@ typedef struct tr_peerIo
     struct evbuffer     * inbuf;
     struct evbuffer     * outbuf;
     struct tr_list      * outbuf_datatypes; /* struct tr_datatype */
+    
+    tr_bool               write_enabled;
+    tr_bool               read_enabled;
 
     struct event        * event_read;
     struct event        * event_write;
