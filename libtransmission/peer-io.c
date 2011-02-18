@@ -1156,6 +1156,11 @@ static int
 tr_peerIoTryWrite( tr_peerIo * io, size_t howmuch )
 {
     int n = 0;
+    const size_t old_len = evbuffer_get_length( io->outbuf );
+    dbgmsg( io, "in tr_peerIoTryWrite %zu", howmuch );
+
+    if( howmuch > old_len )
+        howmuch = old_len;
 
     if(( howmuch = tr_bandwidthClamp( &io->bandwidth, TR_UP, howmuch )))
     {
