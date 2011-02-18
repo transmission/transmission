@@ -367,17 +367,36 @@ maybeSetCongestionAlgorithm( int socket, const char * algorithm )
 static void
 utp_on_read(void *closure, const unsigned char *buf, size_t buflen)
 {
+    int rc;
     tr_peerIo *io = (tr_peerIo *)closure;
     assert( tr_isPeerIo( io ) );
+
     tr_ndbg( "UTP", "On read: %ld", (long)buflen );
+
+    rc = evbuffer_add( io->inbuf, buf, buflen );
+    if( rc < 0 ) {
+        tr_nerr( "UTP", "On read evbuffer_add" );
+        UTP_Close( io->utp_socket );
+        return;
+    }
+
+    tr_peerIoSetEnabled( io, TR_DOWN, TRUE );
+    canReadWrapper( io );
 }
 
 static void
 utp_on_write(void *closure, unsigned char *buf, size_t buflen)
 {
     tr_peerIo *io = (tr_peerIo *)closure;
+    int rc;
+
     assert( tr_isPeerIo( io ) );
     tr_ndbg( "UTP", "On write: %ld", (long)buflen );
+
+    rc = evbuffer_remove( io->outbuf, buf, buflen );
+    if( rc < (long)buflen ) {
+        tr_nerr( "UTP", "Short write: %d < %ld", rc, (long)buflen);
+    }
 }
 
 static size_t
@@ -393,18 +412,24 @@ utp_get_rb_size(void *closure)
 static void
 utp_on_state_change(void *closure, int state)
 {
-    tr_peerIo *io;
-    /* This can be called after UTP_Close, in which case closure can point
-       to an already-destroyed peerIo. */
-    if( state == UTP_STATE_DESTROYING ) {
-        tr_ndbg( "UTP", "Connection destroyed" );
-        return;
-    }
-
-    io = (tr_peerIo *)closure;
+    tr_peerIo *io = (tr_peerIo *)closure;
     assert( tr_isPeerIo( io ) );
 
     tr_ndbg( "UTP", "On state change: %d", state );
+
+    if( state == UTP_STATE_CONNECT || state == UTP_STATE_WRITABLE ) {
+        size_t count = evbuffer_get_length( io->outbuf );
+        if( count > 0 )
+            UTP_Write( io->utp_socket, count );
+    } else if( state == UTP_STATE_EOF ) {
+        if( io->gotError )
+            io->gotError( io, BEV_EVENT_EOF, io->userData );
+    } else if( state == UTP_STATE_DESTROYING ) {
+        tr_nerr( "UTP", "Impossible state UTP_STATE_DESTROYING" );
+        return;
+    } else {
+        tr_nerr( "UTP", "Unknown state %d", state );
+    }
 }
 
 static void
@@ -414,6 +439,11 @@ utp_on_error(void *closure, int errcode)
     assert( tr_isPeerIo( io ) );
 
     tr_ndbg( "UTP", "Error callback: %s", tr_strerror( errcode ) );
+
+    if( io->gotError ) {
+        errno = errcode;
+        io->gotError( io, BEV_EVENT_ERROR, io->userData );
+    }
 }
 
 static void
