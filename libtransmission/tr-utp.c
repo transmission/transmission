@@ -75,9 +75,9 @@ incoming(void *closure, struct UTPSocket *s)
     tr_peerMgrAddIncoming(ss->peerMgr, &addr, port, -1, s);
 }
 
-static void
-send_to(void *closure, const unsigned char *buf, size_t buflen,
-        const struct sockaddr *to, socklen_t tolen)
+void
+tr_utpSendTo(void *closure, const unsigned char *buf, size_t buflen,
+             const struct sockaddr *to, socklen_t tolen)
 {
     tr_session *ss = (tr_session*)closure;
 
@@ -115,7 +115,7 @@ tr_utpPacket(const unsigned char *buf, size_t buflen,
         reset_timer();
     }
 
-    return UTP_IsIncomingUTP(incoming, send_to, ss,
+    return UTP_IsIncomingUTP(incoming, tr_utpSendTo, ss,
                              buf, buflen, from, fromlen);
 }
 

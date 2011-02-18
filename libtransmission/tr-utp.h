@@ -26,3 +26,6 @@ int tr_utpPacket(const unsigned char *buf, size_t buflen,
                  tr_session *ss);
 
 void tr_utpClose( tr_session * );
+
+void tr_utpSendTo(void *closure, const unsigned char *buf, size_t buflen,
+                  const struct sockaddr *to, socklen_t tolen);
