@@ -627,7 +627,7 @@ tr_peerIoNewOutgoing( tr_session        * session,
                       tr_port             port,
                       const uint8_t     * torrentHash,
                       tr_bool             isSeed,
-                      tr_bool             utp UNUSED )
+                      tr_bool             utp )
 {
     int fd = -1;
     struct UTPSocket *utp_socket = NULL;
