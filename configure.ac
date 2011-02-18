@@ -219,10 +219,18 @@ dnl ----------------------------------------------------------------------------
 dnl
 dnl  utp
 
-LIBUTP_CFLAGS="-I\$(top_srcdir)/third-party/"
-LIBUTP_LIBS="\$(top_builddir)/third-party/libutp/libutp.a"
+AC_ARG_ENABLE([utp],
+              AS_HELP_STRING([--enable-utp],[build µTP support]),
+              [build_utp=${enableval}],
+              [build_utp=no])
+if test "x$build_utp" = "xyes" ; then
+    LIBUTP_CFLAGS="-I\$(top_srcdir)/third-party/"
+    LIBUTP_LIBS="\$(top_builddir)/third-party/libutp/libutp.a"
+    AC_DEFINE([WITH_UTP],[1])
+fi
 AC_SUBST(LIBUTP_CFLAGS)
 AC_SUBST(LIBUTP_LIBS)
+AM_CONDITIONAL([BUILD_UTP],[test "x$build_utp" = "xyes"])
 
 
 dnl ----------------------------------------------------------------------------
@@ -507,6 +515,7 @@ Configuration:
    Build libtransmission:                             yes
 
       * optimized for low-resource systems:           ${enable_lightweight}
+      * µTP enabled:                                  ${build_utp}
 
    Build Command-Line client:                         ${build_cli}
 

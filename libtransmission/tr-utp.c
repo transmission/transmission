@@ -34,6 +34,20 @@ THE SOFTWARE.
 #include "peer-mgr.h"
 #include "tr-utp.h"
 
+#ifndef WITH_UTP
+
+int tr_utpPacket(const unsigned char *buf UNUSED, size_t buflen UNUSED,
+                 const struct sockaddr *from UNUSED, socklen_t fromlen UNUSED,
+                 tr_session *ss UNUSED) { return -1; }
+
+void tr_utpClose( tr_session * ss UNUSED ) { }
+
+void tr_utpSendTo(void *closure UNUSED,
+                  const unsigned char *buf UNUSED, size_t buflen UNUSED,
+                  const struct sockaddr *to UNUSED, socklen_t tolen UNUSED) { }
+
+#else
+
 /* Greg says 50ms works for them. */
 
 #define UTP_INTERVAL_US 50000
@@ -141,3 +155,5 @@ tr_utpClose( tr_session * session UNUSED )
         utp_timer = NULL;
     }
 }
+
+#endif /* #ifndef WITH_UTP ... else */

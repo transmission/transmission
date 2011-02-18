@@ -1979,7 +1979,11 @@ tr_sessionIsUTPEnabled( const tr_session * session )
 {
     assert( tr_isSession( session ) );
 
+#ifdef WITH_UTP
     return session->isUTPEnabled;
+#else
+    return FALSE;
+#endif
 }
 
 static void

@@ -2048,15 +2048,19 @@ tr_peerMgrAddIncoming( tr_peerMgr * manager,
         tr_dbg( "Banned IP address \"%s\" tried to connect to us", tr_ntop_non_ts( addr ) );
         if(socket >= 0)
             tr_netClose( session, socket );
+#ifdef WITH_UTP
         else
             UTP_Close( utp_socket );
+#endif
     }
     else if( getExistingHandshake( &manager->incomingHandshakes, addr ) )
     {
         if(socket >= 0)
             tr_netClose( session, socket );
+#ifdef WITH_UTP
         else
             UTP_Close( utp_socket );
+#endif
     }
     else /* we don't have a connection to them yet... */
     {

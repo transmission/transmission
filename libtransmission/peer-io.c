@@ -38,6 +38,7 @@
 #include "trevent.h" /* tr_runInEventThread() */
 #include "utils.h"
 
+
 #define MAGIC_NUMBER 206745
 
 #ifdef WIN32
@@ -368,6 +369,7 @@ maybeSetCongestionAlgorithm( int socket, const char * algorithm )
     }
 }
 
+#ifdef WITH_UTP
 /* UTP callbacks */
 
 static void
@@ -476,6 +478,7 @@ static struct UTPFunctionTable utp_function_table = {
     .on_overhead = utp_on_overhead
 };
 
+
 /* Dummy UTP callbacks. */
 /* We switch a UTP socket to use these after the associated peerIo has been
    destroyed -- see io_dtor. */
@@ -530,6 +533,8 @@ static struct UTPFunctionTable dummy_utp_function_table = {
     .on_overhead = dummy_on_overhead
 };
 
+#endif /* #ifdef WITH_UTP */
+
 static tr_peerIo*
 tr_peerIoNew( tr_session       * session,
               tr_bandwidth     * parent,
@@ -549,6 +554,9 @@ tr_peerIoNew( tr_session       * session,
     assert( tr_isBool( isSeed ) );
     assert( tr_amInEventThread( session ) );
     assert( (socket < 0) == (utp_socket != NULL) );
+#ifndef WITH_UTP
+    assert( socket >= 0 );
+#endif
 
     if( socket >= 0 ) {
         tr_netSetTOS( socket, session->peerSocketTOS );
@@ -579,7 +587,9 @@ tr_peerIoNew( tr_session       * session,
                                     io->socket, EV_READ, event_read_cb, io );
         io->event_write = event_new( session->event_base,
                                      io->socket, EV_WRITE, event_write_cb, io );
-    } else {
+    }
+#ifdef WITH_UTP
+    else {
         UTP_SetSockopt( utp_socket, SO_RCVBUF, UTP_READ_BUFFER_SIZE );
         dbgmsg( io, "%s", "calling UTP_SetCallbacks &utp_function_table" );
         UTP_SetCallbacks( utp_socket,
@@ -590,6 +600,7 @@ tr_peerIoNew( tr_session       * session,
             UTP_Connect( utp_socket );
         }
     }
+#endif
 
     return io;
 }
@@ -616,7 +627,7 @@ tr_peerIoNewOutgoing( tr_session        * session,
                       tr_port             port,
                       const uint8_t     * torrentHash,
                       tr_bool             isSeed,
-                      tr_bool             utp )
+                      tr_bool             utp UNUSED )
 {
     int fd = -1;
     struct UTPSocket *utp_socket = NULL;
@@ -625,12 +636,13 @@ tr_peerIoNewOutgoing( tr_session        * session,
     assert( tr_isAddress( addr ) );
     assert( torrentHash );
 
-    if( !utp ) {
+#ifdef WITH_UTP
+    if( utp )
+        utp_socket = tr_netOpenPeerUTPSocket( session, addr, port, isSeed );
+#endif
+    if( !utp_socket ) {
         fd = tr_netOpenPeerSocket( session, addr, port, isSeed );
         dbgmsg( NULL, "tr_netOpenPeerSocket returned fd %d", fd );
-    } else {
-        utp_socket =
-            tr_netOpenPeerUTPSocket( session, addr, port, isSeed );
     }
 
     if( fd < 0 && utp_socket == NULL )
@@ -722,6 +734,27 @@ tr_peerIoSetEnabled( tr_peerIo    * io,
 /***
 ****
 ***/
+static void
+io_close_socket( tr_peerIo * io )
+{
+    if( io->socket >= 0 ) {
+        tr_netClose( io->session, io->socket );
+        io->socket = -1;
+        event_free( io->event_read );
+        event_free( io->event_write );
+    }
+
+#ifdef WITH_UTP
+    if( io->utp_socket ) {
+        UTP_SetCallbacks( io->utp_socket,
+                          &dummy_utp_function_table,
+                          NULL );
+        UTP_Close( io->utp_socket );
+
+        io->utp_socket = NULL;
+    }
+#endif
+}
 
 static void
 io_dtor( void * vio )
@@ -737,17 +770,7 @@ io_dtor( void * vio )
     tr_bandwidthDestruct( &io->bandwidth );
     evbuffer_free( io->outbuf );
     evbuffer_free( io->inbuf );
-    if( io->socket >= 0 ) {
-        event_free( io->event_read );
-        event_free( io->event_write );
-        tr_netClose( io->session, io->socket );
-    }
-    if( io->utp_socket != NULL ) {
-        UTP_SetCallbacks( io->utp_socket,
-                          &dummy_utp_function_table,
-                          NULL );
-        UTP_Close( io->utp_socket );
-    }
+    io_close_socket( io );
     tr_cryptoFree( io->crypto );
     tr_list_free( &io->outbuf_datatypes, tr_free );
 
@@ -854,19 +877,7 @@ tr_peerIoReconnect( tr_peerIo * io )
     pendingEvents = io->pendingEvents;
     event_disable( io, EV_READ | EV_WRITE );
 
-    if( io->socket >= 0 ) {
-        tr_netClose( session, io->socket );
-        io->socket = -1;
-        event_free( io->event_read );
-        event_free( io->event_write );
-    }
-    if( io->utp_socket != NULL ) {
-        UTP_SetCallbacks( io->utp_socket,
-                          &dummy_utp_function_table,
-                          NULL );
-        UTP_Close(io->utp_socket);
-        io->utp_socket = NULL;
-    }
+    io_close_socket( io );
 
     io->socket = tr_netOpenPeerSocket( session, &io->addr, io->port, io->isSeed );
     io->event_read = event_new( session->event_base, io->socket, EV_READ, event_read_cb, io );
@@ -1133,6 +1144,7 @@ tr_peerIoTryRead( tr_peerIo * io, size_t howmuch )
 
     if(( howmuch = tr_bandwidthClamp( &io->bandwidth, TR_DOWN, howmuch )))
     {
+#ifdef WITH_UTP
         if( io->utp_socket != NULL ) /* utp peer connection */
         {
             /* UTP_RBDrained notifies libutp that your read buffer is emtpy.
@@ -1142,6 +1154,7 @@ tr_peerIoTryRead( tr_peerIo * io, size_t howmuch )
                 UTP_RBDrained( io->utp_socket );
         }
         else /* tcp peer connection */
+#endif
         {
             int e;
 
@@ -1182,6 +1195,7 @@ tr_peerIoTryWrite( tr_peerIo * io, size_t howmuch )
 
     if(( howmuch = tr_bandwidthClamp( &io->bandwidth, TR_UP, howmuch )))
     {
+#ifdef WITH_UTP
         if( io->utp_socket != NULL ) /* utp peer connection */
         {
             const size_t old_len = evbuffer_get_length( io->outbuf );
@@ -1189,6 +1203,7 @@ tr_peerIoTryWrite( tr_peerIo * io, size_t howmuch )
             n = old_len - evbuffer_get_length( io->outbuf );
         }
         else
+#endif
         {
             int e;
 
