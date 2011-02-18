@@ -581,9 +581,6 @@ tr_peerIoNew( tr_session       * session,
             UTP_Connect( utp_socket );
     }
 
-    io->write_enabled = 1;
-    io->read_enabled = 1;
-
     return io;
 }
 
@@ -710,14 +707,6 @@ tr_peerIoSetEnabled( tr_peerIo    * io,
         event_enable( io, event );
     else
         event_disable( io, event );
-
-    if( dir == TR_UP )
-        io->write_enabled = isEnabled;
-    else if( dir == TR_DOWN ) {
-        io->read_enabled = isEnabled;
-        if( io->utp_socket && isEnabled )
-            UTP_RBDrained(io->utp_socket);
-    }
 }
 
 /***
