@@ -588,7 +588,8 @@ tr_peerIoNew( tr_session       * session,
         UTP_SetCallbacks( utp_socket,
                           &utp_function_table,
                           io );
-        
+        if( !isIncoming )
+            UTP_Connect( utp_socket );
     }
 
     io->write_enabled = 1;
@@ -618,20 +619,29 @@ tr_peerIoNewOutgoing( tr_session        * session,
                       const tr_address  * addr,
                       tr_port             port,
                       const uint8_t     * torrentHash,
-                      tr_bool             isSeed )
+                      tr_bool             isSeed,
+                      tr_bool             utp )
 {
-    int fd;
+    int fd = -1;
+    struct UTPSocket *utp_socket = NULL;
 
     assert( session );
     assert( tr_isAddress( addr ) );
     assert( torrentHash );
 
-    fd = tr_netOpenPeerSocket( session, addr, port, isSeed );
-    dbgmsg( NULL, "tr_netOpenPeerSocket returned fd %d", fd );
+    if( !utp ) {
+        fd = tr_netOpenPeerSocket( session, addr, port, isSeed );
+        dbgmsg( NULL, "tr_netOpenPeerSocket returned fd %d", fd );
+    } else {
+        utp_socket =
+            tr_netOpenPeerUTPSocket( session, addr, port, isSeed );
+    }
 
-    return fd < 0 ? NULL
-                  : tr_peerIoNew( session, parent, addr, port,
-                                  torrentHash, FALSE, isSeed, fd, NULL );
+    if( fd < 0 && utp_socket == NULL )
+        return NULL;
+
+    return tr_peerIoNew( session, parent, addr, port,
+                         torrentHash, FALSE, isSeed, fd, utp_socket );
 }
 
 /***

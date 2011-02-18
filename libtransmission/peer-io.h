@@ -123,7 +123,9 @@ tr_peerIo*  tr_peerIoNewOutgoing( tr_session              * session,
                                   const struct tr_address * addr,
                                   tr_port                   port,
                                   const  uint8_t          * torrentHash,
-                                  tr_bool                   isSeed );
+                                  tr_bool                   isSeed,
+                                  tr_bool                   utp );
+
 
 tr_peerIo*  tr_peerIoNewIncoming( tr_session              * session,
                                   struct tr_bandwidth     * parent,
