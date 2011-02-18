@@ -468,42 +468,42 @@ static struct UTPFunctionTable utp_function_table = {
    destroyed -- see io_dtor. */
 
 static void
-dummy_read(void *closure, const unsigned char *buf, size_t buflen)
+dummy_read( void * closure UNUSED, const unsigned char *buf UNUSED, size_t buflen UNUSED )
 {
     /* This cannot happen, as far as I'm aware. */
-    tr_nerr("UTP", "On_read called on closed socket");
+    tr_nerr( "UTP", "On_read called on closed socket" );
 
 }
 
 static void
-dummy_write(void *closure, unsigned char *buf, size_t buflen)
+dummy_write(void * closure UNUSED, unsigned char *buf, size_t buflen)
 {
     /* This can very well happen if we've shut down a peer connection that
        had unflushed buffers.  Complain and send zeroes. */
-    tr_ndbg("UTP", "On_write called on closed socket");
-    memset(buf, 0, buflen);
+    tr_ndbg( "UTP", "On_write called on closed socket" );
+    memset( buf, 0, buflen );
 }
 
 static size_t
-dummy_get_rb_size(void *closure)
+dummy_get_rb_size( void * closure UNUSED )
 {
     return 0;
 }
 
 static void
-dummy_on_state_change(void *closure, int state)
+dummy_on_state_change(void * closure UNUSED, int state UNUSED )
 {
     return;
 }
 
 static void
-dummy_on_error(void *closure, int errcode)
+dummy_on_error( void * closure UNUSED, int errcode UNUSED )
 {
     return;
 }
 
 static void
-dummy_on_overhead(void *closure, bool send, size_t count, int type)
+dummy_on_overhead( void *closure UNUSED, bool send UNUSED, size_t count UNUSED, int type UNUSED )
 {
     return;
 }
