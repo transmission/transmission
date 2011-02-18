@@ -56,6 +56,7 @@ libtransmission_a_SOURCES = \
     tr-dht.c \
     tr-lpd.c \
     tr-udp.c \
+    tr-utp.c \
     tr-getopt.c \
     trevent.c \
     upnp.c \
@@ -108,6 +109,7 @@ noinst_HEADERS = \
     transmission.h \
     tr-dht.h \
     tr-udp.h \
+    tr-utp.h \
     tr-lpd.h \
     trevent.h \
     upnp.h \

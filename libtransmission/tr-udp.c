@@ -30,6 +30,7 @@ THE SOFTWARE.
 #include "net.h"
 #include "session.h"
 #include "tr-dht.h"
+#include "tr-utp.h"
 #include "tr-udp.h"
 
 /* BEP-32 has a rather nice explanation of why we need to bind to one
@@ -139,8 +140,9 @@ event_callback(int s, short type UNUSED, void *sv)
         buf[rc] = '\0';
         tr_dhtCallback(buf, rc, (struct sockaddr*)&from, fromlen, sv);
     } else {
-        /* Probably a UTP packet. */
-        /* Nothing yet. */
+        rc = tr_utpPacket(buf, rc, (struct sockaddr*)&from, fromlen, ss);
+        if(!rc)
+            tr_ndbg("UDP", "Unexpected UDP packet");
     }
 
     free(buf);
