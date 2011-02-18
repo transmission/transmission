@@ -1958,6 +1958,11 @@ myHandshakeDoneCB( tr_handshake  * handshake,
             atom->flags2 &= ~MYFLAG_UNREACHABLE;
         }
 
+        /* In principle, this flag specifies whether the peer groks uTP,
+           not whether it's currently connected over uTP. */
+        if( io->utp_socket )
+            atom->flags |= ADDED_F_UTP_FLAGS;
+
         if( atom->flags2 & MYFLAG_BANNED )
         {
             tordbg( t, "banned peer %s tried to reconnect",

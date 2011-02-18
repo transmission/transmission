@@ -939,6 +939,12 @@ parseLtepHandshake( tr_peermsgs *     msgs,
             msgs->ut_metadata_id = (uint8_t) i;
             dbgmsg( msgs, "msgs->ut_metadata_id is %d", (int)msgs->ut_metadata_id );
         }
+        /* We don't support ut_holepunch yet, but we might as well
+           propagate this information over PEX. */
+        if( tr_bencDictFindInt( sub, "ut_holepunch", &i ) ) {
+            if( i != 0 )
+                pex.flags |= ADDED_F_HOLEPUNCH;
+        }
     }
 
     /* look for metainfo size (BEP 9) */
