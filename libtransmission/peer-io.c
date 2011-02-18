@@ -569,8 +569,6 @@ tr_peerIoNew( tr_session       * session,
         io->event_write = event_new( session->event_base,
                                      io->socket, EV_WRITE, event_write_cb, io );
     } else {
-        tr_ndbg( "UTP", "New %s connection",
-                 isIncoming ? "incoming" : "outgoing" );
         UTP_SetSockopt( utp_socket, SO_RCVBUF, UTP_READ_BUFFER_SIZE );
         UTP_SetCallbacks( utp_socket,
                           &utp_function_table,
@@ -731,7 +729,6 @@ io_dtor( void * vio )
         tr_netClose( io->session, io->socket );
     }
     if( io->utp_socket != NULL ) {
-        tr_ndbg( "UTP", "Destroying connection");
         UTP_SetCallbacks( io->utp_socket,
                           &dummy_utp_function_table,
                           NULL );
