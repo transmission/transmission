@@ -476,6 +476,11 @@ tr_session * fHandle;
     tr_sessionSetDHTEnabled(fHandle, [fDefaults boolForKey: @"DHTGlobal"]);
 }
 
+- (void) setUTP: (id) sender
+{
+    tr_sessionSetUTPEnabled(fHandle, [fDefaults boolForKey: @"UTPGlobal"]);
+}
+
 - (void) setLPD: (id) sender
 {
     tr_sessionSetLPDEnabled(fHandle, [fDefaults boolForKey: @"LocalPeerDiscoveryGlobal"]);
@@ -1109,7 +1114,11 @@ tr_session * fHandle;
     const BOOL dht = tr_sessionIsDHTEnabled(fHandle);
     [fDefaults setBool: dht forKey: @"DHTGlobal"];
     
-    //dht
+    //utp
+    const BOOL utp = tr_sessionIsUTPEnabled(fHandle);
+    [fDefaults setBool: utp forKey: @"UTPGlobal"];
+    
+    //lpd
     const BOOL lpd = tr_sessionIsLPDEnabled(fHandle);
     [fDefaults setBool: lpd forKey: @"LocalPeerDiscoveryGlobal"];
     
@@ -1211,6 +1220,8 @@ tr_session * fHandle;
         //pex handled by bindings
         
         //dht handled by bindings
+        
+        //utp handled by bindings
         
         //lpd handled by bindings
         
