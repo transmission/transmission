@@ -47,6 +47,10 @@
  #define EPIPE        WSAECONNRESET
 #endif
 
+/* The amount of read bufferring that we allow for uTP sockets. */
+
+#define UTP_READ_BUFFER_SIZE (256 * 1024)
+
 static size_t
 guessPacketOverhead( size_t d )
 {
@@ -572,9 +576,11 @@ tr_peerIoNew( tr_session       * session,
     } else {
         tr_ndbg( "UTP", "New %s connection",
                  isIncoming ? "incoming" : "outgoing" );
+        UTP_SetSockopt( utp_socket, SO_RCVBUF, UTP_READ_BUFFER_SIZE );
         UTP_SetCallbacks( utp_socket,
                           &utp_function_table,
                           io );
+        
     }
 
     return io;
