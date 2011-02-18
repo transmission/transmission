@@ -24,7 +24,7 @@ THE SOFTWARE.
 #include <unistd.h>
 
 #include <event.h>
-#include "utp.h"
+#include <libutp/utp.h>
 
 #include "transmission.h"
 #include "net.h"

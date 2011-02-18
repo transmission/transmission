@@ -25,7 +25,7 @@
 
 #include <event2/event.h>
 #include <event2/bufferevent.h>
-#include "utp.h"
+#include <libutp/utp.h>
 
 #include "transmission.h"
 #include "session.h"

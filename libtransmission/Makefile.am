@@ -7,6 +7,7 @@ AM_CPPFLAGS = \
 
 AM_CFLAGS = \
     @DHT_CFLAGS@ \
+    @LIBUTP_CFLAGS@ \
     @LIBEVENT_CFLAGS@ \
     @LIBCURL_CFLAGS@ \
     @OPENSSL_CFLAGS@ \
@@ -142,6 +143,7 @@ apps_ldadd = \
     $(top_builddir)/third-party/libnatpmp/libnatpmp.a \
     @INTLLIBS@ \
     @DHT_LIBS@ \
+    @LIBUTP_LIBS@ \
     @LIBCURL_LIBS@ \
     @LIBEVENT_LIBS@ \
     @OPENSSL_LIBS@ \

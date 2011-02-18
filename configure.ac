@@ -217,6 +217,16 @@ AC_SUBST(DHT_LIBS)
 
 dnl ----------------------------------------------------------------------------
 dnl
+dnl  utp
+
+LIBUTP_CFLAGS="-I\$(top_srcdir)/third-party/"
+LIBUTP_LIBS="\$(top_builddir)/third-party/libutp/libutp.a"
+AC_SUBST(LIBUTP_CFLAGS)
+AC_SUBST(LIBUTP_LIBS)
+
+
+dnl ----------------------------------------------------------------------------
+dnl
 dnl  detection for the GTK+ client
 
 PKG_CHECK_MODULES(GTK,
@@ -470,6 +480,7 @@ AC_CONFIG_FILES([Makefile
                  third-party/Makefile
                  third-party/miniupnp/Makefile
                  third-party/libnatpmp/Makefile
+                 third-party/libutp/Makefile
                  third-party/dht/Makefile
                  macosx/Makefile
                  gtk/Makefile

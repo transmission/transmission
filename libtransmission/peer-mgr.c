@@ -17,7 +17,7 @@
 #include <stdlib.h> /* qsort */
 
 #include <event2/event.h>
-#include "utp.h"
+#include <libutp/utp.h>
 
 #include "transmission.h"
 #include "announcer.h"

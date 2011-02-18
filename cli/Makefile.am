@@ -21,6 +21,7 @@ transmission_cli_LDADD = \
     $(top_builddir)/third-party/libnatpmp/libnatpmp.a \
     $(top_builddir)/third-party/miniupnp/libminiupnp.a \
     @DHT_LIBS@ \
+    @LIBUTP_LIBS@ \
     @LIBEVENT_LIBS@ \
     @LIBCURL_LIBS@ \
     @OPENSSL_LIBS@ \
