@@ -1144,7 +1144,6 @@ tr_peerIoTryRead( tr_peerIo * io, size_t howmuch )
 
     if(( howmuch = tr_bandwidthClamp( &io->bandwidth, TR_DOWN, howmuch )))
     {
-#ifdef WITH_UTP
         if( io->utp_socket != NULL ) /* utp peer connection */
         {
             /* UTP_RBDrained notifies libutp that your read buffer is emtpy.
@@ -1154,7 +1153,6 @@ tr_peerIoTryRead( tr_peerIo * io, size_t howmuch )
                 UTP_RBDrained( io->utp_socket );
         }
         else /* tcp peer connection */
-#endif
         {
             int e;
 
@@ -1195,7 +1193,6 @@ tr_peerIoTryWrite( tr_peerIo * io, size_t howmuch )
 
     if(( howmuch = tr_bandwidthClamp( &io->bandwidth, TR_UP, howmuch )))
     {
-#ifdef WITH_UTP
         if( io->utp_socket != NULL ) /* utp peer connection */
         {
             const size_t old_len = evbuffer_get_length( io->outbuf );
@@ -1203,7 +1200,6 @@ tr_peerIoTryWrite( tr_peerIo * io, size_t howmuch )
             n = old_len - evbuffer_get_length( io->outbuf );
         }
         else
-#endif
         {
             int e;
 
