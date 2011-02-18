@@ -1134,8 +1134,11 @@ tr_peerIoTryRead( tr_peerIo * io, size_t howmuch )
     {
         if( io->utp_socket != NULL ) /* utp peer connection */
         {
-            /* currently a noop. tr-utp's call to UTP_CheckTimeouts()
-             * keeps the pump primed, so no need to call UTP_RBDrained() */
+            /* UTP_RBDrained notifies libutp that your read buffer is emtpy.
+             * It opens up the congestion window by sending an ACK (soonish)
+             * if one was not going to be sent. */
+            if( evbuffer_get_length( io->inbuf ) == 0 )
+                UTP_RBDrained( io->utp_socket );
         }
         else /* tcp peer connection */
         {
