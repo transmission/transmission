@@ -434,6 +434,54 @@ static struct UTPFunctionTable utp_function_table = {
     .on_overhead = utp_on_overhead
 };
 
+/* Dummy UTP callbacks. */
+/* We switch a UTP socket to use these after the associated peerIo has been
+   destroyed -- see io_dtor. */
+
+static void
+dummy_read(void *closure, const unsigned char *buf, size_t buflen)
+{
+    abort();
+}
+
+static void
+dummy_write(void *closure, unsigned char *buf, size_t buflen)
+{
+    abort();
+}
+
+static size_t
+dummy_get_rb_size(void *closure)
+{
+    return 0;
+}
+
+static void
+dummy_on_state_change(void *closure, int state)
+{
+    return;
+}
+
+static void
+dummy_on_error(void *closure, int errcode)
+{
+    return;
+}
+
+static void
+dummy_on_overhead(void *closure, bool send, size_t count, int type)
+{
+}
+
+static struct UTPFunctionTable dummy_utp_function_table = {
+    .on_read = dummy_read,
+    .on_write = dummy_write,
+    .get_rb_size = dummy_get_rb_size,
+    .on_state = dummy_on_state_change,
+    .on_error = dummy_on_error,
+    .on_overhead = dummy_on_overhead
+};
+
 static tr_peerIo*
 tr_peerIoNew( tr_session       * session,
               tr_bandwidth     * parent,
@@ -634,6 +682,9 @@ io_dtor( void * vio )
     }
     if( io->utp_socket != NULL ) {
         tr_ndbg( "UTP", "Destroying connection");
+        UTP_SetCallbacks( io->utp_socket,
+                          &dummy_utp_function_table,
+                          NULL );
         UTP_Close( io->utp_socket );
     }
     tr_cryptoFree( io->crypto );
