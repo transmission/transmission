@@ -2614,6 +2614,8 @@
 				OTHER_CFLAGS = (
 					"$(inherited)",
 					"-DSYS_DARWIN",
+					"-DWITH_UTP",
+					"-DWITH_UTP",
 					"-DHAVE_OPENSSL",
 					"-D__TRANSMISSION__",
 					"-DHAVE_STRLCPY",
@@ -2623,6 +2625,7 @@
 					"-DHAVE_STRCASECMP",
 					"-DHAVE_LIBZ",
 				);
+				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
 				PRODUCT_NAME = transmission;
 			};
 			name = Debug;
@@ -2737,7 +2740,6 @@
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.5;
 				ONLY_ACTIVE_ARCH = YES;
-				OTHER_CFLAGS = "$(inherited)";
 				OTHER_LDFLAGS = "";
 				PREBINDING = NO;
 				PRELINK_LIBS = "";
@@ -3056,6 +3058,7 @@
 				OTHER_CFLAGS = (
 					"$(inherited)",
 					"-DSYS_DARWIN",
+					"-DWITH_UTP",
 					"-DHAVE_OPENSSL",
 					"-D__TRANSMISSION__",
 					"-DHAVE_STRLCPY",
