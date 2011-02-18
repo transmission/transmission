@@ -21,6 +21,7 @@ THE SOFTWARE.
 
 */
 
+#include <assert.h>
 #include <unistd.h>
 
 #include <event.h>
@@ -33,8 +34,25 @@ THE SOFTWARE.
 #include "peer-io.h"
 #include "peer-mgr.h"
 #include "tr-utp.h"
+#include "utils.h"
+
+#define MY_NAME "UTP"
+
+#define dbgmsg( ... ) \
+    do { \
+        if( tr_deepLoggingIsActive( ) ) \
+            tr_deepLog( __FILE__, __LINE__, MY_NAME, __VA_ARGS__ ); \
+    } while( 0 )
 
 #ifndef WITH_UTP
+
+void
+UTP_Close(struct UTPSocket * socket )
+{
+    tr_nerr( MY_NAME, "UTP_Close(%p) was called.", socket );
+    dbgmsg( "UTP_Close(%p) was called.", socket );
+    assert( 0 ); /* FIXME: this is too much for the long term, but probably needed in the short term */
+}
 
 int tr_utpPacket(const unsigned char *buf UNUSED, size_t buflen UNUSED,
                  const struct sockaddr *from UNUSED, socklen_t fromlen UNUSED,
