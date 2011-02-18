@@ -34,6 +34,10 @@ THE SOFTWARE.
 #include "peer-mgr.h"
 #include "tr-utp.h"
 
+/* Greg says 50ms works for them. */
+
+#define UTP_INTERVAL_US 50000
+
 static struct event *utp_timer = NULL;
 
 static void
@@ -82,7 +86,8 @@ static void
 timer_callback(int s UNUSED, short type UNUSED, void *closure UNUSED)
 {
     UTP_CheckTimeouts();
-    tr_timerAdd(utp_timer, 1, tr_cryptoWeakRandInt(1000000));
+    tr_timerAdd(utp_timer, 0,
+                UTP_INTERVAL_US / 2 + tr_cryptoWeakRandInt(UTP_INTERVAL_US));
 }
 
 int
@@ -95,7 +100,8 @@ tr_utpPacket(const unsigned char *buf, size_t buflen,
         if(utp_timer == NULL)
             return -1;
         evtimer_set(utp_timer, timer_callback, NULL);
-        tr_timerAdd(utp_timer, 1, tr_cryptoWeakRandInt(1000000));
+        tr_timerAdd(utp_timer, 0,
+                    UTP_INTERVAL_US / 2 + tr_cryptoWeakRandInt(UTP_INTERVAL_US));
     }
 
     return UTP_IsIncomingUTP(incoming, send_to, ss,
