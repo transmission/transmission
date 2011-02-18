@@ -833,6 +833,9 @@ tr_peerIoReconnect( tr_peerIo * io )
         io->socket = -1;
     }
     if( io->utp_socket != NULL ) {
+        UTP_SetCallbacks( io->utp_socket,
+                          &dummy_utp_function_table,
+                          NULL );
         UTP_Close(io->utp_socket);
         io->utp_socket = NULL;
     }
