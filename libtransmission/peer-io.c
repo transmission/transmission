@@ -395,6 +395,7 @@ utp_on_write(void *closure, unsigned char *buf, size_t buflen)
     assert( tr_isPeerIo( io ) );
 
     rc = evbuffer_remove( io->outbuf, buf, buflen );
+    assert( rc == (int)buflen ); /* if this fails, we've corrupted our bookkeeping somewhere */
     if( rc < (long)buflen ) {
         tr_nerr( "UTP", "Short write: %d < %ld", rc, (long)buflen);
     }
@@ -421,9 +422,7 @@ utp_on_state_change(void *closure, int state)
     assert( tr_isPeerIo( io ) );
 
     if( state == UTP_STATE_CONNECT || state == UTP_STATE_WRITABLE ) {
-        size_t count = evbuffer_get_length( io->outbuf );
-        if( count > 0 )
-            UTP_Write( io->utp_socket, count );
+        /* noop */
     } else if( state == UTP_STATE_EOF ) {
         if( io->gotError )
             io->gotError( io, BEV_EVENT_EOF, io->userData );
@@ -448,7 +447,7 @@ utp_on_error(void *closure, int errcode)
 }
 
 static void
-utp_on_overhead(void *closure, bool send, size_t count, int type)
+utp_on_overhead(void *closure, bool send, size_t count, int type UNUSED)
 {
     tr_peerIo *io = (tr_peerIo *)closure;
     assert( tr_isPeerIo( io ) );
@@ -1010,8 +1009,6 @@ tr_peerIoWriteBuf( tr_peerIo * io, struct evbuffer * buf, tr_bool isPieceData )
     maybeEncryptBuffer( io, buf );
     evbuffer_add_buffer( io->outbuf, buf );
     addDatatype( io, byteCount, isPieceData );
-    if( io->utp_socket )
-        UTP_Write( io->utp_socket, byteCount );
 }
 
 void
@@ -1121,26 +1118,34 @@ tr_peerIoTryRead( tr_peerIo * io, size_t howmuch )
 
     if(( howmuch = tr_bandwidthClamp( &io->bandwidth, TR_DOWN, howmuch )))
     {
-        int e;
-
-        EVUTIL_SET_SOCKET_ERROR( 0 );
-        res = evbuffer_read( io->inbuf, io->socket, (int)howmuch );
-        e = EVUTIL_SOCKET_ERROR( );
-
-        dbgmsg( io, "read %d from peer (%s)", res, (res==-1?strerror(e):"") );
-
-        if( evbuffer_get_length( io->inbuf ) )
-            canReadWrapper( io );
-
-        if( ( res <= 0 ) && ( io->gotError ) && ( e != EAGAIN ) && ( e != EINTR ) && ( e != EINPROGRESS ) )
+        if( io->utp_socket != NULL ) /* utp peer connection */
         {
-            char errstr[512];
-            short what = BEV_EVENT_READING | BEV_EVENT_ERROR;
-            if( res == 0 )
-                what |= BEV_EVENT_EOF;
-            tr_net_strerror( errstr, sizeof( errstr ), e );
-            dbgmsg( io, "tr_peerIoTryRead got an error. res is %d, what is %hd, errno is %d (%s)", res, what, e, errstr );
-            io->gotError( io, what, io->userData );
+            /* currently a noop. tr-utp's call to UTP_CheckTimeouts()
+             * keeps the pump primed, so no need to call UTP_RBDrained() */
+        }
+        else /* tcp peer connection */
+        {
+            int e;
+
+            EVUTIL_SET_SOCKET_ERROR( 0 );
+            res = evbuffer_read( io->inbuf, io->socket, (int)howmuch );
+            e = EVUTIL_SOCKET_ERROR( );
+
+            dbgmsg( io, "read %d from peer (%s)", res, (res==-1?strerror(e):"") );
+
+            if( evbuffer_get_length( io->inbuf ) )
+                canReadWrapper( io );
+
+            if( ( res <= 0 ) && ( io->gotError ) && ( e != EAGAIN ) && ( e != EINTR ) && ( e != EINPROGRESS ) )
+            {
+                char errstr[512];
+                short what = BEV_EVENT_READING | BEV_EVENT_ERROR;
+                if( res == 0 )
+                    what |= BEV_EVENT_EOF;
+                tr_net_strerror( errstr, sizeof( errstr ), e );
+                dbgmsg( io, "tr_peerIoTryRead got an error. res is %d, what is %hd, errno is %d (%s)", res, what, e, errstr );
+                io->gotError( io, what, io->userData );
+            }
         }
     }
 
@@ -1154,24 +1159,34 @@ tr_peerIoTryWrite( tr_peerIo * io, size_t howmuch )
 
     if(( howmuch = tr_bandwidthClamp( &io->bandwidth, TR_UP, howmuch )))
     {
-        int e;
-        EVUTIL_SET_SOCKET_ERROR( 0 );
-        n = tr_evbuffer_write( io, io->socket, howmuch );
-        e = EVUTIL_SOCKET_ERROR( );
-
-        if( n > 0 )
-            didWriteWrapper( io, n );
-
-        if( ( n < 0 ) && ( io->gotError ) && e && ( e != EPIPE ) && ( e != EAGAIN ) && ( e != EINTR ) && ( e != EINPROGRESS ) )
+        if( io->utp_socket != NULL ) /* utp peer connection */
         {
-            char errstr[512];
-            const short what = BEV_EVENT_WRITING | BEV_EVENT_ERROR;
+            const size_t old_len = evbuffer_get_length( io->outbuf );
+            UTP_Write( io->utp_socket, howmuch );
+            n = old_len - evbuffer_get_length( io->outbuf );
+        }
+        else
+        {
+            int e;
 
-            tr_net_strerror( errstr, sizeof( errstr ), e );
-            dbgmsg( io, "tr_peerIoTryWrite got an error. res is %d, what is %hd, errno is %d (%s)", n, what, e, errstr );
+            EVUTIL_SET_SOCKET_ERROR( 0 );
+            n = tr_evbuffer_write( io, io->socket, howmuch );
+            e = EVUTIL_SOCKET_ERROR( );
 
-            if( io->gotError != NULL )
-                io->gotError( io, what, io->userData );
+            if( n > 0 )
+                didWriteWrapper( io, n );
+
+            if( ( n < 0 ) && ( io->gotError ) && e && ( e != EPIPE ) && ( e != EAGAIN ) && ( e != EINTR ) && ( e != EINPROGRESS ) )
+            {
+                char errstr[512];
+                const short what = BEV_EVENT_WRITING | BEV_EVENT_ERROR;
+
+                tr_net_strerror( errstr, sizeof( errstr ), e );
+                dbgmsg( io, "tr_peerIoTryWrite got an error. res is %d, what is %hd, errno is %d (%s)", n, what, e, errstr );
+
+                if( io->gotError != NULL )
+                    io->gotError( io, what, io->userData );
+            }
         }
     }
 
