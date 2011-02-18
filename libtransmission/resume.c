@@ -458,7 +458,7 @@ saveProgress( tr_benc * dict, const tr_torrent * tor )
             const int offset = oldest_nonzero - 1;
             tr_benc * ll = tr_bencListAddList( l, 2 + f->lastPiece - f->firstPiece );
             tr_bencListAddInt( ll, offset );
-            for( p=&inf->pieces[f->firstPiece], pend=&inf->pieces[f->lastPiece]; p!=pend; ++p )
+            for( p=&inf->pieces[f->firstPiece], pend=&inf->pieces[f->lastPiece]+1; p!=pend; ++p )
                 tr_bencListAddInt( ll, p->timeChecked ? p->timeChecked - offset : 0 );
         }
     }
@@ -512,7 +512,7 @@ loadProgress( tr_benc * dict, tr_torrent * tor )
                 tr_benc * b = tr_bencListChild( l, fi );
                 const tr_file * f = &inf->files[fi];
                 tr_piece * p = &inf->pieces[f->firstPiece];
-                const tr_piece * pend = &inf->pieces[f->lastPiece];
+                const tr_piece * pend = &inf->pieces[f->lastPiece]+1;
 
                 if( tr_bencIsInt( b ) )
                 {
@@ -533,7 +533,7 @@ loadProgress( tr_benc * dict, tr_torrent * tor )
                     {
                         int64_t t = 0;
                         tr_bencGetInt( tr_bencListChild( b, i+1 ), &t );
-                        inf->pieces[f->firstPiece+i].timeChecked = (time_t)(t + offset);
+                        inf->pieces[f->firstPiece+i].timeChecked = (time_t)(t ? t + offset : 0);
                     }
                 }
             }
