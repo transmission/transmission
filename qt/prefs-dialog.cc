@@ -355,6 +355,13 @@ PrefsDialog :: createNetworkTab( )
     hig->addRow( tr( "Maximum peers per &torrent:" ), spinBoxNew( Prefs::PEER_LIMIT_TORRENT, 1, 300, 5 ) );
     hig->addRow( tr( "Maximum peers &overall:" ), spinBoxNew( Prefs::PEER_LIMIT_GLOBAL, 1, 3000, 5 ) );
 
+    hig->addSectionDivider( );
+    hig->addSectionTitle( tr( "Options" ) );
+
+    QWidget * w;
+    hig->addWideControl( w = checkBoxNew( tr( "Enable &uTP for peer connections" ), Prefs::UTP_ENABLED ) );
+    w->setToolTip( tr( "uTP is a tool for reducing network congestion." ) );
+
     hig->finish( );
     return hig;
 }

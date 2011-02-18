@@ -1451,6 +1451,10 @@ on_prefs_changed( TrCore * core UNUSED, const char * key, gpointer data )
     {
         tr_sessionSetDHTEnabled( tr, gtr_pref_flag_get( key ) );
     }
+    else if( !strcmp( key, TR_PREFS_KEY_UTP_ENABLED ) )
+    {
+        tr_sessionSetUTPEnabled( tr, gtr_pref_flag_get( key ) );
+    }
     else if( !strcmp( key, TR_PREFS_KEY_LPD_ENABLED ) )
     {
         tr_sessionSetLPDEnabled( tr, gtr_pref_flag_get( key ) );

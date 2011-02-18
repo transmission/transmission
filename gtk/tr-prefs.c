@@ -1217,6 +1217,12 @@ networkPage( GObject * core )
     hig_workarea_add_section_divider( t, &row );
     hig_workarea_add_section_title( t, &row, _( "Options" ) );
 
+    s = _( "Enable _uTP for peer communication" );
+    w = new_check_button( s, TR_PREFS_KEY_UTP_ENABLED, core );
+    s = _( "uTP is a tool for reducing network congestion." );
+    gtr_widget_set_tooltip_text( w, s );
+    hig_workarea_add_wide_control( t, &row, w );
+
     w = gtk_button_new_with_mnemonic( _( "Edit GNOME Proxy Settings" ) );
     g_signal_connect( w, "clicked", G_CALLBACK( onGNOMEClicked ), data );
     h = gtk_hbox_new( FALSE, 0 );

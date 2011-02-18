@@ -57,6 +57,7 @@ and
 .Op Fl hl
 .Op Fl HL
 .Op Fl u Ar number | Fl U
+.Op Fl utp | no-utp
 .Op Fl v
 .Op Fl V
 .Op Fl w Ar download-dir
@@ -267,6 +268,10 @@ KiB/s.
 If current torrent(s) are selected this operates on them. Otherwise, it changes the global setting.
 .It Fl U Fl -no-uplimit
 Disable upload speed limits.
+.It Fl -utp
+Enable uTP for peer connections.
+.It Fl -no-utp
+Disable uTP for peer connections.
 If current torrent(s) are selected this operates on them. Otherwise, it changes the global setting.
 .It Fl v Fl -verify
 Verify the current torrent(s)

@@ -170,6 +170,7 @@ Session :: updatePref( int key )
         case Prefs :: TRASH_ORIGINAL:
         case Prefs :: USPEED:
         case Prefs :: USPEED_ENABLED:
+        case Prefs :: UTP_ENABLED:
             sessionSet( myPrefs.keyStr(key), myPrefs.variant(key) );
             break;
 
