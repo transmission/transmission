@@ -4,6 +4,8 @@
 #define DYNAMIC_PACKET_SIZE_FACTOR 2
 // This should return the global number of bytes sent, used for determining dynamic
 // packet size based on rate
+
+#warning implement this in libtransmission
 uint64 UTP_GetGlobalUTPBytesSent(const struct sockaddr *remote, socklen_t remotelen) { return 0; }
 
 enum bandwidth_type_t {
