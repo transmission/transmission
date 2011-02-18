@@ -990,6 +990,8 @@ tr_peerIoWriteBuf( tr_peerIo * io, struct evbuffer * buf, tr_bool isPieceData )
     maybeEncryptBuffer( io, buf );
     evbuffer_add_buffer( io->outbuf, buf );
     addDatatype( io, byteCount, isPieceData );
+    if( io->utp_socket )
+        UTP_Write( io->utp_socket, byteCount );
 }
 
 void
