@@ -408,10 +408,18 @@ static size_t
 utp_get_rb_size(void *closure)
 {
     tr_peerIo *io = (tr_peerIo *)closure;
+    size_t bytes;
     assert( tr_isPeerIo( io ) );
 
-    tr_ndbg( "UTP", "Get RB size" );
-    return 0;
+    if( io->read_enabled )
+        bytes =
+            tr_bandwidthClamp( &io->bandwidth, TR_DOWN, UTP_READ_BUFFER_SIZE );
+    else
+        bytes = 0;
+
+    tr_ndbg( "UTP", "Get RB size %ld", (long)bytes);
+
+    return UTP_READ_BUFFER_SIZE - bytes;
 }
 
 static void
@@ -706,8 +714,11 @@ tr_peerIoSetEnabled( tr_peerIo    * io,
 
     if( dir == TR_UP )
         io->write_enabled = isEnabled;
-    else if( dir == TR_DOWN )
+    else if( dir == TR_DOWN ) {
         io->read_enabled = isEnabled;
+        if( io->utp_socket && isEnabled )
+            UTP_RBDrained(io->utp_socket);
+    }
 }
 
 /***
