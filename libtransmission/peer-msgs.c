@@ -2381,6 +2381,7 @@ tr_peerMsgsNew( struct tr_torrent    * torrent,
     if( tr_peerIoSupportsUTP( peer->io ) ) {
         const tr_address * addr = tr_peerIoGetAddress( peer->io, NULL );
         tr_peerMgrSetUtpSupported( torrent, addr );
+        tr_peerMgrSetUtpFailed( torrent, addr, FALSE );
     }
 
     if( tr_peerIoSupportsLTEP( peer->io ) )
