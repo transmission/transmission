@@ -3086,15 +3086,7 @@ rechokePulse( int foo UNUSED, short bar UNUSED, void * vmgr )
 ****
 ***/
 
-typedef enum
-{
-    TR_CAN_KEEP,
-    TR_CAN_CLOSE,
-    TR_MUST_CLOSE,
-}
-tr_close_type_t;
-
-static tr_close_type_t
+static tr_bool
 shouldPeerBeClosed( const Torrent    * t,
                     const tr_peer    * peer,
                     int                peerCount,
@@ -3108,7 +3100,7 @@ shouldPeerBeClosed( const Torrent    * t,
     {
         tordbg( t, "purging peer %s because its doPurge flag is set",
                 tr_atomAddrStr( atom ) );
-        return TR_MUST_CLOSE;
+        return TRUE;
     }
 
     /* if we're seeding and the peer has everything we have,
@@ -3133,7 +3125,7 @@ shouldPeerBeClosed( const Torrent    * t,
         {
             tordbg( t, "purging peer %s because we're both seeds",
                     tr_atomAddrStr( atom ) );
-            return TR_MUST_CLOSE;
+            return TRUE;
         }
     }
 
@@ -3154,17 +3146,15 @@ shouldPeerBeClosed( const Torrent    * t,
         if( idleTime > limit ) {
             tordbg( t, "purging peer %s because it's been %d secs since we shared anything",
                        tr_atomAddrStr( atom ), idleTime );
-            return TR_CAN_CLOSE;
+            return TRUE;
         }
     }
 
-    return TR_CAN_KEEP;
+    return FALSE;
 }
 
 static tr_peer **
-getPeersToClose( Torrent * t, tr_close_type_t closeType,
-                 const time_t now_sec,
-                 int * setmeSize )
+getPeersToClose( Torrent * t, const time_t now_sec, int * setmeSize )
 {
     int i, peerCount, outsize;
     tr_peer ** peers = (tr_peer**) tr_ptrArrayPeek( &t->peers, &peerCount );
@@ -3173,7 +3163,7 @@ getPeersToClose( Torrent * t, tr_close_type_t closeType,
     assert( torrentIsLocked( t ) );
 
     for( i = outsize = 0; i < peerCount; ++i )
-        if( shouldPeerBeClosed( t, peers[i], peerCount, now_sec ) == closeType )
+        if( shouldPeerBeClosed( t, peers[i], peerCount, now_sec ) )
             ret[outsize++] = peers[i];
 
     *setmeSize = outsize;
@@ -3271,11 +3261,11 @@ static void
 closeBadPeers( Torrent * t, const time_t now_sec )
 {
     int i;
-    int mustCloseCount;
-    struct tr_peer ** mustClose = getPeersToClose( t, TR_MUST_CLOSE, now_sec, &mustCloseCount );
-    for( i=0; i<mustCloseCount; ++i )
-        closePeer( t, mustClose[i] );
-    tr_free( mustClose );
+    int peerCount;
+    struct tr_peer ** peers = getPeersToClose( t, now_sec, &peerCount );
+    for( i=0; i<peerCount; ++i )
+        closePeer( t, peers[i] );
+    tr_free( peers );
 }
 
 struct peer_liveliness
