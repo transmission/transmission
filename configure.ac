@@ -225,7 +225,7 @@ AC_ARG_ENABLE([utp],
               [build_utp=no])
 if test "x$build_utp" = "xyes" ; then
     LIBUTP_CFLAGS="-I\$(top_srcdir)/third-party/"
-    LIBUTP_LIBS="\$(top_builddir)/third-party/libutp/libutp.a"
+    LIBUTP_LIBS="\$(top_builddir)/third-party/libutp/libutp.a -lrt"
     AC_DEFINE([WITH_UTP],[1])
 fi
 AC_SUBST(LIBUTP_CFLAGS)
