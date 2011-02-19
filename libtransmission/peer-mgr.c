@@ -3161,11 +3161,9 @@ shouldPeerBeClosed( const Torrent    * t,
     return TR_CAN_KEEP;
 }
 
-static void sortPeersByLivelinessReverse( tr_peer ** peers, void ** clientData, int n, uint64_t now );
-
 static tr_peer **
 getPeersToClose( Torrent * t, tr_close_type_t closeType,
-                 const uint64_t now_msec, const time_t now_sec,
+                 const time_t now_sec,
                  int * setmeSize )
 {
     int i, peerCount, outsize;
@@ -3177,8 +3175,6 @@ getPeersToClose( Torrent * t, tr_close_type_t closeType,
     for( i = outsize = 0; i < peerCount; ++i )
         if( shouldPeerBeClosed( t, peers[i], peerCount, now_sec ) == closeType )
             ret[outsize++] = peers[i];
-
-    sortPeersByLivelinessReverse ( ret, NULL, outsize, now_msec );
 
     *setmeSize = outsize;
     return ret;
@@ -3272,7 +3268,7 @@ removeAllPeers( Torrent * t )
 }
 
 static void
-closeBadPeers( Torrent * t, const uint64_t now_msec, const time_t now_sec )
+closeBadPeers( Torrent * t, const time_t now_sec )
 {
     if( !t->isRunning )
     {
@@ -3285,7 +3281,7 @@ closeBadPeers( Torrent * t, const uint64_t now_msec, const time_t now_sec )
         struct tr_peer ** mustClose;
 
         /* disconnect the really bad peers */
-        mustClose = getPeersToClose( t, TR_MUST_CLOSE, now_msec, now_sec, &mustCloseCount );
+        mustClose = getPeersToClose( t, TR_MUST_CLOSE, now_sec, &mustCloseCount );
         for( i=0; i<mustCloseCount; ++i )
             closePeer( t, mustClose[i] );
         tr_free( mustClose );
@@ -3323,12 +3319,6 @@ comparePeerLiveliness( const void * va, const void * vb )
         return a->time > b->time ? -1 : 1;
 
     return 0;
-}
-
-static int
-comparePeerLivelinessReverse( const void * va, const void * vb )
-{
-    return -comparePeerLiveliness (va, vb);
 }
 
 static void
@@ -3376,12 +3366,6 @@ static void
 sortPeersByLiveliness( tr_peer ** peers, void ** clientData, int n, uint64_t now )
 {
     sortPeersByLivelinessImpl( peers, clientData, n, now, comparePeerLiveliness );
-}
-
-static void
-sortPeersByLivelinessReverse( tr_peer ** peers, void ** clientData, int n, uint64_t now )
-{
-    sortPeersByLivelinessImpl( peers, clientData, n, now, comparePeerLivelinessReverse );
 }
 
 
@@ -3470,7 +3454,7 @@ reconnectPulse( int foo UNUSED, short bar UNUSED, void * vmgr )
     /* remove crappy peers */
     tor = NULL;
     while(( tor = tr_torrentNext( mgr->session, tor )))
-        closeBadPeers( tor->torrentPeers, now_msec, now_sec );
+        closeBadPeers( tor->torrentPeers, now_sec );
 
     /* try to make new peer connections */
     makeNewPeerConnections( mgr, MAX_CONNECTIONS_PER_PULSE );
