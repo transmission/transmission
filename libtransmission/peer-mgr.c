@@ -3270,22 +3270,12 @@ removeAllPeers( Torrent * t )
 static void
 closeBadPeers( Torrent * t, const time_t now_sec )
 {
-    if( !t->isRunning )
-    {
-        removeAllPeers( t );
-    }
-    else
-    {
-        int i;
-        int mustCloseCount;
-        struct tr_peer ** mustClose;
-
-        /* disconnect the really bad peers */
-        mustClose = getPeersToClose( t, TR_MUST_CLOSE, now_sec, &mustCloseCount );
-        for( i=0; i<mustCloseCount; ++i )
-            closePeer( t, mustClose[i] );
-        tr_free( mustClose );
-    }
+    int i;
+    int mustCloseCount;
+    struct tr_peer ** mustClose = getPeersToClose( t, TR_MUST_CLOSE, now_sec, &mustCloseCount );
+    for( i=0; i<mustCloseCount; ++i )
+        closePeer( t, mustClose[i] );
+    tr_free( mustClose );
 }
 
 struct peer_liveliness
@@ -3454,7 +3444,10 @@ reconnectPulse( int foo UNUSED, short bar UNUSED, void * vmgr )
     /* remove crappy peers */
     tor = NULL;
     while(( tor = tr_torrentNext( mgr->session, tor )))
-        closeBadPeers( tor->torrentPeers, now_sec );
+        if( !tor->torrentPeers->isRunning )
+            removeAllPeers( tor->torrentPeers );
+        else
+            closeBadPeers( tor->torrentPeers, now_sec );
 
     /* try to make new peer connections */
     makeNewPeerConnections( mgr, MAX_CONNECTIONS_PER_PULSE );
