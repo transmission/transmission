@@ -1225,10 +1225,10 @@ networkPage( GObject * core )
     w = new_spin_button( TR_PREFS_KEY_PEER_LIMIT_GLOBAL, core, 1, 3000, 5 );
     hig_workarea_add_row( t, &row, _( "Maximum peers _overall:" ), w, NULL );
 
-#ifdef WITH_UTP
     hig_workarea_add_section_divider( t, &row );
     hig_workarea_add_section_title( t, &row, _( "Options" ) );
 
+#ifdef WITH_UTP
     s = _( "Enable _uTP for peer communication" );
     w = new_check_button( s, TR_PREFS_KEY_UTP_ENABLED, core );
     s = _( "uTP is a tool for reducing network congestion." );
