@@ -319,7 +319,6 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         tr_bencDictAddInt(&settings, TR_PREFS_KEY_MSGLEVEL, TR_MSG_DBG);
         tr_bencDictAddInt(&settings, TR_PREFS_KEY_PEER_LIMIT_GLOBAL, [fDefaults integerForKey: @"PeersTotal"]);
         tr_bencDictAddInt(&settings, TR_PREFS_KEY_PEER_LIMIT_TORRENT, [fDefaults integerForKey: @"PeersTorrent"]);
-        tr_bencDictAddBool(&settings, TR_PREFS_KEY_UTP_ENABLED, [fDefaults boolForKey: @"UTPGlobal"]);
         
         const BOOL randomPort = [fDefaults boolForKey: @"RandomPort"];
         tr_bencDictAddBool(&settings, TR_PREFS_KEY_PEER_PORT_RANDOM_ON_START, randomPort);
@@ -343,6 +342,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         tr_bencDictAddBool(&settings, TR_PREFS_KEY_START, [fDefaults boolForKey: @"AutoStartDownload"]);
         tr_bencDictAddBool(&settings, TR_PREFS_KEY_SCRIPT_TORRENT_DONE_ENABLED, [fDefaults boolForKey: @"DoneScriptEnabled"]);
         tr_bencDictAddStr(&settings, TR_PREFS_KEY_SCRIPT_TORRENT_DONE_FILENAME, [[fDefaults stringForKey: @"DoneScriptPath"] UTF8String]);
+        tr_bencDictAddBool(&settings, TR_PREFS_KEY_UTP_ENABLED, [fDefaults boolForKey: @"UTPGlobal"]);
         
         tr_formatter_size_init([NSApp isOnSnowLeopardOrBetter] ? 1000 : 1024,
                                     [NSLocalizedString(@"KB", "File size - kilobytes") UTF8String],
@@ -2722,6 +2722,10 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
             
             case TR_PARSE_ERR:
                 [fAutoImportedNames removeObject: file];
+                break;
+            
+            case TR_PARSE_DUPLICATE: //let's ignore this (but silence a warning)
+                break;
         }
         
         tr_ctorFree(ctor);
@@ -3919,7 +3923,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         return canUseTable && [fTableView numberOfSelectedRows] > 0;
     }
     
-    //clear completed transfers item
+    //cleanup completed transfers item
     if (action == @selector(clearCompleted:))
     {
         for (Torrent * torrent in fTorrents)
@@ -4250,7 +4254,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     //size search filter to not overlap buttons
     NSRect searchFrame = [fSearchFilterField frame];
     searchFrame.origin.x = NSMaxX(pauseRect) + 5.0;
-    searchFrame.size.width = [fStatusBar frame].size.width - searchFrame.origin.x - 5.0;
+    searchFrame.size.width = [fFilterBar frame].size.width - searchFrame.origin.x - 5.0;
     
     //make sure it is not too long
     if (searchFrame.size.width > SEARCH_FILTER_MAX_WIDTH)
