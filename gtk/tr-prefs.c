@@ -457,6 +457,15 @@ onBlocklistUpdate( GtkButton * w, gpointer gdata )
 }
 
 static void
+on_blocklist_url_changed( GtkEditable * e, gpointer gbutton )
+{
+    gchar * url = gtk_editable_get_chars( e, 0, -1 );
+    const gboolean err = tr_urlParse( url, -1, NULL, NULL, NULL, NULL );
+    gtk_widget_set_sensitive( GTK_WIDGET( gbutton ), !err );
+    g_free( url );
+}
+
+static void
 onIntComboChanged( GtkComboBox * combo_box, gpointer core )
 {
     const int val = gtr_combo_box_get_active_enum( combo_box );
@@ -516,6 +525,8 @@ privacyPage( GObject * core )
     gtk_box_pack_start( GTK_BOX( h ), b, FALSE, FALSE, 0 );
     g_signal_connect( data->check, "toggled", G_CALLBACK( target_cb ), w ); target_cb( data->check, w );
     hig_workarea_add_wide_control( t, &row, h );
+    g_signal_connect( e, "changed", G_CALLBACK( on_blocklist_url_changed ), data->updateBlocklistButton );
+    on_blocklist_url_changed( GTK_EDITABLE( e ), data->updateBlocklistButton );
 
     s = _( "Enable _automatic updates" );
     w = new_check_button( s, PREF_KEY_BLOCKLIST_UPDATES_ENABLED, core );
