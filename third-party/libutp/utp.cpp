@@ -1628,7 +1628,6 @@ void UTPSocket::apply_ledbat_ccontrol(size_t bytes_acked, uint32 actual_delay, i
 	int32 our_delay = min<uint32>(our_hist.get_value(), uint32(min_rtt));
 	assert(our_delay != INT_MAX);
 	assert(our_delay >= 0);
-	assert(our_hist.get_value() >= 0);
 
 	SOCKADDR_STORAGE sa = addr.get_sockaddr_storage();
 	UTP_DelaySample((sockaddr*)&sa, our_delay / 1000);
@@ -1942,14 +1941,12 @@ size_t UTP_ProcessIncoming(UTPSocket *conn, const byte *packet, size_t len, bool
 		?(pf->reply_micro==INT_MAX?0:uint32(pf->reply_micro))
 		:(uint32(pf1->reply_micro)==INT_MAX?0:uint32(pf1->reply_micro));
 
-	assert(conn->our_hist.get_value() >= 0);
 	// if the actual delay is 0, it means the other end
 	// hasn't received a sample from us yet, and doesn't
 	// know what it is. We can't update out history unless
 	// we have a true measured sample
 	prev_delay_base = conn->our_hist.delay_base;
 	if (actual_delay != 0) conn->our_hist.add_sample(actual_delay);
-	assert(conn->our_hist.get_value() >= 0);
 
 	// if our new delay base is less than our previous one
 	// we should shift the other end's delay base in the other
