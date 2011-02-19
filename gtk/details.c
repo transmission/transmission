@@ -1105,6 +1105,7 @@ enum
     PEER_COL_REQS_CANCELLED_BY_PEER_COUNT_STRING,
     PEER_COL_ENCRYPTION_STOCK_ID,
     PEER_COL_FLAGS,
+    PEER_COL_TORRENT_NAME,
     N_PEER_COLS
 };
 
@@ -1164,13 +1165,15 @@ peer_store_new( void )
                                G_TYPE_INT,      /* # blocks cancelled by peer int */
                                G_TYPE_STRING,   /* # blocks cancelled by peer string */
                                G_TYPE_STRING,   /* encryption stock id */
-                               G_TYPE_STRING);  /* flagString */
+                               G_TYPE_STRING,   /* flagString */
+                               G_TYPE_STRING);  /* torrent name */
 }
 
 static void
 initPeerRow( GtkListStore        * store,
              GtkTreeIter         * iter,
              const char          * key,
+             const char          * torrentName,
              const tr_peer_stat  * peer )
 {
     int q[4];
@@ -1192,6 +1195,7 @@ initPeerRow( GtkListStore        * store,
                         PEER_COL_CLIENT, client,
                         PEER_COL_ENCRYPTION_STOCK_ID, peer->isEncrypted ? "transmission-lock" : NULL,
                         PEER_COL_KEY, key,
+                        PEER_COL_TORRENT_NAME, torrentName,
                         -1 );
 }
 
@@ -1290,7 +1294,7 @@ refreshPeerList( struct DetailsImpl * di, tr_torrent ** torrents, int n )
             if( g_hash_table_lookup( hash, key ) == NULL ) {
                 GtkTreePath * p;
                 gtk_list_store_append( store, &iter );
-                initPeerRow( store, &iter, key, s );
+                initPeerRow( store, &iter, key, tr_torrentName( tor ), s );
                 p = gtk_tree_model_get_path( model, &iter );
                 g_hash_table_insert( hash, g_strdup( key ),
                                      gtk_tree_row_reference_new( model, p ) );
@@ -1464,10 +1468,18 @@ onPeerViewQueryTooltip( GtkWidget   * widget,
                                            &model, NULL, &iter ) )
     {
         const char * pch;
-        char *       str = NULL;
-        GString *    gstr = g_string_new( NULL );
-        gtk_tree_model_get( model, &iter, PEER_COL_FLAGS, &str, -1 );
-        for( pch = str; pch && *pch; ++pch )
+        char * name = NULL;
+        char * addr = NULL;
+        char * flagstr = NULL;
+        GString * gstr = g_string_new( NULL );
+        gtk_tree_model_get( model, &iter, PEER_COL_TORRENT_NAME, &name,
+                                          PEER_COL_ADDRESS, &addr,
+                                          PEER_COL_FLAGS, &flagstr,
+                                          -1 );
+
+        g_string_append_printf( gstr, "<b>%s</b>\n%s\n \n", name, addr );
+
+        for( pch = flagstr; pch && *pch; ++pch )
         {
             const char * s = NULL;
             switch( *pch )
@@ -1490,9 +1502,11 @@ onPeerViewQueryTooltip( GtkWidget   * widget,
         }
         if( gstr->len ) /* remove the last linefeed */
             g_string_set_size( gstr, gstr->len - 1 );
-        gtk_tooltip_set_text( tooltip, gstr->str );
+        gtk_tooltip_set_markup( tooltip, gstr->str );
         g_string_free( gstr, TRUE );
-        g_free( str );
+        g_free( flagstr );
+        g_free( addr );
+        g_free( name );
         show_tip = TRUE;
     }
 
