@@ -1068,11 +1068,11 @@ enum
  * will be clobberred s.t. additional files being added will be saved
  * to the torrent's downloadDir.
  */
-void tr_torrentSetLocation( tr_torrent  * torrent,
-                            const char  * location,
-                            tr_bool       move_from_previous_location,
-                            double      * setme_progress,
-                            int         * setme_state );
+void tr_torrentSetLocation( tr_torrent       * torrent,
+                            const char       * location,
+                            tr_bool            move_from_previous_location,
+                            volatile double  * setme_progress,
+                            volatile int     * setme_state );
 
 uint64_t tr_torrentGetBytesLeftToAllocate( const tr_torrent * torrent );
 
