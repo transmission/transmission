@@ -50,6 +50,8 @@
 
 - (void) dealloc
 {
+    [[NSNotificationCenter defaultCenter] removeObserver: self];
+    
     [fGradient release];
     [super dealloc];
 }
