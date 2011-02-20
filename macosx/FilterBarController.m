@@ -24,7 +24,7 @@
 
 #import "FilterBarController.h"
 #import "FilterButton.h"
-#include "GroupsController.h"
+#import "GroupsController.h"
 
 #define FILTER_TYPE_TAG_NAME    401
 #define FILTER_TYPE_TAG_TRACKER 402
