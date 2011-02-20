@@ -2064,7 +2064,8 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     }
     
     //set button tooltips
-    [fFilterBar setCountAll: [fTorrents count] active: active downloading: downloading seeding: seeding paused: paused];
+    if (fFilterBar)
+        [fFilterBar setCountAll: [fTorrents count] active: active downloading: downloading seeding: seeding paused: paused];
     
     //clear display cache for not-shown torrents
     [previousTorrents removeObjectsInArray: allTorrents];
@@ -2899,8 +2900,9 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     {
         [[NSUserDefaults standardUserDefaults] setObject: FILTER_NONE forKey: @"Filter"];
         [[NSUserDefaults standardUserDefaults] setInteger: GROUP_FILTER_ALL_TAG forKey: @"FilterGroup"];
-        [self applyFilter];
     }
+    
+    [self applyFilter]; //do even if showing to ensure tooltips are updated
 }
 
 //doesn't save shown state
