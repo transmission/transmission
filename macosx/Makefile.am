@@ -72,6 +72,8 @@ EXTRA_DIST = \
     FileOutlineView.m \
     FilePriorityCell.h \
     FilePriorityCell.m \
+    FilterBarController.h \
+    FilterBarController.m \
     FilterBarView.h \
     FilterBarView.m \
     FilterButton.h \

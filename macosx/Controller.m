@@ -45,8 +45,7 @@
 #import "ToolbarSegmentedCell.h"
 #import "BlocklistDownloader.h"
 #import "StatusBarController.h"
-#import "FilterBarView.h"
-#import "FilterButton.h"
+#import "FilterBarController.h"
 #import "BonjourController.h"
 #import "Badger.h"
 #import "DragOverlayWindow.h"
@@ -107,20 +106,6 @@ typedef enum
     SORT_DESC_TAG = 1
 } sortOrderTag;
 
-#define FILTER_NONE     @"None"
-#define FILTER_ACTIVE   @"Active"
-#define FILTER_DOWNLOAD @"Download"
-#define FILTER_SEED     @"Seed"
-#define FILTER_PAUSE    @"Pause"
-
-#define FILTER_TYPE_NAME    @"Name"
-#define FILTER_TYPE_TRACKER @"Tracker"
-
-#define FILTER_TYPE_TAG_NAME    401
-#define FILTER_TYPE_TAG_TRACKER 402
-
-#define GROUP_FILTER_ALL_TAG    -2
-
 #define GROWL_DOWNLOAD_COMPLETE @"Download Complete"
 #define GROWL_SEEDING_COMPLETE  @"Seeding Complete"
 #define GROWL_AUTO_ADD          @"Torrent Auto Added"
@@ -131,9 +116,6 @@ typedef enum
 #define ROW_HEIGHT_REGULAR      62.0
 #define ROW_HEIGHT_SMALL        22.0
 #define WINDOW_REGULAR_WIDTH    468.0
-
-#define SEARCH_FILTER_MIN_WIDTH 48.0
-#define SEARCH_FILTER_MAX_WIDTH 95.0
 
 #define UPDATE_UI_SECONDS   1.0
 
@@ -414,20 +396,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     
     [[fTotalTorrentsField cell] setBackgroundStyle: NSBackgroundStyleRaised];
     
-    [self updateGroupsFilterButton];
-    
     //set up filter bar
-    NSView * contentView = [fWindow contentView];
-    NSSize windowSize = [contentView convertSize: [fWindow frame].size fromView: nil];
-    [fFilterBar setHidden: YES];
-    
-    NSRect filterBarFrame = [fFilterBar frame];
-    filterBarFrame.size.width = windowSize.width;
-    [fFilterBar setFrame: filterBarFrame];
-    
-    [contentView addSubview: fFilterBar];
-    [fFilterBar setFrameOrigin: NSMakePoint(0, NSMaxY([contentView frame]))];
-
     [self showFilterBar: [fDefaults boolForKey: @"FilterBar"] animate: NO];
     
     //set up status bar
@@ -472,43 +441,6 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         }
     }
     
-    //set filter
-    NSString * filterType = [fDefaults stringForKey: @"Filter"];
-    
-    NSButton * currentFilterButton;
-    if ([filterType isEqualToString: FILTER_ACTIVE])
-        currentFilterButton = fActiveFilterButton;
-    else if ([filterType isEqualToString: FILTER_PAUSE])
-        currentFilterButton = fPauseFilterButton;
-    else if ([filterType isEqualToString: FILTER_SEED])
-        currentFilterButton = fSeedFilterButton;
-    else if ([filterType isEqualToString: FILTER_DOWNLOAD])
-        currentFilterButton = fDownloadFilterButton;
-    else
-    {
-        //safety
-        if (![filterType isEqualToString: FILTER_NONE])
-            [fDefaults setObject: FILTER_NONE forKey: @"Filter"];
-        currentFilterButton = fNoFilterButton;
-    }
-    [currentFilterButton setState: NSOnState];
-    
-    //set filter search type
-    NSString * filterSearchType = [fDefaults stringForKey: @"FilterSearchType"];
-    
-    NSMenu * filterSearchMenu = [[fSearchFilterField cell] searchMenuTemplate];
-    NSString * filterSearchTypeTitle;
-    if ([filterSearchType isEqualToString: FILTER_TYPE_TRACKER])
-        filterSearchTypeTitle = [[filterSearchMenu itemWithTag: FILTER_TYPE_TAG_TRACKER] title];
-    else
-    {
-        //safety
-        if (![filterType isEqualToString: FILTER_TYPE_NAME])
-            [fDefaults setObject: FILTER_TYPE_NAME forKey: @"FilterSearchType"];
-        filterSearchTypeTitle = [[filterSearchMenu itemWithTag: FILTER_TYPE_TAG_NAME] title];
-    }
-    [[fSearchFilterField cell] setPlaceholderString: filterSearchTypeTitle];
-    
     fBadger = [[Badger alloc] initWithLib: fLib];
     
     //observe notifications
@@ -545,6 +477,9 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     [nc addObserver: self selector: @selector(updateTorrentsInQueue)
                     name: @"UpdateQueue" object: nil];
     
+    [nc addObserver: self selector: @selector(applyFilter)
+                    name: @"ApplyFilter" object: nil];
+    
     //open newly created torrent file
     [nc addObserver: self selector: @selector(beginCreateFile:)
                     name: @"BeginCreateTorrentFile" object: nil];
@@ -552,10 +487,6 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     //open newly created torrent file
     [nc addObserver: self selector: @selector(openCreatedFile:)
                     name: @"OpenCreatedTorrentFile" object: nil];
-    
-    //update when groups change
-    [nc addObserver: self selector: @selector(updateGroupsFilters:)
-                    name: @"UpdateGroups" object: nil];
 
     //timer to update the interface every second
     [self updateUI];
@@ -564,13 +495,14 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     [[NSRunLoop currentRunLoop] addTimer: fTimer forMode: NSModalPanelRunLoopMode];
     [[NSRunLoop currentRunLoop] addTimer: fTimer forMode: NSEventTrackingRunLoopMode];
     
-    [self applyFilter: nil];
+    [self applyFilter];
     
     [fWindow makeKeyAndOrderFront: nil];
     
+    #warning still needed?
     //can't be done earlier
-    if (![fFilterBar isHidden])
-        [self resizeFilterBar];
+    /*if (![fFilterBar isHidden])
+        [self resizeFilterBar];*/
     
     if ([fDefaults boolForKey: @"InfoVisible"])
         [self showInfo: nil];
@@ -1266,7 +1198,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     }
     
     [self updateUI];
-    [self applyFilter: nil];
+    [self applyFilter];
     [[fWindow toolbar] validateVisibleItems];
     [self updateTorrentHistory];
 }
@@ -1290,7 +1222,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     [torrents makeObjectsPerformSelector: @selector(stopTransfer)];
     
     [self updateUI];
-    [self applyFilter: nil];
+    [self applyFilter];
     [[fWindow toolbar] validateVisibleItems];
     [self updateTorrentHistory];
 }
@@ -1605,7 +1537,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     for (Torrent * torrent in torrents)
         [torrent resetCache];
     
-    [self applyFilter: nil];
+    [self applyFilter];
 }
 
 - (void) showPreferenceWindow: (id) sender
@@ -1760,7 +1692,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     }
     
     [self updateUI];
-    [self applyFilter: nil];
+    [self applyFilter];
     [[fWindow toolbar] validateVisibleItems];
     [self updateTorrentHistory];
 }
@@ -1923,7 +1855,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     }
     
     [fDefaults setObject: sortType forKey: @"Sort"];
-    [self applyFilter: nil]; //better than calling sortTorrents because it will even apply to queue order
+    [self applyFilter]; //better than calling sortTorrents because it will even apply to queue order
 }
 
 - (void) setSortByGroup: (id) sender
@@ -1935,7 +1867,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     if (sortByGroup)
         [fTableView removeAllCollapsedGroups];
     
-    [self applyFilter: nil];
+    [self applyFilter];
 }
 
 - (void) setSortReverse: (id) sender
@@ -2027,7 +1959,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     [fTableView reloadData];
 }
 
-- (void) applyFilter: (id) sender
+- (void) applyFilter
 {
     //get all the torrents in the table
     NSMutableArray * previousTorrents;
@@ -2060,8 +1992,8 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     const NSInteger groupFilterValue = [fDefaults integerForKey: @"FilterGroup"];
     const BOOL filterGroup = groupFilterValue != GROUP_FILTER_ALL_TAG;
     
-    NSString * searchString = [fSearchFilterField stringValue];
-    const BOOL filterText = [searchString length] > 0,
+    NSString * searchString = fFilterBar ? [fFilterBar searchString] : @"";
+    const BOOL filterText = ![searchString isEqualToString: @""],
             filterTracker = filterText && [[fDefaults stringForKey: @"FilterSearchType"] isEqualToString: FILTER_TYPE_TRACKER];
     
     NSMutableArray * allTorrents = [NSMutableArray arrayWithCapacity: [fTorrents count]];
@@ -2132,11 +2064,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     }
     
     //set button tooltips
-    [fNoFilterButton setCount: [fTorrents count]];
-    [fActiveFilterButton setCount: active];
-    [fDownloadFilterButton setCount: downloading];
-    [fSeedFilterButton setCount: seeding];
-    [fPauseFilterButton setCount: paused];
+    [fFilterBar setCountAll: [fTorrents count] active: active downloading: downloading seeding: seeding paused: paused];
     
     //clear display cache for not-shown torrents
     [previousTorrents removeObjectsInArray: allTorrents];
@@ -2219,110 +2147,19 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     [self setWindowSizeToFit];
 }
 
-//resets filter and sorts torrents
-- (void) setFilter: (id) sender
-{
-    NSString * oldFilterType = [fDefaults stringForKey: @"Filter"];
-    
-    NSButton * prevFilterButton;
-    if ([oldFilterType isEqualToString: FILTER_PAUSE])
-        prevFilterButton = fPauseFilterButton;
-    else if ([oldFilterType isEqualToString: FILTER_ACTIVE])
-        prevFilterButton = fActiveFilterButton;
-    else if ([oldFilterType isEqualToString: FILTER_SEED])
-        prevFilterButton = fSeedFilterButton;
-    else if ([oldFilterType isEqualToString: FILTER_DOWNLOAD])
-        prevFilterButton = fDownloadFilterButton;
-    else
-        prevFilterButton = fNoFilterButton;
-    
-    if (sender != prevFilterButton)
-    {
-        [prevFilterButton setState: NSOffState];
-        [sender setState: NSOnState];
-
-        NSString * filterType;
-        if (sender == fActiveFilterButton)
-            filterType = FILTER_ACTIVE;
-        else if (sender == fDownloadFilterButton)
-            filterType = FILTER_DOWNLOAD;
-        else if (sender == fPauseFilterButton)
-            filterType = FILTER_PAUSE;
-        else if (sender == fSeedFilterButton)
-            filterType = FILTER_SEED;
-        else
-            filterType = FILTER_NONE;
-
-        [fDefaults setObject: filterType forKey: @"Filter"];
-    }
-    else
-        [sender setState: NSOnState];
-
-    [self applyFilter: nil];
-}
-
-- (void) setFilterSearchType: (id) sender
-{
-    NSString * oldFilterType = [fDefaults stringForKey: @"FilterSearchType"];
-    
-    NSInteger prevTag, currentTag = [sender tag];
-    if ([oldFilterType isEqualToString: FILTER_TYPE_TRACKER])
-        prevTag = FILTER_TYPE_TAG_TRACKER;
-    else
-        prevTag = FILTER_TYPE_TAG_NAME;
-    
-    if (currentTag != prevTag)
-    {
-        NSString * filterType;
-        if (currentTag == FILTER_TYPE_TAG_TRACKER)
-            filterType = FILTER_TYPE_TRACKER;
-        else
-            filterType = FILTER_TYPE_NAME;
-        
-        [fDefaults setObject: filterType forKey: @"FilterSearchType"];
-        
-        [[fSearchFilterField cell] setPlaceholderString: [sender title]];
-    }
-    
-    [self applyFilter: nil];
-}
-
 - (void) switchFilter: (id) sender
 {
-    NSString * filterType = [fDefaults stringForKey: @"Filter"];
-    
-    NSButton * button;
-    if ([filterType isEqualToString: FILTER_NONE])
-        button = sender == fNextFilterItem ? fActiveFilterButton : fPauseFilterButton;
-    else if ([filterType isEqualToString: FILTER_ACTIVE])
-        button = sender == fNextFilterItem ? fDownloadFilterButton : fNoFilterButton;
-    else if ([filterType isEqualToString: FILTER_DOWNLOAD])
-        button = sender == fNextFilterItem ? fSeedFilterButton : fActiveFilterButton;
-    else if ([filterType isEqualToString: FILTER_SEED])
-        button = sender == fNextFilterItem ? fPauseFilterButton : fDownloadFilterButton;
-    else if ([filterType isEqualToString: FILTER_PAUSE])
-        button = sender == fNextFilterItem ? fNoFilterButton : fSeedFilterButton;
-    else
-        button = fNoFilterButton;
-    
-    [self setFilter: button];
+    [fFilterBar switchFilter: sender == fNextFilterItem];
 }
 
 - (void) menuNeedsUpdate: (NSMenu *) menu
 {
-    if (menu == fGroupsSetMenu || menu == fGroupsSetContextMenu || menu == fGroupFilterMenu)
+    if (menu == fGroupsSetMenu || menu == fGroupsSetContextMenu)
     {
-        const BOOL filter = menu == fGroupFilterMenu;
-        
-        const NSInteger remaining = filter ? 3 : 0;
-        for (NSInteger i = [menu numberOfItems]-1; i >= remaining; i--)
+        for (NSInteger i = [menu numberOfItems]-1; i >= 0; i--)
             [menu removeItemAtIndex: i];
         
-        NSMenu * groupMenu;
-        if (!filter)
-            groupMenu = [[GroupsController groups] groupMenuWithTarget: self action: @selector(setGroup:) isSmall: NO];
-        else
-            groupMenu = [[GroupsController groups] groupMenuWithTarget: self action: @selector(setGroupFilter:) isSmall: YES];
+        NSMenu * groupMenu = [[GroupsController groups] groupMenuWithTarget: self action: @selector(setGroup:) isSmall: NO];
         
         const NSInteger groupMenuCount = [groupMenu numberOfItems];
         for (NSInteger i = 0; i < groupMenuCount; i++)
@@ -2382,45 +2219,9 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         [torrent setGroupValue: [sender tag]];
     }
     
-    [self applyFilter: nil];
+    [self applyFilter];
     [self updateUI];
     [self updateTorrentHistory];
-}
-
-- (void) setGroupFilter: (id) sender
-{
-    [fDefaults setInteger: [sender tag] forKey: @"FilterGroup"];
-    [self updateGroupsFilterButton];
-    [self applyFilter: nil];
-}
-
-- (void) updateGroupsFilterButton
-{
-    NSInteger groupIndex = [fDefaults integerForKey: @"FilterGroup"];
-    
-    NSImage * icon;
-    NSString * toolTip;
-    if (groupIndex == GROUP_FILTER_ALL_TAG)
-    {
-        icon = [NSImage imageNamed: @"PinTemplate.png"];
-        toolTip = NSLocalizedString(@"All Groups", "Groups -> Button");
-    }
-    else
-    {
-        icon = [[GroupsController groups] imageForIndex: groupIndex];
-        NSString * groupName = groupIndex != -1 ? [[GroupsController groups] nameForIndex: groupIndex]
-                                                : NSLocalizedString(@"None", "Groups -> Button");
-        toolTip = [NSLocalizedString(@"Group", "Groups -> Button") stringByAppendingFormat: @": %@", groupName];
-    }
-    
-    [[fGroupFilterMenu itemAtIndex: 0] setImage: icon];
-    [fGroupsButton setToolTip: toolTip];
-}
-
-- (void) updateGroupsFilters: (NSNotification *) notification
-{
-    [self updateGroupsFilterButton];
-    [self applyFilter: nil];
 }
 
 - (void) toggleSpeedLimit: (id) sender
@@ -2786,7 +2587,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
             [fTorrents insertObjects: movingTorrents atIndexes: insertIndexes];
         }
         
-        [self applyFilter: nil];
+        [self applyFilter];
         [fTableView selectValues: selectedValues];
     }
     
@@ -2984,8 +2785,8 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
             NSSize maxSize = [scrollView convertSize: [[fWindow screen] visibleFrame].size fromView: nil];
             if (!fStatusBar)
                 maxSize.height -= [[fStatusBar view] frame].size.height;
-            if ([fFilterBar isHidden]) 
-                maxSize.height -= [fFilterBar frame].size.height;
+            if (!fFilterBar) 
+                maxSize.height -= [[fFilterBar view] frame].size.height;
             if (windowSize.height > maxSize.height)
                 windowSize.height = maxSize.height;
         }
@@ -3025,7 +2826,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         [[fStatusBar view] setFrame: statusBarFrame];
         
         [contentView addSubview: [fStatusBar view]];
-        [[fStatusBar view] setFrameOrigin: NSMakePoint(0, NSMaxY([contentView frame]))];
+        [[fStatusBar view] setFrameOrigin: NSMakePoint(0.0, NSMaxY([contentView frame]))];
     }
     
     NSRect frame;
@@ -3054,8 +2855,12 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     //set views to not autoresize
     const NSUInteger statsMask = [[fStatusBar view] autoresizingMask];
     [[fStatusBar view] setAutoresizingMask: NSViewNotSizable];
-    const NSUInteger filterMask = [fFilterBar autoresizingMask];
-    [fFilterBar setAutoresizingMask: NSViewNotSizable];
+    NSUInteger filterMask;
+    if (fFilterBar)
+    {
+        filterMask = [[fFilterBar view] autoresizingMask];
+        [[fFilterBar view] setAutoresizingMask: NSViewNotSizable];
+    }
     const NSUInteger scrollMask = [scrollView autoresizingMask];
     [scrollView setAutoresizingMask: NSViewNotSizable];
     
@@ -3064,7 +2869,8 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     
     //re-enable autoresize
     [[fStatusBar view] setAutoresizingMask: statsMask];
-    [fFilterBar setAutoresizingMask: filterMask];
+    if (fFilterBar)
+        [[fFilterBar view] setAutoresizingMask: filterMask];
     [scrollView setAutoresizingMask: scrollMask];
     
     //change min size
@@ -3074,6 +2880,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     
     if (!show)
     {
+        [[fStatusBar view] removeFromSuperview];
         [fStatusBar release];
         fStatusBar = nil;
     }
@@ -3081,38 +2888,56 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 
 - (void) toggleFilterBar: (id) sender
 {
-    //disable filtering when hiding
-    if (![fFilterBar isHidden])
-    {
-        [fSearchFilterField setStringValue: @""];
-        [self setFilter: fNoFilterButton];
-        [self setGroupFilter: [fGroupFilterMenu itemWithTag: GROUP_FILTER_ALL_TAG]];
-    }
-
-    [self showFilterBar: [fFilterBar isHidden] animate: YES];
-    [fDefaults setBool: ![fFilterBar isHidden] forKey: @"FilterBar"];
+    const BOOL show = fFilterBar == nil;
+    
+    [self showFilterBar: show animate: YES];
+    [fDefaults setBool: show forKey: @"FilterBar"];
     [[fWindow toolbar] validateVisibleItems];
+    
+    //disable filtering when hiding
+    if (!show)
+    {
+        [[NSUserDefaults standardUserDefaults] setObject: FILTER_NONE forKey: @"Filter"];
+        [[NSUserDefaults standardUserDefaults] setInteger: GROUP_FILTER_ALL_TAG forKey: @"FilterGroup"];
+        [self applyFilter];
+    }
 }
 
 //doesn't save shown state
 - (void) showFilterBar: (BOOL) show animate: (BOOL) animate
 {
-    if (show != [fFilterBar isHidden])
+    const BOOL prevShown = fFilterBar != nil;
+    if (show == prevShown)
         return;
-
+    
     if (show)
-        [fFilterBar setHidden: NO];
-
-    NSRect frame;
-    CGFloat heightChange = [fFilterBar frame].size.height;
+    {
+        fFilterBar = [[FilterBarController alloc] init];
+        
+        NSView * contentView = [fWindow contentView];
+        const NSSize windowSize = [contentView convertSize: [fWindow frame].size fromView: nil];
+        
+        NSRect filterBarFrame = [[fFilterBar view] frame];
+        filterBarFrame.size.width = windowSize.width;
+        [[fFilterBar view] setFrame: filterBarFrame];
+        
+        if (fStatusBar)
+            [contentView addSubview: [fFilterBar view] positioned: NSWindowBelow relativeTo: [fStatusBar view]];
+        else
+            [contentView addSubview: [fFilterBar view]];
+        const CGFloat originY = fStatusBar ? NSMinY([[fStatusBar view] frame]) : NSMaxY([contentView frame]);
+        [[fFilterBar view] setFrameOrigin: NSMakePoint(0.0, originY)];
+    }
+    
+    CGFloat heightChange = NSHeight([[fFilterBar view] frame]);
     if (!show)
         heightChange *= -1;
     
     //allow bar to show even if not enough room
     if (show && ![fDefaults boolForKey: @"AutoSize"])
     {
-        frame = [self windowFrameByAddingHeight: heightChange checkLimits: NO];
-        CGFloat change = [[fWindow screen] visibleFrame].size.height - frame.size.height;
+        NSRect frame = [self windowFrameByAddingHeight: heightChange checkLimits: NO];
+        const CGFloat change = NSHeight([[fWindow screen] visibleFrame]) - NSHeight(frame);
         if (change < 0.0)
         {
             frame = [fWindow frame];
@@ -3125,16 +2950,16 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     NSScrollView * scrollView = [fTableView enclosingScrollView];
 
     //set views to not autoresize
-    NSUInteger filterMask = [fFilterBar autoresizingMask];
-    NSUInteger scrollMask = [scrollView autoresizingMask];
-    [fFilterBar setAutoresizingMask: NSViewNotSizable];
+    const NSUInteger filterMask = [[fFilterBar view] autoresizingMask];
+    const NSUInteger scrollMask = [scrollView autoresizingMask];
+    [[fFilterBar view] setAutoresizingMask: NSViewNotSizable];
     [scrollView setAutoresizingMask: NSViewNotSizable];
     
-    frame = [self windowFrameByAddingHeight: heightChange checkLimits: NO];
+    const NSRect frame = [self windowFrameByAddingHeight: heightChange checkLimits: NO];
     [fWindow setFrame: frame display: YES animate: animate];
     
     //re-enable autoresize
-    [fFilterBar setAutoresizingMask: filterMask];
+    [[fFilterBar view] setAutoresizingMask: filterMask];
     [scrollView setAutoresizingMask: scrollMask];
     
     //change min size
@@ -3144,16 +2969,19 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     
     if (!show)
     {
-        [fFilterBar setHidden: YES];
+        [[fFilterBar view] removeFromSuperview];
+        [fFilterBar release];
+        fFilterBar = nil;
         [fWindow makeFirstResponder: fTableView];
     }
 }
 
+#warning fix?
 - (void) focusFilterField
 {
-    [fWindow makeFirstResponder: fSearchFilterField];
+    /*[fWindow makeFirstResponder: fSearchFilterField];
     if ([fFilterBar isHidden])
-        [self toggleFilterBar: self];
+        [self toggleFilterBar: self];*/
 }
 
 #warning change from id to QLPreviewPanel
@@ -3550,7 +3378,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     //set filter image
     if ([ident isEqualToString: TOOLBAR_FILTER])
     {
-        [(NSButton *)[toolbarItem view] setState: ![fFilterBar isHidden]];
+        [(NSButton *)[toolbarItem view] setState: fFilterBar != nil];
         return YES;
     }
     
@@ -3631,12 +3459,6 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         
         [menuItem setState: checked ? NSOnState : NSOffState];
         return canUseTable && [fTableView numberOfSelectedRows] > 0;
-    }
-    
-    if (action == @selector(setGroupFilter:))
-    {
-        [menuItem setState: [menuItem tag] == [fDefaults integerForKey: @"FilterGroup"] ? NSOnState : NSOffState];
-        return YES;
     }
     
     if (action == @selector(toggleSmallView:))
@@ -3724,7 +3546,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     //enable toggle filter bar
     if (action == @selector(toggleFilterBar:))
     {
-        NSString * title = [fFilterBar isHidden] ? NSLocalizedString(@"Show Filter Bar", "View menu -> Filter Bar")
+        NSString * title = !fFilterBar ? NSLocalizedString(@"Show Filter Bar", "View menu -> Filter Bar")
                             : NSLocalizedString(@"Hide Filter Bar", "View menu -> Filter Bar");
         [menuItem setTitle: title];
 
@@ -3733,7 +3555,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     
     //enable prev/next filter button
     if (action == @selector(switchFilter:))
-        return [fWindow isVisible] && ![fFilterBar isHidden];
+        return [fWindow isVisible] && fFilterBar;
     
     //enable reveal in finder
     if (action == @selector(revealFile:))
@@ -3906,21 +3728,6 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         return YES;
     }
     
-    //check proper filter search item
-    if (action == @selector(setFilterSearchType:))
-    {
-        NSString * filterType = [fDefaults stringForKey: @"FilterSearchType"];
-        
-        BOOL state;
-        if ([menuItem tag] == FILTER_TYPE_TAG_TRACKER)
-            state = [filterType isEqualToString: FILTER_TYPE_TRACKER];
-        else
-            state = [filterType isEqualToString: FILTER_TYPE_NAME];
-        
-        [menuItem setState: state ? NSOnState : NSOffState];
-        return YES;
-    }
-    
     if (action == @selector(toggleQuickLook:))
     {
         const BOOL visible = [NSApp isOnSnowLeopardOrBetter] && [QLPreviewPanelSL sharedPreviewPanelExists]
@@ -4085,66 +3892,6 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     return [self windowFrameByAddingHeight: heightChange checkLimits: YES];
 }
 
-- (void) resizeFilterBar
-{
-    //replace all buttons
-    [fNoFilterButton sizeToFit];
-    [fActiveFilterButton sizeToFit];
-    [fDownloadFilterButton sizeToFit];
-    [fSeedFilterButton sizeToFit];
-    [fPauseFilterButton sizeToFit];
-    
-    NSRect allRect = [fNoFilterButton frame];
-    NSRect activeRect = [fActiveFilterButton frame];
-    NSRect downloadRect = [fDownloadFilterButton frame];
-    NSRect seedRect = [fSeedFilterButton frame];
-    NSRect pauseRect = [fPauseFilterButton frame];
-    
-    //size search filter to not overlap buttons
-    NSRect searchFrame = [fSearchFilterField frame];
-    searchFrame.origin.x = NSMaxX(pauseRect) + 5.0;
-    searchFrame.size.width = [fFilterBar frame].size.width - searchFrame.origin.x - 5.0;
-    
-    //make sure it is not too long
-    if (searchFrame.size.width > SEARCH_FILTER_MAX_WIDTH)
-    {
-        searchFrame.origin.x += searchFrame.size.width - SEARCH_FILTER_MAX_WIDTH;
-        searchFrame.size.width = SEARCH_FILTER_MAX_WIDTH;
-    }
-    else if (searchFrame.size.width < SEARCH_FILTER_MIN_WIDTH)
-    {
-        searchFrame.origin.x += searchFrame.size.width - SEARCH_FILTER_MIN_WIDTH;
-        searchFrame.size.width = SEARCH_FILTER_MIN_WIDTH;
-        
-        //calculate width the buttons can take up
-        const CGFloat allowedWidth = (searchFrame.origin.x - 5.0) - allRect.origin.x;
-        const CGFloat currentWidth = NSWidth(allRect) + NSWidth(activeRect) + NSWidth(downloadRect) + NSWidth(seedRect)
-                                        + NSWidth(pauseRect) + 4.0; //add 4 for space between buttons
-        const CGFloat ratio = allowedWidth / currentWidth;
-        
-        //decrease button widths proportionally
-        allRect.size.width  = NSWidth(allRect) * ratio;
-        activeRect.size.width = NSWidth(activeRect) * ratio;
-        downloadRect.size.width = NSWidth(downloadRect) * ratio;
-        seedRect.size.width = NSWidth(seedRect) * ratio;
-        pauseRect.size.width = NSWidth(pauseRect) * ratio;
-    }
-    else;
-    
-    activeRect.origin.x = NSMaxX(allRect) + 1.0;
-    downloadRect.origin.x = NSMaxX(activeRect) + 1.0;
-    seedRect.origin.x = NSMaxX(downloadRect) + 1.0;
-    pauseRect.origin.x = NSMaxX(seedRect) + 1.0;
-    
-    [fNoFilterButton setFrame: allRect];
-    [fActiveFilterButton setFrame: activeRect];
-    [fDownloadFilterButton setFrame: downloadRect];
-    [fSeedFilterButton setFrame: seedRect];
-    [fPauseFilterButton setFrame: pauseRect];
-    
-    [fSearchFilterField setFrame: searchFrame];
-}
-
 - (void) updateForExpandCollape
 {
     [self setWindowSizeToFit];
@@ -4168,12 +3915,6 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     if ([fDefaults boolForKey: @"AutoSize"])
         proposedFrameSize.height = [fWindow frame].size.height;
     return proposedFrameSize;
-}
-
-- (void) windowDidResize: (NSNotification *) notification
-{
-    if (![fFilterBar isHidden])
-        [self resizeFilterBar];
 }
 
 - (void) applicationWillUnhide: (NSNotification *) notification
@@ -4349,7 +4090,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     [torrent release];
     
     [self updateUI];
-    [self applyFilter: nil];
+    [self applyFilter];
     [self updateTorrentHistory];
 }
 
