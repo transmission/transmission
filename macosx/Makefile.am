@@ -128,6 +128,8 @@ EXTRA_DIST = \
     ProgressGradients.m \
     StatsWindowController.h \
     StatsWindowController.m \
+    StatusBarController.h \
+    StatusBarController.m \
     StatusBarView.h \
     StatusBarView.m \
     ToolbarSegmentedCell.h \

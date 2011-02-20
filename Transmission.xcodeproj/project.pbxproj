@@ -278,6 +278,8 @@
 		A2E384E1130DFB3A001F501B /* utypes.h in Headers */ = {isa = PBXBuildFile; fileRef = A2E384D9130DFB3A001F501B /* utypes.h */; };
 		A2E3850C130DFCCB001F501B /* StdAfx.h in Headers */ = {isa = PBXBuildFile; fileRef = A2E3850B130DFCCB001F501B /* StdAfx.h */; };
 		A2E38540130DFECD001F501B /* libminiupnp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BE1183480CE160960002D0F3 /* libminiupnp.a */; };
+		A2E57ABB1310822C00A7DAB1 /* StatusBarController.m in Sources */ = {isa = PBXBuildFile; fileRef = A2E57ABA1310822C00A7DAB1 /* StatusBarController.m */; };
+		A2E57AC61310831400A7DAB1 /* StatusBar.xib in Resources */ = {isa = PBXBuildFile; fileRef = A2E57AC51310831400A7DAB1 /* StatusBar.xib */; };
 		A2E669790F5B8E5A00B4251A /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2E669780F5B8E5A00B4251A /* Security.framework */; };
 		A2E9AA760C249AF400085DCF /* ToolbarCreateTemplate.png in Resources */ = {isa = PBXBuildFile; fileRef = A2E9AA750C249AF400085DCF /* ToolbarCreateTemplate.png */; };
 		A2ED7D8F0CEF431B00970975 /* FilterButton.m in Sources */ = {isa = PBXBuildFile; fileRef = A2ED7D8E0CEF431B00970975 /* FilterButton.m */; };
@@ -858,6 +860,9 @@
 		A2E384D9130DFB3A001F501B /* utypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = utypes.h; path = "third-party/libutp/utypes.h"; sourceTree = "<group>"; };
 		A2E3850B130DFCCB001F501B /* StdAfx.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = StdAfx.h; path = "third-party/libutp/StdAfx.h"; sourceTree = "<group>"; };
 		A2E38544130DFEE3001F501B /* libutp.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libutp.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		A2E57AB91310822C00A7DAB1 /* StatusBarController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = StatusBarController.h; path = macosx/StatusBarController.h; sourceTree = "<group>"; };
+		A2E57ABA1310822C00A7DAB1 /* StatusBarController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = StatusBarController.m; path = macosx/StatusBarController.m; sourceTree = "<group>"; };
+		A2E57AC51310831400A7DAB1 /* StatusBar.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = StatusBar.xib; path = macosx/StatusBar.xib; sourceTree = "<group>"; };
 		A2E669780F5B8E5A00B4251A /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = /System/Library/Frameworks/Security.framework; sourceTree = "<absolute>"; };
 		A2E9AA750C249AF400085DCF /* ToolbarCreateTemplate.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = ToolbarCreateTemplate.png; path = macosx/Images/ToolbarCreateTemplate.png; sourceTree = "<group>"; };
 		A2EA8E3C0CC3C9830081201C /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = macosx/fr.lproj/InfoPlist.strings; sourceTree = "<group>"; };
@@ -1101,6 +1106,8 @@
 				E1B6FBEB0C0D70AC0015FE4D /* UKKQueue */,
 				E138A9750C04D88F00C5426C /* ProgressGradients.h */,
 				E138A9760C04D88F00C5426C /* ProgressGradients.m */,
+				A2E57AB91310822C00A7DAB1 /* StatusBarController.h */,
+				A2E57ABA1310822C00A7DAB1 /* StatusBarController.m */,
 				A21282A50CA6C66800EAEE0F /* StatusBarView.h */,
 				A21282A60CA6C66800EAEE0F /* StatusBarView.m */,
 				A2661D3A12D0E51A004F69D5 /* FilterBarView.h */,
@@ -1185,6 +1192,7 @@
 				A233BD320D8C6585007EE7B4 /* MessageWindow.xib */,
 				A233BD680D8CF2C7007EE7B4 /* StatsWindow.xib */,
 				A231274B0D11D0B7003F9AFF /* AboutWindow.xib */,
+				A2E57AC51310831400A7DAB1 /* StatusBar.xib */,
 				A2F7CF5413035F7B0016FF10 /* URLSheetWindow.xib */,
 				A2D307B00D9EC9F50051FD27 /* BlocklistStatusWindow.xib */,
 				A209ECA1114319C3002B02D1 /* InfoWindow.xib */,
@@ -2075,6 +2083,7 @@
 				A209ECA2114319C3002B02D1 /* InfoWindow.xib in Resources */,
 				A21F15AD11729A9F00CF5A9C /* AddMagnetWindow.xib in Resources */,
 				A2F7CF5513035F7B0016FF10 /* URLSheetWindow.xib in Resources */,
+				A2E57AC61310831400A7DAB1 /* StatusBar.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2266,6 +2275,7 @@
 				A2661D6112D0E8D9004F69D5 /* FilterBarView.m in Sources */,
 				A25BB02A12F4F517004B724E /* InfoTabButtonBack.m in Sources */,
 				A2F7CF5F13035FFD0016FF10 /* URLSheetWindowController.m in Sources */,
+				A2E57ABB1310822C00A7DAB1 /* StatusBarController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

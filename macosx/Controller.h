@@ -36,7 +36,7 @@
 @class InfoWindowController;
 @class MessageWindowController;
 @class PrefsController;
-@class StatusBarView;
+@class StatusBarController;
 @class Torrent;
 @class TorrentTableView;
 @class URLSheetWindowController;
@@ -74,10 +74,7 @@ typedef enum
     IBOutlet NSButton               * fActionButton, * fSpeedLimitButton;
     IBOutlet NSTextField            * fTotalTorrentsField;
     
-    IBOutlet StatusBarView          * fStatusBar;
-    IBOutlet NSButton               * fStatusButton;
-    IBOutlet NSTextField            * fTotalDLField, * fTotalULField;
-    IBOutlet NSImageView            * fTotalDLImageView;
+    IBOutlet StatusBarController    * fStatusBar;
     
     IBOutlet FilterBarView          * fFilterBar;
     IBOutlet FilterButton           * fNoFilterButton, * fActiveFilterButton, * fDownloadFilterButton,
@@ -187,10 +184,7 @@ typedef enum
 
 - (void) updateUI;
 
-- (void) resizeStatusButton;
 - (void) setBottomCountText: (BOOL) filtering;
-
-- (void) updateSpeedFieldsToolTips;
 
 - (void) updateTorrentsInQueue;
 - (NSUInteger) numToStartFromQueue: (BOOL) downloadQueue;
@@ -212,8 +206,6 @@ typedef enum
 - (void) setFilter: (id) sender;
 - (void) setFilterSearchType: (id) sender;
 - (void) switchFilter: (id) sender;
-
-- (void) setStatusLabel: (id) sender;
 
 - (void) setGroup: (id) sender; //used by delegate-generated menu items
 - (void) setGroupFilter: (id) sender;

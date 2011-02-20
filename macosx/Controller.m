@@ -44,7 +44,7 @@
 #import "GroupToolbarItem.h"
 #import "ToolbarSegmentedCell.h"
 #import "BlocklistDownloader.h"
-#import "StatusBarView.h"
+#import "StatusBarController.h"
 #import "FilterBarView.h"
 #import "FilterButton.h"
 #import "BonjourController.h"
@@ -122,11 +122,13 @@ typedef enum
 
 #define GROUP_FILTER_ALL_TAG    -2
 
+#warning remove
 #define STATUS_RATIO_TOTAL      @"RatioTotal"
 #define STATUS_RATIO_SESSION    @"RatioSession"
 #define STATUS_TRANSFER_TOTAL   @"TransferTotal"
 #define STATUS_TRANSFER_SESSION @"TransferSession"
 
+#warning remove
 typedef enum
 {
     STATUS_RATIO_TOTAL_TAG = 0,
@@ -426,8 +428,6 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     [fWindow setContentBorderThickness: NSMinY([[fTableView enclosingScrollView] frame]) forEdge: NSMinYEdge];
     [fWindow setMovableByWindowBackground: YES];
     
-    [[fTotalDLField cell] setBackgroundStyle: NSBackgroundStyleRaised];
-    [[fTotalULField cell] setBackgroundStyle: NSBackgroundStyleRaised];
     [[fTotalTorrentsField cell] setBackgroundStyle: NSBackgroundStyleRaised];
     
     [self updateGroupsFilterButton];
@@ -447,16 +447,6 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     [self showFilterBar: [fDefaults boolForKey: @"FilterBar"] animate: NO];
     
     //set up status bar
-    [fStatusBar setHidden: YES];
-    
-    [self updateSpeedFieldsToolTips];
-    
-    NSRect statusBarFrame = [fStatusBar frame];
-    statusBarFrame.size.width = windowSize.width;
-    [fStatusBar setFrame: statusBarFrame];
-    
-    [contentView addSubview: fStatusBar];
-    [fStatusBar setFrameOrigin: NSMakePoint(0, NSMaxY([contentView frame]))];
     [self showStatusBar: [fDefaults boolForKey: @"StatusBar"] animate: NO];
     
     [fActionButton setToolTip: NSLocalizedString(@"Shortcuts for changing global settings.",
@@ -582,10 +572,6 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     //update when groups change
     [nc addObserver: self selector: @selector(updateGroupsFilters:)
                     name: @"UpdateGroups" object: nil];
-    
-    //update when speed limits are changed
-    [nc addObserver: self selector: @selector(updateSpeedFieldsToolTips)
-                    name: @"SpeedLimitUpdate" object: nil];
 
     //timer to update the interface every second
     [self updateUI];
@@ -773,6 +759,9 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     [fInfoController release];
     [fMessageController release];
     [fPrefsController release];
+    
+    [fStatusBar release];
+    [fFilterBar release];
     
     [fTorrents release];
     [fDisplayedTorrents release];
@@ -1714,45 +1703,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         {
             [self sortTorrents];
             
-            //update status bar
-            if (![fStatusBar isHidden])
-            {
-                //set rates
-                [fTotalDLField setStringValue: [NSString stringForSpeed: dlRate]];
-                [fTotalULField setStringValue: [NSString stringForSpeed: ulRate]];
-                
-                //set status button text
-                NSString * statusLabel = [fDefaults stringForKey: @"StatusLabel"], * statusString;
-                BOOL total;
-                if ((total = [statusLabel isEqualToString: STATUS_RATIO_TOTAL]) || [statusLabel isEqualToString: STATUS_RATIO_SESSION])
-                {
-                    tr_session_stats stats;
-                    if (total)
-                        tr_sessionGetCumulativeStats(fLib, &stats);
-                    else
-                        tr_sessionGetStats(fLib, &stats);
-                    
-                    statusString = [NSLocalizedString(@"Ratio", "status bar -> status label") stringByAppendingFormat: @": %@",
-                                    [NSString stringForRatio: stats.ratio]];
-                }
-                else //STATUS_TRANSFER_TOTAL or STATUS_TRANSFER_SESSION
-                {
-                    total = [statusLabel isEqualToString: STATUS_TRANSFER_TOTAL];
-                    
-                    tr_session_stats stats;
-                    if (total)
-                        tr_sessionGetCumulativeStats(fLib, &stats);
-                    else
-                        tr_sessionGetStats(fLib, &stats);
-                    
-                    statusString = [NSString stringWithFormat: @"%@: %@  %@: %@",
-                            NSLocalizedString(@"DL", "status bar -> status label"), [NSString stringForFileSize: stats.downloadedBytes],
-                            NSLocalizedString(@"UL", "status bar -> status label"), [NSString stringForFileSize: stats.uploadedBytes]];
-                }
-                
-                [fStatusButton setTitle: statusString];
-                [self resizeStatusButton];
-            }
+            [fStatusBar updateWithDownload: dlRate upload: ulRate];
         }
 
         //update non-constant parts of info window
@@ -1762,21 +1713,6 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     
     //badge dock
     [fBadger updateBadgeWithDownload: dlRate upload: ulRate];
-}
-
-- (void) resizeStatusButton
-{
-    [fStatusButton sizeToFit];
-    
-    //width ends up being too long
-    NSRect statusFrame = [fStatusButton frame];
-    statusFrame.size.width -= 25.0;
-    
-    CGFloat difference = NSMaxX(statusFrame) + 5.0 - [fTotalDLImageView frame].origin.x;
-    if (difference > 0)
-        statusFrame.size.width -= difference;
-    
-    [fStatusButton setFrame: statusFrame];
 }
 
 - (void) setBottomCountText: (BOOL) filtering
@@ -1800,42 +1736,6 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     }
     
     [fTotalTorrentsField setStringValue: totalTorrentsString];
-}
-
-- (void) updateSpeedFieldsToolTips
-{
-    NSString * uploadText, * downloadText;
-    
-    if ([fDefaults boolForKey: @"SpeedLimit"])
-    {
-        NSString * speedString = [NSString stringWithFormat: @"%@ (%@)", NSLocalizedString(@"%d KB/s", "Status Bar -> speed tooltip"),
-                                    NSLocalizedString(@"Speed Limit", "Status Bar -> speed tooltip")];
-        
-        uploadText = [NSString stringWithFormat: speedString, [fDefaults integerForKey: @"SpeedLimitUploadLimit"]];
-        downloadText = [NSString stringWithFormat: speedString, [fDefaults integerForKey: @"SpeedLimitDownloadLimit"]];
-    }
-    else
-    {
-        if ([fDefaults boolForKey: @"CheckUpload"])
-            uploadText = [NSString stringWithFormat: NSLocalizedString(@"%d KB/s", "Status Bar -> speed tooltip"),
-                            [fDefaults integerForKey: @"UploadLimit"]];
-        else
-            uploadText = NSLocalizedString(@"unlimited", "Status Bar -> speed tooltip");
-        
-        if ([fDefaults boolForKey: @"CheckDownload"])
-            downloadText = [NSString stringWithFormat: NSLocalizedString(@"%d KB/s", "Status Bar -> speed tooltip"),
-                            [fDefaults integerForKey: @"DownloadLimit"]];
-        else
-            downloadText = NSLocalizedString(@"unlimited", "Status Bar -> speed tooltip");
-    }
-    
-    uploadText = [NSLocalizedString(@"Global upload limit", "Status Bar -> speed tooltip")
-                    stringByAppendingFormat: @": %@", uploadText];
-    downloadText = [NSLocalizedString(@"Global download limit", "Status Bar -> speed tooltip")
-                    stringByAppendingFormat: @": %@", downloadText];
-    
-    [fTotalULField setToolTip: uploadText];
-    [fTotalDLField setToolTip: downloadText];
 }
 
 - (void) updateTorrentsInQueue
@@ -2424,32 +2324,6 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     [self setFilter: button];
 }
 
-- (void) setStatusLabel: (id) sender
-{
-    NSString * statusLabel;
-    switch ([sender tag])
-    {
-        case STATUS_RATIO_TOTAL_TAG:
-            statusLabel = STATUS_RATIO_TOTAL;
-            break;
-        case STATUS_RATIO_SESSION_TAG:
-            statusLabel = STATUS_RATIO_SESSION;
-            break;
-        case STATUS_TRANSFER_TOTAL_TAG:
-            statusLabel = STATUS_TRANSFER_TOTAL;
-            break;
-        case STATUS_TRANSFER_SESSION_TAG:
-            statusLabel = STATUS_TRANSFER_SESSION;
-            break;
-        default:
-            NSAssert1(NO, @"Unknown status label tag received: %d", [sender tag]);
-            return;
-    }
-    
-    [fDefaults setObject: statusLabel forKey: @"StatusLabel"];
-    [self updateUI];
-}
-
 - (void) menuNeedsUpdate: (NSMenu *) menu
 {
     if (menu == fGroupsSetMenu || menu == fGroupsSetContextMenu || menu == fGroupFilterMenu)
@@ -2574,7 +2448,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 - (void) speedLimitChanged: (id) sender
 {
     tr_sessionUseAltSpeed(fLib, [fDefaults boolForKey: @"SpeedLimit"]);
-    [self updateSpeedFieldsToolTips];
+    [fStatusBar updateSpeedFieldsToolTips];
 }
 
 //dict has been retained
@@ -2583,7 +2457,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     const BOOL isLimited = [[dict objectForKey: @"Active"] boolValue];
 
     [fDefaults setBool: isLimited forKey: @"SpeedLimit"];
-    [self updateSpeedFieldsToolTips];
+    [fStatusBar updateSpeedFieldsToolTips];
     
     if (![[dict objectForKey: @"ByUser"] boolValue])
         [GrowlApplicationBridge notifyWithTitle: isLimited
@@ -3124,8 +2998,8 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         else
         {
             NSSize maxSize = [scrollView convertSize: [[fWindow screen] visibleFrame].size fromView: nil];
-            if ([fStatusBar isHidden])
-                maxSize.height -= [fStatusBar frame].size.height;
+            if (!fStatusBar)
+                maxSize.height -= [[fStatusBar view] frame].size.height;
             if ([fFilterBar isHidden]) 
                 maxSize.height -= [fFilterBar frame].size.height;
             if (windowSize.height > maxSize.height)
@@ -3143,21 +3017,35 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 
 - (void) toggleStatusBar: (id) sender
 {
-    [self showStatusBar: [fStatusBar isHidden] animate: YES];
-    [fDefaults setBool: ![fStatusBar isHidden] forKey: @"StatusBar"];
+    const BOOL show = fStatusBar == nil;
+    [self showStatusBar: show animate: YES];
+    [fDefaults setBool: show forKey: @"StatusBar"];
 }
 
 //doesn't save shown state
 - (void) showStatusBar: (BOOL) show animate: (BOOL) animate
 {
-    if (show != [fStatusBar isHidden])
+    const BOOL prevShown = fStatusBar != nil;
+    if (show == prevShown)
         return;
-
+    
     if (show)
-        [fStatusBar setHidden: NO];
-
+    {
+        fStatusBar = [[StatusBarController alloc] initWithLib: fLib];
+        
+        NSView * contentView = [fWindow contentView];
+        const NSSize windowSize = [contentView convertSize: [fWindow frame].size fromView: nil];
+        
+        NSRect statusBarFrame = [[fStatusBar view] frame];
+        statusBarFrame.size.width = windowSize.width;
+        [[fStatusBar view] setFrame: statusBarFrame];
+        
+        [contentView addSubview: [fStatusBar view]];
+        [[fStatusBar view] setFrameOrigin: NSMakePoint(0, NSMaxY([contentView frame]))];
+    }
+    
     NSRect frame;
-    CGFloat heightChange = [fStatusBar frame].size.height;
+    CGFloat heightChange = [[fStatusBar view] frame].size.height;
     if (!show)
         heightChange *= -1;
     
@@ -3180,18 +3068,18 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     NSScrollView * scrollView = [fTableView enclosingScrollView];
     
     //set views to not autoresize
-    NSUInteger statsMask = [fStatusBar autoresizingMask];
-    NSUInteger filterMask = [fFilterBar autoresizingMask];
-    NSUInteger scrollMask = [scrollView autoresizingMask];
-    [fStatusBar setAutoresizingMask: NSViewNotSizable];
+    const NSUInteger statsMask = [[fStatusBar view] autoresizingMask];
+    [[fStatusBar view] setAutoresizingMask: NSViewNotSizable];
+    const NSUInteger filterMask = [fFilterBar autoresizingMask];
     [fFilterBar setAutoresizingMask: NSViewNotSizable];
+    const NSUInteger scrollMask = [scrollView autoresizingMask];
     [scrollView setAutoresizingMask: NSViewNotSizable];
     
     frame = [self windowFrameByAddingHeight: heightChange checkLimits: NO];
     [fWindow setFrame: frame display: YES animate: animate]; 
     
     //re-enable autoresize
-    [fStatusBar setAutoresizingMask: statsMask];
+    [[fStatusBar view] setAutoresizingMask: statsMask];
     [fFilterBar setAutoresizingMask: filterMask];
     [scrollView setAutoresizingMask: scrollMask];
     
@@ -3201,7 +3089,10 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     [fWindow setContentMinSize: minSize];
     
     if (!show)
-        [fStatusBar setHidden: YES];
+    {
+        [fStatusBar release];
+        fStatusBar = nil;
+    }
 }
 
 - (void) toggleFilterBar: (id) sender
@@ -3742,32 +3633,6 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         return [fWindow isVisible];
     }
     
-    //enable sort options
-    if (action == @selector(setStatusLabel:))
-    {
-        NSString * statusLabel;
-        switch ([menuItem tag])
-        {
-            case STATUS_RATIO_TOTAL_TAG:
-                statusLabel = STATUS_RATIO_TOTAL;
-                break;
-            case STATUS_RATIO_SESSION_TAG:
-                statusLabel = STATUS_RATIO_SESSION;
-                break;
-            case STATUS_TRANSFER_TOTAL_TAG:
-                statusLabel = STATUS_TRANSFER_TOTAL;
-                break;
-            case STATUS_TRANSFER_SESSION_TAG:
-                statusLabel = STATUS_TRANSFER_SESSION;
-                break;
-            default:
-                NSAssert1(NO, @"Unknown status label tag received: %d", [menuItem tag]);
-        }
-        
-        [menuItem setState: [statusLabel isEqualToString: [fDefaults stringForKey: @"StatusLabel"]] ? NSOnState : NSOffState];
-        return YES;
-    }
-    
     if (action == @selector(setGroup:))
     {
         BOOL checked = NO;
@@ -3865,7 +3730,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     //enable toggle status bar
     if (action == @selector(toggleStatusBar:))
     {
-        NSString * title = [fStatusBar isHidden] ? NSLocalizedString(@"Show Status Bar", "View menu -> Status Bar")
+        NSString * title = !fStatusBar ? NSLocalizedString(@"Show Status Bar", "View menu -> Status Bar")
                             : NSLocalizedString(@"Hide Status Bar", "View menu -> Status Bar");
         [menuItem setTitle: title];
 
@@ -4323,13 +4188,8 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 
 - (void) windowDidResize: (NSNotification *) notification
 {
-    if (![fStatusBar isHidden])
-        [self resizeStatusButton];
-    
-    if ([fFilterBar isHidden])
-        return;
-
-    [self resizeFilterBar];
+    if (![fFilterBar isHidden])
+        [self resizeFilterBar];
 }
 
 - (void) applicationWillUnhide: (NSNotification *) notification
