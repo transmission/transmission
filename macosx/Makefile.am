@@ -2,12 +2,14 @@ EXTRA_DIST = \
     Credits.rtf \
     AboutWindow.xib \
     BlocklistStatusWindow.xib \
+    FilterBar.xib \
     InfoFileView.xib \
     InfoPeersView.xib \
     InfoTrackersView.xib \
     InfoWindow.xib \
     MessageWindow.xib \
     StatsWindow.xib \
+    StatusBar.xib \
     URLSheetWindow.xib \
     Defaults.plist \
     Info.plist \
