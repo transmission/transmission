@@ -107,7 +107,6 @@ typedef enum
     SORT_DESC_TAG = 1
 } sortOrderTag;
 
-
 #define FILTER_NONE     @"None"
 #define FILTER_ACTIVE   @"Active"
 #define FILTER_DOWNLOAD @"Download"
