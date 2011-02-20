@@ -122,21 +122,6 @@ typedef enum
 
 #define GROUP_FILTER_ALL_TAG    -2
 
-#warning remove
-#define STATUS_RATIO_TOTAL      @"RatioTotal"
-#define STATUS_RATIO_SESSION    @"RatioSession"
-#define STATUS_TRANSFER_TOTAL   @"TransferTotal"
-#define STATUS_TRANSFER_SESSION @"TransferSession"
-
-#warning remove
-typedef enum
-{
-    STATUS_RATIO_TOTAL_TAG = 0,
-    STATUS_RATIO_SESSION_TAG = 1,
-    STATUS_TRANSFER_TOTAL_TAG = 2,
-    STATUS_TRANSFER_SESSION_TAG = 3
-} statusTag;
-
 #define GROWL_DOWNLOAD_COMPLETE @"Download Complete"
 #define GROWL_SEEDING_COMPLETE  @"Seeding Complete"
 #define GROWL_AUTO_ADD          @"Torrent Auto Added"
