@@ -499,11 +499,6 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     
     [fWindow makeKeyAndOrderFront: nil];
     
-    #warning still needed?
-    //can't be done earlier
-    /*if (![fFilterBar isHidden])
-        [self resizeFilterBar];*/
-    
     if ([fDefaults boolForKey: @"InfoVisible"])
         [self showInfo: nil];
 }

@@ -240,7 +240,7 @@ typedef enum
     statusFrame.size.width -= 25.0;
     
     const CGFloat difference = NSMaxX(statusFrame) + 5.0 - NSMinX([fTotalDLImageView frame]);
-    if (difference > 0)
+    if (difference > 0.0)
         statusFrame.size.width -= difference;
     
     [fStatusButton setFrame: statusFrame];

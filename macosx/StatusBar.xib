@@ -82,7 +82,7 @@
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSTextFieldCell" key="NSCell" id="836599047">
 							<int key="NSCellFlags">67239424</int>
-							<int key="NSCellFlags2">272760832</int>
+							<int key="NSCellFlags2">4325376</int>
 							<string key="NSContents">999.9 KB/s</string>
 							<reference key="NSSupport" ref="26"/>
 							<reference key="NSControlView" ref="1048428465"/>
