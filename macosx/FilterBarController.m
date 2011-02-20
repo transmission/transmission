@@ -49,7 +49,20 @@
 
 - (void) awakeFromNib
 {
-    #warning localize every thing
+    //localizations
+    [fNoFilterButton setTitle: NSLocalizedString(@"All", "Filter Bar -> filter button")];
+    [fActiveFilterButton setTitle: NSLocalizedString(@"Active", "Filter Bar -> filter button")];
+    [fDownloadFilterButton setTitle: NSLocalizedString(@"Downloading", "Filter Bar -> filter button")];
+    [fSeedFilterButton setTitle: NSLocalizedString(@"Seeding", "Filter Bar -> filter button")];
+    [fPauseFilterButton setTitle: NSLocalizedString(@"Paused", "Filter Bar -> filter button")];
+    
+    [[[[fSearchField cell] searchMenuTemplate] itemWithTag: FILTER_TYPE_TAG_NAME] setTitle:
+        NSLocalizedString(@"Name", "Filter Bar -> filter menu")];
+    [[[[fSearchField cell] searchMenuTemplate] itemWithTag: FILTER_TYPE_TAG_TRACKER] setTitle:
+        NSLocalizedString(@"Tracker", "Filter Bar -> filter menu")];
+    
+    [[[fGroupsButton menu] itemWithTag: GROUP_FILTER_ALL_TAG] setTitle:
+        NSLocalizedString(@"All Groups", "Filter Bar -> group filter menu")];
     
     [self resizeBar];
     
@@ -73,7 +86,6 @@
         currentFilterButton = fNoFilterButton;
     }
     [currentFilterButton setState: NSOnState];
-    
     
     //set filter search type
     NSString * filterSearchType = [[NSUserDefaults standardUserDefaults] stringForKey: @"FilterSearchType"];
