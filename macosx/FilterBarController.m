@@ -187,6 +187,11 @@
     [[NSNotificationCenter defaultCenter] postNotificationName: @"ApplyFilter" object: nil];
 }
 
+- (void) focusSearchField
+{
+    [[[self view] window] makeFirstResponder: fSearchField];
+}
+
 - (void) setSearchType: (id) sender
 {
     NSString * oldFilterType = [[NSUserDefaults standardUserDefaults] stringForKey: @"FilterSearchType"];

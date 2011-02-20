@@ -2978,12 +2978,11 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     }
 }
 
-#warning fix?
 - (void) focusFilterField
 {
-    /*[fWindow makeFirstResponder: fSearchFilterField];
-    if ([fFilterBar isHidden])
-        [self toggleFilterBar: self];*/
+    if (!fFilterBar)
+        [self toggleFilterBar: self];
+    [fFilterBar focusSearchField];
 }
 
 #warning change from id to QLPreviewPanel

@@ -56,6 +56,7 @@
 - (void) setGroupFilter: (id) sender;
 
 - (NSString *) searchString;
+- (void) focusSearchField;
 
 - (void) setCountAll: (NSUInteger) all active: (NSUInteger) active downloading: (NSUInteger) downloading
         seeding: (NSUInteger) seeding paused: (NSUInteger) paused;
