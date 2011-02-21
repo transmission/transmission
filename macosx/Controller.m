@@ -1987,9 +1987,10 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     const NSInteger groupFilterValue = [fDefaults integerForKey: @"FilterGroup"];
     const BOOL filterGroup = groupFilterValue != GROUP_FILTER_ALL_TAG;
     
-    NSString * searchString = fFilterBar ? [fFilterBar searchString] : @"";
-    const BOOL filterText = ![searchString isEqualToString: @""],
-            filterTracker = filterText && [[fDefaults stringForKey: @"FilterSearchType"] isEqualToString: FILTER_TYPE_TRACKER];
+    NSString * searchString = [fFilterBar searchString];
+    if (searchString && [searchString isEqualToString: @""])
+        searchString = nil;
+    const BOOL filterTracker = searchString && [[fDefaults stringForKey: @"FilterSearchType"] isEqualToString: FILTER_TYPE_TRACKER];
     
     NSMutableArray * allTorrents = [NSMutableArray arrayWithCapacity: [fTorrents count]];
     
@@ -2001,24 +2002,24 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         {
             const BOOL isActive = ![torrent isStalled];
             if (isActive)
-                active++;
+                ++active;
             
             if ([torrent isSeeding])
             {
-                seeding++;
+                ++seeding;
                 if (filterStatus && !((filterActive && isActive) || filterSeed))
                     continue;
             }
             else
             {
-                downloading++;
+                ++downloading;
                 if (filterStatus && !((filterActive && isActive) || filterDownload))
                     continue;
             }
         }
         else
         {
-            paused++;
+            ++paused;
             if (filterStatus && !filterPause)
                 continue;
         }
@@ -2029,7 +2030,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
                 continue;
         
         //check text field
-        if (filterText)
+        if (searchString)
         {
             if (filterTracker)
             {
@@ -2092,7 +2093,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
                 group = nil;
                 
                 //try to see if the group already exists
-                for (; currentOldGroupIndex < [oldTorrentGroups count]; currentOldGroupIndex++)
+                for (; currentOldGroupIndex < [oldTorrentGroups count]; ++currentOldGroupIndex)
                 {
                     TorrentGroup * currentGroup = [oldTorrentGroups objectAtIndex: currentOldGroupIndex];
                     const NSInteger currentGroupValue = [currentGroup groupIndex];
@@ -2101,7 +2102,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
                         group = currentGroup;
                         [[currentGroup torrents] removeAllObjects];
                         
-                        currentOldGroupIndex++;
+                        ++currentOldGroupIndex;
                     }
                     
                     if (currentGroupValue >= groupValue)
@@ -2138,7 +2139,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     [fTableView selectValues: selectedValues];
     [self resetInfo]; //if group is already selected, but the torrents in it change
     
-    [self setBottomCountText: groupRows || filterStatus || filterGroup || filterText];
+    [self setBottomCountText: groupRows || filterStatus || filterGroup || searchString];
     
     [self setWindowSizeToFit];
 }

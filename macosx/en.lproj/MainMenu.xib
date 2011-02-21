@@ -12,9 +12,8 @@
 		</object>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
-			<integer value="589"/>
-			<integer value="1684"/>
-			<integer value="21"/>
+			<integer value="1400"/>
+			<integer value="2"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -105,28 +104,6 @@
 									<object class="NSMutableArray" key="NSMenuItems">
 										<bool key="EncodedWithXMLCoder">YES</bool>
 										<reference ref="824838798"/>
-										<object class="NSMenuItem" id="420710921">
-											<reference key="NSMenu" ref="97165992"/>
-											<string key="NSTitle">Item2</string>
-											<string key="NSKeyEquiv"/>
-											<int key="NSKeyEquivModMask">1048576</int>
-											<int key="NSMnemonicLoc">2147483647</int>
-											<reference key="NSOnImage" ref="322614661"/>
-											<reference key="NSMixedImage" ref="3851078"/>
-											<string key="NSAction">_popUpItemAction:</string>
-											<reference key="NSTarget" ref="1063285887"/>
-										</object>
-										<object class="NSMenuItem" id="1041175657">
-											<reference key="NSMenu" ref="97165992"/>
-											<string key="NSTitle">Item3</string>
-											<string key="NSKeyEquiv"/>
-											<int key="NSKeyEquivModMask">1048576</int>
-											<int key="NSMnemonicLoc">2147483647</int>
-											<reference key="NSOnImage" ref="322614661"/>
-											<reference key="NSMixedImage" ref="3851078"/>
-											<string key="NSAction">_popUpItemAction:</string>
-											<reference key="NSTarget" ref="1063285887"/>
-										</object>
 									</object>
 								</object>
 								<bool key="NSPullDown">YES</bool>
@@ -5422,25 +5399,13 @@ AAAAAAAAAAAAAAAAA</bytes>
 						<reference key="object" ref="97165992"/>
 						<object class="NSMutableArray" key="children">
 							<bool key="EncodedWithXMLCoder">YES</bool>
-							<reference ref="1041175657"/>
 							<reference ref="824838798"/>
-							<reference ref="420710921"/>
 						</object>
 						<reference key="parent" ref="1063285887"/>
 					</object>
 					<object class="IBObjectRecord">
-						<int key="objectID">2686</int>
-						<reference key="object" ref="1041175657"/>
-						<reference key="parent" ref="97165992"/>
-					</object>
-					<object class="IBObjectRecord">
 						<int key="objectID">2685</int>
 						<reference key="object" ref="824838798"/>
-						<reference key="parent" ref="97165992"/>
-					</object>
-					<object class="IBObjectRecord">
-						<int key="objectID">2684</int>
-						<reference key="object" ref="420710921"/>
 						<reference key="parent" ref="97165992"/>
 					</object>
 					<object class="IBObjectRecord">
@@ -6087,12 +6052,8 @@ AAAAAAAAAAAAAAAAA</bytes>
 					<string>2683.IBEditorWindowLastContentRect</string>
 					<string>2683.IBPluginDependency</string>
 					<string>2683.ImportedFromIB2</string>
-					<string>2684.IBPluginDependency</string>
-					<string>2684.ImportedFromIB2</string>
 					<string>2685.IBPluginDependency</string>
 					<string>2685.ImportedFromIB2</string>
-					<string>2686.IBPluginDependency</string>
-					<string>2686.ImportedFromIB2</string>
 					<string>2690.IBPluginDependency</string>
 					<string>2690.ImportedFromIB2</string>
 					<string>2700.IBPluginDependency</string>
@@ -6591,11 +6552,7 @@ AAAAAAAAAAAAAAAAA</bytes>
 						<bytes key="NSTransformStruct">P4AAAL+AAABAwAAAwZgAAA</bytes>
 					</object>
 					<integer value="1"/>
-					<string>{{346, 449}, {108, 63}}</string>
-					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<integer value="1"/>
-					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<integer value="1"/>
+					<string>{{66, 710}, {105, 23}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="1"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -6809,7 +6766,6 @@ AAAAAAAAAAAAAAAAA</bytes>
 							<string>revealFile:</string>
 							<string>selectedToolbarClicked:</string>
 							<string>setGroup:</string>
-							<string>setGroupFilter:</string>
 							<string>setInfoTab:</string>
 							<string>setLimitGlobalEnabled:</string>
 							<string>setQuickLimitGlobal:</string>
@@ -6889,7 +6845,6 @@ AAAAAAAAAAAAAAAAA</bytes>
 							<string>id</string>
 							<string>id</string>
 							<string>id</string>
-							<string>id</string>
 						</object>
 					</object>
 					<object class="NSMutableDictionary" key="actionInfosByName">
@@ -6918,7 +6873,6 @@ AAAAAAAAAAAAAAAAA</bytes>
 							<string>revealFile:</string>
 							<string>selectedToolbarClicked:</string>
 							<string>setGroup:</string>
-							<string>setGroupFilter:</string>
 							<string>setInfoTab:</string>
 							<string>setLimitGlobalEnabled:</string>
 							<string>setQuickLimitGlobal:</string>
@@ -7035,10 +6989,6 @@ AAAAAAAAAAAAAAAAA</bytes>
 							</object>
 							<object class="IBActionInfo">
 								<string key="name">setGroup:</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBActionInfo">
-								<string key="name">setGroupFilter:</string>
 								<string key="candidateClassName">id</string>
 							</object>
 							<object class="IBActionInfo">
