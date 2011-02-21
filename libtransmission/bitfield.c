@@ -52,18 +52,6 @@ tr_bitfieldClear( tr_bitfield * bitfield )
 }
 
 int
-tr_bitfieldIsEmpty( const tr_bitfield * bitfield )
-{
-    size_t i;
-
-    for( i = 0; i < bitfield->byteCount; ++i )
-        if( bitfield->bits[i] )
-            return 0;
-
-    return 1;
-}
-
-int
 tr_bitfieldAdd( tr_bitfield * bitfield,
                 size_t        nth )
 {
