@@ -475,7 +475,7 @@ replicationNew( Torrent * t )
         uint16_t r = 0;
 
         for( peer_i=0; peer_i<peer_count; ++peer_i )
-            if( tr_bitsetHasFast( &peers[peer_i]->have, piece_i ) )
+            if( tr_bitsetHas( &peers[peer_i]->have, piece_i ) )
                 ++r;
 
         t->pieceReplication[piece_i] = r;
@@ -1023,7 +1023,7 @@ assertReplicationCountIsExact( Torrent * t )
         uint16_t r = 0;
 
         for( peer_i=0; peer_i<peer_count; ++peer_i )
-            if( tr_bitsetHasFast( &peers[peer_i]->have, piece_i ) )
+            if( tr_bitsetHas( &peers[peer_i]->have, piece_i ) )
                 ++r;
 
         assert( rep[piece_i] == r );
@@ -1333,7 +1333,7 @@ tr_peerMgrGetNextRequests( tr_torrent           * tor,
         struct weighted_piece * p = pieces + i;
 
         /* if the peer has this piece that we want... */
-        if( tr_bitsetHasFast( have, p->index ) )
+        if( tr_bitsetHas( have, p->index ) )
         {
             tr_block_index_t b = tr_torPieceFirstBlock( tor, p->index );
             const tr_block_index_t e = b + tr_torPieceCountBlocks( tor, p->index );
