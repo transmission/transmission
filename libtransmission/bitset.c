@@ -60,16 +60,6 @@ tr_bitsetOr( tr_bitfield * a, const tr_bitset * b )
         tr_bitfieldOr( a, &b->bitfield );
 }
 
-/* set 'a' to all the flags that were in 'a' but not 'b' */
-void
-tr_bitsetDifference( tr_bitfield * a, const tr_bitset * b )
-{
-    if( b->haveAll )
-        tr_bitfieldClear( a );
-    else if( !b->haveNone )
-        tr_bitfieldDifference( a, &b->bitfield );
-}
-
 double
 tr_bitsetPercent( const tr_bitset * b )
 {

@@ -173,19 +173,6 @@ tr_bitfieldOr( tr_bitfield * a, const tr_bitfield * b )
     return a;
 }
 
-/* set 'a' to all the flags that were in 'a' but not 'b' */
-void
-tr_bitfieldDifference( tr_bitfield * a, const tr_bitfield * b )
-{
-    uint8_t * ait = a->bits;
-    const uint8_t * aend = ait + a->byteCount;
-    const uint8_t * bit = b->bits;
-    const uint8_t * bend = bit + b->byteCount;
-
-    while( ait!=aend && bit!=bend )
-        *ait++ &= ~( *bit++ );
-}
-
 size_t
 tr_bitfieldCountTrueBits( const tr_bitfield* b )
 {

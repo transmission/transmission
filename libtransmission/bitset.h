@@ -48,7 +48,4 @@ tr_bool tr_bitsetHas( const tr_bitset * b, const size_t nth );
 
 void tr_bitsetOr( tr_bitfield * a, const tr_bitset * b );
 
-/* set 'a' to all the flags that were in 'a' but not 'b' */
-void tr_bitsetDifference( tr_bitfield * a, const tr_bitset * b );
-
 #endif

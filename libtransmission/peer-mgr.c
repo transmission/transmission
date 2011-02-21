@@ -3105,29 +3105,8 @@ shouldPeerBeClosed( const Torrent    * t,
 
     /* if we're seeding and the peer has everything we have,
      * and enough time has passed for a pex exchange, then disconnect */
-    if( tr_torrentIsSeed( tor ) )
-    {
-        tr_bool peerHasEverything;
-
-        if( atom->seedProbability != -1 )
-        {
-            peerHasEverything = atomIsSeed( atom );
-        }
-        else
-        {
-            tr_bitfield * tmp = tr_bitfieldDup( tr_cpPieceBitfield( &tor->completion ) );
-            tr_bitsetDifference( tmp, &peer->have );
-            peerHasEverything = tr_bitfieldCountTrueBits( tmp ) == 0;
-            tr_bitfieldFree( tmp );
-        }
-
-        if( peerHasEverything && ( !tr_torrentAllowsPex(tor) || (now-atom->time>=30 )))
-        {
-            tordbg( t, "purging peer %s because we're both seeds",
-                    tr_atomAddrStr( atom ) );
-            return TRUE;
-        }
-    }
+    if( tr_torrentIsSeed( tor ) && ( peer->progress >= 1.0f ) )
+        return !tr_torrentAllowsPex(tor) || (now-atom->time>=30);
 
     /* disconnect if it's been too long since piece data has been transferred.
      * this is on a sliding scale based on number of available peers... */
