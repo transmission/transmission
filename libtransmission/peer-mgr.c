@@ -379,7 +379,7 @@ peerIsInUse( const Torrent * ct, const struct peer_atom * atom )
 }
 
 static tr_peer*
-peerConstructor( struct peer_atom * atom )
+peerNew( struct peer_atom * atom )
 {
     tr_peer * peer = tr_new0( tr_peer, 1 );
 
@@ -407,7 +407,7 @@ getPeer( Torrent * torrent, struct peer_atom * atom )
 
     if( peer == NULL )
     {
-        peer = peerConstructor( atom );
+        peer = peerNew( atom );
         tr_ptrArrayInsertSorted( &torrent->peers, peer, peerCompare );
     }
 
@@ -417,7 +417,7 @@ getPeer( Torrent * torrent, struct peer_atom * atom )
 static void peerDeclinedAllRequests( Torrent *, const tr_peer * );
 
 static void
-peerDestructor( Torrent * t, tr_peer * peer )
+peerDelete( Torrent * t, tr_peer * peer )
 {
     assert( peer != NULL );
 
@@ -2019,7 +2019,7 @@ myHandshakeDoneCB( tr_handshake  * handshake,
                 }
 
                 peer->io = tr_handshakeStealIO( handshake ); /* this steals its refcount too, which is
-                                                                balanced by our unref in peerDestructor()  */
+                                                                balanced by our unref in peerDelete()  */
                 tr_peerIoSetParent( peer->io, t->tor->bandwidth );
                 tr_peerMsgsNew( t->tor, peer, peerCallbackFunc, t );
 
@@ -2405,7 +2405,7 @@ stopTorrent( Torrent * t )
 
     /* disconnect the peers. */
     for( i=0, n=tr_ptrArraySize( &t->peers ); i<n; ++i )
-        peerDestructor( t, tr_ptrArrayNth( &t->peers, i ) );
+        peerDelete( t, tr_ptrArrayNth( &t->peers, i ) );
     tr_ptrArrayClear( &t->peers );
 
     /* disconnect the handshakes. handshakeAbort calls handshakeDoneCB(),
@@ -3206,7 +3206,7 @@ removePeer( Torrent * t, tr_peer * peer )
         tr_decrReplicationFromBitset( t, &peer->have );
 
     assert( removed == peer );
-    peerDestructor( t, removed );
+    peerDelete( t, removed );
 }
 
 static void
