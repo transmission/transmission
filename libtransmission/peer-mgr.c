@@ -483,7 +483,7 @@ replicationNew( Torrent * t )
 }
 
 static void
-torrentDestructor( void * vt )
+torrentFree( void * vt )
 {
     Torrent * t = vt;
 
@@ -508,8 +508,7 @@ torrentDestructor( void * vt )
 static void peerCallbackFunc( tr_peer *, const tr_peer_event *, void * );
 
 static Torrent*
-torrentConstructor( tr_peerMgr * manager,
-                    tr_torrent * tor )
+torrentNew( tr_peerMgr * manager, tr_torrent * tor )
 {
     int       i;
     Torrent * t;
@@ -2430,7 +2429,7 @@ tr_peerMgrAddTorrent( tr_peerMgr * manager, tr_torrent * tor )
     assert( tr_torrentIsLocked( tor ) );
     assert( tor->torrentPeers == NULL );
 
-    tor->torrentPeers = torrentConstructor( manager, tor );
+    tor->torrentPeers = torrentNew( manager, tor );
 }
 
 void
@@ -2440,7 +2439,7 @@ tr_peerMgrRemoveTorrent( tr_torrent * tor )
     assert( tr_torrentIsLocked( tor ) );
 
     stopTorrent( tor->torrentPeers );
-    torrentDestructor( tor->torrentPeers );
+    torrentFree( tor->torrentPeers );
 }
 
 void
