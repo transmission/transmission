@@ -32,19 +32,19 @@ static int test = 0;
 static int
 test1( void )
 {
-    tr_recentHistory * h;
+    tr_recentHistory h;
 
-    h = tr_historyNew( 60, 10 );
-    tr_historyAdd( h, 10000, 1 );
-    check( (int)tr_historyGet( h, 12000, 1000 ) == 0 )
-    check( (int)tr_historyGet( h, 12000, 3000 ) == 1 )
-    check( (int)tr_historyGet( h, 12000, 5000 ) == 1 )
-    tr_historyAdd( h, 20000, 1 );
-    check( (int)tr_historyGet( h, 22000,  1000 ) == 0 )
-    check( (int)tr_historyGet( h, 22000,  3000 ) == 1 )
-    check( (int)tr_historyGet( h, 22000, 15000 ) == 2 )
-    check( (int)tr_historyGet( h, 22000, 20000 ) == 2 )
-    tr_historyFree( h );
+    tr_historyConstruct( &h, 60, 10 );
+    tr_historyAdd( &h, 10000, 1 );
+    check( (int)tr_historyGet( &h, 12000, 1000 ) == 0 )
+    check( (int)tr_historyGet( &h, 12000, 3000 ) == 1 )
+    check( (int)tr_historyGet( &h, 12000, 5000 ) == 1 )
+    tr_historyAdd( &h, 20000, 1 );
+    check( (int)tr_historyGet( &h, 22000,  1000 ) == 0 )
+    check( (int)tr_historyGet( &h, 22000,  3000 ) == 1 )
+    check( (int)tr_historyGet( &h, 22000, 15000 ) == 2 )
+    check( (int)tr_historyGet( &h, 22000, 20000 ) == 2 )
+    tr_historyDestruct( &h );
 
     return 0;
 }

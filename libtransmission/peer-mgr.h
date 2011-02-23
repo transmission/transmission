@@ -122,11 +122,11 @@ typedef struct tr_peer
 
     time_t                   chokeChangedAt;
 
-    tr_recentHistory       * blocksSentToClient;
-    tr_recentHistory       * blocksSentToPeer;
+    tr_recentHistory         blocksSentToClient;
+    tr_recentHistory         blocksSentToPeer;
 
-    tr_recentHistory       * cancelsSentToClient;
-    tr_recentHistory       * cancelsSentToPeer;
+    tr_recentHistory         cancelsSentToClient;
+    tr_recentHistory         cancelsSentToPeer;
 
     struct tr_peermsgs     * msgs;
 }
