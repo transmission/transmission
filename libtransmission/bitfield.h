@@ -18,7 +18,6 @@
 #define TR_BITFIELD_H 1
 
 #include "transmission.h"
-#include "utils.h" /* tr_new0 */
 
 /** @brief Implementation of the BitTorrent spec's Bitfield array of bits */
 typedef struct tr_bitfield
@@ -29,21 +28,15 @@ typedef struct tr_bitfield
 }
 tr_bitfield;
 
-tr_bitfield* tr_bitfieldConstruct( tr_bitfield*, size_t bitcount );
+extern const tr_bitfield TR_BITFIELD_INIT;
+
+tr_bitfield* tr_bitfieldConstruct( tr_bitfield*, size_t bitCount );
 
 tr_bitfield* tr_bitfieldDestruct( tr_bitfield* );
 
-static inline tr_bitfield* tr_bitfieldNew( size_t bitcount )
-{
-    return tr_bitfieldConstruct( tr_new0( tr_bitfield, 1 ), bitcount );
-}
+tr_bitfield* tr_bitfieldNew( size_t bitCount );
 
-static inline void tr_bitfieldFree( tr_bitfield * b )
-{
-    tr_free( tr_bitfieldDestruct( b ) );
-}
-
-tr_bitfield* tr_bitfieldDup( const tr_bitfield* ) TR_GNUC_MALLOC;
+void tr_bitfieldFree( tr_bitfield * b );
 
 void         tr_bitfieldClear( tr_bitfield* );
 
@@ -56,6 +49,9 @@ int          tr_bitfieldAddRange( tr_bitfield *, size_t begin, size_t end );
 int          tr_bitfieldRemRange( tr_bitfield*, size_t begin, size_t end );
 
 size_t       tr_bitfieldCountTrueBits( const tr_bitfield* );
+
+size_t       tr_bitfieldCountRange( const tr_bitfield * b, size_t begin, size_t end );
+
 
 tr_bitfield* tr_bitfieldOr( tr_bitfield*, const tr_bitfield* );
 

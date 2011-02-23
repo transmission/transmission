@@ -29,14 +29,23 @@ typedef struct tr_bitset
 }
 tr_bitset;
 
-void tr_bitsetReserve( tr_bitset * b, size_t size );
-void tr_bitsetConstructor( tr_bitset * b, size_t size );
-void tr_bitsetDestructor( tr_bitset * b );
+extern const tr_bitset TR_BITSET_INIT;
+
+void tr_bitsetConstruct( tr_bitset * b, size_t bitCount );
+void tr_bitsetDestruct( tr_bitset * b );
 
 void tr_bitsetSetHaveAll( tr_bitset * b );
 void tr_bitsetSetHaveNone( tr_bitset * b );
 
-int  tr_bitsetAdd( tr_bitset * b, size_t i );
+void tr_bitsetSetBitfield( tr_bitset * b, const tr_bitfield * bitfield );
+
+void tr_bitsetAdd( tr_bitset * b, size_t i );
+void tr_bitsetRem( tr_bitset * b, size_t i );
+void tr_bitsetRemRange ( tr_bitset * b, size_t begin, size_t end );
+
+struct tr_benc;
+tr_bool tr_bitsetFromBenc( tr_bitset * bitset, struct tr_benc * benc );
+void tr_bitsetToBenc( const tr_bitset * bitset, struct tr_benc * benc );
 
 /***
 ****
@@ -45,6 +54,7 @@ int  tr_bitsetAdd( tr_bitset * b, size_t i );
 double tr_bitsetPercent( const tr_bitset * b );
 
 tr_bool tr_bitsetHas( const tr_bitset * b, const size_t nth );
+size_t tr_bitsetCountRange( const tr_bitset * b, const size_t begin, const size_t end );
 
 void tr_bitsetOr( tr_bitfield * a, const tr_bitset * b );
 

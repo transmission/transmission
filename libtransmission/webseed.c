@@ -64,7 +64,7 @@ enum
 static void
 webseed_free( struct tr_webseed * w )
 {
-    tr_bitsetDestructor( &w->parent.have );
+    tr_bitsetDestruct( &w->parent.have );
     tr_free( w->parent.client );
 
     event_free( w->timer );
@@ -89,9 +89,7 @@ fire_client_got_rej( tr_torrent * tor, tr_webseed * w, tr_block_index_t block )
 {
     tr_peer_event e = TR_PEER_EVENT_INIT;
     e.eventType = TR_PEER_CLIENT_GOT_REJ;
-    e.pieceIndex = tr_torBlockPiece( tor, block );
-    e.offset = tor->blockSize * block - tor->info.pieceSize * e.pieceIndex;
-    e.length = tr_torBlockCountBytes( tor, block );
+    tr_torrentGetBlockLocation( tor, block, &e.pieceIndex, &e.offset, &e.length );
     publish( w, &e );
 }
 
@@ -100,9 +98,7 @@ fire_client_got_block( tr_torrent * tor, tr_webseed * w, tr_block_index_t block 
 {
     tr_peer_event e = TR_PEER_EVENT_INIT;
     e.eventType = TR_PEER_CLIENT_GOT_BLOCK;
-    e.pieceIndex = tr_torBlockPiece( tor, block );
-    e.offset = tor->blockSize * block - tor->info.pieceSize * e.pieceIndex;
-    e.length = tr_torBlockCountBytes( tor, block );
+    tr_torrentGetBlockLocation( tor, block, &e.pieceIndex, &e.offset, &e.length );
     publish( w, &e );
 }
 
@@ -334,10 +330,10 @@ tr_webseedNew( struct tr_torrent * tor,
 
     peer->peerIsChoked = TRUE;
     peer->clientIsInterested = !tr_torrentIsSeed( tor );
-    tr_bitsetConstructor( &peer->have, tor->info.pieceCount );
-    tr_bitsetSetHaveAll( &peer->have );
     peer->progress = 1.0;
     peer->client = tr_strdup( "webseed" );
+    peer->have = TR_BITSET_INIT;
+    tr_bitsetSetHaveAll( &peer->have );
 
     w->torrent_id = tr_torrentId( tor );
     w->session = tor->session;

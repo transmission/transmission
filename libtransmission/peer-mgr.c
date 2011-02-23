@@ -383,7 +383,7 @@ peerConstructor( struct peer_atom * atom )
 {
     tr_peer * peer = tr_new0( tr_peer, 1 );
 
-    tr_bitsetConstructor( &peer->have, 0 );
+    peer->have = TR_BITSET_INIT;
 
     peer->atom = atom;
     atom->peer = peer;
@@ -434,7 +434,7 @@ peerDestructor( Torrent * t, tr_peer * peer )
     tr_historyFree( peer->cancelsSentToClient );
     tr_historyFree( peer->cancelsSentToPeer   );
 
-    tr_bitsetDestructor( &peer->have );
+    tr_bitsetDestruct( &peer->have );
     tr_bitfieldFree( peer->blame );
     tr_free( peer->client );
     peer->atom->peer = NULL;
@@ -1335,17 +1335,20 @@ tr_peerMgrGetNextRequests( tr_torrent           * tor,
         /* if the peer has this piece that we want... */
         if( tr_bitsetHas( have, p->index ) )
         {
-            tr_block_index_t b = tr_torPieceFirstBlock( tor, p->index );
-            const tr_block_index_t e = b + tr_torPieceCountBlocks( tor, p->index );
+            tr_block_index_t b;
+            tr_block_index_t first;
+            tr_block_index_t last;
             tr_ptrArray peerArr = TR_PTR_ARRAY_INIT;
 
-            for( ; b!=e && got<numwant; ++b )
+            tr_torGetPieceBlockRange( tor, p->index, &first, &last );
+
+            for( b=first; b<=last && got<numwant; ++b )
             {
                 int peerCount;
                 tr_peer ** peers;
 
                 /* don't request blocks we've already got */
-                if( tr_cpBlockIsCompleteFast( &tor->completion, b ) )
+                if( tr_cpBlockIsComplete( &tor->completion, b ) )
                     continue;
 
                 /* always add peer if this block has no peers yet */
@@ -1546,17 +1549,19 @@ peerSuggestedPiece( Torrent            * t UNUSED,
 
     /* request the blocks that we don't have in this piece */
     {
-        tr_block_index_t block;
+        tr_block_index_t b;
+        tr_block_index_t first;
+        tr_block_index_t last;
         const tr_torrent * tor = t->tor;
-        const tr_block_index_t start = tr_torPieceFirstBlock( tor, pieceIndex );
-        const tr_block_index_t end = start + tr_torPieceCountBlocks( tor, pieceIndex );
 
-        for( block=start; block<end; ++block )
+        tr_torGetPieceBlockRange( t->tor, pieceIndex, &first, &last );
+
+        for( b=first; b<=last; ++b )
         {
-            if( !tr_cpBlockIsComplete( tor->completion, block ) )
+            if( !tr_cpBlockIsComplete( tor->completion, b ) )
             {
-                const uint32_t offset = getBlockOffsetInPiece( tor, block );
-                const uint32_t length = tr_torBlockCountBytes( tor, block );
+                const uint32_t offset = getBlockOffsetInPiece( tor, b );
+                const uint32_t length = tr_torBlockCountBytes( tor, b );
                 tr_peerMsgsAddRequest( peer->msgs, pieceIndex, offset, length );
                 incrementPieceRequests( t, pieceIndex );
             }

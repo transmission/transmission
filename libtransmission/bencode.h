@@ -214,6 +214,10 @@ tr_bool   tr_bencGetInt( const tr_benc * val, int64_t * setme );
     @return TRUE if successful, or FALSE if the variant could not be represented as a string  */
 tr_bool   tr_bencGetStr( const tr_benc * val, const char ** setme );
 
+/** @brief Get a raw byte array from a variant object
+    @return TRUE if successful, or FALSE if the variant could not be represented as a raw byte array */
+tr_bool   tr_bencGetRaw( const tr_benc * val, const uint8_t  ** setme_raw, size_t * setme_len );
+
 /** @brief Get a boolean from a variant object
     @return TRUE if successful, or FALSE if the variant could not be represented as a boolean  */
 tr_bool   tr_bencGetBool( const tr_benc * val, tr_bool * setme );

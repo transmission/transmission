@@ -170,7 +170,6 @@ const char* tr_getDefaultDownloadDir( void );
 #define TR_PREFS_KEY_IDLE_LIMIT_ENABLED            "idle-seeding-limit-enabled"
 #define TR_PREFS_KEY_INCOMPLETE_DIR                "incomplete-dir"
 #define TR_PREFS_KEY_INCOMPLETE_DIR_ENABLED        "incomplete-dir-enabled"
-#define TR_PREFS_KEY_LAZY_BITFIELD                 "lazy-bitfield-enabled"
 #define TR_PREFS_KEY_MSGLEVEL                      "message-level"
 #define TR_PREFS_KEY_OPEN_FILE_LIMIT               "open-file-limit"
 #define TR_PREFS_KEY_PEER_LIMIT_GLOBAL             "peer-limit-global"

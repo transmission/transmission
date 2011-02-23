@@ -20,7 +20,8 @@
 #include <assert.h>
 
 #include "transmission.h"
-#include "bitfield.h"
+#include "bitset.h"
+#include "utils.h" /* tr_getRatio() */
 
 typedef struct tr_completion
 {
@@ -31,10 +32,7 @@ typedef struct tr_completion
     tr_torrent *    tor;
 
     /* do we have this block? */
-    tr_bitfield    blockBitfield;
-
-    /* do we have this piece? */
-    tr_bitfield    pieceBitfield;
+    tr_bitset    blockBitset;
 
     /* a block is complete if and only if we have it */
     uint16_t *  completeBlocks;
@@ -76,19 +74,19 @@ tr_completion * tr_cpDestruct( tr_completion * );
 *** General
 **/
 
-tr_completeness            tr_cpGetStatus( const tr_completion * );
+tr_completeness    tr_cpGetStatus( const tr_completion * );
 
-uint64_t                   tr_cpHaveValid( const tr_completion * );
+uint64_t           tr_cpHaveValid( const tr_completion * );
 
-tr_block_index_t           tr_cpBlocksMissing( const tr_completion * );
+tr_block_index_t   tr_cpBlocksMissing( const tr_completion * );
 
-uint64_t                   tr_cpSizeWhenDone( const tr_completion * );
+uint64_t           tr_cpSizeWhenDone( const tr_completion * );
 
-void                       tr_cpInvalidateDND( tr_completion * );
+void               tr_cpInvalidateDND( tr_completion * );
 
-void                       tr_cpGetAmountDone( const   tr_completion * completion,
-                                               float                 * tab,
-                                               int                     tabCount );
+void               tr_cpGetAmountDone( const   tr_completion * completion,
+                                       float                 * tab,
+                                       int                     tabCount );
 
 static inline uint64_t tr_cpHaveTotal( const tr_completion * cp )
 {
@@ -127,17 +125,17 @@ static inline double tr_cpPercentDone( const tr_completion * cp )
 *** Pieces
 **/
 
-int tr_cpMissingBlocksInPiece( const tr_completion  * cp,
-                               tr_piece_index_t       piece );
+int tr_cpMissingBlocksInPiece( const tr_completion * cp, tr_piece_index_t i );
 
-tr_bool  tr_cpPieceIsComplete( const tr_completion * cp,
-                               tr_piece_index_t      piece );
+static inline tr_bool
+tr_cpPieceIsComplete( const tr_completion * cp, tr_piece_index_t i )
+{
+    return tr_cpMissingBlocksInPiece( cp, i ) == 0;
+}
 
-void   tr_cpPieceAdd( tr_completion    * completion,
-                      tr_piece_index_t   piece );
+void   tr_cpPieceAdd( tr_completion * cp, tr_piece_index_t i );
 
-void   tr_cpPieceRem( tr_completion     * completion,
-                      tr_piece_index_t   piece );
+void   tr_cpPieceRem( tr_completion * cp, tr_piece_index_t i );
 
 tr_bool tr_cpFileIsComplete( const tr_completion * cp, tr_file_index_t );
 
@@ -145,37 +143,26 @@ tr_bool tr_cpFileIsComplete( const tr_completion * cp, tr_file_index_t );
 *** Blocks
 **/
 
-static inline tr_bool tr_cpBlockIsCompleteFast( const tr_completion * cp, tr_block_index_t block )
+static inline tr_bool
+tr_cpBlockIsComplete( const tr_completion * cp, tr_block_index_t i )
 {
-    return tr_bitfieldHasFast( &cp->blockBitfield, block );
+    return tr_bitsetHas( &cp->blockBitset, i );
 }
 
-static inline tr_bool tr_cpBlockIsComplete( const tr_completion * cp, tr_block_index_t block )
-{
-    return tr_bitfieldHas( &cp->blockBitfield, block );
-}
+void tr_cpBlockAdd( tr_completion * cp, tr_block_index_t i );
 
-void      tr_cpBlockAdd( tr_completion * completion,
-                         tr_block_index_t block );
-
-tr_bool   tr_cpBlockBitfieldSet( tr_completion      * completion,
-                                 struct tr_bitfield * blocks );
-
-void      tr_cpSetHaveAll( tr_completion * completion );
+tr_bool tr_cpBlockBitsetInit( tr_completion * cp, const tr_bitset * blocks );
 
 /***
 ****
 ***/
 
-static inline const struct tr_bitfield * tr_cpPieceBitfield( const tr_completion * cp ) {
-    return &cp->pieceBitfield;
+static inline const tr_bitset *
+tr_cpBlockBitset( const tr_completion * cp )
+{
+    return &cp->blockBitset;
 }
 
-static inline const struct tr_bitfield * tr_cpBlockBitfield( const tr_completion * cp ) {
-    assert( cp );
-    assert( cp->blockBitfield.bits );
-    assert( cp->blockBitfield.bitCount );
-    return &cp->blockBitfield;
-}
+tr_bitfield * tr_cpCreatePieceBitfield( const tr_completion * cp );
 
 #endif

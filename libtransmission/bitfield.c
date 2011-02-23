@@ -16,6 +16,9 @@
 #include "transmission.h"
 #include "bitfield.h"
 #include "bitset.h"
+#include "utils.h" /* tr_new0() */
+
+const tr_bitfield TR_BITFIELD_INIT = { NULL, 0, 0 };
 
 tr_bitfield*
 tr_bitfieldConstruct( tr_bitfield * b, size_t bitCount )
@@ -35,14 +38,15 @@ tr_bitfieldDestruct( tr_bitfield * b )
 }
 
 tr_bitfield*
-tr_bitfieldDup( const tr_bitfield * in )
+tr_bitfieldNew( size_t bitCount )
 {
-    tr_bitfield * ret = tr_new0( tr_bitfield, 1 );
+    return tr_bitfieldConstruct( tr_new( tr_bitfield, 1 ), bitCount );
+}
 
-    ret->bitCount = in->bitCount;
-    ret->byteCount = in->byteCount;
-    ret->bits = tr_memdup( in->bits, in->byteCount );
-    return ret;
+void
+tr_bitfieldFree( tr_bitfield * b )
+{
+    tr_free( tr_bitfieldDestruct( b ) );
 }
 
 void
@@ -161,21 +165,31 @@ tr_bitfieldOr( tr_bitfield * a, const tr_bitfield * b )
     return a;
 }
 
+static const int trueBitCount[256] =
+{
+    0, 1, 1, 2, 1, 2, 2, 3, 1, 2, 2, 3, 2, 3, 3, 4,
+    1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3, 4, 3, 4, 4, 5,
+    1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3, 4, 3, 4, 4, 5,
+    2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6,
+    1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3, 4, 3, 4, 4, 5,
+    2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6,
+    2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6,
+    3, 4, 4, 5, 4, 5, 5, 6, 4, 5, 5, 6, 5, 6, 6, 7,
+    1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3, 4, 3, 4, 4, 5,
+    2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6,
+    2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6,
+    3, 4, 4, 5, 4, 5, 5, 6, 4, 5, 5, 6, 5, 6, 6, 7,
+    2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6,
+    3, 4, 4, 5, 4, 5, 5, 6, 4, 5, 5, 6, 5, 6, 6, 7,
+    3, 4, 4, 5, 4, 5, 5, 6, 4, 5, 5, 6, 5, 6, 6, 7,
+    4, 5, 5, 6, 5, 6, 6, 7, 5, 6, 6, 7, 6, 7, 7, 8
+};
+
 size_t
 tr_bitfieldCountTrueBits( const tr_bitfield* b )
 {
     size_t           ret = 0;
     const uint8_t *  it, *end;
-    static const int trueBitCount[256] = {
-        0, 1, 1, 2, 1, 2, 2, 3, 1, 2, 2, 3, 2, 3, 3, 4, 1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3, 4, 3, 4, 4, 5,
-        1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3, 4, 3, 4, 4, 5, 2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6,
-        1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3, 4, 3, 4, 4, 5, 2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6,
-        2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6, 3, 4, 4, 5, 4, 5, 5, 6, 4, 5, 5, 6, 5, 6, 6, 7,
-        1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3, 4, 3, 4, 4, 5, 2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6,
-        2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6, 3, 4, 4, 5, 4, 5, 5, 6, 4, 5, 5, 6, 5, 6, 6, 7,
-        2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6, 3, 4, 4, 5, 4, 5, 5, 6, 4, 5, 5, 6, 5, 6, 6, 7,
-        3, 4, 4, 5, 4, 5, 5, 6, 4, 5, 5, 6, 5, 6, 6, 7, 4, 5, 5, 6, 5, 6, 6, 7, 5, 6, 6, 7, 6, 7, 7, 8
-    };
 
     if( !b )
         return 0;
@@ -183,5 +197,56 @@ tr_bitfieldCountTrueBits( const tr_bitfield* b )
     for( it = b->bits, end = it + b->byteCount; it != end; ++it )
         ret += trueBitCount[*it];
 
+    return ret;
+}
+
+size_t
+tr_bitfieldCountRange( const tr_bitfield * b, size_t begin, size_t end )
+{
+    size_t ret = 0;
+    const int first_byte = begin >> 3u; 
+    const int last_byte = ( end - 1 ) >> 3u;
+
+    assert( begin < end );
+
+    if( first_byte == last_byte )
+    {
+        int i;
+        uint8_t val = b->bits[first_byte];
+
+        i = begin - (first_byte * 8);
+        val <<= i;
+        val >>= i;
+        i = (last_byte+1)*8 - end;
+        val >>= i;
+        val <<= i;
+
+        ret += trueBitCount[val];
+    }
+    else
+    {
+        int i;
+        uint8_t val;
+
+        /* first byte */
+        i = begin - (first_byte * 8);
+        val = b->bits[first_byte];
+        val <<= i;
+        val >>= i;
+        ret += trueBitCount[val];
+
+        /* middle bytes */
+        for( i=first_byte+1; i<last_byte; ++i )
+            ret += trueBitCount[b->bits[i]];
+
+        /* last byte */
+        i = (last_byte+1)*8 - end;
+        val = b->bits[last_byte];
+        val >>= i;
+        val <<= i;
+        ret += trueBitCount[val];
+    }
+
+    assert( ret <= ( begin - end ) );
     return ret;
 }

@@ -16,6 +16,7 @@
 
 #include "transmission.h"
 #include "bencode.h"
+#include "bitset.h"
 #include "completion.h"
 #include "metainfo.h" /* tr_metainfoGetBasename() */
 #include "peer-mgr.h" /* pex */
@@ -65,6 +66,7 @@
 #define KEY_PROGRESS_CHECKTIME "time-checked"
 #define KEY_PROGRESS_MTIMES    "mtimes"
 #define KEY_PROGRESS_BITFIELD  "bitfield"
+#define KEY_PROGRESS_BLOCKS    "blocks"
 #define KEY_PROGRESS_HAVE      "have"
 
 enum
@@ -407,12 +409,11 @@ loadIdleLimits( tr_benc *    dict,
 ***/
 
 static void
-saveProgress( tr_benc * dict, const tr_torrent * tor )
+saveProgress( tr_benc * dict, tr_torrent * tor )
 {
     tr_benc * l;
     tr_benc * prog;
     tr_file_index_t fi;
-    const struct tr_bitfield * bitfield;
     const tr_info * inf = tr_torrentInfo( tor );
     const time_t now = tr_time( );
 
@@ -467,10 +468,9 @@ saveProgress( tr_benc * dict, const tr_torrent * tor )
     if( tor->completeness == TR_SEED )
         tr_bencDictAddStr( prog, KEY_PROGRESS_HAVE, "all" );
 
-    /* add the pieces bitfield */
-    bitfield = tr_cpBlockBitfield( &tor->completion );
-    tr_bencDictAddRaw( prog, KEY_PROGRESS_BITFIELD, bitfield->bits,
-                                                    bitfield->byteCount );
+    /* add the blocks bitfield */
+    tr_bitsetToBenc( tr_cpBlockBitset( &tor->completion ),
+                     tr_bencDictAdd( prog, KEY_PROGRESS_BLOCKS ) );
 }
 
 static uint64_t
@@ -491,6 +491,8 @@ loadProgress( tr_benc * dict, tr_torrent * tor )
         const uint8_t * raw;
         size_t rawlen;
         tr_benc * l;
+        tr_benc * b;
+        struct tr_bitset bitset = TR_BITSET_INIT;
 
         if( tr_bencDictFindList( prog, KEY_PROGRESS_CHECKTIME, &l ) )
         {
@@ -565,24 +567,29 @@ loadProgress( tr_benc * dict, tr_torrent * tor )
         }
 
         err = NULL;
-        if( tr_bencDictFindStr( prog, KEY_PROGRESS_HAVE, &str ) )
+
+        if(( b = tr_bencDictFind( prog, KEY_PROGRESS_BLOCKS )))
+        {
+            if( !tr_bitsetFromBenc( &bitset, b ) )
+                err = "Invalid value for PIECES";
+        }
+        else if( tr_bencDictFindStr( prog, KEY_PROGRESS_HAVE, &str ) )
         {
             if( !strcmp( str, "all" ) )
-                tr_cpSetHaveAll( &tor->completion );
+                tr_bitsetSetHaveAll( &bitset );
             else
                 err = "Invalid value for HAVE";
         }
         else if( tr_bencDictFindRaw( prog, KEY_PROGRESS_BITFIELD, &raw, &rawlen ) )
         {
-            tr_bitfield tmp;
-            tmp.byteCount = rawlen;
-            tmp.bitCount = tmp.byteCount * 8;
-            tmp.bits = (uint8_t*) raw;
-            if( !tr_cpBlockBitfieldSet( &tor->completion, &tmp ) )
-                err = "Error loading bitfield";
+            bitset.bitfield.bits = (void*) raw;
+            bitset.bitfield.byteCount = rawlen;
+            bitset.bitfield.bitCount = rawlen * 8;
         }
-        else err = "Couldn't find 'have' or 'bitfield'";
+        else err = "Couldn't find 'pieces' or 'have' or 'bitfield'";
 
+        if( !err && !tr_cpBlockBitsetInit( &tor->completion, &bitset ) )
+            err = "Error loading bitfield";
         if( err != NULL )
             tr_tordbg( tor, "Torrent needs to be verified - %s", err );
 

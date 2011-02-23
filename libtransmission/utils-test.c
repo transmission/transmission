@@ -46,6 +46,44 @@ static int test = 0;
 #endif
 
 static int
+test_bitfield_count_range( void )
+{
+    int i;
+    int n;
+    int begin;
+    int end;
+    int count1;
+    int count2;
+    const int bitCount = 100 + tr_cryptoWeakRandInt( 1000 );
+    tr_bitfield * bf;
+
+    /* generate a random bitfield */
+    bf = tr_bitfieldNew( bitCount );
+    for( i=0, n=tr_cryptoWeakRandInt(bitCount); i<n; ++i )
+        tr_bitfieldAdd( bf, tr_cryptoWeakRandInt(bitCount) );
+
+    begin = tr_cryptoWeakRandInt( bitCount );
+    do {
+        end = tr_cryptoWeakRandInt( bitCount );
+    } while( end == begin );
+    if( end < begin ) {
+        const int tmp = begin;
+        begin = end;
+        end = tmp;
+    }
+
+    count1 = 0;
+    for( i=begin; i<end; ++i )
+        if( tr_bitfieldHas( bf, i ) )
+            ++count1;
+    count2 = tr_bitfieldCountRange( bf, begin, end );
+    check( count1 == count2 );
+
+    tr_bitfieldFree( bf );
+    return 0;
+}
+
+static int
 test_bitfields( void )
 {
     unsigned int  i;
@@ -406,6 +444,15 @@ test_truncd( void )
     return 0;
 }
 
+struct blah
+{
+    uint8_t  hash[SHA_DIGEST_LENGTH];  /* pieces hash */
+    int8_t   priority;                 /* TR_PRI_HIGH, _NORMAL, or _LOW */
+    int8_t   dnd;                      /* "do not download" flag */
+    time_t   timeChecked;              /* the last time we tested this piece */
+};
+
+
 int
 main( void )
 {
@@ -413,6 +460,12 @@ main( void )
     int   len;
     int   i;
     int   l;
+
+fprintf( stderr, "sizeof time_t %zu\n", sizeof(time_t));
+fprintf( stderr, "sizeof char[20] %zu\n", (size_t)20);
+fprintf( stderr, "sizeof uint8_t %zu\n", sizeof(uint8_t));
+fprintf( stderr, "sizeof blah %zu\n", sizeof(struct blah));
+return 0;
 
     /* base64 */
     out = tr_base64_encode( "YOYO!", -1, &len );
@@ -463,6 +516,11 @@ main( void )
     /* simple bitfield tests */
     for( l = 0; l < NUM_LOOPS; ++l )
         if( ( i = test_bitfields( ) ) )
+            return i;
+
+    /* bitfield count range */
+    for( l=0; l<1000000; ++l )
+        if(( i = test_bitfield_count_range( )))
             return i;
 
     return 0;

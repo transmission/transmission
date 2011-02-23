@@ -389,11 +389,11 @@ tr_cachePrefetchBlock( tr_cache         * cache,
 ***/
 
 static int
-findPiece( tr_cache * cache, tr_torrent * torrent, tr_piece_index_t piece )
+findBlockPos( tr_cache * cache, tr_torrent * torrent, tr_piece_index_t block )
 {
     struct cache_block key;
     key.tor = torrent;
-    key.block = tr_torPieceFirstBlock( torrent, piece );
+    key.block = block;
     return tr_ptrArrayLowerBound( &cache->blocks, &key, cache_block_compare, NULL );
 }
 
@@ -419,19 +419,20 @@ int tr_cacheFlushDone( tr_cache * cache )
 int
 tr_cacheFlushFile( tr_cache * cache, tr_torrent * torrent, tr_file_index_t i )
 {
+    int pos;
     int err = 0;
-    const tr_file * file = &torrent->info.files[i];
-    const tr_block_index_t begin = tr_torPieceFirstBlock( torrent, file->firstPiece );
-    const tr_block_index_t end  = tr_torPieceFirstBlock( torrent, file->lastPiece ) + tr_torPieceCountBlocks( torrent, file->lastPiece );
-    const int pos = findPiece( cache, torrent, file->firstPiece );
-    dbgmsg( "flushing file %d from cache to disk: blocks [%zu...%zu)", (int)i, (size_t)begin, (size_t)end );
+    tr_block_index_t first;
+    tr_block_index_t last;
+    tr_torGetFileBlockRange( torrent, i, &first, &last );
+    pos = findBlockPos( cache, torrent, first );
+    dbgmsg( "flushing file %d from cache to disk: blocks [%zu...%zu]", (int)i, (size_t)first, (size_t)last );
 
     /* flush out all the blocks in that file */
     while( !err && ( pos < tr_ptrArraySize( &cache->blocks ) ) )
     {
         const struct cache_block * b = tr_ptrArrayNth( &cache->blocks, pos );
         if( b->tor != torrent ) break;
-        if( ( b->block < begin ) || ( b->block >= end ) ) break;
+        if( ( b->block < first ) || ( b->block > last ) ) break;
         err = flushContiguous( cache, pos, getBlockRun( cache, pos, NULL ) );
     }
 
@@ -442,7 +443,7 @@ int
 tr_cacheFlushTorrent( tr_cache * cache, tr_torrent * torrent )
 {
     int err = 0;
-    const int pos = findPiece( cache, torrent, 0 );
+    const int pos = findBlockPos( cache, torrent, 0 );
 
     /* flush out all the blocks in that torrent */
     while( !err && ( pos < tr_ptrArraySize( &cache->blocks ) ) )
