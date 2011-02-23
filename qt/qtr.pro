@@ -31,7 +31,8 @@ win32:LIBS += -lidn -liconv -lwldap32 -liphlpapi
 TRANSLATIONS += translations/transmission_en.ts \
                 translations/transmission_es.ts \
                 translations/transmission_pt_BR.ts \
-                translations/transmission_ru.ts
+                translations/transmission_ru.ts \
+                translations/transmission_kk.ts
 
 FORMS += mainwin.ui
 RESOURCES += application.qrc
