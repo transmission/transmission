@@ -12,9 +12,6 @@
 		</object>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
-			<integer value="1603"/>
-			<integer value="29"/>
-			<integer value="1480"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -6814,7 +6811,7 @@ PSA4MTkyCkREQ191c2VTcGVjaWFsRmVhdHVyZXMgPSA4MTkyCgAAAA</bytes>
 								</object>
 								<object class="NSMenuItem" id="416556752">
 									<reference key="NSMenu" ref="335948734"/>
-									<string key="NSTitle">Возобновить выбранное</string>
+									<string key="NSTitle">Возобновить выбранные</string>
 									<string key="NSKeyEquiv">/</string>
 									<int key="NSKeyEquivModMask">1048576</int>
 									<int key="NSMnemonicLoc">2147483647</int>
@@ -6914,7 +6911,7 @@ PSA4MTkyCkREQ191c2VTcGVjaWFsRmVhdHVyZXMgPSA4MTkyCgAAAA</bytes>
 								</object>
 								<object class="NSMenuItem" id="522160989">
 									<reference key="NSMenu" ref="335948734"/>
-									<string key="NSTitle">Возобновить выбранное немедленно</string>
+									<string key="NSTitle">Возобновить выбранные немедленно</string>
 									<string key="NSKeyEquiv"/>
 									<int key="NSKeyEquivModMask">1048576</int>
 									<int key="NSMnemonicLoc">2147483647</int>
@@ -7216,7 +7213,7 @@ PSA4MTkyCkREQ191c2VTcGVjaWFsRmVhdHVyZXMgPSA4MTkyCgAAAA</bytes>
 					<bool key="EncodedWithXMLCoder">YES</bool>
 					<object class="NSMenuItem" id="765094731">
 						<reference key="NSMenu" ref="434296936"/>
-						<string key="NSTitle">Приостановить выбранное</string>
+						<string key="NSTitle">Приостановить выбранные</string>
 						<string key="NSKeyEquiv"/>
 						<int key="NSKeyEquivModMask">1048576</int>
 						<int key="NSMnemonicLoc">2147483647</int>
@@ -7226,7 +7223,7 @@ PSA4MTkyCkREQ191c2VTcGVjaWFsRmVhdHVyZXMgPSA4MTkyCgAAAA</bytes>
 					</object>
 					<object class="NSMenuItem" id="941182211">
 						<reference key="NSMenu" ref="434296936"/>
-						<string key="NSTitle">Возобновить выбранное</string>
+						<string key="NSTitle">Возобновить выбранные</string>
 						<string key="NSKeyEquiv"/>
 						<int key="NSKeyEquivModMask">1048576</int>
 						<int key="NSMnemonicLoc">2147483647</int>
@@ -7514,7 +7511,7 @@ PSA4MTkyCkREQ191c2VTcGVjaWFsRmVhdHVyZXMgPSA4MTkyCgAAAA</bytes>
 				<string key="NSName"/>
 			</object>
 			<object class="NSCustomView" id="492482618">
-				<reference key="NSNextResponder"/>
+				<nil key="NSNextResponder"/>
 				<int key="NSvFlags">266</int>
 				<object class="NSMutableArray" key="NSSubviews">
 					<bool key="EncodedWithXMLCoder">YES</bool>
@@ -7682,12 +7679,11 @@ PSA4MTkyCkREQ191c2VTcGVjaWFsRmVhdHVyZXMgPSA4MTkyCgAAAA</bytes>
 					</object>
 				</object>
 				<string key="NSFrameSize">{400, 21}</string>
-				<reference key="NSSuperview"/>
 				<string key="NSClassName">StatusBarView</string>
 				<string key="NSExtension">NSView</string>
 			</object>
 			<object class="NSCustomView" id="793806362">
-				<reference key="NSNextResponder"/>
+				<nil key="NSNextResponder"/>
 				<int key="NSvFlags">266</int>
 				<object class="NSMutableArray" key="NSSubviews">
 					<bool key="EncodedWithXMLCoder">YES</bool>
@@ -7958,7 +7954,6 @@ PSA4MTkyCkREQ191c2VTcGVjaWFsRmVhdHVyZXMgPSA4MTkyCgAAAA</bytes>
 					</object>
 				</object>
 				<string key="NSFrameSize">{563, 23}</string>
-				<reference key="NSSuperview"/>
 				<string key="NSClassName">FilterBarView</string>
 				<string key="NSExtension">NSView</string>
 			</object>
