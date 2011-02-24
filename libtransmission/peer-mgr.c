@@ -603,17 +603,23 @@ atomSetSeedProbability( struct peer_atom * atom, int seedProbability )
         atom->flags &= ~ADDED_F_SEED_FLAG;
 }
 
-static void
-atomSetSeed( struct peer_atom * atom )
-{
-    atomSetSeedProbability( atom, 100 );
-}
-
 static inline tr_bool
 atomIsSeed( const struct peer_atom * atom )
 {
     return atom->seedProbability == 100;
 }
+
+static void
+atomSetSeed( Torrent * t, struct peer_atom * atom )
+{
+    if( !atomIsSeed( atom ) )
+    {
+        tordbg( t, "marking peer %s as a seed", tr_atomAddrStr( atom ) );
+
+        atomSetSeedProbability( atom, 100 );
+    }
+}
+
 
 tr_bool
 tr_peerMgrPeerIsSeed( const tr_torrent  * tor,
@@ -1413,19 +1419,6 @@ peerCallbackFunc( tr_peer * peer, const tr_peer_event * e, void * vt )
             break;
         }
 
-        case TR_PEER_PEER_PROGRESS:
-        {
-            if( peer )
-            {
-                struct peer_atom * atom = peer->atom;
-                if( e->progress >= 1.0 ) {
-                    tordbg( t, "marking peer %s as a seed", tr_atomAddrStr( atom ) );
-                    atomSetSeed( atom );
-                }
-            }
-            break;
-        }
-
         case TR_PEER_CLIENT_GOT_BLOCK:
         {
             tr_torrent * tor = t->tor;
@@ -1585,7 +1578,7 @@ ensureAtomExists( Torrent           * t,
     {
         if( from < a->fromBest )
             a->fromBest = from;
-        
+
         if( a->seedProbability == -1 )
             atomSetSeedProbability( a, seedProbability );
 
@@ -1794,7 +1787,7 @@ tr_peerMgrMarkAllAsSeeds( tr_torrent * tor )
     struct peer_atom ** end = it + n;
 
     while( it != end )
-        atomSetSeed( *it++ );
+        atomSetSeed( t, *it++ );
 }
 
 tr_pex *
@@ -2121,6 +2114,46 @@ tr_peerMgrRemoveTorrent( tr_torrent * tor )
 
     stopTorrent( tor->torrentPeers );
     torrentDestructor( tor->torrentPeers );
+}
+
+void
+tr_peerUpdateProgress( tr_torrent * tor, tr_peer * peer )
+{
+    const tr_bitset * have = &peer->have;
+
+    if( have->haveAll )
+    {
+        peer->progress = 1.0;
+    }
+    else if( have->haveNone )
+    {
+        peer->progress = 0.0;
+    }
+    else
+    {
+        const float trueCount = tr_bitfieldCountTrueBits( &have->bitfield );
+
+        if( tr_torrentHasMetadata( tor ) )
+            peer->progress = trueCount / tor->info.pieceCount;
+        else /* without pieceCount, this result is only a best guess... */
+            peer->progress = trueCount / ( have->bitfield.bitCount + 1 );
+    }
+
+    if( peer->progress >= 1.0 )
+        atomSetSeed( tor->torrentPeers, peer->atom );
+}
+
+void
+tr_peerMgrOnTorrentGotMetainfo( tr_torrent * tor )
+{
+    int i;
+    const int peerCount = tr_ptrArraySize( &tor->torrentPeers->peers );
+    tr_peer ** peers = (tr_peer**) tr_ptrArrayBase( &tor->torrentPeers->peers );
+
+    /* some peer_msgs' progress fields may not be accurate if we
+       didn't have the metadata before now... so refresh them all... */
+    for( i=0; i<peerCount; ++i )
+        tr_peerUpdateProgress( tor, peers[i] );
 }
 
 void

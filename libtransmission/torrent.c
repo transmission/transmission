@@ -744,6 +744,8 @@ tr_torrentGotNewInfoDict( tr_torrent * tor )
 {
     torrentInitFromInfo( tor );
 
+    tr_peerMgrOnTorrentGotMetainfo( tor );
+
     tr_torrentFireMetadataCompleted( tor );
 }
 

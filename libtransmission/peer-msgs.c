@@ -451,7 +451,7 @@ protocolSendHaveNone( tr_peermsgs * msgs )
 ***  EVENTS
 **/
 
-static const tr_peer_event blankEvent = { 0, 0, 0, 0, 0.0f, 0, 0, 0 };
+static const tr_peer_event blankEvent = { 0, 0, 0, 0, 0, 0, 0 };
 
 static void
 publish( tr_peermsgs * msgs, tr_peer_event * e )
@@ -469,15 +469,6 @@ fireError( tr_peermsgs * msgs, int err )
     tr_peer_event e = blankEvent;
     e.eventType = TR_PEER_ERROR;
     e.err = err;
-    publish( msgs, &e );
-}
-
-static void
-firePeerProgress( tr_peermsgs * msgs )
-{
-    tr_peer_event e = blankEvent;
-    e.eventType = TR_PEER_PEER_PROGRESS;
-    e.progress = msgs->peer->progress;
     publish( msgs, &e );
 }
 
@@ -1184,11 +1175,10 @@ readBtId( tr_peermsgs * msgs, struct evbuffer  * inbuf, size_t inlen )
 static void
 updatePeerProgress( tr_peermsgs * msgs )
 {
-    msgs->peer->progress = tr_bitsetPercent( &msgs->peer->have );
-    dbgmsg( msgs, "peer progress is %f", msgs->peer->progress );
+    tr_peerUpdateProgress( msgs->torrent, msgs->peer );
+
     updateFastSet( msgs );
     updateInterest( msgs );
-    firePeerProgress( msgs );
 }
 
 static void

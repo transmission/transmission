@@ -77,7 +77,7 @@ webseed_free( struct tr_webseed * w )
 ****
 ***/
 
-static const tr_peer_event blank_event = { 0, 0, 0, 0, 0.0f, 0, 0, 0 };
+static const tr_peer_event blank_event = { 0, 0, 0, 0, 0, 0, 0 };
 
 static void
 publish( tr_webseed * w, tr_peer_event * e )

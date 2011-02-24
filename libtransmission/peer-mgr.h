@@ -222,6 +222,8 @@ void tr_peerMgrTorrentAvailability( const tr_torrent * tor,
 
 struct tr_bitfield* tr_peerMgrGetAvailable( const tr_torrent * tor );
 
+void tr_peerMgrOnTorrentGotMetainfo( tr_torrent * tor );
+
 void tr_peerMgrOnBlocklistChanged( tr_peerMgr * manager );
 
 void tr_peerMgrTorrentStats( tr_torrent * tor,
