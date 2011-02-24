@@ -461,12 +461,6 @@ main( void )
     int   i;
     int   l;
 
-fprintf( stderr, "sizeof time_t %zu\n", sizeof(time_t));
-fprintf( stderr, "sizeof char[20] %zu\n", (size_t)20);
-fprintf( stderr, "sizeof uint8_t %zu\n", sizeof(uint8_t));
-fprintf( stderr, "sizeof blah %zu\n", sizeof(struct blah));
-return 0;
-
     /* base64 */
     out = tr_base64_encode( "YOYO!", -1, &len );
     check( out );
