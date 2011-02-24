@@ -554,6 +554,13 @@ main( int argc, char ** argv )
         pumpLogMessages( logfile );
     }
 
+    printf( "Closing transmission session..." );
+    tr_sessionSaveSettings( mySession, configDir, &settings );
+    dtr_watchdir_free( watchdir );
+    tr_sessionClose( mySession );
+    pumpLogMessages( logfile );
+    printf( " done.\n" );
+
     /* shutdown */
 #if HAVE_SYSLOG
     if( !foreground )
@@ -562,12 +569,6 @@ main( int argc, char ** argv )
         closelog( );
     }
 #endif
-
-    printf( "Closing transmission session..." );
-    tr_sessionSaveSettings( mySession, configDir, &settings );
-    dtr_watchdir_free( watchdir );
-    tr_sessionClose( mySession );
-    printf( " done.\n" );
 
     /* cleanup */
     if( pidfile_created )
