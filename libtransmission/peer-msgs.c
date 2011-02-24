@@ -456,15 +456,6 @@ fireError( tr_peermsgs * msgs, int err )
 }
 
 static void
-firePeerProgress( tr_peermsgs * msgs )
-{
-    tr_peer_event e = TR_PEER_EVENT_INIT;
-    e.eventType = TR_PEER_PEER_PROGRESS;
-    e.progress = msgs->peer->progress;
-    publish( msgs, &e );
-}
-
-static void
 fireGotBlock( tr_peermsgs * msgs, const struct peer_request * req )
 {
     tr_peer_event e = TR_PEER_EVENT_INIT;
@@ -1208,11 +1199,10 @@ readBtId( tr_peermsgs * msgs, struct evbuffer  * inbuf, size_t inlen )
 static void
 updatePeerProgress( tr_peermsgs * msgs )
 {
-    msgs->peer->progress = tr_bitsetPercent( &msgs->peer->have );
-    dbgmsg( msgs, "peer progress is %f", msgs->peer->progress );
+    tr_peerUpdateProgress( msgs->torrent, msgs->peer );
+
     updateFastSet( msgs );
     updateInterest( msgs );
-    firePeerProgress( msgs );
 }
 
 static void
