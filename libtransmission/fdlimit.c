@@ -793,7 +793,7 @@ tr_fdSetPeerLimit( tr_session * session, int socket_limit )
 #endif
     gFd->public_socket_limit = socket_limit;
 
-    tr_dbg( "socket limit is %d", (int)gFd->socket_limit );
+    tr_dbg( "socket limit is %d", gFd->socket_limit );
 }
 
 int

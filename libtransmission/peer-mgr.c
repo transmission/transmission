@@ -809,10 +809,10 @@ comparePieceByWeight( const void * va, const void * vb )
     /* primary key: weight */
     missing = tr_cpMissingBlocksInPiece( &tor->completion, a->index );
     pending = a->requestCount;
-    ia = missing > pending ? missing - pending : (int)(tor->blockCountInPiece + pending);
+    ia = missing > pending ? missing - pending : (tor->blockCountInPiece + pending);
     missing = tr_cpMissingBlocksInPiece( &tor->completion, b->index );
     pending = b->requestCount;
-    ib = missing > pending ? missing - pending : (int)(tor->blockCountInPiece + pending);
+    ib = missing > pending ? missing - pending : (tor->blockCountInPiece + pending);
     if( ia < ib ) return -1;
     if( ia > ib ) return 1;
 
