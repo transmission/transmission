@@ -204,7 +204,7 @@ tr_bitsetOr( tr_bitfield * a, const tr_bitset * b )
 ***/
 
 tr_bool
-tr_bitsetFromBenc( tr_bitset * bitset, tr_benc * benc )
+tr_bitsetFromBenc( tr_bitset * b, tr_benc * benc )
 {
     size_t buflen;
     const uint8_t * buf;
@@ -214,22 +214,22 @@ tr_bitsetFromBenc( tr_bitset * bitset, tr_benc * benc )
     {
         if( ( buflen == 3 ) && !memcmp( buf, "all", 3 ) )
         {
-            tr_bitsetSetHaveAll( bitset );
+            tr_bitsetSetHaveAll( b );
             handled = TRUE;
         }
         else if( ( buflen == 4 ) && !memcmp( buf, "none", 4 ) )
         {
-            tr_bitsetSetHaveNone( bitset );
+            tr_bitsetSetHaveNone( b );
             handled = TRUE;
         }
         else
         {
-            bitset->haveAll = FALSE;
-            bitset->haveNone = FALSE;
-            tr_free( bitset->bitfield.bits );
-            bitset->bitfield.bits = tr_memdup( buf, buflen );
-            bitset->bitfield.byteCount = buflen;
-            bitset->bitfield.bitCount = buflen * 8;
+            b->haveAll = FALSE;
+            b->haveNone = FALSE;
+            tr_free( b->bitfield.bits );
+            b->bitfield.bits = tr_memdup( buf, buflen );
+            b->bitfield.byteCount = buflen;
+            b->bitfield.bitCount = buflen * 8;
             handled = TRUE;
         }
     }
@@ -238,19 +238,19 @@ tr_bitsetFromBenc( tr_bitset * bitset, tr_benc * benc )
 }
 
 void
-tr_bitsetToBenc( const tr_bitset * bitset, tr_benc * benc )
+tr_bitsetToBenc( const tr_bitset * b, tr_benc * benc )
 {
-    if( bitset->haveAll )
+    if( b->haveAll )
     {
         tr_bencInitStr( benc, "all", 3 );
     }
-    else if( bitset->haveNone )
+    else if( b->haveNone )
     {
         tr_bencInitStr( benc, "none", 4 );
     }
     else
     {
-        const tr_bitfield * bf = &bitset->bitfield;
+        const tr_bitfield * bf = &b->bitfield;
         const size_t n = tr_bitfieldCountTrueBits( bf );
 
         if( n == bf->bitCount )
