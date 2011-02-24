@@ -159,6 +159,28 @@ tr_bitsetCountRange( const tr_bitset * b, const size_t begin, const size_t end )
     return tr_bitfieldCountRange( &b->bitfield, begin, end );
 }
 
+/* return true if "b" is equal to, or a superset of, "set" */
+tr_bool
+tr_bitsetHasSet( const tr_bitset * b, const tr_bitset * set )
+{
+    const uint8_t * bit = b->bitfield.bits;
+    const uint8_t * bend = bit + b->bitfield.byteCount;
+    const uint8_t * sit = set->bitfield.bits;
+    const uint8_t * send = sit + set->bitfield.byteCount;
+    
+    if( b->haveAll || set->haveAll )
+        return b->haveAll;
+
+    if( b->haveNone || set->haveNone )
+        return set->haveNone;
+
+    for( ; bit!=bend && sit!=send; ++bit, ++sit )
+        if( ( *bit & *sit ) != *sit )
+            return FALSE;
+
+    return TRUE;
+}
+
 double
 tr_bitsetPercent( const tr_bitset * b )
 {

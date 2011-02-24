@@ -54,6 +54,7 @@ void tr_bitsetToBenc( const tr_bitset * bitset, struct tr_benc * benc );
 double tr_bitsetPercent( const tr_bitset * b );
 
 tr_bool tr_bitsetHas( const tr_bitset * b, const size_t nth );
+tr_bool tr_bitsetHasSet( const tr_bitset * b, const tr_bitset * compare );
 size_t tr_bitsetCountRange( const tr_bitset * b, const size_t begin, const size_t end );
 
 void tr_bitsetOr( tr_bitfield * a, const tr_bitset * b );
