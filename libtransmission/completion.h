@@ -25,6 +25,7 @@
 typedef struct tr_completion
 {
     tr_bool  sizeWhenDoneIsDirty;
+    tr_bool  blocksWantedIsDirty;
     tr_bool  haveValidIsDirty;
 
     tr_torrent *    tor;
@@ -37,6 +38,16 @@ typedef struct tr_completion
 
     /* a block is complete if and only if we have it */
     uint16_t *  completeBlocks;
+
+    /* total number of blocks that we want downloaded
+       DON'T access this directly; it's a lazy field.
+       Used by tr_cpBlocksMissing(). */
+    tr_block_index_t    blocksWantedLazy;
+
+    /* total number of completed blocks that we want downloaded
+       DON'T access this directly; it's a lazy field.
+       Used by tr_cpBlocksMissing(). */
+    tr_block_index_t    blocksWantedCompleteLazy;
 
     /* number of bytes we'll have when done downloading. [0..info.totalSize]
        DON'T access this directly; it's a lazy field.
@@ -68,6 +79,8 @@ tr_completion * tr_cpDestruct( tr_completion * );
 tr_completeness            tr_cpGetStatus( const tr_completion * );
 
 uint64_t                   tr_cpHaveValid( const tr_completion * );
+
+tr_block_index_t           tr_cpBlocksMissing( const tr_completion * );
 
 uint64_t                   tr_cpSizeWhenDone( const tr_completion * );
 
