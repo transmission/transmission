@@ -11,7 +11,7 @@
  */
 
 #include <stdio.h>
-#include <stdlib.h> /* free() */
+#include <stdlib.h> /* qsort(), free() */
 #include <string.h>
 
 #ifdef WIN32
@@ -46,7 +46,7 @@
 ****  PRIVATE
 ***/
 
-struct tr_ip_range
+struct tr_ipv4_range
 {
     uint32_t    begin;
     uint32_t    end;
@@ -54,12 +54,12 @@ struct tr_ip_range
 
 struct tr_blocklist
 {
-    tr_bool               isEnabled;
-    int                   fd;
-    size_t                ruleCount;
-    size_t                byteCount;
-    char *                filename;
-    struct tr_ip_range *  rules;
+    tr_bool                isEnabled;
+    int                    fd;
+    size_t                 ruleCount;
+    size_t                 byteCount;
+    char *                 filename;
+    struct tr_ipv4_range * rules;
 };
 
 static void
@@ -107,7 +107,7 @@ blocklistLoad( tr_blocklist * b )
 
     b->fd = fd;
     b->byteCount = byteCount;
-    b->ruleCount = byteCount / sizeof( struct tr_ip_range );
+    b->ruleCount = byteCount / sizeof( struct tr_ipv4_range );
 
     {
         char * base = tr_basename( b->filename );
@@ -127,8 +127,8 @@ static int
 compareAddressToRange( const void * va,
                        const void * vb )
 {
-    const uint32_t *           a = va;
-    const struct tr_ip_range * b = vb;
+    const uint32_t *             a = va;
+    const struct tr_ipv4_range * b = vb;
 
     if( *a < b->begin ) return -1;
     if( *a > b->end ) return 1;
@@ -206,8 +206,8 @@ int
 _tr_blocklistHasAddress( tr_blocklist     * b,
                          const tr_address * addr )
 {
-    uint32_t                   needle;
-    const struct tr_ip_range * range;
+    uint32_t                     needle;
+    const struct tr_ipv4_range * range;
 
     assert( tr_isAddress( addr ) );
 
@@ -224,7 +224,7 @@ _tr_blocklistHasAddress( tr_blocklist     * b,
     range = bsearch( &needle,
                      b->rules,
                      b->ruleCount,
-                     sizeof( struct tr_ip_range ),
+                     sizeof( struct tr_ipv4_range ),
                      compareAddressToRange );
 
     return range != NULL;
@@ -236,7 +236,7 @@ _tr_blocklistHasAddress( tr_blocklist     * b,
  * http://en.wikipedia.org/wiki/PeerGuardian#P2P_plaintext_format
  */
 static tr_bool
-parseLine1( const char * line, struct tr_ip_range * range )
+parseLine1( const char * line, struct tr_ipv4_range * range )
 {
     char * walk;
     int b[4];
@@ -272,7 +272,7 @@ parseLine1( const char * line, struct tr_ip_range * range )
  * http://wiki.phoenixlabs.org/wiki/DAT_Format
  */
 static tr_bool
-parseLine2( const char * line, struct tr_ip_range * range )
+parseLine2( const char * line, struct tr_ipv4_range * range )
 {
     int unk;
     int a[4];
@@ -300,22 +300,33 @@ parseLine2( const char * line, struct tr_ip_range * range )
 }
 
 static int
-parseLine( const char * line, struct tr_ip_range * range )
+parseLine( const char * line, struct tr_ipv4_range * range )
 {
     return parseLine1( line, range )
         || parseLine2( line, range );
 }
 
+static int
+compareAddressRangesByFirstAddress( const void * va, const void * vb )
+{
+    const struct tr_ipv4_range * a = va;
+    const struct tr_ipv4_range * b = vb;
+    if( a->begin != b->begin )
+        return a->begin < b->begin ? -1 : 1;
+    return 0;
+}
+
 int
-_tr_blocklistSetContent( tr_blocklist * b,
-                         const char *   filename )
+_tr_blocklistSetContent( tr_blocklist * b, const char * filename )
 {
     FILE * in;
     FILE * out;
     int inCount = 0;
-    int outCount = 0;
     char line[2048];
     const char * err_fmt = _( "Couldn't read \"%1$s\": %2$s" );
+    struct tr_ipv4_range * ranges = NULL;
+    size_t ranges_alloc = 0;
+    size_t ranges_count = 0;
 
     if( !filename )
     {
@@ -340,10 +351,11 @@ _tr_blocklistSetContent( tr_blocklist * b,
         return 0;
     }
 
+    /* load the rules into memory */
     while( fgets( line, sizeof( line ), in ) != NULL )
     {
         char * walk;
-        struct tr_ip_range range;
+        struct tr_ipv4_range range;
 
         ++inCount;
 
@@ -358,27 +370,63 @@ _tr_blocklistSetContent( tr_blocklist * b,
             continue;
         }
 
-        if( fwrite( &range, sizeof( struct tr_ip_range ), 1, out ) != 1 )
+        if( ranges_alloc == ranges_count )
         {
-            tr_err( _( "Couldn't save file \"%1$s\": %2$s" ), b->filename,
-                   tr_strerror( errno ) );
-            break;
+            ranges_alloc += 4096; /* arbitrary */
+            ranges = tr_renew( struct tr_ipv4_range, ranges, ranges_alloc );
         }
 
-        ++outCount;
+        ranges[ranges_count++] = range;
     }
 
+    if( ranges_count > 0 ) /* sort and merge */
     {
+        struct tr_ipv4_range * r;
+        struct tr_ipv4_range * keep = ranges;
+        const struct tr_ipv4_range * end;
+
+        /* sort */
+        qsort( ranges, ranges_count, sizeof( struct tr_ipv4_range ),
+               compareAddressRangesByFirstAddress );
+
+        /* merge */
+        for( r=ranges+1, end=ranges+ranges_count; r!=end; ++r ) {
+            if( keep->end < r->begin )
+                *++keep = *r;
+            else if( keep->end < r->end )
+                keep->end = r->end;
+        }
+
+        ranges_count = keep + 1 - ranges;
+
+#ifndef NDEBUG
+        /* sanity checks: make sure the rules are sorted
+         * in ascending order and don't overlap */
+        {
+            size_t i;
+
+            for( i=0; i<ranges_count; ++i )
+                assert( ranges[i].begin <= ranges[i].end );
+
+            for( i=1; i<ranges_count; ++i )
+                assert( ranges[i-1].end < ranges[i].begin );
+        }
+#endif
+    }
+
+    if( fwrite( ranges, sizeof( struct tr_ipv4_range ), ranges_count, out ) != ranges_count )
+        tr_err( _( "Couldn't save file \"%1$s\": %2$s" ), b->filename, tr_strerror( errno ) );
+    else {
         char * base = tr_basename( b->filename );
-        tr_inf( _( "Blocklist \"%s\" updated with %d entries" ), base, outCount );
+        tr_inf( _( "Blocklist \"%s\" updated with %zu entries" ), base, ranges_count );
         tr_free( base );
     }
 
+    tr_free( ranges );
     fclose( out );
     fclose( in );
 
     blocklistLoad( b );
 
-    return outCount;
+    return ranges_count;
 }
-
