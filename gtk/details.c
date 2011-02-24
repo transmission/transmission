@@ -406,7 +406,7 @@ down_speed_spun_cb( GtkSpinButton * s, struct DetailsImpl * di )
 static void
 idle_spun_cb( GtkSpinButton * s, struct DetailsImpl * di )
 {
-    torrent_set_int( di, "seedInactiveLimit", gtk_spin_button_get_value_as_int( s ) );
+    torrent_set_int( di, "seedIdleLimit", gtk_spin_button_get_value_as_int( s ) );
 }
 
 static void
