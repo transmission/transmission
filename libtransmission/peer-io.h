@@ -278,12 +278,7 @@ tr_peerIoIsEncrypted( const tr_peerIo * io )
     return ( io != NULL ) && ( io->encryptionMode == PEER_ENCRYPTION_RC4 );
 }
 
-static inline void
-evbuffer_add_uint8( struct evbuffer * outbuf, uint8_t byte )
-{
-    evbuffer_add( outbuf, &byte, 1 );
-}
-
+void evbuffer_add_uint8 ( struct evbuffer * outbuf, uint8_t byte );
 void evbuffer_add_uint16( struct evbuffer * outbuf, uint16_t hs );
 void evbuffer_add_uint32( struct evbuffer * outbuf, uint32_t hl );
 

@@ -397,7 +397,14 @@ cached_file_open( struct tr_cached_file  * o,
      * https://bugs.launchpad.net/ubuntu/+source/transmission/+bug/318249
      */
     if( alreadyExisted && ( file_size < (uint64_t)sb.st_size ) )
-        ftruncate( o->fd, file_size );
+    {
+        if( ftruncate( o->fd, file_size ) == -1 )
+        {
+            const int err = errno;
+            tr_err( _( "Couldn't truncate \"%1$s\": %2$s" ), filename, tr_strerror( err ) );
+            return err;
+        }
+    }
 
     if( writable && !alreadyExisted && ( allocation == TR_PREALLOCATE_SPARSE ) )
         preallocate_file_sparse( o->fd, file_size );

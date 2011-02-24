@@ -774,7 +774,7 @@ evbuffer_peek_all( struct evbuffer * buf, size_t * setme_vecCount )
     struct evbuffer_iovec * iovec = tr_new0( struct evbuffer_iovec, vecCount );
     const int n = evbuffer_peek( buf, byteCount, NULL, iovec, vecCount );
     assert( n == vecCount );
-    *setme_vecCount = vecCount;
+    *setme_vecCount = n;
     return iovec;
 }
 
@@ -814,6 +814,12 @@ tr_peerIoWriteBytes( tr_peerIo * io, const void * bytes, size_t byteCount, tr_bo
 /***
 ****
 ***/
+
+void
+evbuffer_add_uint8( struct evbuffer * outbuf, uint8_t byte )
+{
+    evbuffer_add( outbuf, &byte, 1 );
+}
 
 void
 evbuffer_add_uint16( struct evbuffer * outbuf, uint16_t addme_hs )
