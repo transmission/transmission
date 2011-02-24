@@ -230,15 +230,21 @@ dht_bootstrap(void *closure)
         tr_free( bootstrap_file );
     }
 
-    /* We really don't want to abuse our bootstrap nodes.
-       Be glacially slow. */
-    if(!bootstrap_done(cl->session, 0))
-        nap(30);
-
     if(!bootstrap_done(cl->session, 0)) {
-        tr_ninf("DHT", "Attempting bootstrap from dht.transmissionbt.com");
-        bootstrap_from_name( "dht.transmissionbt.com", 6881,
-                             bootstrap_af(session) );
+        for(i = 0; i < 6; i++) {
+            /* We don't want to abuse our bootstrap nodes, so be very
+               slow.  The initial wait is to give other nodes a chance
+               to contact us before we attempt to contact a bootstrap
+               node, for example because we've just been restarted. */
+            nap(40);
+            if(bootstrap_done(cl->session, 0))
+                break;
+            if(i == 0)
+                tr_ninf("DHT",
+                        "Attempting bootstrap from dht.transmissionbt.com");
+            bootstrap_from_name( "dht.transmissionbt.com", 6881,
+                                 bootstrap_af(session) );
+        }
     }
 
     if( cl->nodes )
