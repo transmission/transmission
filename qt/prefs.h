@@ -89,7 +89,6 @@ class Prefs: public QObject
             IDLE_LIMIT_ENABLED,
             INCOMPLETE_DIR,
             INCOMPLETE_DIR_ENABLED,
-            LAZY_BITFIELD,
             MSGLEVEL,
             OPEN_FILE_LIMIT,
             PEER_LIMIT_GLOBAL,
