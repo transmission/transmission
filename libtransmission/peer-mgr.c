@@ -1607,6 +1607,9 @@ peerCallbackFunc( tr_peer * peer, const tr_peer_event * e, void * vt )
 
     torrentLock( t );
 
+    assert( peer != NULL );
+    assert( peer->atom != NULL );
+
     switch( e->eventType )
     {
         case TR_PEER_PEER_GOT_DATA:
@@ -1627,7 +1630,7 @@ peerCallbackFunc( tr_peer * peer, const tr_peer_event * e, void * vt )
                 tr_statsAddUploaded( tor->session, e->length );
 
             /* update our atom */
-            if( peer && e->wasPieceData )
+            if( e->wasPieceData )
                 peer->atom->piece_data_time = now;
 
             break;
@@ -1668,18 +1671,15 @@ peerCallbackFunc( tr_peer * peer, const tr_peer_event * e, void * vt )
             break;
 
         case TR_PEER_CLIENT_GOT_PORT:
-            if( peer )
-                peer->atom->port = e->port;
+            peer->atom->port = e->port;
             break;
 
         case TR_PEER_CLIENT_GOT_SUGGEST:
-            if( peer )
-                peerSuggestedPiece( t, peer, e->pieceIndex, FALSE );
+            peerSuggestedPiece( t, peer, e->pieceIndex, FALSE );
             break;
 
         case TR_PEER_CLIENT_GOT_ALLOWED_FAST:
-            if( peer )
-                peerSuggestedPiece( t, peer, e->pieceIndex, TRUE );
+            peerSuggestedPiece( t, peer, e->pieceIndex, TRUE );
             break;
 
         case TR_PEER_CLIENT_GOT_DATA:
@@ -1699,7 +1699,7 @@ peerCallbackFunc( tr_peer * peer, const tr_peer_event * e, void * vt )
                 tr_statsAddDownloaded( tor->session, e->length );
 
             /* update our atom */
-            if( peer && peer->atom && e->wasPieceData )
+            if( e->wasPieceData )
                 peer->atom->piece_data_time = now;
 
             break;
@@ -1730,8 +1730,7 @@ peerCallbackFunc( tr_peer * peer, const tr_peer_event * e, void * vt )
 
             tr_ptrArrayDestruct( &peerArr, FALSE );
 
-            if( peer )
-                tr_historyAdd( &peer->blocksSentToClient, tr_time( ), 1 );
+            tr_historyAdd( &peer->blocksSentToClient, tr_time( ), 1 );
 
             if( tr_cpBlockIsComplete( &tor->completion, block ) )
             {
