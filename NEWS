@@ -1,3 +1,8 @@
+=== Transmission 2.30 (2011/xx/yy) ===
+==== All Platforms ====
+  * The "lazy bitfield" feature has been superceded by the "Fast Extension" BEP6
+
+
 === Transmission 2.21 (2011/02/08) ===
 ==== All Platforms ====
   * Fix compile error in the the 2.20 tarball
