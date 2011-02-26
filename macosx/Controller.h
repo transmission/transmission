@@ -70,7 +70,7 @@ typedef enum
     NSTimer                         * fTimer;
     
     IBOutlet NSMenuItem             * fOpenIgnoreDownloadFolder;
-    IBOutlet NSButton               * fActionButton, * fSpeedLimitButton, * fClearCompletedButton;
+    IBOutlet NSButton               * fActionButton, * fSpeedLimitButton;
     IBOutlet NSTextField            * fTotalTorrentsField;
     
     StatusBarController             * fStatusBar;

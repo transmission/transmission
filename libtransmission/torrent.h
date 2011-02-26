@@ -219,8 +219,8 @@ struct tr_torrent
     time_t                     startDate;
     time_t                     anyDate;
 
-    int                        secondsDownloading;
-    int                        secondsSeeding;
+    time_t                     secondsDownloading;
+    time_t                     secondsSeeding;
 
     tr_torrent_metadata_func  * metadata_func;
     void                      * metadata_func_user_data;
