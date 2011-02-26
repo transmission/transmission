@@ -107,7 +107,7 @@
         <source>%1 (%Ln pieces @ %2)</source>
         <translation>
             <numerusform>%1 (%Ln бөлім @ %2)</numerusform>
-            <numerusform>%1 (%Ln бөлім @ %2)</numerusform>
+            <numerusform>%1 (%Ln бөлімдер @ %2)</numerusform>
         </translation>
     </message>
     <message numerus="yes">
@@ -115,7 +115,7 @@
         <source>%1 (%Ln pieces)</source>
         <translation>
             <numerusform>%1 (%Ln бөлім)</numerusform>
-            <numerusform>%1 (%Ln бөлім)</numerusform>
+            <numerusform>%1 (%Ln бөлімдер)</numerusform>
         </translation>
     </message>
     <message>
@@ -299,7 +299,7 @@
     <message>
         <location line="+5"/>
         <source>%1 of %2 (%3%)</source>
-        <translation type="unfinished">%1 дайын, барлығы %2 (%3%)</translation>
+        <translation>%1 дайын, барлығы %2 (%3%)</translation>
     </message>
     <message>
         <location line="+7"/>
@@ -613,46 +613,46 @@
     <message>
         <location line="-23"/>
         <source>KiB/s</source>
-        <translation>КиБ/с</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>MiB/s</source>
-        <translation>МиБ/с</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>GiB/s</source>
-        <translation>ГиБ/с</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>TiB/s</source>
-        <translation>ТиБ/с</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+9"/>
         <location line="+12"/>
         <source>KiB</source>
-        <translation>КиБ</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="-11"/>
         <location line="+12"/>
         <source>MiB</source>
-        <translation>МиБ</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="-11"/>
         <location line="+12"/>
         <source>GiB</source>
-        <translation>ГиБ</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="-11"/>
         <location line="+12"/>
         <source>TiB</source>
-        <translation>ТиБ</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+32"/>
@@ -666,7 +666,7 @@
         <source>%Ln day(s)</source>
         <translation>
             <numerusform>%Ln күн</numerusform>
-            <numerusform>%Ln days</numerusform>
+            <numerusform>%Ln күн</numerusform>
         </translation>
     </message>
     <message numerus="yes">
@@ -674,7 +674,7 @@
         <source>%Ln hour(s)</source>
         <translation>
             <numerusform>%Ln сағат</numerusform>
-            <numerusform>%Ln hours</numerusform>
+            <numerusform>%Ln сағат</numerusform>
         </translation>
     </message>
     <message numerus="yes">
@@ -682,7 +682,7 @@
         <source>%Ln minute(s)</source>
         <translation>
             <numerusform>%Ln минут</numerusform>
-            <numerusform>%Ln minutes</numerusform>
+            <numerusform>%Ln минут</numerusform>
         </translation>
     </message>
     <message numerus="yes">
@@ -690,7 +690,7 @@
         <source>%Ln second(s)</source>
         <translation>
             <numerusform>%Ln секунд</numerusform>
-            <numerusform>%Ln seconds</numerusform>
+            <numerusform>%Ln секунд</numerusform>
         </translation>
     </message>
     <message>
@@ -1189,15 +1189,15 @@
         <source>%Ln File(s)</source>
         <translation>
             <numerusform>%Ln Файл</numerusform>
-            <numerusform>%Ln Files</numerusform>
+            <numerusform>%Ln Файлдар</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location line="+1"/>
         <source>%Ln Piece(s)</source>
         <translation>
-            <numerusform>%Ln Бөлік</numerusform>
-            <numerusform>%Ln Pieces</numerusform>
+            <numerusform>%Ln Бөлім</numerusform>
+            <numerusform>%Ln Бөлімдер</numerusform>
         </translation>
     </message>
     <message>
@@ -1522,7 +1522,7 @@ To add another primary URL, add it after a blank line.</source>
     <message>
         <location line="+8"/>
         <source>Options</source>
-        <translation type="unfinished">Баптаулары</translation>
+        <translation>Баптаулары</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -1539,7 +1539,7 @@ To add another primary URL, add it after a blank line.</source>
         <source>&lt;i&gt;Blocklist contains %Ln rules&lt;/i&gt;</source>
         <translation>
             <numerusform>&lt;i&gt;Блоктізімінде %Ln жазба бар&lt;/i&gt;</numerusform>
-            <numerusform></numerusform>
+            <numerusform>&lt;i&gt;Блоктізімінде %Ln жазбалар бар&lt;/i&gt;</numerusform>
         </translation>
     </message>
     <message>
@@ -1566,7 +1566,6 @@ To add another primary URL, add it after a blank line.</source>
         <location line="+35"/>
         <source>&lt;b&gt;Update succeeded!&lt;/b&gt;&lt;p&gt;Blocklist now has %Ln rules.</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -2075,7 +2074,6 @@ To add another primary URL, add it after a blank line.</source>
         <source>Downloading from %1 of %n connected peer(s)</source>
         <translation type="unfinished">
             <numerusform></numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
@@ -2083,14 +2081,12 @@ To add another primary URL, add it after a blank line.</source>
         <source>Downloading metadata from %n peer(s) (%1% done)</source>
         <translation type="unfinished">
             <numerusform></numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location line="+5"/>
         <source>Seeding to %1 of %n connected peer(s)</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -2145,9 +2141,9 @@ To add another primary URL, add it after a blank line.</source>
     <message numerus="yes">
         <location line="+11"/>
         <source>%Ln Torrent(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%Ln торрент</numerusform>
+            <numerusform>%Ln торренттер</numerusform>
         </translation>
     </message>
     <message>
@@ -2295,7 +2291,6 @@ Down: %2</source>
         <location line="-580"/>
         <source>%L1 of %Ln Torrent(s)</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
