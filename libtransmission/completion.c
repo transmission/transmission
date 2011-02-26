@@ -304,6 +304,9 @@ tr_cpSizeWhenDone( const tr_completion * ccp )
 void
 tr_cpGetAmountDone( const tr_completion * cp, float * tab, int tabCount )
 {
+    if( tabCount <= 0 )
+        return;
+
     int i, b;
     const int span = cp->tor->blockCount / tabCount;
 
