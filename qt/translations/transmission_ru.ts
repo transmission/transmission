@@ -201,6 +201,11 @@
         <translation>Узел работает в режиме приёма</translation>
     </message>
     <message>
+        <location line="+1"/>
+        <source>Peer is connected over uTP</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location line="+56"/>
         <source>Activity</source>
         <translation>Активность</translation>
@@ -281,7 +286,7 @@
         <translation>Состояние:</translation>
     </message>
     <message>
-        <location line="-449"/>
+        <location line="-450"/>
         <source>%1 (100%)</source>
         <translation type="unfinished"></translation>
     </message>
@@ -301,7 +306,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+405"/>
+        <location line="+406"/>
         <source>Running time:</source>
         <translation>Длительность:</translation>
     </message>
@@ -459,7 +464,7 @@
         <translation>Клиент</translation>
     </message>
     <message>
-        <location line="-890"/>
+        <location line="-891"/>
         <source>Finished</source>
         <translation>Завершен</translation>
     </message>
@@ -474,7 +479,7 @@
         <translation>Узел был обнаружен с помощью DHT</translation>
     </message>
     <message>
-        <location line="+60"/>
+        <location line="+61"/>
         <source>Availability:</source>
         <translation>Доступность:</translation>
     </message>
@@ -1288,7 +1293,7 @@ To add another primary URL, add it after a blank line.</source>
 <context>
     <name>MyApp</name>
     <message>
-        <location filename="../app.cc" line="+223"/>
+        <location filename="../app.cc" line="+228"/>
         <source>Transmission is a file-sharing program.  When you run a torrent, its data will be made available to others by means of upload.  You and you alone are fully responsible for exercising proper judgement and abiding by your local laws.</source>
         <translation>Transmission is a file-sharing program.  When you run a torrent, its data will be made available to others by means of upload.  You and you alone are fully responsible for exercising proper judgement and abiding by your local laws.</translation>
     </message>
@@ -1505,12 +1510,12 @@ To add another primary URL, add it after a blank line.</source>
     </message>
     <message>
         <location line="+18"/>
-        <location line="+302"/>
+        <location line="+309"/>
         <source>Desktop</source>
         <translation type="unfinished">Рабочий стол</translation>
     </message>
     <message>
-        <location line="-300"/>
+        <location line="-307"/>
         <source>Show Transmission icon in the &amp;notification area</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1540,7 +1545,22 @@ To add another primary URL, add it after a blank line.</source>
         <translation>Входящие соединения</translation>
     </message>
     <message>
-        <location line="+224"/>
+        <location line="+24"/>
+        <source>Options</source>
+        <translation type="unfinished">Параметры</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Enable &amp;uTP for peer connections</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>uTP is a tool for reducing network congestion.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+203"/>
         <source>Call scrip&amp;t when torrent is completed:</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1569,13 +1589,13 @@ To add another primary URL, add it after a blank line.</source>
         </translation>
     </message>
     <message>
-        <location line="-322"/>
-        <location line="+365"/>
+        <location line="-329"/>
+        <location line="+372"/>
         <source>Status unknown</source>
         <translation>Статус неизвестен</translation>
     </message>
     <message>
-        <location line="-357"/>
+        <location line="-364"/>
         <source>&amp;Port for incoming connections:</source>
         <translation>&amp;Порт для входящих соединений:</translation>
     </message>
@@ -1630,7 +1650,7 @@ To add another primary URL, add it after a blank line.</source>
         <translation>&amp;Общее максимальное количество узлов:</translation>
     </message>
     <message numerus="yes">
-        <location line="+28"/>
+        <location line="+35"/>
         <source>&lt;b&gt;Update succeeded!&lt;/b&gt;&lt;p&gt;Blocklist now has %Ln rules.</source>
         <translation>
             <numerusform>&lt;b&gt;Обновление успешно завершено!&lt;/b&gt;&lt;p&gt;В чёрном списке %Ln правило</numerusform>
@@ -1859,7 +1879,7 @@ To add another primary URL, add it after a blank line.</source>
 <context>
     <name>Session</name>
     <message>
-        <location filename="../session.cc" line="+824"/>
+        <location filename="../session.cc" line="+825"/>
         <source>Add Torrent</source>
         <translation>Добавить торрент</translation>
     </message>

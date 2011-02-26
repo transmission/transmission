@@ -200,7 +200,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+56"/>
+        <location line="+57"/>
         <source>Activity</source>
         <translation type="unfinished"></translation>
     </message>
@@ -292,7 +292,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-581"/>
+        <location line="-582"/>
         <source>%1 (100%)</source>
         <translation type="unfinished"></translation>
     </message>
@@ -322,7 +322,12 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+217"/>
+        <location line="+148"/>
+        <source>Peer is connected over uTP</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+70"/>
         <source>Size:</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1256,7 +1261,7 @@ To add another primary URL, add it after a blank line.</source>
 <context>
     <name>MyApp</name>
     <message>
-        <location filename="../app.cc" line="+223"/>
+        <location filename="../app.cc" line="+228"/>
         <source>Transmission is a file-sharing program.  When you run a torrent, its data will be made available to others by means of upload.  You and you alone are fully responsible for exercising proper judgement and abiding by your local laws.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1499,12 +1504,12 @@ To add another primary URL, add it after a blank line.</source>
     </message>
     <message>
         <location line="+5"/>
-        <location line="+365"/>
+        <location line="+372"/>
         <source>Status unknown</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-357"/>
+        <location line="-364"/>
         <source>&amp;Port for incoming connections:</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1513,8 +1518,23 @@ To add another primary URL, add it after a blank line.</source>
         <source>Use UPnP or NAT-PMP port &amp;forwarding from my router</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <location line="+8"/>
+        <source>Options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Enable &amp;uTP for peer connections</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>uTP is a tool for reducing network congestion.</source>
+        <translation type="unfinished"></translation>
+    </message>
     <message numerus="yes">
-        <location line="+311"/>
+        <location line="+306"/>
         <source>&lt;i&gt;Blocklist contains %Ln rules&lt;/i&gt;</source>
         <translation type="unfinished">
             <numerusform></numerusform>
@@ -1522,7 +1542,7 @@ To add another primary URL, add it after a blank line.</source>
         </translation>
     </message>
     <message>
-        <location line="-312"/>
+        <location line="-319"/>
         <source>Pick a &amp;random port every time Transmission is started</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1542,7 +1562,7 @@ To add another primary URL, add it after a blank line.</source>
         <translation type="unfinished"></translation>
     </message>
     <message numerus="yes">
-        <location line="+28"/>
+        <location line="+35"/>
         <source>&lt;b&gt;Update succeeded!&lt;/b&gt;&lt;p&gt;Blocklist now has %Ln rules.</source>
         <translation>
             <numerusform></numerusform>
@@ -1586,7 +1606,7 @@ To add another primary URL, add it after a blank line.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-353"/>
+        <location line="-360"/>
         <source>Limit do&amp;wnload speed (%1):</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1597,12 +1617,12 @@ To add another primary URL, add it after a blank line.</source>
     </message>
     <message>
         <location line="+39"/>
-        <location line="+302"/>
+        <location line="+309"/>
         <source>Desktop</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-300"/>
+        <location line="-307"/>
         <source>Show Transmission icon in the &amp;notification area</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1617,7 +1637,7 @@ To add another primary URL, add it after a blank line.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+78"/>
+        <location line="+85"/>
         <source>Enable &amp;blocklist:</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1822,7 +1842,7 @@ To add another primary URL, add it after a blank line.</source>
 <context>
     <name>Session</name>
     <message>
-        <location filename="../session.cc" line="+824"/>
+        <location filename="../session.cc" line="+825"/>
         <source>Add Torrent</source>
         <translation type="unfinished"></translation>
     </message>

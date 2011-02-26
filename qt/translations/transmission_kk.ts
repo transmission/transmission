@@ -200,7 +200,7 @@
         <translation>Торап қабылдау режимінде жұмыс істеп тұр</translation>
     </message>
     <message>
-        <location line="+56"/>
+        <location line="+57"/>
         <source>Activity</source>
         <translation>Белсенділігі</translation>
     </message>
@@ -292,14 +292,14 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-581"/>
+        <location line="-582"/>
         <source>%1 (100%)</source>
         <translation>%1 (100%)</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>%1 of %2 (%3%)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">%1 дайын, барлығы %2 (%3%)</translation>
     </message>
     <message>
         <location line="+7"/>
@@ -322,7 +322,12 @@
         <translation>Анықталмаған</translation>
     </message>
     <message>
-        <location line="+217"/>
+        <location line="+148"/>
+        <source>Peer is connected over uTP</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+70"/>
         <source>Size:</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1257,7 +1262,7 @@ To add another primary URL, add it after a blank line.</source>
 <context>
     <name>MyApp</name>
     <message>
-        <location filename="../app.cc" line="+223"/>
+        <location filename="../app.cc" line="+228"/>
         <source>Transmission is a file-sharing program.  When you run a torrent, its data will be made available to others by means of upload.  You and you alone are fully responsible for exercising proper judgement and abiding by your local laws.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1500,12 +1505,12 @@ To add another primary URL, add it after a blank line.</source>
     </message>
     <message>
         <location line="+5"/>
-        <location line="+365"/>
+        <location line="+372"/>
         <source>Status unknown</source>
         <translation>Қалып-күйі белгісіз</translation>
     </message>
     <message>
-        <location line="-357"/>
+        <location line="-364"/>
         <source>&amp;Port for incoming connections:</source>
         <translation>Кіріс байланыстар &amp;порты:</translation>
     </message>
@@ -1514,8 +1519,23 @@ To add another primary URL, add it after a blank line.</source>
         <source>Use UPnP or NAT-PMP port &amp;forwarding from my router</source>
         <translation>UPnP немес NAT-PMP порттарды бағ&amp;дарлауды қолдану</translation>
     </message>
+    <message>
+        <location line="+8"/>
+        <source>Options</source>
+        <translation type="unfinished">Баптаулары</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Enable &amp;uTP for peer connections</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>uTP is a tool for reducing network congestion.</source>
+        <translation type="unfinished"></translation>
+    </message>
     <message numerus="yes">
-        <location line="+311"/>
+        <location line="+306"/>
         <source>&lt;i&gt;Blocklist contains %Ln rules&lt;/i&gt;</source>
         <translation>
             <numerusform>&lt;i&gt;Блоктізімінде %Ln жазба бар&lt;/i&gt;</numerusform>
@@ -1523,7 +1543,7 @@ To add another primary URL, add it after a blank line.</source>
         </translation>
     </message>
     <message>
-        <location line="-312"/>
+        <location line="-319"/>
         <source>Pick a &amp;random port every time Transmission is started</source>
         <translation>Әр р&amp;ет Transmission қосылғанда, кездейсоқ портты таңдау</translation>
     </message>
@@ -1543,9 +1563,10 @@ To add another primary URL, add it after a blank line.</source>
         <translation>Жал&amp;пы максималды тораптар саны:</translation>
     </message>
     <message numerus="yes">
-        <location line="+28"/>
+        <location line="+35"/>
         <source>&lt;b&gt;Update succeeded!&lt;/b&gt;&lt;p&gt;Blocklist now has %Ln rules.</source>
         <translation type="unfinished">
+            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -1586,7 +1607,7 @@ To add another primary URL, add it after a blank line.</source>
         <translation>Жекелігі</translation>
     </message>
     <message>
-        <location line="-353"/>
+        <location line="-360"/>
         <source>Limit do&amp;wnload speed (%1):</source>
         <translation>Қабылдау жылдам&amp;дығын шектеу (%1):</translation>
     </message>
@@ -1597,12 +1618,12 @@ To add another primary URL, add it after a blank line.</source>
     </message>
     <message>
         <location line="+39"/>
-        <location line="+302"/>
+        <location line="+309"/>
         <source>Desktop</source>
         <translation>Жұмыс үстелі</translation>
     </message>
     <message>
-        <location line="-300"/>
+        <location line="-307"/>
         <source>Show Transmission icon in the &amp;notification area</source>
         <translation>Transmission таңбашас&amp;ын трейде көрсету</translation>
     </message>
@@ -1617,7 +1638,7 @@ To add another primary URL, add it after a blank line.</source>
         <translation>Портт&amp;ы тексеру</translation>
     </message>
     <message>
-        <location line="+78"/>
+        <location line="+85"/>
         <source>Enable &amp;blocklist:</source>
         <translation>Блок&amp;тізімді іске қосу:</translation>
     </message>
@@ -1822,7 +1843,7 @@ To add another primary URL, add it after a blank line.</source>
 <context>
     <name>Session</name>
     <message>
-        <location filename="../session.cc" line="+824"/>
+        <location filename="../session.cc" line="+825"/>
         <source>Add Torrent</source>
         <translation>Торрентті қосу</translation>
     </message>
@@ -2061,6 +2082,7 @@ To add another primary URL, add it after a blank line.</source>
         <location line="+3"/>
         <source>Downloading metadata from %n peer(s) (%1% done)</source>
         <translation type="unfinished">
+            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>

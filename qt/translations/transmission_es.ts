@@ -213,12 +213,17 @@
         <translation>El compañero es una conexión de entrada</translation>
     </message>
     <message>
+        <location line="+1"/>
+        <source>Peer is connected over uTP</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location line="+56"/>
         <source>Activity</source>
         <translation>Actividad</translation>
     </message>
     <message>
-        <location line="-444"/>
+        <location line="-445"/>
         <source>%1 (100%)</source>
         <translation></translation>
     </message>
@@ -238,7 +243,7 @@
         <translation>%1 (%2 corrupto)</translation>
     </message>
     <message>
-        <location line="+400"/>
+        <location line="+401"/>
         <source>Have:</source>
         <translation>Tenemos:</translation>
     </message>
@@ -1259,7 +1264,7 @@ Para agregar otro URL primario, agrueguelo después de una línea en blanco.</tr
 <context>
     <name>MyApp</name>
     <message>
-        <location filename="../app.cc" line="+223"/>
+        <location filename="../app.cc" line="+228"/>
         <source>Transmission is a file-sharing program.  When you run a torrent, its data will be made available to others by means of upload.  You and you alone are fully responsible for exercising proper judgement and abiding by your local laws.</source>
         <translation>Transmission es un programa para compartir archivos.  Cuando activas un torrent, sus datos van a ponerse disponibles para otros.  Usted y sólo usted es completamente responsable para usar su juicio y cumplir las leyes locales.</translation>
     </message>
@@ -1492,12 +1497,12 @@ Para agregar otro URL primario, agrueguelo después de una línea en blanco.</tr
     </message>
     <message>
         <location line="+18"/>
-        <location line="+302"/>
+        <location line="+309"/>
         <source>Desktop</source>
         <translation>Escritorio</translation>
     </message>
     <message>
-        <location line="-300"/>
+        <location line="-307"/>
         <source>Show Transmission icon in the &amp;notification area</source>
         <translation>Mostrar ícono de Transmission en el área de &amp;notificaciones</translation>
     </message>
@@ -1534,12 +1539,12 @@ Para agregar otro URL primario, agrueguelo después de una línea en blanco.</tr
     </message>
     <message>
         <location line="+1"/>
-        <location line="+365"/>
+        <location line="+372"/>
         <source>Status unknown</source>
         <translation>Estado desconocido</translation>
     </message>
     <message>
-        <location line="-357"/>
+        <location line="-364"/>
         <source>&amp;Port for incoming connections:</source>
         <translation>&amp;Puerto para recibir conexiones:</translation>
     </message>
@@ -1567,6 +1572,21 @@ Para agregar otro URL primario, agrueguelo después de una línea en blanco.</tr
         <location line="+1"/>
         <source>Maximum peers &amp;overall:</source>
         <translation>Máximo número de compañeros &amp;global:</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Options</source>
+        <translation type="unfinished">Opciones</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Enable &amp;uTP for peer connections</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>uTP is a tool for reducing network congestion.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message numerus="yes">
         <location line="+28"/>
@@ -1825,7 +1845,7 @@ Para agregar otro URL primario, agrueguelo después de una línea en blanco.</tr
 <context>
     <name>Session</name>
     <message>
-        <location filename="../session.cc" line="+824"/>
+        <location filename="../session.cc" line="+825"/>
         <source>Add Torrent</source>
         <translation>Agregar torrent</translation>
     </message>

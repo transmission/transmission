@@ -800,6 +800,7 @@ Details :: refresh( )
                     case 'H': txt = tr( "Peer was discovered through DHT" ); break;
                     case 'X': txt = tr( "Peer was discovered through Peer Exchange (PEX)" ); break;
                     case 'I': txt = tr( "Peer is an incoming connection" ); break;
+                    case 'T': txt = tr( "Peer is connected over uTP" ); break;
                 }
                 if( !txt.isEmpty( ) )
                     codeTip += QString("%1: %2\n").arg(ch).arg(txt);
