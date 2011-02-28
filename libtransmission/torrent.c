@@ -10,6 +10,7 @@
  * $Id$
  */
 
+#include <signal.h> /* signal() */
 #include <sys/types.h> /* stat */
 #include <sys/stat.h> /* stat */
 #ifndef WIN32
