@@ -172,8 +172,8 @@ getStatusStr( const tr_stat * st,
             "ul to %d (%s) "
             "[%s]",
             tr_truncd( 100 * st->percentDone, 1 ),
-            st->peersSendingToUs, st->peersConnected, upStr,
-            st->peersGettingFromUs, dnStr,
+            st->peersSendingToUs, st->peersConnected, dnStr,
+            st->peersGettingFromUs, upStr,
             ratioStr );
     }
     else if( st->activity & TR_STATUS_SEED )
