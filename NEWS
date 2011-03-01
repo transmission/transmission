@@ -1,3 +1,20 @@
+=== Transmission 2.22 (2011/0m/dd) ===
+==== All Platforms ====
+  * Faster endgame
+  * Fix bug where leechers might be disconnected while seeding in some situations
+  * Support for unsorted blacklists
+  * Fix IPv6 DHT
+  * Re-add support to automatically close idle peers
+  * Fix bug where the resume file did not save the time checked for the last piece
+==== Mac ====
+  * Fixes for Dutch, German, and Russian localizations
+==== GTK+ ====
+  * Fix setting individual idle seeding time
+==== Qt ====
+  * Fix loading localizations on Linux
+==== CLI ====
+  * Fix bandwidth display issue
+
 === Transmission 2.21 (2011/02/08) ===
 ==== All Platforms ====
   * Fix compile error in the the 2.20 tarball
