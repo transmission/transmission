@@ -2849,7 +2849,7 @@ rechokePulse( int foo UNUSED, short bar UNUSED, void * vmgr )
 {
     tr_torrent * tor = NULL;
     tr_peerMgr * mgr = vmgr;
-    const uint64_t now = tr_sessionGetTimeMsec( mgr->session );
+    const uint64_t now = tr_time_msec( );
 
     managerLock( mgr );
 
@@ -3174,7 +3174,7 @@ reconnectPulse( int foo UNUSED, short bar UNUSED, void * vmgr )
     tr_torrent * tor;
     tr_peerMgr * mgr = vmgr;
     const time_t now_sec = tr_time( );
-    const uint64_t now_msec = tr_sessionGetTimeMsec( mgr->session );
+    const uint64_t now_msec = tr_time_msec( );
 
     /**
     ***  enforce the per-session and per-torrent peer limits

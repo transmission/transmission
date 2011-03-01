@@ -100,7 +100,7 @@ didWriteWrapper( tr_peerIo * io, unsigned int bytes_transferred )
 
         const unsigned int payload = MIN( next->length, bytes_transferred );
         const unsigned int overhead = guessPacketOverhead( payload );
-        const uint64_t now = tr_sessionGetTimeMsec( io->session );
+        const uint64_t now = tr_time_msec( );
 
         tr_bandwidthUsed( &io->bandwidth, TR_UP, payload, next->isPieceData, now );
 
@@ -140,7 +140,7 @@ canReadWrapper( tr_peerIo * io )
     /* try to consume the input buffer */
     if( io->canRead )
     {
-        const uint64_t now = tr_sessionGetTimeMsec( io->session );
+        const uint64_t now = tr_time_msec( );
 
         tr_sessionLock( session );
 
