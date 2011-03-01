@@ -2610,36 +2610,3 @@ tr_sessionSetWebConfigFunc( tr_session * session, void (*func)(tr_session*, void
 {
     session->curl_easy_config_func = func;
 }
-
-/***
-****
-***/
-
-uint64_t
-tr_sessionGetTimeMsec( tr_session * session )
-{
-    struct timeval tv;
-
-    if( event_base_gettimeofday_cached( session->event_base, &tv ) )
-    {
-        return tr_time_msec( );
-    }
-    else
-    {
-        /* event_base_gettimeofday_cached() might be implemented using
-           clock_gettime(CLOCK_MONOTONIC), so calculate the offset to
-           real time... */
-        static uint64_t offset;
-        static tr_bool offset_calculated = FALSE;
-
-        const uint64_t val = (uint64_t) tv.tv_sec * 1000 + ( tv.tv_usec / 1000 );
-
-        if( !offset_calculated )
-        {
-            offset = tr_time_msec() - val;
-            offset_calculated = TRUE;
-        }
-
-        return val + offset;
-    }
-}

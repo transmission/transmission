@@ -306,15 +306,4 @@ tr_bool  tr_sessionGetActiveSpeedLimit_Bps( const tr_session  * session,
                                             tr_direction        dir,
                                             int               * setme );
 
-
-/**
- * Tries to use libevent's cached timeval so we can avoid excessive calls
- * to gettimeofday().
- *
- * This isn't for all uses, but should be reasonably accurate when called
- * near the beginning of a libevent callback.
- */
-uint64_t tr_sessionGetTimeMsec( tr_session * session );
-
-
 #endif

@@ -108,7 +108,7 @@ didWriteWrapper( tr_peerIo * io, unsigned int bytes_transferred )
         /* For uTP sockets, the overhead is computed in utp_on_overhead. */
         const unsigned int overhead =
             io->socket ? guessPacketOverhead( payload ) : 0;
-        const uint64_t now = tr_sessionGetTimeMsec( io->session );
+        const uint64_t now = tr_time_msec( );
 
         tr_bandwidthUsed( &io->bandwidth, TR_UP, payload, next->isPieceData, now );
 
@@ -148,7 +148,7 @@ canReadWrapper( tr_peerIo * io )
     /* try to consume the input buffer */
     if( io->canRead )
     {
-        const uint64_t now = tr_sessionGetTimeMsec( io->session );
+        const uint64_t now = tr_time_msec( );
 
         tr_sessionLock( session );
 
