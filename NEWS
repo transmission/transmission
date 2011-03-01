@@ -6,6 +6,7 @@
   * Fix IPv6 DHT
   * Re-add support to automatically close idle peers
   * Fix bug where the resume file did not save the time checked for the last piece
+  * Fix 2.20 bug that sometimes showed upload/download speeds as zero
 ==== Mac ====
   * Fixes for Dutch, German, and Russian localizations
 ==== GTK+ ====
