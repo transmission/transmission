@@ -168,8 +168,6 @@ void tr_core_set_pref_double( TrCore * self, const char * key, double val );
 ***
 **/
 
-void tr_core_torrent_changed( TrCore * core, int id );
-
 void tr_core_port_test( TrCore * core );
 
 void tr_core_blocklist_update( TrCore * core );
