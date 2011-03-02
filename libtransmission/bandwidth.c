@@ -18,6 +18,7 @@
 #include "crypto.h"
 #include "peer-io.h"
 #include "ptrarray.h"
+#include "session.h"
 #include "utils.h"
 
 #define dbgmsg( ... ) \
@@ -214,7 +215,7 @@ phaseOne( tr_ptrArray * peerArray, tr_direction dir )
     i = n ? tr_cryptoWeakRandInt( n ) : 0; /* pick a random starting point */
     while( n > 1 )
     {
-        const size_t increment = 1024;
+        const size_t increment = 256;//1024;
         const int bytesUsed = tr_peerIoFlush( peers[i], dir, increment );
 
         dbgmsg( "peer #%d of %d used %d bytes in this pass", i, n, bytesUsed );
@@ -305,10 +306,11 @@ tr_bandwidthSetPeer( tr_bandwidth * b, tr_peerIo * peer )
 ****
 ***/
 
-unsigned int
-tr_bandwidthClamp( const tr_bandwidth  * b,
-                   tr_direction          dir,
-                   unsigned int          byteCount )
+static unsigned int
+bandwidthClamp( const tr_bandwidth  * b,
+                const uint64_t        now,
+                tr_direction          dir,
+                unsigned int          byteCount )
 {
     assert( tr_isBandwidth( b ) );
     assert( tr_isDirection( dir ) );
@@ -316,14 +318,37 @@ tr_bandwidthClamp( const tr_bandwidth  * b,
     if( b )
     {
         if( b->band[dir].isLimited )
+        {
+            double current = tr_bandwidthGetRawSpeed_Bps( b, now, TR_DOWN );
+            double desired = tr_bandwidthGetDesiredSpeed_Bps( b, TR_DOWN );
+            double r = desired > 0.001 ? current / desired : 0;
+            size_t i;
+                 if( r > 1.0 ) i = 0;
+            else if( r > 0.9 ) i = byteCount * 0.9;
+            else if( r > 0.8 ) i = byteCount * 0.8;
+            else               i = byteCount;
+
             byteCount = MIN( byteCount, b->band[dir].bytesLeft );
 
-        if( b->parent && b->band[dir].honorParentLimits )
-            byteCount = tr_bandwidthClamp( b->parent, dir, byteCount );
+            //fprintf( stderr, "--> %.4f  (%f... %f) [%zu --> %zu]\n", r, current, desired, byteCount, i );
+            byteCount = i;
+        }
+
+        if( b->parent && b->band[dir].honorParentLimits && ( byteCount > 0 ) )
+            byteCount = bandwidthClamp( b->parent, now, dir, byteCount );
     }
 
     return byteCount;
 }
+unsigned int
+tr_bandwidthClamp( const tr_bandwidth  * b,
+                   tr_direction          dir,
+                   unsigned int          byteCount )
+{
+    const uint64_t now_msec = tr_time_msec( );
+    return bandwidthClamp( b, now_msec, dir, byteCount );
+}
+
 
 unsigned int
 tr_bandwidthGetRawSpeed_Bps( const tr_bandwidth * b, const uint64_t now, const tr_direction dir )
