@@ -6,7 +6,7 @@
   * Fix IPv6 DHT
   * Re-add support to automatically close idle peers
   * Fix bug where the resume file did not save the time checked for the last piece
-  * Fix 2.20 bug that sometimes showed upload/download speeds as zero
+  * Fix 2.20 bug that sometimes showed inaccurate upload/download speeds
 ==== Mac ====
   * Fixes for Dutch, German, and Russian localizations
 ==== GTK+ ====
@@ -18,7 +18,7 @@
 
 === Transmission 2.21 (2011/02/08) ===
 ==== All Platforms ====
-  * Fix compile error in the the 2.20 tarball
+  * Fix compile error in the 2.20 tarball
 ==== GTK+ ====
   * Several updated translations
 ==== Qt ====
