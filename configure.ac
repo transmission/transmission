@@ -195,16 +195,6 @@ AC_TRY_LINK([#include <stdarg.h>], [va_list ap1, ap2; va_copy(ap1, ap2);],
 ])
 
 
-dnl libevent likes to link against librt if possible
-dnl for clock_gettime() and clock_settime()
-dnl TODO(libevent2): this can probably be removed after
-dnl we switch to libevent2, since it will have PKG_CONFIG
-AC_CHECK_LIB([rt],
-             [clock_gettime],
-             [libevent_extra_libs="-lrt"],
-             [libevent_extra_libs=""])
-
-
 dnl ----------------------------------------------------------------------------
 dnl
 dnl  dht
@@ -218,6 +208,11 @@ AC_SUBST(DHT_LIBS)
 dnl ----------------------------------------------------------------------------
 dnl
 dnl  utp
+
+AC_CHECK_LIB([rt],
+             [clock_gettime],
+             [libutp_extra_libs="-lrt"],
+             [libutp_extra_libs=""])
 
 AC_MSG_CHECKING([µTP])
 build_utp="no"
@@ -233,7 +228,10 @@ AC_ARG_ENABLE([utp],
 if test "x$want_utp" = "xyes" ; then
     if test "x$have_utp" = "xyes"; then 
         LIBUTP_CFLAGS="-I\$(top_srcdir)/third-party/"
-        LIBUTP_LIBS="\$(top_builddir)/third-party/libutp/libutp.a -lrt"
+        LIBUTP_LIBS="\$(top_builddir)/third-party/libutp/libutp.a"
+	if test "x$libutp_extra_libs" != "x" ; then
+	   LIBUTP_LIBS="$LIBUTP_LIBS $libutp_extra_libs"
+	fi
         AC_DEFINE([WITH_UTP],[1])
         build_utp="yes"
     else 
