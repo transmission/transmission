@@ -178,6 +178,7 @@ struct tr_peermsgs
     uint16_t        pexCount;
     uint16_t        pexCount6;
 
+    size_t          metadata_size_hint;
 #if 0
     size_t                 fastsetSize;
     tr_piece_index_t       fastset[MAX_FAST_SET_SIZE];
@@ -925,8 +926,10 @@ parseLtepHandshake( tr_peermsgs *     msgs,
     }
 
     /* look for metainfo size (BEP 9) */
-    if( tr_bencDictFindInt( &val, "metadata_size", &i ) )
+    if( tr_bencDictFindInt( &val, "metadata_size", &i ) ) {
         tr_torrentSetMetadataSizeHint( msgs->torrent, i );
+        msgs->metadata_size_hint = (size_t) i;
+    }
 
     /* look for upload_only (BEP 21) */
     if( tr_bencDictFindInt( &val, "upload_only", &i ) )
@@ -1274,7 +1277,13 @@ messageLengthIsCorrect( const tr_peermsgs * msg, uint8_t id, uint32_t len )
             return len == 5;
 
         case BT_BITFIELD:
-            return len == ( msg->torrent->info.pieceCount + 7u ) / 8u + 1u;
+            if( tr_torrentHasMetadata( msg->torrent ) )
+                return len == ( msg->torrent->info.pieceCount + 7u ) / 8u + 1u;
+            /* we don't know the piece count yet, 
+               so we can only guess whether to send TRUE or FALSE */
+            if( msg->metadata_size_hint > 0 )
+                return len <= msg->metadata_size_hint;
+            return TRUE;
 
         case BT_REQUEST:
         case BT_CANCEL:
