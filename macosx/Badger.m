@@ -35,7 +35,7 @@
         
         fCompleted = 0;
         
-        BadgeView * view = [[BadgeView alloc] initWithFrame: [[[NSApp dockTile] contentView] frame] lib: lib];
+        BadgeView * view = [[BadgeView alloc] initWithLib: lib];
         [[NSApp dockTile] setContentView: view];
         [view release];
     }
