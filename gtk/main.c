@@ -82,7 +82,6 @@ static const char * LICENSE =
 struct cbdata
 {
     gboolean            isIconified;
-    gboolean            isClosing;
     guint               timer;
     guint               refresh_actions_tag;
     gpointer            icon;
@@ -1547,7 +1546,7 @@ static gboolean
 updatemodel( gpointer gdata )
 {
     struct cbdata *data = gdata;
-    const gboolean done = data->isClosing || global_sigcount;
+    const gboolean done = global_sigcount;
 
     if( !done )
     {
