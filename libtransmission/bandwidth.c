@@ -323,12 +323,13 @@ bandwidthClamp( const tr_bandwidth  * b,
             double desired = tr_bandwidthGetDesiredSpeed_Bps( b, TR_DOWN );
             double r = desired > 0.001 ? current / desired : 0;
             size_t i;
+
+            byteCount = MIN( byteCount, b->band[dir].bytesLeft );
+
                  if( r > 1.0 ) i = 0;
             else if( r > 0.9 ) i = byteCount * 0.9;
             else if( r > 0.8 ) i = byteCount * 0.8;
             else               i = byteCount;
-
-            byteCount = MIN( byteCount, b->band[dir].bytesLeft );
 
             //fprintf( stderr, "--> %.4f  (%f... %f) [%zu --> %zu]\n", r, current, desired, byteCount, i );
             byteCount = i;
