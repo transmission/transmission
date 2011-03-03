@@ -376,7 +376,7 @@ static void
 utp_on_read(void *closure, const unsigned char *buf, size_t buflen)
 {
     int rc;
-    tr_peerIo *io = (tr_peerIo *)closure;
+    tr_peerIo *io = closure;
     assert( tr_isPeerIo( io ) );
 
     rc = evbuffer_add( io->inbuf, buf, buflen );
@@ -394,8 +394,8 @@ utp_on_read(void *closure, const unsigned char *buf, size_t buflen)
 static void
 utp_on_write(void *closure, unsigned char *buf, size_t buflen)
 {
-    tr_peerIo *io = (tr_peerIo *)closure;
     int rc;
+    tr_peerIo *io = closure;
     assert( tr_isPeerIo( io ) );
 
     rc = evbuffer_remove( io->outbuf, buf, buflen );
@@ -411,8 +411,8 @@ utp_on_write(void *closure, unsigned char *buf, size_t buflen)
 static size_t
 utp_get_rb_size(void *closure)
 {
-    tr_peerIo *io = (tr_peerIo *)closure;
     size_t bytes;
+    tr_peerIo *io = closure;
     assert( tr_isPeerIo( io ) );
 
     bytes = tr_bandwidthClamp( &io->bandwidth, TR_DOWN, UTP_READ_BUFFER_SIZE );
@@ -424,7 +424,7 @@ utp_get_rb_size(void *closure)
 static void
 utp_on_state_change(void *closure, int state)
 {
-    tr_peerIo *io = (tr_peerIo *)closure;
+    tr_peerIo *io = closure;
     assert( tr_isPeerIo( io ) );
 
     if( state == UTP_STATE_CONNECT ) {
@@ -446,7 +446,7 @@ utp_on_state_change(void *closure, int state)
 static void
 utp_on_error(void *closure, int errcode)
 {
-    tr_peerIo *io = (tr_peerIo *)closure;
+    tr_peerIo *io = closure;
     assert( tr_isPeerIo( io ) );
 
     dbgmsg( io, "utp_on_error -- errcode is %d", errcode );
@@ -460,7 +460,7 @@ utp_on_error(void *closure, int errcode)
 static void
 utp_on_overhead(void *closure, bool send, size_t count, int type UNUSED)
 {
-    tr_peerIo *io = (tr_peerIo *)closure;
+    tr_peerIo *io = closure;
     assert( tr_isPeerIo( io ) );
 
     dbgmsg( io, "utp_on_overhead -- count is %zu", count );
