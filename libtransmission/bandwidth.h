@@ -17,6 +17,8 @@
 #ifndef TR_BANDWIDTH_H
 #define TR_BANDWIDTH_H
 
+#include <assert.h>
+
 #include "transmission.h"
 #include "ptrarray.h"
 #include "utils.h" /* tr_new(), tr_free() */

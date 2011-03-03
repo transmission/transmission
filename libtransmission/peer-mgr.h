@@ -68,7 +68,6 @@ typedef struct tr_pex
 tr_pex;
 
 
-struct tr_bandwidth;
 struct tr_peerIo;
 struct tr_peermsgs;
 
@@ -131,6 +130,11 @@ typedef struct tr_peer
     struct tr_peermsgs     * msgs;
 }
 tr_peer;
+
+void tr_peerConstruct( struct tr_peer * peer );
+
+void tr_peerDestruct( tr_torrent * tor, struct tr_peer * peer );
+
 
 static inline tr_bool
 tr_isPex( const tr_pex * pex )
@@ -246,8 +250,6 @@ void tr_peerMgrTorrentStats( tr_torrent * tor,
 
 struct tr_peer_stat* tr_peerMgrPeerStats( const tr_torrent * tor,
                                           int              * setmeCount );
-
-int tr_peerMgrGetWebseedSpeed_Bps( const tr_torrent * tor, uint64_t now );
 
 double* tr_peerMgrWebSpeeds_KBps( const tr_torrent * tor );
 

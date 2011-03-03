@@ -378,20 +378,27 @@ peerIsInUse( const Torrent * ct, const struct peer_atom * atom )
         || getExistingHandshake( &t->manager->incomingHandshakes, &atom->addr );
 }
 
-static tr_peer*
-peerNew( struct peer_atom * atom )
+void
+tr_peerConstruct( tr_peer * peer )
 {
-    tr_peer * peer = tr_new0( tr_peer, 1 );
+    memset( peer, 0, sizeof( tr_peer ) );
 
     peer->have = TR_BITSET_INIT;
-
-    peer->atom = atom;
-    atom->peer = peer;
 
     tr_historyConstruct( &peer->blocksSentToClient,  CANCEL_HISTORY_SEC, ( RECHOKE_PERIOD_MSEC / 1000 ) );
     tr_historyConstruct( &peer->blocksSentToPeer,    CANCEL_HISTORY_SEC, ( RECHOKE_PERIOD_MSEC / 1000 ) );
     tr_historyConstruct( &peer->cancelsSentToClient, CANCEL_HISTORY_SEC, ( RECHOKE_PERIOD_MSEC / 1000 ) );
     tr_historyConstruct( &peer->cancelsSentToPeer,   CANCEL_HISTORY_SEC, ( REFILL_UPKEEP_PERIOD_MSEC / 1000 ) );
+}
+
+static tr_peer*
+peerNew( struct peer_atom * atom )
+{
+    tr_peer * peer = tr_new( tr_peer, 1 );
+    tr_peerConstruct( peer );
+
+    peer->atom = atom;
+    atom->peer = peer;
 
     return peer;
 }
@@ -416,18 +423,20 @@ getPeer( Torrent * torrent, struct peer_atom * atom )
 
 static void peerDeclinedAllRequests( Torrent *, const tr_peer * );
 
-static void
-peerDelete( Torrent * t, tr_peer * peer )
+void
+tr_peerDestruct( tr_torrent * tor, tr_peer * peer )
 {
     assert( peer != NULL );
 
-    peerDeclinedAllRequests( t, peer );
+    peerDeclinedAllRequests( tor->torrentPeers, peer );
 
     if( peer->msgs != NULL )
         tr_peerMsgsFree( peer->msgs );
 
-    tr_peerIoClear( peer->io );
-    tr_peerIoUnref( peer->io ); /* balanced by the ref in handshakeDoneCB() */
+    if( peer->io ) {
+        tr_peerIoClear( peer->io );
+        tr_peerIoUnref( peer->io ); /* balanced by the ref in handshakeDoneCB() */
+    }
 
     tr_historyDestruct( &peer->blocksSentToClient  );
     tr_historyDestruct( &peer->blocksSentToPeer    );
@@ -438,7 +447,12 @@ peerDelete( Torrent * t, tr_peer * peer )
     tr_bitfieldFree( peer->blame );
     tr_free( peer->client );
     peer->atom->peer = NULL;
+}
 
+static void
+peerDelete( Torrent * t, tr_peer * peer )
+{
+    tr_peerDestruct( t->tor, peer );
     tr_free( peer );
 }
 
@@ -2457,7 +2471,7 @@ tr_peerUpdateProgress( tr_torrent * tor, tr_peer * peer )
             peer->progress = trueCount / ( have->bitfield.bitCount + 1 );
     }
 
-    if( peer->progress >= 1.0 )
+    if( peer->atom && ( peer->progress >= 1.0 ) )
         atomSetSeed( tor->torrentPeers, peer->atom );
 }
 
@@ -2579,25 +2593,6 @@ tr_peerMgrTorrentStats( tr_torrent  * tor,
 
     *setmeWebseedsSendingToUs = countActiveWebseeds( t );
 }
-
-int
-tr_peerMgrGetWebseedSpeed_Bps( const tr_torrent * tor, uint64_t now )
-{
-    int i;
-    int tmp;
-    int ret = 0;
-
-    const Torrent * t = tor->torrentPeers;
-    const int n = tr_ptrArraySize( &t->webseeds );
-    const tr_webseed ** webseeds = (const tr_webseed**) tr_ptrArrayBase( &t->webseeds );
-
-    for( i=0; i<n; ++i )
-        if( tr_webseedGetSpeed_Bps( webseeds[i], now, &tmp ) )
-            ret += tmp;
-
-    return ret;
-}
-
 
 double*
 tr_peerMgrWebSpeeds_KBps( const tr_torrent * tor )

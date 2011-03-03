@@ -1138,7 +1138,6 @@ tr_torrentStat( tr_torrent * tor )
     tr_stat *               s;
     int                     usableSeeds;
     uint64_t                now;
-    double                  d;
     uint64_t                seedRatioBytesLeft;
     uint64_t                seedRatioBytesGoal;
     tr_bool                 seedRatioApplies;
@@ -1170,11 +1169,10 @@ tr_torrentStat( tr_torrent * tor )
                             s->peersFrom );
 
     now = tr_time_msec( );
-    d = tr_peerMgrGetWebseedSpeed_Bps( tor, now );
     s->rawUploadSpeed_KBps     = toSpeedKBps( tr_bandwidthGetRawSpeed_Bps  ( tor->bandwidth, now, TR_UP ) );
     s->pieceUploadSpeed_KBps   = toSpeedKBps( tr_bandwidthGetPieceSpeed_Bps( tor->bandwidth, now, TR_UP ) );
-    s->rawDownloadSpeed_KBps   = toSpeedKBps( d + tr_bandwidthGetRawSpeed_Bps  ( tor->bandwidth, now, TR_DOWN ) );
-    s->pieceDownloadSpeed_KBps = toSpeedKBps( d + tr_bandwidthGetPieceSpeed_Bps( tor->bandwidth, now, TR_DOWN ) );
+    s->rawDownloadSpeed_KBps   = toSpeedKBps( tr_bandwidthGetRawSpeed_Bps  ( tor->bandwidth, now, TR_DOWN ) );
+    s->pieceDownloadSpeed_KBps = toSpeedKBps( tr_bandwidthGetPieceSpeed_Bps( tor->bandwidth, now, TR_DOWN ) );
 
     usableSeeds += tor->info.webseedCount;
 
