@@ -60,11 +60,11 @@ tr_bool tr_ioTestPiece( tr_torrent       * tor,
 /**
  * Converts a piece index + offset into a file index + offset.
  */
-void     tr_ioFindFileLocation( const tr_torrent * tor,
-                                tr_piece_index_t   pieceIndex,
-                                uint32_t           pieceOffset,
-                                tr_file_index_t *  fileIndex,
-                                uint64_t *         fileOffset );
+void tr_ioFindFileLocation( const tr_torrent  * tor,
+                             tr_piece_index_t   pieceIndex,
+                             uint32_t           pieceOffset,
+                             tr_file_index_t  * fileIndex,
+                             uint64_t         * fileOffset );
 
 
 /* @} */

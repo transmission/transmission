@@ -54,8 +54,13 @@ int tr_prefetch(int fd, off_t offset, size_t count);
  * continually opening and closing the same files when downloading
  * piece data.
  *
- * - if doWrite is true, subfolders in torrentFile are created if necessary.
- * - if doWrite is true, the target file is created if necessary.
+ * - if do_write is true, subfolders in torrentFile are created if necessary.
+ * - if do_write is true, the target file is created if necessary.
+ *
+ * @param existing_dir An ancestor of filename which must already exist and
+ *                     won't be created by tr_fdFileCheckout(). This prevents
+ *                     directories from being created in error, such as a mount
+ *                     point for an external drive when the drive is unplugged.
  *
  * on success, a file descriptor >= 0 is returned.
  * on failure, a -1 is returned and errno is set.
@@ -63,16 +68,17 @@ int tr_prefetch(int fd, off_t offset, size_t count);
  * @see tr_fdFileClose
  */
 int  tr_fdFileCheckout( tr_session             * session,
-                        int                      torrentId,
-                        tr_file_index_t          fileNum,
-                        const char             * fileName,
-                        tr_bool                  doWrite,
-                        tr_preallocation_mode    preallocationMode,
-                        uint64_t                 desiredFileSize );
+                        int                      torrent_id,
+                        tr_file_index_t          file_num,
+                        const char             * existing_dir,
+                        const char             * filename,
+                        tr_bool                  do_write,
+                        tr_preallocation_mode    preallocation_mode,
+                        uint64_t                 preallocation_file_size );
 
 int tr_fdFileGetCached( tr_session             * session,
-                        int                      torrentId,
-                        tr_file_index_t          fileNum,
+                        int                      torrent_id,
+                        tr_file_index_t          file_num,
                         tr_bool                  doWrite );
 
 /**
@@ -85,7 +91,7 @@ int tr_fdFileGetCached( tr_session             * session,
  */
 void tr_fdFileClose( tr_session        * session,
                      const tr_torrent  * tor,
-                     tr_file_index_t     fileNo );
+                     tr_file_index_t     file_num );
 
 
 /**

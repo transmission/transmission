@@ -350,6 +350,7 @@ cached_file_close( struct tr_cached_file * o )
  */
 static int
 cached_file_open( struct tr_cached_file  * o,
+                  const char             * existing_dir,
                   const char             * filename,
                   tr_bool                  writable,
                   tr_preallocation_mode    allocation,
@@ -358,6 +359,14 @@ cached_file_open( struct tr_cached_file  * o,
     int flags;
     struct stat sb;
     tr_bool alreadyExisted;
+
+    /* confirm that existing_dir, if specified, exists on the disk */
+    if( existing_dir && *existing_dir && stat( existing_dir, &sb ) )
+    {
+        const int err = errno;
+        tr_err( _( "Couldn't open \"%1$s\": %2$s" ), existing_dir, tr_strerror( err ) );
+        return err;
+    }
 
     /* create subfolders, if any */
     if( writable )
@@ -565,6 +574,7 @@ int
 tr_fdFileCheckout( tr_session             * session,
                    int                      torrent_id,
                    tr_file_index_t          i,
+                   const char             * existing_dir,
                    const char             * filename,
                    tr_bool                  writable,
                    tr_preallocation_mode    allocation,
@@ -580,7 +590,7 @@ tr_fdFileCheckout( tr_session             * session,
 
     if( !cached_file_is_open( o ) )
     {
-        const int err = cached_file_open( o, filename, writable, allocation, file_size );
+        const int err = cached_file_open( o, existing_dir, filename, writable, allocation, file_size );
         if( err ) {
             errno = err;
             return -1;
