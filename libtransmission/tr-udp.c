@@ -186,7 +186,7 @@ rebind_ipv6(tr_session *ss, tr_bool force)
 static void
 event_callback(int s, short type UNUSED, void *sv)
 {
-    tr_session *ss = (tr_session*)sv;
+    tr_session *ss = sv;
     unsigned char *buf;
     struct sockaddr_storage from;
     socklen_t fromlen;

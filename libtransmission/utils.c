@@ -360,10 +360,8 @@ tr_memdup( const void * src, size_t byteCount )
 ***/
 
 void
-tr_set_compare( const void * va,
-                size_t aCount,
-                const void * vb,
-                size_t bCount,
+tr_set_compare( const void * va, size_t aCount,
+                const void * vb, size_t bCount,
                 int compare( const void * a, const void * b ),
                 size_t elementSize,
                 tr_set_func in_a_cb,
@@ -371,8 +369,8 @@ tr_set_compare( const void * va,
                 tr_set_func in_both_cb,
                 void * userData )
 {
-    const uint8_t * a = (const uint8_t *) va;
-    const uint8_t * b = (const uint8_t *) vb;
+    const uint8_t * a = va;
+    const uint8_t * b = vb;
     const uint8_t * aend = a + elementSize * aCount;
     const uint8_t * bend = b + elementSize * bCount;
 
@@ -655,7 +653,7 @@ tr_buildPath( const char *first_element, ... )
     element = first_element;
     while( element ) {
         bufLen += strlen( element ) + 1;
-        element = (const char*) va_arg( vl, const char* );
+        element = va_arg( vl, const char* );
     }
     pch = buf = tr_new( char, bufLen );
     va_end( vl );
@@ -668,7 +666,7 @@ tr_buildPath( const char *first_element, ... )
         memcpy( pch, element, elementLen );
         pch += elementLen;
         *pch++ = TR_PATH_DELIMITER;
-        element = (const char*) va_arg( vl, const char* );
+        element = va_arg( vl, const char* );
     }
     va_end( vl );
 
@@ -1216,7 +1214,7 @@ tr_removeElementFromArray( void         * array,
                            size_t         sizeof_element,
                            size_t         nmemb )
 {
-    char * a = (char*) array;
+    char * a = array;
 
     memmove( a + sizeof_element * index_to_remove,
              a + sizeof_element * ( index_to_remove  + 1 ),

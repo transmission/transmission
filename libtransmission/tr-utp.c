@@ -101,7 +101,7 @@ static struct event *utp_timer = NULL;
 static void
 incoming(void *closure, struct UTPSocket *s)
 {
-    tr_session *ss = (tr_session*)closure;
+    tr_session *ss = closure;
     struct sockaddr_storage from_storage;
     struct sockaddr *from = (struct sockaddr*)&from_storage;
     socklen_t fromlen = sizeof(from_storage);
@@ -137,7 +137,7 @@ void
 tr_utpSendTo(void *closure, const unsigned char *buf, size_t buflen,
              const struct sockaddr *to, socklen_t tolen)
 {
-    tr_session *ss = (tr_session*)closure;
+    tr_session *ss = closure;
 
     if(to->sa_family == AF_INET && ss->udp_socket)
         sendto(ss->udp_socket, buf, buflen, 0, to, tolen);
