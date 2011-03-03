@@ -1660,7 +1660,7 @@ accumulate_selected_torrents( GtkTreeModel  * model, GtkTreePath   * path UNUSED
                               GtkTreeIter   * iter, gpointer        gdata )
 {
     int id;
-    GSList ** data = ( GSList** ) gdata;
+    GSList ** data = gdata;
 
     gtk_tree_model_get( model, iter, MC_TORRENT_ID, &id, -1 );
     *data = g_slist_append( *data, GINT_TO_POINTER( id ) );
