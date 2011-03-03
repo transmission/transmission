@@ -336,8 +336,6 @@
 		BEFC1E320C07861A00B0BB3C /* torrent.c in Sources */ = {isa = PBXBuildFile; fileRef = BEFC1DF90C07861A00B0BB3C /* torrent.c */; };
 		BEFC1E350C07861A00B0BB3C /* port-forwarding.h in Headers */ = {isa = PBXBuildFile; fileRef = BEFC1DFC0C07861A00B0BB3C /* port-forwarding.h */; };
 		BEFC1E360C07861A00B0BB3C /* port-forwarding.c in Sources */ = {isa = PBXBuildFile; fileRef = BEFC1DFD0C07861A00B0BB3C /* port-forwarding.c */; };
-		BEFC1E390C07861A00B0BB3C /* ratecontrol.h in Headers */ = {isa = PBXBuildFile; fileRef = BEFC1E000C07861A00B0BB3C /* ratecontrol.h */; };
-		BEFC1E3A0C07861A00B0BB3C /* ratecontrol.c in Sources */ = {isa = PBXBuildFile; fileRef = BEFC1E010C07861A00B0BB3C /* ratecontrol.c */; };
 		BEFC1E3B0C07861A00B0BB3C /* platform.h in Headers */ = {isa = PBXBuildFile; fileRef = BEFC1E020C07861A00B0BB3C /* platform.h */; };
 		BEFC1E3C0C07861A00B0BB3C /* platform.c in Sources */ = {isa = PBXBuildFile; fileRef = BEFC1E030C07861A00B0BB3C /* platform.c */; };
 		BEFC1E450C07861A00B0BB3C /* net.h in Headers */ = {isa = PBXBuildFile; fileRef = BEFC1E0C0C07861A00B0BB3C /* net.h */; };
@@ -930,8 +928,6 @@
 		BEFC1DF90C07861A00B0BB3C /* torrent.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = torrent.c; path = libtransmission/torrent.c; sourceTree = "<group>"; };
 		BEFC1DFC0C07861A00B0BB3C /* port-forwarding.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = "port-forwarding.h"; path = "libtransmission/port-forwarding.h"; sourceTree = "<group>"; };
 		BEFC1DFD0C07861A00B0BB3C /* port-forwarding.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = "port-forwarding.c"; path = "libtransmission/port-forwarding.c"; sourceTree = "<group>"; };
-		BEFC1E000C07861A00B0BB3C /* ratecontrol.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ratecontrol.h; path = libtransmission/ratecontrol.h; sourceTree = "<group>"; };
-		BEFC1E010C07861A00B0BB3C /* ratecontrol.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = ratecontrol.c; path = libtransmission/ratecontrol.c; sourceTree = "<group>"; };
 		BEFC1E020C07861A00B0BB3C /* platform.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = platform.h; path = libtransmission/platform.h; sourceTree = "<group>"; };
 		BEFC1E030C07861A00B0BB3C /* platform.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = platform.c; path = libtransmission/platform.c; sourceTree = "<group>"; };
 		BEFC1E0C0C07861A00B0BB3C /* net.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = net.h; path = libtransmission/net.h; sourceTree = "<group>"; };
@@ -1374,8 +1370,6 @@
 				BEFC1DF90C07861A00B0BB3C /* torrent.c */,
 				BEFC1DFC0C07861A00B0BB3C /* port-forwarding.h */,
 				BEFC1DFD0C07861A00B0BB3C /* port-forwarding.c */,
-				BEFC1E000C07861A00B0BB3C /* ratecontrol.h */,
-				BEFC1E010C07861A00B0BB3C /* ratecontrol.c */,
 				A21FBBA90EDA78C300BC3C51 /* bandwidth.h */,
 				A21FBBAA0EDA78C300BC3C51 /* bandwidth.c */,
 				A209EE5B1144B51E002B02D1 /* history.h */,
@@ -1666,7 +1660,6 @@
 				A2AAB65D0DE0CF6200E04DDA /* rpcimpl.h in Headers */,
 				A2AAB65E0DE0CF6200E04DDA /* rpc-server.h in Headers */,
 				BEFC1E350C07861A00B0BB3C /* port-forwarding.h in Headers */,
-				BEFC1E390C07861A00B0BB3C /* ratecontrol.h in Headers */,
 				BEFC1E3B0C07861A00B0BB3C /* platform.h in Headers */,
 				BEFC1E450C07861A00B0BB3C /* net.h in Headers */,
 				BEFC1E470C07861A00B0BB3C /* natpmp.h in Headers */,
@@ -2170,7 +2163,6 @@
 				BEFC1E2F0C07861A00B0BB3C /* session.c in Sources */,
 				BEFC1E320C07861A00B0BB3C /* torrent.c in Sources */,
 				BEFC1E360C07861A00B0BB3C /* port-forwarding.c in Sources */,
-				BEFC1E3A0C07861A00B0BB3C /* ratecontrol.c in Sources */,
 				BEFC1E3C0C07861A00B0BB3C /* platform.c in Sources */,
 				BEFC1E460C07861A00B0BB3C /* net.c in Sources */,
 				BEFC1E480C07861A00B0BB3C /* natpmp.c in Sources */,
