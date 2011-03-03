@@ -55,7 +55,7 @@ toggled_cb( GtkToggleButton * w,
     const char *   key = g_object_get_data( G_OBJECT( w ), PREF_KEY );
     const gboolean flag = gtk_toggle_button_get_active( w );
 
-    tr_core_set_pref_bool( TR_CORE( core ), key, flag );
+    gtr_core_set_pref_bool( TR_CORE( core ), key, flag );
 }
 
 static GtkWidget*
@@ -107,12 +107,12 @@ spun_cb_idle( gpointer spin )
         if (data->isDouble)
         {
             const double value = gtk_spin_button_get_value( GTK_SPIN_BUTTON( spin ) );
-            tr_core_set_pref_double( TR_CORE( data->core ), key, value );
+            gtr_core_set_pref_double( TR_CORE( data->core ), key, value );
         }
         else
         {
             const int value = gtk_spin_button_get_value_as_int( GTK_SPIN_BUTTON( spin ) );
-            tr_core_set_pref_int( TR_CORE( data->core ), key, value );
+            gtr_core_set_pref_int( TR_CORE( data->core ), key, value );
         }
 
         /* cleanup */
@@ -193,7 +193,7 @@ entry_changed_cb( GtkEntry * w, gpointer   core )
     const char * key = g_object_get_data( G_OBJECT( w ), PREF_KEY );
     const char * value = gtk_entry_get_text( w );
 
-    tr_core_set_pref( TR_CORE( core ), key, value );
+    gtr_core_set_pref( TR_CORE( core ), key, value );
 }
 
 static GtkWidget*
@@ -216,7 +216,7 @@ chosen_cb( GtkFileChooser * w, gpointer core )
 {
     const char * key = g_object_get_data( G_OBJECT( w ), PREF_KEY );
     char * value = gtk_file_chooser_get_filename( GTK_FILE_CHOOSER( w ) );
-    tr_core_set_pref( TR_CORE( core ), key, value );
+    gtr_core_set_pref( TR_CORE( core ), key, value );
     g_free( value );
 }
 
@@ -392,7 +392,7 @@ updateBlocklistText( GtkWidget * w, TrCore * core )
 {
     char buf1[512];
     char buf2[512];
-    const int n = tr_blocklistGetRuleCount( tr_core_session( core ) );
+    const int n = tr_blocklistGetRuleCount( gtr_core_session( core ) );
     g_snprintf( buf1, sizeof( buf1 ),
                 gtr_ngettext( "Blocklist contains %'d rule",
                               "Blocklist contains %'d rules", n ), n );
@@ -426,7 +426,7 @@ static void
 onBlocklistUpdated( TrCore * core, int n, gpointer gdata )
 {
     const tr_bool success = n >= 0;
-    const int count = n >=0 ? n : tr_blocklistGetRuleCount( tr_core_session( core ) );
+    const int count = n >=0 ? n : tr_blocklistGetRuleCount( gtr_core_session( core ) );
     const char * s = gtr_ngettext( "Blocklist has %'d rule.", "Blocklist has %'d rules.", count );
     struct blocklist_data * data = gdata;
     GtkMessageDialog * d = GTK_MESSAGE_DIALOG( data->updateBlocklistDialog );
@@ -452,7 +452,7 @@ onBlocklistUpdate( GtkButton * w, gpointer gdata )
     data->updateBlocklistDialog = d;
     g_signal_connect( d, "response", G_CALLBACK(onBlocklistUpdateResponse), data );
     gtk_widget_show( d );
-    tr_core_blocklist_update( data->core );
+    gtr_core_blocklist_update( data->core );
     data->updateBlocklistTag = g_signal_connect( data->core, "blocklist-updated", G_CALLBACK( onBlocklistUpdated ), data );
 }
 
@@ -470,7 +470,7 @@ onIntComboChanged( GtkComboBox * combo_box, gpointer core )
 {
     const int val = gtr_combo_box_get_active_enum( combo_box );
     const char * key = g_object_get_data( G_OBJECT( combo_box ), PREF_KEY );
-    tr_core_set_pref_int( TR_CORE( core ), key, val );
+    gtr_core_set_pref_int( TR_CORE( core ), key, val );
 }
 
 static GtkWidget*
@@ -519,7 +519,7 @@ privacyPage( GObject * core )
     h = gtk_hbox_new( FALSE, GUI_PAD_BIG );
     gtk_box_pack_start( GTK_BOX( h ), w, TRUE, TRUE, 0 );
     b = data->updateBlocklistButton = gtk_button_new_with_mnemonic( _( "_Update" ) );
-    g_object_set_data( G_OBJECT( b ), "session", tr_core_session( TR_CORE( core ) ) );
+    g_object_set_data( G_OBJECT( b ), "session", gtr_core_session( TR_CORE( core ) ) );
     g_signal_connect( b, "clicked", G_CALLBACK( onBlocklistUpdate ), data );
     g_signal_connect( data->check, "toggled", G_CALLBACK( target_cb ), b ); target_cb( data->check, b );
     gtk_box_pack_start( GTK_BOX( h ), b, FALSE, FALSE, 0 );
@@ -632,7 +632,7 @@ refreshWhitelist( struct remote_page * page )
 
     g_string_truncate( gstr, gstr->len - 1 ); /* remove the trailing comma */
 
-    tr_core_set_pref( page->core, TR_PREFS_KEY_RPC_WHITELIST, gstr->str );
+    gtr_core_set_pref( page->core, TR_PREFS_KEY_RPC_WHITELIST, gstr->str );
 
     g_string_free( gstr, TRUE );
 }
@@ -933,7 +933,7 @@ onTimeComboChanged( GtkComboBox * w,
         int          val = 0;
         gtk_tree_model_get( gtk_combo_box_get_model(
                                 w ), &iter, 0, &val, -1 );
-        tr_core_set_pref_int( TR_CORE( core ), key, val );
+        gtr_core_set_pref_int( TR_CORE( core ), key, val );
     }
 }
 
@@ -1154,7 +1154,7 @@ onPortTest( GtkButton * button UNUSED, gpointer vdata )
     gtk_label_set_markup( GTK_LABEL( data->portLabel ), _( "<i>Testing...</i>" ) );
     if( !data->portTag )
         data->portTag = g_signal_connect( data->core, "port-tested", G_CALLBACK(onPortTested), data );
-    tr_core_port_test( data->core );
+    gtr_core_port_test( data->core );
 }
 
 static void

@@ -30,8 +30,8 @@
 #ifndef HAVE_LIBNOTIFY
 
 void gtr_notify_init( void ) { }
-void gtr_notify_send( TrTorrent * tor UNUSED ) { }
-void gtr_notify_added( const char * name UNUSED ) { }
+void gtr_notify_torrent_completed( TrCore * core UNUSED, int torrent_id UNUSED ) { }
+void gtr_notify_torrent_added( const char * name UNUSED ) { }
 
 #else
  #include <libnotify/notify.h>
@@ -42,25 +42,49 @@ gtr_notify_init( void )
     notify_init( "Transmission" );
 }
 
-static void
-notifyCallback( NotifyNotification * n UNUSED,
-                const char *           action,
-                gpointer               gdata )
+struct notify_callback_data
 {
-    TrTorrent * gtor = TR_TORRENT( gdata );
+    TrCore * core;
+    int torrent_id;
+};
 
-    if( !strcmp( action, "folder" ) )
+static void
+notify_callback_data_free( gpointer gdata )
+{
+    struct notify_callback_data * data = gdata;
+    g_object_unref( G_OBJECT( data->core ) );
+    g_free( data );
+}
+
+static struct notify_callback_data *
+notify_callback_data_new( TrCore * core, int torrent_id )
+{
+    struct notify_callback_data * data = g_new( struct notify_callback_data, 1 );
+    data->core = core;
+    data->torrent_id = torrent_id;
+    g_object_ref( G_OBJECT( data->core ) );
+    return data;
+}
+
+static void
+notifyCallback( NotifyNotification  * n UNUSED,
+                const char          * action,
+                gpointer              gdata )
+{
+    struct notify_callback_data * data = gdata;
+    tr_torrent * tor = gtr_core_find_torrent( data->core, data->torrent_id );
+
+    if( tor != NULL )
     {
-        tr_torrent_open_folder( gtor );
-    }
-    else if( !strcmp( action, "file" ) )
-    {
-        tr_torrent * tor = tr_torrent_handle( gtor );
-        const tr_info * info = tr_torrent_info( gtor );
-        if( tor && info )
+        if( !strcmp( action, "folder" ) )
         {
+            gtr_core_open_folder( data->core, data->torrent_id );
+        }
+        else if( !strcmp( action, "file" ) )
+        {
+            const tr_info * inf = tr_torrentInfo( tor );
             const char * dir = tr_torrentGetDownloadDir( tor );
-            char * path = g_build_filename( dir, info->files[0].name, NULL );
+            char * path = g_build_filename( dir, inf->files[0].name, NULL );
             gtr_open_file( path );
             g_free( path );
         }
@@ -108,8 +132,22 @@ addIcon( NotifyNotification * notify )
     }
 }
 
+static NotifyNotification *
+tr_notify_notification_new( const char * summary,
+                            const char * body,
+                            const char * icon )
+{
+    NotifyNotification * n = notify_notification_new( summary, body, icon
+/* the fourth argument was removed in libnotify 0.7.0 */
+#if !defined(NOTIFY_VERSION_MINOR) || (NOTIFY_VERSION_MAJOR == 0 && NOTIFY_VERSION_MINOR < 7)
+                                                     , NULL
+#endif
+                                                            );
+    return n;
+}
+
 void
-gtr_notify_send( TrTorrent *tor )
+gtr_notify_torrent_completed( TrCore * core, int torrent_id )
 {
 #ifdef HAVE_LIBCANBERRA
     if( gtr_pref_flag_get( PREF_KEY_PLAY_DOWNLOAD_COMPLETE_SOUND ) )
@@ -125,29 +163,27 @@ gtr_notify_send( TrTorrent *tor )
 
     if( gtr_pref_flag_get( PREF_KEY_SHOW_DESKTOP_NOTIFICATION ) )
     {
-        const tr_info * info = tr_torrent_info( tor );
         NotifyNotification * n;
+        tr_torrent * tor = gtr_core_find_torrent( core, torrent_id );
 
-        n = notify_notification_new( _( "Torrent Complete" ),
-                                     tr_torrentName( tr_torrent_handle( tor ) ), NULL
-/* the fourth argument was removed in libnotify 0.7.0 */
-#if !defined(NOTIFY_VERSION_MINOR) || (NOTIFY_VERSION_MAJOR == 0 && NOTIFY_VERSION_MINOR < 7)
-                                                     , NULL
-#endif
-                                                            );
+        n = tr_notify_notification_new( _( "Torrent Complete" ), tr_torrentName( tor ), NULL );
         addIcon( n );
 
         if( can_support_actions( ) )
         {
-            if( info->fileCount == 1 )
+            const tr_info * inf = tr_torrentInfo( tor );
+            if( inf->fileCount == 1 )
                 notify_notification_add_action(
                     n, "file", _( "Open File" ),
-                    NOTIFY_ACTION_CALLBACK( notifyCallback ), tor,
-                    NULL );
+                    NOTIFY_ACTION_CALLBACK( notifyCallback ),
+                    notify_callback_data_new( core, torrent_id ),
+                    notify_callback_data_free );
 
             notify_notification_add_action(
                 n, "folder", _( "Open Folder" ),
-                NOTIFY_ACTION_CALLBACK( notifyCallback ), tor, NULL );
+                NOTIFY_ACTION_CALLBACK( notifyCallback ),
+                notify_callback_data_new( core, torrent_id ),
+                notify_callback_data_free );
         }
 
         notify_notification_show( n, NULL );
@@ -155,17 +191,11 @@ gtr_notify_send( TrTorrent *tor )
 }
 
 void
-gtr_notify_added( const char * name )
+gtr_notify_torrent_added( const char * name )
 {
     if( gtr_pref_flag_get( PREF_KEY_SHOW_DESKTOP_NOTIFICATION ) )
     {
-        NotifyNotification * n = notify_notification_new(
-            _( "Torrent Added" ), name, NULL
-/* the fourth argument was removed in libnotify 0.7.0 */
-#if !defined(NOTIFY_VERSION_MINOR) || (NOTIFY_VERSION_MAJOR == 0 && NOTIFY_VERSION_MINOR < 7)
-	    , NULL
-#endif
-	    );
+        NotifyNotification * n = tr_notify_notification_new( _( "Torrent Added" ), name, NULL );
         addIcon( n );
         notify_notification_set_timeout( n, NOTIFY_EXPIRES_DEFAULT );
         notify_notification_show( n, NULL );

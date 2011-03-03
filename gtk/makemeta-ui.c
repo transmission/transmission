@@ -129,7 +129,7 @@ addTorrent( MakeMetaUI * ui )
 {
     char * path;
     const tr_metainfo_builder * b = ui->builder;
-    tr_ctor * ctor = tr_ctorNew( tr_core_session( ui->core ) );
+    tr_ctor * ctor = tr_ctorNew( gtr_core_session( ui->core ) );
 
     tr_ctorSetMetainfoFromFile( ctor, ui->target );
 
@@ -137,7 +137,7 @@ addTorrent( MakeMetaUI * ui )
     tr_ctorSetDownloadDir( ctor, TR_FORCE, path );
     g_free( path );
 
-    tr_core_add_ctor( ui->core, ctor );
+    gtr_core_add_ctor( ui->core, ctor );
 }
 
 static void

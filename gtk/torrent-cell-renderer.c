@@ -18,7 +18,6 @@
 #include "hig.h"
 #include "icons.h"
 #include "torrent-cell-renderer.h"
-#include "tr-torrent.h"
 #include "util.h"
 
 /* #define TEST_RTL */

@@ -69,7 +69,7 @@ sort_changed_cb( GtkAction            * action UNUSED,
     const int    i = gtk_radio_action_get_current_value( current );
     const char * val = sort_radio_entries[i].name;
 
-    tr_core_set_pref( myCore, key, val );
+    gtr_core_set_pref( myCore, key, val );
 }
 
 static GtkToggleActionEntry show_toggle_entries[] =
@@ -85,7 +85,7 @@ toggle_pref_cb( GtkToggleAction *  action,
     const char *   key = gtk_action_get_name( GTK_ACTION( action ) );
     const gboolean val = gtk_toggle_action_get_active( action );
 
-    tr_core_set_pref_bool( myCore, key, val );
+    gtr_core_set_pref_bool( myCore, key, val );
 }
 
 static GtkToggleActionEntry  pref_toggle_entries[] =

@@ -27,167 +27,66 @@
 
 #include <libtransmission/transmission.h>
 
-#include "conf.h"
 #include "dialogs.h"
-#include "hig.h"
 #include "tr-core.h"
-#include "tr-prefs.h"
 
 /***
 ****
 ***/
 
-struct quitdata
+struct delete_data
 {
-    TrCore *          core;
-    callbackfunc_t    func;
-    void *            cbdata;
-    GtkWidget *       dontask;
+    gboolean   delete_files;
+    GSList   * torrent_ids;
+    TrCore   * core;
 };
 
 static void
-quitresp( GtkWidget * widget,
-          int         response,
-          gpointer    data )
-{
-    struct quitdata * stuff = data;
-    GtkToggleButton * tb = GTK_TOGGLE_BUTTON( stuff->dontask );
-
-    tr_core_set_pref_bool( stuff->core,
-                          PREF_KEY_ASKQUIT,
-                          !gtk_toggle_button_get_active( tb ) );
-
-    if( response == GTK_RESPONSE_ACCEPT )
-        stuff->func( stuff->cbdata );
-
-    g_free( stuff );
-    gtk_widget_destroy( widget );
-}
-
-GtkWidget *
-gtr_confirm_quit( GtkWindow *    parent,
-                  TrCore *       core,
-                  callbackfunc_t func,
-                  void *         cbdata )
-{
-    struct quitdata * stuff;
-    GtkWidget *       w;
-    GtkWidget *       wind;
-    GtkWidget *       dontask;
-
-    stuff          = g_new( struct quitdata, 1 );
-    stuff->func    = func;
-    stuff->cbdata  = cbdata;
-    stuff->core    = core;
-
-    wind = gtk_message_dialog_new_with_markup(
-         parent,
-        GTK_DIALOG_DESTROY_WITH_PARENT,
-        GTK_MESSAGE_WARNING,
-        GTK_BUTTONS_NONE,
-        _(
-            "<big><b>Quit Transmission?</b></big>" ) );
-
-    gtk_dialog_add_button( GTK_DIALOG( wind ), GTK_STOCK_CANCEL,
-                                               GTK_RESPONSE_CANCEL );
-    w = gtk_dialog_add_button( GTK_DIALOG( wind ), GTK_STOCK_QUIT,
-                                                   GTK_RESPONSE_ACCEPT );
-    gtk_dialog_set_default_response( GTK_DIALOG( wind ),
-                                     GTK_RESPONSE_ACCEPT );
-    gtk_dialog_set_alternative_button_order( GTK_DIALOG( wind ),
-                                             GTK_RESPONSE_ACCEPT,
-                                             GTK_RESPONSE_CANCEL,
-                                             -1 );
-    dontask = gtk_check_button_new_with_mnemonic( _( "_Don't ask me again" ) );
-    stuff->dontask = dontask;
-
-    gtr_dialog_set_content( GTK_DIALOG( wind ), dontask );
-
-    g_signal_connect( G_OBJECT( wind ), "response",
-                      G_CALLBACK( quitresp ), stuff );
-    gtk_widget_grab_focus( w );
-
-    gtk_widget_show( wind );
-    return wind;
-}
-
-/***
-****
-***/
-
-struct DeleteData
-{
-    gboolean    delete_files;
-    GSList *    torrents;
-    TrCore *    core;
-};
-
-static void
-removeTorrents( struct DeleteData * data )
+on_remove_dialog_response( GtkDialog * dialog, gint response, gpointer gdd )
 {
     GSList * l;
-
-    for( l = data->torrents; l != NULL; l = l->next )
-        tr_core_remove_torrent( data->core, l->data, data->delete_files );
-    g_slist_free( data->torrents );
-    data->torrents = NULL;
-}
-
-static void
-removeResponse( GtkDialog * dialog,
-                gint        response,
-                gpointer    gdata )
-{
-    struct DeleteData * data = gdata;
+    struct delete_data * dd = gdd;
 
     if( response == GTK_RESPONSE_ACCEPT )
-        removeTorrents( data );
+        for( l=dd->torrent_ids; l!=NULL; l=l->next )
+            gtr_core_remove_torrent( dd->core, GPOINTER_TO_INT( l->data ), dd->delete_files );
 
     gtk_widget_destroy( GTK_WIDGET( dialog ) );
-    g_slist_free( data->torrents );
-    g_free( data );
-}
-
-struct count_data
-{
-    int incomplete;
-    int connected;
-};
-
-static void
-countBusyTorrents( gpointer gtor, gpointer gdata )
-{
-    const tr_stat * stat = tr_torrent_stat( gtor );
-    struct count_data * data = gdata;
-
-    if( stat->leftUntilDone ) ++data->incomplete;
-    if( stat->peersConnected ) ++data->connected;
+    g_slist_free( dd->torrent_ids );
+    g_free( dd );
 }
 
 void
 gtr_confirm_remove( GtkWindow  * parent,
                     TrCore     * core,
-                    GSList     * torrents,
+                    GSList     * torrent_ids,
                     gboolean     delete_files )
 {
-    GtkWidget *         d;
-    const int           count = g_slist_length( torrents );
-    struct count_data   counts;
-    GString           * primary_text;
-    GString           * secondary_text;
-    struct DeleteData * dd;
+    GSList * l;
+    GtkWidget * d;
+    GString * primary_text;
+    GString * secondary_text;
+    struct delete_data * dd;
+    int connected = 0;
+    int incomplete = 0;
+    const int count = g_slist_length( torrent_ids );
 
     if( !count )
         return;
 
-    dd = g_new0( struct DeleteData, 1 );
+    dd = g_new0( struct delete_data, 1 );
     dd->core = core;
-    dd->torrents = torrents;
+    dd->torrent_ids = torrent_ids;
     dd->delete_files = delete_files;
 
-    counts.incomplete = 0;
-    counts.connected = 0;
-    g_slist_foreach( torrents, countBusyTorrents, &counts );
+    for( l=torrent_ids; l!=NULL; l=l->next )
+    {
+        const int id = GPOINTER_TO_INT( l->data );
+        tr_torrent * tor = gtr_core_find_torrent( core, id );
+        const tr_stat * stat = tr_torrentStat( tor );
+        if( stat->leftUntilDone ) ++incomplete;
+        if( stat->peersConnected ) ++connected;
+    }
 
     primary_text = g_string_new( NULL );
 
@@ -206,20 +105,20 @@ gtr_confirm_remove( GtkWindow  * parent,
 
     secondary_text = g_string_new( NULL );
 
-    if( !counts.incomplete && !counts.connected )
+    if( !incomplete && !connected )
     {
         g_string_assign( secondary_text, gtr_ngettext(
                 "Once removed, continuing the transfer will require the torrent file or magnet link.",
                 "Once removed, continuing the transfers will require the torrent files or magnet links.",
                 count ) );
     }
-    else if( count == counts.incomplete )
+    else if( count == incomplete )
     {
         g_string_assign( secondary_text, gtr_ngettext( "This torrent has not finished downloading.",
                                                        "These torrents have not finished downloading.",
                                                        count ) );
     }
-    else if( count == counts.connected )
+    else if( count == connected )
     {
         g_string_assign( secondary_text, gtr_ngettext( "This torrent is connected to peers.",
                                                        "These torrents are connected to peers.",
@@ -227,17 +126,17 @@ gtr_confirm_remove( GtkWindow  * parent,
     }
     else
     {
-        if( counts.connected )
+        if( connected )
             g_string_append( secondary_text, gtr_ngettext( "One of these torrents is connected to peers.",
                                                            "Some of these torrents are connected to peers.",
-                                                       counts.connected ) );
-        if( counts.connected && counts.incomplete )
+                                                       connected ) );
+        if( connected && incomplete )
             g_string_append( secondary_text, "\n" );
 
-        if( counts.incomplete )
+        if( incomplete )
             g_string_assign( secondary_text, gtr_ngettext( "One of these torrents has not finished downloading.",
                                                            "Some of these torrents have not finished downloading.",
-                                                       counts.incomplete ) );
+                                                       incomplete ) );
     }
 
     d = gtk_message_dialog_new_with_markup( parent,
@@ -260,7 +159,7 @@ gtr_confirm_remove( GtkWindow  * parent,
                                              GTK_RESPONSE_ACCEPT,
                                              GTK_RESPONSE_CANCEL,
                                              -1 );
-    g_signal_connect( d, "response", G_CALLBACK( removeResponse ), dd );
+    g_signal_connect( d, "response", G_CALLBACK( on_remove_dialog_response ), dd );
     gtk_widget_show_all( d );
 
     g_string_free( primary_text, TRUE );

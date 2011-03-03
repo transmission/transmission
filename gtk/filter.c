@@ -19,7 +19,7 @@
 #include "favicon.h" /* gtr_get_favicon() */
 #include "filter.h"
 #include "hig.h" /* GUI_PAD */
-#include "tr-core.h" /* MC_TORRENT_RAW */
+#include "tr-core.h" /* MC_TORRENT */
 #include "util.h" /* gtr_idle_add() */
 
 #define DIRTY_KEY          "tr-filter-dirty-key"
@@ -149,7 +149,7 @@ category_filter_model_update( GtkTreeStore * store )
         int keyCount;
         char ** keys;
 
-        gtk_tree_model_get( tmodel, &iter, MC_TORRENT_RAW, &tor, -1 );
+        gtk_tree_model_get( tmodel, &iter, MC_TORRENT, &tor, -1 );
         inf = tr_torrentInfo( tor );
         keyCount = 0;
         keys = g_new( char*, inf->trackerCount );
@@ -692,7 +692,7 @@ activity_filter_model_update( GtkListStore * store )
         hits = 0;
         if( gtk_tree_model_get_iter_first( tmodel, &torrent_iter )) do {
             tr_torrent * tor;
-            gtk_tree_model_get( tmodel, &torrent_iter, MC_TORRENT_RAW, &tor, -1 );
+            gtk_tree_model_get( tmodel, &torrent_iter, MC_TORRENT, &tor, -1 );
             if( test_torrent_activity( tor, type ) )
                 ++hits;
         } while( gtk_tree_model_iter_next( tmodel, &torrent_iter ) );
@@ -910,7 +910,7 @@ is_row_visible( GtkTreeModel * model, GtkTreeIter * iter, gpointer vdata )
     struct filter_data * data = vdata;
     GObject * o = G_OBJECT( data->filter_model );
 
-    gtk_tree_model_get( model, iter, MC_TORRENT_RAW, &tor, -1 );
+    gtk_tree_model_get( model, iter, MC_TORRENT, &tor, -1 );
 
     text = (const char*) g_object_get_data( o, TEXT_KEY );
 

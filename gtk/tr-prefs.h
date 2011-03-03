@@ -32,7 +32,6 @@ GtkWidget * gtr_prefs_dialog_new( GtkWindow * parent, GObject * core );
 #define PREF_KEY_SHOW_MORE_TRACKER_INFO            "show-tracker-scrapes"
 #define PREF_KEY_SHOW_MORE_PEER_INFO               "show-extra-peer-details"
 #define PREF_KEY_SHOW_BACKUP_TRACKERS              "show-backup-trackers"
-#define PREF_KEY_ASKQUIT                           "prompt-before-exit"
 #define PREF_KEY_SORT_MODE                         "sort-mode"
 #define PREF_KEY_SORT_REVERSED                     "sort-reversed"
 #define PREF_KEY_COMPACT_VIEW                      "compact-view"

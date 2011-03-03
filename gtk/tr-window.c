@@ -36,7 +36,6 @@
 #include "hig.h"
 #include "torrent-cell-renderer.h"
 #include "tr-prefs.h"
-#include "tr-torrent.h"
 #include "tr-window.h"
 #include "util.h"
 
@@ -134,7 +133,7 @@ makeview( PrivateData * p )
 
     p->renderer = r = torrent_cell_renderer_new( );
     gtk_tree_view_column_pack_start( col, r, FALSE );
-    gtk_tree_view_column_add_attribute( col, r, "torrent", MC_TORRENT_RAW );
+    gtk_tree_view_column_add_attribute( col, r, "torrent", MC_TORRENT );
     gtk_tree_view_column_add_attribute( col, r, "piece-upload-speed", MC_SPEED_UP );
     gtk_tree_view_column_add_attribute( col, r, "piece-download-speed", MC_SPEED_DOWN );
 
@@ -245,7 +244,7 @@ status_menu_toggled_cb( GtkCheckMenuItem * menu_item,
         PrivateData * p = vprivate;
         const char *  val = g_object_get_data( G_OBJECT(
                                                    menu_item ), STATS_MODE );
-        tr_core_set_pref( p->core, PREF_KEY_STATUSBAR_STATS, val );
+        gtr_core_set_pref( p->core, PREF_KEY_STATUSBAR_STATS, val );
     }
 }
 
@@ -279,7 +278,7 @@ alt_speed_toggled_cb( GtkToggleButton * button, gpointer vprivate )
 {
     PrivateData * p = vprivate;
     const gboolean b = gtk_toggle_button_get_active( button );
-    tr_core_set_pref_bool( p->core, TR_PREFS_KEY_ALT_SPEED_ENABLED,  b );
+    gtr_core_set_pref_bool( p->core, TR_PREFS_KEY_ALT_SPEED_ENABLED,  b );
 }
 
 /***
@@ -298,7 +297,7 @@ findMaxAnnounceTime( GtkTreeModel *      model,
     const tr_stat * torStat;
     time_t *        maxTime = gmaxTime;
 
-    gtk_tree_model_get( model, iter, MC_TORRENT_RAW, &tor, -1 );
+    gtk_tree_model_get( model, iter, MC_TORRENT, &tor, -1 );
     torStat = tr_torrentStatCached( tor );
     *maxTime = MAX( *maxTime, torStat->manualAnnounceTime );
 }
@@ -342,8 +341,8 @@ static gboolean
 onAltSpeedToggledIdle( gpointer vp )
 {
     PrivateData * p = vp;
-    gboolean b = tr_sessionUsesAltSpeed( tr_core_session( p->core ) );
-    tr_core_set_pref_bool( p->core, TR_PREFS_KEY_ALT_SPEED_ENABLED, b );
+    gboolean b = tr_sessionUsesAltSpeed( gtr_core_session( p->core ) );
+    gtr_core_set_pref_bool( p->core, TR_PREFS_KEY_ALT_SPEED_ENABLED, b );
 
     return FALSE;
 }
@@ -373,7 +372,7 @@ onSpeedToggled( GtkCheckMenuItem * check, gpointer vp )
                                     : TR_PREFS_KEY_DSPEED_ENABLED;
 
     if( gtk_check_menu_item_get_active( check ) )
-        tr_core_set_pref_bool( p->core, key, isEnabled );
+        gtr_core_set_pref_bool( p->core, key, isEnabled );
 }
 
 static void
@@ -386,10 +385,10 @@ onSpeedSet( GtkCheckMenuItem * check, gpointer vp )
     tr_direction dir = GPOINTER_TO_INT( g_object_get_data( o, DIRECTION_KEY ) );
 
     key = dir==TR_UP ? TR_PREFS_KEY_USPEED_KBps : TR_PREFS_KEY_DSPEED_KBps;
-    tr_core_set_pref_int( p->core, key, KBps );
+    gtr_core_set_pref_int( p->core, key, KBps );
 
     key = dir==TR_UP ? TR_PREFS_KEY_USPEED_ENABLED : TR_PREFS_KEY_DSPEED_ENABLED;
-    tr_core_set_pref_bool( p->core, key, TRUE );
+    gtr_core_set_pref_bool( p->core, key, TRUE );
 }
 
 static GtkWidget*
@@ -447,7 +446,7 @@ onRatioToggled( GtkCheckMenuItem * check, gpointer vp )
     if( gtk_check_menu_item_get_active( check ) )
     {
         gboolean f = g_object_get_data( G_OBJECT( check ), ENABLED_KEY ) != 0;
-        tr_core_set_pref_bool( p->core, TR_PREFS_KEY_RATIO_ENABLED, f );
+        gtr_core_set_pref_bool( p->core, TR_PREFS_KEY_RATIO_ENABLED, f );
     }
 }
 static void
@@ -456,8 +455,8 @@ onRatioSet( GtkCheckMenuItem * check, gpointer vp )
     PrivateData * p = vp;
     int i = GPOINTER_TO_INT( g_object_get_data( G_OBJECT( check ), RATIO_KEY ) );
     const double ratio = stockRatios[i];
-    tr_core_set_pref_double( p->core, TR_PREFS_KEY_RATIO, ratio );
-    tr_core_set_pref_bool  ( p->core, TR_PREFS_KEY_RATIO_ENABLED, TRUE );
+    gtr_core_set_pref_double( p->core, TR_PREFS_KEY_RATIO, ratio );
+    gtr_core_set_pref_bool  ( p->core, TR_PREFS_KEY_RATIO_ENABLED, TRUE );
 }
 
 static GtkWidget*
@@ -611,8 +610,8 @@ gtr_window_new( GtkUIManager * ui_mgr, TrCore * core )
     gtr_action_set_important( "show-torrent-properties", TRUE );
 
     /* filter */
-    h = filter = p->filter = gtr_filter_bar_new( tr_core_session( core ),
-                                                 tr_core_model( core ),
+    h = filter = p->filter = gtr_filter_bar_new( gtr_core_session( core ),
+                                                 gtr_core_model( core ),
                                                  &p->filter_model );
     gtk_container_set_border_width( GTK_CONTAINER( h ), GUI_PAD_SMALL );
 
@@ -737,7 +736,7 @@ gtr_window_new( GtkUIManager * ui_mgr, TrCore * core )
     p->pref_handler_id = g_signal_connect( core, "prefs-changed",
                                            G_CALLBACK( prefsChanged ), self );
 
-    tr_sessionSetAltSpeedFunc( tr_core_session( core ), onAltSpeedToggled, p );
+    tr_sessionSetAltSpeedFunc( gtr_core_session( core ), onAltSpeedToggled, p );
 
     return self;
 }
@@ -748,7 +747,7 @@ updateTorrentCount( PrivateData * p )
     if( p && p->core )
     {
         char      buf[512];
-        const int torrentCount = gtk_tree_model_iter_n_children( tr_core_model( p->core ), NULL );
+        const int torrentCount = gtk_tree_model_iter_n_children( gtr_core_model( p->core ), NULL );
         const int visibleCount = gtk_tree_model_iter_n_children( p->filter_model, NULL );
 
         if( !torrentCount )
@@ -773,7 +772,7 @@ updateStats( PrivateData * p )
     const char *            pch;
     char                    up[32], down[32], ratio[32], buf[512];
     struct tr_session_stats stats;
-    tr_session *            session = tr_core_session( p->core );
+    tr_session *            session = gtr_core_session( p->core );
 
     /* update the stats */
     pch = gtr_pref_string_get( PREF_KEY_STATUSBAR_STATS );
@@ -817,14 +816,14 @@ updateStats( PrivateData * p )
 static void
 updateSpeeds( PrivateData * p )
 {
-    tr_session * session = tr_core_session( p->core );
+    tr_session * session = gtr_core_session( p->core );
 
     if( session != NULL )
     {
         char buf[128];
         double up=0, down=0;
         GtkTreeIter iter;
-        GtkTreeModel * model = tr_core_model( p->core );
+        GtkTreeModel * model = gtr_core_model( p->core );
 
         if( gtk_tree_model_get_iter_first( model, &iter ) ) do
         {
@@ -850,7 +849,7 @@ gtr_window_refresh( TrWindow * self )
 {
     PrivateData * p = get_private_data( self );
 
-    if( p && p->core && tr_core_session( p->core ) )
+    if( p && p->core && gtr_core_session( p->core ) )
     {
         updateSpeeds( p );
         updateTorrentCount( p );

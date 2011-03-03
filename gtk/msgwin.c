@@ -21,8 +21,8 @@
 
 #include "conf.h"
 #include "hig.h"
-#include "tr-core.h"
 #include "msgwin.h"
+#include "tr-core.h"
 #include "tr-prefs.h"
 #include "util.h"
 
@@ -112,7 +112,7 @@ level_combo_changed_cb( GtkComboBox * combo_box, gpointer gdata )
     const gboolean pinned_to_new = is_pinned_to_new( data );
 
     tr_setMessageLevel( level );
-    tr_core_set_pref_int( data->core, TR_PREFS_KEY_MSGLEVEL, level );
+    gtr_core_set_pref_int( data->core, TR_PREFS_KEY_MSGLEVEL, level );
     data->maxLevel = level;
     gtk_tree_model_filter_refilter( GTK_TREE_MODEL_FILTER( data->filter ) );
 
@@ -216,23 +216,13 @@ onPauseToggled( GtkToggleToolButton * w, gpointer gdata )
 static const char*
 getForegroundColor( int msgLevel )
 {
-    const char * foreground;
-
     switch( msgLevel )
     {
-        case TR_MSG_DBG:
-            foreground = "forestgreen"; break;
-
-        case TR_MSG_INF:
-            foreground = "black"; break;
-
-        case TR_MSG_ERR:
-            foreground = "red"; break;
-
-        default:
-            g_assert_not_reached( );
+        case TR_MSG_DBG: return "forestgreen";
+        case TR_MSG_INF: return "black";
+        case TR_MSG_ERR: return "red";
+        default: g_assert_not_reached( ); return "black";
     }
-    return foreground;
 }
 
 static void

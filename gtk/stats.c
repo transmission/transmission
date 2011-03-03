@@ -16,6 +16,7 @@
 #include "stats.h"
 #include "tr-core.h"
 #include "tr-prefs.h"
+#include "util.h"
 
 enum
 {
@@ -62,8 +63,8 @@ updateStats( gpointer gdata )
     struct stat_ui * ui = gdata;
     tr_session_stats one, all;
 
-    tr_sessionGetStats( tr_core_session( ui->core ), &one );
-    tr_sessionGetCumulativeStats( tr_core_session( ui->core ), &all );
+    tr_sessionGetStats( gtr_core_session( ui->core ), &one );
+    tr_sessionGetCumulativeStats( gtr_core_session( ui->core ), &all );
 
     setLabel( ui->one_up_lb,
              tr_strlsize( buf, one.uploadedBytes, sizeof( buf ) ) );
@@ -121,7 +122,7 @@ dialogResponse( GtkDialog * dialog,
         gtk_message_dialog_format_secondary_text( GTK_MESSAGE_DIALOG( w ), "%s", secondary );
         if( gtk_dialog_run( GTK_DIALOG( w ) ) == TR_RESPONSE_RESET )
         {
-            tr_sessionClearStats( tr_core_session( ui->core ) );
+            tr_sessionClearStats( gtr_core_session( ui->core ) );
             updateStats( ui );
         }
         gtk_widget_destroy( w );

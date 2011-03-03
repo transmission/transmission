@@ -18,11 +18,13 @@
 #include <gtk/gtk.h>
 
 #include <libtransmission/transmission.h>
+#include <libtransmission/utils.h>
 
 #include "file-list.h"
 #include "hig.h"
 #include "icons.h"
 #include "tr-prefs.h"
+#include "util.h"
 
 #define TR_DOWNLOAD_KEY  "tr-download-key"
 #define TR_COLUMN_ID_KEY "tr-model-column-id-key"
@@ -243,11 +245,7 @@ gtr_tree_model_foreach_postorder( GtkTreeModel            * model,
 static void
 refresh( FileData * data )
 {
-    tr_torrent * tor = NULL;
-    tr_session * session = tr_core_session( data->core );
-
-    if( session != NULL )
-        tor = tr_torrentFindFromId( session, data->torrentId );
+    tr_torrent * tor = gtr_core_find_torrent( data->core, data->torrentId );
 
     if( tor == NULL )
     {
@@ -265,7 +263,7 @@ refresh( FileData * data )
         refresh_data.sort_column_id = sort_column_id;
         refresh_data.resort_needed = FALSE;
         refresh_data.refresh_file_stat = tr_torrentFiles( tor, &fileCount );
-        refresh_data.tor = tr_torrentFindFromId( session, data->torrentId );
+        refresh_data.tor = tor;
         refresh_data.file_data = data;
 
         gtr_tree_model_foreach_postorder( data->model, refreshFilesForeach, &refresh_data );
@@ -527,8 +525,7 @@ gtr_file_list_set_torrent( GtkWidget * w, int torrentId )
     /* populate the model */
     if( torrentId > 0 )
     {
-        tr_session * session = tr_core_session( data->core );
-        tr_torrent * tor = tr_torrentFindFromId( session, torrentId );
+        tr_torrent * tor = gtr_core_find_torrent( data->core, torrentId );
         if( tor != NULL )
         {
             tr_file_index_t i;
@@ -649,7 +646,7 @@ onRowActivated( GtkTreeView * view, GtkTreePath * path,
 {
     gboolean handled = FALSE;
     FileData * data = gdata;
-    tr_torrent * tor = tr_torrentFindFromId( tr_core_session( data->core ), data->torrentId );
+    tr_torrent * tor = gtr_core_find_torrent( data->core, data->torrentId );
 
     if( tor != NULL )
     {
@@ -694,7 +691,7 @@ onViewPathToggled( GtkTreeView       * view,
         return FALSE;
 
     cid = GPOINTER_TO_INT( g_object_get_data( G_OBJECT( col ), TR_COLUMN_ID_KEY ) );
-    tor = tr_torrentFindFromId( tr_core_session( data->core ), data->torrentId );
+    tor = gtr_core_find_torrent( data->core, data->torrentId );
     if( ( tor != NULL ) && ( ( cid == FC_PRIORITY ) || ( cid == FC_ENABLED ) ) )
     {
         GtkTreeIter iter;
@@ -767,26 +764,24 @@ getAndSelectEventPath( GtkTreeView        * treeview,
 static gboolean
 onViewButtonPressed( GtkWidget * w, GdkEventButton * event, gpointer gdata )
 {
-    tr_torrent        * tor;
-    GtkTreeViewColumn * col = NULL;
-    GtkTreePath       * path = NULL;
-    FileData          * data = gdata;
-    gboolean            handled = FALSE;
-    GtkTreeView       * treeview = GTK_TREE_VIEW( w );
+    tr_torrent * tor;
+    gboolean handled = FALSE;
+    FileData * data = gdata;
 
-    tor = tr_torrentFindFromId( tr_core_session( data->core ),
-                                data->torrentId );
-    if( tor == NULL )
-        return FALSE;
-
-    if( event->type == GDK_BUTTON_PRESS && event->button == 1
-        && !( event->state & ( GDK_SHIFT_MASK | GDK_CONTROL_MASK ) )
-        && getAndSelectEventPath( treeview, event, &col, &path ) )
+    if(( tor = gtr_core_find_torrent( data->core, data->torrentId )))
     {
-        handled = onViewPathToggled( treeview, col, path, data );
+        GtkTreePath * path;
+        GtkTreeViewColumn * col;
+        GtkTreeView * treeview = GTK_TREE_VIEW( w );
+
+        if( event->type == GDK_BUTTON_PRESS && event->button == 1
+            && !( event->state & ( GDK_SHIFT_MASK | GDK_CONTROL_MASK ) )
+            && getAndSelectEventPath( treeview, event, &col, &path ) )
+            handled = onViewPathToggled( treeview, col, path, data );
+
+        gtk_tree_path_free( path );
     }
 
-    gtk_tree_path_free( path );
     return handled;
 }
 

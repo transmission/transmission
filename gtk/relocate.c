@@ -52,9 +52,7 @@ startMovingNextTorrent( struct relocate_dialog_data * data )
     char * str;
     const int id = GPOINTER_TO_INT( data->torrent_ids->data );
 
-    tr_session * session = tr_core_session( data->core );
-
-    tr_torrent * tor = tr_torrentFindFromId( session, id );
+    tr_torrent * tor = gtr_core_find_torrent( data->core, id );
     if( tor != NULL )
         tr_torrentSetLocation( tor, previousLocation, data->do_move, NULL, &data->done );
 

@@ -29,18 +29,14 @@
 #include <gtk/gtk.h>
 
 #include <libtransmission/transmission.h>
-#include "tr-torrent.h"
+#include <libtransmission/bencode.h>
 
-#define TR_CORE_TYPE ( tr_core_get_type( ) )
-#define TR_CORE( o ) G_TYPE_CHECK_INSTANCE_CAST( ( o ), TR_CORE_TYPE,\
-                                                TrCore )
-#define TR_IS_CORE( o ) G_TYPE_CHECK_INSTANCE_TYPE( ( o ), TR_CORE_TYPE )
-#define TR_CORE_CLASS( k ) G_TYPE_CHECK_CLASS_CAST( ( k ), TR_CORE_TYPE,\
-                                                   TrCoreClass )
-#define TR_IS_CORE_CLASS( k ) G_TYPE_CHECK_CLASS_TYPE( ( k ), TR_CORE_TYPE )
-#define TR_CORE_GET_CLASS( o ) G_TYPE_INSTANCE_GET_CLASS( ( o ),\
-                                                         TR_CORE_TYPE, \
-                                                         TrCoreClass )
+#define TR_CORE_TYPE ( gtr_core_get_type() )
+#define TR_CORE(o) G_TYPE_CHECK_INSTANCE_CAST((o), TR_CORE_TYPE, TrCore)
+#define TR_IS_CORE(o) G_TYPE_CHECK_INSTANCE_TYPE((o), TR_CORE_TYPE )
+#define TR_CORE_CLASS(k) G_TYPE_CHECK_CLASS_CAST((k), TR_CORE_TYPE, TrCoreClass)
+#define TR_IS_CORE_CLASS(k) G_TYPE_CHECK_CLASS_TYPE((k), TR_CORE_TYPE )
+#define TR_CORE_GET_CLASS(o) G_TYPE_INSTANCE_GET_CLASS((o), TR_CORE_TYPE, TrCoreClass)
 
 typedef struct _TrCore
 {
@@ -64,29 +60,31 @@ typedef struct _TrCoreClass
     void (* add_error)         (TrCore*, enum tr_core_err, const char * name);
     void (* add_prompt)        (TrCore*, gpointer ctor);
     void (* blocklist_updated) (TrCore*, int ruleCount );
-    void (* busy)              (TrCore*, gboolean isBusy);
+    void (* busy)              (TrCore*, gboolean is_busy);
     void (* prefs_changed)     (TrCore*, const char* key);
-    void (* port_tested)       (TrCore*, gboolean isOpen);
+    void (* port_tested)       (TrCore*, gboolean is_open);
     void (* quit)              (TrCore*);
 }
 TrCoreClass;
 
-GType          tr_core_get_type( void );
+GType          gtr_core_get_type( void );
 
-TrCore *       tr_core_new( tr_session * );
+TrCore *       gtr_core_new( tr_session * );
 
-void           tr_core_close( TrCore* );
+void           gtr_core_close( TrCore* );
 
 /* Return the model used without incrementing the reference count */
-GtkTreeModel * tr_core_model( TrCore * self );
+GtkTreeModel * gtr_core_model( TrCore * self );
 
-void           tr_core_clear( TrCore * self );
+void           gtr_core_clear( TrCore * self );
 
-tr_session *   tr_core_session( TrCore * self );
+tr_session *   gtr_core_session( TrCore * self );
 
-size_t         tr_core_get_active_torrent_count( TrCore * self );
+size_t         gtr_core_get_active_torrent_count( TrCore * self );
 
-size_t         tr_core_get_torrent_count( TrCore * self );
+size_t         gtr_core_get_torrent_count( TrCore * self );
+
+tr_torrent *   gtr_core_find_torrent( TrCore * core, int id );
 
 /******
 *******
@@ -96,7 +94,7 @@ size_t         tr_core_get_torrent_count( TrCore * self );
  * Load saved state and return number of torrents added.
  * May trigger one or more "error" signals with TR_CORE_ERR_ADD_TORRENT
  */
-void tr_core_load( TrCore * self, gboolean forcepaused );
+void gtr_core_load( TrCore * self, gboolean forcepaused );
 
 /**
  * Add a list of torrents.
@@ -105,78 +103,73 @@ void tr_core_load( TrCore * self, gboolean forcepaused );
  * May pop up dialogs for each torrent if that preference is enabled.
  * May trigger one or more "error" signals with TR_CORE_ERR_ADD_TORRENT
  */
-void tr_core_add_list( TrCore *    self,
-                       GSList *    torrentFiles,
-                       gboolean    doStart,
-                       gboolean    doPrompt,
-                       gboolean    doNotify );
+void gtr_core_add_list( TrCore *    self,
+                        GSList *    torrentFiles,
+                        gboolean    doStart,
+                        gboolean    doPrompt,
+                        gboolean    doNotify );
 
-void tr_core_add_list_defaults( TrCore    * core,
-                                GSList    * torrentFiles,
-                                gboolean    doNotify );
-
+void gtr_core_add_list_defaults( TrCore    * core,
+                                 GSList    * torrentFiles,
+                                 gboolean    doNotify );
 
 /** @brief Add a torrent. */
-gboolean tr_core_add_metainfo( TrCore      * core,
-                               const char  * base64_metainfo,
-                               gboolean    * setme_success,
-                               GError     ** err );
+gboolean gtr_core_add_metainfo( TrCore      * core,
+                                const char  * base64_metainfo,
+                                gboolean    * setme_success,
+                                GError     ** err );
 
 /** @brief Add a torrent from a URL */
-void tr_core_add_from_url( TrCore * core, const char * url );
+void gtr_core_add_from_url( TrCore * core, const char * url );
 
 /** @brief Add a torrent.
     @param ctor this function assumes ownership of the ctor */
-void tr_core_add_ctor( TrCore  * core,
-                       tr_ctor * ctor );
-
+void gtr_core_add_ctor( TrCore * core, tr_ctor * ctor );
 
 /** Add a torrent. */
-void tr_core_add_torrent( TrCore*, TrTorrent*, gboolean doNotify );
+void gtr_core_add_torrent( TrCore*, tr_torrent*, gboolean doNotify );
 
 /** Present the main window */
-gboolean tr_core_present_window( TrCore*, gboolean * setme_success, GError ** err );
-
+gboolean gtr_core_present_window( TrCore*, gboolean * setme_success, GError ** err );
 
 /**
  * Notifies listeners that torrents have been added.
  * This should be called after one or more tr_core_add*() calls.
  */
-void     tr_core_torrents_added( TrCore * self );
+void gtr_core_torrents_added( TrCore * self );
 
 /******
 *******
 ******/
 
 /* remove a torrent */
-void  tr_core_remove_torrent( TrCore * self, TrTorrent * gtor, gboolean deleteFiles );
-void  tr_core_remove_torrent_from_id( TrCore * self, int id, gboolean deleteFiles );
+void gtr_core_remove_torrent( TrCore * self, int id, gboolean delete_files );
 
 /* update the model with current torrent status */
-void  tr_core_update( TrCore * self );
+void gtr_core_update( TrCore * self );
 
 /**
 ***  Set a preference value, save the prefs file, and emit the "prefs-changed" signal
 **/
 
-void tr_core_set_pref     ( TrCore * self, const char * key, const char * val );
-void tr_core_set_pref_bool( TrCore * self, const char * key, gboolean val );
-void tr_core_set_pref_int ( TrCore * self, const char * key, int val );
-void tr_core_set_pref_double( TrCore * self, const char * key, double val );
+void gtr_core_set_pref       ( TrCore * self, const char * key, const char * val );
+void gtr_core_set_pref_bool  ( TrCore * self, const char * key, gboolean val );
+void gtr_core_set_pref_int   ( TrCore * self, const char * key, int val );
+void gtr_core_set_pref_double( TrCore * self, const char * key, double val );
 
 /**
 ***
 **/
 
-void tr_core_torrent_changed( TrCore * core, int id );
+void gtr_core_port_test( TrCore * core );
 
-void tr_core_port_test( TrCore * core );
+void gtr_core_blocklist_update( TrCore * core );
 
-void tr_core_blocklist_update( TrCore * core );
+void gtr_core_exec( TrCore * core, const tr_benc * benc );
 
-void tr_core_exec( TrCore * core, const tr_benc * benc );
+void gtr_core_exec_json( TrCore * core, const char * json );
 
-void tr_core_exec_json( TrCore * core, const char * json );
+void gtr_core_open_folder( TrCore * core, int torrent_id );
 
 
 /**
@@ -190,7 +183,7 @@ enum
     MC_NAME,
     MC_NAME_COLLATED,
     MC_TORRENT,
-    MC_TORRENT_RAW,
+    MC_TORRENT_ID,
     MC_SPEED_UP,
     MC_SPEED_DOWN,
     MC_RECHECK_PROGRESS,
@@ -207,7 +200,6 @@ enum
     /* tr_stat.{ peersSendingToUs + peersGettingFromUs + webseedsSendingToUs }
      * Tracked because ACTIVITY_FILTER_ACTIVE needs the row-changed events */
     MC_ACTIVE_PEER_COUNT,
-
 
     MC_ROW_COUNT
 };
