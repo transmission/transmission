@@ -37,15 +37,6 @@ extern const char * speed_M_str;
 extern const char * speed_G_str;
 extern const char * speed_T_str;
 
-/* portability wrapper around g_warn_if_fail() for older versions of glib */
-#ifdef g_warn_if_fail
- #define gtr_warn_if_fail(expr) g_warn_if_fail(expr)
-#else
- #define gtr_warn_if_fail(expr) do { if G_LIKELY (expr) ; else \
-                                       g_log (G_LOG_DOMAIN, G_LOG_LEVEL_WARNING, "%s:%d func(): %s: invariant failed: %s", \
-                                              __FILE__, __LINE__, G_STRFUNC, #expr ); } while(0)
-#endif
-
 /* macro to shut up "unused parameter" warnings */
 #ifndef UNUSED
  #define UNUSED G_GNUC_UNUSED
