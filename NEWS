@@ -1,4 +1,4 @@
-=== Transmission 2.22 (2011/0m/dd) ===
+=== Transmission 2.22 (2011/03/03) ===
 ==== All Platforms ====
   * Faster endgame
   * Fix bug where leechers might be disconnected while seeding in some situations
