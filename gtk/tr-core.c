@@ -316,8 +316,8 @@ core_emit_busy( TrCore * core, gboolean is_busy )
     g_signal_emit( core, core_signals[BUSY_SIGNAL], 0, is_busy );
 }
 
-static inline void
-core_emit_prefs_changed( TrCore * core, const char * key )
+void
+gtr_core_pref_changed( TrCore * core, const char * key )
 {
     g_signal_emit( core, core_signals[PREFS_SIGNAL], 0, key );
 }
@@ -1573,7 +1573,7 @@ core_maybe_inhibit_hibernation( TrCore * core )
 static void
 core_commit_prefs_change( TrCore * core, const char * key )
 {
-    core_emit_prefs_changed( core, key );
+    gtr_core_pref_changed( core, key );
     gtr_pref_save( gtr_core_session( core ) );
 }
 

@@ -86,6 +86,9 @@ size_t         gtr_core_get_torrent_count( TrCore * self );
 
 tr_torrent *   gtr_core_find_torrent( TrCore * core, int id );
 
+void           gtr_core_pref_changed( TrCore * core, const char * key );
+
+
 /******
 *******
 ******/
