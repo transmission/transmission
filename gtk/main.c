@@ -344,7 +344,7 @@ on_selection_changed( GtkTreeSelection * s UNUSED, gpointer gdata )
 ***/
 
 static void app_setup( TrWindow       * wind,
-                       GSList         * args,
+                       GSList         * torrent_files,
                        struct cbdata  * cbdata,
                        gboolean         paused,
                        gboolean         minimized );
@@ -948,16 +948,16 @@ on_core_busy( TrCore * core UNUSED, gboolean busy, struct cbdata * c )
 
 static void
 app_setup( TrWindow      * wind,
-           GSList        * torrentFiles,
+           GSList        * files,
            struct cbdata * cbdata,
            gboolean        pause_all,
            gboolean        is_iconified )
 {
-    const gboolean doStart = gtr_pref_flag_get( TR_PREFS_KEY_START ) && !pause_all;
-    const gboolean doPrompt = gtr_pref_flag_get( PREF_KEY_OPTIONS_PROMPT );
-    const gboolean doNotify = TRUE;
+    const gboolean do_start = gtr_pref_flag_get( TR_PREFS_KEY_START ) && !pause_all;
+    const gboolean do_prompt = gtr_pref_flag_get( PREF_KEY_OPTIONS_PROMPT );
+    const gboolean do_notify = TRUE;
 
-    cbdata->is_iconified  = is_iconified;
+    cbdata->is_iconified = is_iconified;
 
     if( is_iconified )
         gtr_pref_flag_set( PREF_KEY_SHOW_TRAY_ICON, TRUE );
@@ -972,8 +972,8 @@ app_setup( TrWindow      * wind,
 
     /* add torrents from command-line and saved state */
     gtr_core_load( cbdata->core, pause_all );
-    gtr_core_add_list( cbdata->core, torrentFiles, doStart, doPrompt, doNotify );
-    torrentFiles = NULL;
+    gtr_core_add_list( cbdata->core, files, do_start, do_prompt, do_notify );
+    files = NULL;
     gtr_core_torrents_added( cbdata->core );
 
     /* set up main window */
@@ -1083,7 +1083,7 @@ on_drag_data_received( GtkWidget         * widget          UNUSED,
 {
     int i;
     gboolean success = FALSE;
-    GSList * filenames = NULL;
+    GSList * files = NULL;
     struct cbdata * data = gdata;
     char ** uris = gtk_selection_data_get_uris( selection_data );
 
@@ -1095,7 +1095,7 @@ on_drag_data_received( GtkWidget         * widget          UNUSED,
 
         if( filename && g_file_test( filename, G_FILE_TEST_EXISTS ) )
         {
-            filenames = g_slist_append( filenames, g_strdup( filename ) );
+            files = g_slist_append( files, g_strdup( filename ) );
             success = TRUE;
         }
         else if( tr_urlIsValid( uri, -1 ) || gtr_is_magnet_link( uri ) )
@@ -1105,8 +1105,8 @@ on_drag_data_received( GtkWidget         * widget          UNUSED,
         }
     }
 
-    if( filenames )
-        gtr_core_add_list_defaults( data->core, g_slist_reverse( filenames ), TRUE );
+    if( files )
+        gtr_core_add_list_defaults( data->core, g_slist_reverse( files ), TRUE );
 
     gtr_core_torrents_added( data->core );
     gtk_drag_finish( drag_context, success, FALSE, time_ );
@@ -1840,8 +1840,8 @@ gtr_actions_handler( const char * action_name, gpointer user_data )
             data->prefs = gtr_prefs_dialog_new( data->wind, G_OBJECT( data->core ) );
             g_signal_connect( data->prefs, "destroy",
                               G_CALLBACK( gtk_widget_destroyed ), &data->prefs );
-            gtk_widget_show( GTK_WIDGET( data->prefs ) );
         }
+        gtr_window_present( GTK_WINDOW( data->prefs ) );
     }
     else if( !strcmp( action_name, "toggle-message-log" ) )
     {

@@ -393,7 +393,7 @@ onRefresh( gpointer gdata )
         if( pinned_to_new )
             scroll_to_bottom( data );
     }
-        
+
     return TRUE;
 }
 

@@ -2397,7 +2397,7 @@ tracker_page_new( struct DetailsImpl * di )
 
         sel = gtk_tree_view_get_selection( GTK_TREE_VIEW( v ) );
         g_signal_connect( sel, "changed", G_CALLBACK( on_tracker_list_selection_changed ), di );
-        
+
         c = gtk_tree_view_column_new( );
         gtk_tree_view_column_set_title( c, _( "Trackers" ) );
         gtk_tree_view_append_column( GTK_TREE_VIEW( v ), c );

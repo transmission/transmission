@@ -108,13 +108,13 @@ void gtr_core_load( TrCore * self, gboolean forcepaused );
  */
 void gtr_core_add_list( TrCore *    self,
                         GSList *    torrentFiles,
-                        gboolean    doStart,
-                        gboolean    doPrompt,
-                        gboolean    doNotify );
+                        gboolean    do_start,
+                        gboolean    do_prompt,
+                        gboolean    do_notify );
 
 void gtr_core_add_list_defaults( TrCore    * core,
                                  GSList    * torrentFiles,
-                                 gboolean    doNotify );
+                                 gboolean    do_notify );
 
 /** @brief Add a torrent. */
 gboolean gtr_core_add_metainfo( TrCore      * core,
@@ -130,7 +130,7 @@ void gtr_core_add_from_url( TrCore * core, const char * url );
 void gtr_core_add_ctor( TrCore * core, tr_ctor * ctor );
 
 /** Add a torrent. */
-void gtr_core_add_torrent( TrCore*, tr_torrent*, gboolean doNotify );
+void gtr_core_add_torrent( TrCore*, tr_torrent*, gboolean do_notify );
 
 /** Present the main window */
 gboolean gtr_core_present_window( TrCore*, gboolean * setme_success, GError ** err );

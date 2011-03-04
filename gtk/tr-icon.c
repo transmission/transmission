@@ -25,7 +25,7 @@
 
 #ifndef STATUS_ICON_SUPPORTED
 gpointer gtr_icon_new( TrCore * core UNUSED ) { return NULL; }
-void gtr_icon_refresh( gpointer vicon UNUSED ) { } 
+void gtr_icon_refresh( gpointer vicon UNUSED ) { }
 #else
 
 #ifdef HAVE_LIBAPPINDICATOR
