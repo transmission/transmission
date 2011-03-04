@@ -476,7 +476,7 @@ onRPCChanged( tr_session            * session,
             tr_sessionGetSettings( session, oldvals );
 
             for( l=changed_keys; l!=NULL; l=l->next )
-                prefschanged( cbdata->core, key, cbdata );
+                tr_core_pref_changed( cbdata->core, l->data );
 
             g_slist_free( changed_keys );
             tr_bencFree( &tmp );
