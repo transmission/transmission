@@ -655,4 +655,4 @@
          |         | yes       | session-close  | new method
    ------+---------+-----------+----------------+-------------------------------
    13    | 2.30    | yes       | session-get    | new arg "isUTP" to the "peers" list
-         |         |        NO | torrent-get    | reomved arg "peersKnown"
+         |         |        NO | torrent-get    | removed arg "peersKnown"
