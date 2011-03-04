@@ -38,15 +38,13 @@ struct stat_ui
 };
 
 static void
-setLabel( GtkWidget *  w,
-          const char * str )
+setLabel( GtkWidget *  w, const char * str )
 {
     gtr_label_set_text( GTK_LABEL( w ), str );
 }
 
 static void
-setLabelFromRatio( GtkWidget * w,
-                   double      d )
+setLabelFromRatio( GtkWidget * w, double d )
 {
     char buf[128];
 
@@ -57,49 +55,40 @@ setLabelFromRatio( GtkWidget * w,
 static gboolean
 updateStats( gpointer gdata )
 {
-    const char *     fmt;
-    char             buf[128];
-
-    struct stat_ui * ui = gdata;
+    char buf[128];
+    const char * fmt;
     tr_session_stats one, all;
+    const size_t buflen = sizeof( buf );
+    struct stat_ui * ui = gdata;
 
     tr_sessionGetStats( gtr_core_session( ui->core ), &one );
     tr_sessionGetCumulativeStats( gtr_core_session( ui->core ), &all );
 
-    setLabel( ui->one_up_lb,
-             tr_strlsize( buf, one.uploadedBytes, sizeof( buf ) ) );
-    setLabel( ui->one_down_lb,
-             tr_strlsize( buf, one.downloadedBytes, sizeof( buf ) ) );
-    setLabel( ui->one_time_lb,
-             tr_strltime( buf, one.secondsActive, sizeof( buf ) ) );
+    setLabel( ui->one_up_lb, tr_strlsize( buf, one.uploadedBytes, buflen ) );
+    setLabel( ui->one_down_lb, tr_strlsize( buf, one.downloadedBytes, buflen ) );
+    setLabel( ui->one_time_lb, tr_strltime( buf, one.secondsActive, buflen ) );
     setLabelFromRatio( ui->one_ratio_lb, one.ratio );
 
     fmt = gtr_ngettext( "Started %'d time", "Started %'d times",
                         (int)all.sessionCount );
-    g_snprintf( buf, sizeof( buf ), fmt, (int)all.sessionCount );
+    g_snprintf( buf, buflen, fmt, (int)all.sessionCount );
     setLabel( ui->all_sessions_lb, buf );
-    setLabel( ui->all_up_lb,
-             tr_strlsize( buf, all.uploadedBytes, sizeof( buf ) ) );
-    setLabel( ui->all_down_lb,
-             tr_strlsize( buf, all.downloadedBytes, sizeof( buf ) ) );
-    setLabel( ui->all_time_lb,
-             tr_strltime( buf, all.secondsActive, sizeof( buf ) ) );
+    setLabel( ui->all_up_lb, tr_strlsize( buf, all.uploadedBytes, buflen ) );
+    setLabel( ui->all_down_lb, tr_strlsize( buf, all.downloadedBytes, buflen ) );
+    setLabel( ui->all_time_lb, tr_strltime( buf, all.secondsActive, buflen ) );
     setLabelFromRatio( ui->all_ratio_lb, all.ratio );
 
     return TRUE;
 }
 
 static void
-dialogDestroyed( gpointer         p,
-                 GObject * dialog UNUSED )
+dialogDestroyed( gpointer p, GObject * dialog UNUSED )
 {
     g_source_remove( GPOINTER_TO_UINT( p ) );
 }
 
 static void
-dialogResponse( GtkDialog * dialog,
-                gint        response,
-                gpointer    gdata )
+dialogResponse( GtkDialog * dialog, gint response, gpointer gdata )
 {
     struct stat_ui * ui = gdata;
 
@@ -129,19 +118,17 @@ dialogResponse( GtkDialog * dialog,
     }
 
     if( response == GTK_RESPONSE_CLOSE )
-    {
         gtk_widget_destroy( GTK_WIDGET( dialog ) );
-    }
 }
 
 GtkWidget*
 gtr_stats_dialog_new( GtkWindow * parent, TrCore * core )
 {
-    guint            i;
-    int              row = 0;
-    GtkWidget *      d;
-    GtkWidget *      t;
-    GtkWidget *      l;
+    guint i;
+    GtkWidget * d;
+    GtkWidget * t;
+    GtkWidget * l;
+    int row = 0;
     struct stat_ui * ui = g_new0( struct stat_ui, 1 );
 
     d = gtk_dialog_new_with_buttons( _( "Statistics" ),
@@ -199,4 +186,3 @@ gtr_stats_dialog_new( GtkWindow * parent, TrCore * core )
     g_object_weak_ref( G_OBJECT( d ), dialogDestroyed, GUINT_TO_POINTER( i ) );
     return d;
 }
-
