@@ -1011,18 +1011,20 @@ core_add_ctor( TrCore * core, tr_ctor * ctor, gboolean do_prompt, gboolean do_no
             if( !tr_ctorGetSourceFile(ctor) || !core->priv->adding_from_watch_dir )
                 core_emit_err( core, err, inf.name );
             tr_metainfoFree( &inf );
+            tr_ctorFree( ctor );
             break;
 
         default:
             if( do_prompt )
                 g_signal_emit( core, core_signals[ADD_PROMPT_SIGNAL], 0, ctor );
-            else
+            else {
                 gtr_core_add_torrent( core, core_create_new_torrent( core, ctor ), do_notify );
+                tr_ctorFree( ctor );
+            }
             tr_metainfoFree( &inf );
             break;
     }
 
-    tr_ctorFree( ctor );
     return err;
 }
 
