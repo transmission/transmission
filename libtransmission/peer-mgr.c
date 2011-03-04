@@ -446,7 +446,9 @@ tr_peerDestruct( tr_torrent * tor, tr_peer * peer )
     tr_bitsetDestruct( &peer->have );
     tr_bitfieldFree( peer->blame );
     tr_free( peer->client );
-    peer->atom->peer = NULL;
+
+    if( peer->atom )
+        peer->atom->peer = NULL;
 }
 
 static void
