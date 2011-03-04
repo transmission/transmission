@@ -1520,10 +1520,16 @@ maybeInhibitHibernation( TrCore * core )
 ***  Prefs
 **/
 
+void
+tr_core_pref_changed( TrCore * core, const char * key )
+{
+    g_signal_emit( core, core_signals[PREFS_SIGNAL], 0, key );
+}
+
 static void
 commitPrefsChange( TrCore * core, const char * key )
 {
-    g_signal_emit( core, core_signals[PREFS_SIGNAL], 0, key );
+    tr_core_pref_changed( core, key );
     gtr_pref_save( tr_core_session( core ) );
 }
 

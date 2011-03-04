@@ -88,6 +88,9 @@ size_t         tr_core_get_active_torrent_count( TrCore * self );
 
 size_t         tr_core_get_torrent_count( TrCore * self );
 
+void           tr_core_pref_changed( TrCore * core, const char * key );
+
+
 /******
 *******
 ******/
