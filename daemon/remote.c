@@ -243,7 +243,7 @@ static tr_option opts[] =
     { 'e', "cache",                  "Set the maximum size of the session's memory cache (in " MEM_M_STR ")", "e", 1, "<size>" },
     { 910, "encryption-required",    "Encrypt all peer connections", "er", 0, NULL },
     { 911, "encryption-preferred",   "Prefer encrypted peer connections", "ep", 0, NULL },
-    { 912, "encryption-tolerated",   "Prefer unencrypted peer connections", "et", 0, NULL }, 
+    { 912, "encryption-tolerated",   "Prefer unencrypted peer connections", "et", 0, NULL },
     { 850, "exit",                   "Tell the transmission session to shut down", NULL, 0, NULL },
     { 940, "files",                  "List the current torrent(s)' files", "f",  0, NULL },
     { 'g', "get",                    "Mark files for download", "g",  1, "<files>" },
@@ -1910,7 +1910,7 @@ processArgs( const char * rpcurl, int argc, const char ** argv )
             fields = tr_bencDictAddList( args, "fields", 0 );
 
             if( tset != 0 ) { addIdArg( tr_bencDictFind( tset, ARGUMENTS ), id ); status |= flush( rpcurl, &tset ); }
-            
+
             switch( c )
             {
                 case 'i': tr_bencDictAddInt( top, "tag", TAG_DETAILS );

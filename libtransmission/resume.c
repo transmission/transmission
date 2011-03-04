@@ -445,7 +445,7 @@ saveProgress( tr_benc * dict, tr_torrent * tor )
         /* If some of a file's pieces have been checked more recently than
            the file's mtime, and some lest recently, then that file will
            have a list containing timestamps for each piece.
-           
+
            However, the most common use case is that the file doesn't change
            after it's downloaded. To reduce overhead in the .resume file,
            only a single timestamp is saved for the file if *all* or *none*
@@ -497,11 +497,11 @@ loadProgress( tr_benc * dict, tr_torrent * tor )
         if( tr_bencDictFindList( prog, KEY_PROGRESS_CHECKTIME, &l ) )
         {
             /* per-piece timestamps were added in 2.20.
-              
+
                If some of a file's pieces have been checked more recently than
                the file's mtime, and some lest recently, then that file will
                have a list containing timestamps for each piece.
-              
+
                However, the most common use case is that the file doesn't change
                after it's downloaded. To reduce overhead in the .resume file,
                only a single timestamp is saved for the file if *all* or *none*

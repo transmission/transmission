@@ -112,7 +112,7 @@ incoming(void *closure, struct UTPSocket *s)
         UTP_Close(s);
         return;
     }
-    
+
     UTP_GetPeerName(s, from, &fromlen);
     if( !tr_ssToAddr( &addr, &port, &from_storage ) )
     {

@@ -515,7 +515,7 @@ publishPeersPex( tr_tier * tier, int seeds, int leechers,
 
 static size_t
 publishPeersCompact( tr_tier * tier, int seeds, int leechers,
-                        const void * compact, int compactLen )
+                     const void * compact, int compactLen )
 {
     size_t n = 0;
     tr_pex * pex = tr_peerMgrCompactToPex( compact, compactLen, NULL, 0, &n );
@@ -523,11 +523,11 @@ publishPeersCompact( tr_tier * tier, int seeds, int leechers,
     dbgmsg( tier, "got IPv4 list of %zu peers", n );
     tr_free( pex );
     return n;
-}    
+}
 
 static size_t
 publishPeersCompact6( tr_tier * tier, int seeds, int leechers,
-                         const void * compact, int compactLen )
+                      const void * compact, int compactLen )
 {
     size_t n = 0;
     tr_pex * pex = tr_peerMgrCompact6ToPex( compact, compactLen, NULL, 0, &n );
@@ -577,10 +577,10 @@ publishPeersDict( tr_tier * tier, int seeds, int leechers, tr_benc * peerList )
 }
 
 static char*
-createAnnounceURL( const tr_announcer     * announcer,
-                   const tr_torrent       * torrent,
-                   const tr_tier          * tier,
-                   const char             * eventName )
+createAnnounceURL( const tr_announcer  * announcer,
+                   const tr_torrent    * torrent,
+                   const tr_tier       * tier,
+                   const char          * eventName )
 {
     const int isStopping = !strcmp( eventName, "stopped" );
     const int numwant = isStopping ? 0 : NUMWANT;
@@ -1470,7 +1470,7 @@ compareTiers( const void * va, const void * vb )
     /* secondary key: announcements that have been waiting longer go first */
     if( !ret && ( a->announceAt != b->announceAt ) )
         ret = a->announceAt < b->announceAt ? -1 : 1;
-         
+
     return ret;
 }
 

@@ -616,7 +616,7 @@ tr_peerIoNewIncoming( tr_session        * session,
     assert( session );
     assert( tr_isAddress( addr ) );
 
-    return tr_peerIoNew( session, parent, addr, port, NULL, TRUE, FALSE, 
+    return tr_peerIoNew( session, parent, addr, port, NULL, TRUE, FALSE,
                          fd, utp_socket );
 }
 

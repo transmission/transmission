@@ -85,7 +85,7 @@ tr_getcwd( void )
 #else
     result = getcwd( buf, sizeof( buf ) );
 #endif
-    if( result == NULL ) 
+    if( result == NULL )
     {
         fprintf( stderr, "getcwd error: \"%s\"", tr_strerror( errno ) );
         *buf = '\0';

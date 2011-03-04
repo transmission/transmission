@@ -217,7 +217,7 @@ event_callback(int s, short type UNUSED, void *sv)
     }
 
     free(buf);
-}    
+}
 
 void
 tr_udpInit(tr_session *ss)

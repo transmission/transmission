@@ -54,9 +54,9 @@ enum
     /* true if the peer has holepunch support */
     ADDED_F_HOLEPUNCH = 8,
 
-    /* true if the peer telling us about this peer 
-     * initiated the connection (implying that it is connectible) */ 
-   ADDED_F_CONNECTABLE = 16 
+    /* true if the peer telling us about this peer
+     * initiated the connection (implying that it is connectible) */
+    ADDED_F_CONNECTABLE = 16
 };
 
 typedef struct tr_pex

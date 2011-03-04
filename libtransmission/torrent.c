@@ -1807,7 +1807,7 @@ removeTorrent( void * vdata )
 
 void
 tr_torrentRemove( tr_torrent   * tor,
-                  tr_bool        deleteFlag, 
+                  tr_bool        deleteFlag,
                   tr_fileFunc    deleteFunc )
 {
     struct remove_data * data;
@@ -1940,7 +1940,7 @@ torrentCallScript( const tr_torrent * tor, const char * script )
             tr_strdup_printf( "TR_TORRENT_NAME=%s", tr_torrentName( tor ) ),
             NULL };
 
-        tr_torinf( tor, "Calling script \"%s\"", script ); 
+        tr_torinf( tor, "Calling script \"%s\"", script );
 
 #ifdef WIN32
         _spawnvpe( _P_NOWAIT, script, (const char*)cmd, env );
@@ -2253,7 +2253,7 @@ tr_torrentGetPeerLimit( const tr_torrent * tor )
 ***/
 
 void
-tr_torrentGetBlockLocation( const tr_torrent * tor, 
+tr_torrentGetBlockLocation( const tr_torrent * tor,
                             tr_block_index_t   block,
                             tr_piece_index_t * piece,
                             uint32_t         * offset,

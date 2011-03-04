@@ -1896,7 +1896,7 @@ ensureAtomExists( Torrent           * t,
     {
         if( from < a->fromBest )
             a->fromBest = from;
-        
+
         if( a->seedProbability == -1 )
             atomSetSeedProbability( a, seedProbability );
 
@@ -2453,7 +2453,7 @@ tr_peerMgrRemoveTorrent( tr_torrent * tor )
 void
 tr_peerUpdateProgress( tr_torrent * tor, tr_peer * peer )
 {
-    const tr_bitset * have = &peer->have;  
+    const tr_bitset * have = &peer->have;
 
     if( have->haveAll )
     {
@@ -2480,13 +2480,13 @@ tr_peerUpdateProgress( tr_torrent * tor, tr_peer * peer )
 void
 tr_peerMgrOnTorrentGotMetainfo( tr_torrent * tor )
 {
-    int i; 
-    const int peerCount = tr_ptrArraySize( &tor->torrentPeers->peers ); 
-    tr_peer ** peers = (tr_peer**) tr_ptrArrayBase( &tor->torrentPeers->peers ); 
- 
-    /* some peer_msgs' progress fields may not be accurate if we 
+    int i;
+    const int peerCount = tr_ptrArraySize( &tor->torrentPeers->peers );
+    tr_peer ** peers = (tr_peer**) tr_ptrArrayBase( &tor->torrentPeers->peers );
+
+    /* some peer_msgs' progress fields may not be accurate if we
        didn't have the metadata before now... so refresh them all... */
-    for( i=0; i<peerCount; ++i ) 
+    for( i=0; i<peerCount; ++i )
         tr_peerUpdateProgress( tor, peers[i] );
 }
 

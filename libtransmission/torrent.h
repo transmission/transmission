@@ -82,9 +82,9 @@ uint64_t         tr_pieceOffset( const tr_torrent * tor,
                                  uint32_t           offset,
                                  uint32_t           length );
 
-void             tr_torrentGetBlockLocation( const tr_torrent * tor, 
+void             tr_torrentGetBlockLocation( const tr_torrent * tor,
                                              tr_block_index_t   block,
-                                             tr_piece_index_t * piece, 
+                                             tr_piece_index_t * piece,
                                              uint32_t         * offset,
                                              uint32_t         * length );
 

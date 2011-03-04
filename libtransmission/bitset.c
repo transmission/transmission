@@ -128,7 +128,7 @@ tr_bitsetRemRange( tr_bitset * b, size_t begin, size_t end )
     if( b->haveNone )
         return;
 
-    b->haveAll = FALSE; 
+    b->haveAll = FALSE;
     if( !b->bitfield.bits )
     {
         tr_bitfieldConstruct( &b->bitfield, b->bitfield.bitCount );
@@ -167,7 +167,7 @@ tr_bitsetHasSet( const tr_bitset * b, const tr_bitset * set )
     const uint8_t * bend = bit + b->bitfield.byteCount;
     const uint8_t * sit = set->bitfield.bits;
     const uint8_t * send = sit + set->bitfield.byteCount;
-    
+
     if( b->haveAll || set->haveAll )
         return b->haveAll;
 

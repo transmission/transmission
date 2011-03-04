@@ -1279,7 +1279,7 @@ messageLengthIsCorrect( const tr_peermsgs * msg, uint8_t id, uint32_t len )
         case BT_BITFIELD:
             if( tr_torrentHasMetadata( msg->torrent ) )
                 return len == ( msg->torrent->info.pieceCount + 7u ) / 8u + 1u;
-            /* we don't know the piece count yet, 
+            /* we don't know the piece count yet,
                so we can only guess whether to send TRUE or FALSE */
             if( msg->metadata_size_hint > 0 )
                 return len <= msg->metadata_size_hint;

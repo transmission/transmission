@@ -143,9 +143,9 @@ tr_upnpPulse( tr_upnp * handle,
         char intClient[16];
 
         tr_snprintf( portStr, sizeof( portStr ), "%d", handle->port );
-        if( UPNP_GetSpecificPortMappingEntry( handle->urls.controlURL, handle->data.first.servicetype, 
+        if( UPNP_GetSpecificPortMappingEntry( handle->urls.controlURL, handle->data.first.servicetype,
             portStr, "TCP", intClient, intPort ) != UPNPCOMMAND_SUCCESS  ||
-            UPNP_GetSpecificPortMappingEntry( handle->urls.controlURL, handle->data.first.servicetype, 
+            UPNP_GetSpecificPortMappingEntry( handle->urls.controlURL, handle->data.first.servicetype,
             portStr, "UDP", intClient, intPort ) != UPNPCOMMAND_SUCCESS )
         {
             tr_ninf( getKey( ), _( "Port %d isn't forwarded" ), handle->port );

@@ -79,8 +79,8 @@ typedef struct tr_address
 extern const tr_address tr_inaddr_any;
 extern const tr_address tr_in6addr_any;
 
-tr_bool tr_ssToAddr( tr_address * setme_addr,      
-                     tr_port    * setme_port,     
+tr_bool tr_ssToAddr( tr_address * setme_addr,
+                     tr_port    * setme_port,
                      const struct sockaddr_storage * from );
 
 const char *tr_ntop( const tr_address * src,

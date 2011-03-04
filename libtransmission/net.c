@@ -250,8 +250,8 @@ tr_netSetCongestionControl( int s UNUSED, const char *algorithm UNUSED )
 }
 
 tr_bool
-tr_ssToAddr( tr_address * setme_addr,      
-             tr_port    * setme_port,      
+tr_ssToAddr( tr_address * setme_addr,
+             tr_port    * setme_port,
              const struct sockaddr_storage * from )
 {
     if( from->ss_family == AF_INET )

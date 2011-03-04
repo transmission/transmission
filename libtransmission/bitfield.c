@@ -204,7 +204,7 @@ size_t
 tr_bitfieldCountRange( const tr_bitfield * b, size_t begin, size_t end )
 {
     size_t ret = 0;
-    const int first_byte = begin >> 3u; 
+    const int first_byte = begin >> 3u;
     const int last_byte = ( end - 1 ) >> 3u;
 
     assert( begin < end );

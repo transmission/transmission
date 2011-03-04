@@ -102,7 +102,7 @@ Dialog.prototype = {
 			setTimeout("$('div#dialog_container div.dialog_window').css('top', '0px');",10);
 		}
 	},
- 
+
     /*
      * Display an alert dialog
      */
