@@ -556,8 +556,6 @@ addField( const tr_torrent * tor, tr_benc * d, const char * key )
     }
     else if( tr_streq( key, keylen, "peersGettingFromUs" ) )
         tr_bencDictAddInt( d, key, st->peersGettingFromUs );
-    else if( tr_streq( key, keylen, "peersKnown" ) )
-        tr_bencDictAddInt( d, key, st->peersKnown );
     else if( tr_streq( key, keylen, "peersSendingToUs" ) )
         tr_bencDictAddInt( d, key, st->peersSendingToUs );
     else if( tr_streq( key, keylen, "pieces" ) ) {

@@ -1804,9 +1804,6 @@ typedef struct tr_stat
     /** If seeding, number of seconds left until the idle time limit is reached. */
     int    etaIdle;
 
-    /** Number of peers that the tracker says this torrent has */
-    int    peersKnown;
-
     /** Number of peers that we're connected to */
     int    peersConnected;
 

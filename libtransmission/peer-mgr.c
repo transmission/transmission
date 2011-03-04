@@ -2544,7 +2544,6 @@ tr_peerMgrGetAvailable( const tr_torrent * tor )
 
 void
 tr_peerMgrTorrentStats( tr_torrent  * tor,
-                        int         * setmePeersKnown,
                         int         * setmePeersConnected,
                         int         * setmeSeedsConnected,
                         int         * setmeWebseedsSendingToUs,
@@ -2561,7 +2560,6 @@ tr_peerMgrTorrentStats( tr_torrent  * tor,
     peers = (const tr_peer **) tr_ptrArrayBase( &t->peers );
     size = tr_ptrArraySize( &t->peers );
 
-    *setmePeersKnown           = tr_ptrArraySize( &t->pool );
     *setmePeersConnected       = 0;
     *setmeSeedsConnected       = 0;
     *setmePeersGettingFromUs   = 0;

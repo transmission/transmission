@@ -173,7 +173,6 @@
    peersConnected              | number                      | tr_stat
    peersFrom                   | object (see below)          | n/a
    peersGettingFromUs          | number                      | tr_stat
-   peersKnown                  | number                      | tr_stat
    peersSendingToUs            | number                      | tr_stat
    percentDone                 | double                      | tr_stat
    pieces                      | string (see below)          | tr_torrent
@@ -656,3 +655,4 @@
          |         | yes       | session-close  | new method
    ------+---------+-----------+----------------+-------------------------------
    13    | 2.30    | yes       | session-get    | new arg "isUTP" to the "peers" list
+         |         |        NO | torrent-get    | reomved arg "peersKnown"

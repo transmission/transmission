@@ -240,7 +240,6 @@ void tr_peerMgrOnTorrentGotMetainfo( tr_torrent * tor );
 void tr_peerMgrOnBlocklistChanged( tr_peerMgr * manager );
 
 void tr_peerMgrTorrentStats( tr_torrent * tor,
-                             int * setmePeersKnown,
                              int * setmePeersConnected,
                              int * setmeSeedsConnected,
                              int * setmeWebseedsSendingToUs,

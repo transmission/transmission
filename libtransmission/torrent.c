@@ -1160,7 +1160,6 @@ tr_torrentStat( tr_torrent * tor )
     s->manualAnnounceTime = tr_announcerNextManualAnnounce( tor );
 
     tr_peerMgrTorrentStats( tor,
-                            &s->peersKnown,
                             &s->peersConnected,
                             &usableSeeds,
                             &s->webseedsSendingToUs,
