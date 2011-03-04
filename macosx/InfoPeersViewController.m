@@ -138,15 +138,13 @@
     else
         [fWebSeeds removeAllObjects];
     
-    NSUInteger known = 0, connected = 0, tracker = 0, incoming = 0, cache = 0, lpd = 0, pex = 0, dht = 0, ltep = 0,
+    NSUInteger connected = 0, tracker = 0, incoming = 0, cache = 0, lpd = 0, pex = 0, dht = 0, ltep = 0,
                 toUs = 0, fromUs = 0;
     BOOL anyActive = false;
     for (Torrent * torrent in fTorrents)
     {
         if ([torrent webSeedCount] > 0)
             [fWebSeeds addObjectsFromArray: [torrent webSeeds]];
-        
-        known += [torrent totalPeersKnown];
         
         if ([torrent isActive])
         {
@@ -177,7 +175,6 @@
     [fWebSeeds sortUsingDescriptors: [fWebSeedTable sortDescriptors]];
     [fWebSeedTable reloadData];
     
-    NSString * knownString = [NSString stringWithFormat: NSLocalizedString(@"%d known", "Inspector -> Peers tab -> peers"), known];
     if (anyActive)
     {
         NSString * connectedText = [NSString stringWithFormat: NSLocalizedString(@"%d Connected", "Inspector -> Peers tab -> peers"),
@@ -185,6 +182,16 @@
         
         if (connected > 0)
         {
+            NSMutableArray * upDownComponents = [NSMutableArray arrayWithCapacity: 2];
+            if (toUs > 0)
+                [upDownComponents addObject: [NSString stringWithFormat:
+                                        NSLocalizedString(@"DL from %d", "Inspector -> Peers tab -> peers"), toUs]];
+            if (fromUs > 0)
+                [upDownComponents addObject: [NSString stringWithFormat:
+                                        NSLocalizedString(@"UL to %d", "Inspector -> Peers tab -> peers"), fromUs]];
+            if ([upDownComponents count] > 0)
+                connectedText = [connectedText stringByAppendingFormat: @": %@", [upDownComponents componentsJoinedByString: @", "]];
+            
             NSMutableArray * fromComponents = [NSMutableArray arrayWithCapacity: 7];
             if (tracker > 0)
                 [fromComponents addObject: [NSString stringWithFormat:
@@ -208,33 +215,20 @@
                 [fromComponents addObject: [NSString stringWithFormat:
                                         NSLocalizedString(@"%d LTEP", "Inspector -> Peers tab -> peers"), ltep]];
             
-            NSMutableArray * upDownComponents = [NSMutableArray arrayWithCapacity: 3];
-            if (toUs > 0)
-                [upDownComponents addObject: [NSString stringWithFormat:
-                                        NSLocalizedString(@"DL from %d", "Inspector -> Peers tab -> peers"), toUs]];
-            if (fromUs > 0)
-                [upDownComponents addObject: [NSString stringWithFormat:
-                                        NSLocalizedString(@"UL to %d", "Inspector -> Peers tab -> peers"), fromUs]];
-            [upDownComponents addObject: knownString];
-            
-            connectedText = [connectedText stringByAppendingFormat: @": %@\n%@", [fromComponents componentsJoinedByString: @", "],
-                                [upDownComponents componentsJoinedByString: @", "]];
+            connectedText = [connectedText stringByAppendingFormat: @"\n%@", [fromComponents componentsJoinedByString: @", "]];
         }
-        else
-            connectedText = [connectedText stringByAppendingFormat: @"\n%@", knownString];
         
         [fConnectedPeersField setStringValue: connectedText];
     }
     else
     {
-        NSString * activeString;
+        NSString * notActiveString;
         if ([fTorrents count] == 1)
-            activeString = NSLocalizedString(@"Transfer Not Active", "Inspector -> Peers tab -> peers");
+            notActiveString = NSLocalizedString(@"Transfer Not Active", "Inspector -> Peers tab -> peers");
         else
-            activeString = NSLocalizedString(@"Transfers Not Active", "Inspector -> Peers tab -> peers");
+            notActiveString = NSLocalizedString(@"Transfers Not Active", "Inspector -> Peers tab -> peers");
         
-        NSString * connectedText = [activeString stringByAppendingFormat: @"\n%@", knownString];
-        [fConnectedPeersField setStringValue: connectedText];
+        [fConnectedPeersField setStringValue: notActiveString];
     }
 }
 

@@ -450,6 +450,7 @@ typedef enum
         }
         else
         {
+            #warning change to NSImageNameApplicationIcon
             [fImageView setImage: [NSImage imageNamed: @"NSApplicationIcon"]];
             [fNoneSelectedField setHidden: NO];
             
