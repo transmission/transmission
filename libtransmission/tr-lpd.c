@@ -552,17 +552,32 @@ int tr_lpdAnnounceMore( const time_t now, const int interval )
     {
         if( tr_isTorrent( tor ) )
         {
-            if( !tr_torrentAllowsLPD( tor ) || (
-                    ( tr_torrentGetActivity( tor ) != TR_STATUS_DOWNLOAD ) &&
-                    ( tr_torrentGetActivity( tor ) != TR_STATUS_SEED ) ) )
+            int announcePrio = 0;
+
+            if( !tr_torrentAllowsLPD( tor ) )
                 continue;
 
-            if( tor->lpdAnnounceAt <= now )
+            /* issue #3208: prioritize downloads before seeds */
+            switch( tr_torrentGetActivity( tor ) )
+            {
+            case TR_STATUS_DOWNLOAD:
+                announcePrio = 1;
+                break;
+            case TR_STATUS_SEED:
+                announcePrio = 2;
+                break;
+            default: /* fall through */
+                break;
+            }
+
+            if( announcePrio > 0 && tor->lpdAnnounceAt <= now )
             {
                 if( tr_lpdSendAnnounce( tor ) )
                     announcesSent++;
 
-                tor->lpdAnnounceAt = now + lpd_announceInterval;
+                tor->lpdAnnounceAt = now +
+                    lpd_announceInterval * announcePrio;
+
                 break; /* that's enough; for this interval */
             }
         }

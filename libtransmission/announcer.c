@@ -63,7 +63,7 @@ enum
     UPKEEP_INTERVAL_SECS = 1,
 
     /* this is an upper limit for the frequency of LDS announces */
-    LPD_HOUSEKEEPING_INTERVAL_SECS = 30
+    LPD_HOUSEKEEPING_INTERVAL_SECS = 5
 
 };
 
