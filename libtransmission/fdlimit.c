@@ -670,16 +670,17 @@ tr_fdSocketAccept( tr_session * s, int sockfd, tr_address * addr, tr_port * port
     len = sizeof( struct sockaddr_storage );
     fd = accept( sockfd, (struct sockaddr *) &sock, &len );
 
-    if( ( fd >= 0 ) && gFd->socket_count > gFd->socket_limit )
-    {
-        tr_netCloseSocket( fd );
-        fd = -1;
-    }
-
     if( fd >= 0 )
     {
-        tr_ssToAddr( addr, port, &sock );
-        ++gFd->socket_count;
+        if( ( gFd->socket_count < gFd->socket_limit ) && tr_ssToAddr( addr, port, &sock ) )
+        {
+            ++gFd->socket_count;
+        }
+        else
+        {
+            tr_netCloseSocket( fd );
+            fd = -1;
+        }
     }
 
     return fd;
