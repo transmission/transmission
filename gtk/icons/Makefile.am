@@ -10,6 +10,7 @@ public_icons = \
 	hicolor_apps_24x24_transmission.png \
 	hicolor_apps_32x32_transmission.png \
 	hicolor_apps_48x48_transmission.png \
+	hicolor_apps_256x256_transmission.png \
 	hicolor_apps_scalable_transmission.svg \
 	$(NULL)
 
@@ -17,9 +18,10 @@ private_icons = \
 	$(NULL)
 
 noinst_DATA = \
-	hicolor_apps_16x16_transmission.svg
-	hicolor_apps_22x22_transmission.svg
-	hicolor_apps_32x32_transmission.svg
+	hicolor_apps_16x16_transmission.svg \
+	hicolor_apps_22x22_transmission.svg \
+	hicolor_apps_32x32_transmission.svg \
+	transmission.svg \
 	$(NULL)
 
 EXTRA_DIST = \
