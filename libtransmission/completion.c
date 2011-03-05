@@ -304,11 +304,18 @@ tr_cpSizeWhenDone( const tr_completion * ccp )
 void
 tr_cpGetAmountDone( const tr_completion * cp, float * tab, int tabCount )
 {
-    int i, b;
-    const int span = cp->tor->blockCount / tabCount;
+    int i;
+    const float interval = cp->tor->info.pieceCount / (float)tabCount;
+    const tr_bool seed = isSeed( cp );
 
-    for( i=b=0; i<tabCount; ++i, b+=span )
-        tab[i] = tr_bitsetCountRange(&cp->blockBitset,b,b+span) / (float)span;
+    for( i=0; i<tabCount; ++i ) {
+        if( seed )
+            tab[i] = 1.0f;
+        else {
+            const tr_piece_index_t piece = (tr_piece_index_t)i * interval;
+            tab[i] = getCompleteBlocks(cp)[piece] / (float)countBlocksInPiece( cp->tor, piece );
+        }
+    }
 }
 
 int
