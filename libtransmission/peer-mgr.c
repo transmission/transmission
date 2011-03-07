@@ -2626,6 +2626,17 @@ tr_peerGetPieceSpeed_Bps( const tr_peer * peer, uint64_t now, tr_direction direc
     return peer->io ? tr_peerIoGetPieceSpeed_Bps( peer->io, now, direction ) : 0.0;
 }
 
+static tr_bool
+peerIsSeed( const tr_peer * peer )
+{
+    if( peer->progress >= 1.0 )
+        return TRUE;
+
+    if( peer->atom && ( peer->atom->uploadOnly == UPLOAD_ONLY_YES ) )
+        return TRUE;
+
+    return FALSE;
+}
 
 struct tr_peer_stat *
 tr_peerMgrPeerStats( const tr_torrent * tor, int * setmeCount )
@@ -2666,7 +2677,7 @@ tr_peerMgrPeerStats( const tr_torrent * tor, int * setmeCount )
         stat->isIncoming          = tr_peerIoIsIncoming( peer->io );
         stat->isDownloadingFrom   = clientIsDownloadingFrom( tor, peer );
         stat->isUploadingTo       = clientIsUploadingTo( peer );
-        stat->isSeed              = ( atom->uploadOnly == UPLOAD_ONLY_YES ) || ( peer->progress >= 1.0 );
+        stat->isSeed              = peerIsSeed( peer );
 
         stat->blocksToPeer        = tr_historyGet( &peer->blocksSentToPeer,    now, CANCEL_HISTORY_SEC );
         stat->blocksToClient      = tr_historyGet( &peer->blocksSentToClient,  now, CANCEL_HISTORY_SEC );
@@ -3135,7 +3146,7 @@ shouldPeerBeClosed( const Torrent    * t,
     }
 
     /* disconnect if we're both seeds and enough time has passed for PEX */
-    if( tr_torrentIsSeed( tor ) && ( peer->progress >= 1.0f ) )
+    if( tr_torrentIsSeed( tor ) && peerIsSeed( peer ) )
         return !tr_torrentAllowsPex(tor) || (now-atom->time>=30);
 
     /* disconnect if it's been too long since piece data has been transferred.
