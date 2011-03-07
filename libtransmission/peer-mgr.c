@@ -105,13 +105,6 @@ const tr_peer_event TR_PEER_EVENT_INIT = { 0, 0, NULL, 0, 0, 0, FALSE, 0 };
 ***
 **/
 
-enum
-{
-    UPLOAD_ONLY_UKNOWN,
-    UPLOAD_ONLY_YES,
-    UPLOAD_ONLY_NO
-};
-
 /**
  * Peer information that should be kept even before we've connected and
  * after we've disconnected. These are kept in a pool of peer_atoms to decide
@@ -127,7 +120,6 @@ struct peer_atom
     uint8_t     fromBest;           /* the "best" value of where the peer has been found */
     uint8_t     flags;              /* these match the added_f flags */
     uint8_t     flags2;             /* flags that aren't defined in added_f */
-    uint8_t     uploadOnly;         /* UPLOAD_ONLY_ */
     int8_t      seedProbability;    /* how likely is this to be a seed... [0..100] or -1 for unknown */
     int8_t      blocklisted;        /* -1 for unknown, TRUE for blocklisted, FALSE for not blocklisted */
 
@@ -2634,7 +2626,7 @@ peerIsSeed( const tr_peer * peer )
     if( peer->progress >= 1.0 )
         return TRUE;
 
-    if( peer->atom && ( peer->atom->uploadOnly == UPLOAD_ONLY_YES ) )
+    if( peer->atom && atomIsSeed( peer->atom ) )
         return TRUE;
 
     return FALSE;
@@ -3017,11 +3009,7 @@ rechokeUploads( Torrent * t, const uint64_t now )
         tr_peer * peer = peers[i];
         struct peer_atom * atom = peer->atom;
 
-        if( peer->progress >= 1.0 ) /* choke all seeds */
-        {
-            tr_peerMsgsSetChoke( peer->msgs, TRUE );
-        }
-        else if( atom->uploadOnly == UPLOAD_ONLY_YES ) /* choke partial seeds */
+        if( peerIsSeed( peer ) ) /* choke seeds and partial seeds */
         {
             tr_peerMsgsSetChoke( peer->msgs, TRUE );
         }
@@ -3655,9 +3643,8 @@ static tr_bool
 isPeerCandidate( const tr_torrent * tor, struct peer_atom * atom, const time_t now )
 {
     /* not if we're both seeds */
-    if( tr_torrentIsSeed( tor ) )
-        if( atomIsSeed( atom ) || ( atom->uploadOnly == UPLOAD_ONLY_YES ) )
-            return FALSE;
+    if( tr_torrentIsSeed( tor ) && atomIsSeed( atom ) )
+        return FALSE;
 
     /* not if we've already got a connection to them... */
     if( peerIsInUse( tor->torrentPeers, atom ) )
