@@ -920,9 +920,9 @@ invalidatePieceSorting( Torrent * t )
     t->pieceSortState = PIECES_UNSORTED;
 }
 
-const tr_torrent * weightTorrent;
+static const tr_torrent * weightTorrent;
 
-const uint16_t * weightReplication;
+static const uint16_t * weightReplication;
 
 static void
 setComparePieceByWeightTorrent( Torrent * t )
@@ -1616,6 +1616,8 @@ peerDeclinedAllRequests( Torrent * t, const tr_peer * peer )
     tr_free( blocks );
 }
 
+static void tr_peerMgrSetBlame( tr_torrent *, tr_piece_index_t, int );
+
 static void
 peerCallbackFunc( tr_peer * peer, const tr_peer_event * e, void * vt )
 {
@@ -2196,7 +2198,7 @@ tr_peerMgrArrayToPex( const void * array,
 ***
 **/
 
-void
+static void
 tr_peerMgrSetBlame( tr_torrent     * tor,
                     tr_piece_index_t pieceIndex,
                     int              success )
@@ -2929,8 +2931,7 @@ struct ChokeData
 };
 
 static int
-compareChoke( const void * va,
-              const void * vb )
+compareChoke( const void * va, const void * vb )
 {
     const struct ChokeData * a = va;
     const struct ChokeData * b = vb;

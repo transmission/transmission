@@ -282,8 +282,7 @@ myDebug( const char * file, int line,
 **/
 
 static void
-pokeBatchPeriod( tr_peermsgs * msgs,
-                 int           interval )
+pokeBatchPeriod( tr_peermsgs * msgs, int interval )
 {
     if( msgs->outMessagesBatchPeriod > interval )
     {
@@ -503,9 +502,7 @@ fireClientGotHaveNone( tr_peermsgs * msgs )
 }
 
 static void
-fireClientGotData( tr_peermsgs * msgs,
-                   uint32_t      length,
-                   int           wasPieceData )
+fireClientGotData( tr_peermsgs * msgs, uint32_t length, int wasPieceData )
 {
     tr_peer_event e = TR_PEER_EVENT_INIT;
 
@@ -561,9 +558,7 @@ fireClientGotHave( tr_peermsgs * msgs, tr_piece_index_t index )
 }
 
 static void
-firePeerGotData( tr_peermsgs  * msgs,
-                 uint32_t       length,
-                 int            wasPieceData )
+firePeerGotData( tr_peermsgs * msgs, uint32_t length, tr_bool wasPieceData )
 {
     tr_peer_event e = TR_PEER_EVENT_INIT;
 
@@ -579,6 +574,7 @@ firePeerGotData( tr_peermsgs  * msgs,
 ***  For explanation, see http://www.bittorrent.org/beps/bep_0006.html
 **/
 
+#if 0
 size_t
 tr_generateAllowedSet( tr_piece_index_t * setmePieces,
                        size_t             desiredSetSize,
@@ -636,7 +632,6 @@ tr_generateAllowedSet( tr_piece_index_t * setmePieces,
 static void
 updateFastSet( tr_peermsgs * msgs UNUSED )
 {
-#if 0
     const tr_bool fext = tr_peerIoSupportsFEXT( msgs->peer->io );
     const int peerIsNeedy = msgs->peer->progress < 0.10;
 
@@ -655,8 +650,8 @@ updateFastSet( tr_peermsgs * msgs UNUSED )
         for( i=0; i<msgs->fastsetSize; ++i )
             protocolSendAllowedFast( msgs, msgs->fastset[i] );
     }
-#endif
 }
+#endif
 
 /**
 ***  INTEREST
@@ -734,8 +729,7 @@ cancelAllRequestsToClient( tr_peermsgs * msgs )
 }
 
 void
-tr_peerMsgsSetChoke( tr_peermsgs * msgs,
-                     int           choke )
+tr_peerMsgsSetChoke( tr_peermsgs * msgs, int choke )
 {
     const time_t now = tr_time( );
     const time_t fibrillationTime = now - MIN_CHOKE_PERIOD_SEC;
@@ -763,8 +757,7 @@ tr_peerMsgsSetChoke( tr_peermsgs * msgs,
 **/
 
 void
-tr_peerMsgsHave( tr_peermsgs * msgs,
-                 uint32_t      index )
+tr_peerMsgsHave( tr_peermsgs * msgs, uint32_t index )
 {
     protocolSendHave( msgs, index );
 
@@ -867,9 +860,7 @@ sendLtepHandshake( tr_peermsgs * msgs )
 }
 
 static void
-parseLtepHandshake( tr_peermsgs *     msgs,
-                    int               len,
-                    struct evbuffer * inbuf )
+parseLtepHandshake( tr_peermsgs * msgs, int len, struct evbuffer * inbuf )
 {
     int64_t   i;
     tr_benc   val, * sub;
@@ -1148,9 +1139,7 @@ parseLtep( tr_peermsgs * msgs, int msglen, struct evbuffer  * inbuf )
 }
 
 static int
-readBtLength( tr_peermsgs *     msgs,
-              struct evbuffer * inbuf,
-              size_t            inlen )
+readBtLength( tr_peermsgs * msgs, struct evbuffer * inbuf, size_t inlen )
 {
     uint32_t len;
 
@@ -1170,12 +1159,10 @@ readBtLength( tr_peermsgs *     msgs,
     return READ_NOW;
 }
 
-static int readBtMessage( tr_peermsgs     * msgs,
-                          struct evbuffer * inbuf,
-                          size_t            inlen );
+static int readBtMessage( tr_peermsgs *, struct evbuffer *, size_t );
 
 static int
-readBtId( tr_peermsgs * msgs, struct evbuffer  * inbuf, size_t inlen )
+readBtId( tr_peermsgs * msgs, struct evbuffer * inbuf, size_t inlen )
 {
     uint8_t id;
 
@@ -1204,7 +1191,7 @@ updatePeerProgress( tr_peermsgs * msgs )
 {
     tr_peerUpdateProgress( msgs->torrent, msgs->peer );
 
-    updateFastSet( msgs );
+    /*updateFastSet( msgs );*/
     updateInterest( msgs );
 }
 
@@ -1229,8 +1216,7 @@ prefetchPieces( tr_peermsgs *msgs )
 }
 
 static void
-peerMadeRequest( tr_peermsgs *               msgs,
-                 const struct peer_request * req )
+peerMadeRequest( tr_peermsgs * msgs, const struct peer_request * req )
 {
     const tr_bool fext = tr_peerIoSupportsFEXT( msgs->peer->io );
     const int reqIsValid = requestIsValid( msgs, req );
@@ -1593,9 +1579,9 @@ addPeerToBlamefield( tr_peermsgs * msgs, uint32_t index )
 
 /* returns 0 on success, or an errno on failure */
 static int
-clientGotBlock( tr_peermsgs *               msgs,
-                struct evbuffer *           data,
-                const struct peer_request * req )
+clientGotBlock( tr_peermsgs                * msgs,
+                struct evbuffer            * data,
+                const struct peer_request  * req )
 {
     int err;
     tr_torrent * tor = msgs->torrent;
@@ -2020,9 +2006,7 @@ tr_peerMsgsPulse( tr_peermsgs * msgs )
 }
 
 static void
-gotError( tr_peerIo  * io UNUSED,
-          short        what,
-          void       * vmsgs )
+gotError( tr_peerIo * io UNUSED, short what, void * vmsgs )
 {
     if( what & BEV_EVENT_TIMEOUT )
         dbgmsg( vmsgs, "libevent got a timeout, what=%hd", what );
@@ -2088,8 +2072,7 @@ typedef struct
 PexDiffs;
 
 static void
-pexAddedCb( void * vpex,
-            void * userData )
+pexAddedCb( void * vpex, void * userData )
 {
     PexDiffs * diffs = userData;
     tr_pex *   pex = vpex;
@@ -2102,8 +2085,7 @@ pexAddedCb( void * vpex,
 }
 
 static inline void
-pexDroppedCb( void * vpex,
-              void * userData )
+pexDroppedCb( void * vpex, void * userData )
 {
     PexDiffs * diffs = userData;
     tr_pex *   pex = vpex;
@@ -2115,8 +2097,7 @@ pexDroppedCb( void * vpex,
 }
 
 static inline void
-pexElementCb( void * vpex,
-              void * userData )
+pexElementCb( void * vpex, void * userData )
 {
     PexDiffs * diffs = userData;
     tr_pex * pex = vpex;

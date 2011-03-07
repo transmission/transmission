@@ -204,10 +204,6 @@ void tr_peerMgrAddPex( tr_torrent     * tor,
 
 void tr_peerMgrMarkAllAsSeeds( tr_torrent * tor );
 
-void tr_peerMgrSetBlame( tr_torrent        * tor,
-                         tr_piece_index_t    pieceIndex,
-                         int                 success );
-
 enum
 {
     TR_PEERS_CONNECTED,
