@@ -3134,8 +3134,7 @@ shouldPeerBeClosed( const Torrent    * t,
         return TRUE;
     }
 
-    /* if we're seeding and the peer has everything we have,
-     * and enough time has passed for a pex exchange, then disconnect */
+    /* disconnect if we're both seeds and enough time has passed for PEX */
     if( tr_torrentIsSeed( tor ) && ( peer->progress >= 1.0f ) )
         return !tr_torrentAllowsPex(tor) || (now-atom->time>=30);
 
