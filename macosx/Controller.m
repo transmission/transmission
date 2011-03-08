@@ -117,6 +117,9 @@ typedef enum
 #define ROW_HEIGHT_SMALL        22.0
 #define WINDOW_REGULAR_WIDTH    468.0
 
+#define STATUS_BAR_HEIGHT   21.0
+#define FILTER_BAR_HEIGHT   23.0
+
 #define UPDATE_UI_SECONDS   1.0
 
 #define DOCK_SEEDING_TAG        101
@@ -2781,9 +2784,9 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         {
             NSSize maxSize = [scrollView convertSize: [[fWindow screen] visibleFrame].size fromView: nil];
             if (!fStatusBar)
-                maxSize.height -= [[fStatusBar view] frame].size.height;
-            if (!fFilterBar) 
-                maxSize.height -= [[fFilterBar view] frame].size.height;
+                maxSize.height -= STATUS_BAR_HEIGHT;
+            if (!fFilterBar)
+                maxSize.height -= FILTER_BAR_HEIGHT;
             if (windowSize.height > maxSize.height)
                 windowSize.height = maxSize.height;
         }
