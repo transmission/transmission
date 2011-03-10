@@ -409,6 +409,8 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
                                 "Main window -> 1st bottom left button (action) tooltip")];
     [fSpeedLimitButton setToolTip: NSLocalizedString(@"Speed Limit overrides the total bandwidth limits with its own limits.",
                                 "Main window -> 2nd bottom left button (turtle) tooltip")];
+    [fClearCompletedButton setToolTip: NSLocalizedString(@"Cleanup all transfers that have completed seeding.",
+                                "Main window -> 3rd bottom left button (cleanup) tooltip")];
     
     [fTableView registerForDraggedTypes: [NSArray arrayWithObject: TORRENT_TABLE_VIEW_DATA_TYPE]];
     [fWindow registerForDraggedTypes: [NSArray arrayWithObjects: NSFilenamesPboardType, NSURLPboardType, nil]];
@@ -1605,10 +1607,13 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     
     //pull the upload and download speeds - most consistent by using current stats
     CGFloat dlRate = 0.0, ulRate = 0.0;
+    BOOL completed = NO;
     for (Torrent * torrent in fTorrents)
     {
         dlRate += [torrent downloadRate];
         ulRate += [torrent uploadRate];
+        
+        completed |= [torrent isFinishedSeeding];
     }
     
     if (![NSApp isHidden])
@@ -1618,6 +1623,8 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
             [self sortTorrents];
             
             [fStatusBar updateWithDownload: dlRate upload: ulRate];
+            
+            [fClearCompletedButton setHidden: !completed];
         }
 
         //update non-constant parts of info window
@@ -3368,21 +3375,21 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         return NO;
     }
     
-    //set info image
+    //set info item
     if ([ident isEqualToString: TOOLBAR_INFO])
     {
         [(NSButton *)[toolbarItem view] setState: [[fInfoController window] isVisible]];
         return YES;
     }
     
-    //set filter image
+    //set filter item
     if ([ident isEqualToString: TOOLBAR_FILTER])
     {
         [(NSButton *)[toolbarItem view] setState: fFilterBar != nil];
         return YES;
     }
     
-    //set quick look image
+    //set quick look item
     if ([ident isEqualToString: TOOLBAR_QUICKLOOK])
     {
         [(NSButton *)[toolbarItem view] setState: [NSApp isOnSnowLeopardOrBetter] && [QLPreviewPanelSL sharedPreviewPanelExists]
@@ -3991,7 +3998,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     
     //get the torrent
     Torrent * torrent = nil;
-    if (torrentStruct != NULL && (type != TR_RPC_TORRENT_ADDED && type != TR_RPC_SESSION_CHANGED))
+    if (torrentStruct != NULL && (type != TR_RPC_TORRENT_ADDED && type != TR_RPC_SESSION_CHANGED && type != TR_RPC_SESSION_CLOSE))
     {
         for (torrent in fTorrents)
             if (torrentStruct == [torrent torrentStruct])
