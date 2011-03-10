@@ -1,5 +1,5 @@
 /*
- * Copyright © Dave Perrett and Malcolm Jarvis
+ * Copyright © Dave Perrett, Malcolm Jarvis and Bruno Bierbaumer
  * This code is licensed under the GPL version 2.
  * For details, see http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
  *
@@ -28,6 +28,17 @@ RPC._TurtleTimeEnabled      = 'alt-speed-time-enabled';
 RPC._TurtleTimeBegin        = 'alt-speed-time-begin';
 RPC._TurtleTimeEnd          = 'alt-speed-time-end';
 RPC._TurtleTimeDay          = 'alt-speed-time-day';
+RPC._PeerLimitGlobal		= 'peer-limit-global';
+RPC._PeerLimitPerTorrent	= 'peer-limit-per-torrent';
+RPC._PexEnabled				= 'pex-enabled';
+RPC._DhtEnabled				= 'dht-enabled';
+RPC._LpdEnabled				= 'lpd-enabled';
+RPC._BlocklistEnabled		= 'blocklist-enabled';
+RPC._BlocklistURL			= 'blocklist-url';
+RPC._BlocklistSize			= 'blocklist-size';
+RPC._UtpEnabled				= 'utp-enabled';
+RPC._PeerPortRandom			= 'peer-port-random-on-start';
+RPC._PortForwardingEnabled	= 'port-forwarding-enabled';
 RPC._StartAddedTorrent      = 'start-added-torrents';
 
 function TransmissionRemote( controller )
@@ -108,7 +119,13 @@ TransmissionRemote.prototype =
 		var o = { method: 'session-get' };
 		this.sendRequest( o, callback, async );
 	},
-
+	
+	checkPort: function( callback, async ) {
+		var tr = this._controller;
+		var o = { method: 'port-test' };
+		this.sendRequest( o, callback, async );
+	},
+	
 	loadDaemonStats: function( callback, async ) {
 		var tr = this._controller;
 		var o = { method: 'session-stats' };
@@ -245,6 +262,15 @@ TransmissionRemote.prototype =
 		var o = {
 			method: 'session-set',
 			arguments: args
+		};
+		this.sendRequest( o, function() {
+			remote._controller.loadDaemonPrefs();
+		} );
+	},
+	updateBlocklist: function() {
+		var remote = this;
+		var o = {
+			method: 'blocklist-update',
 		};
 		this.sendRequest( o, function() {
 			remote._controller.loadDaemonPrefs();

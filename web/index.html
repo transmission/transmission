@@ -229,6 +229,8 @@
 						<ul>
 							<li id="prefs_tab_general_tab" class="prefs_tab_enabled">General</li>
 							<li id="prefs_tab_speed_tab" class="prefs_tab_disabled">Speed</li>
+							<li id="prefs_tab_peers_tab" class="prefs_tab_disabled">Peers</li>
+							<li id="prefs_tab_network_tab" class="prefs_tab_disabled">Network</li>
 						</ul>
 						<div id="prefs_tab_general" class="prefs_tab">
 							<div class="preference download_location">
@@ -240,13 +242,6 @@
 								<div class="formdiv checkbox auto_start">
 									<input type="checkbox" name="auto_start" id="auto_start"/>
 									<label for="auto_start" class="item">Start transfers when added</label>
-								</div>
-							</div>
-							<div class="preference port">
-								<label class="category">Network:</label>
-								<div class="formdiv">
-									<label for="port" class="item">Incoming TCP Port:</label>
-									<input type="text" id="port" name="port"/>
 								</div>
 							</div>
 							<div class="preference encryption">
@@ -317,6 +312,75 @@
 										<option value="32">Friday</option>
 										<option value="64">Saturday</option>
 									</select>
+								</div>
+							</div>
+							<div style="clear: both; visibility: hidden;"></div>
+						</div>
+						<div id="prefs_tab_peers" class="prefs_tab" style="display: none;">
+							<div class="preference peers_conn">
+								<label class="category">Connections:</label>
+								<div class="formdiv">
+									<label for="conn_global" class="item">Global maximum connections:</label>
+									<input type="text" name="conn_global" id="conn_global"/>
+									<label class="suffix">peers</label>
+								</div>
+								<div class="formdiv">
+									<label for="conn_torrent" class="item">Maximum connections for new transfers:</label>
+									<input type="text" name="conn_torrent" id="conn_torrent"/>
+									<label class="suffix">peers</label>
+								</div>
+								<div class="formdiv checkbox">
+									<input type="checkbox" name="conn_pex" id="conn_pex"/>
+									<label for="conn_pex" class="item">Use peer exchange (PEX) for public torrents</label>
+								</div>
+								<div class="formdiv checkbox">
+									<input type="checkbox" name="conn_dht" id="conn_dht"/>
+									<label for="conn_dht" class="item">Use distributed hash table (DHT) for public torrents</label>
+								</div>
+								<div class="formdiv checkbox">
+									<input type="checkbox" name="conn_lpd" id="conn_lpd"/>
+									<label for="conn_lpd" class="item">Use local peer discovery for public torrents</label>
+								</div>
+							</div>
+							<div class="preference block_conn">
+								<label class="category">Blocklist:</label>
+								<div class="formdiv checkbox">
+									<input type="checkbox" name="block_enable" id="block_enable"/>
+									<label for="block_enable" class="item">Prevent peers in blocklist from connecting</label>
+								</div>
+								<div class="formdiv block_url">
+									<label for="block_url" class="item">URL:</label>
+									<input type="text" name="block_url" id="block_url"/>
+								</div>
+								<div class="formdiv">
+									<input type="button" name="block_update_button" id="block_update_button" value="Update"/>
+									<label class="suffix" id="block_size">IP rules in the list</label>
+								</div>
+							</div>
+							<div style="clear: both; visibility: hidden;"></div>
+						</div>
+						<div id="prefs_tab_network" class="prefs_tab" style="display: none;">
+							<div class="preference utp">
+								<label class="category">Peer communication:</label>
+								<div class="formdiv checkbox">
+									<input type="checkbox" name="network_utp" id="network_utp"/>
+									<label for="network_utp" class="item">Enable Micro Transport Protocol (µTP)</label>
+								</div>
+							</div>
+							<div class="preference port">
+								<label class="category">Peer listening port:</label>
+								<div class="formdiv">
+									<label for="port" class="item">Incoming TCP Port:</label>
+									<input type="text" id="port" name="port"/>
+									<label class="suffix" id="port_test"></label>
+								</div>
+								<div class="formdiv checkbox">
+									<input type="checkbox" name="port_rand" id="port_rand"/>
+									<label for="port_rand" class="item">Randomize port on launch</label>
+								</div>
+								<div class="formdiv checkbox">
+									<input type="checkbox" name="port_forward" id="port_forward"/>
+									<label for="port_forward" class="item">Automatically map port</label>
 								</div>
 							</div>
 							<div style="clear: both; visibility: hidden;"></div>

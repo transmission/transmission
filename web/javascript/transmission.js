@@ -1,5 +1,5 @@
 /*
- *	Copyright © Dave Perrett and Malcolm Jarvis
+ *	Copyright © Dave Perrett, Malcolm Jarvis and Bruno Bierbaumer
  *	This code is licensed under the GPL version 2.
  *	For details, see http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
  *
@@ -48,6 +48,7 @@ Transmission.prototype =
                 $('#filter_finished_link').parent().bind('click', function(e){ tr.showFinishedClicked(e); });
 		$('#prefs_save_button').bind('click', function(e) { tr.savePrefsClicked(e); return false;});
 		$('#prefs_cancel_button').bind('click', function(e){ tr.cancelPrefsClicked(e); return false; });
+		$('#block_update_button').bind('click', function(e){ tr.blocklistUpdateClicked(e); return false; });
 		$('#stats_close_button').bind('click', function(e){ tr.closeStatsClicked(e); return false; });
 		$('.inspector_tab').bind('click', function(e){ tr.inspectorTabClicked(e, this); });
 		$('.file_wanted_control').live('click', function(e){ tr.fileWantedClicked(e, this); });
@@ -60,7 +61,10 @@ Transmission.prototype =
 		$('#turtle_button').bind('click', function(e){ tr.toggleTurtleClicked(e); return false; });
 		$('#prefs_tab_general_tab').click(function(e){ changeTab(this, 'prefs_tab_general') });
 		$('#prefs_tab_speed_tab').click(function(e){ changeTab(this, 'prefs_tab_speed') });
+		$('#prefs_tab_peers_tab').click(function(e){ changeTab(this, 'prefs_tab_peers') });
+		$('#prefs_tab_network_tab').click(function(e){ changeTab(this, 'prefs_tab_network');});
         $('#torrent_upload_form').submit(function(){ $('#upload_confirm_button').click(); return false; });
+		$('#torrent_upload_form').submit(function(){ $('#upload_confirm_button').click(); return false; });
 
 		if (iPhone) {
 			$('#inspector_close').bind('click', function(e){ tr.hideInspector(); });
@@ -149,6 +153,14 @@ Transmission.prototype =
 			tr.updateStats( o );
 		}, async );
 	},
+	checkPort: function( async ){
+		$('#port_test').text('checking ...')
+		var tr = this;
+		this.remote.checkPort( function(data){
+			var o = data.arguments;
+			tr.updatePortStatus( o );
+		}, async );		
+	},
 
 	preloadImages: function() {
 		if (iPhone) {
@@ -189,7 +201,7 @@ Transmission.prototype =
 	 */
 	setupPrefConstraints: function() {
 		// only allow integers for speed limit & port options
-		$('div.preference input[@type=text]:not(#download_location)').blur( function() {
+		$('div.preference input[@type=text]:not(#download_location,#block_url)').blur( function() {
 			this.value = this.value.replace(/[^0-9]/gi, '');
 			if (this.value == '') {
 				if ($(this).is('#refresh_rate')) {
@@ -636,6 +648,7 @@ Transmission.prototype =
 
 	savePrefsClicked: function(event)
 	{
+		
 		// handle the clutch prefs locally
 		var tr = this;
 		var rate = parseInt( $('#prefs_form #refresh_rate')[0].value );
@@ -669,9 +682,27 @@ Transmission.prototype =
 		o[RPC._TurtleTimeEnd]        = parseInt( $('#prefs_form #turtle_end_time').val() );
 		o[RPC._TurtleTimeDay]        = parseInt( $('#prefs_form #turtle_days').val() );
 
+
+		o[RPC._PeerLimitGlobal]      = parseInt( $('#prefs_form #conn_global').val() );
+		o[RPC._PeerLimitPerTorrent]  = parseInt( $('#prefs_form #conn_torrent').val() );
+		o[RPC._PexEnabled]           = $('#prefs_form #conn_pex')[0].checked;
+		o[RPC._DhtEnabled]           = $('#prefs_form #conn_dht')[0].checked;
+		o[RPC._LpdEnabled]           = $('#prefs_form #conn_lpd')[0].checked;
+		o[RPC._BlocklistEnabled]     = $('#prefs_form #block_enable')[0].checked;
+		o[RPC._BlocklistURL]         = $('#prefs_form #block_url').val();
+		o[RPC._UtpEnabled]			 = $('#prefs_form #network_utp')[0].checked;
+		o[RPC._PeerPortRandom]		 = $('#prefs_form #port_rand')[0].checked;
+		o[RPC._PortForwardingEnabled]= $('#prefs_form #port_forward')[0].checked;
+
+	
+
 		tr.remote.savePrefs( o );
 
 		tr.hidePrefsDialog( );
+	},
+	blocklistUpdateClicked: function(event){
+		var tr = this;
+		tr.remote.updateBlocklist();	
 	},
 
 	closeStatsClicked: function(event) {
@@ -948,6 +979,7 @@ Transmission.prototype =
 	 *--------------------------------------------*/
 
 	showPrefsDialog: function( ) {
+		this.checkPort(true);
 		$('body').addClass('prefs_showing');
 		$('#prefs_container').show();
 		this.hideiPhoneAddressbar();
@@ -1008,6 +1040,19 @@ Transmission.prototype =
 		$('select#turtle_days').val(                prefs[RPC._TurtleTimeDay] );
 		$('#transmission_version').text(            prefs[RPC._DaemonVersion] );
 
+		$('#conn_global').val(						prefs[RPC._PeerLimitGlobal] );
+		$('#conn_torrent').val(						prefs[RPC._PeerLimitPerTorrent] );
+		$('#conn_pex')[0].checked				  = prefs[RPC._PexEnabled];
+		$('#conn_dht')[0].checked				  = prefs[RPC._DhtEnabled];
+		$('#conn_lpd')[0].checked				  = prefs[RPC._LpdEnabled];
+		$('#block_enable')[0].checked			  = prefs[RPC._BlocklistEnabled];
+		$('#block_url').val(					    prefs[RPC._BlocklistURL]);
+		$('#block_size').text(					    prefs[RPC._BlocklistSize] + ' IP rules in the list' );
+		$('#network_utp')[0].checked			  = prefs[RPC._UtpEnabled];
+		$('#port_rand')[0].checked				  = prefs[RPC._PeerPortRandom];
+		$('#port_forward')[0].checked			  = prefs[RPC._PortForwardingEnabled];
+
+
 		if (!iPhone)
 		{
 			setInnerHTML( $('#limited_download_rate')[0], [ 'Limit (', Transmission.fmt.speed(dn_limit_k), ')' ].join('') );
@@ -1023,6 +1068,13 @@ Transmission.prototype =
 
 		this[Prefs._TurtleState] = prefs[RPC._TurtleState];
 		this.updateTurtleButton();
+	},
+
+	updatePortStatus: function( status ){
+		if(status['port-is-open'])
+			$('#port_test').text('Port is open');
+		else
+			$('#port_test').text('Port is closed');
 	},
 
 	showStatsDialog: function( ) {

@@ -1220,6 +1220,10 @@ div#prefs_container div.preference input {
 	float: left;
 }
 
+div#prefs_container div.block_url input {
+	width: 256px !important;
+}
+
 div#prefs_container div.download_location input {
 	width: 256px !important;
 }
