@@ -51,9 +51,6 @@ enum
     /* unless the tracker says otherwise, this is the announce min_interval */
     DEFAULT_ANNOUNCE_MIN_INTERVAL_SEC = ( 60 * 2 ),
 
-    /* the length of the 'key' argument passed in tracker requests */
-    KEYLEN = 8,
-
     /* how many web tasks we allow at one time */
     MAX_CONCURRENT_TASKS = 48,
 
@@ -126,6 +123,7 @@ typedef struct tr_announcer
     tr_session * session;
     struct event * upkeepTimer;
     int slotsAvailable;
+    int key;
     time_t lpdHouseKeepingAt;
 }
 tr_announcer;
@@ -176,6 +174,7 @@ tr_announcerInit( tr_session * session )
 
     a = tr_new0( tr_announcer, 1 );
     a->stops = TR_PTR_ARRAY_INIT;
+    a->key = tr_cryptoRandInt( INT_MAX );
     a->session = session;
     a->slotsAvailable = MAX_CONCURRENT_TASKS;
     a->lpdHouseKeepingAt = lpdAt;
@@ -224,27 +223,8 @@ typedef struct
     int consecutiveAnnounceFailures;
 
     uint32_t id;
-
-    /* Sent as the "key" argument in tracker requests
-     * to verify us if our IP address changes.
-     * This is immutable for the life of the tracker object.
-     * The +1 is for '\0' */
-    unsigned char key_param[KEYLEN + 1];
 }
 tr_tracker_item;
-
-static void
-generateKeyParam( unsigned char * msg, size_t msglen )
-{
-    size_t i;
-    const char * pool = "abcdefghijklmnopqrstuvwxyz0123456789";
-    const int poolSize = 36;
-
-    tr_cryptoRandBuf( msg, msglen );
-    for( i=0; i<msglen; ++i )
-        msg[i] = pool[ msg[i] % poolSize ];
-    msg[msglen] = '\0';
-}
 
 static tr_tracker_item*
 trackerNew( const char  * announce,
@@ -256,7 +236,6 @@ trackerNew( const char  * announce,
     tracker->announce = tr_strdup( announce );
     tracker->scrape = tr_strdup( scrape );
     tracker->id = id;
-    generateKeyParam( tracker->key_param, KEYLEN );
     tracker->seederCount = -1;
     tracker->leecherCount = -1;
     tracker->downloadCount = -1;
@@ -601,7 +580,7 @@ createAnnounceURL( const tr_announcer  * announcer,
                               "&downloaded=%" PRIu64
                               "&left=%" PRIu64
                               "&numwant=%d"
-                              "&key=%s"
+                              "&key=%x"
                               "&compact=1"
                               "&supportcrypto=1",
                               ann,
@@ -613,7 +592,7 @@ createAnnounceURL( const tr_announcer  * announcer,
                               tier->byteCounts[TR_ANN_DOWN],
                               tr_cpLeftUntilComplete( &torrent->completion ),
                               numwant,
-                              tracker->key_param );
+                              announcer->key );
 
     if( announcer->session->encryptionMode == TR_ENCRYPTION_REQUIRED )
         evbuffer_add_printf( buf, "&requirecrypto=1" );
@@ -1723,7 +1702,6 @@ trackerItemCopyAttributes( tr_tracker_item * t, const tr_tracker_item * o )
     t->leecherCount = o->leecherCount;
     t->downloadCount = o->downloadCount;
     t->downloaderCount = o->downloaderCount;
-    memcpy( t->key_param, o->key_param, sizeof( t->key_param ) );
 }
 
 static void
