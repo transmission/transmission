@@ -1508,7 +1508,6 @@ freeTorrent( tr_torrent * tor )
 
     tr_free( tor->downloadDir );
     tr_free( tor->incompleteDir );
-    tr_free( tor->peer_id );
 
     if( tor == session->torrentList )
         session->torrentList = tor->next;
@@ -1617,8 +1616,7 @@ torrentStart( tr_torrent * tor )
      * closed and opened again without quitting Transmission ...
      * change the peerid. It would help sometimes if a stopped event
      * was missed to ensure that we didn't think someone was cheating. */
-    tr_free( tor->peer_id );
-    tor->peer_id = tr_peerIdNew( );
+    tr_peerIdInit( tor->peer_id );
     tor->isRunning = 1;
     tr_torrentSetDirty( tor );
     tr_runInEventThread( tor->session, torrentStartImpl, tor );

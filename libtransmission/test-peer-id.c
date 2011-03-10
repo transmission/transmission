@@ -35,25 +35,25 @@ main( void )
 {
     int i;
     int test = 0;
+    uint8_t peer_id[PEER_ID_LEN+1];
 
     for( i = 0; i < 100000; ++i )
     {
-        int       j;
-        int       val = 0;
-        uint8_t * pch = tr_peerIdNew( );
+        int j;
+        int val = 0;
 
-        check( strlen( (char*)pch ) == 20 );
-        check( !memcmp( pch, PEERID_PREFIX, 8 ) );
+        tr_peerIdInit( peer_id );
 
-        for( j = 8; j < 20; ++j )
+        check( strlen( (char*)peer_id ) == PEER_ID_LEN );
+        check( !memcmp( peer_id, PEERID_PREFIX, 8 ) );
+
+        for( j = 8; j < PEER_ID_LEN; ++j )
         {
-            char tmp[2] = { pch[j], '\0' };
+            char tmp[2] = { peer_id[j], '\0' };
             val += strtoul( tmp, NULL, 36 );
         }
 
         check( ( val % 36 ) == 0 );
-
-        tr_free( pch );
     }
 
     return 0;

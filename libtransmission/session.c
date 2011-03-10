@@ -81,13 +81,12 @@ getRandomPort( tr_session * s )
    characters, where x is the major version number, y is the
    minor version number, z is the maintenance number, and b
    designates beta (Azureus-style) */
-uint8_t*
-tr_peerIdNew( void )
+void
+tr_peerIdInit( uint8_t * buf )
 {
     int          i;
     int          val;
     int          total = 0;
-    uint8_t *    buf = tr_new( uint8_t, 21 );
     const char * pool = "0123456789abcdefghijklmnopqrstuvwxyz";
     const int    base = 36;
 
@@ -103,18 +102,6 @@ tr_peerIdNew( void )
     val = total % base ? base - ( total % base ) : 0;
     buf[19] = pool[val];
     buf[20] = '\0';
-
-    return buf;
-}
-
-const uint8_t*
-tr_getPeerId( void )
-{
-    static uint8_t * id = NULL;
-
-    if( id == NULL )
-        id = tr_peerIdNew( );
-    return id;
 }
 
 /***
@@ -580,6 +567,7 @@ tr_sessionInit( const char  * tag,
     session->tag = tr_strdup( tag );
     session->magicNumber = SESSION_MAGIC_NUMBER;
     session->buffer = tr_valloc( SESSION_BUFFER_SIZE );
+    tr_peerIdInit( session->peer_id );
     tr_bencInitList( &session->removedTorrents, 0 );
 
     /* nice to start logging at the very beginning */

@@ -50,7 +50,6 @@ enum
     HANDSHAKE_NAME_LEN             = 20,
     HANDSHAKE_FLAGS_LEN            = 8,
     HANDSHAKE_SIZE                 = 68,
-    PEER_ID_LEN                    = 20,
     INCOMING_HANDSHAKE_LEN         = 48,
 
     /* Encryption Constants */
@@ -218,7 +217,7 @@ buildHandshakeMessage( tr_handshake * handshake, uint8_t * buf )
     uint8_t          * walk = buf;
     const uint8_t    * torrentHash = tr_cryptoGetTorrentHash( handshake->crypto );
     const tr_torrent * tor = tr_torrentFindFromHash( handshake->session, torrentHash );
-    const uint8_t    * peer_id = tor && tor->peer_id ? tor->peer_id : tr_getPeerId( );
+    const uint8_t    * peer_id = tor ? tor->peer_id : tr_getPeerId( handshake->session );
 
     memcpy( walk, HANDSHAKE_NAME, HANDSHAKE_NAME_LEN );
     walk += HANDSHAKE_NAME_LEN;
@@ -298,7 +297,7 @@ parseHandshake( tr_handshake *    handshake,
     dbgmsg( handshake, "peer-id is [%*.*s]", PEER_ID_LEN, PEER_ID_LEN, peer_id );
 
     tor = tr_torrentFindFromHash( handshake->session, hash );
-    tor_peer_id = tor && tor->peer_id ? tor->peer_id : tr_getPeerId( );
+    tor_peer_id = tor ? tor->peer_id : tr_getPeerId( handshake->session );
     if( !memcmp( peer_id, tor_peer_id, PEER_ID_LEN ) )
     {
         dbgmsg( handshake, "streuth!  we've connected to ourselves." );
@@ -741,7 +740,7 @@ readPeerId( tr_handshake    * handshake,
 
     /* if we've somehow connected to ourselves, don't keep the connection */
     tor = tr_torrentFindFromHash( handshake->session, tr_peerIoGetTorrentHash( handshake->io ) );
-    tor_peer_id = tor && tor->peer_id ? tor->peer_id : tr_getPeerId( );
+    tor_peer_id = tor ? tor->peer_id : tr_getPeerId( handshake->session );
     peerIsGood = memcmp( peer_id, tor_peer_id, PEER_ID_LEN ) != 0;
     dbgmsg( handshake, "isPeerGood == %d", (int)peerIsGood );
     return tr_handshakeDone( handshake, peerIsGood );

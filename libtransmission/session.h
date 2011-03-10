@@ -33,9 +33,12 @@
 
 typedef enum { TR_NET_OK, TR_NET_ERROR, TR_NET_WAIT } tr_tristate_t;
 
-uint8_t*       tr_peerIdNew( void );
+enum
+{
+  PEER_ID_LEN = 20
+};
 
-const uint8_t* tr_getPeerId( void );
+void tr_peerIdInit( uint8_t * setme );
 
 struct event_base;
 struct tr_address;
@@ -206,12 +209,20 @@ struct tr_session
     tr_bool bufferInUse;
 
     tr_web_config_func          * curl_easy_config_func;
+
+    uint8_t peer_id[PEER_ID_LEN+1];
 };
 
 static inline tr_port
 tr_sessionGetPublicPeerPort( const tr_session * session )
 {
     return session->public_peer_port;
+}
+
+static inline const uint8_t*
+tr_getPeerId( tr_session * session )
+{
+    return session->peer_id;
 }
 
 tr_bool      tr_sessionAllowsDHT( const tr_session * session );
