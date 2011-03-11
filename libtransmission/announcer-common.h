@@ -226,6 +226,4 @@ void tr_tracker_http_announce( tr_session                 * session,
                                void                       * user_data );
 
 
-                                            
-
 #endif /* _TR_ANNOUNCER_COMMON_H_ */

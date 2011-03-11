@@ -960,7 +960,7 @@ on_announce_done( tr_session                  * session,
         }
         else
         {
-            int i; 
+            int i;
             const char * str;
             const tr_bool isStopped = event == TR_ANNOUNCE_EVENT_STOPPED;
 
@@ -1113,7 +1113,7 @@ find_tier( tr_torrent * tor, const char * url )
     int i;
     int n = tr_ptrArraySize( &tor->tiers->tiers );
     tr_tier ** tiers = (tr_tier**) tr_ptrArrayBase( &tor->tiers->tiers );
-    
+
     for( i=0; i<n; ++i ) {
         tr_tracker * tracker = tiers[i]->currentTracker;
         if( tracker && !tr_strcmp0( tracker->scrape, url ) )

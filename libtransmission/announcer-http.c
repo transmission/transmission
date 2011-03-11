@@ -44,7 +44,7 @@ get_event_string( const tr_announce_request * req )
 
     return tr_announce_event_get_string( req->event );
 }
-    
+
 static char*
 announce_url_new( const tr_session * session, const tr_announce_request * req )
 {
@@ -331,7 +331,7 @@ on_scrape_done( tr_session   * session,
                 size_t         msglen,
                 void         * vdata )
 {
-    tr_scrape_response * response; 
+    tr_scrape_response * response;
     struct scrape_data * data = vdata;
 
     response = &data->response;
