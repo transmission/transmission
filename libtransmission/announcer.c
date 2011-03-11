@@ -329,7 +329,7 @@ tierNew( tr_torrent * tor )
     t->scrapeIntervalSec = DEFAULT_SCRAPE_INTERVAL_SEC;
     t->announceIntervalSec = DEFAULT_ANNOUNCE_INTERVAL_SEC;
     t->announceMinIntervalSec = DEFAULT_ANNOUNCE_MIN_INTERVAL_SEC;
-    t->scrapeAt = now + tr_cryptoWeakRandInt( 60*5 );
+    t->scrapeAt = now + tr_cryptoWeakRandInt( 60*3 );
     t->tor = tor;
 
     return t;
@@ -1221,28 +1221,58 @@ scrape_request_delegate( tr_announcer             * announcer,
 }
 
 static void
-tierScrape( tr_announcer * announcer, tr_tier * tier )
+multiscrape( tr_announcer * announcer, tr_ptrArray * tiers )
 {
-    tr_scrape_request request;
+    int i;
+    int request_count = 0;
+    const time_t now = tr_time( );
+    const int tier_count = tr_ptrArraySize( tiers );
+    const int max_request_count = MIN( announcer->slotsAvailable, tier_count );
+    tr_scrape_request * requests = tr_new0( tr_scrape_request, max_request_count );
 
-    /* sanity clause */
-    assert( tier );
-    assert( !tier->isScraping );
-    assert( tier->currentTracker != NULL );
-    assert( tr_isTorrent( tier->tor ) );
+    /* batch as many info_hashes into a request as we can */
+    for( i=0; i<tier_count; ++i )
+    {
+        int j;
+        tr_tier * tier = tr_ptrArrayNth( tiers, i );
+        char * url = tier->currentTracker->scrape;
+        const uint8_t * hash = tier->tor->info.hash;
 
-    /* initialize the request */
-    request.url = tier->currentTracker->scrape;
-    request.info_hash_count = 1;
-    memcpy( request.info_hash[0], tier->tor->info.hash, SHA_DIGEST_LENGTH );
-    tier_build_log_name( tier, request.log_name, sizeof( request.log_name ) );
+        /* if there's a request with this scrape URL and a free slot, use it */
+        for( j=0; j<request_count; ++j )
+        {
+            tr_scrape_request * req = &requests[j];
 
-    /* start scraping */
-    dbgmsg( tier, "scraping \"%s\"", request.url );
-    tier->isScraping = TRUE;
-    tier->lastScrapeStartTime = tr_time( );
-    --announcer->slotsAvailable;
-    scrape_request_delegate( announcer, &request, on_scrape_done, NULL );
+            if( req->info_hash_count >= TR_MULTISCRAPE_MAX )
+                continue;
+            if( tr_strcmp0( req->url, url ) )
+                continue;
+
+            memcpy( req->info_hash[req->info_hash_count++], hash, SHA_DIGEST_LENGTH );
+            tier->isScraping = TRUE;
+            tier->lastScrapeStartTime = now;
+            break;
+        }
+
+        /* otherwise, if there's room for another request, build a new one */
+        if( ( j==request_count ) && ( request_count < max_request_count ) )
+        {
+            tr_scrape_request * req = &requests[request_count++];
+            req->url = url;
+            tier_build_log_name( tier, req->log_name, sizeof( req->log_name ) );
+
+            memcpy( req->info_hash[req->info_hash_count++], hash, SHA_DIGEST_LENGTH );
+            tier->isScraping = TRUE;
+            tier->lastScrapeStartTime = now;
+        }
+    }
+
+    /* send the requests we just built */
+    for( i=0; i<request_count; ++i )
+        scrape_request_delegate( announcer, &requests[i], on_scrape_done, NULL );
+
+    /* cleanup */
+    tr_free( requests );
 }
 
 static void
@@ -1338,13 +1368,7 @@ announceMore( tr_announcer * announcer )
         }
 
         /* scrape some */
-        /* FIXME: multiscrape */
-        n = MIN( tr_ptrArraySize( &scrapeMe ), announcer->slotsAvailable );
-        for( i=0; i<n; ++i ) {
-            tr_tier * tier = tr_ptrArrayNth( &scrapeMe, i );
-            dbgmsg( tier, "scraping tier %d of %d", (i+1), n );
-            tierScrape( announcer, tier );
-        }
+        multiscrape( announcer, &scrapeMe );
 
 #if 0
 char timebuf[64];
