@@ -1214,10 +1214,10 @@ scrape_request_delegate( tr_announcer             * announcer,
 {
     tr_session * session = announcer->session;
 
-    if( strstr( request->url, "http://" ) )
+    if( !memcmp( request->url, "http", 4 ) )
         tr_tracker_http_scrape( session, request, callback, callback_data );
     else
-        fprintf( stderr, "can't handle [%s] yet\n", request->url );
+        abort();//fprintf( stderr, "can't handle [%s] yet\n", request->url );
 }
 
 static void
