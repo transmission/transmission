@@ -717,21 +717,16 @@ tier_announce_event_push( tr_tier * tier, tr_announce_event e, time_t announceAt
     dbgmsg( tier, "announcing in %d seconds", (int)difftime(announceAt,tr_time()) );
 }
 
-static tr_bool
-tier_announce_event_pull( tr_tier * tier, tr_announce_event * setme )
+static tr_announce_event
+tier_announce_event_pull( tr_tier * tier )
 {
-    const tr_bool success = tier->announce_event_count > 0;
+    const tr_announce_event e = tier->announce_events[0];
 
-    if( success )
-    {
-        *setme = tier->announce_events[0];
+    tr_removeElementFromArray( tier->announce_events,
+                               0, sizeof( tr_announce_event ),
+                               tier->announce_event_count-- );
 
-        tr_removeElementFromArray( tier->announce_events,
-                                   0, sizeof( tr_announce_event ),
-                                   tier->announce_event_count-- );
-    }
-
-    return success;
+    return e;
 }
 
 static void
@@ -908,6 +903,9 @@ on_announce_done( tr_session                  * session,
     const time_t now = tr_time( );
     const tr_announce_event event = data->event;
 
+    if( announcer )
+        ++announcer->slotsAvailable;
+
     if( tier != NULL )
     {
         tr_tracker * tracker;
@@ -1034,9 +1032,6 @@ on_announce_done( tr_session                  * session,
         }
     }
 
-    if( announcer )
-        ++announcer->slotsAvailable;
-
     tr_free( data );
 }
 
@@ -1048,10 +1043,10 @@ announce_request_delegate( tr_announcer               * announcer,
 {
     tr_session * session = announcer->session;
 
-    if( strstr( request->url, "http://" ) )
+    if( !memcmp( request->url, "http", 4 ) )
         tr_tracker_http_announce( session, request, callback, callback_data );
     else
-        fprintf( stderr, "can't handle [%s] yet\n", request->url );
+        abort();//fprintf( stderr, "can't handle [%s] yet\n", request->url );
 
     tr_free( request->tracker_id_str );
     tr_free( request->url );
@@ -1062,29 +1057,28 @@ static void
 tierAnnounce( tr_announcer * announcer, tr_tier * tier )
 {
     tr_announce_event announce_event;
+    tr_announce_request * req;
+    struct announce_data * data;
+    const tr_torrent * tor = tier->tor;
+    const time_t now = tr_time( );
 
     assert( !tier->isAnnouncing );
+    assert( tier->announce_event_count > 0 );
 
-    if( tier_announce_event_pull( tier, &announce_event ) )
-    {
-        struct announce_data * data;
-        const tr_torrent * tor = tier->tor;
-        const time_t now = tr_time( );
+    announce_event = tier_announce_event_pull( tier );
+    req = announce_request_new( announcer, tor, tier, announce_event );
 
-        tr_announce_request * req = announce_request_new( announcer, tor, tier, announce_event );
+    data = tr_new0( struct announce_data, 1 );
+    data->tierId = tier->key;
+    data->isRunningOnSuccess = tor->isRunning;
+    data->timeSent = now;
+    data->event = announce_event;
 
-        data = tr_new0( struct announce_data, 1 );
-        data->tierId = tier->key;
-        data->isRunningOnSuccess = tor->isRunning;
-        data->timeSent = now;
-        data->event = announce_event;
+    tier->isAnnouncing = TRUE;
+    tier->lastAnnounceStartTime = now;
+    --announcer->slotsAvailable;
 
-        tier->isAnnouncing = TRUE;
-        tier->lastAnnounceStartTime = now;
-        --announcer->slotsAvailable;
-
-        announce_request_delegate( announcer, req, on_announce_done, data );
-    }
+    announce_request_delegate( announcer, req, on_announce_done, data );
 }
 
 /***
@@ -1306,6 +1300,8 @@ announceMore( tr_announcer * announcer )
 {
     tr_torrent * tor = NULL;
     const time_t now = tr_time( );
+
+    dbgmsg( NULL, "announceMore: slotsAvailable is %d", announcer->slotsAvailable );
 
     if( announcer->slotsAvailable > 0 )
     {
