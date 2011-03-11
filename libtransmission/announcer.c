@@ -488,8 +488,16 @@ publishError( tr_tier * tier, const char * msg )
 }
 
 static int8_t
-getSeedProbability( int seeds, int leechers )
+getSeedProbability( tr_tier * tier, int seeds, int leechers, int pex_count )
 {
+    /* special case optimization:
+       ocelot omits seeds from peer lists sent to seeds on private trackers.
+       so check for that case... */
+    if( ( leechers == pex_count ) && tr_torrentIsPrivate( tier->tor )
+                                  && tr_torrentIsSeed( tier->tor )
+                                  && ( seeds + leechers < NUMWANT ) )
+        return 0;
+
     if( !seeds )
         return 0;
 
@@ -504,11 +512,12 @@ publishPeersPex( tr_tier * tier, int seeds, int leechers,
                  const tr_pex * pex, int n )
 {
     tr_tracker_event e = TRACKER_EVENT_INIT;
-
     e.messageType = TR_TRACKER_PEERS;
-    e.seedProbability = getSeedProbability( seeds, leechers );
+    e.seedProbability = getSeedProbability( tier, seeds, leechers, n );
     e.pex = pex;
     e.pexCount = n;
+
+    dbgmsg( tier, "got %d peers; seed probability %d", n, (int)e.seedProbability );
 
     if( tier->tor->tiers->callback != NULL )
         tier->tor->tiers->callback( tier->tor, &e, NULL );
