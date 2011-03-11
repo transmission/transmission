@@ -2620,7 +2620,6 @@
 		0053D3D30C86774200545606 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				GCC_INLINES_ARE_PRIVATE_EXTERN = YES;
 				OTHER_CFLAGS = "-DHAVE_CONFIG_H";
 				PRODUCT_NAME = event;
 				USER_HEADER_SEARCH_PATHS = "third-party/libevent/compat third-party/libevent/include";
@@ -2761,10 +2760,7 @@
 		3C7A118E0D0B2EB800B5701F /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				COPY_PHASE_STRIP = YES;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
-				INSTALL_PATH = /usr/local/lib;
 				OTHER_CFLAGS = "-DENABLE_STRNATPMPERR";
 				PRODUCT_NAME = natpmp;
 			};
@@ -2774,7 +2770,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
-				INSTALL_PATH = /usr/local/lib;
 				OTHER_CFLAGS = "-DENABLE_STRNATPMPERR";
 				PRODUCT_NAME = natpmp;
 			};
@@ -2783,11 +2778,7 @@
 		3C7A11900D0B2EB800B5701F /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				COPY_PHASE_STRIP = NO;
-				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
-				GCC_OPTIMIZATION_LEVEL = 0;
-				INSTALL_PATH = /usr/local/lib;
 				OTHER_CFLAGS = "-DENABLE_STRNATPMPERR";
 				PRODUCT_NAME = natpmp;
 			};
@@ -2897,15 +2888,7 @@
 		A22CFCBB0FC24F720009BD3E /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = YES;
-				COPY_PHASE_STRIP = NO;
-				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
-				GCC_OPTIMIZATION_LEVEL = 0;
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "";
-				INSTALL_PATH = /usr/local/lib;
-				OTHER_LDFLAGS = "";
 				PRODUCT_NAME = dht;
 			};
 			name = Debug;
@@ -2913,12 +2896,7 @@
 		A22CFCBC0FC24F720009BD3E /* Release - Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = YES;
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "";
-				INSTALL_PATH = /usr/local/lib;
-				OTHER_LDFLAGS = "";
 				PRODUCT_NAME = dht;
 			};
 			name = "Release - Debug";
@@ -2926,14 +2904,7 @@
 		A22CFCBD0FC24F720009BD3E /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = YES;
-				COPY_PHASE_STRIP = YES;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "";
-				INSTALL_PATH = /usr/local/lib;
-				OTHER_LDFLAGS = "";
 				PRODUCT_NAME = dht;
 			};
 			name = Release;
@@ -3078,16 +3049,11 @@
 		A2E384CF130DFB1D001F501B /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				COPY_PHASE_STRIP = NO;
-				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
-				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					POSIX,
 					MACOSX,
 				);
-				INSTALL_PATH = /usr/local/lib;
 				PRODUCT_NAME = utp;
 			};
 			name = Debug;
@@ -3095,13 +3061,11 @@
 		A2E384D0130DFB1D001F501B /* Release - Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					POSIX,
 					MACOSX,
 				);
-				INSTALL_PATH = /usr/local/lib;
 				PRODUCT_NAME = utp;
 			};
 			name = "Release - Debug";
@@ -3109,15 +3073,12 @@
 		A2E384D1130DFB1D001F501B /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				COPY_PHASE_STRIP = YES;
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					POSIX,
 					MACOSX,
 					NS_BLOCK_ASSERTIONS,
 				);
-				INSTALL_PATH = /usr/local/lib;
 				PRODUCT_NAME = utp;
 			};
 			name = Release;
@@ -3125,10 +3086,7 @@
 		BE1183490CE160960002D0F3 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				COPY_PHASE_STRIP = YES;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
-				INSTALL_PATH = /usr/local/lib;
 				PRODUCT_NAME = miniupnp;
 			};
 			name = Release;
@@ -3137,8 +3095,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
-				INSTALL_PATH = /usr/local/lib;
-				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
 				PRODUCT_NAME = miniupnp;
 			};
 			name = "Release - Debug";
@@ -3146,12 +3102,7 @@
 		BE11834B0CE160960002D0F3 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				COPY_PHASE_STRIP = NO;
-				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
-				GCC_OPTIMIZATION_LEVEL = 0;
-				INSTALL_PATH = /usr/local/lib;
-				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
 				PRODUCT_NAME = miniupnp;
 			};
 			name = Debug;
