@@ -50,7 +50,7 @@ typedef enum
 
 - (id) initWithLib: (tr_session *) lib
 {
-    if (self = [super initWithNibName: @"StatusBar" bundle: nil])
+    if ((self = [super initWithNibName: @"StatusBar" bundle: nil]))
     {
         fLib = lib;
     }
