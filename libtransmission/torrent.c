@@ -812,6 +812,8 @@ torrentInit( tr_torrent * tor, const tr_ctor * ctor )
     tor->uniqueId = nextUniqueId++;
     tor->magicNumber = TORRENT_MAGIC_NUMBER;
 
+    tr_peerIdInit( tor->peer_id );
+
     tr_sha1( tor->obfuscatedHash, "req2", 4,
              tor->info.hash, SHA_DIGEST_LENGTH,
              NULL );
