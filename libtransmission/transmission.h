@@ -1677,9 +1677,6 @@ struct tr_info
     uint8_t            hash[SHA_DIGEST_LENGTH];
     char               hashString[2 * SHA_DIGEST_LENGTH + 1];
 
-    /* hash, escaped as per rfc2396 for tracker announces */
-    char               hashEscaped[3 * SHA_DIGEST_LENGTH + 1];
-
     /* Flags */
     tr_bool            isPrivate;
     tr_bool            isMultifile;

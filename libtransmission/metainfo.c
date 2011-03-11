@@ -383,32 +383,6 @@ geturllist( tr_info * inf,
     }
 }
 
-static int
-is_rfc2396_alnum( char ch )
-{
-    return ( '0' <= ch && ch <= '9' )
-        || ( 'A' <= ch && ch <= 'Z' )
-        || ( 'a' <= ch && ch <= 'z' )
-        || ch == '.'
-        || ch == '-'
-        || ch == '_'
-        || ch == '~';
-}
-
-static void
-escape( char * out, const uint8_t * in, size_t in_len ) /* rfc2396 */
-{
-    const uint8_t *end = in + in_len;
-
-    while( in != end )
-        if( is_rfc2396_alnum( *in ) )
-            *out++ = (char) *in++;
-        else
-            out += tr_snprintf( out, 4, "%%%02x", (unsigned int)*in++ );
-
-    *out = '\0';
-}
-
 static const char*
 tr_metainfoParseImpl( const tr_session  * session,
                       tr_info           * inf,
@@ -446,7 +420,6 @@ tr_metainfoParseImpl( const tr_session  * session,
                 return "info_hash";
             memcpy( inf->hash, raw, raw_len );
             tr_sha1_to_hex( inf->hashString, inf->hash );
-            escape( inf->hashEscaped, inf->hash, SHA_DIGEST_LENGTH );
 
             /* maybe get the display name */
             if( tr_bencDictFindStr( d, "display-name", &str ) ) {
@@ -468,7 +441,6 @@ tr_metainfoParseImpl( const tr_session  * session,
         char * bstr = tr_bencToStr( infoDict, TR_FMT_BENC, &len );
         tr_sha1( inf->hash, bstr, len, NULL );
         tr_sha1_to_hex( inf->hashString, inf->hash );
-        escape( inf->hashEscaped, inf->hash, SHA_DIGEST_LENGTH );
 
         if( infoDictLength != NULL )
             *infoDictLength = len;

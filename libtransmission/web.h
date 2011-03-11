@@ -69,6 +69,8 @@ void tr_webRunWithBuffer( tr_session         * session,
 
 void tr_http_escape( struct evbuffer *out, const char *str, int len, tr_bool escape_slashes );
 
+void tr_http_escape_sha1( char * out, const uint8_t * sha1_digest );
+
 char* tr_http_unescape( const char * str, int len );
 
 #ifdef __cplusplus

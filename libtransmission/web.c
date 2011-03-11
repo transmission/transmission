@@ -509,3 +509,30 @@ tr_http_unescape( const char * str, int len )
     curl_free( tmp );
     return ret;
 }
+
+static int
+is_rfc2396_alnum( uint8_t ch )
+{
+    return ( '0' <= ch && ch <= '9' )
+        || ( 'A' <= ch && ch <= 'Z' )
+        || ( 'a' <= ch && ch <= 'z' )
+        || ch == '.'
+        || ch == '-'
+        || ch == '_'
+        || ch == '~';
+}
+
+void
+tr_http_escape_sha1( char * out, const uint8_t * sha1_digest )
+{
+    const uint8_t * in = sha1_digest;
+    const uint8_t * end = in + SHA_DIGEST_LENGTH;
+
+    while( in != end )
+        if( is_rfc2396_alnum( *in ) )
+            *out++ = (char) *in++;
+        else
+            out += tr_snprintf( out, 4, "%%%02x", (unsigned int)*in++ );
+
+    *out = '\0';
+}

@@ -197,14 +197,17 @@ doScrape( const tr_info * inf )
         struct evbuffer * buf;
         const char * scrape = inf->trackers[i].scrape;
         char * url;
+        char escaped[SHA_DIGEST_LENGTH*3 + 1];
 
         if( scrape == NULL )
             continue;
 
+        tr_http_escape_sha1( escaped, inf->hash );
+
         url = tr_strdup_printf( "%s%cinfo_hash=%s",
                                 scrape,
                                 strchr( scrape, '?' ) ? '&' : '?',
-                                inf->hashEscaped );
+                                escaped );
 
         printf( "%s ... ", url );
         fflush( stdout );
