@@ -217,7 +217,7 @@ buildHandshakeMessage( tr_handshake * handshake, uint8_t * buf )
     uint8_t          * walk = buf;
     const uint8_t    * torrentHash = tr_cryptoGetTorrentHash( handshake->crypto );
     const tr_torrent * tor = tr_torrentFindFromHash( handshake->session, torrentHash );
-    const uint8_t    * peer_id = tor ? tor->peer_id : tr_getPeerId( handshake->session );
+    const uint8_t    * peer_id = tor && *tor->peer_id ? tor->peer_id : tr_getPeerId( handshake->session );
 
     memcpy( walk, HANDSHAKE_NAME, HANDSHAKE_NAME_LEN );
     walk += HANDSHAKE_NAME_LEN;
