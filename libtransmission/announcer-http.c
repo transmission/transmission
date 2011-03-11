@@ -153,7 +153,6 @@ listToPex( tr_benc * peerList, size_t * setme_len )
 
 struct announce_data
 {
-    int torrent_id;
     tr_session * session;
     tr_announce_response response;
     tr_announce_response_func * response_func;
