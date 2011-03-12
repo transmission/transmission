@@ -1893,19 +1893,10 @@ size_t UTP_ProcessIncoming(UTPSocket *conn, const byte *packet, size_t len, bool
 	for (int i = 0; i < acks; ++i) {
 		int seq = conn->seq_nr - conn->cur_window_packets + i;
 		OutgoingPacket *pkt = (OutgoingPacket*)conn->outbuf.get(seq);
-		int64 rtt;
 		if (pkt == 0 || pkt->transmissions == 0) continue;
 		assert((int)(pkt->payload) >= 0);
 		acked_bytes += pkt->payload;
-		rtt = UTP_GetMicroseconds() - pkt->time_sent;
-		if(rtt < 0) {
-			LOG_UTP("UTP_GetMicroseconds decreased (%ld > %ld).  "
-				"This should not happen.",
-				(long)pkt->time_sent,
-				(long)(pkt->time_sent + rtt));
-			rtt = 0;
-		}
-		min_rtt = min<int64>(min_rtt, rtt);
+		min_rtt = min<int64>(min_rtt, UTP_GetMicroseconds() - pkt->time_sent);
 	}
 	
 	// count bytes acked by EACK
