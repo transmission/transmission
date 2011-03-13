@@ -55,10 +55,6 @@
 #define MY_REALM "Transmission"
 #define TR_N_ELEMENTS( ary ) ( sizeof( ary ) / sizeof( *ary ) )
 
-#ifdef WIN32
-#define strncasecmp _strnicmp
-#endif
-
 struct tr_rpc_server
 {
     tr_bool            isEnabled;
@@ -599,7 +595,7 @@ handle_request( struct evhttp_request * req, void * arg )
         evhttp_add_header( req->output_headers, "Server", MY_REALM );
 
         auth = evhttp_find_header( req->input_headers, "Authorization" );
-        if( auth && !strncasecmp( auth, "basic ", 6 ) )
+        if( auth && !evutil_ascii_strncasecmp( auth, "basic ", 6 ) )
         {
             int    plen;
             char * p = tr_base64_decode( auth + 6, 0, &plen );

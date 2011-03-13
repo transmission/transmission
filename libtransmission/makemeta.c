@@ -14,12 +14,14 @@
 #include <errno.h>
 #include <stdio.h> /* FILE, stderr */
 #include <stdlib.h> /* qsort */
-#include <string.h> /* strcmp, strlen, strcasecmp */
+#include <string.h> /* strcmp, strlen */
 
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
 #include <dirent.h>
+
+#include <event2/util.h> /* evutil_ascii_strcasecmp() */
 
 #include "transmission.h"
 #include "crypto.h" /* tr_sha1 */
@@ -105,13 +107,12 @@ bestPieceSize( uint64_t totalSize )
 }
 
 static int
-builderFileCompare( const void * va,
-                    const void * vb )
+builderFileCompare( const void * va, const void * vb )
 {
     const tr_metainfo_builder_file * a = va;
     const tr_metainfo_builder_file * b = vb;
 
-    return strcasecmp( a->filename, b->filename );
+    return evutil_ascii_strcasecmp( a->filename, b->filename );
 }
 
 tr_metainfo_builder*

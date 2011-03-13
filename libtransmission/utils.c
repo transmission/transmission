@@ -854,7 +854,7 @@ tr_str_has_suffix( const char *str, const char *suffix )
     if( str_len < suffix_len )
         return FALSE;
 
-    return !strncasecmp( str + str_len - suffix_len, suffix, suffix_len );
+    return !evutil_ascii_strncasecmp( str + str_len - suffix_len, suffix, suffix_len );
 }
 
 /****

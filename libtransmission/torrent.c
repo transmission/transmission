@@ -101,7 +101,7 @@ tr_torrentFindFromHashString( tr_session *  session, const char * str )
     tr_torrent * tor = NULL;
 
     while(( tor = tr_torrentNext( session, tor )))
-        if( !strcasecmp( str, tor->info.hashString ) )
+        if( !evutil_ascii_strcasecmp( str, tor->info.hashString ) )
             return tor;
 
     return NULL;

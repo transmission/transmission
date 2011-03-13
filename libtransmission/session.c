@@ -252,25 +252,30 @@ tr_sessionGetPublicAddress( const tr_session * session, int tr_af_type, tr_bool 
 #endif
 
 static int
-parse_tos(const char *string)
+parse_tos( const char *str )
 {
     char *p;
     int value;
 
-    if(strcasecmp(string, "") == 0 || strcasecmp(string, "default") == 0)
+    if( !evutil_ascii_strcasecmp( str, "" ) )
         return 0;
-    else if(strcasecmp(string, "lowcost") == 0 ||
-            strcasecmp(string, "mincost") == 0)
+    if( !evutil_ascii_strcasecmp( str, "default" ) )
+        return 0;
+
+    if( !evutil_ascii_strcasecmp( str, "lowcost" ) )
         return 0x10;
-    else if(strcasecmp(string, "throughput") == 0)
+    if( !evutil_ascii_strcasecmp( str, "mincost" ) )
+        return 0x10;
+
+    if( !evutil_ascii_strcasecmp( str, "throughput" ) )
         return 0x08;
-    else if(strcasecmp(string, "reliability") == 0)
+    if( !evutil_ascii_strcasecmp( str, "reliability" ) )
         return 0x04;
-    else if(strcasecmp(string, "lowdelay") == 0)
+    if( !evutil_ascii_strcasecmp( str, "lowdelay" ) )
         return 0x02;
 
-    value = strtol(string, &p, 0);
-    if(p == NULL || p == string)
+    value = strtol( str, &p, 0 );
+    if( !p || ( p == str ) )
         return 0;
 
     return value;
