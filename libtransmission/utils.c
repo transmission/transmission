@@ -1028,7 +1028,7 @@ tr_urlIsValidTracker( const char * url )
     valid = isValidURLChars( url, len )
          && !tr_urlParse( url, len, &scheme, NULL, NULL, NULL )
          && ( scheme != NULL )
-         && ( !strcmp(scheme,"http") || !strcmp(scheme,"https") );
+         && ( !strcmp(scheme,"http") || !strcmp(scheme,"https") || !strcmp(scheme,"udp") );
 
     tr_free( scheme );
     return valid;
@@ -1646,6 +1646,36 @@ tr_realpath( const char * path, char * resolved_path )
     return resolved_path;
 #else
     return realpath( path, resolved_path );
+#endif
+}
+
+/***
+****
+***/
+
+uint64_t
+tr_ntohll( uint64_t v )
+{
+#ifdef HAVE_NTOHLL
+    return ntohll( v );
+#else
+    union { unsigned long lv[2]; unsigned long long llv; } u;
+    u.lv[0] = ntohl(v >> 32);
+    u.lv[1] = ntohl(v & 0xFFFFFFFFULL);
+    return u.llv;
+#endif
+}
+
+uint64_t
+tr_htonll( uint64_t v )
+{
+#ifdef HAVE_HTONLL
+    return htonll( v );
+#else
+    union { unsigned long lv[2]; unsigned long long llv; } u;
+    u.lv[0] = htonl(v >> 32);
+    u.lv[1] = htonl(v & 0xFFFFFFFFULL);
+    return u.llv;
 #endif
 }
 

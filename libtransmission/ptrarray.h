@@ -67,7 +67,10 @@ static inline void* tr_ptrArrayBack( tr_ptrArray * array )
 
 void tr_ptrArrayErase( tr_ptrArray * t, int begin, int end );
 
-
+static inline void tr_ptrArrayRemove( tr_ptrArray * t, int pos )
+{
+    tr_ptrArrayErase( t, pos, pos+1 );
+}
 
 /** @brief Peek at the array pointer and its size, for easy iteration */
 void** tr_ptrArrayPeek( tr_ptrArray * array, int * size );

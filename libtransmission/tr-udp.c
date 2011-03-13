@@ -205,7 +205,10 @@ event_callback(int s, short type UNUSED, void *sv)
     rc = recvfrom(s, buf, 4096 - 1, 0,
                   (struct sockaddr*)&from, &fromlen);
     if(rc > 0) {
-        if( buf[0] == 'd' ) {
+        if( tau_handle_message( ss, buf, rc ) ) {
+            tr_ndbg("UDP", "Received UDP Tracker packet");
+        }
+        else if( buf[0] == 'd' ) {
             /* DHT packet. */
             buf[rc] = '\0';
             tr_dhtCallback(buf, rc, (struct sockaddr*)&from, fromlen, sv);

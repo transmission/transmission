@@ -562,6 +562,12 @@ static inline void tr_timeUpdate( time_t now ) { __tr_current_time = now; }
 /** @brief Portability wrapper for realpath() that uses the system implementation if available */
 char* tr_realpath( const char *path, char * resolved_path );
 
+/** @brief Portability wrapper for htonll() that uses the system implementation if available */
+uint64_t tr_htonll( uint64_t );
+
+/** @brief Portability wrapper for htonll() that uses the system implementation if available */
+uint64_t tr_ntohll( uint64_t );
+
 /***
 ****
 ***/

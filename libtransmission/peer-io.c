@@ -1069,6 +1069,13 @@ evbuffer_add_uint32( struct evbuffer * outbuf, uint32_t addme_hl )
     evbuffer_add( outbuf, &nl, sizeof( nl ) );
 }
 
+void
+evbuffer_add_uint64( struct evbuffer * outbuf, uint64_t addme_hll )
+{
+    const uint64_t nll = tr_htonll( addme_hll );
+    evbuffer_add( outbuf, &nll, sizeof( nll ) );
+}
+
 /***
 ****
 ***/

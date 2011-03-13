@@ -21,6 +21,9 @@ THE SOFTWARE.
 
 */
 
+#ifndef TR_UDP_H
+#define TR_UDP_H
+
 #ifndef __TRANSMISSION__
  #error only libtransmission should #include this header.
 #endif
@@ -28,3 +31,7 @@ THE SOFTWARE.
 void tr_udpInit( tr_session * );
 void tr_udpUninit( tr_session * );
 void tr_udpSetSocketBuffers(tr_session *);
+
+tr_bool tau_handle_message( tr_session * session, const uint8_t  * msg, size_t msglen );
+
+#endif /* #ifndef TR_UDP_H */

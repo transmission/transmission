@@ -18,6 +18,7 @@
 
 #include <signal.h>
 
+#include <event2/dns.h>
 #include <event2/event.h>
 
 #include "transmission.h"
@@ -223,6 +224,7 @@ static void
 libeventThreadFunc( void * veh )
 {
     struct event_base * base;
+    struct evdns_base * evdns_base;
     tr_event_handle * eh = veh;
 
 #ifndef WIN32
@@ -230,9 +232,14 @@ libeventThreadFunc( void * veh )
     signal( SIGPIPE, SIG_IGN );
 #endif
 
+    /* create the libevent bases */
     base = event_base_new( );
+    evdns_base = evdns_base_new( base, TRUE );
+
+    /* set the struct's fields */
     eh->base = base;
     eh->session->event_base = base;
+    eh->session->evdns_base = evdns_base;
     eh->session->events = eh;
 
     /* listen to the pipe's read fd */
@@ -246,6 +253,7 @@ libeventThreadFunc( void * veh )
 
     /* shut down the thread */
     tr_lockFree( eh->lock );
+    evdns_base_free( evdns_base, FALSE );
     event_base_free( base );
     eh->session->events = NULL;
     tr_free( eh );

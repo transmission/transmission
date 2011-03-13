@@ -105,6 +105,11 @@ void tr_tracker_http_scrape( tr_session               * session,
                              tr_scrape_response_func    response_func,
                              void                     * user_data );
 
+void tr_tracker_udp_scrape( tr_session               * session,
+                            const tr_scrape_request  * req,
+                            tr_scrape_response_func    response_func,
+                            void                     * user_data );
+
 /***
 ****  ANNOUNCE
 ***/
@@ -124,6 +129,9 @@ typedef struct
 {
     tr_announce_event event;
     tr_bool partial_seed;
+
+    /* the port we listen for incoming peers on */
+    int port;
 
     /* per-session key */
     int key;
@@ -225,5 +233,9 @@ void tr_tracker_http_announce( tr_session                 * session,
                                tr_announce_response_func    response_func,
                                void                       * user_data );
 
+void tr_tracker_udp_announce( tr_session                 * session,
+                              const tr_announce_request  * req,
+                              tr_announce_response_func    response_func,
+                              void                       * user_data );
 
 #endif /* _TR_ANNOUNCER_COMMON_H_ */

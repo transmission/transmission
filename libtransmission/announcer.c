@@ -806,6 +806,7 @@ announce_request_new( const tr_announcer  * announcer,
                       tr_announce_event     event )
 {
     tr_announce_request * req = tr_new0( tr_announce_request, 1 );
+    req->port = tr_sessionGetPublicPeerPort( announcer->session );
     req->url = tr_strdup( tier->currentTracker->announce );
     req->tracker_id_str = tr_strdup( tier->currentTracker->tracker_id_str );
     memcpy( req->info_hash, tor->info.hash, SHA_DIGEST_LENGTH );
@@ -1045,8 +1046,10 @@ announce_request_delegate( tr_announcer               * announcer,
 
     if( !memcmp( request->url, "http", 4 ) )
         tr_tracker_http_announce( session, request, callback, callback_data );
+    else if( !memcmp( request->url, "udp://", 6 ) )
+        tr_tracker_udp_announce( session, request, callback, callback_data );
     else
-        abort();//fprintf( stderr, "can't handle [%s] yet\n", request->url );
+        tr_err( "Unsupported ur: %s", request->url );
 
     tr_free( request->tracker_id_str );
     tr_free( request->url );
@@ -1216,8 +1219,10 @@ scrape_request_delegate( tr_announcer             * announcer,
 
     if( !memcmp( request->url, "http", 4 ) )
         tr_tracker_http_scrape( session, request, callback, callback_data );
+    else if( !memcmp( request->url, "udp://", 6 ) )
+        tr_tracker_udp_scrape( session, request, callback, callback_data );
     else
-        abort();//fprintf( stderr, "can't handle [%s] yet\n", request->url );
+        tr_err( "Unsupported ur: %s", request->url );
 }
 
 static void

@@ -291,6 +291,23 @@ tr_peerIoIsEncrypted( const tr_peerIo * io )
 void evbuffer_add_uint8 ( struct evbuffer * outbuf, uint8_t byte );
 void evbuffer_add_uint16( struct evbuffer * outbuf, uint16_t hs );
 void evbuffer_add_uint32( struct evbuffer * outbuf, uint32_t hl );
+void evbuffer_add_uint64( struct evbuffer * outbuf, uint64_t hll );
+
+static inline void
+evbuffer_add_hton_16( struct evbuffer * buf, uint16_t val )
+{
+   evbuffer_add_uint16( buf, val );
+}
+static inline void
+evbuffer_add_hton_32( struct evbuffer * buf, uint32_t val )
+{
+   evbuffer_add_uint32( buf, val );
+}
+static inline void
+evbuffer_add_hton_64( struct evbuffer * buf, uint64_t val )
+{
+   evbuffer_add_uint64( buf, val );
+}
 
 void tr_peerIoReadBytes( tr_peerIo        * io,
                          struct evbuffer  * inbuf,

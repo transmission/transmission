@@ -19,6 +19,7 @@ noinst_LIBRARIES = libtransmission.a
 libtransmission_a_SOURCES = \
     announcer.c \
     announcer-http.c \
+    announcer-udp.c \
     bandwidth.c \
     bencode.c \
     bitfield.c \

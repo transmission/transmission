@@ -41,8 +41,11 @@ enum
 void tr_peerIdInit( uint8_t * setme );
 
 struct event_base;
+struct evdns_base;
+
 struct tr_address;
 struct tr_announcer;
+struct tr_announcer_udp;
 struct tr_bandwidth;
 struct tr_bindsockets;
 struct tr_cache;
@@ -124,6 +127,7 @@ struct tr_session
     tr_preallocation_mode        preallocationMode;
 
     struct event_base          * event_base;
+    struct evdns_base          * evdns_base;
     struct tr_event_handle     * events;
 
     uint16_t                     peerLimitPerTorrent;
@@ -186,6 +190,7 @@ struct tr_session
     struct tr_stats_handle     * sessionStats;
 
     struct tr_announcer        * announcer;
+    struct tr_announcer_udp    * announcer_udp;
 
     tr_benc                    * metainfoLookup;
 

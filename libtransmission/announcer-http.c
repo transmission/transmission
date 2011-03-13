@@ -73,7 +73,7 @@ announce_url_new( const tr_session * session, const tr_announce_request * req )
                               strchr( req->url, '?' ) ? '&' : '?',
                               escaped_info_hash,
                               PEER_ID_LEN, PEER_ID_LEN, req->peer_id,
-                              (int)tr_sessionGetPublicPeerPort( session ),
+                              req->port,
                               req->up,
                               req->down,
                               req->left,
