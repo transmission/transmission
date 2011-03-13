@@ -10,6 +10,8 @@
  * $Id:$
  */
 
+#include <limits.h> /* USHRT_MAX */
+
 #include <event2/buffer.h>
 #include <event2/http.h> /* for HTTP_OK */
 
@@ -17,11 +19,11 @@
 
 #include "transmission.h"
 #include "announcer-common.h"
-#include "limits.h"
 #include "net.h" /* tr_globalIPv6() */
 #include "peer-mgr.h" /* pex */
 #include "torrent.h"
 #include "trevent.h" /* tr_runInEventThread() */
+#include "utils.h"
 #include "web.h" /* tr_http_escape() */
 
 #define dbgmsg( name, ... ) \
