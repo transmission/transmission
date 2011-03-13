@@ -1133,11 +1133,9 @@ gotNewBlocklist( tr_session       * session,
 
         errno = 0;
 
-        if( !errno ) {
-            fd = tr_open_file_for_writing( filename );
-            if( fd < 0 )
-                tr_snprintf( result, sizeof( result ), _( "Couldn't save file \"%1$s\": %2$s" ), filename, tr_strerror( errno ) );
-        }
+        fd = tr_open_file_for_writing( filename );
+        if( fd < 0 )
+            tr_snprintf( result, sizeof( result ), _( "Couldn't save file \"%1$s\": %2$s" ), filename, tr_strerror( errno ) );
 
         if( !errno ) {
             const char * buf = response;

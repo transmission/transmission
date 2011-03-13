@@ -1361,7 +1361,6 @@ parseNumberSection( const char * str, int len, struct number_range * setme )
     if( errno || ( end == tmp ) ) {
         success = FALSE;
     } else if( *end != '-' ) {
-        b = a;
         success = TRUE;
     } else {
         const char * pch = end + 1;
