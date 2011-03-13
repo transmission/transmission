@@ -770,8 +770,8 @@ onViewButtonPressed( GtkWidget * w, GdkEventButton * event, gpointer gdata )
 
     if(( tor = gtr_core_find_torrent( data->core, data->torrentId )))
     {
-        GtkTreePath * path;
         GtkTreeViewColumn * col;
+        GtkTreePath * path = NULL;
         GtkTreeView * treeview = GTK_TREE_VIEW( w );
 
         if( event->type == GDK_BUTTON_PRESS && event->button == 1
@@ -779,7 +779,8 @@ onViewButtonPressed( GtkWidget * w, GdkEventButton * event, gpointer gdata )
             && getAndSelectEventPath( treeview, event, &col, &path ) )
             handled = onViewPathToggled( treeview, col, path, data );
 
-        gtk_tree_path_free( path );
+        if( path != NULL )
+            gtk_tree_path_free( path );
     }
 
     return handled;
