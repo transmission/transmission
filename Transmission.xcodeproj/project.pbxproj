@@ -243,6 +243,9 @@
 		A2A4EA0F0DE106EE000CE197 /* ConvertUTF.h in Headers */ = {isa = PBXBuildFile; fileRef = A2A4EA0B0DE106E8000CE197 /* ConvertUTF.h */; };
 		A2A6321B0CD9751700E3DA60 /* BadgeView.m in Sources */ = {isa = PBXBuildFile; fileRef = A2A6321A0CD9751700E3DA60 /* BadgeView.m */; };
 		A2AA579D0ADFCAB400CA59F6 /* PiecesView.m in Sources */ = {isa = PBXBuildFile; fileRef = A2AA579B0ADFCAB400CA59F6 /* PiecesView.m */; };
+		A2AA9BE1132CAC8E00FA131E /* announcer-udp.c in Sources */ = {isa = PBXBuildFile; fileRef = A2AA9BE0132CAC8D00FA131E /* announcer-udp.c */; };
+		A2AA9BE3132CAE2000FA131E /* evdns.c in Sources */ = {isa = PBXBuildFile; fileRef = A2AA9BE2132CAE2000FA131E /* evdns.c */; };
+		A2AA9BE5132CB19C00FA131E /* evutil_rand.c in Sources */ = {isa = PBXBuildFile; fileRef = A2AA9BE4132CB19C00FA131E /* evutil_rand.c */; };
 		A2AAB65C0DE0CF6200E04DDA /* rpc-server.c in Sources */ = {isa = PBXBuildFile; fileRef = A2AAB6580DE0CF6200E04DDA /* rpc-server.c */; };
 		A2AAB65D0DE0CF6200E04DDA /* rpcimpl.h in Headers */ = {isa = PBXBuildFile; fileRef = A2AAB6590DE0CF6200E04DDA /* rpcimpl.h */; };
 		A2AAB65E0DE0CF6200E04DDA /* rpc-server.h in Headers */ = {isa = PBXBuildFile; fileRef = A2AAB65A0DE0CF6200E04DDA /* rpc-server.h */; };
@@ -809,6 +812,9 @@
 		A2A6321A0CD9751700E3DA60 /* BadgeView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = BadgeView.m; path = macosx/BadgeView.m; sourceTree = "<group>"; };
 		A2AA579A0ADFCAB400CA59F6 /* PiecesView.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = PiecesView.h; path = macosx/PiecesView.h; sourceTree = "<group>"; };
 		A2AA579B0ADFCAB400CA59F6 /* PiecesView.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = PiecesView.m; path = macosx/PiecesView.m; sourceTree = "<group>"; };
+		A2AA9BE0132CAC8D00FA131E /* announcer-udp.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "announcer-udp.c"; path = "libtransmission/announcer-udp.c"; sourceTree = "<group>"; };
+		A2AA9BE2132CAE2000FA131E /* evdns.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = evdns.c; path = "third-party/libevent/evdns.c"; sourceTree = "<group>"; };
+		A2AA9BE4132CB19C00FA131E /* evutil_rand.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = evutil_rand.c; path = "third-party/libevent/evutil_rand.c"; sourceTree = "<group>"; };
 		A2AAB6580DE0CF6200E04DDA /* rpc-server.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "rpc-server.c"; path = "libtransmission/rpc-server.c"; sourceTree = "<group>"; };
 		A2AAB6590DE0CF6200E04DDA /* rpcimpl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = rpcimpl.h; path = libtransmission/rpcimpl.h; sourceTree = "<group>"; };
 		A2AAB65A0DE0CF6200E04DDA /* rpc-server.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "rpc-server.h"; path = "libtransmission/rpc-server.h"; sourceTree = "<group>"; };
@@ -1376,6 +1382,7 @@
 				A25964A4106D73A800453B31 /* announcer.c */,
 				A25964A5106D73A800453B31 /* announcer.h */,
 				A23F29A0132A447400E9A83B /* announcer-http.c */,
+				A2AA9BE0132CAC8D00FA131E /* announcer-udp.c */,
 				BEFC1DF90C07861A00B0BB3C /* torrent.c */,
 				BEFC1DFC0C07861A00B0BB3C /* port-forwarding.h */,
 				BEFC1DFD0C07861A00B0BB3C /* port-forwarding.c */,
@@ -1542,10 +1549,12 @@
 				A20750B712BEB66900F70985 /* bufferevent_ratelim.c */,
 				A2074F5412BEA8E000F70985 /* bufferevent_sock.c */,
 				A2074F5512BEA8E000F70985 /* bufferevent.c */,
+				A2AA9BE2132CAE2000FA131E /* evdns.c */,
 				A2074F7312BEAA3300F70985 /* event.c */,
 				A2074F8412BEAA6600F70985 /* evmap.c */,
 				A2074F9812BEAAAF00F70985 /* evthread.c */,
 				A2074FA212BEAAC600F70985 /* evutil.c */,
+				A2AA9BE4132CB19C00FA131E /* evutil_rand.c */,
 				A2074FAA12BEAAFF00F70985 /* http.c */,
 				A2074FBE12BEAB9A00F70985 /* kqueue.c */,
 				A2074FB612BEAB1E00F70985 /* listener.c */,
@@ -2217,6 +2226,7 @@
 				A2679294130E00A000CB7464 /* tr-utp.c in Sources */,
 				A2E57DFE1311FA6200A7DAB1 /* bitset.c in Sources */,
 				A23F29A2132A447400E9A83B /* announcer-http.c in Sources */,
+				A2AA9BE1132CAC8E00FA131E /* announcer-udp.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2356,6 +2366,8 @@
 				A207503512BEAD9C00F70985 /* select.c in Sources */,
 				A207503712BEADA200F70985 /* poll.c in Sources */,
 				A20750B812BEB66900F70985 /* bufferevent_ratelim.c in Sources */,
+				A2AA9BE3132CAE2000FA131E /* evdns.c in Sources */,
+				A2AA9BE5132CB19C00FA131E /* evutil_rand.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
