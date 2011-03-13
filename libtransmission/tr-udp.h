@@ -32,6 +32,7 @@ void tr_udpInit( tr_session * );
 void tr_udpUninit( tr_session * );
 void tr_udpSetSocketBuffers(tr_session *);
 
-tr_bool tau_handle_message( tr_session * session, const uint8_t  * msg, size_t msglen );
+tr_bool tau_handle_message( tr_session * session,
+                            const uint8_t  * msg, size_t msglen );
 
 #endif /* #ifndef TR_UDP_H */

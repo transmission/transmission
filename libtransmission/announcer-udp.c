@@ -120,6 +120,11 @@ typedef enum
 }
 tau_action_t;
 
+enum
+{
+    TAU_REQUEST_TTL = 120
+};
+
 /****
 *****
 *****  SCRAPE
@@ -157,7 +162,7 @@ tau_scrape_request_new( const tr_scrape_request  * in,
         memcpy( req->response.rows[i].info_hash,
                 in->info_hash[i], SHA_DIGEST_LENGTH );
 
-    /* build the scrape payload */
+    /* build the payload */
     buf = evbuffer_new( );
     evbuffer_add_hton_32( buf, TAU_ACTION_SCRAPE );
     evbuffer_add_hton_32( buf, req->transaction_id );
@@ -223,7 +228,6 @@ on_scrape_response( tr_session                  * session,
             row->seeders   = evbuffer_read_ntoh_32( buf );
             row->downloads = evbuffer_read_ntoh_32( buf );
             row->leechers  = evbuffer_read_ntoh_32( buf );
-
         }
 
         tau_scrape_request_finished( session, request );
@@ -259,10 +263,10 @@ struct tau_announce_request
 typedef enum
 {
     /* used in the "event" field of an announce request */
-    UDP_TRACKER_EVENT_NONE      = 0,
-    UDP_TRACKER_EVENT_COMPLETED = 1,
-    UDP_TRACKER_EVENT_STARTED   = 2,
-    UDP_TRACKER_EVENT_STOPPED   = 3
+    TAU_ANNOUNCE_EVENT_NONE      = 0,
+    TAU_ANNOUNCE_EVENT_COMPLETED = 1,
+    TAU_ANNOUNCE_EVENT_STARTED   = 2,
+    TAU_ANNOUNCE_EVENT_STOPPED   = 3
 }
 tau_announce_event;
 
@@ -271,10 +275,10 @@ get_tau_announce_event( tr_announce_event e )
 {
     switch( e )
     {
-        case TR_ANNOUNCE_EVENT_COMPLETED:  return UDP_TRACKER_EVENT_COMPLETED;
-        case TR_ANNOUNCE_EVENT_STARTED:    return UDP_TRACKER_EVENT_STARTED;
-        case TR_ANNOUNCE_EVENT_STOPPED:    return UDP_TRACKER_EVENT_STOPPED;
-        default:                           return UDP_TRACKER_EVENT_NONE;
+        case TR_ANNOUNCE_EVENT_COMPLETED:  return TAU_ANNOUNCE_EVENT_COMPLETED;
+        case TR_ANNOUNCE_EVENT_STARTED:    return TAU_ANNOUNCE_EVENT_STARTED;
+        case TR_ANNOUNCE_EVENT_STOPPED:    return TAU_ANNOUNCE_EVENT_STOPPED;
+        default:                           return TAU_ANNOUNCE_EVENT_NONE;
     }
 }
 
@@ -285,16 +289,16 @@ tau_announce_request_new( const tr_announce_request  * in,
 {
     struct evbuffer * buf;
 
-    struct tau_announce_request * req = tr_new0( struct tau_announce_request, 1 );
-    req->transaction_id = tau_transaction_new( );
-    req->callback = callback;
-    req->user_data = user_data;
-    memcpy( req->response.info_hash, in->info_hash, SHA_DIGEST_LENGTH );
+    struct tau_announce_request * r = tr_new0( struct tau_announce_request, 1 );
+    r->transaction_id = tau_transaction_new( );
+    r->callback = callback;
+    r->user_data = user_data;
+    memcpy( r->response.info_hash, in->info_hash, SHA_DIGEST_LENGTH );
 
     /* build the announce payload */
     buf = evbuffer_new( );
     evbuffer_add_hton_32( buf, TAU_ACTION_ANNOUNCE );
-    evbuffer_add_hton_32( buf, req->transaction_id );
+    evbuffer_add_hton_32( buf, r->transaction_id );
     evbuffer_add        ( buf, in->info_hash, SHA_DIGEST_LENGTH );
     evbuffer_add        ( buf, in->peer_id, PEER_ID_LEN );
     evbuffer_add_hton_64( buf, in->down );
@@ -305,11 +309,11 @@ tau_announce_request_new( const tr_announce_request  * in,
     evbuffer_add_hton_32( buf, in->key );
     evbuffer_add_hton_32( buf, in->numwant );
     evbuffer_add_hton_16( buf, in->port );
-    req->payload_len = evbuffer_get_length( buf );
-    req->payload = tr_memdup( evbuffer_pullup( buf, -1 ), req->payload_len );
+    r->payload_len = evbuffer_get_length( buf );
+    r->payload = tr_memdup( evbuffer_pullup( buf, -1 ), r->payload_len );
     evbuffer_free( buf );
 
-    return req;
+    return r;
 }
 
 static void
@@ -494,8 +498,7 @@ tau_tracker_upkeep( struct tau_tracker * tracker )
     int n;
     tr_ptrArray * reqs;
     const time_t now = tr_time( );
-
-    /* FIXME: look for timed-out requests */
+    const tr_bool is_connected = tracker->connection_expiration_time > now;
 
     /* if the address info is too old, expire it */
     if( tracker->addr && ( tracker->addr_expiration_time <= now ) ) {
@@ -504,65 +507,77 @@ tau_tracker_upkeep( struct tau_tracker * tracker )
         tracker->addr = NULL;
     }
 
-    /* if no requests, there's nothing to do */
-    if( tr_ptrArrayEmpty( &tracker->announces ) && tr_ptrArrayEmpty( &tracker->scrapes ) )
+    /* are there any requests pending? */
+    if( tr_ptrArrayEmpty( &tracker->announces ) &&
+        tr_ptrArrayEmpty( &tracker->scrapes ) )
         return;
 
-    /* can't do anything without an address */
-    if( !tracker->addr ) {
-        if( !tracker->is_asking_dns ) {
-            struct evutil_addrinfo hints;
-            memset( &hints, 0, sizeof( hints ) );
-            hints.ai_family = AF_UNSPEC;
-            hints.ai_flags = EVUTIL_AI_CANONNAME;
-            hints.ai_socktype = SOCK_DGRAM;
-            hints.ai_protocol = IPPROTO_UDP;
-            tracker->is_asking_dns = TRUE;
-            dbgmsg( tracker->host, "Trying a new DNS lookup" );     
-            evdns_getaddrinfo( tracker->session->evdns_base,
-                               tracker->host, NULL, &hints, tau_tracker_on_dns, tracker );
-        }
+    /* if we don't have an address yet, try & get one now. */
+    if( !tracker->addr && !tracker->is_asking_dns )
+    {
+        struct evutil_addrinfo hints;
+        memset( &hints, 0, sizeof( hints ) );
+        hints.ai_family = AF_UNSPEC;
+        hints.ai_flags = EVUTIL_AI_CANONNAME;
+        hints.ai_socktype = SOCK_DGRAM;
+        hints.ai_protocol = IPPROTO_UDP;
+        tracker->is_asking_dns = TRUE;
+        dbgmsg( tracker->host, "Trying a new DNS lookup" );     
+        evdns_getaddrinfo( tracker->session->evdns_base,
+                           tracker->host, NULL, &hints,
+                           tau_tracker_on_dns, tracker );
         return;
     }
 
     /* also need a valid connection ID... */
-    if( tracker->connection_expiration_time < now ) {
-        if( !tracker->is_connecting ) {
-            struct evbuffer * buf = evbuffer_new( );
-            tracker->is_connecting = TRUE;
-            tracker->connection_transaction_id = tau_transaction_new( );
-            dbgmsg( tracker->key, "Trying to connect. Transaction ID is %u",
-                    tracker->connection_transaction_id );
-            evbuffer_add_hton_64( buf, 0x41727101980LL );
-            evbuffer_add_hton_32( buf, TAU_ACTION_CONNECT );
-            evbuffer_add_hton_32( buf, tracker->connection_transaction_id );
-            tau_sendto( tracker->session, tracker->addr, tracker->port,
-                        evbuffer_pullup( buf, -1 ),
-                        evbuffer_get_length( buf ) );
-            evbuffer_free( buf );
-        }
+    if( !is_connected && !tracker->is_connecting )
+    {
+        struct evbuffer * buf = evbuffer_new( );
+        tracker->is_connecting = TRUE;
+        tracker->connection_transaction_id = tau_transaction_new( );
+        dbgmsg( tracker->key, "Trying to connect. Transaction ID is %u",
+                tracker->connection_transaction_id );
+        evbuffer_add_hton_64( buf, 0x41727101980LL );
+        evbuffer_add_hton_32( buf, TAU_ACTION_CONNECT );
+        evbuffer_add_hton_32( buf, tracker->connection_transaction_id );
+        tau_sendto( tracker->session, tracker->addr, tracker->port,
+                    evbuffer_pullup( buf, -1 ),
+                    evbuffer_get_length( buf ) );
+        evbuffer_free( buf );
         return;
     }
 
     /* send the announce requests */
     reqs = &tracker->announces;
-    for( i=0, n=tr_ptrArraySize(reqs); i<n; ++i ) {
+    for( i=0, n=tr_ptrArraySize(reqs); i<n; ++i )
+    {
         struct tau_announce_request * req = tr_ptrArrayNth( reqs, i );
-        if( req->sent_at == 0 ) {
+        if( is_connected && !req->sent_at ) {
             dbgmsg( tracker->key, "Sending an announce request" );
             req->sent_at = now;
             tau_tracker_send_request( tracker, req->payload, req->payload_len );
+        }
+        else if( req->sent_at && ( req->sent_at + TAU_REQUEST_TTL < now ) ) {
+            tau_announce_request_fail( tracker->session, req, FALSE, TRUE, NULL );
+            tau_announce_request_free( req );
+            tr_ptrArrayRemove( reqs, i-- );
         }
     }
 
     /* send the scrape requests */
     reqs = &tracker->scrapes;
-    for( i=0, n=tr_ptrArraySize(reqs); i<n; ++i ) {
+    for( i=0, n=tr_ptrArraySize(reqs); i<n; ++i )
+    {
         struct tau_scrape_request * req = tr_ptrArrayNth( reqs, i );
-        if( req->sent_at == 0 ) {
+        if( is_connected && !req->sent_at ) {
             dbgmsg( tracker->key, "Sending a scrape request" );
             req->sent_at = now;
             tau_tracker_send_request( tracker, req->payload, req->payload_len );
+        }
+        else if( req->sent_at && ( req->sent_at + TAU_REQUEST_TTL < now ) ) {
+            tau_scrape_request_fail( tracker->session, req, FALSE, TRUE, NULL );
+            tau_scrape_request_free( req );
+            tr_ptrArrayRemove( reqs, i-- );
         }
     }
 }
@@ -673,6 +688,16 @@ tau_session_get_tracker( struct tr_announcer_udp * tau, const char * url )
 *****
 ****/
 
+void
+tr_tracker_udp_upkeep( tr_session * session )
+{
+    struct tr_announcer_udp * tau = session->announcer_udp;
+
+    if( tau != NULL )
+        tr_ptrArrayForeach( &tau->trackers,
+                            (PtrArrayForeachFunc)tau_tracker_upkeep );
+}
+
 tr_bool
 tau_handle_message( tr_session     * session,
                     const uint8_t  * msg,
@@ -711,7 +736,8 @@ tau_handle_message( tr_session     * session,
         struct tau_tracker * tracker = tr_ptrArrayNth( &tau->trackers, i );
 
         /* is it a connection response? */
-        if( tracker->is_connecting && ( transaction_id == tracker->connection_transaction_id ) )
+        if( tracker->is_connecting
+            && ( transaction_id == tracker->connection_transaction_id ) )
         {
             dbgmsg( tracker->key, "%"PRIu32" matches my connection request!", transaction_id );
             on_tracker_connection_response( tracker, action_id, buf );
@@ -761,7 +787,9 @@ tr_tracker_udp_announce( tr_session                 * session,
 {
     struct tr_announcer_udp * tau = announcer_udp_get( session );
     struct tau_tracker * tracker = tau_session_get_tracker( tau, request->url );
-    struct tau_announce_request * r = tau_announce_request_new( request, response_func, user_data );
+    struct tau_announce_request * r = tau_announce_request_new( request,
+                                                                response_func,
+                                                                user_data );
     tr_ptrArrayAppend( &tracker->announces, r );
     tau_tracker_upkeep( tracker );
 }
@@ -774,7 +802,9 @@ tr_tracker_udp_scrape( tr_session               * session,
 {
     struct tr_announcer_udp * tau = announcer_udp_get( session );
     struct tau_tracker * tracker = tau_session_get_tracker( tau, request->url );
-    struct tau_scrape_request * r = tau_scrape_request_new( request, response_func, user_data );
+    struct tau_scrape_request * r = tau_scrape_request_new( request,
+                                                            response_func,
+                                                            user_data );
     tr_ptrArrayAppend( &tracker->scrapes, r );
     tau_tracker_upkeep( tracker );
 }

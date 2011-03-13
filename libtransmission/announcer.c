@@ -64,7 +64,10 @@ enum
     UPKEEP_INTERVAL_SECS = 1,
 
     /* this is an upper limit for the frequency of LDS announces */
-    LPD_HOUSEKEEPING_INTERVAL_SECS = 5
+    LPD_HOUSEKEEPING_INTERVAL_SECS = 5,
+
+    /* this is how often to call the UDP tracker upkeep */
+    TAU_UPKEEP_INTERVAL_SECS = 5
 };
 
 /***
@@ -128,7 +131,8 @@ typedef struct tr_announcer
     struct event * upkeepTimer;
     int slotsAvailable;
     int key;
-    time_t lpdHouseKeepingAt;
+    time_t lpdUpkeepAt;
+    time_t tauUpkeepAt;
 }
 tr_announcer;
 
@@ -139,7 +143,7 @@ tr_announcerHasBacklog( const struct tr_announcer * announcer )
 }
 
 static inline time_t
-calcRescheduleWithJitter( const int minPeriod )
+valPlusJitter( const int minPeriod )
 {
     const double jitter = 0.1;
 
@@ -158,8 +162,7 @@ tr_announcerInit( tr_session * session )
 {
     tr_announcer * a;
 
-    const time_t lpdAt =
-        calcRescheduleWithJitter( LPD_HOUSEKEEPING_INTERVAL_SECS / 3 );
+    const time_t lpdAt = valPlusJitter( LPD_HOUSEKEEPING_INTERVAL_SECS / 3 );
 
     assert( tr_isSession( session ) );
 
@@ -168,7 +171,7 @@ tr_announcerInit( tr_session * session )
     a->key = tr_cryptoRandInt( INT_MAX );
     a->session = session;
     a->slotsAvailable = MAX_CONCURRENT_TASKS;
-    a->lpdHouseKeepingAt = lpdAt;
+    a->lpdUpkeepAt = lpdAt;
     a->upkeepTimer = evtimer_new( session->event_base, onUpkeepTimer, a );
     tr_timerAdd( a->upkeepTimer, UPKEEP_INTERVAL_SECS, 0 );
 
@@ -1414,21 +1417,12 @@ fprintf( stderr, "[%s] announce.c has %d requests ready to send (announce: %d, s
             }
         }
     }
-
-    /* Local Peer Discovery */
-    if( announcer->lpdHouseKeepingAt <= now )
-    {
-        tr_lpdAnnounceMore( now, LPD_HOUSEKEEPING_INTERVAL_SECS );
-
-        /* reschedule more LDS announces for ( the future + jitter ) */
-        announcer->lpdHouseKeepingAt =
-            calcRescheduleWithJitter( LPD_HOUSEKEEPING_INTERVAL_SECS );
-    }
 }
 
 static void
 onUpkeepTimer( int foo UNUSED, short bar UNUSED, void * vannouncer )
 {
+    const time_t now = tr_time( );
     tr_announcer * announcer = vannouncer;
     tr_sessionLock( announcer->session );
 
@@ -1437,6 +1431,19 @@ onUpkeepTimer( int foo UNUSED, short bar UNUSED, void * vannouncer )
 
     /* maybe send out some announcements to trackers */
     announceMore( announcer );
+
+    /* LPD upkeep */
+    if( announcer->lpdUpkeepAt <= now ) {
+        const int seconds = LPD_HOUSEKEEPING_INTERVAL_SECS;
+        announcer->lpdUpkeepAt = valPlusJitter( seconds );
+        tr_lpdAnnounceMore( now, seconds );
+    }
+
+    /* TAU upkeep */
+    if( announcer->tauUpkeepAt <= now ) {
+        announcer->tauUpkeepAt = now + TAU_UPKEEP_INTERVAL_SECS;
+        tr_tracker_udp_upkeep( announcer->session );
+    }
 
     /* set up the next timer */
     tr_timerAdd( announcer->upkeepTimer, UPKEEP_INTERVAL_SECS, 0 );
