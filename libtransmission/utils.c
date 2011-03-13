@@ -1658,6 +1658,8 @@ tr_htonll( uint64_t x )
 #ifdef HAVE_HTONLL
     return htonll( x );
 #else
+    /* fallback code by Runner and Juan Carlos Cobas at
+     * http://www.codeproject.com/KB/cpp/endianness.aspx */
     return (((uint64_t)(htonl((int)((x << 32) >> 32))) << 32) | 
                      (unsigned int)htonl(((int)(x >> 32))));
 #endif
@@ -1669,6 +1671,8 @@ tr_ntohll( uint64_t x )
 #ifdef HAVE_NTOHLL
     return ntohll( x );
 #else
+    /* fallback code by Runner and Juan Carlos Cobas at
+     * http://www.codeproject.com/KB/cpp/endianness.aspx */
     return (((uint64_t)(ntohl((int)((x << 32) >> 32))) << 32) | 
                      (unsigned int)ntohl(((int)(x >> 32))));
 #endif
