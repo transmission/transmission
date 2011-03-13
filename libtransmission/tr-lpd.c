@@ -371,8 +371,8 @@ void tr_lpdUninit( tr_session* ss )
     lpd_event = NULL;
 
     /* just shut down, we won't remember any former nodes */
-    EVUTIL_CLOSESOCKET( lpd_socket );
-    EVUTIL_CLOSESOCKET( lpd_socket2 );
+    evutil_closesocket( lpd_socket );
+    evutil_closesocket( lpd_socket2 );
     tr_ndbg( "LPD", "Done uninitialising Local Peer Discovery" );
 
     session = NULL;

@@ -441,7 +441,7 @@ tr_netAccept( tr_session  * session,
 void
 tr_netCloseSocket( int fd )
 {
-    EVUTIL_CLOSESOCKET( fd );
+    evutil_closesocket( fd );
 }
 
 void
@@ -481,13 +481,13 @@ get_source_address( const struct sockaddr  * dst,
     if(rc < 0)
         goto fail;
 
-    EVUTIL_CLOSESOCKET( s );
+    evutil_closesocket( s );
 
     return rc;
 
  fail:
     save = errno;
-    EVUTIL_CLOSESOCKET( s );
+    evutil_closesocket( s );
     errno = save;
     return -1;
 }
