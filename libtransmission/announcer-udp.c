@@ -530,7 +530,7 @@ tau_tracker_upkeep( struct tau_tracker * tracker )
     }
 
     /* also need a valid connection ID... */
-    if( !is_connected && !tracker->is_connecting )
+    if( !is_connected && !tracker->is_connecting && tracker->addr )
     {
         struct evbuffer * buf = evbuffer_new( );
         tracker->is_connecting = TRUE;
