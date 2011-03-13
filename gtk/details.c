@@ -2264,7 +2264,7 @@ on_add_tracker_response( GtkDialog * dialog, int response, gpointer gdi )
 
         if( url && *url )
         {
-            if( gtr_is_supported_url( url ) )
+            if( tr_urlIsValidTracker( url ) )
             {
                 char * json = g_strdup_printf(
                     "{\n"
