@@ -431,7 +431,7 @@ serve_file( struct evhttp_request * req,
     {
         void * file;
         size_t file_len;
-        struct evbuffer * content = evbuffer_new( );
+        struct evbuffer * content;
         const int error = errno;
 
         errno = 0;
