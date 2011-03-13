@@ -145,9 +145,6 @@ const unsigned char *tr_globalIPv6( void );
 /* The QT exclusion is because something clashes whith the next include */
 #include <ws2tcpip.h>		/* socklen_t */
 
-/** @brief Missing in Windows and Mingw */
-const char *inet_ntop( int af, const void *src, char *dst, socklen_t cnt );
-int inet_pton(int af, const char *src, void *dst);
 #endif
 
 #endif /* _TR_NET_H_ */

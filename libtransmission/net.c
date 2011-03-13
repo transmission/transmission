@@ -64,75 +64,6 @@
 const tr_address tr_in6addr_any = { TR_AF_INET6, { IN6ADDR_ANY_INIT } };
 const tr_address tr_inaddr_any = { TR_AF_INET, { { { { INADDR_ANY, 0x00, 0x00, 0x00 } } } } };
 
-#ifdef WIN32
-const char *
-inet_ntop( int af, const void * src, char * dst, socklen_t cnt )
-{
-    if (af == AF_INET)
-    {
-        struct sockaddr_in in;
-        memset( &in, 0, sizeof( in ) );
-        in.sin_family = AF_INET;
-        memcpy( &in.sin_addr, src, sizeof( struct in_addr ) );
-        getnameinfo((struct sockaddr *)&in, sizeof(struct sockaddr_in),
-                    dst, cnt, NULL, 0, NI_NUMERICHOST);
-        return dst;
-    }
-    else if (af == AF_INET6)
-    {
-        struct sockaddr_in6 in;
-        memset( &in, 0, sizeof( in ) );
-        in.sin6_family = AF_INET6;
-        memcpy( &in.sin6_addr, src, sizeof( struct in_addr6 ) );
-        getnameinfo((struct sockaddr *)&in, sizeof(struct sockaddr_in6),
-                    dst, cnt, NULL, 0, NI_NUMERICHOST);
-        return dst;
-    }
-    return NULL;
-}
-
-int
-inet_pton( int af, const char * src, void * dst )
-{
-    struct addrinfo hints, *res, *ressave;
-    struct sockaddr_in * s4;
-    struct sockaddr_in6 * s6;
-
-    memset( &hints, 0, sizeof( struct addrinfo ));
-    hints.ai_family = af;
-    hints.ai_flags = AI_NUMERICHOST;
-
-    if( getaddrinfo( src, NULL, &hints, &res ) ) {
-        if( WSAGetLastError() == WSAHOST_NOT_FOUND )
-            return 0;
-        else {
-            errno = EAFNOSUPPORT;
-            return -1;
-        }
-    }
-
-    ressave = res;
-    while( res ) {
-        switch (res->ai_family) {
-            case AF_INET:
-                s4 = (struct sockaddr_in *) res->ai_addr;
-                memcpy( dst, &s4->sin_addr, sizeof( struct in_addr ) );
-                break;
-            case AF_INET6:
-                s6 = (struct sockaddr_in6 *) res->ai_addr;
-                memcpy( dst, &s6->sin6_addr, sizeof( struct in6_addr ) );
-                break;
-            default: /* AF_UNSPEC, AF_NETBIOS */
-                break;
-        }
-        res = res->ai_next;
-    }
-
-    freeaddrinfo(ressave);
-    return 1;
-}
-#endif
-
 void
 tr_netInit( void )
 {
@@ -166,9 +97,9 @@ tr_ntop( const tr_address * src, char * dst, int size )
     assert( tr_isAddress( src ) );
 
     if( src->type == TR_AF_INET )
-        return inet_ntop( AF_INET, &src->addr, dst, size );
+        return evutil_inet_ntop( AF_INET, &src->addr, dst, size );
     else
-        return inet_ntop( AF_INET6, &src->addr, dst, size );
+        return evutil_inet_ntop( AF_INET6, &src->addr, dst, size );
 }
 
 /*
@@ -186,12 +117,12 @@ tr_ntop_non_ts( const tr_address * src )
 tr_address *
 tr_pton( const char * src, tr_address * dst )
 {
-    int retval = inet_pton( AF_INET, src, &dst->addr );
+    int retval = evutil_inet_pton( AF_INET, src, &dst->addr );
     assert( dst );
     if( retval < 0 )
         return NULL;
     else if( retval == 0 )
-        retval = inet_pton( AF_INET6, src, &dst->addr );
+        retval = evutil_inet_pton( AF_INET6, src, &dst->addr );
     else
     {
         dst->type = TR_AF_INET;
@@ -599,7 +530,7 @@ tr_globalAddress( int af, void *addr, int *addr_len )
     case AF_INET:
         memset(&sin, 0, sizeof(sin));
         sin.sin_family = AF_INET;
-        inet_pton(AF_INET, "91.121.74.28", &sin.sin_addr);
+        evutil_inet_pton(AF_INET, "91.121.74.28", &sin.sin_addr);
         sin.sin_port = htons(6969);
         sa = (struct sockaddr*)&sin;
         salen = sizeof(sin);
@@ -609,7 +540,7 @@ tr_globalAddress( int af, void *addr, int *addr_len )
         sin6.sin6_family = AF_INET6;
         /* In order for address selection to work right, this should be
            a native IPv6 address, not Teredo or 6to4. */
-        inet_pton(AF_INET6, "2001:1890:1112:1::20", &sin6.sin6_addr);
+        evutil_inet_pton(AF_INET6, "2001:1890:1112:1::20", &sin6.sin6_addr);
         sin6.sin6_port = htons(6969);
         sa = (struct sockaddr*)&sin6;
         salen = sizeof(sin6);

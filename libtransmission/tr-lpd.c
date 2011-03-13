@@ -291,7 +291,7 @@ int tr_lpdInit( tr_session* ss, tr_address* tr_addr UNUSED )
         memset( &lpd_mcastAddr, 0, sizeof lpd_mcastAddr );
         lpd_mcastAddr.sin_family = AF_INET;
         lpd_mcastAddr.sin_port = htons( lpd_mcastPort );
-        if( inet_pton( lpd_mcastAddr.sin_family, lpd_mcastGroup,
+        if( evutil_inet_pton( lpd_mcastAddr.sin_family, lpd_mcastGroup,
                 &lpd_mcastAddr.sin_addr ) < 0 )
             goto fail;
 

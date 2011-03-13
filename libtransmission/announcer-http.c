@@ -106,7 +106,7 @@ announce_url_new( const tr_session * session, const tr_announce_request * req )
     ipv6 = tr_globalIPv6( );
     if( ipv6 ) {
         char ipv6_readable[INET6_ADDRSTRLEN];
-        inet_ntop( AF_INET6, ipv6, ipv6_readable, INET6_ADDRSTRLEN );
+        evutil_inet_ntop( AF_INET6, ipv6, ipv6_readable, INET6_ADDRSTRLEN );
         evbuffer_add_printf( buf, "&ipv6=");
         tr_http_escape( buf, ipv6_readable, -1, TRUE );
     }
