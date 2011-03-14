@@ -203,7 +203,7 @@ typedef struct
     int downloadCount;
     int downloaderCount;
 
-    int consecutiveAnnounceFailures;
+    int consecutiveFailures;
 
     uint32_t id;
 }
@@ -851,7 +851,7 @@ getRetryInterval( const tr_tracker * t )
 {
     int minutes;
     const unsigned int jitter_seconds = tr_cryptoWeakRandInt( 60 );
-    switch( t->consecutiveAnnounceFailures ) {
+    switch( t->consecutiveFailures ) {
         case 0:  minutes =   1; break;
         case 1:  minutes =   5; break;
         case 2:  minutes =  15; break;
@@ -876,6 +876,10 @@ static void
 on_announce_error( tr_tier * tier, const char * err, tr_announce_event e )
 {
     int interval;
+
+    /* increment the error count */
+    if( tier->currentTracker != NULL )
+        ++tier->currentTracker->consecutiveFailures;
 
     /* set the error message */
     dbgmsg( tier, "%s", err );
@@ -941,9 +945,6 @@ on_announce_done( tr_session                  * session,
         tier->isAnnouncing = FALSE;
         tier->manualAnnounceAllowedAt = now + tier->announceMinIntervalSec;
 
-        if(( tracker = tier->currentTracker ))
-            ++tracker->consecutiveAnnounceFailures;
-
         if( !response->did_connect )
         {
             on_announce_error( tier, _( "Could not connect to tracker" ), event );
@@ -966,7 +967,7 @@ on_announce_done( tr_session                  * session,
             publishErrorClear( tier );
 
             if(( tracker = tier->currentTracker ))
-                tracker->consecutiveAnnounceFailures = 0;
+                tracker->consecutiveFailures = 0;
 
             if(( str = response->warning ))
             {
@@ -1094,6 +1095,10 @@ on_scrape_error( tr_tier * tier, const char * errmsg )
 {
     int interval;
 
+    /* increment the error count */
+    if( tier->currentTracker != NULL )
+        ++tier->currentTracker->consecutiveFailures;
+
     /* set the error message */
     dbgmsg( tier, "Scrape error: %s", errmsg );
     tr_torinf( tier->tor, "Scrape error: %s", errmsg );
@@ -1198,6 +1203,7 @@ on_scrape_done( tr_session                * session,
                         tracker->leecherCount = row->leechers;
                         tracker->downloadCount = row->downloads;
                         tracker->downloaderCount = row->downloaders;
+                        tracker->consecutiveFailures = 0;
                     }
                 }
             }
