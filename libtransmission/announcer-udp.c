@@ -59,7 +59,7 @@ tau_sendto( tr_session * session,
     else
         sockfd = -1;
 
-    if( sockfd <  0 ) {
+    if( sockfd < 0 ) {
         errno = EAFNOSUPPORT;
         return -1;
     }
@@ -560,7 +560,9 @@ tau_tracker_upkeep( struct tau_tracker * tracker )
         else if( req->sent_at && ( req->sent_at + TAU_REQUEST_TTL < now ) ) {
             tau_announce_request_fail( tracker->session, req, FALSE, TRUE, NULL );
             tau_announce_request_free( req );
-            tr_ptrArrayRemove( reqs, i-- );
+            tr_ptrArrayRemove( reqs, i );
+            --i;
+            --n;
         }
     }
 
@@ -577,7 +579,9 @@ tau_tracker_upkeep( struct tau_tracker * tracker )
         else if( req->sent_at && ( req->sent_at + TAU_REQUEST_TTL < now ) ) {
             tau_scrape_request_fail( tracker->session, req, FALSE, TRUE, NULL );
             tau_scrape_request_free( req );
-            tr_ptrArrayRemove( reqs, i-- );
+            tr_ptrArrayRemove( reqs, i );
+            --i;
+            --n;
         }
     }
 }
