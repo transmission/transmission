@@ -182,6 +182,7 @@
 							<string key="NSFrame">{{118, 5}, {279, 14}}</string>
 							<reference key="NSSuperview" ref="303120456"/>
 							<reference key="NSWindow"/>
+							<reference key="NSNextKeyView"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSTextFieldCell" key="NSCell" id="696487414">
 								<int key="NSCellFlags">67239488</int>
@@ -227,7 +228,7 @@
 											<string key="NSFrameSize">{515, 224}</string>
 											<reference key="NSSuperview" ref="306237956"/>
 											<reference key="NSWindow"/>
-											<reference key="NSNextKeyView" ref="365285506"/>
+											<reference key="NSNextKeyView" ref="1068338331"/>
 											<bool key="NSEnabled">YES</bool>
 											<object class="_NSCornerView" key="NSCornerView">
 												<nil key="NSNextResponder"/>
@@ -752,7 +753,7 @@ AAAAAAAAAAAAAAAAA</bytes>
 							<string key="NSFrame">{{0, 24}, {515, 224}}</string>
 							<reference key="NSSuperview" ref="303120456"/>
 							<reference key="NSWindow"/>
-							<reference key="NSNextKeyView" ref="306237956"/>
+							<reference key="NSNextKeyView" ref="365285506"/>
 							<int key="NSsFlags">528</int>
 							<reference key="NSVScroller" ref="1068338331"/>
 							<reference key="NSHScroller" ref="365285506"/>
@@ -1522,6 +1523,14 @@ AAAAAAAAAAAAAAAAA</bytes>
 									<reference key="NSMixedImage" ref="3851078"/>
 									<int key="NSTag">4</int>
 								</object>
+								<object class="NSMenuItem" id="96633809">
+									<reference key="NSMenu" ref="335948734"/>
+									<string key="NSTitle">Remove All Completed From List</string>
+									<string key="NSKeyEquiv"/>
+									<int key="NSMnemonicLoc">2147483647</int>
+									<reference key="NSOnImage" ref="322614661"/>
+									<reference key="NSMixedImage" ref="3851078"/>
+								</object>
 								<object class="NSMenuItem" id="135816226">
 									<reference key="NSMenu" ref="335948734"/>
 									<bool key="NSIsDisabled">YES</bool>
@@ -1650,25 +1659,6 @@ AAAAAAAAAAAAAAAAA</bytes>
 									<string key="NSTitle">Verify Local Data</string>
 									<string key="NSKeyEquiv"/>
 									<int key="NSKeyEquivModMask">1048576</int>
-									<int key="NSMnemonicLoc">2147483647</int>
-									<reference key="NSOnImage" ref="322614661"/>
-									<reference key="NSMixedImage" ref="3851078"/>
-								</object>
-								<object class="NSMenuItem" id="250837515">
-									<reference key="NSMenu" ref="335948734"/>
-									<bool key="NSIsDisabled">YES</bool>
-									<bool key="NSIsSeparator">YES</bool>
-									<string key="NSTitle"/>
-									<string key="NSKeyEquiv"/>
-									<int key="NSKeyEquivModMask">1048576</int>
-									<int key="NSMnemonicLoc">2147483647</int>
-									<reference key="NSOnImage" ref="322614661"/>
-									<reference key="NSMixedImage" ref="3851078"/>
-								</object>
-								<object class="NSMenuItem" id="96633809">
-									<reference key="NSMenu" ref="335948734"/>
-									<string key="NSTitle">Cleanup All Completed</string>
-									<string key="NSKeyEquiv"/>
 									<int key="NSMnemonicLoc">2147483647</int>
 									<reference key="NSOnImage" ref="322614661"/>
 									<reference key="NSMixedImage" ref="3851078"/>
@@ -4635,7 +4625,6 @@ AAAAAAAAAAAAAAAAA</bytes>
 							<reference ref="1063637453"/>
 							<reference ref="349340971"/>
 							<reference ref="245039314"/>
-							<reference ref="250837515"/>
 							<reference ref="96633809"/>
 						</array>
 						<reference key="parent" ref="249425108"/>
@@ -4738,11 +4727,6 @@ AAAAAAAAAAAAAAAAA</bytes>
 						<reference key="object" ref="256186660"/>
 						<array class="NSMutableArray" key="children"/>
 						<reference key="parent" ref="1063637453"/>
-					</object>
-					<object class="IBObjectRecord">
-						<int key="objectID">2847</int>
-						<reference key="object" ref="250837515"/>
-						<reference key="parent" ref="335948734"/>
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">1683</int>
@@ -6045,8 +6029,6 @@ AAAAAAAAAAAAAAAAA</bytes>
 				<string key="2840.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<integer value="1" key="2840.ImportedFromIB2"/>
 				<string key="2840.editorWindowContentRectSynchronizationRect">{{558, 631}, {183, 33}}</string>
-				<string key="2847.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="2847.ImportedFromIB2"/>
 				<string key="2848.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<integer value="1" key="2848.ImportedFromIB2"/>
 				<string key="2849.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>

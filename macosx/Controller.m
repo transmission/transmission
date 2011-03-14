@@ -409,8 +409,8 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
                                 "Main window -> 1st bottom left button (action) tooltip")];
     [fSpeedLimitButton setToolTip: NSLocalizedString(@"Speed Limit overrides the total bandwidth limits with its own limits.",
                                 "Main window -> 2nd bottom left button (turtle) tooltip")];
-    [fClearCompletedButton setToolTip: NSLocalizedString(@"Cleanup all transfers that have completed seeding.",
-                                "Main window -> 3rd bottom left button (cleanup) tooltip")];
+    [fClearCompletedButton setToolTip: NSLocalizedString(@"Remove all transfers that have completed seeding.",
+                                "Main window -> 3rd bottom left button (remove all) tooltip")];
     
     [fTableView registerForDraggedTypes: [NSArray arrayWithObject: TORRENT_TABLE_VIEW_DATA_TYPE]];
     [fWindow registerForDraggedTypes: [NSArray arrayWithObjects: NSFilenamesPboardType, NSURLPboardType, nil]];
@@ -3601,7 +3601,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         return canUseTable && [fTableView numberOfSelectedRows] > 0;
     }
     
-    //cleanup completed transfers item
+    //remove all completed transfers item
     if (action == @selector(clearCompleted:))
     {
         for (Torrent * torrent in fTorrents)
