@@ -114,15 +114,23 @@ typedef enum
     TAU_ACTION_CONNECT  = 0,
     TAU_ACTION_ANNOUNCE = 1,
     TAU_ACTION_SCRAPE   = 2,
-    TAU_ACTION_ERROR    = 3,
-
-    TAU_ACTION_MAX      = 3
+    TAU_ACTION_ERROR    = 3
 }
 tau_action_t;
 
+static tr_bool
+is_tau_response_message( int action, int msglen )
+{
+    if( action == TAU_ACTION_CONNECT  ) return msglen == 16;
+    if( action == TAU_ACTION_ANNOUNCE ) return msglen >= 20;
+    if( action == TAU_ACTION_SCRAPE   ) return msglen >= 20;
+    if( action == TAU_ACTION_ERROR    ) return msglen >= 8;
+    return FALSE;
+}
+
 enum
 {
-    TAU_REQUEST_TTL = 120
+    TAU_REQUEST_TTL = 60
 };
 
 /****
@@ -137,6 +145,7 @@ struct tau_scrape_request
     size_t payload_len;
 
     time_t sent_at;
+    time_t created_at;
     tau_transaction_t transaction_id;
 
     tr_scrape_response response;
@@ -151,27 +160,32 @@ tau_scrape_request_new( const tr_scrape_request  * in,
 {
     int i;
     struct evbuffer * buf;
-
-    struct tau_scrape_request * req = tr_new0( struct tau_scrape_request, 1 );
-    req->transaction_id = tau_transaction_new( );
-    req->callback = callback;
-    req->user_data = user_data;
-    req->response.url = tr_strdup( in->url );
-    req->response.row_count = in->info_hash_count;
-    for( i=0; i<req->response.row_count; ++i )
-        memcpy( req->response.rows[i].info_hash,
-                in->info_hash[i], SHA_DIGEST_LENGTH );
+    struct tau_scrape_request * req;
+    const tau_transaction_t transaction_id = tau_transaction_new( );
 
     /* build the payload */
     buf = evbuffer_new( );
     evbuffer_add_hton_32( buf, TAU_ACTION_SCRAPE );
-    evbuffer_add_hton_32( buf, req->transaction_id );
+    evbuffer_add_hton_32( buf, transaction_id );
     for( i=0; i<in->info_hash_count; ++i )
         evbuffer_add( buf, in->info_hash[i], SHA_DIGEST_LENGTH );
+
+    /* build the tau_scrape_request */
+    req = tr_new0( struct tau_scrape_request, 1 );
+    req->created_at = tr_time( );
+    req->transaction_id = transaction_id;
+    req->callback = callback;
+    req->user_data = user_data;
+    req->response.url = tr_strdup( in->url );
+    req->response.row_count = in->info_hash_count;
     req->payload_len = evbuffer_get_length( buf );
     req->payload = tr_memdup( evbuffer_pullup( buf, -1 ), req->payload_len );
-    evbuffer_free( buf );
+    for( i=0; i<req->response.row_count; ++i )
+        memcpy( req->response.rows[i].info_hash,
+                in->info_hash[i], SHA_DIGEST_LENGTH );
 
+    /* cleanup */
+    evbuffer_free( buf );
     return req;
 }
 
@@ -234,10 +248,16 @@ on_scrape_response( tr_session                  * session,
     }
     else
     {
-        assert( action == TAU_ACTION_ERROR );
+        char * errmsg;
+        const size_t buflen = evbuffer_get_length( buf );
 
-        tau_scrape_request_fail( session, request,
-                                 TRUE, FALSE, _( "Unknown error" ) );
+        if( ( action == TAU_ACTION_ERROR ) && ( buflen > 0 ) )
+            errmsg = tr_strndup( evbuffer_pullup( buf, -1 ), buflen );
+        else
+            errmsg = tr_strdup( _( "Unknown error" ) );
+
+        tau_scrape_request_fail( session, request, TRUE, FALSE, errmsg );
+        tr_free( errmsg );
     }
 }
 
@@ -252,6 +272,7 @@ struct tau_announce_request
     void * payload;
     size_t payload_len;
 
+    time_t created_at;
     time_t sent_at;
     tau_transaction_t transaction_id;
 
@@ -288,17 +309,13 @@ tau_announce_request_new( const tr_announce_request  * in,
                           void                       * user_data )
 {
     struct evbuffer * buf;
+    struct tau_announce_request * req;
+    const tau_transaction_t transaction_id = tau_transaction_new( );
 
-    struct tau_announce_request * r = tr_new0( struct tau_announce_request, 1 );
-    r->transaction_id = tau_transaction_new( );
-    r->callback = callback;
-    r->user_data = user_data;
-    memcpy( r->response.info_hash, in->info_hash, SHA_DIGEST_LENGTH );
-
-    /* build the announce payload */
+    /* build the payload */
     buf = evbuffer_new( );
     evbuffer_add_hton_32( buf, TAU_ACTION_ANNOUNCE );
-    evbuffer_add_hton_32( buf, r->transaction_id );
+    evbuffer_add_hton_32( buf, transaction_id );
     evbuffer_add        ( buf, in->info_hash, SHA_DIGEST_LENGTH );
     evbuffer_add        ( buf, in->peer_id, PEER_ID_LEN );
     evbuffer_add_hton_64( buf, in->down );
@@ -309,11 +326,19 @@ tau_announce_request_new( const tr_announce_request  * in,
     evbuffer_add_hton_32( buf, in->key );
     evbuffer_add_hton_32( buf, in->numwant );
     evbuffer_add_hton_16( buf, in->port );
-    r->payload_len = evbuffer_get_length( buf );
-    r->payload = tr_memdup( evbuffer_pullup( buf, -1 ), r->payload_len );
-    evbuffer_free( buf );
 
-    return r;
+    /* build the tau_announce_request */
+    req = tr_new0( struct tau_announce_request, 1 );
+    req->created_at = tr_time( );
+    req->transaction_id = transaction_id;
+    req->callback = callback;
+    req->user_data = user_data;
+    req->payload_len = evbuffer_get_length( buf );
+    req->payload = tr_memdup( evbuffer_pullup( buf, -1 ), req->payload_len );
+    memcpy( req->response.info_hash, in->info_hash, SHA_DIGEST_LENGTH );
+
+    evbuffer_free( buf );
+    return req;
 }
 
 static void
@@ -373,10 +398,16 @@ on_announce_response( tr_session                  * session,
     }
     else
     {
-        assert( action == TAU_ACTION_ERROR );
+        char * errmsg;
+        const size_t buflen = evbuffer_get_length( buf );
 
-        tau_announce_request_fail( session, request,
-                                   TRUE, FALSE, _( "Unknown error" ) );
+        if( ( action == TAU_ACTION_ERROR ) && ( buflen > 0 ) )
+            errmsg = tr_strndup( evbuffer_pullup( buf, -1 ), buflen );
+        else
+            errmsg = tr_strdup( _( "Unknown error" ) );
+
+        tau_announce_request_fail( session, request, TRUE, FALSE, errmsg );
+        tr_free( errmsg );
     }
 }
 
@@ -470,15 +501,15 @@ tau_tracker_on_dns( int errcode, struct evutil_addrinfo *addr, void * vtracker )
     {
         dbgmsg( tracker->key, "DNS lookup succeeded" );
         tracker->addr = addr;
-        tracker->addr_expiration_time = tr_time() + 1800;
+        tracker->addr_expiration_time = tr_time() + (60*60); /* one hour */
         tau_tracker_upkeep( tracker );
     }
 }
 
 static void
-tau_tracker_send_request( struct tau_tracker * tracker,
-                          const void * payload,
-                          size_t payload_len )
+tau_tracker_send_request( struct tau_tracker  * tracker,
+                          const void          * payload,
+                          size_t                payload_len )
 {
     struct evbuffer * buf = evbuffer_new( );
     dbgmsg( tracker->key, "sending request w/connection id %"PRIu64"\n",
@@ -557,7 +588,7 @@ tau_tracker_upkeep( struct tau_tracker * tracker )
             req->sent_at = now;
             tau_tracker_send_request( tracker, req->payload, req->payload_len );
         }
-        else if( req->sent_at && ( req->sent_at + TAU_REQUEST_TTL < now ) ) {
+        else if( req->created_at && ( req->created_at + TAU_REQUEST_TTL < now ) ) {
             tau_announce_request_fail( tracker->session, req, FALSE, TRUE, NULL );
             tau_announce_request_free( req );
             tr_ptrArrayRemove( reqs, i );
@@ -576,7 +607,7 @@ tau_tracker_upkeep( struct tau_tracker * tracker )
             req->sent_at = now;
             tau_tracker_send_request( tracker, req->payload, req->payload_len );
         }
-        else if( req->sent_at && ( req->sent_at + TAU_REQUEST_TTL < now ) ) {
+        else if( req->created_at && ( req->created_at + TAU_REQUEST_TTL < now ) ) {
             tau_scrape_request_fail( tracker->session, req, FALSE, TRUE, NULL );
             tau_scrape_request_free( req );
             tr_ptrArrayRemove( reqs, i );
@@ -714,25 +745,26 @@ tau_handle_message( tr_session     * session,
     tau_transaction_t transaction_id;
     struct evbuffer * buf;
 
-/*fprintf( stderr, "got an incoming udp message w/len %zu\n", msglen );*/
+    /*fprintf( stderr, "got an incoming udp message w/len %zu\n", msglen );*/
+
     if( !session || !session->announcer_udp )
         return FALSE;
     if( msglen < (sizeof(uint32_t)*2) )
         return FALSE;
 
-    /* extract the action_id and transaction_id */
+    /* extract the action_id and see if it makes sense */
     buf = evbuffer_new( );
     evbuffer_add_reference( buf, msg, msglen, NULL, NULL );
-    action_id      = evbuffer_read_ntoh_32( buf );
-    transaction_id = evbuffer_read_ntoh_32( buf );
-/*fprintf( stderr, "UDP got a transaction_id of %u...\n", transaction_id );*/
-    if( action_id > TAU_ACTION_MAX ) {
+    action_id = evbuffer_read_ntoh_32( buf );
+    if( !is_tau_response_message( action_id, msglen ) ) {
         evbuffer_free( buf );
         return FALSE;
     }
 
-    /* look for a match to this transaction id */
+    /* extract the transaction_id and look for a match */
     tau = session->announcer_udp;
+    transaction_id = evbuffer_read_ntoh_32( buf );
+    /*fprintf( stderr, "UDP got a transaction_id of %u...\n", transaction_id );*/
     for( i=0, n=tr_ptrArraySize( &tau->trackers ); i<n; ++i )
     {
         int j, jn;
