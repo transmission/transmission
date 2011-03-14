@@ -17,6 +17,8 @@
 #ifndef _TR_PTR_ARRAY_H_
 #define _TR_PTR_ARRAY_H_
 
+#include <assert.h>
+
 #include "transmission.h"
 
 /**
@@ -48,8 +50,15 @@ void tr_ptrArrayForeach( tr_ptrArray         * array,
 
 /** @brief Return the nth item in a tr_ptrArray
     @return the nth item in a tr_ptrArray */
-void*         tr_ptrArrayNth( tr_ptrArray   * array,
-                              int             nth );
+static inline void*
+tr_ptrArrayNth( tr_ptrArray * array, int i )
+{
+    assert( array );
+    assert( i >= 0 );
+    assert( i < array->n_items );
+
+    return array->items[i];
+}
 
 /** @brief Remove the last item from the array and return it
     @return the pointer that's been removed from the array

@@ -57,17 +57,6 @@ tr_ptrArrayPeek( tr_ptrArray * t,
     return t->items;
 }
 
-void*
-tr_ptrArrayNth( tr_ptrArray* t,
-                int          i )
-{
-    assert( t );
-    assert( i >= 0 );
-    assert( i < t->n_items );
-
-    return t->items[i];
-}
-
 int
 tr_ptrArrayInsert( tr_ptrArray * t,
                    void        * ptr,
