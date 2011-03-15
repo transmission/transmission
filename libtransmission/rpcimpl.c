@@ -1099,7 +1099,7 @@ portTest( tr_session               * session,
 {
     const int port = tr_sessionGetPeerPort( session );
     char * url = tr_strdup_printf( "http://portcheck.transmissionbt.com/%d", port );
-    tr_webRun( session, url, NULL, portTested, idle_data );
+    tr_webRun( session, url, NULL, NULL, portTested, idle_data );
     tr_free( url );
     return NULL;
 }
@@ -1205,7 +1205,7 @@ blocklistUpdate( tr_session               * session,
                  tr_benc                  * args_out UNUSED,
                  struct tr_rpc_idle_data  * idle_data )
 {
-    tr_webRun( session, session->blocklist_url, NULL, gotNewBlocklist, idle_data );
+    tr_webRun( session, session->blocklist_url, NULL, NULL, gotNewBlocklist, idle_data );
     return NULL;
 }
 
@@ -1330,11 +1330,14 @@ torrentAdd( tr_session               * session,
     {
         int64_t      i;
         tr_bool      boolVal;
-        const char * str;
         tr_benc    * l;
+        const char * str;
+        const char * cookies = NULL;
         tr_ctor    * ctor = tr_ctorNew( session );
 
         /* set the optional arguments */
+
+        tr_bencDictFindStr( args_in, "cookies", &cookies );
 
         if( tr_bencDictFindStr( args_in, TR_PREFS_KEY_DOWNLOAD_DIR, &str ) )
             tr_ctorSetDownloadDir( ctor, TR_FORCE, str );
@@ -1387,7 +1390,7 @@ torrentAdd( tr_session               * session,
             struct add_torrent_idle_data * d = tr_new0( struct add_torrent_idle_data, 1 );
             d->data = idle_data;
             d->ctor = ctor;
-            tr_webRun( session, filename, NULL, gotMetadataFromURL, d );
+            tr_webRun( session, filename, NULL, cookies, gotMetadataFromURL, d );
         }
         else
         {

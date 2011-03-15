@@ -347,6 +347,7 @@
 
    key                  | value type & description
    ---------------------+-------------------------------------------------
+   "cookies"            | string      pointer to a string of one or more cookies.
    "download-dir"       | string      path to download the torrent to
    "filename"           | string      filename or URL of the .torrent file
    "metainfo"           | string      base64-encoded .torrent content
@@ -361,6 +362,11 @@
 
    Either "filename" OR "metainfo" MUST be included.
    All other arguments are optional.
+
+   The format of the "cookies" should be NAME=CONTENTS, where NAME is the
+   cookie name and CONTENTS is what the cookie should contain.
+   Set multiple cookies like this: "name1=content1; name2=content2;" etc. 
+   <http://curl.haxx.se/libcurl/c/curl_easy_setopt.html#CURLOPTCOOKIE>
 
    Response arguments: on success, a "torrent-added" object in the
                        form of one of 3.3's tr_info objects with the
@@ -655,4 +661,5 @@
          |         | yes       | session-close  | new method
    ------+---------+-----------+----------------+-------------------------------
    13    | 2.30    | yes       | session-get    | new arg "isUTP" to the "peers" list
+         |         | yes       | torrent-add    | new arg "cookies"
          |         |        NO | torrent-get    | removed arg "peersKnown"

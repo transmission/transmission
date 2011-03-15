@@ -46,6 +46,7 @@ struct tr_ctor
 
     struct optional_args    optionalArgs[2];
 
+    char                  * cookies;
     char                  * incompleteDir;
 
     tr_file_index_t       * want;

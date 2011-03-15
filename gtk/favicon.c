@@ -111,7 +111,7 @@ favicon_web_done_idle_cb( gpointer vfav )
             fav->contents = NULL;
             fav->len = 0;
 
-            tr_webRun( fav->session, url, NULL, favicon_web_done_cb, fav );
+            tr_webRun( fav->session, url, NULL, NULL, favicon_web_done_cb, fav );
             g_free( url );
         }
     }
@@ -167,7 +167,7 @@ gtr_get_favicon( tr_session  * session,
         data->host = g_strdup( host );
         data->type = 0;
 
-        tr_webRun( session, url, NULL, favicon_web_done_cb, data );
+        tr_webRun( session, url, NULL, NULL, favicon_web_done_cb, data );
         g_free( url );
     }
 }

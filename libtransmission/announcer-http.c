@@ -289,7 +289,7 @@ tr_tracker_http_announce( tr_session                 * session,
     tr_strlcpy( d->log_name, request->log_name, sizeof( d->log_name ) );
 
     dbgmsg( request->log_name, "Sending announce to libcurl: \"%s\"", url );
-    tr_webRun( session, url, NULL, on_announce_done, d );
+    tr_webRun( session, url, NULL, NULL, on_announce_done, d );
     tr_free( url );
 }
 
@@ -443,6 +443,6 @@ tr_tracker_http_scrape( tr_session               * session,
     tr_strlcpy( d->log_name, request->log_name, sizeof( d->log_name ) );
 
     dbgmsg( request->log_name, "Sending scrape to libcurl: \"%s\"", url );
-    tr_webRun( session, url, NULL, on_scrape_done, d );
+    tr_webRun( session, url, NULL, NULL, on_scrape_done, d );
     tr_free( url );
 }

@@ -1194,7 +1194,7 @@ gtr_core_add_from_url( TrCore * core, const char * url )
         data->core = core;
         data->url = g_strdup( url );
         core_inc_busy( data->core );
-        tr_webRun( session, url, NULL, on_url_done, data );
+        tr_webRun( session, url, NULL, NULL, on_url_done, data );
     }
 }
 
