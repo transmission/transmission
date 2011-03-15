@@ -213,12 +213,16 @@ tr_tracker;
 static char *
 getKey( const char * url )
 {
-    int port = 0;
-    char * host = NULL;
     char * ret;
-    tr_urlParse( url, -1, NULL, &host, &port, NULL );
-    ret = tr_strdup_printf( "%s:%d", ( host ? host : "invalid" ), port );
+    char * scheme = NULL;
+    char * host = NULL;
+    int port = 0;
+
+    tr_urlParse( url, -1, &scheme, &host, &port, NULL );
+    ret = tr_strdup_printf( "%s://%s:%d", (scheme?scheme:"invalid"), (host?host:"invalid"), port );
+
     tr_free( host );
+    tr_free( scheme );
     return ret;
 }
 
