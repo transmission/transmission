@@ -34,22 +34,32 @@
 static unsigned int
 getSpeed_Bps( const struct bratecontrol * r, unsigned int interval_msec, uint64_t now )
 {
-    uint64_t       bytes = 0;
-    const uint64_t cutoff = (now?now:tr_time_msec()) - interval_msec;
-    int            i = r->newest;
+    if( !now )
+        now = tr_time_msec();
 
-    for( ;; )
+    if( now != r->cache_time )
     {
-        if( r->transfers[i].date <= cutoff )
-            break;
+        int i = r->newest;
+        uint64_t bytes = 0;
+        const uint64_t cutoff = now - interval_msec;
+        struct bratecontrol * rvolatile = (struct bratecontrol*) r;
 
-        bytes += r->transfers[i].size;
+        for( ;; )
+        {
+            if( r->transfers[i].date <= cutoff )
+                break;
 
-        if( --i == -1 ) i = HISTORY_SIZE - 1; /* circular history */
-        if( i == r->newest ) break; /* we've come all the way around */
+            bytes += r->transfers[i].size;
+
+            if( --i == -1 ) i = HISTORY_SIZE - 1; /* circular history */
+            if( i == r->newest ) break; /* we've come all the way around */
+        }
+
+        rvolatile->cache_val = (unsigned int)(( bytes * 1000u ) / interval_msec);
+        rvolatile->cache_time = now;
     }
 
-    return (unsigned int)(( bytes * 1000u ) / interval_msec);
+    return r->cache_val;
 }
 
 static void
@@ -63,6 +73,9 @@ bytesUsed( const uint64_t now, struct bratecontrol * r, size_t size )
         r->transfers[r->newest].date = now;
         r->transfers[r->newest].size = size;
     }
+
+    /* invalidate cache_val*/
+    r->cache_time = 0;
 }
 
 /******
@@ -88,7 +101,7 @@ tr_bandwidthConstruct( tr_bandwidth * b, tr_session * session, tr_bandwidth * pa
 {
     b->session = session;
     b->children = TR_PTR_ARRAY_INIT;
-    b->magicNumber = MAGIC_NUMBER;
+    b->magicNumber = BANDWIDTH_MAGIC_NUMBER;
     b->band[TR_UP].honorParentLimits = TRUE;
     b->band[TR_DOWN].honorParentLimits = TRUE;
     tr_bandwidthSetParent( b, parent );
@@ -215,7 +228,7 @@ phaseOne( tr_ptrArray * peerArray, tr_direction dir )
     i = n ? tr_cryptoWeakRandInt( n ) : 0; /* pick a random starting point */
     while( n > 1 )
     {
-        const size_t increment = 256;//1024;
+        const size_t increment = 512;//1024;
         const int bytesUsed = tr_peerIoFlush( peers[i], dir, increment );
 
         dbgmsg( "peer #%d of %d used %d bytes in this pass", i, n, bytesUsed );
@@ -319,20 +332,20 @@ bandwidthClamp( const tr_bandwidth  * b,
     {
         if( b->band[dir].isLimited )
         {
-            double current = tr_bandwidthGetRawSpeed_Bps( b, now, TR_DOWN );
-            double desired = tr_bandwidthGetDesiredSpeed_Bps( b, TR_DOWN );
-            double r = desired > 0.001 ? current / desired : 0;
-            size_t i;
-
             byteCount = MIN( byteCount, b->band[dir].bytesLeft );
 
-                 if( r > 1.0 ) i = 0;
-            else if( r > 0.9 ) i = byteCount * 0.9;
-            else if( r > 0.8 ) i = byteCount * 0.8;
-            else               i = byteCount;
+            /* if we're getting close to exceeding the speed limit,
+             * clamp down harder on the bytes available */
+            if( byteCount > 0 )
+            {
+                double current = tr_bandwidthGetRawSpeed_Bps( b, now, TR_DOWN );
+                double desired = tr_bandwidthGetDesiredSpeed_Bps( b, TR_DOWN );
+                double r = desired >= 1 ? current / desired : 0;
 
-            //fprintf( stderr, "--> %.4f  (%f... %f) [%zu --> %zu]\n", r, current, desired, byteCount, i );
-            byteCount = i;
+                     if( r > 1.0 ) byteCount = 0;
+                else if( r > 0.9 ) byteCount *= 0.8;
+                else if( r > 0.8 ) byteCount *= 0.9;
+            }
         }
 
         if( b->parent && b->band[dir].honorParentLimits && ( byteCount > 0 ) )

@@ -39,8 +39,6 @@
 #include "utils.h"
 
 
-#define MAGIC_NUMBER 206745
-
 #ifdef WIN32
  #define EAGAIN       WSAEWOULDBLOCK
  #define EINTR        WSAEINTR
@@ -139,8 +137,6 @@ canReadWrapper( tr_peerIo * io )
 
     dbgmsg( io, "canRead" );
 
-    assert( tr_isPeerIo( io ) );
-    assert( tr_isSession( io->session ) );
     tr_peerIoRef( io );
 
     session = io->session;
@@ -159,8 +155,6 @@ canReadWrapper( tr_peerIo * io )
             const int ret = io->canRead( io, io->userData, &piece );
             const size_t used = oldLen - evbuffer_get_length( io->inbuf );
             const unsigned int overhead = guessPacketOverhead( used );
-
-            assert( tr_isPeerIo( io ) );
 
             if( piece || (piece!=used) )
             {
@@ -197,18 +191,7 @@ canReadWrapper( tr_peerIo * io )
         tr_sessionUnlock( session );
     }
 
-    assert( tr_isPeerIo( io ) );
     tr_peerIoUnref( io );
-}
-
-tr_bool
-tr_isPeerIo( const tr_peerIo * io )
-{
-    return ( io != NULL )
-        && ( io->magicNumber == MAGIC_NUMBER )
-        && ( io->refCount >= 0 )
-        && ( tr_isBandwidth( &io->bandwidth ) )
-        && ( tr_isAddress( &io->addr ) );
 }
 
 static void
@@ -564,7 +547,7 @@ tr_peerIoNew( tr_session       * session,
     }
 
     io = tr_new0( tr_peerIo, 1 );
-    io->magicNumber = MAGIC_NUMBER;
+    io->magicNumber = PEER_IO_MAGIC_NUMBER;
     io->refCount = 1;
     io->crypto = tr_cryptoNew( torrentHash, isIncoming );
     io->session = session;

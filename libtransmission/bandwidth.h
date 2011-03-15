@@ -38,7 +38,7 @@ enum
     INTERVAL_MSEC = HISTORY_MSEC,
     GRANULARITY_MSEC = 200,
     HISTORY_SIZE = ( INTERVAL_MSEC / GRANULARITY_MSEC ),
-    MAGIC_NUMBER = 43143
+    BANDWIDTH_MAGIC_NUMBER = 43143
 };
 
 /* these are PRIVATE IMPLEMENTATION details that should not be touched.
@@ -47,6 +47,8 @@ struct bratecontrol
 {
     int newest;
     struct { uint64_t date, size; } transfers[HISTORY_SIZE];
+    uint64_t cache_time;
+    unsigned int cache_val;
 };
 
 /* these are PRIVATE IMPLEMENTATION details that should not be touched.
@@ -141,7 +143,7 @@ static inline void tr_bandwidthFree( tr_bandwidth * bandwidth )
 /** @brief test to see if the pointer refers to a live bandwidth object */
 static inline tr_bool tr_isBandwidth( const tr_bandwidth  * b )
 {
-    return ( b != NULL ) && ( b->magicNumber == MAGIC_NUMBER );
+    return ( b != NULL ) && ( b->magicNumber == BANDWIDTH_MAGIC_NUMBER );
 }
 
 /******

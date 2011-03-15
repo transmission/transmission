@@ -144,8 +144,17 @@ void tr_peerIoUnrefImpl         ( const char              * file,
 
 #define tr_peerIoUnref(io) tr_peerIoUnrefImpl( __FILE__, __LINE__, (io) );
 
-tr_bool     tr_isPeerIo         ( const tr_peerIo         * io );
+#define PEER_IO_MAGIC_NUMBER 206745
 
+static inline tr_bool
+tr_isPeerIo( const tr_peerIo * io )
+{
+    return ( io != NULL )
+        && ( io->magicNumber == PEER_IO_MAGIC_NUMBER )
+        && ( io->refCount >= 0 )
+        && ( tr_isBandwidth( &io->bandwidth ) )
+        && ( tr_isAddress( &io->addr ) );
+}
 
 /**
 ***
@@ -355,17 +364,12 @@ void      tr_peerIoBandwidthUsed( tr_peerIo           * io,
 static inline tr_bool
 tr_peerIoHasBandwidthLeft( const tr_peerIo * io, tr_direction dir )
 {
-    assert( tr_isPeerIo( io ) );
-
     return tr_bandwidthClamp( &io->bandwidth, dir, 1024 ) > 0;
 }
 
 static inline unsigned int
 tr_peerIoGetPieceSpeed_Bps( const tr_peerIo * io, uint64_t now, tr_direction dir )
 {
-    assert( tr_isPeerIo( io ) );
-    assert( tr_isDirection( dir ) );
-
     return tr_bandwidthGetPieceSpeed_Bps( &io->bandwidth, now, dir );
 }
 
