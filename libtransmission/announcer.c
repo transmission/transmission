@@ -225,7 +225,7 @@ getKey( const char * url )
 static tr_tracker*
 trackerNew( const char * announce, const char * scrape, uint32_t id )
 {
-    tr_tracker * tracker = tr_new0( tr_tracker, 1  );
+    tr_tracker * tracker = tr_new0( tr_tracker, 1 );
     tracker->key = getKey( announce );
     tracker->announce = tr_strdup( announce );
     tracker->scrape = tr_strdup( scrape );
@@ -348,8 +348,9 @@ static void
 tierIncrementTracker( tr_tier * tier )
 {
     /* move our index to the next tracker in the tier */
-    const int i = ( tier->currentTrackerIndex + 1 )
-                        % tr_ptrArraySize( &tier->trackers );
+    const int i = ( tier->currentTracker == NULL )
+                ? 0
+                : ( tier->currentTrackerIndex + 1 ) % tr_ptrArraySize( &tier->trackers );
     tier->currentTracker = tr_ptrArrayNth( &tier->trackers, i );
     tier->currentTrackerIndex = i;
 
@@ -519,21 +520,120 @@ publishPeersPex( tr_tier * tier, int seeds, int leechers,
 ****
 ***/
 
+struct ann_tracker_info
+{
+    tr_tracker_info info;
+
+    char * scheme;
+    char * host;
+    char * path;
+    int port;
+};
+
+
+/* primary key: tier
+ * secondary key: udp comes before http */
+static int
+filter_trackers_compare_func( const void * va, const void * vb )
+{
+    const struct ann_tracker_info * a = va;
+    const struct ann_tracker_info * b = vb;
+    if( a->info.tier != b->info.tier )
+        return a->info.tier - b->info.tier;
+    return -strcmp( a->scheme, b->scheme );
+}
+
+/**
+ * Massages the incoming list of trackers into something we can use.
+ */
+static tr_tracker_info *
+filter_trackers( tr_tracker_info * input, int input_count, int * setme_count )
+{
+    int i, in;
+    int j, jn;
+    int n = 0;
+    struct tr_tracker_info * ret;
+    struct ann_tracker_info * tmp = tr_new0( struct ann_tracker_info, input_count );
+
+    /*for( i=0, in=input_count; i<in; ++i ) fprintf( stderr, "IN: [%d][%s]\n", input[i].tier, input[i].announce );*/
+
+    /* build a list of valid trackers */
+    for( i=0, in=input_count; i<in; ++i ) {
+        if( tr_urlIsValidTracker( input[i].announce ) ) {
+            int port;
+            char * scheme;
+            char * host;
+            char * path;
+            tr_bool is_duplicate = FALSE;
+            tr_urlParse( input[i].announce, -1, &scheme, &host, &port, &path );
+
+            /* weed out one common source of duplicates:
+             * "http://tracker/announce" +
+             * "http://tracker:80/announce"
+             */
+            for( j=0, jn=n; !is_duplicate && j<jn; ++j )
+                is_duplicate = (tmp[j].port==port)
+                            && !strcmp(tmp[j].scheme,scheme)
+                            && !strcmp(tmp[j].host,host)
+                            && !strcmp(tmp[j].path,path);
+
+            if( is_duplicate ) {
+                tr_free( path );
+                tr_free( host );
+                tr_free( scheme );
+                continue;
+            }
+            tmp[n].info = input[i];
+            tmp[n].scheme = scheme;
+            tmp[n].host = host;
+            tmp[n].port = port;
+            tmp[n].path = path;
+            n++;
+        }
+    }
+
+    /* if two announce URLs differ only by scheme, put them in the same tier.
+     * (note: this can leave gaps in the `tier' values, but since the calling
+     * function doesn't care, there's no point in removing the gaps...) */
+    for( i=0, in=n; i<n; ++i )
+        for( j=0, jn=n; j<n; ++j )
+            if( (i!=j) && (tmp[i].port==tmp[j].port)
+                       && !tr_strcmp0(tmp[i].host,tmp[j].host)
+                       && !tr_strcmp0(tmp[i].path,tmp[j].path) )
+                tmp[j].info.tier = tmp[i].info.tier;
+
+    /* sort them, for two reasons:
+     * (1) unjumble the tiers from the previous step
+     * (2) move the UDP trackers to the front of each tier */
+    qsort( tmp, n, sizeof(struct ann_tracker_info), filter_trackers_compare_func );
+
+    /* build the output */
+    *setme_count = n;
+    ret = tr_new0( tr_tracker_info, n );
+    for( i=0, in=n; i<in; ++i )
+        ret[i] = tmp[i].info;
+
+    /* cleanup */
+    for( i=0, in=n; i<n; ++i ) {
+        tr_free( tmp[i].path );
+        tr_free( tmp[i].host );
+        tr_free( tmp[i].scheme );
+    }
+    tr_free( tmp );
+
+    /*for( i=0, in=n; i<in; ++i ) fprintf( stderr, "OUT: [%d][%s]\n", ret[i].tier, ret[i].announce );*/
+    return ret;
+}
+
+
 static void
 addTorrentToTier( tr_torrent_tiers * tiers, tr_torrent * tor )
 {
     int i, n;
-    const tr_tracker_info ** infos;
-    const int trackerCount = tor->info.trackerCount;
-    const tr_tracker_info  * trackers = tor->info.trackers;
+    tr_tracker_info * infos = filter_trackers( tor->info.trackers,
+                                               tor->info.trackerCount, &n );
 
-    /* get the trackers that we support... */
-    infos = tr_new0( const tr_tracker_info*, trackerCount );
-    for( i=n=0; i<trackerCount; ++i )
-        if( tr_urlIsValidTracker( trackers[i].announce ) )
-            infos[n++] = &trackers[i];
-
-    /* build our private table of tiers... */
+    /* build our internal table of tiers... */
     if( n > 0 )
     {
         int tierIndex = -1;
@@ -541,7 +641,7 @@ addTorrentToTier( tr_torrent_tiers * tiers, tr_torrent * tor )
 
         for( i=0; i<n; ++i )
         {
-            const tr_tracker_info * info = infos[i];
+            const tr_tracker_info * info = &infos[i];
 
             if( info->tier != tierIndex )
                 tier = NULL;
@@ -620,7 +720,7 @@ tr_announcerNextManualAnnounce( const tr_torrent * tor )
     const tr_torrent_tiers * tiers;
     time_t ret = ~(time_t)0;
 
-    assert( tr_isTorrent( tor  ) );
+    assert( tr_isTorrent( tor ) );
 
     /* find the earliest manual announce time from all peers */
     tiers = tor->tiers;
