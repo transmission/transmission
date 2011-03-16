@@ -1950,7 +1950,9 @@ torrentCallScript( const tr_torrent * tor, const char * script )
 
         if( !fork( ) )
         {
-            execve( script, cmd, env );
+            for (i=0; env[i]; ++i)
+                putenv(env[i]);
+            execvp( script, cmd );
             _exit( 0 );
         }
 #endif
