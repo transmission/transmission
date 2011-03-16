@@ -104,12 +104,13 @@ getBlockRun( const tr_cache * cache, int pos, struct run_info * info )
     return i-pos;
 }
 
+/* higher rank comes before lower rank */
 static int
 compareRuns( const void * va, const void * vb )
 {
-    const struct run_info a = *(const struct run_info*)va;
-    const struct run_info b = *(const struct run_info*)vb;
-    return b.rank - a.rank;
+    const struct run_info * a = va;
+    const struct run_info * b = vb;
+    return b->rank - a->rank;
 }
 
 enum
