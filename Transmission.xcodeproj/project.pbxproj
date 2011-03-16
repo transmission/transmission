@@ -283,7 +283,6 @@
 		A2E384E0130DFB3A001F501B /* utp.h in Headers */ = {isa = PBXBuildFile; fileRef = A2E384D8130DFB3A001F501B /* utp.h */; };
 		A2E384E1130DFB3A001F501B /* utypes.h in Headers */ = {isa = PBXBuildFile; fileRef = A2E384D9130DFB3A001F501B /* utypes.h */; };
 		A2E3850C130DFCCB001F501B /* StdAfx.h in Headers */ = {isa = PBXBuildFile; fileRef = A2E3850B130DFCCB001F501B /* StdAfx.h */; };
-		A2E38540130DFECD001F501B /* libminiupnp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BE1183480CE160960002D0F3 /* libminiupnp.a */; };
 		A2E57ABB1310822C00A7DAB1 /* StatusBarController.m in Sources */ = {isa = PBXBuildFile; fileRef = A2E57ABA1310822C00A7DAB1 /* StatusBarController.m */; };
 		A2E57AC61310831400A7DAB1 /* StatusBar.xib in Resources */ = {isa = PBXBuildFile; fileRef = A2E57AC51310831400A7DAB1 /* StatusBar.xib */; };
 		A2E57B9C13109DC200A7DAB1 /* FilterBar.xib in Resources */ = {isa = PBXBuildFile; fileRef = A2E57B9B13109DC200A7DAB1 /* FilterBar.xib */; };
@@ -1000,7 +999,6 @@
 				A2E669790F5B8E5A00B4251A /* Security.framework in Frameworks */,
 				A22CFB820FB66EF30009BD3E /* Carbon.framework in Frameworks */,
 				A221DCC8104B3660008A642D /* Quartz.framework in Frameworks */,
-				A2E38540130DFECD001F501B /* libminiupnp.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
