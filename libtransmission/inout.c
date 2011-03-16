@@ -15,10 +15,6 @@
 #include <stdlib.h> /* realloc */
 #include <string.h> /* memcmp */
 
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <unistd.h>
-
 #include <openssl/sha.h>
 
 #include "transmission.h"
@@ -115,18 +111,6 @@ readOrWriteBytes( tr_session       * session,
             tr_statsFileCreated( tor->session );
 
         tr_free( subpath );
-    }
-
-    /* check that the file corresponding to 'fd' still exists */
-    if( fd >= 0 )
-    {
-        struct stat sb;
-
-        if( !fstat( fd, &sb ) && sb.st_nlink < 1 )
-        {
-            tr_torrentSetLocalError( tor, "Please Verify Local Data! A file disappeared: \"%s\"", file->name );
-            err = ENOENT;
-        }
     }
 
     if( !err )
