@@ -414,6 +414,12 @@ add_time_header( struct evkeyvalq * headers, const char * key, time_t value )
 }
 
 static void
+evbuffer_ref_cleanup_tr_free( const void * data UNUSED, size_t datalen UNUSED, void * extra )
+{
+    tr_free( extra );
+}
+
+static void
 serve_file( struct evhttp_request * req,
             struct tr_rpc_server *  server,
             const char *            filename )

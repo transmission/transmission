@@ -308,12 +308,6 @@ void* tr_malloc0( size_t size );
 /** @brief Portability wrapper around free() in which `NULL' is a safe argument */
 void tr_free( void * p );
 
-static inline
-void evbuffer_ref_cleanup_tr_free( const void * data UNUSED, size_t datalen UNUSED, void * extra )
-{
-    tr_free( extra );
-}
-
 /**
  * @brief make a newly-allocated copy of a chunk of memory
  * @param src the memory to copy
