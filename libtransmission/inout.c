@@ -10,10 +10,6 @@
  * $Id$
  */
 
-#ifdef HAVE_LSEEK64
- #define _LARGEFILE64_SOURCE
-#endif
-
 #include <assert.h>
 #include <errno.h>
 #include <stdlib.h> /* realloc */
@@ -31,7 +27,6 @@
 #include "fdlimit.h"
 #include "inout.h"
 #include "peer-common.h" /* MAX_BLOCK_SIZE */
-#include "platform.h"
 #include "stats.h"
 #include "torrent.h"
 #include "utils.h"
@@ -39,18 +34,6 @@
 /****
 *****  Low-level IO functions
 ****/
-
-#ifdef WIN32
- #if defined(read)
-  #undef read
- #endif
- #define read  _read
-
- #if defined(write)
-  #undef write
- #endif
- #define write _write
-#endif
 
 enum { TR_IO_READ, TR_IO_PREFETCH,
        /* Any operations that require write access must follow TR_IO_WRITE. */
@@ -73,9 +56,6 @@ readOrWriteBytes( tr_session       * session,
     int             fd = -1;
     int             err = 0;
     const tr_bool doWrite = ioMode >= TR_IO_WRITE;
-
-//if( doWrite )
-//    fprintf( stderr, "in file %s at offset %zu, writing %zu bytes; file length is %zu\n", file->name, (size_t)fileOffset, buflen, (size_t)file->length );
 
     assert( fileIndex < info->fileCount );
     assert( !file->length || ( fileOffset < file->length ) );
@@ -234,8 +214,6 @@ readOrWritePiece( tr_torrent       * tor,
 
     if( pieceIndex >= tor->info.pieceCount )
         return EINVAL;
-    //if( pieceOffset + buflen > tr_torPieceCountBytes( tor, pieceIndex ) )
-    //    return EINVAL;
 
     tr_ioFindFileLocation( tor, pieceIndex, pieceOffset,
                            &fileIndex, &fileOffset );
@@ -248,7 +226,6 @@ readOrWritePiece( tr_torrent       * tor,
         err = readOrWriteBytes( tor->session, tor, ioMode, fileIndex, fileOffset, buf, bytesThisPass );
         buf += bytesThisPass;
         buflen -= bytesThisPass;
-//fprintf( stderr, "++fileIndex to %d\n", (int)fileIndex );
         ++fileIndex;
         fileOffset = 0;
 
