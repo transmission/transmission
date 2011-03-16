@@ -26,6 +26,8 @@
 /* ansi */
 #include <errno.h>
 #include <stdio.h>
+#include <string.h> /* memcpy(), memset(), memchr(), strlen() */
+#include <stdlib.h> /* atoi() */
 
 /* posix */
 #include <signal.h> /* sig_atomic_t */

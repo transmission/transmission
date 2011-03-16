@@ -12,6 +12,7 @@
 
 #include <assert.h>
 #include <limits.h>
+#include <string.h> /* memset() */
 
 #include "transmission.h"
 #include "bandwidth.h"

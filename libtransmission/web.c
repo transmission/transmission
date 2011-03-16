@@ -10,6 +10,9 @@
  * $Id$
  */
 
+#include <string.h> /* strlen(), strstr() */
+#include <stdlib.h> /* getenv() */
+
 #ifdef WIN32
   #include <ws2tcpip.h>
 #else

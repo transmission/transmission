@@ -10,6 +10,9 @@
  * $Id$
  */
 
+#include <string.h> /* memset() */
+#include <stdlib.h> /* realloc() */
+
 #include "transmission.h"
 #include "bencode.h"
 #include "bitset.h"

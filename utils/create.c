@@ -12,6 +12,7 @@
 
 #include <errno.h>
 #include <stdio.h>
+#include <stdlib.h> /* EXIT_FAILURE */
 #include <unistd.h> /* getcwd() */
 
 #include <libtransmission/transmission.h>

@@ -15,6 +15,7 @@
 #include <errno.h>
 #include <math.h> /* fabs() */
 #include <stdio.h> /* rename() */
+#include <stdlib.h> /* strtoul(), strtod(), realloc(), qsort(), mkstemp() */
 #include <string.h>
 
 #ifdef WIN32 /* tr_mkstemp() */

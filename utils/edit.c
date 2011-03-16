@@ -11,6 +11,8 @@
  */
 
 #include <stdio.h>
+#include <string.h> /* strlen(), strstr(), strcmp() */
+#include <stdlib.h> /* EXIT_FAILURE */
 
 #include <event2/buffer.h>
 

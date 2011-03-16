@@ -21,6 +21,7 @@
 
 #include <errno.h>
 #include <string.h> /* strstr */
+#include <stdio.h> /* perror() */
 
 #include <dirent.h> /* readdir */
 

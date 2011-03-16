@@ -28,6 +28,7 @@
 #include <stdarg.h>
 #include <string.h> /* memcmp */
 #include <stdlib.h> /* qsort */
+#include <stdio.h> /* remove() */
 
 #include <event2/util.h> /* evutil_vsnprintf() */
 

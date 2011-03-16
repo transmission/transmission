@@ -12,6 +12,8 @@
 
 #define __LIBTRANSMISSION_ANNOUNCER_MODULE___
 
+#include <string.h> /* memcpy(), memset() */
+
 #include <event2/buffer.h>
 #include <event2/dns.h>
 #include <event2/util.h>

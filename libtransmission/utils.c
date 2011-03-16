@@ -92,7 +92,7 @@ getMessageLock( void )
     return l;
 }
 
-FILE*
+void*
 tr_getLog( void )
 {
     static tr_bool initialized = FALSE;

@@ -12,6 +12,7 @@
 
 #include <assert.h>
 #include <stdio.h> /* remove() */
+#include <string.h> /* memcpy(), memset(), memcmp() */
 
 #include <event2/buffer.h>
 

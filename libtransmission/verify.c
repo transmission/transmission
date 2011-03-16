@@ -10,6 +10,9 @@
  * $Id$
  */
 
+#include <string.h> /* memcmp() */
+#include <stdlib.h> /* free() */
+
 #ifdef HAVE_POSIX_FADVISE
  #define _XOPEN_SOURCE 600
  #include <fcntl.h> /* posix_fadvise() */

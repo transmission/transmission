@@ -10,6 +10,8 @@
  * $Id$
  */
 
+#include <string.h> /* memcpy() */
+
 #include "transmission.h"
 #include "completion.h"
 #include "torrent.h"

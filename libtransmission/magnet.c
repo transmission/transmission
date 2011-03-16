@@ -12,6 +12,7 @@
 
 #include <assert.h>
 #include <string.h> /* strchr() */
+#include <stdio.h> /* sscanf() */
 
 #include "transmission.h"
 #include "bencode.h"

@@ -12,6 +12,9 @@
 
 #include <assert.h>
 #include <limits.h>
+#include <stdio.h>
+#include <stdlib.h> /* qsort() */
+#include <string.h> /* strcmp(), memcpy() */
 
 #include <event2/buffer.h>
 #include <event2/event.h> /* evtimer */

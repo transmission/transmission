@@ -11,6 +11,8 @@
  */
 
 #include <stdio.h>
+#include <string.h> /* strcmp(), strchr(), memcmp() */
+#include <stdlib.h> /* getenv(), qsort() */
 #include <time.h>
 
 #define CURL_DISABLE_TYPECHECK /* otherwise -Wunreachable-code goes insane */

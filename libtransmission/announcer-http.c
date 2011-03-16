@@ -11,6 +11,9 @@
  */
 
 #include <limits.h> /* USHRT_MAX */
+#include <stdio.h> /* fprintf() */
+#include <stdlib.h> /* getenv() */
+#include <string.h> /* strchr(), memcmp(), memcpy() */
 
 #include <event2/buffer.h>
 #include <event2/http.h> /* for HTTP_OK */

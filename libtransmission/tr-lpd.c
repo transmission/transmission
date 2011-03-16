@@ -23,6 +23,7 @@ THE SOFTWARE.
 /* ansi */
 #include <errno.h>
 #include <stdio.h>
+#include <string.h> /* strlen(), strncpy(), strstr(), memset() */
 
 /* posix */
 #include <signal.h> /* sig_atomic_t */

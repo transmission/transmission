@@ -15,9 +15,6 @@
 
 #include <inttypes.h>
 #include <stddef.h> /* size_t */
-#include <stdio.h> /* FILE* */
-#include <string.h> /* memcpy()* */
-#include <stdlib.h> /* malloc() */
 #include <time.h> /* time_t */
 
 #ifdef __cplusplus
@@ -189,7 +186,7 @@ void tr_msg( const char * file, int line,
 
 
 
-FILE*          tr_getLog( void );
+void* tr_getLog( void );
 
 /** @brief return true if deep logging has been enabled by the user; false otherwise */
 tr_bool tr_deepLoggingIsActive( void );

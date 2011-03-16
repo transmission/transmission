@@ -10,6 +10,8 @@
  * $Id$
  */
 
+#include <stdlib.h> /* qsort() */
+
 #include <gtk/gtk.h>
 #include <glib/gi18n.h>
 
