@@ -46,12 +46,11 @@ readOrWriteBytes( tr_session       * session,
                   void             * buf,
                   size_t             buflen )
 {
-    const tr_info * info = &tor->info;
-    const tr_file * file = &info->files[fileIndex];
-
-    int             fd = -1;
-    int             err = 0;
+    int fd;
+    int err = 0;
     const tr_bool doWrite = ioMode >= TR_IO_WRITE;
+    const tr_info * const info = &tor->info;
+    const tr_file * const file = &info->files[fileIndex];
 
     assert( fileIndex < info->fileCount );
     assert( !file->length || ( fileOffset < file->length ) );
@@ -60,58 +59,62 @@ readOrWriteBytes( tr_session       * session,
     if( !file->length )
         return 0;
 
-    fd = tr_fdFileGetCached( session, tr_torrentId( tor ), fileIndex, doWrite );
+    /***
+    ****  Find the fd
+    ***/
 
+    fd = tr_fdFileGetCached( session, tr_torrentId( tor ), fileIndex, doWrite );
     if( fd < 0 )
     {
-        /* the fd cache doesn't have this file...
-         * we'll need to open it and maybe create it */
+        /* it's not cached, so open/create it now */
         char * subpath;
         const char * base;
-        tr_bool fileExists;
-        tr_preallocation_mode preallocationMode;
 
-        fileExists = tr_torrentFindFile2( tor, fileIndex, &base, &subpath );
-
-        if( !fileExists )
+        /* see if the file exists... */
+        if( !tr_torrentFindFile2( tor, fileIndex, &base, &subpath ) )
         {
+            /* we can't read a file that doesn't exist... */
+            if( !doWrite )
+                err = ENOENT;
+
+            /* figure out where the file should go, so we can create it */
             base = tr_torrentGetCurrentDir( tor );
+            subpath = tr_sessionIsIncompleteFileNamingEnabled( tor->session )
+                    ? tr_torrentBuildPartial( tor, fileIndex )
+                    : tr_strdup( file->name );
 
-            if( tr_sessionIsIncompleteFileNamingEnabled( tor->session ) )
-                subpath = tr_torrentBuildPartial( tor, fileIndex );
-            else
-                subpath = tr_strdup( file->name );
         }
 
-        if( ( file->dnd ) || ( ioMode < TR_IO_WRITE ) )
-            preallocationMode = TR_PREALLOCATE_NONE;
-        else
-            preallocationMode = tor->session->preallocationMode;
-
-        if( ( ioMode < TR_IO_WRITE ) && !fileExists ) /* does file exist? */
+        if( !err )
         {
-            err = ENOENT;
-        }
-        else
-        {
+            /* open (and maybe create) the file */
             char * filename = tr_buildPath( base, subpath, NULL );
-
-            if( ( fd = tr_fdFileCheckout( session, tor->uniqueId, fileIndex,
-                                          base, filename,
-                                          doWrite, preallocationMode, file->length ) ) < 0 )
+            const int prealloc = file->dnd || !doWrite
+                               ? TR_PREALLOCATE_NONE
+                               : tor->session->preallocationMode;
+            if((( fd = tr_fdFileCheckout( session, tor->uniqueId, fileIndex,
+                                          base, filename, doWrite,
+                                          prealloc, file->length ))) < 0 )
             {
                 err = errno;
-                tr_torerr( tor, "tr_fdFileCheckout failed for \"%s\": %s", filename, tr_strerror( err ) );
+                tr_torerr( tor, "tr_fdFileCheckout failed for \"%s\": %s",
+                           filename, tr_strerror( err ) );
+            }
+            else if( doWrite )
+            {
+                /* make a note that we just created a file */
+                tr_statsFileCreated( tor->session );
             }
 
             tr_free( filename );
         }
 
-        if( doWrite && !err )
-            tr_statsFileCreated( tor->session );
-
         tr_free( subpath );
     }
+
+    /***
+    ****  Use the fd
+    ***/
 
     if( !err )
     {
