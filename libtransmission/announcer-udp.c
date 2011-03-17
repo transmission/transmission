@@ -51,8 +51,6 @@ tau_sendto( tr_session * session,
             const void * buf, size_t buflen )
 {
     int sockfd;
-
-    tau_sockaddr_setport( ai->ai_addr, port );
     
     if( ai->ai_addr->sa_family == AF_INET )
         sockfd = session->udp_socket;
@@ -66,6 +64,7 @@ tau_sendto( tr_session * session,
         return -1;
     }
 
+    tau_sockaddr_setport( ai->ai_addr, port );
     return sendto( sockfd, buf, buflen, 0, ai->ai_addr, ai->ai_addrlen );
 }
 
@@ -298,10 +297,10 @@ get_tau_announce_event( tr_announce_event e )
 {
     switch( e )
     {
-        case TR_ANNOUNCE_EVENT_COMPLETED:  return TAU_ANNOUNCE_EVENT_COMPLETED;
-        case TR_ANNOUNCE_EVENT_STARTED:    return TAU_ANNOUNCE_EVENT_STARTED;
-        case TR_ANNOUNCE_EVENT_STOPPED:    return TAU_ANNOUNCE_EVENT_STOPPED;
-        default:                           return TAU_ANNOUNCE_EVENT_NONE;
+        case TR_ANNOUNCE_EVENT_COMPLETED: return TAU_ANNOUNCE_EVENT_COMPLETED;
+        case TR_ANNOUNCE_EVENT_STARTED:   return TAU_ANNOUNCE_EVENT_STARTED;
+        case TR_ANNOUNCE_EVENT_STOPPED:   return TAU_ANNOUNCE_EVENT_STOPPED;
+        default:                          return TAU_ANNOUNCE_EVENT_NONE;
     }
 }
 
@@ -346,12 +345,12 @@ tau_announce_request_new( const tr_announce_request  * in,
 static void
 tau_announce_request_free( struct tau_announce_request * req )
 {
-    tr_free( req->payload );
     tr_free( req->response.tracker_id_str );
     tr_free( req->response.warning );
     tr_free( req->response.errmsg );
     tr_free( req->response.pex6 );
     tr_free( req->response.pex );
+    tr_free( req->payload );
     tr_free( req );
 }
 
@@ -590,7 +589,7 @@ tau_tracker_upkeep( struct tau_tracker * tracker )
             req->sent_at = now;
             tau_tracker_send_request( tracker, req->payload, req->payload_len );
         }
-        else if( req->created_at && ( req->created_at + TAU_REQUEST_TTL < now ) ) {
+        else if( req->created_at + TAU_REQUEST_TTL < now ) {
             tau_announce_request_fail( tracker->session, req, FALSE, TRUE, NULL );
             tau_announce_request_free( req );
             tr_ptrArrayRemove( reqs, i );
@@ -609,7 +608,7 @@ tau_tracker_upkeep( struct tau_tracker * tracker )
             req->sent_at = now;
             tau_tracker_send_request( tracker, req->payload, req->payload_len );
         }
-        else if( req->created_at && ( req->created_at + TAU_REQUEST_TTL < now ) ) {
+        else if( req->created_at + TAU_REQUEST_TTL < now ) {
             tau_scrape_request_fail( tracker->session, req, FALSE, TRUE, NULL );
             tau_scrape_request_free( req );
             tr_ptrArrayRemove( reqs, i );
@@ -638,10 +637,17 @@ on_tracker_connection_response( struct tau_tracker  * tracker,
     }
     else
     {
-        const char * errmsg = _( "Connection refused" );
-        assert( action == TAU_ACTION_ERROR );
+        char * errmsg;
+        const size_t buflen = evbuffer_get_length( buf );
+
+        if( ( action == TAU_ACTION_ERROR ) && ( buflen > 0 ) )
+            errmsg = tr_strndup( evbuffer_pullup( buf, -1 ), buflen );
+        else
+            errmsg = tr_strdup( _( "Connection refused" ) );
+
         dbgmsg( tracker->key, "%s", errmsg );
         tau_tracker_fail_all( tracker, TRUE, FALSE, errmsg );
+        tr_free( errmsg );
     }
 
     tau_tracker_upkeep( tracker );
@@ -735,10 +741,10 @@ tr_tracker_udp_upkeep( tr_session * session )
                             (PtrArrayForeachFunc)tau_tracker_upkeep );
 }
 
+/* @brief process an incoming udp message if it's a tracker response.
+ * @return true if msg was a tracker response; false otherwise */
 tr_bool
-tau_handle_message( tr_session     * session,
-                    const uint8_t  * msg,
-                    size_t           msglen )
+tau_handle_message( tr_session * session, const uint8_t * msg, size_t msglen )
 {
     int i;
     int n;
@@ -766,7 +772,7 @@ tau_handle_message( tr_session     * session,
     /* extract the transaction_id and look for a match */
     tau = session->announcer_udp;
     transaction_id = evbuffer_read_ntoh_32( buf );
-    /*fprintf( stderr, "UDP got a transaction_id of %u...\n", transaction_id );*/
+    /*fprintf( stderr, "UDP got a transaction_id %u...\n", transaction_id );*/
     for( i=0, n=tr_ptrArraySize( &tau->trackers ); i<n; ++i )
     {
         int j, jn;
@@ -777,7 +783,7 @@ tau_handle_message( tr_session     * session,
         if( tracker->is_connecting
             && ( transaction_id == tracker->connection_transaction_id ) )
         {
-            dbgmsg( tracker->key, "%"PRIu32" matches my connection request!", transaction_id );
+            dbgmsg( tracker->key, "%"PRIu32" is my connection request!", transaction_id );
             on_tracker_connection_response( tracker, action_id, buf );
             evbuffer_free( buf );
             return TRUE;
@@ -788,7 +794,7 @@ tau_handle_message( tr_session     * session,
         for( j=0, jn=tr_ptrArraySize(reqs); j<jn; ++j ) {
             struct tau_announce_request * req = tr_ptrArrayNth( reqs, j );
             if( req->sent_at && ( transaction_id == req->transaction_id ) ) {
-                dbgmsg( tracker->key, "%"PRIu32" matches one of my announce requests!", transaction_id );
+                dbgmsg( tracker->key, "%"PRIu32" is an announce request!", transaction_id );
                 tr_ptrArrayRemove( reqs, j );
                 on_announce_response( session, req, action_id, buf );
                 tau_announce_request_free( req );
@@ -802,7 +808,7 @@ tau_handle_message( tr_session     * session,
         for( j=0, jn=tr_ptrArraySize(reqs); j<jn; ++j ) {
             struct tau_scrape_request * req = tr_ptrArrayNth( reqs, j );
             if( req->sent_at && ( transaction_id == req->transaction_id ) ) {
-                dbgmsg( tracker->key, "%"PRIu32" matches one of my scrape requests!", transaction_id );
+                dbgmsg( tracker->key, "%"PRIu32" is a scrape request!", transaction_id );
                 tr_ptrArrayRemove( reqs, j );
                 on_scrape_response( session, req, action_id, buf );
                 tau_scrape_request_free( req );
