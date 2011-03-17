@@ -43,6 +43,7 @@
 #include "session.h"
 #include "stats.h"
 #include "torrent.h"
+#include "tr-dht.h" /* tr_dhtUpkeep() */
 #include "tr-udp.h"
 #include "tr-utp.h"
 #include "tr-lpd.h"
@@ -617,6 +618,8 @@ onNowTimer( int foo UNUSED, short bar UNUSED, void * vsession )
     **/
 
     tr_timeUpdate( time( NULL ) );
+
+    tr_dhtUpkeep( session );
 
     if( session->turtle.isClockEnabled )
         turtleCheckClock( session, &session->turtle );

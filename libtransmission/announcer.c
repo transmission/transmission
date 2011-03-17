@@ -28,7 +28,6 @@
 #include "peer-mgr.h" /* tr_peerMgrCompactToPex() */
 #include "ptrarray.h"
 #include "session.h"
-#include "tr-dht.h"
 #include "tr-lpd.h"
 #include "torrent.h"
 #include "utils.h"
@@ -1494,42 +1493,6 @@ announceMore( tr_announcer * announcer )
 }
 
 static void
-dht_upkeep( tr_session * session )
-{
-    tr_torrent * tor = NULL;
-    const time_t now = tr_time( );
-
-    while(( tor = tr_torrentNext( session, tor )))
-    {
-        if( tor->dhtAnnounceAt <= now )
-        {
-            if( tor->isRunning && tr_torrentAllowsDHT(tor) ) {
-                const int rc = tr_dhtAnnounce(tor, AF_INET, 1);
-                if(rc == 0)
-                    /* The DHT is not ready yet. Try again soon. */
-                    tor->dhtAnnounceAt = now + 5 + tr_cryptoWeakRandInt( 5 );
-                else
-                    /* We should announce at least once every 30 minutes. */
-                    tor->dhtAnnounceAt =
-                        now + 25 * 60 + tr_cryptoWeakRandInt( 3 * 60 );
-            }
-        }
-
-        if( tor->dhtAnnounce6At <= now )
-        {
-            if( tor->isRunning && tr_torrentAllowsDHT(tor) ) {
-                const int rc = tr_dhtAnnounce(tor, AF_INET6, 1);
-                if(rc == 0)
-                    tor->dhtAnnounce6At = now + 5 + tr_cryptoWeakRandInt( 5 );
-                else
-                    tor->dhtAnnounce6At =
-                        now + 25 * 60 + tr_cryptoWeakRandInt( 3 * 60 );
-            }
-        }
-    }
-}
-
-static void
 onUpkeepTimer( int foo UNUSED, short bar UNUSED, void * vannouncer )
 {
     const time_t now = tr_time( );
@@ -1541,8 +1504,6 @@ onUpkeepTimer( int foo UNUSED, short bar UNUSED, void * vannouncer )
 
     /* maybe send out some announcements to trackers */
     announceMore( announcer );
-
-    dht_upkeep( announcer->session );
 
     /* LPD upkeep */
     if( announcer->lpdUpkeepAt <= now ) {

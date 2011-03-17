@@ -546,7 +546,7 @@ callback( void *ignore UNUSED, int event,
     }
 }
 
-int
+static int
 tr_dhtAnnounce(tr_torrent *tor, int af, tr_bool announce)
 {
     int rc, status, numnodes, ret = 0;
@@ -587,6 +587,37 @@ tr_dhtAnnounce(tr_torrent *tor, int af, tr_bool announce)
     }
 
     return ret;
+}
+
+void
+tr_dhtUpkeep( tr_session * session )
+{
+    tr_torrent * tor = NULL;
+    const time_t now = tr_time( );
+
+    while(( tor = tr_torrentNext( session, tor )))
+    {
+        if( !tor->isRunning || !tr_torrentAllowsDHT( tor ) )
+            continue;
+
+        if( tor->dhtAnnounceAt <= now )
+        {
+            const int rc = tr_dhtAnnounce(tor, AF_INET, 1);
+
+            tor->dhtAnnounceAt = now + (rc == 0)
+                                     ? 5 + tr_cryptoWeakRandInt( 5 )
+                                     : 25 * 60 + tr_cryptoWeakRandInt( 3*60 );
+        }
+
+        if( tor->dhtAnnounce6At <= now )
+        {
+            const int rc = tr_dhtAnnounce(tor, AF_INET6, 1);
+
+            tor->dhtAnnounce6At = now + (rc == 0)
+                                      ? 5 + tr_cryptoWeakRandInt( 5 )
+                                      : 25 * 60 + tr_cryptoWeakRandInt( 3*60 );
+        }
+    }
 }
 
 void
