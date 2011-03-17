@@ -69,6 +69,11 @@ THE SOFTWARE.
 
 static void event_callback( int, short, void* );
 
+enum {
+   UPKEEP_INTERVAL_SECS = 5
+};
+static struct event * upkeep_timer = NULL;
+
 static int lpd_socket; /**<separate multicast receive socket */
 static int lpd_socket2; /**<and multicast send socket */
 static struct event * lpd_event = NULL;
@@ -250,6 +255,8 @@ static int lpd_extractParam( const char* const str, const char* const name, int 
 /**
 * @} */
 
+static void on_upkeep_timer( int, short, void * );
+
 /**
 * @brief Initializes Local Peer Discovery for this node
 *
@@ -342,6 +349,9 @@ int tr_lpdInit( tr_session* ss, tr_address* tr_addr UNUSED )
     lpd_event = event_new( ss->event_base, lpd_socket, EV_READ | EV_PERSIST, event_callback, NULL );
     event_add( lpd_event, NULL );
 
+    upkeep_timer = evtimer_new( ss->event_base, on_upkeep_timer, ss );
+    tr_timerAdd( upkeep_timer, UPKEEP_INTERVAL_SECS, 0 );
+
     tr_ndbg( "LPD", "Local Peer Discovery initialised" );
 
     return 1;
@@ -370,6 +380,9 @@ void tr_lpdUninit( tr_session* ss )
 
     event_free( lpd_event );
     lpd_event = NULL;
+
+    evtimer_del( upkeep_timer );
+    upkeep_timer = NULL;
 
     /* just shut down, we won't remember any former nodes */
     evutil_closesocket( lpd_socket );
@@ -539,8 +552,13 @@ static int tr_lpdConsiderAnnounce( tr_pex* peer, const char* const msg )
 * the function needs to be informed of the externally employed housekeeping interval.
 * Further, by setting interval to zero (or negative) the caller may actually disable LPD
 * announces on a per-interval basis.
+*
+* FIXME: since this function's been made private and is called by a periodic timer,
+* most of the previous paragraph isn't true anymore... we weren't using that functionality
+* before. are there cases where we should? if not, should we remove the bells & whistles?
 */
-int tr_lpdAnnounceMore( const time_t now, const int interval )
+static int
+tr_lpdAnnounceMore( const time_t now, const int interval )
 {
     tr_torrent* tor = NULL;
     int announcesSent = 0;
@@ -596,6 +614,14 @@ int tr_lpdAnnounceMore( const time_t now, const int interval )
     }
 
     return announcesSent;
+}
+
+static void
+on_upkeep_timer( int foo UNUSED, short bar UNUSED, void * vsession UNUSED )
+{
+    const time_t now = tr_time( );
+    tr_lpdAnnounceMore( now, UPKEEP_INTERVAL_SECS );
+    tr_timerAdd( upkeep_timer, UPKEEP_INTERVAL_SECS, 0 );
 }
 
 /**

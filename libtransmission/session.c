@@ -622,13 +622,6 @@ onNowTimer( int foo UNUSED, short bar UNUSED, void * vsession )
 
     tr_dhtUpkeep( session );
 
-    /* lpd upkeep */
-    if( session->lpdUpkeepAt <= now ) {
-        const int LPD_UPKEEP_INTERVAL_SECS = 5;
-        session->lpdUpkeepAt = now + LPD_UPKEEP_INTERVAL_SECS;
-        tr_lpdAnnounceMore( now, LPD_UPKEEP_INTERVAL_SECS );
-    }
-
     if( session->turtle.isClockEnabled )
         turtleCheckClock( session, &session->turtle );
 

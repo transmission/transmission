@@ -36,8 +36,6 @@ tr_bool tr_lpdEnabled( const tr_session* );
 
 tr_bool tr_lpdSendAnnounce( const tr_torrent* );
 
-int tr_lpdAnnounceMore( const time_t, const int );
-
 /**
 * @defgroup Preproc Helper macros
 * @{
