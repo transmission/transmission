@@ -727,6 +727,7 @@ tr_session * fHandle;
     [fDefaults removeObjectForKey: @"WarningCreatorPrivateBlankAddress"];
     [fDefaults removeObjectForKey: @"WarningRemoveTrackers"];
     [fDefaults removeObjectForKey: @"WarningInvalidOpen"];
+    [fDefaults removeObjectForKey: @"WarningRemoveCompleted"];
     [fDefaults removeObjectForKey: @"WarningDonate"];
     //[fDefaults removeObjectForKey: @"WarningLegal"];
 }

@@ -16,9 +16,9 @@
 	<true/>
 	<key>BindPort</key>
 	<integer>51413</integer>
-	<key>BlocklistNew</key>
-	<false/>
 	<key>BlocklistAutoUpdate</key>
+	<false/>
+	<key>BlocklistNew</key>
 	<false/>
 	<key>CheckDownload</key>
 	<false/>
@@ -98,12 +98,12 @@
 	<string>Constant</string>
 	<key>NatTraversal</key>
 	<true/>
-	<key>PEXGlobal</key>
-	<true/>
 	<key>PeersTorrent</key>
 	<integer>60</integer>
 	<key>PeersTotal</key>
 	<integer>200</integer>
+	<key>PEXGlobal</key>
+	<true/>
 	<key>PiecesBar</key>
 	<false/>
 	<key>PiecesViewShowAvailability</key>
@@ -132,16 +132,14 @@
 	<false/>
 	<key>RPCAuthorize</key>
 	<false/>
-	<key>RPCUseWhitelist</key>
-	<false/>
 	<key>RPCPort</key>
 	<integer>9091</integer>
 	<key>RPCUsername</key>
 	<string>admin</string>
+	<key>RPCUseWhitelist</key>
+	<false/>
 	<key>RPCWebDiscovery</key>
 	<false/>
-	<key>SUEnableAutomaticChecks</key>
-	<true/>
 	<key>SeedingSound</key>
 	<string>Submarine</string>
 	<key>ShowInspector</key>
@@ -160,12 +158,12 @@
 	<false/>
 	<key>SpeedLimitAuto</key>
 	<false/>
+	<key>SpeedLimitAutoDay</key>
+	<integer>127</integer>
 	<key>SpeedLimitAutoOffDate</key>
 	<date>2000-01-01T13:00:00Z</date>
 	<key>SpeedLimitAutoOnDate</key>
 	<date>2000-01-01T03:00:00Z</date>
-	<key>SpeedLimitAutoDay</key>
-	<integer>127</integer>
 	<key>SpeedLimitDownloadLimit</key>
 	<integer>10</integer>
 	<key>SpeedLimitUploadLimit</key>
@@ -176,6 +174,8 @@
 	<true/>
 	<key>StatusLabel</key>
 	<string>RatioTotal</string>
+	<key>SUEnableAutomaticChecks</key>
+	<true/>
 	<key>UploadLimit</key>
 	<integer>50</integer>
 	<key>UseIncompleteDownloadFolder</key>
@@ -197,6 +197,8 @@
 	<key>WarningLegal</key>
 	<true/>
 	<key>WarningRemainingSpace</key>
+	<true/>
+	<key>WarningRemoveCompleted</key>
 	<true/>
 	<key>WarningRemoveTrackers</key>
 	<true/>

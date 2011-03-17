@@ -1233,13 +1233,13 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 
     if ([fDefaults boolForKey: @"CheckRemove"])
     {
-        NSInteger active = 0, downloading = 0;
+        NSUInteger active = 0, downloading = 0;
         for (Torrent * torrent in torrents)
             if ([torrent isActive])
             {
-                active++;
+                ++active;
                 if (![torrent isSeeding])
-                    downloading++;
+                    ++downloading;
             }
 
         if ([fDefaults boolForKey: @"CheckRemoveDownloading"] ? downloading > 0 : active > 0)
@@ -1272,19 +1272,19 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
             {
                 if (deleteData)
                     title = [NSString stringWithFormat:
-                                NSLocalizedString(@"Are you sure you want to remove %d transfers from the transfer list"
-                                " and trash the data files?", "Removal confirm panel -> title"), selected];
+                                NSLocalizedString(@"Are you sure you want to remove %@ transfers from the transfer list"
+                                " and trash the data files?", "Removal confirm panel -> title"), [NSString formattedUInteger: selected]];
                 else
                     title = [NSString stringWithFormat:
-                                NSLocalizedString(@"Are you sure you want to remove %d transfers from the transfer list?",
-                                "Removal confirm panel -> title"), selected];
+                                NSLocalizedString(@"Are you sure you want to remove %@ transfers from the transfer list?",
+                                "Removal confirm panel -> title"), [NSString formattedUInteger: selected]];
                 
                 if (selected == active)
-                    message = [NSString stringWithFormat: NSLocalizedString(@"There are %d active transfers.",
-                                "Removal confirm panel -> message part 1"), active];
+                    message = [NSString stringWithFormat: NSLocalizedString(@"There are %@ active transfers.",
+                                "Removal confirm panel -> message part 1"), [NSString formattedUInteger: active]];
                 else
-                    message = [NSString stringWithFormat: NSLocalizedString(@"There are %d transfers (%d active).",
-                                "Removal confirm panel -> message part 1"), selected, active];
+                    message = [NSString stringWithFormat: NSLocalizedString(@"There are %@ transfers (%@ active).",
+                                "Removal confirm panel -> message part 1"), [NSString formattedUInteger: selected], [NSString formattedUInteger: active]];
                 message = [message stringByAppendingFormat: @" %@",
                             NSLocalizedString(@"Once removed, continuing the transfers will require the torrent files or magnet links.",
                             "Removal confirm panel -> message part 2")];
@@ -1367,6 +1367,43 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     for (Torrent * torrent in fTorrents)
         if ([torrent isFinishedSeeding])
             [torrents addObject: torrent];
+    
+    if ([fDefaults boolForKey: @"WarningRemoveCompleted"])
+    {
+        NSString * message, * info;
+        if ([torrents count] == 1)
+        {
+            NSString * torrentName = [[torrents objectAtIndex: 0] name];
+            message = [NSString stringWithFormat: NSLocalizedString(@"Are you sure you want to remove \"%@\" from the transfer list?",
+                                                                  "Remove completed confirm panel -> title"), torrentName];
+            
+            info = NSLocalizedString(@"Once removed, continuing the transfer will require the torrent file or magnet link.",
+                                     "Remove completed confirm panel -> message");
+        }
+        else
+        {
+            message = [NSString stringWithFormat: NSLocalizedString(@"Are you sure you want to remove %@ completed transfers from the transfer list?",
+                                                                  "Remove completed confirm panel -> title"), [NSString formattedUInteger: [torrents count]]];
+            
+            info = NSLocalizedString(@"Once removed, continuing the transfers will require the torrent files or magnet links.",
+                                     "Remove completed confirm panel -> message");
+        }
+        
+        NSAlert * alert = [[[NSAlert alloc] init] autorelease];
+        [alert setMessageText: message];
+        [alert setInformativeText: info];
+        [alert setAlertStyle: NSWarningAlertStyle];
+        [alert addButtonWithTitle: NSLocalizedString(@"Remove", "Remove completed confirm panel -> button")];
+        [alert addButtonWithTitle: NSLocalizedString(@"Cancel", "Remove completed confirm panel -> button")];
+        [alert setShowsSuppressionButton: YES];
+        
+        const NSInteger returnCode = [alert runModal];
+        if ([[alert suppressionButton] state])
+            [fDefaults setBool: NO forKey: @"WarningRemoveCompleted"];
+        
+        if (returnCode != NSAlertFirstButtonReturn)
+            return;
+    }
     
     [self confirmRemoveTorrents: torrents deleteData: NO];
 }
@@ -3604,6 +3641,19 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     //remove all completed transfers item
     if (action == @selector(clearCompleted:))
     {
+        //append or remove ellipsis when needed
+        NSString * title = [menuItem title], * ellipsis = [NSString ellipsis];
+        if ([fDefaults boolForKey: @"WarningRemoveCompleted"])
+        {
+            if (![title hasSuffix: ellipsis])
+                [menuItem setTitle: [title stringByAppendingEllipsis]];
+        }
+        else
+        {
+            if ([title hasSuffix: ellipsis])
+                [menuItem setTitle: [title substringToIndex: [title rangeOfString: ellipsis].location]];
+        }
+        
         for (Torrent * torrent in fTorrents)
             if ([torrent isFinishedSeeding])
                 return YES;
