@@ -142,6 +142,8 @@ struct tr_session
     struct event                 *udp_event;
     struct event                 *udp6_event;
 
+    time_t                       lpdUpkeepAt;
+
     /* The open port on the local machine for incoming peer requests */
     tr_port                      private_peer_port;
 

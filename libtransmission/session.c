@@ -609,6 +609,7 @@ onNowTimer( int foo UNUSED, short bar UNUSED, void * vsession )
     struct timeval tv;
     tr_torrent * tor = NULL;
     tr_session * session = vsession;
+    const time_t now = time( NULL );
 
     assert( tr_isSession( session ) );
     assert( session->nowTimer != NULL );
@@ -617,9 +618,16 @@ onNowTimer( int foo UNUSED, short bar UNUSED, void * vsession )
     ***  tr_session things to do once per second
     **/
 
-    tr_timeUpdate( time( NULL ) );
+    tr_timeUpdate( now );
 
     tr_dhtUpkeep( session );
+
+    /* lpd upkeep */
+    if( session->lpdUpkeepAt <= now ) {
+        const int LPD_UPKEEP_INTERVAL_SECS = 5;
+        session->lpdUpkeepAt = now + LPD_UPKEEP_INTERVAL_SECS;
+        tr_lpdAnnounceMore( now, LPD_UPKEEP_INTERVAL_SECS );
+    }
 
     if( session->turtle.isClockEnabled )
         turtleCheckClock( session, &session->turtle );

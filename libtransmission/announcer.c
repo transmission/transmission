@@ -28,7 +28,6 @@
 #include "peer-mgr.h" /* tr_peerMgrCompactToPex() */
 #include "ptrarray.h"
 #include "session.h"
-#include "tr-lpd.h"
 #include "torrent.h"
 #include "utils.h"
 
@@ -62,9 +61,6 @@ enum
     NUMWANT = 80,
 
     UPKEEP_INTERVAL_SECS = 1,
-
-    /* this is an upper limit for the frequency of LDS announces */
-    LPD_HOUSEKEEPING_INTERVAL_SECS = 5,
 
     /* this is how often to call the UDP tracker upkeep */
     TAU_UPKEEP_INTERVAL_SECS = 5
@@ -1504,13 +1500,6 @@ onUpkeepTimer( int foo UNUSED, short bar UNUSED, void * vannouncer )
 
     /* maybe send out some announcements to trackers */
     announceMore( announcer );
-
-    /* LPD upkeep */
-    if( announcer->lpdUpkeepAt <= now ) {
-        const int seconds = LPD_HOUSEKEEPING_INTERVAL_SECS;
-        announcer->lpdUpkeepAt = now + jitterize( seconds );
-        tr_lpdAnnounceMore( now, seconds );
-    }
 
     /* TAU upkeep */
     if( announcer->tauUpkeepAt <= now ) {
