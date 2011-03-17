@@ -1106,10 +1106,11 @@ tr_urlParse( const char * url_in,
 
     if( !err && !port )
     {
-        if( !strcmp( protocol, "ftp" ) ) port = 21;
-        if( !strcmp( protocol, "sftp" ) ) port = 22;
-        if( !strcmp( protocol, "http" ) ) port = 80;
-        if( !strcmp( protocol, "https" ) ) port = 443;
+        if( !strcmp( protocol, "udp" ) ) port = 80;
+        else if( !strcmp( protocol, "ftp" ) ) port = 21;
+        else if( !strcmp( protocol, "sftp" ) ) port = 22;
+        else if( !strcmp( protocol, "http" ) ) port = 80;
+        else if( !strcmp( protocol, "https" ) ) port = 443;
     }
 
     if( !err )
