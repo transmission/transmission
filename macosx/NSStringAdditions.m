@@ -122,10 +122,20 @@
 {
     NSAssert(max > 0, @"Cannot generate a time string with no fields");
     
-    NSMutableArray * timeArray = [NSMutableArray arrayWithCapacity: MIN(max, 4)];
+    NSMutableArray * timeArray = [NSMutableArray arrayWithCapacity: MIN(max, 5)];
     NSUInteger remaining = seconds; //causes problems for some users when it's a uint64_t
     
-    if (seconds >= (24 * 60 * 60))
+    if (seconds >= 31557600) //official amount of seconds in one year
+    {
+        const NSUInteger years = remaining / 31557600;
+        if (years == 1)
+            [timeArray addObject: NSLocalizedString(@"1 year", "time string")];
+        else
+            [timeArray addObject: [NSString stringWithFormat: NSLocalizedString(@"%u years", "time string"), years]];
+        remaining %= 31557600;
+        --max;
+    }
+    if (max > 0 && seconds >= (24 * 60 * 60))
     {
         const NSUInteger days = remaining / (24 * 60 * 60);
         if (days == 1)
@@ -133,19 +143,19 @@
         else
             [timeArray addObject: [NSString stringWithFormat: NSLocalizedString(@"%u days", "time string"), days]];
         remaining %= (24 * 60 * 60);
-        max--;
+        --max;
     }
     if (max > 0 && seconds >= (60 * 60))
     {
         [timeArray addObject: [NSString stringWithFormat: NSLocalizedString(@"%u hr", "time string"), remaining / (60 * 60)]];
         remaining %= (60 * 60);
-        max--;
+        --max;
     }
     if (max > 0 && (!showSeconds || seconds >= 60))
     {
         [timeArray addObject: [NSString stringWithFormat: NSLocalizedString(@"%u min", "time string"), remaining / 60]];
         remaining %= 60;
-        max--;
+        --max;
     }
     if (max > 0 && showSeconds)
         [timeArray addObject: [NSString stringWithFormat: NSLocalizedString(@"%u sec", "time string"), remaining]];
