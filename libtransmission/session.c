@@ -21,6 +21,7 @@
 #include <unistd.h> /* stat */
 #include <dirent.h> /* opendir */
 
+#include <event2/dns.h> /* evdns_base_free() */
 #include <event2/event.h>
 
 //#define TR_SHOW_DEPRECATED
@@ -1733,7 +1734,7 @@ sessionCloseImpl( void * vsession )
         tr_lpdUninit( session );
 
     tr_utpClose( session );
-    tr_udpUninit( session );
+    tr_dhtUninit( session );
 
     event_free( session->saveTimer );
     session->saveTimer = NULL;
@@ -1758,12 +1759,33 @@ sessionCloseImpl( void * vsession )
         tr_torrentFree( torrents[i] );
     tr_free( torrents );
 
+    /* Close the announcer *after* closing the torrents
+       so that all the &event=stopped messages will be
+       queued to be sent by tr_announcerClose() */
+    tr_announcerClose( session );
+
+    /* and this goes *after* announcer close so that
+       it won't be idle until the announce events are sent... */
+    tr_webClose( session, TR_WEB_CLOSE_WHEN_IDLE );
+
     tr_cacheFree( session->cache );
     session->cache = NULL;
-    tr_announcerClose( session );
+
+    /* gotta keep udp running long enough to send out all
+       the &event=stopped UDP tracker messages */
+    while( !tr_tracker_udp_is_empty( session ) ) {
+        tr_tracker_udp_upkeep( session );
+        tr_wait_msec( 100 );
+    }
+
+    /* we had to wait until UDP trackers were closed before closing these: */
+    evdns_base_free( session->evdns_base, 0 );
+    session->evdns_base = NULL;
+    tr_tracker_udp_close( session );
+    tr_udpUninit( session );
+
     tr_statsClose( session );
     tr_peerMgrFree( session->peerMgr );
-    tr_webClose( session, TR_WEB_CLOSE_WHEN_IDLE );
 
     closeBlocklists( session );
 
@@ -1801,7 +1823,7 @@ tr_sessionClose( tr_session * session )
      * so we need to keep the transmission thread alive
      * for a bit while they tell the router & tracker
      * that we're closing now */
-    while( ( session->shared || session->web || session->announcer )
+    while( ( session->shared || session->web || session->announcer || session->announcer_udp )
            && !deadlineReached( deadline ) )
     {
         dbgmsg( "waiting on port unmap (%p) or announcer (%p)... now %zu deadline %zu",

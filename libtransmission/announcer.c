@@ -124,7 +124,6 @@ typedef struct tr_announcer
     struct event * upkeepTimer;
     int slotsAvailable;
     int key;
-    time_t lpdUpkeepAt;
     time_t tauUpkeepAt;
 }
 tr_announcer;
@@ -133,14 +132,6 @@ tr_bool
 tr_announcerHasBacklog( const struct tr_announcer * announcer )
 {
     return announcer->slotsAvailable < 1;
-}
-
-static inline time_t
-jitterize( const int val )
-{
-    const double jitter = 0.1;
-    assert( val > 0 );
-    return val + tr_cryptoWeakRandInt((int)(1 + val * jitter));
 }
 
 static void
@@ -158,7 +149,6 @@ tr_announcerInit( tr_session * session )
     a->key = tr_cryptoRandInt( INT_MAX );
     a->session = session;
     a->slotsAvailable = MAX_CONCURRENT_TASKS;
-    a->lpdUpkeepAt = tr_time() + jitterize(5);
     a->upkeepTimer = evtimer_new( session->event_base, onUpkeepTimer, a );
     tr_timerAdd( a->upkeepTimer, UPKEEP_INTERVAL_SECS, 0 );
 
@@ -173,6 +163,8 @@ tr_announcerClose( tr_session * session )
     tr_announcer * announcer = session->announcer;
 
     flushCloseMessages( announcer );
+
+    tr_tracker_udp_start_shutdown( session );
 
     event_free( announcer->upkeepTimer );
     announcer->upkeepTimer = NULL;
@@ -1491,26 +1483,30 @@ announceMore( tr_announcer * announcer )
 static void
 onUpkeepTimer( int foo UNUSED, short bar UNUSED, void * vannouncer )
 {
-    const time_t now = tr_time( );
     tr_announcer * announcer = vannouncer;
-    tr_sessionLock( announcer->session );
+    tr_session * session = announcer->session;
+    const tr_bool is_closing = session->isClosed;
+    const time_t now = tr_time( );
+
+    tr_sessionLock( session );
 
     /* maybe send out some "stopped" messages for closed torrents */
     flushCloseMessages( announcer );
 
     /* maybe send out some announcements to trackers */
-    announceMore( announcer );
+    if( !is_closing ) 
+        announceMore( announcer );
 
     /* TAU upkeep */
     if( announcer->tauUpkeepAt <= now ) {
         announcer->tauUpkeepAt = now + TAU_UPKEEP_INTERVAL_SECS;
-        tr_tracker_udp_upkeep( announcer->session );
+        tr_tracker_udp_upkeep( session );
     }
 
     /* set up the next timer */
     tr_timerAdd( announcer->upkeepTimer, UPKEEP_INTERVAL_SECS, 0 );
 
-    tr_sessionUnlock( announcer->session );
+    tr_sessionUnlock( session );
 }
 
 /***

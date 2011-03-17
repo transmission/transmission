@@ -104,5 +104,16 @@ tr_tracker_stat * tr_announcerStats( const tr_torrent * torrent,
 void tr_announcerStatsFree( tr_tracker_stat * trackers,
                             int               trackerCount );
 
+/***
+****
+***/
+
+void tr_tracker_udp_upkeep( tr_session * session );
+
+void tr_tracker_udp_close( tr_session * session );
+
+tr_bool tr_tracker_udp_is_empty( const tr_session * session );
+
+
 
 #endif /* _TR_ANNOUNCER_H_ */

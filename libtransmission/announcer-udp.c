@@ -19,6 +19,7 @@
 #include <event2/util.h>
 
 #include "transmission.h"
+#include "announcer.h"
 #include "announcer-common.h"
 #include "crypto.h"
 #include "peer-io.h"
@@ -435,13 +436,14 @@ struct tau_tracker
     tau_connection_t connection_id;
     tau_transaction_t connection_transaction_id;
 
+    time_t close_at;
+
     tr_ptrArray announces;
     tr_ptrArray scrapes;
 };
 
 static void tau_tracker_upkeep( struct tau_tracker * );
 
-#if 0
 static void
 tau_tracker_free( struct tau_tracker * t )
 {
@@ -453,7 +455,6 @@ tau_tracker_free( struct tau_tracker * t )
     tr_free( t->key );
     tr_free( t );
 }
-#endif
 
 static void
 tau_tracker_fail_all( struct tau_tracker  * tracker,
@@ -523,6 +524,13 @@ tau_tracker_send_request( struct tau_tracker  * tracker,
     evbuffer_free( buf );
 }
 
+static tr_bool
+tau_tracker_is_empty( const struct tau_tracker * tracker )
+{
+    return tr_ptrArrayEmpty( &tracker->announces )
+        && tr_ptrArrayEmpty( &tracker->scrapes );
+}
+
 static void
 tau_tracker_upkeep( struct tau_tracker * tracker )
 {
@@ -540,8 +548,7 @@ tau_tracker_upkeep( struct tau_tracker * tracker )
     }
 
     /* are there any requests pending? */
-    if( tr_ptrArrayEmpty( &tracker->announces ) &&
-        tr_ptrArrayEmpty( &tracker->scrapes ) )
+    if( tau_tracker_is_empty( tracker ) )
         return;
 
     /* if we don't have an address yet, try & get one now. */
@@ -583,14 +590,21 @@ tau_tracker_upkeep( struct tau_tracker * tracker )
     reqs = &tracker->announces;
     for( i=0, n=tr_ptrArraySize(reqs); i<n; ++i )
     {
+        tr_bool remove_request = FALSE;
         struct tau_announce_request * req = tr_ptrArrayNth( reqs, i );
         if( is_connected && !req->sent_at ) {
             dbgmsg( tracker->key, "Sending an announce request" );
             req->sent_at = now;
             tau_tracker_send_request( tracker, req->payload, req->payload_len );
+            remove_request = req->callback == NULL;
         }
         else if( req->created_at + TAU_REQUEST_TTL < now ) {
             tau_announce_request_fail( tracker->session, req, FALSE, TRUE, NULL );
+            remove_request = TRUE;
+        }
+        if( tracker->close_at && ( tracker->close_at <= time(NULL) ) )
+            remove_request = TRUE;
+        if( remove_request ) {
             tau_announce_request_free( req );
             tr_ptrArrayRemove( reqs, i );
             --i;
@@ -602,14 +616,21 @@ tau_tracker_upkeep( struct tau_tracker * tracker )
     reqs = &tracker->scrapes;
     for( i=0, n=tr_ptrArraySize(reqs); i<n; ++i )
     {
+        tr_bool remove_request = FALSE;
         struct tau_scrape_request * req = tr_ptrArrayNth( reqs, i );
         if( is_connected && !req->sent_at ) {
             dbgmsg( tracker->key, "Sending a scrape request" );
             req->sent_at = now;
             tau_tracker_send_request( tracker, req->payload, req->payload_len );
+            remove_request = req->callback == NULL;
         }
         else if( req->created_at + TAU_REQUEST_TTL < now ) {
             tau_scrape_request_fail( tracker->session, req, FALSE, TRUE, NULL );
+            remove_request = TRUE;
+        }
+        if( tracker->close_at && ( tracker->close_at <= time(NULL) ) )
+            remove_request = TRUE;
+        if( remove_request ) {
             tau_scrape_request_free( req );
             tr_ptrArrayRemove( reqs, i );
             --i;
@@ -739,6 +760,57 @@ tr_tracker_udp_upkeep( tr_session * session )
     if( tau != NULL )
         tr_ptrArrayForeach( &tau->trackers,
                             (PtrArrayForeachFunc)tau_tracker_upkeep );
+}
+
+tr_bool
+tr_tracker_udp_is_empty( const tr_session * session )
+{
+    int i;
+    int n;
+    struct tr_announcer_udp * tau = session->announcer_udp;
+
+    if( tau != NULL )
+        for( i=0, n=tr_ptrArraySize(&tau->trackers); i<n; ++i )
+            if( !tau_tracker_is_empty( tr_ptrArrayNth( &tau->trackers, i ) ) )
+                return FALSE;
+
+    return TRUE;
+}
+
+/* drop dead now. */
+void
+tr_tracker_udp_close( tr_session * session )
+{
+    struct tr_announcer_udp * tau = session->announcer_udp;
+
+    if( tau != NULL )
+    {
+        session->announcer_udp = NULL;
+        tr_ptrArrayDestruct( &tau->trackers, (PtrArrayForeachFunc)tau_tracker_free );
+        tr_free( tau );
+    }
+        
+}
+
+/* start shutting down.
+   This doesn't destroy everything if there are requests,
+   but sets a deadline on how much longer to wait for the remaining ones */
+void
+tr_tracker_udp_start_shutdown( tr_session * session )
+{
+    const time_t now = time( NULL );
+    struct tr_announcer_udp * tau = session->announcer_udp;
+
+    if( tau != NULL )
+    {
+        int i, n;
+        for( i=0, n=tr_ptrArraySize(&tau->trackers); i<n; ++i )
+        {
+            struct tau_tracker * tracker = tr_ptrArrayNth( &tau->trackers, i );
+            tracker->close_at = now + 3;
+            tau_tracker_upkeep( tracker );
+        }
+    }
 }
 
 /* @brief process an incoming udp message if it's a tracker response.

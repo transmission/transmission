@@ -330,7 +330,7 @@ tr_webThreadFunc( void * vsession )
 
         if( web->close_mode == TR_WEB_CLOSE_NOW )
             break;
-        if( ( web->close_mode == TR_WEB_CLOSE_WHEN_IDLE ) && !taskCount )
+        if( ( web->close_mode == TR_WEB_CLOSE_WHEN_IDLE ) && ( web->tasks == NULL ) )
             break;
 
         /* add tasks from the queue */
@@ -349,6 +349,8 @@ tr_webThreadFunc( void * vsession )
         curl_multi_timeout( multi, &msec );
         if( msec < 0 )
             msec = THREADFUNC_MAX_SLEEP_MSEC;
+        if( session->isClosed )
+            msec = 100; /* on shutdown, call perform() more frequently */
         if( msec > 0 )
         {
             int usec;
@@ -368,7 +370,6 @@ tr_webThreadFunc( void * vsession )
             usec = msec * 1000;
             t.tv_sec =  usec / 1000000;
             t.tv_usec = usec % 1000000;
-
             tr_select( max_fd+1, &r_fd_set, &w_fd_set, &c_fd_set, &t );
         }
 
@@ -399,6 +400,15 @@ tr_webThreadFunc( void * vsession )
                 --taskCount;
             }
         }
+
+#if 0
+{
+tr_list * l;
+for( l=web->tasks; l!=NULL; l=l->next )
+    fprintf( stderr, "still pending: %s\n", ((struct tr_web_task*)l->data)->url );
+}
+fprintf( stderr, "loop is ending... web is closing\n" );
+#endif
     }
 
     /* Discard any remaining tasks.

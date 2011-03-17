@@ -169,7 +169,7 @@ tr_utpPacket(const unsigned char *buf, size_t buflen,
              const struct sockaddr *from, socklen_t fromlen,
              tr_session *ss)
 {
-    if(utp_timer == NULL)
+    if( !ss->isClosed && !utp_timer )
     {
         utp_timer = evtimer_new( ss->event_base, timer_callback, ss );
         if(utp_timer == NULL)

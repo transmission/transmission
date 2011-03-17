@@ -289,8 +289,6 @@ tr_udpInit(tr_session *ss)
 void
 tr_udpUninit(tr_session *ss)
 {
-    tr_dhtUninit(ss);
-
     if(ss->udp_socket >= 0) {
         tr_netCloseSocket( ss->udp_socket );
         ss->udp_socket = -1;

@@ -238,6 +238,6 @@ void tr_tracker_udp_announce( tr_session                 * session,
                               tr_announce_response_func    response_func,
                               void                       * user_data );
 
-void tr_tracker_udp_upkeep( tr_session * session );
+void tr_tracker_udp_start_shutdown( tr_session * session );
 
 #endif /* _TR_ANNOUNCER_COMMON_H_ */
