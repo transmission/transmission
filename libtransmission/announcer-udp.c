@@ -592,7 +592,7 @@ tau_tracker_upkeep( struct tau_tracker * tracker )
     {
         tr_bool remove_request = FALSE;
         struct tau_announce_request * req = tr_ptrArrayNth( reqs, i );
-        if( is_connected && !req->sent_at ) {
+        if( is_connected && !req->sent_at && tracker->addr ) {
             dbgmsg( tracker->key, "Sending an announce request" );
             req->sent_at = now;
             tau_tracker_send_request( tracker, req->payload, req->payload_len );
@@ -618,7 +618,7 @@ tau_tracker_upkeep( struct tau_tracker * tracker )
     {
         tr_bool remove_request = FALSE;
         struct tau_scrape_request * req = tr_ptrArrayNth( reqs, i );
-        if( is_connected && !req->sent_at ) {
+        if( is_connected && !req->sent_at && tracker->addr ) {
             dbgmsg( tracker->key, "Sending a scrape request" );
             req->sent_at = now;
             tau_tracker_send_request( tracker, req->payload, req->payload_len );
