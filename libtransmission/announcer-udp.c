@@ -431,7 +431,7 @@ struct tau_tracker
     struct evutil_addrinfo * addr;
     time_t addr_expiration_time;
 
-    tr_bool is_connecting;
+    time_t connecting_at;
     time_t connection_expiration_time;
     tau_connection_t connection_id;
     tau_transaction_t connection_transaction_id;
@@ -524,6 +524,126 @@ tau_tracker_send_request( struct tau_tracker  * tracker,
     evbuffer_free( buf );
 }
 
+static void
+tau_tracker_send_reqs( struct tau_tracker * tracker )
+{
+    int i, n;
+    tr_ptrArray * reqs;
+    const time_t now = tr_time( );
+
+    assert( tracker->is_asking_dns == 0 );
+    assert( tracker->connecting_at == 0 );
+    assert( tracker->addr != NULL );
+    assert( tracker->connection_expiration_time > now );
+
+    reqs = &tracker->announces;
+    for( i=0, n=tr_ptrArraySize(reqs); i<n; ++i ) {
+        struct tau_announce_request * req = tr_ptrArrayNth( reqs, i );
+        if( !req->sent_at ) {
+            dbgmsg( tracker->key, "sending announce req %p", req );
+            req->sent_at = now;
+            tau_tracker_send_request( tracker, req->payload, req->payload_len );
+            if( req->callback == NULL ) {
+                tau_announce_request_free( req );
+                tr_ptrArrayRemove( reqs, i );
+                --i;
+                --n;
+            }
+        }
+    }
+
+    reqs = &tracker->scrapes;
+    for( i=0, n=tr_ptrArraySize(reqs); i<n; ++i ) {
+        struct tau_scrape_request * req = tr_ptrArrayNth( reqs, i );
+        if( !req->sent_at ) {
+            dbgmsg( tracker->key, "sending scrape req %p", req );
+            req->sent_at = now;
+            tau_tracker_send_request( tracker, req->payload, req->payload_len );
+            if( req->callback == NULL) {
+                tau_scrape_request_free( req );
+                tr_ptrArrayRemove( reqs, i );
+                --i;
+                --n;
+            }
+        }
+    }
+}
+
+static void
+on_tracker_connection_response( struct tau_tracker  * tracker,
+                                tau_action_t          action,
+                                struct evbuffer     * buf )
+{
+    const time_t now = tr_time( );
+
+    tracker->connecting_at = 0;
+    tracker->connection_transaction_id = 0;
+
+    if( action == TAU_ACTION_CONNECT )
+    {
+        tracker->connection_id = evbuffer_read_ntoh_64( buf );
+        tracker->connection_expiration_time = now + TAU_CONNECTION_TTL_SECS;
+        dbgmsg( tracker->key, "Got a new connection ID from tracker: %"PRIu64,
+                tracker->connection_id );
+    }
+    else
+    {
+        char * errmsg;
+        const size_t buflen = buf ? evbuffer_get_length( buf ) : 0;
+
+        if( ( action == TAU_ACTION_ERROR ) && ( buflen > 0 ) )
+            errmsg = tr_strndup( evbuffer_pullup( buf, -1 ), buflen );
+        else
+            errmsg = tr_strdup( _( "Connection failed" ) );
+
+        dbgmsg( tracker->key, "%s", errmsg );
+        tau_tracker_fail_all( tracker, TRUE, FALSE, errmsg );
+        tr_free( errmsg );
+    }
+
+    tau_tracker_upkeep( tracker );
+}
+
+static void
+tau_tracker_timeout_reqs( struct tau_tracker * tracker )
+{
+    int i, n;
+    tr_ptrArray * reqs;
+    const time_t now = time( NULL );
+    const tr_bool cancel_all = tracker->close_at && ( tracker->close_at <= now );
+
+
+    if( tracker->connecting_at && ( tracker->connecting_at + TAU_REQUEST_TTL < now ) ) {
+        on_tracker_connection_response( tracker, TAU_ACTION_ERROR, NULL );
+    }
+
+    reqs = &tracker->announces;
+    for( i=0, n=tr_ptrArraySize(reqs); i<n; ++i ) {
+        struct tau_announce_request * req = tr_ptrArrayNth( reqs, i );
+        if( cancel_all || ( req->created_at + TAU_REQUEST_TTL < now ) ) {
+            dbgmsg( tracker->key, "timeout announce req %p", req );
+            tau_announce_request_fail( tracker->session, req, FALSE, TRUE, NULL );
+            tau_announce_request_free( req );
+            tr_ptrArrayRemove( reqs, i );
+            --i;
+            --n;
+        }
+    }
+
+    reqs = &tracker->scrapes;
+    for( i=0, n=tr_ptrArraySize(reqs); i<n; ++i ) {
+        struct tau_scrape_request * req = tr_ptrArrayNth( reqs, i );
+        if( cancel_all || ( req->created_at + TAU_REQUEST_TTL < now ) ) {
+            dbgmsg( tracker->key, "timeout scrape req %p", req );
+            tau_scrape_request_fail( tracker->session, req, FALSE, TRUE, NULL );
+            tau_scrape_request_free( req );
+            tr_ptrArrayRemove( reqs, i );
+            --i;
+            --n;
+        }
+    }
+}
+
 static tr_bool
 tau_tracker_is_empty( const struct tau_tracker * tracker )
 {
@@ -534,11 +654,7 @@ tau_tracker_is_empty( const struct tau_tracker * tracker )
 static void
 tau_tracker_upkeep( struct tau_tracker * tracker )
 {
-    int i;
-    int n;
-    tr_ptrArray * reqs;
     const time_t now = tr_time( );
-    const tr_bool is_connected = tracker->connection_expiration_time > now;
 
     /* if the address info is too old, expire it */
     if( tracker->addr && ( tracker->addr_expiration_time <= now ) ) {
@@ -568,11 +684,18 @@ tau_tracker_upkeep( struct tau_tracker * tracker )
         return;
     }
 
+    dbgmsg( tracker->key, "addr %p -- connected %d (%zu %zu) -- connecting_at %zu",
+            tracker->addr,
+            (int)(tracker->connection_expiration_time > now), (size_t)tracker->connection_expiration_time, (size_t)now,
+            (size_t)tracker->connecting_at );
+
     /* also need a valid connection ID... */
-    if( !is_connected && !tracker->is_connecting && tracker->addr )
+    if( tracker->addr
+        && ( tracker->connection_expiration_time <= now )
+        && ( !tracker->connecting_at ) )
     {
         struct evbuffer * buf = evbuffer_new( );
-        tracker->is_connecting = TRUE;
+        tracker->connecting_at = now;
         tracker->connection_transaction_id = tau_transaction_new( );
         dbgmsg( tracker->key, "Trying to connect. Transaction ID is %u",
                 tracker->connection_transaction_id );
@@ -586,92 +709,10 @@ tau_tracker_upkeep( struct tau_tracker * tracker )
         return;
     }
 
-    /* send the announce requests */
-    reqs = &tracker->announces;
-    for( i=0, n=tr_ptrArraySize(reqs); i<n; ++i )
-    {
-        tr_bool remove_request = FALSE;
-        struct tau_announce_request * req = tr_ptrArrayNth( reqs, i );
-        if( is_connected && !req->sent_at && tracker->addr ) {
-            dbgmsg( tracker->key, "Sending an announce request" );
-            req->sent_at = now;
-            tau_tracker_send_request( tracker, req->payload, req->payload_len );
-            remove_request = req->callback == NULL;
-        }
-        else if( req->created_at + TAU_REQUEST_TTL < now ) {
-            tau_announce_request_fail( tracker->session, req, FALSE, TRUE, NULL );
-            remove_request = TRUE;
-        }
-        if( tracker->close_at && ( tracker->close_at <= time(NULL) ) )
-            remove_request = TRUE;
-        if( remove_request ) {
-            tau_announce_request_free( req );
-            tr_ptrArrayRemove( reqs, i );
-            --i;
-            --n;
-        }
-    }
+    tau_tracker_timeout_reqs( tracker );
 
-    /* send the scrape requests */
-    reqs = &tracker->scrapes;
-    for( i=0, n=tr_ptrArraySize(reqs); i<n; ++i )
-    {
-        tr_bool remove_request = FALSE;
-        struct tau_scrape_request * req = tr_ptrArrayNth( reqs, i );
-        if( is_connected && !req->sent_at && tracker->addr ) {
-            dbgmsg( tracker->key, "Sending a scrape request" );
-            req->sent_at = now;
-            tau_tracker_send_request( tracker, req->payload, req->payload_len );
-            remove_request = req->callback == NULL;
-        }
-        else if( req->created_at + TAU_REQUEST_TTL < now ) {
-            tau_scrape_request_fail( tracker->session, req, FALSE, TRUE, NULL );
-            remove_request = TRUE;
-        }
-        if( tracker->close_at && ( tracker->close_at <= time(NULL) ) )
-            remove_request = TRUE;
-        if( remove_request ) {
-            tau_scrape_request_free( req );
-            tr_ptrArrayRemove( reqs, i );
-            --i;
-            --n;
-        }
-    }
-}
-
-static void
-on_tracker_connection_response( struct tau_tracker  * tracker,
-                                tau_action_t          action,
-                                struct evbuffer     * buf )
-{
-    const time_t now = tr_time( );
-
-    tracker->is_connecting = FALSE;
-    tracker->connection_transaction_id = 0;
-
-    if( action == TAU_ACTION_CONNECT )
-    {
-        tracker->connection_id = evbuffer_read_ntoh_64( buf );
-        tracker->connection_expiration_time = now + TAU_CONNECTION_TTL_SECS;
-        dbgmsg( tracker->key, "Got a new connection ID from tracker: %"PRIu64,
-                tracker->connection_id );
-    }
-    else
-    {
-        char * errmsg;
-        const size_t buflen = evbuffer_get_length( buf );
-
-        if( ( action == TAU_ACTION_ERROR ) && ( buflen > 0 ) )
-            errmsg = tr_strndup( evbuffer_pullup( buf, -1 ), buflen );
-        else
-            errmsg = tr_strdup( _( "Connection refused" ) );
-
-        dbgmsg( tracker->key, "%s", errmsg );
-        tau_tracker_fail_all( tracker, TRUE, FALSE, errmsg );
-        tr_free( errmsg );
-    }
-
-    tau_tracker_upkeep( tracker );
+    if( ( tracker->addr != NULL ) && ( tracker->connection_expiration_time > now ) )
+        tau_tracker_send_reqs( tracker );
 }
 
 /****
@@ -852,7 +893,7 @@ tau_handle_message( tr_session * session, const uint8_t * msg, size_t msglen )
         struct tau_tracker * tracker = tr_ptrArrayNth( &tau->trackers, i );
 
         /* is it a connection response? */
-        if( tracker->is_connecting
+        if( tracker->connecting_at
             && ( transaction_id == tracker->connection_transaction_id ) )
         {
             dbgmsg( tracker->key, "%"PRIu32" is my connection request!", transaction_id );
