@@ -1143,7 +1143,7 @@ announce_request_delegate( tr_announcer               * announcer,
     else if( !memcmp( request->url, "udp://", 6 ) )
         tr_tracker_udp_announce( session, request, callback, callback_data );
     else
-        tr_err( "Unsupported ur: %s", request->url );
+        tr_err( "Unsupported url: %s", request->url );
 
     tr_free( request->tracker_id_str );
     tr_free( request->url );
@@ -1321,7 +1321,7 @@ scrape_request_delegate( tr_announcer             * announcer,
     else if( !memcmp( request->url, "udp://", 6 ) )
         tr_tracker_udp_scrape( session, request, callback, callback_data );
     else
-        tr_err( "Unsupported ur: %s", request->url );
+        tr_err( "Unsupported url: %s", request->url );
 }
 
 static void
