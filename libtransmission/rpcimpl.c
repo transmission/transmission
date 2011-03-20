@@ -838,7 +838,7 @@ addTrackerUrls( tr_torrent * tor, tr_benc * urls )
         const char * announce = NULL;
 
         if(    tr_bencGetStr( val, &announce )
-            && tr_urlIsValid( announce, -1 )
+            && tr_urlIsValidTracker( announce )
             && !findAnnounceUrl( trackers, n, announce, NULL ) )
         {
             trackers[n].tier = ++tier; /* add a new tier */

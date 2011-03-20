@@ -1017,7 +1017,7 @@ isValidURLChars( const char * url, int url_len )
     return TRUE;
 }
 
-/** @brief return TRUE if the url is a http or https url that Transmission understands */
+/** @brief return TRUE if the url is a http or https or UDP URL that Transmission understands */
 tr_bool
 tr_urlIsValidTracker( const char * url )
 {
