@@ -248,7 +248,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         tr_benc settings;
         tr_bencInitDict(&settings, 41);
         const char * configDir = tr_getDefaultConfigDir("Transmission");
-        tr_sessionGetDefaultSettings(configDir, &settings);
+        tr_sessionGetDefaultSettings(&settings);
         
         const BOOL usesSpeedLimitSched = [fDefaults boolForKey: @"SpeedLimitAuto"];
         if (!usesSpeedLimitSched)
