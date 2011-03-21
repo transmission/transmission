@@ -148,63 +148,63 @@ const char* tr_getDefaultDownloadDir( void );
 #define TR_DEFAULT_PEER_LIMIT_GLOBAL_STR        "240"
 #define TR_DEFAULT_PEER_LIMIT_TORRENT_STR        "60"
 
-#define TR_PREFS_KEY_ALT_SPEED_ENABLED             "alt-speed-enabled"
-#define TR_PREFS_KEY_ALT_SPEED_UP_KBps             "alt-speed-up"
-#define TR_PREFS_KEY_ALT_SPEED_DOWN_KBps           "alt-speed-down"
-#define TR_PREFS_KEY_ALT_SPEED_TIME_BEGIN          "alt-speed-time-begin"
-#define TR_PREFS_KEY_ALT_SPEED_TIME_ENABLED        "alt-speed-time-enabled"
-#define TR_PREFS_KEY_ALT_SPEED_TIME_END            "alt-speed-time-end"
-#define TR_PREFS_KEY_ALT_SPEED_TIME_DAY            "alt-speed-time-day"
-#define TR_PREFS_KEY_BIND_ADDRESS_IPV4             "bind-address-ipv4"
-#define TR_PREFS_KEY_BIND_ADDRESS_IPV6             "bind-address-ipv6"
-#define TR_PREFS_KEY_BLOCKLIST_ENABLED             "blocklist-enabled"
-#define TR_PREFS_KEY_BLOCKLIST_URL                 "blocklist-url"
-#define TR_PREFS_KEY_MAX_CACHE_SIZE_MB             "cache-size-mb"
-#define TR_PREFS_KEY_DHT_ENABLED                   "dht-enabled"
-#define TR_PREFS_KEY_UTP_ENABLED                   "utp-enabled"
-#define TR_PREFS_KEY_LPD_ENABLED                   "lpd-enabled"
-#define TR_PREFS_KEY_PREFETCH_ENABLED              "prefetch-enabled"
-#define TR_PREFS_KEY_DOWNLOAD_DIR                  "download-dir"
-#define TR_PREFS_KEY_ENCRYPTION                    "encryption"
-#define TR_PREFS_KEY_IDLE_LIMIT                    "idle-seeding-limit"
-#define TR_PREFS_KEY_IDLE_LIMIT_ENABLED            "idle-seeding-limit-enabled"
-#define TR_PREFS_KEY_INCOMPLETE_DIR                "incomplete-dir"
-#define TR_PREFS_KEY_INCOMPLETE_DIR_ENABLED        "incomplete-dir-enabled"
-#define TR_PREFS_KEY_MSGLEVEL                      "message-level"
-#define TR_PREFS_KEY_OPEN_FILE_LIMIT               "open-file-limit"
-#define TR_PREFS_KEY_PEER_LIMIT_GLOBAL             "peer-limit-global"
-#define TR_PREFS_KEY_PEER_LIMIT_TORRENT            "peer-limit-per-torrent"
-#define TR_PREFS_KEY_PEER_PORT                     "peer-port"
-#define TR_PREFS_KEY_PEER_PORT_RANDOM_ON_START     "peer-port-random-on-start"
-#define TR_PREFS_KEY_PEER_PORT_RANDOM_LOW          "peer-port-random-low"
-#define TR_PREFS_KEY_PEER_PORT_RANDOM_HIGH         "peer-port-random-high"
-#define TR_PREFS_KEY_PEER_SOCKET_TOS               "peer-socket-tos"
-#define TR_PREFS_KEY_PEER_CONGESTION_ALGORITHM     "peer-congestion-algorithm"
-#define TR_PREFS_KEY_PEX_ENABLED                   "pex-enabled"
-#define TR_PREFS_KEY_PORT_FORWARDING               "port-forwarding-enabled"
-#define TR_PREFS_KEY_PREALLOCATION                 "preallocation"
-#define TR_PREFS_KEY_RATIO                         "ratio-limit"
-#define TR_PREFS_KEY_RATIO_ENABLED                 "ratio-limit-enabled"
-#define TR_PREFS_KEY_RENAME_PARTIAL_FILES          "rename-partial-files"
-#define TR_PREFS_KEY_RPC_AUTH_REQUIRED             "rpc-authentication-required"
-#define TR_PREFS_KEY_RPC_BIND_ADDRESS              "rpc-bind-address"
-#define TR_PREFS_KEY_RPC_ENABLED                   "rpc-enabled"
-#define TR_PREFS_KEY_RPC_PASSWORD                  "rpc-password"
-#define TR_PREFS_KEY_RPC_PORT                      "rpc-port"
-#define TR_PREFS_KEY_RPC_USERNAME                  "rpc-username"
-#define TR_PREFS_KEY_RPC_URL                       "rpc-url"
-#define TR_PREFS_KEY_RPC_WHITELIST_ENABLED         "rpc-whitelist-enabled"
-#define TR_PREFS_KEY_SCRIPT_TORRENT_DONE_FILENAME  "script-torrent-done-filename"
-#define TR_PREFS_KEY_SCRIPT_TORRENT_DONE_ENABLED   "script-torrent-done-enabled"
-#define TR_PREFS_KEY_RPC_WHITELIST                 "rpc-whitelist"
-#define TR_PREFS_KEY_DSPEED_KBps                   "speed-limit-down"
-#define TR_PREFS_KEY_DSPEED_ENABLED                "speed-limit-down-enabled"
-#define TR_PREFS_KEY_USPEED_KBps                   "speed-limit-up"
-#define TR_PREFS_KEY_USPEED_ENABLED                "speed-limit-up-enabled"
-#define TR_PREFS_KEY_UMASK                         "umask"
-#define TR_PREFS_KEY_UPLOAD_SLOTS_PER_TORRENT      "upload-slots-per-torrent"
-#define TR_PREFS_KEY_START                         "start-added-torrents"
-#define TR_PREFS_KEY_TRASH_ORIGINAL                "trash-original-torrent-files"
+#define TR_PREFS_KEY_ALT_SPEED_ENABLED            "alt-speed-enabled"
+#define TR_PREFS_KEY_ALT_SPEED_UP_KBps            "alt-speed-up"
+#define TR_PREFS_KEY_ALT_SPEED_DOWN_KBps          "alt-speed-down"
+#define TR_PREFS_KEY_ALT_SPEED_TIME_BEGIN         "alt-speed-time-begin"
+#define TR_PREFS_KEY_ALT_SPEED_TIME_ENABLED       "alt-speed-time-enabled"
+#define TR_PREFS_KEY_ALT_SPEED_TIME_END           "alt-speed-time-end"
+#define TR_PREFS_KEY_ALT_SPEED_TIME_DAY           "alt-speed-time-day"
+#define TR_PREFS_KEY_BIND_ADDRESS_IPV4            "bind-address-ipv4"
+#define TR_PREFS_KEY_BIND_ADDRESS_IPV6            "bind-address-ipv6"
+#define TR_PREFS_KEY_BLOCKLIST_ENABLED            "blocklist-enabled"
+#define TR_PREFS_KEY_BLOCKLIST_URL                "blocklist-url"
+#define TR_PREFS_KEY_MAX_CACHE_SIZE_MB            "cache-size-mb"
+#define TR_PREFS_KEY_DHT_ENABLED                  "dht-enabled"
+#define TR_PREFS_KEY_UTP_ENABLED                  "utp-enabled"
+#define TR_PREFS_KEY_LPD_ENABLED                  "lpd-enabled"
+#define TR_PREFS_KEY_PREFETCH_ENABLED             "prefetch-enabled"
+#define TR_PREFS_KEY_DOWNLOAD_DIR                 "download-dir"
+#define TR_PREFS_KEY_ENCRYPTION                   "encryption"
+#define TR_PREFS_KEY_IDLE_LIMIT                   "idle-seeding-limit"
+#define TR_PREFS_KEY_IDLE_LIMIT_ENABLED           "idle-seeding-limit-enabled"
+#define TR_PREFS_KEY_INCOMPLETE_DIR               "incomplete-dir"
+#define TR_PREFS_KEY_INCOMPLETE_DIR_ENABLED       "incomplete-dir-enabled"
+#define TR_PREFS_KEY_MSGLEVEL                     "message-level"
+#define TR_PREFS_KEY_OPEN_FILE_LIMIT              "open-file-limit"
+#define TR_PREFS_KEY_PEER_LIMIT_GLOBAL            "peer-limit-global"
+#define TR_PREFS_KEY_PEER_LIMIT_TORRENT           "peer-limit-per-torrent"
+#define TR_PREFS_KEY_PEER_PORT                    "peer-port"
+#define TR_PREFS_KEY_PEER_PORT_RANDOM_ON_START    "peer-port-random-on-start"
+#define TR_PREFS_KEY_PEER_PORT_RANDOM_LOW         "peer-port-random-low"
+#define TR_PREFS_KEY_PEER_PORT_RANDOM_HIGH        "peer-port-random-high"
+#define TR_PREFS_KEY_PEER_SOCKET_TOS              "peer-socket-tos"
+#define TR_PREFS_KEY_PEER_CONGESTION_ALGORITHM    "peer-congestion-algorithm"
+#define TR_PREFS_KEY_PEX_ENABLED                  "pex-enabled"
+#define TR_PREFS_KEY_PORT_FORWARDING              "port-forwarding-enabled"
+#define TR_PREFS_KEY_PREALLOCATION                "preallocation"
+#define TR_PREFS_KEY_RATIO                        "ratio-limit"
+#define TR_PREFS_KEY_RATIO_ENABLED                "ratio-limit-enabled"
+#define TR_PREFS_KEY_RENAME_PARTIAL_FILES         "rename-partial-files"
+#define TR_PREFS_KEY_RPC_AUTH_REQUIRED            "rpc-authentication-required"
+#define TR_PREFS_KEY_RPC_BIND_ADDRESS             "rpc-bind-address"
+#define TR_PREFS_KEY_RPC_ENABLED                  "rpc-enabled"
+#define TR_PREFS_KEY_RPC_PASSWORD                 "rpc-password"
+#define TR_PREFS_KEY_RPC_PORT                     "rpc-port"
+#define TR_PREFS_KEY_RPC_USERNAME                 "rpc-username"
+#define TR_PREFS_KEY_RPC_URL                      "rpc-url"
+#define TR_PREFS_KEY_RPC_WHITELIST_ENABLED        "rpc-whitelist-enabled"
+#define TR_PREFS_KEY_SCRIPT_TORRENT_DONE_FILENAME "script-torrent-done-filename"
+#define TR_PREFS_KEY_SCRIPT_TORRENT_DONE_ENABLED  "script-torrent-done-enabled"
+#define TR_PREFS_KEY_RPC_WHITELIST                "rpc-whitelist"
+#define TR_PREFS_KEY_DSPEED_KBps                  "speed-limit-down"
+#define TR_PREFS_KEY_DSPEED_ENABLED               "speed-limit-down-enabled"
+#define TR_PREFS_KEY_USPEED_KBps                  "speed-limit-up"
+#define TR_PREFS_KEY_USPEED_ENABLED               "speed-limit-up-enabled"
+#define TR_PREFS_KEY_UMASK                        "umask"
+#define TR_PREFS_KEY_UPLOAD_SLOTS_PER_TORRENT     "upload-slots-per-torrent"
+#define TR_PREFS_KEY_START                        "start-added-torrents"
+#define TR_PREFS_KEY_TRASH_ORIGINAL               "trash-original-torrent-files"
 
 
 /**
@@ -302,11 +302,13 @@ tr_session * tr_sessionInit( const char     * tag,
                              tr_bool          messageQueueingEnabled,
                              struct tr_benc * settings );
 
-/** @brief Update a session's settings from a benc dictionary like to the one used in tr_sessionInit() */
+/** @brief Update a session's settings from a benc dictionary
+           like to the one used in tr_sessionInit() */
 void tr_sessionSet( tr_session      * session,
                     struct tr_benc  * settings );
 
-/** @brief Rescan the blocklists directory and reload whatever blocklist files are found there */
+/** @brief Rescan the blocklists directory and
+           reload whatever blocklist files are found there */
 void tr_sessionReloadBlocklists( tr_session * session );
 
 
@@ -363,7 +365,7 @@ tr_priority_t tr_ctorGetBandwidthPriority( const tr_ctor * ctor );
  * the new torrent will start downloading into that directory, and then be moved
  * to tr_torrent.downloadDir when the torrent is finished downloading.
  *
- * Torrents are not moved as a result of changing the session's incomplete dir --
+ * Torrents aren't moved as a result of changing the session's incomplete dir --
  * it's applied to new torrents, not existing ones.
  *
  * tr_torrentSetLocation() overrules the incomplete dir: when a user specifies
@@ -398,7 +400,7 @@ tr_bool tr_sessionIsIncompleteDirEnabled( const tr_session * session );
  */
 void tr_sessionSetIncompleteFileNamingEnabled( tr_session * session, tr_bool );
 
-/** @brief return whether or filenames will have ".part" at the end until they're complete */
+/** @brief return true if files will end in ".part" until they're complete */
 tr_bool tr_sessionIsIncompleteFileNamingEnabled( const tr_session * session );
 
 /**
@@ -540,7 +542,7 @@ void tr_sessionSetRPCCallback( tr_session   * session,
 ***
 **/
 
-/** @brief Used by tr_sessionGetStats() and tr_sessionGetCumulativeStats() to give bandwidth statistics */
+/** @brief Used by tr_sessionGetStats() and tr_sessionGetCumulativeStats() */
 typedef struct tr_session_stats
 {
     float       ratio;        /* TR_RATIO_INF, TR_RATIO_NA, or total up/down */
@@ -552,11 +554,13 @@ typedef struct tr_session_stats
 }
 tr_session_stats;
 
-/** @brief Get bandwidth use statistics about the current session */
-void tr_sessionGetStats( const tr_session * session, tr_session_stats * setme );
+/** @brief Get bandwidth use statistics for the current session */
+void tr_sessionGetStats( const tr_session * session,
+                         tr_session_stats * setme );
 
-/** @brief Get cumulative bandwidth use statistics for the current and past sessions */
-void tr_sessionGetCumulativeStats( const tr_session * session, tr_session_stats * setme );
+/** @brief Get cumulative bandwidth statistics for current and past sessions */
+void tr_sessionGetCumulativeStats( const tr_session * session,
+                                   tr_session_stats * setme );
 
 void tr_sessionClearStats( tr_session * session );
 
@@ -1480,7 +1484,7 @@ typedef struct
     /* whether or not we've ever scraped to this tracker */
     tr_bool hasScraped;
 
-    /* ex: http://www.legaltorrents.com:7070 */
+    /* human-readable string identifying the tracker */
     char host[1024];
 
     /* the full announce URL */
