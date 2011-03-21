@@ -247,7 +247,6 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         
         tr_benc settings;
         tr_bencInitDict(&settings, 41);
-        const char * configDir = tr_getDefaultConfigDir("Transmission");
         tr_sessionGetDefaultSettings(&settings);
         
         const BOOL usesSpeedLimitSched = [fDefaults boolForKey: @"SpeedLimitAuto"];
@@ -332,6 +331,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
                                     [NSLocalizedString(@"GB", "Memory size - gigabytes") UTF8String],
                                     [NSLocalizedString(@"TB", "Memory size - terabytes") UTF8String]);
         
+        const char * configDir = tr_getDefaultConfigDir("Transmission");
         fLib = tr_sessionInit("macosx", configDir, YES, &settings);
         tr_bencFree(&settings);
         
