@@ -227,7 +227,7 @@ const char* tr_getDefaultDownloadDir( void );
  * @see tr_sessionInit()
  * @see tr_getDefaultConfigDir()
  */
-void tr_sessionGetDefaultSettings( const char * configDir, struct tr_benc * dictionary );
+void tr_sessionGetDefaultSettings( struct tr_benc * dictionary );
 
 /**
  * Add the session's current configuration settings to the benc dictionary.

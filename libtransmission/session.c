@@ -300,7 +300,7 @@ format_tos(int value)
 }
 
 void
-tr_sessionGetDefaultSettings( const char * configDir UNUSED, tr_benc * d )
+tr_sessionGetDefaultSettings( tr_benc * d )
 {
     assert( tr_bencIsDict( d ) );
 
@@ -443,7 +443,7 @@ tr_sessionLoadSettings( tr_benc * d, const char * configDir, const char * appNam
     /* initializing the defaults: caller may have passed in some app-level defaults.
      * preserve those and use the session defaults to fill in any missing gaps. */
     tr_bencInitDict( &sessionDefaults, 0 );
-    tr_sessionGetDefaultSettings( configDir, &sessionDefaults );
+    tr_sessionGetDefaultSettings( &sessionDefaults );
     tr_bencMergeDicts( &sessionDefaults, d );
     tmp = *d; *d = sessionDefaults; sessionDefaults = tmp;
 
@@ -665,7 +665,7 @@ tr_sessionInitImpl( void * vdata )
             session->bandwidth );
 
     tr_bencInitDict( &settings, 0 );
-    tr_sessionGetDefaultSettings( data->configDir, &settings );
+    tr_sessionGetDefaultSettings( &settings );
     tr_bencMergeDicts( &settings, clientSettings );
 
     assert( session->event_base != NULL );
