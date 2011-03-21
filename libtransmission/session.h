@@ -101,7 +101,6 @@ struct tr_session
     tr_bool                      isPrefetchEnabled;
     tr_bool                      isTorrentDoneScriptEnabled;
     tr_bool                      isClosed;
-    tr_bool                      useLazyBitfield;
     tr_bool                      isIncompleteFileNamingEnabled;
     tr_bool                      isRatioLimited;
     tr_bool                      isIdleLimited;

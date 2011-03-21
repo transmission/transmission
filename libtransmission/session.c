@@ -2092,27 +2092,6 @@ tr_sessionGetCacheLimit_MB( const tr_session * session )
 ****
 ***/
 
-void
-tr_sessionSetLazyBitfieldEnabled( tr_session * session,
-                                  tr_bool      enabled )
-{
-    assert( tr_isSession( session ) );
-
-    session->useLazyBitfield = enabled != 0;
-}
-
-tr_bool
-tr_sessionIsLazyBitfieldEnabled( const tr_session * session )
-{
-    assert( tr_isSession( session ) );
-
-    return session->useLazyBitfield;
-}
-
-/***
-****
-***/
-
 struct port_forwarding_data
 {
     tr_bool enabled;

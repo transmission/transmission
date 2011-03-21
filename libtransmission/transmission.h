@@ -585,9 +585,6 @@ void     tr_sessionSetLPDEnabled( tr_session * session, tr_bool enabled );
 void     tr_sessionSetCacheLimit_MB( tr_session * session, int mb );
 int      tr_sessionGetCacheLimit_MB( const tr_session * session );
 
-void     tr_sessionSetLazyBitfieldEnabled( tr_session * session, tr_bool enabled );
-tr_bool  tr_sessionIsLazyBitfieldEnabled( const tr_session * session );
-
 tr_encryption_mode tr_sessionGetEncryption( tr_session * session );
 void               tr_sessionSetEncryption( tr_session * session,
                                             tr_encryption_mode    mode );
