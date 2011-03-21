@@ -63,6 +63,8 @@ noinst_HEADERS = \
 bin_PROGRAMS = transmission-gtk
 
 dbus_generated_sources = tr-core-dbus.h
+BUILT_SOURCES = $(dbus_generated_sources)
+CLEANFILES = $(dbus_generated_sources)
 
 transmission_gtk_SOURCES = \
     actions.c \
@@ -129,12 +131,11 @@ EXTRA_DIST = \
 DISTCLEANFILES = \
     transmission-gtk.desktop
 
-CLEANFILES = $(dbus_generated_sources)
-
 $(srcdir)/tr-core.c: tr-core-dbus.h
 
 tr-core-dbus.h: $(srcdir)/tr-core-dbus.xml
-	$(DBUS_BINDING_TOOL) --mode=glib-server --prefix=gtr_core $< > $(@F)
+	$(DBUS_BINDING_TOOL) --mode=glib-server --output=$@ --prefix=gtr_core $^
+
 
 if WIN32
 
