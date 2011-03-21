@@ -1671,9 +1671,15 @@ peerCallbackFunc( tr_peer * peer, const tr_peer_event * e, void * vt )
             }
             break;
 
-        case TR_PEER_CLIENT_GOT_REJ:
-            removeRequestFromTables( t, _tr_block( t->tor, e->pieceIndex, e->offset ), peer );
+        case TR_PEER_CLIENT_GOT_REJ: {
+            tr_block_index_t b = _tr_block( t->tor, e->pieceIndex, e->offset );
+            if( b < t->tor->blockCount )
+                removeRequestFromTables( t, b, peer );
+            else
+                tordbg( t, "Peer %s sent an out-of-range reject message",
+                           tr_atomAddrStr( peer->atom ) );
             break;
+        }
 
         case TR_PEER_CLIENT_GOT_CHOKE:
             peerDeclinedAllRequests( t, peer );
