@@ -142,7 +142,7 @@ if WIN32
 transmission.res: transmission.rc
 	$(WINDRES) -J rc -i transmission.rc -O coff -o transmission.res
 
-BUILT_SOURCES = \
+BUILT_SOURCES += \
 	setransmission.res
 
 CLEANFILES += \
