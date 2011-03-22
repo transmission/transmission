@@ -2105,6 +2105,8 @@ pexElementCb( void * vpex, void * userData )
     diffs->elements[diffs->elementCount++] = *pex;
 }
 
+typedef void ( tr_set_func )( void * element, void * userData );
+
 /**
  * @brief find the differences and commonalities in two sorted sets
  * @param a the first set

@@ -402,8 +402,6 @@ char* tr_strsep( char ** str, const char * delim );
 ****
 ***/
 
-typedef void ( tr_set_func )( void * element, void * userData );
-
 int compareInt( const void * va, const void * vb );
 
 void tr_sha1_to_hex( char * out, const uint8_t * sha1 ) TR_GNUC_NONNULL(1,2);
