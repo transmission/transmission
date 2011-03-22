@@ -41,6 +41,7 @@ extern "C" {
 ****
 ***/
 
+#include <stdbool.h>
 #include <inttypes.h> /* uintN_t */
 #include <time.h> /* time_t */
 
