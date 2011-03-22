@@ -473,9 +473,6 @@ char* tr_strpercent( char * buf, double x, size_t buflen );
  */
 char* tr_strratio( char * buf, size_t buflen, double ratio, const char * infinity ) TR_GNUC_NONNULL(1,4);
 
-/* return a truncated double as a string */
-char* tr_strtruncd( char * buf, double x, int precision, size_t buflen );
-
 /** @brief Portability wrapper for localtime_r() that uses the system implementation if available */
 struct tm * tr_localtime_r( const time_t *_clock, struct tm *_result );
 

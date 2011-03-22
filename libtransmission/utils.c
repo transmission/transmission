@@ -1429,7 +1429,8 @@ tr_truncd( double x, int precision )
     return atof(buf);
 }
 
-char*
+/* return a truncated double as a string */
+static char*
 tr_strtruncd( char * buf, double x, int precision, size_t buflen )
 {
     tr_snprintf( buf, buflen, "%.*f", precision, tr_truncd( x, precision ) );
