@@ -2105,6 +2105,71 @@ pexElementCb( void * vpex, void * userData )
     diffs->elements[diffs->elementCount++] = *pex;
 }
 
+/**
+ * @brief find the differences and commonalities in two sorted sets
+ * @param a the first set
+ * @param aCount the number of elements in the set 'a'
+ * @param b the second set
+ * @param bCount the number of elements in the set 'b'
+ * @param compare the sorting method for both sets
+ * @param elementSize the sizeof the element in the two sorted sets
+ * @param in_a called for items in set 'a' but not set 'b'
+ * @param in_b called for items in set 'b' but not set 'a'
+ * @param in_both called for items that are in both sets
+ * @param userData user data passed along to in_a, in_b, and in_both
+ */
+static void
+tr_set_compare( const void * va, size_t aCount,
+                const void * vb, size_t bCount,
+                int compare( const void * a, const void * b ),
+                size_t elementSize,
+                tr_set_func in_a_cb,
+                tr_set_func in_b_cb,
+                tr_set_func in_both_cb,
+                void * userData )
+{
+    const uint8_t * a = va;
+    const uint8_t * b = vb;
+    const uint8_t * aend = a + elementSize * aCount;
+    const uint8_t * bend = b + elementSize * bCount;
+
+    while( a != aend || b != bend )
+    {
+        if( a == aend )
+        {
+            ( *in_b_cb )( (void*)b, userData );
+            b += elementSize;
+        }
+        else if( b == bend )
+        {
+            ( *in_a_cb )( (void*)a, userData );
+            a += elementSize;
+        }
+        else
+        {
+            const int val = ( *compare )( a, b );
+
+            if( !val )
+            {
+                ( *in_both_cb )( (void*)a, userData );
+                a += elementSize;
+                b += elementSize;
+            }
+            else if( val < 0 )
+            {
+                ( *in_a_cb )( (void*)a, userData );
+                a += elementSize;
+            }
+            else if( val > 0 )
+            {
+                ( *in_b_cb )( (void*)b, userData );
+                b += elementSize;
+            }
+        }
+    }
+}
+
+
 static void
 sendPex( tr_peermsgs * msgs )
 {

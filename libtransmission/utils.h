@@ -404,28 +404,6 @@ char* tr_strsep( char ** str, const char * delim );
 
 typedef void ( tr_set_func )( void * element, void * userData );
 
-/**
- * @brief find the differences and commonalities in two sorted sets
- * @param a the first set
- * @param aCount the number of elements in the set 'a'
- * @param b the second set
- * @param bCount the number of elements in the set 'b'
- * @param compare the sorting method for both sets
- * @param elementSize the sizeof the element in the two sorted sets
- * @param in_a called for items in set 'a' but not set 'b'
- * @param in_b called for items in set 'b' but not set 'a'
- * @param in_both called for items that are in both sets
- * @param userData user data passed along to in_a, in_b, and in_both
- */
-void tr_set_compare( const void * a, size_t aCount,
-                     const void * b, size_t bCount,
-                     int compare( const void * a, const void * b ),
-                     size_t elementSize,
-                     tr_set_func in_a_cb,
-                     tr_set_func in_b_cb,
-                     tr_set_func in_both_cb,
-                     void * userData );
-
 int compareInt( const void * va, const void * vb );
 
 void tr_sha1_to_hex( char * out, const uint8_t * sha1 ) TR_GNUC_NONNULL(1,2);

@@ -359,61 +359,6 @@ tr_memdup( const void * src, size_t byteCount )
 ****
 ***/
 
-void
-tr_set_compare( const void * va, size_t aCount,
-                const void * vb, size_t bCount,
-                int compare( const void * a, const void * b ),
-                size_t elementSize,
-                tr_set_func in_a_cb,
-                tr_set_func in_b_cb,
-                tr_set_func in_both_cb,
-                void * userData )
-{
-    const uint8_t * a = va;
-    const uint8_t * b = vb;
-    const uint8_t * aend = a + elementSize * aCount;
-    const uint8_t * bend = b + elementSize * bCount;
-
-    while( a != aend || b != bend )
-    {
-        if( a == aend )
-        {
-            ( *in_b_cb )( (void*)b, userData );
-            b += elementSize;
-        }
-        else if( b == bend )
-        {
-            ( *in_a_cb )( (void*)a, userData );
-            a += elementSize;
-        }
-        else
-        {
-            const int val = ( *compare )( a, b );
-
-            if( !val )
-            {
-                ( *in_both_cb )( (void*)a, userData );
-                a += elementSize;
-                b += elementSize;
-            }
-            else if( val < 0 )
-            {
-                ( *in_a_cb )( (void*)a, userData );
-                a += elementSize;
-            }
-            else if( val > 0 )
-            {
-                ( *in_b_cb )( (void*)b, userData );
-                b += elementSize;
-            }
-        }
-    }
-}
-
-/***
-****
-***/
-
 const char*
 tr_strip_positional_args( const char* str )
 {
