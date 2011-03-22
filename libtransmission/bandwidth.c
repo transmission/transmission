@@ -103,8 +103,8 @@ tr_bandwidthConstruct( tr_bandwidth * b, tr_session * session, tr_bandwidth * pa
     b->session = session;
     b->children = TR_PTR_ARRAY_INIT;
     b->magicNumber = BANDWIDTH_MAGIC_NUMBER;
-    b->band[TR_UP].honorParentLimits = TRUE;
-    b->band[TR_DOWN].honorParentLimits = TRUE;
+    b->band[TR_UP].honorParentLimits = true;
+    b->band[TR_DOWN].honorParentLimits = true;
     tr_bandwidthSetParent( b, parent );
     return b;
 }
@@ -387,7 +387,7 @@ void
 tr_bandwidthUsed( tr_bandwidth  * b,
                   tr_direction    dir,
                   size_t          byteCount,
-                  tr_bool         isPieceData,
+                  bool         isPieceData,
                   uint64_t        now )
 {
     struct tr_band * band;

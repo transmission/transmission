@@ -99,7 +99,7 @@ base32_to_sha1( uint8_t * out, const char * in, const int inlen )
 tr_magnet_info *
 tr_magnetParse( const char * uri )
 {
-    tr_bool got_checksum = FALSE;
+    bool got_checksum = false;
     int trCount = 0;
     int wsCount = 0;
     char * tr[MAX_TRACKERS];
@@ -141,11 +141,11 @@ tr_magnetParse( const char * uri )
 
                 if( hashlen == 40 ) {
                     tr_hex_to_sha1( sha1, hash );
-                    got_checksum = TRUE;
+                    got_checksum = true;
                 }
                 else if( hashlen == 32 ) {
                     base32_to_sha1( sha1, hash, hashlen );
-                    got_checksum = TRUE;
+                    got_checksum = true;
                 }
             }
 

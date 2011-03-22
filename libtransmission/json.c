@@ -26,7 +26,7 @@
 
 struct json_benc_data
 {
-    tr_bool        hasContent;
+    bool        hasContent;
     tr_benc      * top;
     tr_ptrArray    stack;
     char         * key;
@@ -68,7 +68,7 @@ callback( void *             vdata,
     switch( type )
     {
         case JSON_T_ARRAY_BEGIN:
-            data->hasContent = TRUE;
+            data->hasContent = true;
             node = getNode( data );
             tr_bencInitList( node, 0 );
             tr_ptrArrayAppend( &data->stack, node );
@@ -79,7 +79,7 @@ callback( void *             vdata,
             break;
 
         case JSON_T_OBJECT_BEGIN:
-            data->hasContent = TRUE;
+            data->hasContent = true;
             node = getNode( data );
             tr_bencInitDict( node, 0 );
             tr_ptrArrayAppend( &data->stack, node );
@@ -90,39 +90,39 @@ callback( void *             vdata,
             break;
 
         case JSON_T_FLOAT:
-            data->hasContent = TRUE;
+            data->hasContent = true;
             tr_bencInitReal( getNode( data ), value->vu.float_value );
             break;
 
         case JSON_T_NULL:
-            data->hasContent = TRUE;
+            data->hasContent = true;
             tr_bencInitStr( getNode( data ), "", 0 );
             break;
 
         case JSON_T_INTEGER:
-            data->hasContent = TRUE;
+            data->hasContent = true;
             tr_bencInitInt( getNode( data ), value->vu.integer_value );
             break;
 
         case JSON_T_TRUE:
-            data->hasContent = TRUE;
+            data->hasContent = true;
             tr_bencInitBool( getNode( data ), 1 );
             break;
 
         case JSON_T_FALSE:
-            data->hasContent = TRUE;
+            data->hasContent = true;
             tr_bencInitBool( getNode( data ), 0 );
             break;
 
         case JSON_T_STRING:
-            data->hasContent = TRUE;
+            data->hasContent = true;
             tr_bencInitStr( getNode( data ),
                             value->vu.str.value,
                             value->vu.str.length );
             break;
 
         case JSON_T_KEY:
-            data->hasContent = TRUE;
+            data->hasContent = true;
             assert( !data->key );
             data->key = tr_strdup( value->vu.str.value );
             break;
@@ -152,7 +152,7 @@ tr_jsonParse( const char     * source,
     config.callback_ctx = &data;
     config.depth = -1;
 
-    data.hasContent = FALSE;
+    data.hasContent = false;
     data.key = NULL;
     data.top = setme_benc;
     data.stack = TR_PTR_ARRAY_INIT;

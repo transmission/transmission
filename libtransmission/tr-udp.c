@@ -96,7 +96,7 @@ set_socket_buffers(int fd, int large)
 void
 tr_udpSetSocketBuffers(tr_session *session)
 {
-    tr_bool utp = tr_sessionIsUTPEnabled(session);
+    bool utp = tr_sessionIsUTPEnabled(session);
     if(session->udp_socket >= 0)
         set_socket_buffers(session->udp_socket, utp);
     if(session->udp6_socket >= 0)
@@ -110,9 +110,9 @@ tr_udpSetSocketBuffers(tr_session *session)
    IPv6 address, if I may say so myself. */
 
 static void
-rebind_ipv6(tr_session *ss, tr_bool force)
+rebind_ipv6(tr_session *ss, bool force)
 {
-    tr_bool is_default;
+    bool is_default;
     const struct tr_address * public_addr;
     struct sockaddr_in6 sin6;
     const unsigned char *ipv6 = tr_globalIPv6();
@@ -227,7 +227,7 @@ event_callback(int s, short type UNUSED, void *sv)
 void
 tr_udpInit(tr_session *ss)
 {
-    tr_bool is_default;
+    bool is_default;
     const struct tr_address * public_addr;
     struct sockaddr_in sin;
     int rc;
@@ -266,7 +266,7 @@ tr_udpInit(tr_session *ss)
 
  ipv6:
     if(tr_globalIPv6())
-        rebind_ipv6(ss, TRUE);
+        rebind_ipv6(ss, true);
     if(ss->udp6_socket >= 0) {
         ss->udp6_event =
             event_new(ss->event_base, ss->udp6_socket, EV_READ | EV_PERSIST,

@@ -348,7 +348,7 @@ gtr_core_session( TrCore * core )
 ****  BUSY
 ***/
 
-static tr_bool
+static bool
 core_is_busy( TrCore * core )
 {
     return core->priv->busy_count > 0;
@@ -357,7 +357,7 @@ core_is_busy( TrCore * core )
 static void
 core_add_to_busy( TrCore * core, int addMe )
 {
-    const tr_bool wasBusy = core_is_busy( core );
+    const bool wasBusy = core_is_busy( core );
 
     core->priv->busy_count += addMe;
 
@@ -877,7 +877,7 @@ on_torrent_completeness_changed_idle( gpointer gdata )
 static void
 on_torrent_completeness_changed( tr_torrent       * tor,
                                  tr_completeness    completeness,
-                                 tr_bool            was_running,
+                                 bool               was_running,
                                  void             * gcore )
 {
     if( was_running && ( completeness != TR_LEECH ) && ( tr_torrentStat( tor )->sizeWhenDone != 0 ) )
@@ -971,7 +971,7 @@ core_create_new_torrent( TrCore * core, tr_ctor * ctor )
 {
     int errcode = 0;
     tr_torrent * tor;
-    uint8_t do_trash = FALSE;
+    bool do_trash = false;
     tr_session * session = gtr_core_session( core );
 
     /* let the gtk client handle the removal, since libT
@@ -1108,8 +1108,8 @@ struct url_dialog_data
     tr_ctor * ctor;
     char * url;
 
-    tr_bool did_connect;
-    tr_bool did_timeout;
+    bool did_connect;
+    bool did_timeout;
     long response_code;
 };
 
@@ -1143,8 +1143,8 @@ on_url_done_idle( gpointer vdata )
 
 static void
 on_url_done( tr_session   * session,
-             tr_bool        did_connect,
-             tr_bool        did_timeout,
+             bool           did_connect,
+             bool           did_timeout,
              long           response_code,
              const void   * response,
              size_t         response_byte_count,
@@ -1353,7 +1353,7 @@ update_foreach( GtkTreeModel * model,
     int oldActivity, newActivity;
     int oldActivePeerCount, newActivePeerCount;
     int oldError, newError;
-    tr_bool oldFinished, newFinished;
+    bool oldFinished, newFinished;
     tr_priority_t oldPriority, newPriority;
     char * oldCollatedName, * newCollatedName;
     char * oldTrackers, * newTrackers;
@@ -1717,7 +1717,7 @@ static void
 on_port_test_response( TrCore * core, tr_benc * response, gpointer u UNUSED )
 {
     tr_benc * args;
-    tr_bool is_open = FALSE;
+    bool is_open = FALSE;
 
     if( tr_bencDictFindDict( response, "arguments", &args ) )
         tr_bencDictFindBool( args, "port-is-open", &is_open );

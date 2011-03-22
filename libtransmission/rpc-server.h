@@ -24,18 +24,15 @@ tr_rpc_server * tr_rpcInit( tr_session  * session,
 
 void            tr_rpcClose( tr_rpc_server ** freeme );
 
-void            tr_rpcSetEnabled( tr_rpc_server * server,
-                                  tr_bool         isEnabled );
+void            tr_rpcSetEnabled( tr_rpc_server * server, bool isEnabled );
 
-tr_bool         tr_rpcIsEnabled( const tr_rpc_server * server );
+bool            tr_rpcIsEnabled( const tr_rpc_server * server );
 
-void            tr_rpcSetPort( tr_rpc_server * server,
-                               tr_port         port );
+void            tr_rpcSetPort( tr_rpc_server * server, tr_port port );
 
 tr_port         tr_rpcGetPort( const tr_rpc_server * server );
 
-void            tr_rpcSetUrl( tr_rpc_server * server,
-                              const char    * url );
+void            tr_rpcSetUrl( tr_rpc_server * server, const char * url );
 
 const char *    tr_rpcGetUrl( const tr_rpc_server * server );
 
@@ -44,9 +41,9 @@ int             tr_rpcSetTest( const tr_rpc_server   * server,
                                char                 ** allocme_errmsg );
 
 void            tr_rpcSetWhitelistEnabled( tr_rpc_server  * server,
-                                           tr_bool          isEnabled );
+                                           bool             isEnabled );
 
-tr_bool         tr_rpcGetWhitelistEnabled( const tr_rpc_server * server );
+bool            tr_rpcGetWhitelistEnabled( const tr_rpc_server * server );
 
 void            tr_rpcSetWhitelist( tr_rpc_server * server,
                                     const char *    whitelist );
@@ -63,10 +60,9 @@ void            tr_rpcSetUsername( tr_rpc_server * server,
 
 const char*     tr_rpcGetUsername( const tr_rpc_server * server );
 
-void            tr_rpcSetPasswordEnabled( tr_rpc_server * server,
-                                          tr_bool         isEnabled );
+void            tr_rpcSetPasswordEnabled( tr_rpc_server * server, bool isEnabled );
 
-tr_bool         tr_rpcIsPasswordEnabled( const tr_rpc_server * session );
+bool            tr_rpcIsPasswordEnabled( const tr_rpc_server * session );
 
 const char*     tr_rpcGetBindAddress( const tr_rpc_server * server );
 

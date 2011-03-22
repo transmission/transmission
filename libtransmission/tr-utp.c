@@ -68,7 +68,7 @@ UTP_Write(struct UTPSocket *socket, size_t count)
     tr_nerr( MY_NAME, "UTP_RBDrained(%p, %zu) was called.", socket, count );
     dbgmsg( "UTP_RBDrained(%p, %zu) was called.", socket, count );
     assert( 0 ); /* FIXME: this is too much for the long term, but probably needed in the short term */
-    return FALSE;
+    return false;
 }
 
 int tr_utpPacket(const unsigned char *buf UNUSED, size_t buflen UNUSED,

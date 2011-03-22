@@ -29,7 +29,7 @@ void* tr_torrentGetMetadataPiece( tr_torrent * tor, int piece, int * len );
 
 void tr_torrentSetMetadataPiece( tr_torrent * tor, int piece, const void * data, int len );
 
-tr_bool tr_torrentGetNextMetadataRequest( tr_torrent * tor, time_t now, int * setme );
+bool tr_torrentGetNextMetadataRequest( tr_torrent * tor, time_t now, int * setme );
 
 void tr_torrentSetMetadataSizeHint( tr_torrent * tor, int metadata_size );
 

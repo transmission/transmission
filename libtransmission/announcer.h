@@ -76,7 +76,7 @@ struct tr_torrent_tiers * tr_announcerAddTorrent( tr_torrent          * torrent,
                                                   tr_tracker_callback * cb,
                                                   void                * cbdata );
 
-tr_bool tr_announcerHasBacklog( const struct tr_announcer * );
+bool tr_announcerHasBacklog( const struct tr_announcer * );
 
 void tr_announcerResetTorrent( struct tr_announcer*, tr_torrent* );
 
@@ -85,7 +85,7 @@ void tr_announcerRemoveTorrent( struct tr_announcer * ,
 
 void tr_announcerChangeMyPort( tr_torrent * );
 
-tr_bool tr_announcerCanManualAnnounce( const tr_torrent * );
+bool tr_announcerCanManualAnnounce( const tr_torrent * );
 
 void tr_announcerManualAnnounce( tr_torrent * );
 
@@ -112,7 +112,7 @@ void tr_tracker_udp_upkeep( tr_session * session );
 
 void tr_tracker_udp_close( tr_session * session );
 
-tr_bool tr_tracker_udp_is_empty( const tr_session * session );
+bool tr_tracker_udp_is_empty( const tr_session * session );
 
 
 

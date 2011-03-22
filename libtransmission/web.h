@@ -43,8 +43,8 @@ void tr_sessionSetWebConfigFunc( tr_session * session, void (*config)(tr_session
 void tr_webClose( tr_session * session, tr_web_close_mode close_mode );
 
 typedef void ( tr_web_done_func )( tr_session       * session,
-                                   tr_bool            timeout_flag,
-                                   tr_bool            did_connect_flag,
+                                   bool               timeout_flag,
+                                   bool               did_connect_flag,
                                    long               response_code,
                                    const void       * response,
                                    size_t             response_byte_count,
@@ -69,7 +69,7 @@ void tr_webRunWithBuffer( tr_session         * session,
                           void               * done_func_user_data,
                           struct evbuffer    * buffer );
 
-void tr_http_escape( struct evbuffer *out, const char *str, int len, tr_bool escape_slashes );
+void tr_http_escape( struct evbuffer *out, const char *str, int len, bool escape_slashes );
 
 void tr_http_escape_sha1( char * out, const uint8_t * sha1_digest );
 

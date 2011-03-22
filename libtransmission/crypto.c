@@ -83,9 +83,9 @@ struct tr_crypto
     RC4_KEY         dec_key;
     RC4_KEY         enc_key;
     uint8_t         torrentHash[SHA_DIGEST_LENGTH];
-    tr_bool         isIncoming;
-    tr_bool         torrentHashIsSet;
-    tr_bool         mySecretIsSet;
+    bool            isIncoming;
+    bool            torrentHashIsSet;
+    bool            mySecretIsSet;
     uint8_t         myPublicKey[KEY_LEN];
     uint8_t         mySecret[KEY_LEN];
     DH *            dh;
@@ -335,14 +335,14 @@ tr_cryptoRandInt( int upperBound )
 int
 tr_cryptoWeakRandInt( int upperBound )
 {
-    static tr_bool init = FALSE;
+    static bool init = false;
 
     assert( upperBound > 0 );
 
     if( !init )
     {
         srand( tr_time_msec( ) );
-        init = TRUE;
+        init = true;
     }
 
     return rand( ) % upperBound;
@@ -388,14 +388,14 @@ tr_ssha1( const void * plaintext )
     return tr_strdup( &buf );
 }
 
-tr_bool
+bool
 tr_ssha1_matches( const char * source, const char * pass )
 {
     char * salt;
     size_t saltlen;
     char * hashed;
     uint8_t buf[SHA_DIGEST_LENGTH];
-    tr_bool result;
+    bool result;
 
     /* extract the salt */
     saltlen = strlen( source ) - 2*SHA_DIGEST_LENGTH-1;
@@ -410,7 +410,7 @@ tr_ssha1_matches( const char * source, const char * pass )
     hashed[1+2*SHA_DIGEST_LENGTH + saltlen] = '\0';
     hashed[0] = '{';
 
-    result = strcmp( source, hashed ) == 0 ? TRUE : FALSE;
+    result = strcmp( source, hashed ) == 0 ? true : false;
 
     tr_free( hashed );
     tr_free( salt );

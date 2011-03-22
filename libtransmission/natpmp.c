@@ -44,8 +44,8 @@ tr_natpmp_state;
 
 struct tr_natpmp
 {
-    tr_bool           has_discovered;
-    tr_bool           is_mapped;
+    bool              has_discovered;
+    bool              is_mapped;
 
     tr_port           public_port;
     tr_port           private_port;
@@ -112,7 +112,7 @@ setCommandTime( struct tr_natpmp * nat )
 }
 
 int
-tr_natpmpPulse( struct tr_natpmp * nat, tr_port private_port, tr_bool is_enabled, tr_port * public_port )
+tr_natpmpPulse( struct tr_natpmp * nat, tr_port private_port, bool is_enabled, tr_port * public_port )
 {
     int ret;
 
@@ -123,7 +123,7 @@ tr_natpmpPulse( struct tr_natpmp * nat, tr_port private_port, tr_bool is_enabled
         val = sendpublicaddressrequest( &nat->natpmp );
         logVal( "sendpublicaddressrequest", val );
         nat->state = val < 0 ? TR_NATPMP_ERR : TR_NATPMP_RECV_PUB;
-        nat->has_discovered = TRUE;
+        nat->has_discovered = true;
         setCommandTime( nat );
     }
 
@@ -177,7 +177,7 @@ tr_natpmpPulse( struct tr_natpmp * nat, tr_port private_port, tr_bool is_enabled
                 nat->private_port = 0;
                 nat->public_port = 0;
                 nat->state = TR_NATPMP_IDLE;
-                nat->is_mapped = FALSE;
+                nat->is_mapped = false;
             }
         }
         else if( val != NATPMP_TRYAGAIN )
@@ -211,7 +211,7 @@ tr_natpmpPulse( struct tr_natpmp * nat, tr_port private_port, tr_bool is_enabled
         if( val >= 0 )
         {
             nat->state = TR_NATPMP_IDLE;
-            nat->is_mapped = TRUE;
+            nat->is_mapped = true;
             nat->renew_time = tr_time( ) + ( resp.pnu.newportmapping.lifetime / 2 );
             nat->private_port = resp.pnu.newportmapping.privateport;
             nat->public_port = resp.pnu.newportmapping.mappedpublicport;

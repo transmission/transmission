@@ -60,7 +60,7 @@
 
 @end
 
-void completenessChangeCallback(tr_torrent * torrent, tr_completeness status, tr_bool wasRunning, void * torrentData)
+void completenessChangeCallback(tr_torrent * torrent, tr_completeness status, bool wasRunning, void * torrentData)
 {
     NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
     

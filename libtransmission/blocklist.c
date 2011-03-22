@@ -54,7 +54,7 @@ struct tr_ipv4_range
 
 struct tr_blocklist
 {
-    tr_bool                isEnabled;
+    bool                   isEnabled;
     int                    fd;
     size_t                 ruleCount;
     size_t                 byteCount;
@@ -147,7 +147,7 @@ blocklistDelete( tr_blocklist * b )
 ***/
 
 tr_blocklist *
-_tr_blocklistNew( const char * filename, tr_bool isEnabled )
+_tr_blocklistNew( const char * filename, bool isEnabled )
 {
     tr_blocklist * b;
 
@@ -235,7 +235,7 @@ _tr_blocklistHasAddress( tr_blocklist     * b,
  * http://wiki.phoenixlabs.org/wiki/P2P_Format
  * http://en.wikipedia.org/wiki/PeerGuardian#P2P_plaintext_format
  */
-static tr_bool
+static bool
 parseLine1( const char * line, struct tr_ipv4_range * range )
 {
     char * walk;
@@ -246,32 +246,32 @@ parseLine1( const char * line, struct tr_ipv4_range * range )
 
     walk = strrchr( line, ':' );
     if( !walk )
-        return FALSE;
+        return false;
     ++walk; /* walk past the colon */
 
     if( sscanf( walk, "%d.%d.%d.%d-%d.%d.%d.%d",
                 &b[0], &b[1], &b[2], &b[3],
                 &e[0], &e[1], &e[2], &e[3] ) != 8 )
-        return FALSE;
+        return false;
 
     tr_snprintf( str, sizeof( str ), "%d.%d.%d.%d", b[0], b[1], b[2], b[3] );
     if( tr_pton( str, &addr ) == NULL )
-        return FALSE;
+        return false;
     range->begin = ntohl( addr.addr.addr4.s_addr );
 
     tr_snprintf( str, sizeof( str ), "%d.%d.%d.%d", e[0], e[1], e[2], e[3] );
     if( tr_pton( str, &addr ) == NULL )
-        return FALSE;
+        return false;
     range->end = ntohl( addr.addr.addr4.s_addr );
 
-    return TRUE;
+    return true;
 }
 
 /*
  * DAT format: "000.000.000.000 - 000.255.255.255 , 000 , invalid ip"
  * http://wiki.phoenixlabs.org/wiki/DAT_Format
  */
-static tr_bool
+static bool
 parseLine2( const char * line, struct tr_ipv4_range * range )
 {
     int unk;
@@ -284,19 +284,19 @@ parseLine2( const char * line, struct tr_ipv4_range * range )
                 &a[0], &a[1], &a[2], &a[3],
                 &b[0], &b[1], &b[2], &b[3],
                 &unk ) != 9 )
-        return FALSE;
+        return false;
 
     tr_snprintf( str, sizeof(str), "%d.%d.%d.%d", a[0], a[1], a[2], a[3] );
     if( tr_pton( str, &addr ) == NULL )
-        return FALSE;
+        return false;
     range->begin = ntohl( addr.addr.addr4.s_addr );
 
     tr_snprintf( str, sizeof(str), "%d.%d.%d.%d", b[0], b[1], b[2], b[3] );
     if( tr_pton( str, &addr ) == NULL )
-        return FALSE;
+        return false;
     range->end = ntohl( addr.addr.addr4.s_addr );
 
-    return TRUE;
+    return true;
 }
 
 static int

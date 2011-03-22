@@ -18,7 +18,7 @@
 #include "bitset.h"
 #include "utils.h"
 
-const tr_bitset TR_BITSET_INIT = { FALSE, FALSE, { NULL, 0, 0 } };
+const tr_bitset TR_BITSET_INIT = { false, false, { NULL, 0, 0 } };
 
 void
 tr_bitsetConstruct( tr_bitset * b, size_t bitCount )
@@ -39,22 +39,22 @@ tr_bitsetClear( tr_bitset * b )
 {
     tr_free( b->bitfield.bits );
     b->bitfield.bits = NULL;
-    b->haveAll = FALSE;
-    b->haveNone = FALSE;
+    b->haveAll = false;
+    b->haveNone = false;
 }
 
 void
 tr_bitsetSetHaveAll( tr_bitset * b )
 {
     tr_bitsetClear( b );
-    b->haveAll = TRUE;
+    b->haveAll = true;
 }
 
 void
 tr_bitsetSetHaveNone( tr_bitset * b )
 {
     tr_bitsetClear( b );
-    b->haveNone = TRUE;
+    b->haveNone = true;
 }
 
 void
@@ -91,7 +91,7 @@ tr_bitsetAdd( tr_bitset * b, size_t i )
     if( b->haveAll )
         return;
 
-    b->haveNone = FALSE;
+    b->haveNone = false;
 
     /* do we need to resize the bitfield to accomodate this bit? */
     if( !bf->bits || ( bf->bitCount < i+1 ) )
@@ -114,7 +114,7 @@ tr_bitsetRem( tr_bitset * b, size_t i )
     if( b->haveNone )
         return;
 
-    b->haveAll = FALSE;
+    b->haveAll = false;
 
     if( !b->bitfield.bits )
     {
@@ -131,7 +131,7 @@ tr_bitsetRemRange( tr_bitset * b, size_t begin, size_t end )
     if( b->haveNone )
         return;
 
-    b->haveAll = FALSE;
+    b->haveAll = false;
     if( !b->bitfield.bits )
     {
         tr_bitfieldConstruct( &b->bitfield, b->bitfield.bitCount );
@@ -145,12 +145,12 @@ tr_bitsetRemRange( tr_bitset * b, size_t begin, size_t end )
 ****
 ***/
 
-tr_bool
+bool
 tr_bitsetHas( const tr_bitset * b, const size_t nth )
 {
-    if( b->haveAll ) return TRUE;
-    if( b->haveNone ) return FALSE;
-    if( nth >= b->bitfield.bitCount ) return FALSE;
+    if( b->haveAll ) return true;
+    if( b->haveNone ) return false;
+    if( nth >= b->bitfield.bitCount ) return false;
     return tr_bitfieldHas( &b->bitfield, nth );
 }
 
@@ -184,34 +184,34 @@ tr_bitsetOr( tr_bitfield * a, const tr_bitset * b )
 ****
 ***/
 
-tr_bool
+bool
 tr_bitsetFromBenc( tr_bitset * b, tr_benc * benc )
 {
     size_t buflen;
     const uint8_t * buf;
-    tr_bool handled = FALSE;
+    bool handled = false;
 
     if( tr_bencGetRaw( benc, &buf, &buflen ) )
     {
         if( ( buflen == 3 ) && !memcmp( buf, "all", 3 ) )
         {
             tr_bitsetSetHaveAll( b );
-            handled = TRUE;
+            handled = true;
         }
         else if( ( buflen == 4 ) && !memcmp( buf, "none", 4 ) )
         {
             tr_bitsetSetHaveNone( b );
-            handled = TRUE;
+            handled = true;
         }
         else
         {
-            b->haveAll = FALSE;
-            b->haveNone = FALSE;
+            b->haveAll = false;
+            b->haveNone = false;
             tr_free( b->bitfield.bits );
             b->bitfield.bits = tr_memdup( buf, buflen );
             b->bitfield.byteCount = buflen;
             b->bitfield.bitCount = buflen * 8;
-            handled = TRUE;
+            handled = true;
         }
     }
 

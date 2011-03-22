@@ -30,14 +30,6 @@ extern "C" {
  * @{
  */
 
-#ifndef FALSE
- #define FALSE 0
-#endif
-
-#ifndef TRUE
- #define TRUE 1
-#endif
-
 #ifndef UNUSED
  #ifdef __GNUC__
   #define UNUSED __attribute__ ( ( unused ) )
@@ -120,7 +112,7 @@ static inline tr_msg_level tr_getMessageLevel( void )
     return __tr_message_level;
 }
 
-static inline tr_bool tr_msgLoggingIsActive( tr_msg_level level )
+static inline bool tr_msgLoggingIsActive( tr_msg_level level )
 {
     return tr_getMessageLevel() >= level;
 }
@@ -189,7 +181,7 @@ void tr_msg( const char * file, int line,
 void* tr_getLog( void );
 
 /** @brief return true if deep logging has been enabled by the user; false otherwise */
-tr_bool tr_deepLoggingIsActive( void );
+bool tr_deepLoggingIsActive( void );
 
 void           tr_deepLog( const char * file,
                            int          line,
@@ -205,7 +197,7 @@ char* tr_getLogTimeStr( char * buf, int buflen ) TR_GNUC_NONNULL(1);
  * @brief Rich Salz's classic implementation of shell-style pattern matching for ?, \, [], and * characters.
  * @return 1 if the pattern matches, 0 if it doesn't, or -1 if an error occured
  */
-int tr_wildmat( const char * text, const char * pattern ) TR_GNUC_NONNULL(1,2);
+bool tr_wildmat( const char * text, const char * pattern ) TR_GNUC_NONNULL(1,2);
 
 /** @brief Portability wrapper for basename() that uses the system implementation if available */
 char* tr_basename( const char * path ) TR_GNUC_MALLOC;
@@ -356,7 +348,7 @@ int tr_lowerBound( const void * key,
                    size_t       nmemb,
                    size_t       size,
                    int       (* compar)(const void* key, const void* arrayMember),
-                   tr_bool    * exact_match ) TR_GNUC_HOT TR_GNUC_NONNULL(1,5,6);
+                   bool       * exact_match ) TR_GNUC_HOT TR_GNUC_NONNULL(1,5,6);
 
 
 /**
@@ -398,7 +390,7 @@ const char* tr_strerror( int );
 char* tr_strstrip( char * str );
 
 /** @brief Returns true if the string ends with the specified case-insensitive suffix */
-tr_bool tr_str_has_suffix( const char *str, const char *suffix );
+bool tr_str_has_suffix( const char *str, const char *suffix );
 
 
 /** @brief Portability wrapper for memmem() that uses the system implementation if available */
@@ -443,13 +435,13 @@ void tr_sha1_to_hex( char * out, const uint8_t * sha1 ) TR_GNUC_NONNULL(1,2);
 void tr_hex_to_sha1( uint8_t * out, const char * hex ) TR_GNUC_NONNULL(1,2);
 
 /** @brief convenience function to determine if an address is an IP address (IPv4 or IPv6) */
-tr_bool tr_addressIsIP( const char * address );
+bool tr_addressIsIP( const char * address );
 
-/** @brief return TRUE if the url is a http or https url that Transmission understands */
-tr_bool tr_urlIsValidTracker( const char * url ) TR_GNUC_NONNULL(1);
+/** @brief return true if the url is a http or https url that Transmission understands */
+bool tr_urlIsValidTracker( const char * url ) TR_GNUC_NONNULL(1);
 
-/** @brief return TRUE if the url is a [ http, https, ftp, ftps ] url that Transmission understands */
-tr_bool tr_urlIsValid( const char * url, int url_len ) TR_GNUC_NONNULL(1);
+/** @brief return true if the url is a [ http, https, ftp, ftps ] url that Transmission understands */
+bool tr_urlIsValid( const char * url, int url_len ) TR_GNUC_NONNULL(1);
 
 /** @brief parse a URL into its component parts
     @return zero on success or an error number if an error occurred */
@@ -517,10 +509,10 @@ struct tm * tr_localtime_r( const time_t *_clock, struct tm *_result );
  * @return 0 on success; otherwise, return -1 and set errno
  */
 int tr_moveFile( const char * oldpath, const char * newpath,
-                 tr_bool * renamed ) TR_GNUC_NONNULL(1,2);
+                 bool * renamed ) TR_GNUC_NONNULL(1,2);
 
 /** @brief Test to see if the two filenames point to the same file. */
-tr_bool tr_is_same_file( const char * filename1, const char * filename2 );
+bool tr_is_same_file( const char * filename1, const char * filename2 );
 
 /** @brief convenience function to remove an item from an array */
 void tr_removeElementFromArray( void         * array,

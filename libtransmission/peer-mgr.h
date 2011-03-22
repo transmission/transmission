@@ -89,11 +89,11 @@ struct peer_atom;
  */
 typedef struct tr_peer
 {
-    tr_bool                  peerIsChoked;
-    tr_bool                  peerIsInterested;
-    tr_bool                  clientIsChoked;
-    tr_bool                  clientIsInterested;
-    tr_bool                  doPurge;
+    bool                     peerIsChoked;
+    bool                     peerIsInterested;
+    bool                     clientIsChoked;
+    bool                     clientIsInterested;
+    bool                     doPurge;
 
     /* number of bad pieces they've contributed to */
     uint8_t                  strikes;
@@ -136,7 +136,7 @@ void tr_peerConstruct( struct tr_peer * peer );
 void tr_peerDestruct( tr_torrent * tor, struct tr_peer * peer );
 
 
-static inline tr_bool
+static inline bool
 tr_isPex( const tr_pex * pex )
 {
     return pex && tr_isAddress( &pex->addr );
@@ -150,7 +150,7 @@ tr_peerMgr* tr_peerMgrNew( tr_session * );
 
 void tr_peerMgrFree( tr_peerMgr * manager );
 
-tr_bool tr_peerMgrPeerIsSeed( const tr_torrent * tor,
+bool tr_peerMgrPeerIsSeed( const tr_torrent * tor,
                               const tr_address * addr );
 
 void tr_peerMgrSetUtpSupported( tr_torrent       * tor,
@@ -158,7 +158,7 @@ void tr_peerMgrSetUtpSupported( tr_torrent       * tor,
 
 void tr_peerMgrSetUtpFailed( tr_torrent *tor,
                              const tr_address *addr,
-                             tr_bool failed );
+                             bool failed );
 
 void tr_peerMgrGetNextRequests( tr_torrent          * torrent,
                                 tr_peer             * peer,
@@ -166,9 +166,9 @@ void tr_peerMgrGetNextRequests( tr_torrent          * torrent,
                                 tr_block_index_t    * setme,
                                 int                 * numgot );
 
-tr_bool tr_peerMgrDidPeerRequest( const tr_torrent  * torrent,
-                                  const tr_peer     * peer,
-                                  tr_block_index_t    block );
+bool tr_peerMgrDidPeerRequest( const tr_torrent  * torrent,
+                               const tr_peer     * peer,
+                               tr_block_index_t    block );
 
 void tr_peerMgrRebuildRequests( tr_torrent * torrent );
 

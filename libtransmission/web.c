@@ -76,8 +76,8 @@ struct tr_web_task
 {
     long code;
     long timeout_secs;
-    tr_bool did_connect;
-    tr_bool did_timeout;
+    bool did_connect;
+    bool did_timeout;
     struct evbuffer * response;
     struct evbuffer * freebuf;
     char * url;
@@ -118,8 +118,8 @@ static int
 sockoptfunction( void * vtask, curl_socket_t fd, curlsocktype purpose UNUSED )
 {
     struct tr_web_task * task = vtask;
-    const tr_bool isScrape = strstr( task->url, "scrape" ) != NULL;
-    const tr_bool isAnnounce = strstr( task->url, "announce" ) != NULL;
+    const bool isScrape = strstr( task->url, "scrape" ) != NULL;
+    const bool isAnnounce = strstr( task->url, "announce" ) != NULL;
 
     /* announce and scrape requests have tiny payloads. */
     if( isScrape || isAnnounce )
@@ -153,7 +153,7 @@ static CURL *
 createEasy( tr_session * s, struct tr_web_task * task )
 {
     const tr_address * addr;
-    tr_bool is_default_value;
+    bool is_default_value;
     CURL * e = curl_easy_init( );
     const long verbose = getenv( "TR_CURL_VERBOSE" ) != NULL;
     char * cookie_filename = tr_buildPath( s->configDir, "cookies.txt", NULL );
@@ -501,7 +501,7 @@ tr_webGetResponseStr( long code )
 
 void
 tr_http_escape( struct evbuffer  * out,
-                const char * str, int len, tr_bool escape_slashes )
+                const char * str, int len, bool escape_slashes )
 {
     const char * end;
 

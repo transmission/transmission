@@ -21,11 +21,11 @@
 
 struct tr_benc;
 
-tr_bool  tr_metainfoParse( const tr_session     * session,
-                           const struct tr_benc * benc,
-                           tr_info              * setmeInfo,
-                           tr_bool              * setmeHasInfoDict,
-                           int                  * setmeInfoDictLength );
+bool  tr_metainfoParse( const tr_session     * session,
+                        const struct tr_benc * benc,
+                        tr_info              * setmeInfo,
+                        bool                 * setmeHasInfoDict,
+                        int                  * setmeInfoDictLength );
 
 void tr_metainfoRemoveSaved( const tr_session * session,
                              const tr_info    * info );

@@ -73,7 +73,7 @@ tr_thread* tr_threadNew( void ( *func )(void *), void * arg );
 
 /** @brief Return nonzero if this function is being called from `thread'
     @param thread the thread being tested */
-tr_bool tr_amInThread( const tr_thread * );
+bool tr_amInThread( const tr_thread * );
 
 /***
 ****

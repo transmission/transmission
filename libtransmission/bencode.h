@@ -138,7 +138,7 @@ int tr_bencListReserve( tr_benc *, size_t reserveCount );
 
 tr_benc * tr_bencListAdd( tr_benc * );
 
-tr_benc * tr_bencListAddBool( tr_benc *, tr_bool val );
+tr_benc * tr_bencListAddBool( tr_benc *, bool val );
 
 tr_benc * tr_bencListAddInt( tr_benc *, int64_t val );
 
@@ -172,7 +172,7 @@ tr_benc * tr_bencDictAddReal( tr_benc *, const char * key, double );
 
 tr_benc * tr_bencDictAddInt( tr_benc *, const char * key, int64_t );
 
-tr_benc * tr_bencDictAddBool( tr_benc *, const char * key, tr_bool );
+tr_benc * tr_bencDictAddBool( tr_benc *, const char * key, bool );
 
 tr_benc * tr_bencDictAddStr( tr_benc *, const char * key, const char * );
 
@@ -183,23 +183,23 @@ tr_benc * tr_bencDictAddDict( tr_benc *, const char * key, size_t reserve );
 tr_benc * tr_bencDictAddRaw( tr_benc *, const char * key,
                              const void * raw, size_t rawlen );
 
-tr_bool   tr_bencDictChild( tr_benc *, size_t i, const char ** key, tr_benc ** val );
+bool      tr_bencDictChild( tr_benc *, size_t i, const char ** key, tr_benc ** val );
 
 tr_benc*  tr_bencDictFind( tr_benc *, const char * key );
 
-tr_bool   tr_bencDictFindList( tr_benc *, const char * key, tr_benc ** setme );
+bool      tr_bencDictFindList( tr_benc *, const char * key, tr_benc ** setme );
 
-tr_bool   tr_bencDictFindDict( tr_benc *, const char * key, tr_benc ** setme );
+bool      tr_bencDictFindDict( tr_benc *, const char * key, tr_benc ** setme );
 
-tr_bool   tr_bencDictFindInt( tr_benc *, const char * key, int64_t * setme );
+bool      tr_bencDictFindInt( tr_benc *, const char * key, int64_t * setme );
 
-tr_bool   tr_bencDictFindReal( tr_benc *, const char * key, double * setme );
+bool      tr_bencDictFindReal( tr_benc *, const char * key, double * setme );
 
-tr_bool   tr_bencDictFindBool( tr_benc *, const char * key, tr_bool * setme );
+bool      tr_bencDictFindBool( tr_benc *, const char * key, bool * setme );
 
-tr_bool   tr_bencDictFindStr( tr_benc *, const char * key, const char ** setme );
+bool      tr_bencDictFindStr( tr_benc *, const char * key, const char ** setme );
 
-tr_bool   tr_bencDictFindRaw( tr_benc *, const char * key,
+bool      tr_bencDictFindRaw( tr_benc *, const char * key,
                               const uint8_t ** setme_raw, size_t * setme_len );
 
 /***
@@ -207,33 +207,33 @@ tr_bool   tr_bencDictFindRaw( tr_benc *, const char * key,
 ***/
 
 /** @brief Get an int64_t from a variant object
-    @return TRUE if successful, or FALSE if the variant could not be represented as an int64_t  */
-tr_bool   tr_bencGetInt( const tr_benc * val, int64_t * setme );
+    @return true if successful, or false if the variant could not be represented as an int64_t  */
+bool      tr_bencGetInt( const tr_benc * val, int64_t * setme );
 
 /** @brief Get an string from a variant object
-    @return TRUE if successful, or FALSE if the variant could not be represented as a string  */
-tr_bool   tr_bencGetStr( const tr_benc * val, const char ** setme );
+    @return true if successful, or false if the variant could not be represented as a string  */
+bool      tr_bencGetStr( const tr_benc * val, const char ** setme );
 
 /** @brief Get a raw byte array from a variant object
-    @return TRUE if successful, or FALSE if the variant could not be represented as a raw byte array */
-tr_bool   tr_bencGetRaw( const tr_benc * val, const uint8_t  ** setme_raw, size_t * setme_len );
+    @return true if successful, or false if the variant could not be represented as a raw byte array */
+bool      tr_bencGetRaw( const tr_benc * val, const uint8_t  ** setme_raw, size_t * setme_len );
 
 /** @brief Get a boolean from a variant object
-    @return TRUE if successful, or FALSE if the variant could not be represented as a boolean  */
-tr_bool   tr_bencGetBool( const tr_benc * val, tr_bool * setme );
+    @return true if successful, or false if the variant could not be represented as a boolean  */
+bool      tr_bencGetBool( const tr_benc * val, bool * setme );
 
 /** @brief Get a floating-point number from a variant object
-    @return TRUE if successful, or FALSE if the variant could not be represented as a floating-point number  */
-tr_bool   tr_bencGetReal( const tr_benc * val, double * setme );
+    @return true if successful, or false if the variant could not be represented as a floating-point number  */
+bool      tr_bencGetReal( const tr_benc * val, double * setme );
 
-static inline tr_bool tr_bencIsType  ( const tr_benc * b, int type ) { return ( b != NULL ) && ( b->type == type ); }
+static inline bool tr_bencIsType  ( const tr_benc * b, int type ) { return ( b != NULL ) && ( b->type == type ); }
 
-static inline tr_bool tr_bencIsInt   ( const tr_benc * b ) { return tr_bencIsType( b, TR_TYPE_INT ); }
-static inline tr_bool tr_bencIsDict  ( const tr_benc * b ) { return tr_bencIsType( b, TR_TYPE_DICT ); }
-static inline tr_bool tr_bencIsList  ( const tr_benc * b ) { return tr_bencIsType( b, TR_TYPE_LIST ); }
-static inline tr_bool tr_bencIsString( const tr_benc * b ) { return tr_bencIsType( b, TR_TYPE_STR ); }
-static inline tr_bool tr_bencIsBool  ( const tr_benc * b ) { return tr_bencIsType( b, TR_TYPE_BOOL ); }
-static inline tr_bool tr_bencIsReal  ( const tr_benc * b ) { return tr_bencIsType( b, TR_TYPE_REAL ); }
+static inline bool tr_bencIsInt   ( const tr_benc * b ) { return tr_bencIsType( b, TR_TYPE_INT ); }
+static inline bool tr_bencIsDict  ( const tr_benc * b ) { return tr_bencIsType( b, TR_TYPE_DICT ); }
+static inline bool tr_bencIsList  ( const tr_benc * b ) { return tr_bencIsType( b, TR_TYPE_LIST ); }
+static inline bool tr_bencIsString( const tr_benc * b ) { return tr_bencIsType( b, TR_TYPE_STR ); }
+static inline bool tr_bencIsBool  ( const tr_benc * b ) { return tr_bencIsType( b, TR_TYPE_BOOL ); }
+static inline bool tr_bencIsReal  ( const tr_benc * b ) { return tr_bencIsType( b, TR_TYPE_REAL ); }
 
 /** @brief Private function that's exposed here only for unit tests */
 int tr_bencParseInt( const uint8_t *  buf,

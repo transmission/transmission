@@ -348,7 +348,7 @@ onAltSpeedToggledIdle( gpointer vp )
 }
 
 static void
-onAltSpeedToggled( tr_session * s UNUSED, tr_bool isEnabled UNUSED, tr_bool byUser UNUSED, void * p )
+onAltSpeedToggled( tr_session * s UNUSED, bool isEnabled UNUSED, bool byUser UNUSED, void * p )
 {
     gtr_idle_add( onAltSpeedToggledIdle, p );
 }

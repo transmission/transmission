@@ -110,7 +110,7 @@ static inline int tr_ptrArraySize( const tr_ptrArray *  a )
 
 /** @brief Return True if the array has no pointers
     @return True if the array has no pointers */
-static inline tr_bool tr_ptrArrayEmpty( const tr_ptrArray * a )
+static inline bool tr_ptrArrayEmpty( const tr_ptrArray * a )
 {
     return tr_ptrArraySize(a) == 0;
 }
@@ -118,7 +118,7 @@ static inline tr_bool tr_ptrArrayEmpty( const tr_ptrArray * a )
 int tr_ptrArrayLowerBound( const tr_ptrArray * array,
                            const void * key,
                            int compare( const void * arrayItem, const void * key ),
-                           tr_bool * exact_match );
+                           bool * exact_match );
 
 /** @brief Insert a pointer into the array at the position determined by the sort function
     @return the index of the stored pointer */

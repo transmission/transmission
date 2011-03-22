@@ -70,8 +70,8 @@ struct run_info
   int       pos;
   int       rank;
   time_t    last_block_time;
-  tr_bool   is_multi_piece;
-  tr_bool   is_piece_done;
+  bool      is_multi_piece;
+  bool      is_piece_done;
   unsigned  len;
 };
 
@@ -98,7 +98,7 @@ getBlockRun( const tr_cache * cache, int pos, struct run_info * info )
         const struct cache_block * b = blocks[i-1];
         info->last_block_time = b->time;
         info->is_piece_done = tr_cpPieceIsComplete( &b->tor->completion, b->piece );
-        info->is_multi_piece = b->piece != blocks[pos]->piece ? TRUE : FALSE;
+        info->is_multi_piece = b->piece != blocks[pos]->piece ? true : false;
         info->len = i - pos;
         info->pos = pos;
     }

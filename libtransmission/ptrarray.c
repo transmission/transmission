@@ -117,7 +117,7 @@ tr_ptrArrayLowerBound( const tr_ptrArray *                t,
                        const void *                       ptr,
                        int                 compare( const void *,
                                                     const void * ),
-                       tr_bool *                    exact_match )
+                       bool *                    exact_match )
 {
     int len = t->n_items;
     int first = 0;
@@ -135,7 +135,7 @@ tr_ptrArrayLowerBound( const tr_ptrArray *                t,
         else if( !c )
         {
             if( exact_match )
-                *exact_match = TRUE;
+                *exact_match = true;
             return middle;
             break;
         }
@@ -146,7 +146,7 @@ tr_ptrArrayLowerBound( const tr_ptrArray *                t,
     }
 
     if( exact_match )
-        *exact_match = FALSE;
+        *exact_match = false;
 
     return first;
 }
@@ -182,7 +182,7 @@ tr_ptrArrayFindSorted( tr_ptrArray * t,
                        const void *  ptr,
                        int           compare(const void*, const void*) )
 {
-    tr_bool   match;
+    bool   match;
     const int pos = tr_ptrArrayLowerBound( t, ptr, compare, &match );
 
     return match ? t->items[pos] : NULL;
@@ -194,7 +194,7 @@ tr_ptrArrayRemoveSorted( tr_ptrArray * t,
                          int           compare(const void*, const void*) )
 {
     void *    ret = NULL;
-    tr_bool   match;
+    bool   match;
     const int pos = tr_ptrArrayLowerBound( t, ptr, compare, &match );
 
     if( match )

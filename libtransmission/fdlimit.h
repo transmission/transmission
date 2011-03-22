@@ -72,14 +72,14 @@ int  tr_fdFileCheckout( tr_session             * session,
                         tr_file_index_t          file_num,
                         const char             * existing_dir,
                         const char             * filename,
-                        tr_bool                  do_write,
+                        bool                  do_write,
                         tr_preallocation_mode    preallocation_mode,
                         uint64_t                 preallocation_file_size );
 
 int tr_fdFileGetCached( tr_session             * session,
                         int                      torrent_id,
                         tr_file_index_t          file_num,
-                        tr_bool                  doWrite );
+                        bool                  doWrite );
 
 /**
  * Closes a file that's being held by our file repository.

@@ -23,8 +23,8 @@
 /** @brief like a tr_bitfield, but supports haveAll and haveNone */
 typedef struct tr_bitset
 {
-    tr_bool haveAll;
-    tr_bool haveNone;
+    bool haveAll;
+    bool haveNone;
     tr_bitfield bitfield;
 }
 tr_bitset;
@@ -44,7 +44,7 @@ void tr_bitsetRem( tr_bitset * b, size_t i );
 void tr_bitsetRemRange ( tr_bitset * b, size_t begin, size_t end );
 
 struct tr_benc;
-tr_bool tr_bitsetFromBenc( tr_bitset * bitset, struct tr_benc * benc );
+bool tr_bitsetFromBenc( tr_bitset * bitset, struct tr_benc * benc );
 void tr_bitsetToBenc( const tr_bitset * bitset, struct tr_benc * benc );
 
 /***
@@ -53,7 +53,7 @@ void tr_bitsetToBenc( const tr_bitset * bitset, struct tr_benc * benc );
 
 double tr_bitsetPercent( const tr_bitset * b );
 
-tr_bool tr_bitsetHas( const tr_bitset * b, const size_t nth );
+bool tr_bitsetHas( const tr_bitset * b, const size_t nth );
 size_t tr_bitsetCountRange( const tr_bitset * b, const size_t begin, const size_t end );
 
 void tr_bitsetOr( tr_bitfield * a, const tr_bitset * b );

@@ -113,7 +113,7 @@ announce_url_new( const tr_session * session, const tr_announce_request * req )
         char ipv6_readable[INET6_ADDRSTRLEN];
         evutil_inet_ntop( AF_INET6, ipv6, ipv6_readable, INET6_ADDRSTRLEN );
         evbuffer_add_printf( buf, "&ipv6=");
-        tr_http_escape( buf, ipv6_readable, -1, TRUE );
+        tr_http_escape( buf, ipv6_readable, -1, true );
     }
 
     return evbuffer_free_to_str( buf );
@@ -186,8 +186,8 @@ on_announce_done_eventthread( void * vdata )
 
 static void
 on_announce_done( tr_session   * session,
-                  tr_bool        did_connect,
-                  tr_bool        did_timeout,
+                  bool           did_connect,
+                  bool           did_timeout,
                   long           response_code,
                   const void   * msg,
                   size_t         msglen,
@@ -328,8 +328,8 @@ on_scrape_done_eventthread( void * vdata )
 
 static void
 on_scrape_done( tr_session   * session,
-                tr_bool        did_connect,
-                tr_bool        did_timeout,
+                bool           did_connect,
+                bool           did_timeout,
                 long           response_code,
                 const void   * msg,
                 size_t         msglen,

@@ -139,7 +139,7 @@ ensureInfoDictOffsetIsCached( tr_torrent * tor )
     if( !tor->infoDictOffsetIsCached )
     {
         tor->infoDictOffset = findInfoDictOffset( tor );
-        tor->infoDictOffsetIsCached = TRUE;
+        tor->infoDictOffsetIsCached = true;
     }
 }
 
@@ -232,9 +232,9 @@ tr_torrentSetMetadataPiece( tr_torrent  * tor, int piece, const void  * data, in
     /* are we done? */
     if( m->piecesNeededCount == 0 )
     {
-        tr_bool success = FALSE;
-        tr_bool checksumPassed = FALSE;
-        tr_bool metainfoParsed = FALSE;
+        bool success = false;
+        bool checksumPassed = false;
+        bool metainfoParsed = false;
         uint8_t sha1[SHA_DIGEST_LENGTH];
 
         /* we've got a complete set of metainfo... see if it passes the checksum test */
@@ -254,7 +254,7 @@ tr_torrentSetMetadataPiece( tr_torrent  * tor, int piece, const void  * data, in
 
                 if( !tr_bencLoadFile( &newMetainfo, TR_FMT_BENC, path ) )
                 {
-                    tr_bool hasInfo;
+                    bool hasInfo;
                     tr_info info;
                     int infoDictLength;
 
@@ -271,7 +271,7 @@ tr_torrentSetMetadataPiece( tr_torrent  * tor, int piece, const void  * data, in
                     if( success && !tr_getBlockSize( info.pieceSize ) )
                     {
                         tr_torrentSetLocalError( tor, "%s", _( "Magnet torrent's metadata is not usable" ) );
-                        success = FALSE;
+                        success = false;
                     }
 
                     if( success )
@@ -317,10 +317,10 @@ tr_torrentSetMetadataPiece( tr_torrent  * tor, int piece, const void  * data, in
     }
 }
 
-tr_bool
+bool
 tr_torrentGetNextMetadataRequest( tr_torrent * tor, time_t now, int * setme_piece )
 {
-    tr_bool have_request = FALSE;
+    bool have_request = false;
     struct tr_incomplete_metadata * m;
 
     assert( tr_isTorrent( tor ) );
@@ -344,7 +344,7 @@ tr_torrentGetNextMetadataRequest( tr_torrent * tor, time_t now, int * setme_piec
 
         dbgmsg( tor, "next piece to request: %d", piece );
         *setme_piece = piece;
-        have_request = TRUE;
+        have_request = true;
     }
 
     return have_request;
@@ -383,12 +383,12 @@ tr_torrentGetMagnetLink( const tr_torrent * tor )
     if( name && *name )
     {
         evbuffer_add_printf( s, "%s", "&dn=" );
-        tr_http_escape( s, tr_torrentName( tor ), -1, TRUE );
+        tr_http_escape( s, tr_torrentName( tor ), -1, true );
     }
     for( i=0; i<tor->info.trackerCount; ++i )
     {
         evbuffer_add_printf( s, "%s", "&tr=" );
-        tr_http_escape( s, tor->info.trackers[i].announce, -1, TRUE );
+        tr_http_escape( s, tor->info.trackers[i].announce, -1, true );
     }
 
     return evbuffer_free_to_str( s );

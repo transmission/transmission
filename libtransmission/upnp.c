@@ -37,7 +37,7 @@ tr_upnp_state;
 
 struct tr_upnp
 {
-    tr_bool            hasDiscovered;
+    bool               hasDiscovered;
     struct UPNPUrls    urls;
     struct IGDdatas    data;
     int                port;
@@ -149,7 +149,7 @@ tr_upnpPulse( tr_upnp * handle,
             portStr, "UDP", intClient, intPort ) != UPNPCOMMAND_SUCCESS )
         {
             tr_ninf( getKey( ), _( "Port %d isn't forwarded" ), handle->port );
-            handle->isMapped = FALSE;
+            handle->isMapped = false;
         }
     }
 

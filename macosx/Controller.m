@@ -134,7 +134,7 @@ typedef enum
 
 #define DONATE_NAG_TIME (60 * 60 * 24 * 7)
 
-static void altSpeedToggledCallback(tr_session * handle UNUSED, tr_bool active, tr_bool byUser, void * controller)
+static void altSpeedToggledCallback(tr_session * handle UNUSED, bool active, bool byUser, void * controller)
 {
     NSDictionary * dict = [[NSDictionary alloc] initWithObjectsAndKeys: [[NSNumber alloc] initWithBool: active], @"Active",
                                 [[NSNumber alloc] initWithBool: byUser], @"ByUser", nil];

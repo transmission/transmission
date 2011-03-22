@@ -79,9 +79,9 @@ typedef struct tr_address
 extern const tr_address tr_inaddr_any;
 extern const tr_address tr_in6addr_any;
 
-tr_bool tr_ssToAddr( tr_address * setme_addr,
-                     tr_port    * setme_port,
-                     const struct sockaddr_storage * from );
+bool tr_ssToAddr( tr_address * setme_addr,
+                  tr_port    * setme_port,
+                  const struct sockaddr_storage * from );
 
 const char *tr_ntop( const tr_address * src,
                      char * dst,
@@ -92,11 +92,11 @@ tr_address *tr_pton( const char * src,
 int tr_compareAddresses( const tr_address * a,
                          const tr_address * b);
 
-tr_bool tr_isValidPeerAddress( const tr_address * addr, tr_port port );
+bool tr_isValidPeerAddress( const tr_address * addr, tr_port port );
 
-static inline tr_bool tr_isAddress( const tr_address * a ) { return ( a != NULL ) && ( a->type==TR_AF_INET || a->type==TR_AF_INET6 ); }
+static inline bool tr_isAddress( const tr_address * a ) { return ( a != NULL ) && ( a->type==TR_AF_INET || a->type==TR_AF_INET6 ); }
 
-tr_bool tr_net_hasIPv6( tr_port );
+bool tr_net_hasIPv6( tr_port );
 
 /***********************************************************************
  * Sockets
@@ -104,17 +104,17 @@ tr_bool tr_net_hasIPv6( tr_port );
 int  tr_netOpenPeerSocket( tr_session       * session,
                            const tr_address * addr,
                            tr_port            port,
-                           tr_bool            clientIsSeed );
+                           bool               clientIsSeed );
 
 struct UTPSocket *
 tr_netOpenPeerUTPSocket( tr_session        * session,
                          const tr_address  * addr,
                          tr_port             port,
-                         tr_bool             clientIsSeed);
+                         bool                clientIsSeed);
 
 int  tr_netBindTCP( const tr_address * addr,
                     tr_port            port,
-                    tr_bool            suppressMsgs );
+                    bool               suppressMsgs );
 
 int  tr_netAccept( tr_session * session,
                    int          bound,

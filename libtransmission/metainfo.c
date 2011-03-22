@@ -139,17 +139,17 @@ tr_metainfoMigrate( tr_session * session,
 ****
 ***/
 
-static tr_bool
+static bool
 path_is_suspicious( const char * path )
 {
     return ( path == NULL )
         || ( strstr( path, "../" ) != NULL );
 }
 
-static tr_bool
+static bool
 getfile( char ** setme, const char * root, tr_benc * path )
 {
-    tr_bool success = FALSE;
+    bool success = false;
 
     if( tr_bencIsList( path ) )
     {
@@ -173,14 +173,14 @@ getfile( char ** setme, const char * root, tr_benc * path )
         *setme = tr_utf8clean( tmp, -1 );
         tr_free( tmp );
         /* fprintf( stderr, "[%s]\n", *setme ); */
-        success = TRUE;
+        success = true;
     }
 
     if( ( *setme != NULL ) && path_is_suspicious( *setme ) )
     {
         tr_free( *setme );
         *setme = NULL;
-        success = FALSE;
+        success = false;
     }
 
     return success;
@@ -299,7 +299,7 @@ getannounce( tr_info * inf, tr_benc * meta )
         {
             tr_benc * tier = tr_bencListChild( tiers, i );
             const int tierSize = tr_bencListSize( tier );
-            tr_bool anyAdded = FALSE;
+            bool anyAdded = false;
             for( j = 0; j < tierSize; ++j )
             {
                 if( tr_bencGetStr( tr_bencListChild( tier, j ), &str ) )
@@ -313,7 +313,7 @@ getannounce( tr_info * inf, tr_benc * meta )
                         t->scrape = tr_convertAnnounceToScrape( url );
                         t->id = trackerCount;
 
-                        anyAdded = TRUE;
+                        anyAdded = true;
                         ++trackerCount;
                     }
                     tr_free( url );
@@ -386,7 +386,7 @@ geturllist( tr_info * inf,
 static const char*
 tr_metainfoParseImpl( const tr_session  * session,
                       tr_info           * inf,
-                      tr_bool           * hasInfoDict,
+                      bool              * hasInfoDict,
                       int               * infoDictLength,
                       const tr_benc     * meta_in )
 {
@@ -397,8 +397,8 @@ tr_metainfoParseImpl( const tr_session  * session,
     tr_benc *       d;
     tr_benc *       infoDict = NULL;
     tr_benc *       meta = (tr_benc *) meta_in;
-    tr_bool         b;
-    tr_bool         isMagnet = FALSE;
+    bool            b;
+    bool            isMagnet = false;
 
     /* info_hash: urlencoded 20-byte SHA1 hash of the value of the info key
      * from the Metainfo file. Note that the value will be a bencoded
@@ -411,7 +411,7 @@ tr_metainfoParseImpl( const tr_session  * session,
         /* no info dictionary... is this a magnet link? */
         if( tr_bencDictFindDict( meta, "magnet-info", &d ) )
         {
-            isMagnet = TRUE;
+            isMagnet = true;
 
             /* get the info-hash */
             if( !tr_bencDictFindRaw( d, "info_hash", &raw, &raw_len ) )
@@ -530,11 +530,11 @@ tr_metainfoParseImpl( const tr_session  * session,
     return NULL;
 }
 
-tr_bool
+bool
 tr_metainfoParse( const tr_session * session,
                   const tr_benc    * meta_in,
                   tr_info          * inf,
-                  tr_bool          * hasInfoDict,
+                  bool             * hasInfoDict,
                   int              * infoDictLength )
 {
     const char * badTag = tr_metainfoParseImpl( session,
@@ -542,7 +542,7 @@ tr_metainfoParse( const tr_session * session,
                                                 hasInfoDict,
                                                 infoDictLength,
                                                 meta_in );
-    const tr_bool success = badTag == NULL;
+    const bool success = badTag == NULL;
 
     if( badTag )
     {

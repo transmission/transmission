@@ -182,7 +182,7 @@ refreshOptions( struct DetailsImpl * di, tr_torrent ** torrents, int n )
 
     /* honor_limits_check */
     if( n ) {
-        const tr_bool baseline = tr_torrentUsesSessionLimits( torrents[0] );
+        const bool baseline = tr_torrentUsesSessionLimits( torrents[0] );
         int i;
         for( i=1; i<n; ++i )
             if( baseline != tr_torrentUsesSessionLimits( torrents[i] ) )
@@ -194,7 +194,7 @@ refreshOptions( struct DetailsImpl * di, tr_torrent ** torrents, int n )
 
     /* down_limited_check */
     if( n ) {
-        const tr_bool baseline = tr_torrentUsesSpeedLimit( torrents[0], TR_DOWN );
+        const bool baseline = tr_torrentUsesSpeedLimit( torrents[0], TR_DOWN );
         int i;
         for( i=1; i<n; ++i )
             if( baseline != tr_torrentUsesSpeedLimit( torrents[i], TR_DOWN ) )
@@ -218,7 +218,7 @@ refreshOptions( struct DetailsImpl * di, tr_torrent ** torrents, int n )
 
     /* up_limited_check */
     if( n ) {
-        const tr_bool baseline = tr_torrentUsesSpeedLimit( torrents[0], TR_UP );
+        const bool baseline = tr_torrentUsesSpeedLimit( torrents[0], TR_UP );
         int i;
         for( i=1; i<n; ++i )
             if( baseline != tr_torrentUsesSpeedLimit( torrents[i], TR_UP ) )
@@ -550,7 +550,7 @@ options_page_new( struct DetailsImpl * d )
 ****/
 
 static const char *
-activityString( int activity, tr_bool finished )
+activityString( int activity, bool finished )
 {
     switch( activity )
     {
@@ -619,7 +619,7 @@ refreshInfo( struct DetailsImpl * di, tr_torrent ** torrents, int n )
     if( n<=0 )
         str = no_torrent;
     else {
-        const tr_bool baseline = infos[0]->isPrivate;
+        const bool baseline = infos[0]->isPrivate;
         for( i=1; i<n; ++i )
             if( baseline != infos[i]->isPrivate )
                 break;
@@ -699,7 +699,7 @@ refreshInfo( struct DetailsImpl * di, tr_torrent ** torrents, int n )
         str = no_torrent;
     else {
         const tr_torrent_activity activity = stats[0]->activity;
-        tr_bool allFinished = stats[0]->finished;
+        bool allFinished = stats[0]->finished;
         for( i=1; i<n; ++i ) {
             if( activity != stats[i]->activity )
                 break;
@@ -1509,7 +1509,7 @@ setPeerViewColumns( GtkTreeView * peer_view )
 {
     int i;
     int n = 0;
-    const tr_bool more = gtr_pref_flag_get( PREF_KEY_SHOW_MORE_PEER_INFO );
+    const bool more = gtr_pref_flag_get( PREF_KEY_SHOW_MORE_PEER_INFO );
     int view_columns[32];
     GtkTreeViewColumn * c;
     GtkCellRenderer *   r;

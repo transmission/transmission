@@ -35,11 +35,11 @@ void       tr_sharedClose( tr_session * );
 
 void       tr_sharedPortChanged( tr_session * );
 
-void       tr_sharedTraversalEnable( tr_shared *, tr_bool isEnabled );
+void       tr_sharedTraversalEnable( tr_shared *, bool isEnabled );
 
 tr_port    tr_sharedGetPeerPort( const tr_shared * s );
 
-tr_bool    tr_sharedTraversalIsEnabled( const tr_shared * s );
+bool       tr_sharedTraversalIsEnabled( const tr_shared * s );
 
 int        tr_sharedTraversalStatus( const tr_shared * );
 

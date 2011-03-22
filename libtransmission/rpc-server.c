@@ -57,9 +57,9 @@
 
 struct tr_rpc_server
 {
-    tr_bool            isEnabled;
-    tr_bool            isPasswordEnabled;
-    tr_bool            isWhitelistEnabled;
+    bool               isEnabled;
+    bool               isPasswordEnabled;
+    bool               isWhitelistEnabled;
     tr_port            port;
     char *             url;
     struct in_addr     bindAddress;
@@ -74,7 +74,7 @@ struct tr_rpc_server
     time_t             sessionIdExpiresAt;
 
 #ifdef HAVE_ZLIB
-    tr_bool            isStreamInitialized;
+    bool               isStreamInitialized;
     z_stream           stream;
 #endif
 };
@@ -210,11 +210,11 @@ handle_upload( struct evhttp_request * req,
     {
         int i;
         int n;
-        tr_bool hasSessionId = FALSE;
+        bool hasSessionId = false;
         tr_ptrArray parts = TR_PTR_ARRAY_INIT;
 
         const char * query = strchr( req->uri, '?' );
-        const tr_bool paused = query && strstr( query + 1, "paused=true" );
+        const bool paused = query && strstr( query + 1, "paused=true" );
 
         extract_parts_from_multipart( req->input_headers, req->input_buffer, &parts );
         n = tr_ptrArraySize( &parts );
@@ -247,7 +247,7 @@ handle_upload( struct evhttp_request * req,
             int body_len = p->body_len;
             tr_benc top, *args;
             tr_benc test;
-            tr_bool have_source = FALSE;
+            bool have_source = false;
             char * body = p->body;
 
             if( body_len >= 2 && !memcmp( &body[body_len - 2], "\r\n", 2 ) )
@@ -261,14 +261,14 @@ handle_upload( struct evhttp_request * req,
             if( tr_urlIsValid( body, body_len ) )
             {
                 tr_bencDictAddRaw( args, "filename", body, body_len );
-                have_source = TRUE;
+                have_source = true;
             }
             else if( !tr_bencLoad( body, body_len, &test, NULL ) )
             {
                 char * b64 = tr_base64_encode( body, body_len, NULL );
                 tr_bencDictAddStr( args, "metainfo", b64 );
                 tr_free( b64 );
-                have_source = TRUE;
+                have_source = true;
             }
 
             if( have_source )
@@ -352,7 +352,7 @@ add_response( struct evhttp_request * req, struct tr_rpc_server * server,
         {
             int compressionLevel;
 
-            server->isStreamInitialized = TRUE;
+            server->isStreamInitialized = true;
             server->stream.zalloc = (alloc_func) Z_NULL;
             server->stream.zfree = (free_func) Z_NULL;
             server->stream.opaque = (voidpf) Z_NULL;
@@ -562,28 +562,28 @@ handle_rpc( struct evhttp_request * req,
 
 }
 
-static tr_bool
+static bool
 isAddressAllowed( const tr_rpc_server * server,
                   const char *          address )
 {
     tr_list * l;
 
     if( !server->isWhitelistEnabled )
-        return TRUE;
+        return true;
 
     for( l=server->whitelist; l!=NULL; l=l->next )
         if( tr_wildmat( address, l->data ) )
-            return TRUE;
+            return true;
 
-    return FALSE;
+    return false;
 }
 
-static tr_bool
+static bool
 test_session_id( struct tr_rpc_server * server, struct evhttp_request * req )
 {
     const char * ours = get_current_session_id( server );
     const char * theirs = evhttp_find_header( req->input_headers, TR_RPC_SESSION_ID_HEADER );
-    const tr_bool success =  theirs && !strcmp( theirs, ours );
+    const bool success =  theirs && !strcmp( theirs, ours );
     return success;
 }
 
@@ -721,14 +721,14 @@ onEnabledChanged( void * vserver )
 
 void
 tr_rpcSetEnabled( tr_rpc_server * server,
-                  tr_bool         isEnabled )
+                  bool            isEnabled )
 {
     server->isEnabled = isEnabled;
 
     tr_runInEventThread( server->session, onEnabledChanged, server );
 }
 
-tr_bool
+bool
 tr_rpcIsEnabled( const tr_rpc_server * server )
 {
     return server->isEnabled;
@@ -822,12 +822,12 @@ tr_rpcGetWhitelist( const tr_rpc_server * server )
 
 void
 tr_rpcSetWhitelistEnabled( tr_rpc_server  * server,
-                           tr_bool          isEnabled )
+                           bool             isEnabled )
 {
     server->isWhitelistEnabled = isEnabled != 0;
 }
 
-tr_bool
+bool
 tr_rpcGetWhitelistEnabled( const tr_rpc_server * server )
 {
     return server->isWhitelistEnabled;
@@ -871,14 +871,13 @@ tr_rpcGetPassword( const tr_rpc_server * server )
 }
 
 void
-tr_rpcSetPasswordEnabled( tr_rpc_server * server,
-                          tr_bool          isEnabled )
+tr_rpcSetPasswordEnabled( tr_rpc_server * server, bool isEnabled )
 {
     server->isPasswordEnabled = isEnabled;
     dbgmsg( "setting 'password enabled' to %d", (int)isEnabled );
 }
 
-tr_bool
+bool
 tr_rpcIsPasswordEnabled( const tr_rpc_server * server )
 {
     return server->isPasswordEnabled;
@@ -929,8 +928,8 @@ tr_rpc_server *
 tr_rpcInit( tr_session  * session, tr_benc * settings )
 {
     tr_rpc_server * s;
-    tr_bool found;
-    tr_bool boolVal;
+    bool found;
+    bool boolVal;
     int64_t i;
     const char *str;
     tr_address address;

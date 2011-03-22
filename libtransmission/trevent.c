@@ -237,7 +237,7 @@ libeventThreadFunc( void * veh )
     /* set the struct's fields */
     eh->base = base;
     eh->session->event_base = base;
-    eh->session->evdns_base = evdns_base_new( base, TRUE );
+    eh->session->evdns_base = evdns_base_new( base, true );
     eh->session->events = eh;
 
     /* listen to the pipe's read fd */
@@ -280,7 +280,7 @@ tr_eventClose( tr_session * session )
 {
     assert( tr_isSession( session ) );
 
-    session->events->die = TRUE;
+    session->events->die = true;
     tr_deepLog( __FILE__, __LINE__, NULL, "closing trevent pipe" );
     tr_netCloseSocket( session->events->fds[1] );
 }
@@ -289,7 +289,7 @@ tr_eventClose( tr_session * session )
 ***
 **/
 
-tr_bool
+bool
 tr_amInEventThread( const tr_session * session )
 {
     assert( tr_isSession( session ) );

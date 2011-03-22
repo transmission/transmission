@@ -50,7 +50,7 @@ struct tr_webseed
     char               * base_url;
     size_t               base_url_len;
     int                  torrent_id;
-    tr_bool              is_stopping;
+    bool                 is_stopping;
     int                  consecutive_failures;
 };
 
@@ -112,7 +112,7 @@ fire_client_got_data( tr_webseed * w, uint32_t length )
     tr_peer_event e = TR_PEER_EVENT_INIT;
     e.eventType = TR_PEER_CLIENT_GOT_DATA;
     e.length = length;
-    e.wasPieceData = TRUE;
+    e.wasPieceData = true;
     publish( w, &e );
 }
 
@@ -129,14 +129,14 @@ on_content_changed( struct evbuffer                * buf UNUSED,
 
     if( ( info->n_added > 0 ) && !w->is_stopping )
     {
-        tr_bandwidthUsed( &w->bandwidth, TR_DOWN, info->n_added, TRUE, tr_time_msec( ) );
+        tr_bandwidthUsed( &w->bandwidth, TR_DOWN, info->n_added, true, tr_time_msec( ) );
         fire_client_got_data( w, info->n_added );
     }
 }
 
 static void task_request_next_chunk( struct tr_webseed_task * task );
 
-static tr_bool
+static bool
 webseed_has_tasks( const tr_webseed * w )
 {
     return w->tasks != NULL;
@@ -194,8 +194,8 @@ on_idle( tr_webseed * w )
 
 static void
 web_response_func( tr_session    * session,
-                   tr_bool         did_connect UNUSED,
-                   tr_bool         did_timeout UNUSED,
+                   bool            did_connect UNUSED,
+                   bool            did_timeout UNUSED,
                    long            response_code,
                    const void    * response UNUSED,
                    size_t          response_byte_count UNUSED,
@@ -253,7 +253,7 @@ make_url( tr_webseed * w, const tr_file * file )
 
     /* if url ends with a '/', add the torrent name */
     if( w->base_url[w->base_url_len - 1] == '/' && file->name )
-        tr_http_escape( out, file->name, strlen(file->name), FALSE );
+        tr_http_escape( out, file->name, strlen(file->name), false );
 
     return evbuffer_free_to_str( out );
 }
@@ -296,15 +296,15 @@ task_request_next_chunk( struct tr_webseed_task * t )
     }
 }
 
-tr_bool
+bool
 tr_webseedGetSpeed_Bps( const tr_webseed * w, uint64_t now, int * setme_Bps )
 {
-    const tr_bool is_active = webseed_has_tasks( w );
+    const bool is_active = webseed_has_tasks( w );
     *setme_Bps = is_active ? tr_bandwidthGetPieceSpeed_Bps( &w->bandwidth, now, TR_DOWN ) : 0;
     return is_active;
 }
 
-tr_bool
+bool
 tr_webseedIsActive( const tr_webseed * w )
 {
     int Bps = 0;
@@ -334,7 +334,7 @@ tr_webseedNew( struct tr_torrent  * tor,
 
     /* construct parent class */
     tr_peerConstruct( peer );
-    peer->peerIsChoked = TRUE;
+    peer->peerIsChoked = true;
     peer->clientIsInterested = !tr_torrentIsSeed( tor );
     peer->client = tr_strdup( "webseed" );
     tr_bitsetSetHaveAll( &peer->have );
@@ -359,7 +359,7 @@ tr_webseedFree( tr_webseed * w )
     if( w )
     {
         if( webseed_has_tasks( w ) )
-            w->is_stopping = TRUE;
+            w->is_stopping = true;
         else
             webseed_free( w );
     }

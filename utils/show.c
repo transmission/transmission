@@ -63,8 +63,8 @@ getUsage( void )
     return "Usage: " MY_NAME " [options] <.torrent file>";
 }
 
-static tr_bool scrapeFlag = FALSE;
-static tr_bool showVersion = FALSE;
+static bool scrapeFlag = false;
+static bool showVersion = false;
 const char * filename = NULL;
 
 static int
@@ -77,8 +77,8 @@ parseCommandLine( int argc, const char ** argv )
     {
         switch( c )
         {
-            case 's': scrapeFlag = TRUE; break;
-            case 'V': showVersion = TRUE; break;
+            case 's': scrapeFlag = true; break;
+            case 'V': showVersion = true; break;
             case TR_OPT_UNK: filename = optarg; break;
             default: return 1;
         }
@@ -237,7 +237,7 @@ doScrape( const tr_info * inf )
             {
                 tr_benc top;
                 tr_benc * files;
-                tr_bool matched = FALSE;
+                bool matched = false;
                 const char * begin = (const char*) evbuffer_pullup( buf, -1 );
                 const char * end = begin + evbuffer_get_length( buf );
 
@@ -258,7 +258,7 @@ doScrape( const tr_info * inf )
                                 tr_bencDictFindInt( val, "complete", &seeders );
                                 tr_bencDictFindInt( val, "incomplete", &leechers );
                                 printf( "%d seeders, %d leechers\n", (int)seeders, (int)leechers );
-                                matched = TRUE;
+                                matched = true;
                             }
                         }
                     }

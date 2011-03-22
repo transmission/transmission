@@ -53,8 +53,8 @@ int tr_ioWrite( struct tr_torrent  * tor,
 /**
  * @brief Test to see if the piece matches its metainfo's SHA1 checksum.
  */
-tr_bool tr_ioTestPiece( tr_torrent       * tor,
-                        tr_piece_index_t   piece );
+bool tr_ioTestPiece( tr_torrent       * tor,
+                     tr_piece_index_t   piece );
 
 
 /**

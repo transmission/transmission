@@ -299,12 +299,12 @@ test_lowerbound( void )
     int i;
     const int A[] = { 1, 2, 3, 3, 3, 5, 8 };
     const int expected_pos[] = { 0, 1, 2, 5, 5, 6, 6, 6, 7, 7 };
-    const int expected_exact[] = { TRUE, TRUE, TRUE, FALSE, TRUE, FALSE, FALSE, TRUE, FALSE, FALSE };
+    const int expected_exact[] = { true, true, true, false, true, false, false, true, false, false };
     const int N = sizeof(A) / sizeof(A[0]);
 
     for( i=1; i<=10; ++i )
     {
-        tr_bool exact;
+        bool exact;
         const int pos = tr_lowerBound( &i, A, N, sizeof(int), compareInts, &exact );
 
 #if 0

@@ -48,7 +48,7 @@ readOrWriteBytes( tr_session       * session,
 {
     int fd;
     int err = 0;
-    const tr_bool doWrite = ioMode >= TR_IO_WRITE;
+    const bool doWrite = ioMode >= TR_IO_WRITE;
     const tr_info * const info = &tor->info;
     const tr_file * const file = &info->files[fileIndex];
 
@@ -263,14 +263,12 @@ tr_ioWrite( tr_torrent       * tor,
 *****
 ****/
 
-static tr_bool
-recalculateHash( tr_torrent       * tor,
-                 tr_piece_index_t   pieceIndex,
-                 uint8_t          * setme )
+static bool
+recalculateHash( tr_torrent * tor, tr_piece_index_t pieceIndex, uint8_t * setme )
 {
     size_t   bytesLeft;
     uint32_t offset = 0;
-    tr_bool  success = TRUE;
+    bool  success = true;
     const size_t buflen = tor->blockSize;
     void * buffer = tr_valloc( buflen );
     SHA_CTX  sha;
@@ -304,7 +302,7 @@ recalculateHash( tr_torrent       * tor,
     return success;
 }
 
-tr_bool
+bool
 tr_ioTestPiece( tr_torrent * tor, tr_piece_index_t piece )
 {
     uint8_t hash[SHA_DIGEST_LENGTH];

@@ -392,7 +392,8 @@ void tr_lpdUninit( tr_session* ss )
     session = NULL;
 }
 
-tr_bool tr_lpdEnabled( const tr_session* ss )
+bool
+tr_lpdEnabled( const tr_session* ss )
 {
     return ss && ( ss == session );
 }
@@ -425,13 +426,14 @@ static inline void lpd_consistencyCheck( void )
 * @brief Announce the given torrent on the local network
 *
 * @param[in] t Torrent to announce
-* @return Returns TRUE on success
+* @return Returns true on success
 *
 * Send a query for torrent t out to the LPD multicast group (or the LAN, for that
 * matter). A listening client on the same network might react by adding us to his
 * peer pool for torrent t.
 */
-tr_bool tr_lpdSendAnnounce( const tr_torrent* t )
+bool
+tr_lpdSendAnnounce( const tr_torrent* t )
 {
     size_t i;
     const char fmt[] =
@@ -446,7 +448,7 @@ tr_bool tr_lpdSendAnnounce( const tr_torrent* t )
     char query[lpd_maxDatagramLength + 1] = { };
 
     if( t == NULL )
-        return FALSE;
+        return false;
 
     /* make sure the hash string is normalized, just in case */
     for( i = 0; i < sizeof hashString; i++ )
@@ -466,12 +468,12 @@ tr_bool tr_lpdSendAnnounce( const tr_torrent* t )
             (const struct sockaddr*) &lpd_mcastAddr, sizeof lpd_mcastAddr );
 
         if( res != len )
-            return FALSE;
+            return false;
     }
 
     tr_tordbg( t, "LPD announce message away" );
 
-    return TRUE;
+    return true;
 }
 
 /**

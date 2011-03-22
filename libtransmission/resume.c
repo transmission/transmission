@@ -197,13 +197,13 @@ loadDND( tr_benc *    dict,
 
         if( dndCount )
         {
-            tr_torrentInitFileDLs ( tor, dnd, dndCount, FALSE );
+            tr_torrentInitFileDLs ( tor, dnd, dndCount, false );
             tr_tordbg( tor, "Resume file found %d files listed as dnd",
                        dndCount );
         }
         if( dlCount )
         {
-            tr_torrentInitFileDLs ( tor, dl, dlCount, TRUE );
+            tr_torrentInitFileDLs ( tor, dl, dlCount, true );
             tr_tordbg( tor,
                        "Resume file found %d files marked for download",
                        dlCount );
@@ -303,7 +303,7 @@ static void
 loadSingleSpeedLimit( tr_benc * d, tr_direction dir, tr_torrent * tor )
 {
     int64_t i;
-    tr_bool boolVal;
+    bool boolVal;
 
     if( tr_bencDictFindInt( d, KEY_SPEED_Bps, &i ) )
         tr_torrentSetSpeedLimit_Bps( tor, dir, i );
@@ -427,7 +427,7 @@ saveProgress( tr_benc * dict, tr_torrent * tor )
         const tr_piece * pend;
         time_t oldest_nonzero = now;
         time_t newest = 0;
-        tr_bool has_zero = FALSE;
+        bool has_zero = false;
         const time_t mtime = tr_torrentGetFileMTime( tor, fi );
         const tr_file * f = &inf->files[fi];
 
@@ -435,7 +435,7 @@ saveProgress( tr_benc * dict, tr_torrent * tor )
         for( p=&inf->pieces[f->firstPiece], pend=&inf->pieces[f->lastPiece]; p!=pend; ++p )
         {
             if( !p->timeChecked )
-                has_zero = TRUE;
+                has_zero = true;
             else if( oldest_nonzero > p->timeChecked )
                 oldest_nonzero = p->timeChecked;
             if( newest < p->timeChecked )
@@ -653,11 +653,11 @@ loadFromFile( tr_torrent * tor,
 {
     int64_t  i;
     const char * str;
-    uint64_t fieldsLoaded = 0;
     char * filename;
     tr_benc top;
-    tr_bool boolVal;
-    const tr_bool  wasDirty = tor->isDirty;
+    bool boolVal;
+    uint64_t fieldsLoaded = 0;
+    const bool wasDirty = tor->isDirty;
 
     assert( tr_isTorrent( tor ) );
 
@@ -810,7 +810,7 @@ setFromCtor( tr_torrent *    tor,
 
     if( fields & TR_FR_RUN )
     {
-        uint8_t isPaused;
+        bool isPaused;
         if( !tr_ctorGetPaused( ctor, mode, &isPaused ) )
         {
             tor->isRunning = !isPaused;

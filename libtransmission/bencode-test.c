@@ -235,32 +235,32 @@ testParse( void )
     tr_free( saved );
     tr_bencFree( &val );
 
-    if( ( err = testString( "llleee", TRUE ) ) )
+    if( ( err = testString( "llleee", true ) ) )
         return err;
-    if( ( err = testString( "d3:cow3:moo4:spam4:eggse", TRUE ) ) )
+    if( ( err = testString( "d3:cow3:moo4:spam4:eggse", true ) ) )
         return err;
-    if( ( err = testString( "d4:spaml1:a1:bee", TRUE ) ) )
+    if( ( err = testString( "d4:spaml1:a1:bee", true ) ) )
         return err;
     if( ( err =
              testString( "d5:greenli1ei2ei3ee4:spamd1:ai123e3:keyi214eee",
-                         TRUE ) ) )
+                         true ) ) )
         return err;
     if( ( err =
              testString(
                  "d9:publisher3:bob17:publisher-webpage15:www.example.com18:publisher.location4:homee",
-                 TRUE ) ) )
+                 true ) ) )
         return err;
     if( ( err =
              testString(
                  "d8:completei1e8:intervali1800e12:min intervali1800e5:peers0:e",
-                 TRUE ) ) )
+                 true ) ) )
         return err;
-    if( ( err = testString( "d1:ai0e1:be", FALSE ) ) ) /* odd number of children
+    if( ( err = testString( "d1:ai0e1:be", false ) ) ) /* odd number of children
                                                          */
         return err;
-    if( ( err = testString( "", FALSE ) ) )
+    if( ( err = testString( "", false ) ) )
         return err;
-    if( ( err = testString( " ", FALSE ) ) )
+    if( ( err = testString( " ", false ) ) )
         return err;
 
     /* nested containers
@@ -458,13 +458,13 @@ testBool( void )
 {
     tr_benc top;
     int64_t intVal;
-    tr_bool boolVal;
+    bool boolVal;
 
     tr_bencInitDict( &top, 0 );
 
-    tr_bencDictAddBool( &top, "key1", FALSE );
+    tr_bencDictAddBool( &top, "key1", false );
     tr_bencDictAddBool( &top, "key2", 0 );
-    tr_bencDictAddInt ( &top, "key3", TRUE );
+    tr_bencDictAddInt ( &top, "key3", true );
     tr_bencDictAddInt ( &top, "key4", 1 );
     check( tr_bencDictFindBool( &top, "key1", &boolVal ) )
     check( !boolVal )
@@ -495,13 +495,13 @@ testParse2( void )
     int64_t intVal;
     const char * strVal;
     double realVal;
-    tr_bool boolVal;
+    bool boolVal;
     int len;
     char * benc;
     const uint8_t * end;
 
     tr_bencInitDict( &top, 0 );
-    tr_bencDictAddBool( &top, "this-is-a-bool", TRUE );
+    tr_bencDictAddBool( &top, "this-is-a-bool", true );
     tr_bencDictAddInt( &top, "this-is-an-int", 1234 );
     tr_bencDictAddReal( &top, "this-is-a-real", 0.5 );
     tr_bencDictAddStr( &top, "this-is-a-string", "this-is-a-string" );
@@ -514,7 +514,7 @@ testParse2( void )
     check( tr_bencDictFindInt( &top, "this-is-an-int", &intVal ) )
     check( intVal == 1234 )
     check( tr_bencDictFindBool( &top, "this-is-a-bool", &boolVal ) )
-    check( boolVal == TRUE )
+    check( boolVal == true )
     check( tr_bencDictFindStr( &top, "this-is-a-string", &strVal ) )
     check( !strcmp( strVal, "this-is-a-string" ) )
     check( tr_bencDictFindReal( &top, "this-is-a-real", &realVal ) )

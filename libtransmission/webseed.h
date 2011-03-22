@@ -29,12 +29,12 @@ tr_webseed* tr_webseedNew( struct tr_torrent * torrent,
 void        tr_webseedFree( tr_webseed * );
 
 /** @return true if a request is being processed, or false if idle */
-tr_bool     tr_webseedGetSpeed_Bps( const tr_webseed * w,
+bool        tr_webseedGetSpeed_Bps( const tr_webseed * w,
                                     uint64_t           now,
                                     int              * setme_Bps );
 
 /** @return true if a request is being processed, or false if idle */
-tr_bool     tr_webseedIsActive( const tr_webseed * w );
+bool        tr_webseedIsActive( const tr_webseed * w );
 
 
 #endif

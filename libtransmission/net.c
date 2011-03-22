@@ -67,7 +67,7 @@ const tr_address tr_inaddr_any = { TR_AF_INET, { { { { INADDR_ANY, 0x00, 0x00, 0
 void
 tr_netInit( void )
 {
-    static int initialized = FALSE;
+    static int initialized = false;
 
     if( !initialized )
     {
@@ -75,7 +75,7 @@ tr_netInit( void )
         WSADATA wsaData;
         WSAStartup( MAKEWORD( 2, 2 ), &wsaData );
 #endif
-        initialized = TRUE;
+        initialized = true;
     }
 }
 
@@ -180,7 +180,7 @@ tr_netSetCongestionControl( int s UNUSED, const char *algorithm UNUSED )
 #endif
 }
 
-tr_bool
+bool
 tr_ssToAddr( tr_address * setme_addr,
              tr_port    * setme_port,
              const struct sockaddr_storage * from )
@@ -191,7 +191,7 @@ tr_ssToAddr( tr_address * setme_addr,
         setme_addr->type = TR_AF_INET;
         setme_addr->addr.addr4.s_addr = sin->sin_addr.s_addr;
         *setme_port = sin->sin_port;
-        return TRUE;
+        return true;
     }
 
     if( from->ss_family == AF_INET6 )
@@ -200,10 +200,10 @@ tr_ssToAddr( tr_address * setme_addr,
         setme_addr->type = TR_AF_INET6;
         setme_addr->addr.addr6 = sin6->sin6_addr;
         *setme_port = sin6->sin6_port;
-        return TRUE;
+        return true;
     }
 
-    return FALSE;
+    return false;
 }
 
 static socklen_t
@@ -240,7 +240,7 @@ int
 tr_netOpenPeerSocket( tr_session        * session,
                       const tr_address  * addr,
                       tr_port             port,
-                      tr_bool             clientIsSeed )
+                      bool                clientIsSeed )
 {
     static const int domains[NUM_TR_AF_INET_TYPES] = { AF_INET, AF_INET6 };
     int                     s;
@@ -312,7 +312,7 @@ struct UTPSocket *
 tr_netOpenPeerUTPSocket( tr_session        * session,
                          const tr_address  * addr,
                          tr_port             port,
-                         tr_bool             clientIsSeed UNUSED )
+                         bool                clientIsSeed UNUSED )
 {
     struct sockaddr_storage ss;
     socklen_t sslen;
@@ -323,7 +323,7 @@ tr_netOpenPeerUTPSocket( tr_session        * session,
 }
 
 static int
-tr_netBindTCPImpl( const tr_address * addr, tr_port port, tr_bool suppressMsgs, int * errOut )
+tr_netBindTCPImpl( const tr_address * addr, tr_port port, bool suppressMsgs, int * errOut )
 {
     static const int domains[NUM_TR_AF_INET_TYPES] = { AF_INET, AF_INET6 };
     struct sockaddr_storage sock;
@@ -396,27 +396,27 @@ tr_netBindTCPImpl( const tr_address * addr, tr_port port, tr_bool suppressMsgs, 
 }
 
 int
-tr_netBindTCP( const tr_address * addr, tr_port port, tr_bool suppressMsgs )
+tr_netBindTCP( const tr_address * addr, tr_port port, bool suppressMsgs )
 {
     int unused;
     return tr_netBindTCPImpl( addr, port, suppressMsgs, &unused );
 }
 
-tr_bool
+bool
 tr_net_hasIPv6( tr_port port )
 {
-    static tr_bool result = FALSE;
-    static tr_bool alreadyDone = FALSE;
+    static bool result = false;
+    static bool alreadyDone = false;
 
     if( !alreadyDone )
     {
         int err;
-        int fd = tr_netBindTCPImpl( &tr_in6addr_any, port, TRUE, &err );
+        int fd = tr_netBindTCPImpl( &tr_in6addr_any, port, true, &err );
         if( fd >= 0 || err != EAFNOSUPPORT ) /* we support ipv6 */
-            result = TRUE;
+            result = true;
         if( fd >= 0 )
             tr_netCloseSocket( fd );
-        alreadyDone = TRUE;
+        alreadyDone = true;
     }
 
     return result;
@@ -602,13 +602,13 @@ tr_globalIPv6( void )
 ****
 ***/
 
-static tr_bool
+static bool
 isIPv4MappedAddress( const tr_address * addr )
 {
     return ( addr->type == TR_AF_INET6 ) && IN6_IS_ADDR_V4MAPPED( &addr->addr.addr6 );
 }
 
-static tr_bool
+static bool
 isIPv6LinkLocalAddress( const tr_address * addr )
 {
     return ( ( addr->type == TR_AF_INET6 )
@@ -617,7 +617,7 @@ isIPv6LinkLocalAddress( const tr_address * addr )
 
 /* isMartianAddr was written by Juliusz Chroboczek,
    and is covered under the same license as third-party/dht/dht.c. */
-static tr_bool
+static bool
 isMartianAddr( const struct tr_address * a )
 {
     static const unsigned char zeroes[16] =
@@ -650,11 +650,11 @@ isMartianAddr( const struct tr_address * a )
         }
 
         default:
-            return TRUE;
+            return true;
     }
 }
 
-tr_bool
+bool
 tr_isValidPeerAddress( const tr_address * addr, tr_port port )
 {
     return ( port != 0 )

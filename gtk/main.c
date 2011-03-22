@@ -504,10 +504,10 @@ on_rpc_changed( tr_session            * session,
             tr_sessionGetSettings( session, &tmp );
             for( i=0; tr_bencDictChild( &tmp, i, &key, &newval ); ++i )
             {
-                tr_bool changed;
+                bool changed;
                 tr_benc * oldval = tr_bencDictFind( oldvals, key );
                 if( !oldval )
-                    changed = TRUE;
+                    changed = true;
                 else {
                     char * a = tr_bencToStr( oldval, TR_FMT_BENC, NULL );
                     char * b = tr_bencToStr( newval, TR_FMT_BENC, NULL );

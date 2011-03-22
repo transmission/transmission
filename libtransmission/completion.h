@@ -25,9 +25,9 @@
 
 typedef struct tr_completion
 {
-    tr_bool  sizeWhenDoneIsDirty;
-    tr_bool  blocksWantedIsDirty;
-    tr_bool  haveValidIsDirty;
+    bool  sizeWhenDoneIsDirty;
+    bool  blocksWantedIsDirty;
+    bool  haveValidIsDirty;
 
     tr_torrent *    tor;
 
@@ -127,23 +127,23 @@ static inline double tr_cpPercentDone( const tr_completion * cp )
 
 int tr_cpMissingBlocksInPiece( const tr_completion * cp, tr_piece_index_t i );
 
-static inline tr_bool
+static inline bool
 tr_cpPieceIsComplete( const tr_completion * cp, tr_piece_index_t i )
 {
     return tr_cpMissingBlocksInPiece( cp, i ) == 0;
 }
 
-void   tr_cpPieceAdd( tr_completion * cp, tr_piece_index_t i );
+void tr_cpPieceAdd( tr_completion * cp, tr_piece_index_t i );
 
-void   tr_cpPieceRem( tr_completion * cp, tr_piece_index_t i );
+void tr_cpPieceRem( tr_completion * cp, tr_piece_index_t i );
 
-tr_bool tr_cpFileIsComplete( const tr_completion * cp, tr_file_index_t );
+bool tr_cpFileIsComplete( const tr_completion * cp, tr_file_index_t );
 
 /**
 *** Blocks
 **/
 
-static inline tr_bool
+static inline bool
 tr_cpBlockIsComplete( const tr_completion * cp, tr_block_index_t i )
 {
     return tr_bitsetHas( &cp->blockBitset, i );
@@ -151,7 +151,7 @@ tr_cpBlockIsComplete( const tr_completion * cp, tr_block_index_t i )
 
 void tr_cpBlockAdd( tr_completion * cp, tr_block_index_t i );
 
-tr_bool tr_cpBlockBitsetInit( tr_completion * cp, const tr_bitset * blocks );
+bool tr_cpBlockBitsetInit( tr_completion * cp, const tr_bitset * blocks );
 
 /***
 ****

@@ -381,7 +381,7 @@ tr_realMakeMetaInfo( tr_metainfo_builder * builder )
         builder->errfile[0] = '\0';
         builder->my_errno = ENOENT;
         builder->result = TR_MAKEMETA_IO_READ;
-        builder->isDone = TRUE;
+        builder->isDone = true;
     }
 
     if( !builder->result && builder->trackerCount )

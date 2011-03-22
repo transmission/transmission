@@ -74,7 +74,7 @@ typedef struct
     uint32_t              offset;       /* for GOT_BLOCK */
     uint32_t              length;       /* for GOT_BLOCK + GOT_DATA */
     int                   err;          /* errno for GOT_ERROR */
-    tr_bool               wasPieceData; /* for GOT_DATA */
+    bool                  wasPieceData; /* for GOT_DATA */
     tr_port               port;         /* for GOT_PORT */
 }
 tr_peer_event;

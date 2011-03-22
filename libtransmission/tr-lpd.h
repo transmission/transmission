@@ -29,12 +29,10 @@ THE SOFTWARE.
 
 /* $Id$ */
 
-int tr_lpdInit( tr_session*, tr_address* );
+int  tr_lpdInit( tr_session*, tr_address* );
 void tr_lpdUninit( tr_session* );
-
-tr_bool tr_lpdEnabled( const tr_session* );
-
-tr_bool tr_lpdSendAnnounce( const tr_torrent* );
+bool tr_lpdEnabled( const tr_session* );
+bool tr_lpdSendAnnounce( const tr_torrent* );
 
 /**
 * @defgroup Preproc Helper macros

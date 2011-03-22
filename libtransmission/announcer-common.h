@@ -73,10 +73,10 @@ struct tr_scrape_response_row
 typedef struct
 {
     /* whether or not we managed to connect to the tracker */
-    tr_bool did_connect;
+    bool did_connect;
 
     /* whether or not the scrape timed out */
-    tr_bool did_timeout;
+    bool did_timeout;
 
     /* how many info hashes are in the 'rows' field */
     int row_count;
@@ -128,7 +128,7 @@ const char * tr_announce_event_get_string( tr_announce_event );
 typedef struct
 {
     tr_announce_event event;
-    tr_bool partial_seed;
+    bool partial_seed;
 
     /* the port we listen for incoming peers on */
     int port;
@@ -178,10 +178,10 @@ typedef struct
     uint8_t info_hash[SHA_DIGEST_LENGTH];
 
     /* whether or not we managed to connect to the tracker */
-    tr_bool did_connect;
+    bool did_connect;
 
     /* whether or not the scrape timed out */
-    tr_bool did_timeout;
+    bool did_timeout;
 
     /* preferred interval between announces.
      * transmission treats this as the interval for periodic announces */

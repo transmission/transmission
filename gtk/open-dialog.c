@@ -263,7 +263,7 @@ gtr_torrent_options_dialog_new( GtkWindow * parent, TrCore * core, tr_ctor * cto
     GtkWidget *      grab;
     GtkWidget *      source_chooser;
     struct OpenData * data;
-    uint8_t          flag;
+    bool             flag;
     GSList *         list;
     GSList *         walk;
 

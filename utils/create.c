@@ -26,8 +26,8 @@
 #define MAX_TRACKERS 128
 static tr_tracker_info trackers[MAX_TRACKERS];
 static int trackerCount = 0;
-static tr_bool isPrivate = FALSE;
-static tr_bool showVersion = FALSE;
+static bool isPrivate = false;
+static bool showVersion = false;
 const char * comment = NULL;
 const char * outfile = NULL;
 const char * infile = NULL;
@@ -58,8 +58,8 @@ parseCommandLine( int argc, const char ** argv )
     {
         switch( c )
         {
-            case 'V': showVersion = TRUE; break;
-            case 'p': isPrivate = TRUE; break;
+            case 'V': showVersion = true; break;
+            case 'p': isPrivate = true; break;
             case 'o': outfile = optarg; break;
             case 'c': comment = optarg; break;
             case 't': if( trackerCount + 1 < MAX_TRACKERS ) {

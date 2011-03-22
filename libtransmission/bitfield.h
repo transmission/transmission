@@ -60,20 +60,20 @@ tr_bitfield* tr_bitfieldOr( tr_bitfield*, const tr_bitfield* );
     has none of tr_bitfieldHas()'s safety checks, so you
     need to call tr_bitfieldTestFast() first before you
     start looping. */
-static inline tr_bool tr_bitfieldHasFast( const tr_bitfield * b, const size_t nth )
+static inline bool tr_bitfieldHasFast( const tr_bitfield * b, const size_t nth )
 {
     return ( b->bits[nth>>3u] << ( nth & 7u ) & 0x80 ) != 0;
 }
 
 /** @param high the highest nth bit you're going to access */
-static inline tr_bool tr_bitfieldTestFast( const tr_bitfield * b, const size_t high )
+static inline bool tr_bitfieldTestFast( const tr_bitfield * b, const size_t high )
 {
     return ( b != NULL )
         && ( b->bits != NULL )
         && ( high < b->bitCount );
 }
 
-static inline tr_bool tr_bitfieldHas( const tr_bitfield * b, size_t nth )
+static inline bool tr_bitfieldHas( const tr_bitfield * b, size_t nth )
 {
     return tr_bitfieldTestFast( b, nth ) && tr_bitfieldHasFast( b, nth );
 }

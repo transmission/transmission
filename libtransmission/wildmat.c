@@ -20,13 +20,13 @@
 **  explanation is from Lars:
 **  The precondition that must be fulfilled is that DoMatch will consume
 **  at least one character in text. This is true if *p is neither '*' nor
-**  '\0'.)  The last return has ABORT instead of FALSE to avoid quadratic
+**  '\0'.)  The last return has ABORT instead of false to avoid quadratic
 **  behaviour in cases like pattern "*a*b*c*d" with text "abcxxxxx". With
-**  FALSE, each star-loop has to run to the end of the text; with ABORT
+**  false, each star-loop has to run to the end of the text; with ABORT
 **  only the last one does.
 **
 **  Once the control of one instance of DoMatch enters the star-loop, that
-**  instance will return either TRUE or ABORT, and any calling instance
+**  instance will return either true or ABORT, and any calling instance
 **  will therefore return immediately after (without calling recursively
 **  again). In effect, only one star-loop is ever active. It would be
 **  possible to modify the code to maintain this context explicitly,
@@ -51,7 +51,7 @@
 
 
 /*
-**  Match text and p, return TRUE, FALSE, or ABORT.
+**  Match text and p, return true, false, or ABORT.
 */
 static int
 DoMatch( const char * text, const char * p )
@@ -70,7 +70,7 @@ DoMatch( const char * text, const char * p )
 	    /* FALLTHROUGH */
 	default:
 	    if (*text != *p)
-		return FALSE;
+		return false;
 	    continue;
 	case '?':
 	    /* Match anything. */
@@ -81,42 +81,40 @@ DoMatch( const char * text, const char * p )
 		continue;
 	    if (*p == '\0')
 		/* Trailing star matches everything. */
-		return TRUE;
+		return true;
 	    while (*text)
-		if ((matched = DoMatch(text++, p)) != FALSE)
+		if ((matched = DoMatch(text++, p)) != false)
 		    return matched;
 	    return ABORT;
 	case '[':
-	    reverse = p[1] == NEGATE_CLASS ? TRUE : FALSE;
+	    reverse = p[1] == NEGATE_CLASS ? true : false;
 	    if (reverse)
 		/* Inverted character class. */
 		p++;
-	    for (last = 0400, matched = FALSE; *++p && *p != ']'; last = *p)
+	    for (last = 0400, matched = false; *++p && *p != ']'; last = *p)
 		/* This next line requires a good C compiler. */
 		if (*p == '-' ? *text <= *++p && *text >= last : *text == *p)
-		    matched = TRUE;
+		    matched = true;
 	    if (matched == reverse)
-		return FALSE;
+		return false;
 	    continue;
 	}
     }
 
 #ifdef	MATCH_TAR_PATTERN
     if (*text == '/')
-	return TRUE;
+	return true;
 #endif	/* MATCH_TAR_ATTERN */
     return *text == '\0';
 }
 
 
-/*
-**  User-level routine. Returns TRUE or FALSE.
-*/
-int
+/* User-level routine. returns whether or not 'text' and 'p' matched */
+bool
 tr_wildmat(const char * text, const char * p )
 {
     if (p[0] == '*' && p[1] == '\0')
-	return TRUE;
+	return true;
 
-    return DoMatch(text, p) == TRUE;
+    return DoMatch(text, p) == true;
 }

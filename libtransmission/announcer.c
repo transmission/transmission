@@ -128,7 +128,7 @@ typedef struct tr_announcer
 }
 tr_announcer;
 
-tr_bool
+bool
 tr_announcerHasBacklog( const struct tr_announcer * announcer )
 {
     return announcer->slotsAvailable < 1;
@@ -264,15 +264,15 @@ typedef struct tr_tier
     time_t scrapeAt;
     time_t lastScrapeStartTime;
     time_t lastScrapeTime;
-    tr_bool lastScrapeSucceeded;
-    tr_bool lastScrapeTimedOut;
+    bool lastScrapeSucceeded;
+    bool lastScrapeTimedOut;
 
     time_t announceAt;
     time_t manualAnnounceAllowedAt;
     time_t lastAnnounceStartTime;
     time_t lastAnnounceTime;
-    tr_bool lastAnnounceSucceeded;
-    tr_bool lastAnnounceTimedOut;
+    bool lastAnnounceSucceeded;
+    bool lastAnnounceTimedOut;
 
     tr_announce_event * announce_events;
     int announce_event_count;
@@ -287,10 +287,10 @@ typedef struct tr_tier
 
     int lastAnnouncePeerCount;
 
-    tr_bool isRunning;
-    tr_bool isAnnouncing;
-    tr_bool isScraping;
-    tr_bool wasCopied;
+    bool isRunning;
+    bool isAnnouncing;
+    bool isScraping;
+    bool wasCopied;
 
     char lastAnnounceStr[128];
     char lastScrapeStr[128];
@@ -352,8 +352,8 @@ tierIncrementTracker( tr_tier * tier )
     tier->scrapeIntervalSec = DEFAULT_SCRAPE_INTERVAL_SEC;
     tier->announceIntervalSec = DEFAULT_ANNOUNCE_INTERVAL_SEC;
     tier->announceMinIntervalSec = DEFAULT_ANNOUNCE_MIN_INTERVAL_SEC;
-    tier->isAnnouncing = FALSE;
-    tier->isScraping = FALSE;
+    tier->isAnnouncing = false;
+    tier->isScraping = false;
     tier->lastAnnounceStartTime = 0;
     tier->lastScrapeStartTime = 0;
 }
@@ -558,7 +558,7 @@ filter_trackers( tr_tracker_info * input, int input_count, int * setme_count )
             char * scheme;
             char * host;
             char * path;
-            tr_bool is_duplicate = FALSE;
+            bool is_duplicate = false;
             tr_urlParse( input[i].announce, -1, &scheme, &host, &port, &path );
 
             /* weed out one common source of duplicates:
@@ -677,13 +677,13 @@ tr_announcerAddTorrent( tr_torrent           * tor,
 ****
 ***/
 
-static tr_bool
+static bool
 tierCanManualAnnounce( const tr_tier * tier )
 {
     return tier->manualAnnounceAllowedAt <= tr_time( );
 }
 
-tr_bool
+bool
 tr_announcerCanManualAnnounce( const tr_torrent * tor )
 {
     int i;
@@ -694,16 +694,16 @@ tr_announcerCanManualAnnounce( const tr_torrent * tor )
     assert( tor->tiers != NULL );
 
     if( !tor->isRunning )
-        return FALSE;
+        return false;
 
     /* return true if any tier can manual announce */
     n = tr_ptrArraySize( &tor->tiers->tiers );
     tiers = (const tr_tier**) tr_ptrArrayBase( &tor->tiers->tiers );
     for( i=0; i<n; ++i )
         if( tierCanManualAnnounce( tiers[i] ) )
-            return TRUE;
+            return true;
 
-    return FALSE;
+    return false;
 }
 
 time_t
@@ -776,7 +776,7 @@ tier_announce_event_push( tr_tier            * tier,
         /* special case #1: if we're adding a "stopped" event,
          * dump everything leading up to it except "completed" */
         if( e == TR_ANNOUNCE_EVENT_STOPPED ) {
-            tr_bool has_completed = FALSE;
+            bool has_completed = false;
             const tr_announce_event c = TR_ANNOUNCE_EVENT_COMPLETED;
             for( i=0; !has_completed && i<tier->announce_event_count; ++i )
                 has_completed = c == tier->announce_events[i];
@@ -963,7 +963,7 @@ struct announce_data
     tr_announce_event event;
 
     /** If the request succeeds, the value for tier's "isRunning" flag */
-    tr_bool isRunningOnSuccess;
+    bool isRunningOnSuccess;
 };
 
 static void
@@ -1035,8 +1035,8 @@ on_announce_done( tr_session                  * session,
 
         tier->lastAnnounceTime = now;
         tier->lastAnnounceTimedOut = response->did_timeout;
-        tier->lastAnnounceSucceeded = FALSE;
-        tier->isAnnouncing = FALSE;
+        tier->lastAnnounceSucceeded = false;
+        tier->isAnnouncing = false;
         tier->manualAnnounceAllowedAt = now + tier->announceMinIntervalSec;
 
         if( !response->did_connect )
@@ -1056,7 +1056,7 @@ on_announce_done( tr_session                  * session,
         {
             int i;
             const char * str;
-            const tr_bool isStopped = event == TR_ANNOUNCE_EVENT_STOPPED;
+            const bool isStopped = event == TR_ANNOUNCE_EVENT_STOPPED;
 
             publishErrorClear( tier );
 
@@ -1102,8 +1102,8 @@ on_announce_done( tr_session                  * session,
             tier->isRunning = data->isRunningOnSuccess;
             tier->scrapeAt = now + tier->scrapeIntervalSec;
             tier->lastScrapeTime = now;
-            tier->lastScrapeSucceeded = TRUE;
-            tier->lastAnnounceSucceeded = TRUE;
+            tier->lastScrapeSucceeded = true;
+            tier->lastAnnounceSucceeded = true;
             tier->lastAnnouncePeerCount = response->pex_count
                                         + response->pex6_count;
 
@@ -1171,7 +1171,7 @@ tierAnnounce( tr_announcer * announcer, tr_tier * tier )
     data->timeSent = now;
     data->event = announce_event;
 
-    tier->isAnnouncing = TRUE;
+    tier->isAnnouncing = true;
     tier->lastAnnounceStartTime = now;
     --announcer->slotsAvailable;
 
@@ -1204,7 +1204,7 @@ on_scrape_error( tr_tier * tier, const char * errmsg )
     /* schedule a rescrape */
     interval = getRetryInterval( tier->currentTracker );
     dbgmsg( tier, "Retrying scrape in %d seconds.", interval );
-    tier->lastScrapeSucceeded = FALSE;
+    tier->lastScrapeSucceeded = false;
     tier->scrapeAt = tr_time() + interval;
 }
 
@@ -1263,9 +1263,9 @@ on_scrape_done( tr_session                * session,
                               response->min_request_interval,
                               response->errmsg ? response->errmsg : "none" );
 
-                tier->isScraping = FALSE;
+                tier->isScraping = false;
                 tier->lastScrapeTime = now;
-                tier->lastScrapeSucceeded = FALSE;
+                tier->lastScrapeSucceeded = false;
                 tier->lastScrapeTimedOut = response->did_timeout;
 
                 if( !response->did_connect )
@@ -1284,7 +1284,7 @@ on_scrape_done( tr_session                * session,
                 {
                     tr_tracker * tracker;
 
-                    tier->lastScrapeSucceeded = TRUE;
+                    tier->lastScrapeSucceeded = true;
                     tier->scrapeIntervalSec = MAX( DEFAULT_SCRAPE_INTERVAL_SEC,
                                                    response->min_request_interval );
                     tier->scrapeAt = now + tier->scrapeIntervalSec;
@@ -1353,7 +1353,7 @@ multiscrape( tr_announcer * announcer, tr_ptrArray * tiers )
                 continue;
 
             memcpy( req->info_hash[req->info_hash_count++], hash, SHA_DIGEST_LENGTH );
-            tier->isScraping = TRUE;
+            tier->isScraping = true;
             tier->lastScrapeStartTime = now;
             break;
         }
@@ -1366,7 +1366,7 @@ multiscrape( tr_announcer * announcer, tr_ptrArray * tiers )
             tier_build_log_name( tier, req->log_name, sizeof( req->log_name ) );
 
             memcpy( req->info_hash[req->info_hash_count++], hash, SHA_DIGEST_LENGTH );
-            tier->isScraping = TRUE;
+            tier->isScraping = true;
             tier->lastScrapeStartTime = now;
         }
     }
@@ -1391,7 +1391,7 @@ flushCloseMessages( tr_announcer * announcer )
     tr_ptrArrayClear( &announcer->stops );
 }
 
-static tr_bool
+static bool
 tierNeedsToAnnounce( const tr_tier * tier, const time_t now )
 {
     return !tier->isAnnouncing
@@ -1401,7 +1401,7 @@ tierNeedsToAnnounce( const tr_tier * tier, const time_t now )
         && ( tier->announce_event_count > 0 );
 }
 
-static tr_bool
+static bool
 tierNeedsToScrape( const tr_tier * tier, const time_t now )
 {
     return ( !tier->isScraping )
@@ -1485,7 +1485,7 @@ onUpkeepTimer( int foo UNUSED, short bar UNUSED, void * vannouncer )
 {
     tr_announcer * announcer = vannouncer;
     tr_session * session = announcer->session;
-    const tr_bool is_closing = session->isClosed;
+    const bool is_closing = session->isClosed;
     const time_t now = tr_time( );
 
     tr_sessionLock( session );
@@ -1706,7 +1706,7 @@ tr_announcerResetTorrent( tr_announcer * announcer UNUSED, tr_torrent * tor )
                     tierCopyAttributes( t, o );
                     t->currentTracker = item;
                     t->currentTrackerIndex = k;
-                    t->wasCopied = TRUE;
+                    t->wasCopied = true;
                     trackerItemCopyAttributes( item, o->currentTracker );
                     dbgmsg( t, "attributes copied to tier %d, tracker %d"
                                                "from tier %d, tracker %d",

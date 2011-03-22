@@ -27,7 +27,7 @@ static char * previousLocation = NULL;
 struct relocate_dialog_data
 {
     int done;
-    tr_bool do_move;
+    bool do_move;
     TrCore * core;
     GSList * torrent_ids;
     GtkWidget * message_dialog;

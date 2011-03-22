@@ -65,7 +65,7 @@ main( void )
     remove( tmpfile_txt );
     remove( tmpfile_bin );
 
-    b = _tr_blocklistNew( tmpfile_bin, TRUE );
+    b = _tr_blocklistNew( tmpfile_bin, true );
     createTestBlocklist( tmpfile_txt );
     _tr_blocklistSetContent( b, tmpfile_txt );
 
