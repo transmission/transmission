@@ -604,18 +604,18 @@ tr_dhtUpkeep( tr_session * session )
         {
             const int rc = tr_dhtAnnounce(tor, AF_INET, 1);
 
-            tor->dhtAnnounceAt = now + (rc == 0)
+            tor->dhtAnnounceAt = now + ((rc == 0)
                                      ? 5 + tr_cryptoWeakRandInt( 5 )
-                                     : 25 * 60 + tr_cryptoWeakRandInt( 3*60 );
+                                     : 25 * 60 + tr_cryptoWeakRandInt( 3*60 ));
         }
 
         if( tor->dhtAnnounce6At <= now )
         {
             const int rc = tr_dhtAnnounce(tor, AF_INET6, 1);
 
-            tor->dhtAnnounce6At = now + (rc == 0)
+            tor->dhtAnnounce6At = now + ((rc == 0)
                                       ? 5 + tr_cryptoWeakRandInt( 5 )
-                                      : 25 * 60 + tr_cryptoWeakRandInt( 3*60 );
+                                      : 25 * 60 + tr_cryptoWeakRandInt( 3*60 ));
         }
     }
 }
