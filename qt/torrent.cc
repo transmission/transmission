@@ -471,7 +471,7 @@ Torrent :: update( tr_benc * d )
             }
 
             case QVariant :: Bool: {
-                tr_bool val;
+                bool val;
                 if( tr_bencGetBool( child, &val ) )
                     changed |= setBool( i, val );
                 break;
@@ -539,7 +539,7 @@ Torrent :: update( tr_benc * d )
         const int n = tr_bencListSize( files );
         for( int i=0; i<n && i<myFiles.size(); ++i ) {
             int64_t intVal;
-            tr_bool boolVal;
+            bool boolVal;
             tr_benc * child = tr_bencListChild( files, i );
             TrFile& file( myFiles[i] );
             if( tr_bencDictFindInt( child, "bytesCompleted", &intVal ) )
@@ -576,7 +576,7 @@ Torrent :: update( tr_benc * d )
         TrackerStatsList  trackerStatsList;
         int childNum = 0;
         while(( child = tr_bencListChild( trackerStats, childNum++ ))) {
-            tr_bool b;
+            bool b;
             int64_t i;
             const char * str;
             TrackerStat trackerStat;
@@ -645,7 +645,7 @@ Torrent :: update( tr_benc * d )
         int childNum = 0;
         while(( child = tr_bencListChild( peers, childNum++ ))) {
             double d;
-            tr_bool b;
+            bool b;
             int64_t i;
             const char * str;
             Peer peer;

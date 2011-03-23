@@ -799,7 +799,7 @@ Session :: parseResponse( const char * json, size_t jsonLength )
                 }
 
                 case TAG_PORT_TEST: {
-                    tr_bool isOpen = 0;
+                    bool isOpen = 0;
                     if( tr_bencDictFindDict( &top, "arguments", &args ) )
                         tr_bencDictFindBool( args, "port-is-open", &isOpen );
                     emit portTested( (bool)isOpen );
@@ -917,7 +917,7 @@ Session :: updateInfo( tr_benc * d )
                 break;
             }
             case QVariant :: Bool: {
-                tr_bool val;
+                bool val;
                 if( tr_bencGetBool( b, &val ) )
                     myPrefs.set( i, (bool)val );
                 break;
@@ -935,7 +935,7 @@ Session :: updateInfo( tr_benc * d )
         }
     }
 
-    tr_bool b;
+    bool b;
     double x;
     if( tr_bencDictFindBool( d, "seedRatioLimited", &b ) )
         myPrefs.set( Prefs::RATIO_ENABLED, b ? true : false );

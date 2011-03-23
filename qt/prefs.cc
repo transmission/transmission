@@ -140,7 +140,7 @@ Prefs :: Prefs( const char * configDir ):
     for( int i=0; i<PREFS_COUNT; ++i )
     {
         double d;
-        tr_bool boolVal;
+        bool boolVal;
         int64_t intVal;
         const char * str;
         tr_benc * b( tr_bencDictFind( &top, myItems[i].key ) );
