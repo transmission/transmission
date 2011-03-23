@@ -44,12 +44,14 @@ extern "C" {
 #include <inttypes.h> /* uintN_t */
 #include <time.h> /* time_t */
 
-#ifdef HAVE_STDBOOL_H
- #include <stdbool.h>
-#elif !defined(__bool_true_false_are_defined)
- #define bool uint8_t
- #define true 1
- #define false 0
+#if !defined(__cplusplus)
+ #ifdef HAVE_STDBOOL_H
+  #include <stdbool.h>
+ #elif !defined(__bool_true_false_are_defined)
+  #define bool uint8_t
+  #define true 1
+  #define false 0
+ #endif
 #endif
 
 #ifndef PRId64
