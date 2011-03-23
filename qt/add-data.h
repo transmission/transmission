@@ -14,8 +14,6 @@
 #define ADD_DATA_H
 
 #include <QByteArray>
-#include <QFile>
-#include <QObject>
 #include <QString>
 #include <QUrl>
 
