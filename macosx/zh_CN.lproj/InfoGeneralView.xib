@@ -196,7 +196,7 @@
 					<object class="NSTextField" id="99378388">
 						<reference key="NSNextResponder" ref="923140800"/>
 						<int key="NSvFlags">266</int>
-						<string key="NSFrame">{{79, 11}, {242, 14}}</string>
+						<string key="NSFrame">{{79, 10}, {242, 14}}</string>
 						<reference key="NSSuperview" ref="923140800"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSTextFieldCell" key="NSCell" id="85533753">
@@ -229,7 +229,7 @@
 					<object class="NSButton" id="178285891">
 						<reference key="NSNextResponder" ref="923140800"/>
 						<int key="NSvFlags">265</int>
-						<string key="NSFrame">{{326, 11}, {14, 14}}</string>
+						<string key="NSFrame">{{326, 10}, {14, 14}}</string>
 						<reference key="NSSuperview" ref="923140800"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSButtonCell" key="NSCell" id="555982601">
