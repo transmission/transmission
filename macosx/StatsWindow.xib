@@ -2,10 +2,10 @@
 <archive type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="7.10">
 	<data>
 		<int key="IBDocument.SystemTarget">1050</int>
-		<string key="IBDocument.SystemVersion">10J567</string>
+		<string key="IBDocument.SystemVersion">10J869</string>
 		<string key="IBDocument.InterfaceBuilderVersion">1305</string>
 		<string key="IBDocument.AppKitVersion">1038.35</string>
-		<string key="IBDocument.HIToolboxVersion">462.00</string>
+		<string key="IBDocument.HIToolboxVersion">461.00</string>
 		<object class="NSMutableDictionary" key="IBDocument.PluginVersions">
 			<string key="NS.key.0">com.apple.InterfaceBuilder.CocoaPlugin</string>
 			<string key="NS.object.0">1305</string>
@@ -50,8 +50,8 @@
 				<string key="NSWindowTitle">Statistics</string>
 				<string key="NSWindowClass">NSPanel</string>
 				<nil key="NSViewClass"/>
-				<string key="NSWindowContentMaxSize">{284, 191}</string>
-				<string key="NSWindowContentMinSize">{284, 191}</string>
+				<string key="NSWindowContentMaxSize">{326, 191}</string>
+				<string key="NSWindowContentMinSize">{326, 191}</string>
 				<object class="NSView" key="NSWindowView" id="1006">
 					<reference key="NSNextResponder"/>
 					<int key="NSvFlags">256</int>
@@ -362,8 +362,8 @@
 					<reference key="NSNextKeyView" ref="848189093"/>
 				</object>
 				<string key="NSScreenRect">{{0, 0}, {1680, 1028}}</string>
-				<string key="NSMinSize">{284, 213}</string>
-				<string key="NSMaxSize">{284, 213}</string>
+				<string key="NSMinSize">{326, 213}</string>
+				<string key="NSMaxSize">{326, 213}</string>
 				<string key="NSFrameAutosaveName"/>
 			</object>
 		</object>
