@@ -22,7 +22,7 @@
 #endif
 
 #include <assert.h>
-#include <ctype.h> /* isalpha(), tolower() */
+#include <ctype.h> /* isdigit(), isalpha(), tolower() */
 #include <errno.h>
 #include <float.h> /* DBL_EPSILON */
 #include <locale.h> /* localeconv() */
@@ -40,7 +40,7 @@
 #include <sys/time.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <unistd.h> /* stat(), getcwd(), getpagesize() */
+#include <unistd.h> /* stat(), getcwd(), getpagesize(), unlink() */
 
 #include <event2/buffer.h>
 #include <event2/event.h>

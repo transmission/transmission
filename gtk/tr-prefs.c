@@ -12,7 +12,7 @@
 
 #include <ctype.h> /* isspace */
 #include <limits.h> /* USHRT_MAX */
-#include <stdlib.h> /* free() */
+#include <string.h> /* strcmp() */
 #include <unistd.h>
 #include <glib/gi18n.h>
 #include <gtk/gtk.h>

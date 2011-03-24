@@ -24,8 +24,6 @@
  *****************************************************************************/
 
 #include <errno.h>
-#include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 #include <assert.h>
 
@@ -40,9 +38,7 @@
  #include <netinet/tcp.h>
  #include <arpa/inet.h> /* inet_addr */
  #include <netdb.h>
- #include <fcntl.h>
 #endif
-#include <unistd.h>
 
 #include <event2/util.h>
 #include <libutp/utp.h>

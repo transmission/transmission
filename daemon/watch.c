@@ -20,7 +20,7 @@
 #endif
 
 #include <errno.h>
-#include <string.h> /* strstr */
+#include <string.h> /* strlen() */
 #include <stdio.h> /* perror() */
 
 #include <dirent.h> /* readdir */

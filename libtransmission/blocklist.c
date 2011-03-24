@@ -10,9 +10,13 @@
  * $Id$
  */
 
+#include <assert.h>
+#include <errno.h>
 #include <stdio.h>
-#include <stdlib.h> /* qsort(), free() */
+#include <stdlib.h> /* bsearch(), qsort() */
 #include <string.h>
+
+#include <unistd.h> /* unlink() */
 
 #ifdef WIN32
  #include <w32api.h>
@@ -28,8 +32,6 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
-#include <unistd.h>
-#include <assert.h>
 
 #include "transmission.h"
 #include "platform.h"

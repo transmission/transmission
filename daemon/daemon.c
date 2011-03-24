@@ -13,7 +13,7 @@
 #include <errno.h>
 #include <stdio.h> /* printf */
 #include <stdlib.h> /* exit, atoi */
-#include <string.h> /* strcmp */
+#include <string.h> /* strerror() */
 
 #include <fcntl.h> /* open */
 #include <signal.h>

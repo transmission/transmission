@@ -11,7 +11,7 @@
  */
 
 #include <assert.h>
-#include <limits.h>
+#include <limits.h> /* INT_MAX */
 #include <stdio.h>
 #include <stdlib.h> /* qsort() */
 #include <string.h> /* strcmp(), memcpy() */

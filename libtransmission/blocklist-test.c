@@ -1,6 +1,4 @@
 #include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 #include "transmission.h"
 #include "blocklist.h"
 #include "net.h"

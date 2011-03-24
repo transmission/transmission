@@ -12,9 +12,7 @@
 
 #include <assert.h>
 #include <errno.h>
-#include <stdlib.h>
 #include <string.h>
-#include <stdio.h>
 
 #include <signal.h>
 
@@ -125,7 +123,7 @@ piperead( int s, char *buf, int len )
 #define pipewrite(a,b,c) write(a,b,c)
 #endif
 
-#include <unistd.h>
+#include <unistd.h> /* read(), write(), pipe() */
 
 #include "transmission.h"
 #include "platform.h"

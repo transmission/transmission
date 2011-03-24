@@ -18,7 +18,7 @@
 
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <unistd.h>
+#include <unistd.h> /* read() */
 #include <dirent.h>
 
 #include <event2/util.h> /* evutil_ascii_strcasecmp() */

@@ -21,10 +21,11 @@ THE SOFTWARE.
 
 */
 
-#include <unistd.h>
 #include <assert.h>
 #include <string.h> /* memcmp(), memcpy(), memset() */
 #include <stdlib.h> /* malloc(), free() */
+
+#include <unistd.h> /* close() */
 
 #include <event2/event.h>
 

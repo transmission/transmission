@@ -14,8 +14,6 @@
 #include <errno.h>
 #include <limits.h> /* INT_MAX */
 #include <string.h>
-#include <stdio.h>
-#include <unistd.h>
 
 #ifdef WIN32
  #include <winsock2.h>

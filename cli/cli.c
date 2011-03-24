@@ -22,10 +22,9 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
+#include <stdio.h> /* fprintf() */
+#include <stdlib.h> /* atoi() */
+#include <string.h> /* memcmp() */
 #include <signal.h>
 
 #include <libtransmission/transmission.h>

@@ -10,10 +10,9 @@
  * $Id$
  */
 
-#include <assert.h>
 #include <stddef.h>
-#include <stdio.h> /* sscanf */
-#include <stdlib.h>
+#include <stdio.h> /* sscanf() */
+#include <stdlib.h> /* abort() */
 #include <glib/gi18n.h>
 #include <gtk/gtk.h>
 

@@ -12,8 +12,8 @@
 
 #include <assert.h>
 #include <errno.h>
-#include <stdlib.h> /* realloc */
-#include <string.h> /* memcmp */
+#include <stdlib.h> /* bsearch() */
+#include <string.h> /* memcmp() */
 
 #include <openssl/sha.h>
 

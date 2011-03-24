@@ -13,8 +13,6 @@
 #include <assert.h>
 #include <ctype.h>
 #include <errno.h> /* EILSEQ, EINVAL */
-#include <string.h>
-#include <stdio.h> /* printf */
 
 #include "JSON_parser.h"
 

@@ -12,10 +12,10 @@
 
 #include <assert.h>
 #include <inttypes.h> /* uint8_t */
-#include <limits.h> /* for INT_MAX */
+#include <limits.h> /* INT_MAX */
 #include <stdarg.h>
-#include <stdlib.h> /* for abs() */
-#include <string.h> /* memcpy */
+#include <stdlib.h> /* abs() */
+#include <string.h> /* memcpy(), memset(), strcmp() */
 
 #include <openssl/bn.h>
 #include <openssl/dh.h>

@@ -11,7 +11,6 @@
  */
 
 #include <assert.h>
-#include <string.h>
 #include <stdio.h>
 
 #include <sys/types.h>

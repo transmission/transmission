@@ -15,7 +15,6 @@
 #include <inttypes.h>
 #include <limits.h> /* UCHAR_MAX */
 #include <string.h>
-#include <stdio.h>
 
 #include <event2/event.h>
 

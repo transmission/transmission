@@ -26,7 +26,7 @@
 #include <signal.h>
 #include <string.h>
 #include <stdio.h>
-#include <stdlib.h>
+#include <stdlib.h> /* exit() */
 #include <sys/param.h>
 #include <time.h>
 #include <unistd.h>

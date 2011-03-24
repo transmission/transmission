@@ -24,8 +24,6 @@
 #include <assert.h>
 #include <errno.h>
 #include <inttypes.h>
-#include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 #ifdef SYS_DARWIN
  #include <fcntl.h>
@@ -47,7 +45,7 @@
  #include <sys/resource.h> /* getrlimit */
 #endif
 #include <fcntl.h> /* O_LARGEFILE posix_fadvise */
-#include <unistd.h>
+#include <unistd.h> /* lseek(), write(), ftruncate(), pread(), pwrite(), etc */
 
 #include "transmission.h"
 #include "fdlimit.h"

@@ -13,8 +13,7 @@
 #include <ctype.h> /* isxdigit() */
 #include <errno.h>
 #include <stdarg.h>
-#include <stdlib.h> /* free() */
-#include <string.h> /* strcmp() */
+#include <string.h> /* strchr(), strrchr(), strlen(), strncmp(), strstr() */
 
 #include <sys/types.h> /* for gtr_lockfile()'s open() */
 #include <sys/stat.h> /* for gtr_lockfile()'s open() */
@@ -888,6 +887,6 @@ gtr_label_set_text( GtkLabel * lb, const char * newstr )
 {
     const char * oldstr = gtk_label_get_text( lb );
 
-    if( ( oldstr == NULL ) || strcmp( oldstr, newstr ) )
+    if( tr_strcmp0( oldstr, newstr ) )
         gtk_label_set_text( lb, newstr );
 }

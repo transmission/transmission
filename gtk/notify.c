@@ -10,7 +10,7 @@
  * $Id$
  */
 
-#include <string.h>
+#include <string.h> /* strcmp() */
 
 #ifdef HAVE_LIBCANBERRA
  #include <canberra-gtk.h>
