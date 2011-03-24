@@ -238,6 +238,8 @@
     if ([fTrackerTable editedRow] != -1)
         return;
     
+    [self updateInfo];
+    
     if ([[sender cell] tagForSegment: [sender selectedSegment]] == TRACKER_REMOVE_TAG)
         [self removeTrackers];
     else
@@ -330,7 +332,10 @@
         }
     }
     
-    NSAssert(removeCount > 0, @"Trying to remove no trackers.");
+    //we might have no trackers if remove right after a failed add (race condition ftw)
+    #warning look into having a failed add apply right away, so that this can become an assert
+    if (removeCount == 0)
+        return;
     
     if ([[NSUserDefaults standardUserDefaults] boolForKey: @"WarningRemoveTrackers"])
     {
