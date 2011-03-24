@@ -120,6 +120,20 @@ level_combo_changed_cb( GtkComboBox * combo_box, gpointer gdata )
         scroll_to_bottom( data );
 }
 
+/* similar to asctime, but is utf8-clean */
+static char*
+gtr_localtime( time_t time )
+{
+    char buf[256], *eoln;
+    const struct tm tm = *localtime( &time );
+
+    g_strlcpy( buf, asctime( &tm ), sizeof( buf ) );
+    if( ( eoln = strchr( buf, '\n' ) ) )
+        *eoln = '\0';
+
+    return g_locale_to_utf8( buf, -1, NULL, NULL, NULL );
+}
+
 static void
 doSave( GtkWindow * parent, struct MsgData * data, const char * filename )
 {

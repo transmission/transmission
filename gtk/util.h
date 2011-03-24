@@ -63,10 +63,6 @@ char* tr_strlratio( char * buf, double ratio, size_t buflen );
 /* return a human-readable string for the time given in seconds. */
 char* tr_strltime( char * buf, int secs, size_t buflen );
 
-/* similar to asctime, but is utf8-clean */
-char* gtr_localtime( time_t time );
-
-
 int gtr_compare_double( const double a, const double b, int decimal_places );
 
 

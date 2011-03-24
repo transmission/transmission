@@ -212,19 +212,6 @@ tr_strltime( char * buf, int seconds, size_t buflen )
     return buf;
 }
 
-char *
-gtr_localtime( time_t time )
-{
-    char buf[256], *eoln;
-    const struct tm tm = *localtime( &time );
-
-    g_strlcpy( buf, asctime( &tm ), sizeof( buf ) );
-    if( ( eoln = strchr( buf, '\n' ) ) )
-        *eoln = '\0';
-
-    return g_locale_to_utf8( buf, -1, NULL, NULL, NULL );
-}
-
 int
 gtr_mkdir_with_parents( const char * path, int mode )
 {
