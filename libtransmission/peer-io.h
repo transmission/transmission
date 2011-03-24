@@ -23,12 +23,8 @@
 
 #include <assert.h>
 
-#include <event2/buffer.h>
-#include <event2/event.h>
-
 #include "transmission.h"
 #include "bandwidth.h"
-#include "list.h" /* tr_list */
 #include "net.h" /* tr_address */
 #include "utils.h" /* tr_time() */
 
@@ -36,6 +32,7 @@ struct evbuffer;
 struct tr_bandwidth;
 struct tr_crypto;
 struct tr_peerIo;
+struct tr_list;
 
 /**
  * @addtogroup networked_io Networked IO

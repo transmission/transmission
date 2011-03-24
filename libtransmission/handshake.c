@@ -16,6 +16,7 @@
 #include <limits.h> /* UCHAR_MAX */
 #include <string.h>
 
+#include <event2/buffer.h>
 #include <event2/event.h>
 
 #include "transmission.h"

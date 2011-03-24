@@ -26,7 +26,7 @@
 #include "bitfield.h"
 #include "bitset.h"
 #include "history.h"
-#include "net.h"
+#include "net.h" /* tr_address */
 #include "peer-common.h" /* struct peer_request */
 
 /**
