@@ -22,6 +22,7 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
+#include <math.h> /* pow() */
 #include <string.h> /* strcmp, strlen */
 
 #include <gtk/gtk.h>
@@ -1343,6 +1344,16 @@ gtr_core_clear( TrCore * self )
 /***
 ****
 ***/
+
+static int
+gtr_compare_double( const double a, const double b, int decimal_places )
+{
+    const int64_t ia = (int64_t)(a * pow( 10, decimal_places ) );
+    const int64_t ib = (int64_t)(b * pow( 10, decimal_places ) );
+    if( ia < ib ) return -1;
+    if( ia > ib ) return  1;
+    return 0;
+}
 
 static gboolean
 update_foreach( GtkTreeModel * model,
