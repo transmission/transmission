@@ -738,17 +738,6 @@ gtr_widget_set_visible( GtkWidget * w, gboolean b )
 #endif
 }
 
-void
-gtr_cell_renderer_get_padding( GtkCellRenderer * cell, gint * xpad, gint * ypad )
-{
-#if GTK_CHECK_VERSION( 2,18,0 )
-    gtk_cell_renderer_get_padding( cell, xpad, ypad );
-#else
-    if( xpad != NULL ) *xpad = cell->xpad;
-    if( ypad != NULL ) *ypad = cell->ypad;
-#endif
-}
-
 static GtkWidget*
 gtr_dialog_get_content_area( GtkDialog * dialog )
 {

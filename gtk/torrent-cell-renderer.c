@@ -40,6 +40,22 @@ enum
 ****
 ***/
 
+/* backwards-compatible wrapper around gtk_cell_renderer_get_padding() */
+static void
+gtr_cell_renderer_get_padding( GtkCellRenderer * cell, gint * xpad, gint * ypad )
+{
+#if GTK_CHECK_VERSION( 2,18,0 )
+    gtk_cell_renderer_get_padding( cell, xpad, ypad );
+#else
+    if( xpad != NULL ) *xpad = cell->xpad;
+    if( ypad != NULL ) *ypad = cell->ypad;
+#endif
+}
+
+/***
+****
+***/
+
 static char*
 getProgressString( const tr_torrent * tor,
                    const tr_info    * info,
