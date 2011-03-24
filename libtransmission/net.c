@@ -32,26 +32,19 @@
 #ifdef WIN32
  #define _WIN32_WINNT   0x0501
  #include <ws2tcpip.h>
-#else
- #include <sys/socket.h>
- #include <netinet/in.h>
- #include <netinet/tcp.h>
- #include <arpa/inet.h> /* inet_addr */
- #include <netdb.h>
 #endif
 
 #include <event2/util.h>
+
 #include <libutp/utp.h>
 
 #include "transmission.h"
-#include "fdlimit.h"
-#include "natpmp.h"
+#include "fdlimit.h" /* tr_fdSocketClose() */
 #include "net.h"
-#include "peer-io.h"
-#include "platform.h"
-#include "session.h"
-#include "tr-utp.h"
-#include "utils.h"
+#include "peer-io.h" /* tr_peerIoAddrStr() FIXME this should be moved to net.h */
+#include "session.h" /* tr_sessionGetPublicAddress() */
+#include "tr-utp.h" /* tr_utpSendTo() */
+#include "utils.h" /* tr_time(), tr_dbg() */
 
 #ifndef IN_MULTICAST
 #define IN_MULTICAST( a ) ( ( ( a ) & 0xf0000000 ) == 0xe0000000 )

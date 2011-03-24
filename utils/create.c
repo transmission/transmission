@@ -11,7 +11,7 @@
  */
 
 #include <errno.h>
-#include <stdio.h>
+#include <stdio.h> /* fprintf() */
 #include <stdlib.h> /* EXIT_FAILURE */
 #include <unistd.h> /* getcwd() */
 

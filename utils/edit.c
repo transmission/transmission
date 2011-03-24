@@ -10,7 +10,7 @@
  * $Id$
  */
 
-#include <stdio.h>
+#include <stdio.h> /* fprintf() */
 #include <string.h> /* strlen(), strstr(), strcmp() */
 #include <stdlib.h> /* EXIT_FAILURE */
 

@@ -10,7 +10,7 @@
  * $Id$
  */
 
-#include <stdio.h>
+#include <stdio.h> /* fprintf() */
 #include <string.h> /* strcmp(), strchr(), memcmp() */
 #include <stdlib.h> /* getenv(), qsort() */
 #include <time.h>

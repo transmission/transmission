@@ -15,12 +15,6 @@
 #include <limits.h> /* INT_MAX */
 #include <string.h>
 
-#ifdef WIN32
- #include <winsock2.h>
-#else
- #include <arpa/inet.h> /* inet_ntoa */
-#endif
-
 #include <event2/event.h>
 #include <event2/buffer.h>
 #include <event2/bufferevent.h>
