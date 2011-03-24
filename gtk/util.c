@@ -400,19 +400,6 @@ gtr_object_ref_sink( gpointer object )
     return object;
 }
 
-int
-gtr_strcmp0( const char * str1, const char * str2 )
-{
-#if GLIB_CHECK_VERSION( 2, 16, 0 )
-    return g_strcmp0( str1, str2 );
-#else
-    if( str1 && str2 ) return strcmp( str1, str2 );
-    if( str1 ) return 1;
-    if( str2 ) return -1;
-    return 0;
-#endif
-}
-
 const gchar *
 gtr_ngettext( const gchar * msgid,
               const gchar * msgid_plural,

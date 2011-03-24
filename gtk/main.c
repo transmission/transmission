@@ -646,11 +646,11 @@ apply_desktop_proxy_settings( CURL * easy, GConfClient * client, const char * ho
 
             if( !tr_urlParse( url, strlen( url ), &scheme, NULL, NULL, NULL ) )
             {
-                if( !gtr_strcmp0( scheme, "socks4" ) )
+                if( !tr_strcmp0( scheme, "socks4" ) )
                     curl_easy_setopt( easy, CURLOPT_PROXYTYPE, (long)CURLPROXY_SOCKS4 );
-                else if( !gtr_strcmp0( scheme, "socks5" ) )
+                else if( !tr_strcmp0( scheme, "socks5" ) )
                     curl_easy_setopt( easy, CURLOPT_PROXYTYPE, (long)CURLPROXY_SOCKS5 );
-                else if( !gtr_strcmp0( scheme, "http" ) )
+                else if( !tr_strcmp0( scheme, "http" ) )
                     curl_easy_setopt( easy, CURLOPT_PROXYTYPE, (long)CURLPROXY_HTTP );
             }
 
@@ -689,22 +689,22 @@ curl_config_func( tr_session * session UNUSED, void * vcurl UNUSED, const char *
     {
         const char * mode = gconf_value_get_string( value );
 
-        if( !gtr_strcmp0( mode, "auto" ) )
+        if( !tr_strcmp0( mode, "auto" ) )
         {
             apply_desktop_proxy_settings( easy, client, "/system/proxy/autoconfig_url", NULL );
             use_http_proxy = FALSE;
         }
-        else if( !gtr_strcmp0( mode, "manual" ))
+        else if( !tr_strcmp0( mode, "manual" ))
         {
             char * scheme = NULL;
             if( !tr_urlParse( destination, strlen( destination ), &scheme, NULL, NULL, NULL ) )
             {
-                if( !gtr_strcmp0( scheme, "ftp" ) )
+                if( !tr_strcmp0( scheme, "ftp" ) )
                 {
                     apply_desktop_proxy_settings( easy, client, "/system/proxy/ftp_host", "/system/proxy/ftp_port" );
                     use_http_proxy = FALSE;
                 }
-                else if( !gtr_strcmp0( scheme, "https" ) )
+                else if( !tr_strcmp0( scheme, "https" ) )
                 {
                     apply_desktop_proxy_settings( easy, client, "/system/proxy/secure_host", "/system/proxy/secure_port" );
                     use_http_proxy = FALSE;

@@ -442,7 +442,7 @@ compare_by_name( GtkTreeModel * m, GtkTreeIter * a, GtkTreeIter * b, gpointer us
         char *ca, *cb;
         gtk_tree_model_get( m, a, MC_NAME_COLLATED, &ca, -1 );
         gtk_tree_model_get( m, b, MC_NAME_COLLATED, &cb, -1 );
-        ret = gtr_strcmp0( ca, cb );
+        ret = tr_strcmp0( ca, cb );
         g_free( cb );
         g_free( ca );
     }
@@ -755,7 +755,7 @@ core_watchdir_update( TrCore * core )
     const gboolean is_enabled = gtr_pref_flag_get( PREF_KEY_DIR_WATCH_ENABLED );
     struct TrCorePrivate * p = TR_CORE( core )->priv;
 
-    if( p->monitor && ( !is_enabled || gtr_strcmp0( dir, p->monitor_dir ) ) )
+    if( p->monitor && ( !is_enabled || tr_strcmp0( dir, p->monitor_dir ) ) )
     {
         g_signal_handler_disconnect( p->monitor, p->monitor_tag );
         g_free( p->monitor_dir );
@@ -1402,8 +1402,8 @@ update_foreach( GtkTreeModel * model,
         || ( newPriority != oldPriority )
         || ( newError != oldError )
         || ( newActivePeerCount != oldActivePeerCount )
-        || gtr_strcmp0( oldTrackers, newTrackers )
-        || gtr_strcmp0( oldCollatedName, newCollatedName )
+        || tr_strcmp0( oldTrackers, newTrackers )
+        || tr_strcmp0( oldCollatedName, newCollatedName )
         || gtr_compare_double( newUpSpeed, oldUpSpeed, 3 )
         || gtr_compare_double( newDownSpeed, oldDownSpeed, 3 )
         || gtr_compare_double( newRecheckProgress, oldRecheckProgress, 2 ) )
@@ -1582,7 +1582,7 @@ core_commit_prefs_change( TrCore * core, const char * key )
 void
 gtr_core_set_pref( TrCore * self, const char * key, const char * newval )
 {
-    if( gtr_strcmp0( newval, gtr_pref_string_get( key ) ) )
+    if( tr_strcmp0( newval, gtr_pref_string_get( key ) ) )
     {
         gtr_pref_string_set( key, newval );
         core_commit_prefs_change( self, key );
