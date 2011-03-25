@@ -12,15 +12,12 @@
 
 #include <assert.h>
 #include <errno.h>
-#include <inttypes.h>
-#include <limits.h> /* UCHAR_MAX */
-#include <string.h>
+#include <string.h> /* strcmp(), strlen() */
 
 #include <event2/buffer.h>
 #include <event2/event.h>
 
 #include "transmission.h"
-#include "bencode.h"
 #include "clients.h"
 #include "crypto.h"
 #include "handshake.h"

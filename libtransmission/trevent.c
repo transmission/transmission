@@ -126,7 +126,7 @@ piperead( int s, char *buf, int len )
 #include <unistd.h> /* read(), write(), pipe() */
 
 #include "transmission.h"
-#include "platform.h"
+#include "platform.h" /* tr_lockLock() */
 #include "trevent.h"
 #include "utils.h"
 

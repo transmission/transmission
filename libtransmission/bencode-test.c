@@ -7,7 +7,6 @@
 
 #include "transmission.h"
 #include "bencode.h"
-#include "json.h"
 #include "utils.h" /* tr_free */
 
 /* #define VERBOSE */

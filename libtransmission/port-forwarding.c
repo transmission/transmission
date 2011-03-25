@@ -20,7 +20,6 @@
 #include "transmission.h"
 #include "natpmp.h"
 #include "net.h"
-#include "peer-io.h"
 #include "peer-mgr.h"
 #include "port-forwarding.h"
 #include "session.h"

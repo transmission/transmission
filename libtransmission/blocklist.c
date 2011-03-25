@@ -34,7 +34,6 @@
 #include <fcntl.h>
 
 #include "transmission.h"
-#include "platform.h"
 #include "blocklist.h"
 #include "net.h"
 #include "utils.h"

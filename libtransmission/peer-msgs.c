@@ -34,7 +34,6 @@
 #include "peer-mgr.h"
 #include "peer-msgs.h"
 #include "session.h"
-#include "stats.h"
 #include "torrent.h"
 #include "torrent-magnet.h"
 #include "tr-dht.h"

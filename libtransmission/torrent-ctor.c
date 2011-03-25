@@ -14,7 +14,6 @@
 #include "transmission.h"
 #include "bencode.h"
 #include "magnet.h"
-#include "platform.h"
 #include "session.h" /* tr_sessionFindTorrentFile() */
 #include "torrent.h" /* tr_ctorGetSave() */
 #include "utils.h" /* tr_new0 */

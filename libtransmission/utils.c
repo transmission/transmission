@@ -59,7 +59,7 @@
 #include "list.h"
 #include "net.h"
 #include "utils.h"
-#include "platform.h"
+#include "platform.h" /* tr_lockLock() */
 #include "version.h"
 
 

@@ -26,7 +26,7 @@
 #include "bencode.h"
 #include "crypto.h" /* tr_sha1 */
 #include "metainfo.h"
-#include "platform.h"
+#include "platform.h" /* tr_getTorrentDir() */
 #include "utils.h"
 
 /***

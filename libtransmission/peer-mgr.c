@@ -22,7 +22,6 @@
 #include "transmission.h"
 #include "announcer.h"
 #include "bandwidth.h"
-#include "bencode.h"
 #include "blocklist.h"
 #include "cache.h"
 #include "clients.h"

@@ -30,7 +30,6 @@
 #include "json.h"
 #include "rpcimpl.h"
 #include "session.h"
-#include "stats.h"
 #include "torrent.h"
 #include "utils.h"
 #include "version.h"

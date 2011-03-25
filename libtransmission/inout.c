@@ -18,11 +18,11 @@
 #include <openssl/sha.h>
 
 #include "transmission.h"
-#include "cache.h"
+#include "cache.h" /* tr_cacheReadBlock() */
 #include "fdlimit.h"
 #include "inout.h"
 #include "peer-common.h" /* MAX_BLOCK_SIZE */
-#include "stats.h"
+#include "stats.h" /* tr_statsFileCreated() */
 #include "torrent.h"
 #include "utils.h"
 

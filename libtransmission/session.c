@@ -34,7 +34,6 @@
 #include "crypto.h"
 #include "fdlimit.h"
 #include "list.h"
-#include "metainfo.h" /* tr_metainfoFree */
 #include "net.h"
 #include "peer-io.h"
 #include "peer-mgr.h"
