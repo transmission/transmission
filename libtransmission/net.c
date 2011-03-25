@@ -81,47 +81,42 @@ tr_net_strerror( char * buf, size_t buflen, int err )
 }
 
 const char *
-tr_ntop( const tr_address * src, char * dst, int size )
+tr_address_to_string_with_buf( const tr_address * addr, char * buf, size_t buflen )
 {
-    assert( tr_isAddress( src ) );
+    assert( tr_address_is_valid( addr ) );
 
-    if( src->type == TR_AF_INET )
-        return evutil_inet_ntop( AF_INET, &src->addr, dst, size );
+    if( addr->type == TR_AF_INET )
+        return evutil_inet_ntop( AF_INET, &addr->addr, buf, buflen );
     else
-        return evutil_inet_ntop( AF_INET6, &src->addr, dst, size );
+        return evutil_inet_ntop( AF_INET6, &addr->addr, buf, buflen );
 }
 
 /*
- * Non-threadsafe version of tr_ntop, which uses a static memory area for a buffer.
+ * Non-threadsafe version of tr_address_to_string_with_buf()
+ * and uses a static memory area for a buffer.
  * This function is suitable to be called from libTransmission's networking code,
  * which is single-threaded.
  */
 const char *
-tr_ntop_non_ts( const tr_address * src )
+tr_address_to_string( const tr_address * addr )
 {
     static char buf[INET6_ADDRSTRLEN];
-    return tr_ntop( src, buf, sizeof( buf ) );
+    return tr_address_to_string_with_buf( addr, buf, sizeof( buf ) );
 }
 
-tr_address *
-tr_pton( const char * src, tr_address * dst )
+bool
+tr_address_from_string( tr_address * dst, const char * src )
 {
-    int retval = evutil_inet_pton( AF_INET, src, &dst->addr );
-    assert( dst );
-    if( retval < 0 )
-        return NULL;
-    else if( retval == 0 )
-        retval = evutil_inet_pton( AF_INET6, src, &dst->addr );
-    else
-    {
-        dst->type = TR_AF_INET;
-        return dst;
-    }
+    bool ok;
 
-    if( retval < 1 )
-        return NULL;
-    dst->type = TR_AF_INET6;
-    return dst;
+    if(( ok = evutil_inet_pton( AF_INET, src, &dst->addr ) == 1 ))
+        dst->type = TR_AF_INET;
+
+    if( !ok ) /* try IPv6 */
+        if(( ok = evutil_inet_pton( AF_INET6, src, &dst->addr ) == 1 ))
+            dst->type = TR_AF_INET6;
+
+    return ok;
 }
 
 /*
@@ -132,7 +127,7 @@ tr_pton( const char * src, tr_address * dst )
  * 0  if a == b
  */
 int
-tr_compareAddresses( const tr_address * a, const tr_address * b)
+tr_address_compare( const tr_address * a, const tr_address * b)
 {
     static const int sizes[2] = { sizeof(struct in_addr), sizeof(struct in6_addr) };
 
@@ -170,9 +165,9 @@ tr_netSetCongestionControl( int s UNUSED, const char *algorithm UNUSED )
 }
 
 bool
-tr_ssToAddr( tr_address * setme_addr,
-             tr_port    * setme_port,
-             const struct sockaddr_storage * from )
+tr_address_from_sockaddr_storage( tr_address                     * setme_addr,
+                                  tr_port                        * setme_port,
+                                  const struct sockaddr_storage  * from )
 {
     if( from->ss_family == AF_INET )
     {
@@ -200,7 +195,7 @@ setup_sockaddr( const tr_address        * addr,
                 tr_port                   port,
                 struct sockaddr_storage * sockaddr)
 {
-    assert( tr_isAddress( addr ) );
+    assert( tr_address_is_valid( addr ) );
 
     if( addr->type == TR_AF_INET )
     {
@@ -239,9 +234,9 @@ tr_netOpenPeerSocket( tr_session        * session,
     socklen_t               sourcelen;
     struct sockaddr_storage source_sock;
 
-    assert( tr_isAddress( addr ) );
+    assert( tr_address_is_valid( addr ) );
 
-    if( !tr_isValidPeerAddress( addr, port ) )
+    if( !tr_address_is_valid_for_peers( addr, port ) )
         return -EINVAL;
 
     s = tr_fdSocketCreate( session, domains[addr->type], SOCK_STREAM );
@@ -269,7 +264,7 @@ tr_netOpenPeerSocket( tr_session        * session,
     if( bind( s, ( struct sockaddr * ) &source_sock, sourcelen ) )
     {
         tr_err( _( "Couldn't set source address %s on %d: %s" ),
-                tr_ntop_non_ts( source_addr ), s, tr_strerror( errno ) );
+                tr_address_to_string( source_addr ), s, tr_strerror( errno ) );
         return -errno;
     }
 
@@ -285,7 +280,7 @@ tr_netOpenPeerSocket( tr_session        * session,
         if( ( tmperrno != ENETUNREACH && tmperrno != EHOSTUNREACH )
                 || addr->type == TR_AF_INET )
             tr_err( _( "Couldn't connect socket %d to %s, port %d (errno %d - %s)" ),
-                    s, tr_ntop_non_ts( addr ), (int)ntohs( port ), tmperrno,
+                    s, tr_address_to_string( addr ), (int)ntohs( port ), tmperrno,
                     tr_strerror( tmperrno ) );
         tr_netClose( session, s );
         s = -tmperrno;
@@ -320,7 +315,7 @@ tr_netBindTCPImpl( const tr_address * addr, tr_port port, bool suppressMsgs, int
     int addrlen;
     int optval;
 
-    assert( tr_isAddress( addr ) );
+    assert( tr_address_is_valid( addr ) );
 
     fd = socket( domains[addr->type], SOCK_STREAM, 0 );
     if( fd < 0 ) {
@@ -365,7 +360,7 @@ tr_netBindTCPImpl( const tr_address * addr, tr_port port, bool suppressMsgs, int
             else
                 fmt = _( "Couldn't bind port %d on %s: %s (%s)" );
 
-            tr_err( fmt, port, tr_ntop_non_ts( addr ), tr_strerror( err ), hint );
+            tr_err( fmt, port, tr_address_to_string( addr ), tr_strerror( err ), hint );
         }
         tr_netCloseSocket( fd );
         *errOut = err;
@@ -373,7 +368,7 @@ tr_netBindTCPImpl( const tr_address * addr, tr_port port, bool suppressMsgs, int
     }
 
     if( !suppressMsgs )
-        tr_dbg( "Bound socket %d to port %d on %s", fd, port, tr_ntop_non_ts( addr ) );
+        tr_dbg( "Bound socket %d to port %d on %s", fd, port, tr_address_to_string( addr ) );
 
     if( listen( fd, 128 ) == -1 ) {
         *errOut = sockerrno;
@@ -612,7 +607,7 @@ isMartianAddr( const struct tr_address * a )
     static const unsigned char zeroes[16] =
         { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
-    assert( tr_isAddress( a ) );
+    assert( tr_address_is_valid( a ) );
 
     switch( a->type )
     {
@@ -644,10 +639,10 @@ isMartianAddr( const struct tr_address * a )
 }
 
 bool
-tr_isValidPeerAddress( const tr_address * addr, tr_port port )
+tr_address_is_valid_for_peers( const tr_address * addr, tr_port port )
 {
     return ( port != 0 )
-        && ( tr_isAddress( addr ) )
+        && ( tr_address_is_valid( addr ) )
         && ( !isIPv6LinkLocalAddress( addr ) )
         && ( !isIPv4MappedAddress( addr ) )
         && ( !isMartianAddr( addr ) );

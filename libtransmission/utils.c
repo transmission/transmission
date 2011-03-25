@@ -998,10 +998,10 @@ tr_urlIsValid( const char * url, int url_len )
 }
 
 bool
-tr_addressIsIP( const char * address )
+tr_addressIsIP( const char * str )
 {
-    tr_address tempAddr;
-    return tr_pton(address, &tempAddr) != NULL;
+    tr_address tmp;
+    return tr_address_from_string( &tmp, str );
 }
 
 int

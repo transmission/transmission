@@ -138,13 +138,13 @@ listToPex( tr_benc * peerList, size_t * setme_len )
             continue;
         if( !tr_bencDictFindStr( peer, "ip", &ip ) )
             continue;
-        if( tr_pton( ip, &addr ) == NULL )
+        if( !tr_address_from_string( &addr, ip ) )
             continue;
         if( !tr_bencDictFindInt( peer, "port", &port ) )
             continue;
         if( ( port < 0 ) || ( port > USHRT_MAX ) )
             continue;
-        if( !tr_isValidPeerAddress( &addr, port ) )
+        if( !tr_address_is_valid_for_peers( &addr, port ) )
             continue;
 
         pex[n].addr = addr;

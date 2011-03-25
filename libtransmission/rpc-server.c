@@ -689,7 +689,7 @@ startServer( void * vserver )
         addr.type = TR_AF_INET;
         addr.addr.addr4 = server->bindAddress;
         server->httpd = evhttp_new( server->session->event_base );
-        evhttp_bind_socket( server->httpd, tr_ntop_non_ts( &addr ), server->port );
+        evhttp_bind_socket( server->httpd, tr_address_to_string( &addr ), server->port );
         evhttp_set_gencb( server->httpd, handle_request, server );
 
     }
@@ -886,7 +886,7 @@ tr_rpcGetBindAddress( const tr_rpc_server * server )
     tr_address addr;
     addr.type = TR_AF_INET;
     addr.addr.addr4 = server->bindAddress;
-    return tr_ntop_non_ts( &addr );
+    return tr_address_to_string( &addr );
 }
 
 /****
@@ -968,7 +968,7 @@ tr_rpcInit( tr_session  * session, tr_benc * settings )
 
     found = tr_bencDictFindStr( settings, TR_PREFS_KEY_RPC_BIND_ADDRESS, &str );
     assert( found );
-    if( tr_pton( str, &address ) == NULL ) {
+    if( !tr_address_from_string( &address, str ) ) {
         tr_err( _( "%s is not a valid address" ), str );
         address = tr_inaddr_any;
     } else if( address.type != TR_AF_INET ) {

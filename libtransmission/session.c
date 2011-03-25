@@ -237,7 +237,7 @@ tr_sessionGetPublicAddress( const tr_session * session, int tr_af_type, bool * i
     }
 
     if( is_default_value && bindinfo )
-        *is_default_value = !tr_strcmp0( default_value, tr_ntop_non_ts( &bindinfo->addr ) );
+        *is_default_value = !tr_strcmp0( default_value, tr_address_to_string( &bindinfo->addr ) );
 
     return bindinfo ? &bindinfo->addr : NULL;
 }
@@ -421,8 +421,8 @@ tr_sessionGetSettings( tr_session * s, struct tr_benc * d )
     tr_bencDictAddBool( d, TR_PREFS_KEY_USPEED_ENABLED,           tr_sessionIsSpeedLimited( s, TR_UP ) );
     tr_bencDictAddInt ( d, TR_PREFS_KEY_UMASK,                    s->umask );
     tr_bencDictAddInt ( d, TR_PREFS_KEY_UPLOAD_SLOTS_PER_TORRENT, s->uploadSlotsPerTorrent );
-    tr_bencDictAddStr ( d, TR_PREFS_KEY_BIND_ADDRESS_IPV4,        tr_ntop_non_ts( &s->public_ipv4->addr ) );
-    tr_bencDictAddStr ( d, TR_PREFS_KEY_BIND_ADDRESS_IPV6,        tr_ntop_non_ts( &s->public_ipv6->addr ) );
+    tr_bencDictAddStr ( d, TR_PREFS_KEY_BIND_ADDRESS_IPV4,        tr_address_to_string( &s->public_ipv4->addr ) );
+    tr_bencDictAddStr ( d, TR_PREFS_KEY_BIND_ADDRESS_IPV6,        tr_address_to_string( &s->public_ipv6->addr ) );
     tr_bencDictAddBool( d, TR_PREFS_KEY_START,                    !tr_sessionGetPaused( s ) );
     tr_bencDictAddBool( d, TR_PREFS_KEY_TRASH_ORIGINAL,           tr_sessionGetDeleteSource( s ) );
 }
@@ -805,14 +805,14 @@ sessionSetImpl( void * vdata )
 
     str = TR_PREFS_KEY_BIND_ADDRESS_IPV4;
     tr_bencDictFindStr( settings, TR_PREFS_KEY_BIND_ADDRESS_IPV4, &str );
-    if( !tr_pton( str, &b.addr ) || ( b.addr.type != TR_AF_INET ) )
+    if( !tr_address_from_string( &b.addr, str ) || ( b.addr.type != TR_AF_INET ) )
         b.addr = tr_inaddr_any;
     b.socket = -1;
     session->public_ipv4 = tr_memdup( &b, sizeof( struct tr_bindinfo ) );
 
     str = TR_PREFS_KEY_BIND_ADDRESS_IPV6;
     tr_bencDictFindStr( settings, TR_PREFS_KEY_BIND_ADDRESS_IPV6, &str );
-    if( !tr_pton( str, &b.addr ) || ( b.addr.type != TR_AF_INET6 ) )
+    if( !tr_address_from_string( &b.addr, str ) || ( b.addr.type != TR_AF_INET6 ) )
         b.addr = tr_in6addr_any;
     b.socket = -1;
     session->public_ipv6 = tr_memdup( &b, sizeof( struct tr_bindinfo ) );

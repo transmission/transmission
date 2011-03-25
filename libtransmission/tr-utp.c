@@ -113,7 +113,7 @@ incoming(void *closure, struct UTPSocket *s)
     }
 
     UTP_GetPeerName(s, from, &fromlen);
-    if( !tr_ssToAddr( &addr, &port, &from_storage ) )
+    if( !tr_address_from_sockaddr_storage( &addr, &port, &from_storage ) )
     {
         tr_nerr("UTP", "Unknown socket family");
         UTP_Close(s);

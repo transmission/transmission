@@ -150,7 +150,7 @@ tr_isPeerIo( const tr_peerIo * io )
         && ( io->magicNumber == PEER_IO_MAGIC_NUMBER )
         && ( io->refCount >= 0 )
         && ( tr_isBandwidth( &io->bandwidth ) )
-        && ( tr_isAddress( &io->addr ) );
+        && ( tr_address_is_valid( &io->addr ) );
 }
 
 /**

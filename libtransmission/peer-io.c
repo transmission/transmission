@@ -591,7 +591,7 @@ tr_peerIoNewIncoming( tr_session        * session,
                       struct UTPSocket  * utp_socket )
 {
     assert( session );
-    assert( tr_isAddress( addr ) );
+    assert( tr_address_is_valid( addr ) );
 
     return tr_peerIoNew( session, parent, addr, port, NULL, true, false,
                          fd, utp_socket );
@@ -610,7 +610,7 @@ tr_peerIoNewOutgoing( tr_session        * session,
     struct UTPSocket *utp_socket = NULL;
 
     assert( session );
-    assert( tr_isAddress( addr ) );
+    assert( tr_address_is_valid( addr ) );
     assert( torrentHash );
 
     if( utp )
@@ -805,11 +805,7 @@ const char*
 tr_peerIoAddrStr( const tr_address * addr, tr_port port )
 {
     static char buf[512];
-
-    if( addr->type == TR_AF_INET )
-        tr_snprintf( buf, sizeof( buf ), "%s:%u", tr_ntop_non_ts( addr ), ntohs( port ) );
-    else
-        tr_snprintf( buf, sizeof( buf ), "[%s]:%u", tr_ntop_non_ts( addr ), ntohs( port ) );
+    tr_snprintf( buf, sizeof( buf ), "[%s]:%u", tr_address_to_string( addr ), ntohs( port ) );
     return buf;
 }
 

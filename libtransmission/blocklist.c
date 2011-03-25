@@ -197,20 +197,18 @@ _tr_blocklistIsEnabled( tr_blocklist * b )
 }
 
 void
-_tr_blocklistSetEnabled( tr_blocklist * b,
-                         int            isEnabled )
+_tr_blocklistSetEnabled( tr_blocklist * b, bool isEnabled )
 {
     b->isEnabled = isEnabled ? 1 : 0;
 }
 
 int
-_tr_blocklistHasAddress( tr_blocklist     * b,
-                         const tr_address * addr )
+_tr_blocklistHasAddress( tr_blocklist * b, const tr_address * addr )
 {
     uint32_t                     needle;
     const struct tr_ipv4_range * range;
 
-    assert( tr_isAddress( addr ) );
+    assert( tr_address_is_valid( addr ) );
 
     if( !b->isEnabled || addr->type == TR_AF_INET6 )
         return 0;
@@ -256,12 +254,12 @@ parseLine1( const char * line, struct tr_ipv4_range * range )
         return false;
 
     tr_snprintf( str, sizeof( str ), "%d.%d.%d.%d", b[0], b[1], b[2], b[3] );
-    if( tr_pton( str, &addr ) == NULL )
+    if( !tr_address_from_string( &addr, str ) )
         return false;
     range->begin = ntohl( addr.addr.addr4.s_addr );
 
     tr_snprintf( str, sizeof( str ), "%d.%d.%d.%d", e[0], e[1], e[2], e[3] );
-    if( tr_pton( str, &addr ) == NULL )
+    if( !tr_address_from_string( &addr, str ) )
         return false;
     range->end = ntohl( addr.addr.addr4.s_addr );
 
@@ -288,12 +286,12 @@ parseLine2( const char * line, struct tr_ipv4_range * range )
         return false;
 
     tr_snprintf( str, sizeof(str), "%d.%d.%d.%d", a[0], a[1], a[2], a[3] );
-    if( tr_pton( str, &addr ) == NULL )
+    if( !tr_address_from_string( &addr, str ) )
         return false;
     range->begin = ntohl( addr.addr.addr4.s_addr );
 
     tr_snprintf( str, sizeof(str), "%d.%d.%d.%d", b[0], b[1], b[2], b[3] );
-    if( tr_pton( str, &addr ) == NULL )
+    if( !tr_address_from_string( &addr, str ) )
         return false;
     range->end = ntohl( addr.addr.addr4.s_addr );
 

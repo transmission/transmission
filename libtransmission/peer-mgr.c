@@ -147,7 +147,7 @@ tr_isAtom( const struct peer_atom * atom )
     return ( atom != NULL )
         && ( atom->fromFirst < TR_PEER_FROM__MAX )
         && ( atom->fromBest < TR_PEER_FROM__MAX )
-        && ( tr_isAddress( &atom->addr ) );
+        && ( tr_address_is_valid( &atom->addr ) );
 }
 #endif
 
@@ -287,7 +287,7 @@ handshakeCompareToAddr( const void * va, const void * vb )
 {
     const tr_handshake * a = va;
 
-    return tr_compareAddresses( tr_handshakeGetAddr( a, NULL ), vb );
+    return tr_address_compare( tr_handshakeGetAddr( a, NULL ), vb );
 }
 
 static int
@@ -310,7 +310,7 @@ comparePeerAtomToAddress( const void * va, const void * vb )
 {
     const struct peer_atom * a = va;
 
-    return tr_compareAddresses( &a->addr, vb );
+    return tr_address_compare( &a->addr, vb );
 }
 
 static int
@@ -345,7 +345,7 @@ getExistingTorrent( tr_peerMgr *    manager,
 static int
 peerCompare( const void * a, const void * b )
 {
-    return tr_compareAddresses( tr_peerAddress( a ), tr_peerAddress( b ) );
+    return tr_address_compare( tr_peerAddress( a ), tr_peerAddress( b ) );
 }
 
 static struct peer_atom*
@@ -1870,7 +1870,7 @@ ensureAtomExists( Torrent           * t,
 {
     struct peer_atom * a;
 
-    assert( tr_isAddress( addr ) );
+    assert( tr_address_is_valid( addr ) );
     assert( from < TR_PEER_FROM__MAX );
 
     a = getExistingAtom( t, addr );
@@ -2056,7 +2056,7 @@ tr_peerMgrAddIncoming( tr_peerMgr * manager,
 
     if( tr_sessionIsAddressBlocked( session, addr ) )
     {
-        tr_dbg( "Banned IP address \"%s\" tried to connect to us", tr_ntop_non_ts( addr ) );
+        tr_dbg( "Banned IP address \"%s\" tried to connect to us", tr_address_to_string( addr ) );
         if(socket >= 0)
             tr_netClose( session, socket );
         else
@@ -2100,7 +2100,7 @@ tr_peerMgrAddPex( tr_torrent * tor, uint8_t from,
         managerLock( t->manager );
 
         if( !tr_sessionIsAddressBlocked( t->manager->session, &pex->addr ) )
-            if( tr_isValidPeerAddress( &pex->addr, pex->port ) )
+            if( tr_address_is_valid_for_peers( &pex->addr, pex->port ) )
                 ensureAtomExists( t, &pex->addr, pex->port, pex->flags, seedProbability, from );
 
         managerUnlock( t->manager );
@@ -2233,7 +2233,7 @@ tr_pexCompare( const void * va, const void * vb )
     assert( tr_isPex( a ) );
     assert( tr_isPex( b ) );
 
-    if(( i = tr_compareAddresses( &a->addr, &b->addr )))
+    if(( i = tr_address_compare( &a->addr, &b->addr )))
         return i;
 
     if( a->port != b->port )
@@ -2333,7 +2333,7 @@ tr_peerMgrGetPeers( tr_torrent   * tor,
         const struct peer_atom * atom = atoms[i];
         if( atom->addr.type == af )
         {
-            assert( tr_isAddress( &atom->addr ) );
+            assert( tr_address_is_valid( &atom->addr ) );
             walk->addr = atom->addr;
             walk->port = atom->port;
             walk->flags = atom->flags;
@@ -2659,7 +2659,7 @@ tr_peerMgrPeerStats( const tr_torrent * tor, int * setmeCount )
         const struct peer_atom * atom = peer->atom;
         tr_peer_stat *           stat = ret + i;
 
-        tr_ntop( &atom->addr, stat->addr, sizeof( stat->addr ) );
+        tr_address_to_string_with_buf( &atom->addr, stat->addr, sizeof( stat->addr ) );
         tr_strlcpy( stat->client, ( peer->client ? peer->client : "" ),
                    sizeof( stat->client ) );
         stat->port                = ntohs( peer->atom->port );
@@ -3535,7 +3535,7 @@ compareAtomPtrsByAddress( const void * va, const void *vb )
     assert( tr_isAtom( a ) );
     assert( tr_isAtom( b ) );
 
-    return tr_compareAddresses( &a->addr, &b->addr );
+    return tr_address_compare( &a->addr, &b->addr );
 }
 
 /* best come first, worst go last */

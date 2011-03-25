@@ -53,7 +53,11 @@
  #define sockerrno errno
 #endif
 
-struct tr_session;
+/****
+*****
+*****  tr_address
+*****
+****/
 
 typedef enum tr_address_type
 {
@@ -77,28 +81,37 @@ typedef struct tr_address
 extern const tr_address tr_inaddr_any;
 extern const tr_address tr_in6addr_any;
 
-bool tr_ssToAddr( tr_address * setme_addr,
-                  tr_port    * setme_port,
-                  const struct sockaddr_storage * from );
+const char* tr_address_to_string( const tr_address * addr );
 
-const char *tr_ntop( const tr_address * src,
-                     char * dst,
-                     int size );
-const char *tr_ntop_non_ts( const tr_address * src );
-tr_address *tr_pton( const char * src,
-                     tr_address * dst );
-int tr_compareAddresses( const tr_address * a,
-                         const tr_address * b);
+const char* tr_address_to_string_with_buf( const tr_address  * addr,
+                                           char              * buf,
+                                           size_t              buflen );
 
-bool tr_isValidPeerAddress( const tr_address * addr, tr_port port );
+bool tr_address_from_string ( tr_address  * setme,
+                              const char  * string );
 
-static inline bool tr_isAddress( const tr_address * a ) { return ( a != NULL ) && ( a->type==TR_AF_INET || a->type==TR_AF_INET6 ); }
+bool tr_address_from_sockaddr_storage( tr_address                     * setme,
+                                       tr_port                        * port,
+                                       const struct sockaddr_storage  * src );
 
-bool tr_net_hasIPv6( tr_port );
+int tr_address_compare( const tr_address * a,
+                        const tr_address * b );
+
+bool tr_address_is_valid_for_peers( const tr_address  * addr,
+                                    tr_port             port );
+
+static inline bool
+tr_address_is_valid( const tr_address * a )
+{
+    return ( a != NULL ) && ( a->type==TR_AF_INET || a->type==TR_AF_INET6 );
+}
 
 /***********************************************************************
  * Sockets
  **********************************************************************/
+
+struct tr_session;
+
 int  tr_netOpenPeerSocket( tr_session       * session,
                            const tr_address * addr,
                            tr_port            port,
@@ -129,6 +142,8 @@ void tr_netClose( tr_session * session, int s );
 void tr_netCloseSocket( int fd );
 
 void tr_netInit( void );
+
+bool tr_net_hasIPv6( tr_port );
 
 
 /**

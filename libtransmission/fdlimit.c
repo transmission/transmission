@@ -670,7 +670,8 @@ tr_fdSocketAccept( tr_session * s, int sockfd, tr_address * addr, tr_port * port
 
     if( fd >= 0 )
     {
-        if( ( gFd->socket_count < gFd->socket_limit ) && tr_ssToAddr( addr, port, &sock ) )
+        if( ( gFd->socket_count < gFd->socket_limit )
+            && tr_address_from_sockaddr_storage( addr, port, &sock ) )
         {
             ++gFd->socket_count;
         }

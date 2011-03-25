@@ -532,7 +532,7 @@ static int tr_lpdConsiderAnnounce( tr_pex* peer, const char* const msg )
             /* we found a suitable peer, add it to the torrent */
             tr_peerMgrAddPex( tor, TR_PEER_FROM_LPD, peer, -1 );
             tr_tordbg( tor, "Learned %d local peer from LPD (%s:%u)",
-                1, tr_ntop_non_ts( &peer->addr ), peerPort );
+                1, tr_address_to_string( &peer->addr ), peerPort );
 
             /* periodic reconnectPulse() deals with the rest... */
 

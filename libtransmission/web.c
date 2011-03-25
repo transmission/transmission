@@ -181,9 +181,9 @@ createEasy( tr_session * s, struct tr_web_task * task )
     curl_easy_setopt( e, CURLOPT_WRITEFUNCTION, writeFunc );
 
     if((( addr = tr_sessionGetPublicAddress( s, TR_AF_INET, &is_default_value ))) && !is_default_value )
-        curl_easy_setopt( e, CURLOPT_INTERFACE, tr_ntop_non_ts( addr ) );
+        curl_easy_setopt( e, CURLOPT_INTERFACE, tr_address_to_string( addr ) );
     else if ((( addr = tr_sessionGetPublicAddress( s, TR_AF_INET6, &is_default_value ))) && !is_default_value )
-        curl_easy_setopt( e, CURLOPT_INTERFACE, tr_ntop_non_ts( addr ) );
+        curl_easy_setopt( e, CURLOPT_INTERFACE, tr_address_to_string( addr ) );
 
     if( task->cookies != NULL )
         curl_easy_setopt( e, CURLOPT_COOKIE, task->cookies );

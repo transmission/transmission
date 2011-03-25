@@ -139,7 +139,7 @@ void tr_peerDestruct( tr_torrent * tor, struct tr_peer * peer );
 static inline bool
 tr_isPex( const tr_pex * pex )
 {
-    return pex && tr_isAddress( &pex->addr );
+    return pex && tr_address_is_valid( &pex->addr );
 }
 
 const tr_address * tr_peerAddress( const tr_peer * );

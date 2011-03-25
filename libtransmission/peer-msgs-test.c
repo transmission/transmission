@@ -44,7 +44,7 @@ main( void )
 
     for( i = 0; i < SHA_DIGEST_LENGTH; ++i )
         infohash[i] = 0xaa;
-    tr_pton( "80.4.4.200", &addr );
+    tr_address_from_string( &addr, "80.4.4.200" );
 
     numwant = 7;
     numgot = tr_generateAllowedSet( buf, numwant, pieceCount, infohash, &addr );
