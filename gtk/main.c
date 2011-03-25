@@ -1561,11 +1561,18 @@ update_model( gpointer gdata )
     return !done;
 }
 
+/* GTK+ versions before 2.18.0 don't have a default URI hook... */
+#if !GTK_CHECK_VERSION(2,18,0)
+ #define NEED_URL_HOOK
+#endif
+
+#ifdef NEED_URL_HOOK
 static void
 on_uri_clicked( GtkAboutDialog * u UNUSED, const gchar * uri, gpointer u2 UNUSED )
 {
     gtr_open_uri( uri );
 }
+#endif
 
 static void
 show_about_dialog( GtkWindow * parent )
@@ -1578,7 +1585,9 @@ show_about_dialog( GtkWindow * parent )
         NULL
     };
 
+#ifdef NEED_URL_HOOK
     gtk_about_dialog_set_url_hook( on_uri_clicked, NULL, NULL );
+#endif
 
     d = g_object_new( GTK_TYPE_ABOUT_DIALOG,
                       "authors", authors,

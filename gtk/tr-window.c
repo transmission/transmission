@@ -874,7 +874,12 @@ gtr_window_set_busy( TrWindow * w, gboolean isBusy )
         gdk_window_set_cursor( gtr_widget_get_window( GTK_WIDGET( w ) ), cursor );
         gdk_display_flush( display );
 
-        if( cursor )
+        if( cursor ) {
+#if GTK_CHECK_VERSION(3,0,0)
+            g_object_unref( cursor );
+#else
             gdk_cursor_unref( cursor );
+#endif
+        }
     }
 }
