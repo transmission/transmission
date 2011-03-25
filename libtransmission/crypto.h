@@ -22,12 +22,6 @@
 #include "utils.h" /* TR_GNUC_NULL_TERMINATED */
 
 /**
-***
-**/
-
-struct evbuffer;
-
-/**
 *** @addtogroup peers
 *** @{
 **/

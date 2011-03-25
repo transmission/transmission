@@ -48,7 +48,6 @@ THE SOFTWARE.
 
 /* libT */
 #include "transmission.h"
-#include "crypto.h"
 #include "net.h"
 #include "peer-mgr.h" /* tr_peerMgrAddPex() */
 #include "session.h"

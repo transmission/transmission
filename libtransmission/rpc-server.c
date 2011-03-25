@@ -28,7 +28,7 @@
 
 #include "transmission.h"
 #include "bencode.h"
-#include "crypto.h"
+#include "crypto.h" /* tr_cryptoRandBuf(), tr_ssha1_matches() */
 #include "fdlimit.h"
 #include "list.h"
 #include "net.h"

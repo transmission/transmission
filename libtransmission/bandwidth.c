@@ -16,10 +16,8 @@
 
 #include "transmission.h"
 #include "bandwidth.h"
-#include "crypto.h"
+#include "crypto.h" /* tr_cryptoWeakRandInt() */
 #include "peer-io.h"
-#include "ptrarray.h"
-#include "session.h"
 #include "utils.h"
 
 #define dbgmsg( ... ) \

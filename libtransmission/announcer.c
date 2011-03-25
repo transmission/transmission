@@ -24,7 +24,7 @@
 #include "transmission.h"
 #include "announcer.h"
 #include "announcer-common.h"
-#include "crypto.h"
+#include "crypto.h" /* tr_cryptoRandInt(), tr_cryptoWeakRandInt() */
 #include "peer-mgr.h" /* tr_peerMgrCompactToPex() */
 #include "ptrarray.h"
 #include "session.h"

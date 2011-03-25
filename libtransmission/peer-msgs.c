@@ -26,7 +26,7 @@
 #include "bencode.h"
 #include "cache.h"
 #include "completion.h"
-#include "crypto.h"
+#include "crypto.h" /* tr_sha1() */
 #ifdef WIN32
 #include "net.h" /* for ECONN */
 #endif

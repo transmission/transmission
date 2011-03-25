@@ -19,7 +19,6 @@
 
 #include "transmission.h"
 #include "cache.h"
-#include "crypto.h"
 #include "fdlimit.h"
 #include "inout.h"
 #include "peer-common.h" /* MAX_BLOCK_SIZE */

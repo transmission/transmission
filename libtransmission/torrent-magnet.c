@@ -18,7 +18,7 @@
 
 #include "transmission.h"
 #include "bencode.h"
-#include "crypto.h"
+#include "crypto.h" /* tr_sha1() */
 #include "magnet.h"
 #include "metainfo.h"
 #include "resume.h"

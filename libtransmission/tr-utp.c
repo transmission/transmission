@@ -30,7 +30,7 @@ THE SOFTWARE.
 #include "transmission.h"
 #include "net.h"
 #include "session.h"
-#include "crypto.h"
+#include "crypto.h" /* tr_cryptoWeakRandInt() */
 #include "peer-io.h"
 #include "peer-mgr.h"
 #include "tr-utp.h"
