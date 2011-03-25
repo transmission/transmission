@@ -1,6 +1,17 @@
 === Transmission 2.30 (2011/xx/yy) ===
 ==== All Platforms ====
+  * Add uTP support
+  * Add UDP tracker support
+  * Add multiscrape support
+  * Download scarcest pieces first
   * The "lazy bitfield" feature has been superseded by the "Fast Extension" BEP6
+==== Mac ====
+  * FIXME(livings)
+==== GTK+ ====
+  * Added 256 x 256 icon by Andreas Nilsson
+  * Register as a magnet link handler in the .desktop file
+==== Web Client ====
+  * Peer and network settings are accessable in the web client now
 
 === Transmission 2.22 (2011/03/04) ===
 ==== All Platforms ====
