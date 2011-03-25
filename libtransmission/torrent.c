@@ -23,7 +23,6 @@
 #include <dirent.h>
 
 #include <assert.h>
-#include <limits.h> /* INT_MAX */
 #include <math.h>
 #include <stdarg.h>
 #include <string.h> /* memcmp */

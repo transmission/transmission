@@ -30,13 +30,11 @@
 #endif
 
 #include <libtransmission/transmission.h> /* TR_RATIO_NA, TR_RATIO_INF */
-#include <libtransmission/utils.h> /* tr_inf */
+#include <libtransmission/utils.h> /* tr_strratio() */
 #include <libtransmission/web.h> /* tr_webResponseStr() */
-#include <libtransmission/version.h> /* tr_inf */
+#include <libtransmission/version.h> /* SHORT_VERSION_STRING */
 
-#include "conf.h"
 #include "hig.h"
-#include "tr-prefs.h"
 #include "util.h"
 
 /***
