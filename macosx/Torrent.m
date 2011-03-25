@@ -88,8 +88,12 @@ void metadataCallback(tr_torrent * torrent, void * torrentData)
 
 int trashDataFile(const char * filename)
 {
+    NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
+    
     if (filename != NULL)
         [Torrent trashFile: [NSString stringWithUTF8String: filename]];
+    
+    [pool drain];
     return 0;
 }
 
