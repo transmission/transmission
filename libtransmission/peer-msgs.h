@@ -20,9 +20,10 @@
 #include <inttypes.h>
 #include "peer-common.h"
 
-struct tr_torrent;
-struct tr_peer;
+struct tr_address;
 struct tr_bitfield;
+struct tr_peer;
+struct tr_torrent;
 
 /**
  * @addtogroup peers Peers
@@ -52,11 +53,11 @@ void         tr_peerMsgsCancel( tr_peermsgs * msgs,
 
 void         tr_peerMsgsFree( tr_peermsgs* );
 
-size_t       tr_generateAllowedSet( tr_piece_index_t  * setmePieces,
-                                    size_t              desiredSetSize,
-                                    size_t              pieceCount,
-                                    const uint8_t     * infohash,
-                                    const tr_address  * addr );
+size_t       tr_generateAllowedSet( tr_piece_index_t         * setmePieces,
+                                    size_t                     desiredSetSize,
+                                    size_t                     pieceCount,
+                                    const uint8_t            * infohash,
+                                    const struct tr_address  * addr );
 
 
 /* @} */

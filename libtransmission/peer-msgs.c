@@ -27,9 +27,6 @@
 #include "cache.h"
 #include "completion.h"
 #include "crypto.h" /* tr_sha1() */
-#ifdef WIN32
-#include "net.h" /* for ECONN */
-#endif
 #include "peer-io.h"
 #include "peer-mgr.h"
 #include "peer-msgs.h"

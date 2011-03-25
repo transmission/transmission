@@ -12,8 +12,8 @@
 
 #include <assert.h>
 #include <errno.h>
-#include <stdio.h>
-#include <string.h>
+#include <stdio.h> /* fopen(), fwrite(), fclose() */
+#include <string.h> /* strlen() */
 
 #include <sys/types.h>
 #include <sys/stat.h>

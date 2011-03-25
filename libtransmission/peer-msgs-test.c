@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include "transmission.h"
-#include "net.h"
 #include "peer-msgs.h"
 #include "utils.h"
 
