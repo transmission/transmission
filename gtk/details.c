@@ -2385,6 +2385,7 @@ tracker_page_new( struct DetailsImpl * di )
     hbox = gtk_hbox_new( FALSE, GUI_PAD_BIG );
 
         v = di->tracker_view = gtk_tree_view_new_with_model( GTK_TREE_MODEL( di->trackers_filtered ) );
+        g_object_unref( di->trackers_filtered );
         gtk_tree_view_set_headers_visible( GTK_TREE_VIEW( v ), FALSE );
         g_signal_connect( v, "button-press-event", G_CALLBACK( on_tree_view_button_pressed ), NULL );
         g_signal_connect( v, "button-release-event", G_CALLBACK( on_tree_view_button_released ), NULL );

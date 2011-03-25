@@ -157,6 +157,7 @@ makeview( PrivateData * p )
 
 
     gtk_tree_view_set_model( GTK_TREE_VIEW( view ), p->filter_model );
+    g_object_unref( p->filter_model );
 
     return view;
 }

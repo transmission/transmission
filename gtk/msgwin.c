@@ -506,6 +506,7 @@ gtr_message_log_window_new( GtkWindow * parent, TrCore * core )
     data->filter = gtk_tree_model_filter_new( GTK_TREE_MODEL(
                                                   data->store ), NULL );
     data->sort = gtk_tree_model_sort_new_with_model( data->filter );
+    g_object_unref( data->filter );
     gtk_tree_sortable_set_sort_column_id( GTK_TREE_SORTABLE( data->sort ),
                                           COL_SEQUENCE,
                                           GTK_SORT_ASCENDING );
@@ -516,6 +517,7 @@ gtr_message_log_window_new( GtkWindow * parent, TrCore * core )
 
 
     view = gtk_tree_view_new_with_model( data->sort );
+    g_object_unref( data->sort );
     g_signal_connect( view, "button-release-event",
                       G_CALLBACK( on_tree_view_button_released ), NULL );
     data->view = GTK_TREE_VIEW( view );

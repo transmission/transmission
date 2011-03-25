@@ -249,6 +249,7 @@ core_init( GTypeInstance * instance, gpointer g_class UNUSED )
 
     p->raw_model = GTK_TREE_MODEL( store );
     p->sorted_model = gtk_tree_model_sort_new_with_model( p->raw_model );
+    g_object_unref( p->raw_model );
 
 #ifdef HAVE_DBUS_GLIB
     if( our_instance_adds_remote_torrents )

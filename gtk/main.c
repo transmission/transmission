@@ -1103,6 +1103,8 @@ on_drag_data_received( GtkWidget         * widget          UNUSED,
             gtr_core_add_from_url( data->core, uri );
             success = TRUE;
         }
+
+        g_free( filename );
     }
 
     if( files )

@@ -121,6 +121,7 @@ tr_ctorSetMetainfoFromMagnetLink( tr_ctor * ctor, const char * magnet_link )
         err = tr_ctorSetMetainfo( ctor, (const uint8_t*)str, len );
 
         tr_free( str );
+        tr_bencFree( &tmp );
         tr_magnetFree( magnet_info );
     }
 

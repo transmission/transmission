@@ -467,6 +467,13 @@ number_renderer_new( void )
     return r;
 }
 
+static void
+disconnect_cat_model_callbacks( gpointer tmodel, GObject * cat_model )
+{
+    g_signal_handlers_disconnect_by_func( tmodel, torrent_model_row_changed, cat_model );
+    g_signal_handlers_disconnect_by_func( tmodel, torrent_model_row_deleted_cb, cat_model );
+}
+
 static GtkWidget *
 category_combo_box_new( GtkTreeModel * tmodel )
 {
@@ -477,6 +484,7 @@ category_combo_box_new( GtkTreeModel * tmodel )
     /* create the category combobox */
     cat_model = category_filter_model_new( tmodel );
     c = gtk_combo_box_new_with_model( cat_model );
+    g_object_unref( cat_model );
     gtk_combo_box_set_row_separator_func( GTK_COMBO_BOX( c ),
                                           is_it_a_separator, NULL, NULL );
     gtk_combo_box_set_active( GTK_COMBO_BOX( c ), 0 );
@@ -504,12 +512,10 @@ category_combo_box_new( GtkTreeModel * tmodel )
     gtk_cell_layout_set_cell_data_func( GTK_CELL_LAYOUT( c ), r,
                                         render_number_func, NULL, NULL );
 
-    g_signal_connect( tmodel, "row-changed",
-                      G_CALLBACK( torrent_model_row_changed ), cat_model );
-    g_signal_connect( tmodel, "row-inserted",
-                      G_CALLBACK( torrent_model_row_changed ), cat_model );
-    g_signal_connect( tmodel, "row-deleted",
-                      G_CALLBACK( torrent_model_row_deleted_cb ), cat_model );
+    g_object_weak_ref( G_OBJECT( cat_model ), disconnect_cat_model_callbacks, tmodel );
+    g_signal_connect( tmodel, "row-changed", G_CALLBACK( torrent_model_row_changed ), cat_model );
+    g_signal_connect( tmodel, "row-inserted", G_CALLBACK( torrent_model_row_changed ), cat_model );
+    g_signal_connect( tmodel, "row-deleted", G_CALLBACK( torrent_model_row_deleted_cb ), cat_model );
 
     return c;
 }
@@ -793,6 +799,13 @@ activity_torrent_model_row_deleted_cb( GtkTreeModel  * tmodel UNUSED,
     activity_model_update_idle( activity_model );
 }
 
+static void
+disconnect_activity_model_callbacks( gpointer tmodel, GObject * cat_model )
+{
+    g_signal_handlers_disconnect_by_func( tmodel, activity_torrent_model_row_changed, cat_model );
+    g_signal_handlers_disconnect_by_func( tmodel, activity_torrent_model_row_deleted_cb, cat_model );
+}
+
 static GtkWidget *
 activity_combo_box_new( GtkTreeModel * tmodel )
 {
@@ -802,6 +815,7 @@ activity_combo_box_new( GtkTreeModel * tmodel )
 
     activity_model = activity_filter_model_new( tmodel );
     c = gtk_combo_box_new_with_model( activity_model );
+    g_object_unref( activity_model );
     gtk_combo_box_set_row_separator_func( GTK_COMBO_BOX( c ),
                                        activity_is_it_a_separator, NULL, NULL );
     gtk_combo_box_set_active( GTK_COMBO_BOX( c ), 0 );
@@ -825,15 +839,10 @@ activity_combo_box_new( GtkTreeModel * tmodel )
     gtk_cell_layout_set_cell_data_func( GTK_CELL_LAYOUT( c ), r,
                                         render_number_func, NULL, NULL );
 
-    g_signal_connect( tmodel, "row-changed",
-                      G_CALLBACK( activity_torrent_model_row_changed ),
-                      activity_model );
-    g_signal_connect( tmodel, "row-inserted",
-                      G_CALLBACK( activity_torrent_model_row_changed ),
-                      activity_model );
-    g_signal_connect( tmodel, "row-deleted",
-                      G_CALLBACK( activity_torrent_model_row_deleted_cb ),
-                      activity_model );
+    g_object_weak_ref( G_OBJECT( activity_model ), disconnect_activity_model_callbacks, tmodel );
+    g_signal_connect( tmodel, "row-changed", G_CALLBACK( activity_torrent_model_row_changed ), activity_model );
+    g_signal_connect( tmodel, "row-inserted", G_CALLBACK( activity_torrent_model_row_changed ), activity_model );
+    g_signal_connect( tmodel, "row-deleted", G_CALLBACK( activity_torrent_model_row_deleted_cb ), activity_model );
 
     return c;
 }
