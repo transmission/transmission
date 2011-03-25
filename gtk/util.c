@@ -455,6 +455,11 @@ gtr_open_uri( const char * uri )
     {
         gboolean opened = FALSE;
 
+#if GTK_CHECK_VERSION(2,14,0)
+        if( !opened )
+            opened = gtk_show_uri( NULL, uri, GDK_CURRENT_TIME, NULL );
+#endif
+
 #ifdef HAVE_GIO
         if( !opened )
             opened = g_app_info_launch_default_for_uri( uri, NULL, NULL );
