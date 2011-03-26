@@ -961,6 +961,7 @@ struct announce_data
     int tierId;
     time_t timeSent;
     tr_announce_event event;
+    tr_session * session;
 
     /** If the request succeeds, the value for tier's "isRunning" flag */
     bool isRunningOnSuccess;
@@ -990,12 +991,12 @@ on_announce_error( tr_tier * tier, const char * err, tr_announce_event e )
 }
 
 static void
-on_announce_done( tr_session                  * session,
-                  const tr_announce_response  * response,
+on_announce_done( const tr_announce_response  * response,
                   void                        * vdata )
 {
-    tr_announcer * announcer = session->announcer;
+   
     struct announce_data * data = vdata;
+    tr_announcer * announcer = data->session->announcer;
     tr_tier * tier = getTier( announcer, response->info_hash, data->tierId );
     const time_t now = tr_time( );
     const tr_announce_event event = data->event;
@@ -1166,6 +1167,7 @@ tierAnnounce( tr_announcer * announcer, tr_tier * tier )
     req = announce_request_new( announcer, tor, tier, announce_event );
 
     data = tr_new0( struct announce_data, 1 );
+    data->session = announcer->session;
     data->tierId = tier->key;
     data->isRunningOnSuccess = tor->isRunning;
     data->timeSent = now;
@@ -1225,12 +1227,12 @@ find_tier( tr_torrent * tor, const char * url )
 }
 
 static void
-on_scrape_done( tr_session                * session,
-                const tr_scrape_response  * response,
-                void                      * user_data UNUSED )
+on_scrape_done( const tr_scrape_response  * response,
+                void                      * vsession )
 {
     int i;
     const time_t now = tr_time( );
+    tr_session * session = vsession;
     tr_announcer * announcer = session->announcer;
 
     for( i=0; i<response->row_count; ++i )
@@ -1373,7 +1375,7 @@ multiscrape( tr_announcer * announcer, tr_ptrArray * tiers )
 
     /* send the requests we just built */
     for( i=0; i<request_count; ++i )
-        scrape_request_delegate( announcer, &requests[i], on_scrape_done, NULL );
+        scrape_request_delegate( announcer, &requests[i], on_scrape_done, announcer->session );
 
     /* cleanup */
     tr_free( requests );

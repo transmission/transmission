@@ -201,16 +201,14 @@ tau_scrape_request_free( struct tau_scrape_request * req )
 }
 
 static void
-tau_scrape_request_finished( tr_session                       * session,
-                             const struct tau_scrape_request  * request )
+tau_scrape_request_finished( const struct tau_scrape_request  * request )
 {
     if( request->callback != NULL )
-        request->callback( session, &request->response, request->user_data );
+        request->callback( &request->response, request->user_data );
 }
 
 static void
-tau_scrape_request_fail( tr_session                 * session,
-                         struct tau_scrape_request  * request,
+tau_scrape_request_fail( struct tau_scrape_request  * request,
                          bool                         did_connect,
                          bool                         did_timeout,
                          const char                 * errmsg )
@@ -218,12 +216,11 @@ tau_scrape_request_fail( tr_session                 * session,
     request->response.did_connect = did_connect;
     request->response.did_timeout = did_timeout;
     request->response.errmsg = tr_strdup( errmsg );
-    tau_scrape_request_finished( session, request );
+    tau_scrape_request_finished( request );
 }
 
 static void
-on_scrape_response( tr_session                 * session,
-                    struct tau_scrape_request  * request,
+on_scrape_response( struct tau_scrape_request  * request,
                     tau_action_t                 action,
                     struct evbuffer            * buf )
 {
@@ -246,7 +243,7 @@ on_scrape_response( tr_session                 * session,
             row->leechers  = evbuffer_read_ntoh_32( buf );
         }
 
-        tau_scrape_request_finished( session, request );
+        tau_scrape_request_finished( request );
     }
     else
     {
@@ -258,7 +255,7 @@ on_scrape_response( tr_session                 * session,
         else
             errmsg = tr_strdup( _( "Unknown error" ) );
 
-        tau_scrape_request_fail( session, request, true, false, errmsg );
+        tau_scrape_request_fail( request, true, false, errmsg );
         tr_free( errmsg );
     }
 }
@@ -356,16 +353,14 @@ tau_announce_request_free( struct tau_announce_request * req )
 }
 
 static void
-tau_announce_request_finished( tr_session                        * session,
-                               const struct tau_announce_request * request )
+tau_announce_request_finished( const struct tau_announce_request * request )
 {
     if( request->callback != NULL )
-        request->callback( session, &request->response, request->user_data );
+        request->callback( &request->response, request->user_data );
 }
 
 static void
-tau_announce_request_fail( tr_session                   * session,
-                           struct tau_announce_request  * request,
+tau_announce_request_fail( struct tau_announce_request  * request,
                            bool                           did_connect,
                            bool                           did_timeout,
                            const char                   * errmsg )
@@ -373,12 +368,11 @@ tau_announce_request_fail( tr_session                   * session,
     request->response.did_connect = did_connect;
     request->response.did_timeout = did_timeout;
     request->response.errmsg = tr_strdup( errmsg );
-    tau_announce_request_finished( session, request );
+    tau_announce_request_finished( request );
 }
 
 static void
-on_announce_response( tr_session                   * session,
-                      struct tau_announce_request  * request,
+on_announce_response( struct tau_announce_request  * request,
                       tau_action_t                   action,
                       struct evbuffer              * buf )
 {
@@ -397,7 +391,7 @@ on_announce_response( tr_session                   * session,
                                             evbuffer_get_length( buf ),
                                             NULL, 0,
                                             &request->response.pex_count );
-        tau_announce_request_finished( session, request );
+        tau_announce_request_finished( request );
     }
     else
     {
@@ -408,7 +402,7 @@ on_announce_response( tr_session                   * session,
         else
             errmsg = tr_strdup( _( "Unknown error" ) );
 
-        tau_announce_request_fail( session, request, true, false, errmsg );
+        tau_announce_request_fail( request, true, false, errmsg );
         tr_free( errmsg );
     }
 }
@@ -469,7 +463,7 @@ tau_tracker_fail_all( struct tau_tracker  * tracker,
     /* fail all the scrapes */
     reqs = &tracker->scrapes;
     for( i=0, n=tr_ptrArraySize(reqs); i<n; ++i )
-        tau_scrape_request_fail( tracker->session, tr_ptrArrayNth( reqs, i ),
+        tau_scrape_request_fail( tr_ptrArrayNth( reqs, i ),
                                  did_connect, did_timeout, errmsg );
     tr_ptrArrayDestruct( reqs, (PtrArrayForeachFunc)tau_scrape_request_free );
     *reqs = TR_PTR_ARRAY_INIT;
@@ -477,7 +471,7 @@ tau_tracker_fail_all( struct tau_tracker  * tracker,
     /* fail all the announces */
     reqs = &tracker->announces;
     for( i=0, n=tr_ptrArraySize(reqs); i<n; ++i )
-        tau_announce_request_fail( tracker->session, tr_ptrArrayNth( reqs, i ),
+        tau_announce_request_fail( tr_ptrArrayNth( reqs, i ),
                                    did_connect, did_timeout, errmsg );
     tr_ptrArrayDestruct( reqs, (PtrArrayForeachFunc)tau_announce_request_free );
     *reqs = TR_PTR_ARRAY_INIT;
@@ -622,7 +616,7 @@ tau_tracker_timeout_reqs( struct tau_tracker * tracker )
         struct tau_announce_request * req = tr_ptrArrayNth( reqs, i );
         if( cancel_all || ( req->created_at + TAU_REQUEST_TTL < now ) ) {
             dbgmsg( tracker->key, "timeout announce req %p", req );
-            tau_announce_request_fail( tracker->session, req, false, true, NULL );
+            tau_announce_request_fail( req, false, true, NULL );
             tau_announce_request_free( req );
             tr_ptrArrayRemove( reqs, i );
             --i;
@@ -635,7 +629,7 @@ tau_tracker_timeout_reqs( struct tau_tracker * tracker )
         struct tau_scrape_request * req = tr_ptrArrayNth( reqs, i );
         if( cancel_all || ( req->created_at + TAU_REQUEST_TTL < now ) ) {
             dbgmsg( tracker->key, "timeout scrape req %p", req );
-            tau_scrape_request_fail( tracker->session, req, false, true, NULL );
+            tau_scrape_request_fail( req, false, true, NULL );
             tau_scrape_request_free( req );
             tr_ptrArrayRemove( reqs, i );
             --i;
@@ -909,7 +903,7 @@ tau_handle_message( tr_session * session, const uint8_t * msg, size_t msglen )
             if( req->sent_at && ( transaction_id == req->transaction_id ) ) {
                 dbgmsg( tracker->key, "%"PRIu32" is an announce request!", transaction_id );
                 tr_ptrArrayRemove( reqs, j );
-                on_announce_response( session, req, action_id, buf );
+                on_announce_response( req, action_id, buf );
                 tau_announce_request_free( req );
                 evbuffer_free( buf );
                 return true;
@@ -923,7 +917,7 @@ tau_handle_message( tr_session * session, const uint8_t * msg, size_t msglen )
             if( req->sent_at && ( transaction_id == req->transaction_id ) ) {
                 dbgmsg( tracker->key, "%"PRIu32" is a scrape request!", transaction_id );
                 tr_ptrArrayRemove( reqs, j );
-                on_scrape_response( session, req, action_id, buf );
+                on_scrape_response( req, action_id, buf );
                 tau_scrape_request_free( req );
                 evbuffer_free( buf );
                 return true;

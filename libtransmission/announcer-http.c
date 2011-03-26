@@ -158,7 +158,6 @@ listToPex( tr_benc * peerList, size_t * setme_len )
 
 struct announce_data
 {
-    tr_session * session;
     tr_announce_response response;
     tr_announce_response_func * response_func;
     void * response_func_user_data;
@@ -171,9 +170,7 @@ on_announce_done_eventthread( void * vdata )
     struct announce_data * data = vdata;
 
     if( data->response_func != NULL )
-        data->response_func( data->session,
-                             &data->response,
-                             data->response_func_user_data );
+        data->response_func( &data->response, data->response_func_user_data );
 
     tr_free( data->response.pex6 );
     tr_free( data->response.pex );
@@ -285,7 +282,6 @@ tr_tracker_http_announce( tr_session                 * session,
     char * url = announce_url_new( session, request );
 
     d = tr_new0( struct announce_data, 1 );
-    d->session = session;
     d->response_func = response_func;
     d->response_func_user_data = response_func_user_data;
     memcpy( d->response.info_hash, request->info_hash, SHA_DIGEST_LENGTH );
@@ -304,7 +300,6 @@ tr_tracker_http_announce( tr_session                 * session,
 
 struct scrape_data
 {
-    tr_session * session;
     tr_scrape_response response;
     tr_scrape_response_func * response_func;
     void * response_func_user_data;
@@ -317,9 +312,7 @@ on_scrape_done_eventthread( void * vdata )
     struct scrape_data * data = vdata;
 
     if( data->response_func != NULL )
-        data->response_func( data->session,
-                             &data->response,
-                             data->response_func_user_data );
+        data->response_func( &data->response, data->response_func_user_data );
 
     tr_free( data->response.errmsg );
     tr_free( data->response.url );
@@ -436,7 +429,6 @@ tr_tracker_http_scrape( tr_session               * session,
     char * url = scrape_url_new( request );
 
     d = tr_new0( struct scrape_data, 1 );
-    d->session = session;
     d->response.url = tr_strdup( request->url );
     d->response_func = response_func;
     d->response_func_user_data = response_func_user_data;

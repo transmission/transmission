@@ -96,8 +96,7 @@ typedef struct
 }
 tr_scrape_response;
 
-typedef void tr_scrape_response_func( tr_session                * session,
-                                      const tr_scrape_response  * response,
+typedef void tr_scrape_response_func( const tr_scrape_response  * response,
                                       void                      * user_data );
 
 void tr_tracker_http_scrape( tr_session               * session,
@@ -224,8 +223,7 @@ typedef struct
 }
 tr_announce_response;
 
-typedef void tr_announce_response_func( tr_session                 * session,
-                                        const tr_announce_response * response,
+typedef void tr_announce_response_func( const tr_announce_response * response,
                                         void                       * userdata );
 
 void tr_tracker_http_announce( tr_session                 * session,
