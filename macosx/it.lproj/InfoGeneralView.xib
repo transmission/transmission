@@ -130,7 +130,7 @@
 					<object class="NSTextField" id="438336412">
 						<reference key="NSNextResponder" ref="923140800"/>
 						<int key="NSvFlags">268</int>
-						<string key="NSFrame">{{9, 189}, {139, 17}}</string>
+						<string key="NSFrame">{{9, 189}, {141, 17}}</string>
 						<reference key="NSSuperview" ref="923140800"/>
 						<reference key="NSWindow"/>
 						<bool key="NSEnabled">YES</bool>
@@ -151,7 +151,7 @@
 					<object class="NSTextField" id="895565412">
 						<reference key="NSNextResponder" ref="923140800"/>
 						<int key="NSvFlags">268</int>
-						<string key="NSFrame">{{17, 144}, {61, 14}}</string>
+						<string key="NSFrame">{{9, 144}, {69, 14}}</string>
 						<reference key="NSSuperview" ref="923140800"/>
 						<reference key="NSWindow"/>
 						<bool key="NSEnabled">YES</bool>
@@ -203,7 +203,7 @@
 					<object class="NSTextField" id="99378388">
 						<reference key="NSNextResponder" ref="923140800"/>
 						<int key="NSvFlags">266</int>
-						<string key="NSFrame">{{79, 11}, {242, 14}}</string>
+						<string key="NSFrame">{{79, 10}, {242, 14}}</string>
 						<reference key="NSSuperview" ref="923140800"/>
 						<reference key="NSWindow"/>
 						<bool key="NSEnabled">YES</bool>
@@ -238,7 +238,7 @@
 					<object class="NSButton" id="178285891">
 						<reference key="NSNextResponder" ref="923140800"/>
 						<int key="NSvFlags">265</int>
-						<string key="NSFrame">{{326, 11}, {14, 14}}</string>
+						<string key="NSFrame">{{326, 10}, {14, 14}}</string>
 						<reference key="NSSuperview" ref="923140800"/>
 						<reference key="NSWindow"/>
 						<bool key="NSEnabled">YES</bool>
@@ -271,7 +271,7 @@
 					<object class="NSTextField" id="258860752">
 						<reference key="NSNextResponder" ref="923140800"/>
 						<int key="NSvFlags">268</int>
-						<string key="NSFrame">{{17, 128}, {61, 14}}</string>
+						<string key="NSFrame">{{12, 128}, {66, 14}}</string>
 						<reference key="NSSuperview" ref="923140800"/>
 						<reference key="NSWindow"/>
 						<bool key="NSEnabled">YES</bool>
@@ -306,7 +306,7 @@
 					<object class="NSTextField" id="945225777">
 						<reference key="NSNextResponder" ref="923140800"/>
 						<int key="NSvFlags">268</int>
-						<string key="NSFrame">{{9, 112}, {69, 14}}</string>
+						<string key="NSFrame">{{10, 112}, {68, 14}}</string>
 						<reference key="NSSuperview" ref="923140800"/>
 						<reference key="NSWindow"/>
 						<bool key="NSEnabled">YES</bool>
