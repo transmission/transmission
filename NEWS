@@ -7,8 +7,9 @@
   * The "lazy bitfield" feature has been superseded by the "Fast Extension" BEP6
   * Scripts are passed the environment
 ==== Mac ====
-  * The Web Interface is published over Wide-Area Bonjour
+  * An Intel Mac is now required
   * Ability to remove all completed (finished seeding) transfers
+  * The Web Interface is published over Wide-Area Bonjour
   * Enhanced grouping rules
   * Interface tweaks
 ==== GTK+ ====
