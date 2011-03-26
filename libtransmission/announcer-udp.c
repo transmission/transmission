@@ -194,9 +194,9 @@ tau_scrape_request_new( const tr_scrape_request  * in,
 static void
 tau_scrape_request_free( struct tau_scrape_request * req )
 {
-    tr_free( req->payload );
     tr_free( req->response.errmsg );
     tr_free( req->response.url );
+    tr_free( req->payload );
     tr_free( req );
 }
 
@@ -222,10 +222,10 @@ tau_scrape_request_fail( tr_session                 * session,
 }
 
 static void
-on_scrape_response( tr_session                  * session,
-                     struct tau_scrape_request  * request,
-                     tau_action_t                 action,
-                     struct evbuffer            * buf )
+on_scrape_response( tr_session                 * session,
+                    struct tau_scrape_request  * request,
+                    tau_action_t                 action,
+                    struct evbuffer            * buf )
 {
     request->response.did_connect = true;
     request->response.did_timeout = false;
@@ -377,16 +377,17 @@ tau_announce_request_fail( tr_session                   * session,
 }
 
 static void
-on_announce_response( tr_session                  * session,
-                     struct tau_announce_request  * request,
-                     tau_action_t                   action,
-                     struct evbuffer              * buf )
+on_announce_response( tr_session                   * session,
+                      struct tau_announce_request  * request,
+                      tau_action_t                   action,
+                      struct evbuffer              * buf )
 {
+    const size_t buflen = evbuffer_get_length( buf );
+
     request->response.did_connect = true;
     request->response.did_timeout = false;
 
-    if( ( action == TAU_ACTION_ANNOUNCE )
-        && ( evbuffer_get_length( buf ) >= 3*sizeof(uint32_t) ) )
+    if( ( action == TAU_ACTION_ANNOUNCE ) && ( buflen >= 3*sizeof(uint32_t) ) )
     {
         tr_announce_response * resp = &request->response;
         resp->interval = evbuffer_read_ntoh_32( buf );
@@ -401,7 +402,6 @@ on_announce_response( tr_session                  * session,
     else
     {
         char * errmsg;
-        const size_t buflen = evbuffer_get_length( buf );
 
         if( ( action == TAU_ACTION_ERROR ) && ( buflen > 0 ) )
             errmsg = tr_strndup( evbuffer_pullup( buf, -1 ), buflen );
@@ -531,7 +531,7 @@ tau_tracker_send_reqs( struct tau_tracker * tracker )
     tr_ptrArray * reqs;
     const time_t now = tr_time( );
 
-    assert( tracker->is_asking_dns == 0 );
+    assert( tracker->is_asking_dns == false );
     assert( tracker->connecting_at == 0 );
     assert( tracker->addr != NULL );
     assert( tracker->connection_expiration_time > now );
@@ -559,7 +559,7 @@ tau_tracker_send_reqs( struct tau_tracker * tracker )
             dbgmsg( tracker->key, "sending scrape req %p", req );
             req->sent_at = now;
             tau_tracker_send_request( tracker, req->payload, req->payload_len );
-            if( req->callback == NULL) {
+            if( req->callback == NULL ) {
                 tau_scrape_request_free( req );
                 tr_ptrArrayRemove( reqs, i );
                 --i;
@@ -645,7 +645,7 @@ tau_tracker_timeout_reqs( struct tau_tracker * tracker )
 }
 
 static bool
-tau_tracker_is_empty( const struct tau_tracker * tracker )
+tau_tracker_is_idle( const struct tau_tracker * tracker )
 {
     return tr_ptrArrayEmpty( &tracker->announces )
         && tr_ptrArrayEmpty( &tracker->scrapes );
@@ -664,7 +664,7 @@ tau_tracker_upkeep( struct tau_tracker * tracker )
     }
 
     /* are there any requests pending? */
-    if( tau_tracker_is_empty( tracker ) )
+    if( tau_tracker_is_idle( tracker ) )
         return;
 
     /* if we don't have an address yet, try & get one now. */
@@ -804,7 +804,7 @@ tr_tracker_udp_upkeep( tr_session * session )
 }
 
 bool
-tr_tracker_udp_is_empty( const tr_session * session )
+tr_tracker_udp_is_idle( const tr_session * session )
 {
     int i;
     int n;
@@ -812,7 +812,7 @@ tr_tracker_udp_is_empty( const tr_session * session )
 
     if( tau != NULL )
         for( i=0, n=tr_ptrArraySize(&tau->trackers); i<n; ++i )
-            if( !tau_tracker_is_empty( tr_ptrArrayNth( &tau->trackers, i ) ) )
+            if( !tau_tracker_is_idle( tr_ptrArrayNth( &tau->trackers, i ) ) )
                 return false;
 
     return true;

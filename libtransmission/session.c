@@ -1772,7 +1772,7 @@ sessionCloseImpl( void * vsession )
 
     /* gotta keep udp running long enough to send out all
        the &event=stopped UDP tracker messages */
-    while( !tr_tracker_udp_is_empty( session ) ) {
+    while( !tr_tracker_udp_is_idle( session ) ) {
         tr_tracker_udp_upkeep( session );
         tr_wait_msec( 100 );
     }

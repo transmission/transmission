@@ -112,7 +112,7 @@ void tr_tracker_udp_upkeep( tr_session * session );
 
 void tr_tracker_udp_close( tr_session * session );
 
-bool tr_tracker_udp_is_empty( const tr_session * session );
+bool tr_tracker_udp_is_idle( const tr_session * session );
 
 
 
