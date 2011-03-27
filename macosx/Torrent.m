@@ -573,11 +573,9 @@ int trashDataFile(const char * filename)
         return YES;
     
     NSString * downloadFolder = [self currentDirectory];
-    NSLog(@"%@", downloadFolder);
     NSDictionary * systemAttributes;
     if ((systemAttributes = [[NSFileManager defaultManager] attributesOfFileSystemForPath: downloadFolder error: NULL]))
     {
-        NSLog(@"%@", systemAttributes);
         const uint64_t remainingSpace = [[systemAttributes objectForKey: NSFileSystemFreeSize] unsignedLongLongValue];
         
         //if the remaining space is greater than the size left, then there is enough space regardless of preallocation
