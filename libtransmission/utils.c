@@ -1252,6 +1252,8 @@ to_utf8( const char * in, size_t inlen )
             iconv_close( cd );
         }
     }
+
+    tr_free( out );
 #endif
 
     if( ret == NULL )
