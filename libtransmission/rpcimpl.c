@@ -558,11 +558,12 @@ addField( const tr_torrent * tor, tr_benc * d, const char * key )
     else if( tr_streq( key, keylen, "peersSendingToUs" ) )
         tr_bencDictAddInt( d, key, st->peersSendingToUs );
     else if( tr_streq( key, keylen, "pieces" ) ) {
-        tr_bitfield * bf = tr_cpCreatePieceBitfield( &tor->completion );
-        char * str = tr_base64_encode( bf->bits, bf->byteCount, NULL );
+        size_t byte_count = 0;
+        void * bytes = tr_cpCreatePieceBitfield( &tor->completion, &byte_count );
+        char * str = tr_base64_encode( bytes, byte_count, NULL );
         tr_bencDictAddStr( d, key, str!=NULL ? str : "" );
         tr_free( str );
-        tr_bitfieldFree( bf );
+        tr_free( bytes );
     }
     else if( tr_streq( key, keylen, "pieceCount" ) )
         tr_bencDictAddInt( d, key, inf->pieceCount );

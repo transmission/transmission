@@ -16,7 +16,6 @@
 
 #include "transmission.h"
 #include "bencode.h"
-#include "bitset.h"
 #include "completion.h"
 #include "metainfo.h" /* tr_metainfoGetBasename() */
 #include "peer-mgr.h" /* pex */
@@ -409,6 +408,18 @@ loadIdleLimits( tr_benc *    dict,
 ***/
 
 static void
+bitfieldToBenc( const tr_bitfield * b, tr_benc * benc )
+{
+    if( tr_bitfieldHasAll( b ) )
+        tr_bencInitStr( benc, "all", 3 );
+    else if( tr_bitfieldHasNone( b ) )
+        tr_bencInitStr( benc, "none", 4 );
+    else
+        tr_bencInitRaw( benc, b->bits, b->byte_count );
+}
+
+
+static void
 saveProgress( tr_benc * dict, tr_torrent * tor )
 {
     tr_benc * l;
@@ -469,8 +480,8 @@ saveProgress( tr_benc * dict, tr_torrent * tor )
         tr_bencDictAddStr( prog, KEY_PROGRESS_HAVE, "all" );
 
     /* add the blocks bitfield */
-    tr_bitsetToBenc( tr_cpBlockBitset( &tor->completion ),
-                     tr_bencDictAdd( prog, KEY_PROGRESS_BLOCKS ) );
+    bitfieldToBenc( &tor->completion.blockBitfield,
+                    tr_bencDictAdd( prog, KEY_PROGRESS_BLOCKS ) );
 }
 
 static uint64_t
@@ -492,7 +503,7 @@ loadProgress( tr_benc * dict, tr_torrent * tor )
         size_t rawlen;
         tr_benc * l;
         tr_benc * b;
-        struct tr_bitset bitset = TR_BITSET_INIT;
+        struct tr_bitfield blocks = TR_BITFIELD_INIT;
 
         if( tr_bencDictFindList( prog, KEY_PROGRESS_CHECKTIME, &l ) )
         {
@@ -567,32 +578,41 @@ loadProgress( tr_benc * dict, tr_torrent * tor )
         }
 
         err = NULL;
+        tr_bitfieldConstruct( &blocks, tor->blockCount );
 
         if(( b = tr_bencDictFind( prog, KEY_PROGRESS_BLOCKS )))
         {
-            if( !tr_bitsetFromBenc( &bitset, b ) )
-                err = "Invalid value for PIECES";
+            size_t buflen;
+            const uint8_t * buf;
+
+            if( !tr_bencGetRaw( b, &buf, &buflen ) )
+                err = "Invalid value for \"blocks\"";
+            else if( ( buflen == 3 ) && !memcmp( buf, "all", 3 ) )
+                tr_bitfieldSetHasAll( &blocks );
+            else if( ( buflen == 4 ) && !memcmp( buf, "none", 4 ) )
+                tr_bitfieldSetHasNone( &blocks );
+            else
+                tr_bitfieldSetRaw( &blocks, buf, buflen );
         }
         else if( tr_bencDictFindStr( prog, KEY_PROGRESS_HAVE, &str ) )
         {
             if( !strcmp( str, "all" ) )
-                tr_bitsetSetHaveAll( &bitset );
+                tr_bitfieldSetHasAll( &blocks );
             else
                 err = "Invalid value for HAVE";
         }
         else if( tr_bencDictFindRaw( prog, KEY_PROGRESS_BITFIELD, &raw, &rawlen ) )
         {
-            bitset.bitfield.bits = (void*) raw;
-            bitset.bitfield.byteCount = rawlen;
-            bitset.bitfield.bitCount = rawlen * 8;
+            tr_bitfieldSetRaw( &blocks, raw, rawlen );
         }
         else err = "Couldn't find 'pieces' or 'have' or 'bitfield'";
 
-        if( !err && !tr_cpBlockBitsetInit( &tor->completion, &bitset ) )
+        if( !err && !tr_cpBlockInit( &tor->completion, &blocks ) )
             err = "Error loading bitfield";
         if( err != NULL )
             tr_tordbg( tor, "Torrent needs to be verified - %s", err );
 
+        tr_bitfieldDestruct( &blocks );
         ret = TR_FR_PROGRESS;
     }
 

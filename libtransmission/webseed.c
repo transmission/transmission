@@ -337,7 +337,7 @@ tr_webseedNew( struct tr_torrent  * tor,
     peer->peerIsChoked = true;
     peer->clientIsInterested = !tr_torrentIsSeed( tor );
     peer->client = tr_strdup( "webseed" );
-    tr_bitsetSetHaveAll( &peer->have );
+    tr_bitfieldSetHasAll( &peer->have );
     tr_peerUpdateProgress( tor, peer );
 
     w->torrent_id = tr_torrentId( tor );

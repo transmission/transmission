@@ -1138,7 +1138,6 @@ const tr_stat *
 tr_torrentStat( tr_torrent * tor )
 {
     tr_stat *               s;
-    int                     usableSeeds;
     uint64_t                now;
     uint64_t                seedRatioBytesLeft;
     uint64_t                seedRatioBytesGoal;
@@ -1163,7 +1162,6 @@ tr_torrentStat( tr_torrent * tor )
 
     tr_peerMgrTorrentStats( tor,
                             &s->peersConnected,
-                            &usableSeeds,
                             &s->webseedsSendingToUs,
                             &s->peersSendingToUs,
                             &s->peersGettingFromUs,
@@ -1174,8 +1172,6 @@ tr_torrentStat( tr_torrent * tor )
     s->pieceUploadSpeed_KBps   = toSpeedKBps( tr_bandwidthGetPieceSpeed_Bps( tor->bandwidth, now, TR_UP ) );
     s->rawDownloadSpeed_KBps   = toSpeedKBps( tr_bandwidthGetRawSpeed_Bps  ( tor->bandwidth, now, TR_DOWN ) );
     s->pieceDownloadSpeed_KBps = toSpeedKBps( tr_bandwidthGetPieceSpeed_Bps( tor->bandwidth, now, TR_DOWN ) );
-
-    usableSeeds += tor->info.webseedCount;
 
     s->percentComplete = tr_cpPercentComplete ( &tor->completion );
     s->metadataPercentComplete = tr_torrentGetMetadataPercent( tor );
@@ -1196,31 +1192,12 @@ tr_torrentStat( tr_torrent * tor )
     else
         s->idleSecs = -1;
 
-    s->corruptEver     = tor->corruptCur    + tor->corruptPrev;
-    s->downloadedEver  = tor->downloadedCur + tor->downloadedPrev;
-    s->uploadedEver    = tor->uploadedCur   + tor->uploadedPrev;
-    s->haveValid       = tr_cpHaveValid( &tor->completion );
-    s->haveUnchecked   = tr_cpHaveTotal( &tor->completion ) - s->haveValid;
-
-    if( usableSeeds > 0 )
-    {
-        s->desiredAvailable = s->leftUntilDone;
-    }
-    else if( !s->leftUntilDone || !s->peersConnected )
-    {
-        s->desiredAvailable = 0;
-    }
-    else
-    {
-        tr_piece_index_t i;
-        tr_bitfield *    peerPieces = tr_peerMgrGetAvailable( tor );
-        s->desiredAvailable = 0;
-        for( i = 0; i < tor->info.pieceCount; ++i )
-            if( !tor->info.pieces[i].dnd && tr_bitfieldHasFast( peerPieces, i ) )
-                s->desiredAvailable += tr_cpMissingBlocksInPiece( &tor->completion, i );
-        s->desiredAvailable *= tor->blockSize;
-        tr_bitfieldFree( peerPieces );
-    }
+    s->corruptEver      = tor->corruptCur    + tor->corruptPrev;
+    s->downloadedEver   = tor->downloadedCur + tor->downloadedPrev;
+    s->uploadedEver     = tor->uploadedCur   + tor->uploadedPrev;
+    s->haveValid        = tr_cpHaveValid( &tor->completion );
+    s->haveUnchecked    = tr_cpHaveTotal( &tor->completion ) - s->haveValid;
+    s->desiredAvailable = tr_peerMgrGetDesiredAvailable( tor );
 
     s->ratio = tr_getRatio( s->uploadedEver,
                             s->downloadedEver ? s->downloadedEver : s->haveValid );
@@ -1327,7 +1304,7 @@ fileBytesCompleted( const tr_torrent * tor, tr_file_index_t index )
 
             /* the middle blocks */
             if( first + 1 < last ) {
-                uint64_t u = tr_bitsetCountRange( tr_cpBlockBitset( &tor->completion ), first+1, last );
+                uint64_t u = tr_bitfieldCountRange( &tor->completion.blockBitfield, first+1, last );
                 u *= tor->blockSize;
                 total += u;
             }

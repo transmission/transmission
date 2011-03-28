@@ -13,7 +13,6 @@
 #include <assert.h>
 #include <errno.h>
 #include <stdarg.h>
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -216,16 +215,6 @@ struct tr_peermsgs
 /**
 ***
 **/
-
-#if 0
-static tr_bitfield*
-getHave( const struct tr_peermsgs * msgs )
-{
-    if( msgs->peer->have == NULL )
-        msgs->peer->have = tr_bitfieldNew( msgs->torrent->info.pieceCount );
-    return msgs->peer->have;
-}
-#endif
 
 static inline tr_session*
 getSession( struct tr_peermsgs * msgs )
@@ -1417,25 +1406,21 @@ readBtMessage( tr_peermsgs * msgs, struct evbuffer * inbuf, size_t inlen )
             }
 
             /* a peer can send the same HAVE message twice... */
-            if( !tr_bitsetHas( &msgs->peer->have, ui32 ) ) {
-                tr_bitsetAdd( &msgs->peer->have, ui32 );
+            if( !tr_bitfieldHas( &msgs->peer->have, ui32 ) ) {
+                tr_bitfieldAdd( &msgs->peer->have, ui32 );
                 fireClientGotHave( msgs, ui32 );
             }
             updatePeerProgress( msgs );
             break;
 
         case BT_BITFIELD: {
-            tr_bitfield tmp = TR_BITFIELD_INIT;
-            const size_t bitCount = tr_torrentHasMetadata( msgs->torrent )
-                                  ? msgs->torrent->info.pieceCount
-                                  : msglen * 8;
-            tr_bitfieldConstruct( &tmp, bitCount );
+            uint8_t * tmp = tr_new( uint8_t, msglen );
             dbgmsg( msgs, "got a bitfield" );
-            tr_peerIoReadBytes( msgs->peer->io, inbuf, tmp.bits, msglen );
-            tr_bitsetSetBitfield( &msgs->peer->have, &tmp );
-            fireClientGotBitfield( msgs, &tmp );
-            tr_bitfieldDestruct( &tmp );
+            tr_peerIoReadBytes( msgs->peer->io, inbuf, tmp, msglen );
+            tr_bitfieldSetRaw( &msgs->peer->have, tmp, msglen );
+            fireClientGotBitfield( msgs, &msgs->peer->have );
             updatePeerProgress( msgs );
+            tr_free( tmp );
             break;
         }
 
@@ -1510,7 +1495,8 @@ readBtMessage( tr_peermsgs * msgs, struct evbuffer * inbuf, size_t inlen )
         case BT_FEXT_HAVE_ALL:
             dbgmsg( msgs, "Got a BT_FEXT_HAVE_ALL" );
             if( fext ) {
-                tr_bitsetSetHaveAll( &msgs->peer->have );
+                tr_bitfieldSetHasAll( &msgs->peer->have );
+assert( tr_bitfieldHasAll( &msgs->peer->have ) );
                 fireClientGotHaveAll( msgs );
                 updatePeerProgress( msgs );
             } else {
@@ -1522,7 +1508,7 @@ readBtMessage( tr_peermsgs * msgs, struct evbuffer * inbuf, size_t inlen )
         case BT_FEXT_HAVE_NONE:
             dbgmsg( msgs, "Got a BT_FEXT_HAVE_NONE" );
             if( fext ) {
-                tr_bitsetSetHaveNone( &msgs->peer->have );
+                tr_bitfieldSetHasNone( &msgs->peer->have );
                 fireClientGotHaveNone( msgs );
                 updatePeerProgress( msgs );
             } else {
@@ -1565,14 +1551,6 @@ readBtMessage( tr_peermsgs * msgs, struct evbuffer * inbuf, size_t inlen )
     return READ_NOW;
 }
 
-static void
-addPeerToBlamefield( tr_peermsgs * msgs, uint32_t index )
-{
-    if( !msgs->peer->blame )
-         msgs->peer->blame = tr_bitfieldNew( msgs->torrent->info.pieceCount );
-    tr_bitfieldAdd( msgs->peer->blame, index );
-}
-
 /* returns 0 on success, or an errno on failure */
 static int
 clientGotBlock( tr_peermsgs                * msgs,
@@ -1610,7 +1588,7 @@ clientGotBlock( tr_peermsgs                * msgs,
     if(( err = tr_cacheWriteBlock( getSession(msgs)->cache, tor, req->index, req->offset, req->length, data )))
         return err;
 
-    addPeerToBlamefield( msgs, req->index );
+    tr_bitfieldAdd( &msgs->peer->blame, req->index );
     fireGotBlock( msgs, req );
     return 0;
 }
@@ -2015,16 +1993,17 @@ gotError( tr_peerIo * io UNUSED, short what, void * vmsgs )
 static void
 sendBitfield( tr_peermsgs * msgs )
 {
+    size_t byte_count = 0;
     struct evbuffer * out = msgs->outMessages;
-    tr_bitfield * bf = tr_cpCreatePieceBitfield( &msgs->torrent->completion );
+    void * bytes = tr_cpCreatePieceBitfield( &msgs->torrent->completion, &byte_count );
 
-    evbuffer_add_uint32( out, sizeof( uint8_t ) + bf->byteCount );
+    evbuffer_add_uint32( out, sizeof( uint8_t ) + byte_count );
     evbuffer_add_uint8 ( out, BT_BITFIELD );
-    evbuffer_add       ( out, bf->bits, bf->byteCount );
+    evbuffer_add       ( out, bytes, byte_count );
     dbgmsg( msgs, "sending bitfield... outMessage size is now %zu", evbuffer_get_length( out ) );
     pokeBatchPeriod( msgs, IMMEDIATE_PRIORITY_INTERVAL_SECS );
 
-    tr_bitfieldFree( bf );
+    tr_free( bytes );
 }
 
 static void
@@ -2032,15 +2011,15 @@ tellPeerWhatWeHave( tr_peermsgs * msgs )
 {
     const bool fext = tr_peerIoSupportsFEXT( msgs->peer->io );
 
-    if( fext && ( tr_cpBlockBitset( &msgs->torrent->completion )->haveAll ) )
+    if( fext && tr_cpHasAll( &msgs->torrent->completion ) )
     {
         protocolSendHaveAll( msgs );
     }
-    else if( fext && ( tr_cpBlockBitset( &msgs->torrent->completion )->haveNone ) )
+    else if( fext && tr_cpHasNone( &msgs->torrent->completion ) )
     {
         protocolSendHaveNone( msgs );
     }
-    else
+    else if( !tr_cpHasNone( &msgs->torrent->completion ) )
     {
         sendBitfield( msgs );
     }

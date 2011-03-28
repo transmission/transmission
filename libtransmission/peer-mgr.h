@@ -24,7 +24,6 @@
 #endif
 
 #include "bitfield.h"
-#include "bitset.h"
 #include "history.h"
 #include "net.h" /* tr_address */
 #include "peer-common.h" /* struct peer_request */
@@ -110,8 +109,8 @@ typedef struct tr_peer
     struct tr_peerIo       * io;
     struct peer_atom       * atom;
 
-    struct tr_bitfield     * blame;
-    struct tr_bitset         have;
+    struct tr_bitfield       blame;
+    struct tr_bitfield       have;
 
     /** how complete the peer's copy of the torrent is. [0.0...1.0] */
     float                    progress;
@@ -229,7 +228,7 @@ void tr_peerMgrTorrentAvailability( const tr_torrent * tor,
                                     int8_t           * tab,
                                     unsigned int       tabCount );
 
-struct tr_bitfield* tr_peerMgrGetAvailable( const tr_torrent * tor );
+uint64_t tr_peerMgrGetDesiredAvailable( const tr_torrent * tor );
 
 void tr_peerMgrOnTorrentGotMetainfo( tr_torrent * tor );
 
@@ -237,7 +236,6 @@ void tr_peerMgrOnBlocklistChanged( tr_peerMgr * manager );
 
 void tr_peerMgrTorrentStats( tr_torrent * tor,
                              int * setmePeersConnected,
-                             int * setmeSeedsConnected,
                              int * setmeWebseedsSendingToUs,
                              int * setmePeersSendingToUs,
                              int * setmePeersGettingFromUs,

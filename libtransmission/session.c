@@ -1262,7 +1262,7 @@ turtleUpdateTable( struct tr_turtle_info * t )
     int day;
     tr_bitfield * b = &t->minutes;
 
-    tr_bitfieldClear( b );
+    tr_bitfieldSetHasNone( b );
 
     for( day=0; day<7; ++day )
     {

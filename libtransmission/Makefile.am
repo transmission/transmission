@@ -23,7 +23,6 @@ libtransmission_a_SOURCES = \
     bandwidth.c \
     bencode.c \
     bitfield.c \
-    bitset.c \
     blocklist.c \
     cache.c \
     clients.c \
@@ -75,7 +74,6 @@ noinst_HEADERS = \
     bandwidth.h \
     bencode.h \
     bitfield.h \
-    bitset.h \
     blocklist.h \
     cache.h \
     clients.h \

@@ -17,65 +17,111 @@
 #ifndef TR_BITFIELD_H
 #define TR_BITFIELD_H 1
 
+#include <assert.h>
 #include "transmission.h"
 
 /** @brief Implementation of the BitTorrent spec's Bitfield array of bits */
 typedef struct tr_bitfield
 {
     uint8_t *  bits;
-    size_t     bitCount;
-    size_t     byteCount;
+    size_t     bit_count;
+    size_t     byte_count;
+    size_t     true_count;
+
+    /* Special cases for when full or empty but we don't know the bitCount.
+       This occurs when a magnet link's peers send have all / have none */
+    bool       have_all_hint;
+    bool       have_none_hint;
 }
 tr_bitfield;
 
+/***
+****  life cycle
+***/
+
 extern const tr_bitfield TR_BITFIELD_INIT;
 
-tr_bitfield* tr_bitfieldConstruct( tr_bitfield*, size_t bitCount );
+void   tr_bitfieldConstruct( tr_bitfield*, size_t bit_count );
 
-tr_bitfield* tr_bitfieldDestruct( tr_bitfield* );
+void   tr_bitfieldDestruct( tr_bitfield* );
 
-tr_bitfield* tr_bitfieldNew( size_t bitCount );
+/***
+****
+***/
 
-void tr_bitfieldFree( tr_bitfield * b );
+void   tr_bitfieldSetHasAll( tr_bitfield* );
 
-void         tr_bitfieldClear( tr_bitfield* );
+void   tr_bitfieldSetHasNone( tr_bitfield* );
 
-int          tr_bitfieldAdd( tr_bitfield*, size_t bit );
+void   tr_bitfieldAdd( tr_bitfield*, size_t bit );
 
-int          tr_bitfieldRem( tr_bitfield*, size_t bit );
+void   tr_bitfieldRem( tr_bitfield*, size_t bit );
 
-int          tr_bitfieldAddRange( tr_bitfield *, size_t begin, size_t end );
+void   tr_bitfieldAddRange( tr_bitfield*, size_t begin, size_t end );
 
-int          tr_bitfieldRemRange( tr_bitfield*, size_t begin, size_t end );
+void   tr_bitfieldRemRange( tr_bitfield*, size_t begin, size_t end );
 
-size_t       tr_bitfieldCountTrueBits( const tr_bitfield* );
+/***
+****
+***/
 
-size_t       tr_bitfieldCountRange( const tr_bitfield * b, size_t begin, size_t end );
+bool   tr_bitfieldSetFromBitfield( tr_bitfield*, const tr_bitfield* );
 
+bool   tr_bitfieldSetRaw( tr_bitfield*, const void * bits, size_t byte_count );
 
-tr_bitfield* tr_bitfieldOr( tr_bitfield*, const tr_bitfield* );
+void*  tr_bitfieldGetRaw( const tr_bitfield * b, size_t * byte_count );
+
+/***
+****
+***/
+
+size_t  tr_bitfieldCountRange( const tr_bitfield*, size_t begin, size_t end );
+
+static inline size_t
+tr_bitfieldCountTrueBits( const tr_bitfield * b )
+{
+    assert( b->true_count == tr_bitfieldCountRange( b, 0, b->bit_count ) );
+    return b->true_count;
+}
+
+static inline bool
+tr_bitfieldHasAll( const tr_bitfield * b )
+{
+    return b->bit_count ? ( b->true_count == b->bit_count ) : b->have_all_hint;
+}
+
+static inline bool
+tr_bitfieldHasNone( const tr_bitfield * b )
+{
+    return b->bit_count ? ( b->true_count == 0 ) : b->have_none_hint;
+}
 
 /** A stripped-down version of bitfieldHas to be used
     for speed when you're looping quickly. This version
     has none of tr_bitfieldHas()'s safety checks, so you
     need to call tr_bitfieldTestFast() first before you
     start looping. */
-static inline bool tr_bitfieldHasFast( const tr_bitfield * b, const size_t nth )
+static inline bool
+tr_bitfieldHasFast( const tr_bitfield * b, const size_t n )
 {
-    return ( b->bits[nth>>3u] << ( nth & 7u ) & 0x80 ) != 0;
+    if( tr_bitfieldHasAll( b ) ) return true;
+    if( tr_bitfieldHasNone( b ) ) return false;
+    return ( b->bits[n>>3u] << ( n & 7u ) & 0x80 ) != 0;
 }
 
 /** @param high the highest nth bit you're going to access */
-static inline bool tr_bitfieldTestFast( const tr_bitfield * b, const size_t high )
+static inline bool
+tr_bitfieldTestFast( const tr_bitfield * b, const size_t high )
 {
     return ( b != NULL )
-        && ( b->bits != NULL )
-        && ( high < b->bitCount );
+        && ( high < b->bit_count );
 }
 
-static inline bool tr_bitfieldHas( const tr_bitfield * b, size_t nth )
+static inline bool
+tr_bitfieldHas( const tr_bitfield * b, size_t n )
 {
-    return tr_bitfieldTestFast( b, nth ) && tr_bitfieldHasFast( b, nth );
+    return tr_bitfieldTestFast( b, n )
+        && tr_bitfieldHasFast( b, n );
 }
 
 #endif
