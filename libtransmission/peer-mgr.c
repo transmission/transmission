@@ -428,7 +428,6 @@ tr_peerDestruct( tr_torrent * tor, tr_peer * peer )
         tr_peerMsgsFree( peer->msgs );
 
     if( peer->io ) {
-fprintf( stderr, "[%p] peer %p clearing/unreffing its io (%s:%d)\n", peer->io, peer, __FILE__, __LINE__ );
         tr_peerIoClear( peer->io );
         tr_peerIoUnref( peer->io ); /* balanced by the ref in handshakeDoneCB() */
     }

@@ -130,8 +130,6 @@ canReadWrapper( tr_peerIo * io )
 
     dbgmsg( io, "canRead" );
 
-fprintf( stderr, "[%p] in canRead; refcount is %d (%s:%d)\n", io, io->refCount, __FILE__, __LINE__ );
-
     tr_peerIoRef( io );
 
     session = io->session;
@@ -570,7 +568,6 @@ tr_peerIoNew( tr_session       * session,
     else {
         UTP_SetSockopt( utp_socket, SO_RCVBUF, UTP_READ_BUFFER_SIZE );
         dbgmsg( io, "%s", "calling UTP_SetCallbacks &utp_function_table" );
-fprintf( stderr, "[%p] setting utp callbacks (%s:%d)\n", io, __FILE__, __LINE__ );
         UTP_SetCallbacks( utp_socket,
                           &utp_function_table,
                           io );
@@ -724,7 +721,6 @@ io_close_socket( tr_peerIo * io )
 
 #ifdef WITH_UTP
     if( io->utp_socket ) {
-fprintf( stderr, "[%p] clearing utp callbacks (%s:%d)\n", io, __FILE__, __LINE__ );
         UTP_SetCallbacks( io->utp_socket,
                           &dummy_utp_function_table,
                           NULL );
