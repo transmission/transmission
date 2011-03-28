@@ -52,7 +52,7 @@ tau_sendto( tr_session * session,
             const void * buf, size_t buflen )
 {
     int sockfd;
-    
+
     if( ai->ai_addr->sa_family == AF_INET )
         sockfd = session->udp_socket;
     else if( ai->ai_addr->sa_family == AF_INET6 )
@@ -487,7 +487,7 @@ tau_tracker_on_dns( int errcode, struct evutil_addrinfo *addr, void * vtracker )
 
     if ( errcode )
     {
-        char * errmsg = tr_strdup_printf( _( "DNS Lookup failed: %s" ), 
+        char * errmsg = tr_strdup_printf( _( "DNS Lookup failed: %s" ),
                                           evdns_err_to_string( errcode ) );
         dbgmsg( tracker->key, "%s", errmsg );
         tau_tracker_fail_all( tracker, false, false, errmsg );
@@ -652,7 +652,7 @@ tau_tracker_upkeep( struct tau_tracker * tracker )
 
     /* if the address info is too old, expire it */
     if( tracker->addr && ( tracker->addr_expiration_time <= now ) ) {
-        dbgmsg( tracker->host, "Expiring old DNS result" );     
+        dbgmsg( tracker->host, "Expiring old DNS result" );
         evutil_freeaddrinfo( tracker->addr );
         tracker->addr = NULL;
     }
@@ -671,7 +671,7 @@ tau_tracker_upkeep( struct tau_tracker * tracker )
         hints.ai_socktype = SOCK_DGRAM;
         hints.ai_protocol = IPPROTO_UDP;
         tracker->is_asking_dns = true;
-        dbgmsg( tracker->host, "Trying a new DNS lookup" );     
+        dbgmsg( tracker->host, "Trying a new DNS lookup" );
         evdns_getaddrinfo( tracker->session->evdns_base,
                            tracker->host, NULL, &hints,
                            tau_tracker_on_dns, tracker );
@@ -824,7 +824,6 @@ tr_tracker_udp_close( tr_session * session )
         tr_ptrArrayDestruct( &tau->trackers, (PtrArrayForeachFunc)tau_tracker_free );
         tr_free( tau );
     }
-        
 }
 
 /* start shutting down.

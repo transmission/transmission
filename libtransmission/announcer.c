@@ -994,7 +994,6 @@ static void
 on_announce_done( const tr_announce_response  * response,
                   void                        * vdata )
 {
-   
     struct announce_data * data = vdata;
     tr_announcer * announcer = data->session->announcer;
     tr_tier * tier = getTier( announcer, response->info_hash, data->tierId );
@@ -1496,7 +1495,7 @@ onUpkeepTimer( int foo UNUSED, short bar UNUSED, void * vannouncer )
     flushCloseMessages( announcer );
 
     /* maybe send out some announcements to trackers */
-    if( !is_closing ) 
+    if( !is_closing )
         announceMore( announcer );
 
     /* TAU upkeep */
