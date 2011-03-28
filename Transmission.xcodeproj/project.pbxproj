@@ -287,8 +287,6 @@
 		A2E57AC61310831400A7DAB1 /* StatusBar.xib in Resources */ = {isa = PBXBuildFile; fileRef = A2E57AC51310831400A7DAB1 /* StatusBar.xib */; };
 		A2E57B9C13109DC200A7DAB1 /* FilterBar.xib in Resources */ = {isa = PBXBuildFile; fileRef = A2E57B9B13109DC200A7DAB1 /* FilterBar.xib */; };
 		A2E57BA713109E6B00A7DAB1 /* FilterBarController.m in Sources */ = {isa = PBXBuildFile; fileRef = A2E57BA613109E6B00A7DAB1 /* FilterBarController.m */; };
-		A2E57DFE1311FA6200A7DAB1 /* bitset.c in Sources */ = {isa = PBXBuildFile; fileRef = A2E57DFC1311FA6200A7DAB1 /* bitset.c */; };
-		A2E57DFF1311FA6200A7DAB1 /* bitset.h in Headers */ = {isa = PBXBuildFile; fileRef = A2E57DFD1311FA6200A7DAB1 /* bitset.h */; };
 		A2E669790F5B8E5A00B4251A /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2E669780F5B8E5A00B4251A /* Security.framework */; };
 		A2E9AA760C249AF400085DCF /* ToolbarCreateTemplate.png in Resources */ = {isa = PBXBuildFile; fileRef = A2E9AA750C249AF400085DCF /* ToolbarCreateTemplate.png */; };
 		A2ED7D8F0CEF431B00970975 /* FilterButton.m in Sources */ = {isa = PBXBuildFile; fileRef = A2ED7D8E0CEF431B00970975 /* FilterButton.m */; };
@@ -879,8 +877,6 @@
 		A2E57B9B13109DC200A7DAB1 /* FilterBar.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = FilterBar.xib; path = macosx/FilterBar.xib; sourceTree = "<group>"; };
 		A2E57BA513109E6B00A7DAB1 /* FilterBarController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FilterBarController.h; path = macosx/FilterBarController.h; sourceTree = "<group>"; };
 		A2E57BA613109E6B00A7DAB1 /* FilterBarController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = FilterBarController.m; path = macosx/FilterBarController.m; sourceTree = "<group>"; };
-		A2E57DFC1311FA6200A7DAB1 /* bitset.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = bitset.c; path = libtransmission/bitset.c; sourceTree = "<group>"; };
-		A2E57DFD1311FA6200A7DAB1 /* bitset.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = bitset.h; path = libtransmission/bitset.h; sourceTree = "<group>"; };
 		A2E669780F5B8E5A00B4251A /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = /System/Library/Frameworks/Security.framework; sourceTree = "<absolute>"; };
 		A2E9AA750C249AF400085DCF /* ToolbarCreateTemplate.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = ToolbarCreateTemplate.png; path = macosx/Images/ToolbarCreateTemplate.png; sourceTree = "<group>"; };
 		A2EA8E3C0CC3C9830081201C /* fr */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = fr; path = macosx/fr.lproj/InfoPlist.strings; sourceTree = "<group>"; };
@@ -1329,8 +1325,6 @@
 				4D8017E910BBC073008A4AF2 /* torrent-magnet.h */,
 				0A6169A50FE5C9A200C66CE6 /* bitfield.c */,
 				0A6169A60FE5C9A200C66CE6 /* bitfield.h */,
-				A2E57DFC1311FA6200A7DAB1 /* bitset.c */,
-				A2E57DFD1311FA6200A7DAB1 /* bitset.h */,
 				A22CFCA60FC24ED80009BD3E /* tr-dht.c */,
 				A22CFCA70FC24ED80009BD3E /* tr-dht.h */,
 				A284214212DA663E00FBDDBB /* tr-udp.c */,
@@ -1717,7 +1711,6 @@
 				A23547E311CD0B090046EAE6 /* cache.h in Headers */,
 				A284214512DA663E00FBDDBB /* tr-udp.h in Headers */,
 				A2679295130E00A000CB7464 /* tr-utp.h in Headers */,
-				A2E57DFF1311FA6200A7DAB1 /* bitset.h in Headers */,
 				A23F29A1132A447400E9A83B /* announcer-common.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -2222,7 +2215,6 @@
 				A23547E211CD0B090046EAE6 /* cache.c in Sources */,
 				A284214412DA663E00FBDDBB /* tr-udp.c in Sources */,
 				A2679294130E00A000CB7464 /* tr-utp.c in Sources */,
-				A2E57DFE1311FA6200A7DAB1 /* bitset.c in Sources */,
 				A23F29A2132A447400E9A83B /* announcer-http.c in Sources */,
 				A2AA9BE1132CAC8E00FA131E /* announcer-udp.c in Sources */,
 			);
