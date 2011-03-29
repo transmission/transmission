@@ -50,6 +50,10 @@ countRange( const tr_bitfield * b, size_t begin, size_t end )
     const int first_byte = begin >> 3u;
     const int last_byte = ( end - 1 ) >> 3u;
 
+    if( !b->bit_count )
+        return 0;
+
+    assert( begin < end );
     assert( b->bits != NULL );
 
     if( first_byte == last_byte )
@@ -97,8 +101,6 @@ countRange( const tr_bitfield * b, size_t begin, size_t end )
 size_t
 tr_bitfieldCountRange( const tr_bitfield * b, size_t begin, size_t end )
 {
-    assert( begin < end );
-
     if( tr_bitfieldHasAll( b ) )
         return end - begin;
 
