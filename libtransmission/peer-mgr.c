@@ -2283,6 +2283,24 @@ compareAtomsByUsefulness( const void * va, const void *vb )
     return 0;
 }
 
+static bool
+isAtomInteresting( const tr_torrent * tor, struct peer_atom * atom )
+{
+    if( tr_torrentIsSeed( tor ) && atomIsSeed( atom ) )
+        return false;
+
+    if( peerIsInUse( tor->torrentPeers, atom ) )
+        return true;
+
+    if( isAtomBlocklisted( tor->session, atom ) )
+        return false;
+
+    if( atom->flags2 & MYFLAG_BANNED )
+        return false;
+
+    return true;
+}
+
 int
 tr_peerMgrGetPeers( tr_torrent   * tor,
                     tr_pex      ** setme_pex,
@@ -2302,7 +2320,7 @@ tr_peerMgrGetPeers( tr_torrent   * tor,
     assert( tr_isTorrent( tor ) );
     assert( setme_pex != NULL );
     assert( af==TR_AF_INET || af==TR_AF_INET6 );
-    assert( list_mode==TR_PEERS_CONNECTED || list_mode==TR_PEERS_ALL );
+    assert( list_mode==TR_PEERS_CONNECTED || list_mode==TR_PEERS_INTERESTING );
 
     managerLock( t->manager );
 
@@ -2319,11 +2337,15 @@ tr_peerMgrGetPeers( tr_torrent   * tor,
         for( i=0; i<atomCount; ++i )
             atoms[i] = peers[i]->atom;
     }
-    else /* TR_PEERS_ALL */
+    else /* TR_PEERS_INTERESTING */
     {
-        const struct peer_atom ** atomsBase = (const struct peer_atom**) tr_ptrArrayBase( &t->pool );
-        atomCount = tr_ptrArraySize( &t->pool );
-        atoms = tr_memdup( atomsBase, atomCount * sizeof( struct peer_atom * ) );
+        int i;
+        struct peer_atom ** atomBase = (struct peer_atom**) tr_ptrArrayBase( &t->pool );
+        n = tr_ptrArraySize( &t->pool );
+        atoms = tr_new( struct peer_atom *, n );
+        for( i=0; i<n; ++i )
+            if( isAtomInteresting( tor, atomBase[i] ) )
+                atoms[atomCount++] = atomBase[i];
     }
 
     qsort( atoms, atomCount, sizeof( struct peer_atom * ), compareAtomsByUsefulness );

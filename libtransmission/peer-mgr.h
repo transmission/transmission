@@ -206,7 +206,7 @@ void tr_peerMgrMarkAllAsSeeds( tr_torrent * tor );
 enum
 {
     TR_PEERS_CONNECTED,
-    TR_PEERS_ALL
+    TR_PEERS_INTERESTING
 };
 
 int  tr_peerMgrGetPeers( tr_torrent      * tor,
