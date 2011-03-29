@@ -1300,6 +1300,9 @@ on_scrape_done( const tr_scrape_response  * response,
                         tracker->downloaderCount = row->downloaders;
                         tracker->consecutiveFailures = 0;
                     }
+
+                    if( tr_torrentIsPrivate( tier->tor ) && !row->downloaders )
+                        tr_peerMgrMarkAllAsSeeds( tier->tor );
                 }
             }
         }
