@@ -874,7 +874,7 @@ testForEndgame( const Torrent * t )
     /* we consider ourselves to be in endgame if the number of bytes
        we've got requested is >= the number of bytes left to download */
     return ( t->requestCount * t->tor->blockSize )
-               <= tr_cpLeftUntilDone( &t->tor->completion );
+               >= tr_cpLeftUntilDone( &t->tor->completion );
 }
 
 static void
