@@ -54,7 +54,7 @@ void Time_Initialize()
 
 int64 abs64(int64 x) { return x < 0 ? -x : x; }
 
-uint64 UTP_GetMicroseconds()
+static uint64 GetMicroseconds()
 {
 	static bool time_init = false;
 	if (!time_init) {
@@ -94,7 +94,7 @@ uint64 UTP_GetMicroseconds()
 #if defined(__APPLE__)
 #include <mach/mach_time.h>
 
-uint64 UTP_GetMicroseconds()
+static uint64 GetMicroseconds()
 {
 	// http://developer.apple.com/mac/library/qa/qa2004/qa1398.html
 	// http://www.macresearch.org/tutorial_performance_and_time
@@ -118,7 +118,7 @@ uint64 UTP_GetMicroseconds()
    POSIX clocks work -- we could be running a recent libc with an ancient
    kernel (think OpenWRT). -- jch */
 
-uint64 UTP_GetMicroseconds()
+static uint64_t GetMicroseconds()
 {
 	static int have_posix_clocks = -1;
 	int rc;
@@ -154,6 +154,22 @@ uint64 UTP_GetMicroseconds()
 	}
 }
 #endif
+
+uint64 UTP_GetMicroseconds()
+{
+	static bool valid = false;
+	static uint64 last_time;
+
+	uint64 now = GetMicroseconds();
+	if (valid) {
+		if (last_time > now)
+			/* Eek! */
+			now = last_time;
+	}
+	last_time = now;
+	valid = true;
+	return now;
+}
 
 uint32 UTP_GetMilliseconds()
 {
