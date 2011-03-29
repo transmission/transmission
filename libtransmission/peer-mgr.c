@@ -421,8 +421,7 @@ tr_peerDestruct( tr_torrent * tor, tr_peer * peer )
 {
     assert( peer != NULL );
 
-    if( tor->torrentPeers->isRunning )
-        peerDeclinedAllRequests( tor->torrentPeers, peer );
+    peerDeclinedAllRequests( tor->torrentPeers, peer );
 
     if( peer->msgs != NULL )
         tr_peerMsgsFree( peer->msgs );
@@ -1471,9 +1470,9 @@ refillUpkeep( int foo UNUSED, short bar UNUSED, void * vmgr )
         {
             int keepCount = 0;
             int cancelCount = 0;
-            struct block_request * cancel = tr_new( struct block_request, n );
             const struct block_request * it;
             const struct block_request * end;
+            struct block_request * cancel = tr_new( struct block_request, n );
 
             for( it=t->requests, end=it+n; it!=end; ++it )
             {
