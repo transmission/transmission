@@ -116,7 +116,6 @@ static bool
 tr_bitfieldIsValid( const tr_bitfield * b )
 {
     return ( b != NULL )
-        && ( b->bits || ( tr_bitfieldHasAll( b ) || tr_bitfieldHasNone( b )))
         && ( b->byte_count <= b->bit_count )
         && ( b->true_count <= b->bit_count )
         && ( !b->bits || ( b->true_count == countRange( b, 0, b->bit_count )));
