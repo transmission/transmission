@@ -36,16 +36,6 @@ typedef struct tr_bitfield
 tr_bitfield;
 
 /***
-****  life cycle
-***/
-
-extern const tr_bitfield TR_BITFIELD_INIT;
-
-void   tr_bitfieldConstruct( tr_bitfield*, size_t bit_count );
-
-void   tr_bitfieldDestruct( tr_bitfield* );
-
-/***
 ****
 ***/
 
@@ -60,6 +50,20 @@ void   tr_bitfieldRem( tr_bitfield*, size_t bit );
 void   tr_bitfieldAddRange( tr_bitfield*, size_t begin, size_t end );
 
 void   tr_bitfieldRemRange( tr_bitfield*, size_t begin, size_t end );
+
+/***
+****  life cycle
+***/
+
+extern const tr_bitfield TR_BITFIELD_INIT;
+
+void   tr_bitfieldConstruct( tr_bitfield*, size_t bit_count );
+
+static inline void
+tr_bitfieldDestruct( tr_bitfield * b )
+{
+    tr_bitfieldSetHasNone( b );
+}
 
 /***
 ****

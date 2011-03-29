@@ -202,12 +202,6 @@ tr_bitfieldConstruct( tr_bitfield * b, size_t bit_count )
     assert( tr_bitfieldIsValid( b ) );
 }
 
-void
-tr_bitfieldDestruct( tr_bitfield * b )
-{
-    tr_bitfieldSetHasNone( b );
-}
-
 static void
 tr_bitfieldClear( tr_bitfield * b )
 {
