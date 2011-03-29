@@ -715,8 +715,16 @@ io_close_socket( tr_peerIo * io )
     if( io->socket >= 0 ) {
         tr_netClose( io->session, io->socket );
         io->socket = -1;
+    }
+
+    if( io->event_read != NULL) {
         event_free( io->event_read );
+        io->event_read = NULL;
+    }
+
+    if( io->event_write != NULL) {
         event_free( io->event_write );
+        io->event_write = NULL;
     }
 
 #ifdef WITH_UTP
