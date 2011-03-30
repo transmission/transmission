@@ -1553,7 +1553,7 @@ printSession( tr_benc * top )
                         downEnabled ? "Enabled" : "Disabled",
                         tr_formatter_speed_KBps( buf2, downLimit, sizeof( buf2 ) ),
                         altEnabled ? "Enabled" : "Disabled",
-                        tr_formatter_speed_KBps( buf2, altDown, sizeof( buf2 ) ) );
+                        tr_formatter_speed_KBps( buf3, altDown, sizeof( buf3 ) ) );
 
                 if( altTimeEnabled ) {
                     printf( "  Turtle schedule: %02d:%02d - %02d:%02d  ",
