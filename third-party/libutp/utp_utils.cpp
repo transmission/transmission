@@ -157,17 +157,15 @@ static uint64_t GetMicroseconds()
 
 uint64 UTP_GetMicroseconds()
 {
-	static bool valid = false;
-	static uint64 last_time;
+	static uint64 offset = 0, previous = 0;
 
-	uint64 now = GetMicroseconds();
-	if (valid) {
-		if (last_time > now)
-			/* Eek! */
-			now = last_time;
+	uint64 now = GetMicroseconds() + offset;
+	if (previous > now) {
+		/* Eek! */
+		offset += previous - now;
+		now = previous;
 	}
-	last_time = now;
-	valid = true;
+	previous = now;
 	return now;
 }
 
