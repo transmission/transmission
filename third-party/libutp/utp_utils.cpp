@@ -33,11 +33,6 @@ uint64 UTGetTickCount64()
 	return (uint64)GetTickCount();
 }
 
-uint32 UTP_GetMilliseconds()
-{
-	return GetTickCount();
-}
-
 void Time_Initialize()
 {
 	HMODULE kernel32 = GetModuleHandleA("kernel32.dll");
@@ -148,7 +143,7 @@ static uint64_t GetMicroseconds()
 }
 #endif //!__APPLE__
 
-uint32 UTP_GetMilliseconds();
+#endif //!WIN32
 
 uint64 UTP_GetMicroseconds()
 {
@@ -163,8 +158,6 @@ uint64 UTP_GetMicroseconds()
 	previous = now;
 	return now;
 }
-
-#endif //!WIN32
 
 uint32 UTP_GetMilliseconds()
 {
