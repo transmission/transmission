@@ -1482,6 +1482,8 @@ printSession( tr_benc * top )
             printf( "  Listenport: %" PRId64 "\n", i );
         if( tr_bencDictFindBool( args, TR_PREFS_KEY_PORT_FORWARDING, &boolVal ) )
             printf( "  Portforwarding enabled: %s\n", ( boolVal ? "Yes" : "No" ) );
+        if( tr_bencDictFindBool( args, TR_PREFS_KEY_UTP_ENABLED, &boolVal ) )
+            printf( "  uTP enabled: %s\n", ( boolVal ? "Yes" : "No" ) );
         if( tr_bencDictFindBool( args, TR_PREFS_KEY_DHT_ENABLED, &boolVal ) )
             printf( "  Distributed hash table enabled: %s\n", ( boolVal ? "Yes" : "No" ) );
         if( tr_bencDictFindBool( args, TR_PREFS_KEY_LPD_ENABLED, &boolVal ) )
