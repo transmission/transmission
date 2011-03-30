@@ -97,27 +97,6 @@ tr_bitfieldHasNone( const tr_bitfield * b )
     return b->bit_count ? ( b->true_count == 0 ) : b->have_none_hint;
 }
 
-/** A stripped-down version of bitfieldHas to be used
-    for speed when you're looping quickly. This version
-    has none of tr_bitfieldHas()'s safety checks, so you
-    need to call tr_bitfieldTestFast() first before you
-    start looping. */
-static inline bool
-tr_bitfieldHasFast( const tr_bitfield * b, const size_t n )
-{
-    if( tr_bitfieldHasAll( b ) ) return true;
-    if( tr_bitfieldHasNone( b ) ) return false;
-    return ( b->bits[n>>3u] << ( n & 7u ) & 0x80 ) != 0;
-}
-
-/** @param high the highest nth bit you're going to access */
-static inline bool
-tr_bitfieldTestFast( const tr_bitfield * b, const size_t high )
-{
-    return ( b != NULL )
-        && ( high < b->bit_count );
-}
-
 static inline bool
 tr_bitfieldHas( const tr_bitfield * b, size_t n )
 {

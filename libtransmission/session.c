@@ -1335,7 +1335,7 @@ testTurtleTime( const struct tr_turtle_info * t,
     if( minute_of_the_week >= MINUTES_PER_WEEK ) /* leap minutes? */
         minute_of_the_week = MINUTES_PER_WEEK - 1;
 
-    e = tr_bitfieldHasFast( &t->minutes, minute_of_the_week );
+    e = tr_bitfieldHas( &t->minutes, minute_of_the_week );
     if( enabled != NULL )
         *enabled = e;
 
@@ -1343,7 +1343,7 @@ testTurtleTime( const struct tr_turtle_info * t,
     {
         const size_t prev = minute_of_the_week > 0 ? minute_of_the_week - 1
                                                    : MINUTES_PER_WEEK - 1;
-        *changed = e != tr_bitfieldHasFast( &t->minutes, prev );
+        *changed = e != tr_bitfieldHas( &t->minutes, prev );
     }
 }
 

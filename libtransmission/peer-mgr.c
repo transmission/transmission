@@ -1244,8 +1244,6 @@ tr_incrReplicationFromBitfield( Torrent * t, const tr_bitfield * b )
     const size_t n = t->tor->info.pieceCount;
 
     assert( replicationExists( t ) );
-    assert( n == t->pieceReplicationSize );
-    assert( tr_bitfieldTestFast( b, n-1 ) );
 
     for( i=0; i<n; ++i )
         if( tr_bitfieldHas( b, i ) )
