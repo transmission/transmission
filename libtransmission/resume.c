@@ -414,8 +414,12 @@ bitfieldToBenc( const tr_bitfield * b, tr_benc * benc )
         tr_bencInitStr( benc, "all", 3 );
     else if( tr_bitfieldHasNone( b ) )
         tr_bencInitStr( benc, "none", 4 );
-    else
-        tr_bencInitRaw( benc, b->bits, b->byte_count );
+    else {
+        size_t byte_count = 0;
+        uint8_t * raw = tr_bitfieldGetRaw( b, &byte_count );
+        tr_bencInitRaw( benc, raw, byte_count );
+        tr_free( raw );
+    }
 }
 
 
@@ -607,10 +611,10 @@ loadProgress( tr_benc * dict, tr_torrent * tor )
         }
         else err = "Couldn't find 'pieces' or 'have' or 'bitfield'";
 
-        if( !err && !tr_cpBlockInit( &tor->completion, &blocks ) )
-            err = "Error loading bitfield";
         if( err != NULL )
             tr_tordbg( tor, "Torrent needs to be verified - %s", err );
+        else
+            tr_cpBlockInit( &tor->completion, &blocks );
 
         tr_bitfieldDestruct( &blocks );
         ret = TR_FR_PROGRESS;

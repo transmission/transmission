@@ -36,23 +36,19 @@ tr_cpConstruct( tr_completion * cp, tr_torrent * tor )
     tr_cpReset( cp );
 }
 
-bool
+void
 tr_cpBlockInit( tr_completion * cp, const tr_bitfield * b )
 {
-    bool success;
-
     tr_cpReset( cp );
 
     /* set blockBitfield */
-    success = tr_bitfieldSetFromBitfield( &cp->blockBitfield, b );
+    tr_bitfieldSetFromBitfield( &cp->blockBitfield, b );
 
     /* set sizeNow */
     cp->sizeNow = tr_bitfieldCountTrueBits( &cp->blockBitfield );
     cp->sizeNow *= cp->tor->blockSize;
     if( tr_bitfieldHas( b, cp->tor->blockCount-1 ) )
         cp->sizeNow -= ( cp->tor->blockSize - cp->tor->lastBlockSize );
-
-    return success;
 }
 
 /***

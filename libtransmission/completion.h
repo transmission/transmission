@@ -54,7 +54,7 @@ tr_completion;
 
 void  tr_cpConstruct( tr_completion *, tr_torrent * );
 
-bool  tr_cpBlockInit( tr_completion * cp, const tr_bitfield * blocks );
+void  tr_cpBlockInit( tr_completion * cp, const tr_bitfield * blocks );
 
 static inline void
 tr_cpDestruct( tr_completion * cp )

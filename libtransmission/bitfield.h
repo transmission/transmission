@@ -24,8 +24,10 @@
 typedef struct tr_bitfield
 {
     uint8_t *  bits;
+    size_t     alloc_count;
+
     size_t     bit_count;
-    size_t     byte_count;
+
     size_t     true_count;
 
     /* Special cases for when full or empty but we don't know the bitCount.
@@ -69,9 +71,9 @@ tr_bitfieldDestruct( tr_bitfield * b )
 ****
 ***/
 
-bool   tr_bitfieldSetFromBitfield( tr_bitfield*, const tr_bitfield* );
+void   tr_bitfieldSetFromBitfield( tr_bitfield*, const tr_bitfield* );
 
-bool   tr_bitfieldSetRaw( tr_bitfield*, const void * bits, size_t byte_count );
+void   tr_bitfieldSetRaw( tr_bitfield*, const void * bits, size_t byte_count );
 
 void*  tr_bitfieldGetRaw( const tr_bitfield * b, size_t * byte_count );
 
@@ -81,12 +83,7 @@ void*  tr_bitfieldGetRaw( const tr_bitfield * b, size_t * byte_count );
 
 size_t  tr_bitfieldCountRange( const tr_bitfield*, size_t begin, size_t end );
 
-static inline size_t
-tr_bitfieldCountTrueBits( const tr_bitfield * b )
-{
-    assert( b->true_count == tr_bitfieldCountRange( b, 0, b->bit_count ) );
-    return b->true_count;
-}
+size_t  tr_bitfieldCountTrueBits( const tr_bitfield * b );
 
 static inline bool
 tr_bitfieldHasAll( const tr_bitfield * b )
@@ -124,8 +121,10 @@ tr_bitfieldTestFast( const tr_bitfield * b, const size_t high )
 static inline bool
 tr_bitfieldHas( const tr_bitfield * b, size_t n )
 {
-    return tr_bitfieldTestFast( b, n )
-        && tr_bitfieldHasFast( b, n );
+    if( tr_bitfieldHasAll( b ) ) return true;
+    if( tr_bitfieldHasNone( b ) ) return false;
+    if( n>>3u >= b->alloc_count ) return false;
+    return ( b->bits[n>>3u] << ( n & 7u ) & 0x80 ) != 0;
 }
 
 #endif
