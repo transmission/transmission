@@ -148,7 +148,7 @@ static uint64_t GetMicroseconds()
 }
 #endif //!__APPLE__
 
-#endif //!WIN32
+uint32 UTP_GetMilliseconds();
 
 uint64 UTP_GetMicroseconds()
 {
@@ -163,6 +163,8 @@ uint64 UTP_GetMicroseconds()
 	previous = now;
 	return now;
 }
+
+#endif //!WIN32
 
 uint32 UTP_GetMilliseconds()
 {
