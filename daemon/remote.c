@@ -77,7 +77,7 @@ etaToString( char *  buf, size_t  buflen, int64_t eta )
     if( eta < 0 )
         tr_snprintf( buf, buflen, "Unknown" );
     else if( eta < 60 )
-        tr_snprintf( buf, buflen, "%" PRId64 "sec", eta );
+        tr_snprintf( buf, buflen, "%" PRId64 " sec", eta );
     else if( eta < ( 60 * 60 ) )
         tr_snprintf( buf, buflen, "%" PRId64 " min", eta / 60 );
     else if( eta < ( 60 * 60 * 24 ) )
