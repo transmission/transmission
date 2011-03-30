@@ -141,15 +141,8 @@ static uint64_t GetMicroseconds()
 	}
 #endif
 	{
-		static time_t offset = 0, previous = 0;
 		struct timeval tv;
 		rc = gettimeofday(&tv, NULL);
-		tv.tv_sec += offset;
-		if (previous > tv.tv_sec) {
-			offset += previous - tv.tv_sec;
-			tv.tv_sec = previous;
-		}
-		previous = tv.tv_sec;
 		return uint64(tv.tv_sec) * 1000000 + tv.tv_usec;
 	}
 }
