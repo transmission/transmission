@@ -1398,11 +1398,11 @@ jsonStringFunc( const tr_benc * val, void * vdata )
                     *outwalk++ = *it;
                 else {
                     const UTF8 * tmp = it;
-                    UTF32        buf = 0;
-                    UTF32 *      u32 = &buf;
-                    ConversionResult result = ConvertUTF8toUTF32( &tmp, end, &u32, &buf + 1, 0 );
+                    UTF32        buf[1] = { 0 };
+                    UTF32 *      u32 = buf;
+                    ConversionResult result = ConvertUTF8toUTF32( &tmp, end, &u32, buf + 1, 0 );
                     if((( result==conversionOK ) || (result==targetExhausted)) && (tmp!=it)) {
-                        outwalk += tr_snprintf( outwalk, outend-outwalk, "\\u%04x", (unsigned int)buf );
+                        outwalk += tr_snprintf( outwalk, outend-outwalk, "\\u%04x", (unsigned int)buf[0] );
                         it = tmp - 1;
                     }
                 }
