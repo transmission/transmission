@@ -956,13 +956,13 @@ tr_peerIoGetWriteBufferSpace( const tr_peerIo * io, uint64_t now )
 **/
 
 void
-tr_peerIoSetEncryption( tr_peerIo * io, uint32_t encryptionMode )
+tr_peerIoSetEncryption( tr_peerIo * io, tr_encryption_type encryption_type )
 {
     assert( tr_isPeerIo( io ) );
-    assert( encryptionMode == PEER_ENCRYPTION_NONE
-         || encryptionMode == PEER_ENCRYPTION_RC4 );
+    assert( encryption_type == PEER_ENCRYPTION_NONE
+         || encryption_type == PEER_ENCRYPTION_RC4 );
 
-    io->encryptionMode = encryptionMode;
+    io->encryption_type = encryption_type;
 }
 
 /**
@@ -995,7 +995,7 @@ evbuffer_peek_all( struct evbuffer * buf, size_t * setme_vecCount )
 static void
 maybeEncryptBuffer( tr_peerIo * io, struct evbuffer * buf )
 {
-    if( io->encryptionMode == PEER_ENCRYPTION_RC4 )
+    if( io->encryption_type == PEER_ENCRYPTION_RC4 )
     {
         size_t i, n;
         struct evbuffer_iovec * iovec = evbuffer_peek_all( buf, &n );
@@ -1066,7 +1066,7 @@ tr_peerIoReadBytes( tr_peerIo * io, struct evbuffer * inbuf, void * bytes, size_
     assert( tr_isPeerIo( io ) );
     assert( evbuffer_get_length( inbuf )  >= byteCount );
 
-    switch( io->encryptionMode )
+    switch( io->encryption_type )
     {
         case PEER_ENCRYPTION_NONE:
             evbuffer_remove( inbuf, bytes, byteCount );

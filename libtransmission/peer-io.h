@@ -47,6 +47,15 @@ typedef enum
 }
 ReadState;
 
+typedef enum
+{
+    /* these match the values in MSE's crypto_select */
+    PEER_ENCRYPTION_NONE  = ( 1 << 0 ),
+    PEER_ENCRYPTION_RC4   = ( 1 << 1 )
+}
+tr_encryption_type;
+
+
 typedef ReadState ( *tr_can_read_cb  )( struct tr_peerIo * io,
                                         void             * user_data,
                                         size_t           * setme_piece_byte_count );
@@ -76,7 +85,7 @@ typedef struct tr_peerIo
 
     int                   magicNumber;
 
-    uint32_t              encryptionMode;
+    tr_encryption_type    encryption_type;
     bool                  isSeed;
 
     tr_port               port;
@@ -278,20 +287,12 @@ static inline struct tr_crypto * tr_peerIoGetCrypto( tr_peerIo * io )
     return io->crypto;
 }
 
-typedef enum
-{
-    /* these match the values in MSE's crypto_select */
-    PEER_ENCRYPTION_NONE  = ( 1 << 0 ),
-    PEER_ENCRYPTION_RC4   = ( 1 << 1 )
-}
-EncryptionMode;
-
-void tr_peerIoSetEncryption( tr_peerIo * io, uint32_t encryptionMode );
+void tr_peerIoSetEncryption( tr_peerIo * io, tr_encryption_type encryption_type );
 
 static inline bool
 tr_peerIoIsEncrypted( const tr_peerIo * io )
 {
-    return ( io != NULL ) && ( io->encryptionMode == PEER_ENCRYPTION_RC4 );
+    return ( io != NULL ) && ( io->encryption_type == PEER_ENCRYPTION_RC4 );
 }
 
 void evbuffer_add_uint8 ( struct evbuffer * outbuf, uint8_t byte );
