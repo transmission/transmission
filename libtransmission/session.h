@@ -27,6 +27,7 @@
  #endif
 #endif
 
+#include "bandwidth.h"
 #include "bencode.h"
 #include "bitfield.h"
 #include "utils.h"
@@ -46,7 +47,6 @@ struct evdns_base;
 struct tr_address;
 struct tr_announcer;
 struct tr_announcer_udp;
-struct tr_bandwidth;
 struct tr_bindsockets;
 struct tr_cache;
 struct tr_fdInfo;
@@ -197,7 +197,7 @@ struct tr_session
     struct event               * saveTimer;
 
     /* monitors the "global pool" speeds */
-    struct tr_bandwidth        * bandwidth;
+    struct tr_bandwidth          bandwidth;
 
     double                       desiredRatio;
 

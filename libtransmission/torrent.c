@@ -179,7 +179,7 @@ tr_torrentSetSpeedLimit_Bps( tr_torrent * tor, tr_direction dir, int Bps )
     assert( tr_isDirection( dir ) );
     assert( Bps >= 0 );
 
-    if( tr_bandwidthSetDesiredSpeed_Bps( tor->bandwidth, dir, Bps ) )
+    if( tr_bandwidthSetDesiredSpeed_Bps( &tor->bandwidth, dir, Bps ) )
         tr_torrentSetDirty( tor );
 }
 void
@@ -194,7 +194,7 @@ tr_torrentGetSpeedLimit_Bps( const tr_torrent * tor, tr_direction dir )
     assert( tr_isTorrent( tor ) );
     assert( tr_isDirection( dir ) );
 
-    return tr_bandwidthGetDesiredSpeed_Bps( tor->bandwidth, dir );
+    return tr_bandwidthGetDesiredSpeed_Bps( &tor->bandwidth, dir );
 }
 int
 tr_torrentGetSpeedLimit_KBps( const tr_torrent * tor, tr_direction dir )
@@ -208,7 +208,7 @@ tr_torrentUseSpeedLimit( tr_torrent * tor, tr_direction dir, bool do_use )
     assert( tr_isTorrent( tor ) );
     assert( tr_isDirection( dir ) );
 
-    if( tr_bandwidthSetLimited( tor->bandwidth, dir, do_use ) )
+    if( tr_bandwidthSetLimited( &tor->bandwidth, dir, do_use ) )
         tr_torrentSetDirty( tor );
 }
 
@@ -218,7 +218,7 @@ tr_torrentUsesSpeedLimit( const tr_torrent * tor, tr_direction dir )
     assert( tr_isTorrent( tor ) );
     assert( tr_isDirection( dir ) );
 
-    return tr_bandwidthIsLimited( tor->bandwidth, dir );
+    return tr_bandwidthIsLimited( &tor->bandwidth, dir );
 }
 
 void
@@ -228,8 +228,8 @@ tr_torrentUseSessionLimits( tr_torrent * tor, bool doUse )
 
     assert( tr_isTorrent( tor ) );
 
-    changed = tr_bandwidthHonorParentLimits( tor->bandwidth, TR_UP, doUse );
-    changed |= tr_bandwidthHonorParentLimits( tor->bandwidth, TR_DOWN, doUse );
+    changed = tr_bandwidthHonorParentLimits( &tor->bandwidth, TR_UP, doUse );
+    changed |= tr_bandwidthHonorParentLimits( &tor->bandwidth, TR_DOWN, doUse );
 
     if( changed )
         tr_torrentSetDirty( tor );
@@ -240,7 +240,7 @@ tr_torrentUsesSessionLimits( const tr_torrent * tor )
 {
     assert( tr_isTorrent( tor ) );
 
-    return tr_bandwidthAreParentLimitsHonored( tor->bandwidth, TR_UP );
+    return tr_bandwidthAreParentLimitsHonored( &tor->bandwidth, TR_UP );
 }
 
 /***
@@ -827,9 +827,9 @@ torrentInit( tr_torrent * tor, const tr_ctor * ctor )
     if( tr_sessionIsIncompleteDirEnabled( session ) )
         tor->incompleteDir = tr_strdup( dir );
 
-    tor->bandwidth = tr_bandwidthNew( session, session->bandwidth );
+    tr_bandwidthConstruct( &tor->bandwidth, session, &session->bandwidth );
 
-    tor->bandwidth->priority = tr_ctorGetBandwidthPriority( ctor );
+    tor->bandwidth.priority = tr_ctorGetBandwidthPriority( ctor );
 
     tor->error = TR_STAT_OK;
 
@@ -1168,10 +1168,10 @@ tr_torrentStat( tr_torrent * tor )
                             s->peersFrom );
 
     now = tr_time_msec( );
-    s->rawUploadSpeed_KBps     = toSpeedKBps( tr_bandwidthGetRawSpeed_Bps  ( tor->bandwidth, now, TR_UP ) );
-    s->pieceUploadSpeed_KBps   = toSpeedKBps( tr_bandwidthGetPieceSpeed_Bps( tor->bandwidth, now, TR_UP ) );
-    s->rawDownloadSpeed_KBps   = toSpeedKBps( tr_bandwidthGetRawSpeed_Bps  ( tor->bandwidth, now, TR_DOWN ) );
-    s->pieceDownloadSpeed_KBps = toSpeedKBps( tr_bandwidthGetPieceSpeed_Bps( tor->bandwidth, now, TR_DOWN ) );
+    s->rawUploadSpeed_KBps     = toSpeedKBps( tr_bandwidthGetRawSpeed_Bps  ( &tor->bandwidth, now, TR_UP ) );
+    s->pieceUploadSpeed_KBps   = toSpeedKBps( tr_bandwidthGetPieceSpeed_Bps( &tor->bandwidth, now, TR_UP ) );
+    s->rawDownloadSpeed_KBps   = toSpeedKBps( tr_bandwidthGetRawSpeed_Bps  ( &tor->bandwidth, now, TR_DOWN ) );
+    s->pieceDownloadSpeed_KBps = toSpeedKBps( tr_bandwidthGetPieceSpeed_Bps( &tor->bandwidth, now, TR_DOWN ) );
 
     s->percentComplete = tr_cpPercentComplete ( &tor->completion );
     s->metadataPercentComplete = tr_torrentGetMetadataPercent( tor );
@@ -1500,7 +1500,7 @@ freeTorrent( tr_torrent * tor )
     assert( session->torrentCount >= 1 );
     session->torrentCount--;
 
-    tr_bandwidthFree( tor->bandwidth );
+    tr_bandwidthDestruct( &tor->bandwidth );
 
     tr_metainfoFree( inf );
     tr_free( tor );
@@ -2184,7 +2184,7 @@ tr_torrentGetPriority( const tr_torrent * tor )
 {
     assert( tr_isTorrent( tor ) );
 
-    return tor->bandwidth->priority;
+    return tor->bandwidth.priority;
 }
 
 void
@@ -2193,9 +2193,9 @@ tr_torrentSetPriority( tr_torrent * tor, tr_priority_t priority )
     assert( tr_isTorrent( tor ) );
     assert( tr_isPriority( priority ) );
 
-    if( tor->bandwidth->priority != priority )
+    if( tor->bandwidth.priority != priority )
     {
-        tor->bandwidth->priority = priority;
+        tor->bandwidth.priority = priority;
 
         tr_torrentSetDirty( tor );
     }

@@ -2030,7 +2030,7 @@ myHandshakeDoneCB( tr_handshake  * handshake,
 
                 peer->io = tr_handshakeStealIO( handshake ); /* this steals its refcount too, which is
                                                                 balanced by our unref in peerDelete()  */
-                tr_peerIoSetParent( peer->io, t->tor->bandwidth );
+                tr_peerIoSetParent( peer->io, &t->tor->bandwidth );
                 tr_peerMsgsNew( t->tor, peer, peerCallbackFunc, t );
 
                 success = true;
@@ -2078,7 +2078,7 @@ tr_peerMgrAddIncoming( tr_peerMgr * manager,
         tr_peerIo *    io;
         tr_handshake * handshake;
 
-        io = tr_peerIoNewIncoming( session, session->bandwidth, addr, port, socket, utp_socket );
+        io = tr_peerIoNewIncoming( session, &session->bandwidth, addr, port, socket, utp_socket );
 
         handshake = tr_handshakeNew( io,
                                      session->encryptionMode,
@@ -3047,7 +3047,7 @@ rechokeUploads( Torrent * t, const uint64_t now )
     struct ChokeData * choke = tr_new0( struct ChokeData, peerCount );
     const tr_session * session = t->manager->session;
     const int chokeAll = !tr_torrentIsPieceTransferAllowed( t->tor, TR_CLIENT_TO_PEER );
-    const bool isMaxedOut = isBandwidthMaxedOut( t->tor->bandwidth, now, TR_UP );
+    const bool isMaxedOut = isBandwidthMaxedOut( &t->tor->bandwidth, now, TR_UP );
 
     assert( torrentIsLocked( t ) );
 
@@ -3542,8 +3542,8 @@ bandwidthPulse( int foo UNUSED, short bar UNUSED, void * vmgr )
     pumpAllPeers( mgr );
 
     /* allocate bandwidth to the peers */
-    tr_bandwidthAllocate( mgr->session->bandwidth, TR_UP, BANDWIDTH_PERIOD_MSEC );
-    tr_bandwidthAllocate( mgr->session->bandwidth, TR_DOWN, BANDWIDTH_PERIOD_MSEC );
+    tr_bandwidthAllocate( &mgr->session->bandwidth, TR_UP, BANDWIDTH_PERIOD_MSEC );
+    tr_bandwidthAllocate( &mgr->session->bandwidth, TR_DOWN, BANDWIDTH_PERIOD_MSEC );
 
     /* possibly stop torrents that have seeded enough */
     tor = NULL;
@@ -3852,7 +3852,7 @@ getPeerCandidates( tr_session * session, int * candidateCount )
             continue;
 
         /* if we've already got enough speed in this torrent... */
-        if( tr_torrentIsSeed( tor ) && isBandwidthMaxedOut( tor->bandwidth, now_msec, TR_UP ) )
+        if( tr_torrentIsSeed( tor ) && isBandwidthMaxedOut( &tor->bandwidth, now_msec, TR_UP ) )
             continue;
 
         atoms = (struct peer_atom**) tr_ptrArrayPeek( &tor->torrentPeers->pool, &nAtoms );
@@ -3895,7 +3895,7 @@ initiateConnection( tr_peerMgr * mgr, Torrent * t, struct peer_atom * atom )
             tr_atomAddrStr( atom ) );
 
     io = tr_peerIoNewOutgoing( mgr->session,
-                               mgr->session->bandwidth,
+                               &mgr->session->bandwidth,
                                &atom->addr,
                                atom->port,
                                t->tor->info.hash,

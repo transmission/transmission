@@ -567,12 +567,12 @@ tr_sessionInit( const char  * tag,
     session = tr_new0( tr_session, 1 );
     session->udp_socket = -1;
     session->udp6_socket = -1;
-    session->bandwidth = tr_bandwidthNew( session, NULL );
     session->lock = tr_lockNew( );
     session->cache = tr_cacheNew( 1024*1024*2 );
     session->tag = tr_strdup( tag );
     session->magicNumber = SESSION_MAGIC_NUMBER;
     session->buffer = tr_valloc( SESSION_BUFFER_SIZE );
+    tr_bandwidthConstruct( &session->bandwidth, session, NULL );
     tr_peerIdInit( session->peer_id );
     tr_bencInitList( &session->removedTorrents, 0 );
 
@@ -661,7 +661,7 @@ tr_sessionInitImpl( void * vdata )
     assert( tr_bencIsDict( clientSettings ) );
 
     dbgmsg( "tr_sessionInit: the session's top-level bandwidth object is %p",
-            session->bandwidth );
+            &session->bandwidth );
 
     tr_bencInitDict( &settings, 0 );
     tr_sessionGetDefaultSettings( &settings );
@@ -1244,9 +1244,9 @@ updateBandwidth( tr_session * session, tr_direction dir )
     const bool isLimited = tr_sessionGetActiveSpeedLimit_Bps( session, dir, &limit_Bps );
     const bool zeroCase = isLimited && !limit_Bps;
 
-    tr_bandwidthSetLimited( session->bandwidth, dir, isLimited && !zeroCase );
+    tr_bandwidthSetLimited( &session->bandwidth, dir, isLimited && !zeroCase );
 
-    tr_bandwidthSetDesiredSpeed_Bps( session->bandwidth, dir, limit_Bps );
+    tr_bandwidthSetDesiredSpeed_Bps( &session->bandwidth, dir, limit_Bps );
 }
 
 enum
@@ -1680,13 +1680,13 @@ tr_sessionGetDeleteSource( const tr_session * session )
 int
 tr_sessionGetPieceSpeed_Bps( const tr_session * session, tr_direction dir )
 {
-    return tr_isSession( session ) ? tr_bandwidthGetPieceSpeed_Bps( session->bandwidth, 0, dir ) : 0;
+    return tr_isSession( session ) ? tr_bandwidthGetPieceSpeed_Bps( &session->bandwidth, 0, dir ) : 0;
 }
 
 int
 tr_sessionGetRawSpeed_Bps( const tr_session * session, tr_direction dir )
 {
-    return tr_isSession( session ) ? tr_bandwidthGetRawSpeed_Bps( session->bandwidth, 0, dir ) : 0;
+    return tr_isSession( session ) ? tr_bandwidthGetRawSpeed_Bps( &session->bandwidth, 0, dir ) : 0;
 }
 double
 tr_sessionGetRawSpeed_KBps( const tr_session * session, tr_direction dir )
@@ -1854,7 +1854,7 @@ tr_sessionClose( tr_session * session )
 
     /* free the session memory */
     tr_bencFree( &session->removedTorrents );
-    tr_bandwidthFree( session->bandwidth );
+    tr_bandwidthDestruct( &session->bandwidth );
     tr_bitfieldDestruct( &session->turtle.minutes );
     tr_lockFree( session->lock );
     if( session->metainfoLookup ) {

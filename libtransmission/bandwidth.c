@@ -95,7 +95,7 @@ comparePointers( const void * a, const void * b )
 ****
 ***/
 
-tr_bandwidth*
+void
 tr_bandwidthConstruct( tr_bandwidth * b, tr_session * session, tr_bandwidth * parent )
 {
     b->session = session;
@@ -104,10 +104,9 @@ tr_bandwidthConstruct( tr_bandwidth * b, tr_session * session, tr_bandwidth * pa
     b->band[TR_UP].honorParentLimits = true;
     b->band[TR_DOWN].honorParentLimits = true;
     tr_bandwidthSetParent( b, parent );
-    return b;
 }
 
-tr_bandwidth*
+void
 tr_bandwidthDestruct( tr_bandwidth * b )
 {
     assert( tr_isBandwidth( b ) );
@@ -116,7 +115,6 @@ tr_bandwidthDestruct( tr_bandwidth * b )
     tr_ptrArrayDestruct( &b->children, NULL );
 
     memset( b, ~0, sizeof( tr_bandwidth ) );
-    return b;
 }
 
 /***

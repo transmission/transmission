@@ -347,7 +347,7 @@ tr_webseedNew( struct tr_torrent  * tor,
     w->callback = callback;
     w->callback_data = callback_data;
     //tr_rcConstruct( &w->download_rate );
-    tr_bandwidthConstruct( &w->bandwidth, tor->session, tor->bandwidth );
+    tr_bandwidthConstruct( &w->bandwidth, tor->session, &tor->bandwidth );
     w->timer = evtimer_new( w->session->event_base, webseed_timer_func, w );
     tr_timerAddMsec( w->timer, TR_IDLE_TIMER_MSEC );
     return w;

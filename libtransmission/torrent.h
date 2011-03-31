@@ -17,11 +17,11 @@
 #ifndef TR_TORRENT_H
 #define TR_TORRENT_H 1
 
+#include "bandwidth.h" /* tr_bandwidth */
 #include "completion.h" /* tr_completion */
 #include "session.h" /* tr_sessionLock(), tr_sessionUnlock() */
 #include "utils.h" /* TR_GNUC_PRINTF */
 
-struct tr_bandwidth;
 struct tr_torrent_tiers;
 struct tr_magnet_info;
 
@@ -253,7 +253,7 @@ struct tr_torrent
 
     int                        uniqueId;
 
-    struct tr_bandwidth      * bandwidth;
+    struct tr_bandwidth        bandwidth;
 
     struct tr_torrent_peers  * torrentPeers;
 

@@ -122,23 +122,11 @@ tr_bandwidth;
 ***
 **/
 
-tr_bandwidth* tr_bandwidthConstruct( tr_bandwidth * bandwidth,
-                                     tr_session   * session,
-                                     tr_bandwidth * parent );
+void tr_bandwidthConstruct( tr_bandwidth * bandwidth,
+                            tr_session   * session,
+                            tr_bandwidth * parent );
 
-/** @brief create a new tr_bandwidth object */
-static inline tr_bandwidth* tr_bandwidthNew( tr_session * session, tr_bandwidth * parent )
-{
-    return tr_bandwidthConstruct( tr_new0( tr_bandwidth, 1 ), session, parent );
-}
-
-tr_bandwidth* tr_bandwidthDestruct( tr_bandwidth * bandwidth );
-
-/** @brief free a tr_bandwidth object */
-static inline void tr_bandwidthFree( tr_bandwidth * bandwidth )
-{
-    tr_free( tr_bandwidthDestruct( bandwidth ) );
-}
+void tr_bandwidthDestruct( tr_bandwidth * bandwidth );
 
 /** @brief test to see if the pointer refers to a live bandwidth object */
 static inline bool tr_isBandwidth( const tr_bandwidth  * b )
@@ -258,8 +246,8 @@ static inline bool tr_bandwidthHonorParentLimits ( tr_bandwidth   * bandwidth,
     return didChange;
 }
 
-static inline bool tr_bandwidthAreParentLimitsHonored( tr_bandwidth  * bandwidth,
-                                                       tr_direction    direction )
+static inline bool tr_bandwidthAreParentLimitsHonored( const tr_bandwidth  * bandwidth,
+                                                       tr_direction          direction )
 {
     assert( tr_isBandwidth( bandwidth ) );
     assert( tr_isDirection( direction ) );
