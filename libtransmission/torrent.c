@@ -1156,7 +1156,7 @@ tr_torrentStat( tr_torrent * tor )
     s->id = tor->uniqueId;
     s->activity = tr_torrentGetActivity( tor );
     s->error = tor->error;
-    memcpy( s->errorString, tor->errorString, sizeof( s->errorString ) );
+    tr_strlcpy( s->errorString, tor->errorString, sizeof( s->errorString ) );
 
     s->manualAnnounceTime = tr_announcerNextManualAnnounce( tor );
 
