@@ -227,6 +227,7 @@ dht_bootstrap(void *closure)
                 if(bootstrap_done(cl->session, 0))
                     break;
             }
+            fclose( f );
         }
 
         tr_free( bootstrap_file );
