@@ -209,9 +209,9 @@ struct tr_torrent
     uint64_t                   corruptPrev;
 
     uint64_t                   etaDLSpeedCalculatedAt;
-    double                     etaDLSpeed_KBps;
+    float                      etaDLSpeed_KBps;
     uint64_t                   etaULSpeedCalculatedAt;
-    double                     etaULSpeed_KBps;
+    float                      etaULSpeed_KBps;
 
     time_t                     addedDate;
     time_t                     activityDate;
@@ -257,7 +257,7 @@ struct tr_torrent
 
     struct tr_torrent_peers  * torrentPeers;
 
-    double                     desiredRatio;
+    float                      desiredRatio;
     tr_ratiolimit              ratioLimitMode;
 
     uint16_t                   idleLimitMinutes;

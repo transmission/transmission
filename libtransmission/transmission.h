@@ -1783,44 +1783,44 @@ typedef struct tr_stat
         verified. When it gets to 1, the verify process is done.
         Range is [0..1]
         @see tr_stat.activity */
-    double recheckProgress;
+    float recheckProgress;
 
     /** How much has been downloaded of the entire torrent.
         Range is [0..1] */
-    double percentComplete;
+    float percentComplete;
 
     /** How much of the metadata the torrent has.
         For torrents added from a .torrent this will always be 1.
         For magnet links, this number will from from 0 to 1 as the metadata is downloaded.
         Range is [0..1] */
-    double metadataPercentComplete;
+    float metadataPercentComplete;
 
     /** How much has been downloaded of the files the user wants. This differs
         from percentComplete if the user wants only some of the torrent's files.
         Range is [0..1]
         @see tr_stat.leftUntilDone */
-    double percentDone;
+    float percentDone;
 
     /** How much has been uploaded to satisfy the seed ratio.
         This is 1 if the ratio is reached or the torrent is set to seed forever.
         Range is [0..1] */
-    double seedRatioPercentDone;
+    float seedRatioPercentDone;
 
     /** Speed all data being sent for this torrent.
         This includes piece data, protocol messages, and TCP overhead */
-    double rawUploadSpeed_KBps;
+    float rawUploadSpeed_KBps;
 
     /** Speed all data being received for this torrent.
         This includes piece data, protocol messages, and TCP overhead */
-    double rawDownloadSpeed_KBps;
+    float rawDownloadSpeed_KBps;
 
     /** Speed all piece being sent for this torrent.
         This ONLY counts piece data. */
-    double pieceUploadSpeed_KBps;
+    float pieceUploadSpeed_KBps;
 
     /** Speed all piece being received for this torrent.
         This ONLY counts piece data. */
-    double pieceDownloadSpeed_KBps;
+    float pieceDownloadSpeed_KBps;
 
 #define TR_ETA_NOT_AVAIL -1
 #define TR_ETA_UNKNOWN -2

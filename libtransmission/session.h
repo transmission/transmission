@@ -199,7 +199,7 @@ struct tr_session
     /* monitors the "global pool" speeds */
     struct tr_bandwidth          bandwidth;
 
-    double                       desiredRatio;
+    float                        desiredRatio;
 
     uint16_t                     idleLimitMinutes;
 
