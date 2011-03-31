@@ -2814,7 +2814,7 @@ rechokeDownloads( Torrent * t )
     const time_t now = tr_time( );
     const int MIN_INTERESTING_PEERS = 5;
     const int peerCount = tr_ptrArraySize( &t->peers );
-    int maxPeers;
+    int maxPeers         = 0;
 
     int badCount         = 0;
     int goodCount        = 0;
