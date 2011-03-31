@@ -589,8 +589,8 @@ filter_trackers( tr_tracker_info * input, int input_count, int * setme_count )
     /* if two announce URLs differ only by scheme, put them in the same tier.
      * (note: this can leave gaps in the `tier' values, but since the calling
      * function doesn't care, there's no point in removing the gaps...) */
-    for( i=0, in=n; i<n; ++i )
-        for( j=0, jn=n; j<n; ++j )
+    for( i=0, in=n; i<in; ++i )
+        for( j=0, jn=n; j<jn; ++j )
             if( (i!=j) && (tmp[i].port==tmp[j].port)
                        && !tr_strcmp0(tmp[i].host,tmp[j].host)
                        && !tr_strcmp0(tmp[i].path,tmp[j].path) )
@@ -608,7 +608,7 @@ filter_trackers( tr_tracker_info * input, int input_count, int * setme_count )
         ret[i] = tmp[i].info;
 
     /* cleanup */
-    for( i=0, in=n; i<n; ++i ) {
+    for( i=0, in=n; i<in; ++i ) {
         tr_free( tmp[i].path );
         tr_free( tmp[i].host );
         tr_free( tmp[i].scheme );
@@ -1061,7 +1061,18 @@ on_announce_done( const tr_announce_response  * response,
             publishErrorClear( tier );
 
             if(( tracker = tier->currentTracker ))
+            {
                 tracker->consecutiveFailures = 0;
+                tracker->seederCount = response->seeders;
+                tracker->leecherCount = response->leechers;
+                tracker->downloadCount = response->downloads;
+
+                if(( str = response->tracker_id_str ))
+                {
+                    tr_free( tracker->tracker_id_str );
+                    tracker->tracker_id_str = tr_strdup( str );
+                }
+            }
 
             if(( str = response->warning ))
             {
@@ -1076,16 +1087,6 @@ on_announce_done( const tr_announce_response  * response,
 
             if(( i = response->interval ))
                 tier->announceIntervalSec = i;
-
-            if(( str = response->tracker_id_str ))
-            {
-                tr_free( tier->currentTracker->tracker_id_str );
-                tier->currentTracker->tracker_id_str = tr_strdup( str );
-            }
-
-            tier->currentTracker->seederCount = response->seeders;
-            tier->currentTracker->leecherCount = response->leechers;
-            tier->currentTracker->downloadCount = response->downloads;
 
             if( response->pex_count > 0 )
                 publishPeersPex( tier, response->seeders, response->leechers,
