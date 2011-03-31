@@ -1621,7 +1621,7 @@ canRead( tr_peerIo * io, void * vmsgs, size_t * piece )
     }
     else if( msgs->state == AWAITING_BT_PIECE )
     {
-        ret = inlen ? readBtPiece( msgs, in, inlen, piece ) : READ_LATER;
+        ret = readBtPiece( msgs, in, inlen, piece );
     }
     else switch( msgs->state )
     {
