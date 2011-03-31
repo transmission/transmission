@@ -158,13 +158,11 @@ rebind_ipv6(tr_session *ss, bool force)
 
     if(ss->udp6_socket < 0) {
         ss->udp6_socket = s;
-        s = -1;
     } else {
         rc = dup2(s, ss->udp6_socket);
         if(rc < 0)
             goto fail;
         close(s);
-        s = -1;
     }
 
     if(ss->udp6_bound == NULL)
