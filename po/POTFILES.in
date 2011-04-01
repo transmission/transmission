@@ -18,7 +18,6 @@ gtk/transmission-gtk.desktop.in
 gtk/tr-core.c
 gtk/tr-icon.c
 gtk/tr-prefs.c
-gtk/tr-torrent.c
 gtk/tr-window.c
 gtk/util.c
 libtransmission/bencode.c
