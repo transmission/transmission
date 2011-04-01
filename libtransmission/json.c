@@ -12,6 +12,8 @@
 
 #include <assert.h>
 #include <ctype.h>
+#include <stdio.h>
+#include <string.h>
 #include <errno.h> /* EILSEQ, EINVAL */
 
 #include "JSON_parser.h"
@@ -122,7 +124,7 @@ callback( void *             vdata,
         case JSON_T_KEY:
             data->hasContent = true;
             assert( !data->key );
-            data->key = tr_strdup( value->vu.str.value );
+            data->key = tr_strndup( value->vu.str.value, value->vu.str.length );
             break;
     }
 
