@@ -156,27 +156,24 @@ loadPeers( tr_benc * dict, tr_torrent * tor )
 ***/
 
 static void
-saveDND( tr_benc *          dict,
-         const tr_torrent * tor )
+saveDND( tr_benc * dict, const tr_torrent * tor )
 {
-    const tr_info *       inf = tr_torrentInfo( tor );
+    tr_benc * list;
+    tr_file_index_t i;
+    const tr_info * const inf = tr_torrentInfo( tor );
     const tr_file_index_t n = inf->fileCount;
-    tr_file_index_t       i;
-    tr_benc *             list;
 
     list = tr_bencDictAddList( dict, KEY_DND, n );
-    for( i = 0; i < n; ++i )
+    for( i=0; i<n; ++i )
         tr_bencListAddInt( list, inf->files[i].dnd ? 1 : 0 );
 }
 
 static uint64_t
-loadDND( tr_benc *    dict,
-         tr_torrent * tor )
+loadDND( tr_benc * dict, tr_torrent * tor )
 {
-    uint64_t              ret = 0;
-    tr_info *             inf = &tor->info;
-    const tr_file_index_t n = inf->fileCount;
-    tr_benc *             list = NULL;
+    uint64_t ret = 0;
+    tr_benc * list = NULL;
+    const tr_file_index_t n = tor->info.fileCount;
 
     if( tr_bencDictFindList( dict, KEY_DND, &list )
       && ( tr_bencListSize( list ) == n ) )
@@ -186,7 +183,7 @@ loadDND( tr_benc *    dict,
         tr_file_index_t * dnd = tr_new( tr_file_index_t, n );
         tr_file_index_t   i, dlCount = 0, dndCount = 0;
 
-        for( i = 0; i < n; ++i )
+        for( i=0; i<n; ++i )
         {
             if( tr_bencGetInt( tr_bencListChild( list, i ), &tmp ) && tmp )
                 dnd[dndCount++] = i;
@@ -230,10 +227,10 @@ loadDND( tr_benc *    dict,
 static void
 saveFilePriorities( tr_benc * dict, const tr_torrent * tor )
 {
-    const tr_info *       inf = tr_torrentInfo( tor );
+    tr_benc * list;
+    tr_file_index_t i;
+    const tr_info * const inf = tr_torrentInfo( tor );
     const tr_file_index_t n = inf->fileCount;
-    tr_file_index_t       i;
-    tr_benc *             list;
 
     list = tr_bencDictAddList( dict, KEY_FILE_PRIORITIES, n );
     for( i = 0; i < n; ++i )
@@ -243,10 +240,9 @@ saveFilePriorities( tr_benc * dict, const tr_torrent * tor )
 static uint64_t
 loadFilePriorities( tr_benc * dict, tr_torrent * tor )
 {
-    uint64_t              ret = 0;
-    tr_info *             inf = &tor->info;
-    const tr_file_index_t n = inf->fileCount;
-    tr_benc *             list;
+    tr_benc * list;
+    uint64_t ret = 0;
+    const tr_file_index_t n = tor->info.fileCount;
 
     if( tr_bencDictFindList( dict, KEY_FILE_PRIORITIES, &list )
       && ( tr_bencListSize( list ) == n ) )
@@ -325,8 +321,9 @@ enum old_speed_modes
 static uint64_t
 loadSpeedLimits( tr_benc * dict, tr_torrent * tor )
 {
-    uint64_t  ret = 0;
     tr_benc * d;
+    uint64_t ret = 0;
+
 
     if( tr_bencDictFindDict( dict, KEY_SPEEDLIMIT_UP, &d ) )
     {
@@ -363,11 +360,10 @@ loadSpeedLimits( tr_benc * dict, tr_torrent * tor )
 }
 
 static uint64_t
-loadRatioLimits( tr_benc *    dict,
-                 tr_torrent * tor )
+loadRatioLimits( tr_benc * dict, tr_torrent * tor )
 {
-    uint64_t  ret = 0;
     tr_benc * d;
+    uint64_t ret = 0;
 
     if( tr_bencDictFindDict( dict, KEY_RATIOLIMIT, &d ) )
     {
@@ -384,11 +380,10 @@ loadRatioLimits( tr_benc *    dict,
 }
 
 static uint64_t
-loadIdleLimits( tr_benc *    dict,
-                      tr_torrent * tor )
+loadIdleLimits( tr_benc * dict, tr_torrent * tor )
 {
-    uint64_t  ret = 0;
     tr_benc * d;
+    uint64_t ret = 0;
 
     if( tr_bencDictFindDict( dict, KEY_IDLELIMIT, &d ) )
     {
@@ -672,8 +667,7 @@ tr_torrentSaveResume( tr_torrent * tor )
 }
 
 static uint64_t
-loadFromFile( tr_torrent * tor,
-              uint64_t     fieldsToLoad )
+loadFromFile( tr_torrent * tor, uint64_t fieldsToLoad )
 {
     int64_t  i;
     const char * str;
@@ -825,10 +819,7 @@ loadFromFile( tr_torrent * tor,
 }
 
 static uint64_t
-setFromCtor( tr_torrent *    tor,
-             uint64_t        fields,
-             const tr_ctor * ctor,
-             int             mode )
+setFromCtor( tr_torrent * tor, uint64_t fields, const tr_ctor * ctor, int mode )
 {
     uint64_t ret = 0;
 
@@ -861,17 +852,13 @@ setFromCtor( tr_torrent *    tor,
 }
 
 static uint64_t
-useManditoryFields( tr_torrent *    tor,
-                    uint64_t        fields,
-                    const tr_ctor * ctor )
+useManditoryFields( tr_torrent * tor, uint64_t fields, const tr_ctor * ctor )
 {
     return setFromCtor( tor, fields, ctor, TR_FORCE );
 }
 
 static uint64_t
-useFallbackFields( tr_torrent *    tor,
-                   uint64_t        fields,
-                   const tr_ctor * ctor )
+useFallbackFields( tr_torrent * tor, uint64_t fields, const tr_ctor * ctor )
 {
     return setFromCtor( tor, fields, ctor, TR_FALLBACK );
 }
@@ -901,4 +888,3 @@ tr_torrentRemoveResume( const tr_torrent * tor )
     unlink( filename );
     tr_free( filename );
 }
-
