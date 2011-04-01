@@ -966,15 +966,12 @@ bool
 tr_urlIsValidTracker( const char * url )
 {
     bool valid;
-    char * scheme = NULL;
     const int len = url ? strlen(url) : 0;
 
     valid = isValidURLChars( url, len )
-         && !tr_urlParse( url, len, &scheme, NULL, NULL, NULL )
-         && ( scheme != NULL )
-         && ( !strcmp(scheme,"http") || !strcmp(scheme,"https") || !strcmp(scheme,"udp") );
+         && !tr_urlParse( url, len, NULL, NULL, NULL, NULL )
+         && ( !memcmp(url,"http://",7) || !memcmp(url,"https://",8) || !memcmp(url,"udp://",6) );
 
-    tr_free( scheme );
     return valid;
 }
 
@@ -983,16 +980,13 @@ bool
 tr_urlIsValid( const char * url, int url_len )
 {
     bool valid;
-    char * scheme = NULL;
     if( ( url_len < 0 ) && ( url != NULL ) )
         url_len = strlen( url );
 
     valid = isValidURLChars( url, url_len )
-         && !tr_urlParse( url, url_len, &scheme, NULL, NULL, NULL )
-         && ( scheme != NULL )
-         && ( !strcmp(scheme,"http") || !strcmp(scheme,"https") || !strcmp(scheme,"ftp") || !strcmp(scheme,"sftp") );
+         && !tr_urlParse( url, url_len, NULL, NULL, NULL, NULL )
+         && ( !memcmp(url,"http://",7) || !memcmp(url,"https://",8) || !memcmp(url,"ftp://",6) || !memcmp(url,"sftp://",7) );
 
-    tr_free( scheme );
     return valid;
 }
 
