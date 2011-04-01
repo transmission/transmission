@@ -147,17 +147,16 @@ path_is_suspicious( const char * path )
 }
 
 static bool
-getfile( char ** setme, const char * root, tr_benc * path )
+getfile( char ** setme, const char * root, tr_benc * path, struct evbuffer * buf )
 {
     bool success = false;
 
     if( tr_bencIsList( path ) )
     {
         int i;
-        char * tmp;
         const int n = tr_bencListSize( path );
-        struct evbuffer * buf = evbuffer_new( );
 
+        evbuffer_drain( buf, evbuffer_get_length( buf ) );
         evbuffer_add( buf, root, strlen( root ) );
         for( i = 0; i < n; ++i )
         {
@@ -169,9 +168,7 @@ getfile( char ** setme, const char * root, tr_benc * path )
             }
         }
 
-        tmp = evbuffer_free_to_str( buf );
-        *setme = tr_utf8clean( tmp, -1 );
-        tr_free( tmp );
+        *setme = tr_utf8clean( (char*)evbuffer_pullup( buf, -1 ), evbuffer_get_length( buf ) );
         /* fprintf( stderr, "[%s]\n", *setme ); */
         success = true;
     }
@@ -196,6 +193,7 @@ parseFiles( tr_info * inf, tr_benc * files, const tr_benc * length )
     if( tr_bencIsList( files ) ) /* multi-file mode */
     {
         tr_file_index_t i;
+        struct evbuffer * buf = evbuffer_new( );
 
         inf->isMultifile = 1;
         inf->fileCount   = tr_bencListSize( files );
@@ -214,7 +212,7 @@ parseFiles( tr_info * inf, tr_benc * files, const tr_benc * length )
                 if( !tr_bencDictFindList( file, "path", &path ) )
                     return "path";
 
-            if( !getfile( &inf->files[i].name, inf->name, path ) )
+            if( !getfile( &inf->files[i].name, inf->name, path, buf ) )
                 return "path";
 
             if( !tr_bencDictFindInt( file, "length", &len ) )
@@ -223,6 +221,8 @@ parseFiles( tr_info * inf, tr_benc * files, const tr_benc * length )
             inf->files[i].length = len;
             inf->totalSize      += len;
         }
+
+        evbuffer_free( buf );
     }
     else if( tr_bencGetInt( length, &len ) ) /* single-file mode */
     {
