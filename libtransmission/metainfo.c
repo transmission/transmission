@@ -36,22 +36,20 @@
 char*
 tr_metainfoGetBasename( const tr_info * inf )
 {
-    char *ret, *pch, *name;
+    size_t i;
+    const size_t name_len = strlen( inf->name );
+    char * ret = tr_strdup_printf( "%s.%16.16s", inf->name, inf->hashString );
 
-    name = tr_strdup( inf->name );
-    for( pch=name; pch && *pch; ++pch )
-        if( *pch == '/' )
-            *pch = '_';
+    for( i=0; i<name_len; ++i )
+        if( ret[i] == '/' )
+            ret[i] = '_';
 
-    ret = tr_strdup_printf( "%s.%16.16s", name, inf->hashString );
 
-    tr_free( name );
     return ret;
 }
 
 static char*
-getTorrentFilename( const tr_session * session,
-                    const tr_info *   inf )
+getTorrentFilename( const tr_session * session, const tr_info * inf )
 {
     char * base = tr_metainfoGetBasename( inf );
     char * filename = tr_strdup_printf( "%s" TR_PATH_DELIMITER_STR "%s.torrent",
@@ -305,18 +303,18 @@ getannounce( tr_info * inf, tr_benc * meta )
                 if( tr_bencGetStr( tr_bencListChild( tier, j ), &str ) )
                 {
                     char * url = tr_strstrip( tr_strdup( str ) );
-                    if( tr_urlIsValidTracker( url ) )
-                    {
+                    if( !tr_urlIsValidTracker( url ) )
+                        tr_free( url );
+                    else {
                         tr_tracker_info * t = trackers + trackerCount;
                         t->tier = validTiers;
-                        t->announce = tr_strdup( url );
+                        t->announce = url;
                         t->scrape = tr_convertAnnounceToScrape( url );
                         t->id = trackerCount;
 
                         anyAdded = true;
                         ++trackerCount;
                     }
-                    tr_free( url );
                 }
             }
 
@@ -337,17 +335,17 @@ getannounce( tr_info * inf, tr_benc * meta )
       && tr_bencDictFindStr( meta, "announce", &str ) )
     {
         char * url = tr_strstrip( tr_strdup( str ) );
-        if( tr_urlIsValidTracker( url ) )
-        {
+        if( !tr_urlIsValidTracker( url ) )
+            tr_free( url );
+        else {
             trackers = tr_new0( tr_tracker_info, 1 );
             trackers[trackerCount].tier = 0;
-            trackers[trackerCount].announce = tr_strdup( url );
+            trackers[trackerCount].announce = url;
             trackers[trackerCount].scrape = tr_convertAnnounceToScrape( url );
             trackers[trackerCount].id = 0;
             trackerCount++;
             /*fprintf( stderr, "single announce: [%s]\n", url );*/
         }
-        tr_free( url );
     }
 
     inf->trackers = trackers;
@@ -584,8 +582,7 @@ tr_metainfoFree( tr_info * inf )
 }
 
 void
-tr_metainfoRemoveSaved( const tr_session * session,
-                        const tr_info *   inf )
+tr_metainfoRemoveSaved( const tr_session * session, const tr_info * inf )
 {
     char * filename;
 
