@@ -762,21 +762,12 @@ static bool
 hasAnyLocalData( const tr_torrent * tor )
 {
     tr_file_index_t i;
-    bool has_local_data = false;
-    const tr_file_index_t n = tor->info.fileCount;
 
-    for( i=0; i<n && !has_local_data; ++i )
-    {
-        struct stat sb;
-        char * filename = tr_torrentFindFile( tor, i );
+    for( i=0; i<tor->info.fileCount; ++i )
+        if( tr_torrentFindFile2( tor, i, NULL, NULL ) )
+            return true;
 
-        if( filename && !stat( filename, &sb ) )
-            has_local_data = true;
-
-        tr_free( filename );
-    }
-
-    return has_local_data;
+    return false;
 }
 
 static bool
