@@ -32,6 +32,8 @@
 #ifdef WIN32
  #define _WIN32_WINNT   0x0501
  #include <ws2tcpip.h>
+#else
+ #include <netinet/tcp.h>       /* TCP_CONGESTION */
 #endif
 
 #include <event2/util.h>
