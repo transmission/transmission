@@ -2976,7 +2976,7 @@ bool
 tr_torrentFindFile2( const tr_torrent * tor, tr_file_index_t fileNum,
                      const char ** base, char ** subpath )
 {
-    char * part;
+    char * part = NULL;
     const tr_file * file;
     const char * b = NULL;
     const char * s = NULL;
@@ -2985,7 +2985,6 @@ tr_torrentFindFile2( const tr_torrent * tor, tr_file_index_t fileNum,
     assert( fileNum < tor->info.fileCount );
 
     file = &tor->info.files[fileNum];
-    part = tr_torrentBuildPartial( tor, fileNum );
 
     if( b == NULL ) {
         char * filename = tr_buildPath( tor->downloadDir, file->name, NULL );
@@ -3004,6 +3003,9 @@ tr_torrentFindFile2( const tr_torrent * tor, tr_file_index_t fileNum,
         }
         tr_free( filename );
     }
+
+    if( b == NULL )
+        part = tr_torrentBuildPartial( tor, fileNum );
 
     if( ( b == NULL ) && ( tor->incompleteDir != NULL ) ) {
         char * filename = tr_buildPath( tor->incompleteDir, part, NULL );
