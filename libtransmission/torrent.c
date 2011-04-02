@@ -764,7 +764,7 @@ hasAnyLocalData( const tr_torrent * tor )
     tr_file_index_t i;
 
     for( i=0; i<tor->info.fileCount; ++i )
-        if( tr_torrentFindFile2( tor, i, NULL, NULL ) )
+        if( tr_torrentFindFile2( tor, i, NULL, NULL, NULL ) )
             return true;
 
     return false;
@@ -2371,20 +2371,8 @@ tr_torrentCheckPiece( tr_torrent * tor, tr_piece_index_t pieceIndex )
 time_t
 tr_torrentGetFileMTime( const tr_torrent * tor, tr_file_index_t i )
 {
-    struct stat sb;
     time_t mtime = 0;
-    char * path = tr_torrentFindFile( tor, i );
-
-    if( ( path != NULL ) && !stat( path, &sb ) && S_ISREG( sb.st_mode ) )
-    {
-#ifdef SYS_DARWIN
-        mtime = sb.st_mtimespec.tv_sec;
-#else
-        mtime = sb.st_mtime;
-#endif
-    }
-
-    tr_free( path );
+    tr_torrentFindFile2( tor, i, NULL, NULL, &mtime );
     return mtime;
 }
 
@@ -2832,7 +2820,7 @@ setLocation( void * vdata )
             const tr_file * f = &tor->info.files[i];
             const char * oldbase;
             char * sub;
-            if( tr_torrentFindFile2( tor, i, &oldbase, &sub ) )
+            if( tr_torrentFindFile2( tor, i, &oldbase, &sub, NULL ) )
             {
                 char * oldpath = tr_buildPath( oldbase, sub, NULL );
                 char * newpath = tr_buildPath( location, sub, NULL );
@@ -2942,7 +2930,7 @@ tr_torrentFileCompleted( tr_torrent * tor, tr_file_index_t fileNum )
     /* if the torrent's current filename isn't the same as the one in the
      * metadata -- for example, if it had the ".part" suffix appended to
      * it until now -- then rename it to match the one in the metadata */
-    if( tr_torrentFindFile2( tor, fileNum, &base, &sub ) )
+    if( tr_torrentFindFile2( tor, fileNum, &base, &sub, NULL ) )
     {
         if( strcmp( sub, f->name ) )
         {
@@ -2965,16 +2953,26 @@ tr_torrentFileCompleted( tr_torrent * tor, tr_file_index_t fileNum )
 ***/
 
 static bool
-fileExists( const char * filename )
+fileExists( const char * filename, time_t * mtime )
 {
     struct stat sb;
     const bool ok = !stat( filename, &sb );
+
+    if( ok && ( mtime != NULL ) )
+    {
+#ifdef SYS_DARWIN
+        *mtime = sb.st_mtimespec.tv_sec;
+#else
+        *mtime = sb.st_mtime;
+#endif
+    }
+
     return ok;
 }
 
 bool
 tr_torrentFindFile2( const tr_torrent * tor, tr_file_index_t fileNum,
-                     const char ** base, char ** subpath )
+                     const char ** base, char ** subpath, time_t * mtime )
 {
     char * part = NULL;
     const tr_file * file;
@@ -2988,7 +2986,7 @@ tr_torrentFindFile2( const tr_torrent * tor, tr_file_index_t fileNum,
 
     if( b == NULL ) {
         char * filename = tr_buildPath( tor->downloadDir, file->name, NULL );
-        if( fileExists( filename ) ) {
+        if( fileExists( filename, mtime ) ) {
             b = tor->downloadDir;
             s = file->name;
         }
@@ -2997,7 +2995,7 @@ tr_torrentFindFile2( const tr_torrent * tor, tr_file_index_t fileNum,
 
     if( ( b == NULL ) && ( tor->incompleteDir != NULL ) ) {
         char * filename = tr_buildPath( tor->incompleteDir, file->name, NULL );
-        if( fileExists( filename ) ) {
+        if( fileExists( filename, mtime ) ) {
             b = tor->incompleteDir;
             s = file->name;
         }
@@ -3009,7 +3007,7 @@ tr_torrentFindFile2( const tr_torrent * tor, tr_file_index_t fileNum,
 
     if( ( b == NULL ) && ( tor->incompleteDir != NULL ) ) {
         char * filename = tr_buildPath( tor->incompleteDir, part, NULL );
-        if( fileExists( filename ) ) {
+        if( fileExists( filename, mtime ) ) {
             b = tor->incompleteDir;
             s = part;
         }
@@ -3018,7 +3016,7 @@ tr_torrentFindFile2( const tr_torrent * tor, tr_file_index_t fileNum,
 
     if( b == NULL) {
         char * filename = tr_buildPath( tor->downloadDir, part, NULL );
-        if( fileExists( filename ) ) {
+        if( fileExists( filename, mtime ) ) {
             b = tor->downloadDir;
             s = part;
         }
@@ -3041,7 +3039,7 @@ tr_torrentFindFile( const tr_torrent * tor, tr_file_index_t fileNum )
     char * ret = NULL;
     const char * base;
 
-    if( tr_torrentFindFile2( tor, fileNum, &base, &subpath ) )
+    if( tr_torrentFindFile2( tor, fileNum, &base, &subpath, NULL ) )
     {
         ret = tr_buildPath( base, subpath, NULL );
         tr_free( subpath );
@@ -3060,7 +3058,7 @@ refreshCurrentDir( tr_torrent * tor )
         dir = tor->downloadDir;
     else if( !tr_torrentHasMetadata( tor ) ) /* no files to find */
         dir = tor->incompleteDir;
-    else if( !tr_torrentFindFile2( tor, 0, &dir, NULL ) )
+    else if( !tr_torrentFindFile2( tor, 0, &dir, NULL, NULL ) )
         dir = tor->incompleteDir;
 
     assert( dir != NULL );

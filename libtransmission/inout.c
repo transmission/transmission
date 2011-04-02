@@ -70,7 +70,7 @@ readOrWriteBytes( tr_session       * session,
         const char * base;
 
         /* see if the file exists... */
-        if( !tr_torrentFindFile2( tor, fileIndex, &base, &subpath ) )
+        if( !tr_torrentFindFile2( tor, fileIndex, &base, &subpath, NULL ) )
         {
             /* we can't read a file that doesn't exist... */
             if( !doWrite )

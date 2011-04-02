@@ -395,7 +395,7 @@ void tr_torrentFileCompleted( tr_torrent * tor, tr_file_index_t fileNo );
  *                string holding the second half of the filename.
  */
 bool tr_torrentFindFile2( const tr_torrent *, tr_file_index_t fileNo,
-                          const char ** base, char ** subpath );
+                          const char ** base, char ** subpath, time_t * mtime );
 
 
 /* Returns a newly-allocated version of the tr_file.name string
