@@ -181,10 +181,10 @@ add_file_to_list( struct evbuffer * buf, const char * filename, size_t len )
     evbuffer_add( buf, key, strlen( key ) );
     tr_free( key );
 }
-static tr_bool
+static bool
 is_file_in_list( struct evbuffer * buf, const char * filename, size_t len )
 {
-    tr_bool in_list;
+    bool in_list;
     struct evbuffer_ptr ptr;
     char * key = get_key_from_file( filename, len );
 
