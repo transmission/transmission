@@ -688,7 +688,7 @@ bool
 tr_announcerCanManualAnnounce( const tr_torrent * tor )
 {
     int i;
-    struct tr_torrent_tiers * tt;
+    struct tr_torrent_tiers * tt = NULL;
 
     assert( tr_isTorrent( tor ) );
     assert( tor->tiers != NULL );
