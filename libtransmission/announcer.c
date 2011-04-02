@@ -294,11 +294,21 @@ typedef struct tr_tier
 }
 tr_tier;
 
+static time_t
+get_next_scrape_time( int interval )
+{
+    const time_t now = tr_time( );
+
+    /* Add the interval, and then increment to the nearest 10th second.
+     * The latter step is to increas the odds of several torrents coming
+     * due at the same time to improve multiscrape. */
+    return (now+interval) + (10-((now+interval)%10));
+}
+
 static void
 tierConstruct( tr_tier * tier, tr_torrent * tor )
 {
     static int nextKey = 1;
-    const time_t now = tr_time( );
 
     memset( tier, 0, sizeof( tr_tier ) );
 
@@ -307,7 +317,7 @@ tierConstruct( tr_tier * tier, tr_torrent * tor )
     tier->scrapeIntervalSec = DEFAULT_SCRAPE_INTERVAL_SEC;
     tier->announceIntervalSec = DEFAULT_ANNOUNCE_INTERVAL_SEC;
     tier->announceMinIntervalSec = DEFAULT_ANNOUNCE_MIN_INTERVAL_SEC;
-    tier->scrapeAt = now + tr_cryptoWeakRandInt( 60*3 );
+    tier->scrapeAt = get_next_scrape_time( tr_cryptoWeakRandInt( 180 ) );
     tier->tor = tor;
 }
 
@@ -1068,7 +1078,7 @@ on_announce_done( const tr_announce_response  * response,
                             sizeof( tier->lastAnnounceStr ) );
 
             tier->isRunning = data->isRunningOnSuccess;
-            tier->scrapeAt = now + tier->scrapeIntervalSec;
+            tier->scrapeAt = get_next_scrape_time( tier->scrapeIntervalSec );
             tier->lastScrapeTime = now;
             tier->lastScrapeSucceeded = true;
             tier->lastAnnounceSucceeded = true;
@@ -1174,7 +1184,7 @@ on_scrape_error( tr_tier * tier, const char * errmsg )
     interval = getRetryInterval( tier->currentTracker );
     dbgmsg( tier, "Retrying scrape in %d seconds.", interval );
     tier->lastScrapeSucceeded = false;
-    tier->scrapeAt = tr_time() + interval;
+    tier->scrapeAt = get_next_scrape_time( interval );
 }
 
 static tr_tier *
@@ -1254,7 +1264,7 @@ on_scrape_done( const tr_scrape_response  * response, void * vsession )
                     tier->lastScrapeSucceeded = true;
                     tier->scrapeIntervalSec = MAX( DEFAULT_SCRAPE_INTERVAL_SEC,
                                                    response->min_request_interval );
-                    tier->scrapeAt = now + tier->scrapeIntervalSec;
+                    tier->scrapeAt = get_next_scrape_time( tier->scrapeIntervalSec );
                     tr_tordbg( tier->tor, "Scrape successful. Rescraping in %d seconds.",
                                tier->scrapeIntervalSec );
 
