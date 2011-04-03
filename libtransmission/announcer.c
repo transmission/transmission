@@ -585,8 +585,9 @@ filter_trackers( tr_tracker_info * input, int input_count, int * setme_count )
      * (note: this can leave gaps in the `tier' values, but since the calling
      * function doesn't care, there's no point in removing the gaps...) */
     for( i=0, in=n; i<in; ++i )
-        for( j=0, jn=n; j<jn; ++j )
-            if( (i!=j) && (tmp[i].port==tmp[j].port)
+        for( j=i+1, jn=n; j<jn; ++j )
+            if( (tmp[i].info.tier!=tmp[j].info.tier)
+                       && (tmp[i].port==tmp[j].port)
                        && !tr_strcmp0(tmp[i].host,tmp[j].host)
                        && !tr_strcmp0(tmp[i].path,tmp[j].path) )
                 tmp[j].info.tier = tmp[i].info.tier;
