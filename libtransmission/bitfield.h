@@ -17,7 +17,6 @@
 #ifndef TR_BITFIELD_H
 #define TR_BITFIELD_H 1
 
-#include <assert.h>
 #include "transmission.h"
 
 /** @brief Implementation of the BitTorrent spec's Bitfield array of bits */
