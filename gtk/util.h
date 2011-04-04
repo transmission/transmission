@@ -68,7 +68,7 @@ char* tr_strltime( char * buf, int secs, size_t buflen );
 ***/
 
 /* http://www.legaltorrents.com/some/announce/url --> legaltorrents.com */
-char* gtr_get_host_from_url( const char * url );
+void gtr_get_host_from_url( char * buf, size_t buflen, const char * url );
 
 gboolean gtr_is_supported_url( const char * str );
 

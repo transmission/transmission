@@ -178,7 +178,7 @@ gtr_get_favicon_from_url( tr_session  * session,
                           GFunc         pixbuf_ready_func,
                           gpointer      pixbuf_ready_func_data )
 {
-    char * host = gtr_get_host_from_url( url );
+    char host[1024];
+    gtr_get_host_from_url( host, sizeof( host ), url );
     gtr_get_favicon( session, host, pixbuf_ready_func, pixbuf_ready_func_data );
-    g_free( host );
 }

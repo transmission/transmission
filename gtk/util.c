@@ -205,27 +205,25 @@ gtr_mkdir_with_parents( const char * path, int mode )
 }
 
 /* pattern-matching text; ie, legaltorrents.com */
-char*
-gtr_get_host_from_url( const char * url )
+void
+gtr_get_host_from_url( char * buf, size_t buflen, const char * url )
 {
-    char * name;
     char * h = NULL;
 
     tr_urlParse( url, -1, NULL, &h, NULL, NULL );
 
     if( tr_addressIsIP( h ) )
-        name = g_strdup( h );
+        g_strlcpy( buf, url, buflen );
     else {
         const char * first_dot = strchr( h, '.' );
         const char * last_dot = strrchr( h, '.' );
         if( ( first_dot ) && ( last_dot ) && ( first_dot != last_dot ) )
-            name = g_strdup( first_dot + 1 );
+            g_strlcpy( buf, first_dot + 1, buflen );
         else
-            name = g_strdup( h );
+            g_strlcpy( buf, h, buflen );
     }
 
     tr_free( h );
-    return name;
 }
 
 gboolean

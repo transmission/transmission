@@ -159,8 +159,11 @@ category_filter_model_update( GtkTreeStore * store )
         for( i=0, n=inf->trackerCount; i<n; ++i )
         {
             int k;
-            char * key = gtr_get_host_from_url( inf->trackers[i].announce );
-            int * count = g_hash_table_lookup( hosts_hash, key );
+            int * count;
+            char key[1024];
+
+            gtr_get_host_from_url( key, sizeof( key ), inf->trackers[i].announce );
+            count = g_hash_table_lookup( hosts_hash, key );
             if( count == NULL )
             {
                 count = tr_new0( int, 1 );
@@ -172,9 +175,7 @@ category_filter_model_update( GtkTreeStore * store )
                 if( !strcmp( keys[k], key ) )
                     break;
             if( k==keyCount )
-                keys[keyCount++] = key;
-            else
-                g_free( key );
+                keys[keyCount++] = g_strdup( key );
         }
 
         for( i=0; i<keyCount; ++i )
@@ -557,12 +558,11 @@ testCategory( GtkWidget * category_combo, tr_torrent * tor )
         case CAT_FILTER_TYPE_HOST: {
             int i;
             char * host;
+            char tmp[1024];
             gtk_tree_model_get( model, &iter, CAT_FILTER_COL_HOST, &host, -1 );
             for( i=0; i<inf->trackerCount; ++i ) {
-                char * tmp = gtr_get_host_from_url( inf->trackers[i].announce );
-                const gboolean hit = !strcmp( tmp, host );
-                g_free( tmp );
-                if( hit )
+                gtr_get_host_from_url( tmp, sizeof( tmp ), inf->trackers[i].announce );
+                if( !strcmp( tmp, host ) )
                     break;
             }
             g_free( host );
