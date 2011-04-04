@@ -980,30 +980,18 @@ addDatatype( tr_peerIo * io, size_t byteCount, bool isPieceData )
     tr_list_append( &io->outbuf_datatypes, d );
 }
 
-static struct evbuffer_iovec *
-evbuffer_peek_all( struct evbuffer * buf, size_t * setme_vecCount )
-{
-    const size_t byteCount = evbuffer_get_length( buf );
-    const int vecCount = evbuffer_peek( buf, byteCount, NULL, NULL, 0 );
-    struct evbuffer_iovec * iovec = tr_new0( struct evbuffer_iovec, vecCount );
-    const int n = evbuffer_peek( buf, byteCount, NULL, iovec, vecCount );
-    assert( n == vecCount );
-    *setme_vecCount = n;
-    return iovec;
-}
-
 static void
 maybeEncryptBuffer( tr_peerIo * io, struct evbuffer * buf )
 {
     if( io->encryption_type == PEER_ENCRYPTION_RC4 )
     {
-        size_t i, n;
-        struct evbuffer_iovec * iovec = evbuffer_peek_all( buf, &n );
-
-        for( i=0; i<n; ++i )
-            tr_cryptoEncrypt( io->crypto, iovec[i].iov_len, iovec[i].iov_base, iovec[i].iov_base );
-
-        tr_free( iovec );
+        struct evbuffer_ptr pos;
+        struct evbuffer_iovec iovec;
+        evbuffer_ptr_set( buf, &pos, 0, EVBUFFER_PTR_SET );
+        do {
+            evbuffer_peek( buf, -1, &pos, &iovec, 1 );
+            tr_cryptoEncrypt( io->crypto, iovec.iov_len, iovec.iov_base, iovec.iov_base );
+        } while( !evbuffer_ptr_set( buf, &pos, iovec.iov_len, EVBUFFER_PTR_ADD ) );
     }
 }
 
