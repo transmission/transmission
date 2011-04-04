@@ -571,7 +571,6 @@ tr_sessionInit( const char  * tag,
     session->cache = tr_cacheNew( 1024*1024*2 );
     session->tag = tr_strdup( tag );
     session->magicNumber = SESSION_MAGIC_NUMBER;
-    session->buffer = tr_valloc( SESSION_BUFFER_SIZE );
     tr_bandwidthConstruct( &session->bandwidth, session, NULL );
     tr_peerIdInit( session->peer_id );
     tr_bencInitList( &session->removedTorrents, 0 );
@@ -1008,27 +1007,6 @@ tr_sessionIsIncompleteDirEnabled( const tr_session * session )
 /***
 ****
 ***/
-
-void*
-tr_sessionGetBuffer( tr_session * session )
-{
-    assert( tr_isSession( session ) );
-    assert( !session->bufferInUse );
-    assert( tr_amInEventThread( session ) );
-
-    session->bufferInUse = true;
-    return session->buffer;
-}
-
-void
-tr_sessionReleaseBuffer( tr_session * session )
-{
-    assert( tr_isSession( session ) );
-    assert( session->bufferInUse );
-    assert( tr_amInEventThread( session ) );
-
-    session->bufferInUse = false;
-}
 
 void
 tr_sessionLock( tr_session * session )
@@ -1862,7 +1840,6 @@ tr_sessionClose( tr_session * session )
         tr_free( session->metainfoLookup );
     }
     tr_free( session->torrentDoneScript );
-    tr_free( session->buffer );
     tr_free( session->tag );
     tr_free( session->configDir );
     tr_free( session->resumeDir );

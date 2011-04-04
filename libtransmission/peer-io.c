@@ -1061,6 +1061,29 @@ evbuffer_add_uint64( struct evbuffer * outbuf, uint64_t addme_hll )
 ***/
 
 void
+tr_peerIoReadBytesToBuf( tr_peerIo * io, struct evbuffer * inbuf, struct evbuffer * outbuf, size_t byteCount )
+{
+    const size_t old_length = evbuffer_get_length( outbuf );
+
+    assert( tr_isPeerIo( io ) );
+    assert( evbuffer_get_length( inbuf )  >= byteCount );
+
+    /* append it to outbuf */
+    evbuffer_remove_buffer( inbuf, outbuf, byteCount );
+
+    /* decrypt if needed */
+    if( io->encryption_type == PEER_ENCRYPTION_RC4 ) {
+        struct evbuffer_ptr pos;
+        struct evbuffer_iovec iovec;
+        evbuffer_ptr_set( outbuf, &pos, old_length, EVBUFFER_PTR_SET );
+        do {
+           evbuffer_peek( outbuf, byteCount, &pos, &iovec, 1 );
+            tr_cryptoDecrypt( io->crypto, iovec.iov_len, iovec.iov_base, iovec.iov_base );
+        } while( !evbuffer_ptr_set( outbuf, &pos, iovec.iov_len, EVBUFFER_PTR_ADD ) );
+    }
+}
+
+void
 tr_peerIoReadBytes( tr_peerIo * io, struct evbuffer * inbuf, void * bytes, size_t byteCount )
 {
     assert( tr_isPeerIo( io ) );
@@ -1106,8 +1129,8 @@ tr_peerIoDrain( tr_peerIo       * io,
                 struct evbuffer * inbuf,
                 size_t            byteCount )
 {
-    void * buf = tr_sessionGetBuffer( io->session );
-    const size_t buflen = SESSION_BUFFER_SIZE;
+    char buf[4096];
+    const size_t buflen = sizeof( buf );
 
     while( byteCount > 0 )
     {
@@ -1115,8 +1138,6 @@ tr_peerIoDrain( tr_peerIo       * io,
         tr_peerIoReadBytes( io, inbuf, buf, thisPass );
         byteCount -= thisPass;
     }
-
-    tr_sessionReleaseBuffer( io->session );
 }
 
 /***

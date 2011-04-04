@@ -3157,7 +3157,7 @@ rechokePulse( int foo UNUSED, short bar UNUSED, void * vmgr )
     while(( tor = tr_torrentNext( mgr->session, tor ))) {
         if( tor->isRunning ) {
             Torrent * t = tor->torrentPeers;
-            if( tr_ptrArraySize( &t->peers ) == 0 )
+            if( tr_ptrArrayEmpty( &t->peers ) )
                 continue;
             rechokeUploads( t, now );
             if( !tr_torrentIsSeed( tor ) )

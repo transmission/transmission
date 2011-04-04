@@ -1308,20 +1308,8 @@ readBtPiece( tr_peermsgs      * msgs,
         /* read in another chunk of data */
         const size_t nLeft = req->length - evbuffer_get_length( msgs->incoming.block );
         size_t n = MIN( nLeft, inlen );
-        size_t i = n;
-        void * buf = tr_sessionGetBuffer( getSession( msgs ) );
-        const size_t buflen = SESSION_BUFFER_SIZE;
 
-        while( i > 0 )
-        {
-            const size_t thisPass = MIN( i, buflen );
-            tr_peerIoReadBytes( msgs->peer->io, inbuf, buf, thisPass );
-            evbuffer_add( msgs->incoming.block, buf, thisPass );
-            i -= thisPass;
-        }
-
-        tr_sessionReleaseBuffer( getSession( msgs ) );
-        buf = NULL;
+        tr_peerIoReadBytesToBuf( msgs->peer->io, inbuf, msgs->incoming.block, n );
 
         fireClientGotData( msgs, n, true );
         *setme_piece_bytes_read += n;

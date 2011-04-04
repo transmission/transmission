@@ -206,12 +206,6 @@ struct tr_session
     struct tr_bindinfo         * public_ipv4;
     struct tr_bindinfo         * public_ipv6;
 
-    /* a page-aligned buffer for use by the libtransmission thread.
-     * @see SESSION_BUFFER_SIZE */
-    void * buffer;
-
-    bool bufferInUse;
-
     tr_web_config_func          * curl_easy_config_func;
 
     uint8_t peer_id[PEER_ID_LEN+1];
@@ -261,14 +255,7 @@ int tr_sessionCountTorrents( const tr_session * session );
 enum
 {
     SESSION_MAGIC_NUMBER = 3845,
-
-    /* @see tr_session.buffer */
-    SESSION_BUFFER_SIZE = (16*1024)
 };
-
-void* tr_sessionGetBuffer( tr_session * session );
-
-void tr_sessionReleaseBuffer( tr_session * session );
 
 static inline bool tr_isSession( const tr_session * session )
 {
