@@ -1319,12 +1319,11 @@ readBtPiece( tr_peermsgs      * msgs,
         if( evbuffer_get_length( msgs->incoming.block ) < req->length )
             return READ_LATER;
 
-        /* we've got the whole block ... process it */
+        /* pass the block along... */
         err = clientGotBlock( msgs, msgs->incoming.block, req );
+        evbuffer_drain( msgs->incoming.block, evbuffer_get_length( msgs->incoming.block ) );
 
         /* cleanup */
-        evbuffer_free( msgs->incoming.block );
-        msgs->incoming.block = evbuffer_new( );
         req->length = 0;
         msgs->state = AWAITING_BT_LENGTH;
         return err ? READ_ERR : READ_NOW;
