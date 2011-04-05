@@ -21,6 +21,14 @@
 #include "tr-icon.h"
 #include "util.h"
 
+static GQuark
+get_core_quark( void )
+{
+    static GQuark quark = 0;
+    if( !quark ) quark = g_quark_from_static_string( "tr-core" );
+    return quark;
+}
+
 #define ICON_NAME "transmission"
 
 #ifndef STATUS_ICON_SUPPORTED
@@ -65,7 +73,7 @@ gtr_icon_refresh( gpointer vicon )
     char tip[1024];
     const char * idle = _( "Idle" );
     GtkStatusIcon * icon = GTK_STATUS_ICON( vicon );
-    tr_session * session = gtr_core_session( g_object_get_data( G_OBJECT( icon ), "tr-core" ) );
+    tr_session * session = gtr_core_session( g_object_get_qdata( G_OBJECT( icon ), get_core_quark( ) ) );
 
     /* up */
     KBps = tr_sessionGetRawSpeed_KBps( session, TR_UP );
@@ -144,7 +152,7 @@ gtr_icon_new( TrCore * core)
     app_indicator_set_status( indicator, APP_INDICATOR_STATUS_ACTIVE );
     w = gtr_action_get_widget( "/icon-popup" );
     app_indicator_set_menu( indicator, GTK_MENU ( w ) );
-    g_object_set_data( G_OBJECT( indicator ), "tr-core", core );
+    g_object_set_qdata( G_OBJECT( indicator ), get_core_quark( ), core );
     return indicator;
 }
 #else
@@ -155,7 +163,7 @@ gtr_icon_new( TrCore * core )
     GtkStatusIcon * icon = gtk_status_icon_new_from_icon_name( icon_name );
     g_signal_connect( icon, "activate", G_CALLBACK( activated ), NULL );
     g_signal_connect( icon, "popup-menu", G_CALLBACK( popup ), NULL );
-    g_object_set_data( G_OBJECT( icon ), "tr-core", core );
+    g_object_set_qdata( G_OBJECT( icon ), get_core_quark( ), core );
     return icon;
 }
 

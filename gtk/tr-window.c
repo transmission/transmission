@@ -79,12 +79,18 @@ typedef struct
 }
 PrivateData;
 
-#define PRIVATE_DATA_KEY "private-data"
+static GQuark
+get_private_data_key( void )
+{
+    static GQuark q = 0;
+    if( !q ) q = g_quark_from_static_string( "private-data" );
+    return q;
+}
 
 static PrivateData*
 get_private_data( TrWindow * w )
 {
-    return g_object_get_data ( G_OBJECT( w ), PRIVATE_DATA_KEY );
+    return g_object_get_qdata ( G_OBJECT( w ), get_private_data_key( ) );
 }
 
 /***
@@ -579,8 +585,7 @@ gtr_window_new( GtkUIManager * ui_mgr, TrCore * core )
 
     /* make the window */
     self = gtk_window_new ( GTK_WINDOW_TOPLEVEL );
-    g_object_set_data_full( G_OBJECT(
-                                self ), PRIVATE_DATA_KEY, p, privateFree );
+    g_object_set_qdata_full( G_OBJECT(self), get_private_data_key( ), p, privateFree );
     win = GTK_WINDOW( self );
     gtk_window_set_title( win, g_get_application_name( ) );
     gtk_window_set_role( win, "tr-main" );
