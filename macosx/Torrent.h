@@ -134,7 +134,7 @@
 - (NSMutableArray *) allTrackerStats;
 - (NSArray *) allTrackersFlat; //used by GroupRules
 - (BOOL) addTrackerToNewTier: (NSString *) tracker;
-- (void) removeTrackersWithIdentifiers: (NSIndexSet *) removeIdentifiers;
+- (void) removeTrackers: (NSSet *) trackers;
 
 - (NSString *) comment;
 - (NSString *) creator;

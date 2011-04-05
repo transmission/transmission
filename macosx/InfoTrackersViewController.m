@@ -313,14 +313,14 @@
             if (groupSelected || [selectedIndexes containsIndex: i])
             {
                 Torrent * torrent = [(TrackerNode *)object torrent];
-                NSMutableIndexSet * removeIndexSet;
-                if (!(removeIndexSet = [removeIdentifiers objectForKey: torrent]))
+                NSMutableSet * removeSet;
+                if (!(removeSet = [removeIdentifiers objectForKey: torrent]))
                 {
-                    removeIndexSet = [NSMutableIndexSet indexSet];
-                    [removeIdentifiers setObject: removeIndexSet forKey: torrent];
+                    removeSet = [NSMutableSet set];
+                    [removeIdentifiers setObject: removeSet forKey: torrent];
                 }
                 
-                [removeIndexSet addIndex: [(TrackerNode *)object identifier]];
+                [removeSet addObject: [(TrackerNode *)object fullAnnounceAddress]];
                 ++removeCount;
             }
         }
@@ -370,7 +370,7 @@
     }
     
     for (Torrent * torrent in removeIdentifiers)
-        [torrent removeTrackersWithIdentifiers: [removeIdentifiers objectForKey: torrent]];
+        [torrent removeTrackers: [removeIdentifiers objectForKey: torrent]];
     
     //reset table with either new or old value
     [fTrackers release];

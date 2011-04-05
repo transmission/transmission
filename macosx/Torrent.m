@@ -699,7 +699,7 @@ int trashDataFile(const char * filename)
     return success;
 }
 
-- (void) removeTrackersWithIdentifiers: (NSIndexSet *) removeIdentifiers
+- (void) removeTrackers: (NSSet *) trackers
 {
     //recreate the tracker structure
     tr_tracker_info * trackerStructs = tr_new(tr_tracker_info, fInfo->trackerCount);
@@ -707,7 +707,7 @@ int trashDataFile(const char * filename)
     NSUInteger newCount = 0;
     for (NSUInteger i = 0; i < fInfo->trackerCount; i++)
     {
-        if (![removeIdentifiers containsIndex: fInfo->trackers[i].id])
+        if (![trackers containsObject: [NSString stringWithUTF8String: fInfo->trackers[i].announce]])
             trackerStructs[newCount++] = fInfo->trackers[i];
     }
     
