@@ -37,9 +37,12 @@ node_alloc( void )
 static void
 node_free( tr_list* node )
 {
-    *node = TR_LIST_CLEAR;
-    node->next = recycled_nodes;
-    recycled_nodes = node;
+    if( node != NULL )
+    {
+        *node = TR_LIST_CLEAR;
+        node->next = recycled_nodes;
+        recycled_nodes = node;
+    }
 }
 
 /***
