@@ -56,13 +56,6 @@ countArray( const tr_bitfield * b )
     return ret;
 }
 
-size_t
-tr_bitfieldCountTrueBits( const tr_bitfield * b )
-{
-    assert( b->true_count == ( b->bit_count ? tr_bitfieldCountRange( b, 0, b->bit_count ) : countArray ( b ) ) );
-    return b->true_count;
-}
-
 static size_t
 countRange( const tr_bitfield * b, size_t begin, size_t end )
 {
@@ -146,6 +139,13 @@ tr_bitfieldIsValid( const tr_bitfield * b )
     assert( ( b->alloc_count == 0 ) == ( b->bits == 0 ) );
     assert( !b->bits || ( b->true_count == countArray ( b ) ) );
     return true;
+}
+
+size_t
+tr_bitfieldCountTrueBits( const tr_bitfield * b )
+{
+    tr_bitfieldIsValid( b );
+    return b->true_count;
 }
 
 static size_t
