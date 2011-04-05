@@ -1210,8 +1210,8 @@ tr_peerIoTryWrite( tr_peerIo * io, size_t howmuch )
                 char errstr[512];
                 const short what = BEV_EVENT_WRITING | BEV_EVENT_ERROR;
 
-                tr_net_strerror( errstr, sizeof( errstr ), e );
-                dbgmsg( io, "tr_peerIoTryWrite got an error. res is %d, what is %hd, errno is %d (%s)", n, what, e, errstr );
+                dbgmsg( io, "tr_peerIoTryWrite got an error. res is %d, what is %hd, errno is %d (%s)",
+                        n, what, e, tr_net_strerror( errstr, sizeof( errstr ), e ) );
 
                 if( io->gotError != NULL )
                     io->gotError( io, what, io->userData );
