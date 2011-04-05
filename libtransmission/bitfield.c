@@ -303,15 +303,12 @@ tr_bitfieldSetRaw( tr_bitfield * b, const void * bits, size_t byte_count )
 void
 tr_bitfieldAdd( tr_bitfield * b, size_t nth )
 {
-    assert( tr_bitfieldIsValid(  b ) );
-
     if( !tr_bitfieldHas( b, nth ) )
     {
         tr_bitfieldEnsureBitsAlloced( b, nth );
         b->bits[nth >> 3u] |= ( 0x80 >> ( nth & 7u ) );
         tr_bitfieldIncTrueCount( b, 1 );
     }
-    assert( tr_bitfieldIsValid(  b ) );
 }
 
 /* Sets bit range [begin, end) to 1 */
