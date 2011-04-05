@@ -243,8 +243,8 @@ event_read_cb( int fd, short event UNUSED, void * vio )
             what |= BEV_EVENT_ERROR;
         }
 
-        tr_net_strerror( errstr, sizeof( errstr ), e );
-        dbgmsg( io, "event_read_cb got an error. res is %d, what is %hd, errno is %d (%s)", res, what, e, errstr );
+        dbgmsg( io, "event_read_cb got an error. res is %d, what is %hd, errno is %d (%s)",
+                res, what, e, tr_net_strerror( errstr, sizeof( errstr ), e ) );
 
         if( io->gotError != NULL )
             io->gotError( io, what, io->userData );
@@ -1166,8 +1166,8 @@ tr_peerIoTryRead( tr_peerIo * io, size_t howmuch )
                 short what = BEV_EVENT_READING | BEV_EVENT_ERROR;
                 if( res == 0 )
                     what |= BEV_EVENT_EOF;
-                tr_net_strerror( errstr, sizeof( errstr ), e );
-                dbgmsg( io, "tr_peerIoTryRead got an error. res is %d, what is %hd, errno is %d (%s)", res, what, e, errstr );
+                dbgmsg( io, "tr_peerIoTryRead got an error. res is %d, what is %hd, errno is %d (%s)",
+                        res, what, e, tr_net_strerror( errstr, sizeof( errstr ), e ) );
                 io->gotError( io, what, io->userData );
             }
         }
