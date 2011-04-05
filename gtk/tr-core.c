@@ -224,8 +224,7 @@ core_init( GTypeInstance * instance, gpointer g_class UNUSED )
 
     /* column types for the model used to store torrent information */
     /* keep this in sync with the enum near the bottom of tr_core.h */
-    GType types[] = { G_TYPE_STRING,    /* name */
-                      G_TYPE_STRING,    /* collated name */
+    GType types[] = { G_TYPE_STRING,    /* collated name */
                       G_TYPE_POINTER,   /* tr_torrent* */
                       G_TYPE_INT,       /* torrent id */
                       G_TYPE_DOUBLE,    /* tr_stat.pieceUploadSpeed_KBps */
@@ -1006,13 +1005,11 @@ gtr_core_add_torrent( TrCore * core, tr_torrent * tor, gboolean do_notify )
     {
         GtkTreeIter unused;
         const tr_stat * st = tr_torrentStat( tor );
-        const char * name = tr_torrentName( tor );
         char * collated = get_collated_name( tor );
         const unsigned int trackers_hash = build_torrent_trackers_hash( tor );
         GtkListStore * store = GTK_LIST_STORE( core_raw_model( core ) );
 
         gtk_list_store_insert_with_values( store, &unused, 0,
-            MC_NAME,              name,
             MC_NAME_COLLATED,     collated,
             MC_TORRENT,           tor,
             MC_TORRENT_ID,        tr_torrentId( tor ),
@@ -1027,7 +1024,7 @@ gtr_core_add_torrent( TrCore * core, tr_torrent * tor, gboolean do_notify )
             -1 );
 
         if( do_notify )
-            gtr_notify_torrent_added( name );
+            gtr_notify_torrent_added( tr_torrentName( tor ) );
 
         tr_torrentSetMetadataCallback( tor, on_torrent_metadata_changed, core );
         tr_torrentSetCompletenessCallback( tor, on_torrent_completeness_changed, core );

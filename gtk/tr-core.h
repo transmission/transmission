@@ -183,7 +183,6 @@ void gtr_core_open_folder( TrCore * core, int torrent_id );
 /* keep this in sync with the type array in tr_core_init() in tr_core.c */
 enum
 {
-    MC_NAME,
     MC_NAME_COLLATED,
     MC_TORRENT,
     MC_TORRENT_ID,
