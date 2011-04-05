@@ -2925,7 +2925,10 @@ rechokeDownloads( Torrent * t )
                     bad[badCount++] = peer;
             }
 
-            tr_removeElementFromArray( peers, i, sizeof(tr_peer*), n-- );
+            /* remove 'peer' from the array 'peers' */
+            if( i != n - 1 )
+                peers[i] = peers[n-1];
+            --n;
         }
 
         tr_free( peers );
