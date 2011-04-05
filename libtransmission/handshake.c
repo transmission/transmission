@@ -571,16 +571,13 @@ readPadD( tr_handshake *    handshake,
           struct evbuffer * inbuf )
 {
     const size_t needlen = handshake->pad_d_len;
-    uint8_t *    tmp;
 
     dbgmsg( handshake, "pad d: need %zu, got %zu",
             needlen, evbuffer_get_length( inbuf ) );
     if( evbuffer_get_length( inbuf ) < needlen )
         return READ_LATER;
 
-    tmp = tr_new( uint8_t, needlen );
-    tr_peerIoReadBytes( handshake->io, inbuf, tmp, needlen );
-    tr_free( tmp );
+    tr_peerIoDrain( handshake->io, inbuf, needlen );
 
     tr_peerIoSetEncryption( handshake->io, handshake->crypto_select );
 
