@@ -599,7 +599,7 @@ readHandshake( tr_handshake *    handshake,
                struct evbuffer * inbuf )
 {
     uint8_t   pstrlen;
-    uint8_t * pstr;
+    uint8_t   pstr[20];
     uint8_t   reserved[HANDSHAKE_FLAGS_LEN];
     uint8_t   hash[SHA_DIGEST_LENGTH];
 
@@ -649,15 +649,11 @@ readHandshake( tr_handshake *    handshake,
     evbuffer_drain( inbuf, 1 );
 
     /* pstr (BitTorrent) */
-    pstr = tr_new( uint8_t, pstrlen + 1 );
+    assert( pstrlen == 19 );
     tr_peerIoReadBytes( handshake->io, inbuf, pstr, pstrlen );
     pstr[pstrlen] = '\0';
-    if( strcmp( (char*)pstr, "BitTorrent protocol" ) )
-    {
-        tr_free( pstr );
+    if( memcmp( pstr, "BitTorrent protocol", 19 ) )
         return tr_handshakeDone( handshake, false );
-    }
-    tr_free( pstr );
 
     /* reserved bytes */
     tr_peerIoReadBytes( handshake->io, inbuf, reserved, sizeof( reserved ) );
