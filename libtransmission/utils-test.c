@@ -385,6 +385,16 @@ test_url( void )
     char * str;
     const char * url;
 
+    url = "http://1";
+    check( !tr_urlParse( url, -1, &scheme, &host, &port, &path ) );
+    check( !strcmp( scheme, "http" ) )
+    check( !strcmp( host, "1" ) )
+    check( !strcmp( path, "/" ) )
+    check( port == 80 )
+    tr_free( scheme );
+    tr_free( path );
+    tr_free( host );
+
     url = "http://www.some-tracker.org/some/path";
     check( !tr_urlParse( url, -1, &scheme, &host, &port, &path ) )
     check( !strcmp( scheme, "http" ) )

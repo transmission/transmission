@@ -1030,7 +1030,8 @@ tr_urlParse( const char * url_in,
             host = pch;
             host_len = n;
             pch += n;
-            *pch++ = '\0';
+            if( pch && *pch )
+                *pch++ = '\0';
 /*fprintf( stderr, "host is [%s]... what's left is [%s]\n", host, pch );*/
             if( havePort )
             {
@@ -1061,7 +1062,8 @@ tr_urlParse( const char * url_in,
 
         if( setme_host ){ ( (char*)host )[-3] = ':'; *setme_host =
                               tr_strndup( host, host_len ); }
-        if( setme_path ){ if( path[0] == '/' ) *setme_path = tr_strdup( path );
+        if( setme_path ){ if( !*path ) *setme_path = tr_strdup( "/" );
+                          else if( path[0] == '/' ) *setme_path = tr_strdup( path );
                           else { ( (char*)path )[-1] = '/'; *setme_path = tr_strdup( path - 1 ); } }
         if( setme_port ) *setme_port = port;
     }
