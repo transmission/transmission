@@ -235,7 +235,7 @@ core_init( GTypeInstance * instance, gpointer g_class UNUSED )
                       G_TYPE_INT,       /* tr_stat.activity */
                       G_TYPE_UCHAR,     /* tr_stat.finished */
                       G_TYPE_CHAR,      /* tr_priority_t */
-                      G_TYPE_STRING,    /* concatenated trackers string */
+                      G_TYPE_UINT,      /* build_torrent_trackers_hash() */
                       G_TYPE_INT,       /* MC_ERROR */
                       G_TYPE_INT };     /* MC_ACTIVE_PEER_COUNT */
 
@@ -909,17 +909,19 @@ get_collated_name( const tr_torrent * tor )
     return collated;
 }
 
-static char *
-build_torrent_tracker_string( tr_torrent * tor )
+static unsigned int
+build_torrent_trackers_hash( tr_torrent * tor )
 {
     int i;
-    GString * str = g_string_new( NULL );
-    const tr_info * inf = tr_torrentInfo( tor );
+    const char * pch;
+    uint64_t hash = 0;
+    const tr_info * const inf = tr_torrentInfo( tor );
 
     for( i=0; i<inf->trackerCount; ++i )
-        g_string_append( str, inf->trackers[i].announce );
+        for( pch=inf->trackers[i].announce; *pch; ++pch )
+            hash = (hash<<4) ^ (hash>>28) ^ *pch;
 
-    return g_string_free( str, FALSE );
+    return hash;
 }
 
 static gboolean
@@ -939,7 +941,7 @@ gtr_core_add_torrent( TrCore * core, tr_torrent * tor, gboolean do_notify )
         const tr_stat * st = tr_torrentStat( tor );
         const char * name = tr_torrentName( tor );
         char * collated = get_collated_name( tor );
-        char * trackers = build_torrent_tracker_string( tor );
+        const unsigned int trackers_hash = build_torrent_trackers_hash( tor );
         GtkListStore * store = GTK_LIST_STORE( core_raw_model( core ) );
 
         gtk_list_store_insert_with_values( store, &unused, 0,
@@ -954,7 +956,7 @@ gtr_core_add_torrent( TrCore * core, tr_torrent * tor, gboolean do_notify )
             MC_ACTIVITY,          st->activity,
             MC_FINISHED,          st->finished,
             MC_PRIORITY,          tr_torrentGetPriority( tor ),
-            MC_TRACKERS,          trackers,
+            MC_TRACKERS,          trackers_hash,
             -1 );
 
         if( do_notify )
@@ -964,7 +966,6 @@ gtr_core_add_torrent( TrCore * core, tr_torrent * tor, gboolean do_notify )
 
         /* cleanup */
         g_free( collated );
-        g_free( trackers );
     }
 }
 
@@ -1368,7 +1369,7 @@ update_foreach( GtkTreeModel * model,
     bool oldFinished, newFinished;
     tr_priority_t oldPriority, newPriority;
     char * oldCollatedName, * newCollatedName;
-    char * oldTrackers, * newTrackers;
+    unsigned int oldTrackers, newTrackers;
     double oldUpSpeed, newUpSpeed;
     double oldDownSpeed, newDownSpeed;
     double oldRecheckProgress, newRecheckProgress;
@@ -1398,7 +1399,7 @@ update_foreach( GtkTreeModel * model,
     newActivity = st->activity;
     newFinished = st->finished;
     newPriority = tr_torrentGetPriority( tor );
-    newTrackers = build_torrent_tracker_string( tor );
+    newTrackers = build_torrent_trackers_hash( tor );
     newUpSpeed = st->pieceUploadSpeed_KBps;
     newDownSpeed = st->pieceDownloadSpeed_KBps;
     newRecheckProgress = st->recheckProgress;
@@ -1414,7 +1415,7 @@ update_foreach( GtkTreeModel * model,
         || ( newPriority != oldPriority )
         || ( newError != oldError )
         || ( newActivePeerCount != oldActivePeerCount )
-        || tr_strcmp0( oldTrackers, newTrackers )
+        || ( newTrackers != oldTrackers )
         || tr_strcmp0( oldCollatedName, newCollatedName )
         || gtr_compare_double( newUpSpeed, oldUpSpeed, 3 )
         || gtr_compare_double( newDownSpeed, oldDownSpeed, 3 )
@@ -1438,8 +1439,6 @@ update_foreach( GtkTreeModel * model,
     /* cleanup */
     g_free( newCollatedName );
     g_free( oldCollatedName );
-    g_free( newTrackers );
-    g_free( oldTrackers );
     return FALSE;
 }
 
