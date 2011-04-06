@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string.h> /* memset() */
 
 #include "transmission.h"
 #include "history.h"
@@ -34,7 +35,8 @@ test1( void )
 {
     tr_recentHistory h;
 
-    tr_historyConstruct( &h, 60, 10 );
+    memset( &h, 0, sizeof( tr_recentHistory ) );
+
     tr_historyAdd( &h, 10000, 1 );
     check( (int)tr_historyGet( &h, 12000, 1000 ) == 0 )
     check( (int)tr_historyGet( &h, 12000, 3000 ) == 1 )
@@ -44,7 +46,6 @@ test1( void )
     check( (int)tr_historyGet( &h, 22000,  3000 ) == 1 )
     check( (int)tr_historyGet( &h, 22000, 15000 ) == 2 )
     check( (int)tr_historyGet( &h, 22000, 20000 ) == 2 )
-    tr_historyDestruct( &h );
 
     return 0;
 }

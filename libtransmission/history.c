@@ -20,10 +20,10 @@
 void
 tr_historyAdd( tr_recentHistory * h, time_t now, unsigned int n )
 {
-    if( h->slices[h->newest].date + (time_t)h->precision >= now )
+    if( h->slices[h->newest].date == now )
         h->slices[h->newest].n += n;
     else {
-        if( ++h->newest == h->sliceCount ) h->newest = 0;
+        if( ++h->newest == TR_RECENT_HISTORY_PERIOD_SEC ) h->newest = 0;
         h->slices[h->newest].date = now;
         h->slices[h->newest].n = n;
     }
@@ -43,27 +43,9 @@ tr_historyGet( const tr_recentHistory * h, time_t now, unsigned int sec )
 
         n += h->slices[i].n;
 
-        if( --i == -1 ) i = h->sliceCount - 1; /* circular history */
+        if( --i == -1 ) i = TR_RECENT_HISTORY_PERIOD_SEC - 1; /* circular history */
         if( i == h->newest ) break; /* we've come all the way around */
     }
 
     return n;
-}
-
-void
-tr_historyConstruct( tr_recentHistory * h, unsigned int seconds, unsigned int precision )
-{
-    memset( h, 0, sizeof( tr_recentHistory ) );
-
-    assert( precision <= seconds );
-
-    h->precision = precision;
-    h->sliceCount = seconds / precision;
-    h->slices = tr_new0( struct tr_history_slice, h->sliceCount );
-}
-
-void
-tr_historyDestruct( tr_recentHistory * h )
-{
-    tr_free( h->slices );
 }
