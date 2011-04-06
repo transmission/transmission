@@ -170,7 +170,6 @@ tr_bitfieldGetRaw( const tr_bitfield * b, size_t * byte_count )
     uint8_t * bits = tr_new0( uint8_t, n );
 
     assert( b->bit_count > 0 );
-    assert( n >= b->alloc_count );
 
     if( b->alloc_count )
         memcpy( bits, b->bits, b->alloc_count );
