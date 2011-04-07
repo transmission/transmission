@@ -803,6 +803,9 @@
 
 - (NSAttributedString *) attributedStatusString: (NSString *) string
 {
+    #warning we shouldn't have to do this
+    if (!string)
+        string = @"";
     return [[[NSAttributedString alloc] initWithString: string attributes: fStatusAttributes] autorelease];
 }
 
