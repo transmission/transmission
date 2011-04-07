@@ -965,6 +965,7 @@ on_announce_error( tr_tier * tier, const char * err, tr_announce_event e )
     /* schedule a reannounce */
     interval = getRetryInterval( tier->currentTracker );
     dbgmsg( tier, "Retrying announce in %d seconds.", interval );
+    tr_torinf( tier->tor, "Retrying scrape in %d seconds.", interval );
     tier_announce_event_push( tier, e, tr_time( ) + interval );
 }
 
@@ -1184,6 +1185,7 @@ on_scrape_error( tr_tier * tier, const char * errmsg )
     /* schedule a rescrape */
     interval = getRetryInterval( tier->currentTracker );
     dbgmsg( tier, "Retrying scrape in %d seconds.", interval );
+    tr_torinf( tier->tor, "Retrying scrape in %d seconds.", interval );
     tier->lastScrapeSucceeded = false;
     tier->scrapeAt = get_next_scrape_time( interval );
 }
@@ -1447,6 +1449,7 @@ announceMore( tr_announcer * announcer )
     n = MIN( tr_ptrArraySize( &announceMe ), announcer->slotsAvailable );
     for( i=0; i<n; ++i ) {
         tr_tier * tier = tr_ptrArrayNth( &announceMe, i );
+        tr_tordbg( tier->tor, "%s", "Announcing to tracker" );
         dbgmsg( tier, "announcing tier %d of %d", i, n );
         tierAnnounce( announcer, tier );
     }
