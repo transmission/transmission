@@ -300,7 +300,7 @@ get_next_scrape_time( int interval )
     const time_t now = tr_time( );
 
     /* Add the interval, and then increment to the nearest 10th second.
-     * The latter step is to increas the odds of several torrents coming
+     * The latter step is to increase the odds of several torrents coming
      * due at the same time to improve multiscrape. */
     return (now+interval) + (10-((now+interval)%10));
 }
