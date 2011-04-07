@@ -1183,7 +1183,7 @@ on_scrape_error( tr_tier * tier, const char * errmsg )
     tierIncrementTracker( tier );
 
     /* schedule a rescrape */
-    interval = getRetryInterval( tier->currentTracker );
+    interval = get_next_scrape_time( getRetryInterval( tier->currentTracker ) );
     dbgmsg( tier, "Retrying scrape in %d seconds.", interval );
     tr_torinf( tier->tor, "Retrying scrape in %d seconds.", interval );
     tier->lastScrapeSucceeded = false;
