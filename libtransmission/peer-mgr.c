@@ -3320,12 +3320,15 @@ removeAllPeers( Torrent * t )
 static void
 closeBadPeers( Torrent * t, const time_t now_sec )
 {
-    int i;
-    int peerCount;
-    struct tr_peer ** peers = getPeersToClose( t, now_sec, &peerCount );
-    for( i=0; i<peerCount; ++i )
-        closePeer( t, peers[i] );
-    tr_free( peers );
+    if( !tr_ptrArrayEmpty( &t->peers ) )
+    {
+        int i;
+        int peerCount;
+        struct tr_peer ** peers = getPeersToClose( t, now_sec, &peerCount );
+        for( i=0; i<peerCount; ++i )
+            closePeer( t, peers[i] );
+        tr_free( peers );
+    }
 }
 
 struct peer_liveliness
