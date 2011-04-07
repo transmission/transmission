@@ -196,29 +196,32 @@ NSMutableSet * fTrackerIconLoading;
 
 - (NSImage *) favIcon
 {
+    id icon = nil;
     NSURL * address = [NSURL URLWithString: [(TrackerNode *)[self objectValue] fullAnnounceAddress]];
-    NSString * host = [address host];
-    
-    //don't try to parse ip address
-    const BOOL separable = !tr_addressIsIP([host UTF8String]);
-    
-    NSArray * hostComponents = separable ? [host componentsSeparatedByString: @"."] : nil;
-    
-    //let's try getting the tracker address without using any subdomains
-    NSString * baseAddress;
-    if (separable && [hostComponents count] > 1)
-        baseAddress = [NSString stringWithFormat: @"http://%@.%@",
-                        [hostComponents objectAtIndex: [hostComponents count]-2], [hostComponents lastObject]];
-    else
-        baseAddress = [NSString stringWithFormat: @"http://%@", host];
-    
-    id icon = [fTrackerIconCache objectForKey: baseAddress];
-    if (!icon && ![fTrackerIconLoading containsObject: baseAddress])
+    NSString * host;
+    if ((host = [address host]))
     {
-        [fTrackerIconLoading addObject: baseAddress];
-        [NSThread detachNewThreadSelector: @selector(loadTrackerIcon:) toTarget: self withObject: baseAddress];
+        //don't try to parse ip address
+        const BOOL separable = !tr_addressIsIP([host UTF8String]);
+        
+        NSArray * hostComponents = separable ? [host componentsSeparatedByString: @"."] : nil;
+        
+        //let's try getting the tracker address without using any subdomains
+        NSString * baseAddress;
+        if (separable && [hostComponents count] > 1)
+            baseAddress = [NSString stringWithFormat: @"http://%@.%@",
+                            [hostComponents objectAtIndex: [hostComponents count]-2], [hostComponents lastObject]];
+        else
+            baseAddress = [NSString stringWithFormat: @"http://%@", host];
+        
+        icon = [fTrackerIconCache objectForKey: baseAddress];
+        if (!icon && ![fTrackerIconLoading containsObject: baseAddress])
+        {
+            [fTrackerIconLoading addObject: baseAddress];
+            [NSThread detachNewThreadSelector: @selector(loadTrackerIcon:) toTarget: self withObject: baseAddress];
+        }
     }
-    
+        
     return (icon && icon != [NSNull null]) ? icon : [NSImage imageNamed: @"FavIcon.png"];
 }
 
