@@ -1051,13 +1051,17 @@ evbuffer_add_uint64( struct evbuffer * outbuf, uint64_t addme_hll )
 void
 tr_peerIoReadBytesToBuf( tr_peerIo * io, struct evbuffer * inbuf, struct evbuffer * outbuf, size_t byteCount )
 {
+    struct evbuffer * tmp;
     const size_t old_length = evbuffer_get_length( outbuf );
 
     assert( tr_isPeerIo( io ) );
     assert( evbuffer_get_length( inbuf )  >= byteCount );
 
     /* append it to outbuf */
-    evbuffer_remove_buffer( inbuf, outbuf, byteCount );
+    tmp = evbuffer_new( );
+    evbuffer_remove_buffer( inbuf, tmp, byteCount );
+    evbuffer_add_buffer( outbuf, tmp );
+    evbuffer_free( tmp );
 
     /* decrypt if needed */
     if( io->encryption_type == PEER_ENCRYPTION_RC4 ) {
