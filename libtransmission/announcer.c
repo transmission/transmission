@@ -968,7 +968,7 @@ on_announce_error( tr_tier * tier, const char * err, tr_announce_event e )
     /* schedule a reannounce */
     interval = getRetryInterval( tier->currentTracker );
     dbgmsg( tier, "Retrying announce in %d seconds.", interval );
-    tr_torinf( tier->tor, "Retrying scrape in %d seconds.", interval );
+    tr_torinf( tier->tor, "Retrying announce in %d seconds.", interval );
     tier_announce_event_push( tier, e, tr_time( ) + interval );
 }
 
