@@ -1168,7 +1168,7 @@ tierAnnounce( tr_announcer * announcer, tr_tier * tier )
 static void
 on_scrape_error( tr_tier * tier, const char * errmsg )
 {
-    int interval;
+    time_t interval;
 
     /* increment the error count */
     if( tier->currentTracker != NULL )
@@ -1184,8 +1184,8 @@ on_scrape_error( tr_tier * tier, const char * errmsg )
 
     /* schedule a rescrape */
     interval = get_next_scrape_time( getRetryInterval( tier->currentTracker ) );
-    dbgmsg( tier, "Retrying scrape in %d seconds.", interval );
-    tr_torinf( tier->tor, "Retrying scrape in %d seconds.", interval );
+    dbgmsg( tier, "Retrying scrape in %zu seconds.", (size_t)interval );
+    tr_torinf( tier->tor, "Retrying scrape in %zu seconds.", (size_t)interval );
     tier->lastScrapeSucceeded = false;
     tier->scrapeAt = get_next_scrape_time( interval );
 }
