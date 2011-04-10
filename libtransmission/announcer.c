@@ -1190,7 +1190,7 @@ on_scrape_error( tr_tier * tier, const char * errmsg )
     dbgmsg( tier, "Retrying scrape in %zu seconds.", (size_t)interval );
     tr_torinf( tier->tor, "Retrying scrape in %zu seconds.", (size_t)interval );
     tier->lastScrapeSucceeded = false;
-    tier->scrapeAt = get_next_scrape_time( interval );
+    tier->scrapeAt = interval;
 }
 
 static tr_tier *
