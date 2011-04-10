@@ -31,8 +31,8 @@
 struct evbuffer;
 struct tr_bandwidth;
 struct tr_crypto;
+struct tr_datatype;
 struct tr_peerIo;
-struct tr_list;
 
 /**
  * @addtogroup networked_io Networked IO
@@ -111,7 +111,7 @@ typedef struct tr_peerIo
 
     struct evbuffer     * inbuf;
     struct evbuffer     * outbuf;
-    struct tr_list      * outbuf_datatypes; /* struct tr_datatype */
+    struct tr_datatype  * outbuf_datatypes;
 
     struct event        * event_read;
     struct event        * event_write;

@@ -24,7 +24,6 @@
 #include "session.h"
 #include "bandwidth.h"
 #include "crypto.h"
-#include "list.h"
 #include "net.h"
 #include "peer-common.h" /* MAX_BLOCK_SIZE */
 #include "peer-io.h"
@@ -77,12 +76,69 @@ guessPacketOverhead( size_t d )
             tr_deepLog( __FILE__, __LINE__, tr_peerIoGetAddrStr( io ), __VA_ARGS__ ); \
     } while( 0 )
 
+/**
+***
+**/
+
 struct tr_datatype
 {
-    bool    isPieceData;
-    size_t  length;
+    struct tr_datatype * next;
+    size_t length;
+    bool isPieceData;
 };
 
+static struct tr_datatype * datatype_pool = NULL;
+
+static const struct tr_datatype TR_DATATYPE_INIT = { NULL, 0, false };
+
+static struct tr_datatype *
+datatype_new( void )
+{
+    struct tr_datatype * ret;
+
+    if( datatype_pool == NULL )
+        ret = tr_new( struct tr_datatype, 1 );
+    else {
+        ret = datatype_pool;
+        datatype_pool = datatype_pool->next;
+    }
+
+    *ret = TR_DATATYPE_INIT;
+    return ret;
+}
+
+static void
+datatype_free( struct tr_datatype * datatype )
+{
+    datatype->next = datatype_pool;
+    datatype_pool = datatype;
+}
+
+static void
+peer_io_pull_datatype( tr_peerIo * io )
+{
+    struct tr_datatype * tmp;
+
+    if(( tmp = io->outbuf_datatypes ))
+    {
+        io->outbuf_datatypes = tmp->next;
+        datatype_free( tmp );
+    }
+}
+
+static void
+peer_io_push_datatype( tr_peerIo * io, struct tr_datatype * datatype )
+{
+    struct tr_datatype * tmp;
+
+    if(( tmp = io->outbuf_datatypes )) {
+        while( tmp->next != NULL )
+            tmp = tmp->next;
+        tmp->next = datatype;
+    } else {
+        io->outbuf_datatypes = datatype;
+    }
+}
 
 /***
 ****
@@ -93,7 +149,7 @@ didWriteWrapper( tr_peerIo * io, unsigned int bytes_transferred )
 {
      while( bytes_transferred && tr_isPeerIo( io ) )
      {
-        struct tr_datatype * next = io->outbuf_datatypes->data;
+        struct tr_datatype * next = io->outbuf_datatypes;
 
         const unsigned int payload = MIN( next->length, bytes_transferred );
         /* For uTP sockets, the overhead is computed in utp_on_overhead. */
@@ -113,10 +169,8 @@ didWriteWrapper( tr_peerIo * io, unsigned int bytes_transferred )
         {
             bytes_transferred -= payload;
             next->length -= payload;
-            if( !next->length ) {
-                tr_list_pop_front( &io->outbuf_datatypes );
-                tr_free( next );
-            }
+            if( !next->length )
+                peer_io_pull_datatype( io );
         }
     }
 }
@@ -755,7 +809,9 @@ io_dtor( void * vio )
     evbuffer_free( io->inbuf );
     io_close_socket( io );
     tr_cryptoFree( io->crypto );
-    tr_list_free( &io->outbuf_datatypes, tr_free );
+
+    while( io->outbuf_datatypes != NULL )
+        peer_io_pull_datatype( io );
 
     memset( io, ~0, sizeof( tr_peerIo ) );
     tr_free( io );
@@ -973,11 +1029,10 @@ static void
 addDatatype( tr_peerIo * io, size_t byteCount, bool isPieceData )
 {
     struct tr_datatype * d;
-
-    d = tr_new( struct tr_datatype, 1 );
+    d = datatype_new( );
     d->isPieceData = isPieceData != 0;
     d->length = byteCount;
-    tr_list_append( &io->outbuf_datatypes, d );
+    peer_io_push_datatype( io, d );
 }
 
 static void
@@ -1055,7 +1110,7 @@ tr_peerIoReadBytesToBuf( tr_peerIo * io, struct evbuffer * inbuf, struct evbuffe
     const size_t old_length = evbuffer_get_length( outbuf );
 
     assert( tr_isPeerIo( io ) );
-    assert( evbuffer_get_length( inbuf )  >= byteCount );
+    assert( evbuffer_get_length( inbuf ) >= byteCount );
 
     /* append it to outbuf */
     tmp = evbuffer_new( );
@@ -1248,19 +1303,15 @@ int
 tr_peerIoFlushOutgoingProtocolMsgs( tr_peerIo * io )
 {
     size_t byteCount = 0;
-    tr_list * it;
+    const struct tr_datatype * it;
 
     /* count up how many bytes are used by non-piece-data messages
        at the front of our outbound queue */
     for( it=io->outbuf_datatypes; it!=NULL; it=it->next )
-    {
-        struct tr_datatype * d = it->data;
-
-        if( d->isPieceData )
+        if( it->isPieceData )
             break;
-
-        byteCount += d->length;
-    }
+        else
+            byteCount += it->length;
 
     return tr_peerIoFlush( io, TR_UP, byteCount );
 }
