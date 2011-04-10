@@ -234,7 +234,6 @@ buildHandshakeMessage( tr_handshake * handshake, uint8_t * buf )
     memcpy( walk, peer_id, PEER_ID_LEN );
     walk += PEER_ID_LEN;
 
-    assert( strlen( ( const char* )peer_id ) == PEER_ID_LEN );
     assert( walk - buf == HANDSHAKE_SIZE );
 }
 
