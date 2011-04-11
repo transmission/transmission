@@ -1625,6 +1625,7 @@ copy_tier_attributes_impl( struct tr_tier * tgt, int trackerIndex, const tr_tier
     /* ...fix the fields that can't be cleanly bitwise-copied */
     tgt->wasCopied = true;
     tgt->trackers = keep.trackers;
+    tgt->tracker_count = keep.tracker_count;
     tgt->announce_events = tr_memdup( src->announce_events, sizeof( tr_announce_event ) * src->announce_event_count );
     tgt->announce_event_count = src->announce_event_count;
     tgt->announce_event_alloc = src->announce_event_count;
