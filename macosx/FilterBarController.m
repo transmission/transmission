@@ -103,6 +103,10 @@
     }
     [[fSearchField cell] setPlaceholderString: filterSearchTypeTitle];
     
+    NSString * searchString;
+    if ((searchString = [[NSUserDefaults standardUserDefaults] stringForKey: @"FilterSearchString"]))
+        [fSearchField setStringValue: searchString];
+    
     [self updateGroupsButton];
     
     [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(resizeBar)
@@ -184,6 +188,7 @@
 
 - (void) setSearchText: (id) sender
 {
+    [[NSUserDefaults standardUserDefaults] setObject: [fSearchField stringValue] forKey: @"FilterSearchString"];
     [[NSNotificationCenter defaultCenter] postNotificationName: @"ApplyFilter" object: nil];
 }
 

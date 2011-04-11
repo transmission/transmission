@@ -2943,6 +2943,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     {
         [[NSUserDefaults standardUserDefaults] setObject: FILTER_NONE forKey: @"Filter"];
         [[NSUserDefaults standardUserDefaults] setInteger: GROUP_FILTER_ALL_TAG forKey: @"FilterGroup"];
+        [[NSUserDefaults standardUserDefaults] removeObjectForKey: @"FilterSearchString"];
     }
     
     [self applyFilter]; //do even if showing to ensure tooltips are updated
