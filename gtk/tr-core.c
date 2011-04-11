@@ -451,7 +451,7 @@ compare_time( time_t a, time_t b )
 static int
 compare_by_name( GtkTreeModel * m, GtkTreeIter * a, GtkTreeIter * b, gpointer user_data UNUSED )
 {
-    char *ca, *cb;
+    const char *ca, *cb;
     gtk_tree_model_get( m, a, MC_NAME_COLLATED, &ca, -1 );
     gtk_tree_model_get( m, b, MC_NAME_COLLATED, &cb, -1 );
     return tr_strcmp0( ca, cb );
