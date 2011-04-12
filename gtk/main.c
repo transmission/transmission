@@ -69,14 +69,12 @@
 #define MY_CONFIG_NAME "transmission"
 #define MY_READABLE_NAME "transmission-gtk"
 
-#if GTK_CHECK_VERSION( 2, 8, 0 )
- #define SHOW_LICENSE
+#define SHOW_LICENSE
 static const char * LICENSE =
 "The OS X client, CLI client, and parts of libtransmission are licensed under the terms of the MIT license.\n\n"
 "The Transmission daemon, GTK+ client, Qt client, Web client, and most of libtransmission are licensed under the terms of the GNU GPL version 2, with two special exceptions:\n\n"
 "1. The MIT-licensed portions of Transmission listed above are exempt from GPLv2 clause 2(b) and may retain their MIT license.\n\n"
 "2. Permission is granted to link the code in this release with the OpenSSL project's 'OpenSSL' library and to distribute the linked executables. Works derived from Transmission may, at their authors' discretion, keep or delete this exception.";
-#endif
 
 struct cbdata
 {
@@ -104,11 +102,7 @@ struct cbdata
 static void
 gtr_window_present( GtkWindow * window )
 {
-#if GTK_CHECK_VERSION( 2, 8, 0 )
     gtk_window_present_with_time( window, gtk_get_current_event_time( ) );
-#else
-    gtk_window_present( window );
-#endif
 }
 
 /***
@@ -1322,7 +1316,6 @@ on_core_error( TrCore * core UNUSED, guint code, const char * msg, struct cbdata
     }
 }
 
-#if GTK_CHECK_VERSION( 2, 8, 0 )
 static gboolean
 on_main_window_focus_in( GtkWidget      * widget UNUSED,
                          GdkEventFocus  * event  UNUSED,
@@ -1335,20 +1328,16 @@ on_main_window_focus_in( GtkWidget      * widget UNUSED,
     return FALSE;
 }
 
-#endif
-
 static void
 on_add_torrent( TrCore * core, tr_ctor * ctor, gpointer gdata )
 {
     struct cbdata * cbdata = gdata;
     GtkWidget * w = gtr_torrent_options_dialog_new( cbdata->wind, core, ctor );
 
-#if GTK_CHECK_VERSION( 2, 8, 0 )
     g_signal_connect( w, "focus-in-event",
                       G_CALLBACK( on_main_window_focus_in ),  cbdata );
     if( cbdata->wind )
         gtk_window_set_urgency_hint( cbdata->wind, TRUE );
-#endif
 
     gtk_widget_show( w );
 }

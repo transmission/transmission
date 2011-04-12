@@ -39,18 +39,6 @@
 #include "tr-window.h"
 #include "util.h"
 
-#if !GTK_CHECK_VERSION( 2, 8, 0 )
-static void
-gtk_tree_view_column_queue_resize( GtkTreeViewColumn * column ) /* yuck */
-{
-    const int spacing = gtk_tree_view_column_get_spacing( column );
-
-    gtk_tree_view_column_set_spacing( column, spacing + 1 );
-    gtk_tree_view_column_set_spacing( column, spacing );
-}
-
-#endif
-
 typedef struct
 {
     GtkWidget *           speedlimit_on_item[2];

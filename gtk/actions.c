@@ -40,10 +40,6 @@ action_cb( GtkAction * a, gpointer user_data )
     gtr_actions_handler( gtk_action_get_name( a ), user_data );
 }
 
-#if !GTK_CHECK_VERSION( 2, 8, 0 )
- #define GTK_STOCK_INFO GTK_STOCK_PROPERTIES
-#endif
-
 #if !GTK_CHECK_VERSION( 2, 10, 0 )
  #define GTK_STOCK_SELECT_ALL NULL
 #endif
