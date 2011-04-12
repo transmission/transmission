@@ -99,6 +99,8 @@ struct DetailsImpl
     GSList * ids;
     TrCore * core;
     guint periodic_refresh_tag;
+
+    GString * gstr;
 };
 
 static tr_torrent**
@@ -1446,7 +1448,7 @@ onPeerViewQueryTooltip( GtkWidget   * widget,
                         gint          y,
                         gboolean      keyboard_tip,
                         GtkTooltip  * tooltip,
-                        gpointer      user_data UNUSED )
+                        gpointer      gdi )
 {
     gboolean       show_tip = FALSE;
     GtkTreeModel * model;
@@ -1456,16 +1458,18 @@ onPeerViewQueryTooltip( GtkWidget   * widget,
                                            &x, &y, keyboard_tip,
                                            &model, NULL, &iter ) )
     {
+        struct DetailsImpl * di = gdi;
         const char * pch;
         char * name = NULL;
         char * addr = NULL;
         char * flagstr = NULL;
-        GString * gstr = g_string_new( NULL );
+        GString * gstr = di->gstr;
         gtk_tree_model_get( model, &iter, PEER_COL_TORRENT_NAME, &name,
                                           PEER_COL_ADDRESS, &addr,
                                           PEER_COL_FLAGS, &flagstr,
                                           -1 );
 
+        g_string_truncate( gstr, 0 );
         g_string_append_printf( gstr, "<b>%s</b>\n%s\n \n", name, addr );
 
         for( pch = flagstr; pch && *pch; ++pch )
@@ -1492,7 +1496,6 @@ onPeerViewQueryTooltip( GtkWidget   * widget,
         if( gstr->len ) /* remove the last linefeed */
             g_string_set_size( gstr, gstr->len - 1 );
         gtk_tooltip_set_markup( tooltip, gstr->str );
-        g_string_free( gstr, TRUE );
         g_free( flagstr );
         g_free( addr );
         g_free( name );
@@ -1714,7 +1717,7 @@ peer_page_new( struct DetailsImpl * di )
 
 #if GTK_CHECK_VERSION( 2,12,0 )
     g_signal_connect( v, "query-tooltip",
-                      G_CALLBACK( onPeerViewQueryTooltip ), NULL );
+                      G_CALLBACK( onPeerViewQueryTooltip ), di );
 #endif
     g_object_unref( store );
     g_signal_connect( v, "button-release-event",
@@ -1777,13 +1780,12 @@ tr_strltime_rounded( char * buf, time_t t, size_t buflen )
     tr_strltime( buf, t, buflen );
 }
 
-static char *
-buildTrackerSummary( const char * key, const tr_tracker_stat * st, gboolean showScrape )
+static void
+buildTrackerSummary( GString * gstr, const char * key, const tr_tracker_stat * st, gboolean showScrape )
 {
     char * str;
     char timebuf[256];
     const time_t now = time( NULL );
-    GString * gstr = g_string_new( NULL );
     const char * err_markup_begin = "<span color=\"red\">";
     const char * err_markup_end = "</span>";
     const char * timeout_markup_begin = "<span color=\"#224466\">";
@@ -1877,8 +1879,6 @@ buildTrackerSummary( const char * key, const tr_tracker_stat * st, gboolean show
             }
         }
     }
-
-    return g_string_free( gstr, FALSE );
 }
 
 enum
@@ -1969,6 +1969,7 @@ refreshTracker( struct DetailsImpl * di, tr_torrent ** torrents, int n )
     tr_tracker_stat ** stats;
     GtkTreeIter iter;
     GtkTreeModel * model;
+    GString * gstr = di->gstr; /* buffer for temporary strings */
     GHashTable * hash = di->tracker_hash;
     GtkListStore * store = di->tracker_store;
     tr_session * session = gtr_core_session( di->core );
@@ -1994,9 +1995,12 @@ refreshTracker( struct DetailsImpl * di, tr_torrent ** torrents, int n )
             const tr_torrent * tor = torrents[i];
             const tr_tracker_stat * st = &stats[i][j];
             const int torrent_id = tr_torrentId( tor );
-            char * key = g_strdup_printf( "%d\t%d\t%s", torrent_id, st->tier, st->announce );
 
-            if( g_hash_table_lookup( hash, key ) == NULL ) {
+            /* build the key to find the row */
+            g_string_truncate( gstr, 0 );
+            g_string_append_printf( gstr, "%d\t%d\t%s", torrent_id, st->tier, st->announce );
+
+            if( g_hash_table_lookup( hash, gstr->str ) == NULL ) {
                 GtkTreePath * p;
                 GtkTreeIter iter;
                 GtkTreeRowReference * ref;
@@ -2004,41 +2008,49 @@ refreshTracker( struct DetailsImpl * di, tr_torrent ** torrents, int n )
                 gtk_list_store_insert_with_values( store, &iter, -1,
                     TRACKER_COL_TORRENT_ID, torrent_id,
                     TRACKER_COL_TRACKER_ID, st->id,
-                    TRACKER_COL_KEY, key,
+                    TRACKER_COL_KEY, gstr->str,
                     -1 );
 
                 p = gtk_tree_model_get_path( model, &iter );
                 ref = gtk_tree_row_reference_new( model, p );
-                g_hash_table_insert( hash, g_strdup( key ), ref );
+                g_hash_table_insert( hash, g_strdup( gstr->str ), ref );
                 ref = gtk_tree_row_reference_new( model, p );
                 gtr_get_favicon_from_url( session, st->announce, favicon_ready_cb, ref );
                 gtk_tree_path_free( p );
             }
-
-            g_free( key );
         }
     }
 
     /* step 4: update the peers */
-    for( i=0; i<n; ++i ) {
+    for( i=0; i<n; ++i )
+    {
         int j;
         const tr_torrent * tor = torrents[i];
         const char * summary_name = n>1 ? tr_torrentName( tor ) : NULL;
-        for( j=0; j<statCount[i]; ++j ) {
+        for( j=0; j<statCount[i]; ++j )
+        {
+            GtkTreePath * p;
+            GtkTreeRowReference * ref;
             const tr_tracker_stat * st = &stats[i][j];
-            char * summary = buildTrackerSummary( summary_name, st, showScrape );
-            char * key = g_strdup_printf( "%d\t%d\t%s", tr_torrentId( tor ), st->tier, st->announce );
-            GtkTreeRowReference * ref = g_hash_table_lookup( hash, key );
-            GtkTreePath * p = gtk_tree_row_reference_get_path( ref );
+
+            /* build the key to find the row */
+            g_string_truncate( gstr, 0 );
+            g_string_append_printf( gstr, "%d\t%d\t%s", tr_torrentId( tor ), st->tier, st->announce );
+            ref = g_hash_table_lookup( hash, gstr->str );
+            p = gtk_tree_row_reference_get_path( ref );
             gtk_tree_model_get_iter( model, &iter, p );
-            gtk_list_store_set( store, &iter, TRACKER_COL_TEXT, summary,
+
+            /* update the row */
+            g_string_truncate( gstr, 0 );
+            buildTrackerSummary( gstr, summary_name, st, showScrape );
+            gtk_list_store_set( store, &iter, TRACKER_COL_TEXT, gstr->str,
                                               TRACKER_COL_IS_BACKUP, st->isBackup,
                                               TRACKER_COL_TRACKER_ID, st->id,
                                               TRACKER_COL_WAS_UPDATED, TRUE,
                                               -1 );
+
+            /* cleanup */
             gtk_tree_path_free( p );
-            g_free( key );
-            g_free( summary );
         }
     }
 
@@ -2154,12 +2166,11 @@ on_edit_trackers_response( GtkDialog * dialog, int response, gpointer data )
         gtk_widget_destroy( GTK_WIDGET( dialog ) );
 }
 
-static char*
-get_editable_tracker_list( const tr_torrent * tor )
+static void
+get_editable_tracker_list( GString * gstr, const tr_torrent * tor )
 {
     int i;
     int tier = 0;
-    GString * gstr = g_string_new( NULL );
     const tr_info * inf = tr_torrentInfo( tor );
     for( i=0; i<inf->trackerCount; ++i ) {
         const tr_tracker_info * t = &inf->trackers[i];
@@ -2171,7 +2182,6 @@ get_editable_tracker_list( const tr_torrent * tor )
     }
     if( gstr->len > 0 )
         g_string_truncate( gstr, gstr->len-1 );
-    return g_string_free( gstr, FALSE );
 }
 
 static void
@@ -2185,11 +2195,12 @@ on_edit_trackers( GtkButton * button, gpointer data )
         int row;
         GtkWidget *w, *d, *fr, *t, *l, *sw;
         GtkWindow * win = GTK_WINDOW( gtk_widget_get_toplevel( GTK_WIDGET( button ) ) );
-        char * text = get_editable_tracker_list( tor );
+        GString * gstr = di->gstr; /* buffer for temporary strings */
         const int torrent_id = tr_torrentId( tor );
-        char * title = g_strdup_printf( _( "%s - Edit Trackers" ), tr_torrentName( tor ) );
 
-        d = gtk_dialog_new_with_buttons( title, win,
+        g_string_truncate( gstr, 0 );
+        g_string_append_printf( gstr, _( "%s - Edit Trackers" ), tr_torrentName( tor ) );
+        d = gtk_dialog_new_with_buttons( gstr->str, win,
                 GTK_DIALOG_MODAL|GTK_DIALOG_DESTROY_WITH_PARENT,
                 GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
                 GTK_STOCK_SAVE, GTK_RESPONSE_ACCEPT,
@@ -2208,8 +2219,10 @@ on_edit_trackers( GtkButton * button, gpointer data )
         hig_workarea_add_wide_control( t, &row, l );
 
         w = gtk_text_view_new( );
-        gtk_text_buffer_set_text( gtk_text_view_get_buffer( GTK_TEXT_VIEW( w ) ), text, -1 );
         gtk_widget_set_size_request( w, 500u, 166u );
+        g_string_truncate( gstr, 0 );
+        get_editable_tracker_list( gstr, tor );
+        gtk_text_buffer_set_text( gtk_text_view_get_buffer( GTK_TEXT_VIEW( w ) ), gstr->str, -1 );
         fr = gtk_frame_new( NULL );
         gtk_frame_set_shadow_type( GTK_FRAME( fr ), GTK_SHADOW_IN );
         sw = gtk_scrolled_window_new( NULL, NULL );
@@ -2226,9 +2239,6 @@ on_edit_trackers( GtkButton * button, gpointer data )
         g_object_set_data( G_OBJECT( d ), "torrent-id", GINT_TO_POINTER( torrent_id ) );
         g_object_set_data( G_OBJECT( d ), "text-buffer", gtk_text_view_get_buffer( GTK_TEXT_VIEW( w ) ) );
         gtk_widget_show( d );
-
-        g_free( title );
-        g_free( text );
     }
 }
 
@@ -2297,9 +2307,11 @@ on_tracker_list_add_button_clicked( GtkButton * button UNUSED, gpointer gdi )
         GtkWidget * e;
         GtkWidget * t;
         GtkWidget * w;
-        char * title = g_strdup_printf( _( "%s - Add Tracker" ), tr_torrentName( tor ) );
+        GString * gstr = di->gstr; /* buffer for temporary strings */
 
-        w = gtk_dialog_new_with_buttons( title, GTK_WINDOW( di->dialog ),
+        g_string_truncate( gstr, 0 );
+        g_string_append_printf( gstr, _( "%s - Add Tracker" ), tr_torrentName( tor ) );
+        w = gtk_dialog_new_with_buttons( gstr->str, GTK_WINDOW( di->dialog ),
                                          GTK_DIALOG_DESTROY_WITH_PARENT,
                                          GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
                                          GTK_STOCK_ADD, GTK_RESPONSE_ACCEPT,
@@ -2321,8 +2333,6 @@ on_tracker_list_add_button_clicked( GtkButton * button UNUSED, gpointer gdi )
         hig_workarea_add_row( t, &row, _( "_Announce URL:" ), e, NULL );
         gtr_dialog_set_content( GTK_DIALOG( w ), t );
         gtk_widget_show_all( w );
-
-        g_free( title );
     }
 }
 
@@ -2493,6 +2503,7 @@ details_free( gpointer gdata )
     g_hash_table_destroy( data->tracker_hash );
     g_hash_table_destroy( data->webseed_hash );
     g_hash_table_destroy( data->peer_hash );
+    g_string_free( data->gstr, TRUE );
     g_slist_free( data->ids );
     g_free( data );
 }
@@ -2505,6 +2516,7 @@ gtr_torrent_details_dialog_new( GtkWindow * parent, TrCore * core )
 
     /* create the dialog */
     di->core = core;
+    di->gstr = g_string_new( NULL );
     d = gtk_dialog_new_with_buttons( NULL, parent, 0,
                                      GTK_STOCK_CLOSE, GTK_RESPONSE_CLOSE,
                                      NULL );
