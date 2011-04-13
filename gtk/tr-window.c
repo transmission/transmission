@@ -819,7 +819,7 @@ updateSpeeds( PrivateData * p )
         GtkTreeIter iter;
         GtkTreeModel * model = gtr_core_model( p->core );
 
-        if( gtk_tree_model_get_iter_first( model, &iter ) ) do
+        if( gtk_tree_model_iter_nth_child( model, &iter, NULL, 0 ) ) do
         {
             double u, d;
             gtk_tree_model_get( model, &iter, MC_SPEED_UP, &u,

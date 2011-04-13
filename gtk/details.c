@@ -1270,7 +1270,7 @@ refreshPeerList( struct DetailsImpl * di, tr_torrent ** torrents, int n )
 
     /* step 2: mark all the peers in the list as not-updated */
     model = GTK_TREE_MODEL( store );
-    if( gtk_tree_model_get_iter_first( model, &iter ) ) do
+    if( gtk_tree_model_iter_nth_child( model, &iter, NULL, 0 ) ) do
         gtk_list_store_set( store, &iter, PEER_COL_WAS_UPDATED, FALSE, -1 );
     while( gtk_tree_model_iter_next( model, &iter ) );
 
@@ -1314,7 +1314,7 @@ refreshPeerList( struct DetailsImpl * di, tr_torrent ** torrents, int n )
 
     /* step 5: remove peers that have disappeared */
     model = GTK_TREE_MODEL( store );
-    if( gtk_tree_model_get_iter_first( model, &iter ) ) {
+    if( gtk_tree_model_iter_nth_child( model, &iter, NULL, 0 ) ) {
         gboolean more = TRUE;
         while( more ) {
             gboolean b;
@@ -1349,7 +1349,7 @@ refreshWebseedList( struct DetailsImpl * di, tr_torrent ** torrents, int n )
     GtkTreeModel * model = GTK_TREE_MODEL( store );
 
     /* step 1: mark all webseeds as not-updated */
-    if( gtk_tree_model_get_iter_first( model, &iter ) ) do
+    if( gtk_tree_model_iter_nth_child( model, &iter, NULL, 0 ) ) do
         gtk_list_store_set( store, &iter, WEBSEED_COL_WAS_UPDATED, FALSE, -1 );
     while( gtk_tree_model_iter_next( model, &iter ) );
 
@@ -1408,7 +1408,7 @@ refreshWebseedList( struct DetailsImpl * di, tr_torrent ** torrents, int n )
     }
 
     /* step 4: remove webseeds that have disappeared */
-    if( gtk_tree_model_get_iter_first( model, &iter ) ) {
+    if( gtk_tree_model_iter_nth_child( model, &iter, NULL, 0 ) ) {
         gboolean more = TRUE;
         while( more ) {
             gboolean b;
@@ -1983,7 +1983,7 @@ refreshTracker( struct DetailsImpl * di, tr_torrent ** torrents, int n )
 
     /* step 2: mark all the trackers in the list as not-updated */
     model = GTK_TREE_MODEL( store );
-    if( gtk_tree_model_get_iter_first( model, &iter ) ) do
+    if( gtk_tree_model_iter_nth_child( model, &iter, NULL, 0 ) ) do
         gtk_list_store_set( store, &iter, TRACKER_COL_WAS_UPDATED, FALSE, -1 );
     while( gtk_tree_model_iter_next( model, &iter ) );
 
@@ -2055,7 +2055,7 @@ refreshTracker( struct DetailsImpl * di, tr_torrent ** torrents, int n )
     }
 
     /* step 5: remove trackers that have disappeared */
-    if( gtk_tree_model_get_iter_first( model, &iter ) ) {
+    if( gtk_tree_model_iter_nth_child( model, &iter, NULL, 0 ) ) {
         gboolean more = TRUE;
         while( more ) {
             gboolean b;

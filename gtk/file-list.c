@@ -236,7 +236,7 @@ gtr_tree_model_foreach_postorder( GtkTreeModel            * model,
                                   gpointer                  data )
 {
     GtkTreeIter iter;
-    if( gtk_tree_model_get_iter_first( model, &iter ) ) do
+    if( gtk_tree_model_iter_nth_child( model, &iter, NULL, 0 ) ) do
         gtr_tree_model_foreach_postorder_subtree( model, &iter, func, data );
     while( gtk_tree_model_iter_next( model, &iter ) );
 }
