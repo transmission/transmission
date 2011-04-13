@@ -144,7 +144,7 @@ category_filter_model_update( GtkTreeStore * store )
     /* Walk through all the torrents, tallying how many matches there are
      * for the various categories. Also make a sorted list of all tracker
      * hosts s.t. we can merge it with the existing list */
-    if( gtk_tree_model_get_iter_first( tmodel, &iter )) do
+    if( gtk_tree_model_iter_nth_child( tmodel, &iter, NULL, 0 ) ) do
     {
         tr_torrent * tor;
         const tr_info * inf;
@@ -522,20 +522,11 @@ category_combo_box_new( GtkTreeModel * tmodel )
 }
 
 static gboolean
-testCategory( GtkWidget * category_combo, tr_torrent * tor )
+test_category( tr_torrent * tor, int active_category_type, const char * host )
 {
-    int type;
-    const tr_info * inf;
-    GtkTreeIter iter;
-    GtkComboBox * combo = GTK_COMBO_BOX( category_combo );
-    GtkTreeModel * model = gtk_combo_box_get_model( combo );
+    const tr_info * const inf = tr_torrentInfo( tor );
 
-    if( !gtk_combo_box_get_active_iter( combo, &iter ) )
-        return TRUE;
-
-    inf = tr_torrentInfo( tor );
-    gtk_tree_model_get( model, &iter, CAT_FILTER_COL_TYPE, &type, -1 );
-    switch( type )
+    switch( active_category_type )
     {
         case CAT_FILTER_TYPE_ALL:
             return TRUE;
@@ -557,15 +548,12 @@ testCategory( GtkWidget * category_combo, tr_torrent * tor )
 
         case CAT_FILTER_TYPE_HOST: {
             int i;
-            char * host;
             char tmp[1024];
-            gtk_tree_model_get( model, &iter, CAT_FILTER_COL_HOST, &host, -1 );
             for( i=0; i<inf->trackerCount; ++i ) {
                 gtr_get_host_from_url( tmp, sizeof( tmp ), inf->trackers[i].announce );
                 if( !strcmp( tmp, host ) )
                     break;
             }
-            g_free( host );
             return i < inf->trackerCount;
         }
 
@@ -654,21 +642,6 @@ test_torrent_activity( tr_torrent * tor, int type )
     }
 }
 
-static gboolean
-testActivity( GtkWidget * activity_combo, tr_torrent * tor )
-{
-    int type;
-    GtkTreeIter iter;
-    GtkComboBox * combo = GTK_COMBO_BOX( activity_combo );
-    GtkTreeModel * model = gtk_combo_box_get_model( combo );
-
-    if( !gtk_combo_box_get_active_iter( combo, &iter ) )
-        return TRUE;
-
-    gtk_tree_model_get( model, &iter, ACTIVITY_FILTER_COL_TYPE, &type, -1 );
-    return test_torrent_activity( tor, type );
-}
-
 static void
 status_model_update_count( GtkListStore * store, GtkTreeIter * iter, int n )
 {
@@ -689,7 +662,7 @@ activity_filter_model_update( GtkListStore * store )
 
     g_object_steal_qdata( o, DIRTY_KEY );
 
-    if( gtk_tree_model_get_iter_first( model, &iter )) do
+    if( gtk_tree_model_iter_nth_child( model, &iter, NULL, 0 ) ) do
     {
         int hits;
         int type;
@@ -698,7 +671,7 @@ activity_filter_model_update( GtkListStore * store )
         gtk_tree_model_get( model, &iter, ACTIVITY_FILTER_COL_TYPE, &type, -1 );
 
         hits = 0;
-        if( gtk_tree_model_get_iter_first( tmodel, &torrent_iter )) do {
+        if( gtk_tree_model_iter_nth_child( tmodel, &torrent_iter, NULL, 0 ) ) do {
             tr_torrent * tor;
             gtk_tree_model_get( tmodel, &torrent_iter, MC_TORRENT, &tor, -1 );
             if( test_torrent_activity( tor, type ) )
@@ -911,6 +884,9 @@ struct filter_data
     GtkWidget * category;
     GtkWidget * entry;
     GtkTreeModel * filter_model;
+    int active_activity_type;
+    int active_category_type;
+    char * active_category_host;
 };
 
 static gboolean
@@ -925,15 +901,45 @@ is_row_visible( GtkTreeModel * model, GtkTreeIter * iter, gpointer vdata )
 
     text = (const char*) g_object_get_qdata( o, TEXT_KEY );
 
-    return ( tor != NULL ) && testCategory( data->category, tor )
-                           && testActivity( data->activity, tor )
+    return ( tor != NULL ) && test_category( tor, data->active_category_type, data->active_category_host )
+                           && test_torrent_activity( tor, data->active_activity_type )
                            && testText( tor, text );
 }
 
 static void
-selection_changed_cb( GtkComboBox * combo UNUSED, gpointer vdata )
+selection_changed_cb( GtkComboBox * combo, gpointer vdata )
 {
+    int type;
+    char * host;
+    GtkTreeIter iter;
+    GtkTreeModel * model;
     struct filter_data * data = vdata;
+
+    /* set data->active_activity_type from the activity combobox */
+    combo = GTK_COMBO_BOX( data->activity );
+    model = gtk_combo_box_get_model( combo );
+    if( gtk_combo_box_get_active_iter( combo, &iter ) )
+        gtk_tree_model_get( model, &iter, ACTIVITY_FILTER_COL_TYPE, &type, -1 );
+    else
+        type = ACTIVITY_FILTER_ALL;
+    data->active_activity_type = type;
+
+    /* set the active category type & host from the category combobox */
+    combo = GTK_COMBO_BOX( data->category );
+    model = gtk_combo_box_get_model( combo );
+    if( gtk_combo_box_get_active_iter( combo, &iter ) ) {
+        gtk_tree_model_get( model, &iter, CAT_FILTER_COL_TYPE, &type,
+                                          CAT_FILTER_COL_HOST, &host,
+                                          -1 );
+    } else {
+        type = CAT_FILTER_TYPE_ALL;
+        host = NULL;
+    }
+    g_free( data->active_category_host );
+    data->active_category_host = host;
+    data->active_category_type = type;
+
+    /* refilter */
     gtk_tree_model_filter_refilter( GTK_TREE_MODEL_FILTER( data->filter_model ) );
 }
 
@@ -955,10 +961,9 @@ gtr_filter_bar_new( tr_session * session, GtkTreeModel * tmodel, GtkTreeModel **
     SESSION_KEY = g_quark_from_static_string( "tr-session-key" );
     TORRENT_MODEL_KEY = g_quark_from_static_string( "tr-filter-torrent-model-key" );
 
-    data = g_new( struct filter_data, 1 );
+    data = g_new0( struct filter_data, 1 );
     data->activity = activity = activity_combo_box_new( tmodel );
     data->category = category = category_combo_box_new( tmodel );
-    data->entry = NULL;
     data->filter_model = gtk_tree_model_filter_new( tmodel, NULL );
 
     g_object_set( G_OBJECT( data->category ), "width-request", 170, NULL );
@@ -1015,6 +1020,7 @@ gtr_filter_bar_new( tr_session * session, GtkTreeModel * tmodel, GtkTreeModel **
 #endif
 
     g_signal_connect( s, "changed", G_CALLBACK( filter_entry_changed ), data->filter_model );
+    selection_changed_cb( NULL, data );
 
     *filter_model = data->filter_model;
     return h;
