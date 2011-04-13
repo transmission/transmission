@@ -192,7 +192,7 @@ createEasy( tr_session * s, struct tr_web_task * task )
         curl_easy_setopt( e, CURLOPT_RANGE, task->range );
 
     if( s->curl_easy_config_func != NULL )
-        s->curl_easy_config_func( s, e, task->url );
+        s->curl_easy_config_func( s, e, task->url, s->curl_easy_config_user_data );
 
     tr_free( cookie_filename );
     return e;

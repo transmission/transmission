@@ -37,7 +37,7 @@ tr_web_close_mode;
  * Examples of curl_easy_setopt() can be found at
  * http://curl.haxx.se/libcurl/c/curl_easy_setopt.html()
  */
-void tr_sessionSetWebConfigFunc( tr_session * session, void (*config)(tr_session * session, void * curl_pointer, const char * url ) );
+void tr_sessionSetWebConfigFunc( tr_session * session, void (*config)(tr_session * session, void * curl_pointer, const char * url, void * user_data ), void * user_data );
 
 
 void tr_webClose( tr_session * session, tr_web_close_mode close_mode );
