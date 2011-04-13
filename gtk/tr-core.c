@@ -1405,11 +1405,8 @@ gtr_compare_double( const double a, const double b, int decimal_places )
     return 0;
 }
 
-static gboolean
-update_foreach( GtkTreeModel * model,
-                GtkTreePath  * path UNUSED,
-                GtkTreeIter  * iter,
-                gpointer       data UNUSED )
+static void
+update_foreach( GtkTreeModel * model, GtkTreeIter * iter )
 {
     int oldActivity, newActivity;
     int oldActivePeerCount, newActivePeerCount;
@@ -1478,17 +1475,21 @@ update_foreach( GtkTreeModel * model,
                             MC_RECHECK_PROGRESS, newRecheckProgress,
                             -1 );
     }
-
-    /* cleanup */
-    return FALSE;
 }
 
 void
 gtr_core_update( TrCore * core )
 {
-    /* refresh the model */
-    gtk_tree_model_foreach( core_raw_model( core ), update_foreach, NULL );
+    GtkTreeIter iter;
+    GtkTreeModel * model;
 
+    /* update the model */
+    model = core_raw_model( core );
+    if( gtk_tree_model_iter_nth_child( model, &iter, NULL, 0 ) ) do
+        update_foreach( model, &iter );
+    while( gtk_tree_model_iter_next( model, &iter ) );
+
+    /* update hibernation */
     core_maybe_inhibit_hibernation( core );
 }
 
@@ -1850,7 +1851,7 @@ gtr_core_get_active_torrent_count( TrCore * core )
     size_t activeCount = 0;
     GtkTreeModel * model = core_raw_model( core );
 
-    if( gtk_tree_model_get_iter_first( model, &iter ) ) do
+    if( gtk_tree_model_iter_nth_child( model, &iter, NULL, 0 ) ) do
     {
         int activity;
         gtk_tree_model_get( model, &iter, MC_ACTIVITY, &activity, -1 );

@@ -614,21 +614,19 @@ struct remote_page
 static void
 refreshWhitelist( struct remote_page * page )
 {
-    GtkTreeIter    iter;
+    GtkTreeIter iter;
+    GString * gstr = g_string_new( NULL );
     GtkTreeModel * model = GTK_TREE_MODEL( page->store );
-    GString *      gstr = g_string_new( NULL );
 
-    if( gtk_tree_model_get_iter_first( model, &iter ) ) do
-        {
-            char * address;
-            gtk_tree_model_get( model, &iter,
-                                COL_ADDRESS, &address,
-                                -1 );
-            g_string_append( gstr, address );
-            g_string_append( gstr, "," );
-            g_free( address );
-        }
-        while( gtk_tree_model_iter_next( model, &iter ) );
+    if( gtk_tree_model_iter_nth_child( model, &iter, NULL, 0 ) ) do
+    {
+        char * address;
+        gtk_tree_model_get( model, &iter, COL_ADDRESS, &address, -1 );
+        g_string_append( gstr, address );
+        g_string_append( gstr, "," );
+        g_free( address );
+    }
+    while( gtk_tree_model_iter_next( model, &iter ) );
 
     g_string_truncate( gstr, gstr->len - 1 ); /* remove the trailing comma */
 
