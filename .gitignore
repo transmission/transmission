@@ -1,6 +1,8 @@
 /.depend
 Transmission.xcodeproj/*.mode*
 Transmission.xcodeproj/*.pbxuser
+Transmission.xcodeproj/*.xcworkspace
+Transmission.xcodeproj/xcuserdata
 /beta
 /build
 cli/.depend
