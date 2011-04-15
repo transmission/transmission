@@ -308,7 +308,7 @@ Session :: restart( )
 }
 
 static void
-curlConfigFunc( tr_session * session UNUSED, void * vcurl, const char * destination )
+curlConfigFunc( tr_session * session UNUSED, void * vcurl, const char * destination, void * unused UNUSED )
 {
     CURL * easy = vcurl;
     const QUrl url( destination );
@@ -361,7 +361,7 @@ Session :: start( )
         tr_bencInitDict( &settings, 0 );
         tr_sessionLoadSettings( &settings, myConfigDir.toUtf8().constData(), "qt" );
         mySession = tr_sessionInit( "qt", myConfigDir.toUtf8().constData(), true, &settings );
-        tr_sessionSetWebConfigFunc( mySession, curlConfigFunc );
+        tr_sessionSetWebConfigFunc( mySession, curlConfigFunc, NULL );
         tr_bencFree( &settings );
 
         tr_ctor * ctor = tr_ctorNew( mySession );
