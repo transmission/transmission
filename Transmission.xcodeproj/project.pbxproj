@@ -2755,7 +2755,6 @@
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = macosx10.6;
 				STRIP_INSTALLED_PRODUCT = NO;
-				VALID_ARCHS = "i386 x86_64 ppc ppc7400 ppc970";
 			};
 			name = Debug;
 		};
@@ -2883,7 +2882,6 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.5;
 				OTHER_CFLAGS = "-DNDEBUG";
 				SDKROOT = macosx10.6;
-				VALID_ARCHS = "i386 x86_64 ppc ppc7400 ppc970";
 			};
 			name = Release;
 		};
@@ -2949,7 +2947,6 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.5;
 				SDKROOT = macosx10.6;
 				STRIP_INSTALLED_PRODUCT = NO;
-				VALID_ARCHS = "i386 x86_64 ppc ppc7400 ppc970";
 			};
 			name = "Release - Debug";
 		};
