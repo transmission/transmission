@@ -223,9 +223,9 @@ phaseOne( tr_ptrArray * peerArray, tr_direction dir )
     n = peerCount;
     dbgmsg( "%d peers to go round-robin for %s", n, (dir==TR_UP?"upload":"download") );
     i = n ? tr_cryptoWeakRandInt( n ) : 0; /* pick a random starting point */
-    while( n > 1 )
+    while( n > 0 )
     {
-        const size_t increment = 512;//1024;
+        const size_t increment = 1024;
         const int bytesUsed = tr_peerIoFlush( peers[i], dir, increment );
 
         dbgmsg( "peer #%d of %d used %d bytes in this pass", i, n, bytesUsed );
@@ -240,7 +240,7 @@ phaseOne( tr_ptrArray * peerArray, tr_direction dir )
             --n;
         }
 
-        if( i == n )
+        if( i >= n )
             i = 0;
     }
 }
