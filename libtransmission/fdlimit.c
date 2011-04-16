@@ -746,7 +746,19 @@ tr_fdGetFileLimit( tr_session * session )
 void
 tr_fdSetFileLimit( tr_session * session, int limit )
 {
+    int max;
+
+    /* This is a vaguely arbitrary number.
+       It takes announcer.c's MAX_CONCURRENT_TASKS into account,
+       plus extra positions for the listening sockets,
+       plus a few more just to be safe */
+    const int buffer_slots = 128;
+
     ensureSessionFdInfoExists( session );
+
+    max = __FD_SETSIZE - session->fdInfo->socket_limit - buffer_slots;
+    if( limit > max )
+        limit = max;
 
     if( limit != tr_fdGetFileLimit( session ) )
     {
