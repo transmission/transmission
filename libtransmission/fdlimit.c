@@ -756,7 +756,7 @@ tr_fdSetFileLimit( tr_session * session, int limit )
 
     ensureSessionFdInfoExists( session );
 
-    max = __FD_SETSIZE - session->fdInfo->socket_limit - buffer_slots;
+    max = FD_SETSIZE - session->fdInfo->socket_limit - buffer_slots;
     if( limit > max )
         limit = max;
 
