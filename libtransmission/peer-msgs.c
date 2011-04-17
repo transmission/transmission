@@ -1306,24 +1306,31 @@ readBtPiece( tr_peermsgs      * msgs,
     else
     {
         int err;
+        size_t n;
+        size_t nLeft;
+        struct evbuffer * block_buffer;
+
+        if( msgs->incoming.block == NULL )
+            msgs->incoming.block = evbuffer_new( );
+        block_buffer = msgs->incoming.block;
 
         /* read in another chunk of data */
-        const size_t nLeft = req->length - evbuffer_get_length( msgs->incoming.block );
-        size_t n = MIN( nLeft, inlen );
+        nLeft = req->length - evbuffer_get_length( block_buffer );
+        n = MIN( nLeft, inlen );
 
-        tr_peerIoReadBytesToBuf( msgs->peer->io, inbuf, msgs->incoming.block, n );
+        tr_peerIoReadBytesToBuf( msgs->peer->io, inbuf, block_buffer, n );
 
         fireClientGotData( msgs, n, true );
         *setme_piece_bytes_read += n;
         dbgmsg( msgs, "got %zu bytes for block %u:%u->%u ... %d remain",
                n, req->index, req->offset, req->length,
-               (int)( req->length - evbuffer_get_length( msgs->incoming.block ) ) );
-        if( evbuffer_get_length( msgs->incoming.block ) < req->length )
+               (int)( req->length - evbuffer_get_length( block_buffer ) ) );
+        if( evbuffer_get_length( block_buffer ) < req->length )
             return READ_LATER;
 
         /* pass the block along... */
-        err = clientGotBlock( msgs, msgs->incoming.block, req );
-        evbuffer_drain( msgs->incoming.block, evbuffer_get_length( msgs->incoming.block ) );
+        err = clientGotBlock( msgs, block_buffer, req );
+        evbuffer_drain( block_buffer, evbuffer_get_length( block_buffer ) );
 
         /* cleanup */
         req->length = 0;
@@ -2341,7 +2348,6 @@ tr_peerMsgsNew( struct tr_torrent    * torrent,
     m->outMessages = evbuffer_new( );
     m->outMessagesBatchedAt = 0;
     m->outMessagesBatchPeriod = LOW_PRIORITY_INTERVAL_SECS;
-    m->incoming.block = evbuffer_new( );
     peer->msgs = m;
 
     if( tr_torrentAllowsPex( torrent ) ) {
@@ -2383,7 +2389,9 @@ tr_peerMsgsFree( tr_peermsgs* msgs )
         if( msgs->pexTimer != NULL )
             event_free( msgs->pexTimer );
 
-        evbuffer_free( msgs->incoming.block );
+        if( msgs->incoming.block != NULL )
+            evbuffer_free( msgs->incoming.block );
+
         evbuffer_free( msgs->outMessages );
         tr_free( msgs->pex6 );
         tr_free( msgs->pex );
