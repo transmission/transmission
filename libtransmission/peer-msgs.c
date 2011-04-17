@@ -2309,6 +2309,7 @@ pexPulse( int foo UNUSED, short bar UNUSED, void * vmsgs )
 
     sendPex( msgs );
 
+    assert( msgs->pexTimer != NULL );
     tr_timerAdd( msgs->pexTimer, PEX_INTERVAL_SECS, 0 );
 }
 
@@ -2341,9 +2342,12 @@ tr_peerMsgsNew( struct tr_torrent    * torrent,
     m->outMessagesBatchedAt = 0;
     m->outMessagesBatchPeriod = LOW_PRIORITY_INTERVAL_SECS;
     m->incoming.block = evbuffer_new( );
-    m->pexTimer = evtimer_new( torrent->session->event_base, pexPulse, m );
     peer->msgs = m;
-    tr_timerAdd( m->pexTimer, PEX_INTERVAL_SECS, 0 );
+
+    if( tr_torrentAllowsPex( torrent ) ) {
+        m->pexTimer = evtimer_new( torrent->session->event_base, pexPulse, m );
+        tr_timerAdd( m->pexTimer, PEX_INTERVAL_SECS, 0 );
+    }
 
     if( tr_peerIoSupportsUTP( peer->io ) ) {
         const tr_address * addr = tr_peerIoGetAddress( peer->io, NULL );
@@ -2376,7 +2380,8 @@ tr_peerMsgsFree( tr_peermsgs* msgs )
 {
     if( msgs )
     {
-        event_free( msgs->pexTimer );
+        if( msgs->pexTimer != NULL )
+            event_free( msgs->pexTimer );
 
         evbuffer_free( msgs->incoming.block );
         evbuffer_free( msgs->outMessages );
