@@ -2,13 +2,13 @@
 <archive type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="7.10">
 	<data>
 		<int key="IBDocument.SystemTarget">1060</int>
-		<string key="IBDocument.SystemVersion">10J567</string>
-		<string key="IBDocument.InterfaceBuilderVersion">1294</string>
+		<string key="IBDocument.SystemVersion">10J869</string>
+		<string key="IBDocument.InterfaceBuilderVersion">1306</string>
 		<string key="IBDocument.AppKitVersion">1038.35</string>
-		<string key="IBDocument.HIToolboxVersion">462.00</string>
+		<string key="IBDocument.HIToolboxVersion">461.00</string>
 		<object class="NSMutableDictionary" key="IBDocument.PluginVersions">
 			<string key="NS.key.0">com.apple.InterfaceBuilder.CocoaPlugin</string>
-			<string key="NS.object.0">1294</string>
+			<string key="NS.object.0">1306</string>
 		</object>
 		<object class="NSArray" key="IBDocument.IntegratedClassDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -54,7 +54,7 @@
 					<object class="NSTextField" id="377137329">
 						<reference key="NSNextResponder" ref="570476534"/>
 						<int key="NSvFlags">268</int>
-						<string key="NSFrame">{{12, 252}, {76, 14}}</string>
+						<string key="NSFrame">{{15, 252}, {73, 14}}</string>
 						<reference key="NSSuperview" ref="570476534"/>
 						<reference key="NSWindow"/>
 						<reference key="NSNextKeyView" ref="700662710"/>
@@ -111,7 +111,7 @@
 					<object class="NSTextField" id="1068112942">
 						<reference key="NSNextResponder" ref="570476534"/>
 						<int key="NSvFlags">268</int>
-						<string key="NSFrame">{{26, 236}, {62, 14}}</string>
+						<string key="NSFrame">{{29, 236}, {59, 14}}</string>
 						<reference key="NSSuperview" ref="570476534"/>
 						<reference key="NSWindow"/>
 						<reference key="NSNextKeyView" ref="375557524"/>
@@ -148,7 +148,7 @@
 					<object class="NSTextField" id="635463300">
 						<reference key="NSNextResponder" ref="570476534"/>
 						<int key="NSvFlags">268</int>
-						<string key="NSFrame">{{50, 204}, {38, 14}}</string>
+						<string key="NSFrame">{{53, 204}, {35, 14}}</string>
 						<reference key="NSSuperview" ref="570476534"/>
 						<reference key="NSWindow"/>
 						<reference key="NSNextKeyView" ref="655961577"/>
@@ -166,7 +166,7 @@
 					<object class="NSTextField" id="655961577">
 						<reference key="NSNextResponder" ref="570476534"/>
 						<int key="NSvFlags">266</int>
-						<string key="NSFrame">{{89, 204}, {101, 14}}</string>
+						<string key="NSFrame">{{89, 204}, {145, 14}}</string>
 						<reference key="NSSuperview" ref="570476534"/>
 						<reference key="NSWindow"/>
 						<reference key="NSNextKeyView" ref="952075492"/>
@@ -185,7 +185,7 @@
 					<object class="NSTextField" id="206962076">
 						<reference key="NSNextResponder" ref="570476534"/>
 						<int key="NSvFlags">268</int>
-						<string key="NSFrame">{{38, 268}, {50, 14}}</string>
+						<string key="NSFrame">{{40, 268}, {48, 14}}</string>
 						<reference key="NSSuperview" ref="570476534"/>
 						<reference key="NSWindow"/>
 						<reference key="NSNextKeyView" ref="581792195"/>
@@ -416,7 +416,7 @@
 								<double key="NSPercent">0.94565220000000005</double>
 							</object>
 						</object>
-						<string key="NSFrame">{{89, 143}, {261, 58}}</string>
+						<string key="NSFrame">{{89, 144}, {261, 58}}</string>
 						<reference key="NSSuperview" ref="570476534"/>
 						<reference key="NSWindow"/>
 						<reference key="NSNextKeyView" ref="153164887"/>
@@ -428,7 +428,7 @@
 					<object class="NSTextField" id="615655994">
 						<reference key="NSNextResponder" ref="570476534"/>
 						<int key="NSvFlags">268</int>
-						<string key="NSFrame">{{12, 188}, {76, 14}}</string>
+						<string key="NSFrame">{{13, 188}, {75, 14}}</string>
 						<reference key="NSSuperview" ref="570476534"/>
 						<reference key="NSWindow"/>
 						<reference key="NSNextKeyView" ref="1015114756"/>
@@ -446,7 +446,7 @@
 					<object class="NSTextField" id="1017199380">
 						<reference key="NSNextResponder" ref="570476534"/>
 						<int key="NSvFlags">268</int>
-						<string key="NSFrame">{{9, 42}, {91, 14}}</string>
+						<string key="NSFrame">{{9, 39}, {89, 17}}</string>
 						<reference key="NSSuperview" ref="570476534"/>
 						<reference key="NSWindow"/>
 						<reference key="NSNextKeyView" ref="835637422"/>
@@ -573,7 +573,7 @@
 					<object class="NSTextField" id="293727443">
 						<reference key="NSNextResponder" ref="570476534"/>
 						<int key="NSvFlags">268</int>
-						<string key="NSFrame">{{9, 118}, {42, 14}}</string>
+						<string key="NSFrame">{{9, 115}, {42, 17}}</string>
 						<reference key="NSSuperview" ref="570476534"/>
 						<reference key="NSWindow"/>
 						<reference key="NSNextKeyView" ref="895817577"/>
@@ -591,7 +591,7 @@
 					<object class="NSTextField" id="895817577">
 						<reference key="NSNextResponder" ref="570476534"/>
 						<int key="NSvFlags">268</int>
-						<string key="NSFrame">{{14, 102}, {74, 14}}</string>
+						<string key="NSFrame">{{12, 102}, {76, 14}}</string>
 						<reference key="NSSuperview" ref="570476534"/>
 						<reference key="NSWindow"/>
 						<reference key="NSNextKeyView" ref="819483856"/>
@@ -646,7 +646,7 @@
 					<object class="NSTextField" id="267672181">
 						<reference key="NSNextResponder" ref="570476534"/>
 						<int key="NSvFlags">268</int>
-						<string key="NSFrame">{{22, 86}, {66, 14}}</string>
+						<string key="NSFrame">{{29, 86}, {59, 14}}</string>
 						<reference key="NSSuperview" ref="570476534"/>
 						<reference key="NSWindow"/>
 						<reference key="NSNextKeyView" ref="72642357"/>
@@ -725,7 +725,7 @@
 					<object class="NSTextField" id="381599958">
 						<reference key="NSNextResponder" ref="570476534"/>
 						<int key="NSvFlags">268</int>
-						<string key="NSFrame">{{9, 316}, {53, 14}}</string>
+						<string key="NSFrame">{{9, 313}, {53, 17}}</string>
 						<reference key="NSSuperview" ref="570476534"/>
 						<reference key="NSWindow"/>
 						<reference key="NSNextKeyView" ref="553434559"/>
@@ -743,7 +743,7 @@
 					<object class="NSTextField" id="253816666">
 						<reference key="NSNextResponder" ref="570476534"/>
 						<int key="NSvFlags">268</int>
-						<string key="NSFrame">{{16, 70}, {72, 14}}</string>
+						<string key="NSFrame">{{21, 70}, {67, 14}}</string>
 						<reference key="NSSuperview" ref="570476534"/>
 						<reference key="NSWindow"/>
 						<reference key="NSNextKeyView" ref="988657593"/>
@@ -768,8 +768,7 @@
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSTextFieldCell" key="NSCell" id="951805410">
 							<int key="NSCellFlags">67239488</int>
-							<int key="NSCellFlags2">-1874851840</int>
-							<string key="NSContents"/>
+							<int key="NSCellFlags2">272631808</int>
 							<reference key="NSSupport" ref="26"/>
 							<object class="NSDateFormatter" key="NSFormatter" id="658343916">
 								<object class="NSMutableDictionary" key="NS.attributes">
@@ -799,7 +798,7 @@
 					<object class="NSSegmentedControl" id="952075492">
 						<reference key="NSNextResponder" ref="570476534"/>
 						<int key="NSvFlags">265</int>
-						<string key="NSFrame">{{242, 205}, {110, 17}}</string>
+						<string key="NSFrame">{{238, 205}, {113, 15}}</string>
 						<reference key="NSSuperview" ref="570476534"/>
 						<reference key="NSWindow"/>
 						<reference key="NSNextKeyView" ref="615655994"/>
@@ -816,12 +815,12 @@
 							<object class="NSMutableArray" key="NSSegmentImages">
 								<bool key="EncodedWithXMLCoder">YES</bool>
 								<object class="NSSegmentItem">
-									<double key="NSSegmentItemWidth">49</double>
+									<double key="NSSegmentItemWidth">50</double>
 									<string key="NSSegmentItemLabel">Voortgang</string>
 									<int key="NSSegmentItemImageScaling">2</int>
 								</object>
 								<object class="NSSegmentItem">
-									<double key="NSSegmentItemWidth">54</double>
+									<double key="NSSegmentItemWidth">56</double>
 									<string key="NSSegmentItemLabel">Beschikbaar</string>
 									<int key="NSSegmentItemTag">1</int>
 									<int key="NSSegmentItemImageScaling">2</int>
@@ -829,6 +828,7 @@
 							</object>
 							<int key="NSSelectedSegment">-1</int>
 							<int key="NSTrackingMode">1</int>
+							<int key="NSSegmentStyle">1</int>
 						</object>
 					</object>
 					<object class="NSTextField" id="630952996">
@@ -871,7 +871,7 @@
 					<object class="NSTextField" id="882091406">
 						<reference key="NSNextResponder" ref="570476534"/>
 						<int key="NSvFlags">268</int>
-						<string key="NSFrame">{{12, 220}, {76, 14}}</string>
+						<string key="NSFrame">{{15, 220}, {73, 14}}</string>
 						<reference key="NSSuperview" ref="570476534"/>
 						<reference key="NSWindow"/>
 						<reference key="NSNextKeyView" ref="866921806"/>
@@ -1090,12 +1090,10 @@
 						<reference key="object" ref="570476534"/>
 						<object class="NSMutableArray" key="children">
 							<bool key="EncodedWithXMLCoder">YES</bool>
-							<reference ref="1015114756"/>
 							<reference ref="866921806"/>
 							<reference ref="882091406"/>
 							<reference ref="615576480"/>
 							<reference ref="630952996"/>
-							<reference ref="952075492"/>
 							<reference ref="988657593"/>
 							<reference ref="253816666"/>
 							<reference ref="381599958"/>
@@ -1123,6 +1121,8 @@
 							<reference ref="178079550"/>
 							<reference ref="835637422"/>
 							<reference ref="1017199380"/>
+							<reference ref="952075492"/>
+							<reference ref="1015114756"/>
 						</object>
 						<reference key="parent" ref="0"/>
 						<string key="objectName">Activity</string>
@@ -1746,8 +1746,8 @@
 					<string>53.IBDateFormatterBehaviorMetadataKey</string>
 					<string>53.IBPluginDependency</string>
 					<string>53.ImportedFromIB2</string>
+					<string>54.IBNSSegmentedControlInspectorSelectedSegmentMetadataKey</string>
 					<string>54.IBPluginDependency</string>
-					<string>54.IBSegmentedControlInspectorSelectedSegmentMetadataKey</string>
 					<string>55.IBPluginDependency</string>
 					<string>56.IBPluginDependency</string>
 					<string>57.IBPluginDependency</string>
@@ -1766,9 +1766,9 @@
 					<string>79.IBPluginDependency</string>
 					<string>79.IBViewBoundsToFrameTransform</string>
 					<string>79.ImportedFromIB2</string>
+					<string>8.IBNSSegmentedControlTracker.RoundRobinState</string>
+					<string>8.IBNSSegmentedControlTracker.WasGrowing</string>
 					<string>8.IBPluginDependency</string>
-					<string>8.IBSegmentedControlTracker.RoundRobinState</string>
-					<string>8.IBSegmentedControlTracker.WasGrowing</string>
 					<string>8.ImportedFromIB2</string>
 					<string>80.CustomClassName</string>
 					<string>80.IBPluginDependency</string>
@@ -1846,7 +1846,7 @@
 					<string>PiecesView</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="1"/>
-					<string>{{489, 421}, {360, 335}}</string>
+					<string>{{489, 460}, {360, 335}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="1"/>
 					<string>{{274, 636}, {360, 290}}</string>
@@ -1913,8 +1913,8 @@
 					<integer value="1"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="1"/>
-					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="0"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -1935,9 +1935,9 @@
 						<bytes key="NSTransformStruct">AUFwAABDEQAAA</bytes>
 					</object>
 					<integer value="1"/>
-					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<integer value="0"/>
 					<integer value="1"/>
+					<integer value="1"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="1"/>
 					<string>InfoTextField</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
