@@ -225,6 +225,7 @@ NSMutableSet * fTrackerIconLoading;
     return (icon && icon != [NSNull null]) ? icon : [NSImage imageNamed: @"FavIcon.png"];
 }
 
+#warning better favicon detection
 - (void) loadTrackerIcon: (NSString *) baseAddress
 {
     NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
