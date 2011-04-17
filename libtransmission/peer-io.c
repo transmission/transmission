@@ -596,7 +596,7 @@ tr_peerIoNew( tr_session       * session,
     io = tr_new0( tr_peerIo, 1 );
     io->magicNumber = PEER_IO_MAGIC_NUMBER;
     io->refCount = 1;
-    io->crypto = tr_cryptoNew( torrentHash, isIncoming );
+    tr_cryptoConstruct( &io->crypto, torrentHash, isIncoming );
     io->session = session;
     io->addr = *addr;
     io->isSeed = isSeed;
@@ -808,7 +808,7 @@ io_dtor( void * vio )
     evbuffer_free( io->outbuf );
     evbuffer_free( io->inbuf );
     io_close_socket( io );
-    tr_cryptoFree( io->crypto );
+    tr_cryptoDestruct( &io->crypto );
 
     while( io->outbuf_datatypes != NULL )
         peer_io_pull_datatype( io );
@@ -939,25 +939,23 @@ tr_peerIoSetTorrentHash( tr_peerIo *     io,
 {
     assert( tr_isPeerIo( io ) );
 
-    tr_cryptoSetTorrentHash( io->crypto, hash );
+    tr_cryptoSetTorrentHash( &io->crypto, hash );
 }
 
 const uint8_t*
 tr_peerIoGetTorrentHash( tr_peerIo * io )
 {
     assert( tr_isPeerIo( io ) );
-    assert( io->crypto );
 
-    return tr_cryptoGetTorrentHash( io->crypto );
+    return tr_cryptoGetTorrentHash( &io->crypto );
 }
 
 int
 tr_peerIoHasTorrentHash( const tr_peerIo * io )
 {
     assert( tr_isPeerIo( io ) );
-    assert( io->crypto );
 
-    return tr_cryptoHasTorrentHash( io->crypto );
+    return tr_cryptoHasTorrentHash( &io->crypto );
 }
 
 /**
@@ -965,8 +963,7 @@ tr_peerIoHasTorrentHash( const tr_peerIo * io )
 **/
 
 void
-tr_peerIoSetPeersId( tr_peerIo *     io,
-                     const uint8_t * peer_id )
+tr_peerIoSetPeersId( tr_peerIo * io, const uint8_t * peer_id )
 {
     assert( tr_isPeerIo( io ) );
 
@@ -1045,7 +1042,7 @@ maybeEncryptBuffer( tr_peerIo * io, struct evbuffer * buf )
         evbuffer_ptr_set( buf, &pos, 0, EVBUFFER_PTR_SET );
         do {
             evbuffer_peek( buf, -1, &pos, &iovec, 1 );
-            tr_cryptoEncrypt( io->crypto, iovec.iov_len, iovec.iov_base, iovec.iov_base );
+            tr_cryptoEncrypt( &io->crypto, iovec.iov_len, iovec.iov_base, iovec.iov_base );
         } while( !evbuffer_ptr_set( buf, &pos, iovec.iov_len, EVBUFFER_PTR_ADD ) );
     }
 }
@@ -1125,7 +1122,7 @@ tr_peerIoReadBytesToBuf( tr_peerIo * io, struct evbuffer * inbuf, struct evbuffe
         evbuffer_ptr_set( outbuf, &pos, old_length, EVBUFFER_PTR_SET );
         do {
             evbuffer_peek( outbuf, byteCount, &pos, &iovec, 1 );
-            tr_cryptoDecrypt( io->crypto, iovec.iov_len, iovec.iov_base, iovec.iov_base );
+            tr_cryptoDecrypt( &io->crypto, iovec.iov_len, iovec.iov_base, iovec.iov_base );
             byteCount -= iovec.iov_len;
         } while( !evbuffer_ptr_set( outbuf, &pos, iovec.iov_len, EVBUFFER_PTR_ADD ) );
     }
@@ -1145,7 +1142,7 @@ tr_peerIoReadBytes( tr_peerIo * io, struct evbuffer * inbuf, void * bytes, size_
 
         case PEER_ENCRYPTION_RC4:
             evbuffer_remove( inbuf, bytes, byteCount );
-            tr_cryptoDecrypt( io->crypto, byteCount, bytes, bytes );
+            tr_cryptoDecrypt( &io->crypto, byteCount, bytes, bytes );
             break;
 
         default:

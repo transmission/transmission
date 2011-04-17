@@ -77,20 +77,6 @@ static const uint8_t dh_P[PRIME_LEN] =
 
 static const uint8_t dh_G[] = { 2 };
 
-/** @brief Holds state information for encrypted peer communications */
-struct tr_crypto
-{
-    RC4_KEY         dec_key;
-    RC4_KEY         enc_key;
-    uint8_t         torrentHash[SHA_DIGEST_LENGTH];
-    bool            isIncoming;
-    bool            torrentHashIsSet;
-    bool            mySecretIsSet;
-    uint8_t         myPublicKey[KEY_LEN];
-    uint8_t         mySecret[KEY_LEN];
-    DH *            dh;
-};
-
 /**
 ***
 **/
@@ -143,26 +129,21 @@ ensureKeyExists( tr_crypto * crypto)
     }
 }
 
-tr_crypto *
-tr_cryptoNew( const uint8_t * torrentHash,
-              int             isIncoming )
+void
+tr_cryptoConstruct( tr_crypto * crypto, const uint8_t * torrentHash, bool isIncoming )
 {
-    tr_crypto * crypto;
+    memset( crypto, 0, sizeof ( tr_crypto ) );
 
-    crypto = tr_new0( tr_crypto, 1 );
-    crypto->isIncoming = isIncoming ? 1 : 0;
-    tr_cryptoSetTorrentHash( crypto, torrentHash );
     crypto->dh = NULL;
-
-    return crypto;
+    crypto->isIncoming = isIncoming;
+    tr_cryptoSetTorrentHash( crypto, torrentHash );
 }
 
 void
-tr_cryptoFree( tr_crypto * crypto )
+tr_cryptoDestruct( tr_crypto * crypto )
 {
     if( crypto->dh != NULL )
         DH_free( crypto->dh );
-    tr_free( crypto );
 }
 
 /**

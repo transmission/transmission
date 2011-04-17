@@ -25,12 +25,12 @@
 
 #include "transmission.h"
 #include "bandwidth.h"
+#include "crypto.h"
 #include "net.h" /* tr_address */
 #include "utils.h" /* tr_time() */
 
 struct evbuffer;
 struct tr_bandwidth;
-struct tr_crypto;
 struct tr_datatype;
 struct tr_peerIo;
 
@@ -107,7 +107,7 @@ typedef struct tr_peerIo
     void *                userData;
 
     struct tr_bandwidth   bandwidth;
-    struct tr_crypto    * crypto;
+    tr_crypto             crypto;
 
     struct evbuffer     * inbuf;
     struct evbuffer     * outbuf;
@@ -282,9 +282,9 @@ void    tr_peerIoWriteBuf       ( tr_peerIo         * io,
 ***
 **/
 
-static inline struct tr_crypto * tr_peerIoGetCrypto( tr_peerIo * io )
+static inline tr_crypto * tr_peerIoGetCrypto( tr_peerIo * io )
 {
-    return io->crypto;
+    return &io->crypto;
 }
 
 void tr_peerIoSetEncryption( tr_peerIo * io, tr_encryption_type encryption_type );

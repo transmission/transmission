@@ -26,13 +26,34 @@
 *** @{
 **/
 
-typedef struct tr_crypto tr_crypto;
+#include <openssl/dh.h> /* RC4_KEY */
+#include <openssl/rc4.h> /* DH */
 
-/** @brief create a new tr_crypto object */
-tr_crypto*  tr_cryptoNew( const uint8_t * torrentHash, int isIncoming );
+enum
+{
+    KEY_LEN = 96
+};
 
-/** @brief destroy an existing tr_crypto object */
-void           tr_cryptoFree( tr_crypto * crypto );
+/** @brief Holds state information for encrypted peer communications */
+typedef struct
+{
+    RC4_KEY         dec_key;
+    RC4_KEY         enc_key;
+    DH *            dh;
+    uint8_t         myPublicKey[KEY_LEN];
+    uint8_t         mySecret[KEY_LEN];
+    uint8_t         torrentHash[SHA_DIGEST_LENGTH];
+    bool            isIncoming;
+    bool            torrentHashIsSet;
+    bool            mySecretIsSet;
+}
+tr_crypto;
+
+/** @brief construct a new tr_crypto object */
+void tr_cryptoConstruct( tr_crypto * crypto, const uint8_t * torrentHash, bool isIncoming );
+
+/** @brief destruct an existing tr_crypto object */
+void tr_cryptoDestruct( tr_crypto * crypto );
 
 
 void tr_cryptoSetTorrentHash( tr_crypto * crypto, const uint8_t * torrentHash );

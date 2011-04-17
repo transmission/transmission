@@ -55,7 +55,6 @@ enum
     PadC_MAXLEN                    = 512,
     PadD_MAXLEN                    = 512,
     VC_LENGTH                      = 8,
-    KEY_LEN                        = 96,
     CRYPTO_PROVIDE_PLAINTEXT       = 1,
     CRYPTO_PROVIDE_CRYPTO          = 2,
 
