@@ -229,7 +229,7 @@ AC_ARG_ENABLE([utp],
 if test "x$want_utp" = "xyes" ; then
     if test "x$have_utp" = "xyes"; then 
         LIBUTP_CFLAGS="-I\$(top_srcdir)/third-party/"
-        LIBUTP_LIBS="\$(top_builddir)/third-party/libutp/libutp.a -lstdc++"
+        LIBUTP_LIBS="\$(top_builddir)/third-party/libutp/libutp.a"
 	if test "x$libutp_extra_libs" != "x" ; then
 	   LIBUTP_LIBS="$LIBUTP_LIBS $libutp_extra_libs"
 	fi
