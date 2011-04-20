@@ -109,6 +109,8 @@ static const struct tr_option options[] =
     { 'O', "no-dht", "Disable distributed hash tables (DHT)", "O", 0, NULL },
     { 'y', "lpd", "Enable local peer discovery (LPD)", "y", 0, NULL },
     { 'Y', "no-lpd", "Disable local peer discovery (LPD)", "Y", 0, NULL },
+    { 830, "utp", "Enable uTP for peer connections", NULL, 0, NULL },
+    { 831, "no-utp", "Disable uTP for peer connections", NULL, 0, NULL },
     { 'P', "peerport", "Port for incoming peers (Default: " TR_DEFAULT_PEER_PORT_STR ")", "P", 1, "<port>" },
     { 'm', "portmap", "Enable portmapping via NAT-PMP or UPnP", "m", 0, NULL },
     { 'M', "no-portmap", "Disable portmapping", "M", 0, NULL },
@@ -443,6 +445,10 @@ main( int argc, char ** argv )
             case 811: tr_bencDictAddInt( &settings,  TR_PREFS_KEY_MSGLEVEL, TR_MSG_INF );
                       break;
             case 812: tr_bencDictAddInt( &settings,  TR_PREFS_KEY_MSGLEVEL, TR_MSG_DBG );
+                      break;
+            case 830: tr_bencDictAddBool( &settings, TR_PREFS_KEY_UTP_ENABLED, true );
+                      break;
+            case 831: tr_bencDictAddBool( &settings, TR_PREFS_KEY_UTP_ENABLED, false );
                       break;
             default:  showUsage( );
                       break;

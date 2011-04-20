@@ -24,6 +24,7 @@
 .Op Fl l Ar limit
 .Op Fl L Ar limit
 .Op Fl er | ep | et
+.Op Fl utp | no-utp
 .Op Fl V
 .Op Fl w Ar download-dir
 .Op Fl e Ar logfile
@@ -114,6 +115,10 @@ Used for client authentication.
 Used for client authentication.
 .It Fl V Fl -version
 Show version number and exit
+.It Fl -utp
+Enable uTP for peer connections.
+.It Fl -no-utp
+Disable uTP for peer connections.
 .It Fl w Fl -download-dir
 Where to store downloaded data.
 .It Fl e Fl -logfile
