@@ -1458,8 +1458,8 @@ update_foreach( GtkTreeModel * model, GtkTreeIter * iter )
         || ( newError != oldError )
         || ( newActivePeerCount != oldActivePeerCount )
         || ( newTrackers != oldTrackers )
-        || gtr_compare_double( newUpSpeed, oldUpSpeed, 3 )
-        || gtr_compare_double( newDownSpeed, oldDownSpeed, 3 )
+        || gtr_compare_double( newUpSpeed, oldUpSpeed, 2 )
+        || gtr_compare_double( newDownSpeed, oldDownSpeed, 2 )
         || gtr_compare_double( newRecheckProgress, oldRecheckProgress, 2 ) )
     {
         gtk_list_store_set( GTK_LIST_STORE( model ), iter,
