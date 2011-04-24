@@ -2583,17 +2583,9 @@ tr_peerMgrGetDesiredAvailable( const tr_torrent * tor )
     /* do it the hard way */
 
     desiredAvailable = 0;
-    for( i=0, n=tor->info.pieceCount; i<n; ++i )
-    {
-        if( tor->info.pieces[i].dnd )
-            continue;
-        if( t->pieceReplicationSize >= i )
-            continue;
-        if( t->pieceReplication[i] == 0 )
-            continue;
-
-        desiredAvailable += tr_cpMissingBytesInPiece( &t->tor->completion, i );
-    }
+    for( i=0, n=MIN(tor->info.pieceCount, t->pieceReplicationSize); i<n; ++i )
+        if( !tor->info.pieces[i].dnd && ( t->pieceReplication[i] > 0 ) )
+            desiredAvailable += tr_cpMissingBytesInPiece( &t->tor->completion, i );
 
     return desiredAvailable;
 }
