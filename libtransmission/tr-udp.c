@@ -205,17 +205,26 @@ event_callback(int s, short type UNUSED, void *sv)
     fromlen = sizeof(from);
     rc = recvfrom(s, buf, 4096 - 1, 0,
                   (struct sockaddr*)&from, &fromlen);
+
+    /* Since most packets we receive here are µTP, make quick inline
+       checks for the other protocols.  The logic is as follows:
+       - all DHT packets start with 'd';
+       - all UDP tracker packets start with a 32-bit (!) "action", which
+         is between 0 and 3;
+       - the above cannot be µTP packets, since these start with a 4-bit
+         version number (1). */
     if(rc > 0) {
-        if( tau_handle_message( ss, buf, rc ) ) {
-            tr_ndbg("UDP", "Received UDP Tracker packet");
-        }
-        else if( buf[0] == 'd' ) {
-            /* DHT packet. */
-            buf[rc] = '\0';
+        if( buf[0] == 'd' ) {
+            buf[rc] = '\0';     /* required by the DHT code */
             tr_dhtCallback(buf, rc, (struct sockaddr*)&from, fromlen, sv);
+        } else if( rc >= 8 &&
+                   buf[0] == 0 && buf[1] == 0 && buf[2] == 0 && buf[3] <= 3 ) {
+            rc = tau_handle_message( ss, buf, rc );
+            if( !rc )
+                tr_ndbg("UDP", "Couldn't parse UDP tracker packet.");
         } else {
             rc = tr_utpPacket(buf, rc, (struct sockaddr*)&from, fromlen, ss);
-            if(!rc)
+            if( !rc )
                 tr_ndbg("UDP", "Unexpected UDP packet");
         }
     }
