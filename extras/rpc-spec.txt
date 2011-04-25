@@ -398,6 +398,7 @@
    "location"                 | string     the new torrent location
    "move"                     | boolean    if true, move from previous location.
                               |            otherwise, search "location" for files
+                              |            (default: false)
 
    Response arguments: none
 
