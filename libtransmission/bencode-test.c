@@ -323,7 +323,7 @@ testJSONSnippet( const char * benc_str,
     char * serialized;
 
     tr_bencLoad( benc_str, strlen( benc_str ), &top, NULL );
-    tr_bencToBuf( &top, TR_FMT_JSON, buf );
+    buf = tr_bencToBuf( &top, TR_FMT_JSON );
     serialized = (char*) evbuffer_pullup( buf, -1 );
     stripWhitespace( serialized );
 #if 0

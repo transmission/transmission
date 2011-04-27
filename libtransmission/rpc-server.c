@@ -270,8 +270,7 @@ handle_upload( struct evhttp_request * req,
 
             if( have_source )
             {
-                struct evbuffer * json = evbuffer_new( );
-                tr_bencToBuf( &top, TR_FMT_JSON, json );
+                struct evbuffer * json = tr_bencToBuf( &top, TR_FMT_JSON );
                 tr_rpc_request_exec_json( server->session,
                                           evbuffer_pullup( json, -1 ),
                                           evbuffer_get_length( json ),

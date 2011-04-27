@@ -125,7 +125,7 @@ int tr_bencToFile( const tr_benc *, tr_fmt_mode, const char * filename );
 
 char* tr_bencToStr( const tr_benc *, tr_fmt_mode, int * len );
 
-void tr_bencToBuf( const tr_benc *, tr_fmt_mode, struct evbuffer * );
+struct evbuffer * tr_bencToBuf( const tr_benc *, tr_fmt_mode );
 
 /* TR_FMT_JSON_LEAN and TR_FMT_JSON are equivalent in this function. */
 int tr_bencLoadFile( tr_benc * setme, tr_fmt_mode, const char * filename );

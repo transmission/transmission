@@ -1606,10 +1606,11 @@ tr_bencMergeDicts( tr_benc * target, const tr_benc * source )
 ****
 ***/
 
-void
-tr_bencToBuf( const tr_benc * top, tr_fmt_mode mode, struct evbuffer * buf )
+struct evbuffer *
+tr_bencToBuf( const tr_benc * top, tr_fmt_mode mode )
 {
-    evbuffer_drain( buf, evbuffer_get_length( buf ) );
+    struct evbuffer * buf = evbuffer_new( );
+
     evbuffer_expand( buf, 4096 ); /* alloc a little memory to start off with */
 
     switch( mode )
@@ -1630,17 +1631,16 @@ tr_bencToBuf( const tr_benc * top, tr_fmt_mode mode, struct evbuffer * buf )
             break;
         }
     }
+
+    return buf;
 }
 
 char*
 tr_bencToStr( const tr_benc * top, tr_fmt_mode mode, int * len )
 {
-    char * ret;
-    struct evbuffer * buf = evbuffer_new( );
-    size_t n;
-    tr_bencToBuf( top, mode, buf );
-    n = evbuffer_get_length( buf );
-    ret = evbuffer_free_to_str( buf );
+    struct evbuffer * buf = tr_bencToBuf( top, mode );
+    const size_t n = evbuffer_get_length( buf );
+    char * ret = evbuffer_free_to_str( buf );
     if( len != NULL )
         *len = (int) n;
     return ret;

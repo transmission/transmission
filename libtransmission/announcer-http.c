@@ -211,8 +211,7 @@ on_announce_done( tr_session   * session,
 
         if( getenv( "TR_CURL_VERBOSE" ) != NULL )
         {
-            struct evbuffer * buf = evbuffer_new( );
-            tr_bencToBuf( &benc, TR_FMT_JSON, buf );
+            struct evbuffer * buf = tr_bencToBuf( &benc, TR_FMT_JSON );
             fprintf( stderr, "Announce response:\n< %s\n", evbuffer_pullup( buf, -1 ) );
             tr_free( buf );
         }
