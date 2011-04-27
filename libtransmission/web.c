@@ -62,9 +62,11 @@ enum
 
 struct tr_web
 {
+    bool curl_verbose;
     int close_mode;
     tr_list * tasks;
     tr_lock * taskLock;
+    char * cookie_filename;
 };
 
 
@@ -150,18 +152,16 @@ getTimeoutFromURL( const struct tr_web_task * task )
 }
 
 static CURL *
-createEasy( tr_session * s, struct tr_web_task * task )
+createEasy( tr_session * s, struct tr_web * web, struct tr_web_task * task )
 {
-    const tr_address * addr;
     bool is_default_value;
+    const tr_address * addr;
     CURL * e = curl_easy_init( );
-    const long verbose = getenv( "TR_CURL_VERBOSE" ) != NULL;
-    char * cookie_filename = tr_buildPath( s->configDir, "cookies.txt", NULL );
 
     task->timeout_secs = getTimeoutFromURL( task );
 
     curl_easy_setopt( e, CURLOPT_AUTOREFERER, 1L );
-    curl_easy_setopt( e, CURLOPT_COOKIEFILE, cookie_filename );
+    curl_easy_setopt( e, CURLOPT_COOKIEFILE, web->cookie_filename );
     curl_easy_setopt( e, CURLOPT_ENCODING, "gzip;q=1.0, deflate, identity" );
     curl_easy_setopt( e, CURLOPT_FOLLOWLOCATION, 1L );
     curl_easy_setopt( e, CURLOPT_MAXREDIRS, -1L );
@@ -176,7 +176,7 @@ createEasy( tr_session * s, struct tr_web_task * task )
     curl_easy_setopt( e, CURLOPT_TIMEOUT, task->timeout_secs );
     curl_easy_setopt( e, CURLOPT_URL, task->url );
     curl_easy_setopt( e, CURLOPT_USERAGENT, TR_NAME "/" SHORT_VERSION_STRING );
-    curl_easy_setopt( e, CURLOPT_VERBOSE, verbose );
+    curl_easy_setopt( e, CURLOPT_VERBOSE, (long)(web->curl_verbose?1:0) );
     curl_easy_setopt( e, CURLOPT_WRITEDATA, task );
     curl_easy_setopt( e, CURLOPT_WRITEFUNCTION, writeFunc );
 
@@ -194,7 +194,6 @@ createEasy( tr_session * s, struct tr_web_task * task )
     if( s->curl_easy_config_func != NULL )
         s->curl_easy_config_func( s, e, task->url, s->curl_easy_config_user_data );
 
-    tr_free( cookie_filename );
     return e;
 }
 
@@ -318,6 +317,9 @@ tr_webThreadFunc( void * vsession )
     web->close_mode = ~0;
     web->taskLock = tr_lockNew( );
     web->tasks = NULL;
+    web->curl_verbose = getenv( "TR_CURL_VERBOSE" ) != NULL;
+    web->cookie_filename = tr_buildPath( session->configDir, "cookies.txt", NULL );
+
     multi = curl_multi_init( );
     session->web = web;
 
@@ -338,7 +340,7 @@ tr_webThreadFunc( void * vsession )
         while(( task = tr_list_pop_front( &web->tasks )))
         {
             dbgmsg( "adding task to curl: [%s]", task->url );
-            curl_multi_add_handle( multi, createEasy( session, task ));
+            curl_multi_add_handle( multi, createEasy( session, web, task ));
             /*fprintf( stderr, "adding a task.. taskCount is now %d\n", taskCount );*/
             ++taskCount;
         }
@@ -421,6 +423,7 @@ fprintf( stderr, "loop is ending... web is closing\n" );
     /* cleanup */
     curl_multi_cleanup( multi );
     tr_lockFree( web->taskLock );
+    tr_free( web->cookie_filename );
     tr_free( web );
     session->web = NULL;
 }
