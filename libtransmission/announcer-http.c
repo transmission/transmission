@@ -211,9 +211,10 @@ on_announce_done( tr_session   * session,
 
         if( getenv( "TR_CURL_VERBOSE" ) != NULL )
         {
-            char * str = tr_bencToStr( &benc, TR_FMT_JSON, NULL );
-            fprintf( stderr, "Announce response:\n< %s\n", str );
-            tr_free( str );
+            struct evbuffer * buf = evbuffer_new( );
+            tr_bencToBuf( &benc, TR_FMT_JSON, buf );
+            fprintf( stderr, "Announce response:\n< %s\n", evbuffer_pullup( buf, -1 ) );
+            tr_free( buf );
         }
 
         if( benc_loaded && tr_bencIsDict( &benc ) )
