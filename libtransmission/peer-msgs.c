@@ -788,10 +788,9 @@ static void
 sendLtepHandshake( tr_peermsgs * msgs )
 {
     tr_benc val, *m;
-    char * buf;
-    int len;
     bool allow_pex;
     bool allow_metadata_xfer;
+    struct evbuffer * payload;
     struct evbuffer * out = msgs->outMessages;
     const unsigned char * ipv6 = tr_globalIPv6();
 
@@ -832,18 +831,18 @@ sendLtepHandshake( tr_peermsgs * msgs )
     if( allow_pex )
         tr_bencDictAddInt( m, "ut_pex", UT_PEX_ID );
 
-    buf = tr_bencToStr( &val, TR_FMT_BENC, &len );
+    payload = tr_bencToBuf( &val, TR_FMT_BENC );
 
-    evbuffer_add_uint32( out, 2 * sizeof( uint8_t ) + len );
+    evbuffer_add_uint32( out, 2 * sizeof( uint8_t ) + evbuffer_get_length( payload ) );
     evbuffer_add_uint8 ( out, BT_LTEP );
     evbuffer_add_uint8 ( out, LTEP_HANDSHAKE );
-    evbuffer_add       ( out, buf, len );
+    evbuffer_add_buffer( out, payload );
     pokeBatchPeriod( msgs, IMMEDIATE_PRIORITY_INTERVAL_SECS );
     dbgOutMessageLen( msgs );
 
     /* cleanup */
+    evbuffer_free( payload );
     tr_bencFree( &val );
-    tr_free( buf );
 }
 
 static void
@@ -997,26 +996,26 @@ parseUtMetadata( tr_peermsgs * msgs, int msglen, struct evbuffer * inbuf )
         else
         {
             tr_benc tmp;
-            int payloadLen;
-            char * payload;
+            struct evbuffer * payload;
             struct evbuffer * out = msgs->outMessages;
 
             /* build the rejection message */
             tr_bencInitDict( &tmp, 2 );
             tr_bencDictAddInt( &tmp, "msg_type", METADATA_MSG_TYPE_REJECT );
             tr_bencDictAddInt( &tmp, "piece", piece );
-            payload = tr_bencToStr( &tmp, TR_FMT_BENC, &payloadLen );
-            tr_bencFree( &tmp );
+            payload = tr_bencToBuf( &tmp, TR_FMT_BENC );
 
             /* write it out as a LTEP message to our outMessages buffer */
-            evbuffer_add_uint32( out, 2 * sizeof( uint8_t ) + payloadLen );
+            evbuffer_add_uint32( out, 2 * sizeof( uint8_t ) + evbuffer_get_length( payload ) );
             evbuffer_add_uint8 ( out, BT_LTEP );
             evbuffer_add_uint8 ( out, msgs->ut_metadata_id );
-            evbuffer_add       ( out, payload, payloadLen );
+            evbuffer_add_buffer( out, payload );
             pokeBatchPeriod( msgs, HIGH_PRIORITY_INTERVAL_SECS );
             dbgOutMessageLen( msgs );
 
-            tr_free( payload );
+            /* cleanup */
+            evbuffer_free( payload );
+            tr_bencFree( &tmp );
         }
     }
 
@@ -1717,28 +1716,28 @@ updateMetadataRequests( tr_peermsgs * msgs, time_t now )
         && tr_torrentGetNextMetadataRequest( msgs->torrent, now, &piece ) )
     {
         tr_benc tmp;
-        int payloadLen;
-        char * payload;
+        struct evbuffer * payload;
         struct evbuffer * out = msgs->outMessages;
 
         /* build the data message */
         tr_bencInitDict( &tmp, 3 );
         tr_bencDictAddInt( &tmp, "msg_type", METADATA_MSG_TYPE_REQUEST );
         tr_bencDictAddInt( &tmp, "piece", piece );
-        payload = tr_bencToStr( &tmp, TR_FMT_BENC, &payloadLen );
-        tr_bencFree( &tmp );
+        payload = tr_bencToBuf( &tmp, TR_FMT_BENC );
 
         dbgmsg( msgs, "requesting metadata piece #%d", piece );
 
         /* write it out as a LTEP message to our outMessages buffer */
-        evbuffer_add_uint32( out, 2 * sizeof( uint8_t ) + payloadLen );
+        evbuffer_add_uint32( out, 2 * sizeof( uint8_t ) + evbuffer_get_length( payload ) );
         evbuffer_add_uint8 ( out, BT_LTEP );
         evbuffer_add_uint8 ( out, msgs->ut_metadata_id );
-        evbuffer_add       ( out, payload, payloadLen );
+        evbuffer_add_buffer( out, payload );
         pokeBatchPeriod( msgs, HIGH_PRIORITY_INTERVAL_SECS );
         dbgOutMessageLen( msgs );
 
-        tr_free( payload );
+        /* cleanup */
+        evbuffer_free( payload );
+        tr_bencFree( &tmp );
     }
 }
 
@@ -1810,8 +1809,7 @@ fillOutputBuffer( tr_peermsgs * msgs, time_t now )
         if( ( dataLen > 0 ) && ( data != NULL ) )
         {
             tr_benc tmp;
-            int payloadLen;
-            char * payload;
+            struct evbuffer * payload;
             struct evbuffer * out = msgs->outMessages;
 
             /* build the data message */
@@ -1819,19 +1817,19 @@ fillOutputBuffer( tr_peermsgs * msgs, time_t now )
             tr_bencDictAddInt( &tmp, "msg_type", METADATA_MSG_TYPE_DATA );
             tr_bencDictAddInt( &tmp, "piece", piece );
             tr_bencDictAddInt( &tmp, "total_size", msgs->torrent->infoDictLength );
-            payload = tr_bencToStr( &tmp, TR_FMT_BENC, &payloadLen );
-            tr_bencFree( &tmp );
+            payload = tr_bencToBuf( &tmp, TR_FMT_BENC );
 
             /* write it out as a LTEP message to our outMessages buffer */
-            evbuffer_add_uint32( out, 2 * sizeof( uint8_t ) + payloadLen + dataLen );
+            evbuffer_add_uint32( out, 2 * sizeof( uint8_t ) + evbuffer_get_length( payload ) + dataLen );
             evbuffer_add_uint8 ( out, BT_LTEP );
             evbuffer_add_uint8 ( out, msgs->ut_metadata_id );
-            evbuffer_add       ( out, payload, payloadLen );
+            evbuffer_add_buffer( out, payload );
             evbuffer_add       ( out, data, dataLen );
             pokeBatchPeriod( msgs, HIGH_PRIORITY_INTERVAL_SECS );
             dbgOutMessageLen( msgs );
 
-            tr_free( payload );
+            evbuffer_free( payload );
+            tr_bencFree( &tmp );
             tr_free( data );
 
             ok = true;
@@ -1840,26 +1838,25 @@ fillOutputBuffer( tr_peermsgs * msgs, time_t now )
         if( !ok ) /* send a rejection message */
         {
             tr_benc tmp;
-            int payloadLen;
-            char * payload;
+            struct evbuffer * payload;
             struct evbuffer * out = msgs->outMessages;
 
             /* build the rejection message */
             tr_bencInitDict( &tmp, 2 );
             tr_bencDictAddInt( &tmp, "msg_type", METADATA_MSG_TYPE_REJECT );
             tr_bencDictAddInt( &tmp, "piece", piece );
-            payload = tr_bencToStr( &tmp, TR_FMT_BENC, &payloadLen );
-            tr_bencFree( &tmp );
+            payload = tr_bencToBuf( &tmp, TR_FMT_BENC );
 
             /* write it out as a LTEP message to our outMessages buffer */
-            evbuffer_add_uint32( out, 2 * sizeof( uint8_t ) + payloadLen );
+            evbuffer_add_uint32( out, 2 * sizeof( uint8_t ) + evbuffer_get_length( payload ) );
             evbuffer_add_uint8 ( out, BT_LTEP );
             evbuffer_add_uint8 ( out, msgs->ut_metadata_id );
-            evbuffer_add       ( out, payload, payloadLen );
+            evbuffer_add_buffer( out, payload );
             pokeBatchPeriod( msgs, HIGH_PRIORITY_INTERVAL_SECS );
             dbgOutMessageLen( msgs );
 
-            tr_free( payload );
+            evbuffer_free( payload );
+            tr_bencFree( &tmp );
         }
     }
 
@@ -2192,9 +2189,8 @@ sendPex( tr_peermsgs * msgs )
         {
             int  i;
             tr_benc val;
-            char * benc;
-            int bencLen;
             uint8_t * tmp, *walk;
+            struct evbuffer * payload;
             struct evbuffer * out = msgs->outMessages;
 
             /* update peer */
@@ -2284,16 +2280,16 @@ sendPex( tr_peermsgs * msgs )
             }
 
             /* write the pex message */
-            benc = tr_bencToStr( &val, TR_FMT_BENC, &bencLen );
-            evbuffer_add_uint32( out, 2 * sizeof( uint8_t ) + bencLen );
+            payload = tr_bencToBuf( &val, TR_FMT_BENC );
+            evbuffer_add_uint32( out, 2 * sizeof( uint8_t ) + evbuffer_get_length( payload ) );
             evbuffer_add_uint8 ( out, BT_LTEP );
             evbuffer_add_uint8 ( out, msgs->ut_pex_id );
-            evbuffer_add       ( out, benc, bencLen );
+            evbuffer_add_buffer( out, payload );
             pokeBatchPeriod( msgs, HIGH_PRIORITY_INTERVAL_SECS );
             dbgmsg( msgs, "sending a pex message; outMessage size is now %zu", evbuffer_get_length( out ) );
             dbgOutMessageLen( msgs );
 
-            tr_free( benc );
+            evbuffer_free( payload );
             tr_bencFree( &val );
         }
 
