@@ -188,19 +188,13 @@ static void
 event_callback(int s, short type UNUSED, void *sv)
 {
     tr_session *ss = sv;
-    unsigned char *buf;
+    unsigned char buf[4096];
     struct sockaddr_storage from;
     socklen_t fromlen;
     int rc;
 
     assert(tr_isSession(sv));
     assert(type == EV_READ);
-
-    buf = malloc(4096);
-    if(buf == NULL) {
-        tr_nerr("UDP", "Couldn't allocate buffer");
-        return;
-    }
 
     fromlen = sizeof(from);
     rc = recvfrom(s, buf, 4096 - 1, 0,
@@ -228,8 +222,6 @@ event_callback(int s, short type UNUSED, void *sv)
                 tr_ndbg("UDP", "Unexpected UDP packet");
         }
     }
-
-    free(buf);
 }
 
 void
