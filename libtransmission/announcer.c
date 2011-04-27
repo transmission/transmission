@@ -1296,7 +1296,7 @@ on_scrape_done( const tr_scrape_response  * response, void * vsession )
 
 static void
 scrape_request_delegate( tr_announcer             * announcer,
-                         tr_scrape_request        * request,
+                         const tr_scrape_request  * request,
                          tr_scrape_response_func  * callback,
                          void                     * callback_data )
 {
