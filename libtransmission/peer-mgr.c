@@ -3209,14 +3209,18 @@ static tr_peer **
 getPeersToClose( Torrent * t, const time_t now_sec, int * setmeSize )
 {
     int i, peerCount, outsize;
+    struct tr_peer ** ret = NULL;
     tr_peer ** peers = (tr_peer**) tr_ptrArrayPeek( &t->peers, &peerCount );
-    struct tr_peer ** ret = tr_new( tr_peer *, peerCount );
 
     assert( torrentIsLocked( t ) );
 
-    for( i = outsize = 0; i < peerCount; ++i )
-        if( shouldPeerBeClosed( t, peers[i], peerCount, now_sec ) )
+    for( i = outsize = 0; i < peerCount; ++i ) {
+        if( shouldPeerBeClosed( t, peers[i], peerCount, now_sec ) ) {
+            if( ret == NULL )
+                ret = tr_new( tr_peer *, peerCount );
             ret[outsize++] = peers[i];
+        }
+    }
 
     *setmeSize = outsize;
     return ret;
