@@ -729,7 +729,6 @@ dbgmsg_tier_announce_queue( const tr_tier * tier )
     if( tr_deepLoggingIsActive( ) )
     {
         int i;
-        char * str;
         char name[128];
         struct evbuffer * buf = evbuffer_new( );
 
@@ -740,9 +739,9 @@ dbgmsg_tier_announce_queue( const tr_tier * tier )
             const char * str = tr_announce_event_get_string( e );
             evbuffer_add_printf( buf, "[%d:%s]", i, str );
         }
-        str = evbuffer_free_to_str( buf );
-        tr_deepLog( __FILE__, __LINE__, name, "announce queue is %s", str );
-        tr_free( str );
+
+        tr_deepLog( __FILE__, __LINE__, name, "announce queue is %s", evbuffer_pullup( buf, -1 ) );
+        evbuffer_free( buf );
     }
 }
 
