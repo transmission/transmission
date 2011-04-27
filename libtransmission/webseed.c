@@ -244,18 +244,18 @@ web_response_func( tr_session    * session,
     }
 }
 
-static char*
+static struct evbuffer *
 make_url( tr_webseed * w, const tr_file * file )
 {
-    struct evbuffer * out = evbuffer_new( );
+    struct evbuffer * buf = evbuffer_new( );
 
-    evbuffer_add( out, w->base_url, w->base_url_len );
+    evbuffer_add( buf, w->base_url, w->base_url_len );
 
     /* if url ends with a '/', add the torrent name */
     if( w->base_url[w->base_url_len - 1] == '/' && file->name )
-        tr_http_escape( out, file->name, strlen(file->name), false );
+        tr_http_escape( buf, file->name, strlen(file->name), false );
 
-    return evbuffer_free_to_str( out );
+    return buf;
 }
 
 static void
@@ -264,8 +264,8 @@ task_request_next_chunk( struct tr_webseed_task * t )
     tr_torrent * tor = tr_torrentFindFromId( t->session, t->torrent_id );
     if( tor != NULL )
     {
-        char * url;
         char range[64];
+        struct evbuffer * url;
 
         const tr_info * inf = tr_torrentInfo( tor );
         const uint32_t remain = t->length - evbuffer_get_length( t->content );
@@ -290,9 +290,9 @@ task_request_next_chunk( struct tr_webseed_task * t )
         url = make_url( t->webseed, file );
         tr_snprintf( range, sizeof range, "%"PRIu64"-%"PRIu64,
                      file_offset, file_offset + this_pass - 1 );
-        tr_webRunWithBuffer( t->session, url, range, NULL,
-                             web_response_func, t, t->content );
-        tr_free( url );
+        tr_webRunWithBuffer( t->session, (char *) evbuffer_pullup( url, -1 ),
+                             range, NULL, web_response_func, t, t->content );
+        evbuffer_free( url );
     }
 }
 
