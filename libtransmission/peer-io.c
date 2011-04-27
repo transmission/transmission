@@ -1059,10 +1059,17 @@ tr_peerIoWriteBuf( tr_peerIo * io, struct evbuffer * buf, bool isPieceData )
 void
 tr_peerIoWriteBytes( tr_peerIo * io, const void * bytes, size_t byteCount, bool isPieceData )
 {
-    struct evbuffer * buf = evbuffer_new( );
-    evbuffer_add( buf, bytes, byteCount );
-    tr_peerIoWriteBuf( io, buf, isPieceData );
-    evbuffer_free( buf );
+    struct evbuffer_iovec iovec;
+    evbuffer_reserve_space( io->outbuf, byteCount, &iovec, 1 );
+
+    iovec.iov_len = byteCount;
+    if( io->encryption_type == PEER_ENCRYPTION_RC4 )
+        tr_cryptoEncrypt( &io->crypto, iovec.iov_len, bytes, iovec.iov_base );
+    else
+        memcpy( iovec.iov_base, bytes, iovec.iov_len );
+    evbuffer_commit_space( io->outbuf, &iovec, 1 );
+
+    addDatatype( io, byteCount, isPieceData );
 }
 
 /***
