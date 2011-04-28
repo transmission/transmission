@@ -1443,12 +1443,22 @@ refillUpkeep( int foo UNUSED, short bar UNUSED, void * vmgr )
     time_t now;
     time_t too_old;
     tr_torrent * tor;
+    int cancel_buflen = 0;
+    struct block_request * cancel = NULL;
     tr_peerMgr * mgr = vmgr;
     managerLock( mgr );
 
     now = tr_time( );
     too_old = now - REQUEST_TTL_SECS;
 
+    /* alloc the temporary "cancel" buffer */
+    tor = NULL;
+    while(( tor = tr_torrentNext( mgr->session, tor )))
+        cancel_buflen = MAX( cancel_buflen, tor->torrentPeers->requestCount );
+    if( cancel_buflen > 0 )
+        cancel = tr_new( struct block_request, cancel_buflen );
+
+    /* prune requests that are too old */
     tor = NULL;
     while(( tor = tr_torrentNext( mgr->session, tor )))
     {
@@ -1460,7 +1470,6 @@ refillUpkeep( int foo UNUSED, short bar UNUSED, void * vmgr )
             int cancelCount = 0;
             const struct block_request * it;
             const struct block_request * end;
-            struct block_request * cancel = tr_new( struct block_request, n );
 
             for( it=t->requests, end=it+n; it!=end; ++it )
             {
@@ -1489,12 +1498,10 @@ refillUpkeep( int foo UNUSED, short bar UNUSED, void * vmgr )
             /* decrement the pending request counts for the timed-out blocks */
             for( it=cancel, end=it+cancelCount; it!=end; ++it )
                 pieceListRemoveRequest( t, it->block );
-
-            /* cleanup loop */
-            tr_free( cancel );
         }
     }
 
+    tr_free( cancel );
     tr_timerAddMsec( mgr->refillUpkeepTimer, REFILL_UPKEEP_PERIOD_MSEC );
     managerUnlock( mgr );
 }
