@@ -133,11 +133,10 @@ category_filter_model_update( GtkTreeStore * store )
     GtkTreeIter iter;
     GtkTreeModel * model = GTK_TREE_MODEL( store );
     GPtrArray * hosts = g_ptr_array_new( );
-    GHashTable * hosts_hash = g_hash_table_new_full( g_str_hash, g_str_equal,
-                                                     g_free, g_free );
+    GStringChunk * strings = g_string_chunk_new( 4096 );
+    GHashTable * hosts_hash = g_hash_table_new_full( g_str_hash, g_str_equal, NULL, g_free );
     GObject * o = G_OBJECT( store );
-    GtkTreeModel * tmodel = GTK_TREE_MODEL(
-                                    g_object_get_qdata( o, TORRENT_MODEL_KEY ) );
+    GtkTreeModel * tmodel = GTK_TREE_MODEL( g_object_get_qdata( o, TORRENT_MODEL_KEY ) );
 
     g_object_steal_qdata( o, DIRTY_KEY );
 
@@ -160,29 +159,31 @@ category_filter_model_update( GtkTreeStore * store )
         {
             int k;
             int * count;
-            char key[1024];
+            char buf[1024];
+            char * key;
 
-            gtr_get_host_from_url( key, sizeof( key ), inf->trackers[i].announce );
+            gtr_get_host_from_url( buf, sizeof( buf ), inf->trackers[i].announce );
+            key = g_string_chunk_insert( strings, buf );
+
             count = g_hash_table_lookup( hosts_hash, key );
             if( count == NULL )
             {
                 count = tr_new0( int, 1 );
-                g_hash_table_insert( hosts_hash, g_strdup( key ), count );
-                g_ptr_array_add( hosts, g_strdup( key ) );
+                g_hash_table_insert( hosts_hash, key, count );
+                g_ptr_array_add( hosts, key );
             }
 
             for( k=0; k<keyCount; ++k )
                 if( !strcmp( keys[k], key ) )
                     break;
             if( k==keyCount )
-                keys[keyCount++] = g_strdup( key );
+                keys[keyCount++] = key;
         }
 
         for( i=0; i<keyCount; ++i )
         {
             int * incrementme = g_hash_table_lookup( hosts_hash, keys[i] );
             ++*incrementme;
-            g_free( keys[i] );
         }
         g_free( keys );
 
@@ -291,9 +292,9 @@ category_filter_model_update( GtkTreeStore * store )
     category_model_update_count( store, &iter, low );
 
     /* cleanup */
-    g_ptr_array_foreach( hosts, (GFunc)g_free, NULL );
     g_ptr_array_free( hosts, TRUE );
     g_hash_table_unref( hosts_hash );
+    g_string_chunk_free( strings );
     return FALSE;
 }
 
