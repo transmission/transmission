@@ -561,6 +561,25 @@ tr_fdFileGetCached( tr_session * s, int torrent_id, tr_file_index_t i, bool writ
     return o->fd;
 }
 
+#ifdef SYS_DARWIN
+ #define TR_STAT_MTIME(sb) ((sb).st_mtimespec.tv_sec)
+#else
+ #define TR_STAT_MTIME(sb) ((sb).st_mtime)
+#endif
+
+bool
+tr_fdFileGetCachedMTime( tr_session * s, int torrent_id, tr_file_index_t i, time_t * mtime )
+{
+    bool success;
+    struct stat sb;
+    struct tr_cached_file * o = fileset_lookup( get_fileset( s ), torrent_id, i );
+
+    if(( success = ( o != NULL ) && !fstat( o->fd, &sb )))
+        *mtime = TR_STAT_MTIME( sb );
+
+    return success;
+}
+
 void
 tr_fdTorrentClose( tr_session * session, int torrent_id )
 {
