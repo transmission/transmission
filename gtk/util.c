@@ -208,22 +208,28 @@ gtr_mkdir_with_parents( const char * path, int mode )
 void
 gtr_get_host_from_url( char * buf, size_t buflen, const char * url )
 {
-    char * h = NULL;
+    char host[1024];
+    const char * pch;
 
-    tr_urlParse( url, -1, NULL, &h, NULL, NULL );
+    if(( pch = strstr( url, "://" ))) {
+        const size_t hostlen = strcspn( pch+3, ":/" );
+        const size_t copylen = MIN( hostlen, sizeof(host)-1 );
+        memcpy( host, pch+3, copylen );
+        host[copylen] = '\0';
+    } else {
+        *host = '\0';
+    }
 
-    if( tr_addressIsIP( h ) )
+    if( tr_addressIsIP( host ) )
         g_strlcpy( buf, url, buflen );
     else {
-        const char * first_dot = strchr( h, '.' );
-        const char * last_dot = strrchr( h, '.' );
+        const char * first_dot = strchr( host, '.' );
+        const char * last_dot = strrchr( host, '.' );
         if( ( first_dot ) && ( last_dot ) && ( first_dot != last_dot ) )
             g_strlcpy( buf, first_dot + 1, buflen );
         else
-            g_strlcpy( buf, h, buflen );
+            g_strlcpy( buf, host, buflen );
     }
-
-    tr_free( h );
 }
 
 gboolean
