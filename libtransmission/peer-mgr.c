@@ -2891,7 +2891,7 @@ rechokeDownloads( Torrent * t )
         while( n > 0 )
         {
             const int i = tr_cryptoWeakRandInt( n );
-            tr_peer * peer = tr_ptrArrayNth( &t->peers, i );
+            tr_peer * peer = peers[i];
 
             if( !isPeerInteresting( t->tor, peer ) )
             {
