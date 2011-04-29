@@ -2746,9 +2746,10 @@ tr_peerMgrPeerStats( const tr_torrent * tor, int * setmeCount )
     return ret;
 }
 
-/**
-***
-**/
+/***
+****
+****
+***/
 
 void
 tr_peerMgrClearInterest( tr_torrent * tor )
@@ -2795,24 +2796,46 @@ isPeerInteresting( const tr_torrent * tor, const tr_peer * peer )
     return false;
 }
 
+typedef enum
+{
+    RECHOKE_STATE_GOOD,
+    RECHOKE_STATE_UNTESTED,
+    RECHOKE_STATE_BAD
+}
+tr_rechoke_state;
+
+struct tr_rechoke_info
+{
+    tr_peer * peer;
+    int salt;
+    int rechoke_state;
+};
+
+static int
+compare_rechoke_info( const void * va, const void * vb )
+{
+    const struct tr_rechoke_info * a = va;
+    const struct tr_rechoke_info * b = vb;
+
+    if( a->rechoke_state != b->rechoke_state )
+        return a->rechoke_state - b->rechoke_state;
+
+    return a->salt - b->salt;
+}
+
 /* determines who we send "interested" messages to */
 static void
 rechokeDownloads( Torrent * t )
 {
     int i;
-    const time_t now = tr_time( );
+    int maxPeers = 0;
+    int rechoke_count = 0;
+    struct tr_rechoke_info * rechoke = NULL;
     const int MIN_INTERESTING_PEERS = 5;
     const int peerCount = tr_ptrArraySize( &t->peers );
-    int maxPeers         = 0;
+    const time_t now = tr_time( );
 
-    int badCount         = 0;
-    int goodCount        = 0;
-    int untestedCount    = 0;
-    tr_peer ** bad       = tr_new( tr_peer*, peerCount );
-    tr_peer ** good      = tr_new( tr_peer*, peerCount );
-    tr_peer ** untested  = tr_new( tr_peer*, peerCount );
-
-    /* decide how many peers to be interested in */
+    /* decide HOW MANY peers to be interested in */
     {
         int blocks = 0;
         int cancels = 0;
@@ -2880,79 +2903,51 @@ rechokeDownloads( Torrent * t )
 
     t->maxPeers = maxPeers;
 
-    /* separate the peers into "good" (ones with a low cancel-to-block ratio),
-     * untested peers, and "bad" (ones with a high cancel-to-block ratio).
-     * That's the order in which we'll choose who to show interest in */
+    /* decide WHICH peers to be interested in (based on their cancel-to-block ratio) */
+    for( i=0; i<peerCount; ++i )
     {
-        /* Randomize the peer array so the peers in the three groups will be unsorted... */
-        int n = peerCount;
-        tr_peer ** peers = tr_memdup( tr_ptrArrayBase( &t->peers ), n * sizeof( tr_peer * ) );
+        tr_peer * peer = tr_ptrArrayNth( &t->peers, i );
 
-        while( n > 0 )
+        if( !isPeerInteresting( t->tor, peer ) )
         {
-            const int i = tr_cryptoWeakRandInt( n );
-            tr_peer * peer = peers[i];
+            tr_peerMsgsSetInterested( peer->msgs, false );
+        }
+        else
+        {
+            tr_rechoke_state rechoke_state;
+            const int blocks = tr_historyGet( &peer->blocksSentToClient, now, CANCEL_HISTORY_SEC );
+            const int cancels = tr_historyGet( &peer->cancelsSentToPeer, now, CANCEL_HISTORY_SEC );
 
-            if( !isPeerInteresting( t->tor, peer ) )
-            {
-                tr_peerMsgsSetInterested( peer->msgs, false );
-            }
+            if( !blocks && !cancels )
+                rechoke_state = RECHOKE_STATE_UNTESTED;
+            else if( !cancels )
+                rechoke_state = RECHOKE_STATE_GOOD;
+            else if( !blocks )
+                rechoke_state = RECHOKE_STATE_BAD;
+            else if( ( cancels * 10 ) < blocks )
+                rechoke_state = RECHOKE_STATE_GOOD;
             else
-            {
-                const int blocks = tr_historyGet( &peer->blocksSentToClient, now, CANCEL_HISTORY_SEC );
-                const int cancels = tr_historyGet( &peer->cancelsSentToPeer, now, CANCEL_HISTORY_SEC );
+                rechoke_state = RECHOKE_STATE_BAD;
 
-                if( !blocks && !cancels )
-                    untested[untestedCount++] = peer;
-                else if( !cancels )
-                    good[goodCount++] = peer;
-                else if( !blocks )
-                    bad[badCount++] = peer;
-                else if( ( cancels * 10 ) < blocks )
-                    good[goodCount++] = peer;
-                else
-                    bad[badCount++] = peer;
-            }
+            if( rechoke == NULL )
+                rechoke = tr_new( struct tr_rechoke_info, peerCount );
 
-            /* remove 'peer' from the array 'peers' */
-            if( i != n - 1 )
-                peers[i] = peers[n-1];
-            --n;
+             rechoke[rechoke_count].peer = peer;
+             rechoke[rechoke_count].rechoke_state = rechoke_state;
+             rechoke[rechoke_count].salt = tr_cryptoWeakRandInt( INT_MAX );
+             rechoke_count++;
         }
 
-        tr_free( peers );
     }
 
-    t->interestedCount = 0;
-
-    /* We've decided (1) how many peers to be interested in,
-     * and (2) which peers are the best candidates,
-     * Now it's time to update our `interest' flags. */
-    for( i=0; i<goodCount; ++i ) {
-        const bool b = t->interestedCount < maxPeers;
-        tr_peerMsgsSetInterested( good[i]->msgs, b );
-        if( b )
-            ++t->interestedCount;
-    }
-    for( i=0; i<untestedCount; ++i ) {
-        const bool b = t->interestedCount < maxPeers;
-        tr_peerMsgsSetInterested( untested[i]->msgs, b );
-        if( b )
-            ++t->interestedCount;
-    }
-    for( i=0; i<badCount; ++i ) {
-        const bool b = t->interestedCount < maxPeers;
-        tr_peerMsgsSetInterested( bad[i]->msgs, b );
-        if( b )
-            ++t->interestedCount;
-    }
-
-/*fprintf( stderr, "num interested: %d\n", t->interestedCount );*/
+    /* now that we know which & how many peers to be interested in... update the peer interest */
+    qsort( rechoke, rechoke_count, sizeof( struct tr_rechoke_info ), compare_rechoke_info );
+    t->interestedCount = MIN( maxPeers, rechoke_count );
+    for( i=0; i<rechoke_count; ++i )
+        tr_peerMsgsSetInterested( rechoke[i].peer->msgs, i<t->interestedCount );
 
     /* cleanup */
-    tr_free( untested );
-    tr_free( good );
-    tr_free( bad );
+    tr_free( rechoke );
 }
 
 /**
