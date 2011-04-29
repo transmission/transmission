@@ -28,7 +28,11 @@
 #include "tr-prefs.h"
 #include "util.h"
 
-#define DETAILS_KEY "details-data"
+static GQuark ARG_KEY = 0;
+static GQuark DETAILS_KEY = 0;
+static GQuark TORRENT_ID_KEY = 0;
+static GQuark TEXT_BUFFER_KEY = 0;
+static GQuark URL_ENTRY_KEY = 0;
 
 struct DetailsImpl
 {
@@ -429,12 +433,10 @@ new_priority_combo( struct DetailsImpl * di )
 
 static void refresh( struct DetailsImpl * di );
 
-#define ARG_KEY "arg-key"
-
 static void
 onComboEnumChanged( GtkComboBox * combo_box, struct DetailsImpl * di )
 {
-    const char * key = g_object_get_data( G_OBJECT( combo_box ), ARG_KEY );
+    const char * key = g_object_get_qdata( G_OBJECT( combo_box ), ARG_KEY );
     torrent_set_int( di, key, gtr_combo_box_get_active_enum( combo_box ) );
     refresh( di );
 }
@@ -447,7 +449,7 @@ ratio_combo_new( void )
         _( "Seed regardless of ratio" ),  TR_RATIOLIMIT_UNLIMITED,
         _( "Stop seeding at ratio:" ),    TR_RATIOLIMIT_SINGLE,
         NULL );
-    g_object_set_data_full( G_OBJECT( w ), ARG_KEY, g_strdup( "seedRatioMode" ), g_free );
+    g_object_set_qdata( G_OBJECT( w ), ARG_KEY, (gpointer)"seedRatioMode" );
     return w;
 }
 
@@ -459,7 +461,7 @@ idle_combo_new( void )
         _( "Seed regardless of activity" ),         TR_IDLELIMIT_UNLIMITED,
         _( "Stop seeding if idle for N minutes:" ), TR_IDLELIMIT_SINGLE,
         NULL );
-    g_object_set_data_full( G_OBJECT( w ), ARG_KEY, g_strdup( "seedIdleMode" ), g_free );
+    g_object_set_qdata( G_OBJECT( w ), ARG_KEY, (gpointer)"seedIdleMode" );
     return w;
 }
 
@@ -2111,8 +2113,8 @@ on_edit_trackers_response( GtkDialog * dialog, int response, gpointer data )
         int i, n;
         int tier;
         GtkTextIter start, end;
-        const int torrent_id = GPOINTER_TO_INT( g_object_get_data( G_OBJECT( dialog ), "torrent-id" ) );
-        GtkTextBuffer * text_buffer = g_object_get_data( G_OBJECT( dialog ), "text-buffer" );
+        const int torrent_id = GPOINTER_TO_INT( g_object_get_qdata( G_OBJECT( dialog ), TORRENT_ID_KEY ) );
+        GtkTextBuffer * text_buffer = g_object_get_qdata( G_OBJECT( dialog ), TEXT_BUFFER_KEY );
         tr_torrent * tor = gtr_core_find_torrent( di->core, torrent_id );
 
         if( tor != NULL )
@@ -2236,8 +2238,8 @@ on_edit_trackers( GtkButton * button, gpointer data )
         hig_workarea_finish( t, &row );
         gtr_dialog_set_content( GTK_DIALOG( d ), t );
 
-        g_object_set_data( G_OBJECT( d ), "torrent-id", GINT_TO_POINTER( torrent_id ) );
-        g_object_set_data( G_OBJECT( d ), "text-buffer", gtk_text_view_get_buffer( GTK_TEXT_VIEW( w ) ) );
+        g_object_set_qdata( G_OBJECT( d ), TORRENT_ID_KEY, GINT_TO_POINTER( torrent_id ) );
+        g_object_set_qdata( G_OBJECT( d ), TEXT_BUFFER_KEY, gtk_text_view_get_buffer( GTK_TEXT_VIEW( w ) ) );
         gtk_widget_show( d );
     }
 }
@@ -2262,8 +2264,8 @@ on_add_tracker_response( GtkDialog * dialog, int response, gpointer gdi )
     if( response == GTK_RESPONSE_ACCEPT )
     {
         struct DetailsImpl * di = gdi;
-        GtkWidget * e = GTK_WIDGET( g_object_get_data( G_OBJECT( dialog ), "url-entry" ) );
-        const int torrent_id = GPOINTER_TO_INT( g_object_get_data( G_OBJECT( dialog ), "torrent-id" ) );
+        GtkWidget * e = GTK_WIDGET( g_object_get_qdata( G_OBJECT( dialog ), URL_ENTRY_KEY ) );
+        const int torrent_id = GPOINTER_TO_INT( g_object_get_qdata( G_OBJECT( dialog ), TORRENT_ID_KEY ) );
         char * url = g_strdup( gtk_entry_get_text( GTK_ENTRY( e ) ) );
         g_strstrip( url );
 
@@ -2328,8 +2330,8 @@ on_tracker_list_add_button_clicked( GtkButton * button UNUSED, gpointer gdi )
         e = gtk_entry_new( );
         gtk_widget_set_size_request( e, 400, -1 );
         gtr_paste_clipboard_url_into_entry( e );
-        g_object_set_data( G_OBJECT( w ), "url-entry", e );
-        g_object_set_data( G_OBJECT( w ), "torrent-id", GINT_TO_POINTER( tr_torrentId( tor ) ) );
+        g_object_set_qdata( G_OBJECT( w ), URL_ENTRY_KEY, e );
+        g_object_set_qdata( G_OBJECT( w ), TORRENT_ID_KEY, GINT_TO_POINTER( tr_torrentId( tor ) ) );
         hig_workarea_add_row( t, &row, _( "_Announce URL:" ), e, NULL );
         gtr_dialog_set_content( GTK_DIALOG( w ), t );
         gtk_widget_show_all( w );
@@ -2514,6 +2516,16 @@ gtr_torrent_details_dialog_new( GtkWindow * parent, TrCore * core )
     GtkWidget *d, *n, *v, *w, *l;
     struct DetailsImpl * di = g_new0( struct DetailsImpl, 1 );
 
+    /* one-time setup */
+    if( ARG_KEY == 0 )
+    {
+        ARG_KEY          = g_quark_from_static_string( "tr-arg-key" );
+        DETAILS_KEY      = g_quark_from_static_string( "tr-details-data-key" );
+        TORRENT_ID_KEY   = g_quark_from_static_string( "tr-torrent-id-key" );
+        TEXT_BUFFER_KEY  = g_quark_from_static_string( "tr-text-buffer-key" );
+        URL_ENTRY_KEY    = g_quark_from_static_string( "tr-url-entry-key" );
+    }
+
     /* create the dialog */
     di->core = core;
     di->gstr = g_string_new( NULL );
@@ -2525,7 +2537,7 @@ gtr_torrent_details_dialog_new( GtkWindow * parent, TrCore * core )
     g_signal_connect_swapped( d, "response",
                               G_CALLBACK( gtk_widget_destroy ), d );
     gtk_container_set_border_width( GTK_CONTAINER( d ), GUI_PAD );
-    g_object_set_data_full( G_OBJECT( d ), DETAILS_KEY, di, details_free );
+    g_object_set_qdata_full( G_OBJECT( d ), DETAILS_KEY, di, details_free );
 
     n = gtk_notebook_new( );
     gtk_container_set_border_width( GTK_CONTAINER( n ), GUI_PAD );
@@ -2566,7 +2578,7 @@ gtr_torrent_details_dialog_set_torrents( GtkWidget * w, GSList * ids )
 {
     char title[256];
     const int len = g_slist_length( ids );
-    struct DetailsImpl * di = g_object_get_data( G_OBJECT( w ), DETAILS_KEY );
+    struct DetailsImpl * di = g_object_get_qdata( G_OBJECT( w ), DETAILS_KEY );
 
     g_slist_free( di->ids );
     di->ids = g_slist_copy( ids );
