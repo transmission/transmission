@@ -163,7 +163,7 @@ category_filter_model_update( GtkTreeStore * store )
             char * key;
 
             gtr_get_host_from_url( buf, sizeof( buf ), inf->trackers[i].announce );
-            key = g_string_chunk_insert( strings, buf );
+            key = g_string_chunk_insert_const( strings, buf );
 
             count = g_hash_table_lookup( hosts_hash, key );
             if( count == NULL )
