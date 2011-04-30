@@ -1160,7 +1160,8 @@ onGNOMEClicked( GtkButton * button, gpointer vdata UNUSED )
 {
     GError * err = NULL;
 
-    if( !g_spawn_command_line_async( "gnome-network-properties", &err ) )
+    if( !g_spawn_command_line_async( "gnome-network-properties", &err ) &&
+        !g_spawn_command_line_async( "gnome-control-center network", &err ) )
     {
         GtkWidget * d = gtk_message_dialog_new( GTK_WINDOW( gtk_widget_get_toplevel( GTK_WIDGET( button ) ) ),
                                                 GTK_DIALOG_DESTROY_WITH_PARENT,
