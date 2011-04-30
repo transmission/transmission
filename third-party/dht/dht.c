@@ -310,7 +310,7 @@ static struct timeval now;
 static time_t mybucket_grow_time, mybucket6_grow_time;
 static time_t expire_stuff_time;
 
-#define MAX_TOKEN_BUCKET_TOKENS 40
+#define MAX_TOKEN_BUCKET_TOKENS 400
 static time_t token_bucket_time;
 static int token_bucket_tokens;
 
@@ -1221,23 +1221,21 @@ find_storage(const unsigned char *id)
 }
 
 static int
-storage_store(const unsigned char *id, const struct sockaddr *sa)
+storage_store(const unsigned char *id,
+              const struct sockaddr *sa, unsigned short port)
 {
     int i, len;
     struct storage *st;
     unsigned char *ip;
-    unsigned short port;
 
     if(sa->sa_family == AF_INET) {
         struct sockaddr_in *sin = (struct sockaddr_in*)sa;
         ip = (unsigned char*)&sin->sin_addr;
         len = 4;
-        port = ntohs(sin->sin_port);
     } else if(sa->sa_family == AF_INET6) {
         struct sockaddr_in6 *sin6 = (struct sockaddr_in6*)sa;
         ip = (unsigned char*)&sin6->sin6_addr;
         len = 16;
-        port = ntohs(sin6->sin6_port);
     } else {
         return -1;
     }
@@ -1714,7 +1712,7 @@ token_bucket(void)
 {
     if(token_bucket_tokens == 0) {
         token_bucket_tokens = MIN(MAX_TOKEN_BUCKET_TOKENS,
-                                  4 * (now.tv_sec - token_bucket_time));
+                                  100 * (now.tv_sec - token_bucket_time));
         token_bucket_time = now.tv_sec;
     }
 
@@ -2089,7 +2087,7 @@ dht_periodic(const void *buf, size_t buflen,
                            203, "Announce_peer with forbidden port number");
                 break;
             }
-            storage_store(info_hash, from);
+            storage_store(info_hash, from, port);
             /* Note that if storage_store failed, we lie to the requestor.
                This is to prevent them from backtracking, and hence
                polluting the DHT. */
