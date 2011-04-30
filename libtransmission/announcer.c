@@ -628,7 +628,7 @@ addTorrentToTier( tr_torrent_tiers * tt, tr_torrent * tor )
     tr_tracker_info * infos = filter_trackers( tor->info.trackers,
                                                tor->info.trackerCount, &n );
 
-    /* build the array of trackers */ 
+    /* build the array of trackers */
     tt->trackers = tr_new0( tr_tracker, n );
     tt->tracker_count = n;
     for( i=0; i<n; ++i )
@@ -1208,7 +1208,7 @@ find_tier( tr_torrent * tor, const char * scrape )
 }
 
 static void
-on_scrape_done( const tr_scrape_response  * response, void * vsession )
+on_scrape_done( const tr_scrape_response * response, void * vsession )
 {
     int i;
     const time_t now = tr_time( );
