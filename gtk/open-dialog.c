@@ -514,7 +514,7 @@ gtr_torrent_open_from_url_dialog_new( GtkWindow * parent, TrCore * core )
 
     gtr_dialog_set_content( GTK_DIALOG( w ), t );
 
-#ifdef GTK_CHECK_VERSION(2,20,0)
+#if GTK_CHECK_VERSION(2,20,0)
     if( gtk_entry_get_text_length( GTK_ENTRY( e ) ) == 0 )
         gtk_widget_grab_focus( e );
     else
