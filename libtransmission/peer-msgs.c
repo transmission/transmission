@@ -668,12 +668,12 @@ updateInterest( tr_peermsgs * msgs UNUSED )
 }
 
 void
-tr_peerMsgsSetInterested( tr_peermsgs * msgs, int isInterested )
+tr_peerMsgsSetInterested( tr_peermsgs * msgs, bool clientIsInterested )
 {
-    assert( tr_isBool( isInterested ) );
+    assert( tr_isBool( clientIsInterested ) );
 
-    if( isInterested != msgs->peer->clientIsInterested )
-        sendInterest( msgs, isInterested );
+    if( clientIsInterested != msgs->peer->clientIsInterested )
+        sendInterest( msgs, clientIsInterested );
 }
 
 static bool
@@ -716,25 +716,25 @@ cancelAllRequestsToClient( tr_peermsgs * msgs )
 }
 
 void
-tr_peerMsgsSetChoke( tr_peermsgs * msgs, int choke )
+tr_peerMsgsSetChoke( tr_peermsgs * msgs, bool peerIsChoked )
 {
     const time_t now = tr_time( );
     const time_t fibrillationTime = now - MIN_CHOKE_PERIOD_SEC;
 
     assert( msgs );
     assert( msgs->peer );
-    assert( choke == 0 || choke == 1 );
+    assert( tr_isBool( peerIsChoked ) );
 
     if( msgs->peer->chokeChangedAt > fibrillationTime )
     {
-        dbgmsg( msgs, "Not changing choke to %d to avoid fibrillation", choke );
+        dbgmsg( msgs, "Not changing choke to %d to avoid fibrillation", peerIsChoked );
     }
-    else if( msgs->peer->peerIsChoked != choke )
+    else if( msgs->peer->peerIsChoked != peerIsChoked )
     {
-        msgs->peer->peerIsChoked = choke;
-        if( choke )
+        msgs->peer->peerIsChoked = peerIsChoked;
+        if( peerIsChoked )
             cancelAllRequestsToClient( msgs );
-        protocolSendChoke( msgs, choke );
+        protocolSendChoke( msgs, peerIsChoked );
         msgs->peer->chokeChangedAt = now;
     }
 }
