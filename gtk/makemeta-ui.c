@@ -295,16 +295,16 @@ updatePiecesLabel( MakeMetaUI * ui )
     {
         char buf[128];
         tr_strlsize( buf, builder->totalSize, sizeof( buf ) );
-        g_string_append_printf( gstr, gtr_ngettext( "%1$s; %2$'d File",
-                                                    "%1$s; %2$'d Files",
-                                                    builder->fileCount ),
+        g_string_append_printf( gstr, ngettext( "%1$s; %2$'d File",
+                                                "%1$s; %2$'d Files",
+                                                builder->fileCount ),
                                 buf, builder->fileCount );
         g_string_append( gstr, "; " );
 
         tr_formatter_mem_B( buf, builder->pieceSize, sizeof( buf ) );
-        g_string_append_printf( gstr, gtr_ngettext( "%1$'d Piece @ %2$s",
-                                                    "%1$'d Pieces @ %2$s",
-                                                    builder->pieceCount ),
+        g_string_append_printf( gstr, ngettext( "%1$'d Piece @ %2$s",
+                                                "%1$'d Pieces @ %2$s",
+                                                builder->pieceCount ),
                                       builder->pieceCount, buf );
     }
     g_string_append( gstr, "</i>" );

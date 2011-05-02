@@ -394,8 +394,8 @@ updateBlocklistText( GtkWidget * w, TrCore * core )
     char buf2[512];
     const int n = tr_blocklistGetRuleCount( gtr_core_session( core ) );
     g_snprintf( buf1, sizeof( buf1 ),
-                gtr_ngettext( "Blocklist contains %'d rule",
-                              "Blocklist contains %'d rules", n ), n );
+                ngettext( "Blocklist contains %'d rule",
+                          "Blocklist contains %'d rules", n ), n );
     g_snprintf( buf2, sizeof( buf2 ), "<i>%s</i>", buf1 );
     gtk_label_set_markup( GTK_LABEL( w ), buf2 );
 }
@@ -427,7 +427,7 @@ onBlocklistUpdated( TrCore * core, int n, gpointer gdata )
 {
     const bool success = n >= 0;
     const int count = n >=0 ? n : tr_blocklistGetRuleCount( gtr_core_session( core ) );
-    const char * s = gtr_ngettext( "Blocklist has %'d rule.", "Blocklist has %'d rules.", count );
+    const char * s = ngettext( "Blocklist has %'d rule.", "Blocklist has %'d rules.", count );
     struct blocklist_data * data = gdata;
     GtkMessageDialog * d = GTK_MESSAGE_DIALOG( data->updateBlocklistDialog );
     gtk_widget_set_sensitive( data->updateBlocklistButton, TRUE );

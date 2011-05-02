@@ -1340,16 +1340,16 @@ flush_torrent_errors( struct cbdata * cbdata )
 {
     if( cbdata->error_list )
         show_torrent_errors( cbdata->wind,
-                              gtr_ngettext( "Couldn't add corrupt torrent",
-                                            "Couldn't add corrupt torrents",
-                                            g_slist_length( cbdata->error_list ) ),
+                              ngettext( "Couldn't add corrupt torrent",
+                                        "Couldn't add corrupt torrents",
+                                        g_slist_length( cbdata->error_list ) ),
                               &cbdata->error_list );
 
     if( cbdata->duplicates_list )
         show_torrent_errors( cbdata->wind,
-                              gtr_ngettext( "Couldn't add duplicate torrent",
-                                            "Couldn't add duplicate torrents",
-                                            g_slist_length( cbdata->duplicates_list ) ),
+                              ngettext( "Couldn't add duplicate torrent",
+                                        "Couldn't add duplicate torrents",
+                                        g_slist_length( cbdata->duplicates_list ) ),
                               &cbdata->duplicates_list );
 }
 

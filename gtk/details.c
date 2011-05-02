@@ -772,13 +772,13 @@ refreshInfo( struct DetailsImpl * di, tr_torrent ** torrents, int n )
             char piecebuf[128];
             tr_formatter_mem_B( piecebuf, pieceSize, sizeof( piecebuf ) );
             g_snprintf( buf, sizeof( buf ),
-                        gtr_ngettext( "%1$s (%2$'d piece @ %3$s)",
+                        ngettext( "%1$s (%2$'d piece @ %3$s)",
                                       "%1$s (%2$'d pieces @ %3$s)", pieces ),
                         sizebuf, pieces, piecebuf );
             str = buf;
         } else {
             g_snprintf( buf, sizeof( buf ),
-                        gtr_ngettext( "%1$s (%2$'d piece)",
+                        ngettext( "%1$s (%2$'d piece)",
                                       "%1$s (%2$'d pieces)", pieces ),
                         sizebuf, pieces );
             str = buf;

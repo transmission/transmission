@@ -748,13 +748,13 @@ updateTorrentCount( PrivateData * p )
             *buf = '\0';
         else if( torrentCount != visibleCount )
             g_snprintf( buf, sizeof( buf ),
-                        gtr_ngettext( "%1$'d of %2$'d Torrent",
-                                      "%1$'d of %2$'d Torrents",
-                                      torrentCount ),
+                        ngettext( "%1$'d of %2$'d Torrent",
+                                  "%1$'d of %2$'d Torrents",
+                                  torrentCount ),
                         visibleCount, torrentCount );
         else
             g_snprintf( buf, sizeof( buf ),
-                        gtr_ngettext( "%'d Torrent", "%'d Torrents", torrentCount ),
+                        ngettext( "%'d Torrent", "%'d Torrents", torrentCount ),
                         torrentCount );
         gtr_label_set_text( GTK_LABEL( p->gutter_lb ), buf );
     }

@@ -132,9 +132,6 @@ void gtr_widget_set_visible( GtkWidget *, gboolean );
 /* backwards-compatible wrapper around g_object_ref_sink() */
 gpointer gtr_object_ref_sink( gpointer object );
 
-/* backwards-compatible wrapper around g_dngettext() */
-const gchar* gtr_ngettext( const gchar*, const gchar*, gulong );
-
 void gtr_dialog_set_content( GtkDialog * dialog, GtkWidget * content );
 
 /***

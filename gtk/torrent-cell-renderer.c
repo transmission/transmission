@@ -279,18 +279,18 @@ getStatusString( GString           * gstr,
             if( tr_torrentHasMetadata( tor ) )
             {
                 g_string_append_printf( gstr,
-                    gtr_ngettext( "Downloading from %1$'d of %2$'d connected peer",
-                                  "Downloading from %1$'d of %2$'d connected peers",
-                                  st->webseedsSendingToUs + st->peersSendingToUs ),
+                    ngettext( "Downloading from %1$'d of %2$'d connected peer",
+                              "Downloading from %1$'d of %2$'d connected peers",
+                              st->webseedsSendingToUs + st->peersSendingToUs ),
                     st->webseedsSendingToUs + st->peersSendingToUs,
                     st->webseedsSendingToUs + st->peersConnected );
             }
             else
             {
                 g_string_append_printf( gstr,
-                    gtr_ngettext( "Downloading metadata from %1$'d peer (%2$d%% done)",
-                                  "Downloading metadata from %1$'d peers (%2$d%% done)",
-                                  st->peersConnected + st->peersConnected ),
+                    ngettext( "Downloading metadata from %1$'d peer (%2$d%% done)",
+                              "Downloading metadata from %1$'d peers (%2$d%% done)",
+                              st->peersConnected + st->peersConnected ),
                     st->peersConnected + st->webseedsSendingToUs,
                     (int)(100.0*st->metadataPercentComplete) );
             }
@@ -299,9 +299,9 @@ getStatusString( GString           * gstr,
 
         case TR_STATUS_SEED:
             g_string_append_printf( gstr,
-                gtr_ngettext( "Seeding to %1$'d of %2$'d connected peer",
-                              "Seeding to %1$'d of %2$'d connected peers",
-                              st->peersConnected ),
+                ngettext( "Seeding to %1$'d of %2$'d connected peer",
+                          "Seeding to %1$'d of %2$'d connected peers",
+                          st->peersConnected ),
                 st->peersGettingFromUs,
                 st->peersConnected );
                 break;
