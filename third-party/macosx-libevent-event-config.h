@@ -243,6 +243,9 @@
 /* Define to 1 if `sin_len' is a member of `struct sockaddr_in'. */
 #define _EVENT_HAVE_STRUCT_SOCKADDR_IN_SIN_LEN 1
 
+/* Define to 1 if the system has the type `struct sockaddr_storage'. */
+#define _EVENT_HAVE_STRUCT_SOCKADDR_STORAGE 1
+
 /* Define to 1 if `ss_family' is a member of `struct sockaddr_storage'. */
 #define _EVENT_HAVE_STRUCT_SOCKADDR_STORAGE_SS_FAMILY 1
 
@@ -342,12 +345,15 @@
 /* Define if kqueue works correctly with pipes */
 #define _EVENT_HAVE_WORKING_KQUEUE 1
 
+/* Define to 1 if you have the <zlib.h> header file. */
+#define _EVENT_HAVE_ZLIB_H 1
+
 /* Define to the sub-directory in which libtool stores uninstalled libraries.
    */
 #define _EVENT_LT_OBJDIR ".libs/"
 
 /* Numeric representation of the version */
-#define _EVENT_NUMERIC_VERSION 0x02000a00
+#define _EVENT_NUMERIC_VERSION 0x02000b01
 
 /* Name of package */
 #define _EVENT_PACKAGE "libevent"
@@ -363,9 +369,6 @@
 
 /* Define to the one symbol short name of this package. */
 #define _EVENT_PACKAGE_TARNAME ""
-
-/* Define to the home page for this package. */
-#define _EVENT_PACKAGE_URL ""
 
 /* Define to the version of this package. */
 #define _EVENT_PACKAGE_VERSION ""
@@ -402,7 +405,7 @@
 #define _EVENT_TIME_WITH_SYS_TIME 1
 
 /* Version number of package */
-#define _EVENT_VERSION "2.0.10-stable"
+#define _EVENT_VERSION "2.0.11-stable-dev"
 
 /* Define to appropriate substitue if compiler doesnt have __func__ */
 /* #undef _EVENT___func__ */
