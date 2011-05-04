@@ -225,7 +225,11 @@ phaseOne( tr_ptrArray * peerArray, tr_direction dir )
     i = n ? tr_cryptoWeakRandInt( n ) : 0; /* pick a random starting point */
     while( n > 0 )
     {
-        const size_t increment = 1024;
+        /* value of 3000 bytes chosen so that when using uTP we'll send a full-size
+         * frame right away and leave enough buffered data for the next frame to go
+         * out in a timely manner. */
+        const size_t increment = 3000;
+
         const int bytesUsed = tr_peerIoFlush( peers[i], dir, increment );
 
         dbgmsg( "peer #%d of %d used %d bytes in this pass", i, n, bytesUsed );
