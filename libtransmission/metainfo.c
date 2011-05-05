@@ -370,14 +370,26 @@ geturllist( tr_info * inf,
         inf->webseeds = tr_new0( char*, n );
 
         for( i = 0; i < n; ++i )
+        {
             if( tr_bencGetStr( tr_bencListChild( urls, i ), &url ) )
-                inf->webseeds[inf->webseedCount++] = tr_strdup( url );
+            {
+                const size_t len = strlen( url );
+
+                if( tr_urlIsValid( url, len  ) )
+                    inf->webseeds[inf->webseedCount++] = tr_strndup( url, len );
+            }
+        }
     }
     else if( tr_bencDictFindStr( meta, "url-list", &url ) ) /* handle single items in webseeds */
     {
-        inf->webseedCount = 1;
-        inf->webseeds = tr_new0( char*, 1 );
-        inf->webseeds[0] = tr_strdup( url );
+        const size_t len = strlen( url );
+
+        if( tr_urlIsValid( url, len  ) )
+        {
+            inf->webseedCount = 1;
+            inf->webseeds = tr_new0( char*, 1 );
+            inf->webseeds[0] = tr_strndup( url, len );
+        }
     }
 }
 
