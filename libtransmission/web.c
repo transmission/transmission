@@ -519,7 +519,7 @@ tr_http_escape( struct evbuffer  * out,
             || ( ( 'A' <= *str ) && ( *str <= 'Z' ) )
             || ( ( 'a' <= *str ) && ( *str <= 'z' ) )
             || ( ( *str == '/' ) && ( !escape_slashes ) ) )
-            evbuffer_add( out, str, 1 );
+            evbuffer_add_printf( out, "%c", *str );
         else
             evbuffer_add_printf( out, "%%%02X", (unsigned)(*str&0xFF) );
     }
