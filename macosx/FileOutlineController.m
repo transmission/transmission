@@ -211,7 +211,12 @@ typedef enum
 {
     NSString * ident = [tableColumn identifier];
     if ([ident isEqualToString: @"Name"])
-        return [fTorrent fileLocation: item];
+    {
+        NSString * path = [fTorrent fileLocation: item];
+        if (!path)
+            path = [[item path] stringByAppendingPathComponent: [item name]];
+        return path;
+    }
     else if ([ident isEqualToString: @"Check"])
     {
         switch ([cell state])
