@@ -463,10 +463,12 @@ addPeers( const tr_torrent * tor,
 #define tr_streq(a,alen,b) ((alen+1==sizeof(b)) && !memcmp(a,b,alen))
 
 static void
-addField( const tr_torrent * tor, tr_benc * d, const char * key )
+addField( const tr_torrent * const tor,
+          const tr_info    * const inf,
+          const tr_stat    * const st,
+          tr_benc          * const d,
+          const char       * const key )
 {
-    const tr_info * inf = tr_torrentInfo( tor );
-    const tr_stat * st = tr_torrentStat( (tr_torrent*)tor );
     const size_t keylen = strlen( key );
 
     if( tr_streq( key, keylen, "activityDate" ) )
@@ -634,19 +636,23 @@ addField( const tr_torrent * tor, tr_benc * d, const char * key )
 }
 
 static void
-addInfo( const tr_torrent * tor,
-         tr_benc *          d,
-         tr_benc *          fields )
+addInfo( const tr_torrent * tor, tr_benc * d, tr_benc * fields )
 {
-    int          i;
-    const int    n = tr_bencListSize( fields );
     const char * str;
+    const int n = tr_bencListSize( fields );
 
     tr_bencInitDict( d, n );
 
-    for( i = 0; i < n; ++i )
-        if( tr_bencGetStr( tr_bencListChild( fields, i ), &str ) )
-            addField( tor, d, str );
+    if( n > 0 )
+    {
+        int i;
+        const tr_info const * inf = tr_torrentInfo( tor );
+        const tr_stat const * st = tr_torrentStat( (tr_torrent*)tor );
+
+        for( i=0; i<n; ++i )
+            if( tr_bencGetStr( tr_bencListChild( fields, i ), &str ) )
+                addField( tor, inf, st, d, str );
+    }
 }
 
 static const char*
