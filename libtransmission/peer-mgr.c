@@ -3556,26 +3556,24 @@ bandwidthPulse( int foo UNUSED, short bar UNUSED, void * vmgr )
     tr_bandwidthAllocate( &mgr->session->bandwidth, TR_UP, BANDWIDTH_PERIOD_MSEC );
     tr_bandwidthAllocate( &mgr->session->bandwidth, TR_DOWN, BANDWIDTH_PERIOD_MSEC );
 
-    /* possibly stop torrents that have seeded enough */
+    /* torrent upkeep */
     tor = NULL;
     while(( tor = tr_torrentNext( mgr->session, tor )))
+    {
+        /* possibly stop torrents that have seeded enough */
         tr_torrentCheckSeedLimit( tor );
 
-    /* run the completeness check for any torrents that need it */
-    tor = NULL;
-    while(( tor = tr_torrentNext( mgr->session, tor ))) {
+        /* run the completeness check for any torrents that need it */
         if( tor->torrentPeers->needsCompletenessCheck ) {
             tor->torrentPeers->needsCompletenessCheck  = false;
             tr_torrentRecheckCompleteness( tor );
         }
-    }
 
-    /* stop torrents that are ready to stop, but couldn't be stopped earlier
-     * during the peer-io callback call chain */
-    tor = NULL;
-    while(( tor = tr_torrentNext( mgr->session, tor )))
+        /* stop torrents that are ready to stop, but couldn't be stopped
+           earlier during the peer-io callback call chain */
         if( tor->isStopping )
             tr_torrentStop( tor );
+    }
 
     reconnectPulse( 0, 0, mgr );
 
