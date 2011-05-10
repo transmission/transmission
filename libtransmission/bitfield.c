@@ -99,8 +99,7 @@ countRange( const tr_bitfield * b, size_t begin, size_t end )
 
         /* middle bytes */
         for( i=first_byte+1; i<b->alloc_count && i<last_byte; ++i )
-            if( trueBitCount[b->bits[i]] )
-                ret += trueBitCount[b->bits[i]];
+            ret += trueBitCount[b->bits[i]];
 
         /* last byte */
         if( last_byte < b->alloc_count ) {
