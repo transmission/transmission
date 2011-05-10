@@ -2768,29 +2768,23 @@ tr_peerMgrClearInterest( tr_torrent * tor )
     }
 }
 
-/* do we still want this piece and does the peer have it? */
-static bool
-isPieceInteresting( const tr_torrent * tor, const tr_peer * peer, tr_piece_index_t index )
-{
-    return ( !tor->info.pieces[index].dnd ) /* we want it */
-        && ( !tr_cpPieceIsComplete( &tor->completion, index ) )  /* we don't have it */
-        && ( tr_bitfieldHas( &peer->have, index ) ); /* peer has it */
-}
-
 /* does this peer have any pieces that we want? */
 static bool
-isPeerInteresting( const tr_torrent * tor, const tr_peer * peer )
+isPeerInteresting( const tr_torrent  * const tor,
+                   const tr_bitfield * const interesting_pieces,
+                   const tr_peer     * const peer )
 {
     tr_piece_index_t i, n;
 
-    if ( tr_torrentIsSeed( tor ) )
-        return false;
+    /* these cases should have already been handled by the calling code... */
+    assert( !tr_torrentIsSeed( tor ) );
+    assert( tr_torrentIsPieceTransferAllowed( tor, TR_PEER_TO_CLIENT ) );
 
-    if( !tr_torrentIsPieceTransferAllowed( tor, TR_PEER_TO_CLIENT ) )
-        return false;
+    if( peerIsSeed( peer ) )
+        return true;
 
     for( i=0, n=tor->info.pieceCount; i<n; ++i )
-        if( isPieceInteresting( tor, peer, i ) )
+        if( tr_bitfieldHas( interesting_pieces, i ) && tr_bitfieldHas( &peer->have, i ) )
             return true;
 
     return false;
@@ -2903,41 +2897,56 @@ rechokeDownloads( Torrent * t )
 
     t->maxPeers = maxPeers;
 
-    /* decide WHICH peers to be interested in (based on their cancel-to-block ratio) */
-    for( i=0; i<peerCount; ++i )
+    if( peerCount > 0 )
     {
-        tr_peer * peer = tr_ptrArrayNth( &t->peers, i );
+        const tr_torrent * const tor = t->tor;
+        const int n = tor->info.pieceCount;
+        tr_bitfield interesting_pieces = TR_BITFIELD_INIT;
 
-        if( !isPeerInteresting( t->tor, peer ) )
-        {
-            tr_peerMsgsSetInterested( peer->msgs, false );
-        }
-        else
-        {
-            tr_rechoke_state rechoke_state;
-            const int blocks = tr_historyGet( &peer->blocksSentToClient, now, CANCEL_HISTORY_SEC );
-            const int cancels = tr_historyGet( &peer->cancelsSentToPeer, now, CANCEL_HISTORY_SEC );
+        /* build a bitfield of interesting pieces... */
+        tr_bitfieldConstruct( &interesting_pieces, n );
+        for( i=0; i<n; i++ )
+            if( !tor->info.pieces[i].dnd && !tr_cpPieceIsComplete( &tor->completion, i ) )
+                tr_bitfieldAdd( &interesting_pieces, i );
 
-            if( !blocks && !cancels )
-                rechoke_state = RECHOKE_STATE_UNTESTED;
-            else if( !cancels )
-                rechoke_state = RECHOKE_STATE_GOOD;
-            else if( !blocks )
-                rechoke_state = RECHOKE_STATE_BAD;
-            else if( ( cancels * 10 ) < blocks )
-                rechoke_state = RECHOKE_STATE_GOOD;
+        /* decide WHICH peers to be interested in (based on their cancel-to-block ratio) */
+        for( i=0; i<peerCount; ++i )
+        {
+            tr_peer * peer = tr_ptrArrayNth( &t->peers, i );
+
+            if( !isPeerInteresting( t->tor, &interesting_pieces, peer ) )
+            {
+                tr_peerMsgsSetInterested( peer->msgs, false );
+            }
             else
-                rechoke_state = RECHOKE_STATE_BAD;
+            {
+                tr_rechoke_state rechoke_state;
+                const int blocks = tr_historyGet( &peer->blocksSentToClient, now, CANCEL_HISTORY_SEC );
+                const int cancels = tr_historyGet( &peer->cancelsSentToPeer, now, CANCEL_HISTORY_SEC );
 
-            if( rechoke == NULL )
-                rechoke = tr_new( struct tr_rechoke_info, peerCount );
+                if( !blocks && !cancels )
+                    rechoke_state = RECHOKE_STATE_UNTESTED;
+                else if( !cancels )
+                    rechoke_state = RECHOKE_STATE_GOOD;
+                else if( !blocks )
+                    rechoke_state = RECHOKE_STATE_BAD;
+                else if( ( cancels * 10 ) < blocks )
+                    rechoke_state = RECHOKE_STATE_GOOD;
+                else
+                    rechoke_state = RECHOKE_STATE_BAD;
 
-             rechoke[rechoke_count].peer = peer;
-             rechoke[rechoke_count].rechoke_state = rechoke_state;
-             rechoke[rechoke_count].salt = tr_cryptoWeakRandInt( INT_MAX );
-             rechoke_count++;
+                if( rechoke == NULL )
+                    rechoke = tr_new( struct tr_rechoke_info, peerCount );
+
+                 rechoke[rechoke_count].peer = peer;
+                 rechoke[rechoke_count].rechoke_state = rechoke_state;
+                 rechoke[rechoke_count].salt = tr_cryptoWeakRandInt( INT_MAX );
+                 rechoke_count++;
+            }
+
         }
 
+        tr_bitfieldDestruct( &interesting_pieces );
     }
 
     /* now that we know which & how many peers to be interested in... update the peer interest */
@@ -3147,7 +3156,7 @@ rechokePulse( int foo UNUSED, short bar UNUSED, void * vmgr )
             if( tr_ptrArrayEmpty( &t->peers ) )
                 continue;
             rechokeUploads( t, now );
-            if( !tr_torrentIsSeed( tor ) )
+            if( !tr_torrentIsSeed( tor ) && tr_torrentIsPieceTransferAllowed( tor, TR_PEER_TO_CLIENT ) )
                 rechokeDownloads( t );
         }
     }
