@@ -2832,7 +2832,7 @@ rechokeDownloads( Torrent * t )
     /* some cases where this function isn't necessary */
     if( tr_torrentIsSeed( t->tor ) )
         return;
-    if ( tr_torrentIsPieceTransferAllowed( t->tor, TR_PEER_TO_CLIENT ) )
+    if ( !tr_torrentIsPieceTransferAllowed( t->tor, TR_PEER_TO_CLIENT ) )
         return;
 
     /* decide HOW MANY peers to be interested in */
