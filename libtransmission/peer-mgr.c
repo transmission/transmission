@@ -2829,6 +2829,12 @@ rechokeDownloads( Torrent * t )
     const int peerCount = tr_ptrArraySize( &t->peers );
     const time_t now = tr_time( );
 
+    /* some cases where this function isn't necessary */
+    if( tr_torrentIsSeed( t->tor ) )
+        return;
+    if ( tr_torrentIsPieceTransferAllowed( t->tor, TR_PEER_TO_CLIENT ) )
+        return;
+
     /* decide HOW MANY peers to be interested in */
     {
         int blocks = 0;
@@ -3153,11 +3159,10 @@ rechokePulse( int foo UNUSED, short bar UNUSED, void * vmgr )
     while(( tor = tr_torrentNext( mgr->session, tor ))) {
         if( tor->isRunning ) {
             Torrent * t = tor->torrentPeers;
-            if( tr_ptrArrayEmpty( &t->peers ) )
-                continue;
-            rechokeUploads( t, now );
-            if( !tr_torrentIsSeed( tor ) && tr_torrentIsPieceTransferAllowed( tor, TR_PEER_TO_CLIENT ) )
+            if( !tr_ptrArrayEmpty( &t->peers ) ) {
+                rechokeUploads( t, now );
                 rechokeDownloads( t );
+            }
         }
     }
 

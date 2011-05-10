@@ -868,18 +868,10 @@ torrentInit( tr_torrent * tor, const tr_ctor * ctor )
         tr_torrentSetIdleLimit( tor, tr_sessionGetIdleLimit( tor->session ) );
     }
 
-    {
-        tr_torrent * it = NULL;
-        tr_torrent * last = NULL;
-        while( ( it = tr_torrentNext( session, it ) ) )
-            last = it;
-
-        if( !last )
-            session->torrentList = tor;
-        else
-            last->next = tor;
-        ++session->torrentCount;
-    }
+    /* add the torrent to tr_session.torrentList */
+    tor->next = session->torrentList;
+    session->torrentList = tor;
+    ++session->torrentCount;
 
     /* if we don't have a local .torrent file already, assume the torrent is new */
     isNewTorrent = stat( tor->info.torrent, &st );
