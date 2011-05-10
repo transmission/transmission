@@ -3808,7 +3808,8 @@ comparePeerCandidates( const void * va, const void * vb )
 static struct peer_candidate*
 getPeerCandidates( tr_session * session, int * candidateCount )
 {
-    int n;
+    int atomCount;
+    int peerCount;
     tr_torrent * tor;
     struct peer_candidate * candidates;
     struct peer_candidate * walk;
@@ -3817,22 +3818,23 @@ getPeerCandidates( tr_session * session, int * candidateCount )
     /* leave 5% of connection slots for incoming connections -- ticket #2609 */
     const int maxCandidates = tr_sessionGetPeerLimit( session ) * 0.95;
 
-    /* don't start any new handshakes if we're full up */
-    n = 0;
+    /* count how many peers and atoms we've got */
     tor= NULL;
-    while(( tor = tr_torrentNext( session, tor )))
-        n += tr_ptrArraySize( &tor->torrentPeers->peers );
-    if( maxCandidates <= n ) {
+    atomCount = 0;
+    peerCount = 0;
+    while(( tor = tr_torrentNext( session, tor ))) {
+        atomCount += tr_ptrArraySize( &tor->torrentPeers->pool );
+        peerCount += tr_ptrArraySize( &tor->torrentPeers->peers );
+    }
+
+    /* don't start any new handshakes if we're full up */
+    if( maxCandidates <= peerCount ) {
         *candidateCount = 0;
         return NULL;
     }
 
     /* allocate an array of candidates */
-    n = 0;
-    tor= NULL;
-    while(( tor = tr_torrentNext( session, tor )))
-        n += tr_ptrArraySize( &tor->torrentPeers->pool );
-    walk = candidates = tr_new( struct peer_candidate, n );
+    walk = candidates = tr_new( struct peer_candidate, atomCount );
 
     /* populate the candidate array */
     tor = NULL;
