@@ -167,7 +167,7 @@ allocateBandwidth( tr_bandwidth  * b,
                    unsigned int    period_msec,
                    tr_ptrArray   * peer_pool )
 {
-    tr_priority_t priority;
+    const tr_priority_t priority = MAX( parent_priority, b->priority );
 
     assert( tr_isBandwidth( b ) );
     assert( tr_isDirection( dir ) );
@@ -185,8 +185,6 @@ allocateBandwidth( tr_bandwidth  * b,
                          b->band[dir].bytesLeft );
 #endif
     }
-
-    priority = MAX( parent_priority, b->priority );
 
     /* add this bandwidth's peer, if any, to the peer pool */
     if( b->peer != NULL ) {
