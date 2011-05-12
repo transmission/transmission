@@ -470,9 +470,6 @@ Transmission.prototype =
 
 	selectElement: function( e, doUpdate ) {
 		e.addClass('selected');
-		// commented out as an experiment --
-		// see https://trac.transmissionbt.com/ticket/3820#comment:3
-		// this.scrollToElement( e );
 		if( doUpdate )
 			this.selectionChanged( );
 	},
@@ -575,6 +572,7 @@ Transmission.prototype =
 		if( 0<=i && i<rows.length ) {
 			tr.deselectAll( );
 			tr.selectRow( i, true );
+			tr.scrollToElement( tr._rows[i] );
 		}
 	},
 
