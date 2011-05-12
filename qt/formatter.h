@@ -32,8 +32,8 @@ class Formatter: public QObject
 
     public:
 
-        static QString memToString( uint64_t bytes );
-        static QString sizeToString( uint64_t bytes );
+        static QString memToString( int64_t bytes );
+        static QString sizeToString( int64_t bytes );
         static QString speedToString( const Speed& speed );
         static QString percentToString( double x );
         static QString ratioToString( double ratio );

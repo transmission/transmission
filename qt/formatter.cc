@@ -92,9 +92,11 @@ Speed :: fromKBps( double KBps )
 ***/
 
 QString
-Formatter :: memToString( uint64_t bytes )
+Formatter :: memToString( int64_t bytes )
 {
-    if( !bytes )
+    if( bytes < 1 )
+        return tr( "Unknown" );
+    else if( !bytes )
         return tr( "None" );
     else {
         char buf[128];
@@ -104,9 +106,11 @@ Formatter :: memToString( uint64_t bytes )
 }
 
 QString
-Formatter :: sizeToString( uint64_t bytes )
+Formatter :: sizeToString( int64_t bytes )
 {
-    if( !bytes )
+    if( bytes < 1 )
+        return tr( "Unknown" );
+    else if( !bytes )
         return tr( "None" );
     else {
         char buf[128];
