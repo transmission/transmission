@@ -244,6 +244,9 @@ TransmissionRemote.prototype =
 	verifyTorrents: function( torrent_ids, callback ) {
 		this.sendTorrentActionRequests( 'torrent-verify', torrent_ids, callback );
 	},
+	reannounceTorrents: function( torrent_ids, callback ) {
+		this.sendTorrentActionRequests( 'torrent-reannounce', torrent_ids, callback );
+	},
 	addTorrentByUrl: function( url, options ) {
 		var remote = this;
 		var o = {

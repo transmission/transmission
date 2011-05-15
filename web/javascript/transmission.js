@@ -286,6 +286,9 @@ Transmission.prototype =
 	contextVerifySelected: function( ) {
 		this.verifySelectedTorrents( );
 	},
+	contextReannounceSelected: function( ) {
+		this.reannounceSelectedTorrents( );
+	},
 	contextToggleInspector: function( ) {
 		this.toggleInspector( );
 	},
@@ -307,6 +310,7 @@ Transmission.prototype =
 			context_remove:            function(e){ tr.contextRemoveSelected(e); },
 			context_removedata:        function(e){ tr.contextRemoveDataSelected(e); },
 			context_verify:            function(e){ tr.contextVerifySelected(e); },
+			context_reannounce:        function(e){ tr.contextReannounceSelected(e); },
 			context_toggle_inspector:  function(e){ tr.contextToggleInspector(e); },
 			context_select_all:        function(e){ tr.contextSelectAll(e); },
 			context_deselect_all:      function(e){ tr.contextDeselectAll(e); }
@@ -1932,6 +1936,10 @@ Transmission.prototype =
 		this.verifyTorrents( this.getSelectedTorrents( ) );
 	},
 
+	reannounceSelectedTorrents: function() {
+		this.reannounceTorrents( this.getSelectedTorrents( ) );
+	},
+
 	startSelectedTorrents: function( ) {
 		this.startTorrents( this.getSelectedTorrents( ) );
 	},
@@ -1953,6 +1961,15 @@ Transmission.prototype =
 		var torrent_ids = jQuery.map(torrents, function(t) { return t.id(); } );
 		var tr = this;
 		this.remote.verifyTorrents( torrent_ids, function(){ tr.refreshTorrents(torrent_ids) } );
+	},
+
+	reannounceTorrent: function( torrent ) {
+		this.reannounceTorrents( [ torrent ] );
+	},
+	reannounceTorrents: function( torrents ) {
+		var torrent_ids = jQuery.map(torrents, function(t) { return t.id(); } );
+		var tr = this;
+		this.remote.reannounceTorrents( torrent_ids, function(){ tr.refreshTorrents(torrent_ids) } );
 	},
 
 	stopSelectedTorrents: function( ) {
