@@ -8,6 +8,7 @@ Lead Developers <dev@transmissionbt.com>
 
 Project Contributors
   John Clay <john@transmissionbt.com> (Website maintenance and troubleshooting, Mac OS X help documentation)
+  Bruno Bierbaumer (Web client patches)
   Juliusz Chroboczek  (DHT, network code, BitTorrent code improvements)
   Daniel Lee (Patches)
   Tomas Carnecky  (Profiling, patches, and detection of sneaky bugs)
