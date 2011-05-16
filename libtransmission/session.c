@@ -1881,7 +1881,7 @@ tr_sessionLoadTorrents( tr_session * session,
                 tr_ctorSetMetainfoFromFile( ctor, path );
                 if(( tor = tr_torrentNew( ctor, NULL )))
                 {
-                    tr_list_append( &list, tor );
+                    tr_list_prepend( &list, tor );
                     ++n;
                 }
                 tr_free( path );

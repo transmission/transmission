@@ -869,17 +869,14 @@ torrentInit( tr_torrent * tor, const tr_ctor * ctor )
     }
 
     /* add the torrent to tr_session.torrentList */
-    {
-        tr_torrent * it = NULL;
-        tr_torrent * last = NULL;
-        while(( it = tr_torrentNext( session, it )))
-            last = it;
-
-        if( !last )
-            session->torrentList = tor;
-        else
-            last->next = tor;
-        ++session->torrentCount;
+    ++session->torrentCount;
+    if( session->torrentList == NULL )
+        session->torrentList = tor;
+    else {
+        tr_torrent * it = session->torrentList;
+        while( it->next != NULL )
+            it = it->next;
+        it->next = tor;
     }
 
     /* if we don't have a local .torrent file already, assume the torrent is new */
