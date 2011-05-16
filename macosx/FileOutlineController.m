@@ -115,7 +115,7 @@ typedef enum
         NSMutableArray * list = [NSMutableArray arrayWithCapacity: [fTorrent fileCount]];
         
         for (FileListNode * node in [fTorrent flatFileList])
-            if ([[node name] rangeOfString: fFilterText options: NSCaseInsensitiveSearch].location != NSNotFound)
+            if ([[node name] rangeOfString: fFilterText options: (NSCaseInsensitiveSearch | NSDiacriticInsensitiveSearch)].location != NSNotFound)
                 [list addObject: node];
         
         fFileList = [[NSArray alloc] initWithArray: list];
