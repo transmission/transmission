@@ -1,4 +1,10 @@
+=== Transmission 2.31 (2011/05/17) ===
+[http://trac.transmissionbt.com/query?milestone=2.31&group=component&order=severity All tickets closed by this release]
+==== All Platforms ====
+  * This release fixes a pair of 2.30 packaging errors.
+
 === Transmission 2.30 (2011/05/16) ===
+[http://trac.transmissionbt.com/query?milestone=2.30&group=component&order=severity All tickets closed by this release]
 ==== All Platforms ====
   * µTP support
   * UDP tracker support
@@ -19,6 +25,7 @@
   * Peer and Network preferences
 
 === Transmission 2.22 (2011/03/04) ===
+[http://trac.transmissionbt.com/query?milestone=2.22&group=component&order=severity All tickets closed by this release]
 ==== All Platforms ====
   * Faster endgame
   * Fix bug where leechers might be disconnected while seeding in some situations
@@ -37,6 +44,7 @@
   * Fix bandwidth display issue
 
 === Transmission 2.21 (2011/02/08) ===
+[http://trac.transmissionbt.com/query?milestone=2.21&group=component&order=severity All tickets closed by this release]
 ==== All Platforms ====
   * Fix compile error in the the 2.20 tarball
 ==== GTK+ ====
