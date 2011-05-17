@@ -22,8 +22,8 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2011-02-08 00:08+0000\n"
-"X-Generator: Launchpad (build 12335)\n"
+"X-Launchpad-Export-Date: 2011-05-16 23:56+0000\n"
+"X-Generator: Launchpad (build 13045)\n"
 
 #: ../gtk/actions.c:53
 msgid "Sort by _Activity"
@@ -905,18 +905,10 @@ msgstr ""
 "Maarten Van Coile\n"
 "\n"
 "Launchpad Contributions:\n"
-"  Arien Lam https://launchpad.net/~h-a-lam\n"
 "  Arnout Lok https://launchpad.net/~arnout-lok\n"
 "  Jan Klopper https://launchpad.net/~janklopper-innerheight\n"
-"  Sander Wiering https://launchpad.net/~sanderwiering\n"
 "  Taygeto https://launchpad.net/~taygeto\n"
-"  Toorgedm https://launchpad.net/~toorgedm\n"
-"  Wouter Bolsterlee (uws) https://launchpad.net/~uws\n"
-"  Yentl https://launchpad.net/~yentlvt\n"
-"  dvdmeer https://launchpad.net/~dennis-dvdmeer\n"
-"  friendly demon https://launchpad.net/~verstraete-kenny\n"
-"  kkaltuu https://launchpad.net/~kaldranos\n"
-"  rob https://launchpad.net/~rvdb"
+"  dvdmeer https://launchpad.net/~dennis-dvdmeer"
 
 #: ../gtk/makemeta-ui.c:78
 #, c-format
@@ -2334,6 +2326,9 @@ msgstr "In de wachtrij voor verificatie"
 #~ msgid "Choose Directory"
 #~ msgstr "Kies een map"
 
+#~ msgid "File \"%s\" is already open"
+#~ msgstr "Bestand \"%s\" is al open"
+
 #~ msgid "Limit _download speed (KB/s):"
 #~ msgstr "_Downloadsnelheid limiteren (KB/s):"
 
@@ -2475,6 +2470,39 @@ msgstr "In de wachtrij voor verificatie"
 #~ msgid "_Reverse Sort Order"
 #~ msgstr "_Omgekeerd sorteren"
 
+#~ msgid "Blocklist updated with %'d entries"
+#~ msgstr "Blokkadelijst bijgewerkt met %'d items"
+
+#~ msgid "Uncompressing blocklist..."
+#~ msgstr "Bezig met het uitpakken van de blokkadelijst..."
+
+#~ msgid "Unable to get blocklist: %s"
+#~ msgstr "Kan blokkadelijst niet ophalen: %s"
+
+#~ msgid "Unable to get blocklist."
+#~ msgstr "Kan blokkadelijst niet ophalen."
+
+#~ msgid "%1$.1f%% (%2$.1f%% selected)"
+#~ msgstr "%1$.1f%% (%2$.1f%% geselecteerd)"
+
+#~ msgid "Parsing blocklist..."
+#~ msgstr "Lezen van blokkadelijst…"
+
+#~ msgid "Completion"
+#~ msgstr "Voltooid"
+
+#~ msgid "Beginning to use scheduled bandwidth limits"
+#~ msgstr "Starten met het gebruik van bandbreedtelimieten"
+
+#~ msgid "Ending use of scheduled bandwidth limits"
+#~ msgstr "Beëindigen van het gebruik van bandbreedtelimieten"
+
+#~ msgid "_Ignore unencrypted peers"
+#~ msgstr "_Onversleutelde peers negeren"
+
+#~ msgid "_Limit bandwidth between"
+#~ msgstr "_Bandbreedte limiteren tussen"
+
 #~ msgid "This torrent has not finished downloading."
 #~ msgid_plural "These torrents have not finished downloading."
 #~ msgstr[0] "Deze torrent is nog niet klaar met downloaden."
@@ -2519,6 +2547,9 @@ msgstr "In de wachtrij voor verificatie"
 
 #~ msgid "_Enable web interface"
 #~ msgstr "Web-interface _inschakelen"
+
+#~ msgid "Limit d_ownload speed (KB/s):"
+#~ msgstr "Do_wnloadsnelheid limiteren (KB/s):"
 
 #, c-format
 #~ msgid "Couldn't create \"%1$s\": parent folder \"%2$s\" does not exist"

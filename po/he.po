@@ -11,8 +11,8 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2011-02-08 00:09+0000\n"
-"X-Generator: Launchpad (build 12335)\n"
+"X-Launchpad-Export-Date: 2011-05-16 23:57+0000\n"
+"X-Generator: Launchpad (build 13045)\n"
 "Language: he\n"
 "X-Poedit-Language: Hebrew\n"
 
@@ -878,18 +878,7 @@ msgstr ""
 #. dialog
 #: ../gtk/main.c:1554
 msgid "translator-credits"
-msgstr ""
-"מארק קרפיבנר <mark125@gmail.com>\n"
-"\n"
-"Launchpad Contributions:\n"
-"  Elad Alfassa https://launchpad.net/~el-il\n"
-"  Eyal Levin https://launchpad.net/~eyalev\n"
-"  Ilan https://launchpad.net/~ilan\n"
-"  Liel Fridman https://launchpad.net/~lielft\n"
-"  Mark Krapivner https://launchpad.net/~mark125\n"
-"  Shahar Or https://launchpad.net/~dawnlight\n"
-"  Yaron https://launchpad.net/~sh-yaron\n"
-"  nadavvadan https://launchpad.net/~nadavvadan"
+msgstr "מארק קרפיבנר <mark125@gmail.com>"
 
 #: ../gtk/makemeta-ui.c:78
 #, c-format
@@ -2322,8 +2311,33 @@ msgstr ""
 #~ msgid "Proxy _type:"
 #~ msgstr "_סוג הפרוקסי:"
 
+#, c-format
+#~ msgid "%1$s (%2$s verified)"
+#~ msgstr "%1$s (%2$s אומתו)"
+
+#~ msgid "File \"%s\" is already open"
+#~ msgstr "הקובץ \"%s\" כבר פץוח"
+
 #~ msgid "Sort by _Ratio"
 #~ msgstr "מיון לפי יחס _שיתוף"
+
+#~ msgid "_Ignore unencrypted peers"
+#~ msgstr "_התעלם ממקורות לא מוצפנים"
+
+#~ msgid "Blocklist updated with %'d entries"
+#~ msgstr "רשימת חסומים התעדכנה עם %'d רשומות"
+
+#~ msgid "Parsing blocklist..."
+#~ msgstr "עובר על רשימת חסומים..."
+
+#~ msgid "Unable to get blocklist."
+#~ msgstr "לא ניתן להשיג רשימת חסומים."
+
+#~ msgid "Completion"
+#~ msgstr "השלמה"
+
+#~ msgid "%1$.1f%% (%2$.1f%% selected)"
+#~ msgstr "%1$.1f%% (%2$.1f%% נבחרו)"
 
 #, c-format
 #~ msgid "%'.1f MB"
@@ -2361,6 +2375,15 @@ msgstr ""
 
 #~ msgid "Limit u_pload speed (KB/s):"
 #~ msgstr "הגבל מהירות ה_עלאה (ק\"ב/ש):"
+
+#~ msgid "Unable to get blocklist: %s"
+#~ msgstr "לא ניתן לאחזר את רשימת החסימה: %s"
+
+#~ msgid "Uncompressing blocklist..."
+#~ msgstr "מחלץ את רשימת החסימה..."
+
+#~ msgid "Limit d_ownload speed (KB/s):"
+#~ msgstr "הגבל מהי_רות הורדה (ק\"ב/ש):"
 
 #~ msgid "Set _Location"
 #~ msgstr "הגדרת _מיקום"

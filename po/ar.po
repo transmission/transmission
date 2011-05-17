@@ -16,8 +16,8 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n % 100 >= "
 "3 && n % 100 <= 10 ? 3 : n % 100 >= 11 && n % 100 <= 99 ? 4 : 5;\n"
-"X-Launchpad-Export-Date: 2011-02-08 00:08+0000\n"
-"X-Generator: Launchpad (build 12335)\n"
+"X-Launchpad-Export-Date: 2011-05-16 23:56+0000\n"
+"X-Generator: Launchpad (build 13045)\n"
 
 #: ../gtk/actions.c:53
 msgid "Sort by _Activity"
@@ -882,20 +882,6 @@ msgstr ""
 #: ../gtk/main.c:1554
 msgid "translator-credits"
 msgstr ""
-"Launchpad Contributions:\n"
-"  Ahmad Gharbeia أحمد غربية https://launchpad.net/~gharbeia\n"
-"  Ahmed Mohammed https://launchpad.net/~ahmedqatar\n"
-"  Alamoudi https://launchpad.net/~alamoudei\n"
-"  Benjamin Geer https://launchpad.net/~benjamin-geer\n"
-"  Kaïs Bejaoui https://launchpad.net/~kais\n"
-"  Khaled Hosny https://launchpad.net/~khaledhosny\n"
-"  Mohammad AlHobayyeb https://launchpad.net/~mih1406\n"
-"  Mohammed Adnène Trojette https://launchpad.net/~adn+ubuntu\n"
-"  Mohammed Mehdi Zaddem https://launchpad.net/~darkphoenix7878\n"
-"  Zrouga Mohamed https://launchpad.net/~zargonovski\n"
-"  r00t020 https://launchpad.net/~r00t020\n"
-"  someone https://launchpad.net/~somehow\n"
-"  صقر بن عبدالله https://launchpad.net/~agari"
 
 #: ../gtk/makemeta-ui.c:78
 #, c-format
@@ -2396,6 +2382,13 @@ msgstr "في طابور التحقق"
 
 #~ msgid "Tracker Proxy"
 #~ msgstr "وسيط المتعقبين"
+
+#, c-format
+#~ msgid "%1$s (%2$s verified)"
+#~ msgstr "%1$s (%2$s تم التحقق منه)"
+
+#~ msgid "File \"%s\" is already open"
+#~ msgstr "الملف « %s » مفتوح بالفعل"
 
 #~ msgid "Now"
 #~ msgstr "الآن"

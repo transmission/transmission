@@ -10,16 +10,16 @@ msgstr ""
 "Project-Id-Version: Transmission HEAD\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2011-01-27 14:52-0600\n"
-"PO-Revision-Date: 2011-01-31 08:37+0000\n"
-"Last-Translator: Igor Butvin <Unknown>\n"
+"PO-Revision-Date: 2011-05-09 13:08+0000\n"
+"Last-Translator: Evgeny <Unknown>\n"
 "Language-Team: Russian <gnome-cyr@gnome.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
 "n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
-"X-Launchpad-Export-Date: 2011-02-08 00:08+0000\n"
-"X-Generator: Launchpad (build 12335)\n"
+"X-Launchpad-Export-Date: 2011-05-16 23:56+0000\n"
+"X-Generator: Launchpad (build 13045)\n"
 "X-Poedit-Country: RUSSIAN FEDERATION\n"
 "X-Poedit-Language: Russian\n"
 "X-Poedit-SourceCharset: utf-8\n"
@@ -70,7 +70,7 @@ msgstr "_Журнал сообщений"
 
 #: ../gtk/actions.c:93
 msgid "Enable Alternative Speed _Limits"
-msgstr ""
+msgstr "Включить альтернативное ограничение с_корости"
 
 #: ../gtk/actions.c:94
 msgid "_Compact View"
@@ -186,7 +186,7 @@ msgstr "Удалить торрент"
 
 #: ../gtk/actions.c:122
 msgid "_Delete Files and Remove"
-msgstr "Удалить _файлы и торрент"
+msgstr "_Убрать с раздачи и удалить данные"
 
 #: ../gtk/actions.c:123
 msgid "_New..."
@@ -214,7 +214,7 @@ msgstr "Свойства торрента"
 
 #: ../gtk/actions.c:129
 msgid "Open Fold_er"
-msgstr ""
+msgstr "Открыть папк_у"
 
 #: ../gtk/actions.c:131
 msgid "_Contents"
@@ -384,7 +384,7 @@ msgstr "%1$s (доступно %2$s%% из %3$s%%)"
 #: ../gtk/details.c:829
 #, c-format
 msgid "%1$s (%2$s%% of %3$s%% Available); %4$s Unverified"
-msgstr "%1$s (доступно %2$s%% из %3$s%%); неподтверждено %4$s"
+msgstr "%1$s (доступно %2$s%% из %3$s%%); не подтверждено %4$s"
 
 #: ../gtk/details.c:848
 #, c-format
@@ -503,11 +503,11 @@ msgstr "%"
 
 #: ../gtk/details.c:1124
 msgid "Up Reqs"
-msgstr "Исх запр."
+msgstr "Исх. запр."
 
 #: ../gtk/details.c:1126
 msgid "Dn Reqs"
-msgstr "Вх запр."
+msgstr "Вх. запр."
 
 #: ../gtk/details.c:1128
 msgid "Dn Blocks"
@@ -527,7 +527,7 @@ msgstr "Отменено другими участниками"
 
 #: ../gtk/details.c:1135
 msgid "Flags"
-msgstr ""
+msgstr "Флаги"
 
 #: ../gtk/details.c:1475
 msgid "Optimistic unchoke"
@@ -646,7 +646,7 @@ msgstr "Исправьте ошибки и повторите попытку."
 #: ../gtk/details.c:2192
 #, c-format
 msgid "%s - Edit Trackers"
-msgstr ""
+msgstr "%s - Редактор трекеров"
 
 #: ../gtk/details.c:2203
 msgid "Tracker Announce URLs"
@@ -672,7 +672,7 @@ msgstr "Трекер"
 
 #: ../gtk/details.c:2323
 msgid "_Announce URL:"
-msgstr ""
+msgstr "_Сообщить URL:"
 
 #: ../gtk/details.c:2399 ../gtk/details.c:2531 ../gtk/filter.c:316
 msgid "Trackers"
@@ -680,7 +680,7 @@ msgstr "Трекеры"
 
 #: ../gtk/details.c:2423
 msgid "_Add"
-msgstr ""
+msgstr "_Добавить"
 
 #: ../gtk/details.c:2434
 msgid "_Remove"
@@ -773,7 +773,7 @@ msgstr "Размер"
 #. add "progress" column
 #: ../gtk/file-list.c:982
 msgid "Have"
-msgstr ""
+msgstr "Содержит"
 
 #. add priority column
 #: ../gtk/file-list.c:1011 ../gtk/filter.c:336
@@ -822,6 +822,7 @@ msgstr "_Показать:"
 msgid ""
 "Got signal %d; trying to shut down cleanly. Do it again if it gets stuck."
 msgstr ""
+"Получен сигнал %d; при попытке выключения. При необходимости повторите."
 
 #: ../gtk/main.c:723
 msgid "Start with all torrents paused"
@@ -866,6 +867,10 @@ msgid ""
 "fully responsible for exercising proper judgement and abiding by your local "
 "laws."
 msgstr ""
+"Transmission - это программа для обмена файлами. При запуске торрента, "
+"данные будут предоставлены другим пользователям для загрузки. Вы и только вы "
+"несете полную ответственность за соблюдение действующих федеральных или "
+"местных законов."
 
 #: ../gtk/main.c:954
 msgid "I _Accept"
@@ -900,64 +905,15 @@ msgstr ""
 "Anton Shestakov <engored@ya.ru>\n"
 "\n"
 "Launchpad Contributions:\n"
-"  .silent https://launchpad.net/~igor-kalashnikov\n"
-"  Abaza https://launchpad.net/~abazinchik\n"
-"  Alexander Chumanov https://launchpad.net/~achumanov\n"
-"  Alexander Semyonov https://launchpad.net/~rotuka\n"
-"  Alexei Klimenko https://launchpad.net/~nimda7\n"
-"  Alexey Kotlyarov https://launchpad.net/~koterpillar\n"
-"  Alexey Torkhov https://launchpad.net/~atorkhov\n"
-"  Andrei Dziahel https://launchpad.net/~develop7\n"
 "  Andrey Olykainen https://launchpad.net/~andrey.olykainen\n"
 "  Andrey Sitnik https://launchpad.net/~iskin\n"
-"  Anton Lashkov https://launchpad.net/~onto\n"
 "  Anton Shestakov https://launchpad.net/~engored\n"
-"  Arseny Solokha https://launchpad.net/~asolokha\n"
-"  Artem Karimov https://launchpad.net/~a.karimov\n"
 "  ArtemZ https://launchpad.net/~zhirkow-yahoo\n"
-"  Bashtannik Andrew S. https://launchpad.net/~bashtannik\n"
 "  Capone https://launchpad.net/~bolshakov-alexey\n"
-"  DIX2005 https://launchpad.net/~dimail-box\n"
-"  DooMka https://launchpad.net/~xpym-xpym\n"
-"  Egor Bushmelyov https://launchpad.net/~skipper95\n"
-"  Fatroll https://launchpad.net/~fatroll\n"
-"  Grigorev Mihail https://launchpad.net/~grigorevmn\n"
-"  Ignat Loskutov https://launchpad.net/~softwayer\n"
+"  Evgeny https://launchpad.net/~evgeny-ig\n"
 "  Igor Butvin https://launchpad.net/~bootwin\n"
-"  Igor Zubarev https://launchpad.net/~igor.zubarev\n"
-"  Ilya Barygin https://launchpad.net/~randomaction\n"
-"  Ivan https://launchpad.net/~trurl-master\n"
-"  Ivan Kliouchenkov https://launchpad.net/~quick\n"
-"  Kirill Holodilin https://launchpad.net/~charlie-chrl\n"
-"  Max Riveiro https://launchpad.net/~kavu\n"
-"  Max Schukin https://launchpad.net/~schukin\n"
-"  Maxim Prokopyev https://launchpad.net/~xjazz\n"
-"  Maxim S. https://launchpad.net/~luvme-nn\n"
-"  Nosferatu https://launchpad.net/~nusferatu\n"
-"  Novikov Andrey https://launchpad.net/~envek\n"
-"  Oleg Koptev https://launchpad.net/~koptev-oleg\n"
-"  Pavel Dmitriev https://launchpad.net/~dmitrievp\n"
-"  Pavel Kurashov https://launchpad.net/~pavell\n"
-"  Pavels Sevcuks https://launchpad.net/~stlwrt\n"
-"  Phenomen https://launchpad.net/~xphenomen\n"
-"  Sergei Medvedev https://launchpad.net/~smedvedeff\n"
-"  Sergey \"Shnatsel\" Davidoff https://launchpad.net/~shnatsel\n"
-"  Sergey Sedov https://launchpad.net/~serg-sedov\n"
-"  Shu https://launchpad.net/~shu3k\n"
-"  Vadim Rutkovsky https://launchpad.net/~roignac\n"
-"  Victor N. https://launchpad.net/~d447224\n"
-"  Vladimir Yatulchik https://launchpad.net/~yatul\n"
-"  ap0stol https://launchpad.net/~x777ozon\n"
-"  egor panfilov https://launchpad.net/~atom8bit\n"
-"  jmb_kz https://launchpad.net/~jmb-kz\n"
-"  meating https://launchpad.net/~unrealjke\n"
-"  nickkon https://launchpad.net/~nickkon\n"
-"  ttg https://launchpad.net/~xvttgvx\n"
-"  ujin https://launchpad.net/~koshelev-e\n"
-"  Андрей Калинин https://launchpad.net/~prize2step\n"
-"  Артём Попов https://launchpad.net/~artfwo\n"
-"  Денис Победря https://launchpad.net/~arcticfox\n"
-"  Коренберг Марк https://launchpad.net/~socketpair"
+"  Maxim Petrov https://launchpad.net/~maximpetrov\n"
+"  Maxim S. https://launchpad.net/~luvme-nn"
 
 #: ../gtk/makemeta-ui.c:78
 #, c-format
@@ -1187,6 +1143,8 @@ msgid ""
 "These statistics are for your information only. Resetting them doesn't "
 "affect the statistics logged by your BitTorrent trackers."
 msgstr ""
+"Эти статистические данные предназначены исключительно для ознакомления. Их "
+"сброс не влияет на статистику ваших BitTorrent-трекеров."
 
 #: ../gtk/stats.c:119 ../gtk/stats.c:149
 msgid "_Reset"
@@ -1321,7 +1279,7 @@ msgstr "Клиент BitTorrent"
 
 #: ../gtk/transmission-gtk.desktop.in.h:2
 msgid "Download and share files over BitTorrent"
-msgstr "Скачивайте и обменивайтесь файлами в сети BitTorrent"
+msgstr "Загружайте и обменивайтесь файлами в сети BitTorrent"
 
 #: ../gtk/transmission-gtk.desktop.in.h:4
 msgid "Transmission BitTorrent Client"
@@ -1390,7 +1348,7 @@ msgstr "Сохранять _незавершенные торренты в:"
 
 #: ../gtk/tr-prefs.c:311
 msgid "Call scrip_t when torrent is completed:"
-msgstr "Запускать _скрипт по окончанию загрузки:"
+msgstr "Выполнить с_ценарий, после окончания загрузки:"
 
 #: ../gtk/tr-prefs.c:321
 msgid "Stop seeding at _ratio:"
@@ -1434,7 +1392,7 @@ msgstr "Обновление «чёрного списка»"
 
 #: ../gtk/tr-prefs.c:451
 msgid "Getting new blocklist..."
-msgstr "Получение нового «чёрного списка»"
+msgstr "Получение нового «чёрного списка»..."
 
 #: ../gtk/tr-prefs.c:470
 msgid "Allow encryption"
@@ -1480,7 +1438,7 @@ msgstr ""
 
 #: ../gtk/tr-prefs.c:538
 msgid "Use _DHT to find more peers"
-msgstr "Использовать DHT для поиска узлов"
+msgstr "Использовать _DHT для обнаружения узлов"
 
 #: ../gtk/tr-prefs.c:540
 msgid "DHT is a tool for finding peers without a tracker."
@@ -1586,12 +1544,12 @@ msgstr "Ограничения скорости"
 #: ../gtk/tr-prefs.c:1017
 #, c-format
 msgid "_Upload (%s):"
-msgstr ""
+msgstr "_Раздача (%s):"
 
 #: ../gtk/tr-prefs.c:1024
 #, c-format
 msgid "_Download (%s):"
-msgstr ""
+msgstr "_Загрузка (%s):"
 
 #: ../gtk/tr-prefs.c:1035
 msgid "Alternative Speed Limits"
@@ -1605,12 +1563,12 @@ msgstr ""
 #: ../gtk/tr-prefs.c:1049
 #, c-format
 msgid "U_pload (%s):"
-msgstr ""
+msgstr "Р_аздача (%s):"
 
 #: ../gtk/tr-prefs.c:1053
 #, c-format
 msgid "Do_wnload (%s):"
-msgstr ""
+msgstr "За_грузка (%s):"
 
 #: ../gtk/tr-prefs.c:1057
 msgid "_Scheduled times:"
@@ -1646,7 +1604,7 @@ msgstr "Прослушивание порта"
 
 #: ../gtk/tr-prefs.c:1186
 msgid "_Port used for incoming connections:"
-msgstr ""
+msgstr "_Порт, для входящих подключений:"
 
 #: ../gtk/tr-prefs.c:1194
 msgid "Te_st Port"
@@ -1654,7 +1612,7 @@ msgstr "Про_верить порт"
 
 #: ../gtk/tr-prefs.c:1201
 msgid "Pick a _random port every time Transmission is started"
-msgstr "Указывать _случайный порт при каждом запуске программы"
+msgstr "Использовать _случайный порт при каждом запуске программы"
 
 #: ../gtk/tr-prefs.c:1205
 msgid "Use UPnP or NAT-PMP port _forwarding from my router"
@@ -1846,6 +1804,8 @@ msgid ""
 "This magnet link appears to be intended for something other than BitTorrent. "
 "BitTorrent magnet links have a section containing \"%s\"."
 msgstr ""
+"Эта magnet-ссылка, по-видимому, предназначена не для BitTorrent. Magnet-"
+"ссылки для BitTorrent имеют раздел, содержащий \"%s\"."
 
 #. did caller give us an uninitialized val?
 #: ../libtransmission/bencode.c:1107
@@ -2014,10 +1974,13 @@ msgid ""
 "No data found! Ensure your drives are connected or use \"Set Location\". To "
 "re-download, remove the torrent and re-add it."
 msgstr ""
+"Нет данных! Убедитесь, что ваши диски подключены, или используйте "
+"\"Установить местоположение\". Для того, чтобы повторно загрузить файл, "
+"удалите торрент, а затем добавьте его еще раз."
 
 #: ../libtransmission/torrent.c:1635
 msgid "Restarted manually -- disabling its seed ratio"
-msgstr ""
+msgstr "Перезагружено вручную -- отключение рейтинга раздачи"
 
 #: ../libtransmission/torrent.c:1781
 msgid "Removing torrent"
@@ -2064,6 +2027,7 @@ msgstr "Прекращение перенаправления портов че�
 msgid ""
 "Port forwarding through \"%s\", service \"%s\". (local address: %s:%d)"
 msgstr ""
+"Перенаправление через \"%s\", служба \"%s\". (локальный адрес: %s:%d)"
 
 #: ../libtransmission/upnp.c:224
 msgid "Port forwarding successful!"
@@ -2452,6 +2416,13 @@ msgstr "В очереди на проверку"
 #~ msgstr[2] "Приём от %1$'d из %2$'d подключённых узлов"
 
 #, c-format
+#~ msgid "%1$s (%2$s verified)"
+#~ msgstr "%1$s (проверено %2$s)"
+
+#~ msgid "File \"%s\" is already open"
+#~ msgstr "Файл «%s» уже открыт"
+
+#, c-format
 #~ msgid "%1$s @ %2$s"
 #~ msgstr "%1$s по %2$s"
 
@@ -2486,6 +2457,30 @@ msgstr "В очереди на проверку"
 #, c-format
 #~ msgid "Preallocated file \"%s\""
 #~ msgstr "Выделенный файл \"%s\""
+
+#~ msgid "_Ignore unencrypted peers"
+#~ msgstr "Игнорировать узлы, не поддерживающие шифрование"
+
+#~ msgid "Completion"
+#~ msgstr "Завершение"
+
+#~ msgid "%1$.1f%% (%2$.1f%% selected)"
+#~ msgstr "%1$.1f%% (выбрано %2$.1f%%)"
+
+#~ msgid "Uncompressing blocklist..."
+#~ msgstr "Распаковка чёрного списка..."
+
+#~ msgid "Parsing blocklist..."
+#~ msgstr "Обработка чёрного списка..."
+
+#~ msgid "Beginning to use scheduled bandwidth limits"
+#~ msgstr "Начало использования расписания ограничений полосы"
+
+#~ msgid "Ending use of scheduled bandwidth limits"
+#~ msgstr "Окончание использования расписания ограничений полосы"
+
+#~ msgid "_Limit bandwidth between"
+#~ msgstr "_Ограничить пропускную способность значениями"
 
 #~ msgid "This torrent has not finished downloading."
 #~ msgid_plural "These torrents have not finished downloading."
@@ -2571,6 +2566,18 @@ msgstr "В очереди на проверку"
 #~ msgstr[0] "Один из этих торрентов подключен к узлам."
 #~ msgstr[1] "Некоторые из этих торрентов подключены к узлам."
 #~ msgstr[2] "Некоторые из этих торрентов подключены к узлам."
+
+#~ msgid "Unable to get blocklist: %s"
+#~ msgstr "Не удалось получить чёрный список: %s"
+
+#~ msgid "Unable to get blocklist."
+#~ msgstr "Не удалось получить чёрный список."
+
+#~ msgid "Blocklist updated with %'d entries"
+#~ msgstr "В чёрный список добавлено %'d записей"
+
+#~ msgid "Limit d_ownload speed (KB/s):"
+#~ msgstr "Ограничить скорость п_риёма (КБ/с):"
 
 #, c-format
 #~ msgid "Couldn't create \"%1$s\": parent folder \"%2$s\" does not exist"

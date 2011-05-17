@@ -15,8 +15,8 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
 "(n%100<10 || n%100>=20) ? 1 : 2;\n"
-"X-Launchpad-Export-Date: 2011-02-08 00:08+0000\n"
-"X-Generator: Launchpad (build 12335)\n"
+"X-Launchpad-Export-Date: 2011-05-16 23:56+0000\n"
+"X-Generator: Launchpad (build 13045)\n"
 "Language: lt\n"
 
 #: ../gtk/actions.c:53
@@ -890,14 +890,12 @@ msgstr ""
 "Žygimantas Beručka\n"
 "\n"
 "Launchpad Contributions:\n"
-"  Adomas Jackevičius https://launchpad.net/~adomas-jackevicius\n"
-"  Izumi https://launchpad.net/~reyfantasy\n"
-"  Julius Vitkauskas https://launchpad.net/~julius-vitkauskas\n"
+"  Adomas Jackevičius Bosanova https://launchpad.net/~adomas-bosanova\n"
 "  Mantas Kriaučiūnas https://launchpad.net/~mantas\n"
 "  Rimas Kudelis https://launchpad.net/~rq\n"
-"  Sigitas Kalinas https://launchpad.net/~skalinas\n"
 "  Vitalijus Valantiejus https://launchpad.net/~vitalijusv\n"
 "  Vytautas https://launchpad.net/~vytautasjc\n"
+"  zolookas https://launchpad.net/~zolookas\n"
 "  Žygimantas Beručka https://launchpad.net/~zygis"
 
 #: ../gtk/makemeta-ui.c:78
@@ -2440,6 +2438,13 @@ msgstr "Eilėje patikrinimui"
 #, c-format
 #~ msgid "Got %d peers from tracker"
 #~ msgstr "Iš sekiklio gauta %d siuntėjų"
+
+#, c-format
+#~ msgid "%1$s (%2$s verified)"
+#~ msgstr "%1$s (%2$s patikrinta)"
+
+#~ msgid "File \"%s\" is already open"
+#~ msgstr "Failas „%s“ jau atvertas"
 
 #~ msgid "Limit u_pload speed (KB/s):"
 #~ msgstr "Riboti iš_siuntimo greitį (KB/s):"

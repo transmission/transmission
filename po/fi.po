@@ -14,8 +14,8 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2011-02-08 00:08+0000\n"
-"X-Generator: Launchpad (build 12335)\n"
+"X-Launchpad-Export-Date: 2011-05-16 23:56+0000\n"
+"X-Generator: Launchpad (build 13045)\n"
 
 #: ../gtk/actions.c:53
 msgid "Sort by _Activity"
@@ -323,7 +323,7 @@ msgstr "Tauko"
 
 #: ../gtk/details.c:604
 msgid "N/A"
-msgstr ""
+msgstr "N/A"
 
 #: ../gtk/details.c:616 ../gtk/file-list.c:621
 msgid "Mixed"
@@ -392,7 +392,7 @@ msgstr ""
 
 #: ../gtk/details.c:911
 msgid "Never"
-msgstr ""
+msgstr "Ei koskaan"
 
 #: ../gtk/details.c:915
 msgid "Active now"
@@ -888,23 +888,9 @@ msgstr ""
 msgid "translator-credits"
 msgstr ""
 "Launchpad Contributions:\n"
-"  Birunthan Mohanathas https://launchpad.net/~poiru\n"
-"  Christian Hellberg https://launchpad.net/~christian-hellberg\n"
-"  Elias Julkunen https://launchpad.net/~eliasj\n"
-"  Erektium https://launchpad.net/~meizinteizi\n"
-"  Heikki Kulhia https://launchpad.net/~hessuk\n"
-"  Heikki Mäntysaari https://launchpad.net/~heikki-mantysaari\n"
-"  Ilari Oras https://launchpad.net/~ilarioras\n"
-"  Jaakko Huhtala https://launchpad.net/~jaakko-huhtala\n"
-"  Juhana Uuttu https://launchpad.net/~rexroom\n"
-"  Pekka Niemi https://launchpad.net/~pekka-niemi\n"
-"  Saku Laukkanen https://launchpad.net/~nollapiste\n"
-"  Tiigon https://launchpad.net/~tiigon\n"
-"  Timo Jyrinki https://launchpad.net/~timo-jyrinki\n"
-"  Tomi I. https://launchpad.net/~tomii\n"
-"  Tuomas Aavikko https://launchpad.net/~taavikko\n"
-"  papukaija https://launchpad.net/~papukaija\n"
-"  tommi svanbäck https://launchpad.net/~svabari"
+"  Jiri Grönroos https://launchpad.net/~jiri-gronroos\n"
+"  Rami Selin https://launchpad.net/~rami-selin\n"
+"  Tuomas Heino https://launchpad.net/~iheino+ub"
 
 #: ../gtk/makemeta-ui.c:78
 #, c-format
@@ -1341,11 +1327,11 @@ msgstr "Suorita skri_pti, kun torrent on valmis:"
 
 #: ../gtk/tr-prefs.c:321
 msgid "Stop seeding at _ratio:"
-msgstr ""
+msgstr "Lopeta jakaminen _suhteessa:"
 
 #: ../gtk/tr-prefs.c:328
 msgid "Stop seeding if idle for _N minutes:"
-msgstr ""
+msgstr "Lopeta jakaminen jos jouten _N minuuttia:"
 
 #: ../gtk/tr-prefs.c:352 ../gtk/tr-prefs.c:1267
 msgid "Desktop"
@@ -1435,7 +1421,7 @@ msgstr "DHT:n avulla voit löytää vertaisia ilman seurantapalvelinta"
 
 #: ../gtk/tr-prefs.c:544
 msgid "Use _Local Peer Discovery to find more peers"
-msgstr ""
+msgstr "Käytä _paikallisvertaisten etsintää useamman vertaisen löytämiseksi"
 
 #: ../gtk/tr-prefs.c:546
 msgid "LPD is a tool for finding peers on your local network."
@@ -2351,6 +2337,13 @@ msgstr "Laitettiin jonoon tarkistusta varten"
 #~ msgstr "Estolista \"%1$s\" päivitettiin %2$'d kohteella"
 
 #, c-format
+#~ msgid "%1$s (%2$s verified)"
+#~ msgstr "%1$s (%2$s tarkistettu)"
+
+#~ msgid "File \"%s\" is already open"
+#~ msgstr "Tiedosto \"%s\" on jo auki"
+
+#, c-format
 #~ msgid "Seeding to %1$'d of %2$'d connected peer"
 #~ msgid_plural "Seeding to %1$'d of %2$'d connected peers"
 #~ msgstr[0] "Lähetetään %1$'d / %2$'d yhdistetylle vertaiselle"
@@ -2397,8 +2390,44 @@ msgstr "Laitettiin jonoon tarkistusta varten"
 #~ msgstr[0] "Käytä _estolistaa (sisältää %'d säännön)"
 #~ msgstr[1] "Käytä _estolistaa (sisältää %'d sääntöä)"
 
+#~ msgid "_Ignore unencrypted peers"
+#~ msgstr "_Estä salaamattomat lähteet"
+
+#~ msgid "Blocklist updated with %'d entries"
+#~ msgstr "Estolista päivitettiin: %'d kohtaa päivittyi"
+
+#~ msgid "Parsing blocklist..."
+#~ msgstr "Kootaan estolista..."
+
+#~ msgid "Uncompressing blocklist..."
+#~ msgstr "Puretaan estolistaa..."
+
+#~ msgid "Unable to get blocklist: %s"
+#~ msgstr "Estolistaa ei voitu hakea: %s"
+
+#~ msgid "Unable to get blocklist."
+#~ msgstr "Estolistaa ei voitu hakea."
+
+#~ msgid "Completion"
+#~ msgstr "Valmistuminen"
+
+#~ msgid "%1$.1f%% (%2$.1f%% selected)"
+#~ msgstr "%1$.1f%% (%2$.1f%% valittu)"
+
 #~ msgid "<b>Times Completed:</b>"
 #~ msgstr "<b>Valmistumiskerrat:</b>"
+
+#~ msgid "Beginning to use scheduled bandwidth limits"
+#~ msgstr "Aloitetaan ajoitetun kaistan käytön rajoitus"
+
+#~ msgid "Ending use of scheduled bandwidth limits"
+#~ msgstr "Lopetetaan ajoitetun kaistan käytön rajoitus"
+
+#~ msgid "_Limit bandwidth between"
+#~ msgstr "_Rajoita kaistanleveyttä välillä"
+
+#~ msgid "Limit d_ownload speed (KB/s):"
+#~ msgstr "Rajoita l_atausnopeutta (KB/s):"
 
 #~ msgid "Started at:"
 #~ msgstr "Aloitettu:"

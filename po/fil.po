@@ -15,8 +15,8 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n > 1;\n"
-"X-Launchpad-Export-Date: 2011-02-08 00:09+0000\n"
-"X-Generator: Launchpad (build 12335)\n"
+"X-Launchpad-Export-Date: 2011-05-16 23:57+0000\n"
+"X-Generator: Launchpad (build 13045)\n"
 
 #: ../gtk/actions.c:53
 msgid "Sort by _Activity"
@@ -28,11 +28,11 @@ msgstr "Pagsunud-sunurin ayon sa Pa_ngalan"
 
 #: ../gtk/actions.c:55
 msgid "Sort by _Progress"
-msgstr ""
+msgstr "Pagsunud-sunurin ayon sa  _Progreso"
 
 #: ../gtk/actions.c:56
 msgid "Sort by Rati_o"
-msgstr ""
+msgstr "Pagsunud-sunurin ayon sa Pr_oporsyon"
 
 #: ../gtk/actions.c:57
 msgid "Sort by Stat_e"
@@ -40,19 +40,19 @@ msgstr "Pagsunud-sunurin ayon sa _Estado"
 
 #: ../gtk/actions.c:58
 msgid "Sort by A_ge"
-msgstr ""
+msgstr "Pagsunud-sunurin ayon sa  _Gulang"
 
 #: ../gtk/actions.c:59
 msgid "Sort by Time _Left"
-msgstr ""
+msgstr "Pagsunud-sunurin ayon sa Na_lalabing Oras"
 
 #: ../gtk/actions.c:60
 msgid "Sort by Si_ze"
-msgstr ""
+msgstr "Pagsunud-sunurin ayon sa La_ki"
 
 #: ../gtk/actions.c:77
 msgid "_Show Transmission"
-msgstr ""
+msgstr "Ipakita ang Tran_smission"
 
 #: ../gtk/actions.c:78
 msgid "Message _Log"
@@ -881,9 +881,6 @@ msgstr ""
 #: ../gtk/main.c:1554
 msgid "translator-credits"
 msgstr ""
-"Launchpad Contributions:\n"
-"  Reli Ann Faye Rogado https://launchpad.net/~liannfaye\n"
-"  Ron Philip Gutierrez https://launchpad.net/~ronipe12"
 
 #: ../gtk/makemeta-ui.c:78
 #, c-format

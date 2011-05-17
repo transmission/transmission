@@ -7,15 +7,15 @@ msgstr ""
 "Project-Id-Version: transmission-gtk\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2011-01-27 14:52-0600\n"
-"PO-Revision-Date: 2010-12-25 15:03+0000\n"
-"Last-Translator: Almufadado <Unknown>\n"
+"PO-Revision-Date: 2011-05-14 08:43+0000\n"
+"Last-Translator: Tiago Carrondo <Unknown>\n"
 "Language-Team: Portuguese <gnome_pt@yahoogroups.com>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2011-02-08 00:08+0000\n"
-"X-Generator: Launchpad (build 12335)\n"
+"X-Launchpad-Export-Date: 2011-05-16 23:56+0000\n"
+"X-Generator: Launchpad (build 13045)\n"
 
 #: ../gtk/actions.c:53
 msgid "Sort by _Activity"
@@ -67,7 +67,7 @@ msgstr "Vista _Compacta"
 
 #: ../gtk/actions.c:95
 msgid "Re_verse Sort Order"
-msgstr "Inverter Ordenamento"
+msgstr "Inverter Ordem"
 
 #: ../gtk/actions.c:96
 msgid "_Filterbar"
@@ -323,7 +323,7 @@ msgstr "Em Pausa"
 
 #: ../gtk/details.c:604
 msgid "N/A"
-msgstr ""
+msgstr "N/D"
 
 #: ../gtk/details.c:616 ../gtk/file-list.c:621
 msgid "Mixed"
@@ -383,7 +383,7 @@ msgstr "%1$s (+%2$s danificado)"
 #: ../gtk/details.c:870
 #, c-format
 msgid "%s (Ratio: %s)"
-msgstr ""
+msgstr "%s (Rácio: %s)"
 
 #: ../gtk/details.c:898
 msgid "No errors"
@@ -574,7 +574,9 @@ msgstr "Tenho uma lista de %1$s%2$'d pares%3$s %4$s  atrás"
 #: ../gtk/details.c:1817
 #, c-format
 msgid "Peer list request %1$stimed out%2$s %3$s ago; will retry"
-msgstr "Pedido de lista de pares %1$s caducada  há %2$s %3$s; nova tentativa"
+msgstr ""
+"Pedido de lista de pares %1$s caducado  há %2$s %3$s; será feita uma nova "
+"tentativa"
 
 #: ../gtk/details.c:1820
 #, c-format
@@ -887,24 +889,15 @@ msgstr ""
 "\n"
 "Launchpad Contributions:\n"
 "  Almufadado https://launchpad.net/~almufadado\n"
-"  Carl Roberson https://launchpad.net/~carlrobers\n"
 "  Carlos Manuel https://launchpad.net/~crolidge\n"
 "  Diogo Lavareda https://launchpad.net/~diogolavareda\n"
-"  Filipe Gomes https://launchpad.net/~filipefgomes\n"
-"  Filipe Roque https://launchpad.net/~flip-roque\n"
-"  Fábio Domingos https://launchpad.net/~fabioandre-domingos\n"
 "  Henrique Martins https://launchpad.net/~henrique-martins\n"
 "  Jcarvalho https://launchpad.net/~jorge-p-carvalho\n"
-"  João Santos https://launchpad.net/~jmcs\n"
-"  Luís Neto https://launchpad.net/~luisneto3\n"
-"  Pedro Machado Santa https://launchpad.net/~pedro-santa\n"
-"  Pedro Saraiva https://launchpad.net/~pdro-saraiva\n"
-"  Renato Martins https://launchpad.net/~smartins-renato\n"
+"  Jose Almeida https://launchpad.net/~josealmeida\n"
+"  Tiago Carrondo https://launchpad.net/~tcarrondo\n"
 "  Tiago Silva https://launchpad.net/~tiagosilva\n"
 "  Tony Manco https://launchpad.net/~trmanco\n"
 "  ilusi0n https://launchpad.net/~ha-cabrita\n"
-"  korsairtuga https://launchpad.net/~korsairtuga\n"
-"  nitrofurano https://launchpad.net/~nitrofurano-3t\n"
 "  tota https://launchpad.net/~antonio-tavares"
 
 #: ../gtk/makemeta-ui.c:78
@@ -1246,7 +1239,7 @@ msgstr "Verificando dados locais (%.1f%% testado)"
 #: ../gtk/torrent-cell-renderer.c:228
 #, c-format
 msgid "Ratio %s"
-msgstr "Racio %s"
+msgstr "Rácio %s"
 
 #: ../gtk/torrent-cell-renderer.c:257
 #, c-format
@@ -1269,7 +1262,7 @@ msgstr "Cliente de BitTorrent"
 
 #: ../gtk/transmission-gtk.desktop.in.h:2
 msgid "Download and share files over BitTorrent"
-msgstr "Descarregar e partilhar ficheiros em BitTorrent"
+msgstr "Transfira e partilhe ficheiros através de BitTorrent"
 
 #: ../gtk/transmission-gtk.desktop.in.h:4
 msgid "Transmission BitTorrent Client"
@@ -1374,7 +1367,7 @@ msgstr "<b>Actualização com sucesso!</b>"
 
 #: ../gtk/tr-prefs.c:434
 msgid "<b>Unable to update.</b>"
-msgstr ""
+msgstr "<b>Incapaz de actualizar.</b>"
 
 #: ../gtk/tr-prefs.c:449
 msgid "Update Blocklist"
@@ -1402,7 +1395,7 @@ msgstr "Lista de IP's bloqueados"
 
 #: ../gtk/tr-prefs.c:498
 msgid "Enable _blocklist:"
-msgstr ""
+msgstr "Activar _blocklist:"
 
 #: ../gtk/tr-prefs.c:512
 msgid "_Update"
@@ -1442,7 +1435,7 @@ msgstr "Usar o descobridor de pares _locais para encontrar mais pares"
 
 #: ../gtk/tr-prefs.c:546
 msgid "LPD is a tool for finding peers on your local network."
-msgstr "LPD é uma ferramenta para encontrar mais peers na sua rede local."
+msgstr "LPD é uma ferramenta para encontrar pares na sua rede local."
 
 #: ../gtk/tr-prefs.c:765
 msgid "Web Client"
@@ -1810,7 +1803,7 @@ msgstr "Não foi possível guardar o ficheiro temporário \"%1$s\": %2$s"
 #: ../libtransmission/bencode.c:1721
 #, c-format
 msgid "Saved \"%s\""
-msgstr "Gravada \"%s\""
+msgstr "Gravado \"%s\""
 
 #: ../libtransmission/bencode.c:1726 ../libtransmission/bencode.c:1733
 #: ../libtransmission/blocklist.c:363
@@ -2510,14 +2503,6 @@ msgstr "Em fila para verificação"
 #~ msgid "Availability:"
 #~ msgstr "Disponibilidade:"
 
-#, c-format
-#~ msgid ""
-#~ "This magnet link appears to be intended for something other than BitTorrent. "
-#~ " BitTorrent magnet links have a section containing \"%s\"."
-#~ msgstr ""
-#~ "Esta ligação magnética aparenta ter sido feita para algo mais que "
-#~ "BitTorrent. As ligações magnéticas têm uma secção com \"%s\"."
-
 #~ msgid ""
 #~ "No data found!  Reconnect any disconnected drives, use \"Set Location\", or "
 #~ "restart the torrent to re-download."
@@ -2534,19 +2519,16 @@ msgstr "Em fila para verificação"
 #~ msgstr "Limit _download speed (KiB/s):"
 
 #, c-format
+#~ msgid ""
+#~ "This magnet link appears to be intended for something other than BitTorrent. "
+#~ " BitTorrent magnet links have a section containing \"%s\"."
+#~ msgstr ""
+#~ "Esta ligação magnética aparenta ter sido feita para algo que não o "
+#~ "BitTorrent. As ligações magnéticas têm uma secção com \"%s\"."
+
+#, c-format
 #~ msgid "%1$s (%2$s%% of %3$s%% Available) + %4$s Unverified"
 #~ msgstr "%1$s (%2$s%% de %3$s%% Disponíveis) + %4$s Não verificado"
-
-#~ msgid ""
-#~ "Transmission is a file-sharing program.  When you run a torrent, its data "
-#~ "will be made available to others by means of upload.  You and you alone are "
-#~ "fully responsible for exercising proper judgement and abiding by your local "
-#~ "laws."
-#~ msgstr ""
-#~ "Transmission é um programa de partilha de ficheiros. Quando executa um "
-#~ "torrent, os ficheiros irão ser disponibilizados aos outros pelo meio de "
-#~ "upload.Você é totalmente responsável por exercer um juízo adequado e "
-#~ "respeitando as leis locais."
 
 #, c-format
 #~ msgid "Limit do_wnload speed (%s):"
@@ -2555,3 +2537,14 @@ msgstr "Em fila para verificação"
 #, c-format
 #~ msgid "Limit u_pload speed (%s):"
 #~ msgstr "Limitar a velocidade de en_vio (%s):"
+
+#~ msgid ""
+#~ "Transmission is a file-sharing program.  When you run a torrent, its data "
+#~ "will be made available to others by means of upload.  You and you alone are "
+#~ "fully responsible for exercising proper judgement and abiding by your local "
+#~ "laws."
+#~ msgstr ""
+#~ "Transmission é um programa de partilha de ficheiros. Quando executa um "
+#~ "torrent, os ficheiros são disponibilizados aos outros via upload. O "
+#~ "utilizador, e apenas ele, é totalmente responsável por exercer um juízo "
+#~ "adequado que respeite as leis locais."

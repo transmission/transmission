@@ -8,15 +8,15 @@ msgstr ""
 "Project-Id-Version: transmission\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2011-01-27 14:52-0600\n"
-"PO-Revision-Date: 2009-12-03 12:24+0000\n"
-"Last-Translator: Nguyễn Hào Khôi <nguyenhaokhoi@yahoo.com.vn>\n"
+"PO-Revision-Date: 2011-05-16 13:47+0000\n"
+"Last-Translator: Lê Trường An <truongan@linuxmail.org>\n"
 "Language-Team: Vietnamese <vi@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Launchpad-Export-Date: 2011-02-08 00:08+0000\n"
-"X-Generator: Launchpad (build 12335)\n"
+"X-Launchpad-Export-Date: 2011-05-16 23:57+0000\n"
+"X-Generator: Launchpad (build 13045)\n"
 
 #: ../gtk/actions.c:53
 msgid "Sort by _Activity"
@@ -28,15 +28,15 @@ msgstr "Xếp theo _Tên"
 
 #: ../gtk/actions.c:55
 msgid "Sort by _Progress"
-msgstr "Xếp theo _Tiến trình"
+msgstr "Xếp theo Tiến t_rình"
 
 #: ../gtk/actions.c:56
 msgid "Sort by Rati_o"
-msgstr "Sắp xếp theo tỷ lệ"
+msgstr "Xếp theo t_ỷ lệ"
 
 #: ../gtk/actions.c:57
 msgid "Sort by Stat_e"
-msgstr "Sắp xếp theo tình trạng"
+msgstr "Xếp theo tì_nh trạng"
 
 #: ../gtk/actions.c:58
 msgid "Sort by A_ge"
@@ -44,27 +44,27 @@ msgstr "Xếp theo Thời _gian"
 
 #: ../gtk/actions.c:59
 msgid "Sort by Time _Left"
-msgstr "Sắp xếp theo thời gian còn lại"
+msgstr "Xếp theo thời gian _còn lại"
 
 #: ../gtk/actions.c:60
 msgid "Sort by Si_ze"
-msgstr "Sắp xếp theo kích thước"
+msgstr "Xếp theo _kích thước"
 
 #: ../gtk/actions.c:77
 msgid "_Show Transmission"
-msgstr ""
+msgstr "_Hiện Transmission"
 
 #: ../gtk/actions.c:78
 msgid "Message _Log"
-msgstr "_Bản ghi thông điệp"
+msgstr "_Nhật ký"
 
 #: ../gtk/actions.c:93
 msgid "Enable Alternative Speed _Limits"
-msgstr ""
+msgstr "Kích hoạt giới hạn tốc độ"
 
 #: ../gtk/actions.c:94
 msgid "_Compact View"
-msgstr ""
+msgstr "Chế độ thu _gọn"
 
 #: ../gtk/actions.c:95
 msgid "Re_verse Sort Order"
@@ -84,7 +84,7 @@ msgstr "Thanh _công cụ"
 
 #: ../gtk/actions.c:103
 msgid "_File"
-msgstr "_Tệp"
+msgstr "_Tập tin"
 
 #: ../gtk/actions.c:104
 msgid "_Torrent"
@@ -108,15 +108,15 @@ msgstr "_Trợ giúp"
 
 #: ../gtk/actions.c:109
 msgid "Copy _Magnet Link to Clipboard"
-msgstr ""
+msgstr "Chép Liên kết _Magnet vào Clipboard"
 
 #: ../gtk/actions.c:110
 msgid "Open _URL..."
-msgstr ""
+msgstr "Mở _URL..."
 
 #: ../gtk/actions.c:110
 msgid "Open URL..."
-msgstr ""
+msgstr "Mở URL..."
 
 #: ../gtk/actions.c:111 ../gtk/actions.c:112
 msgid "Open a torrent"
@@ -136,7 +136,7 @@ msgstr "_Thống kê"
 
 #: ../gtk/actions.c:115
 msgid "_Donate"
-msgstr ""
+msgstr "Ủng _hộ"
 
 #: ../gtk/actions.c:116
 msgid "_Verify Local Data"
@@ -168,7 +168,7 @@ msgstr "Khởi động tất cả torrent"
 
 #: ../gtk/actions.c:120
 msgid "Set _Location..."
-msgstr ""
+msgstr "Đặt lại _vị trí trên máy..."
 
 #: ../gtk/actions.c:121
 msgid "Remove torrent"
@@ -176,11 +176,11 @@ msgstr "Gỡ bỏ torrent"
 
 #: ../gtk/actions.c:122
 msgid "_Delete Files and Remove"
-msgstr "_Gỡ bỏ và xóa các tệp"
+msgstr "_Gỡ bỏ và xóa các tập tin"
 
 #: ../gtk/actions.c:123
 msgid "_New..."
-msgstr "_Mới..."
+msgstr "Tạo torrent _mới..."
 
 #: ../gtk/actions.c:123
 msgid "Create a torrent"
@@ -238,7 +238,7 @@ msgstr "Nhập \"%s\""
 
 #: ../gtk/details.c:455 ../gtk/details.c:467
 msgid "Use global settings"
-msgstr ""
+msgstr "Dùng các thiết lập toàn cục"
 
 #: ../gtk/details.c:456
 msgid "Seed regardless of ratio"
@@ -316,7 +316,7 @@ msgstr "Đang chia sẻ"
 
 #: ../gtk/details.c:571 ../gtk/filter.c:718 ../gtk/torrent-cell-renderer.c:206
 msgid "Finished"
-msgstr ""
+msgstr "Đã xong"
 
 #: ../gtk/details.c:571 ../gtk/filter.c:717 ../gtk/torrent-cell-renderer.c:208
 msgid "Paused"
@@ -324,7 +324,7 @@ msgstr "Tạm dừng"
 
 #: ../gtk/details.c:604
 msgid "N/A"
-msgstr ""
+msgstr "N/A"
 
 #: ../gtk/details.c:616 ../gtk/file-list.c:621
 msgid "Mixed"
@@ -345,17 +345,17 @@ msgstr "Torrent công cộng"
 #: ../gtk/details.c:664
 #, c-format
 msgid "Created by %1$s"
-msgstr ""
+msgstr "Được tạo bởi %1$s"
 
 #: ../gtk/details.c:666
 #, c-format
 msgid "Created on %1$s"
-msgstr ""
+msgstr "Được tạo lúc %1$s"
 
 #: ../gtk/details.c:668
 #, c-format
 msgid "Created by %1$s on %2$s"
-msgstr ""
+msgstr "Được tạo bởi %1$s vào lúc %2$s"
 
 #: ../gtk/details.c:754
 msgid "Unknown"
@@ -364,7 +364,7 @@ msgstr "Không biết"
 #: ../gtk/details.c:825
 #, c-format
 msgid "%1$s (%2$s%%)"
-msgstr ""
+msgstr "%1$s (%2$s%%)"
 
 #: ../gtk/details.c:827
 #, c-format
@@ -388,7 +388,7 @@ msgstr ""
 
 #: ../gtk/details.c:898
 msgid "No errors"
-msgstr ""
+msgstr "Không có lỗi"
 
 #: ../gtk/details.c:911
 msgid "Never"
@@ -401,7 +401,7 @@ msgstr ""
 #: ../gtk/details.c:919
 #, c-format
 msgid "%1$s ago"
-msgstr ""
+msgstr "%1$s trước"
 
 #: ../gtk/details.c:938
 msgid "Activity"
@@ -429,15 +429,15 @@ msgstr "Tình trạng:"
 
 #: ../gtk/details.c:968
 msgid "Running time:"
-msgstr ""
+msgstr "Thời gian chạy:"
 
 #: ../gtk/details.c:973
 msgid "Remaining time:"
-msgstr ""
+msgstr "Thời gian còn lại:"
 
 #: ../gtk/details.c:978
 msgid "Last activity:"
-msgstr ""
+msgstr "Hoạt động cuối:"
 
 #: ../gtk/details.c:984
 msgid "Error:"
@@ -449,7 +449,7 @@ msgstr "Chi tiết"
 
 #: ../gtk/details.c:995
 msgid "Location:"
-msgstr ""
+msgstr "Vị trí trên máy:"
 
 #: ../gtk/details.c:1002
 msgid "Hash:"
@@ -570,12 +570,13 @@ msgstr ""
 #: ../gtk/details.c:1813
 #, c-format
 msgid "Got a list of %1$s%2$'d peers%3$s %4$s ago"
-msgstr ""
+msgstr "Đã nhận danh sách %1$s%2$'d peers%3$s %4$s trước"
 
 #: ../gtk/details.c:1817
 #, c-format
 msgid "Peer list request %1$stimed out%2$s %3$s ago; will retry"
 msgstr ""
+"Yêu cầu danh sách peer%1$shết thời gian chờ%2$s %3$s trước; sẽ thử lại"
 
 #: ../gtk/details.c:1820
 #, c-format
@@ -626,7 +627,7 @@ msgstr ""
 
 #: ../gtk/details.c:2137
 msgid "List contains invalid URLs"
-msgstr ""
+msgstr "Danh sách có chứa URL không hợp lệ"
 
 #: ../gtk/details.c:2142
 msgid "Please correct the errors and try again."
@@ -639,13 +640,15 @@ msgstr ""
 
 #: ../gtk/details.c:2203
 msgid "Tracker Announce URLs"
-msgstr ""
+msgstr "Announce URLs của tracker"
 
 #: ../gtk/details.c:2206 ../gtk/makemeta-ui.c:499
 msgid ""
 "To add a backup URL, add it on the line after the primary URL.\n"
 "To add another primary URL, add it after a blank line."
 msgstr ""
+"Để thêm một URL phụ, bổ sung nó ở dòng ngay sau dòng URL chính.\n"
+"Để thêm một URL chính, bổ sung nó sau một dòng trống."
 
 #: ../gtk/details.c:2302
 #, c-format
@@ -658,7 +661,7 @@ msgstr "Tracker"
 
 #: ../gtk/details.c:2323
 msgid "_Announce URL:"
-msgstr ""
+msgstr "_Announce URL:"
 
 #: ../gtk/details.c:2399 ../gtk/details.c:2531 ../gtk/filter.c:316
 msgid "Trackers"
@@ -666,11 +669,11 @@ msgstr "Các tracker"
 
 #: ../gtk/details.c:2423
 msgid "_Add"
-msgstr ""
+msgstr "T_hêm"
 
 #: ../gtk/details.c:2434
 msgid "_Remove"
-msgstr ""
+msgstr "_Gỡ bỏ"
 
 #: ../gtk/details.c:2450
 msgid "Show _backup trackers"
@@ -687,10 +690,11 @@ msgstr "Các peer"
 #: ../gtk/details.c:2536
 msgid "File listing not available for combined torrent properties"
 msgstr ""
+"Không cho phép hiển thị danh sách các tập tin khi bạn chọn nhiều torrent"
 
 #: ../gtk/details.c:2540 ../gtk/makemeta-ui.c:446
 msgid "Files"
-msgstr "Các tệp"
+msgstr "Các tập tin"
 
 #: ../gtk/details.c:2544 ../gtk/tr-prefs.c:1218 ../gtk/tr-window.c:645
 msgid "Options"
@@ -823,7 +827,7 @@ msgstr ""
 
 #: ../gtk/main.c:732
 msgid "Where to look for configuration files"
-msgstr "Vị trí tìm các tệp cấu hình"
+msgstr "Vị trí tìm các tập tin cấu hình"
 
 #: ../gtk/main.c:741 ../gtk/transmission-gtk.desktop.in.h:3
 msgid "Transmission"
@@ -831,7 +835,7 @@ msgstr "Transmission"
 
 #: ../gtk/main.c:751
 msgid "[torrent files or urls]"
-msgstr ""
+msgstr "[tập tin torrent hoặc url]"
 
 #: ../gtk/main.c:814
 msgid ""
@@ -841,7 +845,7 @@ msgstr ""
 
 #: ../gtk/main.c:876
 msgid "Transmission cannot be started."
-msgstr ""
+msgstr "Không thể khởi chạy Transmission"
 
 #: ../gtk/main.c:952
 msgid ""
@@ -850,6 +854,9 @@ msgid ""
 "fully responsible for exercising proper judgement and abiding by your local "
 "laws."
 msgstr ""
+"Transmission là một phần mềm chia sẻ tập tin. Khi bạn khởi chạy một torrent, "
+"dữ liệu của nó có thể được tải về bởi nhiều người khác. Bạn và chỉ mình bạn "
+"chịu hoàn toàn trách nhiệm tuân thủ luật pháp sở tại."
 
 #: ../gtk/main.c:954
 msgid "I _Accept"
@@ -882,9 +889,12 @@ msgstr ""
 msgid "translator-credits"
 msgstr ""
 "Launchpad Contributions:\n"
-"  Nguyễn Hào Khôi https://launchpad.net/~isaohk\n"
-"  Phan Trọng Khanh https://launchpad.net/~khanhpt\n"
-"  blackrises https://launchpad.net/~blackrises"
+"  Lê Trường An https://launchpad.net/~truongan\n"
+"  Nguyen Anh Minh https://launchpad.net/~minhna\n"
+"  Nguyễn Việt Hưng https://launchpad.net/~famihug\n"
+"  Ngô Chin https://launchpad.net/~ndtrung4419\n"
+"  Vu Do Quynh https://launchpad.net/~vu-do-quynh\n"
+"  lusiads https://launchpad.net/~lusiads"
 
 #: ../gtk/makemeta-ui.c:78
 #, c-format
@@ -899,7 +909,7 @@ msgstr ""
 #: ../gtk/makemeta-ui.c:82
 #, c-format
 msgid "Error: invalid announce URL \"%s\""
-msgstr ""
+msgstr "Lỗi: announce URL \"%s\" không hợp lệ"
 
 #: ../gtk/makemeta-ui.c:84
 #, c-format
@@ -944,7 +954,7 @@ msgstr ""
 
 #: ../gtk/makemeta-ui.c:466
 msgid "Source _File:"
-msgstr ""
+msgstr "_Tập tin Nguồn:"
 
 #: ../gtk/makemeta-ui.c:478
 msgid "<i>No source selected</i>"
@@ -989,7 +999,7 @@ msgstr "Gỡ lỗi"
 
 #: ../gtk/msgwin.c:442
 msgid "Message Log"
-msgstr "Bản ghi thông điệp"
+msgstr "Nhật ký"
 
 #: ../gtk/msgwin.c:475
 msgid "Level"
@@ -1005,7 +1015,7 @@ msgstr "Hoàn thành Torrent"
 
 #: ../gtk/notify.c:144
 msgid "Open File"
-msgstr "Mở Tệp"
+msgstr "Mở Tập tin"
 
 #: ../gtk/notify.c:149
 msgid "Open Folder"
@@ -1013,7 +1023,7 @@ msgstr "Mở thư mục"
 
 #: ../gtk/notify.c:163
 msgid "Torrent Added"
-msgstr ""
+msgstr "Đã thêm vào torrent."
 
 #: ../gtk/open-dialog.c:243
 msgid "Torrent files"
@@ -1030,19 +1040,19 @@ msgstr "Tùy chọn torrent"
 
 #: ../gtk/open-dialog.c:297 ../gtk/tr-prefs.c:280
 msgid "Mo_ve .torrent file to the trash"
-msgstr ""
+msgstr "Ch_uyển tập tin .torrent vào sọt rác"
 
 #: ../gtk/open-dialog.c:299 ../gtk/tr-prefs.c:272
 msgid "_Start when added"
-msgstr "_Bắt đầu khi được thêm"
+msgstr "_Bắt đầu ngay khi được thêm"
 
 #: ../gtk/open-dialog.c:314
 msgid "_Torrent file:"
-msgstr "_Tệp torrent:"
+msgstr "_Tập tin torrent:"
 
 #: ../gtk/open-dialog.c:318
 msgid "Select Source File"
-msgstr "Chọn tệp nguồn"
+msgstr "Chọn tập tin nguồn"
 
 #: ../gtk/open-dialog.c:329
 msgid "_Destination folder:"
@@ -1058,19 +1068,19 @@ msgstr ""
 
 #: ../gtk/open-dialog.c:444 ../gtk/tr-prefs.c:276
 msgid "Show _options dialog"
-msgstr ""
+msgstr "Hiện hộp thoại tuỳ chọ_n"
 
 #: ../gtk/open-dialog.c:499
 msgid "Open URL"
-msgstr ""
+msgstr "Mở URL"
 
 #: ../gtk/open-dialog.c:512
 msgid "Open torrent from URL"
-msgstr ""
+msgstr "Mở torrent từ URL"
 
 #: ../gtk/open-dialog.c:517
 msgid "_URL"
-msgstr ""
+msgstr "_URL"
 
 #: ../gtk/relocate.c:64
 #, c-format
@@ -1079,7 +1089,7 @@ msgstr ""
 
 #: ../gtk/relocate.c:86
 msgid "Couldn't move torrent"
-msgstr ""
+msgstr "Không di chuyển được torrent"
 
 #: ../gtk/relocate.c:127
 msgid "This may take a moment..."
@@ -1087,7 +1097,7 @@ msgstr ""
 
 #: ../gtk/relocate.c:158 ../gtk/relocate.c:178
 msgid "Set Torrent Location"
-msgstr ""
+msgstr "Đặt lại vị trí Torrent trên máy"
 
 #: ../gtk/relocate.c:174
 msgid "Location"
@@ -1095,11 +1105,11 @@ msgstr "Vị trí"
 
 #: ../gtk/relocate.c:181
 msgid "Torrent _location:"
-msgstr ""
+msgstr "_Vị trí torrent:"
 
 #: ../gtk/relocate.c:182
 msgid "_Move from the current folder"
-msgstr ""
+msgstr "_Di chuyển từ thư mục hiện tại"
 
 #: ../gtk/relocate.c:185
 msgid "Local data is _already there"
@@ -1114,6 +1124,9 @@ msgid ""
 "These statistics are for your information only. Resetting them doesn't "
 "affect the statistics logged by your BitTorrent trackers."
 msgstr ""
+"Những con số thống kê này chỉ mang tính thông báo. Nếu bạn có thiết lập lại "
+"thì cũng không ảnh hưởng tới bản thống kê được lưu bởi các tracker "
+"Bittorrent của bạn."
 
 #: ../gtk/stats.c:119 ../gtk/stats.c:149
 msgid "_Reset"
@@ -1142,7 +1155,7 @@ msgstr "Tổng"
 #: ../gtk/stats.c:176
 #, c-format
 msgid "Started %'d time"
-msgstr ""
+msgstr "Đã chạy %'d lần"
 
 #. %1$s is how much we've got,
 #. %2$s is how much we'll have when done,
@@ -1294,23 +1307,23 @@ msgstr ""
 
 #: ../gtk/tr-prefs.c:270
 msgid "Adding"
-msgstr ""
+msgstr "Thêm Torrent"
 
 #: ../gtk/tr-prefs.c:285
 msgid "Automatically _add torrents from:"
-msgstr "Tự độn_g thêm các torrent từ:"
+msgstr "Tự độn_g thêm các torrent từ thư mục:"
 
 #: ../gtk/tr-prefs.c:297
 msgid "Append \"._part\" to incomplete files' names"
-msgstr ""
+msgstr "Thêm \"._part\" vào tên các tập tin chưa tải xong"
 
 #: ../gtk/tr-prefs.c:302
 msgid "Save to _Location:"
-msgstr ""
+msgstr "Lưu vào _vị trí:"
 
 #: ../gtk/tr-prefs.c:304
 msgid "Keep _incomplete torrents in:"
-msgstr ""
+msgstr "Giữ các torrent _chưa hoàn thành ở thư mục:"
 
 #: ../gtk/tr-prefs.c:311
 msgid "Call scrip_t when torrent is completed:"
@@ -1358,7 +1371,7 @@ msgstr "Cập nhật danh sách cấm"
 
 #: ../gtk/tr-prefs.c:451
 msgid "Getting new blocklist..."
-msgstr "Thêm danh sách cấm mới"
+msgstr "Đang tải về danh sách cấm mới..."
 
 #: ../gtk/tr-prefs.c:470
 msgid "Allow encryption"
@@ -1378,7 +1391,7 @@ msgstr "Danh sách chặn"
 
 #: ../gtk/tr-prefs.c:498
 msgid "Enable _blocklist:"
-msgstr ""
+msgstr "Sử dụng danh sách _chặn:"
 
 #: ../gtk/tr-prefs.c:512
 msgid "_Update"
@@ -1564,7 +1577,7 @@ msgstr ""
 
 #: ../gtk/tr-prefs.c:1184
 msgid "Listening Port"
-msgstr ""
+msgstr "Cổng lắng nghe"
 
 #: ../gtk/tr-prefs.c:1186
 msgid "_Port used for incoming connections:"
@@ -1576,7 +1589,7 @@ msgstr ""
 
 #: ../gtk/tr-prefs.c:1201
 msgid "Pick a _random port every time Transmission is started"
-msgstr ""
+msgstr "Chọn một cổng ngẫu nhiên mỗi khi Transmission khởi động"
 
 #: ../gtk/tr-prefs.c:1205
 msgid "Use UPnP or NAT-PMP port _forwarding from my router"
@@ -1727,17 +1740,17 @@ msgstr ""
 #: ../gtk/util.c:323
 #, c-format
 msgid "The torrent file \"%s\" contains invalid data."
-msgstr "Tệp torrent \"%s\" chứa dữ liệu không hợp lệ."
+msgstr "Tập tin torrent \"%s\" chứa dữ liệu không hợp lệ."
 
 #: ../gtk/util.c:324
 #, c-format
 msgid "The torrent file \"%s\" is already in use."
-msgstr "Tệp torrent \"%s\" đã được sử dụng."
+msgstr "Tập tin torrent \"%s\" đã được sử dụng."
 
 #: ../gtk/util.c:325
 #, c-format
 msgid "The torrent file \"%s\" encountered an unknown error."
-msgstr "Tệp torrent \"%s\" gặp lỗi không xác định."
+msgstr "Tập tin torrent \"%s\" gặp lỗi không xác định."
 
 #: ../gtk/util.c:333
 msgid "Error opening torrent"
@@ -1755,7 +1768,7 @@ msgstr ""
 
 #: ../gtk/util.c:901
 msgid "Unrecognized URL"
-msgstr ""
+msgstr "URL không thể nhận dạng"
 
 #: ../gtk/util.c:903
 #, c-format
@@ -1768,6 +1781,8 @@ msgid ""
 "This magnet link appears to be intended for something other than BitTorrent. "
 "BitTorrent magnet links have a section containing \"%s\"."
 msgstr ""
+"Liên kết magnet này có vẻ như không được tạo ra cho Bittorrent. Liên kết "
+"magnet của Bittorrent phải có một phần chứa \"%s\"."
 
 #. did caller give us an uninitialized val?
 #: ../libtransmission/bencode.c:1107
@@ -1777,7 +1792,7 @@ msgstr "Siêu dữ liệu không hợp lệ"
 #: ../libtransmission/bencode.c:1705 ../libtransmission/bencode.c:1741
 #, c-format
 msgid "Couldn't save temporary file \"%1$s\": %2$s"
-msgstr ""
+msgstr "Không thể lưu tập tin tạm \"%1$s\": %2$s"
 
 #: ../libtransmission/bencode.c:1721
 #, c-format
@@ -1788,7 +1803,7 @@ msgstr ""
 #: ../libtransmission/blocklist.c:363
 #, c-format
 msgid "Couldn't save file \"%1$s\": %2$s"
-msgstr "Không thể lưu tệp \"%1$s\": %2$s"
+msgstr "Không thể lưu tập tin \"%1$s\": %2$s"
 
 #: ../libtransmission/blocklist.c:85 ../libtransmission/blocklist.c:318
 #: ../libtransmission/utils.c:494
@@ -1799,18 +1814,18 @@ msgstr "Không thể đọc \"%1$s\": %2$s"
 #: ../libtransmission/blocklist.c:114
 #, c-format
 msgid "Blocklist \"%s\" contains %zu entries"
-msgstr ""
+msgstr "Danh sách chặn \"%s\" chứa %zu mục"
 
 #. don't try to display the actual lines - it causes issues
 #: ../libtransmission/blocklist.c:357
 #, c-format
 msgid "blocklist skipped invalid address at line %d"
-msgstr ""
+msgstr "danh sách chặn bỏ qua địa chỉ không hợp lệ ở dòng thứ %d"
 
 #: ../libtransmission/blocklist.c:373
 #, c-format
 msgid "Blocklist \"%s\" updated with %d entries"
-msgstr ""
+msgstr "Danh sách chặn \"%s\" đã được cập nhật với %d mục"
 
 #: ../libtransmission/fdlimit.c:593
 #, c-format
@@ -1936,6 +1951,9 @@ msgid ""
 "No data found! Ensure your drives are connected or use \"Set Location\". To "
 "re-download, remove the torrent and re-add it."
 msgstr ""
+"Không tìm thấy dữ liệu! Hãy chắc chắn rằng ổ đĩa của bạn đã kết nối hoặc "
+"chọn \"Đặt lại vị trí trên máy\". Để tải lại từ đầu, hãy gỡ bỏ torrent và "
+"thêm torrent đó lại một lần nữa."
 
 #: ../libtransmission/torrent.c:1635
 msgid "Restarted manually -- disabling its seed ratio"
@@ -1986,6 +2004,7 @@ msgstr ""
 msgid ""
 "Port forwarding through \"%s\", service \"%s\". (local address: %s:%d)"
 msgstr ""
+"Chuyển tiếp cổng thông qua \"%s\", dịch vụ \"%s\". (địa chỉ cục bộ: %s:%d)"
 
 #: ../libtransmission/upnp.c:224
 msgid "Port forwarding successful!"
@@ -1993,11 +2012,11 @@ msgstr "Mở cổng thành công!"
 
 #: ../libtransmission/utils.c:508
 msgid "Not a regular file"
-msgstr "Không phải là một tập tin chuẩn"
+msgstr "Không phải là một tập tin thường"
 
 #: ../libtransmission/utils.c:526
 msgid "Memory allocation failed"
-msgstr ""
+msgstr "Lỗi cấp phát bộ nhớ"
 
 #. Node exists but isn't a folder
 #: ../libtransmission/utils.c:624

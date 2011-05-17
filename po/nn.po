@@ -15,8 +15,8 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2011-02-08 00:09+0000\n"
-"X-Generator: Launchpad (build 12335)\n"
+"X-Launchpad-Export-Date: 2011-05-16 23:56+0000\n"
+"X-Generator: Launchpad (build 13045)\n"
 
 #: ../gtk/actions.c:53
 msgid "Sort by _Activity"
@@ -881,10 +881,6 @@ msgstr ""
 #: ../gtk/main.c:1554
 msgid "translator-credits"
 msgstr ""
-"Launchpad Contributions:\n"
-"  Jon Stødle https://launchpad.net/~jonstodle\n"
-"  Kjetil Birkeland Moe https://launchpad.net/~kjetilbmoe\n"
-"  Vidar Lillebo https://launchpad.net/~weir"
 
 #: ../gtk/makemeta-ui.c:78
 #, c-format
@@ -2148,6 +2144,10 @@ msgstr "Satt i kø for verifisering"
 #~ msgid_plural "Delete these torrents' downloaded files?"
 #~ msgstr[0] "Slett den nedlasta fila frå torrenten?"
 #~ msgstr[1] "Slette dei nedlasta filene frå torrenten?"
+
+#, c-format
+#~ msgid "%1$s (%2$s verified)"
+#~ msgstr "%1$s (%2$s verifisert)"
 
 #~ msgid "_Move source file to Trash"
 #~ msgstr "_Flytt kjeldefila til bosset"

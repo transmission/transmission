@@ -15,8 +15,8 @@ msgstr ""
 "Content-Type: text/plain; charset=UTf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n > 1;\n"
-"X-Launchpad-Export-Date: 2011-02-08 00:08+0000\n"
-"X-Generator: Launchpad (build 12335)\n"
+"X-Launchpad-Export-Date: 2011-05-16 23:56+0000\n"
+"X-Generator: Launchpad (build 13045)\n"
 
 #: ../gtk/actions.c:53
 msgid "Sort by _Activity"
@@ -52,7 +52,7 @@ msgstr "Ordenar pot tama_nho"
 
 #: ../gtk/actions.c:77
 msgid "_Show Transmission"
-msgstr "_Exibir Trasmission"
+msgstr "Mo_strar Transmission"
 
 #: ../gtk/actions.c:78
 msgid "Message _Log"
@@ -324,7 +324,7 @@ msgstr "Pausado"
 
 #: ../gtk/details.c:604
 msgid "N/A"
-msgstr ""
+msgstr "N/D"
 
 #: ../gtk/details.c:616 ../gtk/file-list.c:621
 msgid "Mixed"
@@ -396,7 +396,7 @@ msgstr "Nunca"
 
 #: ../gtk/details.c:915
 msgid "Active now"
-msgstr "Ativo"
+msgstr "Ativar agora"
 
 #: ../gtk/details.c:919
 #, c-format
@@ -473,7 +473,7 @@ msgstr "Fontes Web"
 
 #: ../gtk/details.c:1066 ../gtk/details.c:1118
 msgid "Down"
-msgstr "Down"
+msgstr "Recebendo"
 
 #: ../gtk/details.c:1116
 msgid "Address"
@@ -481,7 +481,7 @@ msgstr "Endereço"
 
 #: ../gtk/details.c:1120
 msgid "Up"
-msgstr "Up"
+msgstr "Enviado"
 
 #: ../gtk/details.c:1121
 msgid "Client"
@@ -605,7 +605,7 @@ msgstr "Perguntando por mais peers agora... <small>%s</small>"
 #: ../gtk/details.c:1852
 #, c-format
 msgid "Tracker had %s%'d seeders and %'d leechers%s %s ago"
-msgstr "O tracker possui %s%'d seeders e %'d leechers%s %s atrás"
+msgstr "O rastreador possuía %s%'d semeadores %'d leechers há%s %s"
 
 #: ../gtk/details.c:1856
 #, c-format
@@ -641,7 +641,7 @@ msgstr ""
 
 #: ../gtk/details.c:2203
 msgid "Tracker Announce URLs"
-msgstr "Anúncio de URLs dos Trackers"
+msgstr "Anúncio de URLs dos rastreadores"
 
 #: ../gtk/details.c:2206 ../gtk/makemeta-ui.c:499
 msgid ""
@@ -678,7 +678,7 @@ msgstr "_Remover"
 
 #: ../gtk/details.c:2450
 msgid "Show _backup trackers"
-msgstr "Mostrar trackers de _backup"
+msgstr "Mostrar cópia de segurança de rastreadores"
 
 #: ../gtk/details.c:2523 ../gtk/msgwin.c:415
 msgid "Information"
@@ -847,7 +847,7 @@ msgstr ""
 
 #: ../gtk/main.c:876
 msgid "Transmission cannot be started."
-msgstr "O Trasmission não pôde ser iniciado."
+msgstr "O Transmission não pôde ser executado."
 
 #: ../gtk/main.c:952
 msgid ""
@@ -891,35 +891,16 @@ msgstr ""
 "Djavan Fagundes <dnoway@gmail.com>\n"
 "\n"
 "Launchpad Contributions:\n"
+"  Adriano Steffler https://launchpad.net/~adrianstiffler\n"
 "  Alexandre Erwin Ittner https://launchpad.net/~aittner\n"
-"  Allan Lopes Peretti https://launchpad.net/~mendigodase\n"
-"  André Gondim https://launchpad.net/~andregondim\n"
-"  Antonio Fernandes C. Neto https://launchpad.net/~fernandes\n"
 "  Aníbal Deboni Neto https://launchpad.net/~adneto\n"
-"  Arthur Rodrigues https://launchpad.net/~araruna\n"
-"  Augusta Carla Klug https://launchpad.net/~augusta-klug\n"
-"  Carl Roberson https://launchpad.net/~carlrobers\n"
-"  Charles Junior Rech https://launchpad.net/~charlespito\n"
-"  Daniel Ribeiro https://launchpad.net/~danielrmt\n"
-"  Derek Willian Stavis https://launchpad.net/~derekstavis\n"
-"  Diogo Lima https://launchpad.net/~diogooo\n"
+"  Celio Alves https://launchpad.net/~dreamcelio\n"
 "  Djavan Fagundes https://launchpad.net/~dnoway\n"
-"  Enrico Nicoletto https://launchpad.net/~liverig\n"
-"  Eugênio F https://launchpad.net/~eugf\n"
 "  Fabio M. P. Bugnon https://launchpad.net/~fbugnon\n"
-"  Garrido https://launchpad.net/~garridovaz\n"
-"  Gerson \"fserve\" Barreiros https://launchpad.net/~fserve\n"
-"  Guilherme Gonçalves https://launchpad.net/~guilherme08\n"
 "  Gustavo Henrique Klug https://launchpad.net/~kuca\n"
-"  Heder Dorneles https://launchpad.net/~heder-to\n"
-"  Henrique P. Machado https://launchpad.net/~zehrique\n"
+"  Heder Dorneles Soares https://launchpad.net/~heder-to\n"
 "  Hutley https://launchpad.net/~helderc\n"
-"  Irio Musskopf https://launchpad.net/~iriomk\n"
-"  Miguel Lima https://launchpad.net/~miguelcpjava\n"
-"  Paulo de Lima Cavalcanti https://launchpad.net/~paulocarpina\n"
 "  Rafael nossal https://launchpad.net/~rafaelnossal\n"
-"  Thiago Negri https://launchpad.net/~evohunz\n"
-"  Ugo https://launchpad.net/~ugosan\n"
 "  Waldir Leoncio https://launchpad.net/~wleoncio"
 
 #: ../gtk/makemeta-ui.c:78
@@ -1328,8 +1309,8 @@ msgid ""
 "Down: %3$s %4$s"
 msgstr ""
 "Transmission\n"
-"Up: %1$s %2$s\n"
-"Down: %3$s %4$s"
+"Enviado: %1$s %2$s\n"
+"Baixado: %3$s %4$s"
 
 #: ../gtk/tr-prefs.c:270
 msgid "Adding"
@@ -1345,7 +1326,7 @@ msgstr "Acrescentar \".part\" aos nomes de arquivos incompletos."
 
 #: ../gtk/tr-prefs.c:302
 msgid "Save to _Location:"
-msgstr "Salvar na _localização"
+msgstr "Salvar na _localização:"
 
 #: ../gtk/tr-prefs.c:304
 msgid "Keep _incomplete torrents in:"
@@ -1365,7 +1346,7 @@ msgstr "Pare de semear se inativo por _N minutes:"
 
 #: ../gtk/tr-prefs.c:352 ../gtk/tr-prefs.c:1267
 msgid "Desktop"
-msgstr "Área de Trabalho"
+msgstr "Área de trabalho"
 
 #: ../gtk/tr-prefs.c:354
 msgid "Inhibit _hibernation when torrents are active"
@@ -1465,7 +1446,7 @@ msgstr "Cliente web"
 #. "enabled" checkbutton
 #: ../gtk/tr-prefs.c:768
 msgid "_Enable web client"
-msgstr "Ativar cli_ente web"
+msgstr "Habilitar cli_ente web"
 
 #: ../gtk/tr-prefs.c:774
 msgid "_Open web client"
@@ -2416,6 +2397,13 @@ msgstr "Na fila para verificação"
 #~ msgid "Web Interface"
 #~ msgstr "Interface web"
 
+#, c-format
+#~ msgid "%1$s (%2$s verified)"
+#~ msgstr "%1$s (%2$s verificado)"
+
+#~ msgid "File \"%s\" is already open"
+#~ msgstr "O arquivo \"%s\" já está aberto"
+
 #~ msgid "_Move source file to Trash"
 #~ msgstr "_Mover arquivo fonte para a lixeira"
 
@@ -2444,6 +2432,15 @@ msgstr "Na fila para verificação"
 
 #~ msgid "Limit u_pload speed (KB/s):"
 #~ msgstr "Limitar velocidade de u_pload (KB/s):"
+
+#~ msgid "_Ignore unencrypted peers"
+#~ msgstr "_Ignorar peers não-criptografados"
+
+#~ msgid "Completion"
+#~ msgstr "Concluído"
+
+#~ msgid "%1$.1f%% (%2$.1f%% selected)"
+#~ msgstr "%1$.1f%% (%2$.1f%% selecionado)"
 
 #, c-format
 #~ msgid "Enable _blocklist (contains %'d rule)"
@@ -2512,6 +2509,18 @@ msgstr "Na fila para verificação"
 #~ msgid "Show desktop _notifications"
 #~ msgstr "Mostrar _notificações no desktop"
 
+#~ msgid "Beginning to use scheduled bandwidth limits"
+#~ msgstr "Iniciando uso dos limites agendados de largura de banda."
+
+#~ msgid "Ending use of scheduled bandwidth limits"
+#~ msgstr "Terminando uso dos limites agendados de largura de banda."
+
+#~ msgid "Limit d_ownload speed (KB/s):"
+#~ msgstr "Limitar velocidade de d_ownload (KB/s):"
+
+#~ msgid "_Limit bandwidth between"
+#~ msgstr "_Limite de banda entre"
+
 #~ msgid "Sort by _State"
 #~ msgstr "Ordenar por e_stado"
 
@@ -2530,6 +2539,21 @@ msgstr "Na fila para verificação"
 
 #~ msgid "_Open web interface"
 #~ msgstr "_Abrir interface web"
+
+#~ msgid "Unable to get blocklist: %s"
+#~ msgstr "Não foi possível obter lista de bloqueados: %s"
+
+#~ msgid "Unable to get blocklist."
+#~ msgstr "Não foi possível obter lista de bloqueado."
+
+#~ msgid "Uncompressing blocklist..."
+#~ msgstr "Descompactando lista de bloqueados..."
+
+#~ msgid "Parsing blocklist..."
+#~ msgstr "Analisando lista de bloqueados..."
+
+#~ msgid "Blocklist updated with %'d entries"
+#~ msgstr "Lista de bloqueados atualizada com %'d entradas"
 
 #~ msgid "_Bandwidth priority:"
 #~ msgstr "Prioridade de _banda:"
@@ -2674,22 +2698,6 @@ msgstr "Na fila para verificação"
 #~ msgstr "_Limites temporários de velocidade"
 
 #, c-format
-#~ msgid ""
-#~ "Click to enable Temporary Speed Limits\n"
-#~ "(%1$s down, %2$s up)"
-#~ msgstr ""
-#~ "Clique para habilitar os limites temporários de velocidade\n"
-#~ "(download %1$s, upload %2$s)"
-
-#, c-format
-#~ msgid ""
-#~ "Click to disable Temporary Speed Limits\n"
-#~ "(%1$s down, %2$s up)"
-#~ msgstr ""
-#~ "Clique para desabilitar os limites temporários de velocidade\n"
-#~ "(download %1$s, upload %2$s)"
-
-#, c-format
 #~ msgid "%1$s (%2$.1f%%); %3$s Unverified"
 #~ msgstr "%1$s (%2$.1f%%); %3$s não verificado"
 
@@ -2709,6 +2717,22 @@ msgstr "Na fila para verificação"
 #, c-format
 #~ msgid "Couldn't create \"%1$s\": \"%2$s\" is not a folder"
 #~ msgstr "Não foi possível criar \"%1$s\": \"%2$s\" não é uma pasta"
+
+#, c-format
+#~ msgid ""
+#~ "Click to disable Temporary Speed Limits\n"
+#~ "(%1$s down, %2$s up)"
+#~ msgstr ""
+#~ "Clique para desabilitar os limites temporários de velocidade\n"
+#~ "(baixado %1$s, enviado %2$s)"
+
+#, c-format
+#~ msgid ""
+#~ "Click to enable Temporary Speed Limits\n"
+#~ "(%1$s down, %2$s up)"
+#~ msgstr ""
+#~ "Clique para habilitar os limites temporários de velocidade\n"
+#~ "(baixado %1$s, enviado %2$s)"
 
 #~ msgid "Sort by T_racker"
 #~ msgstr "Ordenar por _rastreador"
@@ -2806,13 +2830,6 @@ msgstr "Na fila para verificação"
 #~ msgid_plural "%1$'d Pieces @ %2$s"
 #~ msgstr[0] "%1$'d pedaço @ %2$s"
 #~ msgstr[1] "%1$'d pedaços @ %2$s"
-
-#~ msgid ""
-#~ "These statistics are for your information only.  Resetting them doesn't "
-#~ "affect the statistics logged by your BitTorrent trackers."
-#~ msgstr ""
-#~ "Estas estatísticas servem apenas para informação. Reinicia-las não afeta os "
-#~ "dados registrados pelo seu tracker BitTorrent."
 
 #, c-format
 #~ msgid "Downloading metadata from %1$'d peer (%2$d%% done)"
@@ -2915,6 +2932,13 @@ msgstr "Na fila para verificação"
 #, c-format
 #~ msgid "%'.2f MiB/s"
 #~ msgstr "%'.2f MiB/s"
+
+#~ msgid ""
+#~ "These statistics are for your information only.  Resetting them doesn't "
+#~ "affect the statistics logged by your BitTorrent trackers."
+#~ msgstr ""
+#~ "Estas estatísticas servem apenas para informação. Reiniciá-las não afeta os "
+#~ "dados registrados pelo seu rastreador de BitTorrent."
 
 #~ msgid "Limit _download speed (KiB/s):"
 #~ msgstr "Limitar velocidade _de baixar (KiB/s):"

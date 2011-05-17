@@ -8,15 +8,15 @@ msgstr ""
 "Project-Id-Version: transmission\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2011-01-27 14:52-0600\n"
-"PO-Revision-Date: 2011-01-31 19:14+0000\n"
-"Last-Translator: ప్రవీణ్ <Unknown>\n"
+"PO-Revision-Date: 2011-03-03 00:14+0000\n"
+"Last-Translator: Praveen Illa <mail2ipn@gmail.com>\n"
 "Language-Team: Telugu <te@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2011-02-08 00:08+0000\n"
-"X-Generator: Launchpad (build 12335)\n"
+"X-Launchpad-Export-Date: 2011-05-16 23:56+0000\n"
+"X-Generator: Launchpad (build 13045)\n"
 
 #: ../gtk/actions.c:53
 msgid "Sort by _Activity"
@@ -24,7 +24,7 @@ msgstr "క్రియాశీలత బట్టి క్రమబద్ద�
 
 #: ../gtk/actions.c:54
 msgid "Sort by _Name"
-msgstr ""
+msgstr "పేరును బట్టి క్రమబద్దీకరించు(_N)"
 
 #: ../gtk/actions.c:55
 msgid "Sort by _Progress"
@@ -60,11 +60,11 @@ msgstr "సందేశాల నమోదు(_L)"
 
 #: ../gtk/actions.c:93
 msgid "Enable Alternative Speed _Limits"
-msgstr ""
+msgstr "ప్రత్యామ్నాయ వేగ పరిమితులను చేతనపరుచు(_L)"
 
 #: ../gtk/actions.c:94
 msgid "_Compact View"
-msgstr ""
+msgstr "కాంపాక్ట్ వీక్షణ(_C)"
 
 #: ../gtk/actions.c:95
 msgid "Re_verse Sort Order"
@@ -92,7 +92,7 @@ msgstr "టోరెంట్(_T)"
 
 #: ../gtk/actions.c:105
 msgid "_View"
-msgstr "దర్శించు(_V)"
+msgstr "వీక్షణ(_V)"
 
 #: ../gtk/actions.c:106
 msgid "_Sort Torrents By"
@@ -308,7 +308,7 @@ msgstr "స్థానిక సమాచారం తనిఖీ చేయబ
 
 #: ../gtk/details.c:569 ../gtk/filter.c:715 ../gtk/tr-prefs.c:295
 msgid "Downloading"
-msgstr ""
+msgstr "డౌన్లోడు చేయబడుతున్నది"
 
 #: ../gtk/details.c:570 ../gtk/filter.c:716 ../gtk/tr-prefs.c:319
 msgid "Seeding"
@@ -328,7 +328,7 @@ msgstr "N/A"
 
 #: ../gtk/details.c:616 ../gtk/file-list.c:621
 msgid "Mixed"
-msgstr ""
+msgstr "మిశ్రమ"
 
 #: ../gtk/details.c:617
 msgid "No Torrents Selected"
@@ -461,7 +461,7 @@ msgstr "అంతరంగికత:"
 
 #: ../gtk/details.c:1015
 msgid "Origin:"
-msgstr ""
+msgstr "పుట్టుక:"
 
 #: ../gtk/details.c:1032
 msgid "Comment:"
@@ -473,7 +473,7 @@ msgstr "వెబ్ సీడ్స్"
 
 #: ../gtk/details.c:1066 ../gtk/details.c:1118
 msgid "Down"
-msgstr ""
+msgstr "కిందికి"
 
 #: ../gtk/details.c:1116
 msgid "Address"
@@ -481,11 +481,11 @@ msgstr "చిరునామా"
 
 #: ../gtk/details.c:1120
 msgid "Up"
-msgstr ""
+msgstr "పైకి"
 
 #: ../gtk/details.c:1121
 msgid "Client"
-msgstr ""
+msgstr "క్లైంటు"
 
 #: ../gtk/details.c:1122
 msgid "%"
@@ -517,7 +517,7 @@ msgstr "వారు రద్దుచేశారు"
 
 #: ../gtk/details.c:1135
 msgid "Flags"
-msgstr ""
+msgstr "ఫ్లాగ్‌లు"
 
 #: ../gtk/details.c:1475
 msgid "Optimistic unchoke"
@@ -744,11 +744,11 @@ msgstr ""
 #. add "enabled" column
 #: ../gtk/file-list.c:754 ../gtk/file-list.c:995
 msgid "Download"
-msgstr ""
+msgstr "డౌన్లోడు"
 
 #: ../gtk/file-list.c:761
 msgid "Do Not Download"
-msgstr ""
+msgstr "డౌన్లోడు చేయవద్దు"
 
 #: ../gtk/file-list.c:952 ../gtk/msgwin.c:291
 msgid "Name"
@@ -822,7 +822,7 @@ msgstr "వెర్షన్ సంఖ్యను చూపించు మర
 
 #: ../gtk/main.c:729
 msgid "Start minimized in notification area"
-msgstr ""
+msgstr "కనిష్టీకరించబడిన ప్రకటిత ప్రాంతంలో ప్రారంభించు"
 
 #: ../gtk/main.c:732
 msgid "Where to look for configuration files"
@@ -880,7 +880,7 @@ msgstr "ఒక వేగవంతమైన & సులభమైన బిట్ 
 
 #: ../gtk/main.c:1548
 msgid "Copyright (c) The Transmission Project"
-msgstr ""
+msgstr "నకలుహక్కులు (c) The Transmission Project"
 
 #. Translators: translate "translator-credits" as your name
 #. to have it appear in the credits in the "About"
@@ -889,8 +889,7 @@ msgstr ""
 msgid "translator-credits"
 msgstr ""
 "Launchpad Contributions:\n"
-"  ప్రవీణ్ https://launchpad.net/~telugulinux\n"
-"  వీవెన్ (Veeven) https://launchpad.net/~veeven"
+"  Praveen Illa https://launchpad.net/~telugulinux"
 
 #: ../gtk/makemeta-ui.c:78
 #, c-format
@@ -1287,7 +1286,7 @@ msgstr "రంగస్థల సుప్తావస్థను అనుమ�
 #: ../gtk/tr-icon.c:83 ../gtk/tr-icon.c:99
 #, c-format
 msgid "(Limit: %s)"
-msgstr ""
+msgstr "(హద్దు: %s)"
 
 #. %1$s: current upload speed
 #. * %2$s: current upload limit, if any
@@ -1523,16 +1522,16 @@ msgstr ""
 #: ../gtk/tr-prefs.c:1017
 #, c-format
 msgid "_Upload (%s):"
-msgstr ""
+msgstr "అప్లోడు (%s) (_U):"
 
 #: ../gtk/tr-prefs.c:1024
 #, c-format
 msgid "_Download (%s):"
-msgstr ""
+msgstr "డౌన్లోడు (%s) (_D):"
 
 #: ../gtk/tr-prefs.c:1035
 msgid "Alternative Speed Limits"
-msgstr ""
+msgstr "ప్రత్యామ్నాయ వేగ పరిమితులు"
 
 #: ../gtk/tr-prefs.c:1042
 msgid "Override normal speed limits manually or at scheduled times"
@@ -1541,12 +1540,12 @@ msgstr ""
 #: ../gtk/tr-prefs.c:1049
 #, c-format
 msgid "U_pload (%s):"
-msgstr ""
+msgstr "అప్లోడు (%s) (_p):"
 
 #: ../gtk/tr-prefs.c:1053
 #, c-format
 msgid "Do_wnload (%s):"
-msgstr ""
+msgstr "డౌన్లోడు (%s) (_w):"
 
 #: ../gtk/tr-prefs.c:1057
 msgid "_Scheduled times:"
@@ -1612,7 +1611,7 @@ msgstr "టోరెంట్ల మొత్తానికి అత్యధ�
 
 #: ../gtk/tr-prefs.c:1220
 msgid "Edit GNOME Proxy Settings"
-msgstr ""
+msgstr "GNOME ప్రోక్సీ అమరికలను సవరించు"
 
 #: ../gtk/tr-prefs.c:1241
 msgid "Transmission Preferences"
@@ -1671,7 +1670,7 @@ msgstr "%s లో విన్నపాలు ట్రాకర్ అనుమ
 
 #: ../gtk/tr-window.c:404
 msgid "Unlimited"
-msgstr ""
+msgstr "అపరిమితం"
 
 #: ../gtk/tr-window.c:471
 msgid "Seed Forever"
@@ -1730,7 +1729,7 @@ msgstr "మెబై/సె"
 
 #: ../gtk/util.c:63
 msgid "GiB/s"
-msgstr ""
+msgstr "గిబై/సె"
 
 #: ../gtk/util.c:64
 msgid "TiB/s"
@@ -2131,3 +2130,12 @@ msgstr "తనిఖీచేయుటకు వరుసలో చేర్చ�
 
 #~ msgid "Add torrent from URL"
 #~ msgstr "URL నుంచి టోరెంట్ని కలుపు"
+
+#~ msgid "Sort by T_racker"
+#~ msgstr "ట్రాకరును బట్టి పేర్చు (_T)"
+
+#~ msgid "_Add File..."
+#~ msgstr "ఫైల్ ను చేర్చు(_A)"
+
+#~ msgid "Set _Location"
+#~ msgstr "స్థలాన్ని సెట్ చెయ్యి(_L)"

@@ -10,8 +10,8 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Launchpad-Export-Date: 2011-02-08 00:08+0000\n"
-"X-Generator: Launchpad (build 12335)\n"
+"X-Launchpad-Export-Date: 2011-05-16 23:57+0000\n"
+"X-Generator: Launchpad (build 13045)\n"
 
 #: ../gtk/actions.c:53
 msgid "Sort by _Activity"
@@ -163,7 +163,7 @@ msgstr "เริ่มทอร์เรนต์ทั้งหมด"
 
 #: ../gtk/actions.c:120
 msgid "Set _Location..."
-msgstr ""
+msgstr "ตั้งค่าสถานที่เ_ก็บ..."
 
 #: ../gtk/actions.c:121
 msgid "Remove torrent"
@@ -262,12 +262,12 @@ msgstr "ขอบข่ายสากลที่มีชื่อเสีย
 #: ../gtk/details.c:492
 #, c-format
 msgid "Limit _download speed (%s):"
-msgstr ""
+msgstr "จำกัดความเร็ว_ดาวน์โหลด (%s):"
 
 #: ../gtk/details.c:505
 #, c-format
 msgid "Limit _upload speed (%s):"
-msgstr ""
+msgstr "จำกัดความเร็ว_อัปโหลด (%s):"
 
 #: ../gtk/details.c:518 ../gtk/open-dialog.c:355
 msgid "Torrent _priority:"
@@ -383,11 +383,11 @@ msgstr ""
 
 #: ../gtk/details.c:898
 msgid "No errors"
-msgstr ""
+msgstr "ไม่พบข้อพิดพลาด"
 
 #: ../gtk/details.c:911
 msgid "Never"
-msgstr ""
+msgstr "ไม่ต้อง"
 
 #: ../gtk/details.c:915
 msgid "Active now"
@@ -877,14 +877,7 @@ msgstr ""
 msgid "translator-credits"
 msgstr ""
 "Launchpad Contributions:\n"
-"  Isriya Paireepairit https://launchpad.net/~markpeak\n"
-"  Krit Marukawisutthigul https://launchpad.net/~kritmaru\n"
-"  Pummarin Chomkoa https://launchpad.net/~kittenlinux\n"
-"  SiraNokyoongtong https://launchpad.net/~gumara\n"
-"  Supasate Choochaisri https://launchpad.net/~kaizerwing\n"
-"  Teedev https://launchpad.net/~teedev\n"
-"  Thanakrit Chomphuming https://launchpad.net/~jernghan\n"
-"  Tharawut Paripaiboon https://launchpad.net/~xcession"
+"  Thanakrit Chomphuming https://launchpad.net/~jernghan"
 
 #: ../gtk/makemeta-ui.c:78
 #, c-format

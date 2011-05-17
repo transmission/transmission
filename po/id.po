@@ -15,8 +15,8 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Launchpad-Export-Date: 2011-02-08 00:09+0000\n"
-"X-Generator: Launchpad (build 12335)\n"
+"X-Launchpad-Export-Date: 2011-05-16 23:57+0000\n"
+"X-Generator: Launchpad (build 13045)\n"
 
 #: ../gtk/actions.c:53
 msgid "Sort by _Activity"
@@ -881,14 +881,6 @@ msgstr ""
 #: ../gtk/main.c:1554
 msgid "translator-credits"
 msgstr ""
-"Launchpad Contributions:\n"
-"  D. Adhiyaksa https://launchpad.net/~zeonix1984\n"
-"  Eko Yudhi https://launchpad.net/~ekoyudhiprastowo\n"
-"  Fajran Iman Rusadi https://launchpad.net/~fajran\n"
-"  Rahman Yusri Aftian https://launchpad.net/~aftian\n"
-"  Rio Suryotejo https://launchpad.net/~rio-suryotejo\n"
-"  Wayan Sudiarnata https://launchpad.net/~circleshine\n"
-"  rotyyu https://launchpad.net/~rotua-hd"
 
 #: ../gtk/makemeta-ui.c:78
 #, c-format
@@ -2276,3 +2268,10 @@ msgstr ""
 
 #~ msgid "<b>Seeders:</b>"
 #~ msgstr "<b>Seeders:</b>"
+
+#, c-format
+#~ msgid "%1$s (%2$s verified)"
+#~ msgstr "%1$s (%2$s terverifikasi)"
+
+#~ msgid "File \"%s\" is already open"
+#~ msgstr "File \"%s\" sudah dibuka"

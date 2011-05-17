@@ -16,8 +16,8 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2011-02-08 00:08+0000\n"
-"X-Generator: Launchpad (build 12335)\n"
+"X-Launchpad-Export-Date: 2011-05-16 23:56+0000\n"
+"X-Generator: Launchpad (build 13045)\n"
 
 #: ../gtk/actions.c:53
 msgid "Sort by _Activity"
@@ -169,7 +169,7 @@ msgstr "Start alle torrentene"
 
 #: ../gtk/actions.c:120
 msgid "Set _Location..."
-msgstr ""
+msgstr "Velg _plassering..."
 
 #: ../gtk/actions.c:121
 msgid "Remove torrent"
@@ -243,11 +243,11 @@ msgstr ""
 
 #: ../gtk/details.c:456
 msgid "Seed regardless of ratio"
-msgstr ""
+msgstr "Del uansett delingsforhold"
 
 #: ../gtk/details.c:457
 msgid "Stop seeding at ratio:"
-msgstr ""
+msgstr "Stopp deling på delingsforhold:"
 
 #: ../gtk/details.c:468
 msgid "Seed regardless of activity"
@@ -281,11 +281,11 @@ msgstr "Torrent_prioritet:"
 
 #: ../gtk/details.c:522
 msgid "Seeding Limits"
-msgstr ""
+msgstr "Delingsbegrensninger"
 
 #: ../gtk/details.c:532
 msgid "_Ratio:"
-msgstr ""
+msgstr "_Delingsforhold:"
 
 #: ../gtk/details.c:541
 msgid "_Idle:"
@@ -325,7 +325,7 @@ msgstr "Stoppet"
 
 #: ../gtk/details.c:604
 msgid "N/A"
-msgstr ""
+msgstr "Ikke tilgjengelig"
 
 #: ../gtk/details.c:616 ../gtk/file-list.c:621
 msgid "Mixed"
@@ -385,15 +385,15 @@ msgstr "%1$s (+%2$s ødelagt)"
 #: ../gtk/details.c:870
 #, c-format
 msgid "%s (Ratio: %s)"
-msgstr ""
+msgstr "%s (Delingsforhold: %s)"
 
 #: ../gtk/details.c:898
 msgid "No errors"
-msgstr ""
+msgstr "Ingen feil"
 
 #: ../gtk/details.c:911
 msgid "Never"
-msgstr ""
+msgstr "Aldri"
 
 #: ../gtk/details.c:915
 msgid "Active now"
@@ -891,11 +891,8 @@ msgstr ""
 "oversettere\n"
 "\n"
 "Launchpad Contributions:\n"
-"  Anders Oftedal https://launchpad.net/~anders-oftedal-gmail\n"
-"  Geir Hauge https://launchpad.net/~geir-hauge\n"
-"  Mikal Krogstad https://launchpad.net/~mikal-krogstad\n"
-"  Tommy Mikkelsen https://launchpad.net/~tamikkelsen\n"
-"  Vegar https://launchpad.net/~storvann"
+"  Bjørn Harald Vikhagen https://launchpad.net/~vikhagen\n"
+"  Tommy Mikkelsen https://launchpad.net/~tamikkelsen"
 
 #: ../gtk/makemeta-ui.c:78
 #, c-format
@@ -1153,7 +1150,7 @@ msgstr "Totalt"
 #: ../gtk/stats.c:176
 #, c-format
 msgid "Started %'d time"
-msgstr ""
+msgstr "Startet opp %'d gang"
 
 #. %1$s is how much we've got,
 #. %2$s is how much we'll have when done,
@@ -1364,7 +1361,7 @@ msgstr "<b>Oppdateringen var vellykket!</b>"
 
 #: ../gtk/tr-prefs.c:434
 msgid "<b>Unable to update.</b>"
-msgstr ""
+msgstr "<b>Kan ikke oppdatere.</b>"
 
 #: ../gtk/tr-prefs.c:449
 msgid "Update Blocklist"
@@ -1392,7 +1389,7 @@ msgstr "Blokkeringsliste"
 
 #: ../gtk/tr-prefs.c:498
 msgid "Enable _blocklist:"
-msgstr ""
+msgstr "Aktiver _svarteliste:"
 
 #: ../gtk/tr-prefs.c:512
 msgid "_Update"
@@ -1706,31 +1703,31 @@ msgstr "Ned: %1$s, Opp: %2$s"
 
 #: ../gtk/util.c:49 ../gtk/util.c:55
 msgid "KiB"
-msgstr ""
+msgstr "KiB"
 
 #: ../gtk/util.c:50 ../gtk/util.c:56
 msgid "MiB"
-msgstr ""
+msgstr "MiB"
 
 #: ../gtk/util.c:51 ../gtk/util.c:57
 msgid "GiB"
-msgstr ""
+msgstr "GiB"
 
 #: ../gtk/util.c:52 ../gtk/util.c:58
 msgid "TiB"
-msgstr ""
+msgstr "TiB"
 
 #: ../gtk/util.c:61
 msgid "KiB/s"
-msgstr ""
+msgstr "KiB/s"
 
 #: ../gtk/util.c:62
 msgid "MiB/s"
-msgstr ""
+msgstr "MiB/s"
 
 #: ../gtk/util.c:63
 msgid "GiB/s"
-msgstr ""
+msgstr "GiB/s"
 
 #: ../gtk/util.c:64
 msgid "TiB/s"
@@ -1762,7 +1759,7 @@ msgstr "Feil under åpning av torrent"
 #: ../gtk/util.c:878
 #, c-format
 msgid "Error opening \"%s\""
-msgstr ""
+msgstr "Feil ved åpning av \"%s\""
 
 #: ../gtk/util.c:881
 #, c-format
@@ -2338,6 +2335,13 @@ msgstr "Satt i kø for verifisering"
 #~ msgid "Use peer e_xchange"
 #~ msgstr "Bruk _nedlasterutveksling"
 
+#, c-format
+#~ msgid "%1$s (%2$s verified)"
+#~ msgstr "%1$s (%2$s verifisert)"
+
+#~ msgid "File \"%s\" is already open"
+#~ msgstr "Filen «%s» er allerede åpnet"
+
 #~ msgid "Last scrape at:"
 #~ msgstr "Sist krafs:"
 
@@ -2382,6 +2386,42 @@ msgstr "Satt i kø for verifisering"
 #~ "Port forwarding through \"%s\", service \"%s\".  (local address: %s:%d)"
 #~ msgstr ""
 #~ "Videreføring av porter gjennom «%s», tjeneste «%s». (lokal adresse: %s:%d)"
+
+#~ msgid "_Ignore unencrypted peers"
+#~ msgstr "Ignorer _ukrypterte nedlastere"
+
+#~ msgid "Blocklist updated with %'d entries"
+#~ msgstr "Blokkeringsliste er oppdatert med %'d oppføringer"
+
+#~ msgid "Parsing blocklist..."
+#~ msgstr "Tolker blokkeringsliste ..."
+
+#~ msgid "Uncompressing blocklist..."
+#~ msgstr "Dekomprimerer blokkeringsliste ..."
+
+#~ msgid "Unable to get blocklist: %s"
+#~ msgstr "Klarte ikke å hente blokkeringsliste: %s"
+
+#~ msgid "Unable to get blocklist."
+#~ msgstr "Klarte ikke å hente blokkeringsliste."
+
+#~ msgid "Completion"
+#~ msgstr "Ferdigstillelse"
+
+#~ msgid "%1$.1f%% (%2$.1f%% selected)"
+#~ msgstr "%1$.1f%% (%2$.1f%% valgt)"
+
+#~ msgid "Beginning to use scheduled bandwidth limits"
+#~ msgstr "Begynner å ta i bruk planlagte båndbreddebegrensninger"
+
+#~ msgid "Ending use of scheduled bandwidth limits"
+#~ msgstr "Avslutter bruk av planlagte båndbreddebegrensninger"
+
+#~ msgid "_Limit bandwidth between"
+#~ msgstr "Begrens båndbredde _mellom"
+
+#~ msgid "Limit d_ownload speed (KB/s):"
+#~ msgstr "Begrens n_edlastingshastighet (KiB/s):"
 
 #~ msgid "One of these torrents has not finished downloading."
 #~ msgid_plural "Some of these torrents have not finished downloading."

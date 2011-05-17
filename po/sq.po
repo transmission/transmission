@@ -8,51 +8,51 @@ msgstr ""
 "Project-Id-Version: transmission\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2011-01-27 14:52-0600\n"
-"PO-Revision-Date: 2010-03-13 13:02+0000\n"
-"Last-Translator: Vilson Gjeci <vilsongjeci@gmail.com>\n"
+"PO-Revision-Date: 2011-02-22 21:58+0000\n"
+"Last-Translator: truri <Unknown>\n"
 "Language-Team: Albanian <sq@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2011-02-08 00:08+0000\n"
-"X-Generator: Launchpad (build 12335)\n"
+"X-Launchpad-Export-Date: 2011-05-16 23:57+0000\n"
+"X-Generator: Launchpad (build 13045)\n"
 
 #: ../gtk/actions.c:53
 msgid "Sort by _Activity"
-msgstr "Renditi sipas _Aktivitetit"
+msgstr "Klasifiko sipas _Aktivitetit"
 
 #: ../gtk/actions.c:54
 msgid "Sort by _Name"
-msgstr "Renditi sipas _Emrit"
+msgstr "Klasifiko sipas _Emrit"
 
 #: ../gtk/actions.c:55
 msgid "Sort by _Progress"
-msgstr "Renditi sipas _Progresit"
+msgstr "Klasifiko sipas _Progresit"
 
 #: ../gtk/actions.c:56
 msgid "Sort by Rati_o"
-msgstr "Nis Sipas Shka_llës"
+msgstr "Klasifiko sipas Shkallë_s"
 
 #: ../gtk/actions.c:57
 msgid "Sort by Stat_e"
-msgstr "Nis Sipas Gjend_jes"
+msgstr "Klasifiko sipas Gjendje_s"
 
 #: ../gtk/actions.c:58
 msgid "Sort by A_ge"
-msgstr "Renditi sipas _Moshës"
+msgstr "Klasifiko sipas M_oshës"
 
 #: ../gtk/actions.c:59
 msgid "Sort by Time _Left"
-msgstr "Nis Sipas Kohës së _Ngelur"
+msgstr "Klasifiko sipas Kohës së _Ngelur"
 
 #: ../gtk/actions.c:60
 msgid "Sort by Si_ze"
-msgstr "Rendit sipas Si_ze"
+msgstr "Klasifiko sipas Madhësi_së"
 
 #: ../gtk/actions.c:77
 msgid "_Show Transmission"
-msgstr "_Shfaq Transmission"
+msgstr "_Shfaq Transmetimin"
 
 #: ../gtk/actions.c:78
 msgid "Message _Log"
@@ -80,11 +80,11 @@ msgstr "_Shtylla e gjëndjes"
 
 #: ../gtk/actions.c:98
 msgid "_Toolbar"
-msgstr "_Shtylla e vglave"
+msgstr "_Paneli i veglave"
 
 #: ../gtk/actions.c:103
 msgid "_File"
-msgstr "_Skedar"
+msgstr "_Skedari"
 
 #: ../gtk/actions.c:104
 msgid "_Torrent"
@@ -92,11 +92,11 @@ msgstr "_Torrent"
 
 #: ../gtk/actions.c:105
 msgid "_View"
-msgstr "_Shfaq"
+msgstr "_Pamja"
 
 #: ../gtk/actions.c:106
 msgid "_Sort Torrents By"
-msgstr "_Rendit Torrentet sipas"
+msgstr "_Shfaq Torrentët Sipas"
 
 #: ../gtk/actions.c:107 ../gtk/details.c:2428
 msgid "_Edit"
@@ -112,15 +112,15 @@ msgstr "Kopjo _lidhjen Magnet në Kujtesë"
 
 #: ../gtk/actions.c:110
 msgid "Open _URL..."
-msgstr ""
+msgstr "Hap _URL..."
 
 #: ../gtk/actions.c:110
 msgid "Open URL..."
-msgstr ""
+msgstr "Hap _URL..."
 
 #: ../gtk/actions.c:111 ../gtk/actions.c:112
 msgid "Open a torrent"
-msgstr ""
+msgstr "Hap një torrent"
 
 #: ../gtk/actions.c:113
 msgid "_Start"
@@ -136,7 +136,7 @@ msgstr "_Statistika"
 
 #: ../gtk/actions.c:115
 msgid "_Donate"
-msgstr "_Dhuroni"
+msgstr "_Dhuro"
 
 #: ../gtk/actions.c:116
 msgid "_Verify Local Data"
@@ -168,7 +168,7 @@ msgstr "Nisi të gjithë torrentët"
 
 #: ../gtk/actions.c:120
 msgid "Set _Location..."
-msgstr ""
+msgstr "Vendos _Lokacionin..."
 
 #: ../gtk/actions.c:121
 msgid "Remove torrent"
@@ -176,7 +176,7 @@ msgstr "Largo Torrentin"
 
 #: ../gtk/actions.c:122
 msgid "_Delete Files and Remove"
-msgstr "_Fshij skedaret dhe largoj"
+msgstr "_Fshij dhe Largoj Fajllat"
 
 #: ../gtk/actions.c:123
 msgid "_New..."
@@ -267,12 +267,12 @@ msgstr "Respekto kufizimet e _përgjithshme"
 #: ../gtk/details.c:492
 #, c-format
 msgid "Limit _download speed (%s):"
-msgstr ""
+msgstr "Kufizo _shpejtësinë e shkarkimit (%s):"
 
 #: ../gtk/details.c:505
 #, c-format
 msgid "Limit _upload speed (%s):"
-msgstr ""
+msgstr "Kufizo _shpejtësinë e dërgimit (%s):"
 
 #: ../gtk/details.c:518 ../gtk/open-dialog.c:355
 msgid "Torrent _priority:"
@@ -284,11 +284,11 @@ msgstr ""
 
 #: ../gtk/details.c:532
 msgid "_Ratio:"
-msgstr ""
+msgstr "_Raporti"
 
 #: ../gtk/details.c:541
 msgid "_Idle:"
-msgstr ""
+msgstr "_Duke pritur:"
 
 #: ../gtk/details.c:544
 msgid "Peer Connections"
@@ -674,7 +674,7 @@ msgstr ""
 
 #: ../gtk/details.c:2434
 msgid "_Remove"
-msgstr ""
+msgstr "Anulo"
 
 #: ../gtk/details.c:2450
 msgid "Show _backup trackers"
@@ -888,9 +888,7 @@ msgstr ""
 msgid "translator-credits"
 msgstr ""
 "Launchpad Contributions:\n"
-"  Flakerim Ismani https://launchpad.net/~flakerimi\n"
-"  Vilson Gjeci https://launchpad.net/~vilsongjeci\n"
-"  heroid https://launchpad.net/~heroid"
+"  truri https://launchpad.net/~webmaster-truri"
 
 #: ../gtk/makemeta-ui.c:78
 #, c-format
@@ -2873,3 +2871,21 @@ msgstr "E mbajtur për verifikim"
 #~ msgstr ""
 #~ "Kjo lidhje magnet duket se është krijuar për diçka tjetër nga BitTorrent. "
 #~ "lidhjet magnet BitTorrent kanë një seksion që përmban \"%s\"."
+
+#~ msgid "Limit do_wnload speed (KiB/s):"
+#~ msgstr "Kufizo shpejtësinë e s_hkarkimit (KiB/s):"
+
+#~ msgid "Limit _upload speed (KiB/s):"
+#~ msgstr "Kufizo _shpejtësinë e ngarkimit (KiB/s):"
+
+#~ msgid "Limit _download speed (KiB/s):"
+#~ msgstr "Kufizo _shpejtësinë e shkarkimit (KiB/s):"
+
+#~ msgid "Use Local Peer Discovery to find more peers"
+#~ msgstr "Përdor Zbulimin e Burimeve Lokale për të gjetur më tepër burime"
+
+#~ msgid "Limit u_pload speed (KiB/s):"
+#~ msgstr "Kufizo shpejtësinë e n_garkimit (KiB/s):"
+
+#~ msgid "Pick a _random port on startup"
+#~ msgstr "Zgjidh një _port çfarëdo në nisje"

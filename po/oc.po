@@ -15,8 +15,8 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n > 1;\n"
-"X-Launchpad-Export-Date: 2011-02-08 00:08+0000\n"
-"X-Generator: Launchpad (build 12335)\n"
+"X-Launchpad-Export-Date: 2011-05-16 23:57+0000\n"
+"X-Generator: Launchpad (build 13045)\n"
 
 #: ../gtk/actions.c:53
 msgid "Sort by _Activity"
@@ -64,7 +64,7 @@ msgstr ""
 
 #: ../gtk/actions.c:94
 msgid "_Compact View"
-msgstr ""
+msgstr "Vista _compacta"
 
 #: ../gtk/actions.c:95
 msgid "Re_verse Sort Order"
@@ -168,7 +168,7 @@ msgstr "Aviar totes los torrents"
 
 #: ../gtk/actions.c:120
 msgid "Set _Location..."
-msgstr ""
+msgstr "Definir l’_emplaçament…"
 
 #: ../gtk/actions.c:121
 msgid "Remove torrent"
@@ -238,11 +238,11 @@ msgstr "Importacion de « %s »"
 
 #: ../gtk/details.c:455 ../gtk/details.c:467
 msgid "Use global settings"
-msgstr ""
+msgstr "Utilizar los paramètres globals"
 
 #: ../gtk/details.c:456
 msgid "Seed regardless of ratio"
-msgstr ""
+msgstr "Partejar quin que siá lo ratio"
 
 #: ../gtk/details.c:457
 msgid "Stop seeding at ratio:"
@@ -280,15 +280,15 @@ msgstr "_Prioritat del torrent :"
 
 #: ../gtk/details.c:522
 msgid "Seeding Limits"
-msgstr ""
+msgstr "Limits de partiment :"
 
 #: ../gtk/details.c:532
 msgid "_Ratio:"
-msgstr ""
+msgstr "_Ratio :"
 
 #: ../gtk/details.c:541
 msgid "_Idle:"
-msgstr ""
+msgstr "_Inactivitat :"
 
 #: ../gtk/details.c:544
 msgid "Peer Connections"
@@ -316,7 +316,7 @@ msgstr "Partiment"
 
 #: ../gtk/details.c:571 ../gtk/filter.c:718 ../gtk/torrent-cell-renderer.c:206
 msgid "Finished"
-msgstr ""
+msgstr "Acabat"
 
 #: ../gtk/details.c:571 ../gtk/filter.c:717 ../gtk/torrent-cell-renderer.c:208
 msgid "Paused"
@@ -324,7 +324,7 @@ msgstr "En pausa"
 
 #: ../gtk/details.c:604
 msgid "N/A"
-msgstr ""
+msgstr "N/A"
 
 #: ../gtk/details.c:616 ../gtk/file-list.c:621
 msgid "Mixed"
@@ -364,12 +364,12 @@ msgstr "Desconegut"
 #: ../gtk/details.c:825
 #, c-format
 msgid "%1$s (%2$s%%)"
-msgstr ""
+msgstr "%1$s (%2$s%%)"
 
 #: ../gtk/details.c:827
 #, c-format
 msgid "%1$s (%2$s%% of %3$s%% Available)"
-msgstr ""
+msgstr "%1$s (%2$s%% sus %3$s%% disponible)"
 
 #: ../gtk/details.c:829
 #, c-format
@@ -384,15 +384,15 @@ msgstr "%1$s (+%2$s corromput)"
 #: ../gtk/details.c:870
 #, c-format
 msgid "%s (Ratio: %s)"
-msgstr ""
+msgstr "%s (ratio : %s)"
 
 #: ../gtk/details.c:898
 msgid "No errors"
-msgstr ""
+msgstr "Pas d'errors"
 
 #: ../gtk/details.c:911
 msgid "Never"
-msgstr ""
+msgstr "Pas jamai"
 
 #: ../gtk/details.c:915
 msgid "Active now"
@@ -774,7 +774,7 @@ msgstr "Prioritat"
 
 #: ../gtk/filter.c:308 ../gtk/filter.c:712
 msgid "All"
-msgstr ""
+msgstr "Totes"
 
 #: ../gtk/filter.c:322 ../gtk/tr-prefs.c:526 ../gtk/tr-prefs.c:1261
 msgid "Privacy"
@@ -782,23 +782,23 @@ msgstr ""
 
 #: ../gtk/filter.c:327
 msgid "Public"
-msgstr ""
+msgstr "Publica"
 
 #: ../gtk/filter.c:331
 msgid "Private"
-msgstr ""
+msgstr "Privada"
 
 #: ../gtk/filter.c:714
 msgid "Active"
-msgstr ""
+msgstr "Activa"
 
 #: ../gtk/filter.c:719
 msgid "Queued"
-msgstr ""
+msgstr "En fila d'espèra"
 
 #: ../gtk/filter.c:720
 msgid "Verifying"
-msgstr ""
+msgstr "Verificacion"
 
 #: ../gtk/filter.c:721 ../gtk/msgwin.c:414
 msgid "Error"
@@ -807,7 +807,7 @@ msgstr "Error"
 #. add the activity combobox
 #: ../gtk/filter.c:959
 msgid "_Show:"
-msgstr ""
+msgstr "_Afichar :"
 
 #: ../gtk/main.c:440
 #, c-format
@@ -879,7 +879,7 @@ msgstr "Un client BitTorrent simple e rapid"
 
 #: ../gtk/main.c:1548
 msgid "Copyright (c) The Transmission Project"
-msgstr ""
+msgstr "Copyright (c) « The Transmission Project »"
 
 #. Translators: translate "translator-credits" as your name
 #. to have it appear in the credits in the "About"
@@ -1146,7 +1146,7 @@ msgstr ""
 #: ../gtk/stats.c:176
 #, c-format
 msgid "Started %'d time"
-msgstr ""
+msgstr "Aviat %d còp"
 
 #. %1$s is how much we've got,
 #. %2$s is how much we'll have when done,
@@ -1154,7 +1154,7 @@ msgstr ""
 #: ../gtk/torrent-cell-renderer.c:63
 #, c-format
 msgid "%1$s of %2$s (%3$s%%)"
-msgstr ""
+msgstr "%1$s de %2$s (%3$s% %)"
 
 #. %1$s is how much we've got,
 #. %2$s is the torrent's total size,
@@ -1175,7 +1175,7 @@ msgstr ""
 #: ../gtk/torrent-cell-renderer.c:95
 #, c-format
 msgid "%1$s of %2$s (%3$s%%), uploaded %4$s (Ratio: %5$s)"
-msgstr ""
+msgstr "%1$s de %2$s (%3$s% %), mandat %4$s (ratio : %5$s)"
 
 #. %1$s is the torrent's total size,
 #. %2$s is how much we've uploaded,
@@ -1208,13 +1208,13 @@ msgstr ""
 #: ../gtk/torrent-cell-renderer.c:174
 #, c-format
 msgid "%1$s %2$s, %3$s %4$s"
-msgstr ""
+msgstr "%1$s %2$s, %3$s %4$s"
 
 #. bandwidth speed + unicode arrow
 #: ../gtk/torrent-cell-renderer.c:179 ../gtk/torrent-cell-renderer.c:183
 #, c-format
 msgid "%1$s %2$s"
-msgstr ""
+msgstr "%1$s %2$s"
 
 #. the torrent isn't uploading or downloading
 #: ../gtk/torrent-cell-renderer.c:187 ../gtk/tr-icon.c:66
@@ -1229,7 +1229,7 @@ msgstr ""
 #: ../gtk/torrent-cell-renderer.c:228
 #, c-format
 msgid "Ratio %s"
-msgstr ""
+msgstr "Ratio %s"
 
 #: ../gtk/torrent-cell-renderer.c:257
 #, c-format
@@ -1298,7 +1298,7 @@ msgstr ""
 
 #: ../gtk/tr-prefs.c:270
 msgid "Adding"
-msgstr ""
+msgstr "Apondon"
 
 #: ../gtk/tr-prefs.c:285
 msgid "Automatically _add torrents from:"
@@ -1354,7 +1354,7 @@ msgstr ""
 
 #: ../gtk/tr-prefs.c:434
 msgid "<b>Unable to update.</b>"
-msgstr ""
+msgstr "<b>Mesa a jorn impossibla.</b>"
 
 #: ../gtk/tr-prefs.c:449
 msgid "Update Blocklist"
@@ -1382,7 +1382,7 @@ msgstr ""
 
 #: ../gtk/tr-prefs.c:498
 msgid "Enable _blocklist:"
-msgstr ""
+msgstr "Activar la lista d’exclusion :"
 
 #: ../gtk/tr-prefs.c:512
 msgid "_Update"
@@ -1694,15 +1694,15 @@ msgstr ""
 
 #: ../gtk/util.c:49 ../gtk/util.c:55
 msgid "KiB"
-msgstr ""
+msgstr "ko"
 
 #: ../gtk/util.c:50 ../gtk/util.c:56
 msgid "MiB"
-msgstr ""
+msgstr "Mo"
 
 #: ../gtk/util.c:51 ../gtk/util.c:57
 msgid "GiB"
-msgstr ""
+msgstr "Go"
 
 #: ../gtk/util.c:52 ../gtk/util.c:58
 msgid "TiB"
@@ -1710,19 +1710,19 @@ msgstr ""
 
 #: ../gtk/util.c:61
 msgid "KiB/s"
-msgstr ""
+msgstr "Kio/seg"
 
 #: ../gtk/util.c:62
 msgid "MiB/s"
-msgstr ""
+msgstr "Mio/s"
 
 #: ../gtk/util.c:63
 msgid "GiB/s"
-msgstr ""
+msgstr "Gio/s"
 
 #: ../gtk/util.c:64
 msgid "TiB/s"
-msgstr ""
+msgstr "Tio/s"
 
 #: ../gtk/util.c:160
 msgid "size|None"
@@ -1750,7 +1750,7 @@ msgstr ""
 #: ../gtk/util.c:878
 #, c-format
 msgid "Error opening \"%s\""
-msgstr ""
+msgstr "Impossible de dobrir « %s »"
 
 #: ../gtk/util.c:881
 #, c-format
@@ -1947,7 +1947,7 @@ msgstr ""
 
 #: ../libtransmission/torrent.c:1781
 msgid "Removing torrent"
-msgstr ""
+msgstr "Supression del torrent"
 
 #: ../libtransmission/torrent.c:1865
 msgid "Done"
@@ -2020,6 +2020,15 @@ msgstr ""
 #: ../libtransmission/verify.c:257
 msgid "Queued for verification"
 msgstr ""
+
+#~ msgid "Dates"
+#~ msgstr "Datas"
+
+#~ msgid "Progress:"
+#~ msgstr "Progression:"
+
+#~ msgid "Transfer"
+#~ msgstr "Transferir"
 
 #~ msgid "Sort by T_racker"
 #~ msgstr "Triar per t_racador"
@@ -2192,3 +2201,7 @@ msgstr ""
 #~ msgid_plural "%1$'d Pieces @ %2$s"
 #~ msgstr[0] "%1$'d fragment @ %2$s"
 #~ msgstr[1] "%1$'d fragments @ %2$s"
+
+#, c-format
+#~ msgid "%1$s (%2$s%% of %3$s%% Available) + %4$s Unverified"
+#~ msgstr "%1$s (%2$s%% sus %3$s%% disponible) + %4$s pas verificat"

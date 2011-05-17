@@ -22,8 +22,8 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2011-02-08 00:08+0000\n"
-"X-Generator: Launchpad (build 12335)\n"
+"X-Launchpad-Export-Date: 2011-05-16 23:56+0000\n"
+"X-Generator: Launchpad (build 13045)\n"
 
 #: ../gtk/actions.c:53
 msgid "Sort by _Activity"
@@ -199,7 +199,7 @@ msgstr "_Surt"
 
 #: ../gtk/actions.c:125
 msgid "Select _All"
-msgstr "Selecciona-ho _tot"
+msgstr "_Selecciona-ho tot"
 
 #: ../gtk/actions.c:126
 msgid "Dese_lect All"
@@ -784,7 +784,7 @@ msgstr "Prioritat"
 
 #: ../gtk/filter.c:308 ../gtk/filter.c:712
 msgid "All"
-msgstr "Tots"
+msgstr "Tot"
 
 #: ../gtk/filter.c:322 ../gtk/tr-prefs.c:526 ../gtk/tr-prefs.c:1261
 msgid "Privacy"
@@ -909,12 +909,7 @@ msgstr ""
 "\n"
 "Launchpad Contributions:\n"
 "  Aldo Mann https://launchpad.net/~aldomann\n"
-"  Briç https://launchpad.net/~brissels-gmail\n"
-"  David Pinilla https://launchpad.net/~dpini\n"
-"  David Planella https://launchpad.net/~dpm\n"
-"  Enric Marti Gonzalez https://launchpad.net/~britishsteel\n"
 "  Javi Rodríguez https://launchpad.net/~menut\n"
-"  Joan Duran https://launchpad.net/~jodufi\n"
 "  Àngel Ollé https://launchpad.net/~angelolle"
 
 #: ../gtk/makemeta-ui.c:78
@@ -1808,7 +1803,7 @@ msgstr "URL no reconegut"
 #: ../gtk/util.c:903
 #, c-format
 msgid "Transmission doesn't know how to use \"%s\""
-msgstr "El Transmission no sap con utilitzar «%s»"
+msgstr "El Transmission no sap com utilitzar «%s»"
 
 #: ../gtk/util.c:908
 #, c-format
@@ -2346,10 +2341,6 @@ msgstr "S'està encuant per a verificar-lo"
 #~ msgid "_Add..."
 #~ msgstr "_Afegeix..."
 
-#~ msgid "Peer was discovered through Peer Exchange (PEX)"
-#~ msgstr ""
-#~ "El client ha sigut descobert a través del intercanvi de clients (PEX)"
-
 #~ msgid "Sort by _Ratio"
 #~ msgstr "Ordena per la _relació"
 
@@ -2462,6 +2453,13 @@ msgstr "S'està encuant per a verificar-lo"
 #~ msgid "Blocklist \"%1$s\" updated with %2$'d entries"
 #~ msgstr "La llista de bloquejats «%1$s» s'ha actualitzat amb %2$'d entrades"
 
+#, c-format
+#~ msgid "%1$s (%2$s verified)"
+#~ msgstr "%1$s (%2$s verificat)"
+
+#~ msgid "File \"%s\" is already open"
+#~ msgstr "El fitxer «%s» ja està obert"
+
 #~ msgid "Show _icon in the desktop Notification Area"
 #~ msgstr "Mostra la _icona a l'àrea de notificació de l'escriptori"
 
@@ -2494,6 +2492,44 @@ msgstr "S'està encuant per a verificar-lo"
 #, c-format
 #~ msgid "Preallocated file \"%s\""
 #~ msgstr "Fitxer preubicat «%s»"
+
+#~ msgid "_Ignore unencrypted peers"
+#~ msgstr "_Ignora els clients no xifrats"
+
+#~ msgid "Blocklist updated with %'d entries"
+#~ msgstr "S'ha actualitzat la llista de bloquejats amb %'d entrades"
+
+#~ msgid "Parsing blocklist..."
+#~ msgstr "S'està analitzant la llista de bloquejats..."
+
+#~ msgid "Uncompressing blocklist..."
+#~ msgstr "S'està descomprimint la llista de bloquejats..."
+
+#~ msgid "Unable to get blocklist: %s"
+#~ msgstr "No s'ha pogut obtenir la llista de bloquejats: %s"
+
+#~ msgid "Unable to get blocklist."
+#~ msgstr "No s'ha pogut obtenir la llista de bloquejats."
+
+#~ msgid "Completion"
+#~ msgstr "Completat"
+
+#~ msgid "%1$.1f%% (%2$.1f%% selected)"
+#~ msgstr "%1$.1f%% (%2$.1f%% seleccionat)"
+
+#~ msgid "Beginning to use scheduled bandwidth limits"
+#~ msgstr ""
+#~ "S'està començant a utilitzar els límits planificats d'amplada de banda"
+
+#~ msgid "Ending use of scheduled bandwidth limits"
+#~ msgstr ""
+#~ "S'està finalitzant la utilització dels límits planificats d'amplada de banda"
+
+#~ msgid "_Limit bandwidth between"
+#~ msgstr "_Limita l'amplada de banda entre"
+
+#~ msgid "Limit d_ownload speed (KB/s):"
+#~ msgstr "Limita la velocitat de _baixada (KB/s):"
 
 #~ msgid "This torrent has not finished downloading."
 #~ msgid_plural "These torrents have not finished downloading."
@@ -2672,6 +2708,10 @@ msgstr "S'està encuant per a verificar-lo"
 #~ msgid "System does not seem to support IPv6. Not listening onan IPv6 address"
 #~ msgstr ""
 #~ "Sembla que el sistema no admet IPv6. No s'escoltaran les adreces IPv6"
+
+#~ msgid "Peer was discovered through Peer Exchange (PEX)"
+#~ msgstr ""
+#~ "El client ha sigut descobert a través de l'intercanvi de clients (PEX)"
 
 #~ msgid "Sort by T_racker"
 #~ msgstr "Ordena pel r_astrejador"

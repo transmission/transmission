@@ -15,8 +15,8 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2011-02-08 00:08+0000\n"
-"X-Generator: Launchpad (build 12335)\n"
+"X-Launchpad-Export-Date: 2011-05-16 23:57+0000\n"
+"X-Generator: Launchpad (build 13045)\n"
 
 #: ../gtk/actions.c:53
 msgid "Sort by _Activity"
@@ -324,7 +324,7 @@ msgstr "Paused"
 
 #: ../gtk/details.c:604
 msgid "N/A"
-msgstr ""
+msgstr "N/A"
 
 #: ../gtk/details.c:616 ../gtk/file-list.c:621
 msgid "Mixed"
@@ -384,7 +384,7 @@ msgstr "%1$s (+%2$s corrupt)"
 #: ../gtk/details.c:870
 #, c-format
 msgid "%s (Ratio: %s)"
-msgstr ""
+msgstr "%s (Ratio: %s)"
 
 #: ../gtk/details.c:898
 msgid "No errors"
@@ -884,15 +884,7 @@ msgstr "Copyright (c) The Transmission Project"
 msgid "translator-credits"
 msgstr ""
 "Launchpad Contributions:\n"
-"  Bruce Cowan https://launchpad.net/~bruce89\n"
-"  Christopher Swift https://launchpad.net/~chris\n"
-"  Edward Chidgey https://launchpad.net/~chidge\n"
-"  Gabriel Ruiz https://launchpad.net/~anakron\n"
-"  Matthew Gall https://launchpad.net/~matthewgall2005\n"
-"  Pete4 https://launchpad.net/~harlemdavvey\n"
-"  Philip Withnall https://launchpad.net/~drbob\n"
-"  Robert Readman https://launchpad.net/~robert-readman\n"
-"  ascenseur https://launchpad.net/~joseph-odell"
+"  Bruce Cowan https://launchpad.net/~bruce89"
 
 #: ../gtk/makemeta-ui.c:78
 #, c-format
@@ -1361,7 +1353,7 @@ msgstr "<b>Update succeeded!</b>"
 
 #: ../gtk/tr-prefs.c:434
 msgid "<b>Unable to update.</b>"
-msgstr ""
+msgstr "<b>Unable to update.</b>"
 
 #: ../gtk/tr-prefs.c:449
 msgid "Update Blocklist"
@@ -1389,7 +1381,7 @@ msgstr "Blocklist"
 
 #: ../gtk/tr-prefs.c:498
 msgid "Enable _blocklist:"
-msgstr ""
+msgstr "Enable _blocklist:"
 
 #: ../gtk/tr-prefs.c:512
 msgid "_Update"

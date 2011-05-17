@@ -10,14 +10,14 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2011-01-27 14:52-0600\n"
 "PO-Revision-Date: 2010-10-27 07:43+0000\n"
-"Last-Translator: Miro Hadzhiev (Хаджиев) <extigyro@gmail.com>\n"
+"Last-Translator: Miroslav Hadzhiev (Хаджиев) <extigyro@gmail.com>\n"
 "Language-Team: Bulgarian <bg@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2011-02-08 00:09+0000\n"
-"X-Generator: Launchpad (build 12335)\n"
+"X-Launchpad-Export-Date: 2011-05-16 23:57+0000\n"
+"X-Generator: Launchpad (build 13045)\n"
 
 #: ../gtk/actions.c:53
 msgid "Sort by _Activity"
@@ -325,7 +325,7 @@ msgstr "Паузиран"
 
 #: ../gtk/details.c:604
 msgid "N/A"
-msgstr ""
+msgstr "Неизвестен"
 
 #: ../gtk/details.c:616 ../gtk/file-list.c:621
 msgid "Mixed"
@@ -885,23 +885,7 @@ msgstr ""
 #. dialog
 #: ../gtk/main.c:1554
 msgid "translator-credits"
-msgstr ""
-"Любомир Маринов\n"
-"\n"
-"Launchpad Contributions:\n"
-"  Blagovest Petrov https://launchpad.net/~eniac-bg\n"
-"  Emil Pavlov https://launchpad.net/~emil-p-pavlov\n"
-"  Krasimir Chonov https://launchpad.net/~kchonov\n"
-"  Lachezar Dobrev https://launchpad.net/~lachezar\n"
-"  Lubomir Marinov https://launchpad.net/~lubomir-marinov\n"
-"  Miro Hadzhiev (Хаджиев) https://launchpad.net/~extigyro\n"
-"  Pavlin Grucov https://launchpad.net/~pavlin-grucov\n"
-"  Peter Petrov - Sh3p1 https://launchpad.net/~sh3p1\n"
-"  Sabry https://launchpad.net/~sabryhomeit\n"
-"  Siyan Panayotov https://launchpad.net/~xsisqox\n"
-"  Yuksel Saliev https://launchpad.net/~yuksbg\n"
-"  avioli https://launchpad.net/~avioli\n"
-"  vlood https://launchpad.net/~vladimir-vassilev"
+msgstr "Любомир Маринов"
 
 #: ../gtk/makemeta-ui.c:78
 #, c-format
@@ -1714,19 +1698,19 @@ msgstr "size|Качени: %1$s, Изтеглени: %2$s"
 
 #: ../gtk/util.c:49 ../gtk/util.c:55
 msgid "KiB"
-msgstr ""
+msgstr "KiB"
 
 #: ../gtk/util.c:50 ../gtk/util.c:56
 msgid "MiB"
-msgstr ""
+msgstr "MiB"
 
 #: ../gtk/util.c:51 ../gtk/util.c:57
 msgid "GiB"
-msgstr ""
+msgstr "GiB"
 
 #: ../gtk/util.c:52 ../gtk/util.c:58
 msgid "TiB"
-msgstr ""
+msgstr "TiB"
 
 #: ../gtk/util.c:61
 msgid "KiB/s"
@@ -2209,6 +2193,10 @@ msgstr "Нареден за проверка"
 
 #~ msgid "Adding Torrents"
 #~ msgstr "Добавяне на торенти"
+
+#, c-format
+#~ msgid "%1$s (%2$s verified)"
+#~ msgstr "%1$s (%2$s проверени)"
 
 #~ msgid "Status"
 #~ msgstr "Състояние"

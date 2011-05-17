@@ -41,15 +41,15 @@ msgstr ""
 "Project-Id-Version: transmission\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2011-01-27 14:52-0600\n"
-"PO-Revision-Date: 2011-01-04 01:08+0000\n"
+"PO-Revision-Date: 2011-03-20 23:44+0000\n"
 "Last-Translator: AJenbo <anders@jenbo.dk>\n"
 "Language-Team: Danish <dansk@dansk-gruppen.dk>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2011-02-08 00:08+0000\n"
-"X-Generator: Launchpad (build 12335)\n"
+"X-Launchpad-Export-Date: 2011-05-16 23:56+0000\n"
+"X-Generator: Launchpad (build 13045)\n"
 
 #: ../gtk/actions.c:53
 msgid "Sort by _Activity"
@@ -357,7 +357,7 @@ msgstr "På pause"
 
 #: ../gtk/details.c:604
 msgid "N/A"
-msgstr ""
+msgstr "N/A"
 
 #: ../gtk/details.c:616 ../gtk/file-list.c:621
 msgid "Mixed"
@@ -417,7 +417,7 @@ msgstr "%1$s (+%2$s ødelagt)"
 #: ../gtk/details.c:870
 #, c-format
 msgid "%s (Ratio: %s)"
-msgstr ""
+msgstr "%s (Forhold: %s)"
 
 #: ../gtk/details.c:898
 msgid "No errors"
@@ -917,25 +917,6 @@ msgstr "Ophavsret (c) Transmissionprojektet"
 #: ../gtk/main.c:1554
 msgid "translator-credits"
 msgstr ""
-"Launchpad Contributions:\n"
-"  AJenbo https://launchpad.net/~ajenbo\n"
-"  Ask Hjorth Larsen https://launchpad.net/~askhl\n"
-"  Benni https://launchpad.net/~benni-bennetsen\n"
-"  Jan Bastholm Jensen https://launchpad.net/~jan-bastholm\n"
-"  Jannich Brendle https://launchpad.net/~jannich-bredsaal\n"
-"  Jens E. Jensen https://launchpad.net/~jens-e-jensen\n"
-"  Joe Hansen https://launchpad.net/~joedalton2\n"
-"  Mads Konradsen https://launchpad.net/~mads-hk\n"
-"  MadsDyrmannLarsen https://launchpad.net/~dyrmann\n"
-"  Mark Jensen https://launchpad.net/~mark-markjensen\n"
-"  Michael Bæk https://launchpad.net/~mchlbk\n"
-"  Morten Justesen https://launchpad.net/~morten-justesen\n"
-"  Peter Skov https://launchpad.net/~a0peter\n"
-"  Philip Munksgaard https://launchpad.net/~pmunksgaard\n"
-"  Soren Hauberg https://launchpad.net/~hauberg\n"
-"  Søren Vind https://launchpad.net/~sorenvind\n"
-"  Tobias Østergaard-Jørgensen https://launchpad.net/~theoras\n"
-"  nanker https://launchpad.net/~nanker"
 
 #: ../gtk/makemeta-ui.c:78
 #, c-format
@@ -1404,7 +1385,7 @@ msgstr "<b>Opdatering fuldført!</b>"
 
 #: ../gtk/tr-prefs.c:434
 msgid "<b>Unable to update.</b>"
-msgstr ""
+msgstr "<b>Kan ikke opdatere.</b>"
 
 #: ../gtk/tr-prefs.c:449
 msgid "Update Blocklist"
@@ -1432,7 +1413,7 @@ msgstr "Blokeringsliste"
 
 #: ../gtk/tr-prefs.c:498
 msgid "Enable _blocklist:"
-msgstr ""
+msgstr "Aktiver _blokeringsliste:"
 
 #: ../gtk/tr-prefs.c:512
 msgid "_Update"
@@ -2281,6 +2262,13 @@ msgstr "Venter på verifikation"
 #~ msgstr[0] "%'u byte"
 #~ msgstr[1] "%'u bytes"
 
+#, c-format
+#~ msgid "%1$s (%2$s verified)"
+#~ msgstr "%1$s (%2$s bekræftet)"
+
+#~ msgid "File \"%s\" is already open"
+#~ msgstr "Filen \"%s\" er allerede åbnet"
+
 #~ msgid "_Move source file to Trash"
 #~ msgstr "Flyt kildefilen til _papirkurven"
 
@@ -2852,3 +2840,38 @@ msgstr "Venter på verifikation"
 #, c-format
 #~ msgid "%1$s (%2$s%% of %3$s%% Available) + %4$s Unverified"
 #~ msgstr "%1$s (%2$s%% af %3$s%% tilgængelig) + %4$s uverificeret"
+
+#~ msgid "Limit _download speed (KiB/s):"
+#~ msgstr "Begræns _downloadhastighed (KiB/s):"
+
+#~ msgid "Pick a _random port on startup"
+#~ msgstr "Vælg en _tilfældig port ved opstart"
+
+#~ msgid "Use Local Peer Discovery to find more peers"
+#~ msgstr "Brug Local Peer Discovery til at finde flere peers"
+
+#~ msgid "Limit do_wnload speed (KiB/s):"
+#~ msgstr "Begræns _downloadhastighed (KiB/s):"
+
+#~ msgid "Limit u_pload speed (KiB/s):"
+#~ msgstr "Begræns _uploadhastighed (KiB/s):"
+
+#~ msgid "Limit _upload speed (KiB/s):"
+#~ msgstr "Begræns _uploadhastighed (KiB/s):"
+
+#, c-format
+#~ msgid "%1$s of %2$s (%3$.2f%%), uploaded %4$s (Ratio: %5$s Goal: %6$s)"
+#~ msgstr "%1$s af %2$s (%3$.2f%%), uploadet %4$s (Forhold: %5$s Mål: %6$s)"
+
+#~ msgid ""
+#~ "Once removed, continuing the transfer will require the torrent file or "
+#~ "magnet link."
+#~ msgid_plural ""
+#~ "Once removed, continuing the transfers will require the torrent files or "
+#~ "magnet links."
+#~ msgstr[0] ""
+#~ "Når den er fjernet vil torrent-filen eller et magnetlink være påkrævet for "
+#~ "at kunne fortsætte overførslen."
+#~ msgstr[1] ""
+#~ "Når de er fjernet vil torrent-filer eller magnetlinks være påkrævet for at "
+#~ "kunne fortsætte overførslerne."

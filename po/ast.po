@@ -15,8 +15,8 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2011-02-08 00:08+0000\n"
-"X-Generator: Launchpad (build 12335)\n"
+"X-Launchpad-Export-Date: 2011-05-16 23:56+0000\n"
+"X-Generator: Launchpad (build 13045)\n"
 
 #: ../gtk/actions.c:53
 msgid "Sort by _Activity"
@@ -869,7 +869,7 @@ msgstr "_Zarrar Agora"
 
 #: ../gtk/main.c:1547
 msgid "A fast and easy BitTorrent client"
-msgstr "Un cliente BitTorrent rápidu y cenciellu"
+msgstr "Un veceru BitTorrent rápidu y cenciellu"
 
 #: ../gtk/main.c:1548
 msgid "Copyright (c) The Transmission Project"
@@ -883,9 +883,7 @@ msgid "translator-credits"
 msgstr ""
 "Launchpad Contributions:\n"
 "  Costales https://launchpad.net/~costales\n"
-"  Iñigo Varela https://launchpad.net/~ivarela\n"
-"  Xoan Sampaiño https://launchpad.net/~xoan\n"
-"  Xuacu Saturio https://launchpad.net/~xuacusk8"
+"  Iñigo Varela https://launchpad.net/~ivarela"
 
 #: ../gtk/makemeta-ui.c:78
 #, c-format
@@ -1249,7 +1247,7 @@ msgstr "Cliente BitTorrent"
 
 #: ../gtk/transmission-gtk.desktop.in.h:2
 msgid "Download and share files over BitTorrent"
-msgstr "Baxar y compartir ficheros mediante BitTorrent"
+msgstr "Baxar y compartir ficheros per aciu de BitTorrent"
 
 #: ../gtk/transmission-gtk.desktop.in.h:4
 msgid "Transmission BitTorrent Client"

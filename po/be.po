@@ -16,8 +16,8 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
 "n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
-"X-Launchpad-Export-Date: 2011-02-08 00:08+0000\n"
-"X-Generator: Launchpad (build 12335)\n"
+"X-Launchpad-Export-Date: 2011-05-16 23:56+0000\n"
+"X-Generator: Launchpad (build 13045)\n"
 
 #: ../gtk/actions.c:53
 msgid "Sort by _Activity"
@@ -885,10 +885,6 @@ msgstr ""
 #: ../gtk/main.c:1554
 msgid "translator-credits"
 msgstr ""
-"Launchpad Contributions:\n"
-"  Iryna Nikanchuk https://launchpad.net/~unetriste\n"
-"  Mikola Tsekhan https://launchpad.net/~tsekhan\n"
-"  Zmicer Krasiuk https://launchpad.net/~captain-flint"
 
 #: ../gtk/makemeta-ui.c:78
 #, c-format
@@ -1252,19 +1248,19 @@ msgstr "Кліент BitTorrent"
 
 #: ../gtk/transmission-gtk.desktop.in.h:2
 msgid "Download and share files over BitTorrent"
-msgstr ""
+msgstr "Запампоўка і абмен файламі ў сеткі BitTorrent"
 
 #: ../gtk/transmission-gtk.desktop.in.h:4
 msgid "Transmission BitTorrent Client"
-msgstr ""
+msgstr "BitTorrent-кліент Transmission"
 
 #: ../gtk/tr-core.c:1422
 msgid "Transmission Bittorrent Client"
-msgstr ""
+msgstr "BitTorrent-кліент Transmission"
 
 #: ../gtk/tr-core.c:1423
 msgid "BitTorrent Activity"
-msgstr ""
+msgstr "Актыўнасць BitTorrent"
 
 #: ../gtk/tr-core.c:1436
 msgid "Disallowing desktop hibernation"
@@ -2361,3 +2357,30 @@ msgstr ""
 #, c-format
 #~ msgid "%1$s of %2$s (%3$.2f%%), uploaded %4$s (Ratio: %5$s)"
 #~ msgstr "%1$s з %2$s (%3$.2f%%), выслана %4$s (Рэйтынг: %5$s)"
+
+#~ msgid "Announce URL"
+#~ msgstr "URL анонсу"
+
+#, c-format
+#~ msgid "Seeding to %1$'d of %2$'d connected peer"
+#~ msgid_plural "Seeding to %1$'d of %2$'d connected peers"
+#~ msgstr[0] "Раздача %1$'d из %2$'d падключанага вузла"
+#~ msgstr[1] "Раздача %1$'d из %2$'d падлучаных вузлоў"
+#~ msgstr[2] "Раздача %1$'d из %2$'d падлучаных вузлоў"
+
+#, c-format
+#~ msgid "Downloading from %1$'d of %2$'d connected peer"
+#~ msgid_plural "Downloading from %1$'d of %2$'d connected peers"
+#~ msgstr[0] "Прыём ад %1$'d з %2$'d падключанага вузла"
+#~ msgstr[1] "Прыём ад %1$'d з %2$'d падключаных вузлоў"
+#~ msgstr[2] "Прыём ад %1$'d з %2$'d падключаных вузлоў"
+
+#~ msgid "Tier"
+#~ msgstr "Узровень"
+
+#, c-format
+#~ msgid "Downloading metadata from %1$'d peer (%2$d%% done)"
+#~ msgid_plural "Downloading metadata from %1$'d peers (%2$d%% done)"
+#~ msgstr[0] "Загрузка метададзеных ад %1$'d ўдзельніка (%2$d%% завершана)"
+#~ msgstr[1] "Загрузка метададзеных ад %1$'d удзельнікаў (%2$d%% завершана)"
+#~ msgstr[2] "Загрузка метададзеных ад %1$'d удзельнікаў (%2$d%% завершана)"

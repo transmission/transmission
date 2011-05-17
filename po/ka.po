@@ -8,15 +8,15 @@ msgstr ""
 "Project-Id-Version: transmission\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2011-01-27 14:52-0600\n"
-"PO-Revision-Date: 2010-02-23 20:48+0000\n"
+"PO-Revision-Date: 2011-02-09 19:40+0000\n"
 "Last-Translator: aleksandre apkhaidze <momtsere@gmail.com>\n"
 "Language-Team: Georgian <ka@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Launchpad-Export-Date: 2011-02-08 00:08+0000\n"
-"X-Generator: Launchpad (build 12335)\n"
+"X-Launchpad-Export-Date: 2011-05-16 23:56+0000\n"
+"X-Generator: Launchpad (build 13045)\n"
 
 #: ../gtk/actions.c:53
 msgid "Sort by _Activity"
@@ -36,7 +36,7 @@ msgstr ""
 
 #: ../gtk/actions.c:57
 msgid "Sort by Stat_e"
-msgstr ""
+msgstr "მდგომარეობის მიხედვით"
 
 #: ../gtk/actions.c:58
 msgid "Sort by A_ge"
@@ -44,11 +44,11 @@ msgstr "დალაგება ასაკის მიხედვით"
 
 #: ../gtk/actions.c:59
 msgid "Sort by Time _Left"
-msgstr ""
+msgstr "დარჩენილი დროის მიხედვით"
 
 #: ../gtk/actions.c:60
 msgid "Sort by Si_ze"
-msgstr ""
+msgstr "ზომის მიხედვით"
 
 #: ../gtk/actions.c:77
 msgid "_Show Transmission"
@@ -60,15 +60,15 @@ msgstr "შეტყობინებების ჟურნალი"
 
 #: ../gtk/actions.c:93
 msgid "Enable Alternative Speed _Limits"
-msgstr ""
+msgstr "ალტერნატიული სიჩქარის გააქტიურება"
 
 #: ../gtk/actions.c:94
 msgid "_Compact View"
-msgstr ""
+msgstr "კომპაქტური ჩვენება"
 
 #: ../gtk/actions.c:95
 msgid "Re_verse Sort Order"
-msgstr ""
+msgstr "დალაგების შებრუნბა"
 
 #: ../gtk/actions.c:96
 msgid "_Filterbar"
@@ -84,7 +84,7 @@ msgstr "ხელსაწყოთა _პანელი"
 
 #: ../gtk/actions.c:103
 msgid "_File"
-msgstr ""
+msgstr "ფაილი"
 
 #: ../gtk/actions.c:104
 msgid "_Torrent"
@@ -108,7 +108,7 @@ msgstr "_დახმარება"
 
 #: ../gtk/actions.c:109
 msgid "Copy _Magnet Link to Clipboard"
-msgstr ""
+msgstr "მაგნიტის კოპირება"
 
 #: ../gtk/actions.c:110
 msgid "Open _URL..."
@@ -392,7 +392,7 @@ msgstr ""
 
 #: ../gtk/details.c:911
 msgid "Never"
-msgstr ""
+msgstr "არასოდეს"
 
 #: ../gtk/details.c:915
 msgid "Active now"
@@ -881,9 +881,6 @@ msgstr ""
 #: ../gtk/main.c:1554
 msgid "translator-credits"
 msgstr ""
-"Launchpad Contributions:\n"
-"  David Machakhelidze https://launchpad.net/~david-mac\n"
-"  Vladimer Sichinava https://launchpad.net/~alinux"
 
 #: ../gtk/makemeta-ui.c:78
 #, c-format
@@ -2156,6 +2153,10 @@ msgstr ""
 #~ msgid_plural "Remove torrents?"
 #~ msgstr[0] "ტორენტის ამოღება"
 
+#, c-format
+#~ msgid "%1$s (%2$s verified)"
+#~ msgstr "%1$s (%2$s უკვე შემოწმდა)"
+
 #~ msgid "Failed DL:"
 #~ msgstr "შეცდომიანი DL:"
 
@@ -2173,3 +2174,9 @@ msgstr ""
 
 #~ msgid "Torrent created!"
 #~ msgstr "ტორენტი შეიქმნა!"
+
+#~ msgid "Completion"
+#~ msgstr "დასრულება"
+
+#~ msgid "%1$.1f%% (%2$.1f%% selected)"
+#~ msgstr "%1$.1f%% (%2$.1f%% selected)"

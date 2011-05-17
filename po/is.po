@@ -15,8 +15,8 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2011-02-08 00:08+0000\n"
-"X-Generator: Launchpad (build 12335)\n"
+"X-Launchpad-Export-Date: 2011-05-16 23:57+0000\n"
+"X-Generator: Launchpad (build 13045)\n"
 
 #: ../gtk/actions.c:53
 msgid "Sort by _Activity"
@@ -882,15 +882,6 @@ msgstr ""
 #: ../gtk/main.c:1554
 msgid "translator-credits"
 msgstr ""
-"Launchpad Contributions:\n"
-"  Axel https://launchpad.net/~yucchan\n"
-"  Baldur https://launchpad.net/~baldurpet\n"
-"  Elísabet Einarsdóttir https://launchpad.net/~eeinarsdottir\n"
-"  Freyr Gunnar Ólafsson https://launchpad.net/~gnarlin\n"
-"  Hlini Melsteð https://launchpad.net/~hlini\n"
-"  Rúnar Freyr Þorsteinsson https://launchpad.net/~runarf\n"
-"  Samúel Jón Gunnarsson https://launchpad.net/~sammi\n"
-"  Tryggvi Björgvinsson https://launchpad.net/~tryggvib"
 
 #: ../gtk/makemeta-ui.c:78
 #, c-format
@@ -2149,6 +2140,10 @@ msgstr "Bíður eftir að vera endurskoðað"
 
 #~ msgid "<b>E_xtras</b>"
 #~ msgstr "<b>_Aukahlutir</b>"
+
+#, c-format
+#~ msgid "%1$s (%2$s verified)"
+#~ msgstr "%1$s (%2$s sannprófað)"
 
 #, c-format
 #~ msgid "Down: %s"

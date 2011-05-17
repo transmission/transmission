@@ -8,15 +8,15 @@ msgstr ""
 "Project-Id-Version: transmission\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2011-01-27 14:52-0600\n"
-"PO-Revision-Date: 2010-11-16 20:31+0000\n"
-"Last-Translator: Patrick (Petriko) Oudejans <Unknown>\n"
+"PO-Revision-Date: 2011-04-21 18:06+0000\n"
+"Last-Translator: Kristjan SCHMIDT <Unknown>\n"
 "Language-Team: Esperanto <eo@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2011-02-08 00:09+0000\n"
-"X-Generator: Launchpad (build 12335)\n"
+"X-Launchpad-Export-Date: 2011-05-16 23:57+0000\n"
+"X-Generator: Launchpad (build 13045)\n"
 
 #: ../gtk/actions.c:53
 msgid "Sort by _Activity"
@@ -80,11 +80,11 @@ msgstr "_Statbreto"
 
 #: ../gtk/actions.c:98
 msgid "_Toolbar"
-msgstr "_Ilobreto"
+msgstr "Ilobre_to"
 
 #: ../gtk/actions.c:103
 msgid "_File"
-msgstr "_Dosiero"
+msgstr "Dosiero"
 
 #: ../gtk/actions.c:104
 msgid "_Torrent"
@@ -674,7 +674,7 @@ msgstr ""
 
 #: ../gtk/details.c:2434
 msgid "_Remove"
-msgstr ""
+msgstr "Fo_rigi"
 
 #: ../gtk/details.c:2450
 msgid "Show _backup trackers"
@@ -796,7 +796,7 @@ msgstr "Envicigitaj"
 
 #: ../gtk/filter.c:720
 msgid "Verifying"
-msgstr "Kontrolas"
+msgstr "Kontrolante"
 
 #: ../gtk/filter.c:721 ../gtk/msgwin.c:414
 msgid "Error"
@@ -886,18 +886,8 @@ msgstr "Kopirajto (c) La Transmission-projekto"
 msgid "translator-credits"
 msgstr ""
 "Launchpad Contributions:\n"
-"  Brian Croom https://launchpad.net/~aikoniv\n"
-"  Emmanuel Gil Peyrot https://launchpad.net/~linkmauve\n"
-"  Kristjan SCHMIDT https://launchpad.net/~kristjan-eo\n"
-"  Leif Arne Storset https://launchpad.net/~lastorset\n"
-"  Leo Arias https://launchpad.net/~elopio\n"
-"  Lucas Larson https://launchpad.net/~lucaslarson\n"
-"  M. https://launchpad.net/~matmututu\n"
-"  Michael MORONI https://launchpad.net/~haikara90\n"
-"  Patrick (Petriko) Oudejans https://launchpad.net/~patrickoudejans\n"
-"  Stephen Brown https://launchpad.net/~sbrown1992\n"
-"  William Theaker https://launchpad.net/~wsttrollboy\n"
-"  kitzOgen https://launchpad.net/~kitzogen"
+"  Michael Moroni https://launchpad.net/~airon90\n"
+"  Shane D https://launchpad.net/~dimensional"
 
 #: ../gtk/makemeta-ui.c:78
 #, c-format
@@ -917,7 +907,7 @@ msgstr "Eraro: nevalica anonc-URL \"%s\""
 #: ../gtk/makemeta-ui.c:84
 #, c-format
 msgid "Cancelled"
-msgstr "Nuligita"
+msgstr "Nuligite"
 
 #: ../gtk/makemeta-ui.c:86
 #, c-format
@@ -2337,6 +2327,13 @@ msgstr "Envicigita por kontrolo"
 #~ msgid_plural "<i>%1$s; %2$'d Files</i>"
 #~ msgstr[0] "<i>%1$s; %2$'d Dosiero</i>"
 #~ msgstr[1] "<i>%1$s; %2$'d Dosieroj</i>"
+
+#, c-format
+#~ msgid "%1$s (%2$s verified)"
+#~ msgstr "%1$s (%2$s kontrolita)"
+
+#~ msgid "File \"%s\" is already open"
+#~ msgstr "Dosiero \"%s\" estas jam malfermita"
 
 #, c-format
 #~ msgid "%'d Piece"

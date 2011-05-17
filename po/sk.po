@@ -15,8 +15,8 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n==1) ? 1 : (n>=2 && n<=4) ? 2 : 0;\n"
-"X-Launchpad-Export-Date: 2011-02-08 00:08+0000\n"
-"X-Generator: Launchpad (build 12335)\n"
+"X-Launchpad-Export-Date: 2011-05-16 23:56+0000\n"
+"X-Generator: Launchpad (build 13045)\n"
 "X-Poedit-Country: SLOVAKIA\n"
 "X-Poedit-Language: Slovak\n"
 "X-Poedit-SourceCharset: utf-8\n"
@@ -904,15 +904,7 @@ msgstr "Copyright (c) The Transmission Project"
 msgid "translator-credits"
 msgstr ""
 "Launchpad Contributions:\n"
-"  Martin Šturcel https://launchpad.net/~martin-sturcel\n"
-"  Matej Krajčovič https://launchpad.net/~elbarto512\n"
-"  Pavol Klačanský https://launchpad.net/~pavolzetor\n"
-"  Peter Mráz https://launchpad.net/~etki\n"
-"  Roman Horník https://launchpad.net/~roman.hornik\n"
-"  Tomas Hasko https://launchpad.net/~thasko\n"
-"  helix84 https://launchpad.net/~helix84\n"
-"  milboy https://launchpad.net/~milboys\n"
-"  mirek https://launchpad.net/~bletvaska"
+"  Tomas Hasko https://launchpad.net/~thasko"
 
 #: ../gtk/makemeta-ui.c:78
 #, c-format
@@ -2073,6 +2065,10 @@ msgstr "Zaradený do radu na overenie"
 #~ msgid "Now"
 #~ msgstr "Teraz"
 
+#, c-format
+#~ msgid "%1$s (%2$s verified)"
+#~ msgstr "%1$s (%2$s overených)"
+
 #~ msgid "Sort by _State"
 #~ msgstr "Usporiadať podľa _stavu"
 
@@ -2975,3 +2971,15 @@ msgstr "Zaradený do radu na overenie"
 #~ msgstr ""
 #~ "Transmission už beží, ale nereaguje.  Keď chcete spustiť novú reláciu, "
 #~ "musíte najskôr zatvoriť existujúci proces."
+
+#, c-format
+#~ msgid "%1$s (%2$s%% of %3$s%% Available) + %4$s Unverified"
+#~ msgstr "%1$s (%2$s%% z %3$s%% dostupných) + %4$s neoverených"
+
+#, c-format
+#~ msgid "Limit u_pload speed (%s):"
+#~ msgstr "Obmedziť rýchlosť _odosielania (%s):"
+
+#, c-format
+#~ msgid "Limit do_wnload speed (%s):"
+#~ msgstr "Obmedziť rýchlosť _sťahovania (%s):"

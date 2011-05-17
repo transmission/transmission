@@ -11,16 +11,16 @@ msgstr ""
 "Project-Id-Version: Transmission\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2011-01-27 14:52-0600\n"
-"PO-Revision-Date: 2011-01-29 22:54+0000\n"
-"Last-Translator: Piotr Drąg <piotrdrag@gmail.com>\n"
+"PO-Revision-Date: 2011-05-01 07:19+0000\n"
+"Last-Translator: Łukasz Jernaś <deejay1@srem.org>\n"
 "Language-Team: Polish <gnomepl@aviary.pl>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 "
 "|| n%100>=20) ? 1 : 2;\n"
-"X-Launchpad-Export-Date: 2011-02-08 00:08+0000\n"
-"X-Generator: Launchpad (build 12335)\n"
+"X-Launchpad-Export-Date: 2011-05-16 23:56+0000\n"
+"X-Generator: Launchpad (build 13045)\n"
 "X-Poedit-Country: Poland\n"
 "X-Poedit-Language: Polish\n"
 
@@ -402,7 +402,7 @@ msgstr "Nigdy"
 
 #: ../gtk/details.c:915
 msgid "Active now"
-msgstr "Aktywuj teraz"
+msgstr "Obecnie aktywne"
 
 #: ../gtk/details.c:919
 #, c-format
@@ -903,36 +903,11 @@ msgstr "Copyright (c) Projekt Transmission"
 msgid "translator-credits"
 msgstr ""
 "Launchpad Contributions:\n"
-"  Bartosz Kaszubowski https://launchpad.net/~simek\n"
-"  Inox https://launchpad.net/~inox\n"
-"  Jakub Kamecki https://launchpad.net/~puchat3k\n"
-"  Krzysztof Janowski https://launchpad.net/~n00bystance-gmail\n"
-"  Krzysztof Tataradziński https://launchpad.net/~tatar111\n"
-"  Maciej Helt https://launchpad.net/~maciejhelt\n"
-"  Marek https://launchpad.net/~marek-sa2121\n"
-"  Michał Pławsiuk (razit.pl) https://launchpad.net/~mp3-10\n"
 "  Piotr Drąg https://launchpad.net/~raven46\n"
-"  Piotr Lipski https://launchpad.net/~lipski-piotr\n"
 "  Piotr Makowski (Aviary.pl) https://launchpad.net/~zaryk\n"
-"  Piotr Puldzian Płucienniczak https://launchpad.net/~puldzian\n"
-"  Piotr Wicijowski https://launchpad.net/~piwsko\n"
-"  Piotr Łukomiak https://launchpad.net/~pioluk\n"
-"  Rafał Barański https://launchpad.net/~kazislav\n"
-"  Saifer https://launchpad.net/~sawicki-lukasz\n"
-"  TSr https://launchpad.net/~tsr\n"
 "  Tomasz Dominikowski https://launchpad.net/~dominikowski\n"
-"  Vilk https://launchpad.net/~vilkh3m\n"
-"  Wacław Jacek https://launchpad.net/~waclawjacek\n"
-"  hence https://launchpad.net/~maciekradoszko\n"
-"  odra27 https://launchpad.net/~odra27\n"
-"  roffik https://launchpad.net/~roffik\n"
-"  skrzat https://launchpad.net/~radek-floraland\n"
 "  tEster https://launchpad.net/~te2ster-deactivatedaccount\n"
-"  wojtusm https://launchpad.net/~wojtusm\n"
-"  Łukasz Jernaś https://launchpad.net/~deejay1\n"
-"  Łukasz Przybylok https://launchpad.net/~lukasz2003\n"
-"  Łukasz Stasica https://launchpad.net/~sthoo-pl\n"
-"  Łukasz Wyszyński https://launchpad.net/~darzki"
+"  Łukasz Jernaś https://launchpad.net/~deejay1"
 
 #: ../gtk/makemeta-ui.c:78
 #, c-format
@@ -2388,6 +2363,13 @@ msgstr "W kolejce do sprawdzania"
 #~ msgstr[1] "%'d części"
 #~ msgstr[2] "%'d części"
 
+#, c-format
+#~ msgid "%1$s (%2$s verified)"
+#~ msgstr "%1$s (%2$s sprawdzonych)"
+
+#~ msgid "File \"%s\" is already open"
+#~ msgstr "Plik %s jest już otwarty"
+
 #~ msgid "_Move source file to Trash"
 #~ msgstr "Przenieś plik źródłowy do _kosza"
 
@@ -2417,6 +2399,30 @@ msgstr "W kolejce do sprawdzania"
 
 #~ msgid "Tier"
 #~ msgstr "Rząd"
+
+#~ msgid "_Ignore unencrypted peers"
+#~ msgstr "_Ignorowanie niezaszyfrowanych partnerów"
+
+#~ msgid "Blocklist updated with %'d entries"
+#~ msgstr "Lista zablokowanych ukaktualniona %'d wpisami"
+
+#~ msgid "Parsing blocklist..."
+#~ msgstr "Sprawdzanie listy zablokowanych..."
+
+#~ msgid "Uncompressing blocklist..."
+#~ msgstr "Rozpakowywanie listy zablokowanych..."
+
+#~ msgid "Unable to get blocklist: %s"
+#~ msgstr "Nie można pobrać listy zablokowanych: %s"
+
+#~ msgid "Unable to get blocklist."
+#~ msgstr "Nie można pobrać listy zablokowanych."
+
+#~ msgid "Completion"
+#~ msgstr "Ukończenie"
+
+#~ msgid "%1$.1f%% (%2$.1f%% selected)"
+#~ msgstr "%1$.1f%% (%2$.1f%% zaznaczenia)"
 
 #~ msgid "Show _icon in the desktop Notification Area"
 #~ msgstr "Wyświetl _ikonę w obszarze powiadamiania"

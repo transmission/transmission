@@ -19,15 +19,15 @@ msgstr ""
 "Project-Id-Version: transmission\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2011-01-27 14:52-0600\n"
-"PO-Revision-Date: 2010-11-12 20:42+0000\n"
+"PO-Revision-Date: 2011-03-12 11:14+0000\n"
 "Last-Translator: Luca Ferretti <elle.uca@ubuntu-it.org>\n"
 "Language-Team: Italian <tp@lists.linux.it>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2011-02-08 00:08+0000\n"
-"X-Generator: Launchpad (build 12335)\n"
+"X-Launchpad-Export-Date: 2011-05-16 23:56+0000\n"
+"X-Generator: Launchpad (build 13045)\n"
 
 #: ../gtk/actions.c:53
 msgid "Sort by _Activity"
@@ -188,7 +188,7 @@ msgstr "Rimuove il torrent"
 
 #: ../gtk/actions.c:122
 msgid "_Delete Files and Remove"
-msgstr "Eli_mina file e rimuovi"
+msgstr "Elimina _file e rimuovi"
 
 #: ../gtk/actions.c:123
 msgid "_New..."
@@ -337,7 +337,7 @@ msgstr "In pausa"
 
 #: ../gtk/details.c:604
 msgid "N/A"
-msgstr ""
+msgstr "N/D"
 
 #: ../gtk/details.c:616 ../gtk/file-list.c:621
 msgid "Mixed"
@@ -397,7 +397,7 @@ msgstr "%1$s (+%2$s non attendibile)"
 #: ../gtk/details.c:870
 #, c-format
 msgid "%s (Ratio: %s)"
-msgstr ""
+msgstr "%s (Rapporto: %s)"
 
 #: ../gtk/details.c:898
 msgid "No errors"
@@ -567,11 +567,11 @@ msgstr "Connessione cifrata"
 
 #: ../gtk/details.c:1483
 msgid "Peer was found through Peer Exchange (PEX)"
-msgstr ""
+msgstr "Il nodo è strato trovato attraverso PEX (Peer Exchange)"
 
 #: ../gtk/details.c:1484
 msgid "Peer was found through DHT"
-msgstr ""
+msgstr "Il nodo è strato trovato attraverso DHT"
 
 #: ../gtk/details.c:1485
 msgid "Peer is an incoming connection"
@@ -645,12 +645,12 @@ msgstr "L'elenco contiene degli URL non validi"
 
 #: ../gtk/details.c:2142
 msgid "Please correct the errors and try again."
-msgstr ""
+msgstr "Correggere gli errori e provare nuovamente"
 
 #: ../gtk/details.c:2192
 #, c-format
 msgid "%s - Edit Trackers"
-msgstr ""
+msgstr "%s - Modifica tracker"
 
 #: ../gtk/details.c:2203
 msgid "Tracker Announce URLs"
@@ -668,7 +668,7 @@ msgstr ""
 #: ../gtk/details.c:2302
 #, c-format
 msgid "%s - Add Tracker"
-msgstr ""
+msgstr "%s - Aggiungi tracker"
 
 #: ../gtk/details.c:2317
 msgid "Tracker"
@@ -684,7 +684,7 @@ msgstr "Server traccia"
 
 #: ../gtk/details.c:2423
 msgid "_Add"
-msgstr ""
+msgstr "A_ggiungi"
 
 #: ../gtk/details.c:2434
 msgid "_Remove"
@@ -773,7 +773,7 @@ msgstr "Nome"
 #. add "size" column
 #: ../gtk/file-list.c:967
 msgid "Size"
-msgstr ""
+msgstr "Dimensione"
 
 # (ndt) sembra indichi la quantità disponibile del file
 #. add "progress" column
@@ -828,6 +828,8 @@ msgstr "Mo_stra:"
 msgid ""
 "Got signal %d; trying to shut down cleanly. Do it again if it gets stuck."
 msgstr ""
+"Ricevuto il segnale %d; avvio dell'arresto in modo pulito. Eseguire "
+"nuovamente se dovesse rimanere bloccato."
 
 #: ../gtk/main.c:723
 msgid "Start with all torrents paused"
@@ -858,6 +860,8 @@ msgid ""
 "Transmission is already running, but is not responding. To start a new "
 "session, you must first close the existing Transmission process."
 msgstr ""
+"Transmission è già in esecuzione, ma non risponde. Per avviare una nuova "
+"sessione è necessario in primo luogo chiudere il relativo processo esistente."
 
 #: ../gtk/main.c:876
 msgid "Transmission cannot be started."
@@ -905,27 +909,7 @@ msgstr ""
 "Calorì Alessandro\n"
 "\n"
 "Launchpad Contributions:\n"
-"  Alessandro Ranaldi https://launchpad.net/~ciaolo\n"
-"  Alessandro Zattoni https://launchpad.net/~ckale82\n"
-"  Antonio Piccinno https://launchpad.net/~acquarica\n"
-"  Damiano Di Carlo https://launchpad.net/~dldc\n"
-"  Fabrizio Papa https://launchpad.net/~fabri06\n"
-"  Federico \"Zio Vec\" Vecchio https://launchpad.net/~fedevecna\n"
-"  Fire https://launchpad.net/~redsoul\n"
-"  Francesco Baldini https://launchpad.net/~francesco-baldini\n"
-"  Guybrush88 https://launchpad.net/~erpizzo\n"
-"  Luca Ferretti https://launchpad.net/~elle.uca\n"
-"  Luca Wehrstedt https://launchpad.net/~lerks\n"
-"  Matteo Settenvini https://launchpad.net/~tchernobog\n"
-"  Milo Casagrande https://launchpad.net/~milo\n"
-"  Nicola S. https://launchpad.net/~strambinico\n"
-"  Salvatore Udda https://launchpad.net/~udda\n"
-"  domenico https://launchpad.net/~cioffo88\n"
-"  flux https://launchpad.net/~luigimarco\n"
-"  ftaurino https://launchpad.net/~francesco-taurino\n"
-"  gdevitis https://launchpad.net/~gdevitis123\n"
-"  linuxenos https://launchpad.net/~linuxenos\n"
-"  magnuspub https://launchpad.net/~magnus-gmx"
+"  Francesco Baldini https://launchpad.net/~francesco-baldini"
 
 #: ../gtk/makemeta-ui.c:78
 #, c-format
@@ -1043,7 +1027,7 @@ msgstr "Scaricamento completo"
 
 #: ../gtk/notify.c:131
 msgid "Torrent Complete"
-msgstr "Torrent completo"
+msgstr "Torrent completato"
 
 #: ../gtk/notify.c:144
 msgid "Open File"
@@ -1157,6 +1141,9 @@ msgid ""
 "These statistics are for your information only. Resetting them doesn't "
 "affect the statistics logged by your BitTorrent trackers."
 msgstr ""
+"Queste statistiche sono solo per informazione personale. Azzerandole non si "
+"modifica in alcun modo le statistiche registrate dai propri tracker "
+"BitTorrent."
 
 #: ../gtk/stats.c:119 ../gtk/stats.c:149
 msgid "_Reset"
@@ -1398,7 +1385,7 @@ msgstr "<b>Aggiornamento riuscito.</b>"
 
 #: ../gtk/tr-prefs.c:434
 msgid "<b>Unable to update.</b>"
-msgstr ""
+msgstr "<b>Impossibile aggiornare.</b>"
 
 #: ../gtk/tr-prefs.c:449
 msgid "Update Blocklist"
@@ -1569,7 +1556,7 @@ msgstr ""
 
 #: ../gtk/tr-prefs.c:1035
 msgid "Alternative Speed Limits"
-msgstr ""
+msgstr "Limiti di velocità alternativi"
 
 #: ../gtk/tr-prefs.c:1042
 msgid "Override normal speed limits manually or at scheduled times"
@@ -1616,7 +1603,7 @@ msgstr "<i>Controllo...</i>"
 
 #: ../gtk/tr-prefs.c:1184
 msgid "Listening Port"
-msgstr ""
+msgstr "Porta in ascolto"
 
 #: ../gtk/tr-prefs.c:1186
 msgid "_Port used for incoming connections:"
@@ -1637,7 +1624,7 @@ msgstr "Usare il _forwarding della porta UPnP o NAT-PMP dal router"
 
 #: ../gtk/tr-prefs.c:1210
 msgid "Peer Limits"
-msgstr ""
+msgstr "Limiti dei nodi"
 
 #: ../gtk/tr-prefs.c:1213
 msgid "Maximum peers per _torrent:"
@@ -1649,7 +1636,7 @@ msgstr "Numero massimo di nodi _globale:"
 
 #: ../gtk/tr-prefs.c:1220
 msgid "Edit GNOME Proxy Settings"
-msgstr ""
+msgstr "Modifica impostazioni proxy di GNOME"
 
 #: ../gtk/tr-prefs.c:1241
 msgid "Transmission Preferences"
@@ -1694,6 +1681,8 @@ msgid ""
 "Click to disable Alternative Speed Limits\n"
 "(%1$s down, %2$s up)"
 msgstr ""
+"Fare clic per disabilitare i limiti di velocità alternativi\n"
+"(%1$s in ricezione, %2$s in invio)"
 
 #: ../gtk/tr-window.c:266
 #, c-format
@@ -1701,6 +1690,8 @@ msgid ""
 "Click to enable Alternative Speed Limits\n"
 "(%1$s down, %2$s up)"
 msgstr ""
+"Fare clic per abilitare i limiti di velocità alternativi\n"
+"(%1$s in ricezione, %2$s in invio)"
 
 #: ../gtk/tr-window.c:333
 #, c-format
@@ -1831,7 +1822,7 @@ msgstr "Meta-dati non validi"
 #: ../libtransmission/bencode.c:1705 ../libtransmission/bencode.c:1741
 #, c-format
 msgid "Couldn't save temporary file \"%1$s\": %2$s"
-msgstr "Impossibile salvare i file temporaneo «%1$s»: %2$s"
+msgstr "Impossibile salvare il file temporaneo «%1$s»: %2$s"
 
 #: ../libtransmission/bencode.c:1721
 #, c-format
@@ -1918,7 +1909,7 @@ msgstr "Impossibile connettere il socket %d a %s, porta %d (errno %d - %s)"
 
 #: ../libtransmission/net.c:397
 msgid "Is another copy of Transmission already running?"
-msgstr "Il programma è già in esecuzione?"
+msgstr "È già in esecuzione un'altra istanza di Transmission?"
 
 #: ../libtransmission/net.c:402
 #, c-format
@@ -1933,7 +1924,7 @@ msgstr "Impossibile eseguire il bind per la porta %d su %s: %s (%s)"
 #: ../libtransmission/peer-msgs.c:1913
 #, c-format
 msgid "Please Verify Local Data! Piece #%zu is corrupt."
-msgstr ""
+msgstr "Verificare i dati locali. Il pezzo numero %zu risulta danneggiato."
 
 #: ../libtransmission/port-forwarding.c:33
 msgid "Port Forwarding"
@@ -1991,6 +1982,9 @@ msgid ""
 "No data found! Ensure your drives are connected or use \"Set Location\". To "
 "re-download, remove the torrent and re-add it."
 msgstr ""
+"Nessun dato trovato. Verificare che le unità siano connesse oppure usare "
+"«Imposta posizione». Per scaricare ripartendo da zero, rimuovere il torrent "
+"e ri-aggiungerlo."
 
 #: ../libtransmission/torrent.c:1635
 msgid "Restarted manually -- disabling its seed ratio"
@@ -2041,6 +2035,8 @@ msgstr "Interruzione forwarding della porta attraverso «%s», servizio «%s»"
 msgid ""
 "Port forwarding through \"%s\", service \"%s\". (local address: %s:%d)"
 msgstr ""
+"Forwarding della porta attraverso \"%s\", servizio \"%s\" (indirizzo locale: "
+"%s:%d)."
 
 #: ../libtransmission/upnp.c:224
 msgid "Port forwarding successful!"
@@ -2459,6 +2455,9 @@ msgstr "In coda per essere verificato"
 
 #~ msgid "_Move source file to Trash"
 #~ msgstr "Spostare i _file sorgente nel cestino"
+
+#~ msgid "File \"%s\" is already open"
+#~ msgstr "Il file «%s» è già aperto"
 
 #, c-format
 #~ msgid "Enable _blocklist (contains %'d rule)"

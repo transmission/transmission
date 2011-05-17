@@ -15,14 +15,14 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2011-01-27 14:52-0600\n"
 "PO-Revision-Date: 2011-01-04 09:57+0000\n"
-"Last-Translator: Bruno Patri <bruno.patri@gmail.com>\n"
+"Last-Translator: Bruno Patri <Unknown>\n"
 "Language-Team: GNOME French Team <gnomefr@traduc.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n > 1;\n"
-"X-Launchpad-Export-Date: 2011-02-08 00:09+0000\n"
-"X-Generator: Launchpad (build 12335)\n"
+"X-Launchpad-Export-Date: 2011-05-16 23:56+0000\n"
+"X-Generator: Launchpad (build 13045)\n"
 
 #: ../gtk/actions.c:53
 msgid "Sort by _Activity"
@@ -174,7 +174,7 @@ msgstr "Démarrer tous les torrents"
 
 #: ../gtk/actions.c:120
 msgid "Set _Location..."
-msgstr ""
+msgstr "Définir l’_emplacement…"
 
 #: ../gtk/actions.c:121
 msgid "Remove torrent"
@@ -248,19 +248,19 @@ msgstr ""
 
 #: ../gtk/details.c:456
 msgid "Seed regardless of ratio"
-msgstr ""
+msgstr "Partager quel que soit le ratio"
 
 #: ../gtk/details.c:457
 msgid "Stop seeding at ratio:"
-msgstr ""
+msgstr "Partager jusqu’à un ratio de :"
 
 #: ../gtk/details.c:468
 msgid "Seed regardless of activity"
-msgstr ""
+msgstr "Partager quelle que soit l’activité"
 
 #: ../gtk/details.c:469
 msgid "Stop seeding if idle for N minutes:"
-msgstr ""
+msgstr "Arrêter de partager si inactif depuis N minutes :"
 
 #: ../gtk/details.c:485 ../gtk/tr-prefs.c:1258
 msgid "Speed"
@@ -273,12 +273,12 @@ msgstr "Respecter les _limites globales"
 #: ../gtk/details.c:492
 #, c-format
 msgid "Limit _download speed (%s):"
-msgstr ""
+msgstr "Limiter la vitesse de _téléchargement (%s) :"
 
 #: ../gtk/details.c:505
 #, c-format
 msgid "Limit _upload speed (%s):"
-msgstr ""
+msgstr "Limiter la vitesse d'_envoi (%s) :"
 
 #: ../gtk/details.c:518 ../gtk/open-dialog.c:355
 msgid "Torrent _priority:"
@@ -286,15 +286,15 @@ msgstr "_Priorité du torrent :"
 
 #: ../gtk/details.c:522
 msgid "Seeding Limits"
-msgstr ""
+msgstr "Limites de partage :"
 
 #: ../gtk/details.c:532
 msgid "_Ratio:"
-msgstr ""
+msgstr "_Ratio :"
 
 #: ../gtk/details.c:541
 msgid "_Idle:"
-msgstr ""
+msgstr "_Inactivité :"
 
 #: ../gtk/details.c:544
 msgid "Peer Connections"
@@ -330,7 +330,7 @@ msgstr "Suspendu"
 
 #: ../gtk/details.c:604
 msgid "N/A"
-msgstr ""
+msgstr "N/D"
 
 #: ../gtk/details.c:616 ../gtk/file-list.c:621
 msgid "Mixed"
@@ -338,7 +338,7 @@ msgstr "Mixte"
 
 #: ../gtk/details.c:617
 msgid "No Torrents Selected"
-msgstr ""
+msgstr "Aucun torrent sélectionné"
 
 #: ../gtk/details.c:639
 msgid "Private to this tracker -- DHT and PEX disabled"
@@ -370,12 +370,12 @@ msgstr "Inconnu"
 #: ../gtk/details.c:825
 #, c-format
 msgid "%1$s (%2$s%%)"
-msgstr ""
+msgstr "%1$s (%2$s%%)"
 
 #: ../gtk/details.c:827
 #, c-format
 msgid "%1$s (%2$s%% of %3$s%% Available)"
-msgstr ""
+msgstr "%1$s (%2$s%% sur %3$s%% disponible)"
 
 #: ../gtk/details.c:829
 #, c-format
@@ -390,11 +390,11 @@ msgstr "%1$s (+%2$s corrompu)"
 #: ../gtk/details.c:870
 #, c-format
 msgid "%s (Ratio: %s)"
-msgstr ""
+msgstr "%s (ratio : %s)"
 
 #: ../gtk/details.c:898
 msgid "No errors"
-msgstr ""
+msgstr "Aucune erreur"
 
 #: ../gtk/details.c:911
 msgid "Never"
@@ -888,7 +888,7 @@ msgstr "Un client BitTorrent simple et rapide"
 
 #: ../gtk/main.c:1548
 msgid "Copyright (c) The Transmission Project"
-msgstr ""
+msgstr "Copyright (c) « The Transmission Project »"
 
 #. Translators: translate "translator-credits" as your name
 #. to have it appear in the credits in the "About"
@@ -901,74 +901,14 @@ msgstr ""
 "Jean-François Fortin Tam <nekohayo arobas gmail.com>, 2007.\n"
 "\n"
 "Launchpad Contributions:\n"
-"  Alban CLERGEOT https://launchpad.net/~alban-clergeot\n"
-"  Alexandre C https://launchpad.net/~exodus56\n"
-"  Alexandre Franke https://launchpad.net/~afranke\n"
-"  Anthony Guéchoum https://launchpad.net/~athael\n"
 "  Anthony Noël https://launchpad.net/~gnomaton\n"
-"  Arnaud Bonatti https://launchpad.net/~arnaud.bonatti\n"
-"  Arnaud Dessein https://launchpad.net/~arnaud.dessein\n"
-"  Arzach https://launchpad.net/~arzach\n"
-"  BeN https://launchpad.net/~benjamin-pousse-member\n"
-"  BobMauchin https://launchpad.net/~zebob.m\n"
-"  Bruno Patri https://launchpad.net/~bruno-patri\n"
-"  Claude Gagné https://launchpad.net/~miltiad\n"
-"  Clément DREHER https://launchpad.net/~cdreher\n"
 "  Cyril GRAGEON https://launchpad.net/~cyril-g\n"
-"  Cyrille Pontvieux https://launchpad.net/~jrd-enialis\n"
-"  Damien Haïkal https://launchpad.net/~damien-haikal\n"
-"  Denis Jasselette https://launchpad.net/~denis-jasselette\n"
-"  Emilien Klein https://launchpad.net/~emilien-klein\n"
-"  Eric https://launchpad.net/~1eric\n"
-"  Francis Careau https://launchpad.net/~francis-careau\n"
-"  Francois Magimel https://launchpad.net/~linkid\n"
-"  Gabriel U. https://launchpad.net/~gabriel-ull\n"
 "  Guillaume Lemaître https://launchpad.net/~guillaume-lemaitre\n"
 "  Guillaume Mazoyer https://launchpad.net/~respawneral\n"
-"  Jochen Schäfer https://launchpad.net/~lemecje83\n"
-"  Johan Serre https://launchpad.net/~serre-johan\n"
-"  Jonathan Ernst https://launchpad.net/~jonathan.ernst\n"
-"  Kaïs Bejaoui https://launchpad.net/~kais\n"
-"  Loic Treyvaud https://launchpad.net/~loictreyvaud\n"
-"  MBuBuntu https://launchpad.net/~mbubuntu\n"
-"  Maijin https://launchpad.net/~maijin-live\n"
-"  Matthieu Martin https://launchpad.net/~matthieu-martin\n"
-"  Milan Bouchet-Valat https://launchpad.net/~nalimilan\n"
-"  NaSH https://launchpad.net/~lenashou\n"
-"  Niki https://launchpad.net/~nikiroo\n"
-"  Nomis https://launchpad.net/~simon-chatain\n"
-"  Pascal Lemazurier https://launchpad.net/~pascal-lemazurier\n"
-"  Penegal https://launchpad.net/~penegal\n"
-"  Pierre David https://launchpad.net/~azerty-de\n"
-"  Pierre Hanselmann https://launchpad.net/~pierre-hanselmann\n"
-"  Pierre Rudloff https://launchpad.net/~tael67\n"
-"  Rafik Ouerchefani https://launchpad.net/~rafik\n"
-"  RedGuff https://launchpad.net/~domsau2\n"
-"  Romain Fontaine https://launchpad.net/~romain145\n"
-"  Rémy Loubet https://launchpad.net/~brxl\n"
-"  Simon Déziel https://launchpad.net/~sdeziel\n"
-"  Splash https://launchpad.net/~splash-open-web\n"
-"  Stéphane Loeuillet https://launchpad.net/~leroutier\n"
-"  Thomas Grim https://launchpad.net/~thomas-grim\n"
-"  TuniX12 https://launchpad.net/~tunix12-deactivatedaccount\n"
-"  Ulrich Etile https://launchpad.net/~chets\n"
-"  Vincent Batoufflet https://launchpad.net/~santx\n"
-"  Vincent Coiffier https://launchpad.net/~vcoiffier\n"
-"  Vincent Garibal https://launchpad.net/~vincent-garibal\n"
-"  [MA]Pascal https://launchpad.net/~pborreli\n"
-"  alienworkshop https://launchpad.net/~alienworkshop\n"
-"  billux13 https://launchpad.net/~romain-dessort\n"
-"  elgeneralmidi https://launchpad.net/~ubuntufromscratch-deactivatedaccount\n"
-"  jac3n https://launchpad.net/~jacen-mail\n"
-"  jordan https://launchpad.net/~jordan-transmission\n"
-"  lann https://launchpad.net/~lann\n"
-"  lp.descamps https://launchpad.net/~lp-descamps\n"
-"  moimael https://launchpad.net/~moimael\n"
-"  ooliver27 https://launchpad.net/~ooliver27\n"
-"  royto https://launchpad.net/~royto\n"
-"  slurbe https://launchpad.net/~slurbe\n"
-"  tomestla https://launchpad.net/~tomestla\n"
-"  viktor https://launchpad.net/~lfraisse"
+"  Isabell Long https://launchpad.net/~issyl0\n"
+"  Jean-Philippe LECHÊNE https://launchpad.net/~jphlechene\n"
+"  Karen Baxter https://launchpad.net/~alcohol-baxter\n"
+"  Pierre Rudloff https://launchpad.net/~tael67"
 
 #: ../gtk/makemeta-ui.c:78
 #, c-format
@@ -1227,7 +1167,7 @@ msgstr "Total"
 #: ../gtk/stats.c:176
 #, c-format
 msgid "Started %'d time"
-msgstr ""
+msgstr "Démarré %d fois"
 
 #. %1$s is how much we've got,
 #. %2$s is how much we'll have when done,
@@ -1235,7 +1175,7 @@ msgstr ""
 #: ../gtk/torrent-cell-renderer.c:63
 #, c-format
 msgid "%1$s of %2$s (%3$s%%)"
-msgstr ""
+msgstr "%1$s de %2$s (%3$s% %)"
 
 #. %1$s is how much we've got,
 #. %2$s is the torrent's total size,
@@ -1246,7 +1186,7 @@ msgstr ""
 #: ../gtk/torrent-cell-renderer.c:79
 #, c-format
 msgid "%1$s of %2$s (%3$s%%), uploaded %4$s (Ratio: %5$s Goal: %6$s)"
-msgstr ""
+msgstr "%1$s de %2$s (%3$s% %), envoyé %4$s (ratio : %5$s objectif : %6$s)"
 
 #. %1$s is how much we've got,
 #. %2$s is the torrent's total size,
@@ -1256,7 +1196,7 @@ msgstr ""
 #: ../gtk/torrent-cell-renderer.c:95
 #, c-format
 msgid "%1$s of %2$s (%3$s%%), uploaded %4$s (Ratio: %5$s)"
-msgstr ""
+msgstr "%1$s de %2$s (%3$s% %), envoyé %4$s (ratio : %5$s)"
 
 #. %1$s is the torrent's total size,
 #. %2$s is how much we've uploaded,
@@ -1406,11 +1346,11 @@ msgstr "Appeler ce scrip_t quand un torrent est terminé :"
 
 #: ../gtk/tr-prefs.c:321
 msgid "Stop seeding at _ratio:"
-msgstr ""
+msgstr "Partager jusqu’à un ratio de :"
 
 #: ../gtk/tr-prefs.c:328
 msgid "Stop seeding if idle for _N minutes:"
-msgstr ""
+msgstr "Arrêter de partager si inactif depuis _N minutes :"
 
 #: ../gtk/tr-prefs.c:352 ../gtk/tr-prefs.c:1267
 msgid "Desktop"
@@ -1439,7 +1379,7 @@ msgstr "<b>Mise à jour réussie !</b>"
 
 #: ../gtk/tr-prefs.c:434
 msgid "<b>Unable to update.</b>"
-msgstr ""
+msgstr "<b>Mise à jour impossible.</b>"
 
 #: ../gtk/tr-prefs.c:449
 msgid "Update Blocklist"
@@ -1467,7 +1407,7 @@ msgstr "Liste d'exclusion"
 
 #: ../gtk/tr-prefs.c:498
 msgid "Enable _blocklist:"
-msgstr ""
+msgstr "Activer la liste d’exclusion :"
 
 #: ../gtk/tr-prefs.c:512
 msgid "_Update"
@@ -1503,7 +1443,7 @@ msgstr ""
 
 #: ../gtk/tr-prefs.c:544
 msgid "Use _Local Peer Discovery to find more peers"
-msgstr ""
+msgstr "Utiliser la découverte de pairs _locaux pour trouver plus de pairs"
 
 #: ../gtk/tr-prefs.c:546
 msgid "LPD is a tool for finding peers on your local network."
@@ -1784,39 +1724,39 @@ msgstr "Réception : %1$s, Émission : %2$s"
 
 #: ../gtk/util.c:49 ../gtk/util.c:55
 msgid "KiB"
-msgstr ""
+msgstr "Kio"
 
 #: ../gtk/util.c:50 ../gtk/util.c:56
 msgid "MiB"
-msgstr ""
+msgstr "Mio"
 
 #: ../gtk/util.c:51 ../gtk/util.c:57
 msgid "GiB"
-msgstr ""
+msgstr "Gio"
 
 #: ../gtk/util.c:52 ../gtk/util.c:58
 msgid "TiB"
-msgstr ""
+msgstr "Tio"
 
 #: ../gtk/util.c:61
 msgid "KiB/s"
-msgstr ""
+msgstr "Kio/s"
 
 #: ../gtk/util.c:62
 msgid "MiB/s"
-msgstr ""
+msgstr "Mio/s"
 
 #: ../gtk/util.c:63
 msgid "GiB/s"
-msgstr ""
+msgstr "Gio/s"
 
 #: ../gtk/util.c:64
 msgid "TiB/s"
-msgstr ""
+msgstr "Tio/s"
 
 #: ../gtk/util.c:160
 msgid "size|None"
-msgstr ""
+msgstr "taille|aucune"
 
 #: ../gtk/util.c:323
 #, c-format
@@ -1840,12 +1780,12 @@ msgstr "Erreur lors de l'ouverture du torrent"
 #: ../gtk/util.c:878
 #, c-format
 msgid "Error opening \"%s\""
-msgstr ""
+msgstr "Impossible d'ouvrir « %s »"
 
 #: ../gtk/util.c:881
 #, c-format
 msgid "Server returned \"%1$ld %2$s\""
-msgstr ""
+msgstr "Le serveur a retourné « %1$ld%2$s »"
 
 #: ../gtk/util.c:901
 msgid "Unrecognized URL"
@@ -1893,7 +1833,7 @@ msgstr "Impossible de lire « %1$s » : %2$s"
 #: ../libtransmission/blocklist.c:114
 #, c-format
 msgid "Blocklist \"%s\" contains %zu entries"
-msgstr ""
+msgstr "La liste d’exclusion « %s » contient %zu entrées"
 
 #. don't try to display the actual lines - it causes issues
 #: ../libtransmission/blocklist.c:357
@@ -2362,6 +2302,9 @@ msgstr "En attente de vérification"
 #~ msgid_plural "Couldn't add duplicate torrents"
 #~ msgstr[0] "Impossible d'ajouter un torrent dupliqué"
 #~ msgstr[1] "Impossible d'ajouter des torrents dupliqués"
+
+#~ msgid "File \"%s\" is already open"
+#~ msgstr "Le fichier « %s » est déjà ouvert"
 
 #~ msgid "Sort by _Ratio"
 #~ msgstr "Trier par _ratio"
@@ -2906,3 +2849,15 @@ msgstr "En attente de vérification"
 #~ msgstr ""
 #~ "Impossible de trouver les données locales. Essayez «Définir l'emplacement» "
 #~ "pour les localiser ou redémarrez le torrent pour re-télécharger."
+
+#, c-format
+#~ msgid "%1$s (%2$s%% of %3$s%% Available) + %4$s Unverified"
+#~ msgstr "%1$s (%2$s%% sur %3$s%% disponible) + %4$s non vérifié"
+
+#, c-format
+#~ msgid "Limit do_wnload speed (%s):"
+#~ msgstr "Vitesse limite de réception (%s) :"
+
+#, c-format
+#~ msgid "Limit u_pload speed (%s):"
+#~ msgstr "Vitesse limite d’envoi (%s) :"

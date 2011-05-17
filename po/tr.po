@@ -8,15 +8,15 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2011-01-27 14:52-0600\n"
-"PO-Revision-Date: 2010-11-16 13:45+0000\n"
-"Last-Translator: Caner GÜRAL <cgural@gmail.com>\n"
+"PO-Revision-Date: 2011-05-09 13:20+0000\n"
+"Last-Translator: Yiğit Ateş <yigitates@ceviri.ubuntu-tr.net>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Launchpad-Export-Date: 2011-02-08 00:08+0000\n"
-"X-Generator: Launchpad (build 12335)\n"
+"X-Launchpad-Export-Date: 2011-05-16 23:56+0000\n"
+"X-Generator: Launchpad (build 13045)\n"
 
 #: ../gtk/actions.c:53
 msgid "Sort by _Activity"
@@ -324,7 +324,7 @@ msgstr "Duraklatıldı"
 
 #: ../gtk/details.c:604
 msgid "N/A"
-msgstr ""
+msgstr "YOK"
 
 #: ../gtk/details.c:616 ../gtk/file-list.c:621
 msgid "Mixed"
@@ -888,36 +888,7 @@ msgstr ""
 "Can Duruk\n"
 "\n"
 "Launchpad Contributions:\n"
-"  58zarali https://launchpad.net/~yusufulku\n"
-"  Ali ARISOY https://launchpad.net/~e166110\n"
-"  Attila C. YILMAZLAR https://launchpad.net/~attilayilmazlar\n"
-"  Bugra Gokalp Okcu https://launchpad.net/~bugra\n"
-"  Can Bülbül https://launchpad.net/~a.bulbul\n"
-"  Can Kaya https://launchpad.net/~ckaya\n"
-"  Caner GÜRAL https://launchpad.net/~canergural\n"
-"  Emre Ayca https://launchpad.net/~anatolica\n"
-"  Engin BAHADIR https://launchpad.net/~enginbah\n"
-"  Gökhan KILINÇ https://launchpad.net/~kilincgokhan\n"
-"  Hakan Altindas https://launchpad.net/~hakanaltindas\n"
-"  Halil Kasap https://launchpad.net/~halil-kasap\n"
-"  Hasan Tayyar BEŞİK https://launchpad.net/~hasantayyar\n"
-"  Hasan Yılmaz https://launchpad.net/~hasanyilmaz\n"
-"  Holy Penguin https://launchpad.net/~holypenguin\n"
-"  Irfan Durmus https://launchpad.net/~irfandurmus\n"
-"  Meric Kutyar Gul https://launchpad.net/~meric\n"
-"  Mert Bozkurt https://launchpad.net/~aquacultural\n"
-"  Muhammed YÜRÜRDURMAZ https://launchpad.net/~myururdurmaz\n"
-"  Osman Tosun https://launchpad.net/~rainman-neu\n"
-"  Selim Sercan Suerkan https://launchpad.net/~mokoko\n"
-"  Yigit Güneli https://launchpad.net/~yiit\n"
-"  Yiğit Ateş https://launchpad.net/~yigitates52\n"
-"  aylincan https://launchpad.net/~sevencan83\n"
-"  ironic https://launchpad.net/~fatihbostanci\n"
-"  jordan https://launchpad.net/~jordan-transmission\n"
-"  nordstern https://launchpad.net/~deran-delice\n"
-"  rayyildiz https://launchpad.net/~rayyildiz\n"
-"  webdr https://launchpad.net/~drumut\n"
-"  Özgür BASKIN https://launchpad.net/~ozgur-baskin"
+"  Ali ARISOY https://launchpad.net/~e166110"
 
 #: ../gtk/makemeta-ui.c:78
 #, c-format
@@ -1423,7 +1394,7 @@ msgstr "_Güncelle"
 
 #: ../gtk/tr-prefs.c:520
 msgid "Enable _automatic updates"
-msgstr "_Otomatik güncellemeleri etkinleştir"
+msgstr "_Otomatik güncelleştirmeleri etkinleştir"
 
 #: ../gtk/tr-prefs.c:528
 msgid "_Encryption mode:"
@@ -2322,6 +2293,30 @@ msgstr "Doğrulama için kuyrukta"
 #, c-format
 #~ msgid "Got %d peers from tracker"
 #~ msgstr "İzleyiciden %d eş alındı"
+
+#~ msgid "_Ignore unencrypted peers"
+#~ msgstr "Şifrelenmemiş eşleri _yok say"
+
+#~ msgid "Blocklist updated with %'d entries"
+#~ msgstr "Engelli listesi %'d giriş ile güncellendi"
+
+#~ msgid "Parsing blocklist..."
+#~ msgstr "Engelli listesi ayrıştırılıyor..."
+
+#~ msgid "Uncompressing blocklist..."
+#~ msgstr "Engelli listesi açılıyor..."
+
+#~ msgid "Unable to get blocklist: %s"
+#~ msgstr "Engelli listesi alınamıyor: %s"
+
+#~ msgid "Unable to get blocklist."
+#~ msgstr "Engelli listesi alınamıyor."
+
+#~ msgid "Completion"
+#~ msgstr "Tamamlama"
+
+#~ msgid "%1$.1f%% (%2$.1f%% selected)"
+#~ msgstr "%1$.1f%% (%2$.1f%% seçili)"
 
 #~ msgid "Manual announce allowed in:"
 #~ msgstr "İzin verilen manuel duyuru süresi:"

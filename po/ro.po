@@ -16,8 +16,8 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n == 1 ? 0: (((n % 100 > 19) || ((n % 100 "
 "== 0) && (n != 0))) ? 2: 1));\n"
-"X-Launchpad-Export-Date: 2011-02-08 00:08+0000\n"
-"X-Generator: Launchpad (build 12335)\n"
+"X-Launchpad-Export-Date: 2011-05-16 23:56+0000\n"
+"X-Generator: Launchpad (build 13045)\n"
 
 #: ../gtk/actions.c:53
 msgid "Sort by _Activity"
@@ -49,7 +49,7 @@ msgstr "Sortează după _timp rămas"
 
 #: ../gtk/actions.c:60
 msgid "Sort by Si_ze"
-msgstr "Sortea_ză după mărime"
+msgstr "Sortea_ză după dimensiune"
 
 #: ../gtk/actions.c:77
 msgid "_Show Transmission"
@@ -169,7 +169,7 @@ msgstr "Pornește toate torentele"
 
 #: ../gtk/actions.c:120
 msgid "Set _Location..."
-msgstr ""
+msgstr "Stabilește _locația..."
 
 #: ../gtk/actions.c:121
 msgid "Remove torrent"
@@ -177,7 +177,7 @@ msgstr "Elimină torentul"
 
 #: ../gtk/actions.c:122
 msgid "_Delete Files and Remove"
-msgstr "Şter_ge fişierele şi elimină-le"
+msgstr "Șter_ge fișierele și elimină-le"
 
 #: ../gtk/actions.c:123
 msgid "_New..."
@@ -213,7 +213,7 @@ msgstr "_Conținut"
 
 #: ../gtk/actions.c:132
 msgid "Ask Tracker for _More Peers"
-msgstr "Cere tracker-ului mai _mulţi parteneri"
+msgstr "Solicită tracker-ului mai _mulți parteneri"
 
 #: ../gtk/conf.c:62 ../libtransmission/fdlimit.c:355
 #: ../libtransmission/metainfo.c:114 ../libtransmission/utils.c:614
@@ -243,19 +243,19 @@ msgstr ""
 
 #: ../gtk/details.c:456
 msgid "Seed regardless of ratio"
-msgstr ""
+msgstr "Contribuie indiferent de raport"
 
 #: ../gtk/details.c:457
 msgid "Stop seeding at ratio:"
-msgstr ""
+msgstr "Oprește contribuirea la raportul:"
 
 #: ../gtk/details.c:468
 msgid "Seed regardless of activity"
-msgstr ""
+msgstr "Contribuie indiferent de activitate"
 
 #: ../gtk/details.c:469
 msgid "Stop seeding if idle for N minutes:"
-msgstr ""
+msgstr "Oprește contribuirea după N minute de inactivitate:"
 
 #: ../gtk/details.c:485 ../gtk/tr-prefs.c:1258
 msgid "Speed"
@@ -317,7 +317,7 @@ msgstr "Se încarcă"
 
 #: ../gtk/details.c:571 ../gtk/filter.c:718 ../gtk/torrent-cell-renderer.c:206
 msgid "Finished"
-msgstr ""
+msgstr "Finalizat"
 
 #: ../gtk/details.c:571 ../gtk/filter.c:717 ../gtk/torrent-cell-renderer.c:208
 msgid "Paused"
@@ -325,7 +325,7 @@ msgstr "Suspendat"
 
 #: ../gtk/details.c:604
 msgid "N/A"
-msgstr ""
+msgstr "indisp."
 
 #: ../gtk/details.c:616 ../gtk/file-list.c:621
 msgid "Mixed"
@@ -410,7 +410,7 @@ msgstr "Activitate"
 
 #: ../gtk/details.c:943
 msgid "Torrent size:"
-msgstr "Mărime torent:"
+msgstr "Dimensiunea torentului:"
 
 #: ../gtk/details.c:948
 msgid "Have:"
@@ -510,11 +510,11 @@ msgstr ""
 
 #: ../gtk/details.c:1132
 msgid "We Cancelled"
-msgstr ""
+msgstr "Anulat de noi"
 
 #: ../gtk/details.c:1134
 msgid "They Cancelled"
-msgstr ""
+msgstr "Anulat de ei"
 
 #: ../gtk/details.c:1135
 msgid "Flags"
@@ -609,7 +609,7 @@ msgstr ""
 #: ../gtk/details.c:1856
 #, c-format
 msgid "Got a scrape error \"%s%s%s\" %s ago"
-msgstr ""
+msgstr "S-a primit eroarea  „%s%s%s” la interogarea serverului în urmă cu %s"
 
 #: ../gtk/details.c:1866
 #, c-format
@@ -663,7 +663,7 @@ msgstr ""
 
 #: ../gtk/details.c:2399 ../gtk/details.c:2531 ../gtk/filter.c:316
 msgid "Trackers"
-msgstr "Trackeri"
+msgstr "Trackere"
 
 #: ../gtk/details.c:2423
 msgid "_Add"
@@ -769,7 +769,7 @@ msgstr "Prioritate"
 
 #: ../gtk/filter.c:308 ../gtk/filter.c:712
 msgid "All"
-msgstr ""
+msgstr "Toate"
 
 #: ../gtk/filter.c:322 ../gtk/tr-prefs.c:526 ../gtk/tr-prefs.c:1261
 msgid "Privacy"
@@ -777,11 +777,11 @@ msgstr "Intimitate"
 
 #: ../gtk/filter.c:327
 msgid "Public"
-msgstr ""
+msgstr "Public"
 
 #: ../gtk/filter.c:331
 msgid "Private"
-msgstr ""
+msgstr "Privat"
 
 #: ../gtk/filter.c:714
 msgid "Active"
@@ -885,16 +885,12 @@ msgid "translator-credits"
 msgstr ""
 "Launchpad Contributions:\n"
 "  Adi Roiban https://launchpad.net/~adiroiban\n"
-"  Adrian Harabulă https://launchpad.net/~opensoft\n"
-"  Bogdan Bădic-Spătariu https://launchpad.net/~thelad33\n"
+"  Alex Eftimie https://launchpad.net/~alexeftimie\n"
 "  Cris G https://launchpad.net/~krig-tiscali\n"
-"  George Silviu Enea https://launchpad.net/~premamotion\n"
-"  Ionuț Jula https://launchpad.net/~ionutjula\n"
-"  Jorel https://launchpad.net/~d-dymon\n"
+"  Daniel Șerbănescu https://launchpad.net/~serbanescu.daniel\n"
+"  Denis Toader https://launchpad.net/~dentys03\n"
 "  Lucian Adrian Grijincu https://launchpad.net/~lucian.grijincu\n"
-"  MBogdan https://launchpad.net/~m-for-mike\n"
-"  Manuel R. Ciosici https://launchpad.net/~manuelciosici\n"
-"  Mircea Suciu https://launchpad.net/~mirceasuciu"
+"  marianvasile https://launchpad.net/~marianvasile-upcmail"
 
 #: ../gtk/makemeta-ui.c:78
 #, c-format
@@ -1015,7 +1011,7 @@ msgstr "Torent complet"
 
 #: ../gtk/notify.c:144
 msgid "Open File"
-msgstr "Deschide fișier"
+msgstr "Deschide fişier"
 
 #: ../gtk/notify.c:149
 msgid "Open Folder"
@@ -1044,7 +1040,7 @@ msgstr "M_ută fișierul .torrent la gunoi"
 
 #: ../gtk/open-dialog.c:299 ../gtk/tr-prefs.c:272
 msgid "_Start when added"
-msgstr "_Porneşte la adăugare"
+msgstr "_Pornește la adăugare"
 
 #: ../gtk/open-dialog.c:314
 msgid "_Torrent file:"
@@ -1208,7 +1204,7 @@ msgstr "Timp rămas necunoscut"
 #: ../gtk/torrent-cell-renderer.c:145
 #, c-format
 msgid "%s remaining"
-msgstr "%s rămas"
+msgstr "%s rămase"
 
 #. 1==down arrow, 2==down speed, 3==up arrow, 4==down speed
 #: ../gtk/torrent-cell-renderer.c:174
@@ -1327,7 +1323,7 @@ msgstr "Păstrează torentele _incomplete în:"
 
 #: ../gtk/tr-prefs.c:311
 msgid "Call scrip_t when torrent is completed:"
-msgstr ""
+msgstr "Apelează scrip_tul atunci când torrentul s-a finalizat:"
 
 #: ../gtk/tr-prefs.c:321
 msgid "Stop seeding at _ratio:"
@@ -1432,6 +1428,7 @@ msgstr ""
 #: ../gtk/tr-prefs.c:546
 msgid "LPD is a tool for finding peers on your local network."
 msgstr ""
+"LPD este o unealtă pentru găsirea partenerilor în rețeaua voastră locală."
 
 #: ../gtk/tr-prefs.c:765
 msgid "Web Client"
@@ -1707,19 +1704,19 @@ msgstr "Descărcat: %1$s, Încărcat: %2$s"
 
 #: ../gtk/util.c:49 ../gtk/util.c:55
 msgid "KiB"
-msgstr ""
+msgstr "KiB"
 
 #: ../gtk/util.c:50 ../gtk/util.c:56
 msgid "MiB"
-msgstr ""
+msgstr "MiB"
 
 #: ../gtk/util.c:51 ../gtk/util.c:57
 msgid "GiB"
-msgstr ""
+msgstr "GiB"
 
 #: ../gtk/util.c:52 ../gtk/util.c:58
 msgid "TiB"
-msgstr ""
+msgstr "TiB"
 
 #: ../gtk/util.c:61
 msgid "KiB/s"
@@ -2025,7 +2022,7 @@ msgstr "Fişierul „%s” stă în cale"
 
 #: ../libtransmission/utils.c:1511
 msgid "None"
-msgstr "Nici unul"
+msgstr "Nimic"
 
 #: ../libtransmission/verify.c:215
 msgid "Verifying torrent"
@@ -2173,6 +2170,10 @@ msgstr "Pus în coadă pentru verificare"
 #~ msgstr[1] "%'d minute"
 #~ msgstr[2] "%'d de minute"
 
+#, c-format
+#~ msgid "%1$s (%2$s verified)"
+#~ msgstr "%1$s (%2$s verificat)"
+
 #~ msgid "_Active"
 #~ msgstr "_Active"
 
@@ -2222,9 +2223,6 @@ msgstr "Pus în coadă pentru verificare"
 
 #~ msgid "<b>E_xtras</b>"
 #~ msgstr "<b>E_xtra</b>"
-
-#~ msgid "Listening _port:"
-#~ msgstr "_Port conectare:"
 
 #~ msgid "_Enable web interface"
 #~ msgstr "_Activează interfața web"
@@ -2657,3 +2655,18 @@ msgstr "Pus în coadă pentru verificare"
 #~ msgstr ""
 #~ "Nu s-au putut găsi datele locale. Încercați „Definire locație” pentru a le "
 #~ "găsi, sau reporniți torentul pentru a le descărca din nou."
+
+#~ msgid "Enable Temporary Speed _Limits"
+#~ msgstr "Activează _limitarea temporară a vitezei"
+
+#~ msgid "Listening _port:"
+#~ msgstr "_Portul de ascultare:"
+
+#, c-format
+#~ msgid ""
+#~ "This magnet link appears to be intended for something other than BitTorrent. "
+#~ " BitTorrent magnet links have a section containing \"%s\"."
+#~ msgstr ""
+#~ "Această legătură magnetică pare a fi destinată pentru altceva decât "
+#~ "BitTorrent. Legăturile magnetice BitTorrent au o secțiune care conține \"% "
+#~ "s\"."

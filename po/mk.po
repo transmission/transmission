@@ -15,8 +15,8 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n % 10 == 1 && n % 100 != 11) ? 0 : 1;\n"
-"X-Launchpad-Export-Date: 2011-02-08 00:08+0000\n"
-"X-Generator: Launchpad (build 12335)\n"
+"X-Launchpad-Export-Date: 2011-05-16 23:56+0000\n"
+"X-Generator: Launchpad (build 13045)\n"
 
 #: ../gtk/actions.c:53
 msgid "Sort by _Activity"
@@ -392,7 +392,7 @@ msgstr ""
 
 #: ../gtk/details.c:911
 msgid "Never"
-msgstr ""
+msgstr "Никогаш"
 
 #: ../gtk/details.c:915
 msgid "Active now"
@@ -881,9 +881,6 @@ msgstr ""
 #: ../gtk/main.c:1554
 msgid "translator-credits"
 msgstr ""
-"Launchpad Contributions:\n"
-"  Arangel Angov https://launchpad.net/~arangel\n"
-"  simonkoco https://launchpad.net/~simonkoco-gmail"
 
 #: ../gtk/makemeta-ui.c:78
 #, c-format
@@ -2294,3 +2291,19 @@ msgstr "Чека на проверка"
 
 #~ msgid "Next scrape in:"
 #~ msgstr "Наредно гребење:"
+
+#, c-format
+#~ msgid "%1$s (%2$s verified)"
+#~ msgstr "%1$s (проверени %2$s)"
+
+#~ msgid "File \"%s\" is already open"
+#~ msgstr "Датотеката %s е веќе отворена"
+
+#~ msgid "_Ignore unencrypted peers"
+#~ msgstr "_Игнорирај не-енкриптирани пријатели"
+
+#~ msgid "Completion"
+#~ msgstr "Завршено"
+
+#~ msgid "%1$.1f%% (%2$.1f%% selected)"
+#~ msgstr "%1$.1f%% (%2$.1f%% избрани)"
