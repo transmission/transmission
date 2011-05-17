@@ -1,7 +1,7 @@
 === Transmission 2.31 (2011/05/17) ===
 [http://trac.transmissionbt.com/query?milestone=2.31&group=component&order=severity All tickets closed by this release]
 ==== All Platforms ====
-  * This release fixes a pair of 2.30 packaging errors.
+  * This release fixes a 2.30 packaging errors.
 
 === Transmission 2.30 (2011/05/16) ===
 [http://trac.transmissionbt.com/query?milestone=2.30&group=component&order=severity All tickets closed by this release]
