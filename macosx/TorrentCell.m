@@ -118,6 +118,13 @@
 	return self;
 }
 
+- (id) copyWithZone: (NSZone *) zone
+{
+    id value = [super copyWithZone: zone];
+    [value setRepresentedObject: [self representedObject]];
+    return value;
+}
+
 - (NSRect) iconRectForBounds: (NSRect) bounds
 {
     const CGFloat imageSize = [fDefaults boolForKey: @"SmallView"] ? IMAGE_SIZE_MIN : IMAGE_SIZE_REG;
@@ -327,6 +334,7 @@
 - (void) drawInteriorWithFrame: (NSRect) cellFrame inView: (NSView *) controlView
 {
     Torrent * torrent = [self representedObject];
+    NSAssert(torrent != nil, @"can't have a TorrentCell without a Torrent");
     
     const BOOL minimal = [fDefaults boolForKey: @"SmallView"];
     
@@ -803,9 +811,6 @@
 
 - (NSAttributedString *) attributedStatusString: (NSString *) string
 {
-    #warning we shouldn't have to do this
-    if (!string)
-        string = @"";
     return [[[NSAttributedString alloc] initWithString: string attributes: fStatusAttributes] autorelease];
 }
 
