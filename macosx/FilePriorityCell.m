@@ -53,6 +53,13 @@
     return self;
 }
 
+- (id) copyWithZone: (NSZone *) zone
+{
+    id value = [super copyWithZone: zone];
+    [value setRepresentedObject: [self representedObject]];
+    return value;
+}
+
 - (void) setSelected: (BOOL) flag forSegment: (NSInteger) segment
 {
     [super setSelected: flag forSegment: segment];
