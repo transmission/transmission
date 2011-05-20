@@ -196,9 +196,11 @@ tr_clientForId( char * buf, size_t buflen, const void * id_in )
                 three_digits( buf, buflen, "KTorrent", id+3 );
         }
 
-        else if( !memcmp( id+1, "AR", 2 ) ) four_digits( buf, buflen, "Ares", id+3 );
+        else if( !memcmp( id+1, "AG", 2 ) ) four_digits( buf, buflen, "Ares", id+3 );
+        else if( !memcmp( id+1, "AR", 2 ) ) four_digits( buf, buflen, "Arctic", id+3 );
         else if( !memcmp( id+1, "AT", 2 ) ) four_digits( buf, buflen, "Artemis", id+3 );
         else if( !memcmp( id+1, "AV", 2 ) ) four_digits( buf, buflen, "Avicora", id+3 );
+        else if( !memcmp( id+1, "BB", 2 ) ) four_digits( buf, buflen, "BitBuddy", id+3 );
         else if( !memcmp( id+1, "BE", 2 ) ) four_digits( buf, buflen, "BitTorrent SDK", id+3 );
         else if( !memcmp( id+1, "BG", 2 ) ) four_digits( buf, buflen, "BTGetit", id+3 );
         else if( !memcmp( id+1, "BM", 2 ) ) four_digits( buf, buflen, "BitMagnet", id+3 );
@@ -214,11 +216,14 @@ tr_clientForId( char * buf, size_t buflen, const void * id_in )
         else if( !memcmp( id+1, "FC", 2 ) ) four_digits( buf, buflen, "FileCroc", id+3 );
         else if( !memcmp( id+1, "FT", 2 ) ) four_digits( buf, buflen, "FoxTorrent/RedSwoosh", id+3 );
         else if( !memcmp( id+1, "GR", 2 ) ) four_digits( buf, buflen, "GetRight", id+3 );
+        else if( !memcmp( id+1, "GS", 2 ) ) four_digits( buf, buflen, "GSTorrent", id+3 );
+        else if( !memcmp( id+1, "HK", 2 ) ) four_digits( buf, buflen, "Hekate", id+3 );
         else if( !memcmp( id+1, "HN", 2 ) ) four_digits( buf, buflen, "Hydranode", id+3 );
         else if( !memcmp( id+1, "KG", 2 ) ) four_digits( buf, buflen, "KGet", id+3 );
         else if( !memcmp( id+1, "LC", 2 ) ) four_digits( buf, buflen, "LeechCraft", id+3 );
         else if( !memcmp( id+1, "LH", 2 ) ) four_digits( buf, buflen, "LH-ABC", id+3 );
         else if( !memcmp( id+1, "NX", 2 ) ) four_digits( buf, buflen, "Net Transport", id+3 );
+        else if( !memcmp( id+1, "MK", 2 ) ) four_digits( buf, buflen, "Meerkat", id+3 );
         else if( !memcmp( id+1, "MO", 2 ) ) four_digits( buf, buflen, "MonoTorrent", id+3 );
         else if( !memcmp( id+1, "MR", 2 ) ) four_digits( buf, buflen, "Miro", id+3 );
         else if( !memcmp( id+1, "MT", 2 ) ) four_digits( buf, buflen, "Moonlight", id+3 );
@@ -230,17 +235,23 @@ tr_clientForId( char * buf, size_t buflen, const void * id_in )
         else if( !memcmp( id+1, "RT", 2 ) ) four_digits( buf, buflen, "Retriever", id+3 );
         else if( !memcmp( id+1, "RZ", 2 ) ) four_digits( buf, buflen, "RezTorrent", id+3 );
         else if( !memcmp( id+1, "SD", 2 ) ) four_digits( buf, buflen, "Thunder", id+3 );
+        else if( !memcmp( id+1, "SO", 2 ) ) four_digits( buf, buflen, "SoMud", id+3 );
         else if( !memcmp( id+1, "SS", 2 ) ) four_digits( buf, buflen, "SwarmScope", id+3 );
+        else if( !memcmp( id+1, "ST", 2 ) ) four_digits( buf, buflen, "SymTorrent", id+3 );
         else if( !memcmp( id+1, "SZ", 2 ) ) four_digits( buf, buflen, "Shareaza", id+3 );
         else if( !memcmp( id+1, "S~", 2 ) ) four_digits( buf, buflen, "Shareaza", id+3 );
         else if( !memcmp( id+1, "st", 2 ) ) four_digits( buf, buflen, "SharkTorrent", id+3 );
         else if( !memcmp( id+1, "TN", 2 ) ) four_digits( buf, buflen, "Torrent .NET", id+3 );
         else if( !memcmp( id+1, "TS", 2 ) ) four_digits( buf, buflen, "TorrentStorm", id+3 );
+        else if( !memcmp( id+1, "TT", 2 ) ) four_digits( buf, buflen, "TuoTu", id+3 );
         else if( !memcmp( id+1, "UL", 2 ) ) four_digits( buf, buflen, "uLeecher!", id+3 );
         else if( !memcmp( id+1, "VG", 2 ) ) four_digits( buf, buflen, "Vagaa", id+3 );
-        else if( !memcmp( id+1, "WY", 2 ) ) four_digits( buf, buflen, "Wyzo", id+3 );
+        else if( !memcmp( id+1, "WT", 2 ) ) four_digits( buf, buflen, "BitLet", id+3 );
+        else if( !memcmp( id+1, "WY", 2 ) ) four_digits( buf, buflen, "FireTorrent", id+3 );
         else if( !memcmp( id+1, "XL", 2 ) ) four_digits( buf, buflen, "Xunlei", id+3 );
+        else if( !memcmp( id+1, "XS", 2 ) ) four_digits( buf, buflen, "XSwifter", id+3 );
         else if( !memcmp( id+1, "XT", 2 ) ) four_digits( buf, buflen, "XanTorrent", id+3 );
+        else if( !memcmp( id+1, "XX", 2 ) ) four_digits( buf, buflen, "Xtorrent", id+3 );
         else if( !memcmp( id+1, "ZT", 2 ) ) four_digits( buf, buflen, "Zip Torrent", id+3 );
 
         else if( !memcmp( id+1, "AG", 2 ) ) three_digits( buf, buflen, "Ares", id+3 );
