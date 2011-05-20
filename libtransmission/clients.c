@@ -235,7 +235,7 @@ tr_clientForId( char * buf, size_t buflen, const void * id_in )
         else if( !memcmp( id+1, "RT", 2 ) ) four_digits( buf, buflen, "Retriever", id+3 );
         else if( !memcmp( id+1, "RZ", 2 ) ) four_digits( buf, buflen, "RezTorrent", id+3 );
         else if( !memcmp( id+1, "SD", 2 ) ) four_digits( buf, buflen, "Thunder", id+3 );
-        else if( !memcmp( id+1, "SO", 2 ) ) four_digits( buf, buflen, "SoMud", id+3 );
+        else if( !memcmp( id+1, "SM", 2 ) ) four_digits( buf, buflen, "SoMud", id+3 );
         else if( !memcmp( id+1, "SS", 2 ) ) four_digits( buf, buflen, "SwarmScope", id+3 );
         else if( !memcmp( id+1, "ST", 2 ) ) four_digits( buf, buflen, "SymTorrent", id+3 );
         else if( !memcmp( id+1, "SZ", 2 ) ) four_digits( buf, buflen, "Shareaza", id+3 );
