@@ -42,6 +42,8 @@
 - (void) insertChild: (FileListNode *) child;
 - (void) insertIndex: (NSUInteger) index withSize: (uint64_t) size;
 
+- (NSString *) description;
+
 - (BOOL) isFolder;
 - (NSString *) name;
 - (NSString *) path;

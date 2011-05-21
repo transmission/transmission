@@ -88,6 +88,14 @@
     [super dealloc];
 }
 
+- (NSString *) description
+{
+    if (!fIsFolder)
+        return [NSString stringWithFormat: @"%@ (%d)", fName, [fIndexes firstIndex]];
+    else
+        return [NSString stringWithFormat: @"%@ (folder: %@)", fName, fIndexes];
+}
+
 - (BOOL) isFolder
 {
     return fIsFolder;
