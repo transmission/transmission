@@ -494,9 +494,9 @@
         //take line out completely when 10.6-only
         priorityImage = [NSApp isOnSnowLeopardOrBetter] ? [priorityImage retain] : [priorityImage copy];
         
-        NSRect priorityRect = NSMakeRect(NSMaxX(titleRect) + PADDING_BETWEEN_TITLE_AND_PRIORITY,
-                                        NSMidY(titleRect) - PRIORITY_ICON_HEIGHT  * 0.5,
-                                        PRIORITY_ICON_WIDTH, PRIORITY_ICON_HEIGHT);
+        const NSRect priorityRect = NSMakeRect(NSMaxX(titleRect) + PADDING_BETWEEN_TITLE_AND_PRIORITY,
+                                               NSMidY(titleRect) - PRIORITY_ICON_HEIGHT  * 0.5,
+                                               PRIORITY_ICON_WIDTH, PRIORITY_ICON_HEIGHT);
         
         [self drawImage: priorityImage inRect: priorityRect];
         [priorityImage release];
@@ -697,7 +697,7 @@
         result.size.width = NSMaxX(bounds) - NSMinX(result) - PADDING_HORIZONTAL;
     }
     
-    if ([[self representedObject] priority] != TR_PRI_NORMAL)
+    if ([(Torrent *)[self representedObject] priority] != TR_PRI_NORMAL)
     {
         result.size.width -= PRIORITY_ICON_WIDTH + PADDING_BETWEEN_TITLE_AND_PRIORITY;
         result.size.width = MIN(NSWidth(result), [string size].width); //only need to force it smaller for the priority icon
