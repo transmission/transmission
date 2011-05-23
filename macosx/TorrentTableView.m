@@ -750,7 +750,7 @@
         
         NSAssert([[NSColor controlAlternatingRowBackgroundColors] count] >= 2, @"There should be 2 alternating row colors");
         
-        [[[NSColor controlAlternatingRowBackgroundColors] objectAtIndex: 1] set];
+        [(NSColor *)[[NSColor controlAlternatingRowBackgroundColors] objectAtIndex: 1] set];
         NSRectFillList(gridRects, rectNum);
     }
     
