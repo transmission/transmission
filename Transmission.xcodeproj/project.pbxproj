@@ -242,6 +242,7 @@
 		A2A4EA0E0DE106EB000CE197 /* ConvertUTF.c in Sources */ = {isa = PBXBuildFile; fileRef = A2A4EA0A0DE106E8000CE197 /* ConvertUTF.c */; };
 		A2A4EA0F0DE106EE000CE197 /* ConvertUTF.h in Headers */ = {isa = PBXBuildFile; fileRef = A2A4EA0B0DE106E8000CE197 /* ConvertUTF.h */; };
 		A2A6321B0CD9751700E3DA60 /* BadgeView.m in Sources */ = {isa = PBXBuildFile; fileRef = A2A6321A0CD9751700E3DA60 /* BadgeView.m */; };
+		A2A7ACE91389E9FC00657A7C /* NSMutableArrayAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = A2A7ACE81389E9FC00657A7C /* NSMutableArrayAdditions.m */; };
 		A2AA579D0ADFCAB400CA59F6 /* PiecesView.m in Sources */ = {isa = PBXBuildFile; fileRef = A2AA579B0ADFCAB400CA59F6 /* PiecesView.m */; };
 		A2AA9BE1132CAC8E00FA131E /* announcer-udp.c in Sources */ = {isa = PBXBuildFile; fileRef = A2AA9BE0132CAC8D00FA131E /* announcer-udp.c */; };
 		A2AA9BE3132CAE2000FA131E /* evdns.c in Sources */ = {isa = PBXBuildFile; fileRef = A2AA9BE2132CAE2000FA131E /* evdns.c */; };
@@ -807,6 +808,8 @@
 		A2A4EA0B0DE106E8000CE197 /* ConvertUTF.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ConvertUTF.h; path = libtransmission/ConvertUTF.h; sourceTree = "<group>"; };
 		A2A632190CD9751700E3DA60 /* BadgeView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BadgeView.h; path = macosx/BadgeView.h; sourceTree = "<group>"; };
 		A2A6321A0CD9751700E3DA60 /* BadgeView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = BadgeView.m; path = macosx/BadgeView.m; sourceTree = "<group>"; };
+		A2A7ACE71389E9FC00657A7C /* NSMutableArrayAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = NSMutableArrayAdditions.h; path = macosx/NSMutableArrayAdditions.h; sourceTree = "<group>"; };
+		A2A7ACE81389E9FC00657A7C /* NSMutableArrayAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = NSMutableArrayAdditions.m; path = macosx/NSMutableArrayAdditions.m; sourceTree = "<group>"; };
 		A2AA579A0ADFCAB400CA59F6 /* PiecesView.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = PiecesView.h; path = macosx/PiecesView.h; sourceTree = "<group>"; };
 		A2AA579B0ADFCAB400CA59F6 /* PiecesView.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = PiecesView.m; path = macosx/PiecesView.m; sourceTree = "<group>"; };
 		A2AA9BE0132CAC8D00FA131E /* announcer-udp.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "announcer-udp.c"; path = "libtransmission/announcer-udp.c"; sourceTree = "<group>"; };
@@ -1467,6 +1470,8 @@
 				4DE5CC9C0980656F00BE280E /* NSStringAdditions.m */,
 				A29D84021049C25600D1987A /* NSApplicationAdditions.h */,
 				A29D84031049C25600D1987A /* NSApplicationAdditions.m */,
+				A2A7ACE71389E9FC00657A7C /* NSMutableArrayAdditions.h */,
+				A2A7ACE81389E9FC00657A7C /* NSMutableArrayAdditions.m */,
 			);
 			name = Additions;
 			sourceTree = "<group>";
@@ -2298,6 +2303,7 @@
 				A2F7CF5F13035FFD0016FF10 /* URLSheetWindowController.m in Sources */,
 				A2E57ABB1310822C00A7DAB1 /* StatusBarController.m in Sources */,
 				A2E57BA713109E6B00A7DAB1 /* FilterBarController.m in Sources */,
+				A2A7ACE91389E9FC00657A7C /* NSMutableArrayAdditions.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
