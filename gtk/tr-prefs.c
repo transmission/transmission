@@ -1155,25 +1155,6 @@ onPortTest( GtkButton * button UNUSED, gpointer vdata )
     gtr_core_port_test( data->core );
 }
 
-static void
-onGNOMEClicked( GtkButton * button, gpointer vdata UNUSED )
-{
-    GError * err = NULL;
-
-    if( !g_spawn_command_line_async( "gnome-network-properties", &err ) &&
-        !g_spawn_command_line_async( "gnome-control-center network", &err ) )
-    {
-        GtkWidget * d = gtk_message_dialog_new( GTK_WINDOW( gtk_widget_get_toplevel( GTK_WIDGET( button ) ) ),
-                                                GTK_DIALOG_DESTROY_WITH_PARENT,
-                                                GTK_MESSAGE_ERROR,
-                                                GTK_BUTTONS_CLOSE,
-                                                "%s", err->message );
-        g_signal_connect_swapped( d, "response", G_CALLBACK( gtk_widget_destroy ), d );
-        gtk_widget_show( d );
-        g_clear_error( &err );
-    }
-}
-
 static GtkWidget*
 networkPage( GObject * core )
 {
@@ -1234,12 +1215,6 @@ networkPage( GObject * core )
     gtr_widget_set_tooltip_text( w, s );
     hig_workarea_add_wide_control( t, &row, w );
 #endif
-
-    w = gtk_button_new_with_mnemonic( _( "Edit GNOME Proxy Settings" ) );
-    g_signal_connect( w, "clicked", G_CALLBACK( onGNOMEClicked ), data );
-    h = gtk_hbox_new( FALSE, 0 );
-    gtk_box_pack_start( GTK_BOX( h ), w, FALSE, FALSE, 0 );
-    hig_workarea_add_wide_control( t, &row, h );
 
     hig_workarea_finish( t, &row );
     return t;

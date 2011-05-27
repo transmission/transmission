@@ -191,9 +191,6 @@ createEasy( tr_session * s, struct tr_web * web, struct tr_web_task * task )
     if( task->range )
         curl_easy_setopt( e, CURLOPT_RANGE, task->range );
 
-    if( s->curl_easy_config_func != NULL )
-        s->curl_easy_config_func( s, e, task->url, s->curl_easy_config_user_data );
-
     return e;
 }
 
