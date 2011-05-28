@@ -92,9 +92,14 @@ char addrbuf[65];
 char addrbuf2[65];
 #define addrfmt(x, s) x.fmt(s, sizeof(s))
 
-#pragma pack(push,1)
+#ifdef __GNUC__
+ #define PACKED_ATTRIBUTE __attribute__((__packed__))
+#else
+ #define PACKED_ATTRIBUTE
+ #pragma pack(push,1)
+#endif
 
-struct PackedSockAddr {
+struct PACKED_ATTRIBUTE PackedSockAddr {
 
 	// The values are always stored here in network byte order
 	union {
@@ -192,7 +197,7 @@ struct PackedSockAddr {
 	}
 };
 
-struct RST_Info {
+struct PACKED_ATTRIBUTE RST_Info {
 	PackedSockAddr addr;
 	uint32 connid;
 	uint32 timestamp;
@@ -211,7 +216,7 @@ struct RST_Info {
 #define PACKET_SIZE_BIG 1400
 #define PACKET_SIZE_HUGE_BUCKET 4
 
-struct PacketFormat {
+struct PACKED_ATTRIBUTE PacketFormat {
 	// connection ID
 	uint32_big connid;
 	uint32_big tv_sec;
@@ -229,21 +234,21 @@ struct PacketFormat {
 	uint16_big ack_nr;
 };
 
-struct PacketFormatAck {
+struct PACKED_ATTRIBUTE PacketFormatAck {
 	PacketFormat pf;
 	byte ext_next;
 	byte ext_len;
 	byte acks[4];
 };
 
-struct PacketFormatExtensions {
+struct PACKED_ATTRIBUTE PacketFormatExtensions {
 	PacketFormat pf;
 	byte ext_next;
 	byte ext_len;
 	byte extensions[8];
 };
 
-struct PacketFormatV1 {
+struct PACKED_ATTRIBUTE PacketFormatV1 {
 	// packet_type (4 high bits)
 	// protocol version (4 low bits)
 	byte ver_type;
@@ -266,21 +271,23 @@ struct PacketFormatV1 {
 	uint16_big ack_nr;
 };
 
-struct PacketFormatAckV1 {
+struct PACKED_ATTRIBUTE PacketFormatAckV1 {
 	PacketFormatV1 pf;
 	byte ext_next;
 	byte ext_len;
 	byte acks[4];
 };
 
-struct PacketFormatExtensionsV1 {
+struct PACKED_ATTRIBUTE PacketFormatExtensionsV1 {
 	PacketFormatV1 pf;
 	byte ext_next;
 	byte ext_len;
 	byte extensions[8];
 };
 
-#pragma pack(pop)
+#ifndef __GNUC__
+ #pragma pack(pop)
+#endif
 
 enum {
 	ST_DATA = 0,		// Data packet.
