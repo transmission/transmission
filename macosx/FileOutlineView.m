@@ -181,8 +181,7 @@
 {
     if (![self isRowSelected: row])
     {
-        NSDictionary * item = [self itemAtRow: row]; 
-        NSIndexSet * indexes = [(FileListNode *)item indexes];
+        NSIndexSet * indexes = [(FileListNode *)[self itemAtRow: row] indexes];
         
         if ([fTorrent checkForFiles: indexes] != NSOffState)
         {
