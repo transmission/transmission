@@ -739,7 +739,7 @@ static void
 onLaunchClutchCB( GtkButton * w UNUSED, gpointer data UNUSED )
 {
     const int port = gtr_pref_int_get( TR_PREFS_KEY_RPC_PORT );
-    char * uri = g_strdup_printf( "http://localhost:%d/transmission/web", port );
+    char * uri = g_strdup_printf( "http://localhost:%d/", port );
 
     gtr_open_uri( uri );
     g_free( uri );
