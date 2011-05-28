@@ -538,6 +538,25 @@ get_text_color( GtkWidget * w, const tr_stat * st, GdkColor * setme )
         *setme = gtk_widget_get_style(w)->text[GTK_STATE_NORMAL];
 }
 
+static double
+get_percent_done( const tr_torrent * tor, const tr_stat * st, bool * seed )
+{
+    double d;
+
+    if( ( st->activity == TR_STATUS_SEED ) && tr_torrentGetSeedRatio( tor, &d ) )
+    {
+        *seed = true;
+        d = MAX( 0.0, st->seedRatioPercentDone );
+    }
+    else
+    {
+        *seed = false;
+        d = MAX( 0.0, st->percentDone );
+    }
+
+    return d;
+}
+
 static void
 render_compact( TorrentCellRenderer   * cell,
                 GdkDrawable           * window,
@@ -556,12 +575,13 @@ render_compact( TorrentCellRenderer   * cell,
     const char * name;
     GdkPixbuf * icon;
     GdkColor text_color;
+    bool seed;
 
     struct TorrentCellRendererPrivate * p = cell->priv;
     const tr_torrent * tor = p->tor;
     const tr_stat * st = tr_torrentStatCached( (tr_torrent*)tor );
     const gboolean active = st->activity != TR_STATUS_STOPPED;
-    const double percentDone = MAX( 0.0, st->percentDone );
+    const double percentDone = get_percent_done( tor, st, &seed );
     const gboolean sensitive = active || st->error;
     GString * gstr_stat = p->gstr1;
 
@@ -600,7 +620,13 @@ render_compact( TorrentCellRenderer   * cell,
 
     g_object_set( p->icon_renderer, "pixbuf", icon, "sensitive", sensitive, NULL );
     gtk_cell_renderer_render( p->icon_renderer, window, widget, &icon_area, &icon_area, &icon_area, flags );
-    g_object_set( p->progress_renderer, "value", (int)(percentDone*100.0), "text", NULL, "sensitive", sensitive, NULL );
+    g_object_set( p->progress_renderer, "value", (int)(percentDone*100.0), "text", NULL, "sensitive", sensitive,
+#if GTK_CHECK_VERSION( 3,0,0 )
+        "inverted", seed,
+#elif GTK_CHECK_VERSION( 2,6,0 )
+        "orientation", (seed ? GTK_PROGRESS_RIGHT_TO_LEFT : GTK_PROGRESS_LEFT_TO_RIGHT),
+#endif
+        NULL );
     gtk_cell_renderer_render( p->progress_renderer, window, widget, &prog_area, &prog_area, &prog_area, flags );
     g_object_set( p->text_renderer, "text", gstr_stat->str, "scale", SMALL_SCALE, "ellipsize", PANGO_ELLIPSIZE_END, "foreground-gdk", &text_color, NULL );
     gtk_cell_renderer_render( p->text_renderer, window, widget, &stat_area, &stat_area, &stat_area, flags );
@@ -631,13 +657,14 @@ render_full( TorrentCellRenderer   * cell,
     const char * name;
     GdkPixbuf * icon;
     GdkColor text_color;
+    bool seed;
 
     struct TorrentCellRendererPrivate * p = cell->priv;
     const tr_torrent * tor = p->tor;
     const tr_stat * st = tr_torrentStatCached( (tr_torrent*)tor );
     const tr_info * inf = tr_torrentInfo( tor );
     const gboolean active = st->activity != TR_STATUS_STOPPED;
-    const double percentDone = MAX( 0.0, st->percentDone );
+    const double percentDone = get_percent_done( tor, st, &seed );
     const gboolean sensitive = active || st->error;
     GString * gstr_prog = p->gstr1;
     GString * gstr_stat = p->gstr2;
@@ -714,7 +741,13 @@ render_full( TorrentCellRenderer   * cell,
     gtk_cell_renderer_render( p->text_renderer, window, widget, &name_area, &name_area, &name_area, flags );
     g_object_set( p->text_renderer, "text", gstr_prog->str, "scale", SMALL_SCALE, "weight", PANGO_WEIGHT_NORMAL, NULL );
     gtk_cell_renderer_render( p->text_renderer, window, widget, &prog_area, &prog_area, &prog_area, flags );
-    g_object_set( p->progress_renderer, "value", (int)(percentDone*100.0), "text", "", "sensitive", sensitive, NULL );
+    g_object_set( p->progress_renderer, "value", (int)(percentDone*100.0), "text", "", "sensitive", sensitive,
+#if GTK_CHECK_VERSION( 3,0,0 )
+        "inverted", seed,
+#elif GTK_CHECK_VERSION( 2,6,0 )
+        "orientation", (seed ? GTK_PROGRESS_RIGHT_TO_LEFT : GTK_PROGRESS_LEFT_TO_RIGHT),
+#endif
+        NULL );
     gtk_cell_renderer_render( p->progress_renderer, window, widget, &prct_area, &prct_area, &prct_area, flags );
     g_object_set( p->text_renderer, "text", gstr_stat->str, NULL );
     gtk_cell_renderer_render( p->text_renderer, window, widget, &stat_area, &stat_area, &stat_area, flags );

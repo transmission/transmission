@@ -317,6 +317,26 @@ TorrentDelegate :: paint( QPainter                    * painter,
 }
 
 void
+TorrentDelegate :: setProgressBarPercentDone( const QStyleOptionViewItem& option, const Torrent& tor ) const
+{
+    double seedRatioLimit;
+    if (tor.isSeeding() && tor.getSeedRatio(seedRatioLimit))
+    {
+        const double seedRateRatio = tor.ratio() / seedRatioLimit;
+        const double invertedRatio = 1. - seedRateRatio;
+        const int scaledProgress = invertedRatio * (myProgressBarStyle->maximum - myProgressBarStyle->minimum);
+        myProgressBarStyle->progress = myProgressBarStyle->minimum + scaledProgress;
+        myProgressBarStyle->direction = (option.direction == Qt::RightToLeft ? Qt::LeftToRight : Qt::RightToLeft);
+    }
+    else
+    {
+        const bool isMagnet( !tor.hasMetadata( ) );
+        myProgressBarStyle->direction = option.direction;
+        myProgressBarStyle->progress = int(myProgressBarStyle->minimum + (((isMagnet ? tor.metadataPercentDone() : tor.percentDone()) * (myProgressBarStyle->maximum - myProgressBarStyle->minimum))));
+    }
+}
+
+void
 TorrentDelegate :: drawTorrent( QPainter * painter, const QStyleOptionViewItem& option, const Torrent& tor ) const
 {
     const QStyle * style( QApplication::style( ) );
@@ -395,13 +415,12 @@ TorrentDelegate :: drawTorrent( QPainter * painter, const QStyleOptionViewItem& 
     painter->drawText( statusArea, 0, statusFM.elidedText( statusStr, Qt::ElideRight, statusArea.width( ) ) );
     painter->setFont( progressFont );
     painter->drawText( progArea, 0, progressFM.elidedText( progressStr, Qt::ElideRight, progArea.width( ) ) );
-    const bool isMagnet( !tor.hasMetadata( ) );
     myProgressBarStyle->rect = barArea;
-    myProgressBarStyle->direction = option.direction;
     myProgressBarStyle->palette = option.palette;
     myProgressBarStyle->palette.setCurrentColorGroup( cg );
     myProgressBarStyle->state = progressBarState;
-    myProgressBarStyle->progress = int(myProgressBarStyle->minimum + (((isMagnet ? tor.metadataPercentDone() : tor.percentDone()) * (myProgressBarStyle->maximum - myProgressBarStyle->minimum))));
+    setProgressBarPercentDone( option, tor );
+
     style->drawControl( QStyle::CE_ProgressBar, myProgressBarStyle, painter );
 
     painter->restore( );
