@@ -1464,6 +1464,7 @@ onPeerViewQueryTooltip( GtkWidget   * widget,
         const char * pch;
         char * name = NULL;
         char * addr = NULL;
+        char * markup = NULL;
         char * flagstr = NULL;
         GString * gstr = di->gstr;
         gtk_tree_model_get( model, &iter, PEER_COL_TORRENT_NAME, &name,
@@ -1497,7 +1498,11 @@ onPeerViewQueryTooltip( GtkWidget   * widget,
         }
         if( gstr->len ) /* remove the last linefeed */
             g_string_set_size( gstr, gstr->len - 1 );
-        gtk_tooltip_set_markup( tooltip, gstr->str );
+
+        markup = g_markup_escape_text( gstr->str, gstr->len );
+        gtk_tooltip_set_markup( tooltip, markup );
+        g_free( markup );
+
         g_free( flagstr );
         g_free( addr );
         g_free( name );
