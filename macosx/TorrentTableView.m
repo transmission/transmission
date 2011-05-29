@@ -835,14 +835,6 @@
     [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateUI" object: nil];
 }
 
-- (void) checkFile: (id) sender
-{
-    NSIndexSet * indexSet = [(FileListNode *)[sender representedObject] indexes];
-    [fMenuTorrent setFileCheckState: [sender state] != NSOnState ? NSOnState : NSOffState forIndexes: indexSet];
-    
-    [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateStats" object: nil];
-}
-
 - (void) togglePiecesBar
 {
     //stop previous animation

@@ -86,8 +86,6 @@
 
 - (void) setPriority: (id) sender;
 
-- (void) checkFile: (id) sender;
-
 - (void) togglePiecesBar;
 - (CGFloat) piecesBarPercent;
 
