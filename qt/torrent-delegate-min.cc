@@ -162,6 +162,7 @@ TorrentDelegateMin :: drawTorrent( QPainter * painter, const QStyleOptionViewIte
     tr_snprintf( buf, sizeof( buf ), "%d%%", (int)tr_truncd( 100.0 * tor.percentDone( ), 0 ) );
     myProgressBarStyle->text = buf;
     myProgressBarStyle->textVisible = true;
+    myProgressBarStyle->textAlignment = Qt::AlignCenter;
     setProgressBarPercentDone( option, tor );
     style->drawControl( QStyle::CE_ProgressBar, myProgressBarStyle, painter );
 
