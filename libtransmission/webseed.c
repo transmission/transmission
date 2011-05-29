@@ -250,6 +250,7 @@ make_url( tr_webseed * w, const tr_file * file )
     struct evbuffer * buf = evbuffer_new( );
 
     evbuffer_add( buf, w->base_url, w->base_url_len );
+    evbuffer_add( buf, "", 1 );
 
     /* if url ends with a '/', add the torrent name */
     if( w->base_url[w->base_url_len - 1] == '/' && file->name )
