@@ -46,30 +46,15 @@
     [self setAutoresizesOutlineColumn: NO];
     [self setIndentationPerLevel: 14.0];
     
-    NSColor * endingColor = [NSColor colorWithCalibratedRed: 217.0/255.0 green: 250.0/255.0 blue: 211.0/255.0 alpha: 1.0];
-    NSColor * beginningColor = [endingColor blendedColorWithFraction: 0.3 ofColor: [NSColor whiteColor]];
-    fHighPriorityGradient = [[NSGradient alloc] initWithStartingColor: beginningColor endingColor: endingColor];
-    
-    endingColor = [NSColor colorWithCalibratedRed: 255.0/255.0 green: 243.0/255.0 blue: 206.0/255.0 alpha: 1.0];
-    beginningColor = [endingColor blendedColorWithFraction: 0.3 ofColor: [NSColor whiteColor]];
-    fLowPriorityGradient = [[NSGradient alloc] initWithStartingColor: beginningColor endingColor: endingColor];
-    
-    endingColor = [NSColor colorWithCalibratedRed: 225.0/255.0 green: 218.0/255.0 blue: 255.0/255.0 alpha: 1.0];
-    beginningColor = [endingColor blendedColorWithFraction: 0.3 ofColor: [NSColor whiteColor]];
-    fMixedPriorityGradient = [[NSGradient alloc] initWithStartingColor: beginningColor endingColor: endingColor];
-    
     fMouseRow = -1;
 }
 
 - (void) dealloc
 {
-    [fHighPriorityGradient release];
-    [fLowPriorityGradient release];
-    [fMixedPriorityGradient release];
-    
     [super dealloc];
 }
 
+#warning needed?
 - (void) setTorrent: (Torrent *) torrent
 {
     fTorrent = torrent;
@@ -175,46 +160,6 @@
         [self setNeedsDisplayInRect: [self frameOfCellAtColumn: [self columnWithIdentifier: @"Priority"] row: [row intValue]]];
         fMouseRow = -1;
     }
-}
-
-- (void) drawRow: (NSInteger) row clipRect: (NSRect) clipRect
-{
-    if (![self isRowSelected: row])
-    {
-        NSIndexSet * indexes = [(FileListNode *)[self itemAtRow: row] indexes];
-        
-        if ([fTorrent checkForFiles: indexes] != NSOffState)
-        {
-            NSGradient * gradient = nil;
-            
-            NSSet * priorities = [fTorrent filePrioritiesForIndexes: indexes];
-            const NSUInteger count = [priorities count];
-            if (count == 1)
-            {
-                switch ([[priorities anyObject] intValue])
-                {
-                    case TR_PRI_LOW:
-                        gradient = fLowPriorityGradient;
-                        break;
-                    case TR_PRI_HIGH:
-                        gradient = fHighPriorityGradient;
-                        break;
-                }
-            }
-            else if (count > 1)
-                gradient = fMixedPriorityGradient;
-            else;
-            
-            if (gradient)
-            {
-                NSRect rect = [self rectOfRow: row];
-                rect.size.height -= 1.0;
-                [gradient drawInRect: rect angle: 90];
-            }
-        }
-    }
-    
-    [super drawRow: row clipRect: clipRect];
 }
 
 @end

@@ -30,8 +30,6 @@
 {
     Torrent * fTorrent;
     
-    NSGradient * fHighPriorityGradient, * fLowPriorityGradient, * fMixedPriorityGradient;
-    
     NSInteger fMouseRow;
 }
 
