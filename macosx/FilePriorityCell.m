@@ -28,6 +28,8 @@
 #import "NSApplicationAdditions.h"
 #import "Torrent.h"
 
+#define IMAGE_OVERLAP 3.0
+
 @implementation FilePriorityCell
 
 - (id) init
@@ -123,40 +125,59 @@
     }
     else
     {
-        NSImage * image;
+        NSMutableArray * images = [NSMutableArray arrayWithCapacity: MAX(count, 1)];
+        CGFloat totalWidth;
+        
         if (count == 0)
-            image = [NSImage imageNamed: @"PriorityNone.png"];
-        else if (count > 1)
-            image = [NSImage imageNamed: @"PriorityMixed.png"];
+        {
+            NSImage * image = [NSImage imageNamed: @"PriorityNone.png"];
+            [images addObject: image];
+            totalWidth = [image size].width;
+        }
         else
         {
-            switch ([[priorities anyObject] integerValue])
+            totalWidth = 0.0;
+            if ([priorities containsObject: [NSNumber numberWithInteger: TR_PRI_LOW]])
             {
-                case TR_PRI_NORMAL:
-                    image = [NSImage imageNamed: @"PriorityNormal.png"];
-                    break;
-                case TR_PRI_LOW:
-                    image = [NSImage imageNamed: @"PriorityLow.png"];
-                    break;
-                case TR_PRI_HIGH:
-                    image = [NSImage imageNamed: @"PriorityHigh.png"];
-                    break;
+                NSImage * image = [NSImage imageNamed: @"PriorityLow.png"];
+                [images addObject: image];
+                totalWidth += [image size].width;
+            }
+            if ([priorities containsObject: [NSNumber numberWithInteger: TR_PRI_NORMAL]])
+            {
+                NSImage * image = [NSImage imageNamed: @"PriorityNormal.png"];
+                [images addObject: image];
+                totalWidth += [image size].width;
+            }
+            if ([priorities containsObject: [NSNumber numberWithInteger: TR_PRI_HIGH]])
+            {
+                NSImage * image = [NSImage imageNamed: @"PriorityHigh.png"];
+                [images addObject: image];
+                totalWidth += [image size].width;
             }
         }
         
-        NSSize imageSize = [image size];
-        NSRect imageRect = NSMakeRect(NSMidX(cellFrame) - imageSize.width * 0.5, NSMidY(cellFrame) - imageSize.height * 0.5,
-                                        imageSize.width, imageSize.height);
+        if (count > 1)
+            totalWidth -= IMAGE_OVERLAP * (count-1);
         
-        if ([NSApp isOnSnowLeopardOrBetter])
-            [image drawInRect: imageRect fromRect: NSZeroRect operation: NSCompositeSourceOver fraction: 1.0
-                respectFlipped: YES hints: nil];
-        else
+        CGFloat currentWidth = floor(NSMidX(cellFrame) - totalWidth * 0.5);
+        
+        for (NSImage * image in images)
         {
-            image = [image copy];
-            [image setFlipped: YES];
-            [image drawInRect: imageRect fromRect: NSZeroRect operation: NSCompositeSourceOver fraction: 1.0];
-            [image release];
+            const NSSize imageSize = [image size];
+            NSRect imageRect = NSMakeRect(currentWidth, floor(NSMidY(cellFrame) - imageSize.height * 0.5), imageSize.width, imageSize.height);
+            
+            if ([NSApp isOnSnowLeopardOrBetter])
+                [image drawInRect: imageRect fromRect: NSZeroRect operation: NSCompositeSourceOver fraction: 1.0 respectFlipped: YES hints: nil];
+            else
+            {
+                image = [image copy];
+                [image setFlipped: YES];
+                [image drawInRect: imageRect fromRect: NSZeroRect operation: NSCompositeSourceOver fraction: 1.0];
+                [image release];
+            }
+            
+            currentWidth += imageSize.width - IMAGE_OVERLAP;
         }
     }
 }
