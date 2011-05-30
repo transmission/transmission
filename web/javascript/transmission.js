@@ -64,6 +64,12 @@ Transmission.prototype =
 		$('#prefs_tab_peers_tab').click(function(e){ changeTab(this, 'prefs_tab_peers') });
 		$('#prefs_tab_network_tab').click(function(e){ changeTab(this, 'prefs_tab_network');});
         $('#torrent_upload_form').submit(function(){ $('#upload_confirm_button').click(); return false; });
+		$('#torrent_container').bind('dragover', function(e){ return tr.dragenter(e); });
+		$('#torrent_container').bind('dragenter', function(e){ return tr.dragenter(e); });
+		$('#torrent_container').bind('drop', function(e){ return tr.drop(e); });
+		// tell jQuery to copy the dataTransfer property from events over if it exists
+		jQuery.event.props.push("dataTransfer");
+
 		$('#torrent_upload_form').submit(function(){ $('#upload_confirm_button').click(); return false; });
 
 		if (iPhone) {
@@ -624,6 +630,54 @@ Transmission.prototype =
 			tr.uploadTorrentFile( );
 		}
 		tr.updateButtonStates();
+	},
+
+	dragenter: function( event ) {
+		if( event.dataTransfer && event.dataTransfer.types ) {
+			var types = ["text/uri-list", "text/plain"];
+			for( var i = 0; i < types.length; ++i ) {
+				if( event.dataTransfer.types.contains(types[i]) ) {
+					// it would be better to actually look at the links here;
+					// sadly, (at least with Firefox,) trying would throw.
+					event.stopPropagation();
+					event.preventDefault();
+					event.dropEffect = "copy";
+					return false;
+				}
+			}
+		}
+		else if (event.dataTransfer) {
+			event.dataTransfer.dropEffect = "none";
+		}
+		return true;
+	},
+
+	drop: function( event ) {
+		if( !event.dataTransfer || !event.dataTransfer.types ) {
+			return true;
+		}
+		event.preventDefault();
+		var uris = null;
+		var types = ["text/uri-list", "text/plain"];
+		for( var i = 0; i < types.length; ++i ) {
+			if( event.dataTransfer.types.contains(types[i]) ) {
+				uris = event.dataTransfer.getData( types[i] ).split("\n");
+				break;
+			}
+		}
+		var paused = $('#prefs_form #auto_start')[0].checked;
+		for( i = 0; i < uris.length; ++i ) {
+			var uri = uris[i];
+			if( /^#/.test(uri) ) {
+				// lines which start with "#" are comments
+				continue;
+			}
+			if( /^[a-z-]+:/i.test(uri) ) {
+				// close enough to a url
+				this.remote.addTorrentByUrl( uri, paused );
+			}
+		}
+		return false;
 	},
 
 	hideUploadDialog: function( ) {
