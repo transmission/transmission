@@ -329,6 +329,7 @@ event_write_cb( int fd, short event UNUSED, void * vio )
     tr_peerIo * io = vio;
     size_t howmuch;
     const tr_direction dir = TR_UP;
+    char errstr[1024];
 
     assert( tr_isPeerIo( io ) );
     assert( io->socket >= 0 );
@@ -376,7 +377,8 @@ event_write_cb( int fd, short event UNUSED, void * vio )
 
  error:
 
-    dbgmsg( io, "event_write_cb got an error. res is %d, what is %hd, errno is %d (%s)", res, what, e, strerror( e ) );
+    tr_net_strerror( errstr, sizeof( errstr ), e );
+    dbgmsg( io, "event_write_cb got an error. res is %d, what is %hd, errno is %d (%s)", res, what, e, errstr );
 
     if( io->gotError != NULL )
         io->gotError( io, what, io->userData );
@@ -1219,7 +1221,7 @@ tr_peerIoTryRead( tr_peerIo * io, size_t howmuch )
             res = evbuffer_read( io->inbuf, io->socket, (int)howmuch );
             e = EVUTIL_SOCKET_ERROR( );
 
-            dbgmsg( io, "read %d from peer (%s)", res, (res==-1?strerror(e):"") );
+            dbgmsg( io, "read %d from peer (%s)", res, (res==-1?tr_strerror(e):"") );
 
             if( evbuffer_get_length( io->inbuf ) )
                 canReadWrapper( io );
