@@ -76,7 +76,7 @@ watchdir_new_impl( dtr_watchdir * w )
 
     if( i < 0 )
     {
-        tr_err( "Unable to watch \"%s\": %s", w->dir, strerror( errno ) );
+        tr_err( "Unable to watch \"%s\": %s", w->dir, tr_strerror( errno ) );
     }
     else if(( odir = opendir( w->dir )))
     {

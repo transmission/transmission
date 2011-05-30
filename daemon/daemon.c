@@ -13,7 +13,6 @@
 #include <errno.h>
 #include <stdio.h> /* printf */
 #include <stdlib.h> /* exit, atoi */
-#include <string.h> /* strerror() */
 
 #include <fcntl.h> /* open */
 #include <signal.h>
@@ -502,7 +501,7 @@ main( int argc, char ** argv )
             pidfile_created = true;
         }
         else
-            tr_err( "Unable to save pidfile \"%s\": %s", pid_filename, strerror( errno ) );
+            tr_err( "Unable to save pidfile \"%s\": %s", pid_filename, tr_strerror( errno ) );
     }
 
     if( tr_bencDictFindBool( &settings, TR_PREFS_KEY_RPC_AUTH_REQUIRED, &boolVal ) && boolVal )
