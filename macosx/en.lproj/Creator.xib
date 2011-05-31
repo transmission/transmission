@@ -58,7 +58,7 @@
 				<int key="NSWindowStyleMask">15</int>
 				<int key="NSWindowBacking">2</int>
 				<string key="NSWindowRect">{{244, 423}, {708, 408}}</string>
-				<int key="NSWTFlags">1881669632</int>
+				<int key="NSWTFlags">1881671680</int>
 				<string key="NSWindowTitle">Torrent Creator</string>
 				<string key="NSWindowClass">NSWindow</string>
 				<object class="NSMutableString" key="NSViewClass">
