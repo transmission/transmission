@@ -255,6 +255,10 @@
 		A2B3FB460E5901E700FF78FB /* cli.c in Sources */ = {isa = PBXBuildFile; fileRef = A2B3FB450E5901E700FF78FB /* cli.c */; };
 		A2B3FB4C0E59023000FF78FB /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */; };
 		A2B3FB530E59027100FF78FB /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */; };
+		A2B614161395ADA8000E0975 /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A2B614151395ADA8000E0975 /* libz.dylib */; };
+		A2B614181395ADC8000E0975 /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A2B614171395ADC8000E0975 /* libz.dylib */; };
+		A2B6141A1395ADD9000E0975 /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A2B614191395ADD8000E0975 /* libz.dylib */; };
+		A2B6141C1395ADE9000E0975 /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A2B6141B1395ADE9000E0975 /* libz.dylib */; };
 		A2BB67790D5BA74600AB0618 /* ToolbarOpenWebTemplate.png in Resources */ = {isa = PBXBuildFile; fileRef = A2BB67780D5BA74600AB0618 /* ToolbarOpenWebTemplate.png */; };
 		A2BC19850CA9AF5A00DD302A /* CompleteCheck.png in Resources */ = {isa = PBXBuildFile; fileRef = A2BC19840CA9AF5A00DD302A /* CompleteCheck.png */; };
 		A2BE9C520C1E4AF5002D16E6 /* makemeta.c in Sources */ = {isa = PBXBuildFile; fileRef = A2BE9C4E0C1E4ADA002D16E6 /* makemeta.c */; };
@@ -822,6 +826,12 @@
 		A2AF1C370A3D0F6200F1575D /* FileOutlineView.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = FileOutlineView.m; path = macosx/FileOutlineView.m; sourceTree = "<group>"; };
 		A2B3FB450E5901E700FF78FB /* cli.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = cli.c; path = cli/cli.c; sourceTree = "<group>"; };
 		A2B5BB7A0D9C7C2300FCB650 /* es */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = es; path = macosx/es.lproj/AddWindow.xib; sourceTree = "<group>"; };
+		A2B614111395AD53000E0975 /* libz.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.dylib; path = usr/lib/libz.dylib; sourceTree = SDKROOT; };
+		A2B614131395AD8A000E0975 /* libz.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.dylib; path = usr/lib/libz.dylib; sourceTree = SDKROOT; };
+		A2B614151395ADA8000E0975 /* libz.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.dylib; path = usr/lib/libz.dylib; sourceTree = SDKROOT; };
+		A2B614171395ADC8000E0975 /* libz.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.dylib; path = usr/lib/libz.dylib; sourceTree = SDKROOT; };
+		A2B614191395ADD8000E0975 /* libz.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.dylib; path = usr/lib/libz.dylib; sourceTree = SDKROOT; };
+		A2B6141B1395ADE9000E0975 /* libz.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.dylib; path = usr/lib/libz.dylib; sourceTree = SDKROOT; };
 		A2B9F90311BD10BE003FC8CA /* fr */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = fr; path = macosx/fr.lproj/AddMagnetWindow.xib; sourceTree = "<group>"; };
 		A2B9F90411BD10BE003FC8CA /* fr */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = fr; path = macosx/fr.lproj/InfoActivityView.xib; sourceTree = "<group>"; };
 		A2B9F90511BD10BE003FC8CA /* fr */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = fr; path = macosx/fr.lproj/InfoGeneralView.xib; sourceTree = "<group>"; };
@@ -977,6 +987,7 @@
 				4D9A2BF909E16D4F002D0FF9 /* libcrypto.0.9.7.dylib in Frameworks */,
 				A22E59A70DC11A1D00F4BE15 /* libcurl.4.dylib in Frameworks */,
 				A296EF3C11E560BD004A2781 /* libiconv.dylib in Frameworks */,
+				A2B614181395ADC8000E0975 /* libz.dylib in Frameworks */,
 				A2B3FB4C0E59023000FF78FB /* Cocoa.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -993,6 +1004,7 @@
 				A261F1DC0A69A1610002815A /* Growl.framework in Frameworks */,
 				A29EBE710DC06068006CEE80 /* libcurl.4.dylib in Frameworks */,
 				A296EF3B11E560A7004A2781 /* libiconv.dylib in Frameworks */,
+				A2B614161395ADA8000E0975 /* libz.dylib in Frameworks */,
 				A2E669790F5B8E5A00B4251A /* Security.framework in Frameworks */,
 				A22CFB820FB66EF30009BD3E /* Carbon.framework in Frameworks */,
 				A221DCC8104B3660008A642D /* Quartz.framework in Frameworks */,
@@ -1048,6 +1060,7 @@
 				BEFC1C050C07753500B0BB3C /* libtransmission.a in Frameworks */,
 				A22E59A80DC11A1F00F4BE15 /* libcurl.4.dylib in Frameworks */,
 				A296EF3D11E560C3004A2781 /* libiconv.dylib in Frameworks */,
+				A2B6141A1395ADD9000E0975 /* libz.dylib in Frameworks */,
 				A2B3FB530E59027100FF78FB /* Cocoa.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1060,6 +1073,7 @@
 				BEFC1D2D0C0783D900B0BB3C /* libtransmission.a in Frameworks */,
 				A22E59A90DC11A2000F4BE15 /* libcurl.4.dylib in Frameworks */,
 				A296EF3E11E560D1004A2781 /* libiconv.dylib in Frameworks */,
+				A2B6141C1395ADE9000E0975 /* libz.dylib in Frameworks */,
 				A25E03D90E4015100086C225 /* Cocoa.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1170,6 +1184,12 @@
 		29B97314FDCFA39411CA2CEA /* Transmission */ = {
 			isa = PBXGroup;
 			children = (
+				A2B6141B1395ADE9000E0975 /* libz.dylib */,
+				A2B614191395ADD8000E0975 /* libz.dylib */,
+				A2B614171395ADC8000E0975 /* libz.dylib */,
+				A2B614151395ADA8000E0975 /* libz.dylib */,
+				A2B614131395AD8A000E0975 /* libz.dylib */,
+				A2B614111395AD53000E0975 /* libz.dylib */,
 				4DDBB70A09E16B3200284745 /* GUI */,
 				4D1838DC09DEC04A0047D688 /* libtransmission */,
 				4DDBB71F09E16BFE00284745 /* CLI */,
@@ -2654,7 +2674,7 @@
 					"-DHAVE_ASPRINTF",
 					"-DHAVE_LIBGEN",
 					"-DHAVE_STRCASECMP",
-					"-DHAVE_LIBZ",
+					"-DHAVE_ZLIB",
 				);
 				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
 				PRODUCT_NAME = transmission;
@@ -2712,7 +2732,6 @@
 					.,
 					"third-party/libevent/include",
 				);
-				OTHER_CFLAGS = "-DHAVE_LIBZ";
 				PRODUCT_NAME = "transmission-remote";
 			};
 			name = Debug;
@@ -2811,7 +2830,7 @@
 					"-DHAVE_ASPRINTF",
 					"-DHAVE_LIBGEN",
 					"-DHAVE_STRCASECMP",
-					"-DHAVE_LIBZ",
+					"-DHAVE_ZLIB",
 				);
 				PRODUCT_NAME = transmission;
 			};
@@ -3003,7 +3022,7 @@
 					"-DHAVE_ASPRINTF",
 					"-DHAVE_LIBGEN",
 					"-DHAVE_STRCASECMP",
-					"-DHAVE_LIBZ",
+					"-DHAVE_ZLIB",
 				);
 				PRODUCT_NAME = transmission;
 			};
@@ -3033,7 +3052,6 @@
 					.,
 					"third-party/libevent/include",
 				);
-				OTHER_CFLAGS = "-DHAVE_LIBZ";
 				PRODUCT_NAME = "transmission-remote";
 			};
 			name = "Release - Debug";
@@ -3141,7 +3159,6 @@
 					.,
 					"third-party/libevent/include",
 				);
-				OTHER_CFLAGS = "-DHAVE_LIBZ";
 				PRODUCT_NAME = "transmission-remote";
 			};
 			name = Release;
