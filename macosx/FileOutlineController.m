@@ -84,7 +84,6 @@ typedef enum
 - (void) setTorrent: (Torrent *) torrent
 {
     fTorrent = torrent;
-    [fOutline setTorrent: fTorrent];
     
     [fFileList release];
     fFileList = [[fTorrent fileList] retain];

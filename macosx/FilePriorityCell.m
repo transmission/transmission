@@ -81,9 +81,10 @@
             break;
     }
     
-    FileOutlineView * controlView = (FileOutlineView *)[self controlView];
-    Torrent * torrent = [controlView torrent];
+    Torrent * torrent = [(FileListNode *)[self representedObject] torrent];
     [torrent setFilePriority: priority forIndexes: [(FileListNode *)[self representedObject] indexes]];
+    
+    FileOutlineView * controlView = (FileOutlineView *)[self controlView];
     [controlView reloadData];
 }
 
@@ -110,8 +111,8 @@
 
 - (void) drawWithFrame: (NSRect) cellFrame inView: (NSView *) controlView
 {
-    Torrent * torrent = [(FileOutlineView *)controlView torrent];
     FileListNode * node = [self representedObject];
+    Torrent * torrent = [node torrent];
     NSSet * priorities = [torrent filePrioritiesForIndexes: [node indexes]];
     
     const NSUInteger count = [priorities count];

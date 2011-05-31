@@ -54,17 +54,6 @@
     [super dealloc];
 }
 
-#warning needed?
-- (void) setTorrent: (Torrent *) torrent
-{
-    fTorrent = torrent;
-}
-
-- (Torrent *) torrent
-{
-    return fTorrent;
-}
-
 - (void) mouseDown: (NSEvent *) event
 {
     [[self window] makeKeyWindow];

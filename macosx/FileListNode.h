@@ -24,6 +24,8 @@
 
 #import <Cocoa/Cocoa.h>
 
+@class Torrent;
+
 @interface FileListNode : NSObject <NSCopying>
 {
     NSString * fName, * fPath;
@@ -34,10 +36,12 @@
     NSImage * fIcon;
     
     NSMutableArray * fChildren;
+    
+    Torrent * fTorrent;
 }
 
-- (id) initWithFolderName: (NSString *) name path: (NSString *) path;
-- (id) initWithFileName: (NSString *) name path: (NSString *) path size: (uint64_t) size index: (NSUInteger) index;
+- (id) initWithFolderName: (NSString *) name path: (NSString *) path torrent: (Torrent *) torrent;
+- (id) initWithFileName: (NSString *) name path: (NSString *) path size: (uint64_t) size index: (NSUInteger) index torrent: (Torrent *) torrent;
 
 - (void) insertChild: (FileListNode *) child;
 - (void) insertIndex: (NSUInteger) index withSize: (uint64_t) size;
@@ -53,5 +57,7 @@
 - (NSImage *) icon;
 
 - (NSMutableArray *) children;
+
+- (Torrent *) torrent;
 
 @end

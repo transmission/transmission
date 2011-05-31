@@ -129,7 +129,7 @@
     NSColor * titleColor, * statusColor;
     if ([self backgroundStyle] == NSBackgroundStyleDark)
         titleColor = statusColor = [NSColor whiteColor];
-    else if ([[(FileOutlineView *)[self controlView] torrent] checkForFiles: [(FileListNode *)[self objectValue] indexes]] == NSOffState)
+    else if ([[(FileListNode *)[self objectValue] torrent] checkForFiles: [(FileListNode *)[self objectValue] indexes]] == NSOffState)
         titleColor = statusColor = [NSColor disabledControlTextColor];
     else
     {
@@ -207,8 +207,8 @@
 
 - (NSAttributedString *) attributedStatus
 {
-    Torrent * torrent = [(FileOutlineView *)[self controlView] torrent];
     FileListNode * node = (FileListNode *)[self objectValue];
+    Torrent * torrent = [node torrent];
     
     const CGFloat progress = [torrent fileProgress: node];
     NSString * percentString = [NSString percentString: progress longDecimals: YES];

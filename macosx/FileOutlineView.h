@@ -28,13 +28,8 @@
 
 @interface FileOutlineView : NSOutlineView
 {
-    Torrent * fTorrent;
-    
     NSInteger fMouseRow;
 }
-
-- (void) setTorrent: (Torrent *) torrent;
-- (Torrent *) torrent;
 
 - (NSRect) iconRectForRow: (int) row;
 
