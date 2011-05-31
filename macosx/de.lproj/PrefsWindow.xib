@@ -2,17 +2,46 @@
 <archive type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="7.10">
 	<data>
 		<int key="IBDocument.SystemTarget">1050</int>
-		<string key="IBDocument.SystemVersion">10J869</string>
-		<string key="IBDocument.InterfaceBuilderVersion">823</string>
+		<string key="IBDocument.SystemVersion">10J4138</string>
+		<string key="IBDocument.InterfaceBuilderVersion">1306</string>
 		<string key="IBDocument.AppKitVersion">1038.35</string>
 		<string key="IBDocument.HIToolboxVersion">461.00</string>
 		<object class="NSMutableDictionary" key="IBDocument.PluginVersions">
 			<string key="NS.key.0">com.apple.InterfaceBuilder.CocoaPlugin</string>
-			<string key="NS.object.0">823</string>
+			<string key="NS.object.0">1306</string>
 		</object>
-		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
+		<object class="NSArray" key="IBDocument.IntegratedClassDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
-			<integer value="1481"/>
+			<string>NSScroller</string>
+			<string>NSColorWell</string>
+			<string>NSMenu</string>
+			<string>NSButton</string>
+			<string>NSCustomObject</string>
+			<string>NSImageView</string>
+			<string>NSImageCell</string>
+			<string>NSCustomView</string>
+			<string>NSTableView</string>
+			<string>NSTextField</string>
+			<string>NSNumberFormatter</string>
+			<string>NSWindowTemplate</string>
+			<string>NSTextFieldCell</string>
+			<string>NSButtonCell</string>
+			<string>NSSecureTextField</string>
+			<string>NSDatePickerCell</string>
+			<string>NSDatePicker</string>
+			<string>NSSecureTextFieldCell</string>
+			<string>NSTableColumn</string>
+			<string>NSPopUpButtonCell</string>
+			<string>NSView</string>
+			<string>NSSegmentedControl</string>
+			<string>NSScrollView</string>
+			<string>NSUserDefaultsController</string>
+			<string>NSTabViewItem</string>
+			<string>NSProgressIndicator</string>
+			<string>NSSegmentedCell</string>
+			<string>NSPopUpButton</string>
+			<string>NSTabView</string>
+			<string>NSMenuItem</string>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -37,7 +66,7 @@
 				<int key="NSWindowStyleMask">3</int>
 				<int key="NSWindowBacking">2</int>
 				<string key="NSWindowRect">{{108, 632}, {555, 107}}</string>
-				<int key="NSWTFlags">1886913536</int>
+				<int key="NSWTFlags">1886915584</int>
 				<string key="NSWindowTitle">Einstellungen</string>
 				<string key="NSWindowClass">PrefsWindow</string>
 				<object class="NSMutableString" key="NSViewClass">
@@ -45,9 +74,11 @@
 				</object>
 				<string key="NSWindowContentMaxSize">{555, 107}</string>
 				<object class="NSView" key="NSWindowView" id="334064964">
-					<nil key="NSNextResponder"/>
+					<reference key="NSNextResponder"/>
 					<int key="NSvFlags">256</int>
-					<string key="NSFrameSize">{555, 107}</string>
+					<string key="NSFrame">{{7, 11}, {555, 107}}</string>
+					<reference key="NSSuperview"/>
+					<reference key="NSWindow"/>
 				</object>
 				<string key="NSScreenRect">{{0, 0}, {1680, 1028}}</string>
 				<string key="NSMaxSize">{555, 129}</string>
@@ -1010,14 +1041,12 @@
 													<nil key="NS.nil"/>
 													<object class="NSAttributedString" key="NS.nan">
 														<string key="NSString">NaN</string>
-														<object class="NSDictionary" key="NSAttributes" id="128098020">
+														<object class="NSDictionary" key="NSAttributes" id="957994120">
 															<bool key="EncodedWithXMLCoder">YES</bool>
 															<object class="NSArray" key="dict.sortedKeys" id="0">
 																<bool key="EncodedWithXMLCoder">YES</bool>
 															</object>
-															<object class="NSMutableArray" key="dict.values">
-																<bool key="EncodedWithXMLCoder">YES</bool>
-															</object>
+															<reference key="dict.values" ref="0"/>
 														</object>
 													</object>
 													<real value="1" key="NS.min"/>
@@ -1152,7 +1181,7 @@
 													<nil key="NS.nil"/>
 													<object class="NSAttributedString" key="NS.nan">
 														<string key="NSString">NaN</string>
-														<reference key="NSAttributes" ref="128098020"/>
+														<reference key="NSAttributes" ref="957994120"/>
 													</object>
 													<integer value="0" key="NS.min"/>
 													<real value="10000" key="NS.max"/>
@@ -1246,7 +1275,7 @@
 													</object>
 													<object class="NSAttributedString" key="NS.nan">
 														<string key="NSString">NaN</string>
-														<reference key="NSAttributes" ref="128098020"/>
+														<reference key="NSAttributes" ref="957994120"/>
 													</object>
 													<real value="1" key="NS.min"/>
 													<real value="10000" key="NS.max"/>
@@ -1375,7 +1404,7 @@
 													<nil key="NS.nil"/>
 													<object class="NSAttributedString" key="NS.nan">
 														<string key="NSString">NaN</string>
-														<reference key="NSAttributes" ref="128098020"/>
+														<reference key="NSAttributes" ref="957994120"/>
 													</object>
 													<real value="1" key="NS.min"/>
 													<real value="10000" key="NS.max"/>
@@ -1486,7 +1515,7 @@
 													<nil key="NS.nil"/>
 													<object class="NSAttributedString" key="NS.nan">
 														<string key="NSString">NaN</string>
-														<reference key="NSAttributes" ref="128098020"/>
+														<reference key="NSAttributes" ref="957994120"/>
 													</object>
 													<real value="1" key="NS.min"/>
 													<real value="10000" key="NS.max"/>
@@ -1496,8 +1525,8 @@
 														<bool key="NS.raise.underflow">YES</bool>
 														<bool key="NS.raise.dividebyzero">YES</bool>
 													</object>
-													<string key="NS.decimal">,</string>
-													<string key="NS.thousand">.</string>
+													<string key="NS.decimal">.</string>
+													<string key="NS.thousand">,</string>
 													<bool key="NS.hasthousands">NO</bool>
 													<bool key="NS.localized">YES</bool>
 													<bool key="NS.allowsfloats">NO</bool>
@@ -2485,7 +2514,7 @@ xCXGCsf5ye7L6s3lz+vR8dP51grYGdoV28bda98d4MvieuQi5cfnaOj76n3r9u1b7rPwAfE18l3zfPSC
 								<nil key="NS.nil"/>
 								<object class="NSAttributedString" key="NS.nan">
 									<string key="NSString">NaN</string>
-									<reference key="NSAttributes" ref="128098020"/>
+									<reference key="NSAttributes" ref="957994120"/>
 								</object>
 								<integer value="0" key="NS.min"/>
 								<real value="99999" key="NS.max"/>
@@ -2570,7 +2599,7 @@ xCXGCsf5ye7L6s3lz+vR8dP51grYGdoV28bda98d4MvieuQi5cfnaOj76n3r9u1b7rPwAfE18l3zfPSC
 								<nil key="NS.nil"/>
 								<object class="NSAttributedString" key="NS.nan">
 									<string key="NSString">NaN</string>
-									<reference key="NSAttributes" ref="128098020"/>
+									<reference key="NSAttributes" ref="957994120"/>
 								</object>
 								<integer value="0" key="NS.min"/>
 								<real value="99999" key="NS.max"/>
@@ -2703,7 +2732,7 @@ xCXGCsf5ye7L6s3lz+vR8dP51grYGdoV28bda98d4MvieuQi5cfnaOj76n3r9u1b7rPwAfE18l3zfPSC
 								<nil key="NS.nil"/>
 								<object class="NSAttributedString" key="NS.nan">
 									<string key="NSString">NaN</string>
-									<reference key="NSAttributes" ref="128098020"/>
+									<reference key="NSAttributes" ref="957994120"/>
 								</object>
 								<integer value="0" key="NS.min"/>
 								<real value="99999" key="NS.max"/>
@@ -2766,7 +2795,7 @@ xCXGCsf5ye7L6s3lz+vR8dP51grYGdoV28bda98d4MvieuQi5cfnaOj76n3r9u1b7rPwAfE18l3zfPSC
 								<nil key="NS.nil"/>
 								<object class="NSAttributedString" key="NS.nan">
 									<string key="NSString">NaN</string>
-									<reference key="NSAttributes" ref="128098020"/>
+									<reference key="NSAttributes" ref="957994120"/>
 								</object>
 								<integer value="0" key="NS.min"/>
 								<real value="99999" key="NS.max"/>
@@ -3355,7 +3384,7 @@ AAABAAAAAQ</bytes>
 								<nil key="NS.nil"/>
 								<object class="NSAttributedString" key="NS.nan">
 									<string key="NSString">NaN</string>
-									<reference key="NSAttributes" ref="128098020"/>
+									<reference key="NSAttributes" ref="957994120"/>
 								</object>
 								<real value="1" key="NS.min"/>
 								<real value="3000" key="NS.max"/>
@@ -3452,7 +3481,7 @@ AAABAAAAAQ</bytes>
 								<nil key="NS.nil"/>
 								<object class="NSAttributedString" key="NS.nan">
 									<string key="NSString">NaN</string>
-									<reference key="NSAttributes" ref="128098020"/>
+									<reference key="NSAttributes" ref="957994120"/>
 								</object>
 								<real value="1" key="NS.min"/>
 								<real value="3000" key="NS.max"/>
@@ -3947,7 +3976,7 @@ AAABAAAAAQ</bytes>
 								<nil key="NS.nil"/>
 								<object class="NSAttributedString" key="NS.nan">
 									<string key="NSString">NaN</string>
-									<reference key="NSAttributes" ref="128098020"/>
+									<reference key="NSAttributes" ref="957994120"/>
 								</object>
 								<real value="1" key="NS.min"/>
 								<real value="65535" key="NS.max"/>
@@ -4062,7 +4091,7 @@ AAABAAAAAQ</bytes>
 				<string key="NSExtension">NSResponder</string>
 			</object>
 			<object class="NSCustomView" id="810116101">
-				<reference key="NSNextResponder"/>
+				<nil key="NSNextResponder"/>
 				<int key="NSvFlags">256</int>
 				<object class="NSMutableArray" key="NSSubviews">
 					<bool key="EncodedWithXMLCoder">YES</bool>
@@ -4157,7 +4186,7 @@ AAABAAAAAQ</bytes>
 								<nil key="NS.nil"/>
 								<object class="NSAttributedString" key="NS.nan">
 									<string key="NSString">NaN</string>
-									<reference key="NSAttributes" ref="128098020"/>
+									<reference key="NSAttributes" ref="957994120"/>
 								</object>
 								<real value="1" key="NS.min"/>
 								<real value="65535" key="NS.max"/>
@@ -4517,7 +4546,6 @@ AAABAAAAAQ</bytes>
 					</object>
 				</object>
 				<string key="NSFrameSize">{555, 460}</string>
-				<reference key="NSSuperview"/>
 				<string key="NSClassName">NSView</string>
 				<string key="NSExtension">NSResponder</string>
 			</object>
@@ -10927,8 +10955,6 @@ AAABAAAAAQ</bytes>
 					<string>23.IBWindowTemplateEditedContentRect</string>
 					<string>23.ImportedFromIB2</string>
 					<string>23.editorWindowContentRectSynchronizationRect</string>
-					<string>23.windowTemplate.hasMaxSize</string>
-					<string>23.windowTemplate.maxSize</string>
 					<string>230.IBPluginDependency</string>
 					<string>230.ImportedFromIB2</string>
 					<string>24.IBPluginDependency</string>
@@ -11625,8 +11651,6 @@ AAABAAAAAQ</bytes>
 					<string>{{108, 632}, {555, 107}}</string>
 					<real value="1"/>
 					<string>{{127, 767}, {539, 107}}</string>
-					<boolean value="YES"/>
-					<string>{555, 107}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<real value="1"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -11844,17 +11868,13 @@ AAABAAAAAQ</bytes>
 			<object class="NSMutableDictionary" key="unlocalizedProperties">
 				<bool key="EncodedWithXMLCoder">YES</bool>
 				<reference key="dict.sortedKeys" ref="0"/>
-				<object class="NSMutableArray" key="dict.values">
-					<bool key="EncodedWithXMLCoder">YES</bool>
-				</object>
+				<reference key="dict.values" ref="0"/>
 			</object>
 			<nil key="activeLocalization"/>
 			<object class="NSMutableDictionary" key="localizations">
 				<bool key="EncodedWithXMLCoder">YES</bool>
 				<reference key="dict.sortedKeys" ref="0"/>
-				<object class="NSMutableArray" key="dict.values">
-					<bool key="EncodedWithXMLCoder">YES</bool>
-				</object>
+				<reference key="dict.values" ref="0"/>
 			</object>
 			<nil key="sourceID"/>
 			<int key="maxID">2084</int>
@@ -11877,7 +11897,6 @@ AAABAAAAAQ</bytes>
 						<bool key="EncodedWithXMLCoder">YES</bool>
 						<object class="NSArray" key="dict.sortedKeys">
 							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>addRemoveGroup:</string>
 							<string>cancelRules:</string>
 							<string>customDownloadLocationSheetShow:</string>
 							<string>orderFrontRulesSheet:</string>
@@ -11887,7 +11906,6 @@ AAABAAAAAQ</bytes>
 						</object>
 						<object class="NSMutableArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>id</string>
 							<string>id</string>
 							<string>id</string>
 							<string>id</string>
@@ -11900,7 +11918,6 @@ AAABAAAAAQ</bytes>
 						<bool key="EncodedWithXMLCoder">YES</bool>
 						<object class="NSArray" key="dict.sortedKeys">
 							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>addRemoveGroup:</string>
 							<string>cancelRules:</string>
 							<string>customDownloadLocationSheetShow:</string>
 							<string>orderFrontRulesSheet:</string>
@@ -11910,10 +11927,6 @@ AAABAAAAAQ</bytes>
 						</object>
 						<object class="NSMutableArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
-							<object class="IBActionInfo">
-								<string key="name">addRemoveGroup:</string>
-								<string key="candidateClassName">id</string>
-							</object>
 							<object class="IBActionInfo">
 								<string key="name">cancelRules:</string>
 								<string key="candidateClassName">id</string>
@@ -12036,423 +12049,6 @@ AAABAAAAAQ</bytes>
 				<object class="IBPartialClassDescription">
 					<string key="className">PrefsController</string>
 					<string key="superclassName">NSWindowController</string>
-					<object class="NSMutableDictionary" key="actions">
-						<bool key="EncodedWithXMLCoder">YES</bool>
-						<object class="NSArray" key="dict.sortedKeys">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>addRemoveRPCIP:</string>
-							<string>applyIdleStopSetting:</string>
-							<string>applyRatioSetting:</string>
-							<string>applySpeedSettings:</string>
-							<string>doneScriptSheetShow:</string>
-							<string>folderSheetShow:</string>
-							<string>helpForNetwork:</string>
-							<string>helpForPeers:</string>
-							<string>helpForRemote:</string>
-							<string>helpForScript:</string>
-							<string>importFolderSheetShow:</string>
-							<string>incompleteFolderSheetShow:</string>
-							<string>linkWebUI:</string>
-							<string>randomPort:</string>
-							<string>resetWarnings:</string>
-							<string>setAutoImport:</string>
-							<string>setAutoSize:</string>
-							<string>setAutoSpeedLimit:</string>
-							<string>setAutoSpeedLimitDay:</string>
-							<string>setAutoSpeedLimitTime:</string>
-							<string>setAutoStartDownloads:</string>
-							<string>setAutoUpdateToBeta:</string>
-							<string>setBadge:</string>
-							<string>setBlocklistAutoUpdate:</string>
-							<string>setBlocklistEnabled:</string>
-							<string>setDHT:</string>
-							<string>setDefaultForMagnets:</string>
-							<string>setDoneScriptEnabled:</string>
-							<string>setDownloadLocation:</string>
-							<string>setEncryptionMode:</string>
-							<string>setGlobalLimit:</string>
-							<string>setIdleStop:</string>
-							<string>setLPD:</string>
-							<string>setNat:</string>
-							<string>setPEX:</string>
-							<string>setPeersGlobal:</string>
-							<string>setPeersTorrent:</string>
-							<string>setPort:</string>
-							<string>setQueue:</string>
-							<string>setQueueNumber:</string>
-							<string>setRPCAuthorize:</string>
-							<string>setRPCEnabled:</string>
-							<string>setRPCPassword:</string>
-							<string>setRPCPort:</string>
-							<string>setRPCUseWhitelist:</string>
-							<string>setRPCUsername:</string>
-							<string>setRPCWebUIDiscovery:</string>
-							<string>setRandomPortOnStart:</string>
-							<string>setRatioStop:</string>
-							<string>setRenamePartialFiles:</string>
-							<string>setSound:</string>
-							<string>setSpeedLimit:</string>
-							<string>setStalled:</string>
-							<string>setStalledMinutes:</string>
-							<string>setUTP:</string>
-							<string>setUseIncompleteFolder:</string>
-							<string>updateBlocklist:</string>
-						</object>
-						<object class="NSMutableArray" key="dict.values">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>id</string>
-							<string>id</string>
-							<string>id</string>
-							<string>id</string>
-							<string>id</string>
-							<string>id</string>
-							<string>id</string>
-							<string>id</string>
-							<string>id</string>
-							<string>id</string>
-							<string>id</string>
-							<string>id</string>
-							<string>id</string>
-							<string>id</string>
-							<string>id</string>
-							<string>id</string>
-							<string>id</string>
-							<string>id</string>
-							<string>id</string>
-							<string>id</string>
-							<string>id</string>
-							<string>id</string>
-							<string>id</string>
-							<string>id</string>
-							<string>id</string>
-							<string>id</string>
-							<string>id</string>
-							<string>id</string>
-							<string>id</string>
-							<string>id</string>
-							<string>id</string>
-							<string>id</string>
-							<string>id</string>
-							<string>id</string>
-							<string>id</string>
-							<string>id</string>
-							<string>id</string>
-							<string>id</string>
-							<string>id</string>
-							<string>id</string>
-							<string>id</string>
-							<string>id</string>
-							<string>id</string>
-							<string>id</string>
-							<string>id</string>
-							<string>id</string>
-							<string>id</string>
-							<string>id</string>
-							<string>id</string>
-							<string>id</string>
-							<string>id</string>
-							<string>id</string>
-							<string>id</string>
-							<string>id</string>
-							<string>id</string>
-							<string>id</string>
-							<string>id</string>
-						</object>
-					</object>
-					<object class="NSMutableDictionary" key="actionInfosByName">
-						<bool key="EncodedWithXMLCoder">YES</bool>
-						<object class="NSArray" key="dict.sortedKeys">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>addRemoveRPCIP:</string>
-							<string>applyIdleStopSetting:</string>
-							<string>applyRatioSetting:</string>
-							<string>applySpeedSettings:</string>
-							<string>doneScriptSheetShow:</string>
-							<string>folderSheetShow:</string>
-							<string>helpForNetwork:</string>
-							<string>helpForPeers:</string>
-							<string>helpForRemote:</string>
-							<string>helpForScript:</string>
-							<string>importFolderSheetShow:</string>
-							<string>incompleteFolderSheetShow:</string>
-							<string>linkWebUI:</string>
-							<string>randomPort:</string>
-							<string>resetWarnings:</string>
-							<string>setAutoImport:</string>
-							<string>setAutoSize:</string>
-							<string>setAutoSpeedLimit:</string>
-							<string>setAutoSpeedLimitDay:</string>
-							<string>setAutoSpeedLimitTime:</string>
-							<string>setAutoStartDownloads:</string>
-							<string>setAutoUpdateToBeta:</string>
-							<string>setBadge:</string>
-							<string>setBlocklistAutoUpdate:</string>
-							<string>setBlocklistEnabled:</string>
-							<string>setDHT:</string>
-							<string>setDefaultForMagnets:</string>
-							<string>setDoneScriptEnabled:</string>
-							<string>setDownloadLocation:</string>
-							<string>setEncryptionMode:</string>
-							<string>setGlobalLimit:</string>
-							<string>setIdleStop:</string>
-							<string>setLPD:</string>
-							<string>setNat:</string>
-							<string>setPEX:</string>
-							<string>setPeersGlobal:</string>
-							<string>setPeersTorrent:</string>
-							<string>setPort:</string>
-							<string>setQueue:</string>
-							<string>setQueueNumber:</string>
-							<string>setRPCAuthorize:</string>
-							<string>setRPCEnabled:</string>
-							<string>setRPCPassword:</string>
-							<string>setRPCPort:</string>
-							<string>setRPCUseWhitelist:</string>
-							<string>setRPCUsername:</string>
-							<string>setRPCWebUIDiscovery:</string>
-							<string>setRandomPortOnStart:</string>
-							<string>setRatioStop:</string>
-							<string>setRenamePartialFiles:</string>
-							<string>setSound:</string>
-							<string>setSpeedLimit:</string>
-							<string>setStalled:</string>
-							<string>setStalledMinutes:</string>
-							<string>setUTP:</string>
-							<string>setUseIncompleteFolder:</string>
-							<string>updateBlocklist:</string>
-						</object>
-						<object class="NSMutableArray" key="dict.values">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-							<object class="IBActionInfo">
-								<string key="name">addRemoveRPCIP:</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBActionInfo">
-								<string key="name">applyIdleStopSetting:</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBActionInfo">
-								<string key="name">applyRatioSetting:</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBActionInfo">
-								<string key="name">applySpeedSettings:</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBActionInfo">
-								<string key="name">doneScriptSheetShow:</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBActionInfo">
-								<string key="name">folderSheetShow:</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBActionInfo">
-								<string key="name">helpForNetwork:</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBActionInfo">
-								<string key="name">helpForPeers:</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBActionInfo">
-								<string key="name">helpForRemote:</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBActionInfo">
-								<string key="name">helpForScript:</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBActionInfo">
-								<string key="name">importFolderSheetShow:</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBActionInfo">
-								<string key="name">incompleteFolderSheetShow:</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBActionInfo">
-								<string key="name">linkWebUI:</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBActionInfo">
-								<string key="name">randomPort:</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBActionInfo">
-								<string key="name">resetWarnings:</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBActionInfo">
-								<string key="name">setAutoImport:</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBActionInfo">
-								<string key="name">setAutoSize:</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBActionInfo">
-								<string key="name">setAutoSpeedLimit:</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBActionInfo">
-								<string key="name">setAutoSpeedLimitDay:</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBActionInfo">
-								<string key="name">setAutoSpeedLimitTime:</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBActionInfo">
-								<string key="name">setAutoStartDownloads:</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBActionInfo">
-								<string key="name">setAutoUpdateToBeta:</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBActionInfo">
-								<string key="name">setBadge:</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBActionInfo">
-								<string key="name">setBlocklistAutoUpdate:</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBActionInfo">
-								<string key="name">setBlocklistEnabled:</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBActionInfo">
-								<string key="name">setDHT:</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBActionInfo">
-								<string key="name">setDefaultForMagnets:</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBActionInfo">
-								<string key="name">setDoneScriptEnabled:</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBActionInfo">
-								<string key="name">setDownloadLocation:</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBActionInfo">
-								<string key="name">setEncryptionMode:</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBActionInfo">
-								<string key="name">setGlobalLimit:</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBActionInfo">
-								<string key="name">setIdleStop:</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBActionInfo">
-								<string key="name">setLPD:</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBActionInfo">
-								<string key="name">setNat:</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBActionInfo">
-								<string key="name">setPEX:</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBActionInfo">
-								<string key="name">setPeersGlobal:</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBActionInfo">
-								<string key="name">setPeersTorrent:</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBActionInfo">
-								<string key="name">setPort:</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBActionInfo">
-								<string key="name">setQueue:</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBActionInfo">
-								<string key="name">setQueueNumber:</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBActionInfo">
-								<string key="name">setRPCAuthorize:</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBActionInfo">
-								<string key="name">setRPCEnabled:</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBActionInfo">
-								<string key="name">setRPCPassword:</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBActionInfo">
-								<string key="name">setRPCPort:</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBActionInfo">
-								<string key="name">setRPCUseWhitelist:</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBActionInfo">
-								<string key="name">setRPCUsername:</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBActionInfo">
-								<string key="name">setRPCWebUIDiscovery:</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBActionInfo">
-								<string key="name">setRandomPortOnStart:</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBActionInfo">
-								<string key="name">setRatioStop:</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBActionInfo">
-								<string key="name">setRenamePartialFiles:</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBActionInfo">
-								<string key="name">setSound:</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBActionInfo">
-								<string key="name">setSpeedLimit:</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBActionInfo">
-								<string key="name">setStalled:</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBActionInfo">
-								<string key="name">setStalledMinutes:</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBActionInfo">
-								<string key="name">setUTP:</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBActionInfo">
-								<string key="name">setUseIncompleteFolder:</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBActionInfo">
-								<string key="name">updateBlocklist:</string>
-								<string key="candidateClassName">id</string>
-							</object>
-						</object>
-					</object>
 					<object class="NSMutableDictionary" key="outlets">
 						<bool key="EncodedWithXMLCoder">YES</bool>
 						<object class="NSArray" key="dict.sortedKeys">
@@ -12475,8 +12071,6 @@ AAABAAAAAQ</bytes>
 							<string>fImportFolderPopUp</string>
 							<string>fIncompleteFolderPopUp</string>
 							<string>fNatCheck</string>
-							<string>fNatStatusField</string>
-							<string>fNatStatusImage</string>
 							<string>fNetworkView</string>
 							<string>fPeersGlobalField</string>
 							<string>fPeersTorrentField</string>
@@ -12519,8 +12113,6 @@ AAABAAAAAQ</bytes>
 							<string>NSPopUpButton</string>
 							<string>NSPopUpButton</string>
 							<string>NSButton</string>
-							<string>NSTextField</string>
-							<string>NSImageView</string>
 							<string>NSView</string>
 							<string>NSTextField</string>
 							<string>NSTextField</string>
@@ -12566,8 +12158,6 @@ AAABAAAAAQ</bytes>
 							<string>fImportFolderPopUp</string>
 							<string>fIncompleteFolderPopUp</string>
 							<string>fNatCheck</string>
-							<string>fNatStatusField</string>
-							<string>fNatStatusImage</string>
 							<string>fNetworkView</string>
 							<string>fPeersGlobalField</string>
 							<string>fPeersTorrentField</string>
@@ -12663,14 +12253,6 @@ AAABAAAAAQ</bytes>
 							<object class="IBToOneOutletInfo">
 								<string key="name">fNatCheck</string>
 								<string key="candidateClassName">NSButton</string>
-							</object>
-							<object class="IBToOneOutletInfo">
-								<string key="name">fNatStatusField</string>
-								<string key="candidateClassName">NSTextField</string>
-							</object>
-							<object class="IBToOneOutletInfo">
-								<string key="name">fNatStatusImage</string>
-								<string key="candidateClassName">NSImageView</string>
 							</object>
 							<object class="IBToOneOutletInfo">
 								<string key="name">fNetworkView</string>
@@ -12788,7 +12370,6 @@ AAABAAAAAQ</bytes>
 			<integer value="3000" key="NS.object.0"/>
 		</object>
 		<bool key="IBDocument.PluginDeclaredDependenciesTrackSystemTargetVersion">YES</bool>
-		<nil key="IBDocument.LastKnownRelativeProjectPath"/>
 		<int key="IBDocument.defaultPropertyAccessControl">3</int>
 		<object class="NSMutableDictionary" key="IBDocument.LastKnownImageSizes">
 			<bool key="EncodedWithXMLCoder">YES</bool>
