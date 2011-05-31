@@ -2,7 +2,7 @@
 <archive type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="8.00">
 	<data>
 		<int key="IBDocument.SystemTarget">1050</int>
-		<string key="IBDocument.SystemVersion">10J869</string>
+		<string key="IBDocument.SystemVersion">10J4138</string>
 		<string key="IBDocument.InterfaceBuilderVersion">1306</string>
 		<string key="IBDocument.AppKitVersion">1038.35</string>
 		<string key="IBDocument.HIToolboxVersion">461.00</string>
@@ -50,7 +50,7 @@
 				<int key="NSWindowStyleMask">4111</int>
 				<int key="NSWindowBacking">2</int>
 				<string key="NSWindowRect">{{71, 712}, {515, 248}}</string>
-				<int key="NSWTFlags">1881669632</int>
+				<int key="NSWTFlags">1881671680</int>
 				<string key="NSWindowTitle">Transmission</string>
 				<string key="NSWindowClass">NSWindow</string>
 				<object class="NSMutableString" key="NSViewClass">
@@ -182,7 +182,6 @@
 							<string key="NSFrame">{{118, 5}, {279, 14}}</string>
 							<reference key="NSSuperview" ref="303120456"/>
 							<reference key="NSWindow"/>
-							<reference key="NSNextKeyView"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSTextFieldCell" key="NSCell" id="696487414">
 								<int key="NSCellFlags">67239488</int>
@@ -228,7 +227,7 @@
 											<string key="NSFrameSize">{515, 224}</string>
 											<reference key="NSSuperview" ref="306237956"/>
 											<reference key="NSWindow"/>
-											<reference key="NSNextKeyView" ref="1068338331"/>
+											<reference key="NSNextKeyView" ref="365285506"/>
 											<bool key="NSEnabled">YES</bool>
 											<object class="_NSCornerView" key="NSCornerView">
 												<nil key="NSNextResponder"/>
@@ -746,7 +745,7 @@ AAAAAAAAAAAAAA</bytes>
 							<string key="NSFrame">{{0, 24}, {515, 224}}</string>
 							<reference key="NSSuperview" ref="303120456"/>
 							<reference key="NSWindow"/>
-							<reference key="NSNextKeyView" ref="365285506"/>
+							<reference key="NSNextKeyView" ref="306237956"/>
 							<int key="NSsFlags">528</int>
 							<reference key="NSVScroller" ref="1068338331"/>
 							<reference key="NSHScroller" ref="365285506"/>
