@@ -1473,7 +1473,9 @@ onPeerViewQueryTooltip( GtkWidget   * widget,
                                           -1 );
 
         g_string_truncate( gstr, 0 );
-        g_string_append_printf( gstr, "<b>%s</b>\n%s\n \n", name, addr );
+        markup = g_markup_escape_text( name, -1 );
+        g_string_append_printf( gstr, "<b>%s</b>\n%s\n \n", markup, addr );
+        g_free( markup );
 
         for( pch = flagstr; pch && *pch; ++pch )
         {
@@ -1499,9 +1501,7 @@ onPeerViewQueryTooltip( GtkWidget   * widget,
         if( gstr->len ) /* remove the last linefeed */
             g_string_set_size( gstr, gstr->len - 1 );
 
-        markup = g_markup_escape_text( gstr->str, gstr->len );
-        gtk_tooltip_set_markup( tooltip, markup );
-        g_free( markup );
+        gtk_tooltip_set_markup( tooltip, gstr->str );
 
         g_free( flagstr );
         g_free( addr );
