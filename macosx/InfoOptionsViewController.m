@@ -40,6 +40,7 @@
 
 - (void) setupInfo;
 - (void) setGlobalLabels;
+- (void) updateOptionsNotification: (NSNotification *) notification;
 
 @end
 
@@ -59,8 +60,8 @@
 {
     [self setGlobalLabels];
     
-    [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(setGlobalLabels) name: @"UpdateGlobalOptions"
-        object: nil];
+    [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(setGlobalLabels) name: @"UpdateGlobalOptions" object: nil];
+    [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(updateOptionsNotification:) name: @"UpdateOptionsNotification" object: nil];
 }
 
 - (void) dealloc
@@ -286,6 +287,8 @@
     
     NSTextField * label = upload ? fUploadLimitLabel : fDownloadLimitLabel;
     [label setEnabled: limit];
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateOptionsNotification" object: self];
 }
 
 - (void) setUseGlobalSpeedLimit: (id) sender
@@ -296,6 +299,8 @@
     
     for (Torrent * torrent in fTorrents)
         [torrent setUseGlobalSpeedLimit: limit];
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateOptionsNotification" object: self];
 }
 
 - (void) setSpeedLimit: (id) sender
@@ -305,6 +310,8 @@
     
     for (Torrent * torrent in fTorrents)
         [torrent setSpeedLimit: limit upload: upload];
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateOptionsNotification" object: self];
 }
 
 - (void) setRatioSetting: (id) sender
@@ -339,6 +346,8 @@
     }
     
     [fRatioLimitGlobalLabel setHidden: setting != TR_RATIOLIMIT_GLOBAL];
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateOptionsNotification" object: self];
 }
 
 - (void) setRatioLimit: (id) sender
@@ -347,6 +356,8 @@
     
     for (Torrent * torrent in fTorrents)
         [torrent setRatioLimit: limit];
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateOptionsNotification" object: self];
 }
 
 - (void) setIdleSetting: (id) sender
@@ -382,6 +393,8 @@
     }
     
     [fIdleLimitGlobalLabel setHidden: setting != TR_IDLELIMIT_GLOBAL];
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateOptionsNotification" object: self];
 }
 
 - (void) setIdleLimit: (id) sender
@@ -390,6 +403,8 @@
     
     for (Torrent * torrent in fTorrents)
         [torrent setIdleLimitMinutes: limit];
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateOptionsNotification" object: self];
 }
 
 - (void) setPriority: (id) sender
@@ -415,6 +430,8 @@
         [torrent setPriority: priority];
     
     [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateUI" object: nil];
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateOptionsNotification" object: self];
 }
 
 - (void) setPeersConnectLimit: (id) sender
@@ -423,6 +440,8 @@
     
     for (Torrent * torrent in fTorrents)
         [torrent setMaxPeerConnect: limit];
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateOptionsNotification" object: self];
 }
 
 - (BOOL) control: (NSControl *) control textShouldBeginEditing: (NSText *) fieldEditor
@@ -510,6 +529,12 @@
     else
         globalIdle = NSLocalizedString(@"disabled", "Info options -> global setting");
     [fIdleLimitGlobalLabel setStringValue: globalIdle];
+}
+
+- (void) updateOptionsNotification: (NSNotification *) notification
+{
+    if ([notification object] != self)
+        [self updateOptions];
 }
 
 @end
