@@ -2,6 +2,7 @@
 [http://trac.transmissionbt.com/query?milestone=2.32&group=component&order=severity All tickets closed by this release]
 ==== Mac ====
   * Lion stability fixes
+  * Improved tabbing behavior
 ==== GTK+ ====
   * Remove GNOME desktop proxy support
 

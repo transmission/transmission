@@ -60,22 +60,6 @@
     [super mouseDown: event];
 }
 
-- (void) keyDown: (NSEvent *) event
-{
-    const unichar firstChar = [[event charactersIgnoringModifiers] characterAtIndex: 0];
-    
-    //don't allow quick look on add window
-    if ([NSApp isOnSnowLeopardOrBetter] && firstChar == ' ' && [[[self window] windowController] isKindOfClass: [InfoWindowController class]])
-    {
-        if ([[QLPreviewPanelSL sharedPreviewPanel] isVisible])
-            [[QLPreviewPanelSL sharedPreviewPanel] orderOut: nil];
-        else
-            [[QLPreviewPanelSL sharedPreviewPanel] makeKeyAndOrderFront: nil];
-    }
-    
-    [super keyDown: event];  
-}
-
 - (NSMenu *) menuForEvent: (NSEvent *) event
 {
     const NSInteger row = [self rowAtPoint: [self convertPoint: [event locationInWindow] fromView: nil]];
