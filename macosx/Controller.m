@@ -2473,8 +2473,11 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 
 - (id) outlineView: (NSOutlineView *) outlineView objectValueForTableColumn: (NSTableColumn *) tableColumn byItem: (id) item
 {
-    if ([item isKindOfClass: [Torrent class]])
+    if ([item isKindOfClass: [Torrent class]]) {
+        if (tableColumn)
+            return nil;
         return [item hashString];
+    }
     else
     {
         NSString * ident = [tableColumn identifier];
@@ -2891,7 +2894,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
             [fWindow setFrame: frame display: NO animate: NO];
         }
     }
-
+    
     [self updateUI];
     
     NSScrollView * scrollView = [fTableView enclosingScrollView];
@@ -2974,6 +2977,8 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         const CGFloat originY = fStatusBar ? NSMinY([[fStatusBar view] frame]) : NSMaxY([contentView frame]);
         [[fFilterBar view] setFrameOrigin: NSMakePoint(0.0, originY)];
     }
+    else
+        [fWindow makeFirstResponder: fTableView];
     
     CGFloat heightChange = NSHeight([[fFilterBar view] frame]);
     if (!show)
@@ -3018,7 +3023,6 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         [[fFilterBar view] removeFromSuperview];
         [fFilterBar release];
         fFilterBar = nil;
-        [fWindow makeFirstResponder: fTableView];
     }
 }
 
