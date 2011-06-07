@@ -28,8 +28,6 @@
 #import "FileOutlineView.h"
 #import "FilePriorityCell.h"
 #import "Torrent.h"
-#import "NSApplicationAdditions.h"
-#import <Quartz/Quartz.h>
 
 @implementation FileOutlineView
 
