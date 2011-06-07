@@ -41,7 +41,7 @@
     }
     else
     {
-        for (NSUInteger i = fromIndex; i >= toIndex; --i)
+        for (NSUInteger i = fromIndex; i > toIndex; --i)
             [self replaceObjectAtIndex: i withObject: [self objectAtIndex: i-1]];
     }
     [self replaceObjectAtIndex: toIndex withObject: object];
