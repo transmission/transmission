@@ -48,6 +48,11 @@
     return NO;
 }
 
+- (BOOL) isOpaque
+{
+    return YES;
+}
+
 - (void) drawRect: (NSRect) rect
 {
     NSInteger count = 0;

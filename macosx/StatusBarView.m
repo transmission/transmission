@@ -56,6 +56,16 @@
     [super dealloc];
 }
 
+- (BOOL) mouseDownCanMoveWindow
+{
+    return YES;
+}
+
+- (BOOL) isOpaque
+{
+    return YES;
+}
+
 - (void) drawRect: (NSRect) rect
 {
     const BOOL active = [[self window] isMainWindow];
