@@ -760,12 +760,17 @@ Torrent.compareByActivity = function( a, b ) {
 };
 
 /** Helper function for sortTorrents(). */
-Torrent.compareByProgress = function( a, b ) {
-	if( a.getPercentDone() !== b.getPercentDone() )
-		return a.getPercentDone() - b.getPercentDone();
+Torrent.compareByRatio = function( a, b ) {
 	var a_ratio = Math.ratio( a._upload_total, a._download_total );
 	var b_ratio = Math.ratio( b._upload_total, b._download_total );
 	return a_ratio - b_ratio;
+};
+
+/** Helper function for sortTorrents(). */
+Torrent.compareByProgress = function( a, b ) {
+	if( a.getPercentDone() !== b.getPercentDone() )
+		return a.getPercentDone() - b.getPercentDone();
+	return this.compareByRatio( a, b );
 };
 
 /**
@@ -794,6 +799,9 @@ Torrent.sortTorrents = function( torrents, sortMethod, sortDirection )
 			break;
 		case Prefs._SortByName:
 			torrents.sort( this.compareByName );
+			break;
+		case Prefs._SortByRatio:
+			torrents.sort( this.compareByRatio );
 			break;
 		default:
 			console.warn( "unknown sort method: " + sortMethod );

@@ -235,6 +235,7 @@ Prefs._SortByActivity     = 'activity';
 Prefs._SortByQueue        = 'queue_order';
 Prefs._SortByName         = 'name';
 Prefs._SortByProgress     = 'percent_completed';
+Prefs._SortByRatio        = 'ratio';
 Prefs._SortByState        = 'state';
 Prefs._SortByTracker      = 'tracker';
 
