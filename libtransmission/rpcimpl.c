@@ -1126,6 +1126,8 @@ gotNewBlocklist( tr_session       * session,
     char result[1024];
     struct tr_rpc_idle_data * data = user_data;
 
+    *result = '\0';
+
     if( response_code != 200 )
     {
         tr_snprintf( result, sizeof( result ), "gotNewBlocklist: http error %ld: %s",
@@ -1181,9 +1183,14 @@ gotNewBlocklist( tr_session       * session,
                     }
                     tr_free( buf );
                     gzclose( gzf );
+                } else {
+                    tr_snprintf( result, sizeof( result ), _( "Error opening \"%1$s\": %2$s" ), filename, tr_strerror( errno ) );
                 }
                 tr_close_file( fd );
             }
+
+            if( *result )
+                tr_err( "%s", result );
 
             unlink( filename );
             tr_free( filename );
