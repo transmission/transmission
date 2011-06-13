@@ -132,7 +132,10 @@
 										</object>
 										<double key="NSIntercellSpacingWidth">3</double>
 										<double key="NSIntercellSpacingHeight">2</double>
-										<reference key="NSBackgroundColor" ref="519392256"/>
+										<object class="NSColor" key="NSBackgroundColor">
+											<int key="NSColorSpace">3</int>
+											<bytes key="NSWhite">MQA</bytes>
+										</object>
 										<object class="NSColor" key="NSGridColor">
 											<int key="NSColorSpace">6</int>
 											<string key="NSCatalogName">System</string>
@@ -159,7 +162,7 @@
 								<reference key="NSNextKeyView" ref="842054994"/>
 								<reference key="NSDocView" ref="842054994"/>
 								<reference key="NSBGColor" ref="519392256"/>
-								<int key="NScvFlags">2</int>
+								<int key="NScvFlags">6</int>
 							</object>
 							<object class="NSScroller" id="426744110">
 								<reference key="NSNextResponder" ref="277351025"/>

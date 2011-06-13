@@ -716,7 +716,7 @@ AAAAAAAAAAAAAA</bytes>
 									<reference key="NSNextKeyView" ref="675318801"/>
 									<reference key="NSDocView" ref="675318801"/>
 									<reference key="NSBGColor" ref="139722115"/>
-									<int key="NScvFlags">2</int>
+									<int key="NScvFlags">6</int>
 								</object>
 								<object class="NSScroller" id="1068338331">
 									<reference key="NSNextResponder" ref="87647552"/>
