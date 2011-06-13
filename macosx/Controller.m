@@ -386,8 +386,10 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     [fWindow setExcludedFromWindowsMenu: YES];
     
     //set table size
-    if ([fDefaults boolForKey: @"SmallView"])
+    const BOOL small = [fDefaults boolForKey: @"SmallView"];
+    if (small)
         [fTableView setRowHeight: ROW_HEIGHT_SMALL];
+    [fTableView setUsesAlternatingRowBackgroundColors: !small];
     
     //window min height
     NSSize contentMinSize = [fWindow contentMinSize];
@@ -2762,6 +2764,8 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     BOOL makeSmall = ![fDefaults boolForKey: @"SmallView"];
     [fDefaults setBool: makeSmall forKey: @"SmallView"];
     
+    [fTableView setUsesAlternatingRowBackgroundColors: !makeSmall];
+    
     [fTableView setRowHeight: makeSmall ? ROW_HEIGHT_SMALL : ROW_HEIGHT_REGULAR];
     
     [fTableView noteHeightOfRowsWithIndexesChanged: [NSIndexSet indexSetWithIndexesInRange: NSMakeRange(0, [fTableView numberOfRows])]];
@@ -2927,7 +2931,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     
     if (!show)
     {
-        [[fStatusBar view] removeFromSuperview];
+        [[fStatusBar view] removeFromSuperviewWithoutNeedingDisplay];
         [fStatusBar release];
         fStatusBar = nil;
     }
@@ -3020,7 +3024,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     
     if (!show)
     {
-        [[fFilterBar view] removeFromSuperview];
+        [[fFilterBar view] removeFromSuperviewWithoutNeedingDisplay];
         [fFilterBar release];
         fFilterBar = nil;
     }
