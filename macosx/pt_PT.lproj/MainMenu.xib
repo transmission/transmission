@@ -701,7 +701,7 @@ AAAAAAAAAAAAAAAAA</bytes>
 												<bytes key="NSWhite">MC44MDI0MTkzNgA</bytes>
 											</object>
 											<double key="NSRowHeight">62</double>
-											<int key="NSTvFlags">440434688</int>
+											<int key="NSTvFlags">448823296</int>
 											<reference key="NSDelegate"/>
 											<reference key="NSDataSource"/>
 											<int key="NSColumnAutoresizingStyle">1</int>
@@ -761,7 +761,7 @@ AAAAAAAAAAAAAAAAA</bytes>
 					<reference key="NSWindow"/>
 					<reference key="NSNextKeyView" ref="87647552"/>
 				</object>
-				<string key="NSScreenRect">{{0, 0}, {1680, 1028}}</string>
+				<string key="NSScreenRect">{{0, 0}, {2560, 1418}}</string>
 				<string key="NSMinSize">{350, 27}</string>
 				<string key="NSMaxSize">{1e+13, 1e+13}</string>
 				<string key="NSFrameAutosaveName">TransmissionWindow</string>
