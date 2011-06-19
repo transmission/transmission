@@ -1341,6 +1341,9 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         //let's expand all groups that have removed items - they either don't exist anymore, are already expanded, or are collapsed (rpc)
         [fTableView removeCollapsedGroup: [torrent groupValue]];
         
+        //we can't assume the window is active - RPC removal, for example
+        [fBadger removeTorrent: torrent];
+        
         [torrent closeRemoveTorrent: deleteData];
     }
     
@@ -1794,7 +1797,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
                                     iconData: nil priority: 0 isSticky: NO clickContext: clickContext];
         
         if (![fWindow isMainWindow])
-            [fBadger incrementCompleted];
+            [fBadger addCompletedTorrent: torrent];
         
         //bounce download stack
         [[NSDistributedNotificationCenter defaultCenter] postNotificationName: @"com.apple.DownloadFileFinished"

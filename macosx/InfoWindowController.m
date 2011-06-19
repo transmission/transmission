@@ -342,7 +342,7 @@ typedef enum
     [self setTab: nil];
 }
 
-- (void) swipeWithEvent:(NSEvent *) event
+- (void) swipeWithEvent: (NSEvent *) event
 {
     if ([event deltaX] < 0.0)
         [self setNextTab];

@@ -25,17 +25,20 @@
 #import <Cocoa/Cocoa.h>
 #import <transmission.h>
 
+@class Torrent;
+
 @interface Badger : NSObject
 {
     tr_session * fLib;
     
-    NSUInteger fCompleted;
+    NSMutableSet * fHashes;
 }
 
 - (id) initWithLib: (tr_session *) lib;
 
 - (void) updateBadgeWithDownload: (CGFloat) downloadRate upload: (CGFloat) uploadRate;
-- (void) incrementCompleted;
+- (void) addCompletedTorrent: (Torrent *) torrent;
+- (void) removeTorrent: (Torrent *) torrent;
 - (void) clearCompleted;
 - (void) setQuitting;
 
