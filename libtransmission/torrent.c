@@ -1978,7 +1978,7 @@ tr_torrentRecheckCompleteness( tr_torrent * tor )
                 torrentCallScript( tor, tr_sessionGetTorrentDoneScript( tor->session ) );
         }
 
-        fireCompletenessChange( tor, wasRunning, completeness );
+        fireCompletenessChange( tor, completeness, wasRunning );
 
         tr_torrentSetDirty( tor );
     }
