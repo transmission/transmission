@@ -1851,21 +1851,30 @@ tr_sessionClose( tr_session * session )
     tr_free( session );
 }
 
-tr_torrent **
-tr_sessionLoadTorrents( tr_session * session,
-                        tr_ctor    * ctor,
-                        int        * setmeCount )
+struct sessionLoadTorrentsData
 {
-    int           i, n = 0;
-    struct stat   sb;
-    DIR *         odir = NULL;
-    const char *  dirname = tr_getTorrentDir( session );
+    tr_session * session;
+    tr_ctor * ctor;
+    int * setmeCount;
     tr_torrent ** torrents;
-    tr_list *     l = NULL, *list = NULL;
+    bool done;
+};
 
-    assert( tr_isSession( session ) );
+static void
+sessionLoadTorrents( void * vdata )
+{
+    int i;
+    int n = 0;
+    struct stat sb;
+    DIR * odir = NULL;
+    tr_list * l = NULL;
+    tr_list * list = NULL;
+    struct sessionLoadTorrentsData * data = vdata;
+    const char * dirname = tr_getTorrentDir( data->session );
 
-    tr_ctorSetSave( ctor, false ); /* since we already have them */
+    assert( tr_isSession( data->session ) );
+
+    tr_ctorSetSave( data->ctor, false ); /* since we already have them */
 
     if( !stat( dirname, &sb )
       && S_ISDIR( sb.st_mode )
@@ -1878,8 +1887,8 @@ tr_sessionLoadTorrents( tr_session * session,
             {
                 tr_torrent * tor;
                 char * path = tr_buildPath( dirname, d->d_name, NULL );
-                tr_ctorSetMetainfoFromFile( ctor, path );
-                if(( tor = tr_torrentNew( ctor, NULL )))
+                tr_ctorSetMetainfoFromFile( data->ctor, path );
+                if(( tor = tr_torrentNew( data->ctor, NULL )))
                 {
                     tr_list_prepend( &list, tor );
                     ++n;
@@ -1890,9 +1899,9 @@ tr_sessionLoadTorrents( tr_session * session,
         closedir( odir );
     }
 
-    torrents = tr_new( tr_torrent *, n );
+    data->torrents = tr_new( tr_torrent *, n );
     for( i = 0, l = list; l != NULL; l = l->next )
-        torrents[i++] = (tr_torrent*) l->data;
+        data->torrents[i++] = (tr_torrent*) l->data;
     assert( i == n );
 
     tr_list_free( &list, NULL );
@@ -1900,9 +1909,30 @@ tr_sessionLoadTorrents( tr_session * session,
     if( n )
         tr_inf( _( "Loaded %d torrents" ), n );
 
-    if( setmeCount )
-        *setmeCount = n;
-    return torrents;
+    if( data->setmeCount )
+        *data->setmeCount = n;
+
+    data->done = true;
+}
+
+tr_torrent **
+tr_sessionLoadTorrents( tr_session * session,
+                        tr_ctor    * ctor,
+                        int        * setmeCount )
+{
+    struct sessionLoadTorrentsData data;
+
+    data.session = session;
+    data.ctor = ctor;
+    data.setmeCount = setmeCount;
+    data.torrents = NULL;
+    data.done = false;
+
+    tr_runInEventThread( session, sessionLoadTorrents, &data );
+    while( !data.done )
+        tr_wait_msec( 100 );
+
+    return data.torrents;
 }
 
 /***
