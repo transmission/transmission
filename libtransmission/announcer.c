@@ -101,12 +101,30 @@ compareTransfer( uint64_t a_uploaded, uint64_t a_downloaded,
     return 0;
 }
 
+/**
+ * Comparison function for tr_announce_requests.
+ *
+ * The primary key (amount of data transferred) is used to prioritize
+ * tracker announcements of active torrents. The remaining keys are
+ * used to satisfy the uniqueness requirement of a sorted tr_ptrArray.
+ */
 static int
 compareStops( const void * va, const void * vb )
 {
+    int i;
     const tr_announce_request * a = va;
     const tr_announce_request * b = vb;
-    return compareTransfer( a->up, a->down, b->up, b->down);
+
+    /* primary key: volume of data transferred. */
+    if(( i = compareTransfer( a->up, a->down, b->up, b->down)))
+        return i;
+
+    /* secondary key: the torrent's info_hash */
+    if(( i = memcmp( a->info_hash, b->info_hash, SHA_DIGEST_LENGTH )))
+        return i;
+
+    /* tertiary key: the tracker's announec url */
+    return tr_strcmp0( a->url, b->url );
 }
 
 /***
@@ -896,6 +914,8 @@ announce_request_new( const tr_announcer  * announcer,
     return req;
 }
 
+static void announce_request_free( tr_announce_request * req );
+
 void
 tr_announcerRemoveTorrent( tr_announcer * announcer, tr_torrent * tor )
 {
@@ -911,7 +931,11 @@ tr_announcerRemoveTorrent( tr_announcer * announcer, tr_torrent * tor )
             {
                 const tr_announce_event e = TR_ANNOUNCE_EVENT_STOPPED;
                 tr_announce_request * req = announce_request_new( announcer, tor, tier, e );
-                tr_ptrArrayInsertSorted( &announcer->stops, req, compareStops );
+
+                if( tr_ptrArrayFindSorted( &announcer->stops, req, compareStops ) != NULL )
+                    announce_request_free( req );
+                else
+                    tr_ptrArrayInsertSorted( &announcer->stops, req, compareStops );
             }
         }
 
@@ -1113,6 +1137,14 @@ on_announce_done( const tr_announce_response  * response,
 }
 
 static void
+announce_request_free( tr_announce_request * req )
+{
+    tr_free( req->tracker_id_str );
+    tr_free( req->url );
+    tr_free( req );
+}
+
+static void
 announce_request_delegate( tr_announcer               * announcer,
                            tr_announce_request        * request,
                            tr_announce_response_func  * callback,
@@ -1127,9 +1159,7 @@ announce_request_delegate( tr_announcer               * announcer,
     else
         tr_err( "Unsupported url: %s", request->url );
 
-    tr_free( request->tracker_id_str );
-    tr_free( request->url );
-    tr_free( request );
+    announce_request_free( request );
 }
 
 static void
