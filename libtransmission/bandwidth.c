@@ -82,13 +82,12 @@ bytesUsed( const uint64_t now, struct bratecontrol * r, size_t size )
 *******
 ******/
 
-static inline int
-comparePointers( const void * a, const void * b )
+static int
+compareBandwidth( const void * va, const void * vb )
 {
-    if( a != b )
-        return a < b ? -1 : 1;
-
-    return 0;
+    const tr_bandwidth * a = va;
+    const tr_bandwidth * b = vb;
+    return a->uniqueKey - b->uniqueKey;
 }
 
 /***
@@ -98,9 +97,12 @@ comparePointers( const void * a, const void * b )
 void
 tr_bandwidthConstruct( tr_bandwidth * b, tr_session * session, tr_bandwidth * parent )
 {
+    static unsigned int uniqueKey = 0;
+
     b->session = session;
     b->children = TR_PTR_ARRAY_INIT;
     b->magicNumber = BANDWIDTH_MAGIC_NUMBER;
+    b->uniqueKey = uniqueKey++;
     b->band[TR_UP].honorParentLimits = true;
     b->band[TR_DOWN].honorParentLimits = true;
     tr_bandwidthSetParent( b, parent );
@@ -134,9 +136,9 @@ tr_bandwidthSetParent( tr_bandwidth  * b,
 
         assert( tr_isBandwidth( b->parent ) );
 
-        removed = tr_ptrArrayRemoveSorted( &b->parent->children, b, comparePointers );
+        removed = tr_ptrArrayRemoveSorted( &b->parent->children, b, compareBandwidth );
         assert( removed == b );
-        assert( tr_ptrArrayFindSorted( &b->parent->children, b, comparePointers ) == NULL );
+        assert( tr_ptrArrayFindSorted( &b->parent->children, b, compareBandwidth ) == NULL );
 
         b->parent = NULL;
     }
@@ -146,8 +148,9 @@ tr_bandwidthSetParent( tr_bandwidth  * b,
         assert( tr_isBandwidth( parent ) );
         assert( parent->parent != b );
 
-        tr_ptrArrayInsertSorted( &parent->children, b, comparePointers );
-        assert( tr_ptrArrayFindSorted( &parent->children, b, comparePointers ) == b );
+        assert( tr_ptrArrayFindSorted( &parent->children, b, compareBandwidth ) == NULL );
+        tr_ptrArrayInsertSorted( &parent->children, b, compareBandwidth );
+        assert( tr_ptrArrayFindSorted( &parent->children, b, compareBandwidth ) == b );
         b->parent = parent;
     }
 }

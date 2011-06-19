@@ -111,6 +111,7 @@ typedef struct tr_bandwidth
     struct tr_bandwidth * parent;
     tr_priority_t priority;
     int magicNumber;
+    unsigned int uniqueKey;
     tr_session * session;
     tr_ptrArray children; /* struct tr_bandwidth */
     struct tr_peerIo * peer;
