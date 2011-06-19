@@ -74,7 +74,7 @@
 
 - (void) removeTorrent: (Torrent *) torrent
 {
-    if ([fHashes count] > 0)
+    if ([fHashes member: [torrent hashString]])
     {
         [fHashes removeObject: [torrent hashString]];
         if ([fHashes count] > 0)
