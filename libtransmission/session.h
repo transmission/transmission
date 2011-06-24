@@ -129,6 +129,7 @@ struct tr_session
     struct evdns_base          * evdns_base;
     struct tr_event_handle     * events;
 
+    uint16_t                     peerLimit;
     uint16_t                     peerLimitPerTorrent;
 
     int                          uploadSlotsPerTorrent;

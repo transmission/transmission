@@ -148,7 +148,6 @@ const char* tr_getDefaultDownloadDir( void );
 
 #define TR_DEFAULT_BIND_ADDRESS_IPV4        "0.0.0.0"
 #define TR_DEFAULT_BIND_ADDRESS_IPV6             "::"
-#define TR_DEFAULT_OPEN_FILE_LIMIT_STR           "32"
 #define TR_DEFAULT_RPC_WHITELIST          "127.0.0.1"
 #define TR_DEFAULT_RPC_PORT_STR                "9091"
 #define TR_DEFAULT_RPC_URL_STR       "/transmission/"
@@ -180,7 +179,6 @@ const char* tr_getDefaultDownloadDir( void );
 #define TR_PREFS_KEY_INCOMPLETE_DIR               "incomplete-dir"
 #define TR_PREFS_KEY_INCOMPLETE_DIR_ENABLED       "incomplete-dir-enabled"
 #define TR_PREFS_KEY_MSGLEVEL                     "message-level"
-#define TR_PREFS_KEY_OPEN_FILE_LIMIT              "open-file-limit"
 #define TR_PREFS_KEY_PEER_LIMIT_GLOBAL            "peer-limit-global"
 #define TR_PREFS_KEY_PEER_LIMIT_TORRENT           "peer-limit-per-torrent"
 #define TR_PREFS_KEY_PEER_PORT                    "peer-port"

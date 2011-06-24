@@ -22,12 +22,6 @@
  * @{
  */
 
-void tr_fdSetFileLimit( tr_session * session, int limit );
-
-int tr_fdGetFileLimit( tr_session * session );
-
-void tr_fdSetGlobalPeerLimit( tr_session * session, int limit );
-
 /***
 ****
 ***/
@@ -124,10 +118,5 @@ void     tr_fdSocketClose( tr_session * session, int s );
  * Frees resources allocated by tr_fdInit.
  **********************************************************************/
 void     tr_fdClose( tr_session * session );
-
-
-void     tr_fdSetPeerLimit( tr_session * session, int n );
-
-int      tr_fdGetPeerLimit( const tr_session * );
 
 /* @} */
