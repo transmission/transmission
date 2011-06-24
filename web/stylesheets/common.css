@@ -581,7 +581,7 @@ div#torrent_inspector {
 	top: 97px;
 	bottom: 22px;
 	right: 0px;
-	width: 480px;
+	width: 570px;
 	background-color: #ddd;
 	border-left: 1px solid #888;
 	z-index: 2;
@@ -754,7 +754,7 @@ table.peer_list {
 }
 
 .peer_list .addressCol {
-	width: 90px;
+	width: 180px;
 }
 
 .peer_list .clientCol {
