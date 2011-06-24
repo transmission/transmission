@@ -11,7 +11,7 @@
  */
 
 #include <assert.h>
-#include <stdlib.h>
+#include <stdlib.h> /* tr_renew() -> realloc() */
 #include <string.h> /* memmove */
 
 #include "ptrarray.h"
@@ -102,8 +102,8 @@ tr_ptrArrayErase( tr_ptrArray * t,
     assert( end <= t->n_items );
 
     memmove( t->items + begin,
-            t->items + end,
-            sizeof( void* ) * ( t->n_items - end ) );
+             t->items + end,
+             sizeof( void* ) * ( t->n_items - end ) );
 
     t->n_items -= ( end - begin );
 }
@@ -112,68 +112,121 @@ tr_ptrArrayErase( tr_ptrArray * t,
 ***
 **/
 
-int
-tr_ptrArrayLowerBound( const tr_ptrArray *                t,
-                       const void *                       ptr,
-                       int                 compare( const void *,
-                                                    const void * ),
-                       bool *                    exact_match )
+#ifndef NDEBUG
+static int
+lowerBound2( const tr_ptrArray * t,
+             const void * ptr,
+             int compare( const void *, const void * ),
+             bool * exact_match )
 {
-    int len = t->n_items;
-    int first = 0;
+    int i;
+    const int len = t->n_items;
 
-    while( len > 0 )
+    for( i=0; i<len; ++i )
     {
-        int       half = len / 2;
-        int       middle = first + half;
-        const int c = compare( t->items[middle], ptr );
+        const int c = compare( t->items[i], ptr );
+
+        if( c == 0 ) {
+            *exact_match = true;
+            return i;
+        }
+
         if( c < 0 )
+            continue;
+
+        *exact_match = false;
+        return i;
+    }
+
+    *exact_match = false;
+    return len;
+}
+#endif
+
+int
+tr_ptrArrayLowerBound( const tr_ptrArray  * t,
+                       const void         * ptr,
+                       int                  compare( const void *, const void * ),
+                       bool               * exact_match )
+{
+    int pos = -1;
+    bool match = false;
+#ifndef NDEBUG
+    bool match_2;
+#endif
+
+    if( t->n_items == 0 )
+    {
+        pos = 0;
+    }
+    else
+    {
+        int first = 0;
+        int last = t->n_items - 1;
+
+        for( ;; )
         {
-            first = middle + 1;
-            len = len - half - 1;
-        }
-        else if( !c )
-        {
-            if( exact_match )
-                *exact_match = true;
-            return middle;
-            break;
-        }
-        else
-        {
-            len = half;
+            const int half = (last - first) / 2;
+            const int c = compare( t->items[first + half], ptr );
+
+            if( c < 0 ) {
+                const int new_first = first + half + 1;
+                if( new_first > last ) {
+                    pos = new_first;
+                    break;
+                }
+                first = new_first;
+            }
+            else if( c > 0 ) {
+                const int new_last = first + half - 1;
+                if( new_last < first ) {
+                    pos = first;
+                    break;
+                }
+                last = new_last;
+            }
+            else {
+                match = true;
+                pos = first + half;
+                break;
+            }
         }
     }
 
-    if( exact_match )
-        *exact_match = false;
+    assert( pos == lowerBound2( t, ptr, compare, &match_2 ) );
+    assert( match == match_2 );
 
-    return first;
+    if( exact_match )
+        *exact_match = match;
+    return pos;
 }
 
-#ifdef NDEBUG
-#define assertSortedAndUnique(a,b)
-#else
 static void
 assertSortedAndUnique( const tr_ptrArray * t,
                     int compare(const void*, const void*) )
 {
+#if 1
     int i;
 
     for( i = 0; i < t->n_items - 2; ++i )
-        assert( compare( t->items[i], t->items[i + 1] ) <= 0 );
-}
+        assert( compare( t->items[i], t->items[i + 1] ) < 0 );
 #endif
+}
 
 int
 tr_ptrArrayInsertSorted( tr_ptrArray * t,
                          void *        ptr,
                          int           compare(const void*, const void*) )
 {
-    const int pos = tr_ptrArrayLowerBound( t, ptr, compare, NULL );
-    const int ret = tr_ptrArrayInsert( t, ptr, pos );
+    int pos;
+    int ret;
 
-    //assertSortedAndUnique( t, compare );
+    assertSortedAndUnique( t, compare );
+
+    pos = tr_ptrArrayLowerBound( t, ptr, compare, NULL );
+    ret = tr_ptrArrayInsert( t, ptr, pos );
+
+    assertSortedAndUnique( t, compare );
     return ret;
 }
 
@@ -182,9 +235,8 @@ tr_ptrArrayFindSorted( tr_ptrArray * t,
                        const void *  ptr,
                        int           compare(const void*, const void*) )
 {
-    bool   match;
+    bool match = false;
     const int pos = tr_ptrArrayLowerBound( t, ptr, compare, &match );
-
     return match ? t->items[pos] : NULL;
 }
 
@@ -193,15 +245,18 @@ tr_ptrArrayRemoveSorted( tr_ptrArray * t,
                          const void  * ptr,
                          int           compare(const void*, const void*) )
 {
-    void *    ret = NULL;
-    bool   match;
+    bool match;
+    void * ret = NULL;
     const int pos = tr_ptrArrayLowerBound( t, ptr, compare, &match );
+    assertSortedAndUnique( t, compare );
 
     if( match )
     {
         ret = t->items[pos];
+        assert( compare( ret, ptr ) == 0 );
         tr_ptrArrayErase( t, pos, pos + 1 );
     }
     assertSortedAndUnique( t, compare );
+    assert( ( ret == NULL ) || ( compare( ret, ptr ) == 0 ) );
     return ret;
 }
