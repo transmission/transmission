@@ -584,15 +584,24 @@ checkfilenames( int argc, char **argv )
 
     for( i=0; i<argc; ++i )
     {
-        if( gtr_is_supported_url( argv[i] ) || gtr_is_magnet_link( argv[i] ) )
+        const char * arg = argv[i];
+
+        if( gtr_is_supported_url( arg ) || gtr_is_magnet_link( arg ) )
         {
-            ret = g_slist_prepend( ret, g_strdup( argv[i] ) );
+            ret = g_slist_prepend( ret, g_strdup( arg ) );
         }
         else /* local file */
         {
-            char * filename = g_path_is_absolute( argv[i] )
-                            ? g_strdup ( argv[i] )
-                            : g_build_filename( pwd, argv[i], NULL );
+            char * filename;
+
+            if( g_path_is_absolute( arg ) )
+                filename = g_strdup( arg );
+            else {
+                filename = g_filename_from_uri( arg, NULL, NULL );
+
+                if( filename == NULL )
+                    filename = g_build_filename( pwd, arg, NULL );
+            }
 
             if( g_file_test( filename, G_FILE_TEST_EXISTS ) )
                 ret = g_slist_prepend( ret, filename );
