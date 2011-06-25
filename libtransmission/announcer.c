@@ -500,10 +500,7 @@ getSeedProbability( tr_tier * tier, int seeds, int leechers, int pex_count )
                                   && ( seeds + leechers < NUMWANT ) )
         return 0;
 
-    if( !seeds )
-        return 0;
-
-    if( seeds>=0 && leechers>=0 )
+    if( seeds>=0 && leechers>=0 && (seeds+leechers>0) )
         return (int8_t)((100.0*seeds)/(seeds+leechers));
 
     return -1; /* unknown */
@@ -1317,9 +1314,6 @@ on_scrape_done( const tr_scrape_response * response, void * vsession )
                         tracker->downloaderCount = row->downloaders;
                         tracker->consecutiveFailures = 0;
                     }
-
-                    if( tr_torrentIsPrivate( tier->tor ) && !row->downloaders )
-                        tr_peerMgrMarkAllAsSeeds( tier->tor );
                 }
             }
         }
