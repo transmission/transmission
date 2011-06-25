@@ -1,10 +1,20 @@
 === Transmission 2.32 (2011/xx/yy) ===
 [http://trac.transmissionbt.com/query?milestone=2.32&group=component&order=severity All tickets closed by this release]
+==== All Platforms ====
+  * Fix error caused by some "open-file-limit" configuration settings
+  * Fix 2.30 problem seeding to some peers
+  * Fix bug in converting .torrent text contents to utf-8
+  * Better uTP support on systems running uClibc
+  * Other small bugfixes
 ==== Mac ====
   * Lion stability fixes
   * Improved tabbing behavior
 ==== GTK+ ====
+  * Fix 2.30 error opening torrents from a web browser
   * Remove GNOME desktop proxy support
+==== Web Client ====
+  * Support sorting by ratio
+  * Support drag-and-drop of links into the web client
 
 === Transmission 2.31 (2011/05/17) ===
 [http://trac.transmissionbt.com/query?milestone=2.31&group=component&order=severity All tickets closed by this release]
