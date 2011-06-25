@@ -1054,7 +1054,13 @@ on_announce_done( const tr_announce_response  * response,
         }
         else if( response->errmsg )
         {
-            publishError( tier, response->errmsg );
+            /* If the torrent's only tracker returned an error, publish it.
+               Don't bother publishing if there are other trackers -- it's
+               all too common for people to load up dozens of dead trackers
+               in a torrent's metainfo... */
+            if( tier->tor->info.trackerCount < 2 )
+                publishError( tier, response->errmsg );
+
             on_announce_error( tier, response->errmsg, event );
         }
         else
