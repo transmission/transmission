@@ -90,7 +90,6 @@ class Prefs: public QObject
             INCOMPLETE_DIR,
             INCOMPLETE_DIR_ENABLED,
             MSGLEVEL,
-            OPEN_FILE_LIMIT,
             PEER_LIMIT_GLOBAL,
             PEER_LIMIT_TORRENT,
             PEER_PORT,
