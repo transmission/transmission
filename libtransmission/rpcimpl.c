@@ -1136,69 +1136,59 @@ gotNewBlocklist( tr_session       * session,
     else /* successfully fetched the blocklist... */
     {
         int fd;
+        int err;
+        char * filename;
+        z_stream stream;
         const char * configDir = tr_sessionGetConfigDir( session );
-        char * filename = tr_buildPath( configDir, "blocklist.tmp", NULL );
+        const size_t buflen = 1024 * 128; /* 128 KiB buffer */
+        uint8_t * buf = tr_valloc( buflen );
 
-        errno = 0;
+        /* this is an odd Magic Number required by zlib to enable gz support.
+           See zlib's inflateInit2() documentation for a full description */
+        const int windowBits = 15 + 32;
 
+        stream.zalloc = (alloc_func) Z_NULL;
+        stream.zfree = (free_func) Z_NULL;
+        stream.opaque = (voidpf) Z_NULL;
+        stream.next_in = (void*) response;
+        stream.avail_in = response_byte_count;
+        inflateInit2( &stream, windowBits );
+
+        filename = tr_buildPath( configDir, "blocklist.tmp", NULL );
         fd = tr_open_file_for_writing( filename );
         if( fd < 0 )
             tr_snprintf( result, sizeof( result ), _( "Couldn't save file \"%1$s\": %2$s" ), filename, tr_strerror( errno ) );
 
-        if( !errno ) {
-            const char * buf = response;
-            size_t buflen = response_byte_count;
-            while( buflen > 0 ) {
-                int n = write( fd, buf, buflen );
-                if( n < 0 ) {
+        for( ;; )
+        {
+            stream.next_out = (void*) buf;
+            stream.avail_out = buflen;
+            err = inflate( &stream, Z_NO_FLUSH );
+
+            if( stream.avail_out < buflen ) {
+                const int e = write( fd, buf, buflen - stream.avail_out );
+                if( e < 0 ) {
                     tr_snprintf( result, sizeof( result ), _( "Couldn't save file \"%1$s\": %2$s" ), filename, tr_strerror( errno ) );
                     break;
                 }
-                buf += n;
-                buflen -= n;
-            }
-            tr_close_file( fd );
-        }
-
-#ifdef HAVE_ZLIB
-        if( !errno )
-        {
-            char * filename2 = tr_buildPath( configDir, "blocklist.txt.tmp", NULL );
-            fd = tr_open_file_for_writing( filename2 );
-            if( fd < 0 )
-                tr_snprintf( result, sizeof( result ), _( "Couldn't save file \"%1$s\": %2$s" ), filename2, tr_strerror( errno ) );
-            else {
-                gzFile gzf = gzopen( filename, "r" );
-                if( gzf ) {
-                    const size_t buflen = 1024 * 128; /* 128 KiB buffer */
-                    uint8_t * buf = tr_valloc( buflen );
-                    for( ;; ) {
-                        int n = gzread( gzf, buf, buflen );
-                        if( n < 0 ) /* error */
-                            tr_snprintf( result, sizeof( result ), _( "Error reading \"%1$s\": %2$s" ), filename, gzerror( gzf, NULL ) );
-                        if( n < 1 ) /* error or EOF */
-                            break;
-                        if( write( fd, buf, n ) < 0 )
-                            tr_snprintf( result, sizeof( result ), _( "Couldn't save file \"%1$s\": %2$s" ), filename2, tr_strerror( errno ) );
-                    }
-                    tr_free( buf );
-                    gzclose( gzf );
-                } else {
-                    tr_snprintf( result, sizeof( result ), _( "Error opening \"%1$s\": %2$s" ), filename, tr_strerror( errno ) );
-                }
-                tr_close_file( fd );
             }
 
-            if( *result )
-                tr_err( "%s", result );
-
-            unlink( filename );
-            tr_free( filename );
-            filename = filename2;
+            if( err != Z_OK ) {
+                if( ( err != Z_STREAM_END ) && ( err != Z_DATA_ERROR ) )
+                    tr_snprintf( result, sizeof( result ), _( "Error uncompressing blocklist: %s (%d)" ), zError( err ), err );
+                break;
+            }
         }
-#endif
 
-        if( !errno ) {
+        inflateEnd( &stream );
+
+        if( err == Z_DATA_ERROR ) /* couldn't inflate it... it's probably already uncompressed */
+            if( write( fd, response, response_byte_count ) < 0 )
+                tr_snprintf( result, sizeof( result ), _( "Couldn't save file \"%1$s\": %2$s" ), filename, tr_strerror( errno ) );
+
+        if( *result )
+            tr_err( "%s", result );
+        else {
             /* feed it to the session and give the client a response */
             const int rule_count = tr_blocklistSetContent( session, filename );
             tr_bencDictAddInt( data->args_out, "blocklist-size", rule_count );
@@ -1207,6 +1197,7 @@ gotNewBlocklist( tr_session       * session,
 
         unlink( filename );
         tr_free( filename );
+        tr_free( buf );
     }
 
     tr_idle_function_done( data, result );
