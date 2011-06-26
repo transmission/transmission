@@ -3,9 +3,9 @@
 ==== All Platforms ====
   * Fix error caused by some "open-file-limit" configuration settings
   * Fix 2.30 problem seeding to some peers
-  * Fix bug in converting .torrent text contents to utf-8
-  * Better uTP support on systems running uClibc
-  * Other small bugfixes
+  * Fix bug in converting torrent file text contents to UTF-8
+  * Better µTP support on systems running uClibc
+  * Other small bug fixes
 ==== Mac ====
   * Lion stability fixes
   * Improved tabbing behavior
@@ -13,8 +13,10 @@
   * Fix 2.30 error opening torrents from a web browser
   * Remove GNOME desktop proxy support
 ==== Web Client ====
-  * Support sorting by ratio
-  * Support drag-and-drop of links into the web client
+  * Fix bug when adding torrents
+  * Add torrents by info hash in the add dialog
+  * Sorting by ratio
+  * Allow drag-and-drop to add links
 
 === Transmission 2.31 (2011/05/17) ===
 [http://trac.transmissionbt.com/query?milestone=2.31&group=component&order=severity All tickets closed by this release]
