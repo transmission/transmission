@@ -3127,7 +3127,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 {
     ButtonToolbarItem * item = [[ButtonToolbarItem alloc] initWithItemIdentifier: ident];
     
-    NSButton * button = [[NSButton alloc] initWithFrame: NSZeroRect];
+    NSButton * button = [[NSButton alloc] init];
     [button setBezelStyle: NSTexturedRoundedBezelStyle];
     [button setStringValue: @""];
     

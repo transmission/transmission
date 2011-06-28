@@ -1,4 +1,4 @@
-=== Transmission 2.32 (2011/xx/yy) ===
+=== Transmission 2.32 (2011/06/27) ===
 [http://trac.transmissionbt.com/query?milestone=2.32&group=component&order=severity All tickets closed by this release]
 ==== All Platforms ====
   * Fix error caused by some "open-file-limit" configuration settings
@@ -7,8 +7,8 @@
   * Better µTP support on systems running uClibc
   * Other small bug fixes
 ==== Mac ====
-  * Lion stability fixes
   * Improved tabbing behavior
+  * Minor interface tweaks and stability fixes
 ==== GTK+ ====
   * Fix 2.30 error opening torrents from a web browser
   * Remove GNOME desktop proxy support
