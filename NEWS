@@ -1,4 +1,4 @@
-=== Transmission 2.32 (2011/06/27) ===
+=== Transmission 2.32 (2011/06/28) ===
 [http://trac.transmissionbt.com/query?milestone=2.32&group=component&order=severity All tickets closed by this release]
 ==== All Platforms ====
   * Fix error caused by some "open-file-limit" configuration settings
