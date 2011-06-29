@@ -425,7 +425,7 @@
    "download-dir-free-space"        | number     | number of free bytes available in download-dir, or -1 if it can't be calculated
    "dht-enabled"                    | boolean    | true means allow dht in public torrents
    "encryption"                     | string     | "required", "preferred", "tolerated"
-   "idle-seeding-limit"             | number     | the default seed inactivity limit for torrents to use
+   "idle-seeding-limit"             | number     | torrents we're seeding will be stopped if they're idle for this long
    "idle-seeding-limit-enabled"     | boolean    | true if the seeding inactivity limit is honored by default
    "incomplete-dir"                 | string     | path for incomplete torrents, when enabled
    "incomplete-dir-enabled"         | boolean    | true means keep torrents in incomplete-dir until done
@@ -649,8 +649,6 @@
          |         | yes       | torrent-set    | new arg "trackerReplace"
          |         | yes       | session-set    | new arg "idle-seeding-limit"
          |         | yes       | session-set    | new arg "idle-seeding-limit-enabled"
-         |         | yes       | session-get    | new arg "idle-seeding-limit"
-         |         | yes       | session-get    | new arg "idle-seeding-limit-enabled"
          |         | yes       | session-get    | new arg "units"
          |         | yes       | torrent-set    | new arg "seedIdleLimit"
          |         | yes       | torrent-set    | new arg "seedIdleMode"
