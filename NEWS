@@ -3,7 +3,7 @@
 ==== All Platforms ====
   * Fix error caused by some "open-file-limit" configuration settings
   * Fix 2.30 problem seeding to some peers
-  * Fix bug in converting torrent file text contents to UTF-8
+  * Fix bug converting torrent file text contents to UTF-8
   * Better µTP support on systems running uClibc
   * Other small bug fixes
 ==== Mac ====
