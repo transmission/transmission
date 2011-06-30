@@ -215,7 +215,7 @@
     <message>
         <location line="+1"/>
         <source>Peer is connected over uTP</source>
-        <translation type="unfinished"></translation>
+        <translation>Compañero conectado usando uTP</translation>
     </message>
     <message>
         <location line="+56"/>
@@ -659,7 +659,13 @@
     </message>
     <message>
         <location line="+32"/>
-        <location line="+12"/>
+        <location line="+14"/>
+        <source>Unknown</source>
+        <translation>Desconocido</translation>
+    </message>
+    <message>
+        <location line="-12"/>
+        <location line="+14"/>
         <location line="+12"/>
         <source>None</source>
         <translation>Nada</translation>
@@ -1576,17 +1582,17 @@ Para agregar otro URL primario, agrueguelo después de una línea en blanco.</tr
     <message>
         <location line="+3"/>
         <source>Options</source>
-        <translation type="unfinished">Opciones</translation>
+        <translation>Opciones</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Enable &amp;uTP for peer connections</source>
-        <translation type="unfinished"></translation>
+        <translation>Habilitar uTP en conexiones de compañeros</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>uTP is a tool for reducing network congestion.</source>
-        <translation type="unfinished"></translation>
+        <translation>uTP es una herramienta para reducir la congestión en redes.</translation>
     </message>
     <message numerus="yes">
         <location line="+28"/>
@@ -1845,7 +1851,7 @@ Para agregar otro URL primario, agrueguelo después de una línea en blanco.</tr
 <context>
     <name>Session</name>
     <message>
-        <location filename="../session.cc" line="+825"/>
+        <location filename="../session.cc" line="+793"/>
         <source>Add Torrent</source>
         <translation>Agregar torrent</translation>
     </message>
