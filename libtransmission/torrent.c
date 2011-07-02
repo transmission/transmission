@@ -1261,6 +1261,10 @@ tr_torrentStat( tr_torrent * tor )
 
     tr_torrentUnlock( tor );
 
+    /* test some of the constraints */
+    assert( s->sizeWhenDone <= tor->info.totalSize );
+    assert( s->leftUntilDone <= s->sizeWhenDone );
+    assert( s->desiredAvailable <= s->leftUntilDone );
     return s;
 }
 

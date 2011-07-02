@@ -2557,7 +2557,7 @@ peerIsSeed( const tr_peer * peer )
     return false;
 }
 
-/* count how many pieces we want that connected peers have */
+/* count how many bytes we want that connected peers have */
 uint64_t
 tr_peerMgrGetDesiredAvailable( const tr_torrent * tor )
 {
@@ -2594,6 +2594,7 @@ tr_peerMgrGetDesiredAvailable( const tr_torrent * tor )
         if( !tor->info.pieces[i].dnd && ( t->pieceReplication[i] > 0 ) )
             desiredAvailable += tr_cpMissingBytesInPiece( &t->tor->completion, i );
 
+    assert( desiredAvailable <= tor->info.totalSize );
     return desiredAvailable;
 }
 

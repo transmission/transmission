@@ -10,6 +10,8 @@
  * $Id$
  */
 
+#include <assert.h>
+
 #include "transmission.h"
 #include "completion.h"
 #include "torrent.h"
@@ -213,12 +215,19 @@ tr_cpMissingBytesInPiece( const tr_completion * cp, tr_piece_index_t piece )
     else {
         size_t haveBytes = 0;
         tr_block_index_t f, l;
+        const size_t pieceByteSize = tr_torPieceCountBytes( cp->tor, piece );
         tr_torGetPieceBlockRange( cp->tor, piece, &f, &l );
-        haveBytes = tr_bitfieldCountRange( &cp->blockBitfield, f, l+1 );
-        haveBytes *= cp->tor->blockSize;
-        if( tr_bitfieldHas( &cp->blockBitfield, l ) )
+        if( f != l ) {
+            /* nb: we don't pass the usual l+1 here to tr_bitfieldCountRange().
+               It's faster to handle the last block separately because its size
+               needs to be checked separately. */
+            haveBytes = tr_bitfieldCountRange( &cp->blockBitfield, f, l );
+            haveBytes *= cp->tor->blockSize;
+        }
+        if( tr_bitfieldHas( &cp->blockBitfield, l ) ) /* handle the last block */
             haveBytes += tr_torBlockCountBytes( cp->tor, l );
-        return tr_torPieceCountBytes( cp->tor, piece ) - haveBytes;
+        assert(  haveBytes <= pieceByteSize );
+        return pieceByteSize - haveBytes;
     }
 }
 
