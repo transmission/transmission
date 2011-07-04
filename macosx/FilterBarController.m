@@ -56,6 +56,12 @@
     [fSeedFilterButton setTitle: NSLocalizedString(@"Seeding", "Filter Bar -> filter button")];
     [fPauseFilterButton setTitle: NSLocalizedString(@"Paused", "Filter Bar -> filter button")];
     
+    [[fNoFilterButton cell] setBackgroundStyle: NSBackgroundStyleRaised];
+    [[fActiveFilterButton cell] setBackgroundStyle: NSBackgroundStyleRaised];
+    [[fDownloadFilterButton cell] setBackgroundStyle: NSBackgroundStyleRaised];
+    [[fSeedFilterButton cell] setBackgroundStyle: NSBackgroundStyleRaised];
+    [[fPauseFilterButton cell] setBackgroundStyle: NSBackgroundStyleRaised];
+    
     [[[[fSearchField cell] searchMenuTemplate] itemWithTag: FILTER_TYPE_TAG_NAME] setTitle:
         NSLocalizedString(@"Name", "Filter Bar -> filter menu")];
     [[[[fSearchField cell] searchMenuTemplate] itemWithTag: FILTER_TYPE_TAG_TRACKER] setTitle:
