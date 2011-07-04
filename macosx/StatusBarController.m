@@ -70,6 +70,7 @@ typedef enum
     [[[fStatusButton menu] itemWithTag: STATUS_TRANSFER_SESSION_TAG] setTitle: NSLocalizedString(@"Session Transfer",
         "Status Bar -> status menu")];
     
+    [[fStatusButton cell] setBackgroundStyle: NSBackgroundStyleRaised];
     [[fTotalDLField cell] setBackgroundStyle: NSBackgroundStyleRaised];
     [[fTotalULField cell] setBackgroundStyle: NSBackgroundStyleRaised];
     
