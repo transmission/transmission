@@ -88,6 +88,7 @@ typedef enum
 #define SORT_TRACKER    @"Tracker"
 #define SORT_ORDER      @"Order"
 #define SORT_ACTIVITY   @"Activity"
+#define SORT_SIZE       @"Size"
 
 typedef enum
 {
@@ -97,7 +98,8 @@ typedef enum
     SORT_PROGRESS_TAG = 3,
     SORT_STATE_TAG = 4,
     SORT_TRACKER_TAG = 5,
-    SORT_ACTIVITY_TAG = 6
+    SORT_ACTIVITY_TAG = 6,
+    SORT_SIZE_TAG = 7
 } sortTag;
 
 typedef enum
@@ -1896,6 +1898,9 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         case SORT_ACTIVITY_TAG:
             sortType = SORT_ACTIVITY;
             break;
+        case SORT_SIZE_TAG:
+            sortType = SORT_SIZE;
+            break;
         default:
             NSAssert1(NO, @"Unknown sort tag received: %d", [sender tag]);
             return;
@@ -1987,6 +1992,12 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
             NSSortDescriptor * dateDescriptor = [[[NSSortDescriptor alloc] initWithKey: @"dateAdded" ascending: asc] autorelease];
             
             descriptors = [[NSArray alloc] initWithObjects: dateDescriptor, nameDescriptor, nil];
+        }
+        else if ([sortType isEqualToString: SORT_SIZE])
+        {
+            NSSortDescriptor * sizeDescriptor = [[[NSSortDescriptor alloc] initWithKey: @"size" ascending: asc] autorelease];
+            
+            descriptors = [[NSArray alloc] initWithObjects: sizeDescriptor, nameDescriptor, nil];
         }
         else
             descriptors = [[NSArray alloc] initWithObjects: nameDescriptor, nil];
@@ -3492,6 +3503,9 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
                 break;
             case SORT_ACTIVITY_TAG:
                 sortType = SORT_ACTIVITY;
+                break;
+            case SORT_SIZE_TAG:
+                sortType = SORT_SIZE;
                 break;
             default:
                 NSAssert1(NO, @"Unknown sort tag received: %d", [menuItem tag]);

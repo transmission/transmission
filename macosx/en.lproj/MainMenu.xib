@@ -2,9 +2,9 @@
 <archive type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="8.00">
 	<data>
 		<int key="IBDocument.SystemTarget">1050</int>
-		<string key="IBDocument.SystemVersion">10J4138</string>
+		<string key="IBDocument.SystemVersion">10K540</string>
 		<string key="IBDocument.InterfaceBuilderVersion">1306</string>
-		<string key="IBDocument.AppKitVersion">1038.35</string>
+		<string key="IBDocument.AppKitVersion">1038.36</string>
 		<string key="IBDocument.HIToolboxVersion">461.00</string>
 		<object class="NSMutableDictionary" key="IBDocument.PluginVersions">
 			<string key="NS.key.0">com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -429,7 +429,7 @@ dBtdylsFt0VNsgjojBuwipKts4jFtBtdwtjNrF0lw9tdxdsNxtyzItyV11192F2IjjiVkFswoIjDiVtd
 AD4AAAECAAMAAAAEAAAkvAEDAAMAAAABAAUAAAEGAAMAAAABAAIAAAERAAQAAAABAAAACAESAAMAAAAB
 AAEAAAEVAAMAAAABAAQAAAEWAAMAAAABAD4AAAEXAAQAAAABAAAj+gEcAAMAAAABAAEAAAE9AAMAAAAB
 AAIAAAFSAAMAAAABAAEAAAFTAAMAAAAEAAAkxIdzAAcAAAy0AAAkzAAAAAAACAAIAAgACAABAAEAAQAB
-AAAMtGFwcGwCEAAAbW50clJHQiBYWVogB9sABQATAAcALAApYWNzcEFQUEwAAAAAAAAAAAAAAAAAAAAA
+AAAMtGFwcGwCEAAAbW50clJHQiBYWVogB9sABgAaAAwADAATYWNzcEFQUEwAAAAAAAAAAAAAAAAAAAAA
 AAAAAAAAAAAAAPbWAAEAAAAA0y1hcHBsAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 AAAAAAAAAAAAAAARZGVzYwAAAVAAAABiZHNjbQAAAbQAAADwY3BydAAAAqQAAADQd3RwdAAAA3QAAAAU
 clhZWgAAA4gAAAAUZ1hZWgAAA5wAAAAUYlhZWgAAA7AAAAAUclRSQwAAA8QAAAgMYWFyZwAAC9AAAAAg
@@ -1256,6 +1256,16 @@ AAAAAAAAAAAAAAAAA</bytes>
 												<reference key="NSOnImage" ref="322614661"/>
 												<reference key="NSMixedImage" ref="3851078"/>
 												<int key="NSTag">3</int>
+											</object>
+											<object class="NSMenuItem" id="471963525">
+												<reference key="NSMenu" ref="188604546"/>
+												<string key="NSTitle">Size</string>
+												<string key="NSKeyEquiv"/>
+												<int key="NSKeyEquivModMask">1048576</int>
+												<int key="NSMnemonicLoc">2147483647</int>
+												<reference key="NSOnImage" ref="322614661"/>
+												<reference key="NSMixedImage" ref="3851078"/>
+												<int key="NSTag">7</int>
 											</object>
 											<object class="NSMenuItem" id="686852801">
 												<reference key="NSMenu" ref="188604546"/>
@@ -2242,6 +2252,16 @@ AAAAAAAAAAAAAAAAA</bytes>
 									<int key="NSTag">3</int>
 								</object>
 								<object class="NSMenuItem" id="567343578">
+									<reference key="NSMenu" ref="995409894"/>
+									<string key="NSTitle">Size</string>
+									<string key="NSKeyEquiv"/>
+									<int key="NSKeyEquivModMask">1048576</int>
+									<int key="NSMnemonicLoc">2147483647</int>
+									<reference key="NSOnImage" ref="322614661"/>
+									<reference key="NSMixedImage" ref="3851078"/>
+									<int key="NSTag">7</int>
+								</object>
+								<object class="NSMenuItem" id="285722782">
 									<reference key="NSMenu" ref="995409894"/>
 									<string key="NSTitle">State</string>
 									<string key="NSKeyEquiv"/>
@@ -4021,6 +4041,22 @@ AAAAAAAAAAAAAAAAA</bytes>
 					</object>
 					<int key="connectionID">3425</int>
 				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">setSort:</string>
+						<reference key="source" ref="30116300"/>
+						<reference key="destination" ref="471963525"/>
+					</object>
+					<int key="connectionID">3431</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">setSort:</string>
+						<reference key="source" ref="30116300"/>
+						<reference key="destination" ref="285722782"/>
+					</object>
+					<int key="connectionID">3433</int>
+				</object>
 			</array>
 			<object class="IBMutableOrderedSet" key="objectRecords">
 				<array key="orderedObjects">
@@ -4484,6 +4520,7 @@ AAAAAAAAAAAAAAAAA</bytes>
 							<reference ref="204564835"/>
 							<reference ref="315432362"/>
 							<reference ref="254573946"/>
+							<reference ref="471963525"/>
 						</array>
 						<reference key="parent" ref="869366887"/>
 					</object>
@@ -5092,6 +5129,7 @@ AAAAAAAAAAAAAAAAA</bytes>
 							<reference ref="187354483"/>
 							<reference ref="751635815"/>
 							<reference ref="350087065"/>
+							<reference ref="285722782"/>
 						</array>
 						<reference key="parent" ref="129280366"/>
 					</object>
@@ -5620,6 +5658,16 @@ AAAAAAAAAAAAAAAAA</bytes>
 						<reference key="object" ref="617399467"/>
 						<reference key="parent" ref="52857407"/>
 					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">3430</int>
+						<reference key="object" ref="471963525"/>
+						<reference key="parent" ref="188604546"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">3432</int>
+						<reference key="object" ref="285722782"/>
+						<reference key="parent" ref="995409894"/>
+					</object>
 				</array>
 			</object>
 			<dictionary class="NSMutableDictionary" key="flattenedProperties">
@@ -6076,6 +6124,10 @@ AAAAAAAAAAAAAAAAA</bytes>
 				</object>
 				<integer value="1" key="3420.ImportedFromIB2"/>
 				<string key="3421.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
+				<string key="3430.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
+				<integer value="1" key="3430.ImportedFromIB2"/>
+				<string key="3432.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
+				<integer value="1" key="3432.ImportedFromIB2"/>
 				<string key="418.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<integer value="1" key="418.ImportedFromIB2"/>
 				<string key="456.IBEditorWindowLastContentRect">{{586, 242}, {291, 313}}</string>
@@ -6134,7 +6186,7 @@ AAAAAAAAAAAAAAAAA</bytes>
 			<nil key="activeLocalization"/>
 			<dictionary class="NSMutableDictionary" key="localizations"/>
 			<nil key="sourceID"/>
-			<int key="maxID">3429</int>
+			<int key="maxID">3433</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<array class="NSMutableArray" key="referencedPartialClassDescriptions">
