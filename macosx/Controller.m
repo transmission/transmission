@@ -418,6 +418,9 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     
     [fTableView registerForDraggedTypes: [NSArray arrayWithObject: TORRENT_TABLE_VIEW_DATA_TYPE]];
     [fWindow registerForDraggedTypes: [NSArray arrayWithObjects: NSFilenamesPboardType, NSURLPboardType, nil]];
+    
+    //you would think this would be called later in this method from updateUI, but it's not
+    [fStatusBar updateWithDownload: 0.0 upload: 0.0];
 
     //register for sleep notifications
     IONotificationPortRef notify;
