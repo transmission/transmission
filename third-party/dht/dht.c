@@ -2666,10 +2666,20 @@ send_error(const struct sockaddr *sa, int salen,
 #undef COPY
 #undef ADD_V
 
-#ifndef HAVE_MEMMEM
+#ifdef HAVE_MEMMEM
+
 static void *
-memmem(const void *haystack, size_t haystacklen,
-       const void *needle, size_t needlelen)
+dht_memmem(const void *haystack, size_t haystacklen,
+           const void *needle, size_t needlelen)
+{
+    return memmem(haystack, haystacklen, needle, needlelen);
+}
+
+#else
+
+static void *
+dht_memmem(const void *haystack, size_t haystacklen,
+           const void *needle, size_t needlelen)
 {
     const char *h = haystack;
     const char *n = needle;
@@ -2685,6 +2695,7 @@ memmem(const void *haystack, size_t haystacklen,
     }
     return NULL;
 }
+
 #endif
 
 static int
@@ -2711,7 +2722,7 @@ parse_message(const unsigned char *buf, int buflen,
     if(((unsigned char*)ptr) + (len) > (buf) + (buflen)) goto overflow;
 
     if(tid_return) {
-        p = memmem(buf, buflen, "1:t", 3);
+        p = dht_memmem(buf, buflen, "1:t", 3);
         if(p) {
             long l;
             char *q;
@@ -2725,7 +2736,7 @@ parse_message(const unsigned char *buf, int buflen,
         }
     }
     if(id_return) {
-        p = memmem(buf, buflen, "2:id20:", 7);
+        p = dht_memmem(buf, buflen, "2:id20:", 7);
         if(p) {
             CHECK(p + 7, 20);
             memcpy(id_return, p + 7, 20);
@@ -2734,7 +2745,7 @@ parse_message(const unsigned char *buf, int buflen,
         }
     }
     if(info_hash_return) {
-        p = memmem(buf, buflen, "9:info_hash20:", 14);
+        p = dht_memmem(buf, buflen, "9:info_hash20:", 14);
         if(p) {
             CHECK(p + 14, 20);
             memcpy(info_hash_return, p + 14, 20);
@@ -2743,7 +2754,7 @@ parse_message(const unsigned char *buf, int buflen,
         }
     }
     if(port_return) {
-        p = memmem(buf, buflen, "porti", 5);
+        p = dht_memmem(buf, buflen, "porti", 5);
         if(p) {
             long l;
             char *q;
@@ -2756,7 +2767,7 @@ parse_message(const unsigned char *buf, int buflen,
             *port_return = 0;
     }
     if(target_return) {
-        p = memmem(buf, buflen, "6:target20:", 11);
+        p = dht_memmem(buf, buflen, "6:target20:", 11);
         if(p) {
             CHECK(p + 11, 20);
             memcpy(target_return, p + 11, 20);
@@ -2765,7 +2776,7 @@ parse_message(const unsigned char *buf, int buflen,
         }
     }
     if(token_return) {
-        p = memmem(buf, buflen, "5:token", 7);
+        p = dht_memmem(buf, buflen, "5:token", 7);
         if(p) {
             long l;
             char *q;
@@ -2781,7 +2792,7 @@ parse_message(const unsigned char *buf, int buflen,
     }
 
     if(nodes_len) {
-        p = memmem(buf, buflen, "5:nodes", 7);
+        p = dht_memmem(buf, buflen, "5:nodes", 7);
         if(p) {
             long l;
             char *q;
@@ -2797,7 +2808,7 @@ parse_message(const unsigned char *buf, int buflen,
     }
 
     if(nodes6_len) {
-        p = memmem(buf, buflen, "6:nodes6", 8);
+        p = dht_memmem(buf, buflen, "6:nodes6", 8);
         if(p) {
             long l;
             char *q;
@@ -2813,7 +2824,7 @@ parse_message(const unsigned char *buf, int buflen,
     }
 
     if(values_len || values6_len) {
-        p = memmem(buf, buflen, "6:valuesl", 9);
+        p = dht_memmem(buf, buflen, "6:valuesl", 9);
         if(p) {
             int i = p - buf + 9;
             int j = 0, j6 = 0;
@@ -2856,7 +2867,7 @@ parse_message(const unsigned char *buf, int buflen,
     }
 
     if(want_return) {
-        p = memmem(buf, buflen, "4:wantl", 7);
+        p = dht_memmem(buf, buflen, "4:wantl", 7);
         if(p) {
             int i = p - buf + 7;
             *want_return = 0;
@@ -2880,19 +2891,19 @@ parse_message(const unsigned char *buf, int buflen,
 
 #undef CHECK
 
-    if(memmem(buf, buflen, "1:y1:r", 6))
+    if(dht_memmem(buf, buflen, "1:y1:r", 6))
         return REPLY;
-    if(memmem(buf, buflen, "1:y1:e", 6))
+    if(dht_memmem(buf, buflen, "1:y1:e", 6))
         return ERROR;
-    if(!memmem(buf, buflen, "1:y1:q", 6))
+    if(!dht_memmem(buf, buflen, "1:y1:q", 6))
         return -1;
-    if(memmem(buf, buflen, "1:q4:ping", 9))
+    if(dht_memmem(buf, buflen, "1:q4:ping", 9))
         return PING;
-    if(memmem(buf, buflen, "1:q9:find_node", 14))
+    if(dht_memmem(buf, buflen, "1:q9:find_node", 14))
        return FIND_NODE;
-    if(memmem(buf, buflen, "1:q9:get_peers", 14))
+    if(dht_memmem(buf, buflen, "1:q9:get_peers", 14))
         return GET_PEERS;
-    if(memmem(buf, buflen, "1:q13:announce_peer", 19))
+    if(dht_memmem(buf, buflen, "1:q13:announce_peer", 19))
        return ANNOUNCE_PEER;
     return -1;
 
