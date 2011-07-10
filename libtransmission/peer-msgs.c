@@ -1749,7 +1749,7 @@ updateBlockRequests( tr_peermsgs * msgs )
         const int numwant = msgs->desiredRequestCount - msgs->peer->pendingReqsToPeer;
         tr_block_index_t * blocks = alloca( sizeof( tr_block_index_t ) * numwant );
 
-        tr_peerMgrGetNextRequests( msgs->torrent, msgs->peer, numwant, blocks, &n );
+        tr_peerMgrGetNextRequests( msgs->torrent, msgs->peer, numwant, blocks, &n, false );
 
         for( i=0; i<n; ++i )
         {

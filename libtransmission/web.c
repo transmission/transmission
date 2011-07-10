@@ -73,6 +73,7 @@ struct tr_web_task
     tr_session * session;
     tr_web_done_func * done_func;
     void * done_func_user_data;
+    CURL * curl_easy;
     struct tr_web_task * next;
 };
 
@@ -155,7 +156,7 @@ createEasy( tr_session * s, struct tr_web * web, struct tr_web_task * task )
 {
     bool is_default_value;
     const tr_address * addr;
-    CURL * e = curl_easy_init( );
+    CURL * e = task->curl_easy = curl_easy_init( );
 
     task->timeout_secs = getTimeoutFromURL( task );
 
@@ -219,7 +220,7 @@ task_finish_func( void * vtask )
 *****
 ****/
 
-void
+struct tr_web_task *
 tr_webRun( tr_session         * session,
            const char         * url,
            const char         * range,
@@ -227,12 +228,12 @@ tr_webRun( tr_session         * session,
            tr_web_done_func     done_func,
            void               * done_func_user_data )
 {
-    tr_webRunWithBuffer( session, url, range, cookies,
-                         done_func, done_func_user_data,
-                         NULL );
+    return tr_webRunWithBuffer( session, url, range, cookies,
+                                done_func, done_func_user_data,
+                                NULL );
 }
 
-void
+struct tr_web_task *
 tr_webRunWithBuffer( tr_session         * session,
                      const char         * url,
                      const char         * range,
@@ -260,7 +261,9 @@ tr_webRunWithBuffer( tr_session         * session,
         task->next = web->tasks;
         web->tasks = task;
         tr_lockUnlock( web->taskLock );
+        return task;
     }
+    return NULL;
 }
 
 /**
@@ -440,6 +443,12 @@ tr_webClose( tr_session * session, tr_web_close_mode close_mode )
             while( session->web != NULL )
                 tr_wait_msec( 100 );
     }
+}
+
+void
+tr_webGetTaskInfo( struct tr_web_task * task, tr_web_task_info info, void * dst )
+{
+    curl_easy_getinfo( task->curl_easy, (CURLINFO) info, dst );
 }
 
 /*****

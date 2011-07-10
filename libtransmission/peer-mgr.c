@@ -1304,7 +1304,8 @@ tr_peerMgrGetNextRequests( tr_torrent           * tor,
                            tr_peer              * peer,
                            int                    numwant,
                            tr_block_index_t     * setme,
-                           int                  * numgot )
+                           int                  * numgot,
+                           bool                   get_intervals )
 {
     int i;
     int got;
@@ -1348,7 +1349,7 @@ tr_peerMgrGetNextRequests( tr_torrent           * tor,
 
             tr_torGetPieceBlockRange( tor, p->index, &first, &last );
 
-            for( b=first; b<=last && got<numwant; ++b )
+            for( b=first; b<=last && (got<numwant || (get_intervals && setme[2*got-1] == b-1)); ++b )
             {
                 int peerCount;
                 tr_peer ** peers;
@@ -1383,7 +1384,20 @@ tr_peerMgrGetNextRequests( tr_torrent           * tor,
                 }
 
                 /* update the caller's table */
-                setme[got++] = b;
+                if( !get_intervals ) {
+                    setme[got++] = b;
+                }
+                /* if intervals are requested two array entries are necessarry:
+                   one for the interval's starting block and one for its end block */
+                else if( got && setme[2 * got - 1] == b - 1 && b != first ) {
+                    /* expand the last interval */
+                    ++setme[2 * got - 1];
+                }
+                else {
+                    /* begin a new interval */
+                    setme[2 * got] = setme[2 * got + 1] = b;
+                    ++got;
+                }
 
                 /* update our own tables */
                 requestListAdd( t, b, peer );

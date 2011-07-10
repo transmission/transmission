@@ -163,7 +163,8 @@ void tr_peerMgrGetNextRequests( tr_torrent          * torrent,
                                 tr_peer             * peer,
                                 int                   numwant,
                                 tr_block_index_t    * setme,
-                                int                 * numgot );
+                                int                 * numgot,
+                                bool                  get_intervals );
 
 bool tr_peerMgrDidPeerRequest( const tr_torrent  * torrent,
                                const tr_peer     * peer,
