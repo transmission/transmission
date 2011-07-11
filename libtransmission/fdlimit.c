@@ -36,10 +36,8 @@
 
 #include <sys/types.h>
 #include <sys/stat.h>
-#ifdef HAVE_GETRLIMIT
- #include <sys/time.h> /* getrlimit */
- #include <sys/resource.h> /* getrlimit */
-#endif
+#include <sys/time.h> /* getrlimit */
+#include <sys/resource.h> /* getrlimit */
 #include <fcntl.h> /* O_LARGEFILE posix_fadvise */
 #include <unistd.h> /* lseek(), write(), ftruncate(), pread(), pwrite(), etc */
 
@@ -524,10 +522,28 @@ ensureSessionFdInfoExists( tr_session * session )
 
     if( session->fdInfo == NULL )
     {
-        const int TR_MAX_OPEN_FILES = 32;
-        struct tr_fdInfo * i = tr_new0( struct tr_fdInfo, 1 );
-        fileset_construct( &i->fileset, TR_MAX_OPEN_FILES );
+        struct rlimit limit;
+        struct tr_fdInfo * i;
+        const int FILE_CACHE_SIZE = 32;
+
+        /* Create the local file cache */
+        i = tr_new0( struct tr_fdInfo, 1 );
+        fileset_construct( &i->fileset, FILE_CACHE_SIZE );
         session->fdInfo = i;
+
+        /* set the open-file limit to the largest safe size wrt FD_SETSIZE */
+        if( !getrlimit( RLIMIT_NOFILE, &limit ) )
+        {
+            const int old_limit = (int) limit.rlim_cur;
+            const int new_limit = MIN( limit.rlim_max, FD_SETSIZE );
+            if( new_limit != old_limit )
+            {
+                limit.rlim_cur = new_limit;
+                setrlimit( RLIMIT_NOFILE, &limit );
+                getrlimit( RLIMIT_NOFILE, &limit );
+                tr_inf( "Changed open file limit from %d to %d", old_limit, (int)limit.rlim_cur );
+            }
+        }
     }
 }
 
