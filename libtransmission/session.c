@@ -1951,7 +1951,7 @@ tr_sessionIsPexEnabled( const tr_session * session )
 }
 
 bool
-tr_sessionAllowsDHT( const tr_session * session UNUSED )
+tr_sessionAllowsDHT( const tr_session * session )
 {
     return tr_sessionIsDHTEnabled( session );
 }
