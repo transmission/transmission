@@ -345,8 +345,10 @@ tr_dhtUninit(tr_session *ss)
 
     tr_ndbg( "DHT", "Uninitializing DHT" );
 
-    event_free( dht_timer );
-    dht_timer = NULL;
+    if( dht_timer != NULL ) {
+        event_free( dht_timer );
+        dht_timer = NULL;
+    }
 
     /* Since we only save known good nodes, avoid erasing older data if we
        don't know enough nodes. */

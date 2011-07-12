@@ -209,17 +209,21 @@ event_callback(int s, short type UNUSED, void *sv)
          version number (1). */
     if(rc > 0) {
         if( buf[0] == 'd' ) {
-            buf[rc] = '\0';     /* required by the DHT code */
-            tr_dhtCallback(buf, rc, (struct sockaddr*)&from, fromlen, sv);
+            if( tr_sessionAllowsDHT( ss ) ) {
+                buf[rc] = '\0'; /* required by the DHT code */
+                tr_dhtCallback(buf, rc, (struct sockaddr*)&from, fromlen, sv);
+            }
         } else if( rc >= 8 &&
                    buf[0] == 0 && buf[1] == 0 && buf[2] == 0 && buf[3] <= 3 ) {
             rc = tau_handle_message( ss, buf, rc );
             if( !rc )
                 tr_ndbg("UDP", "Couldn't parse UDP tracker packet.");
         } else {
-            rc = tr_utpPacket(buf, rc, (struct sockaddr*)&from, fromlen, ss);
-            if( !rc )
-                tr_ndbg("UDP", "Unexpected UDP packet");
+            if( tr_sessionIsUTPEnabled( ss ) ) {
+                rc = tr_utpPacket(buf, rc, (struct sockaddr*)&from, fromlen, ss);
+                if( !rc )
+                    tr_ndbg("UDP", "Unexpected UDP packet");
+            }
         }
     }
 }
@@ -289,6 +293,8 @@ tr_udpInit(tr_session *ss)
 void
 tr_udpUninit(tr_session *ss)
 {
+    tr_dhtUninit(ss);
+
     if(ss->udp_socket >= 0) {
         tr_netCloseSocket( ss->udp_socket );
         ss->udp_socket = -1;
