@@ -310,11 +310,16 @@ FilterBar :: refreshTrackers( )
         const Torrent * tor = index.data( TorrentModel::TorrentRole ).value<const Torrent*>();
         const QStringList trackers = tor->trackers( );
         QSet<QString> torrentHosts;
-        foreach( QString tracker, trackers )
-            torrentHosts.insert( Favicons::getHost( QUrl( tracker ) ) );
+        foreach( QString tracker, trackers ) {
+            const QString host = Favicons::getHost( QUrl( tracker ) );
+            if( host.isEmpty( ) )
+                qWarning() << "torrent" << qPrintable(tor->name()) << "has an invalid announce URL:" << tracker;
+            else
+                torrentHosts.insert( host );
+        }
         foreach( QString host, torrentHosts ) {
             newHosts.insert( host );
-            ++torrentsPerHost[host];
+            ++torrentsPerHost[ readableHostName( host ) ];
         }
     }
 
@@ -326,7 +331,7 @@ FilterBar :: refreshTrackers( )
     {
         const QString name = readableHostName( host );
         QStandardItem * row = myTrackerModel->findItems(name).front();
-        row->setData( getCountString(torrentsPerHost[host]), TorrentCountRole );
+        row->setData( getCountString(torrentsPerHost[name]), TorrentCountRole );
         row->setData( favicons.findFromHost(host), Qt::DecorationRole );
     }
 
@@ -344,14 +349,19 @@ FilterBar :: refreshTrackers( )
     {
         const QString name = readableHostName( host );
 
+        if( !myTrackerModel->findItems(name).isEmpty() )
+            continue;
+
         // find the sorted position to add this row
         int i = firstTrackerRow;
-        for( int n=myTrackerModel->rowCount(); i<n; ++i )
-            if( myTrackerModel->index(i,0).data(Qt::DisplayRole).toString() > name )
+        for( int n=myTrackerModel->rowCount(); i<n; ++i ) {
+            const QString rowName = myTrackerModel->index(i,0).data(Qt::DisplayRole).toString();
+            if( rowName >= name )
                 break;
+        }
 
         // add the row
-        QStandardItem * row = new QStandardItem( favicons.findFromHost( host ), readableHostName( host ) );
+        QStandardItem * row = new QStandardItem( favicons.findFromHost( host ), name );
         row->setData( getCountString(torrentsPerHost[host]), TorrentCountRole );
         row->setData( favicons.findFromHost(host), Qt::DecorationRole );
         row->setData( host, TrackerRole );
@@ -473,9 +483,10 @@ FilterBar :: refreshPref( int key )
 
         case Prefs :: FILTER_TRACKERS: {
             const QString tracker = myPrefs.getString( key );
-            QModelIndexList indices = myTrackerModel->match( myTrackerModel->index(0,0), TrackerRole, tracker, 1, Qt::MatchFixedString );
-            if( !indices.isEmpty( )  )
-                myTrackerCombo->setCurrentIndex( indices.first().row() );
+            const QString name = readableHostName( tracker );
+            QList<QStandardItem*> rows = myTrackerModel->findItems(name);
+            if( !rows.isEmpty() )
+                myTrackerCombo->setCurrentIndex( rows.front()->row() );
             else { // hm, we don't seem to have this tracker anymore...
                 const bool isBootstrapping = myTrackerModel->rowCount( ) <= 2;
                 if( !isBootstrapping )
@@ -504,10 +515,14 @@ FilterBar :: onTrackerIndexChanged( int i )
     {
         QString str;
         const bool isTracker = !myTrackerCombo->itemData(i,TrackerRole).toString().isEmpty();
-        if( isTracker )
-            str = myTrackerCombo->itemData(i,TrackerRole).toString();
-        else // show all
+        if( !isTracker ) // show all
             str = "";
+        else {
+            str = myTrackerCombo->itemData(i,TrackerRole).toString();
+            const int pos = str.lastIndexOf( '.' );
+            if( pos >= 0 )
+              str.truncate( pos+1 );
+        }
         myPrefs.set( Prefs::FILTER_TRACKERS, str );
     }
 }
