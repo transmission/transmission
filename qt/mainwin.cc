@@ -90,7 +90,8 @@ TrMainWindow :: TrMainWindow( Session& session, Prefs& prefs, TorrentModel& mode
     mySpeedModeOnIcon( ":/icons/alt-limit-on.png" ),
     myLastSendTime( 0 ),
     myLastReadTime( 0 ),
-    myNetworkTimer( this )
+    myNetworkTimer( this ),
+    myRefreshTrayIconTimer( this )
 {
     setAcceptDrops( true );
 
@@ -199,7 +200,7 @@ TrMainWindow :: TrMainWindow( Session& session, Prefs& prefs, TorrentModel& mode
     connect( &myModel, SIGNAL(modelReset()), this, SLOT(onModelReset()));
     connect( &myModel, SIGNAL(rowsRemoved(const QModelIndex&,int,int)), this, SLOT(onModelReset()));
     connect( &myModel, SIGNAL(rowsInserted(const QModelIndex&,int,int)), this, SLOT(onModelReset()));
-    connect( &myModel, SIGNAL(dataChanged(const QModelIndex&,const QModelIndex&)), this, SLOT(refreshTrayIcon()));
+    connect( &myModel, SIGNAL(dataChanged(const QModelIndex&,const QModelIndex&)), this, SLOT(refreshTrayIconSoon()));
 
     ui.listView->setModel( &myFilterModel );
     connect( ui.listView->selectionModel(), SIGNAL(selectionChanged(const QItemSelection&,const QItemSelection&)), this, SLOT(refreshActionSensitivity()));
@@ -273,8 +274,11 @@ TrMainWindow :: TrMainWindow( Session& session, Prefs& prefs, TorrentModel& mode
         myNetworkTimer.start( 1000 );
     }
 
+    connect( &myRefreshTrayIconTimer, SIGNAL(timeout()), this, SLOT(refreshTrayIcon()) );
+
+
     refreshActionSensitivity( );
-    refreshTrayIcon( );
+    refreshTrayIconSoon( );
     refreshStatusBar( );
     refreshTitle( );
     refreshVisibleCount( );
@@ -318,7 +322,7 @@ TrMainWindow :: onModelReset( )
     refreshVisibleCount( );
     refreshActionSensitivity( );
     refreshStatusBar( );
-    refreshTrayIcon( );
+    refreshTrayIconSoon( );
 }
 
 /****
@@ -640,6 +644,15 @@ TrMainWindow :: refreshVisibleCount( )
     myVisibleCountLabel->setVisible( totalCount > 0 );
 }
 
+void
+TrMainWindow :: refreshTrayIconSoon( )
+{
+    if( !myRefreshTrayIconTimer.isActive( ) )
+    {
+        myRefreshTrayIconTimer.setSingleShot( true );
+        myRefreshTrayIconTimer.start( 500 );
+    }
+}
 void
 TrMainWindow :: refreshTrayIcon( )
 {
@@ -965,7 +978,7 @@ TrMainWindow :: refreshPref( int key )
             b = myPrefs.getBool( key );
             ui.action_TrayIcon->setChecked( b );
             myTrayIcon.setVisible( b );
-            refreshTrayIcon( );
+            refreshTrayIconSoon( );
             break;
 
         case Prefs::COMPACT_VIEW: {

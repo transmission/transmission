@@ -75,6 +75,7 @@ class TrMainWindow: public QMainWindow
         time_t myLastSendTime;
         time_t myLastReadTime;
         QTimer myNetworkTimer;
+        QTimer myRefreshTrayIconTimer;
         QAction * myDlimitOffAction;
         QAction * myDlimitOnAction;
         QAction * myUlimitOffAction;
@@ -105,6 +106,7 @@ class TrMainWindow: public QMainWindow
         void refreshTitle( );
         void refreshStatusBar( );
         void refreshTrayIcon( );
+        void refreshTrayIconSoon( );
         void openTorrent( );
         void openURL( );
         void newTorrent( );
