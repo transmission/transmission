@@ -29,7 +29,7 @@
 #include "session.h"
 #include "bencode.h"
 #include "makemeta.h"
-#include "platform.h" /* threads, locks, TR_PATH_MAX */
+#include "platform.h" /* threads, locks */
 #include "utils.h" /* buildpath */
 #include "version.h"
 

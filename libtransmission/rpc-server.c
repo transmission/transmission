@@ -32,7 +32,7 @@
 #include "fdlimit.h"
 #include "list.h"
 #include "net.h"
-#include "platform.h"
+#include "platform.h" /* tr_getWebClientDir() */
 #include "ptrarray.h"
 #include "rpcimpl.h"
 #include "rpc-server.h"

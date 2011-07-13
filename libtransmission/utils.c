@@ -58,7 +58,7 @@
 #include "ConvertUTF.h"
 #include "list.h"
 #include "utils.h"
-#include "platform.h" /* tr_lockLock() */
+#include "platform.h" /* tr_lockLock(), TR_PATH_MAX */
 #include "version.h"
 
 
