@@ -1200,9 +1200,9 @@ networkPage( GObject * core )
     hig_workarea_add_section_divider( t, &row );
     hig_workarea_add_section_title( t, &row, _( "Peer Limits" ) );
 
-    w = new_spin_button( TR_PREFS_KEY_PEER_LIMIT_TORRENT, core, 1, 300, 5 );
+    w = new_spin_button( TR_PREFS_KEY_PEER_LIMIT_TORRENT, core, 1, FD_SETSIZE, 5 );
     hig_workarea_add_row( t, &row, _( "Maximum peers per _torrent:" ), w, NULL );
-    w = new_spin_button( TR_PREFS_KEY_PEER_LIMIT_GLOBAL, core, 1, 3000, 5 );
+    w = new_spin_button( TR_PREFS_KEY_PEER_LIMIT_GLOBAL, core, 1, FD_SETSIZE, 5 );
     hig_workarea_add_row( t, &row, _( "Maximum peers _overall:" ), w, NULL );
 
     hig_workarea_add_section_divider( t, &row );
