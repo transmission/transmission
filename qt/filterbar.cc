@@ -309,18 +309,18 @@ FilterBar :: refreshTrackers( )
             break;
         const Torrent * tor = index.data( TorrentModel::TorrentRole ).value<const Torrent*>();
         const QStringList trackers = tor->trackers( );
-        QSet<QString> torrentHosts;
+        QSet<QString> torrentNames;
         foreach( QString tracker, trackers ) {
             const QString host = Favicons::getHost( QUrl( tracker ) );
             if( host.isEmpty( ) )
                 qWarning() << "torrent" << qPrintable(tor->name()) << "has an invalid announce URL:" << tracker;
-            else
-                torrentHosts.insert( host );
+            else {
+                newHosts.insert( host );
+                torrentNames.insert( readableHostName( host ) );
+            }
         }
-        foreach( QString host, torrentHosts ) {
-            newHosts.insert( host );
-            ++torrentsPerHost[ readableHostName( host ) ];
-        }
+        foreach( QString name, torrentNames )
+            ++torrentsPerHost[ name ];
     }
 
     // update the "All" row
