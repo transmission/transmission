@@ -322,7 +322,7 @@ PrefsDialog :: onPortTested( bool isOpen )
 void
 PrefsDialog :: onPortTest( )
 {
-    myPortLabel->setText( tr( "Testing..." ) );
+    myPortLabel->setText( tr( "Testing TCP Port..." ) );
     myPortButton->setEnabled( false );
     myWidgets[Prefs::PEER_PORT]->setEnabled( false );
     mySession.portTest( );
