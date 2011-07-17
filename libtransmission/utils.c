@@ -1730,7 +1730,7 @@ tr_formatter_speed_KBps( char * buf, double KBps, size_t buflen )
     double speed = KBps;
 
     if( speed <= 999.95 ) /* 0.0 KB to 999.9 KB */
-        tr_snprintf( buf, buflen, "%.2f %s", speed, speed_units.units[TR_FMT_KB].name );
+        tr_snprintf( buf, buflen, "%d %s", (int)speed, speed_units.units[TR_FMT_KB].name );
     else {
         speed /= K;
         if( speed <= 99.995 ) /* 0.98 MB to 99.99 MB */
