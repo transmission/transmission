@@ -132,7 +132,7 @@ tr_bitfieldCountRange( const tr_bitfield * b, size_t begin, size_t end )
 ***/
 
 static bool
-tr_bitfieldIsValid( const tr_bitfield * b )
+tr_bitfieldIsValid( const tr_bitfield * b UNUSED )
 {
     assert( b != NULL );
     assert( ( b->alloc_count == 0 ) == ( b->bits == 0 ) );
@@ -194,7 +194,9 @@ tr_bitfieldEnsureBitsAlloced( tr_bitfield * b, size_t nth )
 
     if( b->alloc_count < bytes_needed )
     {
+#ifndef NDEBUG
         const size_t old_count = countArray( b );
+#endif
         b->bits = tr_renew( uint8_t, b->bits, bytes_needed );
         memset( b->bits + b->alloc_count, 0, bytes_needed - b->alloc_count );
         b->alloc_count = bytes_needed;
