@@ -202,8 +202,8 @@ tr_ptrArrayLowerBound( const tr_ptrArray  * t,
 }
 
 static void
-assertSortedAndUnique( const tr_ptrArray * t,
-                    int compare(const void*, const void*) )
+assertSortedAndUnique( const tr_ptrArray * t UNUSED,
+                       int compare(const void*, const void*) UNUSED )
 {
 #if 1
     int i;
