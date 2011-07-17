@@ -222,7 +222,7 @@ connection_succeeded( void * vinf )
         /* the server seems to be accepting more connections now */
         w->consecutive_failures = w->retry_tickcount = w->retry_challenge = 0;
 
-    if( inf->redirect_url && 
+    if( inf->redirect_url &&
         (tor = tr_torrentFindFromId( w->session, w->torrent_id )))
     {
         uint64_t file_offset;
