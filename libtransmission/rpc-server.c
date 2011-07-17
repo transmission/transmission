@@ -924,55 +924,72 @@ tr_rpc_server *
 tr_rpcInit( tr_session  * session, tr_benc * settings )
 {
     tr_rpc_server * s;
-    bool found;
     bool boolVal;
     int64_t i;
-    const char *str;
+    const char * str;
+    const char * key;
     tr_address address;
 
     s = tr_new0( tr_rpc_server, 1 );
     s->session = session;
 
-    found = tr_bencDictFindBool( settings, TR_PREFS_KEY_RPC_ENABLED, &boolVal );
-    assert( found );
-    s->isEnabled = boolVal;
+    key = TR_PREFS_KEY_RPC_ENABLED;
+    if( !tr_bencDictFindBool( settings, key, &boolVal ) )
+        tr_nerr( MY_NAME, _( "Couldn't find settings key \"%s\"" ), key );
+    else
+        s->isEnabled = boolVal;
 
-    found = tr_bencDictFindInt( settings, TR_PREFS_KEY_RPC_PORT, &i );
-    assert( found );
-    s->port = i;
+    key = TR_PREFS_KEY_RPC_PORT;
+    if( !tr_bencDictFindInt( settings, key, &i ) )
+        tr_nerr( MY_NAME, _( "Couldn't find settings key \"%s\"" ), key );
+    else
+        s->port = i;
 
-    found = tr_bencDictFindStr( settings, TR_PREFS_KEY_RPC_URL, &str );
-    assert( found );
-    s->url = tr_strdup( str );
+    key = TR_PREFS_KEY_RPC_URL;
+    if( !tr_bencDictFindStr( settings, TR_PREFS_KEY_RPC_URL, &str ) )
+        tr_nerr( MY_NAME, _( "Couldn't find settings key \"%s\"" ), key );
+    else
+        s->url = tr_strdup( str );
 
-    found = tr_bencDictFindBool( settings, TR_PREFS_KEY_RPC_WHITELIST_ENABLED, &boolVal );
-    assert( found );
-    tr_rpcSetWhitelistEnabled( s, boolVal );
+    key = TR_PREFS_KEY_RPC_WHITELIST_ENABLED;
+    if( !tr_bencDictFindBool( settings, key, &boolVal ) )
+        tr_nerr( MY_NAME, _( "Couldn't find settings key \"%s\"" ), key );
+    else
+        tr_rpcSetWhitelistEnabled( s, boolVal );
 
-    found = tr_bencDictFindBool( settings, TR_PREFS_KEY_RPC_AUTH_REQUIRED, &boolVal );
-    assert( found );
-    tr_rpcSetPasswordEnabled( s, boolVal );
+    key = TR_PREFS_KEY_RPC_AUTH_REQUIRED;
+    if( !tr_bencDictFindBool( settings, key, &boolVal ) )
+        tr_nerr( MY_NAME, _( "Couldn't find settings key \"%s\"" ), key );
+    else
+        tr_rpcSetPasswordEnabled( s, boolVal );
 
-    found = tr_bencDictFindStr( settings, TR_PREFS_KEY_RPC_WHITELIST, &str );
-    assert( found );
-    tr_rpcSetWhitelist( s, str ? str : "127.0.0.1" );
+    key = TR_PREFS_KEY_RPC_WHITELIST;
+    if( !tr_bencDictFindStr( settings, key, &str ) && str )
+        tr_nerr( MY_NAME, _( "Couldn't find settings key \"%s\"" ), key );
+    else
+        tr_rpcSetWhitelist( s, str );
 
-    found = tr_bencDictFindStr( settings, TR_PREFS_KEY_RPC_USERNAME, &str );
-    assert( found );
-    tr_rpcSetUsername( s, str );
+    key = TR_PREFS_KEY_RPC_USERNAME;
+    if( !tr_bencDictFindStr( settings, key, &str ) )
+        tr_nerr( MY_NAME, _( "Couldn't find settings key \"%s\"" ), key );
+    else
+        tr_rpcSetUsername( s, str );
 
-    found = tr_bencDictFindStr( settings, TR_PREFS_KEY_RPC_PASSWORD, &str );
-    assert( found );
-    tr_rpcSetPassword( s, str );
+    key = TR_PREFS_KEY_RPC_PASSWORD;
+    if( !tr_bencDictFindStr( settings, key, &str ) )
+        tr_nerr( MY_NAME, _( "Couldn't find settings key \"%s\"" ), key );
+    else
+        tr_rpcSetPassword( s, str );
 
-    found = tr_bencDictFindStr( settings, TR_PREFS_KEY_RPC_BIND_ADDRESS, &str );
-    assert( found );
-    if( !tr_address_from_string( &address, str ) ) {
-        tr_err( _( "%s is not a valid address" ), str );
+    key = TR_PREFS_KEY_RPC_BIND_ADDRESS;
+    if( !tr_bencDictFindStr( settings, TR_PREFS_KEY_RPC_BIND_ADDRESS, &str ) ) {
+        tr_nerr( MY_NAME, _( "Couldn't find settings key \"%s\"" ), key );
+        address = tr_inaddr_any;
+    } else if( !tr_address_from_string( &address, str ) ) {
+        tr_nerr( MY_NAME, _( "%s is not a valid address" ), str );
         address = tr_inaddr_any;
     } else if( address.type != TR_AF_INET ) {
-        tr_err( _( "%s is not an IPv4 address. RPC listeners must be IPv4" ),
-                   str );
+        tr_nerr( MY_NAME, _( "%s is not an IPv4 address. RPC listeners must be IPv4" ), str );
         address = tr_inaddr_any;
     }
     s->bindAddress = address.addr.addr4;
