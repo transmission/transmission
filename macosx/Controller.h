@@ -237,6 +237,9 @@ typedef enum
 
 - (void) setWindowSizeToFit;
 - (NSRect) sizedWindowFrame;
+- (void) updateForAutoSize;
+- (void) setWindowMinMaxToCurrent;
+- (CGFloat) minWindowContentSizeAllowed;
 
 - (void) updateForExpandCollape;
 

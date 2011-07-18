@@ -393,11 +393,6 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         [fTableView setRowHeight: ROW_HEIGHT_SMALL];
     [fTableView setUsesAlternatingRowBackgroundColors: !small];
     
-    //window min height
-    NSSize contentMinSize = [fWindow contentMinSize];
-    contentMinSize.height = [[fWindow contentView] frame].size.height - [[fTableView enclosingScrollView] frame].size.height
-                                + [fTableView rowHeight] + [fTableView intercellSpacing].height;
-    [fWindow setContentMinSize: contentMinSize];
     [fWindow setContentBorderThickness: NSMinY([[fTableView enclosingScrollView] frame]) forEdge: NSMinYEdge];
     [fWindow setMovableByWindowBackground: YES];
     
@@ -419,9 +414,13 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     [fTableView registerForDraggedTypes: [NSArray arrayWithObject: TORRENT_TABLE_VIEW_DATA_TYPE]];
     [fWindow registerForDraggedTypes: [NSArray arrayWithObjects: NSFilenamesPboardType, NSURLPboardType, nil]];
     
-    //you would think this would be called later in this method from updateUI, but it's not
+    //you would think this would be called later in this method from updateUI, but it's not reached in awakeFromNib
+    //this must be called after showStatusBar:
     [fStatusBar updateWithDownload: 0.0 upload: 0.0];
 
+    //this should also be after the rest of the setup
+    [self updateForAutoSize];
+    
     //register for sleep notifications
     IONotificationPortRef notify;
     io_object_t iterator;
@@ -477,7 +476,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     [nc addObserver: self selector: @selector(changeAutoImport)
                     name: @"AutoImportSettingChange" object: nil];
     
-    [nc addObserver: self selector: @selector(setWindowSizeToFit)
+    [nc addObserver: self selector: @selector(updateForAutoSize)
                     name: @"AutoSizeSettingChange" object: nil];
     
     [nc addObserver: self selector: @selector(updateForExpandCollape)
@@ -2787,16 +2786,16 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     
     [fTableView noteHeightOfRowsWithIndexesChanged: [NSIndexSet indexSetWithIndexesInRange: NSMakeRange(0, [fTableView numberOfRows])]];
     
-    //window min height
-    NSSize contentMinSize = [fWindow contentMinSize],
-            contentSize = [[fWindow contentView] frame].size;
-    contentMinSize.height = contentSize.height - [[fTableView enclosingScrollView] frame].size.height
-                            + [fTableView rowHeight] + [fTableView intercellSpacing].height;
-    [fWindow setContentMinSize: contentMinSize];
-    
     //resize for larger min height if not set to auto size
     if (![fDefaults boolForKey: @"AutoSize"])
     {
+        const NSSize contentSize = [[fWindow contentView] frame].size;
+        
+        NSSize contentMinSize = [fWindow contentMinSize];
+        contentMinSize.height = [self minWindowContentSizeAllowed];
+        [fWindow setContentMinSize: contentMinSize];
+        
+        //make sure the window already isn't too small
         if (!makeSmall && contentSize.height < contentMinSize.height)
         {
             NSRect frame = [fWindow frame];
@@ -2844,10 +2843,12 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     
     if (check)
     {
-        NSSize minSize = [scrollView convertSize: [fWindow minSize] fromView: nil];
+        //we can't call minSize, since it might be set to the current size (auto size)
+        const CGFloat minHeight = [self minWindowContentSizeAllowed]
+                                    + (NSHeight([fWindow frame]) - NSHeight([[fWindow contentView] frame])); //contentView to window
         
-        if (windowSize.height < minSize.height)
-            windowSize.height = minSize.height;
+        if (windowSize.height < minHeight)
+            windowSize.height =minHeight;
         else
         {
             NSSize maxSize = [scrollView convertSize: [[fWindow screen] visibleFrame].size fromView: nil];
@@ -2941,16 +2942,21 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         [[fFilterBar view] setAutoresizingMask: filterMask];
     [scrollView setAutoresizingMask: scrollMask];
     
-    //change min size
-    NSSize minSize = [fWindow contentMinSize];
-    minSize.height += heightChange;
-    [fWindow setContentMinSize: minSize];
-    
     if (!show)
     {
         [[fStatusBar view] removeFromSuperviewWithoutNeedingDisplay];
         [fStatusBar release];
         fStatusBar = nil;
+    }
+    
+    if ([fDefaults boolForKey: @"AutoSize"])
+        [self setWindowMinMaxToCurrent];
+    else
+    {
+        //change min size
+        NSSize minSize = [fWindow contentMinSize];
+        minSize.height += heightChange;
+        [fWindow setContentMinSize: minSize];
     }
 }
 
@@ -3034,16 +3040,21 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     [[fFilterBar view] setAutoresizingMask: filterMask];
     [scrollView setAutoresizingMask: scrollMask];
     
-    //change min size
-    NSSize minSize = [fWindow contentMinSize];
-    minSize.height += heightChange;
-    [fWindow setContentMinSize: minSize];
-    
     if (!show)
     {
         [[fFilterBar view] removeFromSuperviewWithoutNeedingDisplay];
         [fFilterBar release];
         fFilterBar = nil;
+    }
+    
+    if ([fDefaults boolForKey: @"AutoSize"])
+        [self setWindowMinMaxToCurrent];
+    else
+    {
+        //change min size
+        NSSize minSize = [fWindow contentMinSize];
+        minSize.height += heightChange;
+        [fWindow setContentMinSize: minSize];
     }
 }
 
@@ -3963,6 +3974,8 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
             [scrollView setAutohidesScrollers: NO];
             [scrollView setAutohidesScrollers: YES];
         }
+        
+        [self setWindowMinMaxToCurrent];
     }
 }
 
@@ -3973,9 +3986,46 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     
     CGFloat heightChange = (GROUP_SEPARATOR_HEIGHT + [fTableView intercellSpacing].height) * groups
                         + ([fTableView rowHeight] + [fTableView intercellSpacing].height) * ([fTableView numberOfRows] - groups)
-                        - [[fTableView enclosingScrollView] frame].size.height;
+                        - NSHeight([[fTableView enclosingScrollView] frame]);
     
     return [self windowFrameByAddingHeight: heightChange checkLimits: YES];
+}
+
+- (void) updateForAutoSize
+{
+    if ([fDefaults boolForKey: @"AutoSize"])
+        [self setWindowSizeToFit];
+    else
+    {
+        NSSize contentMinSize = [fWindow contentMinSize];
+        contentMinSize.height = [self minWindowContentSizeAllowed];
+        
+        [fWindow setContentMinSize: contentMinSize];
+        
+        NSSize contentMaxSize = [fWindow contentMaxSize];
+        contentMaxSize.height = FLT_MAX;
+        [fWindow setContentMaxSize: contentMaxSize];
+    }
+}
+
+- (void) setWindowMinMaxToCurrent
+{
+    const CGFloat height = NSHeight([[fWindow contentView] frame]);
+    
+    NSSize minSize = [fWindow contentMinSize],
+            maxSize = [fWindow contentMaxSize];
+    minSize.height = height;
+    maxSize.height = height;
+    
+    [fWindow setContentMinSize: minSize];
+    [fWindow setContentMaxSize: maxSize];
+}
+
+- (CGFloat) minWindowContentSizeAllowed
+{
+    CGFloat contentMinHeight = NSHeight([[fWindow contentView] frame]) - NSHeight([[fTableView enclosingScrollView] frame])
+                                + [fTableView rowHeight] + [fTableView intercellSpacing].height;
+    return contentMinHeight;
 }
 
 - (void) updateForExpandCollape
@@ -3993,14 +4043,6 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 {
     [fBadger clearCompleted];
     [self updateUI];
-}
-
-- (NSSize) windowWillResize: (NSWindow *) sender toSize: (NSSize) proposedFrameSize
-{
-    //only resize horizontally if autosize is enabled
-    if ([fDefaults boolForKey: @"AutoSize"])
-        proposedFrameSize.height = [fWindow frame].size.height;
-    return proposedFrameSize;
 }
 
 - (void) applicationWillUnhide: (NSNotification *) notification
