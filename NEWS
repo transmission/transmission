@@ -1,3 +1,18 @@
+=== Transmission 2.33 (2011/mm/dd) ===
+[http://trac.transmissionbt.com/query?milestone=2.33&group=component&order=severity All tickets closed by this release]
+==== All Platforms ====
+  * Improved webseed support
+  * Better support for moving and deleting files
+  * Fix "Too many open files" bug
+  * Apply blacklists towards DHT communication
+  * Fix displayed availability
+==== Mac ====
+  * Minor Lion interface tweaks
+==== Qt ====
+  * Fix high CPU issues
+  * Fix wrong torrent count on tracker filterbar
+  * Update Spanish translation
+
 === Transmission 2.32 (2011/06/28) ===
 [http://trac.transmissionbt.com/query?milestone=2.32&group=component&order=severity All tickets closed by this release]
 ==== All Platforms ====
@@ -8,6 +23,7 @@
   * Other small bug fixes
 ==== Mac ====
   * Improved tabbing behavior
+  * Lion compatibility
   * Minor interface tweaks and stability fixes
 ==== GTK+ ====
   * Fix 2.30 error opening torrents from a web browser
