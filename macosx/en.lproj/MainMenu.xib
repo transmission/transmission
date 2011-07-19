@@ -1259,6 +1259,7 @@ AAAAAAAAAAAAAAAAA</bytes>
 											</object>
 											<object class="NSMenuItem" id="471963525">
 												<reference key="NSMenu" ref="188604546"/>
+												<bool key="NSIsHidden">YES</bool>
 												<string key="NSTitle">Size</string>
 												<string key="NSKeyEquiv"/>
 												<int key="NSKeyEquivModMask">1048576</int>
@@ -2253,6 +2254,7 @@ AAAAAAAAAAAAAAAAA</bytes>
 								</object>
 								<object class="NSMenuItem" id="567343578">
 									<reference key="NSMenu" ref="995409894"/>
+									<bool key="NSIsHidden">YES</bool>
 									<string key="NSTitle">Size</string>
 									<string key="NSKeyEquiv"/>
 									<int key="NSKeyEquivModMask">1048576</int>
