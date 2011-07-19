@@ -91,7 +91,8 @@ TrMainWindow :: TrMainWindow( Session& session, Prefs& prefs, TorrentModel& mode
     myLastSendTime( 0 ),
     myLastReadTime( 0 ),
     myNetworkTimer( this ),
-    myRefreshTrayIconTimer( this )
+    myRefreshTrayIconTimer( this ),
+    myRefreshActionSensitivityTimer( this )
 {
     setAcceptDrops( true );
 
@@ -190,8 +191,8 @@ TrMainWindow :: TrMainWindow( Session& session, Prefs& prefs, TorrentModel& mode
 
     connect( &myFilterModel, SIGNAL(rowsInserted(const QModelIndex&,int,int)), this, SLOT(refreshVisibleCount()));
     connect( &myFilterModel, SIGNAL(rowsRemoved(const QModelIndex&,int,int)), this, SLOT(refreshVisibleCount()));
-    connect( &myFilterModel, SIGNAL(rowsInserted(const QModelIndex&,int,int)), this, SLOT(refreshActionSensitivity()));
-    connect( &myFilterModel, SIGNAL(rowsRemoved(const QModelIndex&,int,int)), this, SLOT(refreshActionSensitivity()));
+    connect( &myFilterModel, SIGNAL(rowsInserted(const QModelIndex&,int,int)), this, SLOT(refreshActionSensitivitySoon()));
+    connect( &myFilterModel, SIGNAL(rowsRemoved(const QModelIndex&,int,int)), this, SLOT(refreshActionSensitivitySoon()));
 
     connect( ui.action_Quit, SIGNAL(triggered()), QCoreApplication::instance(), SLOT(quit()) );
 
@@ -203,7 +204,7 @@ TrMainWindow :: TrMainWindow( Session& session, Prefs& prefs, TorrentModel& mode
     connect( &myModel, SIGNAL(dataChanged(const QModelIndex&,const QModelIndex&)), this, SLOT(refreshTrayIconSoon()));
 
     ui.listView->setModel( &myFilterModel );
-    connect( ui.listView->selectionModel(), SIGNAL(selectionChanged(const QItemSelection&,const QItemSelection&)), this, SLOT(refreshActionSensitivity()));
+    connect( ui.listView->selectionModel(), SIGNAL(selectionChanged(const QItemSelection&,const QItemSelection&)), this, SLOT(refreshActionSensitivitySoon()));
 
     QActionGroup * actionGroup = new QActionGroup( this );
     actionGroup->addAction( ui.action_SortByActivity );
@@ -275,9 +276,10 @@ TrMainWindow :: TrMainWindow( Session& session, Prefs& prefs, TorrentModel& mode
     }
 
     connect( &myRefreshTrayIconTimer, SIGNAL(timeout()), this, SLOT(refreshTrayIcon()) );
+    connect( &myRefreshActionSensitivityTimer, SIGNAL(timeout()), this, SLOT(refreshActionSensitivity()) );
 
 
-    refreshActionSensitivity( );
+    refreshActionSensitivitySoon( );
     refreshTrayIconSoon( );
     refreshStatusBar( );
     refreshTitle( );
@@ -320,7 +322,7 @@ TrMainWindow :: onModelReset( )
 {
     refreshTitle( );
     refreshVisibleCount( );
-    refreshActionSensitivity( );
+    refreshActionSensitivitySoon( );
     refreshStatusBar( );
     refreshTrayIconSoon( );
 }
@@ -707,6 +709,17 @@ TrMainWindow :: refreshStatusBar( )
     myStatsLabel->setText( str );
 }
 
+
+
+void
+TrMainWindow :: refreshActionSensitivitySoon( )
+{
+    if( !myRefreshActionSensitivityTimer.isActive( ) )
+    {
+        myRefreshActionSensitivityTimer.setSingleShot( true );
+        myRefreshActionSensitivityTimer.start( 500 );
+    }
+}
 void
 TrMainWindow :: refreshActionSensitivity( )
 {
