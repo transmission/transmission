@@ -4,7 +4,7 @@
   * Improved webseed support
   * Better support for moving and deleting files
   * Fix "Too many open files" bug
-  * Apply blacklists towards DHT communication
+  * Apply blocklists towards DHT communication
   * Fix displayed availability
 ==== Mac ====
   * Minor Lion interface tweaks
@@ -66,7 +66,7 @@
   * Faster endgame
   * Fix bug where leechers might be disconnected while seeding in some situations
   * Fix 2.20 bug that sometimes showed inaccurate upload/download speeds
-  * Support for unsorted blacklists
+  * Support for unsorted blocklists
   * Fix IPv6 DHT
   * Re-add support to automatically close idle peers
   * Fix bug where the resume file did not save the time checked for the last piece
