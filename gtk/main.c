@@ -357,6 +357,7 @@ static gboolean update_model( gpointer gdata );
 static void
 register_magnet_link_handler( void )
 {
+#ifdef HAVE_GIO
     GAppInfo * app_info = g_app_info_get_default_for_uri_scheme( "magnet" );
     if( app_info == NULL )
     {
@@ -370,6 +371,7 @@ register_magnet_link_handler( void )
             g_clear_error( &error );
         }
     }
+#endif
 }
 
 static void
