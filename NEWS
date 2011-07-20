@@ -1,4 +1,4 @@
-=== Transmission 2.33 (2011/mm/dd) ===
+=== Transmission 2.33 (2011/07/20) ===
 [http://trac.transmissionbt.com/query?milestone=2.33&group=component&order=severity All tickets closed by this release]
 ==== All Platforms ====
   * Improved webseed support
@@ -8,6 +8,8 @@
   * Fix displayed availability
 ==== Mac ====
   * Minor Lion interface tweaks
+==== GTK+ ====
+  * Remove deprecated GConf2 dependency 
 ==== Qt ====
   * Fix high CPU issues
   * Fix wrong torrent count on tracker filterbar
