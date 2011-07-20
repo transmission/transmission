@@ -16,7 +16,6 @@ AM_CFLAGS = \
     @LIBAPPINDICATOR_CFLAGS@ \
     @LIBEVENT_CFLAGS@ \
     @LIBCANBERRA_CFLAGS@ \
-    @GCONF2_CFLAGS@ \
     @GTK_CFLAGS@ \
     @LIBCURL_CFLAGS@ \
     @GIO_CFLAGS@ \
@@ -96,7 +95,6 @@ transmission_gtk_LDADD = \
     $(top_builddir)/third-party/miniupnp/libminiupnp.a \
     $(top_builddir)/third-party/libnatpmp/libnatpmp.a \
     @LIBCANBERRA_LIBS@ \
-    @GCONF2_LIBS@ \
     @DHT_LIBS@ \
     @LIBUTP_LIBS@ \
     @GTK_LIBS@ \

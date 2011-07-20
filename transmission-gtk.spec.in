@@ -27,11 +27,9 @@ BuildRequires: gtk2-devel >= @GTK_MINIMUM@
 Requires: glib2 >= @GLIB_MINIMUM@
 Requires: gtk2 >= @GTK_MINIMUM@
 # OPTIONAL for the gtk+ client... see configure.ac for details
-BuildRequires: GConf2-devel >= @GCONF2_MINIMUM@
 BuildRequires: dbus-glib-devel >= @DBUS_GLIB_MINIMUM@
 BuildRequires: libcanberra-devel >= @CANBERRA_MINIMUM@
 BuildRequires: libnotify-devel >= @LIBNOTIFY_MINIMUM@
-Requires: GConf2 >= @GCONF2_MINIMUM@
 Requires: dbus-glib >= @DBUS_GLIB_MINIMUM@
 Requires: libcanberra >= @CANBERRA_MINIMUM@
 Requires: libnotify >= @LIBNOTIFY_MINIMUM@

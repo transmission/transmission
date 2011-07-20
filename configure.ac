@@ -66,9 +66,6 @@ AC_SUBST(CANBERRA_MINIMUM)
 # inhibit hibernation when a torrent is active...
 DBUS_GLIB_MINIMUM=0.70
 AC_SUBST(DBUS_GLIB_MINIMUM)
-# register the GTK+ client as a magnet link handler...
-GCONF2_MINIMUM=2.20.0
-AC_SUBST(GCONF2_MINIMUM)
 # implement "watch" directories to use new .torrent files...
 GIO_MINIMUM=2.15.5
 AC_SUBST(GIO_MINIMUM)
@@ -266,7 +263,6 @@ use_libappindicator=no
 use_libnotify=no
 use_dbus_glib=no
 use_canberra=no
-use_gconf2=no
 if test "x$want_gtk" = "xyes" ; then
     if test "x$have_gtk" = "xyes"; then
       build_gtk=yes
@@ -337,23 +333,6 @@ if test "x$build_gtk" = "xyes"; then
         else
             LIBCANBERRA_CFLAGS=
             LIBCANBERRA_LIBS=
-        fi
-    fi
-
-    PKG_CHECK_MODULES([GCONF2],
-                      [gconf-2.0 >= $GCONF2_MINIMUM],
-                      [have_gconf2=yes],
-                      [have_gconf2=no])
-    AC_ARG_ENABLE([gconf2], 
-                  AS_HELP_STRING([--enable-gconf2],[enable GConf support]),, 
-                  [enable_gconf2=yes]) 
-    if test "x$have_gconf2" = "xyes"; then
-        if test "x$enable_gconf2" = "xyes" ; then
-            use_gconf2=yes
-            AC_DEFINE([HAVE_GCONF2], 1) 
-        else
-            GCONF2_CFLAGS=
-            GCONF2_LIBS=
         fi
     fi
 
@@ -536,10 +515,9 @@ Configuration:
      Optional dependencies for GTK+ client:
 
       * dbus support:                                 ${use_dbus_glib}
-      * gio for watchdir support:                     ${use_gio}
+      * gio for watchdir and mime-type support:       ${use_gio}
       * libnotify for 'download completed' popups:    ${use_libnotify}
       * libcanberra for 'download completed' sounds:  ${use_canberra}
-      * gconf2 to register as a magnet link handler:  ${use_gconf2}
       * libappindicator for an Ubuntu-style tray:     ${use_libappindicator}
 
    Build Daemon:                                      ${build_daemon}

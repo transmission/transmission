@@ -37,11 +37,6 @@
 #include <glib/gi18n.h>
 #include <glib/gstdio.h>
 
-#ifdef HAVE_GCONF2
- #include <gconf/gconf.h>
- #include <gconf/gconf-client.h>
-#endif
-
 #include <libtransmission/transmission.h>
 #include <libtransmission/rpcimpl.h>
 #include <libtransmission/utils.h>
@@ -362,35 +357,19 @@ static gboolean update_model( gpointer gdata );
 static void
 register_magnet_link_handler( void )
 {
-#ifdef HAVE_GCONF2
-    GError * err;
-    GConfValue * value;
-    GConfClient * client = gconf_client_get_default( );
-    const char * key = "/desktop/gnome/url-handlers/magnet/command";
-
-    /* if there's already a manget handler registered, don't do anything */
-    value = gconf_client_get( client, key, NULL );
-    if( value != NULL )
+    GAppInfo * app_info = g_app_info_get_default_for_uri_scheme( "magnet" );
+    if( app_info == NULL )
     {
-        gconf_value_free( value );
-        return;
+        /* there's no default magnet handler, so register ourselves for the job... */
+        GError * error = NULL;
+        app_info = g_app_info_create_from_commandline( "transmission-gtk", "transmission-gtk", G_APP_INFO_CREATE_SUPPORTS_URIS, NULL );
+        g_app_info_set_as_default_for_type( app_info, "x-scheme-handler/magnet", &error );
+        if( error != NULL )
+        {
+            g_warning( _( "Error registering Transmission as x-scheme-handler/magnet handler: %s" ), error->message );
+            g_clear_error( &error );
+        }
     }
-
-    err = NULL;
-    if( !gconf_client_set_string( client, key, "transmission '%s'", &err ) )
-    {
-        tr_inf( "Unable to register Transmission as default magnet link handler: \"%s\"", err->message );
-        g_clear_error( &err );
-    }
-    else
-    {
-        gconf_client_set_bool( client, "/desktop/gnome/url-handlers/magnet/needs_terminal", FALSE, NULL );
-        gconf_client_set_bool( client, "/desktop/gnome/url-handlers/magnet/enabled", TRUE, NULL );
-        tr_inf( "Transmission registered as default magnet link handler" );
-    }
-
-    g_object_unref( G_OBJECT( client ) );
-#endif
 }
 
 static void
