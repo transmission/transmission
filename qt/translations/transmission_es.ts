@@ -550,12 +550,12 @@
     <name>FilterBar</name>
     <message>
         <location filename="../filterbar.cc" line="+223"/>
-        <location line="+151"/>
+        <location line="+161"/>
         <source>All</source>
         <translation>Todos</translation>
     </message>
     <message>
-        <location line="-144"/>
+        <location line="-154"/>
         <source>Active</source>
         <translation>Activos</translation>
     </message>
@@ -595,7 +595,7 @@
         <translation>Error</translation>
     </message>
     <message>
-        <location line="+147"/>
+        <location line="+157"/>
         <source>Show:</source>
         <translation>Mostrar:</translation>
     </message>
@@ -1529,8 +1529,8 @@ Para agregar otro URL primario, agrueguelo después de una línea en blanco.</tr
     </message>
     <message>
         <location line="+6"/>
-        <source>Testing...</source>
-        <translation>Probando...</translation>
+        <source>Testing TCP Port...</source>
+        <translation>Probando puerto TCP...</translation>
     </message>
     <message>
         <location line="+10"/>
@@ -1851,7 +1851,7 @@ Para agregar otro URL primario, agrueguelo después de una línea en blanco.</tr
 <context>
     <name>Session</name>
     <message>
-        <location filename="../session.cc" line="+793"/>
+        <location filename="../session.cc" line="+798"/>
         <source>Add Torrent</source>
         <translation>Agregar torrent</translation>
     </message>
@@ -2106,7 +2106,7 @@ Para agregar otro URL primario, agrueguelo después de una línea en blanco.</tr
 <context>
     <name>TrMainWindow</name>
     <message>
-        <location filename="../mainwin.cc" line="+451"/>
+        <location filename="../mainwin.cc" line="+457"/>
         <source>Limit Download Speed</source>
         <translation>Limitar velocidad de descarga</translation>
     </message>
@@ -2119,13 +2119,13 @@ Para agregar otro URL primario, agrueguelo después de una línea en blanco.</tr
     <message>
         <location line="-15"/>
         <location line="+20"/>
-        <location line="+448"/>
+        <location line="+468"/>
         <location line="+8"/>
         <source>Limited at %1</source>
         <translation>Limitada a %1</translation>
     </message>
     <message>
-        <location line="-464"/>
+        <location line="-484"/>
         <source>Limit Upload Speed</source>
         <translation>Limitar velocidad de carga</translation>
     </message>
@@ -2142,12 +2142,12 @@ Para agregar otro URL primario, agrueguelo después de una línea en blanco.</tr
     </message>
     <message>
         <location line="+5"/>
-        <location line="+442"/>
+        <location line="+462"/>
         <source>Stop at Ratio (%1)</source>
         <translation>Detener a la proporción (%1)</translation>
     </message>
     <message>
-        <location line="-318"/>
+        <location line="-338"/>
         <source> - %1:%2</source>
         <translation> - %1:%2</translation>
     </message>
@@ -2168,7 +2168,7 @@ Para agregar otro URL primario, agrueguelo después de una línea en blanco.</tr
         </translation>
     </message>
     <message>
-        <location line="+9"/>
+        <location line="+18"/>
         <source>Idle</source>
         <translation>Sin cambio</translation>
     </message>
@@ -2194,7 +2194,7 @@ Bajada: %2</translation>
         <translation>Bajada: %1, Subida: %2</translation>
     </message>
     <message>
-        <location line="+315"/>
+        <location line="+326"/>
         <source>Click to disable Temporary Speed Limits
 (%1 down, %2 up)</source>
         <translation>Presione para deshabilitar límites temporales de velocidad
