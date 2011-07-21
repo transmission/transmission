@@ -1079,8 +1079,6 @@
 		080E96DDFE201D6D7F000001 /* Sources */ = {
 			isa = PBXGroup;
 			children = (
-				A21A9BE0106D86A800F1C3C1 /* TrackerNode.h */,
-				A21A9BE1106D86A800F1C3C1 /* TrackerNode.m */,
 				32CA4F630368D1EE00C91783 /* Transmission_Prefix.pch */,
 				29B97316FDCFA39411CA2CEA /* main.m */,
 				4DF0C5AA0899190500DD8943 /* Controller.h */,
@@ -1093,6 +1091,8 @@
 				4D364D9F091FBB2C00377D12 /* TorrentTableView.m */,
 				4DCCBB3D09C3D71100D3CABF /* TorrentCell.h */,
 				4DCCBB3C09C3D71100D3CABF /* TorrentCell.m */,
+				A21A9BE0106D86A800F1C3C1 /* TrackerNode.h */,
+				A21A9BE1106D86A800F1C3C1 /* TrackerNode.m */,
 				A2725B6C0DE5C4F5003445E7 /* FileListNode.h */,
 				A2725B6D0DE5C4F5003445E7 /* FileListNode.m */,
 				A28F4F750E085BDC003A3882 /* ColorTextField.h */,
