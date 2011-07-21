@@ -30,11 +30,13 @@
 @interface FileOutlineController : NSObject
 {
     Torrent * fTorrent;
-    NSArray * fFileList;
+    NSMutableArray * fFileList;
     
     IBOutlet FileOutlineView * fOutline;
     
     NSString * fFilterText;
+    
+    NSLock * fLock;
 }
 
 - (FileOutlineView *) outlineView;
