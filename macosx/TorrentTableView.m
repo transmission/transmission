@@ -25,6 +25,7 @@
 #import "TorrentTableView.h"
 #import "Controller.h"
 #import "FileListNode.h"
+#import "InfoOptionsViewController.h"
 #import "NSApplicationAdditions.h"
 #import "NSStringAdditions.h"
 #import "Torrent.h"
@@ -151,14 +152,17 @@
 {
     if ([item isKindOfClass: [Torrent class]])
     {
-        [cell setRepresentedObject: item];
-        
-        const NSInteger row = [self rowForItem: item];
-        [cell setHover: row == fMouseRow];
-        [cell setControlHover: row == fMouseControlRow];
-        [cell setRevealHover: row == fMouseRevealRow];
-        [cell setActionHover: row == fMouseActionRow];
-        [cell setActionPushed: row == fActionPushedRow];
+        if (!tableColumn)
+        {
+            [cell setRepresentedObject: item];
+            
+            const NSInteger row = [self rowForItem: item];
+            [cell setHover: row == fMouseRow];
+            [cell setControlHover: row == fMouseControlRow];
+            [cell setRevealHover: row == fMouseRevealRow];
+            [cell setActionHover: row == fMouseActionRow];
+            [cell setActionPushed: row == fActionPushedRow];
+        }
     }
     else
     {
@@ -403,7 +407,8 @@
         fActionPushedRow = row;
         [self setNeedsDisplayInRect: [self rectOfRow: row]]; //ensure button is pushed down
         
-        [self displayTorrentMenuForEvent: event];
+        #warning maybe make appear on mouse down
+        [self displayTorrentActionPopoverForEvent: event];
         
         fActionPushedRow = -1;
         [self setNeedsDisplayInRect: [self rectOfRow: row]];
@@ -564,40 +569,60 @@
     }
 }
 
-- (void) displayTorrentMenuForEvent: (NSEvent *) event
+- (void) displayTorrentActionPopoverForEvent: (NSEvent *) event
 {
     const NSInteger row = [self rowAtPoint: [self convertPoint: [event locationInWindow] fromView: nil]];
     if (row < 0)
         return;
     
-    //update file action menu
-    fMenuTorrent = [[self itemAtRow: row] retain];
+    const NSRect rect = [fTorrentCell iconRectForBounds: [self rectOfRow: row]];
     
-    //update global limit check
-    [fGlobalLimitItem setState: [fMenuTorrent usesGlobalSpeedLimit] ? NSOnState : NSOffState];
-    
-    //place menu below button
-    NSRect rect = [fTorrentCell iconRectForBounds: [self rectOfRow: row]];
-    NSPoint location = rect.origin;
-    location.y += rect.size.height + 5.0;
-    
-    if ([NSApp isOnSnowLeopardOrBetter])
+    if ([NSApp isOnLionOrBetter])
     {
-        location = [self convertPoint: location toView: self];
-        [fActionMenu popUpMenuPositioningItem: nil atLocation: location inView: self];
+        Torrent * torrent = [self itemAtRow: row];
+        
+        NSPopover * popover = [[NSPopoverLion alloc] init];
+        [popover setBehavior: NSPopoverBehaviorTransient];
+        InfoOptionsViewController * infoViewController = [[InfoOptionsViewController alloc] init];
+        [popover setContentViewController: infoViewController];
+        
+        [popover showRelativeToRect: rect ofView: self preferredEdge: NSMaxYEdge];
+        [infoViewController setInfoForTorrents: [NSArray arrayWithObject: torrent]];
+        [infoViewController updateInfo];
+        
+        [infoViewController release];
+        [popover release];
     }
     else
     {
-        location = [self convertPoint: location toView: nil];
-        NSEvent * newEvent = [NSEvent mouseEventWithType: [event type] location: location
-            modifierFlags: [event modifierFlags] timestamp: [event timestamp] windowNumber: [event windowNumber]
-            context: [event context] eventNumber: [event eventNumber] clickCount: [event clickCount] pressure: [event pressure]];
+        //update file action menu
+        fMenuTorrent = [[self itemAtRow: row] retain];
         
-        [NSMenu popUpContextMenu: fActionMenu withEvent: newEvent forView: self];
+        //update global limit check
+        [fGlobalLimitItem setState: [fMenuTorrent usesGlobalSpeedLimit] ? NSOnState : NSOffState];
+        
+        //place menu below button
+        NSPoint location = rect.origin;
+        location.y += NSHeight(rect) + 5.0;
+        
+        if ([NSApp isOnSnowLeopardOrBetter])
+        {
+            location = [self convertPoint: location toView: self];
+            [fActionMenu popUpMenuPositioningItem: nil atLocation: location inView: self];
+        }
+        else
+        {
+            location = [self convertPoint: location toView: nil];
+            NSEvent * newEvent = [NSEvent mouseEventWithType: [event type] location: location
+                modifierFlags: [event modifierFlags] timestamp: [event timestamp] windowNumber: [event windowNumber]
+                context: [event context] eventNumber: [event eventNumber] clickCount: [event clickCount] pressure: [event pressure]];
+            
+            [NSMenu popUpContextMenu: fActionMenu withEvent: newEvent forView: self];
+        }
+        
+        [fMenuTorrent release];
+        fMenuTorrent = nil;
     }
-    
-    [fMenuTorrent release];
-    fMenuTorrent = nil;
 }
 
 - (void) menuNeedsUpdate: (NSMenu *) menu

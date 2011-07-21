@@ -75,7 +75,7 @@
 
 - (void) toggleControlForTorrent: (Torrent *) torrent;
 
-- (void) displayTorrentMenuForEvent: (NSEvent *) event;
+- (void) displayTorrentActionPopoverForEvent: (NSEvent *) event;
 
 - (void) setQuickLimitMode: (id) sender;
 - (void) setQuickLimit: (id) sender;
