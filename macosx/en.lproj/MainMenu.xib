@@ -2,13 +2,13 @@
 <archive type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="8.00">
 	<data>
 		<int key="IBDocument.SystemTarget">1050</int>
-		<string key="IBDocument.SystemVersion">10K540</string>
-		<string key="IBDocument.InterfaceBuilderVersion">1306</string>
-		<string key="IBDocument.AppKitVersion">1038.36</string>
-		<string key="IBDocument.HIToolboxVersion">461.00</string>
+		<string key="IBDocument.SystemVersion">11A511</string>
+		<string key="IBDocument.InterfaceBuilderVersion">1617</string>
+		<string key="IBDocument.AppKitVersion">1138</string>
+		<string key="IBDocument.HIToolboxVersion">566.00</string>
 		<object class="NSMutableDictionary" key="IBDocument.PluginVersions">
 			<string key="NS.key.0">com.apple.InterfaceBuilder.CocoaPlugin</string>
-			<string key="NS.object.0">1306</string>
+			<string key="NS.object.0">1617</string>
 		</object>
 		<array key="IBDocument.IntegratedClassDependencies">
 			<string>NSUserDefaultsController</string>
@@ -32,10 +32,7 @@
 		<array key="IBDocument.PluginDependencies">
 			<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 		</array>
-		<object class="NSMutableDictionary" key="IBDocument.Metadata">
-			<string key="NS.key.0">PluginDependencyRecalculationVersion</string>
-			<integer value="1" key="NS.object.0"/>
-		</object>
+		<dictionary class="NSMutableDictionary" key="IBDocument.Metadata"/>
 		<array class="NSMutableArray" key="IBDocument.RootObjects" id="179598352">
 			<object class="NSCustomObject" id="130864441">
 				<string key="NSClassName">NSApplication</string>
@@ -56,6 +53,7 @@
 				<object class="NSMutableString" key="NSViewClass">
 					<characters key="NS.bytes">View</characters>
 				</object>
+				<nil key="NSUserInterfaceItemIdentifier"/>
 				<string key="NSWindowContentMinSize">{350, 5}</string>
 				<object class="NSView" key="NSWindowView" id="303120456">
 					<reference key="NSNextResponder"/>
@@ -182,7 +180,6 @@
 							<string key="NSFrame">{{118, 5}, {279, 14}}</string>
 							<reference key="NSSuperview" ref="303120456"/>
 							<reference key="NSWindow"/>
-							<reference key="NSNextKeyView"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSTextFieldCell" key="NSCell" id="696487414">
 								<int key="NSCellFlags">67239488</int>
@@ -228,7 +225,7 @@
 											<string key="NSFrameSize">{515, 224}</string>
 											<reference key="NSSuperview" ref="306237956"/>
 											<reference key="NSWindow"/>
-											<reference key="NSNextKeyView" ref="1068338331"/>
+											<reference key="NSNextKeyView" ref="365285506"/>
 											<bool key="NSEnabled">YES</bool>
 											<object class="_NSCornerView" key="NSCornerView">
 												<nil key="NSNextResponder"/>
@@ -428,62 +425,60 @@ dBtdylsFt0VNsgjojBuwipKts4jFtBtdwtjNrF0lw9tdxdsNxtyzItyV11192F2IjjiVkFswoIjDiVtd
 3UrFtdzBu5Q1yF2V4V4d4l4t3F45RF39t1x11tx941596AjQgIAADwEAAAMAAAABAD4AAAEBAAMAAAAB
 AD4AAAECAAMAAAAEAAAkvAEDAAMAAAABAAUAAAEGAAMAAAABAAIAAAERAAQAAAABAAAACAESAAMAAAAB
 AAEAAAEVAAMAAAABAAQAAAEWAAMAAAABAD4AAAEXAAQAAAABAAAj+gEcAAMAAAABAAEAAAE9AAMAAAAB
-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
+AAIAAAFSAAMAAAABAAEAAAFTAAMAAAAEAAAkxIdzAAcAAAw4AAAkzAAAAAAACAAIAAgACAABAAEAAQAB
+AAAMOGFwcGwCEAAAbW50clJHQiBYWVogB9sABwAUABIAEgABYWNzcEFQUEwAAAAAAAAAAAAAAAAAAAAA
 AAAAAAAAAAAAAPbWAAEAAAAA0y1hcHBsAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-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
+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
-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
-AdkB4QHpAfIB+gIDAgwCFAIdAiYCLwI4AkECSwJUAl0CZwJxAnoChAKOApgCogKsArYCwQLLAtUC4ALr
-AvUDAAMLAxYDIQMtAzgDQwNPA1oDZgNyA34DigOWA6IDrgO6A8cD0wPgA+wD+QQGBBMEIAQtBDsESARV
-BGMEcQR+BIwEmgSoBLYExATTBOEE8AT+BQ0FHAUrBToFSQVYBWcFdwWGBZYFpgW1BcUF1QXlBfYGBgYW
-BicGNwZIBlkGagZ7BowGnQavBsAG0QbjBvUHBwcZBysHPQdPB2EHdAeGB5kHrAe/B9IH5Qf4CAsIHwgy
-CEYIWghuCIIIlgiqCL4I0gjnCPsJEAklCToJTwlkCXkJjwmkCboJzwnlCfsKEQonCj0KVApqCoEKmAqu
-CsUK3ArzCwsLIgs5C1ELaQuAC5gLsAvIC+EL+QwSDCoMQwxcDHUMjgynDMAM2QzzDQ0NJg1ADVoNdA2O
-DakNww3eDfgOEw4uDkkOZA5/DpsOtg7SDu4PCQ8lD0EPXg96D5YPsw/PD+wQCRAmEEMQYRB+EJsQuRDX
-EPURExExEU8RbRGMEaoRyRHoEgcSJhJFEmQShBKjEsMS4xMDEyMTQxNjE4MTpBPFE+UUBhQnFEkUahSL
-FK0UzhTwFRIVNBVWFXgVmxW9FeAWAxYmFkkWbBaPFrIW1hb6Fx0XQRdlF4kXrhfSF/cYGxhAGGUYihiv
-GNUY+hkgGUUZaxmRGbcZ3RoEGioaURp3Gp4axRrsGxQbOxtjG4obshvaHAIcKhxSHHscoxzMHPUdHh1H
-HXAdmR3DHeweFh5AHmoelB6+HukfEx8+H2kflB+/H+ogFSBBIGwgmCDEIPAhHCFIIXUhoSHOIfsiJyJV
-IoIiryLdIwojOCNmI5QjwiPwJB8kTSR8JKsk2iUJJTglaCWXJccl9yYnJlcmhya3JugnGCdJJ3onqyfc
-KA0oPyhxKKIo1CkGKTgpaymdKdAqAio1KmgqmyrPKwIrNitpK50r0SwFLDksbiyiLNctDC1BLXYtqy3h
-LhYuTC6CLrcu7i8kL1ovkS/HL/4wNTBsMKQw2zESMUoxgjG6MfIyKjJjMpsy1DMNM0YzfzO4M/E0KzRl
-NJ402DUTNU01hzXCNf02NzZyNq426TckN2A3nDfXOBQ4UDiMOMg5BTlCOX85vDn5OjY6dDqyOu87LTtr
-O6o76DwnPGU8pDzjPSI9YT2hPeA+ID5gPqA+4D8hP2E/oj/iQCNAZECmQOdBKUFqQaxB7kIwQnJCtUL3
-QzpDfUPARANER0SKRM5FEkVVRZpF3kYiRmdGq0bwRzVHe0fASAVIS0iRSNdJHUljSalJ8Eo3Sn1KxEsM
-S1NLmkviTCpMcky6TQJNSk2TTdxOJU5uTrdPAE9JT5NP3VAnUHFQu1EGUVBRm1HmUjFSfFLHUxNTX1Oq
-U/ZUQlSPVNtVKFV1VcJWD1ZcVqlW91dEV5JX4FgvWH1Yy1kaWWlZuFoHWlZaplr1W0VblVvlXDVchlzW
-XSddeF3JXhpebF69Xw9fYV+zYAVgV2CqYPxhT2GiYfViSWKcYvBjQ2OXY+tkQGSUZOllPWWSZedmPWaS
-ZuhnPWeTZ+loP2iWaOxpQ2maafFqSGqfavdrT2una/9sV2yvbQhtYG25bhJua27Ebx5veG/RcCtwhnDg
-cTpxlXHwcktypnMBc11zuHQUdHB0zHUodYV14XY+dpt2+HdWd7N4EXhueMx5KnmJeed6RnqlewR7Y3vC
-fCF8gXzhfUF9oX4BfmJ+wn8jf4R/5YBHgKiBCoFrgc2CMIKSgvSDV4O6hB2EgITjhUeFq4YOhnKG14c7
-h5+IBIhpiM6JM4mZif6KZIrKizCLlov8jGOMyo0xjZiN/45mjs6PNo+ekAaQbpDWkT+RqJIRknqS45NN
-k7aUIJSKlPSVX5XJljSWn5cKl3WX4JhMmLiZJJmQmfyaaJrVm0Kbr5wcnImc951kndKeQJ6unx2fi5/6
-oGmg2KFHobaiJqKWowajdqPmpFakx6U4pammGqaLpv2nbqfgqFKoxKk3qamqHKqPqwKrdavprFys0K1E
-rbiuLa6hrxavi7AAsHWw6rFgsdayS7LCszizrrQltJy1E7WKtgG2ebbwt2i34LhZuNG5SrnCuju6tbsu
-u6e8IbybvRW9j74KvoS+/796v/XAcMDswWfB48JfwtvDWMPUxFHEzsVLxcjGRsbDx0HHv8g9yLzJOsm5
-yjjKt8s2y7bMNcy1zTXNtc42zrbPN8+40DnQutE80b7SP9LB00TTxtRJ1MvVTtXR1lXW2Ndc1+DYZNjo
-2WzZ8dp22vvbgNwF3IrdEN2W3hzeot8p36/gNuC94UThzOJT4tvjY+Pr5HPk/OWE5g3mlucf56noMui8
-6Ubp0Opb6uXrcOv77IbtEe2c7ijutO9A78zwWPDl8XLx//KM8xnzp/Q09ML1UPXe9m32+/eK+Bn4qPk4
-+cf6V/rn+3f8B/yY/Sn9uv5L/tz/bf//cGFyYQAAAAAAAwAAAAJmZgAA8qcAAA1ZAAAT0AAACg52Y2d0
-AAAAAAAAAAEAAQAAAAAAAAABAAAAAQAAAAAAAAABAAAAAQAAAAAAAAABAABuZGluAAAAAAAAADYAAKdA
-AABVgAAATMAAAJ7AAAAlgAAADMAAAFAAAABUQAACMzMAAjMzAAIzMwAAAAAAAAAAc2YzMgAAAAAAAQxy
-AAAF+P//8x0AAAe6AAD9cv//+53///2kAAAD2QAAwHFtbW9kAAAAAAAABhAAAKAHAAAAAMknHgAAAAAA
-AAAAAAAAAAAAAAAAA</bytes>
+AAAAAAAAAAAAAAAAAAAAAG1sdWMAAAAAAAAAFgAAAAxwdEJSAAAACAAAARhpdElUAAAACAAAARhodUhV
+AAAACAAAARh6aFRXAAAACAAAARhuYk5PAAAACAAAARhjc0NaAAAACAAAARhrb0tSAAAACAAAARhkZURF
+AAAACAAAARhzdlNFAAAACAAAARh6aENOAAAACAAAARhqYUpQAAAACAAAARhhcgAAAAAACAAAARhwdFBU
+AAAACAAAARhubE5MAAAACAAAARhmckZSAAAACAAAARhlc0VTAAAACAAAARh0clRSAAAACAAAARhmaUZJ
+AAAACAAAARhwbFBMAAAACAAAARhydVJVAAAACAAAARhlblVTAAAACAAAARhkYURLAAAACAAAARgAaQBN
+AGEAY3RleHQAAAAAQ29weXJpZ2h0IEFwcGxlLCBJbmMuLCAyMDExAFhZWiAAAAAAAADzFgABAAAAARbK
+WFlaIAAAAAAAAHHAAAA5igAAAWdYWVogAAAAAAAAYSMAALnmAAAT9lhZWiAAAAAAAAAj8gAADJAAAL3Q
+Y3VydgAAAAAAAAQAAAAABQAKAA8AFAAZAB4AIwAoAC0AMgA2ADsAQABFAEoATwBUAFkAXgBjAGgAbQBy
+AHcAfACBAIYAiwCQAJUAmgCfAKMAqACtALIAtwC8AMEAxgDLANAA1QDbAOAA5QDrAPAA9gD7AQEBBwEN
+ARMBGQEfASUBKwEyATgBPgFFAUwBUgFZAWABZwFuAXUBfAGDAYsBkgGaAaEBqQGxAbkBwQHJAdEB2QHh
+AekB8gH6AgMCDAIUAh0CJgIvAjgCQQJLAlQCXQJnAnECegKEAo4CmAKiAqwCtgLBAssC1QLgAusC9QMA
+AwsDFgMhAy0DOANDA08DWgNmA3IDfgOKA5YDogOuA7oDxwPTA+AD7AP5BAYEEwQgBC0EOwRIBFUEYwRx
+BH4EjASaBKgEtgTEBNME4QTwBP4FDQUcBSsFOgVJBVgFZwV3BYYFlgWmBbUFxQXVBeUF9gYGBhYGJwY3
+BkgGWQZqBnsGjAadBq8GwAbRBuMG9QcHBxkHKwc9B08HYQd0B4YHmQesB78H0gflB/gICwgfCDIIRgha
+CG4IggiWCKoIvgjSCOcI+wkQCSUJOglPCWQJeQmPCaQJugnPCeUJ+woRCicKPQpUCmoKgQqYCq4KxQrc
+CvMLCwsiCzkLUQtpC4ALmAuwC8gL4Qv5DBIMKgxDDFwMdQyODKcMwAzZDPMNDQ0mDUANWg10DY4NqQ3D
+Dd4N+A4TDi4OSQ5kDn8Omw62DtIO7g8JDyUPQQ9eD3oPlg+zD88P7BAJECYQQxBhEH4QmxC5ENcQ9RET
+ETERTxFtEYwRqhHJEegSBxImEkUSZBKEEqMSwxLjEwMTIxNDE2MTgxOkE8UT5RQGFCcUSRRqFIsUrRTO
+FPAVEhU0FVYVeBWbFb0V4BYDFiYWSRZsFo8WshbWFvoXHRdBF2UXiReuF9IX9xgbGEAYZRiKGK8Y1Rj6
+GSAZRRlrGZEZtxndGgQaKhpRGncanhrFGuwbFBs7G2MbihuyG9ocAhwqHFIcexyjHMwc9R0eHUcdcB2Z
+HcMd7B4WHkAeah6UHr4e6R8THz4faR+UH78f6iAVIEEgbCCYIMQg8CEcIUghdSGhIc4h+yInIlUigiKv
+It0jCiM4I2YjlCPCI/AkHyRNJHwkqyTaJQklOCVoJZclxyX3JicmVyaHJrcm6CcYJ0kneierJ9woDSg/
+KHEooijUKQYpOClrKZ0p0CoCKjUqaCqbKs8rAis2K2krnSvRLAUsOSxuLKIs1y0MLUEtdi2rLeEuFi5M
+LoIuty7uLyQvWi+RL8cv/jA1MGwwpDDbMRIxSjGCMbox8jIqMmMymzLUMw0zRjN/M7gz8TQrNGU0njTY
+NRM1TTWHNcI1/TY3NnI2rjbpNyQ3YDecN9c4FDhQOIw4yDkFOUI5fzm8Ofk6Njp0OrI67zstO2s7qjvo
+PCc8ZTykPOM9Ij1hPaE94D4gPmA+oD7gPyE/YT+iP+JAI0BkQKZA50EpQWpBrEHuQjBCckK1QvdDOkN9
+Q8BEA0RHRIpEzkUSRVVFmkXeRiJGZ0arRvBHNUd7R8BIBUhLSJFI10kdSWNJqUnwSjdKfUrESwxLU0ua
+S+JMKkxyTLpNAk1KTZNN3E4lTm5Ot08AT0lPk0/dUCdQcVC7UQZRUFGbUeZSMVJ8UsdTE1NfU6pT9lRC
+VI9U21UoVXVVwlYPVlxWqVb3V0RXklfgWC9YfVjLWRpZaVm4WgdaVlqmWvVbRVuVW+VcNVyGXNZdJ114
+XcleGl5sXr1fD19hX7NgBWBXYKpg/GFPYaJh9WJJYpxi8GNDY5dj62RAZJRk6WU9ZZJl52Y9ZpJm6Gc9
+Z5Nn6Wg/aJZo7GlDaZpp8WpIap9q92tPa6dr/2xXbK9tCG1gbbluEm5rbsRvHm94b9FwK3CGcOBxOnGV
+cfByS3KmcwFzXXO4dBR0cHTMdSh1hXXhdj52m3b4d1Z3s3gReG54zHkqeYl553pGeqV7BHtje8J8IXyB
+fOF9QX2hfgF+Yn7CfyN/hH/lgEeAqIEKgWuBzYIwgpKC9INXg7qEHYSAhOOFR4Wrhg6GcobXhzuHn4gE
+iGmIzokziZmJ/opkisqLMIuWi/yMY4zKjTGNmI3/jmaOzo82j56QBpBukNaRP5GokhGSepLjk02TtpQg
+lIqU9JVflcmWNJaflwqXdZfgmEyYuJkkmZCZ/JpomtWbQpuvnByciZz3nWSd0p5Anq6fHZ+Ln/qgaaDY
+oUehtqImopajBqN2o+akVqTHpTilqaYapoum/adup+CoUqjEqTepqaocqo+rAqt1q+msXKzQrUStuK4t
+rqGvFq+LsACwdbDqsWCx1rJLssKzOLOutCW0nLUTtYq2AbZ5tvC3aLfguFm40blKucK6O7q1uy67p7wh
+vJu9Fb2Pvgq+hL7/v3q/9cBwwOzBZ8Hjwl/C28NYw9TEUcTOxUvFyMZGxsPHQce/yD3IvMk6ybnKOMq3
+yzbLtsw1zLXNNc21zjbOts83z7jQOdC60TzRvtI/0sHTRNPG1EnUy9VO1dHWVdbY11zX4Nhk2OjZbNnx
+2nba+9uA3AXcit0Q3ZbeHN6i3ynfr+A24L3hROHM4lPi2+Nj4+vkc+T85YTmDeaW5x/nqegy6LzpRunQ
+6lvq5etw6/vshu0R7ZzuKO6070DvzPBY8OXxcvH/8ozzGfOn9DT0wvVQ9d72bfb794r4Gfio+Tj5x/pX
++uf7d/wH/Jj9Kf26/kv+3P9t//9wYXJhAAAAAAADAAAAAmZmAADypwAADVkAABPQAAAKDnZjZ3QAAAAA
+AAAAAQABAAAAAAAAAAEAAAABAAAAAAAAAAEAAAABAAAAAAAAAAEAAG5kaW4AAAAAAAAANgAAp0AAAFWA
+AABMwAAAnsAAACWAAAAMwAAAUAAAAFRAAAIzMwACMzMAAjMzAAAAAAAAAABzZjMyAAAAAAABDHIAAAX4
+///zHQAAB7oAAP1y///7nf///aQAAAPZAADAcW1tb2QAAAAAAAAGEAAAoAcAAAAAySceAAAAAAAAAAAA
+AAAAAAAAAAA</bytes>
 																		</object>
 																		<string key="NSCacheWindowColorSpace">NSCalibratedRGBColorSpace</string>
 																		<int key="NSCacheWindowBPS">8</int>
@@ -663,6 +658,7 @@ AAAAAAAAAAAAAAAAA</bytes>
 											<int key="NSDraggingSourceMaskForNonLocal">0</int>
 											<bool key="NSAllowsTypeSelect">YES</bool>
 											<int key="NSTableViewDraggingDestinationStyle">0</int>
+											<int key="NSTableViewGroupRowStyle">1</int>
 											<bool key="NSOutlineViewAutoresizesOutlineColumnKey">NO</bool>
 											<bool key="NSOutlineViewIndentationMarkerFollowsCellKey">NO</bool>
 										</object>
@@ -702,23 +698,24 @@ AAAAAAAAAAAAAAAAA</bytes>
 							<string key="NSFrame">{{0, 24}, {515, 224}}</string>
 							<reference key="NSSuperview" ref="303120456"/>
 							<reference key="NSWindow"/>
-							<reference key="NSNextKeyView" ref="365285506"/>
-							<int key="NSsFlags">528</int>
+							<reference key="NSNextKeyView" ref="306237956"/>
+							<int key="NSsFlags">133648</int>
 							<reference key="NSVScroller" ref="1068338331"/>
 							<reference key="NSHScroller" ref="365285506"/>
 							<reference key="NSContentView" ref="306237956"/>
 							<bytes key="NSScrollAmts">AAAAAAAAAABCggAAQoIAAA</bytes>
 						</object>
 					</array>
-					<string key="NSFrame">{{7, 11}, {515, 248}}</string>
+					<string key="NSFrameSize">{515, 248}</string>
 					<reference key="NSSuperview"/>
 					<reference key="NSWindow"/>
 					<reference key="NSNextKeyView" ref="87647552"/>
 				</object>
 				<string key="NSScreenRect">{{0, 0}, {2560, 1418}}</string>
 				<string key="NSMinSize">{350, 27}</string>
-				<string key="NSMaxSize">{1e+13, 1e+13}</string>
+				<string key="NSMaxSize">{10000000000000, 10000000000000}</string>
 				<string key="NSFrameAutosaveName">TransmissionWindow</string>
+				<bool key="NSWindowIsRestorable">YES</bool>
 			</object>
 			<object class="NSMenu" id="421442763">
 				<string key="NSTitle">MainMenu</string>
@@ -1259,7 +1256,6 @@ AAAAAAAAAAAAAAAAA</bytes>
 											</object>
 											<object class="NSMenuItem" id="471963525">
 												<reference key="NSMenu" ref="188604546"/>
-												<bool key="NSIsHidden">YES</bool>
 												<string key="NSTitle">Size</string>
 												<string key="NSKeyEquiv"/>
 												<int key="NSKeyEquivModMask">1048576</int>
@@ -1738,7 +1734,7 @@ AAAAAAAAAAAAAAAAA</bytes>
 									<reference key="NSMenu" ref="986610193"/>
 									<string key="NSTitle">Statistics</string>
 									<string key="NSKeyEquiv">2</string>
-									<int key="NSKeyEquivModMask">1048840</int>
+									<int key="NSKeyEquivModMask">1048576</int>
 									<int key="NSMnemonicLoc">2147483647</int>
 									<reference key="NSOnImage" ref="322614661"/>
 									<reference key="NSMixedImage" ref="3851078"/>
@@ -1747,7 +1743,7 @@ AAAAAAAAAAAAAAAAA</bytes>
 									<reference key="NSMenu" ref="986610193"/>
 									<string key="NSTitle">Message Log</string>
 									<string key="NSKeyEquiv">3</string>
-									<int key="NSKeyEquivModMask">1048840</int>
+									<int key="NSKeyEquivModMask">1048576</int>
 									<int key="NSMnemonicLoc">2147483647</int>
 									<reference key="NSOnImage" ref="322614661"/>
 									<reference key="NSMixedImage" ref="3851078"/>
@@ -2254,7 +2250,6 @@ AAAAAAAAAAAAAAAAA</bytes>
 								</object>
 								<object class="NSMenuItem" id="567343578">
 									<reference key="NSMenu" ref="995409894"/>
-									<bool key="NSIsHidden">YES</bool>
 									<string key="NSTitle">Size</string>
 									<string key="NSKeyEquiv"/>
 									<int key="NSKeyEquivModMask">1048576</int>
@@ -5673,390 +5668,182 @@ AAAAAAAAAAAAAAAAA</bytes>
 				</array>
 			</object>
 			<dictionary class="NSMutableDictionary" key="flattenedProperties">
+				<string key="-1.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
+				<string key="-2.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="-3.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="-3.ImportedFromIB2"/>
 				<string key="1028.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="1028.ImportedFromIB2"/>
 				<string key="103.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="103.ImportedFromIB2"/>
-				<string key="1041.IBEditorWindowLastContentRect">{{233, 384}, {248, 173}}</string>
 				<string key="1041.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="1041.ImportedFromIB2"/>
-				<string key="1041.editorWindowContentRectSynchronizationRect">{{72, 664}, {214, 143}}</string>
 				<string key="1044.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="1044.ImportedFromIB2"/>
-				<string key="1045.IBEditorWindowLastContentRect">{{356, 707}, {135, 53}}</string>
 				<string key="1045.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="1045.ImportedFromIB2"/>
-				<string key="1045.editorWindowContentRectSynchronizationRect">{{286, 714}, {135, 53}}</string>
 				<string key="1046.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="1046.ImportedFromIB2"/>
 				<string key="1048.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="1048.ImportedFromIB2"/>
 				<string key="1058.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="1058.ImportedFromIB2"/>
 				<string key="1059.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="1059.ImportedFromIB2"/>
-				<string key="106.IBEditorWindowLastContentRect">{{790, 788}, {239, 93}}</string>
 				<string key="106.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="106.ImportedFromIB2"/>
-				<string key="106.editorWindowContentRectSynchronizationRect">{{599, 808}, {242, 93}}</string>
-				<string key="1060.IBEditorWindowLastContentRect">{{356, 727}, {135, 53}}</string>
 				<string key="1060.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="1060.ImportedFromIB2"/>
-				<string key="1060.editorWindowContentRectSynchronizationRect">{{286, 734}, {135, 53}}</string>
 				<string key="1064.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="1064.ImportedFromIB2"/>
 				<string key="1068.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="1068.ImportedFromIB2"/>
 				<string key="1070.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="1070.ImportedFromIB2"/>
 				<string key="1222.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="1222.ImportedFromIB2"/>
 				<string key="124.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="124.ImportedFromIB2"/>
 				<string key="125.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="125.ImportedFromIB2"/>
 				<string key="126.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="126.ImportedFromIB2"/>
 				<string key="1282.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="1282.ImportedFromIB2"/>
 				<string key="129.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="129.ImportedFromIB2"/>
 				<string key="1293.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="1293.ImportedFromIB2"/>
 				<string key="130.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="130.ImportedFromIB2"/>
 				<string key="1309.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="1309.ImportedFromIB2"/>
 				<string key="131.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="131.ImportedFromIB2"/>
 				<string key="1310.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="1310.ImportedFromIB2"/>
-				<string key="1310.editorWindowContentRectSynchronizationRect">{{286, 684}, {156, 53}}</string>
 				<string key="1316.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="1316.ImportedFromIB2"/>
 				<string key="1317.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="1317.ImportedFromIB2"/>
 				<string key="1318.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="1318.ImportedFromIB2"/>
 				<string key="134.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="134.ImportedFromIB2"/>
 				<string key="1341.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="1341.ImportedFromIB2"/>
 				<string key="136.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="136.ImportedFromIB2"/>
 				<string key="1399.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="1399.ImportedFromIB2"/>
-				<string key="1400.IBEditorWindowLastContentRect">{{468, 378}, {290, 363}}</string>
 				<string key="1400.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="1400.ImportedFromIB2"/>
-				<string key="1400.editorWindowContentRectSynchronizationRect">{{446, 528}, {293, 373}}</string>
 				<string key="1403.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="1403.ImportedFromIB2"/>
 				<string key="1404.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="1404.ImportedFromIB2"/>
 				<string key="1412.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="1412.ImportedFromIB2"/>
 				<string key="1413.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="1413.ImportedFromIB2"/>
 				<string key="1414.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="1414.ImportedFromIB2"/>
 				<string key="144.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="144.ImportedFromIB2"/>
 				<string key="145.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="145.ImportedFromIB2"/>
 				<string key="149.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="149.ImportedFromIB2"/>
 				<string key="150.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="150.ImportedFromIB2"/>
 				<string key="1514.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="1514.ImportedFromIB2"/>
 				<string key="1516.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="1516.ImportedFromIB2"/>
 				<string key="1522.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="1522.ImportedFromIB2"/>
 				<string key="1526.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="1526.ImportedFromIB2"/>
 				<string key="1533.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="1533.ImportedFromIB2"/>
 				<string key="1536.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="1536.ImportedFromIB2"/>
 				<string key="1537.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="1537.ImportedFromIB2"/>
 				<string key="1539.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="1539.ImportedFromIB2"/>
 				<string key="1541.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="1541.ImportedFromIB2"/>
 				<string key="1550.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="1550.ImportedFromIB2"/>
 				<string key="1551.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="1551.ImportedFromIB2"/>
 				<string key="1558.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="1558.ImportedFromIB2"/>
 				<string key="1559.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="1559.ImportedFromIB2"/>
 				<string key="1561.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="1561.ImportedFromIB2"/>
 				<string key="1566.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="1566.ImportedFromIB2"/>
 				<string key="1567.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="1567.ImportedFromIB2"/>
 				<string key="157.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="157.ImportedFromIB2"/>
 				<string key="1574.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="1574.ImportedFromIB2"/>
 				<string key="1575.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="1575.ImportedFromIB2"/>
 				<string key="1578.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="1578.ImportedFromIB2"/>
 				<string key="1591.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="1591.ImportedFromIB2"/>
 				<string key="160.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="160.ImportedFromIB2"/>
 				<string key="1620.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="1620.ImportedFromIB2"/>
 				<string key="163.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="163.ImportedFromIB2"/>
 				<string key="1638.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="1638.ImportedFromIB2"/>
-				<string key="1639.IBEditorWindowLastContentRect">{{481, 294}, {154, 193}}</string>
 				<string key="1639.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="1639.ImportedFromIB2"/>
-				<string key="1639.editorWindowContentRectSynchronizationRect">{{286, 514}, {197, 173}}</string>
 				<string key="1641.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="1641.ImportedFromIB2"/>
 				<string key="1642.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="1642.ImportedFromIB2"/>
 				<string key="1643.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="1643.ImportedFromIB2"/>
 				<string key="1644.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="1644.ImportedFromIB2"/>
 				<string key="1645.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="1645.ImportedFromIB2"/>
 				<string key="1646.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="1646.ImportedFromIB2"/>
 				<string key="1675.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="1675.ImportedFromIB2"/>
 				<string key="1678.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="1678.ImportedFromIB2"/>
 				<string key="1680.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="1680.ImportedFromIB2"/>
 				<string key="1683.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="1683.ImportedFromIB2"/>
-				<string key="1684.IBEditorWindowLastContentRect">{{550, 498}, {249, 243}}</string>
 				<string key="1684.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="1684.ImportedFromIB2"/>
 				<string key="1685.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="1685.ImportedFromIB2"/>
 				<string key="1687.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="1687.ImportedFromIB2"/>
 				<string key="1688.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="1688.ImportedFromIB2"/>
-				<string key="169.IBEditorWindowLastContentRect">{{543, 708}, {169, 173}}</string>
 				<string key="169.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="169.ImportedFromIB2"/>
 				<string key="1692.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="1692.ImportedFromIB2"/>
 				<string key="1693.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="1693.ImportedFromIB2"/>
 				<string key="1694.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="1694.ImportedFromIB2"/>
 				<string key="1695.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="1695.ImportedFromIB2"/>
 				<string key="1696.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="1696.ImportedFromIB2"/>
 				<string key="1697.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="1697.ImportedFromIB2"/>
 				<string key="171.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="171.ImportedFromIB2"/>
 				<string key="172.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="172.ImportedFromIB2"/>
 				<string key="1766.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="1766.ImportedFromIB2"/>
 				<string key="1795.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="1795.ImportedFromIB2"/>
 				<string key="1797.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="1797.ImportedFromIB2"/>
 				<string key="1798.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="1798.ImportedFromIB2"/>
 				<string key="1799.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="1799.ImportedFromIB2"/>
 				<string key="1804.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="1804.ImportedFromIB2"/>
 				<string key="1805.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="1805.ImportedFromIB2"/>
 				<string key="1808.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="1808.ImportedFromIB2"/>
-				<integer value="1" key="1812.ImportedFromIB2"/>
+				<string key="1812.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="1815.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="1815.ImportedFromIB2"/>
 				<string key="1846.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="1846.ImportedFromIB2"/>
 				<string key="1858.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="1858.ImportedFromIB2"/>
 				<string key="1860.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="1860.ImportedFromIB2"/>
 				<string key="1861.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="1861.ImportedFromIB2"/>
 				<string key="1874.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="1874.ImportedFromIB2"/>
 				<string key="1877.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="1877.ImportedFromIB2"/>
 				<string key="1884.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="1884.ImportedFromIB2"/>
 				<string key="1891.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="1891.ImportedFromIB2"/>
 				<string key="1894.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="1894.ImportedFromIB2"/>
-				<string key="1895.IBEditorWindowLastContentRect">{{820, 598}, {154, 193}}</string>
 				<string key="1895.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="1895.ImportedFromIB2"/>
-				<string key="1895.editorWindowContentRectSynchronizationRect">{{449, 701}, {197, 173}}</string>
 				<string key="1896.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="1896.ImportedFromIB2"/>
 				<string key="1897.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="1897.ImportedFromIB2"/>
 				<string key="1899.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="1899.ImportedFromIB2"/>
 				<string key="1900.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="1900.ImportedFromIB2"/>
 				<string key="1901.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="1901.ImportedFromIB2"/>
 				<string key="1902.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="1902.ImportedFromIB2"/>
 				<string key="1921.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="1921.ImportedFromIB2"/>
 				<string key="1923.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="1923.ImportedFromIB2"/>
 				<string key="1926.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="1926.ImportedFromIB2"/>
 				<string key="1930.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="1930.ImportedFromIB2"/>
 				<string key="1933.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="1933.ImportedFromIB2"/>
-				<string key="1936.IBEditorWindowLastContentRect">{{209, 484}, {310, 123}}</string>
 				<string key="1936.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="1936.ImportedFromIB2"/>
-				<string key="1936.editorWindowContentRectSynchronizationRect">{{381, 469}, {214, 113}}</string>
 				<string key="1944.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="1944.ImportedFromIB2"/>
-				<string key="1945.IBEditorWindowLastContentRect">{{322, 871}, {135, 53}}</string>
 				<string key="1945.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="1945.ImportedFromIB2"/>
-				<string key="1945.editorWindowContentRectSynchronizationRect">{{595, 509}, {135, 73}}</string>
 				<string key="1946.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="1946.ImportedFromIB2"/>
 				<string key="1950.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="1950.ImportedFromIB2"/>
-				<string key="1951.IBEditorWindowLastContentRect">{{313, 922}, {135, 53}}</string>
 				<string key="1951.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="1951.ImportedFromIB2"/>
-				<string key="1951.editorWindowContentRectSynchronizationRect">{{595, 489}, {135, 73}}</string>
 				<string key="196.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="196.ImportedFromIB2"/>
 				<string key="1960.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="1960.ImportedFromIB2"/>
 				<string key="1963.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="1963.ImportedFromIB2"/>
 				<string key="1964.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="1964.ImportedFromIB2"/>
 				<string key="1971.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="1971.ImportedFromIB2"/>
 				<string key="2.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="2.ImportedFromIB2"/>
 				<string key="2005.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="2005.ImportedFromIB2"/>
 				<string key="2017.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="2017.ImportedFromIB2"/>
 				<string key="2018.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="2018.ImportedFromIB2"/>
-				<string key="2018.editorWindowContentRectSynchronizationRect">{{595, 459}, {156, 73}}</string>
 				<string key="2024.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="2024.ImportedFromIB2"/>
 				<string key="2025.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="2025.ImportedFromIB2"/>
 				<string key="2026.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="2026.ImportedFromIB2"/>
 				<string key="2029.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="2029.ImportedFromIB2"/>
 				<string key="2031.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="2031.ImportedFromIB2"/>
-				<integer value="1" key="206.ImportedFromIB2"/>
-				<string key="21.IBEditorWindowLastContentRect">{{71, 712}, {515, 248}}</string>
+				<string key="206.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="21.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="21.IBWindowTemplateEditedContentRect">{{71, 712}, {515, 248}}</string>
-				<integer value="1" key="21.ImportedFromIB2"/>
-				<string key="21.editorWindowContentRectSynchronizationRect">{{52, 684}, {468, 196}}</string>
 				<string key="2122.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="2122.ImportedFromIB2"/>
 				<string key="2123.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="2123.ImportedFromIB2"/>
 				<string key="2185.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="2185.ImportedFromIB2"/>
 				<string key="2279.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="2279.ImportedFromIB2"/>
 				<string key="2301.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="2301.ImportedFromIB2"/>
 				<string key="2324.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="2324.ImportedFromIB2"/>
 				<string key="2326.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="2326.ImportedFromIB2"/>
 				<string key="2681.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<object class="NSAffineTransform" key="2681.IBViewBoundsToFrameTransform">
-					<bytes key="NSTransformStruct">P4AAAL+AAABAwAAAwZgAAA</bytes>
-				</object>
-				<integer value="1" key="2681.ImportedFromIB2"/>
-				<string key="2683.IBEditorWindowLastContentRect">{{66, 710}, {105, 23}}</string>
 				<string key="2683.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="2683.ImportedFromIB2"/>
 				<string key="2685.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="2685.ImportedFromIB2"/>
 				<string key="2690.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<object class="NSAffineTransform" key="2690.IBViewBoundsToFrameTransform">
-					<bytes key="NSTransformStruct">P4AAAL+AAABCNAAAwZgAAA</bytes>
-				</object>
-				<integer value="1" key="2690.ImportedFromIB2"/>
 				<string key="2700.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<object class="NSAffineTransform" key="2700.IBViewBoundsToFrameTransform">
-					<bytes key="NSTransformStruct">P4AAAL+AAABCrAAAwYgAAA</bytes>
-				</object>
-				<integer value="1" key="2700.ImportedFromIB2"/>
 				<string key="2839.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="2839.ImportedFromIB2"/>
-				<string key="2840.IBEditorWindowLastContentRect">{{669, 494}, {64, 6}}</string>
 				<string key="2840.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="2840.ImportedFromIB2"/>
-				<string key="2840.editorWindowContentRectSynchronizationRect">{{558, 631}, {183, 33}}</string>
 				<string key="2848.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="2848.ImportedFromIB2"/>
 				<string key="2849.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="2849.ImportedFromIB2"/>
-				<string key="2850.IBEditorWindowLastContentRect">{{860, 429}, {64, 6}}</string>
 				<string key="2850.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="2850.ImportedFromIB2"/>
 				<string key="2881.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="2881.ImportedFromIB2"/>
 				<string key="2883.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="2883.ImportedFromIB2"/>
-				<string key="29.IBEditorWindowLastContentRect">{{203, 741}, {479, 20}}</string>
 				<string key="29.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="29.ImportedFromIB2"/>
-				<string key="29.editorWindowContentRectSynchronizationRect">{{468, 888}, {479, 20}}</string>
 				<string key="301.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="301.ImportedFromIB2"/>
-				<string key="302.IBEditorWindowLastContentRect">{{587, 638}, {233, 243}}</string>
 				<string key="302.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="302.ImportedFromIB2"/>
-				<string key="302.editorWindowContentRectSynchronizationRect">{{396, 658}, {236, 243}}</string>
 				<string key="3047.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="3048.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="3049.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="3077.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="3078.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="3078.ImportedFromIB2"/>
 				<string key="3080.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="3080.ImportedFromIB2"/>
 				<string key="3088.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="3089.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="3090.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -6075,114 +5862,61 @@ AAAAAAAAAAAAAAAAA</bytes>
 				<string key="3145.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="3146.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="3163.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="3163.ImportedFromIB2"/>
 				<string key="3164.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="3164.ImportedFromIB2"/>
 				<string key="3166.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="3167.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="3167.ImportedFromIB2"/>
 				<string key="3170.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="3170.ImportedFromIB2"/>
 				<string key="3172.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="3172.ImportedFromIB2"/>
 				<string key="3190.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="3195.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="3195.ImportedFromIB2"/>
 				<string key="3196.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<string key="3197.IBEditorWindowLastContentRect">{{322, 891}, {105, 63}}</string>
 				<string key="3197.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="3198.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="3199.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="3200.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="3206.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="3206.ImportedFromIB2"/>
 				<string key="3207.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="3207.ImportedFromIB2"/>
 				<string key="3209.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="3209.ImportedFromIB2"/>
 				<string key="3211.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="3211.ImportedFromIB2"/>
 				<string key="3212.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="3212.ImportedFromIB2"/>
 				<string key="3215.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="3215.ImportedFromIB2"/>
 				<string key="3216.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="3218.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="3220.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="3220.ImportedFromIB2"/>
 				<string key="3321.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="3322.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="3400.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="3403.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="3403.ImportedFromIB2"/>
 				<string key="3405.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="3405.ImportedFromIB2"/>
 				<string key="3407.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="3408.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="3408.ImportedFromIB2"/>
 				<string key="3420.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<object class="NSAffineTransform" key="3420.IBViewBoundsToFrameTransform">
-					<bytes key="NSTransformStruct">P4AAAL+AAABCogAAwYgAAA</bytes>
-				</object>
-				<integer value="1" key="3420.ImportedFromIB2"/>
 				<string key="3421.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="3430.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="3430.ImportedFromIB2"/>
 				<string key="3432.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="3432.ImportedFromIB2"/>
 				<string key="418.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="418.ImportedFromIB2"/>
-				<string key="456.IBEditorWindowLastContentRect">{{586, 242}, {291, 313}}</string>
 				<string key="456.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="456.ImportedFromIB2"/>
 				<string key="457.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="457.ImportedFromIB2"/>
 				<string key="459.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="459.ImportedFromIB2"/>
 				<string key="516.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="516.ImportedFromIB2"/>
 				<string key="545.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="545.ImportedFromIB2"/>
 				<string key="547.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="547.ImportedFromIB2"/>
 				<string key="56.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="56.ImportedFromIB2"/>
-				<string key="57.IBEditorWindowLastContentRect">{{83, 441}, {227, 223}}</string>
 				<string key="57.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="57.ImportedFromIB2"/>
 				<string key="58.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="58.ImportedFromIB2"/>
 				<string key="581.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="581.ImportedFromIB2"/>
-				<string key="581.editorWindowContentRectSynchronizationRect">{{0, 922}, {148, 73}}</string>
 				<string key="582.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="582.ImportedFromIB2"/>
 				<string key="583.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="583.ImportedFromIB2"/>
-				<string key="589.IBEditorWindowLastContentRect">{{0, 902}, {231, 93}}</string>
 				<string key="589.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="589.ImportedFromIB2"/>
-				<string key="589.editorWindowContentRectSynchronizationRect">{{0, 902}, {234, 93}}</string>
 				<string key="598.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="598.ImportedFromIB2"/>
 				<string key="611.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="611.ImportedFromIB2"/>
 				<string key="613.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="613.ImportedFromIB2"/>
 				<string key="72.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="72.ImportedFromIB2"/>
 				<string key="73.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="73.ImportedFromIB2"/>
 				<string key="79.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="79.ImportedFromIB2"/>
-				<string key="81.IBEditorWindowLastContentRect">{{501, 638}, {302, 243}}</string>
 				<string key="81.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="81.ImportedFromIB2"/>
-				<string key="81.editorWindowContentRectSynchronizationRect">{{597, 705}, {294, 183}}</string>
 				<string key="83.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="83.ImportedFromIB2"/>
 				<string key="975.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="975.ImportedFromIB2"/>
 			</dictionary>
 			<dictionary class="NSMutableDictionary" key="unlocalizedProperties"/>
 			<nil key="activeLocalization"/>
