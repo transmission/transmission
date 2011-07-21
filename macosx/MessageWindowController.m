@@ -24,6 +24,7 @@
 
 #import "MessageWindowController.h"
 #import "NSApplicationAdditions.h"
+#import "NSMutableArrayAdditions.h"
 #import "NSStringAdditions.h"
 #import <transmission.h>
 #import <utils.h>
@@ -38,6 +39,7 @@
 
 - (void) resizeColumn;
 - (BOOL) shouldIncludeMessageForFilter: (NSString *) filterString message: (NSDictionary *) message;
+- (void) updateListForFilter;
 - (NSString *) stringForMessage: (NSDictionary *) message;
 
 @end
@@ -47,21 +49,6 @@
 - (id) init
 {
     return [super initWithWindowNibName: @"MessageWindow"];
-}
-
-- (void) dealloc
-{
-    [[NSNotificationCenter defaultCenter] removeObserver: self];
-    
-    [fTimer invalidate];
-    [fLock release];
-    
-    [fMessages release];
-    [fDisplayedMessages release];
-    
-    [fAttributes release];
-    
-    [super dealloc];
 }
 
 - (void) awakeFromNib
@@ -141,6 +128,21 @@
     fDisplayedMessages = [[NSMutableArray alloc] init];
     
     fLock = [[NSLock alloc] init];
+}
+
+- (void) dealloc
+{
+    [[NSNotificationCenter defaultCenter] removeObserver: self];
+    
+    [fTimer invalidate];
+    [fLock release];
+    
+    [fMessages release];
+    [fDisplayedMessages release];
+    
+    [fAttributes release];
+    
+    [super dealloc];
 }
 
 - (void) windowDidBecomeKey: (NSNotification *) notification
@@ -341,27 +343,11 @@
     if ([[NSUserDefaults standardUserDefaults] integerForKey: @"MessageLevel"] == level)
         return;
     
-    [fLock lock];
-    
     [[NSUserDefaults standardUserDefaults] setInteger: level forKey: @"MessageLevel"];
     
-    NSString * filterString = [fFilterField stringValue];
+    [fLock lock];
     
-    [fDisplayedMessages removeAllObjects];
-    for (NSDictionary * message in fMessages)
-        if ([[message objectForKey: @"Level"] integerValue] <= level
-            && [self shouldIncludeMessageForFilter: filterString message: message])
-            [fDisplayedMessages addObject: message];
-    
-    [fDisplayedMessages sortUsingDescriptors: [fMessageTable sortDescriptors]];
-    
-    [fMessageTable reloadData];
-    
-    if ([fDisplayedMessages count] > 0)
-    {
-        [fMessageTable deselectAll: self];
-        [fMessageTable scrollRowToVisible: [fMessageTable numberOfRows]-1];
-    }
+    [self updateListForFilter];
     
     [fLock unlock];
 }
@@ -370,24 +356,7 @@
 {
     [fLock lock];
     
-    const NSInteger level = [[NSUserDefaults standardUserDefaults] integerForKey: @"MessageLevel"];
-    NSString * filterString = [fFilterField stringValue];
-    
-    [fDisplayedMessages removeAllObjects];
-    for (NSDictionary * message in fMessages)
-        if ([[message objectForKey: @"Level"] integerValue] <= level
-            && [self shouldIncludeMessageForFilter: filterString message: message])
-            [fDisplayedMessages addObject: message];
-    
-    [fDisplayedMessages sortUsingDescriptors: [fMessageTable sortDescriptors]];
-    
-    [fMessageTable reloadData];
-    
-    if ([fDisplayedMessages count] > 0)
-    {
-        [fMessageTable deselectAll: self];
-        [fMessageTable scrollRowToVisible: [fMessageTable numberOfRows]-1];
-    }
+    [self updateListForFilter];
     
     [fLock unlock];
 }
@@ -397,8 +366,20 @@
     [fLock lock];
     
     [fMessages removeAllObjects];
+    
+    const BOOL onLion = [NSApp isOnLionOrBetter];
+    
+    if (onLion)
+        [fMessageTable beginUpdates];
+    
+    if (onLion)
+        [fMessageTable removeRowsAtIndexes: [NSIndexSet indexSetWithIndexesInRange: NSMakeRange(0, [fDisplayedMessages count])] withAnimation: NSTableViewAnimationSlideLeft];
     [fDisplayedMessages removeAllObjects];
-    [fMessageTable reloadData];
+    
+    if (onLion)
+        [fMessageTable endUpdates];
+    else
+        [fMessageTable reloadData];
     
     [fLock unlock];
 }
@@ -467,6 +448,81 @@
     const NSStringCompareOptions searchOptions = NSCaseInsensitiveSearch | NSDiacriticInsensitiveSearch;
     return [[message objectForKey: @"Name"] rangeOfString: filterString options: searchOptions].location != NSNotFound
             || [[message objectForKey: @"Message"] rangeOfString: filterString options: searchOptions].location != NSNotFound;
+}
+
+- (void) updateListForFilter
+{
+    const NSInteger level = [[NSUserDefaults standardUserDefaults] integerForKey: @"MessageLevel"];
+    NSString * filterString = [fFilterField stringValue];
+    
+    NSMutableArray * tempMessages = [NSMutableArray arrayWithCapacity: [fMessages count]]; //rough guess
+    
+    for (NSDictionary * message in fMessages)
+    {
+        if ([[message objectForKey: @"Level"] integerValue] <= level
+            && [self shouldIncludeMessageForFilter: filterString message: message])
+            [tempMessages addObject: message];
+    }
+    
+    [tempMessages sortUsingDescriptors: [fMessageTable sortDescriptors]];
+    
+    const BOOL onLion = [NSApp isOnLionOrBetter];
+    
+    if (onLion)
+        [fMessageTable beginUpdates];
+    
+    //figure out which rows were added/moved
+    NSUInteger currentIndex = 0, totalCount = 0;
+    NSMutableArray * itemsToAdd = [NSMutableArray array];
+    NSMutableIndexSet * itemsToAddIndexes = [NSMutableIndexSet indexSet];
+    
+    for (NSDictionary * message in tempMessages)
+    {
+        const NSUInteger previousIndex = [fDisplayedMessages indexOfObject: message inRange: NSMakeRange(currentIndex, [fDisplayedMessages count]-currentIndex)];
+        if (previousIndex == NSNotFound)
+        {
+            [itemsToAdd addObject: message];
+            [itemsToAddIndexes addIndex: totalCount];
+        }
+        else
+        {
+            if (previousIndex != currentIndex)
+            {
+                [fDisplayedMessages moveObjectAtIndex: previousIndex toIndex: currentIndex];
+                if (onLion)
+                    [fMessageTable moveRowAtIndex: previousIndex toIndex: currentIndex];
+            }
+            ++currentIndex;
+        }
+        
+        ++totalCount;
+    }
+    
+    //remove trailing items - those are the unused
+    if (currentIndex < [fDisplayedMessages count])
+    {
+        const NSRange removeRange = NSMakeRange(currentIndex, [fDisplayedMessages count]-currentIndex);
+        [fDisplayedMessages removeObjectsInRange: removeRange];
+        if (onLion)
+            [fMessageTable removeRowsAtIndexes: [NSIndexSet indexSetWithIndexesInRange: removeRange] withAnimation: NSTableViewAnimationSlideDown];
+    }
+    
+    //add new items
+    [fDisplayedMessages insertObjects: itemsToAdd atIndexes: itemsToAddIndexes];
+    if (onLion)
+        [fMessageTable insertRowsAtIndexes: itemsToAddIndexes withAnimation: NSTableViewAnimationSlideUp];
+    
+    if (onLion)
+        [fMessageTable endUpdates];
+    else
+    {
+        [fMessageTable reloadData];
+        
+        if ([fDisplayedMessages count] > 0)
+            [fMessageTable deselectAll: self];
+    }
+    
+    NSAssert([fDisplayedMessages isEqualToArray: tempMessages], @"Inconsistency between message arrays! %@ %@", fDisplayedMessages, tempMessages);
 }
 
 - (NSString *) stringForMessage: (NSDictionary *) message
