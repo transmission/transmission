@@ -117,6 +117,7 @@
 		A21F15AD11729A9F00CF5A9C /* AddMagnetWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = A21F1538117299F100CF5A9C /* AddMagnetWindow.xib */; };
 		A21FBBAB0EDA78C300BC3C51 /* bandwidth.h in Headers */ = {isa = PBXBuildFile; fileRef = A21FBBA90EDA78C300BC3C51 /* bandwidth.h */; };
 		A21FBBAC0EDA78C300BC3C51 /* bandwidth.c in Sources */ = {isa = PBXBuildFile; fileRef = A21FBBAA0EDA78C300BC3C51 /* bandwidth.c */; };
+		A220AF7513D7C4B00035C512 /* evutil_rand.c in Sources */ = {isa = PBXBuildFile; fileRef = A220AF7413D7C4B00035C512 /* evutil_rand.c */; };
 		A220EC5B118C8A060022B4BE /* tr-lpd.c in Sources */ = {isa = PBXBuildFile; fileRef = A220EC59118C8A060022B4BE /* tr-lpd.c */; };
 		A220EC5C118C8A060022B4BE /* tr-lpd.h in Headers */ = {isa = PBXBuildFile; fileRef = A220EC5A118C8A060022B4BE /* tr-lpd.h */; };
 		A22180980D148A71007D09ED /* GroupsPrefsController.m in Sources */ = {isa = PBXBuildFile; fileRef = A22180970D148A71007D09ED /* GroupsPrefsController.m */; };
@@ -245,7 +246,6 @@
 		A2AA579D0ADFCAB400CA59F6 /* PiecesView.m in Sources */ = {isa = PBXBuildFile; fileRef = A2AA579B0ADFCAB400CA59F6 /* PiecesView.m */; };
 		A2AA9BE1132CAC8E00FA131E /* announcer-udp.c in Sources */ = {isa = PBXBuildFile; fileRef = A2AA9BE0132CAC8D00FA131E /* announcer-udp.c */; };
 		A2AA9BE3132CAE2000FA131E /* evdns.c in Sources */ = {isa = PBXBuildFile; fileRef = A2AA9BE2132CAE2000FA131E /* evdns.c */; };
-		A2AA9BE5132CB19C00FA131E /* evutil_rand.c in Sources */ = {isa = PBXBuildFile; fileRef = A2AA9BE4132CB19C00FA131E /* evutil_rand.c */; };
 		A2AAB65C0DE0CF6200E04DDA /* rpc-server.c in Sources */ = {isa = PBXBuildFile; fileRef = A2AAB6580DE0CF6200E04DDA /* rpc-server.c */; };
 		A2AAB65D0DE0CF6200E04DDA /* rpcimpl.h in Headers */ = {isa = PBXBuildFile; fileRef = A2AAB6590DE0CF6200E04DDA /* rpcimpl.h */; };
 		A2AAB65E0DE0CF6200E04DDA /* rpc-server.h in Headers */ = {isa = PBXBuildFile; fileRef = A2AAB65A0DE0CF6200E04DDA /* rpc-server.h */; };
@@ -590,6 +590,7 @@
 		A21F15AB11729A8B00CF5A9C /* AddMagnetWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AddMagnetWindowController.h; path = macosx/AddMagnetWindowController.h; sourceTree = "<group>"; };
 		A21FBBA90EDA78C300BC3C51 /* bandwidth.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = bandwidth.h; path = libtransmission/bandwidth.h; sourceTree = "<group>"; };
 		A21FBBAA0EDA78C300BC3C51 /* bandwidth.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = bandwidth.c; path = libtransmission/bandwidth.c; sourceTree = "<group>"; };
+		A220AF7413D7C4B00035C512 /* evutil_rand.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = evutil_rand.c; path = "third-party/evutil_rand.c"; sourceTree = "<group>"; };
 		A220EC59118C8A060022B4BE /* tr-lpd.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "tr-lpd.c"; path = "libtransmission/tr-lpd.c"; sourceTree = "<group>"; };
 		A220EC5A118C8A060022B4BE /* tr-lpd.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "tr-lpd.h"; path = "libtransmission/tr-lpd.h"; sourceTree = "<group>"; };
 		A220EE6611A8382C0022B4BE /* de */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = de; path = macosx/de.lproj/AddMagnetWindow.xib; sourceTree = "<group>"; };
@@ -816,7 +817,6 @@
 		A2AA579B0ADFCAB400CA59F6 /* PiecesView.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = PiecesView.m; path = macosx/PiecesView.m; sourceTree = "<group>"; };
 		A2AA9BE0132CAC8D00FA131E /* announcer-udp.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "announcer-udp.c"; path = "libtransmission/announcer-udp.c"; sourceTree = "<group>"; };
 		A2AA9BE2132CAE2000FA131E /* evdns.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = evdns.c; path = "third-party/libevent/evdns.c"; sourceTree = "<group>"; };
-		A2AA9BE4132CB19C00FA131E /* evutil_rand.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = evutil_rand.c; path = "third-party/libevent/evutil_rand.c"; sourceTree = "<group>"; };
 		A2AAB6580DE0CF6200E04DDA /* rpc-server.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "rpc-server.c"; path = "libtransmission/rpc-server.c"; sourceTree = "<group>"; };
 		A2AAB6590DE0CF6200E04DDA /* rpcimpl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = rpcimpl.h; path = libtransmission/rpcimpl.h; sourceTree = "<group>"; };
 		A2AAB65A0DE0CF6200E04DDA /* rpc-server.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "rpc-server.h"; path = "libtransmission/rpc-server.h"; sourceTree = "<group>"; };
@@ -1558,7 +1558,7 @@
 				A2074F8412BEAA6600F70985 /* evmap.c */,
 				A2074F9812BEAAAF00F70985 /* evthread.c */,
 				A2074FA212BEAAC600F70985 /* evutil.c */,
-				A2AA9BE4132CB19C00FA131E /* evutil_rand.c */,
+				A220AF7413D7C4B00035C512 /* evutil_rand.c */,
 				A2074FAA12BEAAFF00F70985 /* http.c */,
 				A2074FBE12BEAB9A00F70985 /* kqueue.c */,
 				A2074FB612BEAB1E00F70985 /* listener.c */,
@@ -2369,7 +2369,7 @@
 				A207503712BEADA200F70985 /* poll.c in Sources */,
 				A20750B812BEB66900F70985 /* bufferevent_ratelim.c in Sources */,
 				A2AA9BE3132CAE2000FA131E /* evdns.c in Sources */,
-				A2AA9BE5132CB19C00FA131E /* evutil_rand.c in Sources */,
+				A220AF7513D7C4B00035C512 /* evutil_rand.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
