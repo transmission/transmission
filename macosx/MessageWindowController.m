@@ -522,7 +522,7 @@
             [fMessageTable deselectAll: self];
     }
     
-    NSAssert([fDisplayedMessages isEqualToArray: tempMessages], @"Inconsistency between message arrays! %@ %@", fDisplayedMessages, tempMessages);
+    NSAssert2([fDisplayedMessages isEqualToArray: tempMessages], @"Inconsistency between message arrays! %@ %@", fDisplayedMessages, tempMessages);
 }
 
 - (NSString *) stringForMessage: (NSDictionary *) message
