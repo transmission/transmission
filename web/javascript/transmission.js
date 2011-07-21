@@ -1455,9 +1455,9 @@ Transmission.prototype =
 		setInnerHTML( tab.secure, private_string );
 		setInnerHTML( tab.creator_date, date_created );
 		setInnerHTML( tab.progress, torrents.length ? fmt.percentString(Math.ratio( sizeDone*100, sizeWhenDone )) + '%' : na );
-		setInnerHTML( tab.comment, comment == na ? comment : comment.replace(/\//g, '/&#8203;') );
+		setInnerHTML( tab.comment, comment );
 		setInnerHTML( tab.creator, creator );
-		setInnerHTML( tab.download_dir, download_dir == na ? download_dir : download_dir.replace(/([\/_\.])/g, "$1&#8203;") );
+		setInnerHTML( tab.download_dir, download_dir );
 		setInnerHTML( tab.error, error );
 
 		this.updatePeersLists();

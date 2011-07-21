@@ -699,7 +699,7 @@ div#inspector_tabs {
 	width: 100px; /* this + the next 380 == inspector_container_with */
 }
 .inspector_row > div {
-	display: table-cell;
+	word-wrap: break-word;
 	padding-top: 10px;
 	width: 380px; /* inspector_container_width==480 - inspector_label_width==100 */
 }
