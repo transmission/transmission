@@ -192,8 +192,6 @@ event_callback(int s, short type UNUSED, void *sv)
     unsigned char buf[4096];
     struct sockaddr_storage from;
     tr_session *ss = sv;
-    tr_address addr;
-    tr_port port;
 
     assert(tr_isSession(sv));
     assert(type == EV_READ);
@@ -201,11 +199,6 @@ event_callback(int s, short type UNUSED, void *sv)
     fromlen = sizeof(from);
     rc = recvfrom(s, buf, 4096 - 1, 0,
                   (struct sockaddr*)&from, &fromlen);
-
-    /* don't process messages from blocked addresses */
-    if( !tr_address_from_sockaddr_storage( &addr, &port, &from )
-            || tr_sessionIsAddressBlocked( ss, &addr ) )
-        return;
 
     /* Since most packets we receive here are ÂµTP, make quick inline
        checks for the other protocols.  The logic is as follows:
