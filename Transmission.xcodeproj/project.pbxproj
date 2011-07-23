@@ -118,6 +118,7 @@
 		A21FBBAB0EDA78C300BC3C51 /* bandwidth.h in Headers */ = {isa = PBXBuildFile; fileRef = A21FBBA90EDA78C300BC3C51 /* bandwidth.h */; };
 		A21FBBAC0EDA78C300BC3C51 /* bandwidth.c in Sources */ = {isa = PBXBuildFile; fileRef = A21FBBAA0EDA78C300BC3C51 /* bandwidth.c */; };
 		A220AF7513D7C4B00035C512 /* evutil_rand.c in Sources */ = {isa = PBXBuildFile; fileRef = A220AF7413D7C4B00035C512 /* evutil_rand.c */; };
+		A220AF7B13D7CC460035C512 /* GlobalOptionsPopover.xib in Resources */ = {isa = PBXBuildFile; fileRef = A220AF7913D7CC460035C512 /* GlobalOptionsPopover.xib */; };
 		A220EC5B118C8A060022B4BE /* tr-lpd.c in Sources */ = {isa = PBXBuildFile; fileRef = A220EC59118C8A060022B4BE /* tr-lpd.c */; };
 		A220EC5C118C8A060022B4BE /* tr-lpd.h in Headers */ = {isa = PBXBuildFile; fileRef = A220EC5A118C8A060022B4BE /* tr-lpd.h */; };
 		A22180980D148A71007D09ED /* GroupsPrefsController.m in Sources */ = {isa = PBXBuildFile; fileRef = A22180970D148A71007D09ED /* GroupsPrefsController.m */; };
@@ -217,6 +218,7 @@
 		A28F4F770E085BDC003A3882 /* ColorTextField.m in Sources */ = {isa = PBXBuildFile; fileRef = A28F4F760E085BDC003A3882 /* ColorTextField.m */; };
 		A292A6E80DFB45FC004B9C0A /* webseed.c in Sources */ = {isa = PBXBuildFile; fileRef = A292A6E50DFB45EC004B9C0A /* webseed.c */; };
 		A29576030D11D63C0093B167 /* Creator.xib in Resources */ = {isa = PBXBuildFile; fileRef = A29576010D11D63C0093B167 /* Creator.xib */; };
+		A2966E8713DAF74C007B52DF /* GlobalOptionsPopoverViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A2966E8613DAF74C007B52DF /* GlobalOptionsPopoverViewController.m */; };
 		A296EF3B11E560A7004A2781 /* libiconv.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A296EF3411E5605E004A2781 /* libiconv.dylib */; };
 		A296EF3C11E560BD004A2781 /* libiconv.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A296EF3411E5605E004A2781 /* libiconv.dylib */; };
 		A296EF3D11E560C3004A2781 /* libiconv.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A296EF3411E5605E004A2781 /* libiconv.dylib */; };
@@ -591,6 +593,7 @@
 		A21FBBA90EDA78C300BC3C51 /* bandwidth.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = bandwidth.h; path = libtransmission/bandwidth.h; sourceTree = "<group>"; };
 		A21FBBAA0EDA78C300BC3C51 /* bandwidth.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = bandwidth.c; path = libtransmission/bandwidth.c; sourceTree = "<group>"; };
 		A220AF7413D7C4B00035C512 /* evutil_rand.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = evutil_rand.c; path = "third-party/evutil_rand.c"; sourceTree = "<group>"; };
+		A220AF7A13D7CC460035C512 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = macosx/en.lproj/GlobalOptionsPopover.xib; sourceTree = "<group>"; };
 		A220EC59118C8A060022B4BE /* tr-lpd.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "tr-lpd.c"; path = "libtransmission/tr-lpd.c"; sourceTree = "<group>"; };
 		A220EC5A118C8A060022B4BE /* tr-lpd.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "tr-lpd.h"; path = "libtransmission/tr-lpd.h"; sourceTree = "<group>"; };
 		A220EE6611A8382C0022B4BE /* de */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = de; path = macosx/de.lproj/AddMagnetWindow.xib; sourceTree = "<group>"; };
@@ -784,6 +787,8 @@
 		A292A6E40DFB45E5004B9C0A /* peer-common.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "peer-common.h"; path = "libtransmission/peer-common.h"; sourceTree = "<group>"; };
 		A292A6E50DFB45EC004B9C0A /* webseed.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = webseed.c; path = libtransmission/webseed.c; sourceTree = "<group>"; };
 		A292A6E60DFB45EC004B9C0A /* webseed.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = webseed.h; path = libtransmission/webseed.h; sourceTree = "<group>"; };
+		A2966E8513DAF74C007B52DF /* GlobalOptionsPopoverViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GlobalOptionsPopoverViewController.h; path = macosx/GlobalOptionsPopoverViewController.h; sourceTree = "<group>"; };
+		A2966E8613DAF74C007B52DF /* GlobalOptionsPopoverViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = GlobalOptionsPopoverViewController.m; path = macosx/GlobalOptionsPopoverViewController.m; sourceTree = "<group>"; };
 		A296EF3411E5605E004A2781 /* libiconv.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libiconv.dylib; path = usr/lib/libiconv.dylib; sourceTree = SDKROOT; };
 		A29AF4F60D01BADC00D097EC /* DownArrowTemplate.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = DownArrowTemplate.png; path = macosx/Images/DownArrowTemplate.png; sourceTree = "<group>"; };
 		A29AF4F80D01BAEB00D097EC /* UpArrowTemplate.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = UpArrowTemplate.png; path = macosx/Images/UpArrowTemplate.png; sourceTree = "<group>"; };
@@ -1119,6 +1124,8 @@
 				A2085DDA0C53BC74000BC3B7 /* AboutWindowController.m */,
 				A2F7CF5D13035FFD0016FF10 /* URLSheetWindowController.h */,
 				A2F7CF5E13035FFD0016FF10 /* URLSheetWindowController.m */,
+				A2966E8513DAF74C007B52DF /* GlobalOptionsPopoverViewController.h */,
+				A2966E8613DAF74C007B52DF /* GlobalOptionsPopoverViewController.m */,
 				A234D0D40C79FB6000A82373 /* Additions */,
 				E1B6FBF80C0D719B0015FE4D /* Info Window */,
 				A26AF2220D2DA42800FF7140 /* File Outline View */,
@@ -1226,6 +1233,7 @@
 				A209EBA61142EAF3002B02D1 /* InfoPeersView.xib */,
 				A209EBD81142F52B002B02D1 /* InfoFileView.xib */,
 				A209EC11114301C6002B02D1 /* InfoOptionsView.xib */,
+				A220AF7913D7CC460035C512 /* GlobalOptionsPopover.xib */,
 				A20B6FA40C4D97840034AB1D /* PriorityNone.png */,
 				A20B6FAD0C4D9B040034AB1D /* PriorityNormal.png */,
 				A20B6F6A0C4D842B0034AB1D /* PriorityLow.png */,
@@ -2116,6 +2124,7 @@
 				A2E57AC61310831400A7DAB1 /* StatusBar.xib in Resources */,
 				A2E57B9C13109DC200A7DAB1 /* FilterBar.xib in Resources */,
 				A23D5DA71320570800E422BA /* CleanupTemplate.png in Resources */,
+				A220AF7B13D7CC460035C512 /* GlobalOptionsPopover.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2311,6 +2320,7 @@
 				A2E57ABB1310822C00A7DAB1 /* StatusBarController.m in Sources */,
 				A2E57BA713109E6B00A7DAB1 /* FilterBarController.m in Sources */,
 				A22BAE281388040500FB022F /* NSMutableArrayAdditions.m in Sources */,
+				A2966E8713DAF74C007B52DF /* GlobalOptionsPopoverViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2542,6 +2552,14 @@
 				A279E40711C8369100D48B1F /* zh_CN */,
 			);
 			name = AddMagnetWindow.xib;
+			sourceTree = "<group>";
+		};
+		A220AF7913D7CC460035C512 /* GlobalOptionsPopover.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				A220AF7A13D7CC460035C512 /* en */,
+			);
+			name = GlobalOptionsPopover.xib;
 			sourceTree = "<group>";
 		};
 		A22A8D540AEEAFA5007E9CB9 /* Localizable.strings */ = {

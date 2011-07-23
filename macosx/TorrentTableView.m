@@ -84,6 +84,8 @@
 
 - (void) dealloc
 {
+    [[NSNotificationCenter defaultCenter] removeObserver: self];
+    
     [fCollapsedGroups release];
     
     [fPiecesBarAnimation release];
@@ -100,6 +102,9 @@
 {
     //set group columns to show ratio, needs to be in awakeFromNib to size columns correctly
     [self setGroupStatusColumns];
+    
+    [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(reloadData)
+                                                 name: @"ReloadTorrentTable" object: nil];
 }
 
 - (BOOL) isGroupCollapsed: (NSInteger) value

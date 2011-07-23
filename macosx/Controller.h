@@ -80,6 +80,8 @@ typedef enum
                                 
     IBOutlet NSMenuItem             * fNextInfoTabItem, * fPrevInfoTabItem;
     
+    IBOutlet NSMenu                 * fActionMenu;
+    
     IBOutlet NSMenu                 * fUploadMenu, * fDownloadMenu;
     IBOutlet NSMenuItem             * fUploadLimitItem, * fUploadNoLimitItem,
                                     * fDownloadLimitItem, * fDownloadNoLimitItem;
@@ -199,6 +201,8 @@ typedef enum
 - (void) setSortReverse: (id) sender;
 
 - (void) switchFilter: (id) sender;
+
+- (IBAction) showGlobalPopover: (id) sender;
 
 - (void) setGroup: (id) sender; //used by delegate-generated menu items
 

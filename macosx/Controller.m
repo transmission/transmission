@@ -40,6 +40,7 @@
 #import "AddWindowController.h"
 #import "AddMagnetWindowController.h"
 #import "MessageWindowController.h"
+#import "GlobalOptionsPopoverViewController.h"
 #import "ButtonToolbarItem.h"
 #import "GroupToolbarItem.h"
 #import "ToolbarSegmentedCell.h"
@@ -2214,6 +2215,40 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     [fFilterBar switchFilter: sender == fNextFilterItem];
 }
 
+- (IBAction) showGlobalPopover: (id) sender
+{
+    if ([NSApp isOnLionOrBetter])
+    {
+        NSPopover * popover = [[NSPopoverLion alloc] init];
+        [popover setBehavior: NSPopoverBehaviorTransient];
+        GlobalOptionsPopoverViewController * viewController = [[GlobalOptionsPopoverViewController alloc] initWithHandle: [PrefsController handle]];
+        [popover setContentViewController: viewController];
+        
+        [popover showRelativeToRect: [sender frame] ofView: sender preferredEdge: NSMaxYEdge];
+        
+        [viewController release];
+        [popover release];
+    }
+    else
+    {
+        //place menu below button
+        NSRect rect = [sender frame];
+        NSPoint location = rect.origin;
+        location.y += NSHeight(rect) + 5.0;
+        
+        if ([NSApp isOnSnowLeopardOrBetter])
+            [fActionMenu popUpMenuPositioningItem: nil atLocation: location inView: sender];
+        else
+        {
+            NSEvent * newEvent = [NSEvent mouseEventWithType: NSLeftMouseDown location: location
+                                               modifierFlags: NSLeftMouseDownMask timestamp: GetCurrentEventTime() windowNumber: [fWindow windowNumber]
+                                                     context: nil eventNumber: 1 clickCount: 1 pressure: 1];
+             
+            [NSMenu popUpContextMenu: fActionMenu withEvent: newEvent forView: sender];
+        }
+    }
+}
+
 - (void) menuNeedsUpdate: (NSMenu *) menu
 {
     if (menu == fGroupsSetMenu || menu == fGroupsSetContextMenu)
@@ -2346,7 +2381,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     [fDefaults setBool: YES forKey: @"RatioCheck"];
     [fDefaults setFloat: [[sender representedObject] floatValue] forKey: @"RatioLimit"];
     
-    [fPrefsController updateRatioStopField];
+    [fPrefsController updateRatioStopFieldOld];
 }
 
 - (void) sound: (NSSound *) sound didFinishPlaying: (BOOL) finishedPlaying

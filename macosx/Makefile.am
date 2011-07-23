@@ -80,6 +80,8 @@ EXTRA_DIST = \
     FilterBarView.m \
     FilterButton.h \
     FilterButton.m \
+    GlobalOptionsPopoverViewController.h \
+    GlobalOptionsPopoverViewController.m \
     GroupsController.h \
     GroupsController.m \
     GroupsPrefsController.h \

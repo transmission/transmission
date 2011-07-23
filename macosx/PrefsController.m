@@ -223,6 +223,15 @@ tr_session * fHandle;
     [self updateBlocklistButton];
     [self updateBlocklistFields];
     
+    [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(updateLimitFields)
+                                                 name: @"UpdateSpeedLimitValuesOutsidePrefs" object: nil];
+    
+    [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(updateRatioStopField)
+                                                 name: @"UpdateRatioStopValueOutsidePrefs" object: nil];
+    
+    [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(updateLimitStopField)
+                                                 name: @"UpdateIdleStopValueOutsidePrefs" object: nil];
+    
     [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(updateBlocklistFields)
         name: @"BlocklistUpdated" object: nil];
     
@@ -618,6 +627,11 @@ tr_session * fHandle;
 {
     if (fHasLoaded)
         [fRatioStopField setFloatValue: [fDefaults floatForKey: @"RatioLimit"]];
+}
+
+- (void) updateRatioStopFieldOld
+{
+    [self updateRatioStopField];
     
     [self applyRatioSetting: nil];
 }
@@ -636,6 +650,12 @@ tr_session * fHandle;
     [fDefaults setInteger: [sender integerValue] forKey: @"IdleLimitMinutes"];
     
     [self applyIdleStopSetting: nil];
+}
+
+- (void) updateLimitStopField
+{
+    if (fHasLoaded)
+        [fIdleStopField setIntegerValue: [fDefaults integerForKey: @"IdleLimitMinutes"]];
 }
 
 - (void) updateLimitFields

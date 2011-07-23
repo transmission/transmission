@@ -125,9 +125,11 @@
 - (void) applyRatioSetting: (id) sender;
 - (void) setRatioStop: (id) sender;
 - (void) updateRatioStopField;
+- (void) updateRatioStopFieldOld;
 
 - (void) applyIdleStopSetting: (id) sender;
 - (void) setIdleStop: (id) sender;
+- (void) updateLimitStopField;
 
 - (void) applySpeedSettings: (id) sender;
 - (void) applyAltSpeedSettings;
