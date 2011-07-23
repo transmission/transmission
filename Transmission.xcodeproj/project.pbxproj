@@ -567,7 +567,7 @@
 		A209EBD81142F52B002B02D1 /* InfoFileView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = InfoFileView.xib; path = macosx/InfoFileView.xib; sourceTree = "<group>"; };
 		A209EBF71142FEEE002B02D1 /* InfoOptionsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = InfoOptionsViewController.h; path = macosx/InfoOptionsViewController.h; sourceTree = "<group>"; };
 		A209EBF81142FEEE002B02D1 /* InfoOptionsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = InfoOptionsViewController.m; path = macosx/InfoOptionsViewController.m; sourceTree = "<group>"; };
-		A209EC13114301C6002B02D1 /* en */ = {isa = PBXFileReference; explicitFileType = file.xib; name = en; path = macosx/en.lproj/InfoOptionsView.xib; sourceTree = "<group>"; };
+		A209EC13114301C6002B02D1 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = macosx/en.lproj/InfoOptionsView.xib; sourceTree = "<group>"; };
 		A209ECA1114319C3002B02D1 /* InfoWindow.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = InfoWindow.xib; path = macosx/InfoWindow.xib; sourceTree = "<group>"; };
 		A209EE5A1144B51E002B02D1 /* history.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = history.c; path = libtransmission/history.c; sourceTree = "<group>"; };
 		A209EE5B1144B51E002B02D1 /* history.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = history.h; path = libtransmission/history.h; sourceTree = "<group>"; };
