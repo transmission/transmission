@@ -60,18 +60,12 @@ AC_SUBST(GTK_MINIMUM)
 ##   OPTIONAL for the GTK+ client
 ##
 ##
-# play the XDG "download done" sound...
-CANBERRA_MINIMUM=0.10
-AC_SUBST(CANBERRA_MINIMUM)
 # inhibit hibernation when a torrent is active...
 DBUS_GLIB_MINIMUM=0.70
 AC_SUBST(DBUS_GLIB_MINIMUM)
 # implement "watch" directories to use new .torrent files...
 GIO_MINIMUM=2.15.5
 AC_SUBST(GIO_MINIMUM)
-# pop up a "download done" notice...
-LIBNOTIFY_MINIMUM=0.4.3
-AC_SUBST(LIBNOTIFY_MINIMUM)
 # create the tray icon with AppIndicator
 LIBAPPINDICATOR_MINIMUM=0.0.11
   AC_SUBST(LIBAPPINDICATOR_MINIMUM)
@@ -260,9 +254,7 @@ AC_ARG_ENABLE([gtk],
 build_gtk=no
 use_gio=no
 use_libappindicator=no
-use_libnotify=no
 use_dbus_glib=no
-use_canberra=no
 if test "x$want_gtk" = "xyes" ; then
     if test "x$have_gtk" = "xyes"; then
       build_gtk=yes
@@ -282,24 +274,6 @@ if test "x$build_gtk" = "xyes"; then
         AC_DEFINE([HAVE_GIO], 1)
     fi
 
-    PKG_CHECK_MODULES([LIBNOTIFY],
-                      [libnotify >= $LIBNOTIFY_MINIMUM],
-                      [have_libnotify=yes],
-                      [have_libnotify=no])
-    AC_ARG_ENABLE([libnotify], 
-                  AS_HELP_STRING([--enable-libnotify],[enable notifications]),, 
-                  [enable_libnotify=yes]) 
-    use_libnotify=no
-    if test "x$have_libnotify" = "xyes"; then
-        if test "x$enable_libnotify" = "xyes" ; then
-            use_libnotify=yes
-            AC_DEFINE([HAVE_LIBNOTIFY], 1) 
-        else
-            LIBNOTIFY_CFLAGS=
-            LIBNOTIFY_LIBS=
-        fi
-    fi
-
     PKG_CHECK_MODULES([LIBAPPINDICATOR],
                       [appindicator-0.1 >= $LIBAPPINDICATOR_MINIMUM],
                       [have_libappindicator=yes],
@@ -316,23 +290,6 @@ if test "x$build_gtk" = "xyes"; then
         else
             LIBAPPINDICATOR_CFLAGS=
             LIBAPPINDICATOR_LIBS=
-        fi
-    fi
-
-    PKG_CHECK_MODULES([LIBCANBERRA],
-                      [libcanberra-gtk >= $CANBERRA_MINIMUM],
-                      [have_libcanberra=yes],
-                      [have_libcanberra=no])
-    AC_ARG_ENABLE([libcanberra], 
-                  AS_HELP_STRING([--enable-libcanberra],[enable sounds]),, 
-                  [enable_libcanberra=yes]) 
-    if test "x$have_libcanberra" = "xyes"; then
-        if test "x$enable_libcanberra" = "xyes" ; then
-            use_canberra=yes
-            AC_DEFINE([HAVE_LIBCANBERRA], 1) 
-        else
-            LIBCANBERRA_CFLAGS=
-            LIBCANBERRA_LIBS=
         fi
     fi
 
@@ -516,8 +473,6 @@ Configuration:
 
       * dbus support:                                 ${use_dbus_glib}
       * gio for watchdir and mime-type support:       ${use_gio}
-      * libnotify for 'download completed' popups:    ${use_libnotify}
-      * libcanberra for 'download completed' sounds:  ${use_canberra}
       * libappindicator for an Ubuntu-style tray:     ${use_libappindicator}
 
    Build Daemon:                                      ${build_daemon}

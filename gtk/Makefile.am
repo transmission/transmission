@@ -15,11 +15,9 @@ AM_CPPFLAGS = \
 AM_CFLAGS = \
     @LIBAPPINDICATOR_CFLAGS@ \
     @LIBEVENT_CFLAGS@ \
-    @LIBCANBERRA_CFLAGS@ \
     @GTK_CFLAGS@ \
     @LIBCURL_CFLAGS@ \
     @GIO_CFLAGS@ \
-    @LIBNOTIFY_CFLAGS@ \
     @DBUS_GLIB_CFLAGS@ \
     @OPENSSL_CFLAGS@ \
     @ZLIB_CFLAGS@ \
@@ -94,13 +92,11 @@ transmission_gtk_LDADD = \
     $(top_builddir)/libtransmission/libtransmission.a \
     $(top_builddir)/third-party/miniupnp/libminiupnp.a \
     $(top_builddir)/third-party/libnatpmp/libnatpmp.a \
-    @LIBCANBERRA_LIBS@ \
     @DHT_LIBS@ \
     @LIBUTP_LIBS@ \
     @GTK_LIBS@ \
     @GIO_LIBS@ \
     @LIBAPPINDICATOR_LIBS@ \
-    @LIBNOTIFY_LIBS@ \
     @LIBEVENT_LIBS@ \
     @DBUS_GLIB_LIBS@ \
     @LIBCURL_LIBS@ \

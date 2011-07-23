@@ -343,15 +343,15 @@ torrentPage( GObject * core )
 static GtkWidget*
 desktopPage( GObject * core )
 {
-    int          row = 0;
+    int row = 0;
+    GtkWidget * t;
+    GtkWidget * w;
     const char * s;
-    GtkWidget *  t;
-    GtkWidget *  w;
 
     t = hig_workarea_create( );
     hig_workarea_add_section_title( t, &row, _( "Desktop" ) );
 
-    s = _( "Inhibit _hibernation when torrents are active" );
+    s = _( "_Inhibit hibernation when torrents are active" );
     w = new_check_button( s, PREF_KEY_INHIBIT_HIBERNATION, core );
     hig_workarea_add_wide_control( t, &row, w );
 
@@ -359,15 +359,20 @@ desktopPage( GObject * core )
     w = new_check_button( s, PREF_KEY_SHOW_TRAY_ICON, core );
     hig_workarea_add_wide_control( t, &row, w );
 
-    s = _( "Show _popup notifications" );
-    w = new_check_button( s, PREF_KEY_SHOW_DESKTOP_NOTIFICATION, core );
+    hig_workarea_add_section_divider( t, &row );
+    hig_workarea_add_section_title ( t, &row, _( "Notification" ) );
+
+    s = _( "Show a notification when torrents are a_dded" );
+    w = new_check_button( s, PREF_KEY_TORRENT_ADDED_NOTIFICATION_ENABLED, core );
     hig_workarea_add_wide_control( t, &row, w );
 
-#ifdef HAVE_LIBCANBERRA
-    s = _( "Play _sound when downloads are complete" );
-    w = new_check_button( s, PREF_KEY_PLAY_DOWNLOAD_COMPLETE_SOUND, core );
+    s = _( "Show a notification when torrents _finish" );
+    w = new_check_button( s, PREF_KEY_TORRENT_COMPLETE_NOTIFICATION_ENABLED, core );
     hig_workarea_add_wide_control( t, &row, w );
-#endif
+
+    s = _( "Play a _sound when torrents finish" );
+    w = new_check_button( s, PREF_KEY_TORRENT_COMPLETE_SOUND_ENABLED, core );
+    hig_workarea_add_wide_control( t, &row, w );
 
     hig_workarea_finish( t, &row );
     return t;

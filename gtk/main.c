@@ -50,7 +50,6 @@
 #include "hig.h"
 #include "makemeta-ui.h"
 #include "msgwin.h"
-#include "notify.h"
 #include "open-dialog.h"
 #include "relocate.h"
 #include "stats.h"
@@ -665,7 +664,6 @@ main( int argc, char ** argv )
     if( configDir == NULL )
         configDir = (char*) tr_getDefaultConfigDir( MY_CONFIG_NAME );
 
-    gtr_notify_init( );
     didinit = cf_init( configDir, NULL ); /* must come before actions_init */
 
     setupsighandlers( ); /* set up handlers for fatal signals */
