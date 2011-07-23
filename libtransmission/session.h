@@ -107,6 +107,7 @@ struct tr_session
     bool                         isIncompleteDirEnabled;
     bool                         pauseAddedTorrent;
     bool                         deleteSourceTorrent;
+    bool                         scrapePausedTorrents;
 
     tr_benc                      removedTorrents;
 

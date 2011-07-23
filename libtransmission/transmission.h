@@ -201,6 +201,7 @@ const char* tr_getDefaultDownloadDir( void );
 #define TR_PREFS_KEY_RPC_USERNAME                 "rpc-username"
 #define TR_PREFS_KEY_RPC_URL                      "rpc-url"
 #define TR_PREFS_KEY_RPC_WHITELIST_ENABLED        "rpc-whitelist-enabled"
+#define TR_PREFS_KEY_SCRAPE_PAUSED_TORRENTS       "scrape-paused-torrents-enabled"
 #define TR_PREFS_KEY_SCRIPT_TORRENT_DONE_FILENAME "script-torrent-done-filename"
 #define TR_PREFS_KEY_SCRIPT_TORRENT_DONE_ENABLED  "script-torrent-done-enabled"
 #define TR_PREFS_KEY_RPC_WHITELIST                "rpc-whitelist"

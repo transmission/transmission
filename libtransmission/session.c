@@ -342,6 +342,7 @@ tr_sessionGetDefaultSettings( tr_benc * d )
     tr_bencDictAddBool( d, TR_PREFS_KEY_RPC_WHITELIST_ENABLED,    true );
     tr_bencDictAddInt ( d, TR_PREFS_KEY_RPC_PORT,                 atoi( TR_DEFAULT_RPC_PORT_STR ) );
     tr_bencDictAddStr ( d, TR_PREFS_KEY_RPC_URL,                  TR_DEFAULT_RPC_URL_STR );
+    tr_bencDictAddBool( d, TR_PREFS_KEY_SCRAPE_PAUSED_TORRENTS,   true );
     tr_bencDictAddStr ( d, TR_PREFS_KEY_SCRIPT_TORRENT_DONE_FILENAME, "" );
     tr_bencDictAddBool( d, TR_PREFS_KEY_SCRIPT_TORRENT_DONE_ENABLED, false );
     tr_bencDictAddBool( d, TR_PREFS_KEY_ALT_SPEED_ENABLED,        false );
@@ -406,6 +407,7 @@ tr_sessionGetSettings( tr_session * s, struct tr_benc * d )
     tr_bencDictAddStr ( d, TR_PREFS_KEY_RPC_USERNAME,             tr_sessionGetRPCUsername( s ) );
     tr_bencDictAddStr ( d, TR_PREFS_KEY_RPC_WHITELIST,            tr_sessionGetRPCWhitelist( s ) );
     tr_bencDictAddBool( d, TR_PREFS_KEY_RPC_WHITELIST_ENABLED,    tr_sessionGetRPCWhitelistEnabled( s ) );
+    tr_bencDictAddBool( d, TR_PREFS_KEY_SCRAPE_PAUSED_TORRENTS,   s->scrapePausedTorrents );
     tr_bencDictAddBool( d, TR_PREFS_KEY_SCRIPT_TORRENT_DONE_ENABLED, tr_sessionIsTorrentDoneScriptEnabled( s ) );
     tr_bencDictAddStr ( d, TR_PREFS_KEY_SCRIPT_TORRENT_DONE_FILENAME, tr_sessionGetTorrentDoneScript( s ) );
     tr_bencDictAddBool( d, TR_PREFS_KEY_ALT_SPEED_ENABLED,        tr_sessionUsesAltSpeed( s ) );
@@ -885,6 +887,10 @@ sessionSetImpl( void * vdata )
         tr_sessionSetTorrentDoneScriptEnabled( session, boolVal );
     if( tr_bencDictFindStr( settings, TR_PREFS_KEY_SCRIPT_TORRENT_DONE_FILENAME, &str ) )
         tr_sessionSetTorrentDoneScript( session, str );
+
+
+    if( tr_bencDictFindBool( settings, TR_PREFS_KEY_SCRAPE_PAUSED_TORRENTS, &boolVal ) )
+        session->scrapePausedTorrents = boolVal;
 
     data->done = true;
 }
