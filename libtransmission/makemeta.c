@@ -78,10 +78,7 @@ getFiles( const char *      dir,
     {
         struct FileList * node = tr_new( struct FileList, 1 );
         node->size = sb.st_size;
-        if( ( buf[0] == '.' ) && ( buf[1] == '/' ) )
-            node->filename = tr_strdup( buf + 2 );
-        else
-            node->filename = tr_strdup( buf );
+        node->filename = tr_strdup( buf );
         node->next = list;
         list = node;
     }
@@ -116,12 +113,15 @@ builderFileCompare( const void * va, const void * vb )
 }
 
 tr_metainfo_builder*
-tr_metaInfoBuilderCreate( const char * topFile )
+tr_metaInfoBuilderCreate( const char * topFileArg )
 {
-    int                   i;
-    struct FileList *     files;
-    struct FileList *     walk;
+    int i;
+    struct FileList * files;
+    struct FileList * walk;
+    char topFile[TR_PATH_MAX];
     tr_metainfo_builder * ret = tr_new0( tr_metainfo_builder, 1 );
+
+    tr_realpath( topFileArg, topFile );
 
     ret->top = tr_strdup( topFile );
 
