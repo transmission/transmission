@@ -33,9 +33,12 @@
 
 #include <curl/curl.h>
 
-#include <gtk/gtk.h>
 #include <glib/gi18n.h>
 #include <glib/gstdio.h>
+#ifdef HAVE_GIO
+ #include <gio/gio.h>
+#endif
+#include <gtk/gtk.h>
 
 #include <libtransmission/transmission.h>
 #include <libtransmission/rpcimpl.h>
