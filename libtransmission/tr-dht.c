@@ -660,6 +660,17 @@ timer_callback(int s UNUSED, short type UNUSED, void *session )
     tr_dhtCallback(NULL, 0, NULL, 0, session);
 }
 
+/* This function should return true when a node is blacklisted.  We do
+   not support using a blacklist with the DHT in Transmission, since
+   massive (ab)use of this feature could harm the DHT.  However, feel
+   free to add support to your private copy as long as you don't
+   redistribute it. */
+
+int
+dht_blacklisted(const struct sockaddr *sa UNUSED, int salen UNUSED)
+{
+    return 0;
+}
 
 void
 dht_hash(void *hash_return, int hash_size,
