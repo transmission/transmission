@@ -92,7 +92,7 @@ readOrWriteBytes( tr_session       * session,
                                ? TR_PREALLOCATE_NONE
                                : tor->session->preallocationMode;
             if((( fd = tr_fdFileCheckout( session, tor->uniqueId, fileIndex,
-                                          base, filename, doWrite,
+                                          filename, doWrite,
                                           prealloc, file->length ))) < 0 )
             {
                 err = errno;
