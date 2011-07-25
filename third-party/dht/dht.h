@@ -50,6 +50,7 @@ int dht_get_nodes(struct sockaddr_in *sin, int *num,
 int dht_uninit(void);
 
 /* This must be provided by the user. */
+int dht_blacklisted(const struct sockaddr *sa, int salen);
 void dht_hash(void *hash_return, int hash_size,
               const void *v1, int len1,
               const void *v2, int len2,

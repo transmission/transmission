@@ -157,6 +157,12 @@ of the search.
 In the case of DHT_EVENT_VALUES, data is a list of nodes in ``compact''
 format -- 6 or 18 bytes per node.  Its length in bytes is in data_len.
 
+* dht_blacklisted
+
+This is a function that takes an IP address and returns true if this
+address should be silently ignored.  Do not use this feature unless you
+really must -- Kademlia supposes transitive reachability.
+
 * dht_hash
 
 This should compute a reasonably strong cryptographic hash of the passed

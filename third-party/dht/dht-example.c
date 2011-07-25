@@ -409,6 +409,14 @@ main(int argc, char **argv)
     exit(1);
 }
 
+/* Functions called by the DHT. */
+
+int
+dht_blacklisted(const struct sockaddr *sa, int salen)
+{
+    return 0;
+}
+
 /* We need to provide a reasonably strong cryptographic hashing function.
    Here's how we'd do it if we had RSA's MD5 code. */
 #if 0

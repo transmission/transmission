@@ -1,3 +1,7 @@
+25 July 2011: dht-0.21
+
+  * Blacklisting support.
+
 7 July 2011: dht-0.20
 
   * Fix compilation on systems that have memmem but don't define HAVE_MEMMEM.
