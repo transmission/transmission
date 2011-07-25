@@ -787,7 +787,7 @@ tr_peerMsgsCancel( tr_peermsgs * msgs, tr_block_index_t block )
 static void
 sendLtepHandshake( tr_peermsgs * msgs )
 {
-    tr_benc val, *m;
+    tr_benc val;
     bool allow_pex;
     bool allow_metadata_xfer;
     struct evbuffer * payload;
@@ -825,11 +825,13 @@ sendLtepHandshake( tr_peermsgs * msgs )
     tr_bencDictAddInt( &val, "reqq", REQQ );
     tr_bencDictAddInt( &val, "upload_only", tr_torrentIsSeed( msgs->torrent ) );
     tr_bencDictAddStr( &val, "v", TR_NAME " " USERAGENT_PREFIX );
-    m  = tr_bencDictAddDict( &val, "m", 2 );
-    if( allow_metadata_xfer )
-        tr_bencDictAddInt( m, "ut_metadata", UT_METADATA_ID );
-    if( allow_pex )
-        tr_bencDictAddInt( m, "ut_pex", UT_PEX_ID );
+    if( allow_metadata_xfer || allow_pex ) {
+        tr_benc * m  = tr_bencDictAddDict( &val, "m", 2 );
+        if( allow_metadata_xfer )
+            tr_bencDictAddInt( m, "ut_metadata", UT_METADATA_ID );
+        if( allow_pex )
+            tr_bencDictAddInt( m, "ut_pex", UT_PEX_ID );
+    }
 
     payload = tr_bencToBuf( &val, TR_FMT_BENC );
 
