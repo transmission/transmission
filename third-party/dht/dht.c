@@ -686,7 +686,7 @@ node_blacklisted(const struct sockaddr *sa, int salen)
 {
     int i;
 
-    if(salen > sizeof(struct sockaddr_storage))
+    if((unsigned)salen > sizeof(struct sockaddr_storage))
         abort();
 
     if(dht_blacklisted(sa, salen))
