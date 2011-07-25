@@ -150,7 +150,7 @@ dht_bootstrap(void *closure)
         return;
 
     if(cl->len > 0)
-        tr_ninf( "DHT", "Bootstrapping from %d nodes", num );
+        tr_ninf( "DHT", "Bootstrapping from %d IPv4 nodes", num );
 
     if(cl->len6 > 0)
         tr_ninf( "DHT", "Bootstrapping from %d IPv6 nodes", num6 );
@@ -529,9 +529,9 @@ callback( void *ignore UNUSED, int event,
             for( i=0; i<n; ++i )
                 tr_peerMgrAddPex( tor, TR_PEER_FROM_DHT, pex+i, -1 );
             tr_free(pex);
-            tr_tordbg(tor, "Learned %d%s peers from DHT",
+            tr_tordbg(tor, "Learned %d %s peers from DHT",
                       (int)n,
-                      event == DHT_EVENT_VALUES6 ? " IPv6" : "");
+                      event == DHT_EVENT_VALUES6 ? "IPv6" : "IPv4");
         }
         tr_sessionUnlock( session );
     } else if( event == DHT_EVENT_SEARCH_DONE ||
@@ -539,7 +539,7 @@ callback( void *ignore UNUSED, int event,
         tr_torrent * tor = tr_torrentFindFromHash( session, info_hash );
         if( tor ) {
             if( event == DHT_EVENT_SEARCH_DONE ) {
-                tr_torinf(tor, "DHT announce done");
+                tr_torinf(tor, "IPv4 DHT announce done");
                 tor->dhtAnnounceInProgress = 0;
             } else {
                 tr_torinf(tor, "IPv6 DHT announce done");
@@ -569,8 +569,8 @@ tr_dhtAnnounce(tr_torrent *tor, int af, bool announce)
                          announce ? tr_sessionGetPeerPort(session) : 0,
                          af, callback, NULL);
         if( rc >= 1 ) {
-            tr_torinf(tor, "Starting%s DHT announce (%s, %d nodes)",
-                      af == AF_INET6 ? " IPv6" : "",
+            tr_torinf(tor, "Starting %s DHT announce (%s, %d nodes)",
+                      af == AF_INET6 ? "IPv6" : "IPv4",
                       tr_dhtPrintableStatus(status), numnodes);
             if(af == AF_INET)
                 tor->dhtAnnounceInProgress = true;
@@ -578,14 +578,14 @@ tr_dhtAnnounce(tr_torrent *tor, int af, bool announce)
                 tor->dhtAnnounce6InProgress = true;
             ret = 1;
         } else {
-            tr_torerr(tor, "%sDHT announce failed (%s, %d nodes): %s",
-                      af == AF_INET6 ? "IPv6 " : "",
+            tr_torerr(tor, "%s DHT announce failed (%s, %d nodes): %s",
+                      af == AF_INET6 ? "IPv6" : "IPv4",
                       tr_dhtPrintableStatus(status), numnodes,
                       tr_strerror( errno ) );
         }
     } else {
-        tr_tordbg(tor, "%sDHT not ready (%s, %d nodes)",
-                  af == AF_INET6 ? "IPv6 " : "",
+        tr_tordbg(tor, "%s DHT not ready (%s, %d nodes)",
+                  af == AF_INET6 ? "IPv6" : "IPv4",
                   tr_dhtPrintableStatus(status), numnodes);
     }
 
