@@ -327,8 +327,6 @@ tr_torrentGetNextMetadataRequest( tr_torrent * tor, time_t now, int * setme_piec
 
     m = tor->incompleteMetadata;
 
-fprintf( stderr, "%s:%d m %p a %d b %d\n", __FILE__, __LINE__, m, (m?( m->piecesNeededCount > 0 ):-1), (m?( m->piecesNeeded[0].requestedAt + MIN_REPEAT_INTERVAL_SECS < now ):-1) );
-
     if( ( m != NULL )
         && ( m->piecesNeededCount > 0 )
         && ( m->piecesNeeded[0].requestedAt + MIN_REPEAT_INTERVAL_SECS < now ) )
