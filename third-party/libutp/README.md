@@ -45,6 +45,13 @@ from libutp:
 
     cd utp_test && make
 
+## Packaging and API
+
+The libutp API is considered unstable, and probably always will be. We encourage
+you to test with the version of libutp you have, and be mindful when upgrading.
+For this reason, it is probably also a good idea to bundle libutp with your
+application.
+
 ## License
 
 libutp is released under the [MIT][lic] license.
