@@ -171,7 +171,11 @@ prefsChanged( TrCore * core UNUSED,
         /* since the cell size has changed, we need gtktreeview to revalidate
          * its fixed-height mode values. Unfortunately there's not an API call
          * for that, but it *does* revalidate when it thinks the style's been tweaked */
+#if GTK_CHECK_VERSION( 3,0,0 )
+        g_signal_emit_by_name( p->view, "style-updated", NULL, NULL );
+#else
         g_signal_emit_by_name( p->view, "style-set", NULL, NULL );
+#endif
     }
     else if( !strcmp( key, PREF_KEY_STATUSBAR ) )
     {
