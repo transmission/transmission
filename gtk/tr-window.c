@@ -789,7 +789,7 @@ updateStats( PrivateData * p )
            %1$s is the size of the data we've downloaded
            %2$s is the size of the data we've uploaded */
         g_snprintf( buf, sizeof( buf ), Q_(
-                        "size|Down: %1$s, Up: %2$s" ), down, up );
+                        "Down: %1$s, Up: %2$s" ), down, up );
     }
     else if( !strcmp( pch, "total-transfer" ) )
     {
