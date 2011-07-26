@@ -652,7 +652,7 @@ TrMainWindow :: refreshTrayIconSoon( )
     if( !myRefreshTrayIconTimer.isActive( ) )
     {
         myRefreshTrayIconTimer.setSingleShot( true );
-        myRefreshTrayIconTimer.start( 500 );
+        myRefreshTrayIconTimer.start( 100 );
     }
 }
 void
@@ -717,7 +717,7 @@ TrMainWindow :: refreshActionSensitivitySoon( )
     if( !myRefreshActionSensitivityTimer.isActive( ) )
     {
         myRefreshActionSensitivityTimer.setSingleShot( true );
-        myRefreshActionSensitivityTimer.start( 500 );
+        myRefreshActionSensitivityTimer.start( 100 );
     }
 }
 void
