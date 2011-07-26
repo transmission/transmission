@@ -454,6 +454,8 @@ void
 Torrent :: update( tr_benc * d )
 {
     bool changed = false;
+    const bool was_seed = isSeed( );
+    const uint64_t old_verified_size = haveVerified( );
 
     for( int  i=0; i<PROPERTY_COUNT; ++i )
     {
@@ -687,6 +689,9 @@ Torrent :: update( tr_benc * d )
 
     if( changed )
         emit torrentChanged( id( ) );
+
+    if( !was_seed && isSeed() && (old_verified_size>0) )
+        emit torrentCompleted( id( ) );
 }
 
 QString

@@ -254,8 +254,8 @@ MyApp :: MyApp( int& argc, char ** argv ):
         std::cerr << "couldn't register " << DBUS_OBJECT_PATH << std::endl;
 }
 
-/* these two functions are for popping up desktop notification
- * when new torrents are added */
+/* these functions are for popping up desktop notifications */
+
 void
 MyApp :: onTorrentsAdded( QSet<int> torrents )
 {
@@ -265,12 +265,31 @@ MyApp :: onTorrentsAdded( QSet<int> torrents )
     foreach( int id, torrents )
     {
         Torrent * tor = myModel->getTorrentFromId( id );
-        if( !tor->name().isEmpty( ) )
-            onNewTorrentChanged( id );
-        else // wait until the torrent's INFO fields are loaded
+        std::cerr << "torrent added: " << qPrintable(tor->name()) << std::endl;
+
+        if( tor->name().isEmpty( ) ) // wait until the torrent's INFO fields are loaded
             connect( tor, SIGNAL(torrentChanged(int)), this, SLOT(onNewTorrentChanged(int)) );
+        else {
+            onNewTorrentChanged( id );
+            if( !tor->isSeed( ) )
+	        connect( tor, SIGNAL(torrentCompleted(int)), this, SLOT(onTorrentCompleted(int)) );
+        }
     }
 }
+
+void
+MyApp :: onTorrentCompleted( int id )
+{
+    Torrent * tor = myModel->getTorrentFromId( id );
+
+    if( tor && !tor->name().isEmpty() )
+    {
+        notify( tr( "Torrent Completed" ), tor->name( ) );
+
+        disconnect( tor, SIGNAL(torrentCompleted(int)), this, SLOT(onTorrentCompleted(int)) );
+    }
+}
+
 void
 MyApp :: onNewTorrentChanged( int id )
 {
@@ -283,8 +302,15 @@ MyApp :: onNewTorrentChanged( int id )
             notify( tr( "Torrent Added" ), tor->name( ) );
 
         disconnect( tor, SIGNAL(torrentChanged(int)), this, SLOT(onNewTorrentChanged(int)) );
+
+        if( !tor->isSeed( ) )
+            connect( tor, SIGNAL(torrentCompleted(int)), this, SLOT(onTorrentCompleted(int)) );
     }
 }
+
+/***
+****
+***/
 
 void
 MyApp :: consentGiven( )

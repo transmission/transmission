@@ -61,6 +61,7 @@ class MyApp: public QApplication
         void refreshPref( int key );
         void refreshTorrents( );
         void onTorrentsAdded( QSet<int> );
+        void onTorrentCompleted( int );
         void onNewTorrentChanged( int );
 
     public slots:

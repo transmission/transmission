@@ -182,6 +182,7 @@ class Torrent: public QObject
 
     signals:
         void torrentChanged( int id );
+        void torrentCompleted( int id );
 
     private:
 
