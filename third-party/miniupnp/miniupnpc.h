@@ -1,8 +1,8 @@
-/* $Id: miniupnpc.h,v 1.19 2009/10/10 19:15:35 nanard Exp $ */
+/* $Id: miniupnpc.h,v 1.23 2011/04/11 08:21:46 nanard Exp $ */
 /* Project: miniupnp
  * http://miniupnp.free.fr/
  * Author: Thomas Bernard
- * Copyright (c) 2005-2006 Thomas Bernard
+ * Copyright (c) 2005-2011 Thomas Bernard
  * This software is subjects to the conditions detailed
  * in the LICENCE file provided within this distribution */
 #ifndef __MINIUPNPC_H__
@@ -11,6 +11,12 @@
 #include "declspec.h"
 #include "igd_desc_parse.h"
 
+/* error codes : */
+#define UPNPDISCOVER_SUCCESS (0)
+#define UPNPDISCOVER_UNKNOWN_ERROR (-1)
+#define UPNPDISCOVER_SOCKET_ERROR (-101)
+#define UPNPDISCOVER_MEMORY_ERROR (-102)
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -18,9 +24,10 @@ extern "C" {
 /* Structures definitions : */
 struct UPNParg { const char * elt; const char * val; };
 
-int simpleUPnPcommand(int, const char *, const char *,
-                      const char *, struct UPNParg *,
-                      char *, int *);
+char *
+simpleUPnPcommand(int, const char *, const char *,
+                  const char *, struct UPNParg *,
+                  int *);
 
 struct UPNPDev {
 	struct UPNPDev * pNext;
@@ -42,8 +49,11 @@ struct UPNPDev {
  * multicast interface for sending SSDP discover packets.
  * If sameport is not null, SSDP packets will be sent from the source port
  * 1900 (same as destination port) otherwise system assign a source port. */
-LIBSPEC struct UPNPDev * upnpDiscover(int delay, const char * multicastif,
-                                      const char * minissdpdsock, int sameport);
+LIBSPEC struct UPNPDev *
+upnpDiscover(int delay, const char * multicastif,
+             const char * minissdpdsock, int sameport,
+             int ipv6,
+             int * error);
 /* freeUPNPDevlist()
  * free list returned by upnpDiscover() */
 LIBSPEC void freeUPNPDevlist(struct UPNPDev * devlist);
@@ -57,11 +67,13 @@ LIBSPEC void parserootdesc(const char *, int, struct IGDdatas *);
  * controlURL: controlURL of the WANIPConnection
  * ipcondescURL: url of the description of the WANIPConnection
  * controlURL_CIF: controlURL of the WANCommonInterfaceConfig
+ * controlURL_6FC: controlURL of the WANIPv6FirewallControl
  */
 struct UPNPUrls {
 	char * controlURL;
 	char * ipcondescURL;
 	char * controlURL_CIF;
+	char * controlURL_6FC;
 };
 
 /* UPNP_GetValidIGD() :
@@ -96,11 +108,6 @@ UPNP_GetIGDFromUrl(const char * rootdescurl,
 LIBSPEC void GetUPNPUrls(struct UPNPUrls *, struct IGDdatas *, const char *);
 
 LIBSPEC void FreeUPNPUrls(struct UPNPUrls *);
-
-/* Reads data from the specified socket. 
- * Returns the number of bytes read if successful, zero if no bytes were 
- * read or if we timed out. Returns negative if there was an error. */
-int ReceiveData(int socket, char * data, int length, int timeout);
 
 /* return 0 or 1 */
 LIBSPEC int UPNPIGD_IsConnected(struct UPNPUrls *, struct IGDdatas *);

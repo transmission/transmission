@@ -10,6 +10,8 @@ libminiupnp_a_SOURCES = \
     miniupnpc.c \
     miniwget.c \
     minixml.c \
+    portlistingparse.c \
+    receivedata.c \
     upnpcommands.c \
     upnpreplyparse.c
 
@@ -22,8 +24,11 @@ noinst_HEADERS = \
     minisoap.h \
     minissdpc.h \
     miniupnpc.h \
+    miniupnpctypes.h \
     miniwget.h \
     minixml.h \
+    portlistingparse.h \
+    receivedata.h \
     upnpcommands.h \
     upnpreplyparse.h
 

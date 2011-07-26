@@ -1,10 +1,10 @@
-/* $Id: minixml.c,v 1.7 2009/10/10 19:15:35 nanard Exp $ */
+/* $Id: minixml.c,v 1.9 2011/02/07 13:44:57 nanard Exp $ */
 /* minixml.c : the minimum size a xml parser can be ! */
 /* Project : miniupnp
  * webpage: http://miniupnp.free.fr/ or http://miniupnp.tuxfamily.org/
  * Author : Thomas Bernard
 
-Copyright (c) 2005-2009, Thomas BERNARD 
+Copyright (c) 2005-2011, Thomas BERNARD 
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -30,6 +30,7 @@ CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 */
+#include <string.h>
 #include "minixml.h"
 
 /* parseatt : used to parse the argument list
@@ -143,18 +144,42 @@ static void parseelt(struct xmlparser * p)
 						return;
 					while( IS_WHITE_SPACE(*p->xml) )
 					{
-						p->xml++;
-						if (p->xml >= p->xmlend)
-							return;
-					}
-					while(*p->xml!='<')
-					{
 						i++; p->xml++;
 						if (p->xml >= p->xmlend)
 							return;
 					}
-					if(i>0 && p->datafunc)
-						p->datafunc(p->data, data, i);
+					if(memcmp(p->xml, "<![CDATA[", 9) == 0)
+					{ 
+						/* CDATA handling */
+						p->xml += 9;
+						data = p->xml;
+						i = 0;
+						while(memcmp(p->xml, "]]>", 3) != 0)
+						{
+							i++; p->xml++;
+							if ((p->xml + 3) >= p->xmlend)
+								return;
+						}
+						if(i>0 && p->datafunc)
+							p->datafunc(p->data, data, i);
+						while(*p->xml!='<')
+						{
+							p->xml++;
+							if (p->xml >= p->xmlend)
+								return;
+						}
+					}
+					else
+					{
+						while(*p->xml!='<')
+						{
+							i++; p->xml++;
+							if ((p->xml + 1) >= p->xmlend)
+								return;
+						}
+						if(i>0 && p->datafunc && *(p->xml + 1) == '/')
+							p->datafunc(p->data, data, i);
+					}
 				}
 			}
 			else if(*p->xml == '/')

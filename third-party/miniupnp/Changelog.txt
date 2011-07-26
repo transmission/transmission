@@ -1,5 +1,86 @@
-$Id: Changelog.txt,v 1.125 2010/12/21 16:13:13 nanard Exp $
+$Id: Changelog.txt,v 1.152 2011/07/25 18:02:11 nanard Exp $
 miniUPnP client Changelog.
+
+VERSION 1.6 : released 2011/07/25
+
+2011/07/25:
+  Update doc for version 1.6 release
+
+2011/06/18:
+  Fix for windows in miniwget.c
+
+2011/06/04:
+  display remote host in port mapping listing
+
+2011/06/03:
+  Fix in make install : there were missing headers
+
+2011/05/26:
+  Fix the socket leak in miniwget thanks to Richard Marsh.
+  Permit to add leaseduration in -a command. Display lease duration.
+
+2011/05/15:
+  Try both LinkLocal and SiteLocal multicast address for SSDP in IPv6
+
+2011/05/09:
+  add a test in testminiwget.sh.
+  more error checking in miniwget.c
+
+2011/05/06:
+  Adding some tool to test and validate miniwget.c
+  simplified and debugged miniwget.c
+
+2011/04/11:
+  moving ReceiveData() to a receivedata.c file.
+  parsing presentation url
+  adding IGD v2 WANIPv6FirewallControl commands
+
+2011/04/10:
+  update of miniupnpcmodule.c
+  comments in miniwget.c, update in testminiwget
+  Adding errors codes from IGD v2
+  new functions in upnpc.c for IGD v2
+
+2011/04/09:
+  Support for litteral ip v6 address in miniwget
+
+2011/04/08:
+  Adding support for urn:schemas-upnp-org:service:WANIPv6FirewallControl:1
+  Updating APIVERSION
+  Supporting IPV6 in upnpDiscover()
+  Adding a -6 option to upnpc command line tool
+
+2011/03/18:
+  miniwget/parseURL() : return an error when url param is null.
+  fixing GetListOfPortMappings()
+
+2011/03/14:
+  upnpDiscover() now reporting an error code.
+  improvements in comments.
+
+2011/03/11:
+  adding miniupnpcstrings.h.cmake and CMakeLists.txt files.
+
+2011/02/15:
+  Implementation of GetListOfPortMappings()
+
+2011/02/07:
+  updates to minixml to support character data starting with spaces
+  minixml now support CDATA
+  upnpreplyparse treats <NewPortListing> specificaly
+  change in simpleUPnPcommand to return the buffer (simplification)
+
+2011/02/06:
+  Added leaseDuration argument to AddPortMapping()
+  Starting to implement GetListOfPortMappings()
+
+2011/01/11:
+  updating wingenminiupnpcstrings.c
+
+2011/01/04:
+  improving updateminiupnpcstrings.sh
+
+VERSION 1.5 : released 2011/01/01
 
 2010/12/21:
   use NO_GETADDRINFO macro to disable the use of getaddrinfo/freeaddrinfo

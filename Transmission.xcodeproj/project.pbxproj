@@ -68,6 +68,11 @@
 		A2012AE20D77151D0056FD71 /* YingYangGroupTemplate.png in Resources */ = {isa = PBXBuildFile; fileRef = A2012AE10D77151D0056FD71 /* YingYangGroupTemplate.png */; };
 		A20152640D1C1BE70081714F /* PinTemplate.png in Resources */ = {isa = PBXBuildFile; fileRef = A20152630D1C1BE70081714F /* PinTemplate.png */; };
 		A201527E0D1C270F0081714F /* torrent-ctor.c in Sources */ = {isa = PBXBuildFile; fileRef = A20152790D1C26EB0081714F /* torrent-ctor.c */; };
+		A20162C913DE48BF00E15488 /* receivedata.c in Sources */ = {isa = PBXBuildFile; fileRef = A20162C713DE48BF00E15488 /* receivedata.c */; };
+		A20162CA13DE48BF00E15488 /* receivedata.h in Headers */ = {isa = PBXBuildFile; fileRef = A20162C813DE48BF00E15488 /* receivedata.h */; };
+		A20162CD13DE497000E15488 /* portlistingparse.c in Sources */ = {isa = PBXBuildFile; fileRef = A20162CB13DE497000E15488 /* portlistingparse.c */; };
+		A20162CE13DE497000E15488 /* portlistingparse.h in Headers */ = {isa = PBXBuildFile; fileRef = A20162CC13DE497000E15488 /* portlistingparse.h */; };
+		A20162D013DE49E500E15488 /* miniupnpctypes.h in Headers */ = {isa = PBXBuildFile; fileRef = A20162CF13DE49E500E15488 /* miniupnpctypes.h */; };
 		A2074F4C12BEA8CE00F70985 /* buffer.c in Sources */ = {isa = PBXBuildFile; fileRef = A2074F4B12BEA8CE00F70985 /* buffer.c */; };
 		A2074F5912BEA8E000F70985 /* bufferevent_filter.c in Sources */ = {isa = PBXBuildFile; fileRef = A2074F5012BEA8E000F70985 /* bufferevent_filter.c */; };
 		A2074F5A12BEA8E000F70985 /* bufferevent_openssl.c in Sources */ = {isa = PBXBuildFile; fileRef = A2074F5112BEA8E000F70985 /* bufferevent_openssl.c */; };
@@ -525,6 +530,11 @@
 		A2012AE10D77151D0056FD71 /* YingYangGroupTemplate.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = YingYangGroupTemplate.png; path = macosx/Images/YingYangGroupTemplate.png; sourceTree = "<group>"; };
 		A20152630D1C1BE70081714F /* PinTemplate.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = PinTemplate.png; path = macosx/Images/PinTemplate.png; sourceTree = "<group>"; };
 		A20152790D1C26EB0081714F /* torrent-ctor.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "torrent-ctor.c"; path = "libtransmission/torrent-ctor.c"; sourceTree = "<group>"; };
+		A20162C713DE48BF00E15488 /* receivedata.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = receivedata.c; path = "third-party/miniupnp/receivedata.c"; sourceTree = "<group>"; };
+		A20162C813DE48BF00E15488 /* receivedata.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = receivedata.h; path = "third-party/miniupnp/receivedata.h"; sourceTree = "<group>"; };
+		A20162CB13DE497000E15488 /* portlistingparse.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = portlistingparse.c; path = "third-party/miniupnp/portlistingparse.c"; sourceTree = "<group>"; };
+		A20162CC13DE497000E15488 /* portlistingparse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = portlistingparse.h; path = "third-party/miniupnp/portlistingparse.h"; sourceTree = "<group>"; };
+		A20162CF13DE49E500E15488 /* miniupnpctypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = miniupnpctypes.h; path = "third-party/miniupnp/miniupnpctypes.h"; sourceTree = "<group>"; };
 		A202FF5B0DDA9275009938FF /* it */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = it; path = macosx/it.lproj/AddWindow.xib; sourceTree = "<group>"; };
 		A202FF5C0DDA9275009938FF /* it */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = it; path = macosx/it.lproj/Creator.xib; sourceTree = "<group>"; };
 		A202FF5D0DDA9275009938FF /* it */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = it; path = macosx/it.lproj/InfoPlist.strings; sourceTree = "<group>"; };
@@ -1534,6 +1544,8 @@
 				BE1183660CE160D50002D0F3 /* upnpreplyparse.c */,
 				BE1183670CE160D50002D0F3 /* upnpcommands.c */,
 				BE1183680CE160D50002D0F3 /* miniupnpc.c */,
+				A20162CB13DE497000E15488 /* portlistingparse.c */,
+				A20162C713DE48BF00E15488 /* receivedata.c */,
 				BE11834D0CE160C50002D0F3 /* bsdqueue.h */,
 				A22B00AF116A9E90003315FC /* connecthostport.h */,
 				BE11834E0CE160C50002D0F3 /* declspec.h */,
@@ -1542,11 +1554,14 @@
 				BE1183510CE160C50002D0F3 /* miniwget.h */,
 				BE1183520CE160C50002D0F3 /* minisoap.h */,
 				A2F8CD420F3D0F4A00DB356A /* miniupnpcstrings.h */,
+				A20162CF13DE49E500E15488 /* miniupnpctypes.h */,
 				BE1183530CE160C50002D0F3 /* upnpreplyparse.h */,
 				BE1183540CE160C50002D0F3 /* upnpcommands.h */,
 				BE1183550CE160C50002D0F3 /* miniupnpc.h */,
 				BE1183560CE160C50002D0F3 /* minissdpc.h */,
 				A25485390EB66CBB004539DA /* codelength.h */,
+				A20162CC13DE497000E15488 /* portlistingparse.h */,
+				A20162C813DE48BF00E15488 /* receivedata.h */,
 			);
 			name = libminiupnp;
 			sourceTree = "<group>";
@@ -1773,6 +1788,9 @@
 				A254853C0EB66CD4004539DA /* codelength.h in Headers */,
 				A2F8CD430F3D0F4A00DB356A /* miniupnpcstrings.h in Headers */,
 				A22B00B2116A9E9F003315FC /* connecthostport.h in Headers */,
+				A20162CA13DE48BF00E15488 /* receivedata.h in Headers */,
+				A20162CE13DE497000E15488 /* portlistingparse.h in Headers */,
+				A20162D013DE49E500E15488 /* miniupnpctypes.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2354,6 +2372,8 @@
 				BE11836F0CE160D50002D0F3 /* upnpcommands.c in Sources */,
 				BE1183700CE160D50002D0F3 /* miniupnpc.c in Sources */,
 				A22B00B3116A9EA4003315FC /* connecthostport.c in Sources */,
+				A20162C913DE48BF00E15488 /* receivedata.c in Sources */,
+				A20162CD13DE497000E15488 /* portlistingparse.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

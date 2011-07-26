@@ -97,7 +97,7 @@ tr_upnpPulse( tr_upnp * handle,
     {
         struct UPNPDev * devlist;
         errno = 0;
-        devlist = upnpDiscover( 2000, NULL, NULL, 0 );
+        devlist = upnpDiscover( 2000, NULL, NULL, 0, 0, &errno );
         if( devlist == NULL )
         {
             tr_ndbg(
@@ -144,9 +144,9 @@ tr_upnpPulse( tr_upnp * handle,
 
         tr_snprintf( portStr, sizeof( portStr ), "%d", handle->port );
         if( UPNP_GetSpecificPortMappingEntry( handle->urls.controlURL, handle->data.first.servicetype,
-            portStr, "TCP", intClient, intPort ) != UPNPCOMMAND_SUCCESS  ||
+            portStr, "TCP", intClient, intPort, NULL, NULL, NULL ) != UPNPCOMMAND_SUCCESS  ||
             UPNP_GetSpecificPortMappingEntry( handle->urls.controlURL, handle->data.first.servicetype,
-            portStr, "UDP", intClient, intPort ) != UPNPCOMMAND_SUCCESS )
+            portStr, "UDP", intClient, intPort, NULL, NULL, NULL ) != UPNPCOMMAND_SUCCESS )
         {
             tr_ninf( getKey( ), _( "Port %d isn't forwarded" ), handle->port );
             handle->isMapped = false;
@@ -198,7 +198,7 @@ tr_upnpPulse( tr_upnp * handle,
             err_tcp = UPNP_AddPortMapping( handle->urls.controlURL,
                                        handle->data.first.servicetype,
                                        portStr, portStr, handle->lanaddr,
-                                       desc, "TCP", NULL );
+                                       desc, "TCP", NULL, NULL );
             if( err_tcp )
                 tr_ndbg( getKey( ), "TCP Port forwarding failed with error %d (errno %d - %s)",
                          err_tcp, errno, tr_strerror( errno ) );
@@ -207,7 +207,7 @@ tr_upnpPulse( tr_upnp * handle,
             err_udp = UPNP_AddPortMapping( handle->urls.controlURL,
                                        handle->data.first.servicetype,
                                        portStr, portStr, handle->lanaddr,
-                                       desc, "UDP", NULL );
+                                       desc, "UDP", NULL, NULL );
             if( err_udp )
                 tr_ndbg( getKey( ), "UDP Port forwarding failed with error %d (errno %d - %s)",
                          err_udp, errno, tr_strerror( errno ) );

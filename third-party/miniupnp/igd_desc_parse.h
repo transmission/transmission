@@ -1,4 +1,4 @@
-/* $Id: igd_desc_parse.h,v 1.7 2010/04/05 20:36:59 nanard Exp $ */
+/* $Id: igd_desc_parse.h,v 1.10 2011/04/11 09:19:24 nanard Exp $ */
 /* Project : miniupnp
  * http://miniupnp.free.fr/
  * Author : Thomas Bernard
@@ -23,6 +23,7 @@ struct IGDdatas_service {
 struct IGDdatas {
 	char cureltname[MINIUPNPC_URL_MAXSIZE];
 	char urlbase[MINIUPNPC_URL_MAXSIZE];
+	char presentationurl[MINIUPNPC_URL_MAXSIZE];
 	int level;
 	/*int state;*/
 	/* "urn:schemas-upnp-org:service:WANCommonInterfaceConfig:1" */
@@ -32,6 +33,8 @@ struct IGDdatas {
 	struct IGDdatas_service first;
 	/* if both WANIPConnection and WANPPPConnection are present */
 	struct IGDdatas_service second;
+	/* "urn:schemas-upnp-org:service:WANIPv6FirewallControl:1" */
+	struct IGDdatas_service IPv6FC;
 	/* tmp */
 	struct IGDdatas_service tmp;
 };
