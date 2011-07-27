@@ -248,6 +248,9 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
             [fDefaults setBool: NO forKey: @"CheckDownload"];
         }
         
+        //upgrading from versions < 2.40: clear recent items
+        [[NSDocumentController sharedDocumentController] clearRecentDocuments: nil];
+        
         tr_benc settings;
         tr_bencInitDict(&settings, 41);
         tr_sessionGetDefaultSettings(&settings);
@@ -866,9 +869,6 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         //verify the data right away if it was newly created
         if (type == ADD_CREATED)
             [torrent resetCache];
-        
-        //add it to the "File -> Open Recent" menu
-        [[NSDocumentController sharedDocumentController] noteNewRecentDocumentURL: [NSURL fileURLWithPath: torrentPath]];
         
         //show the add window or add directly
         if (showWindow || !location)
