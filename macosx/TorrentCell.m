@@ -466,6 +466,7 @@
         [self drawImage: revealImage inRect: [self revealButtonRectForBounds: cellFrame]];
         
         //action button
+        #warning image should use new gear
         NSString * actionImageString;
         if (fMouseDownActionButton)
             actionImageString = @"ActionOn.png";

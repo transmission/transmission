@@ -74,6 +74,8 @@
         fMouseActionRow = -1;
         fActionPushedRow = -1;
         
+        fActionPopoverShown = NO;
+        
         [self setDelegate: self];
         
         fPiecesBarPercent = [fDefaults boolForKey: @"PiecesBar"] ? 1.0 : 0.0;
@@ -584,12 +586,16 @@
     
     if ([NSApp isOnLionOrBetter])
     {
+        if (fActionPopoverShown)
+            return;
+        
         Torrent * torrent = [self itemAtRow: row];
         
         NSPopover * popover = [[NSPopoverLion alloc] init];
         [popover setBehavior: NSPopoverBehaviorTransient];
         InfoOptionsViewController * infoViewController = [[InfoOptionsViewController alloc] init];
         [popover setContentViewController: infoViewController];
+        [popover setDelegate: self];
         
         [popover showRelativeToRect: rect ofView: self preferredEdge: NSMaxYEdge];
         [infoViewController setInfoForTorrents: [NSArray arrayWithObject: torrent]];
@@ -628,6 +634,17 @@
         [fMenuTorrent release];
         fMenuTorrent = nil;
     }
+}
+
+//don't show multiple popovers when clicking the gear button repeatedly
+- (void) popoverWillShow: (NSNotification *) notification
+{
+    fActionPopoverShown = YES;
+}
+
+- (void) popoverWillClose: (NSNotification *) notification
+{
+    fActionPopoverShown = NO;
 }
 
 - (void) menuNeedsUpdate: (NSMenu *) menu

@@ -52,6 +52,8 @@
     
     CGFloat fPiecesBarPercent;
     NSAnimation * fPiecesBarAnimation;
+    
+    BOOL fActionPopoverShown;
 }
 
 - (BOOL) isGroupCollapsed: (NSInteger) value;

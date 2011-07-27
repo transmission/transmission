@@ -356,6 +356,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         fPrefsController = [[PrefsController alloc] init];
         
         fQuitting = NO;
+        fGlobalPopoverShown = NO;
         fSoundPlaying = NO;
         
         tr_sessionSetAltSpeedFunc(fLib, altSpeedToggledCallback, self);
@@ -2219,10 +2220,14 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 {
     if ([NSApp isOnLionOrBetter])
     {
+        if (fGlobalPopoverShown)
+            return;
+        
         NSPopover * popover = [[NSPopoverLion alloc] init];
         [popover setBehavior: NSPopoverBehaviorTransient];
         GlobalOptionsPopoverViewController * viewController = [[GlobalOptionsPopoverViewController alloc] initWithHandle: [PrefsController handle]];
         [popover setContentViewController: viewController];
+        [popover setDelegate: self];
         
         [popover showRelativeToRect: [sender frame] ofView: sender preferredEdge: NSMaxYEdge];
         
@@ -2247,6 +2252,17 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
             [NSMenu popUpContextMenu: fActionMenu withEvent: newEvent forView: sender];
         }
     }
+}
+
+//don't show multiple popovers when clicking the gear button repeatedly
+- (void) popoverWillShow: (NSNotification *) notification
+{
+    fGlobalPopoverShown = YES;
+}
+
+- (void) popoverWillClose: (NSNotification *) notification
+{
+    fGlobalPopoverShown = NO;
 }
 
 - (void) menuNeedsUpdate: (NSMenu *) menu
