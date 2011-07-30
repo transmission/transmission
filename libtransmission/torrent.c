@@ -2711,16 +2711,23 @@ static void
 deleteLocalData( tr_torrent * tor, tr_fileFunc fileFunc )
 {
     int i, n;
+    char * tmp;
+    char * root;
     char ** s;
     tr_file_index_t f;
+    const char * cpch;
+    const char * firstFile;
     tr_ptrArray torrentFiles = TR_PTR_ARRAY_INIT;
     tr_ptrArray folders      = TR_PTR_ARRAY_INIT;
     tr_ptrArray dirtyFolders = TR_PTR_ARRAY_INIT; /* dirty == contains non-torrent files */
 
-    const char * firstFile = tor->info.files[0].name;
-    const char * cpch = strchr( firstFile, TR_PATH_DELIMITER );
-    char * tmp = cpch ? tr_strndup( firstFile, cpch - firstFile ) : NULL;
-    char * root = tr_buildPath( tor->currentDir, tmp, NULL );
+    if( !tr_torrentHasMetadata( tor ) )
+        return;
+
+    firstFile = tor->info.files[0].name;
+    cpch = strchr( firstFile, TR_PATH_DELIMITER );
+    tmp = cpch ? tr_strndup( firstFile, cpch - firstFile ) : NULL;
+    root = tr_buildPath( tor->currentDir, tmp, NULL );
 
     for( f=0; f<tor->info.fileCount; ++f ) {
         tr_ptrArrayInsertSorted( &torrentFiles, tr_strdup( tor->info.files[f].name ), vstrcmp );
