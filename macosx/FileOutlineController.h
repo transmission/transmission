@@ -36,7 +36,7 @@
     
     NSString * fFilterText;
     
-    NSLock * fLock;
+    NSRecursiveLock * fLock;
 }
 
 - (FileOutlineView *) outlineView;

@@ -70,7 +70,7 @@ typedef enum
     [fOutline setMenu: [self menu]];
     
     #warning needed?
-    fLock = [[NSLock alloc] init];
+    fLock = [[NSRecursiveLock alloc] init];
     
     [self setTorrent: nil];
 }
@@ -109,21 +109,25 @@ typedef enum
 
 - (void) setFilterText: (NSString *) text
 {
-    [fLock lock];
-    
     if ([text isEqualToString: @""])
         text = nil;
     
     if ((!text && !fFilterText) || (text && fFilterText && [text isEqualToString: fFilterText]))
     {
-        [fLock unlock];
         return;
     }
     
     const BOOL onLion = [NSApp isOnLionOrBetter];
     
+    [fLock lock];
+    
     if (onLion)
+    {
+        [[NSAnimationContext currentContext] setCompletionHandler: ^{ [fLock unlock]; NSLog(@"called"); }];
+        [NSAnimationContext beginGrouping];
+        
         [fOutline beginUpdates];
+    }
     
     NSUInteger currentIndex = 0, totalCount = 0;
     NSMutableArray * itemsToAdd = [NSMutableArray array];
@@ -200,14 +204,20 @@ typedef enum
         [fOutline insertItemsAtIndexes: itemsToAddIndexes inParent: nil withAnimation: NSTableViewAnimationSlideUp];
     
     if (onLion)
+    {
         [fOutline endUpdates];
+        
+        [NSAnimationContext endGrouping];
+    }
     else
+    {
         [fOutline reloadData];
+    
+        [fLock unlock];
+    }
     
     [fFilterText release];
     fFilterText = [text retain];
-    
-    [fLock unlock];
 }
 
 - (void) reloadData
