@@ -77,6 +77,7 @@ struct cbdata
 {
     gboolean                    is_iconified;
     guint                       timer;
+    guint                       update_model_soon_tag;
     guint                       refresh_actions_tag;
     gpointer                    icon;
     GtkWindow                 * wind;
@@ -321,12 +322,18 @@ refresh_actions( gpointer gdata )
 }
 
 static void
-on_selection_changed( GtkTreeSelection * s UNUSED, gpointer gdata )
+refresh_actions_soon( gpointer gdata )
 {
     struct cbdata * data = gdata;
 
     if( data->refresh_actions_tag == 0 )
         data->refresh_actions_tag = gtr_idle_add( refresh_actions, data );
+}
+
+static void
+on_selection_changed( GtkTreeSelection * s UNUSED, gpointer gdata )
+{
+    refresh_actions_soon( gdata );
 }
 
 /***
@@ -350,7 +357,8 @@ static void on_add_torrent( TrCore *, tr_ctor *, gpointer );
 
 static void on_prefs_changed( TrCore * core, const char * key, gpointer );
 
-static gboolean update_model( gpointer gdata );
+static gboolean update_model_loop( gpointer gdata );
+static gboolean update_model_once( gpointer gdata );
 
 /***
 ****
@@ -828,8 +836,8 @@ app_setup( TrWindow      * wind,
     on_prefs_changed( cbdata->core, PREF_KEY_SHOW_TRAY_ICON, cbdata );
 
     /* start model update timer */
-    cbdata->timer = gtr_timeout_add_seconds( MAIN_WINDOW_REFRESH_INTERVAL_SECONDS, update_model, cbdata );
-    update_model( cbdata );
+    cbdata->timer = gtr_timeout_add_seconds( MAIN_WINDOW_REFRESH_INTERVAL_SECONDS, update_model_loop, cbdata );
+    update_model_once( cbdata );
 
     /* either show the window or iconify it */
     if( !is_iconified )
@@ -912,8 +920,9 @@ rowChangedCB( GtkTreeModel  * model UNUSED,
               gpointer        gdata )
 {
     struct cbdata * data = gdata;
+
     if( gtk_tree_selection_path_is_selected ( data->sel, path ) )
-        refresh_actions( gdata );
+        refresh_actions_soon( data );
 }
 
 static void
@@ -1378,27 +1387,44 @@ on_prefs_changed( TrCore * core UNUSED, const char * key, gpointer data )
 }
 
 static gboolean
-update_model( gpointer gdata )
+update_model_once( gpointer gdata )
 {
     struct cbdata *data = gdata;
+
+    /* update the torrent data in the model */
+    gtr_core_update( data->core );
+
+    /* refresh the main window's statusbar and toolbar buttons */
+    if( data->wind != NULL )
+        gtr_window_refresh( data->wind );
+
+    /* update the actions */
+        refresh_actions( data );
+
+    /* update the status tray icon */
+    if( data->icon != NULL )
+        gtr_icon_refresh( data->icon );
+
+    data->update_model_soon_tag = 0;
+    return FALSE;
+}
+
+static void
+update_model_soon( gpointer gdata )
+{
+    struct cbdata *data = gdata;
+
+    if( data->update_model_soon_tag == 0 )
+        data->update_model_soon_tag = gtr_idle_add( update_model_once, data );
+}
+
+static gboolean
+update_model_loop( gpointer gdata )
+{
     const gboolean done = global_sigcount;
 
     if( !done )
-    {
-        /* update the torrent data in the model */
-        gtr_core_update( data->core );
-
-        /* refresh the main window's statusbar and toolbar buttons */
-        if( data->wind != NULL )
-            gtr_window_refresh( data->wind );
-
-        /* update the actions */
-        refresh_actions( data );
-
-        /* update the status tray icon */
-        if( data->icon != NULL )
-            gtr_icon_refresh( data->icon );
-    }
+        update_model_once( gdata );
 
     return !done;
 }
@@ -1724,5 +1750,5 @@ gtr_actions_handler( const char * action_name, gpointer user_data )
     else g_error ( "Unhandled action: %s", action_name );
 
     if( changed )
-        update_model( data );
+        update_model_soon( data );
 }
