@@ -265,7 +265,6 @@ MyApp :: onTorrentsAdded( QSet<int> torrents )
     foreach( int id, torrents )
     {
         Torrent * tor = myModel->getTorrentFromId( id );
-        std::cerr << "torrent added: " << qPrintable(tor->name()) << std::endl;
 
         if( tor->name().isEmpty( ) ) // wait until the torrent's INFO fields are loaded
             connect( tor, SIGNAL(torrentChanged(int)), this, SLOT(onNewTorrentChanged(int)) );
