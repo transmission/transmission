@@ -112,37 +112,6 @@ tr_ptrArrayErase( tr_ptrArray * t,
 ***
 **/
 
-#ifndef NDEBUG
-static int
-lowerBound2( const tr_ptrArray * t,
-             const void * ptr,
-             int compare( const void *, const void * ),
-             bool * exact_match )
-{
-    int i;
-    const int len = t->n_items;
-
-    for( i=0; i<len; ++i )
-    {
-        const int c = compare( t->items[i], ptr );
-
-        if( c == 0 ) {
-            *exact_match = true;
-            return i;
-        }
-
-        if( c < 0 )
-            continue;
-
-        *exact_match = false;
-        return i;
-    }
-
-    *exact_match = false;
-    return len;
-}
-#endif
-
 int
 tr_ptrArrayLowerBound( const tr_ptrArray  * t,
                        const void         * ptr,
@@ -151,9 +120,6 @@ tr_ptrArrayLowerBound( const tr_ptrArray  * t,
 {
     int pos = -1;
     bool match = false;
-#ifndef NDEBUG
-    bool match_2;
-#endif
 
     if( t->n_items == 0 )
     {
@@ -193,9 +159,6 @@ tr_ptrArrayLowerBound( const tr_ptrArray  * t,
         }
     }
 
-    assert( pos == lowerBound2( t, ptr, compare, &match_2 ) );
-    assert( match == match_2 );
-
     if( exact_match )
         *exact_match = match;
     return pos;
@@ -205,7 +168,7 @@ static void
 assertSortedAndUnique( const tr_ptrArray * t UNUSED,
                        int compare(const void*, const void*) UNUSED )
 {
-#if 1
+#ifndef NDEBUG
     int i;
 
     for( i = 0; i < t->n_items - 2; ++i )
