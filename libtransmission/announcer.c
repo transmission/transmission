@@ -1072,6 +1072,7 @@ on_announce_done( const tr_announce_response  * response,
         {
             int i;
             const char * str;
+            bool got_scrape_info = false;
             const bool isStopped = event == TR_ANNOUNCE_EVENT_STOPPED;
 
             publishErrorClear( tier );
@@ -1079,9 +1080,20 @@ on_announce_done( const tr_announce_response  * response,
             if(( tracker = tier->currentTracker ))
             {
                 tracker->consecutiveFailures = 0;
-                tracker->seederCount = response->seeders;
-                tracker->leecherCount = response->leechers;
-                tracker->downloadCount = response->downloads;
+
+                /* if the tracker included scrape fields in its announce response,
+                   then a separate scrape isn't needed */
+
+                got_scrape_info = response->seeders
+                               || response->leechers
+                               || response->downloads;
+
+                if( got_scrape_info )
+                {
+                    tracker->seederCount = response->seeders;
+                    tracker->leecherCount = response->leechers;
+                    tracker->downloadCount = response->downloads;
+                }
 
                 if(( str = response->tracker_id_str ))
                 {
@@ -1117,9 +1129,18 @@ on_announce_done( const tr_announce_response  * response,
                             sizeof( tier->lastAnnounceStr ) );
 
             tier->isRunning = data->isRunningOnSuccess;
-            tier->scrapeAt = get_next_scrape_time( announcer->session, tier, tier->scrapeIntervalSec );
-            tier->lastScrapeTime = now;
-            tier->lastScrapeSucceeded = true;
+
+            if( got_scrape_info )
+            {
+                tier->scrapeAt = get_next_scrape_time( announcer->session, tier, tier->scrapeIntervalSec );
+                tier->lastScrapeTime = now;
+                tier->lastScrapeSucceeded = true;
+            }
+            else if( tier->lastScrapeTime + tier->scrapeIntervalSec <= now )
+            {
+                tier->scrapeAt = get_next_scrape_time( announcer->session, tier, 0 );
+            }
+
             tier->lastAnnounceSucceeded = true;
             tier->lastAnnouncePeerCount = response->pex_count
                                         + response->pex6_count;
