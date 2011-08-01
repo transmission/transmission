@@ -193,6 +193,7 @@ enum
     MC_ACTIVITY,
     MC_FINISHED,
     MC_PRIORITY,
+    MC_QUEUE_POSITION,
     MC_TRACKERS,
 
     /* tr_stat.error

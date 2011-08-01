@@ -226,6 +226,14 @@ getShortStatusString( GString           * gstr,
                                     tr_truncd( st->recheckProgress * 100.0, 1 ) );
             break;
 
+        case TR_STATUS_DOWNLOAD_WAIT:
+            g_string_append_printf( gstr, _( "Download queue #%d" ), st->queuePosition + 1 );
+            break;
+
+        case TR_STATUS_SEED_WAIT:
+            g_string_append_printf( gstr, _( "Seed queue #%d" ), st->queuePosition + 1 );
+            break;
+
         case TR_STATUS_DOWNLOAD:
         case TR_STATUS_SEED:
         {
@@ -253,10 +261,6 @@ getStatusString( GString           * gstr,
                  const double        uploadSpeed_KBps,
                  const double        downloadSpeed_KBps )
 {
-    const int isActive = st->activity != TR_STATUS_STOPPED;
-    const int isChecking = st->activity == TR_STATUS_CHECK
-                        || st->activity == TR_STATUS_CHECK_WAIT;
-
     if( st->error )
     {
         const char * fmt[] = { NULL, N_( "Tracker gave a warning: \"%s\"" ),
@@ -269,6 +273,8 @@ getStatusString( GString           * gstr,
         case TR_STATUS_STOPPED:
         case TR_STATUS_CHECK_WAIT:
         case TR_STATUS_CHECK:
+        case TR_STATUS_DOWNLOAD_WAIT:
+        case TR_STATUS_SEED_WAIT:
         {
             getShortStatusString( gstr, tor, st, uploadSpeed_KBps, downloadSpeed_KBps );
             break;
@@ -307,7 +313,11 @@ getStatusString( GString           * gstr,
                 break;
     }
 
-    if( isActive && !isChecking )
+    if( ( st->activity != TR_STATUS_CHECK_WAIT ) &&
+        ( st->activity != TR_STATUS_CHECK ) &&
+        ( st->activity != TR_STATUS_DOWNLOAD_WAIT ) &&
+        ( st->activity != TR_STATUS_SEED_WAIT ) &&
+        ( st->activity != TR_STATUS_STOPPED ) )
     {
         char buf[256];
         getShortTransferString( tor, st, uploadSpeed_KBps, downloadSpeed_KBps, buf, sizeof( buf ) );
@@ -630,7 +640,7 @@ render_compact( TorrentCellRenderer   * cell,
     struct TorrentCellRendererPrivate * p = cell->priv;
     const tr_torrent * tor = p->tor;
     const tr_stat * st = tr_torrentStatCached( (tr_torrent*)tor );
-    const gboolean active = st->activity != TR_STATUS_STOPPED;
+    const gboolean active = ( st->activity != TR_STATUS_STOPPED ) && ( st->activity != TR_STATUS_DOWNLOAD_WAIT ) && ( st->activity != TR_STATUS_SEED_WAIT );
     const double percentDone = get_percent_done( tor, st, &seed );
     const gboolean sensitive = active || st->error;
     GString * gstr_stat = p->gstr1;
@@ -673,7 +683,8 @@ render_compact( TorrentCellRenderer   * cell,
 
     g_object_set( p->icon_renderer, "pixbuf", icon, "sensitive", sensitive, NULL );
     gtr_cell_renderer_render( p->icon_renderer, window, widget, &icon_area, flags );
-    g_object_set( p->progress_renderer, "value", (int)(percentDone*100.0), "text", NULL, "sensitive", sensitive,
+    g_object_set( p->progress_renderer, "value", (int)(percentDone*100.0), "text", NULL,
+        "sensitive", sensitive || ( st->queuePosition >= 0 ),
 #if GTK_CHECK_VERSION( 3,0,0 )
         "inverted", seed,
 #elif GTK_CHECK_VERSION( 2,6,0 )
@@ -683,7 +694,7 @@ render_compact( TorrentCellRenderer   * cell,
     gtr_cell_renderer_render( p->progress_renderer, window, widget, &prog_area, flags );
     g_object_set( p->text_renderer, "text", gstr_stat->str, "scale", SMALL_SCALE, "ellipsize", PANGO_ELLIPSIZE_END, FOREGROUND_COLOR_KEY, &text_color, NULL );
     gtr_cell_renderer_render( p->text_renderer, window, widget, &stat_area, flags );
-    g_object_set( p->text_renderer, "text", name, "scale", 1.0, NULL );
+    g_object_set( p->text_renderer, "text", name, "scale", 1.0, FOREGROUND_COLOR_KEY, &text_color, NULL );
     gtr_cell_renderer_render( p->text_renderer, window, widget, &name_area, flags );
 
     /* cleanup */
@@ -715,7 +726,7 @@ render_full( TorrentCellRenderer   * cell,
     const tr_torrent * tor = p->tor;
     const tr_stat * st = tr_torrentStatCached( (tr_torrent*)tor );
     const tr_info * inf = tr_torrentInfo( tor );
-    const gboolean active = st->activity != TR_STATUS_STOPPED;
+    const gboolean active = ( st->activity != TR_STATUS_STOPPED ) && ( st->activity != TR_STATUS_DOWNLOAD_WAIT ) && ( st->activity != TR_STATUS_SEED_WAIT );
     const double percentDone = get_percent_done( tor, st, &seed );
     const gboolean sensitive = active || st->error;
     GString * gstr_prog = p->gstr1;
@@ -793,7 +804,7 @@ render_full( TorrentCellRenderer   * cell,
     gtr_cell_renderer_render( p->text_renderer, window, widget, &name_area, flags );
     g_object_set( p->text_renderer, "text", gstr_prog->str, "scale", SMALL_SCALE, "weight", PANGO_WEIGHT_NORMAL, NULL );
     gtr_cell_renderer_render( p->text_renderer, window, widget, &prog_area, flags );
-    g_object_set( p->progress_renderer, "value", (int)(percentDone*100.0), "text", "", "sensitive", sensitive,
+    g_object_set( p->progress_renderer, "value", (int)(percentDone*100.0), "text", "", "sensitive", ( sensitive || st->queuePosition >= 0 ),
 #if GTK_CHECK_VERSION( 3,0,0 )
         "inverted", seed,
 #elif GTK_CHECK_VERSION( 2,6,0 )
@@ -801,7 +812,7 @@ render_full( TorrentCellRenderer   * cell,
 #endif
         NULL );
     gtr_cell_renderer_render( p->progress_renderer, window, widget, &prct_area, flags );
-    g_object_set( p->text_renderer, "text", gstr_stat->str, NULL );
+    g_object_set( p->text_renderer, "text", gstr_stat->str, FOREGROUND_COLOR_KEY, &text_color, NULL );
     gtr_cell_renderer_render( p->text_renderer, window, widget, &stat_area, flags );
 
     /* cleanup */

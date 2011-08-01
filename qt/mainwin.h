@@ -161,11 +161,16 @@ class TrMainWindow: public QMainWindow
     public slots:
         void startAll( );
         void startSelected( );
+        void startSelectedNow( );
         void pauseAll( );
         void pauseSelected( );
         void removeSelected( );
         void deleteSelected( );
         void verifySelected( );
+        void queueMoveTop( );
+        void queueMoveUp( );
+        void queueMoveDown( );
+        void queueMoveBottom( );
         void reannounceSelected( );
         void addTorrent( const QString& filename );
         void onNetworkTimer( );
@@ -187,6 +192,7 @@ class TrMainWindow: public QMainWindow
         virtual ~TrMainWindow( );
 
     protected:
+        virtual void contextMenuEvent( QContextMenuEvent * );
         virtual void dragEnterEvent( QDragEnterEvent * );
         virtual void dropEvent( QDropEvent * );
 };

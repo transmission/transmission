@@ -232,7 +232,6 @@ Prefs._SortDescending     = 'descending';
 Prefs._SortMethod         = 'sort_method';
 Prefs._SortByAge          = 'age';
 Prefs._SortByActivity     = 'activity';
-Prefs._SortByQueue        = 'queue_order';
 Prefs._SortByName         = 'name';
 Prefs._SortByProgress     = 'percent_completed';
 Prefs._SortByRatio        = 'ratio';

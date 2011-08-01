@@ -112,6 +112,7 @@ TrMainWindow :: TrMainWindow( Session& session, Prefs& prefs, TorrentModel& mode
     ui.action_Properties->setIcon( getStockIcon( "document-properties", QStyle::SP_DesktopIcon ) );
     ui.action_OpenFolder->setIcon( getStockIcon( "folder-open", QStyle::SP_DirOpenIcon ) );
     ui.action_Start->setIcon( getStockIcon( "media-playback-start", QStyle::SP_MediaPlay ) );
+    ui.action_StartNow->setIcon( getStockIcon( "media-playback-start", QStyle::SP_MediaPlay ) );
     ui.action_Announce->setIcon( getStockIcon( "network-transmit-receive" ) );
     ui.action_Pause->setIcon( getStockIcon( "media-playback-pause", QStyle::SP_MediaPause ) );
     ui.action_Remove->setIcon( getStockIcon( "list-remove", QStyle::SP_TrashIcon ) );
@@ -124,6 +125,10 @@ TrMainWindow :: TrMainWindow( Session& session, Prefs& prefs, TorrentModel& mode
     ui.action_Preferences->setIcon( getStockIcon( "preferences-system" ) );
     ui.action_Contents->setIcon( getStockIcon( "help-contents", QStyle::SP_DialogHelpButton ) );
     ui.action_About->setIcon( getStockIcon( "help-about" ) );
+    ui.action_QueueMoveTop->setIcon( getStockIcon( "go-top" ) );
+    ui.action_QueueMoveUp->setIcon( getStockIcon( "go-up", QStyle::SP_ArrowUp ) );
+    ui.action_QueueMoveDown->setIcon( getStockIcon( "go-down", QStyle::SP_ArrowDown ) );
+    ui.action_QueueMoveBottom->setIcon( getStockIcon( "go-bottom" ) );
 
     // ui signals
     connect( ui.action_Toolbar, SIGNAL(toggled(bool)), this, SLOT(setToolbarVisible(bool)));
@@ -140,6 +145,11 @@ TrMainWindow :: TrMainWindow( Session& session, Prefs& prefs, TorrentModel& mode
     connect( ui.action_SortByState,    SIGNAL(toggled(bool)), this, SLOT(onSortByStateToggled(bool)));
     connect( ui.action_ReverseSortOrder, SIGNAL(toggled(bool)), this, SLOT(setSortAscendingPref(bool)));
     connect( ui.action_Start, SIGNAL(triggered()), this, SLOT(startSelected()));
+    connect( ui.action_QueueMoveTop,    SIGNAL(triggered()), this, SLOT(queueMoveTop()));
+    connect( ui.action_QueueMoveUp,     SIGNAL(triggered()), this, SLOT(queueMoveUp()));
+    connect( ui.action_QueueMoveDown,   SIGNAL(triggered()), this, SLOT(queueMoveDown()));
+    connect( ui.action_QueueMoveBottom, SIGNAL(triggered()), this, SLOT(queueMoveBottom()));
+    connect( ui.action_StartNow, SIGNAL(triggered()), this, SLOT(startSelectedNow()));
     connect( ui.action_Pause, SIGNAL(triggered()), this, SLOT(pauseSelected()));
     connect( ui.action_Remove, SIGNAL(triggered()), this, SLOT(removeSelected()));
     connect( ui.action_Delete, SIGNAL(triggered()), this, SLOT(deleteSelected()));
@@ -161,29 +171,6 @@ TrMainWindow :: TrMainWindow( Session& session, Prefs& prefs, TorrentModel& mode
     connect( ui.action_Properties, SIGNAL(triggered()), this, SLOT(openProperties()));
     connect( ui.action_SessionDialog, SIGNAL(triggered()), mySessionDialog, SLOT(show()));
     connect( ui.listView, SIGNAL(activated(const QModelIndex&)), ui.action_Properties, SLOT(trigger()));
-
-    QAction * sep2 = new QAction( this );
-    sep2->setSeparator( true );
-    QAction * sep3 = new QAction( this );
-    sep3->setSeparator( true );
-
-    // context menu
-    QList<QAction*> actions;
-    actions << ui.action_Properties
-            << ui.action_OpenFolder
-            << sep2
-            << ui.action_Start
-            << ui.action_Announce
-            << ui.action_Pause
-            << ui.action_CopyMagnetToClipboard
-            << sep3
-            << ui.action_Verify
-            << ui.action_SetLocation
-            << sep
-            << ui.action_Remove
-            << ui.action_Delete;
-    addActions( actions );
-    setContextMenuPolicy( Qt::ActionsContextMenu );
 
     // signals
     connect( ui.action_SelectAll, SIGNAL(triggered()), ui.listView, SLOT(selectAll()));
@@ -725,7 +712,9 @@ TrMainWindow :: refreshActionSensitivity( )
 {
     int selected( 0 );
     int paused( 0 );
+    int queued( 0 );
     int selectedAndPaused( 0 );
+    int selectedAndQueued( 0 );
     int canAnnounce( 0 );
     const QAbstractItemModel * model( ui.listView->model( ) );
     const QItemSelectionModel * selectionModel( ui.listView->selectionModel( ) );
@@ -739,14 +728,13 @@ TrMainWindow :: refreshActionSensitivity( )
         if( tor ) {
             const bool isSelected( selectionModel->isSelected( modelIndex ) );
             const bool isPaused( tor->isPaused( ) );
-            if( isSelected )
-                ++selected;
-            if( isPaused )
-                ++ paused;
-            if( isSelected && isPaused )
-                ++selectedAndPaused;
-            if( tor->canManualAnnounce( ) )
-                ++canAnnounce;
+            const bool isQueued( tor->isQueued( ) );
+            if( isSelected ) ++selected;
+            if( isQueued ) ++queued;
+            if( isPaused ) ++ paused;
+            if( isSelected && isPaused ) ++selectedAndPaused;
+            if( isSelected && isQueued ) ++selectedAndQueued;
+            if( tor->canManualAnnounce( ) ) ++canAnnounce;
         }
     }
 
@@ -766,8 +754,14 @@ TrMainWindow :: refreshActionSensitivity( )
     ui.action_StartAll->setEnabled( paused > 0 );
     ui.action_PauseAll->setEnabled( paused < rowCount );
     ui.action_Start->setEnabled( selectedAndPaused > 0 );
+    ui.action_StartNow->setEnabled( selectedAndPaused + selectedAndQueued > 0 );
     ui.action_Pause->setEnabled( selectedAndPaused < selected );
     ui.action_Announce->setEnabled( selected > 0 && ( canAnnounce == selected ) );
+
+    ui.action_QueueMoveTop->setEnabled( selectedAndQueued > 0 );
+    ui.action_QueueMoveUp->setEnabled( selectedAndQueued > 0 );
+    ui.action_QueueMoveDown->setEnabled( selectedAndQueued > 0 );
+    ui.action_QueueMoveBottom->setEnabled( selectedAndQueued > 0 );
 
     if( myDetailsDialog )
         myDetailsDialog->setIds( getSelectedTorrents( ) );
@@ -803,9 +797,34 @@ TrMainWindow :: startSelected( )
     mySession.startTorrents( getSelectedTorrents( ) );
 }
 void
+TrMainWindow :: startSelectedNow( )
+{
+    mySession.startTorrentsNow( getSelectedTorrents( ) );
+}
+void
 TrMainWindow :: pauseSelected( )
 {
     mySession.pauseTorrents( getSelectedTorrents( ) );
+}
+void
+TrMainWindow :: queueMoveTop( )
+{
+    mySession.queueMoveTop( getSelectedTorrents( ) );
+}
+void
+TrMainWindow :: queueMoveUp( )
+{
+    mySession.queueMoveUp( getSelectedTorrents( ) );
+}
+void
+TrMainWindow :: queueMoveDown( )
+{
+    mySession.queueMoveDown( getSelectedTorrents( ) );
+}
+void
+TrMainWindow :: queueMoveBottom( )
+{
+    mySession.queueMoveBottom( getSelectedTorrents( ) );
 }
 void
 TrMainWindow :: startAll( )
@@ -1295,4 +1314,45 @@ TrMainWindow :: dropEvent( QDropEvent * event )
         key = QUrl::fromPercentEncoding( url.path().toUtf8( ) );
 
     dynamic_cast<MyApp*>(QApplication::instance())->addTorrent( key );
+}
+
+/***
+****
+***/
+
+void
+TrMainWindow :: contextMenuEvent( QContextMenuEvent * event )
+{
+    QMenu * menu = new QMenu( this );
+
+    menu->addAction( ui.action_Properties );
+    menu->addAction( ui.action_OpenFolder );
+
+    QAction * sep = new QAction( this );
+    sep->setSeparator( true );
+    menu->addAction( sep );
+    menu->addAction( ui.action_Start );
+    menu->addAction( ui.action_StartNow );
+    menu->addAction( ui.action_Announce );
+    QMenu * queueMenu = menu->addMenu( tr( "Queue" ) );
+        queueMenu->addAction( ui.action_QueueMoveTop );
+        queueMenu->addAction( ui.action_QueueMoveUp );
+        queueMenu->addAction( ui.action_QueueMoveDown );
+        queueMenu->addAction( ui.action_QueueMoveBottom );
+    menu->addAction( ui.action_Pause );
+
+    sep = new QAction( this );
+    sep->setSeparator( true );
+    menu->addAction( sep );
+    menu->addAction( ui.action_Verify );
+    menu->addAction( ui.action_SetLocation );
+    menu->addAction( ui.action_CopyMagnetToClipboard );
+
+    sep = new QAction( this );
+    sep->setSeparator( true );
+    menu->addAction( sep );
+    menu->addAction( ui.action_Remove );
+    menu->addAction( ui.action_Delete );
+
+    menu->popup( event->globalPos( ) );
 }

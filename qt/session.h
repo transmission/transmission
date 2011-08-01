@@ -105,6 +105,11 @@ class Session: public QObject
     public slots:
         void pauseTorrents( const QSet<int>& torrentIds = QSet<int>() );
         void startTorrents( const QSet<int>& torrentIds = QSet<int>() );
+        void startTorrentsNow( const QSet<int>& torrentIds = QSet<int>() );
+        void queueMoveTop( const QSet<int>& torrentIds = QSet<int>() );
+        void queueMoveUp( const QSet<int>& torrentIds = QSet<int>() );
+        void queueMoveDown( const QSet<int>& torrentIds = QSet<int>() );
+        void queueMoveBottom( const QSet<int>& torrentIds = QSet<int>() );
         void refreshSessionInfo( );
         void refreshSessionStats( );
         void refreshActiveTorrents( );

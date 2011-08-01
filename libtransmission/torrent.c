@@ -669,7 +669,7 @@ tr_torrentInitFilePieces( tr_torrent * tor )
     tr_free( firstFiles );
 }
 
-static void torrentStart( tr_torrent * tor );
+static void torrentStart( tr_torrent * tor, bool bypass_queue );
 
 /**
  * Decide on a block size. Constraints:
@@ -802,6 +802,7 @@ torrentInit( tr_torrent * tor, const tr_ctor * ctor )
     tor->session   = session;
     tor->uniqueId = nextUniqueId++;
     tor->magicNumber = TORRENT_MAGIC_NUMBER;
+    tor->queuePosition = -1;
 
     tr_peerIdInit( tor->peer_id );
 
@@ -905,7 +906,7 @@ torrentInit( tr_torrent * tor, const tr_ctor * ctor )
     }
     else if( doStart )
     {
-        torrentStart( tor );
+        tr_torrentStart( tor );
     }
 
     tr_sessionUnlock( session );
@@ -1089,24 +1090,60 @@ tr_torrentSetVerifyState( tr_torrent * tor, tr_verify_state state )
     tor->anyDate = tr_time( );
 }
 
-tr_torrent_activity
-tr_torrentGetActivity( tr_torrent * tor )
+static tr_torrent_activity
+torrentGetActivity( const tr_torrent * tor )
 {
+    const bool is_seed = tr_torrentIsSeed( tor );
     assert( tr_isTorrent( tor ) );
-
-    tr_torrentRecheckCompleteness( tor );
 
     if( tor->verifyState == TR_VERIFY_NOW )
         return TR_STATUS_CHECK;
+
     if( tor->verifyState == TR_VERIFY_WAIT )
         return TR_STATUS_CHECK_WAIT;
-    if( !tor->isRunning )
-        return TR_STATUS_STOPPED;
-    if( tor->completeness == TR_LEECH )
-        return TR_STATUS_DOWNLOAD;
 
-    return TR_STATUS_SEED;
+    if( tor->isRunning )
+        return is_seed ? TR_STATUS_SEED : TR_STATUS_DOWNLOAD;
+
+    if( tor->queuePosition >= 0 ) {
+        if( is_seed && tr_sessionGetQueueEnabled( tor->session, TR_UP ) )
+            return TR_STATUS_SEED_WAIT;
+        if( !is_seed && tr_sessionGetQueueEnabled( tor->session, TR_DOWN ) )
+            return TR_STATUS_DOWNLOAD_WAIT;
+    }
+
+    return TR_STATUS_STOPPED;
 }
+
+tr_torrent_activity
+tr_torrentGetActivity( tr_torrent * tor )
+{
+    /* FIXME: is this call still needed? */
+    tr_torrentRecheckCompleteness( tor );
+
+    return torrentGetActivity( tor );
+}
+
+static time_t
+torrentGetIdleSecs( const tr_torrent * tor )
+{
+    int idle_secs;
+    const tr_torrent_activity activity = torrentGetActivity( tor );
+
+    if ((activity == TR_STATUS_DOWNLOAD || activity == TR_STATUS_SEED) && tor->startDate != 0)
+        idle_secs = difftime(tr_time(), MAX(tor->startDate, tor->activityDate));
+    else
+        idle_secs = -1;
+
+    return idle_secs;
+}
+
+bool
+tr_torrentIsStalled( const tr_torrent * tor )
+{
+    return torrentGetIdleSecs( tor ) > ( tr_sessionGetQueueStalledMinutes( tor->session ) * 60 );
+}
+
 
 static double
 getVerifyProgress( const tr_torrent * tor )
@@ -1145,6 +1182,7 @@ tr_torrentStat( tr_torrent * tor )
     s->id = tor->uniqueId;
     s->activity = tr_torrentGetActivity( tor );
     s->error = tor->error;
+    s->queuePosition = tor->queuePosition;
     tr_strlcpy( s->errorString, tor->errorString, sizeof( s->errorString ) );
 
     s->manualAnnounceTime = tr_announcerNextManualAnnounce( tor );
@@ -1175,11 +1213,7 @@ tr_torrentStat( tr_torrent * tor )
     s->startDate           = tor->startDate;
     s->secondsSeeding      = tor->secondsSeeding;
     s->secondsDownloading  = tor->secondsDownloading;
-
-    if ((s->activity == TR_STATUS_DOWNLOAD || s->activity == TR_STATUS_SEED) && s->startDate != 0)
-        s->idleSecs = difftime(tr_time(), MAX(s->startDate, s->activityDate));
-    else
-        s->idleSecs = -1;
+    s->idleSecs            = torrentGetIdleSecs( tor );
 
     s->corruptEver      = tor->corruptCur    + tor->corruptPrev;
     s->downloadedEver   = tor->downloadedCur + tor->downloadedPrev;
@@ -1505,6 +1539,8 @@ freeTorrent( tr_torrent * tor )
 ***  Start/Stop Callback
 **/
 
+static void queueRemove( tr_torrent * tor );
+
 static void
 torrentStartImpl( void * vtor )
 {
@@ -1516,6 +1552,7 @@ torrentStartImpl( void * vtor )
     tr_sessionLock( tor->session );
 
     tr_torrentRecheckCompleteness( tor );
+    queueRemove( tor );
 
     now = tr_time( );
     tor->isRunning = true;
@@ -1556,23 +1593,51 @@ tr_torrentGetCurrentSizeOnDisk( const tr_torrent * tor )
     return byte_count;
 }
 
-static void
-torrentStart( tr_torrent * tor )
+static bool
+torrentShouldQueue( const tr_torrent * tor )
 {
-    /* already running... */
-    if( tor->isRunning )
-        return;
+    const tr_direction dir = tr_torrentGetQueueDirection( tor );
+
+    return tr_sessionCountQueueFreeSlots( tor->session, dir ) == 0;
+}
+
+static void queueAppend( tr_torrent * tor );
+
+static void
+torrentStart( tr_torrent * tor, bool bypass_queue )
+{
+    switch( torrentGetActivity( tor ) )
+    {
+        case TR_STATUS_SEED:
+        case TR_STATUS_DOWNLOAD:
+            return; /* already started */
+            break;
+
+        case TR_STATUS_SEED_WAIT:
+        case TR_STATUS_DOWNLOAD_WAIT:
+            if( !bypass_queue )
+                return; /* already queued */
+            break;
+
+        case TR_STATUS_CHECK:
+        case TR_STATUS_CHECK_WAIT:
+            /* verifying right now... wait until that's done so
+             * we'll know what completeness to use/announce */
+            tor->startAfterVerify = true;
+            return;
+            break;
+
+        case TR_STATUS_STOPPED:
+            if( !bypass_queue && torrentShouldQueue( tor ) ) {
+                queueAppend( tor );
+                return;
+            }
+            break;
+    }
 
     /* don't allow the torrent to be started if the files disappeared */
     if( setLocalErrorIfFilesDisappeared( tor ) )
         return;
-
-    /* verifying right now... wait until that's done so
-     * we'll know what completeness to use/announce */
-    if( tor->verifyState != TR_VERIFY_NONE ) {
-        tor->startAfterVerify = true;
-        return;
-    }
 
     /* otherwise, start it now... */
     tr_sessionLock( tor->session );
@@ -1600,7 +1665,14 @@ void
 tr_torrentStart( tr_torrent * tor )
 {
     if( tr_isTorrent( tor ) )
-        torrentStart( tor );
+        torrentStart( tor, false );
+}
+
+void
+tr_torrentStartNow( tr_torrent * tor )
+{
+    if( tr_isTorrent( tor ) )
+        torrentStart( tor, true );
 }
 
 static void
@@ -1613,7 +1685,7 @@ torrentRecheckDoneImpl( void * vtor )
 
     if( tor->startAfterVerify ) {
         tor->startAfterVerify = false;
-        torrentStart( tor );
+        torrentStart( tor, false );
     }
 }
 
@@ -1681,6 +1753,7 @@ stopTorrent( void * vtor )
     tr_torrentLock( tor );
 
     tr_verifyRemove( tor );
+    queueRemove( tor );
     tr_peerMgrStopTorrent( tor );
     tr_announcerTorrentStopped( tor );
     tr_cacheFlushTorrent( tor->session->cache, tor );
@@ -3084,4 +3157,212 @@ char*
 tr_torrentBuildPartial( const tr_torrent * tor, tr_file_index_t fileNum )
 {
     return tr_strdup_printf( "%s.part", tor->info.files[fileNum].name );
+}
+
+/***
+****
+***/
+
+static int
+compareTorrentByQueuePosition( const void * va, const void * vb )
+{
+    const tr_torrent * a = * (const tr_torrent **) va;
+    const tr_torrent * b = * (const tr_torrent **) vb;
+
+    return a->queuePosition - b->queuePosition;
+}
+
+static bool
+queueIsSequenced( tr_torrent * tor )
+{
+    int i ;
+    int n ;
+    bool is_sequenced = true;
+    tr_session * session = tor->session;
+    tr_direction direction = tr_torrentGetQueueDirection( tor );
+    tr_torrent ** tmp = tr_new( tr_torrent *, session->torrentCount );
+
+    /* get all the torrents in that queue */
+    n = 0;
+    tor = NULL;
+    while(( tor = tr_torrentNext( session, tor )))
+        if( tr_torrentIsQueued( tor ) && ( direction == tr_torrentGetQueueDirection( tor ) ) )
+            tmp[n++] = tor;
+
+    /* sort them by position */
+    qsort( tmp, n, sizeof( tr_torrent * ), compareTorrentByQueuePosition );
+
+#if 0
+    /* print them */
+    fprintf( stderr, "sequence: " );
+    for( i=0; i<n; ++i )
+        fprintf( stderr, "%d ", tmp[i]->queuePosition );
+    fprintf( stderr, "\n" );
+#endif
+
+    /* test them */
+    for( i=0; is_sequenced && i<n; ++i )
+        if( tmp[i]->queuePosition != i )
+            is_sequenced = false;
+
+    tr_free( tmp );
+    return is_sequenced;
+}
+
+int
+tr_torrentGetQueuePosition( const tr_torrent * tor )
+{
+    return tor->queuePosition;
+}
+
+void
+tr_torrentSetQueuePosition( tr_torrent * tor, int pos )
+{
+    if( tr_torrentIsQueued( tor ) )
+    {
+        int back = -1;
+        tr_torrent * walk;
+        const tr_direction direction = tr_torrentGetQueueDirection( tor );
+        const int old_pos = tor->queuePosition;
+        const time_t now = tr_time( );
+
+        if( pos < 0 )
+            pos = 0;
+
+        tor->queuePosition = -1;
+
+        walk = NULL;
+        while(( walk = tr_torrentNext( tor->session, walk )))
+        {
+            if( tr_torrentIsQueued( walk ) && ( tr_torrentGetQueueDirection( walk ) == direction ) )
+            {
+                if( old_pos < pos ) {
+                    if( ( old_pos <= walk->queuePosition ) && ( walk->queuePosition <= pos ) ) {
+                        walk->queuePosition--;
+                        walk->anyDate = now;
+                    }
+                }
+
+                if( old_pos > pos ) {
+                    if( ( pos <= walk->queuePosition ) && ( walk->queuePosition < old_pos ) ) {
+                        walk->queuePosition++;
+                        walk->anyDate = now;
+                    }
+                }
+
+                if( back < walk->queuePosition )
+                    back = walk->queuePosition;
+            }
+        }
+
+        tor->queuePosition = MIN( pos, (back+1) );
+        tor->anyDate = now;
+    }
+
+    assert( queueIsSequenced( tor ) );
+}
+
+void
+tr_torrentsQueueMoveTop( tr_torrent ** torrents_in, int n )
+{
+    int i;
+    tr_torrent ** torrents = tr_memdup( torrents_in, sizeof( tr_torrent * ) * n );
+    qsort( torrents, n, sizeof( tr_torrent * ), compareTorrentByQueuePosition );
+    for( i=n-1; i>=0; --i )
+        tr_torrentSetQueuePosition( torrents[i], 0 );
+    tr_free( torrents );
+}
+
+void
+tr_torrentsQueueMoveUp( tr_torrent ** torrents_in, int n )
+{
+    int i;
+    tr_torrent ** torrents = tr_memdup( torrents_in, sizeof( tr_torrent * ) * n );
+    qsort( torrents, n, sizeof( tr_torrent * ), compareTorrentByQueuePosition );
+    for( i=0; i<n; ++i )
+        tr_torrentSetQueuePosition( torrents[i], torrents[i]->queuePosition - 1 );
+    tr_free( torrents );
+}
+
+void
+tr_torrentsQueueMoveDown( tr_torrent ** torrents_in, int n )
+{
+    int i;
+    tr_torrent ** torrents = tr_memdup( torrents_in, sizeof( tr_torrent * ) * n );
+    qsort( torrents, n, sizeof( tr_torrent * ), compareTorrentByQueuePosition );
+    for( i=n-1; i>=0; --i )
+        tr_torrentSetQueuePosition( torrents[i], torrents[i]->queuePosition + 1 );
+    tr_free( torrents );
+}
+
+void
+tr_torrentsQueueMoveBottom( tr_torrent ** torrents_in, int n )
+{
+    int i;
+    tr_torrent ** torrents = tr_memdup( torrents_in, sizeof( tr_torrent * ) * n );
+    qsort( torrents, n, sizeof( tr_torrent * ), compareTorrentByQueuePosition );
+    for( i=0; i<n; ++i )
+        tr_torrentSetQueuePosition( torrents[i], INT_MAX );
+    tr_free( torrents );
+}
+
+/* Ensure that the torrents queued for downloads have queuePositions contiguous from [0...n] */
+static void
+queueResequence( tr_session * session, tr_direction direction )
+{
+    int i;
+    int n;
+    tr_torrent * tor = NULL;
+    tr_torrent ** tmp = tr_new( tr_torrent *, session->torrentCount );
+    const time_t now = tr_time( );
+
+    assert( tr_isSession( session ) );
+    assert( tr_isDirection( direction ) );
+
+    /* get all the torrents in that queue */
+    n = 0;
+    while(( tor = tr_torrentNext( session, tor ))) {
+        if( direction == tr_torrentGetQueueDirection( tor )) {
+            const int position = tr_torrentGetQueuePosition( tor );
+            if( position >= 0 )
+                tmp[n++] = tor;
+        }
+    }
+
+    /* sort them by position */
+    qsort( tmp, n, sizeof( tr_torrent * ), compareTorrentByQueuePosition );
+
+    /* sequence them... */
+    for( i=0; i<n; ++i ) {
+        tr_torrent * tor = tmp[i];
+        if( tor->queuePosition != i ) {
+            tor->queuePosition = i;
+            tor->anyDate = now;
+        }
+    }
+
+    tr_free( tmp );
+}
+
+static void
+queueRemove( tr_torrent * tor )
+{
+    if( tr_torrentIsQueued( tor ) )
+    {
+        tor->queuePosition = -1;
+        queueResequence( tor->session, tr_torrentGetQueueDirection( tor ) );
+    }
+}
+
+static void
+queueAppend( tr_torrent * tor )
+{
+    if( !tr_torrentIsQueued( tor ) )
+    {
+        /* tr_torrentSetQueuePosition() requres the torrent to be queued,
+           so init tor->queuePosition to the back... */
+        tor->queuePosition = INT_MAX;
+
+        tr_torrentSetQueuePosition( tor, INT_MAX );
+    }
 }

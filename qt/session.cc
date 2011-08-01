@@ -151,6 +151,8 @@ Session :: updatePref( int key )
         case Prefs :: BLOCKLIST_URL:
         case Prefs :: DHT_ENABLED:
         case Prefs :: DOWNLOAD_DIR:
+        case Prefs :: DOWNLOAD_QUEUE_ENABLED:
+        case Prefs :: DOWNLOAD_QUEUE_SIZE:
         case Prefs :: DSPEED:
         case Prefs :: DSPEED_ENABLED:
         case Prefs :: IDLE_LIMIT:
@@ -536,17 +538,13 @@ Session :: sendTorrentRequest( const char * request, const QSet<int>& ids )
     refreshTorrents( ids );
 }
 
-void
-Session :: pauseTorrents( const QSet<int>& ids )
-{
-    sendTorrentRequest( "torrent-stop", ids );
-}
-
-void
-Session :: startTorrents( const QSet<int>& ids )
-{
-    sendTorrentRequest( "torrent-start", ids );
-}
+void Session :: pauseTorrents    ( const QSet<int>& ids ) { sendTorrentRequest( "torrent-stop", ids ); }
+void Session :: startTorrents    ( const QSet<int>& ids ) { sendTorrentRequest( "torrent-start", ids ); } 
+void Session :: startTorrentsNow ( const QSet<int>& ids ) { sendTorrentRequest( "torrent-start-now", ids ); }
+void Session :: queueMoveTop     ( const QSet<int>& ids ) { sendTorrentRequest( "queue-move-top", ids ); } 
+void Session :: queueMoveUp      ( const QSet<int>& ids ) { sendTorrentRequest( "queue-move-up", ids ); } 
+void Session :: queueMoveDown    ( const QSet<int>& ids ) { sendTorrentRequest( "queue-move-down", ids ); } 
+void Session :: queueMoveBottom  ( const QSet<int>& ids ) { sendTorrentRequest( "queue-move-bottom", ids ); } 
 
 void
 Session :: refreshActiveTorrents( )

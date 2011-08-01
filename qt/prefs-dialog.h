@@ -78,6 +78,7 @@ class PrefsDialog: public QDialog
         void setPref( int key, const QVariant& v );
         bool isAllowed( int key ) const;
         QWidget * createTorrentsTab( );
+        QWidget * createDownloadTab( );
         QWidget * createSpeedTab( );
         QWidget * createPrivacyTab( );
         QWidget * createNetworkTab( );

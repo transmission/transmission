@@ -172,6 +172,7 @@ class Torrent: public QObject
             PEERS,
             TORRENT_FILE,
             BANDWIDTH_PRIORITY,
+            QUEUE_POSITION,
 
             PROPERTY_COUNT
         };
@@ -271,6 +272,7 @@ class Torrent: public QObject
         int compareTracker( const Torrent& ) const;
         int compareSeedRatio( const Torrent& ) const;
         int compareRatio( const Torrent& ) const;
+        int compareQueue( const Torrent& ) const;
         int compareETA( const Torrent& ) const;
         bool hasETA( ) const { return getETA( ) >= 0; }
         int getETA( ) const { return getInt( ETA ); }
@@ -304,6 +306,8 @@ class Torrent: public QObject
         QStringList trackers() const { return myValues[TRACKERS].value<QStringList>(); }
         PeerList peers( ) const{ return myValues[PEERS].value<PeerList>(); }
         const FileList& files( ) const { return myFiles; }
+        int queuePosition( ) const { return getInt( QUEUE_POSITION ); }
+        bool isQueued( ) const { return queuePosition( ) >= 0; }
 
     public:
         QString activityString( ) const;
@@ -313,7 +317,9 @@ class Torrent: public QObject
         bool isWaitingToVerify( ) const { return getActivity( ) == TR_STATUS_CHECK_WAIT; }
         bool isVerifying( ) const { return getActivity( ) == TR_STATUS_CHECK; }
         bool isDownloading( ) const { return getActivity( ) == TR_STATUS_DOWNLOAD; }
+        bool isWaitingToDownload( ) const { return getActivity( ) == TR_STATUS_DOWNLOAD_WAIT; }
         bool isSeeding( ) const { return getActivity( ) == TR_STATUS_SEED; }
+        bool isWaitingToSeed( ) const { return getActivity( ) == TR_STATUS_SEED_WAIT; }
         bool isReadyToTransfer( ) const { return getActivity()==TR_STATUS_DOWNLOAD || getActivity()==TR_STATUS_SEED; }
         void notifyComplete( ) const;
 

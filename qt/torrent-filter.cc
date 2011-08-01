@@ -101,11 +101,12 @@ TorrentFilter :: lessThan( const QModelIndex& left, const QModelIndex& right ) c
         case SortMode :: SORT_BY_STATE:
             if( !val ) val = compare( a->hasError(), b->hasError() );
             if( !val ) val = compare( a->getActivity(), b->getActivity() );
+            if( !val ) val = a->compareQueue( *b );
             // fall through
         case SortMode :: SORT_BY_PROGRESS:
             if( !val ) val = compare( a->percentComplete(), b->percentComplete() );
             if( !val ) val = a->compareSeedRatio( *b );
-            // fall through
+            if( !val ) val = a->compareQueue( *b );
         case SortMode :: SORT_BY_RATIO:
             if( !val ) val = a->compareRatio( *b );
             break;
@@ -144,19 +145,16 @@ TorrentFilter :: activityFilterAcceptsTorrent( const Torrent * tor, const Filter
             accepts = tor->peersWeAreUploadingTo( ) > 0 || tor->peersWeAreDownloadingFrom( ) > 0 || tor->isVerifying( );
             break;
         case FilterMode::SHOW_DOWNLOADING:
-            accepts = tor->isDownloading( );
+            accepts = tor->isDownloading( ) || tor->isWaitingToDownload( );
             break;
         case FilterMode::SHOW_SEEDING:
-            accepts = tor->isSeeding( );
+            accepts = tor->isSeeding( ) || tor->isWaitingToSeed( );
             break;
         case FilterMode::SHOW_PAUSED:
             accepts = tor->isPaused( );
             break;
         case FilterMode::SHOW_FINISHED:
             accepts = tor->isFinished( );
-            break;
-        case FilterMode::SHOW_QUEUED:
-            accepts = tor->isWaitingToVerify( );
             break;
         case FilterMode::SHOW_VERIFYING:
             accepts = tor->isVerifying( ) || tor->isWaitingToVerify( );

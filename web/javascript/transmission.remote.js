@@ -28,17 +28,17 @@ RPC._TurtleTimeEnabled      = 'alt-speed-time-enabled';
 RPC._TurtleTimeBegin        = 'alt-speed-time-begin';
 RPC._TurtleTimeEnd          = 'alt-speed-time-end';
 RPC._TurtleTimeDay          = 'alt-speed-time-day';
-RPC._PeerLimitGlobal		= 'peer-limit-global';
-RPC._PeerLimitPerTorrent	= 'peer-limit-per-torrent';
-RPC._PexEnabled				= 'pex-enabled';
-RPC._DhtEnabled				= 'dht-enabled';
-RPC._LpdEnabled				= 'lpd-enabled';
-RPC._BlocklistEnabled		= 'blocklist-enabled';
-RPC._BlocklistURL			= 'blocklist-url';
-RPC._BlocklistSize			= 'blocklist-size';
-RPC._UtpEnabled				= 'utp-enabled';
-RPC._PeerPortRandom			= 'peer-port-random-on-start';
-RPC._PortForwardingEnabled	= 'port-forwarding-enabled';
+RPC._PeerLimitGlobal        = 'peer-limit-global';
+RPC._PeerLimitPerTorrent    = 'peer-limit-per-torrent';
+RPC._PexEnabled	            = 'pex-enabled';
+RPC._DhtEnabled             = 'dht-enabled';
+RPC._LpdEnabled             = 'lpd-enabled';
+RPC._BlocklistEnabled       = 'blocklist-enabled';
+RPC._BlocklistURL           = 'blocklist-url';
+RPC._BlocklistSize          = 'blocklist-size';
+RPC._UtpEnabled	            = 'utp-enabled';
+RPC._PeerPortRandom         = 'peer-port-random-on-start';
+RPC._PortForwardingEnabled  = 'port-forwarding-enabled';
 RPC._StartAddedTorrent      = 'start-added-torrents';
 
 function TransmissionRemote( controller )
@@ -215,8 +215,9 @@ TransmissionRemote.prototype =
 		this.sendTorrentSetRequests( method, torrent_ids, null, callback );
 	},
 
-	startTorrents: function( torrent_ids, callback ) {
-		this.sendTorrentActionRequests( 'torrent-start', torrent_ids, callback );
+	startTorrents: function( torrent_ids, noqueue, callback ) {
+		var name = noqueue ? 'torrent-start-now' : 'torrent-start';
+		this.sendTorrentActionRequests( name, torrent_ids, callback );
 	},
 	stopTorrents: function( torrent_ids, callback ) {
 		this.sendTorrentActionRequests( 'torrent-stop', torrent_ids, callback );

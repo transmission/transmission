@@ -532,6 +532,10 @@ PrefsDialog :: createTorrentsTab( )
     HIG * hig = new HIG( this );
     hig->addSectionTitle( tr( "Adding" ) );
 
+        hig->addWideControl( checkBoxNew( tr( "Show &options dialog" ), Prefs::OPTIONS_PROMPT ) );
+        hig->addWideControl( checkBoxNew( tr( "&Start when added" ), Prefs::START ) );
+        hig->addWideControl( checkBoxNew( tr( "Mo&ve .torrent file to the trash" ), Prefs::TRASH_ORIGINAL ) );
+
         l = checkBoxNew( tr( "Automatically &add torrents from:" ), Prefs::DIR_WATCH_ENABLED );
         QPushButton * b = myWatchButton = new QPushButton;
         b->setIcon( folderPixmap );
@@ -540,20 +544,53 @@ PrefsDialog :: createTorrentsTab( )
         hig->addRow( l, b );
         enableBuddyWhenChecked( qobject_cast<QCheckBox*>(l), b );
 
-        hig->addWideControl( checkBoxNew( tr( "Show &options dialog" ), Prefs::OPTIONS_PROMPT ) );
-        hig->addWideControl( checkBoxNew( tr( "&Start when added" ), Prefs::START ) );
-        hig->addWideControl( checkBoxNew( tr( "Mo&ve .torrent file to the trash" ), Prefs::TRASH_ORIGINAL ) );
-
     hig->addSectionDivider( );
-    hig->addSectionTitle( tr( "Downloading" ) );
+    hig->addSectionTitle( tr( "Seeding Limits" ) );
 
-        hig->addWideControl( checkBoxNew( tr( "Append \".&part\" to incomplete files' names" ), Prefs::RENAME_PARTIAL_FILES ) );
+        l = checkBoxNew( tr( "Stop seeding at &ratio:" ), Prefs::RATIO_ENABLED );
+        r = doubleSpinBoxNew( Prefs::RATIO, 0, INT_MAX, 0.5, 2 );
+        hig->addRow( l, r );
+        enableBuddyWhenChecked( qobject_cast<QCheckBox*>(l), r );
 
-        b = myDestinationButton = new QPushButton;
+        l = checkBoxNew( tr( "Stop seeding if idle for &N minutes:" ), Prefs::IDLE_LIMIT_ENABLED );
+        r = spinBoxNew( Prefs::IDLE_LIMIT, 1, INT_MAX, 5 );
+        hig->addRow( l, r );
+        enableBuddyWhenChecked( qobject_cast<QCheckBox*>(l), r );
+
+    hig->finish( );
+    return hig;
+}
+
+QWidget *
+PrefsDialog :: createDownloadTab( )
+{
+    const int iconSize( style( )->pixelMetric( QStyle :: PM_SmallIconSize ) );
+    const QFileIconProvider iconProvider;
+    const QIcon folderIcon = iconProvider.icon( QFileIconProvider::Folder );
+    const QPixmap folderPixmap = folderIcon.pixmap( iconSize );
+    const QIcon fileIcon = iconProvider.icon( QFileIconProvider::File );
+    const QPixmap filePixmap = fileIcon.pixmap( iconSize );
+
+    QWidget *l;
+    HIG * hig = new HIG( this );
+    hig->addSectionTitle( tr( "Location" ) );
+
+        QPushButton * b = myDestinationButton = new QPushButton;
         b->setIcon( folderPixmap );
         b->setStyleSheet( "text-align: left; padding-left: 5; padding-right: 5" );
         connect( b, SIGNAL(clicked(bool)), this, SLOT(onDestinationClicked(void)) );
         hig->addRow( tr( "Save to &Location:" ), b );
+
+    hig->addSectionDivider( );
+    hig->addSectionTitle( tr( "Queue" ) );
+    
+        hig->addRow( tr( "Maximum active &downloads:" ), spinBoxNew( Prefs::DOWNLOAD_QUEUE_SIZE, 1, FD_SETSIZE, 5 ) );
+        hig->addRow( tr( "E&xempt torrents if idle for N minutes:" ), spinBoxNew( Prefs::QUEUE_STALLED_MINUTES, 1, FD_SETSIZE, 5 ) );
+
+    hig->addSectionDivider( );
+    hig->addSectionTitle( tr( "Incomplete" ) );
+
+        hig->addWideControl( checkBoxNew( tr( "Append \".&part\" to incomplete files' names" ), Prefs::RENAME_PARTIAL_FILES ) );
 
         l = myIncompleteCheckbox = checkBoxNew( tr( "Keep &incomplete files in:" ), Prefs::INCOMPLETE_DIR_ENABLED );
         b = myIncompleteButton = new QPushButton;
@@ -570,19 +607,6 @@ PrefsDialog :: createTorrentsTab( )
         connect( b, SIGNAL(clicked(bool)), this, SLOT(onScriptClicked(void)) );
         hig->addRow( myTorrentDoneScriptCheckbox, b );
         enableBuddyWhenChecked( qobject_cast<QCheckBox*>(l), b );
-
-    hig->addSectionDivider( );
-    hig->addSectionTitle( tr( "Seeding Limits" ) );
-
-        l = checkBoxNew( tr( "Stop seeding at &ratio:" ), Prefs::RATIO_ENABLED );
-        r = doubleSpinBoxNew( Prefs::RATIO, 0, INT_MAX, 0.5, 2 );
-        hig->addRow( l, r );
-        enableBuddyWhenChecked( qobject_cast<QCheckBox*>(l), r );
-
-        l = checkBoxNew( tr( "Stop seeding if idle for &N minutes:" ), Prefs::IDLE_LIMIT_ENABLED );
-        r = spinBoxNew( Prefs::IDLE_LIMIT, 1, INT_MAX, 5 );
-        hig->addRow( l, r );
-        enableBuddyWhenChecked( qobject_cast<QCheckBox*>(l), r );
 
     hig->finish( );
     return hig;
@@ -603,6 +627,7 @@ PrefsDialog :: PrefsDialog( Session& session, Prefs& prefs, QWidget * parent ):
 
     QTabWidget * t = new QTabWidget( this );
     t->addTab( createTorrentsTab( ),     tr( "Torrents" ) );
+    t->addTab( createDownloadTab( ),     tr( "Download" ) );
     t->addTab( createSpeedTab( ),        tr( "Speed" ) );
     t->addTab( createPrivacyTab( ),      tr( "Privacy" ) );
     t->addTab( createNetworkTab( ),      tr( "Network" ) );

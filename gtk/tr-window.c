@@ -596,7 +596,7 @@ gtr_window_new( GtkUIManager * ui_mgr, TrCore * core )
 
     /* main menu */
     mainmenu = gtr_action_get_widget( "/main-window-menu" );
-    w = gtr_action_get_widget( "/main-window-menu/torrent-menu/update-tracker" );
+    w = gtr_action_get_widget( "/main-window-menu/torrent-menu/torrent-reannounce" );
 #if GTK_CHECK_VERSION( 2, 12, 0 )
     g_signal_connect( w, "query-tooltip",
                       G_CALLBACK( onAskTrackerQueryTooltip ), p );

@@ -530,12 +530,15 @@ torrentNew( tr_peerMgr * manager, tr_torrent * tor )
     return t;
 }
 
+static void ensureMgrTimersExist( struct tr_peerMgr * m );
+
 tr_peerMgr*
 tr_peerMgrNew( tr_session * session )
 {
     tr_peerMgr * m = tr_new0( tr_peerMgr, 1 );
     m->session = session;
     m->incomingHandshakes = TR_PTR_ARRAY_INIT;
+    ensureMgrTimersExist( m );
     return m;
 }
 
@@ -3558,22 +3561,41 @@ pumpAllPeers( tr_peerMgr * mgr )
 }
 
 static void
+queuePulse( tr_session * session, tr_direction dir )
+{
+    assert( tr_isSession( session ) );
+    assert( tr_isDirection( dir ) );
+
+    if( tr_sessionGetQueueEnabled( session, dir ) )
+    {
+        int i;
+        const int n = tr_sessionCountQueueFreeSlots( session, dir );
+        for( i=0; i<n; i++ ) {
+            tr_torrent * tor = tr_sessionGetNextQueuedTorrent( session, dir );
+            if( tor != NULL )
+                tr_torrentStartNow( tor );
+        }
+    }
+}
+
+static void
 bandwidthPulse( int foo UNUSED, short bar UNUSED, void * vmgr )
 {
     tr_torrent * tor;
     tr_peerMgr * mgr = vmgr;
+    tr_session * session = mgr->session;
     managerLock( mgr );
 
     /* FIXME: this next line probably isn't necessary... */
     pumpAllPeers( mgr );
 
     /* allocate bandwidth to the peers */
-    tr_bandwidthAllocate( &mgr->session->bandwidth, TR_UP, BANDWIDTH_PERIOD_MSEC );
-    tr_bandwidthAllocate( &mgr->session->bandwidth, TR_DOWN, BANDWIDTH_PERIOD_MSEC );
+    tr_bandwidthAllocate( &session->bandwidth, TR_UP, BANDWIDTH_PERIOD_MSEC );
+    tr_bandwidthAllocate( &session->bandwidth, TR_DOWN, BANDWIDTH_PERIOD_MSEC );
 
     /* torrent upkeep */
     tor = NULL;
-    while(( tor = tr_torrentNext( mgr->session, tor )))
+    while(( tor = tr_torrentNext( session, tor )))
     {
         /* possibly stop torrents that have seeded enough */
         tr_torrentCheckSeedLimit( tor );
@@ -3589,6 +3611,10 @@ bandwidthPulse( int foo UNUSED, short bar UNUSED, void * vmgr )
         if( tor->isStopping )
             tr_torrentStop( tor );
     }
+
+    /* pump the queues */
+    queuePulse( session, TR_UP );
+    queuePulse( session, TR_DOWN );
 
     reconnectPulse( 0, 0, mgr );
 

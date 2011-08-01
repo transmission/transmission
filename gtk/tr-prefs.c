@@ -253,6 +253,62 @@ target_cb( GtkWidget * tb, gpointer target )
 }
 
 /****
+*****  Download Tab
+****/
+
+static GtkWidget*
+downloadPage( GObject * core )
+{
+    GtkWidget * t;
+    GtkWidget * w;
+    GtkWidget * l;
+    const char * s;
+    int row = 0;
+
+    t = hig_workarea_create( );
+
+    hig_workarea_add_section_title( t, &row, _( "Location" ) );
+
+    w = new_path_chooser_button( TR_PREFS_KEY_DOWNLOAD_DIR, core );
+    hig_workarea_add_row( t, &row, _( "Save to _Location:" ), w, NULL );
+
+    hig_workarea_add_section_divider( t, &row );
+    hig_workarea_add_section_title( t, &row, _( "Queue" ) );
+
+    s = _( "Maximum active _downloads:" );
+    w = new_spin_button( TR_PREFS_KEY_DOWNLOAD_QUEUE_SIZE, core, 0, INT_MAX, 1 );
+    hig_workarea_add_row( t, &row, s, w, NULL );
+
+    s = _( "E_xempt torrents if idle for N minutes:" );
+    w = new_spin_button( TR_PREFS_KEY_QUEUE_STALLED_MINUTES, core, 1, INT_MAX, 1 );
+    hig_workarea_add_row( t, &row, s, w, NULL );
+
+    hig_workarea_add_section_divider( t, &row );
+    hig_workarea_add_section_title( t, &row, _( "Incomplete" ) );
+
+    s = _( "Append \"._part\" to incomplete files' names" );
+    w = new_check_button( s, TR_PREFS_KEY_RENAME_PARTIAL_FILES, core );
+    hig_workarea_add_wide_control( t, &row, w );
+
+    s = _( "Keep _incomplete torrents in:" );
+    l = new_check_button( s, TR_PREFS_KEY_INCOMPLETE_DIR_ENABLED, core );
+    w = new_path_chooser_button( TR_PREFS_KEY_INCOMPLETE_DIR, core );
+    gtk_widget_set_sensitive( GTK_WIDGET( w ), gtr_pref_flag_get( TR_PREFS_KEY_INCOMPLETE_DIR_ENABLED ) );
+    g_signal_connect( l, "toggled", G_CALLBACK( target_cb ), w );
+    hig_workarea_add_row_w( t, &row, l, w, NULL );
+
+    s = _( "Call _script when torrent is completed:" );
+    l = new_check_button( s, TR_PREFS_KEY_SCRIPT_TORRENT_DONE_ENABLED, core );
+    w = new_file_chooser_button( TR_PREFS_KEY_SCRIPT_TORRENT_DONE_FILENAME, core );
+    gtk_widget_set_sensitive( GTK_WIDGET( w ), gtr_pref_flag_get( TR_PREFS_KEY_SCRIPT_TORRENT_DONE_ENABLED ) );
+    g_signal_connect( l, "toggled", G_CALLBACK( target_cb ), w );
+    hig_workarea_add_row_w( t, &row, l, w, NULL );
+
+    hig_workarea_finish( t, &row );
+    return t;
+}
+
+/****
 *****  Torrent Tab
 ****/
 
@@ -290,30 +346,6 @@ torrentPage( GObject * core )
     g_signal_connect( l, "toggled", G_CALLBACK( target_cb ), w );
     hig_workarea_add_row_w( t, &row, l, w, NULL );
 #endif
-
-    hig_workarea_add_section_divider( t, &row );
-    hig_workarea_add_section_title( t, &row, _( "Downloading" ) );
-
-    s = _( "Append \"._part\" to incomplete files' names" );
-    w = new_check_button( s, TR_PREFS_KEY_RENAME_PARTIAL_FILES, core );
-    hig_workarea_add_wide_control( t, &row, w );
-
-    w = new_path_chooser_button( TR_PREFS_KEY_DOWNLOAD_DIR, core );
-    hig_workarea_add_row( t, &row, _( "Save to _Location:" ), w, NULL );
-
-    s = _( "Keep _incomplete torrents in:" );
-    l = new_check_button( s, TR_PREFS_KEY_INCOMPLETE_DIR_ENABLED, core );
-    w = new_path_chooser_button( TR_PREFS_KEY_INCOMPLETE_DIR, core );
-    gtk_widget_set_sensitive( GTK_WIDGET( w ), gtr_pref_flag_get( TR_PREFS_KEY_INCOMPLETE_DIR_ENABLED ) );
-    g_signal_connect( l, "toggled", G_CALLBACK( target_cb ), w );
-    hig_workarea_add_row_w( t, &row, l, w, NULL );
-
-    s = _( "Call scrip_t when torrent is completed:" );
-    l = new_check_button( s, TR_PREFS_KEY_SCRIPT_TORRENT_DONE_ENABLED, core );
-    w = new_file_chooser_button( TR_PREFS_KEY_SCRIPT_TORRENT_DONE_FILENAME, core );
-    gtk_widget_set_sensitive( GTK_WIDGET( w ), gtr_pref_flag_get( TR_PREFS_KEY_SCRIPT_TORRENT_DONE_ENABLED ) );
-    g_signal_connect( l, "toggled", G_CALLBACK( target_cb ), w );
-    hig_workarea_add_row_w( t, &row, l, w, NULL );
 
     hig_workarea_add_section_divider( t, &row );
     hig_workarea_add_section_title( t, &row, _( "Seeding" ) );
@@ -1251,6 +1283,9 @@ gtr_prefs_dialog_new( GtkWindow * parent, GObject * core )
     gtk_notebook_append_page( GTK_NOTEBOOK( n ),
                               torrentPage( core ),
                               gtk_label_new ( _( "Torrents" ) ) );
+    gtk_notebook_append_page( GTK_NOTEBOOK( n ),
+                              downloadPage( core ),
+                              gtk_label_new ( _( "Downloading" ) ) );
     gtk_notebook_append_page( GTK_NOTEBOOK( n ),
                               bandwidthPage( core ),
                               gtk_label_new ( _( "Speed" ) ) );

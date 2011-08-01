@@ -107,7 +107,8 @@ Torrent :: myProperties[] =
     { MANUAL_ANNOUNCE_TIME, "manualAnnounceTime", QVariant::DateTime, STAT_EXTRA },
     { PEERS, "peers", TrTypes::PeerList, STAT_EXTRA },
     { TORRENT_FILE, "torrentFile", QVariant::String, STAT_EXTRA },
-    { BANDWIDTH_PRIORITY, "bandwidthPriority", QVariant::Int, STAT_EXTRA }
+    { BANDWIDTH_PRIORITY, "bandwidthPriority", QVariant::Int, STAT_EXTRA },
+    { QUEUE_POSITION, "queuePosition", QVariant::Int, STAT }
 };
 
 Torrent :: KeyList
@@ -366,6 +367,18 @@ Torrent :: hasTrackerSubstring( const QString& substr ) const
         if( s.contains( substr, Qt::CaseInsensitive ) )
             return true;
     return false;
+}
+
+int
+Torrent :: compareQueue( const Torrent& that ) const
+{
+    const bool a_is_queued = isQueued( );
+    const bool b_is_queued = that.isQueued( );
+
+    if( a_is_queued != b_is_queued )
+        return a_is_queued ? -1 : 1;
+
+    return that.queuePosition() - queuePosition();
 }
 
 int
@@ -701,11 +714,13 @@ Torrent :: activityString( ) const
 
     switch( getActivity( ) )
     {
-        case TR_STATUS_CHECK_WAIT: str = tr( "Waiting to verify local data" ); break;
-        case TR_STATUS_CHECK:      str = tr( "Verifying local data" ); break;
-        case TR_STATUS_DOWNLOAD:   str = tr( "Downloading" ); break;
-        case TR_STATUS_SEED:       str = tr( "Seeding" ); break;
-        case TR_STATUS_STOPPED:    str = isFinished() ? tr( "Finished" ): tr( "Paused" ); break;
+        case TR_STATUS_STOPPED:       str = isFinished() ? tr( "Finished" ): tr( "Paused" ); break;
+        case TR_STATUS_CHECK_WAIT:    str = tr( "Waiting to verify local data" ); break;
+        case TR_STATUS_CHECK:         str = tr( "Verifying local data" ); break;
+        case TR_STATUS_DOWNLOAD_WAIT: str = tr( "Download queue #%1" ).arg( queuePosition() + 1 ); break;
+        case TR_STATUS_DOWNLOAD:      str = tr( "Downloading" );
+        case TR_STATUS_SEED_WAIT:     str = tr( "Seed queue #%1" ).arg( queuePosition() + 1 ); break;
+        case TR_STATUS_SEED:          str = tr( "Seeding" ); break;
     }
 
     return str;

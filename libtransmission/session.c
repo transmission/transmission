@@ -304,62 +304,67 @@ tr_sessionGetDefaultSettings( tr_benc * d )
     assert( tr_bencIsDict( d ) );
 
     tr_bencDictReserve( d, 60 );
-    tr_bencDictAddBool( d, TR_PREFS_KEY_BLOCKLIST_ENABLED,        false );
-    tr_bencDictAddStr ( d, TR_PREFS_KEY_BLOCKLIST_URL,            "http://www.example.com/blocklist" );
-    tr_bencDictAddInt ( d, TR_PREFS_KEY_MAX_CACHE_SIZE_MB,        DEFAULT_CACHE_SIZE_MB );
-    tr_bencDictAddBool( d, TR_PREFS_KEY_DHT_ENABLED,              true );
-    tr_bencDictAddBool( d, TR_PREFS_KEY_UTP_ENABLED,              true );
-    tr_bencDictAddBool( d, TR_PREFS_KEY_LPD_ENABLED,              false );
-    tr_bencDictAddStr ( d, TR_PREFS_KEY_DOWNLOAD_DIR,             tr_getDefaultDownloadDir( ) );
-    tr_bencDictAddInt ( d, TR_PREFS_KEY_DSPEED_KBps,              100 );
-    tr_bencDictAddBool( d, TR_PREFS_KEY_DSPEED_ENABLED,           false );
-    tr_bencDictAddInt ( d, TR_PREFS_KEY_ENCRYPTION,               TR_DEFAULT_ENCRYPTION );
-    tr_bencDictAddInt ( d, TR_PREFS_KEY_IDLE_LIMIT,               30 );
-    tr_bencDictAddBool( d, TR_PREFS_KEY_IDLE_LIMIT_ENABLED,       false );
-    tr_bencDictAddStr ( d, TR_PREFS_KEY_INCOMPLETE_DIR,           tr_getDefaultDownloadDir( ) );
-    tr_bencDictAddBool( d, TR_PREFS_KEY_INCOMPLETE_DIR_ENABLED,   false );
-    tr_bencDictAddInt ( d, TR_PREFS_KEY_MSGLEVEL,                 TR_MSG_INF );
-    tr_bencDictAddInt ( d, TR_PREFS_KEY_PEER_LIMIT_GLOBAL,        atoi( TR_DEFAULT_PEER_LIMIT_GLOBAL_STR ) );
-    tr_bencDictAddInt ( d, TR_PREFS_KEY_PEER_LIMIT_TORRENT,       atoi( TR_DEFAULT_PEER_LIMIT_TORRENT_STR ) );
-    tr_bencDictAddInt ( d, TR_PREFS_KEY_PEER_PORT,                atoi( TR_DEFAULT_PEER_PORT_STR ) );
-    tr_bencDictAddBool( d, TR_PREFS_KEY_PEER_PORT_RANDOM_ON_START, false );
-    tr_bencDictAddInt ( d, TR_PREFS_KEY_PEER_PORT_RANDOM_LOW,     49152 );
-    tr_bencDictAddInt ( d, TR_PREFS_KEY_PEER_PORT_RANDOM_HIGH,    65535 );
-    tr_bencDictAddStr ( d, TR_PREFS_KEY_PEER_SOCKET_TOS,          TR_DEFAULT_PEER_SOCKET_TOS_STR );
-    tr_bencDictAddBool( d, TR_PREFS_KEY_PEX_ENABLED,              true );
-    tr_bencDictAddBool( d, TR_PREFS_KEY_PORT_FORWARDING,          true );
-    tr_bencDictAddInt ( d, TR_PREFS_KEY_PREALLOCATION,            TR_PREALLOCATE_SPARSE );
-    tr_bencDictAddBool( d, TR_PREFS_KEY_PREFETCH_ENABLED,         DEFAULT_PREFETCH_ENABLED );
-    tr_bencDictAddReal( d, TR_PREFS_KEY_RATIO,                    2.0 );
-    tr_bencDictAddBool( d, TR_PREFS_KEY_RATIO_ENABLED,            false );
-    tr_bencDictAddBool( d, TR_PREFS_KEY_RENAME_PARTIAL_FILES,     true );
-    tr_bencDictAddBool( d, TR_PREFS_KEY_RPC_AUTH_REQUIRED,        false );
-    tr_bencDictAddStr ( d, TR_PREFS_KEY_RPC_BIND_ADDRESS,         "0.0.0.0" );
-    tr_bencDictAddBool( d, TR_PREFS_KEY_RPC_ENABLED,              false );
-    tr_bencDictAddStr ( d, TR_PREFS_KEY_RPC_PASSWORD,             "" );
-    tr_bencDictAddStr ( d, TR_PREFS_KEY_RPC_USERNAME,             "" );
-    tr_bencDictAddStr ( d, TR_PREFS_KEY_RPC_WHITELIST,            TR_DEFAULT_RPC_WHITELIST );
-    tr_bencDictAddBool( d, TR_PREFS_KEY_RPC_WHITELIST_ENABLED,    true );
-    tr_bencDictAddInt ( d, TR_PREFS_KEY_RPC_PORT,                 atoi( TR_DEFAULT_RPC_PORT_STR ) );
-    tr_bencDictAddStr ( d, TR_PREFS_KEY_RPC_URL,                  TR_DEFAULT_RPC_URL_STR );
-    tr_bencDictAddBool( d, TR_PREFS_KEY_SCRAPE_PAUSED_TORRENTS,   true );
-    tr_bencDictAddStr ( d, TR_PREFS_KEY_SCRIPT_TORRENT_DONE_FILENAME, "" );
-    tr_bencDictAddBool( d, TR_PREFS_KEY_SCRIPT_TORRENT_DONE_ENABLED, false );
-    tr_bencDictAddBool( d, TR_PREFS_KEY_ALT_SPEED_ENABLED,        false );
-    tr_bencDictAddInt ( d, TR_PREFS_KEY_ALT_SPEED_UP_KBps,        50 ); /* half the regular */
-    tr_bencDictAddInt ( d, TR_PREFS_KEY_ALT_SPEED_DOWN_KBps,      50 ); /* half the regular */
-    tr_bencDictAddInt ( d, TR_PREFS_KEY_ALT_SPEED_TIME_BEGIN,     540 ); /* 9am */
-    tr_bencDictAddBool( d, TR_PREFS_KEY_ALT_SPEED_TIME_ENABLED,   false );
-    tr_bencDictAddInt ( d, TR_PREFS_KEY_ALT_SPEED_TIME_END,       1020 ); /* 5pm */
-    tr_bencDictAddInt ( d, TR_PREFS_KEY_ALT_SPEED_TIME_DAY,       TR_SCHED_ALL );
-    tr_bencDictAddInt ( d, TR_PREFS_KEY_USPEED_KBps,              100 );
-    tr_bencDictAddBool( d, TR_PREFS_KEY_USPEED_ENABLED,           false );
-    tr_bencDictAddInt ( d, TR_PREFS_KEY_UMASK,                    022 );
-    tr_bencDictAddInt ( d, TR_PREFS_KEY_UPLOAD_SLOTS_PER_TORRENT, 14 );
-    tr_bencDictAddStr ( d, TR_PREFS_KEY_BIND_ADDRESS_IPV4,        TR_DEFAULT_BIND_ADDRESS_IPV4 );
-    tr_bencDictAddStr ( d, TR_PREFS_KEY_BIND_ADDRESS_IPV6,        TR_DEFAULT_BIND_ADDRESS_IPV6 );
-    tr_bencDictAddBool( d, TR_PREFS_KEY_START,                    true );
-    tr_bencDictAddBool( d, TR_PREFS_KEY_TRASH_ORIGINAL,           false );
+    tr_bencDictAddBool( d, TR_PREFS_KEY_BLOCKLIST_ENABLED,               false );
+    tr_bencDictAddStr ( d, TR_PREFS_KEY_BLOCKLIST_URL,                   "http://www.example.com/blocklist" );
+    tr_bencDictAddInt ( d, TR_PREFS_KEY_MAX_CACHE_SIZE_MB,               DEFAULT_CACHE_SIZE_MB );
+    tr_bencDictAddBool( d, TR_PREFS_KEY_DHT_ENABLED,                     true );
+    tr_bencDictAddBool( d, TR_PREFS_KEY_UTP_ENABLED,                     true );
+    tr_bencDictAddBool( d, TR_PREFS_KEY_LPD_ENABLED,                     false );
+    tr_bencDictAddStr ( d, TR_PREFS_KEY_DOWNLOAD_DIR,                    tr_getDefaultDownloadDir( ) );
+    tr_bencDictAddInt ( d, TR_PREFS_KEY_DSPEED_KBps,                     100 );
+    tr_bencDictAddBool( d, TR_PREFS_KEY_DSPEED_ENABLED,                  false );
+    tr_bencDictAddInt ( d, TR_PREFS_KEY_ENCRYPTION,                      TR_DEFAULT_ENCRYPTION );
+    tr_bencDictAddInt ( d, TR_PREFS_KEY_IDLE_LIMIT,                      30 );
+    tr_bencDictAddBool( d, TR_PREFS_KEY_IDLE_LIMIT_ENABLED,              false );
+    tr_bencDictAddStr ( d, TR_PREFS_KEY_INCOMPLETE_DIR,                  tr_getDefaultDownloadDir( ) );
+    tr_bencDictAddBool( d, TR_PREFS_KEY_INCOMPLETE_DIR_ENABLED,          false );
+    tr_bencDictAddInt ( d, TR_PREFS_KEY_MSGLEVEL,                        TR_MSG_INF );
+    tr_bencDictAddInt ( d, TR_PREFS_KEY_DOWNLOAD_QUEUE_SIZE,             10 );
+    tr_bencDictAddBool( d, TR_PREFS_KEY_DOWNLOAD_QUEUE_ENABLED,          true );
+    tr_bencDictAddInt ( d, TR_PREFS_KEY_PEER_LIMIT_GLOBAL,               atoi( TR_DEFAULT_PEER_LIMIT_GLOBAL_STR ) );
+    tr_bencDictAddInt ( d, TR_PREFS_KEY_PEER_LIMIT_TORRENT,              atoi( TR_DEFAULT_PEER_LIMIT_TORRENT_STR ) );
+    tr_bencDictAddInt ( d, TR_PREFS_KEY_PEER_PORT,                       atoi( TR_DEFAULT_PEER_PORT_STR ) );
+    tr_bencDictAddBool( d, TR_PREFS_KEY_PEER_PORT_RANDOM_ON_START,       false );
+    tr_bencDictAddInt ( d, TR_PREFS_KEY_PEER_PORT_RANDOM_LOW,            49152 );
+    tr_bencDictAddInt ( d, TR_PREFS_KEY_PEER_PORT_RANDOM_HIGH,           65535 );
+    tr_bencDictAddStr ( d, TR_PREFS_KEY_PEER_SOCKET_TOS,                 TR_DEFAULT_PEER_SOCKET_TOS_STR );
+    tr_bencDictAddBool( d, TR_PREFS_KEY_PEX_ENABLED,                     true );
+    tr_bencDictAddBool( d, TR_PREFS_KEY_PORT_FORWARDING,                 true );
+    tr_bencDictAddInt ( d, TR_PREFS_KEY_PREALLOCATION,                   TR_PREALLOCATE_SPARSE );
+    tr_bencDictAddBool( d, TR_PREFS_KEY_PREFETCH_ENABLED,                DEFAULT_PREFETCH_ENABLED );
+    tr_bencDictAddInt ( d, TR_PREFS_KEY_QUEUE_STALLED_MINUTES,           30 );
+    tr_bencDictAddReal( d, TR_PREFS_KEY_RATIO,                           2.0 );
+    tr_bencDictAddBool( d, TR_PREFS_KEY_RATIO_ENABLED,                   false );
+    tr_bencDictAddBool( d, TR_PREFS_KEY_RENAME_PARTIAL_FILES,            true );
+    tr_bencDictAddBool( d, TR_PREFS_KEY_RPC_AUTH_REQUIRED,               false );
+    tr_bencDictAddStr ( d, TR_PREFS_KEY_RPC_BIND_ADDRESS,                "0.0.0.0" );
+    tr_bencDictAddBool( d, TR_PREFS_KEY_RPC_ENABLED,                     false );
+    tr_bencDictAddStr ( d, TR_PREFS_KEY_RPC_PASSWORD,                    "" );
+    tr_bencDictAddStr ( d, TR_PREFS_KEY_RPC_USERNAME,                    "" );
+    tr_bencDictAddStr ( d, TR_PREFS_KEY_RPC_WHITELIST,                   TR_DEFAULT_RPC_WHITELIST );
+    tr_bencDictAddBool( d, TR_PREFS_KEY_RPC_WHITELIST_ENABLED,           true );
+    tr_bencDictAddInt ( d, TR_PREFS_KEY_RPC_PORT,                        atoi( TR_DEFAULT_RPC_PORT_STR ) );
+    tr_bencDictAddStr ( d, TR_PREFS_KEY_RPC_URL,                         TR_DEFAULT_RPC_URL_STR );
+    tr_bencDictAddBool( d, TR_PREFS_KEY_SCRAPE_PAUSED_TORRENTS,          true );
+    tr_bencDictAddStr ( d, TR_PREFS_KEY_SCRIPT_TORRENT_DONE_FILENAME,    "" );
+    tr_bencDictAddBool( d, TR_PREFS_KEY_SCRIPT_TORRENT_DONE_ENABLED,     false );
+    tr_bencDictAddInt ( d, TR_PREFS_KEY_SEED_QUEUE_SIZE,                 10 );
+    tr_bencDictAddBool( d, TR_PREFS_KEY_SEED_QUEUE_ENABLED,              false );
+    tr_bencDictAddBool( d, TR_PREFS_KEY_ALT_SPEED_ENABLED,               false );
+    tr_bencDictAddInt ( d, TR_PREFS_KEY_ALT_SPEED_UP_KBps,               50 ); /* half the regular */
+    tr_bencDictAddInt ( d, TR_PREFS_KEY_ALT_SPEED_DOWN_KBps,             50 ); /* half the regular */
+    tr_bencDictAddInt ( d, TR_PREFS_KEY_ALT_SPEED_TIME_BEGIN,            540 ); /* 9am */
+    tr_bencDictAddBool( d, TR_PREFS_KEY_ALT_SPEED_TIME_ENABLED,          false );
+    tr_bencDictAddInt ( d, TR_PREFS_KEY_ALT_SPEED_TIME_END,              1020 ); /* 5pm */
+    tr_bencDictAddInt ( d, TR_PREFS_KEY_ALT_SPEED_TIME_DAY,              TR_SCHED_ALL );
+    tr_bencDictAddInt ( d, TR_PREFS_KEY_USPEED_KBps,                     100 );
+    tr_bencDictAddBool( d, TR_PREFS_KEY_USPEED_ENABLED,                  false );
+    tr_bencDictAddInt ( d, TR_PREFS_KEY_UMASK,                           022 );
+    tr_bencDictAddInt ( d, TR_PREFS_KEY_UPLOAD_SLOTS_PER_TORRENT,        14 );
+    tr_bencDictAddStr ( d, TR_PREFS_KEY_BIND_ADDRESS_IPV4,               TR_DEFAULT_BIND_ADDRESS_IPV4 );
+    tr_bencDictAddStr ( d, TR_PREFS_KEY_BIND_ADDRESS_IPV6,               TR_DEFAULT_BIND_ADDRESS_IPV6 );
+    tr_bencDictAddBool( d, TR_PREFS_KEY_START,                           true );
+    tr_bencDictAddBool( d, TR_PREFS_KEY_TRASH_ORIGINAL,                  false );
 }
 
 void
@@ -368,63 +373,68 @@ tr_sessionGetSettings( tr_session * s, struct tr_benc * d )
     assert( tr_bencIsDict( d ) );
 
     tr_bencDictReserve( d, 60 );
-    tr_bencDictAddBool( d, TR_PREFS_KEY_BLOCKLIST_ENABLED,        tr_blocklistIsEnabled( s ) );
-    tr_bencDictAddStr ( d, TR_PREFS_KEY_BLOCKLIST_URL,            tr_blocklistGetURL( s ) );
-    tr_bencDictAddInt ( d, TR_PREFS_KEY_MAX_CACHE_SIZE_MB,        tr_sessionGetCacheLimit_MB( s ) );
-    tr_bencDictAddBool( d, TR_PREFS_KEY_DHT_ENABLED,              s->isDHTEnabled );
-    tr_bencDictAddBool( d, TR_PREFS_KEY_UTP_ENABLED,              s->isUTPEnabled );
-    tr_bencDictAddBool( d, TR_PREFS_KEY_LPD_ENABLED,              s->isLPDEnabled );
-    tr_bencDictAddStr ( d, TR_PREFS_KEY_DOWNLOAD_DIR,             s->downloadDir );
-    tr_bencDictAddInt ( d, TR_PREFS_KEY_DSPEED_KBps,              tr_sessionGetSpeedLimit_KBps( s, TR_DOWN ) );
-    tr_bencDictAddBool( d, TR_PREFS_KEY_DSPEED_ENABLED,           tr_sessionIsSpeedLimited( s, TR_DOWN ) );
-    tr_bencDictAddInt ( d, TR_PREFS_KEY_ENCRYPTION,               s->encryptionMode );
-    tr_bencDictAddInt ( d, TR_PREFS_KEY_IDLE_LIMIT,               tr_sessionGetIdleLimit( s ) );
-    tr_bencDictAddBool( d, TR_PREFS_KEY_IDLE_LIMIT_ENABLED,       tr_sessionIsIdleLimited( s ) );
-    tr_bencDictAddStr ( d, TR_PREFS_KEY_INCOMPLETE_DIR,           tr_sessionGetIncompleteDir( s ) );
-    tr_bencDictAddBool( d, TR_PREFS_KEY_INCOMPLETE_DIR_ENABLED,   tr_sessionIsIncompleteDirEnabled( s ) );
-    tr_bencDictAddInt ( d, TR_PREFS_KEY_MSGLEVEL,                 tr_getMessageLevel( ) );
-    tr_bencDictAddInt ( d, TR_PREFS_KEY_PEER_LIMIT_GLOBAL,        s->peerLimit );
-    tr_bencDictAddInt ( d, TR_PREFS_KEY_PEER_LIMIT_TORRENT,       s->peerLimitPerTorrent );
-    tr_bencDictAddInt ( d, TR_PREFS_KEY_PEER_PORT,                tr_sessionGetPeerPort( s ) );
-    tr_bencDictAddBool( d, TR_PREFS_KEY_PEER_PORT_RANDOM_ON_START, s->isPortRandom );
-    tr_bencDictAddInt ( d, TR_PREFS_KEY_PEER_PORT_RANDOM_LOW,     s->randomPortLow );
-    tr_bencDictAddInt ( d, TR_PREFS_KEY_PEER_PORT_RANDOM_HIGH,    s->randomPortHigh );
-    tr_bencDictAddStr ( d, TR_PREFS_KEY_PEER_SOCKET_TOS,          format_tos(s->peerSocketTOS) );
-    tr_bencDictAddStr ( d, TR_PREFS_KEY_PEER_CONGESTION_ALGORITHM, s->peer_congestion_algorithm );
-    tr_bencDictAddBool( d, TR_PREFS_KEY_PEX_ENABLED,              s->isPexEnabled );
-    tr_bencDictAddBool( d, TR_PREFS_KEY_PORT_FORWARDING,          tr_sessionIsPortForwardingEnabled( s ) );
-    tr_bencDictAddInt ( d, TR_PREFS_KEY_PREALLOCATION,            s->preallocationMode );
-    tr_bencDictAddInt ( d, TR_PREFS_KEY_PREFETCH_ENABLED,         s->isPrefetchEnabled );
-    tr_bencDictAddReal( d, TR_PREFS_KEY_RATIO,                    s->desiredRatio );
-    tr_bencDictAddBool( d, TR_PREFS_KEY_RATIO_ENABLED,            s->isRatioLimited );
-    tr_bencDictAddBool( d, TR_PREFS_KEY_RENAME_PARTIAL_FILES,     tr_sessionIsIncompleteFileNamingEnabled( s ) );
-    tr_bencDictAddBool( d, TR_PREFS_KEY_RPC_AUTH_REQUIRED,        tr_sessionIsRPCPasswordEnabled( s ) );
-    tr_bencDictAddStr ( d, TR_PREFS_KEY_RPC_BIND_ADDRESS,         tr_sessionGetRPCBindAddress( s ) );
-    tr_bencDictAddBool( d, TR_PREFS_KEY_RPC_ENABLED,              tr_sessionIsRPCEnabled( s ) );
-    tr_bencDictAddStr ( d, TR_PREFS_KEY_RPC_PASSWORD,             tr_sessionGetRPCPassword( s ) );
-    tr_bencDictAddInt ( d, TR_PREFS_KEY_RPC_PORT,                 tr_sessionGetRPCPort( s ) );
-    tr_bencDictAddStr ( d, TR_PREFS_KEY_RPC_URL,                  tr_sessionGetRPCUrl( s ) );
-    tr_bencDictAddStr ( d, TR_PREFS_KEY_RPC_USERNAME,             tr_sessionGetRPCUsername( s ) );
-    tr_bencDictAddStr ( d, TR_PREFS_KEY_RPC_WHITELIST,            tr_sessionGetRPCWhitelist( s ) );
-    tr_bencDictAddBool( d, TR_PREFS_KEY_RPC_WHITELIST_ENABLED,    tr_sessionGetRPCWhitelistEnabled( s ) );
-    tr_bencDictAddBool( d, TR_PREFS_KEY_SCRAPE_PAUSED_TORRENTS,   s->scrapePausedTorrents );
-    tr_bencDictAddBool( d, TR_PREFS_KEY_SCRIPT_TORRENT_DONE_ENABLED, tr_sessionIsTorrentDoneScriptEnabled( s ) );
-    tr_bencDictAddStr ( d, TR_PREFS_KEY_SCRIPT_TORRENT_DONE_FILENAME, tr_sessionGetTorrentDoneScript( s ) );
-    tr_bencDictAddBool( d, TR_PREFS_KEY_ALT_SPEED_ENABLED,        tr_sessionUsesAltSpeed( s ) );
-    tr_bencDictAddInt ( d, TR_PREFS_KEY_ALT_SPEED_UP_KBps,        tr_sessionGetAltSpeed_KBps( s, TR_UP ) );
-    tr_bencDictAddInt ( d, TR_PREFS_KEY_ALT_SPEED_DOWN_KBps,      tr_sessionGetAltSpeed_KBps( s, TR_DOWN ) );
-    tr_bencDictAddInt ( d, TR_PREFS_KEY_ALT_SPEED_TIME_BEGIN,     tr_sessionGetAltSpeedBegin( s ) );
-    tr_bencDictAddBool( d, TR_PREFS_KEY_ALT_SPEED_TIME_ENABLED,   tr_sessionUsesAltSpeedTime( s ) );
-    tr_bencDictAddInt ( d, TR_PREFS_KEY_ALT_SPEED_TIME_END,       tr_sessionGetAltSpeedEnd( s ) );
-    tr_bencDictAddInt ( d, TR_PREFS_KEY_ALT_SPEED_TIME_DAY,       tr_sessionGetAltSpeedDay( s ) );
-    tr_bencDictAddInt ( d, TR_PREFS_KEY_USPEED_KBps,              tr_sessionGetSpeedLimit_KBps( s, TR_UP ) );
-    tr_bencDictAddBool( d, TR_PREFS_KEY_USPEED_ENABLED,           tr_sessionIsSpeedLimited( s, TR_UP ) );
-    tr_bencDictAddInt ( d, TR_PREFS_KEY_UMASK,                    s->umask );
-    tr_bencDictAddInt ( d, TR_PREFS_KEY_UPLOAD_SLOTS_PER_TORRENT, s->uploadSlotsPerTorrent );
-    tr_bencDictAddStr ( d, TR_PREFS_KEY_BIND_ADDRESS_IPV4,        tr_address_to_string( &s->public_ipv4->addr ) );
-    tr_bencDictAddStr ( d, TR_PREFS_KEY_BIND_ADDRESS_IPV6,        tr_address_to_string( &s->public_ipv6->addr ) );
-    tr_bencDictAddBool( d, TR_PREFS_KEY_START,                    !tr_sessionGetPaused( s ) );
-    tr_bencDictAddBool( d, TR_PREFS_KEY_TRASH_ORIGINAL,           tr_sessionGetDeleteSource( s ) );
+    tr_bencDictAddBool( d, TR_PREFS_KEY_BLOCKLIST_ENABLED,                tr_blocklistIsEnabled( s ) );
+    tr_bencDictAddStr ( d, TR_PREFS_KEY_BLOCKLIST_URL,                    tr_blocklistGetURL( s ) );
+    tr_bencDictAddInt ( d, TR_PREFS_KEY_MAX_CACHE_SIZE_MB,                tr_sessionGetCacheLimit_MB( s ) );
+    tr_bencDictAddBool( d, TR_PREFS_KEY_DHT_ENABLED,                      s->isDHTEnabled );
+    tr_bencDictAddBool( d, TR_PREFS_KEY_UTP_ENABLED,                      s->isUTPEnabled );
+    tr_bencDictAddBool( d, TR_PREFS_KEY_LPD_ENABLED,                      s->isLPDEnabled );
+    tr_bencDictAddStr ( d, TR_PREFS_KEY_DOWNLOAD_DIR,                     s->downloadDir );
+    tr_bencDictAddInt ( d, TR_PREFS_KEY_DOWNLOAD_QUEUE_SIZE,              tr_sessionGetQueueSize( s, TR_DOWN ) );
+    tr_bencDictAddBool( d, TR_PREFS_KEY_DOWNLOAD_QUEUE_ENABLED,           tr_sessionGetQueueEnabled( s, TR_DOWN ) );
+    tr_bencDictAddInt ( d, TR_PREFS_KEY_DSPEED_KBps,                      tr_sessionGetSpeedLimit_KBps( s, TR_DOWN ) );
+    tr_bencDictAddBool( d, TR_PREFS_KEY_DSPEED_ENABLED,                   tr_sessionIsSpeedLimited( s, TR_DOWN ) );
+    tr_bencDictAddInt ( d, TR_PREFS_KEY_ENCRYPTION,                       s->encryptionMode );
+    tr_bencDictAddInt ( d, TR_PREFS_KEY_IDLE_LIMIT,                       tr_sessionGetIdleLimit( s ) );
+    tr_bencDictAddBool( d, TR_PREFS_KEY_IDLE_LIMIT_ENABLED,               tr_sessionIsIdleLimited( s ) );
+    tr_bencDictAddStr ( d, TR_PREFS_KEY_INCOMPLETE_DIR,                   tr_sessionGetIncompleteDir( s ) );
+    tr_bencDictAddBool( d, TR_PREFS_KEY_INCOMPLETE_DIR_ENABLED,           tr_sessionIsIncompleteDirEnabled( s ) );
+    tr_bencDictAddInt ( d, TR_PREFS_KEY_MSGLEVEL,                         tr_getMessageLevel( ) );
+    tr_bencDictAddInt ( d, TR_PREFS_KEY_PEER_LIMIT_GLOBAL,                s->peerLimit );
+    tr_bencDictAddInt ( d, TR_PREFS_KEY_PEER_LIMIT_TORRENT,               s->peerLimitPerTorrent );
+    tr_bencDictAddInt ( d, TR_PREFS_KEY_PEER_PORT,                        tr_sessionGetPeerPort( s ) );
+    tr_bencDictAddBool( d, TR_PREFS_KEY_PEER_PORT_RANDOM_ON_START,        s->isPortRandom );
+    tr_bencDictAddInt ( d, TR_PREFS_KEY_PEER_PORT_RANDOM_LOW,             s->randomPortLow );
+    tr_bencDictAddInt ( d, TR_PREFS_KEY_PEER_PORT_RANDOM_HIGH,            s->randomPortHigh );
+    tr_bencDictAddStr ( d, TR_PREFS_KEY_PEER_SOCKET_TOS,                  format_tos(s->peerSocketTOS) );
+    tr_bencDictAddStr ( d, TR_PREFS_KEY_PEER_CONGESTION_ALGORITHM,        s->peer_congestion_algorithm );
+    tr_bencDictAddBool( d, TR_PREFS_KEY_PEX_ENABLED,                      s->isPexEnabled );
+    tr_bencDictAddBool( d, TR_PREFS_KEY_PORT_FORWARDING,                  tr_sessionIsPortForwardingEnabled( s ) );
+    tr_bencDictAddInt ( d, TR_PREFS_KEY_PREALLOCATION,                    s->preallocationMode );
+    tr_bencDictAddInt ( d, TR_PREFS_KEY_PREFETCH_ENABLED,                 s->isPrefetchEnabled );
+    tr_bencDictAddInt ( d, TR_PREFS_KEY_QUEUE_STALLED_MINUTES,            tr_sessionGetQueueStalledMinutes( s ) );
+    tr_bencDictAddReal( d, TR_PREFS_KEY_RATIO,                            s->desiredRatio );
+    tr_bencDictAddBool( d, TR_PREFS_KEY_RATIO_ENABLED,                    s->isRatioLimited );
+    tr_bencDictAddBool( d, TR_PREFS_KEY_RENAME_PARTIAL_FILES,             tr_sessionIsIncompleteFileNamingEnabled( s ) );
+    tr_bencDictAddBool( d, TR_PREFS_KEY_RPC_AUTH_REQUIRED,                tr_sessionIsRPCPasswordEnabled( s ) );
+    tr_bencDictAddStr ( d, TR_PREFS_KEY_RPC_BIND_ADDRESS,                 tr_sessionGetRPCBindAddress( s ) );
+    tr_bencDictAddBool( d, TR_PREFS_KEY_RPC_ENABLED,                      tr_sessionIsRPCEnabled( s ) );
+    tr_bencDictAddStr ( d, TR_PREFS_KEY_RPC_PASSWORD,                     tr_sessionGetRPCPassword( s ) );
+    tr_bencDictAddInt ( d, TR_PREFS_KEY_RPC_PORT,                         tr_sessionGetRPCPort( s ) );
+    tr_bencDictAddStr ( d, TR_PREFS_KEY_RPC_URL,                          tr_sessionGetRPCUrl( s ) );
+    tr_bencDictAddStr ( d, TR_PREFS_KEY_RPC_USERNAME,                     tr_sessionGetRPCUsername( s ) );
+    tr_bencDictAddStr ( d, TR_PREFS_KEY_RPC_WHITELIST,                    tr_sessionGetRPCWhitelist( s ) );
+    tr_bencDictAddBool( d, TR_PREFS_KEY_RPC_WHITELIST_ENABLED,            tr_sessionGetRPCWhitelistEnabled( s ) );
+    tr_bencDictAddBool( d, TR_PREFS_KEY_SCRAPE_PAUSED_TORRENTS,           s->scrapePausedTorrents );
+    tr_bencDictAddBool( d, TR_PREFS_KEY_SCRIPT_TORRENT_DONE_ENABLED,      tr_sessionIsTorrentDoneScriptEnabled( s ) );
+    tr_bencDictAddStr ( d, TR_PREFS_KEY_SCRIPT_TORRENT_DONE_FILENAME,     tr_sessionGetTorrentDoneScript( s ) );
+    tr_bencDictAddInt ( d, TR_PREFS_KEY_SEED_QUEUE_SIZE,                  tr_sessionGetQueueSize( s, TR_UP ) );
+    tr_bencDictAddBool( d, TR_PREFS_KEY_SEED_QUEUE_ENABLED,               tr_sessionGetQueueEnabled( s, TR_UP ) );
+    tr_bencDictAddBool( d, TR_PREFS_KEY_ALT_SPEED_ENABLED,                tr_sessionUsesAltSpeed( s ) );
+    tr_bencDictAddInt ( d, TR_PREFS_KEY_ALT_SPEED_UP_KBps,                tr_sessionGetAltSpeed_KBps( s, TR_UP ) );
+    tr_bencDictAddInt ( d, TR_PREFS_KEY_ALT_SPEED_DOWN_KBps,              tr_sessionGetAltSpeed_KBps( s, TR_DOWN ) );
+    tr_bencDictAddInt ( d, TR_PREFS_KEY_ALT_SPEED_TIME_BEGIN,             tr_sessionGetAltSpeedBegin( s ) );
+    tr_bencDictAddBool( d, TR_PREFS_KEY_ALT_SPEED_TIME_ENABLED,           tr_sessionUsesAltSpeedTime( s ) );
+    tr_bencDictAddInt ( d, TR_PREFS_KEY_ALT_SPEED_TIME_END,               tr_sessionGetAltSpeedEnd( s ) );
+    tr_bencDictAddInt ( d, TR_PREFS_KEY_ALT_SPEED_TIME_DAY,               tr_sessionGetAltSpeedDay( s ) );
+    tr_bencDictAddInt ( d, TR_PREFS_KEY_USPEED_KBps,                      tr_sessionGetSpeedLimit_KBps( s, TR_UP ) );
+    tr_bencDictAddBool( d, TR_PREFS_KEY_USPEED_ENABLED,                   tr_sessionIsSpeedLimited( s, TR_UP ) );
+    tr_bencDictAddInt ( d, TR_PREFS_KEY_UMASK,                            s->umask );
+    tr_bencDictAddInt ( d, TR_PREFS_KEY_UPLOAD_SLOTS_PER_TORRENT,         s->uploadSlotsPerTorrent );
+    tr_bencDictAddStr ( d, TR_PREFS_KEY_BIND_ADDRESS_IPV4,                tr_address_to_string( &s->public_ipv4->addr ) );
+    tr_bencDictAddStr ( d, TR_PREFS_KEY_BIND_ADDRESS_IPV6,                tr_address_to_string( &s->public_ipv6->addr ) );
+    tr_bencDictAddBool( d, TR_PREFS_KEY_START,                            !tr_sessionGetPaused( s ) );
+    tr_bencDictAddBool( d, TR_PREFS_KEY_TRASH_ORIGINAL,                   tr_sessionGetDeleteSource( s ) );
 }
 
 bool
@@ -778,6 +788,18 @@ sessionSetImpl( void * vdata )
         tr_sessionSetPaused( session, !boolVal );
     if( tr_bencDictFindBool( settings, TR_PREFS_KEY_TRASH_ORIGINAL, &boolVal) )
         tr_sessionSetDeleteSource( session, boolVal );
+
+    /* torrent queues */
+    if( tr_bencDictFindInt( settings, TR_PREFS_KEY_QUEUE_STALLED_MINUTES, &i ) )
+        tr_sessionSetQueueStalledMinutes( session, i );
+    if( tr_bencDictFindInt( settings, TR_PREFS_KEY_DOWNLOAD_QUEUE_SIZE, &i ) )
+        tr_sessionSetQueueSize( session, TR_DOWN, i );
+    if( tr_bencDictFindBool( settings, TR_PREFS_KEY_DOWNLOAD_QUEUE_ENABLED, &boolVal ) )
+        tr_sessionSetQueueEnabled( session, TR_DOWN, boolVal );
+    if( tr_bencDictFindInt( settings, TR_PREFS_KEY_SEED_QUEUE_SIZE, &i ) )
+        tr_sessionSetQueueSize( session, TR_UP, i );
+    if( tr_bencDictFindBool( settings, TR_PREFS_KEY_SEED_QUEUE_ENABLED, &boolVal ) )
+        tr_sessionSetQueueEnabled( session, TR_UP, boolVal );
 
     /* files and directories */
     if( tr_bencDictFindBool( settings, TR_PREFS_KEY_PREFETCH_ENABLED, &boolVal ) )
@@ -2599,4 +2621,110 @@ tr_sessionSetTorrentDoneScript( tr_session * session, const char * scriptFilenam
         tr_free( session->torrentDoneScript );
         session->torrentDoneScript = tr_strdup( scriptFilename );
     }
+}
+
+/***
+****
+***/
+
+void
+tr_sessionSetQueueSize( tr_session * session, tr_direction dir, int n )
+{
+    assert( tr_isSession( session ) );
+    assert( tr_isDirection( dir ) );
+
+    session->queueSize[dir] = n;
+}
+
+int
+tr_sessionGetQueueSize( const tr_session * session, tr_direction dir )
+{
+    assert( tr_isSession( session ) );
+    assert( tr_isDirection( dir ) );
+
+    return session->queueSize[dir];
+}
+
+void
+tr_sessionSetQueueEnabled( tr_session * session, tr_direction dir, bool is_enabled )
+{
+    assert( tr_isSession( session ) );
+    assert( tr_isDirection( dir ) );
+    assert( tr_isBool( is_enabled ) );
+
+    session->queueEnabled[dir] = is_enabled;
+}
+
+bool
+tr_sessionGetQueueEnabled( const tr_session * session, tr_direction dir )
+{
+    assert( tr_isSession( session ) );
+    assert( tr_isDirection( dir ) );
+
+    return session->queueEnabled[dir];
+}
+
+void
+tr_sessionSetQueueStalledMinutes( tr_session * session, int minutes )
+{
+    assert( tr_isSession( session ) );
+    assert( minutes > 0 );
+
+    session->queueStalledMinutes = minutes;
+   
+}
+
+int
+tr_sessionGetQueueStalledMinutes( const tr_session * session )
+{
+    assert( tr_isSession( session ) );
+
+    return session->queueStalledMinutes;
+}
+
+tr_torrent *
+tr_sessionGetNextQueuedTorrent( tr_session * session, tr_direction direction )
+{
+    tr_torrent * tor = NULL;
+    tr_torrent * best_tor = NULL;
+    int best_position = INT_MAX;
+
+    assert( tr_isSession( session ) );
+    assert( tr_isDirection( direction ) );
+
+    while(( tor = tr_torrentNext( session, tor ))) {
+        if( !tor->isRunning && ( direction == tr_torrentGetQueueDirection( tor ) ) ) { 
+            const int position = tr_torrentGetQueuePosition( tor );
+            if( ( position >= 0 ) && ( best_position > position ) ) {
+                best_position = position;
+                best_tor = tor;
+            }
+        }
+    }
+
+    return best_tor;
+}
+
+int
+tr_sessionCountQueueFreeSlots( tr_session * session, tr_direction dir )
+{
+    tr_torrent * tor;
+    int active_count;
+    const int max = tr_sessionGetQueueSize( session, dir );
+    const tr_torrent_activity activity = TR_UP ? TR_STATUS_SEED : TR_STATUS_DOWNLOAD;
+
+    if( !tr_sessionGetQueueEnabled( session, dir ) )
+        return INT_MAX;
+
+    tor = NULL;
+    active_count = 0;
+    while(( tor = tr_torrentNext( session, tor )))
+        if( !tr_torrentIsStalled( tor ) )
+            if( tr_torrentGetActivity( tor ) == activity )
+                ++active_count;
+
+    if( active_count >= max )
+        return 0;
+
+    return max - active_count;
 }

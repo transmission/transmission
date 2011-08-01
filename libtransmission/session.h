@@ -111,6 +111,10 @@ struct tr_session
 
     tr_benc                      removedTorrents;
 
+    bool                         queueEnabled[2];
+    int                          queueSize[2];
+    int                          queueStalledMinutes;
+
     int                          umask;
 
     int                          speedLimit_Bps[2];
@@ -307,5 +311,11 @@ void tr_sessionSetAltSpeed_Bps  ( tr_session *, tr_direction, int Bps );
 bool  tr_sessionGetActiveSpeedLimit_Bps( const tr_session  * session,
                                          tr_direction        dir,
                                          int               * setme );
+
+tr_torrent * tr_sessionGetNextQueuedSeed( tr_session * session );
+tr_torrent * tr_sessionGetNextQueuedTorrent( tr_session * session, tr_direction );
+
+int tr_sessionCountQueueFreeSlots( tr_session * session, tr_direction );
+
 
 #endif

@@ -247,6 +247,7 @@ core_init( GTypeInstance * instance, gpointer g_class UNUSED )
                       G_TYPE_INT,       /* tr_stat.activity */
                       G_TYPE_UCHAR,     /* tr_stat.finished */
                       G_TYPE_CHAR,      /* tr_priority_t */
+                      G_TYPE_INT,       /* tr_stat.queuePosition */
                       G_TYPE_UINT,      /* build_torrent_trackers_hash() */
                       G_TYPE_INT,       /* MC_ERROR */
                       G_TYPE_INT };     /* MC_ACTIVE_PEER_COUNT */
@@ -458,6 +459,15 @@ compare_by_name( GtkTreeModel * m, GtkTreeIter * a, GtkTreeIter * b, gpointer us
 }
 
 static int
+compare_by_queue( const tr_stat * a, const tr_stat * b )
+{
+    const bool a_is_queued = a->queuePosition >= 0;
+    const bool b_is_queued = b->queuePosition >= 0;
+    if( a_is_queued != b_is_queued ) return a_is_queued ? -1 : 1;
+    return b->queuePosition - a->queuePosition;
+}
+
+static int
 compare_by_ratio( GtkTreeModel* m, GtkTreeIter * a, GtkTreeIter * b, gpointer user_data )
 {
     int ret = 0;
@@ -470,6 +480,7 @@ compare_by_ratio( GtkTreeModel* m, GtkTreeIter * a, GtkTreeIter * b, gpointer us
     sb = tr_torrentStatCached( tb );
 
     if( !ret ) ret = compare_ratio( sa->ratio, sb->ratio );
+    if( !ret ) ret = compare_by_queue( sa, sb );
     if( !ret ) ret = compare_by_name( m, a, b, user_data );
     return ret;
 }
@@ -495,6 +506,7 @@ compare_by_activity( GtkTreeModel * m, GtkTreeIter * a, GtkTreeIter * b, gpointe
 
     if( !ret ) ret = compare_double( aUp+aDown, bUp+bDown );
     if( !ret ) ret = compare_uint64( sa->uploadedEver, sb->uploadedEver );
+    if( !ret ) ret = compare_by_queue( sa, sb );
     if( !ret ) ret = compare_by_name( m, a, b, user_data );
     return ret;
 }
@@ -569,11 +581,13 @@ compare_by_state( GtkTreeModel * m, GtkTreeIter * a, GtkTreeIter * b, gpointer u
 {
     int ret = 0;
     int sa, sb;
+    tr_torrent *ta, *tb;
 
-    gtk_tree_model_get( m, a, MC_ACTIVITY, &sa, -1 );
-    gtk_tree_model_get( m, b, MC_ACTIVITY, &sb, -1 );
+    gtk_tree_model_get( m, a, MC_ACTIVITY, &sa, MC_TORRENT, &ta, -1 );
+    gtk_tree_model_get( m, b, MC_ACTIVITY, &sb, MC_TORRENT, &tb, -1 );
 
     if( !ret ) ret = compare_int( sa, sb );
+    if( !ret ) ret = compare_by_queue( tr_torrentStatCached( ta ), tr_torrentStatCached( tb ) );
     if( !ret ) ret = compare_by_progress( m, a, b, u );
     return ret;
 }
@@ -1026,6 +1040,7 @@ gtr_core_add_torrent( TrCore * core, tr_torrent * tor, gboolean do_notify )
             MC_ACTIVITY,          st->activity,
             MC_FINISHED,          st->finished,
             MC_PRIORITY,          tr_torrentGetPriority( tor ),
+            MC_QUEUE_POSITION,    st->queuePosition,
             MC_TRACKERS,          trackers_hash,
             -1 );
 
@@ -1412,6 +1427,7 @@ update_foreach( GtkTreeModel * model, GtkTreeIter * iter )
     int oldActivePeerCount, newActivePeerCount;
     int oldError, newError;
     bool oldFinished, newFinished;
+    int oldQueuePosition, newQueuePosition;
     tr_priority_t oldPriority, newPriority;
     unsigned int oldTrackers, newTrackers;
     double oldUpSpeed, newUpSpeed;
@@ -1430,6 +1446,7 @@ update_foreach( GtkTreeModel * model, GtkTreeIter * iter )
                         MC_ACTIVITY, &oldActivity,
                         MC_FINISHED, &oldFinished,
                         MC_PRIORITY, &oldPriority,
+                        MC_QUEUE_POSITION, &oldQueuePosition,
                         MC_TRACKERS, &oldTrackers,
                         MC_SPEED_UP, &oldUpSpeed,
                         MC_RECHECK_PROGRESS, &oldRecheckProgress,
@@ -1442,6 +1459,7 @@ update_foreach( GtkTreeModel * model, GtkTreeIter * iter )
     newActivity = st->activity;
     newFinished = st->finished;
     newPriority = tr_torrentGetPriority( tor );
+    newQueuePosition = st->queuePosition;
     newTrackers = build_torrent_trackers_hash( tor );
     newUpSpeed = st->pieceUploadSpeed_KBps;
     newDownSpeed = st->pieceDownloadSpeed_KBps;
@@ -1455,6 +1473,7 @@ update_foreach( GtkTreeModel * model, GtkTreeIter * iter )
         || ( newActivity  != oldActivity )
         || ( newFinished != oldFinished )
         || ( newPriority != oldPriority )
+        || ( newQueuePosition != oldQueuePosition )
         || ( newError != oldError )
         || ( newActivePeerCount != oldActivePeerCount )
         || ( newTrackers != oldTrackers )
@@ -1469,6 +1488,7 @@ update_foreach( GtkTreeModel * model, GtkTreeIter * iter )
                             MC_ACTIVITY, newActivity,
                             MC_FINISHED, newFinished,
                             MC_PRIORITY, newPriority,
+                            MC_QUEUE_POSITION, newQueuePosition,
                             MC_TRACKERS, newTrackers,
                             MC_SPEED_UP, newUpSpeed,
                             MC_SPEED_DOWN, newDownSpeed,

@@ -51,7 +51,7 @@
      <x>0</x>
      <y>0</y>
      <width>792</width>
-     <height>23</height>
+     <height>25</height>
     </rect>
    </property>
    <property name="sizePolicy">
@@ -64,17 +64,28 @@
     <property name="title">
      <string>&amp;Torrent</string>
     </property>
+    <widget class="QMenu" name="menuQueue">
+     <property name="title">
+      <string>Queue</string>
+     </property>
+     <addaction name="action_QueueMoveTop"/>
+     <addaction name="action_QueueMoveUp"/>
+     <addaction name="action_QueueMoveDown"/>
+     <addaction name="action_QueueMoveBottom"/>
+    </widget>
     <addaction name="separator"/>
     <addaction name="action_Properties"/>
     <addaction name="action_OpenFolder"/>
     <addaction name="separator"/>
     <addaction name="action_Start"/>
+    <addaction name="action_StartNow"/>
+    <addaction name="menuQueue"/>
     <addaction name="action_Announce"/>
     <addaction name="action_Pause"/>
-    <addaction name="action_CopyMagnetToClipboard"/>
     <addaction name="separator"/>
     <addaction name="action_SetLocation"/>
     <addaction name="action_Verify"/>
+    <addaction name="action_CopyMagnetToClipboard"/>
     <addaction name="separator"/>
     <addaction name="action_Remove"/>
     <addaction name="action_Delete"/>
@@ -585,6 +596,40 @@
   <action name="action_Donate">
    <property name="text">
     <string>&amp;Donate</string>
+   </property>
+  </action>
+  <action name="action_StartNow">
+   <property name="text">
+    <string>Start &amp;Now</string>
+   </property>
+   <property name="toolTip">
+    <string>Bypass the queue and start now</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+S</string>
+   </property>
+   <property name="priority">
+    <enum>QAction::LowPriority</enum>
+   </property>
+  </action>
+  <action name="action_QueueMoveTop">
+   <property name="text">
+    <string>Move to &amp;Top</string>
+   </property>
+  </action>
+  <action name="action_QueueMoveUp">
+   <property name="text">
+    <string>Move &amp;Up</string>
+   </property>
+  </action>
+  <action name="action_QueueMoveDown">
+   <property name="text">
+    <string>Move &amp;Down</string>
+   </property>
+  </action>
+  <action name="action_QueueMoveBottom">
+   <property name="text">
+    <string>Move to &amp;Bottom</string>
    </property>
   </action>
  </widget>

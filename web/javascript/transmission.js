@@ -100,6 +100,7 @@ Transmission.prototype =
 		this._toolbar_remove_button    = $('li#remove')[0];
 		this._context_pause_button     = $('li#context_pause_selected')[0];
 		this._context_start_button     = $('li#context_resume_selected')[0];
+		this._context_start_now_button = $('li#context_resume_now_selected')[0];
 
 		var ti = '#torrent_inspector_';
 		this._inspector = { };
@@ -281,7 +282,10 @@ Transmission.prototype =
 		this.stopSelectedTorrents( );
 	},
 	contextStartSelected: function( ) {
-		this.startSelectedTorrents( );
+		this.startSelectedTorrents( false );
+	},
+	contextStartNowSelected: function( ) {
+		this.startSelectedTorrents( true );
 	},
 	contextRemoveSelected: function( ) {
 		this.removeSelectedTorrents( );
@@ -311,15 +315,16 @@ Transmission.prototype =
 	createContextMenu: function() {
 		var tr = this;
 		var bindings = {
-			context_pause_selected:    function(e){ tr.contextStopSelected(e); },
-			context_resume_selected:   function(e){ tr.contextStartSelected(e); },
-			context_remove:            function(e){ tr.contextRemoveSelected(e); },
-			context_removedata:        function(e){ tr.contextRemoveDataSelected(e); },
-			context_verify:            function(e){ tr.contextVerifySelected(e); },
-			context_reannounce:        function(e){ tr.contextReannounceSelected(e); },
-			context_toggle_inspector:  function(e){ tr.contextToggleInspector(e); },
-			context_select_all:        function(e){ tr.contextSelectAll(e); },
-			context_deselect_all:      function(e){ tr.contextDeselectAll(e); }
+			context_pause_selected:       function(e){ tr.contextStopSelected(e); },
+			context_resume_selected:      function(e){ tr.contextStartSelected(e); },
+			context_resume_now_selected:  function(e){ tr.contextStartNowSelected(e); },
+			context_remove:               function(e){ tr.contextRemoveSelected(e); },
+			context_removedata:           function(e){ tr.contextRemoveDataSelected(e); },
+			context_verify:               function(e){ tr.contextVerifySelected(e); },
+			context_reannounce:           function(e){ tr.contextReannounceSelected(e); },
+			context_toggle_inspector:     function(e){ tr.contextToggleInspector(e); },
+			context_select_all:           function(e){ tr.contextSelectAll(e); },
+			context_deselect_all:         function(e){ tr.contextDeselectAll(e); }
 		};
 
 		// Setup the context menu
@@ -618,7 +623,7 @@ Transmission.prototype =
 	startSelectedClicked: function( event ) {
 		var tr = this;
 		if( tr.isButtonEnabled( event ) ) {
-			tr.startSelectedTorrents( );
+			tr.startSelectedTorrents( false );
 			tr.hideiPhoneAddressbar( );
 		}
 	},
@@ -1994,19 +1999,19 @@ Transmission.prototype =
 		this.reannounceTorrents( this.getSelectedTorrents( ) );
 	},
 
-	startSelectedTorrents: function( ) {
-		this.startTorrents( this.getSelectedTorrents( ) );
+	startSelectedTorrents: function( force ) {
+		this.startTorrents( this.getSelectedTorrents( ), force );
 	},
 	startAllTorrents: function( ) {
-		this.startTorrents( this.getAllTorrents( ) );
+		this.startTorrents( this.getAllTorrents( ), false );
 	},
 	startTorrent: function( torrent ) {
-		this.startTorrents( [ torrent ] );
+		this.startTorrents( [ torrent ], false );
 	},
-	startTorrents: function( torrents ) {
+	startTorrents: function( torrents, force ) {
 		var torrent_ids = jQuery.map(torrents, function(t) { return t.id(); } );
 		var tr = this;
-		this.remote.startTorrents( torrent_ids, function(){ tr.refreshTorrents(torrent_ids) } );
+		this.remote.startTorrents( torrent_ids, force, function(){ tr.refreshTorrents(torrent_ids) } );
 	},
 	verifyTorrent: function( torrent ) {
 		this.verifyTorrents( [ torrent ] );
@@ -2137,6 +2142,7 @@ Transmission.prototype =
 			this.setEnabled( this._context_pause_button, haveActiveSelection );
 			this.setEnabled( this._toolbar_start_button, havePausedSelection );
 			this.setEnabled( this._context_start_button, havePausedSelection );
+			this.setEnabled( this._context_start_now_button, havePausedSelection );
 			this.setEnabled( this._toolbar_remove_button, haveSelection );
 			this.setEnabled( this._toolbar_pause_all_button, haveActive );
 			this.setEnabled( this._toolbar_start_all_button, havePaused );

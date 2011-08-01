@@ -222,6 +222,8 @@ struct tr_torrent
     int                        secondsDownloading;
     int                        secondsSeeding;
 
+    int                        queuePosition;
+
     tr_torrent_metadata_func  * metadata_func;
     void                      * metadata_func_user_data;
 
@@ -426,5 +428,18 @@ time_t tr_torrentGetFileMTime( const tr_torrent * tor, tr_file_index_t i );
 
 uint64_t tr_torrentGetCurrentSizeOnDisk( const tr_torrent * tor );
 
+bool tr_torrentIsStalled( const tr_torrent * tor );
+
+static inline bool
+tr_torrentIsQueued( const tr_torrent * tor )
+{
+    return tor->queuePosition >= 0;
+}
+
+static inline tr_direction
+tr_torrentGetQueueDirection( const tr_torrent * tor )
+{
+    return tr_torrentIsSeed( tor ) ? TR_UP : TR_DOWN;
+}
 
 #endif
