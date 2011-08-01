@@ -88,16 +88,16 @@ TorrentFilter :: lessThan( const QModelIndex& left, const QModelIndex& right ) c
         case SortMode :: SORT_BY_SIZE:
             if( !val ) val = compare( a->sizeWhenDone(), b->sizeWhenDone() );
             break;
-        case SortMode :: SORT_BY_ACTIVITY:
-            if( !val ) val = compare( a->downloadSpeed() + a->uploadSpeed(), b->downloadSpeed() + b->uploadSpeed() );
-            if( !val ) val = compare( a->uploadedEver(), b->uploadedEver() );
-            break;
         case SortMode :: SORT_BY_AGE:
             val = compare( a->dateAdded().toTime_t(), b->dateAdded().toTime_t() );
             break;
         case SortMode :: SORT_BY_ID:
             if( !val ) val = compare( a->id(), b->id() );
             break;
+        case SortMode :: SORT_BY_ACTIVITY:
+            if( !val ) val = compare( a->downloadSpeed() + a->uploadSpeed(), b->downloadSpeed() + b->uploadSpeed() );
+            if( !val ) val = compare( a->uploadedEver(), b->uploadedEver() );
+            // fall through
         case SortMode :: SORT_BY_STATE:
             if( !val ) val = compare( a->hasError(), b->hasError() );
             if( !val ) val = compare( a->getActivity(), b->getActivity() );
