@@ -164,6 +164,7 @@
    id                          | number                      | tr_torrent
    isFinished                  | boolean                     | tr_stat
    isPrivate                   | boolean                     | tr_torrent
+   isStalled                   | boolean                     | tr_stat
    leftUntilDone               | number                      | tr_stat
    magnetLink                  | number                      | n/a
    manualAnnounceTime          | number                      | tr_stat
@@ -690,6 +691,7 @@
    ------+---------+-----------+----------------+-------------------------------
    14    | 2.40    |        NO | torrent-get    | values of "status" field changed
          |         | yes       | torrent-get    | new arg "queuePosition"
+         |         | yes       | torrent-get    | new arg "isStalled"
          |         | yes       | torrent-set    | new arg "queuePosition"
          |         | yes       | session-set    | new arg "download-queue-size"
          |         | yes       | session-set    | new arg "download-queue-enabled"

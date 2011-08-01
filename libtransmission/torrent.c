@@ -1183,6 +1183,7 @@ tr_torrentStat( tr_torrent * tor )
     s->activity = tr_torrentGetActivity( tor );
     s->error = tor->error;
     s->queuePosition = tor->queuePosition;
+    s->isStalled = tr_torrentIsStalled( tor );
     tr_strlcpy( s->errorString, tor->errorString, sizeof( s->errorString ) );
 
     s->manualAnnounceTime = tr_announcerNextManualAnnounce( tor );

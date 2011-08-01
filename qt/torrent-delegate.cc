@@ -178,6 +178,8 @@ TorrentDelegate :: shortTransferString( const Torrent& tor ) const
         str = tr( "%1 %2" ).arg(downArrow).arg(downStr);
     else if( haveUp )
         str = tr( "%1 %2" ).arg(upArrow).arg(upStr);
+    else if( tor.isStalled( ) )
+        str = tr( "Stalled" );
     else if( tor.hasMetadata( ) )
         str = tr( "Idle" );
 

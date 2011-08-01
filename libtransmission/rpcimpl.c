@@ -609,6 +609,8 @@ addField( const tr_torrent * const tor,
         tr_bencDictAddBool( d, key, st->finished );
     else if( tr_streq( key, keylen, "isPrivate" ) )
         tr_bencDictAddBool( d, key, tr_torrentIsPrivate( tor ) );
+    else if( tr_streq( key, keylen, "isStalled" ) )
+        tr_bencDictAddBool( d, key, st->isStalled );
     else if( tr_streq( key, keylen, "leftUntilDone" ) )
         tr_bencDictAddInt( d, key, st->leftUntilDone );
     else if( tr_streq( key, keylen, "manualAnnounceTime" ) )

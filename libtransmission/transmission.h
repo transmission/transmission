@@ -2000,6 +2000,10 @@ typedef struct tr_stat
     /** The position of this torrent in the download queue.
         This will be >= 0 if the torrent is queued; -1 otherwise. */
     int queuePosition;
+
+    /** True if the torrent is running, but has been idle for long enough
+        to be considered stalled.  @see tr_sessionGetQueueStalledMinutes() */
+    bool isStalled;
 }
 tr_stat;
 

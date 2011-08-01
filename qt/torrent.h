@@ -166,6 +166,7 @@ class Torrent: public QObject
             HASH_STRING,
             IS_FINISHED,
             IS_PRIVATE,
+            IS_STALLED,
             COMMENT,
             CREATOR,
             MANUAL_ANNOUNCE_TIME,
@@ -308,6 +309,7 @@ class Torrent: public QObject
         const FileList& files( ) const { return myFiles; }
         int queuePosition( ) const { return getInt( QUEUE_POSITION ); }
         bool isQueued( ) const { return queuePosition( ) >= 0; }
+        bool isStalled( ) const { return getBool( IS_STALLED ); }
 
     public:
         QString activityString( ) const;

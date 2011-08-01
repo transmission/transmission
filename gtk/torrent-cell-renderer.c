@@ -191,8 +191,9 @@ getShortTransferString( const tr_torrent  * tor,
         /* bandwidth speed + unicode arrow */
         g_snprintf( buf, buflen, _( "%1$s %2$s" ),
                     gtr_get_unicode_string( GTR_UNICODE_UP ), upStr );
+    else if( st->isStalled )
+        g_strlcpy( buf, _( "Stalled" ), buflen );
     else if( haveMeta )
-        /* the torrent isn't uploading or downloading */
         g_strlcpy( buf, _( "Idle" ), buflen );
     else
         *buf = '\0';

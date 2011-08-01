@@ -102,13 +102,14 @@ Torrent :: myProperties[] =
     { HASH_STRING, "hashString", QVariant::String, INFO },
     { IS_FINISHED, "isFinished", QVariant::Bool, STAT },
     { IS_PRIVATE, "isPrivate", QVariant::Bool, INFO },
+    { IS_STALLED, "isStalled", QVariant::Bool, STAT },
     { COMMENT, "comment", QVariant::String, INFO },
     { CREATOR, "creator", QVariant::String, INFO },
     { MANUAL_ANNOUNCE_TIME, "manualAnnounceTime", QVariant::DateTime, STAT_EXTRA },
     { PEERS, "peers", TrTypes::PeerList, STAT_EXTRA },
     { TORRENT_FILE, "torrentFile", QVariant::String, STAT_EXTRA },
     { BANDWIDTH_PRIORITY, "bandwidthPriority", QVariant::Int, STAT_EXTRA },
-    { QUEUE_POSITION, "queuePosition", QVariant::Int, STAT }
+    { QUEUE_POSITION, "queuePosition", QVariant::Int, STAT },
 };
 
 Torrent :: KeyList
