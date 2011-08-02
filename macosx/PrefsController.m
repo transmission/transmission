@@ -762,24 +762,38 @@ tr_session * fHandle;
 
 - (void) setQueue: (id) sender
 {
+    //let's just do both - easier that way
+    tr_sessionSetQueueEnabled(fHandle, TR_DOWN, [fDefaults boolForKey: @"Queue"]);
+    tr_sessionSetQueueEnabled(fHandle, TR_UP, [fDefaults boolForKey: @"QueueSeed"]);
+    
     [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateQueue" object: self];
 }
 
 - (void) setQueueNumber: (id) sender
 {
-    [fDefaults setInteger: [sender intValue] forKey: sender == fQueueDownloadField ? @"QueueDownloadNumber" : @"QueueSeedNumber"];
-    [self setQueue: nil];
+    const NSInteger number = [sender intValue];
+    const BOOL seed = sender == fQueueSeedField;
+    
+    [fDefaults setInteger: number forKey: seed ? @"QueueSeedNumber" : @"QueueDownloadNumber"];
+    
+    tr_sessionSetQueueSize(fHandle, seed ? TR_UP : TR_DOWN, number);
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateQueue" object: self];
 }
 
 - (void) setStalled: (id) sender
 {
+#warning do something here
+    
     [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateQueue" object: self];
 }
 
 - (void) setStalledMinutes: (id) sender
 {
     [fDefaults setInteger: [sender intValue] forKey: @"StalledMinutes"];
-    [self setStalled: nil];
+    tr_sessionSetQueueStalledMinutes(fHandle, [fDefaults integerForKey: @"StalledMinutes"]);
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateQueue" object: self];
 }
 
 - (void) setDownloadLocation: (id) sender
@@ -1220,6 +1234,20 @@ tr_session * fHandle;
     
     const NSUInteger idleLimitMin = tr_sessionGetIdleLimit(fHandle);
     [fDefaults setInteger: idleLimitMin forKey: @"IdleLimitMinutes"];
+    
+    //queue
+    const BOOL downloadQueue = tr_sessionGetQueueEnabled(fHandle, TR_DOWN);
+    [fDefaults setBool: downloadQueue forKey: @"Queue"];
+    
+    const int downloadQueueNum = tr_sessionGetQueueSize(fHandle, TR_DOWN);
+    [fDefaults setInteger: downloadQueueNum forKey: @"QueueDownloadNumber"];
+    
+    const BOOL seedQueue = tr_sessionGetQueueEnabled(fHandle, TR_UP);
+    [fDefaults setBool: seedQueue forKey: @"QueueSeed"];
+    [fDefaults setBool: downloadQueue forKey: @"Queue"];
+    
+    const int seedQueueNum = tr_sessionGetQueueSize(fHandle, TR_UP);
+    [fDefaults setInteger: seedQueueNum forKey: @"QueueSeedNumber"];
     
     //done script
     const BOOL doneScriptEnabled = tr_sessionIsTorrentDoneScriptEnabled(fHandle);

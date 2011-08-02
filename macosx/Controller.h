@@ -185,7 +185,6 @@ typedef enum
 - (void) setBottomCountText: (BOOL) filtering;
 
 - (void) updateTorrentsInQueue;
-- (NSUInteger) numToStartFromQueue: (BOOL) downloadQueue;
 
 - (void) torrentFinishedDownloading: (NSNotification *) notification;
 - (void) torrentRestartedDownloading: (NSNotification *) notification;

@@ -199,8 +199,10 @@
 
 - (void) confirmAdd
 {
-    [fTorrent setWaitToStart: [fStartCheck state] == NSOnState];
     [fTorrent setGroupValue: fGroupValue];
+    
+    if ([fStartCheck state] == NSOnState)
+        [fTorrent startTransfer];
     
     [self close];
     [fController askOpenMagnetConfirmed: self add: YES]; //ensure last, since it releases this controller

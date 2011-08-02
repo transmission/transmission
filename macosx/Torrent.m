@@ -37,7 +37,6 @@
 
 - (id) initWithPath: (NSString *) path hash: (NSString *) hashString torrentStruct: (tr_torrent *) torrentStruct
         magnetAddress: (NSString *) magnetAddress lib: (tr_session *) lib
-        waitToStart: (NSNumber *) waitToStart
         groupValue: (NSNumber *) groupValue
         timeMachineExcludeLocation: (NSString *) timeMachineExclude
         downloadFolder: (NSString *) downloadFolder
@@ -103,7 +102,7 @@ int trashDataFile(const char * filename)
         lib: (tr_session *) lib
 {
     self = [self initWithPath: path hash: nil torrentStruct: NULL magnetAddress: nil lib: lib
-            waitToStart: nil groupValue: nil
+            groupValue: nil
             timeMachineExcludeLocation: nil
             downloadFolder: location
             legacyIncompleteFolder: nil];
@@ -119,7 +118,7 @@ int trashDataFile(const char * filename)
 - (id) initWithTorrentStruct: (tr_torrent *) torrentStruct location: (NSString *) location lib: (tr_session *) lib
 {
     self = [self initWithPath: nil hash: nil torrentStruct: torrentStruct magnetAddress: nil lib: lib
-            waitToStart: nil groupValue: nil
+            groupValue: nil
             timeMachineExcludeLocation: nil
             downloadFolder: location
             legacyIncompleteFolder: nil];
@@ -130,7 +129,7 @@ int trashDataFile(const char * filename)
 - (id) initWithMagnetAddress: (NSString *) address location: (NSString *) location lib: (tr_session *) lib
 {
     self = [self initWithPath: nil hash: nil torrentStruct: nil magnetAddress: address
-            lib: lib waitToStart: nil groupValue: nil
+            lib: lib groupValue: nil
             timeMachineExcludeLocation: nil
             downloadFolder: location legacyIncompleteFolder: nil];
     
@@ -144,7 +143,6 @@ int trashDataFile(const char * filename)
                 torrentStruct: NULL
                 magnetAddress: nil
                 lib: lib
-                waitToStart: [history objectForKey: @"WaitToStart"]
                 groupValue: [history objectForKey: @"GroupValue"]
                 timeMachineExcludeLocation: [history objectForKey: @"TimeMachineExcludeLocation"]
                 downloadFolder: [history objectForKey: @"DownloadFolder"] //upgrading from versions < 1.80
@@ -158,8 +156,11 @@ int trashDataFile(const char * filename)
         if (!pause && (active = [history objectForKey: @"Active"]) && [active boolValue])
         {
             fStat = tr_torrentStat(fHandle);
-            [self startTransfer];
+            [self startTransferNoQueue];
         }
+        
+        //fWaitToStart = waitToStart && [waitToStart boolValue];
+        
         
         //upgrading from versions < 1.30: get old added, activity, and done dates
         NSDate * date;
@@ -194,7 +195,7 @@ int trashDataFile(const char * filename)
                                         [self torrentLocation], @"InternalTorrentPath",
                                         [self hashString], @"TorrentHash",
                                         [NSNumber numberWithBool: [self isActive]], @"Active",
-                                        [NSNumber numberWithBool: fWaitToStart], @"WaitToStart",
+                                        [NSNumber numberWithBool: [self waitingToStart]], @"WaitToStart",
                                         [NSNumber numberWithInt: fGroupValue], @"GroupValue", nil];
     
     if (fTimeMachineExclude)
@@ -289,37 +290,30 @@ int trashDataFile(const char * filename)
 
 - (void) update
 {
-    //get previous status values before update
-    BOOL wasChecking = NO, wasError = NO, wasStalled = NO;
-    if (fStat != NULL)
-    {
-        wasChecking = [self isChecking];
-        wasError = [self isError];
-        wasStalled = fStalled;
-    }
-    
     fStat = tr_torrentStat(fHandle);
-    
-    //check if stalled (stored because based on time and needs to check if it was previously stalled)
-    fStalled = [self isActive] && [fDefaults boolForKey: @"CheckStalled"]
-                && [self stalledMinutes] > [fDefaults integerForKey: @"StalledMinutes"];
-    
-    //update queue for checking (from downloading to seeding), stalled, or error
-    if ((wasChecking && ![self isChecking]) || (wasStalled != fStalled) || (!wasError && [self isError] && [self isActive]))
-        [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateQueue" object: self];
     
     //when the data first appears, update time machine exclusion
     if (!fTimeMachineExclude)
         [self updateTimeMachineExclude];
 }
 
-- (void) startTransfer
+- (void) startTransferNoQueue
 {
-    fWaitToStart = NO;
-    
     if (![self isActive] && [self alertForRemainingDiskSpace])
     {
-        tr_ninf( fInfo->name, "restarting via startTransfer" );
+        tr_torrentStartNow(fHandle);
+        [self update];
+        
+        //capture, specifically, stop-seeding settings changing to unlimited
+        [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateOptions" object: nil];
+    }
+}
+
+#warning merge
+- (void) startTransfer
+{
+    if (![self isActive] && ![self waitingToStart] && [self alertForRemainingDiskSpace])
+    {
         tr_torrentStart(fHandle);
         [self update];
         
@@ -330,13 +324,12 @@ int trashDataFile(const char * filename)
 
 - (void) stopTransfer
 {
-    fWaitToStart = NO;
-    
-    if ([self isActive])
+    if ([self isActive] || [self waitingToStart])
     {
         tr_torrentStop(fHandle);
         [self update];
         
+        #warning still needed?
         [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateQueue" object: self];
     }
 }
@@ -354,6 +347,11 @@ int trashDataFile(const char * filename)
         tr_ninf( fInfo->name, "restarting because of wakeUp" );
         tr_torrentStart(fHandle);
     }
+}
+
+- (void) setQueueIndex: (NSUInteger) index
+{
+    tr_torrentSetQueuePosition(fHandle, index);
 }
 
 - (void) manualAnnounce
@@ -475,15 +473,9 @@ int trashDataFile(const char * filename)
 {
     return tr_torrentGetPeerLimit(fHandle);
 }
-
-- (void) setWaitToStart: (BOOL) wait
-{
-    fWaitToStart = wait;
-}
-
 - (BOOL) waitingToStart
 {
-    return fWaitToStart;
+    return fStat->activity == TR_STATUS_DOWNLOAD_WAIT || fStat->activity == TR_STATUS_SEED_WAIT;
 }
 
 - (tr_priority_t) priority
@@ -622,6 +614,8 @@ int trashDataFile(const char * filename)
 
 - (NSString *) name
 {
+#warning remove
+    //return [NSString stringWithFormat: @"%d  %@", fStat->queuePosition, [NSString stringWithUTF8String: fInfo->name]];
     return fInfo->name != NULL ? [NSString stringWithUTF8String: fInfo->name] : fHashString;
 }
 
@@ -840,7 +834,7 @@ int trashDataFile(const char * filename)
 
 - (BOOL) isActive
 {
-    return fStat->activity != TR_STATUS_STOPPED;
+    return fStat->activity != TR_STATUS_STOPPED && fStat->activity != TR_STATUS_DOWNLOAD_WAIT && fStat->activity != TR_STATUS_SEED_WAIT;
 }
 
 - (BOOL) isSeeding
@@ -1050,18 +1044,20 @@ int trashDataFile(const char * filename)
         switch (fStat->activity)
         {
             case TR_STATUS_STOPPED:
-                if (fWaitToStart)
-                {
-                    string = ![self allDownloaded]
-                            ? [NSLocalizedString(@"Waiting to download", "Torrent -> status string") stringByAppendingEllipsis]
-                            : [NSLocalizedString(@"Waiting to seed", "Torrent -> status string") stringByAppendingEllipsis];
-                }
-                else if ([self isFinishedSeeding])
+                if ([self isFinishedSeeding])
                     string = NSLocalizedString(@"Seeding complete", "Torrent -> status string");
                 else
                     string = NSLocalizedString(@"Paused", "Torrent -> status string");
                 break;
-
+            
+            case TR_STATUS_DOWNLOAD_WAIT:
+                string = [NSLocalizedString(@"Waiting to download", "Torrent -> status string") stringByAppendingEllipsis];
+                break;
+                
+            case TR_STATUS_SEED_WAIT:
+                string = [NSLocalizedString(@"Waiting to seed", "Torrent -> status string") stringByAppendingEllipsis];
+                break;
+            
             case TR_STATUS_CHECK_WAIT:
                 string = [NSLocalizedString(@"Waiting to check existing data", "Torrent -> status string") stringByAppendingEllipsis];
                 break;
@@ -1104,7 +1100,7 @@ int trashDataFile(const char * filename)
                                                     [self peersGettingFromUs]];
         }
         
-        if (fStalled)
+        if ([self isStalled])
             string = [NSLocalizedString(@"Stalled", "Torrent -> status string") stringByAppendingFormat: @", %@", string];
     }
     
@@ -1130,17 +1126,17 @@ int trashDataFile(const char * filename)
     switch (fStat->activity)
     {
         case TR_STATUS_STOPPED:
-            if (fWaitToStart)
-            {
-                string = ![self allDownloaded]
-                        ? [NSLocalizedString(@"Waiting to download", "Torrent -> status string") stringByAppendingEllipsis]
-                        : [NSLocalizedString(@"Waiting to seed", "Torrent -> status string") stringByAppendingEllipsis];
-            }
-            else if ([self isFinishedSeeding])
+            if ([self isFinishedSeeding])
                 string = NSLocalizedString(@"Seeding complete", "Torrent -> status string");
             else
                 string = NSLocalizedString(@"Paused", "Torrent -> status string");
             break;
+        
+        case TR_STATUS_DOWNLOAD_WAIT:
+            string = [NSLocalizedString(@"Waiting to download", "Torrent -> status string") stringByAppendingEllipsis];
+            
+        case TR_STATUS_SEED_WAIT:
+            string = [NSLocalizedString(@"Waiting to seed", "Torrent -> status string") stringByAppendingEllipsis];
 
         case TR_STATUS_CHECK_WAIT:
             string = [NSLocalizedString(@"Waiting to check existing data", "Torrent -> status string") stringByAppendingEllipsis];
@@ -1180,13 +1176,15 @@ int trashDataFile(const char * filename)
     switch (fStat->activity)
     {
         case TR_STATUS_STOPPED:
+        case TR_STATUS_DOWNLOAD_WAIT:
+        case TR_STATUS_SEED_WAIT:
         {
             NSString * string = NSLocalizedString(@"Paused", "Torrent -> status string");
             
             NSString * extra = nil;
-            if (fWaitToStart)
+            if ([self waitingToStart])
             {
-                extra = ![self allDownloaded]
+                extra = fStat->activity == TR_STATUS_DOWNLOAD_WAIT 
                         ? NSLocalizedString(@"Waiting to download", "Torrent -> status string")
                         : NSLocalizedString(@"Waiting to seed", "Torrent -> status string");
             }
@@ -1210,10 +1208,6 @@ int trashDataFile(const char * filename)
 
         case TR_STATUS_SEED:
             return NSLocalizedString(@"Seeding", "Torrent -> status string");
-        
-        default:
-            NSAssert1(NO, @"Unknown activity %d for state string", fStat->activity);
-            return nil;
     }
 }
 
@@ -1536,7 +1530,7 @@ int trashDataFile(const char * filename)
 
 - (BOOL) isStalled
 {
-    return fStalled;
+    return fStat->isStalled;
 }
 
 - (void) updateTimeMachineExclude
@@ -1567,7 +1561,7 @@ int trashDataFile(const char * filename)
 {
     if (![self isActive]) //paused
     {
-        if (fWaitToStart)
+        if ([self waitingToStart])
             return 1;
         else
             return 0;
@@ -1613,7 +1607,6 @@ int trashDataFile(const char * filename)
 
 - (id) initWithPath: (NSString *) path hash: (NSString *) hashString torrentStruct: (tr_torrent *) torrentStruct
         magnetAddress: (NSString *) magnetAddress lib: (tr_session *) lib
-        waitToStart: (NSNumber *) waitToStart
         groupValue: (NSNumber *) groupValue
         timeMachineExcludeLocation: (NSString *) timeMachineExclude
         downloadFolder: (NSString *) downloadFolder
@@ -1669,7 +1662,6 @@ int trashDataFile(const char * filename)
     
     fHashString = [[NSString alloc] initWithUTF8String: fInfo->hashString];
     
-    fWaitToStart = waitToStart && [waitToStart boolValue];
     fResumeOnWake = NO;
     
     //don't do after this point - it messes with auto-group functionality

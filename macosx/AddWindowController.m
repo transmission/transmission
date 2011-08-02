@@ -287,12 +287,13 @@
 {
     [fTimer invalidate];
     fTimer = nil;
-    
-    [fTorrent setWaitToStart: [fStartCheck state] == NSOnState];
     [fTorrent setGroupValue: fGroupValue];
     
     if (fTorrentFile && [fDeleteCheck state] == NSOnState)
         [Torrent trashFile: fTorrentFile];
+    
+    if ([fStartCheck state] == NSOnState)
+        [fTorrent startTransfer];
     
     [fFileController setTorrent: nil]; //avoid a crash when window tries to update
     
