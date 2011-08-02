@@ -1534,7 +1534,7 @@ freeTorrent( tr_torrent * tor )
 
     /* resequence the queue positions */
     t = NULL;
-    while(( t = tr_torrentNext( session, tor ))) {
+    while(( t = tr_torrentNext( session, t ))) {
         if( t->queuePosition > tor->queuePosition ) {
             t->queuePosition--;
             t->anyDate = now;
