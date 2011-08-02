@@ -252,7 +252,8 @@ Torrent.prototype =
 	isSeeding: function() { return this.state() == Torrent._StatusSeed; },
 	name: function() { return this._name; },
         queuePosition: function() { return this._queue_position; },
-        isQueued: function() { return this.queuePosition() >= 0; },
+        isQueued: function() { return ( this.state() == Torrent._StatusSeedWait )
+                                   || ( this.state() == Torrent._StatusDownloadWait ); },
 	webseedsSendingToUs: function() { return this._webseeds_sending_to_us; },
 	peersSendingToUs: function() { return this._peers_sending_to_us; },
 	peersGettingFromUs: function() { return this._peers_getting_from_us; },
@@ -272,9 +273,9 @@ Torrent.prototype =
 			case Torrent._StatusStopped:        return this.isFinished() ? 'Seeding complete' : 'Paused';
 			case Torrent._StatusCheckWait:      return 'Waiting to verify local data';
 			case Torrent._StatusCheck:          return 'Verifying local data';
-			case Torrent._StatusDownloadWait:   return 'Waiting to download #' + (this.queuePosition()+1);
+			case Torrent._StatusDownloadWait:   return 'Waiting to download';
 			case Torrent._StatusDownload:       return 'Downloading';
-			case Torrent._StatusSeedWait:       return 'Waiting to seed #' + (this.queuePosition()+1);
+			case Torrent._StatusSeedWait:       return 'Waiting to seed';
 			case Torrent._StatusSeed:           return 'Seeding';
 			default:                            return 'error';
 		}
@@ -770,17 +771,7 @@ Torrent.compareByName = function( a, b ) {
 /** Helper function for sortTorrents(). */
 Torrent.compareByQueue = function( a, b )
 {
-	var a_is_queued = a.isQueued( );
-	var b_is_queued = b.isQueued( );
-	if( a_is_queued != b_is_queued )
-		return a_is_queued ? -1 : 1;
-
-	var a_pos = a.queuePosition( );
-	var b_pos = b.queuePosition( );
-	if( a_pos != b_pos )
-		return a_pos - b_pos;
-
-	return Torrent.compareByName( a, b );
+	return a.queuePosition( ) - b.queuePosition();
 };
 
 /** Helper function for sortTorrents(). */
@@ -845,6 +836,9 @@ Torrent.sortTorrents = function( torrents, sortMethod, sortDirection )
 			break;
 		case Prefs._SortByAge:
 			torrents.sort( this.compareByAge );
+			break;
+		case Prefs._SortByQueue:
+			torrents.sort( this.compareByQueue );
 			break;
 		case Prefs._SortByProgress:
 			torrents.sort( this.compareByProgress );

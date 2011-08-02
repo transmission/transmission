@@ -2692,13 +2692,19 @@ tr_sessionGetNextQueuedTorrent( tr_session * session, tr_direction direction )
     assert( tr_isSession( session ) );
     assert( tr_isDirection( direction ) );
 
-    while(( tor = tr_torrentNext( session, tor ))) {
-        if( !tor->isRunning && ( direction == tr_torrentGetQueueDirection( tor ) ) ) { 
-            const int position = tr_torrentGetQueuePosition( tor );
-            if( ( position >= 0 ) && ( best_position > position ) ) {
-                best_position = position;
-                best_tor = tor;
-            }
+    while(( tor = tr_torrentNext( session, tor )))
+    {
+        int position;
+
+        if( !tr_torrentIsQueued( tor ) )
+            continue;
+        if( direction != tr_torrentGetQueueDirection( tor ) )
+            continue;
+
+        position = tr_torrentGetQueuePosition( tor );
+        if( best_position > position ) {
+            best_position = position;
+            best_tor = tor;
         }
     }
 
@@ -2711,7 +2717,7 @@ tr_sessionCountQueueFreeSlots( tr_session * session, tr_direction dir )
     tr_torrent * tor;
     int active_count;
     const int max = tr_sessionGetQueueSize( session, dir );
-    const tr_torrent_activity activity = TR_UP ? TR_STATUS_SEED : TR_STATUS_DOWNLOAD;
+    const tr_torrent_activity activity = dir == TR_UP ? TR_STATUS_SEED : TR_STATUS_DOWNLOAD;
 
     if( !tr_sessionGetQueueEnabled( session, dir ) )
         return INT_MAX;

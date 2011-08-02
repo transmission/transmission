@@ -50,6 +50,7 @@ static const char * fallback_ui_file =
     "      <menuitem action='sort-by-age'/>\n"
     "      <menuitem action='sort-by-name'/>\n"
     "      <menuitem action='sort-by-progress'/>\n"
+    "      <menuitem action='sort-by-queue'/>\n"
     "      <menuitem action='sort-by-ratio'/>\n"
     "      <menuitem action='sort-by-size'/>\n"
     "      <menuitem action='sort-by-state'/>\n"

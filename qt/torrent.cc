@@ -371,18 +371,6 @@ Torrent :: hasTrackerSubstring( const QString& substr ) const
 }
 
 int
-Torrent :: compareQueue( const Torrent& that ) const
-{
-    const bool a_is_queued = isQueued( );
-    const bool b_is_queued = that.isQueued( );
-
-    if( a_is_queued != b_is_queued )
-        return a_is_queued ? -1 : 1;
-
-    return that.queuePosition() - queuePosition();
-}
-
-int
 Torrent :: compareSeedRatio( const Torrent& that ) const
 {
     double a;
@@ -718,10 +706,10 @@ Torrent :: activityString( ) const
         case TR_STATUS_STOPPED:       str = isFinished() ? tr( "Finished" ): tr( "Paused" ); break;
         case TR_STATUS_CHECK_WAIT:    str = tr( "Waiting to verify local data" ); break;
         case TR_STATUS_CHECK:         str = tr( "Verifying local data" ); break;
-        case TR_STATUS_DOWNLOAD_WAIT: str = tr( "Download queue #%1" ).arg( queuePosition() + 1 ); break;
-        case TR_STATUS_DOWNLOAD:      str = tr( "Downloading" );
-        case TR_STATUS_SEED_WAIT:     str = tr( "Seed queue #%1" ).arg( queuePosition() + 1 ); break;
-        case TR_STATUS_SEED:          str = tr( "Seeding" ); break;
+        case TR_STATUS_DOWNLOAD_WAIT: str = tr( "Waiting to download" ); break;
+        case TR_STATUS_DOWNLOAD:      str = tr( "Downloading" ); break;
+        case TR_STATUS_SEED_WAIT:     str = tr( "Queued" ); break;
+        case TR_STATUS_SEED:          str = tr( "Waiting to seed" ); break;
     }
 
     return str;

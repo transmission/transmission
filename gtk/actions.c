@@ -49,11 +49,12 @@ static GtkRadioActionEntry sort_radio_entries[] =
     { "sort-by-activity",  NULL, N_( "Sort by _Activity" ),  NULL, NULL, 0 },
     { "sort-by-name",      NULL, N_( "Sort by _Name" ),      NULL, NULL, 1 },
     { "sort-by-progress",  NULL, N_( "Sort by _Progress" ),  NULL, NULL, 2 },
-    { "sort-by-ratio",     NULL, N_( "Sort by Rati_o" ),     NULL, NULL, 3 },
-    { "sort-by-state",     NULL, N_( "Sort by Stat_e" ),     NULL, NULL, 4 },
-    { "sort-by-age",       NULL, N_( "Sort by A_ge" ),       NULL, NULL, 5 },
-    { "sort-by-time-left", NULL, N_( "Sort by Time _Left" ), NULL, NULL, 6 },
-    { "sort-by-size",      NULL, N_( "Sort by Si_ze" ),      NULL, NULL, 7 }
+    { "sort-by-queue",     NULL, N_( "Sort by _Queue" ),     NULL, NULL, 3 },
+    { "sort-by-ratio",     NULL, N_( "Sort by Rati_o" ),     NULL, NULL, 4 },
+    { "sort-by-state",     NULL, N_( "Sort by Stat_e" ),     NULL, NULL, 5 },
+    { "sort-by-age",       NULL, N_( "Sort by A_ge" ),       NULL, NULL, 6 },
+    { "sort-by-time-left", NULL, N_( "Sort by Time _Left" ), NULL, NULL, 7 },
+    { "sort-by-size",      NULL, N_( "Sort by Si_ze" ),      NULL, NULL, 8 }
 };
 
 static void

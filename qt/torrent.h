@@ -273,7 +273,6 @@ class Torrent: public QObject
         int compareTracker( const Torrent& ) const;
         int compareSeedRatio( const Torrent& ) const;
         int compareRatio( const Torrent& ) const;
-        int compareQueue( const Torrent& ) const;
         int compareETA( const Torrent& ) const;
         bool hasETA( ) const { return getETA( ) >= 0; }
         int getETA( ) const { return getInt( ETA ); }
@@ -308,7 +307,6 @@ class Torrent: public QObject
         PeerList peers( ) const{ return myValues[PEERS].value<PeerList>(); }
         const FileList& files( ) const { return myFiles; }
         int queuePosition( ) const { return getInt( QUEUE_POSITION ); }
-        bool isQueued( ) const { return queuePosition( ) >= 0; }
         bool isStalled( ) const { return getBool( IS_STALLED ); }
 
     public:
@@ -323,6 +321,7 @@ class Torrent: public QObject
         bool isSeeding( ) const { return getActivity( ) == TR_STATUS_SEED; }
         bool isWaitingToSeed( ) const { return getActivity( ) == TR_STATUS_SEED_WAIT; }
         bool isReadyToTransfer( ) const { return getActivity()==TR_STATUS_DOWNLOAD || getActivity()==TR_STATUS_SEED; }
+        bool isQueued( ) const { return isWaitingToDownload() || isWaitingToSeed(); }
         void notifyComplete( ) const;
 
     public:

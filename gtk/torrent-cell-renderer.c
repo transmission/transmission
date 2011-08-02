@@ -228,11 +228,10 @@ getShortStatusString( GString           * gstr,
             break;
 
         case TR_STATUS_DOWNLOAD_WAIT:
-            g_string_append_printf( gstr, _( "Download queue #%d" ), st->queuePosition + 1 );
+            g_string_append( gstr, _( "Waiting to download" ) );
             break;
-
         case TR_STATUS_SEED_WAIT:
-            g_string_append_printf( gstr, _( "Seed queue #%d" ), st->queuePosition + 1 );
+            g_string_append( gstr, _( "Waiting to seed" ) );
             break;
 
         case TR_STATUS_DOWNLOAD:
@@ -685,7 +684,7 @@ render_compact( TorrentCellRenderer   * cell,
     g_object_set( p->icon_renderer, "pixbuf", icon, "sensitive", sensitive, NULL );
     gtr_cell_renderer_render( p->icon_renderer, window, widget, &icon_area, flags );
     g_object_set( p->progress_renderer, "value", (int)(percentDone*100.0), "text", NULL,
-        "sensitive", sensitive || ( st->queuePosition >= 0 ),
+        "sensitive", sensitive,
 #if GTK_CHECK_VERSION( 3,0,0 )
         "inverted", seed,
 #elif GTK_CHECK_VERSION( 2,6,0 )
@@ -805,7 +804,7 @@ render_full( TorrentCellRenderer   * cell,
     gtr_cell_renderer_render( p->text_renderer, window, widget, &name_area, flags );
     g_object_set( p->text_renderer, "text", gstr_prog->str, "scale", SMALL_SCALE, "weight", PANGO_WEIGHT_NORMAL, NULL );
     gtr_cell_renderer_render( p->text_renderer, window, widget, &prog_area, flags );
-    g_object_set( p->progress_renderer, "value", (int)(percentDone*100.0), "text", "", "sensitive", ( sensitive || st->queuePosition >= 0 ),
+    g_object_set( p->progress_renderer, "value", (int)(percentDone*100.0), "text", "", "sensitive", sensitive,
 #if GTK_CHECK_VERSION( 3,0,0 )
         "inverted", seed,
 #elif GTK_CHECK_VERSION( 2,6,0 )

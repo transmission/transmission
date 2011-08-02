@@ -1997,8 +1997,8 @@ typedef struct tr_stat
         As a result, only paused torrents can be finished. */
     bool   finished;
 
-    /** The position of this torrent in the download queue.
-        This will be >= 0 if the torrent is queued; -1 otherwise. */
+    /** This torrent's queue position.
+        All torrents have a queue position, even if it's not queued. */
     int queuePosition;
 
     /** True if the torrent is running, but has been idle for long enough

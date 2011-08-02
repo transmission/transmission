@@ -138,6 +138,7 @@ class TrMainWindow: public QMainWindow
         void onSortByETAToggled      ( bool );
         void onSortByNameToggled     ( bool );
         void onSortByProgressToggled ( bool );
+        void onSortByQueueToggled    ( bool );
         void onSortByRatioToggled    ( bool );
         void onSortBySizeToggled     ( bool );
         void onSortByStateToggled    ( bool );

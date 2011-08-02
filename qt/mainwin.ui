@@ -126,6 +126,7 @@
     <addaction name="action_SortByAge"/>
     <addaction name="action_SortByName"/>
     <addaction name="action_SortByProgress"/>
+    <addaction name="action_SortByQueue"/>
     <addaction name="action_SortByRatio"/>
     <addaction name="action_SortBySize"/>
     <addaction name="action_SortByState"/>
@@ -630,6 +631,14 @@
   <action name="action_QueueMoveBottom">
    <property name="text">
     <string>Move to &amp;Bottom</string>
+   </property>
+  </action>
+  <action name="action_SortByQueue">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Sort by &amp;Queue</string>
    </property>
   </action>
  </widget>

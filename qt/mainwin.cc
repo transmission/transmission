@@ -140,6 +140,7 @@ TrMainWindow :: TrMainWindow( Session& session, Prefs& prefs, TorrentModel& mode
     connect( ui.action_SortByETA,      SIGNAL(toggled(bool)), this, SLOT(onSortByETAToggled(bool)));
     connect( ui.action_SortByName,     SIGNAL(toggled(bool)), this, SLOT(onSortByNameToggled(bool)));
     connect( ui.action_SortByProgress, SIGNAL(toggled(bool)), this, SLOT(onSortByProgressToggled(bool)));
+    connect( ui.action_SortByQueue,    SIGNAL(toggled(bool)), this, SLOT(onSortByQueueToggled(bool)));
     connect( ui.action_SortByRatio,    SIGNAL(toggled(bool)), this, SLOT(onSortByRatioToggled(bool)));
     connect( ui.action_SortBySize,     SIGNAL(toggled(bool)), this, SLOT(onSortBySizeToggled(bool)));
     connect( ui.action_SortByState,    SIGNAL(toggled(bool)), this, SLOT(onSortByStateToggled(bool)));
@@ -520,6 +521,7 @@ void TrMainWindow :: onSortByAgeToggled      ( bool b ) { if( b ) setSortPref( S
 void TrMainWindow :: onSortByETAToggled      ( bool b ) { if( b ) setSortPref( SortMode::SORT_BY_ETA );      }
 void TrMainWindow :: onSortByNameToggled     ( bool b ) { if( b ) setSortPref( SortMode::SORT_BY_NAME );     }
 void TrMainWindow :: onSortByProgressToggled ( bool b ) { if( b ) setSortPref( SortMode::SORT_BY_PROGRESS ); }
+void TrMainWindow :: onSortByQueueToggled    ( bool b ) { if( b ) setSortPref( SortMode::SORT_BY_QUEUE );    }
 void TrMainWindow :: onSortByRatioToggled    ( bool b ) { if( b ) setSortPref( SortMode::SORT_BY_RATIO );    }
 void TrMainWindow :: onSortBySizeToggled     ( bool b ) { if( b ) setSortPref( SortMode::SORT_BY_SIZE );     }
 void TrMainWindow :: onSortByStateToggled    ( bool b ) { if( b ) setSortPref( SortMode::SORT_BY_STATE );    }
@@ -758,10 +760,10 @@ TrMainWindow :: refreshActionSensitivity( )
     ui.action_Pause->setEnabled( selectedAndPaused < selected );
     ui.action_Announce->setEnabled( selected > 0 && ( canAnnounce == selected ) );
 
-    ui.action_QueueMoveTop->setEnabled( selectedAndQueued > 0 );
-    ui.action_QueueMoveUp->setEnabled( selectedAndQueued > 0 );
-    ui.action_QueueMoveDown->setEnabled( selectedAndQueued > 0 );
-    ui.action_QueueMoveBottom->setEnabled( selectedAndQueued > 0 );
+    ui.action_QueueMoveTop->setEnabled( haveSelection );
+    ui.action_QueueMoveUp->setEnabled( haveSelection );
+    ui.action_QueueMoveDown->setEnabled( haveSelection );
+    ui.action_QueueMoveBottom->setEnabled( haveSelection );
 
     if( myDetailsDialog )
         myDetailsDialog->setIds( getSelectedTorrents( ) );
@@ -959,6 +961,7 @@ TrMainWindow :: refreshPref( int key )
             ui.action_SortByETA->setChecked      ( i == SortMode::SORT_BY_ETA );
             ui.action_SortByName->setChecked     ( i == SortMode::SORT_BY_NAME );
             ui.action_SortByProgress->setChecked ( i == SortMode::SORT_BY_PROGRESS );
+            ui.action_SortByQueue->setChecked    ( i == SortMode::SORT_BY_QUEUE );
             ui.action_SortByRatio->setChecked    ( i == SortMode::SORT_BY_RATIO );
             ui.action_SortBySize->setChecked     ( i == SortMode::SORT_BY_SIZE );
             ui.action_SortByState->setChecked    ( i == SortMode::SORT_BY_STATE );

@@ -459,12 +459,17 @@ compare_by_name( GtkTreeModel * m, GtkTreeIter * a, GtkTreeIter * b, gpointer us
 }
 
 static int
-compare_by_queue( const tr_stat * a, const tr_stat * b )
+compare_by_queue( GtkTreeModel * m, GtkTreeIter * a, GtkTreeIter * b, gpointer user_data UNUSED )
 {
-    const bool a_is_queued = a->queuePosition >= 0;
-    const bool b_is_queued = b->queuePosition >= 0;
-    if( a_is_queued != b_is_queued ) return a_is_queued ? -1 : 1;
-    return b->queuePosition - a->queuePosition;
+    tr_torrent *ta, *tb;
+    const tr_stat *sa, *sb;
+
+    gtk_tree_model_get( m, a, MC_TORRENT, &ta, -1 );
+    sa = tr_torrentStatCached( ta );
+    gtk_tree_model_get( m, b, MC_TORRENT, &tb, -1 );
+    sb = tr_torrentStatCached( tb );
+
+    return sb->queuePosition - sa->queuePosition;
 }
 
 static int
@@ -480,8 +485,7 @@ compare_by_ratio( GtkTreeModel* m, GtkTreeIter * a, GtkTreeIter * b, gpointer us
     sb = tr_torrentStatCached( tb );
 
     if( !ret ) ret = compare_ratio( sa->ratio, sb->ratio );
-    if( !ret ) ret = compare_by_queue( sa, sb );
-    if( !ret ) ret = compare_by_name( m, a, b, user_data );
+    if( !ret ) ret = compare_by_queue( m, a, b, user_data );
     return ret;
 }
 
@@ -506,8 +510,7 @@ compare_by_activity( GtkTreeModel * m, GtkTreeIter * a, GtkTreeIter * b, gpointe
 
     if( !ret ) ret = compare_double( aUp+aDown, bUp+bDown );
     if( !ret ) ret = compare_uint64( sa->uploadedEver, sb->uploadedEver );
-    if( !ret ) ret = compare_by_queue( sa, sb );
-    if( !ret ) ret = compare_by_name( m, a, b, user_data );
+    if( !ret ) ret = compare_by_queue( m, a, b, user_data );
     return ret;
 }
 
@@ -587,8 +590,7 @@ compare_by_state( GtkTreeModel * m, GtkTreeIter * a, GtkTreeIter * b, gpointer u
     gtk_tree_model_get( m, b, MC_ACTIVITY, &sb, MC_TORRENT, &tb, -1 );
 
     if( !ret ) ret = compare_int( sa, sb );
-    if( !ret ) ret = compare_by_queue( tr_torrentStatCached( ta ), tr_torrentStatCached( tb ) );
-    if( !ret ) ret = compare_by_progress( m, a, b, u );
+    if( !ret ) ret = compare_by_queue( m, a, b, u );
     return ret;
 }
 
@@ -606,6 +608,8 @@ core_set_sort_mode( TrCore * core, const char * mode, gboolean is_reversed )
         sort_func = compare_by_age;
     else if( !strcmp( mode, "sort-by-progress" ) )
         sort_func = compare_by_progress;
+    else if( !strcmp( mode, "sort-by-queue" ) )
+        sort_func = compare_by_queue;
     else if( !strcmp( mode, "sort-by-time-left" ) )
         sort_func = compare_by_eta;
     else if( !strcmp( mode, "sort-by-ratio" ) )

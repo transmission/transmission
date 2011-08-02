@@ -85,6 +85,9 @@ TorrentFilter :: lessThan( const QModelIndex& left, const QModelIndex& right ) c
 
     switch( myPrefs.get<SortMode>(Prefs::SORT_MODE).mode() )
     {
+        case SortMode :: SORT_BY_QUEUE:
+            if( !val ) val = -compare( a->queuePosition(), b->queuePosition() );
+            break;
         case SortMode :: SORT_BY_SIZE:
             if( !val ) val = compare( a->sizeWhenDone(), b->sizeWhenDone() );
             break;
@@ -101,12 +104,12 @@ TorrentFilter :: lessThan( const QModelIndex& left, const QModelIndex& right ) c
         case SortMode :: SORT_BY_STATE:
             if( !val ) val = compare( a->hasError(), b->hasError() );
             if( !val ) val = compare( a->getActivity(), b->getActivity() );
-            if( !val ) val = a->compareQueue( *b );
+            if( !val ) val = -compare( a->queuePosition(), b->queuePosition() );
             // fall through
         case SortMode :: SORT_BY_PROGRESS:
             if( !val ) val = compare( a->percentComplete(), b->percentComplete() );
             if( !val ) val = a->compareSeedRatio( *b );
-            if( !val ) val = a->compareQueue( *b );
+            if( !val ) val = -compare( a->queuePosition(), b->queuePosition() );
         case SortMode :: SORT_BY_RATIO:
             if( !val ) val = a->compareRatio( *b );
             break;
