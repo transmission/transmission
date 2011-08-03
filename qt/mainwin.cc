@@ -200,6 +200,7 @@ TrMainWindow :: TrMainWindow( Session& session, Prefs& prefs, TorrentModel& mode
     actionGroup->addAction( ui.action_SortByETA );
     actionGroup->addAction( ui.action_SortByName );
     actionGroup->addAction( ui.action_SortByProgress );
+    actionGroup->addAction( ui.action_SortByQueue );
     actionGroup->addAction( ui.action_SortByRatio );
     actionGroup->addAction( ui.action_SortBySize );
     actionGroup->addAction( ui.action_SortByState );

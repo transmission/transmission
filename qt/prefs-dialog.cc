@@ -584,7 +584,7 @@ PrefsDialog :: createDownloadTab( )
     hig->addSectionDivider( );
     hig->addSectionTitle( tr( "Queue" ) );
     
-        hig->addRow( tr( "Maximum active &downloads:" ), spinBoxNew( Prefs::DOWNLOAD_QUEUE_SIZE, 1, FD_SETSIZE, 5 ) );
+        hig->addRow( tr( "Maximum active &downloads:" ), spinBoxNew( Prefs::DOWNLOAD_QUEUE_SIZE, 1, INT_MAX, 1 ) );
         hig->addRow( tr( "E&xempt torrents if idle for N minutes:" ), spinBoxNew( Prefs::QUEUE_STALLED_MINUTES, 1, FD_SETSIZE, 5 ) );
 
     hig->addSectionDivider( );
