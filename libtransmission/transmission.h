@@ -808,6 +808,9 @@ void tr_sessionSetQueueStalledMinutes( tr_session *, int minutes );
 /** @return the number of minutes a torrent can be idle before being considered as stalled */
 int  tr_sessionGetQueueStalledMinutes( const tr_session * );
 
+/** @brief Set a callback that is invoked when the queue starts a torrent */
+void tr_torrentSetQueueStartCallback( tr_torrent * torrent, void (*callback)( tr_torrent * ) );
+
 
 /***
 ****

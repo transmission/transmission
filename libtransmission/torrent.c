@@ -3321,3 +3321,11 @@ torrentSetQueued( tr_torrent * tor, bool queued )
         tor->anyDate = tr_time( );
     }
 }
+
+void
+tr_torrentSetQueueStartCallback( tr_torrent * torrent, void (*callback)( tr_torrent * ) )
+{
+    torrent->queue_started_callback = callback;
+}
+
+

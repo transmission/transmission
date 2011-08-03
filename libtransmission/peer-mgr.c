@@ -3572,8 +3572,11 @@ queuePulse( tr_session * session, tr_direction dir )
         const int n = tr_sessionCountQueueFreeSlots( session, dir );
         for( i=0; i<n; i++ ) {
             tr_torrent * tor = tr_sessionGetNextQueuedTorrent( session, dir );
-            if( tor != NULL )
+            if( tor != NULL ) {
                 tr_torrentStartNow( tor );
+                if( tor->queue_started_callback != NULL )
+                    (*tor->queue_started_callback)( tor );
+            }
         }
     }
 }

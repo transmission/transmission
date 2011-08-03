@@ -236,6 +236,8 @@ struct tr_torrent
     tr_torrent_idle_limit_hit_func  * idle_limit_hit_func;
     void                            * idle_limit_hit_func_user_data;
 
+    void ( * queue_started_callback )( tr_torrent * );
+
     bool                       isRunning;
     bool                       isStopping;
     bool                       isDeleting;
