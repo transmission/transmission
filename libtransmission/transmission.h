@@ -809,7 +809,7 @@ void tr_sessionSetQueueStalledMinutes( tr_session *, int minutes );
 int  tr_sessionGetQueueStalledMinutes( const tr_session * );
 
 /** @brief Set a callback that is invoked when the queue starts a torrent */
-void tr_torrentSetQueueStartCallback( tr_torrent * torrent, void (*callback)( tr_torrent * ) );
+void tr_torrentSetQueueStartCallback( tr_torrent * torrent, void (*callback)( tr_torrent *, void * ), void * user_data );
 
 
 /***

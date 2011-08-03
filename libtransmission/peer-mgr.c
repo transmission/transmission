@@ -3575,7 +3575,7 @@ queuePulse( tr_session * session, tr_direction dir )
             if( tor != NULL ) {
                 tr_torrentStartNow( tor );
                 if( tor->queue_started_callback != NULL )
-                    (*tor->queue_started_callback)( tor );
+                    (*tor->queue_started_callback)( tor, tor->queue_started_user_data );
             }
         }
     }
