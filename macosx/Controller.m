@@ -1221,11 +1221,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     for (Torrent * torrent in torrents)
         [torrent startTransferNoQueue];
     
-    #warning change to updateTorrentsInQueue?
-    [self updateUI];
-    [self applyFilter];
-    [[fWindow toolbar] validateVisibleItems];
-    [self updateTorrentHistory];
+    [self updateTorrentsInQueue];
 }
 
 - (void) stopSelectedTorrents: (id) sender
@@ -1247,10 +1243,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 
     [torrents makeObjectsPerformSelector: @selector(stopTransfer)];
     
-    [self updateUI];
-    [self applyFilter];
-    [[fWindow toolbar] validateVisibleItems];
-    [self updateTorrentHistory];
+    [self updateTorrentsInQueue];
 }
 
 - (void) removeTorrents: (NSArray *) torrents deleteData: (BOOL) deleteData

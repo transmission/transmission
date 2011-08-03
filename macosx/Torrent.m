@@ -328,9 +328,6 @@ int trashDataFile(const char * filename)
     {
         tr_torrentStop(fHandle);
         [self update];
-        
-        #warning still needed?
-        [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateQueue" object: self];
     }
 }
 
@@ -614,9 +611,8 @@ int trashDataFile(const char * filename)
 
 - (NSString *) name
 {
-#warning remove
-    //return [NSString stringWithFormat: @"%d  %@", fStat->queuePosition, [NSString stringWithUTF8String: fInfo->name]];
-    return fInfo->name != NULL ? [NSString stringWithUTF8String: fInfo->name] : fHashString;
+    return [NSString stringWithFormat: @"%d  %@", fStat->queuePosition, [NSString stringWithUTF8String: fInfo->name]];
+    //return fInfo->name != NULL ? [NSString stringWithUTF8String: fInfo->name] : fHashString;
 }
 
 - (BOOL) isFolder
