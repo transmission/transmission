@@ -181,10 +181,9 @@ typedef enum
 - (void) showStatsWindow: (id) sender;
 
 - (void) updateUI;
+- (void) fullUpdateUI;
 
 - (void) setBottomCountText: (BOOL) filtering;
-
-- (void) updateTorrentsInQueue;
 
 - (void) torrentFinishedDownloading: (NSNotification *) notification;
 - (void) torrentRestartedDownloading: (NSNotification *) notification;

@@ -507,7 +507,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
                     name: @"MakeWindowKey" object: nil];
     
 #warning look at this
-    [nc addObserver: self selector: @selector(updateTorrentsInQueue)
+    [nc addObserver: self selector: @selector(fullUpdateUI)
                     name: @"UpdateQueue" object: nil];
     
     [nc addObserver: self selector: @selector(applyFilter)
@@ -907,7 +907,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         }
     }
 
-    [self updateTorrentsInQueue];
+    [self fullUpdateUI];
 }
 
 - (void) askOpenConfirmed: (AddWindowController *) addController add: (BOOL) add
@@ -921,7 +921,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         [fTorrents addObject: torrent];
         [torrent release];
         
-        [self updateTorrentsInQueue];
+        [self fullUpdateUI];
     }
     else
     {
@@ -976,7 +976,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         [torrent release];
     }
 
-    [self updateTorrentsInQueue];
+    [self fullUpdateUI];
 }
 
 - (void) askOpenMagnetConfirmed: (AddMagnetWindowController *) addController add: (BOOL) add
@@ -990,7 +990,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         [fTorrents addObject: torrent];
         [torrent release];
         
-        [self updateTorrentsInQueue];
+        [self fullUpdateUI];
     }
     else
     {
@@ -1196,7 +1196,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     for (Torrent * torrent in torrents)
         [torrent startTransfer];
     
-    [self updateTorrentsInQueue];
+    [self fullUpdateUI];
 }
 
 - (void) resumeSelectedTorrentsNoWait:  (id) sender
@@ -1221,7 +1221,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     for (Torrent * torrent in torrents)
         [torrent startTransferNoQueue];
     
-    [self updateTorrentsInQueue];
+    [self fullUpdateUI];
 }
 
 - (void) stopSelectedTorrents: (id) sender
@@ -1244,7 +1244,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     for (Torrent * torrent in torrents)
         [torrent stopTransfer];
     
-    [self updateTorrentsInQueue];
+    [self fullUpdateUI];
 }
 
 - (void) removeTorrents: (NSArray *) torrents deleteData: (BOOL) deleteData
@@ -1343,7 +1343,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     
     [fTorrents removeObjectsInArray: torrents];
     
-    //if not removed from displayed torrents, updateTorrentsInQueue might cause a crash
+    //if not removed from displayed torrents, fullUpdateUI might cause a crash
     if ([fDisplayedTorrents count] > 0)
     {
         if ([[fDisplayedTorrents objectAtIndex: 0] isKindOfClass: [TorrentGroup class]])
@@ -1371,7 +1371,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     
     [fTableView selectValues: selectedValues];
     
-    [self updateTorrentsInQueue];
+    [self fullUpdateUI];
 }
 
 - (void) removeNoDelete: (id) sender
@@ -1697,6 +1697,15 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     [fBadger updateBadgeWithDownload: dlRate upload: ulRate];
 }
 
+#warning can this be removed or refined?
+- (void) fullUpdateUI
+{
+    [self updateUI];
+    [self applyFilter];
+    [[fWindow toolbar] validateVisibleItems];
+    [self updateTorrentHistory];
+}
+
 - (void) setBottomCountText: (BOOL) filtering
 {
     NSString * totalTorrentsString;
@@ -1718,15 +1727,6 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     }
     
     [fTotalTorrentsField setStringValue: totalTorrentsString];
-}
-
-#warning rename? remove?
-- (void) updateTorrentsInQueue
-{
-    [self updateUI];
-    [self applyFilter];
-    [[fWindow toolbar] validateVisibleItems];
-    [self updateTorrentHistory];
 }
 
 - (void) torrentFinishedDownloading: (NSNotification *) notification
@@ -1764,20 +1764,20 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
             object: [torrent dataLocation]];
     }
     
-    [self updateTorrentsInQueue];
+    [self fullUpdateUI];
 }
 
 #warning remove?
 - (void) torrentRestartedDownloading: (NSNotification *) notification
 {
-    [self updateTorrentsInQueue];
+    [self fullUpdateUI];
 }
 
 - (void) torrentFinishedSeeding: (NSNotification *) notification
 {
     Torrent * torrent = [notification object];
     
-    [self updateTorrentsInQueue];
+    [self fullUpdateUI];
     
     if ([[fTableView selectedTorrents] containsObject: torrent])
     {
@@ -4193,7 +4193,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     [fTorrents addObject: torrent];
     [torrent release];
     
-    [self updateTorrentsInQueue];
+    [self fullUpdateUI];
 }
 
 - (void) rpcRemoveTorrent: (Torrent *) torrent
