@@ -534,6 +534,8 @@
         [fController focusFilterField];
     else if (firstChar == ' ')
         [fController toggleQuickLook: nil];
+    else if ([event keyCode] == 53) //esc key
+        [self deselectAll: nil];
     else
         [super keyDown: event];
 }
