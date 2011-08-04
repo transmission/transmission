@@ -1240,8 +1240,9 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     //don't want any of these starting then stopping
     /*for (Torrent * torrent in torrents)
         [torrent setWaitToStart: NO];*/
-
-    [torrents makeObjectsPerformSelector: @selector(stopTransfer)];
+    
+    for (Torrent * torrent in torrents)
+        [torrent stopTransfer];
     
     [self updateTorrentsInQueue];
 }

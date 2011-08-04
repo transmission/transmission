@@ -47,6 +47,7 @@
     index: (NSInteger) index flatList: (NSMutableArray *) flatFileList;
 - (void) sortFileList: (NSMutableArray *) fileNodes;
 
+- (void) startQueue;
 - (void) completenessChange: (NSDictionary *) statusInfo;
 - (void) ratioLimitHit;
 - (void) idleLimitHit;
@@ -58,6 +59,11 @@
 - (void) setTimeMachineExclude: (BOOL) exclude forPath: (NSString *) path;
 
 @end
+
+void startQueueCallback(tr_torrent * torrent, void * torrentData)
+{
+    [(Torrent *)torrentData performSelectorOnMainThread: @selector(startQueue) withObject: nil waitUntilDone: NO];
+}
 
 void completenessChangeCallback(tr_torrent * torrent, tr_completeness status, bool wasRunning, void * torrentData)
 {
@@ -158,9 +164,6 @@ int trashDataFile(const char * filename)
             fStat = tr_torrentStat(fHandle);
             [self startTransferNoQueue];
         }
-        
-        //fWaitToStart = waitToStart && [waitToStart boolValue];
-        
         
         //upgrading from versions < 1.30: get old added, activity, and done dates
         NSDate * date;
@@ -1651,6 +1654,7 @@ int trashDataFile(const char * filename)
 
     fInfo = tr_torrentInfo(fHandle);
     
+    tr_torrentSetQueueStartCallback(fHandle, startQueueCallback, self);
     tr_torrentSetCompletenessCallback(fHandle, completenessChangeCallback, self);
     tr_torrentSetRatioLimitHitCallback(fHandle, ratioLimitHitCallback, self);
     tr_torrentSetIdleLimitHitCallback(fHandle, idleLimitHitCallback, self);
@@ -1789,6 +1793,11 @@ int trashDataFile(const char * filename)
     for (FileListNode * node in fileNodes)
         if ([node isFolder])
             [self sortFileList: [node children]];
+}
+
+- (void) startQueue
+{
+    [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateQueue" object: self];
 }
 
 //status has been retained
