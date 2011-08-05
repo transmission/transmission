@@ -110,6 +110,9 @@
 {
     tr_sessionSetIdleLimited(fHandle, [fDefaults boolForKey: @"IdleLimitCheck"]);
     
+    //reload main table for remaining seeding time
+    [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateUI" object: nil];
+    
     //reload global settings in inspector
     [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateGlobalOptions" object: nil];
 }
@@ -121,6 +124,9 @@
     tr_sessionSetIdleLimit(fHandle, value);
     
     [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateIdleStopValueOutsidePrefs" object: nil];
+    
+    //reload main table for remaining seeding time
+    [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateUI" object: nil];
     
     //reload global settings in inspector
     [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateGlobalOptions" object: nil];

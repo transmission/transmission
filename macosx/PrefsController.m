@@ -641,7 +641,8 @@ tr_session * fHandle;
     tr_sessionSetIdleLimited(fHandle, [fDefaults boolForKey: @"IdleLimitCheck"]);
     tr_sessionSetIdleLimit(fHandle, [fDefaults integerForKey: @"IdleLimitMinutes"]);
     
-    #warning reload main table for remaining seeding time
+    //reload main table for remaining seeding time
+    [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateUI" object: nil];
     
     //reload global settings in inspector
     [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateGlobalOptions" object: nil];
