@@ -90,6 +90,9 @@
 {
     tr_sessionSetRatioLimited(fHandle, [fDefaults boolForKey: @"RatioCheck"]);
     
+    //reload main table for seeding progress
+    [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateUI" object: nil];
+    
     //reload global settings in inspector
     [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateGlobalOptions" object: nil];
 }
@@ -101,6 +104,9 @@
     tr_sessionSetRatioLimit(fHandle, value);
     
     [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateRatioStopValueOutsidePrefs" object: nil];
+    
+    //reload main table for seeding progress
+    [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateUI" object: nil];
     
     //reload global settings in inspector
     [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateGlobalOptions" object: nil];

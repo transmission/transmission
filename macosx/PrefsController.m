@@ -612,6 +612,9 @@ tr_session * fHandle;
     tr_sessionSetRatioLimited(fHandle, [fDefaults boolForKey: @"RatioCheck"]);
     tr_sessionSetRatioLimit(fHandle, [fDefaults floatForKey: @"RatioLimit"]);
     
+    //reload main table for seeding progress
+    [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateUI" object: nil];
+    
     //reload global settings in inspector
     [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateGlobalOptions" object: nil];
 }
