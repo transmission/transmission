@@ -3876,17 +3876,17 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 
 - (NSMenu *) applicationDockMenu: (NSApplication *) sender
 {
+    if (fQuitting)
+        return nil;
+    
     NSInteger seeding = 0, downloading = 0;
-    if (!fQuitting)
+    for (Torrent * torrent in fTorrents)
     {
-        for (Torrent * torrent in fTorrents)
-        {
-            if ([torrent isSeeding])
-                seeding++;
-            else if ([torrent isActive])
-                downloading++;
-            else;
-        }
+        if ([torrent isSeeding])
+            seeding++;
+        else if ([torrent isActive])
+            downloading++;
+        else;
     }
     
     NSMenu * menu = [[NSMenu alloc] init];
