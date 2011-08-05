@@ -614,7 +614,7 @@ int trashDataFile(const char * filename)
 
 - (NSString *) name
 {
-    return [NSString stringWithFormat: @"%d  %@", fStat->queuePosition, [NSString stringWithUTF8String: fInfo->name]];
+    return [NSString stringWithFormat: @"%d  %@", fStat->queuePosition, fInfo->name != NULL ? [NSString stringWithUTF8String: fInfo->name] : fHashString];
     //return fInfo->name != NULL ? [NSString stringWithUTF8String: fInfo->name] : fHashString;
 }
 
