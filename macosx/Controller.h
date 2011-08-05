@@ -98,7 +98,6 @@ typedef enum
     BOOL                            fPauseOnLaunch;
     
     Badger                          * fBadger;
-    IBOutlet NSMenu                 * fDockMenu;
     
     NSMutableArray                  * fAutoImportedNames;
     NSTimer                         * fAutoImportTimer;

@@ -125,9 +125,6 @@ typedef enum
 
 #define UPDATE_UI_SECONDS   1.0
 
-#define DOCK_SEEDING_TAG        101
-#define DOCK_DOWNLOADING_TAG    102
-
 #define TRANSFER_PLIST  @"/Library/Application Support/Transmission/Transfers.plist"
 
 #define WEBSITE_URL @"http://www.transmissionbt.com/"
@@ -3880,68 +3877,41 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 - (NSMenu *) applicationDockMenu: (NSApplication *) sender
 {
     NSInteger seeding = 0, downloading = 0;
-    for (Torrent * torrent in fTorrents)
+    if (!fQuitting)
     {
-        if ([torrent isSeeding])
-            seeding++;
-        else if ([torrent isActive])
-            downloading++;
-        else;
+        for (Torrent * torrent in fTorrents)
+        {
+            if ([torrent isSeeding])
+                seeding++;
+            else if ([torrent isActive])
+                downloading++;
+            else;
+        }
     }
     
-    NSMenuItem * seedingItem = [fDockMenu itemWithTag: DOCK_SEEDING_TAG],
-            * downloadingItem = [fDockMenu itemWithTag: DOCK_DOWNLOADING_TAG];
-    
-    BOOL hasSeparator = seedingItem || downloadingItem;
+    NSMenu * menu = [[NSMenu alloc] init];
     
     if (seeding > 0)
     {
         NSString * title = [NSString stringWithFormat: NSLocalizedString(@"%d Seeding", "Dock item - Seeding"), seeding];
-        if (!seedingItem)
-        {
-            seedingItem = [[[NSMenuItem alloc] initWithTitle: title action: nil keyEquivalent: @""] autorelease];
-            [seedingItem setTag: DOCK_SEEDING_TAG];
-            [fDockMenu insertItem: seedingItem atIndex: 0];
-        }
-        else
-            [seedingItem setTitle: title];
-    }
-    else
-    {
-        if (seedingItem)
-            [fDockMenu removeItem: seedingItem];
+        [menu addItemWithTitle: title action: nil keyEquivalent: @""];
     }
     
     if (downloading > 0)
     {
         NSString * title = [NSString stringWithFormat: NSLocalizedString(@"%d Downloading", "Dock item - Downloading"), downloading];
-        if (!downloadingItem)
-        {
-            downloadingItem = [[[NSMenuItem alloc] initWithTitle: title action: nil keyEquivalent: @""] autorelease];
-            [downloadingItem setTag: DOCK_DOWNLOADING_TAG];
-            [fDockMenu insertItem: downloadingItem atIndex: seeding > 0 ? 1 : 0];
-        }
-        else
-            [downloadingItem setTitle: title];
-    }
-    else
-    {
-        if (downloadingItem)
-            [fDockMenu removeItem: downloadingItem];
+        [menu addItemWithTitle: title action: nil keyEquivalent: @""];
     }
     
     if (seeding > 0 || downloading > 0)
-    {
-        if (!hasSeparator)
-            [fDockMenu insertItem: [NSMenuItem separatorItem] atIndex: (seeding > 0 && downloading > 0) ? 2 : 1];
-    }
-    else
-    {
-        if (hasSeparator)
-            [fDockMenu removeItemAtIndex: 0];
-    }
+        [menu addItem: [NSMenuItem separatorItem]];
     
-    return fDockMenu;
+    [menu addItemWithTitle: NSLocalizedString(@"Pause All", "Dock item") action: @selector(stopAllTorrents:) keyEquivalent: @""];
+    [menu addItemWithTitle: NSLocalizedString(@"Resume All", "Dock item") action: @selector(resumeAllTorrents:) keyEquivalent: @""];
+    [menu addItem: [NSMenuItem separatorItem]];
+    [menu addItemWithTitle: NSLocalizedString(@"Speed Limit", "Dock item") action: @selector(toggleSpeedLimit:) keyEquivalent: @""];
+    
+    return [menu autorelease];
 }
 
 - (NSRect) windowWillUseStandardFrame: (NSWindow *) window defaultFrame: (NSRect) defaultFrame
