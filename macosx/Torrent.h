@@ -127,6 +127,7 @@
 - (NSImage *) icon;
 
 - (NSString *) name;
+- (NSInteger) queuePosition;
 - (BOOL) isFolder;
 - (uint64_t) size;
 - (uint64_t) sizeLeft;
