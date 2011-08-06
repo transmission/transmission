@@ -45,7 +45,7 @@ Transmission.prototype =
 		$('#filter_downloading_link').parent().bind('click', function(e){ tr.showDownloadingClicked(e); });
 		$('#filter_seeding_link').parent().bind('click', function(e){ tr.showSeedingClicked(e); });
 		$('#filter_paused_link').parent().bind('click', function(e){ tr.showPausedClicked(e); });
-                $('#filter_finished_link').parent().bind('click', function(e){ tr.showFinishedClicked(e); });
+		$('#filter_finished_link').parent().bind('click', function(e){ tr.showFinishedClicked(e); });
 		$('#prefs_save_button').bind('click', function(e) { tr.savePrefsClicked(e); return false;});
 		$('#prefs_cancel_button').bind('click', function(e){ tr.cancelPrefsClicked(e); return false; });
 		$('#block_update_button').bind('click', function(e){ tr.blocklistUpdateClicked(e); return false; });
@@ -63,7 +63,7 @@ Transmission.prototype =
 		$('#prefs_tab_speed_tab').click(function(e){ changeTab(this, 'prefs_tab_speed') });
 		$('#prefs_tab_peers_tab').click(function(e){ changeTab(this, 'prefs_tab_peers') });
 		$('#prefs_tab_network_tab').click(function(e){ changeTab(this, 'prefs_tab_network');});
-        $('#torrent_upload_form').submit(function(){ $('#upload_confirm_button').click(); return false; });
+		$('#torrent_upload_form').submit(function(){ $('#upload_confirm_button').click(); return false; });
 		$('#torrent_container').bind('dragover', function(e){ return tr.dragenter(e); });
 		$('#torrent_container').bind('dragenter', function(e){ return tr.dragenter(e); });
 		$('#torrent_container').bind('drop', function(e){ return tr.drop(e); });
