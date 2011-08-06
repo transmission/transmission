@@ -279,8 +279,8 @@ downloadPage( GObject * core )
     w = new_spin_button( TR_PREFS_KEY_DOWNLOAD_QUEUE_SIZE, core, 0, INT_MAX, 1 );
     hig_workarea_add_row( t, &row, s, w, NULL );
 
-    s = _( "E_xempt torrents if idle for N minutes:" );
-    w = new_spin_button( TR_PREFS_KEY_QUEUE_STALLED_MINUTES, core, 1, INT_MAX, 1 );
+    s = _( "Downloads sharing data in the last N minutes are _active:" );
+    w = new_spin_button( TR_PREFS_KEY_QUEUE_STALLED_MINUTES, core, 1, INT_MAX, 15 );
     hig_workarea_add_row( t, &row, s, w, NULL );
 
     hig_workarea_add_section_divider( t, &row );
