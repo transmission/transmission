@@ -40,6 +40,10 @@ RPC._UtpEnabled	            = 'utp-enabled';
 RPC._PeerPortRandom         = 'peer-port-random-on-start';
 RPC._PortForwardingEnabled  = 'port-forwarding-enabled';
 RPC._StartAddedTorrent      = 'start-added-torrents';
+RPC._QueueMoveTop			= 'queue-move-top';
+RPC._QueueMoveBottom		= 'queue-move-bottom';
+RPC._QueueMoveUp			= 'queue-move-up';
+RPC._QueueMoveDown			= 'queue-move-down';
 
 function TransmissionRemote( controller )
 {
@@ -288,5 +292,19 @@ TransmissionRemote.prototype =
 	},
 	filesDeselectAll: function( torrent_ids, files, callback ) {
 		this.sendTorrentSetRequests( 'torrent-set', torrent_ids, { 'files-unwanted': files }, callback );
+	},
+
+	// Added queue calls
+	moveTorrentsToTop: function( torrent_ids, callback ) {
+		this.sendTorrentActionRequests( RPC._QueueMoveTop, torrent_ids, callback );
+	},
+	moveTorrentsToBottom: function( torrent_ids, callback ) {
+		this.sendTorrentActionRequests( RPC._QueueMoveBottom, torrent_ids, callback );
+	},
+	moveTorrentsUp: function( torrent_ids, callback ) {
+		this.sendTorrentActionRequests( RPC._QueueMoveUp, torrent_ids, callback );
+	},
+	moveTorrentsDown: function( torrent_ids, callback ) {
+		this.sendTorrentActionRequests( RPC._QueueMoveDown, torrent_ids, callback );
 	}
 };

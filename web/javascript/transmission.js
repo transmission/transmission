@@ -101,6 +101,10 @@ Transmission.prototype =
 		this._context_pause_button     = $('li#context_pause_selected')[0];
 		this._context_start_button     = $('li#context_resume_selected')[0];
 		this._context_start_now_button = $('li#context_resume_now_selected')[0];
+		this._context_move_top         = $('li#context_move_top')[0];
+		this._context_move_up          = $('li#context_move_up')[0];
+		this._context_move_down        = $('li#context_move_down')[0];
+		this._context_move_bottom      = $('li#context_move_bottom')[0];
 
 		var ti = '#torrent_inspector_';
 		this._inspector = { };
@@ -309,6 +313,21 @@ Transmission.prototype =
 		this.deselectAll( true );
 	},
 
+	// Queue
+
+	contextMoveUp: function( ) {
+		this.moveUp( );
+	},
+	contextMoveDown: function( ) {
+		this.moveDown( );
+	},
+	contextMoveTop: function( ) {
+		this.moveTop( );
+	},
+	contextMoveBottom: function( ) {
+		this.moveBottom( );
+	},
+
 	/*
 	 * Create the torrent right-click menu
 	 */
@@ -324,7 +343,11 @@ Transmission.prototype =
 			context_reannounce:           function(e){ tr.contextReannounceSelected(e); },
 			context_toggle_inspector:     function(e){ tr.contextToggleInspector(e); },
 			context_select_all:           function(e){ tr.contextSelectAll(e); },
-			context_deselect_all:         function(e){ tr.contextDeselectAll(e); }
+			context_deselect_all:         function(e){ tr.contextDeselectAll(e); },
+			context_move_top:             function(e){ tr.contextMoveTop(e); },
+			context_move_up:              function(e){ tr.contextMoveUp(e); },
+			context_move_down:            function(e){ tr.contextMoveDown(e); },
+			context_move_bottom:          function(e){ tr.contextMoveBottom(e); }
 		};
 
 		// Setup the context menu
@@ -2064,6 +2087,29 @@ Transmission.prototype =
 		scroll_timeout=null;
 	},
 
+	// Queue
+	moveTop: function( ) {
+		var torrent_ids = jQuery.map(this.getSelectedTorrents( ), function(t) { return t.id(); } );
+		var tr = this;
+		this.remote.moveTorrentsToTop( torrent_ids, function(){ tr.refreshTorrents(torrent_ids )} );
+	},
+	moveUp: function( ) {
+		var torrent_ids = jQuery.map(this.getSelectedTorrents( ), function(t) { return t.id(); } );
+		var tr = this;
+		this.remote.moveTorrentsUp( torrent_ids, function(){ tr.refreshTorrents(torrent_ids )} );
+	},
+	moveDown: function( ) {
+		var torrent_ids = jQuery.map(this.getSelectedTorrents( ), function(t) { return t.id(); } );
+		var tr = this;
+		this.remote.moveTorrentsDown( torrent_ids, function(){ tr.refreshTorrents(torrent_ids )} );
+	},
+	moveBottom: function( ) {
+		var torrent_ids = jQuery.map(this.getSelectedTorrents( ), function(t) { return t.id(); } );
+		var tr = this;
+		this.remote.moveTorrentsToBottom( torrent_ids, function(){ tr.refreshTorrents(torrent_ids )} );
+	},
+
+
 	/***
 	****
 	***/
@@ -2138,14 +2184,18 @@ Transmission.prototype =
 				if( isSelected && !isActive ) havePausedSelection = true;
 			}
 
-			this.setEnabled( this._toolbar_pause_button, haveActiveSelection );
-			this.setEnabled( this._context_pause_button, haveActiveSelection );
-			this.setEnabled( this._toolbar_start_button, havePausedSelection );
-			this.setEnabled( this._context_start_button, havePausedSelection );
-			this.setEnabled( this._context_start_now_button, havePausedSelection );
-			this.setEnabled( this._toolbar_remove_button, haveSelection );
-			this.setEnabled( this._toolbar_pause_all_button, haveActive );
-			this.setEnabled( this._toolbar_start_all_button, havePaused );
+			this.setEnabled( this._toolbar_pause_button,       haveActiveSelection );
+			this.setEnabled( this._context_pause_button,       haveActiveSelection );
+			this.setEnabled( this._toolbar_start_button,       havePausedSelection );
+			this.setEnabled( this._context_start_button,       havePausedSelection );
+			this.setEnabled( this._context_move_top_button,    haveSelection );
+			this.setEnabled( this._context_move_up_button,     haveSelection );
+			this.setEnabled( this._context_move_down_button,   haveSelection );
+			this.setEnabled( this._context_move_bottom_button, haveSelection );
+			this.setEnabled( this._context_start_now_button,   havePausedSelection );
+			this.setEnabled( this._toolbar_remove_button,      haveSelection );
+			this.setEnabled( this._toolbar_pause_all_button,   haveActive );
+			this.setEnabled( this._toolbar_start_all_button,   havePaused );
 		}
 	}
 };
