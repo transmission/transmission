@@ -31,7 +31,7 @@
 
 #define GROUP_SEPARATOR_HEIGHT 18.0
 
-@interface TorrentTableView : NSOutlineView
+@interface TorrentTableView : NSOutlineView <NSOutlineViewDelegate, NSAnimationDelegate>
 {
     IBOutlet Controller * fController;
     
