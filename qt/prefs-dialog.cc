@@ -585,7 +585,7 @@ PrefsDialog :: createDownloadTab( )
     hig->addSectionTitle( tr( "Queue" ) );
     
         hig->addRow( tr( "Maximum active &downloads:" ), spinBoxNew( Prefs::DOWNLOAD_QUEUE_SIZE, 1, INT_MAX, 1 ) );
-        hig->addRow( tr( "Downloads sharing data in the last N minutes are _active:" ), spinBoxNew( Prefs::QUEUE_STALLED_MINUTES, 1, INT_MAX, 15 ) );
+        hig->addRow( tr( "Downloads sharing data in the last N minutes are &active:" ), spinBoxNew( Prefs::QUEUE_STALLED_MINUTES, 1, INT_MAX, 15 ) );
 
     hig->addSectionDivider( );
     hig->addSectionTitle( tr( "Incomplete" ) );
