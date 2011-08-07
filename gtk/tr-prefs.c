@@ -337,15 +337,12 @@ torrentPage( GObject * core )
     w = new_check_button( s, TR_PREFS_KEY_TRASH_ORIGINAL, core );
     hig_workarea_add_wide_control( t, &row, w );
 
-#ifdef HAVE_GIO
     s = _( "Automatically _add torrents from:" );
     l = new_check_button( s, PREF_KEY_DIR_WATCH_ENABLED, core );
     w = new_path_chooser_button( PREF_KEY_DIR_WATCH, core );
-    gtk_widget_set_sensitive( GTK_WIDGET( w ),
-                             gtr_pref_flag_get( PREF_KEY_DIR_WATCH_ENABLED ) );
+    gtk_widget_set_sensitive( GTK_WIDGET( w ), gtr_pref_flag_get( PREF_KEY_DIR_WATCH_ENABLED ) );
     g_signal_connect( l, "toggled", G_CALLBACK( target_cb ), w );
     hig_workarea_add_row_w( t, &row, l, w, NULL );
-#endif
 
     hig_workarea_add_section_divider( t, &row );
     hig_workarea_add_section_title( t, &row, _( "Seeding" ) );

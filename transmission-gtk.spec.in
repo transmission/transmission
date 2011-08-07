@@ -26,9 +26,6 @@ BuildRequires: glib2-devel >= @GLIB_MINIMUM@
 BuildRequires: gtk2-devel >= @GTK_MINIMUM@
 Requires: glib2 >= @GLIB_MINIMUM@
 Requires: gtk2 >= @GTK_MINIMUM@
-# OPTIONAL for the gtk+ client... see configure.ac for details
-BuildRequires: dbus-glib-devel >= @DBUS_GLIB_MINIMUM@
-Requires: dbus-glib >= @DBUS_GLIB_MINIMUM@
 
 Provides: %{name}
 

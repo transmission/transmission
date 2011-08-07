@@ -55,7 +55,7 @@ cf_init( const char * configDir, char ** errstr )
 
     gl_confdir = g_strdup( configDir );
 
-    if( gtr_mkdir_with_parents( gl_confdir, 0755 ) )
+    if( g_mkdir_with_parents( gl_confdir, 0755 ) )
         return TRUE;
 
     if( errstr != NULL )
@@ -152,14 +152,12 @@ tr_prefs_init_defaults( tr_benc * d )
 
     cf_check_older_configs( );
 
-#ifdef HAVE_GIO
     str = NULL;
     if( !str ) str = g_get_user_special_dir( G_USER_DIRECTORY_DOWNLOAD );
     if( !str ) str = g_get_user_special_dir( G_USER_DIRECTORY_DESKTOP );
     if( !str ) str = tr_getDefaultDownloadDir( );
     tr_bencDictAddStr ( d, PREF_KEY_DIR_WATCH, str );
     tr_bencDictAddBool( d, PREF_KEY_DIR_WATCH_ENABLED, FALSE );
-#endif
 
     tr_bencDictAddBool( d, PREF_KEY_USER_HAS_GIVEN_INFORMED_CONSENT, FALSE );
     tr_bencDictAddBool( d, PREF_KEY_INHIBIT_HIBERNATION, FALSE );
@@ -191,11 +189,7 @@ tr_prefs_init_defaults( tr_benc * d )
     tr_bencDictAddInt( d, PREF_KEY_MAIN_WINDOW_X, 50 );
     tr_bencDictAddInt( d, PREF_KEY_MAIN_WINDOW_Y, 50 );
 
-    str = NULL;
-#if GLIB_CHECK_VERSION( 2, 14, 0 )
-    if( !str ) str = g_get_user_special_dir( G_USER_DIRECTORY_DOWNLOAD );
-#endif
-    if( !str ) str = tr_getDefaultDownloadDir( );
+    str = g_get_user_special_dir( G_USER_DIRECTORY_DOWNLOAD );
     tr_bencDictAddStr( d, TR_PREFS_KEY_DOWNLOAD_DIR, str );
 
     tr_bencDictAddStr( d, PREF_KEY_SORT_MODE, "sort-by-name" );

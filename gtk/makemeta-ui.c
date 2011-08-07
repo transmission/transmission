@@ -367,13 +367,7 @@ onFileToggled( GtkToggleButton * tb, gpointer data )
 static const char *
 getDefaultSavePath( void )
 {
-    const char * path;
-#if GLIB_CHECK_VERSION( 2,14,0 )
-    path = g_get_user_special_dir( G_USER_DIRECTORY_DESKTOP );
-#else
-    path = g_get_home_dir( );
-#endif
-    return path;
+    return g_get_user_special_dir( G_USER_DIRECTORY_DESKTOP );
 }
 
 static void

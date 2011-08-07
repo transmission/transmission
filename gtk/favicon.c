@@ -17,7 +17,7 @@
 #include <libtransmission/web.h> /* tr_webRun() */
 
 #include "favicon.h"
-#include "util.h" /* gtr_mkdir_with_parents(), gtr_idle_add() */
+#include "util.h" /* gtr_idle_add() */
 
 #define IMAGE_TYPES 4
 static const char * image_types[IMAGE_TYPES] = { "ico", "png", "gif", "jpg" };
@@ -50,7 +50,7 @@ favicon_get_cache_dir( void )
                                 "transmission",
                                 "favicons",
                                 NULL );
-        gtr_mkdir_with_parents( dir, 0777 );
+        g_mkdir_with_parents( dir, 0777 );
     }
 
     return dir;

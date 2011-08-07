@@ -50,22 +50,19 @@ AC_SUBST(OPENSSL_MINIMUM)
 ##   MANDATORY for the GTK+ client
 ##
 ##
-GLIB_MINIMUM=2.8.0
-AC_SUBST(GLIB_MINIMUM)
 GTK_MINIMUM=2.8.0
 AC_SUBST(GTK_MINIMUM)
+GLIB_MINIMUM=2.26.0
+AC_SUBST(GLIB_MINIMUM)
+GIO_MINIMUM=2.26.0
+AC_SUBST(GIO_MINIMUM)
 
 ##
 ##
 ##   OPTIONAL for the GTK+ client
 ##
 ##
-# inhibit hibernation when a torrent is active...
-DBUS_GLIB_MINIMUM=0.70
-AC_SUBST(DBUS_GLIB_MINIMUM)
-# implement "watch" directories to use new .torrent files...
-GIO_MINIMUM=2.15.5
-AC_SUBST(GIO_MINIMUM)
+
 # create the tray icon with AppIndicator
 LIBAPPINDICATOR_MINIMUM=0.0.11
   AC_SUBST(LIBAPPINDICATOR_MINIMUM)
@@ -243,6 +240,7 @@ dnl  detection for the GTK+ client
 PKG_CHECK_MODULES(GTK,
                   [gtk+-2.0 >= $GTK_MINIMUM
                    glib-2.0 >= $GLIB_MINIMUM
+                   gio-2.0 >= $GIO_MINIMUM],
                    gmodule-2.0 >= $GLIB_MINIMUM
                    gthread-2.0 >= $GLIB_MINIMUM],
                   [have_gtk=yes],
@@ -252,9 +250,7 @@ AC_ARG_ENABLE([gtk],
               [want_gtk=${enableval}],
               [want_gtk=${have_gtk}])
 build_gtk=no
-use_gio=no
 use_libappindicator=no
-use_dbus_glib=no
 if test "x$want_gtk" = "xyes" ; then
     if test "x$have_gtk" = "xyes"; then
       build_gtk=yes
@@ -265,14 +261,6 @@ fi
 AM_CONDITIONAL([BUILD_GTK],[test "x$build_gtk" = "xyes"])
 
 if test "x$build_gtk" = "xyes"; then
-
-    PKG_CHECK_MODULES([GIO],
-                      [gio-2.0 >= $GIO_MINIMUM],
-                      [use_gio=yes],
-                      [use_gio=no])
-    if test "x$use_gio" = "xyes"; then
-        AC_DEFINE([HAVE_GIO], 1)
-    fi
 
     PKG_CHECK_MODULES([LIBAPPINDICATOR],
                       [appindicator-0.1 >= $LIBAPPINDICATOR_MINIMUM],
@@ -290,21 +278,6 @@ if test "x$build_gtk" = "xyes"; then
         else
             LIBAPPINDICATOR_CFLAGS=
             LIBAPPINDICATOR_LIBS=
-        fi
-    fi
-
-    PKG_CHECK_MODULES([DBUS_GLIB],
-                      [dbus-glib-1 >= $DBUS_GLIB_MINIMUM],
-                      [use_dbus_glib=yes],
-                      [use_dbus_glib=no])
-    if test "x$use_dbus_glib" = "xyes"; then
-        AC_DEFINE([HAVE_DBUS_GLIB], 1)
-    fi
-    if test "x$use_dbus_glib" = "xyes"; then
-        AC_PATH_PROG(DBUS_BINDING_TOOL, dbus-binding-tool, no)
-        if test "x$DBUS_BINDING_TOOL" = xno; then
-          AC_MSG_WARN([Cannot find dbus-binding-tool])
-          use_dbus_glib="no (dbus-binding-tool not found)"
         fi
     fi
 fi
@@ -461,18 +434,12 @@ Configuration:
    Compiler:                                          ${CXX}
 
    Build libtransmission:                             yes
-
       * optimized for low-resource systems:           ${enable_lightweight}
       * µTP enabled:                                  ${build_utp}
 
    Build Command-Line client:                         ${build_cli}
 
    Build GTK+ client:                                 ${build_gtk}
-
-     Optional dependencies for GTK+ client:
-
-      * dbus support:                                 ${use_dbus_glib}
-      * gio for watchdir and mime-type support:       ${use_gio}
       * libappindicator for an Ubuntu-style tray:     ${use_libappindicator}
 
    Build Daemon:                                      ${build_daemon}

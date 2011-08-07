@@ -11,10 +11,8 @@
 #include <gtk/gtk.h>
 #include "icons.h"
 
-#ifdef HAVE_GIO
- #if GTK_CHECK_VERSION( 2, 12, 0 )
-   #define USE_GIO_ICONS
- #endif
+#if GTK_CHECK_VERSION( 2, 12, 0 )
+ #define USE_GIO_ICONS
 #endif
 
 #ifdef USE_GIO_ICONS

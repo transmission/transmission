@@ -981,9 +981,9 @@ torrent_cell_renderer_init( GTypeInstance * instance, gpointer g_class UNUSED )
     g_object_set( p->text_renderer, "xpad", 0, "ypad", 0, NULL );
     p->progress_renderer = gtk_cell_renderer_progress_new(  );
     p->icon_renderer = gtk_cell_renderer_pixbuf_new(  );
-    gtr_object_ref_sink( p->text_renderer );
-    gtr_object_ref_sink( p->progress_renderer );
-    gtr_object_ref_sink( p->icon_renderer );
+    g_object_ref_sink( p->text_renderer );
+    g_object_ref_sink( p->progress_renderer );
+    g_object_ref_sink( p->icon_renderer );
 
     p->bar_height = DEFAULT_BAR_HEIGHT;
 }

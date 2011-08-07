@@ -27,12 +27,7 @@
 
 #include <gtk/gtk.h>
 #include <glib/gi18n.h>
-#ifdef HAVE_GIO
- #include <gio/gio.h>
-#endif
-#ifdef HAVE_DBUS_GLIB
- #include <dbus/dbus-glib.h>
-#endif
+#include <gio/gio.h>
 
 #include <event2/buffer.h>
 
@@ -46,9 +41,6 @@
 #include "conf.h"
 #include "notify.h"
 #include "tr-core.h"
-#ifdef HAVE_DBUS_GLIB
- #include "tr-core-dbus.h"
-#endif
 #include "tr-prefs.h"
 #include "util.h"
 #include "actions.h"
@@ -73,22 +65,21 @@ static guint core_signals[LAST_SIGNAL] = { 0 };
 
 static void core_maybe_inhibit_hibernation( TrCore * core );
 
-static gboolean our_instance_adds_remote_torrents = FALSE;
-
 struct TrCorePrivate
 {
-#ifdef HAVE_GIO
     GFileMonitor * monitor;
     gulong         monitor_tag;
     char         * monitor_dir;
     GSList       * monitor_files;
     guint          monitor_idle_tag;
-#endif
+
     gboolean       adding_from_watch_dir;
     gboolean       inhibit_allowed;
     gboolean       have_inhibit_cookie;
     gboolean       dbus_error;
     guint          inhibit_cookie;
+    guint          dbus_session_owner_id;
+    guint          dbus_display_owner_id;
     gint           busy_count;
     GtkTreeModel * raw_model;
     GtkTreeModel * sorted_model;
@@ -199,33 +190,108 @@ gtr_core_class_init( gpointer g_class, gpointer g_class_data UNUSED )
         g_cclosure_marshal_VOID__STRING,
         G_TYPE_NONE,
         1, G_TYPE_STRING );
+}
 
-#ifdef HAVE_DBUS_GLIB
+static void
+handle_dbus_method( GDBusConnection       * connection UNUSED,
+                    const gchar           * sender UNUSED,
+                    const gchar           * object_path,
+                    const gchar           * interface_name,
+                    const gchar           * method_name,
+                    GVariant              * parameters,
+                    GDBusMethodInvocation * invocation,
+                    gpointer                core )
+{
+    gboolean handled = false;
+
+    if( !g_strcmp0( interface_name, TR_DBUS_SESSION_INTERFACE ) )
     {
-        DBusGConnection * bus = dbus_g_bus_get( DBUS_BUS_SESSION, NULL );
-        DBusGProxy *      bus_proxy = NULL;
-        if( bus )
-            bus_proxy =
-                dbus_g_proxy_new_for_name( bus, "org.freedesktop.DBus",
-                                           "/org/freedesktop/DBus",
-                                           "org.freedesktop.DBus" );
-        if( bus_proxy )
+        if( !g_strcmp0( method_name, "TorrentAdd" ) )
         {
-            int result = 0;
-            dbus_g_proxy_call( bus_proxy, "RequestName", NULL,
-                               G_TYPE_STRING,
-                               "com.transmissionbt.Transmission",
-                               G_TYPE_UINT, 0,
-                               G_TYPE_INVALID,
-                               G_TYPE_UINT, &result,
-                               G_TYPE_INVALID );
-            if( ( our_instance_adds_remote_torrents = result == 1 ) )
-                dbus_g_object_type_install_info(
-                    TR_CORE_TYPE,
-                    &dbus_glib_gtr_core_object_info );
+            GVariant * args = g_variant_get_child_value( parameters, 0 );
+            GVariant * filename_variant = g_variant_lookup_value ( args, "filename", G_VARIANT_TYPE_STRING );
+            char * filename = g_variant_dup_string( filename_variant, NULL );
+            GSList * files = g_slist_append( NULL, filename );
+            gtr_core_add_list_defaults( TR_CORE( core ), files, TRUE );
+            g_dbus_method_invocation_return_value( invocation, g_variant_new( "(b)", true ) );
+            handled = true;
         }
     }
-#endif
+    else if( !g_strcmp0( interface_name, TR_DBUS_DISPLAY_INTERFACE ) )
+    {
+        if( !g_strcmp0( method_name, "PresentWindow" ) )
+        {
+            gtr_action_activate( "present-main-window" );
+            g_dbus_method_invocation_return_value( invocation, NULL );
+            handled = true;
+        }
+    }
+
+    if( !handled )
+        g_warning( "Unhandled method call:\n\tObject Path: %s\n\tInterface Name: %s\n\tMethod Name: %s",
+                   object_path, interface_name, method_name );
+};
+
+static void
+on_session_registered_in_dbus( GDBusConnection *connection, const gchar *name UNUSED, gpointer core )
+{
+    GError * err = NULL;
+    GDBusNodeInfo * node_info;
+    GDBusInterfaceVTable vtable;
+    const char * interface_xml = "<node>"
+                                 "  <interface name='" TR_DBUS_SESSION_INTERFACE "'>"
+                                 "    <method name='TorrentAdd'>"
+                                 "      <arg type='a{sv}' name='args' direction='in'/>"
+                                 "      <arg type='b' name='response' direction='out'/>"
+                                 "    </method>"
+                                 "  </interface>"
+                                 "</node>";
+
+    node_info = g_dbus_node_info_new_for_xml( interface_xml, &err );
+
+    vtable.method_call = handle_dbus_method;
+    vtable.get_property = NULL;
+    vtable.set_property = NULL;
+
+    g_dbus_connection_register_object ( connection,
+                                        TR_DBUS_SESSION_OBJECT_PATH,
+                                        node_info->interfaces[0],
+                                        &vtable,
+                                        core,
+                                        NULL,
+                                        &err );
+
+    if( err != NULL ) {
+        g_warning( "%s:%d Error registering object: %s", __FILE__, __LINE__, err->message );
+        g_error_free( err );
+    }
+}
+
+static void
+on_display_registered_in_dbus( GDBusConnection *connection, const gchar *name UNUSED, gpointer core )
+{
+    GError * err = NULL;
+    const char * interface_xml = "<node>"
+                                 "  <interface name='" TR_DBUS_DISPLAY_INTERFACE "'>"
+                                 "    <method name='PresentWindow'>"
+                                 "    </method>"
+                                 "  </interface>"
+                                 "</node>";
+    GDBusInterfaceVTable vtable = { .method_call=handle_dbus_method };
+    GDBusNodeInfo * node_info = g_dbus_node_info_new_for_xml( interface_xml, &err );
+
+    g_dbus_connection_register_object ( connection,
+                                        TR_DBUS_DISPLAY_OBJECT_PATH,
+                                        node_info->interfaces[0],
+                                        &vtable,
+                                        core,
+                                        NULL,
+                                        &err );
+
+    if( err != NULL ) {
+        g_warning( "%s:%d Error registering object: %s", __FILE__, __LINE__, err->message );
+        g_error_free( err );
+    }
 }
 
 static void
@@ -265,17 +331,23 @@ core_init( GTypeInstance * instance, gpointer g_class UNUSED )
     p->string_chunk = g_string_chunk_new( 2048 );
     g_object_unref( p->raw_model );
 
-#ifdef HAVE_DBUS_GLIB
-    if( our_instance_adds_remote_torrents )
-    {
-        DBusGConnection * bus = dbus_g_bus_get( DBUS_BUS_SESSION, NULL );
-        if( bus )
-            dbus_g_connection_register_g_object(
-                 bus,
-                "/com/transmissionbt/Transmission",
-                G_OBJECT( self ) );
-    }
-#endif
+    p->dbus_session_owner_id = g_bus_own_name( G_BUS_TYPE_SESSION,
+                                               TR_DBUS_SESSION_SERVICE_NAME,
+                                               G_BUS_NAME_OWNER_FLAGS_NONE,
+                                               NULL,
+                                               on_session_registered_in_dbus,
+                                               NULL,
+                                               self,
+                                               NULL );
+
+    p->dbus_display_owner_id = g_bus_own_name( G_BUS_TYPE_SESSION,
+                                               TR_DBUS_DISPLAY_SERVICE_NAME,
+                                               G_BUS_NAME_OWNER_FLAGS_NONE,
+                                               NULL,
+                                               on_display_registered_in_dbus,
+                                               NULL,
+                                               self,
+                                               NULL );
 }
 
 GType
@@ -633,8 +705,6 @@ core_set_sort_mode( TrCore * core, const char * mode, gboolean is_reversed )
 ****
 ***/
 
-#ifdef HAVE_GIO
-
 struct watchdir_file
 {
     char * filename;
@@ -803,8 +873,6 @@ core_watchdir_update( TrCore * core )
     }
 }
 
-#endif
-
 /***
 ****
 ***/
@@ -833,13 +901,11 @@ on_pref_changed( TrCore * core, const char * key, gpointer data UNUSED )
     {
         core_maybe_inhibit_hibernation( core );
     }
-#ifdef HAVE_GIO
     else if( !strcmp( key, PREF_KEY_DIR_WATCH )
            || !strcmp( key, PREF_KEY_DIR_WATCH_ENABLED ) )
     {
         core_watchdir_update( core );
     }
-#endif
 }
 
 /**
@@ -875,6 +941,9 @@ gtr_core_close( TrCore * core )
         gtr_pref_save( session );
         tr_sessionClose( session );
     }
+
+    g_bus_unown_name( core->priv->dbus_display_owner_id );
+    g_bus_unown_name( core->priv->dbus_session_owner_id );
 }
 
 /***
@@ -1146,46 +1215,6 @@ gtr_core_add_ctor( TrCore * core, tr_ctor * ctor )
     const gboolean do_prompt = gtr_pref_flag_get( PREF_KEY_OPTIONS_PROMPT );
     core_apply_defaults( ctor );
     core_add_ctor( core, ctor, do_prompt, do_notify );
-}
-
-/* invoked remotely via dbus. */
-gboolean
-gtr_core_add_metainfo( TrCore      * core,
-                       const char  * payload,
-                       gboolean    * setme_handled,
-                       GError     ** gerr UNUSED )
-{
-    tr_session * session = gtr_core_session( core );
-
-    if( !session )
-    {
-        *setme_handled = FALSE;
-    }
-    else if( gtr_is_supported_url( payload ) || gtr_is_magnet_link( payload ) )
-    {
-        gtr_core_add_from_url( core, payload );
-        *setme_handled = TRUE;
-    }
-    else /* base64-encoded metainfo */
-    {
-        int file_length;
-        tr_ctor * ctor;
-        char * file_contents;
-        gboolean do_prompt = gtr_pref_flag_get( PREF_KEY_OPTIONS_PROMPT );
-
-        ctor = tr_ctorNew( session );
-        core_apply_defaults( ctor );
-
-        file_contents = tr_base64_decode( payload, -1, &file_length );
-        tr_ctorSetMetainfo( ctor, (const uint8_t*)file_contents, file_length );
-        core_add_ctor( core, ctor, do_prompt, TRUE );
-
-        tr_free( file_contents );
-        gtr_core_torrents_added( core );
-        *setme_handled = TRUE;
-    }
-
-    return TRUE;
 }
 
 /***
@@ -1521,96 +1550,85 @@ gtr_core_update( TrCore * core )
 ***  Hibernate
 **/
 
-#ifdef HAVE_DBUS_GLIB
-
-static DBusGProxy*
-get_hibernation_inhibit_proxy( void )
-{
-    GError * error = NULL;
-    const char * name = "org.gnome.SessionManager";
-    const char * path = "/org/gnome/SessionManager";
-    const char * interface = "org.gnome.SessionManager";
-    DBusGConnection * conn = dbus_g_bus_get( DBUS_BUS_SESSION, &error );
-
-    if( error )
-    {
-        g_warning ( "DBUS cannot connect : %s", error->message );
-        g_error_free ( error );
-        return NULL;
-    }
-
-    return dbus_g_proxy_new_for_name ( conn, name, path, interface );
-}
+#define SESSION_MANAGER_SERVICE_NAME  "org.gnome.SessionManager"
+#define SESSION_MANAGER_INTERFACE     "org.gnome.SessionManager"
+#define SESSION_MANAGER_OBJECT_PATH   "/org/gnome/SessionManager"
 
 static gboolean
 gtr_inhibit_hibernation( guint * cookie )
 {
-    gboolean success = FALSE;
-    DBusGProxy * proxy = get_hibernation_inhibit_proxy( );
+    gboolean success;
+    GVariant * response;
+    GDBusConnection * connection;
+    GError * err = NULL;
+    const char * application = "Transmission BitTorrent Client";
+    const char * reason = "BitTorrent Activity";
+    const int toplevel_xid = 0;
+    const int flags = 4; /* Inhibit suspending the session or computer */
 
-    if( proxy )
-    {
-        GError * error = NULL;
-        const int toplevel_xid = 0;
-        const char * application = _( "Transmission Bittorrent Client" );
-        const char * reason = _( "BitTorrent Activity" );
-        const int flags = 4; /* Inhibit suspending the session or computer */
+    connection = g_bus_get_sync( G_BUS_TYPE_SESSION, NULL, &err );
 
-        success = dbus_g_proxy_call( proxy, "Inhibit", &error,
-                                     G_TYPE_STRING, application,
-                                     G_TYPE_UINT, toplevel_xid,
-                                     G_TYPE_STRING, reason,
-                                     G_TYPE_UINT, flags,
-                                     G_TYPE_INVALID, /* sentinel - end of input args */
-                                     G_TYPE_UINT, cookie,
-                                     G_TYPE_INVALID /* senitnel - end of output args */ );
+    response = g_dbus_connection_call_sync( connection,
+                                            SESSION_MANAGER_SERVICE_NAME,
+                                            SESSION_MANAGER_OBJECT_PATH,
+                                            SESSION_MANAGER_INTERFACE,
+                                            "Inhibit",
+                                            g_variant_new( "(susu)", application, toplevel_xid, reason, flags ),
+                                            NULL, G_DBUS_CALL_FLAGS_NONE,
+                                            1000, NULL, &err );
 
-        if( success )
-            tr_inf( "%s", _( "Disallowing desktop hibernation" ) );
-        else
-        {
-            tr_err( _( "Couldn't disable desktop hibernation: %s" ),
-                    error->message );
-            g_error_free( error );
-        }
+    *cookie = g_variant_get_uint32( g_variant_get_child_value( response, 0 ) );
 
-        g_object_unref( G_OBJECT( proxy ) );
+    success = err == NULL;
+
+    /* logging */
+    if( success )
+        tr_inf( "%s", _( "Inhibiting desktop hibernation" ) );
+    else {
+        tr_err( _( "Couldn't inhibit desktop hibernation: %s" ), err->message );
+        g_error_free( err );
     }
 
-    return success != 0;
+    /* cleanup */
+    g_variant_unref( response );
+    g_object_unref( connection );
+    return success;
 }
 
 static void
 gtr_uninhibit_hibernation( guint inhibit_cookie )
 {
-    DBusGProxy * proxy = get_hibernation_inhibit_proxy( );
+    GVariant * response;
+    GDBusConnection * connection;
+    GError * err = NULL;
 
-    if( proxy )
-    {
-        GError * error = NULL;
-        gboolean success = dbus_g_proxy_call( proxy, "Uninhibit", &error,
-                                              G_TYPE_UINT, inhibit_cookie,
-                                              G_TYPE_INVALID,
-                                              G_TYPE_INVALID );
-        if( success )
-            tr_inf( "%s", _( "Allowing desktop hibernation" ) );
-        else
-        {
-            g_warning( "Couldn't uninhibit the system from suspending: %s.",
-                       error->message );
-            g_error_free( error );
-        }
+    connection = g_bus_get_sync( G_BUS_TYPE_SESSION, NULL, &err );
 
-        g_object_unref( G_OBJECT( proxy ) );
+    response = g_dbus_connection_call_sync( connection,
+                                            SESSION_MANAGER_SERVICE_NAME,
+                                            SESSION_MANAGER_OBJECT_PATH,
+                                            SESSION_MANAGER_INTERFACE,
+                                            "Uninhibit",
+                                            g_variant_new( "(u)", inhibit_cookie ),
+                                            NULL, G_DBUS_CALL_FLAGS_NONE,
+                                            1000, NULL, &err );
+
+    /* logging */
+    if( err == NULL )
+        tr_inf( "%s", _( "Allowing desktop hibernation" ) );
+    else {
+        g_warning( "Couldn't uninhibit desktop hibernation: %s.", err->message );
+        g_error_free( err );
     }
-}
 
-#endif
+    /* cleanup */
+    g_variant_unref( response );
+    g_object_unref( connection );
+}
 
 static void
 gtr_core_set_hibernation_allowed( TrCore * core, gboolean allowed )
 {
-#ifdef HAVE_DBUS_GLIB
     g_return_if_fail( core );
     g_return_if_fail( core->priv );
 
@@ -1631,7 +1649,6 @@ gtr_core_set_hibernation_allowed( TrCore * core, gboolean allowed )
         else
             core->priv->dbus_error = TRUE;
     }
-#endif
 }
 
 static void
@@ -1917,17 +1934,4 @@ gtr_core_open_folder( TrCore * core, int torrent_id )
             g_free( path );
         }
     }
-}
-
-gboolean
-gtr_core_present_window( TrCore      * core UNUSED,
-                         gboolean    * success,
-                         GError     ** err  UNUSED )
-{
-    /* Setting the toggle-main-window GtkCheckMenuItem to
-       make sure its state is correctly set */
-    gtr_action_set_toggled( "toggle-main-window", TRUE);
-
-    *success = TRUE;
-    return TRUE;
 }

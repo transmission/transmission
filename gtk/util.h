@@ -108,9 +108,6 @@ const char* gtr_get_help_uri( void );
 ****
 ***/
 
-/* backwards-compatible wrapper around g_mkdir_with_parents() */
-int gtr_mkdir_with_parents( const char *name, int mode );
-
 /* backwards-compatible wrapper around gdk_threads_add_timeout_seconds() */
 guint gtr_timeout_add_seconds( guint seconds, GSourceFunc func, gpointer data );
 
@@ -128,9 +125,6 @@ gboolean gtr_widget_get_realized( GtkWidget * w );
 
 /* backwards-compatible wrapper around gtk_widget_set_visible() */
 void gtr_widget_set_visible( GtkWidget *, gboolean );
-
-/* backwards-compatible wrapper around g_object_ref_sink() */
-gpointer gtr_object_ref_sink( gpointer object );
 
 void gtr_dialog_set_content( GtkDialog * dialog, GtkWidget * content );
 

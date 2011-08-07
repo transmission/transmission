@@ -22,12 +22,7 @@
 #include <gtk/gtk.h>
 #include <glib/gi18n.h>
 #include <glib/gstdio.h> /* g_unlink() */
-#ifdef HAVE_GIO
- #include <gio/gio.h> /* g_file_trash() */
-#endif
-#ifdef HAVE_DBUS_GLIB
- #include <dbus/dbus-glib.h>
-#endif
+#include <gio/gio.h> /* g_file_trash() */
 
 #include <libtransmission/transmission.h> /* TR_RATIO_NA, TR_RATIO_INF */
 #include <libtransmission/utils.h> /* tr_strratio() */
@@ -35,6 +30,7 @@
 #include <libtransmission/version.h> /* SHORT_VERSION_STRING */
 
 #include "hig.h"
+#include "tr-core.h" /* dbus names */
 #include "util.h"
 
 /***
@@ -194,16 +190,6 @@ tr_strltime( char * buf, int seconds, size_t buflen )
     return buf;
 }
 
-int
-gtr_mkdir_with_parents( const char * path, int mode )
-{
-#if GLIB_CHECK_VERSION( 2, 8, 0 )
-    return !g_mkdir_with_parents( path, mode );
-#else
-    return !tr_mkdirp( path, mode );
-#endif
-}
-
 /* pattern-matching text; ie, legaltorrents.com */
 void
 gtr_get_host_from_url( char * buf, size_t buflen, const char * url )
@@ -361,25 +347,12 @@ on_tree_view_button_released( GtkWidget *      view,
     return FALSE;
 }
 
-gpointer
-gtr_object_ref_sink( gpointer object )
-{
-#if GLIB_CHECK_VERSION( 2, 10, 0 )
-    g_object_ref_sink( object );
-#else
-    g_object_ref( object );
-    gtk_object_sink( GTK_OBJECT( object ) );
-#endif
-    return object;
-}
-
 int
 gtr_file_trash_or_remove( const char * filename )
 {
     if( filename && g_file_test( filename, G_FILE_TEST_EXISTS ) )
     {
         gboolean trashed = FALSE;
-#ifdef HAVE_GIO
         GError * err = NULL;
         GFile *  file = g_file_new_for_path( filename );
         trashed = g_file_trash( file, NULL, &err );
@@ -387,7 +360,6 @@ gtr_file_trash_or_remove( const char * filename )
             g_message( "Unable to trash file \"%s\": %s", filename, err->message );
         g_clear_error( &err );
         g_object_unref( G_OBJECT( file ) );
-#endif
 
         if( !trashed && g_remove( filename ) )
         {
@@ -420,11 +392,10 @@ gtr_open_file( const char * path )
 {
     char * uri = NULL;
 
-#ifdef HAVE_GIO
     GFile * file = g_file_new_for_path( path );
     uri = g_file_get_uri( file );
     g_object_unref( G_OBJECT( file ) );
-#else
+
     if( g_path_is_absolute( path ) )
         uri = g_strdup_printf( "file://%s", path );
     else {
@@ -432,7 +403,6 @@ gtr_open_file( const char * path )
         uri = g_strdup_printf( "file://%s/%s", cwd, path );
         g_free( cwd );
     }
-#endif
 
     gtr_open_uri( uri );
     g_free( uri );
@@ -450,10 +420,8 @@ gtr_open_uri( const char * uri )
             opened = gtk_show_uri( NULL, uri, GDK_CURRENT_TIME, NULL );
 #endif
 
-#ifdef HAVE_GIO
         if( !opened )
             opened = g_app_info_launch_default_for_uri( uri, NULL, NULL );
-#endif
 
         if( !opened ) {
             char * argv[] = { (char*)"xdg-open", (char*)uri, NULL };
@@ -466,92 +434,70 @@ gtr_open_uri( const char * uri )
     }
 }
 
-#define VALUE_SERVICE_NAME        "com.transmissionbt.Transmission"
-#define VALUE_SERVICE_OBJECT_PATH "/com/transmissionbt/Transmission"
-#define VALUE_SERVICE_INTERFACE   "com.transmissionbt.Transmission"
-
 gboolean
 gtr_dbus_add_torrent( const char * filename )
 {
-    /* FIXME: why is this static? */
-    static gboolean handled = FALSE;
+    GVariant * response;
+    GVariant * args;
+    GVariant * parameters;
+    GVariantBuilder * builder;
+    GDBusConnection * connection;
+    GError * err = NULL;
+    gboolean handled = FALSE;
 
-#ifdef HAVE_DBUS_GLIB
-    char * payload;
-    gsize file_length;
-    char * file_contents = NULL;
+    /* "args" is a dict as described in the RPC spec's "torrent-add" section */
+    builder = g_variant_builder_new( G_VARIANT_TYPE( "a{sv}" ) );
+    g_variant_builder_add( builder, "{sv}", "filename", g_variant_new_string( filename ) );
+    args = g_variant_builder_end( builder );
+    parameters = g_variant_new_tuple( &args, 1 );
+    g_variant_builder_unref( builder );
 
-    /* If it's a file, load its contents and send them over the wire...
-     * it might be a temporary file that's going to disappear. */
-    if( g_file_get_contents( filename, &file_contents, &file_length, NULL ) )
-        payload = tr_base64_encode( file_contents, file_length, NULL );
-    else if( gtr_is_supported_url( filename ) || gtr_is_magnet_link( filename ) )
-        payload = tr_strdup( filename );
-    else
-        payload = NULL;
+    connection = g_bus_get_sync( G_BUS_TYPE_SESSION, NULL, &err );
 
-    if( payload != NULL )
-    {
-        GError * err = NULL;
-        DBusGConnection * conn;
-        DBusGProxy * proxy = NULL;
+    response = g_dbus_connection_call_sync( connection,
+                                            TR_DBUS_SESSION_SERVICE_NAME,
+                                            TR_DBUS_SESSION_OBJECT_PATH,
+                                            TR_DBUS_SESSION_INTERFACE,
+                                            "TorrentAdd",
+                                            parameters,
+                                            G_VARIANT_TYPE_TUPLE,
+                                            G_DBUS_CALL_FLAGS_NONE,
+                                            10000, /* wait 10 sec */
+                                            NULL,
+                                            &err );
 
-        if(( conn = dbus_g_bus_get( DBUS_BUS_SESSION, &err )))
-            proxy = dbus_g_proxy_new_for_name (conn, VALUE_SERVICE_NAME,
-                                                     VALUE_SERVICE_OBJECT_PATH,
-                                                     VALUE_SERVICE_INTERFACE );
-        else if( err )
-           g_message( "err: %s", err->message );
 
-        if( proxy )
-            dbus_g_proxy_call( proxy, "AddMetainfo", &err,
-                               G_TYPE_STRING, payload,
-                               G_TYPE_INVALID,
-                               G_TYPE_BOOLEAN, &handled,
-                               G_TYPE_INVALID );
-        if( err )
-           g_message( "err: %s", err->message );
+    handled = g_variant_get_boolean( g_variant_get_child_value( response, 0 ) );
 
-        if( proxy )
-            g_object_unref( proxy );
-        if( conn )
-            dbus_g_connection_unref( conn );
-
-        tr_free( payload );
-    }
-
-    g_free( file_contents );
-
-#endif
+    g_object_unref( connection );
+    g_variant_unref( response );
     return handled;
 }
 
 gboolean
 gtr_dbus_present_window( void )
 {
-    static gboolean   success = FALSE;
+    gboolean success;
+    GDBusConnection * connection;
+    GError * err = NULL;
 
-#ifdef HAVE_DBUS_GLIB
-    DBusGProxy *      proxy = NULL;
-    GError *          err = NULL;
-    DBusGConnection * conn;
-    if( ( conn = dbus_g_bus_get( DBUS_BUS_SESSION, &err ) ) )
-        proxy = dbus_g_proxy_new_for_name ( conn, VALUE_SERVICE_NAME,
-                                            VALUE_SERVICE_OBJECT_PATH,
-                                            VALUE_SERVICE_INTERFACE );
-    else if( err )
-        g_message( "err: %s", err->message );
-    if( proxy )
-        dbus_g_proxy_call( proxy, "PresentWindow", &err,
-                           G_TYPE_INVALID,
-                           G_TYPE_BOOLEAN, &success,
-                           G_TYPE_INVALID );
-    if( err )
-        g_message( "err: %s", err->message );
+    connection = g_bus_get_sync( G_BUS_TYPE_SESSION, NULL, &err );
 
-    g_object_unref( proxy );
-    dbus_g_connection_unref( conn );
-#endif
+    g_dbus_connection_call_sync( connection,
+                                 TR_DBUS_DISPLAY_SERVICE_NAME,
+                                 TR_DBUS_DISPLAY_OBJECT_PATH,
+                                 TR_DBUS_DISPLAY_INTERFACE,
+                                 "PresentWindow",
+                                 NULL,
+                                 NULL, G_DBUS_CALL_FLAGS_NONE,
+                                 1000, NULL, &err );
+
+    success = err == NULL;
+
+    /* cleanup */
+    if( err != NULL )
+        g_error_free( err );
+    g_object_unref( connection );
     return success;
 }
 

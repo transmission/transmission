@@ -116,11 +116,6 @@ void gtr_core_add_list_defaults( TrCore    * core,
                                  GSList    * torrentFiles,
                                  gboolean    do_notify );
 
-/** @brief Add a torrent. */
-gboolean gtr_core_add_metainfo( TrCore      * core,
-                                const char  * base64_metainfo,
-                                gboolean    * setme_success,
-                                GError     ** err );
 
 /** @brief Add a torrent from a URL */
 void gtr_core_add_from_url( TrCore * core, const char * url );
@@ -131,9 +126,6 @@ void gtr_core_add_ctor( TrCore * core, tr_ctor * ctor );
 
 /** Add a torrent. */
 void gtr_core_add_torrent( TrCore*, tr_torrent*, gboolean do_notify );
-
-/** Present the main window */
-gboolean gtr_core_present_window( TrCore*, gboolean * setme_success, GError ** err );
 
 /**
  * Notifies listeners that torrents have been added.
@@ -206,5 +198,15 @@ enum
 
     MC_ROW_COUNT
 };
+
+
+#define TR_DBUS_SESSION_SERVICE_NAME  "com.transmissionbt.transmission.Session"
+#define TR_DBUS_SESSION_INTERFACE     "com.transmissionbt.transmission.Session"
+#define TR_DBUS_SESSION_OBJECT_PATH   "/com/transmissionbt/transmission/Session"
+
+#define TR_DBUS_DISPLAY_SERVICE_NAME  "com.transmissionbt.transmission.Display"
+#define TR_DBUS_DISPLAY_INTERFACE     "com.transmissionbt.transmission.Display"
+#define TR_DBUS_DISPLAY_OBJECT_PATH   "/com/transmissionbt/transmission/Display"
+
 
 #endif /* GTR_CORE_H */

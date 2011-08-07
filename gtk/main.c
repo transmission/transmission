@@ -35,9 +35,7 @@
 
 #include <glib/gi18n.h>
 #include <glib/gstdio.h>
-#ifdef HAVE_GIO
- #include <gio/gio.h>
-#endif
+#include <gio/gio.h>
 #include <gtk/gtk.h>
 
 #include <libtransmission/transmission.h>
@@ -376,7 +374,6 @@ static gboolean update_model_once( gpointer gdata );
 static void
 register_magnet_link_handler( void )
 {
-#ifdef HAVE_GIO
     GAppInfo * app_info = g_app_info_get_default_for_uri_scheme( "magnet" );
     if( app_info == NULL )
     {
@@ -390,7 +387,6 @@ register_magnet_link_handler( void )
             g_clear_error( &error );
         }
     }
-#endif
 }
 
 static void
@@ -747,9 +743,9 @@ main( int argc, char ** argv )
 
         /* ensure the directories are created */
         if(( str = gtr_pref_string_get( TR_PREFS_KEY_DOWNLOAD_DIR )))
-            gtr_mkdir_with_parents( str, 0777 );
+            g_mkdir_with_parents( str, 0777 );
         if(( str = gtr_pref_string_get( TR_PREFS_KEY_INCOMPLETE_DIR )))
-            gtr_mkdir_with_parents( str, 0777 );
+            g_mkdir_with_parents( str, 0777 );
 
         /* initialize the libtransmission session */
         session = tr_sessionInit( "gtk", configDir, TRUE, gtr_pref_get_all( ) );
@@ -883,28 +879,44 @@ app_setup( TrWindow      * wind,
 }
 
 static void
-toggleMainWindow( struct cbdata * cbdata )
+presentMainWindow( struct cbdata * cbdata )
 {
     GtkWindow * window = cbdata->wind;
-    const int   doShow = cbdata->is_iconified;
-    static int  x = 0;
-    static int  y = 0;
 
-    if( doShow )
+    if( cbdata->is_iconified )
     {
-        cbdata->is_iconified = 0;
+        cbdata->is_iconified = false;
+
         gtk_window_set_skip_taskbar_hint( window, FALSE );
-        gtk_window_move( window, x, y );
-        gtr_widget_set_visible( GTK_WIDGET( window ), TRUE );
-        gtr_window_present( window );
     }
-    else
+
+    if( !gtk_widget_get_visible( GTK_WIDGET( window ) ) )
     {
-        gtk_window_get_position( window, &x, &y );
-        gtk_window_set_skip_taskbar_hint( window, TRUE );
-        gtr_widget_set_visible( GTK_WIDGET( window ), FALSE );
-        cbdata->is_iconified = 1;
+        gtk_window_resize( window, gtr_pref_int_get( PREF_KEY_MAIN_WINDOW_WIDTH ),
+                                   gtr_pref_int_get( PREF_KEY_MAIN_WINDOW_HEIGHT ) );
+        gtk_window_move( window, gtr_pref_int_get( PREF_KEY_MAIN_WINDOW_X ),
+                                 gtr_pref_int_get( PREF_KEY_MAIN_WINDOW_Y ) );
+        gtr_widget_set_visible( GTK_WIDGET( window ), TRUE );
     }
+    gtr_window_present( window );
+}
+
+static void
+hideMainWindow( struct cbdata * cbdata )
+{
+    GtkWindow * window = cbdata->wind;
+    gtk_window_set_skip_taskbar_hint( window, TRUE );
+    gtr_widget_set_visible( GTK_WIDGET( window ), FALSE );
+    cbdata->is_iconified = true;
+}
+
+static void
+toggleMainWindow( struct cbdata * cbdata )
+{
+    if( cbdata->is_iconified )
+        presentMainWindow( cbdata );
+    else
+        hideMainWindow( cbdata );
 }
 
 static gboolean
@@ -1759,6 +1771,10 @@ gtr_actions_handler( const char * action_name, gpointer user_data )
     else if( !strcmp( action_name, "toggle-main-window" ) )
     {
         toggleMainWindow( data );
+    }
+    else if( !strcmp( action_name, "present-main-window" ) )
+    {
+        presentMainWindow( data );
     }
     else g_error ( "Unhandled action: %s", action_name );
 
