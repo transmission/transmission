@@ -1559,10 +1559,14 @@ sessionSet( tr_session               * session,
         tr_blocklistSetURL( session, str );
     if( tr_bencDictFindStr( args_in, TR_PREFS_KEY_DOWNLOAD_DIR, &str ) )
         tr_sessionSetDownloadDir( session, str );
-    if( tr_bencDictFindBool( args_in, TR_PREFS_KEY_DOWNLOAD_QUEUE_ENABLED, &boolVal ) )
-        tr_sessionSetQueueEnabled ( session, TR_DOWN, boolVal );
+    if( tr_bencDictFindInt( args_in, TR_PREFS_KEY_QUEUE_STALLED_MINUTES, &i ) )
+        tr_sessionSetQueueStalledMinutes( session, i );
+    if( tr_bencDictFindBool( args_in, TR_PREFS_KEY_QUEUE_STALLED_ENABLED, &boolVal ) )
+        tr_sessionSetQueueStalledEnabled( session, boolVal );
     if( tr_bencDictFindInt( args_in, TR_PREFS_KEY_DOWNLOAD_QUEUE_SIZE, &i ) )
         tr_sessionSetQueueSize( session, TR_DOWN, i );
+    if( tr_bencDictFindBool( args_in, TR_PREFS_KEY_DOWNLOAD_QUEUE_ENABLED, &boolVal ) )
+        tr_sessionSetQueueEnabled ( session, TR_DOWN, boolVal );
     if( tr_bencDictFindStr( args_in, TR_PREFS_KEY_INCOMPLETE_DIR, &str ) )
         tr_sessionSetIncompleteDir( session, str );
     if( tr_bencDictFindBool( args_in, TR_PREFS_KEY_INCOMPLETE_DIR_ENABLED, &boolVal ) )
@@ -1730,6 +1734,8 @@ sessionGet( tr_session               * s,
     tr_bencDictAddBool( d, TR_PREFS_KEY_DSPEED_ENABLED, tr_sessionIsSpeedLimited( s, TR_DOWN ) );
     tr_bencDictAddStr ( d, TR_PREFS_KEY_SCRIPT_TORRENT_DONE_FILENAME, tr_sessionGetTorrentDoneScript( s ) );
     tr_bencDictAddBool( d, TR_PREFS_KEY_SCRIPT_TORRENT_DONE_ENABLED, tr_sessionIsTorrentDoneScriptEnabled( s ) );
+    tr_bencDictAddInt ( d, TR_PREFS_KEY_QUEUE_STALLED_MINUTES, tr_sessionGetQueueStalledMinutes( s ) );
+    tr_bencDictAddBool( d, TR_PREFS_KEY_QUEUE_STALLED_ENABLED, tr_sessionGetQueueStalledEnabled( s ) );
     tr_formatter_get_units( tr_bencDictAddDict( d, "units", 0 ) );
     tr_bencDictAddStr ( d, "version", LONG_VERSION_STRING );
     switch( tr_sessionGetEncryption( s ) ) {

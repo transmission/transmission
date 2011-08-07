@@ -1141,7 +1141,8 @@ torrentGetIdleSecs( const tr_torrent * tor )
 bool
 tr_torrentIsStalled( const tr_torrent * tor )
 {
-    return torrentGetIdleSecs( tor ) > ( tr_sessionGetQueueStalledMinutes( tor->session ) * 60 );
+    return tr_sessionGetQueueStalledEnabled( tor->session )
+        && ( torrentGetIdleSecs( tor ) > ( tr_sessionGetQueueStalledMinutes( tor->session ) * 60 ) );
 }
 
 

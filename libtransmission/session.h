@@ -111,6 +111,7 @@ struct tr_session
 
     tr_benc                      removedTorrents;
 
+    bool                         stalledEnabled;
     bool                         queueEnabled[2];
     int                          queueSize[2];
     int                          queueStalledMinutes;

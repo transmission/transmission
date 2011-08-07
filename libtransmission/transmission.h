@@ -209,6 +209,7 @@ const char* tr_getDefaultDownloadDir( void );
 #define TR_PREFS_KEY_SEED_QUEUE_SIZE                    "seed-queue-size"
 #define TR_PREFS_KEY_SEED_QUEUE_ENABLED                 "seed-queue-enabled"
 #define TR_PREFS_KEY_RPC_WHITELIST                      "rpc-whitelist"
+#define TR_PREFS_KEY_QUEUE_STALLED_ENABLED              "queue-stalled-enabled"
 #define TR_PREFS_KEY_QUEUE_STALLED_MINUTES              "queue-stalled-minutes"
 #define TR_PREFS_KEY_DSPEED_KBps                        "speed-limit-down"
 #define TR_PREFS_KEY_DSPEED_ENABLED                     "speed-limit-down-enabled"
@@ -801,12 +802,24 @@ void tr_sessionSetQueueEnabled  ( tr_session *, tr_direction, bool do_limit_simu
 /** @brief Return true if we're limiting how many torrents can concurrently download (TR_DOWN) or seed (TR_UP) at the same time */
 bool tr_sessionGetQueueEnabled  ( const tr_session *, tr_direction );
 
+/**
+**/
+
 /** @brief Consider torrent as 'stalled' when it's been inactive for N minutes.
     Stalled torrents are left running but are not counted by tr_sessionGetQueueSize(). */
 void tr_sessionSetQueueStalledMinutes( tr_session *, int minutes );
 
 /** @return the number of minutes a torrent can be idle before being considered as stalled */
 int  tr_sessionGetQueueStalledMinutes( const tr_session * );
+
+/** @brief Set whether or not to count torrents idle for over N minutes as 'stalled' */
+void tr_sessionSetQueueStalledEnabled( tr_session *, bool );
+
+/** @return true if we're torrents idle for over N minutes will be flagged as 'stalled' */
+bool tr_sessionGetQueueStalledEnabled( const tr_session * );
+
+/**
+**/
 
 /** @brief Set a callback that is invoked when the queue starts a torrent */
 void tr_torrentSetQueueStartCallback( tr_torrent * torrent, void (*callback)( tr_torrent *, void * ), void * user_data );

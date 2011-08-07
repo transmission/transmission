@@ -332,6 +332,7 @@ tr_sessionGetDefaultSettings( tr_benc * d )
     tr_bencDictAddBool( d, TR_PREFS_KEY_PORT_FORWARDING,                 true );
     tr_bencDictAddInt ( d, TR_PREFS_KEY_PREALLOCATION,                   TR_PREALLOCATE_SPARSE );
     tr_bencDictAddBool( d, TR_PREFS_KEY_PREFETCH_ENABLED,                DEFAULT_PREFETCH_ENABLED );
+    tr_bencDictAddBool( d, TR_PREFS_KEY_QUEUE_STALLED_ENABLED,           true );
     tr_bencDictAddInt ( d, TR_PREFS_KEY_QUEUE_STALLED_MINUTES,           30 );
     tr_bencDictAddReal( d, TR_PREFS_KEY_RATIO,                           2.0 );
     tr_bencDictAddBool( d, TR_PREFS_KEY_RATIO_ENABLED,                   false );
@@ -402,6 +403,7 @@ tr_sessionGetSettings( tr_session * s, struct tr_benc * d )
     tr_bencDictAddBool( d, TR_PREFS_KEY_PORT_FORWARDING,                  tr_sessionIsPortForwardingEnabled( s ) );
     tr_bencDictAddInt ( d, TR_PREFS_KEY_PREALLOCATION,                    s->preallocationMode );
     tr_bencDictAddInt ( d, TR_PREFS_KEY_PREFETCH_ENABLED,                 s->isPrefetchEnabled );
+    tr_bencDictAddBool( d, TR_PREFS_KEY_QUEUE_STALLED_ENABLED,            tr_sessionGetQueueStalledEnabled( s ) );
     tr_bencDictAddInt ( d, TR_PREFS_KEY_QUEUE_STALLED_MINUTES,            tr_sessionGetQueueStalledMinutes( s ) );
     tr_bencDictAddReal( d, TR_PREFS_KEY_RATIO,                            s->desiredRatio );
     tr_bencDictAddBool( d, TR_PREFS_KEY_RATIO_ENABLED,                    s->isRatioLimited );
@@ -792,6 +794,8 @@ sessionSetImpl( void * vdata )
     /* torrent queues */
     if( tr_bencDictFindInt( settings, TR_PREFS_KEY_QUEUE_STALLED_MINUTES, &i ) )
         tr_sessionSetQueueStalledMinutes( session, i );
+    if( tr_bencDictFindBool( settings, TR_PREFS_KEY_QUEUE_STALLED_ENABLED, &boolVal ) )
+        tr_sessionSetQueueStalledEnabled( session, boolVal );
     if( tr_bencDictFindInt( settings, TR_PREFS_KEY_DOWNLOAD_QUEUE_SIZE, &i ) )
         tr_sessionSetQueueSize( session, TR_DOWN, i );
     if( tr_bencDictFindBool( settings, TR_PREFS_KEY_DOWNLOAD_QUEUE_ENABLED, &boolVal ) )
@@ -2672,6 +2676,23 @@ tr_sessionSetQueueStalledMinutes( tr_session * session, int minutes )
 
     session->queueStalledMinutes = minutes;
    
+}
+
+void
+tr_sessionSetQueueStalledEnabled( tr_session * session, bool is_enabled )
+{
+    assert( tr_isSession( session ) );
+    assert( tr_isBool( is_enabled ) );
+
+    session->stalledEnabled = is_enabled;
+}
+  
+bool
+tr_sessionGetQueueStalledEnabled( const tr_session * session )
+{
+    assert( tr_isSession( session ) );
+
+    return session->stalledEnabled;
 }
 
 int
