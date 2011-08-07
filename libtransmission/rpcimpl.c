@@ -35,7 +35,7 @@
 #include "version.h"
 #include "web.h"
 
-#define RPC_VERSION     13
+#define RPC_VERSION     14
 #define RPC_VERSION_MIN 1
 
 #define RECENTLY_ACTIVE_SECONDS 60
