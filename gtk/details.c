@@ -1445,7 +1445,6 @@ refreshPeers( struct DetailsImpl * di, tr_torrent ** torrents, int n )
     refreshWebseedList( di, torrents, n );
 }
 
-#if GTK_CHECK_VERSION( 2,12,0 )
 static gboolean
 onPeerViewQueryTooltip( GtkWidget   * widget,
                         gint          x,
@@ -1513,7 +1512,6 @@ onPeerViewQueryTooltip( GtkWidget   * widget,
 
     return show_tip;
 }
-#endif
 
 static void
 setPeerViewColumns( GtkTreeView * peer_view )
@@ -1710,24 +1708,15 @@ peer_page_new( struct DetailsImpl * di )
     gtk_tree_sortable_set_sort_column_id( GTK_TREE_SORTABLE( m ),
                                           PEER_COL_PROGRESS,
                                           GTK_SORT_DESCENDING );
-#if GTK_CHECK_VERSION( 2,12,0 )
     v = GTK_WIDGET( g_object_new( GTK_TYPE_TREE_VIEW,
                                   "model",  m,
                                   "rules-hint", TRUE,
                                   "has-tooltip", TRUE,
                                   NULL ) );
-#else
-    v = GTK_WIDGET( g_object_new( GTK_TYPE_TREE_VIEW,
-                                  "model",  m,
-                                  "rules-hint", TRUE,
-                                  NULL ) );
-#endif
     di->peer_view = v;
 
-#if GTK_CHECK_VERSION( 2,12,0 )
     g_signal_connect( v, "query-tooltip",
                       G_CALLBACK( onPeerViewQueryTooltip ), di );
-#endif
     g_object_unref( store );
     g_signal_connect( v, "button-release-event",
                       G_CALLBACK( on_tree_view_button_released ), NULL );

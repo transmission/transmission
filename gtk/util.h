@@ -114,15 +114,6 @@ guint gtr_timeout_add_seconds( guint seconds, GSourceFunc func, gpointer data );
 /* backwards-compatible wrapper around gdk_threads_add_idle() */
 guint gtr_idle_add( GSourceFunc  func, gpointer data );
 
-/* backwards-compatible wrapper around gtk_widget_set_tooltip_text() */
-void gtr_widget_set_tooltip_text( GtkWidget * w, const char * tip );
-
-/* backwards-compatible wrapper around gtk_widget_get_window() */
-GdkWindow* gtr_widget_get_window( GtkWidget * w );
-
-/* backwards-compatible wrapper around gtk_widget_get_realized() */
-gboolean gtr_widget_get_realized( GtkWidget * w );
-
 /* backwards-compatible wrapper around gtk_widget_set_visible() */
 void gtr_widget_set_visible( GtkWidget *, gboolean );
 

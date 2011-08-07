@@ -415,10 +415,8 @@ gtr_open_uri( const char * uri )
     {
         gboolean opened = FALSE;
 
-#if GTK_CHECK_VERSION(2,14,0)
         if( !opened )
             opened = gtk_show_uri( NULL, uri, GDK_CURRENT_TIME, NULL );
-#endif
 
         if( !opened )
             opened = g_app_info_launch_default_for_uri( uri, NULL, NULL );
@@ -590,39 +588,6 @@ gtr_priority_combo_new( void )
 ***/
 
 void
-gtr_widget_set_tooltip_text( GtkWidget * w, const char * tip )
-{
-#if GTK_CHECK_VERSION( 2,12,0 )
-    gtk_widget_set_tooltip_text( w, tip );
-#else
-    static GtkTooltips * tips = NULL;
-    if( tips == NULL )
-        tips = gtk_tooltips_new( );
-    gtk_tooltips_set_tip( tips, w, tip, NULL );
-#endif
-}
-
-GdkWindow*
-gtr_widget_get_window( GtkWidget * w )
-{
-#if GTK_CHECK_VERSION( 2,14,0 )
-    return gtk_widget_get_window( w );
-#else
-    return w->window;
-#endif
-}
-
-gboolean
-gtr_widget_get_realized( GtkWidget * w )
-{
-#if GTK_CHECK_VERSION( 2,20,0 )
-    return gtk_widget_get_realized( w );
-#else
-    return GTK_WIDGET_REALIZED( w ) != 0;
-#endif
-}
-
-void
 gtr_widget_set_visible( GtkWidget * w, gboolean b )
 {
     /* toggle the transient children, too */
@@ -640,30 +605,13 @@ gtr_widget_set_visible( GtkWidget * w, gboolean b )
         g_list_free( windows );
     }
 
-#if GTK_CHECK_VERSION( 2,18,0 )
     gtk_widget_set_visible( w, b );
-#else
-    if( b )
-        gtk_widget_show( w );
-    else
-        gtk_widget_hide( w );
-#endif
-}
-
-static GtkWidget*
-gtr_dialog_get_content_area( GtkDialog * dialog )
-{
-#if GTK_CHECK_VERSION( 2,14,0 )
-    return gtk_dialog_get_content_area( dialog );
-#else
-    return dialog->vbox;
-#endif
 }
 
 void
 gtr_dialog_set_content( GtkDialog * dialog, GtkWidget * content )
 {
-    GtkWidget * vbox = gtr_dialog_get_content_area( dialog );
+    GtkWidget * vbox = gtk_dialog_get_content_area( dialog );
     gtk_box_pack_start( GTK_BOX( vbox ), content, TRUE, TRUE, 0 );
     gtk_widget_show_all( content );
 }
@@ -672,77 +620,16 @@ gtr_dialog_set_content( GtkDialog * dialog, GtkWidget * content )
 ****
 ***/
 
-#if !GTK_CHECK_VERSION( 2,12,0 )
-struct gtr_func_data
-{
-    GSourceFunc function;
-    gpointer data;
-};
-
-static void
-gtr_func_data_free( gpointer data )
-{
-#if GTK_CHECK_VERSION( 2,10,0 )
-    g_slice_free( struct gtr_func_data, data );
-#else
-    g_free( data );
-#endif
-}
-
-static struct gtr_func_data *
-gtr_func_data_new( GSourceFunc function, gpointer data )
-{
-#if GTK_CHECK_VERSION( 2,10,0 )
-    struct gtr_func_data * d = g_slice_new( struct gtr_func_data );
-#else
-    struct gtr_func_data * d = g_new( struct gtr_func_data, 1 );
-#endif
-    d->function = function;
-    d->data = data;
-    return d;
-}
-
-static gboolean
-gtr_thread_func( gpointer data )
-{
-    gboolean more;
-    struct gtr_func_data * idle_data = data;
-
-    gdk_threads_enter( );
-    more = idle_data->function( idle_data->data );
-    gdk_threads_leave( );
-
-    return more;
-}
-#endif
-
 guint
 gtr_idle_add( GSourceFunc function, gpointer data )
 {
-#if GTK_CHECK_VERSION( 2,12,0 )
     return gdk_threads_add_idle( function, data );
-#else
-    return g_idle_add_full( G_PRIORITY_DEFAULT,
-                            gtr_thread_func,
-                            gtr_func_data_new( function, data ),
-                            gtr_func_data_free );
-#endif
 }
 
 guint
 gtr_timeout_add_seconds( guint seconds, GSourceFunc function, gpointer data )
 {
-#if GTK_CHECK_VERSION( 2,14,0 )
     return gdk_threads_add_timeout_seconds( seconds, function, data );
-#elif GTK_CHECK_VERSION( 2,12,0 )
-    return gdk_threads_add_timeout( seconds*1000, function, data );
-#else
-    return g_timeout_add_full( G_PRIORITY_DEFAULT,
-                               seconds * 1000,
-                               gtr_thread_func,
-                               gtr_func_data_new( function, data ),
-                               gtr_func_data_free );
-#endif
 }
 
 void

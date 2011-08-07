@@ -577,19 +577,19 @@ privacyPage( GObject * core )
     s = _( "Use PE_X to find more peers" );
     w = new_check_button( s, TR_PREFS_KEY_PEX_ENABLED, core );
     s = _( "PEX is a tool for exchanging peer lists with the peers you're connected to." );
-    gtr_widget_set_tooltip_text( w, s );
+    gtk_widget_set_tooltip_text( w, s );
     hig_workarea_add_wide_control( t, &row, w );
 
     s = _( "Use _DHT to find more peers" );
     w = new_check_button( s, TR_PREFS_KEY_DHT_ENABLED, core );
     s = _( "DHT is a tool for finding peers without a tracker." );
-    gtr_widget_set_tooltip_text( w, s );
+    gtk_widget_set_tooltip_text( w, s );
     hig_workarea_add_wide_control( t, &row, w );
 
     s = _( "Use _Local Peer Discovery to find more peers" );
     w = new_check_button( s, TR_PREFS_KEY_LPD_ENABLED, core );
     s = _( "LPD is a tool for finding peers on your local network." );
-    gtr_widget_set_tooltip_text( w, s );
+    gtk_widget_set_tooltip_text( w, s );
     hig_workarea_add_wide_control( t, &row, w );
 
     hig_workarea_finish( t, &row );
@@ -875,7 +875,7 @@ webPage( GObject * core )
 
         page->whitelist_widgets = g_slist_append( page->whitelist_widgets, w );
         v = page->view = GTK_TREE_VIEW( w );
-        gtr_widget_set_tooltip_text( w, _( "IP addresses may use wildcards, such as 192.168.*.*" ) );
+        gtk_widget_set_tooltip_text( w, _( "IP addresses may use wildcards, such as 192.168.*.*" ) );
         sel = gtk_tree_view_get_selection( v );
         g_signal_connect( sel, "changed",
                           G_CALLBACK( onWhitelistSelectionChanged ), page );
@@ -1246,7 +1246,7 @@ networkPage( GObject * core )
     s = _( "Enable _uTP for peer communication" );
     w = new_check_button( s, TR_PREFS_KEY_UTP_ENABLED, core );
     s = _( "uTP is a tool for reducing network congestion." );
-    gtr_widget_set_tooltip_text( w, s );
+    gtk_widget_set_tooltip_text( w, s );
     hig_workarea_add_wide_control( t, &row, w );
 #endif
 

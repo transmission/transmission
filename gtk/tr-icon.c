@@ -113,11 +113,7 @@ gtr_icon_refresh( gpointer vicon )
      * %4$s: current download limit, if any */
     g_snprintf( tip, sizeof( tip ), _( "Transmission\nUp: %1$s %2$s\nDown: %3$s %4$s" ), up, upLimit, down, downLimit );
 
-#if GTK_CHECK_VERSION( 2,16,0 )
     gtk_status_icon_set_tooltip_text( GTK_STATUS_ICON( icon ), tip );
-#else
-    gtk_status_icon_set_tooltip( GTK_STATUS_ICON( icon ), tip );
-#endif
 }
 #endif
 

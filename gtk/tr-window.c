@@ -267,7 +267,7 @@ syncAltSpeedButton( PrivateData * p )
     gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON( w ), b );
     gtk_image_set_from_stock( GTK_IMAGE( p->alt_speed_image ), stock, -1 );
     gtk_button_set_alignment( GTK_BUTTON( w ), 0.5, 0.5 );
-    gtr_widget_set_tooltip_text( w, str );
+    gtk_widget_set_tooltip_text( w, str );
 
     g_free( str );
 }
@@ -283,8 +283,6 @@ alt_speed_toggled_cb( GtkToggleButton * button, gpointer vprivate )
 /***
 ****  FILTER
 ***/
-
-#if GTK_CHECK_VERSION( 2, 12, 0 )
 
 static void
 findMaxAnnounceTime( GtkTreeModel *      model,
@@ -333,8 +331,6 @@ onAskTrackerQueryTooltip( GtkWidget *            widget UNUSED,
         return TRUE;
     }
 }
-
-#endif
 
 static gboolean
 onAltSpeedToggledIdle( gpointer vp )
@@ -597,10 +593,7 @@ gtr_window_new( GtkUIManager * ui_mgr, TrCore * core )
     /* main menu */
     mainmenu = gtr_action_get_widget( "/main-window-menu" );
     w = gtr_action_get_widget( "/main-window-menu/torrent-menu/torrent-reannounce" );
-#if GTK_CHECK_VERSION( 2, 12, 0 )
-    g_signal_connect( w, "query-tooltip",
-                      G_CALLBACK( onAskTrackerQueryTooltip ), p );
-#endif
+    g_signal_connect( w, "query-tooltip", G_CALLBACK( onAskTrackerQueryTooltip ), p );
 
     /* toolbar */
     toolbar = p->toolbar = gtr_action_get_widget( "/main-window-toolbar" );
@@ -639,7 +632,7 @@ gtr_window_new( GtkUIManager * ui_mgr, TrCore * core )
 
         w = gtk_button_new( );
         gtk_container_add( GTK_CONTAINER( w ), gtk_image_new_from_stock( "utilities", -1 ) );
-        gtr_widget_set_tooltip_text( w, _( "Options" ) );
+        gtk_widget_set_tooltip_text( w, _( "Options" ) );
         gtk_box_pack_start( GTK_BOX( h ), w, 0, 0, 0 );
         gtk_button_set_relief( GTK_BUTTON( w ), GTK_RELIEF_NONE );
         p->options_menu = createOptionsMenu( p );
@@ -680,7 +673,7 @@ gtr_window_new( GtkUIManager * ui_mgr, TrCore * core )
 
         hbox = gtk_hbox_new( FALSE, GUI_PAD );
             w = gtk_button_new( );
-            gtr_widget_set_tooltip_text( w, _( "Statistics" ) );
+            gtk_widget_set_tooltip_text( w, _( "Statistics" ) );
             gtk_container_add( GTK_CONTAINER( w ), gtk_image_new_from_stock( "ratio", -1 ) );
             gtk_button_set_relief( GTK_BUTTON( w ), GTK_RELIEF_NONE );
             g_signal_connect( w, "clicked", G_CALLBACK( onYinYangReleased ), p );
@@ -864,16 +857,16 @@ gtr_window_get_selection( TrWindow * w )
 void
 gtr_window_set_busy( TrWindow * w, gboolean isBusy )
 {
-    if( w && gtr_widget_get_realized( GTK_WIDGET( w ) ) )
+    if( w && gtk_widget_get_realized( GTK_WIDGET( w ) ) )
     {
         GdkDisplay * display = gtk_widget_get_display( GTK_WIDGET( w ) );
         GdkCursor * cursor = isBusy ? gdk_cursor_new_for_display( display, GDK_WATCH ) : NULL;
 
-        gdk_window_set_cursor( gtr_widget_get_window( GTK_WIDGET( w ) ), cursor );
+        gdk_window_set_cursor( gtk_widget_get_window( GTK_WIDGET( w ) ), cursor );
         gdk_display_flush( display );
 
         if( cursor ) {
-#if GTK_CHECK_VERSION(3,0,0)
+#if GTK_CHECK_VERSION( 3,0,0 )
             g_object_unref( cursor );
 #else
             gdk_cursor_unref( cursor );

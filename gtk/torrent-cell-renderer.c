@@ -39,22 +39,6 @@ enum
 ****
 ***/
 
-/* backwards-compatible wrapper around gtk_cell_renderer_get_padding() */
-static void
-gtr_cell_renderer_get_padding( GtkCellRenderer * cell, gint * xpad, gint * ypad )
-{
-#if GTK_CHECK_VERSION( 2,18,0 )
-    gtk_cell_renderer_get_padding( cell, xpad, ypad );
-#else
-    if( xpad != NULL ) *xpad = cell->xpad;
-    if( ypad != NULL ) *ypad = cell->ypad;
-#endif
-}
-
-/***
-****
-***/
-
 static void
 getProgressString( GString          * gstr,
                    const tr_torrent * tor,
@@ -422,7 +406,7 @@ get_size_compact( TorrentCellRenderer * cell,
     name = tr_torrentName( tor );
     g_string_truncate( gstr_stat, 0 );
     getShortStatusString( gstr_stat, tor, st, p->upload_speed_KBps, p->download_speed_KBps );
-    gtr_cell_renderer_get_padding( GTK_CELL_RENDERER( cell ), &xpad, &ypad );
+    gtk_cell_renderer_get_padding( GTK_CELL_RENDERER( cell ), &xpad, &ypad );
 
     /* get the idealized cell dimensions */
     g_object_set( p->icon_renderer, "pixbuf", icon, NULL );
@@ -475,7 +459,7 @@ get_size_full( TorrentCellRenderer * cell,
     getStatusString( gstr_stat, tor, st, p->upload_speed_KBps, p->download_speed_KBps );
     g_string_truncate( gstr_prog, 0 );
     getProgressString( gstr_prog, tor, inf, st );
-    gtr_cell_renderer_get_padding( GTK_CELL_RENDERER( cell ), &xpad, &ypad );
+    gtk_cell_renderer_get_padding( GTK_CELL_RENDERER( cell ), &xpad, &ypad );
 
     /* get the idealized cell dimensions */
     g_object_set( p->icon_renderer, "pixbuf", icon, NULL );
@@ -537,7 +521,7 @@ torrent_cell_renderer_get_size( GtkCellRenderer     * cell,
 
         if( y_offset ) {
             int xpad, ypad;
-            gtr_cell_renderer_get_padding( cell, &xpad, &ypad );
+            gtk_cell_renderer_get_padding( cell, &xpad, &ypad );
             *y_offset = cell_area ? (int)((cell_area->height - (ypad*2 +h)) / 2.0) : 0;
         }
     }
@@ -649,7 +633,7 @@ render_compact( TorrentCellRenderer   * cell,
     name = tr_torrentName( tor );
     g_string_truncate( gstr_stat, 0 );
     getShortStatusString( gstr_stat, tor, st, p->upload_speed_KBps, p->download_speed_KBps );
-    gtr_cell_renderer_get_padding( GTK_CELL_RENDERER( cell ), &xpad, &ypad );
+    gtk_cell_renderer_get_padding( GTK_CELL_RENDERER( cell ), &xpad, &ypad );
     get_text_color( widget, st, &text_color );
 
     fill_area = *background_area;
@@ -687,7 +671,7 @@ render_compact( TorrentCellRenderer   * cell,
         "sensitive", sensitive,
 #if GTK_CHECK_VERSION( 3,0,0 )
         "inverted", seed,
-#elif GTK_CHECK_VERSION( 2,6,0 )
+#else
         "orientation", (seed ? GTK_PROGRESS_RIGHT_TO_LEFT : GTK_PROGRESS_LEFT_TO_RIGHT),
 #endif
         NULL );
@@ -738,7 +722,7 @@ render_full( TorrentCellRenderer   * cell,
     getProgressString( gstr_prog, tor, inf, st );
     g_string_truncate( gstr_stat, 0 );
     getStatusString( gstr_stat, tor, st, p->upload_speed_KBps, p->download_speed_KBps );
-    gtr_cell_renderer_get_padding( GTK_CELL_RENDERER( cell ), &xpad, &ypad );
+    gtk_cell_renderer_get_padding( GTK_CELL_RENDERER( cell ), &xpad, &ypad );
     get_text_color( widget, st, &text_color );
 
     /* get the idealized cell dimensions */
@@ -807,7 +791,7 @@ render_full( TorrentCellRenderer   * cell,
     g_object_set( p->progress_renderer, "value", (int)(percentDone*100.0), "text", "", "sensitive", sensitive,
 #if GTK_CHECK_VERSION( 3,0,0 )
         "inverted", seed,
-#elif GTK_CHECK_VERSION( 2,6,0 )
+#else
         "orientation", (seed ? GTK_PROGRESS_RIGHT_TO_LEFT : GTK_PROGRESS_LEFT_TO_RIGHT),
 #endif
         NULL );

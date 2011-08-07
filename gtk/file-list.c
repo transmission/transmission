@@ -446,7 +446,6 @@ buildTree( GNode * node, gpointer gdata )
 
     tr_strlsize( size_str, child_data->length, sizeof size_str );
 
-#if GTK_CHECK_VERSION(2,10,0)
     gtk_tree_store_insert_with_values( build->store, &child_iter, build->iter, INT_MAX,
                                        FC_INDEX, child_data->index,
                                        FC_LABEL, child_data->name,
@@ -456,18 +455,6 @@ buildTree( GNode * node, gpointer gdata )
                                        FC_PRIORITY, priority,
                                        FC_ENABLED, enabled,
                                        -1 );
-#else
-    gtk_tree_store_append( build->store, &child_iter, build->iter );
-    gtk_tree_store_set( build->store, &child_iter,
-                        FC_INDEX, child_data->index,
-                        FC_LABEL, child_data->name,
-                        FC_SIZE, child_data->length,
-                        FC_SIZE_STR, size_str,
-                        FC_ICON, icon,
-                        FC_PRIORITY, priority,
-                        FC_ENABLED, enabled,
-                        -1 );
-#endif
 
     if( !isLeaf )
     {

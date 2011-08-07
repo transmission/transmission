@@ -1002,21 +1002,10 @@ gtr_filter_bar_new( tr_session * session, GtkTreeModel * tmodel, GtkTreeModel **
     gtk_box_pack_start( GTK_BOX( h ), w, FALSE, FALSE, 0 );
 
     /* add the entry field */
-#if GTK_CHECK_VERSION( 2,16,0 )
     s = gtk_entry_new( );
     gtk_entry_set_icon_from_stock( GTK_ENTRY( s ), GTK_ENTRY_ICON_SECONDARY, GTK_STOCK_CLEAR );
     g_signal_connect( s, "icon-release", G_CALLBACK( entry_clear ), NULL );
     gtk_box_pack_start( GTK_BOX( h ), s, TRUE, TRUE, 0 );
-#else
-    s = gtk_entry_new( );
-    gtk_box_pack_start( GTK_BOX( h ), s, TRUE, TRUE, 0 );
-    w = gtk_button_new( );
-    gtk_button_set_relief( GTK_BUTTON( w ), GTK_RELIEF_NONE );
-    l = gtk_image_new_from_stock( GTK_STOCK_CLEAR, GTK_ICON_SIZE_MENU );
-    gtk_button_set_image( GTK_BUTTON( w ), l );
-    gtk_box_pack_start( GTK_BOX( h ), w, FALSE, FALSE, 0 );
-    g_signal_connect_swapped( w, "clicked", G_CALLBACK( entry_clear ), s );
-#endif
 
     g_signal_connect( s, "changed", G_CALLBACK( filter_entry_changed ), data->filter_model );
     selection_changed_cb( NULL, data );

@@ -50,7 +50,7 @@ AC_SUBST(OPENSSL_MINIMUM)
 ##   MANDATORY for the GTK+ client
 ##
 ##
-GTK_MINIMUM=2.8.0
+GTK_MINIMUM=2.22.0
 AC_SUBST(GTK_MINIMUM)
 GLIB_MINIMUM=2.26.0
 AC_SUBST(GLIB_MINIMUM)
@@ -240,7 +240,7 @@ dnl  detection for the GTK+ client
 PKG_CHECK_MODULES(GTK,
                   [gtk+-2.0 >= $GTK_MINIMUM
                    glib-2.0 >= $GLIB_MINIMUM
-                   gio-2.0 >= $GIO_MINIMUM],
+                   gio-2.0 >= $GIO_MINIMUM,
                    gmodule-2.0 >= $GLIB_MINIMUM
                    gthread-2.0 >= $GLIB_MINIMUM],
                   [have_gtk=yes],
