@@ -704,12 +704,12 @@ Torrent :: activityString( ) const
     switch( getActivity( ) )
     {
         case TR_STATUS_STOPPED:       str = isFinished() ? tr( "Finished" ): tr( "Paused" ); break;
-        case TR_STATUS_CHECK_WAIT:    str = tr( "Waiting to verify local data" ); break;
+        case TR_STATUS_CHECK_WAIT:    str = tr( "Queued for verification" ); break;
         case TR_STATUS_CHECK:         str = tr( "Verifying local data" ); break;
-        case TR_STATUS_DOWNLOAD_WAIT: str = tr( "Waiting to download" ); break;
+        case TR_STATUS_DOWNLOAD_WAIT: str = tr( "Queued for download" ); break;
         case TR_STATUS_DOWNLOAD:      str = tr( "Downloading" ); break;
-        case TR_STATUS_SEED_WAIT:     str = tr( "Queued" ); break;
-        case TR_STATUS_SEED:          str = tr( "Waiting to seed" ); break;
+        case TR_STATUS_SEED_WAIT:     str = tr( "Queued for seeding" ); break;
+        case TR_STATUS_SEED:          str = tr( "Seeding" ); break;
     }
 
     return str;

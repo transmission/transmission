@@ -557,11 +557,11 @@ activityString( int activity, bool finished )
 {
     switch( activity )
     {
-        case TR_STATUS_CHECK_WAIT:    return _( "Waiting to verify local data" );
+        case TR_STATUS_CHECK_WAIT:    return _( "Queued for verification" );
         case TR_STATUS_CHECK:         return _( "Verifying local data" );
-        case TR_STATUS_DOWNLOAD_WAIT: return _( "Queued to download" );
+        case TR_STATUS_DOWNLOAD_WAIT: return _( "Queued for download" );
         case TR_STATUS_DOWNLOAD:      return _( "Downloading" );
-        case TR_STATUS_SEED_WAIT:     return _( "Queued to seed" );
+        case TR_STATUS_SEED_WAIT:     return _( "Queued for seeding" );
         case TR_STATUS_SEED:          return _( "Seeding" );
         case TR_STATUS_STOPPED:       return finished ? _( "Finished" ) : _( "Paused" );
     }

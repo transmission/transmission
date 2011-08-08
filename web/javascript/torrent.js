@@ -271,11 +271,11 @@ Torrent.prototype =
 	stateStr: function() {
 		switch( this.state() ) {
 			case Torrent._StatusStopped:        return this.isFinished() ? 'Seeding complete' : 'Paused';
-			case Torrent._StatusCheckWait:      return 'Waiting to verify local data';
+			case Torrent._StatusCheckWait:      return 'Queued for verification';
 			case Torrent._StatusCheck:          return 'Verifying local data';
-			case Torrent._StatusDownloadWait:   return 'Waiting to download';
+			case Torrent._StatusDownloadWait:   return 'Queued for download';
 			case Torrent._StatusDownload:       return 'Downloading';
-			case Torrent._StatusSeedWait:       return 'Waiting to seed';
+			case Torrent._StatusSeedWait:       return 'Queued for seeding';
 			case Torrent._StatusSeed:           return 'Seeding';
 			default:                            return 'error';
 		}
