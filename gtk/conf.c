@@ -55,8 +55,11 @@ cf_init( const char * configDir, char ** errstr )
 
     gl_confdir = g_strdup( configDir );
 
+    if( g_file_test( gl_confdir, G_FILE_TEST_IS_DIR ) )
+        return true;
+
     if( g_mkdir_with_parents( gl_confdir, 0755 ) )
-        return TRUE;
+        return true;
 
     if( errstr != NULL )
         *errstr = g_strdup_printf( _( "Couldn't create \"%1$s\": %2$s" ),
