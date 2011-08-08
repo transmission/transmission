@@ -1138,9 +1138,11 @@ int trashDataFile(const char * filename)
         
         case TR_STATUS_DOWNLOAD_WAIT:
             string = [NSLocalizedString(@"Waiting to download", "Torrent -> status string") stringByAppendingEllipsis];
+            break;
             
         case TR_STATUS_SEED_WAIT:
             string = [NSLocalizedString(@"Waiting to seed", "Torrent -> status string") stringByAppendingEllipsis];
+            break;
 
         case TR_STATUS_CHECK_WAIT:
             string = [NSLocalizedString(@"Waiting to check existing data", "Torrent -> status string") stringByAppendingEllipsis];
