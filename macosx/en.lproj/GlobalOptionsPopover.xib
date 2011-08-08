@@ -859,22 +859,6 @@
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBBindingConnection" key="connection">
-						<string key="label">value: values.DisplaySmallStatusRegular</string>
-						<reference key="source" ref="293769057"/>
-						<reference key="destination" ref="355540060"/>
-						<object class="NSNibBindingConnector" key="connector">
-							<reference key="NSSource" ref="293769057"/>
-							<reference key="NSDestination" ref="355540060"/>
-							<string key="NSLabel">value: values.DisplaySmallStatusRegular</string>
-							<string key="NSBinding">value</string>
-							<string key="NSKeyPath">values.DisplaySmallStatusRegular</string>
-							<int key="NSNibBindingConnectorVersion">2</int>
-						</object>
-					</object>
-					<int key="connectionID">163</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBBindingConnection" key="connection">
 						<string key="label">hidden: values.SmallView</string>
 						<reference key="source" ref="293769057"/>
 						<reference key="destination" ref="355540060"/>
@@ -1036,6 +1020,26 @@
 						<reference key="destination" ref="122634398"/>
 					</object>
 					<int key="connectionID">192</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBBindingConnection" key="connection">
+						<string key="label">value: values.DisplaySmallStatusRegular</string>
+						<reference key="source" ref="293769057"/>
+						<reference key="destination" ref="355540060"/>
+						<object class="NSNibBindingConnector" key="connector">
+							<reference key="NSSource" ref="293769057"/>
+							<reference key="NSDestination" ref="355540060"/>
+							<string key="NSLabel">value: values.DisplaySmallStatusRegular</string>
+							<string key="NSBinding">value</string>
+							<string key="NSKeyPath">values.DisplaySmallStatusRegular</string>
+							<object class="NSDictionary" key="NSOptions">
+								<string key="NS.key.0">NSValueTransformerName</string>
+								<string key="NS.object.0">NSNegateBoolean</string>
+							</object>
+							<int key="NSNibBindingConnectorVersion">2</int>
+						</object>
+					</object>
+					<int key="connectionID">193</int>
 				</object>
 			</object>
 			<object class="IBMutableOrderedSet" key="objectRecords">
@@ -1457,7 +1461,7 @@
 				<reference key="dict.values" ref="0"/>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">192</int>
+			<int key="maxID">193</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
