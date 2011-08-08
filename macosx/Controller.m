@@ -1424,7 +1424,10 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
             [fDefaults setBool: NO forKey: @"WarningRemoveCompleted"];
         
         if (returnCode != NSAlertFirstButtonReturn)
+        {
+            [torrents release];
             return;
+        }
     }
     
     [self confirmRemoveTorrents: torrents deleteData: NO];
