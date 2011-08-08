@@ -108,9 +108,6 @@ const char* gtr_get_help_uri( void );
 ****
 ***/
 
-/* backwards-compatible wrapper around gdk_threads_add_idle() */
-guint gtr_idle_add( GSourceFunc  func, gpointer data );
-
 /* backwards-compatible wrapper around gtk_widget_set_visible() */
 void gtr_widget_set_visible( GtkWidget *, gboolean );
 

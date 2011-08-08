@@ -334,7 +334,7 @@ refresh_actions_soon( gpointer gdata )
     struct cbdata * data = gdata;
 
     if( data->refresh_actions_tag == 0 )
-        data->refresh_actions_tag = gtr_idle_add( refresh_actions, data );
+        data->refresh_actions_tag = gdk_threads_add_idle( refresh_actions, data );
 }
 
 static void
@@ -467,7 +467,7 @@ on_rpc_changed( tr_session            * session,
             struct torrent_idle_data * data = g_new0( struct torrent_idle_data, 1 );
             data->id = tr_torrentId( tor );
             data->core = cbdata->core;
-            gtr_idle_add( rpc_torrent_add_idle, data );
+            gdk_threads_add_idle( rpc_torrent_add_idle, data );
             break;
         }
 
@@ -477,7 +477,7 @@ on_rpc_changed( tr_session            * session,
             data->id = tr_torrentId( tor );
             data->core = cbdata->core;
             data->delete_files = type == TR_RPC_TORRENT_TRASHING;
-            gtr_idle_add( rpc_torrent_remove_idle, data );
+            gdk_threads_add_idle( rpc_torrent_remove_idle, data );
             status = TR_RPC_NOREMOVE;
             break;
         }
@@ -1053,7 +1053,7 @@ session_close_threadfunc( gpointer gdata )
     struct cbdata * cbdata = gdata;
     gdk_threads_enter( );
     gtr_core_close( cbdata->core );
-    gtr_idle_add( on_session_closed, gdata );
+    gdk_threads_add_idle( on_session_closed, gdata );
     gdk_threads_leave( );
     return NULL;
 }
@@ -1442,7 +1442,7 @@ update_model_soon( gpointer gdata )
     struct cbdata *data = gdata;
 
     if( data->update_model_soon_tag == 0 )
-        data->update_model_soon_tag = gtr_idle_add( update_model_once, data );
+        data->update_model_soon_tag = gdk_threads_add_idle( update_model_once, data );
 }
 
 static gboolean

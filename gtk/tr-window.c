@@ -345,7 +345,7 @@ onAltSpeedToggledIdle( gpointer vp )
 static void
 onAltSpeedToggled( tr_session * s UNUSED, bool isEnabled UNUSED, bool byUser UNUSED, void * p )
 {
-    gtr_idle_add( onAltSpeedToggledIdle, p );
+    gdk_threads_add_idle( onAltSpeedToggledIdle, p );
 }
 
 /***

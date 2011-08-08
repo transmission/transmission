@@ -620,12 +620,6 @@ gtr_dialog_set_content( GtkDialog * dialog, GtkWidget * content )
 ****
 ***/
 
-guint
-gtr_idle_add( GSourceFunc function, gpointer data )
-{
-    return gdk_threads_add_idle( function, data );
-}
-
 void
 gtr_http_failure_dialog( GtkWidget * parent, const char * url, long response_code )
 {

@@ -980,7 +980,7 @@ on_torrent_completeness_changed( tr_torrent       * tor,
         data->core = gcore;
         data->torrent_id = tr_torrentId( tor );
         g_object_ref( G_OBJECT( data->core ) );
-        gtr_idle_add( on_torrent_completeness_changed_idle, data );
+        gdk_threads_add_idle( on_torrent_completeness_changed_idle, data );
     }
 }
 
@@ -1059,7 +1059,7 @@ on_torrent_metadata_changed( tr_torrent * tor, void * gcore )
     data->core = gcore;
     data->torrent_id = tr_torrentId( tor );
     g_object_ref( G_OBJECT( data->core ) );
-    gtr_idle_add( on_torrent_metadata_changed_idle, data );
+    gdk_threads_add_idle( on_torrent_metadata_changed_idle, data );
 }
 
 /***
@@ -1278,7 +1278,7 @@ on_url_done( tr_session   * session,
     core_apply_defaults( data->ctor );
     tr_ctorSetMetainfo( data->ctor, response, response_byte_count );
 
-    gtr_idle_add( on_url_done_idle, data );
+    gdk_threads_add_idle( on_url_done_idle, data );
 }
 
 void
@@ -1766,7 +1766,7 @@ core_read_rpc_response( tr_session       * session UNUSED,
 {
     struct evbuffer * buf = evbuffer_new( );
     evbuffer_add_buffer( buf, response );
-    gtr_idle_add( core_read_rpc_response_idle, buf );
+    gdk_threads_add_idle( core_read_rpc_response_idle, buf );
 }
 
 static void

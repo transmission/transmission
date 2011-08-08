@@ -22,7 +22,7 @@
 #include "filter.h"
 #include "hig.h" /* GUI_PAD */
 #include "tr-core.h" /* MC_TORRENT */
-#include "util.h" /* gtr_idle_add() */
+#include "util.h" /* gtr_get_host_from_url() */
 
 static GQuark DIRTY_KEY = 0;
 static GQuark SESSION_KEY = 0;
@@ -378,7 +378,7 @@ category_model_update_idle( gpointer category_model )
     {
         GSourceFunc func = (GSourceFunc) category_filter_model_update;
         g_object_set_qdata( o, DIRTY_KEY, GINT_TO_POINTER(1) );
-        gtr_idle_add( func, category_model );
+        gdk_threads_add_idle( func, category_model );
     }
 }
 
@@ -750,7 +750,7 @@ activity_model_update_idle( gpointer activity_model )
     {
         GSourceFunc func = (GSourceFunc) activity_filter_model_update;
         g_object_set_qdata( o, DIRTY_KEY, GINT_TO_POINTER(1) );
-        gtr_idle_add( func, activity_model );
+        gdk_threads_add_idle( func, activity_model );
     }
 }
 

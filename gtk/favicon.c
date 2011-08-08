@@ -17,7 +17,7 @@
 #include <libtransmission/web.h> /* tr_webRun() */
 
 #include "favicon.h"
-#include "util.h" /* gtr_idle_add() */
+#include "util.h" /* gtr_get_host_from_url() */
 
 #define IMAGE_TYPES 4
 static const char * image_types[IMAGE_TYPES] = { "ico", "png", "gif", "jpg" };
@@ -140,7 +140,7 @@ favicon_web_done_cb( tr_session    * session UNUSED,
     fav->contents = g_memdup( data, len );
     fav->len = len;
 
-    gtr_idle_add( favicon_web_done_idle_cb, fav );
+    gdk_threads_add_idle( favicon_web_done_idle_cb, fav );
 }
 
 void
