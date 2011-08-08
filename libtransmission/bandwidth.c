@@ -158,10 +158,6 @@ tr_bandwidthSetParent( tr_bandwidth  * b,
 /***
 ****
 ***/
-#if 0
-#warning do not check the code in with this enabled
-#define DEBUG_DIRECTION TR_UP
-#endif
 
 static void
 allocateBandwidth( tr_bandwidth  * b,
@@ -180,13 +176,6 @@ allocateBandwidth( tr_bandwidth  * b,
     {
         const unsigned int nextPulseSpeed = b->band[dir].desiredSpeed_Bps;
         b->band[dir].bytesLeft = ( nextPulseSpeed * period_msec ) / 1000u;
-
-#ifdef DEBUG_DIRECTION
-        if( dir == DEBUG_DIRECTION )
-                fprintf( stderr, "bandwidth %p currentPieceSpeed(%5.2f of %5.2f) desiredSpeed(%5.2f), allocating %d\n",
-                         b, currentSpeed, tr_bandwidthGetRawSpeed( b, dir ), desiredSpeed,
-                         b->band[dir].bytesLeft );
-#endif
     }
 
     /* add this bandwidth's peer, if any, to the peer pool */
@@ -194,11 +183,6 @@ allocateBandwidth( tr_bandwidth  * b,
         b->peer->priority = priority;
         tr_ptrArrayAppend( peer_pool, b->peer );
     }
-
-#ifdef DEBUG_DIRECTION
-if( ( dir == DEBUG_DIRECTION ) && ( n > 1 ) )
-fprintf( stderr, "bandwidth %p has %d peers\n", b, n );
-#endif
 
     /* traverse & repeat for the subtree */
     if( 1 ) {

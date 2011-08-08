@@ -2260,20 +2260,6 @@ tr_pexCompare( const void * va, const void * vb )
     return 0;
 }
 
-#if 0
-static int
-peerPrefersCrypto( const tr_peer * peer )
-{
-    if( peer->encryption_preference == ENCRYPTION_PREFERENCE_YES )
-        return true;
-
-    if( peer->encryption_preference == ENCRYPTION_PREFERENCE_NO )
-        return false;
-
-    return tr_peerIoIsEncrypted( peer->io );
-}
-#endif
-
 /* better goes first */
 static int
 compareAtomsByUsefulness( const void * va, const void *vb )

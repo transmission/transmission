@@ -196,21 +196,6 @@ TorrentFilter :: filterAcceptsRow( int sourceRow, const QModelIndex& sourceParen
             accepts = tor->name().contains( text, Qt::CaseInsensitive );
     }
 
-#if 0
-    if( accepts && !myText.isEmpty( ) ) switch( myTextMode )
-    {
-        case FILTER_BY_NAME:
-            accepts = tor->name().contains( myText, Qt::CaseInsensitive );
-            break;
-        case FILTER_BY_FILES:
-            accepts = tor->hasFileSubstring( myText );
-            break;
-        case FILTER_BY_TRACKER:
-            accepts = tor->hasTrackerSubstring( myText );
-            break;
-    }
-#endif
-
     return accepts;
 }
 
