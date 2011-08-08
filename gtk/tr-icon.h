@@ -16,10 +16,6 @@
 #include <gtk/gtk.h>
 #include "tr-core.h"
 
-#if GTK_CHECK_VERSION( 2,10,0 )
- #define STATUS_ICON_SUPPORTED
-#endif
-
 gpointer  gtr_icon_new      ( TrCore * core );
 void      gtr_icon_refresh  ( gpointer );
 

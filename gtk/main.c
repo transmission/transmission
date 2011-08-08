@@ -638,11 +638,9 @@ main( int argc, char ** argv )
           &startpaused, _( "Start with all torrents paused" ), NULL },
         { "version",    '\0', 0, G_OPTION_ARG_NONE,
           &showversion, _( "Show version number and exit" ), NULL },
-#ifdef STATUS_ICON_SUPPORTED
         { "minimized",  'm', 0, G_OPTION_ARG_NONE,
           &startminimized,
           _( "Start minimized in notification area" ), NULL },
-#endif
         { "config-dir", 'g', 0, G_OPTION_ARG_FILENAME, &configDir,
           _( "Where to look for configuration files" ), NULL },
         { NULL, 0,   0, 0, NULL, NULL, NULL }

@@ -31,11 +31,6 @@ get_core_quark( void )
 
 #define ICON_NAME "transmission"
 
-#ifndef STATUS_ICON_SUPPORTED
-gpointer gtr_icon_new( TrCore * core UNUSED ) { return NULL; }
-void gtr_icon_refresh( gpointer vicon UNUSED ) { }
-#else
-
 #ifdef HAVE_LIBAPPINDICATOR
 void
 gtr_icon_refresh( gpointer vindicator UNUSED )
@@ -138,10 +133,10 @@ getIconName( void )
     return icon_name;
 }
 
-#ifdef HAVE_LIBAPPINDICATOR
 gpointer
 gtr_icon_new( TrCore * core)
 {
+#ifdef HAVE_LIBAPPINDICATOR
     GtkWidget * w;
     const char * icon_name = getIconName( );
     AppIndicator * indicator = app_indicator_new( ICON_NAME, icon_name, APP_INDICATOR_CATEGORY_SYSTEM_SERVICES );
@@ -150,19 +145,12 @@ gtr_icon_new( TrCore * core)
     app_indicator_set_menu( indicator, GTK_MENU ( w ) );
     g_object_set_qdata( G_OBJECT( indicator ), get_core_quark( ), core );
     return indicator;
-}
 #else
-gpointer
-gtr_icon_new( TrCore * core )
-{
     const char * icon_name = getIconName( );
     GtkStatusIcon * icon = gtk_status_icon_new_from_icon_name( icon_name );
     g_signal_connect( icon, "activate", G_CALLBACK( activated ), NULL );
     g_signal_connect( icon, "popup-menu", G_CALLBACK( popup ), NULL );
     g_object_set_qdata( G_OBJECT( icon ), get_core_quark( ), core );
     return icon;
+#endif
 }
-
-#endif
-
-#endif
