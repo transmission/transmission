@@ -226,6 +226,8 @@ TorrentDelegate :: statusString( const Torrent& tor ) const
         case TR_STATUS_STOPPED:
         case TR_STATUS_CHECK_WAIT:
         case TR_STATUS_CHECK:
+        case TR_STATUS_DOWNLOAD_WAIT:
+        case TR_STATUS_SEED_WAIT:
             str = shortStatusString( tor );
             break;
 

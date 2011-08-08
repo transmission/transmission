@@ -195,27 +195,21 @@ getShortStatusString( GString           * gstr,
     switch( st->activity )
     {
         case TR_STATUS_STOPPED:
-            if( st->finished )
-                g_string_append( gstr, _( "Finished" ) );
-            else
-                g_string_append( gstr, _( "Paused" ) );
+            g_string_append( gstr, st->finished ? _( "Finished" ) : _( "Paused" ) );
             break;
-
         case TR_STATUS_CHECK_WAIT:
-            g_string_append( gstr, _( "Waiting to verify local data" ) );
+            g_string_append( gstr, _( "Queued for verification" ) );
+            break;
+        case TR_STATUS_DOWNLOAD_WAIT:
+            g_string_append( gstr, _( "Queued for download" ) );
+            break;
+        case TR_STATUS_SEED_WAIT:
+            g_string_append( gstr, _( "Queued for seeding" ) );
             break;
 
         case TR_STATUS_CHECK:
-            g_string_append_printf( gstr,
-                                    _( "Verifying local data (%.1f%% tested)" ),
+            g_string_append_printf( gstr, _( "Verifying local data (%.1f%% tested)" ),
                                     tr_truncd( st->recheckProgress * 100.0, 1 ) );
-            break;
-
-        case TR_STATUS_DOWNLOAD_WAIT:
-            g_string_append( gstr, _( "Waiting to download" ) );
-            break;
-        case TR_STATUS_SEED_WAIT:
-            g_string_append( gstr, _( "Waiting to seed" ) );
             break;
 
         case TR_STATUS_DOWNLOAD:
