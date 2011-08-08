@@ -134,7 +134,7 @@ onResponse( GtkDialog * dialog, int response, gpointer unused UNUSED )
         data->message_dialog = w;
         data->done = TR_LOC_DONE;
         onTimer( data );
-        gtr_timeout_add_seconds( 1, onTimer, data );
+        gdk_threads_add_timeout_seconds( 1, onTimer, data );
     }
     else
     {

@@ -140,7 +140,7 @@ spun_cb( GtkSpinButton * w, gpointer core, gboolean isDouble )
         data->isDouble = isDouble;
         g_object_set_data_full( o, IDLE_DATA, data, spin_idle_data_free );
         g_object_ref( G_OBJECT( o ) );
-        gtr_timeout_add_seconds( 1, spun_cb_idle, w );
+        gdk_threads_add_timeout_seconds( 1, spun_cb_idle, w );
     }
     g_timer_start( data->last_change );
 }

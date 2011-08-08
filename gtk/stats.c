@@ -182,7 +182,7 @@ gtr_stats_dialog_new( GtkWindow * parent, TrCore * core )
     updateStats( ui );
     g_object_set_data_full( G_OBJECT( d ), "data", ui, g_free );
     g_signal_connect( d, "response", G_CALLBACK( dialogResponse ), ui );
-    i = gtr_timeout_add_seconds( SECONDARY_WINDOW_REFRESH_INTERVAL_SECONDS, updateStats, ui );
+    i = gdk_threads_add_timeout_seconds( SECONDARY_WINDOW_REFRESH_INTERVAL_SECONDS, updateStats, ui );
     g_object_weak_ref( G_OBJECT( d ), dialogDestroyed, GUINT_TO_POINTER( i ) );
     return d;
 }

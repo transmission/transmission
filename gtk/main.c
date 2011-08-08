@@ -839,7 +839,7 @@ app_setup( TrWindow      * wind,
     on_prefs_changed( cbdata->core, PREF_KEY_SHOW_TRAY_ICON, cbdata );
 
     /* start model update timer */
-    cbdata->timer = gtr_timeout_add_seconds( MAIN_WINDOW_REFRESH_INTERVAL_SECONDS, update_model_loop, cbdata );
+    cbdata->timer = gdk_threads_add_timeout_seconds( MAIN_WINDOW_REFRESH_INTERVAL_SECONDS, update_model_loop, cbdata );
     update_model_once( cbdata );
 
     /* either show the window or iconify it */

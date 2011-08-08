@@ -2564,8 +2564,8 @@ gtr_torrent_details_dialog_new( GtkWindow * parent, TrCore * core )
     gtk_notebook_append_page( GTK_NOTEBOOK( n ), w, l );
 
     gtr_dialog_set_content( GTK_DIALOG( d ), n );
-    di->periodic_refresh_tag = gtr_timeout_add_seconds( SECONDARY_WINDOW_REFRESH_INTERVAL_SECONDS,
-                                                        periodic_refresh, di );
+    di->periodic_refresh_tag = gdk_threads_add_timeout_seconds( SECONDARY_WINDOW_REFRESH_INTERVAL_SECONDS,
+                                                                periodic_refresh, di );
     return d;
 }
 

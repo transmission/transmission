@@ -108,9 +108,6 @@ const char* gtr_get_help_uri( void );
 ****
 ***/
 
-/* backwards-compatible wrapper around gdk_threads_add_timeout_seconds() */
-guint gtr_timeout_add_seconds( guint seconds, GSourceFunc func, gpointer data );
-
 /* backwards-compatible wrapper around gdk_threads_add_idle() */
 guint gtr_idle_add( GSourceFunc  func, gpointer data );
 

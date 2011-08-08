@@ -626,12 +626,6 @@ gtr_idle_add( GSourceFunc function, gpointer data )
     return gdk_threads_add_idle( function, data );
 }
 
-guint
-gtr_timeout_add_seconds( guint seconds, GSourceFunc function, gpointer data )
-{
-    return gdk_threads_add_timeout_seconds( seconds, function, data );
-}
-
 void
 gtr_http_failure_dialog( GtkWidget * parent, const char * url, long response_code )
 {

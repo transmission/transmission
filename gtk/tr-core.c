@@ -799,7 +799,7 @@ core_watchdir_monitor_file( TrCore * core, const char * filename )
             p->monitor_files = g_slist_append( p->monitor_files, watchdir_file_new( filename ) );
 
         if( !p->monitor_idle_tag )
-            p->monitor_idle_tag = gtr_timeout_add_seconds( 1, core_watchdir_idle, core );
+            p->monitor_idle_tag = gdk_threads_add_timeout_seconds( 1, core_watchdir_idle, core );
     }
 }
 

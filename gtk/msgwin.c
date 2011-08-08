@@ -535,7 +535,7 @@ gtr_message_log_window_new( GtkWindow * parent, TrCore * core )
     gtk_box_pack_start( GTK_BOX( vbox ), w, TRUE, TRUE, 0 );
     gtk_container_add( GTK_CONTAINER( win ), vbox );
 
-    data->refresh_tag = gtr_timeout_add_seconds( SECONDARY_WINDOW_REFRESH_INTERVAL_SECONDS, onRefresh, data );
+    data->refresh_tag = gdk_threads_add_timeout_seconds( SECONDARY_WINDOW_REFRESH_INTERVAL_SECONDS, onRefresh, data );
     g_object_weak_ref( G_OBJECT( win ), onWindowDestroyed, data );
 
     scroll_to_bottom( data );

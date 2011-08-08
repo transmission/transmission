@@ -562,7 +562,7 @@ gtr_file_list_set_torrent( GtkWidget * w, int torrentId )
         }
 
         refresh( data );
-        data->timeout_tag = gtr_timeout_add_seconds( SECONDARY_WINDOW_REFRESH_INTERVAL_SECONDS, refreshModel, data );
+        data->timeout_tag = gdk_threads_add_timeout_seconds( SECONDARY_WINDOW_REFRESH_INTERVAL_SECONDS, refreshModel, data );
     }
 
     gtk_tree_view_set_model( GTK_TREE_VIEW( data->view ), data->model );
