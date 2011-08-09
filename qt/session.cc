@@ -164,6 +164,7 @@ Session :: updatePref( int key )
         case Prefs :: PEER_LIMIT_TORRENT:
         case Prefs :: PEER_PORT:
         case Prefs :: PEER_PORT_RANDOM_ON_START:
+        case Prefs :: QUEUE_STALLED_MINUTES:
         case Prefs :: PEX_ENABLED:
         case Prefs :: PORT_FORWARDING:
         case Prefs :: SCRIPT_TORRENT_DONE_ENABLED:
