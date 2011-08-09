@@ -733,6 +733,7 @@ main( int argc, char ** argv )
     g_signal_connect( app, "activate", G_CALLBACK(on_activate), &cbdata );
     ret = g_application_run (app, argc, argv);
     g_object_unref( app );
+    g_free( application_id );
     return ret;
 }
 
