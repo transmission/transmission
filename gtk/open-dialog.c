@@ -23,6 +23,7 @@
 #include "hig.h"
 #include "open-dialog.h"
 #include "tr-prefs.h"
+#include "util.h" /* gtr_priority_combo_get_value() */
 
 /****
 *****
@@ -403,12 +404,14 @@ onOpenDialogResponse( GtkDialog * dialog, int response, gpointer core )
         GtkFileChooser  * chooser = GTK_FILE_CHOOSER( dialog );
         GtkWidget       * w = gtk_file_chooser_get_extra_widget( chooser );
         GtkToggleButton * tb = GTK_TOGGLE_BUTTON( w );
-        const gboolean    doStart = gtr_pref_flag_get( TR_PREFS_KEY_START );
-        const gboolean    doPrompt = gtk_toggle_button_get_active( tb );
-        const gboolean    doNotify = FALSE;
-        GSList * l = gtk_file_chooser_get_filenames( chooser );
+        const gboolean    do_start = gtr_pref_flag_get( TR_PREFS_KEY_START );
+        const gboolean    do_prompt = gtk_toggle_button_get_active( tb );
+        const gboolean    do_notify = FALSE;
+        GSList * files = gtk_file_chooser_get_files( chooser );
 
-        gtr_core_add_list( core, l, doStart, doPrompt, doNotify );
+        gtr_core_add_files( core, files, do_start, do_prompt, do_notify );
+        g_slist_foreach( files, (GFunc)g_object_unref, NULL );
+        g_slist_free( files );
     }
 
     gtk_widget_destroy( GTK_WIDGET( dialog ) );
@@ -453,7 +456,7 @@ gtr_torrent_open_from_file_dialog_new( GtkWindow * parent, TrCore * core )
 static void
 onOpenURLResponse( GtkDialog * dialog, int response, gpointer user_data )
 {
-    gboolean destroy = TRUE;
+    bool handled = false;
 
     if( response == GTK_RESPONSE_ACCEPT )
     {
@@ -461,26 +464,15 @@ onOpenURLResponse( GtkDialog * dialog, int response, gpointer user_data )
         char * url = g_strdup( gtk_entry_get_text( GTK_ENTRY( e ) ) );
         g_strstrip( url );
 
-        if( url && *url )
-        {
-            TrCore * core = user_data;
-
-            if( gtr_is_supported_url( url ) || gtr_is_magnet_link( url )
-                                            || gtr_is_hex_hashcode( url ) )
-            {
-                gtr_core_add_from_url( core, url );
-            }
-            else
-            {
+        if( url ) {
+            handled = gtr_core_add_from_url( user_data, url );
+            if( !handled )
                 gtr_unrecognized_url_dialog( GTK_WIDGET( dialog ), url );
-                destroy = FALSE;
-            }
+            g_free( url );
         }
-
-        g_free( url );
     }
 
-    if( destroy )
+    if( handled )
         gtk_widget_destroy( GTK_WIDGET( dialog ) );
 }
 

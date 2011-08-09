@@ -44,96 +44,11 @@
 #define MY_READABLE_NAME "transmission-gtk"
 
 static char * gl_confdir = NULL;
-static char * gl_lockpath = NULL;
 
-/* errstr may be NULL, this might be called before GTK is initialized */
-gboolean
-cf_init( const char * configDir, char ** errstr )
+void
+gtr_pref_init( const char * config_dir )
 {
-    if( errstr != NULL )
-        *errstr = NULL;
-
-    gl_confdir = g_strdup( configDir );
-
-    if( g_file_test( gl_confdir, G_FILE_TEST_IS_DIR ) )
-        return true;
-
-    if( g_mkdir_with_parents( gl_confdir, 0755 ) )
-        return true;
-
-    if( errstr != NULL )
-        *errstr = g_strdup_printf( _( "Couldn't create \"%1$s\": %2$s" ),
-                                  gl_confdir, g_strerror( errno ) );
-
-    return FALSE;
-}
-
-/***
-****
-****  Lockfile
-****
-***/
-
-/* errstr may be NULL, this might be called before GTK is initialized */
-static gboolean
-lockfile( const char * filename, gtr_lockfile_state_t * tr_state, char ** errstr )
-{
-    const gtr_lockfile_state_t state = gtr_lockfile( filename );
-    const gboolean success = state == GTR_LOCKFILE_SUCCESS;
-
-    if( errstr ) switch( state )
-        {
-            case GTR_LOCKFILE_EOPEN:
-                *errstr =
-                    g_strdup_printf( _( "Couldn't open \"%1$s\": %2$s" ),
-                                    filename, g_strerror( errno ) );
-                break;
-
-            case GTR_LOCKFILE_ELOCK:
-                *errstr = g_strdup_printf( _( "%s is already running." ),
-                                          g_get_application_name( ) );
-                break;
-
-            case GTR_LOCKFILE_SUCCESS:
-                *errstr = NULL;
-                break;
-        }
-
-    if( tr_state != NULL )
-        *tr_state = state;
-
-    return success;
-}
-
-static char*
-getLockFilename( void )
-{
-    g_assert( gl_confdir != NULL );
-    return g_build_filename( gl_confdir, "lock", NULL );
-}
-
-static void
-cf_removelocks( void )
-{
-    if( gl_lockpath )
-    {
-        g_unlink( gl_lockpath );
-        g_free( gl_lockpath );
-    }
-}
-
-/* errstr may be NULL, this might be called before GTK is initialized */
-gboolean
-cf_lock( gtr_lockfile_state_t * tr_state, char ** errstr )
-{
-    char *         path = getLockFilename( );
-    const gboolean didLock = lockfile( path, tr_state, errstr );
-
-    if( didLock )
-        gl_lockpath = g_strdup( path );
-    g_atexit( cf_removelocks );
-    g_free( path );
-    return didLock;
+    gl_confdir = g_strdup( config_dir );
 }
 
 /***

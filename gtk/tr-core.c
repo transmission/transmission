@@ -78,8 +78,6 @@ struct TrCorePrivate
     gboolean       have_inhibit_cookie;
     gboolean       dbus_error;
     guint          inhibit_cookie;
-    guint          dbus_session_owner_id;
-    guint          dbus_display_owner_id;
     gint           busy_count;
     GtkTreeModel * raw_model;
     GtkTreeModel * sorted_model;
@@ -193,108 +191,6 @@ gtr_core_class_init( gpointer g_class, gpointer g_class_data UNUSED )
 }
 
 static void
-handle_dbus_method( GDBusConnection       * connection UNUSED,
-                    const gchar           * sender UNUSED,
-                    const gchar           * object_path,
-                    const gchar           * interface_name,
-                    const gchar           * method_name,
-                    GVariant              * parameters,
-                    GDBusMethodInvocation * invocation,
-                    gpointer                core )
-{
-    gboolean handled = false;
-
-    if( !g_strcmp0( interface_name, TR_DBUS_SESSION_INTERFACE ) )
-    {
-        if( !g_strcmp0( method_name, "TorrentAdd" ) )
-        {
-            GVariant * args = g_variant_get_child_value( parameters, 0 );
-            GVariant * filename_variant = g_variant_lookup_value ( args, "filename", G_VARIANT_TYPE_STRING );
-            char * filename = g_variant_dup_string( filename_variant, NULL );
-            GSList * files = g_slist_append( NULL, filename );
-            gtr_core_add_list_defaults( TR_CORE( core ), files, TRUE );
-            g_dbus_method_invocation_return_value( invocation, g_variant_new( "(b)", true ) );
-            handled = true;
-        }
-    }
-    else if( !g_strcmp0( interface_name, TR_DBUS_DISPLAY_INTERFACE ) )
-    {
-        if( !g_strcmp0( method_name, "PresentWindow" ) )
-        {
-            gtr_action_activate( "present-main-window" );
-            g_dbus_method_invocation_return_value( invocation, NULL );
-            handled = true;
-        }
-    }
-
-    if( !handled )
-        g_warning( "Unhandled method call:\n\tObject Path: %s\n\tInterface Name: %s\n\tMethod Name: %s",
-                   object_path, interface_name, method_name );
-};
-
-static void
-on_session_registered_in_dbus( GDBusConnection *connection, const gchar *name UNUSED, gpointer core )
-{
-    GError * err = NULL;
-    GDBusNodeInfo * node_info;
-    GDBusInterfaceVTable vtable;
-    const char * interface_xml = "<node>"
-                                 "  <interface name='" TR_DBUS_SESSION_INTERFACE "'>"
-                                 "    <method name='TorrentAdd'>"
-                                 "      <arg type='a{sv}' name='args' direction='in'/>"
-                                 "      <arg type='b' name='response' direction='out'/>"
-                                 "    </method>"
-                                 "  </interface>"
-                                 "</node>";
-
-    node_info = g_dbus_node_info_new_for_xml( interface_xml, &err );
-
-    vtable.method_call = handle_dbus_method;
-    vtable.get_property = NULL;
-    vtable.set_property = NULL;
-
-    g_dbus_connection_register_object ( connection,
-                                        TR_DBUS_SESSION_OBJECT_PATH,
-                                        node_info->interfaces[0],
-                                        &vtable,
-                                        core,
-                                        NULL,
-                                        &err );
-
-    if( err != NULL ) {
-        g_warning( "%s:%d Error registering object: %s", __FILE__, __LINE__, err->message );
-        g_error_free( err );
-    }
-}
-
-static void
-on_display_registered_in_dbus( GDBusConnection *connection, const gchar *name UNUSED, gpointer core )
-{
-    GError * err = NULL;
-    const char * interface_xml = "<node>"
-                                 "  <interface name='" TR_DBUS_DISPLAY_INTERFACE "'>"
-                                 "    <method name='PresentWindow'>"
-                                 "    </method>"
-                                 "  </interface>"
-                                 "</node>";
-    GDBusInterfaceVTable vtable = { .method_call=handle_dbus_method };
-    GDBusNodeInfo * node_info = g_dbus_node_info_new_for_xml( interface_xml, &err );
-
-    g_dbus_connection_register_object ( connection,
-                                        TR_DBUS_DISPLAY_OBJECT_PATH,
-                                        node_info->interfaces[0],
-                                        &vtable,
-                                        core,
-                                        NULL,
-                                        &err );
-
-    if( err != NULL ) {
-        g_warning( "%s:%d Error registering object: %s", __FILE__, __LINE__, err->message );
-        g_error_free( err );
-    }
-}
-
-static void
 core_init( GTypeInstance * instance, gpointer g_class UNUSED )
 {
     GtkListStore * store;
@@ -330,24 +226,6 @@ core_init( GTypeInstance * instance, gpointer g_class UNUSED )
     p->sorted_model = gtk_tree_model_sort_new_with_model( p->raw_model );
     p->string_chunk = g_string_chunk_new( 2048 );
     g_object_unref( p->raw_model );
-
-    p->dbus_session_owner_id = g_bus_own_name( G_BUS_TYPE_SESSION,
-                                               TR_DBUS_SESSION_SERVICE_NAME,
-                                               G_BUS_NAME_OWNER_FLAGS_NONE,
-                                               NULL,
-                                               on_session_registered_in_dbus,
-                                               NULL,
-                                               self,
-                                               NULL );
-
-    p->dbus_display_owner_id = g_bus_own_name( G_BUS_TYPE_SESSION,
-                                               TR_DBUS_DISPLAY_SERVICE_NAME,
-                                               G_BUS_NAME_OWNER_FLAGS_NONE,
-                                               NULL,
-                                               on_display_registered_in_dbus,
-                                               NULL,
-                                               self,
-                                               NULL );
 }
 
 GType
@@ -755,6 +633,8 @@ core_watchdir_idle( gpointer gcore )
     TrCore * core = TR_CORE( gcore );
     const time_t now = tr_time( );
     struct TrCorePrivate * p = core->priv;
+    const gboolean do_start = gtr_pref_flag_get( TR_PREFS_KEY_START );
+    const gboolean do_prompt = gtr_pref_flag_get( PREF_KEY_OPTIONS_PROMPT );
 
     /* of the monitor_files, make a list of those that haven't
      * changed lately, since they should be ready to add */
@@ -764,14 +644,16 @@ core_watchdir_idle( gpointer gcore )
         if( f->mtime + 2 >= now )
             monitor_files = g_slist_prepend( monitor_files, f );
         else {
-            addme = g_slist_prepend( addme, g_strdup( f->filename ) );
+            addme = g_slist_prepend( addme, g_file_new_for_commandline_arg( f->filename ) );
             watchdir_file_free( f );
         }
     }
 
     /* add the torrents from that list */
     core->priv->adding_from_watch_dir = TRUE;
-    gtr_core_add_list_defaults( core, addme, TRUE );
+    gtr_core_add_files( core, addme, do_start, do_prompt, TRUE );
+    g_slist_foreach( addme, (GFunc)g_object_unref, NULL );
+    g_slist_free( addme );
     core->priv->adding_from_watch_dir = FALSE;
 
     /* update the monitor_files list */
@@ -941,9 +823,6 @@ gtr_core_close( TrCore * core )
         gtr_pref_save( session );
         tr_sessionClose( session );
     }
-
-    g_bus_unown_name( core->priv->dbus_display_owner_id );
-    g_bus_unown_name( core->priv->dbus_session_owner_id );
 }
 
 /***
@@ -1221,169 +1100,152 @@ gtr_core_add_ctor( TrCore * core, tr_ctor * ctor )
 ****
 ***/
 
-struct url_dialog_data
+struct add_from_url_data
 {
     TrCore * core;
     tr_ctor * ctor;
-    char * url;
-
-    bool did_connect;
-    bool did_timeout;
-    long response_code;
+    bool do_prompt;
+    bool do_notify;
 };
 
-static gboolean
-on_url_done_idle( gpointer vdata )
+static void
+add_file_async_callback( GObject * file, GAsyncResult * result, gpointer gdata )
 {
-    struct url_dialog_data * data = vdata;
+    gsize length;
+    char * contents;
+    GError * error = NULL;
+    struct add_from_url_data * data = gdata;
 
-    if( data->response_code != 200 )
+    if( !g_file_load_contents_finish( G_FILE( file ), result, &contents, &length, NULL, &error ) )
     {
-        gtr_http_failure_dialog( NULL, data->url, data->response_code );
+        g_message( _( "Couldn't read \"%s\": %s" ), g_file_get_parse_name( G_FILE( file ) ), error->message );
+        g_error_free( error );
+    }
+    else if( !tr_ctorSetMetainfo( data->ctor, (const uint8_t*)contents, length ) )
+    {
+        core_add_ctor( data->core, data->ctor, data->do_prompt, data->do_notify );
     }
     else
     {
-        const gboolean do_prompt = gtr_pref_flag_get( PREF_KEY_OPTIONS_PROMPT );
-        const gboolean do_notify = FALSE;
-        const int err = core_add_ctor( data->core, data->ctor, do_prompt, do_notify );
-
-        if( err == TR_PARSE_ERR )
-            core_emit_err( data->core, TR_PARSE_ERR, data->url );
-
-        gtr_core_torrents_added( data->core );
+        tr_ctorFree( data->ctor );
     }
 
-    /* cleanup */
     core_dec_busy( data->core );
-    g_free( data->url );
     g_free( data );
-    return FALSE;
 }
 
-static void
-on_url_done( tr_session   * session,
-             bool           did_connect,
-             bool           did_timeout,
-             long           response_code,
-             const void   * response,
-             size_t         response_byte_count,
-             void         * vdata )
+static bool
+add_file( TrCore      * core,
+          GFile       * file,
+          gboolean      do_start,
+          gboolean      do_prompt,
+          gboolean      do_notify )
 {
-    struct url_dialog_data * data = vdata;
-
-    data->did_connect = did_connect;
-    data->did_timeout = did_timeout;
-    data->response_code = response_code;
-    data->ctor = tr_ctorNew( session );
-    core_apply_defaults( data->ctor );
-    tr_ctorSetMetainfo( data->ctor, response, response_byte_count );
-
-    gdk_threads_add_idle( on_url_done_idle, data );
-}
-
-void
-gtr_core_add_from_url( TrCore * core, const char * url )
-{
-    tr_session * session = gtr_core_session( core );
-    const gboolean is_magnet_link = gtr_is_magnet_link( url );
-
-    if( is_magnet_link || gtr_is_hex_hashcode( url ) )
-    {
-        int err;
-        char * tmp = NULL;
-        tr_ctor * ctor = tr_ctorNew( session );
-
-        if( gtr_is_hex_hashcode( url ) )
-            url = tmp = g_strdup_printf( "magnet:?xt=urn:btih:%s", url );
-
-        err = tr_ctorSetMetainfoFromMagnetLink( ctor, url );
-
-        if( !err )
-            gtr_core_add_ctor( core, ctor );
-        else {
-            gtr_unrecognized_url_dialog( NULL, url );
-            tr_ctorFree( ctor );
-        }
-
-        g_free( tmp );
-    }
-    else
-    {
-        struct url_dialog_data * data = g_new( struct url_dialog_data, 1 );
-        data->core = core;
-        data->url = g_strdup( url );
-        core_inc_busy( data->core );
-        tr_webRun( session, url, NULL, NULL, on_url_done, data );
-    }
-}
-
-/***
-****
-***/
-
-static void
-add_filename( TrCore      * core,
-              const char  * filename,
-              gboolean      do_start,
-              gboolean      do_prompt,
-              gboolean      do_notify )
-{
+    bool handled = false;
     tr_session * session = gtr_core_session( core );
 
-    if( session == NULL )
-        return;
-
-    if( gtr_is_supported_url( filename ) || gtr_is_magnet_link( filename ) )
+    if( session != NULL )
     {
-        gtr_core_add_from_url( core, filename );
-    }
-    else if( g_file_test( filename, G_FILE_TEST_EXISTS ) )
-    {
-        int err;
+        tr_ctor * ctor;
+        bool tried = false;
+        bool loaded = false;
 
-        tr_ctor * ctor = tr_ctorNew( session );
-        tr_ctorSetMetainfoFromFile( ctor, filename );
+        ctor = tr_ctorNew( session );
         core_apply_defaults( ctor );
         tr_ctorSetPaused( ctor, TR_FORCE, !do_start );
 
-        err = core_add_ctor( core, ctor, do_prompt, do_notify );
-        if( err == TR_PARSE_ERR )
-            core_emit_err( core, TR_PARSE_ERR, filename );
+        /* local files... */
+        if( !tried ) {
+            char * str = g_file_get_path( file );
+            if(( tried = g_file_test( str, G_FILE_TEST_EXISTS )))
+               loaded = !tr_ctorSetMetainfoFromFile( ctor, str );
+            g_free( str );
+        }
+
+        /* magnet links... */
+        if( !tried && g_file_has_uri_scheme( file, "magnet" ) ) {
+            /* GFile mangles the original string with /// so we have to un-mangle */
+            char * str = g_file_get_parse_name( file );
+            char * magnet = g_strdup_printf( "magnet:%s", strchr( str, '?' ) );
+            tried = true;
+            loaded = !tr_ctorSetMetainfoFromMagnetLink( ctor, magnet );
+            g_free( magnet );
+            g_free( str );
+        }
+
+        /* hashcodes that we can turn into magnet links... */
+        if( !tried ) {
+            char * str = g_file_get_basename( file );
+            if( gtr_is_hex_hashcode( str ) ) {
+                char * magnet = g_strdup_printf( "magnet:?xt=urn:btih:%s", str );
+                tried = true;
+                loaded = !tr_ctorSetMetainfoFromMagnetLink( ctor, magnet );
+                g_free( magnet );
+            }
+            g_free( str );
+        }
+
+        /* if we were able to load the metainfo, add the torrent */
+        if( loaded )
+        {
+            handled = true;
+            core_add_ctor( core, ctor, do_prompt, do_notify );
+        }
+        else if( g_file_has_uri_scheme( file, "http" ) ||
+                 g_file_has_uri_scheme( file, "https" ) ||
+                 g_file_has_uri_scheme( file, "ftp" ) )
+        {
+            struct add_from_url_data * data;
+
+            data = g_new0( struct add_from_url_data, 1 );
+            data->core = core;
+            data->ctor = ctor;
+            data->do_prompt = do_prompt;
+            data->do_notify = do_notify;
+
+            handled = true;
+            core_inc_busy( core );
+            g_file_load_contents_async( file, NULL, add_file_async_callback, data );
+        }
+        else
+        {
+            tr_ctorFree( ctor );
+            g_message( _( "Skipping unknown torrent \"%s\"" ), g_file_get_parse_name( file ) );
+        }
     }
-    else if( gtr_is_hex_hashcode( filename ) )
-    {
-        gtr_core_add_from_url( core, filename );
-    }
+
+    return handled;
+}
+
+bool
+gtr_core_add_from_url( TrCore * core, const char * uri )
+{
+    bool handled;
+    const bool do_start = gtr_pref_flag_get( TR_PREFS_KEY_START );
+    const bool do_prompt = gtr_pref_flag_get( PREF_KEY_OPTIONS_PROMPT );
+    const bool do_notify = false;
+
+    GFile * file = g_file_new_for_uri( uri );
+    handled = add_file( core, file, do_start, do_prompt, do_notify );
+    g_object_unref( file );
+    gtr_core_torrents_added( core );
+
+    return handled;
 }
 
 void
-gtr_core_add_list( TrCore    * core,
-                   GSList    * files,
-                   gboolean    do_start,
-                   gboolean    do_prompt,
-                   gboolean    do_notify )
+gtr_core_add_files( TrCore     * core,
+                    GSList     * files,
+                    gboolean     do_start,
+                    gboolean     do_prompt,
+                    gboolean     do_notify )
 {
     GSList * l;
 
     for( l=files; l!=NULL; l=l->next )
-    {
-        char * filename = l->data;
-        add_filename( core, filename, do_start, do_prompt, do_notify );
-        g_free( filename );
-    }
+        add_file( core, l->data, do_start, do_prompt, do_notify );
 
     gtr_core_torrents_added( core );
-
-    g_slist_free( files );
-}
-
-void
-gtr_core_add_list_defaults( TrCore * core, GSList * files, gboolean do_notify )
-{
-    const gboolean do_start = gtr_pref_flag_get( TR_PREFS_KEY_START );
-    const gboolean do_prompt = gtr_pref_flag_get( PREF_KEY_OPTIONS_PROMPT );
-
-    gtr_core_add_list( core, files, do_start, do_prompt, do_notify );
 }
 
 void

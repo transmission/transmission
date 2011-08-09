@@ -26,8 +26,9 @@
 #define GTR_CONFIG_H
 
 #include <inttypes.h>
-#include <libtransmission/transmission.h>
-#include "util.h" /* gtr_lockfile */
+#include <libtransmission/transmission.h> /* tr_benc, tr_session */
+
+void             gtr_pref_init              ( const char * config_dir );
 
 int64_t          gtr_pref_int_get           ( const char * key );
 void             gtr_pref_int_set           ( const char * key, int64_t value );
@@ -43,13 +44,5 @@ void             gtr_pref_string_set        ( const char * key, const char * val
 
 void             gtr_pref_save              ( tr_session * );
 struct tr_benc*  gtr_pref_get_all           ( void );
-
-/**
-***
-**/
-
-gboolean cf_init( const char *confdir, char ** errstr );
-
-gboolean cf_lock( gtr_lockfile_state_t * tr_state, char ** errstr );
 
 #endif /* GTR_CONFIG_H */

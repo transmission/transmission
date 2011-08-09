@@ -15,10 +15,6 @@
 #include <stdarg.h>
 #include <string.h> /* strchr(), strrchr(), strlen(), strncmp(), strstr() */
 
-#include <sys/types.h> /* for gtr_lockfile()'s open() */
-#include <sys/stat.h> /* for gtr_lockfile()'s open() */
-#include <fcntl.h> /* for gtr_lockfile()'s open() */
-
 #include <gtk/gtk.h>
 #include <glib/gi18n.h>
 #include <glib/gstdio.h> /* g_unlink() */
@@ -54,54 +50,6 @@ const char * speed_K_str = N_("KiB/s");
 const char * speed_M_str = N_("MiB/s");
 const char * speed_G_str = N_("GiB/s");
 const char * speed_T_str = N_("TiB/s");
-
-/***
-****
-***/
-
-gtr_lockfile_state_t
-gtr_lockfile( const char * filename )
-{
-    gtr_lockfile_state_t ret;
-
-#ifdef WIN32
-
-    HANDLE file = CreateFile( filename,
-                              GENERIC_READ | GENERIC_WRITE,
-                              FILE_SHARE_READ | FILE_SHARE_WRITE,
-                              NULL,
-                              OPEN_ALWAYS,
-                              FILE_ATTRIBUTE_NORMAL,
-                              NULL );
-    if( file == INVALID_HANDLE_VALUE )
-        ret = GTR_LOCKFILE_EOPEN;
-    else if( !LockFile( file, 0, 0, 1, 1 ) )
-        ret = GTR_LOCKFILE_ELOCK;
-    else
-        ret = GTR_LOCKFILE_SUCCESS;
-
-#else
-
-    int fd = open( filename, O_RDWR | O_CREAT, 0666 );
-    if( fd < 0 )
-        ret = GTR_LOCKFILE_EOPEN;
-    else {
-        struct flock lk;
-        memset( &lk, 0,  sizeof( lk ) );
-        lk.l_start = 0;
-        lk.l_len = 0;
-        lk.l_type = F_WRLCK;
-        lk.l_whence = SEEK_SET;
-        if( -1 == fcntl( fd, F_SETLK, &lk ) )
-            ret = GTR_LOCKFILE_ELOCK;
-        else
-            ret = GTR_LOCKFILE_SUCCESS;
-    }
-
-#endif
-
-    return ret;
-}
 
 /***
 ****
@@ -218,7 +166,7 @@ gtr_get_host_from_url( char * buf, size_t buflen, const char * url )
     }
 }
 
-gboolean
+static gboolean
 gtr_is_supported_url( const char * str )
 {
     return !strncmp( str, "ftp://", 6 )
@@ -430,73 +378,6 @@ gtr_open_uri( const char * uri )
         if( !opened )
             g_message( "Unable to open \"%s\"", uri );
     }
-}
-
-gboolean
-gtr_dbus_add_torrent( const char * filename )
-{
-    GVariant * response;
-    GVariant * args;
-    GVariant * parameters;
-    GVariantBuilder * builder;
-    GDBusConnection * connection;
-    GError * err = NULL;
-    gboolean handled = FALSE;
-
-    /* "args" is a dict as described in the RPC spec's "torrent-add" section */
-    builder = g_variant_builder_new( G_VARIANT_TYPE( "a{sv}" ) );
-    g_variant_builder_add( builder, "{sv}", "filename", g_variant_new_string( filename ) );
-    args = g_variant_builder_end( builder );
-    parameters = g_variant_new_tuple( &args, 1 );
-    g_variant_builder_unref( builder );
-
-    connection = g_bus_get_sync( G_BUS_TYPE_SESSION, NULL, &err );
-
-    response = g_dbus_connection_call_sync( connection,
-                                            TR_DBUS_SESSION_SERVICE_NAME,
-                                            TR_DBUS_SESSION_OBJECT_PATH,
-                                            TR_DBUS_SESSION_INTERFACE,
-                                            "TorrentAdd",
-                                            parameters,
-                                            G_VARIANT_TYPE_TUPLE,
-                                            G_DBUS_CALL_FLAGS_NONE,
-                                            10000, /* wait 10 sec */
-                                            NULL,
-                                            &err );
-
-
-    handled = g_variant_get_boolean( g_variant_get_child_value( response, 0 ) );
-
-    g_object_unref( connection );
-    g_variant_unref( response );
-    return handled;
-}
-
-gboolean
-gtr_dbus_present_window( void )
-{
-    gboolean success;
-    GDBusConnection * connection;
-    GError * err = NULL;
-
-    connection = g_bus_get_sync( G_BUS_TYPE_SESSION, NULL, &err );
-
-    g_dbus_connection_call_sync( connection,
-                                 TR_DBUS_DISPLAY_SERVICE_NAME,
-                                 TR_DBUS_DISPLAY_OBJECT_PATH,
-                                 TR_DBUS_DISPLAY_INTERFACE,
-                                 "PresentWindow",
-                                 NULL,
-                                 NULL, G_DBUS_CALL_FLAGS_NONE,
-                                 1000, NULL, &err );
-
-    success = err == NULL;
-
-    /* cleanup */
-    if( err != NULL )
-        g_error_free( err );
-    g_object_unref( connection );
-    return success;
 }
 
 /***

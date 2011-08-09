@@ -106,19 +106,14 @@ void gtr_core_load( TrCore * self, gboolean forcepaused );
  * May pop up dialogs for each torrent if that preference is enabled.
  * May trigger one or more "error" signals with TR_CORE_ERR_ADD_TORRENT
  */
-void gtr_core_add_list( TrCore *    self,
-                        GSList *    torrentFiles,
-                        gboolean    do_start,
-                        gboolean    do_prompt,
-                        gboolean    do_notify );
-
-void gtr_core_add_list_defaults( TrCore    * core,
-                                 GSList    * torrentFiles,
-                                 gboolean    do_notify );
-
+void gtr_core_add_files( TrCore     * core,
+                         GSList     * files,
+                         gboolean     do_start,
+                         gboolean     do_prompt,
+                         gboolean     do_notify );
 
 /** @brief Add a torrent from a URL */
-void gtr_core_add_from_url( TrCore * core, const char * url );
+bool gtr_core_add_from_url( TrCore * core, const char * url );
 
 /** @brief Add a torrent.
     @param ctor this function assumes ownership of the ctor */
@@ -198,15 +193,6 @@ enum
 
     MC_ROW_COUNT
 };
-
-
-#define TR_DBUS_SESSION_SERVICE_NAME  "com.transmissionbt.transmission.Session"
-#define TR_DBUS_SESSION_INTERFACE     "com.transmissionbt.transmission.Session"
-#define TR_DBUS_SESSION_OBJECT_PATH   "/com/transmissionbt/transmission/Session"
-
-#define TR_DBUS_DISPLAY_SERVICE_NAME  "com.transmissionbt.transmission.Display"
-#define TR_DBUS_DISPLAY_INTERFACE     "com.transmissionbt.transmission.Display"
-#define TR_DBUS_DISPLAY_OBJECT_PATH   "/com/transmissionbt/transmission/Display"
 
 
 #endif /* GTR_CORE_H */

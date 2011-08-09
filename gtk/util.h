@@ -70,8 +70,6 @@ char* tr_strltime( char * buf, int secs, size_t buflen );
 /* http://www.legaltorrents.com/some/announce/url --> legaltorrents.com */
 void gtr_get_host_from_url( char * buf, size_t buflen, const char * url );
 
-gboolean gtr_is_supported_url( const char * str );
-
 gboolean gtr_is_magnet_link( const char * str );
 
 gboolean gtr_is_hex_hashcode( const char * str );
@@ -80,27 +78,9 @@ gboolean gtr_is_hex_hashcode( const char * str );
 ****
 ***/
 
-typedef enum
-{
-    GTR_LOCKFILE_SUCCESS = 0,
-    GTR_LOCKFILE_EOPEN,
-    GTR_LOCKFILE_ELOCK
-}
-gtr_lockfile_state_t;
-
-gtr_lockfile_state_t gtr_lockfile( const char * filename );
-
-/***
-****
-***/
-
 void        gtr_open_uri( const char * uri );
 
 void        gtr_open_file( const char * path );
-
-gboolean    gtr_dbus_add_torrent( const char * filename );
-
-gboolean    gtr_dbus_present_window( void );
 
 const char* gtr_get_help_uri( void );
 
