@@ -308,8 +308,6 @@ getStatusString( GString           * gstr,
 ****
 ***/
 
-static GtkCellRendererClass * parent_class = NULL;
-
 struct TorrentCellRendererPrivate
 {
     tr_torrent       * tor;
@@ -892,6 +890,8 @@ torrent_cell_renderer_dispose( GObject * o )
     parent->dispose( o );
 }
 
+G_DEFINE_TYPE (TorrentCellRenderer, torrent_cell_renderer, GTK_TYPE_CELL_RENDERER)
+
 static void
 torrent_cell_renderer_class_init( TorrentCellRendererClass * klass )
 {
@@ -900,8 +900,6 @@ torrent_cell_renderer_class_init( TorrentCellRendererClass * klass )
 
     g_type_class_add_private( klass,
                              sizeof( struct TorrentCellRendererPrivate ) );
-
-    parent_class = (GtkCellRendererClass*) g_type_class_peek_parent( klass );
 
     cell_class->render = torrent_cell_renderer_render;
     cell_class->get_size = torrent_cell_renderer_get_size;
@@ -941,10 +939,9 @@ torrent_cell_renderer_class_init( TorrentCellRendererClass * klass )
 }
 
 static void
-torrent_cell_renderer_init( GTypeInstance * instance, gpointer g_class UNUSED )
+torrent_cell_renderer_init( TorrentCellRenderer * self )
 {
     struct TorrentCellRendererPrivate * p;
-    TorrentCellRenderer * self = TORRENT_CELL_RENDERER( instance );
 
     p = self->priv = G_TYPE_INSTANCE_GET_PRIVATE(
             self,
@@ -966,35 +963,6 @@ torrent_cell_renderer_init( GTypeInstance * instance, gpointer g_class UNUSED )
     p->bar_height = DEFAULT_BAR_HEIGHT;
 }
 
-GType
-torrent_cell_renderer_get_type( void )
-{
-    static GType type = 0;
-
-    if( !type )
-    {
-        static const GTypeInfo info =
-        {
-            sizeof( TorrentCellRendererClass ),
-            NULL,                                            /* base_init */
-            NULL,                                            /* base_finalize */
-            (GClassInitFunc)torrent_cell_renderer_class_init,
-            NULL,                                            /* class_finalize
-                                                               */
-            NULL,                                            /* class_data */
-            sizeof( TorrentCellRenderer ),
-            0,                                               /* n_preallocs */
-            (GInstanceInitFunc)torrent_cell_renderer_init,
-            NULL
-        };
-
-        type = g_type_register_static( GTK_TYPE_CELL_RENDERER,
-                                       "TorrentCellRenderer",
-                                       &info, (GTypeFlags)0 );
-    }
-
-    return type;
-}
 
 GtkCellRenderer *
 torrent_cell_renderer_new( void )

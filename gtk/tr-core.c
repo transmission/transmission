@@ -61,7 +61,7 @@ enum
   LAST_SIGNAL
 };
 
-static guint core_signals[LAST_SIGNAL] = { 0 };
+static guint signals[LAST_SIGNAL] = { 0 };
 
 static void core_maybe_inhibit_hibernation( TrCore * core );
 
@@ -118,84 +118,80 @@ core_finalize( GObject * o )
     parent->finalize( o );
 }
 
+G_DEFINE_TYPE (TrCore, tr_core, G_TYPE_OBJECT)
+
 static void
-gtr_core_class_init( gpointer g_class, gpointer g_class_data UNUSED )
+tr_core_class_init( TrCoreClass * core_class )
 {
     GObjectClass * gobject_class;
+    GType core_type = G_TYPE_FROM_CLASS( core_class );
 
-    g_type_class_add_private( g_class, sizeof( struct TrCorePrivate ) );
+    g_type_class_add_private( core_class, sizeof( struct TrCorePrivate ) );
 
-    gobject_class = G_OBJECT_CLASS( g_class );
+    gobject_class = G_OBJECT_CLASS( core_class );
     gobject_class->dispose = core_dispose;
     gobject_class->finalize = core_finalize;
 
-    core_signals[ADD_ERROR_SIGNAL] = g_signal_new(
-        "add-error",
-        G_TYPE_FROM_CLASS( g_class ),
-        G_SIGNAL_RUN_LAST,
-        G_STRUCT_OFFSET(TrCoreClass, add_error),
-        NULL, NULL,
-        g_cclosure_marshal_VOID__UINT_POINTER,
-        G_TYPE_NONE,
-        2, G_TYPE_UINT, G_TYPE_POINTER );
+    signals[ADD_ERROR_SIGNAL] =
+        g_signal_new( "add-error", core_type,
+                      G_SIGNAL_RUN_LAST,
+                      G_STRUCT_OFFSET(TrCoreClass, add_error),
+                      NULL, NULL,
+                      g_cclosure_marshal_VOID__UINT_POINTER,
+                      G_TYPE_NONE,
+                      2, G_TYPE_UINT, G_TYPE_POINTER );
 
-    core_signals[ADD_PROMPT_SIGNAL] = g_signal_new(
-        "add-prompt",
-        G_TYPE_FROM_CLASS( g_class ),
-        G_SIGNAL_RUN_LAST,
-        G_STRUCT_OFFSET(TrCoreClass, add_prompt),
-        NULL, NULL,
-        g_cclosure_marshal_VOID__POINTER,
-        G_TYPE_NONE,
-        1, G_TYPE_POINTER );
+    signals[ADD_PROMPT_SIGNAL] =
+        g_signal_new( "add-prompt", core_type,
+                      G_SIGNAL_RUN_LAST,
+                      G_STRUCT_OFFSET(TrCoreClass, add_prompt),
+                      NULL, NULL,
+                      g_cclosure_marshal_VOID__POINTER,
+                      G_TYPE_NONE,
+                      1, G_TYPE_POINTER );
 
-    core_signals[BUSY_SIGNAL] = g_signal_new(
-        "busy",
-        G_TYPE_FROM_CLASS( g_class ),
-        G_SIGNAL_RUN_FIRST,
-        G_STRUCT_OFFSET(TrCoreClass, busy),
-        NULL, NULL,
-        g_cclosure_marshal_VOID__BOOLEAN,
-        G_TYPE_NONE,
-        1, G_TYPE_BOOLEAN );
+    signals[BUSY_SIGNAL] =
+        g_signal_new( "busy", core_type,
+                      G_SIGNAL_RUN_FIRST,
+                      G_STRUCT_OFFSET(TrCoreClass, busy),
+                      NULL, NULL,
+                      g_cclosure_marshal_VOID__BOOLEAN,
+                      G_TYPE_NONE,
+                      1, G_TYPE_BOOLEAN );
 
-    core_signals[BLOCKLIST_SIGNAL] = g_signal_new(
-        "blocklist-updated",
-        G_TYPE_FROM_CLASS( g_class ),
-        G_SIGNAL_RUN_FIRST,
-        G_STRUCT_OFFSET(TrCoreClass, blocklist_updated),
-        NULL, NULL,
-        g_cclosure_marshal_VOID__INT,
-        G_TYPE_NONE,
-        1, G_TYPE_INT );
+    signals[BLOCKLIST_SIGNAL] =
+        g_signal_new( "blocklist-updated", core_type,
+                      G_SIGNAL_RUN_FIRST,
+                      G_STRUCT_OFFSET(TrCoreClass, blocklist_updated),
+                      NULL, NULL,
+                      g_cclosure_marshal_VOID__INT,
+                      G_TYPE_NONE,
+                      1, G_TYPE_INT );
 
-    core_signals[PORT_SIGNAL] = g_signal_new(
-        "port-tested",
-        G_TYPE_FROM_CLASS( g_class ),
-        G_SIGNAL_RUN_LAST,
-        G_STRUCT_OFFSET(TrCoreClass, port_tested),
-        NULL, NULL,
-        g_cclosure_marshal_VOID__BOOLEAN,
-        G_TYPE_NONE,
-        1, G_TYPE_BOOLEAN );
+    signals[PORT_SIGNAL] =
+        g_signal_new( "port-tested", core_type,
+                      G_SIGNAL_RUN_LAST,
+                      G_STRUCT_OFFSET(TrCoreClass, port_tested),
+                      NULL, NULL,
+                      g_cclosure_marshal_VOID__BOOLEAN,
+                      G_TYPE_NONE,
+                      1, G_TYPE_BOOLEAN );
 
-    core_signals[PREFS_SIGNAL] = g_signal_new(
-        "prefs-changed",
-        G_TYPE_FROM_CLASS( g_class ),
-        G_SIGNAL_RUN_LAST,
-        G_STRUCT_OFFSET(TrCoreClass, prefs_changed),
-        NULL, NULL,
-        g_cclosure_marshal_VOID__STRING,
-        G_TYPE_NONE,
-        1, G_TYPE_STRING );
+    signals[PREFS_SIGNAL] =
+        g_signal_new( "prefs-changed", core_type,
+                      G_SIGNAL_RUN_LAST,
+                      G_STRUCT_OFFSET(TrCoreClass, prefs_changed),
+                      NULL, NULL,
+                      g_cclosure_marshal_VOID__STRING,
+                      G_TYPE_NONE,
+                      1, G_TYPE_STRING );
 }
 
 static void
-core_init( GTypeInstance * instance, gpointer g_class UNUSED )
+tr_core_init( TrCore * core )
 {
     GtkListStore * store;
     struct TrCorePrivate * p;
-    TrCore * self = (TrCore *) instance;
 
     /* column types for the model used to store torrent information */
     /* keep this in sync with the enum near the bottom of tr_core.h */
@@ -214,7 +210,7 @@ core_init( GTypeInstance * instance, gpointer g_class UNUSED )
                       G_TYPE_INT,       /* MC_ERROR */
                       G_TYPE_INT };     /* MC_ACTIVE_PEER_COUNT */
 
-    p = self->priv = G_TYPE_INSTANCE_GET_PRIVATE( self,
+    p = core->priv = G_TYPE_INSTANCE_GET_PRIVATE( core,
                                                   TR_CORE_TYPE,
                                                   struct TrCorePrivate );
 
@@ -228,31 +224,7 @@ core_init( GTypeInstance * instance, gpointer g_class UNUSED )
     g_object_unref( p->raw_model );
 }
 
-GType
-gtr_core_get_type( void )
-{
-    static GType type = 0;
 
-    if( !type )
-    {
-        static const GTypeInfo info =
-        {
-            sizeof( TrCoreClass ),
-            NULL,                 /* base_init */
-            NULL,                 /* base_finalize */
-            gtr_core_class_init,  /* class_init */
-            NULL,                 /* class_finalize */
-            NULL,                 /* class_data */
-            sizeof( TrCore ),
-            0,                    /* n_preallocs */
-            core_init,            /* instance_init */
-            NULL,
-        };
-        type = g_type_register_static( G_TYPE_OBJECT, "TrCore", &info, 0 );
-    }
-
-    return type;
-}
 
 /***
 ****  EMIT SIGNALS
@@ -261,31 +233,31 @@ gtr_core_get_type( void )
 static inline void
 core_emit_blocklist_udpated( TrCore * core, int ruleCount )
 {
-    g_signal_emit( core, core_signals[BLOCKLIST_SIGNAL], 0, ruleCount );
+    g_signal_emit( core, signals[BLOCKLIST_SIGNAL], 0, ruleCount );
 }
 
 static inline void
 core_emit_port_tested( TrCore * core, gboolean is_open )
 {
-    g_signal_emit( core, core_signals[PORT_SIGNAL], 0, is_open );
+    g_signal_emit( core, signals[PORT_SIGNAL], 0, is_open );
 }
 
 static inline void
 core_emit_err( TrCore * core, enum tr_core_err type, const char * msg )
 {
-    g_signal_emit( core, core_signals[ADD_ERROR_SIGNAL], 0, type, msg );
+    g_signal_emit( core, signals[ADD_ERROR_SIGNAL], 0, type, msg );
 }
 
 static inline void
 core_emit_busy( TrCore * core, gboolean is_busy )
 {
-    g_signal_emit( core, core_signals[BUSY_SIGNAL], 0, is_busy );
+    g_signal_emit( core, signals[BUSY_SIGNAL], 0, is_busy );
 }
 
 void
 gtr_core_pref_changed( TrCore * core, const char * key )
 {
-    g_signal_emit( core, core_signals[PREFS_SIGNAL], 0, key );
+    g_signal_emit( core, signals[PREFS_SIGNAL], 0, key );
 }
 
 /***
@@ -1056,7 +1028,7 @@ core_add_ctor( TrCore * core, tr_ctor * ctor,
 
         default:
             if( do_prompt )
-                g_signal_emit( core, core_signals[ADD_PROMPT_SIGNAL], 0, ctor );
+                g_signal_emit( core, signals[ADD_PROMPT_SIGNAL], 0, ctor );
             else {
                 gtr_core_add_torrent( core, core_create_new_torrent( core, ctor ), do_notify );
                 tr_ctorFree( ctor );

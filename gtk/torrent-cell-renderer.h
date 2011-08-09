@@ -13,7 +13,6 @@
 #ifndef GTR_TORRENT_CELL_RENDERER_H
 #define GTR_TORRENT_CELL_RENDERER_H
 
-#include <glib-object.h>
 #include <gtk/gtk.h>
 
 #define TORRENT_CELL_RENDERER_TYPE ( torrent_cell_renderer_get_type( ) )
@@ -29,16 +28,18 @@ typedef struct TorrentCellRendererClass TorrentCellRendererClass;
 
 struct TorrentCellRenderer
 {
-    GtkCellRenderer                      parent;
-    struct TorrentCellRendererPrivate *  priv;
+    GtkCellRenderer parent;
+
+    /*< private >*/
+    struct TorrentCellRendererPrivate * priv;
 };
 
 struct TorrentCellRendererClass
 {
-    GtkCellRendererClass    parent;
+    GtkCellRendererClass parent;
 };
 
-GType             torrent_cell_renderer_get_type( void );
+GType torrent_cell_renderer_get_type( void ) G_GNUC_CONST;
 
 GtkCellRenderer * torrent_cell_renderer_new( void );
 

@@ -31,17 +31,16 @@
 #include <libtransmission/transmission.h>
 #include <libtransmission/bencode.h>
 
-#define TR_CORE_TYPE ( gtr_core_get_type() )
-#define TR_CORE(o) G_TYPE_CHECK_INSTANCE_CAST((o), TR_CORE_TYPE, TrCore)
-#define TR_IS_CORE(o) G_TYPE_CHECK_INSTANCE_TYPE((o), TR_CORE_TYPE )
-#define TR_CORE_CLASS(k) G_TYPE_CHECK_CLASS_CAST((k), TR_CORE_TYPE, TrCoreClass)
-#define TR_IS_CORE_CLASS(k) G_TYPE_CHECK_CLASS_TYPE((k), TR_CORE_TYPE )
-#define TR_CORE_GET_CLASS(o) G_TYPE_INSTANCE_GET_CLASS((o), TR_CORE_TYPE, TrCoreClass)
+G_BEGIN_DECLS
+
+#define TR_CORE_TYPE (tr_core_get_type ())
+#define TR_CORE(o)   (G_TYPE_CHECK_INSTANCE_CAST ((o), TR_CORE_TYPE, TrCore))
 
 typedef struct _TrCore
 {
     GObject parent;
 
+    /*< private >*/
     struct TrCorePrivate  * priv;
 }
 TrCore;
@@ -67,7 +66,7 @@ typedef struct _TrCoreClass
 }
 TrCoreClass;
 
-GType          gtr_core_get_type( void );
+GType          tr_core_get_type (void) G_GNUC_CONST;
 
 TrCore *       gtr_core_new( tr_session * );
 
@@ -193,6 +192,8 @@ enum
 
     MC_ROW_COUNT
 };
+
+G_END_DECLS
 
 
 #endif /* GTR_CORE_H */
