@@ -122,7 +122,6 @@
 		A21F15AD11729A9F00CF5A9C /* AddMagnetWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = A21F1538117299F100CF5A9C /* AddMagnetWindow.xib */; };
 		A21FBBAB0EDA78C300BC3C51 /* bandwidth.h in Headers */ = {isa = PBXBuildFile; fileRef = A21FBBA90EDA78C300BC3C51 /* bandwidth.h */; };
 		A21FBBAC0EDA78C300BC3C51 /* bandwidth.c in Sources */ = {isa = PBXBuildFile; fileRef = A21FBBAA0EDA78C300BC3C51 /* bandwidth.c */; };
-		A220AF7513D7C4B00035C512 /* evutil_rand.c in Sources */ = {isa = PBXBuildFile; fileRef = A220AF7413D7C4B00035C512 /* evutil_rand.c */; };
 		A220AF7B13D7CC460035C512 /* GlobalOptionsPopover.xib in Resources */ = {isa = PBXBuildFile; fileRef = A220AF7913D7CC460035C512 /* GlobalOptionsPopover.xib */; };
 		A220EC5B118C8A060022B4BE /* tr-lpd.c in Sources */ = {isa = PBXBuildFile; fileRef = A220EC59118C8A060022B4BE /* tr-lpd.c */; };
 		A220EC5C118C8A060022B4BE /* tr-lpd.h in Headers */ = {isa = PBXBuildFile; fileRef = A220EC5A118C8A060022B4BE /* tr-lpd.h */; };
@@ -237,6 +236,7 @@
 		A29DF8BA0DB2544C00D04E5A /* resume.h in Headers */ = {isa = PBXBuildFile; fileRef = A29DF8B70DB2544C00D04E5A /* resume.h */; };
 		A29DF8BB0DB2544C00D04E5A /* torrent.h in Headers */ = {isa = PBXBuildFile; fileRef = A29DF8B80DB2544C00D04E5A /* torrent.h */; };
 		A29DF8BE0DB2545F00D04E5A /* verify.h in Headers */ = {isa = PBXBuildFile; fileRef = A2D22A110D65EED100007D5F /* verify.h */; };
+		A29E653613F1603100048D71 /* evutil_rand.c in Sources */ = {isa = PBXBuildFile; fileRef = A29E653513F1603100048D71 /* evutil_rand.c */; };
 		A29EBE710DC06068006CEE80 /* libcurl.4.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A29EBE700DC06068006CEE80 /* libcurl.4.dylib */; };
 		A2A1CB7A0BF29D5500AE959F /* PeerProgressIndicatorCell.m in Sources */ = {isa = PBXBuildFile; fileRef = A2A1CB780BF29D5500AE959F /* PeerProgressIndicatorCell.m */; };
 		A2A3065C0AAD24A80049E2AC /* UKFileWatcher.m in Sources */ = {isa = PBXBuildFile; fileRef = A2A306540AAD24A80049E2AC /* UKFileWatcher.m */; };
@@ -602,7 +602,6 @@
 		A21F15AB11729A8B00CF5A9C /* AddMagnetWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AddMagnetWindowController.h; path = macosx/AddMagnetWindowController.h; sourceTree = "<group>"; };
 		A21FBBA90EDA78C300BC3C51 /* bandwidth.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = bandwidth.h; path = libtransmission/bandwidth.h; sourceTree = "<group>"; };
 		A21FBBAA0EDA78C300BC3C51 /* bandwidth.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = bandwidth.c; path = libtransmission/bandwidth.c; sourceTree = "<group>"; };
-		A220AF7413D7C4B00035C512 /* evutil_rand.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = evutil_rand.c; path = "third-party/evutil_rand.c"; sourceTree = "<group>"; };
 		A220AF7A13D7CC460035C512 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = macosx/en.lproj/GlobalOptionsPopover.xib; sourceTree = "<group>"; };
 		A220EC59118C8A060022B4BE /* tr-lpd.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "tr-lpd.c"; path = "libtransmission/tr-lpd.c"; sourceTree = "<group>"; };
 		A220EC5A118C8A060022B4BE /* tr-lpd.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "tr-lpd.h"; path = "libtransmission/tr-lpd.h"; sourceTree = "<group>"; };
@@ -809,6 +808,7 @@
 		A29DF8B60DB2544C00D04E5A /* resume.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = resume.c; path = libtransmission/resume.c; sourceTree = "<group>"; };
 		A29DF8B70DB2544C00D04E5A /* resume.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = resume.h; path = libtransmission/resume.h; sourceTree = "<group>"; };
 		A29DF8B80DB2544C00D04E5A /* torrent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = torrent.h; path = libtransmission/torrent.h; sourceTree = "<group>"; };
+		A29E653513F1603100048D71 /* evutil_rand.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = evutil_rand.c; path = "third-party/libevent/evutil_rand.c"; sourceTree = "<group>"; };
 		A29EBE520DC01FC9006CEE80 /* web.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = web.c; path = libtransmission/web.c; sourceTree = "<group>"; };
 		A29EBE530DC01FC9006CEE80 /* web.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = web.h; path = libtransmission/web.h; sourceTree = "<group>"; };
 		A29EBE700DC06068006CEE80 /* libcurl.4.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libcurl.4.dylib; path = "third-party/curl/lib/libcurl.4.dylib"; sourceTree = "<group>"; };
@@ -1581,7 +1581,7 @@
 				A2074F8412BEAA6600F70985 /* evmap.c */,
 				A2074F9812BEAAAF00F70985 /* evthread.c */,
 				A2074FA212BEAAC600F70985 /* evutil.c */,
-				A220AF7413D7C4B00035C512 /* evutil_rand.c */,
+				A29E653513F1603100048D71 /* evutil_rand.c */,
 				A2074FAA12BEAAFF00F70985 /* http.c */,
 				A2074FBE12BEAB9A00F70985 /* kqueue.c */,
 				A2074FB612BEAB1E00F70985 /* listener.c */,
@@ -2400,7 +2400,7 @@
 				A207503712BEADA200F70985 /* poll.c in Sources */,
 				A20750B812BEB66900F70985 /* bufferevent_ratelim.c in Sources */,
 				A2AA9BE3132CAE2000FA131E /* evdns.c in Sources */,
-				A220AF7513D7C4B00035C512 /* evutil_rand.c in Sources */,
+				A29E653613F1603100048D71 /* evutil_rand.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
