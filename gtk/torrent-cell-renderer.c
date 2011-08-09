@@ -870,11 +870,12 @@ torrent_cell_renderer_get_property( GObject     * object,
     }
 }
 
+G_DEFINE_TYPE (TorrentCellRenderer, torrent_cell_renderer, GTK_TYPE_CELL_RENDERER)
+
 static void
 torrent_cell_renderer_dispose( GObject * o )
 {
     TorrentCellRenderer * r = TORRENT_CELL_RENDERER( o );
-    GObjectClass *        parent;
 
     if( r && r->priv )
     {
@@ -886,11 +887,8 @@ torrent_cell_renderer_dispose( GObject * o )
         r->priv = NULL;
     }
 
-    parent = g_type_class_peek( g_type_parent( TORRENT_CELL_RENDERER_TYPE ) );
-    parent->dispose( o );
+    G_OBJECT_CLASS( torrent_cell_renderer_parent_class )->dispose( o );
 }
-
-G_DEFINE_TYPE (TorrentCellRenderer, torrent_cell_renderer, GTK_TYPE_CELL_RENDERER)
 
 static void
 torrent_cell_renderer_class_init( TorrentCellRendererClass * klass )

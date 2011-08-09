@@ -91,11 +91,12 @@ core_is_disposed( const TrCore * core )
     return !core || !core->priv->sorted_model;
 }
 
+G_DEFINE_TYPE (TrCore, tr_core, G_TYPE_OBJECT)
+
 static void
 core_dispose( GObject * o )
 {
     TrCore * core = TR_CORE( o );
-    GObjectClass * parent = g_type_class_peek( g_type_parent( TR_CORE_TYPE ) );
 
     if( core->priv->sorted_model != NULL )
     {
@@ -104,21 +105,18 @@ core_dispose( GObject * o )
         core->priv->raw_model = NULL;
     }
 
-    parent->dispose( o );
+    G_OBJECT_CLASS( tr_core_parent_class )->dispose( o );
 }
 
 static void
 core_finalize( GObject * o )
 {
     TrCore * core = TR_CORE( o );
-    GObjectClass * parent = g_type_class_peek( g_type_parent( TR_CORE_TYPE ) );
 
     g_string_chunk_free( core->priv->string_chunk );
 
-    parent->finalize( o );
+    G_OBJECT_CLASS( tr_core_parent_class )->finalize( o );
 }
-
-G_DEFINE_TYPE (TrCore, tr_core, G_TYPE_OBJECT)
 
 static void
 tr_core_class_init( TrCoreClass * core_class )
