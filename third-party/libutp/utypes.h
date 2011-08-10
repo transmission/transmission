@@ -36,7 +36,7 @@ typedef const char * cstr;
 typedef char * str;
 
 #ifndef __cplusplus
-#include <stdbool.h>
+typedef uint8 bool;
 #endif
 
 #endif //__UTYPES_H__

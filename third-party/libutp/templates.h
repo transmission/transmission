@@ -19,6 +19,14 @@
 #endif
 #endif
 
+#ifdef __GNUC__
+// Used for gcc tool chains accepting but not supporting pragma pack
+// See http://gcc.gnu.org/onlinedocs/gcc/Type-Attributes.html
+#define PACKED_ATTRIBUTE __attribute__((__packed__))
+#else
+#define PACKED_ATTRIBUTE
+#endif
+
 // Utility templates
 #undef min
 #undef max
@@ -48,7 +56,7 @@ namespace aux
 }
 
 template <class T>
-struct big_endian
+struct PACKED_ATTRIBUTE big_endian
 {
 	T operator=(T i) { m_integer = aux::host_to_network(i); return i; }
 	operator T() const { return aux::network_to_host(m_integer); }
