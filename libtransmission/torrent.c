@@ -2682,199 +2682,174 @@ tr_torrentGetBytesLeftToAllocate( const tr_torrent * tor )
 *****  Removing the torrent's local data
 ****/
 
-static int
-vstrcmp( const void * a, const void * b )
-{
-    return strcmp( a, b );
-}
-
-static int
-compareLongestFirst( const void * a, const void * b )
-{
-    const size_t alen = strlen( a );
-    const size_t blen = strlen( b );
-
-    if( alen != blen )
-        return alen > blen ? -1 : 1;
-
-    return vstrcmp( a, b );
-}
-
-static void
-addDirtyFile( const char  * root,
-              const char  * filename,
-              tr_ptrArray * dirtyFolders )
-{
-    char * dir = tr_dirname( filename );
-
-    /* add the parent folders to dirtyFolders until we reach the root or a known-dirty */
-    while (     ( dir != NULL )
-             && ( strlen( root ) <= strlen( dir ) )
-             && ( tr_ptrArrayFindSorted( dirtyFolders, dir, vstrcmp ) == NULL ) )
-    {
-        char * tmp;
-        tr_ptrArrayInsertSorted( dirtyFolders, tr_strdup( dir ), vstrcmp );
-
-        tmp = tr_dirname( dir );
-        tr_free( dir );
-        dir = tmp;
-    }
-
-    tr_free( dir );
-}
-
 static bool
-isSystemFile( const char * base )
+isJunkFile( const char * base )
 {
     int i;
-    static const char * stockFiles[] = { ".DS_Store", "desktop.ini", "Thumbs.db" };
-    static const int stockFileCount = sizeof(stockFiles) / sizeof(stockFiles[0]);
+    static const char * files[] = { ".DS_Store", "desktop.ini", "Thumbs.db" };
+    static const int file_count = sizeof(files) / sizeof(files[0]);
 
-    for( i=0; i<stockFileCount; ++i )
-        if( !strcmp( base, stockFiles[i] ) )
+    for( i=0; i<file_count; ++i )
+        if( !strcmp( base, files[i] ) )
             return true;
 
+#ifdef SYS_DARWIN
     /* check for resource forks. <http://support.apple.com/kb/TA20578> */
     if( !memcmp( base, "._", 2 ) )
         return true;
+#endif
 
     return false;
 }
 
 static void
-deleteLocalFile( const tr_torrent * tor, const char * filename, tr_fileFunc fileFunc )
+removeEmptyFoldersAndJunkFiles( const char * folder )
 {
-    struct stat sb;
-
-    /* add safeguards for (1) making sure the file exists and
-       (2) that we haven't somehow walked up past the torrent's top directory... */
-    if( !stat( filename, &sb ) )
-        if( !tr_is_same_file( tor->currentDir, filename ) )
-            fileFunc( filename );
-}
-
-static void
-walkLocalData( const tr_torrent * tor,
-               const char       * root,
-               const char       * dir,
-               const char       * base,
-               tr_ptrArray      * torrentFiles,
-               tr_ptrArray      * folders,
-               tr_ptrArray      * dirtyFolders,
-               tr_fileFunc        fileFunc )
-{
-    struct stat sb;
-    char * buf = tr_buildPath( dir, base, NULL );
-    int i = stat( buf, &sb );
-
-    if( !i )
-    {
-        DIR * odir = NULL;
-
-        if( S_ISDIR( sb.st_mode ) && ( ( odir = opendir ( buf ) ) ) )
-        {
-            struct dirent *d;
-            tr_ptrArrayInsertSorted( folders, tr_strdup( buf ), vstrcmp );
-            for( d = readdir( odir ); d != NULL; d = readdir( odir ) )
-                if( d->d_name && strcmp( d->d_name, "." ) && strcmp( d->d_name, ".." ) )
-                    walkLocalData( tor, root, buf, d->d_name, torrentFiles, folders, dirtyFolders, fileFunc );
-            closedir( odir );
-        }
-        else if( S_ISREG( sb.st_mode ) && ( sb.st_size > 0 ) )
-        {
-            if( isSystemFile( base ) )
-                deleteLocalFile( tor, buf, fileFunc );
-            else {
-                 const char * sub = buf + strlen( tor->currentDir ) + strlen( TR_PATH_DELIMITER_STR );
-                const bool isTorrentFile = tr_ptrArrayFindSorted( torrentFiles, sub, vstrcmp ) != NULL;
-                if( !isTorrentFile )
-                    addDirtyFile( root, buf, dirtyFolders );
+    DIR * odir;
+    if(( odir = opendir( folder ))) {
+        struct dirent * d;
+        while(( d = readdir( odir ))) {
+            if( strcmp( d->d_name, "." ) && strcmp( d->d_name, ".." ) ) {
+                struct stat sb;
+                char * filename = tr_buildPath( folder, d->d_name, NULL );
+                if( !stat( filename, &sb ) ) {
+                    if( S_ISDIR( sb.st_mode ) )
+                        removeEmptyFoldersAndJunkFiles( filename );
+                    else if( isJunkFile( d->d_name ) )
+                        remove( filename );
+                }
+                tr_free( filename );
             }
         }
+        remove( folder );
+        closedir( odir );
     }
-
-    tr_free( buf );
 }
 
+static bool fileExists( const char * filename, time_t * optional_mtime );
+
+/**
+ * This convoluted code does something (seemingly) simple:
+ * remove the torrent's local files.
+ *
+ * Fun complications:
+ * 1. Try to preserve the directory hierarchy in the recycle bin.
+ * 2. If there are nontorrent files, don't delete them...
+ * 3. ...unless the other files are "junk", such as .DS_Store
+ */
 static void
-deleteLocalData( tr_torrent * tor, tr_fileFunc fileFunc )
+deleteLocalData( tr_torrent * tor, tr_fileFunc func )
 {
     int i, n;
-    char * tmp;
-    char * root;
-    char ** s;
     tr_file_index_t f;
-    const char * cpch;
-    const char * firstFile;
-    tr_ptrArray torrentFiles = TR_PTR_ARRAY_INIT;
-    tr_ptrArray folders      = TR_PTR_ARRAY_INIT;
-    tr_ptrArray dirtyFolders = TR_PTR_ARRAY_INIT; /* dirty == contains non-torrent files */
+    char * base;
+    DIR * odir;
+    char * tmpdir = NULL;
+    tr_ptrArray files = TR_PTR_ARRAY_INIT;
+    tr_ptrArray folders = TR_PTR_ARRAY_INIT;
+    const void * const vstrcmp = strcmp;
+    const char * const top = tor->currentDir;
 
-    if( !tr_torrentHasMetadata( tor ) )
-        return;
+    /***
+    ****  Move the local data to a new tmpdir
+    ***/
 
-    firstFile = tor->info.files[0].name;
-    cpch = strchr( firstFile, TR_PATH_DELIMITER );
-    tmp = cpch ? tr_strndup( firstFile, cpch - firstFile ) : NULL;
-    root = tr_buildPath( tor->currentDir, tmp, NULL );
+    base = tr_strdup_printf( "%s__XXXXXX", tr_torrentName( tor ) );
+    tmpdir = tr_buildPath( top, base, NULL );
+    mkdtemp( tmpdir );
+    tr_free( base );
 
-    for( f=0; f<tor->info.fileCount; ++f ) {
-        tr_ptrArrayInsertSorted( &torrentFiles, tr_strdup( tor->info.files[f].name ), vstrcmp );
-        tr_ptrArrayInsertSorted( &torrentFiles, tr_torrentBuildPartial( tor, f ), vstrcmp );
-    }
-
-    /* build the set of folders and dirtyFolders */
-    walkLocalData( tor, root, root, NULL, &torrentFiles, &folders, &dirtyFolders, fileFunc );
-
-    /* try to remove entire folders first, so that the recycle bin will be tidy */
-    s = (char**) tr_ptrArrayPeek( &folders, &n );
-    for( i=0; i<n; ++i )
-        if( tr_ptrArrayFindSorted( &dirtyFolders, s[i], vstrcmp ) == NULL )
-            deleteLocalFile( tor, s[i], fileFunc );
-
-    /* now blow away any remaining torrent files, such as torrent files in dirty folders */
-    for( i=0, n=tr_ptrArraySize( &torrentFiles ); i<n; ++i ) {
-        char * path = tr_buildPath( tor->currentDir, tr_ptrArrayNth( &torrentFiles, i ), NULL );
-        deleteLocalFile( tor, path, fileFunc );
-        tr_free( path );
-    }
-
-    /* Now clean out the directories left empty from the previous step.
-     * Work from deepest to shallowest s.t. lower folders
-     * won't prevent the upper folders from being deleted */
+    for( f=0; f<tor->info.fileCount; ++f )
     {
-        tr_ptrArray cleanFolders = TR_PTR_ARRAY_INIT;
-        s = (char**) tr_ptrArrayPeek( &folders, &n );
-        for( i=0; i<n; ++i )
-            if( tr_ptrArrayFindSorted( &dirtyFolders, s[i], vstrcmp ) == NULL )
-                tr_ptrArrayInsertSorted( &cleanFolders, s[i], compareLongestFirst );
-        s = (char**) tr_ptrArrayPeek( &cleanFolders, &n );
-        for( i=0; i<n; ++i )
-            deleteLocalFile( tor, s[i], fileFunc );
-        tr_ptrArrayDestruct( &cleanFolders, NULL );
+        char * subpath;
+        const char * base;
+
+        if( tr_torrentFindFile2( tor, f, &base, &subpath, NULL ) )
+        {
+            char * source = tr_buildPath( base, subpath, NULL );
+            char * target = tr_buildPath( tmpdir, subpath, NULL );
+            char * target_dir = tr_dirname( target );
+            tr_mkdirp( target_dir, 0777 );
+            rename( source, target );
+            tr_free( target_dir );
+            tr_free( target );
+            tr_free( source );
+        }
+    }
+
+    /***
+    ****  Remove tmpdir.
+    ****
+    ****  Try deleting the top-level files & folders to preserve
+    ****  the directory hierarchy in the recycle bin.
+    ****  If case that fails -- for example, rmdir() doesn't
+    ****  delete nonempty folders -- go from the bottom up too.
+    ***/
+
+    /* try deleting the local data's top-level files & folders */
+    if(( odir = opendir( tmpdir )))
+    {
+        struct dirent * d;
+        while(( d = readdir( odir )))
+        {
+            if( strcmp( d->d_name, "." ) && strcmp( d->d_name, ".." ) )
+            {
+                char * file = tr_buildPath( tmpdir, d->d_name, NULL );
+                tr_ptrArrayInsertSorted( &folders, tr_strdup( d->d_name ), vstrcmp );
+                func( file );
+                tr_free( file );
+            }
+        }
+        closedir( odir );
+    }
+
+    /* go from the bottom up */
+    for( i=0, n=tr_ptrArraySize(&files); i<n; ++i )
+    {
+        char * walk = tr_strdup( tr_ptrArrayNth( &files, i ) );
+        while( fileExists( walk, NULL ) && !tr_is_same_file( tmpdir, walk ) )
+        {
+            char * tmp = tr_dirname( walk );
+            func( walk );
+            tr_free( walk );
+            walk = tmp;
+        }
+        tr_free( walk );
+    }
+
+    /***
+    ****  The local data has been removed.
+    ****  What's left in top are empty folders, junk, and user-generated files.
+    ****  Remove the first two categories and leave the third.
+    ***/
+
+    for( i=0, n=tr_ptrArraySize(&folders); i<n; ++i )
+    {
+        char * folder = tr_buildPath( top, tr_ptrArrayNth(&folders,i), NULL );
+        removeEmptyFoldersAndJunkFiles( folder );
+        tr_free( folder );
     }
 
     /* cleanup */
-    tr_ptrArrayDestruct( &dirtyFolders, tr_free );
+    rmdir( tmpdir );
+    tr_free( tmpdir );
+    tr_ptrArrayDestruct( &files, tr_free );
     tr_ptrArrayDestruct( &folders, tr_free );
-    tr_ptrArrayDestruct( &torrentFiles, tr_free );
-    tr_free( root );
-    tr_free( tmp );
 }
 
 static void
-tr_torrentDeleteLocalData( tr_torrent * tor, tr_fileFunc fileFunc )
+tr_torrentDeleteLocalData( tr_torrent * tor, tr_fileFunc func )
 {
     assert( tr_isTorrent( tor ) );
 
-    if( fileFunc == NULL )
-        fileFunc = remove;
+    if( func == NULL )
+        func = remove;
 
     /* close all the files because we're about to delete them */
     tr_cacheFlushTorrent( tor->session->cache, tor );
     tr_fdTorrentClose( tor->session, tor->uniqueId );
 
-    deleteLocalData( tor, fileFunc );
+    deleteLocalData( tor, func );
 }
 
 /***
