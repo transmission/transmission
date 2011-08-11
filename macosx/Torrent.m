@@ -302,7 +302,7 @@ int trashDataFile(const char * filename)
 
 - (void) startTransferNoQueue
 {
-    if (![self isActive] && [self alertForRemainingDiskSpace])
+    if ([self alertForRemainingDiskSpace])
     {
         tr_torrentStartNow(fHandle);
         [self update];
@@ -315,7 +315,7 @@ int trashDataFile(const char * filename)
 #warning merge
 - (void) startTransfer
 {
-    if (![self isActive] && ![self waitingToStart] && [self alertForRemainingDiskSpace])
+    if ([self alertForRemainingDiskSpace])
     {
         tr_torrentStart(fHandle);
         [self update];
@@ -327,11 +327,8 @@ int trashDataFile(const char * filename)
 
 - (void) stopTransfer
 {
-    if ([self isActive] || [self waitingToStart])
-    {
-        tr_torrentStop(fHandle);
-        [self update];
-    }
+    tr_torrentStop(fHandle);
+    [self update];
 }
 
 - (void) sleep
@@ -349,7 +346,13 @@ int trashDataFile(const char * filename)
     }
 }
 
-- (void) setQueueIndex: (NSUInteger) index
+#warning remove
+- (NSInteger) queuePosition
+{
+    return fStat->queuePosition;
+}
+
+- (void) setQueuePosition: (NSUInteger) index
 {
     tr_torrentSetQueuePosition(fHandle, index);
 }
@@ -615,12 +618,6 @@ int trashDataFile(const char * filename)
 - (NSString *) name
 {
     return fInfo->name != NULL ? [NSString stringWithUTF8String: fInfo->name] : fHashString;
-}
-
-#warning remove
-- (NSInteger) queuePosition
-{
-    return fStat->queuePosition;
 }
 
 - (BOOL) isFolder

@@ -2644,7 +2644,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
             NSUInteger insertIndex = topTorrent ? [fTorrents indexOfObject: topTorrent] + 1 : 0;
             NSIndexSet * insertIndexes = [NSIndexSet indexSetWithIndexesInRange: NSMakeRange(insertIndex, [movingTorrents count])];
             for (Torrent * torrent in movingTorrents)
-                [torrent setQueueIndex: insertIndex++];
+                [torrent setQueuePosition: insertIndex++];
             [fTorrents insertObjects: movingTorrents atIndexes: insertIndexes];
         }
         

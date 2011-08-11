@@ -81,7 +81,8 @@
 - (void) sleep;
 - (void) wakeUp;
 
-- (void) setQueueIndex: (NSUInteger) index;
+- (NSInteger) queuePosition;
+- (void) setQueuePosition: (NSUInteger) index;
 
 - (void) manualAnnounce;
 - (BOOL) canManualAnnounce;
@@ -127,7 +128,6 @@
 - (NSImage *) icon;
 
 - (NSString *) name;
-- (NSInteger) queuePosition;
 - (BOOL) isFolder;
 - (uint64_t) size;
 - (uint64_t) sizeLeft;
