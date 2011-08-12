@@ -2769,8 +2769,8 @@ deleteLocalData( tr_torrent * tor, tr_fileFunc func )
             char * target_dir = tr_dirname( target );
             tr_mkdirp( target_dir, 0777 );
             rename( source, target );
+            tr_ptrArrayAppend( &files, target );
             tr_free( target_dir );
-            tr_free( target );
             tr_free( source );
             tr_free( subpath );
         }
