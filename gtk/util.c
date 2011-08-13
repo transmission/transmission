@@ -25,7 +25,9 @@
 #include <libtransmission/web.h> /* tr_webResponseStr() */
 #include <libtransmission/version.h> /* SHORT_VERSION_STRING */
 
+#include "conf.h"
 #include "hig.h"
+#include "tr-prefs.h"
 #include "util.h"
 
 /***
@@ -297,24 +299,28 @@ on_tree_view_button_released( GtkWidget *      view,
 int
 gtr_file_trash_or_remove( const char * filename )
 {
-    if( filename && g_file_test( filename, G_FILE_TEST_EXISTS ) )
-    {
-        gboolean trashed = FALSE;
-        GError * err = NULL;
-        GFile *  file = g_file_new_for_path( filename );
-        trashed = g_file_trash( file, NULL, &err );
-        if( err )
-            g_message( "Unable to trash file \"%s\": %s", filename, err->message );
-        g_clear_error( &err );
-        g_object_unref( G_OBJECT( file ) );
+    gboolean trashed = FALSE;
+    GFile * file = g_file_new_for_path( filename );
 
-        if( !trashed && g_remove( filename ) )
-        {
-            const int err = errno;
-            g_message( "Unable to remove file \"%s\": %s", filename, g_strerror( err ) );
+    if( gtr_pref_flag_get( PREF_KEY_TRASH_CAN_ENABLED ) ) {
+        GError * err = NULL;
+        trashed = g_file_trash( file, NULL, &err );
+        if( err ) {
+            g_message( "Unable to trash file \"%s\": %s", filename, err->message );
+            g_clear_error( &err );
         }
     }
 
+    if( !trashed ) {
+        GError * err = NULL;
+        trashed = g_file_delete( file, NULL, &err );
+        if( err ) {
+            g_message( "Unable to delete file \"%s\": %s", filename, err->message );
+            g_clear_error( &err );
+        }
+    }
+
+    g_object_unref( G_OBJECT( file ) );
     return 0;
 }
 

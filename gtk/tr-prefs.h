@@ -48,6 +48,7 @@ GtkWidget * gtr_prefs_dialog_new( GtkWindow * parent, GObject * core );
 #define PREF_KEY_TORRENT_COMPLETE_NOTIFICATION_ENABLED   "torrent-complete-notification-enabled"
 #define PREF_KEY_TORRENT_COMPLETE_SOUND_COMMAND          "torrent-complete-sound-command"
 #define PREF_KEY_TORRENT_COMPLETE_SOUND_ENABLED          "torrent-complete-sound-enabled"
+#define PREF_KEY_TRASH_CAN_ENABLED                       "trash-can-enabled"
 #define PREF_KEY_USER_HAS_GIVEN_INFORMED_CONSENT         "user-has-given-informed-consent"
 
 enum
