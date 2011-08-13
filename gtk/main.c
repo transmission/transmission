@@ -102,7 +102,7 @@ gtr_window_present( GtkWindow * window )
 static int
 compare_integers( gconstpointer a, gconstpointer b )
 {
-    return (int)a - (int)b;
+    return GPOINTER_TO_INT(a) - GPOINTER_TO_INT(b);
 }
 
 static char*
