@@ -262,7 +262,7 @@ downloadPage( GObject * core )
     GtkWidget * w;
     GtkWidget * l;
     const char * s;
-    int row = 0;
+    guint row = 0;
 
     t = hig_workarea_create( );
 
@@ -314,12 +314,12 @@ downloadPage( GObject * core )
 static GtkWidget*
 torrentPage( GObject * core )
 {
-    int          row = 0;
     const char * s;
     GtkWidget *  t;
     GtkWidget *  w;
     GtkWidget *  w2;
     GtkWidget *  l;
+    guint row = 0;
 
     t = hig_workarea_create( );
     hig_workarea_add_section_title( t, &row, _( "Adding" ) );
@@ -371,10 +371,10 @@ torrentPage( GObject * core )
 static GtkWidget*
 desktopPage( GObject * core )
 {
-    int row = 0;
     GtkWidget * t;
     GtkWidget * w;
     const char * s;
+    guint row = 0;
 
     t = hig_workarea_create( );
     hig_workarea_add_section_title( t, &row, _( "Desktop" ) );
@@ -522,7 +522,6 @@ new_encryption_combo( GObject * core, const char * key )
 static GtkWidget*
 privacyPage( GObject * core )
 {
-    int row = 0;
     const char * s;
     GtkWidget * t;
     GtkWidget * w;
@@ -530,6 +529,7 @@ privacyPage( GObject * core )
     GtkWidget * h;
     GtkWidget * e;
     struct blocklist_data * data;
+    guint row = 0;
 
     data = g_new0( struct blocklist_data, 1 );
     data->core = TR_CORE( core );
@@ -792,11 +792,11 @@ remotePageFree( gpointer gpage )
 static GtkWidget*
 webPage( GObject * core )
 {
-    const char *         s;
-    int                  row = 0;
-    GtkWidget *          t;
-    GtkWidget *          w;
-    GtkWidget *          h;
+    GtkWidget * t;
+    GtkWidget * w;
+    GtkWidget * h;
+    const char * s;
+    guint row = 0;
     struct remote_page * page = g_new0( struct remote_page, 1 );
 
     page->core = TR_CORE( core );
@@ -1043,12 +1043,12 @@ bandwidthPageFree( gpointer gpage )
 static GtkWidget*
 bandwidthPage( GObject * core )
 {
-    int row = 0;
     const char * s;
     GtkWidget * t;
     GtkWidget * l;
     GtkWidget * w, * w2, * h;
     char buf[512];
+    guint row = 0;
     struct BandwidthPage * page = tr_new0( struct BandwidthPage, 1 );
 
     page->core = TR_CORE( core );
@@ -1191,13 +1191,13 @@ onPortTest( GtkButton * button UNUSED, gpointer vdata )
 static GtkWidget*
 networkPage( GObject * core )
 {
-    int                        row = 0;
-    const char *               s;
-    GtkWidget *                t;
-    GtkWidget *                w;
-    GtkWidget *                h;
-    GtkWidget *                l;
+    GtkWidget * t;
+    GtkWidget * w;
+    GtkWidget * h;
+    GtkWidget * l;
+    const char * s;
     struct network_page_data * data;
+    guint row = 0;
 
     /* register to stop listening to core prefs changes when the page is destroyed */
     data = g_new0( struct network_page_data, 1 );

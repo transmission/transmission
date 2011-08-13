@@ -254,8 +254,8 @@ addTorrentFilters( GtkFileChooser * chooser )
 GtkWidget*
 gtr_torrent_options_dialog_new( GtkWindow * parent, TrCore * core, tr_ctor * ctor )
 {
-    int              row;
-    int              col;
+    guint            row;
+    guint            col;
     const char *     str;
     GtkWidget *      w;
     GtkWidget *      d;
@@ -479,7 +479,7 @@ onOpenURLResponse( GtkDialog * dialog, int response, gpointer user_data )
 GtkWidget*
 gtr_torrent_open_from_url_dialog_new( GtkWindow * parent, TrCore * core )
 {
-    int row;
+    guint row;
     GtkWidget * e;
     GtkWidget * t;
     GtkWidget * w;

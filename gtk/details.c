@@ -468,7 +468,7 @@ idle_combo_new( void )
 static GtkWidget*
 options_page_new( struct DetailsImpl * d )
 {
-    int row;
+    guint row;
     gulong tag;
     char buf[128];
     GtkWidget *t, *w, *tb, *h;
@@ -925,7 +925,7 @@ refreshInfo( struct DetailsImpl * di, tr_torrent ** torrents, int n )
 static GtkWidget*
 info_page_new( struct DetailsImpl * di )
 {
-    int row = 0;
+    guint row = 0;
     GtkTextBuffer * b;
     GtkWidget *l, *w, *fr, *sw;
     GtkWidget *t = hig_workarea_create( );
@@ -2190,7 +2190,7 @@ on_edit_trackers( GtkButton * button, gpointer data )
 
     if( tor != NULL )
     {
-        int row;
+        guint row;
         GtkWidget *w, *d, *fr, *t, *l, *sw;
         GtkWindow * win = GTK_WINDOW( gtk_widget_get_toplevel( GTK_WIDGET( button ) ) );
         GString * gstr = di->gstr; /* buffer for temporary strings */
@@ -2301,7 +2301,7 @@ on_tracker_list_add_button_clicked( GtkButton * button UNUSED, gpointer gdi )
 
     if( tor != NULL )
     {
-        int row;
+        guint row;
         GtkWidget * e;
         GtkWidget * t;
         GtkWidget * w;

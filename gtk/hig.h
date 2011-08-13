@@ -23,57 +23,57 @@
 GtkWidget* hig_workarea_create( void );
 
 void       hig_workarea_add_section_divider( GtkWidget * table,
-                                             int *       row );
+                                             guint     *  row );
 
 void       hig_workarea_add_section_title_widget( GtkWidget * t,
-                                                  int *       row,
+                                                  guint     * row,
                                                   GtkWidget * w );
 
-void       hig_workarea_add_section_title( GtkWidget *  table,
-                                           int *        row,
+void       hig_workarea_add_section_title( GtkWidget  *  table,
+                                           guint      * row,
                                            const char * section_title );
 
 void       hig_workarea_add_wide_tall_control( GtkWidget * table,
-                                               int *       row,
+                                               guint     * row,
                                                GtkWidget * w );
 
 void       hig_workarea_add_wide_control( GtkWidget * table,
-                                          int *       row,
+                                          guint     * row,
                                           GtkWidget * w );
 
-GtkWidget* hig_workarea_add_wide_checkbutton( GtkWidget *  table,
-                                              int *        row,
+GtkWidget* hig_workarea_add_wide_checkbutton( GtkWidget  * table,
+                                              guint      * row,
                                               const char * mnemonic_string,
                                               gboolean     is_active );
 
-GtkWidget* hig_workarea_add_label( GtkWidget *  table,
-                                   int          row,
+GtkWidget* hig_workarea_add_label( GtkWidget  * table,
+                                   guint        row,
                                    const char * mnemonic_string );
 
 void       hig_workarea_add_label_w( GtkWidget * table,
-                                     int         row,
+                                     guint       row,
                                      GtkWidget * label_widget );
 
-GtkWidget* hig_workarea_add_tall_row( GtkWidget *  table,
-                                      int *        row,
+GtkWidget* hig_workarea_add_tall_row( GtkWidget  * table,
+                                      guint      * row,
                                       const char * mnemonic_string,
-                                      GtkWidget *  control,
-                                      GtkWidget *  mnemonic_or_null_for_control );
+                                      GtkWidget  * control,
+                                      GtkWidget  * mnemonic_or_null_for_control );
 
-GtkWidget* hig_workarea_add_row( GtkWidget *  table,
-                                 int *        row,
+GtkWidget* hig_workarea_add_row( GtkWidget  * table,
+                                 guint      * row,
                                  const char * mnemonic_string,
-                                 GtkWidget *  control,
-                                 GtkWidget *  mnemonic_or_null_for_control );
+                                 GtkWidget  * control,
+                                 GtkWidget  * mnemonic_or_null_for_control );
 
 void       hig_workarea_add_row_w( GtkWidget * table,
-                                   int *       row,
+                                   guint     * row,
                                    GtkWidget * label,
                                    GtkWidget * control,
                                    GtkWidget * mnemonic_or_null_for_control );
 
 void       hig_workarea_finish( GtkWidget * table,
-                                int *       row );
+                                guint     * row );
 
 enum
 {

@@ -414,10 +414,10 @@ on_drag_data_received( GtkWidget         * widget           UNUSED,
 GtkWidget*
 gtr_torrent_creation_dialog_new( GtkWindow  * parent, TrCore * core )
 {
-    int row = 0;
     const char * str;
     GtkWidget * d, *t, *w, *l, *fr, *sw, *v;
     GSList * slist;
+    guint row = 0;
     MakeMetaUI * ui = g_new0 ( MakeMetaUI, 1 );
 
     ui->core = core;

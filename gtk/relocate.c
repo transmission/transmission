@@ -147,7 +147,7 @@ gtr_relocate_dialog_new( GtkWindow * parent,
                          TrCore    * core,
                          GSList    * torrent_ids )
 {
-    int row;
+    guint row;
     GtkWidget * w;
     GtkWidget * d;
     GtkWidget * t;

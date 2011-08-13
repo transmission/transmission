@@ -128,7 +128,7 @@ gtr_stats_dialog_new( GtkWindow * parent, TrCore * core )
     GtkWidget * d;
     GtkWidget * t;
     GtkWidget * l;
-    int row = 0;
+    guint row = 0;
     struct stat_ui * ui = g_new0( struct stat_ui, 1 );
 
     d = gtk_dialog_new_with_buttons( _( "Statistics" ),
