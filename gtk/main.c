@@ -284,26 +284,6 @@ on_selection_changed( GtkTreeSelection * s UNUSED, gpointer gdata )
 
 /***
 ****
-****
-***/
-
-static void app_setup( TrWindow * wind, struct cbdata  * cbdata );
-
-static void main_window_setup( struct cbdata * cbdata, TrWindow * wind );
-
-static void on_app_exit( gpointer vdata );
-
-static void on_core_error( TrCore *, guint, const char *, struct cbdata * );
-
-static void on_add_torrent( TrCore *, tr_ctor *, gpointer );
-
-static void on_prefs_changed( TrCore * core, const char * key, gpointer );
-
-static gboolean update_model_loop( gpointer gdata );
-static gboolean update_model_once( gpointer gdata );
-
-/***
-****
 ***/
 
 static void
@@ -500,6 +480,8 @@ signal_handler( int sig )
 *****
 ****/
 
+static void app_setup( TrWindow * wind, struct cbdata  * cbdata );
+
 static void
 on_startup( GApplication * application, gpointer user_data )
 {
@@ -678,6 +660,13 @@ on_core_busy( TrCore * core UNUSED, gboolean busy, struct cbdata * c )
     gtr_window_set_busy( c->wind, busy );
 }
 
+static void on_core_error( TrCore *, guint, const char *, struct cbdata * );
+static void on_add_torrent( TrCore *, tr_ctor *, gpointer );
+static void on_prefs_changed( TrCore * core, const char * key, gpointer );
+static void main_window_setup( struct cbdata * cbdata, TrWindow * wind );
+static gboolean update_model_loop( gpointer gdata );
+static gboolean update_model_once( gpointer gdata );
+
 static void
 app_setup( TrWindow * wind, struct cbdata * cbdata )
 {
@@ -780,6 +769,8 @@ toggleMainWindow( struct cbdata * cbdata )
     else
         hideMainWindow( cbdata );
 }
+
+static void on_app_exit( gpointer vdata );
 
 static gboolean
 winclose( GtkWidget * w    UNUSED,
