@@ -36,14 +36,13 @@
 #include <libtransmission/rpcimpl.h>
 #include <libtransmission/json.h>
 #include <libtransmission/utils.h> /* tr_free */
-#include <libtransmission/web.h>
 
+#include "actions.h"
 #include "conf.h"
 #include "notify.h"
 #include "tr-core.h"
 #include "tr-prefs.h"
 #include "util.h"
-#include "actions.h"
 
 /***
 ****

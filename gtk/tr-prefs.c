@@ -19,7 +19,6 @@
 #include <libtransmission/transmission.h>
 #include <libtransmission/utils.h>
 #include <libtransmission/version.h>
-#include <libtransmission/web.h>
 #include "conf.h"
 #include "hig.h"
 #include "tr-core.h"

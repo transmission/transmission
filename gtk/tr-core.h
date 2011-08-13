@@ -25,7 +25,6 @@
 #ifndef GTR_CORE_H
 #define GTR_CORE_H
 
-#include <glib-object.h>
 #include <gtk/gtk.h>
 
 #include <libtransmission/transmission.h>

@@ -26,7 +26,6 @@
 #include <libtransmission/version.h> /* SHORT_VERSION_STRING */
 
 #include "hig.h"
-#include "tr-core.h" /* dbus names */
 #include "util.h"
 
 /***

@@ -14,7 +14,6 @@
 #include "conf.h"
 #include "notify.h"
 #include "tr-prefs.h"
-#include "util.h"
 
 void
 gtr_notify_torrent_completed( TrCore * core, int torrent_id )
