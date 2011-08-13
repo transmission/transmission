@@ -92,12 +92,6 @@ struct cbdata
     gpointer                    quit_dialog;
 };
 
-/***
-****
-****  DETAILS DIALOGS MANAGEMENT
-****
-***/
-
 static void
 gtr_window_present( GtkWindow * window )
 {
@@ -111,32 +105,22 @@ gtr_window_present( GtkWindow * window )
 ***/
 
 static int
-compare_integers( const void * a, const void * b )
+compare_integers( gconstpointer a, gconstpointer b )
 {
-    return *(int*)a - *(int*)b;
+    return (int)a - (int)b;
 }
 
 static char*
 get_details_dialog_key( GSList * id_list )
 {
-    int i;
-    int n;
-    int * ids;
     GSList * l;
+    GSList * tmp = g_slist_sort( g_slist_copy( id_list ), compare_integers );
     GString * gstr = g_string_new( NULL );
 
-    n = g_slist_length( id_list );
-    ids = g_new( int, n );
-    i = 0;
-    for( l=id_list; l!=NULL; l=l->next )
-        ids[i++] = GPOINTER_TO_INT( l->data );
-    g_assert( i == n );
-    qsort( ids, n, sizeof(int), compare_integers );
+    for( l=tmp; l!=NULL; l=l->next )
+        g_string_append_printf( gstr, "%d ", (int)l->data );
 
-    for( i=0; i<n; ++i )
-        g_string_append_printf( gstr, "%d ", ids[i] );
-
-    g_free( ids );
+    g_slist_free( tmp );
     return g_string_free( gstr, FALSE );
 }
 
