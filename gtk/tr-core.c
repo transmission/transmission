@@ -562,6 +562,19 @@ get_file_mtime( GFile * file )
     return mtime;
 }
 
+static void
+rename_torrent_and_unref_file( GFile * file )
+{
+    GFileInfo * info = g_file_query_info( file, G_FILE_ATTRIBUTE_STANDARD_EDIT_NAME, 0, NULL, NULL );
+    const char * old_name = g_file_info_get_attribute_string( info, G_FILE_ATTRIBUTE_STANDARD_EDIT_NAME );
+    char * new_name = g_strdup_printf( "%s.added", old_name );
+    GFile * new_file = g_file_set_display_name( file, new_name, NULL, NULL );
+    g_object_unref( G_OBJECT( new_file ) );
+    g_free( new_name );
+    g_object_unref( G_OBJECT( info ) );
+    g_object_unref( G_OBJECT( file ) );
+}
+
 static gboolean
 core_watchdir_idle( gpointer gcore )
 {
@@ -591,7 +604,7 @@ core_watchdir_idle( gpointer gcore )
 
         core->priv->adding_from_watch_dir = TRUE;
         gtr_core_add_files( core, unchanging, do_start, do_prompt, TRUE );
-        g_slist_foreach( unchanging, (GFunc)g_object_unref, NULL );
+        g_slist_foreach( unchanging, (GFunc)rename_torrent_and_unref_file, NULL );
         g_slist_free( unchanging );
         core->priv->adding_from_watch_dir = FALSE;
     }
