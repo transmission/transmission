@@ -331,7 +331,7 @@ on_main_window_size_allocated( GtkWidget      * gtk_window,
 **** listen to changes that come from RPC
 ***/
 
-struct torrent_idle_data
+struct rpc_idle_data
 {
     TrCore * core;
     int id;
@@ -341,7 +341,7 @@ struct torrent_idle_data
 static gboolean
 rpc_torrent_remove_idle( gpointer gdata )
 {
-    struct torrent_idle_data * data = gdata;
+    struct rpc_idle_data * data = gdata;
 
     gtr_core_remove_torrent( data->core, data->id, data->delete_files );
 
@@ -353,7 +353,7 @@ static gboolean
 rpc_torrent_add_idle( gpointer gdata )
 {
     tr_torrent * tor;
-    struct torrent_idle_data * data = gdata;
+    struct rpc_idle_data * data = gdata;
 
     if(( tor = gtr_core_find_torrent( data->core, data->id )))
         gtr_core_add_torrent( data->core, tor, TRUE );
@@ -379,7 +379,7 @@ on_rpc_changed( tr_session            * session,
             break;
 
         case TR_RPC_TORRENT_ADDED: {
-            struct torrent_idle_data * data = g_new0( struct torrent_idle_data, 1 );
+            struct rpc_idle_data * data = g_new0( struct rpc_idle_data, 1 );
             data->id = tr_torrentId( tor );
             data->core = cbdata->core;
             gdk_threads_add_idle( rpc_torrent_add_idle, data );
@@ -388,7 +388,7 @@ on_rpc_changed( tr_session            * session,
 
         case TR_RPC_TORRENT_REMOVING:
         case TR_RPC_TORRENT_TRASHING: {
-            struct torrent_idle_data * data = g_new0( struct torrent_idle_data, 1 );
+            struct rpc_idle_data * data = g_new0( struct rpc_idle_data, 1 );
             data->id = tr_torrentId( tor );
             data->core = cbdata->core;
             data->delete_files = type == TR_RPC_TORRENT_TRASHING;
