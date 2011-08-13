@@ -113,108 +113,65 @@ get_details_dialog_key( GSList * id_list )
     GString * gstr = g_string_new( NULL );
 
     for( l=tmp; l!=NULL; l=l->next )
-        g_string_append_printf( gstr, "%d ", (int)l->data );
+        g_string_append_printf( gstr, "%d ", GPOINTER_TO_INT(l->data) );
 
     g_slist_free( tmp );
     return g_string_free( gstr, FALSE );
 }
 
-struct DetailsDialogHandle
+static void
+get_selected_torrent_ids_foreach( GtkTreeModel  * model,
+                                  GtkTreePath   * p UNUSED,
+                                  GtkTreeIter   * iter,
+                                  gpointer        gdata )
 {
-    char * key;
-    GtkWidget * dialog;
-};
-
+    int id;
+    GSList ** ids = gdata;
+    gtk_tree_model_get( model, iter, MC_TORRENT_ID, &id, -1 );
+    *ids = g_slist_append( *ids, GINT_TO_POINTER( id ) );
+}
 static GSList*
-getSelectedTorrentIds( struct cbdata * data )
+get_selected_torrent_ids( struct cbdata * data )
 {
-    GList * l;
-    GtkTreeModel * model;
     GSList * ids = NULL;
-    GList * paths = NULL;
-    GtkTreeSelection * s = data->sel;
-
-    /* build a list of the selected torrents' ids */
-    for( paths=l=gtk_tree_selection_get_selected_rows(s,&model); l; l=l->next ) {
-        GtkTreeIter iter;
-        if( gtk_tree_model_get_iter( model, &iter, l->data ) ) {
-            int id;
-            gtk_tree_model_get( model, &iter, MC_TORRENT_ID, &id, -1 );
-            ids = g_slist_append( ids, GINT_TO_POINTER( id ) );
-        }
-    }
-
-    /* cleanup */
-    g_list_foreach( paths, (GFunc)gtk_tree_path_free, NULL );
-    g_list_free( paths );
+    gtk_tree_selection_selected_foreach( data->sel,
+                                         get_selected_torrent_ids_foreach,
+                                         &ids );
     return ids;
-}
-
-static struct DetailsDialogHandle*
-find_details_dialog_from_ids( struct cbdata * cbdata, GSList * ids )
-{
-    GSList * l;
-    struct DetailsDialogHandle * ret = NULL;
-    char * key = get_details_dialog_key( ids );
-
-    for( l=cbdata->details; l!=NULL && ret==NULL; l=l->next ) {
-        struct DetailsDialogHandle * h = l->data;
-        if( !strcmp( h->key, key ) )
-            ret = h;
-    }
-
-    g_free( key );
-    return ret;
-}
-
-static struct DetailsDialogHandle*
-find_details_dialog_from_widget( struct cbdata * cbdata, gpointer w )
-{
-    GSList * l;
-    struct DetailsDialogHandle * ret = NULL;
-
-    for( l=cbdata->details; l!=NULL && ret==NULL; l=l->next ) {
-        struct DetailsDialogHandle * h = l->data;
-        if( h->dialog == w )
-            ret = h;
-    }
-
-    return ret;
 }
 
 static void
 on_details_dialog_closed( gpointer gdata, GObject * dead )
 {
     struct cbdata * data = gdata;
-    struct DetailsDialogHandle * h = find_details_dialog_from_widget( data, dead );
 
-    if( h != NULL )
-    {
-        data->details = g_slist_remove( data->details, h );
-        g_free( h->key );
-        g_free( h );
-    }
+    data->details = g_slist_remove( data->details, dead );
 }
 
 static void
 show_details_dialog_for_selected_torrents( struct cbdata * data )
 {
-    GtkWidget * w;
-    GSList * ids = getSelectedTorrentIds( data );
-    struct DetailsDialogHandle * h = find_details_dialog_from_ids( data, ids );
+    GtkWidget * dialog = NULL;
+    GSList * l;
+    GSList * ids = get_selected_torrent_ids( data );
+    char * key = get_details_dialog_key( ids );
 
-    if( h != NULL )
-        w = h->dialog;
-    else {
-        h = g_new( struct DetailsDialogHandle, 1 );
-        h->key = get_details_dialog_key( ids );
-        h->dialog = w = gtr_torrent_details_dialog_new( data->wind, data->core );
-        gtr_torrent_details_dialog_set_torrents( w, ids );
-        data->details = g_slist_append( data->details, h );
-        g_object_weak_ref( G_OBJECT( w ), on_details_dialog_closed, data );
-        gtk_widget_show( w );
+    for( l=data->details; dialog==NULL && l!=NULL; l=l->next )
+        if( !strcmp( key, g_object_get_data( l->data, "key" ) ) )
+            dialog = l->data;
+
+    if( dialog == NULL )
+    {
+        dialog = gtr_torrent_details_dialog_new( GTK_WINDOW( data->wind ), data->core );
+        gtr_torrent_details_dialog_set_torrents( dialog, ids );
+        g_object_set_data_full( G_OBJECT( dialog ), "key", g_strdup( key ), g_free );
+        g_object_weak_ref( G_OBJECT( dialog ), on_details_dialog_closed, data );
+        data->details = g_slist_append( data->details, dialog );
+        gtk_widget_show( dialog );
     }
-    gtr_window_present( GTK_WINDOW( w ) );
+
+    gtr_window_present( GTK_WINDOW( dialog ) );
+    g_free( key );
     g_slist_free( ids );
 }
 
@@ -675,7 +632,6 @@ main( int argc, char ** argv )
     g_set_application_name (_( "Transmission" ));
     gtk_window_set_default_icon_name (MY_CONFIG_NAME);
 
-
     /* parse the command line */
     option_context = g_option_context_new( _( "[torrent files or urls]" ) );
     g_option_context_add_main_entries( option_context, option_entries, GETTEXT_PACKAGE );
@@ -908,13 +864,12 @@ main_window_setup( struct cbdata * cbdata, TrWindow * wind )
 static gboolean
 on_session_closed( gpointer gdata )
 {
+    GSList * tmp;
     struct cbdata * cbdata = gdata;
 
-    /* shutdown the gui */
-    while( cbdata->details != NULL ) {
-        struct DetailsDialogHandle * h = cbdata->details->data;
-        gtk_widget_destroy( h->dialog );
-    }
+    tmp = g_slist_copy( cbdata->details );
+    g_slist_foreach( tmp, (GFunc)gtk_widget_destroy, NULL );
+    g_slist_free( tmp );
 
     if( cbdata->prefs )
         gtk_widget_destroy( GTK_WIDGET( cbdata->prefs ) );
@@ -1550,7 +1505,7 @@ gtr_actions_handler( const char * action_name, gpointer user_data )
     }
     else if( !strcmp( action_name, "relocate-torrent" ) )
     {
-        GSList * ids = getSelectedTorrentIds( data );
+        GSList * ids = get_selected_torrent_ids( data );
         if( ids != NULL )
         {
             GtkWindow * parent = data->wind;
