@@ -814,46 +814,46 @@ webPage( GObject * core )
     h = gtk_hbox_new( FALSE, GUI_PAD_BIG );
     gtk_box_pack_start( GTK_BOX( h ), w, TRUE, TRUE, 0 );
     w = gtk_button_new_with_mnemonic( _( "_Open web client" ) );
-    page->widgets = g_slist_append( page->widgets, w );
+    page->widgets = g_slist_prepend( page->widgets, w );
     g_signal_connect( w, "clicked", G_CALLBACK( onLaunchClutchCB ), NULL );
     gtk_box_pack_start( GTK_BOX( h ), w, FALSE, FALSE, 0 );
     hig_workarea_add_wide_control( t, &row, h );
 
     /* port */
     w = new_spin_button( TR_PREFS_KEY_RPC_PORT, core, 0, USHRT_MAX, 1 );
-    page->widgets = g_slist_append( page->widgets, w );
+    page->widgets = g_slist_prepend( page->widgets, w );
     w = hig_workarea_add_row( t, &row, _( "HTTP _port:" ), w, NULL );
-    page->widgets = g_slist_append( page->widgets, w );
+    page->widgets = g_slist_prepend( page->widgets, w );
 
     /* require authentication */
     s = _( "Use _authentication" );
     w = new_check_button( s, TR_PREFS_KEY_RPC_AUTH_REQUIRED, core );
     hig_workarea_add_wide_control( t, &row, w );
     page->auth_tb = GTK_TOGGLE_BUTTON( w );
-    page->widgets = g_slist_append( page->widgets, w );
+    page->widgets = g_slist_prepend( page->widgets, w );
     g_signal_connect( w, "clicked", G_CALLBACK( onRPCToggled ), page );
 
     /* username */
     s = _( "_Username:" );
     w = new_entry( TR_PREFS_KEY_RPC_USERNAME, core );
-    page->auth_widgets = g_slist_append( page->auth_widgets, w );
+    page->auth_widgets = g_slist_prepend( page->auth_widgets, w );
     w = hig_workarea_add_row( t, &row, s, w, NULL );
-    page->auth_widgets = g_slist_append( page->auth_widgets, w );
+    page->auth_widgets = g_slist_prepend( page->auth_widgets, w );
 
     /* password */
     s = _( "Pass_word:" );
     w = new_entry( TR_PREFS_KEY_RPC_PASSWORD, core );
     gtk_entry_set_visibility( GTK_ENTRY( w ), FALSE );
-    page->auth_widgets = g_slist_append( page->auth_widgets, w );
+    page->auth_widgets = g_slist_prepend( page->auth_widgets, w );
     w = hig_workarea_add_row( t, &row, s, w, NULL );
-    page->auth_widgets = g_slist_append( page->auth_widgets, w );
+    page->auth_widgets = g_slist_prepend( page->auth_widgets, w );
 
     /* require authentication */
     s = _( "Only allow these IP a_ddresses to connect:" );
     w = new_check_button( s, TR_PREFS_KEY_RPC_WHITELIST_ENABLED, core );
     hig_workarea_add_wide_control( t, &row, w );
     page->whitelist_tb = GTK_TOGGLE_BUTTON( w );
-    page->widgets = g_slist_append( page->widgets, w );
+    page->widgets = g_slist_prepend( page->widgets, w );
     g_signal_connect( w, "clicked", G_CALLBACK( onRPCToggled ), page );
 
     /* access control list */
@@ -872,7 +872,7 @@ webPage( GObject * core )
         g_signal_connect( w, "button-release-event",
                           G_CALLBACK( on_tree_view_button_released ), NULL );
 
-        page->whitelist_widgets = g_slist_append( page->whitelist_widgets, w );
+        page->whitelist_widgets = g_slist_prepend( page->whitelist_widgets, w );
         v = page->view = GTK_TREE_VIEW( w );
         gtk_widget_set_tooltip_text( w, _( "IP addresses may use wildcards, such as 192.168.*.*" ) );
         sel = gtk_tree_view_get_selection( v );
@@ -900,7 +900,7 @@ webPage( GObject * core )
         w = hig_workarea_add_row( t, &row, s, w, NULL );
         gtk_misc_set_alignment( GTK_MISC( w ), 0.0f, 0.0f );
         gtk_misc_set_padding( GTK_MISC( w ), 0, GUI_PAD );
-        page->whitelist_widgets = g_slist_append( page->whitelist_widgets, w );
+        page->whitelist_widgets = g_slist_prepend( page->whitelist_widgets, w );
 
         h = gtk_hbox_new( TRUE, GUI_PAD );
         w = gtk_button_new_from_stock( GTK_STOCK_REMOVE );
@@ -910,7 +910,7 @@ webPage( GObject * core )
         onWhitelistSelectionChanged( sel, page );
         gtk_box_pack_start( GTK_BOX( h ), w, TRUE, TRUE, 0 );
         w = gtk_button_new_from_stock( GTK_STOCK_ADD );
-        page->whitelist_widgets = g_slist_append( page->whitelist_widgets, w );
+        page->whitelist_widgets = g_slist_prepend( page->whitelist_widgets, w );
         g_signal_connect( w, "clicked", G_CALLBACK( onAddWhitelistClicked ), page );
         gtk_box_pack_start( GTK_BOX( h ), w, TRUE, TRUE, 0 );
         w = gtk_hbox_new( FALSE, 0 );
@@ -1099,14 +1099,14 @@ bandwidthPage( GObject * core )
         s = _( "_Scheduled times:" );
         h = gtk_hbox_new( FALSE, 0 );
         w2 = new_time_combo( core, TR_PREFS_KEY_ALT_SPEED_TIME_BEGIN );
-        page->sched_widgets = g_slist_append( page->sched_widgets, w2 );
+        page->sched_widgets = g_slist_prepend( page->sched_widgets, w2 );
         gtk_box_pack_start( GTK_BOX( h ), w2, TRUE, TRUE, 0 );
         w2 = l = gtk_label_new_with_mnemonic ( _( " _to " ) );
-        page->sched_widgets = g_slist_append( page->sched_widgets, w2 );
+        page->sched_widgets = g_slist_prepend( page->sched_widgets, w2 );
         gtk_box_pack_start( GTK_BOX( h ), w2, FALSE, FALSE, 0 );
         w2 = new_time_combo( core, TR_PREFS_KEY_ALT_SPEED_TIME_END );
         gtk_label_set_mnemonic_widget( GTK_LABEL( l ), w2 );
-        page->sched_widgets = g_slist_append( page->sched_widgets, w2 );
+        page->sched_widgets = g_slist_prepend( page->sched_widgets, w2 );
         gtk_box_pack_start( GTK_BOX( h ), w2, TRUE, TRUE, 0 );
         w = new_check_button( s, TR_PREFS_KEY_ALT_SPEED_TIME_ENABLED, core );
         g_signal_connect( w, "toggled", G_CALLBACK( onSchedToggled ), page );
@@ -1114,9 +1114,9 @@ bandwidthPage( GObject * core )
 
         s = _( "_On days:" );
         w = new_week_combo( core, TR_PREFS_KEY_ALT_SPEED_TIME_DAY );
-        page->sched_widgets = g_slist_append( page->sched_widgets, w );
+        page->sched_widgets = g_slist_prepend( page->sched_widgets, w );
         w = hig_workarea_add_row( t, &row, s, w, NULL );
-        page->sched_widgets = g_slist_append( page->sched_widgets, w );
+        page->sched_widgets = g_slist_prepend( page->sched_widgets, w );
 
     hig_workarea_finish( t, &row );
     g_object_set_data_full( G_OBJECT( t ), "page", page, bandwidthPageFree );

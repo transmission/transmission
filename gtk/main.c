@@ -559,7 +559,7 @@ on_open (GApplication  * application UNUSED,
     GSList * files = NULL;
 
     for( i=0; i<file_count; ++i )
-        files = g_slist_append( files, f[i] );
+        files = g_slist_prepend( files, f[i] );
 
     open_files( files, gdata );
 
@@ -808,7 +808,7 @@ on_drag_data_received( GtkWidget         * widget          UNUSED,
     GSList * files = NULL;
 
     for( i=0; i<file_count; ++i )
-        files = g_slist_append( files, g_file_new_for_uri( uris[i] ) );
+        files = g_slist_prepend( files, g_file_new_for_uri( uris[i] ) );
 
     open_files( files, gdata );
 
