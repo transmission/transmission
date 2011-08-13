@@ -69,7 +69,7 @@ struct TrCorePrivate
 {
     GFileMonitor * monitor;
     gulong         monitor_tag;
-    char         * monitor_dir;
+    GFile        * monitor_dir;
     GSList       * monitor_files;
     guint          monitor_idle_tag;
 
@@ -553,82 +553,53 @@ core_set_sort_mode( TrCore * core, const char * mode, gboolean is_reversed )
 ****
 ***/
 
-struct watchdir_file
-{
-    char * filename;
-    time_t mtime;
-};
-
-static int
-compare_watchdir_file_to_filename( const void * a, const void * filename )
-{
-    return strcmp( ((const struct watchdir_file*)a)->filename, filename );
-}
-
 static time_t
-get_file_mtime( const char * filename )
+get_file_mtime( GFile * file )
 {
     time_t mtime;
-    GFile * gfile = g_file_new_for_path( filename );
-    GFileInfo * info = g_file_query_info( gfile, G_FILE_ATTRIBUTE_TIME_MODIFIED, 0, NULL, NULL );
+    GFileInfo * info = g_file_query_info( file, G_FILE_ATTRIBUTE_TIME_MODIFIED, 0, NULL, NULL );
     mtime = g_file_info_get_attribute_uint64( info, G_FILE_ATTRIBUTE_TIME_MODIFIED );
     g_object_unref( G_OBJECT( info ) );
-    g_object_unref( G_OBJECT( gfile ) );
     return mtime;
-}
-
-static struct watchdir_file*
-watchdir_file_new( const char * filename )
-{
-    struct watchdir_file * f;
-    f = g_new( struct watchdir_file, 1 );
-    f->filename = g_strdup( filename );
-    f->mtime = get_file_mtime( filename );
-    return f;
-}
-
-static void
-watchdir_file_free( struct watchdir_file * f )
-{
-    g_free( f->filename );
-    g_free( f );
 }
 
 static gboolean
 core_watchdir_idle( gpointer gcore )
 {
     GSList * l;
-    GSList * addme = NULL;
-    GSList * monitor_files = NULL;
+    GSList * changing = NULL;
+    GSList * unchanging = NULL;
     TrCore * core = TR_CORE( gcore );
     const time_t now = tr_time( );
     struct TrCorePrivate * p = core->priv;
-    const gboolean do_start = gtr_pref_flag_get( TR_PREFS_KEY_START );
-    const gboolean do_prompt = gtr_pref_flag_get( PREF_KEY_OPTIONS_PROMPT );
 
-    /* of the monitor_files, make a list of those that haven't
-     * changed lately, since they should be ready to add */
-    for( l=p->monitor_files; l!=NULL; l=l->next ) {
-        struct watchdir_file * f = l->data;
-        f->mtime = get_file_mtime( f->filename );
-        if( f->mtime + 2 >= now )
-            monitor_files = g_slist_prepend( monitor_files, f );
-        else {
-            addme = g_slist_prepend( addme, g_file_new_for_commandline_arg( f->filename ) );
-            watchdir_file_free( f );
-        }
+    /* separate the files into two lists: changing and unchanging */
+    for( l=p->monitor_files; l!=NULL; l=l->next )
+    {
+        GFile * file = l->data;
+        const time_t mtime = get_file_mtime( file );
+        if( mtime + 2 >= now )
+            changing = g_slist_prepend( changing, file );
+        else
+            unchanging = g_slist_prepend( unchanging, file );
     }
 
-    /* add the torrents from that list */
-    core->priv->adding_from_watch_dir = TRUE;
-    gtr_core_add_files( core, addme, do_start, do_prompt, TRUE );
-    g_slist_foreach( addme, (GFunc)g_object_unref, NULL );
-    g_slist_free( addme );
-    core->priv->adding_from_watch_dir = FALSE;
+    /* add the files that have stopped changing */
+    if( unchanging != NULL )
+    {
+        const gboolean do_start = gtr_pref_flag_get( TR_PREFS_KEY_START );
+        const gboolean do_prompt = gtr_pref_flag_get( PREF_KEY_OPTIONS_PROMPT );
 
-    /* update the monitor_files list */
+        core->priv->adding_from_watch_dir = TRUE;
+        gtr_core_add_files( core, unchanging, do_start, do_prompt, TRUE );
+        g_slist_foreach( unchanging, (GFunc)g_object_unref, NULL );
+        g_slist_free( unchanging );
+        core->priv->adding_from_watch_dir = FALSE;
+    }
+
+    /* keep monitoring the ones that are still changing */
     g_slist_free( p->monitor_files );
-    p->monitor_files = monitor_files;
+    p->monitor_files = changing;
 
     /* if monitor_files is nonempty, keep checking every second */
     if( core->priv->monitor_files )
@@ -638,23 +609,34 @@ core_watchdir_idle( gpointer gcore )
 
 }
 
+/* If this file is a torrent, add it to our list */
 static void
-core_watchdir_monitor_file( TrCore * core, const char * filename )
+core_watchdir_monitor_file( TrCore * core, GFile * file )
 {
-    const gboolean isTorrent = g_str_has_suffix( filename, ".torrent" );
+    char * filename = g_file_get_path( file );
+    const gboolean is_torrent = g_str_has_suffix( filename, ".torrent" );
 
-    if( isTorrent )
+    if( is_torrent )
     {
+        GSList * l;
         struct TrCorePrivate * p = core->priv;
 
-        if( !g_slist_find_custom( p->monitor_files, filename, (GCompareFunc)compare_watchdir_file_to_filename ) )
-            p->monitor_files = g_slist_append( p->monitor_files, watchdir_file_new( filename ) );
-
-        if( !p->monitor_idle_tag )
-            p->monitor_idle_tag = gdk_threads_add_timeout_seconds( 1, core_watchdir_idle, core );
+        /* if we're not already watching this file, start watching it now */
+        for( l=p->monitor_files; l!=NULL; l=l->next )
+            if( g_file_equal( file, l->data ) )
+                break;
+        if( l == NULL ) {
+            g_object_ref( file );
+            p->monitor_files = g_slist_prepend( p->monitor_files, file );
+            if( p->monitor_idle_tag == 0 )
+                p->monitor_idle_tag = gdk_threads_add_timeout_seconds( 1, core_watchdir_idle, core );
+        }
     }
+
+    g_free( filename );
 }
 
+/* GFileMonitor noticed a file was created */
 static void
 on_file_changed_in_watchdir( GFileMonitor       * monitor UNUSED,
                              GFile              * file,
@@ -663,51 +645,46 @@ on_file_changed_in_watchdir( GFileMonitor       * monitor UNUSED,
                              gpointer             core )
 {
     if( event_type == G_FILE_MONITOR_EVENT_CREATED )
-    {
-        char * filename = g_file_get_path( file );
-        core_watchdir_monitor_file( core, filename );
-        g_free( filename );
-    }
+        core_watchdir_monitor_file( core, file );
 }
 
+/* walk through the pre-existing files in the watchdir */
 static void
 core_watchdir_scan( TrCore * core )
 {
-    const gboolean is_enabled = gtr_pref_flag_get( PREF_KEY_DIR_WATCH_ENABLED );
+    const char * dirname = gtr_pref_string_get( PREF_KEY_DIR_WATCH );
+    GDir * dir = g_dir_open( dirname, 0, NULL );
 
-    if( is_enabled )
+    if( dir != NULL )
     {
-        const char * dirname = gtr_pref_string_get( PREF_KEY_DIR_WATCH );
-        GDir * dir = g_dir_open( dirname, 0, NULL );
-
-        if( dir != NULL )
+        const char * name;
+        while(( name = g_dir_read_name( dir )))
         {
-            const char * basename;
-            while(( basename = g_dir_read_name( dir )))
-            {
-                char * filename = g_build_filename( dirname, basename, NULL );
-                core_watchdir_monitor_file( core, filename );
-                g_free( filename );
-            }
-
-            g_dir_close( dir );
+            char * filename = g_build_filename( dirname, name, NULL );
+            GFile * file = g_file_new_for_path( filename );
+            core_watchdir_monitor_file( core, file );
+            g_object_unref( file );
+            g_free( filename );
         }
+
+        g_dir_close( dir );
     }
 }
 
 static void
 core_watchdir_update( TrCore * core )
 {
-    const char * dir = gtr_pref_string_get( PREF_KEY_DIR_WATCH );
     const gboolean is_enabled = gtr_pref_flag_get( PREF_KEY_DIR_WATCH_ENABLED );
-    struct TrCorePrivate * p = TR_CORE( core )->priv;
+    GFile * dir = g_file_new_for_path( gtr_pref_string_get( PREF_KEY_DIR_WATCH ) );
+    struct TrCorePrivate * p = core->priv;
 
-    if( p->monitor && ( !is_enabled || tr_strcmp0( dir, p->monitor_dir ) ) )
+    if( p->monitor && ( !is_enabled || !g_file_equal( dir, p->monitor_dir ) ) )
     {
         g_signal_handler_disconnect( p->monitor, p->monitor_tag );
-        g_free( p->monitor_dir );
         g_file_monitor_cancel( p->monitor );
-        g_object_unref( G_OBJECT( p->monitor ) );
+        g_object_unref( p->monitor );
+        g_object_unref( p->monitor_dir );
+
         p->monitor_dir = NULL;
         p->monitor = NULL;
         p->monitor_tag = 0;
@@ -715,14 +692,17 @@ core_watchdir_update( TrCore * core )
 
     if( is_enabled && !p->monitor )
     {
-        GFile * file = g_file_new_for_path( dir );
-        GFileMonitor * m = g_file_monitor_directory( file, 0, NULL, NULL );
+        GFileMonitor * m = g_file_monitor_directory( dir, 0, NULL, NULL );
         core_watchdir_scan( core );
+
+        g_object_ref( dir );
         p->monitor = m;
-        p->monitor_dir = g_strdup( dir );
+        p->monitor_dir = dir;
         p->monitor_tag = g_signal_connect( m, "changed",
                                            G_CALLBACK( on_file_changed_in_watchdir ), core );
     }
+
+    g_object_unref( dir );
 }
 
 /***
