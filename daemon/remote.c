@@ -766,6 +766,11 @@ getStatusString( tr_benc * t, char * buf, size_t buflen )
     }
     else switch( status )
     {
+        case TR_STATUS_DOWNLOAD_WAIT:
+        case TR_STATUS_SEED_WAIT:
+            tr_strlcpy( buf, "Queued", buflen );
+            break;
+
         case TR_STATUS_STOPPED:
             if( tr_bencDictFindBool( t, "isFinished", &boolVal ) && boolVal )
                 tr_strlcpy( buf, "Finished", buflen );
