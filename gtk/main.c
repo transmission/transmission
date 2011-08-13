@@ -461,17 +461,10 @@ signal_handler( int sig )
         signal( sig, SIG_DFL );
         raise( sig );
     }
-    else switch( sig )
+    else if(( sig == SIGINT ) || ( sig == SIGTERM ))
     {
-        case SIGINT:
-        case SIGTERM:
-            g_message( _( "Got signal %d; trying to shut down cleanly. Do it again if it gets stuck." ), sig );
-            gtr_actions_handler( "quit", sighandler_cbdata );
-            break;
-
-        default:
-            g_message( "unhandled signal" );
-            break;
+        g_message( _( "Got signal %d; trying to shut down cleanly. Do it again if it gets stuck." ), sig );
+        gtr_actions_handler( "quit", sighandler_cbdata );
     }
 }
 
