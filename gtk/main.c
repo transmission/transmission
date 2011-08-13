@@ -27,11 +27,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h> /* exit() */
-#include <sys/param.h>
 #include <time.h>
-#include <unistd.h>
-
-#include <curl/curl.h>
 
 #include <glib/gi18n.h>
 #include <glib/gstdio.h>
@@ -42,7 +38,6 @@
 #include <libtransmission/rpcimpl.h>
 #include <libtransmission/utils.h>
 #include <libtransmission/version.h>
-#include <libtransmission/web.h>
 
 #include "actions.h"
 #include "conf.h"
