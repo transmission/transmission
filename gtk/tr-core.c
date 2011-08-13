@@ -70,7 +70,7 @@ struct TrCorePrivate
     gulong         monitor_tag;
     GFile        * monitor_dir;
     GSList       * monitor_files;
-    guint          monitor_idle_tag;
+    gulong         monitor_idle_tag;
 
     gboolean       adding_from_watch_dir;
     gboolean       inhibit_allowed;

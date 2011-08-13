@@ -51,17 +51,17 @@ struct DetailsImpl
     GtkWidget * idle_spin;
     GtkWidget * max_peers_spin;
 
-    guint honor_limits_check_tag;
-    guint up_limited_check_tag;
-    guint down_limited_check_tag;
-    guint down_limit_spin_tag;
-    guint up_limit_spin_tag;
-    guint bandwidth_combo_tag;
-    guint ratio_combo_tag;
-    guint ratio_spin_tag;
-    guint idle_combo_tag;
-    guint idle_spin_tag;
-    guint max_peers_spin_tag;
+    gulong honor_limits_check_tag;
+    gulong up_limited_check_tag;
+    gulong down_limited_check_tag;
+    gulong down_limit_spin_tag;
+    gulong up_limit_spin_tag;
+    gulong bandwidth_combo_tag;
+    gulong ratio_combo_tag;
+    gulong ratio_spin_tag;
+    gulong idle_combo_tag;
+    gulong idle_spin_tag;
+    gulong max_peers_spin_tag;
 
     GtkWidget * size_lb;
     GtkWidget * state_lb;
@@ -130,7 +130,7 @@ getTorrents( struct DetailsImpl * d, int * setmeCount )
 ****/
 
 static void
-set_togglebutton_if_different( GtkWidget * w, guint tag, gboolean value )
+set_togglebutton_if_different( GtkWidget * w, gulong tag, gboolean value )
 {
     GtkToggleButton * toggle = GTK_TOGGLE_BUTTON( w );
     const gboolean currentValue = gtk_toggle_button_get_active( toggle );
@@ -143,7 +143,7 @@ set_togglebutton_if_different( GtkWidget * w, guint tag, gboolean value )
 }
 
 static void
-set_int_spin_if_different( GtkWidget * w, guint tag, int value )
+set_int_spin_if_different( GtkWidget * w, gulong tag, int value )
 {
     GtkSpinButton * spin = GTK_SPIN_BUTTON( w );
     const int currentValue = gtk_spin_button_get_value_as_int( spin );
@@ -156,7 +156,7 @@ set_int_spin_if_different( GtkWidget * w, guint tag, int value )
 }
 
 static void
-set_double_spin_if_different( GtkWidget * w, guint tag, double value )
+set_double_spin_if_different( GtkWidget * w, gulong tag, double value )
 {
     GtkSpinButton * spin = GTK_SPIN_BUTTON( w );
     const double currentValue = gtk_spin_button_get_value( spin );
@@ -169,7 +169,7 @@ set_double_spin_if_different( GtkWidget * w, guint tag, double value )
 }
 
 static void
-unset_combo( GtkWidget * w, guint tag )
+unset_combo( GtkWidget * w, gulong tag )
 {
     GtkComboBox * combobox = GTK_COMBO_BOX( w );
 
@@ -468,8 +468,8 @@ idle_combo_new( void )
 static GtkWidget*
 options_page_new( struct DetailsImpl * d )
 {
-    guint tag;
     int row;
+    gulong tag;
     char buf[128];
     GtkWidget *t, *w, *tb, *h;
 
