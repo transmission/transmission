@@ -1132,6 +1132,9 @@ on_announce_done( const tr_announce_response  * response,
 
             if( got_scrape_info )
             {
+                tr_tordbg( tier->tor, "Announce response contained scrape info; "
+                                      "rescheduling next scrape to %d seconds from now.",
+                                      tier->scrapeIntervalSec );
                 tier->scrapeAt = get_next_scrape_time( announcer->session, tier, tier->scrapeIntervalSec );
                 tier->lastScrapeTime = now;
                 tier->lastScrapeSucceeded = true;
