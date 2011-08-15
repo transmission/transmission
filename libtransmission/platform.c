@@ -571,14 +571,10 @@ tr_getWebClientDir( const tr_session * session UNUSED )
                 CFURLRef appURL = CFBundleCopyBundleURL( CFBundleGetMainBundle( ) );
                 CFStringRef appRef = CFURLCopyFileSystemPath( appURL,
                                                               kCFURLPOSIXPathStyle );
-                CFIndex appLength = CFStringGetMaximumSizeForEncoding( CFStringGetLength(appRef),
-                                                                       CFStringGetFastestEncoding( appRef ));
+                const CFIndex appStringLength = CFStringGetMaximumSizeOfFileSystemRepresentation(appRef);
 
-                char * appString = tr_malloc( appLength + 1 );
-                bool success = CFStringGetCString( appRef,
-                                              appString,
-                                              appLength + 1,
-                                              CFStringGetFastestEncoding( appRef ));
+                char * appString = tr_malloc( appStringLength );
+                const bool success = CFStringGetFileSystemRepresentation( appRef, appString, appStringLength );
                 assert( success );
 
                 CFRelease( appURL );
