@@ -25,7 +25,7 @@
 #import <Cocoa/Cocoa.h>
 #import "InfoViewController.h"
 
-@interface InfoPeersViewController : NSViewController <InfoViewController>
+@interface InfoPeersViewController : NSViewController <InfoViewController, NSAnimationDelegate>
 {
     NSArray * fTorrents;
     

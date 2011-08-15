@@ -27,7 +27,7 @@
 
 @class PortChecker;
 
-@interface PrefsController : NSWindowController
+@interface PrefsController : NSWindowController <NSToolbarDelegate>
 {
     NSUserDefaults * fDefaults;
     BOOL fHasLoaded;
