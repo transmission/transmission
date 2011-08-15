@@ -33,6 +33,8 @@
     IBOutlet NSImageView * fTotalDLImageView;
     
     tr_session * fLib;
+    
+    CGFloat fPreviousDownloadRate, fPreviousUploadRate;
 }
 
 - (id) initWithLib: (tr_session *) lib;

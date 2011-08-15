@@ -53,6 +53,9 @@ typedef enum
     if ((self = [super initWithNibName: @"StatusBar" bundle: nil]))
     {
         fLib = lib;
+        
+        fPreviousDownloadRate = -1.0;
+        fPreviousUploadRate = -1.0;
     }
     
     return self;
@@ -93,8 +96,17 @@ typedef enum
 - (void) updateWithDownload: (CGFloat) dlRate upload: (CGFloat) ulRate
 {
     //set rates
-    [fTotalDLField setStringValue: [NSString stringForSpeed: dlRate]];
-    [fTotalULField setStringValue: [NSString stringForSpeed: ulRate]];
+    if (dlRate != fPreviousDownloadRate)
+    {
+        [fTotalDLField setStringValue: [NSString stringForSpeed: dlRate]];
+        fPreviousDownloadRate = dlRate;
+    }
+    
+    if (ulRate != fPreviousUploadRate)
+    {
+        [fTotalULField setStringValue: [NSString stringForSpeed: ulRate]];
+        fPreviousUploadRate = ulRate;
+    }
     
     //set status button text
     NSString * statusLabel = [[NSUserDefaults standardUserDefaults] stringForKey: @"StatusLabel"], * statusString;
@@ -125,8 +137,11 @@ typedef enum
                 NSLocalizedString(@"UL", "status bar -> status label"), [NSString stringForFileSize: stats.uploadedBytes]];
     }
     
-    [fStatusButton setTitle: statusString];
-    [self resizeStatusButton];
+    
+    if (![[fStatusButton title] isEqualToString:statusString]) {
+        [fStatusButton setTitle: statusString];
+        [self resizeStatusButton];
+    }
 }
 
 - (void) setStatusLabel: (id) sender
