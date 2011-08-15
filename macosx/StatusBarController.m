@@ -138,7 +138,8 @@ typedef enum
     }
     
     
-    if (![[fStatusButton title] isEqualToString:statusString]) {
+    if (![[fStatusButton title] isEqualToString: statusString])
+    {
         [fStatusButton setTitle: statusString];
         [self resizeStatusButton];
     }
