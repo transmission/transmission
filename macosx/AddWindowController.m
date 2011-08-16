@@ -271,13 +271,13 @@
     [fFileController reloadData];
     
     if ([fTorrent isChecking])
-    {NSLog(@"start");
+    {
         const BOOL waiting = [fTorrent isCheckingWaiting];
         [fVerifyIndicator setIndeterminate: waiting];
-        if (!waiting)
+        if (waiting)
+            [fVerifyIndicator startAnimation: self];
+        else
             [fVerifyIndicator setDoubleValue: [fTorrent checkingProgress]];
-        
-        [fVerifyIndicator startAnimation: self];
     }
     else {
         [fVerifyIndicator setIndeterminate: YES]; //we want to hide when stopped, which only applies when indeterminate
