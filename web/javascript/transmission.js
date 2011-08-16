@@ -1838,15 +1838,15 @@ Transmission.prototype =
         {
                 // Prevents click carrying to parent element
                 // which deselects all on click
-                event.stopPropagation();
+                ev.stopPropagation();
                 // but still hide the context menu if it is showing
                 $('#jqContextMenu').hide();
 
                 // 'Apple' button emulation on PC :
                 // Need settable meta-key and ctrl-key variables for mac emulation
-                var meta_key = event.metaKey;
-                var ctrl_key = event.ctrlKey;
-                if (event.ctrlKey && navigator.appVersion.toLowerCase().indexOf("mac") == -1) {
+                var meta_key = ev.metaKey;
+                var ctrl_key = ev.ctrlKey;
+                if (ev.ctrlKey && navigator.appVersion.toLowerCase().indexOf("mac") == -1) {
                         meta_key = true;
                         ctrl_key = false;
                 }
@@ -1857,7 +1857,7 @@ Transmission.prototype =
                                 this.showInspector();
                         this.setSelectedRow( row, true );
 
-                } else if (event.shiftKey) {
+                } else if (ev.shiftKey) {
                         this.selectRange( row, true );
                         // Need to deselect any selected text
                         window.focus();
