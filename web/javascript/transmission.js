@@ -51,8 +51,6 @@ Transmission.prototype =
 		$('#block_update_button').bind('click', function(e){ tr.blocklistUpdateClicked(e); return false; });
 		$('#stats_close_button').bind('click', function(e){ tr.closeStatsClicked(e); return false; });
 		$('.inspector_tab').bind('click', function(e){ tr.inspectorTabClicked(e, this); });
-		$('.file_wanted_control').live('click', function(e){ tr.fileWantedClicked(e, this); });
-		$('.file_priority_control').live('click', function(e){ tr.filePriorityClicked(e, this); });
 		$('#files_select_all').live('click', function(e){ tr.filesSelectAllClicked(e, this); });
 		$('#files_deselect_all').live('click', function(e){ tr.filesDeselectAllClicked(e, this); });
 		$('#open_link').bind('click', function(e){ tr.openTorrentClicked(e); });
@@ -224,6 +222,15 @@ Transmission.prototype =
 		});
 	},
 
+	setCompactMode: function( is_compact )
+	{
+		this.torrentRenderer = is_compact ? new TorrentRendererCompact( )
+		                                  : new TorrentRendererFull( );
+		$('ul.torrent_list li').remove();
+		this._rows = [];
+		this.refilter();
+	},
+
 	/*
 	 * Load the clutch prefs and init the GUI according to those prefs
 	 */
@@ -251,6 +258,8 @@ Transmission.prototype =
 
 		if( !iPhone && this[Prefs._CompactDisplayState] )
 			$('#compact_view').selectMenuItem();
+
+		this.setCompactMode( this[Prefs._CompactDisplayState] );
 	},
 
 	/*
@@ -362,9 +371,13 @@ Transmission.prototype =
 			boundingRightPad:  20,
 			boundingBottomPad: 5,
 			onContextMenu:     function(e) {
-				var closestRow = $(e.target).closest('.torrent')[0]._torrent;
-				if(!closestRow.isSelected())
-					tr.setSelectedTorrent( closestRow, true );
+				var closest_row = $(e.target).closest('.torrent')[0];
+				for( var i=0, row; row = tr._rows[i]; ++i ) {
+					if( row.getElement() === closest_row ) {
+						tr.setSelectedRow( row );
+						break;
+					}
+				}
 				return true;
 			}
 		});
@@ -421,45 +434,56 @@ Transmission.prototype =
 	{
 		var torrents = [ ];
 		for( var i=0, row; row=this._rows[i]; ++i )
-			if( row._torrent && ( row[0].style.display != 'none' ) )
-				torrents.push( row._torrent );
+			if( row.isVisible( ) )
+				torrents.push( row.getTorrent( ) );
 		return torrents;
+	},
+
+	getSelectedRows: function()
+	{
+		var s = [ ];
+
+		for( var i=0, row; row=this._rows[i]; ++i )
+			if( row.isSelected( ) )
+				s.push( row );
+
+		return s;
 	},
 
 	getSelectedTorrents: function()
 	{
-		var v = this.getVisibleTorrents( );
-		var s = [ ];
-		for( var i=0, row; row=v[i]; ++i )
-			if( row.isSelected( ) )
-				s.push( row );
+		var s = this.getSelectedRows( );
+
+		for( var i=0, row; row=s[i]; ++i )
+			s[i] = s[i].getTorrent();
+
 		return s;
 	},
 
-	getDeselectedTorrents: function() {
-		var visible_torrent_ids = jQuery.map(this.getVisibleTorrents(), function(t) { return t.id(); } );
-		var s = [ ];
-		jQuery.each( this.getAllTorrents( ), function() {
-			var visible = (-1 != jQuery.inArray(this.id(), visible_torrent_ids));
-			if (!this.isSelected() || !visible)
-				s.push( this );
-		} );
-		return s;
+	getDeselectedTorrents: function()
+	{
+		var ret = { };
+		for( var key in this._torrents )
+			ret[ key ] = this._torrents[key];
+		var sel = this.getSelectedTorrents( );
+		for( var i=0, tor; tor=sel[i]; ++i )
+			delete ret[ tor.id() ];
+		return ret;
 	},
 
 	getVisibleRows: function()
 	{
 		var rows = [ ];
 		for( var i=0, row; row=this._rows[i]; ++i )
-			if( row[0].style.display != 'none' )
+			if( row.isVisible( ) )
 				rows.push( row );
 		return rows;
 	},
 
-	getTorrentIndex: function( rows, torrent )
+	getRowIndex: function( rows, row )
 	{
-		for( var i=0, row; row=rows[i]; ++i )
-			if( row._torrent == torrent )
+		for( var i=0, r; r=rows[i]; ++i )
+			if( r === row )
 				return i;
 		return null;
 	},
@@ -479,8 +503,8 @@ Transmission.prototype =
 		var scrollTop = container.scrollTop( );
 		var innerHeight = container.innerHeight( );
 
-		var offsetTop = e[0].offsetTop;
-		var offsetHeight = e.outerHeight( );
+		var offsetTop = e.offsetTop;
+		var offsetHeight = $(e).outerHeight( );
 
 		if( offsetTop < scrollTop )
 			container.scrollTop( offsetTop );
@@ -501,72 +525,57 @@ Transmission.prototype =
 	 *
 	 *--------------------------------------------*/
 
-	setSelectedTorrent: function( torrent, doUpdate ) {
-		this.deselectAll( );
-		this.selectTorrent( torrent, doUpdate );
+	setSelectedRow: function( row ) {
+		var rows = this.getSelectedRows( );
+		for( var i=0, r; r=rows[i]; ++i )
+			this.deselectRow( r );
+		this.selectRow( row );
 	},
 
-	selectElement: function( e, doUpdate ) {
-		e.addClass('selected');
-		if( doUpdate )
-			this.selectionChanged( );
-	},
-	selectRow: function( rowIndex, doUpdate ) {
-		this.selectElement( this._rows[rowIndex], doUpdate );
-	},
-	selectTorrent: function( torrent, doUpdate ) {
-		if( torrent._element )
-			this.selectElement( torrent._element, doUpdate );
+	selectRow: function( row ) {
+		row.setSelected( true );
+		this.callSelectionChangedSoon();
 	},
 
-	deselectElement: function( e, doUpdate ) {
-		e.removeClass('selected');
-		if( doUpdate )
-			this.selectionChanged( );
-	},
-	deselectTorrent: function( torrent, doUpdate ) {
-		if( torrent._element )
-			this.deselectElement( torrent._element, doUpdate );
+	deselectRow: function( row ) {
+		row.setSelected( false );
+		this.callSelectionChangedSoon();
 	},
 
-	selectAll: function( doUpdate ) {
+	selectAll: function( ) {
 		var tr = this;
 		for( var i=0, row; row=tr._rows[i]; ++i )
-			tr.selectElement( row );
-		if( doUpdate )
-			tr.selectionChanged();
+			tr.selectRow( row );
+		this.callSelectionChangedSoon();
 	},
-	deselectAll: function( doUpdate ) {
-		var tr = this;
-		for( var i=0, row; row=tr._rows[i]; ++i )
-			tr.deselectElement( row );
-		tr._last_torrent_clicked = null;
-		if( doUpdate )
-			tr.selectionChanged( );
+	deselectAll: function( ) {
+		for( var i=0, row; row=this._rows[i]; ++i )
+			this.deselectRow( row );
+		this.callSelectionChangedSoon();
+		this._last_row_clicked = null;
 	},
 
 	/*
 	 * Select a range from this torrent to the last clicked torrent
 	 */
-	selectRange: function( torrent, doUpdate )
+	selectRange: function( row )
 	{
-		if( !this._last_torrent_clicked )
+		if( this._last_row_clicked === null )
 		{
-			this.selectTorrent( torrent );
+			this.selectRow( row );
 		}
 		else // select the range between the prevous & current
 		{
 			var rows = this.getVisibleRows( );
-			var i = this.getTorrentIndex( rows, this._last_torrent_clicked );
-			var end = this.getTorrentIndex( rows, torrent );
+			var i = this.getRowIndex( rows, this._last_row_clicked );
+			var end = this.getRowIndex( rows, row );
 			var step = i < end ? 1 : -1;
 			for( ; i!=end; i+=step )
-				this.selectRow( i );
-			this.selectRow( i );
+				this.selectRow( this._rows[i] );
+			this.selectRow( this._rows[i] );
 		}
 
-		if( doUpdate )
-			this.selectionChanged( );
+		this.callSelectionChangedSoon( );
 	},
 
 	selectionChanged: function()
@@ -574,6 +583,13 @@ Transmission.prototype =
 		this.updateButtonStates();
 		this.updateInspector();
 		this.updateSelectedData();
+		this.selectionChangedTimer = null;
+	},
+
+	callSelectionChangedSoon: function()
+	{
+		if( this.selectionChangedTimer === null )
+			this.selectionChangedTimer = setTimeout(function(o) { o.selectionChanged(); }, 200, this);
 	},
 
 	/*--------------------------------------------
@@ -588,28 +604,28 @@ Transmission.prototype =
 	keyDown: function(event)
 	{
 		var tr = this;
-		var sel = tr.getSelectedTorrents( );
+		var sel = tr.getSelectedRows( );
 		var rows = tr.getVisibleRows( );
 		var i = -1;
 
 		if( event.keyCode == 40 ) // down arrow
 		{
-			var t = sel.length ? sel[sel.length-1] : null;
-			i = t==null ? null : tr.getTorrentIndex(rows,t)+1;
+			var r = sel.length ? sel[sel.length-1] : null;
+			i = r==null ? null : tr.getRowIndex(rows,r)+1;
 			if( i == rows.length || i == null )
 				i = 0;
 		}
 		else if( event.keyCode == 38 ) // up arrow
 		{
-			var t = sel.length ? sel[0] : null
-			i = t==null ? null : tr.getTorrentIndex(rows,t)-1;
+			var r = sel.length ? sel[0] : null
+			i = r==null ? null : tr.getRowIndex(rows,r)-1;
 			if( i == -1 || i == null )
 				i = rows.length - 1;
 		}
 
 		if( 0<=i && i<rows.length ) {
 			tr.deselectAll( );
-			tr.selectRow( i, true );
+			tr.selectRow( tr._rows[i], true );
 			tr.scrollToElement( tr._rows[i] );
 		}
 	},
@@ -828,61 +844,30 @@ Transmission.prototype =
 		}
 		this.hideiPhoneAddressbar();
 
-		this.updateVisibleFileLists();
 		this.updatePeersLists();
 		this.updateTrackersLists();
-	},
-
-	fileWantedClicked: function(event, element){
-		this.extractFileFromElement(element).fileWantedControlClicked(event);
-	},
-
-	filePriorityClicked: function(event, element){
-		this.extractFileFromElement(element).filePriorityControlClicked(event, element);
+		this.updateFileList();
 	},
 
 	filesSelectAllClicked: function(event) {
-		var tr = this;
-		var ids = jQuery.map(this.getSelectedTorrents( ), function(t) { return t.id(); } );
-		var files_list = this.toggleFilesWantedDisplay(ids, true);
-		for (i = 0; i < ids.length; ++i) {
-			if (files_list[i].length)
-				this.remote.filesSelectAll( [ ids[i] ], files_list[i], function() { tr.refreshTorrents( ids ); } );
-		}
+		var t = this._files_torrent;
+		if (t != null)
+			this.toggleFilesWantedDisplay(t, true);
 	},
-
 	filesDeselectAllClicked: function(event) {
-		var tr = this;
-		var ids = jQuery.map(this.getSelectedTorrents( ), function(t) { return t.id(); } );
-		var files_list = this.toggleFilesWantedDisplay(ids, false);
-		for (i = 0; i < ids.length; ++i) {
-			if (files_list[i].length)
-				this.remote.filesDeselectAll( [ ids[i] ], files_list[i], function() { tr.refreshTorrents( ids ); } );
-		}
+		var t = this._files_torrent;
+		if (t != null)
+			this.toggleFilesWantedDisplay(t, false);
 	},
-
-	extractFileFromElement: function(element) {
-		var match = $(element).closest('.inspector_torrent_file_list_entry').attr('id').match(/^t(\d+)f(\d+)$/);
-		var torrent_id = match[1];
-		var file_id = match[2];
-		var torrent = this._torrents[torrent_id];
-		return torrent._file_view[file_id];
-	},
-
-	toggleFilesWantedDisplay: function(ids, wanted) {
-		var i, j, k, torrent, files_list = [ ];
-		for (i = 0; i < ids.length; ++i) {
-			torrent = this._torrents[ids[i]];
-			files_list[i] = [ ];
-			for (j = k = 0; j < torrent._file_view.length; ++j) {
-				if (torrent._file_view[j].isEditable() && torrent._file_view[j]._wanted != wanted) {
-					torrent._file_view[j].setWanted(wanted, false);
-					files_list[i][k++] = j;
-				}
-			}
-			torrent.refreshFileView;
+	toggleFilesWantedDisplay: function(torrent, wanted) {
+		var rows = [ ];
+		for( var i=0, row; row=this._files[i]; ++i )
+			if( row.isEditable() && (torrent._file_model[i].wanted !== wanted) )
+				rows.push( row );
+		if( rows.length > 1 ) {
+			var command = wanted ? 'files-wanted' : 'files-unwanted';
+			this.changeFileCommand( command, rows );
 		}
-		return files_list;
 	},
 
 	toggleFilterClicked: function(event) {
@@ -1237,7 +1222,7 @@ Transmission.prototype =
 		// Figure out which menu has been clicked
 		switch ($element.parent()[0].id) {
 
-			// Display the preferences dialog
+				// Display the preferences dialog
 			case 'footer_super_menu':
 				if ($element[0].id == 'preferences') {
 					$('div#prefs_container div#pref_error').hide();
@@ -1255,7 +1240,7 @@ Transmission.prototype =
 						$element.selectMenuItem();
 					else
 						$element.deselectMenuItem();
-					this.refreshDisplay( );
+					this.setCompactMode( this[Prefs._CompactDisplayState] );
 				}
 				else if ($element[0].id == 'homepage') {
 					window.open('http://www.transmissionbt.com/');
@@ -1336,11 +1321,6 @@ Transmission.prototype =
 		return false; // to prevent the event from bubbling up
 	},
 
-	setLastTorrentClicked: function( torrent )
-	{
-		this._last_torrent_clicked = torrent;
-	},
-
 	/*
 	 * Update the inspector with the latest data for the selected torrents
 	 */
@@ -1407,7 +1387,7 @@ Transmission.prototype =
 			setInnerHTML( tab.creator, na );
 			setInnerHTML( tab.download_dir, na );
 			setInnerHTML( tab.error, na );
-			this.updateVisibleFileLists();
+			this.updateFileList();
 			this.updatePeersLists();
 			this.updateTrackersLists();
 			$("#torrent_inspector_size, .inspector_row > div:contains('N/A')").css('color', '#666');
@@ -1491,27 +1471,67 @@ Transmission.prototype =
 		this.updatePeersLists();
 		this.updateTrackersLists();
 		$(".inspector_row > div:contains('N/A')").css('color', '#666');
-		this.updateVisibleFileLists();
+		this.updateFileList();
 	},
 
-	fileListIsVisible: function() {
-		return this._inspector_tab_files.className.indexOf('selected') != -1;
+	onFileWantedToggled: function( row, want ) {
+		var command = want ? 'files-wanted' : 'files-unwanted';
+		this.changeFileCommand( command, [ row ] );
 	},
-
-	updateVisibleFileLists: function() {
-		if( this.fileListIsVisible( ) === true ) {
-			var selected = this.getSelectedTorrents();
-			jQuery.each( selected, function() { this.showFileList(); } );
-			jQuery.each( this.getDeselectedTorrents(), function() { this.hideFileList(); } );
-			// Check if we need to display the select all buttions
-			if ( !selected.length ) {
-				if ( $("#select_all_button_container").is(':visible') )
-					$("#select_all_button_container").hide();
-			} else {
-				if ( !$("#select_all_button_container").is(':visible') )
-					$("#select_all_button_container").show();
-			}
+	onFilePriorityToggled: function( row, priority ) {
+		var command;
+		switch( priority ) {
+			case -1: command = 'priority-low'; break;
+			case  1: command = 'priority-high'; break;
+			default: command = 'priority-normal'; break;
 		}
+		this.changeFileCommand( command, [ row ] );
+	},
+	clearFileList: function() {
+		$(this._inspector_file_list).empty();
+		delete this._files_torrent;
+		delete this._files;
+	},
+	updateFileList: function() {
+
+		// if the file list is hidden, clear the list
+		if( this._inspector_tab_files.className.indexOf('selected') == -1 ) {
+			this.clearFileList( );
+			return;
+		}
+
+		// if not torrent is selected, clear the list
+		var selected_torrents = this.getSelectedTorrents( );
+		if( selected_torrents.length != 1 ) {
+			this.clearFileList( );
+			return;
+		}
+
+		// if the active torrent hasn't changed, noop
+		var torrent = selected_torrents[0];
+		if( this._files_torrent === torrent )
+			return;
+
+		// build the file list
+		this.clearFileList( );
+		this._files_torrent = torrent;
+		var n = torrent._file_model.length;
+		this._files = new Array( n );
+		var fragment = document.createDocumentFragment( );
+		var tr = this;
+		for( var i=0; i<n; ++i ) {
+			var row = new FileRow( this, torrent, i );
+			fragment.appendChild( row.getElement( ) );
+			this._files[i] = row;
+	                $(row).bind('wantedToggled',function(e,row,want){tr.onFileWantedToggled(row,want);});
+	                $(row).bind('priorityToggled',function(e,row,priority){tr.onFilePriorityToggled(row,priority);});
+		}
+		this._inspector_file_list.appendChild( fragment );
+	},
+
+	refreshFileView: function() {
+		for( var i=0, row; row=this._files[i]; ++i )
+			row.refresh();
 	},
 
 	updatePeersLists: function() {
@@ -1744,11 +1764,12 @@ Transmission.prototype =
 	{
 		var tr = this;
 		var refresh_files_for = [ ];
+		var selected_torrents = this.getSelectedTorrents();
 		jQuery.each( torrents, function( ) {
 			var t = tr._torrents[ this.id ];
 			if( t ) {
 				t.refreshMetaData( this );
-				if( t.isSelected( ) )
+				if( selected_torrents.indexOf(t) != -1 )
 					refresh_files_for.push( t.id( ) );
 			}
 		} );
@@ -1768,16 +1789,18 @@ Transmission.prototype =
 		var tr = this;
 		var new_torrent_ids = [];
 		var refresh_files_for = [];
-		jQuery.each( updated, function() {
-			var t = tr._torrents[this.id];
-			if (t){
-				t.refresh(this);
-				if(t.isSelected())
+		var selected_torrents = this.getSelectedTorrents();
+
+		for( var i=0, o; o=updated[i]; ++i ) {
+			var t = tr._torrents[o.id];
+			if (t == null)
+				new_torrent_ids.push(o.id);
+			else {
+				t.refresh(o);
+				if( selected_torrents.indexOf(t) != -1 )
 					refresh_files_for.push(t.id());
 			}
-			else
-				new_torrent_ids.push(this.id);
-		} );
+		}
 
 		if(refresh_files_for.length > 0)
 			tr.remote.loadTorrentFiles( refresh_files_for );
@@ -1796,16 +1819,14 @@ Transmission.prototype =
 	},
 
 	updateTorrentsFileData: function( torrents ){
-		var tr = this;
-		var listIsVisible = tr.fileListIsVisible( );
-		jQuery.each( torrents, function() {
-			var t = tr._torrents[this.id];
-			if (t) {
-				t.refreshFileModel(this);
-				if( listIsVisible && t.isSelected())
-					t.refreshFileView();
+		for( var i=0, o; o=torrents[i]; ++i ) {
+			var t = this._torrents[o.id];
+			if( t !== null ) {
+				t.refreshFileModel( o );
+				if( t === this._files_torrent )
+					this.refreshFileView();
 			}
-		} );
+		}
 	},
 
 	initializeAllTorrents: function(){
@@ -1813,18 +1834,62 @@ Transmission.prototype =
 		this.remote.getInitialDataFor( null ,function(torrents) { tr.addTorrents(torrents); } );
 	},
 
+        onRowClicked: function( ev, row )
+        {
+                // Prevents click carrying to parent element
+                // which deselects all on click
+                event.stopPropagation();
+                // but still hide the context menu if it is showing
+                $('#jqContextMenu').hide();
+
+                // 'Apple' button emulation on PC :
+                // Need settable meta-key and ctrl-key variables for mac emulation
+                var meta_key = event.metaKey;
+                var ctrl_key = event.ctrlKey;
+                if (event.ctrlKey && navigator.appVersion.toLowerCase().indexOf("mac") == -1) {
+                        meta_key = true;
+                        ctrl_key = false;
+                }
+
+                // Shift-Click - selects a range from the last-clicked row to this one
+                if (iPhone) {
+                        if ( row.isSelected() )
+                                this.showInspector();
+                        this.setSelectedRow( row, true );
+
+                } else if (event.shiftKey) {
+                        this.selectRange( row, true );
+                        // Need to deselect any selected text
+                        window.focus();
+
+                // Apple-Click, not selected
+                } else if (!row.isSelected() && meta_key) {
+                        this.selectRow( row, true );
+
+                // Regular Click, not selected
+                } else if (!row.isSelected()) {
+                        this.setSelectedRow( row, true );
+
+                // Apple-Click, selected
+                } else if (row.isSelected() && meta_key) {
+                        this.deselectRow( row );
+
+                // Regular Click, selected
+                } else if (row.isSelected()) {
+                        this.setSelectedRow( row, true );
+                }
+
+		this._last_row_clicked = row;
+        },
+
 	addTorrents: function( new_torrents )
 	{
-		var transferFragment = document.createDocumentFragment( );
-		var fileFragment = document.createDocumentFragment( );
+		var tr = this;
 
 		for( var i=0, row; row=new_torrents[i]; ++i ) {
-			var new_torrent = new Torrent( transferFragment, fileFragment, this, row );
-			this._torrents[new_torrent.id()] = new_torrent;
+			var t = new Torrent( this, row );
+			this._torrents[t.id()] = t;
 		}
-
-		this._inspector_file_list.appendChild( fileFragment );
-		this._torrent_list.appendChild( transferFragment );
 
 		this.refilter( );
 	},
@@ -1839,7 +1904,7 @@ Transmission.prototype =
 
 			if(torrent) {
 				removedAny = true;
-				var e = torrent.element();
+				var e = torrent.view;
 				if( e ) {
 					var row_index;
 					for( var i=0, row; row = tr._rows[i]; ++i ) {
@@ -1855,8 +1920,6 @@ Transmission.prototype =
 					e.remove();
 				}
 
-				torrent.hideFileList();
-				torrent.deleteFiles();
 				delete tr._torrents[torrent.id()];
 			}
 		});
@@ -1866,9 +1929,9 @@ Transmission.prototype =
 
 	refreshDisplay: function( )
 	{
-		var torrents = this.getVisibleTorrents();
-		for( var i=0; torrents[i]; ++i )
-			torrents[i].refreshHTML();
+		var rows = this.getVisibleRows( );
+		for( var i=0, row; row=rows[i]; ++i )
+			row.render( this );
 	},
 
 	/*
@@ -1877,12 +1940,8 @@ Transmission.prototype =
 	setTorrentBgColors: function( )
 	{
 		var rows = this.getVisibleRows( );
-		for( var i=0, row; row=rows[i]; ++i ) {
-			var wasEven = row[0].className.indexOf('even') != -1;
-			var isEven = ((i+1) % 2 == 0);
-			if( wasEven != isEven )
-				row.toggleClass('even', isEven);
-		}
+		for( var i=0, row; row=rows[i]; ++i )
+			row.setEven((i+1) % 2 == 0);
 	},
 
 	updateStatusbar: function()
@@ -2068,8 +2127,8 @@ Transmission.prototype =
 		var tr = this;
 		this.remote.stopTorrents( torrent_ids,	function(){ tr.refreshTorrents(torrent_ids )} );
 	},
-	changeFileCommand: function(command, torrent, file) {
-		this.remote.changeFileCommand(command, torrent, file)
+	changeFileCommand: function(command, rows) {
+		this.remote.changeFileCommand(command, rows);
 	},
 
 	hideiPhoneAddressbar: function(timeInSeconds) {
@@ -2114,6 +2173,16 @@ Transmission.prototype =
 	****
 	***/
 
+	onToggleRunningClicked: function( ev )
+	{
+		var torrent = ev.data.r.getTorrent( );
+
+		if( torrent.isStopped( ) )
+			this.startTorrent( torrent );
+		else
+			this.stopTorrent( torrent );
+	},
+
 	refilter: function()
 	{
 		// decide which torrents to keep showing
@@ -2129,23 +2198,39 @@ Transmission.prototype =
 
 		// make a backup of the selection
 		var sel = this.getSelectedTorrents( );
-		this.deselectAll( );
 
-		// hide the ones we're not keeping
+		// add rows it there aren't enough
+		if( this._rows.length < keep.length ) {
+			var tr = this;
+			var fragment = document.createDocumentFragment( );
+			while( this._rows.length < keep.length ) {
+				var row = new TorrentRow( this, this.torrentRenderer );
+				if( !iPhone ) {
+					var b = row.getToggleRunningButton( );
+					if( b !== null ) {
+						$(b).bind('click', {r:row}, function(e) { tr.onToggleRunningClicked(e); });
+					}
+				}
+				$(row.getElement()).bind('click',{r: row}, function(ev){ tr.onRowClicked(ev,ev.data.r);});
+				fragment.appendChild( row.getElement() );
+				this._rows.push( row );
+			}
+			this._torrent_list.appendChild(fragment);
+		}
+
+		// hide rows if there are too many
 		for( var i=keep.length, e; e=this._rows[i]; ++i ) {
 			delete e._torrent;
-			e[0].style.display = 'none';
+			e.setVisible(false);
 		}
 
 		// show the ones we're keeping
-		sel.sort( Torrent.compareById );
 		for( var i=0, len=keep.length; i<len; ++i ) {
-			var e = this._rows[i];
-			e[0].style.display = 'block';
-			var t = keep[i];
-			t.setElement( e );
-			if( Torrent.indexOf( sel, t.id() ) != -1 )
-				this.selectElement( e );
+			var row = this._rows[i];
+			var tor = keep[i];
+			row.setVisible( true );
+			row.setTorrent( this, tor );
+			row.setSelected( sel.indexOf( tor ) !== -1 );
 		}
 
 		// sync gui
@@ -2174,14 +2259,16 @@ Transmission.prototype =
 			var havePaused = false;
 			var havePausedSelection = false;
 
-			for( var i=0, len=torrents.length; !haveSelection && i<len; ++i ) {
-				var isActive = torrents[i].isActive( );
-				var isSelected = torrents[i].isSelected( );
-				if( isActive ) haveActive = true;
-				if( !isActive ) havePaused = true;
-				if( isSelected ) haveSelection = true;
-				if( isSelected && isActive ) haveActiveSelection = true;
-				if( isSelected && !isActive ) havePausedSelection = true;
+			for( var i=0, row; row=this._rows[i]; ++i ) {
+				if( row.isVisible( ) ) {
+					var isActive = row.getTorrent().isActive( );
+					var isSelected = row.isSelected();
+					if( isActive ) haveActive = true;
+					if( !isActive ) havePaused = true;
+					if( isSelected ) haveSelection = true;
+					if( isSelected && isActive ) haveActiveSelection = true;
+					if( isSelected && !isActive ) havePausedSelection = true;
+				}
 			}
 
 			this.setEnabled( this._toolbar_pause_button,       haveActiveSelection );

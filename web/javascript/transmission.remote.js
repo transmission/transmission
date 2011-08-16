@@ -189,17 +189,20 @@ TransmissionRemote.prototype =
 		} );
 	},
 
-	changeFileCommand: function( command, torrent, file ) {
+	changeFileCommand: function( command, rows ) {
 		var remote = this;
-		var torrent_ids = [ torrent.id() ];
+		var torrent_ids = [ rows[0].getTorrent().id() ];
+		var files = [ ];
+		for( var i=0, row; row=rows[i]; ++i )
+			files.push( row.getIndex( ) );
 		var o = {
 			method: 'torrent-set',
 			arguments: { ids: torrent_ids }
 		};
-		o.arguments[command] = [ file._index ];
+		o.arguments[command] = files;
 		this.sendRequest( o, function( ) {
 			remote._controller.refreshTorrents( torrent_ids );
-		} );
+		});
 	},
 
 	sendTorrentSetRequests: function( method, torrent_ids, args, callback ) {
@@ -287,12 +290,14 @@ TransmissionRemote.prototype =
 			remote._controller.loadDaemonPrefs();
 		} );
 	},
+/*
 	filesSelectAll: function( torrent_ids, files, callback ) {
 		this.sendTorrentSetRequests( 'torrent-set', torrent_ids, { 'files-wanted': files }, callback );
 	},
 	filesDeselectAll: function( torrent_ids, files, callback ) {
 		this.sendTorrentSetRequests( 'torrent-set', torrent_ids, { 'files-unwanted': files }, callback );
 	},
+*/
 
 	// Added queue calls
 	moveTorrentsToTop: function( torrent_ids, callback ) {

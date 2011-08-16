@@ -331,49 +331,65 @@ div.torrent_peer_details {
 	font-size: 10px;
 }
 
-ul.torrent_list li.torrent div.torrent_progress_bar {
-	height: 10px;
-	margin: 3px 0 3px 0;
-	float: left;
-	line-height: 1px;
-	font-size: 1px;
-	width: 100%;
-	background-image: url('../images/progress/progress.png');
-	background-repeat: repeat-x;
-	background-color: transparent;
-}
+/***
+**** Progressbar
+***/
 
-ul.torrent_list li.torrent div.torrent_progress_bar.complete {
-	background-position: left -10px;
-	border: 1px solid #29AD35;
+ul.torrent_list div.torrent_progress_bar_container {
+        height: 10px;
+        position: relative;
+        margin-top: 2px;
 }
-
-ul.torrent_list li.torrent div.torrent_progress_bar.in_progress {
-	background-position: left 0px;
-	border: 1px solid #3F79EE;
-	border-right: none;
+ul.torrent_list div.torrent_progress_bar_container.full {
+        margin-bottom: 5px;
 }
-
-ul.torrent_list li.torrent div.torrent_progress_bar.incomplete {
-	margin-right: -10px;
-	background-position: left -20px;
-	border: 1px solid #C8CACD;
-	border-left: none;
+ul.torrent_list div.torrent_progress_bar {
+        height: 100%;
+        position: absolute;
+        top: 0px;
+        left: 0px;
+        background-image: url('../images/progress/progress.png');
+        background-repeat: repeat-x;
+        border: 1px solid #888;
 }
-
-ul.torrent_list li.torrent div.torrent_progress_bar.incomplete_stopped {
-	background-position: left -30px;
-	border: 1px solid #939393;
-	border-right: none;
+ul.torrent_list div.torrent_progress_bar.complete {
+        z-index: 2;
 }
-
-ul.torrent_list li.torrent div.torrent_progress_bar.complete_stopped {
-	background-position: left -30px;
-	border: 1px solid #939393;
+ul.torrent_list div.torrent_progress_bar.incomplete {
+        z-index: 1;
+        width: 100%;
 }
-
-ul.torrent_list li.torrent div.torrent_progress_bar.incomplete {
-	margin-right: -10px;
+ul.torrent_list div.torrent_progress_bar.complete.paused {
+        background-position: left -30px;
+        border-color: #989898;
+}
+ul.torrent_list div.torrent_progress_bar.incomplete.paused {
+        background-position: left -20px;
+        border-color: #CFCFCF;
+}
+ul.torrent_list div.torrent_progress_bar.complete.magnet {
+        background-position: left -20px;
+        border-color: #CFCFCF;
+}
+ul.torrent_list div.torrent_progress_bar.incomplete.magnet {
+        background-position: left -50px;
+        border-color: #D47778;
+}
+ul.torrent_list div.torrent_progress_bar.complete.leeching {
+        background-position: left 0px;
+        border-color: #3D9DEA;
+}
+ul.torrent_list div.torrent_progress_bar.incomplete.leeching {
+        background-position: left -20px;
+        border-color: #CFCFCF;
+}       
+ul.torrent_list div.torrent_progress_bar.complete.seeding {
+        background-position: left -10px;
+        border-color: #35CA53;
+}
+ul.torrent_list div.torrent_progress_bar.incomplete.seeding {
+        background-position: left -40px;
+        border-color: #35AC47;
 }
 
 div.dialog_container {
