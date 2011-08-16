@@ -2759,20 +2759,27 @@ deleteLocalData( tr_torrent * tor, tr_fileFunc func )
 
     for( f=0; f<tor->info.fileCount; ++f )
     {
-        char * subpath;
-        const char * base;
+        char * filename = tr_buildPath( top, tor->info.files[f].name, NULL );
+        if( !fileExists( filename, NULL ) ) {
+                char * partial = tr_torrentBuildPartial( tor, f );
+                tr_free( filename );
+                filename = tr_buildPath( top, partial, NULL );
+                tr_free( partial );
+                if( !fileExists( filename, NULL ) ) {
+                        tr_free( filename );
+                        filename = NULL;
+                }
+        }
 
-        if( tr_torrentFindFile2( tor, f, &base, &subpath, NULL ) )
+        if( filename != NULL )
         {
-            char * source = tr_buildPath( base, subpath, NULL );
-            char * target = tr_buildPath( tmpdir, subpath, NULL );
+            char * target = tr_buildPath( tmpdir, tor->info.files[f].name, NULL );
             char * target_dir = tr_dirname( target );
             tr_mkdirp( target_dir, 0777 );
-            rename( source, target );
+            rename( filename, target );
             tr_ptrArrayAppend( &files, target );
             tr_free( target_dir );
-            tr_free( source );
-            tr_free( subpath );
+            tr_free( filename );
         }
     }
 
@@ -2794,7 +2801,6 @@ deleteLocalData( tr_torrent * tor, tr_fileFunc func )
             if( strcmp( d->d_name, "." ) && strcmp( d->d_name, ".." ) )
             {
                 char * file = tr_buildPath( tmpdir, d->d_name, NULL );
-                tr_ptrArrayInsertSorted( &folders, tr_strdup( d->d_name ), vstrcmp );
                 func( file );
                 tr_free( file );
             }
@@ -2822,12 +2828,33 @@ deleteLocalData( tr_torrent * tor, tr_fileFunc func )
     ****  Remove the first two categories and leave the third.
     ***/
 
-    for( i=0, n=tr_ptrArraySize(&folders); i<n; ++i )
+    /* build a list of 'top's child directories that belong to this torrent */
+    for( f=0; f<tor->info.fileCount; ++f )
     {
-        char * folder = tr_buildPath( top, tr_ptrArrayNth(&folders,i), NULL );
-        removeEmptyFoldersAndJunkFiles( folder );
-        tr_free( folder );
+        char * dir;
+        char * filename;
+
+        /* get the directory that this file goes in... */
+        filename = tr_buildPath( top, tor->info.files[f].name, NULL );
+        dir = tr_dirname( filename );
+        tr_free( filename );
+
+        if( !tr_is_same_file( top, dir ) ) {
+            for( ;; ) {
+                char * parent = tr_dirname( dir );
+                if( tr_is_same_file( top, parent ) ) {
+                    if( tr_ptrArrayFindSorted( &folders, dir, vstrcmp ) == NULL ) {
+                        tr_ptrArrayInsertSorted( &folders, tr_strdup( dir ), vstrcmp );
+                    }
+                    break;
+                }
+                tr_free( dir );
+                dir = parent;
+            }
+        }
     }
+    for( i=0, n=tr_ptrArraySize(&folders); i<n; ++i )
+        removeEmptyFoldersAndJunkFiles( tr_ptrArrayNth( &folders, i ) );
 
     /* cleanup */
     rmdir( tmpdir );
