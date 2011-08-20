@@ -2248,23 +2248,21 @@ Transmission.prototype =
 
 		if (!showing_dialog)
 		{
-			var torrents = this.getVisibleTorrents( );
+			var rows = this.getVisibleRows()
 			var haveSelection = false;
 			var haveActive = false;
 			var haveActiveSelection = false;
 			var havePaused = false;
 			var havePausedSelection = false;
 
-			for( var i=0, row; row=this._rows[i]; ++i ) {
-				if( row.isVisible( ) ) {
-					var isStopped = row.getTorrent().isStopped( );
-					var isSelected = row.isSelected();
-					if( !isStopped ) haveActive = true;
-					if( isStopped ) havePaused = true;
-					if( isSelected ) haveSelection = true;
-					if( isSelected && !isStopped ) haveActiveSelection = true;
-					if( isSelected && isStopped ) havePausedSelection = true;
-				}
+			for(var i=0, row; row=rows[i]; ++i) {
+				var isStopped = row.getTorrent().isStopped( );
+				var isSelected = row.isSelected();
+				if( !isStopped ) haveActive = true;
+				if( isStopped ) havePaused = true;
+				if( isSelected ) haveSelection = true;
+				if( isSelected && !isStopped ) haveActiveSelection = true;
+				if( isSelected && isStopped ) havePausedSelection = true;
 			}
 
 			this.setEnabled( this._toolbar_pause_button,       haveActiveSelection );
