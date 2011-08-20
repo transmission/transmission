@@ -2838,11 +2838,10 @@ deleteLocalData( tr_torrent * tor, tr_fileFunc func )
         filename = tr_buildPath( top, tor->info.files[f].name, NULL );
         dir = tr_dirname( filename );
         tr_free( filename );
-
-        if( !tr_is_same_file( top, dir ) ) {
+        if( !tr_is_same_file( top, dir ) && strcmp( top, dir ) ) {
             for( ;; ) {
                 char * parent = tr_dirname( dir );
-                if( tr_is_same_file( top, parent ) ) {
+                if( tr_is_same_file( top, parent ) || !strcmp( top, parent ) ) {
                     if( tr_ptrArrayFindSorted( &folders, dir, vstrcmp ) == NULL ) {
                         tr_ptrArrayInsertSorted( &folders, tr_strdup( dir ), vstrcmp );
                     }
