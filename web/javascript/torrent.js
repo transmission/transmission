@@ -1,411 +1,415 @@
 /*
- *	Copyright © Dave Perrett and Malcolm Jarvis
+ *	Copyright © Jordan Lee, Dave Perrett and Malcolm Jarvis
  *	This code is licensed under the GPL version 2.
  *	For details, see http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
  *
  *	Class Torrent
  */
 
-function Torrent( controller, data) {
-	this.initialize( controller, data);
+
+function Torrent(controller, data)
+{
+	this.initialize(controller, data)
 }
 
-// Constants
-Torrent._StatusStopped         = 0; /* torrent is stopped */
-Torrent._StatusCheckWait       = 1; /* waiting in queue to check files */
-Torrent._StatusCheck           = 2; /* checking files */
-Torrent._StatusDownloadWait    = 3; /* queued to download */
-Torrent._StatusDownload        = 4; /* downloading */
-Torrent._StatusSeedWait        = 5; /* queeud to seed */
-Torrent._StatusSeed            = 6; /* seeding */
+/***
+****
+****  Constants
+****
+***/
 
-Torrent._InfiniteTimeRemaining = 215784000; // 999 Hours - may as well be infinite
+// Torrent.fields.status
+Torrent._StatusStopped         = 0 
+Torrent._StatusCheckWait       = 1
+Torrent._StatusCheck           = 2
+Torrent._StatusDownloadWait    = 3
+Torrent._StatusDownload        = 4
+Torrent._StatusSeedWait        = 5
+Torrent._StatusSeed            = 6
 
-Torrent._RatioUseGlobal        = 0;
-Torrent._RatioUseLocal         = 1;
-Torrent._RatioUnlimited        = 2;
+// Torrent.fields.seedRatioMode
+Torrent._RatioUseGlobal        = 0
+Torrent._RatioUseLocal         = 1
+Torrent._RatioUnlimited        = 2
 
-Torrent._ErrNone               = 0;
-Torrent._ErrTrackerWarning     = 1;
-Torrent._ErrTrackerError       = 2;
-Torrent._ErrLocalError         = 3;
+// Torrent.fields.error
+Torrent._ErrNone               = 0
+Torrent._ErrTrackerWarning     = 1
+Torrent._ErrTrackerError       = 2
+Torrent._ErrLocalError         = 3
 
-Torrent._TrackerInactive       = 0;
-Torrent._TrackerWaiting        = 1;
-Torrent._TrackerQueued         = 2;
-Torrent._TrackerActive         = 3;
+// TrackerStats' announceState
+Torrent._TrackerInactive       = 0
+Torrent._TrackerWaiting        = 1
+Torrent._TrackerQueued         = 2
+Torrent._TrackerActive         = 3
 
 
-Torrent._StaticFields = [ 'hashString', 'id' ]
+// fields whose values never change and are always known
+Torrent._StaticFields = [
+	'hashString', 'id' ]
 
-Torrent._MetaDataFields = [ 'addedDate', 'comment', 'creator', 'dateCreated',
-		'isPrivate', 'name', 'totalSize', 'pieceCount', 'pieceSize' ]
+// fields whose values never change and are known upon constructon OR
+// when a magnet torrent finishes downloading its metadata
+Torrent._MetaDataFields = [
+	'addedDate', 'comment', 'creator', 'dateCreated',
+	'isPrivate', 'name', 'totalSize', 'pieceCount', 'pieceSize' ]
 
-Torrent._DynamicFields = [ 'downloadedEver', 'error', 'errorString', 'eta',
-    'haveUnchecked', 'haveValid', 'leftUntilDone', 'metadataPercentComplete',
-    'peers', 'peersConnected', 'peersGettingFromUs', 'peersSendingToUs',
-    'queuePosition', 'rateDownload', 'rateUpload', 'recheckProgress',
-    'sizeWhenDone', 'status', 'trackerStats', 'desiredAvailable',
-    'uploadedEver', 'uploadRatio', 'seedRatioLimit', 'seedRatioMode',
-    'downloadDir', 'isFinished' ]
+// torrent fields whose values change all the time
+Torrent._DynamicFields = [
+	'desiredAvailable', 'downloadDir', 'downloadedEver', 'error',
+	'errorString', 'eta', 'haveUnchecked', 'haveValid', 'isFinished',
+	'leftUntilDone', 'metadataPercentComplete', 'peers', 'peersConnected',
+	'peersGettingFromUs', 'peersSendingToUs', 'queuePosition',
+	'rateDownload', 'rateUpload', 'recheckProgress', 'seedRatioLimit',
+	'seedRatioMode', 'sizeWhenDone', 'status', 'trackerStats',
+	'uploadedEver', 'uploadRatio', 'webseedsSendingToUs' ]
+
+// tracker stats fields whose values change all the time
+Torrent._TrackerStatFields = [
+	'announce', 'announceState', 'downloadCount', 'hasAnnounced',
+	'hasScraped', 'host', 'isBackup', 'lastAnnouncePeerCount',
+	'lastAnnounceResult', 'lastAnnounceSucceeded', 'lastAnnounceTime',
+	'lastScrapeResult', 'lastScrapeSucceeded', 'lastScrapeTime',
+	'leecherCount', 'nextAnnounceTime', 'seederCount'
+]
+
+
+/***
+****
+****  Methods
+****
+***/
 
 Torrent.prototype =
 {
-	initMetaData: function( data ) {
-		this._date          = data.addedDate;
-		this._comment       = data.comment;
-		this._creator       = data.creator;
-		this._creator_date  = data.dateCreated;
-		this._is_private    = data.isPrivate;
-		this._name          = data.name;
-		this._name_lc       = this._name.toLowerCase( );
-		this._size          = data.totalSize;
-		this._pieceCount    = data.pieceCount;
-		this._pieceSize     = data.pieceSize;
+	initialize: function(controller, data)
+	{
+		this.fields = { }
+		this._files = [ ]
 
-		if( data.files ) {
-			for( var i=0, row; row=data.files[i]; ++i ) {
-				this._file_model[i] = {
+		// these fields are set in the ctor and never change
+		for(var i=0, key; key=Torrent._StaticFields[i]; ++i)
+			if(key in data)
+				this.fields[key] = data[key]
+
+		this.initMetaData(data)
+		this._trackerStats = this.buildTrackerStats(data.trackerStats)
+		this.refresh(data)
+	},
+
+	buildTrackerStats: function(trackerStats) {
+		result = []
+		for(var i=0, tracker; tracker=trackerStats[i]; ++i) {
+			tier = result[tracker.tier] || []
+			tier[tier.length] = tracker
+			result[tracker.tier] = tier
+		}
+		return result
+	},
+
+	initMetaData: function(data) {
+
+		var f = this.fields
+
+		// populate the metadata fields
+		for(var i=0, key; key=Torrent._MetaDataFields[i]; ++i) {
+			if(key in data) {
+				f[key] = data[key]
+				if(key == 'name')
+					f.collatedName = data.name.toLowerCase()
+			}
+		}
+
+		// populate the files array
+		if(data.files) {
+			for(var i=0, row; row=data.files[i]; ++i) {
+				this._files[i] = {
 					'index': i,
 					'torrent': this,
 					'length': row.length,
 					'name': row.name
-				};
+				}
 			}
 		}
 	},
 
-	/*
-	 * Constructor
-	 */
-	initialize: function( controller, data) {
-		this._id            = data.id;
-		this._hashString    = data.hashString;
-		this._sizeWhenDone  = data.sizeWhenDone;
-		this._trackerStats  = this.buildTrackerStats(data.trackerStats);
-		this._file_model    = [ ];
-		this.initMetaData( data );
-
-		// Update all the labels etc
-		this.refresh(data);
-	},
-
-	buildTrackerStats: function(trackerStats) {
-		result = [];
-		for( var i=0, tracker; tracker=trackerStats[i]; ++i ) {
-			tier = result[tracker.tier] || [];
-			tier[tier.length] = {
-				'host': tracker.host,
-				'announce': tracker.announce,
-				'hasAnnounced': tracker.hasAnnounced,
-				'lastAnnounceTime': tracker.lastAnnounceTime,
-				'lastAnnounceSucceeded': tracker.lastAnnounceSucceeded,
-				'lastAnnounceResult': tracker.lastAnnounceResult,
-				'lastAnnouncePeerCount': tracker.lastAnnouncePeerCount,
-				'announceState': tracker.announceState,
-				'nextAnnounceTime': tracker.nextAnnounceTime,
-				'isBackup': tracker.isBackup,
-				'hasScraped': tracker.hasScraped,
-				'lastScrapeTime': tracker.lastScrapeTime,
-				'lastScrapeSucceeded': tracker.lastScrapeSucceeded,
-				'lastScrapeResult': tracker.lastScrapeResult,
-				'seederCount': tracker.seederCount,
-				'leecherCount': tracker.leecherCount,
-				'downloadCount': tracker.downloadCount
-			};
-			result[tracker.tier] = tier;
-		}
-		return result;
-	},
-
-	/*--------------------------------------------
-	 *
-	 *  S E T T E R S   /   G E T T E R S
-	 *
-	 *--------------------------------------------*/
-
-	activity: function() { return this.downloadSpeed() + this.uploadSpeed(); },
-	comment: function() { return this._comment; },
-	completed: function() { return this._completed; },
-	creator: function() { return this._creator; },
-	dateAdded: function() { return this._date; },
-	downloadSpeed: function() { return this._download_speed; },
-	downloadTotal: function() { return this._download_total; },
-	hash: function() { return this._hashString; },
-	id: function() { return this._id; },
-	isActiveFilter: function() { return this.peersGettingFromUs() > 0
-					 || this.peersSendingToUs() > 0
-					 || this.webseedsSendingToUs() > 0
-					 || this.state() == Torrent._StatusCheck; },
-	isStopped: function() { return this.state() === Torrent._StatusStopped; },
-	isActive: function() { return this.state() != Torrent._StatusStopped; },
-	isDownloading: function() { return this.state() == Torrent._StatusDownload; },
-	isFinished: function() { return this._isFinishedSeeding; },
-	isDone: function() { return this._leftUntilDone < 1; },
-	isSeeding: function() { return this.state() == Torrent._StatusSeed; },
-	name: function() { return this._name; },
-        queuePosition: function() { return this._queue_position; },
-	webseedsSendingToUs: function() { return this._webseeds_sending_to_us; },
-	peersSendingToUs: function() { return this._peers_sending_to_us; },
-	peersGettingFromUs: function() { return this._peers_getting_from_us; },
-	needsMetaData: function(){ return this._metadataPercentComplete < 1 },
-	getPercentDone: function() {
-		if( !this._sizeWhenDone ) return 1.0;
-		if( !this._leftUntilDone ) return 1.0;
-		return ( this._sizeWhenDone - this._leftUntilDone ) / this._sizeWhenDone;
-	},
-	getPercentDoneStr: function() {
-		return Transmission.fmt.percentString( 100 * this.getPercentDone() );
-	},
-	size: function() { return this._size; },
-	state: function() { return this._state; },
-	stateStr: function() {
-		switch( this.state() ) {
-			case Torrent._StatusStopped:        return this.isFinished() ? 'Seeding complete' : 'Paused';
-			case Torrent._StatusCheckWait:      return 'Queued for verification';
-			case Torrent._StatusCheck:          return 'Verifying local data';
-			case Torrent._StatusDownloadWait:   return 'Queued for download';
-			case Torrent._StatusDownload:       return 'Downloading';
-			case Torrent._StatusSeedWait:       return 'Queued for seeding';
-			case Torrent._StatusSeed:           return 'Seeding';
-			default:                            return 'error';
-		}
-	},
-	trackerStats: function() { return this._trackerStats; },
-	uploadSpeed: function() { return this._upload_speed; },
-	uploadTotal: function() { return this._upload_total; },
-	seedRatioLimit: function(controller){
-		switch( this._seed_ratio_mode ) {
-			case Torrent._RatioUseGlobal: return controller.seedRatioLimit();
-			case Torrent._RatioUseLocal:  return this._seed_ratio_limit;
-			default:                      return -1;
-		}
-	},
-        getErrorMessage: function() {
-                if( this._error  == Torrent._ErrTrackerWarning )
-                        return 'Tracker returned a warning: ' + this._error_string;
-                if( this._error  == Torrent._ErrTrackerError )
-                        return 'Tracker returned an error: ' + this._error_string;
-                if( this._error  == Torrent._ErrLocalError )
-                        return 'Error: ' + this._error_string;
-                return null;
-        },
-
-
-	/*--------------------------------------------
-	 *
-	 *  I N T E R F A C E   F U N C T I O N S
-	 *
-	 *--------------------------------------------*/
-
 	fireDataChanged: function()
 	{
-		$(this).trigger('dataChanged',[]);
+		$(this).trigger('dataChanged',[])
 	},
 
 	refreshMetaData: function(data)
 	{
-		this.initMetaData( data );
-		this.fireDataChanged();
+		this.initMetaData(data)
+		this.fireDataChanged()
 	},
 
 	refresh: function(data)
 	{
-		if( this.needsMetaData() && ( data.metadataPercentComplete >= 1 ) )
-			transmission.refreshMetaData( [ this._id ] );
+		// FIXME: unnecessary coupling... this should be handled by transmission.js
+		if(this.needsMetaData() && (data.metadataPercentComplete >= 1))
+			transmission.refreshMetaData([ this.getId() ])
 
-		this._completed               = data.haveUnchecked + data.haveValid;
-		this._verified                = data.haveValid;
-		this._leftUntilDone           = data.leftUntilDone;
-		this._download_total          = data.downloadedEver;
-		this._upload_total            = data.uploadedEver;
-		this._upload_ratio            = data.uploadRatio;
-		this._seed_ratio_limit        = data.seedRatioLimit;
-		this._seed_ratio_mode         = data.seedRatioMode;
-		this._download_speed          = data.rateDownload;
-		this._upload_speed            = data.rateUpload;
-		this._peers                   = data.peers;
-		this._peers_connected         = data.peersConnected;
-		this._peers_getting_from_us   = data.peersGettingFromUs;
-		this._peers_sending_to_us     = data.peersSendingToUs;
-		this._queue_position          = data.queuePosition;
-		this._webseeds_sending_to_us  = data.webseedsSendingToUs;
-		this._sizeWhenDone            = data.sizeWhenDone;
-		this._recheckProgress         = data.recheckProgress;
-		this._error                   = data.error;
-		this._error_string            = data.errorString;
-		this._eta                     = data.eta;
-		this._trackerStats            = this.buildTrackerStats(data.trackerStats);
-		this._state                   = data.status;
-		this._download_dir            = data.downloadDir;
-		this._metadataPercentComplete = data.metadataPercentComplete;
-		this._isFinishedSeeding       = data.isFinished;
-		this._desiredAvailable        = data.desiredAvailable;
+		var f = this.fields
+
+		// refresh the dynamic fields
+		for(var i=0, key; key=Torrent._DynamicFields[i]; ++i)
+			if(key in data)
+				f[key] = data[key]
+
+		this._trackerStats = this.buildTrackerStats(data.trackerStats)
 
 		if (data.fileStats)
-			this.refreshFileModel( data );
+			this.refreshFiles(data)
 
-		this.fireDataChanged();
+		this.fireDataChanged()
 	},
 
-	refreshFileModel: function(data) {
-		for( var i=0; i<data.fileStats.length; ++i ) {
-			var src = data.fileStats[i];
-			var tgt = this._file_model[i];
-			if( !tgt )
-				tgt = this._file_model[i] = { };
-			tgt.wanted = src.wanted;
-			tgt.priority = src.priority;
-			tgt.bytesCompleted = src.bytesCompleted;
+	refreshFiles: function(data) {
+		for(var i=0; i<data.fileStats.length; ++i) {
+			var src = data.fileStats[i]
+			var tgt = this._files[i]
+			if(!tgt)
+				tgt = this._files[i] = { }
+			tgt.wanted = src.wanted
+			tgt.priority = src.priority
+			tgt.bytesCompleted = src.bytesCompleted
 		}
 	},
+
+	/****
+	*****
+	****/
+
+	// simple accessors
+	getCollatedName: function() { return this.fields.collatedName },
+	getComment: function() { return this.fields.comment },
+	getCreator: function() { return this.fields.creator },
+	getDateAdded: function() { return this.fields.addedDate },
+	getDateCreated: function() { return this.fields.dateCreated },
+	getDesiredAvailable: function() { return this.fields.desiredAvailable },
+	getDownloadDir: function() { return this.fields.downloadDir },
+	getDownloadSpeed: function() { return this.fields.rateDownload },
+	getDownloadedEver: function() { return this.fields.downloadedEver },
+	getError: function() { return this.fields.error },
+	getErrorString: function() { return this.fields.errorString },
+	getETA: function() { return this.fields.eta },
+	getHashString: function() { return this.fields.hashString },
+	getHaveValid: function() { return this.fields.haveValid },
+	getHave: function() { return this.getHaveValid() + this.fields.haveUnchecked },
+	getId: function() { return this.fields.id },
+	getLeftUntilDone: function() { return this.fields.leftUntilDone },
+	getMetadataPercentComplete: function() { return this.fields.metadataPercentComplete },
+	getName: function() { return this.fields.name },
+	getPeers: function() { return this.fields.peers },
+	getPeersConnected: function() { return this.fields.peersConnected },
+	getPeersGettingFromUs: function() { return this.fields.peersGettingFromUs },
+	getPeersSendingToUs: function() { return this.fields.peersSendingToUs },
+	getPieceCount: function() { return this.fields.pieceCount },
+	getPieceCount: function() { return this.fields.pieceCount },
+	getPieceSize: function() { return this.fields.pieceSize },
+	getPrivateFlag: function() { return this.fields.isPrivate },
+	getQueuePosition: function() { return this.fields.queuePosition },
+	getRecheckProgress: function() { return this.fields.recheckProgress },
+	getSeedRatioLimit: function() { return this.fields.seedRatioLimit },
+	getSeedRatioMode: function() { return this.fields.seedRatioMode },
+	getSizeWhenDone: function() { return this.fields.sizeWhenDone },
+	getStatus: function() { return this.fields.status },
+	getTotalSize: function() { return this.fields.totalSize },
+	getUploadSpeed: function() { return this.fields.rateUpload },
+	getUploadRatio: function() { return this.fields.uploadRatio },
+	getUploadedEver: function() { return this.fields.uploadedEver },
+	getWebseedsSendingToUs: function() { return this.fields.webseedsSendingToUs },
+	isFinished: function() { return this.fields.isFinished },
+
+	// derived accessors
+	isSeeding: function() { return this.getStatus() === Torrent._StatusSeed },
+	isStopped: function() { return this.getStatus() === Torrent._StatusStopped },
+	isChecking: function() { return this.getStatus() === Torrent._StatusCheck },
+	isDownloading: function() { return this.getStatus() === Torrent._StatusDownload },
+	isDone: function() { return this.getLeftUntilDone() < 1 },
+	needsMetaData: function(){ return this.getMetadataPercentComplete() < 1 },
+	getActivity: function() { return this.getDownloadSpeed() + this.getUploadSpeed() },
+	getPercentDoneStr: function() { return Transmission.fmt.percentString(100*this.getPercentDone()) },
+	getPercentDone: function() {
+		var finalSize = this.getSizeWhenDone()
+		if(!finalSize) return 1.0
+		var left = this.getLeftUntilDone()
+		if(!left) return 1.0
+		return (finalSize - left) / finalSize
+	},
+	getStateString: function() {
+		switch(this.getStatus()) {
+			case Torrent._StatusStopped:        return this.isFinished() ? 'Seeding complete' : 'Paused'
+			case Torrent._StatusCheckWait:      return 'Queued for verification'
+			case Torrent._StatusCheck:          return 'Verifying local data'
+			case Torrent._StatusDownloadWait:   return 'Queued for download'
+			case Torrent._StatusDownload:       return 'Downloading'
+			case Torrent._StatusSeedWait:       return 'Queued for seeding'
+			case Torrent._StatusSeed:           return 'Seeding'
+			default:                            return 'error'
+		}
+	},
+	trackerStats: function() { return this._trackerStats },
+	seedRatioLimit: function(controller){
+		switch(this.getSeedRatioMode()) {
+			case Torrent._RatioUseGlobal: return controller.seedRatioLimit()
+			case Torrent._RatioUseLocal:  return this.getSeedRatioLimit()
+			default:                      return -1
+		}
+	},
+        getErrorMessage: function() {
+		var str = this.getErrorString()
+		switch(this.getError()) {
+			case Torrent._ErrTrackerWarning:
+				return 'Tracker returned a warning: ' + str
+			case Torrent._ErrTrackerError:
+				return 'Tracker returned an error: ' + str
+			case Torrent._ErrLocalError:
+				return 'Error: ' + str
+			default:
+				return null
+		}
+	},
+
+	/****
+	*****
+	****/
 
 	/**
 	 * @param filter one of Prefs._Filter*
 	 * @param search substring to look for, or null
 	 * @return true if it passes the test, false if it fails
 	 */
-	test: function( filter, search )
+	test: function(filter, search)
 	{
-		var pass = false;
-                var s = this.state( );
+		var pass = false
+		var s = this.getStatus()
 
-		switch( filter )
+		switch(filter)
 		{
 			case Prefs._FilterActive:
-				pass = this.isActiveFilter();
-				break;
+				pass = this.getPeersGettingFromUs() > 0
+				    || this.getPeersSendingToUs() > 0
+				    || this.getWebseedsSendingToUs() > 0
+				    || this.isChecking()
+				break
 			case Prefs._FilterSeeding:
-				pass = ( s == Torrent._StatusSeed ) || ( s == Torrent._StatusSeedWait );
-				break;
+				pass = (s == Torrent._StatusSeed) || (s == Torrent._StatusSeedWait)
+				break
 			case Prefs._FilterDownloading:
-				pass = ( s == Torrent._StatusDownload ) || ( s == Torrent._StatusDownloadWait );
-				break;
+				pass = (s == Torrent._StatusDownload) || (s == Torrent._StatusDownloadWait)
+				break
 			case Prefs._FilterPaused:
-				pass = !this.isActive();
-				break;
+				pass = this.isStopped()
+				break
 			case Prefs._FilterFinished:
-				pass = this.isFinished();
-				break;
+				pass = this.isFinished()
+				break
 			default:
-				pass = true;
-				break;
+				pass = true
+				break
 		}
 
-		if( !pass )
-			return false;
+		if(!pass)
+			return false
 
-		if( !search || !search.length )
-			return pass;
+		if(!search || !search.length)
+			return pass
 
-		return this._name_lc.indexOf( search.toLowerCase() ) !== -1;
+		return this.getCollatedName().indexOf(search.toLowerCase()) !== -1
 	}
-};
+}
 
-/** Helper function for Torrent.sortTorrents(). */
-Torrent.compareById = function( a, b ) {
-	return a.id() - b.id();
-};
 
-/** Helper function for sortTorrents(). */
-Torrent.compareByName = function( a, b ) {
-	var i = a._name_lc.compareTo( b._name_lc );
-	if( i )
-		return i;
-	return Torrent.compareById( a, b );
-};
+/***
+****
+****  SORTING
+****
+***/
 
-/** Helper function for sortTorrents(). */
-Torrent.compareByQueue = function( a, b )
+Torrent.compareById = function(ta, tb)
 {
-	return a.queuePosition( ) - b.queuePosition();
-};
-
-/** Helper function for sortTorrents(). */
-Torrent.compareByAge = function( a, b )
+	return ta.getId() - tb.getId()
+}
+Torrent.compareByName = function(ta, tb)
 {
-	var a_age = a.dateAdded();
-	var b_age = b.dateAdded();
-	if( a_age != b_age )
-		return a_age - b_age;
-
-	return Torrent.compareByQueue( a, b );
-};
-
-/** Helper function for sortTorrents(). */
-Torrent.compareByState = function( a, b )
+	var i = ta.getCollatedName().compareTo(tb.getCollatedName())
+	return i || Torrent.compareById(ta, tb)
+}
+Torrent.compareByQueue = function(ta, tb)
 {
-	var a_state = a.state( );
-	var b_state = b.state( );
-	if( a_state != b_state )
-		return b_state - a_state;
-
-	return Torrent.compareByQueue( a, b );
-};
-
-/** Helper function for sortTorrents(). */
-Torrent.compareByActivity = function( a, b )
+	return ta.getQueuePosition() - tb.getQueuePosition()
+}
+Torrent.compareByAge = function(ta, tb)
 {
-	var a_activity = a.activity( );
-	var b_activity = b.activity( );
-	if( a_activity != b_activity )
-		return a_activity - b_activity;
-
-	return Torrent.compareByState( a, b );
-};
-
-/** Helper function for sortTorrents(). */
-Torrent.compareByRatio = function( a, b ) {
-	var a_ratio = Math.ratio( a._upload_total, a._download_total );
-	var b_ratio = Math.ratio( b._upload_total, b._download_total );
-	if( a_ratio != b_ratio )
-		return a_ratio - b_ratio;
-	return Torrent.compareByState( a, b );
-};
-
-Torrent.compareByProgress = function( a, b ) {
-	if( a.getPercentDone() !== b.getPercentDone() )
-		return a.getPercentDone() - b.getPercentDone();
-	return Torrent.compareByRatio( a, b );
-};
+	var a = ta.getDateAdded()
+	var b = tb.getDateAdded()
+	return (b - a) || Torrent.compareByQueue(ta, tb)
+}
+Torrent.compareByState = function(ta, tb)
+{
+	var a = ta.getStatus()
+	var b = tb.getStatus()
+	return (b - a) || Torrent.compareByQueue(ta, tb)
+}
+Torrent.compareByActivity = function(ta, tb)
+{
+	var a = ta.getActivity()
+	var b = tb.getActivity()
+	return (a - b) || Torrent.compareByState(ta, tb)
+}
+Torrent.compareByRatio = function(a, b)
+{
+	var a = Math.ratio(ta.getUploadedEver(), ta.getDownloadedEver())
+	var b = Math.ratio(tb.getUploadedEver(), tb.getDownloadedEver())
+	return (a - b) || Torrent.compareByState(ta, tb)
+}
+Torrent.compareByProgress = function(ta, tb)
+{
+	var a = ta.getPercentDone()
+	var b = tb.getPercentDone()
+	return (a - b) || Torrent.compareByRatio(ta, tb)
+}
 
 /**
  * @param torrents an array of Torrent objects
  * @param sortMethod one of Prefs._SortBy*
  * @param sortDirection Prefs._SortAscending or Prefs._SortDescending
  */
-Torrent.sortTorrents = function( torrents, sortMethod, sortDirection )
+Torrent.sortTorrents = function(torrents, sortMethod, sortDirection)
 {
-	switch( sortMethod )
+	switch(sortMethod)
 	{
 		case Prefs._SortByActivity:
-			torrents.sort( this.compareByActivity );
-			break;
+			torrents.sort(this.compareByActivity)
+			break
 		case Prefs._SortByAge:
-			torrents.sort( this.compareByAge );
-			break;
+			torrents.sort(this.compareByAge)
+			break
 		case Prefs._SortByQueue:
-			torrents.sort( this.compareByQueue );
-			break;
+			torrents.sort(this.compareByQueue)
+			break
 		case Prefs._SortByProgress:
-			torrents.sort( this.compareByProgress );
-			break;
+			torrents.sort(this.compareByProgress)
+			break
 		case Prefs._SortByState:
-			torrents.sort( this.compareByState );
-			break;
+			torrents.sort(this.compareByState)
+			break
 		case Prefs._SortByName:
-			torrents.sort( this.compareByName );
-			break;
+			torrents.sort(this.compareByName)
+			break
 		case Prefs._SortByRatio:
-			torrents.sort( this.compareByRatio );
-			break;
+			torrents.sort(this.compareByRatio)
+			break
 		default:
-			console.warn( "unknown sort method: " + sortMethod );
-			break;
+			console.warn("unknown sort method: " + sortMethod)
+			break
 	}
 
-	if( sortDirection === Prefs._SortDescending )
-		torrents.reverse( );
+	if(sortDirection === Prefs._SortDescending)
+		torrents.reverse()
 
-	return torrents;
-};
+	return torrents
+}

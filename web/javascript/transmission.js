@@ -467,7 +467,7 @@ Transmission.prototype =
 			ret[ key ] = this._torrents[key];
 		var sel = this.getSelectedTorrents( );
 		for( var i=0, tor; tor=sel[i]; ++i )
-			delete ret[ tor.id() ];
+			delete ret[ tor.getId() ];
 		return ret;
 	},
 
@@ -862,7 +862,7 @@ Transmission.prototype =
 	toggleFilesWantedDisplay: function(torrent, wanted) {
 		var rows = [ ];
 		for( var i=0, row; row=this._files[i]; ++i )
-			if( row.isEditable() && (torrent._file_model[i].wanted !== wanted) )
+			if( row.isEditable() && (torrent._files[i].wanted !== wanted) )
 				rows.push( row );
 		if( rows.length > 1 ) {
 			var command = wanted ? 'files-wanted' : 'files-unwanted';
@@ -1019,7 +1019,7 @@ Transmission.prototype =
 
 	updateSelectedData: function()
 	{
-		var ids = jQuery.map(this.getSelectedTorrents( ), function(t) { return t.id(); } );
+		var ids = jQuery.map(this.getSelectedTorrents( ), function(t) { return t.getId(); } );
 		if( ids.length > 0 )
 			this.periodicTorrentUpdate( ids );
 		else
@@ -1395,46 +1395,49 @@ Transmission.prototype =
 		}
 
 		name = torrents.length == 1
-			? torrents[0].name()
+			? torrents[0].getName()
 			: torrents.length+' Transfers Selected';
 
 		if( torrents.length == 1 )
 		{
+			var text
 			var t = torrents[0];
 			var err = t.getErrorMessage( );
 			if( err )
 				error = err;
-			if( t._comment)
-				comment = t._comment ;
-			if( t._creator )
-				creator = t._creator ;
-			if( t._download_dir)
-				download_dir = t._download_dir;
+			if(( text = t.getComment()))
+				comment = text
+			if(( text = t.getCreator()))
+				creator = text
+			if(( text = t.getDownloadDir()))
+				download_dir = text
 
-			hash = t.hash();
-			pieces = [ t._pieceCount, 'pieces @', Transmission.fmt.mem(t._pieceSize) ].join(' ');
-			date_created = Transmission.fmt.timestamp( t._creator_date );
+			hash = t.getHashString();
+			pieces = [ t.getPieceCount(), 'pieces @', Transmission.fmt.mem(t.getPieceSize()) ].join(' ');
+			date_created = Transmission.fmt.timestamp( t.getDateCreated() );
 		}
 
 		for( var i=0, t; t=torrents[i]; ++i ) {
-			sizeWhenDone         += t._sizeWhenDone;
-			sizeDone             += t._sizeWhenDone - t._leftUntilDone;
-			total_completed      += t.completed();
-			total_verified       += t._verified;
-			total_size           += t.size();
-			total_upload         += t.uploadTotal();
-			total_download       += t.downloadTotal();
-			total_upload_speed   += t.uploadSpeed();
-			total_download_speed += t.downloadSpeed();
-			total_upload_peers   += t.peersGettingFromUs();
-			total_download_peers += t.peersSendingToUs();
-			total_availability   += t._sizeWhenDone - t._leftUntilDone + t._desiredAvailable;
+			var sizeWhenDone = t.getSizeWhenDone()
+			var left = t.getLeftUntilDone()
+			sizeWhenDone         += sizeWhenDone
+			sizeDone             += sizeWhenDone - left;
+			total_completed      += t.getHave();
+			total_verified       += t.getHaveValid();
+			total_size           += t.getTotalSize();
+			total_upload         += t.getUploadedEver();
+			total_download       += t.getDownloadedEver();
+			total_upload_speed   += t.getUploadSpeed();
+			total_download_speed += t.getDownloadSpeed();
+			total_upload_peers   += t.getPeersGettingFromUs();
+			total_download_peers += t.getPeersSendingToUs();
+			total_availability   += sizeWhenDone - left + t.getDesiredAvailable();
 
-			var s = t.stateStr();
+			var s = t.getStateString();
 			if( total_state.indexOf( s ) == -1 )
 				total_state.push( s );
 
-			if( t._is_private )
+			if( t.getPrivateFlag( ) )
 				have_private = true;
 			else
 				have_public = true;
@@ -1515,7 +1518,7 @@ Transmission.prototype =
 		// build the file list
 		this.clearFileList( );
 		this._files_torrent = torrent;
-		var n = torrent._file_model.length;
+		var n = torrent._files.length;
 		this._files = new Array( n );
 		var fragment = document.createDocumentFragment( );
 		var tr = this;
@@ -1541,11 +1544,12 @@ Transmission.prototype =
 		var torrents = this.getSelectedTorrents( );
 		if( $(this._inspector_peers_list).is(':visible') ) {
 			for( var k=0, torrent; torrent=torrents[k]; ++k ) {
+				var peers = torrent.getPeers()
 				html.push( '<div class="inspector_group">' );
 				if( torrents.length > 1 ) {
-					html.push( '<div class="inspector_torrent_label">', torrent._name, '</div>' );
+					html.push( '<div class="inspector_torrent_label">', torrent.getName(), '</div>' );
 				}
-				if( torrent._peers.length == 0 ) {
+				if( peers.length == 0 ) {
 					html.push( '<br></div>' ); // firefox won't paint the top border if the div is empty
 					continue;
 				}
@@ -1559,7 +1563,7 @@ Transmission.prototype =
 				           '<th class="addressCol">Address</th>',
 				           '<th class="clientCol">Client</th>',
 				           '</tr>' );
-				for( var i=0, peer; peer=torrent._peers[i]; ++i ) {
+				for( var i=0, peer; peer=peers[i]; ++i ) {
 					var parity = ((i+1) % 2 == 0 ? 'even' : 'odd');
 					html.push( '<tr class="inspector_peer_entry ', parity, '">',
 					           '<td>', (peer.isEncrypted ? '<img src="images/graphics/lock_icon.png" alt="Encrypted"/>' : ''), '</td>',
@@ -1588,7 +1592,7 @@ Transmission.prototype =
 			for( var k=0, torrent; torrent = torrents[k]; ++k ) {
 				html.push( '<div class="inspector_group">' );
 				if( torrents.length > 1 ) {
-					html.push( '<div class="inspector_torrent_label">', torrent._name, '</div>' );
+					html.push( '<div class="inspector_torrent_label">', torrent.getName(), '</div>' );
 				}
 				for( var i=0, tier; tier=torrent._trackerStats[i]; ++i ) {
 					html.push( '<div class="inspector_group_label">',
@@ -1770,7 +1774,7 @@ Transmission.prototype =
 			if( t ) {
 				t.refreshMetaData( this );
 				if( selected_torrents.indexOf(t) != -1 )
-					refresh_files_for.push( t.id( ) );
+					refresh_files_for.push( t.getId( ) );
 			}
 		} );
 		if( refresh_files_for.length > 0 )
@@ -1798,7 +1802,7 @@ Transmission.prototype =
 			else {
 				t.refresh(o);
 				if( selected_torrents.indexOf(t) != -1 )
-					refresh_files_for.push(t.id());
+					refresh_files_for.push(t.getId());
 			}
 		}
 
@@ -1822,7 +1826,7 @@ Transmission.prototype =
 		for( var i=0, o; o=torrents[i]; ++i ) {
 			var t = this._torrents[o.id];
 			if( t !== null ) {
-				t.refreshFileModel( o );
+				t.refreshFiles( o );
 				if( t === this._files_torrent )
 					this.refreshFileView();
 			}
@@ -1888,43 +1892,34 @@ Transmission.prototype =
 
 		for( var i=0, row; row=new_torrents[i]; ++i ) {
 			var t = new Torrent( this, row );
-			this._torrents[t.id()] = t;
+			this._torrents[t.getId()] = t;
 		}
 
 		this.refilter( );
 	},
 
 	deleteTorrents: function(torrent_ids){
+
 		if(typeof torrent_ids == 'undefined')
-			return false;
-		var tr = this;
-		var removedAny = false;
-		$.each( torrent_ids, function(index, id){
-			var torrent = tr._torrents[id];
+			return false
 
-			if(torrent) {
-				removedAny = true;
-				var e = torrent.view;
-				if( e ) {
-					var row_index;
-					for( var i=0, row; row = tr._rows[i]; ++i ) {
-						if( row._id == torrent._id )
-						{
-							row_index = i;
-							e = tr._rows[row_index];
-							break;
-						}
-					}
-					delete e._torrent; //remove circular refernce to help IE garbage collect
-					tr._rows.splice(row_index, 1)
-					e.remove();
-				}
+		var keep = [ ]
+		var elements = [ ]
 
-				delete tr._torrents[torrent.id()];
+		for(var i=0, row; row=this._rows[i]; ++i) {
+			var tor = row.getTorrent()
+			var tid = tor ? tor.getId() : -1
+			if( torrent_ids.indexOf( tid ) == -1 )
+				keep.push( row )
+			else {
+				delete this._torrents[ tid ]
+				$(row.getElement()).remove()
 			}
-		});
+		}
 
-		return removedAny;
+		this._rows = keep
+
+		return remove.length > 0
 	},
 
 	refreshDisplay: function( )
@@ -1954,8 +1949,8 @@ Transmission.prototype =
 		var upSpeed = 0;
 		var downSpeed = 0;
 		for( var i=0, row; row=torrents[i]; ++i ) {
-			upSpeed += row.uploadSpeed( );
-			downSpeed += row.downloadSpeed( );
+			upSpeed += row.getUploadSpeed( );
+			downSpeed += row.getDownloadSpeed( );
 		}
 
 		// update torrent count label
@@ -2034,7 +2029,7 @@ Transmission.prototype =
 		if( torrents.length == 1 )
 		{
 			var torrent = torrents[0];
-			var header = 'Remove ' + torrent.name() + '?';
+			var header = 'Remove ' + torrent.getName() + '?';
 			var message = 'Once removed, continuing the transfer will require the torrent file. Are you sure you want to remove it?';
 			dialog.confirm( header, message, 'Remove', 'transmission.removeTorrents', torrents );
 		}
@@ -2051,7 +2046,7 @@ Transmission.prototype =
 		if( torrents.length == 1 )
 		{
 			var torrent = torrents[0],
-				header = 'Remove ' + torrent.name() + ' and delete data?',
+				header = 'Remove ' + torrent.getName() + ' and delete data?',
 				message = 'All data downloaded for this torrent will be deleted. Are you sure you want to remove it?';
 			dialog.confirm( header, message, 'Remove', 'transmission.removeTorrentsAndData', torrents );
 		}
@@ -2064,7 +2059,7 @@ Transmission.prototype =
 	},
 
 	removeTorrents: function( torrents ) {
-		var torrent_ids = jQuery.map(torrents, function(t) { return t.id(); } );
+		var torrent_ids = jQuery.map(torrents, function(t) { return t.getId(); } );
 		var tr = this;
 		this.remote.removeTorrents( torrent_ids, function(){ tr.refreshTorrents() } );
 	},
@@ -2091,7 +2086,7 @@ Transmission.prototype =
 		this.startTorrents( [ torrent ], false );
 	},
 	startTorrents: function( torrents, force ) {
-		var torrent_ids = jQuery.map(torrents, function(t) { return t.id(); } );
+		var torrent_ids = jQuery.map(torrents, function(t) { return t.getId(); } );
 		var tr = this;
 		this.remote.startTorrents( torrent_ids, force, function(){ tr.refreshTorrents(torrent_ids) } );
 	},
@@ -2099,7 +2094,7 @@ Transmission.prototype =
 		this.verifyTorrents( [ torrent ] );
 	},
 	verifyTorrents: function( torrents ) {
-		var torrent_ids = jQuery.map(torrents, function(t) { return t.id(); } );
+		var torrent_ids = jQuery.map(torrents, function(t) { return t.getId(); } );
 		var tr = this;
 		this.remote.verifyTorrents( torrent_ids, function(){ tr.refreshTorrents(torrent_ids) } );
 	},
@@ -2108,7 +2103,7 @@ Transmission.prototype =
 		this.reannounceTorrents( [ torrent ] );
 	},
 	reannounceTorrents: function( torrents ) {
-		var torrent_ids = jQuery.map(torrents, function(t) { return t.id(); } );
+		var torrent_ids = jQuery.map(torrents, function(t) { return t.getId(); } );
 		var tr = this;
 		this.remote.reannounceTorrents( torrent_ids, function(){ tr.refreshTorrents(torrent_ids) } );
 	},
@@ -2123,7 +2118,7 @@ Transmission.prototype =
 		this.stopTorrents( [ torrent ] );
 	},
 	stopTorrents: function( torrents ) {
-		var torrent_ids = jQuery.map(torrents, function(t) { return t.id(); } );
+		var torrent_ids = jQuery.map(torrents, function(t) { return t.getId(); } );
 		var tr = this;
 		this.remote.stopTorrents( torrent_ids,	function(){ tr.refreshTorrents(torrent_ids )} );
 	},
@@ -2148,22 +2143,22 @@ Transmission.prototype =
 
 	// Queue
 	moveTop: function( ) {
-		var torrent_ids = jQuery.map(this.getSelectedTorrents( ), function(t) { return t.id(); } );
+		var torrent_ids = jQuery.map(this.getSelectedTorrents( ), function(t) { return t.getId(); } );
 		var tr = this;
 		this.remote.moveTorrentsToTop( torrent_ids, function(){ tr.refreshTorrents(torrent_ids )} );
 	},
 	moveUp: function( ) {
-		var torrent_ids = jQuery.map(this.getSelectedTorrents( ), function(t) { return t.id(); } );
+		var torrent_ids = jQuery.map(this.getSelectedTorrents( ), function(t) { return t.getId(); } );
 		var tr = this;
 		this.remote.moveTorrentsUp( torrent_ids, function(){ tr.refreshTorrents(torrent_ids )} );
 	},
 	moveDown: function( ) {
-		var torrent_ids = jQuery.map(this.getSelectedTorrents( ), function(t) { return t.id(); } );
+		var torrent_ids = jQuery.map(this.getSelectedTorrents( ), function(t) { return t.getId(); } );
 		var tr = this;
 		this.remote.moveTorrentsDown( torrent_ids, function(){ tr.refreshTorrents(torrent_ids )} );
 	},
 	moveBottom: function( ) {
-		var torrent_ids = jQuery.map(this.getSelectedTorrents( ), function(t) { return t.id(); } );
+		var torrent_ids = jQuery.map(this.getSelectedTorrents( ), function(t) { return t.getId(); } );
 		var tr = this;
 		this.remote.moveTorrentsToBottom( torrent_ids, function(){ tr.refreshTorrents(torrent_ids )} );
 	},
@@ -2262,13 +2257,13 @@ Transmission.prototype =
 
 			for( var i=0, row; row=this._rows[i]; ++i ) {
 				if( row.isVisible( ) ) {
-					var isActive = row.getTorrent().isActive( );
+					var isStopped = row.getTorrent().isStopped( );
 					var isSelected = row.isSelected();
-					if( isActive ) haveActive = true;
-					if( !isActive ) havePaused = true;
+					if( !isStopped ) haveActive = true;
+					if( isStopped ) havePaused = true;
 					if( isSelected ) haveSelection = true;
-					if( isSelected && isActive ) haveActiveSelection = true;
-					if( isSelected && !isActive ) havePausedSelection = true;
+					if( isSelected && !isStopped ) haveActiveSelection = true;
+					if( isSelected && isStopped ) havePausedSelection = true;
 				}
 			}
 

@@ -191,7 +191,7 @@ TransmissionRemote.prototype =
 
 	changeFileCommand: function( command, rows ) {
 		var remote = this;
-		var torrent_ids = [ rows[0].getTorrent().id() ];
+		var torrent_ids = [ rows[0].getTorrent().getId() ];
 		var files = [ ];
 		for( var i=0, row; row=rows[i]; ++i )
 			files.push( row.getIndex( ) );
@@ -244,7 +244,7 @@ TransmissionRemote.prototype =
 
 		if( torrents != null )
 			for( var i=0, len=torrents.length; i<len; ++i )
-				o.arguments.ids.push( torrents[i].id() );
+				o.arguments.ids.push( torrents[i].getId() );
 		this.sendRequest( o, function( ) {
 			remote._controller.refreshTorrents();
 		} );

@@ -19,11 +19,11 @@ TorrentRendererHelper.getProgressInfo = function( controller, t )
 
 	var pct = 0;
 	if( t.needsMetaData( ) )
-		pct = t._metadataPercentComplete * 100;
+		pct = t.getMetadataPercentComplete() * 100;
 	else if( !t.isDone( ) )
 		pct = Math.round( t.getPercentDone() * 100 );
 	else if( seed_ratio_limit > 0 )
-		pct = Math.round( t._upload_ratio * 100 / seed_ratio_limit );
+		pct = Math.round( t.getUploadRatio() * 100 / seed_ratio_limit );
 	else
 		pct = 100;
 
@@ -72,12 +72,12 @@ TorrentRendererHelper.renderProgressbar = function( controller, t, progressbar )
 
 TorrentRendererHelper.formatUL = function( t )
 {
-	return 'UL: ' + Transmission.fmt.speedBps( t.uploadSpeed( ) );
+	return 'UL: ' + Transmission.fmt.speedBps( t.getUploadSpeed( ) );
 }
 
 TorrentRendererHelper.formatDL = function( t )
 {
-	return 'DL: ' + Transmission.fmt.speedBps( t.downloadSpeed( ) );
+	return 'DL: ' + Transmission.fmt.speedBps( t.getDownloadSpeed( ) );
 }
 
 /****
@@ -134,9 +134,9 @@ TorrentRendererFull.prototype =
 
 		if( t.isDownloading( ) )
 			return [ 'Downloading from',
-			         t.peersSendingToUs(),
+			         t.getPeersSendingToUs(),
 			         'of',
-			         t._peers_connected,
+			         t.getPeersConnected(),
 			         'peers',
 			         '-',
 			         TorrentRendererHelper.formatDL(t),
@@ -144,60 +144,63 @@ TorrentRendererFull.prototype =
 
 		if( t.isSeeding( ) )
 			return [ 'Seeding to',
-			         t.peersGettingFromUs(),
+			         t.getPeersGettingFromUs(),
 			         'of',
-			         t._peers_connected,
+			         t.getPeersConnected(),
 			         'peers',
 			         '-',
 			         TorrentRendererHelper.formatUL(t) ].join(' ');
 
-		if( t.state() === Torrent._StatusCheck )
+		if( t.isChecking( ) )
 			return [ 'Verifying local data (',
-			         Transmission.fmt.percentString( 100.0 * t._recheckProgress ),
+			         Transmission.fmt.percentString( 100.0 * t.getRecheckProgress() ),
 			         '% tested)' ].join('');
 
-		return t.stateStr( );
+		return t.getStateString( );
 	},
 
 	getProgressDetails: function( controller, t )
 	{
 		if( t.needsMetaData() ) {
-			var percent = 100 * t._metadataPercentComplete;
+			var percent = 100 * t.getMetadataPercentComplete();
 			return [ "Magnetized transfer - retrieving metadata (",
 			         Transmission.fmt.percentString( percent ),
 			         "%)" ].join('');
 		}
 
 		var c;
-		var is_done = ( t.isDone( ) )
-		           || ( t.state() === Torrent._StatusSeeding );
+		var sizeWhenDone = t.getSizeWhenDone()
+		var totalSize = t.getTotalSize()
+		var is_done = ( t.isDone( ) ) || ( t.isSeeding() )
+
 		if( is_done ) {
-			if( t._size == t._sizeWhenDone ) // seed: '698.05 MiB'
-				c = [ Transmission.fmt.size( t._size ) ];
+			if( totalSize == sizeWhenDone ) // seed: '698.05 MiB'
+				c = [ Transmission.fmt.size( totalSize ) ];
 			else // partial seed: '127.21 MiB of 698.05 MiB (18.2%)'
-				c = [ Transmission.fmt.size( t._sizeWhenDone ),
+				c = [ Transmission.fmt.size( sizeWhenDone ),
 				      ' of ',
-				      Transmission.fmt.size( t._size ),
+				      Transmission.fmt.size( t.getTotalSize() ),
 				      ' (', t.getPercentDoneStr, '%)' ];
 			// append UL stats: ', uploaded 8.59 GiB (Ratio: 12.3)'
 			c.push( ', uploaded ',
-			        Transmission.fmt.size( t._upload_total ),
+			        Transmission.fmt.size( t.getUploadedEver() ),
 			        ' (Ratio ',
-			        Transmission.fmt.ratioString( t._upload_ratio ),
+			        Transmission.fmt.ratioString( t.getUploadRatio() ),
 			        ')' );
 		} else { // not done yet
-			c = [ Transmission.fmt.size( t._sizeWhenDone - t._leftUntilDone ),
-			      ' of ', Transmission.fmt.size( t._sizeWhenDone ),
+			c = [ Transmission.fmt.size( sizeWhenDone - t.getLeftUntilDone() ),
+			      ' of ', Transmission.fmt.size( sizeWhenDone ),
 			      ' (', t.getPercentDoneStr(), '%)' ];
 		}
 
 		// maybe append eta
-		if( t.isActive() && ( !is_done || t.seedRatioLimit(controller)>0 ) ) {
+		if( !t.isStopped() && ( !is_done || t.seedRatioLimit(controller)>0 ) ) {
 			c.push(' - ');
-			if (t._eta < 0 || this._eta >= Torrent._InfiniteTimeRemaining )
+			var eta = t.getETA()
+			if (eta < 0 || eta >= (999*60*60) /* arbitrary */ )
 				c.push( 'remaining time unknown' );
 			else
-				c.push( Transmission.fmt.timeInterval(t._eta),
+				c.push( Transmission.fmt.timeInterval(t.getETA()),
 				        ' remaining' );
 		}
 
@@ -207,13 +210,13 @@ TorrentRendererFull.prototype =
 	render: function( controller, t, root )
 	{
 		// name
-		setInnerHTML( root._name_container, t.name() );
+		setInnerHTML( root._name_container, t.getName() );
 
 		// progressbar
 		TorrentRendererHelper.renderProgressbar( controller, t, root._progressbar );
 
 		// peer details
-		var has_error = t._error !== Torrent._ErrNone;
+		var has_error = t.getError() !== Torrent._ErrNone;
 		var e = root._peer_details_container;
 		$(e).toggleClass('error',has_error);
 		setInnerHTML( e, this.getPeerDetails( t ) );
@@ -223,10 +226,10 @@ TorrentRendererFull.prototype =
 		setInnerHTML( e, this.getProgressDetails( controller, t ) );
 
 		// pause/resume button
-		var is_stopped = t.state() === Torrent._StatusStopped;
-		e = root._pause_resume_button_image;
-		e.alt = is_stopped ? 'Resume' : 'Pause';
-		e.className = is_stopped ? 'torrent_resume' : 'torrent_pause';
+		var is_stopped = t.isStopped()
+		e = root._pause_resume_button_image
+		e.alt = is_stopped ? 'Resume' : 'Pause'
+		e.className = is_stopped ? 'torrent_resume' : 'torrent_pause'
 	}
 };
 
@@ -271,19 +274,19 @@ TorrentRendererCompact.prototype =
 			         TorrentRendererHelper.formatUL(t) ].join(' ');
 		if( t.isSeeding( ) )
 			return TorrentRendererHelper.formatUL(t);
-		return t.stateStr( );
+		return t.getStateString( );
 	},
 
 	render: function( controller, t, root )
 	{
 		// name
-		var is_stopped = t.state() === Torrent._StatusStopped;
+		var is_stopped = t.isStopped()
 		var e = root._name_container;
 		$(e).toggleClass( 'paused', is_stopped );
-		setInnerHTML( e, t.name() );
+		setInnerHTML( e, t.getName() );
 
 		// peer details
-		var has_error = t._error !== Torrent._ErrNone;
+		var has_error = t.getError() !== Torrent._ErrNone;
 		e = root._details_container;
 		$(e).toggleClass('error', has_error );
 		setInnerHTML( e, this.getPeerDetails( t ) );

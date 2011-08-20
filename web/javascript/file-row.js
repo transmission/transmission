@@ -90,7 +90,7 @@ FileRow.prototype =
 	{
 		var i = this.getIndex( );
 		var t = this.getTorrent( );
-		this.readAttributes( t._file_model[i] );
+		this.readAttributes( t._files[i] );
 		this.refreshHTML();
 	},
 
@@ -98,17 +98,17 @@ FileRow.prototype =
                 return this._done >= this._size;
         },
         isEditable: function () {
-                return (this.getTorrent()._file_model.length>1) && !this.isDone();
+                return (this.getTorrent()._files.length>1) && !this.isDone();
         },
 
         createRow: function( torrent, i )
 	{
 		var me = this;
-		var file = torrent._file_model[i];
+		var file = torrent._files[i];
                 var name = file.name.substring (file.name.lastIndexOf('/')+1);
 
                 var root = document.createElement('li');
-                root.id = 't' + this._torrent.id() + 'f' + this._index;
+                root.id = 't' + this._torrent.getId() + 'f' + this._index;
                 root.classNameConst = 'inspector_torrent_file_list_entry ' + ((i%2)?'odd':'even');
                 root.className = root.classNameConst;
 
