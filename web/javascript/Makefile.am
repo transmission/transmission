@@ -7,7 +7,7 @@ dist_data_DATA = \
   formatter.js \
   menu.js \
   torrent.js \
-  torrent-renderer.js \
+  torrent-row.js \
   transmission.js \
   transmission.remote.js
 
