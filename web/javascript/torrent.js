@@ -65,16 +65,6 @@ Torrent._DynamicFields = [
 	'seedRatioMode', 'sizeWhenDone', 'status', 'trackerStats',
 	'uploadedEver', 'uploadRatio', 'webseedsSendingToUs' ]
 
-// tracker stats fields whose values change all the time
-Torrent._TrackerStatFields = [
-	'announce', 'announceState', 'downloadCount', 'hasAnnounced',
-	'hasScraped', 'host', 'isBackup', 'lastAnnouncePeerCount',
-	'lastAnnounceResult', 'lastAnnounceSucceeded', 'lastAnnounceTime',
-	'lastScrapeResult', 'lastScrapeSucceeded', 'lastScrapeTime',
-	'leecherCount', 'nextAnnounceTime', 'seederCount'
-]
-
-
 /***
 ****
 ****  Methods
@@ -85,8 +75,8 @@ Torrent.prototype =
 {
 	initialize: function(controller, data)
 	{
-		this.fields = { }
-		this._files = [ ]
+		this.fields = {}
+		this._files = []
 
 		// these fields are set in the ctor and never change
 		for(var i=0, key; key=Torrent._StaticFields[i]; ++i)
@@ -102,7 +92,7 @@ Torrent.prototype =
 		result = []
 		for(var i=0, tracker; tracker=trackerStats[i]; ++i) {
 			tier = result[tracker.tier] || []
-			tier[tier.length] = tracker
+			tier.push(tracker)
 			result[tracker.tier] = tier
 		}
 		return result
@@ -116,7 +106,7 @@ Torrent.prototype =
 		for(var i=0, key; key=Torrent._MetaDataFields[i]; ++i) {
 			if(key in data) {
 				f[key] = data[key]
-				if(key == 'name')
+				if(key === 'name')
 					f.collatedName = data.name.toLowerCase()
 			}
 		}
@@ -132,11 +122,6 @@ Torrent.prototype =
 				}
 			}
 		}
-	},
-
-	fireDataChanged: function()
-	{
-		$(this).trigger('dataChanged',[])
 	},
 
 	refreshMetaData: function(data)
@@ -176,6 +161,11 @@ Torrent.prototype =
 			tgt.priority = src.priority
 			tgt.bytesCompleted = src.bytesCompleted
 		}
+	},
+
+	fireDataChanged: function()
+	{
+		$(this).trigger('dataChanged',[])
 	},
 
 	/****
@@ -296,10 +286,10 @@ Torrent.prototype =
 				    || this.isChecking()
 				break
 			case Prefs._FilterSeeding:
-				pass = (s == Torrent._StatusSeed) || (s == Torrent._StatusSeedWait)
+				pass = (s === Torrent._StatusSeed) || (s === Torrent._StatusSeedWait)
 				break
 			case Prefs._FilterDownloading:
-				pass = (s == Torrent._StatusDownload) || (s == Torrent._StatusDownloadWait)
+				pass = (s === Torrent._StatusDownload) || (s === Torrent._StatusDownloadWait)
 				break
 			case Prefs._FilterPaused:
 				pass = this.isStopped()
@@ -335,8 +325,8 @@ Torrent.compareById = function(ta, tb)
 }
 Torrent.compareByName = function(ta, tb)
 {
-	var i = ta.getCollatedName().compareTo(tb.getCollatedName())
-	return i || Torrent.compareById(ta, tb)
+	return ta.getCollatedName().compareTo(tb.getCollatedName())
+	    || Torrent.compareById(ta, tb)
 }
 Torrent.compareByQueue = function(ta, tb)
 {
