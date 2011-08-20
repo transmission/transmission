@@ -67,33 +67,46 @@ Utils :: guessMimeIcon( const QString& filename )
     {
         fallback = QApplication::style()->standardIcon( QStyle :: SP_FileIcon );
 
-        fileIcons[DISK]= QIcon::fromTheme( "media-optical", fallback );
-        suffixes[DISK] << "iso";
+        suffixes[DISK] << QString::fromAscii("iso");
+        fileIcons[DISK]= QIcon::fromTheme( QString::fromAscii("media-optical"), fallback );
 
-        fileIcons[DOCUMENT] = QIcon::fromTheme( "text-x-generic", fallback );
-        suffixes[DOCUMENT] << "abw" << "csv" << "doc" << "dvi" << "htm" << "html" << "ini" << "log"
-                           << "odp" << "ods" << "odt" << "pdf" << "ppt" << "ps" << "rtf" << "tex"
-                           << "txt" << "xml";
+        const char * doc_types[] = {
+            "abw", "csv", "doc", "dvi", "htm", "html", "ini", "log", "odp",
+            "ods", "odt", "pdf", "ppt", "ps",  "rtf", "tex", "txt", "xml" };
+        for( int i=0, n=sizeof(doc_types)/sizeof(doc_types[0]); i<n; ++i )
+            suffixes[DOCUMENT] << QString::fromAscii(doc_types[i] );
+        fileIcons[DOCUMENT] = QIcon::fromTheme( QString::fromAscii("text-x-generic"), fallback );
 
-        fileIcons[PICTURE]  = QIcon::fromTheme( "image-x-generic", fallback );
-        suffixes[PICTURE] << "bmp" << "gif" << "jpg" << "jpeg" << "pcx" << "png" << "psd" << "raw"
-                          << "tga" << "tiff";
+        const char * pic_types[] = {
+            "bmp", "gif", "jpg", "jpeg", "pcx", "png", "psd", "ras", "tga", "tiff" };
+        for( int i=0, n=sizeof(pic_types)/sizeof(pic_types[0]); i<n; ++i )
+            suffixes[PICTURE] << QString::fromAscii(pic_types[i]);
+        fileIcons[PICTURE]  = QIcon::fromTheme( QString::fromAscii("image-x-generic"), fallback );
 
-        fileIcons[VIDEO] = QIcon::fromTheme( "video-x-generic", fallback );
-        suffixes[VIDEO] << "3gp" << "asf" << "avi" << "mov" << "mpeg" << "mpg" << "mp4" << "mkv"
-                        << "mov" << "ogm" << "ogv" << "qt" << "rm" << "wmv";
+        const char * vid_types[] = {
+            "3gp", "asf", "avi", "mov", "mpeg", "mpg", "mp4" "mkv", "mov",
+            "ogm", "ogv", "qt", "rm", "wmv" };
+        for( int i=0, n=sizeof(vid_types)/sizeof(vid_types[0]); i<n; ++i )
+            suffixes[VIDEO] << QString::fromAscii(vid_types[i]);
+        fileIcons[VIDEO] = QIcon::fromTheme( QString::fromAscii("video-x-generic"), fallback );
 
-        fileIcons[ARCHIVE]  = QIcon::fromTheme( "package-x-generic", fallback );
-        suffixes[ARCHIVE] << "7z" << "ace" << "bz2" << "cbz" << "gz" << "gzip" << "lzma" << "rar"
-                          << "sft" << "tar" << "zip";
+        const char * arc_types[] = {
+            "7z", "ace", "bz2", "cbz", "gz", "gzip", "lzma", "rar", "sft", "tar", "zip" };
+        for( int i=0, n=sizeof(arc_types)/sizeof(arc_types[0]); i<n; ++i )
+            suffixes[VIDEO] << QString::fromAscii(arc_types[i]);
+        fileIcons[ARCHIVE]  = QIcon::fromTheme( QString::fromAscii("package-x-generic"), fallback );
 
-        fileIcons[AUDIO] = QIcon::fromTheme( "audio-x-generic", fallback );
-        suffixes[AUDIO] << "aac" << "ac3" << "aiff" << "ape" << "au" << "flac" << "m3u" << "m4a"
-                        << "mid" << "midi" << "mp2" << "mp3" << "mpc" << "nsf" << "oga" << "ogg"
-                        << "ra" << "ram" << "shn" << "voc" << "wav" << "wma";
+        const char * aud_types[] = {
+            "aac", "ac3", "aiff", "ape", "au", "flac", "m3u", "m4a", "mid", "midi", "mp2",
+            "mp3", "mpc", "nsf", "oga", "ogg", "ra", "ram", "shn", "voc", "wav", "wma" };
+        for( int i=0, n=sizeof(aud_types)/sizeof(aud_types[0]); i<n; ++i )
+            suffixes[AUDIO] << QString::fromAscii(aud_types[i]);
+        fileIcons[AUDIO] = QIcon::fromTheme( QString::fromAscii("audio-x-generic"), fallback );
 
-        fileIcons[APP] = QIcon::fromTheme( "application-x-executable", fallback );
-        suffixes[APP] << "bat" << "cmd" << "com" << "exe";
+        const char * exe_types[] = { "bat", "cmd", "com", "exe" };
+        for( int i=0, n=sizeof(exe_types)/sizeof(exe_types[0]); i<n; ++i )
+            suffixes[APP] << QString::fromAscii(exe_types[i]);
+        fileIcons[APP] = QIcon::fromTheme( QString::fromAscii("application-x-executable"), fallback );
     }
 
     QString suffix( QFileInfo( filename ).suffix( ).toLower( ) );

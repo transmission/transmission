@@ -84,7 +84,7 @@ RelocateDialog :: RelocateDialog( Session& session, TorrentModel& model, const Q
             if( mySession.isServer() )
                 myPath = QDir::homePath( );
             else
-                myPath = QString( "/" );
+                myPath = QDir::rootPath( );
         }
     }
 

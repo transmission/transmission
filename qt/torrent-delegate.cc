@@ -246,7 +246,7 @@ TorrentDelegate :: statusString( const Torrent& tor ) const
             break;
 
         default:
-            str = "Error";
+            str = tr( "Error" );
             break;
     }
 

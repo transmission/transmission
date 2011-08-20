@@ -40,7 +40,7 @@ class Utils: public QObject
         /// URLs
         ///
 
-        static bool isMagnetLink( const QString& s ) { return s.startsWith( "magnet:?" ); }
+        static bool isMagnetLink( const QString& s ) { return s.startsWith( QString::fromAscii( "magnet:?" ) ); }
 
         static bool isHexHashcode( const QString& s )
         {
@@ -49,9 +49,13 @@ class Utils: public QObject
             return true;
         }
 
-        static bool isURL( const QString& s ) { return s.startsWith( "http://" )
-                                                    || s.startsWith( "https://" )
-                                                    || s.startsWith( "ftp://" ); }
+        static bool isUriWithSupportedScheme( const QString& s )
+        {
+            static const QString ftp = QString::fromAscii( "ftp://" );
+            static const QString http = QString::fromAscii( "http://" );
+            static const QString https = QString::fromAscii( "https://" );
+            return s.startsWith(http) || s.startsWith(https) || s.startsWith(ftp);
+        }
 
 };
 

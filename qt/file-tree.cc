@@ -420,7 +420,7 @@ FileTreeModel :: addFile( int                   index,
 {
     FileTreeItem * i( rootItem );
 
-    foreach( QString token, filename.split( "/" ) )
+    foreach( QString token, filename.split( QChar::fromAscii('/') ) )
     {
         FileTreeItem * child( i->child( token ) );
         if( !child )

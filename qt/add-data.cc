@@ -27,7 +27,7 @@ AddData :: set( const QString& key )
         magnet = key;
         type = MAGNET;
     }
-    else if ( Utils::isURL( key ) )
+    else if ( Utils::isUriWithSupportedScheme( key ) )
     {
         url = key;
         type = URL;
@@ -44,7 +44,7 @@ AddData :: set( const QString& key )
     }
     else if( Utils::isHexHashcode( key ) )
     {
-        magnet = QString("magnet:?xt=urn:btih:") + key;
+        magnet = QString::fromAscii("magnet:?xt=urn:btih:") + key;
         type = MAGNET;
     }
     else
@@ -96,7 +96,7 @@ AddData :: readableName( ) const
             tr_ctor * ctor = tr_ctorNew( NULL );
             tr_ctorSetMetainfo( ctor, (const uint8_t*)metainfo.constData(), metainfo.size() );
             if( tr_torrentParse( ctor, &inf ) == TR_PARSE_OK  ) {
-                ret = inf.name;
+                ret = QString::fromUtf8( inf.name ); // metainfo is required to be UTF-8
                 tr_metainfoFree( &inf );
             }
             tr_ctorFree( ctor );

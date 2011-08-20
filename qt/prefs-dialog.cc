@@ -134,7 +134,7 @@ PrefsDialog :: timeEditNew( int key )
 {
     const int minutes( myPrefs.getInt( key ) );
     QTimeEdit * e = new QTimeEdit( );
-    e->setDisplayFormat( "hh:mm" );
+    e->setDisplayFormat( QString::fromAscii( "hh:mm" ) );
     e->setProperty( PREF_KEY, key );
     e->setTime( QTime().addSecs( minutes * 60 ) );
     myWidgets.insert( key, e );
@@ -232,11 +232,11 @@ PrefsDialog :: createSpeedTab( )
     QHBoxLayout * h = new QHBoxLayout;
     h->setSpacing( HIG :: PAD );
     QLabel * label = new QLabel;
-    label->setPixmap( QPixmap( ":/icons/alt-limit-off.png" ) );
+    label->setPixmap( QPixmap( QString::fromAscii( ":/icons/alt-limit-off.png" ) ) );
     label->setAlignment( Qt::AlignLeft|Qt::AlignVCenter );
     h->addWidget( label );
     label = new QLabel( tr( "Temporary Speed Limits" ) );
-    label->setStyleSheet( "font: bold" );
+    label->setStyleSheet( QString::fromAscii( "font: bold" ) );
     label->setAlignment( Qt::AlignLeft|Qt::AlignVCenter );
     h->addWidget( label );
     hig->addSectionTitle( h );
@@ -346,7 +346,7 @@ PrefsDialog :: createNetworkTab( )
     connect( &mySession, SIGNAL(portTested(bool)), this, SLOT(onPortTested(bool)));
 
     hig->addRow( tr( "&Port for incoming connections:" ), s );
-    hig->addRow( "", h, 0 );
+    hig->addRow( QString(), h, 0 );
     hig->addWideControl( checkBoxNew( tr( "Pick a &random port every time Transmission is started" ), Prefs :: PEER_PORT_RANDOM_ON_START ) );
     hig->addWideControl( checkBoxNew( tr( "Use UPnP or NAT-PMP port &forwarding from my router" ), Prefs::PORT_FORWARDING ) );
 
@@ -396,7 +396,7 @@ void
 PrefsDialog :: onUpdateBlocklistClicked( )
 {
     myBlocklistDialog = new QMessageBox( QMessageBox::Information,
-                                         "",
+                                         QString(),
                                          tr( "<b>Update Blocklist</b><p>Getting new blocklist..." ),
                                          QMessageBox::Close,
                                          this );
@@ -426,7 +426,7 @@ PrefsDialog :: createPrivacyTab( )
     myBlockWidgets << e;
     hig->addRow( l, e );
 
-    l = myBlocklistLabel = new QLabel( "" );
+    l = myBlocklistLabel = new QLabel( );
     myBlockWidgets << l;
     w = new QPushButton( tr( "&Update" ) );
     connect( w, SIGNAL(clicked(bool)), this, SLOT(onUpdateBlocklistClicked()));
@@ -539,7 +539,7 @@ PrefsDialog :: createTorrentsTab( )
         l = checkBoxNew( tr( "Automatically &add torrents from:" ), Prefs::DIR_WATCH_ENABLED );
         QPushButton * b = myWatchButton = new QPushButton;
         b->setIcon( folderPixmap );
-        b->setStyleSheet( "text-align: left; padding-left: 5; padding-right: 5" );
+        b->setStyleSheet( QString::fromAscii( "text-align: left; padding-left: 5; padding-right: 5" ) );
         connect( b, SIGNAL(clicked(bool)), this, SLOT(onWatchClicked(void)) );
         hig->addRow( l, b );
         enableBuddyWhenChecked( qobject_cast<QCheckBox*>(l), b );
@@ -577,7 +577,7 @@ PrefsDialog :: createDownloadTab( )
 
         QPushButton * b = myDestinationButton = new QPushButton;
         b->setIcon( folderPixmap );
-        b->setStyleSheet( "text-align: left; padding-left: 5; padding-right: 5" );
+        b->setStyleSheet( QString::fromAscii( "text-align: left; padding-left: 5; padding-right: 5" ) );
         connect( b, SIGNAL(clicked(bool)), this, SLOT(onDestinationClicked(void)) );
         hig->addRow( tr( "Save to &Location:" ), b );
 
@@ -595,7 +595,7 @@ PrefsDialog :: createDownloadTab( )
         l = myIncompleteCheckbox = checkBoxNew( tr( "Keep &incomplete files in:" ), Prefs::INCOMPLETE_DIR_ENABLED );
         b = myIncompleteButton = new QPushButton;
         b->setIcon( folderPixmap );
-        b->setStyleSheet( "text-align: left; padding-left: 5; padding-right: 5" );
+        b->setStyleSheet( QString::fromAscii( "text-align: left; padding-left: 5; padding-right: 5" ) );
         connect( b, SIGNAL(clicked(bool)), this, SLOT(onIncompleteClicked(void)) );
         hig->addRow( myIncompleteCheckbox, b );
         enableBuddyWhenChecked( qobject_cast<QCheckBox*>(l), b );
@@ -603,7 +603,7 @@ PrefsDialog :: createDownloadTab( )
         l = myTorrentDoneScriptCheckbox = checkBoxNew( tr( "Call scrip&t when torrent is completed:" ), Prefs::SCRIPT_TORRENT_DONE_ENABLED );
         b = myTorrentDoneScriptButton = new QPushButton;
         b->setIcon( filePixmap );
-        b->setStyleSheet( "text-align: left; padding-left: 5; padding-right: 5" );
+        b->setStyleSheet( QString::fromAscii( "text-align: left; padding-left: 5; padding-right: 5" ) );
         connect( b, SIGNAL(clicked(bool)), this, SLOT(onScriptClicked(void)) );
         hig->addRow( myTorrentDoneScriptCheckbox, b );
         enableBuddyWhenChecked( qobject_cast<QCheckBox*>(l), b );

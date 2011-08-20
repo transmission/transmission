@@ -564,7 +564,7 @@ Torrent :: update( tr_benc * d )
         tr_benc * child;
         while(( child = tr_bencListChild( trackers, i++ ))) {
             if( tr_bencDictFindStr( child, "announce", &str )) {
-                dynamic_cast<MyApp*>(QApplication::instance())->favicons.add( QUrl(str) );
+                dynamic_cast<MyApp*>(QApplication::instance())->favicons.add( QUrl(QString::fromUtf8(str)) );
                 list.append( QString::fromUtf8( str ) );
             }
         }
@@ -605,7 +605,7 @@ Torrent :: update( tr_benc * d )
             if( tr_bencDictFindInt( child, "lastAnnouncePeerCount", &i ) )
                 trackerStat.lastAnnouncePeerCount = i;
             if( tr_bencDictFindStr( child, "lastAnnounceResult", &str ) )
-                trackerStat.lastAnnounceResult = str;
+                trackerStat.lastAnnounceResult = QString::fromUtf8(str);
             if( tr_bencDictFindInt( child, "lastAnnounceStartTime", &i ) )
                 trackerStat.lastAnnounceStartTime = i;
             if( tr_bencDictFindBool( child, "lastAnnounceSucceeded", &b ) )

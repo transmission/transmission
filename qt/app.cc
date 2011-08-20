@@ -45,13 +45,11 @@
 
 namespace
 {
-    const char * DBUS_SERVICE     ( "com.transmissionbt.Transmission"  );
-    const char * DBUS_OBJECT_PATH ( "/com/transmissionbt/Transmission" );
-    const char * DBUS_INTERFACE   ( "com.transmissionbt.Transmission"  );
+    const QString DBUS_SERVICE     = QString::fromAscii( "com.transmissionbt.Transmission"  );
+    const QString DBUS_OBJECT_PATH = QString::fromAscii( "/com/transmissionbt/Transmission" );
+    const QString DBUS_INTERFACE   = QString::fromAscii( "com.transmissionbt.Transmission"  );
 
-    const char * MY_CONFIG_NAME( "transmission" );
     const char * MY_READABLE_NAME( "transmission-qt" );
-
 
     const tr_option opts[] =
     {
@@ -91,6 +89,8 @@ MyApp :: MyApp( int& argc, char ** argv ):
     QApplication( argc, argv ),
     myLastFullUpdateTime( 0 )
 {
+    const QString MY_CONFIG_NAME = QString::fromAscii( "transmission" );
+
     setApplicationName( MY_CONFIG_NAME );
 
     // install the qt translator
@@ -109,11 +109,10 @@ MyApp :: MyApp( int& argc, char ** argv ):
 
     // set the default icon
     QIcon icon;
-    icon.addPixmap( QPixmap( ":/icons/transmission-16.png" ) );
-    icon.addPixmap( QPixmap( ":/icons/transmission-22.png" ) );
-    icon.addPixmap( QPixmap( ":/icons/transmission-24.png" ) );
-    icon.addPixmap( QPixmap( ":/icons/transmission-32.png" ) );
-    icon.addPixmap( QPixmap( ":/icons/transmission-48.png" ) );
+    QList<int> sizes;
+    sizes << 16 << 22 << 24 << 32 << 48;
+    foreach( int size, sizes )
+        icon.addPixmap( QPixmap( QString::fromAscii(":/icons/transmission-%1.png" ).arg(size) ) );
     setWindowIcon( icon );
 
     // parse the command-line arguments
@@ -142,7 +141,7 @@ MyApp :: MyApp( int& argc, char ** argv ):
 
     // set the fallback config dir
     if( configDir == 0 )
-        configDir = tr_getDefaultConfigDir( MY_CONFIG_NAME );
+        configDir = tr_getDefaultConfigDir( "transmission" );
 
     // ensure our config directory exists
     QDir dir( configDir );
@@ -249,9 +248,9 @@ MyApp :: MyApp( int& argc, char ** argv ):
     new TrDBusAdaptor( this );
     QDBusConnection bus = QDBusConnection::sessionBus();
     if( !bus.registerService( DBUS_SERVICE ) )
-        std::cerr << "couldn't register " << DBUS_SERVICE << std::endl;
+        std::cerr << "couldn't register " << qPrintable(DBUS_SERVICE) << std::endl;
     if( !bus.registerObject( DBUS_OBJECT_PATH, this ) )
-        std::cerr << "couldn't register " << DBUS_OBJECT_PATH << std::endl;
+        std::cerr << "couldn't register " << qPrintable(DBUS_OBJECT_PATH) << std::endl;
 }
 
 /* these functions are for popping up desktop notifications */
@@ -443,20 +442,20 @@ MyApp :: raise( )
 bool
 MyApp :: notify( const QString& title, const QString& body ) const
 {
-    const QString dbusServiceName = "org.freedesktop.Notifications";
-    const QString dbusInterfaceName = "org.freedesktop.Notifications";
-    const QString dbusPath = "/org/freedesktop/Notifications";
+    const QString dbusServiceName   = QString::fromAscii( "org.freedesktop.Notifications" );
+    const QString dbusInterfaceName = QString::fromAscii( "org.freedesktop.Notifications" );
+    const QString dbusPath          = QString::fromAscii( "/org/freedesktop/Notifications" );
 
-    QDBusMessage m = QDBusMessage::createMethodCall(dbusServiceName, dbusPath, dbusInterfaceName, "Notify");
+    QDBusMessage m = QDBusMessage::createMethodCall(dbusServiceName, dbusPath, dbusInterfaceName, QString::fromAscii("Notify"));
     QList<QVariant> args;
-    args.append( "Transmission" ); // app_name
-    args.append( 0U );             // replaces_id
-    args.append( "transmission" ); // icon
-    args.append( title );          // summary
-    args.append( body );           // body
-    args.append( QStringList( ) ); // actions - unused for plain passive popups
-    args.append( QVariantMap( ) ); // hints - unused atm
-    args.append( int32_t(-1) );    // use the default timeout period
+    args.append( QString::fromAscii( "Transmission" ) ); // app_name
+    args.append( 0U );                                   // replaces_id
+    args.append( QString::fromAscii( "transmission" ) ); // icon
+    args.append( title );                                // summary
+    args.append( body );                                 // body
+    args.append( QStringList( ) );                       // actions - unused for plain passive popups
+    args.append( QVariantMap( ) );                       // hints - unused atm
+    args.append( int32_t(-1) );                          // use the default timeout period
     m.setArguments( args );
     QDBusMessage replyMsg = QDBusConnection::sessionBus().call(m);
     //std::cerr << qPrintable(replyMsg.errorName()) << std::endl;
@@ -489,7 +488,7 @@ main( int argc, char * argv[] )
         QDBusMessage request = QDBusMessage::createMethodCall( DBUS_SERVICE,
                                                                DBUS_OBJECT_PATH,
                                                                DBUS_INTERFACE,
-                                                               "AddMetainfo" );
+                                                               QString::fromAscii("AddMetainfo") );
         QList<QVariant> arguments;
         AddData a( addme[i] );
         switch( a.type ) {
