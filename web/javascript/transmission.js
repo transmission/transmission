@@ -2204,7 +2204,7 @@ Transmission.prototype =
 			var tr = this;
 			var fragment = document.createDocumentFragment( );
 			while( this._rows.length < keep.length ) {
-				var row = new TorrentRow( this, this.torrentRenderer );
+				var row = new TorrentRow( this.torrentRenderer );
 				if( !iPhone ) {
 					var b = row.getToggleRunningButton( );
 					if( b !== null ) {
@@ -2212,6 +2212,7 @@ Transmission.prototype =
 					}
 				}
 				$(row.getElement()).bind('click',{r: row}, function(ev){ tr.onRowClicked(ev,ev.data.r);});
+				$(row.getElement()).bind('dblclick', function(e) { tr.toggleInspector(); });
 				fragment.appendChild( row.getElement() );
 				this._rows.push( row );
 			}

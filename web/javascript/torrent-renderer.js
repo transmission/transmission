@@ -44,15 +44,28 @@ TorrentRendererHelper.getProgressInfo = function( controller, t )
 	};
 }
 
-TorrentRendererHelper.renderProgressbar = function( controller, t, complete, incomplete )
+TorrentRendererHelper.createProgressbar = function( classes )
+{
+	var complete = document.createElement( 'div' );
+	complete.className = 'torrent_progress_bar complete';
+	var incomplete = document.createElement( 'div' );
+	incomplete.className = 'torrent_progress_bar incomplete';
+	var progressbar = document.createElement( 'div' );
+	progressbar.className = 'torrent_progress_bar_container ' + classes;
+	progressbar.appendChild( complete );
+	progressbar.appendChild( incomplete );
+	return { 'element': progressbar, 'complete': complete, 'incomplete': incomplete }
+}
+
+TorrentRendererHelper.renderProgressbar = function( controller, t, progressbar )
 {
 	var info = TorrentRendererHelper.getProgressInfo( controller, t );
 	var e;
-	e = complete;
+	e = progressbar.complete;
 	e.style.width = '' + info.percent + "%";
 	e.className = info.complete;
 	e.style.display = info.percent<=0 ? 'none' : 'block';
-	e = incomplete;
+	e = progressbar.incomplete;
 	e.className = info.incomplete;
 	e.style.display = info.percent>=100 ? 'none' : 'block';
 }
@@ -88,14 +101,7 @@ TorrentRendererFull.prototype =
 		var peers = document.createElement( 'div' );
 		peers.className = 'torrent_peer_details';
 
-		var complete = document.createElement( 'div' );
-		complete.className = 'torrent_progress_bar complete';
-		var incomplete = document.createElement( 'div' );
-		incomplete.className = 'torrent_progress_bar incomplete';
-		var progressbar = document.createElement( 'div' );
-		progressbar.className = 'torrent_progress_bar_container full';
-		progressbar.appendChild( complete );
-		progressbar.appendChild( incomplete );
+		var progressbar = TorrentRendererHelper.createProgressbar( 'full' );
 
 		var details = document.createElement( 'div' );
 		details.className = 'torrent_progress_details';
@@ -107,14 +113,13 @@ TorrentRendererFull.prototype =
 		root.appendChild( name );
 		root.appendChild( peers );
 		root.appendChild( button );
-		root.appendChild( progressbar );
+		root.appendChild( progressbar.element );
 		root.appendChild( details );
 
 		root._name_container = name;
 		root._peer_details_container = peers;
 		root._progress_details_container = details;
-		root._progress_complete_container = complete;
-		root._progress_incomplete_container = incomplete;
+		root._progressbar = progressbar;
 		root._pause_resume_button_image = image;
 		root._toggle_running_button = button;
 
@@ -205,10 +210,7 @@ TorrentRendererFull.prototype =
 		setInnerHTML( root._name_container, t.name() );
 
 		// progressbar
-		TorrentRendererHelper.renderProgressbar(
-			controller, t,
-			root._progress_complete_container,
-			root._progress_incomplete_container );
+		TorrentRendererHelper.renderProgressbar( controller, t, root._progressbar );
 
 		// peer details
 		var has_error = t._error !== Torrent._ErrNone;
@@ -240,14 +242,7 @@ TorrentRendererCompact.prototype =
 {
 	createRow: function( )
 	{
-		var complete = document.createElement( 'div' );
-		complete.className = 'torrent_progress_bar complete';
-		var incomplete = document.createElement( 'div' );
-		incomplete.className = 'torrent_progress_bar incomplete';
-		var progressbar = document.createElement( 'div' );
-		progressbar.className = 'torrent_progress_bar_container compact';
-		progressbar.appendChild( complete );
-		progressbar.appendChild( incomplete );
+		var progressbar = TorrentRendererHelper.createProgressbar( 'compact' );
 
 		var details = document.createElement( 'div' );
 		details.className = 'torrent_peer_details compact';
@@ -256,12 +251,11 @@ TorrentRendererCompact.prototype =
 		name.className = 'torrent_name';
 
 		var root = document.createElement( 'li' );
-		root.appendChild( progressbar );
+		root.appendChild( progressbar.element );
 		root.appendChild( details );
 		root.appendChild( name );
 		root.className = 'torrent compact';
-		root._progress_complete_container = complete;
-		root._progress_incomplete_container = incomplete;
+		root._progressbar = progressbar;
 		root._details_container = details;
 		root._name_container = name;
 		return root;
@@ -295,10 +289,7 @@ TorrentRendererCompact.prototype =
 		setInnerHTML( e, this.getPeerDetails( t ) );
 
 		// progressbar
-		TorrentRendererHelper.renderProgressbar(
-			controller, t,
-			root._progress_complete_container,
-			root._progress_incomplete_container );
+		TorrentRendererHelper.renderProgressbar( controller, t, root._progressbar );
 	}
 };
 
@@ -307,17 +298,15 @@ TorrentRendererCompact.prototype =
 *****
 ****/
 
-function TorrentRow( controller, generator )
+function TorrentRow( view )
 {
-        this.initialize( controller, generator );
+        this.initialize( view );
 }
 TorrentRow.prototype =
 {
-	initialize: function( controller, generator ) {
-		this._generator = generator;
-		var root = generator.createRow( );
-		this._element = root;
-                $(root).bind('dblclick', function(e) { controller.toggleInspector(); });
+	initialize: function( view ) {
+		this._view = view;
+		this._element = view.createRow( );
 
 	},
 	getElement: function( ) {
@@ -326,7 +315,7 @@ TorrentRow.prototype =
 	render: function( controller ) {
 		var tor = this.getTorrent( );
 		if( tor !== null )
-			this._generator.render( controller, tor, this.getElement( ) );
+			this._view.render( controller, tor, this.getElement( ) );
 	},
 	isSelected: function( ) {
 		return this.getElement().className.indexOf('selected') != -1;
@@ -351,10 +340,11 @@ TorrentRow.prototype =
 
 	setTorrent: function( controller, t ) {
 		if( this._torrent !== t ) {
+			var key = 'dataChanged.renderer';
 			if( this._torrent )
-				$(this).unbind('dataChanged.renderer');
+				$(this).unbind(key);
 			if(( this._torrent = t ))
-				$(this).bind('dataChanged.renderer',this.render(controller));
+				$(this).bind(key,this.render(controller));
 		}
 	},
 	getTorrent: function() {
