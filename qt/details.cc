@@ -771,9 +771,9 @@ Details :: refresh( )
                 static const QIcon myEncryptionIcon( ":/icons/encrypted.png" );
                 static const QIcon myEmptyIcon;
                 item = new PeerItem( peer );
-                item->setTextAlignment( COL_UP, Qt::AlignRight );
-                item->setTextAlignment( COL_DOWN, Qt::AlignRight );
-                item->setTextAlignment( COL_PERCENT, Qt::AlignRight );
+                item->setTextAlignment( COL_UP, Qt::AlignRight|Qt::AlignVCenter );
+                item->setTextAlignment( COL_DOWN, Qt::AlignRight|Qt::AlignVCenter );
+                item->setTextAlignment( COL_PERCENT, Qt::AlignRight|Qt::AlignVCenter );
                 item->setIcon( COL_LOCK, peer.isEncrypted ? myEncryptionIcon : myEmptyIcon );
                 item->setToolTip( COL_LOCK, peer.isEncrypted ? tr( "Encrypted connection" ) : "" );
                 item->setText( COL_ADDRESS, peer.address );
