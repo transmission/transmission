@@ -250,20 +250,20 @@ Transmission.prototype =
 	{
 		var tr = this;
 		var search_box = $('#torrent_search');
-		search_box.bind('keyup click', {transmission: this}, function(event) {
+		search_box.bind('keyup click', function(event) {
 			tr.setSearch(this.value);
 		});
 		if (!$.browser.safari)
 		{
 			search_box.addClass('blur');
 			search_box[0].value = 'Filter';
-			search_box.bind('blur', {transmission: this}, function(event) {
+			search_box.bind('blur', function(event) {
 				if (this.value == '') {
 					$(this).addClass('blur');
 					this.value = 'Filter';
 					tr.setSearch(null);
 				}
-			}).bind('focus', {}, function(event) {
+			}).bind('focus', function(event) {
 				if ($(this).is('.blur')) {
 					this.value = '';
 					$(this).removeClass('blur');
