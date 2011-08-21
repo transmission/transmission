@@ -475,22 +475,23 @@ Transmission.prototype =
 		Prefs.setValue( key, val );
 	},
 
-	scrollToElement: function( e )
+	scrollToRow: function(row)
 	{
-		if( iPhone )
-			return;
+		if( iPhone ) // FIXME: why?
+			return
 
-		var container = $('#torrent_container');
-		var scrollTop = container.scrollTop( );
-		var innerHeight = container.innerHeight( );
+		var list = $('#torrent_container')
+		var scrollTop = list.scrollTop()
+		var innerHeight = list.innerHeight()
 
-		var offsetTop = e.offsetTop;
-		var offsetHeight = $(e).outerHeight( );
+		var e = $(row.getElement())
+		var offsetTop = e[0].offsetTop
+		var offsetHeight = e.outerHeight()
 
 		if( offsetTop < scrollTop )
-			container.scrollTop( offsetTop );
+			list.scrollTop( offsetTop );
 		else if( innerHeight + scrollTop < offsetTop + offsetHeight )
-			container.scrollTop( offsetTop + offsetHeight - innerHeight );
+			list.scrollTop( offsetTop + offsetHeight - innerHeight );
 	},
 
 	seedRatioLimit: function(){
@@ -582,32 +583,29 @@ Transmission.prototype =
 	/*
 	 * Process key event
 	 */
-	keyDown: function(event)
+	keyDown: function(ev)
 	{
-		var tr = this;
-		var sel = tr.getSelectedRows( );
-		var rows = tr.getVisibleRows( );
-		var i = -1;
+		var up = ev.keyCode === 38 // up key pressed
+		var dn = ev.keyCode === 40 // down key pressed
 
-		if( event.keyCode == 40 ) // down arrow
+		if(up || dn)
 		{
-			var r = sel.length ? sel[sel.length-1] : null;
-			i = r==null ? null : tr.getRowIndex(rows,r)+1;
-			if( i == rows.length || i == null )
-				i = 0;
-		}
-		else if( event.keyCode == 38 ) // up arrow
-		{
-			var r = sel.length ? sel[0] : null
-			i = r==null ? null : tr.getRowIndex(rows,r)-1;
-			if( i == -1 || i == null )
-				i = rows.length - 1;
-		}
+			var rows = this.getVisibleRows()
 
-		if( 0<=i && i<rows.length ) {
-			tr.deselectAll( );
-			tr.selectRow( tr._rows[i], true );
-			tr.scrollToElement( tr._rows[i] );
+			// find the first selected row	
+			for(var i=0, row; row=rows[i]; ++i)
+				if(row.isSelected())
+					break
+
+			if(i == rows.length) // no selection yet
+				i = 0
+			else if(dn)
+				i = (i+1) % rows.length
+			else if(up)
+				i = (i || rows.length) - 1
+
+			this.setSelectedRow(rows[i])
+			this.scrollToRow(rows[i])
 		}
 	},
 
