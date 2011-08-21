@@ -441,17 +441,6 @@ Transmission.prototype =
 		return s;
 	},
 
-	getDeselectedTorrents: function()
-	{
-		var ret = { };
-		for( var key in this._torrents )
-			ret[ key ] = this._torrents[key];
-		var sel = this.getSelectedTorrents( );
-		for( var i=0, tor; tor=sel[i]; ++i )
-			delete ret[ tor.getId() ];
-		return ret;
-	},
-
 	getVisibleRows: function()
 	{
 		var rows = [ ];
