@@ -257,7 +257,7 @@
 								<label class="category">Web Client:</label>
 								<div class="formdiv">
 									<label for="refresh_rate" class="item">Refresh Rate:</label>
-									<input type="text" name="refresh_rate" id="refresh_rate"/>
+									<input type="text" name="refresh_rate" id="refresh_rate" class="numberinput"/>
 									<label class="suffix">seconds</label>
 								</div>
 							</div>
@@ -269,13 +269,13 @@
 								<div class="formdiv checkbox">
 									<input type="checkbox" name="limit_download" id="limit_download"/>
 									<label for="limit_download" class="item">Download Rate:</label>
-									<input type="text" name="download_rate" id="download_rate"/>
+									<input type="text" name="download_rate" id="download_rate" class="numberinput"/>
 									<label class="suffix">kB/s</label>
 								</div>
 								<div class="formdiv checkbox">
 									<input type="checkbox" name="limit_upload" id="limit_upload"/>
 									<label for="limit_upload" class="item">Upload Rate:</label>
-									<input type="text" name="upload_rate" id="upload_rate"/>
+									<input type="text" name="upload_rate" id="upload_rate" class="numberinput"/>
 									<label class="suffix">kB/s</label>
 								</div>
 							</div>
@@ -284,12 +284,12 @@
 								<label>Override normal speed limits manually or at scheduled times</label>
 								<div class="formdiv">
 									<label for="turtle_download_rate" class="item">Download Rate:</label>
-									<input type="text" name="turtle_download_rate" id="turtle_download_rate"/>
+									<input type="text" name="turtle_download_rate" id="turtle_download_rate" class="numberinput"/>
 									<label class="suffix">kB/s</label>
 								</div>
 								<div class="formdiv">
 									<label for="turtle_upload_rate" class="item">Upload Rate:</label>
-									<input type="text" name="turtle_upload_rate" id="turtle_upload_rate"/>
+									<input type="text" name="turtle_upload_rate" id="turtle_upload_rate" class="numberinput"/>
 									<label class="suffix">kB/s</label>
 								</div>
 								<div class="formdiv checkbox">
@@ -323,12 +323,12 @@
 								<label class="category">Connections:</label>
 								<div class="formdiv">
 									<label for="conn_global" class="item">Global maximum connections:</label>
-									<input type="text" name="conn_global" id="conn_global"/>
+									<input type="text" name="conn_global" id="conn_global" class="numberinput"/>
 									<label class="suffix">peers</label>
 								</div>
 								<div class="formdiv">
 									<label for="conn_torrent" class="item">Maximum connections for new transfers:</label>
-									<input type="text" name="conn_torrent" id="conn_torrent"/>
+									<input type="text" name="conn_torrent" id="conn_torrent" class="numberinput"/>
 									<label class="suffix">peers</label>
 								</div>
 								<div class="formdiv checkbox">
@@ -373,7 +373,7 @@
 								<label class="category">Peer listening port:</label>
 								<div class="formdiv">
 									<label for="port" class="item">Incoming TCP Port:</label>
-									<input type="text" id="port" name="port"/>
+									<input type="text" id="port" name="port" class="numberinput"/>
 									<label class="suffix" id="port_test"></label>
 								</div>
 								<div class="formdiv checkbox">

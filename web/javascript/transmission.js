@@ -35,6 +35,7 @@ Transmission.prototype =
 
 		// Set up user events
 		var tr = this;
+		$(".numberinput").forceNumeric();
 		$('#pause_all_link').bind('click', function(e){ tr.stopAllClicked(e); });
 		$('#resume_all_link').bind('click', function(e){ tr.startAllClicked(e); });
 		$('#pause_selected_link').bind('click', function(e){ tr.stopSelectedClicked(e); } );
@@ -129,9 +130,6 @@ Transmission.prototype =
 		this._inspector._info_tab.upload_speed = $(ti+'upload_speed')[0];
 		this._inspector._info_tab.upload_to = $(ti+'upload_to')[0];
 
-		// Setup the preference box
-		this.setupPrefConstraints();
-
 		// Setup the prefs gui
 		this.initializeSettings( );
 
@@ -203,23 +201,6 @@ Transmission.prototype =
 	loadImages: function() {
 		for( var i=0, row; row=arguments[i]; ++i )
 			jQuery("<img>").attr("src", row);
-	},
-
-	/*
-	 * Set up the preference validation
-	 */
-	setupPrefConstraints: function() {
-		// only allow integers for speed limit & port options
-		$('div.preference input[@type=text]:not(#download_location,#block_url)').blur( function() {
-			this.value = this.value.replace(/[^0-9]/gi, '');
-			if (this.value == '') {
-				if ($(this).is('#refresh_rate')) {
-					this.value = 5;
-				} else {
-					this.value = 0;
-				}
-			}
-		});
 	},
 
 	setCompactMode: function( is_compact )
@@ -1257,7 +1238,7 @@ Transmission.prototype =
 					$element.deselectMenuSiblings().selectMenuItem();
 					args[RPC._DownSpeedLimited] = false;
 				} else {
-					var rate_str = ($element[0].innerHTML).replace(/[^0-9]/ig, '');
+					var rate_str = $element[0].innerHTML
 					var rate_val = parseInt( rate_str );
 					setInnerHTML( $('#limited_download_rate')[0], [ 'Limit (', Transmission.fmt.speed(rate_val), ')' ].join('') );
 					$('#limited_download_rate').deselectMenuSiblings().selectMenuItem();
@@ -1276,7 +1257,7 @@ Transmission.prototype =
 					$element.deselectMenuSiblings().selectMenuItem();
 					args[RPC._UpSpeedLimited] = false;
 				} else {
-					var rate_str = ($element[0].innerHTML).replace(/[^0-9]/ig, '');
+					var rate_str = $element[0].innerHTML
 					var rate_val = parseInt( rate_str );
 					setInnerHTML( $('#limited_upload_rate')[0], [ 'Limit (', Transmission.fmt.speed(rate_val), ')' ].join('')  );
 					$('#limited_upload_rate').deselectMenuSiblings().selectMenuItem();
