@@ -919,6 +919,8 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         [fTorrents addObject: torrent];
         [torrent release];
         
+        #warning set to bottom of queue
+        
         [self fullUpdateUI];
     }
     else
@@ -987,6 +989,8 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         [torrent update];
         [fTorrents addObject: torrent];
         [torrent release];
+        
+        #warning set to bottom of queue
         
         [self fullUpdateUI];
     }
@@ -1665,13 +1669,13 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 
 - (void) updateUI
 {
-    [fTorrents makeObjectsPerformSelector: @selector(update)];
-    
-    //pull the upload and download speeds - most consistent by using current stats
     CGFloat dlRate = 0.0, ulRate = 0.0;
     BOOL completed = NO;
     for (Torrent * torrent in fTorrents)
     {
+        [torrent update];
+        
+        //pull the upload and download speeds - most consistent by using current stats
         dlRate += [torrent downloadRate];
         ulRate += [torrent uploadRate];
         
