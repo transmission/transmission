@@ -504,7 +504,6 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     [nc addObserver: fWindow selector: @selector(makeKeyWindow)
                     name: @"MakeWindowKey" object: nil];
     
-#warning look at this
     [nc addObserver: self selector: @selector(fullUpdateUI)
                     name: @"UpdateQueue" object: nil];
     
@@ -915,11 +914,11 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     
     if (add)
     {
+        [torrent setQueuePosition: [fTorrents count]];
+        
         [torrent update];
         [fTorrents addObject: torrent];
         [torrent release];
-        
-        #warning set to bottom of queue
         
         [self fullUpdateUI];
     }
@@ -986,11 +985,11 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     
     if (add)
     {
+        [torrent setQueuePosition: [fTorrents count]];
+        
         [torrent update];
         [fTorrents addObject: torrent];
         [torrent release];
-        
-        #warning set to bottom of queue
         
         [self fullUpdateUI];
     }
