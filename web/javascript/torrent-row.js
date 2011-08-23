@@ -180,7 +180,7 @@ TorrentRendererFull.prototype =
 				c = [ Transmission.fmt.size( sizeWhenDone ),
 				      ' of ',
 				      Transmission.fmt.size( t.getTotalSize() ),
-				      ' (', t.getPercentDoneStr, '%)' ];
+				      ' (', t.getPercentDoneStr(), '%)' ];
 			// append UL stats: ', uploaded 8.59 GiB (Ratio: 12.3)'
 			c.push( ', uploaded ',
 			        Transmission.fmt.size( t.getUploadedEver() ),
@@ -251,7 +251,7 @@ TorrentRendererCompact.prototype =
 		details.className = 'torrent_peer_details compact';
 
 		var name = document.createElement( 'div' );
-		name.className = 'torrent_name';
+		name.className = 'torrent_name compact';
 
 		var root = document.createElement( 'li' );
 		root.appendChild( progressbar.element );
@@ -343,11 +343,12 @@ TorrentRow.prototype =
 
 	setTorrent: function( controller, t ) {
 		if( this._torrent !== t ) {
-			var key = 'dataChanged.renderer';
-			if( this._torrent )
-				$(this).unbind(key);
-			if(( this._torrent = t ))
-				$(this).bind(key,this.render(controller));
+			var row = this
+			var key = 'dataChanged.torrentRowListener';
+			if(this._torrent)
+				$(this._torrent).unbind(key);
+			if((this._torrent = t))
+				$(this._torrent).bind(key,function(){row.render(controller)})
 		}
 	},
 	getTorrent: function() {
