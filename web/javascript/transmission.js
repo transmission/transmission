@@ -1669,15 +1669,6 @@ Transmission.prototype =
 		}
 	},
 
-	/*
-	 * Set the alternating background colors for torrents
-	 */
-	setTorrentBgColors: function()
-	{
-		for (var i=0, row; row=this._rows[i]; ++i)
-			row.setEven((i+1) % 2 == 0);
-	},
-
 	updateStatusbar: function()
 	{
 		this.refreshFilterButton();
@@ -2036,6 +2027,7 @@ Transmission.prototype =
 		{
 			var is_selected = sel.indexOf(tor) !== -1;
 			var row = new TorrentRow(this.torrentRenderer, this, tor, is_selected);
+			row.setEven((i+1) % 2 == 0);
 			if (is_selected)
 				new_sel_count++;
 			if (!iPhone) {
@@ -2054,7 +2046,6 @@ Transmission.prototype =
 		this._torrent_list.appendChild(fragment);
 
 		// sync gui
-		this.setTorrentBgColors();
 		this.updateStatusbar();
 		if (sel.length !== new_sel_count)
 			this.selectionChanged();
