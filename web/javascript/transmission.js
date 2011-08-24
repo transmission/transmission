@@ -1881,7 +1881,7 @@ Transmission.prototype =
 			if( torrent_ids.indexOf( tid ) == -1 )
 				keep.push( row )
 			else {
-                removedAny = true
+				removedAny = true
 				delete this._torrents[ tid ]
 				$(row.getElement()).remove()
 			}
