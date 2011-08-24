@@ -644,26 +644,26 @@ Transmission.prototype =
 			tr.togglePeriodicRefresh (true);
 		}
 
-		var up_bytes        = parseInt($('#prefs_form #upload_rate'       )[0].value, 10);
-		var dn_bytes        = parseInt($('#prefs_form #download_rate'     )[0].value, 10);
-		var turtle_up_bytes = parseInt($('#prefs_form #turtle_upload_rate')[0].value, 10);
-		var turtle_dn_bytes = parseInt($('#prefs_form #turtle_download_rate')[0].value, 10);
+		var up_bytes        = parseInt($('#prefs_form #upload_rate').val(), 10);
+		var dn_bytes        = parseInt($('#prefs_form #download_rate').val(), 10);
+		var turtle_up_bytes = parseInt($('#prefs_form #turtle_upload_rate').val(), 10);
+		var turtle_dn_bytes = parseInt($('#prefs_form #turtle_download_rate').val(), 10);
 
 		// pass the new prefs upstream to the RPC server
 		var o = { };
 		o[RPC._StartAddedTorrent]    = $('#prefs_form #auto_start')[0].checked;
-		o[RPC._PeerPort]             = parseInt($('#prefs_form #port')[0].value, 10);
+		o[RPC._PeerPort]             = parseInt($('#prefs_form #port').val(), 10);
 		o[RPC._UpSpeedLimit]         = up_bytes;
 		o[RPC._DownSpeedLimit]       = dn_bytes;
-		o[RPC._DownloadDir]          = $('#prefs_form #download_location')[0].value;
-		o[RPC._UpSpeedLimited]       = $('#prefs_form #limit_upload')[0].checked;
-		o[RPC._DownSpeedLimited]     = $('#prefs_form #limit_download')[0].checked;
-		o[RPC._Encryption]           = $('#prefs_form #encryption')[0].checked
+		o[RPC._DownloadDir]          = $('#prefs_form #download_location').val();
+		o[RPC._UpSpeedLimited]       = $('#prefs_form #limit_upload').prop('checked');
+		o[RPC._DownSpeedLimited]     = $('#prefs_form #limit_download').prop('checked');
+		o[RPC._Encryption]           = $('#prefs_form #encryption').prop('checked')
 		                                   ? RPC._EncryptionRequired
 		                                   : RPC._EncryptionPreferred;
 		o[RPC._TurtleDownSpeedLimit] = turtle_dn_bytes;
 		o[RPC._TurtleUpSpeedLimit]   = turtle_up_bytes;
-		o[RPC._TurtleTimeEnabled]    = $('#prefs_form #turtle_schedule')[0].checked;
+		o[RPC._TurtleTimeEnabled]    = $('#prefs_form #turtle_schedule').prop('checked');
 		o[RPC._TurtleTimeBegin]      = parseInt($('#prefs_form #turtle_start_time').val(), 10);
 		o[RPC._TurtleTimeEnd]        = parseInt($('#prefs_form #turtle_end_time').val(), 10);
 		o[RPC._TurtleTimeDay]        = parseInt($('#prefs_form #turtle_days').val(), 10);
@@ -671,14 +671,14 @@ Transmission.prototype =
 
 		o[RPC._PeerLimitGlobal]      = parseInt($('#prefs_form #conn_global').val(), 10);
 		o[RPC._PeerLimitPerTorrent]  = parseInt($('#prefs_form #conn_torrent').val(), 10);
-		o[RPC._PexEnabled]           = $('#prefs_form #conn_pex')[0].checked;
-		o[RPC._DhtEnabled]           = $('#prefs_form #conn_dht')[0].checked;
-		o[RPC._LpdEnabled]           = $('#prefs_form #conn_lpd')[0].checked;
-		o[RPC._BlocklistEnabled]     = $('#prefs_form #block_enable')[0].checked;
+		o[RPC._PexEnabled]           = $('#prefs_form #conn_pex').prop('checked');
+		o[RPC._DhtEnabled]           = $('#prefs_form #conn_dht').prop('checked');
+		o[RPC._LpdEnabled]           = $('#prefs_form #conn_lpd').prop('checked');
+		o[RPC._BlocklistEnabled]     = $('#prefs_form #block_enable').prop('checked');
 		o[RPC._BlocklistURL]         = $('#prefs_form #block_url').val();
-		o[RPC._UtpEnabled]           = $('#prefs_form #network_utp')[0].checked;
-		o[RPC._PeerPortRandom]       = $('#prefs_form #port_rand')[0].checked;
-		o[RPC._PortForwardingEnabled]= $('#prefs_form #port_forward')[0].checked;
+		o[RPC._UtpEnabled]           = $('#prefs_form #network_utp').prop('checked');
+		o[RPC._PeerPortRandom]       = $('#prefs_form #port_rand').prop('checked');
+		o[RPC._PortForwardingEnabled]= $('#prefs_form #port_forward').prop('checked');
 
 		tr.remote.savePrefs(o);
 
@@ -881,49 +881,48 @@ Transmission.prototype =
 	/*
 	 * Process got some new session data from the server
 	 */
-	updatePrefs: function(prefs)
+	updatePrefs: function(p)
 	{
 		// remember them for later
-		this._prefs = prefs;
+		this._prefs = p;
 
-		var up_limited        = prefs[RPC._UpSpeedLimited];
-		var dn_limited        = prefs[RPC._DownSpeedLimited];
-		var up_limit_k        = prefs[RPC._UpSpeedLimit];
-		var dn_limit_k        = prefs[RPC._DownSpeedLimit];
-		var turtle_up_limit_k = prefs[RPC._TurtleUpSpeedLimit];
-		var turtle_dn_limit_k = prefs[RPC._TurtleDownSpeedLimit];
+		var up_limited        = p[RPC._UpSpeedLimited];
+		var dn_limited        = p[RPC._DownSpeedLimited];
+		var up_limit_k        = p[RPC._UpSpeedLimit];
+		var dn_limit_k        = p[RPC._DownSpeedLimit];
+		var turtle_up_limit_k = p[RPC._TurtleUpSpeedLimit];
+		var turtle_dn_limit_k = p[RPC._TurtleDownSpeedLimit];
 
-                if (prefs.units)
-                    Transmission.fmt.updateUnits(prefs.units);
+                if (p.units)
+                    Transmission.fmt.updateUnits(p.units);
 
-		$('div.download_location input')[0].value = prefs[RPC._DownloadDir];
-		$('div.port input')[0].value              = prefs[RPC._PeerPort];
-		$('div.auto_start input')[0].checked      = prefs[RPC._StartAddedTorrent];
-		$('input#limit_download')[0].checked      = dn_limited;
-		$('input#download_rate')[0].value         = dn_limit_k;
-		$('input#limit_upload')[0].checked        = up_limited;
-		$('input#upload_rate')[0].value           = up_limit_k;
-		$('input#refresh_rate')[0].value          = prefs[Prefs._RefreshRate];
-		$('div.encryption input')[0].checked      = prefs[RPC._Encryption] == RPC._EncryptionRequired;
-		$('input#turtle_download_rate')[0].value  = turtle_dn_limit_k;
-		$('input#turtle_upload_rate')[0].value    = turtle_up_limit_k;
-		$('input#turtle_schedule')[0].checked     = prefs[RPC._TurtleTimeEnabled];
-		$('select#turtle_start_time').val(        prefs[RPC._TurtleTimeBegin]);
-		$('select#turtle_end_time').val(          prefs[RPC._TurtleTimeEnd]);
-		$('select#turtle_days').val(              prefs[RPC._TurtleTimeDay]);
-		$('#transmission_version').text(          prefs[RPC._DaemonVersion]);
-		$('#conn_global').val(                    prefs[RPC._PeerLimitGlobal]);
-		$('#conn_torrent').val(                   prefs[RPC._PeerLimitPerTorrent]);
-		$('#conn_pex')[0].checked                 = prefs[RPC._PexEnabled];
-		$('#conn_dht')[0].checked                 = prefs[RPC._DhtEnabled];
-		$('#conn_lpd')[0].checked                 = prefs[RPC._LpdEnabled];
-		$('#block_enable')[0].checked             = prefs[RPC._BlocklistEnabled];
-		$('#block_url').val(                      prefs[RPC._BlocklistURL]);
-		$('#block_size').text(                    prefs[RPC._BlocklistSize] + ' IP rules in the list');
-		$('#network_utp')[0].checked              = prefs[RPC._UtpEnabled];
-		$('#port_rand')[0].checked                = prefs[RPC._PeerPortRandom];
-		$('#port_forward')[0].checked             = prefs[RPC._PortForwardingEnabled];
-
+		$('div.download_location input').val(      p[RPC._DownloadDir]);
+		$('div.port input').val(                   p[RPC._PeerPort]);
+		$('div.auto_start input').prop('checked',  p[RPC._StartAddedTorrent]);
+		$('input#limit_download').prop('checked',  dn_limited);
+		$('input#download_rate').val(              dn_limit_k);
+		$('input#limit_upload').prop('checked',    up_limited);
+		$('input#upload_rate').val(                up_limit_k);
+		$('input#refresh_rate').val(               p[Prefs._RefreshRate]);
+		$('div.encryption input').val(             p[RPC._Encryption] == RPC._EncryptionRequired);
+		$('input#turtle_download_rate').val(       turtle_dn_limit_k);
+		$('input#turtle_upload_rate').val(         turtle_up_limit_k);
+		$('input#turtle_schedule').prop('checked', p[RPC._TurtleTimeEnabled]);
+		$('select#turtle_start_time').val(         p[RPC._TurtleTimeBegin]);
+		$('select#turtle_end_time').val(           p[RPC._TurtleTimeEnd]);
+		$('select#turtle_days').val(               p[RPC._TurtleTimeDay]);
+		$('#transmission_version').text(           p[RPC._DaemonVersion]);
+		$('#conn_global').val(                     p[RPC._PeerLimitGlobal]);
+		$('#conn_torrent').val(                    p[RPC._PeerLimitPerTorrent]);
+		$('#conn_pex').prop('checked',             p[RPC._PexEnabled]);
+		$('#conn_dht').prop('checked',             p[RPC._DhtEnabled]);
+		$('#conn_lpd').prop('checked',             p[RPC._LpdEnabled]);
+		$('#block_enable').prop('checked',         p[RPC._BlocklistEnabled]);
+		$('#block_url').val(                       p[RPC._BlocklistURL]);
+		$('#block_size').text(                     p[RPC._BlocklistSize]+' IP rules in the list');
+		$('#network_utp').prop('checked',          p[RPC._UtpEnabled]);
+		$('#port_rand').prop('checked',            p[RPC._PeerPortRandom]);
+		$('#port_forward').prop('checked',         p[RPC._PortForwardingEnabled]);
 
 		if (!iPhone)
 		{
