@@ -2783,7 +2783,11 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     
     [fTableView setRowHeight: makeSmall ? ROW_HEIGHT_SMALL : ROW_HEIGHT_REGULAR];
     
+    if ([NSApp isOnLionOrBetter])
+        [fTableView beginUpdates];
     [fTableView noteHeightOfRowsWithIndexesChanged: [NSIndexSet indexSetWithIndexesInRange: NSMakeRange(0, [fTableView numberOfRows])]];
+    if ([NSApp isOnLionOrBetter])
+        [fTableView endUpdates];
     
     //resize for larger min height if not set to auto size
     if (![fDefaults boolForKey: @"AutoSize"])
