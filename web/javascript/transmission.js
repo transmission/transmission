@@ -1502,7 +1502,6 @@ Transmission.prototype =
 
 		this.setPref(Prefs._ShowInspector, true);
 		this.updateInspector();
-		this.refreshDisplay();
 	},
 
 	/*
@@ -1523,7 +1522,6 @@ Transmission.prototype =
 		}
 
 		this.setPref(Prefs._ShowInspector, false);
-		this.refreshDisplay();
 	},
 
 	refreshMetaData: function(ids) {
@@ -1670,12 +1668,6 @@ Transmission.prototype =
 				delete this._torrents[id];
 			this.refilter();
 		}
-	},
-
-	refreshDisplay: function()
-	{
-		for (var i=0, row; row=this._rows[i]; ++i)
-			row.render(this);
 	},
 
 	/*
@@ -2013,7 +2005,7 @@ Transmission.prototype =
 		if (!this.refilterTimer)
 		{
 			var tr = this;
-			this.refilterTimer = setTimeout(function() {tr.refilter();}, 200);
+			this.refilterTimer = setTimeout(function() {tr.refilter();}, 500);
 		}
 	},
 
@@ -2057,7 +2049,7 @@ Transmission.prototype =
 			fragment.appendChild(row.getElement());
 			rows.push(row);
 		}
-		$('ul.torrent_list li').remove();
+		$('ul.torrent_list').empty();
 		delete this._rows;
 		this._rows = rows;
 		this._torrent_list.appendChild(fragment);
@@ -2067,7 +2059,6 @@ Transmission.prototype =
 		this.updateStatusbar();
 		if (sel.length !== new_sel_count)
 			this.selectionChanged();
-		this.refreshDisplay();
 		this.refreshFilterButton();
 	},
 

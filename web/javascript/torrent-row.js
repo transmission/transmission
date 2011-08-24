@@ -63,10 +63,12 @@ TorrentRendererHelper.renderProgressbar = function(controller, t, progressbar)
 	var e;
 	e = progressbar.complete;
 	e.style.width = '' + info.percent + "%";
-	e.className = info.complete;
+	if (e.className !== info.complete)
+		e.className = info.complete;
 	e.style.display = info.percent<=0 ? 'none' : 'block';
 	e = progressbar.incomplete;
-	e.className = info.incomplete;
+	if (e.className !== info.incomplete)
+		e.className = info.incomplete;
 	e.style.display = info.percent>=100 ? 'none' : 'block';
 };
 
