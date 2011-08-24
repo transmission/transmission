@@ -263,6 +263,7 @@ static tr_option opts[] =
     { 'n', "auth",                   "Set username and password", "n",  1, "<user:pw>" },
     { 810, "authenv",                "Set authentication info from the TR_AUTH environment variable (user:pw)", "ne", 0, NULL },
     { 'N', "netrc",                  "Set authentication info from a .netrc file", "N",  1, "<file>" },
+    { 820, "ssl",                    "Use SSL when talking to daemon", NULL,  0, NULL },
     { 'o', "dht",                    "Enable distributed hash tables (DHT)", "o", 0, NULL },
     { 'O', "no-dht",                 "Disable distributed hash tables (DHT)", "O", 0, NULL },
     { 'p', "port",                   "Port for incoming peers (Default: " TR_DEFAULT_PEER_PORT_STR ")", "p", 1, "<port>" },
@@ -363,6 +364,7 @@ getOptMode( int val )
         case 'n': /* auth */
         case 810: /* authenv */
         case 'N': /* netrc */
+        case 820: /* UseSSL */
         case 't': /* set current torrent */
         case 'V': /* show version number */
             return 0;
@@ -489,6 +491,7 @@ static bool debug = 0;
 static char * auth = NULL;
 static char * netrc = NULL;
 static char * sessionId = NULL;
+static bool UseSSL = false;
 
 static char*
 tr_getcwd( void )
@@ -1731,6 +1734,8 @@ tr_curl_easy_init( struct evbuffer * writebuf )
         curl_easy_setopt( curl, CURLOPT_NETRC_FILE, netrc );
     if( auth )
         curl_easy_setopt( curl, CURLOPT_USERPWD, auth );
+    if( UseSSL )
+        curl_easy_setopt( curl, CURLOPT_SSL_VERIFYPEER, 0 ); /* since most certs will be self-signed, do not verify against CA */		
     if( sessionId ) {
         char * h = tr_strdup_printf( "%s: %s", TR_RPC_SESSION_ID_HEADER, sessionId );
         struct curl_slist * custom_headers = curl_slist_append( NULL, h );
@@ -1748,9 +1753,10 @@ flush( const char * rpcurl, tr_benc ** benc )
     int status = EXIT_SUCCESS;
     struct evbuffer * buf = evbuffer_new( );
     char * json = tr_bencToStr( *benc, TR_FMT_JSON_LEAN, NULL );
+    char *rpcurl_http =  tr_strdup_printf( UseSSL? "https://%s" : "http://%s", rpcurl );
 
     curl = tr_curl_easy_init( buf );
-    curl_easy_setopt( curl, CURLOPT_URL, rpcurl );
+    curl_easy_setopt( curl, CURLOPT_URL, rpcurl_http );
     curl_easy_setopt( curl, CURLOPT_POSTFIELDS, json );
     curl_easy_setopt( curl, CURLOPT_TIMEOUT, getTimeoutSecs( json ) );
 
@@ -1759,7 +1765,7 @@ flush( const char * rpcurl, tr_benc ** benc )
 
     if(( res = curl_easy_perform( curl )))
     {
-        tr_nerr( MY_NAME, "(%s) %s", rpcurl, curl_easy_strerror( res ) );
+        tr_nerr( MY_NAME, "(%s) %s", rpcurl_http, curl_easy_strerror( res ) );
         status |= EXIT_FAILURE;
     }
     else
@@ -1787,6 +1793,7 @@ flush( const char * rpcurl, tr_benc ** benc )
     }
 
     /* cleanup */
+    tr_free( rpcurl_http );
     tr_free( json );
     evbuffer_free( buf );
     if( curl != 0 )
@@ -1884,6 +1891,10 @@ processArgs( const char * rpcurl, int argc, const char ** argv )
 
                 case 'N': /* netrc */
                     netrc = tr_strdup( optarg );
+                    break;
+
+                case 820: /* UseSSL */
+                    UseSSL = true;
                     break;
 
                 case 't': /* set current torrent */
@@ -2375,7 +2386,7 @@ main( int argc, char ** argv )
     if( host == NULL )
         host = tr_strdup( DEFAULT_HOST );
     if( rpcurl == NULL )
-        rpcurl = tr_strdup_printf( "http://%s:%d%s", host, port, DEFAULT_URL );
+        rpcurl = tr_strdup_printf( "%s:%d%s", host, port, DEFAULT_URL );
 
     exit_status = processArgs( rpcurl, argc, (const char**)argv );
 
