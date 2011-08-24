@@ -2199,7 +2199,7 @@ Transmission.prototype =
 					var uri = parseUri(tracker.announce);
 					var domain = this.getDomainName(uri.host);
 					var name = this.getReadableDomain(domain);
-					if (!(name in trackers));
+					if (!(name in trackers))
 						trackers[name] = { 'uri': uri, 'domain': domain, 'count': 0 };
 					if (names.indexOf(name) === -1)
 						names.push(name);
