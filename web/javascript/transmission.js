@@ -1361,7 +1361,7 @@ Transmission.prototype =
 					           '<td>', (peer.rateToPeer ? fmt.speedBps(peer.rateToPeer) : ''), '</td>',
 					           '<td>', (peer.rateToClient ? fmt.speedBps(peer.rateToClient) : ''), '</td>',
 					           '<td class="percentCol">', Math.floor(peer.progress*100), '%', '</td>',
-					           '<td>', peer.flagStr, '</td>',
+					           '<td>', fmt.peerStatus(peer.flagStr), '</td>',
 					           '<td>', peer.address, '</td>',
 					           '<td class="clientCol">', peer.clientName, '</td>',
 					           '</tr>');

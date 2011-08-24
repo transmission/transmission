@@ -269,6 +269,37 @@ Transmission.fmt = (function()
 		plural: function(i, word)
 		{
 			return [ i, ' ', word, (word==1?'':'s') ].join('');
-		}
+		},
+
+		peerStatus: function( flagStr ) 
+		{ 
+			var formattedFlags = []; 
+			for (var i=0, flag; flag=flagStr[i]; ++i)
+			{
+				var explanation = null;
+				switch (flag)
+				{
+					case "O": explanation = "Optimistic unchoke"; break;
+					case "D": explanation = "Downloading from this peer"; break;
+					case "d": explanation = "We would download from this peer if they'd let us"; break;
+					case "U": explanation = "Uploading to peer"; break;
+					case "u": explanation = "We would upload to this peer if they'd ask"; break;
+					case "K": explanation = "Peer has unchoked us, but we're not interested"; break;
+					case "?": explanation = "We unchoked this peer, but they're not interested"; break;
+					case "E": explanation = "Encrypted Connection"; break;
+					case "H": explanation = "Peer was discovered through Distributed Hash Table (DHT)"; break;
+					case "X": explanation = "Peer was discovered through Peer Exchange (PEX)"; break;
+					case "I": explanation = "Peer is an incoming connection"; break;
+					case "T": explanation = "Peer is connected via uTP"; break;
+				}
+
+				if( explanation == null ) { 
+					formattedFlags.push(flag); 
+				} else { 
+					formattedFlags.push("<span title=\"" + flag + ': ' + explanation + "\">" + flag + "</span>"); 
+				} 
+			} 
+			return formattedFlags.join(''); 
+		},
 	}
 })();
