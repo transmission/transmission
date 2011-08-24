@@ -934,9 +934,9 @@ Transmission.prototype =
 			$(key).deselectMenuSiblings().selectMenuItem();
 		}
 
-		this[Prefs._TurtleState] = prefs[RPC._TurtleState];
+		this[Prefs._TurtleState] = p[RPC._TurtleState];
 		this.updateTurtleButton();
-		this.setCompactMode(prefs[Prefs._CompactDisplayState]);
+		this.setCompactMode(p[Prefs._CompactDisplayState]);
 	},
 
 	updatePortStatus: function(status) {
@@ -1660,7 +1660,7 @@ Transmission.prototype =
 	{
 		if (torrent_ids && torrent_ids.length)
 		{
-			for (var i=0, id; i=torrent_ids[i]; ++i)
+			for (var i=0, id; id=torrent_ids[i]; ++i)
 				delete this._torrents[id];
 			this.refilter();
 		}
