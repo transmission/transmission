@@ -734,7 +734,7 @@ Transmission.prototype =
 		for (var i=0, row; row=this._files[i]; ++i)
 			if (row.isEditable() && (torrent._files[i].wanted !== wanted))
 				rows.push(row);
-		if (rows.length > 1) {
+		if (rows.length > 0) {
 			var command = wanted ? 'files-wanted' : 'files-unwanted';
 			this.changeFileCommand(command, rows);
 		}
