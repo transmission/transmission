@@ -1866,23 +1866,23 @@ Transmission.prototype =
 	// Queue
 	moveTop: function() {
 		var tr = this;
-		var ids = this.getSelectedTorrentIds();
-		this.remote.moveTorrentsToTop(torrent_ids, function() { tr.refreshTorrents(ids);});
+		var torrent_ids = this.getSelectedTorrentIds();
+		this.remote.moveTorrentsToTop(torrent_ids, function() { tr.refreshTorrents(torrent_ids);});
 	},
 	moveUp: function() {
 		var tr = this;
-		var ids = this.getSelectedTorrentIds();
-		this.remote.moveTorrentsUp(torrent_ids, function() { tr.refreshTorrents(ids);});
+		var torrent_ids = this.getSelectedTorrentIds();
+		this.remote.moveTorrentsUp(torrent_ids, function() { tr.refreshTorrents(torrent_ids);});
 	},
 	moveDown: function() {
 		var tr = this;
-		var ids = this.getSelectedTorrentIds();
-		this.remote.moveTorrentsDown(torrent_ids, function() { tr.refreshTorrents(ids);});
+		var torrent_ids = this.getSelectedTorrentIds();
+		this.remote.moveTorrentsDown(torrent_ids, function() { tr.refreshTorrents(torrent_ids);});
 	},
 	moveBottom: function() {
 		var tr = this;
-		var ids = this.getSelectedTorrentIds();
-		this.remote.moveTorrentsToBottom(torrent_ids, function() { tr.refreshTorrents(ids);});
+		var torrent_ids = this.getSelectedTorrentIds();
+		this.remote.moveTorrentsToBottom(torrent_ids, function() { tr.refreshTorrents(torrent_ids);});
 	},
 
 
