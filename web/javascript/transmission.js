@@ -1873,6 +1873,7 @@ Transmission.prototype =
 
 		var keep = [ ]
 		var elements = [ ]
+		var removedAny = false
 
 		for(var i=0, row; row=this._rows[i]; ++i) {
 			var tor = row.getTorrent()
@@ -1880,6 +1881,7 @@ Transmission.prototype =
 			if( torrent_ids.indexOf( tid ) == -1 )
 				keep.push( row )
 			else {
+                removedAny = true
 				delete this._torrents[ tid ]
 				$(row.getElement()).remove()
 			}
@@ -1887,7 +1889,7 @@ Transmission.prototype =
 
 		this._rows = keep
 
-		return remove.length > 0
+		return removedAny
 	},
 
 	refreshDisplay: function( )
