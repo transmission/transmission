@@ -390,9 +390,11 @@ Torrent.compareByActivity = function(ta, tb)
 };
 Torrent.compareByRatio = function(ta, tb)
 {
-	var a = Math.ratio(ta.getUploadedEver(), ta.getDownloadedEver());
-	var b = Math.ratio(tb.getUploadedEver(), tb.getDownloadedEver());
-	return (a - b) || Torrent.compareByState(ta, tb);
+	var a = ta.getUploadRatio();
+	var b = tb.getUploadRatio();
+	if (a < b) return 1;
+	if (a > b) return -1;
+	return Torrent.compareByState(ta, tb);
 };
 Torrent.compareByProgress = function(ta, tb)
 {
