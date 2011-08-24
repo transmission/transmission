@@ -143,7 +143,7 @@ Transmission.prototype =
 	loadDaemonPrefs: function(async) {
 		var tr = this;
 		this.remote.loadDaemonPrefs(function(data) {
-			var o = data.arguments;
+			var o = data['arguments'];
 			Prefs.getClutchPrefs(o);
 			tr.updatePrefs(o);
 		}, async);
@@ -152,17 +152,15 @@ Transmission.prototype =
 	loadDaemonStats: function(async) {
 		var tr = this;
 		this.remote.loadDaemonStats(function(data) {
-			var o = data.arguments;
-			tr.updateStats(o);
+			tr.updateStats(data['arguments']);
 		}, async);
 	},
 	checkPort: function(async) {
 		$('#port_test').text('checking ...');
 		var tr = this;
 		this.remote.checkPort(function(data) {
-			var o = data.arguments;
-			tr.updatePortStatus(o);
-		}, async);		
+			tr.updatePortStatus(data['arguments']);
+		}, async);
 	},
 
 	preloadImages: function() {
@@ -503,7 +501,7 @@ Transmission.prototype =
 		{
 			var rows = this._rows;
 
-			// find the first selected row	
+			// find the first selected row
 			for (var i=0, row; row=rows[i]; ++i)
 				if (row.isSelected())
 					break;
@@ -635,7 +633,6 @@ Transmission.prototype =
 
 	savePrefsClicked: function()
 	{
-		
 		// handle the clutch prefs locally
 		var tr = this;
 		var rate = parseInt ($('#prefs_form #refresh_rate')[0].value, 10);
@@ -686,7 +683,7 @@ Transmission.prototype =
 	},
 	blocklistUpdateClicked: function() {
 		var tr = this;
-		tr.remote.updateBlocklist();	
+		tr.remote.updateBlocklist();
 	},
 
 	closeStatsClicked: function() {
