@@ -29,8 +29,8 @@ Dialog.prototype = {
 		this._callback_data = null;
 		
 		// Observe the buttons
-		this._cancel_button.bind('click', {dialog: this}, this.onCancelClicked );
-		this._confirm_button.bind('click', {dialog: this}, this.onConfirmClicked );
+		this._cancel_button.bind('click', {dialog: this}, this.onCancelClicked);
+		this._confirm_button.bind('click', {dialog: this}, this.onConfirmClicked);
 	},
 
 
@@ -43,7 +43,7 @@ Dialog.prototype = {
      *
      *--------------------------------------------*/
 
-	hideDialog: function( )
+	hideDialog: function()
 	{
 		$('body.dialog_showing').removeClass('dialog_showing');
 		if (Safari3) {
@@ -56,16 +56,16 @@ Dialog.prototype = {
 		transmission.updateButtonStates();
 	},
 
-	onCancelClicked: function( event )
+	onCancelClicked: function(event)
 	{
-		event.data.dialog.hideDialog( );
+		event.data.dialog.hideDialog();
 	},
 
-	onConfirmClicked: function( event )
+	onConfirmClicked: function(event)
 	{
 		var dialog = event.data.dialog;
-		eval( dialog._callback_function + "(dialog._callback_data)" );
-		dialog.hideDialog( );
+		eval(dialog._callback_function + "(dialog._callback_data)");
+		dialog.hideDialog();
 	},
 
     /*--------------------------------------------
@@ -86,10 +86,10 @@ Dialog.prototype = {
 		} else if (!iPhone) {
 			$('.dialog_container').hide();
 		}
-		setInnerHTML( this._heading[0], dialog_heading );
-		setInnerHTML( this._message[0], dialog_message );
-		setInnerHTML( this._cancel_button[0], (cancel_button_label == null) ? 'Cancel' : cancel_button_label );
-		setInnerHTML( this._confirm_button[0], confirm_button_label );
+		setInnerHTML(this._heading[0], dialog_heading);
+		setInnerHTML(this._message[0], dialog_message);
+		setInnerHTML(this._cancel_button[0], (cancel_button_label == null) ? 'Cancel' : cancel_button_label);
+		setInnerHTML(this._confirm_button[0], confirm_button_label);
 		this._confirm_button.show();
 		this._callback_function = callback_function;
 		this._callback_data = callback_data;
@@ -115,11 +115,11 @@ Dialog.prototype = {
 		} else if (!iPhone) {
 			$('.dialog_container').hide();
 		}
-		setInnerHTML( this._heading[0], dialog_heading );
-		setInnerHTML( this._message[0], dialog_message );
+		setInnerHTML(this._heading[0], dialog_heading);
+		setInnerHTML(this._message[0], dialog_message);
 		// jquery::hide() doesn't work here in Safari for some odd reason
 		this._confirm_button.css('display', 'none');
-		setInnerHTML( this._cancel_button[0], cancel_button_label );
+		setInnerHTML(this._cancel_button[0], cancel_button_label);
 		// Just in case
 		if (!iPhone && Safari3) {
 			$('div#upload_container div.dialog_window').css('top', '-205px');

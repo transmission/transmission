@@ -8,7 +8,6 @@
 
 var transmission;
 var dialog;
-var resizeTimer = null;
 // Test for a Webkit build that supports box-shadow: 521+ (release Safari 3 is
 // actually 523.10.3). We need 3.1 for CSS animation (dialog sheets) but as it
 // degrades gracefully let's not worry too much.
@@ -16,11 +15,11 @@ var Safari3 = testSafari3();
 var iPhone = RegExp("(iPhone|iPod|Android)").test(navigator.userAgent);
 if (iPhone) var scroll_timeout;
 
-if(!Array.indexOf){
+if (!Array.indexOf){
 	Array.prototype.indexOf = function(obj){
 		var i, len;
-		for(i=0, len=this.length; i<len; i++)
-			if(this[i]==obj)
+		for (i=0, len=this.length; i<len; i++)
+			if (this[i]==obj)
 				return i;
 		return -1;
 	}
@@ -29,7 +28,7 @@ if(!Array.indexOf){
 function testSafari3()
 {
 	var minimum = new Array(521,0);
-	var webKitFields = RegExp("( AppleWebKit/)([^ ]+)").exec(navigator.userAgent);
+	var webKitFields = RegExp("(AppleWebKit/)([^ ]+)").exec(navigator.userAgent);
 	if (!webKitFields || webKitFields.length < 3) return false;
 	var version = webKitFields[2].split(".");
 	for (var i = 0; i < minimum.length; i++) {
@@ -43,7 +42,7 @@ function testSafari3()
 	return true;
 };
 
-$(document).ready( function() {
+$(document).ready(function() {
 	// Initialise the dialog controller
 	dialog = new Dialog();
 
@@ -83,20 +82,13 @@ $(document).ready( function() {
 	}
 	if (iPhone){
 		window.onload = function(){ setTimeout(function() { window.scrollTo(0,1); },500); };
-		window.onorientationchange = function(){ setTimeout( function() { window.scrollTo(0,1); },100); };
-		if(window.navigator.standalone)
+		window.onorientationchange = function(){ setTimeout(function() { window.scrollTo(0,1); },100); };
+		if (window.navigator.standalone)
 			// Fix min height for iPhone when run in full screen mode from home screen
 			// so the footer appears in the right place
 			$('body div#torrent_container').css('min-height', '338px');
 		$("label[for=torrent_upload_url]").text("URL: ");
 	}
-
-	// Add resize event handler with a timeout to handle browsers that fire a
-	// resize event for every pixel changed
-	$(window).bind('resize', function() {
-		if (resizeTimer) clearTimeout(resizeTimer);
-		resizeTimer = setTimeout('transmission.refreshDisplay()', 50)
-		});
 });
 
 /*
@@ -113,15 +105,15 @@ Array.prototype.clone = function () {
  * changes are triggered by periodic refreshes on torrents whose state hasn't
  * changed since the last update, so even this simple test helps a lot.
  */
-function setInnerHTML( e, html )
+function setInnerHTML(e, html)
 {
-	if( e == undefined )
+	if (e == undefined)
 		return;
 
 	/* innerHTML is listed as a string, but the browser seems to change it.
 	 * For example, "&infin;" gets changed to "∞" somewhere down the line.
 	 * So, let's use an arbitrary  different field to test our state... */
-	if( e.currentHTML != html )
+	if (e.currentHTML != html)
 	{
 		e.currentHTML = html;
 		e.innerHTML = html;
@@ -131,12 +123,12 @@ function setInnerHTML( e, html )
 /*
  *   Given a numerator and denominator, return a ratio string
  */
-Math.ratio = function( numerator, denominator ) {
+Math.ratio = function(numerator, denominator) {
 	var result = Math.floor(100 * numerator / denominator) / 100;
 
 	// check for special cases
-	if(result==Number.POSITIVE_INFINITY || result==Number.NEGATIVE_INFINITY) result = -2;
-	else if(isNaN(result)) result = -1;
+	if (result==Number.POSITIVE_INFINITY || result==Number.NEGATIVE_INFINITY) result = -2;
+	else if (isNaN(result)) result = -1;
 
 	return result;
 };
@@ -150,16 +142,16 @@ Math.ratio = function( numerator, denominator ) {
  *   @returns float
  */
 Math.truncateWithPrecision = function(floatnum, precision) {
-	return Math.floor( floatnum * Math.pow ( 10, precision ) ) / Math.pow( 10, precision );
+	return Math.floor(floatnum * Math.pow (10, precision)) / Math.pow(10, precision);
 };
 
 /*
  *   Round a string of a number to a specified number of decimal
  *   places
  */
-Number.prototype.toTruncFixed = function( place ) {
-	var ret = Math.truncateWithPrecision( this, place );
-	return ret.toFixed( place );
+Number.prototype.toTruncFixed = function(place) {
+	var ret = Math.truncateWithPrecision(this, place);
+	return ret.toFixed(place);
 }
 
 /*
@@ -172,10 +164,10 @@ String.prototype.trim = function () {
 /**
  * @brief strcmp()-style compare useful for sorting
  */
-String.prototype.compareTo = function( that ) {
+String.prototype.compareTo = function(that) {
 	// FIXME: how to fold these two comparisons together?
-	if( this < that ) return -1;
-	if( this > that ) return 1;
+	if (this < that) return -1;
+	if (this > that) return 1;
 	return 0;
 }
 
@@ -183,7 +175,7 @@ String.prototype.compareTo = function( that ) {
  * @brief Switch between different dialog tabs
  */
 function changeTab(tab, id) {
-	for ( var x = 0, node; tab.parentNode.childNodes[x]; x++ ) {
+	for (var x = 0, node; tab.parentNode.childNodes[x]; x++) {
 		node = tab.parentNode.childNodes[x];
 		if (node == tab) {
 			node.className = "prefs_tab_enabled";
@@ -191,7 +183,7 @@ function changeTab(tab, id) {
 			node.className = "prefs_tab_disabled";
 		}
 	}
-	for ( x = 0; tab.parentNode.parentNode.childNodes[x]; x++ ) {
+	for (x = 0; tab.parentNode.parentNode.childNodes[x]; x++) {
 		node = tab.parentNode.parentNode.childNodes[x];
 		if (node.tagName == "DIV") {
 			if (node.id == id) {
@@ -212,8 +204,6 @@ Prefs.prototype = { };
 
 Prefs._RefreshRate        = 'refresh_rate';
 Prefs._SessionRefreshRate = 'session_refresh_rate';
-
-Prefs._ShowFilter         = 'show_filter';
 
 Prefs._ShowInspector      = 'show_inspector';
 
@@ -257,10 +247,10 @@ Prefs._Defaults =
 /*
  * Set a preference option
  */
-Prefs.setValue = function( key, val )
+Prefs.setValue = function(key, val)
 {
-	if( Prefs._Defaults[key] == undefined )
-		console.warn( "unrecognized preference key '%s'", key );
+	if (Prefs._Defaults[key] == undefined)
+		console.warn("unrecognized preference key '%s'", key);
 
 	var days = 30;
 	var date = new Date();
@@ -274,25 +264,25 @@ Prefs.setValue = function( key, val )
  * @param key the preference's key
  * @param fallback if the option isn't set, return this instead
  */
-Prefs.getValue = function( key, fallback )
+Prefs.getValue = function(key, fallback)
 {
 	var val;
 
-	if( Prefs._Defaults[key] == undefined )
-		console.warn( "unrecognized preference key '%s'", key );
+	if (Prefs._Defaults[key] == undefined)
+		console.warn("unrecognized preference key '%s'", key);
 
-	var lines = document.cookie.split( ';' );
-	for( var i=0, len=lines.length; !val && i<len; ++i ) {
-		var line = lines[i].trim( );
-		var delim = line.indexOf( '=' );
-		if( ( delim == key.length ) && line.indexOf( key ) == 0 )
-			val = line.substring( delim + 1 );
+	var lines = document.cookie.split(';');
+	for (var i=0, len=lines.length; !val && i<len; ++i) {
+		var line = lines[i].trim();
+		var delim = line.indexOf('=');
+		if ((delim == key.length) && line.indexOf(key) == 0)
+			val = line.substring(delim + 1);
 	}
 
 	// FIXME: we support strings and booleans... add number support too?
-	if( !val ) val = fallback;
-	else if( val == 'true' ) val = true;
-	else if( val == 'false' ) val = false;
+	if (!val) val = fallback;
+	else if (val == 'true') val = true;
+	else if (val == 'false') val = false;
 	return val;
 };
 
@@ -301,12 +291,12 @@ Prefs.getValue = function( key, fallback )
  *
  * @pararm o object to be populated (optional)
  */
-Prefs.getClutchPrefs = function( o )
+Prefs.getClutchPrefs = function(o)
 {
-	if( !o )
+	if (!o)
 		o = { };
-	for( var key in Prefs._Defaults )
-		o[key] = Prefs.getValue( key, Prefs._Defaults[key] );
+	for (var key in Prefs._Defaults)
+		o[key] = Prefs.getValue(key, Prefs._Defaults[key]);
 	return o;
 };
 
@@ -334,3 +324,40 @@ jQuery.fn.forceNumeric = function () {
 		});
 	});
 }
+
+
+/**
+ * http://blog.stevenlevithan.com/archives/parseuri
+ *
+ * parseUri 1.2.2
+ * (c) Steven Levithan <stevenlevithan.com>
+ * MIT License
+ */
+function parseUri (str) {
+	var	o   = parseUri.options,
+		m   = o.parser[o.strictMode ? "strict" : "loose"].exec(str),
+		uri = {},
+		i   = 14;
+
+	while (i--) uri[o.key[i]] = m[i] || "";
+
+	uri[o.q.name] = {};
+	uri[o.key[12]].replace(o.q.parser, function ($0, $1, $2) {
+		if ($1) uri[o.q.name][$1] = $2;
+	});
+
+	return uri;
+};
+
+parseUri.options = {
+	strictMode: false,
+	key: ["source","protocol","authority","userInfo","user","password","host","port","relative","path","directory","file","query","anchor"],
+	q:   {
+		name:   "queryKey",
+		parser: /(?:^|&)([^&=]*)=?([^&]*)/g
+	},
+	parser: {
+		strict: /^(?:([^:\/?#]+):)?(?:\/\/((?:(([^:@]*)(?::([^:@]*))?)?@)?([^:\/?#]*)(?::(\d*))?))?((((?:[^?#\/]*\/)*)([^?#]*))(?:\?([^#]*))?(?:#(.*))?)/,
+		loose:  /^(?:(?![^:@]+:[^:@\/]*@)([^:\/?#.]+):)?(?:\/\/)?((?:(([^:@]*)(?::([^:@]*))?)?@)?([^:\/?#]*)(?::(\d*))?)(((\/(?:[^?#](?![^?#\/]*\.[^?#\/.]+(?:[?#]|$)))*\/?)?([^?#\/]*))(?:\?([^#]*))?(?:#(.*))?)/
+	}
+};

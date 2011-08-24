@@ -4,48 +4,48 @@
  *   <http://www.gnu.org/licenses/old-licenses/gpl-2.0.html>
  */
 
-function FileRow( controller, torrent, i )
+function FileRow(torrent, i)
 {
-        this.initialize( controller, torrent, i );
+        this.initialize(torrent, i);
 }
 
 FileRow.prototype =
 {
-	initialize: function( controller, torrent, i )
+	initialize: function(torrent, i)
 	{
 		this._torrent = torrent;
 		this._index = i;
-		this.createRow( torrent, i );
+		this.createRow(torrent, i);
 	},
 
-	getTorrent: function( )
+	getTorrent: function()
 	{
 		return this._torrent;
 	},
-	getIndex: function( )
+	getIndex: function()
 	{
 		return this._index;
 	},
 
         readAttributes: function(file)
 	{
-                if( file.index !== undefined && file.index !== this._index ) {
+                if (file.index !== undefined && file.index !== this._index) {
                         this._index = file.index;
                         this._dirty = true;
                 }
-                if( file.bytesCompleted !== undefined && file.bytesCompleted !== this._done ) {
+                if (file.bytesCompleted !== undefined && file.bytesCompleted !== this._done) {
                         this._done   = file.bytesCompleted;
                         this._dirty = true;
                 }
-                if( file.length !== undefined && file.length !== this._size ) {
+                if (file.length !== undefined && file.length !== this._size) {
                         this._size   = file.length;
                         this._dirty = true;
                 }
-                if( file.priority !== undefined && file.priority !== this._prio ) {
+                if (file.priority !== undefined && file.priority !== this._prio) {
                         this._prio   = file.priority;
                         this._dirty = true;
                 }
-                if( file.wanted !== undefined && file.wanted !== this._wanted ) {
+                if (file.wanted !== undefined && file.wanted !== this._wanted) {
                         this._wanted = file.wanted;
                         this._dirty = true;
                 }
@@ -54,22 +54,22 @@ FileRow.prototype =
         refreshWantedHTML: function() {
                 var e = this.getElement();
                 var c = [ e.classNameConst ];
-                if(!this._wanted) { c.push( 'skip' ); }
-                if(this.isDone()) { c.push( 'complete' ); }
+                if (!this._wanted) { c.push('skip'); }
+                if (this.isDone()) { c.push('complete'); }
                 e.className = c.join(' ');
         },
         refreshPriorityHTML: function() {
                 var e = this._priority_control;
                 var c = [ e.classNameConst ];
-                switch( this._prio ) {
-                        case 1  : c.push( 'high'   ); break;
-                        case -1 : c.push( 'low'    ); break;
-                        default : c.push( 'normal' ); break;
+                switch(this._prio) {
+                        case -1 : c.push('low'); break;
+                        case 1  : c.push('high'); break;
+                        default : c.push('normal'); break;
                 }
                 e.className = c.join(' ');
         },
         refreshProgressHTML: function() {
-		var pct = 100 * (this._size ? ( this._done / this._size ) : 1.0);
+		var pct = 100 * (this._size ? (this._done / this._size) : 1.0);
                 var c = [ Transmission.fmt.size(this._done),
                           ' of ',
                           Transmission.fmt.size(this._size),
@@ -79,18 +79,18 @@ FileRow.prototype =
                 setInnerHTML(this._progress[0], c);
         },
         refreshHTML: function() {
-                if( this._dirty ) {
+                if (this._dirty) {
                         this._dirty = false;
                         this.refreshProgressHTML();
                         this.refreshWantedHTML();
                         this.refreshPriorityHTML();
                 }
         },
-	refresh: function( )
+	refresh: function()
 	{
-		var i = this.getIndex( );
-		var t = this.getTorrent( );
-		this.readAttributes( t._files[i] );
+		var i = this.getIndex();
+		var t = this.getTorrent();
+		this.readAttributes(t._files[i]);
 		this.refreshHTML();
 	},
 
@@ -101,7 +101,7 @@ FileRow.prototype =
                 return (this.getTorrent()._files.length>1) && !this.isDone();
         },
 
-        createRow: function( torrent, i )
+        createRow: function(torrent, i)
 	{
 		var me = this;
 		var file = torrent._files[i];
@@ -114,7 +114,7 @@ FileRow.prototype =
 
                 var wanted_div = document.createElement('div');
                 wanted_div.className = "file_wanted_control";
-                $(wanted_div).bind('click',function(e){ me.fireWantedChanged( !me._wanted ); });
+                $(wanted_div).bind('click',function(){ me.fireWantedChanged(!me._wanted); });
 
                 var pri_div = document.createElement('div');
                 pri_div.classNameConst = "file_priority_control";
@@ -122,21 +122,21 @@ FileRow.prototype =
                 $(pri_div).bind('click',function(ev){
 			var x = ev.pageX;
 			var e = ev.target;
-			while (e !== null) {
+			while (e) {
 				x -= e.offsetLeft;
 				e = e.offsetParent;
 			}
 			var prio;
-			if(iPhone) {
-				if( x < 8 ) prio = -1;
-				else if( x < 27 ) prio = 0;
+			if (iPhone) {
+				if (x < 8) prio = -1;
+				else if (x < 27) prio = 0;
 				else prio = 1;
 			} else {
-				if( x < 12 ) prio = -1;
-				else if( x < 23 ) prio = 0;
+				if (x < 12) prio = -1;
+				else if (x < 23) prio = 0;
 				else prio = 1;
 			}
-			me.firePriorityChanged( prio );
+			me.firePriorityChanged(prio);
 		});
 
                 var file_div = document.createElement('div');
@@ -159,16 +159,16 @@ FileRow.prototype =
 		return root;
         },
 
-	getElement: function( )
+	getElement: function()
 	{
 		return this._element;
 	},
 
-        fireWantedChanged: function( do_want )
+        fireWantedChanged: function(do_want)
         {
                 $(this).trigger('wantedToggled',[ this, do_want ]);
         },
-        firePriorityChanged: function( priority )
+        firePriorityChanged: function(priority)
         {
                 $(this).trigger('priorityToggled',[ this, priority ]);
         }

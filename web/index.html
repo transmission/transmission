@@ -9,13 +9,17 @@
 		<link href="./images/favicon.png" rel="shortcut icon" />
 		<link rel="apple-touch-icon" href="./images/webclip-icon.png"/>
 		<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
+		<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.min.js"></script>
+		<link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/themes/base/jquery-ui.css" type="text/css" media="all" /> 
+<!--
+		<link media="screen" href="./stylesheets/iphone.css" type= "text/css" rel="stylesheet" />
+-->
 		<link media="only screen and (max-device-width: 480px)" href="./stylesheets/iphone.css" type= "text/css" rel="stylesheet" />
 		<link media="screen and (min-device-width: 481px)" href="./stylesheets/common.css" type="text/css" rel="stylesheet" />
 		<!--[if IE]>
 			<link media="screen" href="./stylesheets/common.css" type="text/css" rel="stylesheet" />
 			<link media="screen" href="./stylesheets/ieAll.css" type="text/css" rel="stylesheet" />
 		<![endif]-->
-		<!--[if IE 6]><link media="screen" href="./stylesheets/ie6.css" type="text/css" rel="stylesheet" /><![endif]-->
 		<!--[if IE 7]><link media="screen" href="./stylesheets/ie7.css" type="text/css" rel="stylesheet" /><![endif]-->
 		<script type="text/javascript" src="./javascript/jquery/jquery.transmenu.min.js"></script>
 		<script type="text/javascript" src="./javascript/jquery/jquery.contextmenu.min.js"></script>
@@ -34,7 +38,7 @@
 	</head>
 	<body id="transmission_body">
 
-		<div class="torrent_global_menu">
+		<div id="toolbar">
 			<ul>
 				<li id="open"><div id="open_link"><div class="toolbar_image"></div>Open</div></li>
 				<li id="remove" class="disabled"><div id="remove_link"><div class="toolbar_image"></div>Remove</div></li>
@@ -45,26 +49,23 @@
 				<li id="pause_all" class="disabled"><div id="pause_all_link"><div class="toolbar_image"></div>Pause All</div></li>
 				<li id="resume_all" class="disabled"><div id="resume_all_link"><div class="toolbar_image"></div>Resume All</div></li>
 				<li id="inspector"><div id="inspector_link"><div class="toolbar_image"></div>Inspector</div></li>
-				<li id="filter"><div id="filter_toggle_link"><div class="toolbar_image"></div>Filter</div></li>
 			</ul>
 		</div>
 
-		<div class="torrent_global_details">
-			<div id="torrent_global_transfer">0 Transfers</div>
-			<div id="torrent_global_upload">0 B/s</div>
-			<div id="torrent_global_download">0 B/s</div>
-		</div>
-
-		<div id="torrent_filter_bar">
-			<ul>
-				<li><a href="#all" id="filter_all_link" class="active">All</a></li>
-				<li><a href="#active" id="filter_active_link">Active</a></li>
-				<li><a href="#downloading" id="filter_downloading_link">Downloading</a></li>
-				<li><a href="#seeding" id="filter_seeding_link">Seeding</a></li>
-				<li><a href="#paused" id="filter_paused_link">Paused</a></li>
-				<li><a href="#finished" id="filter_finished_link" class="finished">Finished</a></li>
-			</ul>
+		<div id="statusbar">
 			<input type="search" id="torrent_search" placeholder="Filter" results="0" />
+			<div id='filter-button'></div>
+			<div id='speed-info'>
+				<span id="speed-up-label">0 B/s</span>
+				<span id="speed-dn-label">0 B/s</span>
+			</div>
+		</div>
+
+		<div id="filter-popup" style="display:none;">
+			<div id='filter-popup-workarea'>
+				<div id='filter-by-state'></div>
+				<div id='filter-by-tracker'></div>
+			</div>
 		</div>
 
 		<div id="torrent_inspector" style="display:none;">
@@ -539,6 +540,7 @@
 					</ul>
 				</li>
 			</ul>
+			<div id="compact-button">&nbsp;</div>
 			<div id="turtle_button">&nbsp;</div>
 			<div style="clear: both; visibility: hidden;"></div>
 		</div>
