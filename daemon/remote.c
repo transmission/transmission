@@ -1644,6 +1644,16 @@ processResponse( const char * rpcurl, const void * response, size_t len )
     {
         int64_t      tag = -1;
         const char * str;
+
+        if(tr_bencDictFindStr(&top, "result", &str))
+        {
+            if( strcmp( str, "success") )
+            {
+                printf( "Error: %s\n", str );
+                status |= EXIT_FAILURE;
+            }
+            else
+            {
         tr_bencDictFindInt( &top, "tag", &tag );
 
         switch( tag )
@@ -1695,6 +1705,10 @@ processResponse( const char * rpcurl, const void * response, size_t len )
         }
 
         tr_bencFree( &top );
+    }
+        }
+        else
+            status |= EXIT_FAILURE;
     }
 
     return status;
