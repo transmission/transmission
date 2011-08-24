@@ -275,7 +275,10 @@ TorrentRendererCompact.prototype =
 			return [ TorrentRendererHelper.formatDL(t),
 			         TorrentRendererHelper.formatUL(t) ].join(' ');
 		if (t.isSeeding())
-			return TorrentRendererHelper.formatUL(t);
+			return [ 'Ratio: ',
+			         Transmission.fmt.ratioString(t.getUploadRatio()),
+			         ', ',
+			         TorrentRendererHelper.formatUL(t) ].join('');
 		return t.getStateString();
 	},
 
