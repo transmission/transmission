@@ -1006,7 +1006,7 @@ div.dialog_container div.dialog_window {
 	border-top: none;
 	text-align: left;
 	width: 420px;
-	z-index: 4;
+	z-index: 10;
 	overflow: hidden;
 	position: relative;
 	-webkit-box-shadow: 0 3px 6px rgba(0,0,0,0.7);
@@ -1016,7 +1016,6 @@ div.dialog_container div.dialog_window {
 	div.dialog_container div.dialog_window {
 		top: 0;
 		margin-top: 71px;
-		z-index: 2
 	}
 }
 
