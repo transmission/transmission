@@ -230,12 +230,12 @@
 				<form action="" id="prefs_form">
 					<div id="prefs_tabs">
 						<ul>
-							<li id="prefs_tab_general_tab" class="prefs_tab_enabled">General</li>
-							<li id="prefs_tab_speed_tab" class="prefs_tab_disabled">Speed</li>
-							<li id="prefs_tab_peers_tab" class="prefs_tab_disabled">Peers</li>
-							<li id="prefs_tab_network_tab" class="prefs_tab_disabled">Network</li>
+							<li id="prefs-tab-general" class="prefs-tab selected">General</li>
+							<li id="prefs-tab-speed" class="prefs-tab">Speed</li>
+							<li id="prefs-tab-peers" class="prefs-tab">Peers</li>
+							<li id="prefs-tab-network" class="prefs-tab">Network</li>
 						</ul>
-						<div id="prefs_tab_general" class="prefs_tab">
+						<div id="prefs-page-general" class="prefs-page">
 							<div class="preference download_location">
 								<label class="category">Add transfers:</label>
 								<div class="formdiv">
@@ -264,7 +264,7 @@
 							</div>
 							<div style="clear: both; visibility: hidden;"></div>
 						</div>
-						<div id="prefs_tab_speed" class="prefs_tab" style="display: none;">
+						<div id="prefs-page-speed" class="prefs-page" style="display: none;">
 							<div class="preference limit_total">
 								<label class="category">Speed Limits:</label>
 								<div class="formdiv checkbox">
@@ -319,7 +319,7 @@
 							</div>
 							<div style="clear: both; visibility: hidden;"></div>
 						</div>
-						<div id="prefs_tab_peers" class="prefs_tab" style="display: none;">
+						<div id="prefs-page-peers" class="prefs-page" style="display: none;">
 							<div class="preference peers_conn">
 								<label class="category">Connections:</label>
 								<div class="formdiv">
@@ -362,7 +362,7 @@
 							</div>
 							<div style="clear: both; visibility: hidden;"></div>
 						</div>
-						<div id="prefs_tab_network" class="prefs_tab" style="display: none;">
+						<div id="prefs-page-network" class="prefs-page" style="display: none;">
 							<div class="preference utp">
 								<label class="category">Peer communication:</label>
 								<div class="formdiv checkbox">

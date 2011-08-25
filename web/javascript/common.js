@@ -171,30 +171,6 @@ String.prototype.compareTo = function(that) {
 	return 0;
 }
 
-/**
- * @brief Switch between different dialog tabs
- */
-function changeTab(tab, id) {
-	for (var x = 0, node; tab.parentNode.childNodes[x]; x++) {
-		node = tab.parentNode.childNodes[x];
-		if (node == tab) {
-			node.className = "prefs_tab_enabled";
-		} else {
-			node.className = "prefs_tab_disabled";
-		}
-	}
-	for (x = 0; tab.parentNode.parentNode.childNodes[x]; x++) {
-		node = tab.parentNode.parentNode.childNodes[x];
-		if (node.tagName == "DIV") {
-			if (node.id == id) {
-				node.style.display = "block";
-			} else {
-				node.style.display = "none";
-			}
-		}
-	}
-}
-
 /***
 ****  Preferences
 ***/

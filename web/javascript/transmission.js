@@ -54,10 +54,10 @@ Transmission.prototype =
 		$('#upload_cancel_button').click(function(e) { tr.hideUploadDialog(); return false; });
 		$('#turtle_button').click(function() { tr.toggleTurtleClicked(); return false; });
 		$('#compact-button').click(function() { tr.toggleCompactClicked(); return false; });
-		$('#prefs_tab_general_tab').click(function() { changeTab(this, 'prefs_tab_general'); });
-		$('#prefs_tab_speed_tab').click(function() { changeTab(this, 'prefs_tab_speed'); });
-		$('#prefs_tab_peers_tab').click(function() { changeTab(this, 'prefs_tab_peers'); });
-		$('#prefs_tab_network_tab').click(function() { changeTab(this, 'prefs_tab_network');});
+		$('#prefs-tab-general').click(function() { tr.selectPrefsTab('general'); });
+		$('#prefs-tab-speed').click(function() { tr.selectPrefsTab('speed'); });
+		$('#prefs-tab-peers').click(function() { tr.selectPrefsTab('peers'); });
+		$('#prefs-tab-network').click(function() { tr.selectPrefsTab('network'); });
 		$('#torrent_upload_form').submit(function() { $('#upload_confirm_button').click(); return false; });
 		$('#torrent_container').bind('dragover', function(e) { return tr.dragenter(e); });
 		$('#torrent_container').bind('dragenter', function(e) { return tr.dragenter(e); });
@@ -138,6 +138,11 @@ Transmission.prototype =
 		this.togglePeriodicSessionRefresh(true);
 
 		this.filterSetup();
+	},
+
+	selectPrefsTab: function(name) {
+		$('#prefs-tab-'+name).addClass('selected').siblings('.prefs-tab').removeClass('selected');
+		$('#prefs-page-'+name).show().siblings('.prefs-page').hide();
 	},
 
 	loadDaemonPrefs: function(async) {
