@@ -22,7 +22,7 @@ TorrentRendererHelper.getProgressInfo = function(controller, t)
 		pct = t.getMetadataPercentComplete() * 100;
 	else if (!t.isDone())
 		pct = Math.round(t.getPercentDone() * 100);
-	else if (seed_ratio_limit > 0 && !t.isStopped())
+	else if (seed_ratio_limit > 0 && t.isSeeding()) // don't split up the bar if paused or queued
 		pct = Math.round(t.getUploadRatio() * 100 / seed_ratio_limit);
 	else
 		pct = 100;
