@@ -1584,50 +1584,50 @@ Transmission.prototype =
 		this.remote.getInitialDataFor(null ,function(torrents) { tr.addTorrents(torrents); });
 	},
 
-        onRowClicked: function(ev, row)
-        {
-                // Prevents click carrying to parent element
-                // which deselects all on click
-                ev.stopPropagation();
-                // but still hide the context menu if it is showing
-                $('#jqContextMenu').hide();
+	onRowClicked: function(ev, row)
+	{
+		// Prevents click carrying to parent element
+		// which deselects all on click
+		ev.stopPropagation();
+		// but still hide the context menu if it is showing
+		$('#jqContextMenu').hide();
 
-                // 'Apple' button emulation on PC :
-                // Need settable meta-key and ctrl-key variables for mac emulation
-                var meta_key = ev.metaKey;
-                if (ev.ctrlKey && navigator.appVersion.toLowerCase().indexOf("mac") == -1)
-                        meta_key = true;
+		// 'Apple' button emulation on PC :
+		// Need settable meta-key and ctrl-key variables for mac emulation
+		var meta_key = ev.metaKey;
+		if (ev.ctrlKey && navigator.appVersion.toLowerCase().indexOf("mac") == -1)
+			meta_key = true;
 
-                // Shift-Click - selects a range from the last-clicked row to this one
-                if (iPhone) {
-                        if (row.isSelected())
-                                this.showInspector();
-                        this.setSelectedRow(row, true);
+		// Shift-Click - selects a range from the last-clicked row to this one
+		if (iPhone) {
+			if (row.isSelected())
+				this.showInspector();
+			this.setSelectedRow(row);
 
-                } else if (ev.shiftKey) {
-                        this.selectRange(row, true);
-                        // Need to deselect any selected text
-                        window.focus();
+		} else if (ev.shiftKey) {
+			this.selectRange(row);
+			// Need to deselect any selected text
+			window.focus();
 
-                // Apple-Click, not selected
-                } else if (!row.isSelected() && meta_key) {
-                        this.selectRow(row, true);
+		// Apple-Click, not selected
+		} else if (!row.isSelected() && meta_key) {
+			this.selectRow(row);
 
-                // Regular Click, not selected
-                } else if (!row.isSelected()) {
-                        this.setSelectedRow(row, true);
+		// Regular Click, not selected
+		} else if (!row.isSelected()) {
+			this.setSelectedRow(row);
 
-                // Apple-Click, selected
-                } else if (row.isSelected() && meta_key) {
-                        this.deselectRow(row);
+		// Apple-Click, selected
+		} else if (row.isSelected() && meta_key) {
+			this.deselectRow(row);
 
-                // Regular Click, selected
-                } else if (row.isSelected()) {
-                        this.setSelectedRow(row, true);
-                }
+		// Regular Click, selected
+		} else if (row.isSelected()) {
+			this.setSelectedRow(row);
+		}
 
 		this._last_torrent_clicked = row.getTorrent().getId();
-        },
+	},
 
 	addTorrents: function(new_torrents)
 	{
