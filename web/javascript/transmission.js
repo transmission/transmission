@@ -518,7 +518,7 @@ Transmission.prototype =
 				i = (i+1) % rows.length;
 			else if (up)
 				i = (i || rows.length) - 1;
-			r = rows[i];
+			var r = rows[i];
 
 			if (this._shift_index >= 0)
 			{
