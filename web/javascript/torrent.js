@@ -45,25 +45,79 @@ Torrent._TrackerQueued         = 2;
 Torrent._TrackerActive         = 3;
 
 
-// fields whose values never change and are always known
-Torrent._StaticFields = [
-	'hashString', 'id' ];
+Torrent.Fields = { };
 
-// fields whose values never change and are known upon constructon OR
-// when a magnet torrent finishes downloading its metadata
-Torrent._MetaDataFields = [
-	'addedDate', 'comment', 'creator', 'dateCreated',
-	'isPrivate', 'name', 'totalSize', 'pieceCount', 'pieceSize' ];
+// commonly used fields which only need to be loaded once,
+// either on startup or when a magnet finishes downloading its metadata
+// finishes downloading its metadata
+Torrent.Fields.Metadata = [
+	'addedDate',
+	'name',
+	'totalSize'
+];
 
-// torrent fields whose values change all the time
-Torrent._DynamicFields = [
-	'desiredAvailable', 'downloadDir', 'downloadedEver', 'error',
-	'errorString', 'eta', 'haveUnchecked', 'haveValid', 'isFinished',
-	'leftUntilDone', 'metadataPercentComplete', 'peers', 'peersConnected',
-	'peersGettingFromUs', 'peersSendingToUs', 'queuePosition',
-	'rateDownload', 'rateUpload', 'recheckProgress', 'seedRatioLimit',
-	'seedRatioMode', 'sizeWhenDone', 'status', 'trackerStats',
-	'uploadedEver', 'uploadRatio', 'webseedsSendingToUs' ];
+// commonly used fields which need to be periodically refreshed
+Torrent.Fields.Stats = [
+	'error',
+	'errorString',
+	'eta',
+	'isFinished',
+	'isStalled',
+	'leftUntilDone',
+	'metadataPercentComplete',
+	'peersConnected',
+	'peersGettingFromUs',
+	'peersSendingToUs',
+	'percentDone',
+	'queuePosition',
+	'rateDownload',
+	'rateUpload',
+	'recheckProgress',
+	'seedRatioMode',
+	'sizeWhenDone',
+	'status',
+	'trackers',
+	'uploadedEver',
+	'uploadRatio'
+];
+
+// fields used by the inspector which only need to be loaded once
+Torrent.Fields.InfoExtra = [
+	'comment',
+	'creator',
+	'dateCreated',
+	'files',
+	'hashString',
+	'isPrivate',
+	'pieceCount',
+	'pieceSize'
+];
+
+// fields used in the inspector which need to be periodically refreshed
+Torrent.Fields.StatsExtra = [
+	'activityDate',
+	'desiredAvailable',
+	'downloadDir',
+	'downloadLimit',
+	'downloadLimited',
+	'downloadedEver',
+	'fileStats',
+	'haveUnchecked',
+	'haveValid',
+	'honorsSessionLimits',
+	'manualAnnounceTime',
+	'peer-limit',
+	'peers',
+	'seedIdleLimit',
+	'seedIdleMode',
+	'seedRatioLimit',
+	'startDate',
+	'torrentFile',
+	'trackerStats',
+	'uploadLimited',
+	'uploadLimit',
+	'webseedsSendingToUs'
+];
 
 /***
 ****
@@ -76,129 +130,76 @@ Torrent.prototype =
 	initialize: function(data)
 	{
 		this.fields = {};
-		this._files = [];
-
-		// these fields are set in the ctor and never change
-		for (var i=0, key; key=Torrent._StaticFields[i]; ++i) {
-			if (key in data) {
-				this.fields[key] = data[key];
-			}
-		}
-
-		this.initMetaData(data);
-		this._trackerStats = this.buildTrackerStats(data.trackerStats);
-		this.refresh(data);
+		this.refresh (data);
 	},
 
-	buildTrackerStats: function(trackerStats) {
-		var announce = [];
-		var result = [];
-		for (var i=0, tracker; tracker=trackerStats[i]; ++i) {
-			var tier = result[tracker.tier] || [];
-			tier.push(tracker);
-			result[tracker.tier] = tier;
-			announce.push(tracker.announce);
-		}
-		this.fields.collatedTrackers = announce.join('\t');
-		return result;
-	},
-
-	initMetaData: function(data) {
-
-		var f = this.fields;
-		var changed = false;
-
-		// populate the metadata fields
-		for (var i=0, key; key=Torrent._MetaDataFields[i]; ++i) {
-			if (key in data) {
-				if (f[key] !== data[key]) {
-					f[key] = data[key];
-					if (key === 'name')
-						f.collatedName = data.name.toLowerCase();
-					changed = true;
-				}
-			}
-		}
-
-		// populate the files array
-		if (data.files) {
-			for (var i=0, row; row=data.files[i]; ++i) {
-				this._files[i] = {
-					'index': i,
-					'length': row.length,
-					'name': row.name
-				};
-			}
-		}
-
+	setField: function(o, name, value)
+	{
+		var changed = !(name in o) || (o[name] !== value);
+		if (changed)
+			o[name] = value;
 		return changed;
 	},
 
-	refreshMetaData: function(data)
+	// fields.files is an array of unions of RPC's "files" and "fileStats" objects.
+	updateFiles: function(files) {
+		var changed = false;
+		var myfiles = this.fields.files || [];
+		var keys = [ 'length', 'name', 'bytesCompleted', 'wanted', 'priority' ];
+		for (var i=0, f; f=files[i]; ++i) {
+			var myfile = myfiles[i] || {};
+			for (var j=0, key; key=keys[j]; ++j)
+				if(key in f)
+					changed |= this.setField(myfile,key,f[key]);
+			myfiles[i] = myfile;
+		}
+		this.fields.files = myfiles;
+		return changed;
+	},
+
+	collateTrackers: function(trackers) {
+		announces = [];
+		for (var i=0, t; t=trackers[i]; ++i)
+			announces.push(t.announce.toLowerCase());
+		return announces.join('\t');
+	},
+
+	isField: function(name) {
+		return ( name === 'id' )
+		    || ( Torrent.Fields.Stats.indexOf(name)      !== -1 )
+		    || ( Torrent.Fields.StatsExtra.indexOf(name) !== -1 )
+		    || ( Torrent.Fields.InfoExtra.indexOf(name)  !== -1 )
+		    || ( Torrent.Fields.Metadata.indexOf(name)   !== -1 );
+	},
+
+	refreshFields: function(data)
 	{
-		var changed = this.initMetaData(data);
-		if (changed)
-			this.fireDataChanged();
+		var changed = false;
+
+		for (var key in data) {
+			if (this.isField(key)) switch (key) {
+				case 'files':
+				case 'fileStats': // merge files and fileStats together
+					changed |= this.updateFiles(data[key]);
+					break;
+				case 'trackerStats': // 'trackerStats' is a superset of 'trackers'...
+					changed |= this.setField(this.fields,'trackers',data[key]);
+				case 'trackers': // ...so only save 'trackers' if we don't have it already
+					if (!(key in this.fields))
+						changed |= this.setField(this.fields,key,data[key]);
+					break;
+				default:
+					changed |= this.setField(this.fields,key,data[key]);
+			}
+		}
+
 		return changed;
 	},
 
 	refresh: function(data)
 	{
-		var changed = false;
-
-		// FIXME: unnecessary coupling... this should be handled by transmission.js
-		if (this.needsMetaData() && (data.metadataPercentComplete >= 1))
-			changed |= transmission.refreshMetaData([ this.getId() ]);
-
-		var f = this.fields;
-
-		// refresh the dynamic fields
-		for (var i=0, key; key=Torrent._DynamicFields[i]; ++i) {
-			if (key in data) {
-				if (f[key] !== data[key]) {
-					f[key] = data[key];
-					changed = true;
-				}
-			}
-		}
-
-		this._trackerStats = this.buildTrackerStats(data.trackerStats);
-
-		if (data.fileStats)
-			changed |= this.refreshFiles(data);
-
-		if (changed)
-			this.fireDataChanged();
-	},
-
-	refreshFiles: function(data) {
-		var changed = false;
-		for (var i=0; i<data.fileStats.length; ++i) {
-			var src = data.fileStats[i];
-			var tgt = this._files[i];
-			if (!tgt) {
-				changed = true;
-				tgt = this._files[i] = { };
-			}
-			if (tgt.wanted !== src.wanted) {
-				tgt.wanted = src.wanted;
-				changed = true;
-			}
-			if (tgt.priority !== src.priority) {
-				tgt.priority = src.priority;
-				changed = true;
-			}
-			if (tgt.bytesCompleted !== src.bytesCompleted) {
-				tgt.bytesCompleted = src.bytesCompleted;
-				changed = true;
-			}
-		}
-		return changed;
-	},
-
-	fireDataChanged: function()
-	{
-		$(this).trigger('dataChanged');
+		if (this.refreshFields(data))
+			$(this).trigger('dataChanged');
 	},
 
 	/****
@@ -219,6 +220,8 @@ Torrent.prototype =
 	getError: function() { return this.fields.error; },
 	getErrorString: function() { return this.fields.errorString; },
 	getETA: function() { return this.fields.eta; },
+	getFile: function(i) { return this.fields.files[i]; },
+	getFileCount: function() { return this.fields.files ? this.fields.files.length : 0; },
 	getHashString: function() { return this.fields.hashString; },
 	getHaveValid: function() { return this.fields.haveValid; },
 	getHave: function() { return this.getHaveValid() + this.fields.haveUnchecked; },
@@ -231,7 +234,6 @@ Torrent.prototype =
 	getPeersGettingFromUs: function() { return this.fields.peersGettingFromUs; },
 	getPeersSendingToUs: function() { return this.fields.peersSendingToUs; },
 	getPieceCount: function() { return this.fields.pieceCount; },
-	getPieceCount: function() { return this.fields.pieceCount; },
 	getPieceSize: function() { return this.fields.pieceSize; },
 	getPrivateFlag: function() { return this.fields.isPrivate; },
 	getQueuePosition: function() { return this.fields.queuePosition; },
@@ -241,6 +243,7 @@ Torrent.prototype =
 	getSizeWhenDone: function() { return this.fields.sizeWhenDone; },
 	getStatus: function() { return this.fields.status; },
 	getTotalSize: function() { return this.fields.totalSize; },
+	getTrackers: function() { return this.fields.trackers; },
 	getUploadSpeed: function() { return this.fields.rateUpload; },
 	getUploadRatio: function() { return this.fields.uploadRatio; },
 	getUploadedEver: function() { return this.fields.uploadedEver; },
@@ -275,7 +278,6 @@ Torrent.prototype =
 			default:                            return 'error';
 		}
 	},
-	trackerStats: function() { return this._trackerStats; },
 	seedRatioLimit: function(controller){
 		switch(this.getSeedRatioMode()) {
 			case Torrent._RatioUseGlobal: return controller.seedRatioLimit();
@@ -362,8 +364,14 @@ Torrent.compareById = function(ta, tb)
 };
 Torrent.compareByName = function(ta, tb)
 {
-	return ta.getCollatedName().compareTo(tb.getCollatedName())
-	    || Torrent.compareById(ta, tb);
+	var i = 0;
+	var a = ta.getCollatedName();
+	var b = tb.getCollatedName();
+	if (a && b)
+		i = a.compareTo(b);
+	if (i)
+		return i;
+	return Torrent.compareById(ta, tb);
 };
 Torrent.compareByQueue = function(ta, tb)
 {

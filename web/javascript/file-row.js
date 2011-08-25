@@ -90,7 +90,7 @@ FileRow.prototype =
 	{
 		var i = this.getIndex();
 		var t = this.getTorrent();
-		this.readAttributes(t._files[i]);
+		this.readAttributes(t.getFile(i));
 		this.refreshHTML();
 	},
 
@@ -98,13 +98,13 @@ FileRow.prototype =
                 return this._done >= this._size;
         },
         isEditable: function () {
-                return (this.getTorrent()._files.length>1) && !this.isDone();
+                return (this.getTorrent().getFileCount()>1) && !this.isDone();
         },
 
         createRow: function(torrent, i)
 	{
 		var me = this;
-		var file = torrent._files[i];
+		var file = torrent.getFile(i);
                 var name = file.name.substring (file.name.lastIndexOf('/')+1);
 
                 var root = document.createElement('li');

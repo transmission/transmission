@@ -30,20 +30,20 @@ RPC._TurtleTimeEnd          = 'alt-speed-time-end';
 RPC._TurtleTimeDay          = 'alt-speed-time-day';
 RPC._PeerLimitGlobal        = 'peer-limit-global';
 RPC._PeerLimitPerTorrent    = 'peer-limit-per-torrent';
-RPC._PexEnabled	            = 'pex-enabled';
+RPC._PexEnabled             = 'pex-enabled';
 RPC._DhtEnabled             = 'dht-enabled';
 RPC._LpdEnabled             = 'lpd-enabled';
 RPC._BlocklistEnabled       = 'blocklist-enabled';
 RPC._BlocklistURL           = 'blocklist-url';
 RPC._BlocklistSize          = 'blocklist-size';
-RPC._UtpEnabled	            = 'utp-enabled';
+RPC._UtpEnabled             = 'utp-enabled';
 RPC._PeerPortRandom         = 'peer-port-random-on-start';
 RPC._PortForwardingEnabled  = 'port-forwarding-enabled';
 RPC._StartAddedTorrent      = 'start-added-torrents';
-RPC._QueueMoveTop			= 'queue-move-top';
-RPC._QueueMoveBottom		= 'queue-move-bottom';
-RPC._QueueMoveUp			= 'queue-move-up';
-RPC._QueueMoveDown			= 'queue-move-down';
+RPC._QueueMoveTop           = 'queue-move-top';
+RPC._QueueMoveBottom        = 'queue-move-bottom';
+RPC._QueueMoveUp            = 'queue-move-up';
+RPC._QueueMoveDown          = 'queue-move-down';
 
 function TransmissionRemote(controller)
 {
@@ -133,28 +133,25 @@ TransmissionRemote.prototype =
 		this.sendRequest(o, callback, async);
 	},
 
-	getInitialDataFor: function(torrent_ids, callback) {
+	getTorrentInitial: function(torrent_ids, callback) {
 		var o = {
 			method: 'torrent-get',
 			arguments: {
-			fields: Torrent._StaticFields.concat(Torrent._MetaDataFields,
-			                                     Torrent._DynamicFields,
-			                                     [ 'files', 'fileStats' ])
+				fields: ['id'].concat(Torrent.Fields.Metadata, Torrent.Fields.Stats)
 			}
 		};
 
 		if (torrent_ids)
 			o.arguments.ids = torrent_ids;
 
-		this.sendRequest(o, function(data){ callback(data.arguments.torrents);});
+		this.sendRequest(o, function(data){ callback(data.arguments.torrents, data.arguments.removed);});
 	},
 
-	getMetaDataFor: function(torrent_ids, callback) {
+	getTorrentMetadata: function(torrent_ids, callback) {
 		var o = {
 			method: 'torrent-get',
 			arguments: {
-			fields: Torrent._StaticFields.concat(Torrent._MetaDataFields,
-			                                     ['files', 'fileStats'])
+				fields: ['id'].concat(Torrent.Fields.Metadata)
 			}
 		};
 
@@ -164,26 +161,31 @@ TransmissionRemote.prototype =
 		this.sendRequest(o, function(data) {callback(data.arguments.torrents)});
 	},
 
-	getUpdatedDataFor: function(torrent_ids, callback) {
+	getTorrentStats: function(torrent_ids, callback) {
 		var o = {
 			method: 'torrent-get',
 			arguments: {
 				'ids': torrent_ids,
-				fields: [ 'id' ].concat(Torrent._DynamicFields)
+				fields: ['id'].concat(Torrent.Fields.Stats)
 			}
 		};
 
 		this.sendRequest(o, function(data) {callback(data.arguments.torrents, data.arguments.removed);});
 	},
 
-	loadTorrentFiles: function(torrent_ids) {
-		var tr = this._controller;
-		this.sendRequest({
+	/* called for the torrents in the inspector aka details dialog */
+	getTorrentDetails: function(torrent_ids, full, callback) {
+		var f = ['id'].concat(Torrent.Fields.StatsExtra);
+		if (full) // these only need to be loaded once...
+			f = f.concat(Torrent.Fields.InfoExtra);
+		var o = {
 			method: 'torrent-get',
-			arguments: { fields: [ 'id', 'fileStats'], ids: torrent_ids }
-		}, function(data) {
-			tr.updateTorrentsFileData(data.arguments.torrents);
-		});
+			arguments: {
+				'ids': torrent_ids,
+				fields: f,
+			}
+		};
+		this.sendRequest(o, function(data) {callback(data.arguments.torrents,null)});
 	},
 
 	changeFileCommand: function(command, rows) {

@@ -68,13 +68,13 @@ Transmission.prototype =
 		$('#torrent_upload_form').submit(function() { $('#upload_confirm_button').click(); return false; });
 
 		if (iPhone) {
-			$('#inspector_close').bind('click', function() { tr.hideInspector(); });
+			$('#inspector_close').bind('click', function() { tr.setInspectorVisible(false); });
 			$('#preferences_link').bind('click', function(e) { tr.releaseClutchPreferencesButton(e); });
 		} else {
 			$(document).bind('keydown',  function(e) { tr.keyDown(e); });
 			$(document).bind('keyup',  function(e) { tr.keyUp(e); });
 			$('#torrent_container').click(function() { tr.deselectAll(true); });
-			$('#inspector_link').click(function(e) { tr.toggleInspectorClicked(e); });
+			$('#inspector_link').click(function(e) { tr.toggleInspector(); });
 
 			this.setupSearchBox();
 			this.createContextMenu();
@@ -86,7 +86,6 @@ Transmission.prototype =
 		this._inspector_file_list      = $('#inspector_file_list')[0];
 		this._inspector_peers_list     = $('#inspector_peers_list')[0];
 		this._inspector_trackers_list  = $('#inspector_trackers_list')[0];
-		this._inspector_tab_files      = $('#inspector_tab_files')[0];
 		this._toolbar_buttons          = $('#toolbar ul li');
 		this._toolbar_pause_button     = $('#toolbar #pause_selected')[0];
 		this._toolbar_pause_all_button = $('#toolbar #pause_all')[0];
@@ -221,7 +220,7 @@ Transmission.prototype =
 			$('#reverse_sort_order').selectMenuItem();
 
 		if (!iPhone && this[Prefs._ShowInspector])
-			this.showInspector();
+			this.setInspectorVisible(true);
 
 		this.initCompactMode();
 	},
@@ -473,6 +472,9 @@ Transmission.prototype =
 
 	selectionChanged: function()
 	{
+		if (this[Prefs._ShowInspector])
+			this.refreshInspectorTorrents(true);
+
 		this.updateButtonStates();
 		this.updateInspector();
 		this.updateSelectedData();
@@ -719,11 +721,6 @@ Transmission.prototype =
 		}
 	},
 
-	toggleInspectorClicked: function(ev) {
-		if (this.isButtonEnabled(ev))
-			this.toggleInspector();
-	},
-
 	inspectorTabClicked: function(ev, tab) {
 		if (iPhone) ev.stopPropagation();
 
@@ -740,19 +737,19 @@ Transmission.prototype =
 	},
 
 	filesSelectAllClicked: function() {
-		var t = this._files_torrent;
+		var t = this._file_torrent;
 		if (t)
 			this.toggleFilesWantedDisplay(t, true);
 	},
 	filesDeselectAllClicked: function() {
-		var t = this._files_torrent;
+		var t = this._file_torrent;
 		if (t)
 			this.toggleFilesWantedDisplay(t, false);
 	},
 	toggleFilesWantedDisplay: function(torrent, wanted) {
 		var rows = [ ];
-		for (var i=0, row; row=this._files[i]; ++i)
-			if (row.isEditable() && (torrent._files[i].wanted !== wanted))
+		for (var i=0, row; row=this._file_rows[i]; ++i)
+			if (row.isEditable() && (torrent.getFile(i).wanted !== wanted))
 				rows.push(row);
 		if (rows.length > 0) {
 			var command = wanted ? 'files-wanted' : 'files-unwanted';
@@ -1144,7 +1141,7 @@ Transmission.prototype =
 
 		var torrents = this.getSelectedTorrents();
 		if (!torrents.length && iPhone) {
-			this.hideInspector();
+			this.setInspectorVisible(false);
 			return;
 		}
 
@@ -1302,137 +1299,149 @@ Transmission.prototype =
 		}
 		this.changeFileCommand(command, [ row ]);
 	},
-	clearFileList: function() {
+	clearFileList: function()
+	{
 		$(this._inspector_file_list).empty();
-		delete this._files_torrent;
-		delete this._files;
+		delete this._file_torrent;
+		delete this._file_rows;
 	},
-	updateFileList: function() {
+	updateFileList: function()
+	{
+		if (!$(this._inspector_file_list).is(':visible'))
+			return;
 
-		// if the file list is hidden, clear the list
-		if (this._inspector_tab_files.className.indexOf('selected') == -1) {
+		var sel = this.getSelectedTorrents();
+		if (sel.length !== 1) {
 			this.clearFileList();
 			return;
 		}
 
-		// if not torrent is selected, clear the list
-		var selected_torrents = this.getSelectedTorrents();
-		if (selected_torrents.length != 1) {
-			this.clearFileList();
-			return;
-		}
-
-		// if the active torrent hasn't changed, noop
-		var torrent = selected_torrents[0];
-		if (this._files_torrent === torrent)
-			return;
+		var torrent = sel[0];
+		if (torrent === this._files_torrent)
+			if(torrent.getFileCount() === (this._files ? this._files.length: 0))
+				return;
 
 		// build the file list
 		this.clearFileList();
-		this._files_torrent = torrent;
-		var n = torrent._files.length;
-		this._files = new Array(n);
+		this._file_torrent = torrent;
+		var n = torrent.getFileCount();
+		this._file_rows = [];
 		var fragment = document.createDocumentFragment();
 		var tr = this;
 		for (var i=0; i<n; ++i) {
-			var row = new FileRow(torrent, i);
+			var row = this._file_rows[i] = new FileRow(torrent, i);
 			fragment.appendChild(row.getElement());
-			this._files[i] = row;
 	                $(row).bind('wantedToggled',function(e,row,want) {tr.onFileWantedToggled(row,want);});
 	                $(row).bind('priorityToggled',function(e,row,priority) {tr.onFilePriorityToggled(row,priority);});
 		}
 		this._inspector_file_list.appendChild(fragment);
 	},
 
-	refreshFileView: function() {
-		for (var i=0, row; row=this._files[i]; ++i)
-			row.refresh();
-	},
+	updatePeersLists: function()
+	{
+		if (!$(this._inspector_peers_list).is(':visible'))
+			return;
 
-	updatePeersLists: function() {
 		var html = [ ];
 		var fmt = Transmission.fmt;
 		var torrents = this.getSelectedTorrents();
-		if ($(this._inspector_peers_list).is(':visible')) {
-			for (var k=0, torrent; torrent=torrents[k]; ++k) {
-				var peers = torrent.getPeers();
-				html.push('<div class="inspector_group">');
-				if (torrents.length > 1) {
-					html.push('<div class="inspector_torrent_label">', torrent.getName(), '</div>');
-				}
-				if (peers.length == 0) {
-					html.push('<br></div>'); // firefox won't paint the top border if the div is empty
-					continue;
-				}
-				html.push('<table class="peer_list">',
-				           '<tr class="inspector_peer_entry even">',
-				           '<th class="encryptedCol"></th>',
-				           '<th class="upCol">Up</th>',
-				           '<th class="downCol">Down</th>',
-				           '<th class="percentCol">%</th>',
-				           '<th class="statusCol">Status</th>',
-				           '<th class="addressCol">Address</th>',
-				           '<th class="clientCol">Client</th>',
-				           '</tr>');
-				for (var i=0, peer; peer=peers[i]; ++i) {
-					var parity = ((i+1) % 2 == 0 ? 'even' : 'odd');
-					html.push('<tr class="inspector_peer_entry ', parity, '">',
-					           '<td>', (peer.isEncrypted ? '<img src="images/graphics/lock_icon.png" alt="Encrypted"/>' : ''), '</td>',
-					           '<td>', (peer.rateToPeer ? fmt.speedBps(peer.rateToPeer) : ''), '</td>',
-					           '<td>', (peer.rateToClient ? fmt.speedBps(peer.rateToClient) : ''), '</td>',
-					           '<td class="percentCol">', Math.floor(peer.progress*100), '%', '</td>',
-					           '<td>', fmt.peerStatus(peer.flagStr), '</td>',
-					           '<td>', peer.address, '</td>',
-					           '<td class="clientCol">', peer.clientName, '</td>',
-					           '</tr>');
-				}
-				html.push('</table></div>');
+
+		for (var k=0, torrent; torrent=torrents[k]; ++k) {
+			var peers = torrent.getPeers();
+			html.push('<div class="inspector_group">');
+			if (torrents.length > 1) {
+				html.push('<div class="inspector_torrent_label">', torrent.getName(), '</div>');
 			}
+			if (!peers || !peers.length) {
+				html.push('<br></div>'); // firefox won't paint the top border if the div is empty
+				continue;
+			}
+			html.push('<table class="peer_list">',
+				   '<tr class="inspector_peer_entry even">',
+				   '<th class="encryptedCol"></th>',
+				   '<th class="upCol">Up</th>',
+				   '<th class="downCol">Down</th>',
+				   '<th class="percentCol">%</th>',
+				   '<th class="statusCol">Status</th>',
+				   '<th class="addressCol">Address</th>',
+				   '<th class="clientCol">Client</th>',
+				   '</tr>');
+			for (var i=0, peer; peer=peers[i]; ++i) {
+				var parity = ((i+1) % 2 == 0 ? 'even' : 'odd');
+				html.push('<tr class="inspector_peer_entry ', parity, '">',
+					   '<td>', (peer.isEncrypted ? '<img src="images/graphics/lock_icon.png" alt="Encrypted"/>' : ''), '</td>',
+					   '<td>', (peer.rateToPeer ? fmt.speedBps(peer.rateToPeer) : ''), '</td>',
+					   '<td>', (peer.rateToClient ? fmt.speedBps(peer.rateToClient) : ''), '</td>',
+					   '<td class="percentCol">', Math.floor(peer.progress*100), '%', '</td>',
+					   '<td>', fmt.peerStatus(peer.flagStr), '</td>',
+					   '<td>', peer.address, '</td>',
+					   '<td class="clientCol">', peer.clientName, '</td>',
+					   '</tr>');
+			}
+			html.push('</table></div>');
 		}
+
 		setInnerHTML(this._inspector_peers_list, html.join(''));
 	},
 
 	updateTrackersLists: function() {
-		// By building up the HTML as as string, then have the browser
-		// turn this into a DOM tree, this is a fast operation.
+		if (!$(this._inspector_trackers_list).is(':visible'))
+			return;
+
 		var tr = this;
 		var html = [ ];
 		var na = 'N/A';
 		var torrents = this.getSelectedTorrents();
-		if ($(this._inspector_trackers_list).is(':visible')) {
-			for (var k=0, torrent; torrent = torrents[k]; ++k) {
-				html.push ('<div class="inspector_group">');
-				if (torrents.length > 1) {
-					html.push('<div class="inspector_torrent_label">', torrent.getName(), '</div>');
-				}
-				for (var i=0, tier; tier=torrent._trackerStats[i]; ++i) {
-					html.push('<div class="inspector_group_label">',
-					          'Tier ', (i + 1), '</div>',
-					          '<ul class="tier_list">');
-					for (var j=0, tracker; tracker=tier[j]; ++j) {
-						var lastAnnounceStatusHash = tr.lastAnnounceStatus(tracker);
-						var announceState = tr.announceState(tracker);
-						var lastScrapeStatusHash = tr.lastScrapeStatus(tracker);
 
-						// Display construction
-						var parity = ((j+1) % 2 == 0 ? 'even' : 'odd');
-						html.push('<li class="inspector_tracker_entry ', parity, '"><div class="tracker_host" title="', tracker.announce, '">',
-						          tracker.host, '</div>',
-						          '<div class="tracker_activity">',
-						          '<div>', lastAnnounceStatusHash['label'], ': ', lastAnnounceStatusHash['value'], '</div>',
-						          '<div>', announceState, '</div>',
-						          '<div>', lastScrapeStatusHash['label'], ': ', lastScrapeStatusHash['value'], '</div>',
-						          '</div><table class="tracker_stats">',
-						          '<tr><th>Seeders:</th><td>', (tracker.seederCount > -1 ? tracker.seederCount : na), '</td></tr>',
-						          '<tr><th>Leechers:</th><td>', (tracker.leecherCount > -1 ? tracker.leecherCount : na), '</td></tr>',
-						          '<tr><th>Downloads:</th><td>', (tracker.downloadCount > -1 ? tracker.downloadCount : na), '</td></tr>',
-						          '</table></li>');
-					}
-					html.push('</ul>');
+		// By building up the HTML as as string, then have the browser
+		// turn this into a DOM tree, this is a fast operation.
+		for (var i=0, torrent; torrent=torrents[i]; ++i)
+		{
+			html.push ('<div class="inspector_group">');
+
+			if (torrents.length > 1)
+				html.push('<div class="inspector_torrent_label">', torrent.getName(), '</div>');
+
+			var tier = -1;
+			var trackers = torrent.getTrackers();
+			for (var j=0, tracker; tracker=trackers[j]; ++j)
+			{
+				if (tier != tracker.tier)
+				{
+					if (tier !== -1) // close previous tier
+						html.push('</ul></div>');
+	
+					tier = tracker.tier;
+
+					html.push('<div class="inspector_group_label">',
+						  'Tier ', tier, '</div>',
+						  '<ul class="tier_list">');
 				}
-				html.push('</div>');
+
+				var lastAnnounceStatusHash = tr.lastAnnounceStatus(tracker);
+				var announceState = tr.announceState(tracker);
+				var lastScrapeStatusHash = tr.lastScrapeStatus(tracker);
+
+				// Display construction
+				var parity = ((j+1) % 2 == 0 ? 'even' : 'odd');
+				html.push('<li class="inspector_tracker_entry ', parity, '"><div class="tracker_host" title="', tracker.announce, '">',
+					  tracker.host, '</div>',
+					  '<div class="tracker_activity">',
+					  '<div>', lastAnnounceStatusHash['label'], ': ', lastAnnounceStatusHash['value'], '</div>',
+					  '<div>', announceState, '</div>',
+					  '<div>', lastScrapeStatusHash['label'], ': ', lastScrapeStatusHash['value'], '</div>',
+					  '</div><table class="tracker_stats">',
+					  '<tr><th>Seeders:</th><td>', (tracker.seederCount > -1 ? tracker.seederCount : na), '</td></tr>',
+					  '<tr><th>Leechers:</th><td>', (tracker.leecherCount > -1 ? tracker.leecherCount : na), '</td></tr>',
+					  '<tr><th>Downloads:</th><td>', (tracker.downloadCount > -1 ? tracker.downloadCount : na), '</td></tr>',
+					  '</table></li>');
 			}
+			if (tier !== -1) // close last tier
+					html.push('</ul></div>');
+
+			html.push('</div>'); // inspector_group
 		}
+
 		setInnerHTML(this._inspector_trackers_list, html.join(''));
 	},
 
@@ -1493,128 +1502,95 @@ Transmission.prototype =
 		return {'label':lastScrapeLabel, 'value':lastScrape};
 	},
 
-	/*
-	 * Toggle the visibility of the inspector (used by the context menu)
-	 */
-	toggleInspector: function() {
-		if (this[Prefs._ShowInspector])
-			this.hideInspector();
-		else
-			this.showInspector();
+	toggleInspector: function()
+	{
+		this.setInspectorVisible(!this[Prefs._ShowInspector]);
 	},
+	setInspectorVisible: function(visible)
+	{
+		// we collect extra stats on torrents when they're in the inspector...
+		clearInterval(this._periodic_inspector_refresh);
+		delete this._periodic_inspector_refresh;
+		if (visible) {
+			var tr = this;
+			this._periodic_inspector_refresh = setInterval(function() {tr.refreshInspectorTorrents(false);},2000);
+			this.refreshInspectorTorrents(true);
+		}
 
-	showInspector: function() {
-		$('#torrent_inspector').show();
+		// update the ui widgetry
+		$('#torrent_inspector').toggle(visible);
 		if (iPhone) {
-			$('body').addClass('inspector_showing');
-			$('#inspector_close').show();
+			$('body').toggleClass('inspector_showing',visible);
+			$('#inspector_close').toggle(visible);
 			this.hideiPhoneAddressbar();
 		} else {
-			var w = $('#torrent_inspector').width() + 1 + 'px';
+			var w = visible ? $('#torrent_inspector').width() + 1 + 'px' : '0px';
 			$('#torrent_container')[0].style.right = w;
 		}
 
-		setInnerHTML($('ul li#context_toggle_inspector')[0], 'Hide Inspector');
-
-		this.setPref(Prefs._ShowInspector, true);
-		this.updateInspector();
+		setInnerHTML($('ul li#context_toggle_inspector')[0], (visible?'Hide':'Show')+' Inspector');
+		this.setPref(Prefs._ShowInspector, visible);
+		if (visible)
+			this.updateInspector();
 	},
 
-	/*
-	 * Hide the inspector
-	 */
-	hideInspector: function() {
+	onTorrentChanged: function(ev)
+	{
+		this.refilterSoon();
+	
+		// if this torrent is in the inspector, refresh the inspector
+		if (this[Prefs._ShowInspector])
+			if (this.getSelectedTorrentIds().indexOf(ev.target.getId()) !== -1)
+				this.updateInspector();
+	},
 
-		$('#torrent_inspector').hide();
+	updateFromTorrentGet: function(updates, removed_ids)
+	{
+		var new_ids = [];
 
-		if (iPhone) {
-			this.deselectAll();
-			$('body.inspector_showing').removeClass('inspector_showing');
-			$('#inspector_close').hide();
-			this.hideiPhoneAddressbar();
-		} else {
-			$('#torrent_container')[0].style.right = '0px';
-			setInnerHTML($('ul li#context_toggle_inspector')[0], 'Show Inspector');
+		for (var i=0, o; o=updates[i]; ++i) {
+			var t;
+			var id = o.id;
+			if ((t = this._torrents[id]))
+				t.refresh(o);
+			else {
+				t = this._torrents[id] = new Torrent(o);
+				$(t).bind('dataChanged',function(ev) {tr.onTorrentChanged(ev);});
+				new_ids.push(id);
+			}
 		}
 
-		this.setPref(Prefs._ShowInspector, false);
-	},
+		if (new_ids.length) {
+			var tr = this;
+			this.remote.getTorrentInitial(new_ids, function(a,b){tr.updateFromTorrentGet(a,b);});
+			this.refilterSoon();
+		}
 
-	refreshMetaData: function(ids) {
-		var tr = this;
-		this.remote.getMetaDataFor(ids, function(active) { tr.updateMetaData(active); });
-	},
-
-	updateMetaData: function(torrents)
-	{
-		var tr = this;
-		var refresh_files_for = [ ];
-		var selected_torrents = this.getSelectedTorrents();
-		jQuery.each(torrents, function() {
-			var t = tr._torrents[ this.id ];
-			if (t) {
-				t.refreshMetaData(this);
-				if (selected_torrents.indexOf(t) != -1)
-					refresh_files_for.push(t.getId());
-			}
-		});
-		if (refresh_files_for.length > 0)
-			tr.remote.loadTorrentFiles(refresh_files_for);
+		if (removed_ids) {
+			this.deleteTorrents(removed_ids);
+			this.refilterSoon();
+		}
 	},
 
 	refreshTorrents: function(ids) {
-		var tr = this;
 		if (!ids)
 			ids = 'recently-active';
-
-		this.remote.getUpdatedDataFor(ids, function(active, removed) { tr.updateTorrentsData(active, removed); });
-	},
-
-	updateTorrentsData: function(updated, removed_ids) {
 		var tr = this;
-		var new_torrent_ids = [];
-		var refresh_files_for = [];
-		var selected_torrents = this.getSelectedTorrents();
-
-		for (var i=0, o; o=updated[i]; ++i) {
-			var t = tr._torrents[o.id];
-			if (t == null)
-				new_torrent_ids.push(o.id);
-			else {
-				t.refresh(o);
-				if (selected_torrents.indexOf(t) != -1)
-					refresh_files_for.push(t.getId());
-			}
-		}
-
-		if (refresh_files_for.length > 0)
-			tr.remote.loadTorrentFiles(refresh_files_for);
-
-		if (new_torrent_ids.length > 0)
-			tr.remote.getInitialDataFor(new_torrent_ids, function(torrents) {tr.addTorrents(torrents);});
-
-		tr.deleteTorrents(removed_ids);
-
-		if (new_torrent_ids.length != 0) {
-			tr.hideiPhoneAddressbar();
-			tr.deselectAll(true);
-		}
+		this.remote.getTorrentStats(ids, function(a,b){tr.updateFromTorrentGet(a,b);});
 	},
-
-	updateTorrentsFileData: function(torrents) {
-		for (var i=0, o; o=torrents[i]; ++i) {
-			var t = this._torrents[o.id];
-			if (t) {
-				t.refreshFiles(o);
-				if (t === this._files_torrent)
-					this.refreshFileView();
-			}
-		}
-	},
-
 	initializeAllTorrents: function() {
 		var tr = this;
-		this.remote.getInitialDataFor(null ,function(torrents) { tr.addTorrents(torrents); });
+		this.remote.getTorrentInitial(null, function(a,b){tr.updateFromTorrentGet(a,b);});
+	},
+	refreshMetadata: function(ids) {
+		var tr = this;
+		this.remote.getTorrentMetadata(ids, function(a,b){tr.updateFromTorrentGet(a,b);});
+	},
+	refreshInspectorTorrents: function(full) {
+		var tr = this;
+		var ids = tr.getSelectedTorrentIds();
+		if (ids.length > 0)
+			this.remote.getTorrentDetails(ids, full, function(a,b){tr.updateFromTorrentGet(a,b);});
 	},
 
 	onRowClicked: function(ev, row)
@@ -1634,7 +1610,7 @@ Transmission.prototype =
 		// Shift-Click - selects a range from the last-clicked row to this one
 		if (iPhone) {
 			if (row.isSelected())
-				this.showInspector();
+				this.setInspectorVisible(true);
 			this.setSelectedRow(row);
 
 		} else if (ev.shiftKey) {
@@ -1660,20 +1636,6 @@ Transmission.prototype =
 		}
 
 		this._last_torrent_clicked = row.getTorrent().getId();
-	},
-
-	addTorrents: function(new_torrents)
-	{
-		var tr = this;
-		var key = 'dataChanged';
-
-		for (var i=0, row; row=new_torrents[i]; ++i) {
-			var t = new Torrent(row);
-			$(t).bind(key,function() {tr.refilterSoon();});
-			this._torrents[t.getId()] = t;
-		}
-
-		this.refilterSoon();
 	},
 
 	deleteTorrents: function(torrent_ids)
@@ -2197,27 +2159,26 @@ Transmission.prototype =
 
 	getTrackers: function()
 	{
-		var trackers = {};
+		var ret = {};
 
 		var torrents = this.getAllTorrents();
 		for (var i=0, torrent; torrent=torrents[i]; ++i) {
 			var names = [];
-			for (var j=0, tier; tier=torrent._trackerStats[j]; ++j) {
-				for (var k=0, tracker; tracker=tier[k]; ++k) {
-					var uri = parseUri(tracker.announce);
-					var domain = this.getDomainName(uri.host);
-					var name = this.getReadableDomain(domain);
-					if (!(name in trackers))
-						trackers[name] = { 'uri': uri, 'domain': domain, 'count': 0 };
-					if (names.indexOf(name) === -1)
-						names.push(name);
-				}
+			var trackers = torrent.getTrackers();
+			for (var j=0, tracker; tracker=trackers[j]; ++j) {
+				var uri = parseUri(tracker.announce);
+				var domain = this.getDomainName(uri.host);
+				var name = this.getReadableDomain(domain);
+				if (!(name in ret))
+					ret[name] = { 'uri': uri, 'domain': domain, 'count': 0 };
+				if (names.indexOf(name) === -1)
+					names.push(name);
 			}
 			for (var j=0, name; name=names[j]; ++j)
-				trackers[name].count++;
+				ret[name].count++;
 		}
 
-		return trackers;
+		return ret;
 	},
 
 	/***
