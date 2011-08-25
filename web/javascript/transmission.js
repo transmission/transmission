@@ -2070,6 +2070,7 @@ Transmission.prototype =
 		var states = [ Prefs._FilterAll,
 		               Prefs._FilterActive,
 		               Prefs._FilterDownloading,
+		               Prefs._FilterSeeding,
 		               Prefs._FilterPaused,
 		               Prefs._FilterFinished ];
 		for (var i=0, state; state=states[i]; ++i)
