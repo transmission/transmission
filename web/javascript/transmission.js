@@ -43,15 +43,15 @@ Transmission.prototype =
 		$('#resume_selected_link').click(function(e) { tr.startSelectedClicked(e); });
 		$('#remove_link').click(function(e) { tr.removeClicked(e); });
 		$('#prefs_save_button').click(function(e) { tr.savePrefsClicked(e); return false;});
-		$('#prefs_cancel_button').click(function(e) { tr.cancelPrefsClicked(e); return false; });
-		$('#block_update_button').click(function(e) { tr.blocklistUpdateClicked(e); return false; });
-		$('#stats_close_button').click(function(e) { tr.closeStatsClicked(e); return false; });
+		$('#prefs_cancel_button').click(function(e) { tr.hidePrefsDialog(); return false; });
+		$('#block_update_button').click(function(e) { tr.remote.updateBlocklist(); return false; });
+		$('#stats_close_button').click(function(e) { tr.hideStatsDialog(); return false; });
 		$('.inspector_tab').click(function(e) { tr.inspectorTabClicked(e, this); });
 		$('#files_select_all').live('click', function(e) { tr.filesSelectAllClicked(e, this); });
 		$('#files_deselect_all').live('click', function(e) { tr.filesDeselectAllClicked(e, this); });
 		$('#open_link').click(function(e) { tr.openTorrentClicked(e); });
 		$('#upload_confirm_button').click(function(e) { tr.confirmUploadClicked(e); return false;});
-		$('#upload_cancel_button').click(function(e) { tr.cancelUploadClicked(e); return false; });
+		$('#upload_cancel_button').click(function(e) { tr.hideUploadDialog(); return false; });
 		$('#turtle_button').click(function() { tr.toggleTurtleClicked(); return false; });
 		$('#compact-button').click(function() { tr.toggleCompactClicked(); return false; });
 		$('#prefs_tab_general_tab').click(function() { changeTab(this, 'prefs_tab_general'); });
@@ -618,17 +618,9 @@ Transmission.prototype =
 		this.updateButtonStates();
 	},
 
-	cancelUploadClicked: function() {
-		this.hideUploadDialog();
-	},
-
 	confirmUploadClicked: function() {
 		this.uploadTorrentFile(true);
 		this.hideUploadDialog();
-	},
-
-	cancelPrefsClicked: function() {
-		this.hidePrefsDialog();
 	},
 
 	savePrefsClicked: function()
@@ -681,27 +673,17 @@ Transmission.prototype =
 
 		tr.hidePrefsDialog();
 	},
-	blocklistUpdateClicked: function() {
-		var tr = this;
-		tr.remote.updateBlocklist();
-	},
-
-	closeStatsClicked: function() {
-		this.hideStatsDialog();
-	},
 
 	removeClicked: function(ev) {
-		var tr = this;
-		if (tr.isButtonEnabled(ev)) {
-			tr.removeSelectedTorrents();
-			tr.hideiPhoneAddressbar();
+		if (this.isButtonEnabled(ev)) {
+			this.removeSelectedTorrents();
+			this.hideiPhoneAddressbar();
 		}
 	},
 
 	toggleInspectorClicked: function(ev) {
-		var tr = this;
-		if (tr.isButtonEnabled(ev))
-			tr.toggleInspector();
+		if (this.isButtonEnabled(ev))
+			this.toggleInspector();
 	},
 
 	inspectorTabClicked: function(ev, tab) {
