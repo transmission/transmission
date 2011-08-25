@@ -27,15 +27,20 @@ TorrentRendererHelper.getProgressInfo = function(controller, t)
 	else
 		pct = 100;
 
-	var extra;
-	if (t.isStopped())
+	var extra = '';
+	var s = t.getStatus();
+	if (s == Torrent._StatusStopped)
 		extra = 'paused';
-	else if (t.isSeeding())
-		extra = 'seeding';
+	else if (s == Torrent._StatusDownloadWait)
+		extra = 'leeching queued';
 	else if (t.needsMetaData())
 		extra = 'magnet';
-	else
+	else if (s === Torrent._StatusDownload)
 		extra = 'leeching';
+	else if (s == Torrent._StatusSeedWait)
+		extra = 'seeding queued';
+	else if (s == Torrent._StatusSeed)
+		extra = 'seeding';
 
 	return {
 		percent: pct,
@@ -271,9 +276,20 @@ TorrentRendererCompact.prototype =
 		var c;
 		if ((c = t.getErrorMessage()))
 			return c;
-		if (t.isDownloading())
-			return [ TorrentRendererHelper.formatDL(t),
-			         TorrentRendererHelper.formatUL(t) ].join(' ');
+		if (t.isDownloading()) {
+			var have_dn = t.getDownloadSpeed() > 0;
+			var have_up = t.getUploadSpeed() > 0;
+			if (!have_up && !have_dn)
+				return 'Idle';
+			var s = '';
+			if (have_dn)
+				s += TorrentRendererHelper.formatDL(t);
+			if (have_dn && have_up)
+				s += ' '
+			if (have_up)
+				s += TorrentRendererHelper.formatUL(t);
+			return s;
+		}
 		if (t.isSeeding())
 			return [ 'Ratio: ',
 			         Transmission.fmt.ratioString(t.getUploadRatio()),

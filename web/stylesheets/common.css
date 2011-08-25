@@ -380,7 +380,7 @@ ul.torrent_list li.torrent.selected div.torrent_peer_details.error {
  * is pinned to the left side of the parent and has a higher z-index.
  *
  * The progressbar has different colors depending on its state, so there
- * are four 'decorator' classNames: magnet, seeding, leeching, and paused.
+ * are five 'decorator' classNames: paused, queued, magnet, leeching, seeding.
  */
 
 ul.torrent_list div.torrent_progress_bar_container {
@@ -441,13 +441,25 @@ ul.torrent_list div.torrent_progress_bar.complete.leeching {
         background-position: left 0px;
         border-color: #3D9DEA;
 }
+ul.torrent_list div.torrent_progress_bar.complete.leeching.queued {
+        background-position: left -70px;
+        border-color: #889CA5;
+}
 ul.torrent_list div.torrent_progress_bar.incomplete.leeching {
         background-position: left -20px;
         border-color: #CFCFCF;
 }
+ul.torrent_list div.torrent_progress_bar.incomplete.leeching.queued {
+        background-position: left -80px;
+        border-color: #C4C4C4;
+}
 ul.torrent_list div.torrent_progress_bar.complete.seeding {
         background-position: left -40px;
         border-color: #269E30;
+}
+ul.torrent_list div.torrent_progress_bar.complete.seeding.queued {
+        background-position: left -60px;
+        border-color: #8A998D;
 }
 ul.torrent_list div.torrent_progress_bar.incomplete.seeding {
         background-position: left -10px;
