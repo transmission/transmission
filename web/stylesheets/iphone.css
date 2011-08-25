@@ -407,12 +407,12 @@ ul.torrent_list div.torrent_progress_bar.incomplete.leeching {
         border-color: #CFCFCF;
 }
 ul.torrent_list div.torrent_progress_bar.complete.seeding {
-        background-position: left -10px;
-        border-color: #35CA53;
+        background-position: left -40px;
+        border-color: #269E30;
 }
 ul.torrent_list div.torrent_progress_bar.incomplete.seeding {
-        background-position: left -40px;
-        border-color: #35AC47;
+        background-position: left -10px;
+        border-color: #29AD35;
 }
 
 div.dialog_container {
