@@ -447,7 +447,7 @@ ul.torrent_list div.torrent_progress_bar.incomplete.leeching {
 }
 ul.torrent_list div.torrent_progress_bar.complete.seeding {
         background-position: left -40px;
-        border: 1px solid #269E30;
+        border-color: #269E30;
 }
 ul.torrent_list div.torrent_progress_bar.incomplete.seeding {
         background-position: left -10px;
