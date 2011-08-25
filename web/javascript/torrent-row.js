@@ -17,12 +17,12 @@ TorrentRendererHelper.getProgressInfo = function(controller, t)
 {
 	var seed_ratio_limit = t.seedRatioLimit(controller);
 
-	var pct = 0;
+	var pct;
 	if (t.needsMetaData())
 		pct = t.getMetadataPercentComplete() * 100;
 	else if (!t.isDone())
 		pct = Math.round(t.getPercentDone() * 100);
-	else if (seed_ratio_limit > 0)
+	else if (seed_ratio_limit > 0 && !t.isStopped())
 		pct = Math.round(t.getUploadRatio() * 100 / seed_ratio_limit);
 	else
 		pct = 100;
