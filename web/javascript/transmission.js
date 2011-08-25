@@ -72,6 +72,7 @@ Transmission.prototype =
 			$('#preferences_link').bind('click', function(e) { tr.releaseClutchPreferencesButton(e); });
 		} else {
 			$(document).bind('keydown',  function(e) { tr.keyDown(e); });
+			$(document).bind('keyup',  function(e) { tr.keyUp(e); });
 			$('#torrent_container').click(function() { tr.deselectAll(true); });
 			$('#inspector_link').click(function(e) { tr.toggleInspectorClicked(e); });
 
@@ -442,30 +443,31 @@ Transmission.prototype =
 		delete this._last_torrent_clicked;
 	},
 
+	indexOfLastTorrent: function() {
+		for (var i=0, r; r=this._rows[i]; ++i)
+			if (r.getTorrent().getId() === this._last_torrent_clicked)
+				return i;
+		return -1;
+	},
+
 	/* Select a range from this torrent to the last clicked torrent */
 	selectRange: function(row)
 	{
-		if (!this._last_torrent_clicked) {
-			this.selectRow(row);
-		} else { // select the range between the prevous & current
+		var last = this.indexOfLastTorrent();
 
-			var prev = null;
-			var next = null;
-			for (var i=0, r; r=this._rows[i]; ++i) {
-				if (r.getTorrent().getId() === this._last_torrent_clicked)
-					prev = i;
-				if (r === row)
-					next = i;
-			}
-			if ((prev!==null) && (next!==null)) {
-				var min = Math.min(prev, next);
-				var max = Math.max(prev, next);
-				for (i=min; i<=max; ++i)
-					this.selectRow(this._rows[i]);
-			}
+		if (last === -1)
+		{
+			this.selectRow(row);
+		}
+		else // select the range between the prevous & current
+		{
+			var next = this._rows.indexOf(row);
+			var min = Math.min(last, next);
+			var max = Math.max(last, next);
+			for (var i=min; i<=max; ++i)
+				this.selectRow(this._rows[i]);
 		}
 
-		//this._last_row_clicked = row
 		this.callSelectionChangedSoon();
 	},
 
@@ -501,26 +503,57 @@ Transmission.prototype =
 	{
 		var up = ev.keyCode === 38; // up key pressed
 		var dn = ev.keyCode === 40; // down key pressed
+		var shift = ev.keyCode === 16; // shift key pressed
 
 		if (up || dn)
 		{
 			var rows = this._rows;
 
-			// find the first selected row
-			for (var i=0, row; row=rows[i]; ++i)
-				if (row.isSelected())
-					break;
+			var last = this.indexOfLastTorrent();
+			var i = last;
 
-			if (i == rows.length) // no selection yet
+			if (i === -1) // no selection yet
 				i = 0;
 			else if (dn)
 				i = (i+1) % rows.length;
 			else if (up)
 				i = (i || rows.length) - 1;
+			r = rows[i];
 
-			this.setSelectedRow(rows[i]);
-			this.scrollToRow(rows[i]);
+			if (this._shift_index >= 0)
+			{
+				// user is extending the selection with the shift + arrow keys...
+				if (   ((this._shift_index <= last) && (last < i))
+				    || ((this._shift_index >= last) && (last > i)))
+				{
+					this.selectRow(r);
+				}
+				else if (((this._shift_index >= last) && (i > last))
+				      || ((this._shift_index <= last) && (last > i)))
+				{
+					this.deselectRow(rows[last]);
+				}
+			}
+			else
+			{
+				if (ev.shiftKey)
+					this.selectRange(r);
+				else
+					this.setSelectedRow(r);
+			}
+			this._last_torrent_clicked = r.getTorrent().getId();
+			this.scrollToRow(r);
 		}
+		else if (shift)
+		{
+			this._shift_index = this.indexOfLastTorrent();
+		}
+	},
+
+	keyUp: function(ev)
+	{
+		if (ev.keyCode === 16) // shift key pressed
+			delete this._shift_index;
 	},
 
 	isButtonEnabled: function(e) {
