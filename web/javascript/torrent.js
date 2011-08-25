@@ -125,7 +125,6 @@ Torrent.prototype =
 			for (var i=0, row; row=data.files[i]; ++i) {
 				this._files[i] = {
 					'index': i,
-					'torrent': this,
 					'length': row.length,
 					'name': row.name
 				};
