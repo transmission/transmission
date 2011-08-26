@@ -721,21 +721,6 @@ Transmission.prototype =
 		}
 	},
 
-	inspectorTabClicked: function(ev, tab) {
-		if (iPhone) ev.stopPropagation();
-
-		// select this tab and deselect the others
-		$(tab).addClass('selected').siblings().removeClass('selected');
-
-		// show this tab and hide the others
-		$('#'+tab.id+'_container').show().siblings('.inspector_container').hide();
-
-		this.hideiPhoneAddressbar();
-		this.updatePeersLists();
-		this.updateTrackersLists();
-		this.updateFileList();
-	},
-
 	filesSelectAllClicked: function() {
 		var t = this._file_torrent;
 		if (t)
@@ -1131,6 +1116,406 @@ Transmission.prototype =
 		return false; // to prevent the event from bubbling up
 	},
 
+
+	onTorrentChanged: function(ev)
+	{
+		this.refilterSoon();
+	
+		// if this torrent is in the inspector, refresh the inspector
+		if (this[Prefs._ShowInspector])
+			if (this.getSelectedTorrentIds().indexOf(ev.target.getId()) !== -1)
+				this.updateInspector();
+	},
+
+	updateFromTorrentGet: function(updates, removed_ids)
+	{
+		var new_ids = [];
+
+		for (var i=0, o; o=updates[i]; ++i) {
+			var t;
+			var id = o.id;
+			if ((t = this._torrents[id]))
+				t.refresh(o);
+			else {
+				t = this._torrents[id] = new Torrent(o);
+				$(t).bind('dataChanged',function(ev) {tr.onTorrentChanged(ev);});
+				new_ids.push(id);
+			}
+		}
+
+		if (new_ids.length) {
+			var tr = this;
+			this.remote.getTorrentInitial(new_ids, function(a,b){tr.updateFromTorrentGet(a,b);});
+			this.refilterSoon();
+		}
+
+		if (removed_ids) {
+			this.deleteTorrents(removed_ids);
+			this.refilterSoon();
+		}
+	},
+
+	refreshTorrents: function(ids) {
+		if (!ids)
+			ids = 'recently-active';
+		var tr = this;
+		this.remote.getTorrentStats(ids, function(a,b){tr.updateFromTorrentGet(a,b);});
+	},
+	initializeAllTorrents: function() {
+		var tr = this;
+		this.remote.getTorrentInitial(null, function(a,b){tr.updateFromTorrentGet(a,b);});
+	},
+	refreshMetadata: function(ids) {
+		var tr = this;
+		this.remote.getTorrentMetadata(ids, function(a,b){tr.updateFromTorrentGet(a,b);});
+	},
+	refreshInspectorTorrents: function(full) {
+		var tr = this;
+		var ids = tr.getSelectedTorrentIds();
+		if (ids.length > 0)
+			this.remote.getTorrentDetails(ids, full, function(a,b){tr.updateFromTorrentGet(a,b);});
+	},
+
+	onRowClicked: function(ev, row)
+	{
+		// Prevents click carrying to parent element
+		// which deselects all on click
+		ev.stopPropagation();
+		// but still hide the context menu if it is showing
+		$('#jqContextMenu').hide();
+
+		// 'Apple' button emulation on PC :
+		// Need settable meta-key and ctrl-key variables for mac emulation
+		var meta_key = ev.metaKey;
+		if (ev.ctrlKey && navigator.appVersion.toLowerCase().indexOf("mac") == -1)
+			meta_key = true;
+
+		// Shift-Click - selects a range from the last-clicked row to this one
+		if (iPhone) {
+			if (row.isSelected())
+				this.setInspectorVisible(true);
+			this.setSelectedRow(row);
+
+		} else if (ev.shiftKey) {
+			this.selectRange(row);
+			// Need to deselect any selected text
+			window.focus();
+
+		// Apple-Click, not selected
+		} else if (!row.isSelected() && meta_key) {
+			this.selectRow(row);
+
+		// Regular Click, not selected
+		} else if (!row.isSelected()) {
+			this.setSelectedRow(row);
+
+		// Apple-Click, selected
+		} else if (row.isSelected() && meta_key) {
+			this.deselectRow(row);
+
+		// Regular Click, selected
+		} else if (row.isSelected()) {
+			this.setSelectedRow(row);
+		}
+
+		this._last_torrent_clicked = row.getTorrentId();
+	},
+
+	deleteTorrents: function(torrent_ids)
+	{
+		if (torrent_ids && torrent_ids.length)
+		{
+			for (var i=0, id; id=torrent_ids[i]; ++i)
+				delete this._torrents[id];
+			this.refilter();
+		}
+	},
+
+	updateStatusbar: function()
+	{
+		this.refreshFilterButton();
+
+		// up/down speed
+		var u=0, d=0;
+		var torrents = this.getAllTorrents();
+		for (var i=0, row; row=torrents[i]; ++i) {
+			u += row.getUploadSpeed();
+			d += row.getDownloadSpeed();
+		}
+		setInnerHTML($('#statusbar #speed-up-label')[0], '&uarr; ' + Transmission.fmt.speedBps(u));
+		setInnerHTML($('#statusbar #speed-dn-label')[0], '&darr; ' + Transmission.fmt.speedBps(d));
+	},
+
+	/*
+	 * Select a torrent file to upload
+	 * FIXME
+	 */
+	uploadTorrentFile: function(confirmed)
+	{
+		// Display the upload dialog
+		if (! confirmed) {
+				$('input#torrent_upload_file').attr('value', '');
+				$('input#torrent_upload_url').attr('value', '');
+				$('input#torrent_auto_start').attr('checked', $('#prefs_form #auto_start')[0].checked);
+				$('#upload_container').show();
+                $('#torrent_upload_url').focus();
+			if (!iPhone && Safari3) {
+				setTimeout("$('div#upload_container div.dialog_window').css('top', '0px');",10);
+			}
+
+		// Submit the upload form
+		} else {
+			var tr = this;
+			var args = { };
+			var paused = !$('#torrent_auto_start').is(':checked');
+			if ('' != $('#torrent_upload_url').val()) {
+				tr.remote.addTorrentByUrl($('#torrent_upload_url').val(), { paused: paused });
+			} else {
+				args.url = '../upload?paused=' + paused;
+				args.type = 'POST';
+				args.data = { 'X-Transmission-Session-Id' : tr.remote._token };
+				args.dataType = 'xml';
+				args.iframe = true;
+				args.success = function() {
+					tr.refreshTorrents();
+					tr.togglePeriodicRefresh(true);
+				};
+				tr.togglePeriodicRefresh(false);
+				$('#torrent_upload_form').ajaxSubmit(args);
+			}
+		}
+	},
+
+	removeSelectedTorrents: function() {
+		var torrents = this.getSelectedTorrents();
+		if (torrents.length)
+			this.promptToRemoveTorrents(torrents);
+	},
+
+	removeSelectedTorrentsAndData: function() {
+		var torrents = this.getSelectedTorrents();
+		if (torrents.length)
+			this.promptToRemoveTorrentsAndData(torrents);
+	},
+
+	promptToRemoveTorrents:function(torrents)
+	{
+		if (torrents.length == 1)
+		{
+			var torrent = torrents[0];
+			var header = 'Remove ' + torrent.getName() + '?';
+			var message = 'Once removed, continuing the transfer will require the torrent file. Are you sure you want to remove it?';
+			dialog.confirm(header, message, 'Remove', 'transmission.removeTorrents', torrents);
+		}
+		else
+		{
+			var header = 'Remove ' + torrents.length + ' transfers?';
+			var message = 'Once removed, continuing the transfers will require the torrent files. Are you sure you want to remove them?';
+			dialog.confirm(header, message, 'Remove', 'transmission.removeTorrents', torrents);
+		}
+	},
+
+	promptToRemoveTorrentsAndData:function(torrents)
+	{
+		if (torrents.length == 1)
+		{
+			var torrent = torrents[0],
+				header = 'Remove ' + torrent.getName() + ' and delete data?',
+				message = 'All data downloaded for this torrent will be deleted. Are you sure you want to remove it?';
+			dialog.confirm(header, message, 'Remove', 'transmission.removeTorrentsAndData', torrents);
+		}
+		else
+		{
+			var header = 'Remove ' + torrents.length + ' transfers and delete data?',
+				message = 'All data downloaded for these torrents will be deleted. Are you sure you want to remove them?';
+			dialog.confirm(header, message, 'Remove', 'transmission.removeTorrentsAndData', torrents);
+		}
+	},
+
+	removeTorrents: function(torrents) {
+		var torrent_ids = jQuery.map(torrents, function(t) { return t.getId(); });
+		var tr = this;
+		this.remote.removeTorrents(torrent_ids, function() { tr.refreshTorrents();});
+	},
+
+	removeTorrentsAndData: function(torrents) {
+		this.remote.removeTorrentsAndData(torrents);
+	},
+
+	verifySelectedTorrents: function() {
+		this.verifyTorrents(this.getSelectedTorrents());
+	},
+
+	reannounceSelectedTorrents: function() {
+		this.reannounceTorrents(this.getSelectedTorrents());
+	},
+
+	startSelectedTorrents: function(force) {
+		this.startTorrents(this.getSelectedTorrents(), force);
+	},
+	startAllTorrents: function() {
+		this.startTorrents(this.getAllTorrents(), false);
+	},
+	startTorrent: function(torrent) {
+		this.startTorrents([ torrent ], false);
+	},
+	startTorrents: function(torrents, force) {
+		var torrent_ids = jQuery.map(torrents, function(t) { return t.getId(); });
+		var tr = this;
+		this.remote.startTorrents(torrent_ids, force, function() { tr.refreshTorrents(torrent_ids); });
+	},
+	verifyTorrent: function(torrent) {
+		this.verifyTorrents([ torrent ]);
+	},
+	verifyTorrents: function(torrents) {
+		var tr = this;
+		var torrent_ids = jQuery.map(torrents, function(t) { return t.getId(); });
+		this.remote.verifyTorrents(torrent_ids, function() { tr.refreshTorrents(torrent_ids); });
+	},
+
+	reannounceTorrent: function(torrent) {
+		this.reannounceTorrents([ torrent ]);
+	},
+	reannounceTorrents: function(torrents) {
+		var tr = this;
+		var torrent_ids = jQuery.map(torrents, function(t) { return t.getId(); });
+		this.remote.reannounceTorrents(torrent_ids, function() { tr.refreshTorrents(torrent_ids); });
+	},
+
+	stopSelectedTorrents: function() {
+		this.stopTorrents(this.getSelectedTorrents());
+	},
+	stopAllTorrents: function() {
+		this.stopTorrents(this.getAllTorrents());
+	},
+	stopTorrent: function(torrent) {
+		this.stopTorrents([ torrent ]);
+	},
+	stopTorrents: function(torrents) {
+		var torrent_ids = jQuery.map(torrents, function(t) { return t.getId(); });
+		var tr = this;
+		this.remote.stopTorrents(torrent_ids,	function() { tr.refreshTorrents(torrent_ids);});
+	},
+	changeFileCommand: function(command, rows) {
+		this.remote.changeFileCommand(command, rows);
+	},
+
+	hideiPhoneAddressbar: function(timeInSeconds) {
+		if (iPhone) {
+			var delayLength = timeInSeconds ? timeInSeconds*1000 : 150;
+			// not currently supported on iPhone
+			if (/*document.body.scrollTop!=1 && */scroll_timeout==null) {
+				var tr = this;
+				scroll_timeout = setTimeout(function() {tr.doToolbarHide();}, delayLength);
+			}
+		}
+	},
+	doToolbarHide: function() {
+		window.scrollTo(0,1);
+		scroll_timeout=null;
+	},
+
+	// Queue
+	moveTop: function() {
+		var tr = this;
+		var torrent_ids = this.getSelectedTorrentIds();
+		this.remote.moveTorrentsToTop(torrent_ids, function() { tr.refreshTorrents(torrent_ids);});
+	},
+	moveUp: function() {
+		var tr = this;
+		var torrent_ids = this.getSelectedTorrentIds();
+		this.remote.moveTorrentsUp(torrent_ids, function() { tr.refreshTorrents(torrent_ids);});
+	},
+	moveDown: function() {
+		var tr = this;
+		var torrent_ids = this.getSelectedTorrentIds();
+		this.remote.moveTorrentsDown(torrent_ids, function() { tr.refreshTorrents(torrent_ids);});
+	},
+	moveBottom: function() {
+		var tr = this;
+		var torrent_ids = this.getSelectedTorrentIds();
+		this.remote.moveTorrentsToBottom(torrent_ids, function() { tr.refreshTorrents(torrent_ids);});
+	},
+
+
+	/***
+	****
+	***/
+
+	onToggleRunningClicked: function(ev)
+	{
+		var torrent = ev.data.r.getTorrent();
+
+		if (torrent.isStopped())
+			this.startTorrent(torrent);
+		else
+			this.stopTorrent(torrent);
+	},
+
+	setEnabled: function(key, flag)
+	{
+		$(key).toggleClass('disabled', !flag);
+	},
+
+	updateButtonStates: function()
+	{
+		var showing_dialog = new RegExp("(prefs_showing|dialog_showing|open_showing)").test(document.body.className);
+		this._toolbar_buttons.toggleClass('disabled', showing_dialog);
+
+		if (!showing_dialog)
+		{
+			var haveSelection = false;
+			var haveActive = false;
+			var haveActiveSelection = false;
+			var havePaused = false;
+			var havePausedSelection = false;
+
+			for (var i=0, row; row=this._rows[i]; ++i) {
+				var isStopped = row.getTorrent().isStopped();
+				var isSelected = row.isSelected();
+				if (!isStopped) haveActive = true;
+				if (isStopped) havePaused = true;
+				if (isSelected) haveSelection = true;
+				if (isSelected && !isStopped) haveActiveSelection = true;
+				if (isSelected && isStopped) havePausedSelection = true;
+			}
+
+			this.setEnabled(this._toolbar_pause_button,       haveActiveSelection);
+			this.setEnabled(this._context_pause_button,       haveActiveSelection);
+			this.setEnabled(this._toolbar_start_button,       havePausedSelection);
+			this.setEnabled(this._context_start_button,       havePausedSelection);
+			this.setEnabled(this._context_move_top_button,    haveSelection);
+			this.setEnabled(this._context_move_up_button,     haveSelection);
+			this.setEnabled(this._context_move_down_button,   haveSelection);
+			this.setEnabled(this._context_move_bottom_button, haveSelection);
+			this.setEnabled(this._context_start_now_button,   havePausedSelection);
+			this.setEnabled(this._toolbar_remove_button,      haveSelection);
+			this.setEnabled(this._toolbar_pause_all_button,   haveActive);
+			this.setEnabled(this._toolbar_start_all_button,   havePaused);
+		}
+	},
+
+	/****
+	*****
+	*****  INSPECTOR
+	*****
+	****/
+
+	inspectorTabClicked: function(ev, tab)
+	{
+		if (iPhone) ev.stopPropagation();
+
+		// select this tab and deselect the others
+		$(tab).addClass('selected').siblings().removeClass('selected');
+
+		// show this tab and hide the others
+		$('#'+tab.id+'_container').show().siblings('.inspector_container').hide();
+
+		this.hideiPhoneAddressbar();
+		this.updatePeersLists();
+		this.updateTrackersLists();
+		this.updateFileList();
+	},
 	/*
 	 * Update the inspector with the latest data for the selected torrents
 	 */
@@ -1532,384 +1917,6 @@ Transmission.prototype =
 		this.setPref(Prefs._ShowInspector, visible);
 		if (visible)
 			this.updateInspector();
-	},
-
-	onTorrentChanged: function(ev)
-	{
-		this.refilterSoon();
-	
-		// if this torrent is in the inspector, refresh the inspector
-		if (this[Prefs._ShowInspector])
-			if (this.getSelectedTorrentIds().indexOf(ev.target.getId()) !== -1)
-				this.updateInspector();
-	},
-
-	updateFromTorrentGet: function(updates, removed_ids)
-	{
-		var new_ids = [];
-
-		for (var i=0, o; o=updates[i]; ++i) {
-			var t;
-			var id = o.id;
-			if ((t = this._torrents[id]))
-				t.refresh(o);
-			else {
-				t = this._torrents[id] = new Torrent(o);
-				$(t).bind('dataChanged',function(ev) {tr.onTorrentChanged(ev);});
-				new_ids.push(id);
-			}
-		}
-
-		if (new_ids.length) {
-			var tr = this;
-			this.remote.getTorrentInitial(new_ids, function(a,b){tr.updateFromTorrentGet(a,b);});
-			this.refilterSoon();
-		}
-
-		if (removed_ids) {
-			this.deleteTorrents(removed_ids);
-			this.refilterSoon();
-		}
-	},
-
-	refreshTorrents: function(ids) {
-		if (!ids)
-			ids = 'recently-active';
-		var tr = this;
-		this.remote.getTorrentStats(ids, function(a,b){tr.updateFromTorrentGet(a,b);});
-	},
-	initializeAllTorrents: function() {
-		var tr = this;
-		this.remote.getTorrentInitial(null, function(a,b){tr.updateFromTorrentGet(a,b);});
-	},
-	refreshMetadata: function(ids) {
-		var tr = this;
-		this.remote.getTorrentMetadata(ids, function(a,b){tr.updateFromTorrentGet(a,b);});
-	},
-	refreshInspectorTorrents: function(full) {
-		var tr = this;
-		var ids = tr.getSelectedTorrentIds();
-		if (ids.length > 0)
-			this.remote.getTorrentDetails(ids, full, function(a,b){tr.updateFromTorrentGet(a,b);});
-	},
-
-	onRowClicked: function(ev, row)
-	{
-		// Prevents click carrying to parent element
-		// which deselects all on click
-		ev.stopPropagation();
-		// but still hide the context menu if it is showing
-		$('#jqContextMenu').hide();
-
-		// 'Apple' button emulation on PC :
-		// Need settable meta-key and ctrl-key variables for mac emulation
-		var meta_key = ev.metaKey;
-		if (ev.ctrlKey && navigator.appVersion.toLowerCase().indexOf("mac") == -1)
-			meta_key = true;
-
-		// Shift-Click - selects a range from the last-clicked row to this one
-		if (iPhone) {
-			if (row.isSelected())
-				this.setInspectorVisible(true);
-			this.setSelectedRow(row);
-
-		} else if (ev.shiftKey) {
-			this.selectRange(row);
-			// Need to deselect any selected text
-			window.focus();
-
-		// Apple-Click, not selected
-		} else if (!row.isSelected() && meta_key) {
-			this.selectRow(row);
-
-		// Regular Click, not selected
-		} else if (!row.isSelected()) {
-			this.setSelectedRow(row);
-
-		// Apple-Click, selected
-		} else if (row.isSelected() && meta_key) {
-			this.deselectRow(row);
-
-		// Regular Click, selected
-		} else if (row.isSelected()) {
-			this.setSelectedRow(row);
-		}
-
-		this._last_torrent_clicked = row.getTorrentId();
-	},
-
-	deleteTorrents: function(torrent_ids)
-	{
-		if (torrent_ids && torrent_ids.length)
-		{
-			for (var i=0, id; id=torrent_ids[i]; ++i)
-				delete this._torrents[id];
-			this.refilter();
-		}
-	},
-
-	updateStatusbar: function()
-	{
-		this.refreshFilterButton();
-
-		// up/down speed
-		var u=0, d=0;
-		var torrents = this.getAllTorrents();
-		for (var i=0, row; row=torrents[i]; ++i) {
-			u += row.getUploadSpeed();
-			d += row.getDownloadSpeed();
-		}
-		setInnerHTML($('#statusbar #speed-up-label')[0], '&uarr; ' + Transmission.fmt.speedBps(u));
-		setInnerHTML($('#statusbar #speed-dn-label')[0], '&darr; ' + Transmission.fmt.speedBps(d));
-	},
-
-	/*
-	 * Select a torrent file to upload
-	 * FIXME
-	 */
-	uploadTorrentFile: function(confirmed)
-	{
-		// Display the upload dialog
-		if (! confirmed) {
-				$('input#torrent_upload_file').attr('value', '');
-				$('input#torrent_upload_url').attr('value', '');
-				$('input#torrent_auto_start').attr('checked', $('#prefs_form #auto_start')[0].checked);
-				$('#upload_container').show();
-                $('#torrent_upload_url').focus();
-			if (!iPhone && Safari3) {
-				setTimeout("$('div#upload_container div.dialog_window').css('top', '0px');",10);
-			}
-
-		// Submit the upload form
-		} else {
-			var tr = this;
-			var args = { };
-			var paused = !$('#torrent_auto_start').is(':checked');
-			if ('' != $('#torrent_upload_url').val()) {
-				tr.remote.addTorrentByUrl($('#torrent_upload_url').val(), { paused: paused });
-			} else {
-				args.url = '../upload?paused=' + paused;
-				args.type = 'POST';
-				args.data = { 'X-Transmission-Session-Id' : tr.remote._token };
-				args.dataType = 'xml';
-				args.iframe = true;
-				args.success = function() {
-					tr.refreshTorrents();
-					tr.togglePeriodicRefresh(true);
-				};
-				tr.togglePeriodicRefresh(false);
-				$('#torrent_upload_form').ajaxSubmit(args);
-			}
-		}
-	},
-
-	removeSelectedTorrents: function() {
-		var torrents = this.getSelectedTorrents();
-		if (torrents.length)
-			this.promptToRemoveTorrents(torrents);
-	},
-
-	removeSelectedTorrentsAndData: function() {
-		var torrents = this.getSelectedTorrents();
-		if (torrents.length)
-			this.promptToRemoveTorrentsAndData(torrents);
-	},
-
-	promptToRemoveTorrents:function(torrents)
-	{
-		if (torrents.length == 1)
-		{
-			var torrent = torrents[0];
-			var header = 'Remove ' + torrent.getName() + '?';
-			var message = 'Once removed, continuing the transfer will require the torrent file. Are you sure you want to remove it?';
-			dialog.confirm(header, message, 'Remove', 'transmission.removeTorrents', torrents);
-		}
-		else
-		{
-			var header = 'Remove ' + torrents.length + ' transfers?';
-			var message = 'Once removed, continuing the transfers will require the torrent files. Are you sure you want to remove them?';
-			dialog.confirm(header, message, 'Remove', 'transmission.removeTorrents', torrents);
-		}
-	},
-
-	promptToRemoveTorrentsAndData:function(torrents)
-	{
-		if (torrents.length == 1)
-		{
-			var torrent = torrents[0],
-				header = 'Remove ' + torrent.getName() + ' and delete data?',
-				message = 'All data downloaded for this torrent will be deleted. Are you sure you want to remove it?';
-			dialog.confirm(header, message, 'Remove', 'transmission.removeTorrentsAndData', torrents);
-		}
-		else
-		{
-			var header = 'Remove ' + torrents.length + ' transfers and delete data?',
-				message = 'All data downloaded for these torrents will be deleted. Are you sure you want to remove them?';
-			dialog.confirm(header, message, 'Remove', 'transmission.removeTorrentsAndData', torrents);
-		}
-	},
-
-	removeTorrents: function(torrents) {
-		var torrent_ids = jQuery.map(torrents, function(t) { return t.getId(); });
-		var tr = this;
-		this.remote.removeTorrents(torrent_ids, function() { tr.refreshTorrents();});
-	},
-
-	removeTorrentsAndData: function(torrents) {
-		this.remote.removeTorrentsAndData(torrents);
-	},
-
-	verifySelectedTorrents: function() {
-		this.verifyTorrents(this.getSelectedTorrents());
-	},
-
-	reannounceSelectedTorrents: function() {
-		this.reannounceTorrents(this.getSelectedTorrents());
-	},
-
-	startSelectedTorrents: function(force) {
-		this.startTorrents(this.getSelectedTorrents(), force);
-	},
-	startAllTorrents: function() {
-		this.startTorrents(this.getAllTorrents(), false);
-	},
-	startTorrent: function(torrent) {
-		this.startTorrents([ torrent ], false);
-	},
-	startTorrents: function(torrents, force) {
-		var torrent_ids = jQuery.map(torrents, function(t) { return t.getId(); });
-		var tr = this;
-		this.remote.startTorrents(torrent_ids, force, function() { tr.refreshTorrents(torrent_ids); });
-	},
-	verifyTorrent: function(torrent) {
-		this.verifyTorrents([ torrent ]);
-	},
-	verifyTorrents: function(torrents) {
-		var tr = this;
-		var torrent_ids = jQuery.map(torrents, function(t) { return t.getId(); });
-		this.remote.verifyTorrents(torrent_ids, function() { tr.refreshTorrents(torrent_ids); });
-	},
-
-	reannounceTorrent: function(torrent) {
-		this.reannounceTorrents([ torrent ]);
-	},
-	reannounceTorrents: function(torrents) {
-		var tr = this;
-		var torrent_ids = jQuery.map(torrents, function(t) { return t.getId(); });
-		this.remote.reannounceTorrents(torrent_ids, function() { tr.refreshTorrents(torrent_ids); });
-	},
-
-	stopSelectedTorrents: function() {
-		this.stopTorrents(this.getSelectedTorrents());
-	},
-	stopAllTorrents: function() {
-		this.stopTorrents(this.getAllTorrents());
-	},
-	stopTorrent: function(torrent) {
-		this.stopTorrents([ torrent ]);
-	},
-	stopTorrents: function(torrents) {
-		var torrent_ids = jQuery.map(torrents, function(t) { return t.getId(); });
-		var tr = this;
-		this.remote.stopTorrents(torrent_ids,	function() { tr.refreshTorrents(torrent_ids);});
-	},
-	changeFileCommand: function(command, rows) {
-		this.remote.changeFileCommand(command, rows);
-	},
-
-	hideiPhoneAddressbar: function(timeInSeconds) {
-		if (iPhone) {
-			var delayLength = timeInSeconds ? timeInSeconds*1000 : 150;
-			// not currently supported on iPhone
-			if (/*document.body.scrollTop!=1 && */scroll_timeout==null) {
-				var tr = this;
-				scroll_timeout = setTimeout(function() {tr.doToolbarHide();}, delayLength);
-			}
-		}
-	},
-	doToolbarHide: function() {
-		window.scrollTo(0,1);
-		scroll_timeout=null;
-	},
-
-	// Queue
-	moveTop: function() {
-		var tr = this;
-		var torrent_ids = this.getSelectedTorrentIds();
-		this.remote.moveTorrentsToTop(torrent_ids, function() { tr.refreshTorrents(torrent_ids);});
-	},
-	moveUp: function() {
-		var tr = this;
-		var torrent_ids = this.getSelectedTorrentIds();
-		this.remote.moveTorrentsUp(torrent_ids, function() { tr.refreshTorrents(torrent_ids);});
-	},
-	moveDown: function() {
-		var tr = this;
-		var torrent_ids = this.getSelectedTorrentIds();
-		this.remote.moveTorrentsDown(torrent_ids, function() { tr.refreshTorrents(torrent_ids);});
-	},
-	moveBottom: function() {
-		var tr = this;
-		var torrent_ids = this.getSelectedTorrentIds();
-		this.remote.moveTorrentsToBottom(torrent_ids, function() { tr.refreshTorrents(torrent_ids);});
-	},
-
-
-	/***
-	****
-	***/
-
-	onToggleRunningClicked: function(ev)
-	{
-		var torrent = ev.data.r.getTorrent();
-
-		if (torrent.isStopped())
-			this.startTorrent(torrent);
-		else
-			this.stopTorrent(torrent);
-	},
-
-	setEnabled: function(key, flag)
-	{
-		$(key).toggleClass('disabled', !flag);
-	},
-
-	updateButtonStates: function()
-	{
-		var showing_dialog = new RegExp("(prefs_showing|dialog_showing|open_showing)").test(document.body.className);
-		this._toolbar_buttons.toggleClass('disabled', showing_dialog);
-
-		if (!showing_dialog)
-		{
-			var haveSelection = false;
-			var haveActive = false;
-			var haveActiveSelection = false;
-			var havePaused = false;
-			var havePausedSelection = false;
-
-			for (var i=0, row; row=this._rows[i]; ++i) {
-				var isStopped = row.getTorrent().isStopped();
-				var isSelected = row.isSelected();
-				if (!isStopped) haveActive = true;
-				if (isStopped) havePaused = true;
-				if (isSelected) haveSelection = true;
-				if (isSelected && !isStopped) haveActiveSelection = true;
-				if (isSelected && isStopped) havePausedSelection = true;
-			}
-
-			this.setEnabled(this._toolbar_pause_button,       haveActiveSelection);
-			this.setEnabled(this._context_pause_button,       haveActiveSelection);
-			this.setEnabled(this._toolbar_start_button,       havePausedSelection);
-			this.setEnabled(this._context_start_button,       havePausedSelection);
-			this.setEnabled(this._context_move_top_button,    haveSelection);
-			this.setEnabled(this._context_move_up_button,     haveSelection);
-			this.setEnabled(this._context_move_down_button,   haveSelection);
-			this.setEnabled(this._context_move_bottom_button, haveSelection);
-			this.setEnabled(this._context_start_now_button,   havePausedSelection);
-			this.setEnabled(this._toolbar_remove_button,      haveSelection);
-			this.setEnabled(this._toolbar_pause_all_button,   haveActive);
-			this.setEnabled(this._toolbar_start_all_button,   havePaused);
-		}
 	},
 
 	/****
