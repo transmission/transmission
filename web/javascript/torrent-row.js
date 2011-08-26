@@ -64,17 +64,30 @@ TorrentRendererHelper.createProgressbar = function(classes)
 
 TorrentRendererHelper.renderProgressbar = function(controller, t, progressbar)
 {
-	var info = TorrentRendererHelper.getProgressInfo(controller, t);
 	var e;
+	var display;
+	var info = TorrentRendererHelper.getProgressInfo(controller, t);
+
+	// update the complete progressbar
 	e = progressbar.complete;
-	e.style.width = '' + info.percent + "%";
-	if (e.className !== info.complete)
-		e.className = info.complete;
-	e.style.display = info.percent<=0 ? 'none' : 'block';
+	if (info.percent > 0) {
+		display = 'block';
+		e.style.width = '' + info.percent + '%';
+	} else {
+		display = 'none';
+	}
+	if (e.style.display !== display)
+		e.style.display = display;
+	if (e.style.className !== info.complete)
+		e.style.className = info.complete;
+
+	// update the incomplete progressbar
 	e = progressbar.incomplete;
-	if (e.className !== info.incomplete)
-		e.className = info.incomplete;
-	e.style.display = info.percent>=100 ? 'none' : 'block';
+	display = (info.percent < 100) ? 'block' : 'none';
+	if (e.style.display !== display)
+		e.style.display = display;
+	if (e.style.className !== info.incomplete)
+		e.style.className = info.incomplete;
 };
 
 TorrentRendererHelper.formatUL = function(t)
