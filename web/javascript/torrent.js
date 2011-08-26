@@ -285,7 +285,7 @@ Torrent.prototype =
 			if (name)
 				f.collatedName = name.toLowerCase();
 		}
-		return f.collatedName;
+		return f.collatedName || '';
 	},
 	getCollatedTrackers: function() {
 		var f = this.fields;
@@ -294,7 +294,7 @@ Torrent.prototype =
 			if (trackers)
 				f.collatedTrackers = this.collateTrackers(trackers);
 		}
-		return f.collatedTrackers;
+		return f.collatedTrackers || '';
 	},
 
 	/****
