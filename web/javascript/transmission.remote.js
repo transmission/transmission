@@ -133,59 +133,19 @@ TransmissionRemote.prototype =
 		this.sendRequest(o, callback, async);
 	},
 
-	getTorrentInitial: function(torrent_ids, callback) {
+	updateTorrents: function(torrentIds, fields, callback, context) {
 		var o = {
 			method: 'torrent-get',
-			arguments: {
-				fields: ['id'].concat(Torrent.Fields.Metadata, Torrent.Fields.Stats)
+			'arguments': {
+				'fields': fields,
 			}
 		};
-
-		if (torrent_ids)
-			o.arguments.ids = torrent_ids;
-
-		this.sendRequest(o, function(data){ callback(data.arguments.torrents, data.arguments.removed);});
-	},
-
-	getTorrentMetadata: function(torrent_ids, callback) {
-		var o = {
-			method: 'torrent-get',
-			arguments: {
-				fields: ['id'].concat(Torrent.Fields.Metadata)
-			}
-		};
-
-		if (torrent_ids)
-			o.arguments.ids = torrent_ids;
-
-		this.sendRequest(o, function(data) {callback(data.arguments.torrents)});
-	},
-
-	getTorrentStats: function(torrent_ids, callback) {
-		var o = {
-			method: 'torrent-get',
-			arguments: {
-				'ids': torrent_ids,
-				fields: ['id'].concat(Torrent.Fields.Stats)
-			}
-		};
-
-		this.sendRequest(o, function(data) {callback(data.arguments.torrents, data.arguments.removed);});
-	},
-
-	/* called for the torrents in the inspector aka details dialog */
-	getTorrentDetails: function(torrent_ids, full, callback) {
-		var f = ['id'].concat(Torrent.Fields.StatsExtra);
-		if (full) // these only need to be loaded once...
-			f = f.concat(Torrent.Fields.InfoExtra);
-		var o = {
-			method: 'torrent-get',
-			arguments: {
-				'ids': torrent_ids,
-				fields: f,
-			}
-		};
-		this.sendRequest(o, function(data) {callback(data.arguments.torrents,null)});
+		if (torrentIds)
+			o['arguments'].ids = torrentIds;
+		this.sendRequest(o, function(response) {
+			var args = response['arguments'];
+			callback.call(context,args.torrents,args.removed);
+		});
 	},
 
 	changeFileCommand: function(command, rows) {

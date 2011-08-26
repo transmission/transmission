@@ -132,7 +132,7 @@ Transmission.prototype =
 		var async = false;
 		this.loadDaemonPrefs(async);
 		this.loadDaemonStats(async);
-		this.initializeAllTorrents();
+		this.initializeTorrents();
 		this.refreshTorrents();
 		this.togglePeriodicSessionRefresh(true);
 
@@ -1055,15 +1055,17 @@ Transmission.prototype =
 			if ((t = this._torrents[id]))
 				t.refresh(o);
 			else {
-				t = this._torrents[id] = new Torrent(o);
+				var tr = this;
+				t = tr._torrents[id] = new Torrent(o);
 				$(t).bind('dataChanged',function(ev) {tr.onTorrentChanged(ev);});
 				new_ids.push(id);
 			}
 		}
 
 		if (new_ids.length) {
-			var tr = this;
-			this.remote.getTorrentInitial(new_ids, function(a,b){tr.updateFromTorrentGet(a,b);});
+			// whee, new torrents! get their initial information.
+			var fields = ['id'].concat(Torrent.Fields.Metadata, Torrent.Fields.Stats);
+	        	this.remote.updateTorrents(new_ids, fields, this.updateFromTorrentGet, this);
 			this.refilterSoon();
 		}
 
@@ -1076,26 +1078,33 @@ Transmission.prototype =
 	refreshTorrents: function()
 	{
 		// send a request right now
-		var tr = this;
-		this.remote.getTorrentStats('recently-active', function(a,b){tr.updateFromTorrentGet(a,b);});
+		var fields = ['id'].concat(Torrent.Fields.Stats);
+		this.remote.updateTorrents('recently-active', fields, this.updateFromTorrentGet, this);
 
 		// schedule the next request
 		clearTimeout(this.refreshTorrentsTimeout);
-                this.refreshTorrentsTimeout = setTimeout(function(){tr.refreshTorrents();}, tr[Prefs._RefreshRate]*1000);
-	},
-	initializeAllTorrents: function() {
 		var tr = this;
-		this.remote.getTorrentInitial(null, function(a,b){tr.updateFromTorrentGet(a,b);});
+		this.refreshTorrentsTimeout = setTimeout(function(){tr.refreshTorrents();}, tr[Prefs._RefreshRate]*1000);
 	},
-	refreshMetadata: function(ids) {
-		var tr = this;
-		this.remote.getTorrentMetadata(ids, function(a,b){tr.updateFromTorrentGet(a,b);});
+
+	initializeTorrents: function()
+	{
+		// to bootstrap, we only need to ask for the servers's torrents' ids.
+		// updateFromTorrentGet() automatically asks for the rest of the info when it gets a new id.
+	        this.remote.updateTorrents(null, ['id'], this.updateFromTorrentGet, this);
 	},
-	refreshInspectorTorrents: function(full) {
-		var tr = this;
-		var ids = tr.getSelectedTorrentIds();
-		if (ids.length > 0)
-			this.remote.getTorrentDetails(ids, full, function(a,b){tr.updateFromTorrentGet(a,b);});
+
+	refreshInspectorTorrents: function(full)
+	{
+		// some torrent fields are only used by the inspector, so we defer loading them
+		// until the user is viewing the torrent in the inspector.
+		if ($('#torrent_inspector').is(':visible')) {
+			var ids = this.getSelectedTorrentIds();
+			if (ids && ids.length) {
+				var fields = ['id'].concat(Torrent.Fields.StatsExtra);
+				this.remote.updateTorrents(ids, fields, this.updateFromTorrentGet, this);
+			}
+		}
 	},
 
 	onRowClicked: function(ev, row)
