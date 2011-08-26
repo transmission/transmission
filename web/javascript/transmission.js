@@ -73,7 +73,7 @@ Transmission.prototype =
 		} else {
 			$(document).bind('keydown',  function(e) { tr.keyDown(e); });
 			$(document).bind('keyup',  function(e) { tr.keyUp(e); });
-			$('#torrent_container').click(function() { tr.deselectAll(true); });
+			$('#torrent_container').click(function() { tr.deselectAll(); });
 			$('#inspector_link').click(function(e) { tr.toggleInspector(); });
 
 			this.setupSearchBox();
@@ -213,14 +213,16 @@ Transmission.prototype =
 		// include transmenu js to save some bandwidth; if we
 		// start using prefs on iPhone we need to weed
 		// transmenu refs out of that too.
+		if (!iPhone)
+		{
+			$('#sort_by_' + this[Prefs._SortMethod]).selectMenuItem();
 
-		if (!iPhone) $('#sort_by_' + this[Prefs._SortMethod]).selectMenuItem();
+			if (this[Prefs._SortDirection] === Prefs._SortDescending)
+				$('#reverse_sort_order').selectMenuItem();
 
-		if (!iPhone && (this[Prefs._SortDirection] == Prefs._SortDescending))
-			$('#reverse_sort_order').selectMenuItem();
-
-		if (!iPhone && this[Prefs._ShowInspector])
-			this.setInspectorVisible(true);
+			if (this[Prefs._ShowInspector])
+				this.setInspectorVisible(true);
+		}
 
 		this.initCompactMode();
 	},
@@ -340,15 +342,7 @@ Transmission.prototype =
 	{
 		var torrents = [];
 		for (var key in this._torrents)
-		  torrents.push(this._torrents[key]);
-		return torrents;
-	},
-
-	getVisibleTorrents: function()
-	{
-		var torrents = [];
-		for (var i=0, row; row=this._rows[i]; ++i)
-			torrents.push(row.getTorrent());
+			torrents.push(this._torrents[key]);
 		return torrents;
 	},
 
@@ -374,8 +368,7 @@ Transmission.prototype =
 	seedRatioLimit: function() {
 		if (this._prefs && this._prefs['seedRatioLimited'])
 			return this._prefs['seedRatioLimit'];
-		else
-			return -1;
+		return -1;
 	},
 
 	setPref: function(key, val)
@@ -391,32 +384,19 @@ Transmission.prototype =
 	****/
 
 	getSelectedRows: function() {
-		var s = [];
-		for (var i=0, row; row=this._rows[i]; ++i)
-			if (row.isSelected())
-				s.push(row);
-		return s;
+		return $.grep(this._rows, function(r) {return r.isSelected();});
 	},
 
 	getSelectedTorrents: function() {
-		var s = this.getSelectedRows();
-		for (var i=0, row; row=s[i]; ++i)
-			s[i] = s[i].getTorrent();
-		return s;
+		return $.map(this.getSelectedRows(),function(r) {return r.getTorrent();});
 	},
 
 	getSelectedTorrentIds: function() {
-		var s = [];
-		for (var i=0, row; row=this._rows[i]; ++i)
-			if (row.isSelected())
-				s.push(row.getTorrentId());
-		return s;
+		return $.map(this.getSelectedRows(),function(r) {return r.getTorrentId();});
 	},
 
 	setSelectedRow: function(row) {
-		var rows = this.getSelectedRows();
-		for (var i=0, r; r=rows[i]; ++i)
-			this.deselectRow(r);
+		$.each(this.getSelectedRows(),function(i,r) {r.setSelected(false);});
 		this.selectRow(row);
 	},
 
@@ -431,13 +411,11 @@ Transmission.prototype =
 	},
 
 	selectAll: function() {
-		for (var i=0, row; row=this._rows[i]; ++i)
-			this.selectRow(row);
+		$.each(this._rows, function(i,r) {r.setSelected(true);});
 		this.callSelectionChangedSoon();
 	},
 	deselectAll: function() {
-		for (var i=0, row; row=this._rows[i]; ++i)
-			this.deselectRow(row);
+		$.each(this._rows, function(i,r) {r.setSelected(false);});
 		this.callSelectionChangedSoon();
 		delete this._last_torrent_clicked;
 	},
@@ -521,16 +499,17 @@ Transmission.prototype =
 				i = (i || rows.length) - 1;
 			var r = rows[i];
 
-			if (this._shift_index >= 0)
+			var anchor = this._shift_index;
+			if (anchor >= 0)
 			{
 				// user is extending the selection with the shift + arrow keys...
-				if (   ((this._shift_index <= last) && (last < i))
-				    || ((this._shift_index >= last) && (last > i)))
+				if (   ((anchor <= last) && (last < i))
+				    || ((anchor >= last) && (last > i)))
 				{
 					this.selectRow(r);
 				}
-				else if (((this._shift_index >= last) && (i > last))
-				      || ((this._shift_index <= last) && (last > i)))
+				else if (((anchor >= last) && (i > last))
+				      || ((anchor <= last) && (last > i)))
 				{
 					this.deselectRow(rows[last]);
 				}
@@ -717,27 +696,6 @@ Transmission.prototype =
 		if (this.isButtonEnabled(ev)) {
 			this.removeSelectedTorrents();
 			this.hideiPhoneAddressbar();
-		}
-	},
-
-	filesSelectAllClicked: function() {
-		var t = this._file_torrent;
-		if (t)
-			this.toggleFilesWantedDisplay(t, true);
-	},
-	filesDeselectAllClicked: function() {
-		var t = this._file_torrent;
-		if (t)
-			this.toggleFilesWantedDisplay(t, false);
-	},
-	toggleFilesWantedDisplay: function(torrent, wanted) {
-		var rows = [ ];
-		for (var i=0, row; row=this._file_rows[i]; ++i)
-			if (row.isEditable() && (torrent.getFile(i).wanted !== wanted))
-				rows.push(row);
-		if (rows.length > 0) {
-			var command = wanted ? 'files-wanted' : 'files-unwanted';
-			this.changeFileCommand(command, rows);
 		}
 	},
 
@@ -955,22 +913,20 @@ Transmission.prototype =
 	 */
 	updateStats: function(stats)
 	{
-		// can't think of a reason to remember this
-		//this._stats = stats;
-
 		var fmt = Transmission.fmt;
-		var session = stats["current-stats"];
-		var total = stats["cumulative-stats"];
 
-		setInnerHTML($('#stats_session_uploaded')[0], fmt.size(session["uploadedBytes"]));
-		setInnerHTML($('#stats_session_downloaded')[0], fmt.size(session["downloadedBytes"]));
-		setInnerHTML($('#stats_session_ratio')[0], fmt.ratioString(Math.ratio(session["uploadedBytes"],session["downloadedBytes"])));
-		setInnerHTML($('#stats_session_duration')[0], fmt.timeInterval(session["secondsActive"]));
-		setInnerHTML($('#stats_total_count')[0], total["sessionCount"] + " times");
-		setInnerHTML($('#stats_total_uploaded')[0], fmt.size(total["uploadedBytes"]));
-		setInnerHTML($('#stats_total_downloaded')[0], fmt.size(total["downloadedBytes"]));
-		setInnerHTML($('#stats_total_ratio')[0], fmt.ratioString(Math.ratio(total["uploadedBytes"],total["downloadedBytes"])));
-		setInnerHTML($('#stats_total_duration')[0], fmt.timeInterval(total["secondsActive"]));
+		var s = stats["current-stats"];
+		$('#stats_session_uploaded').html(fmt.size(s.uploadedBytes));
+		$('#stats_session_downloaded').html(fmt.size(s.downloadedBytes));
+		$('#stats_session_ratio').html(fmt.ratioString(Math.ratio(s.uploadedBytes,s.downloadedBytes)));
+		$('#stats_session_duration').html(fmt.timeInterval(s.secondsActive));
+
+		var t = stats["cumulative-stats"];
+		$('#stats_total_count').html(t.sessionCount + " times");
+		$('#stats_total_uploaded').html(fmt.size(t.uploadedBytes));
+		$('#stats_total_downloaded').html(fmt.size(t.downloadedBytes));
+		$('#stats_total_ratio').html(fmt.ratioString(Math.ratio(t.uploadedBytes,t.downloadedBytes)));
+		$('#stats_total_duration').html(fmt.timeInterval(t.secondsActive));
 	},
 
 	setSearch: function(search) {
@@ -1477,6 +1433,27 @@ Transmission.prototype =
 	*****
 	****/
 
+	filesSelectAllClicked: function() {
+		var t = this._file_torrent;
+		if (t)
+			this.toggleFilesWantedDisplay(t, true);
+	},
+	filesDeselectAllClicked: function() {
+		var t = this._file_torrent;
+		if (t)
+			this.toggleFilesWantedDisplay(t, false);
+	},
+	toggleFilesWantedDisplay: function(torrent, wanted) {
+		var rows = [ ];
+		for (var i=0, row; row=this._file_rows[i]; ++i)
+			if (row.isEditable() && (torrent.getFile(i).wanted !== wanted))
+				rows.push(row);
+		if (rows.length > 0) {
+			var command = wanted ? 'files-wanted' : 'files-unwanted';
+			this.changeFileCommand(command, rows);
+		}
+	},
+
 	inspectorTabClicked: function(ev, tab)
 	{
 		if (iPhone) ev.stopPropagation();
@@ -1531,6 +1508,7 @@ Transmission.prototype =
 		var total_verified = 0;
 		var na = 'N/A';
 		var tab = this._inspector._info_tab;
+		var fmt = Transmission.fmt;
 
 		$("#torrent_inspector_size, .inspector_row div").css('color', '#222');
 
@@ -1583,8 +1561,8 @@ Transmission.prototype =
 				download_dir = text;
 
 			hash = t.getHashString();
-			pieces = [ t.getPieceCount(), 'pieces @', Transmission.fmt.mem(t.getPieceSize()) ].join(' ');
-			date_created = Transmission.fmt.timestamp(t.getDateCreated());
+			pieces = [ t.getPieceCount(), 'pieces @', fmt.mem(t.getPieceSize()) ].join(' ');
+			date_created = fmt.timestamp(t.getDateCreated());
 		}
 
 		for (var i=0, t; t=torrents[i]; ++i) {
@@ -1614,7 +1592,6 @@ Transmission.prototype =
 		}
 
 		var private_string = '';
-		var fmt = Transmission.fmt;
 		if (have_private && have_public) private_string = 'Mixed';
 		else if (have_private) private_string = 'Private Torrent';
 		else if (have_public) private_string = 'Public Torrent';
@@ -1943,8 +1920,8 @@ Transmission.prototype =
 		else
 			text = 'Show <span class="filter-selection">' + state_string + '</span> at <span class="filter-selection">' + tracker_string + '</span>';
 
-		var torrent_count = this.getAllTorrents().length;
-		var visible_count = this.getVisibleTorrents().length;
+		var torrent_count = Object.keys(this._torrents).length;
+		var visible_count = this._rows.length;
 		if (torrent_count === visible_count)
 			text += ' &mdash; ' + torrent_count + ' Transfers';
 		else
