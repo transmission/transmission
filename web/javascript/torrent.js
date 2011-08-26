@@ -98,23 +98,13 @@ Torrent.Fields.StatsExtra = [
 	'activityDate',
 	'desiredAvailable',
 	'downloadDir',
-	'downloadLimit',
-	'downloadLimited',
 	'downloadedEver',
 	'fileStats',
 	'haveUnchecked',
 	'haveValid',
-	'honorsSessionLimits',
-	'manualAnnounceTime',
-	'peer-limit',
 	'peers',
-	'seedIdleLimit',
-	'seedIdleMode',
 	'seedRatioLimit',
-	'startDate',
 	'trackerStats',
-	'uploadLimited',
-	'uploadLimit',
 	'webseedsSendingToUs'
 ];
 
