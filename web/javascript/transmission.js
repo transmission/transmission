@@ -1081,7 +1081,7 @@ Transmission.prototype =
 
 		// schedule the next request
 		clearTimeout(this.refreshTorrentsTimeout);
-		this.refreshTorrentsTimeout = setTimeout(tr.refreshTorrents, tr[Prefs._RefreshRate]*1000);
+                this.refreshTorrentsTimeout = setTimeout(function(){tr.refreshTorrents();}, tr[Prefs._RefreshRate]*1000);
 	},
 	initializeAllTorrents: function() {
 		var tr = this;
