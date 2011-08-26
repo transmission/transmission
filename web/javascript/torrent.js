@@ -112,7 +112,6 @@ Torrent.Fields.StatsExtra = [
 	'seedIdleMode',
 	'seedRatioLimit',
 	'startDate',
-	'torrentFile',
 	'trackerStats',
 	'uploadLimited',
 	'uploadLimit',
