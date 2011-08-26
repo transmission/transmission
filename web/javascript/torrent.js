@@ -183,6 +183,7 @@ Torrent.prototype =
 					break;
 				case 'trackerStats': // 'trackerStats' is a superset of 'trackers'...
 					changed |= this.setField(this.fields,'trackers',data[key]);
+					break;
 				case 'trackers': // ...so only save 'trackers' if we don't have it already
 					if (!(key in this.fields))
 						changed |= this.setField(this.fields,key,data[key]);
