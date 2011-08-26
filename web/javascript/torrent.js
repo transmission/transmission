@@ -153,20 +153,12 @@ Torrent.prototype =
 		return announces.join('\t');
 	},
 
-	isField: function(name) {
-		return ( name === 'id' )
-		    || ( Torrent.Fields.Stats.indexOf(name)      !== -1 )
-		    || ( Torrent.Fields.StatsExtra.indexOf(name) !== -1 )
-		    || ( Torrent.Fields.InfoExtra.indexOf(name)  !== -1 )
-		    || ( Torrent.Fields.Metadata.indexOf(name)   !== -1 );
-	},
-
 	refreshFields: function(data)
 	{
 		var changed = false;
 
 		for (var key in data) {
-			if (this.isField(key)) switch (key) {
+			switch (key) {
 				case 'files':
 				case 'fileStats': // merge files and fileStats together
 					changed |= this.updateFiles(data[key]);
