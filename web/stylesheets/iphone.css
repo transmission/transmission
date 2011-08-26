@@ -312,11 +312,11 @@ ul.torrent_list li.torrent div.torrent_name {
 }
 
 ul.torrent_list li.torrent div.torrent_name.compact {
+	font-size: 1.0em;
 	font-weight: normal;
 }
 
 ul.torrent_list li.torrent div.torrent_name.paused {
-	font-size: 1.3em;
 	font-weight: normal;
 	color: #777;
 }
@@ -357,7 +357,6 @@ ul.torrent_list div.torrent_progress_bar_container.compact {
 	/*float: right;*/
 }
 ul.torrent_list div.torrent_peer_details.compact {
-	font-size: 12px; /* matching the progressbar height (10px) + progressbar border (1px top, 1px bottom) */
 	margin-top: 2px;
 	margin-left: 10px;
 	margin-right: 65px; /* leave room on the right for the progressbar */
