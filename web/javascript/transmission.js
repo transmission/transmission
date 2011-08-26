@@ -477,7 +477,6 @@ Transmission.prototype =
 
 		this.updateButtonStates();
 		this.updateInspector();
-		this.updateSelectedData();
 
 		clearTimeout(this.selectionChangedTimer);
 		delete this.selectionChangedTimer;
@@ -770,20 +769,6 @@ Transmission.prototype =
 		}
 	},
 
-	/* Turn the periodic ajax torrents refresh on & off for the selected torrents */
-	periodicTorrentUpdate: function(ids) {
-		clearInterval (this._metadata_refresh);
-		delete this._metadata_refresh;
-		delete this._extra_data_ids;
-		if (ids && ids.length) {
-			this.refreshTorrents(ids);
-			this._extra_data_ids = ids;
-			var tr = this;
-			var msec = this.getIntervalMsec(Prefs._RefreshRate, 3);
-			this._metadata_refresh = setInterval(function() { tr.refreshTorrents(ids);}, msec);
-		}
-	},
-
 	/* Turn the periodic ajax session refresh on & off */
 	togglePeriodicSessionRefresh: function(enabled) {
 		clearInterval(this._periodic_session_refresh);
@@ -816,15 +801,6 @@ Transmission.prototype =
 		var args = { };
 		args[RPC._TurtleState] = this[p];
 		this.remote.savePrefs(args);
-	},
-
-	updateSelectedData: function()
-	{
-		var ids = this.getSelectedTorrentIds();
-		if (ids.length > 0)
-			this.periodicTorrentUpdate(ids);
-		else
-			this.periodicTorrentUpdate(false);
 	},
 
 	updateTurtleButton: function() {
