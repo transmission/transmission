@@ -1164,8 +1164,10 @@ Transmission.prototype =
 			u += row.getUploadSpeed();
 			d += row.getDownloadSpeed();
 		}
-		setInnerHTML($('#statusbar #speed-up-label')[0], '&uarr; ' + Transmission.fmt.speedBps(u));
-		setInnerHTML($('#statusbar #speed-dn-label')[0], '&darr; ' + Transmission.fmt.speedBps(d));
+
+		var fmt = Transmission.fmt;
+		setInnerHTML($('#statusbar #speed-up-label')[0], u ? '&uarr; ' + fmt.speedBps(u) : '');
+		setInnerHTML($('#statusbar #speed-dn-label')[0], d ? '&darr; ' + fmt.speedBps(d) : '');
 	},
 
 	/*
