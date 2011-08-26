@@ -2006,7 +2006,7 @@ Transmission.prototype =
 		Torrent.sortTorrents(keep, this[Prefs._SortMethod], this[Prefs._SortDirection]);
 
 		// maybe rebuild the rows
-		if (!this.matchesTorrentList(keep))
+		if (this._force_refilter || !this.matchesTorrentList(keep))
 		{
 			var old_sel = this.getSelectedTorrents();
 			var new_sel_count = 0;
@@ -2039,6 +2039,8 @@ Transmission.prototype =
 
 			if (old_sel.length !== new_sel_count)
 				this.selectionChanged();
+
+			delete this._force_refilter;
 		}
 
 		// sync gui
@@ -2239,6 +2241,7 @@ Transmission.prototype =
 		// update the ui: torrent list
 		this.torrentRenderer = compact ? new TorrentRendererCompact()
 		                               : new TorrentRendererFull();
+		this._force_refilter = true;
 		this.refilter();
 	}
 };
