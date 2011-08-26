@@ -207,8 +207,6 @@ Torrent.prototype =
 	****/
 
 	// simple accessors
-	getCollatedName: function() { return this.fields.collatedName; },
-	getCollatedTrackers: function() { return this.fields.collatedTrackers; },
 	getComment: function() { return this.fields.comment; },
 	getCreator: function() { return this.fields.creator; },
 	getDateAdded: function() { return this.fields.addedDate; },
@@ -298,6 +296,24 @@ Torrent.prototype =
 				return null;
 		}
 	},
+	getCollatedName: function() {
+		var f = this.fields;
+		if (!f.collatedName) {
+			var name = this.getName();
+			if (name)
+				f.collatedName = name.toLowerCase();
+		}
+		return f.collatedName;
+	},
+	getCollatedTrackers: function() {
+		var f = this.fields;
+		if (!f.collatedTrackers) {
+			var trackers = this.getTrackers();
+			if (trackers)
+				f.collatedTrackers = this.collateTrackers(trackers);
+		}
+		return f.collatedTrackers;
+	},
 
 	/****
 	*****
@@ -364,14 +380,8 @@ Torrent.compareById = function(ta, tb)
 };
 Torrent.compareByName = function(ta, tb)
 {
-	var i = 0;
-	var a = ta.getCollatedName();
-	var b = tb.getCollatedName();
-	if (a && b)
-		i = a.compareTo(b);
-	if (i)
-		return i;
-	return Torrent.compareById(ta, tb);
+	return ta.getCollatedName().compareTo(tb.getCollatedName())
+	    || Torrent.compareById(ta, tb);
 };
 Torrent.compareByQueue = function(ta, tb)
 {
