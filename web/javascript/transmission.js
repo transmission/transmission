@@ -409,7 +409,7 @@ Transmission.prototype =
 		var s = [];
 		for (var i=0, row; row=this._rows[i]; ++i)
 			if (row.isSelected())
-				s.push(row.getTorrent().getId());
+				s.push(row.getTorrentId());
 		return s;
 	},
 
@@ -444,7 +444,7 @@ Transmission.prototype =
 
 	indexOfLastTorrent: function() {
 		for (var i=0, r; r=this._rows[i]; ++i)
-			if (r.getTorrent().getId() === this._last_torrent_clicked)
+			if (r.getTorrentId() === this._last_torrent_clicked)
 				return i;
 		return -1;
 	},
@@ -543,7 +543,7 @@ Transmission.prototype =
 				else
 					this.setSelectedRow(r);
 			}
-			this._last_torrent_clicked = r.getTorrent().getId();
+			this._last_torrent_clicked = r.getTorrentId();
 			this.scrollToRow(r);
 		}
 		else if (shift)
@@ -1635,7 +1635,7 @@ Transmission.prototype =
 			this.setSelectedRow(row);
 		}
 
-		this._last_torrent_clicked = row.getTorrent().getId();
+		this._last_torrent_clicked = row.getTorrentId();
 	},
 
 	deleteTorrents: function(torrent_ids)
@@ -1978,56 +1978,71 @@ Transmission.prototype =
 		}
 	},
 
+	matchesTorrentList: function(torrents)
+	{
+		if (!torrents || !this._rows)
+			return false;
+		if (torrents.length !== this._rows.length)
+			return false;
+
+		for (var i=0, tor; tor=torrents[i]; ++i)
+			if (tor.getId() !== this._rows[i].getTorrentId())
+				return false;
+
+		return true;
+	},
+
 	refilter: function()
 	{
 		clearTimeout(this.refilterTimer);
 		delete this.refilterTimer;
 
-		// decide which torrents to show
+		// make a filtered, sorted array of our torrents
 		var keep = [];
 		var all_torrents = this.getAllTorrents();
 		for (var i=0, t; t=all_torrents[i]; ++i)
 			if (t.test(this[Prefs._FilterMode], this._current_search, this.filterTracker))
 				keep.push(t);
+		Torrent.sortTorrents(keep, this[Prefs._SortMethod], this[Prefs._SortDirection]);
 
-		// sort the torrents we're going to show
-		Torrent.sortTorrents(keep, this[Prefs._SortMethod],
-		                           this[Prefs._SortDirection]);
-
-		// make a temporary backup of the selection
-		var sel = this.getSelectedTorrents();
-		var new_sel_count = 0;
-
-		// make the new rows
-		var tr = this;
-		var rows = [ ];
-		var fragment = document.createDocumentFragment();
-		for (var i=0, tor; tor=keep[i]; ++i)
+		// maybe rebuild the rows
+		if (!this.matchesTorrentList(keep))
 		{
-			var is_selected = sel.indexOf(tor) !== -1;
-			var row = new TorrentRow(this.torrentRenderer, this, tor, is_selected);
-			row.setEven((i+1) % 2 == 0);
-			if (is_selected)
-				new_sel_count++;
-			if (!iPhone) {
-				var b = row.getToggleRunningButton();
-				if (b)
-					$(b).click({r:row}, function(ev) {tr.onToggleRunningClicked(ev);});
+			var old_sel = this.getSelectedTorrents();
+			var new_sel_count = 0;
+
+			// make the new rows
+			var tr = this;
+			var rows = [ ];
+			var fragment = document.createDocumentFragment();
+			for (var i=0, tor; tor=keep[i]; ++i)
+			{
+				var is_selected = old_sel.indexOf(tor) !== -1;
+				var row = new TorrentRow(this.torrentRenderer, this, tor, is_selected);
+				row.setEven((i+1) % 2 == 0);
+				if (is_selected)
+					new_sel_count++;
+				if (!iPhone) {
+					var b = row.getToggleRunningButton();
+					if (b)
+						$(b).click({r:row}, function(ev) {tr.onToggleRunningClicked(ev);});
+				}
+				$(row.getElement()).click({r: row}, function(ev) {tr.onRowClicked(ev,ev.data.r);});
+				$(row.getElement()).dblclick(function() { tr.toggleInspector();});
+				fragment.appendChild(row.getElement());
+				rows.push(row);
 			}
-			$(row.getElement()).click({r: row}, function(ev) {tr.onRowClicked(ev,ev.data.r);});
-			$(row.getElement()).dblclick(function() { tr.toggleInspector();});
-			fragment.appendChild(row.getElement());
-			rows.push(row);
+			$('ul.torrent_list').empty();
+			delete this._rows;
+			this._rows = rows;
+			this._torrent_list.appendChild(fragment);
+
+			if (old_sel.length !== new_sel_count)
+				this.selectionChanged();
 		}
-		$('ul.torrent_list').empty();
-		delete this._rows;
-		this._rows = rows;
-		this._torrent_list.appendChild(fragment);
 
 		// sync gui
 		this.updateStatusbar();
-		if (sel.length !== new_sel_count)
-			this.selectionChanged();
 		this.refreshFilterButton();
 	},
 
