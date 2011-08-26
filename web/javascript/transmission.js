@@ -1047,7 +1047,7 @@ Transmission.prototype =
 
 	updateFromTorrentGet: function(updates, removed_ids)
 	{
-		var new_ids = [];
+		var needinfo = [];
 
 		for (var i=0, o; o=updates[i]; ++i) {
 			var t;
@@ -1058,14 +1058,15 @@ Transmission.prototype =
 				var tr = this;
 				t = tr._torrents[id] = new Torrent(o);
 				$(t).bind('dataChanged',function(ev) {tr.onTorrentChanged(ev);});
-				new_ids.push(id);
+				if(!('name' in t.fields) || !('status' in t.fields)) // missing some fields...
+					needinfo.push(id);
 			}
 		}
 
-		if (new_ids.length) {
+		if (needinfo.length) {
 			// whee, new torrents! get their initial information.
 			var fields = ['id'].concat(Torrent.Fields.Metadata, Torrent.Fields.Stats);
-	        	this.remote.updateTorrents(new_ids, fields, this.updateFromTorrentGet, this);
+	        	this.remote.updateTorrents(needinfo, fields, this.updateFromTorrentGet, this);
 			this.refilterSoon();
 		}
 
@@ -1091,7 +1092,8 @@ Transmission.prototype =
 	{
 		// to bootstrap, we only need to ask for the servers's torrents' ids.
 		// updateFromTorrentGet() automatically asks for the rest of the info when it gets a new id.
-	        this.remote.updateTorrents(null, ['id'], this.updateFromTorrentGet, this);
+		var fields = ['id'].concat(Torrent.Fields.Metadata, Torrent.Fields.Stats);
+	        this.remote.updateTorrents(null, fields, this.updateFromTorrentGet, this);
 	},
 
 	refreshInspectorTorrents: function(full)

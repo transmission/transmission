@@ -208,7 +208,7 @@ Torrent.prototype =
 	getId: function() { return this.fields.id; },
 	getLeftUntilDone: function() { return this.fields.leftUntilDone; },
 	getMetadataPercentComplete: function() { return this.fields.metadataPercentComplete; },
-	getName: function() { return this.fields.name; },
+	getName: function() { return this.fields.name || 'Unknown'; },
 	getPeers: function() { return this.fields.peers; },
 	getPeersConnected: function() { return this.fields.peersConnected; },
 	getPeersGettingFromUs: function() { return this.fields.peersGettingFromUs; },
@@ -255,7 +255,9 @@ Torrent.prototype =
 			case Torrent._StatusDownload:       return 'Downloading';
 			case Torrent._StatusSeedWait:       return 'Queued for seeding';
 			case Torrent._StatusSeed:           return 'Seeding';
-			default:                            return 'error';
+			case null:
+			case undefined:                     return 'Unknown';
+			default:                            return 'Error';
 		}
 	},
 	seedRatioLimit: function(controller){
@@ -281,7 +283,7 @@ Torrent.prototype =
 	getCollatedName: function() {
 		var f = this.fields;
 		if (!f.collatedName) {
-			var name = this.getName();
+			var name = this.fields.name;
 			if (name)
 				f.collatedName = name.toLowerCase();
 		}
