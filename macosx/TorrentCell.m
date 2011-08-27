@@ -469,6 +469,7 @@
         #warning image should use new gear
         NSString * actionImageString;
         if (fMouseDownActionButton)
+            #warning we can get rid of the on 10.7
             actionImageString = @"ActionOn.png";
         else if (!fTracking && fHoverAction)
             actionImageString = @"ActionHover.png";

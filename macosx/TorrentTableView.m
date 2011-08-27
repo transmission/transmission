@@ -72,6 +72,7 @@
         fMouseControlRow = -1;
         fMouseRevealRow = -1;
         fMouseActionRow = -1;
+        #warning we can get rid of the on 10.7
         fActionPushedRow = -1;
         
         fActionPopoverShown = NO;
@@ -411,14 +412,20 @@
     //avoid weird behavior when showing menu by doing this after mouse down
     if (row != -1 && fMouseActionRow == row)
     {
-        fActionPushedRow = row;
-        [self setNeedsDisplayInRect: [self rectOfRow: row]]; //ensure button is pushed down
+        if (![NSApp isOnLionOrBetter])
+        {
+            fActionPushedRow = row;
+            [self setNeedsDisplayInRect: [self rectOfRow: row]]; //ensure button is pushed down
+        }
         
         #warning maybe make appear on mouse down
         [self displayTorrentActionPopoverForEvent: event];
         
-        fActionPushedRow = -1;
-        [self setNeedsDisplayInRect: [self rectOfRow: row]];
+        if (![NSApp isOnLionOrBetter])
+        {
+            fActionPushedRow = -1;
+            [self setNeedsDisplayInRect: [self rectOfRow: row]];
+        }
     }
     else if (!pushed && [event clickCount] == 2) //double click
     {
