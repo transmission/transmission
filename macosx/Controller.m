@@ -3429,7 +3429,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     if ([ident isEqualToString: TOOLBAR_RESUME_ALL])
     {
         for (Torrent * torrent in fTorrents)
-            if (![torrent isActive] && ![torrent waitingToStart])
+            if (![torrent isActive] && ![torrent waitingToStart] && ![torrent isFinishedSeeding])
                 return YES;
         return NO;
     }
@@ -3729,7 +3729,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
             return NO;
     
         for (Torrent * torrent in fTorrents)
-            if (![torrent isActive] && [torrent waitingToStart])
+            if ([torrent waitingToStart])
                 return YES;
         return NO;
     }
