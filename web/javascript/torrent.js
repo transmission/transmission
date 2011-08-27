@@ -282,20 +282,14 @@ Torrent.prototype =
 	},
 	getCollatedName: function() {
 		var f = this.fields;
-		if (!f.collatedName) {
-			var name = this.fields.name;
-			if (name)
-				f.collatedName = name.toLowerCase();
-		}
+		if (!f.collatedName && f.name)
+			f.collatedName = f.name.toLowerCase();
 		return f.collatedName || '';
 	},
 	getCollatedTrackers: function() {
 		var f = this.fields;
-		if (!f.collatedTrackers) {
-			var trackers = this.getTrackers();
-			if (trackers)
-				f.collatedTrackers = this.collateTrackers(trackers);
-		}
+		if (!f.collatedTrackers && f.trackers)
+			f.collatedTrackers = this.collateTrackers(f.trackers);
 		return f.collatedTrackers || '';
 	},
 

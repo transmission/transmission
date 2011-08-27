@@ -1104,6 +1104,8 @@ Transmission.prototype =
 			var ids = this.getSelectedTorrentIds();
 			if (ids && ids.length) {
 				var fields = ['id'].concat(Torrent.Fields.StatsExtra);
+				if (full)
+					fields = fields.concat(Torrent.Fields.InfoExtra);
 				this.remote.updateTorrents(ids, fields, this.updateFromTorrentGet, this);
 			}
 		}
@@ -1956,11 +1958,12 @@ Transmission.prototype =
 		delete this.refilterTimer;
 
 		// make a filtered, sorted array of our torrents
-		var keep = [];
-		var all_torrents = this.getAllTorrents();
-		for (var i=0, t; t=all_torrents[i]; ++i)
-			if (t.test(this[Prefs._FilterMode], this._current_search, this.filterTracker))
-				keep.push(t);
+		var filter_mode = this[Prefs._FilterMode];
+		var filter_text = this._current_search;
+		var filter_tracker = this.filterTracker;
+		var keep = $.grep(this.getAllTorrents(), function(t) {
+			return t.test(filter_mode, filter_text, filter_tracker);
+		});
 		Torrent.sortTorrents(keep, this[Prefs._SortMethod], this[Prefs._SortDirection]);
 
 		// maybe rebuild the rows
@@ -1973,10 +1976,11 @@ Transmission.prototype =
 			var tr = this;
 			var rows = [ ];
 			var fragment = document.createDocumentFragment();
+			var renderer = this.torrentRenderer;
 			for (var i=0, tor; tor=keep[i]; ++i)
 			{
 				var is_selected = old_sel.indexOf(tor) !== -1;
-				var row = new TorrentRow(this.torrentRenderer, this, tor, is_selected);
+				var row = new TorrentRow(renderer, this, tor, is_selected);
 				row.setEven((i+1) % 2 == 0);
 				if (is_selected)
 					new_sel_count++;
@@ -1985,8 +1989,8 @@ Transmission.prototype =
 					if (b)
 						$(b).click({r:row}, function(ev) {tr.onToggleRunningClicked(ev);});
 				}
-				$(row.getElement()).click({r: row}, function(ev) {tr.onRowClicked(ev,ev.data.r);});
-				$(row.getElement()).dblclick(function() { tr.toggleInspector();});
+				$(row.getElement()).click({r: row}, function(ev) {tr.onRowClicked(ev,ev.data.r);})
+				                   .dblclick(function() {tr.toggleInspector();});
 				fragment.appendChild(row.getElement());
 				rows.push(row);
 			}
@@ -2058,10 +2062,7 @@ Transmission.prototype =
 		***/
 
 		var trackers = this.getTrackers();
-		var names = [];
-		for (var name in trackers)
-			names.push(name);
-		names.sort();
+		var names = Object.keys(trackers).sort();
 
 		var fragment = document.createDocumentFragment();
 		var div = document.createElement('div');
