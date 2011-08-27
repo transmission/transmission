@@ -203,7 +203,6 @@ Prefs._SortByQueue        = 'queue_order';
 Prefs._SortByProgress     = 'percent_completed';
 Prefs._SortByRatio        = 'ratio';
 Prefs._SortByState        = 'state';
-Prefs._SortByTracker      = 'tracker';
 
 Prefs._TurtleState        = 'turtle-state';
 Prefs._CompactDisplayState= 'compact_display_state';

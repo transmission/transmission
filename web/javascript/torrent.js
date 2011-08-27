@@ -95,7 +95,6 @@ Torrent.Fields.InfoExtra = [
 
 // fields used in the inspector which need to be periodically refreshed
 Torrent.Fields.StatsExtra = [
-	'activityDate',
 	'desiredAvailable',
 	'downloadDir',
 	'downloadedEver',
@@ -124,10 +123,10 @@ Torrent.prototype =
 
 	setField: function(o, name, value)
 	{
-		var changed = !(name in o) || (o[name] !== value);
-		if (changed)
-			o[name] = value;
-		return changed;
+		if (o[name] === value)
+			return false;
+		o[name] = value;
+		return true;
 	},
 
 	// fields.files is an array of unions of RPC's "files" and "fileStats" objects.
@@ -181,7 +180,7 @@ Torrent.prototype =
 	refresh: function(data)
 	{
 		if (this.refreshFields(data))
-			$(this).trigger('dataChanged');
+			$(this).trigger('dataChanged', this);
 	},
 
 	/****
@@ -239,13 +238,7 @@ Torrent.prototype =
 	needsMetaData: function(){ return this.getMetadataPercentComplete() < 1; },
 	getActivity: function() { return this.getDownloadSpeed() + this.getUploadSpeed(); },
 	getPercentDoneStr: function() { return Transmission.fmt.percentString(100*this.getPercentDone()); },
-	getPercentDone: function() {
-		var finalSize = this.getSizeWhenDone();
-		if (!finalSize) return 1.0;
-		var left = this.getLeftUntilDone();
-		if (!left) return 1.0;
-		return (finalSize - left) / finalSize;
-	},
+	getPercentDone: function() { return this.fields.percentDone; },
 	getStateString: function() {
 		switch(this.getStatus()) {
 			case Torrent._StatusStopped:        return this.isFinished() ? 'Seeding complete' : 'Paused';
@@ -396,6 +389,41 @@ Torrent.compareByProgress = function(ta, tb)
 	var a = ta.getPercentDone();
 	var b = tb.getPercentDone();
 	return (a - b) || Torrent.compareByRatio(ta, tb);
+};
+
+Torrent.compareTorrents = function(a, b, sortMethod, sortDirection)
+{
+	var i;
+
+	switch(sortMethod)
+	{
+		case Prefs._SortByActivity:
+			i = Torrent.compareByActivity(a,b);
+			break;
+		case Prefs._SortByAge:
+			i = Torrent.compareByAge(a,b);
+			break;
+		case Prefs._SortByQueue:
+			i = Torrent.compareByQueue(a,b);
+			break;
+		case Prefs._SortByProgress:
+			i = Torrent.compareByProgress(a,b);
+			break;
+		case Prefs._SortByState:
+			i = Torrent.compareByState(a,b);
+			break;
+		case Prefs._SortByRatio:
+			i = Torrent.compareByRatio(a,b);
+			break;
+		default:
+			i = Torrent.compareByName(a,b);
+			break;
+	}
+
+	if (sortDirection === Prefs._SortDescending)
+		i = -i;
+
+	return i;
 };
 
 /**
