@@ -1053,7 +1053,7 @@ Transmission.prototype =
 	
 		// if this torrent is in the inspector, refresh the inspector
 		if (this[Prefs._ShowInspector])
-			if (this.getSelectedTorrentIds().indexOf(ev.target.getId()) !== -1)
+			if (this.getSelectedTorrentIds().indexOf(id) !== -1)
 				this.updateInspector();
 	},
 
