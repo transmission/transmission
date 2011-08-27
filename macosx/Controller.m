@@ -4143,6 +4143,10 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
             [self performSelectorOnMainThread: @selector(rpcMovedTorrent:) withObject: torrent waitUntilDone: NO];
             break;
         
+        case TR_RPC_SESSION_QUEUE_POSITIONS_CHANGED:
+            [self performSelectorOnMainThread: @selector(rpcUpdateQueue) withObject: nil waitUntilDone: NO];
+            break;
+        
         case TR_RPC_SESSION_CHANGED:
             [fPrefsController performSelectorOnMainThread: @selector(rpcUpdatePrefs) withObject: nil waitUntilDone: NO];
             break;
@@ -4222,6 +4226,22 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         [fInfoController updateInfoStats];
     
     [torrent release];
+}
+
+- (void) rpcUpdateQueue
+{
+    NSLog(@"rpcUpdateQueue");
+    
+    for (Torrent * torrent in fTorrents)
+        [torrent update];
+    
+    NSSortDescriptor * descriptor = [[NSSortDescriptor alloc] initWithKey: @"queuePosition" ascending: YES];
+    NSArray * descriptors = [NSArray arrayWithObject: descriptor];
+    [descriptor release];
+    
+    [fTorrents sortUsingDescriptors: descriptors];
+    
+    [self fullUpdateUI];
 }
 
 @end

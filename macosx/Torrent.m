@@ -346,7 +346,6 @@ int trashDataFile(const char * filename)
     }
 }
 
-#warning remove
 - (NSInteger) queuePosition
 {
     return fStat->queuePosition;

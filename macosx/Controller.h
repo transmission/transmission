@@ -261,5 +261,6 @@ typedef enum
 - (void) rpcStartedStoppedTorrent: (Torrent *) torrent;
 - (void) rpcChangedTorrent: (Torrent *) torrent;
 - (void) rpcMovedTorrent: (Torrent *) torrent;
+- (void) rpcUpdateQueue;
 
 @end

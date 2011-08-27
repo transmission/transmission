@@ -187,11 +187,12 @@ getTorrents( tr_session * session,
 }
 
 static void
-notifyBatchChange( tr_session * session, tr_torrent ** torrents, int n )
+notifyBatchQueueChange( tr_session * session, tr_torrent ** torrents, int n )
 {
     int i;
     for( i=0; i<n; ++i )
         notify( session, TR_RPC_TORRENT_CHANGED, torrents[i] );
+    notify( session, TR_RPC_SESSION_QUEUE_POSITIONS_CHANGED, NULL );
 }
 
 static const char*
@@ -203,7 +204,7 @@ queueMoveTop( tr_session               * session,
     int n;
     tr_torrent ** torrents = getTorrents( session, args_in, &n );
     tr_torrentsQueueMoveTop( torrents, n );
-    notifyBatchChange( session, torrents, n );
+    notifyBatchQueueChange( session, torrents, n );
     tr_free( torrents );
     return NULL;
 }
@@ -217,7 +218,7 @@ queueMoveUp( tr_session               * session,
     int n;
     tr_torrent ** torrents = getTorrents( session, args_in, &n );
     tr_torrentsQueueMoveUp( torrents, n );
-    notifyBatchChange( session, torrents, n );
+    notifyBatchQueueChange( session, torrents, n );
     tr_free( torrents );
     return NULL;
 }
@@ -231,7 +232,7 @@ queueMoveDown( tr_session               * session,
     int n;
     tr_torrent ** torrents = getTorrents( session, args_in, &n );
     tr_torrentsQueueMoveDown( torrents, n );
-    notifyBatchChange( session, torrents, n );
+    notifyBatchQueueChange( session, torrents, n );
     tr_free( torrents );
     return NULL;
 }
@@ -245,7 +246,7 @@ queueMoveBottom( tr_session               * session,
     int n;
     tr_torrent ** torrents = getTorrents( session, args_in, &n );
     tr_torrentsQueueMoveBottom( torrents, n );
-    notifyBatchChange( session, torrents, n );
+    notifyBatchQueueChange( session, torrents, n );
     tr_free( torrents );
     return NULL;
 }
