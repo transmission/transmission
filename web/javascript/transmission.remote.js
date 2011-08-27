@@ -89,7 +89,6 @@ TransmissionRemote.prototype =
 			'alert(remote._error);',
 			null,
 			'Dismiss');
-		remote._controller.togglePeriodicRefresh(false);
 		remote._controller.togglePeriodicSessionRefresh(false);
 	},
 
