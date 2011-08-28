@@ -107,7 +107,7 @@ TransmissionRemote.prototype =
 			contentType: 'json',
 			dataType: 'json',
 			cache: false,
-			data: $.toJSON(data),
+			data: JSON.stringify(data),
 			beforeSend: function(XHR){ remote.appendSessionId(XHR); },
 			error: function(request, error_string, exception){ remote.ajaxError(request, error_string, exception, ajaxSettings); },
 			success: callback,
