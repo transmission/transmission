@@ -96,7 +96,7 @@ TransmissionRemote.prototype =
 		XHR.setRequestHeader('X-Transmission-Session-Id', this._token);
 	},
 
-	sendRequest: function(data, success, async) {
+	sendRequest: function(data, callback, context, async) {
 		remote = this;
 		if (typeof async != 'boolean')
 			async = true;
@@ -110,32 +110,33 @@ TransmissionRemote.prototype =
 			data: $.toJSON(data),
 			beforeSend: function(XHR){ remote.appendSessionId(XHR); },
 			error: function(request, error_string, exception){ remote.ajaxError(request, error_string, exception, ajaxSettings); },
-			success: success,
+			success: callback,
+			context: context,
 			async: async
 		};
 
 		$.ajax(ajaxSettings);
 	},
 
-	loadDaemonPrefs: function(callback, async) {
+	loadDaemonPrefs: function(callback, context, async) {
 		var o = { method: 'session-get' };
-		this.sendRequest(o, callback, async);
+		this.sendRequest(o, callback, context, async);
 	},
 	
-	checkPort: function(callback, async) {
+	checkPort: function(callback, context, async) {
 		var o = { method: 'port-test' };
-		this.sendRequest(o, callback, async);
+		this.sendRequest(o, callback, context, async);
 	},
 	
-	loadDaemonStats: function(callback, async) {
+	loadDaemonStats: function(callback, context, async) {
 		var o = { method: 'session-stats' };
-		this.sendRequest(o, callback, async);
+		this.sendRequest(o, callback, context, async);
 	},
 
 	updateTorrents: function(torrentIds, fields, callback, context) {
 		var o = {
 			method: 'torrent-get',
-			'arguments': {
+				'arguments': {
 				'fields': fields,
 			}
 		};
@@ -163,32 +164,29 @@ TransmissionRemote.prototype =
 		});
 	},
 
-	sendTorrentSetRequests: function(method, torrent_ids, args, callback) {
+	sendTorrentSetRequests: function(method, torrent_ids, args, callback, context) {
 		if (!args) args = { };
 		args['ids'] = torrent_ids;
 		var o = {
 			method: method,
 			arguments: args
 		};
-
-		this.sendRequest(o, function(data) {
-			callback();
-		});
+		this.sendRequest(o, callback, context);
 	},
 
-	sendTorrentActionRequests: function(method, torrent_ids, callback) {
-		this.sendTorrentSetRequests(method, torrent_ids, null, callback);
+	sendTorrentActionRequests: function(method, torrent_ids, callback, context) {
+		this.sendTorrentSetRequests(method, torrent_ids, null, callback, context);
 	},
 
-	startTorrents: function(torrent_ids, noqueue, callback) {
+	startTorrents: function(torrent_ids, noqueue, callback, context) {
 		var name = noqueue ? 'torrent-start-now' : 'torrent-start';
-		this.sendTorrentActionRequests(name, torrent_ids, callback);
+		this.sendTorrentActionRequests(name, torrent_ids, callback, context);
 	},
-	stopTorrents: function(torrent_ids, callback) {
-		this.sendTorrentActionRequests('torrent-stop', torrent_ids, callback);
+	stopTorrents: function(torrent_ids, callback, context) {
+		this.sendTorrentActionRequests('torrent-stop', torrent_ids, callback, context);
 	},
-	removeTorrents: function(torrent_ids, callback) {
-		this.sendTorrentActionRequests('torrent-remove', torrent_ids, callback);
+	removeTorrents: function(torrent_ids, callback, context) {
+		this.sendTorrentActionRequests('torrent-remove', torrent_ids, callback, context);
 	},
 	removeTorrentsAndData: function(torrents) {
 		var remote = this;
@@ -209,8 +207,8 @@ TransmissionRemote.prototype =
 			remote._controller.refreshTorrents();
 		});
 	},
-	verifyTorrents: function(torrent_ids, callback) {
-		this.sendTorrentActionRequests('torrent-verify', torrent_ids, callback);
+	verifyTorrents: function(torrent_ids, callback, context) {
+		this.sendTorrentActionRequests('torrent-verify', torrent_ids, callback, context);
 	},
 	reannounceTorrents: function(torrent_ids, callback) {
 		this.sendTorrentActionRequests('torrent-reannounce', torrent_ids, callback);
@@ -252,16 +250,16 @@ TransmissionRemote.prototype =
 	},
 
 	// Added queue calls
-	moveTorrentsToTop: function(torrent_ids, callback) {
-		this.sendTorrentActionRequests(RPC._QueueMoveTop, torrent_ids, callback);
+	moveTorrentsToTop: function(torrent_ids, callback, context) {
+		this.sendTorrentActionRequests(RPC._QueueMoveTop, torrent_ids, callback, context);
 	},
-	moveTorrentsToBottom: function(torrent_ids, callback) {
-		this.sendTorrentActionRequests(RPC._QueueMoveBottom, torrent_ids, callback);
+	moveTorrentsToBottom: function(torrent_ids, callback, context) {
+		this.sendTorrentActionRequests(RPC._QueueMoveBottom, torrent_ids, callback, context);
 	},
-	moveTorrentsUp: function(torrent_ids, callback) {
-		this.sendTorrentActionRequests(RPC._QueueMoveUp, torrent_ids, callback);
+	moveTorrentsUp: function(torrent_ids, callback, context) {
+		this.sendTorrentActionRequests(RPC._QueueMoveUp, torrent_ids, callback, context);
 	},
-	moveTorrentsDown: function(torrent_ids, callback) {
-		this.sendTorrentActionRequests(RPC._QueueMoveDown, torrent_ids, callback);
+	moveTorrentsDown: function(torrent_ids, callback, context) {
+		this.sendTorrentActionRequests(RPC._QueueMoveDown, torrent_ids, callback, context);
 	}
 };

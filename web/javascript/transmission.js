@@ -149,26 +149,23 @@ Transmission.prototype =
 	},
 
 	loadDaemonPrefs: function(async) {
-		var tr = this;
 		this.remote.loadDaemonPrefs(function(data) {
 			var o = data['arguments'];
 			Prefs.getClutchPrefs(o);
-			tr.updatePrefs(o);
-		}, async);
+			this.updatePrefs(o);
+		}, this, async);
 	},
 
 	loadDaemonStats: function(async) {
-		var tr = this;
 		this.remote.loadDaemonStats(function(data) {
-			tr.updateStats(data['arguments']);
-		}, async);
+			this.updateStats(data['arguments']);
+		}, this, async);
 	},
 	checkPort: function(async) {
 		$('#port_test').text('checking ...');
-		var tr = this;
 		this.remote.checkPort(function(data) {
-			tr.updatePortStatus(data['arguments']);
-		}, async);
+			this.updatePortStatus(data['arguments']);
+		}, this, async);
 	},
 
 	preloadImages: function() {
@@ -1278,9 +1275,8 @@ Transmission.prototype =
 	},
 
 	removeTorrents: function(torrents) {
-		var tr = this;
 		var ids = $.map(torrents, function(t) { return t.getId(); });
-		this.remote.removeTorrents(ids, function() { tr.refreshTorrents();});
+		this.remote.removeTorrents(ids, this.refreshTorrents, this);
 	},
 
 	removeTorrentsAndData: function(torrents) {
@@ -1305,26 +1301,23 @@ Transmission.prototype =
 		this.startTorrents([ torrent ], false);
 	},
 	startTorrents: function(torrents, force) {
-		var tr = this;
-		var ids = $.map(torrents, function(t) { return t.getId(); });
-		this.remote.startTorrents(ids, force, function() { tr.refreshTorrents(); });
+		this.remote.startTorrents($.map(torrents, function(t) {return t.getId();}),
+		                          force, this.refreshTorrents, this);
 	},
 	verifyTorrent: function(torrent) {
 		this.verifyTorrents([ torrent ]);
 	},
 	verifyTorrents: function(torrents) {
-		var tr = this;
-		var ids = $.map(torrents, function(t) { return t.getId(); });
-		this.remote.verifyTorrents(ids, function() { tr.refreshTorrents(); });
+		this.remote.verifyTorrents($.map(torrents, function(t) {return t.getId();}),
+		                           this.refreshTorrents, this);
 	},
 
 	reannounceTorrent: function(torrent) {
 		this.reannounceTorrents([ torrent ]);
 	},
 	reannounceTorrents: function(torrents) {
-		var tr = this;
-		var ids = $.map(torrents, function(t) { return t.getId(); });
-		this.remote.reannounceTorrents(ids, function() { tr.refreshTorrents(); });
+		this.remote.reannounceTorrents($.map(torrents, function(t) {return t.getId();}),
+		                               this.refreshTorrents, this);
 	},
 
 	stopSelectedTorrents: function() {
@@ -1337,9 +1330,8 @@ Transmission.prototype =
 		this.stopTorrents([ torrent ]);
 	},
 	stopTorrents: function(torrents) {
-		var tr = this;
-		var ids = $.map(torrents, function(t) { return t.getId(); });
-		this.remote.stopTorrents(ids,	function() { tr.refreshTorrents();});
+		this.remote.stopTorrents($.map(torrents.slice(0), function(t) {return t.getId();}),
+		                         this.refreshTorrents, this);
 	},
 	changeFileCommand: function(command, rows) {
 		this.remote.changeFileCommand(command, rows);
@@ -1362,26 +1354,21 @@ Transmission.prototype =
 
 	// Queue
 	moveTop: function() {
-		var tr = this;
-		var ids = this.getSelectedTorrentIds();
-		this.remote.moveTorrentsToTop(ids, function() { tr.refreshTorrents();});
+		this.remote.moveTorrentsToTop(this.getSelectedTorrentIds(),
+		                              this.refreshTorrents, this);
 	},
 	moveUp: function() {
-		var tr = this;
-		var ids = this.getSelectedTorrentIds();
-		this.remote.moveTorrentsUp(ids, function() { tr.refreshTorrents();});
+		this.remote.moveTorrentsUp(this.getSelectedTorrentIds(),
+		                           this.refreshTorrents, this);
 	},
 	moveDown: function() {
-		var tr = this;
-		var ids = this.getSelectedTorrentIds();
-		this.remote.moveTorrentsDown(ids, function() { tr.refreshTorrents();});
+		this.remote.moveTorrentsDown(this.getSelectedTorrentIds(),
+		                             this.refreshTorrents, this);
 	},
 	moveBottom: function() {
-		var tr = this;
-		var ids = this.getSelectedTorrentIds();
-		this.remote.moveTorrentsToBottom(ids, function() { tr.refreshTorrents();});
+		this.remote.moveTorrentsToBottom(this.getSelectedTorrentIds(),
+		                                 this.refreshTorrents, this);
 	},
-
 
 	/***
 	****
@@ -1739,7 +1726,6 @@ Transmission.prototype =
 		if (!$(this._inspector_trackers_list).is(':visible'))
 			return;
 
-		var tr = this;
 		var html = [ ];
 		var na = 'N/A';
 		var torrents = this.getSelectedTorrents();
@@ -1769,9 +1755,9 @@ Transmission.prototype =
 						  '<ul class="tier_list">');
 				}
 
-				var lastAnnounceStatusHash = tr.lastAnnounceStatus(tracker);
-				var announceState = tr.announceState(tracker);
-				var lastScrapeStatusHash = tr.lastScrapeStatus(tracker);
+				var lastAnnounceStatusHash = this.lastAnnounceStatus(tracker);
+				var announceState = this.announceState(tracker);
+				var lastScrapeStatusHash = this.lastScrapeStatus(tracker);
 
 				// Display construction
 				var parity = ((j+1) % 2 == 0 ? 'even' : 'odd');
