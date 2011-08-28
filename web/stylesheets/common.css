@@ -937,6 +937,7 @@ div.torrent_footer div#turtle_button {
 	width: 32px !important;
 	margin: 0 0 0 38px;
 	padding: 0;
+	cursor: pointer;
 	-moz-user-select: none;
 	-webkit-user-select: none;
 }
@@ -962,6 +963,7 @@ div.torrent_footer #compact-button {
 	float: left;
 	margin-left: 38px;
 	position: relative;
+	cursor: pointer;
 	-moz-user-select: none;
 	-webkit-user-select: none;
 }
