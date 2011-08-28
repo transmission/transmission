@@ -1042,8 +1042,9 @@ Transmission.prototype =
 		// update our dirty fields
 		this.dirtyTorrents[id] = true;
 
-		// enqueue a filter refresh
+		// enqueue ui refreshes
 		this.refilterSoon();
+		this.updateButtonsSoon();
 	
 		// if this torrent is in the inspector, refresh the inspector
 		if (this[Prefs._ShowInspector])
@@ -1386,8 +1387,20 @@ Transmission.prototype =
 		$(key).toggleClass('disabled', !flag);
 	},
 
+	updateButtonsSoon: function()
+	{
+		if (!this.buttonRefreshTimer)
+		{
+			var tr = this;
+			this.buttonRefreshTimer = setTimeout(function() {tr.updateButtonStates();}, 100);
+		}
+	},
+
 	updateButtonStates: function()
 	{
+		clearTimeout(this.buttonRefreshTimer);
+		delete this.buttonRefreshTimer;
+
 		var showing_dialog = new RegExp("(prefs_showing|dialog_showing|open_showing)").test(document.body.className);
 		this._toolbar_buttons.toggleClass('disabled', showing_dialog);
 
@@ -2070,6 +2083,8 @@ Transmission.prototype =
 		// sync gui
 		this.updateStatusbar();
 		this.refreshFilterButton();
+		if (Object.keys(sel).length !== this.getSelectedRows().length)
+			this.selectionChanged();
 	},
 
 	setFilterMode: function(mode)
