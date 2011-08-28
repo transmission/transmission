@@ -75,6 +75,7 @@
 
 - (void) update;
 
+- (void) startTransferIgnoringQueue: (BOOL) ignoreQueue;
 - (void) startTransferNoQueue;
 - (void) startTransfer;
 - (void) stopTransfer;

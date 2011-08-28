@@ -4230,8 +4230,6 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 
 - (void) rpcUpdateQueue
 {
-    NSLog(@"rpcUpdateQueue");
-    
     for (Torrent * torrent in fTorrents)
         [torrent update];
     

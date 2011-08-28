@@ -300,11 +300,11 @@ int trashDataFile(const char * filename)
         [self updateTimeMachineExclude];
 }
 
-- (void) startTransferNoQueue
+- (void) startTransferIgnoringQueue: (BOOL) ignoreQueue
 {
     if ([self alertForRemainingDiskSpace])
     {
-        tr_torrentStartNow(fHandle);
+        ignoreQueue ? tr_torrentStartNow(fHandle) : tr_torrentStart(fHandle);
         [self update];
         
         //capture, specifically, stop-seeding settings changing to unlimited
@@ -312,17 +312,14 @@ int trashDataFile(const char * filename)
     }
 }
 
-#warning merge
+- (void) startTransferNoQueue
+{
+    [self startTransferIgnoringQueue: YES];
+}
+
 - (void) startTransfer
 {
-    if ([self alertForRemainingDiskSpace])
-    {
-        tr_torrentStart(fHandle);
-        [self update];
-        
-        //capture, specifically, stop-seeding settings changing to unlimited
-        [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateOptions" object: nil];
-    }
+    [self startTransferIgnoringQueue: NO];
 }
 
 - (void) stopTransfer
