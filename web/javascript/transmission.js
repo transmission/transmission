@@ -481,23 +481,31 @@ Transmission.prototype =
 	keyDown: function(ev)
 	{
 		var handled = false,
+			rows = this._rows,
 		    up = ev.keyCode === 38; // up key pressed
 		    dn = ev.keyCode === 40, // down key pressed
 		    shift = ev.keyCode === 16; // shift key pressed
 
-		if (up || dn)
+		if ((up || dn) && rows.length)
 		{
-			var rows = this._rows,
-			    last = this.indexOfLastTorrent(),
+			var last = this.indexOfLastTorrent(),
 			    i = last,
 			    anchor = this._shift_index;
 
-			if (i === -1) // no selection yet
-				i = 0;
-			else if (dn)
-				i = (i+1) % rows.length;
-			else if (up)
-				i = (i || rows.length) - 1;
+			if (dn)
+			{
+				if (i === -1) // no selection yet
+					i = 0;
+				else
+					i = (i+1) % rows.length;
+			}
+			else
+			{
+				if (i === -1) // no selection yet
+					i = rows.length - 1;
+				else
+					i = (i || rows.length) - 1;
+			}
 			var r = rows[i];
 
 			if (anchor >= 0)
