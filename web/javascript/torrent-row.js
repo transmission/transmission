@@ -84,16 +84,16 @@ TorrentRendererHelper.renderProgressbar = function(controller, t, progressbar)
 	}
 	if (e.style.display !== display)
 		e.style.display = display;
-	if (e.style.className !== info.complete)
-		e.style.className = info.complete;
+	if (e.className !== info.complete)
+		e.className = info.complete;
 
 	// update the incomplete progressbar
 	e = progressbar.incomplete;
 	display = (info.percent < 100) ? 'block' : 'none';
 	if (e.style.display !== display)
 		e.style.display = display;
-	if (e.style.className !== info.incomplete)
-		e.style.className = info.incomplete;
+	if (e.className !== info.incomplete)
+		e.className = info.incomplete;
 };
 
 TorrentRendererHelper.formatUL = function(t)
