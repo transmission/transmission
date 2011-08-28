@@ -282,7 +282,7 @@ int trashDataFile(const char * filename)
         return nil;
 }
 
--(void) setPreviousFinishedPieces: (NSIndexSet *) indexes
+- (void) setPreviousFinishedPieces: (NSIndexSet *) indexes
 {
     [fPreviousFinishedIndexes release];
     fPreviousFinishedIndexes = [indexes retain];

@@ -4233,6 +4233,8 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     for (Torrent * torrent in fTorrents)
         [torrent update];
     
+    NSArray * selectedValues = [fTableView selectedValues];
+    
     NSSortDescriptor * descriptor = [[NSSortDescriptor alloc] initWithKey: @"queuePosition" ascending: YES];
     NSArray * descriptors = [NSArray arrayWithObject: descriptor];
     [descriptor release];
@@ -4240,6 +4242,8 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     [fTorrents sortUsingDescriptors: descriptors];
     
     [self fullUpdateUI];
+    
+    [fTableView selectValues: selectedValues];
 }
 
 @end
