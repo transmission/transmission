@@ -1986,25 +1986,35 @@ Transmission.prototype =
 
 	refilter: function(rebuildEverything)
 	{
-		var i, id, t, row, sel;
+		var i, e, id, t, row, tmp, sel, rows, clean_rows, dirty_rows,
+		    sort_mode = this[Prefs._SortMethod],
+		    sort_direction = this[Prefs._SortDirection],
+		    filter_mode = this[Prefs._FilterMode],
+		    filter_text = this.filterText,
+		    filter_tracker = this.filterTracker,
+		    renderer = this.torrentRenderer,
+		    list = this._torrent_list;
 
 		clearTimeout(this.refilterTimer);
 		delete this.refilterTimer;
 
-		// get a temporary lookup table of selected torrent ids
+		// build a temporary lookup table of selected torrent ids
 		sel = { };
 		for (i=0; row=this._rows[i]; ++i)
 			if (row.isSelected())
 				sel[row.getTorrentId()] = row;
 
-		if (rebuildEverything)
+		if (rebuildEverything) {
+			$(list).empty();
+			this._rows = [];
 			for (id in this._torrents)
-				this.dirtyTorrents[id] = ~0;
+				this.dirtyTorrents[id] = true;
+		}
 
 		// rows that overlap with dirtyTorrents need to be refiltered.
 		// those that don't are 'clean' and don't need refiltering.
-		var dirty_rows = [];
-		var clean_rows = [];
+		clean_rows = [];
+		dirty_rows = [];
 		for (i=0; row=this._rows[i]; ++i) {
 			if(row.getTorrentId() in this.dirtyTorrents)
 				dirty_rows.push(row);
@@ -2013,16 +2023,13 @@ Transmission.prototype =
 		}
 
 		// remove the dirty rows from the dom
-		var elementsToRemove = $.map(dirty_rows.slice(0), function(r) {
+		e = $.map(dirty_rows.slice(0), function(r) {
 			return r.getElement();
 		});
-		$(elementsToRemove).remove();
+		$(e).remove();
 
 		// drop any dirty rows that don't pass the filter test
-		var tmp = [];
-		var filter_mode = this[Prefs._FilterMode];
-		var filter_text = this.filterText;
-		var filter_tracker = this.filterTracker;
+		tmp = [];
 		for (i=0; row=dirty_rows[i]; ++i) {
 			t = row.getTorrent();
 			if (t.test(filter_mode, filter_text, filter_tracker))
@@ -2033,7 +2040,6 @@ Transmission.prototype =
 
 		// make new rows for dirty torrents that pass the filter test
 		// but don't already have a row
-		var renderer = this.torrentRenderer;
 		for (id in this.dirtyTorrents) {
 			t = this._torrents[id];
 			if (t.test(filter_mode, filter_text, filter_tracker)) {
@@ -2049,12 +2055,9 @@ Transmission.prototype =
 
 		// now we have two sorted arrays of rows
 		// and can do a simple two-way sorted merge.
-		var rows = []
+		rows = [];
 		var ci=0, cmax=clean_rows.length;
 		var di=0, dmax=dirty_rows.length;
-		var sort_method = this[Prefs._SortMethod];
-		var sort_direction = this[Prefs._SortDirection];
-		var list = this._torrent_list;
 		while (ci!=cmax || di!=dmax)
 		{
 			var push_clean;
@@ -2064,17 +2067,17 @@ Transmission.prototype =
 			else if (di==dmax)
 				push_clean = true;
 			else {
-				var ctor = clean_rows[ci].getTorrent();
-				var dtor = dirty_rows[di].getTorrent();
-				var c = Torrent.compareTorrents(ctor, dtor, sort_method, sort_direction);
+				var c = Torrent.compareTorrents(clean_rows[ci].getTorrent(),
+				                                dirty_rows[di].getTorrent(),
+				                                sort_mode, sort_direction);
 				push_clean = (c < 0);
 			}
 
 			if (push_clean)
 				rows.push(clean_rows[ci++]);
 			else {
-				var row = dirty_rows[di++];
-				var e = row.getElement();
+				row = dirty_rows[di++];
+				e = row.getElement();
 				if (ci !== cmax)
 					list.insertBefore(e, clean_rows[ci].getElement());
 				else
@@ -2088,9 +2091,9 @@ Transmission.prototype =
 		this.dirtyTorrents = { };
 
 		// jquery's even/odd starts with 1 rather than 0, so invert the logic here
-		var elements = $.map(rows.slice(0), function(r){return r.getElement();});
-		$(elements).filter(":odd").addClass('even');
-		$(elements).filter(":even").removeClass('even');
+		e = $.map(rows.slice(0), function(r){return r.getElement();});
+		$(e).filter(":odd").addClass('even');
+		$(e).filter(":even").removeClass('even');
 
 		// sync gui
 		this.updateStatusbar();
