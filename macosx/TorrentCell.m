@@ -807,8 +807,7 @@
 
 - (NSAttributedString *) attributedTitle
 {
-    NSString * title = [NSString stringWithFormat: @"%d %@", [[self representedObject] queuePosition], [[self representedObject] name]];
-    //NSString * title = [[self representedObject] name];
+    NSString * title = [[self representedObject] name];
     return [[[NSAttributedString alloc] initWithString: title attributes: fTitleAttributes] autorelease];
 }
 
