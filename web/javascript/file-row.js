@@ -133,7 +133,7 @@ FileRow.prototype =
 				x -= e.offsetLeft;
 				e = e.offsetParent;
 			}
-			if (iPhone) {
+			if (isMobileDevice) {
 				if (x < 8) prio = -1;
 				else if (x < 27) prio = 0;
 				else prio = 1;

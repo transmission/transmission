@@ -71,7 +71,7 @@ Transmission.prototype =
 	
 		$('#torrent_upload_form').submit(function() { $('#upload_confirm_button').click(); return false; });
 
-		if (iPhone) {
+		if (isMobileDevice) {
 			$('#inspector_close').bind('click', function() { tr.setInspectorVisible(false); });
 			$('#preferences_link').bind('click', function(e) { tr.releaseClutchPreferencesButton(e); });
 		} else {
@@ -169,7 +169,7 @@ Transmission.prototype =
 	},
 
 	preloadImages: function() {
-		if (iPhone) {
+		if (isMobileDevice) {
 			this.loadImages(
 				'images/buttons/info_general.png',
 				'images/buttons/info_activity.png',
@@ -211,9 +211,9 @@ Transmission.prototype =
 
 		// iPhone conditions in the section allow us to not
 		// include transmenu js to save some bandwidth; if we
-		// start using prefs on iPhone we need to weed
+		// start using prefs on mobile devices we need to weed
 		// transmenu refs out of that too.
-		if (!iPhone)
+		if (!isMobileDevice)
 		{
 			$('#sort_by_' + this[Prefs._SortMethod]).selectMenuItem();
 
@@ -350,7 +350,7 @@ Transmission.prototype =
 
 	scrollToRow: function(row)
 	{
-		if (iPhone) // FIXME: why?
+		if (isMobileDevice) // FIXME: why?
 			return;
 
 		var list = $('#torrent_container'),
@@ -547,28 +547,28 @@ Transmission.prototype =
 	stopAllClicked: function(ev) {
 		if (this.isButtonEnabled(ev)) {
 			this.stopAllTorrents();
-			this.hideiPhoneAddressbar();
+			this.hideMobileAddressbar();
 		}
 	},
 
 	stopSelectedClicked: function(ev) {
 		if (this.isButtonEnabled(ev)) {
 			this.stopSelectedTorrents();
-			this.hideiPhoneAddressbar();
+			this.hideMobileAddressbar();
 		}
 	},
 
 	startAllClicked: function(ev) {
 		if (this.isButtonEnabled(ev)) {
 			this.startAllTorrents();
-			this.hideiPhoneAddressbar();
+			this.hideMobileAddressbar();
 		}
 	},
 
 	startSelectedClicked: function(ev) {
 		if (this.isButtonEnabled(ev)) {
 			this.startSelectedTorrents(false);
-			this.hideiPhoneAddressbar();
+			this.hideMobileAddressbar();
 		}
 	},
 
@@ -630,12 +630,7 @@ Transmission.prototype =
 
 	hideUploadDialog: function() {
 		$('body.open_showing').removeClass('open_showing');
-		if (!iPhone && Safari3) {
-			$('div#upload_container div.dialog_window').css('top', '-205px');
-			setTimeout("$('#upload_container').hide();",500);
-		} else {
-			$('#upload_container').hide();
-		}
+		$('#upload_container').hide();
 		this.updateButtonStates();
 	},
 
@@ -696,12 +691,12 @@ Transmission.prototype =
 	removeClicked: function(ev) {
 		if (this.isButtonEnabled(ev)) {
 			this.removeSelectedTorrents();
-			this.hideiPhoneAddressbar();
+			this.hideMobileAddressbar();
 		}
 	},
 
 	/*
-	 * 'Clutch Preferences' was clicked (iPhone only)
+	 * 'Clutch Preferences' was clicked (isMobileDevice only)
 	 */
 	releaseClutchPreferencesButton: function() {
 		$('div#prefs_container div#pref_error').hide();
@@ -778,9 +773,7 @@ Transmission.prototype =
 		this.checkPort(true);
 		$('body').addClass('prefs_showing');
 		$('#prefs_container').show();
-		this.hideiPhoneAddressbar();
-		if (Safari3)
-			setTimeout("$('div#prefs_container div.dialog_window').css('top', '0px');",10);
+		this.hideMobileAddressbar();
 		this.updateButtonStates();
 		this.togglePeriodicSessionRefresh(false);
 	},
@@ -788,15 +781,9 @@ Transmission.prototype =
 	hidePrefsDialog: function()
 	{
 		$('body.prefs_showing').removeClass('prefs_showing');
-		if (iPhone) {
-			this.hideiPhoneAddressbar();
-			$('#prefs_container').hide();
-		} else if (Safari3) {
-			$('div#prefs_container div.dialog_window').css('top', '-425px');
-			setTimeout("$('#prefs_container').hide();",500);
-		} else {
-			$('#prefs_container').hide();
-		}
+		if (isMobileDevice)
+			this.hideMobileAddressbar();
+		$('#prefs_container').hide();
 		this.updateButtonStates();
 		this.togglePeriodicSessionRefresh(true);
 	},
@@ -847,7 +834,7 @@ Transmission.prototype =
 		$('#port_rand').prop('checked',            p[RPC._PeerPortRandom]);
 		$('#port_forward').prop('checked',         p[RPC._PortForwardingEnabled]);
 
-		if (!iPhone)
+		if (!isMobileDevice)
 		{
 			setInnerHTML($('#limited_download_rate')[0], [ 'Limit (', Transmission.fmt.speed(dn_limit_k), ')' ].join(''));
 			var key = dn_limited ? '#limited_download_rate'
@@ -876,24 +863,16 @@ Transmission.prototype =
 		this.loadDaemonStats();
 		$('body').addClass('stats_showing');
 		$('#stats_container').show();
-		this.hideiPhoneAddressbar();
-		if (Safari3)
-			setTimeout("$('div#stats_container div.dialog_window').css('top', '0px');",10);
+		this.hideMobileAddressbar();
 		this.updateButtonStates();
 		this.togglePeriodicStatsRefresh(true);
 	},
 
 	hideStatsDialog: function() {
 		$('body.stats_showing').removeClass('stats_showing');
-		if (iPhone) {
-			this.hideiPhoneAddressbar();
-			$('#stats_container').hide();
-		} else if (Safari3) {
-			$('div#stats_container div.dialog_window').css('top', '-425px');
-			setTimeout("$('#stats_container').hide();",500);
-		} else {
-			$('#stats_container').hide();
-		}
+		if (isMobileDevice)
+			this.hideMobileAddressbar();
+		$('#stats_container').hide();
 		this.updateButtonStates();
 		this.togglePeriodicStatsRefresh(false);
 	},
@@ -1138,7 +1117,7 @@ Transmission.prototype =
 			meta_key = true;
 
 		// Shift-Click - selects a range from the last-clicked row to this one
-		if (iPhone) {
+		if (isMobileDevice) {
 			if (row.isSelected())
 				this.setInspectorVisible(true);
 			this.setSelectedRow(row);
@@ -1208,9 +1187,6 @@ Transmission.prototype =
 			$('input#torrent_auto_start').attr('checked', $('#prefs_form #auto_start')[0].checked);
 			$('#upload_container').show();
 			$('#torrent_upload_url').focus();
-			if (!iPhone && Safari3) {
-				setTimeout("$('div#upload_container div.dialog_window').css('top', '0px');",10);
-			}
 
 		// Submit the upload form
 		} else {
@@ -1339,10 +1315,10 @@ Transmission.prototype =
 		this.remote.changeFileCommand(command, rows);
 	},
 
-	hideiPhoneAddressbar: function(timeInSeconds) {
-		if (iPhone) {
+	hideMobileAddressbar: function(timeInSeconds) {
+		if (isMobileDevice) {
 			var delayLength = timeInSeconds ? timeInSeconds*1000 : 150;
-			// not currently supported on iPhone
+			// not currently supported on isMobileDevice
 			if (/*document.body.scrollTop!=1 && */scroll_timeout==null) {
 				var tr = this;
 				scroll_timeout = setTimeout(function() {tr.doToolbarHide();}, delayLength);
@@ -1470,7 +1446,7 @@ Transmission.prototype =
 
 	inspectorTabClicked: function(ev, tab)
 	{
-		if (iPhone) ev.stopPropagation();
+		if (isMobileDevice) ev.stopPropagation();
 
 		// select this tab and deselect the others
 		$(tab).addClass('selected').siblings().removeClass('selected');
@@ -1478,7 +1454,7 @@ Transmission.prototype =
 		// show this tab and hide the others
 		$('#'+tab.id+'_container').show().siblings('.inspector_container').hide();
 
-		this.hideiPhoneAddressbar();
+		this.hideMobileAddressbar();
 		this.updatePeersLists();
 		this.updateTrackersLists();
 		this.updateFileList();
@@ -1492,7 +1468,7 @@ Transmission.prototype =
 			return;
 
 		var torrents = this.getSelectedTorrents();
-		if (!torrents.length && iPhone) {
+		if (!torrents.length && isMobileDevice) {
 			this.setInspectorVisible(false);
 			return;
 		}
@@ -1870,10 +1846,10 @@ Transmission.prototype =
 
 		// update the ui widgetry
 		$('#torrent_inspector').toggle(visible);
-		if (iPhone) {
+		if (isMobileDevice) {
 			$('body').toggleClass('inspector_showing',visible);
 			$('#inspector_close').toggle(visible);
-			this.hideiPhoneAddressbar();
+			this.hideMobileAddressbar();
 		} else {
 			var w = visible ? $('#torrent_inspector').width() + 1 + 'px' : '0px';
 			$('#torrent_container')[0].style.right = w;
@@ -1896,7 +1872,7 @@ Transmission.prototype =
 		var popup = $('#filter-popup');
 		popup.dialog({
 			autoOpen: false,
-			position: iPhone ? [0,0] : [40,80],
+			position: isMobileDevice ? [0,0] : [40,80],
 			show: 'blind',
 			hide: 'blind',
 			title: 'Show',
@@ -2277,7 +2253,7 @@ Transmission.prototype =
 
 		// update the ui: context menu
 		// (disabled in iphone mode...)
-		if (!iPhone) {
+		if (!isMobileDevice) {
 			var e = $('#settings_menu #compact_view');
 			if (compact)
 				e.selectMenuItem();

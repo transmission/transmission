@@ -6,14 +6,10 @@
  * Common javascript
  */
 
-var transmission;
-var dialog;
-// Test for a Webkit build that supports box-shadow: 521+ (release Safari 3 is
-// actually 523.10.3). We need 3.1 for CSS animation (dialog sheets) but as it
-// degrades gracefully let's not worry too much.
-var Safari3 = testSafari3();
-var iPhone = RegExp("(iPhone|iPod|Android)").test(navigator.userAgent);
-if (iPhone) var scroll_timeout;
+var transmission,
+    dialog,
+    isMobileDevice = RegExp("(isMobileDevice|iPod|Android)").test(navigator.userAgent),
+    scroll_timeout;
 
 if (!Array.indexOf){
 	Array.prototype.indexOf = function(obj){
@@ -24,23 +20,6 @@ if (!Array.indexOf){
 		return -1;
 	}
 }
-
-function testSafari3()
-{
-	var minimum = new Array(521,0);
-	var webKitFields = RegExp("(AppleWebKit/)([^ ]+)").exec(navigator.userAgent);
-	if (!webKitFields || webKitFields.length < 3) return false;
-	var version = webKitFields[2].split(".");
-	for (var i = 0; i < minimum.length; i++) {
-		var toInt = parseInt(version[i]);
-		var versionField = isNaN(toInt) ? 0 : toInt;
-		var minimumField = minimum[i];
-
-		if (versionField > minimumField) return true;
-		if (versionField < minimumField) return false;
-	}
-	return true;
-};
 
 $(document).ready(function() {
 	// Initialise the dialog controller
@@ -61,33 +40,21 @@ $(document).ready(function() {
 		// Move search field's margin down for the styled input
 		$('#torrent_search').css('margin-top', 3);
 	}
-	if (!Safari3 && !iPhone) {
+	if (isMobileDevice){
+		window.onload = function(){ setTimeout(function() { window.scrollTo(0,1); },500); };
+		window.onorientationchange = function(){ setTimeout(function() { window.scrollTo(0,1); },100); };
+		if (window.navigator.standalone)
+			// Fix min height for isMobileDevice when run in full screen mode from home screen
+			// so the footer appears in the right place
+			$('body div#torrent_container').css('min-height', '338px');
+		$("label[for=torrent_upload_url]").text("URL: ");
+	} else {
 		// Fix for non-Safari-3 browsers: dark borders to replace shadows.
 		// Opera messes up the menu if we use a border on .trans_menu
 		// div.outerbox so use ul instead
 		$('.trans_menu ul, div#jqContextMenu, div.dialog_container div.dialog_window').css('border', '1px solid #777');
 		// and this kills the border we used to have
 		$('.trans_menu div.outerbox').css('border', 'none');
-	} else if (!iPhone) {
-		// Used for Safari 3.1 CSS animation. Degrades gracefully (so Safari 3
-		// test is good enough) but we delay our hide/unhide to wait for the
-		// scrolling - no point making other browsers wait.
-		$('div#upload_container div.dialog_window').css('top', '-205px');
-		$('div#prefs_container div.dialog_window').css('top', '-425px');
-		$('div#dialog_container div.dialog_window').css('top', '-425px');
-		$('div.dialog_container div.dialog_window').css('-webkit-transition', 'top 0.3s');
-		// -webkit-appearance makes some links into buttons, but needs
-		// different padding.
-		$('div.dialog_container div.dialog_window a').css('padding', '2px 10px 3px');
-	}
-	if (iPhone){
-		window.onload = function(){ setTimeout(function() { window.scrollTo(0,1); },500); };
-		window.onorientationchange = function(){ setTimeout(function() { window.scrollTo(0,1); },100); };
-		if (window.navigator.standalone)
-			// Fix min height for iPhone when run in full screen mode from home screen
-			// so the footer appears in the right place
-			$('body div#torrent_container').css('min-height', '338px');
-		$("label[for=torrent_upload_url]").text("URL: ");
 	}
 });
 
