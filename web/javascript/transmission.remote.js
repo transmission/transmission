@@ -215,9 +215,9 @@ TransmissionRemote.prototype =
 	},
 	addTorrentByUrl: function(url, options) {
 		var remote = this;
-        if (url.match(/^[0-9a-f]{40}$/i)) {
-            url = 'magnet:?xt=urn:btih:'+url;
-        }
+		if (url.match(/^[0-9a-f]{40}$/i)) {
+			url = 'magnet:?xt=urn:btih:'+url;
+		}
 		var o = {
 			method: 'torrent-add',
 			arguments: {

@@ -353,13 +353,11 @@ Transmission.prototype =
 		if (iPhone) // FIXME: why?
 			return;
 
-		var list = $('#torrent_container');
-		var scrollTop = list.scrollTop();
-		var innerHeight = list.innerHeight();
-
-		var e = $(row.getElement());
-		var offsetTop = e[0].offsetTop;
-		var offsetHeight = e.outerHeight();
+		var list = $('#torrent_container'),
+		    scrollTop = list.scrollTop(),
+		    innerHeight = list.innerHeight(),
+		    offsetTop = row.getElement().offsetTop,
+		    offsetHeight = $(row.getElement()).outerHeight();
 
 		if (offsetTop < scrollTop)
 			list.scrollTop(offsetTop);
@@ -483,15 +481,15 @@ Transmission.prototype =
 	keyDown: function(ev)
 	{
 		var up = ev.keyCode === 38; // up key pressed
-		var dn = ev.keyCode === 40; // down key pressed
-		var shift = ev.keyCode === 16; // shift key pressed
+		    dn = ev.keyCode === 40, // down key pressed
+		    shift = ev.keyCode === 16; // shift key pressed
 
 		if (up || dn)
 		{
-			var rows = this._rows;
-
-			var last = this.indexOfLastTorrent();
-			var i = last;
+			var rows = this._rows,
+			    last = this.indexOfLastTorrent(),
+			    i = last,
+			    anchor = this._shift_index;
 
 			if (i === -1) // no selection yet
 				i = 0;
@@ -501,7 +499,6 @@ Transmission.prototype =
 				i = (i || rows.length) - 1;
 			var r = rows[i];
 
-			var anchor = this._shift_index;
 			if (anchor >= 0)
 			{
 				// user is extending the selection with the shift + arrow keys...
@@ -543,58 +540,58 @@ Transmission.prototype =
 		return p.className!='disabled' && p.parentNode.className!='disabled';
 	},
 
-	stopAllClicked: function(event) {
-		if (this.isButtonEnabled(event)) {
+	stopAllClicked: function(ev) {
+		if (this.isButtonEnabled(ev)) {
 			this.stopAllTorrents();
 			this.hideiPhoneAddressbar();
 		}
 	},
 
-	stopSelectedClicked: function(event) {
-		if (this.isButtonEnabled(event)) {
+	stopSelectedClicked: function(ev) {
+		if (this.isButtonEnabled(ev)) {
 			this.stopSelectedTorrents();
 			this.hideiPhoneAddressbar();
 		}
 	},
 
-	startAllClicked: function(event) {
-		if (this.isButtonEnabled(event)) {
+	startAllClicked: function(ev) {
+		if (this.isButtonEnabled(ev)) {
 			this.startAllTorrents();
 			this.hideiPhoneAddressbar();
 		}
 	},
 
-	startSelectedClicked: function(event) {
-		if (this.isButtonEnabled(event)) {
+	startSelectedClicked: function(ev) {
+		if (this.isButtonEnabled(ev)) {
 			this.startSelectedTorrents(false);
 			this.hideiPhoneAddressbar();
 		}
 	},
 
-	openTorrentClicked: function(event) {
-		if (this.isButtonEnabled(event)) {
+	openTorrentClicked: function(ev) {
+		if (this.isButtonEnabled(ev)) {
 			$('body').addClass('open_showing');
 			this.uploadTorrentFile();
 			this.updateButtonStates();
 		}
 	},
 
-	dragenter: function(event) {
-		if (event.dataTransfer && event.dataTransfer.types) {
+	dragenter: function(ev) {
+		if (ev.dataTransfer && ev.dataTransfer.types) {
 			var types = ["text/uri-list", "text/plain"];
 			for (var i = 0; i < types.length; ++i) {
-				if (event.dataTransfer.types.contains(types[i])) {
-					// it would be better to actually look at the links here;
-					// sadly, (at least with Firefox,) trying would throw.
-					event.stopPropagation();
-					event.preventDefault();
-					event.dropEffect = "copy";
+				// it would be better to look at the links here;
+				// sadly, with Firefox, trying would throw.
+				if (ev.dataTransfer.types.contains(types[i])) {
+					ev.stopPropagation();
+					ev.preventDefault();
+					ev.dropEffect = "copy";
 					return false;
 				}
 			}
 		}
-		else if (event.dataTransfer) {
-			event.dataTransfer.dropEffect = "none";
+		else if (ev.dataTransfer) {
+			ev.dataTransfer.dropEffect = "none";
 		}
 		return true;
 	},
@@ -651,10 +648,10 @@ Transmission.prototype =
 		if (rate != tr[Prefs._RefreshRate])
 			tr.setPref (Prefs._RefreshRate, rate);
 
-		var up_bytes        = parseInt($('#prefs_form #upload_rate').val(), 10);
-		var dn_bytes        = parseInt($('#prefs_form #download_rate').val(), 10);
-		var turtle_up_bytes = parseInt($('#prefs_form #turtle_upload_rate').val(), 10);
-		var turtle_dn_bytes = parseInt($('#prefs_form #turtle_download_rate').val(), 10);
+		var up_bytes        = parseInt($('#prefs_form #upload_rate').val(), 10),
+		    dn_bytes        = parseInt($('#prefs_form #download_rate').val(), 10),
+		    turtle_up_bytes = parseInt($('#prefs_form #turtle_upload_rate').val(), 10),
+		    turtle_dn_bytes = parseInt($('#prefs_form #turtle_download_rate').val(), 10);
 
 		// pass the new prefs upstream to the RPC server
 		var o = { };
@@ -815,8 +812,8 @@ Transmission.prototype =
 		var turtle_up_limit_k = p[RPC._TurtleUpSpeedLimit];
 		var turtle_dn_limit_k = p[RPC._TurtleDownSpeedLimit];
 
-                if (p.units)
-                    Transmission.fmt.updateUnits(p.units);
+		if (p.units)
+			Transmission.fmt.updateUnits(p.units);
 
 		$('div.download_location input').val(      p[RPC._DownloadDir]);
 		$('div.port input').val(                   p[RPC._PeerPort]);
@@ -1201,11 +1198,11 @@ Transmission.prototype =
 	{
 		// Display the upload dialog
 		if (! confirmed) {
-				$('input#torrent_upload_file').attr('value', '');
-				$('input#torrent_upload_url').attr('value', '');
-				$('input#torrent_auto_start').attr('checked', $('#prefs_form #auto_start')[0].checked);
-				$('#upload_container').show();
-                $('#torrent_upload_url').focus();
+			$('input#torrent_upload_file').attr('value', '');
+			$('input#torrent_upload_url').attr('value', '');
+			$('input#torrent_auto_start').attr('checked', $('#prefs_form #auto_start')[0].checked);
+			$('#upload_container').show();
+			$('#torrent_upload_url').focus();
 			if (!iPhone && Safari3) {
 				setTimeout("$('div#upload_container div.dialog_window').css('top', '0px');",10);
 			}
@@ -1912,20 +1909,22 @@ Transmission.prototype =
 		    torrent_count = Object.keys(this._torrents).length,
 		    visible_count = this._rows.length;
 
+		text = 'Show <span class="filter-selection">';
 		if (state_all && tracker_all)
-			text = 'Show <span class="filter-selection">All</span>';
+			text += 'All';
 		else if (state_all)
-			text = 'Show <span class="filter-selection">' + tracker_string + '</span>';
+			text += tracker_string;
 		else if (tracker_all)
-			text = 'Show <span class="filter-selection">' + state_string + '</span>';
+			text += state_string;
 		else
-			text = 'Show <span class="filter-selection">' + state_string + '</span> at <span class="filter-selection">' + tracker_string + '</span>';
+			text += state_string + '</span> at <span class="filter-selection">' + tracker_string;
+		text += '</span> &mdash; ';
 
 		if (torrent_count === visible_count)
-			text += ' &mdash; ' + torrent_count + ' Transfers';
+			text += torrent_count + ' Transfers';
 		else
-			text += ' &mdash; ' + visible_count + ' of ' + torrent_count;
-		$('#filter-button')[0].innerHTML = text;
+			text += visible_count + ' of ' + torrent_count;
+		$('#filter-button').html(text);
 	},
 
 	refilterSoon: function()
@@ -2015,8 +2014,8 @@ Transmission.prototype =
 		for (id in this.dirtyTorrents) {
 			t = this._torrents[id];
 			if (t.test(filter_mode, filter_text, filter_tracker)) {
-				var is_selected = t.getId() in sel;
-				row = new TorrentRow(renderer, this, t, is_selected);
+				var s = t.getId() in sel;
+				row = new TorrentRow(renderer, this, t, s);
 				row.getElement().row = row;
 				dirty_rows.push(row);
 			}
@@ -2039,9 +2038,10 @@ Transmission.prototype =
 			else if (di==dmax)
 				push_clean = true;
 			else {
-				var c = Torrent.compareTorrents(clean_rows[ci].getTorrent(),
-				                                dirty_rows[di].getTorrent(),
-				                                sort_mode, sort_direction);
+				var c = Torrent.compareTorrents(
+				           clean_rows[ci].getTorrent(),
+				           dirty_rows[di].getTorrent(),
+				           sort_mode, sort_direction);
 				push_clean = (c < 0);
 			}
 
@@ -2062,7 +2062,7 @@ Transmission.prototype =
 		this._rows = rows;
 		this.dirtyTorrents = { };
 
-		// jquery's even/odd starts with 1 rather than 0, so invert the logic here
+		// jquery's even/odd starts with 1 not 0, so invert its logic
 		e = $.map(rows.slice(0), function(r){return r.getElement();});
 		$(e).filter(":odd").addClass('even');
 		$(e).filter(":even").removeClass('even');
@@ -2240,8 +2240,9 @@ Transmission.prototype =
 	},
 	setCompactMode: function(is_compact)
 	{
-		var key = Prefs._CompactDisplayState;
-		var was_compact = this[key];
+		var key = Prefs._CompactDisplayState,
+		    was_compact = this[key];
+
 		if (was_compact !== is_compact) {
 			this.setPref(key, is_compact);
 			this.onCompactModeChanged();

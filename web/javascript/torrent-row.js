@@ -15,9 +15,10 @@ function TorrentRendererHelper()
 
 TorrentRendererHelper.getProgressInfo = function(controller, t)
 {
-	var seed_ratio_limit = t.seedRatioLimit(controller);
+	var pct, extra,
+	    s = t.getStatus(),
+	    seed_ratio_limit = t.seedRatioLimit(controller);
 
-	var pct;
 	if (t.needsMetaData())
 		pct = t.getMetadataPercentComplete() * 100;
 	else if (!t.isDone())
@@ -27,8 +28,6 @@ TorrentRendererHelper.getProgressInfo = function(controller, t)
 	else
 		pct = 100;
 
-	var extra = '';
-	var s = t.getStatus();
 	if (s == Torrent._StatusStopped)
 		extra = 'paused';
 	else if (s == Torrent._StatusDownloadWait)
@@ -41,6 +40,8 @@ TorrentRendererHelper.getProgressInfo = function(controller, t)
 		extra = 'seeding queued';
 	else if (s == Torrent._StatusSeed)
 		extra = 'seeding';
+	else
+		extra = '';
 
 	return {
 		percent: pct,
@@ -51,14 +52,19 @@ TorrentRendererHelper.getProgressInfo = function(controller, t)
 
 TorrentRendererHelper.createProgressbar = function(classes)
 {
-	var complete = document.createElement('div');
+	var complete, incomplete, progressbar;
+
+	complete = document.createElement('div');
 	complete.className = 'torrent_progress_bar complete';
-	var incomplete = document.createElement('div');
+
+	incomplete = document.createElement('div');
 	incomplete.className = 'torrent_progress_bar incomplete';
-	var progressbar = document.createElement('div');
+
+	progressbar = document.createElement('div');
 	progressbar.className = 'torrent_progress_bar_container ' + classes;
 	progressbar.appendChild(complete);
 	progressbar.appendChild(incomplete);
+
 	return { 'element': progressbar, 'complete': complete, 'incomplete': incomplete };
 };
 
@@ -112,22 +118,24 @@ TorrentRendererFull.prototype =
 {
 	createRow: function()
 	{
-		var root = document.createElement('li');
+		var root, name, peers, progressbar, details, image, button;
+
+		root = document.createElement('li');
 		root.className = 'torrent';
 
-		var name = document.createElement('div');
+		name = document.createElement('div');
 		name.className = 'torrent_name';
 
-		var peers = document.createElement('div');
+		peers = document.createElement('div');
 		peers.className = 'torrent_peer_details';
 
-		var progressbar = TorrentRendererHelper.createProgressbar('full');
+		progressbar = TorrentRendererHelper.createProgressbar('full');
 
-		var details = document.createElement('div');
+		details = document.createElement('div');
 		details.className = 'torrent_progress_details';
 
-		var image = document.createElement('div');
-		var button = document.createElement('a');
+		image = document.createElement('div');
+		button = document.createElement('a');
 		button.appendChild(image);
 
 		root.appendChild(name);
@@ -188,10 +196,10 @@ TorrentRendererFull.prototype =
 			         "%)" ].join('');
 		}
 
-		var c;
-		var sizeWhenDone = t.getSizeWhenDone();
-		var totalSize = t.getTotalSize();
-		var is_done = t.isDone() || t.isSeeding();
+		var c,
+		    sizeWhenDone = t.getSizeWhenDone(),
+		    totalSize = t.getTotalSize(),
+		    is_done = t.isDone() || t.isSeeding();
 
 		if (is_done) {
 			if (totalSize == sizeWhenDone) // seed: '698.05 MiB'
@@ -265,15 +273,17 @@ TorrentRendererCompact.prototype =
 {
 	createRow: function()
 	{
-		var progressbar = TorrentRendererHelper.createProgressbar('compact');
+		var progressbar, deatils, name, root;
 
-		var details = document.createElement('div');
+		progressbar = TorrentRendererHelper.createProgressbar('compact');
+
+		details = document.createElement('div');
 		details.className = 'torrent_peer_details compact';
 
-		var name = document.createElement('div');
+		name = document.createElement('div');
 		name.className = 'torrent_name compact';
 
-		var root = document.createElement('li');
+		root = document.createElement('li');
 		root.appendChild(progressbar.element);
 		root.appendChild(details);
 		root.appendChild(name);
@@ -290,8 +300,8 @@ TorrentRendererCompact.prototype =
 		if ((c = t.getErrorMessage()))
 			return c;
 		if (t.isDownloading()) {
-			var have_dn = t.getDownloadSpeed() > 0;
-			var have_up = t.getUploadSpeed() > 0;
+			var have_dn = t.getDownloadSpeed() > 0,
+			    have_up = t.getUploadSpeed() > 0;
 			if (!have_up && !have_dn)
 				return 'Idle';
 			var s = '';
@@ -337,7 +347,7 @@ TorrentRendererCompact.prototype =
 
 function TorrentRow(view, controller, torrent, selected)
 {
-        this.initialize(view, controller, torrent, selected);
+	this.initialize(view, controller, torrent, selected);
 }
 TorrentRow.prototype =
 {
@@ -371,8 +381,8 @@ TorrentRow.prototype =
 
 	setTorrent: function(controller, t) {
 		if (this._torrent !== t) {
-			var row = this;
-			var key = 'dataChanged.torrentRowListener';
+			var row = this,
+			    key = 'dataChanged.torrentRowListener';
 			if (this._torrent)
 				$(this._torrent).unbind(key);
 			if ((this._torrent = t))

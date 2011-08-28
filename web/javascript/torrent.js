@@ -130,13 +130,16 @@ Torrent.prototype =
 	},
 
 	// fields.files is an array of unions of RPC's "files" and "fileStats" objects.
-	updateFiles: function(files) {
-		var changed = false;
-		var myfiles = this.fields.files || [];
-		var keys = [ 'length', 'name', 'bytesCompleted', 'wanted', 'priority' ];
-		for (var i=0, f; f=files[i]; ++i) {
-			var myfile = myfiles[i] || {};
-			for (var j=0, key; key=keys[j]; ++j)
+	updateFiles: function(files)
+	{
+		var changed = false,
+		    myfiles = this.fields.files || [],
+		    keys = [ 'length', 'name', 'bytesCompleted', 'wanted', 'priority' ],
+		    i, f, j, key, myfile;
+
+		for (i=0; f=files[i]; ++i) {
+			myfile = myfiles[i] || {};
+			for (j=0; key=keys[j]; ++j)
 				if(key in f)
 					changed |= this.setField(myfile,key,f[key]);
 			myfiles[i] = myfile;
@@ -145,18 +148,21 @@ Torrent.prototype =
 		return changed;
 	},
 
-	collateTrackers: function(trackers) {
-		announces = [];
-		for (var i=0, t; t=trackers[i]; ++i)
+	collateTrackers: function(trackers)
+	{
+		var i, t, announces = [];
+
+		for (i=0; t=trackers[i]; ++i)
 			announces.push(t.announce.toLowerCase());
 		return announces.join('\t');
 	},
 
 	refreshFields: function(data)
 	{
-		var changed = false;
+		var key,
+		    changed = false;
 
-		for (var key in data) {
+		for (key in data) {
 			switch (key) {
 				case 'files':
 				case 'fileStats': // merge files and fileStats together
@@ -260,7 +266,7 @@ Torrent.prototype =
 			default:                      return -1;
 		}
 	},
-        getErrorMessage: function() {
+	getErrorMessage: function() {
 		var str = this.getErrorString();
 		switch(this.getError()) {
 			case Torrent._ErrTrackerWarning:
@@ -360,34 +366,39 @@ Torrent.compareByQueue = function(ta, tb)
 };
 Torrent.compareByAge = function(ta, tb)
 {
-	var a = ta.getDateAdded();
-	var b = tb.getDateAdded();
+	var a = ta.getDateAdded(),
+	    b = tb.getDateAdded();
+
 	return (b - a) || Torrent.compareByQueue(ta, tb);
 };
 Torrent.compareByState = function(ta, tb)
 {
-	var a = ta.getStatus();
-	var b = tb.getStatus();
+	var a = ta.getStatus(),
+	    b = tb.getStatus();
+
 	return (b - a) || Torrent.compareByQueue(ta, tb);
 };
 Torrent.compareByActivity = function(ta, tb)
 {
-	var a = ta.getActivity();
-	var b = tb.getActivity();
+	var a = ta.getActivity(),
+	    b = tb.getActivity();
+
 	return (b - a) || Torrent.compareByState(ta, tb);
 };
 Torrent.compareByRatio = function(ta, tb)
 {
-	var a = ta.getUploadRatio();
-	var b = tb.getUploadRatio();
+	var a = ta.getUploadRatio(),
+	    b = tb.getUploadRatio();
+
 	if (a < b) return 1;
 	if (a > b) return -1;
 	return Torrent.compareByState(ta, tb);
 };
 Torrent.compareByProgress = function(ta, tb)
 {
-	var a = ta.getPercentDone();
-	var b = tb.getPercentDone();
+	var a = ta.getPercentDone(),
+	    b = tb.getPercentDone();
+
 	return (a - b) || Torrent.compareByRatio(ta, tb);
 };
 

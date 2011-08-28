@@ -7,15 +7,15 @@
  */
 
 function Dialog(){
-    this.initialize();
+	this.initialize();
 }
 
 Dialog.prototype = {
 
-    /*
-     * Constructor
-     */
-    initialize: function() {
+	/*
+	 * Constructor
+	 */
+	initialize: function() {
 		
 		/*
 		 * Private Interface Variables
@@ -37,11 +37,11 @@ Dialog.prototype = {
 
 
 
-    /*--------------------------------------------
-     *
-     *  E V E N T   F U N C T I O N S
-     *
-     *--------------------------------------------*/
+	/*--------------------------------------------
+	 *
+	 *  E V E N T   F U N C T I O N S
+	 *
+	 *--------------------------------------------*/
 
 	hideDialog: function()
 	{
@@ -68,16 +68,18 @@ Dialog.prototype = {
 		dialog.hideDialog();
 	},
 
-    /*--------------------------------------------
-     *
-     *  I N T E R F A C E   F U N C T I O N S
-     *
-     *--------------------------------------------*/
+	/*--------------------------------------------
+	 *
+	 *  I N T E R F A C E   F U N C T I O N S
+	 *
+	 *--------------------------------------------*/
 
-    /*
-     * Display a confirm dialog
-     */
-    confirm: function(dialog_heading, dialog_message, confirm_button_label, callback_function, callback_data, cancel_button_label) {
+	/*
+	 * Display a confirm dialog
+	 */
+	confirm: function(dialog_heading, dialog_message, confirm_button_label,
+	                  callback_function, callback_data, cancel_button_label)
+	{
 		if (!iPhone && Safari3) {
 			$('div#upload_container div.dialog_window').css('top', '-205px');
 			$('div#prefs_container div.dialog_window').css('top', '-425px');
@@ -103,10 +105,10 @@ Dialog.prototype = {
 		}
 	},
 
-    /*
-     * Display an alert dialog
-     */
-    alert: function(dialog_heading, dialog_message, cancel_button_label) {
+	/*
+	 * Display an alert dialog
+	 */
+	alert: function(dialog_heading, dialog_message, cancel_button_label) {
 		if (!iPhone && Safari3) {
 			$('div#upload_container div.dialog_window').css('top', '-205px');
 			$('div#prefs_container div.dialog_window').css('top', '-425px');
