@@ -1396,11 +1396,11 @@ Transmission.prototype =
 
 		if (!showing_dialog)
 		{
-			var haveSelection = false;
-			var haveActive = false;
-			var haveActiveSelection = false;
-			var havePaused = false;
-			var havePausedSelection = false;
+			var haveSelection = false,
+			    haveActive = false,
+			    haveActiveSelection = false,
+			    havePaused = false,
+			    havePausedSelection = false;
 
 			for (var i=0, row; row=this._rows[i]; ++i) {
 				var isStopped = row.getTorrent().isStopped();
@@ -1483,32 +1483,32 @@ Transmission.prototype =
 			return;
 		}
 
-		var creator = 'N/A';
-		var comment = 'N/A';
-		var download_dir = 'N/A';
-		var date_created = 'N/A';
-		var error = 'None';
-		var hash = 'N/A';
-		var have_public = false;
-		var have_private = false;
-		var name;
-		var sizeWhenDone = 0;
-		var sizeDone = 0;
-		var total_completed = 0;
-		var total_download = 0;
-		var total_download_peers = 0;
-		var total_download_speed = 0;
-		var total_availability = 0;
-		var total_size = 0;
-		var total_state = [ ];
-		var pieces = 'N/A';
-		var total_upload = 0;
-		var total_upload_peers = 0;
-		var total_upload_speed = 0;
-		var total_verified = 0;
-		var na = 'N/A';
-		var tab = this._inspector._info_tab;
-		var fmt = Transmission.fmt;
+		var creator = 'N/A',
+		    comment = 'N/A',
+		    download_dir = 'N/A',
+		    date_created = 'N/A',
+		    error = 'None',
+		    hash = 'N/A',
+		    have_public = false,
+		    have_private = false,
+		    name,
+		    sizeWhenDone = 0,
+		    sizeDone = 0,
+		    total_completed = 0,
+		    total_download = 0,
+		    total_download_peers = 0,
+		    total_download_speed = 0,
+		    total_availability = 0,
+		    total_size = 0,
+		    total_state = [ ],
+		    pieces = 'N/A',
+		    total_upload = 0,
+		    total_upload_peers = 0,
+		    total_upload_speed = 0,
+		    total_verified = 0,
+		    na = 'N/A',
+		    tab = this._inspector._info_tab,
+		    fmt = Transmission.fmt;
 
 		$("#torrent_inspector_size, .inspector_row div").css('color', '#222');
 
@@ -1902,14 +1902,16 @@ Transmission.prototype =
 
 	refreshFilterButton: function()
 	{
-		var state = this[Prefs._FilterMode];
-		var state_all = state == Prefs._FilterAll;
-		var state_string = this.getStateString(state);
-		var tracker = this.filterTracker;
-		var tracker_all = !tracker;
-		var tracker_string = tracker ? this.getReadableDomain(tracker) : '';
+		var text,
+		    state = this[Prefs._FilterMode],
+		    state_all = state == Prefs._FilterAll,
+		    state_string = this.getStateString(state),
+		    tracker = this.filterTracker,
+		    tracker_all = !tracker,
+		    tracker_string = tracker ? this.getReadableDomain(tracker) : '',
+		    torrent_count = Object.keys(this._torrents).length,
+		    visible_count = this._rows.length;
 
-		var text;
 		if (state_all && tracker_all)
 			text = 'Show <span class="filter-selection">All</span>';
 		else if (state_all)
@@ -1919,8 +1921,6 @@ Transmission.prototype =
 		else
 			text = 'Show <span class="filter-selection">' + state_string + '</span> at <span class="filter-selection">' + tracker_string + '</span>';
 
-		var torrent_count = Object.keys(this._torrents).length;
-		var visible_count = this._rows.length;
 		if (torrent_count === visible_count)
 			text += ' &mdash; ' + torrent_count + ' Transfers';
 		else
@@ -1935,20 +1935,6 @@ Transmission.prototype =
 			var tr = this;
 			this.refilterTimer = setTimeout(function() {tr.refilter();}, 500);
 		}
-	},
-
-	matchesTorrentList: function(torrents)
-	{
-		if (!torrents || !this._rows)
-			return false;
-		if (torrents.length !== this._rows.length)
-			return false;
-
-		for (var i=0, tor; tor=torrents[i]; ++i)
-			if (tor.getId() !== this._rows[i].getTorrentId())
-				return false;
-
-		return true;
 	},
 
 	sortRows: function(rows)
