@@ -66,7 +66,7 @@ Transmission.prototype =
 		// tell jQuery to copy the dataTransfer property from events over if it exists
 		jQuery.event.props.push("dataTransfer");
 
-		$(document).delegate('#torrent_list > li', 'click', function(ev) {tr.setSelectedRow(ev.currentTarget.row);});
+		$(document).delegate('#torrent_list > li', 'click', function(ev) {tr.onRowClicked(ev,ev.currentTarget.row);});
 		$(document).delegate('#torrent_list > li', 'dblclick', function(e) {tr.toggleInspector();});
 	
 		$('#torrent_upload_form').submit(function() { $('#upload_confirm_button').click(); return false; });
@@ -75,9 +75,9 @@ Transmission.prototype =
 			$('#inspector_close').bind('click', function() { tr.setInspectorVisible(false); });
 			$('#preferences_link').bind('click', function(e) { tr.releaseClutchPreferencesButton(e); });
 		} else {
-			$(document).bind('keydown',  function(e) { tr.keyDown(e); });
-			$(document).bind('keyup',  function(e) { tr.keyUp(e); });
-			$('#torrent_container').click(function() { tr.deselectAll(); });
+			$(document).bind('keydown', function(e) { return tr.keyDown(e); });
+			$(document).bind('keyup', function(e) { tr.keyUp(e); });
+			$(document).delegate('#torrent_container', 'click', function() { tr.deselectAll(); });
 			$('#inspector_link').click(function(e) { tr.toggleInspector(); });
 
 			this.setupSearchBox();
@@ -480,7 +480,8 @@ Transmission.prototype =
 	 */
 	keyDown: function(ev)
 	{
-		var up = ev.keyCode === 38; // up key pressed
+		var handled = false,
+		    up = ev.keyCode === 38; // up key pressed
 		    dn = ev.keyCode === 40, // down key pressed
 		    shift = ev.keyCode === 16; // shift key pressed
 
@@ -522,11 +523,14 @@ Transmission.prototype =
 			}
 			this._last_torrent_clicked = r.getTorrentId();
 			this.scrollToRow(r);
+			handled = true;
 		}
 		else if (shift)
 		{
 			this._shift_index = this.indexOfLastTorrent();
 		}
+
+		return !handled;
 	},
 
 	keyUp: function(ev)
