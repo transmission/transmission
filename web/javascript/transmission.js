@@ -289,14 +289,11 @@ Transmission.prototype =
 			boundingElement:   $('div#torrent_container'),
 			boundingRightPad:  20,
 			boundingBottomPad: 5,
-			onContextMenu:     function(e) {
-				var closest_row = $(e.target).closest('.torrent')[0];
-				for (var i=0, row; row = tr._rows[i]; ++i) {
-					if (row.getElement() === closest_row) {
-						tr.setSelectedRow(row);
-						break;
-					}
-				}
+			onContextMenu: function(ev) {
+				var element = $(ev.target).closest('.torrent')[0];
+				var i = $('#torrent_list > li').index(element);
+				if ((i!==-1) && !tr._rows[i].isSelected())
+					tr.setSelectedRow(tr._rows[i]);
 				return true;
 			}
 		});
