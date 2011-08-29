@@ -1649,11 +1649,6 @@ Transmission.prototype =
 			return;
 		}
 
-		var torrent = sel[0];
-		if (torrent === this._files_torrent)
-			if(torrent.getFileCount() === (this._files ? this._files.length: 0))
-				return;
-
 		// build the file list
 		this.clearFileList();
 		this._file_torrent = torrent;

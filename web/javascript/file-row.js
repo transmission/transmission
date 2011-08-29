@@ -110,8 +110,7 @@ FileRow.prototype =
 	{
 		var me = this,
 		    file = torrent.getFile(i),
-		    name = file.name.substring (file.name.lastIndexOf('/')+1),
-		    root, wanted_div, pri_div, file_div, prog_div;
+		    name, root, wanted_div, pri_div, file_div, prog_div;
 
 		root = document.createElement('li');
 		root.id = 't' + this._torrent.getId() + 'f' + this._index;
@@ -145,9 +144,12 @@ FileRow.prototype =
 			me.firePriorityChanged(prio);
 		});
 
+		name = file.name || 'Unknown';
+		name = name.substring(name.lastIndexOf('/')+1);
+		name = name.replace(/([\/_\.])/g, "$1&#8203;");
 		file_div = document.createElement('div');
 		file_div.className = "inspector_torrent_file_list_entry_name";
-		file_div.innerHTML = name.replace(/([\/_\.])/g, "$1&#8203;");
+		file_div.innerHTML = name;
 
 		prog_div = document.createElement('div');
 		prog_div.className = "inspector_torrent_file_list_entry_progress";
