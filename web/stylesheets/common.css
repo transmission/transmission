@@ -65,10 +65,10 @@ a {
 	list-style-type: none;
 	list-style-image: none;
 	float: left;
-	padding: 0;
 	margin: 13px 0 0 0;
-	vertical-align: middle;
 	height: 50px;
+	padding: 0 8px;
+	cursor: pointer;
 }
 
 #toolbar #inspector {
@@ -76,15 +76,8 @@ a {
 }
 
 #toolbar ul li > div {
-	color: #000;
-	font-size: 1.1em;
-	text-decoration: none;
-	padding: 0 8px;
-	display: block;
-	margin: 0;
 	text-shadow: 0 1px 0 #ccc;
 	min-width: 32px;
-	cursor: pointer;
 }
 
 #toolbar ul li div.toolbar_image {
@@ -149,12 +142,8 @@ li#inspector       div:active div.toolbar_image { background-position: right -22
 
 #statusbar #filter-button {
 	float: left;
-	border: none;
-	padding: 1px 5px;
 	text-shadow: 0 1px 0 #ccc;
-	border-radius: 2px;*/
-	font-size: 1.2em;
-	margin: 5px 4px 0px 4px;
+	margin: 5px 8px;
 	-moz-user-select: none;
 	-webkit-user-select: none;
 }
@@ -282,24 +271,12 @@ ul.torrent_list {
 	margin: 0;
 	padding: 0;
 	text-align: left;
-	cursor: default;
-}
-
-ul.torrent_list li {
-	list-style-type: none;
-	list-style-image: none;
-	clear: both;
-	display: block;
-	vertical-align: middle;
-	-moz-user-select: none;
-	-webkit-user-select: none;
-	overflow: hidden;
+	cursor: pointer;
 }
 
 ul.torrent_list li.torrent {
 	border-bottom: 1px solid #ccc;
 	padding: 4px 30px 5px 10px; /* Make space for buttons on the right */
-	margin: 0 !important;
 	color: #666;
 }
 ul.torrent_list li.torrent.compact {
@@ -386,7 +363,6 @@ ul.torrent_list li.torrent.selected div.torrent_peer_details.error {
 ul.torrent_list div.torrent_progress_bar_container {
 	height: 10px;
 	position: relative;
-	margin-top: 2px;
 }
 ul.torrent_list div.torrent_progress_bar_container.compact {
 	width: 50px;
@@ -397,11 +373,11 @@ ul.torrent_list div.torrent_progress_bar_container.compact {
 }
 ul.torrent_list div.torrent_peer_details.compact {
 	margin-top: 2px;
-	margin-left: 10px;
 	margin-right: 65px; /* leave room on the right for the progressbar */
 	float: right; /* pins it next to progressbar & forces torrent_name to ellipsize when it bumps up against this div */
 }
 ul.torrent_list div.torrent_progress_bar_container.full {
+	margin-top: 2px;
 	margin-bottom: 5px;
 }
 ul.torrent_list div.torrent_progress_bar {
@@ -888,19 +864,13 @@ li.inspector_torrent_file_list_entry.complete div.file_priority_control {
  *--------------------------------------*/
 
 div.torrent_footer {
-	width: 100%;
-	height: 22px;
-	margin: 0;
-	padding: 0;
-	border-top: 1px solid #555;
 	background: #aaa url('../images/graphics/chrome.png') left -142px repeat-x;
-	position: fixed;
-	left: 0px;
-	right: 0px;
+	border-top: 1px solid #555;
 	bottom: 0;
+	height: 22px;
+	position: fixed;
+	width: 100%;
 	z-index: 3;
-	color: #000;
-	text-shadow: 0 1px 0 #ccc;
 }
 
 div.torrent_footer ul#settings_menu li#button {
