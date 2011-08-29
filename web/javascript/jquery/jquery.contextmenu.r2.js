@@ -125,7 +125,7 @@
     
     setTimeout( function() { // Delay for Mozilla
 		$(document).click( function() {
-			$(document).unbind('click');
+			menu.unbind('click');
 			hide();
 			return false;
 		});
