@@ -1640,24 +1640,27 @@ Transmission.prototype =
 	},
 	updateFileList: function()
 	{
+		var i, n, tr, sel, row, torrent, fragment;
+
 		if (!$(this._inspector_file_list).is(':visible'))
 			return;
 
-		var sel = this.getSelectedTorrents();
+		sel = this.getSelectedTorrents();
 		if (sel.length !== 1) {
 			this.clearFileList();
 			return;
 		}
 
 		// build the file list
+		torrent = sel[0];
 		this.clearFileList();
 		this._file_torrent = torrent;
-		var n = torrent.getFileCount();
+		n = torrent.getFileCount();
 		this._file_rows = [];
-		var fragment = document.createDocumentFragment();
-		var tr = this;
-		for (var i=0; i<n; ++i) {
-			var row = this._file_rows[i] = new FileRow(torrent, i);
+		fragment = document.createDocumentFragment();
+		tr = this;
+		for (i=0; i<n; ++i) {
+			row = this._file_rows[i] = new FileRow(torrent, i);
 			fragment.appendChild(row.getElement());
 	                $(row).bind('wantedToggled',function(e,row,want) {tr.onFileWantedToggled(row,want);});
 	                $(row).bind('priorityToggled',function(e,row,priority) {tr.onFilePriorityToggled(row,priority);});
