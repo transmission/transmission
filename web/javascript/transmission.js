@@ -1152,8 +1152,10 @@ Transmission.prototype =
 	{
 		if (ids && ids.length)
 		{
-			for (var i=0, id; id=ids[i]; ++i)
+			for (var i=0, id; id=ids[i]; ++i) {
+				this.dirtyTorrents[id] = true;
 				delete this._torrents[id];
+			}
 			this.refilter();
 		}
 	},
@@ -1994,10 +1996,11 @@ Transmission.prototype =
 		// drop any dirty rows that don't pass the filter test
 		tmp = [];
 		for (i=0; row=dirty_rows[i]; ++i) {
-			t = row.getTorrent();
-			if (t.test(filter_mode, filter_text, filter_tracker))
+			id = row.getTorrentId();
+			t = this._torrents[ id ];
+			if (t && t.test(filter_mode, filter_text, filter_tracker))
 				tmp.push(row);
-			delete this.dirtyTorrents[t.getId()];
+			delete this.dirtyTorrents[id];
 		}
 		dirty_rows = tmp;
 
@@ -2005,7 +2008,7 @@ Transmission.prototype =
 		// but don't already have a row
 		for (id in this.dirtyTorrents) {
 			t = this._torrents[id];
-			if (t.test(filter_mode, filter_text, filter_tracker)) {
+			if (t && t.test(filter_mode, filter_text, filter_tracker)) {
 				var s = t.getId() in sel;
 				row = new TorrentRow(renderer, this, t, s);
 				row.getElement().row = row;
