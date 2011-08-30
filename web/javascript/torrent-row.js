@@ -345,18 +345,16 @@ TorrentRendererCompact.prototype =
 *****
 ****/
 
-function TorrentRow(view, controller, torrent, selected)
+function TorrentRow(view, controller, torrent)
 {
-	this.initialize(view, controller, torrent, selected);
+	this.initialize(view, controller, torrent);
 }
 TorrentRow.prototype =
 {
-	initialize: function(view, controller, torrent, selected) {
+	initialize: function(view, controller, torrent) {
 		this._view = view;
 		this._element = view.createRow();
 		this.setTorrent(controller, torrent);
-		if (selected)
-			this.setSelected(selected);
 		this.render(controller);
 
 	},

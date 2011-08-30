@@ -1949,23 +1949,19 @@ Transmission.prototype =
 
 	refilter: function(rebuildEverything)
 	{
-		var i, e, id, t, row, tmp, sel, rows, clean_rows, dirty_rows,
+		var i, e, id, t, row, tmp, rows, clean_rows, dirty_rows,
 		    sort_mode = this[Prefs._SortMethod],
 		    sort_direction = this[Prefs._SortDirection],
 		    filter_mode = this[Prefs._FilterMode],
 		    filter_text = this.filterText,
 		    filter_tracker = this.filterTracker,
 		    renderer = this.torrentRenderer,
-		    list = this._torrent_list;
+		    list = this._torrent_list,
+		    old_sel_count = $(list).children('.selected').length;
+
 
 		clearTimeout(this.refilterTimer);
 		delete this.refilterTimer;
-
-		// build a temporary lookup table of selected torrent ids
-		sel = { };
-		for (i=0; row=this._rows[i]; ++i)
-			if (row.isSelected())
-				sel[row.getTorrentId()] = row;
 
 		if (rebuildEverything) {
 			$(list).empty();
@@ -2007,8 +2003,7 @@ Transmission.prototype =
 		for (id in this.dirtyTorrents) {
 			t = this._torrents[id];
 			if (t && t.test(filter_mode, filter_text, filter_tracker)) {
-				var s = t.getId() in sel;
-				row = new TorrentRow(renderer, this, t, s);
+				row = new TorrentRow(renderer, this, t);
 				row.getElement().row = row;
 				dirty_rows.push(row);
 			}
@@ -2063,7 +2058,7 @@ Transmission.prototype =
 		// sync gui
 		this.updateStatusbar();
 		this.refreshFilterButton();
-		if (Object.keys(sel).length !== this.getSelectedRows().length)
+		if (old_sel_count !== $(list).children('.selected').length)
 			this.selectionChanged();
 	},
 
