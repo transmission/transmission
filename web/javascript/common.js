@@ -128,16 +128,6 @@ String.prototype.trim = function () {
 	return this.replace(/^\s*/, "").replace(/\s*$/, "");
 }
 
-/**
- * @brief strcmp()-style compare useful for sorting
- */
-String.prototype.compareTo = function(that) {
-	// FIXME: how to fold these two comparisons together?
-	if (this < that) return -1;
-	if (this > that) return 1;
-	return 0;
-}
-
 /***
 ****  Preferences
 ***/
@@ -176,7 +166,6 @@ Prefs._Defaults =
 {
 	'filter': 'all',
 	'refresh_rate' : 5,
-	'show_filter': true,
 	'sort_direction': 'ascending',
 	'sort_method': 'name',
 	'turtle-state' : false,

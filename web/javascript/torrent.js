@@ -358,7 +358,7 @@ Torrent.compareById = function(ta, tb)
 };
 Torrent.compareByName = function(ta, tb)
 {
-	return ta.getCollatedName().compareTo(tb.getCollatedName())
+	return ta.getCollatedName().localeCompare(tb.getCollatedName())
 	    || Torrent.compareById(ta, tb);
 };
 Torrent.compareByQueue = function(ta, tb)
