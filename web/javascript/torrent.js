@@ -236,6 +236,7 @@ Torrent.prototype =
 	isFinished: function() { return this.fields.isFinished; },
 
 	// derived accessors
+	hasExtraInfo: function() { return 'hashString' in this.fields; },
 	isSeeding: function() { return this.getStatus() === Torrent._StatusSeed; },
 	isStopped: function() { return this.getStatus() === Torrent._StatusStopped; },
 	isChecking: function() { return this.getStatus() === Torrent._StatusCheck; },

@@ -448,7 +448,7 @@ Transmission.prototype =
 	selectionChanged: function()
 	{
 		if (this[Prefs._ShowInspector])
-			this.refreshInspectorTorrents(true);
+			this.refreshInspectorTorrents();
 
 		this.updateButtonStates();
 		this.updateInspector();
@@ -1076,7 +1076,19 @@ Transmission.prototype =
 	        this.remote.updateTorrents(null, fields, this.updateFromTorrentGet, this);
 	},
 
-	refreshInspectorTorrents: function(full)
+	needsExtraInfo: function(ids)
+	{
+		var i, id, tor;
+
+		for (i=0; id=ids[i]; ++i)
+			if ((tor = this._torrents[id]))
+				if (!tor.hasExtraInfo())
+					return true;
+
+		return false;
+	},
+
+    refreshInspectorTorrents: function(full)
 	{
 		// some torrent fields are only used by the inspector, so we defer loading them
 		// until the user is viewing the torrent in the inspector.
@@ -1084,7 +1096,7 @@ Transmission.prototype =
 			var ids = this.getSelectedTorrentIds();
 			if (ids && ids.length) {
 				var fields = ['id'].concat(Torrent.Fields.StatsExtra);
-				if (full)
+				if (this.needsExtraInfo(ids))
 					fields = fields.concat(Torrent.Fields.InfoExtra);
 				this.remote.updateTorrents(ids, fields, this.updateFromTorrentGet, this);
 			}
@@ -1827,8 +1839,8 @@ Transmission.prototype =
 		delete this._periodic_inspector_refresh;
 		if (visible) {
 			var tr = this;
-			this._periodic_inspector_refresh = setInterval(function() {tr.refreshInspectorTorrents(false);},2000);
-			this.refreshInspectorTorrents(true);
+			this._periodic_inspector_refresh = setInterval(function() {tr.refreshInspectorTorrents();},2000);
+			this.refreshInspectorTorrents();
 		}
 
 		// update the ui widgetry
