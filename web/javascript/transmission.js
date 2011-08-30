@@ -1924,7 +1924,7 @@ Transmission.prototype =
 		if (!this.refilterTimer)
 		{
 			var tr = this;
-			this.refilterTimer = setTimeout(function() {tr.refilter();}, 500);
+			this.refilterTimer = setTimeout(function() {tr.refilter();}, 100);
 		}
 	},
 
