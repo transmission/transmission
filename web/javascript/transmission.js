@@ -300,11 +300,10 @@ Transmission.prototype =
 	 * Create the footer settings menu
 	 */
 	createSettingsMenu: function() {
-		var tr = this;
 		$('#settings_menu').transMenu({
 			selected_char: '&#x2714;',
 			direction: 'up',
-			onClick: function(e) { return tr.processSettingsMenuEvent(e); }
+			onClick: $.proxy(this.processSettingsMenuEvent,this)
 		});
 
 		$('#unlimited_download_rate').selectMenuItem();
@@ -455,10 +454,7 @@ Transmission.prototype =
 	callSelectionChangedSoon: function()
 	{
 		if (!this.selectionChangedTimer)
-		{
-			var tr = this;
-			this.selectionChangedTimer = setTimeout(function() {tr.selectionChanged();},200);
-		}
+			this.selectionChangedTimer = setTimeout($.proxy(this.selectionChanged,this),200);
 	},
 
 	/*--------------------------------------------
@@ -636,10 +632,9 @@ Transmission.prototype =
 	savePrefsClicked: function()
 	{
 		// handle the clutch prefs locally
-		var tr = this;
 		var rate = parseInt ($('#prefs_form #refresh_rate')[0].value, 10);
-		if (rate != tr[Prefs._RefreshRate])
-			tr.setPref (Prefs._RefreshRate, rate);
+		if (rate != this[Prefs._RefreshRate])
+			this.setPref (Prefs._RefreshRate, rate);
 
 		var up_bytes        = parseInt($('#prefs_form #upload_rate').val(), 10),
 		    dn_bytes        = parseInt($('#prefs_form #download_rate').val(), 10),
@@ -677,9 +672,9 @@ Transmission.prototype =
 		o[RPC._PeerPortRandom]       = $('#prefs_form #port_rand').prop('checked');
 		o[RPC._PortForwardingEnabled]= $('#prefs_form #port_forward').prop('checked');
 
-		tr.remote.savePrefs(o);
+		this.remote.savePrefs(o);
 
-		tr.hidePrefsDialog();
+		this.hidePrefsDialog();
 	},
 
 	removeClicked: function(ev) {
@@ -711,9 +706,8 @@ Transmission.prototype =
 		clearInterval(this._periodic_session_refresh);
 		delete this._periodic_session_refresh;
 		if (enabled) {
-			var tr = this;
 			var msec = this.getIntervalMsec(Prefs._SessionRefreshRate, 5);
-			this._periodic_session_refresh = setInterval(function() {tr.loadDaemonPrefs();}, msec);
+			this._periodic_session_refresh = setInterval($.proxy(this.loadDaemonPrefs,this), msec);
 		}
 	},
 
@@ -722,9 +716,8 @@ Transmission.prototype =
 		clearInterval(this._periodic_stats_refresh);
 		delete this._periodic_stats_refresh;
 		if (enabled) {
-			var tr = this;
 			var msec = this.getIntervalMsec(Prefs._SessionRefreshRate, 5);
-			this._periodic_stats_refresh = setInterval(function() {tr.loadDaemonStats();}, msec);
+			this._periodic_stats_refresh = setInterval($.proxy(this.loadDaemonStats,this), msec);
 		}
 	},
 
@@ -1049,13 +1042,14 @@ Transmission.prototype =
 	refreshTorrents: function()
 	{
 		// send a request right now
-		var fields = ['id'].concat(Torrent.Fields.Stats);
-		this.remote.updateTorrents('recently-active', fields, this.updateFromTorrentGet, this);
+		this.remote.updateTorrents('recently-active',
+		                           ['id'].concat(Torrent.Fields.Stats),
+		                           this.updateFromTorrentGet,
+		                           this);
 
 		// schedule the next request
 		clearTimeout(this.refreshTorrentsTimeout);
-		var tr = this;
-		this.refreshTorrentsTimeout = setTimeout(function(){tr.refreshTorrents();}, tr[Prefs._RefreshRate]*1000);
+		this.refreshTorrentsTimeout = setTimeout($.proxy(this.refreshTorrents,this), this[Prefs._RefreshRate]*1000);
 	},
 
 	initializeTorrents: function()
@@ -1183,15 +1177,15 @@ Transmission.prototype =
 
 		// Submit the upload form
 		} else {
-			var tr = this;
 			var args = { };
+			var remote = this.remote;
 			var paused = !$('#torrent_auto_start').is(':checked');
 			if ('' != $('#torrent_upload_url').val()) {
-				tr.remote.addTorrentByUrl($('#torrent_upload_url').val(), { paused: paused });
+				remote.addTorrentByUrl($('#torrent_upload_url').val(), { paused: paused });
 			} else {
 				args.url = '../upload?paused=' + paused;
 				args.type = 'POST';
-				args.data = { 'X-Transmission-Session-Id' : tr.remote._token };
+				args.data = { 'X-Transmission-Session-Id' : remote._token };
 				args.dataType = 'xml';
 				args.iframe = true;
 				$('#torrent_upload_form').ajaxSubmit(args);
@@ -1309,13 +1303,9 @@ Transmission.prototype =
 	},
 
 	hideMobileAddressbar: function(timeInSeconds) {
-		if (isMobileDevice) {
+		if (isMobileDevice && !scroll_timeout) {
 			var delayLength = timeInSeconds ? timeInSeconds*1000 : 150;
-			// not currently supported on isMobileDevice
-			if (/*document.body.scrollTop!=1 && */scroll_timeout==null) {
-				var tr = this;
-				scroll_timeout = setTimeout(function() {tr.doToolbarHide();}, delayLength);
-			}
+			scroll_timeout = setTimeout($.proxy(this.doToolbarHide,this), delayLength);
 		}
 	},
 	doToolbarHide: function() {
@@ -1363,10 +1353,7 @@ Transmission.prototype =
 	updateButtonsSoon: function()
 	{
 		if (!this.buttonRefreshTimer)
-		{
-			var tr = this;
-			this.buttonRefreshTimer = setTimeout(function() {tr.updateButtonStates();}, 100);
-		}
+			this.buttonRefreshTimer = setTimeout($.proxy(this.updateButtonStates,this), 100);
 	},
 
 	updateButtonStates: function()
@@ -1929,10 +1916,7 @@ Transmission.prototype =
 	refilterSoon: function()
 	{
 		if (!this.refilterTimer)
-		{
-			var tr = this;
-			this.refilterTimer = setTimeout(function() {tr.refilter();}, 100);
-		}
+			this.refilterTimer = setTimeout($.proxy(this.refilter,this), 100);
 	},
 
 	sortRows: function(rows)
