@@ -390,26 +390,26 @@ Transmission.prototype =
 	},
 
 	setSelectedRow: function(row) {
-		$.each(this.getSelectedRows(),function(i,r) {r.setSelected(false);});
+		$(this._torrent_list).children('.selected').removeClass('selected');
 		this.selectRow(row);
 	},
 
 	selectRow: function(row) {
-		row.setSelected(true);
+		$(row.getElement()).addClass('selected');
 		this.callSelectionChangedSoon();
 	},
 
 	deselectRow: function(row) {
-		row.setSelected(false);
+		$(row.getElement()).removeClass('selected');
 		this.callSelectionChangedSoon();
 	},
 
 	selectAll: function() {
-		$.each(this._rows, function(i,r) {r.setSelected(true);});
+		$(this._torrent_list).children().addClass('selected');
 		this.callSelectionChangedSoon();
 	},
 	deselectAll: function() {
-		$.each(this._rows, function(i,r) {r.setSelected(false);});
+		$(this._torrent_list).children('.selected').removeClass('selected');
 		this.callSelectionChangedSoon();
 		delete this._last_torrent_clicked;
 	},
