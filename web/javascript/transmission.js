@@ -487,22 +487,16 @@ Transmission.prototype =
 		{
 			var last = this.indexOfLastTorrent(),
 			    i = last,
-			    anchor = this._shift_index;
+			    anchor = this._shift_index,
+			    r,
+			    min = 0,
+			    max = rows.length - 1;
 
-			if (dn)
-			{
-				if (i === -1) // no selection yet
-					i = 0;
-				else
-					i = (i+1) % rows.length;
-			}
-			else
-			{
-				if (i === -1) // no selection yet
-					i = rows.length - 1;
-				else
-					i = (i || rows.length) - 1;
-			}
+			if (dn && (i+1 <= max))
+				++i;
+			else if (up && (i-1 >= min))
+				--i;
+
 			var r = rows[i];
 
 			if (anchor >= 0)
