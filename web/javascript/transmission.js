@@ -933,9 +933,6 @@ Transmission.prototype =
 					$('div#stats_container h2.dialog_heading').show();
 					tr.showStatsDialog();
 				}
-				else if ($element[0].id == 'compact_view') {
-					this.toggleCompactClicked();
-				}
 				else if ($element[0].id == 'homepage') {
 					window.open('http://www.transmissionbt.com/');
 				}
@@ -2246,16 +2243,6 @@ Transmission.prototype =
 	onCompactModeChanged: function()
 	{
 		var compact = this[Prefs._CompactDisplayState];
-
-		// update the ui: context menu
-		// (disabled in iphone mode...)
-		if (!isMobileDevice) {
-			var e = $('#settings_menu #compact_view');
-			if (compact)
-				e.selectMenuItem();
-			else
-				e.deselectMenuItem();
-		}
 
 		// update the ui: footer button
 		$("#compact-button").toggleClass('enabled',compact);
