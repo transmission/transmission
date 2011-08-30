@@ -1088,7 +1088,7 @@ Transmission.prototype =
 		return false;
 	},
 
-    refreshInspectorTorrents: function(full)
+	refreshInspectorTorrents: function(full)
 	{
 		// some torrent fields are only used by the inspector, so we defer loading them
 		// until the user is viewing the torrent in the inspector.
