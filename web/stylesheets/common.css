@@ -28,6 +28,17 @@ a {
 	outline: 0;
 }
 
+#toolbar,
+#statusbar,
+.torrent_footer {
+	background-color: #B9B9B9; /* fallback color if gradients are not supported */
+	background-image: -webkit-gradient(linear, left top, left bottom, from(#C9C9C9), to(#A7A7A7)); 
+	background-image: -webkit-linear-gradient(top, #C9C9C9, #A7A7A7); 
+	background-image:    -moz-linear-gradient(top, #C9C9C9, #A7A7A7); 
+	background-image:     -ms-linear-gradient(top, #C9C9C9, #A7A7A7); 
+	background-image:      -o-linear-gradient(top, #C9C9C9, #A7A7A7); 
+	background-image:         linear-gradient(top, #C9C9C9, #A7A7A7); /* standard, but currently unimplemented */
+}
 
 /***
 ****
@@ -39,7 +50,6 @@ a {
 	width: 100%;
 	height: 75px;
 	margin: 0;
-	background: transparent url('../images/graphics/chrome.png') left top repeat-x;
         border: 1px outset #AEBBCB;
 	overflow: hidden;
 	-moz-user-select: none;
@@ -126,7 +136,6 @@ li#inspector       div:active div.toolbar_image { background-position: right -22
 ***/
 
 #statusbar {
-	background: #ACACAC;
 	border: 1px outset #AEBBCB;
 	height: 24px;
 	width: 100%;
@@ -864,90 +873,66 @@ li.inspector_torrent_file_list_entry.complete div.file_priority_control {
  *--------------------------------------*/
 
 div.torrent_footer {
-	background: #aaa url('../images/graphics/chrome.png') left -142px repeat-x;
+	height: 22px;
 	border-top: 1px solid #555;
 	bottom: 0;
-	height: 22px;
 	position: fixed;
 	width: 100%;
 	z-index: 3;
 }
 
+div.torrent_footer > * {
+	position: relative;
+	float: left;
+	margin: 2px 4px;
+}
+div.torrent_footer > *,
 div.torrent_footer ul#settings_menu li#button {
-	height: 22px;
-	width: 32px !important;
-	background: transparent url('../images/graphics/chrome.png') left -75px no-repeat;
-	margin: 0 0 0 3px;
-	padding: 0;
-	float: left;
-	position: relative;
+	height: 18px;
+	width: 32px;
+	cursor: pointer;
 	-moz-user-select: none;
 	-webkit-user-select: none;
 }
 
-div.torrent_footer ul#settings_menu li#button:active {
-	background: transparent url('../images/graphics/chrome.png') -32px -75px no-repeat;
+div.torrent_footer ul#settings_menu li#button {
+	background: transparent url('../images/graphics/chrome.png') left top no-repeat;
+	padding: 0;
+	position: relative;
 }
-
+div.torrent_footer ul#settings_menu li#button:active,
 div.torrent_footer ul#settings_menu li#button:hover {
-	background: transparent url('../images/graphics/chrome.png') -32px -75px no-repeat;
+	background-position: -32px top;
 }
 
-div.torrent_footer div#disk_space_container {
-	float: right;
-	font-size: 1.1em;
-	line-height: 22px;
-	vertical-align: middle;
-	margin: 0 20px 0 0;
-	padding: 0px;
+#turtle-button {
+	background: transparent url('../images/graphics/chrome.png') left -18px no-repeat;
+}
+#turtle-button:active,
+#turtle-button:hover {
+	background-position: -32px -18px;
+}
+#turtle-button.enabled {
+	background-position: left -36px;
+}
+#turtle-button.enabled:active,
+#turtle-button.enabled:hover {
+	background-position: -32px -36px;
 }
 
-div.torrent_footer div#turtle_button {
-	height: 22px;
-	width: 32px !important;
-	margin: 0 0 0 38px;
-	padding: 0;
-	cursor: pointer;
-	-moz-user-select: none;
-	-webkit-user-select: none;
+#compact-button {
+        background: transparent url('../images/graphics/chrome.png') left -54px no-repeat;
 }
-
-.turtleEnabled {
-	background: transparent url('../images/graphics/chrome.png') left -119px no-repeat;
+#compact-button:active,
+#compact-button:hover {
+	background-position: -32px -54px;
 }
-.turtleEnabled:active {
-	background: transparent url('../images/graphics/chrome.png') -32px -119px no-repeat;
+#compact-button.enabled {
+	background-position: left -72px;
 }
-.turtleDisabled {
-	background: transparent url('../images/graphics/chrome.png') left -97px no-repeat;
-}
-.turtleDisabled:active {
-	background: transparent url('../images/graphics/chrome.png') -32px -97px no-repeat;
-}
-
-div.torrent_footer #compact-button {
-	height: 22px;
-	width: 32px !important;
-	visibility: visible;
-	padding: 0;
-	float: left;
-	margin-left: 38px;
-	position: relative;
-	cursor: pointer;
-	-moz-user-select: none;
-	-webkit-user-select: none;
-}
-div.torrent_footer #compact-button {
-        background: transparent url('../images/graphics/chrome.png') left -185px no-repeat;
-}
-div.torrent_footer #compact-button:active {
-        background: transparent url('../images/graphics/chrome.png') -32px -185px no-repeat;
-}
-div.torrent_footer #compact-button.enabled {
-        background: transparent url('../images/graphics/chrome.png') left -163px no-repeat;
-}
-div.torrent_footer #compact-button.enabled:active {
-        background: transparent url('../images/graphics/chrome.png') -32px -163px no-repeat;
+#compact-button.enabled:active,
+#compact-button.enabled:hover {
+	background-position: -32px -72px;
 }
 
 
@@ -1284,17 +1269,20 @@ div#prefs_container div#pref_error {
 .trans_menu {
 	margin: 0;
 	padding: 0;
-	cursor: default;
 }
 
-.trans_menu, .trans_menu ul {
+.trans_menu,
+.trans_menu ul {
 	list-style: none;
 }
 
 .trans_menu ul {
+	/* place it right above the button */
+	position: relative;
+	bottom: 18px;
+
 	min-width: 210px;
-	background-color: #fff;
-	opacity: .98;
+	background-color: white;
 	padding: 5px 0;
 	text-align: left;
 	list-style: none;
@@ -1310,7 +1298,7 @@ div#prefs_container div#pref_error {
 	min-width: 175px;
 }
 
-.trans_menu li {
+.trans_menu > * li {
 	margin: 0;
 	padding: 0 10px 2px 20px !important;
 	color: #000;
@@ -1327,7 +1315,8 @@ div#prefs_container div#pref_error {
 	text-shadow: none;
 }
 
-.trans_menu li.separator, .trans_menu li.separator.hover {
+.trans_menu li.separator,
+.trans_menu li.separator.hover {
 	border-top: 1px solid #ddd;
 	margin: 5px 0;
 	padding: 0px;
@@ -1343,7 +1332,7 @@ div#prefs_container div#pref_error {
 }
 
 .trans_menu li.hover li.hover span.arrow, .trans_menu li.hover li.hover li.hover span.selected {
-	color: #fff;
+	color: white;
 }
 
 .trans_menu span.selected {
@@ -1365,19 +1354,9 @@ div#prefs_container div#pref_error {
 	margin: 0;
 }
 
-.trans_menu li.main {
-	float: left;
-	padding: 0 !important;
-	width: 30px !important;
-}
-
 .trans_menu li.main li {
 	z-index: 2;
 	min-width: 78px;
-}
-
-.trans_menu li.main.active {
-	background: transparent url('../images/graphics/chrome.png') right -75px no-repeat !important;
 }
 
 .trans_menu a {

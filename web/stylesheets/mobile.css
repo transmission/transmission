@@ -857,9 +857,8 @@ ul.single_file li.inspector_torrent_file_list_entry>.file_priority_control, li.i
  *--------------------------------------*/
 
 div.torrent_footer {
-	margin: -1px 0 0;
+	margin: 0px;
 	height: 20px;
-	background: #ddd url('../images/graphics/filter_bar.png') repeat-x left -51px;
 	border-top: 1px solid #777;
 	position: relative;
 	width: 100%;
@@ -868,6 +867,14 @@ div.torrent_footer {
 	color: #222;
 	text-shadow: 0 1px 1px #fff;
 	overflow: hidden;
+
+        background-color: #B9B9B9; /* fallback color if gradients are not supported */
+        background-image: -webkit-gradient(linear, left top, left bottom, from(#C9C9C9), to(#A7A7A7));
+        background-image: -webkit-linear-gradient(top, #C9C9C9, #A7A7A7);
+        background-image:    -moz-linear-gradient(top, #C9C9C9, #A7A7A7);
+        background-image:     -ms-linear-gradient(top, #C9C9C9, #A7A7A7);
+        background-image:      -o-linear-gradient(top, #C9C9C9, #A7A7A7);
+        background-image:         linear-gradient(top, #C9C9C9, #A7A7A7); /* standard, but currently unimplemented */
 }
 
 div.torrent_footer div#disk_space_container, div.torrent_footer a#preferences_link {
@@ -904,69 +911,41 @@ iframe#torrent_upload_frame {
 	margin: 0;
 }
 
-div.torrent_footer #compact-button {
+div.torrent_footer #compact-button,
+div.torrent_footer #turtle-button {
 	position: absolute;
-	top: 0px;
-	right: 0px;
-	margin: 2px;
 	height: 18px;
 	width: 32px !important;
-}
-div.torrent_footer #compact-button {
-	background: transparent url('../images/graphics/chrome.png') left -31px no-repeat;
-}
-div.torrent_footer #compact-button.active {
-	background: transparent url('../images/graphics/chrome.png') -32px -31px no-repeat;
-}
-div.torrent_footer #compact-button.enabled {
-	background: transparent url('../images/graphics/chrome.png') left -53px no-repeat;
-}
-div.torrent_footer #compact-button.enabled.active {
-	background: transparent url('../images/graphics/chrome.png') -32px -53px no-repeat;
+	top: 0px;
+	margin: 2px;
 }
 
-div.torrent_footer div#turtle_button {
-	position: absolute;
-	top: 0px;
+#compact-button {
+	right: 0px;
+        background: transparent url('../images/graphics/chrome.png') left -54px no-repeat;
+}
+#compact-button:active {
+        background-position: -32px -54px;
+}
+#compact-button.enabled {
+        background-position: left -72px;
+}
+#compact-button.enabled:active {
+        background-position: -32px -72px;
+}
+
+#turtle-button {
 	left: 0px;
-	margin: 2px;
-	height: 18px;
-	width: 32px !important;
+        background: transparent url('../images/graphics/chrome.png') left -18px no-repeat;
 }
-
-.turtleEnabled {
-	background: transparent url('../images/graphics/chrome.png') left -121px no-repeat;
+#turtle-button:active {
+        background-position: -32px -18px;
 }
-.turtleEnabled:active {
-	background: transparent url('../images/graphics/chrome.png') -32px -121px no-repeat;
+#turtle-button.enabled {
+        background-position: left -36px;
 }
-.turtleDisabled {
-	background: transparent url('../images/graphics/chrome.png') left -99px no-repeat;
-}
-.turtleDisabled:active {
-	background: transparent url('../images/graphics/chrome.png') -32px -99px no-repeat;
-}
-
-div.torrent_footer #compact-button {
-	position: absolute;
-	top: 0px;
-	right: 0px;
-	margin: 2px;
-	height: 18px;
-	width: 32px !important;
-        visibility: visible;
-}
-div.torrent_footer #compact-button {
-        background: transparent url('../images/graphics/chrome.png') left -187px no-repeat;
-}
-div.torrent_footer #compact-button:active {
-        background: transparent url('../images/graphics/chrome.png') -32px -187px no-repeat;
-}
-div.torrent_footer #compact-button.enabled {
-        background: transparent url('../images/graphics/chrome.png') left -165px no-repeat;
-}
-div.torrent_footer #compact-button.enabled:active {
-        background: transparent url('../images/graphics/chrome.png') -32px -165px no-repeat;
+#turtle-button.enabled:active {
+        background-position: -32px -36px;
 }
 
 /*--------------------------------------

@@ -53,8 +53,8 @@ Transmission.prototype =
 		$('#open_link').click(function(e) { tr.openTorrentClicked(e); });
 		$('#upload_confirm_button').click(function(e) { tr.confirmUploadClicked(e); return false;});
 		$('#upload_cancel_button').click(function(e) { tr.hideUploadDialog(); return false; });
-		$('#turtle_button').click(function() { tr.toggleTurtleClicked(); return false; });
-		$('#compact-button').click(function() { tr.toggleCompactClicked(); return false; });
+		$('#turtle-button').click(function() { tr.toggleTurtleClicked(); });
+		$('#compact-button').click(function() { tr.toggleCompactClicked(); });
 		$('#prefs-tab-general').click(function() { tr.selectPrefsTab('general'); });
 		$('#prefs-tab-speed').click(function() { tr.selectPrefsTab('speed'); });
 		$('#prefs-tab-peers').click(function() { tr.selectPrefsTab('peers'); });
@@ -752,19 +752,12 @@ Transmission.prototype =
 	},
 
 	updateTurtleButton: function() {
-		var t;
-		var w = $('#turtle_button');
-		if (this[Prefs._TurtleState]) {
-			w.addClass('turtleEnabled');
-			w.removeClass('turtleDisabled');
-			t = [ 'Click to disable Temporary Speed Limits' ];
-		} else {
-			w.removeClass('turtleEnabled');
-			w.addClass('turtleDisabled');
-			t = [ 'Click to enable Temporary Speed Limits' ];
-		}
-		t.push('(', Transmission.fmt.speed(this._prefs[RPC._TurtleUpSpeedLimit]), 'up,',
-		             Transmission.fmt.speed(this._prefs[RPC._TurtleDownSpeedLimit]), 'down)');
+		var enabled = this[Prefs._TurtleState],
+		    w = $('#turtle-button'),
+		    t = [ 'Click to ', (enabled?'disable':'enable'), ' Temporary Speed Limits',
+		          '(', Transmission.fmt.speed(this._prefs[RPC._TurtleUpSpeedLimit]), 'up,',
+		               Transmission.fmt.speed(this._prefs[RPC._TurtleDownSpeedLimit]), 'down)' ];
+		w.toggleClass('enabled',enabled);
 		w.attr('title', t.join(' '));
 	},
 
