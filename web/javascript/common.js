@@ -148,8 +148,6 @@ Prefs.prototype = { };
 Prefs._RefreshRate        = 'refresh_rate';
 Prefs._SessionRefreshRate = 'session_refresh_rate';
 
-Prefs._ShowInspector      = 'show_inspector';
-
 Prefs._FilterMode         = 'filter';
 Prefs._FilterAll          = 'all';
 Prefs._FilterActive       = 'active';
@@ -179,7 +177,6 @@ Prefs._Defaults =
 	'filter': 'all',
 	'refresh_rate' : 5,
 	'show_filter': true,
-	'show_inspector': false,
 	'sort_direction': 'ascending',
 	'sort_method': 'name',
 	'turtle-state' : false,

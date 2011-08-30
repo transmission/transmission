@@ -219,9 +219,6 @@ Transmission.prototype =
 
 			if (this[Prefs._SortDirection] === Prefs._SortDescending)
 				$('#reverse_sort_order').selectMenuItem();
-
-			if (this[Prefs._ShowInspector])
-				this.setInspectorVisible(true);
 		}
 
 		this.initCompactMode();
@@ -447,7 +444,7 @@ Transmission.prototype =
 
 	selectionChanged: function()
 	{
-		if (this[Prefs._ShowInspector])
+		if (this.inspectorIsVisible())
 			this.refreshInspectorTorrents();
 
 		this.updateButtonStates();
@@ -1019,9 +1016,8 @@ Transmission.prototype =
 		this.updateButtonsSoon();
 	
 		// if this torrent is in the inspector, refresh the inspector
-		if (this[Prefs._ShowInspector])
-			if (this.getSelectedTorrentIds().indexOf(id) !== -1)
-				this.updateInspector();
+		if (this.getSelectedTorrentIds().indexOf(id) !== -1)
+			this.updateInspector();
 	},
 
 	updateFromTorrentGet: function(updates, removed_ids)
@@ -1092,7 +1088,7 @@ Transmission.prototype =
 	{
 		// some torrent fields are only used by the inspector, so we defer loading them
 		// until the user is viewing the torrent in the inspector.
-		if ($('#torrent_inspector').is(':visible')) {
+		if (this.inspectorIsVisible()) {
 			var ids = this.getSelectedTorrentIds();
 			if (ids && ids.length) {
 				var fields = ['id'].concat(Torrent.Fields.StatsExtra);
@@ -1426,6 +1422,10 @@ Transmission.prototype =
 	*****
 	****/
 
+	inspectorIsVisible: function() {
+		return $('#torrent_inspector').is(':visible');
+	},
+
 	filesSelectAllClicked: function() {
 		var t = this._file_torrent;
 		if (t)
@@ -1467,7 +1467,7 @@ Transmission.prototype =
 	 */
 	updateInspector: function()
 	{
-		if (!this[Prefs._ShowInspector])
+		if (!this.inspectorIsVisible())
 			return;
 
 		var torrents = this.getSelectedTorrents();
@@ -1832,7 +1832,7 @@ Transmission.prototype =
 
 	toggleInspector: function()
 	{
-		this.setInspectorVisible(!this[Prefs._ShowInspector]);
+		this.setInspectorVisible(!this.inspectorIsVisible());
 	},
 	setInspectorVisible: function(visible)
 	{
@@ -1857,9 +1857,7 @@ Transmission.prototype =
 		}
 
 		setInnerHTML($('ul li#context_toggle_inspector')[0], (visible?'Hide':'Show')+' Inspector');
-		this.setPref(Prefs._ShowInspector, visible);
-		if (visible)
-			this.updateInspector();
+		this.updateInspector();
 	},
 
 	/****
