@@ -444,14 +444,12 @@ Transmission.prototype =
 
 	selectionChanged: function()
 	{
-		if (this.inspectorIsVisible())
-			this.refreshInspectorTorrents();
-
 		this.updateButtonStates();
-		this.updateInspector();
+		this.inspectorSelectionChanged();
 
 		clearTimeout(this.selectionChangedTimer);
 		delete this.selectionChangedTimer;
+
 	},
 
 	callSelectionChangedSoon: function()
@@ -1014,10 +1012,6 @@ Transmission.prototype =
 		// enqueue ui refreshes
 		this.refilterSoon();
 		this.updateButtonsSoon();
-	
-		// if this torrent is in the inspector, refresh the inspector
-		if (this.getSelectedTorrentIds().indexOf(id) !== -1)
-			this.updateInspector();
 	},
 
 	updateFromTorrentGet: function(updates, removed_ids)
@@ -1830,21 +1824,34 @@ Transmission.prototype =
 		return {'label':lastScrapeLabel, 'value':lastScrape};
 	},
 
+	inspectorSelectionChanged: function()
+	{
+		var i;
+
+		// if the inspector's hidden, don't create new ones
+		if (this.inspectorIsVisible())
+		{
+			// update the inspector when a selected torrent's data changes.
+			$(this.getAllTorrents()).unbind('dataChanged.inspector');
+			$(this.getSelectedTorrents()).bind('dataChanged.inspector', $.proxy(this.updateInspector,this));
+
+			// periodically ask for updates to the inspector's torrents
+			i = this._inspector;
+			clearInterval(i.refreshInterval);
+			i.refreshInterval = setInterval($.proxy(this.refreshInspectorTorrents,this), 2000);
+			this.refreshInspectorTorrents();
+
+			// refresh the inspector's UI
+			this.updateInspector();
+		}
+	},
+
 	toggleInspector: function()
 	{
 		this.setInspectorVisible(!this.inspectorIsVisible());
 	},
 	setInspectorVisible: function(visible)
 	{
-		// we collect extra stats on torrents when they're in the inspector...
-		clearInterval(this._periodic_inspector_refresh);
-		delete this._periodic_inspector_refresh;
-		if (visible) {
-			var tr = this;
-			this._periodic_inspector_refresh = setInterval(function() {tr.refreshInspectorTorrents();},2000);
-			this.refreshInspectorTorrents();
-		}
-
 		// update the ui widgetry
 		$('#torrent_inspector').toggle(visible);
 		if (isMobileDevice) {
@@ -1855,9 +1862,9 @@ Transmission.prototype =
 			var w = visible ? $('#torrent_inspector').width() + 1 + 'px' : '0px';
 			$('#torrent_container')[0].style.right = w;
 		}
-
 		setInnerHTML($('ul li#context_toggle_inspector')[0], (visible?'Hide':'Show')+' Inspector');
-		this.updateInspector();
+
+		this.inspectorSelectionChanged();
 	},
 
 	/****
