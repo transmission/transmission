@@ -6,10 +6,10 @@ dist_data_DATA = \
   file-row.js \
   formatter.js \
   menu.js \
+  remote.js \
   torrent.js \
   torrent-row.js \
   transmission.js \
-  transmission.remote.js
 
 SUBDIRS = \
   jquery
