@@ -66,9 +66,6 @@ Transmission.prototype =
 		// tell jQuery to copy the dataTransfer property from events over if it exists
 		jQuery.event.props.push("dataTransfer");
 
-		$(document).delegate('#torrent_list > li', 'click', function(ev) {tr.onRowClicked(ev,ev.currentTarget.row);});
-		$(document).delegate('#torrent_list > li', 'dblclick', function() {tr.toggleInspector();});
-	
 		$('#torrent_upload_form').submit(function() { $('#upload_confirm_button').click(); return false; });
 
 		if (isMobileDevice) {
@@ -1995,7 +1992,7 @@ Transmission.prototype =
 		e = $.map(dirty_rows.slice(0), function(r) {
 			return r.getElement();
 		});
-		$(e).remove();
+		$(e).detach();
 
 		// drop any dirty rows that don't pass the filter test
 		tmp = [];
@@ -2014,8 +2011,12 @@ Transmission.prototype =
 			t = this._torrents[id];
 			if (t && t.test(filter_mode, filter_text, filter_tracker)) {
 				row = new TorrentRow(renderer, this, t);
-				row.getElement().row = row;
+				e = row.getElement();
+				e.row = row;
 				dirty_rows.push(row);
+				var tr = this;
+				$(e).click(function(ev){tr.onRowClicked(ev,ev.currentTarget.row);});
+				$(e).dblclick(function(ev){tr.toggleInspector();});
 			}
 		}
 
