@@ -56,7 +56,7 @@
 			if ( !div.isVisible ) {
 				div.timer = setTimeout( function() {
 					//check if the mouse is still over the parent item - if not dont show the submenu
-					if (! $('div').parent().is('.hover')) {
+					if (! $(div).parent().is('.hover')) {
 						return;
 					}
 					//assign events to all div>ul>li-elements
