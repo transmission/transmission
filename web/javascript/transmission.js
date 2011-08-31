@@ -1337,12 +1337,16 @@ Transmission.prototype =
 
 	onToggleRunningClicked: function(ev)
 	{
-		var torrent = ev.data.r.getTorrent();
-
-		if (torrent.isStopped())
-			this.startTorrent(torrent);
-		else
-			this.stopTorrent(torrent);
+		var t, i, e;
+		e = $(ev.target).closest('.torrent')[0];
+		i = $('#torrent_list > li').index(e);
+		if ((0<=i) && (i<this._rows.length)) {
+			t = this._rows[i].getTorrent();
+			if (t.isStopped())
+				this.startTorrent(t);
+			else
+				this.stopTorrent(t);
+		}
 	},
 
 	setEnabled: function(key, flag)
@@ -1997,6 +2001,8 @@ Transmission.prototype =
 				row = new TorrentRow(renderer, this, t);
 				row.getElement().row = row;
 				dirty_rows.push(row);
+				if ((e = row.getToggleRunningButton()))
+					$(e).click($.proxy(this.onToggleRunningClicked,this));
 			}
 		}
 
