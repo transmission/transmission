@@ -752,7 +752,7 @@ Transmission.prototype =
 	showPrefsDialog: function() {
 		this.checkPort(true);
 		$('body').addClass('prefs_showing');
-		$('#prefs_container').show();
+		$('#prefs_container').fadeIn();
 		this.hideMobileAddressbar();
 		this.updateButtonStates();
 		this.togglePeriodicSessionRefresh(false);
@@ -763,7 +763,7 @@ Transmission.prototype =
 		$('body.prefs_showing').removeClass('prefs_showing');
 		if (isMobileDevice)
 			this.hideMobileAddressbar();
-		$('#prefs_container').hide();
+		$('#prefs_container').fadeOut();
 		this.updateButtonStates();
 		this.togglePeriodicSessionRefresh(true);
 	},
@@ -842,7 +842,7 @@ Transmission.prototype =
 	showStatsDialog: function() {
 		this.loadDaemonStats();
 		$('body').addClass('stats_showing');
-		$('#stats_container').show();
+		$('#stats_container').fadeIn();
 		this.hideMobileAddressbar();
 		this.updateButtonStates();
 		this.togglePeriodicStatsRefresh(true);
@@ -852,7 +852,7 @@ Transmission.prototype =
 		$('body.stats_showing').removeClass('stats_showing');
 		if (isMobileDevice)
 			this.hideMobileAddressbar();
-		$('#stats_container').hide();
+		$('#stats_container').fadeOut();
 		this.updateButtonStates();
 		this.togglePeriodicStatsRefresh(false);
 	},
