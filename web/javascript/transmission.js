@@ -1009,13 +1009,20 @@ Transmission.prototype =
 
 	updateFromTorrentGet: function(updates, removed_ids)
 	{
-		var needinfo = [];
+		var i, o, t, id, needed, needs, 
+		    needinfo = [];
 
-		for (var i=0, o; o=updates[i]; ++i) {
-			var t;
-			var id = o.id;
+		for (i=0; o=updates[i]; ++i)
+		{
+			id = o.id;
 			if ((t = this._torrents[id]))
+			{
+				needed = t.needsMetaData();
 				t.refresh(o);
+				needs = t.needsMetaData();
+				if (needed && !needs)
+					needinfo.push(id);
+			}
 			else {
 				var tr = this;
 				t = tr._torrents[id] = new Torrent(o);
