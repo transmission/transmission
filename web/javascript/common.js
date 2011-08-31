@@ -8,7 +8,7 @@
 
 var transmission,
     dialog,
-    isMobileDevice = RegExp("(isMobileDevice|iPod|Android)").test(navigator.userAgent),
+    isMobileDevice = RegExp("(iPhone|iPod|Android)").test(navigator.userAgent),
     scroll_timeout;
 
 if (!Array.indexOf){
