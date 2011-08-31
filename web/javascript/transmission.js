@@ -1096,6 +1096,18 @@ Transmission.prototype =
 
 	onRowClicked: function(ev, row)
 	{
+		// handle the per-row "torrent_resume" button
+		if (ev.target.className === 'torrent_resume') {
+			this.startTorrent(row.getTorrent());
+			return;
+		}
+
+		// handle the per-row "torrent_pause" button
+		if (ev.target.className === 'torrent_pause') {
+			this.stopTorrent(row.getTorrent());
+			return;
+		}
+
 		// Prevents click carrying to parent element
 		// which deselects all on click
 		ev.stopPropagation();
@@ -1341,20 +1353,6 @@ Transmission.prototype =
 	/***
 	****
 	***/
-
-	onToggleRunningClicked: function(ev)
-	{
-		var t, i, e;
-		e = $(ev.target).closest('.torrent')[0];
-		i = $('#torrent_list > li').index(e);
-		if ((0<=i) && (i<this._rows.length)) {
-			t = this._rows[i].getTorrent();
-			if (t.isStopped())
-				this.startTorrent(t);
-			else
-				this.stopTorrent(t);
-		}
-	},
 
 	setEnabled: function(key, flag)
 	{
@@ -1926,8 +1924,10 @@ Transmission.prototype =
 
 	refilterSoon: function()
 	{
-		if (!this.refilterTimer)
-			this.refilterTimer = setTimeout($.proxy(this.refilter,this), 100);
+		if (!this.refilterTimer) {
+			var tr = this;
+			this.refilterTimer = setTimeout(function(){tr.refilter(false);}, 100);
+		}
 	},
 
 	sortRows: function(rows)
@@ -2008,8 +2008,6 @@ Transmission.prototype =
 				row = new TorrentRow(renderer, this, t);
 				row.getElement().row = row;
 				dirty_rows.push(row);
-				if ((e = row.getToggleRunningButton()))
-					$(e).click($.proxy(this.onToggleRunningClicked,this));
 			}
 		}
 
