@@ -348,10 +348,12 @@ function TorrentRow(view, controller, torrent)
 TorrentRow.prototype =
 {
 	initialize: function(view, controller, torrent) {
+		var row = this;
 		this._view = view;
+		this._torrent = torrent;
 		this._element = view.createRow();
-		this.setTorrent(controller, torrent);
 		this.render(controller);
+		$(this._torrent).bind('dataChanged.torrentRowListener',function(){row.render(controller);});
 
 	},
 	getElement: function() {
@@ -373,16 +375,6 @@ TorrentRow.prototype =
 		return this.getElement()._toggle_running_button;
 	},
 
-	setTorrent: function(controller, t) {
-		if (this._torrent !== t) {
-			var row = this,
-			    key = 'dataChanged.torrentRowListener';
-			if (this._torrent)
-				$(this._torrent).unbind(key);
-			if ((this._torrent = t))
-				$(this._torrent).bind(key,function(){row.render(controller);});
-		}
-	},
 	getTorrent: function() {
 		return this._torrent;
 	},
