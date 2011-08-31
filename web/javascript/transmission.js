@@ -44,15 +44,15 @@ Transmission.prototype =
 		$('#resume_selected_link').click(function(e) { tr.startSelectedClicked(e); });
 		$('#remove_link').click(function(e) { tr.removeClicked(e); });
 		$('#prefs_save_button').click(function(e) { tr.savePrefsClicked(e); return false;});
-		$('#prefs_cancel_button').click(function(e) { tr.hidePrefsDialog(); return false; });
-		$('#block_update_button').click(function(e) { tr.remote.updateBlocklist(); return false; });
-		$('#stats_close_button').click(function(e) { tr.hideStatsDialog(); return false; });
+		$('#prefs_cancel_button').click(function() { tr.hidePrefsDialog(); return false; });
+		$('#block_update_button').click(function() { tr.remote.updateBlocklist(); return false; });
+		$('#stats_close_button').click(function() { tr.hideStatsDialog(); return false; });
 		$('.inspector_tab').click(function(e) { tr.inspectorTabClicked(e, this); });
 		$('#files_select_all').live('click', function(e) { tr.filesSelectAllClicked(e, this); });
 		$('#files_deselect_all').live('click', function(e) { tr.filesDeselectAllClicked(e, this); });
 		$('#open_link').click(function(e) { tr.openTorrentClicked(e); });
 		$('#upload_confirm_button').click(function(e) { tr.confirmUploadClicked(e); return false;});
-		$('#upload_cancel_button').click(function(e) { tr.hideUploadDialog(); return false; });
+		$('#upload_cancel_button').click(function() { tr.hideUploadDialog(); return false; });
 		$('#turtle-button').click(function() { tr.toggleTurtleClicked(); });
 		$('#compact-button').click(function() { tr.toggleCompactClicked(); });
 		$('#prefs-tab-general').click(function() { tr.selectPrefsTab('general'); });
@@ -67,7 +67,7 @@ Transmission.prototype =
 		jQuery.event.props.push("dataTransfer");
 
 		$(document).delegate('#torrent_list > li', 'click', function(ev) {tr.onRowClicked(ev,ev.currentTarget.row);});
-		$(document).delegate('#torrent_list > li', 'dblclick', function(e) {tr.toggleInspector();});
+		$(document).delegate('#torrent_list > li', 'dblclick', function() {tr.toggleInspector();});
 	
 		$('#torrent_upload_form').submit(function() { $('#upload_confirm_button').click(); return false; });
 
@@ -359,8 +359,9 @@ Transmission.prototype =
 	},
 
 	seedRatioLimit: function() {
-		if (this._prefs && this._prefs['seedRatioLimited'])
-			return this._prefs['seedRatioLimit'];
+		var p = this._prefs;
+		if (p && p.seedRatioLimited)
+			return p.seedRatioLimit;
 		return -1;
 	},
 
@@ -381,11 +382,15 @@ Transmission.prototype =
 	},
 
 	getSelectedTorrents: function() {
-		return $.map(this.getSelectedRows(),function(r) {return r.getTorrent();});
+		return $.map(this.getSelectedRows(),function(r) {
+			return r.getTorrent();
+		});
 	},
 
 	getSelectedTorrentIds: function() {
-		return $.map(this.getSelectedRows(),function(r) {return r.getTorrentId();});
+		return $.map(this.getSelectedRows(),function(r) {
+			return r.getTorrentId();
+		});
 	},
 
 	setSelectedRow: function(row) {
@@ -454,7 +459,8 @@ Transmission.prototype =
 	callSelectionChangedSoon: function()
 	{
 		if (!this.selectionChangedTimer)
-			this.selectionChangedTimer = setTimeout($.proxy(this.selectionChanged,this),200);
+			this.selectionChangedTimer =
+				setTimeout($.proxy(this.selectionChanged,this),200);
 	},
 
 	/*--------------------------------------------
@@ -469,7 +475,7 @@ Transmission.prototype =
 	keyDown: function(ev)
 	{
 		var handled = false,
-			rows = this._rows,
+		    rows = this._rows,
 		    up = ev.keyCode === 38; // up key pressed
 		    dn = ev.keyCode === 40, // down key pressed
 		    shift = ev.keyCode === 16; // shift key pressed
@@ -492,7 +498,8 @@ Transmission.prototype =
 
 			if (anchor >= 0)
 			{
-				// user is extending the selection with the shift + arrow keys...
+				// user is extending the selection
+				// with the shift + arrow keys...
 				if (   ((anchor <= last) && (last < i))
 				    || ((anchor >= last) && (last > i)))
 				{
@@ -529,9 +536,10 @@ Transmission.prototype =
 			delete this._shift_index;
 	},
 
-	isButtonEnabled: function(e) {
-		var p = e.target ? e.target.parentNode : e.srcElement.parentNode;
-		return p.className!='disabled' && p.parentNode.className!='disabled';
+	isButtonEnabled: function(ev) {
+		var p = (ev.target || ev.srcElement).parentNode;
+		return p.className!=='disabled'
+		    && p.parentNode.className!=='disabled';
 	},
 
 	stopAllClicked: function(ev) {
@@ -703,21 +711,21 @@ Transmission.prototype =
 
 	/* Turn the periodic ajax session refresh on & off */
 	togglePeriodicSessionRefresh: function(enabled) {
-		clearInterval(this._periodic_session_refresh);
-		delete this._periodic_session_refresh;
+		clearInterval(this.sessionInterval);
+		delete this.sessionInterval;
 		if (enabled) {
 			var msec = this.getIntervalMsec(Prefs._SessionRefreshRate, 5);
-			this._periodic_session_refresh = setInterval($.proxy(this.loadDaemonPrefs,this), msec);
+			this.sessionInterval = setInterval($.proxy(this.loadDaemonPrefs,this), msec);
 		}
 	},
 
 	/* Turn the periodic ajax stats refresh on & off */
 	togglePeriodicStatsRefresh: function(enabled) {
-		clearInterval(this._periodic_stats_refresh);
-		delete this._periodic_stats_refresh;
+		clearInterval(this.statsInterval);
+		delete this.statsInterval;
 		if (enabled) {
 			var msec = this.getIntervalMsec(Prefs._SessionRefreshRate, 5);
-			this._periodic_stats_refresh = setInterval($.proxy(this.loadDaemonStats,this), msec);
+			this.statsInterval = setInterval($.proxy(this.loadDaemonStats,this), msec);
 		}
 	},
 
@@ -997,10 +1005,8 @@ Transmission.prototype =
 
 	onTorrentChanged: function(tor)
 	{
-		var id = tor.getId();
-
 		// update our dirty fields
-		this.dirtyTorrents[id] = true;
+		this.dirtyTorrents[ tor.getId() ] = true;
 
 		// enqueue ui refreshes
 		this.refilterSoon();
@@ -1009,8 +1015,7 @@ Transmission.prototype =
 
 	updateFromTorrentGet: function(updates, removed_ids)
 	{
-		var i, o, t, id, needed, needs, 
-		    needinfo = [];
+		var i, o, t, id, needed, needinfo = [];
 
 		for (i=0; o=updates[i]; ++i)
 		{
@@ -1019,8 +1024,7 @@ Transmission.prototype =
 			{
 				needed = t.needsMetaData();
 				t.refresh(o);
-				needs = t.needsMetaData();
-				if (needed && !needs)
+				if (needed && !t.needsMetaData())
 					needinfo.push(id);
 			}
 			else {
@@ -1061,10 +1065,10 @@ Transmission.prototype =
 
 	initializeTorrents: function()
 	{
-		// to bootstrap, we only need to ask for the servers's torrents' ids.
-		// updateFromTorrentGet() automatically asks for the rest of the info when it gets a new id.
-		var fields = ['id'].concat(Torrent.Fields.Metadata, Torrent.Fields.Stats);
-	        this.remote.updateTorrents(null, fields, this.updateFromTorrentGet, this);
+		var fields = ['id'].concat(Torrent.Fields.Metadata,
+		                           Torrent.Fields.Stats);
+		this.remote.updateTorrents(null, fields,
+		                           this.updateFromTorrentGet, this);
 	},
 
 	needsExtraInfo: function(ids)
@@ -1079,18 +1083,20 @@ Transmission.prototype =
 		return false;
 	},
 
+	// Load the torrent fields which are only used by the inspector
 	refreshInspectorTorrents: function(full)
 	{
-		// some torrent fields are only used by the inspector, so we defer loading them
-		// until the user is viewing the torrent in the inspector.
-		if (this.inspectorIsVisible()) {
-			var ids = this.getSelectedTorrentIds();
-			if (ids && ids.length) {
-				var fields = ['id'].concat(Torrent.Fields.StatsExtra);
-				if (this.needsExtraInfo(ids))
-					fields = fields.concat(Torrent.Fields.InfoExtra);
-				this.remote.updateTorrents(ids, fields, this.updateFromTorrentGet, this);
-			}
+		var fields, ids=null;
+
+		if (this.inspectorIsVisible())
+			ids = this.getSelectedTorrentIds();
+
+		if (ids && ids.length) {
+			fields = ['id'].concat(Torrent.Fields.StatsExtra);
+			if (this.needsExtraInfo(ids))
+				$.merge(fields, Torrent.Fields.InfoExtra);
+			this.remote.updateTorrents(
+				ids, fields, this.updateFromTorrentGet, this);
 		}
 	},
 
@@ -1165,17 +1171,19 @@ Transmission.prototype =
 
 	updateStatusbar: function()
 	{
+		var i, row,
+		    u=0, d=0,
+		    fmt = Transmission.fmt,
+		    torrents = this.getAllTorrents();
+
 		this.refreshFilterButton();
 
 		// up/down speed
-		var u=0, d=0;
-		var torrents = this.getAllTorrents();
-		for (var i=0, row; row=torrents[i]; ++i) {
+		for (i=0; row=torrents[i]; ++i) {
 			u += row.getUploadSpeed();
 			d += row.getDownloadSpeed();
 		}
 
-		var fmt = Transmission.fmt;
 		setInnerHTML($('#statusbar #speed-up-label')[0], u ? '&uarr; ' + fmt.speedBps(u) : '');
 		setInnerHTML($('#statusbar #speed-dn-label')[0], d ? '&darr; ' + fmt.speedBps(d) : '');
 	},
@@ -1321,10 +1329,10 @@ Transmission.prototype =
 		this.remote.changeFileCommand(command, rows);
 	},
 
-	hideMobileAddressbar: function(timeInSeconds) {
+	hideMobileAddressbar: function(delaySecs) {
 		if (isMobileDevice && !scroll_timeout) {
-			var delayLength = timeInSeconds ? timeInSeconds*1000 : 150;
-			scroll_timeout = setTimeout($.proxy(this.doToolbarHide,this), delayLength);
+			var delayMsec = delaySecs*1000 || 150;
+			scroll_timeout = setTimeout($.proxy(this.doToolbarHide,this), delayMsec);
 		}
 	},
 	doToolbarHide: function() {
