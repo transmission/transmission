@@ -1940,7 +1940,7 @@ Transmission.prototype =
 
 	refilter: function(rebuildEverything)
 	{
-		var i, e, id, t, row, tmp, rows, clean_rows, dirty_rows,
+		var i, e, id, t, row, tmp, rows, clean_rows, dirty_rows, frag,
 		    sort_mode = this[Prefs._SortMethod],
 		    sort_direction = this[Prefs._SortDirection],
 		    filter_mode = this[Prefs._FilterMode],
@@ -2008,6 +2008,7 @@ Transmission.prototype =
 		rows = [];
 		var ci=0, cmax=clean_rows.length;
 		var di=0, dmax=dirty_rows.length;
+		frag = document.createDocumentFragment();
 		while (ci!=cmax || di!=dmax)
 		{
 			var push_clean;
@@ -2032,10 +2033,11 @@ Transmission.prototype =
 				if (ci !== cmax)
 					list.insertBefore(e, clean_rows[ci].getElement());
 				else
-					list.appendChild(e);
+					frag.appendChild(e);
 				rows.push(row);
 			}
 		}
+		list.appendChild(frag);
 
 		// update our implementation fields
 		this._rows = rows;

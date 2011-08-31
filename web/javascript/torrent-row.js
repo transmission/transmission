@@ -70,20 +70,16 @@ TorrentRendererHelper.createProgressbar = function(classes)
 
 TorrentRendererHelper.renderProgressbar = function(controller, t, progressbar)
 {
-	var e;
-	var display;
-	var info = TorrentRendererHelper.getProgressInfo(controller, t);
+	var e, style, width, display,
+	    info = TorrentRendererHelper.getProgressInfo(controller, t);
 
 	// update the complete progressbar
 	e = progressbar.complete;
-	if (info.percent > 0) {
-		display = 'block';
-		e.style.width = '' + info.percent + '%';
-	} else {
-		display = 'none';
-	}
-	if (e.style.display !== display)
-		e.style.display = display;
+	style = e.style;
+	width = '' + info.percent + '%';
+	display = info.percent > 0 ? 'block' : 'none';
+	if (style.width!==width || style.display!==display)
+		$(e).css({ width: ''+info.percent+'%', display: display });
 	if (e.className !== info.complete)
 		e.className = info.complete;
 
