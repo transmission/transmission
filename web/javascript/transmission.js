@@ -1899,15 +1899,22 @@ Transmission.prototype =
 
 	refreshFilterButton: function()
 	{
-		var text,
+		var o, tmp, text, torrent_count,
 		    state = this[Prefs._FilterMode],
 		    state_all = state == Prefs._FilterAll,
 		    state_string = this.getStateString(state),
 		    tracker = this.filterTracker,
 		    tracker_all = !tracker,
 		    tracker_string = tracker ? this.getReadableDomain(tracker) : '',
-		    torrent_count = Object.keys(this._torrents).length,
 		    visible_count = this._rows.length;
+
+		// count the total number of torrents
+		// torrent_count = Object.keys(this._torrents).length; // IE8 doesn't support Object.keys(
+		torrent_count = 0;
+		o = this._torrents;
+		for (tmp in o)
+			if (o.hasOwnProperty(tmp))
+				++torrent_count;
 
 		text = 'Show <span class="filter-selection">';
 		if (state_all && tracker_all)
@@ -2130,7 +2137,12 @@ Transmission.prototype =
 		***/
 
 		var trackers = this.getTrackers();
-		var names = Object.keys(trackers).sort();
+		//var names = Object.keys(trackers).sort(); (IE8 doesn't have Object.keys)
+		var name, name=[];
+		var names = [];
+		for  (name in trackers)
+			names.push (name);
+		names.sort();
 
 		var fragment = document.createDocumentFragment();
 		var div = document.createElement('div');
