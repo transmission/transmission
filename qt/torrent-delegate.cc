@@ -330,7 +330,6 @@ TorrentDelegate :: setProgressBarPercentDone( const QStyleOptionViewItem& option
         const double invertedRatio = 1. - seedRateRatio;
         const int scaledProgress = invertedRatio * (myProgressBarStyle->maximum - myProgressBarStyle->minimum);
         myProgressBarStyle->progress = myProgressBarStyle->minimum + scaledProgress;
-        myProgressBarStyle->direction = (option.direction == Qt::RightToLeft ? Qt::LeftToRight : Qt::RightToLeft);
     }
     else
     {

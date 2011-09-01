@@ -659,14 +659,7 @@ render_compact( TorrentCellRenderer   * cell,
 
     g_object_set( p->icon_renderer, "pixbuf", icon, "sensitive", sensitive, NULL );
     gtr_cell_renderer_render( p->icon_renderer, window, widget, &icon_area, flags );
-    g_object_set( p->progress_renderer, "value", (int)(percentDone*100.0), "text", NULL,
-        "sensitive", sensitive,
-#if GTK_CHECK_VERSION( 3,0,0 )
-        "inverted", seed,
-#else
-        "orientation", (seed ? GTK_PROGRESS_RIGHT_TO_LEFT : GTK_PROGRESS_LEFT_TO_RIGHT),
-#endif
-        NULL );
+    g_object_set( p->progress_renderer, "value", (int)(percentDone*100.0), "text", NULL, "sensitive", sensitive, NULL );
     gtr_cell_renderer_render( p->progress_renderer, window, widget, &prog_area, flags );
     g_object_set( p->text_renderer, "text", gstr_stat->str, "scale", SMALL_SCALE, "ellipsize", PANGO_ELLIPSIZE_END, FOREGROUND_COLOR_KEY, &text_color, NULL );
     gtr_cell_renderer_render( p->text_renderer, window, widget, &stat_area, flags );
@@ -780,13 +773,7 @@ render_full( TorrentCellRenderer   * cell,
     gtr_cell_renderer_render( p->text_renderer, window, widget, &name_area, flags );
     g_object_set( p->text_renderer, "text", gstr_prog->str, "scale", SMALL_SCALE, "weight", PANGO_WEIGHT_NORMAL, NULL );
     gtr_cell_renderer_render( p->text_renderer, window, widget, &prog_area, flags );
-    g_object_set( p->progress_renderer, "value", (int)(percentDone*100.0), "text", "", "sensitive", sensitive,
-#if GTK_CHECK_VERSION( 3,0,0 )
-        "inverted", seed,
-#else
-        "orientation", (seed ? GTK_PROGRESS_RIGHT_TO_LEFT : GTK_PROGRESS_LEFT_TO_RIGHT),
-#endif
-        NULL );
+    g_object_set( p->progress_renderer, "value", (int)(percentDone*100.0), "text", "", "sensitive", sensitive, NULL );
     gtr_cell_renderer_render( p->progress_renderer, window, widget, &prct_area, flags );
     g_object_set( p->text_renderer, "text", gstr_stat->str, FOREGROUND_COLOR_KEY, &text_color, NULL );
     gtr_cell_renderer_render( p->text_renderer, window, widget, &stat_area, flags );
