@@ -9,7 +9,7 @@ dist_data_DATA = \
   remote.js \
   torrent.js \
   torrent-row.js \
-  transmission.js \
+  transmission.js
 
 SUBDIRS = \
   jquery
