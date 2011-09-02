@@ -23,6 +23,7 @@ Transmission.prototype =
 	{
 		// Initialize the helper classes
 		this.remote = new TransmissionRemote(this);
+		this.inspector = new Inspector(this, this.remote);
 
 		// Initialize the implementation fields
 		this.filterText    = '';
@@ -47,9 +48,6 @@ Transmission.prototype =
 		$('#prefs_cancel_button').click(function() { tr.hidePrefsDialog(); return false; });
 		$('#block_update_button').click(function() { tr.remote.updateBlocklist(); return false; });
 		$('#stats_close_button').click(function() { tr.hideStatsDialog(); return false; });
-		$('.inspector_tab').click(function(e) { tr.inspectorTabClicked(e, this); });
-		$('#files_select_all').live('click', function(e) { tr.filesSelectAllClicked(e, this); });
-		$('#files_deselect_all').live('click', function(e) { tr.filesDeselectAllClicked(e, this); });
 		$('#open_link').click(function(e) { tr.openTorrentClicked(e); });
 		$('#upload_confirm_button').click(function(e) { tr.confirmUploadClicked(e); return false;});
 		$('#upload_cancel_button').click(function() { tr.hideUploadDialog(); return false; });
@@ -84,9 +82,6 @@ Transmission.prototype =
 		this.initTurtleDropDowns();
 
 		this._torrent_list             = $('#torrent_list')[0];
-		this._inspector_file_list      = $('#inspector_file_list')[0];
-		this._inspector_peers_list     = $('#inspector_peers_list')[0];
-		this._inspector_trackers_list  = $('#inspector_trackers_list')[0];
 		this._toolbar_buttons          = $('#toolbar ul li');
 		this._toolbar_pause_button     = $('#toolbar #pause_selected')[0];
 		this._toolbar_pause_all_button = $('#toolbar #pause_all')[0];
@@ -100,31 +95,6 @@ Transmission.prototype =
 		this._context_move_up          = $('li#context_move_up')[0];
 		this._context_move_down        = $('li#context_move_down')[0];
 		this._context_move_bottom      = $('li#context_move_bottom')[0];
-
-		var ti = '#torrent_inspector_';
-		this._inspector = { };
-		this._inspector._info_tab = { };
-		this._inspector._info_tab.availability = $(ti+'availability')[0];
-		this._inspector._info_tab.comment = $(ti+'comment')[0];
-		this._inspector._info_tab.creator_date = $(ti+'creator_date')[0];
-		this._inspector._info_tab.creator = $(ti+'creator')[0];
-		this._inspector._info_tab.download_dir = $(ti+'download_dir')[0];
-		this._inspector._info_tab.downloaded = $(ti+'downloaded')[0];
-		this._inspector._info_tab.download_from = $(ti+'download_from')[0];
-		this._inspector._info_tab.download_speed = $(ti+'download_speed')[0];
-		this._inspector._info_tab.error = $(ti+'error')[0];
-		this._inspector._info_tab.hash = $(ti+'hash')[0];
-		this._inspector._info_tab.have = $(ti+'have')[0];
-		this._inspector._info_tab.name = $(ti+'name')[0];
-		this._inspector._info_tab.progress = $(ti+'progress')[0];
-		this._inspector._info_tab.ratio = $(ti+'ratio')[0];
-		this._inspector._info_tab.secure = $(ti+'secure')[0];
-		this._inspector._info_tab.size = $(ti+'size')[0];
-		this._inspector._info_tab.state = $(ti+'state')[0];
-		this._inspector._info_tab.pieces = $(ti+'pieces')[0];
-		this._inspector._info_tab.uploaded = $(ti+'uploaded')[0];
-		this._inspector._info_tab.upload_speed = $(ti+'upload_speed')[0];
-		this._inspector._info_tab.upload_to = $(ti+'upload_to')[0];
 
 		// Setup the prefs gui
 		this.initializeSettings();
@@ -446,7 +416,8 @@ Transmission.prototype =
 	selectionChanged: function()
 	{
 		this.updateButtonStates();
-		this.inspectorSelectionChanged();
+
+		this.inspector.setTorrents(this.inspectorIsVisible() ? this.getSelectedTorrents() : []);
 
 		clearTimeout(this.selectionChangedTimer);
 		delete this.selectionChangedTimer;
@@ -1036,8 +1007,7 @@ Transmission.prototype =
 
 		if (needinfo.length) {
 			// whee, new torrents! get their initial information.
-			var fields = ['id'].concat(Torrent.Fields.Metadata, Torrent.Fields.Stats);
-	        	this.remote.updateTorrents(needinfo, fields, this.updateFromTorrentGet, this);
+			this.updateTorrents(needinfo, ['id'].concat(Torrent.Fields.Metadata, Torrent.Fields.Stats));
 			this.refilterSoon();
 		}
 
@@ -1047,13 +1017,15 @@ Transmission.prototype =
 		}
 	},
 
+	updateTorrents: function(ids, fields)
+	{
+		this.remote.updateTorrents(ids, fields, this.updateFromTorrentGet, this);
+	},
+
 	refreshTorrents: function()
 	{
 		// send a request right now
-		this.remote.updateTorrents('recently-active',
-		                           ['id'].concat(Torrent.Fields.Stats),
-		                           this.updateFromTorrentGet,
-		                           this);
+		this.updateTorrents('recently-active', ['id'].concat(Torrent.Fields.Stats));
 
 		// schedule the next request
 		clearTimeout(this.refreshTorrentsTimeout);
@@ -1062,39 +1034,7 @@ Transmission.prototype =
 
 	initializeTorrents: function()
 	{
-		var fields = ['id'].concat(Torrent.Fields.Metadata,
-		                           Torrent.Fields.Stats);
-		this.remote.updateTorrents(null, fields,
-		                           this.updateFromTorrentGet, this);
-	},
-
-	needsExtraInfo: function(ids)
-	{
-		var i, id, tor;
-
-		for (i=0; id=ids[i]; ++i)
-			if ((tor = this._torrents[id]))
-				if (!tor.hasExtraInfo())
-					return true;
-
-		return false;
-	},
-
-	// Load the torrent fields which are only used by the inspector
-	refreshInspectorTorrents: function(full)
-	{
-		var fields, ids=null;
-
-		if (this.inspectorIsVisible())
-			ids = this.getSelectedTorrentIds();
-
-		if (ids && ids.length) {
-			fields = ['id'].concat(Torrent.Fields.StatsExtra);
-			if (this.needsExtraInfo(ids))
-				$.merge(fields, Torrent.Fields.InfoExtra);
-			this.remote.updateTorrents(
-				ids, fields, this.updateFromTorrentGet, this);
-		}
+		this.updateTorrents(null, ['id'].concat(Torrent.Fields.Metadata, Torrent.Fields.Stats));
 	},
 
 	onRowClicked: function(ev, row)
@@ -1417,436 +1357,10 @@ Transmission.prototype =
 	*****
 	****/
 
-	inspectorIsVisible: function() {
+	inspectorIsVisible: function()
+	{
 		return $('#torrent_inspector').is(':visible');
 	},
-
-	filesSelectAllClicked: function() {
-		var t = this._file_torrent;
-		if (t)
-			this.toggleFilesWantedDisplay(t, true);
-	},
-	filesDeselectAllClicked: function() {
-		var t = this._file_torrent;
-		if (t)
-			this.toggleFilesWantedDisplay(t, false);
-	},
-	toggleFilesWantedDisplay: function(torrent, wanted) {
-		var rows = [ ];
-		for (var i=0, row; row=this._file_rows[i]; ++i)
-			if (row.isEditable() && (torrent.getFile(i).wanted !== wanted))
-				rows.push(row);
-		if (rows.length > 0) {
-			var command = wanted ? 'files-wanted' : 'files-unwanted';
-			this.changeFileCommand(command, rows);
-		}
-	},
-
-	inspectorTabClicked: function(ev, tab)
-	{
-		if (isMobileDevice) ev.stopPropagation();
-
-		// select this tab and deselect the others
-		$(tab).addClass('selected').siblings().removeClass('selected');
-
-		// show this tab and hide the others
-		$('#'+tab.id+'_container').show().siblings('.inspector_container').hide();
-
-		this.hideMobileAddressbar();
-		this.updatePeersLists();
-		this.updateTrackersLists();
-		this.updateFileList();
-	},
-	/*
-	 * Update the inspector with the latest data for the selected torrents
-	 */
-	updateInspector: function()
-	{
-		if (!this.inspectorIsVisible())
-			return;
-
-		var torrents = this.getSelectedTorrents();
-		if (!torrents.length && isMobileDevice) {
-			this.setInspectorVisible(false);
-			return;
-		}
-
-		var creator = 'N/A',
-		    comment = 'N/A',
-		    download_dir = 'N/A',
-		    date_created = 'N/A',
-		    error = 'None',
-		    hash = 'N/A',
-		    have_public = false,
-		    have_private = false,
-		    name,
-		    sizeWhenDone = 0,
-		    sizeDone = 0,
-		    total_completed = 0,
-		    total_download = 0,
-		    total_download_peers = 0,
-		    total_download_speed = 0,
-		    total_availability = 0,
-		    total_size = 0,
-		    total_state = [ ],
-		    pieces = 'N/A',
-		    total_upload = 0,
-		    total_upload_peers = 0,
-		    total_upload_speed = 0,
-		    total_verified = 0,
-		    na = 'N/A',
-		    tab = this._inspector._info_tab,
-		    fmt = Transmission.fmt;
-
-		$("#torrent_inspector_size, .inspector_row div").css('color', '#222');
-
-		if (torrents.length == 0)
-		{
-			setInnerHTML(tab.name, 'No Selection');
-			setInnerHTML(tab.size, na);
-			setInnerHTML(tab.pieces, na);
-			setInnerHTML(tab.hash, na);
-			setInnerHTML(tab.state, na);
-			setInnerHTML(tab.download_speed, na);
-			setInnerHTML(tab.upload_speed, na);
-			setInnerHTML(tab.uploaded, na);
-			setInnerHTML(tab.downloaded, na);
-			setInnerHTML(tab.availability, na);
-			setInnerHTML(tab.ratio, na);
-			setInnerHTML(tab.have, na);
-			setInnerHTML(tab.upload_to, na);
-			setInnerHTML(tab.download_from, na);
-			setInnerHTML(tab.secure, na);
-			setInnerHTML(tab.creator_date, na);
-			setInnerHTML(tab.progress, na);
-			setInnerHTML(tab.comment, na);
-			setInnerHTML(tab.creator, na);
-			setInnerHTML(tab.download_dir, na);
-			setInnerHTML(tab.error, na);
-			this.updateFileList();
-			this.updatePeersLists();
-			this.updateTrackersLists();
-			$("#torrent_inspector_size, .inspector_row > div:contains('N/A')").css('color', '#666');
-			return;
-		}
-
-		name = torrents.length == 1
-			? torrents[0].getName()
-			: torrents.length+' Transfers Selected';
-
-		if (torrents.length == 1)
-		{
-			var text;
-			var t = torrents[0];
-			var err = t.getErrorMessage();
-			if (err)
-				error = err;
-			if ((text = t.getComment()))
-				comment = text;
-			if ((text = t.getCreator()))
-				creator = text;
-			if ((text = t.getDownloadDir()))
-				download_dir = text;
-
-			hash = t.getHashString();
-			pieces = [ t.getPieceCount(), 'pieces @', fmt.mem(t.getPieceSize()) ].join(' ');
-			date_created = fmt.timestamp(t.getDateCreated());
-		}
-
-		for (var i=0, t; t=torrents[i]; ++i) {
-			var l = t.getLeftUntilDone();
-			var d = t.getSizeWhenDone();
-			sizeWhenDone         += d;
-			sizeDone             += d - l;
-			total_completed      += t.getHave();
-			total_verified       += t.getHaveValid();
-			total_size           += t.getTotalSize();
-			total_upload         += t.getUploadedEver();
-			total_download       += t.getDownloadedEver();
-			total_upload_speed   += t.getUploadSpeed();
-			total_download_speed += t.getDownloadSpeed();
-			total_upload_peers   += t.getPeersGettingFromUs();
-			total_download_peers += t.getPeersSendingToUs();
-			total_availability   += sizeWhenDone - l + t.getDesiredAvailable();
-
-			var s = t.getStateString();
-			if (total_state.indexOf(s) == -1)
-				total_state.push(s);
-
-			if (t.getPrivateFlag())
-				have_private = true;
-			else
-				have_public = true;
-		}
-
-		var private_string = '';
-		if (have_private && have_public) private_string = 'Mixed';
-		else if (have_private) private_string = 'Private Torrent';
-		else if (have_public) private_string = 'Public Torrent';
-
-		setInnerHTML(tab.name, name);
-		setInnerHTML(tab.size, torrents.length ? fmt.size(total_size) : na);
-		setInnerHTML(tab.pieces, pieces);
-		setInnerHTML(tab.hash, hash);
-		setInnerHTML(tab.state, total_state.join('/'));
-		setInnerHTML(tab.download_speed, torrents.length ? fmt.speedBps(total_download_speed) : na);
-		setInnerHTML(tab.upload_speed, torrents.length ? fmt.speedBps(total_upload_speed) : na);
-		setInnerHTML(tab.uploaded, torrents.length ? fmt.size(total_upload) : na);
-		setInnerHTML(tab.downloaded, torrents.length ? fmt.size(total_download) : na);
-		setInnerHTML(tab.availability, torrents.length ? fmt.percentString(Math.ratio(total_availability*100, sizeWhenDone)) + '%' : na);
-		setInnerHTML(tab.ratio, torrents.length ? fmt.ratioString(Math.ratio(total_upload, total_download)) : na);
-		setInnerHTML(tab.have, torrents.length ? fmt.size(total_completed) + ' (' + fmt.size(total_verified) + ' verified)' : na);
-		setInnerHTML(tab.upload_to, torrents.length ? total_upload_peers : na);
-		setInnerHTML(tab.download_from, torrents.length ? total_download_peers : na);
-		setInnerHTML(tab.secure, private_string);
-		setInnerHTML(tab.creator_date, date_created);
-		setInnerHTML(tab.progress, torrents.length ? fmt.percentString(Math.ratio(sizeDone*100, sizeWhenDone)) + '%' : na);
-		setInnerHTML(tab.comment, comment);
-		setInnerHTML(tab.creator, creator);
-		setInnerHTML(tab.download_dir, download_dir);
-		setInnerHTML(tab.error, error);
-
-		this.updatePeersLists();
-		this.updateTrackersLists();
-		$(".inspector_row > div:contains('N/A')").css('color', '#666');
-		this.updateFileList();
-	},
-
-	onFileWantedToggled: function(row, want) {
-		var command = want ? 'files-wanted' : 'files-unwanted';
-		this.changeFileCommand(command, [ row ]);
-	},
-	onFilePriorityToggled: function(row, priority) {
-		var command;
-		switch(priority) {
-			case -1: command = 'priority-low'; break;
-			case  1: command = 'priority-high'; break;
-			default: command = 'priority-normal'; break;
-		}
-		this.changeFileCommand(command, [ row ]);
-	},
-	clearFileList: function()
-	{
-		$(this._inspector_file_list).empty();
-		delete this._file_torrent;
-		delete this._file_rows;
-	},
-	updateFileList: function()
-	{
-		var i, n, tr, sel, row, torrent, fragment;
-
-		if (!$(this._inspector_file_list).is(':visible'))
-			return;
-
-		sel = this.getSelectedTorrents();
-		if (sel.length !== 1) {
-			this.clearFileList();
-			return;
-		}
-
-		// build the file list
-		torrent = sel[0];
-		this.clearFileList();
-		this._file_torrent = torrent;
-		n = torrent.getFileCount();
-		this._file_rows = [];
-		fragment = document.createDocumentFragment();
-		tr = this;
-		for (i=0; i<n; ++i) {
-			row = this._file_rows[i] = new FileRow(torrent, i);
-			fragment.appendChild(row.getElement());
-	                $(row).bind('wantedToggled',function(e,row,want) {tr.onFileWantedToggled(row,want);});
-	                $(row).bind('priorityToggled',function(e,row,priority) {tr.onFilePriorityToggled(row,priority);});
-		}
-		this._inspector_file_list.appendChild(fragment);
-	},
-
-	updatePeersLists: function()
-	{
-		if (!$(this._inspector_peers_list).is(':visible'))
-			return;
-
-		var html = [ ];
-		var fmt = Transmission.fmt;
-		var torrents = this.getSelectedTorrents();
-
-		for (var k=0, torrent; torrent=torrents[k]; ++k) {
-			var peers = torrent.getPeers();
-			html.push('<div class="inspector_group">');
-			if (torrents.length > 1) {
-				html.push('<div class="inspector_torrent_label">', torrent.getName(), '</div>');
-			}
-			if (!peers || !peers.length) {
-				html.push('<br></div>'); // firefox won't paint the top border if the div is empty
-				continue;
-			}
-			html.push('<table class="peer_list">',
-				   '<tr class="inspector_peer_entry even">',
-				   '<th class="encryptedCol"></th>',
-				   '<th class="upCol">Up</th>',
-				   '<th class="downCol">Down</th>',
-				   '<th class="percentCol">%</th>',
-				   '<th class="statusCol">Status</th>',
-				   '<th class="addressCol">Address</th>',
-				   '<th class="clientCol">Client</th>',
-				   '</tr>');
-			for (var i=0, peer; peer=peers[i]; ++i) {
-				var parity = ((i+1) % 2 == 0 ? 'even' : 'odd');
-				html.push('<tr class="inspector_peer_entry ', parity, '">',
-					   '<td>', (peer.isEncrypted ? '<img src="images/graphics/lock_icon.png" alt="Encrypted"/>' : ''), '</td>',
-					   '<td>', (peer.rateToPeer ? fmt.speedBps(peer.rateToPeer) : ''), '</td>',
-					   '<td>', (peer.rateToClient ? fmt.speedBps(peer.rateToClient) : ''), '</td>',
-					   '<td class="percentCol">', Math.floor(peer.progress*100), '%', '</td>',
-					   '<td>', fmt.peerStatus(peer.flagStr), '</td>',
-					   '<td>', peer.address, '</td>',
-					   '<td class="clientCol">', peer.clientName, '</td>',
-					   '</tr>');
-			}
-			html.push('</table></div>');
-		}
-
-		setInnerHTML(this._inspector_peers_list, html.join(''));
-	},
-
-	updateTrackersLists: function() {
-		if (!$(this._inspector_trackers_list).is(':visible'))
-			return;
-
-		var html = [ ];
-		var na = 'N/A';
-		var torrents = this.getSelectedTorrents();
-
-		// By building up the HTML as as string, then have the browser
-		// turn this into a DOM tree, this is a fast operation.
-		for (var i=0, torrent; torrent=torrents[i]; ++i)
-		{
-			html.push ('<div class="inspector_group">');
-
-			if (torrents.length > 1)
-				html.push('<div class="inspector_torrent_label">', torrent.getName(), '</div>');
-
-			var tier = -1;
-			var trackers = torrent.getTrackers();
-			for (var j=0, tracker; tracker=trackers[j]; ++j)
-			{
-				if (tier != tracker.tier)
-				{
-					if (tier !== -1) // close previous tier
-						html.push('</ul></div>');
-	
-					tier = tracker.tier;
-
-					html.push('<div class="inspector_group_label">',
-						  'Tier ', tier, '</div>',
-						  '<ul class="tier_list">');
-				}
-
-				var lastAnnounceStatusHash = this.lastAnnounceStatus(tracker);
-				var announceState = this.announceState(tracker);
-				var lastScrapeStatusHash = this.lastScrapeStatus(tracker);
-
-				// Display construction
-				var parity = ((j+1) % 2 == 0 ? 'even' : 'odd');
-				html.push('<li class="inspector_tracker_entry ', parity, '"><div class="tracker_host" title="', tracker.announce, '">',
-					  tracker.host, '</div>',
-					  '<div class="tracker_activity">',
-					  '<div>', lastAnnounceStatusHash['label'], ': ', lastAnnounceStatusHash['value'], '</div>',
-					  '<div>', announceState, '</div>',
-					  '<div>', lastScrapeStatusHash['label'], ': ', lastScrapeStatusHash['value'], '</div>',
-					  '</div><table class="tracker_stats">',
-					  '<tr><th>Seeders:</th><td>', (tracker.seederCount > -1 ? tracker.seederCount : na), '</td></tr>',
-					  '<tr><th>Leechers:</th><td>', (tracker.leecherCount > -1 ? tracker.leecherCount : na), '</td></tr>',
-					  '<tr><th>Downloads:</th><td>', (tracker.downloadCount > -1 ? tracker.downloadCount : na), '</td></tr>',
-					  '</table></li>');
-			}
-			if (tier !== -1) // close last tier
-					html.push('</ul></div>');
-
-			html.push('</div>'); // inspector_group
-		}
-
-		setInnerHTML(this._inspector_trackers_list, html.join(''));
-	},
-
-	lastAnnounceStatus: function(tracker) {
-		var lastAnnounceLabel = 'Last Announce';
-		var lastAnnounce = [ 'N/A' ];
-		if (tracker.hasAnnounced) {
-			var lastAnnounceTime = Transmission.fmt.timestamp(tracker.lastAnnounceTime);
-			if (tracker.lastAnnounceSucceeded) {
-				lastAnnounce = [ lastAnnounceTime, ' (got ',  Transmission.fmt.plural(tracker.lastAnnouncePeerCount, 'peer'), ')' ];
-			} else {
-				lastAnnounceLabel = 'Announce error';
-				lastAnnounce = [ (tracker.lastAnnounceResult ? (tracker.lastAnnounceResult + ' - ') : ''), lastAnnounceTime ];
-			}
-		}
-		return { 'label':lastAnnounceLabel, 'value':lastAnnounce.join('') };
-	},
-
-	announceState: function(tracker) {
-		var announceState = '';
-		switch (tracker.announceState) {
-			case Torrent._TrackerActive:
-				announceState = 'Announce in progress';
-				break;
-			case Torrent._TrackerWaiting:
-				var timeUntilAnnounce = tracker.nextAnnounceTime - ((new Date()).getTime() / 1000);
-				if (timeUntilAnnounce < 0) {
-					timeUntilAnnounce = 0;
-				}
-				announceState = 'Next announce in ' + Transmission.fmt.timeInterval(timeUntilAnnounce);
-				break;
-			case Torrent._TrackerQueued:
-				announceState = 'Announce is queued';
-				break;
-			case Torrent._TrackerInactive:
-				announceState = tracker.isBackup ?
-					'Tracker will be used as a backup' :
-					'Announce not scheduled';
-				break;
-			default:
-				announceState = 'unknown announce state: ' + tracker.announceState;
-		}
-		return announceState;
-	},
-
-	lastScrapeStatus: function(tracker) {
-		var lastScrapeLabel = 'Last Scrape';
-		var lastScrape = 'N/A';
-		if (tracker.hasScraped) {
-			var lastScrapeTime = Transmission.fmt.timestamp(tracker.lastScrapeTime);
-			if (tracker.lastScrapeSucceeded) {
-				lastScrape = lastScrapeTime;
-			} else {
-				lastScrapeLabel = 'Scrape error';
-				lastScrape = (tracker.lastScrapeResult ? tracker.lastScrapeResult + ' - ' : '') + lastScrapeTime;
-			}
-		}
-		return {'label':lastScrapeLabel, 'value':lastScrape};
-	},
-
-	inspectorSelectionChanged: function()
-	{
-		var i;
-
-		// if the inspector's hidden, don't create new ones
-		if (this.inspectorIsVisible())
-		{
-			// update the inspector when a selected torrent's data changes.
-			$(this.getAllTorrents()).unbind('dataChanged.inspector');
-			$(this.getSelectedTorrents()).bind('dataChanged.inspector', $.proxy(this.updateInspector,this));
-
-			// periodically ask for updates to the inspector's torrents
-			i = this._inspector;
-			clearInterval(i.refreshInterval);
-			i.refreshInterval = setInterval($.proxy(this.refreshInspectorTorrents,this), 2000);
-			this.refreshInspectorTorrents();
-
-			// refresh the inspector's UI
-			this.updateInspector();
-		}
-	},
-
 	toggleInspector: function()
 	{
 		this.setInspectorVisible(!this.inspectorIsVisible());
@@ -1865,7 +1379,8 @@ Transmission.prototype =
 		}
 		setInnerHTML($('ul li#context_toggle_inspector')[0], (visible?'Hide':'Show')+' Inspector');
 
-		this.inspectorSelectionChanged();
+		if (visible)
+			this.inspector.setTorrents(this.getSelectedTorrents());
 	},
 
 	/****

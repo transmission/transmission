@@ -5,6 +5,7 @@ dist_data_DATA = \
   dialog.js \
   file-row.js \
   formatter.js \
+  inspector.js \
   menu.js \
   remote.js \
   torrent.js \
