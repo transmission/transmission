@@ -381,11 +381,4 @@ TorrentRow.prototype =
 	getTorrentId: function() {
 		return this.getTorrent().getId();
 	},
-	isEven: function() {
-		return this.getElement().className.indexOf('even') != -1;
-	},
-	setEven: function(even) {
-		if (this.isEven() != even)
-			$(this.getElement()).toggleClass('even', even);
-	}
 };
