@@ -971,7 +971,7 @@ Transmission.prototype =
 	},
 
 
-	onTorrentChanged: function(tor)
+	onTorrentChanged: function(ev, tor)
 	{
 		// update our dirty fields
 		this.dirtyTorrents[ tor.getId() ] = true;
@@ -996,10 +996,9 @@ Transmission.prototype =
 					needinfo.push(id);
 			}
 			else {
-				var tr = this;
 				t = tr._torrents[id] = new Torrent(o);
 				this.dirtyTorrents[id] = true;
-				$(t).bind('dataChanged',function(ev,tor) {tr.onTorrentChanged(tor);});
+				$(t).bind('dataChanged',$.proxy(this.onTorrentChanged,this));
 				if(!('name' in t.fields) || !('status' in t.fields)) // missing some fields...
 					needinfo.push(id);
 			}
@@ -1037,8 +1036,10 @@ Transmission.prototype =
 		this.updateTorrents(null, ['id'].concat(Torrent.Fields.Metadata, Torrent.Fields.Stats));
 	},
 
-	onRowClicked: function(ev, row)
+	onRowClicked: function(ev)
 	{
+		var row = ev.currentTarget.row;
+
 		// handle the per-row "torrent_resume" button
 		if (ev.target.className === 'torrent_resume') {
 			this.startTorrent(row.getTorrent());
@@ -1511,9 +1512,9 @@ Transmission.prototype =
 		}
 
 		// remove the dirty rows from the dom
-		e = $.map(dirty_rows.slice(0), function(r) {
-			return r.getElement();
-		});
+		e = [];
+		for (i=0; row=dirty_rows[i]; ++i)
+			e.push (row.getElement());
 		$(e).detach();
 
 		// drop any dirty rows that don't pass the filter test
@@ -1536,9 +1537,8 @@ Transmission.prototype =
 				e = row.getElement();
 				e.row = row;
 				dirty_rows.push(row);
-				var tr = this;
-				$(e).click(function(ev){tr.onRowClicked(ev,ev.currentTarget.row);});
-				$(e).dblclick(function(ev){tr.toggleInspector();});
+				$(e).click($.proxy(this.onRowClicked,this));
+				$(e).dblclick($.proxy(this.toggleInspector,this));
 			}
 		}
 
@@ -1586,9 +1586,8 @@ Transmission.prototype =
 		this.dirtyTorrents = { };
 
 		// jquery's even/odd starts with 1 not 0, so invert its logic
-		e = $.map(rows.slice(0), function(r){return r.getElement();});
-		$(e).filter(":odd").addClass('even');
-		$(e).filter(":even").removeClass('even');
+		for (i=0; row=rows[i]; ++i)
+			$(row.getElement()).toggleClass('even',(i%2)!==0);
 
 		// sync gui
 		this.updateStatusbar();
