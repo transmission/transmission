@@ -201,26 +201,24 @@ function Inspector(controller) {
     filesSelectAllClicked = function() { filesAllClicked(true); },
     filesDeselectAllClicked = function() { filesAllClicked(false); },
     filesAllClicked = function(s) {
-        var t = data.file_torrent;
-        if (t)
-            toggleFilesWantedDisplay(t, s);
-    },
-
-    changeFileCommand = function(command, rows) {
-        data.controller.changeFileCommand(command, rows);
-    },
-
-    toggleFilesWantedDisplay = function(torrent, wanted) {
-        var i, row, rows=[];
+        var i, row, rows=[], t=data.file_torrent;
+        if (!t)
+		return;
         for (i=0; row=data.file_rows[i]; ++i)
-            if (row.isEditable() && (torrent.getFile(i).wanted !== wanted))
+            if (row.isEditable() && (t.getFile(i).wanted !== s))
                 rows.push(row);
         if (rows.length > 0)
-            changeFileCommand(wanted?'files-wanted':'files-unwanted', rows);
+            changeFileCommand(rows, s?'files-wanted':'files-unwanted');
+    },
+
+    changeFileCommand = function(rows, command) {
+	var torrentId = data.file_torrent.getId();
+	var rowIndices = $.map(rows.slice(0),function (row) {return row.getIndex();});
+        data.controller.changeFileCommand(torrentId, rowIndices, command);
     },
 
     onFileWantedToggled = function(row, want) {
-        changeFileCommand(want ? 'files-wanted' : 'files-unwanted',  [row]);
+        changeFileCommand([row], want?'files-wanted':'files-unwanted');
     },
 
     onFilePriorityToggled = function(row, priority) {
@@ -230,7 +228,7 @@ function Inspector(controller) {
             case  1: command = 'priority-high'; break;
             default: command = 'priority-normal'; break;
         }
-        changeFileCommand(command, [ row ]);
+        changeFileCommand([row], command);
     },
 
     clearFileList = function() {

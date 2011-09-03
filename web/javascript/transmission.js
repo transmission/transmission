@@ -1262,8 +1262,8 @@ Transmission.prototype =
 		this.remote.stopTorrents($.map(torrents.slice(0), function(t) {return t.getId();}),
 		                         this.refreshTorrents, this);
 	},
-	changeFileCommand: function(command, rows) {
-		this.remote.changeFileCommand(command, rows);
+	changeFileCommand: function(torrentId, rowIndices, command) {
+		this.remote.changeFileCommand(torrentId, rowIndices, command);
 	},
 
 	hideMobileAddressbar: function(delaySecs) {

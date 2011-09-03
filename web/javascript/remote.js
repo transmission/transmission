@@ -146,18 +146,14 @@ TransmissionRemote.prototype =
 		});
 	},
 
-	changeFileCommand: function(command, rows) {
-		var remote = this;
-		var torrent_ids = [ rows[0].getTorrent().getId() ];
-		var files = [];
-		for (var i=0, row; row=rows[i]; ++i)
-			files.push(row.getIndex());
-		var o = {
-			method: 'torrent-set',
-			arguments: { ids: torrent_ids }
-		};
-		o.arguments[command] = files;
-		this.sendRequest(o, function() {
+	changeFileCommand: function(torrentId, fileIndices, command) {
+		var remote = this,
+		    args = { ids: [torrentId] };
+		args[command] = fileIndices;
+		this.sendRequest({
+			arguments: args,
+			method: 'torrent-set'
+		}, function() {
 			remote._controller.refreshTorrents(torrent_ids);
 		});
 	},
