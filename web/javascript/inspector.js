@@ -240,7 +240,7 @@ function Inspector(controller) {
     },
 
     updateFilesPage = function() {
-        var i, n, tr, sel, row, tor, fragment,
+        var i, n, sel, row, tor, fragment,
             file_list = data.elements.file_list,
             torrents = data.torrents;
 
@@ -257,7 +257,6 @@ function Inspector(controller) {
         n = tor.getFileCount();
         data.file_rows = [];
         fragment = document.createDocumentFragment();
-        tr = this;
 
         for (i=0; i<n; ++i) {
             row = data.file_rows[i] = new FileRow(tor, i);
