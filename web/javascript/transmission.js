@@ -996,7 +996,7 @@ Transmission.prototype =
 					needinfo.push(id);
 			}
 			else {
-				t = tr._torrents[id] = new Torrent(o);
+				t = this._torrents[id] = new Torrent(o);
 				this.dirtyTorrents[id] = true;
 				$(t).bind('dataChanged',$.proxy(this.onTorrentChanged,this));
 				if(!('name' in t.fields) || !('status' in t.fields)) // missing some fields...
@@ -1586,8 +1586,11 @@ Transmission.prototype =
 		this.dirtyTorrents = { };
 
 		// jquery's even/odd starts with 1 not 0, so invert its logic
+		e = []
 		for (i=0; row=rows[i]; ++i)
-			$(row.getElement()).toggleClass('even',(i%2)!==0);
+			e.push(row.getElement());
+		$(e).filter(":odd").addClass('even'); 
+		$(e).filter(":even").removeClass('even'); 
 
 		// sync gui
 		this.updateStatusbar();
