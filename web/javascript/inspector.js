@@ -37,7 +37,9 @@ function Inspector(controller) {
         }
     },
 
-    onTabClicked = function (ev, tab) {
+    onTabClicked = function (ev) {
+        var tab = ev.currentTarget;
+
         if (isMobileDevice)
             ev.stopPropagation();
 
@@ -203,7 +205,7 @@ function Inspector(controller) {
     filesAllClicked = function(s) {
         var i, row, rows=[], t=data.file_torrent;
         if (!t)
-		return;
+            return;
         for (i=0; row=data.file_rows[i]; ++i)
             if (row.isEditable() && (t.getFile(i).wanted !== s))
                 rows.push(row);
@@ -212,16 +214,16 @@ function Inspector(controller) {
     },
 
     changeFileCommand = function(rows, command) {
-	var torrentId = data.file_torrent.getId();
-	var rowIndices = $.map(rows.slice(0),function (row) {return row.getIndex();});
+        var torrentId = data.file_torrent.getId();
+        var rowIndices = $.map(rows.slice(0),function (row) {return row.getIndex();});
         data.controller.changeFileCommand(torrentId, rowIndices, command);
     },
 
-    onFileWantedToggled = function(row, want) {
+    onFileWantedToggled = function(ev, row, want) {
         changeFileCommand([row], want?'files-wanted':'files-unwanted');
     },
 
-    onFilePriorityToggled = function(row, priority) {
+    onFilePriorityToggled = function(ev, row, priority) {
         var command;
         switch(priority) {
             case -1: command = 'priority-low'; break;
@@ -260,8 +262,8 @@ function Inspector(controller) {
         for (i=0; i<n; ++i) {
             row = data.file_rows[i] = new FileRow(tor, i);
             fragment.appendChild(row.getElement());
-                    $(row).bind('wantedToggled',function(e,row,want) {onFileWantedToggled(row,want);});
-                    $(row).bind('priorityToggled',function(e,row,priority) {onFilePriorityToggled(row,priority);});
+                    $(row).bind('wantedToggled',onFileWantedToggled);
+                    $(row).bind('priorityToggled',onFilePriorityToggled);
         }
 
         file_list.appendChild(fragment);
@@ -450,9 +452,9 @@ function Inspector(controller) {
 
         data.controller = controller;
 
-        $('.inspector_tab').click(function (e) {onTabClicked(e, this);});
-        $('#files_select_all').live('click', function(e) { filesSelectAllClicked(); });
-        $('#files_deselect_all').live('click', function(e) { filesDeselectAllClicked(); });
+        $('.inspector_tab').click(onTabClicked);
+        $('#files_select_all').click(filesSelectAllClicked);
+        $('#files_deselect_all').click(filesDeselectAllClicked);
 
         data.elements.info_page      = $('#inspector_tab_info_container')[0];
         data.elements.files_page     = $('#inspector_tab_files_container')[0];
