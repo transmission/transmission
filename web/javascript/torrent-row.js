@@ -269,7 +269,7 @@ TorrentRendererCompact.prototype =
 {
 	createRow: function()
 	{
-		var progressbar, deatils, name, root;
+		var progressbar, details, name, root;
 
 		progressbar = TorrentRendererHelper.createProgressbar('compact');
 

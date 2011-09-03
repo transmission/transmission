@@ -444,7 +444,7 @@ Transmission.prototype =
 	{
 		var handled = false,
 		    rows = this._rows,
-		    up = ev.keyCode === 38; // up key pressed
+		    up = ev.keyCode === 38, // up key pressed
 		    dn = ev.keyCode === 40, // down key pressed
 		    shift = ev.keyCode === 16; // shift key pressed
 

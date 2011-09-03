@@ -385,10 +385,10 @@ function Inspector(controller) {
     },
 
     updateTrackersPage = function() {
-        var i, j, tier, trackers, tor,
+        var i, j, tier, tracker, trackers, tor,
             html, parity, lastAnnounceStatusHash,
             announceState, lastScrapeStatusHash,
-            na = 'N/A';
+            na = 'N/A',
             trackers_list = data.elements.trackers_list,
             torrents = data.torrents;
 
