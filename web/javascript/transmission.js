@@ -159,7 +159,6 @@ Transmission.prototype =
 				'images/graphics/chrome.png',
 				'images/graphics/filter_bar.png',
 				'images/graphics/logo.png',
-				'images/graphics/transfer_arrows.png',
 				'images/progress/progress.png'
 			);
 		}
