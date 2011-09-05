@@ -86,7 +86,7 @@ function Inspector(controller) {
     accumulateString = function (oldVal, newVal) {
         if (!oldVal || !oldVal.length)
             return newVal;
-        if (oldVal == newVal)
+        if (oldVal === newVal)
             return newVal;
         return 'Mixed';
     },
@@ -301,7 +301,7 @@ function Inspector(controller) {
                    '<th class="clientCol">Client</th>',
                    '</tr>');
             for (i=0; peer=peers[i]; ++i) {
-                parity = ((i+1) % 2 == 0 ? 'even' : 'odd');
+                parity = (i%2) ? 'odd' : 'even';
                 html.push('<tr class="inspector_peer_entry ', parity, '">',
                        '<td>', (peer.isEncrypted ? '<img src="images/graphics/lock_icon.png" alt="Encrypted"/>' : ''), '</td>',
                        '<td>', (peer.rateToPeer ? fmt.speedBps(peer.rateToPeer) : ''), '</td>',
@@ -423,7 +423,7 @@ function Inspector(controller) {
                 lastAnnounceStatusHash = lastAnnounceStatus(tracker);
                 announceState = getAnnounceState(tracker);
                 lastScrapeStatusHash = lastScrapeStatus(tracker);
-                parity = ((j+1) % 2 == 0 ? 'even' : 'odd');
+                parity = (j%2) ? 'odd' : 'even';
                 html.push('<li class="inspector_tracker_entry ', parity, '"><div class="tracker_host" title="', tracker.announce, '">',
                       tracker.host, '</div>',
                       '<div class="tracker_activity">',

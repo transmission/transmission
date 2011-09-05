@@ -74,7 +74,7 @@ Array.prototype.clone = function () {
  */
 function setInnerHTML(e, html)
 {
-	if (e == undefined)
+	if (!e)
 		return;
 
 	/* innerHTML is listed as a string, but the browser seems to change it.
@@ -177,7 +177,7 @@ Prefs._Defaults =
  */
 Prefs.setValue = function(key, val)
 {
-	if (Prefs._Defaults[key] == undefined)
+	if (!(key in Prefs._Defaults))
 		console.warn("unrecognized preference key '%s'", key);
 
 	var days = 30;
@@ -196,21 +196,21 @@ Prefs.getValue = function(key, fallback)
 {
 	var val;
 
-	if (Prefs._Defaults[key] == undefined)
+	if (!(key in Prefs._Defaults))
 		console.warn("unrecognized preference key '%s'", key);
 
 	var lines = document.cookie.split(';');
 	for (var i=0, len=lines.length; !val && i<len; ++i) {
 		var line = lines[i].trim();
 		var delim = line.indexOf('=');
-		if ((delim == key.length) && line.indexOf(key) == 0)
+		if ((delim === key.length) && line.indexOf(key) === 0)
 			val = line.substring(delim + 1);
 	}
 
 	// FIXME: we support strings and booleans... add number support too?
 	if (!val) val = fallback;
-	else if (val == 'true') val = true;
-	else if (val == 'false') val = false;
+	else if (val === 'true') val = true;
+	else if (val === 'false') val = false;
 	return val;
 };
 
@@ -240,15 +240,15 @@ jQuery.fn.forceNumeric = function () {
 				// Numeric keypad
 				key >= 96 && key <= 105 ||
 				// comma, period and minus, . on keypad
-				key == 190 || key == 188 || key == 109 || key == 110 ||
+				key === 190 || key === 188 || key === 109 || key === 110 ||
 				// Backspace and Tab and Enter
-				key == 8 || key == 9 || key == 13 ||
+				key === 8 || key === 9 || key === 13 ||
 				// Home and End
-				key == 35 || key == 36 ||
+				key === 35 || key === 36 ||
 				// left and right arrows
-				key == 37 || key == 39 ||
+				key === 37 || key === 39 ||
 				// Del and Ins
-				key == 46 || key == 45;
+				key === 46 || key === 45;
 		});
 	});
 }

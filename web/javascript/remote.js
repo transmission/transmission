@@ -69,7 +69,7 @@ TransmissionRemote.prototype =
 		   remote = this;
 
 		// set the Transmission-Session-Id on a 409
-		if (request.status == 409 && (token = request.getResponseHeader('X-Transmission-Session-Id'))){
+		if (request.status === 409 && (token = request.getResponseHeader('X-Transmission-Session-Id'))){
 			remote._token = token;
 			$.ajax(ajaxObject);
 			return;

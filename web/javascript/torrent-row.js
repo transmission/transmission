@@ -28,17 +28,17 @@ TorrentRendererHelper.getProgressInfo = function(controller, t)
 	else
 		pct = 100;
 
-	if (s == Torrent._StatusStopped)
+	if (s === Torrent._StatusStopped)
 		extra = 'paused';
-	else if (s == Torrent._StatusDownloadWait)
+	else if (s === Torrent._StatusDownloadWait)
 		extra = 'leeching queued';
 	else if (t.needsMetaData())
 		extra = 'magnet';
 	else if (s === Torrent._StatusDownload)
 		extra = 'leeching';
-	else if (s == Torrent._StatusSeedWait)
+	else if (s === Torrent._StatusSeedWait)
 		extra = 'seeding queued';
-	else if (s == Torrent._StatusSeed)
+	else if (s === Torrent._StatusSeed)
 		extra = 'seeding';
 	else
 		extra = '';
@@ -198,7 +198,7 @@ TorrentRendererFull.prototype =
 		    is_done = t.isDone() || t.isSeeding();
 
 		if (is_done) {
-			if (totalSize == sizeWhenDone) // seed: '698.05 MiB'
+			if (totalSize === sizeWhenDone) // seed: '698.05 MiB'
 				c = [ Transmission.fmt.size(totalSize) ];
 			else // partial seed: '127.21 MiB of 698.05 MiB (18.2%)'
 				c = [ Transmission.fmt.size(sizeWhenDone),

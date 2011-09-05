@@ -205,7 +205,7 @@ Transmission.prototype =
 			search_box.addClass('blur');
 			search_box[0].value = 'Filter';
 			search_box.bind('blur', function() {
-				if (this.value == '') {
+				if (this.value === '') {
 					$(this).addClass('blur');
 					this.value = 'Filter';
 					tr.setFilterText(null);
@@ -287,7 +287,7 @@ Transmission.prototype =
 			mins = ((i % 4) * 15);
 
 			value = (i * 15);
-			content = hour + ":" + (mins == 0 ? "00" : mins);
+			content = hour + ":" + (mins || '00');
 			start.options[i] = new Option(content, value);
 			end.options[i]  = new Option(content, value);
 		}
@@ -769,7 +769,7 @@ Transmission.prototype =
 		$('input#limit_upload').prop('checked',    up_limited);
 		$('input#upload_rate').val(                up_limit_k);
 		$('input#refresh_rate').val(               p[Prefs._RefreshRate]);
-		$('div.encryption input').val(             p[RPC._Encryption] == RPC._EncryptionRequired);
+		$('div.encryption input').val(             p[RPC._Encryption] === RPC._EncryptionRequired);
 		$('input#turtle_download_rate').val(       turtle_dn_limit_k);
 		$('input#turtle_upload_rate').val(         turtle_up_limit_k);
 		$('input#turtle_schedule').prop('checked', p[RPC._TurtleTimeEnabled]);
@@ -880,20 +880,20 @@ Transmission.prototype =
 
 				// Display the preferences dialog
 			case 'footer_super_menu':
-				if ($element[0].id == 'preferences') {
+				if ($element[0].id === 'preferences') {
 					$('div#prefs_container div#pref_error').hide();
 					$('div#prefs_container h2.dialog_heading').show();
 					tr.showPrefsDialog();
 				}
-				else if ($element[0].id == 'statistics') {
+				else if ($element[0].id === 'statistics') {
 					$('div#stats_container div#stats_error').hide();
 					$('div#stats_container h2.dialog_heading').show();
 					tr.showStatsDialog();
 				}
-				else if ($element[0].id == 'homepage') {
+				else if ($element[0].id === 'homepage') {
 					window.open('http://www.transmissionbt.com/');
 				}
-				else if ($element[0].id == 'tipjar') {
+				else if ($element[0].id === 'tipjar') {
 					window.open('http://www.transmissionbt.com/donate.php');
 				}
 				break;
@@ -1060,7 +1060,7 @@ Transmission.prototype =
 		// 'Apple' button emulation on PC :
 		// Need settable meta-key and ctrl-key variables for mac emulation
 		var meta_key = ev.metaKey;
-		if (ev.ctrlKey && navigator.appVersion.toLowerCase().indexOf("mac") == -1)
+		if (ev.ctrlKey && navigator.appVersion.toLowerCase().indexOf("mac") === -1)
 			meta_key = true;
 
 		// Shift-Click - selects a range from the last-clicked row to this one
@@ -1171,7 +1171,7 @@ Transmission.prototype =
 
 	promptToRemoveTorrents:function(torrents)
 	{
-		if (torrents.length == 1)
+		if (torrents.length === 1)
 		{
 			var torrent = torrents[0];
 			var header = 'Remove ' + torrent.getName() + '?';
@@ -1188,7 +1188,7 @@ Transmission.prototype =
 
 	promptToRemoveTorrentsAndData:function(torrents)
 	{
-		if (torrents.length == 1)
+		if (torrents.length === 1)
 		{
 			var torrent = torrents[0],
 				header = 'Remove ' + torrent.getName() + ' and delete data?',
@@ -1416,7 +1416,7 @@ Transmission.prototype =
 	{
 		var o, tmp, text, torrent_count,
 		    state = this[Prefs._FilterMode],
-		    state_all = state == Prefs._FilterAll,
+		    state_all = state === Prefs._FilterAll,
 		    state_string = this.getStateString(state),
 		    tracker = this.filterTracker,
 		    tracker_all = !tracker,

@@ -69,12 +69,11 @@ Transmission.fmt = (function()
 		 *   Format a ratio to a string
 		 */
 		ratioString: function(x) {
-			if (x ==  -1)
+			if (x === -1)
 				return "None";
-			else if (x == -2)
+			if (x === -2)
 				return '&infin;';
-			else
-				return this.percentString(x);
+			return this.percentString(x);
 		},
 
 		/**
@@ -192,15 +191,15 @@ Transmission.fmt = (function()
 			var minutes = Math.floor((seconds % 3600) / 60);
 			var seconds = Math.floor((seconds % 3600) % 60);
 
-			if (days > 0 && hours == 0)
+			if (days > 0 && hours === 0)
 				result = [ days, 'days' ];
 			else if (days > 0 && hours > 0)
 				result = [ days, 'days', hours, 'hr' ];
-			else if (hours > 0 && minutes == 0)
+			else if (hours > 0 && minutes === 0)
 				result = [ hours, 'hr' ];
 			else if (hours > 0 && minutes > 0)
 				result = [ hours,'hr', minutes, 'min' ];
-			else if (minutes > 0 && seconds == 0)
+			else if (minutes > 0 && seconds === 0)
 				result = [ minutes, 'min' ];
 			else if (minutes > 0 && seconds > 0)
 				result = [ minutes, 'min', seconds, 'seconds' ];
@@ -221,15 +220,15 @@ Transmission.fmt = (function()
 			var date = "";
 			var time = "";
 
-			var sameYear = now.getFullYear() == myDate.getFullYear();
-			var sameMonth = now.getMonth() == myDate.getMonth();
+			var sameYear = now.getFullYear() === myDate.getFullYear();
+			var sameMonth = now.getMonth() === myDate.getMonth();
 
 			var dateDiff = now.getDate() - myDate.getDate();
 			if (sameYear && sameMonth && Math.abs(dateDiff) <= 1){
-				if (dateDiff == 0){
+				if (dateDiff === 0){
 					date = "Today";
 				}
-				else if (dateDiff == 1){
+				else if (dateDiff === 1){
 					date = "Yesterday";
 				}
 				else{
@@ -246,7 +245,7 @@ Transmission.fmt = (function()
 				hours = hours - 12;
 				period = "PM";
 			}
-			if (hours == 0){
+			if (hours === 0){
 				hours = 12;
 			}
 			if (hours < 10){
@@ -293,7 +292,7 @@ Transmission.fmt = (function()
 					case "T": explanation = "Peer is connected via uTP"; break;
 				}
 
-				if( explanation == null ) { 
+				if (!explanation) { 
 					formattedFlags.push(flag); 
 				} else { 
 					formattedFlags.push("<span title=\"" + flag + ': ' + explanation + "\">" + flag + "</span>"); 
