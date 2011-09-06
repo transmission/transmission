@@ -46,9 +46,10 @@
 #define HEIGHT_TITLE 16.0
 #define HEIGHT_STATUS 12.0
 
-#define PADDING_HORIZONTAL 3.0
-#define PADDING_BETWEEN_IMAGE_AND_TITLE 5.0
-#define PADDING_BETWEEN_IMAGE_AND_BAR 4.0
+#define PADDING_HORIZONTAL 5.0
+#define PADDING_BETWEEN_BUTTONS 4.0
+#define PADDING_BETWEEN_IMAGE_AND_TITLE (PADDING_HORIZONTAL + 1.0)
+#define PADDING_BETWEEN_IMAGE_AND_BAR PADDING_HORIZONTAL
 #define PADDING_BETWEEN_TITLE_AND_PRIORITY 3.0
 #define PADDING_ABOVE_TITLE 4.0
 #define PADDING_BETWEEN_TITLE_AND_MIN_STATUS 3.0
@@ -673,7 +674,7 @@
     NSRect result;
     result.size = [string size];
     
-    result.origin.x = NSMaxX(bounds) - (NSWidth(result) + PADDING_HORIZONTAL * 2.0);
+    result.origin.x = NSMaxX(bounds) - (PADDING_HORIZONTAL + NSWidth(result));
     result.origin.y = ceil(NSMidY(bounds) - NSHeight(result) * 0.5);
     
     return result;
@@ -742,7 +743,7 @@
                         + HEIGHT_STATUS + PADDING_BETWEEN_PROGRESS_AND_BAR;
     
     result.size.width = floor(NSMaxX(bounds) - NSMinX(result) - PADDING_HORIZONTAL
-                        - 2.0 * (PADDING_HORIZONTAL + NORMAL_BUTTON_WIDTH));
+                        - 2.0 * (PADDING_BETWEEN_BUTTONS + NORMAL_BUTTON_WIDTH));
     
     return result;
 }
@@ -753,7 +754,7 @@
     result.origin.x = NSMinX(bounds) + PADDING_HORIZONTAL + IMAGE_SIZE_MIN + PADDING_BETWEEN_IMAGE_AND_BAR;
     result.origin.y = NSMinY(bounds) + PADDING_BETWEEN_BAR_AND_EDGE_MIN;
     result.size.height = NSHeight(bounds) - 2.0 * PADDING_BETWEEN_BAR_AND_EDGE_MIN;
-    result.size.width = NSMaxX(bounds) - NSMinX(result) - PADDING_HORIZONTAL;
+    result.size.width = NSMaxX(bounds) - NSMinX(result) - PADDING_BETWEEN_BAR_AND_EDGE_MIN;
     
     return result;
 }
@@ -763,16 +764,13 @@
     NSRect result;
     result.size.height = NORMAL_BUTTON_WIDTH;
     result.size.width = NORMAL_BUTTON_WIDTH;
-    result.origin.x = NSMaxX(bounds) - 2.0 * (PADDING_HORIZONTAL + NORMAL_BUTTON_WIDTH);
+    result.origin.x = NSMaxX(bounds) - (PADDING_HORIZONTAL + NORMAL_BUTTON_WIDTH + PADDING_BETWEEN_BUTTONS + NORMAL_BUTTON_WIDTH);
     
     if (![fDefaults boolForKey: @"SmallView"])
         result.origin.y = NSMinY(bounds) + PADDING_ABOVE_TITLE + HEIGHT_TITLE - (NORMAL_BUTTON_WIDTH - BAR_HEIGHT) * 0.5
                             + PADDING_BETWEEN_TITLE_AND_PROGRESS + HEIGHT_STATUS + PADDING_BETWEEN_PROGRESS_AND_BAR;
     else
-    {
         result.origin.y = ceil(NSMidY(bounds) - NSHeight(result) * 0.5);
-        result.origin.x -= PADDING_HORIZONTAL;
-    }
     
     return result;
 }
@@ -788,10 +786,7 @@
         result.origin.y = NSMinY(bounds) + PADDING_ABOVE_TITLE + HEIGHT_TITLE - (NORMAL_BUTTON_WIDTH - BAR_HEIGHT) * 0.5
                             + PADDING_BETWEEN_TITLE_AND_PROGRESS + HEIGHT_STATUS + PADDING_BETWEEN_PROGRESS_AND_BAR;
     else
-    {
         result.origin.y = ceil(NSMidY(bounds) - NSHeight(result) * 0.5);
-        result.origin.x -= PADDING_HORIZONTAL;
-    }
     
     return result;
 }
