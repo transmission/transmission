@@ -41,7 +41,6 @@ struct tr_webseed_task
     struct tr_web_task * web_task;
     long                 response_code;
     int                  torrent_id;
-    bool                 bad_range;
 };
 
 struct tr_webseed
@@ -415,8 +414,6 @@ web_response_func( tr_session    * session,
                 /* now wait a while until retrying to establish a connection */
                 ++w->retry_tickcount;
 
-            t->bad_range = response_code == 416;
-
             tr_list_remove_data( &w->tasks, t );
             evbuffer_free( t->content );
             tr_free( t );
@@ -459,18 +456,15 @@ web_response_func( tr_session    * session,
 }
 
 static struct evbuffer *
-make_url( struct tr_webseed_task * t, const tr_file * file )
+make_url( tr_webseed * w, const tr_file * file )
 {
     struct evbuffer * buf = evbuffer_new( );
-    struct tr_webseed * w = t->webseed;
 
     evbuffer_add( buf, w->base_url, w->base_url_len );
 
-    if( t->bad_range || ( w->base_url[w->base_url_len - 1] == '/' && file->name ) ) {
-        if( t->bad_range )
-            evbuffer_add( buf, "/", 1 );
+    /* if url ends with a '/', add the torrent name */
+    if( w->base_url[w->base_url_len - 1] == '/' && file->name )
         tr_http_escape( buf, file->name, strlen(file->name), false );
-    }
 
     return buf;
 }
@@ -505,7 +499,7 @@ task_request_next_chunk( struct tr_webseed_task * t )
         this_pass = MIN( remain, file->length - file_offset );
 
         if( !urls[file_index] )
-            urls[file_index] = evbuffer_free_to_str( make_url( t, file ) );
+            urls[file_index] = evbuffer_free_to_str( make_url( t->webseed, file ) );
 
         tr_snprintf( range, sizeof range, "%"PRIu64"-%"PRIu64,
                      file_offset, file_offset + this_pass - 1 );
