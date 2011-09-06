@@ -354,6 +354,34 @@ getannounce( tr_info * inf, tr_benc * meta )
     return NULL;
 }
 
+/**
+ * @brief Ensure that the URLs for multfile torrents end in a slash.
+ *
+ * See http://bittorrent.org/beps/bep_0019.html#metadata-extension
+ * for background on how the trailing slash is used for "url-list"
+ * fields.
+ *
+ * This function is to workaround some .torrent generators, such as
+ * mktorrent and very old versions of utorrent, that don't add the
+ * trailing slash for multifile torrents if omitted by the end user.
+ */
+static char*
+fix_webseed_url( const tr_info * inf, const char * url )
+{
+    char * ret = NULL;
+    const size_t len = strlen( url );
+
+    if( tr_urlIsValid( url, len ) )
+    {
+        if( ( inf->fileCount > 1 ) && ( len > 0 ) && ( url[len-1] != '/' ) )
+            ret = tr_strdup_printf( "%*.*s/", (int)len, (int)len, url );
+        else
+            ret = tr_strndup( url, len );
+    }
+
+    return ret;
+}
+
 static void
 geturllist( tr_info * inf,
             tr_benc * meta )
@@ -373,22 +401,22 @@ geturllist( tr_info * inf,
         {
             if( tr_bencGetStr( tr_bencListChild( urls, i ), &url ) )
             {
-                const size_t len = strlen( url );
+                char * fixed_url = fix_webseed_url( inf, url );
 
-                if( tr_urlIsValid( url, len  ) )
-                    inf->webseeds[inf->webseedCount++] = tr_strndup( url, len );
+                if( fixed_url != NULL )
+                    inf->webseeds[inf->webseedCount++] = fixed_url;
             }
         }
     }
     else if( tr_bencDictFindStr( meta, "url-list", &url ) ) /* handle single items in webseeds */
     {
-        const size_t len = strlen( url );
+        char * fixed_url = fix_webseed_url( inf, url );
 
-        if( tr_urlIsValid( url, len  ) )
+        if( fixed_url != NULL )
         {
             inf->webseedCount = 1;
             inf->webseeds = tr_new0( char*, 1 );
-            inf->webseeds[0] = tr_strndup( url, len );
+            inf->webseeds[0] = fixed_url;
         }
     }
 }
