@@ -1,4 +1,4 @@
-﻿/* Inspector -> selected torrents
+/* Inspector -> selected torrents
    stats -> bytes */
 
 "%@ bytes" = "%@ byte";
@@ -29,7 +29,7 @@
 "%@ of torrent metadata retrieved" = "recuperati %@ metadati del torrent";
 
 /* Torrent -> eta string */
-"%@ remaining" = "tempo rimanente %@";
+"%@ remaining" = "tempo residuo %@";
 
 /* Add torrent -> info
    Inspector -> Activity tab -> progress
@@ -182,7 +182,7 @@
 "A transfer of \"%@\" already exists." = "Esiste già un trasferimento di \"%@\".";
 
 /* Filter Bar -> filter button */
-"Active" = "Attivo";
+"Active" = "Attivi";
 
 /* Inspector -> tab
    Inspector view -> title */
@@ -666,7 +666,7 @@
 "Normal Priority" = "Priorità normale";
 
 /* Torrent disk space alert -> title */
-"Not enough remaining disk space to download \"%@\" completely." = "Spazio su disco insufficiente per scaricare completamente \"%@\".";
+"Not enough remaining disk space to download \"%@\" completely." = "Spazio residuo su disco insufficiente per scaricare completamente \"%@\".";
 
 /* About window -> license close button
    Blocklist -> button
@@ -759,7 +759,9 @@
 /* Selected toolbar item -> palette label */
 "Pause / Resume Selected" = "Pausa / Riprendi selezionati";
 
-/* All toolbar item -> label */
+/* All toolbar item -> label
+   Dock item */
+
 "Pause All" = "Metti tutti in pausa";
 
 /* All toolbar item -> tooltip */
@@ -868,10 +870,10 @@
 "Red" = "Rosso";
 
 /* Action menu -> status string toggle */
-"Remaining Time" = "Tempo rimanente";
+"Remaining Time" = "Tempo residuo";
 
 /* Torrent -> eta string */
-"remaining time unknown" = "tempo rimanente sconosciuto";
+"remaining time unknown" = "tempo residuo sconosciuto";
 
 /* Preferences -> toolbar item title */
 "Remote" = "Remoto";
@@ -902,7 +904,9 @@
 
 "Reset" = "Reset";
 
-/* All toolbar item -> label */
+/* All toolbar item -> label
+   Dock item */
+
 "Resume All" = "Riprendi tutti";
 
 /* All toolbar item -> tooltip */
@@ -1002,7 +1006,9 @@
 /* Torrent cell -> button info */
 "Show the data file in Finder" = "Mostra il file dati nel Finder";
 
-/* Status Bar -> speed tooltip */
+/* Dock item
+   Status Bar -> speed tooltip */
+
 "Speed Limit" = "Limite velocità";
 
 /* Growl notification title */
