@@ -48,7 +48,7 @@
 
 #define PADDING_HORIZONTAL 3.0
 #define PADDING_BETWEEN_IMAGE_AND_TITLE 5.0
-#define PADDING_BETWEEN_IMAGE_AND_BAR 7.0
+#define PADDING_BETWEEN_IMAGE_AND_BAR 4.0
 #define PADDING_BETWEEN_TITLE_AND_PRIORITY 3.0
 #define PADDING_ABOVE_TITLE 4.0
 #define PADDING_BETWEEN_TITLE_AND_MIN_STATUS 3.0
@@ -737,7 +737,7 @@
 {
     NSRect result;
     result.size.height = BAR_HEIGHT;
-    result.origin.x = NSMinX(bounds) + IMAGE_SIZE_REG + PADDING_BETWEEN_IMAGE_AND_BAR;
+    result.origin.x = NSMinX(bounds) + PADDING_HORIZONTAL + IMAGE_SIZE_REG + PADDING_BETWEEN_IMAGE_AND_BAR;
     result.origin.y = NSMinY(bounds) + PADDING_ABOVE_TITLE + HEIGHT_TITLE + PADDING_BETWEEN_TITLE_AND_PROGRESS
                         + HEIGHT_STATUS + PADDING_BETWEEN_PROGRESS_AND_BAR;
     
@@ -750,7 +750,7 @@
 - (NSRect) barRectMinForBounds: (NSRect) bounds
 {
     NSRect result;
-    result.origin.x = NSMinX(bounds) + IMAGE_SIZE_MIN + PADDING_BETWEEN_IMAGE_AND_BAR;
+    result.origin.x = NSMinX(bounds) + PADDING_HORIZONTAL + IMAGE_SIZE_MIN + PADDING_BETWEEN_IMAGE_AND_BAR;
     result.origin.y = NSMinY(bounds) + PADDING_BETWEEN_BAR_AND_EDGE_MIN;
     result.size.height = NSHeight(bounds) - 2.0 * PADDING_BETWEEN_BAR_AND_EDGE_MIN;
     result.size.width = NSMaxX(bounds) - NSMinX(result) - PADDING_HORIZONTAL;
