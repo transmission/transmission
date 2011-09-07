@@ -206,46 +206,61 @@ replaceURL( tr_benc * metainfo, const char * in, const char * out )
 }
 
 static bool
+announce_list_has_url( tr_benc * announce_list, const char * url )
+{
+    tr_benc * tier;
+    int tierCount = 0;
+    while(( tier = tr_bencListChild( announce_list, tierCount++ ))) {
+        tr_benc * node;
+        const char * str;
+        int nodeCount = 0;
+        while(( node = tr_bencListChild( tier, nodeCount++ )))
+            if( tr_bencGetStr( node, &str ) && !strcmp( str, url ) )
+                return true;
+    }
+    return false;
+}
+
+static bool
 addURL( tr_benc * metainfo, const char * url )
 {
-    const char * str;
-    tr_benc * announce_list;
+    const char * announce = NULL;
+    tr_benc * announce_list = NULL;
     bool changed = false;
-    bool match = false;
+    const bool had_announce = tr_bencDictFindStr( metainfo, "announce", &announce );
+    const bool had_announce_list = tr_bencDictFindList( metainfo, "announce-list", &announce_list );
 
-    /* maybe add it to "announce" */
-    if( !tr_bencDictFindStr( metainfo, "announce", &str ) )
+    if( !had_announce && !had_announce_list )
     {
+        /* this new tracker is the only one, so add it to "announce"... */
         printf( "\tAdded \"%s\" in \"announce\"\n", url );
         tr_bencDictAddStr( metainfo, "announce", url );
         changed = true;
     }
-
-    /* see if it's already in announce-list */
-    if( tr_bencDictFindList( metainfo, "announce-list", &announce_list ) ) {
-        tr_benc * tier;
-        int tierCount = 0;
-        while(( tier = tr_bencListChild( announce_list, tierCount++ ))) {
-            tr_benc * node;
-            int nodeCount = 0;
-            while(( node = tr_bencListChild( tier, nodeCount++ )))
-                if( tr_bencGetStr( node, &str ) && !strcmp( str, url ) )
-                    match = true;
-        }
-    }
-
-    /* if it's not in announce-list, add it now */
-    if( !match )
+    else
     {
-        tr_benc * tier;
+        if( !had_announce_list )
+        {
+            announce_list = tr_bencDictAddList( metainfo, "announce-list", 2 );
+       
+            if( had_announce )
+            {
+                /* we're moving from an 'announce' to an 'announce-list',
+                 * so copy the old announce URL to the list */
+                tr_benc * tier = tr_bencListAddList( announce_list, 1 );
+                tr_bencListAddStr( tier, announce );
+                changed = true;
+            }
+        }
 
-        if( !tr_bencDictFindList( metainfo, "announce-list", &announce_list ) )
-            announce_list = tr_bencDictAddList( metainfo, "announce-list", 1 );
-
-        tier = tr_bencListAddList( announce_list, 1 );
-        tr_bencListAddStr( tier, url );
-        printf( "\tAdded \"%s\" to \"announce-list\" tier %zu\n", url, tr_bencListSize( announce_list ) );
-        changed = true;
+        /* If the user-specified URL isn't in the announce list yet, add it */
+        if( !announce_list_has_url( announce_list, url ) )
+        {
+            tr_benc * tier = tr_bencListAddList( announce_list, 1 );
+            tr_bencListAddStr( tier, url );
+            printf( "\tAdded \"%s\" to \"announce-list\" tier %zu\n", url, tr_bencListSize( announce_list ) );
+            changed = true;
+        }
     }
 
     return changed;
