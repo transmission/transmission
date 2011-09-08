@@ -224,6 +224,7 @@
 		A292C9E11413BA5F00EF710F /* PriorityNone.png in Resources */ = {isa = PBXBuildFile; fileRef = A20B6FA40C4D97840034AB1D /* PriorityNone.png */; };
 		A292C9E3141593DA00EF710F /* PriorityNone.png in Resources */ = {isa = PBXBuildFile; fileRef = A20B6FA40C4D97840034AB1D /* PriorityNone.png */; };
 		A292C9E514163AE500EF710F /* PriorityNone.png in Resources */ = {isa = PBXBuildFile; fileRef = A20B6FA40C4D97840034AB1D /* PriorityNone.png */; };
+		A29443281419746A0016143A /* PriorityNone.png in Resources */ = {isa = PBXBuildFile; fileRef = A20B6FA40C4D97840034AB1D /* PriorityNone.png */; };
 		A29576030D11D63C0093B167 /* Creator.xib in Resources */ = {isa = PBXBuildFile; fileRef = A29576010D11D63C0093B167 /* Creator.xib */; };
 		A2966E8713DAF74C007B52DF /* GlobalOptionsPopoverViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A2966E8613DAF74C007B52DF /* GlobalOptionsPopoverViewController.m */; };
 		A296EF3B11E560A7004A2781 /* libiconv.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A296EF3411E5605E004A2781 /* libiconv.dylib */; };
@@ -804,6 +805,7 @@
 		A292C9E01413BA5F00EF710F /* es */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = es; path = macosx/es.lproj/GlobalOptionsPopover.xib; sourceTree = "<group>"; };
 		A292C9E2141593DA00EF710F /* de */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = de; path = macosx/de.lproj/GlobalOptionsPopover.xib; sourceTree = "<group>"; };
 		A292C9E414163AE500EF710F /* it */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = it; path = macosx/it.lproj/GlobalOptionsPopover.xib; sourceTree = "<group>"; };
+		A29443271419746A0016143A /* ru */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = ru; path = macosx/ru.lproj/GlobalOptionsPopover.xib; sourceTree = "<group>"; };
 		A2966E8513DAF74C007B52DF /* GlobalOptionsPopoverViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GlobalOptionsPopoverViewController.h; path = macosx/GlobalOptionsPopoverViewController.h; sourceTree = "<group>"; };
 		A2966E8613DAF74C007B52DF /* GlobalOptionsPopoverViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = GlobalOptionsPopoverViewController.m; path = macosx/GlobalOptionsPopoverViewController.m; sourceTree = "<group>"; };
 		A296EF3411E5605E004A2781 /* libiconv.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libiconv.dylib; path = usr/lib/libiconv.dylib; sourceTree = SDKROOT; };
@@ -2154,6 +2156,7 @@
 				A292C9E11413BA5F00EF710F /* PriorityNone.png in Resources */,
 				A292C9E3141593DA00EF710F /* PriorityNone.png in Resources */,
 				A292C9E514163AE500EF710F /* PriorityNone.png in Resources */,
+				A29443281419746A0016143A /* PriorityNone.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2594,6 +2597,7 @@
 				A292C9E01413BA5F00EF710F /* es */,
 				A292C9E2141593DA00EF710F /* de */,
 				A292C9E414163AE500EF710F /* it */,
+				A29443271419746A0016143A /* ru */,
 			);
 			name = GlobalOptionsPopover.xib;
 			sourceTree = "<group>";
