@@ -802,6 +802,7 @@
 		A292C9E2141593DA00EF710F /* de */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = de; path = macosx/de.lproj/GlobalOptionsPopover.xib; sourceTree = "<group>"; };
 		A292C9E414163AE500EF710F /* it */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = it; path = macosx/it.lproj/GlobalOptionsPopover.xib; sourceTree = "<group>"; };
 		A29443271419746A0016143A /* ru */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = ru; path = macosx/ru.lproj/GlobalOptionsPopover.xib; sourceTree = "<group>"; };
+		A294432E141B23CD0016143A /* pt_PT */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = pt_PT; path = macosx/pt_PT.lproj/GlobalOptionsPopover.xib; sourceTree = "<group>"; };
 		A2966E8513DAF74C007B52DF /* GlobalOptionsPopoverViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GlobalOptionsPopoverViewController.h; path = macosx/GlobalOptionsPopoverViewController.h; sourceTree = "<group>"; };
 		A2966E8613DAF74C007B52DF /* GlobalOptionsPopoverViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = GlobalOptionsPopoverViewController.m; path = macosx/GlobalOptionsPopoverViewController.m; sourceTree = "<group>"; };
 		A296EF3411E5605E004A2781 /* libiconv.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libiconv.dylib; path = usr/lib/libiconv.dylib; sourceTree = SDKROOT; };
@@ -2590,6 +2591,7 @@
 				A292C9E2141593DA00EF710F /* de */,
 				A292C9E414163AE500EF710F /* it */,
 				A29443271419746A0016143A /* ru */,
+				A294432E141B23CD0016143A /* pt_PT */,
 			);
 			name = GlobalOptionsPopover.xib;
 			sourceTree = "<group>";
