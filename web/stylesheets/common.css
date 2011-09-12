@@ -1168,12 +1168,9 @@ div#prefs_container div#prefs_tabs ul {
 	color: #323232;
 	text-align: center;
 	padding: 2px 20px;
-	border-left: 1px solid #787878;
-	border-right: 1px solid #787878;
-	border-top: 1px solid #787878;
+	border: 1px solid #787878;
 	margin-bottom: -1px;
 	background: #C0C8D6 url('../images/graphics/filter_bar.png') bottom repeat-x;
-	border-bottom: 1px solid #787878;
 }
 .prefs-tab.selected {
 	background: none;
