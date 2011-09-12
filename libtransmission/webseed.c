@@ -253,6 +253,8 @@ on_content_changed( struct evbuffer                * buf,
         fire_client_got_data( w, info->n_added );
     }
 
+    len = evbuffer_get_length( buf );
+
     if( !task->response_code ) {
         tr_webGetTaskInfo( task->web_task, TR_WEB_GET_CODE, &task->response_code );
 
@@ -262,7 +264,9 @@ on_content_changed( struct evbuffer                * buf,
 
             inf->webseed = w;
             inf->piece_index = task->piece_index;
-            inf->piece_offset = task->piece_offset;
+            inf->piece_offset = task->piece_offset
+                              + (task->blocks_done * task->block_size)
+                              + (len - 1);
             tr_webGetTaskInfo( task->web_task, TR_WEB_GET_REDIRECTS, &redirects );
             if( redirects ) {
                 char * redirect_url;
@@ -272,12 +276,10 @@ on_content_changed( struct evbuffer                * buf,
             else
                 inf->redirect_url = NULL;
             /* run this in the webseed thread to avoid tampering with mutexes and to
-            not cost the web thrad too much time */
+            not cost the web thread too much time */
             tr_runInEventThread( task->session, connection_succeeded, inf );
         }
     }
-
-    len = evbuffer_get_length( buf );
 
     if( task->response_code == 206 && len >= task->block_size )
     {
