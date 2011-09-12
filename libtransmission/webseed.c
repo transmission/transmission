@@ -62,24 +62,6 @@ struct tr_webseed
     char              ** file_urls;
 };
 
-struct tr_blockwrite_info
-{
-    struct tr_webseed  * webseed;
-    struct evbuffer    * data;
-    tr_piece_index_t     piece_index;
-    tr_block_index_t     block_index;
-    tr_block_index_t     count;
-    uint32_t             block_offset;
-};
-
-struct tr_http_info
-{
-    struct tr_webseed  * webseed;
-    char               * redirect_url;
-    tr_piece_index_t     piece_index;
-    uint32_t             piece_offset;
-};
-
 enum
 {
     TR_IDLE_TIMER_MSEC = 2000,
@@ -170,12 +152,22 @@ fire_client_got_data( tr_webseed * w, uint32_t length )
 ****
 ***/
 
-static void
-write_block_func( void * vblock )
+struct write_block_data
 {
-    struct tr_blockwrite_info * block = vblock;
-    struct tr_webseed * w = block->webseed;
-    struct evbuffer * buf = block->data;
+    struct tr_webseed  * webseed;
+    struct evbuffer    * content;
+    tr_piece_index_t     piece_index;
+    tr_block_index_t     block_index;
+    tr_block_index_t     count;
+    uint32_t             block_offset;
+};
+
+static void
+write_block_func( void * vdata )
+{
+    struct write_block_data * data = vdata;
+    struct tr_webseed * w = data->webseed;
+    struct evbuffer * buf = data->content;
     struct tr_torrent * tor;
 
     tor = tr_torrentFindFromId( w->session, w->torrent_id );
@@ -183,120 +175,133 @@ write_block_func( void * vblock )
     {
         const uint32_t block_size = tor->blockSize;
         uint32_t len = evbuffer_get_length( buf );
-        uint32_t offset_end = block->block_offset + len;
+        const uint32_t offset_end = data->block_offset + len;
         tr_cache * cache = w->session->cache;
-        tr_piece_index_t piece = block->piece_index;
+        const tr_piece_index_t piece = data->piece_index;
 
-        while( true )
+        while( len > 0 )
         {
-            if( len > block_size) {
-                tr_cacheWriteBlock( cache, tor, piece, offset_end - len,
-                                    block_size, buf );
-                len -= block_size;
-            }
-            else {
-                tr_cacheWriteBlock( cache, tor, piece, offset_end - len,
-                                    len, buf );
-                break;
-            }
-	}
-        fire_client_got_blocks( tor, w, block->block_index, block->count );
+            const uint32_t bytes_this_pass = MIN( len, block_size );
+            tr_cacheWriteBlock( cache, tor, piece, offset_end - len, bytes_this_pass, buf );
+            len -= bytes_this_pass;
+        }
+
+        fire_client_got_blocks( tor, w, data->block_index, data->count );
     }
 
     evbuffer_free( buf );
-    tr_free( block );
+    tr_free( data );
 }
 
-static void
-connection_succeeded( void * vinf )
+/***
+****
+***/
+
+struct connection_succeeded_data
 {
-    struct tr_http_info * inf = vinf;
-    struct tr_webseed * w = inf->webseed;
-    struct tr_torrent * tor;
+    struct tr_webseed  * webseed;
+    char               * real_url;
+    tr_piece_index_t     piece_index;
+    uint32_t             piece_offset;
+};
+
+static void
+connection_succeeded( void * vdata )
+{
+    tr_torrent * tor;
+    struct connection_succeeded_data * data = vdata;
+    struct tr_webseed * w = data->webseed;
 
     if( ++w->active_transfers >= w->retry_challenge && w->retry_challenge )
         /* the server seems to be accepting more connections now */
         w->consecutive_failures = w->retry_tickcount = w->retry_challenge = 0;
 
-    if( inf->redirect_url &&
+    if( data->real_url &&
         (tor = tr_torrentFindFromId( w->session, w->torrent_id )))
     {
         uint64_t file_offset;
         tr_file_index_t file_index;
 
-        tr_ioFindFileLocation( tor, inf->piece_index, inf->piece_offset,
+        tr_ioFindFileLocation( tor, data->piece_index, data->piece_offset,
                                &file_index, &file_offset );
         tr_free( w->file_urls[file_index] );
-        w->file_urls[file_index] = inf->redirect_url;
+        w->file_urls[file_index] = data->real_url;
     }
 }
+
+/***
+****
+***/
 
 static void
 on_content_changed( struct evbuffer                * buf,
                     const struct evbuffer_cb_info  * info,
                     void                           * vtask )
 {
+    uint32_t len;
+    const size_t n_added = info->n_added;
     struct tr_webseed_task * task = vtask;
     struct tr_webseed * w = task->webseed;
-    uint32_t len;
 
-    if( info->n_added <= 0 )
+    if( n_added <= 0 )
         return;
 
     if( !w->is_stopping )
     {
-        tr_bandwidthUsed( &w->bandwidth, TR_DOWN, info->n_added, true, tr_time_msec( ) );
-        fire_client_got_data( w, info->n_added );
+        tr_bandwidthUsed( &w->bandwidth, TR_DOWN, n_added, true, tr_time_msec( ) );
+        fire_client_got_data( w, n_added );
     }
 
     len = evbuffer_get_length( buf );
 
-    if( !task->response_code ) {
+    if( !task->response_code )
+    {
         tr_webGetTaskInfo( task->web_task, TR_WEB_GET_CODE, &task->response_code );
 
-        if( task->response_code == 206 ) {
-            struct tr_http_info * inf = tr_new( struct tr_http_info, 1 );
-            long redirects;
+        if( task->response_code == 206 )
+        {
+            const char * url;
+            struct connection_succeeded_data * data;
 
-            inf->webseed = w;
-            inf->piece_index = task->piece_index;
-            inf->piece_offset = task->piece_offset
-                              + (task->blocks_done * task->block_size)
-                              + (len - 1);
-            tr_webGetTaskInfo( task->web_task, TR_WEB_GET_REDIRECTS, &redirects );
-            if( redirects ) {
-                char * redirect_url;
-                tr_webGetTaskInfo( task->web_task, TR_WEB_GET_REAL_URL, &redirect_url );
-                inf->redirect_url = tr_strdup( redirect_url );
-            }
-            else
-                inf->redirect_url = NULL;
-            /* run this in the webseed thread to avoid tampering with mutexes and to
-            not cost the web thread too much time */
-            tr_runInEventThread( w->session, connection_succeeded, inf );
+            url = NULL;
+            tr_webGetTaskInfo( task->web_task, TR_WEB_GET_REAL_URL, &url );
+
+            data = tr_new( struct connection_succeeded_data, 1 );
+            data->webseed = w;
+            data->real_url = tr_strdup( url );
+            data->piece_index = task->piece_index;
+            data->piece_offset = task->piece_offset
+                               + (task->blocks_done * task->block_size)
+                               + (len - 1);
+
+            /* processing this uses a tr_torrent pointer,
+               so push the work to the libevent thread... */
+            tr_runInEventThread( w->session, connection_succeeded, data );
         }
     }
 
-    if( task->response_code == 206 && len >= task->block_size )
+    if( ( task->response_code == 206 ) && ( len >= task->block_size ) )
     {
-        /* one (ore more) block(s) received. write to hd */
+        /* once we've got at least one full block, save it */
+
+        struct write_block_data * data;
         const uint32_t block_size = task->block_size;
         const tr_block_index_t completed = len / block_size;
-        struct tr_blockwrite_info * b = tr_new( struct tr_blockwrite_info, 1 );
 
-        b->webseed = task->webseed;
-        b->piece_index = task->piece_index;
-        b->block_index = task->block + task->blocks_done;
-        b->count = completed;
-        b->block_offset = task->piece_offset + task->blocks_done * block_size;
-        b->data = evbuffer_new( );
+        data = tr_new( struct write_block_data, 1 );
+        data->webseed = task->webseed;
+        data->piece_index = task->piece_index;
+        data->block_index = task->block + task->blocks_done;
+        data->count = completed;
+        data->block_offset = task->piece_offset + task->blocks_done * block_size;
+        data->content = evbuffer_new( );
 
         /* we don't use locking on this evbuffer so we must copy out the data
         that will be needed when writing the block in a different thread */
-        evbuffer_remove_buffer( task->content, b->data,
+        evbuffer_remove_buffer( task->content, data->content,
                                 block_size * completed );
 
-        tr_runInEventThread( w->session, write_block_func, b );
+        tr_runInEventThread( w->session, write_block_func, data );
         task->blocks_done += completed;
     }
 }
