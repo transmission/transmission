@@ -98,10 +98,8 @@ webseed_free( struct tr_webseed * w )
     const tr_info * inf = tr_torrentInfo( tor );
     tr_file_index_t i;
 
-    for( i = 0; i < inf->fileCount; i++ ) {
-        if( w->file_urls[i] )
-            tr_free( w->file_urls[i] );
-    }
+    for( i=0; i<inf->fileCount; ++i )
+        tr_free( w->file_urls[i] );
     tr_free( w->file_urls );
 
     /* webseed destruct */
