@@ -105,6 +105,25 @@ view_row_activated( GtkTreeView       * tree_view UNUSED,
     gtr_action_activate( "show-torrent-properties" );
 }
 
+static gboolean
+tree_view_search_equal_func( GtkTreeModel * model,
+                             gint           column UNUSED,
+                             const gchar  * key,
+                             GtkTreeIter  * iter,
+                             gpointer       search_data UNUSED )
+{
+    gboolean match;
+    char * lower;
+    const char * name = NULL;
+
+    lower = g_strstrip( g_utf8_strdown( key, -1 ) );
+    gtk_tree_model_get( model, iter, MC_NAME_COLLATED, &name, -1 );
+    match = strstr( name, lower ) != NULL;
+    g_free( lower );
+
+    return !match;
+}
+
 static GtkWidget*
 makeview( PrivateData * p )
 {
@@ -112,12 +131,18 @@ makeview( PrivateData * p )
     GtkTreeViewColumn * col;
     GtkTreeSelection *  sel;
     GtkCellRenderer *   r;
+    GtkTreeView * tree_view;
 
     view = gtk_tree_view_new( );
-    gtk_tree_view_set_headers_visible( GTK_TREE_VIEW( view ), FALSE );
-    gtk_tree_view_set_fixed_height_mode( GTK_TREE_VIEW( view ), TRUE );
+    tree_view = GTK_TREE_VIEW( view );
+    gtk_tree_view_set_search_column( tree_view, MC_NAME_COLLATED );
+    gtk_tree_view_set_search_equal_func( tree_view,
+                                         tree_view_search_equal_func,
+                                         NULL, NULL );
+    gtk_tree_view_set_headers_visible( tree_view, FALSE );
+    gtk_tree_view_set_fixed_height_mode( tree_view, TRUE );
 
-    p->selection = gtk_tree_view_get_selection( GTK_TREE_VIEW( view ) );
+    p->selection = gtk_tree_view_get_selection( tree_view );
 
     p->column = col = GTK_TREE_VIEW_COLUMN (g_object_new (GTK_TYPE_TREE_VIEW_COLUMN,
         "title", _("Torrent"),
@@ -131,11 +156,11 @@ makeview( PrivateData * p )
     gtk_tree_view_column_add_attribute( col, r, "piece-upload-speed", MC_SPEED_UP );
     gtk_tree_view_column_add_attribute( col, r, "piece-download-speed", MC_SPEED_DOWN );
 
-    gtk_tree_view_append_column( GTK_TREE_VIEW( view ), col );
+    gtk_tree_view_append_column( tree_view, col );
     g_object_set( r, "xpad", GUI_PAD_SMALL, "ypad", GUI_PAD_SMALL, NULL );
 
-    gtk_tree_view_set_rules_hint( GTK_TREE_VIEW( view ), TRUE );
-    sel = gtk_tree_view_get_selection( GTK_TREE_VIEW( view ) );
+    gtk_tree_view_set_rules_hint( tree_view, TRUE );
+    sel = gtk_tree_view_get_selection( tree_view );
     gtk_tree_selection_set_mode( GTK_TREE_SELECTION( sel ),
                                  GTK_SELECTION_MULTIPLE );
 
@@ -150,7 +175,7 @@ makeview( PrivateData * p )
                       G_CALLBACK( view_row_activated ), NULL );
 
 
-    gtk_tree_view_set_model( GTK_TREE_VIEW( view ), p->filter_model );
+    gtk_tree_view_set_model( tree_view, p->filter_model );
     g_object_unref( p->filter_model );
 
     return view;
