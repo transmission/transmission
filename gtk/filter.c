@@ -839,6 +839,14 @@ testText( const tr_torrent * tor, const char * key )
         tr_file_index_t i;
         const tr_info * inf = tr_torrentInfo( tor );
 
+        /* test the torrent name... */
+        {
+            char * pch = g_utf8_casefold( tr_torrentName( tor ), -1 );
+            ret = !key || strstr( pch, key ) != NULL;
+            g_free( pch );
+        }
+
+        /* test the files... */
         for( i=0; i<inf->fileCount && !ret; ++i )
         {
             char * pch = g_utf8_casefold( inf->files[i].name, -1 );
