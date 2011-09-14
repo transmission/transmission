@@ -42,7 +42,7 @@ body.landscape div#dialog_container, body.landscape div#torrent_inspector {
 }
 
 body.inspector_showing #torrent_filter_bar, body.inspector_showing #torrent_container,
-body.dialog_showing #torrent_filter_bar, body.dialog_showing #torrent_container, body.dialog_showing #torrent_inspector, body.dialog_showing #prefs_container,
+body.dialog_showing #torrent_filter_bar, body.dialog_showing #torrent_container, body.dialog_showing #torrent_inspector,
 body.prefs_showing #torrent_inspector, body.prefs_showing #torrent_filter_bar, body.prefs_showing #torrent_container,
 body.open_showing #torrent_filter_bar, body.open_showing #torrent_container {
 	display: none !important;

@@ -46,7 +46,6 @@ Transmission.prototype =
 		$('#pause_selected_link').click($.proxy(this.stopSelectedClicked,this));
 		$('#resume_selected_link').click($.proxy(this.startSelectedClicked,this));
 		$('#remove_link').click($.proxy(this.removeClicked,this));
-		$('#stats_close_button').click($.proxy(this.hideStatsDialog,this));
 		$('#open_link').click($.proxy(this.openTorrentClicked,this));
 
 		$('#prefs-button').click($.proxy(this.showPrefsDialog,this));
@@ -115,12 +114,6 @@ Transmission.prototype =
 			var o = data['arguments'];
 			Prefs.getClutchPrefs(o);
 			this.updateGuiFromSession(o);
-		}, this, async);
-	},
-
-	loadDaemonStats: function(async) {
-		this.remote.loadDaemonStats(function(data) {
-			this.updateStats(data['arguments']);
 		}, this, async);
 	},
 
@@ -589,17 +582,6 @@ Transmission.prototype =
 		}
 	},
 
-	// turn the periodic ajax stats refresh on & off
-	togglePeriodicStatsRefresh: function(enabled) {
-		clearInterval(this.statsInterval);
-		delete this.statsInterval;
-		if (enabled) {
-			var callback = $.proxy(this.loadDaemonStats,this),
-                            msec = 5000;
-			this.statsInterval = setInterval(callback, msec);
-		}
-	},
-
 	toggleTurtleClicked: function()
 	{
 		var o = {};
@@ -616,41 +598,6 @@ Transmission.prototype =
 	showPrefsDialog: function()
 	{
 		this.prefsDialog.show();
-	},
-
-	showStatsDialog: function() {
-		this.loadDaemonStats();
-		$('#stats_container').fadeIn();
-		this.hideMobileAddressbar();
-		this.togglePeriodicStatsRefresh(true);
-	},
-
-	hideStatsDialog: function() {
-		$('#stats_container').fadeOut();
-		this.hideMobileAddressbar();
-		this.togglePeriodicStatsRefresh(false);
-	},
-
-	// Process new session stats from the server
-	updateStats: function(stats)
-	{
-		var s, ratio,
-		    fmt = Transmission.fmt;
-
-		s = stats["current-stats"];
-		ratio = Math.ratio(s.uploadedBytes,s.downloadedBytes);
-		$('#stats_session_uploaded').html(fmt.size(s.uploadedBytes));
-		$('#stats_session_downloaded').html(fmt.size(s.downloadedBytes));
-		$('#stats_session_ratio').html(fmt.ratioString(ratio));
-		$('#stats_session_duration').html(fmt.timeInterval(s.secondsActive));
-
-		s = stats["cumulative-stats"];
-		ratio = Math.ratio(s.uploadedBytes,s.downloadedBytes);
-		$('#stats_total_count').html(s.sessionCount + " times");
-		$('#stats_total_uploaded').html(fmt.size(s.uploadedBytes));
-		$('#stats_total_downloaded').html(fmt.size(s.downloadedBytes));
-		$('#stats_total_ratio').html(fmt.ratioString(ratio));
-		$('#stats_total_duration').html(fmt.timeInterval(s.secondsActive));
 	},
 
 	setFilterText: function(search) {
@@ -673,6 +620,8 @@ Transmission.prototype =
 		var limit, limited, e, b, text,
                     fmt = Transmission.fmt,
                     menu = $('#settings_menu');
+
+		this.serverVersion = o.version;
 
 		this.prefsDialog.set(o);
 
@@ -755,8 +704,6 @@ Transmission.prototype =
 				break;
 
 			case 'statistics':
-				$('div#stats_container div#stats_error').hide();
-				$('div#stats_container h2.dialog_heading').show();
 				this.showStatsDialog();
 				break;
 
@@ -1661,5 +1608,68 @@ Transmission.prototype =
 		this.torrentRenderer = compact ? new TorrentRendererCompact()
 		                               : new TorrentRendererFull();
 		this.refilter(true);
+	},
+
+	/***
+	****
+	****  Statistics
+	****
+	***/
+
+	// turn the periodic ajax stats refresh on & off
+	togglePeriodicStatsRefresh: function(enabled) {
+		clearInterval(this.statsInterval);
+		delete this.statsInterval;
+		if (enabled) {
+			var callback = $.proxy(this.loadDaemonStats,this),
+                            msec = 5000;
+			this.statsInterval = setInterval(callback, msec);
+		}
+	},
+
+	loadDaemonStats: function(async) {
+		this.remote.loadDaemonStats(function(data) {
+			this.updateStats(data['arguments']);
+		}, this, async);
+	},
+
+	// Process new session stats from the server
+	updateStats: function(stats)
+	{
+		var s, ratio,
+		    fmt = Transmission.fmt;
+
+		s = stats["current-stats"];
+		ratio = Math.ratio(s.uploadedBytes,s.downloadedBytes);
+		$('#stats-session-uploaded').html(fmt.size(s.uploadedBytes));
+		$('#stats-session-downloaded').html(fmt.size(s.downloadedBytes));
+		$('#stats-session-ratio').html(fmt.ratioString(ratio));
+		$('#stats-session-duration').html(fmt.timeInterval(s.secondsActive));
+
+		s = stats["cumulative-stats"];
+		ratio = Math.ratio(s.uploadedBytes,s.downloadedBytes);
+		$('#stats-total-count').html(s.sessionCount + " times");
+		$('#stats-total-uploaded').html(fmt.size(s.uploadedBytes));
+		$('#stats-total-downloaded').html(fmt.size(s.downloadedBytes));
+		$('#stats-total-ratio').html(fmt.ratioString(ratio));
+		$('#stats-total-duration').html(fmt.timeInterval(s.secondsActive));
+	},
+
+
+	showStatsDialog: function() {
+		this.loadDaemonStats();
+		this.hideMobileAddressbar();
+		this.togglePeriodicStatsRefresh(true);
+		$('#stats-dialog').dialog({
+			'close': $.proxy(this.onStatsDialogClosed,this),
+			'show': 'fade',
+			'hide': 'fade',
+			'title': 'Transmission ' + this.serverVersion
+		});
+	},
+
+	onStatsDialogClosed: function() {
+		this.hideMobileAddressbar();
+		this.togglePeriodicStatsRefresh(false);
 	}
 };

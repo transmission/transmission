@@ -1013,16 +1013,6 @@ div.dialog_container div.dialog_window {
 	}
 }
 
-div#prefs_container div.dialog_window {
-	width: 410px;
-	padding: 0 15px;
-}
-
-div#stats_container div.dialog_window {
-	width: 255px;
-	padding: 0 15px;
-}
-
 div.dialog_container div.dialog_window img {
 	margin: 20px 20px 0 20px;
 	float: left;
@@ -1109,60 +1099,6 @@ iframe#torrent_upload_frame {
 	border: none;
 	padding: 0;
 	margin: 0;
-}
-
-div#stats_container h2.dialog_heading {
-	display: none;
-}
-div#stats_container div#stats_error {
-	display: none;
-	width: 395px;
-	margin: 6px auto 6px auto;
-	padding: 3px 0 3px 0;
-	border: 2px solid #cc3333;
-	color: #cc3333;
-	font-size: 1.2em;
-	vertical-align: middle;
-	text-align: center;
-	height: 20px;
-	line-height: 20px;
-	background-color: #FFEFEF;
-}
-.stats_info_container {
-	clear: both;
-	padding: 0px 7px 0px 7px;
-}
-.stats_group {
-	display: table;
-	margin: 5px 0px 0px 0px;
-	padding: 5px 0px 0px 0px;
-	width: 100%;
-}
-.stats_row {
-	display: table-row;
-}
-.stats_row > div {
-	padding-top: 4px;
-}
-div#stats_container label.category {
-	clear: both;
-	font-size: 1.2em;
-	margin: 5px 0px;
-}
-div#stats_container div.item {
-	font-size: 11px !important;
-	margin: 0 5px 0 20px;
-	float: left;
-	width: 100px;
-}
-div#stats_container div.item2 {
-	font-size: 11px !important;
-	margin: 0 5px 0 20px;
-	float: left;
-}
-div#stats_container a {
-	clear: left;
-	margin: 10px 5px 10px 7px;
 }
 
 /****
