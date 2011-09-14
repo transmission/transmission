@@ -215,13 +215,6 @@ function PrefsDialog(remote) {
                     break;
             }
         }
-
-        // handle orientation changes...
-        var supportsOrientationChange = 'onorientationchange' in window,
-            orientationEvent = supportsOrientationChange ? 'orientationchange' : 'resize';
-        $('body').bind(orientationEvent, function() {
-            data.elements.root.dialog('option',getDefaultMobileOptions());
-        });
     },
 
     getValues = function()
