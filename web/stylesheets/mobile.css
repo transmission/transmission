@@ -825,20 +825,24 @@ ul.single_file li.inspector_torrent_file_list_entry>.file_priority_control, li.i
 
 div.torrent_footer {
 	height: 20px;
-	padding: 1px;
+	padding-top: 1px;
 	border-top: 1px solid #555;
 	position: relative;
 	width: 100%;
 	z-index: 3;
-	background-color: #6b83a1;
+
+        background-color: #B9B9B9; /* fallback color if gradients are not supported */
+        background-image: -webkit-gradient(linear, left top, left bottom, from(#C9C9C9), to(#A7A7A7));
+        background-image: -webkit-linear-gradient(top, #C9C9C9, #A7A7A7);
+        background-image:    -moz-linear-gradient(top, #C9C9C9, #A7A7A7);
+        background-image:     -ms-linear-gradient(top, #C9C9C9, #A7A7A7);
+        background-image:      -o-linear-gradient(top, #C9C9C9, #A7A7A7);
+        background-image:         linear-gradient(top, #C9C9C9, #A7A7A7); /* standard, but currently unimplemented */
 }
 
 div.torrent_footer > * {
 	position: relative;
 	float: left;
-	margin-right: 30px;
-}
-div.torrent_footer > * {
 	height: 18px;
 	width: 32px;
 	cursor: pointer;
@@ -846,6 +850,12 @@ div.torrent_footer > * {
 	-webkit-user-select: none;
 }
 
+div.torrent_footer > #compact-button {
+	margin-left: 10px;
+}
+div.torrent_footer > #prefs-button {
+	float: right;
+}
 div.torrent_footer ul#settings_menu {
 	display: none;
 }

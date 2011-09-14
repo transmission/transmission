@@ -164,9 +164,7 @@ function PrefsDialog(remote) {
         return {
             width: $(window).width(),
             height: $(window).height(),
-            position: [ 'left', 'top' ],
-            resizable: false,
-            draggable: false
+            position: [ 'left', 'top' ]
         };
     },
 
