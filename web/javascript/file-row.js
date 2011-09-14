@@ -1,7 +1,8 @@
-/*
- *   Copyright © Jordan Lee
- *   This code is licensed under the GPL version 2.
- *   <http://www.gnu.org/licenses/old-licenses/gpl-2.0.html>
+/**
+ * Copyright © Mnemosyne LLC
+ *
+ * This file is licensed under the GPLv2.
+ * http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
  */
 
 function FileRow(torrent, i)

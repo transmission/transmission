@@ -1,46 +1,24 @@
-/*
- * Copyright © Dave Perrett, Malcolm Jarvis and Bruno Bierbaumer
- * This code is licensed under the GPL version 2.
- * For details, see http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+/**
+ * Copyright © Jordan Lee, Dave Perrett, Malcolm Jarvis and Bruno Bierbaumer
  *
- * Class TransmissionRemote
+ * This file is licensed under the GPLv2.
+ * http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
  */
 
 var RPC = {
-	_Root                   : '../rpc',
 	_DaemonVersion          : 'version',
-	_Encryption             : 'encryption',
-	_EncryptionPreferred    : 'preferred',
-	_EncryptionRequired     : 'required',
-	_UpSpeedLimit           : 'speed-limit-up',
 	_DownSpeedLimit         : 'speed-limit-down',
-	_DownloadDir            : 'download-dir',
-	_PeerPort               : 'peer-port',
-	_UpSpeedLimited         : 'speed-limit-up-enabled',
 	_DownSpeedLimited       : 'speed-limit-down-enabled',
-	_TurtleState            : 'alt-speed-enabled',
-	_TurtleUpSpeedLimit     : 'alt-speed-up',
-	_TurtleDownSpeedLimit   : 'alt-speed-down',
-	_TurtleTimeEnabled      : 'alt-speed-time-enabled',
-	_TurtleTimeBegin        : 'alt-speed-time-begin',
-	_TurtleTimeEnd          : 'alt-speed-time-end',
-	_TurtleTimeDay          : 'alt-speed-time-day',
-	_PeerLimitGlobal        : 'peer-limit-global',
-	_PeerLimitPerTorrent    : 'peer-limit-per-torrent',
-	_PexEnabled             : 'pex-enabled',
-	_DhtEnabled             : 'dht-enabled',
-	_LpdEnabled             : 'lpd-enabled',
-	_BlocklistEnabled       : 'blocklist-enabled',
-	_BlocklistURL           : 'blocklist-url',
-	_BlocklistSize          : 'blocklist-size',
-	_UtpEnabled             : 'utp-enabled',
-	_PeerPortRandom         : 'peer-port-random-on-start',
-	_PortForwardingEnabled  : 'port-forwarding-enabled',
-	_StartAddedTorrent      : 'start-added-torrents',
 	_QueueMoveTop           : 'queue-move-top',
 	_QueueMoveBottom        : 'queue-move-bottom',
 	_QueueMoveUp            : 'queue-move-up',
-	_QueueMoveDown          : 'queue-move-down'
+	_QueueMoveDown          : 'queue-move-down',
+	_Root                   : '../rpc',
+	_TurtleDownSpeedLimit   : 'alt-speed-down',
+	_TurtleState            : 'alt-speed-enabled',
+	_TurtleUpSpeedLimit     : 'alt-speed-up',
+	_UpSpeedLimit           : 'speed-limit-up',
+	_UpSpeedLimited         : 'speed-limit-up-enabled'
 };
 
 function TransmissionRemote(controller)

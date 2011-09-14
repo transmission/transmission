@@ -50,18 +50,10 @@ a {
 	width: 100%;
 	height: 75px;
 	margin: 0;
-        border: 1px outset #AEBBCB;
+	border: 1px outset #AEBBCB;
 	overflow: hidden;
 	-moz-user-select: none;
 	-webkit-user-select: none;
-}
-
-#toolbar h1 {
-	height: inherit;
-	width: 205px;
-	text-indent: -9000px !important;
-	padding: 0;
-	margin: 0 0 0 5px;
 }
 
 #toolbar ul {
@@ -214,7 +206,6 @@ div#filter-popup #filter-by-state .row .filter-name {
         left: 0px;
 }
 #filter-popup .row {
-	font-size: 1.2em;
 	text-align: left;
 	cursor: pointer;
 	margin: 8px 2px;
@@ -482,6 +473,49 @@ li.torrent a:hover div.torrent_resume {
 }
 li.torrent a:active div.torrent_resume {
 	background-position: center bottom;
+}
+
+/***
+****
+****  PREFERENCES
+****
+***/
+
+#prefs-dialog.ui-tabs .ui-tabs-panel {
+	padding: 0px;
+	-moz-user-select: none;
+	-webkit-user-select: none;
+}
+.prefs-section {
+	margin: 10px;
+	text-align: left;
+}
+.prefs-section > * {
+	padding-top: 8px;
+	padding-left: 8px;
+}
+.prefs-section .title {
+	font-weight: bold;
+	padding-left: 0px;
+}
+.prefs-section .row .key {
+	float: left;
+	padding-top: 3px;
+}
+.prefs-section .row .key > * {
+	margin-left: 0px;
+}
+.prefs-section .row .value {
+	margin-left: 150px;
+}
+.prefs-section .row .value > * {
+	width: 100%;
+}
+.prefs-section .checkbox-row > input {
+	margin: 0px;
+}
+.prefs-section .checkbox-row > label {
+	margin-left: 5px;
 }
 
 /*--------------------------------------
@@ -866,11 +900,12 @@ li.inspector_torrent_file_list_entry.complete div.file_priority_control {
 	cursor: default;
 }
 
-/*--------------------------------------
- *
- * T O R R E N T   F O O T E R
- *
- *--------------------------------------*/
+
+/****
+*****
+*****  MAIN WINDOW FOOTER
+*****
+****/
 
 div.torrent_footer {
 	height: 22px;
@@ -900,48 +935,51 @@ div.torrent_footer ul#settings_menu li#button {
 	padding: 0;
 	position: relative;
 }
-div.torrent_footer ul#settings_menu li#button:active,
-div.torrent_footer ul#settings_menu li#button:hover {
+div.torrent_footer ul#settings_menu li#button:hover,
+div.torrent_footer ul#settings_menu li#button:active {
 	background-position: -32px top;
 }
 
 #turtle-button {
 	background: transparent url('../images/graphics/chrome.png') left -18px no-repeat;
 }
-#turtle-button:active,
-#turtle-button:hover {
+#turtle-button:hover,
+#turtle-button:active {
 	background-position: -32px -18px;
 }
 #turtle-button.enabled {
 	background-position: left -36px;
 }
-#turtle-button.enabled:active,
-#turtle-button.enabled:hover {
+#turtle-button.enabled:hover,
+#turtle-button.enabled:active {
 	background-position: -32px -36px;
 }
 
 #compact-button {
-        background: transparent url('../images/graphics/chrome.png') left -54px no-repeat;
+	background: transparent url('../images/graphics/chrome.png') left -54px no-repeat;
 }
-#compact-button:active,
-#compact-button:hover {
+#compact-button:hover,
+#compact-button:active {
 	background-position: -32px -54px;
 }
 #compact-button.enabled {
 	background-position: left -72px;
 }
-#compact-button.enabled:active,
-#compact-button.enabled:hover {
+#compact-button.enabled:hover,
+#compact-button.enabled:active {
 	background-position: -32px -72px;
 }
 
+#prefs-button {
+	display: none;
+}
 
 
-/*--------------------------------------
- *
- * D I A L O G S
- *
- *--------------------------------------*/
+/****
+*****
+*****  DIALOGS
+*****
+****/
 
 div.dialog_container {
 	position: absolute;
@@ -1073,114 +1111,6 @@ iframe#torrent_upload_frame {
 	margin: 0;
 }
 
-div#prefs_container label {
-	display: block;
-	margin: 0 0 0 2px;
-}
-
-div#prefs_container label.category {
-	clear: both;
-	font-size: 1.2em;
-}
-
-div#prefs_container label.item {
-	font-size: 11px !important;
-	margin: 0 5px 0 20px;
-	float: left;
-}
-
-div#prefs_container label.suffix {
-	margin: 0 5px 0 10px;
-	float: left;
-}
-
-div#prefs_container div.formdiv.checkbox label.item {
-	margin: 0 5px 0 2px;
-}
-
-div#prefs_container div.limit_total label.item {
-	width: 102px;
-}
-
-div#prefs_container div.limit_turtle label.item {
-	width: 120px;
-}
-
-div#prefs_container div.preference input[type=checkbox] {
-	float: left;
-	margin-left: 20px;
-	margin-top: 9px;
-}
-@-moz-document url-prefix() {
-	div#prefs_container div.preference input[type=checkbox] {
-		margin-top: 8px;
-	}
-}
-
-div#prefs_container div.preference input[type=text] {
-	width: 50px;
-	padding: 0px !important;
-	height: 18px;
-	margin-top: 2px;
-}
-
-div#prefs_container div.preference input {
-	float: left;
-}
-
-div#prefs_container div.block_url input {
-	width: 256px !important;
-}
-
-div#prefs_container div.download_location input {
-	width: 256px !important;
-}
-div#prefs_container div.download_location .checkbox input {
-	width: auto !important;
-}
-
-div#prefs_container div.formdiv {
-	clear: both;
-	line-height: 30px;
-}
-
-div#prefs_container a {
-	clear: left;
-	margin: 10px 5px 10px 7px;
-}
-
-div#prefs_container h2.dialog_heading {
-	display: none;
-}
-
-div#prefs_container div#prefs_tabs {
-	clear: both;
-}
-div#prefs_container div#prefs_tabs ul {
-	margin: 0;
-	padding: 0 0 0 10px;
-}
-.prefs-tab {
-	cursor: pointer;
-	display: block;
-	float: left;
-	font-size: 1.2em;
-	color: #323232;
-	text-align: center;
-	padding: 2px 20px;
-	border: 1px solid #787878;
-	margin-bottom: -1px;
-	background: #C0C8D6 url('../images/graphics/filter_bar.png') bottom repeat-x;
-}
-.prefs-tab.selected {
-	background: none;
-	border-bottom: 1px solid #efefef;
-}
-.prefs-page {
-	border-top: 1px solid #787878;
-	clear: both;
-	padding: 7px;
-}
 div#stats_container h2.dialog_heading {
 	display: none;
 }
@@ -1235,33 +1165,11 @@ div#stats_container a {
 	margin: 10px 5px 10px 7px;
 }
 
-div#prefs_container div#pref_error {
-	display: none;
-	width: 395px;
-	margin: 6px auto 6px auto;
-	padding: 3px 0 3px 0;
-	border: 2px solid #cc3333;
-	color: #cc3333;
-	font-size: 1.2em;
-	vertical-align: middle;
-	text-align: center;
-	height: 20px;
-	line-height: 20px;
-	background-color: #FFEFEF;
-}
-
-#transmission_version{
-	position: absolute;
-	bottom: 10px;
-	left:   10px;
-	color:  #999;
-}
-
-/*--------------------------------------
- *
- * T R A N S   M E N U
- *
- *--------------------------------------*/
+/****
+*****
+*****  POPUP MENU
+*****
+****/
 
 .trans_menu {
 	margin: 0;
@@ -1297,9 +1205,8 @@ div#prefs_container div#pref_error {
 
 .trans_menu > * li {
 	margin: 0;
-	padding: 0 10px 2px 20px !important;
+	padding: 3px 10px 3px 20px !important;
 	color: #000;
-	font-size: 14px;
 	cursor: default;
 	text-indent: auto !important;
 	width: inherit;
@@ -1322,10 +1229,6 @@ div#prefs_container div#pref_error {
 
 .trans_menu li span.arrow {
 	float: right;
-	margin: 3px 0 0;
-	font-size: 11px;
-	color: #333;
-	text-shadow: none;
 }
 
 .trans_menu li.hover li.hover span.arrow, .trans_menu li.hover li.hover li.hover span.selected {
@@ -1334,7 +1237,6 @@ div#prefs_container div#pref_error {
 
 .trans_menu span.selected {
 	margin: 0 3px 0 -15px;
-	font-size: 14px;
 	color: #666;
 	float: left;
 }

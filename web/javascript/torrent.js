@@ -1,11 +1,9 @@
-/*
- *	Copyright © Jordan Lee, Dave Perrett and Malcolm Jarvis
- *	This code is licensed under the GPL version 2.
- *	For details, see http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+/**
+ * Copyright © Mnemosyne LLC
  *
- *	Class Torrent
+ * This file is licensed under the GPLv2.
+ * http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
  */
-
 
 function Torrent(data)
 {

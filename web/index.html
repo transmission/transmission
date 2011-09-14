@@ -11,6 +11,7 @@
 		<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js"></script>
 		<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.min.js"></script>
 		<link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/themes/base/jquery-ui.css" type="text/css" media="all" /> 
+
 <!--
 		<link media="screen" href="./stylesheets/mobile.css" type= "text/css" rel="stylesheet" />
 -->
@@ -23,11 +24,11 @@
 		<!--[if IE 7]><link media="screen" href="./stylesheets/ie7.css" type="text/css" rel="stylesheet" /><![endif]-->
 		<script type="text/javascript" src="./javascript/jquery/jquery.transmenu.min.js"></script>
 		<script type="text/javascript" src="./javascript/jquery/jquery.contextmenu.min.js"></script>
-		<script type="text/javascript" src="./javascript/menu.js"></script>
 		<script type="text/javascript" src="./javascript/jquery/jquery.form.min.js"></script>
 		<script type="text/javascript" src="./javascript/jquery/json2.min.js"></script>
 		<script type="text/javascript" src="./javascript/common.js"></script>
 		<script type="text/javascript" src="./javascript/inspector.js"></script>
+		<script type="text/javascript" src="./javascript/prefs-dialog.js"></script>
 		<script type="text/javascript" src="./javascript/remote.js"></script>
 		<script type="text/javascript" src="./javascript/transmission.js"></script>
 		<script type="text/javascript" src="./javascript/torrent.js"></script>
@@ -66,6 +67,113 @@
 			<div id='filter-popup-workarea'>
 				<div id='filter-by-state'></div>
 				<div id='filter-by-tracker'></div>
+			</div>
+		</div>
+
+		<div id="prefs-dialog" style="display:none;">
+			<ul>
+				<li id="prefs-tab-general"><a href="#prefs-page-torrents">Torrents</a></li>
+				<li id="prefs-tab-speed"><a href="#prefs-page-speed">Speed</a></li>
+				<li id="prefs-tab-privacy"><a href="#prefs-page-privacy">Privacy</a></li>
+				<li id="prefs-tab-network"><a href="#prefs-page-network">Network</a></li>
+				<li class="ui-tab-dialog-close"></li>
+			</ul>
+			<div>
+				<div id="prefs-page-torrents">
+					<div class="prefs-section">
+						<div class="title">Downloading</div>
+						<div class="row"><div class="key">Download to:</div><div class="value"><input type="text" id="download-dir"/></div></div>
+						<div class="checkbox-row"><input type="checkbox" id="start-added-torrents"/><label for="start-added-torrents">Start when added</label></div>
+						<div class="checkbox-row"><input type="checkbox" id="rename-partial-files"/><label for="rename-partial-files">Append &quot;.part&quot; to incomplete files' names</label></div>
+					</div>
+					<div class="prefs-section">
+						<div class="title">Seeding</div>
+						<div class="row"><div class="key"><input type="checkbox" id="seedRatioLimited"/><label for="seedRatioLimited">Stop seeding at ratio:</label></div>
+                                                                 <div class="value"><input type="text" class="numberinput" id="seedRatioLimit"/></div></div>
+						<div class="row"><div class="key"><input type="checkbox" id="idle-seeding-limit-enabled"/><label for="idle-seeding-limit-enabled">Stop seeding if idle for N minutes:</label></div>
+                                                                 <div class="value"><input type="text" class="numberinput" id="idle-seeding-limit"/></div></div>
+					</div>
+				</div>
+				<div id="prefs-page-speed">
+					<div class="prefs-section">
+						<div class="title">Speed Limits</div>
+						<div class="row"><div class="key"><input type="checkbox" id="speed-limit-up-enabled"/><label for="speed-limit-up-enabled">Upload (kB/s):</label></div>
+                                                                 <div class="value"><input type="text" class="numberinput" id="speed-limit-up"/></div></div>
+						<div class="row"><div class="key"><input type="checkbox" id="speed-limit-down-enabled"/><label for="speed-limit-down-enabled">Download (kB/s):</label></div>
+                                                                 <div class="value"><input type="text" class="numberinput" id="speed-limit-down"/></div></div>
+					</div>
+					<div class="prefs-section">
+						<div class="title"><img src="images/graphics/blue-turtle.png" width="16" height="9" style="padding-right: 10px;"/>Alternative Speed Limits</div>
+						<div class="row" style="font-size: smaller; padding-bottom: 4px;">Override normal speed limits manually or at scheduled times</div>
+						<div class="row"><div class="key">Upload (kB/s):</div>
+                                                                 <div class="value"><input type="text" class="numberinput" id="alt-speed-up"/></div></div>
+						<div class="row"><div class="key">Download (kB/s):</div>
+                                                                 <div class="value"><input type="text" class="numberinput" id="alt-speed-down"/></div></div>
+						<div class="checkbox-row"><input type="checkbox" id="alt-speed-time-enabled"/><label for="alt-speed-time-enabled">Scheduled Times</label></div>
+						<div class="row"><div class="key">From:</div>
+						                 <div class="value"><select id="alt-speed-time-begin"></select></div></div>
+						<div class="row"><div class="key">To:</div>
+						                 <div class="value"><select id="alt-speed-time-end"></select></div></div>
+						<div class="row"><div class="key"><label for="alt-speed-time-day">On days:</label></div>
+						                 <div class="value"><select id="alt-speed-time-day">
+								 		<option value="127">Everyday</option>
+										<option value="62">Weekdays</option>
+										<option value="65">Weekends</option>
+										<option value="1">Sunday</option>
+										<option value="2">Monday</option>
+										<option value="4">Tuesday</option>
+										<option value="8">Wednesday</option>
+										<option value="16">Thursday</option>
+										<option value="32">Friday</option>
+										<option value="64">Saturday</option></select></div></div>
+					</div>
+				</div>
+				<div id="prefs-page-privacy">
+					<div class="prefs-section">
+						<div class="title">Blocklist</div>
+						<div class="row"><div class="key"><input type="checkbox" id="blocklist-enabled"/><label for="blocklist-enabled">Enable blocklist:</label></div>
+						                 <div class="value"><input type="text" id="blocklist-url"/></div></div>
+						<div class="row"><div class="key" style="margin-top: 3px; font-size: smaller;">Blocklist has <span id="blocklist-size">?</span> rules</div>
+						                 <div class="value"><input type="button" id="blocklist-update-button" value="Update"/></div></div>
+					</div>
+					<div class="prefs-section">
+						<div class="title">Privacy</div>
+						<div class="row"><div class="key">Encryption mode:</div>
+						                 <div class="value"><select id="encryption">
+						                 	<option value="tolerated">Allow encryption</option>
+						                 	<option value="preferred">Prefer encryption</option>
+						                 	<option value="required">Require encryption</option></select></div></div>
+						<div class="checkbox-row"><input type="checkbox" id="pex-enabled" title="PEX is a tool for exchanging peer lists with the peers you're connected to."/>
+						                          <label for="pex-enabled" title="PEX is a tool for exchanging peer lists with the peers you're connected to.">Use PEX to find more peers</label></div>
+						<div class="checkbox-row"><input type="checkbox" id="dht-enabled" title="DHT is a tool for finding peers without a tracker."/>
+						                          <label for="dht-enabled" title="DHT is a tool for finding peers without a tracker.">Use DHT to find more peers</label></div>
+						<div class="checkbox-row"><input type="checkbox" id="lpd-enabled" title="LPD is a tool for finding peers on your local network."/>
+						                          <label for="lpd-enabled" title="LPD is a tool for finding peers on your local network.">Use LPD to find more peers</label></div>
+					</div>
+				</div>
+				<div id="prefs-page-network">
+					<div class="prefs-section">
+						<div class="title">Listening Port</div>
+						<div class="row"><div class="key"><label for="peer-port">Peer listening port:</div>
+						                 <div class="value"><input type="text" class="numberinput" id="peer-port"/></div></div>
+						<div class="row"><div class="key">&nbsp;</div>
+						                 <div class="value"><span id="port-label">Status: Unknown</span></div></div>
+						<div class="checkbox-row"><input type="checkbox" id="peer-port-random-on-start"/><label for="peer-port-random-on-start">Randomize port on launch</label></div>
+						<div class="checkbox-row"><input type="checkbox" id="port-forwarding-enabled"/><label for="port-forwarding-enabled">Use port forwarding from my router</label></div>
+					</div>
+					<div class="prefs-section">
+						<div class="title">Connections</div>
+						<div class="row"><div class="key"><label for="peer-limit-per-torrent">Max peers per torrent:</label></div>
+						                 <div class="value"><input type="text" class="numberinput" id="peer-limit-per-torrent"/></div></div>
+						<div class="row"><div class="key"><label for="peer-limit-global">Max peers overall:</label></div>
+						                 <div class="value"><input type="text" class="numberinput" id="peer-limit-global"/></div></div>
+					</div>
+					<div class="prefs-section">
+						<div class="title">Options</div>
+						<div class="checkbox-row"><input type="checkbox" id="utp-enabled" title="uTP is a tool for reducing network congestion."/>
+						                          <label for="utp-enabled" title="uTP is a tool for reducing network congestion.">Enable uTP for peer communication</label></div>
+					</div>
+				</div>
 			</div>
 		</div>
 
@@ -223,180 +331,6 @@
 			</div>
 		</div>
 
-		<div class="dialog_container" id="prefs_container" style="display:none;">
-			<div class="dialog_top_bar"></div>
-			<div class="dialog_window">
-				<h2 class="dialog_heading">Preferences</h2>
-				<div id="pref_error"></div>
-				<form action="" id="prefs_form">
-					<div id="prefs_tabs">
-						<ul>
-							<li id="prefs-tab-general" class="prefs-tab selected">General</li>
-							<li id="prefs-tab-speed" class="prefs-tab">Speed</li>
-							<li id="prefs-tab-peers" class="prefs-tab">Peers</li>
-							<li id="prefs-tab-network" class="prefs-tab">Network</li>
-						</ul>
-						<div id="prefs-page-general" class="prefs-page">
-							<div class="preference download_location">
-								<label class="category">Add transfers:</label>
-								<div class="formdiv">
-									<label for="download_location" class="item">Download to:</label>
-									<input type="text" name="download_location" id="download_location"/>
-								</div>
-								<div class="formdiv checkbox auto_start">
-									<input type="checkbox" name="auto_start" id="auto_start"/>
-									<label for="auto_start" class="item">Start transfers when added</label>
-								</div>
-							</div>
-							<div class="preference encryption">
-								<label class="category">Encryption:</label>
-								<div class="formdiv checkbox">
-									<input type="checkbox" name="encryption" id="encryption"/>
-									<label for="encryption" class="item">Ignore unencrypted peers</label>
-								</div>
-							</div>
-							<div class="preference web_gui">
-								<label class="category">Web Client:</label>
-								<div class="formdiv">
-									<label for="refresh_rate" class="item">Refresh Rate:</label>
-									<input type="text" name="refresh_rate" id="refresh_rate" class="numberinput"/>
-									<label class="suffix">seconds</label>
-								</div>
-							</div>
-							<div style="clear: both; visibility: hidden;"></div>
-						</div>
-						<div id="prefs-page-speed" class="prefs-page" style="display: none;">
-							<div class="preference limit_total">
-								<label class="category">Speed Limits:</label>
-								<div class="formdiv checkbox">
-									<input type="checkbox" name="limit_download" id="limit_download"/>
-									<label for="limit_download" class="item">Download Rate:</label>
-									<input type="text" name="download_rate" id="download_rate" class="numberinput"/>
-									<label class="suffix">kB/s</label>
-								</div>
-								<div class="formdiv checkbox">
-									<input type="checkbox" name="limit_upload" id="limit_upload"/>
-									<label for="limit_upload" class="item">Upload Rate:</label>
-									<input type="text" name="upload_rate" id="upload_rate" class="numberinput"/>
-									<label class="suffix">kB/s</label>
-								</div>
-							</div>
-							<div class="preference limit_turtle">
-								<label class="category">Temporary Speed Limits: (Turtle)</label>
-								<label>Override normal speed limits manually or at scheduled times</label>
-								<div class="formdiv">
-									<label for="turtle_download_rate" class="item">Download Rate:</label>
-									<input type="text" name="turtle_download_rate" id="turtle_download_rate" class="numberinput"/>
-									<label class="suffix">kB/s</label>
-								</div>
-								<div class="formdiv">
-									<label for="turtle_upload_rate" class="item">Upload Rate:</label>
-									<input type="text" name="turtle_upload_rate" id="turtle_upload_rate" class="numberinput"/>
-									<label class="suffix">kB/s</label>
-								</div>
-								<div class="formdiv checkbox">
-									<input type="checkbox" name="turtle_schedule" id="turtle_schedule"/>
-									<label for="turtle_schedule" class="item">Scheduled times:</label>
-									<select name="turtle_start_time" id="turtle_start_time" size="1">
-									</select>
-									<select name="turtle_end_time" id="turtle_end_time" size="1">
-									</select>
-								</div>
-								<div class="formdiv">
-									<label for="turtle_days" class="item">On days:</label>
-									<select name="turtle_days" id="turtle_days" size="1">
-										<option value="127">Everyday</option>
-										<option value="62">Weekdays</option>
-										<option value="65">Weekends</option>
-										<option value="1">Sunday</option>
-										<option value="2">Monday</option>
-										<option value="4">Tuesday</option>
-										<option value="8">Wednesday</option>
-										<option value="16">Thursday</option>
-										<option value="32">Friday</option>
-										<option value="64">Saturday</option>
-									</select>
-								</div>
-							</div>
-							<div style="clear: both; visibility: hidden;"></div>
-						</div>
-						<div id="prefs-page-peers" class="prefs-page" style="display: none;">
-							<div class="preference peers_conn">
-								<label class="category">Connections:</label>
-								<div class="formdiv">
-									<label for="conn_global" class="item">Global maximum connections:</label>
-									<input type="text" name="conn_global" id="conn_global" class="numberinput"/>
-									<label class="suffix">peers</label>
-								</div>
-								<div class="formdiv">
-									<label for="conn_torrent" class="item">Maximum connections for new transfers:</label>
-									<input type="text" name="conn_torrent" id="conn_torrent" class="numberinput"/>
-									<label class="suffix">peers</label>
-								</div>
-								<div class="formdiv checkbox">
-									<input type="checkbox" name="conn_pex" id="conn_pex"/>
-									<label for="conn_pex" class="item">Use peer exchange (PEX) for public torrents</label>
-								</div>
-								<div class="formdiv checkbox">
-									<input type="checkbox" name="conn_dht" id="conn_dht"/>
-									<label for="conn_dht" class="item">Use distributed hash table (DHT) for public torrents</label>
-								</div>
-								<div class="formdiv checkbox">
-									<input type="checkbox" name="conn_lpd" id="conn_lpd"/>
-									<label for="conn_lpd" class="item">Use local peer discovery for public torrents</label>
-								</div>
-							</div>
-							<div class="preference block_conn">
-								<label class="category">Blocklist:</label>
-								<div class="formdiv checkbox">
-									<input type="checkbox" name="block_enable" id="block_enable"/>
-									<label for="block_enable" class="item">Prevent peers in blocklist from connecting</label>
-								</div>
-								<div class="formdiv block_url">
-									<label for="block_url" class="item">URL:</label>
-									<input type="text" name="block_url" id="block_url"/>
-								</div>
-								<div class="formdiv">
-									<input type="button" name="block_update_button" id="block_update_button" value="Update"/>
-									<label class="suffix" id="block_size">IP rules in the list</label>
-								</div>
-							</div>
-							<div style="clear: both; visibility: hidden;"></div>
-						</div>
-						<div id="prefs-page-network" class="prefs-page" style="display: none;">
-							<div class="preference utp">
-								<label class="category">Peer communication:</label>
-								<div class="formdiv checkbox">
-									<input type="checkbox" name="network_utp" id="network_utp"/>
-									<label for="network_utp" class="item">Enable Micro Transport Protocol (µTP)</label>
-								</div>
-							</div>
-							<div class="preference port">
-								<label class="category">Peer listening port:</label>
-								<div class="formdiv">
-									<label for="port" class="item">Incoming TCP Port:</label>
-									<input type="text" id="port" name="port" class="numberinput"/>
-									<label class="suffix" id="port_test"></label>
-								</div>
-								<div class="formdiv checkbox">
-									<input type="checkbox" name="port_rand" id="port_rand"/>
-									<label for="port_rand" class="item">Randomize port on launch</label>
-								</div>
-								<div class="formdiv checkbox">
-									<input type="checkbox" name="port_forward" id="port_forward"/>
-									<label for="port_forward" class="item">Automatically map port</label>
-								</div>
-							</div>
-							<div style="clear: both; visibility: hidden;"></div>
-						</div>
-					</div>
-					<span id="transmission_version"></span>
-					<a href="#save" id="prefs_save_button">Save</a>
-					<a href="#cancel" id="prefs_cancel_button">Cancel</a>
-				</form>
-			</div>
-		</div>
-
 		<div class="dialog_container" id="stats_container" style="display:none;">
 			<div class="dialog_top_bar"></div>
 			<div class="dialog_window">
@@ -486,19 +420,19 @@
 								<li id="unlimited_download_rate">Unlimited</li>
 								<li id="limited_download_rate">Limit (10 kB/s)</li>
 								<li class="separator"></li>
-								<li>5 kB/s</li>
-								<li>10 kB/s</li>
-								<li>20 kB/s</li>
-								<li>30 kB/s</li>
-								<li>40 kB/s</li>
-								<li>50 kB/s</li>
-								<li>75 kB/s</li>
-								<li>100 kB/s</li>
-								<li>150 kB/s</li>
-								<li>200 kB/s</li>
-								<li>250 kB/s</li>
-								<li>500 kB/s</li>
-								<li>750 kB/s</li>
+								<li class='download-speed'>5 kB/s</li>
+								<li class='download-speed'>10 kB/s</li>
+								<li class='download-speed'>20 kB/s</li>
+								<li class='download-speed'>30 kB/s</li>
+								<li class='download-speed'>40 kB/s</li>
+								<li class='download-speed'>50 kB/s</li>
+								<li class='download-speed'>75 kB/s</li>
+								<li class='download-speed'>100 kB/s</li>
+								<li class='download-speed'>150 kB/s</li>
+								<li class='download-speed'>200 kB/s</li>
+								<li class='download-speed'>250 kB/s</li>
+								<li class='download-speed'>500 kB/s</li>
+								<li class='download-speed'>750 kB/s</li>
 							</ul>
 						</li>
 						<li>Total Upload Rate
@@ -506,31 +440,31 @@
 								<li id="unlimited_upload_rate">Unlimited</li>
 								<li id="limited_upload_rate">Limit (10 kB/s)</li>
 								<li class="separator"></li>
-								<li>5 kB/s</li>
-								<li>10 kB/s</li>
-								<li>20 kB/s</li>
-								<li>30 kB/s</li>
-								<li>40 kB/s</li>
-								<li>50 kB/s</li>
-								<li>75 kB/s</li>
-								<li>100 kB/s</li>
-								<li>150 kB/s</li>
-								<li>200 kB/s</li>
-								<li>250 kB/s</li>
-								<li>500 kB/s</li>
-								<li>750 kB/s</li>
+								<li class='upload-speed'>5 kB/s</li>
+								<li class='upload-speed'>10 kB/s</li>
+								<li class='upload-speed'>20 kB/s</li>
+								<li class='upload-speed'>30 kB/s</li>
+								<li class='upload-speed'>40 kB/s</li>
+								<li class='upload-speed'>50 kB/s</li>
+								<li class='upload-speed'>75 kB/s</li>
+								<li class='upload-speed'>100 kB/s</li>
+								<li class='upload-speed'>150 kB/s</li>
+								<li class='upload-speed'>200 kB/s</li>
+								<li class='upload-speed'>250 kB/s</li>
+								<li class='upload-speed'>500 kB/s</li>
+								<li class='upload-speed'>750 kB/s</li>
 							</ul>
 						</li>
 						<li class="separator"></li>
 						<li>Sort Transfers By
 							<ul id="footer_sort_menu">
-								<li id="sort_by_activity">Activity</li>
-								<li id="sort_by_age">Age</li>
-								<li id="sort_by_name">Name</li>
-								<li id="sort_by_percent_completed">Progress</li>
-								<li id="sort_by_ratio">Ratio</li>
-								<li id="sort_by_queue_order">Queue Order</li>
-								<li id="sort_by_state">State</li>
+								<li class='sort-mode' id="sort_by_activity">Activity</li>
+								<li class='sort-mode' id="sort_by_age">Age</li>
+								<li class='sort-mode' id="sort_by_name">Name</li>
+								<li class='sort-mode' id="sort_by_percent_completed">Progress</li>
+								<li class='sort-mode' id="sort_by_ratio">Ratio</li>
+								<li class='sort-mode' id="sort_by_queue_order">Queue Order</li>
+								<li class='sort-mode' id="sort_by_state">State</li>
 								<li class="separator"></li>
 								<li id="reverse_sort_order">Reverse Sort Order</li>
 							</ul>
@@ -538,6 +472,7 @@
 					</ul>
 				</li>
 			</ul>
+			<div id="prefs-button">&nbsp;</div>
 			<div id="turtle-button">&nbsp;</div>
 			<div id="compact-button">&nbsp;</div>
 		</div>

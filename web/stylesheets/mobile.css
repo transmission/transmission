@@ -12,8 +12,7 @@ html {
 
 body {
 	font: 11px Helvetica, Arial, sans-serif;
-	color: #323232 !important;
-	background: #fff;
+	background: #FFF;
 	text-align: center;
 	margin: 0;
 	padding: 0;
@@ -65,25 +64,24 @@ body.open_showing #torrent_filter_bar, body.open_showing #torrent_container {
 	margin: 0;
 	background: #6685a1 url('../images/graphics/iphone_chrome.png') top left repeat-x;
 	border: 1px outset #AEBBCB;
-	position: relative;
-	text-shadow: 0 -1px 0 #446;
 }
 
 #toolbar ul {
 	margin: 0;
 	padding: 0 3px;
-	text-align: left;
+	text-align: center;
 }
 
 #toolbar ul li {
 	list-style-type: none;
 	list-style-image: none;
-	padding: 0;
 	margin: 4px 0 0 0;
+	padding: 0 2px;
+	cursor: pointer;
 	display: inline-block;
 }
 
-#toolbar li#remove, li#open {
+#toolbar li#remove, li#open, li#resume_selected, li#pause_selected {
 	float: left;
 }
 #toolbar li#resume_all, li#pause_all {
@@ -103,11 +101,7 @@ body.open_showing #torrent_filter_bar, body.open_showing #torrent_container {
 	font-weight: bold;
 }
 
-#toolbar ul li.disabled {
-	opacity: 0.25;
-}
-
-#toolbar ul li div div.toolbar_image {
+#toolbar ul li div.toolbar_image {
 	width: 32px;
 	height: 32px;
 	margin: 0 auto 2px;
@@ -131,6 +125,12 @@ li#filter          div        div.toolbar_image { background-position: left  -19
 li#filter          div:active div.toolbar_image { background-position: right -192px; }
 li#inspector       div        div.toolbar_image { background-position: left  -224px; }
 li#inspector       div:active div.toolbar_image { background-position: right -224px; }
+
+#toolbar ul li.disabled > div {
+	text-shadow: 0 1px 0 #fff;
+	opacity: 0.25;
+	cursor: default;
+}
 
 #toolbar ul li#filter,
 #toolbar ul li#inspector,
@@ -207,12 +207,13 @@ div#filter-popup #filter-by-state .row .filter-name {
         left: 0px;
 }
 #filter-popup .row {
-	font-size: 1.2em;
 	text-align: left;
 	cursor: pointer;
 	margin: 15px 2px;
 	position: relative;
 	height: 18px;
+	-moz-user-select: none;
+	-webkit-user-select: none;
 }
 div#filter-popup .row .filter-img {
         border: none;
@@ -256,7 +257,6 @@ div#filter-popup .row .filter-img {
 ***/
 
 ul.torrent_list {
-	width: 100%;
 	margin: 0;
 	padding: 0;
 	text-align: left;
@@ -297,12 +297,12 @@ ul.torrent_list li.torrent.even {
 }
 
 ul.torrent_list li.torrent.selected {
-	background-color: #3875D7;
+	background-color: #3879D7;
 	color: #FFF;
 }
 
 ul.torrent_list li.torrent div.torrent_name {
-	font-size: 13px;
+	font-size: 1.3em;
 	font-weight: bold;
 	overflow: hidden;
 	text-overflow: ellipsis;
@@ -325,9 +325,28 @@ ul.torrent_list li.torrent.selected div.torrent_name {
 	color: #fff;
 }
 
-div.torrent_peer_details {
-	font-size: 10px;
+ul.torrent_list div.torrent_progress_details,
+ul.torrent_list div.torrent_peer_details {
+	clear: left;
+	font-size: 1em;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
 }
+
+ul.torrent_list li.torrent div.torrent_progress_details.error {
+	color: #FF0000;
+}
+ul.torrent_list li.torrent.selected div.torrent_progress_details.error {
+	color: #FFF;
+}
+ul.torrent_list li.torrent div.torrent_peer_details.error {
+	color: #FF0000;
+}
+ul.torrent_list li.torrent.selected div.torrent_peer_details.error {
+	color: #FFF;
+}
+
 
 /**
  * Progressbar
@@ -402,24 +421,24 @@ ul.torrent_list div.torrent_progress_bar.complete.leeching {
         border-color: #3D9DEA;
 }
 ul.torrent_list div.torrent_progress_bar.complete.leeching.queued {
-	background-position: left -70px;
-	border-color: #889CA5;
+        background-position: left -70px;
+        border-color: #889CA5;
 }
 ul.torrent_list div.torrent_progress_bar.incomplete.leeching {
         background-position: left -20px;
         border-color: #CFCFCF;
 }
 ul.torrent_list div.torrent_progress_bar.incomplete.leeching.queued {
-	background-position: left -80px;
-	border-color: #C4C4C4;
+        background-position: left -80px;
+        border-color: #C4C4C4;
 }
 ul.torrent_list div.torrent_progress_bar.complete.seeding {
         background-position: left -40px;
         border-color: #269E30;
 }
 ul.torrent_list div.torrent_progress_bar.complete.seeding.queued {
-	background-position: left -60px;
-	border-color: #8A998D;
+        background-position: left -60px;
+        border-color: #8A998D;
 }
 ul.torrent_list div.torrent_progress_bar.incomplete.seeding {
         background-position: left -10px;
@@ -474,17 +493,6 @@ div.dialog_container a {
 	text-align: center;
 }
 
-div.dialog_container a#dialog_cancel_button, div.dialog_container a#prefs_cancel_button {
-	left: 55px;
-}
-
-div.dialog_container a#dialog_confirm_button, div.dialog_container a#prefs_save_button {
-	right: 55px;
-	color: black;
-	text-shadow: none;
-	background: #fff;
-}
-
 #dialog_container div.dialog_window img {
 	margin: 5px auto 12px;
 }
@@ -514,93 +522,47 @@ div.dialog_container a#dialog_confirm_button, div.dialog_container a#prefs_save_
 	text-align: left;
 }
 
-/*--------------------------------------
- *
- * P R E F S   C O N T A I N E R
- *
- *--------------------------------------*/
+/***
+****
+****  PREFERENCES
+****
+***/
 
-div#prefs_container {
+#prefs-dialog.ui-tabs .ui-tabs-panel {
+	padding: 0px;
+	-moz-user-select: none;
+	-webkit-user-select: none;
+}
+.prefs-section {
+	margin: 10px;
 	text-align: left;
 }
-
-div#prefs_container label.item {
-	margin: 0 5px 0 15px;
-	float: left;
+.prefs-section > * {
+	padding-top: 8px;
+	padding-left: 8px;
 }
-
-form#prefs_form {
-	height: 365px;
-	padding: 0 5px;
-}
-
-div#prefs_container label.suffix {
-	margin: 0 5px 0 10px;
-	float: left;
-}
-
-div#prefs_container input {
-	float: left;
-}
-
-div#prefs_container div.preference input[type=checkbox] {
-	margin: 3px 7px 0 16px;
-	width: 18px;
-	height: 18px;
-	clear: left;
-}
-
-div#prefs_container label {
-	line-height: 25px;
-	display: block;
-}
-
-div#prefs_container div.download_location label.item,
-div#prefs_container div.port label.item,
-div#prefs_container div.web_gui label.item {
-	width: 127px;
-	clear: left;
-}
-
-div#prefs_container div.auto_start label.item,
-div#prefs_container div.encryption label.item,
-div#prefs_container div.limit_total label.item {
-	margin: 0 5px 0 0;
-}
-
-div#prefs_container div.limit_total label.item {
-	width: 101px;
-}
-
-div#prefs_container div.preference input[type=text] {
-	padding: 2px 2px 1px;
-	text-shadow: none !important;
-	font-size: 13px;
-	width: 50px;
-}
-
-div#prefs_container div.download_location input {
-	position: absolute;
-	right: 20px;
-	left: 160px;
-	width: auto !important;
-}
-
-div#prefs_container label.category {
-	clear: both;
+.prefs-section .title {
 	font-weight: bold;
+	padding-left: 0px;
 }
-
-div#prefs_container a {
-	margin-top: 42px !important;
+.prefs-section .row .key {
+	float: left;
+	padding-top: 3px;
 }
-
-.landscape div.dialog_container a#prefs_cancel_button {
-	left: 135px;
+.prefs-section .row .key > * {
+	margin-left: 0px;
 }
-
-.landscape div.dialog_container a#prefs_save_button {
-	right: 135px;
+.prefs-section .row .value {
+	margin-left: 150px;
+}
+.prefs-section .row .value > * {
+	width: 100%;
+}
+.prefs-section .checkbox-row > input {
+	margin: 0px;
+}
+.prefs-section .checkbox-row > label {
+	margin-left: 5px;
 }
 
 /*--------------------------------------
@@ -630,11 +592,10 @@ div#torrent_inspector {
 div#torrent_inspector #torrent_inspector_name {
 	margin: 0;
 	overflow: hidden;
-	word-wrap: break-word;
 }
 div#torrent_inspector #torrent_inspector_size {
 	font-size: 1.2em;
-	margin: 3;
+	margin: 3px;
 	display: block;
 	padding-top: 2px;
 }
@@ -790,9 +751,6 @@ div.inspector_torrent_file_list_entry_name {
 li.inspector_torrent_file_list_entry.skip>.inspector_torrent_file_list_entry_name {
 	color: #666;
 }
-li.inspector_torrent_file_list_entry.even {
-	background-color: #EEEEEE;
-}
 div.inspector_torrent_file_list_entry_progress {
 	font-size: 1em;
 	color: #666;
@@ -836,12 +794,21 @@ div.file_priority_control {
 	cursor: pointer;
 }
 div.file_priority_control.normal {
+	background-position: left top;
+}
+div.file_priority_control.normal:hover {
 	background-position: right top;
 }
 div.file_priority_control.high {
+	background-position: left -19px;
+}
+div.file_priority_control.high:hover {
 	background-position: right -19px;
 }
 div.file_priority_control.low {
+	background-position: left -38px;
+}
+div.file_priority_control.low:hover {
 	background-position: right -38px;
 }
 ul.single_file li.inspector_torrent_file_list_entry>.file_priority_control, li.inspector_torrent_file_list_entry.complete div.file_priority_control {
@@ -850,52 +817,92 @@ ul.single_file li.inspector_torrent_file_list_entry>.file_priority_control, li.i
 }
 
 
+/****
+*****
+*****  MAIN WINDOW FOOTER
+*****
+****/
+
+div.torrent_footer {
+	height: 20px;
+	padding: 1px;
+	border-top: 1px solid #555;
+	position: relative;
+	width: 100%;
+	z-index: 3;
+	background-color: #6b83a1;
+}
+
+div.torrent_footer > * {
+	position: relative;
+	float: left;
+	margin-right: 30px;
+}
+div.torrent_footer > * {
+	height: 18px;
+	width: 32px;
+	cursor: pointer;
+	-moz-user-select: none;
+	-webkit-user-select: none;
+}
+
+div.torrent_footer ul#settings_menu {
+	display: none;
+}
+
+#turtle-button {
+	background: transparent url('../images/graphics/chrome.png') left -18px no-repeat;
+}
+#turtle-button:active {
+	background-position: -32px -18px;
+}
+#turtle-button.enabled {
+	background-position: left -36px;
+}
+#turtle-button.enabled:active {
+	background-position: -32px -36px;
+}
+
+#compact-button {
+	background: transparent url('../images/graphics/chrome.png') left -54px no-repeat;
+}
+#compact-button:active {
+	background-position: -32px -54px;
+}
+#compact-button.enabled {
+	background-position: left -72px;
+}
+#compact-button.enabled:active {
+	background-position: -32px -72px;
+}
+
+#prefs-button {
+	background: transparent url('../images/graphics/chrome.png') left -90px no-repeat;
+}
+#prefs-button:active {
+	background-position: -32px -90px;
+}
+
+/****
+*****
+*****  POPUP MENU
+*****
+****/
+
+.trans_menu,
+.trans_menu * {
+	display: none;
+}
+
+
 /*--------------------------------------
  *
- * T O R R E N T   F O O T E R
+ * Hide remnants of stuff we don't need, like
+ * transmenu and contextmenu.
  *
  *--------------------------------------*/
 
-div.torrent_footer {
-	margin: 0px;
-	height: 20px;
-	border-top: 1px solid #777;
-	position: relative;
-	width: 100%;
-	z-index: 2;
-	text-align: center;
-	color: #222;
-	text-shadow: 0 1px 1px #fff;
-	overflow: hidden;
-
-        background-color: #B9B9B9; /* fallback color if gradients are not supported */
-        background-image: -webkit-gradient(linear, left top, left bottom, from(#C9C9C9), to(#A7A7A7));
-        background-image: -webkit-linear-gradient(top, #C9C9C9, #A7A7A7);
-        background-image:    -moz-linear-gradient(top, #C9C9C9, #A7A7A7);
-        background-image:     -ms-linear-gradient(top, #C9C9C9, #A7A7A7);
-        background-image:      -o-linear-gradient(top, #C9C9C9, #A7A7A7);
-        background-image:         linear-gradient(top, #C9C9C9, #A7A7A7); /* standard, but currently unimplemented */
-}
-
-div.torrent_footer div#disk_space_container, div.torrent_footer a#preferences_link {
-	float: right;
-	font-size: 12px;
-	vertical-align: middle;
-	margin: 1px 6px 0 0;
-	padding: 2px 0 2px;
-	max-width: 55%;
-	overflow: hidden;
-	white-space: nowrap;
-	text-overflow: ellipsis;
-}
-
-div.torrent_footer a#preferences_link {
-	float: left;
-	font-weight: bold;
-	margin: 1px 0 0 6px;
-}
-
-body.prefs_showing div.torrent_footer a#preferences_link, body.dialog_showing div.torrent_footer a#preferences_link {
+div#torrent_context_menu {
 	display: none;
 }
 
@@ -909,52 +916,4 @@ iframe#torrent_upload_frame {
 	border: none;
 	padding: 0;
 	margin: 0;
-}
-
-div.torrent_footer #compact-button,
-div.torrent_footer #turtle-button {
-	position: absolute;
-	height: 18px;
-	width: 32px !important;
-	top: 0px;
-	margin: 2px;
-}
-
-#compact-button {
-	right: 0px;
-        background: transparent url('../images/graphics/chrome.png') left -54px no-repeat;
-}
-#compact-button:active {
-        background-position: -32px -54px;
-}
-#compact-button.enabled {
-        background-position: left -72px;
-}
-#compact-button.enabled:active {
-        background-position: -32px -72px;
-}
-
-#turtle-button {
-	left: 0px;
-        background: transparent url('../images/graphics/chrome.png') left -18px no-repeat;
-}
-#turtle-button:active {
-        background-position: -32px -18px;
-}
-#turtle-button.enabled {
-        background-position: left -36px;
-}
-#turtle-button.enabled:active {
-        background-position: -32px -36px;
-}
-
-/*--------------------------------------
- *
- * Hide remnants of stuff we don't need, like
- * transmenu and contextmenu.
- *
- *--------------------------------------*/
-
-.torrent_footer div.main_container, .torrent_footer ul#settings_menu, div.torrent_footer ul#settings_menu li#button, div#torrent_context_menu {
-	display: none;
 }

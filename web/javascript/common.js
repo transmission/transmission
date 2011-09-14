@@ -1,9 +1,8 @@
-/*
- *	Copyright © Dave Perrett and Malcolm Jarvis
- *	This code is licensed under the GPL version 2.
- *	For more details, see http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+/**
+ * Copyright © Dave Perrett and Malcolm Jarvis
  *
- * Common javascript
+ * This file is licensed under the GPLv2.
+ * http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
  */
 
 var transmission,
@@ -19,6 +18,19 @@ if (!Array.indexOf){
 				return i;
 		return -1;
 	}
+}
+
+// http://forum.jquery.com/topic/combining-ui-dialog-and-tabs
+$.fn.tabbedDialog = function (dialog_opts) {
+	this.tabs({selected: 0});
+	this.dialog(dialog_opts);
+	this.find('.ui-tab-dialog-close').append(this.parent().find('.ui-dialog-titlebar-close'));
+	this.find('.ui-tab-dialog-close').css({'position':'absolute','right':'0', 'top':'16px'});
+	this.find('.ui-tab-dialog-close > a').css({'float':'none','padding':'0'});
+	var tabul = this.find('ul:first');
+	this.parent().addClass('ui-tabs').prepend(tabul).draggable('option','handle',tabul); 
+	this.siblings('.ui-dialog-titlebar').remove();
+	tabul.addClass('ui-dialog-titlebar');
 }
 
 $(document).ready(function() {
@@ -58,15 +70,6 @@ $(document).ready(function() {
 	}
 });
 
-/*
- *   Return a copy of the array
- *
- *   @returns array
- */
-Array.prototype.clone = function () {
-	return this.concat();
-};
-
 /**
  * "innerHTML = html" is pretty slow in FF.  Happily a lot of our innerHTML
  * changes are triggered by periodic refreshes on torrents whose state hasn't
@@ -100,26 +103,18 @@ Math.ratio = function(numerator, denominator) {
 	return result;
 };
 
-/*
- *   Truncate a float to a specified number of decimal
- *   places, stripping trailing zeroes
- *
- *   @param float floatnum
- *   @param integer precision
- *   @returns float
- */
-Math.truncateWithPrecision = function(floatnum, precision) {
-	return Math.floor(floatnum * Math.pow (10, precision)) / Math.pow(10, precision);
-};
-
-/*
- *   Round a string of a number to a specified number of decimal
- *   places
+/**
+ * Round a string of a number to a specified number of decimal places
  */
 Number.prototype.toTruncFixed = function(place) {
-	var ret = Math.truncateWithPrecision(this, place);
+	var ret = Math.floor(this * Math.pow (10, place)) / Math.pow(10, place);
 	return ret.toFixed(place);
 }
+
+Number.prototype.toStringWithCommas = function() {
+    return this.toString().replace(/\B(?=(?:\d{3})+(?!\d))/g, ",");
+}
+
 
 /*
  * Trim whitespace from a string
@@ -136,7 +131,6 @@ function Prefs() { }
 Prefs.prototype = { };
 
 Prefs._RefreshRate        = 'refresh_rate';
-Prefs._SessionRefreshRate = 'session_refresh_rate';
 
 Prefs._FilterMode         = 'filter';
 Prefs._FilterAll          = 'all';
@@ -159,7 +153,6 @@ Prefs._SortByProgress     = 'percent_completed';
 Prefs._SortByRatio        = 'ratio';
 Prefs._SortByState        = 'state';
 
-Prefs._TurtleState        = 'turtle-state';
 Prefs._CompactDisplayState= 'compact_display_state';
 
 Prefs._Defaults =
