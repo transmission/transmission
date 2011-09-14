@@ -80,10 +80,13 @@
         rect.size.height -= 1.0;
     }
     
-    NSRectFillListWithColors(gridRects, colorRects, count);
+    if (!NSIsEmptyRect(rect))
+    {
+        const NSRect gradientRect = NSMakeRect(NSMinX(rect), 1.0, NSWidth(rect), NSHeight([self bounds]) - 1.0 - 1.0); //proper gradient requires the full height of the bar
+        [fGradient drawInRect: gradientRect angle: 270.0];
+    }
     
-    const NSRect gradientRect = NSMakeRect(NSMinX(rect), 1.0, NSWidth(rect), NSHeight([self bounds]) - 1.0 - 1.0); //proper gradient requires the full height of the bar
-    [fGradient drawInRect: gradientRect angle: 270.0];
+    NSRectFillListWithColors(gridRects, colorRects, count);
 }
 
 @end

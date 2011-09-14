@@ -99,16 +99,19 @@
         rect.size.height -= 1.0;
     }
     
-    if (active)
+    if (!NSIsEmptyRect(rect))
     {
-        const NSRect gradientRect = NSMakeRect(NSMinX(rect), 1.0, NSWidth(rect), NSHeight([self bounds]) - 1.0 - 1.0); //proper gradient requires the full height of the bar
-        [fGradient drawInRect: gradientRect angle: 270.0];
-    }
-    else
-    {
-        gridRects[count] = rect;
-        colorRects[count] = [NSColor colorWithCalibratedWhite: 0.85 alpha: 1.0];
-        ++count;
+        if (active)
+        {
+            const NSRect gradientRect = NSMakeRect(NSMinX(rect), 1.0, NSWidth(rect), NSHeight([self bounds]) - 1.0 - 1.0); //proper gradient requires the full height of the bar
+            [fGradient drawInRect: gradientRect angle: 270.0];
+        }
+        else
+        {
+            gridRects[count] = rect;
+            colorRects[count] = [NSColor colorWithCalibratedWhite: 0.85 alpha: 1.0];
+            ++count;
+        }
     }
     
     NSRectFillListWithColors(gridRects, colorRects, count);
