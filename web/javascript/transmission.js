@@ -1250,10 +1250,12 @@ Transmission.prototype =
 			text += state_string + '</span> at <span class="filter-selection">' + tracker_string;
 		text += '</span> &mdash; ';
 
-		if (torrent_count === visible_count)
-			text += torrent_count + ' Transfers';
+		if (torrent_count !== visible_count)
+			text += visible_count.toStringWithCommas() + ' of ' + torrent_count.toStringWithCommas();
+		else if (torrent_count === 1)
+			text = '1 Transfer';
 		else
-			text += visible_count + ' of ' + torrent_count;
+			text += torrent_count.toStringWithCommas() + ' Transfers';
 		$('#filter-button').html(text);
 	},
 
@@ -1454,7 +1456,7 @@ Transmission.prototype =
 			div.className = 'row' + (s === sel_state ? ' selected':'');
 			div.innerHTML = '<span class="filter-img"></span>'
 			              + '<span class="filter-name">' + tr.getStateString(s) + '</span>'
-			              + '<span class="count">' + counts[s] + '</span>';
+			              + '<span class="count">' + counts[s].toStringWithCommas() + '</span>';
 			$(div).click({'state':s}, function(ev) {
 				tr.setFilterMode(ev.data.state);
 				$('#filter-popup').dialog('close');
@@ -1479,7 +1481,7 @@ Transmission.prototype =
 		div.className = 'row' + (tr.filterTracker ? '' : ' selected');
 		div.innerHTML = '<span class="filter-img"></span>'
 		              + '<span class="filter-name">All</span>'
-		              + '<span class="count">' + torrents.length + '</span>';
+		              + '<span class="count">' + torrents.length.toStringWithCommas() + '</span>';
 		$(div).click(function() {
 			tr.setFilterTracker(null);
 			$('#filter-popup').dialog('close');
@@ -1492,7 +1494,7 @@ Transmission.prototype =
 			div.className = 'row' + (o.domain === tr.filterTracker  ? ' selected':'');
 			div.innerHTML = '<img class="filter-img" src="http://'+o.domain+'/favicon.ico"/>'
 			              + '<span class="filter-name">'+ name + '</span>'
-			              + '<span class="count">'+ o.count + '</span>';
+			              + '<span class="count">'+ o.count.toStringWithCommas() + '</span>';
 			$(div).click({domain:o.domain}, function(ev) {
 				tr.setFilterTracker(ev.data.domain);
 				$('#filter-popup').dialog('close');
