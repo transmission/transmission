@@ -30,9 +30,9 @@ Transmission.prototype =
 
 		// Initialize the implementation fields
 		this.filterText    = '';
-		this._torrents     = { };
-		this._rows         = [ ];
-		this.dirtyTorrents = { };
+		this._torrents     = {};
+		this._rows         = [];
+		this.dirtyTorrents = {};
 
 		// Initialize the clutch preferences
 		Prefs.getClutchPrefs(this);
@@ -247,9 +247,6 @@ Transmission.prototype =
 		});
 	},
 
-	/*
-	 * Create the footer settings menu
-	 */
 	createSettingsMenu: function() {
 		$('#settings_menu').transMenu({
 			selected_char: '&#x2714;',
@@ -274,6 +271,11 @@ Transmission.prototype =
 		for (var key in this._torrents)
 			torrents.push(this._torrents[key]);
 		return torrents;
+	},
+
+	getTorrentIds: function(torrents)
+	{
+		return $.map(torrents.slice(0), function(t) {return t.getId();});
 	},
 
 	scrollToRow: function(row)
@@ -323,9 +325,7 @@ Transmission.prototype =
 	},
 
 	getSelectedTorrentIds: function() {
-		return $.map(this.getSelectedRows(),function(r) {
-			return r.getTorrentId();
-		});
+		return this.getTorrentIds(this.getSelectedTorrents());
 	},
 
 	setSelectedRow: function(row) {
@@ -360,7 +360,7 @@ Transmission.prototype =
 		return -1;
 	},
 
-	/* Select a range from this torrent to the last clicked torrent */
+	// Select a range from this row to the last clicked torrent
 	selectRange: function(row)
 	{
 		var last = this.indexOfLastTorrent();
@@ -395,8 +395,11 @@ Transmission.prototype =
 	callSelectionChangedSoon: function()
 	{
 		if (!this.selectionChangedTimer)
-			this.selectionChangedTimer =
-				setTimeout($.proxy(this.selectionChanged,this),200);
+		{
+			var callback = $.proxy(this.selectionChanged,this),
+			    msec = 200;
+			this.selectionChangedTimer = setTimeout(callback, msec);
+		}
 	},
 
 	/*--------------------------------------------
@@ -466,8 +469,7 @@ Transmission.prototype =
 		return !handled;
 	},
 
-	keyUp: function(ev)
-	{
+	keyUp: function(ev) {
 		if (ev.keyCode === 16) // shift key pressed
 			delete this._shift_index;
 	},
@@ -534,31 +536,27 @@ Transmission.prototype =
 		return true;
 	},
 
-	drop: function(ev) {
-		if (!ev.dataTransfer || !ev.dataTransfer.types) {
+	drop: function(ev)
+	{
+		var i, uri, uris=null,
+		    types = ["text/uri-list", "text/plain"];
+		    paused = this.shouldAddedTorrentsStart();
+
+		if (!ev.dataTransfer || !ev.dataTransfer.types)
 			return true;
-		}
-		ev.preventDefault();
-		var uris = null;
-		var types = ["text/uri-list", "text/plain"];
-		for (var i = 0; i < types.length; ++i) {
-			if (ev.dataTransfer.types.contains(types[i])) {
+
+		for (i=0; !uris && i<types.length; ++i)
+			if (ev.dataTransfer.types.contains(types[i]))
 				uris = ev.dataTransfer.getData(types[i]).split("\n");
-				break;
-			}
-		}
-		var paused = this.shouldAddedTorrentsStart();
-		for (i = 0; i < uris.length; ++i) {
-			var uri = uris[i];
-			if (/^#/.test(uri)) {
-				// lines which start with "#" are comments
+
+		for (i=0; uri=uris[i]; ++i) {
+			if (/^#/.test(uri)) // lines which start with "#" are comments
 				continue;
-			}
-			if (/^[a-z-]+:/i.test(uri)) {
-				// close enough to a url
+			if (/^[a-z-]+:/i.test(uri)) // close enough to a url
 				this.remote.addTorrentByUrl(uri, paused);
-			}
 		}
+
+		ev.preventDefault();
 		return false;
 	},
 
@@ -580,8 +578,8 @@ Transmission.prototype =
 		}
 	},
 
+	// turn the periodic ajax session refresh on & off
 	togglePeriodicSessionRefresh: function(enabled) {
-		/* Turn the periodic ajax session refresh on & off */
 		clearInterval(this.sessionInterval);
 		delete this.sessionInterval;
 		if (enabled) {
@@ -591,7 +589,7 @@ Transmission.prototype =
 		}
 	},
 
-	/* Turn the periodic ajax stats refresh on & off */
+	// turn the periodic ajax stats refresh on & off
 	togglePeriodicStatsRefresh: function(enabled) {
 		clearInterval(this.statsInterval);
 		delete this.statsInterval;
@@ -624,36 +622,35 @@ Transmission.prototype =
 		this.loadDaemonStats();
 		$('#stats_container').fadeIn();
 		this.hideMobileAddressbar();
-		this.updateButtonStates();
 		this.togglePeriodicStatsRefresh(true);
 	},
 
 	hideStatsDialog: function() {
 		$('#stats_container').fadeOut();
 		this.hideMobileAddressbar();
-		this.updateButtonStates();
 		this.togglePeriodicStatsRefresh(false);
 	},
 
-	/*
-	 * Process got some new session stats from the server
-	 */
+	// Process new session stats from the server
 	updateStats: function(stats)
 	{
-		var fmt = Transmission.fmt;
+		var s, ratio,
+		    fmt = Transmission.fmt;
 
-		var s = stats["current-stats"];
+		s = stats["current-stats"];
+		ratio = Math.ratio(s.uploadedBytes,s.downloadedBytes);
 		$('#stats_session_uploaded').html(fmt.size(s.uploadedBytes));
 		$('#stats_session_downloaded').html(fmt.size(s.downloadedBytes));
-		$('#stats_session_ratio').html(fmt.ratioString(Math.ratio(s.uploadedBytes,s.downloadedBytes)));
+		$('#stats_session_ratio').html(fmt.ratioString(ratio));
 		$('#stats_session_duration').html(fmt.timeInterval(s.secondsActive));
 
-		var t = stats["cumulative-stats"];
-		$('#stats_total_count').html(t.sessionCount + " times");
-		$('#stats_total_uploaded').html(fmt.size(t.uploadedBytes));
-		$('#stats_total_downloaded').html(fmt.size(t.downloadedBytes));
-		$('#stats_total_ratio').html(fmt.ratioString(Math.ratio(t.uploadedBytes,t.downloadedBytes)));
-		$('#stats_total_duration').html(fmt.timeInterval(t.secondsActive));
+		s = stats["cumulative-stats"];
+		ratio = Math.ratio(s.uploadedBytes,s.downloadedBytes);
+		$('#stats_total_count').html(s.sessionCount + " times");
+		$('#stats_total_uploaded').html(fmt.size(s.uploadedBytes));
+		$('#stats_total_downloaded').html(fmt.size(s.downloadedBytes));
+		$('#stats_total_ratio').html(fmt.ratioString(ratio));
+		$('#stats_total_duration').html(fmt.timeInterval(s.secondsActive));
 	},
 
 	setFilterText: function(search) {
@@ -683,9 +680,12 @@ Transmission.prototype =
 		{
 			b = o[RPC._TurtleState];
 			e = $('#turtle-button');
-			text = [ 'Click to ', (b?'disable':'enable'), ' Temporary Speed Limits (',
-			         fmt.speed(o[RPC._TurtleUpSpeedLimit]), ' up,',
-			         fmt.speed(o[RPC._TurtleDownSpeedLimit]), ' down)' ].join('');
+			text = [ 'Click to ', (b?'disable':'enable'),
+			         ' Temporary Speed Limits (',
+			         fmt.speed(o[RPC._TurtleUpSpeedLimit]),
+			         ' up,',
+			         fmt.speed(o[RPC._TurtleDownSpeedLimit]),
+			         ' down)' ].join('');
 			e.toggleClass('enabled', b);
 			e.attr('title', text);
 		}
@@ -769,13 +769,13 @@ Transmission.prototype =
 				break;	
 
 			case 'unlimited_download_rate':
-				o = { };
+				o = {};
 				o[RPC._DownSpeedLimited] = false;
 				remote.savePrefs(o);
 				break;
 
 			case 'limited_download_rate':
-				o = { };
+				o = {};
 				o[RPC._DownSpeedLimited] = true;
 				remote.savePrefs(o);
 				break;
@@ -825,7 +825,8 @@ Transmission.prototype =
 
 	updateFromTorrentGet: function(updates, removed_ids)
 	{
-		var i, o, t, id, needed, needinfo = [];
+		var i, o, t, id, needed, needinfo = [],
+		    callback, fields;
 
 		for (i=0; o=updates[i]; ++i)
 		{
@@ -840,8 +841,9 @@ Transmission.prototype =
 			else {
 				t = this._torrents[id] = new Torrent(o);
 				this.dirtyTorrents[id] = true;
-				$(t).bind('dataChanged',$.proxy(this.onTorrentChanged,this));
-				// if we need them, ask for fields from the server...
+				callback = $.proxy(this.onTorrentChanged,this);
+				$(t).bind('dataChanged',callback);
+				// do we need more info for this torrent?
 				if(!('name' in t.fields) || !('status' in t.fields))
 					needinfo.push(id);
 			}
@@ -849,7 +851,9 @@ Transmission.prototype =
 
 		if (needinfo.length) {
 			// whee, new torrents! get their initial information.
-			this.updateTorrents(needinfo, ['id'].concat(Torrent.Fields.Metadata, Torrent.Fields.Stats));
+			fields = ['id'].concat(Torrent.Fields.Metadata,
+			                       Torrent.Fields.Stats);
+			this.updateTorrents(needinfo, fields);
 			this.refilterSoon();
 		}
 
@@ -861,7 +865,8 @@ Transmission.prototype =
 
 	updateTorrents: function(ids, fields)
 	{
-		this.remote.updateTorrents(ids, fields, this.updateFromTorrentGet, this);
+		this.remote.updateTorrents(ids, fields,
+		                           this.updateFromTorrentGet, this);
 	},
 
 	refreshTorrents: function()
@@ -875,7 +880,7 @@ Transmission.prototype =
 
 		// schedule the next request
 		clearTimeout(this.refreshTorrentsTimeout);
-		this.refreshTorrentsTimeout = setTimeout(callback,msec);
+		this.refreshTorrentsTimeout = setTimeout(callback, msec);
 	},
 
 	initializeTorrents: function()
@@ -887,7 +892,8 @@ Transmission.prototype =
 
 	onRowClicked: function(ev)
 	{
-		var row = ev.currentTarget.row;
+		var meta_key = ev.metaKey || ev.ctrlKey,
+		    row = ev.currentTarget.row;
 
 		// handle the per-row "torrent_resume" button
 		if (ev.target.className === 'torrent_resume') {
@@ -907,13 +913,6 @@ Transmission.prototype =
 		// but still hide the context menu if it is showing
 		$('#jqContextMenu').hide();
 
-		// 'Apple' button emulation on PC :
-		// Need settable meta-key and ctrl-key variables for mac emulation
-		var meta_key = ev.metaKey;
-		if (ev.ctrlKey && navigator.appVersion.toLowerCase().indexOf("mac") === -1)
-			meta_key = true;
-
-		// Shift-Click - selects a range from the last-clicked row to this one
 		if (isMobileDevice) {
 			if (row.isSelected())
 				this.setInspectorVisible(true);
@@ -946,9 +945,11 @@ Transmission.prototype =
 
 	deleteTorrents: function(ids)
 	{
+		var i, id;
+
 		if (ids && ids.length)
 		{
-			for (var i=0, id; id=ids[i]; ++i) {
+			for (i=0; id=ids[i]; ++i) {
 				this.dirtyTorrents[id] = true;
 				delete this._torrents[id];
 			}
@@ -999,7 +1000,7 @@ Transmission.prototype =
 
 		// Submit the upload form
 		} else {
-			var args = { };
+			var args = {};
 			var remote = this.remote;
 			var paused = !$('#torrent_auto_start').is(':checked');
 			if ('' != $('#torrent_upload_url').val()) {
@@ -1088,9 +1089,6 @@ Transmission.prototype =
 		this.startTorrents([ torrent ], false);
 	},
 
-	getTorrentIds: function(torrents) {
-		return $.map(torrents.slice(0), function(t) {return t.getId();});
-	},
 	startTorrents: function(torrents, force) {
 		this.remote.startTorrents(this.getTorrentIds(torrents), force,
 		                          this.refreshTorrents, this);
@@ -1182,9 +1180,9 @@ Transmission.prototype =
 		var e = this.elements,
 		    haveActive = false,
 		    havePaused = false,
-		    haveSelection = false,
-		    haveActiveSelection = false,
-		    havePausedSelection = false;
+		    haveSel = false,
+		    haveActiveSel = false,
+		    havePausedSel = false;
 
 		clearTimeout(this.buttonRefreshTimer);
 		delete this.buttonRefreshTimer;
@@ -1194,21 +1192,21 @@ Transmission.prototype =
 			var isSelected = row.isSelected();
 			if (!isStopped) haveActive = true;
 			if (isStopped) havePaused = true;
-			if (isSelected) haveSelection = true;
-			if (isSelected && !isStopped) haveActiveSelection = true;
-			if (isSelected && isStopped) havePausedSelection = true;
+			if (isSelected) haveSel = true;
+			if (isSelected && !isStopped) haveActiveSel = true;
+			if (isSelected && isStopped) havePausedSel = true;
 		}
 
-		this.setEnabled(e.toolbar_pause_button,       haveActiveSelection);
-		this.setEnabled(e.context_pause_button,       haveActiveSelection);
-		this.setEnabled(e.toolbar_start_button,       havePausedSelection);
-		this.setEnabled(e.context_start_button,       havePausedSelection);
-		this.setEnabled(e.context_move_top_button,    haveSelection);
-		this.setEnabled(e.context_move_up_button,     haveSelection);
-		this.setEnabled(e.context_move_down_button,   haveSelection);
-		this.setEnabled(e.context_move_bottom_button, haveSelection);
-		this.setEnabled(e.context_start_now_button,   havePausedSelection);
-		this.setEnabled(e.toolbar_remove_button,      haveSelection);
+		this.setEnabled(e.toolbar_pause_button,       haveActiveSel);
+		this.setEnabled(e.context_pause_button,       haveActiveSel);
+		this.setEnabled(e.toolbar_start_button,       havePausedSel);
+		this.setEnabled(e.context_start_button,       havePausedSel);
+		this.setEnabled(e.context_move_top_button,    haveSel);
+		this.setEnabled(e.context_move_up_button,     haveSel);
+		this.setEnabled(e.context_move_down_button,   haveSel);
+		this.setEnabled(e.context_move_bottom_button, haveSel);
+		this.setEnabled(e.context_start_now_button,   havePausedSel);
+		this.setEnabled(e.toolbar_remove_button,      haveSel);
 		this.setEnabled(e.toolbar_pause_all_button,   haveActive);
 		this.setEnabled(e.toolbar_start_all_button,   havePaused);
 	},
@@ -1253,7 +1251,9 @@ Transmission.prototype =
 
 	filterSetup: function()
 	{
-		var popup = $('#filter-popup');
+		var tr = this,
+		    popup = $('#filter-popup');
+
 		popup.dialog({
 			autoOpen: false,
 			position: isMobileDevice ? 'center' : [40,80],
@@ -1262,7 +1262,7 @@ Transmission.prototype =
 			title: 'Show',
 			width: 315
 		});
-		var tr = this;
+
 		$('#filter-button').click(function() {
 			if (popup.is(":visible"))
 				popup.dialog('close');
@@ -1350,7 +1350,6 @@ Transmission.prototype =
 		    renderer = this.torrentRenderer,
 		    list = this.elements.torrent_list,
 		    old_sel_count = $(list).children('.selected').length;
-
 
 		clearTimeout(this.refilterTimer);
 		delete this.refilterTimer;
@@ -1445,7 +1444,7 @@ Transmission.prototype =
 
 		// update our implementation fields
 		this._rows = rows;
-		this.dirtyTorrents = { };
+		this.dirtyTorrents = {};
 
 		// jquery's even/odd starts with 1 not 0, so invert its logic
 		e = []
@@ -1472,31 +1471,38 @@ Transmission.prototype =
 
 	refreshFilterPopup: function()
 	{
-		var tr = this;
+		var i, j, o, s, state, states, counts,
+		    sel_state, fragment, div,
+		    tor, torrents, name, names,
+		    trackers = this.getTrackers(),
+		    tr = this;
 
 		/***
 		****  States
 		***/
 
-		var counts = { };
-		var states = [ Prefs._FilterAll,
-		               Prefs._FilterActive,
-		               Prefs._FilterDownloading,
-		               Prefs._FilterSeeding,
-		               Prefs._FilterPaused,
-		               Prefs._FilterFinished ];
-		for (var i=0, state; state=states[i]; ++i)
+		states = [ Prefs._FilterAll,
+		           Prefs._FilterActive,
+		           Prefs._FilterDownloading,
+		           Prefs._FilterSeeding,
+		           Prefs._FilterPaused,
+		           Prefs._FilterFinished ];
+
+		counts = {};
+		for (i=0; state=states[i]; ++i)
 			counts[state] = 0;
-		var torrents = this.getAllTorrents();
-		for (var i=0, tor; tor=torrents[i]; ++i)
-			for (var j=0, s; s=states[j]; ++j)
-				if (tor.testState(s))
-					counts[s]++;
-		var sel_state = tr[Prefs._FilterMode];
-		var fragment = document.createDocumentFragment();
-		for (var i=0, s; s=states[i]; ++i)
+
+		torrents = this.getAllTorrents();
+		for (i=0; tor=torrents[i]; ++i)
+			for (j=0; state=states[j]; ++j)
+				if (tor.testState(state))
+					counts[state]++;
+
+		sel_state = tr[Prefs._FilterMode];
+		fragment = document.createDocumentFragment();
+		for (i=0; s=states[i]; ++i)
 		{
-			var div = document.createElement('div');
+			div = document.createElement('div');
 			div.id = 'show-state-' + s;
 			div.className = 'row' + (s === sel_state ? ' selected':'');
 			div.innerHTML = '<span class="filter-img"></span>'
@@ -1515,15 +1521,13 @@ Transmission.prototype =
 		****  Trackers
 		***/
 
-		var trackers = this.getTrackers(),
-		    name, name=[],
-		    names = [];
+		names = [];
 		for (name in trackers)
 			names.push (name);
 		names.sort();
 
-		var fragment = document.createDocumentFragment();
-		var div = document.createElement('div');
+		fragment = document.createDocumentFragment();
+		div = document.createElement('div');
 		div.id = 'show-tracker-all';
 		div.className = 'row' + (tr.filterTracker ? '' : ' selected');
 		div.innerHTML = '<span class="filter-img"></span>'
@@ -1534,9 +1538,9 @@ Transmission.prototype =
 			$('#filter-popup').dialog('close');
 		});
 		fragment.appendChild(div);
-		for (var i=0, name; name=names[i]; ++i) {
-			var div = document.createElement('div');
-			var o = trackers[name];
+		for (i=0; name=names[i]; ++i) {
+			o = trackers[name];
+			div = document.createElement('div');
 			div.id = 'show-tracker-' + name;
 			div.className = 'row' + (o.domain === tr.filterTracker  ? ' selected':'');
 			div.innerHTML = '<img class="filter-img" src="http://'+o.domain+'/favicon.ico"/>'
@@ -1567,17 +1571,16 @@ Transmission.prototype =
 
 	setFilterTracker: function(domain)
 	{
-		this.filterTracker = domain;
-
 		// update which tracker is selected in the popup
-		var key = domain ? this.getReadableDomain(domain) : 'all';
-		var id = '#show-tracker-' + key;
+		var key = domain ? this.getReadableDomain(domain) : 'all',
+		    id = '#show-tracker-' + key;
 		$(id).addClass('selected').siblings().removeClass('selected');
 
+		this.filterTracker = domain;
 		this.refilter(true);
 	},
 
-	/* example: "tracker.ubuntu.com" returns "ubuntu.com" */
+	// example: "tracker.ubuntu.com" returns "ubuntu.com"
 	getDomainName: function(host)
 	{
 		var dot = host.indexOf('.');
@@ -1586,7 +1589,7 @@ Transmission.prototype =
 		return host;
 	},
 
-	/* example: "ubuntu.com" returns "Ubuntu" */
+	// example: "ubuntu.com" returns "Ubuntu"
 	getReadableDomain: function(name)
 	{
 		if (name.length)
@@ -1610,7 +1613,9 @@ Transmission.prototype =
 				var domain = this.getDomainName(uri.host);
 				var name = this.getReadableDomain(domain);
 				if (!(name in ret))
-					ret[name] = { 'uri': uri, 'domain': domain, 'count': 0 };
+					ret[name] = { 'uri': uri,
+					              'domain': domain,
+					              'count': 0 };
 				if (names.indexOf(name) === -1)
 					names.push(name);
 			}
