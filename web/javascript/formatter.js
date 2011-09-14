@@ -185,28 +185,31 @@ Transmission.fmt = (function()
 
 		timeInterval: function(seconds)
 		{
-			var result;
-			var days = Math.floor(seconds / 86400);
-			var hours = Math.floor((seconds % 86400) / 3600);
-			var minutes = Math.floor((seconds % 3600) / 60);
-			var seconds = Math.floor((seconds % 3600) % 60);
+			var days    = Math.floor (seconds / 86400),
+			    hours   = Math.floor ((seconds % 86400) / 3600),
+			    minutes = Math.floor ((seconds % 3600) / 60),
+			    seconds = Math.floor (seconds % 60),
+			    d = days    + ' ' + (days    > 1 ? 'days'    : 'day'),
+			    h = hours   + ' ' + (hours   > 1 ? 'hours'   : 'hour'),
+			    m = minutes + ' ' + (minutes > 1 ? 'minutes' : 'minute'),
+			    s = seconds + ' ' + (seconds > 1 ? 'seconds' : 'second');
 
-			if (days > 0 && hours === 0)
-				result = [ days, 'days' ];
-			else if (days > 0 && hours > 0)
-				result = [ days, 'days', hours, 'hr' ];
-			else if (hours > 0 && minutes === 0)
-				result = [ hours, 'hr' ];
-			else if (hours > 0 && minutes > 0)
-				result = [ hours,'hr', minutes, 'min' ];
-			else if (minutes > 0 && seconds === 0)
-				result = [ minutes, 'min' ];
-			else if (minutes > 0 && seconds > 0)
-				result = [ minutes, 'min', seconds, 'seconds' ];
-			else
-				result = [ seconds, 'seconds' ];
-
-			return result.join(' ');
+			if (days) {
+				if (days >= 4 || !hours)
+					return d;
+				return d + ', ' + h;
+			}
+			if (hours) {
+				if (hours >= 4 || !minutes)
+					return h;
+				return h + ', ' + m;
+			}
+			if (minutes) {
+				if (minutes >= 4 || !seconds)
+					return m;
+				return m + ', ' + s;
+			}
+			return s;
 		},
 
 		timestamp: function(seconds)
