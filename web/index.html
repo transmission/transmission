@@ -74,7 +74,7 @@
 			<ul>
 				<li id="prefs-tab-general"><a href="#prefs-page-torrents">Torrents</a></li>
 				<li id="prefs-tab-speed"><a href="#prefs-page-speed">Speed</a></li>
-				<li id="prefs-tab-privacy"><a href="#prefs-page-privacy">Privacy</a></li>
+				<li id="prefs-tab-peers"><a href="#prefs-page-peers">Peers</a></li>
 				<li id="prefs-tab-network"><a href="#prefs-page-network">Network</a></li>
 				<li class="ui-tab-dialog-close"></li>
 			</ul>
@@ -128,16 +128,16 @@
 										<option value="64">Saturday</option></select></div></div>
 					</div>
 				</div>
-				<div id="prefs-page-privacy">
+				<div id="prefs-page-peers">
 					<div class="prefs-section">
-						<div class="title">Blocklist</div>
-						<div class="row"><div class="key"><input type="checkbox" id="blocklist-enabled"/><label for="blocklist-enabled">Enable blocklist:</label></div>
-						                 <div class="value"><input type="text" id="blocklist-url"/></div></div>
-						<div class="row"><div class="key" style="margin-top: 3px; font-size: smaller;">Blocklist has <span id="blocklist-size">?</span> rules</div>
-						                 <div class="value"><input type="button" id="blocklist-update-button" value="Update"/></div></div>
+						<div class="title">Connections</div>
+						<div class="row"><div class="key"><label for="peer-limit-per-torrent">Max peers per torrent:</label></div>
+						                 <div class="value"><input type="text" class="numberinput" id="peer-limit-per-torrent"/></div></div>
+						<div class="row"><div class="key"><label for="peer-limit-global">Max peers overall:</label></div>
+						                 <div class="value"><input type="text" class="numberinput" id="peer-limit-global"/></div></div>
 					</div>
 					<div class="prefs-section">
-						<div class="title">Privacy</div>
+						<div class="title">Options</div>
 						<div class="row"><div class="key">Encryption mode:</div>
 						                 <div class="value"><select id="encryption">
 						                 	<option value="tolerated">Allow encryption</option>
@@ -150,6 +150,13 @@
 						<div class="checkbox-row"><input type="checkbox" id="lpd-enabled" title="LPD is a tool for finding peers on your local network."/>
 						                          <label for="lpd-enabled" title="LPD is a tool for finding peers on your local network.">Use LPD to find more peers</label></div>
 					</div>
+					<div class="prefs-section">
+						<div class="title">Blocklist</div>
+						<div class="row"><div class="key"><input type="checkbox" id="blocklist-enabled"/><label for="blocklist-enabled">Enable blocklist:</label></div>
+						                 <div class="value"><input type="text" id="blocklist-url"/></div></div>
+						<div class="row"><div class="key" style="margin-top: 3px; font-size: smaller;">Blocklist has <span id="blocklist-size">?</span> rules</div>
+						                 <div class="value"><input type="button" id="blocklist-update-button" value="Update"/></div></div>
+					</div>
 				</div>
 				<div id="prefs-page-network">
 					<div class="prefs-section">
@@ -160,13 +167,6 @@
 						                 <div class="value"><span id="port-label">Status: Unknown</span></div></div>
 						<div class="checkbox-row"><input type="checkbox" id="peer-port-random-on-start"/><label for="peer-port-random-on-start">Randomize port on launch</label></div>
 						<div class="checkbox-row"><input type="checkbox" id="port-forwarding-enabled"/><label for="port-forwarding-enabled">Use port forwarding from my router</label></div>
-					</div>
-					<div class="prefs-section">
-						<div class="title">Connections</div>
-						<div class="row"><div class="key"><label for="peer-limit-per-torrent">Max peers per torrent:</label></div>
-						                 <div class="value"><input type="text" class="numberinput" id="peer-limit-per-torrent"/></div></div>
-						<div class="row"><div class="key"><label for="peer-limit-global">Max peers overall:</label></div>
-						                 <div class="value"><input type="text" class="numberinput" id="peer-limit-global"/></div></div>
 					</div>
 					<div class="prefs-section">
 						<div class="title">Options</div>
