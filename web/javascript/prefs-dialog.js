@@ -184,8 +184,7 @@ function PrefsDialog(remote) {
           ? getDefaultMobileOptions()
           : { width: 350, height: 400 };
         o.autoOpen = false;
-        o.show = 'fade';
-        o.hide = 'fade';
+        o.show = o.hide = 'fade';
         o.close = onDialogClosed;
         e.tabbedDialog(o);
 

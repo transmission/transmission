@@ -657,7 +657,11 @@ Transmission.prototype =
 			case 'about-button':
 				o = 'Transmission ' + this.serverVersion;
 				$('#about-dialog #about-title').html(o);
-				$('#about-dialog').dialog({'title':'About'});
+				$('#about-dialog').dialog({
+					title: 'About',
+					show: 'fade',
+					hide: 'fade'
+				});
 				break;
 
 			case 'homepage':
@@ -1669,10 +1673,10 @@ Transmission.prototype =
 		this.hideMobileAddressbar();
 		this.togglePeriodicStatsRefresh(true);
 		$('#stats-dialog').dialog({
-			'close': $.proxy(this.onStatsDialogClosed,this),
-			'show': 'fade',
-			'hide': 'fade',
-			'title': 'Statistics'
+			close: $.proxy(this.onStatsDialogClosed,this),
+			show: 'fade',
+			hide: 'fade',
+			title: 'Statistics'
 		});
 	},
 
