@@ -615,59 +615,6 @@ Transmission.prototype =
 		this.refilter(true);
 	},
 
-	updateGuiFromSession: function(o)
-	{
-		var limit, limited, e, b, text,
-                    fmt = Transmission.fmt,
-                    menu = $('#settings_menu');
-
-		this.serverVersion = o.version;
-
-		this.prefsDialog.set(o);
-
-		if (RPC._TurtleState in o)
-		{
-			b = o[RPC._TurtleState];
-			e = $('#turtle-button');
-			text = [ 'Click to ', (b?'disable':'enable'),
-			         ' Temporary Speed Limits (',
-			         fmt.speed(o[RPC._TurtleUpSpeedLimit]),
-			         ' up,',
-			         fmt.speed(o[RPC._TurtleDownSpeedLimit]),
-			         ' down)' ].join('');
-			e.toggleClass('enabled', b);
-			e.attr('title', text);
-		}
-
-		if (this.isMenuEnabled && (RPC._DownSpeedLimited in o)
-		                       && (RPC._DownSpeedLimit in o))
-		{
-			limit = o[RPC._DownSpeedLimit];
-			limited = o[RPC._DownSpeedLimited];
-
-			e = menu.find('#limited_download_rate');
-                        e.html('Limit (' + fmt.speed(limit) + ')');
-
-                        if (!limited)
-                        	e = menu.find('#unlimited_download_rate');
-                        e.deselectMenuSiblings().selectMenuItem();
-		}
-
-		if (this.isMenuEnabled && (RPC._UpSpeedLimited in o)
-		                       && (RPC._UpSpeedLimit in o))
-		{
-			limit = o[RPC._UpSpeedLimit];
-			limited = o[RPC._UpSpeedLimited];
-
-			e = menu.find('#limited_upload_rate');
-                        e.html('Limit (' + fmt.speed(limit) + ')');
-
-                        if (!limited)
-                        	e = menu.find('#unlimited_upload_rate');
-                        e.deselectMenuSiblings().selectMenuItem();
-		}
-	},
-
 	onMenuClicked: function(ev)
 	{
 		var o, dir,
@@ -904,28 +851,6 @@ Transmission.prototype =
 		}
 	},
 
-	updateStatusbar: function()
-	{
-		var i, row, text,
-		    u=0, d=0,
-		    fmt = Transmission.fmt,
-		    torrents = this.getAllTorrents();
-
-		this.refreshFilterButton();
-
-		// up/down speed
-		for (i=0; row=torrents[i]; ++i) {
-			u += row.getUploadSpeed();
-			d += row.getDownloadSpeed();
-		}
-
-		text = u ? '&uarr; ' + fmt.speedBps(u) : '';
-		setInnerHTML($('#statusbar #speed-up-label')[0], text);
-
-		text = d ? '&darr; ' + fmt.speedBps(d) : '';
-		setInnerHTML($('#statusbar #speed-dn-label')[0], text);
-	},
-
 	shouldAddedTorrentsStart: function()
 	{
 		return this.prefsDialog.shouldAddedTorrentsStart();
@@ -1106,6 +1031,81 @@ Transmission.prototype =
 	/***
 	****
 	***/
+
+	updateGuiFromSession: function(o)
+	{
+		var limit, limited, e, b, text,
+                    fmt = Transmission.fmt,
+                    menu = $('#settings_menu');
+
+		this.serverVersion = o.version;
+
+		this.prefsDialog.set(o);
+
+		if (RPC._TurtleState in o)
+		{
+			b = o[RPC._TurtleState];
+			e = $('#turtle-button');
+			text = [ 'Click to ', (b?'disable':'enable'),
+			         ' Temporary Speed Limits (',
+			         fmt.speed(o[RPC._TurtleUpSpeedLimit]),
+			         ' up,',
+			         fmt.speed(o[RPC._TurtleDownSpeedLimit]),
+			         ' down)' ].join('');
+			e.toggleClass('enabled', b);
+			e.attr('title', text);
+		}
+
+		if (this.isMenuEnabled && (RPC._DownSpeedLimited in o)
+		                       && (RPC._DownSpeedLimit in o))
+		{
+			limit = o[RPC._DownSpeedLimit];
+			limited = o[RPC._DownSpeedLimited];
+
+			e = menu.find('#limited_download_rate');
+                        e.html('Limit (' + fmt.speed(limit) + ')');
+
+                        if (!limited)
+                        	e = menu.find('#unlimited_download_rate');
+                        e.deselectMenuSiblings().selectMenuItem();
+		}
+
+		if (this.isMenuEnabled && (RPC._UpSpeedLimited in o)
+		                       && (RPC._UpSpeedLimit in o))
+		{
+			limit = o[RPC._UpSpeedLimit];
+			limited = o[RPC._UpSpeedLimited];
+
+			e = menu.find('#limited_upload_rate');
+                        e.html('Limit (' + fmt.speed(limit) + ')');
+
+                        if (!limited)
+                        	e = menu.find('#unlimited_upload_rate');
+                        e.deselectMenuSiblings().selectMenuItem();
+		}
+	},
+
+	updateStatusbar: function()
+	{
+		var i, row, text,
+		    u=0, d=0,
+		    fmt = Transmission.fmt,
+		    torrents = this.getAllTorrents();
+
+		this.refreshFilterButton();
+
+		// up/down speed
+		for (i=0; row=torrents[i]; ++i) {
+			u += row.getUploadSpeed();
+			d += row.getDownloadSpeed();
+		}
+
+		text = u ? '&uarr; ' + fmt.speedBps(u) : '';
+		setInnerHTML($('#statusbar #speed-up-label')[0], text);
+
+		text = d ? '&darr; ' + fmt.speedBps(d) : '';
+		setInnerHTML($('#statusbar #speed-dn-label')[0], text);
+	},
 
 	setEnabled: function(key, flag)
 	{
