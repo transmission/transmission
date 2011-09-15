@@ -654,6 +654,12 @@ Transmission.prototype =
 				this.showStatsDialog();
 				break;
 
+			case 'about-button':
+				o = 'Transmission ' + this.serverVersion;
+				$('#about-dialog #about-title').html(o);
+				$('#about-dialog').dialog();
+				break;
+
 			case 'homepage':
 				window.open('http://www.transmissionbt.com/');
 				break;
@@ -1666,7 +1672,7 @@ Transmission.prototype =
 			'close': $.proxy(this.onStatsDialogClosed,this),
 			'show': 'fade',
 			'hide': 'fade',
-			'title': 'Transmission ' + this.serverVersion
+			'title': 'Statistics'
 		});
 	},
 

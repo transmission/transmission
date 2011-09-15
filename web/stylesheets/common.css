@@ -42,6 +42,20 @@ a {
 
 /***
 ****
+****  ABOUT DIALOG
+****
+***/
+
+#about-dialog > * {
+	text-align: center;
+}
+#about-dialog > #about-title {
+	font-size: 1.3em;
+	font-weight: bold;
+}
+
+/***
+****
 ****  TOOLBAR
 ****
 ***/
