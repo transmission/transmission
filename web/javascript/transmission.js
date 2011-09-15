@@ -86,13 +86,6 @@ Transmission.prototype =
 		e.toolbar_start_button      = $('#toolbar #resume_selected')[0];
 		e.toolbar_start_all_button  = $('#toolbar #resume_all')[0];
 		e.toolbar_remove_button     = $('#toolbar #remove')[0];
-		e.context_pause_button      = $('li#context_pause_selected')[0];
-		e.context_start_button      = $('li#context_resume_selected')[0];
-		e.context_start_now_button  = $('li#context_resume_now_selected')[0];
-		e.context_move_top          = $('li#context_move_top')[0];
-		e.context_move_up           = $('li#context_move_up')[0];
-		e.context_move_down         = $('li#context_move_down')[0];
-		e.context_move_bottom       = $('li#context_move_bottom')[0];
 		this.elements = e;
 
 		// Apply the prefs settings to the gui
@@ -225,7 +218,6 @@ Transmission.prototype =
 			menuStyle:         { width: '310px', backgroundColor: '#fff', border: 'none', padding: '5px 0', textAlign: 'left' },
 			itemStyle:         { backgroundColor: 'transparent', margin: '0', padding: '3px 10px 3px 20px', color: '#000', cursor: 'default', border: 'none'},
 			itemHoverStyle:    { backgroundColor: '#24e', color: '#fff', border: 'none'},
-			itemDisabledStyle: { backgroundColor: 'transparent', margin: '0', padding: '3px 10px 3px 20px', color: '#aaa', cursor: 'default', border: 'none'},
 			shadow:            false,
 			boundingElement:   $('div#torrent_container'),
 			boundingRightPad:  20,
@@ -1155,14 +1147,7 @@ Transmission.prototype =
 		}
 
 		this.setEnabled(e.toolbar_pause_button,       haveActiveSel);
-		this.setEnabled(e.context_pause_button,       haveActiveSel);
 		this.setEnabled(e.toolbar_start_button,       havePausedSel);
-		this.setEnabled(e.context_start_button,       havePausedSel);
-		this.setEnabled(e.context_move_top_button,    haveSel);
-		this.setEnabled(e.context_move_up_button,     haveSel);
-		this.setEnabled(e.context_move_down_button,   haveSel);
-		this.setEnabled(e.context_move_bottom_button, haveSel);
-		this.setEnabled(e.context_start_now_button,   havePausedSel);
 		this.setEnabled(e.toolbar_remove_button,      haveSel);
 		this.setEnabled(e.toolbar_pause_all_button,   haveActive);
 		this.setEnabled(e.toolbar_start_all_button,   havePaused);
