@@ -657,7 +657,7 @@ Transmission.prototype =
 			case 'about-button':
 				o = 'Transmission ' + this.serverVersion;
 				$('#about-dialog #about-title').html(o);
-				$('#about-dialog').dialog();
+				$('#about-dialog').dialog({'title':'About'});
 				break;
 
 			case 'homepage':
