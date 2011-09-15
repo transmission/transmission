@@ -487,6 +487,14 @@ function Inspector(controller) {
         data.elements.uploaded       = $(ti+'uploaded')[0];
         data.elements.upload_speed   = $(ti+'upload_speed')[0];
         data.elements.upload_to      = $(ti+'upload_to')[0];
+
+        // force initial 'N/A' updates on all the pages
+        updateInspector();
+        updateInfoPage();
+        updateActivityPage();
+        updatePeersPage();
+        updateTrackersPage();
+        updateFilesPage();
     };
 
     /****
