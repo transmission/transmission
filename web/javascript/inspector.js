@@ -120,7 +120,13 @@ function Inspector(controller) {
             directory   = accumulateString(directory, t.getDownloadDir());
         }
 
-        setInnerHTML(e.pieces, (pieceSize==='Mixed') ? 'Mixed' : ''+pieceCount+' pieces @ '+pieceSize);
+        if (!pieceCount)
+            setInnerHTML(e.pieces, na);
+        else if (pieceSize == 'Mixed')
+            setInnerHTML(e.pieces, 'Mixed');
+        else
+            setInnerHTML(e.pieces, pieceCount + ' pieces @ ' + pieceSize);
+
         setInnerHTML(e.hash, hash || na);
         setInnerHTML(e.secure, secure || na);
         setInnerHTML(e.comment, comment || na);
