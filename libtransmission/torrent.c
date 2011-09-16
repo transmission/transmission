@@ -2748,6 +2748,10 @@ deleteLocalData( tr_torrent * tor, tr_fileFunc func )
     const void * const vstrcmp = strcmp;
     const char * const top = tor->currentDir;
 
+    /* if it's a magnet link, there's nothing to move... */
+    if( !tr_torrentHasMetadata( tor ) )
+        return;
+
     /***
     ****  Move the local data to a new tmpdir
     ***/
