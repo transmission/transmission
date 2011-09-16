@@ -1248,7 +1248,7 @@ Transmission.prototype =
 		if (torrent_count !== visible_count)
 			text += visible_count.toStringWithCommas() + ' of ' + torrent_count.toStringWithCommas();
 		else if (torrent_count === 1)
-			text = '1 Transfer';
+			text += '1 Transfer';
 		else
 			text += torrent_count.toStringWithCommas() + ' Transfers';
 		$('#filter-button').html(text);
