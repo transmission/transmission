@@ -377,9 +377,12 @@ tr_ssha1_matches( const char * source, const char * pass )
     char * hashed;
     uint8_t buf[SHA_DIGEST_LENGTH];
     bool result;
+    const size_t sourcelen = strlen( source );
 
     /* extract the salt */
-    saltlen = strlen( source ) - 2*SHA_DIGEST_LENGTH-1;
+    if( sourcelen < 2*SHA_DIGEST_LENGTH-1 )
+        return false;
+    saltlen = sourcelen - SHA_DIGEST_LENGTH-1;
     salt = tr_malloc( saltlen );
     memcpy( salt, source + 2*SHA_DIGEST_LENGTH+1, saltlen );
 
