@@ -1,3 +1,30 @@
+=== Transmission 2.40 (2011/MM/DD) ===
+[http://trac.transmissionbt.com/query?milestone=2.40&group=component&order=severity All tickets closed by this release]
+==== All Platforms ====
+  * Download and seeding queues
+  * Improved webseed support
+  * Fix crash when removing a magnetized transfer
+  * Fix adding transfers over RPC when a subfolder does not exist
+  * Other minor fixes
+==== Mac ====
+  * Lion: Use a popover for the global and per-torrent action menus
+  * Lion: Animations in the torrent inspector file list and the message window
+  * Sort transfers by size
+  * No longer keep track of recently opened torrent files
+  * Minor interface tweaks and behavior adjustments
+==== GTK+ ====
+  * 
+==== Qt ====
+  * 
+==== Daemon ====
+  * SSL support in transmission-remote
+==== Web Client ====
+  * Speed improvements
+  * Allow preference changes on mobile devices
+  * Allow compact view on mobile devices
+  * Stop ratio functionality
+  * Compact view interface improvements
+
 === Transmission 2.33 (2011/07/20) ===
 [http://trac.transmissionbt.com/query?milestone=2.33&group=component&order=severity All tickets closed by this release]
 ==== All Platforms ====
@@ -114,7 +141,7 @@
 ==== GTK+ ====
   * Add "Add" and "Remove" buttons to the tracker list
   * Add filesize column to the files list
-  * Several minor bugfixes and interface improvements
+  * Several minor bug fixes and interface improvements
 ==== Qt ====
   * Accept info_hash values in the "Add url..." dialog
 ==== Daemon ====
