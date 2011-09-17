@@ -8,14 +8,14 @@
   * Other minor fixes
 ==== Mac ====
   * Lion: Use a popover for the global and per-torrent action menus
-  * Lion: Animations in the torrent inspector file list and the message window
+  * Lion: Animations in the inspector's file list and the message window
   * Sort transfers by size
   * No longer keep track of recently opened torrent files
   * Minor interface tweaks and behavior adjustments
 ==== GTK+ ====
   * Add GTK+ 3 support
   * Make popup notification and system sounds system-configurable
-  * Add a settings option to hard-delete files instead of using the recyle bin
+  * Add a settings option to hard-delete files instead of using the recycle bin
   * Raise the minimum library requirements for GTK+ to 2.22 and glib to 2.28
 ==== Qt ====
   * Add popup notification for finished torrents
