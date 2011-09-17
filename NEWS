@@ -1,7 +1,7 @@
 === Transmission 2.40 (2011/MM/DD) ===
 [http://trac.transmissionbt.com/query?milestone=2.40&group=component&order=severity All tickets closed by this release]
 ==== All Platforms ====
-  * Download and seeding queues
+  * Torrent queuing
   * Improved webseed support
   * Fix crash when removing a magnetized transfer
   * Fix adding transfers over RPC when a subfolder does not exist
@@ -13,17 +13,25 @@
   * No longer keep track of recently opened torrent files
   * Minor interface tweaks and behavior adjustments
 ==== GTK+ ====
-  * 
+  * Add GTK+ 3 support
+  * Make popup notification and system sounds system-configurable
+  * Add a settings option to hard-delete files instead of using the recyle bin
+  * Raise the minimum library requirements for GTK+ to 2.22 and glib to 2.28
 ==== Qt ====
-  * 
+  * Add popup notification for finished torrents
+  * Fix non-UTF-8 display issue in the "New Torrent" dialog
 ==== Daemon ====
   * SSL support in transmission-remote
 ==== Web Client ====
   * Speed improvements
+  * Add filtering by tracker
   * Allow preference changes on mobile devices
   * Allow compact view on mobile devices
   * Stop ratio functionality
   * Compact view interface improvements
+==== Utils ====
+  * Fix transmission-edit bug when adding a tracker to a single-tracker torrent
+  * Fix transmission-create bug when specifying a directory with a leading "./"
 
 === Transmission 2.33 (2011/07/20) ===
 [http://trac.transmissionbt.com/query?milestone=2.33&group=component&order=severity All tickets closed by this release]
