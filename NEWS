@@ -7,7 +7,7 @@
   * Fix adding transfers over RPC when a subfolder does not exist
   * Other minor fixes
 ==== Mac ====
-  * Lion: Use a popover for the global and per-torrent action menus
+  * Lion: Use popovers for the global and per-torrent action menus
   * Lion: Animations in the inspector's file list and the message window
   * Sort transfers by size
   * No longer keep track of recently opened torrent files
