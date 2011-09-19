@@ -186,7 +186,8 @@
 {
     NSMutableArray * components = [NSMutableArray array];
     
-    for (NSUInteger i = 0; i < [self length];)
+    NSUInteger i = 0;
+    while (i < [self length])
     {
         const NSRange range = [self rangeOfCharacterFromSet: separator options: 0 range: NSMakeRange(i, [self length]-i)];
         
@@ -201,8 +202,9 @@
             
             if (range.location == NSNotFound)
                 break;
-            i += length + range.length;
+            i += length;
         }
+        i += range.length;
     }
     
     return components;
