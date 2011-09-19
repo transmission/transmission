@@ -204,7 +204,6 @@
             i += length + range.length;
         }
     }
-    NSLog(@"%@", components);
     
     return components;
 }
