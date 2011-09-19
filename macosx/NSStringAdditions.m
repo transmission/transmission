@@ -184,8 +184,28 @@
 
 - (NSArray *) betterComponentsSeparatedByCharactersInSet: (NSCharacterSet *) separator
 {
-    NSMutableArray * components = [NSMutableArray arrayWithArray: [self componentsSeparatedByCharactersInSet: separator]];
-    [components removeObject: @""];
+    NSMutableArray * components = [NSMutableArray array];
+    
+    for (NSUInteger i = 0; i < [self length];)
+    {
+        const NSRange range = [self rangeOfCharacterFromSet: separator options: 0 range: NSMakeRange(i, [self length]-i)];
+        
+        if (range.location != i)
+        {
+            NSUInteger length;
+            if (range.location == NSNotFound)
+                length = [self length] - i;
+            else
+                length = range.location - i;
+            [components addObject: [self substringWithRange: NSMakeRange(i, length)]];
+            
+            if (range.location == NSNotFound)
+                break;
+            i += length + range.length;
+        }
+    }
+    NSLog(@"%@", components);
+    
     return components;
 }
 
