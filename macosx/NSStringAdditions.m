@@ -193,16 +193,18 @@
         
         if (range.location != i)
         {
-            NSUInteger length;
             if (range.location == NSNotFound)
-                length = [self length] - i;
-            else
-                length = range.location - i;
-            [components addObject: [self substringWithRange: NSMakeRange(i, length)]];
-            
-            if (range.location == NSNotFound)
+            {
+                [components addObject: [self substringFromIndex: i]];
                 break;
-            i += length;
+            }
+            else
+            {
+                const NSUInteger length = range.location - i;
+                [components addObject: [self substringWithRange: NSMakeRange(i, length)]];
+                
+                i += length;
+            }
         }
         i += range.length;
     }
