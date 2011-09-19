@@ -55,7 +55,7 @@
 - (void) setSearchType: (id) sender;
 - (void) setGroupFilter: (id) sender;
 
-- (NSString *) searchString;
+- (NSArray *) searchStrings;
 - (void) focusSearchField;
 
 - (void) setCountAll: (NSUInteger) all active: (NSUInteger) active downloading: (NSUInteger) downloading

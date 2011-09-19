@@ -25,6 +25,7 @@
 #import "FilterBarController.h"
 #import "FilterButton.h"
 #import "GroupsController.h"
+#import "NSStringAdditions.h"
 
 #define FILTER_TYPE_TAG_NAME    401
 #define FILTER_TYPE_TAG_TRACKER 402
@@ -237,9 +238,9 @@
     [[NSNotificationCenter defaultCenter] postNotificationName: @"ApplyFilter" object: nil];
 }
 
-- (NSString *) searchString
+- (NSArray *) searchStrings
 {
-    return [fSearchField stringValue];
+    return [[fSearchField stringValue] betterComponentsSeparatedByCharactersInSet: [NSCharacterSet whitespaceAndNewlineCharacterSet]];
 }
 
 - (void) setCountAll: (NSUInteger) all active: (NSUInteger) active downloading: (NSUInteger) downloading

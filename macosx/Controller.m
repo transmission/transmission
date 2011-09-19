@@ -2000,10 +2000,10 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     const NSInteger groupFilterValue = [fDefaults integerForKey: @"FilterGroup"];
     const BOOL filterGroup = groupFilterValue != GROUP_FILTER_ALL_TAG;
     
-    NSString * searchString = [fFilterBar searchString];
-    if (searchString && [searchString isEqualToString: @""])
-        searchString = nil;
-    const BOOL filterTracker = searchString && [[fDefaults stringForKey: @"FilterSearchType"] isEqualToString: FILTER_TYPE_TRACKER];
+    NSArray * searchStrings = [fFilterBar searchStrings];
+    if (searchStrings && [searchStrings count] == 0)
+        searchStrings = nil;
+    const BOOL filterTracker = searchStrings && [[fDefaults stringForKey: @"FilterSearchType"] isEqualToString: FILTER_TYPE_TRACKER];
     
     NSMutableArray * allTorrents = [NSMutableArray arrayWithCapacity: [fTorrents count]];
     
@@ -2043,30 +2043,45 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
                 continue;
         
         //check text field
-        if (searchString)
+        if (searchStrings)
         {
+            BOOL removeTextField = NO;
             if (filterTracker)
             {
-                BOOL removeTextField = YES;
-                for (NSString * tracker in [torrent allTrackersFlat])
+                NSArray * trackers = [torrent allTrackersFlat];
+                
+                //to count, we need each string in atleast 1 tracker
+                for (NSString * searchString in searchStrings)
                 {
-                    if ([tracker rangeOfString: searchString options:
-                            (NSCaseInsensitiveSearch | NSDiacriticInsensitiveSearch)].location != NSNotFound)
+                    BOOL found = NO;
+                    for (NSString * tracker in trackers)
                     {
-                        removeTextField = NO;
+                        if ([tracker rangeOfString: searchString options:
+                             (NSCaseInsensitiveSearch | NSDiacriticInsensitiveSearch)].location != NSNotFound)
+                        {
+                            found = YES;
+                            break;
+                        }
+                    }
+                    if (!found)
+                    {
+                        removeTextField = YES;
                         break;
                     }
                 }
-                
-                if (removeTextField)
-                    continue;
             }
             else
             {
-                if ([[torrent name] rangeOfString: searchString options:
-                        (NSCaseInsensitiveSearch | NSDiacriticInsensitiveSearch)].location == NSNotFound)
-                    continue;
+                for (NSString * searchString in searchStrings)
+                    if ([[torrent name] rangeOfString: searchString options: (NSCaseInsensitiveSearch | NSDiacriticInsensitiveSearch)].location == NSNotFound)
+                    {
+                        removeTextField = YES;
+                        break;
+                    }
             }
+            
+            if (removeTextField)
+                continue;
         }
         
         [allTorrents addObject: torrent];
@@ -2152,7 +2167,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     [fTableView selectValues: selectedValues];
     [self resetInfo]; //if group is already selected, but the torrents in it change
     
-    [self setBottomCountText: groupRows || filterStatus || filterGroup || searchString];
+    [self setBottomCountText: groupRows || filterStatus || filterGroup || searchStrings];
     
     [self setWindowSizeToFit];
 }

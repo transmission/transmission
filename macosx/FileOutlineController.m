@@ -29,6 +29,7 @@
 #import "FileListNode.h"
 #import "NSApplicationAdditions.h"
 #import "NSMutableArrayAdditions.h"
+#import "NSStringAdditions.h"
 #import <Quartz/Quartz.h>
 
 #import "utils.h"
@@ -112,13 +113,15 @@ typedef enum
 
 - (void) setFilterText: (NSString *) text
 {
-    if ([text isEqualToString: @""])
+    NSArray * components = [text betterComponentsSeparatedByCharactersInSet: [NSCharacterSet whitespaceAndNewlineCharacterSet]];
+    if (!components || [components count] == 0)
+    {
         text = nil;
+        components = nil;
+    }
     
     if ((!text && !fFilterText) || (text && fFilterText && [text isEqualToString: fFilterText]))
-    {
         return;
-    }
     
     const BOOL onLion = [NSApp isOnLionOrBetter];
     
@@ -142,7 +145,18 @@ typedef enum
     NSArray * tempList = !text ? [fTorrent fileList] : [fTorrent flatFileList];
     for (FileListNode * item in tempList)
     {
-        if (!text || [[item name] rangeOfString: text options: (NSCaseInsensitiveSearch | NSDiacriticInsensitiveSearch)].location != NSNotFound)
+        BOOL filter = NO;
+        if (components)
+        {
+            for (NSString * sub in components)
+                if ([[item name] rangeOfString: sub options: (NSCaseInsensitiveSearch | NSDiacriticInsensitiveSearch)].location == NSNotFound)
+                {
+                    filter = YES;
+                    break;
+                }
+        }
+        
+        if (!filter)
         {
             FileListNode * parent = nil;
             NSUInteger previousIndex = ![item isFolder] ? [self findFileNode: item inList: fFileList inRange: NSMakeRange(currentIndex, [fFileList count]-currentIndex) currentParent: nil finalParent: &parent] : NSNotFound;

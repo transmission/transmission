@@ -182,6 +182,13 @@
     return [self compare: string options: comparisonOptions range: NSMakeRange(0, [self length]) locale: [NSLocale currentLocale]];
 }
 
+- (NSArray *) betterComponentsSeparatedByCharactersInSet: (NSCharacterSet *) separator
+{
+    NSMutableArray * components = [NSMutableArray arrayWithArray: [self componentsSeparatedByCharactersInSet: separator]];
+    [components removeObject: @""];
+    return components;
+}
+
 @end
 
 @implementation NSString (Private)
