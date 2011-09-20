@@ -301,6 +301,27 @@ tr_bitfieldSetRaw( tr_bitfield * b, const void * bits, size_t byte_count )
 }
 
 void
+tr_bitfieldSetFromFlags( tr_bitfield * b, const bool * flags, size_t n )
+{
+    size_t i;
+    size_t trueCount = 0;
+
+    tr_bitfieldFreeArray( b );
+    tr_bitfieldEnsureBitsAlloced( b, n );
+
+    for( i=0; i<n; ++i )
+    {
+        if( flags[i] )
+        {
+            ++trueCount;
+            b->bits[i >> 3u] |= ( 0x80 >> ( i & 7u ) );
+        }
+    }
+
+    tr_bitfieldSetTrueCount( b, trueCount );
+}
+
+void
 tr_bitfieldAdd( tr_bitfield * b, size_t nth )
 {
     if( !tr_bitfieldHas( b, nth ) )

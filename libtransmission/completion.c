@@ -255,9 +255,11 @@ tr_cpCreatePieceBitfield( const tr_completion * cp, size_t * byte_count )
         tr_bitfieldSetHasAll( &pieces );
     else if( !tr_cpHasNone( cp ) ) {
         tr_piece_index_t i;
+        bool * flags = tr_new( bool, n );
         for( i=0; i<n; ++i )
-            if( tr_cpPieceIsComplete( cp, i ) )
-                tr_bitfieldAdd( &pieces, i );
+            flags[i] = tr_cpPieceIsComplete( cp, i );
+        tr_bitfieldSetFromFlags( &pieces, flags, n );
+        tr_free( flags );
     }
 
     ret = tr_bitfieldGetRaw( &pieces, byte_count );

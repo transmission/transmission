@@ -70,6 +70,8 @@ tr_bitfieldDestruct( tr_bitfield * b )
 ****
 ***/
 
+void   tr_bitfieldSetFromFlags( tr_bitfield*, const bool * bytes, size_t n );
+
 void   tr_bitfieldSetFromBitfield( tr_bitfield*, const tr_bitfield* );
 
 void   tr_bitfieldSetRaw( tr_bitfield*, const void * bits, size_t byte_count );
