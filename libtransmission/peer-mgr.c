@@ -2775,7 +2775,7 @@ tr_peerMgrClearInterest( tr_torrent * tor )
 /* does this peer have any pieces that we want? */
 static bool
 isPeerInteresting( const tr_torrent  * const tor,
-                   const tr_bitfield * const interesting_pieces,
+                   const bool        * const piece_is_interesting,
                    const tr_peer     * const peer )
 {
     tr_piece_index_t i, n;
@@ -2788,7 +2788,7 @@ isPeerInteresting( const tr_torrent  * const tor,
         return true;
 
     for( i=0, n=tor->info.pieceCount; i<n; ++i )
-        if( tr_bitfieldHas( interesting_pieces, i ) && tr_bitfieldHas( &peer->have, i ) )
+        if( piece_is_interesting[i] && tr_bitfieldHas( &peer->have, i ) )
             return true;
 
     return false;
@@ -2909,22 +2909,21 @@ rechokeDownloads( Torrent * t )
 
     if( peerCount > 0 )
     {
+        bool * piece_is_interesting;
         const tr_torrent * const tor = t->tor;
         const int n = tor->info.pieceCount;
-        tr_bitfield interesting_pieces = TR_BITFIELD_INIT;
 
         /* build a bitfield of interesting pieces... */
-        tr_bitfieldConstruct( &interesting_pieces, n );
+        piece_is_interesting = tr_new( bool, n );
         for( i=0; i<n; i++ )
-            if( !tor->info.pieces[i].dnd && !tr_cpPieceIsComplete( &tor->completion, i ) )
-                tr_bitfieldAdd( &interesting_pieces, i );
+            piece_is_interesting[i] = !tor->info.pieces[i].dnd && !tr_cpPieceIsComplete( &tor->completion, i );
 
         /* decide WHICH peers to be interested in (based on their cancel-to-block ratio) */
         for( i=0; i<peerCount; ++i )
         {
             tr_peer * peer = tr_ptrArrayNth( &t->peers, i );
 
-            if( !isPeerInteresting( t->tor, &interesting_pieces, peer ) )
+            if( !isPeerInteresting( t->tor, piece_is_interesting, peer ) )
             {
                 tr_peerMsgsSetInterested( peer->msgs, false );
             }
@@ -2956,7 +2955,7 @@ rechokeDownloads( Torrent * t )
 
         }
 
-        tr_bitfieldDestruct( &interesting_pieces );
+        tr_free( piece_is_interesting );
     }
 
     /* now that we know which & how many peers to be interested in... update the peer interest */
