@@ -185,8 +185,6 @@ tr_bitfieldEnsureBitsAlloced( tr_bitfield * b, size_t nth )
     size_t bytes_needed;
     const bool has_all = tr_bitfieldHasAll( b );
 
-    assert( tr_bitfieldIsValid( b ) );
-
     if( has_all )
         bytes_needed = get_bytes_needed( MAX( nth, b->true_count ) + 1 );
     else
@@ -194,13 +192,9 @@ tr_bitfieldEnsureBitsAlloced( tr_bitfield * b, size_t nth )
 
     if( b->alloc_count < bytes_needed )
     {
-#ifndef NDEBUG
-        const size_t old_count = countArray( b );
-#endif
         b->bits = tr_renew( uint8_t, b->bits, bytes_needed );
         memset( b->bits + b->alloc_count, 0, bytes_needed - b->alloc_count );
         b->alloc_count = bytes_needed;
-        assert( old_count == countArray( b ) );
 
         if( has_all )
             set_all_true( b->bits, b->true_count );
