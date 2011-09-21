@@ -517,9 +517,6 @@ onTrackerResponse( tr_torrent * tor, const tr_tracker_event * event, void * unus
             for( i = 0; i < event->pexCount; ++i )
                 tr_peerMgrAddPex( tor, TR_PEER_FROM_TRACKER, &event->pex[i], seedProbability );
 
-            if( allAreSeeds && tr_torrentIsPrivate( tor ) )
-                tr_peerMgrMarkAllAsSeeds( tor );
-
             break;
         }
 
