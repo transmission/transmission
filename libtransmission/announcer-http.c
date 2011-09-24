@@ -359,6 +359,22 @@ on_scrape_done( tr_session   * session,
         tr_benc * files;
         const char * str;
         const int benc_loaded = !tr_bencLoad( msg, msglen, &top, NULL );
+        
+        if( getenv( "TR_CURL_VERBOSE" ) != NULL )
+        {
+            if( !benc_loaded )
+                fprintf( stderr, "%s", "Scrape response was not in benc format\n" );
+            else {
+                int i, len;
+                char * str = tr_bencToStr( &top, TR_FMT_JSON, &len );
+                fprintf( stderr, "%s", "Scrape response:\n< " );
+                for( i=0; i<len; ++i )
+                    fputc( str[i], stderr );
+                fputc( '\n', stderr );
+                tr_free( str );
+            }
+        }
+        
         if( benc_loaded )
         {
             if( tr_bencDictFindStr( &top, "failure reason", &str ) )
