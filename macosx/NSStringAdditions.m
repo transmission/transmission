@@ -191,21 +191,19 @@
     {
         const NSRange range = [self rangeOfCharacterFromSet: separator options: 0 range: NSMakeRange(i, [self length]-i)];
         
-        if (range.location != i)
+        if (range.location == NSNotFound)
         {
-            if (range.location == NSNotFound)
-            {
-                [components addObject: [self substringFromIndex: i]];
-                break;
-            }
-            else
-            {
-                const NSUInteger length = range.location - i;
-                [components addObject: [self substringWithRange: NSMakeRange(i, length)]];
-                
-                i += length;
-            }
+            [components addObject: [self substringFromIndex: i]];
+            break;
         }
+        else if (range.location != i)
+        {
+            const NSUInteger length = range.location - i;
+            [components addObject: [self substringWithRange: NSMakeRange(i, length)]];
+            
+            i += length;
+        }
+        
         i += range.length;
     }
     
