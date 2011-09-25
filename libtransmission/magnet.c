@@ -149,10 +149,10 @@ tr_magnetParse( const char * uri )
                 }
             }
 
-            if( ( keylen==2 ) && !memcmp( key, "dn", 2 ) )
+            if( ( vallen > 0 ) && ( keylen==2 ) && !memcmp( key, "dn", 2 ) )
                 displayName = tr_http_unescape( val, vallen );
 
-            if( trCount < MAX_TRACKERS ) {
+            if( ( vallen > 0 ) && ( trCount < MAX_TRACKERS ) ) {
                 int i;
                 if( ( keylen==2 ) && !memcmp( key, "tr", 2 ) )
                     tr[trCount++] = tr_http_unescape( val, vallen );
