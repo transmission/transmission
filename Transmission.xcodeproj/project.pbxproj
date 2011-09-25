@@ -239,6 +239,7 @@
 		A29DF8BE0DB2545F00D04E5A /* verify.h in Headers */ = {isa = PBXBuildFile; fileRef = A2D22A110D65EED100007D5F /* verify.h */; };
 		A29E653613F1603100048D71 /* evutil_rand.c in Sources */ = {isa = PBXBuildFile; fileRef = A29E653513F1603100048D71 /* evutil_rand.c */; };
 		A29EBE710DC06068006CEE80 /* libcurl.4.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A29EBE700DC06068006CEE80 /* libcurl.4.dylib */; };
+		A2A1C81E142EC032008C17BF /* PriorityNone.png in Resources */ = {isa = PBXBuildFile; fileRef = A20B6FA40C4D97840034AB1D /* PriorityNone.png */; };
 		A2A1CB7A0BF29D5500AE959F /* PeerProgressIndicatorCell.m in Sources */ = {isa = PBXBuildFile; fileRef = A2A1CB780BF29D5500AE959F /* PeerProgressIndicatorCell.m */; };
 		A2A3065C0AAD24A80049E2AC /* UKFileWatcher.m in Sources */ = {isa = PBXBuildFile; fileRef = A2A306540AAD24A80049E2AC /* UKFileWatcher.m */; };
 		A2A3065E0AAD24A80049E2AC /* UKFNSubscribeFileWatcher.m in Sources */ = {isa = PBXBuildFile; fileRef = A2A306560AAD24A80049E2AC /* UKFNSubscribeFileWatcher.m */; };
@@ -821,6 +822,7 @@
 		A29EBE520DC01FC9006CEE80 /* web.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = web.c; path = libtransmission/web.c; sourceTree = "<group>"; };
 		A29EBE530DC01FC9006CEE80 /* web.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = web.h; path = libtransmission/web.h; sourceTree = "<group>"; };
 		A29EBE700DC06068006CEE80 /* libcurl.4.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libcurl.4.dylib; path = "third-party/curl/lib/libcurl.4.dylib"; sourceTree = "<group>"; };
+		A2A1C81D142EC032008C17BF /* nl */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = nl; path = macosx/nl.lproj/GlobalOptionsPopover.xib; sourceTree = "<group>"; };
 		A2A1CB770BF29D5500AE959F /* PeerProgressIndicatorCell.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = PeerProgressIndicatorCell.h; path = macosx/PeerProgressIndicatorCell.h; sourceTree = "<group>"; };
 		A2A1CB780BF29D5500AE959F /* PeerProgressIndicatorCell.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = PeerProgressIndicatorCell.m; path = macosx/PeerProgressIndicatorCell.m; sourceTree = "<group>"; };
 		A2A306530AAD24A80049E2AC /* UKFileWatcher.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = UKFileWatcher.h; path = macosx/UKKQueue/UKFileWatcher.h; sourceTree = "<group>"; };
@@ -2153,6 +2155,7 @@
 				A23D5DA71320570800E422BA /* CleanupTemplate.png in Resources */,
 				A220AF7B13D7CC460035C512 /* GlobalOptionsPopover.xib in Resources */,
 				A2963CFE1423F2BB00C497B5 /* PriorityNone.png in Resources */,
+				A2A1C81E142EC032008C17BF /* PriorityNone.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2596,6 +2599,7 @@
 				A29443271419746A0016143A /* ru */,
 				A294432E141B23CD0016143A /* pt_PT */,
 				A2963CFD1423F2BB00C497B5 /* fr */,
+				A2A1C81D142EC032008C17BF /* nl */,
 			);
 			name = GlobalOptionsPopover.xib;
 			sourceTree = "<group>";
