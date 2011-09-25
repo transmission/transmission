@@ -222,7 +222,6 @@
 		A28F4F770E085BDC003A3882 /* ColorTextField.m in Sources */ = {isa = PBXBuildFile; fileRef = A28F4F760E085BDC003A3882 /* ColorTextField.m */; };
 		A292A6E80DFB45FC004B9C0A /* webseed.c in Sources */ = {isa = PBXBuildFile; fileRef = A292A6E50DFB45EC004B9C0A /* webseed.c */; };
 		A29576030D11D63C0093B167 /* Creator.xib in Resources */ = {isa = PBXBuildFile; fileRef = A29576010D11D63C0093B167 /* Creator.xib */; };
-		A2963CFE1423F2BB00C497B5 /* PriorityNone.png in Resources */ = {isa = PBXBuildFile; fileRef = A20B6FA40C4D97840034AB1D /* PriorityNone.png */; };
 		A2966E8713DAF74C007B52DF /* GlobalOptionsPopoverViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A2966E8613DAF74C007B52DF /* GlobalOptionsPopoverViewController.m */; };
 		A296EF3B11E560A7004A2781 /* libiconv.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A296EF3411E5605E004A2781 /* libiconv.dylib */; };
 		A296EF3C11E560BD004A2781 /* libiconv.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A296EF3411E5605E004A2781 /* libiconv.dylib */; };
@@ -239,7 +238,6 @@
 		A29DF8BE0DB2545F00D04E5A /* verify.h in Headers */ = {isa = PBXBuildFile; fileRef = A2D22A110D65EED100007D5F /* verify.h */; };
 		A29E653613F1603100048D71 /* evutil_rand.c in Sources */ = {isa = PBXBuildFile; fileRef = A29E653513F1603100048D71 /* evutil_rand.c */; };
 		A29EBE710DC06068006CEE80 /* libcurl.4.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A29EBE700DC06068006CEE80 /* libcurl.4.dylib */; };
-		A2A1C81E142EC032008C17BF /* PriorityNone.png in Resources */ = {isa = PBXBuildFile; fileRef = A20B6FA40C4D97840034AB1D /* PriorityNone.png */; };
 		A2A1CB7A0BF29D5500AE959F /* PeerProgressIndicatorCell.m in Sources */ = {isa = PBXBuildFile; fileRef = A2A1CB780BF29D5500AE959F /* PeerProgressIndicatorCell.m */; };
 		A2A3065C0AAD24A80049E2AC /* UKFileWatcher.m in Sources */ = {isa = PBXBuildFile; fileRef = A2A306540AAD24A80049E2AC /* UKFileWatcher.m */; };
 		A2A3065E0AAD24A80049E2AC /* UKFNSubscribeFileWatcher.m in Sources */ = {isa = PBXBuildFile; fileRef = A2A306560AAD24A80049E2AC /* UKFNSubscribeFileWatcher.m */; };
@@ -2154,8 +2152,6 @@
 				A2E57B9C13109DC200A7DAB1 /* FilterBar.xib in Resources */,
 				A23D5DA71320570800E422BA /* CleanupTemplate.png in Resources */,
 				A220AF7B13D7CC460035C512 /* GlobalOptionsPopover.xib in Resources */,
-				A2963CFE1423F2BB00C497B5 /* PriorityNone.png in Resources */,
-				A2A1C81E142EC032008C17BF /* PriorityNone.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
