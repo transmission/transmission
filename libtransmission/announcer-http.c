@@ -357,6 +357,7 @@ on_scrape_done( tr_session   * session,
         tr_benc top;
         int64_t intVal;
         tr_benc * files;
+        tr_benc * flags;
         const char * str;
         const int benc_loaded = !tr_bencLoad( msg, msglen, &top, NULL );
         
@@ -380,8 +381,9 @@ on_scrape_done( tr_session   * session,
             if( tr_bencDictFindStr( &top, "failure reason", &str ) )
                 response->errmsg = tr_strdup( str );
 
-            if( tr_bencDictFindInt( &top, "min_request_interval", &intVal ) )
-                response->min_request_interval = intVal;
+            if( tr_bencDictFindDict( &top, "flags", &flags ) )
+                if( tr_bencDictFindInt( flags, "min_request_interval", &intVal ) )
+                    response->min_request_interval = intVal;
 
             if( tr_bencDictFindDict( &top, "files", &files ) )
             {
