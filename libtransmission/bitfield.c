@@ -281,16 +281,30 @@ tr_bitfieldSetFromBitfield( tr_bitfield * b, const tr_bitfield * src )
     else if( tr_bitfieldHasNone( src ) )
         tr_bitfieldSetHasNone( b );
     else
-        tr_bitfieldSetRaw( b, src->bits, src->alloc_count );
+        tr_bitfieldSetRaw( b, src->bits, src->alloc_count, true );
 }
 
 void
-tr_bitfieldSetRaw( tr_bitfield * b, const void * bits, size_t byte_count )
+tr_bitfieldSetRaw( tr_bitfield * b, const void * bits, size_t byte_count, bool bounded )
 {
     tr_bitfieldFreeArray( b );
     b->true_count = 0;
+
+    if( bounded )
+        byte_count = MIN( byte_count, get_bytes_needed( b->bit_count ) );
+
     b->bits = tr_memdup( bits, byte_count );
     b->alloc_count = byte_count;
+
+    if( bounded ) {
+        /* ensure the excess bits are set to '0' */
+        const int excess_bit_count = byte_count*8 - b->bit_count;
+        assert( excess_bit_count >= 0 );
+        assert( excess_bit_count <= 7 );
+        if( excess_bit_count )
+            b->bits[b->alloc_count-1] &= ((0xff) << excess_bit_count);
+    }
+
     tr_bitfieldRebuildTrueCount( b );
 }
 

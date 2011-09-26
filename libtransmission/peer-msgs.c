@@ -1414,7 +1414,7 @@ readBtMessage( tr_peermsgs * msgs, struct evbuffer * inbuf, size_t inlen )
             uint8_t * tmp = tr_new( uint8_t, msglen );
             dbgmsg( msgs, "got a bitfield" );
             tr_peerIoReadBytes( msgs->peer->io, inbuf, tmp, msglen );
-            tr_bitfieldSetRaw( &msgs->peer->have, tmp, msglen );
+            tr_bitfieldSetRaw( &msgs->peer->have, tmp, msglen, tr_torrentHasMetadata( msgs->torrent ) );
             fireClientGotBitfield( msgs, &msgs->peer->have );
             updatePeerProgress( msgs );
             tr_free( tmp );
