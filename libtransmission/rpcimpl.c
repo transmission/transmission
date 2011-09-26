@@ -642,6 +642,7 @@ addField( const tr_torrent * const tor,
         tr_bencDictAddInt( tmp, "fromCache",    f[TR_PEER_FROM_RESUME] );
         tr_bencDictAddInt( tmp, "fromDht",      f[TR_PEER_FROM_DHT] );
         tr_bencDictAddInt( tmp, "fromIncoming", f[TR_PEER_FROM_INCOMING] );
+        tr_bencDictAddInt( tmp, "fromLpd",      f[TR_PEER_FROM_LPD] );
         tr_bencDictAddInt( tmp, "fromLtep",     f[TR_PEER_FROM_LTEP] );
         tr_bencDictAddInt( tmp, "fromPex",      f[TR_PEER_FROM_PEX] );
         tr_bencDictAddInt( tmp, "fromTracker",  f[TR_PEER_FROM_TRACKER] );

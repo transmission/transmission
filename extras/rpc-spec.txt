@@ -247,6 +247,7 @@
                       | fromCache               | number     | tr_stat
                       | fromDht                 | number     | tr_stat
                       | fromIncoming            | number     | tr_stat
+                      | fromLpd                 | number     | tr_stat
                       | fromLtep                | number     | tr_stat
                       | fromPex                 | number     | tr_stat
                       | fromTracker             | number     | tr_stat
@@ -693,6 +694,7 @@
    14    | 2.40    |        NO | torrent-get    | values of "status" field changed
          |         | yes       | torrent-get    | new arg "queuePosition"
          |         | yes       | torrent-get    | new arg "isStalled"
+         |         | yes       | torrent-get    | new arg "fromLpd" in peersFrom
          |         | yes       | torrent-set    | new arg "queuePosition"
          |         | yes       | session-set    | new arg "download-queue-size"
          |         | yes       | session-set    | new arg "download-queue-enabled"
