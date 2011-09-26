@@ -401,7 +401,7 @@ getPeer( Torrent * torrent, struct peer_atom * atom )
     if( peer == NULL )
     {
         peer = peerNew( atom );
-        tr_bitfieldConstruct( &peer->have, torrent->tor->blockCount );
+        tr_bitfieldConstruct( &peer->have, torrent->tor->info.pieceCount );
         tr_bitfieldConstruct( &peer->blame, torrent->tor->blockCount );
         tr_ptrArrayInsertSorted( &torrent->peers, peer, peerCompare );
     }
