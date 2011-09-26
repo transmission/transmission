@@ -48,9 +48,11 @@ tr_cpBlockInit( tr_completion * cp, const tr_bitfield * b )
 
     /* set sizeNow */
     cp->sizeNow = tr_bitfieldCountTrueBits( &cp->blockBitfield );
+    assert( cp->sizeNow <= cp->tor->blockCount );
     cp->sizeNow *= cp->tor->blockSize;
     if( tr_bitfieldHas( b, cp->tor->blockCount-1 ) )
         cp->sizeNow -= ( cp->tor->blockSize - cp->tor->lastBlockSize );
+    assert( cp->sizeNow <= cp->tor->info.totalSize );
 }
 
 /***
@@ -141,38 +143,66 @@ tr_cpSizeWhenDone( const tr_completion * ccp )
     {
         uint64_t size = 0;
         const tr_torrent * tor = ccp->tor;
+        const tr_info * inf = tr_torrentInfo( tor );
         tr_completion * cp = (tr_completion *) ccp; /* mutable */
 
         if( tr_cpHasAll( ccp ) )
         {
-            size = tor->info.totalSize;
+            size = inf->totalSize;
         }
         else
         {
             tr_piece_index_t p;
 
-            for( p=0; p<tor->info.pieceCount; ++p )
+            for( p=0; p<inf->pieceCount; ++p )
             {
-                if( !tor->info.pieces[p].dnd )
+                uint64_t n = 0;
+                const uint64_t pieceSize = tr_torPieceCountBytes( tor, p );
+
+                if( !inf->pieces[p].dnd )
                 {
-                    size += tr_torPieceCountBytes( tor, p );
+                    n = pieceSize;
                 }
                 else
                 {
+                    uint64_t o = 0;
                     tr_block_index_t b, f, l;
                     tr_torGetPieceBlockRange( cp->tor, p, &f, &l );
                     for( b=f; b<=l; ++b )
                         if( tr_cpBlockIsComplete( cp, b ) )
-                            size += tr_torBlockCountBytes( tor, b );
+                            n += tr_torBlockCountBytes( tor, b );
+
+                    o = tr_bitfieldCountRange( &cp->blockBitfield, f, l+1 );
+                    o *= cp->tor->blockSize;
+                    if( l == ( cp->tor->blockCount - 1 )  && tr_bitfieldHas( &cp->blockBitfield, l ) )
+                        o -= ( cp->tor->blockSize - cp->tor->lastBlockSize );
+
+                    assert( n == o );
                 }
+
+                assert( n <= tr_torPieceCountBytes( tor, p ) );
+                size += n;
             }
         }
+
+        assert( size <= inf->totalSize );
+        assert( size >= cp->sizeNow );
 
         cp->sizeWhenDoneLazy = size;
         cp->sizeWhenDoneIsDirty = false;
     }
 
     return ccp->sizeWhenDoneLazy;
+}
+
+uint64_t
+tr_cpLeftUntilDone( const tr_completion * cp )
+{
+    const uint64_t sizeWhenDone = tr_cpSizeWhenDone( cp );
+
+    assert( sizeWhenDone >= cp->sizeNow );
+
+    return sizeWhenDone - cp->sizeNow;
 }
 
 void

@@ -76,6 +76,8 @@ uint64_t          tr_cpHaveValid( const tr_completion * );
 
 uint64_t          tr_cpSizeWhenDone( const tr_completion * );
 
+uint64_t          tr_cpLeftUntilDone( const tr_completion * );
+
 void              tr_cpGetAmountDone( const   tr_completion * completion,
                                       float                 * tab,
                                       int                     tabCount );
@@ -91,12 +93,6 @@ static inline uint64_t
 tr_cpLeftUntilComplete( const tr_completion * cp )
 {
     return tr_torrentInfo(cp->tor)->totalSize - cp->sizeNow;
-}
-
-static inline uint64_t
-tr_cpLeftUntilDone( const tr_completion * cp )
-{
-    return tr_cpSizeWhenDone( cp ) - cp->sizeNow;
 }
 
 static inline bool tr_cpHasAll( const tr_completion * cp )
