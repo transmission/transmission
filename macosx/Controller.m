@@ -4190,6 +4190,13 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     
     Torrent * torrent = [[Torrent alloc] initWithTorrentStruct: torrentStruct location: location lib: fLib];
     
+    //change the location if the group calls for it (this has to wait until after the torrent is created)
+    if ([[GroupsController groups] usesCustomDownloadLocationForIndex: [torrent groupValue]])
+    {
+        location = [[GroupsController groups] customDownloadLocationForIndex: [torrent groupValue]];
+        [torrent changeDownloadFolderBeforeUsing: location];
+    }
+    
     [torrent update];
     [fTorrents addObject: torrent];
     [torrent release];
