@@ -205,6 +205,10 @@ function PrefsDialog(remote) {
                     break;
 
                 case 'text':
+                case 'url':
+                case 'email':
+                case 'number':
+                case 'search':
                     e.focus(onControlFocused);
                     e.blur(onControlBlurred);
 
@@ -266,6 +270,10 @@ function PrefsDialog(remote) {
                     setGroupEnabled(key, val);
                     break;
                 case 'text':
+                case 'url':
+                case 'email':
+                case 'number':
+                case 'search':
                     // don't change the text if the user's editing it.
                     // it's very annoying when that happens!
                     if (e[0] !== document.activeElement)
