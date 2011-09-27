@@ -11,6 +11,7 @@
   * Lion: Animations in the inspector's file list and the message window
   * Support sorting transfers by size
   * No longer keep track of recently opened torrent files
+  * Apply group locations when adding transfers through the web client/RPC
   * Minor interface tweaks and behavior adjustments
 ==== GTK+ ====
   * Add GTK+ 3 support
