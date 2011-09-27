@@ -36,7 +36,7 @@ BUILDING
 
   Building Transmission from SVN (First Time):
 
-    $ svn co svn://svn.transmissionbt.org/Transmission/trunk Transmission
+    $ svn co svn://svn.transmissionbt.com/Transmission/trunk Transmission
     $ cd Transmission
     $ ./autogen.sh
     $ make
