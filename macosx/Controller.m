@@ -4105,7 +4105,6 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     }
 }
 
-#warning handle queue state changes
 - (void) rpcCallback: (tr_rpc_callback_type) type forTorrentStruct: (struct tr_torrent *) torrentStruct
 {
     NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
