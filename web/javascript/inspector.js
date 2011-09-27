@@ -129,7 +129,7 @@ function Inspector(controller) {
 
         setInnerHTML(e.hash, hash || na);
         setInnerHTML(e.secure, secure || na);
-        setInnerHTML(e.comment, comment || na);
+        setInnerHTML(e.comment, comment.replace(/(https?|ftp):\/\/([\w\-]+(\.[\w\-]+)*(\.[a-z]{2,4})?)(\d{1,5})?(\/([^<>\s]*))?/g, '<a target="_blank" href="$&">$&</a>') || na);
         setInnerHTML(e.creator, creator || na);
         setInnerHTML(e.date, date || na);
         setInnerHTML(e.directory, directory || na);
