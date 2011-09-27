@@ -199,8 +199,6 @@ tr_bitfieldEnsureBitsAlloced( tr_bitfield * b, size_t nth )
         if( has_all )
             set_all_true( b->bits, b->true_count );
     }
-
-    assert( tr_bitfieldIsValid( b ) );
 }
 
 static void
