@@ -33,6 +33,7 @@ Transmission.prototype =
 		this._torrents     = {};
 		this._rows         = [];
 		this.dirtyTorrents = {};
+		this.uriCache      = {};
 
 		// Initialize the clutch preferences
 		Prefs.getClutchPrefs(this);
@@ -1549,19 +1550,29 @@ Transmission.prototype =
 		var ret = {};
 
 		var torrents = this.getAllTorrents();
-		for (var i=0, torrent; torrent=torrents[i]; ++i) {
+		for (var i=0, torrent; torrent=torrents[i]; ++i)
+		{
 			var names = [];
 			var trackers = torrent.getTrackers();
-			for (var j=0, tracker; tracker=trackers[j]; ++j) {
-				var uri = parseUri(tracker.announce);
-				var domain = this.getDomainName(uri.host);
-				var name = this.getReadableDomain(domain);
-				if (!(name in ret))
-					ret[name] = { 'uri': uri,
-					              'domain': domain,
-					              'count': 0 };
-				if (names.indexOf(name) === -1)
-					names.push(name);
+			for (var j=0, tracker; tracker=trackers[j]; ++j)
+			{
+				var uri, announce = tracker.announce;
+
+				if (announce in this.uriCache)
+					uri = this.uriCache[announce];
+				else {
+					uri = this.uriCache[announce] = parseUri (announce);
+					uri.domain = this.getDomainName (uri.host);
+					uri.name = this.getReadableDomain (uri.domain);
+				}
+
+				if (!(uri.name in ret))
+					ret[uri.name] = { 'uri': uri,
+					                  'domain': uri.domain,
+					                  'count': 0 };
+
+				if (names.indexOf(uri.name) === -1)
+					names.push(uri.name);
 			}
 			for (var j=0, name; name=names[j]; ++j)
 				ret[name].count++;
