@@ -1545,6 +1545,7 @@ freeTorrent( tr_torrent * tor )
     tr_bandwidthDestruct( &tor->bandwidth );
 
     tr_metainfoFree( inf );
+    memset( tor, ~0, sizeof( tr_torrent ) );
     tr_free( tor );
 
     tr_sessionUnlock( session );
