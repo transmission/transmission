@@ -393,7 +393,7 @@
     [descriptors release];
     
     NSSavePanel * panel = [NSSavePanel savePanel];
-    [panel setRequiredFileType: @"txt"];
+    [panel setAllowedFileTypes: [NSArray arrayWithObject: @"txt"]];
     [panel setCanSelectHiddenExtension: YES];
     
     [panel beginSheetForDirectory: nil file: NSLocalizedString(@"untitled", "Save log panel -> default file name")
