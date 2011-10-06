@@ -221,7 +221,7 @@
     NSInteger index = [[GroupsController groups] indexForRow: [fTableView selectedRow]];
     if (code == NSOKButton)
     {
-        NSString * path = [[openPanel filenames] objectAtIndex: 0];
+        NSString * path = [[[openPanel URLs] objectAtIndex: 0] path];
         [[GroupsController groups] setCustomDownloadLocation: path forIndex: index];
         [[GroupsController groups] setUsesCustomDownloadLocation: YES forIndex: index];
     }

@@ -327,7 +327,7 @@
     if (code == NSOKButton)
     {
         fLockDestination = NO;
-        [self setDestinationPath: [[openPanel filenames] objectAtIndex: 0]];
+        [self setDestinationPath: [[[openPanel URLs] objectAtIndex: 0] path]];
     }
     else
     {

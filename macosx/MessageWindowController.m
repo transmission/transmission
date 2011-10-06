@@ -404,14 +404,14 @@
     
         NSString * fileString = [messageStrings componentsJoinedByString: @"\n"];
         
-        if (![fileString writeToFile: [panel filename] atomically: YES encoding: NSUTF8StringEncoding error: nil])
+        if (![fileString writeToFile: [[panel URL] path] atomically: YES encoding: NSUTF8StringEncoding error: nil])
         {
             NSAlert * alert = [[NSAlert alloc] init];
             [alert addButtonWithTitle: NSLocalizedString(@"OK", "Save log alert panel -> button")];
             [alert setMessageText: NSLocalizedString(@"Log Could Not Be Saved", "Save log alert panel -> title")];
             [alert setInformativeText: [NSString stringWithFormat:
                     NSLocalizedString(@"There was a problem creating the file \"%@\".",
-                    "Save log alert panel -> message"), [[panel filename] lastPathComponent]]];
+                    "Save log alert panel -> message"), [[[panel URL] path] lastPathComponent]]];
             [alert setAlertStyle: NSWarningAlertStyle];
             
             [alert runModal];

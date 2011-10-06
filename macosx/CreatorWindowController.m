@@ -404,7 +404,7 @@
     [panel setMessage: NSLocalizedString(@"Select a file or folder for the torrent file.", "Create torrent -> select file")];
     
     BOOL success = [panel runModal] == NSOKButton;
-    return success ? [[panel filenames] objectAtIndex: 0] : nil;
+    return success ? [[[panel URLs] objectAtIndex: 0] path] : nil;
 }
 
 - (void) locationSheetClosed: (NSSavePanel *) panel returnCode: (NSInteger) code contextInfo: (void *) info
@@ -412,7 +412,7 @@
     if (code == NSOKButton)
     {
         [fLocation release];
-        fLocation = [[panel filename] retain];
+        fLocation = [[[panel URL] path] retain];
         
         [fLocationField setStringValue: [fLocation stringByAbbreviatingWithTildeInPath]];
         [fLocationField setToolTip: fLocation];

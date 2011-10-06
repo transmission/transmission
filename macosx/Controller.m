@@ -1445,7 +1445,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     if (code == NSOKButton)
     {
         for (Torrent * torrent in torrents)
-            [torrent moveTorrentDataFileTo: [[panel filenames] objectAtIndex: 0]];
+            [torrent moveTorrentDataFileTo: [[[panel URLs] objectAtIndex: 0] path]];
     }
     
     [torrents release];
@@ -1501,7 +1501,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 {
     //copy torrent to new location with name of data file
     if (code == NSOKButton)
-        [[torrents objectAtIndex: 0] copyTorrentFileTo: [panel filename]];
+        [[torrents objectAtIndex: 0] copyTorrentFileTo: [[panel URL] path]];
     
     [torrents removeObjectAtIndex: 0];
     [self performSelectorOnMainThread: @selector(copyTorrentFileForTorrents:) withObject: torrents waitUntilDone: NO];
