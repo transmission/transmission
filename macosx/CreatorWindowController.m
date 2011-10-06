@@ -146,7 +146,7 @@
     const BOOL multifile = !fInfo->isSingleFile;
     
     NSImage * icon = [[NSWorkspace sharedWorkspace] iconForFileType: multifile
-                        ? NSFileTypeForHFSTypeCode('fldr') : [fPath pathExtension]];
+                        ? NSFileTypeForHFSTypeCode(kGenericFolderIcon) : [fPath pathExtension]];
     [icon setSize: [fIconView frame].size];
     [fIconView setImage: icon];
     

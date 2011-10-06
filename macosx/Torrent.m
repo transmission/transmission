@@ -604,9 +604,9 @@ int trashDataFile(const char * filename)
     if ([self isMagnet])
         return [NSImage imageNamed: @"Magnet.png"];
     
-    #warning replace 'fldr' stuff with NSImageNameFolder on 10.6
+    #warning replace kGenericFolderIcon stuff with NSImageNameFolder on 10.6
     if (!fIcon)
-        fIcon = [[[NSWorkspace sharedWorkspace] iconForFileType: [self isFolder] ? NSFileTypeForHFSTypeCode('fldr')
+        fIcon = [[[NSWorkspace sharedWorkspace] iconForFileType: [self isFolder] ? NSFileTypeForHFSTypeCode(kGenericFolderIcon)
                                                                                 : [[self name] pathExtension]] retain];
     return fIcon;
 }

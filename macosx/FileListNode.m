@@ -124,7 +124,7 @@
 - (NSImage *) icon
 {
     if (!fIcon)
-        fIcon = [[[NSWorkspace sharedWorkspace] iconForFileType: fIsFolder ? NSFileTypeForHFSTypeCode('fldr')
+        fIcon = [[[NSWorkspace sharedWorkspace] iconForFileType: fIsFolder ? NSFileTypeForHFSTypeCode(kGenericFolderIcon)
                                                                             : [fName pathExtension]] retain];
     return fIcon;
 }
