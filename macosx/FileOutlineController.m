@@ -252,9 +252,8 @@ typedef enum
 
 - (void) outlineViewSelectionDidChange: (NSNotification *) notification
 {
-    if ([NSApp isOnSnowLeopardOrBetter] && [QLPreviewPanelSL sharedPreviewPanelExists]
-        && [[QLPreviewPanelSL sharedPreviewPanel] isVisible])
-        [[QLPreviewPanelSL sharedPreviewPanel] reloadData];
+    if ([QLPreviewPanel sharedPreviewPanelExists] && [[QLPreviewPanel sharedPreviewPanel] isVisible])
+        [[QLPreviewPanel sharedPreviewPanel] reloadData];
 }
 
 - (NSInteger) outlineView: (NSOutlineView *) outlineView numberOfChildrenOfItem: (id) item
@@ -309,7 +308,7 @@ typedef enum
     if ([identifier isEqualToString: @"Check"])
     {
         NSIndexSet * indexSet;
-        if (([NSApp isOnSnowLeopardOrBetter] ? [NSEvent modifierFlags] : [[NSApp currentEvent] modifierFlags]) & NSAlternateKeyMask)
+        if ([NSEvent modifierFlags] & NSAlternateKeyMask)
             indexSet = [NSIndexSet indexSetWithIndexesInRange: NSMakeRange(0, [fTorrent fileCount])];
         else
             indexSet = [(FileListNode *)item indexes];
@@ -458,28 +457,16 @@ typedef enum
         tr_wait_msec(100);
     
     NSIndexSet * indexes = [fOutline selectedRowIndexes];
-    if ([NSApp isOnSnowLeopardOrBetter])
+    NSMutableArray * paths = [NSMutableArray arrayWithCapacity: [indexes count]];
+    for (NSUInteger i = [indexes firstIndex]; i != NSNotFound; i = [indexes indexGreaterThanIndex: i])
     {
-        NSMutableArray * paths = [NSMutableArray arrayWithCapacity: [indexes count]];
-        for (NSUInteger i = [indexes firstIndex]; i != NSNotFound; i = [indexes indexGreaterThanIndex: i])
-        {
-            NSString * path = [fTorrent fileLocation: [fOutline itemAtRow: i]];
-            if (path)
-                [paths addObject: [NSURL fileURLWithPath: path]];
-        }
-        
-        if ([paths count])
-            [[NSWorkspace sharedWorkspace] activateFileViewerSelectingURLs: paths];
+        NSString * path = [fTorrent fileLocation: [fOutline itemAtRow: i]];
+        if (path)
+            [paths addObject: [NSURL fileURLWithPath: path]];
     }
-    else
-    {
-        for (NSUInteger i = [indexes firstIndex]; i != NSNotFound; i = [indexes indexGreaterThanIndex: i])
-        {
-            NSString * path = [fTorrent fileLocation: [fOutline itemAtRow: i]];
-            if (path)
-                [[NSWorkspace sharedWorkspace] selectFile: path inFileViewerRootedAtPath: nil];
-        }
-    }
+    
+    if ([paths count] > 0)
+        [[NSWorkspace sharedWorkspace] activateFileViewerSelectingURLs: paths];
     
     [fLock unlock];
 }

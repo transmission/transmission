@@ -23,7 +23,6 @@
  *****************************************************************************/
 
 #import "InfoTrackersViewController.h"
-#import "NSApplicationAdditions.h"
 #import "Torrent.h"
 #import "TrackerCell.h"
 #import "TrackerNode.h"
@@ -121,21 +120,18 @@
     {
         NSAssert1([fTorrents count] == 1, @"Attempting to add tracker with %d transfers selected", [fTorrents count]);
         
-        if ([NSApp isOnSnowLeopardOrBetter])
-        {
-            NSIndexSet * addedIndexes = [NSIndexSet indexSetWithIndexesInRange: NSMakeRange([fTrackers count]-2, 2)];
-            NSArray * tierAndTrackerBeingAdded = [fTrackers objectsAtIndexes: addedIndexes];
-            
-            [fTrackers release];
-            fTrackers = [[[fTorrents objectAtIndex: 0] allTrackerStats] retain];
-            [fTrackers addObjectsFromArray: tierAndTrackerBeingAdded];
-            
-            [fTrackerTable setTrackers: fTrackers];
-            
-            NSIndexSet * updateIndexes = [NSIndexSet indexSetWithIndexesInRange: NSMakeRange(0, [fTrackers count]-2)],
-                    * columnIndexes = [NSIndexSet indexSetWithIndexesInRange: NSMakeRange(0, [[fTrackerTable tableColumns] count])];
-            [fTrackerTable reloadDataForRowIndexes: updateIndexes columnIndexes: columnIndexes];
-        }
+        NSIndexSet * addedIndexes = [NSIndexSet indexSetWithIndexesInRange: NSMakeRange([fTrackers count]-2, 2)];
+        NSArray * tierAndTrackerBeingAdded = [fTrackers objectsAtIndexes: addedIndexes];
+        
+        [fTrackers release];
+        fTrackers = [[[fTorrents objectAtIndex: 0] allTrackerStats] retain];
+        [fTrackers addObjectsFromArray: tierAndTrackerBeingAdded];
+        
+        [fTrackerTable setTrackers: fTrackers];
+        
+        NSIndexSet * updateIndexes = [NSIndexSet indexSetWithIndexesInRange: NSMakeRange(0, [fTrackers count]-2)],
+                * columnIndexes = [NSIndexSet indexSetWithIndexesInRange: NSMakeRange(0, [[fTrackerTable tableColumns] count])];
+        [fTrackerTable reloadDataForRowIndexes: updateIndexes columnIndexes: columnIndexes];
     }
 }
 

@@ -43,7 +43,6 @@
 + (NSString *) timeString: (uint64_t) seconds showSeconds: (BOOL) showSeconds;
 + (NSString *) timeString: (uint64_t) seconds showSeconds: (BOOL) showSeconds maxFields: (NSUInteger) max;
 
-- (NSComparisonResult) compareFinder: (NSString *) string; //how the Finder compares strings
 - (NSComparisonResult) compareNumeric: (NSString *) string; //simple compare method for strings with numbers (works for IP addresses)
 
 - (NSArray *) betterComponentsSeparatedByCharactersInSet: (NSCharacterSet *) separator; //like betterComponentsSeparatedByCharactersInSet:, but excludes blank values

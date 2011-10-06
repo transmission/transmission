@@ -18,7 +18,6 @@
  #define HAVE_GETPAGESIZE
  #define HAVE_ICONV_OPEN
  #define HAVE_VALLOC
- #undef HAVE_POSIX_MEMALIGN /* not supported on OS X 10.5 and lower */
 #endif
 
 #include <assert.h>

@@ -1786,8 +1786,7 @@ int trashDataFile(const char * filename)
 
 - (void) sortFileList: (NSMutableArray *) fileNodes
 {
-    NSSortDescriptor * descriptor = [[[NSSortDescriptor alloc] initWithKey: @"name" ascending: YES
-                                            selector: @selector(compareFinder:)] autorelease];
+    NSSortDescriptor * descriptor = [NSSortDescriptor sortDescriptorWithKey: @"name" ascending: YES selector: @selector(localizedStandardCompare:)];
     [fileNodes sortUsingDescriptors: [NSArray arrayWithObject: descriptor]];
     
     for (FileListNode * node in fileNodes)

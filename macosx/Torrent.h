@@ -28,8 +28,7 @@
 
 @class FileListNode;
 
-#warning uncomment
-@interface Torrent : NSObject <NSCopying>//, QLPreviewItem>
+@interface Torrent : NSObject <NSCopying, QLPreviewItem>
 {
     tr_torrent * fHandle;
     const tr_info * fInfo;

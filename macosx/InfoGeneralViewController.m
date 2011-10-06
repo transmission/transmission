@@ -23,7 +23,6 @@
  *****************************************************************************/
 
 #import "InfoGeneralViewController.h"
-#import "NSApplicationAdditions.h"
 #import "NSStringAdditions.h"
 #import "Torrent.h"
 
@@ -43,24 +42,6 @@
     }
     
     return self;
-}
-
-- (void) awakeFromNib
-{
-    if (![NSApp isOnSnowLeopardOrBetter])
-    {
-        NSImage * revealOn = [[NSImage imageNamed: @"RevealOn.png"] copy],
-                * revealOff = [[NSImage imageNamed: @"RevealOff.png"] copy];
-        
-        [revealOn setFlipped: NO];
-        [revealOff setFlipped: NO];
-        
-        [fRevealDataButton setImage: revealOff];
-        [fRevealDataButton setAlternateImage: revealOn];
-        
-        [revealOn release];
-        [revealOff release];
-    }
 }
 
 - (void) dealloc
@@ -103,13 +84,8 @@
     if (!location)
         return;
     
-    if ([NSApp isOnSnowLeopardOrBetter])
-    {
-        NSURL * file = [NSURL fileURLWithPath: location];
-        [[NSWorkspace sharedWorkspace] activateFileViewerSelectingURLs: [NSArray arrayWithObject: file]];
-    }
-    else
-        [[NSWorkspace sharedWorkspace] selectFile: location inFileViewerRootedAtPath: nil];
+    NSURL * file = [NSURL fileURLWithPath: location];
+    [[NSWorkspace sharedWorkspace] activateFileViewerSelectingURLs: [NSArray arrayWithObject: file]];
 }
 
 @end

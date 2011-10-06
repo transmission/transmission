@@ -159,27 +159,8 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 + (void) initialize
 {
     //make sure another Transmission.app isn't running already
-    BOOL othersRunning = NO;
-    
-    if ([NSApp isOnSnowLeopardOrBetter])
-    {
-        NSArray * apps = [NSRunningApplicationSL runningApplicationsWithBundleIdentifier: [[NSBundle mainBundle] bundleIdentifier]];
-        othersRunning = [apps count] > 1;
-    }
-    else
-    {
-        NSString * bundleIdentifier = [[NSBundle mainBundle] bundleIdentifier];
-        const int processIdentifier = [[NSProcessInfo processInfo] processIdentifier];
-
-        for (NSDictionary * dic in [[NSWorkspace sharedWorkspace] launchedApplications])
-        {
-            if ([[dic objectForKey: @"NSApplicationBundleIdentifier"] isEqualToString: bundleIdentifier]
-                    && [[dic objectForKey: @"NSApplicationProcessIdentifier"] intValue] != processIdentifier)
-                othersRunning = YES;
-        }
-    }
-    
-    if (othersRunning)
+    NSArray * apps = [NSRunningApplication runningApplicationsWithBundleIdentifier: [[NSBundle mainBundle] bundleIdentifier]];
+    if ([apps count] > 1)
     {
         NSAlert * alert = [[NSAlert alloc] init];
         [alert addButtonWithTitle: NSLocalizedString(@"Quit", "Transmission already running alert -> button")];
@@ -323,19 +304,17 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         tr_bencDictAddStr(&settings, TR_PREFS_KEY_SCRIPT_TORRENT_DONE_FILENAME, [[fDefaults stringForKey: @"DoneScriptPath"] UTF8String]);
         tr_bencDictAddBool(&settings, TR_PREFS_KEY_UTP_ENABLED, [fDefaults boolForKey: @"UTPGlobal"]);
         
-        tr_formatter_size_init([NSApp isOnSnowLeopardOrBetter] ? 1000 : 1024,
-                                    [NSLocalizedString(@"KB", "File size - kilobytes") UTF8String],
-                                    [NSLocalizedString(@"MB", "File size - megabytes") UTF8String],
-                                    [NSLocalizedString(@"GB", "File size - gigabytes") UTF8String],
-                                    [NSLocalizedString(@"TB", "File size - terabytes") UTF8String]);
+        tr_formatter_size_init(1000, [NSLocalizedString(@"KB", "File size - kilobytes") UTF8String],
+                                        [NSLocalizedString(@"MB", "File size - megabytes") UTF8String],
+                                        [NSLocalizedString(@"GB", "File size - gigabytes") UTF8String],
+                                        [NSLocalizedString(@"TB", "File size - terabytes") UTF8String]);
 
-        tr_formatter_speed_init([NSApp isOnSnowLeopardOrBetter] ? 1000 : 1024,
-                                    [NSLocalizedString(@"KB/s", "Transfer speed (kilobytes per second)") UTF8String],
-                                    [NSLocalizedString(@"MB/s", "Transfer speed (megabytes per second)") UTF8String],
-                                    [NSLocalizedString(@"GB/s", "Transfer speed (gigabytes per second)") UTF8String],
-                                    [NSLocalizedString(@"TB/s", "Transfer speed (terabytes per second)") UTF8String]); //why not?
+        tr_formatter_speed_init(1000, [NSLocalizedString(@"KB/s", "Transfer speed (kilobytes per second)") UTF8String],
+                                        [NSLocalizedString(@"MB/s", "Transfer speed (megabytes per second)") UTF8String],
+                                        [NSLocalizedString(@"GB/s", "Transfer speed (gigabytes per second)") UTF8String],
+                                        [NSLocalizedString(@"TB/s", "Transfer speed (terabytes per second)") UTF8String]); //why not?
 
-        tr_formatter_mem_init(1024, [NSLocalizedString(@"KB", "Memory size - kilobytes") UTF8String],
+        tr_formatter_mem_init(1000, [NSLocalizedString(@"KB", "Memory size - kilobytes") UTF8String],
                                     [NSLocalizedString(@"MB", "Memory size - megabytes") UTF8String],
                                     [NSLocalizedString(@"GB", "Memory size - gigabytes") UTF8String],
                                     [NSLocalizedString(@"TB", "Memory size - terabytes") UTF8String]);
@@ -681,10 +660,8 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     //remember window states and close all windows
     [fDefaults setBool: [[fInfoController window] isVisible] forKey: @"InfoVisible"];
     
-    const BOOL quickLookOpen = [NSApp isOnSnowLeopardOrBetter] && [QLPreviewPanelSL sharedPreviewPanelExists]
-                                && [[QLPreviewPanelSL sharedPreviewPanel] isVisible];
-    if (quickLookOpen)
-        [[QLPreviewPanelSL sharedPreviewPanel] updateController];
+    if ([QLPreviewPanel sharedPreviewPanelExists] && [[QLPreviewPanel sharedPreviewPanel] isVisible])
+        [[QLPreviewPanel sharedPreviewPanel] updateController];
     
     for (NSWindow * window in [NSApp windows])
         [window close];
@@ -1544,43 +1521,23 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     NSString * text = [links componentsJoinedByString: @"\n"];
     
     NSPasteboard * pb = [NSPasteboard generalPasteboard];
-    if ([NSApp isOnSnowLeopardOrBetter])
-    {
-        [pb clearContents];
-        [pb writeObjects: [NSArray arrayWithObject: text]];
-    }
-    else
-    {
-        [pb declareTypes: [NSArray arrayWithObject: NSStringPboardType] owner: nil];
-        [pb setString: text forType: NSStringPboardType];
-    }
+    [pb clearContents];
+    [pb writeObjects: [NSArray arrayWithObject: text]];
 }
 
 - (void) revealFile: (id) sender
 {
     NSArray * selected = [fTableView selectedTorrents];
-    if ([NSApp isOnSnowLeopardOrBetter])
+    NSMutableArray * paths = [NSMutableArray arrayWithCapacity: [selected count]];
+    for (Torrent * torrent in selected)
     {
-        NSMutableArray * paths = [NSMutableArray arrayWithCapacity: [selected count]];
-        for (Torrent * torrent in selected)
-        {
-            NSString * location = [torrent dataLocation];
-            if (location)
-                [paths addObject: [NSURL fileURLWithPath: location]];
-        }
-        
-        if ([paths count] > 0)
-            [[NSWorkspace sharedWorkspace] activateFileViewerSelectingURLs: paths];
+        NSString * location = [torrent dataLocation];
+        if (location)
+            [paths addObject: [NSURL fileURLWithPath: location]];
     }
-    else
-    {
-        for (Torrent * torrent in selected)
-        {
-            NSString * location = [torrent dataLocation];
-            if (location)
-                [[NSWorkspace sharedWorkspace] selectFile: location inFileViewerRootedAtPath: nil];
-        }
-    }
+    
+    if ([paths count] > 0)
+        [[NSWorkspace sharedWorkspace] activateFileViewerSelectingURLs: paths];
 }
 
 - (void) announceSelectedTorrents: (id) sender
@@ -1628,10 +1585,8 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         [fInfoController updateInfoStats];
         [[fInfoController window] orderFront: nil];
         
-        if ([fInfoController canQuickLook]
-            && [QLPreviewPanelSL sharedPreviewPanelExists] && [[QLPreviewPanelSL sharedPreviewPanel] isVisible])
-            [[QLPreviewPanelSL sharedPreviewPanel] reloadData];
-        
+        if ([fInfoController canQuickLook] && [QLPreviewPanel sharedPreviewPanelExists] && [[QLPreviewPanel sharedPreviewPanel] isVisible])
+            [[QLPreviewPanel sharedPreviewPanel] reloadData];
     }
     
     [[fWindow toolbar] validateVisibleItems];
@@ -1641,9 +1596,8 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 {
     [fInfoController setInfoForTorrents: [fTableView selectedTorrents]];
     
-    if ([NSApp isOnSnowLeopardOrBetter] && [QLPreviewPanelSL sharedPreviewPanelExists]
-        && [[QLPreviewPanelSL sharedPreviewPanel] isVisible])
-        [[QLPreviewPanelSL sharedPreviewPanel] reloadData];
+    if ([QLPreviewPanel sharedPreviewPanelExists] && [[QLPreviewPanel sharedPreviewPanel] isVisible])
+        [[QLPreviewPanel sharedPreviewPanel] reloadData];
 }
 
 - (void) setInfoTab: (id) sender
@@ -1900,52 +1854,48 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         const BOOL asc = ![fDefaults boolForKey: @"SortReverse"];
         
         NSArray * descriptors;
-        NSSortDescriptor * nameDescriptor = [[[NSSortDescriptor alloc] initWithKey: @"name" ascending: asc
-                                                selector: @selector(compareFinder:)] autorelease];
+        NSSortDescriptor * nameDescriptor = [NSSortDescriptor sortDescriptorWithKey: @"name" ascending: asc selector: @selector(localizedStandardCompare:)];
         
         if ([sortType isEqualToString: SORT_STATE])
         {
-            NSSortDescriptor * stateDescriptor = [[[NSSortDescriptor alloc] initWithKey: @"stateSortKey" ascending: !asc] autorelease],
-                            * progressDescriptor = [[[NSSortDescriptor alloc] initWithKey: @"progress" ascending: !asc] autorelease],
-                            * ratioDescriptor = [[[NSSortDescriptor alloc] initWithKey: @"ratio" ascending: !asc] autorelease];
+            NSSortDescriptor * stateDescriptor = [NSSortDescriptor sortDescriptorWithKey: @"stateSortKey" ascending: !asc],
+                            * progressDescriptor = [NSSortDescriptor sortDescriptorWithKey: @"progress" ascending: !asc],
+                            * ratioDescriptor = [NSSortDescriptor sortDescriptorWithKey: @"ratio" ascending: !asc];
             
             descriptors = [[NSArray alloc] initWithObjects: stateDescriptor, progressDescriptor, ratioDescriptor,
                                                                 nameDescriptor, nil];
         }
         else if ([sortType isEqualToString: SORT_PROGRESS])
         {
-            NSSortDescriptor * progressDescriptor = [[[NSSortDescriptor alloc] initWithKey: @"progress" ascending: asc] autorelease],
-                            * ratioProgressDescriptor = [[[NSSortDescriptor alloc] initWithKey: @"progressStopRatio"
-                                                            ascending: asc] autorelease],
-                            * ratioDescriptor = [[[NSSortDescriptor alloc] initWithKey: @"ratio" ascending: asc] autorelease];
+            NSSortDescriptor * progressDescriptor = [NSSortDescriptor sortDescriptorWithKey: @"progress" ascending: asc],
+                            * ratioProgressDescriptor = [NSSortDescriptor sortDescriptorWithKey: @"progressStopRatio" ascending: asc],
+                            * ratioDescriptor = [NSSortDescriptor sortDescriptorWithKey: @"ratio" ascending: asc];
             
             descriptors = [[NSArray alloc] initWithObjects: progressDescriptor, ratioProgressDescriptor, ratioDescriptor,
                                                                 nameDescriptor, nil];
         }
         else if ([sortType isEqualToString: SORT_TRACKER])
         {
-            NSSortDescriptor * trackerDescriptor = [[[NSSortDescriptor alloc] initWithKey: @"trackerSortKey" ascending: asc
-                                                    selector: @selector(localizedCaseInsensitiveCompare:)] autorelease];
+            NSSortDescriptor * trackerDescriptor = [NSSortDescriptor sortDescriptorWithKey: @"trackerSortKey" ascending: asc selector: @selector(localizedCaseInsensitiveCompare:)];
             
             descriptors = [[NSArray alloc] initWithObjects: trackerDescriptor, nameDescriptor, nil];
         }
         else if ([sortType isEqualToString: SORT_ACTIVITY])
         {
-            NSSortDescriptor * rateDescriptor = [[[NSSortDescriptor alloc] initWithKey: @"totalRate" ascending: !asc] autorelease];
-            NSSortDescriptor * activityDescriptor = [[[NSSortDescriptor alloc] initWithKey: @"dateActivityOrAdd" ascending: !asc]
-                                                        autorelease];
+            NSSortDescriptor * rateDescriptor = [NSSortDescriptor sortDescriptorWithKey: @"totalRate" ascending: !asc];
+            NSSortDescriptor * activityDescriptor = [NSSortDescriptor sortDescriptorWithKey: @"dateActivityOrAdd" ascending: !asc];
             
             descriptors = [[NSArray alloc] initWithObjects: rateDescriptor, activityDescriptor, nameDescriptor, nil];
         }
         else if ([sortType isEqualToString: SORT_DATE])
         {
-            NSSortDescriptor * dateDescriptor = [[[NSSortDescriptor alloc] initWithKey: @"dateAdded" ascending: asc] autorelease];
+            NSSortDescriptor * dateDescriptor = [NSSortDescriptor sortDescriptorWithKey: @"dateAdded" ascending: asc];
             
             descriptors = [[NSArray alloc] initWithObjects: dateDescriptor, nameDescriptor, nil];
         }
         else if ([sortType isEqualToString: SORT_SIZE])
         {
-            NSSortDescriptor * sizeDescriptor = [[[NSSortDescriptor alloc] initWithKey: @"size" ascending: asc] autorelease];
+            NSSortDescriptor * sizeDescriptor = [NSSortDescriptor sortDescriptorWithKey: @"size" ascending: asc];
             
             descriptors = [[NSArray alloc] initWithObjects: sizeDescriptor, nameDescriptor, nil];
         }
@@ -2106,7 +2056,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         
         [fDisplayedTorrents removeAllObjects];
         
-        NSSortDescriptor * groupDescriptor = [[[NSSortDescriptor alloc] initWithKey: @"groupOrderValue" ascending: YES] autorelease];
+        NSSortDescriptor * groupDescriptor = [NSSortDescriptor sortDescriptorWithKey: @"groupOrderValue" ascending: YES];
         [allTorrents sortUsingDescriptors: [NSArray arrayWithObject: groupDescriptor]];
         
         TorrentGroup * group = nil;
@@ -2202,16 +2152,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         NSPoint location = rect.origin;
         location.y += NSHeight(rect) + 5.0;
         
-        if ([NSApp isOnSnowLeopardOrBetter])
-            [fActionMenu popUpMenuPositioningItem: nil atLocation: location inView: sender];
-        else
-        {
-            NSEvent * newEvent = [NSEvent mouseEventWithType: NSLeftMouseDown location: location
-                                               modifierFlags: NSLeftMouseDownMask timestamp: GetCurrentEventTime() windowNumber: [fWindow windowNumber]
-                                                     context: nil eventNumber: 1 clickCount: 1 pressure: 1];
-             
-            [NSMenu popUpContextMenu: fActionMenu withEvent: newEvent forView: sender];
-        }
+        [fActionMenu popUpMenuPositioningItem: nil atLocation: location inView: sender];
     }
 }
 
@@ -3083,20 +3024,19 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     [fFilterBar focusSearchField];
 }
 
-#warning change from id to QLPreviewPanel
-- (BOOL) acceptsPreviewPanelControl: (id) panel
+- (BOOL) acceptsPreviewPanelControl: (QLPreviewPanel *) panel
 {
     return !fQuitting;
 }
 
-- (void) beginPreviewPanelControl: (id) panel
+- (void) beginPreviewPanelControl: (QLPreviewPanel *) panel
 {
     fPreviewPanel = [panel retain];
     [fPreviewPanel setDelegate: self];
     [fPreviewPanel setDataSource: self];
 }
 
-- (void) endPreviewPanelControl: (id) panel
+- (void) endPreviewPanelControl: (QLPreviewPanel *) panel
 {
     [fPreviewPanel release];
     fPreviewPanel = nil;
@@ -3114,7 +3054,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     return qlArray;
 }
 
-- (NSInteger) numberOfPreviewItemsInPreviewPanel: (id) panel
+- (NSInteger) numberOfPreviewItemsInPreviewPanel: (QLPreviewPanel *) panel
 {
     if ([fInfoController canQuickLook])
         return [[fInfoController quickLookURLs] count];
@@ -3122,7 +3062,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         return [[self quickLookableTorrents] count];
 }
 
-- (id /*<QLPreviewItem>*/) previewPanel: (id) panel previewItemAtIndex: (NSInteger) index
+- (id <QLPreviewItem>) previewPanel: (QLPreviewPanel *) panel previewItemAtIndex: (NSInteger) index
 {
     if ([fInfoController canQuickLook])
         return [[fInfoController quickLookURLs] objectAtIndex: index];
@@ -3130,7 +3070,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         return [[self quickLookableTorrents] objectAtIndex: index];
 }
 
-- (BOOL) previewPanel: (id) panel handleEvent: (NSEvent *) event
+- (BOOL) previewPanel: (QLPreviewPanel *) panel handleEvent: (NSEvent *) event
 {
     /*if ([event type] == NSKeyDown)
     {
@@ -3141,7 +3081,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     return NO;
 }
 
-- (NSRect) previewPanel: (id) panel sourceFrameOnScreenForPreviewItem: (id /*<QLPreviewItem>*/) item
+- (NSRect) previewPanel: (QLPreviewPanel *) panel sourceFrameOnScreenForPreviewItem: (id <QLPreviewItem>) item
 {
     if ([fInfoController canQuickLook])
         return [fInfoController quickLookSourceFrameForPreviewItem: item];
@@ -3484,9 +3424,8 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     //set quick look item
     if ([ident isEqualToString: TOOLBAR_QUICKLOOK])
     {
-        [(NSButton *)[toolbarItem view] setState: [NSApp isOnSnowLeopardOrBetter] && [QLPreviewPanelSL sharedPreviewPanelExists]
-                                                    && [[QLPreviewPanelSL sharedPreviewPanel] isVisible]];
-        return [NSApp isOnSnowLeopardOrBetter];
+        [(NSButton *)[toolbarItem view] setState: [QLPreviewPanel sharedPreviewPanelExists] && [[QLPreviewPanel sharedPreviewPanel] isVisible]];
+        return YES;
     }
 
     return YES;
@@ -3846,14 +3785,13 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     
     if (action == @selector(toggleQuickLook:))
     {
-        const BOOL visible = [NSApp isOnSnowLeopardOrBetter] && [QLPreviewPanelSL sharedPreviewPanelExists]
-                                && [[QLPreviewPanelSL sharedPreviewPanel] isVisible];
+        const BOOL visible =[QLPreviewPanel sharedPreviewPanelExists] && [[QLPreviewPanel sharedPreviewPanel] isVisible];
         //text consistent with Finder
         NSString * title = !visible ? NSLocalizedString(@"Quick Look", "View menu -> Quick Look")
                                     : NSLocalizedString(@"Close Quick Look", "View menu -> Quick Look");
         [menuItem setTitle: title];
         
-        return [NSApp isOnSnowLeopardOrBetter];
+        return YES;
     }
     
     return YES;
@@ -3960,13 +3898,6 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         [fWindow setFrame: [self sizedWindowFrame] display: YES animate: YES];
         [scrollView setHasVerticalScroller: YES];
         
-        //hack to ensure scrollbars don't disappear after resizing
-        if (![NSApp isOnSnowLeopardOrBetter])
-        {
-            [scrollView setAutohidesScrollers: NO];
-            [scrollView setAutohidesScrollers: YES];
-        }
-        
         [self setWindowMinMaxToCurrent];
     }
 }
@@ -4044,13 +3975,10 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 
 - (void) toggleQuickLook: (id) sender
 {
-    if (![NSApp isOnSnowLeopardOrBetter])
-        return;
-    
-    if ([[QLPreviewPanelSL sharedPreviewPanel] isVisible])
-        [[QLPreviewPanelSL sharedPreviewPanel] orderOut: nil];
+    if ([[QLPreviewPanel sharedPreviewPanel] isVisible])
+        [[QLPreviewPanel sharedPreviewPanel] orderOut: nil];
     else
-        [[QLPreviewPanelSL sharedPreviewPanel] makeKeyAndOrderFront: nil];
+        [[QLPreviewPanel sharedPreviewPanel] makeKeyAndOrderFront: nil];
 }
 
 - (void) linkHomepage: (id) sender
@@ -4095,13 +4023,8 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     if (([type isEqualToString: GROWL_DOWNLOAD_COMPLETE] || [type isEqualToString: GROWL_SEEDING_COMPLETE])
             && (location = [clickContext objectForKey: @"Location"]))
     {
-        if ([NSApp isOnSnowLeopardOrBetter])
-        {
-            NSURL * file = [NSURL fileURLWithPath: location];
-            [[NSWorkspace sharedWorkspace] activateFileViewerSelectingURLs: [NSArray arrayWithObject: file]];
-        }
-        else
-            [[NSWorkspace sharedWorkspace] selectFile: location inFileViewerRootedAtPath: nil];
+        NSURL * file = [NSURL fileURLWithPath: location];
+        [[NSWorkspace sharedWorkspace] activateFileViewerSelectingURLs: [NSArray arrayWithObject: file]];
     }
 }
 
@@ -4256,9 +4179,8 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     
     NSArray * selectedValues = [fTableView selectedValues];
     
-    NSSortDescriptor * descriptor = [[NSSortDescriptor alloc] initWithKey: @"queuePosition" ascending: YES];
+    NSSortDescriptor * descriptor = [NSSortDescriptor sortDescriptorWithKey: @"queuePosition" ascending: YES];
     NSArray * descriptors = [NSArray arrayWithObject: descriptor];
-    [descriptor release];
     
     [fTorrents sortUsingDescriptors: descriptors];
     

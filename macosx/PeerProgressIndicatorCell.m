@@ -23,7 +23,6 @@
  *****************************************************************************/
 
 #import "PeerProgressIndicatorCell.h"
-#import "NSApplicationAdditions.h"
 #import "NSStringAdditions.h"
 
 #import "transmission.h" // required by utils.h
@@ -85,14 +84,7 @@
                                             floor(NSMidY(cellFrame) - imageSize.height * 0.5),
                                             imageSize.width, imageSize.height);
             
-            if ([NSApp isOnSnowLeopardOrBetter])
-                [checkImage drawInRect: rect fromRect: NSZeroRect operation: NSCompositeSourceOver fraction: 1.0 respectFlipped: YES
-                        hints: nil];
-            else
-            {
-                [checkImage setFlipped: YES];
-                [checkImage drawInRect: rect fromRect: NSZeroRect operation: NSCompositeSourceOver fraction: 1.0];
-            }
+            [checkImage drawInRect: rect fromRect: NSZeroRect operation: NSCompositeSourceOver fraction: 1.0 respectFlipped: YES hints: nil];
         }
     }
 }

@@ -300,16 +300,8 @@
     NSString * messageString = [messageStrings componentsJoinedByString: @"\n"];
     
     NSPasteboard * pb = [NSPasteboard generalPasteboard];
-    if ([NSApp isOnSnowLeopardOrBetter])
-    {
-        [pb clearContents];
-        [pb writeObjects: [NSArray arrayWithObject: messageString]];
-    }
-    else
-    {
-        [pb declareTypes: [NSArray arrayWithObject: NSStringPboardType] owner: nil];
-        [pb setString: messageString forType: NSStringPboardType];
-    }
+    [pb clearContents];
+    [pb writeObjects: [NSArray arrayWithObject: messageString]];
 }
 
 - (BOOL) validateMenuItem: (NSMenuItem *) menuItem
@@ -387,7 +379,7 @@
 - (void) writeToFile: (id) sender
 {
     //make the array sorted by date
-    NSSortDescriptor * descriptor = [[[NSSortDescriptor alloc] initWithKey: @"Index" ascending: YES] autorelease];
+    NSSortDescriptor * descriptor = [NSSortDescriptor sortDescriptorWithKey: @"Index" ascending: YES];
     NSArray * descriptors = [[NSArray alloc] initWithObjects: descriptor, nil];
     NSArray * sortedMessages = [[fDisplayedMessages sortedArrayUsingDescriptors: descriptors] retain];
     [descriptors release];

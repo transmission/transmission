@@ -31,7 +31,6 @@
 #import "InfoFileViewController.h"
 #import "InfoOptionsViewController.h"
 #import "InfoTabButtonCell.h"
-#import "NSApplicationAdditions.h"
 #import "NSStringAdditions.h"
 #import "Torrent.h"
 
@@ -179,9 +178,8 @@ typedef enum
 
 - (void) windowWillClose: (NSNotification *) notification
 {
-    if ([NSApp isOnSnowLeopardOrBetter] && fCurrentTabTag == TAB_FILE_TAG
-        && ([QLPreviewPanelSL sharedPreviewPanelExists] && [[QLPreviewPanelSL sharedPreviewPanel] isVisible]))
-        [[QLPreviewPanelSL sharedPreviewPanel] reloadData];
+    if (fCurrentTabTag == TAB_FILE_TAG && ([QLPreviewPanel sharedPreviewPanelExists] && [[QLPreviewPanel sharedPreviewPanel] isVisible]))
+        [[QLPreviewPanel sharedPreviewPanel] reloadData];
 }
 
 - (void) setTab: (id) sender
@@ -317,9 +315,9 @@ typedef enum
     [window setFrame: windowRect display: YES animate: oldTabTag != INVALID];
     [[window contentView] addSubview: view];
     
-    if ([NSApp isOnSnowLeopardOrBetter] && (fCurrentTabTag == TAB_FILE_TAG || oldTabTag == TAB_FILE_TAG)
-        && ([QLPreviewPanelSL sharedPreviewPanelExists] && [[QLPreviewPanelSL sharedPreviewPanel] isVisible]))
-        [[QLPreviewPanelSL sharedPreviewPanel] reloadData];
+    if ((fCurrentTabTag == TAB_FILE_TAG || oldTabTag == TAB_FILE_TAG)
+        && ([QLPreviewPanel sharedPreviewPanelExists] && [[QLPreviewPanel sharedPreviewPanel] isVisible]))
+        [[QLPreviewPanel sharedPreviewPanel] reloadData];
 }
 
 - (void) setNextTab
@@ -367,14 +365,13 @@ typedef enum
 
 - (BOOL) canQuickLook
 {
-    if (fCurrentTabTag != TAB_FILE_TAG || ![[self window] isVisible] || ![NSApp isOnSnowLeopardOrBetter])
+    if (fCurrentTabTag != TAB_FILE_TAG || ![[self window] isVisible])
         return NO;
     
     return [fFileViewController canQuickLook];
 }
 
-#warning uncomment (in header too)
-- (NSRect) quickLookSourceFrameForPreviewItem: (id /*<QLPreviewItem>*/) item
+- (NSRect) quickLookSourceFrameForPreviewItem: (id <QLPreviewItem>) item
 {
     return [fFileViewController quickLookSourceFrameForPreviewItem: item];
 }
@@ -450,8 +447,7 @@ typedef enum
         }
         else
         {
-            #warning change to NSImageNameApplicationIcon
-            [fImageView setImage: [NSImage imageNamed: @"NSApplicationIcon"]];
+            [fImageView setImage: [NSImage imageNamed: NSImageNameApplicationIcon]];
             [fNoneSelectedField setHidden: NO];
             
             [fNameField setHidden: YES];
@@ -464,15 +460,7 @@ typedef enum
     {
         Torrent * torrent = [fTorrents objectAtIndex: 0];
         
-        if ([NSApp isOnSnowLeopardOrBetter])
-            [fImageView setImage: [torrent icon]];
-        else
-        {
-            NSImage * icon = [[torrent icon] copy];
-            [icon setFlipped: NO];
-            [fImageView setImage: icon];
-            [icon release];
-        }
+        [fImageView setImage: [torrent icon]];
         
         NSString * name = [torrent name];
         [fNameField setStringValue: name];

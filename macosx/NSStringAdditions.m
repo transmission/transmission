@@ -23,7 +23,6 @@
  *****************************************************************************/
 
 #import "NSStringAdditions.h"
-#import "NSApplicationAdditions.h"
 
 #import <transmission.h>
 #import "utils.h"
@@ -163,19 +162,6 @@
     return [timeArray componentsJoinedByString: @" "];
 }
 
-//also used in InfoWindow.xib and MessageWindow.xib
-- (NSComparisonResult) compareFinder: (NSString *) string
-{
-    if ([NSApp isOnSnowLeopardOrBetter])
-        return [self localizedStandardCompare: string];
-    else
-    {
-        const NSStringCompareOptions comparisonOptions = NSCaseInsensitiveSearch | NSNumericSearch | NSWidthInsensitiveSearch
-                                                            | NSForcedOrderingSearch;
-        return [self compare: string options: comparisonOptions range: NSMakeRange(0, [self length]) locale: [NSLocale currentLocale]];
-    }
-}
-
 - (NSComparisonResult) compareNumeric: (NSString *) string
 {
     const NSStringCompareOptions comparisonOptions = NSNumericSearch | NSForcedOrderingSearch;
@@ -217,33 +203,30 @@
 + (NSString *) stringForFileSize: (uint64_t) size showUnitUnless: (NSString *) notAllowedUnit
     unitsUsed: (NSString **) unitUsed
 {
-    const float baseFloat = [NSApp isOnSnowLeopardOrBetter] ? 1000.0 : 1024.0;
-    const NSUInteger baseInt = [NSApp isOnSnowLeopardOrBetter] ? 1000 : 1024;
-    
     double convertedSize;
     NSString * unit;
     NSUInteger decimals;
-    if (size < pow(baseInt, 2))
+    if (size < pow(1000, 2))
     {
-        convertedSize = size / baseFloat;
+        convertedSize = size / 1000.0;
         unit = NSLocalizedString(@"KB", "File size - kilobytes");
         decimals = convertedSize >= 10.0 ? 0 : 1;
     }
-    else if (size < pow(baseInt, 3))
+    else if (size < pow(1000, 3))
     {
-        convertedSize = size / powf(baseFloat, 2);
+        convertedSize = size / powf(1000.0, 2);
         unit = NSLocalizedString(@"MB", "File size - megabytes");
         decimals = 1;
     }
-    else if (size < pow(baseInt, 4))
+    else if (size < pow(1000, 4))
     {
-        convertedSize = size / powf(baseFloat, 3);
+        convertedSize = size / powf(1000.0, 3);
         unit = NSLocalizedString(@"GB", "File size - gigabytes");
         decimals = 2;
     }
     else
     {
-        convertedSize = size / powf(baseFloat, 4);
+        convertedSize = size / powf(1000.0, 4);
         unit = NSLocalizedString(@"TB", "File size - terabytes");
         decimals = 3; //guessing on this one
     }
@@ -268,19 +251,17 @@
 
 + (NSString *) stringForSpeed: (CGFloat) speed kb: (NSString *) kb mb: (NSString *) mb gb: (NSString *) gb
 {
-    const CGFloat baseFloat = [NSApp isOnSnowLeopardOrBetter] ? 1000.0 : 1024.0;
-    
     if (speed <= 999.95) //0.0 KB/s to 999.9 KB/s
         return [NSString localizedStringWithFormat: @"%.1f %@", speed, kb];
     
-    speed /= baseFloat;
+    speed /= 1000.0;
     
     if (speed <= 99.995) //1.00 MB/s to 99.99 MB/s
         return [NSString localizedStringWithFormat: @"%.2f %@", speed, mb];
     else if (speed <= 999.95) //100.0 MB/s to 999.9 MB/s
         return [NSString localizedStringWithFormat: @"%.1f %@", speed, mb];
     else //insane speeds
-        return [NSString localizedStringWithFormat: @"%.2f %@", (speed / baseFloat), gb];
+        return [NSString localizedStringWithFormat: @"%.2f %@", (speed / 1000.0), gb];
 }
 
 @end

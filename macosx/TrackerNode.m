@@ -23,7 +23,6 @@
  *****************************************************************************/
 
 #import "TrackerNode.h"
-#import "NSApplicationAdditions.h"
 #import "NSStringAdditions.h"
 
 @implementation TrackerNode
@@ -98,9 +97,7 @@
         NSDateFormatter * dateFormatter = [[NSDateFormatter alloc] init];
         [dateFormatter setDateStyle: NSDateFormatterFullStyle];
         [dateFormatter setTimeStyle: NSDateFormatterShortStyle];
-        
-        if ([NSApp isOnSnowLeopardOrBetter])
-            [dateFormatter setDoesRelativeDateFormatting: YES];
+        [dateFormatter setDoesRelativeDateFormatting: YES];
         
         dateString = [dateFormatter stringFromDate: [NSDate dateWithTimeIntervalSince1970: fStat.lastAnnounceTime]];
         [dateFormatter release];
@@ -171,9 +168,7 @@
         NSDateFormatter * dateFormatter = [[NSDateFormatter alloc] init];
         [dateFormatter setDateStyle: NSDateFormatterFullStyle];
         [dateFormatter setTimeStyle: NSDateFormatterShortStyle];
-        
-        if ([NSApp isOnSnowLeopardOrBetter])
-            [dateFormatter setDoesRelativeDateFormatting: YES];
+        [dateFormatter setDoesRelativeDateFormatting: YES];
         
         dateString = [dateFormatter stringFromDate: [NSDate dateWithTimeIntervalSince1970: fStat.lastScrapeTime]];
         [dateFormatter release];
