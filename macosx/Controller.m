@@ -1017,7 +1017,11 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 {
     if (code == NSOKButton)
     {
-        NSDictionary * dictionary = [[NSDictionary alloc] initWithObjectsAndKeys: [panel filenames], @"Filenames",
+        NSMutableArray * filenames = [NSMutableArray arrayWithCapacity: [[panel URLs] count]];
+        for (NSURL * url in [panel URLs])
+            [filenames addObject: [url path]];
+        
+        NSDictionary * dictionary = [[NSDictionary alloc] initWithObjectsAndKeys: filenames, @"Filenames",
             [NSNumber numberWithInt: [useOptions boolValue] ? ADD_SHOW_OPTIONS : ADD_MANUAL], @"AddType", nil];
         [self performSelectorOnMainThread: @selector(openFilesWithDict:) withObject: dictionary waitUntilDone: NO];
     }
