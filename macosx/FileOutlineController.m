@@ -72,7 +72,7 @@ typedef enum
     
     [fOutline setMenu: [self menu]];
     
-    fLock = [[NSRecursiveLock alloc] init];
+    //fLock = [[NSRecursiveLock alloc] init];
     [fLock setName: @"File Table"];
     
     [self setTorrent: nil];
@@ -102,8 +102,8 @@ typedef enum
     [fFilterText release];
     fFilterText = nil;
     
-    while (![fLock tryLock])
-        tr_wait_msec(100);
+    /*while (![fLock tryLock])
+        tr_wait_msec(100);*/
     
     [fOutline deselectAll: nil];
     [fOutline reloadData];
@@ -125,12 +125,12 @@ typedef enum
     
     const BOOL onLion = [NSApp isOnLionOrBetter];
     
-    while (![fLock tryLock])
-        tr_wait_msec(100);
+    /*while (![fLock tryLock])
+        tr_wait_msec(100);*/
     
     if (onLion)
     {
-        [[NSAnimationContext currentContext] setCompletionHandler: ^{ [fLock unlock]; }];
+        [[NSAnimationContext currentContext] setCompletionHandler: nil];
         [NSAnimationContext beginGrouping];
         
         [fOutline beginUpdates];
@@ -242,8 +242,8 @@ typedef enum
 {
     [fTorrent updateFileStat];
     
-    while (![fLock tryLock])
-        tr_wait_msec(100);
+    /*while (![fLock tryLock])
+        tr_wait_msec(100);*/
     
     [fOutline reloadData];
     
@@ -386,8 +386,8 @@ typedef enum
 
 - (void) setCheck: (id) sender
 {
-    while (![fLock tryLock])
-        tr_wait_msec(100);
+    /*while (![fLock tryLock])
+        tr_wait_msec(100);*/
     
     NSInteger state = [sender tag] == FILE_UNCHECK_TAG ? NSOffState : NSOnState;
     
@@ -404,8 +404,8 @@ typedef enum
 
 - (void) setOnlySelectedCheck: (id) sender
 {
-    while (![fLock tryLock])
-        tr_wait_msec(100);
+    /*while (![fLock tryLock])
+        tr_wait_msec(100);*/
     
     NSIndexSet * indexSet = [fOutline selectedRowIndexes];
     NSMutableIndexSet * itemIndexes = [NSMutableIndexSet indexSet];
@@ -438,8 +438,8 @@ typedef enum
             priority = TR_PRI_LOW;
     }
     
-    while (![fLock tryLock])
-        tr_wait_msec(100);
+    /*while (![fLock tryLock])
+        tr_wait_msec(100);*/
     
     NSIndexSet * indexSet = [fOutline selectedRowIndexes];
     NSMutableIndexSet * itemIndexes = [NSMutableIndexSet indexSet];
@@ -454,8 +454,8 @@ typedef enum
 
 - (void) revealFile: (id) sender
 {
-    while (![fLock tryLock])
-        tr_wait_msec(100);
+    /*while (![fLock tryLock])
+        tr_wait_msec(100);*/
     
     NSIndexSet * indexes = [fOutline selectedRowIndexes];
     if ([NSApp isOnSnowLeopardOrBetter])
