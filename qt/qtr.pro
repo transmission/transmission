@@ -19,7 +19,7 @@ TRANSMISSION_TOP = ..
 INCLUDEPATH = $${EVENT_TOP}/include $${INCLUDEPATH}
 INCLUDEPATH += $${TRANSMISSION_TOP}
 LIBS += $${TRANSMISSION_TOP}/libtransmission/libtransmission.a
-exists( $${TRANSMISSION_TOP}/third-party/libutp/libutp.a ) { 
+exists( $${TRANSMISSION_TOP}/third-party/libutp/Makefile ) { 
     LIBS += $${TRANSMISSION_TOP}/third-party/libutp/libutp.a
 }
 LIBS += $${TRANSMISSION_TOP}/third-party/dht/libdht.a

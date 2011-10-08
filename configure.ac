@@ -70,6 +70,7 @@ AC_SUBST(LIBAPPINDICATOR_MINIMUM)
 
 AC_PROG_CC
 AC_PROG_CXX
+AC_CHECK_PROG([HAVE_CXX],[$CXX],[yes],[no])
 AC_C_INLINE
 if test "x$GCC" = "xyes" ; then
 
@@ -205,10 +206,10 @@ AC_CHECK_LIB([rt],
 
 AC_MSG_CHECKING([µTP])
 build_utp="no"
-if test "x$CXX" = "x" ; then
-    have_utp="no"
-else
+if test "x$HAVE_CXX" = "xyes" ; then
     have_utp="yes"
+else
+    have_utp="no"
 fi
 AC_ARG_ENABLE([utp],
               AS_HELP_STRING([--enable-utp],[build µTP support]),
@@ -409,7 +410,6 @@ AC_CONFIG_FILES([Makefile
                  third-party/Makefile
                  third-party/miniupnp/Makefile
                  third-party/libnatpmp/Makefile
-                 third-party/libutp/Makefile
                  third-party/dht/Makefile
                  macosx/Makefile
                  gtk/Makefile
@@ -423,6 +423,11 @@ AC_CONFIG_FILES([Makefile
                  web/javascript/jquery/Makefile
                  web/stylesheets/Makefile
                  po/Makefile.in])
+
+dnl Maybe build libutp...
+AM_CONDITIONAL([CONDITIONAL],[test "x$build_utp" = "xyes"])
+AM_COND_IF([CONDITIONAL],
+           [AC_CONFIG_FILES([third-party/libutp/Makefile])])
 
 AC_OUTPUT
 

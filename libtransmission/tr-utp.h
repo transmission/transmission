@@ -28,6 +28,9 @@ THE SOFTWARE.
 #ifndef _TR_UTP_H_
 #define _TR_UTP_H_
 
+/* this is included *after* transmission.h s.t. we get bool defined */
+#include <libutp/utp.h>
+
 int tr_utpPacket(const unsigned char *buf, size_t buflen,
                  const struct sockaddr *from, socklen_t fromlen,
                  tr_session *ss);
