@@ -129,6 +129,14 @@
 		A222EA7B0E6C32C4009FB003 /* BlocklistScheduler.m in Sources */ = {isa = PBXBuildFile; fileRef = A222EA7A0E6C32C4009FB003 /* BlocklistScheduler.m */; };
 		A2265F420B5EF5F40093DDA5 /* FileNameCell.m in Sources */ = {isa = PBXBuildFile; fileRef = A2265F400B5EF5F40093DDA5 /* FileNameCell.m */; };
 		A226FDAC0D0CDF20005A7F71 /* libnatpmp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3C7A118D0D0B2EB800B5701F /* libnatpmp.a */; };
+		A2290D1E14421CC100B95A09 /* libcrypto.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A27653A714369C5C009D3CCF /* libcrypto.dylib */; };
+		A2290D1F14421CC600B95A09 /* libcurl.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A27653A514369C12009D3CCF /* libcurl.dylib */; };
+		A2290D2014421CD000B95A09 /* libcrypto.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A27653A714369C5C009D3CCF /* libcrypto.dylib */; };
+		A2290D2114421CD300B95A09 /* libcurl.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A27653A514369C12009D3CCF /* libcurl.dylib */; };
+		A2290D2214421CD800B95A09 /* libcrypto.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A27653A714369C5C009D3CCF /* libcrypto.dylib */; };
+		A2290D2314421CDA00B95A09 /* libcurl.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A27653A514369C12009D3CCF /* libcurl.dylib */; };
+		A2290D2414421D1500B95A09 /* libcurl.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A27653A514369C12009D3CCF /* libcurl.dylib */; };
+		A2290D2514421D1A00B95A09 /* libcrypto.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A27653A714369C5C009D3CCF /* libcrypto.dylib */; };
 		A22A8D560AEEAFA5007E9CB9 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = A22A8D540AEEAFA5007E9CB9 /* Localizable.strings */; };
 		A22B00B2116A9E9F003315FC /* connecthostport.h in Headers */ = {isa = PBXBuildFile; fileRef = A22B00AF116A9E90003315FC /* connecthostport.h */; };
 		A22B00B3116A9EA4003315FC /* connecthostport.c in Sources */ = {isa = PBXBuildFile; fileRef = A22B00AE116A9E90003315FC /* connecthostport.c */; };
@@ -209,7 +217,6 @@
 		A2710E770A86796000CE4F7D /* PrefsWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = A2710E750A86796000CE4F7D /* PrefsWindow.m */; };
 		A2725B6E0DE5C4F5003445E7 /* FileListNode.m in Sources */ = {isa = PBXBuildFile; fileRef = A2725B6D0DE5C4F5003445E7 /* FileListNode.m */; };
 		A2725D5D0DE7507C003445E7 /* TrackerTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = A2725D5C0DE7507C003445E7 /* TrackerTableView.m */; };
-		A27653A814369C5C009D3CCF /* libcrypto.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A27653A714369C5C009D3CCF /* libcrypto.dylib */; };
 		A277DA0B0C693D9C00DA2CD4 /* ActionOn.png in Resources */ = {isa = PBXBuildFile; fileRef = A277DA090C693D9C00DA2CD4 /* ActionOn.png */; };
 		A27F0F330E19AD9800B2DB97 /* TorrentGroup.m in Sources */ = {isa = PBXBuildFile; fileRef = A27F0F320E19AD9800B2DB97 /* TorrentGroup.m */; };
 		A284214412DA663E00FBDDBB /* tr-udp.c in Sources */ = {isa = PBXBuildFile; fileRef = A284214212DA663E00FBDDBB /* tr-udp.c */; };
@@ -253,7 +260,6 @@
 		A2AAB65F0DE0CF6200E04DDA /* rpcimpl.c in Sources */ = {isa = PBXBuildFile; fileRef = A2AAB65B0DE0CF6200E04DDA /* rpcimpl.c */; };
 		A2AAB6650DE0D08B00E04DDA /* blocklist.h in Headers */ = {isa = PBXBuildFile; fileRef = A2D307930D9EC4860051FD27 /* blocklist.h */; };
 		A2AF1C390A3D0F6200F1575D /* FileOutlineView.m in Sources */ = {isa = PBXBuildFile; fileRef = A2AF1C370A3D0F6200F1575D /* FileOutlineView.m */; };
-		A2B3D82D14375080000C3A83 /* libcurl.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A2B3D82C1437507F000C3A83 /* libcurl.dylib */; };
 		A2B3FB460E5901E700FF78FB /* cli.c in Sources */ = {isa = PBXBuildFile; fileRef = A2B3FB450E5901E700FF78FB /* cli.c */; };
 		A2B3FB4C0E59023000FF78FB /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */; };
 		A2B3FB530E59027100FF78FB /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */; };
@@ -279,12 +285,6 @@
 		A2DF37070C220D03006523C1 /* CreatorWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = A2DF37050C220D03006523C1 /* CreatorWindowController.m */; };
 		A2DF58580DE4B2B0000795D5 /* JSON_parser.c in Sources */ = {isa = PBXBuildFile; fileRef = A2DF576A0DE468C6000795D5 /* JSON_parser.c */; };
 		A2DF58590DE4B2B1000795D5 /* JSON_parser.h in Headers */ = {isa = PBXBuildFile; fileRef = A2DF576B0DE468C6000795D5 /* JSON_parser.h */; };
-		A2E0E107143DD771002CCBFF /* libcrypto.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A2E0E106143DD771002CCBFF /* libcrypto.dylib */; };
-		A2E0E109143DD77F002CCBFF /* libcurl.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A2E0E108143DD77F002CCBFF /* libcurl.dylib */; };
-		A2E0E10F143DD7CC002CCBFF /* libcrypto.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A2E0E10E143DD7CC002CCBFF /* libcrypto.dylib */; };
-		A2E0E111143DD7D2002CCBFF /* libcurl.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A2E0E110143DD7D2002CCBFF /* libcurl.dylib */; };
-		A2E0E113143DD7EC002CCBFF /* libcrypto.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A2E0E112143DD7EC002CCBFF /* libcrypto.dylib */; };
-		A2E0E115143DD7F4002CCBFF /* libcurl.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A2E0E114143DD7F4002CCBFF /* libcurl.dylib */; };
 		A2E23AC60CB5E1930002BB25 /* InfoTabButtonCell.m in Sources */ = {isa = PBXBuildFile; fileRef = A2E23AC40CB5E1930002BB25 /* InfoTabButtonCell.m */; };
 		A2E2EA920EE321C200EB6308 /* Groups.png in Resources */ = {isa = PBXBuildFile; fileRef = A2E2EA910EE321C200EB6308 /* Groups.png */; };
 		A2E384DA130DFB3A001F501B /* templates.h in Headers */ = {isa = PBXBuildFile; fileRef = A2E384D2130DFB3A001F501B /* templates.h */; };
@@ -847,7 +847,6 @@
 		A2AC81D60D987E2D00A2878C /* nl */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = nl; path = macosx/nl.lproj/AddWindow.xib; sourceTree = "<group>"; };
 		A2AF1C360A3D0F6200F1575D /* FileOutlineView.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = FileOutlineView.h; path = macosx/FileOutlineView.h; sourceTree = "<group>"; };
 		A2AF1C370A3D0F6200F1575D /* FileOutlineView.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = FileOutlineView.m; path = macosx/FileOutlineView.m; sourceTree = "<group>"; };
-		A2B3D82C1437507F000C3A83 /* libcurl.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libcurl.dylib; path = usr/lib/libcurl.dylib; sourceTree = SDKROOT; };
 		A2B3FB450E5901E700FF78FB /* cli.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = cli.c; path = cli/cli.c; sourceTree = "<group>"; };
 		A2B5BB7A0D9C7C2300FCB650 /* es */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = es; path = macosx/es.lproj/AddWindow.xib; sourceTree = "<group>"; };
 		A2B6141B1395ADE9000E0975 /* libz.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.dylib; path = usr/lib/libz.dylib; sourceTree = SDKROOT; };
@@ -888,15 +887,6 @@
 		A2DF37050C220D03006523C1 /* CreatorWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CreatorWindowController.m; path = macosx/CreatorWindowController.m; sourceTree = "<group>"; };
 		A2DF576A0DE468C6000795D5 /* JSON_parser.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = JSON_parser.c; path = libtransmission/JSON_parser.c; sourceTree = "<group>"; };
 		A2DF576B0DE468C6000795D5 /* JSON_parser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JSON_parser.h; path = libtransmission/JSON_parser.h; sourceTree = "<group>"; };
-		A2E0E104143DD70F002CCBFF /* libcurl.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libcurl.dylib; path = usr/lib/libcurl.dylib; sourceTree = SDKROOT; };
-		A2E0E106143DD771002CCBFF /* libcrypto.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libcrypto.dylib; path = usr/lib/libcrypto.dylib; sourceTree = SDKROOT; };
-		A2E0E108143DD77F002CCBFF /* libcurl.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libcurl.dylib; path = usr/lib/libcurl.dylib; sourceTree = SDKROOT; };
-		A2E0E10A143DD7A4002CCBFF /* libcurl.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libcurl.dylib; path = usr/lib/libcurl.dylib; sourceTree = SDKROOT; };
-		A2E0E10C143DD7AF002CCBFF /* libcrypto.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libcrypto.dylib; path = usr/lib/libcrypto.dylib; sourceTree = SDKROOT; };
-		A2E0E10E143DD7CC002CCBFF /* libcrypto.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libcrypto.dylib; path = usr/lib/libcrypto.dylib; sourceTree = SDKROOT; };
-		A2E0E110143DD7D2002CCBFF /* libcurl.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libcurl.dylib; path = usr/lib/libcurl.dylib; sourceTree = SDKROOT; };
-		A2E0E112143DD7EC002CCBFF /* libcrypto.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libcrypto.dylib; path = usr/lib/libcrypto.dylib; sourceTree = SDKROOT; };
-		A2E0E114143DD7F4002CCBFF /* libcurl.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libcurl.dylib; path = usr/lib/libcurl.dylib; sourceTree = SDKROOT; };
 		A2E23AC30CB5E1930002BB25 /* InfoTabButtonCell.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = InfoTabButtonCell.h; path = macosx/InfoTabButtonCell.h; sourceTree = "<group>"; };
 		A2E23AC40CB5E1930002BB25 /* InfoTabButtonCell.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = InfoTabButtonCell.m; path = macosx/InfoTabButtonCell.m; sourceTree = "<group>"; };
 		A2E2EA910EE321C200EB6308 /* Groups.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Groups.png; path = macosx/Images/Groups.png; sourceTree = "<group>"; };
@@ -1013,8 +1003,8 @@
 			files = (
 				4D9A2BF009E16D21002D0FF9 /* libtransmission.a in Frameworks */,
 				A296EF3C11E560BD004A2781 /* libiconv.dylib in Frameworks */,
-				A2E0E107143DD771002CCBFF /* libcrypto.dylib in Frameworks */,
-				A2E0E109143DD77F002CCBFF /* libcurl.dylib in Frameworks */,
+				A2290D1E14421CC100B95A09 /* libcrypto.dylib in Frameworks */,
+				A2290D1F14421CC600B95A09 /* libcurl.dylib in Frameworks */,
 				A2B6141E1395B0EC000E0975 /* libz.dylib in Frameworks */,
 				A2B3FB4C0E59023000FF78FB /* Cocoa.framework in Frameworks */,
 			);
@@ -1030,8 +1020,8 @@
 				A24F19080A3A790800C9C145 /* Sparkle.framework in Frameworks */,
 				A261F1DC0A69A1610002815A /* Growl.framework in Frameworks */,
 				A296EF3B11E560A7004A2781 /* libiconv.dylib in Frameworks */,
-				A27653A814369C5C009D3CCF /* libcrypto.dylib in Frameworks */,
-				A2B3D82D14375080000C3A83 /* libcurl.dylib in Frameworks */,
+				A2290D2514421D1A00B95A09 /* libcrypto.dylib in Frameworks */,
+				A2290D2414421D1500B95A09 /* libcurl.dylib in Frameworks */,
 				A2B6141F1395B0F5000E0975 /* libz.dylib in Frameworks */,
 				A2E669790F5B8E5A00B4251A /* Security.framework in Frameworks */,
 				A22CFB820FB66EF30009BD3E /* Carbon.framework in Frameworks */,
@@ -1086,8 +1076,8 @@
 			files = (
 				BEFC1C050C07753500B0BB3C /* libtransmission.a in Frameworks */,
 				A296EF3D11E560C3004A2781 /* libiconv.dylib in Frameworks */,
-				A2E0E10F143DD7CC002CCBFF /* libcrypto.dylib in Frameworks */,
-				A2E0E111143DD7D2002CCBFF /* libcurl.dylib in Frameworks */,
+				A2290D2014421CD000B95A09 /* libcrypto.dylib in Frameworks */,
+				A2290D2114421CD300B95A09 /* libcurl.dylib in Frameworks */,
 				A2B6141D1395B0E3000E0975 /* libz.dylib in Frameworks */,
 				A2B3FB530E59027100FF78FB /* Cocoa.framework in Frameworks */,
 			);
@@ -1099,8 +1089,8 @@
 			files = (
 				BEFC1D2D0C0783D900B0BB3C /* libtransmission.a in Frameworks */,
 				A296EF3E11E560D1004A2781 /* libiconv.dylib in Frameworks */,
-				A2E0E113143DD7EC002CCBFF /* libcrypto.dylib in Frameworks */,
-				A2E0E115143DD7F4002CCBFF /* libcurl.dylib in Frameworks */,
+				A2290D2214421CD800B95A09 /* libcrypto.dylib in Frameworks */,
+				A2290D2314421CDA00B95A09 /* libcurl.dylib in Frameworks */,
 				A2B6141C1395ADE9000E0975 /* libz.dylib in Frameworks */,
 				A25E03D90E4015100086C225 /* Cocoa.framework in Frameworks */,
 			);
@@ -1214,16 +1204,6 @@
 		29B97314FDCFA39411CA2CEA /* Transmission */ = {
 			isa = PBXGroup;
 			children = (
-				A2E0E114143DD7F4002CCBFF /* libcurl.dylib */,
-				A2E0E112143DD7EC002CCBFF /* libcrypto.dylib */,
-				A2E0E110143DD7D2002CCBFF /* libcurl.dylib */,
-				A2E0E10E143DD7CC002CCBFF /* libcrypto.dylib */,
-				A2E0E10C143DD7AF002CCBFF /* libcrypto.dylib */,
-				A2E0E10A143DD7A4002CCBFF /* libcurl.dylib */,
-				A2E0E108143DD77F002CCBFF /* libcurl.dylib */,
-				A2E0E106143DD771002CCBFF /* libcrypto.dylib */,
-				A2E0E104143DD70F002CCBFF /* libcurl.dylib */,
-				A2B3D82C1437507F000C3A83 /* libcurl.dylib */,
 				4DDBB70A09E16B3200284745 /* GUI */,
 				4D1838DC09DEC04A0047D688 /* libtransmission */,
 				4DDBB71F09E16BFE00284745 /* CLI */,
