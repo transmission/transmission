@@ -21,6 +21,10 @@
   #include <miniupnp/upnpcommands.h>
 #endif
 
+#ifdef SYS_DARWIN
+  #define HAVE_MINIUPNP_16 1
+#endif
+
 #include "transmission.h"
 #include "port-forwarding.h"
 #include "session.h"
