@@ -1112,6 +1112,11 @@ on_announce_done( const tr_announce_response  * response,
                 dbgmsg( tier, "tracker gave \"%s\"", str );
                 publishWarning( tier, str );
             }
+            else
+            {
+                tr_strlcpy( tier->lastAnnounceStr, _( "Success" ),
+                            sizeof( tier->lastAnnounceStr ) );
+            }
 
             if(( i = response->min_interval ))
                 tier->announceMinIntervalSec = i;
@@ -1126,10 +1131,6 @@ on_announce_done( const tr_announce_response  * response,
             if( response->pex6_count > 0 )
                 publishPeersPex( tier, response->seeders, response->leechers,
                                  response->pex6, response->pex6_count );
-
-            if( !*tier->lastAnnounceStr )
-                tr_strlcpy( tier->lastAnnounceStr, _( "Success" ),
-                            sizeof( tier->lastAnnounceStr ) );
 
             tier->isRunning = data->isRunningOnSuccess;
 
