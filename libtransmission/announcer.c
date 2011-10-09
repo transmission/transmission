@@ -1072,7 +1072,7 @@ on_announce_done( const tr_announce_response  * response,
         {
             int i;
             const char * str;
-            bool got_scrape_info = false;
+            int scrape_fields = 0;
             const bool isStopped = event == TR_ANNOUNCE_EVENT_STOPPED;
 
             publishErrorClear( tier );
@@ -1081,18 +1081,21 @@ on_announce_done( const tr_announce_response  * response,
             {
                 tracker->consecutiveFailures = 0;
 
-                /* if the tracker included scrape fields in its announce response,
-                   then a separate scrape isn't needed */
-
-                got_scrape_info = response->seeders
-                               || response->leechers
-                               || response->downloads;
-
-                if( got_scrape_info )
+                if( response->seeders >= 0 )
                 {
                     tracker->seederCount = response->seeders;
+                    ++scrape_fields;
+                }
+
+                if( response->leechers >= 0 )
+                {
                     tracker->leecherCount = response->leechers;
+                    ++scrape_fields;
+                }
+                if( response->downloads >= 0 )
+                {
                     tracker->downloadCount = response->downloads;
+                    ++scrape_fields;
                 }
 
                 if(( str = response->tracker_id_str ))
@@ -1130,7 +1133,9 @@ on_announce_done( const tr_announce_response  * response,
 
             tier->isRunning = data->isRunningOnSuccess;
 
-            if( got_scrape_info )
+            /* if the tracker included scrape fields in its announce response,
+               then a separate scrape isn't needed */
+            if( scrape_fields >= 3 )
             {
                 tr_tordbg( tier->tor, "Announce response contained scrape info; "
                                       "rescheduling next scrape to %d seconds from now.",
