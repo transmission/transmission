@@ -23,7 +23,9 @@ exists( $${TRANSMISSION_TOP}/third-party/libutp/Makefile ) {
     LIBS += $${TRANSMISSION_TOP}/third-party/libutp/libutp.a
 }
 LIBS += $${TRANSMISSION_TOP}/third-party/dht/libdht.a
-LIBS += $${TRANSMISSION_TOP}/third-party/miniupnp/libminiupnp.a
+exists( $${TRANSMISSION_TOP}/third-party/miniupnp/Makefile ) { 
+    LIBS += $${TRANSMISSION_TOP}/third-party/miniupnp/libminiupnp.a
+}
 LIBS += $${TRANSMISSION_TOP}/third-party/libnatpmp/libnatpmp.a
 unix: LIBS += -L$${EVENT_TOP}/lib -lz -lrt
 win32:DEFINES += QT_DBUS

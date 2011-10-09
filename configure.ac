@@ -219,9 +219,9 @@ if test "x$want_utp" = "xyes" ; then
     if test "x$have_utp" = "xyes"; then 
         LIBUTP_CFLAGS="-I\$(top_srcdir)/third-party/"
         LIBUTP_LIBS="\$(top_builddir)/third-party/libutp/libutp.a"
-	if test "x$libutp_extra_libs" != "x" ; then
-	   LIBUTP_LIBS="$LIBUTP_LIBS $libutp_extra_libs"
-	fi
+        if test "x$libutp_extra_libs" != "x" ; then
+            LIBUTP_LIBS="$LIBUTP_LIBS $libutp_extra_libs"
+        fi
         AC_DEFINE([WITH_UTP],[1])
         build_utp="yes"
     else 
@@ -232,6 +232,78 @@ AC_SUBST(LIBUTP_CFLAGS)
 AC_SUBST(LIBUTP_LIBS)
 AM_CONDITIONAL([BUILD_UTP],[test "x$build_utp" = "xyes"])
 AC_MSG_RESULT([$build_utp])
+
+
+dnl
+dnl  look for preinstalled miniupnpc...
+dnl
+
+AC_MSG_CHECKING([supported miniupnp library])
+upnp_version="none"
+ac_save_LIBS="$LIBS" 
+LIBS="-lminiupnpc" 
+# See if the OS has its miniupnp 1.5 installed
+AC_TRY_LINK([ 
+    #include <stdlib.h> 
+    #include <miniupnpc/miniupnpc.h> 
+    #include <miniupnpc/upnpcommands.h> 
+],[ 
+    struct UPNPDev * devlist; 
+    struct UPNPUrls    urls; 
+    struct IGDdatas    data; 
+    char lanaddr[16]; 
+    char portStr[8]; 
+    char intPort[8]; 
+    char intClient[16]; 
+    upnpDiscover( 2000, NULL, NULL, 0 ); 
+    UPNP_GetValidIGD( devlist, &urls, &data, lanaddr, sizeof( lanaddr ) );  
+    UPNP_GetSpecificPortMappingEntry( urls.controlURL, data.first.servicetype, 
+                        portStr, "TCP", intClient, intPort ); 
+],[ 
+AC_DEFINE(HAVE_MINIUPNP_15, 1, [Define to 1 if you have miniupnpc version 1.5]) 
+upnp_version="1.5"])
+ 
+# See if the OS has its miniupnp 1.6 installed
+AC_TRY_LINK([ 
+    #include <stdlib.h> 
+    #include <errno.h> 
+    #include <miniupnpc/miniupnpc.h> 
+    #include <miniupnpc/upnpcommands.h> 
+],[ 
+    struct UPNPDev * devlist; 
+    struct UPNPUrls    urls; 
+    struct IGDdatas    data; 
+    char lanaddr[16]; 
+    char portStr[8]; 
+    char intPort[8]; 
+    char intClient[16]; 
+    upnpDiscover( 2000, NULL, NULL, 0, 0, &errno ); 
+    UPNP_GetValidIGD( devlist, &urls, &data, lanaddr, sizeof( lanaddr ) );  
+    UPNP_GetSpecificPortMappingEntry( urls.controlURL, data.first.servicetype, 
+                        portStr, "TCP", intClient, intPort, NULL, NULL, NULL ); 
+],[ 
+AC_DEFINE(HAVE_MINIUPNP_16, 1, [Define to 1 if you have miniupnpc version 1.6]) 
+upnp_version="1.6"])
+
+# ... and the results of our tests
+LIBS="$ac_save_LIBS" 
+AC_MSG_RESULT([$upnp_version])
+AM_CONDITIONAL([BUILD_MINIUPNP],[test "x$upnp_version" = "xnone"]) 
+if test "x$upnp_version" = "xnone" ; then
+    LIBUPNP_CFLAGS="-I\$(top_srcdir)/third-party/" 
+    LIBUPNP_LIBS="\$(top_builddir)/third-party/miniupnp/libminiupnp.a" 
+    LIBUPNP_LIBS_QT="\$\${TRANSMISSION_TOP}/third-party/miniupnp/libminiupnp.a" 
+    dnl because this is the version that we bundle...
+    AC_DEFINE(HAVE_MINIUPNP_16, 1, [Define to 1 if you have miniupnpc version 1.6]) 
+else
+    AC_DEFINE([SYSTEM_MINIUPNP]) 
+    LIBUPNP_CFLAGS=""  
+    LIBUPNP_LIBS="-lminiupnpc" 
+    LIBUPNP_LIBS_QT="-lminiupnpc" 
+fi
+AC_SUBST(LIBUPNP_CFLAGS) 
+AC_SUBST(LIBUPNP_LIBS) 
+AC_SUBST(LIBUPNP_LIBS_QT) 
 
 
 dnl ----------------------------------------------------------------------------
@@ -408,7 +480,6 @@ AC_CONFIG_FILES([Makefile
                  libtransmission/Makefile
                  utils/Makefile
                  third-party/Makefile
-                 third-party/miniupnp/Makefile
                  third-party/libnatpmp/Makefile
                  third-party/dht/Makefile
                  macosx/Makefile
@@ -425,9 +496,14 @@ AC_CONFIG_FILES([Makefile
                  po/Makefile.in])
 
 dnl Maybe build libutp...
-AM_CONDITIONAL([CONDITIONAL],[test "x$build_utp" = "xyes"])
-AM_COND_IF([CONDITIONAL],
+AM_CONDITIONAL([LIBUTP_CONDITIONAL],[test "x$build_utp" = "xyes"])
+AM_COND_IF([LIBUTP_CONDITIONAL],
            [AC_CONFIG_FILES([third-party/libutp/Makefile])])
+
+dnl Maybe build miniupnpc...
+AM_CONDITIONAL([UPNP_CONDITIONAL],[test "x$upnp_version" = "xnone"])
+AM_COND_IF([UPNP_CONDITIONAL],
+           [AC_CONFIG_FILES([third-party/miniupnp/Makefile])])
 
 AC_OUTPUT
 

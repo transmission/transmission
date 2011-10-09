@@ -20,7 +20,7 @@ bin_PROGRAMS = \
 
 LDADD = \
     $(top_builddir)/libtransmission/libtransmission.a \
-    $(top_builddir)/third-party/miniupnp/libminiupnp.a \
+    @LIBUPNP_LIBS@ \
     $(top_builddir)/third-party/libnatpmp/libnatpmp.a \
     @DHT_LIBS@ \
     @LIBUTP_LIBS@ \

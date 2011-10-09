@@ -8,6 +8,7 @@ AM_CPPFLAGS = \
 AM_CFLAGS = \
     @DHT_CFLAGS@ \
     @LIBUTP_CFLAGS@ \
+    @LIBUPNP_CFLAGS@ \
     @LIBEVENT_CFLAGS@ \
     @LIBCURL_CFLAGS@ \
     @OPENSSL_CFLAGS@ \
@@ -139,7 +140,7 @@ apps_ldflags = \
 
 apps_ldadd = \
     ./libtransmission.a  \
-    $(top_builddir)/third-party/miniupnp/libminiupnp.a \
+    @LIBUPNP_LIBS@ \
     $(top_builddir)/third-party/libnatpmp/libnatpmp.a \
     @INTLLIBS@ \
     @DHT_LIBS@ \
