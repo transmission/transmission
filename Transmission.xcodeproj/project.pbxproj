@@ -2748,9 +2748,9 @@
 		0053D3D60C86774200545606 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SRCROOT)/third-party/curl/lib\"",
+				HEADER_SEARCH_PATHS = (
+					"third-party/curl/include",
+					.,
 				);
 				PRODUCT_NAME = transmissioncli;
 			};
@@ -2761,11 +2761,8 @@
 			buildSettings = {
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
+					.,
 					"third-party/libevent/include",
-				);
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SRCROOT)/third-party/curl/lib\"",
 				);
 				OTHER_CFLAGS = (
 					"$(inherited)",
@@ -2780,11 +2777,8 @@
 			buildSettings = {
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
+					.,
 					"third-party/libevent/include",
-				);
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SRCROOT)/third-party/curl/lib\"",
 				);
 				PRODUCT_NAME = "transmission-remote";
 			};
@@ -2882,9 +2876,9 @@
 		4DDBB71E09E16BF100284745 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SRCROOT)/third-party/curl/lib\"",
+				HEADER_SEARCH_PATHS = (
+					"third-party/curl/include",
+					.,
 				);
 				PRODUCT_NAME = transmissioncli;
 			};
@@ -3024,9 +3018,9 @@
 		A250CFED0CDA19680068B4B6 /* Release - Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SRCROOT)/third-party/curl/lib\"",
+				HEADER_SEARCH_PATHS = (
+					"third-party/curl/include",
+					.,
 				);
 				PRODUCT_NAME = transmissioncli;
 			};
@@ -3067,11 +3061,8 @@
 			buildSettings = {
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
+					.,
 					"third-party/libevent/include",
-				);
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SRCROOT)/third-party/curl/lib\"",
 				);
 				OTHER_CFLAGS = (
 					"$(inherited)",
@@ -3086,11 +3077,8 @@
 			buildSettings = {
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
+					.,
 					"third-party/libevent/include",
-				);
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SRCROOT)/third-party/curl/lib\"",
 				);
 				PRODUCT_NAME = "transmission-remote";
 			};
@@ -3174,11 +3162,8 @@
 			buildSettings = {
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
+					.,
 					"third-party/libevent/include",
-				);
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SRCROOT)/third-party/curl/lib\"",
 				);
 				OTHER_CFLAGS = (
 					"$(inherited)",
@@ -3193,11 +3178,8 @@
 			buildSettings = {
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
+					.,
 					"third-party/libevent/include",
-				);
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SRCROOT)/third-party/curl/lib\"",
 				);
 				PRODUCT_NAME = "transmission-remote";
 			};
