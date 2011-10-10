@@ -130,13 +130,13 @@
 		A2265F420B5EF5F40093DDA5 /* FileNameCell.m in Sources */ = {isa = PBXBuildFile; fileRef = A2265F400B5EF5F40093DDA5 /* FileNameCell.m */; };
 		A226FDAC0D0CDF20005A7F71 /* libnatpmp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3C7A118D0D0B2EB800B5701F /* libnatpmp.a */; };
 		A2290D1E14421CC100B95A09 /* libcrypto.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A27653A714369C5C009D3CCF /* libcrypto.dylib */; };
-		A2290D1F14421CC600B95A09 /* libcurl.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A27653A514369C12009D3CCF /* libcurl.dylib */; };
 		A2290D2014421CD000B95A09 /* libcrypto.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A27653A714369C5C009D3CCF /* libcrypto.dylib */; };
-		A2290D2114421CD300B95A09 /* libcurl.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A27653A514369C12009D3CCF /* libcurl.dylib */; };
 		A2290D2214421CD800B95A09 /* libcrypto.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A27653A714369C5C009D3CCF /* libcrypto.dylib */; };
-		A2290D2314421CDA00B95A09 /* libcurl.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A27653A514369C12009D3CCF /* libcurl.dylib */; };
-		A2290D2414421D1500B95A09 /* libcurl.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A27653A514369C12009D3CCF /* libcurl.dylib */; };
 		A2290D2514421D1A00B95A09 /* libcrypto.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A27653A714369C5C009D3CCF /* libcrypto.dylib */; };
+		A2290D2E1442B23200B95A09 /* libcurl.4.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A2290D2D1442B23200B95A09 /* libcurl.4.dylib */; };
+		A2290D2F1442B23200B95A09 /* libcurl.4.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A2290D2D1442B23200B95A09 /* libcurl.4.dylib */; };
+		A2290D301442B23200B95A09 /* libcurl.4.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A2290D2D1442B23200B95A09 /* libcurl.4.dylib */; };
+		A2290D311442B23200B95A09 /* libcurl.4.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A2290D2D1442B23200B95A09 /* libcurl.4.dylib */; };
 		A22A8D560AEEAFA5007E9CB9 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = A22A8D540AEEAFA5007E9CB9 /* Localizable.strings */; };
 		A22B00B2116A9E9F003315FC /* connecthostport.h in Headers */ = {isa = PBXBuildFile; fileRef = A22B00AF116A9E90003315FC /* connecthostport.h */; };
 		A22B00B3116A9EA4003315FC /* connecthostport.c in Sources */ = {isa = PBXBuildFile; fileRef = A22B00AE116A9E90003315FC /* connecthostport.c */; };
@@ -635,6 +635,7 @@
 		A223AA830D220CEB00840069 /* nl */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = nl; path = macosx/nl.lproj/PrefsWindow.xib; sourceTree = "<group>"; };
 		A2265F3F0B5EF5F40093DDA5 /* FileNameCell.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = FileNameCell.h; path = macosx/FileNameCell.h; sourceTree = "<group>"; };
 		A2265F400B5EF5F40093DDA5 /* FileNameCell.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = FileNameCell.m; path = macosx/FileNameCell.m; sourceTree = "<group>"; };
+		A2290D2D1442B23200B95A09 /* libcurl.4.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libcurl.4.dylib; path = "third-party/curl/lib/libcurl.4.dylib"; sourceTree = "<group>"; };
 		A22B00AE116A9E90003315FC /* connecthostport.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = connecthostport.c; path = "third-party/miniupnp/connecthostport.c"; sourceTree = "<group>"; };
 		A22B00AF116A9E90003315FC /* connecthostport.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = connecthostport.h; path = "third-party/miniupnp/connecthostport.h"; sourceTree = "<group>"; };
 		A22BAE261388040500FB022F /* NSMutableArrayAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = NSMutableArrayAdditions.h; path = macosx/NSMutableArrayAdditions.h; sourceTree = "<group>"; };
@@ -762,7 +763,6 @@
 		A2725D5C0DE7507C003445E7 /* TrackerTableView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TrackerTableView.m; path = macosx/TrackerTableView.m; sourceTree = "<group>"; };
 		A27476FF0CC38EE6003CC76D /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = macosx/es.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		A27477010CC38EE6003CC76D /* es */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = es; path = macosx/es.lproj/Localizable.strings; sourceTree = "<group>"; };
-		A27653A514369C12009D3CCF /* libcurl.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libcurl.dylib; path = usr/lib/libcurl.dylib; sourceTree = SDKROOT; };
 		A27653A714369C5C009D3CCF /* libcrypto.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libcrypto.dylib; path = usr/lib/libcrypto.dylib; sourceTree = SDKROOT; };
 		A2768AAE140DCB6A00F82413 /* pt */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = pt; path = macosx/pt.lproj/GlobalOptionsPopover.xib; sourceTree = "<group>"; };
 		A277DA090C693D9C00DA2CD4 /* ActionOn.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = ActionOn.png; path = macosx/Images/ActionOn.png; sourceTree = "<group>"; };
@@ -1004,7 +1004,7 @@
 				4D9A2BF009E16D21002D0FF9 /* libtransmission.a in Frameworks */,
 				A296EF3C11E560BD004A2781 /* libiconv.dylib in Frameworks */,
 				A2290D1E14421CC100B95A09 /* libcrypto.dylib in Frameworks */,
-				A2290D1F14421CC600B95A09 /* libcurl.dylib in Frameworks */,
+				A2290D2F1442B23200B95A09 /* libcurl.4.dylib in Frameworks */,
 				A2B6141E1395B0EC000E0975 /* libz.dylib in Frameworks */,
 				A2B3FB4C0E59023000FF78FB /* Cocoa.framework in Frameworks */,
 			);
@@ -1021,7 +1021,7 @@
 				A261F1DC0A69A1610002815A /* Growl.framework in Frameworks */,
 				A296EF3B11E560A7004A2781 /* libiconv.dylib in Frameworks */,
 				A2290D2514421D1A00B95A09 /* libcrypto.dylib in Frameworks */,
-				A2290D2414421D1500B95A09 /* libcurl.dylib in Frameworks */,
+				A2290D2E1442B23200B95A09 /* libcurl.4.dylib in Frameworks */,
 				A2B6141F1395B0F5000E0975 /* libz.dylib in Frameworks */,
 				A2E669790F5B8E5A00B4251A /* Security.framework in Frameworks */,
 				A22CFB820FB66EF30009BD3E /* Carbon.framework in Frameworks */,
@@ -1077,7 +1077,7 @@
 				BEFC1C050C07753500B0BB3C /* libtransmission.a in Frameworks */,
 				A296EF3D11E560C3004A2781 /* libiconv.dylib in Frameworks */,
 				A2290D2014421CD000B95A09 /* libcrypto.dylib in Frameworks */,
-				A2290D2114421CD300B95A09 /* libcurl.dylib in Frameworks */,
+				A2290D301442B23200B95A09 /* libcurl.4.dylib in Frameworks */,
 				A2B6141D1395B0E3000E0975 /* libz.dylib in Frameworks */,
 				A2B3FB530E59027100FF78FB /* Cocoa.framework in Frameworks */,
 			);
@@ -1090,7 +1090,7 @@
 				BEFC1D2D0C0783D900B0BB3C /* libtransmission.a in Frameworks */,
 				A296EF3E11E560D1004A2781 /* libiconv.dylib in Frameworks */,
 				A2290D2214421CD800B95A09 /* libcrypto.dylib in Frameworks */,
-				A2290D2314421CDA00B95A09 /* libcurl.dylib in Frameworks */,
+				A2290D311442B23200B95A09 /* libcurl.4.dylib in Frameworks */,
 				A2B6141C1395ADE9000E0975 /* libz.dylib in Frameworks */,
 				A25E03D90E4015100086C225 /* Cocoa.framework in Frameworks */,
 			);
@@ -1471,7 +1471,7 @@
 			isa = PBXGroup;
 			children = (
 				A27653A714369C5C009D3CCF /* libcrypto.dylib */,
-				A27653A514369C12009D3CCF /* libcurl.dylib */,
+				A2290D2D1442B23200B95A09 /* libcurl.4.dylib */,
 				A296EF3411E5605E004A2781 /* libiconv.dylib */,
 				A2B6141B1395ADE9000E0975 /* libz.dylib */,
 			);
@@ -2731,7 +2731,10 @@
 				FRAMEWORK_SEARCH_PATHS = macosx;
 				GCC_PREFIX_HEADER = macosx/Transmission_Prefix.pch;
 				INFOPLIST_FILE = macosx/Info.plist;
-				LIBRARY_SEARCH_PATHS = "$(inherited)";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/third-party/curl/lib\"",
+				);
 				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				OTHER_CFLAGS = (
 					"$(inherited)",
@@ -2745,9 +2748,9 @@
 		0053D3D60C86774200545606 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				HEADER_SEARCH_PATHS = (
+				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
-					.,
+					"\"$(SRCROOT)/third-party/curl/lib\"",
 				);
 				PRODUCT_NAME = transmissioncli;
 			};
@@ -2758,8 +2761,11 @@
 			buildSettings = {
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					.,
 					"third-party/libevent/include",
+				);
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/third-party/curl/lib\"",
 				);
 				OTHER_CFLAGS = (
 					"$(inherited)",
@@ -2774,8 +2780,11 @@
 			buildSettings = {
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					.,
 					"third-party/libevent/include",
+				);
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/third-party/curl/lib\"",
 				);
 				PRODUCT_NAME = "transmission-remote";
 			};
@@ -2800,6 +2809,7 @@
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				GCC_WARN_INITIALIZER_NOT_FULLY_BRACKETED = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = "third-party/curl/include";
 				IBC_FLATTEN_NIBS = YES;
 				IBC_NOTICES = NO;
 				IBC_WARNINGS = YES;
@@ -2807,6 +2817,7 @@
 				INFOPLIST_OTHER_PREPROCESSOR_FLAGS = "-CC";
 				INFOPLIST_PREFIX_HEADER = "$(SRCROOT)/libtransmission/version.h";
 				INFOPLIST_PREPROCESS = YES;
+				LIBRARY_SEARCH_PATHS = "third-party/curl/lib";
 				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = macosx10.7;
@@ -2871,9 +2882,9 @@
 		4DDBB71E09E16BF100284745 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				HEADER_SEARCH_PATHS = (
+				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
-					.,
+					"\"$(SRCROOT)/third-party/curl/lib\"",
 				);
 				PRODUCT_NAME = transmissioncli;
 			};
@@ -2885,7 +2896,10 @@
 				FRAMEWORK_SEARCH_PATHS = macosx;
 				GCC_PREFIX_HEADER = macosx/Transmission_Prefix.pch;
 				INFOPLIST_FILE = macosx/Info.plist;
-				LIBRARY_SEARCH_PATHS = "$(inherited)";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/third-party/curl/lib\"",
+				);
 				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				OTHER_CFLAGS = (
 					"$(inherited)",
@@ -2917,6 +2931,7 @@
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				GCC_WARN_INITIALIZER_NOT_FULLY_BRACKETED = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = "third-party/curl/include";
 				IBC_FLATTEN_NIBS = YES;
 				IBC_NOTICES = NO;
 				IBC_WARNINGS = YES;
@@ -2924,6 +2939,7 @@
 				INFOPLIST_OTHER_PREPROCESSOR_FLAGS = "-CC";
 				INFOPLIST_PREFIX_HEADER = "$(SRCROOT)/libtransmission/version.h";
 				INFOPLIST_PREPROCESS = YES;
+				LIBRARY_SEARCH_PATHS = "third-party/curl/lib";
 				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				OTHER_CFLAGS = "-DNDEBUG";
 				SDKROOT = macosx10.7;
@@ -2970,6 +2986,7 @@
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				GCC_WARN_INITIALIZER_NOT_FULLY_BRACKETED = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = "third-party/curl/include";
 				IBC_FLATTEN_NIBS = YES;
 				IBC_NOTICES = NO;
 				IBC_WARNINGS = YES;
@@ -2977,6 +2994,7 @@
 				INFOPLIST_OTHER_PREPROCESSOR_FLAGS = "-CC";
 				INFOPLIST_PREFIX_HEADER = "$(SRCROOT)/libtransmission/version.h";
 				INFOPLIST_PREPROCESS = YES;
+				LIBRARY_SEARCH_PATHS = "third-party/curl/lib";
 				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				SDKROOT = macosx10.7;
 				STRIP_INSTALLED_PRODUCT = NO;
@@ -2989,7 +3007,10 @@
 				FRAMEWORK_SEARCH_PATHS = macosx;
 				GCC_PREFIX_HEADER = macosx/Transmission_Prefix.pch;
 				INFOPLIST_FILE = macosx/Info.plist;
-				LIBRARY_SEARCH_PATHS = "$(inherited)";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/third-party/curl/lib\"",
+				);
 				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				OTHER_CFLAGS = (
 					"$(inherited)",
@@ -3003,9 +3024,9 @@
 		A250CFED0CDA19680068B4B6 /* Release - Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				HEADER_SEARCH_PATHS = (
+				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
-					.,
+					"\"$(SRCROOT)/third-party/curl/lib\"",
 				);
 				PRODUCT_NAME = transmissioncli;
 			};
@@ -3046,8 +3067,11 @@
 			buildSettings = {
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					.,
 					"third-party/libevent/include",
+				);
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/third-party/curl/lib\"",
 				);
 				OTHER_CFLAGS = (
 					"$(inherited)",
@@ -3062,8 +3086,11 @@
 			buildSettings = {
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					.,
 					"third-party/libevent/include",
+				);
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/third-party/curl/lib\"",
 				);
 				PRODUCT_NAME = "transmission-remote";
 			};
@@ -3147,8 +3174,11 @@
 			buildSettings = {
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					.,
 					"third-party/libevent/include",
+				);
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/third-party/curl/lib\"",
 				);
 				OTHER_CFLAGS = (
 					"$(inherited)",
@@ -3163,8 +3193,11 @@
 			buildSettings = {
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					.,
 					"third-party/libevent/include",
+				);
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/third-party/curl/lib\"",
 				);
 				PRODUCT_NAME = "transmission-remote";
 			};
