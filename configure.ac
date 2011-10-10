@@ -480,8 +480,10 @@ AC_CONFIG_FILES([Makefile
                  libtransmission/Makefile
                  utils/Makefile
                  third-party/Makefile
-                 third-party/libnatpmp/Makefile
                  third-party/dht/Makefile
+                 third-party/libutp/Makefile
+                 third-party/libnatpmp/Makefile
+                 third-party/miniupnp/Makefile
                  macosx/Makefile
                  gtk/Makefile
                  gtk/icons/Makefile
@@ -494,16 +496,6 @@ AC_CONFIG_FILES([Makefile
                  web/javascript/jquery/Makefile
                  web/stylesheets/Makefile
                  po/Makefile.in])
-
-dnl Maybe build libutp...
-AM_CONDITIONAL([LIBUTP_CONDITIONAL],[test "x$build_utp" = "xyes"])
-AM_COND_IF([LIBUTP_CONDITIONAL],
-           [AC_CONFIG_FILES([third-party/libutp/Makefile])])
-
-dnl Maybe build miniupnpc...
-AM_CONDITIONAL([UPNP_CONDITIONAL],[test "x$upnp_version" = "xnone"])
-AM_COND_IF([UPNP_CONDITIONAL],
-           [AC_CONFIG_FILES([third-party/miniupnp/Makefile])])
 
 AC_OUTPUT
 
