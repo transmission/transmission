@@ -12,6 +12,7 @@
 
 #include <gtk/gtk.h>
 #include "hig.h"
+#include "util.h" /* gtr_hbox_new */
 
 GtkWidget*
 hig_workarea_create( void )
@@ -58,7 +59,7 @@ static GtkWidget*
 rowNew( GtkWidget * w )
 {
     GtkWidget * a;
-    GtkWidget * h = gtk_hbox_new( FALSE, 0 );
+    GtkWidget * h = gtr_hbox_new( FALSE, 0 );
 
     /* spacer */
     a = gtk_alignment_new( 0.0f, 0.0f, 0.0f, 0.0f );
@@ -187,8 +188,8 @@ hig_workarea_add_tall_row( GtkWidget  * table,
                            GtkWidget  * mnemonic )
 {
     GtkWidget * l = gtk_label_new_with_mnemonic( mnemonic_string );
-    GtkWidget * h = gtk_hbox_new( FALSE, 0 );
-    GtkWidget * v = gtk_vbox_new( FALSE, 0 );
+    GtkWidget * h = gtr_hbox_new( FALSE, 0 );
+    GtkWidget * v = gtr_vbox_new( FALSE, 0 );
     gtk_box_pack_start( GTK_BOX( h ), l, FALSE, FALSE, 0 );
     gtk_box_pack_start( GTK_BOX( v ), h, FALSE, FALSE, GUI_PAD_SMALL );
 
