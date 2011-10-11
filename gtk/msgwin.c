@@ -453,6 +453,10 @@ gtr_message_log_window_new( GtkWindow * parent, TrCore * core )
 
     toolbar = gtk_toolbar_new( );
     gtk_toolbar_set_style( GTK_TOOLBAR( toolbar ), GTK_TOOLBAR_BOTH_HORIZ );
+#if GTK_CHECK_VERSION( 3,0,0 )
+    gtk_style_context_add_class( gtk_widget_get_style_context( toolbar ),
+                                 GTK_STYLE_CLASS_PRIMARY_TOOLBAR );
+#endif
 
     item = gtk_tool_button_new_from_stock( GTK_STOCK_SAVE_AS );
     g_object_set( G_OBJECT( item ), "is-important", TRUE, NULL );
