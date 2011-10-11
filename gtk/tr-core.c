@@ -1415,8 +1415,11 @@ gtr_inhibit_hibernation( guint * cookie )
     }
 
     /* cleanup */
-    g_variant_unref( response );
-    g_object_unref( connection );
+    if( response != NULL )
+        g_variant_unref( response );
+    if( connection != NULL )
+        g_object_unref( connection );
+
     return success;
 }
 
