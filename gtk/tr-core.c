@@ -1401,9 +1401,10 @@ gtr_inhibit_hibernation( guint * cookie )
                                             NULL, G_DBUS_CALL_FLAGS_NONE,
                                             1000, NULL, &err );
 
-    *cookie = g_variant_get_uint32( g_variant_get_child_value( response, 0 ) );
+    if( response != NULL )
+        *cookie = g_variant_get_uint32( g_variant_get_child_value( response, 0 ) );
 
-    success = err == NULL;
+    success = ( response != NULL ) && ( err == NULL );
 
     /* logging */
     if( success )
