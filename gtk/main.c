@@ -1285,35 +1285,29 @@ update_model_loop( gpointer gdata )
 static void
 show_about_dialog( GtkWindow * parent )
 {
-    GtkWidget * d;
-    const char * website_uri = "http://www.transmissionbt.com/";
-    const char * authors[] = {
-        "Jordan Lee (Backend; GTK+)",
-        "Mitchell Livingston (Backend; OS X)",
-        NULL
-    };
+    const char * uri = "http://www.transmissionbt.com/";
+    const char * authors[] = { "Jordan Lee (Backend; GTK+)",
+                               "Mitchell Livingston (Backend; OS X)",
+                               NULL };
 
-    d = g_object_new( GTK_TYPE_ABOUT_DIALOG,
-                      "authors", authors,
-                      "comments", _( "A fast and easy BitTorrent client" ),
-                      "copyright", _( "Copyright (c) The Transmission Project" ),
-                      "logo-icon-name", MY_CONFIG_NAME,
-                      "name", g_get_application_name( ),
-                      /* Translators: translate "translator-credits" as your name
-                         to have it appear in the credits in the "About"
-                         dialog */
-                      "translator-credits", _( "translator-credits" ),
-                      "version", LONG_VERSION_STRING,
-                      "website", website_uri,
-                      "website-label", website_uri,
+    gtk_show_about_dialog( parent,
+        "authors", authors,
+        "comments", _( "A fast and easy BitTorrent client" ),
+        "copyright", _( "Copyright (c) The Transmission Project" ),
+        "logo-icon-name", MY_CONFIG_NAME,
+        "name", g_get_application_name( ),
+        /* Translators: translate "translator-credits" as your name
+           to have it appear in the credits in the "About"
+           dialog */
+        "translator-credits", _( "translator-credits" ),
+        "version", LONG_VERSION_STRING,
+        "website", uri,
+        "website-label", uri,
 #ifdef SHOW_LICENSE
-                      "license", LICENSE,
-                      "wrap-license", TRUE,
+        "license", LICENSE,
+        "wrap-license", TRUE,
 #endif
-                      NULL );
-    gtk_window_set_transient_for( GTK_WINDOW( d ), parent );
-    g_signal_connect_swapped( d, "response", G_CALLBACK (gtk_widget_destroy), d );
-    gtk_widget_show( d );
+        NULL );
 }
 
 static void
