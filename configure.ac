@@ -316,8 +316,8 @@ dnl  detection for the GTK+ client
 
 gtk_version="none"
 with_gtk_default="no"
-PKG_CHECK_MODULES([GTK2],[gtk+-2.0 >= $GTK2_MINIMUM],[gtk_version="2" with_gtk_default="yes"])
-PKG_CHECK_MODULES([GTK3],[gtk+-3.0 >= $GTK3_MINIMUM],[gtk_version="3" with_gtk_default="yes"])
+PKG_CHECK_EXISTS([gtk+-2.0 >= $GTK2_MINIMUM],[gtk_version="2" with_gtk_default="yes"])
+PKG_CHECK_EXISTS([gtk+-3.0 >= $GTK3_MINIMUM],[gtk_version="3" with_gtk_default="yes"])
 AC_ARG_WITH([gtk], AC_HELP_STRING([--with-gtk],[with Gtk]),
             [with_gtk=$withval],
             [with_gtk=$with_gtk_default])
