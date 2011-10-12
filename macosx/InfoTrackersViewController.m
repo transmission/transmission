@@ -184,6 +184,11 @@
         return [tableView rowHeight];
 }
 
+- (BOOL)tableView:(NSTableView *)aTableView shouldEditTableColumn:(NSTableColumn *)aTableColumn row:(NSInteger)rowIndex
+{
+    return NO;
+}
+
 - (void) tableViewSelectionDidChange: (NSNotification *) notification
 {
     [fTrackerAddRemoveControl setEnabled: [fTrackerTable numberOfSelectedRows] > 0 forSegment: TRACKER_REMOVE_TAG];
