@@ -6,6 +6,6 @@ dist_data_DATA = \
 
 SUBDIRS = \
   images \
-  javascript \
-  stylesheets
+  style \
+  javascript
 

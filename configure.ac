@@ -497,12 +497,14 @@ AC_CONFIG_FILES([Makefile
                  gtk/icons/Makefile
                  web/Makefile
                  web/images/Makefile
-                 web/images/buttons/Makefile
-                 web/images/graphics/Makefile
-                 web/images/progress/Makefile
+                 web/style/Makefile
+                 web/style/jqueryui/Makefile
+                 web/style/jqueryui/images/Makefile
+                 web/style/transmission/Makefile
+                 web/style/transmission/images/Makefile
+                 web/style/transmission/images/buttons/Makefile
                  web/javascript/Makefile
                  web/javascript/jquery/Makefile
-                 web/stylesheets/Makefile
                  po/Makefile.in])
 
 AC_OUTPUT

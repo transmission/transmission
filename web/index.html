@@ -9,20 +9,20 @@
 		<link href="./images/favicon.ico" rel="icon" />
 		<link href="./images/favicon.png" rel="shortcut icon" />
 		<link rel="apple-touch-icon" href="./images/webclip-icon.png"/>
-		<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js"></script>
-		<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.min.js"></script>
-		<link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/themes/base/jquery-ui.css" type="text/css" media="all" />
+		<script type="text/javascript" src="./javascript/jquery/jquery-1.6.4.min.js"></script>
+		<script type="text/javascript" src="./javascript/jquery/jqueryui-1.8.16.min.js"></script>
+		<link rel="stylesheet" href="./style/jqueryui/jqueryui-1.8.16.css" type="text/css" media="all" />
 
 <!--
 		<link media="screen" href="./stylesheets/mobile.css" type= "text/css" rel="stylesheet" />
 -->
-		<link media="only screen and (max-device-width: 480px)" href="./stylesheets/mobile.css" type= "text/css" rel="stylesheet" />
-		<link media="screen and (min-device-width: 481px)" href="./stylesheets/common.css" type="text/css" rel="stylesheet" />
+		<link media="only screen and (max-device-width: 480px)" href="./style/transmission/mobile.css" type= "text/css" rel="stylesheet" />
+		<link media="screen and (min-device-width: 481px)" href="./style/transmission/common.css" type="text/css" rel="stylesheet" />
 		<!--[if IE]>
-			<link media="screen" href="./stylesheets/common.css" type="text/css" rel="stylesheet" />
-			<link media="screen" href="./stylesheets/ieAll.css" type="text/css" rel="stylesheet" />
+			<link media="screen" href="./style/transmission/common.css" type="text/css" rel="stylesheet" />
+			<link media="screen" href="./style/transmission/ieAll.css" type="text/css" rel="stylesheet" />
 		<![endif]-->
-		<!--[if IE 7]><link media="screen" href="./stylesheets/ie7.css" type="text/css" rel="stylesheet" /><![endif]-->
+		<!--[if IE 7]><link media="screen" href="./style/transmission/ie7.css" type="text/css" rel="stylesheet" /><![endif]-->
 		<script type="text/javascript" src="./javascript/jquery/jquery.transmenu.min.js"></script>
 		<script type="text/javascript" src="./javascript/jquery/jquery.contextmenu.min.js"></script>
 		<script type="text/javascript" src="./javascript/jquery/jquery.form.min.js"></script>
@@ -104,7 +104,7 @@
                                                                  <div class="value"><input type="text" class="numberinput" id="speed-limit-down"/></div></div>
 					</div>
 					<div class="prefs-section">
-						<div class="title"><img src="images/graphics/blue-turtle.png" width="16" height="9" style="padding-right: 10px;"/>Alternative Speed Limits</div>
+						<div class="title"><div id="alternative-speed-limits-title">Alternative Speed Limits</div></div>
 						<div class="row" style="font-size: smaller; padding-bottom: 4px;">Override normal speed limits manually or at scheduled times</div>
 						<div class="row"><div class="key">Upload (kB/s):</div>
                                                                  <div class="value"><input type="text" class="numberinput" id="alt-speed-up"/></div></div>
@@ -180,14 +180,14 @@
 
 		<div id="torrent_inspector" style="display:none;">
 
-			<div style="display:none;" class="inspector_close" id="inspector_close"><img id="inspector_close_image" src="./images/buttons/cancel.png"/></div>
+			<div style="display:none;" class="inspector_close" id="inspector_close"></div>
 
 			<div id="inspector_tabs">
-				<div class="inspector_tab selected" id="inspector_tab_info"><a href="#info"><img src="images/buttons/info_general.png" alt="Information"/></a></div>
-				<div class="inspector_tab" id="inspector_tab_activity"><a href="#activity"><img src="images/buttons/info_activity.png" alt="Activity"/></a></div>
-				<div class="inspector_tab" id="inspector_tab_peers"><a href="#peers"><img src="images/buttons/info_peers.png" alt="Peers"/></a></div>
-				<div class="inspector_tab" id="inspector_tab_trackers"><a href="#trackers"><img src="images/buttons/info_trackers.png" alt="Trackers"/></a></div>
-				<div class="inspector_tab" id="inspector_tab_files"><a href="#files"><img src="images/buttons/info_files.png" alt="Files"/></a></div>
+				<div class="inspector_tab selected" id="inspector_tab_info"><div id="inspector-tab-label-info"></div><a href="#info"></a></div>
+				<div class="inspector_tab" id="inspector_tab_activity"><div id="inspector-tab-label-activity"></div><a href="#activity"></a></div>
+				<div class="inspector_tab" id="inspector_tab_peers"><div id="inspector-tab-label-peers"></div><a href="#peers"></a></div>
+				<div class="inspector_tab" id="inspector_tab_trackers"><div id="inspector-tab-label-trackers"></div><a href="#trackers"></a></div>
+				<div class="inspector_tab" id="inspector_tab_files"><div id="inspector-tab-label-files"></div><a href="#files"></a></div>
 			</div>
 
 			<div id="inspector_header">
@@ -324,7 +324,7 @@
 		<div class="dialog_container" id="dialog_container" style="display:none;">
 			<div class="dialog_top_bar"></div>
 			<div class="dialog_window">
-				<img src="images/graphics/logo.png" alt="Transmission Logo" />
+				<div class="dialog_logo" id="dialog_logo"></div>
 				<h2 class="dialog_heading" id="dialog_heading"></h2>
 				<div class="dialog_message" id="dialog_message"></div>
 				<a href="#confirm" id="dialog_confirm_button">Confirm</a>
@@ -333,7 +333,7 @@
 		</div>
 
 		<div id="about-dialog" style="display:none;">
-			<p><img src="images/graphics/logo.png"></p>
+			<p id="about-logo"></p>
 			<p id="about-title">Transmission X</p>
 			<p id="about-blurb">A fast and easy BitTorrent client</p>
 			<p id="about-copyright">Copyright (c) The Transmission Project</p>
@@ -360,7 +360,7 @@
 		<div class="dialog_container" id="upload_container" style="display:none;">
 			<div class="dialog_top_bar"></div>
 			<div class="dialog_window">
-				<img src="images/graphics/logo.png" alt="Transmission Logo" />
+				<div class="dialog_logo" id="dialog_logo"></div>
 				<h2 class="dialog_heading">Upload Torrent Files</h2>
 				<form action="#" method="post" id="torrent_upload_form"
 					enctype="multipart/form-data" target="torrent_upload_frame">

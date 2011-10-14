@@ -38,8 +38,6 @@ Transmission.prototype =
 		// Initialize the clutch preferences
 		Prefs.getClutchPrefs(this);
 
-		this.preloadImages();
-
 		// Set up user events
 		$(".numberinput").forceNumeric();
 		$('#pause_all_link').click($.proxy(this.stopAllClicked,this));
@@ -111,34 +109,6 @@ Transmission.prototype =
 		}, this, async);
 	},
 
-	preloadImages: function() {
-		if (isMobileDevice) {
-			this.loadImages(
-				'images/buttons/info_general.png',
-				'images/buttons/info_activity.png',
-				'images/buttons/info_files.png',
-				'images/buttons/toolbar_buttons.png',
-				'images/graphics/filter_bar.png',
-				'images/graphics/iphone_chrome.png',
-				'images/graphics/logo.png'
-			);
-		} else {
-			this.loadImages(
-				'images/buttons/info_general.png',
-				'images/buttons/info_activity.png',
-				'images/buttons/info_files.png',
-				'images/buttons/tab_backgrounds.png',
-				'images/buttons/toolbar_buttons.png',
-				'images/buttons/torrent_buttons.png',
-				'images/buttons/file_wanted_buttons.png',
-				'images/buttons/file_priority_buttons.png',
-				'images/graphics/chrome.png',
-				'images/graphics/filter_bar.png',
-				'images/graphics/logo.png',
-				'images/progress/progress.png'
-			);
-		}
-	},
 	loadImages: function() {
 		for (var i=0, row; row=arguments[i]; ++i)
 			jQuery("<img>").attr("src", row);

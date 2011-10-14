@@ -8,48 +8,56 @@ html {
 	margin: 0;
 /* setting border: 0 hoses ie6 win window inner well border */
 	padding: 0;
+	height: 100%;
 }
 
 body {
-	font: 11px Helvetica, Arial, sans-serif;
+	font: 62.5% "lucida grande", Tahoma, Verdana, Arial, Helvetica, sans-serif; /* Resets 1em to 10px */
+	color: #222;/* !important; */
 	background: #FFF;
 	text-align: center;
-	margin: 0;
-	padding: 0;
-	width: 100%;
-	overflow-x: hidden;
-	-webkit-text-size-adjust: none;
+	margin: 0 0 30px;
+	overflow: hidden;
 }
 
-body div#torrent_container {
-        min-height: 328px;
+img {
+	border: none;
 }
 
-body div.dialog_container {
-        min-height: 326px;
+a {
+	outline: 0;
 }
 
-body div#torrent_inspector {
-        min-height: 329px;
+#toolbar,
+#statusbar,
+.torrent_footer {
+	background-color: #B9B9B9; /* fallback color if gradients are not supported */
+	background-image: -webkit-gradient(linear, left top, left bottom, from(#C9C9C9), to(#A7A7A7)); 
+	background-image: -webkit-linear-gradient(top, #C9C9C9, #A7A7A7); 
+	background-image:    -moz-linear-gradient(top, #C9C9C9, #A7A7A7); 
+	background-image:     -ms-linear-gradient(top, #C9C9C9, #A7A7A7); 
+	background-image:      -o-linear-gradient(top, #C9C9C9, #A7A7A7); 
+	background-image:         linear-gradient(top, #C9C9C9, #A7A7A7); /* standard, but currently unimplemented */
 }
 
-body.landscape div#torrent_container {
-	min-height: 147px;
-}
+/***
+****
+****  ABOUT DIALOG
+****
+***/
 
-body.landscape div#dialog_container, body.landscape div#torrent_inspector {
-	min-height: 143px;
+#about-dialog > * {
+	text-align: center;
 }
-
-body.inspector_showing #torrent_filter_bar, body.inspector_showing #torrent_container,
-body.dialog_showing #torrent_filter_bar, body.dialog_showing #torrent_container, body.dialog_showing #torrent_inspector,
-body.prefs_showing #torrent_inspector, body.prefs_showing #torrent_filter_bar, body.prefs_showing #torrent_container,
-body.open_showing #torrent_filter_bar, body.open_showing #torrent_container {
-	display: none !important;
+#about-dialog > #about-logo {
+	background: transparent url('images/logo.png') top left no-repeat;
+	width: 64px;
+	height: 64px;
+	margin-left: 100px;
 }
-
-.torrent a img {
-	display: none;
+#about-dialog > #about-title {
+	font-size: 1.3em;
+	font-weight: bold;
 }
 
 /***
@@ -60,52 +68,45 @@ body.open_showing #torrent_filter_bar, body.open_showing #torrent_container {
 
 #toolbar {
 	width: 100%;
-	height: 55px;
+	height: 75px;
 	margin: 0;
-	background: #6685a1 url('../images/graphics/iphone_chrome.png') top left repeat-x;
 	border: 1px outset #AEBBCB;
+	overflow: hidden;
+	-moz-user-select: none;
+	-webkit-user-select: none;
 }
 
 #toolbar ul {
+	height: 50px;
 	margin: 0;
-	padding: 0 3px;
+	padding: 0 7px;
 	text-align: center;
 }
 
 #toolbar ul li {
 	list-style-type: none;
 	list-style-image: none;
-	margin: 4px 0 0 0;
-	padding: 0 2px;
+	float: left;
+	margin: 13px 0 0 0;
+	height: 50px;
+	padding: 0 8px;
 	cursor: pointer;
-	display: inline-block;
 }
 
-#toolbar li#remove, li#open, li#resume_selected, li#pause_selected {
-	float: left;
-}
-#toolbar li#resume_all, li#pause_all {
+#toolbar #inspector {
 	float: right;
 }
 
 #toolbar ul li > div {
-	color: #fff;
-	font-size: 9px;
-	text-decoration: none;
-	padding: 0 4px 0;
-	display: block;
-	margin: 0;
-	background-position: top center;
-	background-repeat: no-repeat;
-	position: relative;
-	font-weight: bold;
+	text-shadow: 0 1px 0 #ccc;
+	min-width: 32px;
 }
 
 #toolbar ul li div.toolbar_image {
 	width: 32px;
 	height: 32px;
-	margin: 0 auto 2px;
-	background-image: url('../images/buttons/toolbar_buttons.png');
+	margin: 0 auto 5px;
+	background-image: url('images/buttons/toolbar_buttons.png');
 }
 
 /* toolbar images */
@@ -132,10 +133,12 @@ li#inspector       div:active div.toolbar_image { background-position: right -22
 	cursor: default;
 }
 
-#toolbar ul li#filter,
-#toolbar ul li#inspector,
 #toolbar ul li.divider {
-	display: none;
+	width: 0;
+	border-right: 1px dotted black;
+	opacity: 0.2;
+	margin: 14px 4px 0;
+	height: 49px;
 }
 
 /***
@@ -145,30 +148,23 @@ li#inspector       div:active div.toolbar_image { background-position: right -22
 ***/
 
 #statusbar {
-	margin: 0;
-	color: #fff;
-	background: #6B83A1;
 	border: 1px outset #AEBBCB;
+	height: 24px;
 	width: 100%;
 	overflow: hidden;
 	position: relative;
-	text-align: left;
 }
 
 #statusbar #speed-info {
-	margin-top: 3px;
-	float: right;
-	margin-right: 6px;
+	margin-top: 5px;
+	margin-left: 45%;
+	text-align: left;
 }
 
 #statusbar #filter-button {
 	float: left;
-	border: none;
-	font-size: 1.2em;
-	padding: 1px 6px;
-	margin-top: 1px;
-	overflow: hidden;
-	text-overflow: ellipsis;
+	text-shadow: 0 1px 0 #ccc;
+	margin: 5px 8px;
 	-moz-user-select: none;
 	-webkit-user-select: none;
 }
@@ -180,9 +176,32 @@ li#inspector       div:active div.toolbar_image { background-position: right -22
 }
 
 
+#statusbar input#torrent_search {
+	float: right;
+	height: 15px;
+	width: 100px;
+	border: solid 0 #fff;
+	padding: 2px;
+	margin: 4px 5px 0 0;
+	border-radius: 10px;
+}
+/* Safari-look filter input for Firefox */
+@-moz-document url-prefix() {
+	div#statusbar input#torrent_search {
+		background: #FFF url('images/filter_icon.png') top left no-repeat;
+		border: 1px solid #5D80A1;
+		margin-top: 3px;
+		padding: 1px 10px 1px 18px;
+		width: 76px;
+		-moz-border-radius: 10px;
+	}
+	div#torrent_filter_bar input#torrent_search.blur {
+		border-color: #CCC;
+	}
+}
 
-#statusbar #torrent_search {
-	display: none;
+#statusbar input#torrent_search.blur {
+	color: #999;
 }
 
 /***
@@ -209,7 +228,7 @@ div#filter-popup #filter-by-state .row .filter-name {
 #filter-popup .row {
 	text-align: left;
 	cursor: pointer;
-	margin: 15px 2px;
+	margin: 8px 2px;
 	position: relative;
 	height: 18px;
 	-moz-user-select: none;
@@ -256,40 +275,37 @@ div#filter-popup .row .filter-img {
 ****
 ***/
 
+div#torrent_container {
+	position: fixed;
+	top: 102px;
+	bottom: 22px;
+	right: 0px;
+	left: 0px;
+	padding: 0px;
+	margin: 0px;
+	overflow: auto;
+}
+
 ul.torrent_list {
+	width: 100%;
 	margin: 0;
 	padding: 0;
 	text-align: left;
-}
-
-ul.torrent_list li {
-	list-style-type: none;
-	list-style-image: none;
-	clear: both;
-	display: block;
-	padding: 0;
-	margin: 0;
-	vertical-align: middle;
+	cursor: pointer;
 }
 
 ul.torrent_list li.torrent {
 	border-bottom: 1px solid #ccc;
-	padding: 4px 10px;
+	padding: 4px 30px 5px 10px; /* Make space for buttons on the right */
 	color: #666;
-	font-size: 11px;
-	margin: 0 !important;
-	background: white;
 }
-
 ul.torrent_list li.torrent.compact {
 	padding: 4px;
 }
 
-.torrent div.torrent_progress_details, .torrent div.torrent_peer_details {
-	clear: both;
-	white-space: nowrap;
-	overflow: hidden;
-	text-overflow: ellipsis;
+ul.torrent_list li.torrent a img {
+	position: relative;
+	right: -10px;
 }
 
 ul.torrent_list li.torrent.even {
@@ -308,6 +324,7 @@ ul.torrent_list li.torrent div.torrent_name {
 	text-overflow: ellipsis;
 	white-space: nowrap;
 	color: #222;
+	margin-top: 2px;
 	margin-bottom: 2px;
 }
 
@@ -366,7 +383,6 @@ ul.torrent_list li.torrent.selected div.torrent_peer_details.error {
 ul.torrent_list div.torrent_progress_bar_container {
 	height: 10px;
 	position: relative;
-	margin-top: 2px;
 }
 ul.torrent_list div.torrent_progress_bar_container.compact {
 	width: 50px;
@@ -377,11 +393,11 @@ ul.torrent_list div.torrent_progress_bar_container.compact {
 }
 ul.torrent_list div.torrent_peer_details.compact {
 	margin-top: 2px;
-	margin-left: 10px;
 	margin-right: 65px; /* leave room on the right for the progressbar */
 	float: right; /* pins it next to progressbar & forces torrent_name to ellipsize when it bumps up against this div */
 }
 ul.torrent_list div.torrent_progress_bar_container.full {
+	margin-top: 2px;
 	margin-bottom: 5px;
 }
 ul.torrent_list div.torrent_progress_bar {
@@ -389,7 +405,7 @@ ul.torrent_list div.torrent_progress_bar {
 	position: absolute;
 	top: 0px;
 	left: 0px;
-	background-image: url('../images/progress/progress.png');
+	background-image: url('images/progress.png');
 	background-repeat: repeat-x;
 	border: 1px solid #888;
 }
@@ -445,81 +461,38 @@ ul.torrent_list div.torrent_progress_bar.incomplete.seeding {
         border-color: #29AD35;
 }
 
-div.dialog_container {
-	background: rgba(0,0,0,0.85);
-	color: white;
-	padding: 15px 10px;
-}
+/****
+*****  START / STOP BUTTON
+****/
 
-div.dialog_container .dialog_window {
-	height: auto;
-	font-size: 13px;
-	text-shadow: black 1px 1px 1px !important;
+li.torrent a {
+	float: right;
+	position: relative;
+	right: -22px;
+	top: 1px;
 }
-
-div#dialog_message.dialog_message {
-	width: 280px;
-	margin: 10px auto 25px;
-	font-size: 13px;
-	line-height: 14px;
-	word-wrap: break-word;
-	overflow: hidden;
-	padding-bottom: 0;
+li.torrent a div {
+	background: url('images/buttons/torrent_buttons.png');
+	height: 14px;
+	width: 14px;
 }
-
-#torrent_upload_file, label[for="torrent_upload_file"]{
-	display:none;
+li.torrent a div.torrent_pause {
+	background-position: left top;
 }
-
-h2.dialog_heading {
-	text-align: center;
-	width: 300px;
-	margin: 0 auto;
-	font-size: 17px;
+li.torrent a:hover div.torrent_pause {
+	background-position: left center;
 }
-
-div.dialog_container a {
-	color: white;
-	padding: 7px 0;
-	background: #222;
-	text-decoration: none;
-	border: 2px solid white;
-	margin: 5px 5px 0;
-	font-weight: bold;
-	-webkit-border-radius: 16px;
-	display: inline-block;
-	width: 90px;
-	font-size: 12px;
-	text-align: center;
+li.torrent a:active div.torrent_pause {
+	background-position: left bottom;
 }
-
-#dialog_container div.dialog_window img {
-	margin: 5px auto 12px;
+li.torrent a div.torrent_resume {
+	background-position: center top;
 }
-
-.landscape div.dialog_container a#dialog_cancel_button {
-	left: 155px;
+li.torrent a:hover div.torrent_resume {
+	background-position: center center;
 }
-
-.landscape div.dialog_container a#dialog_confirm_button {
-	right: 110px;
-}
-
-.landscape div.dialog_container img {
-	float: left !important;
-	margin: 0 0 0 50px;
-}
-
-.landscape h2#dialog_heading.dialog_heading {
-	margin: 5px auto 0;
-	margin-left: 150px;
-	text-align: left;
-}
-
-.landscape div#dialog_message.dialog_message {
-	width: 300px;
-	margin: 10px 0 20px 150px;
-	text-align: left;
+li.torrent a:active div.torrent_resume {
+	background-position: center bottom;
 }
 
 /***
@@ -565,27 +538,26 @@ div.dialog_container a {
 	margin-left: 5px;
 }
 
+.prefs-section #alternative-speed-limits-title {
+	padding-left: 18px;
+	background: transparent url('images/blue-turtle.png') no-repeat;
+}
+
 /*--------------------------------------
  *
  * T O R R E N T   I N S P E C T O R
  *
  *--------------------------------------*/
 
-#inspector_close {
-	align: right;
-	text-align: centre;
-	float: right;
-	padding-right: 10px;
-	padding-top: 12px;
-}
-
 div#torrent_inspector {
-	position: relative;
-	top: 0 !important;
+	position: fixed;
+	top: 102px;
+	bottom: 22px;
 	right: 0px;
-	width: 100%;
+	width: 570px;
 	background-color: #ddd;
-	z-index: 2;
+	border-left: 1px solid #888;
+	z-index: 5;
 	text-align: left;
 	overflow: auto;
 }
@@ -606,24 +578,100 @@ div#inspector_header {
 	padding-right: 10px;
 }
 div#inspector_tabs {
-	width: 243px;
-	margin: 0 auto;
-	padding-top: 10px;
+	width: 283px;
+	margin: 10px auto 0 auto;
 }
 .inspector_tab {
 	float: left;
 	height: 17px;
-	background: transparent url('../images/buttons/tab_backgrounds.png') left -1px repeat-x;
-	border: 1px solid #888;
-	margin: 0px 1px;
+	background: transparent url('images/buttons/tab_backgrounds_highlight.png') left -1px repeat-x;
+	margin: 0px;
 	padding: 3px 15px; /* 3px == ((bg image height - fg image height) / 2) */
 	cursor: pointer;
 }
 #inspector_tabs .selected {
 	background-position: left -26px; /* the highlighted part of the image */
 }
+
+.inspector_tab > #inspector-tab-label-info {
+	width: 24px;
+	height: 20px;
+	background: transparent url('images/buttons/info_general.png') no-repeat;
+}
+.inspector_tab > #inspector-tab-label-activity {
+	width: 24px;
+	height: 20px;
+	background: transparent url('images/buttons/info_activity.png') no-repeat;
+}
+.inspector_tab > #inspector-tab-label-peers {
+	width: 24px;
+	height: 20px;
+	background: transparent url('images/buttons/info_peers.png') no-repeat;
+}
+.inspector_tab > #inspector-tab-label-trackers {
+	width: 24px;
+	height: 20px;
+	background: transparent url('images/buttons/info_trackers.png') no-repeat;
+}
+.inspector_tab > #inspector-tab-label-files {
+	width: 24px;
+	height: 20px;
+	background: transparent url('images/buttons/info_files.png') no-repeat;
+}
+
+#inspector_tab_info {
+	background: transparent url('images/buttons/tab_backgrounds.png') left -1px repeat-x;
+	border: 1px solid #aaa;
+	-webkit-border-top-left-radius: 5px;
+	-webkit-border-top-right-radius: 0px;
+	-webkit-border-bottom-right-radius: 0px;
+	-webkit-border-bottom-left-radius: 5px;
+	-moz-border-radius-topleft: 5px;
+	-moz-border-radius-topright: 0px;
+	-moz-border-radius-bottomright: 0px;
+	-moz-border-radius-bottomleft: 5px;
+	border-top-left-radius: 5px;
+	border-top-right-radius: 0px;
+	border-bottom-right-radius: 0px;
+	border-bottom-left-radius: 5px;
+}
+
+#inspector_tab_info .selected {
+	background: transparent url('images/buttons/tab_backgrounds.png') left -26px repeat-x;
+}
+
+#inspector_tabs #inspector_tab_info .selected {
+	background: transparent url('images/buttons/tab_backgrounds.png') left -26px repeat-x !important;
+}
+
+#inspector_tabs #inspector_tab_activity, #inspector_tabs #inspector_tab_peers {
+	border-top: 1px solid #aaa;
+	border-bottom: 1px solid #aaa;
+	border-right: 1px solid #aaa;
+}
+
+#inspector_tabs #inspector_tab_activity, #inspector_tabs #inspector_tab_trackers {
+	border-top: 1px solid #aaa;
+	border-bottom: 1px solid #aaa;
+}
+
+#inspector_tabs #inspector_tab_files {
+	border: 1px solid #aaa;
+	-webkit-border-top-left-radius: 0px;
+	-webkit-border-top-right-radius: 5px;
+	-webkit-border-bottom-right-radius: 5px;
+	-webkit-border-bottom-left-radius: 0px;
+	-moz-border-radius-topleft: 0px;
+	-moz-border-radius-topright: 5px;
+	-moz-border-radius-bottomright: 5px;
+	-moz-border-radius-bottomleft: 0px;
+	border-top-left-radius: 0px;
+	border-top-right-radius: 5px;
+	border-bottom-right-radius: 5px;
+	border-bottom-left-radius: 0px;
+}
 .inspector_container {
-	margin: 3%;
+	margin: 0 3%;
 	width: 96%;
 }
 .inspector_group {
@@ -632,6 +680,11 @@ div#inspector_tabs {
 	border-top: 1px solid #888;
 	margin: 10px 0px;
 	padding: 10px 0px;
+}
+.inspector_torrent_label {
+	display: table-caption;
+	font-size: 1.2em;
+	font-weight: bold;
 }
 .inspector_group_label {
 	display: table-header-group;
@@ -642,12 +695,79 @@ div#inspector_tabs {
 }
 .inspector_row > .inspector_label {
 	display: table-cell;
-	width: 100px; /* this + the next 230 == inspector_container_with */
+	width: 100px; /* this + the next 380 == inspector_container_with */
 }
 .inspector_row > div {
-	display: table-cell;
+	word-wrap: break-word;
 	padding-top: 10px;
-	width: 230px; /* inspector_container_width==330 - inspector_label_width==100 */
+	width: 380px; /* inspector_container_width==480 - inspector_label_width==100 */
+}
+
+/* Peers Inspector Tab */
+#inspector_peers_list {
+	padding: 0 0 0 0;
+	margin: 0 0 0 0;
+	text-align: left;
+	cursor: default;
+	overflow: hidden;
+}
+
+#inspector_peers_list > div.inspector_group {
+	padding-bottom: 0;
+	margin-bottom: 0;
+}
+
+table.peer_list {
+	width: 100%;
+	border-collapse: collapse;
+	text-align: left;
+	cursor: default;
+	clear: both;
+	table-layout: fixed;
+}
+
+.peer_list .encryptedCol {
+	width: 16px;
+}
+
+.peer_list .upCol {
+	width: 70px;
+}
+
+.peer_list .downCol {
+	width: 70px;
+}
+
+.peer_list .percentCol {
+	width: 30px;
+	padding-right: 5px;
+}
+
+.peer_list td.percentCol {
+	text-align: right;
+}
+
+.peer_list .statusCol {
+	width: 40px;
+	padding-right: 5px;
+}
+
+.peer_list .addressCol {
+	width: 180px;
+}
+
+.peer_list .clientCol {
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+tr.inspector_peer_entry {
+
+}
+
+tr.inspector_peer_entry.odd {
+	background-color: #EEEEEE;
 }
 
 /* Trackers Inspector Tab */
@@ -666,7 +786,7 @@ div#inspector_tabs {
 
 ul.tier_list {
 	width: 100%;
-	margin: 10px 0 0 0;
+	margin: 2px 0 8px 0;
 	padding-left: 0px;
 	text-align: left;
 	display: block;
@@ -682,7 +802,7 @@ ul.tier_list {
 .tier_list .tracker_activity{
 	float: left;
 	color: #666;
-	width: 200px;
+	width: 330px;
 	display: table;
 	margin-top: 1px;
 }
@@ -719,7 +839,20 @@ div.tracker_host {
 	cursor: default;
 	overflow: hidden;
 }
-ul.inspector_torrent_file_list {
+#inspector_tab_files_container #select_all_button_container {
+	width: 100%;
+}
+#inspector_tab_files_container .select_all_button {
+	background: transparent url('images/buttons/tab_backgrounds.png') repeat-x scroll left -6px;
+	border: 1px solid #888888;
+	cursor: pointer;
+	float: right;
+	list-style-type: none;
+	margin: 2px;
+	padding: 2px 5px;
+}
+
+#inspector_file_list {
 	width: 100%;
 	margin: 0  0 0 0;
 	padding-bottom: 10px;
@@ -729,6 +862,7 @@ ul.inspector_torrent_file_list {
 	list-style-type: none;
 	list-style: none;
 	list-style-image: none;
+	clear: both;
 }
 li.inspector_torrent_file_list_entry {
 	padding: 3px 0 3px 2px;
@@ -764,7 +898,7 @@ div.file_wanted_control {
 	margin: 3px 0 0 0;
 	width: 19px;
 	height: 19px;
-	background-image: url('../images/buttons/file_wanted_buttons.png');
+	background-image: url('images/buttons/file_wanted_buttons.png');
 	background-repeat: no-repeat;
 	background-color: transparent;
 }
@@ -788,7 +922,7 @@ div.file_priority_control {
 	margin: 4px 0 0 0;
 	width: 35px;
 	height: 19px;
-	background-image: url('../images/buttons/file_priority_buttons.png');
+	background-image: url('images/buttons/file_priority_buttons.png');
 	background-repeat: no-repeat;
 	background-color: transparent;
 	cursor: pointer;
@@ -811,7 +945,8 @@ div.file_priority_control.low {
 div.file_priority_control.low:hover {
 	background-position: right -38px;
 }
-ul.single_file li.inspector_torrent_file_list_entry>.file_priority_control, li.inspector_torrent_file_list_entry.complete div.file_priority_control {
+ul.single_file li.inspector_torrent_file_list_entry>.file_priority_control,
+li.inspector_torrent_file_list_entry.complete div.file_priority_control {
 	background-position: left -57px;
 	cursor: default;
 }
@@ -824,25 +959,21 @@ ul.single_file li.inspector_torrent_file_list_entry>.file_priority_control, li.i
 ****/
 
 div.torrent_footer {
-	height: 20px;
-	padding-top: 1px;
+	height: 22px;
 	border-top: 1px solid #555;
-	position: relative;
+	bottom: 0;
+	position: fixed;
 	width: 100%;
 	z-index: 3;
-
-        background-color: #B9B9B9; /* fallback color if gradients are not supported */
-        background-image: -webkit-gradient(linear, left top, left bottom, from(#C9C9C9), to(#A7A7A7));
-        background-image: -webkit-linear-gradient(top, #C9C9C9, #A7A7A7);
-        background-image:    -moz-linear-gradient(top, #C9C9C9, #A7A7A7);
-        background-image:     -ms-linear-gradient(top, #C9C9C9, #A7A7A7);
-        background-image:      -o-linear-gradient(top, #C9C9C9, #A7A7A7);
-        background-image:         linear-gradient(top, #C9C9C9, #A7A7A7); /* standard, but currently unimplemented */
 }
 
 div.torrent_footer > * {
 	position: relative;
 	float: left;
+	margin: 2px 4px;
+}
+div.torrent_footer > *,
+div.torrent_footer ul#settings_menu li#button {
 	height: 18px;
 	width: 32px;
 	cursor: pointer;
@@ -850,70 +981,166 @@ div.torrent_footer > * {
 	-webkit-user-select: none;
 }
 
-div.torrent_footer > #compact-button {
-	margin-left: 10px;
+div.torrent_footer ul#settings_menu li#button {
+	background: transparent url('images/chrome.png') left top no-repeat;
+	padding: 0;
+	position: relative;
 }
-div.torrent_footer > #prefs-button {
-	float: right;
-}
-div.torrent_footer ul#settings_menu {
-	display: none;
+div.torrent_footer ul#settings_menu li#button:hover,
+div.torrent_footer ul#settings_menu li#button:active {
+	background-position: -32px top;
 }
 
 #turtle-button {
-	background: transparent url('../images/graphics/chrome.png') left -18px no-repeat;
+	background: transparent url('images/chrome.png') left -18px no-repeat;
 }
+#turtle-button:hover,
 #turtle-button:active {
 	background-position: -32px -18px;
 }
 #turtle-button.enabled {
 	background-position: left -36px;
 }
+#turtle-button.enabled:hover,
 #turtle-button.enabled:active {
 	background-position: -32px -36px;
 }
 
 #compact-button {
-	background: transparent url('../images/graphics/chrome.png') left -54px no-repeat;
+	background: transparent url('images/chrome.png') left -54px no-repeat;
 }
+#compact-button:hover,
 #compact-button:active {
 	background-position: -32px -54px;
 }
 #compact-button.enabled {
 	background-position: left -72px;
 }
+#compact-button.enabled:hover,
 #compact-button.enabled:active {
 	background-position: -32px -72px;
 }
 
 #prefs-button {
-	background: transparent url('../images/graphics/chrome.png') left -90px no-repeat;
+	display: none;
 }
-#prefs-button:active {
-	background-position: -32px -90px;
-}
+
 
 /****
 *****
-*****  POPUP MENU
+*****  DIALOGS
 *****
 ****/
 
-.trans_menu,
-.trans_menu * {
-	display: none;
+div.dialog_container {
+	position: absolute;
+	top: 0;
+	left: 0px;
+	margin: 0px;
+	width: 100%;
+	height: 100%;
+	text-align: center;
+	color: black;
+	font-size: 1.1em;
 }
 
+div.dialog_container div.dialog_window {
+	background-color: #eee;
+	margin: 0 auto;
+	opacity: .95;
+	border-top: none;
+	text-align: left;
+	width: 420px;
+	z-index: 10;
+	overflow: hidden;
+	position: relative;
+	-webkit-box-shadow: 0 3px 6px rgba(0,0,0,0.7);
+	top: 80px;
+}
+@media screen and (-webkit-min-device-pixel-ratio:0) {
+	div.dialog_container div.dialog_window {
+		top: 0;
+		margin-top: 71px;
+	}
+}
 
-/*--------------------------------------
- *
- * Hide remnants of stuff we don't need, like
- * transmenu and contextmenu.
- *
- *--------------------------------------*/
+div.dialog_container #dialog_logo {
+	width: 64px;
+	height: 64px;
+	margin: 20px 20px 0 20px;
+	float: left;
+	background: transparent url('images/logo.png') top left no-repeat;
+}
 
-div#torrent_context_menu {
-	display: none;
+div.dialog_container div.dialog_window h2.dialog_heading {
+	display: block;
+	float: left;
+	width: 305px;
+	font-size: 1.2em;
+	color: black;
+	margin-top: 20px;
+}
+
+div.dialog_container div.dialog_window div.dialog_message {
+	float: left;
+	padding-left: 3px;
+	margin-left: -3px;
+	width: 305px;
+	overflow: hidden;
+}
+
+div.dialog_container div.dialog_window a {
+	display: block;
+	float: right;
+	margin: 10px 20px 10px -8px;
+	padding: 5px;
+	background-color: #EEE;
+	border: 1px solid #787878;
+	width: 50px;
+	height: 15px;
+	text-align: center;
+	font-weight: bold;
+	text-decoration: none;
+	color: #323232;
+	-webkit-appearance: button;
+	font: -webkit-control;
+	cursor: default;
+}
+
+div.dialog_container div.dialog_window a:hover,
+div.dialog_container div.dialog_window a:active {
+	background: #C0C8D6 url('images/filter_bar.png') bottom repeat-x;
+}
+
+div#upload_container div.dialog_window div.dialog_message label {
+	margin-top: 15px;
+	display: block;
+}
+
+div#upload_container div.dialog_window div.dialog_message input {
+	width: 249px;
+	margin: 3px 0 0 0;
+	display: block;
+}
+
+div#upload_container div.dialog_window div.dialog_message input[type=text] {
+	width: 245px;
+	padding: 2px;
+}
+
+div#upload_container div.dialog_window div.dialog_message input[type=checkbox] {
+	margin: 15px 3px 0 0;
+	display: inline;
+	width: auto;
+}
+
+div#upload_container div.dialog_window div.dialog_message #auto_start_label {
+	display: inline;
+}
+
+div.dialog_container div.dialog_window form {
+	margin: 0;
+	padding: 0px;
 }
 
 iframe#torrent_upload_frame {
@@ -926,4 +1153,130 @@ iframe#torrent_upload_frame {
 	border: none;
 	padding: 0;
 	margin: 0;
+}
+
+/****
+*****
+*****  POPUP MENU
+*****
+****/
+
+.trans_menu {
+	margin: 0;
+	padding: 0;
+}
+
+.trans_menu,
+.trans_menu ul {
+	list-style: none;
+}
+
+.trans_menu ul {
+	/* place it right above the button */
+	position: relative;
+	bottom: 18px;
+
+	min-width: 210px;
+	background-color: white;
+	padding: 5px 0;
+	text-align: left;
+	list-style: none;
+	-webkit-border-radius: 5px;
+	-webkit-box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+}
+
+.trans_menu ul ul {
+	min-width: 150px;
+}
+
+.trans_menu ul ul#footer_sort_menu {
+	min-width: 175px;
+}
+
+.trans_menu > * li {
+	margin: 0;
+	padding: 3px 10px 3px 20px !important;
+	color: #000;
+	cursor: default;
+	text-indent: auto !important;
+	width: inherit;
+}
+
+.trans_menu li.hover {
+	z-index: 1 !important; /* the hover z-index has to be below the normal one the hovering items may be drawn over a submenu */
+	background-color: #24e;
+	color: #fff;
+	text-shadow: none;
+}
+
+.trans_menu li.separator,
+.trans_menu li.separator.hover {
+	border-top: 1px solid #ddd;
+	margin: 5px 0;
+	padding: 0px;
+	background: transparent;
+}
+
+.trans_menu li span.arrow {
+	float: right;
+}
+
+.trans_menu li.hover li.hover span.arrow, .trans_menu li.hover li.hover li.hover span.selected {
+	color: white;
+}
+
+.trans_menu span.selected {
+	margin: 0 3px 0 -15px;
+	color: #666;
+	float: left;
+}
+
+.trans_menu div.outerbox {
+	display: none;
+	background: transparent;
+	border: 1px solid rgba(0,0,0,0.1);
+	-webkit-border-radius: 5px;
+}
+
+.trans_menu div.inner {
+	left: 0;
+	margin: 0;
+}
+
+.trans_menu li.main li {
+	z-index: 2;
+	min-width: 78px;
+}
+
+.trans_menu a {
+	text-decoration: none;
+	cursor: default;
+}
+
+/*--------------------------------------
+ *
+ * C O N T E X T   M E N U
+ *
+ *--------------------------------------*/
+
+div#jqContextMenu {
+	-webkit-border-radius: 5px;
+	border: 1px solid rgba(0,0,0,0.1);
+	-moz-user-select: none;
+	-webkit-user-select: none;
+}
+
+div#jqContextMenu ul {
+	filter: alpha(opacity=98);
+	-moz-opacity: .98;
+	opacity: .98;
+	-webkit-box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+	-webkit-border-radius: 5px;
+}
+
+div#jqContextMenu li.separator, div#jqContextMenu li.separator:hover {
+	background: inherit !important;
+	border-top: 1px solid #ddd !important;
+	margin: 5px 0 !important;
+	padding: 0px;
 }

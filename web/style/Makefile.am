@@ -1,0 +1,4 @@
+SUBDIRS = \
+  jqueryui \
+  transmission
+
