@@ -1073,6 +1073,9 @@ on_announce_done( const tr_announce_response  * response,
             int i;
             const char * str;
             int scrape_fields = 0;
+            int seeders = 0;
+            int leechers = 0;
+            int downloads = 0;
             const bool isStopped = event == TR_ANNOUNCE_EVENT_STOPPED;
 
             publishErrorClear( tier );
@@ -1083,18 +1086,18 @@ on_announce_done( const tr_announce_response  * response,
 
                 if( response->seeders >= 0 )
                 {
-                    tracker->seederCount = response->seeders;
+                    tracker->seederCount = seeders = response->seeders;
                     ++scrape_fields;
                 }
 
                 if( response->leechers >= 0 )
                 {
-                    tracker->leecherCount = response->leechers;
+                    tracker->leecherCount = leechers = response->leechers;
                     ++scrape_fields;
                 }
                 if( response->downloads >= 0 )
                 {
-                    tracker->downloadCount = response->downloads;
+                    tracker->downloadCount = downloads = response->downloads;
                     ++scrape_fields;
                 }
 
@@ -1125,11 +1128,11 @@ on_announce_done( const tr_announce_response  * response,
                 tier->announceIntervalSec = i;
 
             if( response->pex_count > 0 )
-                publishPeersPex( tier, response->seeders, response->leechers,
+                publishPeersPex( tier, seeders, leechers,
                                  response->pex, response->pex_count );
 
             if( response->pex6_count > 0 )
-                publishPeersPex( tier, response->seeders, response->leechers,
+                publishPeersPex( tier, seeders, leechers,
                                  response->pex6, response->pex6_count );
 
             tier->isRunning = data->isRunningOnSuccess;
@@ -1346,9 +1349,12 @@ on_scrape_done( const tr_scrape_response * response, void * vsession )
 
                     if(( tracker = tier->currentTracker ))
                     {
-                        tracker->seederCount = row->seeders;
-                        tracker->leecherCount = row->leechers;
-                        tracker->downloadCount = row->downloads;
+                        if( row->seeders >= 0 )
+                            tracker->seederCount = row->seeders;
+                        if( row->leechers >= 0 )
+                            tracker->leecherCount = row->leechers;
+                        if( row->downloads >= 0 )
+                            tracker->downloadCount = row->downloads;
                         tracker->downloaderCount = row->downloaders;
                         tracker->consecutiveFailures = 0;
                     }

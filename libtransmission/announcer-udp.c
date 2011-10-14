@@ -183,8 +183,13 @@ tau_scrape_request_new( const tr_scrape_request  * in,
     req->payload_len = evbuffer_get_length( buf );
     req->payload = tr_memdup( evbuffer_pullup( buf, -1 ), req->payload_len );
     for( i=0; i<req->response.row_count; ++i )
+    {
+        req->response.rows[i].seeders = -1;
+        req->response.rows[i].leechers = -1;
+        req->response.rows[i].downloads = -1;
         memcpy( req->response.rows[i].info_hash,
                 in->info_hash[i], SHA_DIGEST_LENGTH );
+    }
 
     /* cleanup */
     evbuffer_free( buf );
@@ -334,6 +339,9 @@ tau_announce_request_new( const tr_announce_request  * in,
     req->user_data = user_data;
     req->payload_len = evbuffer_get_length( buf );
     req->payload = tr_memdup( evbuffer_pullup( buf, -1 ), req->payload_len );
+    req->response.seeders = -1;
+    req->response.leechers = -1;
+    req->response.downloads = -1;
     memcpy( req->response.info_hash, in->info_hash, SHA_DIGEST_LENGTH );
 
     evbuffer_free( buf );

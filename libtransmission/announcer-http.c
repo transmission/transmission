@@ -291,6 +291,9 @@ tr_tracker_http_announce( tr_session                 * session,
     const char * url = (const char *) evbuffer_pullup( buf, -1 );
 
     d = tr_new0( struct announce_data, 1 );
+    d->response.seeders = -1;
+    d->response.leechers = -1;
+    d->response.downloads = -1;
     d->response_func = response_func;
     d->response_func_user_data = response_func_user_data;
     memcpy( d->response.info_hash, request->info_hash, SHA_DIGEST_LENGTH );
@@ -463,7 +466,12 @@ tr_tracker_http_scrape( tr_session               * session,
     d->response_func_user_data = response_func_user_data;
     d->response.row_count = request->info_hash_count;
     for( i=0; i<d->response.row_count; ++i )
+    {
         memcpy( d->response.rows[i].info_hash, request->info_hash[i], SHA_DIGEST_LENGTH );
+        d->response.rows[i].seeders = -1;
+        d->response.rows[i].leechers = -1;
+        d->response.rows[i].downloads = -1;
+    }
     tr_strlcpy( d->log_name, request->log_name, sizeof( d->log_name ) );
 
     dbgmsg( request->log_name, "Sending scrape to libcurl: \"%s\"", url );
