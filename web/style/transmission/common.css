@@ -766,6 +766,12 @@ tr.inspector_peer_entry {
 
 }
 
+tr.inspector_peer_entry span.encrypted-peer-cell {
+	width: 16px;
+	height: 16px;
+	background: transparent url('images/lock_icon.png') no-repeat;
+}
+
 tr.inspector_peer_entry.odd {
 	background-color: #EEEEEE;
 }
@@ -1064,7 +1070,7 @@ div.dialog_container div.dialog_window {
 	}
 }
 
-div.dialog_container #dialog_logo {
+div.dialog_container .dialog_logo {
 	width: 64px;
 	height: 64px;
 	margin: 20px 20px 0 20px;

@@ -310,7 +310,8 @@ function Inspector(controller) {
             for (i=0; peer=peers[i]; ++i) {
                 parity = (i%2) ? 'odd' : 'even';
                 html.push('<tr class="inspector_peer_entry ', parity, '">',
-                       '<td>', (peer.isEncrypted ? '<img src="images/graphics/lock_icon.png" alt="Encrypted"/>' : ''), '</td>',
+                       '<td>', (peer.isEncrypted ? '<span class="encrypted-peer-cell">'
+                                                 : '<span class="unencrypted-peer-cell">'), '</span>', '</td>',
                        '<td>', (peer.rateToPeer ? fmt.speedBps(peer.rateToPeer) : ''), '</td>',
                        '<td>', (peer.rateToClient ? fmt.speedBps(peer.rateToClient) : ''), '</td>',
                        '<td class="percentCol">', Math.floor(peer.progress*100), '%', '</td>',

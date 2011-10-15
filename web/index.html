@@ -2,8 +2,6 @@
 <html>
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-		<meta http-equiv="cache-control" content="Private" />
-		<meta http-equiv="X-UA-Compatible" content="IE=7,IE=8,IE=9"><!-- ticket #4555 -->
 		<meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;"/>
 		<meta name="apple-mobile-web-app-capable" content="yes" />
 		<link href="./images/favicon.ico" rel="icon" />
@@ -56,7 +54,7 @@
 		</div>
 
 		<div id="statusbar">
-			<input type="search" id="torrent_search" placeholder="Filter" results="0" />
+			<input type="search" id="torrent_search" placeholder="Filter" />
 			<div id='filter-button'></div>
 			<div id='speed-info'>
 				<span id="speed-dn-label">0 B/s</span>
@@ -162,7 +160,7 @@
 				<div id="prefs-page-network">
 					<div class="prefs-section">
 						<div class="title">Listening Port</div>
-						<div class="row"><div class="key"><label for="peer-port">Peer listening port:</div>
+						<div class="row"><div class="key"><label for="peer-port">Peer listening port:</label></div>
 						                 <div class="value"><input type="text" class="numberinput" id="peer-port"/></div></div>
 						<div class="row"><div class="key">&nbsp;</div>
 						                 <div class="value"><span id="port-label">Status: Unknown</span></div></div>
@@ -360,7 +358,7 @@
 		<div class="dialog_container" id="upload_container" style="display:none;">
 			<div class="dialog_top_bar"></div>
 			<div class="dialog_window">
-				<div class="dialog_logo" id="dialog_logo"></div>
+				<div class="dialog_logo" id="upload_dialog_logo"></div>
 				<h2 class="dialog_heading">Upload Torrent Files</h2>
 				<form action="#" method="post" id="torrent_upload_form"
 					enctype="multipart/form-data" target="torrent_upload_frame">
