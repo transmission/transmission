@@ -376,5 +376,5 @@ TorrentRow.prototype =
 	},
 	getTorrentId: function() {
 		return this.getTorrent().getId();
-	},
+	}
 };
