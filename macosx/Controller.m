@@ -3320,7 +3320,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 - (void) allToolbarClicked: (id) sender
 {
     NSInteger tagValue = [sender isKindOfClass: [NSSegmentedControl class]]
-                    ? [(NSSegmentedCell *)[sender cell] tagForSegment: [sender selectedSegment]] : [sender tag];
+                    ? [(NSSegmentedCell *)[sender cell] tagForSegment: [sender selectedSegment]] : [(NSControl *)sender tag];
     switch (tagValue)
     {
         case TOOLBAR_PAUSE_TAG:
@@ -3335,7 +3335,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 - (void) selectedToolbarClicked: (id) sender
 {
     NSInteger tagValue = [sender isKindOfClass: [NSSegmentedControl class]]
-                    ? [(NSSegmentedCell *)[sender cell] tagForSegment: [sender selectedSegment]] : [sender tag];
+                    ? [(NSSegmentedCell *)[sender cell] tagForSegment: [sender selectedSegment]] : [(NSControl *)sender tag];
     switch (tagValue)
     {
         case TOOLBAR_PAUSE_TAG:
