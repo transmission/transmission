@@ -202,7 +202,7 @@
 
 - (NSString *) outlineView: (NSOutlineView *) outlineView typeSelectStringForTableColumn: (NSTableColumn *) tableColumn item: (id) item
 {
-    return [item isKindOfClass: [Torrent class]] ? [item name]
+    return [item isKindOfClass: [Torrent class]] ? [(Torrent *)item name]
             : [[self preparedCellAtColumn: [self columnWithIdentifier: @"Group"] row: [self rowForItem: item]] stringValue];
 }
 

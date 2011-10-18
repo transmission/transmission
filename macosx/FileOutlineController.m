@@ -333,7 +333,7 @@ typedef enum
     {
         NSString * path = [fTorrent fileLocation: item];
         if (!path)
-            path = [[item path] stringByAppendingPathComponent: [item name]];
+            path = [[(FileListNode *)item path] stringByAppendingPathComponent: [(FileListNode *)item name]];
         return path;
     }
     else if ([ident isEqualToString: @"Check"])

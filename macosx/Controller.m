@@ -1255,7 +1255,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
             const NSInteger selected = [torrents count];
             if (selected == 1)
             {
-                NSString * torrentName = [[torrents objectAtIndex: 0] name];
+                NSString * torrentName = [(Torrent *)[torrents objectAtIndex: 0] name];
                 
                 if (deleteData)
                     title = [NSString stringWithFormat:
@@ -1379,7 +1379,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         NSString * message, * info;
         if ([torrents count] == 1)
         {
-            NSString * torrentName = [[torrents objectAtIndex: 0] name];
+            NSString * torrentName = [(Torrent *)[torrents objectAtIndex: 0] name];
             message = [NSString stringWithFormat: NSLocalizedString(@"Are you sure you want to remove \"%@\" from the transfer list?",
                                                                   "Remove completed confirm panel -> title"), torrentName];
             
@@ -1435,7 +1435,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     NSInteger count = [torrents count];
     if (count == 1)
         [panel setMessage: [NSString stringWithFormat: NSLocalizedString(@"Select the new folder for \"%@\".",
-                            "Move torrent -> select destination folder"), [[torrents objectAtIndex: 0] name]]];
+                            "Move torrent -> select destination folder"), [(Torrent *)[torrents objectAtIndex: 0] name]]];
     else
         [panel setMessage: [NSString stringWithFormat: NSLocalizedString(@"Select the new folder for %d data files.",
                             "Move torrent -> select destination folder"), count]];
@@ -1782,7 +1782,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 - (void) setSort: (id) sender
 {
     NSString * sortType;
-    switch ([sender tag])
+    switch ([(NSMenuItem *)sender tag])
     {
         case SORT_ORDER_TAG:
             sortType = SORT_ORDER;
@@ -1810,7 +1810,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
             sortType = SORT_SIZE;
             break;
         default:
-            NSAssert1(NO, @"Unknown sort tag received: %d", [sender tag]);
+            NSAssert1(NO, @"Unknown sort tag received: %d", [(NSMenuItem *)sender tag]);
             return;
     }
     
@@ -1832,7 +1832,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 
 - (void) setSortReverse: (id) sender
 {
-    const BOOL setReverse = [sender tag] == SORT_DESC_TAG;
+    const BOOL setReverse = [(NSMenuItem *)sender tag] == SORT_DESC_TAG;
     if (setReverse != [fDefaults boolForKey: @"SortReverse"])
     {
         [fDefaults setBool: setReverse forKey: @"SortReverse"];
@@ -2235,7 +2235,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     {
         [fTableView removeCollapsedGroup: [torrent groupValue]]; //remove old collapsed group
         
-        [torrent setGroupValue: [sender tag]];
+        [torrent setGroupValue: [(NSMenuItem *)sender tag]];
     }
     
     [self applyFilter];

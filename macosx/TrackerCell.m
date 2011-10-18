@@ -64,7 +64,7 @@ NSMutableSet * fTrackerIconLoading;
 
 + (void) initialize
 {
-    fTrackerIconCache = [[NSMutableDictionary alloc] init];
+    fTrackerIconCache = [[NSCache alloc] init];
     fTrackerIconLoading = [[NSMutableSet alloc] init];
 }
 

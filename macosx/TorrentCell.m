@@ -784,7 +784,7 @@
 
 - (NSAttributedString *) attributedTitle
 {
-    NSString * title = [[self representedObject] name];
+    NSString * title = [(Torrent *)[self representedObject] name];
     return [[[NSAttributedString alloc] initWithString: title attributes: fTitleAttributes] autorelease];
 }
 
