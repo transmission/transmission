@@ -106,7 +106,7 @@ typedef enum
         tr_wait_msec(100);
     
     [fOutline reloadData];
-    [fOutline deselectAll: nil];
+    [fOutline deselectAll: nil]; //do this after reloading the data #4575
     
     [fLock unlock];
 }
