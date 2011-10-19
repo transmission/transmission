@@ -105,8 +105,8 @@ typedef enum
     while (![fLock tryLock])
         tr_wait_msec(100);
     
-    [fOutline deselectAll: nil];
     [fOutline reloadData];
+    [fOutline deselectAll: nil];
     
     [fLock unlock];
 }
