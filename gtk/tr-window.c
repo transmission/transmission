@@ -612,7 +612,7 @@ gtr_window_new( GtkUIManager * ui_mgr, TrCore * core )
     gtk_window_add_accel_group( win, gtk_ui_manager_get_accel_group( ui_mgr ) );
 
     /* window's main container */
-    vbox = gtk_vbox_new ( FALSE, 0 );
+    vbox = gtr_vbox_new ( FALSE, 0 );
     gtk_container_add ( GTK_CONTAINER( self ), vbox );
 
     /* main menu */
@@ -622,6 +622,10 @@ gtr_window_new( GtkUIManager * ui_mgr, TrCore * core )
 
     /* toolbar */
     toolbar = p->toolbar = gtr_action_get_widget( "/main-window-toolbar" );
+#if GTK_CHECK_VERSION( 3,0,0 )
+    gtk_style_context_add_class( gtk_widget_get_style_context( toolbar ),
+                                 GTK_STYLE_CLASS_PRIMARY_TOOLBAR );
+#endif
     gtr_action_set_important( "open-torrent-toolbar", TRUE );
     gtr_action_set_important( "show-torrent-properties", TRUE );
 
@@ -652,7 +656,7 @@ gtr_window_new( GtkUIManager * ui_mgr, TrCore * core )
     }
 
     /* status */
-    h = status = p->status = gtk_hbox_new( FALSE, GUI_PAD_BIG );
+    h = status = p->status = gtr_hbox_new( FALSE, GUI_PAD_BIG );
     gtk_container_set_border_width( GTK_CONTAINER( h ), GUI_PAD_SMALL );
 
         w = gtk_button_new( );
@@ -674,7 +678,7 @@ gtr_window_new( GtkUIManager * ui_mgr, TrCore * core )
         gtk_label_set_single_line_mode( GTK_LABEL( w ), TRUE );
         gtk_box_pack_start( GTK_BOX( h ), w, 1, 1, GUI_PAD );
 
-        hbox = gtk_hbox_new( FALSE, GUI_PAD );
+        hbox = gtr_hbox_new( FALSE, GUI_PAD );
             w = gtk_alignment_new( 0.0f, 0.0f, 0.0f, 0.0f );
             gtk_widget_set_size_request( w, GUI_PAD, 0u );
             gtk_box_pack_start( GTK_BOX( hbox ), w, FALSE, FALSE, 0 );
@@ -685,7 +689,7 @@ gtr_window_new( GtkUIManager * ui_mgr, TrCore * core )
             gtk_box_pack_start( GTK_BOX( hbox ), w, FALSE, FALSE, 0 );
         gtk_box_pack_end( GTK_BOX( h ), hbox, FALSE, FALSE, 0 );
 
-        hbox = gtk_hbox_new( FALSE, GUI_PAD );
+        hbox = gtr_hbox_new( FALSE, GUI_PAD );
             w = gtk_alignment_new( 0.0f, 0.0f, 0.0f, 0.0f );
             gtk_widget_set_size_request( w, GUI_PAD, 0u );
             gtk_box_pack_start( GTK_BOX( hbox ), w, FALSE, FALSE, 0 );
@@ -696,7 +700,7 @@ gtr_window_new( GtkUIManager * ui_mgr, TrCore * core )
             gtk_box_pack_start( GTK_BOX( hbox ), w, FALSE, FALSE, 0 );
         gtk_box_pack_end( GTK_BOX( h ), hbox, FALSE, FALSE, 0 );
 
-        hbox = gtk_hbox_new( FALSE, GUI_PAD );
+        hbox = gtr_hbox_new( FALSE, GUI_PAD );
             w = gtk_button_new( );
             gtk_widget_set_tooltip_text( w, _( "Statistics" ) );
             gtk_container_add( GTK_CONTAINER( w ), gtk_image_new_from_stock( "ratio", -1 ) );

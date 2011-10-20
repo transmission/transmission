@@ -473,6 +473,28 @@ gtr_priority_combo_new( void )
 ****
 ***/
 
+GtkWidget*
+gtr_hbox_new( gboolean homogenous UNUSED, gint spacing )
+{
+#if GTK_CHECK_VERSION( 3,2,0 )
+    return gtk_box_new( GTK_ORIENTATION_HORIZONTAL, spacing );
+#else
+    return gtk_hbox_new( homogenous, spacing );
+#endif
+}
+
+GtkWidget*
+gtr_vbox_new( gboolean homogenous UNUSED, gint spacing )
+{
+#if GTK_CHECK_VERSION( 3,2,0 )
+    return gtk_box_new( GTK_ORIENTATION_VERTICAL, spacing );
+#else
+    return gtk_vbox_new( homogenous, spacing );
+#endif
+}
+
+#define GTR_CHILD_HIDDEN "gtr-child-hidden"
+
 void
 gtr_widget_set_visible( GtkWidget * w, gboolean b )
 {
