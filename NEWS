@@ -3,9 +3,13 @@
 ==== Mac ====
   * Fix a potential crash on 10.5 Leopard
   * Fix bugs with the tracker and file inspector tables
+==== All Platforms ====
+  * Fix error connecting to UDP trackers from big-endian computers
+  * Fix RPC error when editing UDP trackers
+  * Fix build failure when a C++ compiler is not installed
 ==== GTK+ ====
-  * Fix crasher on systems not running DBus
   * Support GTK+ 3.2 
+  * Fix crasher on systems not running DBus
 ==== Web Client ====
   * Fix bug which broke Opera support
 
