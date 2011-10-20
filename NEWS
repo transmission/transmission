@@ -18,7 +18,7 @@
 ==== Mac ====
   * Fix crasher on 10.5 Leopard
 
-=== Transmission 2.40 (2011/10/05) ===
+=== Transmission 2.40 (2011/10/08) ===
 [http://trac.transmissionbt.com/query?milestone=2.40&group=component&order=severity All tickets closed by this release]
 ==== All Platforms ====
   * Torrent queuing
