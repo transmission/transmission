@@ -70,6 +70,7 @@ AC_SUBST(LIBAPPINDICATOR_MINIMUM)
 
 AC_PROG_CC
 AC_PROG_CXX
+AC_CHECK_PROG([HAVE_CXX],[$CXX],[yes],[no])
 AC_C_INLINE
 if test "x$GCC" = "xyes" ; then
 
@@ -205,10 +206,10 @@ AC_CHECK_LIB([rt],
 
 AC_MSG_CHECKING([µTP])
 build_utp="no"
-if test "x$CXX" = "x" ; then
-    have_utp="no"
-else
+if test "x$HAVE_CXX" = "xyes" ; then
     have_utp="yes"
+else
+    have_utp="no"
 fi
 AC_ARG_ENABLE([utp],
               AS_HELP_STRING([--enable-utp],[build µTP support]),
@@ -218,9 +219,9 @@ if test "x$want_utp" = "xyes" ; then
     if test "x$have_utp" = "xyes"; then 
         LIBUTP_CFLAGS="-I\$(top_srcdir)/third-party/"
         LIBUTP_LIBS="\$(top_builddir)/third-party/libutp/libutp.a"
-	if test "x$libutp_extra_libs" != "x" ; then
-	   LIBUTP_LIBS="$LIBUTP_LIBS $libutp_extra_libs"
-	fi
+        if test "x$libutp_extra_libs" != "x" ; then
+            LIBUTP_LIBS="$LIBUTP_LIBS $libutp_extra_libs"
+        fi
         AC_DEFINE([WITH_UTP],[1])
         build_utp="yes"
     else 
