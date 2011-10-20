@@ -982,7 +982,7 @@ replaceTrackers( tr_torrent * tor, tr_benc * urls )
 
         if(    tr_bencGetInt( pair[0], &pos )
             && tr_bencGetStr( pair[1], &newval )
-            && tr_urlIsValid( newval, -1 )
+            && tr_urlIsValidTracker( newval )
             && pos < n
             && pos >= 0 )
         {
