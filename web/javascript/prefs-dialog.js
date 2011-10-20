@@ -235,7 +235,8 @@ function PrefsDialog(remote) {
 
     onDialogClosed = function()
     {
-        window.scrollTo(0,1);
+        transmission.hideMobileAddressbar();
+
         $(data.dialog).trigger('closed', getValues());
     };
 
@@ -290,7 +291,7 @@ function PrefsDialog(remote) {
 
     this.show = function ()
     {
-        window.scrollTo(0,1);
+        transmission.hideMobileAddressbar();
 
         setBlocklistButtonEnabled(true);
         data.remote.checkPort(onPortChecked,this);
