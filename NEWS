@@ -1,12 +1,18 @@
-=== Transmission 2.41 (2011/10/08) ===
-[http://trac.transmissionbt.com/query?milestone=2.41&group=component&order=severity All tickets closed by this release]
+=== Transmission 2.42 (2011/10/19) ===
+[http://trac.transmissionbt.com/query?milestone=2.42&group=component&order=severity All tickets closed by this release]
 ==== Mac ====
-  * Fix crasher on 10.5 Leopard
+  * Fix a potential crash on 10.5 Leopard
+  * Fix bugs with the tracker and file inspector tables
 ==== GTK+ ====
   * Fix crasher on systems not running DBus
   * Support GTK+ 3.2 
 ==== Web Client ====
   * Fix bug which broke Opera support
+
+=== Transmission 2.41 (2011/10/08) ===
+[http://trac.transmissionbt.com/query?milestone=2.41&group=component&order=severity All tickets closed by this release]
+==== Mac ====
+  * Fix crasher on 10.5 Leopard
 
 === Transmission 2.40 (2011/10/05) ===
 [http://trac.transmissionbt.com/query?milestone=2.40&group=component&order=severity All tickets closed by this release]
