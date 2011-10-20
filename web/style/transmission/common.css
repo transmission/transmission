@@ -766,7 +766,7 @@ tr.inspector_peer_entry {
 
 }
 
-tr.inspector_peer_entry span.encrypted-peer-cell {
+tr.inspector_peer_entry div.encrypted-peer-cell {
 	width: 16px;
 	height: 16px;
 	background: transparent url('images/lock_icon.png') no-repeat;
