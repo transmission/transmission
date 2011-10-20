@@ -1606,10 +1606,12 @@ tr_htonll( uint64_t x )
 #ifdef HAVE_HTONLL
     return htonll( x );
 #else
-    /* fallback code by Runner and Juan Carlos Cobas at
-     * http://www.codeproject.com/KB/cpp/endianness.aspx */
-    return (((uint64_t)(htonl((int)((x << 32) >> 32))) << 32) |
-                     (unsigned int)htonl(((int)(x >> 32))));
+    /* fallback code by bdonlan at 
+     * http://stackoverflow.com/questions/809902/64-bit-ntohl-in-c/875505#875505 */ 
+    union { uint32_t lx[2]; uint64_t llx; } u; 
+    u.lx[0] = htonl(x >> 32); 
+    u.lx[1] = htonl(x & 0xFFFFFFFFULL); 
+    return u.llx; 
 #endif
 }
 
@@ -1619,10 +1621,11 @@ tr_ntohll( uint64_t x )
 #ifdef HAVE_NTOHLL
     return ntohll( x );
 #else
-    /* fallback code by Runner and Juan Carlos Cobas at
-     * http://www.codeproject.com/KB/cpp/endianness.aspx */
-    return (((uint64_t)(ntohl((int)((x << 32) >> 32))) << 32) |
-                     (unsigned int)ntohl(((int)(x >> 32))));
+    /* fallback code by bdonlan at 
+     * http://stackoverflow.com/questions/809902/64-bit-ntohl-in-c/875505#875505 */ 
+    union { uint32_t lx[2]; uint64_t llx; } u; 
+    u.llx = x; 
+    return ((uint64_t)ntohl(u.lx[0]) << 32) | (uint64_t)ntohl(u.lx[1]); 
 #endif
 }
 
