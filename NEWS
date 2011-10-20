@@ -10,6 +10,8 @@
 ==== GTK+ ====
   * Support GTK+ 3.2 
   * Fix crasher on systems not running DBus
+==== Qt ====
+  * Updated Lithuanian Translation
 ==== Web Client ====
   * Fix bug which broke Opera support
 
