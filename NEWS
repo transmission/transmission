@@ -1,12 +1,12 @@
 === Transmission 2.42 (2011/10/19) ===
 [http://trac.transmissionbt.com/query?milestone=2.42&group=component&order=severity All tickets closed by this release]
-==== Mac ====
-  * Fix a potential crash on 10.5 Leopard
-  * Fix bugs with the tracker and file inspector tables
 ==== All Platforms ====
   * Fix error connecting to UDP trackers from big-endian computers
   * Fix RPC error when editing UDP trackers
   * Fix build failure when a C++ compiler is not installed
+==== Mac ====
+  * Fix a potential crash on 10.5 Leopard
+  * Fix bugs with the tracker and file inspector tables
 ==== GTK+ ====
   * Support GTK+ 3.2 
   * Fix crasher on systems not running DBus
