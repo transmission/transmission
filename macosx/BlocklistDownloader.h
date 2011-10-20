@@ -33,7 +33,7 @@ typedef enum
     BLOCKLIST_DL_PROCESSING
 } blocklistDownloadState;
 
-@interface BlocklistDownloader : NSObject
+@interface BlocklistDownloader : NSObject <NSURLDownloadDelegate>
 {
     NSURLDownload * fDownload;
     

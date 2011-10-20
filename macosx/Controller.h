@@ -49,7 +49,7 @@ typedef enum
     ADD_CREATED
 } addType;
 
-@interface Controller : NSObject <GrowlApplicationBridgeDelegate, NSPopoverDelegate, NSSoundDelegate, NSToolbarDelegate, NSWindowDelegate, QLPreviewPanelDataSource, QLPreviewPanelDelegate>
+@interface Controller : NSObject <GrowlApplicationBridgeDelegate, NSURLDownloadDelegate, NSPopoverDelegate, NSSoundDelegate, NSToolbarDelegate, NSWindowDelegate, QLPreviewPanelDataSource, QLPreviewPanelDelegate>
 {
     tr_session                      * fLib;
     
