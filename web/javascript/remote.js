@@ -113,7 +113,7 @@ TransmissionRemote.prototype =
 		var o = {
 			method: 'torrent-get',
 				'arguments': {
-				'fields': fields,
+				'fields': fields
 			}
 		};
 		if (torrentIds)

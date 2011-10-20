@@ -302,6 +302,6 @@ Transmission.fmt = (function()
 				} 
 			} 
 			return formattedFlags.join(''); 
-		},
+		}
 	}
 })();
