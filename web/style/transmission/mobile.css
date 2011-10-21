@@ -631,6 +631,33 @@ div#inspector_tabs {
 #inspector_tabs .selected {
 	background-position: left -26px; /* the highlighted part of the image */
 }
+.inspector_tab > #inspector-tab-label-info {
+	width: 24px;
+	height: 20px;
+	background: transparent url('images/buttons/info_general.png') no-repeat;
+}
+.inspector_tab > #inspector-tab-label-activity {
+	width: 24px;
+	height: 20px;
+	background: transparent url('images/buttons/info_activity.png') no-repeat;
+}
+.inspector_tab > #inspector-tab-label-peers {
+	width: 24px;
+	height: 20px;
+	background: transparent url('images/buttons/info_peers.png') no-repeat;
+}
+.inspector_tab > #inspector-tab-label-trackers {
+	width: 24px;
+	height: 20px;
+	background: transparent url('images/buttons/info_trackers.png') no-repeat;
+}
+.inspector_tab > #inspector-tab-label-files {
+	width: 24px;
+	height: 20px;
+	background: transparent url('images/buttons/info_files.png') no-repeat;
+}
+
+
 .inspector_container {
 	margin: 3%;
 	width: 96%;
