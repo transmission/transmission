@@ -132,7 +132,7 @@ TransmissionRemote.prototype =
 			arguments: args,
 			method: 'torrent-set'
 		}, function() {
-			remote._controller.refreshTorrents(torrent_ids);
+			remote._controller.refreshTorrents([torrentId]);
 		});
 	},
 
