@@ -8,10 +8,10 @@
   * Fix a potential crash on 10.5 Leopard
   * Fix bugs with the tracker and file inspector tables
 ==== GTK+ ====
-  * Support GTK+ 3.2 
+  * Support GTK+ 3.2
   * Fix crasher on systems not running DBus
 ==== Qt ====
-  * Updated Lithuanian Translation
+  * Updated Lithuanian translation
 ==== Web Client ====
   * Fix bug which broke Opera support
 

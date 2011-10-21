@@ -163,7 +163,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     if ([apps count] > 1)
     {
         NSAlert * alert = [[NSAlert alloc] init];
-        [alert addButtonWithTitle: NSLocalizedString(@"Quit", "Transmission already running alert -> button")];
+        [alert addButtonWithTitle: NSLocalizedString(@"OK", "Transmission already running alert -> button")];
         [alert setMessageText: NSLocalizedString(@"Transmission is already running.",
                                                 "Transmission already running alert -> title")];
         [alert setInformativeText: NSLocalizedString(@"There is already a copy of Transmission running. "
