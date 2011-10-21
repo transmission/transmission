@@ -19,7 +19,9 @@ function FileRow(torrent, i)
 	},
 
 	elements = {
-		priority_control: null,
+		priority_low_button: null,
+		priority_normal_button: null,
+		priority_high_button: null,
 		progress: null,
 		root: null
 	},
@@ -51,24 +53,15 @@ function FileRow(torrent, i)
 
 	refreshWantedHTML = function()
 	{
-		var e = elements.root,
-		    c = [ e.classNameConst ];
-
-		if (!fields.isWanted) { c.push('skip'); }
-		if (isDone()) { c.push('complete'); }
-		e.className = c.join(' ');
+		var e = $(elements.root);
+		e.toggleClass('skip', !fields.isWanted);
+		e.toggleClass('complete', isDone());
 	},
 	refreshPriorityHTML = function()
 	{
-		var e = elements.priority_control,
-		    c = [ e.classNameConst ];
-
-		switch(fields.priority) {
-			case -1 : c.push('low'); break;
-			case 1  : c.push('high'); break;
-			default : c.push('normal'); break;
-		}
-		e.className = c.join(' ');
+		$(elements.priority_high_button  ).toggleClass('selected', fields.priority ===  1 );
+		$(elements.priority_normal_button).toggleClass('selected', fields.priority ===  0 );
+		$(elements.priority_low_button   ).toggleClass('selected', fields.priority === -1 );
 	},
 	refreshProgressHTML = function()
 	{
@@ -99,60 +92,57 @@ function FileRow(torrent, i)
 	},
 
 	createRow = function(torrent, i) {
-		var file = torrent.getFile(i),
-		    name, root, wanted_div, pri_div, file_div, prog_div;
+		var file = torrent.getFile(i), e, name, root, box;
 
 		root = document.createElement('li');
 		root.id = 't' + fields.torrent.getId() + 'f' + fields.index;
-		root.classNameConst = 'inspector_torrent_file_list_entry ' + ((i%2)?'odd':'even');
-		root.className = root.classNameConst;
+		root.className = 'inspector_torrent_file_list_entry ' + ((i%2)?'odd':'even');
+		elements.root = root;
 
-		wanted_div = document.createElement('div');
-		wanted_div.className = "file_wanted_control";
-		$(wanted_div).click(function(){ fireWantedChanged(!fields.isWanted); });
+		e = document.createElement('div');
+		e.className = "file_wanted_control";
+		$(e).click(function(){ fireWantedChanged(!fields.isWanted); });
+		root.appendChild(e);
 
-		pri_div = document.createElement('div');
-		pri_div.classNameConst = "file_priority_control";
-		pri_div.className = pri_div.classNameConst;
-		$(pri_div).bind('click',function(ev){
-			var prio,
-			    x = ev.pageX,
-			    e = ev.target;
-			while (e) {
-				x -= e.offsetLeft;
-				e = e.offsetParent;
-			}
-			// ugh.
-			if (isMobileDevice) {
-				if (x < 8) prio = -1;
-				else if (x < 27) prio = 0;
-				else prio = 1;
-			} else {
-				if (x < 12) prio = -1;
-				else if (x < 23) prio = 0;
-				else prio = 1;
-			}
-			firePriorityChanged(prio);
-		});
+		e = document.createElement('div');
+		e.className = 'file-priority-radiobox';
+		box = e;
+
+			e = document.createElement('div');
+			e.className = 'low';
+			e.title = 'Low Priority';
+			$(e).click(function(){ firePriorityChanged(-1); });
+			elements.priority_low_button = e;
+			box.appendChild(e);
+
+			e = document.createElement('div');
+			e.className = 'normal';
+			e.title = 'Normal Priority';
+			$(e).click(function(){ firePriorityChanged(0); });
+			elements.priority_normal_button = e;
+			box.appendChild(e);
+
+			e = document.createElement('div');
+			e.title = 'High Priority';
+			e.className = 'high';
+			$(e).click(function(){ firePriorityChanged(1); });
+			elements.priority_high_button = e;
+			box.appendChild(e);
+
+		root.appendChild(box);
 
 		name = file.name || 'Unknown';
 		name = name.substring(name.lastIndexOf('/')+1);
 		name = name.replace(/([\/_\.])/g, "$1&#8203;");
-		file_div = document.createElement('div');
-		file_div.className = "inspector_torrent_file_list_entry_name";
-		file_div.innerHTML = name;
+		e = document.createElement('div');
+		e.className = "inspector_torrent_file_list_entry_name";
+		e.innerHTML = name;
+		root.appendChild(e);
 
-		prog_div = document.createElement('div');
-		prog_div.className = "inspector_torrent_file_list_entry_progress";
-
-		root.appendChild(wanted_div);
-		root.appendChild(pri_div);
-		root.appendChild(file_div);
-		root.appendChild(prog_div);
-
-		elements.root = root;
-		elements.priority_control = pri_div;
-		elements.progress = prog_div;
+		e = document.createElement('div');
+		e.className = "inspector_torrent_file_list_entry_progress";
+		root.appendChild(e);
+		elements.progress = e;
 
 		refresh();
 		return root;
