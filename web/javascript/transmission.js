@@ -1150,7 +1150,7 @@ Transmission.prototype =
 			$('#inspector_close').toggle(visible);
 			this.hideMobileAddressbar();
 		} else {
-			var w = visible ? $('#torrent_inspector').width() + 1 + 'px' : '0px';
+			var w = visible ? $('#torrent_inspector').outerWidth() + 1 + 'px' : '0px';
 			$('#torrent_container')[0].style.right = w;
 		}
 		setInnerHTML($('ul li#context_toggle_inspector')[0], (visible?'Hide':'Show')+' Inspector');
