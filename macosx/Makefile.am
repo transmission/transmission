@@ -114,6 +114,8 @@ EXTRA_DIST = \
     MessageWindowController.m \
     NSApplicationAdditions.h \
     NSApplicationAdditions.m \
+    NSImageAdditions.h \
+    NSImageAdditions.m \
     NSMutableArrayAdditions.h \
     NSMutableArrayAdditions.m \
     NSStringAdditions.h \

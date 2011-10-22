@@ -25,6 +25,7 @@
 #import "FilePriorityCell.h"
 #import "FileOutlineView.h"
 #import "FileListNode.h"
+#import "NSImageAdditions.h"
 #import "Torrent.h"
 
 #define IMAGE_OVERLAP 3.0
@@ -130,28 +131,33 @@
         
         if (count == 0)
         {
-            NSImage * image = [NSImage imageNamed: @"PriorityNone.png"];
-            [images addObject: image];
-            totalWidth = [image size].width;
+            //if ([self backgroundStyle] != NSBackgroundStyleDark)
+            {
+                NSImage * image = [[NSImage imageNamed: @"PriorityNormalTemplate.png"] imageWithColor: [NSColor lightGrayColor]];
+                [images addObject: image];
+                totalWidth = [image size].width;
+            }
         }
         else
         {
+            NSColor * priorityColor = [self backgroundStyle] == NSBackgroundStyleDark ? [NSColor whiteColor] : [NSColor darkGrayColor];
+            
             totalWidth = 0.0;
             if ([priorities containsObject: [NSNumber numberWithInteger: TR_PRI_LOW]])
             {
-                NSImage * image = [NSImage imageNamed: @"PriorityLow.png"];
+                NSImage * image = [[NSImage imageNamed: @"PriorityLowTemplate.png"] imageWithColor: priorityColor];
                 [images addObject: image];
                 totalWidth += [image size].width;
             }
             if ([priorities containsObject: [NSNumber numberWithInteger: TR_PRI_NORMAL]])
             {
-                NSImage * image = [NSImage imageNamed: @"PriorityNormal.png"];
+                NSImage * image = [[NSImage imageNamed: @"PriorityNormalTemplate.png"] imageWithColor: priorityColor];
                 [images addObject: image];
                 totalWidth += [image size].width;
             }
             if ([priorities containsObject: [NSNumber numberWithInteger: TR_PRI_HIGH]])
             {
-                NSImage * image = [NSImage imageNamed: @"PriorityHigh.png"];
+                NSImage * image = [[NSImage imageNamed: @"PriorityHighTemplate.png"] imageWithColor: priorityColor];
                 [images addObject: image];
                 totalWidth += [image size].width;
             }

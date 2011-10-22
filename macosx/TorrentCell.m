@@ -24,6 +24,7 @@
 
 #import "TorrentCell.h"
 #import "GroupsController.h"
+#import "NSImageAdditions.h"
 #import "NSStringAdditions.h"
 #import "ProgressGradients.h"
 #import "Torrent.h"
@@ -38,8 +39,8 @@
 #define NORMAL_BUTTON_WIDTH 14.0
 #define ACTION_BUTTON_WIDTH 16.0
 
-#define PRIORITY_ICON_WIDTH 14.0
-#define PRIORITY_ICON_HEIGHT 14.0
+#define PRIORITY_ICON_WIDTH 12.0
+#define PRIORITY_ICON_HEIGHT 12.0
 
 //ends up being larger than font height
 #define HEIGHT_TITLE 16.0
@@ -49,7 +50,7 @@
 #define PADDING_BETWEEN_BUTTONS 3.0
 #define PADDING_BETWEEN_IMAGE_AND_TITLE (PADDING_HORIZONTAL + 1.0)
 #define PADDING_BETWEEN_IMAGE_AND_BAR PADDING_HORIZONTAL
-#define PADDING_BETWEEN_TITLE_AND_PRIORITY 3.0
+#define PADDING_BETWEEN_TITLE_AND_PRIORITY 4.0
 #define PADDING_ABOVE_TITLE 4.0
 #define PADDING_BETWEEN_TITLE_AND_MIN_STATUS 3.0
 #define PADDING_BETWEEN_TITLE_AND_PROGRESS 1.0
@@ -480,13 +481,12 @@
     //priority icon
     if ([torrent priority] != TR_PRI_NORMAL)
     {
-        NSImage * priorityImage = [torrent priority] == TR_PRI_HIGH ? [NSImage imageNamed: @"PriorityHigh.png"]
-                                                                    : [NSImage imageNamed: @"PriorityLow.png"];
-        
         const NSRect priorityRect = NSMakeRect(NSMaxX(titleRect) + PADDING_BETWEEN_TITLE_AND_PRIORITY,
                                                NSMidY(titleRect) - PRIORITY_ICON_HEIGHT  * 0.5,
                                                PRIORITY_ICON_WIDTH, PRIORITY_ICON_HEIGHT);
         
+        NSColor * priorityColor = [self backgroundStyle] == NSBackgroundStyleDark ? [NSColor whiteColor] : [NSColor darkGrayColor];
+        NSImage * priorityImage = [[NSImage imageNamed: ([torrent priority] == TR_PRI_HIGH ? @"PriorityHighTemplate.png" : @"PriorityLowTemplate.png")] imageWithColor: priorityColor];
         [priorityImage drawInRect: priorityRect fromRect: NSZeroRect operation: NSCompositeSourceOver fraction: 1.0 respectFlipped: YES hints: nil];
     }
     
