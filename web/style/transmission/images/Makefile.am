@@ -12,7 +12,7 @@ dist_data_DATA = \
   inspector-files.png \
   inspector-info.png \
   inspector-peers.png \
-  inspector-trackers.png
+  inspector-trackers.png \
   iphone_chrome.png \
   lock_icon.png \
   logo.png \
