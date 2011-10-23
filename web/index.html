@@ -12,7 +12,7 @@
 		<script type="text/javascript" src="./javascript/jquery/jqueryui-1.8.16.min.js"></script>
 		<link rel="stylesheet" href="./style/jqueryui/jqueryui-1.8.16.css" type="text/css" media="all" />
 <!--
-		<link media="screen" href="./stylesheets/mobile.css" type= "text/css" rel="stylesheet" />
+		<link media="screen" href="./style/transmission/mobile.css" type= "text/css" rel="stylesheet" />
 -->
 		<link media="only screen and (max-device-width: 480px)" href="./style/transmission/mobile.css" type= "text/css" rel="stylesheet" />
 		<link media="screen and (min-device-width: 481px)" href="./style/transmission/common.css" type="text/css" rel="stylesheet" />
@@ -176,22 +176,20 @@
 
 		<div id="torrent_inspector" style="display:none;">
 
-			<div style="display:none;" class="inspector_close" id="inspector_close"></div>
+			<div id="inspector-close"></div>
 
-			<div id="inspector_tabs">
-				<div class="inspector_tab selected" id="inspector_tab_info"><div id="inspector-tab-label-info"></div><a href="#info"></a></div>
-				<div class="inspector_tab" id="inspector_tab_activity"><div id="inspector-tab-label-activity"></div><a href="#activity"></a></div>
-				<div class="inspector_tab" id="inspector_tab_peers"><div id="inspector-tab-label-peers"></div><a href="#peers"></a></div>
-				<div class="inspector_tab" id="inspector_tab_trackers"><div id="inspector-tab-label-trackers"></div><a href="#trackers"></a></div>
-				<div class="inspector_tab" id="inspector_tab_files"><div id="inspector-tab-label-files"></div><a href="#files"></a></div>
-			</div>
+			<div id="inspector-tabs-wrapper">
+			<div id="inspector-tabs">
+				<div class="inspector-tab selected" id="inspector-tab-info" title="Info"><a href="#info"></a></div><div class="inspector-tab" id="inspector-tab-activity" title="Activity"><a href="#activity"></a></div><div class="inspector-tab" id="inspector-tab-peers" title="Peers"><a href="#peers"></a></div><div class="inspector-tab" id="inspector-tab-trackers" title="Trackers"><a href="#trackers"></a></div><div class="inspector-tab" id="inspector-tab-files" title="Files"><a href="#files"></a></div>
+			</div><!-- inspector-tabs -->
+			</div><!-- inspector-tabs-wrapper -->
 
 			<div id="inspector_header">
-				<h1 id="torrent_inspector_name"></h1>
+				<div id="torrent_inspector_name"></div>
 				<span id="torrent_inspector_size"></span>
 			</div>
 
-			<div class="inspector_container" id="inspector_tab_info_container">
+			<div class="inspector-page" id="inspector-page-info">
 				<div class="inspector_group">
 					<div class="inspector_group_label">Information</div>
 					<div class="inspector_row">
@@ -233,7 +231,7 @@
 				</div><!-- class="inspector_group"-->
 			</div><!-- id="inspector_tab_info_container" -->
 
-			<div style="display:none;" class="inspector_container" id="inspector_tab_activity_container">
+			<div style="display:none;" class="inspector-page" id="inspector-page-activity">
 
 				<div class="inspector_group">
 					<div class="inspector_group_label">Activity</div>
@@ -292,23 +290,25 @@
 				</div><!-- class="inspector_group"-->
 			</div><!-- id="inspector_tab_activity_container" -->
 
-			<div style="display:none;" class="inspector_container" id="inspector_tab_peers_container">
+			<div style="display:none;" class="inspector-page" id="inspector-page-peers">
 				<div id="inspector_peers_list">
 				</div>
 			</div><!-- id="inspector_tab_peers_container" -->
 
-			<div style="display:none;" class="inspector_container" id="inspector_tab_trackers_container">
+			<div style="display:none;" class="inspector-page" id="inspector-page-trackers">
 				<div id="inspector_trackers_list">
 				</div>
 			</div><!-- id="inspector_tab_trackers_container" -->
 
-			<div style="display:none;" class="inspector_container" id="inspector_tab_files_container">
-				<div id="select_all_button_container">
-					<div id="files_deselect_all" class="select_all_button">Deselect All</div>
-					<div id="files_select_all" class="select_all_button">Select All</div>
+			<div style="display:none;" class="inspector-page" id="inspector-page-files">
+				<div class="inspector_group">
+					<div id="select_all_button_container">
+						<div id="files_deselect_all" class="select_all_button">Deselect All</div>
+						<div id="files_select_all" class="select_all_button">Select All</div>
+					</div>
+					<ul id="inspector_file_list">
+					</ul>
 				</div>
-				<ul id="inspector_file_list">
-				</ul>
 			</div><!-- id="inspector_tab_files_container" -->
 
 		</div>
@@ -375,7 +375,7 @@
 		</div>
 
 		<div class="torrent_footer">
-			<ul id="settings_menu">
+			<ul id="settings_menu" title="Settings Menu">
 				<li id="button">&nbsp;
 					<ul id="footer_super_menu">
 						<li id="about-button">About</li>
@@ -443,9 +443,9 @@
 					</ul>
 				</li>
 			</ul>
-			<div id="turtle-button">&nbsp;</div>
-			<div id="compact-button">&nbsp;</div>
-			<div id="prefs-button">&nbsp;</div>
+			<div id="turtle-button" title="Alternative Speed Limits">&nbsp;</div>
+			<div id="compact-button" title="Compact View">&nbsp;</div>
+			<div id="prefs-button" title="Edit Preferences...">&nbsp;</div>
 		</div>
 
 		<div class="contextMenu" id="torrent_context_menu">

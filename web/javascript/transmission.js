@@ -62,9 +62,9 @@ Transmission.prototype =
 
 		$('#torrent_upload_form').submit(function() { $('#upload_confirm_button').click(); return false; });
 
-		if (isMobileDevice) {
-			$('#inspector_close').click($.proxy(this.toggleInspector,this));
-		} else {
+		$('#inspector-close').click($.proxy(this.toggleInspector,this));
+
+		if (!isMobileDevice) {
 			$(document).bind('keydown', $.proxy(this.keyDown,this) );
 			$(document).bind('keyup', $.proxy(this.keyUp, this) );
 			$('#torrent_container').click( $.proxy(this.deselectAll,this) );
@@ -548,7 +548,7 @@ Transmission.prototype =
 	toggleTurtleClicked: function()
 	{
 		var o = {};
-		o[RPC._TurtleState] = !$('#turtle-button').hasClass('enabled');
+		o[RPC._TurtleState] = !$('#turtle-button').hasClass('selected');
 		this.remote.savePrefs(o);
 	},
 
@@ -1025,7 +1025,7 @@ Transmission.prototype =
 			         ' up,',
 			         fmt.speed(o[RPC._TurtleDownSpeedLimit]),
 			         ' down)' ].join('');
-			e.toggleClass('enabled', b);
+			e.toggleClass('selected', b);
 			e.attr('title', text);
 		}
 
@@ -1147,7 +1147,6 @@ Transmission.prototype =
 		$('#torrent_inspector').toggle(visible);
 		if (isMobileDevice) {
 			$('body').toggleClass('inspector_showing',visible);
-			$('#inspector_close').toggle(visible);
 			this.hideMobileAddressbar();
 		} else {
 			var w = visible ? $('#torrent_inspector').outerWidth() + 1 + 'px' : '0px';
@@ -1580,7 +1579,7 @@ Transmission.prototype =
 		var compact = this[Prefs._CompactDisplayState];
 
 		// update the ui: footer button
-		$("#compact-button").toggleClass('enabled',compact);
+		$("#compact-button").toggleClass('selected',compact);
 
 		// update the ui: torrent list
 		this.torrentRenderer = compact ? new TorrentRendererCompact()

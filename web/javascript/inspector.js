@@ -48,7 +48,8 @@ function Inspector(controller) {
         $(tab).addClass('selected').siblings().removeClass('selected');
 
         // show this tab and hide the others
-        $('#'+tab.id+'_container').show().siblings('.inspector_container').hide();
+        console.log('#' + tab.id.replace('tab','page'));
+        $('#' + tab.id.replace('tab','page')).show().siblings('.inspector-page').hide();
 
         updateInspector();
     },
@@ -459,15 +460,15 @@ function Inspector(controller) {
 
         data.controller = controller;
 
-        $('.inspector_tab').click(onTabClicked);
+        $('.inspector-tab').click(onTabClicked);
         $('#files_select_all').click(filesSelectAllClicked);
         $('#files_deselect_all').click(filesDeselectAllClicked);
 
-        data.elements.info_page      = $('#inspector_tab_info_container')[0];
-        data.elements.files_page     = $('#inspector_tab_files_container')[0];
-        data.elements.peers_page     = $('#inspector_tab_peers_container')[0];
-        data.elements.trackers_page  = $('#inspector_tab_trackers_container')[0];
-        data.elements.activity_page  = $('#inspector_tab_activity_container')[0];
+        data.elements.info_page      = $('#inspector-page-info')[0];
+        data.elements.files_page     = $('#inspector-page-files')[0];
+        data.elements.peers_page     = $('#inspector-page-peers')[0];
+        data.elements.trackers_page  = $('#inspector-page-trackers')[0];
+        data.elements.activity_page  = $('#inspector-page-activity')[0];
 
         data.elements.file_list      = $('#inspector_file_list')[0];
         data.elements.peers_list     = $('#inspector_peers_list')[0];
