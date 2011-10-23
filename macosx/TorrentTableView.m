@@ -206,8 +206,7 @@
             : [[self preparedCellAtColumn: [self columnWithIdentifier: @"Group"] row: [self rowForItem: item]] stringValue];
 }
 
-- (NSString *) outlineView: (NSOutlineView *) outlineView toolTipForCell: (NSCell *) cell rect: (NSRectPointer) rect
-                tableColumn: (NSTableColumn *) column item: (id) item mouseLocation: (NSPoint) mouseLocation
+- (NSString *) outlineView: (NSOutlineView *) outlineView toolTipForCell: (NSCell *) cell rect: (NSRectPointer) rect tableColumn: (NSTableColumn *) column item: (id) item mouseLocation: (NSPoint) mouseLocation
 {
     NSString * ident = [column identifier];
     if ([ident isEqualToString: @"DL"] || [ident isEqualToString: @"DL Image"])

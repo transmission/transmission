@@ -50,13 +50,14 @@
 #define PADDING_BETWEEN_BUTTONS 3.0
 #define PADDING_BETWEEN_IMAGE_AND_TITLE (PADDING_HORIZONTAL + 1.0)
 #define PADDING_BETWEEN_IMAGE_AND_BAR PADDING_HORIZONTAL
-#define PADDING_BETWEEN_TITLE_AND_PRIORITY 4.0
+#define PADDING_BETWEEN_TITLE_AND_PRIORITY 6.0
 #define PADDING_ABOVE_TITLE 4.0
 #define PADDING_BETWEEN_TITLE_AND_MIN_STATUS 3.0
 #define PADDING_BETWEEN_TITLE_AND_PROGRESS 1.0
 #define PADDING_BETWEEN_PROGRESS_AND_BAR 2.0
 #define PADDING_BETWEEN_BAR_AND_STATUS 2.0
 #define PADDING_BETWEEN_BAR_AND_EDGE_MIN 3.0
+#define PADDING_EXPANSION_FRAME 2.0
 
 #define PIECES_TOTAL_PERCENT 0.6
 
@@ -487,6 +488,8 @@
         
         NSColor * priorityColor = [self backgroundStyle] == NSBackgroundStyleDark ? [NSColor whiteColor] : [NSColor darkGrayColor];
         NSImage * priorityImage = [[NSImage imageNamed: ([torrent priority] == TR_PRI_HIGH ? @"PriorityHighTemplate.png" : @"PriorityLowTemplate.png")] imageWithColor: priorityColor];
+        
+        
         [priorityImage drawInRect: priorityRect fromRect: NSZeroRect operation: NSCompositeSourceOver fraction: 1.0 respectFlipped: YES hints: nil];
     }
     
@@ -496,6 +499,50 @@
         NSAttributedString * statusString = [self attributedStatusString: [self statusString]];
         [statusString drawInRect: [self rectForStatusWithStringInBounds: cellFrame]];
     }
+}
+
+- (NSRect) expansionFrameWithFrame: (NSRect) cellFrame inView: (NSView *) view
+{
+    BOOL minimal = [fDefaults boolForKey: @"SmallView"];
+    
+    //this code needs to match the code in drawInteriorWithFrame:withView:
+    CGFloat minimalTitleRightBound;
+    if (minimal)
+    {
+        NSAttributedString * minimalString = [self attributedStatusString: [self minimalStatusString]];
+        NSRect minimalStatusRect = [self rectForMinimalStatusWithString: minimalString inBounds: cellFrame];
+        
+        minimalTitleRightBound = NSMinX(minimalStatusRect);
+    }
+    
+    if (!minimal || fHover)
+    {
+        const NSRect controlRect = [self controlButtonRectForBounds: cellFrame];
+        minimalTitleRightBound = MIN(minimalTitleRightBound, NSMinX(controlRect));
+    }
+    
+    NSAttributedString * titleString = [self attributedTitle];
+    NSRect realRect = [self rectForTitleWithString: titleString withRightBound: minimalTitleRightBound inBounds: cellFrame];
+    
+    NSAssert([titleString size].width >= NSWidth(realRect), @"Full rect width should not be less than the used title rect width!");
+    
+    if ([titleString size].width > NSWidth(realRect)
+        && NSMouseInRect([view convertPoint: [[view window] convertScreenToBase: [NSEvent mouseLocation]] fromView: nil], realRect, [view isFlipped]))
+    {
+        realRect.size.width = [titleString size].width;
+        return NSInsetRect(realRect, -PADDING_EXPANSION_FRAME, -PADDING_EXPANSION_FRAME);
+    }
+    
+    return NSZeroRect;
+}
+
+- (void) drawWithExpansionFrame: (NSRect) cellFrame inView: (NSView *)view
+{
+    cellFrame.origin.x += PADDING_EXPANSION_FRAME;
+    cellFrame.origin.y += PADDING_EXPANSION_FRAME;
+    
+    NSAttributedString * titleString = [self attributedTitle];
+    [titleString drawInRect: cellFrame];
 }
 
 @end
@@ -683,10 +730,8 @@
     }
     
     if ([(Torrent *)[self representedObject] priority] != TR_PRI_NORMAL)
-    {
         result.size.width -= PRIORITY_ICON_WIDTH + PADDING_BETWEEN_TITLE_AND_PRIORITY;
-        result.size.width = MIN(NSWidth(result), [string size].width); //only need to force it smaller for the priority icon
-    }
+    result.size.width = MIN(NSWidth(result), [string size].width);
     
     return result;
 }

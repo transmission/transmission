@@ -35,6 +35,7 @@
 }
 
 - (NSRect) iconRectForBounds: (NSRect) bounds;
+- (NSRect) rectForTitleWithString: (NSAttributedString *) string withRightBound: (CGFloat) rightBound inBounds: (NSRect) bounds;
 
 - (void) addTrackingAreasForView: (NSView *) controlView inRect: (NSRect) cellFrame withUserInfo: (NSDictionary *) userInfo
             mouseLocation: (NSPoint) mouseLocation;

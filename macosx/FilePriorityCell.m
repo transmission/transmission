@@ -28,7 +28,7 @@
 #import "NSImageAdditions.h"
 #import "Torrent.h"
 
-#define IMAGE_OVERLAP 3.0
+#define IMAGE_OVERLAP 1.0
 
 @implementation FilePriorityCell
 
