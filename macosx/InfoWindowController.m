@@ -77,6 +77,8 @@ typedef enum
     //window location and size
     NSPanel * window = (NSPanel *)[self window];
     
+    [window setFloatingPanel: NO];
+    
     const CGFloat windowHeight = NSHeight([window frame]);
     
     [window setFrameAutosaveName: @"InspectorWindow"];
