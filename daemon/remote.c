@@ -817,6 +817,10 @@ getStatusString( tr_benc * t, char * buf, size_t buflen )
             }
             break;
         }
+
+        default:
+            tr_strlcpy( buf, "Unknown", buflen );
+            break;
     }
 
     return buf;
