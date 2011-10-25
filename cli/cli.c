@@ -226,6 +226,8 @@ main( int argc, char ** argv )
     const char  * configDir;
     uint8_t     * fileContents;
     size_t        fileLength;
+    const char  * str; 
+    char          buf[TR_PATH_MAX]; 
 
     tr_formatter_mem_init( MEM_K, MEM_K_STR, MEM_M_STR, MEM_G_STR, MEM_T_STR );
     tr_formatter_size_init( DISK_K,DISK_K_STR, DISK_M_STR, DISK_G_STR, DISK_T_STR );
@@ -255,6 +257,16 @@ main( int argc, char ** argv )
     if( !torrentPath ) {
         fprintf( stderr, "No torrent specified!\n" );
         return EXIT_FAILURE;
+    }
+
+    if( tr_bencDictFindStr( &settings, TR_PREFS_KEY_DOWNLOAD_DIR, &str ) ) {
+        str = tr_realpath( str, buf );
+        if( str != NULL ) {
+            tr_bencDictAddStr( &settings, TR_PREFS_KEY_DOWNLOAD_DIR, str );
+        } else {
+            fprintf( stderr, "Download directory does not exist!\n" );
+            return EXIT_FAILURE;
+        }
     }
 
     h = tr_sessionInit( "cli", configDir, false, &settings );
