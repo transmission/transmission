@@ -207,9 +207,10 @@ phaseOne( tr_ptrArray * peerArray, tr_direction dir )
      * and/or peers that can use it */
     n = peerCount;
     dbgmsg( "%d peers to go round-robin for %s", n, (dir==TR_UP?"upload":"download") );
-    i = n ? tr_cryptoWeakRandInt( n ) : 0; /* pick a random starting point */
     while( n > 0 )
     {
+        i = n ? tr_cryptoWeakRandInt( n ) : 0; /* pick a peer at random */
+
         /* value of 3000 bytes chosen so that when using uTP we'll send a full-size
          * frame right away and leave enough buffered data for the next frame to go
          * out in a timely manner. */
@@ -219,18 +220,13 @@ phaseOne( tr_ptrArray * peerArray, tr_direction dir )
 
         dbgmsg( "peer #%d of %d used %d bytes in this pass", i, n, bytesUsed );
 
-        if( bytesUsed == (int)increment )
-            ++i;
-        else {
+        if( bytesUsed != (int)increment ) {
             /* peer is done writing for now; move it to the end of the list */
             tr_peerIo * pio = peers[i];
             peers[i] = peers[n-1];
             peers[n-1] = pio;
             --n;
         }
-
-        if( i >= n )
-            i = 0;
     }
 }
 
