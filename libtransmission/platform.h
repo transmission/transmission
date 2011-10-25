@@ -20,18 +20,6 @@
 #define TR_PATH_DELIMITER '/'
 #define TR_PATH_DELIMITER_STR "/"
 
-#ifdef WIN32
- #include <windef.h> /* MAX_PATH */
- #define TR_PATH_MAX (MAX_PATH + 1)
-#else
- #include <limits.h> /* PATH_MAX */
- #ifdef PATH_MAX
-  #define TR_PATH_MAX PATH_MAX
- #else
-  #define TR_PATH_MAX 4096
- #endif
-#endif
-
 /**
  * @addtogroup tr_session Session
  * @{
