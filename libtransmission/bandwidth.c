@@ -197,7 +197,7 @@ allocateBandwidth( tr_bandwidth  * b,
 static void
 phaseOne( tr_ptrArray * peerArray, tr_direction dir )
 {
-    int i, n;
+    int n;
     int peerCount = tr_ptrArraySize( peerArray );
     struct tr_peerIo ** peers = (struct tr_peerIo**) tr_ptrArrayBase( peerArray );
 
@@ -209,7 +209,7 @@ phaseOne( tr_ptrArray * peerArray, tr_direction dir )
     dbgmsg( "%d peers to go round-robin for %s", n, (dir==TR_UP?"upload":"download") );
     while( n > 0 )
     {
-        i = n ? tr_cryptoWeakRandInt( n ) : 0; /* pick a peer at random */
+        const int i = tr_cryptoWeakRandInt( n ); /* pick a peer at random */
 
         /* value of 3000 bytes chosen so that when using uTP we'll send a full-size
          * frame right away and leave enough buffered data for the next frame to go
