@@ -38,17 +38,12 @@
 	<body id="transmission_body">
 
 		<div id="toolbar">
-			<ul>
-				<li id="open"><div id="open_link"><div class="toolbar_image"></div>Open</div></li>
-				<li id="remove" class="disabled"><div id="remove_link"><div class="toolbar_image"></div>Remove</div></li>
-				<li class="divider">&nbsp;</li>
-				<li id="pause_selected" class="disabled"><div id="pause_selected_link"><div class="toolbar_image"></div>Pause</div></li>
-				<li id="resume_selected" class="disabled"><div id="resume_selected_link"><div class="toolbar_image"></div>Resume</div></li>
-				<li class="divider">&nbsp;</li>
-				<li id="pause_all" class="disabled"><div id="pause_all_link"><div class="toolbar_image"></div>Pause All</div></li>
-				<li id="resume_all" class="disabled"><div id="resume_all_link"><div class="toolbar_image"></div>Resume All</div></li>
-				<li id="inspector"><div id="inspector_link"><div class="toolbar_image"></div>Inspector</div></li>
-			</ul>
+			<div id="toolbar-open" title="Open Torrent"></div>
+			<div id="toolbar-remove" title="Remove Selected Torrents"></div>
+			<div id="toolbar-start" title="Start Selected Torrents"></div>
+			<div id="toolbar-pause" title="Pause Selected Torrents"></div>
+			<div id="toolbar-select" title="Toggle Selection"></div>
+			<div id="toolbar-inspector" title="Toggle Inspector"></div>
 		</div>
 
 		<div id="statusbar">
@@ -175,8 +170,6 @@
 		</div>
 
 		<div id="torrent_inspector" style="display:none;">
-
-			<div id="inspector-close"></div>
 
 			<div id="inspector-tabs-wrapper">
 			<div id="inspector-tabs">
@@ -465,11 +458,6 @@
 				<li id="context_verify">Verify Local Data</li>
 				<li class="separator"></li>
 				<li id="context_reannounce">Ask tracker for more peers</li>
-				<li class="separator"></li>
-				<li id="context_toggle_inspector">Show Inspector</li>
-				<li class="separator"></li>
-				<li id="context_select_all" class="context_select_all">Select All</li>
-				<li id="context_deselect_all" class="context_deselect_all">Deselect All</li>
 			</ul>
 		</div>
 

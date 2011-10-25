@@ -51,7 +51,7 @@ a {
 	background-repeat: no-repeat;
 }
 
-$nonselected-gradient-color-top: #EEE;
+$nonselected-gradient-color-top: white;
 $nonselected-gradient-color-bottom: #BBB;
 $selected-gradient-color-top: #68abe6;
 $selected-gradient-color-bottom: #93e8ff;
@@ -95,7 +95,7 @@ $selected-gradient-color-bottom: #93e8ff;
 #toolbar,
 #statusbar,
 .torrent_footer {
-	@include verticalGradient($nonselected-gradient-color-top, $nonselected-gradient-color-bottom);
+	background: #CCC;
 }
 
 /***
@@ -104,18 +104,21 @@ $selected-gradient-color-bottom: #93e8ff;
 ****
 ***/
 
-#about-dialog > * {
-	text-align: center;
-}
-#about-dialog > #about-logo {
-	background: transparent url('images/logo.png') top left no-repeat;
-	width: 64px;
-	height: 64px;
-	margin-left: 100px;
-}
-#about-dialog > #about-title {
-	font-size: 1.3em;
-	font-weight: bold;
+#about-dialog
+{
+	> * {
+		text-align: center;
+	}
+	> #about-logo {
+		background: transparent url('images/logo.png') top left no-repeat;
+		width: 64px;
+		height: 64px;
+		margin-left: 100px;
+	}
+	> #about-title {
+		font-size: 1.3em;
+		font-weight: bold;
+	}
 }
 
 /***
@@ -124,82 +127,83 @@ $selected-gradient-color-bottom: #93e8ff;
 ****
 ***/
 
-#toolbar
+div#toolbar
 {
+	$separator-spacing: 20px;
+
 	width: 100%;
-	height: 75px;
-	margin: 0;
-	border-bottom: 1px outset #AEBBCB;
-	overflow: hidden;
-	-moz-user-select: none;
-	-webkit-user-select: none;
+	height: 25px;
+	margin: 0px;
+	padding: 2px;
+	border-bottom: 1px solid #AAA;
 
-	ul
-	{
-		height: 50px;
-		margin: 0;
-		padding: 0 7px;
-		text-align: center;
-
-		li
-		{
-			list-style-type: none;
-			list-style-image: none;
-			float: left;
-			margin: 13px 0 0 0;
-			height: 50px;
-			padding: 0 8px;
-			cursor: pointer;
-
-			> div {
-				text-shadow: 0 1px 0 #ccc;
-				min-width: 32px;
-			}
-
-			div.toolbar_image {
-				width: 32px;
-				height: 32px;
-				margin: 0 auto 5px;
-				background-image: url('images/buttons/toolbar_buttons.png');
-			}
-
-			&.disabled > div {
-				text-shadow: 0 1px 0 #fff;
-				opacity: 0.25;
-				cursor: default;
-			}
-
-			&.divider {
-				width: 0;
-				border-right: 1px dotted black;
-				opacity: 0.2;
-				margin: 14px 4px 0;
-				height: 49px;
-			}
-
-			/* toolbar images */
-			&#open            div        div.toolbar_image { background-position: left     0px; }
-			&#open            div:active div.toolbar_image { background-position: right    0px; }
-			&#remove          div        div.toolbar_image { background-position: left   -32px; }
-			&#remove          div:active div.toolbar_image { background-position: right  -32px; }
-			&#resume_selected div        div.toolbar_image { background-position: left   -96px; }
-			&#resume_selected div:active div.toolbar_image { background-position: right  -96px; }
-			&#pause_selected  div        div.toolbar_image { background-position: left   -64px; }
-			&#pause_selected  div:active div.toolbar_image { background-position: right  -64px; }
-			&#pause_all       div        div.toolbar_image { background-position: left  -128px; }
-			&#pause_all       div:active div.toolbar_image { background-position: right -128px; }
-			&#resume_all      div        div.toolbar_image { background-position: left  -160px; }
-			&#resume_all      div:active div.toolbar_image { background-position: right -160px; }
-			&#filter          div        div.toolbar_image { background-position: left  -192px; }
-			&#filter          div:active div.toolbar_image { background-position: right -192px; }
-			&#inspector       div        div.toolbar_image { background-position: left  -224px; }
-			&#inspector       div:active div.toolbar_image { background-position: right -224px; }
-		}
+	> * {
+		@include button;
+		width: 18px;
+		height: 18px;
+		padding: 2px 8px;
+		float: left;
+		border: 1px solid #888;
 	}
 
-
-	#inspector {
+	div#toolbar-open {
+		@include leftRoundedBox(5px);
+		$image-url: 'images/toolbar-folder.png';
+		@include imageOnVerticalGradient($image-url, $nonselected-gradient-color-top, $nonselected-gradient-color-bottom);
+		&:active {
+			@include imageOnVerticalGradient($image-url, $selected-gradient-color-top, $selected-gradient-color-bottom);
+		}
+		margin-left: 4px;
+	}
+	> div#toolbar-remove {
+		@include rightRoundedBox(5px);
+		$image-url: 'images/toolbar-close.png';
+		@include imageOnVerticalGradient($image-url, $nonselected-gradient-color-top, $nonselected-gradient-color-bottom);
+		&:active {
+			@include imageOnVerticalGradient($image-url, $selected-gradient-color-top, $selected-gradient-color-bottom);
+		}
+	}
+	> div#toolbar-start {
+		@include leftRoundedBox(5px);
+		$image-url: 'images/toolbar-start.png';
+		@include imageOnVerticalGradient($image-url, $nonselected-gradient-color-top, $nonselected-gradient-color-bottom);
+		&:active {
+			@include imageOnVerticalGradient($image-url, $selected-gradient-color-top, $selected-gradient-color-bottom);
+		}
+		margin-left: $separator-spacing;
+	}
+	> div#toolbar-pause {
+		@include rightRoundedBox(5px);
+		$image-url: 'images/toolbar-pause.png';
+		@include imageOnVerticalGradient($image-url, $nonselected-gradient-color-top, $nonselected-gradient-color-bottom);
+		&:active {
+			@include imageOnVerticalGradient($image-url, $selected-gradient-color-top, $selected-gradient-color-bottom);
+		}
+	}
+	> div#toolbar-select {
+		@include leftRoundedBox(5px);
+		@include rightRoundedBox(5px);
+		$image-url: 'images/toolbar-pointer.png';
+		@include imageOnVerticalGradient($image-url, $nonselected-gradient-color-top, $nonselected-gradient-color-bottom);
+		&:active {
+			@include imageOnVerticalGradient($image-url, $selected-gradient-color-top, $selected-gradient-color-bottom);
+		}
+		margin-left: $separator-spacing;
+	}
+	> div#toolbar-inspector {
+		@include leftRoundedBox(5px);
+		@include rightRoundedBox(5px);
+		$image-url: 'images/toolbar-info.png';
+		@include imageOnVerticalGradient($image-url, $nonselected-gradient-color-top, $nonselected-gradient-color-bottom);
+		&:active, &.selected {
+			@include imageOnVerticalGradient($image-url, $selected-gradient-color-top, $selected-gradient-color-bottom);
+		}
 		float: right;
+		margin-right: 8px;
+	}
+
+	> *.disabled {
+		opacity: 0.25;
 	}
 }
 
@@ -213,7 +217,7 @@ $selected-gradient-color-bottom: #93e8ff;
 {
 	height: 24px;
 	width: 100%;
-	border-bottom: 1px outset #AEBBCB;
+	border-bottom: 1px solid #AAA;
 	overflow: hidden;
 	position: relative;
 
@@ -327,7 +331,7 @@ $selected-gradient-color-bottom: #93e8ff;
 
 div#torrent_container {
 	position: fixed;
-	top: 102px;
+	top: 55px;
 	bottom: 22px;
 	right: 0px;
 	left: 0px;
@@ -349,9 +353,13 @@ ul.torrent_list
 		border-bottom: 1px solid #ccc;
 		padding: 4px 30px 5px 10px; /* Make space for buttons on the right */
 		color: #666;
+		background-color: white;
 
-		&.compact { padding: 4px; }
-		&.even { background-color: #EDF3FE; }
+		&.compact {
+			padding: 4px;
+		}
+
+		&.even { background-color: #F7F7F7; }
 		&.selected
 		{
 			color: white;
@@ -359,9 +367,8 @@ ul.torrent_list
 
 			div.torrent_progress_details.error,
 			div.torrent_peer_details.error,
-			div.torrent_name {
-				color: #FFF;
-			}
+			div.torrent_name { color: #FFF; }
+			&.compact { div.torrent_name { color: white; } }
 		}
 
 		a img {
@@ -560,7 +567,7 @@ div#torrent_inspector
 {
 	padding: 15px;
 	position: fixed;
-	top: 102px;
+	top: 55px;
 	bottom: 22px;
 	right: 0px;
 	width: $inspector-width;
@@ -962,18 +969,24 @@ div.torrent_footer
 	width: 100%;
 	z-index: 3;
 
-	> * {
+	> * { 
+		float: left;
+		margin: 2px 4px;
+		width: 18px;
+		height: 12px;
+		padding: 2px 8px;
+		float: left;
+		border: 1px solid #888;
+	}
+
+	div.main_container {
 		$image-url: 'images/settings.png';
-		@include roundedButton(3px);
+		@include leftRoundedBox(5px);
+		@include rightRoundedBox(5px);
 		@include imageOnVerticalGradient($image-url, $nonselected-gradient-color-top, $nonselected-gradient-color-bottom);
 		&:active {
 			@include imageOnVerticalGradient($image-url, $selected-gradient-color-top, $selected-gradient-color-bottom);
 		}
-		float: left;
-		margin: 2px 4px;
-		height: 10px;
-		width: 24px;
-		border: 1px solid #666;
 	}
 
 	#turtle-button {
@@ -1223,24 +1236,25 @@ iframe#torrent_upload_frame {
  *
  *--------------------------------------*/
 
-div#jqContextMenu {
+div#jqContextMenu
+{
 	-webkit-border-radius: 5px;
 	border: 1px solid rgba(0,0,0,0.1);
 	-moz-user-select: none;
 	-webkit-user-select: none;
-}
 
-div#jqContextMenu ul {
-	filter: alpha(opacity=98);
-	-moz-opacity: .98;
-	opacity: .98;
-	-webkit-box-shadow: 0 10px 25px rgba(0,0,0,0.4);
-	-webkit-border-radius: 5px;
-}
+	ul {
+		filter: alpha(opacity=98);
+		-moz-opacity: .98;
+		opacity: .98;
+		-webkit-box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+		-webkit-border-radius: 5px;
+	}
 
-div#jqContextMenu li.separator, div#jqContextMenu li.separator:hover {
-	background: inherit !important;
-	border-top: 1px solid #ddd !important;
-	margin: 5px 0 !important;
-	padding: 0px;
+	li.separator, div#jqContextMenu li.separator:hover {
+		background: inherit !important;
+		border-top: 1px solid #ddd !important;
+		margin: 5px 0 !important;
+		padding: 0px;
+	}
 }

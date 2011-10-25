@@ -114,84 +114,85 @@ body.open_showing #torrent_filter_bar, body.open_showing #torrent_container {
 ****
 ***/
 
-#toolbar {
+div#toolbar
+{
+	$separator-spacing: 20px;
+
+        background: #CCC;
 	width: 100%;
-	height: 55px;
-	margin: 0;
-	background: #6685a1 url('images/iphone_chrome.png') top left repeat-x;
-	border: 1px outset #AEBBCB;
-}
+	height: 25px;
+	margin: 0px;
+	padding: 2px;
+	border-bottom: 1px solid #AAA;
 
-#toolbar ul {
-	margin: 0;
-	padding: 0 3px;
-	text-align: center;
-}
+	> * {
+		@include button;
+		width: 18px;
+		height: 18px;
+		padding: 2px 8px;
+		float: left;
+		border: 1px solid #888;
+	}
 
-#toolbar ul li {
-	list-style-type: none;
-	list-style-image: none;
-	margin: 4px 0 0 0;
-	padding: 0 2px;
-	cursor: pointer;
-	display: inline-block;
-}
+	div#toolbar-open {
+		@include leftRoundedBox(5px);
+		$image-url: 'images/toolbar-folder.png';
+		@include imageOnVerticalGradient($image-url, $nonselected-gradient-color-top, $nonselected-gradient-color-bottom);
+		&:active {
+			@include imageOnVerticalGradient($image-url, $selected-gradient-color-top, $selected-gradient-color-bottom);
+		}
+		margin-left: 4px;
+	}
+	> div#toolbar-remove {
+		@include rightRoundedBox(5px);
+		$image-url: 'images/toolbar-close.png';
+		@include imageOnVerticalGradient($image-url, $nonselected-gradient-color-top, $nonselected-gradient-color-bottom);
+		&:active {
+			@include imageOnVerticalGradient($image-url, $selected-gradient-color-top, $selected-gradient-color-bottom);
+		}
+	}
+	> div#toolbar-start {
+		@include leftRoundedBox(5px);
+		$image-url: 'images/toolbar-start.png';
+		@include imageOnVerticalGradient($image-url, $nonselected-gradient-color-top, $nonselected-gradient-color-bottom);
+		&:active {
+			@include imageOnVerticalGradient($image-url, $selected-gradient-color-top, $selected-gradient-color-bottom);
+		}
+		margin-left: $separator-spacing;
+	}
+	> div#toolbar-pause {
+		@include rightRoundedBox(5px);
+		$image-url: 'images/toolbar-pause.png';
+		@include imageOnVerticalGradient($image-url, $nonselected-gradient-color-top, $nonselected-gradient-color-bottom);
+		&:active {
+			@include imageOnVerticalGradient($image-url, $selected-gradient-color-top, $selected-gradient-color-bottom);
+		}
+	}
+	> div#toolbar-select {
+		@include leftRoundedBox(5px);
+		@include rightRoundedBox(5px);
+		$image-url: 'images/toolbar-pointer.png';
+		@include imageOnVerticalGradient($image-url, $nonselected-gradient-color-top, $nonselected-gradient-color-bottom);
+		&:active {
+			@include imageOnVerticalGradient($image-url, $selected-gradient-color-top, $selected-gradient-color-bottom);
+		}
+		margin-left: $separator-spacing;
+	}
+	> div#toolbar-inspector {
+		@include leftRoundedBox(5px);
+		@include rightRoundedBox(5px);
+		$image-url: 'images/toolbar-info.png';
+		@include imageOnVerticalGradient($image-url, $nonselected-gradient-color-top, $nonselected-gradient-color-bottom);
+		&:active, &.selected {
+			@include imageOnVerticalGradient($image-url, $selected-gradient-color-top, $selected-gradient-color-bottom);
+		}
+		float: right;
+		margin-right: 8px;
+	}
 
-#toolbar li#remove, li#open, li#resume_selected, li#pause_selected {
-	float: left;
-}
-#toolbar li#resume_all, li#pause_all {
-	float: right;
-}
-
-#toolbar ul li > div {
-	color: #fff;
-	font-size: 9px;
-	text-decoration: none;
-	padding: 0 4px 0;
-	display: block;
-	margin: 0;
-	background-position: top center;
-	background-repeat: no-repeat;
-	position: relative;
-	font-weight: bold;
-}
-
-#toolbar ul li div.toolbar_image {
-	width: 32px;
-	height: 32px;
-	margin: 0 auto 2px;
-	background-image: url('images/buttons/toolbar_buttons.png');
-}
-
-/* toolbar images */
-li#open            div        div.toolbar_image { background-position: left     0px; }
-li#open            div:active div.toolbar_image { background-position: right    0px; }
-li#remove          div        div.toolbar_image { background-position: left   -32px; }
-li#remove          div:active div.toolbar_image { background-position: right  -32px; }
-li#resume_selected div        div.toolbar_image { background-position: left   -96px; }
-li#resume_selected div:active div.toolbar_image { background-position: right  -96px; }
-li#pause_selected  div        div.toolbar_image { background-position: left   -64px; }
-li#pause_selected  div:active div.toolbar_image { background-position: right  -64px; }
-li#pause_all       div        div.toolbar_image { background-position: left  -128px; }
-li#pause_all       div:active div.toolbar_image { background-position: right -128px; }
-li#resume_all      div        div.toolbar_image { background-position: left  -160px; }
-li#resume_all      div:active div.toolbar_image { background-position: right -160px; }
-li#filter          div        div.toolbar_image { background-position: left  -192px; }
-li#filter          div:active div.toolbar_image { background-position: right -192px; }
-li#inspector       div        div.toolbar_image { background-position: left  -224px; }
-li#inspector       div:active div.toolbar_image { background-position: right -224px; }
-
-#toolbar ul li.disabled > div {
-	text-shadow: 0 1px 0 #fff;
-	opacity: 0.25;
-	cursor: default;
-}
-
-#toolbar ul li#filter,
-#toolbar ul li#inspector,
-#toolbar ul li.divider {
-	display: none;
+	> *.disabled {
+		opacity: 0.25;
+	}
 }
 
 /***
@@ -200,46 +201,42 @@ li#inspector       div:active div.toolbar_image { background-position: right -22
 ****
 ***/
 
-#statusbar {
+#statusbar
+{
+        background: #CCC;
 	margin: 0;
-	color: #fff;
-	background: #6B83A1;
-	border: 1px outset #AEBBCB;
+	color: black;
+	border-bottom: 1px solid #AAA;
 	width: 100%;
 	overflow: hidden;
 	position: relative;
 	text-align: left;
+
+	#speed-info {
+		margin-top: 3px;
+		float: right;
+		margin-right: 6px;
+	}
+
+	#filter-button {
+		float: left;
+		border: none;
+		font-size: 1.2em;
+		padding: 1px 6px;
+		margin-top: 1px;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		-moz-user-select: none;
+		-webkit-user-select: none;
+		&:hover { cursor: pointer };
+		#filter-button .filter-selection { text-decoration: underline; }
+	}
+
+	#torrent_search {
+		display: none;
+	}
 }
 
-#statusbar #speed-info {
-	margin-top: 3px;
-	float: right;
-	margin-right: 6px;
-}
-
-#statusbar #filter-button {
-	float: left;
-	border: none;
-	font-size: 1.2em;
-	padding: 1px 6px;
-	margin-top: 1px;
-	overflow: hidden;
-	text-overflow: ellipsis;
-	-moz-user-select: none;
-	-webkit-user-select: none;
-}
-#statusbar #filter-button:hover {
-	cursor: pointer;
-}
-#statusbar #filter-button .filter-selection {
-	text-decoration: underline;
-}
-
-
-
-#statusbar #torrent_search {
-	display: none;
-}
 
 /***
 ****
@@ -656,16 +653,6 @@ div#torrent_inspector
 	text-align: left;
 	overflow: auto;
 
-	#inspector-close
-	{
-		float: right;
-		display: inline;
-		width: 20px;
-		height: 20px;
-		margin: 10px 10px 0px 0px;
-		background: transparent url('images/buttons/cancel.png') no-repeat;
-	}
-
 	#inspector-tabs-wrapper
 	{
 		width: 100%;
@@ -931,6 +918,7 @@ div.file-priority-radiobox
 		@include button;
 		width: 30px;
 		height: 12px;
+		border: 1px solid #888;
 	}
 
 	> div.low {

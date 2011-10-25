@@ -13,11 +13,16 @@ dist_data_DATA = \
   inspector-info.png \
   inspector-peers.png \
   inspector-trackers.png \
-  iphone_chrome.png \
   lock_icon.png \
   logo.png \
   progress.png \
   settings.png \
+  toolbar-close.png \
+  toolbar-folder.png \
+  toolbar-info.png \
+  toolbar-pause.png \
+  toolbar-pointer.png \
+  toolbar-start.png \
   turtle.png \
   wrench.png
 
