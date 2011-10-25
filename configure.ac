@@ -321,6 +321,12 @@ PKG_CHECK_EXISTS([gtk+-3.0 >= $GTK3_MINIMUM],[gtk_version="3" with_gtk_default="
 AC_ARG_WITH([gtk], AC_HELP_STRING([--with-gtk],[with Gtk]),
             [with_gtk=$withval],
             [with_gtk=$with_gtk_default])
+if test "x$with_gtk" = "x2" ; then
+    PKG_CHECK_EXISTS([gtk+-2.0 >= $GTK2_MINIMUM],[gtk_version="2" with_gtk="yes"],[gtk_version="none" with_gtk="no"])
+fi
+if test "x$with_gtk" = "x3" ; then
+    PKG_CHECK_EXISTS([gtk+-3.0 >= $GTK3_MINIMUM],[gtk_version="3" with_gtk="yes"],[gtk_version="none" with_gtk="no"])
+fi
 AC_ARG_ENABLE([nls], 
               [AS_HELP_STRING([--enable-nls],[enable native language support])],,
               [enable_nls=yes])
@@ -522,7 +528,7 @@ Configuration:
 
    Build Command-Line client:                         ${build_cli}
 
-   Build GTK+ client:                                 ${with_gtk}
+   Build GTK+ client:                                 ${with_gtk} (GTK+ $gtk_version)
       * libappindicator for an Ubuntu-style tray:     ${use_libappindicator}
 
    Build Daemon:                                      ${build_daemon}
