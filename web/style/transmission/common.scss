@@ -140,8 +140,9 @@ div#toolbar
 	height: 25px;
 	margin: 0px;
 	padding: 2px;
-	border-bottom: 1px solid #AAA;
-	background: #CCC;
+	//border-bottom: 1px solid black;
+	background: #C00; // TESTING
+	//background: #CCC;
 
 	$idle-color-top: $nonselected-gradient-color-top;
 	$idle-color-bottom: $nonselected-gradient-color-bottom;
@@ -210,9 +211,11 @@ div#toolbar
 {
 	height: 24px;
 	width: 100%;
-	border-bottom: 1px solid #AAA;
+	//border-bottom: 1px solid #AAA; TESTING
 	overflow: hidden;
 	position: relative;
+	background-color: #C00;
+	color: white;
 
 	#speed-info
 	{
@@ -384,12 +387,11 @@ ul.torrent_list
 		&.even { background-color: #F7F7F7; }
 		&.selected
 		{
-			color: white;
-			background-color: #3879D7;
+			@include verticalGradient(#C00, #900);
 
-			div.torrent_progress_details.error,
-			div.torrent_peer_details.error,
-			div.torrent_name { color: #FFF; }
+			div.torrent_progress_details,
+			div.torrent_peer_details,
+			div.torrent_name { color: white; }
 			&.compact { div.torrent_name { color: white; } }
 		}
 
