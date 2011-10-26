@@ -23,6 +23,6 @@ dist_data_DATA = \
   toolbar-pause.png \
   toolbar-pointer.png \
   toolbar-start.png \
-  turtle.png \
-  wrench.png
+  toolbar-wrench.png \
+  turtle.png
 

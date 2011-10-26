@@ -26,6 +26,8 @@ Transmission.prototype =
 		this.remote = new TransmissionRemote(this);
 		this.inspector = new Inspector(this, this.remote);
 		this.prefsDialog = new PrefsDialog(this.remote);
+		$(this.prefsDialog).bind('closed', $.proxy(this.onPrefsDialogClosed,this));
+
 		this.isMenuEnabled = !isMobileDevice;
 
 		// Initialize the implementation fields
@@ -45,8 +47,7 @@ Transmission.prototype =
 		$('#toolbar-remove').click($.proxy(this.removeClicked,this));
 		$('#toolbar-open').click($.proxy(this.openTorrentClicked,this));
 		$('#toolbar-select').click($.proxy(this.toggleSelectionClicked,this));
-
-		$('#prefs-button').click($.proxy(this.showPrefsDialog,this));
+		$('#toolbar-prefs').click($.proxy(this.togglePrefsDialogClicked,this));
 
 		$('#upload_confirm_button').click($.proxy(this.confirmUploadClicked,this));
 		$('#upload_cancel_button').click($.proxy(this.hideUploadDialog,this));
@@ -549,9 +550,20 @@ Transmission.prototype =
 	 *
 	 *--------------------------------------------*/
 
-	showPrefsDialog: function()
+	onPrefsDialogClosed: function() {
+		$('#toolbar-prefs').removeClass('selected');
+	},
+
+	togglePrefsDialogClicked: function(ev)
 	{
-		this.prefsDialog.show();
+		var e = $('#toolbar-prefs');
+
+		if (e.hasClass('selected'))
+			this.prefsDialog.close();
+		else {
+			e.addClass('selected');
+			this.prefsDialog.show();
+		}
 	},
 
 	setFilterText: function(search) {
@@ -600,10 +612,6 @@ Transmission.prototype =
 		}
 		else switch (id)
 		{
-			case 'preferences':
-				this.showPrefsDialog();
-				break;
-
 			case 'statistics':
 				this.showStatsDialog();
 				break;

@@ -181,8 +181,14 @@ div#toolbar
 		@include buttonImage('images/toolbar-pointer.png', $idle-color-top, $idle-color-bottom, $active-color-top, $active-color-bottom);
 		margin-left: $separator-spacing;
 	}
-	> div#toolbar-inspector {
+
+	> div#toolbar-prefs {
 		@include leftRoundedBox(5px);
+		@include buttonImage('images/toolbar-wrench.png', $idle-color-top, $idle-color-bottom, $active-color-top, $active-color-bottom);
+		border-right-width: 0px;
+		float: right;
+	}
+	> div#toolbar-inspector {
 		@include rightRoundedBox(5px);
 		@include buttonImage('images/toolbar-info.png', $idle-color-top, $idle-color-bottom, $active-color-top, $active-color-bottom);
 		float: right;
@@ -971,10 +977,6 @@ div.torrent_footer
 		@include leftRoundedBox(5px);
 		@include rightRoundedBox(5px);
 		@include buttonImage('images/compact.png', $idle-color-top, $idle-color-bottom, $active-color-top, $active-color-bottom);
-	}
-
-	#prefs-button {
-		display: none;
 	}
 }
 

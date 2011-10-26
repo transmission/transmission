@@ -298,6 +298,12 @@ function PrefsDialog(remote) {
         data.elements.root.dialog('open');
     };
 
+    this.close = function ()
+    {
+        transmission.hideMobileAddressbar();
+        data.elements.root.dialog('close');
+    },
+
     this.shouldAddedTorrentsStart = function()
     {
         return data.elements.root.find('#start-added-torrents')[0].checked;
