@@ -1045,8 +1045,8 @@ Transmission.prototype =
 
 	updateStatusbar: function()
 	{
-		var i, row, text,
-		    u=0, d=0,
+		var u=0, d=0,
+		    i, row, text,
 		    fmt = Transmission.fmt,
 		    torrents = this.getAllTorrents();
 
@@ -1058,11 +1058,11 @@ Transmission.prototype =
 			d += row.getDownloadSpeed();
 		}
 
-		text = u ? '&uarr; ' + fmt.speedBps(u) : '';
-		setInnerHTML($('#statusbar #speed-up-label')[0], text);
+		$('#speed-up-container').toggleClass('active', u>0 );
+		$('#speed-up-label').text( fmt.speedBps( u ) );
 
-		text = d ? '&darr; ' + fmt.speedBps(d) : '';
-		setInnerHTML($('#statusbar #speed-dn-label')[0], text);
+		$('#speed-dn-container').toggleClass('active', d>0 );
+		$('#speed-dn-label').text( fmt.speedBps( d ) );
 	},
 
 	setEnabled: function(key, flag)
@@ -1130,7 +1130,7 @@ Transmission.prototype =
 		$('#torrent_inspector').toggle(visible);
 		$('#toolbar-inspector').toggleClass('selected',visible);
 		this.hideMobileAddressbar();
-		if (!isMobileDevice) {
+		if (isMobileDevice) {
 			$('body').toggleClass('inspector_showing',visible);
 		} else {
 			var w = visible ? $('#torrent_inspector').outerWidth() + 1 + 'px' : '0px';

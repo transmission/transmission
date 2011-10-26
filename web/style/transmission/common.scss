@@ -195,7 +195,7 @@ div#toolbar
 		@include rightRoundedBox(5px);
 		$image-url: 'images/toolbar-info.png';
 		@include imageOnVerticalGradient($image-url, $nonselected-gradient-color-top, $nonselected-gradient-color-bottom);
-		&:active, &.selected {
+		&:active {
 			@include imageOnVerticalGradient($image-url, $selected-gradient-color-top, $selected-gradient-color-bottom);
 		}
 		float: right;
@@ -221,10 +221,39 @@ div#toolbar
 	overflow: hidden;
 	position: relative;
 
-	#speed-info {
+	#speed-info
+	{
 		margin-top: 5px;
 		margin-left: 45%;
 		text-align: left;
+
+		* {
+			display: inline-block;
+		}
+
+		#speed-up-icon {
+			margin-left: 8px;
+			width: 8px;
+			height: 8px;
+			background: url('images/arrow-up.png') bottom no-repeat;
+		}
+
+		#speed-dn-icon {
+			width: 8px;
+			height: 8px;
+			background: url('images/arrow-down.png') bottom no-repeat;
+		}
+
+		#speed-up-container {
+			display: none;
+			&.active { display: inline; }
+		}
+
+		#speed-dn-container {
+			display: none;
+			&.active { display: inline; }
+		}
+
 	}
 
 	#filter-button {
