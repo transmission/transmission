@@ -346,7 +346,7 @@ main( int argc, char ** argv )
         }
 
         st = tr_torrentStat( tor );
-        if( st->activity & TR_STATUS_STOPPED )
+        if( st->activity == TR_STATUS_STOPPED )
             break;
 
         getStatusStr( st, line, sizeof( line ) );
