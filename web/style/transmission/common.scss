@@ -51,6 +51,13 @@ a {
 	background-repeat: no-repeat;
 }
 
+@mixin buttonImage($image-url, $idle-color-top, $idle-color-bottom, $active-color-top, $active-color-bottom) {
+	@include imageOnVerticalGradient($image-url, $idle-color-top, $idle-color-bottom);
+	&:active, &:hover, &.selected {
+		@include imageOnVerticalGradient($image-url, $active-color-top, $active-color-bottom);
+	}
+}
+
 $nonselected-gradient-color-top: white;
 $nonselected-gradient-color-bottom: #BBB;
 $selected-gradient-color-top: #68abe6;
@@ -91,8 +98,6 @@ $selected-gradient-color-bottom: #93e8ff;
 	border-bottom-right-radius: $radius;
 }
 
-
-#toolbar,
 #statusbar,
 .torrent_footer {
 	background: #CCC;
@@ -136,6 +141,12 @@ div#toolbar
 	margin: 0px;
 	padding: 2px;
 	border-bottom: 1px solid #AAA;
+	background: #CCC;
+
+	$idle-color-top: $nonselected-gradient-color-top;
+	$idle-color-bottom: $nonselected-gradient-color-bottom;
+	$active-color-top: $selected-gradient-color-top;
+	$active-color-bottom: $selected-gradient-color-bottom;
 
 	> * {
 		@include button;
@@ -148,56 +159,32 @@ div#toolbar
 
 	div#toolbar-open {
 		@include leftRoundedBox(5px);
-		$image-url: 'images/toolbar-folder.png';
-		@include imageOnVerticalGradient($image-url, $nonselected-gradient-color-top, $nonselected-gradient-color-bottom);
-		&:active {
-			@include imageOnVerticalGradient($image-url, $selected-gradient-color-top, $selected-gradient-color-bottom);
-		}
+		@include buttonImage('images/toolbar-folder.png', $idle-color-top, $idle-color-bottom, $active-color-top, $active-color-bottom);
 		margin-left: 4px;
 	}
 	> div#toolbar-remove {
 		@include rightRoundedBox(5px);
-		$image-url: 'images/toolbar-close.png';
-		@include imageOnVerticalGradient($image-url, $nonselected-gradient-color-top, $nonselected-gradient-color-bottom);
-		&:active {
-			@include imageOnVerticalGradient($image-url, $selected-gradient-color-top, $selected-gradient-color-bottom);
-		}
+		@include buttonImage('images/toolbar-close.png', $idle-color-top, $idle-color-bottom, $active-color-top, $active-color-bottom);
 	}
 	> div#toolbar-start {
 		@include leftRoundedBox(5px);
-		$image-url: 'images/toolbar-start.png';
-		@include imageOnVerticalGradient($image-url, $nonselected-gradient-color-top, $nonselected-gradient-color-bottom);
-		&:active {
-			@include imageOnVerticalGradient($image-url, $selected-gradient-color-top, $selected-gradient-color-bottom);
-		}
+		@include buttonImage('images/toolbar-start.png', $idle-color-top, $idle-color-bottom, $active-color-top, $active-color-bottom);
 		margin-left: $separator-spacing;
 	}
 	> div#toolbar-pause {
 		@include rightRoundedBox(5px);
-		$image-url: 'images/toolbar-pause.png';
-		@include imageOnVerticalGradient($image-url, $nonselected-gradient-color-top, $nonselected-gradient-color-bottom);
-		&:active {
-			@include imageOnVerticalGradient($image-url, $selected-gradient-color-top, $selected-gradient-color-bottom);
-		}
+		@include buttonImage('images/toolbar-pause.png', $idle-color-top, $idle-color-bottom, $active-color-top, $active-color-bottom);
 	}
 	> div#toolbar-select {
 		@include leftRoundedBox(5px);
 		@include rightRoundedBox(5px);
-		$image-url: 'images/toolbar-pointer.png';
-		@include imageOnVerticalGradient($image-url, $nonselected-gradient-color-top, $nonselected-gradient-color-bottom);
-		&:active {
-			@include imageOnVerticalGradient($image-url, $selected-gradient-color-top, $selected-gradient-color-bottom);
-		}
+		@include buttonImage('images/toolbar-pointer.png', $idle-color-top, $idle-color-bottom, $active-color-top, $active-color-bottom);
 		margin-left: $separator-spacing;
 	}
 	> div#toolbar-inspector {
 		@include leftRoundedBox(5px);
 		@include rightRoundedBox(5px);
-		$image-url: 'images/toolbar-info.png';
-		@include imageOnVerticalGradient($image-url, $nonselected-gradient-color-top, $nonselected-gradient-color-bottom);
-		&:active {
-			@include imageOnVerticalGradient($image-url, $selected-gradient-color-top, $selected-gradient-color-bottom);
-		}
+		@include buttonImage('images/toolbar-info.png', $idle-color-top, $idle-color-bottom, $active-color-top, $active-color-bottom);
 		float: right;
 		margin-right: 8px;
 	}
@@ -620,61 +607,40 @@ div#torrent_inspector
 		#inspector-tabs
 		{
 			$border-radius: 5px;
+			$idle-color-top: $nonselected-gradient-color-top;
+			$idle-color-bottom: $nonselected-gradient-color-bottom;
+			$active-color-top: $selected-gradient-color-top;
+			$active-color-bottom: $selected-gradient-color-bottom;
 
 			display: inline-block;
 
 			> * {
+				@include button;
 				width: 30px;
 				height: 20px;
 			}
 
 			> #inspector-tab-info {
-				$image-url: 'images/inspector-info.png';
-				@include button;
-				@include imageOnVerticalGradient($image-url, $nonselected-gradient-color-top, $nonselected-gradient-color-bottom);
                                 @include leftRoundedBox($border-radius);
+				@include buttonImage('images/inspector-info.png', $idle-color-top, $idle-color-bottom, $active-color-top, $active-color-bottom);
                                 border-left-width: 1px;
-				&.selected {
-					@include imageOnVerticalGradient($image-url, $selected-gradient-color-top, $selected-gradient-color-bottom);
-				}
 			}
 
 			> #inspector-tab-activity {
-				$image-url: 'images/inspector-activity.png';
-				@include button;
-				@include imageOnVerticalGradient($image-url, $nonselected-gradient-color-top, $nonselected-gradient-color-bottom);
-				&.selected {
-					@include imageOnVerticalGradient($image-url, $selected-gradient-color-top, $selected-gradient-color-bottom);
-				}
+				@include buttonImage('images/inspector-activity.png', $idle-color-top, $idle-color-bottom, $active-color-top, $active-color-bottom);
 			}
 
 			> #inspector-tab-peers {
-				$image-url: 'images/inspector-peers.png';
-				@include button;
-				@include imageOnVerticalGradient($image-url, $nonselected-gradient-color-top, $nonselected-gradient-color-bottom);
-				&.selected {
-					@include imageOnVerticalGradient($image-url, $selected-gradient-color-top, $selected-gradient-color-bottom);
-				}
+				@include buttonImage('images/inspector-peers.png', $idle-color-top, $idle-color-bottom, $active-color-top, $active-color-bottom);
 			}
 
 			> #inspector-tab-trackers {
-				$image-url: 'images/inspector-trackers.png';
-				@include button;
-				@include imageOnVerticalGradient($image-url, $nonselected-gradient-color-top, $nonselected-gradient-color-bottom);
-				&.selected {
-					@include imageOnVerticalGradient($image-url, $selected-gradient-color-top, $selected-gradient-color-bottom);
-				}
+				@include buttonImage('images/inspector-trackers.png', $idle-color-top, $idle-color-bottom, $active-color-top, $active-color-bottom);
 			}
 
 			> #inspector-tab-files {
-				$image-url: 'images/inspector-files.png';
-				@include button;
-				@include imageOnVerticalGradient($image-url, $nonselected-gradient-color-top, $nonselected-gradient-color-bottom);
                                 @include rightRoundedBox($border-radius);
-                                border-right-width: 1px;
-				&.selected {
-					@include imageOnVerticalGradient($image-url, $selected-gradient-color-top, $selected-gradient-color-bottom);
-				}
+				@include buttonImage('images/inspector-files.png', $idle-color-top, $idle-color-bottom, $active-color-top, $active-color-bottom);
 			}
 		}
 	}
@@ -953,31 +919,24 @@ div.file-priority-radiobox
 		height: 12px;
 	}
 
+	$idle-color-top: $nonselected-gradient-color-top;
+	$idle-color-bottom: $nonselected-gradient-color-bottom;
+	$active-color-top: $selected-gradient-color-top;
+	$active-color-bottom: $selected-gradient-color-bottom;
+
 	> div.low {
-		$image-url: 'images/file-priority-low.png';
 		@include leftRoundedBox($border-radius);
-		@include imageOnVerticalGradient($image-url, $nonselected-gradient-color-top, $nonselected-gradient-color-bottom);
-		&.selected {
-			@include imageOnVerticalGradient($image-url, $selected-gradient-color-top, $selected-gradient-color-bottom);
-		}
+		@include buttonImage('images/file-priority-low.png', $idle-color-top, $idle-color-bottom, $active-color-top, $active-color-bottom);
 		border-right-width: 0px;
 	}
 
 	> div.normal {
-		$image-url: 'images/file-priority-normal.png';
-		@include imageOnVerticalGradient($image-url, $nonselected-gradient-color-top, $nonselected-gradient-color-bottom);
-		&.selected {
-			@include imageOnVerticalGradient($image-url, $selected-gradient-color-top, $selected-gradient-color-bottom);
-		}
+		@include buttonImage('images/file-priority-normal.png', $idle-color-top, $idle-color-bottom, $active-color-top, $active-color-bottom);
 	}
 
 	> div.high {
-		$image-url: 'images/file-priority-high.png';
 		@include rightRoundedBox($border-radius);
-		@include imageOnVerticalGradient($image-url, $nonselected-gradient-color-top, $nonselected-gradient-color-bottom);
-		&.selected {
-			@include imageOnVerticalGradient($image-url, $selected-gradient-color-top, $selected-gradient-color-bottom);
-		}
+		@include buttonImage('images/file-priority-high.png', $idle-color-top, $idle-color-bottom, $active-color-top, $active-color-bottom);
 		border-left-width: 0px;
 	}
 }
@@ -1008,30 +967,27 @@ div.torrent_footer
 		border: 1px solid #888;
 	}
 
+	$idle-color-top: $nonselected-gradient-color-top;
+	$idle-color-bottom: $nonselected-gradient-color-bottom;
+	$active-color-top: $selected-gradient-color-top;
+	$active-color-bottom: $selected-gradient-color-bottom;
+
 	div.main_container {
-		$image-url: 'images/settings.png';
 		@include leftRoundedBox(5px);
 		@include rightRoundedBox(5px);
-		@include imageOnVerticalGradient($image-url, $nonselected-gradient-color-top, $nonselected-gradient-color-bottom);
-		&:active {
-			@include imageOnVerticalGradient($image-url, $selected-gradient-color-top, $selected-gradient-color-bottom);
-		}
+		@include buttonImage('images/settings.png', $idle-color-top, $idle-color-bottom, $active-color-top, $active-color-bottom);
 	}
 
 	#turtle-button {
-		$image-url: 'images/turtle.png';
-		@include imageOnVerticalGradient($image-url, $nonselected-gradient-color-top, $nonselected-gradient-color-bottom);
-		&.selected {
-			@include imageOnVerticalGradient($image-url, $selected-gradient-color-top, $selected-gradient-color-bottom);
-		}
+		@include leftRoundedBox(5px);
+		@include rightRoundedBox(5px);
+		@include buttonImage('images/turtle.png', $idle-color-top, $idle-color-bottom, $active-color-top, $active-color-bottom);
 	}
 
 	#compact-button {
-		$image-url: 'images/compact.png';
-		@include imageOnVerticalGradient($image-url, $nonselected-gradient-color-top, $nonselected-gradient-color-bottom);
-		&.selected {
-			@include imageOnVerticalGradient($image-url, $selected-gradient-color-top, $selected-gradient-color-bottom);
-		}
+		@include leftRoundedBox(5px);
+		@include rightRoundedBox(5px);
+		@include buttonImage('images/compact.png', $idle-color-top, $idle-color-bottom, $active-color-top, $active-color-bottom);
 	}
 
 	#prefs-button {
