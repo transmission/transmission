@@ -760,17 +760,11 @@ div#torrent_inspector
 		cursor: default;
 		overflow: hidden;
 	}
-	#inspector-page-files .select_all_button {
-		@include verticalGradient($nonselected-gradient-color-top, $nonselected-gradient-color-bottom);
-		@include roundedButton(5px);
-		float: left;
-		margin: 5px;
-		padding: 2px 5px;
-	}
-
 	#inspector_file_list {
+		border-top: 1px solid #888;
 		width: 100%;
-		margin: 0  0 0 0;
+		margin: 6px 0 0 0;
+		padding-top: 6px;
 		padding-bottom: 10px;
 		text-align: left;
 		display: block;
@@ -789,29 +783,16 @@ div#torrent_inspector
 
 	div.inspector_torrent_file_list_entry_name {
 		font-size: 1.2em;
-		font-weight: bold;
-		color: #222;
-		margin-left: 20px;
+		color: black; 
+		display: inline;
+		margin-left: 0px;
 	}
 	li.inspector_torrent_file_list_entry.skip>.inspector_torrent_file_list_entry_name {
-		color: #666;
+		color: #999;
 	}
 	div.inspector_torrent_file_list_entry_progress {
-		font-size: 1em;
-		color: #666;
+		color: #999;
 		margin-left: 20px;
-	}
-	div.file_wanted_control {
-		background-position: left -19px;
-		float: left;
-		position: absolute;
-		cursor: pointer;
-		margin: 3px 0 0 0;
-		width: 19px;
-		height: 19px;
-		background-image: url('images/buttons/file_wanted_buttons.png');
-		background-repeat: no-repeat;
-		background-color: transparent;
 	}
 
 	li.inspector_torrent_file_list_entry.skip>.file_wanted_control {
@@ -915,14 +896,16 @@ div.file-priority-radiobox
 
 	> * {
 		@include button;
-		width: 30px;
+		width: 20px;
 		height: 12px;
 	}
 
-	$idle-color-top: $nonselected-gradient-color-top;
-	$idle-color-bottom: $nonselected-gradient-color-bottom;
-	$active-color-top: $selected-gradient-color-top;
-	$active-color-bottom: $selected-gradient-color-bottom;
+	// We have row after row of these buttons, so the flashy colors used in the inspector tabs look harsh here.
+	// Keep the same basic color theme, but look less harsh, by cutting the gradient's color range.
+	$idle-color-top:      mix( $nonselected-gradient-color-top, $nonselected-gradient-color-bottom, 60% );
+	$idle-color-bottom:   mix( $nonselected-gradient-color-top, $nonselected-gradient-color-bottom, 40% );
+	$active-color-top:    mix( $selected-gradient-color-top,    $selected-gradient-color-bottom,    60% );
+	$active-color-bottom: mix( $selected-gradient-color-top,    $selected-gradient-color-bottom,    40% );
 
 	> div.low {
 		@include leftRoundedBox($border-radius);

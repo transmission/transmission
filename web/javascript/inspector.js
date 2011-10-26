@@ -208,19 +208,6 @@ function Inspector(controller) {
     *****  FILES PAGE
     ****/
 
-    filesSelectAllClicked = function() { filesAllClicked(true); },
-    filesDeselectAllClicked = function() { filesAllClicked(false); },
-    filesAllClicked = function(s) {
-        var i, row, rows=[], t=data.file_torrent;
-        if (!t)
-            return;
-        for (i=0; row=data.file_rows[i]; ++i)
-            if (row.isEditable() && (t.getFile(i).wanted !== s))
-                rows.push(row);
-        if (rows.length > 0)
-            changeFileCommand(rows, s?'files-wanted':'files-unwanted');
-    },
-
     changeFileCommand = function(rows, command) {
         var torrentId = data.file_torrent.getId();
         var rowIndices = $.map(rows.slice(0),function (row) {return row.getIndex();});
@@ -461,8 +448,6 @@ function Inspector(controller) {
         data.controller = controller;
 
         $('.inspector-tab').click(onTabClicked);
-        $('#files_select_all').click(filesSelectAllClicked);
-        $('#files_deselect_all').click(filesDeselectAllClicked);
 
         data.elements.info_page      = $('#inspector-page-info')[0];
         data.elements.files_page     = $('#inspector-page-files')[0];
