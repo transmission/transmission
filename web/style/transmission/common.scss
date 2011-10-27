@@ -1,33 +1,3 @@
-/*--------------------------------------
- *
- * G L O B A L
- *
- *--------------------------------------*/
-
-html {
-	margin: 0;
-/* setting border: 0 hoses ie6 win window inner well border */
-	padding: 0;
-	height: 100%;
-}
-
-body {
-	font: 62.5% "lucida grande", Tahoma, Verdana, Arial, Helvetica, sans-serif; /* Resets 1em to 10px */
-	color: #222;/* !important; */
-	background: #FFF;
-	text-align: center;
-	margin: 0 0 30px;
-	overflow: hidden;
-}
-
-img {
-	border: none;
-}
-
-a {
-	outline: 0;
-}
-
 @mixin verticalGradient($topColor, $bottomColor) {
 	background-color: mix($topColor, $bottomColor);
 	background-image: -webkit-gradient(linear, left top, left bottom, from($topColor), to($bottomColor)); 
@@ -98,6 +68,36 @@ $selected-gradient-color-bottom: #93e8ff;
 	border-bottom-right-radius: $radius;
 }
 
+/*--------------------------------------
+ *
+ * G L O B A L
+ *
+ *--------------------------------------*/
+
+html {
+	margin: 0;
+/* setting border: 0 hoses ie6 win window inner well border */
+	padding: 0;
+	height: 100%;
+}
+
+body {
+	font: 62.5% "lucida grande", Tahoma, Verdana, Arial, Helvetica, sans-serif; /* Resets 1em to 10px */
+	color: #222;/* !important; */
+	background: #FFF;
+	text-align: center;
+	margin: 0 0 30px;
+	overflow: hidden;
+}
+
+img {
+	border: none;
+}
+
+a {
+	outline: 0;
+}
+
 #statusbar,
 .torrent_footer {
 	background: #CCC;
@@ -141,7 +141,7 @@ div#toolbar
 	margin: 0px;
 	padding: 2px;
 	border-bottom: 1px solid #AAA;
-	background: #A00;
+	background: url('images/red-texture.png') repeat-x;
 
 	$idle-color-top: $nonselected-gradient-color-top;
 	$idle-color-bottom: $nonselected-gradient-color-bottom;
@@ -256,14 +256,8 @@ div#toolbar
 		margin: 5px 8px;
 		-moz-user-select: none;
 		-webkit-user-select: none;
-
-		&:hover {
-			cursor: pointer;
-		}
-
-		.filter-selection {
-			text-decoration: underline;
-		}
+		&:hover { cursor: pointer };
+		#filter-button .filter-selection { text-decoration: underline; }
 	}
 
 	input#torrent_search

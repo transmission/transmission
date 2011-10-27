@@ -13,6 +13,7 @@ dist_data_DATA = \
   inspector-info.png \
   inspector-peers.png \
   inspector-trackers.png \
+  red-texture.png \
   lock_icon.png \
   logo.png \
   progress.png \
