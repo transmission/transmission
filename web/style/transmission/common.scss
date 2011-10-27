@@ -140,9 +140,8 @@ div#toolbar
 	height: 25px;
 	margin: 0px;
 	padding: 2px;
-	//border-bottom: 1px solid black;
-	background: #C00; // TESTING
-	//background: #CCC;
+	border-bottom: 1px solid #AAA;
+	background: #A00;
 
 	$idle-color-top: $nonselected-gradient-color-top;
 	$idle-color-bottom: $nonselected-gradient-color-bottom;
@@ -211,11 +210,10 @@ div#toolbar
 {
 	height: 24px;
 	width: 100%;
-	//border-bottom: 1px solid #AAA; TESTING
+	border-bottom: 1px solid #AAA;
 	overflow: hidden;
 	position: relative;
-	background-color: #C00;
-	color: white;
+	background-color: #CCC;
 
 	#speed-info
 	{

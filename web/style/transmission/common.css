@@ -23,7 +23,7 @@ a { outline: 0; }
 ****  TOOLBAR
 ****
 ***/
-div#toolbar { width: 100%; height: 25px; margin: 0px; padding: 2px; background: #C00; }
+div#toolbar { width: 100%; height: 25px; margin: 0px; padding: 2px; border-bottom: 1px solid #AAA; background: #A00; }
 div#toolbar > * { cursor: pointer; -moz-user-select: none; -webkit-user-select: none; display: inline-block; border-style: solid; border-color: #aaa; border-width: 1px; padding: 3px; width: 18px; height: 18px; padding: 2px 8px; float: left; border: 1px solid #888; }
 div#toolbar div#toolbar-open { -moz-border-radius-topleft: 5px; -moz-border-radius-bottomleft: 5px; border-top-left-radius: 5px; border-bottom-left-radius: 5px; background-color: #dddddd; background-image: url("images/toolbar-folder.png"); /* fallback */ background-image: url("images/toolbar-folder.png"), -webkit-gradient(linear, left top, left bottom, from(white), to(#bbbbbb)); /* Saf4+, Chrome */ background-image: url("images/toolbar-folder.png"), -webkit-linear-gradient(top, white, #bbbbbb); /* Chrome 10+, Saf5.1+ */ background-image: url("images/toolbar-folder.png"), -moz-linear-gradient(top, white, #bbbbbb); /* FF3.6+ */ background-image: url("images/toolbar-folder.png"), -ms-linear-gradient(top, white, #bbbbbb); /* IE10 */ background-image: url("images/toolbar-folder.png"), -o-linear-gradient(top, white, #bbbbbb); /* Opera 11.10+ */ background-image: url("images/toolbar-folder.png"), linear-gradient(top, white, #bbbbbb); /* W3C */ background-position: center; background-repeat: no-repeat; margin-left: 4px; }
 div#toolbar div#toolbar-open:active, div#toolbar div#toolbar-open:hover, div#toolbar div#toolbar-open.selected { background-color: #7dc9f2; background-image: url("images/toolbar-folder.png"); /* fallback */ background-image: url("images/toolbar-folder.png"), -webkit-gradient(linear, left top, left bottom, from(#68abe6), to(#93e8ff)); /* Saf4+, Chrome */ background-image: url("images/toolbar-folder.png"), -webkit-linear-gradient(top, #68abe6, #93e8ff); /* Chrome 10+, Saf5.1+ */ background-image: url("images/toolbar-folder.png"), -moz-linear-gradient(top, #68abe6, #93e8ff); /* FF3.6+ */ background-image: url("images/toolbar-folder.png"), -ms-linear-gradient(top, #68abe6, #93e8ff); /* IE10 */ background-image: url("images/toolbar-folder.png"), -o-linear-gradient(top, #68abe6, #93e8ff); /* Opera 11.10+ */ background-image: url("images/toolbar-folder.png"), linear-gradient(top, #68abe6, #93e8ff); /* W3C */ background-position: center; background-repeat: no-repeat; }
@@ -46,7 +46,7 @@ div#toolbar > *.disabled { opacity: 0.25; }
 ****  STATUSBAR
 ****
 ***/
-#statusbar { height: 24px; width: 100%; overflow: hidden; position: relative; background-color: #C00; color: white; }
+#statusbar { height: 24px; width: 100%; border-bottom: 1px solid #AAA; overflow: hidden; position: relative; background-color: #CCC; }
 #statusbar #speed-info { margin-top: 5px; margin-left: 45%; text-align: left; }
 #statusbar #speed-info * { display: inline-block; }
 #statusbar #speed-info #speed-up-icon { margin-left: 8px; width: 8px; height: 8px; background: url("images/arrow-up.png") bottom no-repeat; }
