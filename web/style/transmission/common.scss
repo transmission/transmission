@@ -255,8 +255,7 @@ $statusbar-gradient-bottom: #bbb;
 		#filter-button .filter-selection { text-decoration: underline; }
 	}
 
-	input#torrent_search
-	{
+	input#torrent_search {
 		float: right;
 		height: 15px;
 		width: 100px;
@@ -561,14 +560,13 @@ li.torrent a
 	}
 }
 
-/*--------------------------------------
- *
- * T O R R E N T   I N S P E C T O R
- *
- *--------------------------------------*/
+/***
+****
+****  TORRENT INSPECTOR
+****
+***/
 
 $inspector-width: 570px;
-$inspector-background: #eee;
 
 div#torrent_inspector
 {
@@ -578,7 +576,6 @@ div#torrent_inspector
 	bottom: 22px;
 	right: 0px;
 	width: $inspector-width;
-	background-color: $inspector-background;
 	border-left: 1px solid #888;
 	z-index: 5;
 	overflow: auto;
@@ -768,7 +765,7 @@ div#torrent_inspector
 		padding: 3px 0 3px 2px;
 		display: block;
 		&.skip { color: #666; }
-		&.even { background-color: #EEEEEE; }
+		&.even { background-color: #F7F7F7; }
 	}
 
 	div.inspector_torrent_file_list_entry_name {
@@ -867,10 +864,10 @@ div.file-priority-radiobox
 
 	// We have row after row of these buttons, so the flashy colors used in the inspector tabs look harsh here.
 	// Keep the same basic color theme, but look less harsh, by cutting the gradient's color range.
-	$idle-color-top:      mix( $nonselected-gradient-top, $nonselected-gradient-bottom, 60% );
-	$idle-color-bottom:   mix( $nonselected-gradient-top, $nonselected-gradient-bottom, 40% );
-	$active-color-top:    mix( $selected-gradient-top,    $selected-gradient-bottom,    60% );
-	$active-color-bottom: mix( $selected-gradient-top,    $selected-gradient-bottom,    40% );
+	$idle-color-top:      mix( $nonselected-gradient-top, $nonselected-gradient-bottom, 80% );
+	$idle-color-bottom:   mix( $nonselected-gradient-top, $nonselected-gradient-bottom, 20% );
+	$active-color-top:    mix( $selected-gradient-top,    $selected-gradient-bottom,    80% );
+	$active-color-bottom: mix( $selected-gradient-top,    $selected-gradient-bottom,    20% );
 
 	> div.low {
 		@include leftRoundedBox($border-radius);

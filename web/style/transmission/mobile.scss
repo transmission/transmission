@@ -238,7 +238,7 @@ $statusbar-gradient-bottom: #bbb;
 		#filter-button .filter-selection { text-decoration: underline; }
 	}
 
-	#torrent_search {
+	input#torrent_search {
 		display: none;
 	}
 }
@@ -255,10 +255,16 @@ $statusbar-gradient-bottom: #bbb;
 	background: #FFF;
 	z-index: 100;
 
+	li { text-align: left }
+
+	.count {
+		padding-left: 3px;
+	}
+
 	.row {
 		text-align: left;
 		cursor: pointer;
-		margin: 15px 2px;
+		margin: 8px 2px;
 		position: relative;
 		height: 18px;
 		-moz-user-select: none;
@@ -282,9 +288,6 @@ $statusbar-gradient-bottom: #bbb;
 		&:hover, &.selected {
 			font-weight: bold;
 		}
-	}
-	li {
-		text-align: left
 	}
 
 	#filter-by-state {
@@ -312,28 +315,19 @@ $statusbar-gradient-bottom: #bbb;
 
 ul.torrent_list
 {
+	width: 100%;
 	margin: 0;
 	padding: 0;
 	text-align: left;
-
-	li {
-		list-style-type: none;
-		list-style-image: none;
-		clear: both;
-		display: block;
-		padding: 0;
-		margin: 0;
-		vertical-align: middle;
-	}
+	cursor: pointer;
 
 	li.torrent
 	{
 		border-bottom: 1px solid #ccc;
 		padding: 4px 10px;
 		color: #666;
-		font-size: 11px;
-		margin: 0 !important;
-		background: white;
+		background-color: white;
+
 		&.compact { padding: 4px; }
 		&.even { background-color: #F7F7F7; }
 		&.selected { background-color: #FDD; }
@@ -347,6 +341,7 @@ ul.torrent_list
 			text-overflow: ellipsis;
 			white-space: nowrap;
 			color: #222;
+			margin-top: 2px;
 			margin-bottom: 2px;
 
 			&.compact { font-size: 1.0em; font-weight: normal; }
@@ -355,7 +350,7 @@ ul.torrent_list
 
 		div.torrent_progress_details,
 		div.torrent_peer_details {
-			clear: both;
+			clear: left;
 			overflow: hidden;
 			text-overflow: ellipsis;
 			white-space: nowrap;
@@ -491,11 +486,11 @@ ul.torrent_list
 	}
 }
 
-/*--------------------------------------
- *
- * T O R R E N T   I N S P E C T O R
- *
- *--------------------------------------*/
+/***
+****
+****  TORRENT INSPECTOR
+****
+***/
 
 div#torrent_inspector
 {
@@ -503,10 +498,10 @@ div#torrent_inspector
 	position: relative;
 	right: 0px;
 	width: 100%;
-	background-color: #ddd;
 	z-index: 2;
-	text-align: left;
 	overflow: auto;
+	text-align: left;
+
 
 	#inspector-tabs-wrapper
 	{
@@ -590,7 +585,6 @@ div#torrent_inspector
 			}
 
 			> div {
-				display: table-cell;
 				padding-top: 10px;
 				width: 230px; /* inspector_container_width==330 - inspector_label_width==100 */
 			}
@@ -614,7 +608,7 @@ div#torrent_inspector
 
 	ul.tier_list
 	{
-		margin: 10px 0 0 0;
+		margin: 2px 0 8px 0;
 		width: 100%;
 		padding-left: 0px;
 		text-align: left;
@@ -670,9 +664,11 @@ div#torrent_inspector
 		cursor: default;
 		overflow: hidden;
 	}
-	ul.inspector_torrent_file_list {
+	#inspector_file_list {
+		border-top: 1px solid #888;
 		width: 100%;
-		margin: 0  0 0 0;
+		margin: 6px 0 0 0;
+		padding-top: 6px;
 		padding-bottom: 10px;
 		text-align: left;
 		display: block;
@@ -686,7 +682,7 @@ div#torrent_inspector
 		padding: 3px 0 3px 2px;
 		display: block;
 		&.skip { color: #666; }
-		&.even { background-color: #EEEEEE; }
+		&.even { background-color: #F7F7F7; }
 	}
 
 	div.inspector_torrent_file_list_entry_name {
@@ -779,17 +775,16 @@ div.file-priority-radiobox
 
 	> * {
 		@include button;
-		width: 30px;
+		width: 20px;
 		height: 12px;
-		border: 1px solid #888;
 	}
 
 	// We have row after row of these buttons, so the flashy colors used in the inspector tabs look harsh here.
 	// Keep the same basic color theme, but look less harsh, by cutting the gradient's color range.
-	$idle-color-top:      mix( $nonselected-gradient-top, $nonselected-gradient-bottom, 60% );
-	$idle-color-bottom:   mix( $nonselected-gradient-top, $nonselected-gradient-bottom, 40% );
-	$active-color-top:    mix( $selected-gradient-top,    $selected-gradient-bottom,    60% );
-	$active-color-bottom: mix( $selected-gradient-top,    $selected-gradient-bottom,    40% );
+	$idle-color-top:      mix( $nonselected-gradient-top, $nonselected-gradient-bottom, 80% );
+	$idle-color-bottom:   mix( $nonselected-gradient-top, $nonselected-gradient-bottom, 20% );
+	$active-color-top:    mix( $selected-gradient-top,    $selected-gradient-bottom,    80% );
+	$active-color-bottom: mix( $selected-gradient-top,    $selected-gradient-bottom,    20% );
 
 	> div.low {
 		@include leftRoundedBox($border-radius);
@@ -826,7 +821,6 @@ div.torrent_footer
 	@include verticalGradient($statusbar-gradient-top, $statusbar-gradient-bottom);
 
 	> * {
-		@include button;
 		position: relative;
 		float: left;
 		margin: 2px 4px;
