@@ -43,16 +43,10 @@ $selected-gradient-color-bottom: #93e8ff;
 	border-width: 1px;
 	padding: 3px;
 }
-@mixin roundedButton($radius) {
-	@include button;
-	border-top-left-radius: $radius;
-	border-top-right-radius: $radius;
-	border-bottom-left-radius: $radius;
-	border-bottom-right-radius: $radius;
-	-moz-border-radius-topleft: $radius;
-	-moz-border-radius-bottomleft: $radius;
-	-moz-border-radius-topright: $radius;
-	-moz-border-radius-bottomright: $radius;
+
+@mixin roundedBox($radius) {
+	-moz-border-radius: $radius;
+	border-radius: $radius;
 }
 
 @mixin leftRoundedBox($radius) {
@@ -66,6 +60,11 @@ $selected-gradient-color-bottom: #93e8ff;
 	-moz-border-radius-bottomright: $radius;
 	border-top-right-radius: $radius;
 	border-bottom-right-radius: $radius;
+}
+
+@mixin roundedButton($radius) {
+	@include button;
+	@include roundedBox($radius);
 }
 
 /*--------------------------------------
@@ -177,20 +176,13 @@ div#toolbar
 		@include buttonImage('images/toolbar-pause.png', $idle-color-top, $idle-color-bottom, $active-color-top, $active-color-bottom);
 	}
 	> div#toolbar-select {
-		@include leftRoundedBox(5px);
-		@include rightRoundedBox(5px);
+		@include roundedBox(5px);
 		@include buttonImage('images/toolbar-pointer.png', $idle-color-top, $idle-color-bottom, $active-color-top, $active-color-bottom);
 		margin-left: $separator-spacing;
 	}
 
-	> div#toolbar-prefs {
-		@include leftRoundedBox(5px);
-		@include buttonImage('images/toolbar-wrench.png', $idle-color-top, $idle-color-bottom, $active-color-top, $active-color-bottom);
-		border-right-width: 0px;
-		float: right;
-	}
 	> div#toolbar-inspector {
-		@include rightRoundedBox(5px);
+		@include roundedBox(5px);
 		@include buttonImage('images/toolbar-info.png', $idle-color-top, $idle-color-bottom, $active-color-top, $active-color-bottom);
 		float: right;
 		margin-right: 8px;
@@ -214,7 +206,7 @@ div#toolbar
 	border-bottom: 1px solid #AAA;
 	overflow: hidden;
 	position: relative;
-	background-color: #CCC;
+        @include verticalGradient($nonselected-gradient-color-top, $nonselected-gradient-color-bottom);
 
 	#speed-info
 	{
@@ -285,9 +277,9 @@ div#toolbar
 
 #filter-popup
 {
-        color: #222;/* !important; */
-        background: #FFF;
-        z-index: 100;
+	color: #222;/* !important; */
+	background: #FFF;
+	z-index: 100;
 
 	li { text-align: left }
 
@@ -375,10 +367,7 @@ ul.torrent_list
 		color: #666;
 		background-color: white;
 
-		&.compact {
-			padding: 4px;
-		}
-
+		&.compact { padding: 4px; }
 		&.even { background-color: #F7F7F7; }
 		&.selected
 		{
@@ -421,7 +410,7 @@ ul.torrent_list
 
 		div.torrent_progress_details.error,
 		div.torrent_peer_details.error {
-			color: #FF0000;
+			color: #F00;
 		}
 	}
 }
@@ -943,6 +932,8 @@ div.torrent_footer
 	width: 100%;
 	z-index: 3;
 
+        @include verticalGradient($nonselected-gradient-color-top, $nonselected-gradient-color-bottom);
+
 	> * { 
 		float: left;
 		margin: 2px 4px;
@@ -959,20 +950,23 @@ div.torrent_footer
 	$active-color-bottom: $selected-gradient-color-bottom;
 
 	div.main_container {
-		@include leftRoundedBox(5px);
-		@include rightRoundedBox(5px);
+		@include roundedBox(5px);
 		@include buttonImage('images/settings.png', $idle-color-top, $idle-color-bottom, $active-color-top, $active-color-bottom);
 	}
 
+	#prefs-button {
+		@include roundedBox(5px);
+		@include buttonImage('images/toolbar-wrench.png', $idle-color-top, $idle-color-bottom, $active-color-top, $active-color-bottom);
+		float: right;
+	}
+
 	#turtle-button {
-		@include leftRoundedBox(5px);
-		@include rightRoundedBox(5px);
+		@include roundedBox(5px);
 		@include buttonImage('images/turtle.png', $idle-color-top, $idle-color-bottom, $active-color-top, $active-color-bottom);
 	}
 
 	#compact-button {
-		@include leftRoundedBox(5px);
-		@include rightRoundedBox(5px);
+		@include roundedBox(5px);
 		@include buttonImage('images/compact.png', $idle-color-top, $idle-color-bottom, $active-color-top, $active-color-bottom);
 	}
 }
