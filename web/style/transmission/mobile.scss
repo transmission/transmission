@@ -182,6 +182,9 @@ div#toolbar
 ****
 ***/
 
+$statusbar-gradient-top: #ddd;
+$statusbar-gradient-bottom: #fff;
+
 #statusbar
 {
 	height: 24px;
@@ -189,7 +192,7 @@ div#toolbar
 	border-bottom: 1px solid #AAA;
 	overflow: hidden;
 	position: relative;
-	@include verticalGradient($nonselected-gradient-color-top, mix($nonselected-gradient-color-top,$nonselected-gradient-color-bottom));
+	@include verticalGradient($statusbar-gradient-top, $statusbar-gradient-bottom);
 
 	#speed-info
 	{
@@ -823,7 +826,7 @@ div.torrent_footer
 	width: 100%;
 	z-index: 3;
 
-	@include verticalGradient($nonselected-gradient-color-top, mix($nonselected-gradient-color-top,$nonselected-gradient-color-bottom));
+	@include verticalGradient($statusbar-gradient-top, $statusbar-gradient-bottom);
 
 	> * {
 		@include button;
