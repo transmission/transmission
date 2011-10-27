@@ -240,7 +240,6 @@ div#toolbar
 			display: none;
 			&.active { display: inline; }
 		}
-
 	}
 
 	#filter-button {
@@ -402,7 +401,6 @@ ul.torrent_list
 		div.torrent_progress_details,
 		div.torrent_peer_details {
 			clear: left;
-			font-size: 1em;
 			overflow: hidden;
 			text-overflow: ellipsis;
 			white-space: nowrap;
@@ -411,6 +409,11 @@ ul.torrent_list
 		div.torrent_progress_details.error,
 		div.torrent_peer_details.error {
 			color: #F00;
+		}
+
+		&.selected div.torrent_progress_details.error,
+		&.selected div.torrent_peer_details.error {
+			color: #FFF;
 		}
 	}
 }
@@ -726,7 +729,6 @@ div#torrent_inspector
 		th {
 			text-align: right;
 		}
-
 	}
 
 	li.inspector_tracker_entry {
@@ -824,38 +826,13 @@ table.peer_list {
 	clear: both;
 	table-layout: fixed;
 
-	.encryptedCol {
-		width: 16px;
-	}
-
-	.upCol {
-		width: 70px;
-	}
-
-	.downCol {
-		width: 70px;
-	}
-
-	.percentCol {
-		width: 30px;
-		padding-right: 5px;
-		text-align: right;
-	}
-
-	.statusCol {
-		width: 40px;
-		padding-right: 5px;
-	}
-
-	.addressCol {
-		width: 180px;
-	}
-
-	.clientCol {
-		white-space: nowrap;
-		overflow: hidden;
-		text-overflow: ellipsis;
-	}
+	.encryptedCol { width: 16px; }
+	.upCol { width: 70px; }
+	.downCol { width: 70px; }
+	.percentCol { width: 30px; padding-right: 5px; text-align: right; }
+	.statusCol { width: 40px; padding-right: 5px; }
+	.addressCol { width: 180px; }
+	.clientCol { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 }
 
 tr.inspector_peer_entry

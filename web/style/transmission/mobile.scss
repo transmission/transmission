@@ -23,7 +23,7 @@
 
 @mixin buttonImage($image-url, $idle-color-top, $idle-color-bottom, $active-color-top, $active-color-bottom) {
 	@include imageOnVerticalGradient($image-url, $idle-color-top, $idle-color-bottom);
-	&:active, &:hover, &.selected {
+	&:active, &.selected {
 		@include imageOnVerticalGradient($image-url, $active-color-top, $active-color-bottom);
 	}
 }
@@ -88,26 +88,13 @@ body {
 	width: 100%;
 	overflow-x: hidden;
 	-webkit-text-size-adjust: none;
-}
 
-body div#torrent_container {
-        min-height: 328px;
-}
-
-body div.dialog_container {
-        min-height: 326px;
-}
-
-body div#torrent_inspector {
-        min-height: 329px;
-}
-
-body.landscape div#torrent_container {
-	min-height: 147px;
-}
-
-body.landscape div#dialog_container, body.landscape div#torrent_inspector {
-	min-height: 143px;
+	div#torrent_container { min-height: 328px; }
+	div.dialog_container { min-height: 326px; }
+	div#torrent_inspector { min-height: 329px; }
+	&.landscape div#torrent_container {	min-height: 147px; }
+	&.landscape div#dialog_container,
+	&.landscape div#torrent_inspector {	min-height: 143px; }
 }
 
 body.inspector_showing #torrent_filter_bar, body.inspector_showing #torrent_container,
@@ -236,7 +223,6 @@ div#toolbar
 			display: none;
 			&.active { display: inline; }
 		}
-
 	}
 
 	#filter-button {
@@ -337,7 +323,8 @@ ul.torrent_list
 		vertical-align: middle;
 	}
 
-	li.torrent {
+	li.torrent
+	{
 		border-bottom: 1px solid #ccc;
 		padding: 4px 10px;
 		color: #666;
@@ -352,7 +339,8 @@ ul.torrent_list
 			div.torrent_name { color: #FFF; }
 		}
 
-		div.torrent_name {
+		div.torrent_name
+		{
 			font-size: 1.3em;
 			font-weight: bold;
 			overflow: hidden;
@@ -368,16 +356,6 @@ ul.torrent_list
 		div.torrent_progress_details,
 		div.torrent_peer_details {
 			clear: both;
-			white-space: nowrap;
-			overflow: hidden;
-			text-overflow: ellipsis;
-		}
-
-
-		div.torrent_progress_details,
-		div.torrent_peer_details {
-			clear: left;
-			font-size: 1em;
 			overflow: hidden;
 			text-overflow: ellipsis;
 			white-space: nowrap;
@@ -393,7 +371,6 @@ ul.torrent_list
 			color: #FFF;
 		}
 	}
-
 }
 
 
@@ -463,74 +440,6 @@ ul.torrent_list
 	}
 }
 
-/****
-*****  START / STOP BUTTON
-****/
-
-div#dialog_message.dialog_message {
-	width: 280px;
-	margin: 10px auto 25px;
-	font-size: 13px;
-	line-height: 14px;
-	word-wrap: break-word;
-	overflow: hidden;
-	padding-bottom: 0;
-}
-
-#torrent_upload_file, label[for="torrent_upload_file"]{
-	display:none;
-}
-
-h2.dialog_heading {
-	text-align: center;
-	width: 300px;
-	margin: 0 auto;
-	font-size: 17px;
-}
-
-div.dialog_container a {
-	color: white;
-	padding: 7px 0;
-	background: #222;
-	text-decoration: none;
-	border: 2px solid white;
-	margin: 5px 5px 0;
-	font-weight: bold;
-	-webkit-border-radius: 16px;
-	display: inline-block;
-	width: 90px;
-	font-size: 12px;
-	text-align: center;
-}
-
-#dialog_container div.dialog_window img {
-	margin: 5px auto 12px;
-}
-
-.landscape div.dialog_container a#dialog_cancel_button {
-	left: 155px;
-}
-
-.landscape div.dialog_container a#dialog_confirm_button {
-	right: 110px;
-}
-
-.landscape div.dialog_container img {
-	float: left !important;
-	margin: 0 0 0 50px;
-}
-
-.landscape h2#dialog_heading.dialog_heading {
-	margin: 5px auto 0;
-	margin-left: 150px;
-	text-align: left;
-}
-
-.landscape div#dialog_message.dialog_message {
-	width: 300px;
-	margin: 10px 0 20px 150px;
-	text-align: left;
-}
 
 /***
 ****
@@ -587,9 +496,6 @@ div.dialog_container a {
  * T O R R E N T   I N S P E C T O R
  *
  *--------------------------------------*/
-
-
-
 
 div#torrent_inspector
 {
@@ -812,6 +718,52 @@ div#torrent_inspector
 	}
 }
 
+/* Peers Inspector Tab */
+#inspector_peers_list {
+	padding: 0 0 0 0;
+	margin: 0 0 0 0;
+	text-align: left;
+	cursor: default;
+	overflow: hidden;
+
+	> div.inspector_group {
+		padding-bottom: 0;
+		margin-bottom: 0;
+	}
+}
+
+table.peer_list {
+	width: 100%;
+	border-collapse: collapse;
+	text-align: left;
+	cursor: default;
+	clear: both;
+	table-layout: fixed;
+
+	.encryptedCol { width: 16px; }
+	.upCol { width: 70px; }
+	.downCol { width: 70px; }
+	.percentCol { width: 30px; padding-right: 5px; text-align: right; }
+	.statusCol { width: 40px; padding-right: 5px; }
+	.addressCol { width: 180px; }
+	.clientCol { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+}
+
+tr.inspector_peer_entry
+{
+	div.encrypted-peer-cell
+	{
+		width: 16px;
+		height: 16px;
+		background: transparent url('images/lock_icon.png') no-repeat;
+	}
+
+	&.odd
+	{
+		background-color: #EEEEEE;
+	}
+}
+
 /***
 ****  File Priority Buttons
 ***/
@@ -914,13 +866,66 @@ div.torrent_footer
 
 /****
 *****
-*****  POPUP MENU
+*****  DIALOGS
 *****
 ****/
 
-.trans_menu,
-.trans_menu * {
-	display: none;
+div#dialog_message.dialog_message {
+	width: 280px;
+	margin: 10px auto 25px;
+	font-size: 13px;
+	line-height: 14px;
+	word-wrap: break-word;
+	overflow: hidden;
+	padding-bottom: 0;
+}
+
+#torrent_upload_file, label[for="torrent_upload_file"]{
+	display:none;
+}
+
+h2.dialog_heading {
+	text-align: center;
+	width: 300px;
+	margin: 0 auto;
+	font-size: 17px;
+}
+
+div.dialog_container a {
+	color: white;
+	padding: 7px 0;
+	background: #222;
+	text-decoration: none;
+	border: 2px solid white;
+	margin: 5px 5px 0;
+	font-weight: bold;
+	-webkit-border-radius: 16px;
+	display: inline-block;
+	width: 90px;
+	font-size: 12px;
+	text-align: center;
+}
+
+#dialog_container div.dialog_window img {
+	margin: 5px auto 12px;
+}
+
+.landscape {
+	div.dialog_container {
+		a#dialog_cancel_button { left: 155px; }
+		a#dialog_confirm_button { right: 110px; }
+		img { float: left !important; margin: 0 0 0 50px; }
+	}
+	h2#dialog_heading.dialog_heading {
+		margin: 5px auto 0;
+		margin-left: 150px;
+		text-align: left;
+	}
+	div#dialog_message.dialog_message {
+		width: 300px;
+		margin: 10px 0 20px 150px;
+		text-align: left;
+	}
 }
 
 

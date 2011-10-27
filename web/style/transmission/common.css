@@ -95,8 +95,9 @@ ul.torrent_list li.torrent a img { position: relative; right: -10px; }
 ul.torrent_list li.torrent div.torrent_name { font-size: 1.3em; font-weight: bold; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: #222; margin-top: 2px; margin-bottom: 2px; }
 ul.torrent_list li.torrent div.torrent_name.compact { font-size: 1.0em; font-weight: normal; }
 ul.torrent_list li.torrent div.torrent_name.paused { font-weight: normal; color: #777; }
-ul.torrent_list li.torrent div.torrent_progress_details, ul.torrent_list li.torrent div.torrent_peer_details { clear: left; font-size: 1em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+ul.torrent_list li.torrent div.torrent_progress_details, ul.torrent_list li.torrent div.torrent_peer_details { clear: left; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 ul.torrent_list li.torrent div.torrent_progress_details.error, ul.torrent_list li.torrent div.torrent_peer_details.error { color: #F00; }
+ul.torrent_list li.torrent.selected div.torrent_progress_details.error, ul.torrent_list li.torrent.selected div.torrent_peer_details.error { color: #FFF; }
 
 /** Progressbar  Each progressbar has three elemens: a parent container and two children, complete and incomplete.  The only thing needed to set the progressbar percentage is to set the complete child's width as a percentage. This is because incomplete is pinned to the full width and height of the parent, and complete is pinned to the left side of the parent and has a higher z-index.  The progressbar has different colors depending on its state, so there are five 'decorator' classNames: paused, queued, magnet, leeching, seeding. */
 ul.torrent_list div.torrent_progress_bar_container { height: 10px; position: relative; }
