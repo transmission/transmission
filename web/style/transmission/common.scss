@@ -28,10 +28,10 @@
 	}
 }
 
-$nonselected-gradient-color-top: white;
-$nonselected-gradient-color-bottom: #BBB;
-$selected-gradient-color-top: #68abe6;
-$selected-gradient-color-bottom: #93e8ff;
+$nonselected-gradient-top: white;
+$nonselected-gradient-bottom: #BBB;
+$selected-gradient-top: #DBB;
+$selected-gradient-bottom: white;
 
 @mixin button {
 	cursor: pointer;
@@ -142,10 +142,10 @@ div#toolbar
 	border-bottom: 1px solid #AAA;
 	background: url('images/red-texture.png') repeat;
 
-	$idle-color-top: $nonselected-gradient-color-top;
-	$idle-color-bottom: $nonselected-gradient-color-bottom;
-	$active-color-top: $selected-gradient-color-top;
-	$active-color-bottom: $selected-gradient-color-bottom;
+	$idle-color-top: $nonselected-gradient-top;
+	$idle-color-bottom: $nonselected-gradient-bottom;
+	$active-color-top: $selected-gradient-top;
+	$active-color-bottom: $selected-gradient-bottom;
 
 	> * {
 		@include button;
@@ -371,15 +371,8 @@ ul.torrent_list
 
 		&.compact { padding: 4px; }
 		&.even { background-color: #F7F7F7; }
-		&.selected
-		{
-			@include verticalGradient(#C00, #900);
-
-			div.torrent_progress_details,
-			div.torrent_peer_details,
-			div.torrent_name { color: white; }
-			&.compact { div.torrent_name { color: white; } }
-		}
+		&.selected { background-color: #FDD; }
+		&.compact { div.torrent_name { color: black; } }
 
 		a img {
 			position: relative;
@@ -605,10 +598,10 @@ div#torrent_inspector
 		#inspector-tabs
 		{
 			$border-radius: 5px;
-			$idle-color-top: $nonselected-gradient-color-top;
-			$idle-color-bottom: $nonselected-gradient-color-bottom;
-			$active-color-top: $selected-gradient-color-top;
-			$active-color-bottom: $selected-gradient-color-bottom;
+			$idle-color-top: $nonselected-gradient-top;
+			$idle-color-bottom: $nonselected-gradient-bottom;
+			$active-color-top: $selected-gradient-top;
+			$active-color-bottom: $selected-gradient-bottom;
 
 			display: inline-block;
 
@@ -874,10 +867,10 @@ div.file-priority-radiobox
 
 	// We have row after row of these buttons, so the flashy colors used in the inspector tabs look harsh here.
 	// Keep the same basic color theme, but look less harsh, by cutting the gradient's color range.
-	$idle-color-top:      mix( $nonselected-gradient-color-top, $nonselected-gradient-color-bottom, 60% );
-	$idle-color-bottom:   mix( $nonselected-gradient-color-top, $nonselected-gradient-color-bottom, 40% );
-	$active-color-top:    mix( $selected-gradient-color-top,    $selected-gradient-color-bottom,    60% );
-	$active-color-bottom: mix( $selected-gradient-color-top,    $selected-gradient-color-bottom,    40% );
+	$idle-color-top:      mix( $nonselected-gradient-top, $nonselected-gradient-bottom, 60% );
+	$idle-color-bottom:   mix( $nonselected-gradient-top, $nonselected-gradient-bottom, 40% );
+	$active-color-top:    mix( $selected-gradient-top,    $selected-gradient-bottom,    60% );
+	$active-color-bottom: mix( $selected-gradient-top,    $selected-gradient-bottom,    40% );
 
 	> div.low {
 		@include leftRoundedBox($border-radius);
@@ -922,12 +915,14 @@ div.torrent_footer
 		padding: 2px 8px;
 		float: left;
 		border: 1px solid #888;
+		-moz-user-select: none;
+		-webkit-user-select: none;
 	}
 
-	$idle-color-top: $nonselected-gradient-color-top;
-	$idle-color-bottom: $nonselected-gradient-color-bottom;
-	$active-color-top: $selected-gradient-color-top;
-	$active-color-bottom: $selected-gradient-color-bottom;
+	$idle-color-top: $nonselected-gradient-top;
+	$idle-color-bottom: $nonselected-gradient-bottom;
+	$active-color-top: $selected-gradient-top;
+	$active-color-bottom: $selected-gradient-bottom;
 
 	div.main_container {
 		@include roundedBox(5px);
