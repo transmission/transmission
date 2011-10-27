@@ -137,11 +137,11 @@ div#toolbar
 	$separator-spacing: 20px;
 
 	width: 100%;
-	height: 25px;
+	height: 35px;
 	margin: 0px;
 	padding: 2px;
 	border-bottom: 1px solid #AAA;
-	background: url('images/red-texture.png') repeat-x;
+	background: url('images/red-texture.png') repeat;
 
 	$idle-color-top: $nonselected-gradient-color-top;
 	$idle-color-bottom: $nonselected-gradient-color-bottom;
@@ -150,6 +150,7 @@ div#toolbar
 
 	> * {
 		@include button;
+		margin-top: 5px;
 		width: 18px;
 		height: 18px;
 		padding: 2px 8px;
@@ -346,9 +347,11 @@ div#toolbar
 ****
 ***/
 
+$torrent-container-top: 65px;
+
 div#torrent_container {
 	position: fixed;
-	top: 55px;
+	top: $torrent-container-top;
 	bottom: 22px;
 	right: 0px;
 	left: 0px;
@@ -583,7 +586,7 @@ div#torrent_inspector
 {
 	padding: 15px;
 	position: fixed;
-	top: 55px;
+	top: $torrent-container-top;
 	bottom: 22px;
 	right: 0px;
 	width: $inspector-width;

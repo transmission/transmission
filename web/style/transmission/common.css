@@ -23,8 +23,8 @@ a { outline: 0; }
 ****  TOOLBAR
 ****
 ***/
-div#toolbar { width: 100%; height: 25px; margin: 0px; padding: 2px; border-bottom: 1px solid #AAA; background: url("images/red-texture.png") repeat-x; }
-div#toolbar > * { cursor: pointer; -moz-user-select: none; -webkit-user-select: none; display: inline-block; border-style: solid; border-color: #aaa; border-width: 1px; padding: 3px; width: 18px; height: 18px; padding: 2px 8px; float: left; border: 1px solid #888; }
+div#toolbar { width: 100%; height: 35px; margin: 0px; padding: 2px; border-bottom: 1px solid #AAA; background: url("images/red-texture.png") repeat; }
+div#toolbar > * { cursor: pointer; -moz-user-select: none; -webkit-user-select: none; display: inline-block; border-style: solid; border-color: #aaa; border-width: 1px; padding: 3px; margin-top: 5px; width: 18px; height: 18px; padding: 2px 8px; float: left; border: 1px solid #888; }
 div#toolbar div#toolbar-open { -moz-border-radius-topleft: 5px; -moz-border-radius-bottomleft: 5px; border-top-left-radius: 5px; border-bottom-left-radius: 5px; background-color: #dddddd; background-image: url("images/toolbar-folder.png"); /* fallback */ background-image: url("images/toolbar-folder.png"), -webkit-gradient(linear, left top, left bottom, from(white), to(#bbbbbb)); /* Saf4+, Chrome */ background-image: url("images/toolbar-folder.png"), -webkit-linear-gradient(top, white, #bbbbbb); /* Chrome 10+, Saf5.1+ */ background-image: url("images/toolbar-folder.png"), -moz-linear-gradient(top, white, #bbbbbb); /* FF3.6+ */ background-image: url("images/toolbar-folder.png"), -ms-linear-gradient(top, white, #bbbbbb); /* IE10 */ background-image: url("images/toolbar-folder.png"), -o-linear-gradient(top, white, #bbbbbb); /* Opera 11.10+ */ background-image: url("images/toolbar-folder.png"), linear-gradient(top, white, #bbbbbb); /* W3C */ background-position: center; background-repeat: no-repeat; margin-left: 4px; }
 div#toolbar div#toolbar-open:active, div#toolbar div#toolbar-open:hover, div#toolbar div#toolbar-open.selected { background-color: #7dc9f2; background-image: url("images/toolbar-folder.png"); /* fallback */ background-image: url("images/toolbar-folder.png"), -webkit-gradient(linear, left top, left bottom, from(#68abe6), to(#93e8ff)); /* Saf4+, Chrome */ background-image: url("images/toolbar-folder.png"), -webkit-linear-gradient(top, #68abe6, #93e8ff); /* Chrome 10+, Saf5.1+ */ background-image: url("images/toolbar-folder.png"), -moz-linear-gradient(top, #68abe6, #93e8ff); /* FF3.6+ */ background-image: url("images/toolbar-folder.png"), -ms-linear-gradient(top, #68abe6, #93e8ff); /* IE10 */ background-image: url("images/toolbar-folder.png"), -o-linear-gradient(top, #68abe6, #93e8ff); /* Opera 11.10+ */ background-image: url("images/toolbar-folder.png"), linear-gradient(top, #68abe6, #93e8ff); /* W3C */ background-position: center; background-repeat: no-repeat; }
 div#toolbar > div#toolbar-remove { -moz-border-radius-topright: 5px; -moz-border-radius-bottomright: 5px; border-top-right-radius: 5px; border-bottom-right-radius: 5px; background-color: #dddddd; background-image: url("images/toolbar-close.png"); /* fallback */ background-image: url("images/toolbar-close.png"), -webkit-gradient(linear, left top, left bottom, from(white), to(#bbbbbb)); /* Saf4+, Chrome */ background-image: url("images/toolbar-close.png"), -webkit-linear-gradient(top, white, #bbbbbb); /* Chrome 10+, Saf5.1+ */ background-image: url("images/toolbar-close.png"), -moz-linear-gradient(top, white, #bbbbbb); /* FF3.6+ */ background-image: url("images/toolbar-close.png"), -ms-linear-gradient(top, white, #bbbbbb); /* IE10 */ background-image: url("images/toolbar-close.png"), -o-linear-gradient(top, white, #bbbbbb); /* Opera 11.10+ */ background-image: url("images/toolbar-close.png"), linear-gradient(top, white, #bbbbbb); /* W3C */ background-position: center; background-repeat: no-repeat; }
@@ -84,7 +84,7 @@ div#toolbar > *.disabled { opacity: 0.25; }
 ****  TORRENT CONTAINER
 ****
 ***/
-div#torrent_container { position: fixed; top: 55px; bottom: 22px; right: 0px; left: 0px; padding: 0px; margin: 0px; overflow: auto; }
+div#torrent_container { position: fixed; top: 65px; bottom: 22px; right: 0px; left: 0px; padding: 0px; margin: 0px; overflow: auto; }
 
 ul.torrent_list { width: 100%; margin: 0; padding: 0; text-align: left; cursor: pointer; }
 ul.torrent_list li.torrent { border-bottom: 1px solid #ccc; padding: 4px 30px 5px 10px; /* Make space for buttons on the right */ color: #666; background-color: white; }
@@ -151,7 +151,7 @@ li.torrent a:hover div.torrent_resume { background-position: center center; }
 .prefs-section #alternative-speed-limits-title { padding-left: 18px; background: transparent url("images/blue-turtle.png") no-repeat; }
 
 /*--------------------------------------  T O R R E N T   I N S P E C T O R  --------------------------------------*/
-div#torrent_inspector { padding: 15px; position: fixed; top: 55px; bottom: 22px; right: 0px; width: 570px; background-color: #eeeeee; border-left: 1px solid #888; z-index: 5; overflow: auto; text-align: left; /* Files Inspector Tab */ }
+div#torrent_inspector { padding: 15px; position: fixed; top: 65px; bottom: 22px; right: 0px; width: 570px; background-color: #eeeeee; border-left: 1px solid #888; z-index: 5; overflow: auto; text-align: left; /* Files Inspector Tab */ }
 div#torrent_inspector #inspector-close { display: none; }
 div#torrent_inspector #inspector-tabs-wrapper { width: 100%; overflow: hidden; text-align: center; }
 div#torrent_inspector #inspector-tabs-wrapper #inspector-tabs { display: inline-block; }
