@@ -2,7 +2,10 @@ SUBDIRS = buttons
 
 datadir = ${datarootdir}/${PACKAGE_NAME}/${subdir}
 dist_data_DATA = \
+  arrow-down.png \
+  arrow-up.png \
   blue-turtle.png \
+  compact.png \
   file-priority-high.png \
   file-priority-low.png \
   file-priority-normal.png \
