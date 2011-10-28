@@ -47,7 +47,8 @@ Transmission.prototype =
 		$('#toolbar-remove').click($.proxy(this.removeClicked,this));
 		$('#toolbar-open').click($.proxy(this.openTorrentClicked,this));
 		$('#toolbar-select').click($.proxy(this.toggleSelectionClicked,this));
-		$('#toolbar-prefs').click($.proxy(this.togglePrefsDialogClicked,this));
+
+		$('#prefs-button').click($.proxy(this.togglePrefsDialogClicked,this));
 
 		$('#upload_confirm_button').click($.proxy(this.confirmUploadClicked,this));
 		$('#upload_cancel_button').click($.proxy(this.hideUploadDialog,this));
@@ -551,12 +552,12 @@ Transmission.prototype =
 	 *--------------------------------------------*/
 
 	onPrefsDialogClosed: function() {
-		$('#toolbar-prefs').removeClass('selected');
+		$('#prefs-button').removeClass('selected');
 	},
 
 	togglePrefsDialogClicked: function(ev)
 	{
-		var e = $('#toolbar-prefs');
+		var e = $('#prefs-button');
 
 		if (e.hasClass('selected'))
 			this.prefsDialog.close();
