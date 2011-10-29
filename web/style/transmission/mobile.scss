@@ -75,7 +75,6 @@ $selected-gradient-bottom: white;
 
 html {
 	margin: 0;
-/* setting border: 0 hoses ie6 win window inner well border */
 	padding: 0;
 }
 
@@ -87,6 +86,8 @@ body {
 	padding: 0;
 	width: 100%;
 	overflow-x: hidden;
+	img { border: none; }
+	a { outline: 0; }
 	-webkit-text-size-adjust: none;
 
 	div#torrent_container { min-height: 328px; }
@@ -102,10 +103,6 @@ body.dialog_showing #torrent_filter_bar, body.dialog_showing #torrent_container,
 body.prefs_showing #torrent_inspector, body.prefs_showing #torrent_filter_bar, body.prefs_showing #torrent_container,
 body.open_showing #torrent_filter_bar, body.open_showing #torrent_container {
 	display: none !important;
-}
-
-.torrent a img {
-	display: none;
 }
 
 /***
@@ -313,6 +310,8 @@ $statusbar-gradient-bottom: #bbb;
 ****
 ***/
 
+$torrent-list-button-width: 0px;
+
 ul.torrent_list
 {
 	width: 100%;
@@ -324,14 +323,19 @@ ul.torrent_list
 	li.torrent
 	{
 		border-bottom: 1px solid #ccc;
-		padding: 4px 10px;
+		padding: 4px 30px 5px $torrent-list-button-width;
 		color: #666;
 		background-color: white;
 
 		&.compact { padding: 4px; }
 		&.even { background-color: #F7F7F7; }
-		&.selected { background-color: #FDD; }
+		&.selected { background-color: #ffe4e1; }
 		&.compact { div.torrent_name { color: black; } }
+
+		// start-stop button
+		a {
+			display: none;
+		}
 
 		div.torrent_name
 		{
@@ -366,26 +370,21 @@ ul.torrent_list
 			color: #FFF;
 		}
 	}
-}
 
-
-/**
- * Progressbar
- *
- * Each progressbar has three elemens: a parent container and two children,
- * complete and incomplete.
- *
- * The only thing needed to set the progressbar percentage is to set
- * the complete child's width as a percentage. This is because incomplete
- * is pinned to the full width and height of the parent, and complete
- * is pinned to the left side of the parent and has a higher z-index.
- *
- * The progressbar has different colors depending on its state, so there
- * are five 'decorator' classNames: paused, queued, magnet, leeching, seeding.
- */
-
-ul.torrent_list
-{
+	/**
+	 * Progressbar
+	 *
+	 * Each progressbar has three elemens: a parent container and two children,
+	 * complete and incomplete.
+	 *
+	 * The only thing needed to set the progressbar percentage is to set
+	 * the complete child's width as a percentage. This is because incomplete
+	 * is pinned to the full width and height of the parent, and complete
+	 * is pinned to the left side of the parent and has a higher z-index.
+	 *
+	 * The progressbar has different colors depending on its state, so there
+	 * are five 'decorator' classNames: paused, queued, magnet, leeching, seeding.
+	 */
 	div.torrent_progress_bar_container
 	{
 		height: 10px;
@@ -434,7 +433,6 @@ ul.torrent_list
 		&.incomplete.seeding         { background-position: left -10px; border-color: #29AD35; }
 	}
 }
-
 
 /***
 ****
@@ -494,13 +492,13 @@ ul.torrent_list
 
 div#torrent_inspector
 {
-	top: 0 !important;
-	position: relative;
-	right: 0px;
-	width: 100%;
-	z-index: 2;
 	overflow: auto;
 	text-align: left;
+	padding: 15px;
+	top: 0;
+	position: relative;
+	width: 100%;
+	z-index: 2;
 
 
 	#inspector-tabs-wrapper
@@ -845,8 +843,7 @@ div.torrent_footer
 
 	#prefs-button {
 		@include roundedBox(5px);
-		@include buttonImage('images/toolbar-wrench.png', $idle-color-top, $idle-color-bottom, $active-color-top, $active-color-bottom);
-		float: right;
+		@include buttonImage('images/wrench.png', $idle-color-top, $idle-color-bottom, $active-color-top, $active-color-bottom);
 	}
 
 	#turtle-button {
@@ -925,13 +922,7 @@ div.dialog_container a {
 }
 
 
-/*--------------------------------------
- *
- * Hide remnants of stuff we don't need, like
- * transmenu and contextmenu.
- *
- *--------------------------------------*/
-
+// no context menu in the mobile version...
 div#torrent_context_menu {
 	display: none;
 }

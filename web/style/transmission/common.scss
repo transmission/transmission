@@ -75,7 +75,6 @@ $selected-gradient-bottom: white;
 
 html {
 	margin: 0;
-/* setting border: 0 hoses ie6 win window inner well border */
 	padding: 0;
 	height: 100%;
 }
@@ -87,19 +86,8 @@ body {
 	text-align: center;
 	margin: 0 0 30px;
 	overflow: hidden;
-}
-
-img {
-	border: none;
-}
-
-a {
-	outline: 0;
-}
-
-#statusbar,
-.torrent_footer {
-	background: #CCC;
+	img { border: none; }
+	a { outline: 0; }
 }
 
 /***
@@ -341,6 +329,7 @@ $statusbar-gradient-bottom: #bbb;
 ***/
 
 $torrent-container-top: 65px;
+$torrent-list-button-width: 14px;
 
 div#torrent_container {
 	position: fixed;
@@ -364,18 +353,44 @@ ul.torrent_list
 	li.torrent
 	{
 		border-bottom: 1px solid #ccc;
-		padding: 4px 30px 5px 10px; /* Make space for buttons on the right */
+		padding: 4px 30px 5px $torrent-list-button-width;
 		color: #666;
 		background-color: white;
 
 		&.compact { padding: 4px; }
 		&.even { background-color: #F7F7F7; }
-		&.selected { background-color: #FDD; }
+		&.selected { background-color: #ffe4e1; }
 		&.compact { div.torrent_name { color: black; } }
 
-		a img {
+		// start-stop button
+		a {
+			float: right;
 			position: relative;
-			right: -10px;
+			right: -22px;
+			top: 1px;
+
+			img {
+				position: relative;
+				right: -10px;
+			}
+
+			div {
+				background: url('images/buttons/torrent_buttons.png');
+				height: 14px;
+				width: 14px;
+			}
+	
+			div.torrent_pause { background-position: left top; }
+			div.torrent_resume { background-position: center top; }
+	
+			&:active {
+				div.torrent_pause { background-position: left bottom; }
+				div.torrent_resume { background-position: center bottom; }
+			}
+			&:hover {
+				div.torrent_pause { background-position: left center; }
+				div.torrent_resume { background-position: center center; }
+			}
 		}
 
 		div.torrent_name
@@ -411,26 +426,21 @@ ul.torrent_list
 			color: #FFF;
 		}
 	}
-}
 
-
-/**
- * Progressbar
- *
- * Each progressbar has three elemens: a parent container and two children,
- * complete and incomplete.
- *
- * The only thing needed to set the progressbar percentage is to set
- * the complete child's width as a percentage. This is because incomplete
- * is pinned to the full width and height of the parent, and complete
- * is pinned to the left side of the parent and has a higher z-index.
- *
- * The progressbar has different colors depending on its state, so there
- * are five 'decorator' classNames: paused, queued, magnet, leeching, seeding.
- */
-
-ul.torrent_list
-{
+	/**
+	 * Progressbar
+	 *
+	 * Each progressbar has three elemens: a parent container and two children,
+	 * complete and incomplete.
+	 *
+	 * The only thing needed to set the progressbar percentage is to set
+	 * the complete child's width as a percentage. This is because incomplete
+	 * is pinned to the full width and height of the parent, and complete
+	 * is pinned to the left side of the parent and has a higher z-index.
+	 *
+	 * The progressbar has different colors depending on its state, so there
+	 * are five 'decorator' classNames: paused, queued, magnet, leeching, seeding.
+	 */
 	div.torrent_progress_bar_container
 	{
 		height: 10px;
@@ -477,36 +487,6 @@ ul.torrent_list
 		&.incomplete.leeching        { background-position: left -20px; border-color: #CFCFCF; }
 		&.incomplete.leeching.queued { background-position: left -80px; border-color: #C4C4C4; }
 		&.incomplete.seeding         { background-position: left -10px; border-color: #29AD35; }
-	}
-}
-
-/****
-*****  START / STOP BUTTON
-****/
-
-li.torrent a
-{
-	float: right;
-	position: relative;
-	right: -22px;
-	top: 1px;
-
-	div {
-		background: url('images/buttons/torrent_buttons.png');
-		height: 14px;
-		width: 14px;
-	}
-
-	div.torrent_pause { background-position: left top; }
-	div.torrent_resume { background-position: center top; }
-
-	&:active {
-		div.torrent_pause { background-position: left bottom; }
-		div.torrent_resume { background-position: center bottom; }
-	}
-	&:hover {
-		div.torrent_pause { background-position: left center; }
-		div.torrent_resume { background-position: center center; }
 	}
 }
 
@@ -570,16 +550,16 @@ $inspector-width: 570px;
 
 div#torrent_inspector
 {
-	padding: 15px;
-	position: fixed;
-	top: $torrent-container-top;
-	bottom: 22px;
-	right: 0px;
-	width: $inspector-width;
-	border-left: 1px solid #888;
-	z-index: 5;
 	overflow: auto;
 	text-align: left;
+	padding: 15px;
+	top: $torrent-container-top;
+	position: fixed;
+	width: $inspector-width;
+	z-index: 5;
+	border-left: 1px solid #888;
+	bottom: 22px;
+	right: 0px;
 
 	#inspector-close
 	{
@@ -904,7 +884,7 @@ div.torrent_footer
 
 	@include verticalGradient($statusbar-gradient-top, $statusbar-gradient-bottom);
 
-	> * { 
+	> * {
 		float: left;
 		margin: 2px 4px;
 		width: 18px;
@@ -928,8 +908,7 @@ div.torrent_footer
 
 	#prefs-button {
 		@include roundedBox(5px);
-		@include buttonImage('images/toolbar-wrench.png', $idle-color-top, $idle-color-bottom, $active-color-top, $active-color-bottom);
-		float: right;
+		@include buttonImage('images/wrench.png', $idle-color-top, $idle-color-bottom, $active-color-top, $active-color-bottom);
 	}
 
 	#turtle-button {
