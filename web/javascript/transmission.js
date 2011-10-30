@@ -1449,8 +1449,7 @@ Transmission.prototype =
 			div = document.createElement('div');
 			div.id = 'show-tracker-' + name;
 			div.className = 'row' + (o.domain === tr.filterTracker  ? ' selected':'');
-			div.innerHTML = '<img class="filter-img" src="http://'+o.domain+'/favicon.ico"/>'
-			              + '<span class="filter-name">'+ name + '</span>'
+			div.innerHTML = '<span class="filter-name">'+ name + '</span>'
 			              + '<span class="count">'+ o.count.toStringWithCommas() + '</span>';
 			$(div).click({domain:o.domain}, function(ev) {
 				tr.setFilterTracker(ev.data.domain);
