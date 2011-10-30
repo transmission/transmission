@@ -637,7 +637,7 @@
 					<object class="NSTextField" id="340525598">
 						<reference key="NSNextResponder" ref="617828785"/>
 						<int key="NSvFlags">268</int>
-						<string key="NSFrame">{{10, 204}, {95, 14}}</string>
+						<string key="NSFrame">{{10, 204}, {94, 14}}</string>
 						<reference key="NSSuperview" ref="617828785"/>
 						<reference key="NSWindow"/>
 						<reference key="NSNextKeyView" ref="529271757"/>
@@ -645,7 +645,7 @@
 						<object class="NSTextFieldCell" key="NSCell" id="780052505">
 							<int key="NSCellFlags">67239424</int>
 							<int key="NSCellFlags2">272629760</int>
-							<string key="NSContents">Transfer priority:</string>
+							<string key="NSContents">Transfer Priority:</string>
 							<reference key="NSSupport" ref="26"/>
 							<reference key="NSControlView" ref="340525598"/>
 							<reference key="NSBackgroundColor" ref="874092629"/>
@@ -836,7 +836,7 @@
 					<object class="NSPopUpButton" id="529271757">
 						<reference key="NSNextResponder" ref="617828785"/>
 						<int key="NSvFlags">268</int>
-						<string key="NSFrame">{{110, 200}, {98, 22}}</string>
+						<string key="NSFrame">{{109, 200}, {98, 22}}</string>
 						<reference key="NSSuperview" ref="617828785"/>
 						<reference key="NSWindow"/>
 						<reference key="NSNextKeyView" ref="1004759797"/>
@@ -853,26 +853,27 @@
 							<string key="NSKeyEquivalent"/>
 							<int key="NSPeriodicDelay">400</int>
 							<int key="NSPeriodicInterval">75</int>
-							<nil key="NSMenuItem"/>
+							<object class="NSMenuItem" key="NSMenuItem" id="884480943">
+								<reference key="NSMenu" ref="355652245"/>
+								<string key="NSTitle">High</string>
+								<string key="NSKeyEquiv"/>
+								<int key="NSKeyEquivModMask">1048576</int>
+								<int key="NSMnemonicLoc">2147483647</int>
+								<int key="NSState">1</int>
+								<object class="NSCustomResource" key="NSImage">
+									<string key="NSClassName">NSImage</string>
+									<string key="NSResourceName">PriorityHighTemplate</string>
+								</object>
+								<reference key="NSOnImage" ref="662512792"/>
+								<reference key="NSMixedImage" ref="999867276"/>
+								<string key="NSAction">_popUpItemAction:</string>
+								<reference key="NSTarget" ref="545585394"/>
+							</object>
 							<bool key="NSMenuItemRespectAlignment">YES</bool>
 							<object class="NSMenu" key="NSMenu" id="355652245">
 								<string key="NSTitle">OtherViews</string>
 								<array class="NSMutableArray" key="NSMenuItems">
-									<object class="NSMenuItem" id="884480943">
-										<reference key="NSMenu" ref="355652245"/>
-										<string key="NSTitle">High</string>
-										<string key="NSKeyEquiv"/>
-										<int key="NSKeyEquivModMask">1048576</int>
-										<int key="NSMnemonicLoc">2147483647</int>
-										<object class="NSCustomResource" key="NSImage">
-											<string key="NSClassName">NSImage</string>
-											<string key="NSResourceName">PriorityHighTemplate</string>
-										</object>
-										<reference key="NSOnImage" ref="662512792"/>
-										<reference key="NSMixedImage" ref="999867276"/>
-										<string key="NSAction">_popUpItemAction:</string>
-										<reference key="NSTarget" ref="545585394"/>
-									</object>
+									<reference ref="884480943"/>
 									<object class="NSMenuItem" id="329620563">
 										<reference key="NSMenu" ref="355652245"/>
 										<string key="NSTitle">Normal</string>
