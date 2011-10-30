@@ -293,7 +293,14 @@ int trashDataFile(const char * filename)
 
 - (void) update
 {
+    //get previous stalled value before update
+    const BOOL wasStalled = fStat != NULL && [self isStalled];
+    
     fStat = tr_torrentStat(fHandle);
+
+    //make sure the "active" filter is updated when stalled-ness changes
+    if (wasStalled != [self isStalled])
+        [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateQueue" object: self];
     
     //when the data first appears, update time machine exclusion
     if (!fTimeMachineExclude)
