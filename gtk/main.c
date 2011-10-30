@@ -72,6 +72,7 @@ struct cbdata
     gboolean                    start_paused;
     gboolean                    is_iconified;
 
+    guint                       activation_count;
     guint                       timer;
     guint                       update_model_soon_tag;
     guint                       refresh_actions_tag;
@@ -532,8 +533,16 @@ on_startup( GApplication * application, gpointer user_data )
 }
 
 static void
-on_activate( GApplication * app UNUSED, gpointer unused UNUSED )
+on_activate( GApplication * app UNUSED, struct cbdata * cbdata )
 {
+    cbdata->activation_count++;
+
+    /* GApplication emits an 'activate' signal when bootstrapping the primary.
+     * Ordinarily we handle that by presenting the main window, but if the user
+     * user started Transmission minimized, ignore that initial signal... */
+    if( cbdata->is_iconified && ( cbdata->activation_count == 1 ) )
+        return;
+
     gtr_action_activate( "present-main-window" );
 }
 
