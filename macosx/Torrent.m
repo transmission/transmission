@@ -1818,6 +1818,17 @@ int trashDataFile(const char * filename)
             //simpler to create a new dictionary than to use statusInfo - avoids retention chicanery
             [[NSNotificationCenter defaultCenter] postNotificationName: @"TorrentFinishedDownloading" object: self
                 userInfo: [NSDictionary dictionaryWithObject: [statusInfo objectForKey: @"WasRunning"] forKey: @"WasRunning"]];
+            
+            NSString * dataLocation = [[self currentDirectory] stringByAppendingPathComponent: [self name]];
+            FSRef ref;
+            if (FSPathMakeRef((const UInt8 *)[dataLocation UTF8String], &ref, NULL) == noErr)
+            {
+                NSDictionary * quarantineProperties = [NSDictionary dictionaryWithObject: (NSString *)kLSQuarantineTypeOtherDownload forKey: (NSString *)kLSQuarantineTypeKey];
+                LSSetItemAttribute(&ref, kLSRolesAll, kLSItemQuarantineProperties, quarantineProperties);
+            }
+            else
+                NSLog(@"Could not find file to quarantine: %@!", dataLocation);
+            
             break;
         
         case TR_LEECH:
