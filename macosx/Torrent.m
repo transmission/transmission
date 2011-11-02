@@ -1824,10 +1824,11 @@ int trashDataFile(const char * filename)
             if (FSPathMakeRef((const UInt8 *)[dataLocation UTF8String], &ref, NULL) == noErr)
             {
                 NSDictionary * quarantineProperties = [NSDictionary dictionaryWithObject: (NSString *)kLSQuarantineTypeOtherDownload forKey: (NSString *)kLSQuarantineTypeKey];
-                LSSetItemAttribute(&ref, kLSRolesAll, kLSItemQuarantineProperties, quarantineProperties);
+                if (LSSetItemAttribute(&ref, kLSRolesAll, kLSItemQuarantineProperties, quarantineProperties) != noErr)
+                    NSLog(@"Failed to quarantine: %@", dataLocation);
             }
             else
-                NSLog(@"Could not find file to quarantine: %@!", dataLocation);
+                NSLog(@"Could not find file to quarantine: %@", dataLocation);
             
             break;
         
