@@ -796,14 +796,11 @@ refreshInfo( struct DetailsImpl * di, tr_torrent ** torrents, int n )
         uint64_t leftUntilDone = 0;
         uint64_t haveUnchecked = 0;
         uint64_t haveValid = 0;
-        uint32_t verifiedPieces = 0;
         uint64_t available = 0;
         for( i=0; i<n; ++i ) {
             const tr_stat * st = stats[i];
-            const tr_info * inf = infos[i];
             haveUnchecked += st->haveUnchecked;
             haveValid += st->haveValid;
-            verifiedPieces += inf->pieceSize ? st->haveValid / inf->pieceSize : 0;
             sizeWhenDone += st->sizeWhenDone;
             leftUntilDone += st->leftUntilDone;
             available += st->sizeWhenDone - st->leftUntilDone + st->desiredAvailable;
