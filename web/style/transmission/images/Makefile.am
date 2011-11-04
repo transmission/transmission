@@ -11,7 +11,6 @@ dist_data_DATA = \
   file-priority-normal.png \
   filter_bar.png \
   filter_icon.png \
-  inspector-activity.png \
   inspector-files.png \
   inspector-info.png \
   inspector-peers.png \

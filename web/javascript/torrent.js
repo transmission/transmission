@@ -93,6 +93,8 @@ Torrent.Fields.InfoExtra = [
 
 // fields used in the inspector which need to be periodically refreshed
 Torrent.Fields.StatsExtra = [
+	'activityDate',
+	'corruptEver',
 	'desiredAvailable',
 	'downloadDir',
 	'downloadedEver',
@@ -101,6 +103,7 @@ Torrent.Fields.StatsExtra = [
 	'haveValid',
 	'peers',
 	'seedRatioLimit',
+	'startDate',
 	'trackerStats',
 	'webseedsSendingToUs'
 ];
@@ -203,12 +206,15 @@ Torrent.prototype =
 	getError: function() { return this.fields.error; },
 	getErrorString: function() { return this.fields.errorString; },
 	getETA: function() { return this.fields.eta; },
+	getFailedEver: function(i) { return this.fields.corruptEver; },
 	getFile: function(i) { return this.fields.files[i]; },
 	getFileCount: function() { return this.fields.files ? this.fields.files.length : 0; },
 	getHashString: function() { return this.fields.hashString; },
+	getHave: function() { return this.getHaveValid() + this.getHaveUnchecked() },
+	getHaveUnchecked: function() { return this.fields.haveUnchecked; },
 	getHaveValid: function() { return this.fields.haveValid; },
-	getHave: function() { return this.getHaveValid() + this.fields.haveUnchecked; },
 	getId: function() { return this.fields.id; },
+	getLastActivity: function() { return this.fields.activityDate; },
 	getLeftUntilDone: function() { return this.fields.leftUntilDone; },
 	getMetadataPercentComplete: function() { return this.fields.metadataPercentComplete; },
 	getName: function() { return this.fields.name || 'Unknown'; },
@@ -224,6 +230,7 @@ Torrent.prototype =
 	getSeedRatioLimit: function() { return this.fields.seedRatioLimit; },
 	getSeedRatioMode: function() { return this.fields.seedRatioMode; },
 	getSizeWhenDone: function() { return this.fields.sizeWhenDone; },
+	getStartDate: function() { return this.fields.startDate; },
 	getStatus: function() { return this.fields.status; },
 	getTotalSize: function() { return this.fields.totalSize; },
 	getTrackers: function() { return this.fields.trackers; },

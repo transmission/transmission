@@ -514,6 +514,7 @@ ul.torrent_list
 
 	.title {
 		font-weight: bold;
+		font-size: larger;
 		padding-left: 0px;
 	}
 
@@ -594,10 +595,6 @@ div#torrent_inspector
                                 border-left-width: 1px;
 			}
 
-			> #inspector-tab-activity {
-				@include buttonImage('images/inspector-activity.png', $idle-color-top, $idle-color-bottom, $active-color-top, $active-color-bottom);
-			}
-
 			> #inspector-tab-peers {
 				@include buttonImage('images/inspector-peers.png', $idle-color-top, $idle-color-bottom, $active-color-top, $active-color-bottom);
 			}
@@ -621,51 +618,6 @@ div#torrent_inspector
 		{
 			font-weight: bold;
 			font-size: large;
-		}
-	}
-
-	.inspector_group
-	{
-		display: table;
-		width: 100%;
-		border-top: 1px solid #888;
-		margin: 10px 0px;
-		padding: 10px 0px;
-
-		.inspector_group_label
-		{
-			display: table-header-group;
-			font-weight: bold;
-		}
-
-		.inspector_row
-		{
-			display: table-row;
-
-			> .inspector_label {
-				display: table-cell;
-				width: 100px; /* this + the next 380 == inspector_container_with */
-			}
-
-			> div {
-				padding-top: 10px;
-				width: 380px; /* inspector_container_width==480 - inspector_label_width==100 */
-			}
-		}
-
-		/* Trackers Inspector Tab */
-		#inspector_trackers_list
-		{
-			padding: 0 0 0 0;
-			margin: 0 0 0 0;
-			text-align: left;
-			cursor: default;
-			overflow: hidden;
-
-			& > div.inspector_group {
-				padding-bottom: 0;
-				margin-bottom: 0;
-			}
 		}
 	}
 

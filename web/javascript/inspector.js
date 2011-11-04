@@ -48,7 +48,6 @@ function Inspector(controller) {
         $(tab).addClass('selected').siblings().removeClass('selected');
 
         // show this tab and hide the others
-        console.log('#' + tab.id.replace('tab','page'));
         $('#' + tab.id.replace('tab','page')).show().siblings('.inspector-page').hide();
 
         updateInspector();
@@ -66,13 +65,11 @@ function Inspector(controller) {
             name = torrents[0].getName();
         else
             name = '' + torrents.length+' Transfers Selected';
-        setInnerHTML(e.name, name || na);
+        setInnerHTML(e.name_lb, name || na);
 
         // update the visible page
         if ($(e.info_page).is(':visible'))
             updateInfoPage();
-        else if ($(e.activity_page).is(':visible'))
-            updateActivityPage();
         else if ($(e.peers_page).is(':visible'))
             updatePeersPage();
         else if ($(e.trackers_page).is(':visible'))
@@ -97,7 +94,11 @@ function Inspector(controller) {
         var torrents = data.torrents,
             e = data.elements,
             fmt = Transmission.fmt,
-            na = 'N/A',
+            none = 'None',
+            mixed = 'Mixed',
+            unknown = 'Unknown',
+            isMixed, allPaused, allFinished,
+            str,
             name = '',
             pieceCount = 0,
             pieceSize = '',
@@ -107,101 +108,349 @@ function Inspector(controller) {
             creator = '',
             date = '',
             directory = '',
-            s, i, t;
-
-        for (i=0; t=torrents[i]; ++i) {
-            name        = accumulateString(name, t.getName());
-            pieceCount += t.getPieceCount();
-            pieceSize   = accumulateString(pieceSize, fmt.mem(t.getPieceSize()));
-            hash        = accumulateString(hash, t.getHashString());
-            secure      = accumulateString(secure, (t.getPrivateFlag() ? 'Private' : 'Public')+' Torrent');
-            comment     = accumulateString(comment, t.getComment() || 'N/A');
-            creator     = accumulateString(creator, t.getCreator());
-            date        = accumulateString(date, fmt.timestamp(t.getDateCreated()));
-            directory   = accumulateString(directory, t.getDownloadDir());
-        }
-
-        if (!pieceCount)
-            setInnerHTML(e.pieces, na);
-        else if (pieceSize == 'Mixed')
-            setInnerHTML(e.pieces, 'Mixed');
-        else
-            setInnerHTML(e.pieces, pieceCount + ' pieces @ ' + pieceSize);
-
-        setInnerHTML(e.hash, hash || na);
-        setInnerHTML(e.secure, secure || na);
-        setInnerHTML(e.comment, comment.replace(/(https?|ftp):\/\/([\w\-]+(\.[\w\-]+)*(\.[a-z]{2,4})?)(\d{1,5})?(\/([^<>\s]*))?/g, '<a target="_blank" href="$&">$&</a>') || na);
-        setInnerHTML(e.creator, creator || na);
-        setInnerHTML(e.date, date || na);
-        setInnerHTML(e.directory, directory || na);
-
-        $("#inspector_tab_info_container .inspector_row > div").css('color', '#222');
-        $("#inspector_tab_info_container .inspector_row > div:contains('N/A')").css('color', '#666');
-    },
-
-    /****
-    *****  ACTIVITY PAGE
-    ****/
-
-    updateActivityPage = function() {
-
-        var i, t, l, d, na='N/A',
-            fmt = Transmission.fmt,
-            e = data.elements,
-            torrents = data.torrents,
-            state = '',
-            have = 0,
+            baseline, it,  ref, s, i, t,
             sizeWhenDone = 0,
-            progress = '',
-            have = 0,
-            verified = 0,
-            availability = 0,
-            downloaded = 0,
-            uploaded = 0,
-            error = '',
-            uploadSpeed = 0,
-            uploadPeers = 0,
-            downloadSpeed = 0,
-            downloadPeers = 0,
-            availability = 0;
+            leftUntilDone = 0,
+            available = 0,
+            haveTotal = 0,
+            haveVerified = 0,
+            haveUnverified = 0,
+            verifiedPieces = 0,
+            stateString,
+            latest,
+            pieces,
+            size,
+            pieceSize,
+            creator, mixed_creator,
+            date, mixed_date,
+            v, u, f, d, pct, now;
 
-        for (i=0; t=torrents[i]; ++i)
-        {
-            l = t.getLeftUntilDone();
-            d = t.getSizeWhenDone();
+        //
+        //  state_lb
+        //
 
-            state = accumulateString(state, t.getStateString());
-            error = accumulateString(error, t.getErrorString());
+        if(torrents.length <1)
+            str = none;
+        else {
+            isMixed = false;
+            allPaused = true;
+            allFinished = true;
 
-            have           += t.getHave();
-            verified       += t.getHaveValid();
-            sizeWhenDone   += d;
-            availability   += (d - l + t.getDesiredAvailable());
-
-            uploaded       += t.getUploadedEver();
-            uploadSpeed    += t.getUploadSpeed();
-            uploadPeers    += t.getPeersGettingFromUs();
-
-            downloaded     += t.getDownloadedEver();
-            downloadSpeed  += t.getDownloadSpeed();
-            downloadPeers  += t.getPeersSendingToUs();
+            baseline = torrents[0].getStatus();
+            for(i=0; t=torrents[i]; ++i) {
+                it = t.getStatus();
+                if(it != baseline)
+                    isMixed = true;
+                if(!t.isStopped())
+                    allPaused = allFinished = false;
+                if(!t.isFinished())
+                    allFinished = false;
+            }
+            if( isMixed )
+                str = mixed;
+            else if( allFinished )
+                str = 'Finished';
+            else if( allPaused )
+                str = 'Paused';
+            else
+                str = torrents[0].getStateString();
         }
+        setInnerHTML(e.state_lb, str);
+        stateString = str;
 
-        setInnerHTML(e.state, state);
-        setInnerHTML(e.progress, torrents.length ? fmt.percentString(Math.ratio(have*100, sizeWhenDone)) + '%' : na);
-        setInnerHTML(e.have, torrents.length ? fmt.size(have) + ' (' + fmt.size(verified) + ' verified)' : na);
-        setInnerHTML(e.availability, torrents.length ? fmt.percentString(Math.ratio(availability*100, sizeWhenDone)) + '%' : na);
-        setInnerHTML(e.uploaded, torrents.length ? fmt.size(uploaded) : na);
-        setInnerHTML(e.downloaded, torrents.length ? fmt.size(downloaded) : na);
-        setInnerHTML(e.ratio, torrents.length ? fmt.ratioString(Math.ratio(uploaded, downloaded)) : na);
-        setInnerHTML(e.error, error);
-        setInnerHTML(e.upload_speed, torrents.length ? fmt.speedBps(uploadSpeed) : na);
-        setInnerHTML(e.download_speed, torrents.length ? fmt.speedBps(downloadSpeed) : na);
-        setInnerHTML(e.upload_to, torrents.length ? uploadPeers : na);
-        setInnerHTML(e.download_from, torrents.length ? downloadPeers : na);
+        //
+        //  have_lb
+        //
 
-        $("#inspector_tab_activity_container .inspector_row > div").css('color', '#222');
-        $("#inspector_tab_activity_container .inspector_row > div:contains('N/A')").css('color', '#666');
+        if(torrents.length < 1)
+            str = none;
+        else {
+            baseline = torrents[0].getStatus();
+            for(i=0; t=torrents[i]; ++i) {
+                if(!t.needsMetaData()) {
+                    haveTotal += t.getHave();
+                    haveUnverified += t.getHaveUnchecked();
+                    v = t.getHaveValid();
+                    haveVerified += v;
+                    if(t.getPieceSize())
+                        verifiedPieces += v / t.getPieceSize();
+                    sizeWhenDone += t.getSizeWhenDone();
+                    leftUntilDone += t.getLeftUntilDone();
+                    available += (t.getHave()) + t.getDesiredAvailable();
+                }
+            }
+
+            d = 100.0 * ( sizeWhenDone ? ( sizeWhenDone - leftUntilDone ) / sizeWhenDone : 1 );
+            str = fmt.percentString( d );
+
+            if( !haveUnverified && !leftUntilDone )
+                str = fmt.size(haveVerified) + ' (100%)';
+            else if( !haveUnverified )
+                str = fmt.size(haveVerified) + ' of ' + fmt.size(sizeWhenDone) + ' (' + str +'%)';
+            else
+                str = fmt.size(haveVerified) + ' of ' + fmt.size(sizeWhenDone) + ' (' + str +'%), ' + fmt.size(haveUnverified) + ' Unverified';
+        }
+        setInnerHTML(e.have_lb, str);
+
+        //
+        //  availability_lb
+        //
+
+        if(torrents.length < 1)
+            str = none;
+        else if( sizeWhenDone == 0 )
+            str = none;
+        else
+            str = '' + fmt.percentString( ( 100.0 * available ) / sizeWhenDone ) +  '%';
+        setInnerHTML(e.availability_lb, str);
+
+        //
+        //  downloaded_lb
+        //
+
+        if(torrents.length < 1)
+            str = none;
+        else {
+            d = f = 0;
+            for(i=0; t=torrents[i]; ++i) {
+                d = t.getDownloadedEver();
+                f = t.getFailedEver();
+            }
+            if(f)
+                str = fmt.size(d) + ' (' + fmt.size(f) + ' corrupt)';
+            else
+                str = fmt.size(d);
+        }
+        setInnerHTML(e.downloaded_lb, str);
+
+        //
+        //  uploaded_lb
+        //
+
+        if(torrents.length < 1)
+            str = none;
+        else {
+            d = u = 0;
+            for(i=0; t=torrents[i]; ++i) {
+                d = t.getDownloadedEver();
+                u = t.getUploadedEver();
+            }
+            str = fmt.size(u) + ' (Ratio: ' + fmt.ratioString( Math.ratio(u,d))+')';
+        }
+        setInnerHTML(e.uploaded_lb, str);
+
+        //
+        // running time
+        //
+
+        if(torrents.length < 1)
+            str = none;
+        else {
+            allPaused = true;
+            baseline = torrents[0].getStartDate();
+            for(i=0; t=torrents[i]; ++i) {
+                if(baseline != t.getStartDate())
+                    baseline = 0;
+                if(!t.isStopped())
+                    allPaused = false;
+            }
+            if(allPaused)
+                str = stateString; // paused || finished
+            else if(!baseline)
+                str = mixed;
+            else
+                str = fmt.timeInterval(Date.now()/1000 - baseline);
+        }
+        setInnerHTML(e.running_time_lb, str);
+
+        //
+        // remaining time
+        //
+
+        str = '';
+        if(torrents.length < 1)
+            str = none;
+        else {
+            baseline = torrents[0].getETA();
+            for(i=0; t=torrents[i]; ++i) {
+                if(baseline != t.getETA()) {
+                    str = mixed;
+                    break;
+                }
+            }
+        }
+        if(!str.length) {
+            if(baseline < 0)
+                str = unknown;
+            else
+                str = fmt.timeInterval(baseline);
+        }
+        setInnerHTML(e.remaining_time_lb, str);
+
+        //
+        // last activity
+        //
+
+        latest = -1;
+        if(torrents.length < 1)
+            str = none;
+        else {
+            baseline = torrents[0].getLastActivity();
+            for(i=0; t=torrents[i]; ++i) {
+                d = t.getLastActivity();
+                if(latest < d)
+                    latest = d;
+            }
+            d = Date.now()/1000 - latest; // seconds since last activity
+            if(d < 0)
+                str = none;
+            else if(d < 5)
+                str = 'Active now';
+            else
+                str = fmt.timeInterval(d) + ' ago';
+        }
+        setInnerHTML(e.last_activity_lb, str);
+
+        //
+        // error
+        //
+
+        if(torrents.length < 1)
+            str = none;
+        else {
+            str = torrents[0].getErrorString();
+            for(i=0; t=torrents[i]; ++i) {
+                if(str != t.getErrorString()) {
+                    str = mixed;
+                    break;
+                }
+            }
+        }
+        setInnerHTML(e.error_lb, str || none);
+
+        //
+        // size
+        //
+
+        if(torrents.length < 1)
+            str = none;
+        else {
+            pieces = 0;
+            size = 0;
+            pieceSize = torrents[0].getPieceSize();
+            for(i=0; t=torrents[i]; ++i) {
+                pieces += t.getPieceCount();
+                size += t.getTotalSize();
+                if(pieceSize != t.getPieceSize())
+                    pieceSize = 0;
+            }
+            if(!size)
+                str = none;
+            else if(pieceSize > 0)
+                str = fmt.size(size) + ' (' + pieces.toStringWithCommas() + ' pieces @ ' + fmt.mem(pieceSize) + ')';
+            else
+                str = fmt.size(size) + ' (' + pieces.toStringWithCommas() + ' pieces)';
+        }
+        setInnerHTML(e.size_lb, str);
+
+        //
+        //  hash
+        //
+
+        if(torrents.length < 1)
+            str = none;
+        else {
+            str = torrents[0].getHashString();
+            for(i=0; t=torrents[i]; ++i) {
+                if(str != t.getHashString()) {
+                    str = mixed;
+                    break;
+                }
+            }
+        }
+        setInnerHTML(e.hash_lb, str);
+
+        //
+        //  privacy
+        //
+
+        if(torrents.length < 1)
+            str = none;
+        else {
+            baseline = torrents[0].getPrivateFlag();
+            str = baseline ? 'Private to this tracker -- DHT and PEX disabled' : 'Public torrent';
+            for(i=0; t=torrents[i]; ++i) {
+                if(baseline != t.getPrivateFlag()) {
+                    str = mixed;
+                    break;
+                }
+            }
+        }
+        setInnerHTML(e.privacy_lb, str);
+
+        //
+        //  comment
+        //
+
+        if(torrents.length < 1)
+            str = none;
+        else {
+            str = torrents[0].getComment();
+            for(i=0; t=torrents[i]; ++i) {
+                if(str != t.getComment()) {
+                    str = mixed;
+                    break;
+                }
+            }
+        }
+        if(!str)
+            str = none;  
+        setInnerHTML(e.comment_lb, str.replace(/(https?|ftp):\/\/([\w\-]+(\.[\w\-]+)*(\.[a-z]{2,4})?)(\d{1,5})?(\/([^<>\s]*))?/g, '<a target="_blank" href="$&">$&</a>'));
+
+        //
+        //  origin
+        //
+
+        if(torrents.length < 1)
+            str = none;
+        else {
+            mixed_creator = false;
+            mixed_date = false;
+            creator = torrents[0].getCreator();
+            date = torrents[0].getDateCreated();
+            for(i=0; t=torrents[i]; ++i) {
+                if(creator != t.getCreator())
+                    mixed_creator = true;
+                if(date != t.getDateCreated())
+                    mixed_date = true;
+            }
+            if(mixed_creator && mixed_date)
+                str = mixed;
+            else if(mixed_date && creator.length)
+                str = 'Created by ' + creator;
+            else if(mixed_creator && date)
+                str = 'Created on ' + (new Date(date*1000)).toDateString();
+            else
+                str = 'Created by ' + creator + ' on ' + (new Date(date*1000)).toDateString();
+        }
+        setInnerHTML(e.origin_lb, str);
+
+        //
+        //  foldername
+        //
+
+        if(torrents.length < 1)
+            str = none;
+        else {
+            str = torrents[0].getDownloadDir();
+            for(i=0; t=torrents[i]; ++i) {
+                if(str != t.getDownloadDir()) {
+                    str = mixed;
+                    break;
+                }
+            }
+        }
+        setInnerHTML(e.foldername_lb, str);
     },
 
     /****
@@ -453,38 +702,31 @@ function Inspector(controller) {
         data.elements.files_page     = $('#inspector-page-files')[0];
         data.elements.peers_page     = $('#inspector-page-peers')[0];
         data.elements.trackers_page  = $('#inspector-page-trackers')[0];
-        data.elements.activity_page  = $('#inspector-page-activity')[0];
 
         data.elements.file_list      = $('#inspector_file_list')[0];
         data.elements.peers_list     = $('#inspector_peers_list')[0];
         data.elements.trackers_list  = $('#inspector_trackers_list')[0];
 
-        data.elements.availability   = $(ti+'availability')[0];
-        data.elements.comment        = $(ti+'comment')[0];
-        data.elements.date           = $(ti+'creator_date')[0];
-        data.elements.creator        = $(ti+'creator')[0];
-        data.elements.directory      = $(ti+'download_dir')[0];
-        data.elements.downloaded     = $(ti+'downloaded')[0];
-        data.elements.download_from  = $(ti+'download_from')[0];
-        data.elements.download_speed = $(ti+'download_speed')[0];
-        data.elements.error          = $(ti+'error')[0];
-        data.elements.hash           = $(ti+'hash')[0];
-        data.elements.have           = $(ti+'have')[0];
-        data.elements.name           = $(ti+'name')[0];
-        data.elements.progress       = $(ti+'progress')[0];
-        data.elements.ratio          = $(ti+'ratio')[0];
-        data.elements.secure         = $(ti+'secure')[0];
-        data.elements.size           = $(ti+'size')[0];
-        data.elements.state          = $(ti+'state')[0];
-        data.elements.pieces         = $(ti+'pieces')[0];
-        data.elements.uploaded       = $(ti+'uploaded')[0];
-        data.elements.upload_speed   = $(ti+'upload_speed')[0];
-        data.elements.upload_to      = $(ti+'upload_to')[0];
+	data.elements.have_lb           = $('#inspector-info-have')[0];
+	data.elements.availability_lb   = $('#inspector-info-availability')[0];
+	data.elements.downloaded_lb     = $('#inspector-info-downloaded')[0];
+	data.elements.uploaded_lb       = $('#inspector-info-uploaded')[0];
+	data.elements.state_lb          = $('#inspector-info-state')[0];
+	data.elements.running_time_lb   = $('#inspector-info-running-time')[0];
+	data.elements.remaining_time_lb = $('#inspector-info-remaining-time')[0];
+	data.elements.last_activity_lb  = $('#inspector-info-last-activity')[0];
+	data.elements.error_lb          = $('#inspector-info-error')[0];
+	data.elements.size_lb           = $('#inspector-info-size')[0];
+	data.elements.foldername_lb     = $('#inspector-info-location')[0];
+	data.elements.hash_lb           = $('#inspector-info-hash')[0];
+	data.elements.privacy_lb        = $('#inspector-info-privacy')[0];
+	data.elements.origin_lb         = $('#inspector-info-origin')[0];
+	data.elements.comment_lb        = $('#inspector-info-comment')[0];
+        data.elements.name_lb           = $('#torrent_inspector_name')[0];
 
         // force initial 'N/A' updates on all the pages
         updateInspector();
         updateInfoPage();
-        updateActivityPage();
         updatePeersPage();
         updateTrackersPage();
         updateFilesPage();
