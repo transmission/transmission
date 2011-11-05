@@ -360,9 +360,10 @@ Details :: refresh( )
         bool isMixed = false;
         bool allPaused = true;
         bool allFinished = true;
-        const tr_torrent_activity activity = torrents[0]->getActivity( );
+        const tr_torrent_activity baseline = torrents[0]->getActivity( );
         foreach( const Torrent * t, torrents ) {
-            if( activity != t->getActivity( ) )
+            const tr_torrent_activity activity = t->getActivity( );
+            if( activity != baseline )
                 isMixed = true;
             if( activity != TR_STATUS_STOPPED )
                 allPaused = allFinished = false;
@@ -445,10 +446,11 @@ Details :: refresh( )
     myAvailabilityLabel->setText( string );
 
     // myDownloadedLabel
-    uint64_t d = 0, f = 0;
     if( torrents.empty( ) )
         string = none;
     else {
+        uint64_t d = 0;
+        uint64_t f = 0;
         foreach( const Torrent * t, torrents ) {
             d += t->downloadedEver( );
             f += t->failedEver( );
