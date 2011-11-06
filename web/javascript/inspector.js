@@ -99,20 +99,10 @@ function Inspector(controller) {
             unknown = 'Unknown',
             isMixed, allPaused, allFinished,
             str,
-            name = '',
-            pieceCount = 0,
-            pieceSize = '',
-            hash = '',
-            secure = '',
-            comment = '',
-            creator = '',
-            date = '',
-            directory = '',
-            baseline, it,  ref, s, i, t,
+            baseline, it, s, i, t,
             sizeWhenDone = 0,
             leftUntilDone = 0,
             available = 0,
-            haveTotal = 0,
             haveVerified = 0,
             haveUnverified = 0,
             verifiedPieces = 0,
@@ -123,7 +113,8 @@ function Inspector(controller) {
             pieceSize,
             creator, mixed_creator,
             date, mixed_date,
-            v, u, f, d, pct, now;
+            v, u, f, d, pct,
+            now = Date.now();
 
         //
         //  state_lb
@@ -168,7 +159,6 @@ function Inspector(controller) {
             baseline = torrents[0].getStatus();
             for(i=0; t=torrents[i]; ++i) {
                 if(!t.needsMetaData()) {
-                    haveTotal += t.getHave();
                     haveUnverified += t.getHaveUnchecked();
                     v = t.getHaveValid();
                     haveVerified += v;
@@ -259,7 +249,7 @@ function Inspector(controller) {
             else if(!baseline)
                 str = mixed;
             else
-                str = fmt.timeInterval(Date.now()/1000 - baseline);
+                str = fmt.timeInterval(now/1000 - baseline);
         }
         setInnerHTML(e.running_time_lb, str);
 
@@ -301,7 +291,7 @@ function Inspector(controller) {
                 if(latest < d)
                     latest = d;
             }
-            d = Date.now()/1000 - latest; // seconds since last activity
+            d = now/1000 - latest; // seconds since last activity
             if(d < 0)
                 str = none;
             else if(d < 5)
