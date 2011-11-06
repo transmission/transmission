@@ -40,6 +40,13 @@ $(document).ready(function() {
 	// Initialise the main Transmission controller
 	transmission = new Transmission();
 
+	// IE8 and below don’t support ES5 Date.now()
+	if (!Date.now) {
+		Date.now = function() {
+			return +new Date();
+		};
+	}
+
 	// IE specific fixes here
 	if ($.browser.msie) {
 		try {
