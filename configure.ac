@@ -338,7 +338,7 @@ if test "x$with_gtk" = "xyes" ; then
         AC_MSG_ERROR("GTK+ not found!")
     fi
     if test "x$enable_nls" = "xno" ; then
-        AC_MSG_ERROR("The gtk client cannot be built without nls support.  Try adding either --enable-nls or --disable-gtk" )
+        AC_MSG_ERROR("The gtk client cannot be built without nls support.  Try adding either --enable-nls or --without-gtk" )
     fi
 
     if test "x$gtk_version" = "x3"; then
