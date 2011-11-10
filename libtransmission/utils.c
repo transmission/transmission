@@ -17,6 +17,7 @@
 #if defined(SYS_DARWIN)
  #define HAVE_GETPAGESIZE
  #define HAVE_ICONV_OPEN
+ #define HAVE_MKDTEMP
  #define HAVE_VALLOC
 #endif
 
@@ -502,6 +503,18 @@ tr_dirname( const char * path )
     char * ret = tr_strdup( dirname( tmp ) );
     tr_free( tmp );
     return ret;
+}
+
+char*
+tr_mkdtemp( char * template )
+{
+#ifdef HAVE_MKDTEMP
+    return mkdtemp( template );
+#else
+    if( !mktemp( template ) || mkdir( template, 0700 ) )
+        return NULL;
+    return template;
+#endif
 }
 
 int

@@ -2756,7 +2756,7 @@ deleteLocalData( tr_torrent * tor, tr_fileFunc func )
 
     base = tr_strdup_printf( "%s__XXXXXX", tr_torrentName( tor ) );
     tmpdir = tr_buildPath( top, base, NULL );
-    mkdtemp( tmpdir );
+    tr_mkdtemp( tmpdir );
     tr_free( base );
 
     for( f=0; f<tor->info.fileCount; ++f )
