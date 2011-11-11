@@ -30,7 +30,8 @@
 
 $nonselected-gradient-top: white;
 $nonselected-gradient-bottom: #BBB;
-$selected-gradient-top: #DBB;
+$selection-color: #cdcdff;
+$selected-gradient-top: $selection-color;
 $selected-gradient-bottom: white;
 
 @mixin button {
@@ -329,7 +330,7 @@ ul.torrent_list
 
 		&.compact { padding: 4px; }
 		&.even { background-color: #F7F7F7; }
-		&.selected { background-color: #ffe4e1; }
+		&.selected { background-color: $selection-color; }
 		&.compact { div.torrent_name { color: black; } }
 
 		// start-stop button
