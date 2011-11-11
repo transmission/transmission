@@ -34,11 +34,6 @@ $.fn.tabbedDialog = function (dialog_opts) {
 }
 
 $(document).ready(function() {
-	// Initialise the dialog controller
-	dialog = new Dialog();
-
-	// Initialise the main Transmission controller
-	transmission = new Transmission();
 
 	// IE8 and below don’t support ES5 Date.now()
 	if (!Date.now) {
@@ -46,6 +41,12 @@ $(document).ready(function() {
 			return +new Date();
 		};
 	}
+
+	// Initialise the dialog controller
+	dialog = new Dialog();
+
+	// Initialise the main Transmission controller
+	transmission = new Transmission();
 
 	// IE specific fixes here
 	if ($.browser.msie) {
