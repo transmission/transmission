@@ -72,6 +72,7 @@ Torrent.Fields.Stats = [
 	'rateUpload',
 	'recheckProgress',
 	'seedRatioMode',
+	'seedRatioLimit',
 	'sizeWhenDone',
 	'status',
 	'trackers',
@@ -102,7 +103,6 @@ Torrent.Fields.StatsExtra = [
 	'haveUnchecked',
 	'haveValid',
 	'peers',
-	'seedRatioLimit',
 	'startDate',
 	'trackerStats',
 	'webseedsSendingToUs'
