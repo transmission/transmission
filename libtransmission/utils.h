@@ -223,7 +223,7 @@ int tr_mkdir( const char * path, int permissions ) TR_GNUC_NONNULL(1);
 int tr_mkdirp( const char * path, int permissions ) TR_GNUC_NONNULL(1);
 
 /** @brief Portability wrapper for mkdtemp() that uses the system implementation if available */
-char* tr_mkdtemp( char * template );
+char* tr_mkdtemp( char * _template );
 
 
 /**
