@@ -336,7 +336,7 @@ div#toolbar {
     border: solid 0 #fff;
     padding: 2px;
     margin: 4px 5px 0 0;
-    border-radius: 10px; }
+    border-radius: 5px; }
     #statusbar input#torrent_search.blur {
       color: #999; }
 
@@ -1219,7 +1219,6 @@ div.dialog_container div.dialog_window {
   div.dialog_container div.dialog_window {
     top: 0;
     margin-top: 71px; } }
-
 div.dialog_container .dialog_logo {
   width: 64px;
   height: 64px;
