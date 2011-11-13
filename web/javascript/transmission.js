@@ -65,7 +65,9 @@ Transmission.prototype =
 
 		$('#toolbar-inspector').click($.proxy(this.toggleInspector,this));
 
-		$('#filter-mode').change($.proxy(this.onFilterModeClicked,this));
+		e = $('#filter-mode');
+		e.val(this[Prefs._FilterMode]);
+		e.change($.proxy(this.onFilterModeClicked,this));
 		$('#filter-tracker').change($.proxy(this.onFilterTrackerClicked,this));
 
 		if (!isMobileDevice) {
