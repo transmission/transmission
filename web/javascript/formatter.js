@@ -270,7 +270,7 @@ Transmission.fmt = (function()
 
 		plural: function(i, word)
 		{
-			return [ i, ' ', word, (word==1?'':'s') ].join('');
+			return [ i.toStringWithCommas(), ' ', word, (i==1?'':'s') ].join('');
 		},
 
 		peerStatus: function( flagStr ) 
