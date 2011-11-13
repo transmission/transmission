@@ -326,16 +326,9 @@ div#toolbar {
       display: none; }
       #statusbar #speed-info #speed-dn-container.active {
         display: inline; }
-  #statusbar #filter-button {
+  #statusbar #filter-select {
     float: left;
-    text-shadow: 0 1px 0 #ccc;
-    margin: 5px 8px;
-    -moz-user-select: none;
-    -webkit-user-select: none; }
-    #statusbar #filter-button:hover {
-      cursor: pointer; }
-    #statusbar #filter-button #filter-button .filter-selection {
-      text-decoration: underline; }
+    margin-left: 5px; }
   #statusbar input#torrent_search {
     float: right;
     height: 15px;

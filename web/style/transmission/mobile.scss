@@ -226,15 +226,10 @@ $statusbar-gradient-bottom: #bbb;
 		}
 	}
 
-	#filter-button {
-		float: left;
-		text-shadow: 0 1px 0 #ccc;
-		margin: 5px 8px;
-		-moz-user-select: none;
-		-webkit-user-select: none;
-		&:hover { cursor: pointer };
-		#filter-button .filter-selection { text-decoration: underline; }
-	}
+        #filter-select {
+                float: left;
+                margin-left: 5px;
+        }
 
 	input#torrent_search {
 		display: none;

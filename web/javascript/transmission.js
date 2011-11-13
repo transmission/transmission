@@ -65,6 +65,9 @@ Transmission.prototype =
 
 		$('#toolbar-inspector').click($.proxy(this.toggleInspector,this));
 
+		$('#filter-mode').change($.proxy(this.onFilterModeClicked,this));
+		$('#filter-tracker').change($.proxy(this.onFilterTrackerClicked,this));
+
 		if (!isMobileDevice) {
 			$(document).bind('keydown', $.proxy(this.keyDown,this) );
 			$(document).bind('keyup', $.proxy(this.keyUp, this) );
@@ -96,8 +99,6 @@ Transmission.prototype =
 		this.initializeTorrents();
 		this.refreshTorrents();
 		this.togglePeriodicSessionRefresh(true);
-
-		this.filterSetup();
 
 		this.updateButtonsSoon();
 	},
@@ -1059,8 +1060,6 @@ Transmission.prototype =
 		    fmt = Transmission.fmt,
 		    torrents = this.getAllTorrents();
 
-		this.refreshFilterButton();
-
 		// up/down speed
 		for (i=0; row=torrents[i]; ++i) {
 			u += row.getUploadSpeed();
@@ -1072,11 +1071,44 @@ Transmission.prototype =
 
 		$('#speed-dn-container').toggleClass('active', d>0 );
 		$('#speed-dn-label').text( fmt.speedBps( d ) );
+
+		// visible torrents
+		$('#filter-count').text( fmt.plural(this._rows.length, 'Transfer') );
 	},
 
 	setEnabled: function(key, flag)
 	{
 		$(key).toggleClass('disabled', !flag);
+	},
+
+	updateFilterSelect: function()
+	{
+		var i, names, name, str, o,
+		    e = $('#filter-tracker'),
+		    trackers = this.getTrackers();
+
+		// build a sorted list of names
+		names = [];
+		for (name in trackers)
+			names.push (name);
+		names.sort();
+
+		// build the new html
+		if (!this.filterTracker)
+			str = '<option value="all" selected="selected">All</option>';
+		else
+			str = '<option value="all">All</option>';
+		for (i=0; name=names[i]; ++i) {
+			o = trackers[name];
+			str += '<option value="' + o.domain + '"';
+			if (trackers[name].domain === this.filterTracker) str += ' selected="selected"';
+			str += '>' + name + '</option>';
+		}
+
+		if (!this.filterTrackersStr || (this.filterTrackersStr !== str)) {
+			this.filterTrackersStr = str;
+			$('#filter-tracker').html(str);
+		}
 	},
 
 	updateButtonsSoon: function()
@@ -1153,69 +1185,6 @@ Transmission.prototype =
 	*****
 	****/
 
-	filterSetup: function()
-	{
-		var tr = this,
-		    popup = $('#filter-popup');
-
-		popup.dialog({
-			autoOpen: false,
-			position: isMobileDevice ? 'center' : [40,40],
-			show: 'blind',
-			hide: 'blind',
-			title: 'Show',
-			width: 315
-		});
-
-		$('#filter-button').click(function() {
-			if (popup.is(":visible"))
-				popup.dialog('close');
-			else {
-				tr.refreshFilterPopup();
-				popup.dialog('open');
-			}
-		});
-		this.refreshFilterButton();
-	},
-
-	refreshFilterButton: function()
-	{
-		var o, tmp, text, torrent_count,
-		    state = this[Prefs._FilterMode],
-		    state_all = state === Prefs._FilterAll,
-		    state_string = this.getStateString(state),
-		    tracker = this.filterTracker,
-		    tracker_all = !tracker,
-		    tracker_string = tracker ? this.getReadableDomain(tracker) : '',
-		    visible_count = this._rows.length;
-
-		// count the total number of torrents
-		torrent_count = 0;
-		o = this._torrents;
-		for (tmp in o)
-			if (o.hasOwnProperty(tmp))
-				++torrent_count;
-
-		text = 'Show <span class="filter-selection">';
-		if (state_all && tracker_all)
-			text += 'All';
-		else if (state_all)
-			text += tracker_string;
-		else if (tracker_all)
-			text += state_string;
-		else
-			text += state_string + '</span> at <span class="filter-selection">' + tracker_string;
-		text += '</span> &mdash; ';
-
-		if (torrent_count !== visible_count)
-			text += visible_count.toStringWithCommas() + ' of ' + torrent_count.toStringWithCommas();
-		else if (torrent_count === 1)
-			text += '1 Transfer';
-		else
-			text += torrent_count.toStringWithCommas() + ' Transfers';
-		$('#filter-button').html(text);
-	},
-
 	refilterSoon: function()
 	{
 		if (!this.refilterTimer) {
@@ -1256,6 +1225,8 @@ Transmission.prototype =
 		    renderer = this.torrentRenderer,
 		    list = this.elements.torrent_list,
 		    old_sel_count = $(list).children('.selected').length;
+
+		this.updateFilterSelect();
 
 		clearTimeout(this.refilterTimer);
 		delete this.refilterTimer;
@@ -1361,7 +1332,6 @@ Transmission.prototype =
 
 		// sync gui
 		this.updateStatusbar();
-		this.refreshFilterButton();
 		if (old_sel_count !== $(list).children('.selected').length)
 			this.selectionChanged();
 	},
@@ -1375,103 +1345,15 @@ Transmission.prototype =
 		this.refilter(true);
 	},
 
-	refreshFilterPopup: function()
+	onFilterModeClicked: function(ev)
 	{
-		var i, j, o, s, state, states, counts,
-		    sel_state, fragment, div,
-		    tor, torrents, name, names,
-		    trackers = this.getTrackers(),
-		    tr = this;
-
-		/***
-		****  States
-		***/
-
-		states = [ Prefs._FilterAll,
-		           Prefs._FilterActive,
-		           Prefs._FilterDownloading,
-		           Prefs._FilterSeeding,
-		           Prefs._FilterPaused,
-		           Prefs._FilterFinished ];
-
-		counts = {};
-		for (i=0; state=states[i]; ++i)
-			counts[state] = 0;
-
-		torrents = this.getAllTorrents();
-		for (i=0; tor=torrents[i]; ++i)
-			for (j=0; state=states[j]; ++j)
-				if (tor.testState(state))
-					counts[state]++;
-
-		sel_state = tr[Prefs._FilterMode];
-		fragment = document.createDocumentFragment();
-		for (i=0; s=states[i]; ++i)
-		{
-			div = document.createElement('div');
-			div.id = 'show-state-' + s;
-			div.className = 'row' + (s === sel_state ? ' selected':'');
-			div.innerHTML = '<span class="filter-img"></span>'
-			              + '<span class="filter-name">' + tr.getStateString(s) + '</span>'
-			              + '<span class="count">' + counts[s].toStringWithCommas() + '</span>';
-			$(div).click({'state':s}, function(ev) {
-				tr.setFilterMode(ev.data.state);
-				$('#filter-popup').dialog('close');
-			});
-			fragment.appendChild(div);
-		}
-		$('#filter-by-state .row').remove();
-		$('#filter-by-state')[0].appendChild(fragment);
-
-		/***
-		****  Trackers
-		***/
-
-		names = [];
-		for (name in trackers)
-			names.push (name);
-		names.sort();
-
-		fragment = document.createDocumentFragment();
-		div = document.createElement('div');
-		div.id = 'show-tracker-all';
-		div.className = 'row' + (tr.filterTracker ? '' : ' selected');
-		div.innerHTML = '<span class="filter-img"></span>'
-		              + '<span class="filter-name">All</span>'
-		              + '<span class="count">' + torrents.length.toStringWithCommas() + '</span>';
-		$(div).click(function() {
-			tr.setFilterTracker(null);
-			$('#filter-popup').dialog('close');
-		});
-		fragment.appendChild(div);
-		for (i=0; name=names[i]; ++i) {
-			o = trackers[name];
-			div = document.createElement('div');
-			div.id = 'show-tracker-' + name;
-			div.className = 'row' + (o.domain === tr.filterTracker  ? ' selected':'');
-			div.innerHTML = '<span class="filter-name">'+ name + '</span>'
-			              + '<span class="count">'+ o.count.toStringWithCommas() + '</span>';
-			$(div).click({domain:o.domain}, function(ev) {
-				tr.setFilterTracker(ev.data.domain);
-				$('#filter-popup').dialog('close');
-			});
-			fragment.appendChild(div);
-		}
-		$('#filter-by-tracker .row').remove();
-		$('#filter-by-tracker')[0].appendChild(fragment);
+		this.setFilterMode($('#filter-mode').val());
 	},
 
-	getStateString: function(mode)
+	onFilterTrackerClicked: function(ev)
 	{
-		switch (mode)
-		{
-			case Prefs._FilterActive:      return 'Active';
-			case Prefs._FilterSeeding:     return 'Seeding';
-			case Prefs._FilterDownloading: return 'Downloading';
-			case Prefs._FilterPaused:      return 'Paused';
-			case Prefs._FilterFinished:    return 'Finished';
-			default:                       return 'All';
-		}
+		var tracker = $('#filter-tracker').val();
+		this.setFilterTracker(tracker==='all' ? null : tracker);
 	},
 
 	setFilterTracker: function(domain)
