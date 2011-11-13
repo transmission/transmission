@@ -42,12 +42,6 @@ $(document).ready(function() {
 		};
 	}
 
-	// Initialise the dialog controller
-	dialog = new Dialog();
-
-	// Initialise the main Transmission controller
-	transmission = new Transmission();
-
 	// IE specific fixes here
 	if ($.browser.msie) {
 		try {
@@ -76,6 +70,12 @@ $(document).ready(function() {
 		// and this kills the border we used to have
 		$('.trans_menu div.outerbox').css('border', 'none');
 	}
+
+	// Initialise the dialog controller
+	dialog = new Dialog();
+
+	// Initialise the main Transmission controller
+	transmission = new Transmission();
 });
 
 /**
