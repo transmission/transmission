@@ -309,8 +309,7 @@ div#toolbar {
     #statusbar #filter input#torrent_search {
       height: 18px;
       width: 100px;
-      border: 1px solid black;
-      border-radius: 4px; }
+      border-radius: 6px; }
       #statusbar #filter input#torrent_search.blur {
         color: #999; }
   #statusbar #speed-info {
@@ -1210,6 +1209,7 @@ div.dialog_container div.dialog_window {
   div.dialog_container div.dialog_window {
     top: 0;
     margin-top: 71px; } }
+
 div.dialog_container .dialog_logo {
   width: 64px;
   height: 64px;
