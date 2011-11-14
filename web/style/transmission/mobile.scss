@@ -16,7 +16,6 @@
 	background-image: url($src), -moz-linear-gradient(top, $topColor, $bottomColor); /* FF3.6+ */
 	background-image: url($src), -ms-linear-gradient(top, $topColor, $bottomColor); /* IE10 */
 	background-image: url($src), -o-linear-gradient(top, $topColor, $bottomColor); /* Opera 11.10+ */
-	background-image: url($src), linear-gradient(top, $topColor, $bottomColor); /* W3C */
 	background-position: center;
 	background-repeat: no-repeat;
 }
@@ -192,11 +191,21 @@ $statusbar-gradient-bottom: #bbb;
 	position: relative;
 	@include verticalGradient($statusbar-gradient-top, $statusbar-gradient-bottom);
 
+	#filter
+	{
+		float: left;
+		margin-left: 5px;
+
+		input#torrent_search {
+			display: none;
+		}
+	}
+
 	#speed-info
 	{
+		float: right;
 		margin-top: 5px;
-		margin-left: 45%;
-		text-align: left;
+		margin-right: 10px;
 
 		* {
 			display: inline-block;
@@ -215,24 +224,9 @@ $statusbar-gradient-bottom: #bbb;
 			background: url('images/arrow-down.png') bottom no-repeat;
 		}
 
-		#speed-up-container {
-			display: none;
-			&.active { display: inline; }
+		#speed-up-container, #speed-dn-container {
+			display: inline;
 		}
-
-		#speed-dn-container {
-			display: none;
-			&.active { display: inline; }
-		}
-	}
-
-        #filter-select {
-                float: left;
-                margin-left: 5px;
-        }
-
-	input#torrent_search {
-		display: none;
 	}
 }
 

@@ -199,11 +199,25 @@ $statusbar-gradient-bottom: #bbb;
 	position: relative;
 	@include verticalGradient($statusbar-gradient-top, $statusbar-gradient-bottom);
 
+	#filter
+	{
+		float: left;
+		margin-left: 5px;
+
+		input#torrent_search {
+			height: 18px;
+			width: 100px;
+			border: 1px solid black;
+			border-radius: 4px;
+			&.blur { color: #999; }
+		}
+	}
+
 	#speed-info
 	{
+		float: right;
 		margin-top: 5px;
-		margin-left: 45%;
-		text-align: left;
+		margin-right: 10px;
 
 		* {
 			display: inline-block;
@@ -222,33 +236,8 @@ $statusbar-gradient-bottom: #bbb;
 			background: url('images/arrow-down.png') bottom no-repeat;
 		}
 
-		#speed-up-container {
-			display: none;
-			&.active { display: inline; }
-		}
-
-		#speed-dn-container {
-			display: none;
-			&.active { display: inline; }
-		}
-	}
-
-	#filter-select {
-		float: left;
-		margin-left: 5px;
-	}
-
-	input#torrent_search {
-		float: right;
-		height: 15px;
-		width: 100px;
-		border: solid 0 #fff;
-		padding: 2px;
-		margin: 4px 5px 0 0;
-		border-radius: 5px;
-
-		&.blur {
-			color: #999;
+		#speed-up-container, #speed-dn-container {
+			display: inline;
 		}
 	}
 }
