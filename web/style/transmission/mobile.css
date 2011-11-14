@@ -307,6 +307,8 @@ div#toolbar {
     margin-left: 5px; }
     #statusbar #filter input#torrent_search {
       display: none; }
+    #statusbar #filter #filter-count {
+      margin-left: 8px; }
   #statusbar #speed-info {
     float: right;
     margin-top: 5px;
