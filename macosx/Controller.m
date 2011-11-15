@@ -887,7 +887,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 - (void) askOpenConfirmed: (AddWindowController *) addController add: (BOOL) add
 {
     Torrent * torrent = [addController torrent];
-    [addController release];
+    [addController autorelease];
     
     if (add)
     {

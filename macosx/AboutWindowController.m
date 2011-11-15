@@ -65,7 +65,7 @@ AboutWindowController * fAboutBoxInstance = nil;
 
 - (void) windowWillClose: (id) sender
 {
-	[fAboutBoxInstance release];
+	[fAboutBoxInstance autorelease];
     fAboutBoxInstance = nil;
 }
 

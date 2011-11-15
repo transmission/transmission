@@ -254,7 +254,7 @@
 
 - (void) windowWillClose: (NSNotification *) notification
 {
-    [self release];
+    [self autorelease];
 }
 
 - (void) cancelCreateProgress: (id) sender
