@@ -304,7 +304,7 @@ tr_clientForId( char * buf, size_t buflen, const void * id_in )
             return;
     }
 
-    /* uTorrent will replace the training dash for an extra digit for longer version numbers */
+    /* uTorrent will replace the trailing dash with an extra digit for longer version numbers */
     if( id[0] == '-' )
     {
         if( !memcmp( id+1, "UT", 2 ) )
