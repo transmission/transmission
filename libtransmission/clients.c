@@ -304,6 +304,29 @@ tr_clientForId( char * buf, size_t buflen, const void * id_in )
             return;
     }
 
+    /* uTorrent will replace the training dash for an extra digit for longer version numbers */
+    if( id[0] == '-' )
+    {
+        if( !memcmp( id+1, "UT", 2 ) )
+        {
+            tr_snprintf( buf, buflen, "\xc2\xb5Torrent %d.%d.%d%s",
+                        strint(id+3,1), strint(id+4,1), strint(id+5,2), getMnemonicEnd(id[7]) );
+        }
+        else if( !memcmp( id+1, "UM", 2 ) )
+        {
+            tr_snprintf( buf, buflen, "\xc2\xb5Torrent Mac %d.%d.%d%s",
+                        strint(id+3,1), strint(id+4,1), strint(id+5,2), getMnemonicEnd(id[7]) );
+        }
+        else if( !memcmp( id+1, "UE", 2 ) )
+        {
+            tr_snprintf( buf, buflen, "\xc2\xb5Torrent Embedded %d.%d.%d%s",
+                        strint(id+3,1), strint(id+4,1), strint(id+5,2), getMnemonicEnd(id[7]) );
+        }
+
+        if( *buf )
+            return;
+    }
+
     /* Mainline */
     if( isMainlineStyle( id ) )
     {
