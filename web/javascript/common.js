@@ -157,6 +157,7 @@ Prefs._SortByAge          = 'age';
 Prefs._SortByActivity     = 'activity';
 Prefs._SortByName         = 'name';
 Prefs._SortByQueue        = 'queue_order';
+Prefs._SortBySize         = 'size';
 Prefs._SortByProgress     = 'percent_completed';
 Prefs._SortByRatio        = 'ratio';
 Prefs._SortByState        = 'state';
