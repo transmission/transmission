@@ -33,6 +33,7 @@
 #import "transmission.h"
 #import "utils.h"
 
+#import <Growl/Growl.h>
 #import <Sparkle/Sparkle.h>
 
 #define DOWNLOAD_FOLDER     0
@@ -180,6 +181,11 @@ tr_session * fHandle;
     [toolbar release];
     
     [self setPrefView: nil];
+    
+    [fBuiltInGrowlButton setState: [GrowlApplicationBridge shouldUseBuiltInNotifications]];
+    const BOOL growlRunning = [GrowlApplicationBridge isGrowlRunning];
+    [fBuiltInGrowlButton setHidden: growlRunning];
+    [fGrowlInstalledField setHidden: !growlRunning];
     
     //set download folder
     [fFolderPopUp selectItemAtIndex: [fDefaults boolForKey: @"DownloadLocationConstant"] ? DOWNLOAD_FOLDER : DOWNLOAD_TORRENT];
@@ -727,6 +733,11 @@ tr_session * fHandle;
 - (void) setBadge: (id) sender
 {
     [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateUI" object: self];
+}
+
+- (IBAction) setBuiltInGrowlEnabled: (id) sender
+{
+    [GrowlApplicationBridge setShouldUseBuiltInNotifications: [sender state] == NSOnState];
 }
 
 - (void) resetWarnings: (id) sender
