@@ -211,7 +211,7 @@ getUsage( void )
                 "       "
         MY_NAME " [host:port] [options]\n"
                 "       "
-        MY_NAME " [http://host:port/transmission/] [options]\n"
+        MY_NAME " [http(s?)://host:port/transmission/] [options]\n"
                 "\n"
                 "See the man page for detailed explanations and many examples.";
 }
@@ -2334,7 +2334,7 @@ processArgs( const char * rpcurl, int argc, const char ** argv )
     return status;
 }
 
-/* [host:port] or [host] or [port] or [http://host:port/transmission/] */
+/* [host:port] or [host] or [port] or [http(s?)://host:port/transmission/] */
 static void
 getHostAndPortAndRpcUrl( int * argc, char ** argv,
                          char ** host, int * port, char ** rpcurl )
@@ -2344,9 +2344,14 @@ getHostAndPortAndRpcUrl( int * argc, char ** argv,
         int          i;
         const char * s = argv[1];
         const char * delim = strchr( s, ':' );
-        if( !strncmp(s, "http://", 7 ) )   /* user passed in full rpc url */
+        if( !strncmp(s, "http://", 7 ) )   /* user passed in http rpc url */
         {
-            *rpcurl = tr_strdup_printf( "%s/rpc/", s );
+            *rpcurl = tr_strdup_printf( "%s/rpc/", s + 7 );
+        }
+        else if( !strncmp(s, "https://", 8) ) /* user passed in https rpc url */
+        {
+            UseSSL = true;
+            *rpcurl = tr_strdup_printf( "%s/rpc/", s + 8 );
         }
         else if( delim )   /* user passed in both host and port */
         {
