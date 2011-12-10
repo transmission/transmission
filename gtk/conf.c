@@ -93,9 +93,7 @@ tr_prefs_init_defaults( tr_benc * d )
     tr_bencDictAddBool( d, PREF_KEY_SHOW_BACKUP_TRACKERS, FALSE );
     tr_bencDictAddStr ( d, PREF_KEY_STATUSBAR_STATS, "total-ratio" );
 
-    tr_bencDictAddStr ( d, PREF_KEY_TORRENT_ADDED_NOTIFICATION_COMMAND, "notify-send -c transfer -i transmission '%s' '%s'" );
     tr_bencDictAddBool( d, PREF_KEY_TORRENT_ADDED_NOTIFICATION_ENABLED, true );
-    tr_bencDictAddStr ( d, PREF_KEY_TORRENT_COMPLETE_NOTIFICATION_COMMAND, "notify-send -c transfer.complete -i transmission '%s' '%s'" );
     tr_bencDictAddBool( d, PREF_KEY_TORRENT_COMPLETE_NOTIFICATION_ENABLED, true );
     tr_bencDictAddStr ( d, PREF_KEY_TORRENT_COMPLETE_SOUND_COMMAND, "canberra-gtk-play -i complete-download -d 'transmission torrent downloaded'" );
     tr_bencDictAddBool( d, PREF_KEY_TORRENT_COMPLETE_SOUND_ENABLED, true );

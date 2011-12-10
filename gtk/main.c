@@ -46,6 +46,7 @@
 #include "hig.h"
 #include "makemeta-ui.h"
 #include "msgwin.h"
+#include "notify.h"
 #include "open-dialog.h"
 #include "relocate.h"
 #include "stats.h"
@@ -642,6 +643,9 @@ main( int argc, char ** argv )
     /* set up the config dir */
     gtr_pref_init( cbdata.config_dir );
     g_mkdir_with_parents( cbdata.config_dir, 0755 );
+
+    /* init notifications */
+    gtr_notify_init( );
 
     /* init the application for the specified config dir */
     stat( cbdata.config_dir, &sb );
