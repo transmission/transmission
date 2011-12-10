@@ -481,19 +481,20 @@ task_request_next_chunk( struct tr_webseed_task * t )
         char ** urls = t->webseed->file_urls;
 
         const tr_info * inf = tr_torrentInfo( tor );
-        const uint32_t remain = t->length - t->blocks_done * tor->blockSize
+        const uint64_t remain = t->length - t->blocks_done * tor->blockSize
                                 - evbuffer_get_length( t->content );
 
-        const uint64_t total_offset = inf->pieceSize * t->piece_index
-                                    + t->piece_offset + t->length - remain;
+        const uint64_t total_offset = tr_pieceOffset( tor, t->piece_index,
+                                                           t->piece_offset,
+                                                           t->length - remain );
         const tr_piece_index_t step_piece = total_offset / inf->pieceSize;
-        const uint32_t step_piece_offset
+        const uint64_t step_piece_offset
                                = total_offset - ( inf->pieceSize * step_piece );
 
         tr_file_index_t file_index;
-        uint64_t file_offset;
         const tr_file * file;
-        uint32_t this_pass;
+        uint64_t file_offset;
+        uint64_t this_pass;
 
         tr_ioFindFileLocation( tor, step_piece, step_piece_offset,
                                     &file_index, &file_offset );
