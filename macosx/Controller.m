@@ -1003,28 +1003,25 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 - (void) openShowSheet: (id) sender
 {
     NSOpenPanel * panel = [NSOpenPanel openPanel];
-
+    
     [panel setAllowsMultipleSelection: YES];
     [panel setCanChooseFiles: YES];
     [panel setCanChooseDirectories: NO];
-
-    [panel beginSheetForDirectory: nil file: nil types: [NSArray arrayWithObjects: @"org.bittorrent.torrent", @"torrent", nil]
-        modalForWindow: fWindow modalDelegate: self didEndSelector: @selector(openSheetClosed:returnCode:contextInfo:)
-        contextInfo: [NSNumber numberWithBool: sender == fOpenIgnoreDownloadFolder]];
-}
-
-- (void) openSheetClosed: (NSOpenPanel *) panel returnCode: (NSInteger) code contextInfo: (NSNumber *) useOptions
-{
-    if (code == NSOKButton)
-    {
-        NSMutableArray * filenames = [NSMutableArray arrayWithCapacity: [[panel URLs] count]];
-        for (NSURL * url in [panel URLs])
-            [filenames addObject: [url path]];
-        
-        NSDictionary * dictionary = [[NSDictionary alloc] initWithObjectsAndKeys: filenames, @"Filenames",
-            [NSNumber numberWithInt: [useOptions boolValue] ? ADD_SHOW_OPTIONS : ADD_MANUAL], @"AddType", nil];
-        [self performSelectorOnMainThread: @selector(openFilesWithDict:) withObject: dictionary waitUntilDone: NO];
-    }
+    
+    [panel setAllowedFileTypes: [NSArray arrayWithObjects: @"org.bittorrent.torrent", @"torrent", nil]];
+    
+    [panel beginSheetModalForWindow: fWindow completionHandler: ^(NSInteger result) {
+        if (result == NSFileHandlingPanelOKButton)
+        {
+            NSMutableArray * filenames = [NSMutableArray arrayWithCapacity: [[panel URLs] count]];
+            for (NSURL * url in [panel URLs])
+                [filenames addObject: [url path]];
+            
+            NSDictionary * dictionary = [[NSDictionary alloc] initWithObjectsAndKeys: filenames, @"Filenames",
+                                         [NSNumber numberWithInt: sender == fOpenIgnoreDownloadFolder ? ADD_SHOW_OPTIONS : ADD_MANUAL], @"AddType", nil];
+            [self performSelectorOnMainThread: @selector(openFilesWithDict:) withObject: dictionary waitUntilDone: NO];
+        }
+    }];
 }
 
 - (void) invalidOpenAlert: (NSString *) filename
@@ -1431,7 +1428,6 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     [panel setCanChooseDirectories: YES];
     [panel setCanCreateDirectories: YES];
     
-    torrents = [torrents retain];
     NSInteger count = [torrents count];
     if (count == 1)
         [panel setMessage: [NSString stringWithFormat: NSLocalizedString(@"Select the new folder for \"%@\".",
@@ -1439,20 +1435,14 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     else
         [panel setMessage: [NSString stringWithFormat: NSLocalizedString(@"Select the new folder for %d data files.",
                             "Move torrent -> select destination folder"), count]];
-        
-    [panel beginSheetForDirectory: nil file: nil modalForWindow: fWindow modalDelegate: self
-        didEndSelector: @selector(moveDataFileChoiceClosed:returnCode:contextInfo:) contextInfo: torrents];
-}
-
-- (void) moveDataFileChoiceClosed: (NSOpenPanel *) panel returnCode: (NSInteger) code contextInfo: (NSArray *) torrents
-{
-    if (code == NSOKButton)
-    {
-        for (Torrent * torrent in torrents)
-            [torrent moveTorrentDataFileTo: [[[panel URLs] objectAtIndex: 0] path]];
-    }
     
-    [torrents release];
+    [panel beginSheetModalForWindow: fWindow completionHandler: ^(NSInteger result) {
+        if (result == NSFileHandlingPanelOKButton)
+        {
+            for (Torrent * torrent in torrents)
+                [torrent moveTorrentDataFileTo: [[[panel URLs] objectAtIndex: 0] path]];
+        }
+    }];
 }
 
 - (void) copyTorrentFiles: (id) sender
@@ -1476,8 +1466,16 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         [panel setAllowedFileTypes: [NSArray arrayWithObjects: @"org.bittorrent.torrent", @"torrent", nil]];
         [panel setExtensionHidden: NO];
         
-        [panel beginSheetForDirectory: nil file: [torrent name] modalForWindow: fWindow modalDelegate: self
-            didEndSelector: @selector(saveTorrentCopySheetClosed:returnCode:contextInfo:) contextInfo: torrents];
+        [panel setNameFieldStringValue: [torrent name]];
+        
+        [panel beginSheetModalForWindow: fWindow completionHandler: ^(NSInteger result) {
+            //copy torrent to new location with name of data file
+            if (result == NSFileHandlingPanelOKButton)
+                [torrent copyTorrentFileTo: [[panel URL] path]];
+            
+            [torrents removeObjectAtIndex: 0];
+            [self performSelectorOnMainThread: @selector(copyTorrentFileForTorrents:) withObject: torrents waitUntilDone: NO];
+        }];
     }
     else
     {
@@ -1499,16 +1497,6 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         [torrents removeObjectAtIndex: 0];
         [self copyTorrentFileForTorrents: torrents];
     }
-}
-
-- (void) saveTorrentCopySheetClosed: (NSSavePanel *) panel returnCode: (NSInteger) code contextInfo: (NSMutableArray *) torrents
-{
-    //copy torrent to new location with name of data file
-    if (code == NSOKButton)
-        [[torrents objectAtIndex: 0] copyTorrentFileTo: [[panel URL] path]];
-    
-    [torrents removeObjectAtIndex: 0];
-    [self performSelectorOnMainThread: @selector(copyTorrentFileForTorrents:) withObject: torrents waitUntilDone: NO];
 }
 
 - (void) copyMagnetLinks: (id) sender

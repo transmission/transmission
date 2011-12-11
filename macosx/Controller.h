@@ -152,7 +152,6 @@ typedef enum
 
 - (void) moveDataFilesSelected: (id) sender;
 - (void) moveDataFiles: (NSArray *) torrents;
-- (void) moveDataFileChoiceClosed: (NSOpenPanel *) panel returnCode: (NSInteger) code contextInfo: (NSArray *) torrents;
 
 - (void) copyTorrentFiles: (id) sender;
 - (void) copyTorrentFileForTorrents: (NSMutableArray *) torrents;

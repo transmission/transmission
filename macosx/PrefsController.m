@@ -59,11 +59,6 @@
 
 - (void) setPrefView: (id) sender;
 
-- (void) folderSheetClosed: (NSOpenPanel *) openPanel returnCode: (int) code contextInfo: (void *) info;
-- (void) incompleteFolderSheetClosed: (NSOpenPanel *) openPanel returnCode: (int) code contextInfo: (void *) info;
-- (void) importFolderSheetClosed: (NSOpenPanel *) openPanel returnCode: (int) code contextInfo: (void *) info;
-- (void) doneScriptSheetClosed: (NSOpenPanel *) openPanel returnCode: (int) code contextInfo: (void *) info;
-
 - (void) setKeychainPassword: (const char *) password forService: (const char *) service username: (const char *) username;
 
 @end
@@ -815,10 +810,24 @@ tr_session * fHandle;
     [panel setCanChooseFiles: NO];
     [panel setCanChooseDirectories: YES];
     [panel setCanCreateDirectories: YES];
-
-    [panel beginSheetForDirectory: nil file: nil types: nil
-        modalForWindow: [self window] modalDelegate: self didEndSelector:
-        @selector(folderSheetClosed:returnCode:contextInfo:) contextInfo: nil];
+    
+    [panel beginSheetModalForWindow: [self window] completionHandler: ^(NSInteger result) {
+        if (result == NSFileHandlingPanelOKButton)
+        {
+            [fFolderPopUp selectItemAtIndex: DOWNLOAD_FOLDER];
+            
+            NSString * folder = [[[panel URLs] objectAtIndex: 0] path];
+            [fDefaults setObject: folder forKey: @"DownloadFolder"];
+            [fDefaults setObject: @"Constant" forKey: @"DownloadChoice"];
+            
+            tr_sessionSetDownloadDir(fHandle, [folder UTF8String]);
+        }
+        else
+        {
+            //reset if cancelled
+            [fFolderPopUp selectItemAtIndex: [fDefaults boolForKey: @"DownloadLocationConstant"] ? DOWNLOAD_FOLDER : DOWNLOAD_TORRENT];
+        }
+    }];
 }
 
 - (void) incompleteFolderSheetShow: (id) sender
@@ -830,10 +839,17 @@ tr_session * fHandle;
     [panel setCanChooseFiles: NO];
     [panel setCanChooseDirectories: YES];
     [panel setCanCreateDirectories: YES];
-
-    [panel beginSheetForDirectory: nil file: nil types: nil
-        modalForWindow: [self window] modalDelegate: self didEndSelector:
-        @selector(incompleteFolderSheetClosed:returnCode:contextInfo:) contextInfo: nil];
+    
+    [panel beginSheetModalForWindow: [self window] completionHandler: ^(NSInteger result) {
+        if (result == NSFileHandlingPanelOKButton)
+        {
+            NSString * folder = [[[panel URLs] objectAtIndex: 0] path];
+            [fDefaults setObject: folder forKey: @"IncompleteDownloadFolder"];
+            
+            tr_sessionSetIncompleteDir(fHandle, [folder UTF8String]);
+        }
+        [fIncompleteFolderPopUp selectItemAtIndex: 0];
+    }];
 }
 
 - (void) doneScriptSheetShow:(id)sender
@@ -846,9 +862,19 @@ tr_session * fHandle;
     [panel setCanChooseDirectories: NO];
     [panel setCanCreateDirectories: NO];
     
-    [panel beginSheetForDirectory: nil file: nil types: nil
-                   modalForWindow: [self window] modalDelegate: self didEndSelector:
-     @selector(doneScriptSheetClosed:returnCode:contextInfo:) contextInfo: nil];
+    [panel beginSheetModalForWindow: [self window] completionHandler: ^(NSInteger result) {
+        if (result == NSFileHandlingPanelOKButton)
+        {
+            NSString * filePath = [[[panel URLs] objectAtIndex: 0] path];
+            
+            [fDefaults setObject: filePath forKey: @"DoneScriptPath"];
+            tr_sessionSetTorrentDoneScript(fHandle, [filePath UTF8String]);
+            
+            [fDefaults setBool: YES forKey: @"DoneScriptEnabled"];
+            tr_sessionSetTorrentDoneScriptEnabled(fHandle, YES);
+        }
+        [fDoneScriptPopUp selectItemAtIndex: 0];
+    }];
 }
 
 - (void) setUseIncompleteFolder: (id) sender
@@ -899,9 +925,25 @@ tr_session * fHandle;
     [panel setCanChooseDirectories: YES];
     [panel setCanCreateDirectories: YES];
 
-    [panel beginSheetForDirectory: nil file: nil types: nil
-        modalForWindow: [self window] modalDelegate: self didEndSelector:
-        @selector(importFolderSheetClosed:returnCode:contextInfo:) contextInfo: nil];
+    [panel beginSheetModalForWindow: [self window] completionHandler: ^(NSInteger result) {
+        NSString * path = [fDefaults stringForKey: @"AutoImportDirectory"];
+        if (result == NSFileHandlingPanelOKButton)
+        {
+            UKKQueue * sharedQueue = [UKKQueue sharedFileWatcher];
+            if (path)
+                [sharedQueue removePathFromQueue: [path stringByExpandingTildeInPath]];
+            
+            path = [[[panel URLs] objectAtIndex: 0] path];
+            [fDefaults setObject: path forKey: @"AutoImportDirectory"];
+            [sharedQueue addPath: [path stringByExpandingTildeInPath]];
+            
+            [[NSNotificationCenter defaultCenter] postNotificationName: @"AutoImportSettingChange" object: self];
+        }
+        else if (!path)
+            [fDefaults setBool: NO forKey: @"AutoImport"];
+        
+        [fImportFolderPopUp selectItemAtIndex: 0];
+    }];
 }
 
 - (void) setAutoSize: (id) sender
@@ -1390,80 +1432,6 @@ tr_session * fHandle;
                 break;
             }
     }
-}
-
-- (void) folderSheetClosed: (NSOpenPanel *) openPanel returnCode: (int) code contextInfo: (void *) info
-{
-    if (code == NSOKButton)
-    {
-        [fFolderPopUp selectItemAtIndex: DOWNLOAD_FOLDER];
-        
-        NSString * folder = [[[openPanel URLs] objectAtIndex: 0] path];
-        [fDefaults setObject: folder forKey: @"DownloadFolder"];
-        [fDefaults setObject: @"Constant" forKey: @"DownloadChoice"];
-        
-        tr_sessionSetDownloadDir(fHandle, [folder UTF8String]);
-    }
-    else
-    {
-        //reset if cancelled
-        [fFolderPopUp selectItemAtIndex: [fDefaults boolForKey: @"DownloadLocationConstant"] ? DOWNLOAD_FOLDER : DOWNLOAD_TORRENT];
-    }
-}
-
-- (void) incompleteFolderSheetClosed: (NSOpenPanel *) openPanel returnCode: (int) code contextInfo: (void *) info
-{
-    if (code == NSOKButton)
-    {
-        NSString * folder = [[[openPanel URLs] objectAtIndex: 0] path];
-        [fDefaults setObject: folder forKey: @"IncompleteDownloadFolder"];
-        
-        tr_sessionSetIncompleteDir(fHandle, [folder UTF8String]);
-    }
-    [fIncompleteFolderPopUp selectItemAtIndex: 0];
-}
-
-- (void) importFolderSheetClosed: (NSOpenPanel *) openPanel returnCode: (int) code contextInfo: (void *) info
-{
-    NSString * path = [fDefaults stringForKey: @"AutoImportDirectory"];
-    if (code == NSOKButton)
-    {
-        UKKQueue * sharedQueue = [UKKQueue sharedFileWatcher];
-        if (path)
-            [sharedQueue removePathFromQueue: [path stringByExpandingTildeInPath]];
-        
-        path = [[[openPanel URLs] objectAtIndex: 0] path];
-        [fDefaults setObject: path forKey: @"AutoImportDirectory"];
-        [sharedQueue addPath: [path stringByExpandingTildeInPath]];
-        
-        [[NSNotificationCenter defaultCenter] postNotificationName: @"AutoImportSettingChange" object: self];
-    }
-    else if (!path)
-        [fDefaults setBool: NO forKey: @"AutoImport"];
-    
-    [fImportFolderPopUp selectItemAtIndex: 0];
-}
-
-- (void) doneScriptSheetClosed: (NSOpenPanel *) openPanel returnCode: (int) code contextInfo: (void *) info
-{
-    if (code == NSOKButton)
-    {
-        NSString * filePath = [[[openPanel URLs] objectAtIndex: 0] path];
-        
-        if ([[NSFileManager defaultManager] fileExistsAtPath: filePath])  // script file exists
-        {
-            [fDefaults setObject: filePath forKey: @"DoneScriptPath"];
-            [fDefaults setBool: YES forKey: @"DoneScriptEnabled"];
-        }
-        else // script file doesn't exist so don't enable
-        {
-            [fDefaults setObject: nil forKey:@"DoneScriptPath"];
-            [fDefaults setBool: NO forKey: @"DoneScriptEnabled"];
-        }
-        tr_sessionSetTorrentDoneScript(fHandle, [[fDefaults stringForKey:@"DoneScriptPath"] UTF8String]);
-        tr_sessionSetTorrentDoneScriptEnabled(fHandle, [fDefaults boolForKey:@"DoneScriptEnabled"]);
-    }
-    [fDoneScriptPopUp selectItemAtIndex: 0];
 }
 
 - (void) setKeychainPassword: (const char *) password forService: (const char *) service username: (const char *) username

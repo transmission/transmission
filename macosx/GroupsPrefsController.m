@@ -194,10 +194,25 @@
     [panel setCanChooseFiles: NO];
     [panel setCanChooseDirectories: YES];
     [panel setCanCreateDirectories: YES];
-
-    [panel beginSheetForDirectory: nil file: nil types: nil
-        modalForWindow: [fCustomLocationPopUp window] modalDelegate: self didEndSelector:
-        @selector(customDownloadLocationSheetClosed:returnCode:contextInfo:) contextInfo: nil];
+    
+    [panel beginSheetModalForWindow: [fCustomLocationPopUp window] completionHandler: ^(NSInteger result) {
+        const NSInteger index = [[GroupsController groups] indexForRow: [fTableView selectedRow]];
+        if (result == NSFileHandlingPanelOKButton)
+        {
+            NSString * path = [[[panel URLs] objectAtIndex: 0] path];
+            [[GroupsController groups] setCustomDownloadLocation: path forIndex: index];
+            [[GroupsController groups] setUsesCustomDownloadLocation: YES forIndex: index];
+        }
+        else
+        {
+            if (![[GroupsController groups] customDownloadLocationForIndex: index])
+                [[GroupsController groups] setUsesCustomDownloadLocation: NO forIndex: index];
+        }
+        
+        [self refreshCustomLocationWithSingleGroup];
+        
+        [fCustomLocationPopUp selectItemAtIndex: 0];
+    }];
 }
 
 - (IBAction) toggleUseCustomDownloadLocation: (id) sender
@@ -214,26 +229,6 @@
         [[GroupsController groups] setUsesCustomDownloadLocation: NO forIndex: index];
 
     [fCustomLocationPopUp setEnabled: ([fCustomLocationEnableCheck state] == NSOnState)];
-}
-
-- (void) customDownloadLocationSheetClosed: (NSOpenPanel *) openPanel returnCode: (int) code contextInfo: (void *) info
-{
-    NSInteger index = [[GroupsController groups] indexForRow: [fTableView selectedRow]];
-    if (code == NSOKButton)
-    {
-        NSString * path = [[[openPanel URLs] objectAtIndex: 0] path];
-        [[GroupsController groups] setCustomDownloadLocation: path forIndex: index];
-        [[GroupsController groups] setUsesCustomDownloadLocation: YES forIndex: index];
-    }
-    else
-    {
-        if (![[GroupsController groups] customDownloadLocationForIndex: index])
-            [[GroupsController groups] setUsesCustomDownloadLocation: NO forIndex: index];
-    }
-    
-    [self refreshCustomLocationWithSingleGroup];
-    
-    [fCustomLocationPopUp selectItemAtIndex: 0];
 }
 
 #pragma mark -

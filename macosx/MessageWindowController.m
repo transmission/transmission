@@ -378,48 +378,43 @@
 
 - (void) writeToFile: (id) sender
 {
-    //make the array sorted by date
-    NSSortDescriptor * descriptor = [NSSortDescriptor sortDescriptorWithKey: @"Index" ascending: YES];
-    NSArray * descriptors = [[NSArray alloc] initWithObjects: descriptor, nil];
-    NSArray * sortedMessages = [[fDisplayedMessages sortedArrayUsingDescriptors: descriptors] retain];
-    [descriptors release];
-    
     NSSavePanel * panel = [NSSavePanel savePanel];
     [panel setAllowedFileTypes: [NSArray arrayWithObject: @"txt"]];
     [panel setCanSelectHiddenExtension: YES];
     
-    [panel beginSheetForDirectory: nil file: NSLocalizedString(@"untitled", "Save log panel -> default file name")
-            modalForWindow: [self window] modalDelegate: self
-            didEndSelector: @selector(writeToFileSheetClosed:returnCode:contextInfo:) contextInfo: sortedMessages];
-}
-
-- (void) writeToFileSheetClosed: (NSSavePanel *) panel returnCode: (NSInteger) code contextInfo: (NSArray *) messages
-{
-    if (code == NSOKButton)
-    {
-        //create the text to output
-        NSMutableArray * messageStrings = [NSMutableArray arrayWithCapacity: [messages count]];
-        for (NSDictionary * message in messages)
-            [messageStrings addObject: [self stringForMessage: message]];
+    [panel setNameFieldStringValue: NSLocalizedString(@"untitled", "Save log panel -> default file name")];
     
-        NSString * fileString = [messageStrings componentsJoinedByString: @"\n"];
-        
-        if (![fileString writeToFile: [[panel URL] path] atomically: YES encoding: NSUTF8StringEncoding error: nil])
+    [panel beginSheetModalForWindow: [self window] completionHandler: ^(NSInteger result) {
+        if (result == NSFileHandlingPanelOKButton)
         {
-            NSAlert * alert = [[NSAlert alloc] init];
-            [alert addButtonWithTitle: NSLocalizedString(@"OK", "Save log alert panel -> button")];
-            [alert setMessageText: NSLocalizedString(@"Log Could Not Be Saved", "Save log alert panel -> title")];
-            [alert setInformativeText: [NSString stringWithFormat:
-                    NSLocalizedString(@"There was a problem creating the file \"%@\".",
-                    "Save log alert panel -> message"), [[[panel URL] path] lastPathComponent]]];
-            [alert setAlertStyle: NSWarningAlertStyle];
+            //make the array sorted by date
+            NSSortDescriptor * descriptor = [NSSortDescriptor sortDescriptorWithKey: @"Index" ascending: YES];
+            NSArray * descriptors = [[NSArray alloc] initWithObjects: descriptor, nil];
+            NSArray * sortedMessages = [fDisplayedMessages sortedArrayUsingDescriptors: descriptors];
+            [descriptors release];
             
-            [alert runModal];
-            [alert release];
+            //create the text to output
+            NSMutableArray * messageStrings = [NSMutableArray arrayWithCapacity: [sortedMessages count]];
+            for (NSDictionary * message in sortedMessages)
+                [messageStrings addObject: [self stringForMessage: message]];
+            
+            NSString * fileString = [messageStrings componentsJoinedByString: @"\n"];
+            
+            if (![fileString writeToFile: [[panel URL] path] atomically: YES encoding: NSUTF8StringEncoding error: nil])
+            {
+                NSAlert * alert = [[NSAlert alloc] init];
+                [alert addButtonWithTitle: NSLocalizedString(@"OK", "Save log alert panel -> button")];
+                [alert setMessageText: NSLocalizedString(@"Log Could Not Be Saved", "Save log alert panel -> title")];
+                [alert setInformativeText: [NSString stringWithFormat:
+                                            NSLocalizedString(@"There was a problem creating the file \"%@\".",
+                                                              "Save log alert panel -> message"), [[[panel URL] path] lastPathComponent]]];
+                [alert setAlertStyle: NSWarningAlertStyle];
+                
+                [alert runModal];
+                [alert release];
+            }
         }
-    }
-    
-    [messages release];
+    }];
 }
 
 @end

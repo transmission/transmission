@@ -44,8 +44,6 @@
 
 - (void) setDestinationPath: (NSString *) destination;
 
-- (void) folderChoiceClosed: (NSOpenPanel *) openPanel returnCode: (NSInteger) code contextInfo: (void *) contextInfo;
-
 - (void) setGroupsMenu;
 - (void) changeGroupValue: (id) sender;
 
@@ -166,8 +164,18 @@
     [panel setMessage: [NSString stringWithFormat: NSLocalizedString(@"Select the download folder for \"%@\"",
                         "Add -> select destination folder"), [fTorrent name]]];
     
-    [panel beginSheetForDirectory: nil file: nil types: nil modalForWindow: [self window] modalDelegate: self
-            didEndSelector: @selector(folderChoiceClosed:returnCode:contextInfo:) contextInfo: nil];
+    [panel beginSheetModalForWindow: [self window] completionHandler: ^(NSInteger result) {
+        if (result == NSFileHandlingPanelOKButton)
+        {
+            fLockDestination = NO;
+            [self setDestinationPath: [[[panel URLs] objectAtIndex: 0] path]];
+        }
+        else
+        {
+            if (!fDestination)
+                [self performSelectorOnMainThread: @selector(cancelAdd:) withObject: nil waitUntilDone: NO];
+        }
+    }];
 }
 
 - (void) add: (id) sender
@@ -320,20 +328,6 @@
     ExpandedPathToIconTransformer * iconTransformer = [[ExpandedPathToIconTransformer alloc] init];
     [fLocationImageView setImage: [iconTransformer transformedValue: fDestination]];
     [iconTransformer release];
-}
-
-- (void) folderChoiceClosed: (NSOpenPanel *) openPanel returnCode: (NSInteger) code contextInfo: (void *) contextInfo
-{
-    if (code == NSOKButton)
-    {
-        fLockDestination = NO;
-        [self setDestinationPath: [[[openPanel URLs] objectAtIndex: 0] path]];
-    }
-    else
-    {
-        if (!fDestination)
-            [self performSelectorOnMainThread: @selector(cancelAdd:) withObject: nil waitUntilDone: NO];
-    }
 }
 
 - (void) setGroupsMenu
