@@ -319,8 +319,8 @@ testJSONSnippet( const char * benc_str,
                  const char * expected )
 {
     tr_benc top;
-    struct evbuffer * buf = evbuffer_new( );
     char * serialized;
+    struct evbuffer * buf;
 
     tr_bencLoad( benc_str, strlen( benc_str ), &top, NULL );
     buf = tr_bencToBuf( &top, TR_FMT_JSON );
