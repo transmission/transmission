@@ -478,19 +478,25 @@ fileset_lookup( struct tr_fileset * set, int torrent_id, tr_file_index_t i )
 static struct tr_cached_file *
 fileset_get_empty_slot( struct tr_fileset * set )
 {
-    struct tr_cached_file * o;
-    struct tr_cached_file * cull;
+    struct tr_cached_file * cull = NULL;
 
-    /* try to find an unused slot */
-    for( o=set->begin; o!=set->end; ++o )
-        if( !cached_file_is_open( o ) )
-            return o;
+    if( set->begin != NULL )
+    {
+        struct tr_cached_file * o;
 
-    /* all slots are full... recycle the least recently used */
-    for( cull=NULL, o=set->begin; o!=set->end; ++o )
-        if( !cull || o->used_at < cull->used_at )
-            cull = o;
-    cached_file_close( cull );
+        /* try to find an unused slot */
+        for( o=set->begin; o!=set->end; ++o )
+            if( !cached_file_is_open( o ) )
+                return o;
+
+        /* all slots are full... recycle the least recently used */
+        for( cull=NULL, o=set->begin; o!=set->end; ++o )
+            if( !cull || o->used_at < cull->used_at )
+                cull = o;
+
+        cached_file_close( cull );
+    }
+
     return cull;
 }
 
