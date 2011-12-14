@@ -978,11 +978,19 @@ bool
 tr_urlIsValidTracker( const char * url )
 {
     bool valid;
-    const int len = url ? strlen(url) : 0;
 
-    valid = isValidURLChars( url, len )
-         && !tr_urlParse( url, len, NULL, NULL, NULL, NULL )
-         && ( !memcmp(url,"http://",7) || !memcmp(url,"https://",8) || !memcmp(url,"udp://",6) );
+    if( url == NULL )
+    {
+        valid = false;
+    }
+    else
+    {
+        const int len = strlen( url );
+
+        valid = isValidURLChars( url, len )
+            && !tr_urlParse( url, len, NULL, NULL, NULL, NULL )
+            && ( !memcmp(url,"http://",7) || !memcmp(url,"https://",8) || !memcmp(url,"udp://",6) );
+    }
 
     return valid;
 }
@@ -992,12 +1000,20 @@ bool
 tr_urlIsValid( const char * url, int url_len )
 {
     bool valid;
-    if( ( url_len < 0 ) && ( url != NULL ) )
-        url_len = strlen( url );
 
-    valid = isValidURLChars( url, url_len )
-         && !tr_urlParse( url, url_len, NULL, NULL, NULL, NULL )
-         && ( !memcmp(url,"http://",7) || !memcmp(url,"https://",8) || !memcmp(url,"ftp://",6) || !memcmp(url,"sftp://",7) );
+    if( url == NULL )
+    {
+        valid = false;
+    }
+    else
+    {
+        if( url_len < 0 )
+            url_len = strlen( url );
+
+        valid = isValidURLChars( url, url_len )
+            && !tr_urlParse( url, url_len, NULL, NULL, NULL, NULL )
+            && ( !memcmp(url,"http://",7) || !memcmp(url,"https://",8) || !memcmp(url,"ftp://",6) || !memcmp(url,"sftp://",7) );
+    }
 
     return valid;
 }
