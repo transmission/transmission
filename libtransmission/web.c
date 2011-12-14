@@ -188,8 +188,11 @@ createEasy( tr_session * s, struct tr_web * web, struct tr_web_task * task )
     if( task->cookies != NULL )
         curl_easy_setopt( e, CURLOPT_COOKIE, task->cookies );
 
-    if( task->range )
+    if( task->range != NULL ) {
         curl_easy_setopt( e, CURLOPT_RANGE, task->range );
+        /* don't bother asking the server to compress webseed fragments */
+        curl_easy_setopt( e, CURLOPT_ENCODING, "identity" );
+    }
 
     return e;
 }
