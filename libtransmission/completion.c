@@ -165,19 +165,13 @@ tr_cpSizeWhenDone( const tr_completion * ccp )
                 }
                 else
                 {
-                    uint64_t o = 0;
-                    tr_block_index_t b, f, l;
+                    tr_block_index_t f, l;
                     tr_torGetPieceBlockRange( cp->tor, p, &f, &l );
-                    for( b=f; b<=l; ++b )
-                        if( tr_cpBlockIsComplete( cp, b ) )
-                            n += tr_torBlockCountBytes( tor, b );
 
-                    o = tr_bitfieldCountRange( &cp->blockBitfield, f, l+1 );
-                    o *= cp->tor->blockSize;
+                    n = tr_bitfieldCountRange( &cp->blockBitfield, f, l+1 );
+                    n *= cp->tor->blockSize;
                     if( l == ( cp->tor->blockCount - 1 )  && tr_bitfieldHas( &cp->blockBitfield, l ) )
-                        o -= ( cp->tor->blockSize - cp->tor->lastBlockSize );
-
-                    assert( n == o );
+                        n -= ( cp->tor->blockSize - cp->tor->lastBlockSize );
                 }
 
                 assert( n <= tr_torPieceCountBytes( tor, p ) );
