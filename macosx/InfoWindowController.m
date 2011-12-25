@@ -302,14 +302,17 @@ typedef enum
     
     if ([fViewController respondsToSelector: @selector(saveViewSize)]) //a little bit hacky, but avoids requiring an extra method
     {
-        const CGFloat screenHeight = NSHeight([[window screen] visibleFrame]);
-        if (NSHeight(windowRect) > screenHeight)
+        if ([window screen])
         {
-            const CGFloat difference = (screenHeight - NSHeight(windowRect)) * [window userSpaceScaleFactor];
-            windowRect.origin.y -= difference;
-            windowRect.size.height += difference;
-            
-            viewRect.size.height += difference;
+            const CGFloat screenHeight = NSHeight([[window screen] visibleFrame]);
+            if (NSHeight(windowRect) > screenHeight)
+            {
+                const CGFloat difference = (screenHeight - NSHeight(windowRect)) * [window userSpaceScaleFactor];
+                windowRect.origin.y -= difference;
+                windowRect.size.height += difference;
+                
+                viewRect.size.height += difference;
+            }
         }
         
         [window setMinSize: NSMakeSize([window minSize].width, NSHeight(windowRect) - NSHeight(viewRect) + TAB_MIN_HEIGHT)];
