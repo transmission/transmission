@@ -551,7 +551,7 @@
         NSArray * items = [[NSPasteboard generalPasteboard] readObjectsForClasses: [NSArray arrayWithObject: [NSString class]] options: nil];
         if (items)
         {
-            NSDataDetector * detector = [NSDataDetector dataDetectorWithTypes: NSTextCheckingTypeLink error: nil];
+            NSDataDetector * detector = [NSDataDetectorLion dataDetectorWithTypes: NSTextCheckingTypeLink error: nil];
             for (NSString * pbItem in items)
             {
                 for (NSTextCheckingResult * result in [detector matchesInString: pbItem options: 0 range: NSMakeRange(0, [pbItem length])])
@@ -572,14 +572,17 @@
         if ([[[NSPasteboard generalPasteboard] types] containsObject: NSURLPboardType])
             return YES;
         
-        NSArray * items = [[NSPasteboard generalPasteboard] readObjectsForClasses: [NSArray arrayWithObject: [NSString class]] options: nil];
-        if (items)
+        if ([NSApp isOnLionOrBetter])
         {
-            NSDataDetector * detector = [NSDataDetector dataDetectorWithTypes: NSTextCheckingTypeLink error: nil];
-            for (NSString * pbItem in items)
+            NSArray * items = [[NSPasteboard generalPasteboard] readObjectsForClasses: [NSArray arrayWithObject: [NSString class]] options: nil];
+            if (items)
             {
-                if ([detector firstMatchInString: pbItem options: 0 range: NSMakeRange(0, [pbItem length])])
-                    return YES;
+                NSDataDetector * detector = [NSDataDetectorLion dataDetectorWithTypes: NSTextCheckingTypeLink error: nil];
+                for (NSString * pbItem in items)
+                {
+                    if ([detector firstMatchInString: pbItem options: 0 range: NSMakeRange(0, [pbItem length])])
+                        return YES;
+                }
             }
         }
         

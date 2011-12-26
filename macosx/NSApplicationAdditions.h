@@ -23,6 +23,7 @@
  *****************************************************************************/
 
 #define NSPopoverLion NSClassFromString(@"NSPopover")
+#define NSDataDetectorLion NSClassFromString(@"NSDataDetector")
 
 @interface NSApplication (NSApplicationAdditions)
 
