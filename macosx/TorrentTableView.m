@@ -545,8 +545,7 @@
     NSURL * url;
     if ((url = [NSURL URLFromPasteboard: [NSPasteboard generalPasteboard]]))
         [fController openURL: [url absoluteString]];
-    
-    if ([NSApp isOnLionOrBetter])
+    else if ([NSApp isOnLionOrBetter])
     {
         NSArray * items = [[NSPasteboard generalPasteboard] readObjectsForClasses: [NSArray arrayWithObject: [NSString class]] options: nil];
         if (items)
@@ -555,9 +554,7 @@
             for (NSString * pbItem in items)
             {
                 for (NSTextCheckingResult * result in [detector matchesInString: pbItem options: 0 range: NSMakeRange(0, [pbItem length])])
-                {
                     [fController openURL: [[result URL] absoluteString]];
-                }
             }
         }
     }
