@@ -540,12 +540,27 @@
     return [fTorrentCell iconRectForBounds: [self rectOfRow: row]];
 }
 
-#warning catch string urls?
 - (void) paste: (id) sender
 {
     NSURL * url;
     if ((url = [NSURL URLFromPasteboard: [NSPasteboard generalPasteboard]]))
         [fController openURL: [url absoluteString]];
+    
+    if ([NSApp isOnLionOrBetter])
+    {
+        NSArray * items = [[NSPasteboard generalPasteboard] readObjectsForClasses: [NSArray arrayWithObject: [NSString class]] options: nil];
+        if (items)
+        {
+            NSDataDetector * detector = [NSDataDetector dataDetectorWithTypes: NSTextCheckingTypeLink error: nil];
+            for (NSString * pbItem in items)
+            {
+                for (NSTextCheckingResult * result in [detector matchesInString: pbItem options: 0 range: NSMakeRange(0, [pbItem length])])
+                {
+                    [fController openURL: [[result URL] absoluteString]];
+                }
+            }
+        }
+    }
 }
 
 - (BOOL) validateMenuItem: (NSMenuItem *) menuItem
@@ -553,7 +568,23 @@
     SEL action = [menuItem action];
     
     if (action == @selector(paste:))
-        return [[[NSPasteboard generalPasteboard] types] containsObject: NSURLPboardType];
+    {
+        if ([[[NSPasteboard generalPasteboard] types] containsObject: NSURLPboardType])
+            return YES;
+        
+        NSArray * items = [[NSPasteboard generalPasteboard] readObjectsForClasses: [NSArray arrayWithObject: [NSString class]] options: nil];
+        if (items)
+        {
+            NSDataDetector * detector = [NSDataDetector dataDetectorWithTypes: NSTextCheckingTypeLink error: nil];
+            for (NSString * pbItem in items)
+            {
+                if ([detector firstMatchInString: pbItem options: 0 range: NSMakeRange(0, [pbItem length])])
+                    return YES;
+            }
+        }
+        
+        return NO;
+    }
     
     return YES;
 }
