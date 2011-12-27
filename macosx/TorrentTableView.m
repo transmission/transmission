@@ -553,8 +553,14 @@
             NSDataDetector * detector = [NSDataDetectorLion dataDetectorWithTypes: NSTextCheckingTypeLink error: nil];
             for (NSString * pbItem in items)
             {
-                for (NSTextCheckingResult * result in [detector matchesInString: pbItem options: 0 range: NSMakeRange(0, [pbItem length])])
-                    [fController openURL: [[result URL] absoluteString]];
+                if ([pbItem rangeOfString: @"magnet:" options: (NSAnchoredSearch | NSCaseInsensitiveSearch)].location != NSNotFound)
+                    [fController openURL: pbItem];
+                else
+                {
+                    #warning only accept full text?
+                    for (NSTextCheckingResult * result in [detector matchesInString: pbItem options: 0 range: NSMakeRange(0, [pbItem length])])
+                        [fController openURL: [[result URL] absoluteString]];
+                }
             }
         }
     }
@@ -577,7 +583,8 @@
                 NSDataDetector * detector = [NSDataDetectorLion dataDetectorWithTypes: NSTextCheckingTypeLink error: nil];
                 for (NSString * pbItem in items)
                 {
-                    if ([detector firstMatchInString: pbItem options: 0 range: NSMakeRange(0, [pbItem length])])
+                    if (([pbItem rangeOfString: @"magnet:" options: (NSAnchoredSearch | NSCaseInsensitiveSearch)].location != NSNotFound)
+                        || [detector firstMatchInString: pbItem options: 0 range: NSMakeRange(0, [pbItem length])])
                         return YES;
                 }
             }
