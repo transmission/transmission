@@ -114,6 +114,7 @@ typedef enum
 #define GROWL_AUTO_ADD          @"Torrent Auto Added"
 #define GROWL_AUTO_SPEED_LIMIT  @"Speed Limit Auto Changed"
 
+#warning remove when Lion-only
 #define TORRENT_TABLE_VIEW_DATA_TYPE    @"TorrentTableViewDataType"
 
 #define ROW_HEIGHT_REGULAR      62.0
@@ -398,7 +399,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     [fClearCompletedButton setToolTip: NSLocalizedString(@"Remove all transfers that have completed seeding.",
                                 "Main window -> 3rd bottom left button (remove all) tooltip")];
     
-    [fTableView registerForDraggedTypes: [NSArray arrayWithObject: TORRENT_TABLE_VIEW_DATA_TYPE]];
+    [fTableView registerForDraggedTypes: [NSArray arrayWithObjects: TORRENT_TABLE_VIEW_DATA_TYPE, NSPasteboardTypeString, nil]];
     [fWindow registerForDraggedTypes: [NSArray arrayWithObjects: NSFilenamesPboardType, NSURLPboardType, nil]];
     
     //you would think this would be called later in this method from updateUI, but it's not reached in awakeFromNib
@@ -2475,6 +2476,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     }
 }
 
+#warning remove when Lion-only
 - (BOOL) outlineView: (NSOutlineView *) outlineView writeItems: (NSArray *) items toPasteboard: (NSPasteboard *) pasteboard
 {
     //only allow reordering of rows if sorting by order
@@ -2489,18 +2491,29 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
             [indexSet addIndex: [fTableView rowForItem: torrent]];
         }
         
-        [pasteboard declareTypes: [NSArray arrayWithObject: TORRENT_TABLE_VIEW_DATA_TYPE] owner: self];
         [pasteboard setData: [NSKeyedArchiver archivedDataWithRootObject: indexSet] forType: TORRENT_TABLE_VIEW_DATA_TYPE];
         return YES;
     }
     return NO;
 }
 
-- (NSDragOperation) outlineView: (NSOutlineView *) outlineView validateDrop: (id < NSDraggingInfo >) info proposedItem: (id) item
-    proposedChildIndex: (NSInteger) index
+- (id <NSPasteboardWriting>) outlineView: (NSOutlineView *) outlineView pasteboardWriterForItem: (id) item
 {
-    NSPasteboard * pasteboard = [info draggingPasteboard];
-    if ([[pasteboard types] containsObject: TORRENT_TABLE_VIEW_DATA_TYPE])
+    //only allow reordering of rows if sorting by order
+    if ([item isKindOfClass: [Torrent class]] && ([fDefaults boolForKey: @"SortByGroup"] || [[fDefaults stringForKey: @"Sort"] isEqualToString: SORT_ORDER]))
+    {
+        NSPasteboardItem * pbItem = [[[NSPasteboardItem alloc] init] autorelease];
+        #warning might make more sense to use TORRENT_TABLE_VIEW_DATA_TYPE
+        [pbItem setData: [NSKeyedArchiver archivedDataWithRootObject: [NSNumber numberWithInteger: [fTableView rowForItem: item]]] forType: NSPasteboardTypeString];
+        return pbItem;
+    }
+    else
+        return nil;
+}
+
+- (NSDragOperation) outlineView: (NSOutlineView *) outlineView validateDrop: (id <NSDraggingInfo>) info proposedItem: (id) item proposedChildIndex: (NSInteger) index
+{
+    if ([info draggingSource] == outlineView)
     {
         if ([fDefaults boolForKey: @"SortByGroup"])
         {
@@ -2539,21 +2552,35 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     return NSDragOperationNone;
 }
 
-- (BOOL) outlineView: (NSOutlineView *) outlineView acceptDrop: (id < NSDraggingInfo >) info item: (id) item
-    childIndex: (NSInteger) newRow
+- (BOOL) outlineView: (NSOutlineView *) outlineView acceptDrop: (id <NSDraggingInfo>) info item: (id) item childIndex: (NSInteger) newRow
 {
-    NSPasteboard * pasteboard = [info draggingPasteboard];
-    if ([[pasteboard types] containsObject: TORRENT_TABLE_VIEW_DATA_TYPE])
+    if ([info draggingSource] == outlineView)
     {
         //remember selected rows
         NSArray * selectedValues = [fTableView selectedValues];
-    
-        NSIndexSet * indexes = [NSKeyedUnarchiver unarchiveObjectWithData: [pasteboard dataForType: TORRENT_TABLE_VIEW_DATA_TYPE]];
         
-        //get the torrents to move
-        NSMutableArray * movingTorrents = [NSMutableArray arrayWithCapacity: [indexes count]];
-        for (NSUInteger i = [indexes firstIndex]; i != NSNotFound; i = [indexes indexGreaterThanIndex: i])
-            [movingTorrents addObject: [fTableView itemAtRow: i]];
+        NSMutableArray * movingTorrents;
+        if ([[[info draggingPasteboard] types] containsObject: TORRENT_TABLE_VIEW_DATA_TYPE])
+        {
+            NSAssert(![NSApp isOnLionOrBetter], @"Dragging using pre-Lion functionality on Lion or greater");
+            
+            NSIndexSet * indexes = [NSKeyedUnarchiver unarchiveObjectWithData: [[info draggingPasteboard] dataForType: TORRENT_TABLE_VIEW_DATA_TYPE]];
+            
+            //get the torrents to move
+            movingTorrents = [NSMutableArray arrayWithCapacity: [indexes count]];
+            for (NSUInteger i = [indexes firstIndex]; i != NSNotFound; i = [indexes indexGreaterThanIndex: i])
+                [movingTorrents addObject: [fTableView itemAtRow: i]];   
+        }
+        else
+        {
+            NSAssert([NSApp isOnLionOrBetter], @"Dragging using Lion functionality on pre-Lion");
+            
+            movingTorrents = [NSMutableArray arrayWithCapacity: info.numberOfValidItemsForDrop];
+            [info enumerateDraggingItemsWithOptions: 0 forView: outlineView classes: [NSArray arrayWithObject: [NSPasteboardItem class]] searchOptions: nil usingBlock: ^(NSDraggingItem * draggingItem, NSInteger index, BOOL * stop) {
+                NSNumber * rowNumber = [NSKeyedUnarchiver unarchiveObjectWithData: [draggingItem.item dataForType: NSPasteboardTypeString]];
+                [movingTorrents addObject: [fTableView itemAtRow: [rowNumber integerValue]]];
+            }];
+        }
         
         //reset groups
         if (item)
