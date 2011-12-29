@@ -2491,6 +2491,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
             [indexSet addIndex: [fTableView rowForItem: torrent]];
         }
         
+        [pasteboard declareTypes: [NSArray arrayWithObject: TORRENT_TABLE_VIEW_DATA_TYPE] owner: self]; 
         [pasteboard setData: [NSKeyedArchiver archivedDataWithRootObject: indexSet] forType: TORRENT_TABLE_VIEW_DATA_TYPE];
         return YES;
     }
