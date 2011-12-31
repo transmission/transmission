@@ -3832,22 +3832,105 @@ getPeerCandidateScore( const tr_torrent * tor, const struct peer_atom * atom, ui
     return score;
 }
 
-/* sort an array of peer candidates */
+#ifndef NDEBUG
 static int
-comparePeerCandidates( const void * va, const void * vb )
+checkPartition( const struct peer_candidate * candidates, int left, int right, uint64_t pivotScore, int storeIndex )
 {
-    const struct peer_candidate * a = va;
-    const struct peer_candidate * b = vb;
+    int i;
 
-    if( a->score < b->score ) return -1;
-    if( a->score > b->score ) return 1;
+    assert( storeIndex >= left );
+    assert( storeIndex <= right );
+    assert( candidates[storeIndex].score == pivotScore );
 
-    return 0;
+    for( i=left; i<storeIndex; ++i )
+        assert( candidates[i].score < pivotScore );
+    for( i=storeIndex+1; i<=right; ++i )
+        assert( candidates[i].score >= pivotScore );
+
+    return true;
 }
+#endif
+
+/* Helper to selectBestCandidates().
+ * Adapted from http://en.wikipedia.org/wiki/Selection_algorithm */
+static int
+partitionPeerCandidates( struct peer_candidate * candidates, int left, int right, int pivotIndex )
+{
+    int i;
+    int storeIndex;
+    struct peer_candidate tmp;
+    const struct peer_candidate pivotValue = candidates[pivotIndex];
+
+    /* move pivot to end */
+    tmp = candidates[right];
+    candidates[right] = pivotValue;
+    candidates[pivotIndex] = tmp;
+
+    storeIndex = left;
+    for( i=left; i<=right; ++i )
+    {
+        if( candidates[i].score < pivotValue.score )
+        {
+            tmp = candidates[storeIndex];
+            candidates[storeIndex] = candidates[i];
+            candidates[i] = tmp;
+            storeIndex++;
+        }
+    }
+
+    /* move pivot to its final place */
+    tmp = candidates[right];
+    candidates[right] = candidates[storeIndex];
+    candidates[storeIndex] = tmp;
+
+    /* sanity check */
+    assert( checkPartition( candidates, left, right, pivotValue.score, storeIndex ) );
+
+    return storeIndex;
+}
+
+/* Adapted from http://en.wikipedia.org/wiki/Selection_algorithm */
+static void
+selectPeerCandidates( struct peer_candidate * candidates, int left, int right, int k )
+{
+    if( right > left )
+    {
+        const int pivotIndex = left + (right-left)/2;
+
+        int pivotNewIndex = partitionPeerCandidates( candidates, left, right, pivotIndex );
+
+        if( pivotNewIndex > left + k ) /* new condition */
+            selectPeerCandidates( candidates, left, pivotNewIndex-1, k );
+        else if( pivotNewIndex < left + k )
+            selectPeerCandidates( candidates, pivotNewIndex+1, right, k+left-pivotNewIndex-1 );
+    }
+}
+
+#ifndef NDEBUG
+static bool
+checkBestScoresComeFirst( const struct peer_candidate * candidates, int n, int k )
+{
+    int i;
+    uint64_t worstFirstScore = 0;
+    const int x = MIN( n, k ) - 1;
+
+    for( i=0; i<x; i++ )
+        if( worstFirstScore < candidates[i].score )
+            worstFirstScore = candidates[i].score;
+
+    for( i=0; i<x; i++ )
+        assert( candidates[i].score <= worstFirstScore );
+
+    for( i=x+1; i<n; i++ )
+        assert( candidates[i].score >= worstFirstScore );
+
+    return true;
+}
+#endif /* NDEBUG */
 
 /** @return an array of all the atoms we might want to connect to */
 static struct peer_candidate*
-getPeerCandidates( tr_session * session, int * candidateCount )
+getPeerCandidates( tr_session * session, int * candidateCount, int max )
 {
     int atomCount;
     int peerCount;
@@ -3912,8 +3995,11 @@ getPeerCandidates( tr_session * session, int * candidateCount )
     }
 
     *candidateCount = walk - candidates;
-    if( *candidateCount > 1 )
-        qsort( candidates, *candidateCount, sizeof( struct peer_candidate ), comparePeerCandidates );
+    if( walk != candidates )
+        selectPeerCandidates( candidates, 0, (walk-candidates)-1, max );
+
+    assert( checkBestScoresComeFirst( candidates, *candidateCount, max ) );
+
     return candidates;
 }
 
@@ -3990,7 +4076,7 @@ makeNewPeerConnections( struct tr_peerMgr * mgr, const int max )
     int i, n;
     struct peer_candidate * candidates;
 
-    candidates = getPeerCandidates( mgr->session, &n );
+    candidates = getPeerCandidates( mgr->session, &n, max );
 
     for( i=0; i<n && i<max; ++i )
         initiateCandidateConnection( mgr, &candidates[i] );
