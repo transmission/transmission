@@ -26,6 +26,7 @@
 #import "GroupsController.h"
 #import "ExpandedPathToPathTransformer.h"
 #import "ExpandedPathToIconTransformer.h"
+#import "NSApplicationAdditions.h"
 
 #define GROUP_TABLE_VIEW_DATA_TYPE @"GroupTableViewDataType"
 
@@ -121,21 +122,33 @@
         NSIndexSet * indexes = [NSKeyedUnarchiver unarchiveObjectWithData: [pasteboard dataForType: GROUP_TABLE_VIEW_DATA_TYPE]];
         NSInteger oldRow = [indexes firstIndex], selectedRow = [fTableView selectedRow];
         
+        
+        if ([NSApp isOnLionOrBetter])
+            [fTableView beginUpdates];
+        
         [[GroupsController groups] moveGroupAtRow: oldRow toRow: newRow];
         
         if (oldRow < newRow)
             newRow--;
         
-        if (selectedRow == oldRow)
-            selectedRow = newRow;
-        else if (selectedRow > oldRow && selectedRow <= newRow)
-            selectedRow--;
-        else if (selectedRow < oldRow && selectedRow >= newRow)
-            selectedRow++;
-        else;
-        
-        [fTableView selectRowIndexes: [NSIndexSet indexSetWithIndex: selectedRow] byExtendingSelection: NO];
-        [fTableView reloadData];
+        if ([NSApp isOnLionOrBetter])
+        {
+            [fTableView moveRowAtIndex: oldRow toIndex: newRow];
+            [fTableView endUpdates];
+        }
+        else
+        {
+            if (selectedRow == oldRow)
+                selectedRow = newRow;
+            else if (selectedRow > oldRow && selectedRow <= newRow)
+                selectedRow--;
+            else if (selectedRow < oldRow && selectedRow >= newRow)
+                selectedRow++;
+            else;
+            
+            [fTableView selectRowIndexes: [NSIndexSet indexSetWithIndex: selectedRow] byExtendingSelection: NO];
+            [fTableView reloadData];
+        }
     }
     
     return YES;
@@ -150,11 +163,21 @@
     switch ([[sender cell] tagForSegment: [sender selectedSegment]])
     {
         case ADD_TAG:
+            if ([NSApp isOnLionOrBetter])
+                [fTableView beginUpdates];
+            
             [[GroupsController groups] addNewGroup];
             
-            [fTableView reloadData];
+            row = [fTableView numberOfRows];
             
-            row = [fTableView numberOfRows]-1;
+            if ([NSApp isOnLionOrBetter])
+            {
+                [fTableView insertRowsAtIndexes: [NSIndexSet indexSetWithIndex: row] withAnimation: NSTableViewAnimationSlideUp];
+                [fTableView endUpdates];
+            }
+            else
+                [fTableView reloadData];
+            
             [fTableView selectRowIndexes: [NSIndexSet indexSetWithIndex: row] byExtendingSelection: NO];
             [fTableView scrollRowToVisible: row];
             
@@ -164,20 +187,28 @@
         
         case REMOVE_TAG:
             row = [fTableView selectedRow];
+            
+            
+            if ([NSApp isOnLionOrBetter])
+                [fTableView beginUpdates];
+            
             [[GroupsController groups] removeGroupWithRowIndex: row];            
-                        
-            [fTableView reloadData];
+            
+            if ([NSApp isOnLionOrBetter])
+            {
+                [fTableView removeRowsAtIndexes: [NSIndexSet indexSetWithIndex: row] withAnimation: NSTableViewAnimationSlideUp];
+                [fTableView endUpdates];
+            }
+            else
+                [fTableView reloadData];
             
             if ([fTableView numberOfRows] > 0)
             {
                 if (row == [fTableView numberOfRows])
-                {
                     --row;
-                    [fTableView selectRowIndexes: [NSIndexSet indexSetWithIndex: row] byExtendingSelection: NO];
-                }
-                
-                [fTableView scrollRowToVisible: row];
+                [fTableView selectRowIndexes: [NSIndexSet indexSetWithIndex: row] byExtendingSelection: NO];
             }
+            [fTableView scrollRowToVisible: row];
             
             break;
     }
