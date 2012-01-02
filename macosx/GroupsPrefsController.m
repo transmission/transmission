@@ -156,7 +156,8 @@
 
 - (void) addRemoveGroup: (id) sender
 {
-    [[NSColorPanel sharedColorPanel] close];
+    if ([NSColorPanel sharedColorPanelExists])
+        [[NSColorPanel sharedColorPanel] close];
 
     NSInteger row;
     
