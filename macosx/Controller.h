@@ -190,7 +190,7 @@ typedef enum
 - (void) applyFilter;
 
 - (void) sortTorrents;
-- (void) sortTorrentsIgnoreSelected;
+- (void) sortTorrentsIgnoreSelected: (BOOL *) changed;
 - (void) setSort: (id) sender;
 - (void) setSortByGroup: (id) sender;
 - (void) setSortReverse: (id) sender;

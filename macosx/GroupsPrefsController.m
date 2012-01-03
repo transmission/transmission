@@ -208,8 +208,8 @@
                 if (row == [fTableView numberOfRows])
                     --row;
                 [fTableView selectRowIndexes: [NSIndexSet indexSetWithIndex: row] byExtendingSelection: NO];
+                [fTableView scrollRowToVisible: row];
             }
-            [fTableView scrollRowToVisible: row];
             
             break;
     }

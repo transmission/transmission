@@ -1616,6 +1616,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 {
     CGFloat dlRate = 0.0, ulRate = 0.0;
     BOOL completed = NO;
+    #warning use a block to do in parallel?
     for (Torrent * torrent in fTorrents)
     {
         [torrent update];
@@ -1717,7 +1718,6 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     [self fullUpdateUI];
 }
 
-#warning remove?
 - (void) torrentRestartedDownloading: (NSNotification *) notification
 {
     [self fullUpdateUI];
@@ -1832,13 +1832,23 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 {
     NSArray * selectedValues = [fTableView selectedValues];
     
-    [self sortTorrentsIgnoreSelected]; //actually sort
+    BOOL changed;
+    [self sortTorrentsIgnoreSelected: &changed]; //actually sort
     
-    [fTableView selectValues: selectedValues];
+    if (changed)
+    {
+        [fTableView reloadData];
+        [fTableView selectValues: selectedValues];
+    }
+    else
+        [fTableView setNeedsDisplay: YES];
 }
 
-- (void) sortTorrentsIgnoreSelected
+- (void) sortTorrentsIgnoreSelected: (BOOL *) changed
 {
+    if (changed)
+        *changed = NO;
+    
     NSString * sortType = [fDefaults stringForKey: @"Sort"];
     
     if (![sortType isEqualToString: SORT_ORDER])
@@ -1854,8 +1864,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
                             * progressDescriptor = [NSSortDescriptor sortDescriptorWithKey: @"progress" ascending: !asc],
                             * ratioDescriptor = [NSSortDescriptor sortDescriptorWithKey: @"ratio" ascending: !asc];
             
-            descriptors = [[NSArray alloc] initWithObjects: stateDescriptor, progressDescriptor, ratioDescriptor,
-                                                                nameDescriptor, nil];
+            descriptors = [[NSArray alloc] initWithObjects: stateDescriptor, progressDescriptor, ratioDescriptor, nameDescriptor, nil];
         }
         else if ([sortType isEqualToString: SORT_PROGRESS])
         {
@@ -1863,8 +1872,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
                             * ratioProgressDescriptor = [NSSortDescriptor sortDescriptorWithKey: @"progressStopRatio" ascending: asc],
                             * ratioDescriptor = [NSSortDescriptor sortDescriptorWithKey: @"ratio" ascending: asc];
             
-            descriptors = [[NSArray alloc] initWithObjects: progressDescriptor, ratioProgressDescriptor, ratioDescriptor,
-                                                                nameDescriptor, nil];
+            descriptors = [[NSArray alloc] initWithObjects: progressDescriptor, ratioProgressDescriptor, ratioDescriptor, nameDescriptor, nil];
         }
         else if ([sortType isEqualToString: SORT_TRACKER])
         {
@@ -1898,15 +1906,34 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         if ([fDefaults boolForKey: @"SortByGroup"])
         {
             for (TorrentGroup * group in fDisplayedTorrents)
-                [[group torrents] sortUsingDescriptors: descriptors];
+            {
+                if (changed)
+                {
+                    NSArray * sorted = [[group torrents] sortedArrayUsingDescriptors: descriptors];
+                    if (![[group torrents] isEqualToArray: sorted])
+                    {
+                        [[group torrents] setArray: sorted];
+                        *changed = YES;
+                    }
+                }
+                else
+                    [[group torrents] sortUsingDescriptors: descriptors];
+            }
         }
         else
-            [fDisplayedTorrents sortUsingDescriptors: descriptors];
+        {
+            if (changed)
+            {
+                NSArray * sorted = [fDisplayedTorrents sortedArrayUsingDescriptors: descriptors];
+                if ((*changed = ![fDisplayedTorrents isEqualToArray: sorted]))
+                    [fDisplayedTorrents setArray: sorted];
+            }
+            else
+                [fDisplayedTorrents sortUsingDescriptors: descriptors];
+        }
         
         [descriptors release];
     }
-    
-    [fTableView reloadData];
 }
 
 - (void) applyFilter
@@ -2092,7 +2119,8 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         [fDisplayedTorrents setArray: allTorrents];
     
     //actually sort
-    [self sortTorrentsIgnoreSelected];
+    [self sortTorrentsIgnoreSelected: NULL];
+    [fTableView reloadData];
     
     //reset expanded/collapsed rows
     if (groupRows)
@@ -2780,7 +2808,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     else
         [fDefaults setBool: ![fDefaults boolForKey: @"DisplayStatusProgressSelected"] forKey: @"DisplayStatusProgressSelected"];
     
-    [fTableView reloadData];
+    [fTableView setNeedsDisplay: YES];
 }
 
 - (NSRect) windowFrameByAddingHeight: (CGFloat) height checkLimits: (BOOL) check
