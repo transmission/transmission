@@ -276,7 +276,7 @@
 {
     [fTorrent update];
     
-    [fFileController reloadData];
+    [fFileController refresh];
     
     if ([fTorrent isChecking])
     {

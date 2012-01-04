@@ -238,14 +238,14 @@ typedef enum
     fFilterText = [text retain];
 }
 
-- (void) reloadData
+- (void) refresh
 {
     [fTorrent updateFileStat];
     
     while (![fLock tryLock])
         tr_wait_msec(100);
     
-    [fOutline reloadData];
+    [fOutline setNeedsDisplay: YES];
     
     [fLock unlock];
 }
@@ -285,8 +285,7 @@ typedef enum
         return item;
 }
 
-- (void) outlineView: (NSOutlineView *) outlineView willDisplayCell: (id) cell
-            forTableColumn: (NSTableColumn *) tableColumn item: (id) item
+- (void) outlineView: (NSOutlineView *) outlineView willDisplayCell: (id) cell forTableColumn: (NSTableColumn *) tableColumn item: (id) item
 {
     NSString * identifier = [tableColumn identifier];
     if ([identifier isEqualToString: @"Check"])
@@ -301,8 +300,7 @@ typedef enum
     else;
 }
 
-- (void) outlineView: (NSOutlineView *) outlineView setObjectValue: (id) object
-        forTableColumn: (NSTableColumn *) tableColumn byItem: (id) item
+- (void) outlineView: (NSOutlineView *) outlineView setObjectValue: (id) object forTableColumn: (NSTableColumn *) tableColumn byItem: (id) item
 {
     NSString * identifier = [tableColumn identifier];
     if ([identifier isEqualToString: @"Check"])
@@ -314,7 +312,7 @@ typedef enum
             indexSet = [(FileListNode *)item indexes];
         
         [fTorrent setFileCheckState: [object intValue] != NSOffState ? NSOnState : NSOffState forIndexes: indexSet];
-        [fOutline reloadData];
+        [fOutline setNeedsDisplay: YES];
         
         [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateUI" object: nil];
     }
@@ -396,7 +394,7 @@ typedef enum
         [itemIndexes addIndexes: [[fOutline itemAtRow: i] indexes]];
     
     [fTorrent setFileCheckState: state forIndexes: itemIndexes];
-    [fOutline reloadData];
+    [fOutline setNeedsDisplay: YES];
     
     [fLock unlock];
 }
@@ -417,7 +415,7 @@ typedef enum
     [remainingItemIndexes removeIndexes: itemIndexes];
     [fTorrent setFileCheckState: NSOffState forIndexes: remainingItemIndexes];
     
-    [fOutline reloadData];
+    [fOutline setNeedsDisplay: YES];
     
     [fLock unlock];
 }
@@ -446,7 +444,7 @@ typedef enum
         [itemIndexes addIndexes: [[fOutline itemAtRow: i] indexes]];
     
     [fTorrent setFilePriority: priority forIndexes: itemIndexes];
-    [fOutline reloadData];
+    [fOutline setNeedsDisplay: YES];
     
     [fLock unlock];
 }

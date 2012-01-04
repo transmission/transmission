@@ -45,7 +45,7 @@
 
 - (void) setFilterText: (NSString *) text;
 
-- (void) reloadData;
+- (void) refresh;
 
 - (void) setCheck: (id) sender;
 - (void) setOnlySelectedCheck: (id) sender;

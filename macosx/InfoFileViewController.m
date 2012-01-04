@@ -83,7 +83,7 @@
         [self setupInfo];
     
     if ([fTorrents count] == 1)
-        [fFileController reloadData];
+        [fFileController refresh];
 }
 
 - (void) saveViewSize
