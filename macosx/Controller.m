@@ -51,6 +51,7 @@
 #import "Badger.h"
 #import "DragOverlayWindow.h"
 #import "NSApplicationAdditions.h"
+#import "NSMutableArrayAdditions.h"
 #import "NSStringAdditions.h"
 #import "ExpandedPathToPathTransformer.h"
 #import "ExpandedPathToIconTransformer.h"
@@ -1632,7 +1633,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     {
         if ([fWindow isVisible])
         {
-            [self sortTorrents];
+            [self sortTorrents: NO];
             
             [fStatusBar updateWithDownload: dlRate upload: ulRate];
             
@@ -1803,7 +1804,8 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     }
     
     [fDefaults setObject: sortType forKey: @"Sort"];
-    [self applyFilter]; //better than calling sortTorrents because it will even apply to queue order
+    
+    [self sortTorrents: YES];
 }
 
 - (void) setSortByGroup: (id) sender
@@ -1824,116 +1826,182 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     if (setReverse != [fDefaults boolForKey: @"SortReverse"])
     {
         [fDefaults setBool: setReverse forKey: @"SortReverse"];
-        [self sortTorrents];
+        [self sortTorrents: NO];
     }
 }
 
-- (void) sortTorrents
+- (void) sortTorrents: (BOOL) includeQueueOrder
 {
-    NSArray * selectedValues = [fTableView selectedValues];
+    NSArray * selectedValues;
+    if ([NSApp isOnLionOrBetter])
+        [fTableView beginUpdates];
+    else
+        selectedValues = [fTableView selectedValues];
     
-    BOOL changed;
-    [self sortTorrentsIgnoreSelected: &changed]; //actually sort
+    NSMutableArray * moves = [NSMutableArray array];
+    [self sortTorrentsIgnoreSelected: moves includeQueueOrder: includeQueueOrder]; //actually sort
     
-    if (changed)
+    if ([NSApp isOnLionOrBetter])
     {
-        [fTableView reloadData];
-        [fTableView selectValues: selectedValues];
+        for (NSDictionary * move in moves)
+        {
+            id parent = [move objectForKey: @"Parent"];
+            [fTableView moveItemAtIndex: [(NSNumber *)[move objectForKey: @"From"] unsignedIntegerValue] inParent: parent toIndex: [(NSNumber *)[move objectForKey: @"To"] unsignedIntegerValue] inParent: parent];
+        }
+        
+        [fTableView setNeedsDisplay: YES]; //need to make sure all have new info
     }
     else
-        [fTableView setNeedsDisplay: YES];
+    {
+        if ([moves count] > 0)
+        {
+            [fTableView reloadData];
+            [fTableView selectValues: selectedValues];
+        }
+        else
+            [fTableView setNeedsDisplay: YES];
+    }
+    
+    if ([NSApp isOnLionOrBetter])
+        [fTableView endUpdates];
 }
 
-- (void) sortTorrentsIgnoreSelected: (BOOL *) changed
+#warning rename
+- (void) sortTorrentsIgnoreSelected: (NSMutableArray *) moves includeQueueOrder: (BOOL) includeQueueOrder
 {
-    if (changed)
-        *changed = NO;
+    [moves removeAllObjects];
+    
+    //don't do anything else if we don't have to
+    const BOOL sortByGroup = [fDefaults boolForKey: @"SortByGroup"];
+    const NSUInteger count = [fDisplayedTorrents count];
+    if (count == 0 || (!sortByGroup && count == 1))
+        return;
     
     NSString * sortType = [fDefaults stringForKey: @"Sort"];
     
-    if (![sortType isEqualToString: SORT_ORDER])
+    if (!includeQueueOrder && [sortType isEqualToString: SORT_ORDER])
+        return;
+    
+    const BOOL asc = ![fDefaults boolForKey: @"SortReverse"];
+    
+    NSArray * descriptors;
+    NSSortDescriptor * nameDescriptor = [NSSortDescriptor sortDescriptorWithKey: @"name" ascending: asc selector: @selector(localizedStandardCompare:)];
+    
+    if ([sortType isEqualToString: SORT_STATE])
     {
-        const BOOL asc = ![fDefaults boolForKey: @"SortReverse"];
+        NSSortDescriptor * stateDescriptor = [NSSortDescriptor sortDescriptorWithKey: @"stateSortKey" ascending: !asc],
+                        * progressDescriptor = [NSSortDescriptor sortDescriptorWithKey: @"progress" ascending: !asc],
+                        * ratioDescriptor = [NSSortDescriptor sortDescriptorWithKey: @"ratio" ascending: !asc];
         
-        NSArray * descriptors;
-        NSSortDescriptor * nameDescriptor = [NSSortDescriptor sortDescriptorWithKey: @"name" ascending: asc selector: @selector(localizedStandardCompare:)];
+        descriptors = [[NSArray alloc] initWithObjects: stateDescriptor, progressDescriptor, ratioDescriptor, nameDescriptor, nil];
+    }
+    else if ([sortType isEqualToString: SORT_PROGRESS])
+    {
+        NSSortDescriptor * progressDescriptor = [NSSortDescriptor sortDescriptorWithKey: @"progress" ascending: asc],
+                        * ratioProgressDescriptor = [NSSortDescriptor sortDescriptorWithKey: @"progressStopRatio" ascending: asc],
+                        * ratioDescriptor = [NSSortDescriptor sortDescriptorWithKey: @"ratio" ascending: asc];
         
-        if ([sortType isEqualToString: SORT_STATE])
-        {
-            NSSortDescriptor * stateDescriptor = [NSSortDescriptor sortDescriptorWithKey: @"stateSortKey" ascending: !asc],
-                            * progressDescriptor = [NSSortDescriptor sortDescriptorWithKey: @"progress" ascending: !asc],
-                            * ratioDescriptor = [NSSortDescriptor sortDescriptorWithKey: @"ratio" ascending: !asc];
-            
-            descriptors = [[NSArray alloc] initWithObjects: stateDescriptor, progressDescriptor, ratioDescriptor, nameDescriptor, nil];
-        }
-        else if ([sortType isEqualToString: SORT_PROGRESS])
-        {
-            NSSortDescriptor * progressDescriptor = [NSSortDescriptor sortDescriptorWithKey: @"progress" ascending: asc],
-                            * ratioProgressDescriptor = [NSSortDescriptor sortDescriptorWithKey: @"progressStopRatio" ascending: asc],
-                            * ratioDescriptor = [NSSortDescriptor sortDescriptorWithKey: @"ratio" ascending: asc];
-            
-            descriptors = [[NSArray alloc] initWithObjects: progressDescriptor, ratioProgressDescriptor, ratioDescriptor, nameDescriptor, nil];
-        }
-        else if ([sortType isEqualToString: SORT_TRACKER])
-        {
-            NSSortDescriptor * trackerDescriptor = [NSSortDescriptor sortDescriptorWithKey: @"trackerSortKey" ascending: asc selector: @selector(localizedCaseInsensitiveCompare:)];
-            
-            descriptors = [[NSArray alloc] initWithObjects: trackerDescriptor, nameDescriptor, nil];
-        }
-        else if ([sortType isEqualToString: SORT_ACTIVITY])
-        {
-            NSSortDescriptor * rateDescriptor = [NSSortDescriptor sortDescriptorWithKey: @"totalRate" ascending: !asc];
-            NSSortDescriptor * activityDescriptor = [NSSortDescriptor sortDescriptorWithKey: @"dateActivityOrAdd" ascending: !asc];
-            
-            descriptors = [[NSArray alloc] initWithObjects: rateDescriptor, activityDescriptor, nameDescriptor, nil];
-        }
-        else if ([sortType isEqualToString: SORT_DATE])
-        {
-            NSSortDescriptor * dateDescriptor = [NSSortDescriptor sortDescriptorWithKey: @"dateAdded" ascending: asc];
-            
-            descriptors = [[NSArray alloc] initWithObjects: dateDescriptor, nameDescriptor, nil];
-        }
-        else if ([sortType isEqualToString: SORT_SIZE])
-        {
-            NSSortDescriptor * sizeDescriptor = [NSSortDescriptor sortDescriptorWithKey: @"size" ascending: asc];
-            
-            descriptors = [[NSArray alloc] initWithObjects: sizeDescriptor, nameDescriptor, nil];
-        }
-        else
-            descriptors = [[NSArray alloc] initWithObjects: nameDescriptor, nil];
+        descriptors = [[NSArray alloc] initWithObjects: progressDescriptor, ratioProgressDescriptor, ratioDescriptor, nameDescriptor, nil];
+    }
+    else if ([sortType isEqualToString: SORT_TRACKER])
+    {
+        NSSortDescriptor * trackerDescriptor = [NSSortDescriptor sortDescriptorWithKey: @"trackerSortKey" ascending: asc selector: @selector(localizedCaseInsensitiveCompare:)];
         
-        //actually sort
-        if ([fDefaults boolForKey: @"SortByGroup"])
+        descriptors = [[NSArray alloc] initWithObjects: trackerDescriptor, nameDescriptor, nil];
+    }
+    else if ([sortType isEqualToString: SORT_ACTIVITY])
+    {
+        NSSortDescriptor * rateDescriptor = [NSSortDescriptor sortDescriptorWithKey: @"totalRate" ascending: !asc];
+        NSSortDescriptor * activityDescriptor = [NSSortDescriptor sortDescriptorWithKey: @"dateActivityOrAdd" ascending: !asc];
+        
+        descriptors = [[NSArray alloc] initWithObjects: rateDescriptor, activityDescriptor, nameDescriptor, nil];
+    }
+    else if ([sortType isEqualToString: SORT_DATE])
+    {
+        NSSortDescriptor * dateDescriptor = [NSSortDescriptor sortDescriptorWithKey: @"dateAdded" ascending: asc];
+        
+        descriptors = [[NSArray alloc] initWithObjects: dateDescriptor, nameDescriptor, nil];
+    }
+    else if ([sortType isEqualToString: SORT_SIZE])
+    {
+        NSSortDescriptor * sizeDescriptor = [NSSortDescriptor sortDescriptorWithKey: @"size" ascending: asc];
+        
+        descriptors = [[NSArray alloc] initWithObjects: sizeDescriptor, nameDescriptor, nil];
+    }
+    else if ([sortType isEqualToString: SORT_NAME])
+    {
+        descriptors = [[NSArray alloc] initWithObjects: nameDescriptor, nil];
+    }
+    else
+    {
+        NSAssert1([sortType isEqualToString: SORT_ORDER], @"Unknown sort type received: %@", sortType);
+        NSAssert(includeQueueOrder, @"Sorting by queue order when we shouldn't");
+        
+        NSSortDescriptor * orderDescriptor = [NSSortDescriptor sortDescriptorWithKey: @"queuePosition" ascending: asc];
+        
+        descriptors = [[NSArray alloc] initWithObjects: orderDescriptor, nil];
+    }
+    
+    //actually sort
+    if (sortByGroup)
+    {
+        for (TorrentGroup * group in fDisplayedTorrents)
         {
-            for (TorrentGroup * group in fDisplayedTorrents)
+            if ([[group torrents] count] > 1)
             {
-                if (changed)
+                if (moves)
                 {
                     NSArray * sorted = [[group torrents] sortedArrayUsingDescriptors: descriptors];
-                    if (![[group torrents] isEqualToArray: sorted])
-                    {
-                        [[group torrents] setArray: sorted];
-                        *changed = YES;
-                    }
+                    [moves addObjectsFromArray: [self rearrangeTorrentArray: [group torrents] to: sorted forParent: group]];
                 }
                 else
                     [[group torrents] sortUsingDescriptors: descriptors];
             }
         }
-        else
-        {
-            if (changed)
-            {
-                NSArray * sorted = [fDisplayedTorrents sortedArrayUsingDescriptors: descriptors];
-                if ((*changed = ![fDisplayedTorrents isEqualToArray: sorted]))
-                    [fDisplayedTorrents setArray: sorted];
-            }
-            else
-                [fDisplayedTorrents sortUsingDescriptors: descriptors];
-        }
-        
-        [descriptors release];
     }
+    else
+    {
+        if (moves)
+        {
+            NSArray * sorted = [fDisplayedTorrents sortedArrayUsingDescriptors: descriptors];
+            [moves setArray: [self rearrangeTorrentArray: fDisplayedTorrents to: sorted forParent: nil]];
+        }
+        else
+            [fDisplayedTorrents sortUsingDescriptors: descriptors];
+    }
+    
+    [descriptors release];
+}
+
+- (NSArray *) rearrangeTorrentArray: (NSMutableArray *) rearrangeArray to: (NSArray *) endingArray forParent: parent
+{
+    NSAssert2([rearrangeArray count] == [endingArray count], @"Torrent arrays aren't equal size: %d and %d", [rearrangeArray count], [endingArray count]);
+    
+    NSMutableArray * moves = [NSMutableArray array];
+    for (NSUInteger currentIndex = 0; currentIndex < [rearrangeArray count]; ++currentIndex)
+    {
+        Torrent * torrent = [endingArray objectAtIndex: currentIndex];
+        const NSUInteger previousIndex = [rearrangeArray indexOfObject: torrent inRange: NSMakeRange(currentIndex, [rearrangeArray count]-currentIndex)];
+        
+        if (previousIndex != currentIndex)
+        {
+            NSAssert3(previousIndex != NSNotFound, @"Expected torrent %@ not found! %@ %@", torrent, rearrangeArray, endingArray);
+            
+            [rearrangeArray moveObjectAtIndex: previousIndex toIndex: currentIndex];
+            
+            NSMutableDictionary * move = [NSMutableDictionary dictionaryWithCapacity: parent ? 3 : 2];
+            [move setObject: [NSNumber numberWithUnsignedInteger: previousIndex] forKey: @"From"];
+            [move setObject: [NSNumber numberWithUnsignedInteger: currentIndex] forKey: @"To"];
+            if (parent)
+                [move setObject: parent forKey: @"Parent"];
+            
+            [moves addObject: move];
+        }
+    }
+    
+    NSAssert2([rearrangeArray isEqualToArray: endingArray], @"Torrent rearranging didn't work! %@ %@", rearrangeArray, endingArray);
+    
+    return moves;
 }
 
 - (void) applyFilter
@@ -2119,7 +2187,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         [fDisplayedTorrents setArray: allTorrents];
     
     //actually sort
-    [self sortTorrentsIgnoreSelected: NULL];
+    [self sortTorrentsIgnoreSelected: NULL includeQueueOrder: NO];
     [fTableView reloadData];
     
     //reset expanded/collapsed rows
@@ -2801,6 +2869,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     [fTableView display];
 }
 
+#warning elliminate when 10.7-only
 - (void) toggleStatusString: (id) sender
 {
     if ([fDefaults boolForKey: @"SmallView"])
@@ -3534,7 +3603,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         return [fWindow isVisible];
     }
     
-    #warning remove when menu is removed
+    #warning remove when menu is removed (10.7-only)
     if (action == @selector(toggleStatusString:))
     {
         if ([fDefaults boolForKey: @"SmallView"])
