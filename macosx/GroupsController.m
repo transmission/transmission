@@ -23,6 +23,7 @@
  *****************************************************************************/
 
 #import "GroupsController.h"
+#import "NSMutableArrayAdditions.h"
 
 #define ICON_WIDTH 16.0
 #define ICON_WIDTH_SMALL 12.0
@@ -281,17 +282,7 @@ GroupsController * fGroupsInstance = nil;
 
 - (void) moveGroupAtRow: (NSInteger) oldRow toRow: (NSInteger) newRow
 {
-    if (oldRow < newRow)
-        newRow--;
-    
-    //remove objects to reinsert
-    id movingGroup = [[fGroups objectAtIndex: oldRow] retain];
-    [fGroups removeObjectAtIndex: oldRow];
-    
-    //insert objects at new location
-    [fGroups insertObject: movingGroup atIndex: newRow];
-    
-    [movingGroup release];
+    [fGroups moveObjectAtIndex: oldRow toIndex: newRow];
     
     [self saveGroups];
     [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateGroups" object: self];

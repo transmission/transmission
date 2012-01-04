@@ -122,14 +122,13 @@
         NSIndexSet * indexes = [NSKeyedUnarchiver unarchiveObjectWithData: [pasteboard dataForType: GROUP_TABLE_VIEW_DATA_TYPE]];
         NSInteger oldRow = [indexes firstIndex], selectedRow = [fTableView selectedRow];
         
+        if (oldRow < newRow)
+            newRow--;
         
         if ([NSApp isOnLionOrBetter])
             [fTableView beginUpdates];
         
         [[GroupsController groups] moveGroupAtRow: oldRow toRow: newRow];
-        
-        if (oldRow < newRow)
-            newRow--;
         
         if ([NSApp isOnLionOrBetter])
         {
