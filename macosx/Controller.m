@@ -1832,45 +1832,26 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 
 - (void) sortTorrents: (BOOL) includeQueueOrder
 {
+    const BOOL onLion = [NSApp isOnLionOrBetter];
+    
     NSArray * selectedValues;
-    if ([NSApp isOnLionOrBetter])
-        [fTableView beginUpdates];
-    else
+    if (!onLion)
         selectedValues = [fTableView selectedValues];
     
-    NSMutableArray * moves = [NSMutableArray array];
-    [self sortTorrentsIgnoreSelected: moves includeQueueOrder: includeQueueOrder]; //actually sort
+    [self sortTorrentsIgnoreSelectedReloadTable: YES includeQueueOrder: includeQueueOrder]; //actually sort
     
-    if ([NSApp isOnLionOrBetter])
-    {
-        for (NSDictionary * move in moves)
-        {
-            id parent = [move objectForKey: @"Parent"];
-            [fTableView moveItemAtIndex: [(NSNumber *)[move objectForKey: @"From"] unsignedIntegerValue] inParent: parent toIndex: [(NSNumber *)[move objectForKey: @"To"] unsignedIntegerValue] inParent: parent];
-        }
-        
-        [fTableView setNeedsDisplay: YES]; //need to make sure all have new info
-    }
-    else
-    {
-        if ([moves count] > 0)
-        {
-            [fTableView reloadData];
-            [fTableView selectValues: selectedValues];
-        }
-        else
-            [fTableView setNeedsDisplay: YES];
-    }
+    if (!onLion)
+        [fTableView selectValues: selectedValues];
     
-    if ([NSApp isOnLionOrBetter])
+    [fTableView setNeedsDisplay: YES];
+    
+    if (onLion)
         [fTableView endUpdates];
 }
 
 #warning rename
-- (void) sortTorrentsIgnoreSelected: (NSMutableArray *) moves includeQueueOrder: (BOOL) includeQueueOrder
+- (void) sortTorrentsIgnoreSelectedReloadTable: (BOOL) reload includeQueueOrder: (BOOL) includeQueueOrder
 {
-    [moves removeAllObjects];
-    
     //don't do anything else if we don't have to
     const BOOL sortByGroup = [fDefaults boolForKey: @"SortByGroup"];
     const NSUInteger count = [fDisplayedTorrents count];
@@ -1942,6 +1923,8 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         descriptors = [[NSArray alloc] initWithObjects: orderDescriptor, nil];
     }
     
+    BOOL beganTableUpdate = NO;
+    
     //actually sort
     if (sortByGroup)
     {
@@ -1949,10 +1932,10 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         {
             if ([[group torrents] count] > 1)
             {
-                if (moves)
+                if (reload)
                 {
                     NSArray * sorted = [[group torrents] sortedArrayUsingDescriptors: descriptors];
-                    [moves addObjectsFromArray: [self rearrangeTorrentArray: [group torrents] to: sorted forParent: group]];
+                    [self rearrangeTorrentArray: [group torrents] to: sorted forParent: group beganTableUpdate: &beganTableUpdate];
                 }
                 else
                     [[group torrents] sortUsingDescriptors: descriptors];
@@ -1961,23 +1944,30 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     }
     else
     {
-        if (moves)
+        if (reload)
         {
             NSArray * sorted = [fDisplayedTorrents sortedArrayUsingDescriptors: descriptors];
-            [moves setArray: [self rearrangeTorrentArray: fDisplayedTorrents to: sorted forParent: nil]];
+            [self rearrangeTorrentArray: fDisplayedTorrents to: sorted forParent: nil beganTableUpdate: &beganTableUpdate];
         }
         else
             [fDisplayedTorrents sortUsingDescriptors: descriptors];
     }
     
+    if (beganTableUpdate)
+    {
+        if ([NSApp isOnLionOrBetter])
+            [fTableView endUpdates];
+        else
+            [fTableView reloadData];
+    }
+    
     [descriptors release];
 }
 
-- (NSArray *) rearrangeTorrentArray: (NSMutableArray *) rearrangeArray to: (NSArray *) endingArray forParent: parent
+- (void) rearrangeTorrentArray: (NSMutableArray *) rearrangeArray to: (NSArray *) endingArray forParent: parent beganTableUpdate: (BOOL *) beganTableUpdate
 {
     NSAssert2([rearrangeArray count] == [endingArray count], @"Torrent arrays aren't equal size: %d and %d", [rearrangeArray count], [endingArray count]);
     
-    NSMutableArray * moves = [NSMutableArray array];
     for (NSUInteger currentIndex = 0; currentIndex < [rearrangeArray count]; ++currentIndex)
     {
         Torrent * torrent = [endingArray objectAtIndex: currentIndex];
@@ -1987,21 +1977,20 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         {
             NSAssert3(previousIndex != NSNotFound, @"Expected torrent %@ not found! %@ %@", torrent, rearrangeArray, endingArray);
             
+            if (beganTableUpdate && !*beganTableUpdate)
+            {
+                *beganTableUpdate = YES;
+                if ([NSApp isOnLionOrBetter])
+                    [fTableView beginUpdates];
+            }
+            
             [rearrangeArray moveObjectAtIndex: previousIndex toIndex: currentIndex];
-            
-            NSMutableDictionary * move = [NSMutableDictionary dictionaryWithCapacity: parent ? 3 : 2];
-            [move setObject: [NSNumber numberWithUnsignedInteger: previousIndex] forKey: @"From"];
-            [move setObject: [NSNumber numberWithUnsignedInteger: currentIndex] forKey: @"To"];
-            if (parent)
-                [move setObject: parent forKey: @"Parent"];
-            
-            [moves addObject: move];
+            if ([NSApp isOnLionOrBetter])
+                [fTableView moveItemAtIndex: previousIndex inParent: parent toIndex: currentIndex inParent: parent];
         }
     }
     
     NSAssert2([rearrangeArray isEqualToArray: endingArray], @"Torrent rearranging didn't work! %@ %@", rearrangeArray, endingArray);
-    
-    return moves;
 }
 
 - (void) applyFilter
@@ -2187,7 +2176,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         [fDisplayedTorrents setArray: allTorrents];
     
     //actually sort
-    [self sortTorrentsIgnoreSelected: NULL includeQueueOrder: NO];
+    [self sortTorrentsIgnoreSelectedReloadTable: NO includeQueueOrder: NO];
     [fTableView reloadData];
     
     //reset expanded/collapsed rows
