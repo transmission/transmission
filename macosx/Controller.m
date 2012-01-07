@@ -213,6 +213,8 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 {
     if ((self = [super init]))
     {
+        fLaunching = YES;
+        
         fDefaults = [NSUserDefaults standardUserDefaults];
         
         //checks for old version speeds of -1
@@ -511,6 +513,8 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     
     if ([fDefaults boolForKey: @"InfoVisible"])
         [self showInfo: nil];
+    
+    fLaunching = NO;
 }
 
 - (void) applicationDidFinishLaunching: (NSNotification *) notification
@@ -2028,7 +2032,6 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     NSAssert2([rearrangeArray isEqualToArray: [rearrangeArray sortedArrayUsingDescriptors: descriptors]], @"Torrent rearranging didn't work! %@ %@", rearrangeArray, [rearrangeArray sortedArrayUsingDescriptors: descriptors]);
 }
 
-#warning don't animate on launch
 - (void) applyFilter
 {
     const BOOL onLion = [NSApp isOnLionOrBetter];
@@ -2171,6 +2174,13 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     }
     
     BOOL beganUpdates = NO;
+    
+    //don't animate torrents when first launching
+    if (onLion && fLaunching)
+    {
+        [[NSAnimationContext currentContext] setDuration: 0];
+        [NSAnimationContext beginGrouping];
+    }
     
     //place torrents into groups
     //if either the previous or current lists are blank, set its value to the other
@@ -2441,6 +2451,9 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         if (beganUpdates)
             [fTableView endUpdates];
         [fTableView setNeedsDisplay: YES];
+        
+        if (fLaunching)
+            [NSAnimationContext endGrouping];
     }
     else
         [fTableView reloadData];
@@ -2972,6 +2985,8 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
                 }
                 else
                 {
+                    NSAssert(item && oldParent, @"Expected to be dragging between group rows");
+                    
                     NSMutableArray * newTorrents = [(TorrentGroup *)item torrents];
                     [newTorrents insertObject: torrent atIndex: insertDisplayIndex];
                     [oldTorrents removeObjectAtIndex: oldIndex];
