@@ -2157,15 +2157,16 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
                 return objDisplay == objAll;
             }];
             
-            if (index == NSNotFound)
-                [(Torrent *)objDisplay setPreviousFinishedPieces: nil];
+            if (index == NSNotFound){NSLog(@"%@",objDisplay);
+                [(Torrent *)objDisplay setPreviousFinishedPieces: nil];}
             else
                 [unusedIndexesInAll removeIndex: index];
         };
         
         if ([[fDisplayedTorrents objectAtIndex: 0] isKindOfClass: [TorrentGroup class]])
-            for (TorrentGroup * group in fDisplayedTorrents)
-                [[group torrents] enumerateObjectsWithOptions: NSEnumerationConcurrent usingBlock: removePreviousFinishedPieces];
+            [fDisplayedTorrents enumerateObjectsWithOptions: NSEnumerationConcurrent usingBlock: ^(id obj, NSUInteger idx, BOOL * stop) {
+                [[(TorrentGroup *)obj torrents] enumerateObjectsWithOptions: NSEnumerationConcurrent usingBlock: removePreviousFinishedPieces];
+            }];
         else
             [fDisplayedTorrents enumerateObjectsWithOptions: NSEnumerationConcurrent usingBlock: removePreviousFinishedPieces];
     }
