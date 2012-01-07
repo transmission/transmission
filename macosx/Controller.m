@@ -2358,7 +2358,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
                             [fDisplayedTorrents addObject: newGroup];
                             
                             if (onLion)
-                                [fTableView insertItemsAtIndexes: [NSIndexSet indexSetWithIndex: [fDisplayedTorrents count]-1] inParent: nil withAnimation: NSTableViewAnimationSlideLeft];
+                                [fTableView insertItemsAtIndexes: [NSIndexSet indexSetWithIndex: [fDisplayedTorrents count]-1] inParent: nil withAnimation: NSTableViewAnimationEffectFade];
                         }
                         else //if we haven't processed the other group yet, we have to make sure we don't flag it for removal the next time
                         {
@@ -2401,7 +2401,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
                 [fDisplayedTorrents addObject: group];
                 
                 if (onLion)
-                    [fTableView insertItemsAtIndexes: [NSIndexSet indexSetWithIndex: [fDisplayedTorrents count]-1] inParent: nil withAnimation: NSTableViewAnimationSlideLeft];
+                    [fTableView insertItemsAtIndexes: [NSIndexSet indexSetWithIndex: [fDisplayedTorrents count]-1] inParent: nil withAnimation: NSTableViewAnimationEffectFade];
             }
             
             [[group torrents] addObject: torrent];
@@ -2422,7 +2422,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         {
             [fDisplayedTorrents removeObjectsAtIndexes: removeIndexes];
             if (onLion)
-                [fTableView removeItemsAtIndexes: removeIndexes inParent: nil withAnimation: NSTableViewAnimationSlideLeft];
+                [fTableView removeItemsAtIndexes: removeIndexes inParent: nil withAnimation: NSTableViewAnimationEffectFade];
         }
         
         //now that all groups are there, sort them - don't insert on the fly in case groups were reordered in prefs
