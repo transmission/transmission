@@ -33,6 +33,7 @@
 - (id) initWithGroup: (NSInteger) group;
 
 - (NSInteger) groupIndex;
+- (NSInteger) groupOrderValue;
 - (NSMutableArray *) torrents;
 
 - (CGFloat) ratio;

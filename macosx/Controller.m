@@ -1313,45 +1313,92 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 
 - (void) confirmRemoveTorrents: (NSArray *) torrents deleteData: (BOOL) deleteData
 {
-    NSMutableArray * selectedValues = [NSMutableArray arrayWithArray: [fTableView selectedValues]];
-    [selectedValues removeObjectsInArray: torrents];
-    
-    //don't want any of these starting then stopping
-    for (Torrent * torrent in torrents)
-        if ([torrent waitingToStart])
-            [torrent stopTransfer];
-    
-    [fTorrents removeObjectsInArray: torrents];
-    
-    //if not removed from displayed torrents, fullUpdateUI might cause a crash
-    if ([fDisplayedTorrents count] > 0)
+    NSMutableArray * selectedValues = nil;
+    if ([NSApp isOnLionOrBetter])
     {
-        if ([[fDisplayedTorrents objectAtIndex: 0] isKindOfClass: [TorrentGroup class]])
-        {
-            for (TorrentGroup * group in fDisplayedTorrents)
-                [[group torrents] removeObjectsInArray: torrents];
-        }
-        else
-            [fDisplayedTorrents removeObjectsInArray: torrents];
+        selectedValues = [NSMutableArray arrayWithArray: [fTableView selectedValues]];
+        [selectedValues removeObjectsInArray: torrents];
     }
     
+    //miscellaneous
     for (Torrent * torrent in torrents)
     {
+        //don't want any of these starting then stopping
+        if ([torrent waitingToStart])
+            [torrent stopTransfer];
+        
         //let's expand all groups that have removed items - they either don't exist anymore, are already expanded, or are collapsed (rpc)
         [fTableView removeCollapsedGroup: [torrent groupValue]];
         
         //we can't assume the window is active - RPC removal, for example
         [fBadger removeTorrent: torrent];
-        
-        [torrent closeRemoveTorrent: deleteData];
     }
     
-    #warning why do we need them retained?
-    [torrents release];
+    [fTorrents removeObjectsInArray: torrents];
     
-    [fTableView selectValues: selectedValues];
+    //set up helpers to remove from the table
+    __block BOOL beganUpdate = NO;
+    
+    void (^doTableRemoval)(NSMutableArray *, id) = ^(NSMutableArray * displayedTorrents, id parent) {
+        NSIndexSet * indexes = [displayedTorrents indexesOfObjectsWithOptions: NSEnumerationConcurrent passingTest: ^(id obj, NSUInteger idx, BOOL * stop) {
+            return [torrents containsObject: obj];
+        }];
+        
+        if ([indexes count] > 0)
+        {
+            if ([NSApp isOnLionOrBetter])
+            {
+                if (!beganUpdate)
+                {
+                    //we can't closeRemoveTorrent: until it's no longer in the GUI at all
+                    [[NSAnimationContext currentContext] setCompletionHandler: ^{
+                        for (Torrent * torrent in torrents)
+                            [torrent closeRemoveTorrent: deleteData];
+                    }];
+                    
+                    [NSAnimationContext beginGrouping];
+                    [fTableView beginUpdates];
+                    beganUpdate = YES;
+                }
+                
+                [fTableView removeItemsAtIndexes: indexes inParent: parent withAnimation: NSTableViewAnimationSlideLeft];
+            }
+            [displayedTorrents removeObjectsAtIndexes: indexes];
+        }
+    };
+    
+    //if not removed from the displayed torrents here, fullUpdateUI might cause a crash
+    if ([fDisplayedTorrents count] > 0)
+    {
+        if ([[fDisplayedTorrents objectAtIndex: 0] isKindOfClass: [TorrentGroup class]])
+        {
+            for (TorrentGroup * group in fDisplayedTorrents)
+                doTableRemoval([group torrents], group);
+        }
+        else
+            doTableRemoval(fDisplayedTorrents, nil);
+        
+        if (beganUpdate)
+        {
+            [fTableView endUpdates];
+            [NSAnimationContext endGrouping];
+        }
+    }
+    
+    if (!beganUpdate)
+    {
+        //do here if we're not doing it at the end of the animation
+        for (Torrent * torrent in torrents)
+            [torrent closeRemoveTorrent: deleteData];
+        
+        if (selectedValues)
+            [fTableView selectValues: selectedValues];
+    }
     
     [self fullUpdateUI];
+    
+    #warning why do we need them retained?
+    [torrents autorelease];
 }
 
 - (void) removeNoDelete: (id) sender
@@ -1838,7 +1885,8 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     if (!onLion)
         selectedValues = [fTableView selectedValues];
     
-    [self sortTorrentsIgnoreSelectedReloadTable: YES includeQueueOrder: includeQueueOrder]; //actually sort
+    //actually sort
+    [self sortTorrentsIgnoreSelectedCallUpdates: YES includeQueueOrder: includeQueueOrder];
     
     if (!onLion)
         [fTableView selectValues: selectedValues];
@@ -1850,7 +1898,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 }
 
 #warning rename
-- (void) sortTorrentsIgnoreSelectedReloadTable: (BOOL) reload includeQueueOrder: (BOOL) includeQueueOrder
+- (void) sortTorrentsIgnoreSelectedCallUpdates: (BOOL) callUpdates includeQueueOrder: (BOOL) includeQueueOrder
 {
     //don't do anything else if we don't have to
     const BOOL sortByGroup = [fDefaults boolForKey: @"SortByGroup"];
@@ -1923,37 +1971,18 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         descriptors = [[NSArray alloc] initWithObjects: orderDescriptor, nil];
     }
     
-    BOOL beganTableUpdate = NO;
+    BOOL beganTableUpdate = !callUpdates || ![NSApp isOnLionOrBetter];
     
     //actually sort
     if (sortByGroup)
     {
         for (TorrentGroup * group in fDisplayedTorrents)
-        {
-            if ([[group torrents] count] > 1)
-            {
-                if (reload)
-                {
-                    NSArray * sorted = [[group torrents] sortedArrayUsingDescriptors: descriptors];
-                    [self rearrangeTorrentArray: [group torrents] to: sorted forParent: group beganTableUpdate: &beganTableUpdate];
-                }
-                else
-                    [[group torrents] sortUsingDescriptors: descriptors];
-            }
-        }
+            [self rearrangeTorrentTableArray: [group torrents] forParent: group withSortDescriptors: descriptors beganTableUpdate: &beganTableUpdate];
     }
     else
-    {
-        if (reload)
-        {
-            NSArray * sorted = [fDisplayedTorrents sortedArrayUsingDescriptors: descriptors];
-            [self rearrangeTorrentArray: fDisplayedTorrents to: sorted forParent: nil beganTableUpdate: &beganTableUpdate];
-        }
-        else
-            [fDisplayedTorrents sortUsingDescriptors: descriptors];
-    }
+        [self rearrangeTorrentTableArray: fDisplayedTorrents forParent: nil withSortDescriptors: descriptors beganTableUpdate: &beganTableUpdate];
     
-    if (beganTableUpdate)
+    if (beganTableUpdate && callUpdates)
     {
         if ([NSApp isOnLionOrBetter])
             [fTableView endUpdates];
@@ -1964,39 +1993,47 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     [descriptors release];
 }
 
-- (void) rearrangeTorrentArray: (NSMutableArray *) rearrangeArray to: (NSArray *) endingArray forParent: parent beganTableUpdate: (BOOL *) beganTableUpdate
+#warning redo so that we search a copy once again (best explained by changing sorting from ascending to descending)
+- (void) rearrangeTorrentTableArray: (NSMutableArray *) rearrangeArray forParent: parent withSortDescriptors: (NSArray *) descriptors beganTableUpdate: (BOOL *) beganTableUpdate
 {
-    NSAssert2([rearrangeArray count] == [endingArray count], @"Torrent arrays aren't equal size: %d and %d", [rearrangeArray count], [endingArray count]);
-    
-    for (NSUInteger currentIndex = 0; currentIndex < [rearrangeArray count]; ++currentIndex)
+    for (NSUInteger currentIndex = 1; currentIndex < [rearrangeArray count]; ++currentIndex)
     {
-        Torrent * torrent = [endingArray objectAtIndex: currentIndex];
-        const NSUInteger previousIndex = [rearrangeArray indexOfObject: torrent inRange: NSMakeRange(currentIndex, [rearrangeArray count]-currentIndex)];
-        
-        if (previousIndex != currentIndex)
-        {
-            NSAssert3(previousIndex != NSNotFound, @"Expected torrent %@ not found! %@ %@", torrent, rearrangeArray, endingArray);
+        //manually do the sorting in-place
+        const NSUInteger insertIndex = [rearrangeArray indexOfObject: [rearrangeArray objectAtIndex: currentIndex] inSortedRange: NSMakeRange(0, currentIndex) options: (NSBinarySearchingInsertionIndex | NSBinarySearchingLastEqual) usingComparator: ^(id obj1, id obj2) {
+            for (NSSortDescriptor * descriptor in descriptors)
+            {
+                const NSComparisonResult result = [descriptor compareObject: obj1 toObject: obj2];
+                if (result != NSOrderedSame)
+                    return result;
+            }
             
-            if (beganTableUpdate && !*beganTableUpdate)
+            return NSOrderedSame;
+        }];
+        
+        if (insertIndex != currentIndex)
+        {
+            if (!*beganTableUpdate)
             {
                 *beganTableUpdate = YES;
                 if ([NSApp isOnLionOrBetter])
                     [fTableView beginUpdates];
             }
             
-            [rearrangeArray moveObjectAtIndex: previousIndex toIndex: currentIndex];
+            [rearrangeArray moveObjectAtIndex: currentIndex toIndex: insertIndex];
             if ([NSApp isOnLionOrBetter])
-                [fTableView moveItemAtIndex: previousIndex inParent: parent toIndex: currentIndex inParent: parent];
+                [fTableView moveItemAtIndex: currentIndex inParent: parent toIndex: insertIndex inParent: parent];
         }
     }
     
-    NSAssert2([rearrangeArray isEqualToArray: endingArray], @"Torrent rearranging didn't work! %@ %@", rearrangeArray, endingArray);
+    NSAssert2([rearrangeArray isEqualToArray: [rearrangeArray sortedArrayUsingDescriptors: descriptors]], @"Torrent rearranging didn't work! %@ %@", rearrangeArray, [rearrangeArray sortedArrayUsingDescriptors: descriptors]);
 }
 
+#warning don't animate on launch
 - (void) applyFilter
 {
+    #warning re-add
     //get all the torrents in the table
-    NSMutableArray * previousTorrents;
+    /*NSMutableArray * previousTorrents;
     if ([fDisplayedTorrents count] > 0 && [[fDisplayedTorrents objectAtIndex: 0] isKindOfClass: [TorrentGroup class]])
     {
         previousTorrents = [NSMutableArray array];
@@ -2005,9 +2042,13 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
             [previousTorrents addObjectsFromArray: [group torrents]];
     }
     else
-        previousTorrents = fDisplayedTorrents;
+        previousTorrents = fDisplayedTorrents;*/
     
-    NSArray * selectedValues = [fTableView selectedValues];
+    const BOOL onLion = [NSApp isOnLionOrBetter];
+    
+    NSArray * selectedValues = nil;
+    if (!onLion)
+        selectedValues = [fTableView selectedValues];
     
     NSUInteger active = 0, downloading = 0, seeding = 0, paused = 0;
     NSString * filterType = [fDefaults stringForKey: @"Filter"];
@@ -2118,66 +2159,288 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         [fFilterBar setCountAll: [fTorrents count] active: active downloading: downloading seeding: seeding paused: paused];
     
     //clear display cache for not-shown torrents
-    [previousTorrents removeObjectsInArray: allTorrents];
+    /*[previousTorrents removeObjectsInArray: allTorrents];
     for (Torrent * torrent in previousTorrents)
-        [torrent setPreviousFinishedPieces: nil];
+        [torrent setPreviousFinishedPieces: nil];*/
+    
+    BOOL beganUpdates = NO;
     
     //place torrents into groups
-    const BOOL groupRows = [fDefaults boolForKey: @"SortByGroup"];
-    if (groupRows)
+    //if either the previous or current lists are blank, set its value to the other
+    const BOOL groupRows = [allTorrents count] > 0 ? [fDefaults boolForKey: @"SortByGroup"] : ([fDisplayedTorrents count] > 0 && [[fDisplayedTorrents objectAtIndex: 0] isKindOfClass: [TorrentGroup class]]);
+    const BOOL wasGroupRows = [fDisplayedTorrents count] > 0 ? [[fDisplayedTorrents objectAtIndex: 0] isKindOfClass: [TorrentGroup class]] : groupRows;
+    if (!groupRows && !wasGroupRows)
     {
-        NSMutableArray * oldTorrentGroups = [NSMutableArray array];
-        if ([fDisplayedTorrents count] > 0 && [[fDisplayedTorrents objectAtIndex: 0] isKindOfClass: [TorrentGroup class]])
-            [oldTorrentGroups addObjectsFromArray: fDisplayedTorrents];
+        const NSRange existingTorrentRange = NSMakeRange(0, [fDisplayedTorrents count]);
+        NSMutableIndexSet * addIndexes = [NSMutableIndexSet indexSet],
+                        * remainingPreviousIndexes = [NSMutableIndexSet indexSetWithIndexesInRange: existingTorrentRange];
         
-        [fDisplayedTorrents removeAllObjects];
+        for (NSUInteger previousIndex = 0; previousIndex < [allTorrents count]; ++previousIndex)
+        {
+            Torrent * torrent = [allTorrents objectAtIndex: previousIndex];
+            const NSUInteger currentIndex = [fDisplayedTorrents indexOfObjectAtIndexes: remainingPreviousIndexes options: NSEnumerationConcurrent passingTest: ^(id obj, NSUInteger idx, BOOL *stop) {
+                return (BOOL)(obj == torrent);
+            }];
+            if (currentIndex == NSNotFound)
+                [addIndexes addIndex: previousIndex];
+            else
+                [remainingPreviousIndexes removeIndex: currentIndex];
+        }
         
-        NSSortDescriptor * groupDescriptor = [NSSortDescriptor sortDescriptorWithKey: @"groupOrderValue" ascending: YES];
-        [allTorrents sortUsingDescriptors: [NSArray arrayWithObject: groupDescriptor]];
+        if ([addIndexes count] > 0 || [remainingPreviousIndexes count] > 0)
+        {
+            beganUpdates = YES;
+            if (onLion)
+                [fTableView beginUpdates];
+            
+            //remove torrents we didn't find
+            if ([remainingPreviousIndexes count] > 0)
+            {
+                [fDisplayedTorrents removeObjectsAtIndexes: remainingPreviousIndexes];
+                if (onLion)
+                    [fTableView removeItemsAtIndexes: remainingPreviousIndexes inParent: nil withAnimation: NSTableViewAnimationSlideDown];
+            }
+            
+            //add new torrents
+            if ([addIndexes count] > 0)
+            {
+                [fDisplayedTorrents addObjectsFromArray: [allTorrents objectsAtIndexes: addIndexes]];
+                if (onLion)
+                    [fTableView insertItemsAtIndexes: [NSIndexSet indexSetWithIndexesInRange: NSMakeRange([fDisplayedTorrents count] - [addIndexes count], [addIndexes count])] inParent: nil withAnimation: NSTableViewAnimationSlideDown];
+            }
+        }
+    }
+    else if (!groupRows && wasGroupRows)
+    {
+        //since we're not doing this the right way (boo buggy animation), we need to remember selected group
+        NSArray * selectedValues = [fTableView selectedValues];
         
-        TorrentGroup * group = nil;
-        NSInteger lastGroupValue = -2, currentOldGroupIndex = 0;
+        beganUpdates = YES;
+        if (onLion)
+            [fTableView beginUpdates];
+        
+#if 1
+        if (onLion)
+            [fTableView removeItemsAtIndexes: [NSIndexSet indexSetWithIndexesInRange: NSMakeRange(0, [fDisplayedTorrents count])] inParent: nil withAnimation: NSTableViewAnimationSlideDown];
+             
+        [fDisplayedTorrents setArray: allTorrents];
+        
+        if (onLion)
+            [fTableView insertItemsAtIndexes: [NSIndexSet indexSetWithIndexesInRange: NSMakeRange(0, [fDisplayedTorrents count])] inParent: nil withAnimation: NSTableViewAnimationEffectFade];
+        
+        [fTableView selectValues: selectedValues];
+#else
+        #warning hard hat zone
+        
+        #warning use and don't modify all torrents?
+        NSMutableIndexSet * addIndexes = [NSMutableIndexSet indexSet];
+        
+        const NSUInteger groupCount = [fDisplayedTorrents count];
+        for (NSUInteger groupIndex = 0; groupIndex < groupCount; ++groupIndex)
+        {
+            TorrentGroup * group = [fDisplayedTorrents objectAtIndex: groupIndex];
+            
+            for (NSInteger indexInGroup = [[group torrents] count]-1; indexInGroup >= 0; --indexInGroup)
+            {
+                Torrent * torrent = [[group torrents] objectAtIndex: indexInGroup];
+                
+                #warning maybe keep some sort of index set? idk - don't modify allTorrents?
+                const NSUInteger indexInAll = [allTorrents indexOfObject: torrent];
+                if (indexInAll != NSNotFound)
+                {
+                    [allTorrents removeObjectAtIndex: indexInAll];
+                    [[group torrents] removeObjectAtIndex: indexInGroup];
+                    [fDisplayedTorrents addObject: torrent];
+                    if (onLion)
+                        [fTableView moveItemAtIndex: indexInGroup inParent: group toIndex: [fDisplayedTorrents count]-1 inParent: nil];
+                }
+            }
+        }
+        
+        NSIndexSet * groupIndexes = [NSIndexSet indexSetWithIndexesInRange: NSMakeRange(0, groupCount)];
+        [fDisplayedTorrents removeObjectsAtIndexes: groupIndexes];
+        if (onLion)
+            [fTableView removeItemsAtIndexes: groupIndexes inParent: nil withAnimation: NSTableViewAnimationSlideDown];
+        
+        if ([allTorrents count] > 0)
+        {
+            [fDisplayedTorrents addObjectsFromArray: allTorrents];
+            if (onLion)
+                [fTableView insertItemsAtIndexes: [NSIndexSet indexSetWithIndexesInRange: NSMakeRange([fDisplayedTorrents count] - [allTorrents count], [allTorrents count])] inParent: nil withAnimation: NSTableViewAnimationSlideDown];
+        }
+#endif
+    }
+    else if (groupRows && !wasGroupRows)
+    {
+        //since we're not doing this the right way (boo buggy animation), we need to remember selected group
+        selectedValues = [fTableView selectedValues];
+        
+        beganUpdates = YES;
+        if (onLion)
+            [fTableView beginUpdates];
+        
+        //a map for quickly finding groups
+        NSMutableDictionary * groupsByIndex = [NSMutableDictionary dictionaryWithCapacity: [[GroupsController groups] numberOfGroups]];
         for (Torrent * torrent in allTorrents)
         {
             const NSInteger groupValue = [torrent groupValue];
-            if (groupValue != lastGroupValue)
+            TorrentGroup * group = [groupsByIndex objectForKey: [NSNumber numberWithInteger: groupValue]];
+            if (!group)
             {
-                lastGroupValue = groupValue;
-                
-                group = nil;
-                
-                //try to see if the group already exists
-                for (; currentOldGroupIndex < [oldTorrentGroups count]; ++currentOldGroupIndex)
-                {
-                    TorrentGroup * currentGroup = [oldTorrentGroups objectAtIndex: currentOldGroupIndex];
-                    const NSInteger currentGroupValue = [currentGroup groupIndex];
-                    if (currentGroupValue == groupValue)
-                    {
-                        group = currentGroup;
-                        [[currentGroup torrents] removeAllObjects];
-                        
-                        ++currentOldGroupIndex;
-                    }
-                    
-                    if (currentGroupValue >= groupValue)
-                        break;
-                }
-                
-                if (!group)
-                    group = [[[TorrentGroup alloc] initWithGroup: groupValue] autorelease];
-                [fDisplayedTorrents addObject: group];
+                group = [[[TorrentGroup alloc] initWithGroup: groupValue] autorelease];
+                [groupsByIndex setObject: group forKey: [NSNumber numberWithInteger: groupValue]];
             }
             
-            NSAssert(group != nil, @"No group object to add torrents to");
             [[group torrents] addObject: torrent];
         }
+        
+        #warning duplicate from above
+        if (onLion)
+            [fTableView removeItemsAtIndexes: [NSIndexSet indexSetWithIndexesInRange: NSMakeRange(0, [fDisplayedTorrents count])] inParent: nil withAnimation: NSTableViewAnimationSlideDown];
+        
+        [fDisplayedTorrents setArray: [groupsByIndex allValues]];
+        
+        //we need the groups to be sorted, and we can do it without moving items in the table, too!
+        NSSortDescriptor * groupDescriptor = [NSSortDescriptor sortDescriptorWithKey: @"groupOrderValue" ascending: YES];
+        [fDisplayedTorrents sortUsingDescriptors: [NSArray arrayWithObject: groupDescriptor]];
+        
+        if (onLion)
+            [fTableView insertItemsAtIndexes: [NSIndexSet indexSetWithIndexesInRange: NSMakeRange(0, [fDisplayedTorrents count])] inParent: nil withAnimation: NSTableViewAnimationEffectFade];
     }
     else
-        [fDisplayedTorrents setArray: allTorrents];
+    {
+        NSAssert(groupRows && wasGroupRows, @"Should have had group rows and should remain with group rows");
+        
+        #warning not remembering selected when changing to a new group
+        
+        #warning don't always do?
+        beganUpdates = YES;
+        if (onLion)
+            [fTableView beginUpdates];
+        
+        NSMutableIndexSet * unusedAllTorrentsIndexes = [NSMutableIndexSet indexSetWithIndexesInRange: NSMakeRange(0, [allTorrents count])];
+        
+        NSMutableDictionary * groupsByIndex = [NSMutableDictionary dictionaryWithCapacity: [fDisplayedTorrents count]];
+        
+        #warning necessary? make more efficient?
+        for (TorrentGroup * group in fDisplayedTorrents)
+            [groupsByIndex setObject: group forKey: [NSNumber numberWithInteger: [group groupIndex]]];
+        
+        const NSUInteger originalGroupCount = [fDisplayedTorrents count];
+        for (NSUInteger index = 0; index < originalGroupCount; ++index)
+        {
+            TorrentGroup * group = [fDisplayedTorrents objectAtIndex: index];
+            
+            NSMutableIndexSet * removeIndexes = [NSMutableIndexSet indexSet];
+            
+            //needs to be a signed integer
+            for (NSInteger indexInGroup = 0; indexInGroup < [[group torrents] count]; ++indexInGroup)
+            {
+                #warning indexOfObject:inSortedRange:options:usingComparator:?
+                Torrent * torrent = [[group torrents] objectAtIndex: indexInGroup];
+                const NSUInteger allIndex = [allTorrents indexOfObjectAtIndexes: unusedAllTorrentsIndexes options: NSEnumerationConcurrent passingTest: ^(id obj, NSUInteger idx, BOOL * stop) {
+                    return (BOOL)(obj == torrent);
+                }];
+                if (allIndex == NSNotFound)
+                    [removeIndexes addIndex: indexInGroup];
+                else
+                {
+                    BOOL markTorrentAsUsed = YES;
+                    
+                    const NSInteger groupValue = [torrent groupValue];
+                    if (groupValue != [group groupIndex])
+                    {
+                        TorrentGroup * newGroup = [groupsByIndex objectForKey: [NSNumber numberWithInteger: groupValue]];
+                        if (!newGroup)
+                        {
+                            newGroup = [[[TorrentGroup alloc] initWithGroup: groupValue] autorelease];
+                            [groupsByIndex setObject: newGroup forKey: [NSNumber numberWithInteger: groupValue]];
+                            [fDisplayedTorrents addObject: newGroup];
+                            
+                            if (onLion)
+                                [fTableView insertItemsAtIndexes: [NSIndexSet indexSetWithIndex: [fDisplayedTorrents count]-1] inParent: nil withAnimation: NSTableViewAnimationSlideLeft];
+                        }
+                        else //if we haven't processed the other group yet, we have to make sure we don't flag it for removal the next time
+                        {
+                            //ugggh, but shouldn't happen too often
+                            if ([fDisplayedTorrents indexOfObject: newGroup inRange: NSMakeRange(index+1, originalGroupCount-(index+1))] != NSNotFound)
+                                markTorrentAsUsed = NO;
+                        }
+                        
+                        [[group torrents] removeObjectAtIndex: indexInGroup];
+                        [[newGroup torrents] addObject: torrent];
+                        
+                        if (onLion)
+                            [fTableView moveItemAtIndex: indexInGroup inParent: group toIndex: [[newGroup torrents] count]-1 inParent: newGroup];
+                        
+                        --indexInGroup;
+                    }
+                    
+                    if (markTorrentAsUsed)
+                        [unusedAllTorrentsIndexes removeIndex: allIndex];
+                }
+            }
+            
+            if ([removeIndexes count] > 0)
+            {
+                [[group torrents] removeObjectsAtIndexes: removeIndexes];
+                if (onLion)
+                    [fTableView removeItemsAtIndexes: removeIndexes inParent: group withAnimation: NSTableViewAnimationSlideDown];
+            }
+        }
+        
+        //add remaining new torrents
+        for (Torrent * torrent in [allTorrents objectsAtIndexes: unusedAllTorrentsIndexes])
+        {
+            const NSInteger groupValue = [torrent groupValue];
+            TorrentGroup * group = [groupsByIndex objectForKey: [NSNumber numberWithInteger: groupValue]];
+            if (!group)
+            {
+                group = [[[TorrentGroup alloc] initWithGroup: groupValue] autorelease];
+                [groupsByIndex setObject: group forKey: [NSNumber numberWithInteger: groupValue]];
+                [fDisplayedTorrents addObject: group];
+                
+                if (onLion)
+                    [fTableView insertItemsAtIndexes: [NSIndexSet indexSetWithIndex: [fDisplayedTorrents count]-1] inParent: nil withAnimation: NSTableViewAnimationSlideLeft];
+            }
+            
+            [[group torrents] addObject: torrent];
+            if (onLion)
+                [fTableView insertItemsAtIndexes: [NSIndexSet indexSetWithIndex: [[group torrents] count]-1] inParent: group withAnimation: NSTableViewAnimationSlideDown];
+        }
+        
+        //remove empty groups
+        NSMutableIndexSet * removeIndexes = [NSMutableIndexSet indexSet];
+        for (NSUInteger index = 0; index < originalGroupCount; ++index)
+        {
+            TorrentGroup * group = [fDisplayedTorrents objectAtIndex: index];
+            if ([[group torrents] count] == 0)
+                [removeIndexes addIndex: index];
+        }
+        
+        if ([removeIndexes count] > 0)
+        {
+            [fDisplayedTorrents removeObjectsAtIndexes: removeIndexes];
+            if (onLion)
+                [fTableView removeItemsAtIndexes: removeIndexes inParent: nil withAnimation: NSTableViewAnimationSlideLeft];
+        }
+        
+        //now that all groups are there, sort them - don't insert on the fly in case groups were reordered in prefs
+        NSSortDescriptor * groupDescriptor = [NSSortDescriptor sortDescriptorWithKey: @"groupOrderValue" ascending: YES];
+        [self rearrangeTorrentTableArray: fDisplayedTorrents forParent: nil withSortDescriptors: [NSArray arrayWithObject: groupDescriptor] beganTableUpdate: &beganUpdates];
+    }
     
-    //actually sort
-    [self sortTorrentsIgnoreSelectedReloadTable: NO includeQueueOrder: NO];
-    [fTableView reloadData];
+    //sort the torrents (won't sort the groups, though)
+    [self sortTorrentsIgnoreSelectedCallUpdates: !beganUpdates includeQueueOrder: YES];
+    
+    if (onLion)
+    {
+        if (beganUpdates)
+            [fTableView endUpdates];
+        [fTableView setNeedsDisplay: YES];
+    }
+    else
+        [fTableView reloadData];
     
     //reset expanded/collapsed rows
     if (groupRows)
@@ -2191,7 +2454,9 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         }
     }
     
-    [fTableView selectValues: selectedValues];
+    if (selectedValues)
+        [fTableView selectValues: selectedValues];
+    
     [self resetInfo]; //if group is already selected, but the torrents in it change
     
     [self setBottomCountText: groupRows || filterStatus || filterGroup || searchStrings];
@@ -2624,14 +2889,16 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     return NSDragOperationNone;
 }
 
-- (BOOL) outlineView: (NSOutlineView *) outlineView acceptDrop: (id < NSDraggingInfo >) info item: (id) item
-    childIndex: (NSInteger) newRow
+#warning don't accept drop on overall group (without groups, or maybe with?)
+- (BOOL) outlineView: (NSOutlineView *) outlineView acceptDrop: (id < NSDraggingInfo >) info item: (id) item childIndex: (NSInteger) newRow
 {
     NSPasteboard * pasteboard = [info draggingPasteboard];
     if ([[pasteboard types] containsObject: TORRENT_TABLE_VIEW_DATA_TYPE])
     {
         //remember selected rows
-        NSArray * selectedValues = [fTableView selectedValues];
+        NSArray * selectedValues = nil;
+        if (![NSApp isOnLionOrBetter])
+            selectedValues = [fTableView selectedValues];
     
         NSIndexSet * indexes = [NSKeyedUnarchiver unarchiveObjectWithData: [pasteboard dataForType: TORRENT_TABLE_VIEW_DATA_TYPE]];
         
@@ -2644,17 +2911,10 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         if (item)
         {
             //change groups
-            NSInteger groupValue = [item groupIndex];
-            for (Torrent * torrent in movingTorrents)
-            {
-                //have to reset objects here to avoid weird crash
-                [[[fTableView parentForItem: torrent] torrents] removeObject: torrent];
-                [[item torrents] addObject: torrent];
-                
-                [torrent setGroupValue: groupValue];
-            }
-            //part 2 of avoiding weird crash
-            [fTableView reloadItem: nil reloadChildren: YES];
+            const NSInteger groupValue = [item groupIndex];
+            [movingTorrents enumerateObjectsWithOptions: NSEnumerationConcurrent usingBlock: ^(id obj, NSUInteger idx, BOOL *stop)  {
+                [(Torrent *)obj setGroupValue: groupValue];
+            }];
         }
         
         //reorder queue order
@@ -2679,13 +2939,20 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
             //insert objects at new location
             NSUInteger insertIndex = topTorrent ? [fTorrents indexOfObject: topTorrent] + 1 : 0;
             NSIndexSet * insertIndexes = [NSIndexSet indexSetWithIndexesInRange: NSMakeRange(insertIndex, [movingTorrents count])];
-            for (Torrent * torrent in movingTorrents)
-                [torrent setQueuePosition: insertIndex++];
             [fTorrents insertObjects: movingTorrents atIndexes: insertIndexes];
+            
+            //we need to make sure the queue order is updated in the Torrent object before we sort - safest to just reset all queue positions
+            NSUInteger i = 0;
+            for (Torrent * torrent in fTorrents)
+            {
+                [torrent setQueuePosition: i++];
+                [torrent update];
+            }
         }
         
         [self applyFilter];
-        [fTableView selectValues: selectedValues];
+        if (selectedValues)
+            [fTableView selectValues: selectedValues];
     }
     
     return YES;

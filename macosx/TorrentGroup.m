@@ -23,6 +23,7 @@
  *****************************************************************************/
 
 #import "TorrentGroup.h"
+#import "GroupsController.h"
 #import "Torrent.h"
 
 #include "transmission.h" // required by utils.h
@@ -46,9 +47,19 @@
     [super dealloc];
 }
 
+- (NSString *) description
+{
+    return [NSString stringWithFormat: @"Torrent Group %d: %@", fGroup, fTorrents];
+}
+
 - (NSInteger) groupIndex
 {
     return fGroup;
+}
+
+- (NSInteger) groupOrderValue
+{
+    return [[GroupsController groups] rowValueForIndex: fGroup];
 }
 
 - (NSMutableArray *) torrents

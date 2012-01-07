@@ -190,8 +190,8 @@ typedef enum
 - (void) applyFilter;
 
 - (void) sortTorrents: (BOOL) includeQueueOrder;
-- (void) sortTorrentsIgnoreSelectedReloadTable: (BOOL) reload includeQueueOrder: (BOOL) includeQueueOrder;
-- (void) rearrangeTorrentArray: (NSMutableArray *) rearrangeArray to: (NSArray *) endingArray forParent: parent beganTableUpdate: (BOOL *) beganTableUpdate;
+- (void) sortTorrentsIgnoreSelectedCallUpdates: (BOOL) callUpdates includeQueueOrder: (BOOL) includeQueueOrder;
+- (void) rearrangeTorrentTableArray: (NSMutableArray *) rearrangeArray forParent: (id) parent withSortDescriptors: (NSArray *) descriptors beganTableUpdate: (BOOL *) beganTableUpdate;
 - (void) setSort: (id) sender;
 - (void) setSortByGroup: (id) sender;
 - (void) setSortReverse: (id) sender;
