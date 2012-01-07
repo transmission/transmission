@@ -2031,19 +2031,6 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 #warning don't animate on launch
 - (void) applyFilter
 {
-    #warning re-add
-    //get all the torrents in the table
-    /*NSMutableArray * previousTorrents;
-    if ([fDisplayedTorrents count] > 0 && [[fDisplayedTorrents objectAtIndex: 0] isKindOfClass: [TorrentGroup class]])
-    {
-        previousTorrents = [NSMutableArray array];
-        
-        for (TorrentGroup * group in fDisplayedTorrents)
-            [previousTorrents addObjectsFromArray: [group torrents]];
-    }
-    else
-        previousTorrents = fDisplayedTorrents;*/
-    
     const BOOL onLion = [NSApp isOnLionOrBetter];
     
     NSArray * selectedValues = nil;
@@ -2158,10 +2145,30 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     if (fFilterBar)
         [fFilterBar setCountAll: [fTorrents count] active: active downloading: downloading seeding: seeding paused: paused];
     
+    #warning could probably be merged with later code somehow
     //clear display cache for not-shown torrents
-    /*[previousTorrents removeObjectsInArray: allTorrents];
-    for (Torrent * torrent in previousTorrents)
-        [torrent setPreviousFinishedPieces: nil];*/
+    if ([fDisplayedTorrents count] > 0)
+    {
+        NSMutableIndexSet * unusedIndexesInAll = [NSMutableIndexSet indexSetWithIndexesInRange: NSMakeRange(0, [allTorrents count])];
+        
+        //for each torrent, removes the previous piece info if it's not in allTorrents, and keeps track of which torrents we already found in allTorrents
+        void (^removePreviousFinishedPieces)(id, NSUInteger, BOOL *) = ^(id objDisplay, NSUInteger idx, BOOL * stop) {
+            const NSUInteger index = [allTorrents indexOfObjectAtIndexes: unusedIndexesInAll options: NSEnumerationConcurrent passingTest: ^BOOL(id objAll, NSUInteger idxAll, BOOL * stopAll) {
+                return objDisplay == objAll;
+            }];
+            
+            if (index == NSNotFound)
+                [(Torrent *)objDisplay setPreviousFinishedPieces: nil];
+            else
+                [unusedIndexesInAll removeIndex: index];
+        };
+        
+        if ([[fDisplayedTorrents objectAtIndex: 0] isKindOfClass: [TorrentGroup class]])
+            for (TorrentGroup * group in fDisplayedTorrents)
+                [[group torrents] enumerateObjectsWithOptions: NSEnumerationConcurrent usingBlock: removePreviousFinishedPieces];
+        else
+            [fDisplayedTorrents enumerateObjectsWithOptions: NSEnumerationConcurrent usingBlock: removePreviousFinishedPieces];
+    }
     
     BOOL beganUpdates = NO;
     
