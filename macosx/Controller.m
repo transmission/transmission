@@ -2910,16 +2910,13 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         //get the torrents to move
         NSMutableArray * movingTorrents = [NSMutableArray arrayWithCapacity: [indexes count]];
         for (NSUInteger i = [indexes firstIndex]; i != NSNotFound; i = [indexes indexGreaterThanIndex: i])
-            [movingTorrents addObject: [fTableView itemAtRow: i]];
-        
-        //reset groups
-        if (item)
         {
+            Torrent * torrent = [fTableView itemAtRow: i];
+            [movingTorrents addObject: torrent];
+            
             //change groups
-            const NSInteger groupValue = [item groupIndex];
-            [movingTorrents enumerateObjectsWithOptions: NSEnumerationConcurrent usingBlock: ^(id obj, NSUInteger idx, BOOL *stop)  {
-                [(Torrent *)obj setGroupValue: groupValue];
-            }];
+            if (item)
+                [torrent setGroupValue: [item groupIndex]];
         }
         
         //reorder queue order
@@ -2942,7 +2939,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
             [fTorrents removeObjectsInArray: movingTorrents];
             
             //insert objects at new location
-            NSUInteger insertIndex = topTorrent ? [fTorrents indexOfObject: topTorrent] + 1 : 0;
+            const NSUInteger insertIndex = topTorrent ? [fTorrents indexOfObject: topTorrent] + 1 : 0;
             NSIndexSet * insertIndexes = [NSIndexSet indexSetWithIndexesInRange: NSMakeRange(insertIndex, [movingTorrents count])];
             [fTorrents insertObjects: movingTorrents atIndexes: insertIndexes];
             
@@ -2953,6 +2950,41 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
                 [torrent setQueuePosition: i++];
                 [torrent update];
             }
+            
+            //do the drag animation here so that the dragged torrents are the ones that are animated as moving, and not the torrents around them
+            const BOOL onLion = [NSApp isOnLionOrBetter];
+            if (onLion)
+                [fTableView beginUpdates];
+            
+            NSUInteger insertDisplayIndex = topTorrent ? [groupTorrents indexOfObject: topTorrent] + 1 : 0;
+            
+            for (Torrent * torrent in movingTorrents)
+            {
+                TorrentGroup * oldParent = item ? [fTableView parentForItem: torrent] : nil;
+                NSMutableArray * oldTorrents = oldParent ? [oldParent torrents] : fDisplayedTorrents;
+                const NSUInteger oldIndex = [oldTorrents indexOfObject: torrent];
+                
+                if (item == oldParent)
+                {
+                    if (oldIndex < insertDisplayIndex)
+                        --insertDisplayIndex;
+                    [oldTorrents moveObjectAtIndex: oldIndex toIndex: insertDisplayIndex];
+                }
+                else
+                {
+                    NSMutableArray * newTorrents = [(TorrentGroup *)item torrents];
+                    [newTorrents insertObject: torrent atIndex: insertDisplayIndex];
+                    [oldTorrents removeObjectAtIndex: oldIndex];
+                }
+                
+                if (onLion)
+                    [fTableView moveItemAtIndex: oldIndex inParent: oldParent toIndex: insertDisplayIndex inParent: item];
+                
+                ++insertDisplayIndex;
+            }
+            
+            if (onLion)
+                [fTableView endUpdates];
         }
         
         [self applyFilter];
