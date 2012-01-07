@@ -2875,6 +2875,9 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         }
         else
         {
+            if (index == NSOutlineViewDropOnItemIndex)
+                return NSDragOperationNone;
+            
             if (item)
             {
                 index = [fTableView rowForItem: item] + 1;
@@ -2889,7 +2892,6 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     return NSDragOperationNone;
 }
 
-#warning don't accept drop on overall group (without groups, or maybe with?)
 - (BOOL) outlineView: (NSOutlineView *) outlineView acceptDrop: (id < NSDraggingInfo >) info item: (id) item childIndex: (NSInteger) newRow
 {
     NSPasteboard * pasteboard = [info draggingPasteboard];
