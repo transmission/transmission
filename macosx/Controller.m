@@ -2110,8 +2110,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
                     BOOL found = NO;
                     for (NSString * tracker in trackers)
                     {
-                        if ([tracker rangeOfString: searchString options:
-                             (NSCaseInsensitiveSearch | NSDiacriticInsensitiveSearch)].location != NSNotFound)
+                        if ([tracker rangeOfString: searchString options: (NSCaseInsensitiveSearch | NSDiacriticInsensitiveSearch)].location != NSNotFound)
                         {
                             found = YES;
                             break;
@@ -2157,7 +2156,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
                 return objDisplay == objAll;
             }];
             
-            if (index == NSNotFound){NSLog(@"%@",objDisplay);
+            if (index == NSNotFound){
                 [(Torrent *)objDisplay setPreviousFinishedPieces: nil];}
             else
                 [unusedIndexesInAll removeIndex: index];
@@ -2179,34 +2178,32 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     const BOOL wasGroupRows = [fDisplayedTorrents count] > 0 ? [[fDisplayedTorrents objectAtIndex: 0] isKindOfClass: [TorrentGroup class]] : groupRows;
     if (!groupRows && !wasGroupRows)
     {
-        const NSRange existingTorrentRange = NSMakeRange(0, [fDisplayedTorrents count]);
         NSMutableIndexSet * addIndexes = [NSMutableIndexSet indexSet],
-                        * remainingPreviousIndexes = [NSMutableIndexSet indexSetWithIndexesInRange: existingTorrentRange];
+                        * removePreviousIndexes = [NSMutableIndexSet indexSetWithIndexesInRange: NSMakeRange(0, [fDisplayedTorrents count])];
         
-        for (NSUInteger previousIndex = 0; previousIndex < [allTorrents count]; ++previousIndex)
-        {
-            Torrent * torrent = [allTorrents objectAtIndex: previousIndex];
-            const NSUInteger currentIndex = [fDisplayedTorrents indexOfObjectAtIndexes: remainingPreviousIndexes options: NSEnumerationConcurrent passingTest: ^(id obj, NSUInteger idx, BOOL *stop) {
-                return (BOOL)(obj == torrent);
+        //for each of the torrents to add, find if it already exists (and keep track of those we've already added & those we need to remove)
+        [allTorrents enumerateObjectsWithOptions: NSEnumerationConcurrent usingBlock:^(id objAll, NSUInteger previousIndex, BOOL * stop) {
+            const NSUInteger currentIndex = [fDisplayedTorrents indexOfObjectAtIndexes: removePreviousIndexes options: NSEnumerationConcurrent passingTest: ^(id objDisplay, NSUInteger idx, BOOL *stop) {
+                return (BOOL)(objAll == objDisplay);
             }];
             if (currentIndex == NSNotFound)
                 [addIndexes addIndex: previousIndex];
             else
-                [remainingPreviousIndexes removeIndex: currentIndex];
-        }
+                [removePreviousIndexes removeIndex: currentIndex];
+        }];
         
-        if ([addIndexes count] > 0 || [remainingPreviousIndexes count] > 0)
+        if ([addIndexes count] > 0 || [removePreviousIndexes count] > 0)
         {
             beganUpdates = YES;
             if (onLion)
                 [fTableView beginUpdates];
             
             //remove torrents we didn't find
-            if ([remainingPreviousIndexes count] > 0)
+            if ([removePreviousIndexes count] > 0)
             {
-                [fDisplayedTorrents removeObjectsAtIndexes: remainingPreviousIndexes];
+                [fDisplayedTorrents removeObjectsAtIndexes: removePreviousIndexes];
                 if (onLion)
-                    [fTableView removeItemsAtIndexes: remainingPreviousIndexes inParent: nil withAnimation: NSTableViewAnimationSlideDown];
+                    [fTableView removeItemsAtIndexes: removePreviousIndexes inParent: nil withAnimation: NSTableViewAnimationSlideDown];
             }
             
             //add new torrents
@@ -2220,14 +2217,14 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     }
     else if (!groupRows && wasGroupRows)
     {
-        //since we're not doing this the right way (boo buggy animation), we need to remember selected group
-        NSArray * selectedValues = [fTableView selectedValues];
-        
         beganUpdates = YES;
         if (onLion)
             [fTableView beginUpdates];
         
 #if 1
+        //since we're not doing this the right way (boo buggy animation), we need to remember selected group
+        NSArray * selectedValues = [fTableView selectedValues];
+        
         if (onLion)
             [fTableView removeItemsAtIndexes: [NSIndexSet indexSetWithIndexesInRange: NSMakeRange(0, [fDisplayedTorrents count])] inParent: nil withAnimation: NSTableViewAnimationSlideDown];
              
@@ -2283,10 +2280,6 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         //since we're not doing this the right way (boo buggy animation), we need to remember selected group
         selectedValues = [fTableView selectedValues];
         
-        beganUpdates = YES;
-        if (onLion)
-            [fTableView beginUpdates];
-        
         //a map for quickly finding groups
         NSMutableDictionary * groupsByIndex = [NSMutableDictionary dictionaryWithCapacity: [[GroupsController groups] numberOfGroups]];
         for (Torrent * torrent in allTorrents)
@@ -2301,6 +2294,10 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
             
             [[group torrents] addObject: torrent];
         }
+        
+        beganUpdates = YES;
+        if (onLion)
+            [fTableView beginUpdates];
         
         #warning duplicate from above
         if (onLion)
@@ -2393,7 +2390,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
             {
                 [[group torrents] removeObjectsAtIndexes: removeIndexes];
                 if (onLion)
-                    [fTableView removeItemsAtIndexes: removeIndexes inParent: group withAnimation: NSTableViewAnimationSlideDown];
+                    [fTableView removeItemsAtIndexes: removeIndexes inParent: group withAnimation: NSTableViewAnimationEffectFade];
             }
         }
         
@@ -2419,12 +2416,10 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         
         //remove empty groups
         NSMutableIndexSet * removeIndexes = [NSMutableIndexSet indexSet];
-        for (NSUInteger index = 0; index < originalGroupCount; ++index)
-        {
-            TorrentGroup * group = [fDisplayedTorrents objectAtIndex: index];
-            if ([[group torrents] count] == 0)
-                [removeIndexes addIndex: index];
-        }
+        [fDisplayedTorrents enumerateObjectsAtIndexes: [NSIndexSet indexSetWithIndexesInRange: NSMakeRange(0, originalGroupCount)] options: NSEnumerationConcurrent usingBlock: ^(id obj, NSUInteger idx, BOOL * stop) {
+            if ([[(TorrentGroup *)obj torrents] count] == 0)
+                [removeIndexes addIndex: idx];
+        }];
         
         if ([removeIndexes count] > 0)
         {
