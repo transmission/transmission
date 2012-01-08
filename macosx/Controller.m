@@ -2261,7 +2261,6 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         if (onLion)
             [fTableView beginUpdates];
         
-#if 1
         //since we're not doing this the right way (boo buggy animation), we need to remember selected group
         NSArray * selectedValues = [fTableView selectedValues];
         
@@ -2274,46 +2273,6 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
             [fTableView insertItemsAtIndexes: [NSIndexSet indexSetWithIndexesInRange: NSMakeRange(0, [fDisplayedTorrents count])] inParent: nil withAnimation: NSTableViewAnimationEffectFade];
         
         [fTableView selectValues: selectedValues];
-#else
-        #warning hard hat zone
-        
-        #warning use and don't modify all torrents?
-        NSMutableIndexSet * addIndexes = [NSMutableIndexSet indexSet];
-        
-        const NSUInteger groupCount = [fDisplayedTorrents count];
-        for (NSUInteger groupIndex = 0; groupIndex < groupCount; ++groupIndex)
-        {
-            TorrentGroup * group = [fDisplayedTorrents objectAtIndex: groupIndex];
-            
-            for (NSInteger indexInGroup = [[group torrents] count]-1; indexInGroup >= 0; --indexInGroup)
-            {
-                Torrent * torrent = [[group torrents] objectAtIndex: indexInGroup];
-                
-                #warning maybe keep some sort of index set? idk - don't modify allTorrents?
-                const NSUInteger indexInAll = [allTorrents indexOfObject: torrent];
-                if (indexInAll != NSNotFound)
-                {
-                    [allTorrents removeObjectAtIndex: indexInAll];
-                    [[group torrents] removeObjectAtIndex: indexInGroup];
-                    [fDisplayedTorrents addObject: torrent];
-                    if (onLion)
-                        [fTableView moveItemAtIndex: indexInGroup inParent: group toIndex: [fDisplayedTorrents count]-1 inParent: nil];
-                }
-            }
-        }
-        
-        NSIndexSet * groupIndexes = [NSIndexSet indexSetWithIndexesInRange: NSMakeRange(0, groupCount)];
-        [fDisplayedTorrents removeObjectsAtIndexes: groupIndexes];
-        if (onLion)
-            [fTableView removeItemsAtIndexes: groupIndexes inParent: nil withAnimation: NSTableViewAnimationSlideDown];
-        
-        if ([allTorrents count] > 0)
-        {
-            [fDisplayedTorrents addObjectsFromArray: allTorrents];
-            if (onLion)
-                [fTableView insertItemsAtIndexes: [NSIndexSet indexSetWithIndexesInRange: NSMakeRange([fDisplayedTorrents count] - [allTorrents count], [allTorrents count])] inParent: nil withAnimation: NSTableViewAnimationSlideDown];
-        }
-#endif
     }
     else if (groupRows && !wasGroupRows)
     {
