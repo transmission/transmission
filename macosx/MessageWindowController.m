@@ -442,16 +442,11 @@
     const NSInteger level = [[NSUserDefaults standardUserDefaults] integerForKey: @"MessageLevel"];
     NSString * filterString = [fFilterField stringValue];
     
-    NSMutableArray * tempMessages = [NSMutableArray arrayWithCapacity: [fMessages count]]; //rough guess
+    NSIndexSet * indexes = [fMessages indexesOfObjectsWithOptions: NSEnumerationConcurrent passingTest: ^BOOL(id message, NSUInteger idx, BOOL * stop) {
+        return [[(NSDictionary *)message objectForKey: @"Level"] integerValue] <= level && [self shouldIncludeMessageForFilter: filterString message: message];
+    }];
     
-    for (NSDictionary * message in fMessages)
-    {
-        if ([[message objectForKey: @"Level"] integerValue] <= level
-            && [self shouldIncludeMessageForFilter: filterString message: message])
-            [tempMessages addObject: message];
-    }
-    
-    [tempMessages sortUsingDescriptors: [fMessageTable sortDescriptors]];
+    NSArray * tempMessages = [[fMessages objectsAtIndexes: indexes] sortedArrayUsingDescriptors: [fMessageTable sortDescriptors]];
     
     const BOOL onLion = [NSApp isOnLionOrBetter];
     
