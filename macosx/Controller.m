@@ -2166,18 +2166,11 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     //clear display cache for not-shown torrents
     if ([fDisplayedTorrents count] > 0)
     {
-        NSMutableIndexSet * unusedIndexesInAll = [NSMutableIndexSet indexSetWithIndexesInRange: NSMakeRange(0, [allTorrents count])];
-        
         //for each torrent, removes the previous piece info if it's not in allTorrents, and keeps track of which torrents we already found in allTorrents
-        void (^removePreviousFinishedPieces)(id, NSUInteger, BOOL *) = ^(id objDisplay, NSUInteger idx, BOOL * stop) {
-            const NSUInteger index = [allTorrents indexOfObjectAtIndexes: unusedIndexesInAll options: NSEnumerationConcurrent passingTest: ^BOOL(id objAll, NSUInteger idxAll, BOOL * stopAll) {
-                return objDisplay == objAll;
-            }];
-            
-            if (index == NSNotFound)
-                [(Torrent *)objDisplay setPreviousFinishedPieces: nil];
-            else
-                [unusedIndexesInAll removeIndex: index];
+        void (^removePreviousFinishedPieces)(id, NSUInteger, BOOL *) = ^(id obj, NSUInteger idx, BOOL * stop) {
+            //we used to keep track of which torrents we already found in allTorrents, but it wasn't safe fo concurrent enumeration
+            if (![allTorrents containsObject: obj])
+                [(Torrent *)obj setPreviousFinishedPieces: nil];
         };
         
         if ([[fDisplayedTorrents objectAtIndex: 0] isKindOfClass: [TorrentGroup class]])
