@@ -32,8 +32,6 @@
 #import "NSStringAdditions.h"
 #import <Quartz/Quartz.h>
 
-#import "utils.h"
-
 #define ROW_SMALL_HEIGHT 18.0
 
 typedef enum
@@ -72,9 +70,6 @@ typedef enum
     
     [fOutline setMenu: [self menu]];
     
-    fLock = [[NSRecursiveLock alloc] init];
-    [fLock setName: @"File Table"];
-    
     [self setTorrent: nil];
 }
 
@@ -82,8 +77,6 @@ typedef enum
 {
     [fFileList release];
     [fFilterText release];
-    
-    [fLock release];
     
     [super dealloc];
 }
@@ -102,13 +95,8 @@ typedef enum
     [fFilterText release];
     fFilterText = nil;
     
-    while (![fLock tryLock])
-        tr_wait_msec(100);
-    
     [fOutline reloadData];
     [fOutline deselectAll: nil]; //do this after reloading the data #4575
-    
-    [fLock unlock];
 }
 
 - (void) setFilterText: (NSString *) text
@@ -125,16 +113,8 @@ typedef enum
     
     const BOOL onLion = [NSApp isOnLionOrBetter];
     
-    while (![fLock tryLock])
-        tr_wait_msec(100);
-    
     if (onLion)
-    {
-        [[NSAnimationContext currentContext] setCompletionHandler: ^{ [fLock unlock]; }];
-        [NSAnimationContext beginGrouping];
-        
         [fOutline beginUpdates];
-    }
     
     NSUInteger currentIndex = 0, totalCount = 0;
     NSMutableArray * itemsToAdd = [NSMutableArray array];
@@ -222,17 +202,9 @@ typedef enum
         [fOutline insertItemsAtIndexes: itemsToAddIndexes inParent: nil withAnimation: NSTableViewAnimationSlideUp];
     
     if (onLion)
-    {
         [fOutline endUpdates];
-        
-        [NSAnimationContext endGrouping];
-    }
     else
-    {
         [fOutline reloadData];
-    
-        [fLock unlock];
-    }
     
     [fFilterText release];
     fFilterText = [text retain];
@@ -242,12 +214,7 @@ typedef enum
 {
     [fTorrent updateFileStat];
     
-    while (![fLock tryLock])
-        tr_wait_msec(100);
-    
     [fOutline setNeedsDisplay: YES];
-    
-    [fLock unlock];
 }
 
 - (void) outlineViewSelectionDidChange: (NSNotification *) notification
@@ -383,9 +350,6 @@ typedef enum
 
 - (void) setCheck: (id) sender
 {
-    while (![fLock tryLock])
-        tr_wait_msec(100);
-    
     NSInteger state = [sender tag] == FILE_UNCHECK_TAG ? NSOffState : NSOnState;
     
     NSIndexSet * indexSet = [fOutline selectedRowIndexes];
@@ -395,15 +359,10 @@ typedef enum
     
     [fTorrent setFileCheckState: state forIndexes: itemIndexes];
     [fOutline setNeedsDisplay: YES];
-    
-    [fLock unlock];
 }
 
 - (void) setOnlySelectedCheck: (id) sender
 {
-    while (![fLock tryLock])
-        tr_wait_msec(100);
-    
     NSIndexSet * indexSet = [fOutline selectedRowIndexes];
     NSMutableIndexSet * itemIndexes = [NSMutableIndexSet indexSet];
     for (NSInteger i = [indexSet firstIndex]; i != NSNotFound; i = [indexSet indexGreaterThanIndex: i])
@@ -416,8 +375,6 @@ typedef enum
     [fTorrent setFileCheckState: NSOffState forIndexes: remainingItemIndexes];
     
     [fOutline setNeedsDisplay: YES];
-    
-    [fLock unlock];
 }
 
 - (void) setPriority: (id) sender
@@ -435,9 +392,6 @@ typedef enum
             priority = TR_PRI_LOW;
     }
     
-    while (![fLock tryLock])
-        tr_wait_msec(100);
-    
     NSIndexSet * indexSet = [fOutline selectedRowIndexes];
     NSMutableIndexSet * itemIndexes = [NSMutableIndexSet indexSet];
     for (NSInteger i = [indexSet firstIndex]; i != NSNotFound; i = [indexSet indexGreaterThanIndex: i])
@@ -445,15 +399,10 @@ typedef enum
     
     [fTorrent setFilePriority: priority forIndexes: itemIndexes];
     [fOutline setNeedsDisplay: YES];
-    
-    [fLock unlock];
 }
 
 - (void) revealFile: (id) sender
 {
-    while (![fLock tryLock])
-        tr_wait_msec(100);
-    
     NSIndexSet * indexes = [fOutline selectedRowIndexes];
     NSMutableArray * paths = [NSMutableArray arrayWithCapacity: [indexes count]];
     for (NSUInteger i = [indexes firstIndex]; i != NSNotFound; i = [indexes indexGreaterThanIndex: i])
@@ -465,8 +414,6 @@ typedef enum
     
     if ([paths count] > 0)
         [[NSWorkspace sharedWorkspace] activateFileViewerSelectingURLs: paths];
-    
-    [fLock unlock];
 }
 
 #warning make real view controller (Leopard-only) so that Command-R will work
