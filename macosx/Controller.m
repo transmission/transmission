@@ -2057,7 +2057,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     if (!onLion)
         selectedValues = [fTableView selectedValues];
     
-    NSUInteger active = 0, downloading = 0, seeding = 0, paused = 0;
+    __block NSUInteger active = 0, downloading = 0, seeding = 0, paused = 0;
     NSString * filterType = [fDefaults stringForKey: @"Filter"];
     BOOL filterActive = NO, filterDownload = NO, filterSeed = NO, filterPause = NO, filterStatus = YES;
     if ([filterType isEqualToString: FILTER_ACTIVE])
@@ -2079,11 +2079,8 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         searchStrings = nil;
     const BOOL filterTracker = searchStrings && [[fDefaults stringForKey: @"FilterSearchType"] isEqualToString: FILTER_TYPE_TRACKER];
     
-    NSMutableArray * allTorrents = [NSMutableArray arrayWithCapacity: [fTorrents count]];
-    
-    //get count of each type
-    for (Torrent * torrent in fTorrents)
-    {
+    //filter & get counts of each type
+    NSIndexSet * indexesOfNonFilteredTorrents = [fTorrents indexesOfObjectsWithOptions: NSEnumerationConcurrent passingTest: ^BOOL(Torrent * torrent, NSUInteger idx, BOOL * stop) {
         //check status
         if ([torrent isActive] && ![torrent isCheckingWaiting])
         {
@@ -2095,26 +2092,26 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
             {
                 ++seeding;
                 if (filterStatus && !((filterActive && isActive) || filterSeed))
-                    continue;
+                    return NO;
             }
             else
             {
                 ++downloading;
                 if (filterStatus && !((filterActive && isActive) || filterDownload))
-                    continue;
+                    return NO;
             }
         }
         else
         {
             ++paused;
             if (filterStatus && !filterPause)
-                continue;
+                return NO;
         }
         
         //checkGroup
         if (filterGroup)
             if ([torrent groupValue] != groupFilterValue)
-                continue;
+                return NO;
         
         //check text field
         if (searchStrings)
@@ -2153,11 +2150,13 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
             }
             
             if (removeTextField)
-                continue;
+                return NO;
         }
         
-        [allTorrents addObject: torrent];
-    }
+        return YES;
+    }];
+    
+    NSArray * allTorrents = [fTorrents objectsAtIndexes: indexesOfNonFilteredTorrents];
     
     //set button tooltips
     if (fFilterBar)
