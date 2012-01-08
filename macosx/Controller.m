@@ -2416,10 +2416,8 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         }
         
         //remove empty groups
-        NSMutableIndexSet * removeIndexes = [NSMutableIndexSet indexSet];
-        [fDisplayedTorrents enumerateObjectsAtIndexes: [NSIndexSet indexSetWithIndexesInRange: NSMakeRange(0, originalGroupCount)] options: NSEnumerationConcurrent usingBlock: ^(id obj, NSUInteger idx, BOOL * stop) {
-            if ([[(TorrentGroup *)obj torrents] count] == 0)
-                [removeIndexes addIndex: idx];
+        NSIndexSet * removeIndexes = [fDisplayedTorrents indexesOfObjectsAtIndexes: [NSIndexSet indexSetWithIndexesInRange: NSMakeRange(0, originalGroupCount)] options: NSEnumerationConcurrent passingTest: ^BOOL(id obj, NSUInteger idx, BOOL * stop) {
+            return [[(TorrentGroup *)obj torrents] count] == 0;
         }];
         
         if ([removeIndexes count] > 0)
