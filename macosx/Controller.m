@@ -887,7 +887,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
             [torrent release];
             
             if (!fAddingTransfers)
-                fAddingTransfers = [[NSMutableArray alloc] init];
+                fAddingTransfers = [[NSMutableSet alloc] init];
             [fAddingTransfers addObject: torrent];
         }
     }
@@ -909,7 +909,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         [torrent release];
         
         if (!fAddingTransfers)
-            fAddingTransfers = [[NSMutableArray alloc] init];
+            fAddingTransfers = [[NSMutableSet alloc] init];
         [fAddingTransfers addObject: torrent];
         
         [self fullUpdateUI];
@@ -967,7 +967,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         [torrent release];
         
         if (!fAddingTransfers)
-            fAddingTransfers = [[NSMutableArray alloc] init];
+            fAddingTransfers = [[NSMutableSet alloc] init];
         [fAddingTransfers addObject: torrent];
     }
 
@@ -988,7 +988,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         [torrent release];
         
         if (!fAddingTransfers)
-            fAddingTransfers = [[NSMutableArray alloc] init];
+            fAddingTransfers = [[NSMutableSet alloc] init];
         [fAddingTransfers addObject: torrent];
         
         [self fullUpdateUI];
@@ -1686,7 +1686,6 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 {
     CGFloat dlRate = 0.0, ulRate = 0.0;
     BOOL completed = NO;
-    #warning use a block to do in parallel?
     for (Torrent * torrent in fTorrents)
     {
         [torrent update];
@@ -2177,8 +2176,8 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
                 return objDisplay == objAll;
             }];
             
-            if (index == NSNotFound){
-                [(Torrent *)objDisplay setPreviousFinishedPieces: nil];}
+            if (index == NSNotFound)
+                [(Torrent *)objDisplay setPreviousFinishedPieces: nil];
             else
                 [unusedIndexesInAll removeIndex: index];
         };
@@ -4561,7 +4560,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     [torrent release];
     
     if (!fAddingTransfers)
-        fAddingTransfers = [[NSMutableArray alloc] init];
+        fAddingTransfers = [[NSMutableSet alloc] init];
     [fAddingTransfers addObject: torrent];
     
     [self fullUpdateUI];
