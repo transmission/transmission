@@ -103,6 +103,8 @@ typedef enum
     
     NSMutableDictionary             * fPendingTorrentDownloads;
     
+    NSMutableArray                  * fAddingTransfers;
+    
     BOOL                            fGlobalPopoverShown;
     BOOL                            fSoundPlaying;
 }

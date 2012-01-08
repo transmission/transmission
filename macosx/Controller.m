@@ -689,6 +689,8 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     [fTorrents release];
     [fDisplayedTorrents release];
     
+    [fAddingTransfers release];
+    
     [fOverlayWindow release];
     [fBadger release];
     
@@ -883,6 +885,10 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
             [torrent update];
             [fTorrents addObject: torrent];
             [torrent release];
+            
+            if (!fAddingTransfers)
+                fAddingTransfers = [[NSMutableArray alloc] init];
+            [fAddingTransfers addObject: torrent];
         }
     }
 
@@ -901,6 +907,10 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         [torrent update];
         [fTorrents addObject: torrent];
         [torrent release];
+        
+        if (!fAddingTransfers)
+            fAddingTransfers = [[NSMutableArray alloc] init];
+        [fAddingTransfers addObject: torrent];
         
         [self fullUpdateUI];
     }
@@ -955,6 +965,10 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         [torrent update];
         [fTorrents addObject: torrent];
         [torrent release];
+        
+        if (!fAddingTransfers)
+            fAddingTransfers = [[NSMutableArray alloc] init];
+        [fAddingTransfers addObject: torrent];
     }
 
     [self fullUpdateUI];
@@ -972,6 +986,10 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         [torrent update];
         [fTorrents addObject: torrent];
         [torrent release];
+        
+        if (!fAddingTransfers)
+            fAddingTransfers = [[NSMutableArray alloc] init];
+        [fAddingTransfers addObject: torrent];
         
         [self fullUpdateUI];
     }
@@ -2219,6 +2237,20 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
             //add new torrents
             if ([addIndexes count] > 0)
             {
+                //slide new torrents in differently
+                if (fAddingTransfers)
+                {
+                    NSIndexSet * newAddIndexes = [allTorrents indexesOfObjectsWithOptions: NSEnumerationConcurrent passingTest: ^BOOL(id obj, NSUInteger idx, BOOL * stop) {
+                        return [fAddingTransfers containsObject: obj];
+                    }];
+                    
+                    [addIndexes removeIndexes: newAddIndexes];
+                    
+                    [fDisplayedTorrents addObjectsFromArray: [allTorrents objectsAtIndexes: newAddIndexes]];
+                    if (onLion)
+                        [fTableView insertItemsAtIndexes: [NSIndexSet indexSetWithIndexesInRange: NSMakeRange([fDisplayedTorrents count] - [newAddIndexes count], [newAddIndexes count])] inParent: nil withAnimation: NSTableViewAnimationSlideLeft];
+                }
+                
                 [fDisplayedTorrents addObjectsFromArray: [allTorrents objectsAtIndexes: addIndexes]];
                 if (onLion)
                     [fTableView insertItemsAtIndexes: [NSIndexSet indexSetWithIndexesInRange: NSMakeRange([fDisplayedTorrents count] - [addIndexes count], [addIndexes count])] inParent: nil withAnimation: NSTableViewAnimationSlideDown];
@@ -2351,7 +2383,6 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
             //needs to be a signed integer
             for (NSInteger indexInGroup = 0; indexInGroup < [[group torrents] count]; ++indexInGroup)
             {
-                #warning indexOfObject:inSortedRange:options:usingComparator:?
                 Torrent * torrent = [[group torrents] objectAtIndex: indexInGroup];
                 const NSUInteger allIndex = [allTorrents indexOfObjectAtIndexes: unusedAllTorrentsIndexes options: NSEnumerationConcurrent passingTest: ^(id obj, NSUInteger idx, BOOL * stop) {
                     return (BOOL)(obj == torrent);
@@ -2421,7 +2452,10 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
             
             [[group torrents] addObject: torrent];
             if (onLion)
-                [fTableView insertItemsAtIndexes: [NSIndexSet indexSetWithIndex: [[group torrents] count]-1] inParent: group withAnimation: NSTableViewAnimationSlideDown];
+            {
+                const BOOL newTorrent = fAddingTransfers && [fAddingTransfers containsObject: torrent];
+                [fTableView insertItemsAtIndexes: [NSIndexSet indexSetWithIndex: [[group torrents] count]-1] inParent: group withAnimation: newTorrent ? NSTableViewAnimationSlideLeft : NSTableViewAnimationSlideDown];
+            }
         }
         
         //remove empty groups
@@ -2478,6 +2512,12 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     [self setBottomCountText: groupRows || filterStatus || filterGroup || searchStrings];
     
     [self setWindowSizeToFit];
+    
+    if (fAddingTransfers)
+    {
+        [fAddingTransfers release];
+        fAddingTransfers = nil;
+    }
 }
 
 - (void) switchFilter: (id) sender
@@ -4519,6 +4559,10 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     [torrent update];
     [fTorrents addObject: torrent];
     [torrent release];
+    
+    if (!fAddingTransfers)
+        fAddingTransfers = [[NSMutableArray alloc] init];
+    [fAddingTransfers addObject: torrent];
     
     [self fullUpdateUI];
 }
