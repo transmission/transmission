@@ -2119,38 +2119,37 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         //check text field
         if (searchStrings)
         {
-            BOOL removeTextField = NO;
+            __block BOOL removeTextField = NO;
             if (filterTracker)
             {
                 NSArray * trackers = [torrent allTrackersFlat];
                 
-                //to count, we need each string in atleast 1 tracker
-                for (NSString * searchString in searchStrings)
-                {
-                    BOOL found = NO;
-                    for (NSString * tracker in trackers)
-                    {
+                //to count, we need each string in at least 1 tracker
+                [searchStrings enumerateObjectsWithOptions: NSEnumerationConcurrent usingBlock: ^(id searchString, NSUInteger idx, BOOL * stop) {
+                    __block BOOL found = NO;
+                    [trackers enumerateObjectsWithOptions: NSEnumerationConcurrent usingBlock: ^(id tracker, NSUInteger idx, BOOL * stopTracker) {
                         if ([tracker rangeOfString: searchString options: (NSCaseInsensitiveSearch | NSDiacriticInsensitiveSearch)].location != NSNotFound)
                         {
                             found = YES;
-                            break;
+                            *stopTracker = YES;
                         }
-                    }
+                    }];
                     if (!found)
                     {
                         removeTextField = YES;
-                        break;
+                        *stop = YES;
                     }
-                }
+                }];
             }
             else
             {
-                for (NSString * searchString in searchStrings)
+                [searchStrings enumerateObjectsWithOptions: NSEnumerationConcurrent usingBlock: ^(id searchString, NSUInteger idx, BOOL * stop) {
                     if ([[torrent name] rangeOfString: searchString options: (NSCaseInsensitiveSearch | NSDiacriticInsensitiveSearch)].location == NSNotFound)
                     {
                         removeTextField = YES;
-                        break;
+                        *stop = YES;
                     }
+                }];
             }
             
             if (removeTextField)

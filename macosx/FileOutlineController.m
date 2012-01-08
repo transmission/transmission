@@ -125,15 +125,16 @@ typedef enum
     NSArray * tempList = !text ? [fTorrent fileList] : [fTorrent flatFileList];
     for (FileListNode * item in tempList)
     {
-        BOOL filter = NO;
+        __block BOOL filter = NO;
         if (components)
         {
-            for (NSString * sub in components)
-                if ([[item name] rangeOfString: sub options: (NSCaseInsensitiveSearch | NSDiacriticInsensitiveSearch)].location == NSNotFound)
+            [components enumerateObjectsWithOptions: NSEnumerationConcurrent usingBlock: ^(id obj, NSUInteger idx, BOOL * stop) {
+                if ([[item name] rangeOfString: (NSString *)obj options: (NSCaseInsensitiveSearch | NSDiacriticInsensitiveSearch)].location == NSNotFound)
                 {
                     filter = YES;
-                    break;
+                    *stop = YES;
                 }
+            }];
         }
         
         if (!filter)
