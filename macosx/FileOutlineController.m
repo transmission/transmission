@@ -587,24 +587,25 @@ typedef enum
 {
     NSAssert(![node isFolder], @"Looking up folder node!");
     
-    const NSUInteger nodeIndex = [[node indexes] firstIndex];
-    for (NSUInteger index = range.location; index < NSMaxRange(range); ++index)
-    {
-        FileListNode * checkNode = [list objectAtIndex: index];
+    __block NSUInteger retIndex = NSNotFound;
+    
+    [list enumerateObjectsAtIndexes: [NSIndexSet indexSetWithIndexesInRange: range] options: NSEnumerationConcurrent usingBlock: ^(id checkNode, NSUInteger index, BOOL * stop) {
         if ([checkNode isEqualTo: node])
         {
             *parent = currentParent;
-            return index;
+            retIndex = index;
+            *stop = YES;
         }
-        else if ([checkNode isFolder] && [[checkNode indexes] containsIndex: nodeIndex])
+        else if ([checkNode isFolder] && [[checkNode indexes] containsIndex: [[node indexes] firstIndex]])
         {
             const NSUInteger subIndex = [self findFileNode: node inList: [checkNode children] inRange: NSMakeRange(0, [[checkNode children] count]) currentParent: checkNode finalParent: parent];
             NSAssert(subIndex != NSNotFound, @"We didn't find an expected file node.");
-            return subIndex;
+            retIndex = subIndex;
+            *stop = YES;
         }
-    }
+    }];
     
-    return NSNotFound;
+    return retIndex;
 }
 
 @end
