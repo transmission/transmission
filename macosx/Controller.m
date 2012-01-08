@@ -2200,7 +2200,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
                         * removePreviousIndexes = [NSMutableIndexSet indexSetWithIndexesInRange: NSMakeRange(0, [fDisplayedTorrents count])];
         
         //for each of the torrents to add, find if it already exists (and keep track of those we've already added & those we need to remove)
-        [allTorrents enumerateObjectsWithOptions: NSEnumerationConcurrent usingBlock:^(id objAll, NSUInteger previousIndex, BOOL * stop) {
+        [allTorrents enumerateObjectsWithOptions: 0 usingBlock:^(id objAll, NSUInteger previousIndex, BOOL * stop) {
             const NSUInteger currentIndex = [fDisplayedTorrents indexOfObjectAtIndexes: removePreviousIndexes options: NSEnumerationConcurrent passingTest: ^(id objDisplay, NSUInteger idx, BOOL *stop) {
                 return (BOOL)(objAll == objDisplay);
             }];
@@ -2230,7 +2230,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
                 //slide new torrents in differently
                 if (fAddingTransfers)
                 {
-                    NSIndexSet * newAddIndexes = [allTorrents indexesOfObjectsWithOptions: NSEnumerationConcurrent passingTest: ^BOOL(id obj, NSUInteger idx, BOOL * stop) {
+                    NSIndexSet * newAddIndexes = [allTorrents indexesOfObjectsAtIndexes: addIndexes options: NSEnumerationConcurrent passingTest: ^BOOL(id obj, NSUInteger idx, BOOL * stop) {
                         return [fAddingTransfers containsObject: obj];
                     }];
                     
