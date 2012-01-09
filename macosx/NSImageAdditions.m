@@ -33,7 +33,9 @@
     [coloredImage lockFocus];
     
     [color set];
-    NSRectFillUsingOperation(NSMakeRect(0.0, 0.0, [coloredImage size].width, [coloredImage size].height), NSCompositeSourceAtop);
+    
+    const NSSize size = [coloredImage size];
+    NSRectFillUsingOperation(NSMakeRect(0.0, 0.0, size.width, size.height), NSCompositeSourceAtop);
     
     [coloredImage unlockFocus];
     

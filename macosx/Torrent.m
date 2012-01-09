@@ -1761,9 +1761,11 @@ int trashDataFile(const char * filename)
     FileListNode * node = nil;
     if (isFolder)
     {
-        for (node in [parent children])
-            if ([[node name] isEqualToString: name] && [node isFolder])
-                break;
+        const NSUInteger nodeIndex = [[parent children] indexOfObjectWithOptions: NSEnumerationConcurrent passingTest: ^BOOL(FileListNode * searchNode, NSUInteger idx, BOOL * stop) {
+            return [[searchNode name] isEqualToString: name] && [searchNode isFolder];
+        }];
+        if (nodeIndex != NSNotFound)
+            node = [[parent children] objectAtIndex: nodeIndex];
     }
     
     //create new folder or file if it doesn't already exist
@@ -1796,9 +1798,10 @@ int trashDataFile(const char * filename)
     NSSortDescriptor * descriptor = [NSSortDescriptor sortDescriptorWithKey: @"name" ascending: YES selector: @selector(localizedStandardCompare:)];
     [fileNodes sortUsingDescriptors: [NSArray arrayWithObject: descriptor]];
     
-    for (FileListNode * node in fileNodes)
+    [fileNodes enumerateObjectsWithOptions: NSEnumerationConcurrent usingBlock: ^(FileListNode * node, NSUInteger idx, BOOL * stop) {
         if ([node isFolder])
             [self sortFileList: [node children]];
+    }];
 }
 
 - (void) startQueue
