@@ -2247,63 +2247,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
             }
         }
     }
-    else if (!groupRows && wasGroupRows)
-    {
-        beganUpdates = YES;
-        if (onLion)
-            [fTableView beginUpdates];
-        
-        //since we're not doing this the right way (boo buggy animation), we need to remember selected group
-        NSArray * selectedValues = [fTableView selectedValues];
-        
-        if (onLion)
-            [fTableView removeItemsAtIndexes: [NSIndexSet indexSetWithIndexesInRange: NSMakeRange(0, [fDisplayedTorrents count])] inParent: nil withAnimation: NSTableViewAnimationSlideDown];
-             
-        [fDisplayedTorrents setArray: allTorrents];
-        
-        if (onLion)
-            [fTableView insertItemsAtIndexes: [NSIndexSet indexSetWithIndexesInRange: NSMakeRange(0, [fDisplayedTorrents count])] inParent: nil withAnimation: NSTableViewAnimationEffectFade];
-        
-        [fTableView selectValues: selectedValues];
-    }
-    else if (groupRows && !wasGroupRows)
-    {
-        //since we're not doing this the right way (boo buggy animation), we need to remember selected group
-        selectedValues = [fTableView selectedValues];
-        
-        //a map for quickly finding groups
-        NSMutableDictionary * groupsByIndex = [NSMutableDictionary dictionaryWithCapacity: [[GroupsController groups] numberOfGroups]];
-        for (Torrent * torrent in allTorrents)
-        {
-            const NSInteger groupValue = [torrent groupValue];
-            TorrentGroup * group = [groupsByIndex objectForKey: [NSNumber numberWithInteger: groupValue]];
-            if (!group)
-            {
-                group = [[[TorrentGroup alloc] initWithGroup: groupValue] autorelease];
-                [groupsByIndex setObject: group forKey: [NSNumber numberWithInteger: groupValue]];
-            }
-            
-            [[group torrents] addObject: torrent];
-        }
-        
-        beganUpdates = YES;
-        if (onLion)
-            [fTableView beginUpdates];
-        
-        #warning duplicate from above
-        if (onLion)
-            [fTableView removeItemsAtIndexes: [NSIndexSet indexSetWithIndexesInRange: NSMakeRange(0, [fDisplayedTorrents count])] inParent: nil withAnimation: NSTableViewAnimationSlideDown];
-        
-        [fDisplayedTorrents setArray: [groupsByIndex allValues]];
-        
-        //we need the groups to be sorted, and we can do it without moving items in the table, too!
-        NSSortDescriptor * groupDescriptor = [NSSortDescriptor sortDescriptorWithKey: @"groupOrderValue" ascending: YES];
-        [fDisplayedTorrents sortUsingDescriptors: [NSArray arrayWithObject: groupDescriptor]];
-        
-        if (onLion)
-            [fTableView insertItemsAtIndexes: [NSIndexSet indexSetWithIndexesInRange: NSMakeRange(0, [fDisplayedTorrents count])] inParent: nil withAnimation: NSTableViewAnimationEffectFade];
-    }
-    else
+    else if (groupRows && wasGroupRows)
     {
         NSAssert(groupRows && wasGroupRows, @"Should have had group rows and should remain with group rows");
         
@@ -2422,6 +2366,49 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         //now that all groups are there, sort them - don't insert on the fly in case groups were reordered in prefs
         NSSortDescriptor * groupDescriptor = [NSSortDescriptor sortDescriptorWithKey: @"groupOrderValue" ascending: YES];
         [self rearrangeTorrentTableArray: fDisplayedTorrents forParent: nil withSortDescriptors: [NSArray arrayWithObject: groupDescriptor] beganTableUpdate: &beganUpdates];
+    }
+    else
+    {
+        NSAssert(groupRows != wasGroupRows, @"Trying togglng-group torrent reordering when we weren't expecting to.");
+        
+        //since we're not doing this the right way (boo buggy animation), we need to remember selected values
+        selectedValues = [fTableView selectedValues];
+        
+        beganUpdates = YES;
+        if (onLion)
+            [fTableView beginUpdates];
+        
+        if (onLion)
+            [fTableView removeItemsAtIndexes: [NSIndexSet indexSetWithIndexesInRange: NSMakeRange(0, [fDisplayedTorrents count])] inParent: nil withAnimation: NSTableViewAnimationSlideDown];
+        
+        if (groupRows)
+        {
+            //a map for quickly finding groups
+            NSMutableDictionary * groupsByIndex = [NSMutableDictionary dictionaryWithCapacity: [[GroupsController groups] numberOfGroups]];
+            for (Torrent * torrent in allTorrents)
+            {
+                const NSInteger groupValue = [torrent groupValue];
+                TorrentGroup * group = [groupsByIndex objectForKey: [NSNumber numberWithInteger: groupValue]];
+                if (!group)
+                {
+                    group = [[[TorrentGroup alloc] initWithGroup: groupValue] autorelease];
+                    [groupsByIndex setObject: group forKey: [NSNumber numberWithInteger: groupValue]];
+                }
+                
+                [[group torrents] addObject: torrent];
+            }
+            
+            [fDisplayedTorrents setArray: [groupsByIndex allValues]];
+            
+            //we need the groups to be sorted, and we can do it without moving items in the table, too!
+            NSSortDescriptor * groupDescriptor = [NSSortDescriptor sortDescriptorWithKey: @"groupOrderValue" ascending: YES];
+            [fDisplayedTorrents sortUsingDescriptors: [NSArray arrayWithObject: groupDescriptor]];
+        }
+        else
+            [fDisplayedTorrents setArray: allTorrents];
+        
+        if (onLion)
+            [fTableView insertItemsAtIndexes: [NSIndexSet indexSetWithIndexesInRange: NSMakeRange(0, [fDisplayedTorrents count])] inParent: nil withAnimation: NSTableViewAnimationEffectFade];
     }
     
     //sort the torrents (won't sort the groups, though)
