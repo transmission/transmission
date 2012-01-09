@@ -1758,14 +1758,16 @@ int trashDataFile(const char * filename)
     NSString * name = [components objectAtIndex: 0];
     const BOOL isFolder = [components count] > 1;
     
-    FileListNode * node = nil;
+    __block FileListNode * node = nil;
     if (isFolder)
     {
-        const NSUInteger nodeIndex = [[parent children] indexOfObjectWithOptions: NSEnumerationConcurrent passingTest: ^BOOL(FileListNode * searchNode, NSUInteger idx, BOOL * stop) {
-            return [[searchNode name] isEqualToString: name] && [searchNode isFolder];
+        [[parent children] enumerateObjectsWithOptions: NSEnumerationConcurrent usingBlock: ^(FileListNode * searchNode, NSUInteger idx, BOOL * stop) {
+            if ([[searchNode name] isEqualToString: name] && [searchNode isFolder])
+            {
+                node = searchNode;
+                *stop = YES;
+            }
         }];
-        if (nodeIndex != NSNotFound)
-            node = [[parent children] objectAtIndex: nodeIndex];
     }
     
     //create new folder or file if it doesn't already exist
