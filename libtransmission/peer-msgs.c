@@ -16,8 +16,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <alloca.h>
-
 #include <event2/buffer.h>
 #include <event2/bufferevent.h>
 #include <event2/event.h>
@@ -1748,7 +1746,7 @@ updateBlockRequests( tr_peermsgs * msgs )
         int i;
         int n;
         const int numwant = msgs->desiredRequestCount - msgs->peer->pendingReqsToPeer;
-        tr_block_index_t * blocks = alloca( sizeof( tr_block_index_t ) * numwant );
+        tr_block_index_t * blocks = tr_new( tr_block_index_t, numwant );
 
         tr_peerMgrGetNextRequests( msgs->torrent, msgs->peer, numwant, blocks, &n, false );
 
@@ -1758,6 +1756,8 @@ updateBlockRequests( tr_peermsgs * msgs )
             blockToReq( msgs->torrent, blocks[i], &req );
             protocolSendRequest( msgs, &req );
         }
+
+        tr_free( blocks );
     }
 }
 
