@@ -910,7 +910,7 @@ announce_request_new( const tr_announcer  * announcer,
     req->up = tier->byteCounts[TR_ANN_UP];
     req->down = tier->byteCounts[TR_ANN_DOWN];
     req->corrupt = tier->byteCounts[TR_ANN_CORRUPT];
-    req->left = tr_cpLeftUntilComplete( &tor->completion ),
+    req->left = tr_cpLeftUntilComplete( &tor->completion );
     req->event = event;
     req->numwant = event == TR_ANNOUNCE_EVENT_STOPPED ? 0 : NUMWANT;
     req->key = announcer->key;
