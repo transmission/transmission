@@ -392,8 +392,6 @@
 - (void) updateGroups: (NSNotification *) notification
 {
     [self updateGroupsButton];
-    
-    [[NSNotificationCenter defaultCenter] postNotificationName: @"ApplyFilter" object: nil];
 }
 
 @end

@@ -499,6 +499,9 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     //open newly created torrent file
     [nc addObserver: self selector: @selector(openCreatedFile:)
                     name: @"OpenCreatedTorrentFile" object: nil];
+    
+    [nc addObserver: self selector: @selector(applyFilter)
+                    name: @"UpdateGroups" object: nil];
 
     //timer to update the interface every second
     [self updateUI];
@@ -2352,15 +2355,15 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         }
         
         //remove empty groups
-        NSIndexSet * removeIndexes = [fDisplayedTorrents indexesOfObjectsAtIndexes: [NSIndexSet indexSetWithIndexesInRange: NSMakeRange(0, originalGroupCount)] options: NSEnumerationConcurrent passingTest: ^BOOL(id obj, NSUInteger idx, BOOL * stop) {
+        NSIndexSet * removeGroupIndexes = [fDisplayedTorrents indexesOfObjectsAtIndexes: [NSIndexSet indexSetWithIndexesInRange: NSMakeRange(0, originalGroupCount)] options: NSEnumerationConcurrent passingTest: ^BOOL(id obj, NSUInteger idx, BOOL * stop) {
             return [[(TorrentGroup *)obj torrents] count] == 0;
         }];
         
-        if ([removeIndexes count] > 0)
+        if ([removeGroupIndexes count] > 0)
         {
-            [fDisplayedTorrents removeObjectsAtIndexes: removeIndexes];
+            [fDisplayedTorrents removeObjectsAtIndexes: removeGroupIndexes];
             if (onLion)
-                [fTableView removeItemsAtIndexes: removeIndexes inParent: nil withAnimation: NSTableViewAnimationEffectFade];
+                [fTableView removeItemsAtIndexes: removeGroupIndexes inParent: nil withAnimation: NSTableViewAnimationEffectFade];
         }
         
         //now that all groups are there, sort them - don't insert on the fly in case groups were reordered in prefs
@@ -2369,7 +2372,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     }
     else
     {
-        NSAssert(groupRows != wasGroupRows, @"Trying togglng-group torrent reordering when we weren't expecting to.");
+        NSAssert(groupRows != wasGroupRows, @"Trying toggling group-torrent reordering when we weren't expecting to.");
         
         //since we're not doing this the right way (boo buggy animation), we need to remember selected values
         selectedValues = [fTableView selectedValues];
