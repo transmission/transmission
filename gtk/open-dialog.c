@@ -261,7 +261,6 @@ gtr_torrent_options_dialog_new( GtkWindow * parent, TrCore * core, tr_ctor * cto
     GtkWidget *      d;
     GtkWidget *      t;
     GtkWidget *      l;
-    GtkWidget *      grab;
     GtkWidget *      source_chooser;
     struct OpenData * data;
     bool             flag;
@@ -271,9 +270,9 @@ gtr_torrent_options_dialog_new( GtkWindow * parent, TrCore * core, tr_ctor * cto
     /* make the dialog */
     d = gtk_dialog_new_with_buttons( _( "Torrent Options" ), parent,
                                      GTK_DIALOG_DESTROY_WITH_PARENT,
+                                     GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
+                                     GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT,
                                      NULL );
-    gtk_dialog_add_button( GTK_DIALOG( d ), GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL );
-    grab = gtk_dialog_add_button( GTK_DIALOG( d ), GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT );
     gtk_dialog_set_default_response( GTK_DIALOG( d ),
                                      GTK_RESPONSE_ACCEPT );
     gtk_dialog_set_alternative_button_order( GTK_DIALOG( d ),
@@ -381,7 +380,8 @@ gtr_torrent_options_dialog_new( GtkWindow * parent, TrCore * core, tr_ctor * cto
         sourceChanged( GTK_FILE_CHOOSER_BUTTON( w ), data );
 
     gtr_dialog_set_content( GTK_DIALOG( d ), t );
-    gtk_widget_grab_focus( grab );
+    w = gtk_dialog_get_widget_for_response( GTK_DIALOG( d ), GTK_RESPONSE_ACCEPT );
+    gtk_widget_grab_focus( w );
     return d;
 }
 
