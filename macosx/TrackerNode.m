@@ -49,6 +49,17 @@
     return [self retain];
 }
 
+- (BOOL) isEqual: (id) object
+{
+    if (self == object)
+        return YES;
+    
+    if (![object isKindOfClass: [self class]])
+        return NO;
+    
+    return [self tier] == [object tier] && [[self fullAnnounceAddress] isEqualToString: [object fullAnnounceAddress]];
+}
+
 - (NSString *) host
 {
     return [NSString stringWithUTF8String: fStat.host];

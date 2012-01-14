@@ -36,6 +36,8 @@
 
 - (id) initWithTrackerStat: (tr_tracker_stat *) stat torrent: (Torrent *) torrent;
 
+- (BOOL) isEqual: (id) object;
+
 - (NSString *) host;
 - (NSString *) fullAnnounceAddress;
 

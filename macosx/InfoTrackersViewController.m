@@ -23,6 +23,7 @@
  *****************************************************************************/
 
 #import "InfoTrackersViewController.h"
+#import "NSApplicationAdditions.h"
 #import "Torrent.h"
 #import "TrackerCell.h"
 #import "TrackerNode.h"
@@ -102,7 +103,7 @@
     //get updated tracker stats
     if ([fTrackerTable editedRow] == -1)
     {
-        [fTrackers release];
+        NSArray * oldTrackers = fTrackers;
         
         if ([fTorrents count] == 1)
             fTrackers = [[[fTorrents objectAtIndex: 0] allTrackerStats] retain];
@@ -114,7 +115,13 @@
         }
         
         [fTrackerTable setTrackers: fTrackers];
-        [fTrackerTable reloadData];
+        
+        if ([NSApp isOnLionOrBetter] && [fTrackers isEqualToArray: oldTrackers])
+            [fTrackerTable setNeedsDisplay: YES];
+        else
+            [fTrackerTable reloadData];
+        
+        [oldTrackers release];
     }
     else
     {
@@ -303,10 +310,12 @@
 - (void) removeTrackers
 {
     NSMutableDictionary * removeIdentifiers = [NSMutableDictionary dictionaryWithCapacity: [fTorrents count]];
-    NSUInteger removeCount = 0;
+    NSUInteger removeTrackerCount = 0;
        
     NSIndexSet * selectedIndexes = [fTrackerTable selectedRowIndexes];
     BOOL groupSelected = NO;
+    NSUInteger groupRowIndex = NSNotFound;
+    NSMutableIndexSet * removeIndexes = [NSMutableIndexSet indexSet];
     for (NSUInteger i = 0; i < [fTrackers count]; ++i)
     {
         id object = [fTrackers objectAtIndex: i];
@@ -323,30 +332,49 @@
                 }
                 
                 [removeSet addObject: [(TrackerNode *)object fullAnnounceAddress]];
-                ++removeCount;
+                ++removeTrackerCount;
+                
+                [removeIndexes addIndex: i];
             }
+            else
+                groupRowIndex = NSNotFound; //don't remove the group row
         }
         else
         {
+            //mark the previous group row for removal, if necessary
+            if (groupRowIndex != NSNotFound)
+                [removeIndexes addIndex: groupRowIndex];
+            
             groupSelected = [selectedIndexes containsIndex: i];
             if (!groupSelected && i > [selectedIndexes lastIndex])
+            {
+                groupRowIndex = NSNotFound;
                 break;
+            }
+            
+            groupRowIndex = i;
         }
     }
     
+    //mark the last group for removal, too
+    if (groupRowIndex != NSNotFound)
+        [removeIndexes addIndex: groupRowIndex];
+    
+    NSAssert2(removeTrackerCount <= [removeIndexes count], @"Marked %ld trackers to remove, but only removing %ld rows", removeTrackerCount, [removeIndexes count]);
+    
     //we might have no trackers if remove right after a failed add (race condition ftw)
     #warning look into having a failed add apply right away, so that this can become an assert
-    if (removeCount == 0)
+    if (removeTrackerCount == 0)
         return;
     
     if ([[NSUserDefaults standardUserDefaults] boolForKey: @"WarningRemoveTrackers"])
     {
         NSAlert * alert = [[NSAlert alloc] init];
         
-        if (removeCount > 1)
+        if (removeTrackerCount > 1)
         {
             [alert setMessageText: [NSString stringWithFormat: NSLocalizedString(@"Are you sure you want to remove %d trackers?",
-                                                                "Remove trackers alert -> title"), removeCount]];
+                                                                "Remove trackers alert -> title"), removeTrackerCount]];
             [alert setInformativeText: NSLocalizedString(@"Once removed, Transmission will no longer attempt to contact them."
                                         " This cannot be undone.", "Remove trackers alert -> message")];
         }
@@ -371,6 +399,10 @@
             return;
     }
     
+    
+    if ([NSApp isOnLionOrBetter])
+        [fTrackerTable beginUpdates];
+    
     for (Torrent * torrent in removeIdentifiers)
         [torrent removeTrackers: [removeIdentifiers objectForKey: torrent]];
     
@@ -380,9 +412,21 @@
     for (Torrent * torrent in fTorrents)
         [fTrackers addObjectsFromArray: [torrent allTrackerStats]];
     
-    [fTrackerTable setTrackers: fTrackers];
-    [fTrackerTable reloadData];
-    [fTrackerTable deselectAll: self];
+    if ([NSApp isOnLionOrBetter])
+    {
+        [fTrackerTable removeRowsAtIndexes: removeIndexes withAnimation: NSTableViewAnimationSlideLeft];
+        
+        [fTrackerTable setTrackers: fTrackers];
+        
+        [fTrackerTable endUpdates];
+    }
+    else
+    {
+        [fTrackerTable setTrackers: fTrackers];
+        
+        [fTrackerTable reloadData];
+        [fTrackerTable deselectAll: self];
+    }
     
     [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateUI" object: nil]; //incase sort by tracker
 }
