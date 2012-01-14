@@ -1880,10 +1880,6 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     BOOL sortByGroup = ![fDefaults boolForKey: @"SortByGroup"];
     [fDefaults setBool: sortByGroup forKey: @"SortByGroup"];
     
-    //expand all groups
-    if (sortByGroup)
-        [fTableView removeAllCollapsedGroups];
-    
     [self applyFilter];
 }
 
@@ -2374,6 +2370,9 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     {
         NSAssert(groupRows != wasGroupRows, @"Trying toggling group-torrent reordering when we weren't expecting to.");
         
+        //set all groups as expanded
+        [fTableView removeAllCollapsedGroups];
+        
         //since we're not doing this the right way (boo buggy animation), we need to remember selected values
         #warning when Lion-only and using views instead of cells, this likely won't be needed
         NSArray * selectedValues = [fTableView selectedValues];
@@ -2404,6 +2403,10 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
             
             [fDisplayedTorrents setArray: [groupsByIndex allValues]];
             
+            //actually expand group rows
+            for (TorrentGroup * group in fDisplayedTorrents)
+                [fTableView expandItem: group];
+            
             //we need the groups to be sorted, and we can do it without moving items in the table, too!
             NSSortDescriptor * groupDescriptor = [NSSortDescriptor sortDescriptorWithKey: @"groupOrderValue" ascending: YES];
             [fDisplayedTorrents sortUsingDescriptors: [NSArray arrayWithObject: groupDescriptor]];
@@ -2413,18 +2416,6 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         
         if (onLion)
             [fTableView insertItemsAtIndexes: [NSIndexSet indexSetWithIndexesInRange: NSMakeRange(0, [fDisplayedTorrents count])] inParent: nil withAnimation: NSTableViewAnimationEffectFade];
-        
-        //reset expanded/collapsed rows
-        if (groupRows)
-        {
-            for (TorrentGroup * group in fDisplayedTorrents)
-            {
-                if ([fTableView isGroupCollapsed: [group groupIndex]])
-                    [fTableView collapseItem: group];
-                else
-                    [fTableView expandItem: group];
-            }
-        }
         
         if (selectedValues)
             [fTableView selectValues: selectedValues];
