@@ -2403,10 +2403,6 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
             
             [fDisplayedTorrents setArray: [groupsByIndex allValues]];
             
-            //actually expand group rows
-            for (TorrentGroup * group in fDisplayedTorrents)
-                [fTableView expandItem: group];
-            
             //we need the groups to be sorted, and we can do it without moving items in the table, too!
             NSSortDescriptor * groupDescriptor = [NSSortDescriptor sortDescriptorWithKey: @"groupOrderValue" ascending: YES];
             [fDisplayedTorrents sortUsingDescriptors: [NSArray arrayWithObject: groupDescriptor]];
@@ -2416,6 +2412,13 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         
         if (onLion)
             [fTableView insertItemsAtIndexes: [NSIndexSet indexSetWithIndexesInRange: NSMakeRange(0, [fDisplayedTorrents count])] inParent: nil withAnimation: NSTableViewAnimationEffectFade];
+        
+        if (groupRows)
+        {
+            //actually expand group rows
+            for (TorrentGroup * group in fDisplayedTorrents)
+                [fTableView expandItem: group];
+        }
         
         if (selectedValues)
             [fTableView selectValues: selectedValues];
