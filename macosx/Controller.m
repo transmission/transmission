@@ -1906,7 +1906,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         selectedValues = [fTableView selectedValues];
     
     //actually sort
-    [self sortTorrentsIgnoreSelectedCallUpdates: YES includeQueueOrder: includeQueueOrder];
+    [self sortTorrentsCallUpdates: YES includeQueueOrder: includeQueueOrder];
     
     if (!onLion)
         [fTableView selectValues: selectedValues];
@@ -1917,8 +1917,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         [fTableView endUpdates];
 }
 
-#warning rename
-- (void) sortTorrentsIgnoreSelectedCallUpdates: (BOOL) callUpdates includeQueueOrder: (BOOL) includeQueueOrder
+- (void) sortTorrentsCallUpdates: (BOOL) callUpdates includeQueueOrder: (BOOL) includeQueueOrder
 {
     //don't do anything else if we don't have to
     const BOOL sortByGroup = [fDefaults boolForKey: @"SortByGroup"];
@@ -2052,9 +2051,9 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 {
     const BOOL onLion = [NSApp isOnLionOrBetter];
     
-    NSArray * selectedValues = nil;
+    NSArray * selectedValuesSL = nil;
     if (!onLion)
-        selectedValues = [fTableView selectedValues];
+        selectedValuesSL = [fTableView selectedValues];
     
     __block NSUInteger active = 0, downloading = 0, seeding = 0, paused = 0;
     NSString * filterType = [fDefaults stringForKey: @"Filter"];
@@ -2253,8 +2252,6 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     {
         NSAssert(groupRows && wasGroupRows, @"Should have had group rows and should remain with group rows");
         
-        #warning not remembering selected when changing to a new group
-        
         #warning don't always do?
         beganUpdates = YES;
         if (onLion)
@@ -2297,7 +2294,10 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
                             [fDisplayedTorrents addObject: newGroup];
                             
                             if (onLion)
+                            {
                                 [fTableView insertItemsAtIndexes: [NSIndexSet indexSetWithIndex: [fDisplayedTorrents count]-1] inParent: nil withAnimation: NSTableViewAnimationEffectFade];
+                                [fTableView isGroupCollapsed: groupValue] ? [fTableView collapseItem: newGroup] : [fTableView expandItem: newGroup];
+                            }
                         }
                         else //if we haven't processed the other group yet, we have to make sure we don't flag it for removal the next time
                         {
@@ -2340,7 +2340,10 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
                 [fDisplayedTorrents addObject: group];
                 
                 if (onLion)
+                {
                     [fTableView insertItemsAtIndexes: [NSIndexSet indexSetWithIndex: [fDisplayedTorrents count]-1] inParent: nil withAnimation: NSTableViewAnimationEffectFade];
+                    [fTableView isGroupCollapsed: groupValue] ? [fTableView collapseItem: group] : [fTableView expandItem: group];
+                }
             }
             
             [[group torrents] addObject: torrent];
@@ -2372,7 +2375,8 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         NSAssert(groupRows != wasGroupRows, @"Trying toggling group-torrent reordering when we weren't expecting to.");
         
         //since we're not doing this the right way (boo buggy animation), we need to remember selected values
-        selectedValues = [fTableView selectedValues];
+        #warning when Lion-only and using views instead of cells, this likely won't be needed
+        NSArray * selectedValues = [fTableView selectedValues];
         
         beganUpdates = YES;
         if (onLion)
@@ -2409,10 +2413,25 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         
         if (onLion)
             [fTableView insertItemsAtIndexes: [NSIndexSet indexSetWithIndexesInRange: NSMakeRange(0, [fDisplayedTorrents count])] inParent: nil withAnimation: NSTableViewAnimationEffectFade];
+        
+        //reset expanded/collapsed rows
+        if (groupRows)
+        {
+            for (TorrentGroup * group in fDisplayedTorrents)
+            {
+                if ([fTableView isGroupCollapsed: [group groupIndex]])
+                    [fTableView collapseItem: group];
+                else
+                    [fTableView expandItem: group];
+            }
+        }
+        
+        if (selectedValues)
+            [fTableView selectValues: selectedValues];
     }
     
     //sort the torrents (won't sort the groups, though)
-    [self sortTorrentsIgnoreSelectedCallUpdates: !beganUpdates includeQueueOrder: YES];
+    [self sortTorrentsCallUpdates: !beganUpdates includeQueueOrder: YES];
     
     if (onLion)
     {
@@ -2425,20 +2444,8 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     else
         [fTableView reloadData];
     
-    //reset expanded/collapsed rows
-    if (groupRows)
-    {
-        for (TorrentGroup * group in fDisplayedTorrents)
-        {
-            if ([fTableView isGroupCollapsed: [group groupIndex]])
-                [fTableView collapseItem: group];
-            else
-                [fTableView expandItem: group];
-        }
-    }
-    
-    if (selectedValues)
-        [fTableView selectValues: selectedValues];
+    if (!onLion)
+        [fTableView selectValues: selectedValuesSL];
     
     [self resetInfo]; //if group is already selected, but the torrents in it change
     
