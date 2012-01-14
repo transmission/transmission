@@ -57,6 +57,9 @@
     if (![object isKindOfClass: [self class]])
         return NO;
     
+    if ([self torrent] != [object torrent])
+        return NO;
+    
     return [self tier] == [object tier] && [[self fullAnnounceAddress] isEqualToString: [object fullAnnounceAddress]];
 }
 

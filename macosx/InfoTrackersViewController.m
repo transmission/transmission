@@ -116,7 +116,7 @@
         
         [fTrackerTable setTrackers: fTrackers];
         
-        if ([NSApp isOnLionOrBetter] && [fTrackers isEqualToArray: oldTrackers])
+        if ([NSApp isOnLionOrBetter] && (oldTrackers && [fTrackers isEqualToArray: oldTrackers]))
             [fTrackerTable setNeedsDisplay: YES];
         else
             [fTrackerTable reloadData];
