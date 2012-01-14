@@ -91,7 +91,6 @@ typedef enum
     IBOutlet NSMenu                 * fGroupsSetMenu, * fGroupsSetContextMenu;
     
     QLPreviewPanel                  * fPreviewPanel;
-    BOOL                            fLaunching;
     BOOL                            fQuitting;
     BOOL                            fQuitRequested;
     BOOL                            fPauseOnLaunch;

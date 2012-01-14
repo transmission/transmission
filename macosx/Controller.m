@@ -213,8 +213,6 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 {
     if ((self = [super init]))
     {
-        fLaunching = YES;
-        
         fDefaults = [NSUserDefaults standardUserDefaults];
         
         //checks for old version speeds of -1
@@ -516,8 +514,6 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     
     if ([fDefaults boolForKey: @"InfoVisible"])
         [self showInfo: nil];
-    
-    fLaunching = NO;
 }
 
 - (void) applicationDidFinishLaunching: (NSNotification *) notification
@@ -2186,10 +2182,13 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     
     BOOL beganUpdates = NO;
     
-    //don't animate torrents when first launching
-    if (onLion && fLaunching)
+    if (onLion)
     {
-        [[NSAnimationContext currentContext] setDuration: 0];
+        //don't animate torrents when first launching
+        static dispatch_once_t onceToken;
+        dispatch_once(&onceToken, ^{
+            [[NSAnimationContext currentContext] setDuration: 0];
+        });
         [NSAnimationContext beginGrouping];
     }
     
@@ -2203,7 +2202,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
                         * removePreviousIndexes = [NSMutableIndexSet indexSetWithIndexesInRange: NSMakeRange(0, [fDisplayedTorrents count])];
         
         //for each of the torrents to add, find if it already exists (and keep track of those we've already added & those we need to remove)
-        [allTorrents enumerateObjectsWithOptions: 0 usingBlock:^(id objAll, NSUInteger previousIndex, BOOL * stop) {
+        [allTorrents enumerateObjectsWithOptions: 0 usingBlock: ^(id objAll, NSUInteger previousIndex, BOOL * stop) {
             const NSUInteger currentIndex = [fDisplayedTorrents indexOfObjectAtIndexes: removePreviousIndexes options: NSEnumerationConcurrent passingTest: ^(id objDisplay, NSUInteger idx, BOOL *stop) {
                 return (BOOL)(objAll == objDisplay);
             }];
@@ -2264,8 +2263,6 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         NSMutableIndexSet * unusedAllTorrentsIndexes = [NSMutableIndexSet indexSetWithIndexesInRange: NSMakeRange(0, [allTorrents count])];
         
         NSMutableDictionary * groupsByIndex = [NSMutableDictionary dictionaryWithCapacity: [fDisplayedTorrents count]];
-        
-        #warning necessary? make more efficient?
         for (TorrentGroup * group in fDisplayedTorrents)
             [groupsByIndex setObject: group forKey: [NSNumber numberWithInteger: [group groupIndex]]];
         
@@ -2423,8 +2420,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
             [fTableView endUpdates];
         [fTableView setNeedsDisplay: YES];
         
-        if (fLaunching)
-            [NSAnimationContext endGrouping];
+        [NSAnimationContext endGrouping];
     }
     else
         [fTableView reloadData];
