@@ -345,6 +345,8 @@
 
 - (void) outlineViewSelectionIsChanging: (NSNotification *) notification
 {
+    #warning elliminate when view-based?
+    //if pushing a button, don't change the selected rows
     if (fSelectedValues)
         [self selectValues: fSelectedValues];
 }

@@ -1335,7 +1335,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 - (void) confirmRemoveTorrents: (NSArray *) torrents deleteData: (BOOL) deleteData
 {
     NSMutableArray * selectedValues = nil;
-    if ([NSApp isOnLionOrBetter])
+    if (![NSApp isOnLionOrBetter])
     {
         selectedValues = [NSMutableArray arrayWithArray: [fTableView selectedValues]];
         [selectedValues removeObjectsInArray: torrents];
@@ -1411,10 +1411,10 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         //do here if we're not doing it at the end of the animation
         for (Torrent * torrent in torrents)
             [torrent closeRemoveTorrent: deleteData];
-        
-        if (selectedValues)
-            [fTableView selectValues: selectedValues];
     }
+    
+    if (selectedValues)
+        [fTableView selectValues: selectedValues];
     
     [self fullUpdateUI];
     
