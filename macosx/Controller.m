@@ -1908,9 +1908,6 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         [fTableView selectValues: selectedValues];
     
     [fTableView setNeedsDisplay: YES];
-    
-    if (onLion)
-        [fTableView endUpdates];
 }
 
 - (void) sortTorrentsCallUpdates: (BOOL) callUpdates includeQueueOrder: (BOOL) includeQueueOrder
