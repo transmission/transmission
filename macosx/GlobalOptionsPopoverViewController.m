@@ -49,8 +49,7 @@
 
 - (IBAction) updatedDisplayString: (id) sender
 {
-    #warning setNeedsDisplay: instead of reloadData?
-    [[NSNotificationCenter defaultCenter] postNotificationName: @"ReloadTorrentTable" object: nil];
+    [[NSNotificationCenter defaultCenter] postNotificationName: @"RefreshTorrentTable" object: nil];
 }
 
 - (IBAction) setDownSpeedSetting: (id) sender

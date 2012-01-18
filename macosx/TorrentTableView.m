@@ -107,8 +107,7 @@
     //set group columns to show ratio, needs to be in awakeFromNib to size columns correctly
     [self setGroupStatusColumns];
     
-    [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(reloadData)
-                                                 name: @"ReloadTorrentTable" object: nil];
+    [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(setNeedsDisplay) name: @"RefreshTorrentTable" object: nil];
 }
 
 - (BOOL) isGroupCollapsed: (NSInteger) value
@@ -871,7 +870,7 @@
         else
             fPiecesBarPercent = 1.0 - progress;
         
-        [self reloadData];
+        [self setNeedsDisplay: YES];
     }
 }
 
