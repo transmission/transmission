@@ -1912,29 +1912,19 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 
 - (void) sortTorrentsCallUpdates: (BOOL) callUpdates includeQueueOrder: (BOOL) includeQueueOrder
 {
-    //don't do anything else if we don't have to
-    const BOOL sortByGroup = [fDefaults boolForKey: @"SortByGroup"];
-    const NSUInteger count = [fDisplayedTorrents count];
-    if (count == 0 || (!sortByGroup && count == 1))
-        return;
-    
-    NSString * sortType = [fDefaults stringForKey: @"Sort"];
-    
-    if (!includeQueueOrder && [sortType isEqualToString: SORT_ORDER])
-        return;
-    
     const BOOL asc = ![fDefaults boolForKey: @"SortReverse"];
     
     NSArray * descriptors;
     NSSortDescriptor * nameDescriptor = [NSSortDescriptor sortDescriptorWithKey: @"name" ascending: asc selector: @selector(localizedStandardCompare:)];
     
+    NSString * sortType = [fDefaults stringForKey: @"Sort"];
     if ([sortType isEqualToString: SORT_STATE])
     {
         NSSortDescriptor * stateDescriptor = [NSSortDescriptor sortDescriptorWithKey: @"stateSortKey" ascending: !asc],
                         * progressDescriptor = [NSSortDescriptor sortDescriptorWithKey: @"progress" ascending: !asc],
                         * ratioDescriptor = [NSSortDescriptor sortDescriptorWithKey: @"ratio" ascending: !asc];
         
-        descriptors = [[NSArray alloc] initWithObjects: stateDescriptor, progressDescriptor, ratioDescriptor, nameDescriptor, nil];
+        descriptors = [NSArray arrayWithObjects: stateDescriptor, progressDescriptor, ratioDescriptor, nameDescriptor, nil];
     }
     else if ([sortType isEqualToString: SORT_PROGRESS])
     {
@@ -1942,51 +1932,53 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
                         * ratioProgressDescriptor = [NSSortDescriptor sortDescriptorWithKey: @"progressStopRatio" ascending: asc],
                         * ratioDescriptor = [NSSortDescriptor sortDescriptorWithKey: @"ratio" ascending: asc];
         
-        descriptors = [[NSArray alloc] initWithObjects: progressDescriptor, ratioProgressDescriptor, ratioDescriptor, nameDescriptor, nil];
+        descriptors = [NSArray arrayWithObjects: progressDescriptor, ratioProgressDescriptor, ratioDescriptor, nameDescriptor, nil];
     }
     else if ([sortType isEqualToString: SORT_TRACKER])
     {
         NSSortDescriptor * trackerDescriptor = [NSSortDescriptor sortDescriptorWithKey: @"trackerSortKey" ascending: asc selector: @selector(localizedCaseInsensitiveCompare:)];
         
-        descriptors = [[NSArray alloc] initWithObjects: trackerDescriptor, nameDescriptor, nil];
+        descriptors = [NSArray arrayWithObjects: trackerDescriptor, nameDescriptor, nil];
     }
     else if ([sortType isEqualToString: SORT_ACTIVITY])
     {
         NSSortDescriptor * rateDescriptor = [NSSortDescriptor sortDescriptorWithKey: @"totalRate" ascending: !asc];
         NSSortDescriptor * activityDescriptor = [NSSortDescriptor sortDescriptorWithKey: @"dateActivityOrAdd" ascending: !asc];
         
-        descriptors = [[NSArray alloc] initWithObjects: rateDescriptor, activityDescriptor, nameDescriptor, nil];
+        descriptors = [NSArray arrayWithObjects: rateDescriptor, activityDescriptor, nameDescriptor, nil];
     }
     else if ([sortType isEqualToString: SORT_DATE])
     {
         NSSortDescriptor * dateDescriptor = [NSSortDescriptor sortDescriptorWithKey: @"dateAdded" ascending: asc];
         
-        descriptors = [[NSArray alloc] initWithObjects: dateDescriptor, nameDescriptor, nil];
+        descriptors = [NSArray arrayWithObjects: dateDescriptor, nameDescriptor, nil];
     }
     else if ([sortType isEqualToString: SORT_SIZE])
     {
         NSSortDescriptor * sizeDescriptor = [NSSortDescriptor sortDescriptorWithKey: @"size" ascending: asc];
         
-        descriptors = [[NSArray alloc] initWithObjects: sizeDescriptor, nameDescriptor, nil];
+        descriptors = [NSArray arrayWithObjects: sizeDescriptor, nameDescriptor, nil];
     }
     else if ([sortType isEqualToString: SORT_NAME])
     {
-        descriptors = [[NSArray alloc] initWithObjects: nameDescriptor, nil];
+        descriptors = [NSArray arrayWithObject: nameDescriptor];
     }
     else
     {
         NSAssert1([sortType isEqualToString: SORT_ORDER], @"Unknown sort type received: %@", sortType);
-        NSAssert(includeQueueOrder, @"Sorting by queue order when we shouldn't");
+        
+        if (!includeQueueOrder)
+            return;
         
         NSSortDescriptor * orderDescriptor = [NSSortDescriptor sortDescriptorWithKey: @"queuePosition" ascending: asc];
         
-        descriptors = [[NSArray alloc] initWithObjects: orderDescriptor, nil];
+        descriptors = [NSArray arrayWithObject: orderDescriptor];
     }
     
     BOOL beganTableUpdate = !callUpdates || ![NSApp isOnLionOrBetter];
     
     //actually sort
-    if (sortByGroup)
+    if ([fDefaults boolForKey: @"SortByGroup"])
     {
         for (TorrentGroup * group in fDisplayedTorrents)
             [self rearrangeTorrentTableArray: [group torrents] forParent: group withSortDescriptors: descriptors beganTableUpdate: &beganTableUpdate];
@@ -2001,8 +1993,6 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         else
             [fTableView reloadData];
     }
-    
-    [descriptors release];
 }
 
 #warning redo so that we search a copy once again (best explained by changing sorting from ascending to descending)
@@ -2153,18 +2143,22 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     if (fFilterBar)
         [fFilterBar setCountAll: [fTorrents count] active: active downloading: downloading seeding: seeding paused: paused];
     
+    //if either the previous or current lists are blank, set its value to the other
+    const BOOL groupRows = [allTorrents count] > 0 ? [fDefaults boolForKey: @"SortByGroup"] : ([fDisplayedTorrents count] > 0 && [[fDisplayedTorrents objectAtIndex: 0] isKindOfClass: [TorrentGroup class]]);
+    const BOOL wasGroupRows = [fDisplayedTorrents count] > 0 ? [[fDisplayedTorrents objectAtIndex: 0] isKindOfClass: [TorrentGroup class]] : groupRows;
+    
     #warning could probably be merged with later code somehow
     //clear display cache for not-shown torrents
     if ([fDisplayedTorrents count] > 0)
     {
         //for each torrent, removes the previous piece info if it's not in allTorrents, and keeps track of which torrents we already found in allTorrents
-        void (^removePreviousFinishedPieces)(id, NSUInteger, BOOL *) = ^(id obj, NSUInteger idx, BOOL * stop) {
+        void (^removePreviousFinishedPieces)(id, NSUInteger, BOOL *) = ^(Torrent * torrent, NSUInteger idx, BOOL * stop) {
             //we used to keep track of which torrents we already found in allTorrents, but it wasn't safe fo concurrent enumeration
-            if (![allTorrents containsObject: obj])
-                [(Torrent *)obj setPreviousFinishedPieces: nil];
+            if (![allTorrents containsObject: torrent])
+                [torrent setPreviousFinishedPieces: nil];
         };
         
-        if ([[fDisplayedTorrents objectAtIndex: 0] isKindOfClass: [TorrentGroup class]])
+        if (wasGroupRows)
             [fDisplayedTorrents enumerateObjectsWithOptions: NSEnumerationConcurrent usingBlock: ^(id obj, NSUInteger idx, BOOL * stop) {
                 [[(TorrentGroup *)obj torrents] enumerateObjectsWithOptions: NSEnumerationConcurrent usingBlock: removePreviousFinishedPieces];
             }];
@@ -2184,10 +2178,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         [NSAnimationContext beginGrouping];
     }
     
-    //place torrents into groups
-    //if either the previous or current lists are blank, set its value to the other
-    const BOOL groupRows = [allTorrents count] > 0 ? [fDefaults boolForKey: @"SortByGroup"] : ([fDisplayedTorrents count] > 0 && [[fDisplayedTorrents objectAtIndex: 0] isKindOfClass: [TorrentGroup class]]);
-    const BOOL wasGroupRows = [fDisplayedTorrents count] > 0 ? [[fDisplayedTorrents objectAtIndex: 0] isKindOfClass: [TorrentGroup class]] : groupRows;
+    //add/remove torrents (and rearrange for groups), one by one
     if (!groupRows && !wasGroupRows)
     {
         NSMutableIndexSet * addIndexes = [NSMutableIndexSet indexSet],
@@ -4212,7 +4203,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     if (fQuitting)
         return nil;
     
-    NSInteger seeding = 0, downloading = 0;
+    NSUInteger seeding = 0, downloading = 0;
     for (Torrent * torrent in fTorrents)
     {
         if ([torrent isSeeding])

@@ -51,7 +51,7 @@ typedef enum
 
 - (NSMenu *) menu;
 
-- (NSUInteger) findFileNode: (FileListNode *) node inList: (NSArray *) list inRange: (NSRange) range currentParent: (FileListNode *) currentParent finalParent: (FileListNode **) parent;
+- (NSUInteger) findFileNode: (FileListNode *) node inList: (NSArray *) list atIndexes: (NSIndexSet *) range currentParent: (FileListNode *) currentParent finalParent: (FileListNode **) parent;
 
 @end
 
@@ -140,7 +140,7 @@ typedef enum
         if (!filter)
         {
             FileListNode * parent = nil;
-            NSUInteger previousIndex = ![item isFolder] ? [self findFileNode: item inList: fFileList inRange: NSMakeRange(currentIndex, [fFileList count]-currentIndex) currentParent: nil finalParent: &parent] : NSNotFound;
+            NSUInteger previousIndex = ![item isFolder] ? [self findFileNode: item inList: fFileList atIndexes: [NSIndexSet indexSetWithIndexesInRange: NSMakeRange(currentIndex, [fFileList count]-currentIndex)] currentParent: nil finalParent: &parent] : NSNotFound;
             
             if (previousIndex == NSNotFound)
             {
@@ -584,24 +584,29 @@ typedef enum
     return [menu autorelease];
 }
 
-- (NSUInteger) findFileNode: (FileListNode *) node inList: (NSArray *) list inRange: (NSRange) range currentParent: (FileListNode *) currentParent finalParent: (FileListNode **) parent
+- (NSUInteger) findFileNode: (FileListNode *) node inList: (NSArray *) list atIndexes: (NSIndexSet *) indexes currentParent: (FileListNode *) currentParent finalParent: (FileListNode **) parent
 {
     NSAssert(![node isFolder], @"Looking up folder node!");
     
     __block NSUInteger retIndex = NSNotFound;
     
-    [list enumerateObjectsAtIndexes: [NSIndexSet indexSetWithIndexesInRange: range] options: NSEnumerationConcurrent usingBlock: ^(id checkNode, NSUInteger index, BOOL * stop) {
-        if ([checkNode isEqualTo: node])
+    [list enumerateObjectsAtIndexes: indexes options: NSEnumerationConcurrent usingBlock: ^(id checkNode, NSUInteger index, BOOL * stop) {
+        if ([[checkNode indexes] containsIndex: [[node indexes] firstIndex]])
         {
-            *parent = currentParent;
-            retIndex = index;
-            *stop = YES;
-        }
-        else if ([checkNode isFolder] && [[checkNode indexes] containsIndex: [[node indexes] firstIndex]])
-        {
-            const NSUInteger subIndex = [self findFileNode: node inList: [checkNode children] inRange: NSMakeRange(0, [[checkNode children] count]) currentParent: checkNode finalParent: parent];
-            NSAssert(subIndex != NSNotFound, @"We didn't find an expected file node.");
-            retIndex = subIndex;
+            if (![checkNode isFolder])
+            {
+                NSAssert2([checkNode isEqualTo: node], @"Expected file nodes to be equal: %@ %@", checkNode, node);
+                
+                *parent = currentParent;
+                retIndex = index;
+            }
+            else
+            {
+                const NSUInteger subIndex = [self findFileNode: node inList: [checkNode children] atIndexes: [NSIndexSet indexSetWithIndexesInRange: NSMakeRange(0, [[checkNode children] count])] currentParent: checkNode finalParent: parent];
+                NSAssert(subIndex != NSNotFound, @"We didn't find an expected file node.");
+                retIndex = subIndex;
+            }
+            
             *stop = YES;
         }
     }];
