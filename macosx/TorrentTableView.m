@@ -842,7 +842,7 @@
     
     NSMutableArray * progressMarks = [NSMutableArray arrayWithCapacity: 16];
     for (NSAnimationProgress i = 0.0625; i <= 1.0; i += 0.0625)
-        [progressMarks addObject: [NSNumber numberWithDouble: i]];
+        [progressMarks addObject: [NSNumber numberWithFloat: i]];
     
     fPiecesBarAnimation = [[NSAnimation alloc] initWithDuration: TOGGLE_PROGRESS_SECONDS animationCurve: NSAnimationEaseIn];
     [fPiecesBarAnimation setAnimationBlockingMode: NSAnimationNonblocking];
