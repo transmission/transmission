@@ -2401,6 +2401,13 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         if (onLion)
             [fTableView insertItemsAtIndexes: [NSIndexSet indexSetWithIndexesInRange: NSMakeRange(0, [fDisplayedTorrents count])] inParent: nil withAnimation: NSTableViewAnimationEffectFade];
         
+        if (groupRows) 
+        { 
+            //actually expand group rows 
+            for (TorrentGroup * group in fDisplayedTorrents) 
+                [fTableView expandItem: group]; 
+        } 
+        
         if (selectedValues)
             [fTableView selectValues: selectedValues];
     }
