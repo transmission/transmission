@@ -2401,13 +2401,6 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         if (onLion)
             [fTableView insertItemsAtIndexes: [NSIndexSet indexSetWithIndexesInRange: NSMakeRange(0, [fDisplayedTorrents count])] inParent: nil withAnimation: NSTableViewAnimationEffectFade];
         
-        if (groupRows)
-        {
-            //actually expand group rows
-            for (TorrentGroup * group in fDisplayedTorrents)
-                [fTableView expandItem: group];
-        }
-        
         if (selectedValues)
             [fTableView selectValues: selectedValues];
     }
@@ -2424,7 +2417,20 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         [NSAnimationContext endGrouping];
     }
     else
+    {
         [fTableView reloadData];
+        
+        if (groupRows)
+        {
+            for (TorrentGroup * group in fDisplayedTorrents)
+            {
+                if ([fTableView isGroupCollapsed: [group groupIndex]])
+                    [fTableView collapseItem: group];
+                else
+                    [fTableView expandItem: group];
+            }
+        }
+    }
     
     if (!onLion)
         [fTableView selectValues: selectedValuesSL];
