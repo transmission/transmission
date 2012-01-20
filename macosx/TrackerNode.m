@@ -27,12 +27,14 @@
 
 @implementation TrackerNode
 
+@synthesize torrent = fTorrent;
+
 - (id) initWithTrackerStat: (tr_tracker_stat *) stat torrent: (Torrent *) torrent
 {
     if ((self = [super init]))
     {
         fStat = *stat;
-        fTorrent = torrent;
+        fTorrent = torrent; //weak reference
     }
     
     return self;
@@ -81,11 +83,6 @@
 - (NSUInteger) identifier
 {
     return fStat.id;
-}
-
-- (Torrent *) torrent
-{
-    return fTorrent;
 }
 
 - (NSInteger) totalSeeders

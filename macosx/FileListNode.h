@@ -28,17 +28,19 @@
 
 @interface FileListNode : NSObject <NSCopying>
 {
-    NSString * fName, * fPath;
-    BOOL fIsFolder;
     NSMutableIndexSet * fIndexes;
     
-    uint64_t fSize;
-    NSImage * fIcon;
-    
     NSMutableArray * fChildren;
-    
-    Torrent * fTorrent;
 }
+
+@property (nonatomic, readonly) NSString * name;
+@property (nonatomic, readonly) NSString * path;
+
+@property (nonatomic, readonly) Torrent * torrent;
+
+@property (nonatomic, readonly) uint64_t size;
+@property (nonatomic, readonly) NSImage * icon;
+@property (nonatomic, readonly) BOOL isFolder;
 
 - (id) initWithFolderName: (NSString *) name path: (NSString *) path torrent: (Torrent *) torrent;
 - (id) initWithFileName: (NSString *) name path: (NSString *) path size: (uint64_t) size index: (NSUInteger) index torrent: (Torrent *) torrent;
@@ -48,16 +50,8 @@
 
 - (NSString *) description;
 
-- (BOOL) isFolder;
-- (NSString *) name;
-- (NSString *) path;
 - (NSIndexSet *) indexes;
 
-- (uint64_t) size;
-- (NSImage *) icon;
-
 - (NSMutableArray *) children;
-
-- (Torrent *) torrent;
 
 @end

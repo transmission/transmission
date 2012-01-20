@@ -297,7 +297,7 @@ int trashDataFile(const char * filename)
     const BOOL wasStalled = fStat != NULL && [self isStalled];
     
     fStat = tr_torrentStat(fHandle);
-
+    
     //make sure the "active" filter is updated when stalled-ness changes
     if (wasStalled != [self isStalled])
         [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateQueue" object: self];

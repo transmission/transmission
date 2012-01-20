@@ -30,9 +30,9 @@
 @interface TrackerNode : NSObject
 {
     tr_tracker_stat fStat;
-    
-    Torrent * fTorrent; //weak reference
 }
+
+@property (nonatomic, readonly) Torrent * torrent;
 
 - (id) initWithTrackerStat: (tr_tracker_stat *) stat torrent: (Torrent *) torrent;
 
@@ -44,8 +44,6 @@
 - (NSInteger) tier;
 
 - (NSUInteger) identifier;
-
-- (Torrent *) torrent;
 
 - (NSInteger) totalSeeders;
 - (NSInteger) totalLeechers;

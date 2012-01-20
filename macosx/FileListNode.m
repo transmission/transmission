@@ -32,6 +32,13 @@
 
 @implementation FileListNode
 
+@synthesize name = fName;
+@synthesize path = fPath;
+@synthesize torrent = fTorrent;
+@synthesize size = fSize;
+@synthesize icon = fIcon;
+@synthesize isFolder = fIsFolder;
+
 - (id) initWithFolderName: (NSString *) name path: (NSString *) path torrent: (Torrent *) torrent
 {
     if ((self = [self initWithFolder: YES name: name path: path torrent: torrent]))
@@ -96,29 +103,9 @@
         return [NSString stringWithFormat: @"%@ (folder: %@)", fName, fIndexes];
 }
 
-- (BOOL) isFolder
-{
-    return fIsFolder;
-}
-
-- (NSString *) name
-{
-    return fName;
-}
-
-- (NSString *) path
-{
-    return fPath;
-}
-
 - (NSIndexSet *) indexes
 {
     return fIndexes;
-}
-
-- (uint64_t) size
-{
-    return fSize;
 }
 
 - (NSImage *) icon
@@ -134,11 +121,6 @@
     NSAssert(fIsFolder, @"method can only be invoked on folders");
     
     return fChildren;
-}
-
-- (Torrent *) torrent
-{
-    return fTorrent;
 }
 
 @end
