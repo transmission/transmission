@@ -30,6 +30,8 @@
 @interface TrackerNode : NSObject
 {
     tr_tracker_stat fStat;
+    
+    Torrent * fTorrent;
 }
 
 @property (nonatomic, readonly) Torrent * torrent;

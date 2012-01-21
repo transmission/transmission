@@ -32,6 +32,7 @@
 
 @implementation FileListNode
 
+#warning remove ivars in header when 64-bit only (or it compiles in 32-bit mode)
 @synthesize name = fName;
 @synthesize path = fPath;
 @synthesize torrent = fTorrent;

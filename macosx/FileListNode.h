@@ -31,6 +31,13 @@
     NSMutableIndexSet * fIndexes;
     
     NSMutableArray * fChildren;
+    
+    NSString * fName;
+    NSString * fPath;
+    Torrent * fTorrent;
+    uint64_t fSize;
+    NSImage * fIcon;
+    BOOL fIsFolder;
 }
 
 @property (nonatomic, readonly) NSString * name;
