@@ -126,7 +126,7 @@ typedef enum
 
 #define UPDATE_UI_SECONDS   1.0
 
-#define TRANSFER_PLIST  @"/Library/Application Support/Transmission/Transfers.plist"
+#define TRANSFER_PLIST  @"Transfers.plist"
 
 #define WEBSITE_URL @"http://www.transmissionbt.com/"
 #define FORUM_URL   @"http://forum.transmissionbt.com/"
@@ -418,8 +418,8 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         NSLog(@"Could not IORegisterForSystemPower");
     
     //load previous transfers
-    NSArray * history = [NSArray arrayWithContentsOfFile: [NSHomeDirectory() stringByAppendingPathComponent: TRANSFER_PLIST]];
-    
+    NSURL * historyURL = [[[[[NSFileManager defaultManager] URLsForDirectory: NSApplicationSupportDirectory inDomains: NSUserDomainMask] objectAtIndex: 0] URLByAppendingPathComponent: @"Transmission"] URLByAppendingPathComponent: TRANSFER_PLIST];
+    NSArray * history = [NSArray arrayWithContentsOfURL: historyURL];
     if (!history)
     {
         //old version saved transfer info in prefs file
@@ -1832,7 +1832,8 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     for (Torrent * torrent in fTorrents)
         [history addObject: [torrent history]];
     
-    [history writeToFile: [NSHomeDirectory() stringByAppendingPathComponent: TRANSFER_PLIST] atomically: YES];
+    NSURL * historyURL = [[[[[NSFileManager defaultManager] URLsForDirectory: NSApplicationSupportDirectory inDomains: NSUserDomainMask] objectAtIndex: 0] URLByAppendingPathComponent: @"Transmission"] URLByAppendingPathComponent: TRANSFER_PLIST];
+    [history writeToURL: historyURL atomically: YES];
 }
 
 - (void) setSort: (id) sender
