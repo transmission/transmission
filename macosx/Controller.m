@@ -320,7 +320,8 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
                                     [NSLocalizedString(@"GB", "Memory size - gigabytes") UTF8String],
                                     [NSLocalizedString(@"TB", "Memory size - terabytes") UTF8String]);
         
-        const char * configDir = tr_getDefaultConfigDir("Transmission");
+        //use this instead of tr_getDefaultConfigDir("Transmission") so we are sure to get the "real" Application Support directory
+        const char * configDir = [[[NSSearchPathForDirectoriesInDomains(NSApplicationSupportDirectory, NSUserDomainMask, YES) objectAtIndex: 0] stringByAppendingPathComponent: @"Transmission"] UTF8String];
         fLib = tr_sessionInit("macosx", configDir, YES, &settings);
         tr_bencFree(&settings);
         
