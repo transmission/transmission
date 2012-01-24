@@ -45,11 +45,17 @@ body {
 ***/
 div#toolbar {
   width: 100%;
-  height: 35px;
+  height: 36px;
   margin: 0px;
   padding: 2px;
   border-bottom: 1px solid #AAA;
-  background: url("images/red-texture.png") repeat; }
+  background-color: #cccccc;
+  background-image: -webkit-gradient(linear, left top, left bottom, from(#dddddd), to(#bbbbbb));
+  background-image: -webkit-linear-gradient(top, #dddddd, #bbbbbb);
+  background-image: -moz-linear-gradient(top, #dddddd, #bbbbbb);
+  background-image: -ms-linear-gradient(top, #dddddd, #bbbbbb);
+  background-image: -o-linear-gradient(top, #dddddd, #bbbbbb);
+  background-image: linear-gradient(top, #dddddd, #bbbbbb); }
   div#toolbar > * {
     cursor: pointer;
     -moz-user-select: none;
@@ -59,229 +65,34 @@ div#toolbar {
     border-color: #aaa;
     border-width: 1px;
     padding: 3px;
-    margin-top: 5px;
-    width: 18px;
-    height: 18px;
-    padding: 2px 8px;
+    width: 34px;
+    height: 34px;
     float: left;
-    border: 1px solid #888; }
-  div#toolbar div#toolbar-open {
-    -moz-border-radius-topleft: 5px;
-    -moz-border-radius-bottomleft: 5px;
-    border-top-left-radius: 5px;
-    border-bottom-left-radius: 5px;
-    background-color: #dddddd;
-    background-image: url("images/toolbar-folder.png");
-    /* fallback */
-    background-image: url("images/toolbar-folder.png"), -webkit-gradient(linear, left top, left bottom, from(white), to(#bbbbbb));
-    /* Saf4+, Chrome */
-    background-image: url("images/toolbar-folder.png"), -webkit-linear-gradient(top, white, #bbbbbb);
-    /* Chrome 10+, Saf5.1+ */
-    background-image: url("images/toolbar-folder.png"), -moz-linear-gradient(top, white, #bbbbbb);
-    /* FF3.6+ */
-    background-image: url("images/toolbar-folder.png"), -ms-linear-gradient(top, white, #bbbbbb);
-    /* IE10 */
-    background-image: url("images/toolbar-folder.png"), -o-linear-gradient(top, white, #bbbbbb);
-    /* Opera 11.10+ */
-    background-position: center;
-    background-repeat: no-repeat;
+    border: none;
+    padding: 0px 3px; }
+  div#toolbar > div#toolbar-separator {
+    height: 25px;
+    margin-top: 8px;
+    margin-bottom: 5px;
+    border-left: 1px solid #aaa;
+    width: 3px; }
+  div#toolbar > div#toolbar-open {
+    background: url("images/toolbar-folder.png") no-repeat;
     margin-left: 4px; }
-    div#toolbar div#toolbar-open:active, div#toolbar div#toolbar-open:hover, div#toolbar div#toolbar-open.selected {
-      background-color: #e6e6ff;
-      background-image: url("images/toolbar-folder.png");
-      /* fallback */
-      background-image: url("images/toolbar-folder.png"), -webkit-gradient(linear, left top, left bottom, from(#cdcdff), to(white));
-      /* Saf4+, Chrome */
-      background-image: url("images/toolbar-folder.png"), -webkit-linear-gradient(top, #cdcdff, white);
-      /* Chrome 10+, Saf5.1+ */
-      background-image: url("images/toolbar-folder.png"), -moz-linear-gradient(top, #cdcdff, white);
-      /* FF3.6+ */
-      background-image: url("images/toolbar-folder.png"), -ms-linear-gradient(top, #cdcdff, white);
-      /* IE10 */
-      background-image: url("images/toolbar-folder.png"), -o-linear-gradient(top, #cdcdff, white);
-      /* Opera 11.10+ */
-      background-position: center;
-      background-repeat: no-repeat; }
   div#toolbar > div#toolbar-remove {
-    -moz-border-radius-topright: 5px;
-    -moz-border-radius-bottomright: 5px;
-    border-top-right-radius: 5px;
-    border-bottom-right-radius: 5px;
-    background-color: #dddddd;
-    background-image: url("images/toolbar-close.png");
-    /* fallback */
-    background-image: url("images/toolbar-close.png"), -webkit-gradient(linear, left top, left bottom, from(white), to(#bbbbbb));
-    /* Saf4+, Chrome */
-    background-image: url("images/toolbar-close.png"), -webkit-linear-gradient(top, white, #bbbbbb);
-    /* Chrome 10+, Saf5.1+ */
-    background-image: url("images/toolbar-close.png"), -moz-linear-gradient(top, white, #bbbbbb);
-    /* FF3.6+ */
-    background-image: url("images/toolbar-close.png"), -ms-linear-gradient(top, white, #bbbbbb);
-    /* IE10 */
-    background-image: url("images/toolbar-close.png"), -o-linear-gradient(top, white, #bbbbbb);
-    /* Opera 11.10+ */
-    background-position: center;
-    background-repeat: no-repeat; }
-    div#toolbar > div#toolbar-remove:active, div#toolbar > div#toolbar-remove:hover, div#toolbar > div#toolbar-remove.selected {
-      background-color: #e6e6ff;
-      background-image: url("images/toolbar-close.png");
-      /* fallback */
-      background-image: url("images/toolbar-close.png"), -webkit-gradient(linear, left top, left bottom, from(#cdcdff), to(white));
-      /* Saf4+, Chrome */
-      background-image: url("images/toolbar-close.png"), -webkit-linear-gradient(top, #cdcdff, white);
-      /* Chrome 10+, Saf5.1+ */
-      background-image: url("images/toolbar-close.png"), -moz-linear-gradient(top, #cdcdff, white);
-      /* FF3.6+ */
-      background-image: url("images/toolbar-close.png"), -ms-linear-gradient(top, #cdcdff, white);
-      /* IE10 */
-      background-image: url("images/toolbar-close.png"), -o-linear-gradient(top, #cdcdff, white);
-      /* Opera 11.10+ */
-      background-position: center;
-      background-repeat: no-repeat; }
+    background: url("images/toolbar-close.png") no-repeat; }
   div#toolbar > div#toolbar-start {
-    -moz-border-radius-topleft: 5px;
-    -moz-border-radius-bottomleft: 5px;
-    border-top-left-radius: 5px;
-    border-bottom-left-radius: 5px;
-    background-color: #dddddd;
-    background-image: url("images/toolbar-start.png");
-    /* fallback */
-    background-image: url("images/toolbar-start.png"), -webkit-gradient(linear, left top, left bottom, from(white), to(#bbbbbb));
-    /* Saf4+, Chrome */
-    background-image: url("images/toolbar-start.png"), -webkit-linear-gradient(top, white, #bbbbbb);
-    /* Chrome 10+, Saf5.1+ */
-    background-image: url("images/toolbar-start.png"), -moz-linear-gradient(top, white, #bbbbbb);
-    /* FF3.6+ */
-    background-image: url("images/toolbar-start.png"), -ms-linear-gradient(top, white, #bbbbbb);
-    /* IE10 */
-    background-image: url("images/toolbar-start.png"), -o-linear-gradient(top, white, #bbbbbb);
-    /* Opera 11.10+ */
-    background-position: center;
-    background-repeat: no-repeat;
-    margin-left: 20px; }
-    div#toolbar > div#toolbar-start:active, div#toolbar > div#toolbar-start:hover, div#toolbar > div#toolbar-start.selected {
-      background-color: #e6e6ff;
-      background-image: url("images/toolbar-start.png");
-      /* fallback */
-      background-image: url("images/toolbar-start.png"), -webkit-gradient(linear, left top, left bottom, from(#cdcdff), to(white));
-      /* Saf4+, Chrome */
-      background-image: url("images/toolbar-start.png"), -webkit-linear-gradient(top, #cdcdff, white);
-      /* Chrome 10+, Saf5.1+ */
-      background-image: url("images/toolbar-start.png"), -moz-linear-gradient(top, #cdcdff, white);
-      /* FF3.6+ */
-      background-image: url("images/toolbar-start.png"), -ms-linear-gradient(top, #cdcdff, white);
-      /* IE10 */
-      background-image: url("images/toolbar-start.png"), -o-linear-gradient(top, #cdcdff, white);
-      /* Opera 11.10+ */
-      background-position: center;
-      background-repeat: no-repeat; }
+    background: url("images/toolbar-start.png") no-repeat; }
   div#toolbar > div#toolbar-pause {
-    -moz-border-radius-topright: 5px;
-    -moz-border-radius-bottomright: 5px;
-    border-top-right-radius: 5px;
-    border-bottom-right-radius: 5px;
-    background-color: #dddddd;
-    background-image: url("images/toolbar-pause.png");
-    /* fallback */
-    background-image: url("images/toolbar-pause.png"), -webkit-gradient(linear, left top, left bottom, from(white), to(#bbbbbb));
-    /* Saf4+, Chrome */
-    background-image: url("images/toolbar-pause.png"), -webkit-linear-gradient(top, white, #bbbbbb);
-    /* Chrome 10+, Saf5.1+ */
-    background-image: url("images/toolbar-pause.png"), -moz-linear-gradient(top, white, #bbbbbb);
-    /* FF3.6+ */
-    background-image: url("images/toolbar-pause.png"), -ms-linear-gradient(top, white, #bbbbbb);
-    /* IE10 */
-    background-image: url("images/toolbar-pause.png"), -o-linear-gradient(top, white, #bbbbbb);
-    /* Opera 11.10+ */
-    background-position: center;
-    background-repeat: no-repeat; }
-    div#toolbar > div#toolbar-pause:active, div#toolbar > div#toolbar-pause:hover, div#toolbar > div#toolbar-pause.selected {
-      background-color: #e6e6ff;
-      background-image: url("images/toolbar-pause.png");
-      /* fallback */
-      background-image: url("images/toolbar-pause.png"), -webkit-gradient(linear, left top, left bottom, from(#cdcdff), to(white));
-      /* Saf4+, Chrome */
-      background-image: url("images/toolbar-pause.png"), -webkit-linear-gradient(top, #cdcdff, white);
-      /* Chrome 10+, Saf5.1+ */
-      background-image: url("images/toolbar-pause.png"), -moz-linear-gradient(top, #cdcdff, white);
-      /* FF3.6+ */
-      background-image: url("images/toolbar-pause.png"), -ms-linear-gradient(top, #cdcdff, white);
-      /* IE10 */
-      background-image: url("images/toolbar-pause.png"), -o-linear-gradient(top, #cdcdff, white);
-      /* Opera 11.10+ */
-      background-position: center;
-      background-repeat: no-repeat; }
-  div#toolbar > div#toolbar-select {
-    -moz-border-radius: 5px;
-    border-radius: 5px;
-    background-color: #dddddd;
-    background-image: url("images/toolbar-pointer.png");
-    /* fallback */
-    background-image: url("images/toolbar-pointer.png"), -webkit-gradient(linear, left top, left bottom, from(white), to(#bbbbbb));
-    /* Saf4+, Chrome */
-    background-image: url("images/toolbar-pointer.png"), -webkit-linear-gradient(top, white, #bbbbbb);
-    /* Chrome 10+, Saf5.1+ */
-    background-image: url("images/toolbar-pointer.png"), -moz-linear-gradient(top, white, #bbbbbb);
-    /* FF3.6+ */
-    background-image: url("images/toolbar-pointer.png"), -ms-linear-gradient(top, white, #bbbbbb);
-    /* IE10 */
-    background-image: url("images/toolbar-pointer.png"), -o-linear-gradient(top, white, #bbbbbb);
-    /* Opera 11.10+ */
-    background-position: center;
-    background-repeat: no-repeat;
-    margin-left: 20px; }
-    div#toolbar > div#toolbar-select:active, div#toolbar > div#toolbar-select:hover, div#toolbar > div#toolbar-select.selected {
-      background-color: #e6e6ff;
-      background-image: url("images/toolbar-pointer.png");
-      /* fallback */
-      background-image: url("images/toolbar-pointer.png"), -webkit-gradient(linear, left top, left bottom, from(#cdcdff), to(white));
-      /* Saf4+, Chrome */
-      background-image: url("images/toolbar-pointer.png"), -webkit-linear-gradient(top, #cdcdff, white);
-      /* Chrome 10+, Saf5.1+ */
-      background-image: url("images/toolbar-pointer.png"), -moz-linear-gradient(top, #cdcdff, white);
-      /* FF3.6+ */
-      background-image: url("images/toolbar-pointer.png"), -ms-linear-gradient(top, #cdcdff, white);
-      /* IE10 */
-      background-image: url("images/toolbar-pointer.png"), -o-linear-gradient(top, #cdcdff, white);
-      /* Opera 11.10+ */
-      background-position: center;
-      background-repeat: no-repeat; }
+    background: url("images/toolbar-pause.png") no-repeat; }
+  div#toolbar > div#toolbar-start-all {
+    background: url("images/toolbar-start-all.png") no-repeat; }
+  div#toolbar > div#toolbar-pause-all {
+    background: url("images/toolbar-pause-all.png") no-repeat; }
   div#toolbar > div#toolbar-inspector {
-    -moz-border-radius: 5px;
-    border-radius: 5px;
-    background-color: #dddddd;
-    background-image: url("images/toolbar-info.png");
-    /* fallback */
-    background-image: url("images/toolbar-info.png"), -webkit-gradient(linear, left top, left bottom, from(white), to(#bbbbbb));
-    /* Saf4+, Chrome */
-    background-image: url("images/toolbar-info.png"), -webkit-linear-gradient(top, white, #bbbbbb);
-    /* Chrome 10+, Saf5.1+ */
-    background-image: url("images/toolbar-info.png"), -moz-linear-gradient(top, white, #bbbbbb);
-    /* FF3.6+ */
-    background-image: url("images/toolbar-info.png"), -ms-linear-gradient(top, white, #bbbbbb);
-    /* IE10 */
-    background-image: url("images/toolbar-info.png"), -o-linear-gradient(top, white, #bbbbbb);
-    /* Opera 11.10+ */
-    background-position: center;
-    background-repeat: no-repeat;
+    background: url("images/toolbar-info.png") no-repeat;
     float: right;
-    margin-right: 8px; }
-    div#toolbar > div#toolbar-inspector:active, div#toolbar > div#toolbar-inspector:hover, div#toolbar > div#toolbar-inspector.selected {
-      background-color: #e6e6ff;
-      background-image: url("images/toolbar-info.png");
-      /* fallback */
-      background-image: url("images/toolbar-info.png"), -webkit-gradient(linear, left top, left bottom, from(#cdcdff), to(white));
-      /* Saf4+, Chrome */
-      background-image: url("images/toolbar-info.png"), -webkit-linear-gradient(top, #cdcdff, white);
-      /* Chrome 10+, Saf5.1+ */
-      background-image: url("images/toolbar-info.png"), -moz-linear-gradient(top, #cdcdff, white);
-      /* FF3.6+ */
-      background-image: url("images/toolbar-info.png"), -ms-linear-gradient(top, #cdcdff, white);
-      /* IE10 */
-      background-image: url("images/toolbar-info.png"), -o-linear-gradient(top, #cdcdff, white);
-      /* Opera 11.10+ */
-      background-position: center;
-      background-repeat: no-repeat; }
+    margin-right: 4px; }
   div#toolbar > *.disabled {
     opacity: 0.25; }
 
@@ -291,7 +102,7 @@ div#toolbar {
 ****
 ***/
 #statusbar {
-  height: 24px;
+  height: 26px;
   width: 100%;
   border-bottom: 1px solid #AAA;
   overflow: hidden;
@@ -390,7 +201,7 @@ div#toolbar {
 ***/
 div#torrent_container {
   position: fixed;
-  top: 65px;
+  top: 66px;
   bottom: 22px;
   right: 0px;
   left: 0px;
@@ -592,7 +403,7 @@ div#torrent_inspector {
   overflow: auto;
   text-align: left;
   padding: 15px;
-  top: 65px;
+  top: 66px;
   position: fixed;
   width: 570px;
   z-index: 5;

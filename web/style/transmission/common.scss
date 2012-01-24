@@ -118,17 +118,18 @@ body {
 ****  TOOLBAR
 ****
 ***/
+$toolbar-gradient-top: #ddd;
+$toolbar-gradient-bottom: #bbb;
+$toolbar-height: 36px;
 
 div#toolbar
 {
-	$separator-spacing: 20px;
-
 	width: 100%;
-	height: 35px;
+	height: $toolbar-height;
 	margin: 0px;
 	padding: 2px;
 	border-bottom: 1px solid #AAA;
-	background: url('images/red-texture.png') repeat;
+	@include verticalGradient($toolbar-gradient-top, $toolbar-gradient-bottom);
 
 	$idle-color-top: $nonselected-gradient-top;
 	$idle-color-bottom: $nonselected-gradient-bottom;
@@ -137,43 +138,45 @@ div#toolbar
 
 	> * {
 		@include button;
-		margin-top: 5px;
-		width: 18px;
-		height: 18px;
-		padding: 2px 8px;
+		width: 34px;
+		height: 34px;
 		float: left;
-		border: 1px solid #888;
+		border: none;
+		padding: 0px 3px;
 	}
 
-	div#toolbar-open {
-		@include leftRoundedBox(5px);
-		@include buttonImage('images/toolbar-folder.png', $idle-color-top, $idle-color-bottom, $active-color-top, $active-color-bottom);
+        >div#toolbar-separator {
+                height: 25px;
+                margin-top: 8px;
+                margin-bottom: 5px;
+                border-left: 1px solid #aaa;
+                width: 3px;
+        }
+
+	> div#toolbar-open {
+		background: url('images/toolbar-folder.png') no-repeat;
 		margin-left: 4px;
 	}
 	> div#toolbar-remove {
-		@include rightRoundedBox(5px);
-		@include buttonImage('images/toolbar-close.png', $idle-color-top, $idle-color-bottom, $active-color-top, $active-color-bottom);
+		background: url('images/toolbar-close.png') no-repeat;
 	}
 	> div#toolbar-start {
-		@include leftRoundedBox(5px);
-		@include buttonImage('images/toolbar-start.png', $idle-color-top, $idle-color-bottom, $active-color-top, $active-color-bottom);
-		margin-left: $separator-spacing;
+		background: url('images/toolbar-start.png') no-repeat;
 	}
 	> div#toolbar-pause {
-		@include rightRoundedBox(5px);
-		@include buttonImage('images/toolbar-pause.png', $idle-color-top, $idle-color-bottom, $active-color-top, $active-color-bottom);
+		background: url('images/toolbar-pause.png') no-repeat;
 	}
-	> div#toolbar-select {
-		@include roundedBox(5px);
-		@include buttonImage('images/toolbar-pointer.png', $idle-color-top, $idle-color-bottom, $active-color-top, $active-color-bottom);
-		margin-left: $separator-spacing;
+	> div#toolbar-start-all {
+		background: url('images/toolbar-start-all.png') no-repeat;
+	}
+	> div#toolbar-pause-all {
+		background: url('images/toolbar-pause-all.png') no-repeat;
 	}
 
 	> div#toolbar-inspector {
-		@include roundedBox(5px);
-		@include buttonImage('images/toolbar-info.png', $idle-color-top, $idle-color-bottom, $active-color-top, $active-color-bottom);
+		background: url('images/toolbar-info.png') no-repeat;
 		float: right;
-		margin-right: 8px;
+		margin-right: 4px;
 	}
 
 	> *.disabled {
@@ -189,10 +192,11 @@ div#toolbar
 
 $statusbar-gradient-top: #ddd;
 $statusbar-gradient-bottom: #bbb;
+$statusbar-height: 26px;
 
 #statusbar
 {
-	height: 24px;
+	height: $statusbar-height;
 	width: 100%;
 	border-bottom: 1px solid #AAA;
 	overflow: hidden;
@@ -313,7 +317,7 @@ $statusbar-gradient-bottom: #bbb;
 ****
 ***/
 
-$torrent-container-top: 65px;
+$torrent-container-top: $toolbar-height + $statusbar-height + 4px;
 $torrent-list-button-width: 14px;
 
 div#torrent_container {

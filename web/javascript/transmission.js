@@ -44,9 +44,10 @@ Transmission.prototype =
 		$(".numberinput").forceNumeric();
 		$('#toolbar-pause').click($.proxy(this.stopSelectedClicked,this));
 		$('#toolbar-start').click($.proxy(this.startSelectedClicked,this));
+		$('#toolbar-pause-all').click($.proxy(this.stopAllClicked,this));
+		$('#toolbar-start-all').click($.proxy(this.startAllClicked,this));
 		$('#toolbar-remove').click($.proxy(this.removeClicked,this));
 		$('#toolbar-open').click($.proxy(this.openTorrentClicked,this));
-		$('#toolbar-select').click($.proxy(this.toggleSelectionClicked,this));
 
 		$('#prefs-button').click($.proxy(this.togglePrefsDialogClicked,this));
 
@@ -437,15 +438,6 @@ Transmission.prototype =
 		    && p.parentNode.className!=='disabled';
 	},
 
-	toggleSelectionClicked: function(ev) {
-		if (this.isButtonEnabled(ev)) {
-			if (this._rows.length !== this.getSelectedRows().length)
-				this.selectAll();
-			else
-				this.deselectAll();
-		}
-	},
-
 	stopSelectedClicked: function(ev) {
 		if (this.isButtonEnabled(ev)) {
 			this.stopSelectedTorrents();
@@ -456,6 +448,20 @@ Transmission.prototype =
 	startSelectedClicked: function(ev) {
 		if (this.isButtonEnabled(ev)) {
 			this.startSelectedTorrents(false);
+			this.hideMobileAddressbar();
+		}
+	},
+
+	stopAllClicked: function(ev) {
+		if (this.isButtonEnabled(ev)) {
+			this.stopAllTorrents();
+			this.hideMobileAddressbar();
+		}
+	},
+
+	startAllClicked: function(ev) {
+		if (this.isButtonEnabled(ev)) {
+			this.startAllTorrents(false);
 			this.hideMobileAddressbar();
 		}
 	},
@@ -927,6 +933,9 @@ Transmission.prototype =
 		this.reannounceTorrents(this.getSelectedTorrents());
 	},
 
+	startAllTorrents: function(force) {
+		this.startTorrents(this.getAllTorrents(), force);
+	},
 	startSelectedTorrents: function(force) {
 		this.startTorrents(this.getSelectedTorrents(), force);
 	},
@@ -954,6 +963,9 @@ Transmission.prototype =
 		                               this.refreshTorrents, this);
 	},
 
+	stopAllTorrents: function() {
+		this.stopTorrents(this.getAllTorrents());
+	},
 	stopSelectedTorrents: function() {
 		this.stopTorrents(this.getSelectedTorrents());
 	},

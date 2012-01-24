@@ -15,7 +15,6 @@ dist_data_DATA = \
   inspector-info.png \
   inspector-peers.png \
   inspector-trackers.png \
-  red-texture.png \
   lock_icon.png \
   logo.png \
   progress.png \
@@ -24,8 +23,9 @@ dist_data_DATA = \
   toolbar-folder.png \
   toolbar-info.png \
   toolbar-pause.png \
-  toolbar-pointer.png \
   toolbar-start.png \
+  toolbar-pause-all.png \
+  toolbar-start-all.png \
   turtle.png \
   wrench.png
 
