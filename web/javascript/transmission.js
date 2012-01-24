@@ -55,9 +55,6 @@ Transmission.prototype =
 		$('#upload_cancel_button').click($.proxy(this.hideUploadDialog,this));
 		$('#turtle-button').click($.proxy(this.toggleTurtleClicked,this));
 		$('#compact-button').click($.proxy(this.toggleCompactClicked,this));
-		$('#torrent_container').bind('dragover', $.proxy(this.dragenter,this));
-		$('#torrent_container').bind('dragenter', $.proxy(this.dragenter,this));
-		$('#torrent_container').bind('drop', $.proxy(this.drop,this));
 
 		// tell jQuery to copy the dataTransfer property from events over if it exists
 		jQuery.event.props.push("dataTransfer");
@@ -75,6 +72,9 @@ Transmission.prototype =
 			$(document).bind('keydown', $.proxy(this.keyDown,this) );
 			$(document).bind('keyup', $.proxy(this.keyUp, this) );
 			$('#torrent_container').click( $.proxy(this.deselectAll,this) );
+			$('#torrent_container').bind('dragover', $.proxy(this.dragenter,this));
+			$('#torrent_container').bind('dragenter', $.proxy(this.dragenter,this));
+			$('#torrent_container').bind('drop', $.proxy(this.drop,this));
 			$('#inspector_link').click( $.proxy(this.toggleInspector,this) );
 
 			this.setupSearchBox();
