@@ -1786,7 +1786,7 @@ flush( const char * rpcurl, tr_benc ** benc )
                  * build a new CURL* and try again */
                 curl_easy_cleanup( curl );
                 curl = NULL;
-                flush( rpcurl, benc );
+                status |= flush( rpcurl, benc );
                 benc = NULL;
                 break;
             default:
