@@ -403,6 +403,31 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     [fTableView registerForDraggedTypes: [NSArray arrayWithObject: TORRENT_TABLE_VIEW_DATA_TYPE]];
     [fWindow registerForDraggedTypes: [NSArray arrayWithObjects: NSFilenamesPboardType, NSURLPboardType, nil]];
     
+    //sort the sort menu items (localization is from strings file)
+    NSMutableArray * sortMenuItems = [NSMutableArray arrayWithCapacity: 7];
+    NSUInteger sortMenuIndex = 0;
+    BOOL foundSortItem = NO;
+    for (NSMenuItem * item in [fSortMenu itemArray])
+    {
+        if ([item action] == @selector(setSort:) && [item tag] != SORT_ORDER_TAG)
+        {
+            [sortMenuItems addObject: item];
+            [fSortMenu removeItemAtIndex: sortMenuIndex];
+            foundSortItem = YES;
+        }
+        else
+        {
+            if (foundSortItem)
+                break;
+            ++sortMenuIndex;
+        }
+    }
+    
+    [sortMenuItems sortUsingDescriptors: [NSArray arrayWithObject: [NSSortDescriptor sortDescriptorWithKey: @"title" ascending: YES selector: @selector(localizedCompare:)]]];
+    
+    for (NSMenuItem * item in sortMenuItems)
+        [fSortMenu insertItem: item atIndex: sortMenuIndex++];
+    
     //you would think this would be called later in this method from updateUI, but it's not reached in awakeFromNib
     //this must be called after showStatusBar:
     [fStatusBar updateWithDownload: 0.0 upload: 0.0];

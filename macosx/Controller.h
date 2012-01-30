@@ -79,6 +79,8 @@ typedef enum
                                 
     IBOutlet NSMenuItem             * fNextInfoTabItem, * fPrevInfoTabItem;
     
+    IBOutlet NSMenu                 * fSortMenu;
+    
     IBOutlet NSMenu                 * fActionMenu;
     
     IBOutlet NSMenu                 * fUploadMenu, * fDownloadMenu;

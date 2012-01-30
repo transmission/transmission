@@ -148,7 +148,6 @@
 							<string key="NSFrame">{{118, 5}, {279, 14}}</string>
 							<reference key="NSSuperview" ref="303120456"/>
 							<reference key="NSWindow"/>
-							<reference key="NSNextKeyView"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSTextFieldCell" key="NSCell" id="696487414">
 								<int key="NSCellFlags">67239488</int>
@@ -194,7 +193,7 @@
 											<string key="NSFrameSize">{515, 224}</string>
 											<reference key="NSSuperview" ref="306237956"/>
 											<reference key="NSWindow"/>
-											<reference key="NSNextKeyView" ref="1068338331"/>
+											<reference key="NSNextKeyView" ref="365285506"/>
 											<bool key="NSEnabled">YES</bool>
 											<object class="_NSCornerView" key="NSCornerView">
 												<nil key="NSNextResponder"/>
@@ -667,7 +666,7 @@ AAAAAAAAAAA</bytes>
 							<string key="NSFrame">{{0, 24}, {515, 224}}</string>
 							<reference key="NSSuperview" ref="303120456"/>
 							<reference key="NSWindow"/>
-							<reference key="NSNextKeyView" ref="365285506"/>
+							<reference key="NSNextKeyView" ref="306237956"/>
 							<int key="NSsFlags">133648</int>
 							<reference key="NSVScroller" ref="1068338331"/>
 							<reference key="NSHScroller" ref="365285506"/>
@@ -5731,6 +5730,7 @@ AAAAAAAAAAA</bytes>
 						<string key="fOpenIgnoreDownloadFolder">NSMenuItem</string>
 						<string key="fPrevInfoTabItem">NSMenuItem</string>
 						<string key="fRatioStopMenu">NSMenu</string>
+						<string key="fSortMenu">NSMenu</string>
 						<string key="fSpeedLimitButton">NSButton</string>
 						<string key="fTableView">TorrentTableView</string>
 						<string key="fTotalTorrentsField">NSTextField</string>
@@ -5798,6 +5798,10 @@ AAAAAAAAAAA</bytes>
 						</object>
 						<object class="IBToOneOutletInfo" key="fRatioStopMenu">
 							<string key="name">fRatioStopMenu</string>
+							<string key="candidateClassName">NSMenu</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="fSortMenu">
+							<string key="name">fSortMenu</string>
 							<string key="candidateClassName">NSMenu</string>
 						</object>
 						<object class="IBToOneOutletInfo" key="fSpeedLimitButton">
