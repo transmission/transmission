@@ -1381,13 +1381,7 @@ int trashDataFile(const char * filename)
 {
     NSAssert2(index < [self fileCount], @"Index %d is greater than file count %d", index, [self fileCount]);
     
-    if ([self fileCount] == 1 || [self isComplete])
-        return NO;
-    
-    if (!fFileStat)
-        [self updateFileStat];
-    
-    return fFileStat[index].progress < 1.0;
+    return [self canChangeDownloadCheckForFiles: [NSIndexSet indexSetWithIndex: index]];
 }
 
 - (BOOL) canChangeDownloadCheckForFiles: (NSIndexSet *) indexSet
@@ -1398,10 +1392,15 @@ int trashDataFile(const char * filename)
     if (!fFileStat)
         [self updateFileStat];
     
-    for (NSUInteger index = [indexSet firstIndex]; index != NSNotFound; index = [indexSet indexGreaterThanIndex: index])
+    __block BOOL canChange = NO;
+    [indexSet enumerateIndexesWithOptions: NSEnumerationConcurrent usingBlock: ^(NSUInteger index, BOOL *stop) {
         if (fFileStat[index].progress < 1.0)
-            return YES;
-    return NO;
+        {
+            canChange = YES;
+            *stop = YES;
+        }
+    }];
+    return canChange;
 }
 
 - (NSInteger) checkForFiles: (NSIndexSet *) indexSet

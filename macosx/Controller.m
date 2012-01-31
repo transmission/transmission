@@ -409,6 +409,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     BOOL foundSortItem = NO;
     for (NSMenuItem * item in [fSortMenu itemArray])
     {
+        //assume all sort items are together and the Queue Order item is first
         if ([item action] == @selector(setSort:) && [item tag] != SORT_ORDER_TAG)
         {
             [sortMenuItems addObject: item];
