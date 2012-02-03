@@ -34,24 +34,24 @@ QString Formatter::unitStrings[3][5];
 void
 Formatter :: initUnits( )
 {
-    speed_K = 1024;
-    unitStrings[SPEED][B]  = tr(   "B/s" );
-    unitStrings[SPEED][KB] = tr( "KiB/s" );
-    unitStrings[SPEED][MB] = tr( "MiB/s" );
-    unitStrings[SPEED][GB] = tr( "GiB/s" );
-    unitStrings[SPEED][TB] = tr( "TiB/s" );
+    speed_K = 1000;
+    unitStrings[SPEED][B]  = tr(  "B/s" );
+    unitStrings[SPEED][KB] = tr( "kB/s" );
+    unitStrings[SPEED][MB] = tr( "MB/s" );
+    unitStrings[SPEED][GB] = tr( "GB/s" );
+    unitStrings[SPEED][TB] = tr( "TB/s" );
     tr_formatter_speed_init( speed_K,
                              qPrintable( unitStrings[SPEED][KB] ),
                              qPrintable( unitStrings[SPEED][MB] ),
                              qPrintable( unitStrings[SPEED][GB] ),
                              qPrintable( unitStrings[SPEED][TB] ) );
 
-    size_K = 1024;
-    unitStrings[SIZE][B]  = tr(   "B" );
-    unitStrings[SIZE][KB] = tr( "KiB" );
-    unitStrings[SIZE][MB] = tr( "MiB" );
-    unitStrings[SIZE][GB] = tr( "GiB" );
-    unitStrings[SIZE][TB] = tr( "TiB" );
+    size_K = 1000;
+    unitStrings[SIZE][B]  = tr(  "B" );
+    unitStrings[SIZE][KB] = tr( "kB" );
+    unitStrings[SIZE][MB] = tr( "MB" );
+    unitStrings[SIZE][GB] = tr( "GB" );
+    unitStrings[SIZE][TB] = tr( "TB" );
     tr_formatter_size_init( size_K,
                             qPrintable( unitStrings[SIZE][KB] ),
                             qPrintable( unitStrings[SIZE][MB] ),
