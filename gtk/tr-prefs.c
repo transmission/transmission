@@ -322,7 +322,7 @@ torrentPage( GObject * core )
     guint row = 0;
 
     t = hig_workarea_create( );
-    hig_workarea_add_section_title( t, &row, _( "Adding" ) );
+    hig_workarea_add_section_title( t, &row, C_( "Gerund", "Adding" ) );
 
     s = _( "_Start when added" );
     w = new_check_button( s, TR_PREFS_KEY_START, core );
@@ -344,7 +344,7 @@ torrentPage( GObject * core )
     hig_workarea_add_row_w( t, &row, l, w, NULL );
 
     hig_workarea_add_section_divider( t, &row );
-    hig_workarea_add_section_title( t, &row, _( "Seeding" ) );
+    hig_workarea_add_section_title( t, &row, C_( "Gerund", "Seeding" ) );
 
     s = _( "Stop seeding at _ratio:" );
     w = new_check_button( s, TR_PREFS_KEY_RATIO_ENABLED, core );
@@ -1281,7 +1281,7 @@ gtr_prefs_dialog_new( GtkWindow * parent, GObject * core )
                               gtk_label_new ( _( "Torrents" ) ) );
     gtk_notebook_append_page( GTK_NOTEBOOK( n ),
                               downloadPage( core ),
-                              gtk_label_new ( _( "Downloading" ) ) );
+                              gtk_label_new ( C_( "Gerund", "Downloading" ) ) );
     gtk_notebook_append_page( GTK_NOTEBOOK( n ),
                               bandwidthPage( core ),
                               gtk_label_new ( _( "Speed" ) ) );
