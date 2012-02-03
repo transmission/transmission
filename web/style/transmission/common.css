@@ -201,7 +201,7 @@ div#toolbar {
 ***/
 div#torrent_container {
   position: fixed;
-  top: 66px;
+  top: 68px;
   bottom: 22px;
   right: 0px;
   left: 0px;
@@ -403,7 +403,7 @@ div#torrent_inspector {
   overflow: auto;
   text-align: left;
   padding: 15px;
-  top: 66px;
+  top: 68px;
   position: fixed;
   width: 570px;
   z-index: 5;
