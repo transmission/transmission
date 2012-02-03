@@ -551,6 +551,11 @@ div#torrent_inspector
 	bottom: 22px;
 	right: 0px;
 
+	$idle-color-top: $nonselected-gradient-top;
+	$idle-color-bottom: $nonselected-gradient-bottom;
+	$active-color-top: $selected-gradient-top;
+	$active-color-bottom: $selected-gradient-bottom;
+
 	#inspector-close
 	{
 		display: none;
@@ -565,10 +570,6 @@ div#torrent_inspector
 		#inspector-tabs
 		{
 			$border-radius: 5px;
-			$idle-color-top: $nonselected-gradient-top;
-			$idle-color-bottom: $nonselected-gradient-bottom;
-			$active-color-top: $selected-gradient-top;
-			$active-color-bottom: $selected-gradient-bottom;
 
 			display: inline-block;
 
@@ -661,6 +662,18 @@ div#torrent_inspector
 	}
 
 	/* Files Inspector Tab */
+
+	#file-list-header {
+		float: right;
+		> * {
+			@include roundedButton(5px);
+			@include verticalGradient($idle-color-top, $idle-color-bottom);
+			&:active {
+				@include verticalGradient($active-color-top, $active-color-bottom);
+			}
+		}
+	}
+
 	#inspector_file_list {
 		padding: 0 0 0 0;
 		margin: 0 0 0 0;
@@ -668,6 +681,7 @@ div#torrent_inspector
 		cursor: default;
 		overflow: hidden;
 	}
+
 	#inspector_file_list {
 		border-top: 1px solid #888;
 		width: 100%;

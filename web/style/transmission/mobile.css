@@ -564,6 +564,34 @@ div#torrent_inspector {
     font-size: 1.2em;
     font-weight: bold;
     color: #222; }
+  div#torrent_inspector #file-list-header {
+    float: right; }
+    div#torrent_inspector #file-list-header > * {
+      background-color: #dddddd;
+      background-image: -webkit-gradient(linear, left top, left bottom, from(white), to(#bbbbbb));
+      background-image: -webkit-linear-gradient(top, white, #bbbbbb);
+      background-image: -moz-linear-gradient(top, white, #bbbbbb);
+      background-image: -ms-linear-gradient(top, white, #bbbbbb);
+      background-image: -o-linear-gradient(top, white, #bbbbbb);
+      background-image: linear-gradient(top, white, #bbbbbb);
+      cursor: pointer;
+      -moz-user-select: none;
+      -webkit-user-select: none;
+      display: inline-block;
+      border-style: solid;
+      border-color: #aaa;
+      border-width: 1px;
+      padding: 3px;
+      -moz-border-radius: 5px;
+      border-radius: 5px; }
+      div#torrent_inspector #file-list-header > *:active {
+        background-color: #e6e6ff;
+        background-image: -webkit-gradient(linear, left top, left bottom, from(#cdcdff), to(white));
+        background-image: -webkit-linear-gradient(top, #cdcdff, white);
+        background-image: -moz-linear-gradient(top, #cdcdff, white);
+        background-image: -ms-linear-gradient(top, #cdcdff, white);
+        background-image: -o-linear-gradient(top, #cdcdff, white);
+        background-image: linear-gradient(top, #cdcdff, white); }
   div#torrent_inspector #inspector_file_list {
     padding: 0 0 0 0;
     margin: 0 0 0 0;

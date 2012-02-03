@@ -453,6 +453,14 @@ function Inspector(controller) {
         data.controller.changeFileCommand(torrentId, rowIndices, command);
     },
 
+    selectAllFiles = function() {
+        changeFileCommand([], 'files-wanted');
+    },
+
+    deselectAllFiles = function() {
+        changeFileCommand([], 'files-unwanted');
+    },
+
     onFileWantedToggled = function(ev, row, want) {
         changeFileCommand([row], want?'files-wanted':'files-unwanted');
     },
@@ -713,6 +721,10 @@ function Inspector(controller) {
 	data.elements.origin_lb         = $('#inspector-info-origin')[0];
 	data.elements.comment_lb        = $('#inspector-info-comment')[0];
         data.elements.name_lb           = $('#torrent_inspector_name')[0];
+
+        // file page's buttons
+        $('#select-all-files').click(selectAllFiles);
+        $('#deselect-all-files').click(deselectAllFiles);
 
         // force initial 'N/A' updates on all the pages
         updateInspector();
