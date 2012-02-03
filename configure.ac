@@ -137,35 +137,35 @@ dnl ----------------------------------------------------------------------------
 dnl
 dnl file monitoring for the daemon
 
-AC_CHECK_HEADER([sys/inotify.h], 
-                [AC_CHECK_FUNC([inotify_init],[have_inotify="yes"],[have_inotify="no"])], 
-                [have_inotify="no"]) 
-AC_ARG_WITH([inotify], 
-            [AS_HELP_STRING([--with-inotify],[Enable inotify support (default=auto)])], 
-            [want_inotify=${withval}], 
-            [want_inotify=${have_inotify}]) 
-if test "x$want_inotify" = "xyes" ; then 
-    if test "x$have_inotify" = "xyes"; then 
-      AC_DEFINE([WITH_INOTIFY],[1]) 
-    else 
-      AC_MSG_ERROR("inotify not found!") 
-    fi 
-fi 
- 
-AC_CHECK_HEADER([sys/event.h], 
-                [AC_CHECK_FUNC([kqueue],[have_kqueue="yes"],[have_kqueue="no"])], 
-                [have_kqueue="no"]) 
-AC_ARG_WITH([kqueue], 
-            [AS_HELP_STRING([--with-kqueue],[Enable kqueue support (default=auto)])], 
-            [want_kqueue=${withval}], 
-            [want_kqueue=${have_kqueue}]) 
-if test "x$want_kqueue" = "xyes" ; then 
-    if test "x$have_kqueue" = "xyes"; then 
-      AC_DEFINE([WITH_KQUEUE],[1]) 
-    else 
-      AC_MSG_ERROR("kqueue not found!") 
-    fi 
-fi 
+AC_CHECK_HEADER([sys/inotify.h],
+                [AC_CHECK_FUNC([inotify_init],[have_inotify="yes"],[have_inotify="no"])],
+                [have_inotify="no"])
+AC_ARG_WITH([inotify],
+            [AS_HELP_STRING([--with-inotify],[Enable inotify support (default=auto)])],
+            [want_inotify=${withval}],
+            [want_inotify=${have_inotify}])
+if test "x$want_inotify" = "xyes" ; then
+    if test "x$have_inotify" = "xyes"; then
+      AC_DEFINE([WITH_INOTIFY],[1])
+    else
+      AC_MSG_ERROR("inotify not found!")
+    fi
+fi
+
+AC_CHECK_HEADER([sys/event.h],
+                [AC_CHECK_FUNC([kqueue],[have_kqueue="yes"],[have_kqueue="no"])],
+                [have_kqueue="no"])
+AC_ARG_WITH([kqueue],
+            [AS_HELP_STRING([--with-kqueue],[Enable kqueue support (default=auto)])],
+            [want_kqueue=${withval}],
+            [want_kqueue=${have_kqueue}])
+if test "x$want_kqueue" = "xyes" ; then
+    if test "x$have_kqueue" = "xyes"; then
+      AC_DEFINE([WITH_KQUEUE],[1])
+    else
+      AC_MSG_ERROR("kqueue not found!")
+    fi
+fi
 
 AC_CHECK_HEADERS([sys/statvfs.h \
                   xfs/xfs.h])
@@ -219,7 +219,7 @@ AC_ARG_ENABLE([utp],
               [want_utp=${enableval}],
               [want_utp=${have_utp}])
 if test "x$want_utp" = "xyes" ; then
-    if test "x$have_utp" = "xyes"; then 
+    if test "x$have_utp" = "xyes"; then
         LIBUTP_CFLAGS="-I\$(top_srcdir)/third-party/"
         LIBUTP_LIBS="\$(top_builddir)/third-party/libutp/libutp.a"
         if test "x$libutp_extra_libs" != "x" ; then
@@ -227,10 +227,10 @@ if test "x$want_utp" = "xyes" ; then
         fi
         AC_DEFINE([WITH_UTP],[1])
         build_utp="yes"
-    else 
-      AC_MSG_ERROR("Unable to build uTP support -- C++ compiler not found") 
-    fi 
-fi 
+    else
+      AC_MSG_ERROR("Unable to build uTP support -- C++ compiler not found")
+    fi
+fi
 AC_SUBST(LIBUTP_CFLAGS)
 AC_SUBST(LIBUTP_LIBS)
 AM_CONDITIONAL([BUILD_UTP],[test "x$build_utp" = "xyes"])
@@ -243,70 +243,70 @@ dnl
 
 AC_MSG_CHECKING([supported miniupnp library])
 upnp_version="none"
-ac_save_LIBS="$LIBS" 
-LIBS="-lminiupnpc" 
+ac_save_LIBS="$LIBS"
+LIBS="-lminiupnpc"
 # See if the OS has its miniupnp 1.5 installed
-AC_TRY_LINK([ 
-    #include <stdlib.h> 
-    #include <miniupnpc/miniupnpc.h> 
-    #include <miniupnpc/upnpcommands.h> 
-],[ 
-    struct UPNPDev * devlist; 
-    struct UPNPUrls    urls; 
-    struct IGDdatas    data; 
-    char lanaddr[16]; 
-    char portStr[8]; 
-    char intPort[8]; 
-    char intClient[16]; 
-    upnpDiscover( 2000, NULL, NULL, 0 ); 
-    UPNP_GetValidIGD( devlist, &urls, &data, lanaddr, sizeof( lanaddr ) );  
-    UPNP_GetSpecificPortMappingEntry( urls.controlURL, data.first.servicetype, 
-                        portStr, "TCP", intClient, intPort ); 
-],[ 
-AC_DEFINE(HAVE_MINIUPNP_15, 1, [Define to 1 if you have miniupnpc version 1.5]) 
+AC_TRY_LINK([
+    #include <stdlib.h>
+    #include <miniupnpc/miniupnpc.h>
+    #include <miniupnpc/upnpcommands.h>
+],[
+    struct UPNPDev * devlist;
+    struct UPNPUrls    urls;
+    struct IGDdatas    data;
+    char lanaddr[16];
+    char portStr[8];
+    char intPort[8];
+    char intClient[16];
+    upnpDiscover( 2000, NULL, NULL, 0 );
+    UPNP_GetValidIGD( devlist, &urls, &data, lanaddr, sizeof( lanaddr ) ); 
+    UPNP_GetSpecificPortMappingEntry( urls.controlURL, data.first.servicetype,
+                        portStr, "TCP", intClient, intPort );
+],[
+AC_DEFINE(HAVE_MINIUPNP_15, 1, [Define to 1 if you have miniupnpc version 1.5])
 upnp_version="1.5"])
- 
+
 # See if the OS has its miniupnp 1.6 installed
-AC_TRY_LINK([ 
-    #include <stdlib.h> 
-    #include <errno.h> 
-    #include <miniupnpc/miniupnpc.h> 
-    #include <miniupnpc/upnpcommands.h> 
-],[ 
-    struct UPNPDev * devlist; 
-    struct UPNPUrls    urls; 
-    struct IGDdatas    data; 
-    char lanaddr[16]; 
-    char portStr[8]; 
-    char intPort[8]; 
-    char intClient[16]; 
-    upnpDiscover( 2000, NULL, NULL, 0, 0, &errno ); 
-    UPNP_GetValidIGD( devlist, &urls, &data, lanaddr, sizeof( lanaddr ) );  
-    UPNP_GetSpecificPortMappingEntry( urls.controlURL, data.first.servicetype, 
-                        portStr, "TCP", intClient, intPort, NULL, NULL, NULL ); 
-],[ 
-AC_DEFINE(HAVE_MINIUPNP_16, 1, [Define to 1 if you have miniupnpc version 1.6]) 
+AC_TRY_LINK([
+    #include <stdlib.h>
+    #include <errno.h>
+    #include <miniupnpc/miniupnpc.h>
+    #include <miniupnpc/upnpcommands.h>
+],[
+    struct UPNPDev * devlist;
+    struct UPNPUrls    urls;
+    struct IGDdatas    data;
+    char lanaddr[16];
+    char portStr[8];
+    char intPort[8];
+    char intClient[16];
+    upnpDiscover( 2000, NULL, NULL, 0, 0, &errno );
+    UPNP_GetValidIGD( devlist, &urls, &data, lanaddr, sizeof( lanaddr ) ); 
+    UPNP_GetSpecificPortMappingEntry( urls.controlURL, data.first.servicetype,
+                        portStr, "TCP", intClient, intPort, NULL, NULL, NULL );
+],[
+AC_DEFINE(HAVE_MINIUPNP_16, 1, [Define to 1 if you have miniupnpc version 1.6])
 upnp_version="1.6"])
 
 # ... and the results of our tests
-LIBS="$ac_save_LIBS" 
+LIBS="$ac_save_LIBS"
 AC_MSG_RESULT([$upnp_version])
-AM_CONDITIONAL([BUILD_MINIUPNP],[test "x$upnp_version" = "xnone"]) 
+AM_CONDITIONAL([BUILD_MINIUPNP],[test "x$upnp_version" = "xnone"])
 if test "x$upnp_version" = "xnone" ; then
-    LIBUPNP_CFLAGS="-I\$(top_srcdir)/third-party/" 
-    LIBUPNP_LIBS="\$(top_builddir)/third-party/miniupnp/libminiupnp.a" 
-    LIBUPNP_LIBS_QT="\$\${TRANSMISSION_TOP}/third-party/miniupnp/libminiupnp.a" 
+    LIBUPNP_CFLAGS="-I\$(top_srcdir)/third-party/"
+    LIBUPNP_LIBS="\$(top_builddir)/third-party/miniupnp/libminiupnp.a"
+    LIBUPNP_LIBS_QT="\$\${TRANSMISSION_TOP}/third-party/miniupnp/libminiupnp.a"
     dnl because this is the version that we bundle...
-    AC_DEFINE(HAVE_MINIUPNP_16, 1, [Define to 1 if you have miniupnpc version 1.6]) 
+    AC_DEFINE(HAVE_MINIUPNP_16, 1, [Define to 1 if you have miniupnpc version 1.6])
 else
-    AC_DEFINE([SYSTEM_MINIUPNP]) 
-    LIBUPNP_CFLAGS=""  
-    LIBUPNP_LIBS="-lminiupnpc" 
-    LIBUPNP_LIBS_QT="-lminiupnpc" 
+    AC_DEFINE([SYSTEM_MINIUPNP])
+    LIBUPNP_CFLAGS="" 
+    LIBUPNP_LIBS="-lminiupnpc"
+    LIBUPNP_LIBS_QT="-lminiupnpc"
 fi
-AC_SUBST(LIBUPNP_CFLAGS) 
-AC_SUBST(LIBUPNP_LIBS) 
-AC_SUBST(LIBUPNP_LIBS_QT) 
+AC_SUBST(LIBUPNP_CFLAGS)
+AC_SUBST(LIBUPNP_LIBS)
+AC_SUBST(LIBUPNP_LIBS_QT)
 
 
 dnl ----------------------------------------------------------------------------
@@ -327,7 +327,7 @@ fi
 if test "x$with_gtk" = "x3" ; then
     PKG_CHECK_EXISTS([gtk+-3.0 >= $GTK3_MINIMUM],[gtk_version="3" with_gtk="yes"],[gtk_version="none" with_gtk="no"])
 fi
-AC_ARG_ENABLE([nls], 
+AC_ARG_ENABLE([nls],
               [AS_HELP_STRING([--enable-nls],[enable native language support])],,
               [enable_nls=yes])
 AM_CONDITIONAL([BUILD_GTK],[test "x$with_gtk" = "xyes"])
@@ -370,7 +370,7 @@ if test "x$with_gtk" = "xyes" ; then
 
     if test "x$have_libappindicator" = "xyes"; then
         use_libappindicator=yes
-        AC_DEFINE([HAVE_LIBAPPINDICATOR], 1) 
+        AC_DEFINE([HAVE_LIBAPPINDICATOR], 1)
     else
         LIBAPPINDICATOR_CFLAGS=
         LIBAPPINDICATOR_LIBS=
@@ -436,9 +436,9 @@ AC_ARG_ENABLE([lightweight],
               AS_HELP_STRING([--enable-lightweight],[optimize libtransmission for low-resource systems: smaller cache size, prefer unencrypted peer connections, etc.]),
               [enable_lightweight=${enableval}],
               [enable_lightweight="no"])
-if test "x$enable_lightweight" = "xyes" ; then 
+if test "x$enable_lightweight" = "xyes" ; then
   AC_DEFINE([TR_LIGHTWEIGHT],[1],[optimize libtransmission for low-resource systems])
-fi 
+fi
 
 AC_ARG_ENABLE([cli],
               [AS_HELP_STRING([--enable-cli],[build command-line client])],

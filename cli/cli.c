@@ -226,8 +226,8 @@ main( int argc, char ** argv )
     const char  * configDir;
     uint8_t     * fileContents;
     size_t        fileLength;
-    const char  * str; 
-    char          buf[TR_PATH_MAX]; 
+    const char  * str;
+    char          buf[TR_PATH_MAX];
 
     tr_formatter_mem_init( MEM_K, MEM_K_STR, MEM_M_STR, MEM_G_STR, MEM_T_STR );
     tr_formatter_size_init( DISK_K,DISK_K_STR, DISK_M_STR, DISK_G_STR, DISK_T_STR );

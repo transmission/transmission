@@ -242,7 +242,7 @@ addURL( tr_benc * metainfo, const char * url )
         if( !had_announce_list )
         {
             announce_list = tr_bencDictAddList( metainfo, "announce-list", 2 );
-       
+
             if( had_announce )
             {
                 /* we're moving from an 'announce' to an 'announce-list',

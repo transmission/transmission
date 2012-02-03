@@ -759,7 +759,7 @@ void            tr_torrentSetPriority( tr_torrent *, tr_priority_t );
 ****  Torrents can be moved in the queue using the simple functions
 ****  tr_torrentQueueMove{Top,Up,Down,Bottom}. They can be moved to
 ****  arbitrary points in the queue with tr_torrentSetQueuePosition().
-****  
+****
 ***/
 
 

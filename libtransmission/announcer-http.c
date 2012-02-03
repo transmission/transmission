@@ -363,7 +363,7 @@ on_scrape_done( tr_session   * session,
         tr_benc * flags;
         const char * str;
         const int benc_loaded = !tr_bencLoad( msg, msglen, &top, NULL );
-        
+
         if( getenv( "TR_CURL_VERBOSE" ) != NULL )
         {
             if( !benc_loaded )
@@ -378,7 +378,7 @@ on_scrape_done( tr_session   * session,
                 tr_free( str );
             }
         }
-        
+
         if( benc_loaded )
         {
             if( tr_bencDictFindStr( &top, "failure reason", &str ) )
