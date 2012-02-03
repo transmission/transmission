@@ -934,7 +934,7 @@ on_app_exit( gpointer vdata )
     gtk_misc_set_alignment( GTK_MISC( w ), 0.0, 0.5 );
     gtk_table_attach_defaults( GTK_TABLE( p ), w, 1, 2, 0, 1 );
 
-    w = gtk_label_new( _( "Sending upload/download totals to tracker..." ) );
+    w = gtk_label_new( _( "Sending upload/download totals to tracker…" ) );
     gtk_misc_set_alignment( GTK_MISC( w ), 0.0, 0.5 );
     gtk_table_attach_defaults( GTK_TABLE( p ), w, 1, 2, 1, 2 );
 

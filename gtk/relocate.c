@@ -122,7 +122,7 @@ onResponse( GtkDialog * dialog, int response, gpointer unused UNUSED )
                                     GTK_MESSAGE_INFO,
                                     GTK_BUTTONS_CLOSE,
                                     NULL );
-        gtk_message_dialog_format_secondary_text( GTK_MESSAGE_DIALOG( w ), _( "This may take a moment..." ) );
+        gtk_message_dialog_format_secondary_text( GTK_MESSAGE_DIALOG( w ), _( "This may take a moment…" ) );
         gtk_dialog_set_response_sensitive( GTK_DIALOG( w ), GTK_RESPONSE_CLOSE, FALSE );
         gtk_widget_show( w );
 

@@ -180,7 +180,7 @@ makeProgressDialog( GtkWidget * parent, MakeMetaUI * ui )
     v = gtr_vbox_new( TRUE, GUI_PAD );
     gtk_container_add( GTK_CONTAINER( fr ), v );
 
-    l = gtk_label_new( _( "Creating torrent..." ) );
+    l = gtk_label_new( _( "Creating torrent…" ) );
     gtk_misc_set_alignment( GTK_MISC( l ), 0.0, 0.5 );
     gtk_label_set_justify( GTK_LABEL( l ), GTK_JUSTIFY_LEFT );
     ui->progress_label = l;

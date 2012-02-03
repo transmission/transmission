@@ -481,7 +481,7 @@ onBlocklistUpdate( GtkButton * w, gpointer gdata )
                                 GTK_BUTTONS_CLOSE,
                                 "%s", _( "Update Blocklist" ) );
     gtk_widget_set_sensitive( data->updateBlocklistButton, FALSE );
-    gtk_message_dialog_format_secondary_text( GTK_MESSAGE_DIALOG( d ), "%s", _( "Getting new blocklist..." ) );
+    gtk_message_dialog_format_secondary_text( GTK_MESSAGE_DIALOG( d ), "%s", _( "Getting new blocklist…" ) );
     data->updateBlocklistDialog = d;
     g_signal_connect( d, "response", G_CALLBACK(onBlocklistUpdateResponse), data );
     gtk_widget_show( d );
@@ -1182,7 +1182,7 @@ onPortTest( GtkButton * button UNUSED, gpointer vdata )
     struct network_page_data * data = vdata;
     gtk_widget_set_sensitive( data->portButton, FALSE );
     gtk_widget_set_sensitive( data->portSpin, FALSE );
-    gtk_label_set_markup( GTK_LABEL( data->portLabel ), _( "<i>Testing TCP port...</i>" ) );
+    gtk_label_set_markup( GTK_LABEL( data->portLabel ), _( "<i>Testing TCP port…</i>" ) );
     if( !data->portTag )
         data->portTag = g_signal_connect( data->core, "port-tested", G_CALLBACK(onPortTested), data );
     gtr_core_port_test( data->core );

@@ -1840,7 +1840,7 @@ buildTrackerSummary( GString * gstr, const char * key, const tr_tracker_stat * s
             case TR_TRACKER_ACTIVE:
                 tr_strltime_rounded( timebuf, now - st->lastAnnounceStartTime, sizeof( timebuf ) );
                 g_string_append_c( gstr, '\n' );
-                g_string_append_printf( gstr, _( "Asking for more peers now... <small>%s</small>" ), timebuf );
+                g_string_append_printf( gstr, _( "Asking for more peers now… <small>%s</small>" ), timebuf );
                 break;
         }
 
@@ -1873,7 +1873,7 @@ buildTrackerSummary( GString * gstr, const char * key, const tr_tracker_stat * s
                 case TR_TRACKER_ACTIVE:
                     g_string_append_c( gstr, '\n' );
                     tr_strltime_rounded( timebuf, now - st->lastScrapeStartTime, sizeof( timebuf ) );
-                    g_string_append_printf( gstr, _( "Asking for peer counts now... <small>%s</small>" ), timebuf );
+                    g_string_append_printf( gstr, _( "Asking for peer counts now… <small>%s</small>" ), timebuf );
                     break;
             }
         }
