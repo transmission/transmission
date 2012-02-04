@@ -123,7 +123,7 @@ Don't store incomplete torrents in a different directory.
 .It Fl d Fl -downlimit Ar limit
 Limit the maximum download speed to
 .Ar limit
-KiB/s.
+kB/s.
 If current torrent(s) are selected this operates on them. Otherwise, it changes the global setting.
 .It Fl D Fl -no-downlimit
 Disable download speed limits.
@@ -264,7 +264,7 @@ Make the current torrent(s) not honor the session limits.
 .It Fl u Fl -uplimit Ar limit
 Limit the maximum upload speed to
 .Ar limit
-KiB/s.
+kB/s.
 If current torrent(s) are selected this operates on them. Otherwise, it changes the global setting.
 .It Fl U Fl -no-uplimit
 Disable upload speed limits.
@@ -306,12 +306,12 @@ In the `status' section of the list, the following shorthand is used:
 .D1 ?: We unchoked this peer, but they're not interested
 .El
 .Sh EXAMPLES
-Set download and upload limits to 400 KiB/sec and 60 KiB/sec:
+Set download and upload limits to 400 kB/sec and 60 kB/sec:
 .Bd -literal -offset indent
 $ transmission-remote \-d400 \-u60
 $ transmission-remote \-\-downlimit=400 \-\-uplimit=60
 .Ed
-Set alternate download and upload limits to 100 KiB/sec and 20 KiB/sec:
+Set alternate download and upload limits to 100 kB/sec and 20 kB/sec:
 .Bd -literal -offset indent
 $ transmission-remote \-asd100 \-asu20
 $ transmission-remote \-\-alt-speed-downlimit=100 \-\-alt-speed-uplimit=20
