@@ -16,17 +16,16 @@ QT += network
 PKGCONFIG = fontconfig libcurl openssl libevent
 
 TRANSMISSION_TOP = ..
+
+include(config.pri) 
+
 INCLUDEPATH = $${EVENT_TOP}/include $${INCLUDEPATH}
 INCLUDEPATH += $${TRANSMISSION_TOP}
 LIBS += $${TRANSMISSION_TOP}/libtransmission/libtransmission.a
-exists( $${TRANSMISSION_TOP}/third-party/libutp/Makefile ) { 
-    LIBS += $${TRANSMISSION_TOP}/third-party/libutp/libutp.a
-}
+LIBS += $${LIBUTP_LIBS}
 LIBS += $${TRANSMISSION_TOP}/third-party/dht/libdht.a
-exists( $${TRANSMISSION_TOP}/third-party/miniupnp/Makefile ) { 
-    LIBS += $${TRANSMISSION_TOP}/third-party/miniupnp/libminiupnp.a
-}
-LIBS += $${TRANSMISSION_TOP}/third-party/libnatpmp/libnatpmp.a
+LIBS += $${LIBUPNP_LIBS}
+LIBS += $${LIBNATPMP_LIBS}
 unix: LIBS += -L$${EVENT_TOP}/lib -lz -lrt
 win32:DEFINES += QT_DBUS
 win32:LIBS += -levent-2.0 -lws2_32 -lintl

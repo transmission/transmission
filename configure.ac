@@ -222,8 +222,10 @@ if test "x$want_utp" = "xyes" ; then
     if test "x$have_utp" = "xyes"; then
         LIBUTP_CFLAGS="-I\$(top_srcdir)/third-party/"
         LIBUTP_LIBS="\$(top_builddir)/third-party/libutp/libutp.a"
+        LIBUTP_LIBS_QT="\$\${TRANSMISSION_TOP}/third-party/libutp/libutp.a"
         if test "x$libutp_extra_libs" != "x" ; then
             LIBUTP_LIBS="$LIBUTP_LIBS $libutp_extra_libs"
+            LIBUTP_LIBS_QT="$LIBUTP_LIBS_QT $libutp_extra_libs"
         fi
         AC_DEFINE([WITH_UTP],[1])
         build_utp="yes"
@@ -233,6 +235,7 @@ if test "x$want_utp" = "xyes" ; then
 fi
 AC_SUBST(LIBUTP_CFLAGS)
 AC_SUBST(LIBUTP_LIBS)
+AC_SUBST(LIBUTP_LIBS_QT)
 AM_CONDITIONAL([BUILD_UTP],[test "x$build_utp" = "xyes"])
 AC_MSG_RESULT([$build_utp])
 
@@ -530,6 +533,7 @@ AC_CONFIG_FILES([Makefile
                  macosx/Makefile
                  gtk/Makefile
                  gtk/icons/Makefile
+                 qt/config.pri
                  web/Makefile
                  web/images/Makefile
                  web/style/Makefile
