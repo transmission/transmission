@@ -2833,13 +2833,9 @@ deleteLocalData( tr_torrent * tor, tr_fileFunc func )
     /* build a list of 'top's child directories that belong to this torrent */
     for( f=0; f<tor->info.fileCount; ++f )
     {
-        char * dir;
-        char * filename;
-
         /* get the directory that this file goes in... */
-        filename = tr_buildPath( top, tor->info.files[f].name, NULL );
-        dir = tr_dirname( filename );
-        tr_free( filename );
+        char * filename = tr_buildPath( top, tor->info.files[f].name, NULL );
+        char * dir = tr_dirname( filename );
         if( !tr_is_same_file( top, dir ) && strcmp( top, dir ) ) {
             for( ;; ) {
                 char * parent = tr_dirname( dir );
@@ -2853,6 +2849,8 @@ deleteLocalData( tr_torrent * tor, tr_fileFunc func )
                 dir = parent;
             }
         }
+        tr_free( dir );
+        tr_free( filename );
     }
     for( i=0, n=tr_ptrArraySize(&folders); i<n; ++i )
         removeEmptyFoldersAndJunkFiles( tr_ptrArrayNth( &folders, i ) );
