@@ -1593,6 +1593,16 @@ tr_bencMergeDicts( tr_benc * target, const tr_benc * source )
                     tr_bencListCopy( tr_bencDictAddList( target, key, tr_bencListSize( val ) ), val );
                 }
             }
+            else if( tr_bencIsDict( val ) )
+            {
+                tr_benc * target_dict = tr_bencDictFind( target, key );
+
+                if( target_dict == NULL )
+                    target_dict = tr_bencDictAddDict( target, key, tr_bencDictSize( val ) );
+
+                if( tr_bencIsDict( target_dict ) )
+                    tr_bencMergeDicts( target_dict, val );
+            }
             else
             {
                 tr_dbg( "tr_bencMergeDicts skipping \"%s\"", key );
