@@ -302,6 +302,7 @@
 		A2E669790F5B8E5A00B4251A /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2E669780F5B8E5A00B4251A /* Security.framework */; };
 		A2E9AA760C249AF400085DCF /* ToolbarCreateTemplate.png in Resources */ = {isa = PBXBuildFile; fileRef = A2E9AA750C249AF400085DCF /* ToolbarCreateTemplate.png */; };
 		A2ED7D8F0CEF431B00970975 /* FilterButton.m in Sources */ = {isa = PBXBuildFile; fileRef = A2ED7D8E0CEF431B00970975 /* FilterButton.m */; };
+		A2EE726F14DCCC950093C99A /* natpmp_local.h in Headers */ = {isa = PBXBuildFile; fileRef = A2EE726E14DCCC950093C99A /* natpmp_local.h */; };
 		A2EF7DEC0C96297400FA9811 /* PurpleDot.png in Resources */ = {isa = PBXBuildFile; fileRef = A2EF7DEB0C96297400FA9811 /* PurpleDot.png */; };
 		A2F011990C27418800576FC0 /* CreateLarge.png in Resources */ = {isa = PBXBuildFile; fileRef = A2F011980C27418800576FC0 /* CreateLarge.png */; };
 		A2F151180CD438A4001F3B0E /* YellowDot.png in Resources */ = {isa = PBXBuildFile; fileRef = A2F151150CD438A4001F3B0E /* YellowDot.png */; };
@@ -353,7 +354,6 @@
 		BEFC1E3C0C07861A00B0BB3C /* platform.c in Sources */ = {isa = PBXBuildFile; fileRef = BEFC1E030C07861A00B0BB3C /* platform.c */; };
 		BEFC1E450C07861A00B0BB3C /* net.h in Headers */ = {isa = PBXBuildFile; fileRef = BEFC1E0C0C07861A00B0BB3C /* net.h */; };
 		BEFC1E460C07861A00B0BB3C /* net.c in Sources */ = {isa = PBXBuildFile; fileRef = BEFC1E0D0C07861A00B0BB3C /* net.c */; };
-		BEFC1E470C07861A00B0BB3C /* natpmp.h in Headers */ = {isa = PBXBuildFile; fileRef = BEFC1E0E0C07861A00B0BB3C /* natpmp.h */; };
 		BEFC1E480C07861A00B0BB3C /* natpmp.c in Sources */ = {isa = PBXBuildFile; fileRef = BEFC1E0F0C07861A00B0BB3C /* natpmp.c */; };
 		BEFC1E490C07861A00B0BB3C /* metainfo.h in Headers */ = {isa = PBXBuildFile; fileRef = BEFC1E100C07861A00B0BB3C /* metainfo.h */; };
 		BEFC1E4A0C07861A00B0BB3C /* metainfo.c in Sources */ = {isa = PBXBuildFile; fileRef = BEFC1E110C07861A00B0BB3C /* metainfo.c */; };
@@ -913,6 +913,7 @@
 		A2EA8E3E0CC3C9830081201C /* fr */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = fr; path = macosx/fr.lproj/Localizable.strings; sourceTree = "<group>"; };
 		A2ED7D8D0CEF431B00970975 /* FilterButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FilterButton.h; path = macosx/FilterButton.h; sourceTree = "<group>"; };
 		A2ED7D8E0CEF431B00970975 /* FilterButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = FilterButton.m; path = macosx/FilterButton.m; sourceTree = "<group>"; };
+		A2EE726E14DCCC950093C99A /* natpmp_local.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = natpmp_local.h; path = libtransmission/natpmp_local.h; sourceTree = "<group>"; };
 		A2EF7DEB0C96297400FA9811 /* PurpleDot.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = PurpleDot.png; path = macosx/Images/PurpleDot.png; sourceTree = "<group>"; };
 		A2F011980C27418800576FC0 /* CreateLarge.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = CreateLarge.png; path = macosx/Images/CreateLarge.png; sourceTree = "<group>"; };
 		A2F151150CD438A4001F3B0E /* YellowDot.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = YellowDot.png; path = macosx/Images/YellowDot.png; sourceTree = "<group>"; };
@@ -969,7 +970,6 @@
 		BEFC1E030C07861A00B0BB3C /* platform.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = platform.c; path = libtransmission/platform.c; sourceTree = "<group>"; };
 		BEFC1E0C0C07861A00B0BB3C /* net.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = net.h; path = libtransmission/net.h; sourceTree = "<group>"; };
 		BEFC1E0D0C07861A00B0BB3C /* net.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = net.c; path = libtransmission/net.c; sourceTree = "<group>"; };
-		BEFC1E0E0C07861A00B0BB3C /* natpmp.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = natpmp.h; path = libtransmission/natpmp.h; sourceTree = "<group>"; };
 		BEFC1E0F0C07861A00B0BB3C /* natpmp.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = natpmp.c; path = libtransmission/natpmp.c; sourceTree = "<group>"; };
 		BEFC1E100C07861A00B0BB3C /* metainfo.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = metainfo.h; path = libtransmission/metainfo.h; sourceTree = "<group>"; };
 		BEFC1E110C07861A00B0BB3C /* metainfo.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = metainfo.c; path = libtransmission/metainfo.c; sourceTree = "<group>"; };
@@ -1422,7 +1422,7 @@
 				BEFC1E030C07861A00B0BB3C /* platform.c */,
 				BEFC1E0C0C07861A00B0BB3C /* net.h */,
 				BEFC1E0D0C07861A00B0BB3C /* net.c */,
-				BEFC1E0E0C07861A00B0BB3C /* natpmp.h */,
+				A2EE726E14DCCC950093C99A /* natpmp_local.h */,
 				BEFC1E0F0C07861A00B0BB3C /* natpmp.c */,
 				BEFC1E100C07861A00B0BB3C /* metainfo.h */,
 				BEFC1E110C07861A00B0BB3C /* metainfo.c */,
@@ -1716,7 +1716,6 @@
 				BEFC1E350C07861A00B0BB3C /* port-forwarding.h in Headers */,
 				BEFC1E3B0C07861A00B0BB3C /* platform.h in Headers */,
 				BEFC1E450C07861A00B0BB3C /* net.h in Headers */,
-				BEFC1E470C07861A00B0BB3C /* natpmp.h in Headers */,
 				BEFC1E490C07861A00B0BB3C /* metainfo.h in Headers */,
 				BEFC1E4D0C07861A00B0BB3C /* session.h in Headers */,
 				BEFC1E4E0C07861A00B0BB3C /* inout.h in Headers */,
@@ -1756,6 +1755,7 @@
 				A284214512DA663E00FBDDBB /* tr-udp.h in Headers */,
 				A2679295130E00A000CB7464 /* tr-utp.h in Headers */,
 				A23F29A1132A447400E9A83B /* announcer-common.h in Headers */,
+				A2EE726F14DCCC950093C99A /* natpmp_local.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
