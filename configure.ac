@@ -309,6 +309,33 @@ AC_SUBST(LIBUPNP_LIBS)
 AC_SUBST(LIBUPNP_LIBS_QT)
 
 
+ 
+
+dnl ----------------------------------------------------------------------------
+dnl
+dnl  Allow usage of system natpmp library 
+
+LIBNATPMP_CFLAGS="-I\$(top_srcdir)/third-party/libnatpmp/" 
+LIBNATPMP_LIBS="\$(top_builddir)/third-party/libnatpmp/libnatpmp.a" 
+LIBNATPMP_LIBS_QT="\$\${TRANSMISSION_TOP}/third-party/libnatpmp/libnatpmp.a" 
+build_bundled_natpmp="yes" 
+AC_ARG_ENABLE([external-natpmp], 
+              AS_HELP_STRING([--enable-external-natpmp],[Use system external-natpmp]), 
+              [want_external_natpmp=${enableval}], 
+              [want_external_natpmp=no]) 
+if test "x$want_external_natpmp" != "xno" ; then 
+	dnl Would be lovely if it had pkgconfig 
+	LIBNATPMP_CFLAGS=""  
+	LIBNATPMP_LIBS="-lnatpmp" 
+	LIBNATPMP_LIBS_QT="-lnatpmp" 
+	build_bundled_natpmp="no" 
+fi 
+AM_CONDITIONAL([BUILD_NATPMP],[test "x$build_bundled_natpmp" = "xyes"]) 
+AC_SUBST(LIBNATPMP_CFLAGS) 
+AC_SUBST(LIBNATPMP_LIBS) 
+AC_SUBST(LIBNATPMP_LIBS_QT) 
+
+
 dnl ----------------------------------------------------------------------------
 dnl
 dnl  detection for the GTK+ client

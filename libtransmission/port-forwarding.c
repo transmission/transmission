@@ -18,7 +18,7 @@
 #include <event2/event.h>
 
 #include "transmission.h"
-#include "natpmp.h"
+#include "natpmp_local.h"
 #include "net.h"
 #include "peer-mgr.h"
 #include "port-forwarding.h"

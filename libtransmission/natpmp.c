@@ -17,10 +17,10 @@
 #include <event2/util.h> /* evutil_inet_ntop() */
 
 #define ENABLE_STRNATPMPERR
-#include <libnatpmp/natpmp.h>
+#include "natpmp.h"
 
 #include "transmission.h"
-#include "natpmp.h"
+#include "natpmp_local.h"
 #include "net.h" /* tr_netCloseSocket */
 #include "port-forwarding.h"
 #include "utils.h"

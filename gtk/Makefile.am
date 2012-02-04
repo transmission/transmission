@@ -85,7 +85,7 @@ dist_man_MANS = transmission-gtk.1
 transmission_gtk_LDADD = \
     $(top_builddir)/libtransmission/libtransmission.a \
     @LIBUPNP_LIBS@ \
-    $(top_builddir)/third-party/libnatpmp/libnatpmp.a \
+    @LIBNATPMP_LIBS@ \
     @DHT_LIBS@ \
     @LIBUTP_LIBS@ \
     @GTK_LIBS@ \

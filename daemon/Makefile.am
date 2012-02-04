@@ -21,7 +21,7 @@ bin_PROGRAMS = \
 LDADD = \
     $(top_builddir)/libtransmission/libtransmission.a \
     @LIBUPNP_LIBS@ \
-    $(top_builddir)/third-party/libnatpmp/libnatpmp.a \
+    @LIBNATPMP_LIBS@ \
     @DHT_LIBS@ \
     @LIBUTP_LIBS@ \
     @LIBEVENT_LIBS@ \
