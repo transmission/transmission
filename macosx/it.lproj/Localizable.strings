@@ -685,7 +685,9 @@
    Save log alert panel -> button
    Torrent disk space alert -> button
    Torrent download failed -> button
-   Torrent file copy alert -> button */
+   Torrent file copy alert -> button
+   Transmission already running alert -> button */
+
 
 
 
@@ -848,9 +850,7 @@
 "Quick Look" = "Visualizzazione rapida";
 
 /* Confirm Quit panel -> button
-   Legal alert -> button
-   Transmission already running alert -> button */
-
+   Legal alert -> button */
 
 "Quit" = "Esci";
 
