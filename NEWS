@@ -13,6 +13,7 @@
   * Fix Fails-To-Build error on FreeBSD from use of alloca()
   * Fix Fails-To-Build error when building without a C++ compiler for libuTP
 ==== Mac ====
+  * Requires Mac OS X 10.6 Snow Leopard or newer
   * Animated rows in the main window (Lion only)
   * Quarantine downloaded files (to protect against malware)
   * The inspector no longer floats above other windows (by popular demand)
