@@ -1,3 +1,35 @@
+
+=== Transmission 2.50 (2012/02/xx) ===
+[http://trac.transmissionbt.com/query?milestone=2.50&group=component&order=severity All tickets closed by this release]
+==== All Platforms ====
+  * Fix crash when adding some magnet links
+  * Fix Fails-To-Build error on Solaris 10 from use of mkdtemp()
+  * Fix Fails-To-Build error on FreeBSD from use of alloca()
+  * Fix Fails-To-Build error when building without a C++ compiler for libuTP
+  * Improved support for downloading webseeds with large files
+  * Fairer bandwidth distribution across connected peers
+  * Use less CPU when calculating undownloaded portions of large torrents
+  * Use the Selection Algorithm, rather than sorting, to select peer candidates
+  * Gracefully handle incorrectly-compressed data from webseed downloads
+  * If the OS has its own copy of natpmp, prefer it over our bundled version
+==== Mac ====
+  * FIXME
+==== GTK+ ====
+  * Fix regression that broke the "--minimized" command-line argument
+  * Instead of notify-send, use the org.freedesktop.Notifications DBus API
+==== Qt ====
+  * Fix FTB when building without libuTP support on Debian
+==== Web Client ====
+  * Fix runtime errors in IE 9
+  * Allow sorting by size
+  * Upgrade to jQuery 1.7
+  * The toolbar's tracker and state filters now use browser-builtin radiobuttons
+  * Fix the torrent size and time remaining in the inspector's details tab
+  * Bundle jQuery and the stylesheets to avoid third-party CDNs
+  * Make the toolbar buttons a little larger so they'll be easier to press
+==== Daemon ====
+  * Fix corrupted status string in transmission-remote
+
 === Transmission 2.42 (2011/10/19) ===
 [http://trac.transmissionbt.com/query?milestone=2.42&group=component&order=severity All tickets closed by this release]
 ==== All Platforms ====
