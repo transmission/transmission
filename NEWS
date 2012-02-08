@@ -7,7 +7,7 @@
   * Fairer bandwidth distribution across connected peers
   * Use less CPU when calculating undownloaded portions of large torrents
   * Use the Selection Algorithm, rather than sorting, to select peer candidates
-  * Use base-2 units when displaying bandwidth speed and disk space
+  * Use base-10 units when displaying bandwidth speed and disk space
   * If the OS has its own copy of natpmp, prefer it over our bundled version
   * Fix Fails-To-Build error on Solaris 10 from use of mkdtemp()
   * Fix Fails-To-Build error on FreeBSD from use of alloca()
