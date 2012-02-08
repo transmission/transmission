@@ -28,7 +28,7 @@
 ==== Web Client ====
   * Filtering by state and tracker
   * Sorting by size
-  * Larger toolbar buttons to make them easier to press
+  * Larger, easier-to-press toolbar buttons
   * Fix the torrent size and time remaining in the inspector's details tab
   * Bundle jQuery and the stylesheets to avoid third-party CDNs
   * Upgrade to jQuery 1.7.1
