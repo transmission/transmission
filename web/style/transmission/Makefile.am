@@ -5,4 +5,6 @@ dist_data_DATA = \
   common.css \
   mobile.css
 
-
+EXTRA_DIST = \
+  common.scss \
+  mobile.scss
