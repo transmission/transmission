@@ -67,13 +67,12 @@ void startQueueCallback(tr_torrent * torrent, void * torrentData)
 
 void completenessChangeCallback(tr_torrent * torrent, tr_completeness status, bool wasRunning, void * torrentData)
 {
-    NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
-    
-    NSDictionary * dict = [[NSDictionary alloc] initWithObjectsAndKeys: [NSNumber numberWithInt: status], @"Status",
-                            [NSNumber numberWithBool: wasRunning], @"WasRunning", nil];
-    [(Torrent *)torrentData performSelectorOnMainThread: @selector(completenessChange:) withObject: dict waitUntilDone: NO];
-    
-    [pool drain];
+    @autoreleasepool
+    {
+        NSDictionary * dict = [[NSDictionary alloc] initWithObjectsAndKeys: [NSNumber numberWithInt: status], @"Status",
+                               [NSNumber numberWithBool: wasRunning], @"WasRunning", nil];
+        [(Torrent *)torrentData performSelectorOnMainThread: @selector(completenessChange:) withObject: dict waitUntilDone: NO];
+    }
 }
 
 void ratioLimitHitCallback(tr_torrent * torrent, void * torrentData)
@@ -93,12 +92,11 @@ void metadataCallback(tr_torrent * torrent, void * torrentData)
 
 int trashDataFile(const char * filename)
 {
-    NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
-    
-    if (filename != NULL)
-        [Torrent trashFile: [NSString stringWithUTF8String: filename]];
-    
-    [pool drain];
+    @autoreleasepool
+    {
+        if (filename != NULL)
+            [Torrent trashFile: [NSString stringWithUTF8String: filename]];
+    }
     return 0;
 }
 

@@ -218,40 +218,39 @@ NSMutableSet * fTrackerIconLoading;
 #warning better favicon detection
 - (void) loadTrackerIcon: (NSString *) baseAddress
 {
-    NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
-    
-    //try favicon.png
-    NSURL * favIconUrl = [NSURL URLWithString: [baseAddress stringByAppendingPathComponent: @"favicon.png"]];
-    
-    NSURLRequest * request = [NSURLRequest requestWithURL: favIconUrl cachePolicy: NSURLRequestUseProtocolCachePolicy
-                                timeoutInterval: 30.0];
-    NSData * iconData = [NSURLConnection sendSynchronousRequest: request returningResponse: NULL error: NULL];
-    NSImage * icon = [[NSImage alloc] initWithData: iconData];
-    
-    //try favicon.ico
-    if (!icon)
+    @autoreleasepool
     {
-        favIconUrl = [NSURL URLWithString: [baseAddress stringByAppendingPathComponent: @"favicon.ico"]];
+        //try favicon.png
+        NSURL * favIconUrl = [NSURL URLWithString: [baseAddress stringByAppendingPathComponent: @"favicon.png"]];
         
-        request = [NSURLRequest requestWithURL: favIconUrl cachePolicy: NSURLRequestUseProtocolCachePolicy
-                    timeoutInterval: 30.0];
-        iconData = [NSURLConnection sendSynchronousRequest: request returningResponse: NULL error: NULL];
-        icon = [[NSImage alloc] initWithData: iconData];
-    }
-    
-    if (icon)
-    {
-        [fTrackerIconCache setObject: icon forKey: baseAddress];
-        [icon release];
+        NSURLRequest * request = [NSURLRequest requestWithURL: favIconUrl cachePolicy: NSURLRequestUseProtocolCachePolicy
+                                    timeoutInterval: 30.0];
+        NSData * iconData = [NSURLConnection sendSynchronousRequest: request returningResponse: NULL error: NULL];
+        NSImage * icon = [[NSImage alloc] initWithData: iconData];
         
-        [[self controlView] setNeedsDisplay: YES];
+        //try favicon.ico
+        if (!icon)
+        {
+            favIconUrl = [NSURL URLWithString: [baseAddress stringByAppendingPathComponent: @"favicon.ico"]];
+            
+            request = [NSURLRequest requestWithURL: favIconUrl cachePolicy: NSURLRequestUseProtocolCachePolicy
+                        timeoutInterval: 30.0];
+            iconData = [NSURLConnection sendSynchronousRequest: request returningResponse: NULL error: NULL];
+            icon = [[NSImage alloc] initWithData: iconData];
+        }
+        
+        if (icon)
+        {
+            [fTrackerIconCache setObject: icon forKey: baseAddress];
+            [icon release];
+            
+            [[self controlView] setNeedsDisplay: YES];
+        }
+        else
+            [fTrackerIconCache setObject: [NSNull null] forKey: baseAddress];
+        
+        [fTrackerIconLoading removeObject: baseAddress];
     }
-    else
-        [fTrackerIconCache setObject: [NSNull null] forKey: baseAddress];
-    
-    [fTrackerIconLoading removeObject: baseAddress];
-
-    [pool drain];
 }
 
 - (NSRect) imageRectForBounds: (NSRect) bounds

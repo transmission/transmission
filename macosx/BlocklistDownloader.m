@@ -236,35 +236,34 @@ BlocklistDownloader * fDownloader = nil;
 
 - (void) finishDownloadSuccess
 {
-    NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
-    
-    [fViewController setStatusProcessing];
-    
-    //process data
-    NSAssert(fDestination != nil, @"the blocklist file destination has not been specified");
-    
-    [self decompressBlocklist];
-    
-    const int count = tr_blocklistSetContent([PrefsController handle], [fDestination UTF8String]);
-    
-    //delete downloaded file
-    [[NSFileManager defaultManager] removeItemAtPath: fDestination error: NULL];
-    
-    if (count > 0)
-        [fViewController setFinished];
-    else
-        [fViewController setFailed: NSLocalizedString(@"The specified blocklist file did not contain any valid rules.",
-                                        "blocklist fail message")];
-    
-    //update last updated date for schedule
-    NSDate * date = [NSDate date];
-    [[NSUserDefaults standardUserDefaults] setObject: date forKey: @"BlocklistNewLastUpdate"];
-    [[NSUserDefaults standardUserDefaults] setObject: date forKey: @"BlocklistNewLastUpdateSuccess"];
-    [[BlocklistScheduler scheduler] updateSchedule];
-    
-    [[NSNotificationCenter defaultCenter] postNotificationName: @"BlocklistUpdated" object: nil];
-    
-    [pool drain];
+    @autoreleasepool
+    {
+        [fViewController setStatusProcessing];
+        
+        //process data
+        NSAssert(fDestination != nil, @"the blocklist file destination has not been specified");
+        
+        [self decompressBlocklist];
+        
+        const int count = tr_blocklistSetContent([PrefsController handle], [fDestination UTF8String]);
+        
+        //delete downloaded file
+        [[NSFileManager defaultManager] removeItemAtPath: fDestination error: NULL];
+        
+        if (count > 0)
+            [fViewController setFinished];
+        else
+            [fViewController setFailed: NSLocalizedString(@"The specified blocklist file did not contain any valid rules.",
+                                            "blocklist fail message")];
+        
+        //update last updated date for schedule
+        NSDate * date = [NSDate date];
+        [[NSUserDefaults standardUserDefaults] setObject: date forKey: @"BlocklistNewLastUpdate"];
+        [[NSUserDefaults standardUserDefaults] setObject: date forKey: @"BlocklistNewLastUpdateSuccess"];
+        [[BlocklistScheduler scheduler] updateSchedule];
+        
+        [[NSNotificationCenter defaultCenter] postNotificationName: @"BlocklistUpdated" object: nil];
+    }
     
     fDownloader = nil;
     [self release];
