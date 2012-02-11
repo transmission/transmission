@@ -117,7 +117,11 @@ function PrefsDialog(remote) {
             case 'radio':
                 return e.prop('checked');
 
-            case 'text':
+			case 'text':
+			case 'url':
+			case 'email':
+			case 'number':
+			case 'search':
             case 'select-one':
                 str = e.val();
                 if( parseInt(str,10).toString() === str)
