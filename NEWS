@@ -34,8 +34,8 @@
   * Bundle jQuery and the stylesheets to avoid third-party CDNs
   * Upgrade to jQuery 1.7.1
   * Fix runtime errors in IE 8, IE 9, and Opera
-  * Minor interface tweaks
   * Revise CSS stylesheets to use SASS
+  * Minor interface tweaks
 ==== Daemon ====
   * Fix corrupted status string in transmission-remote
 
