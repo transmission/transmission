@@ -145,57 +145,6 @@ div#toolbar {
 
 /***
 ****
-****  FILTER POPUP
-****
-***/
-#filter-popup {
-  color: #222;
-  /* !important; */
-  background: #FFF;
-  z-index: 100; }
-  #filter-popup li {
-    text-align: left; }
-  #filter-popup .count {
-    padding-left: 3px; }
-  #filter-popup .row {
-    text-align: left;
-    cursor: pointer;
-    margin: 8px 2px;
-    position: relative;
-    height: 18px;
-    -moz-user-select: none;
-    -webkit-user-select: none; }
-    #filter-popup .row .filter-img {
-      border: none;
-      width: 16px;
-      height: 16px;
-      position: absolute;
-      left: 0px; }
-    #filter-popup .row .filter-name {
-      position: absolute;
-      left: 20px; }
-    #filter-popup .row .count {
-      float: right;
-      color: #aaa; }
-    #filter-popup .row:hover, #filter-popup .row.selected {
-      font-weight: bold; }
-  #filter-popup #filter-by-state {
-    float: left;
-    width: 120px;
-    overflow: hidden;
-    text-overflow: ellipsis; }
-    #filter-popup #filter-by-state .row .filter-img {
-      display: none; }
-    #filter-popup #filter-by-state .row .filter-name {
-      left: 0px; }
-  #filter-popup #filter-by-tracker {
-    float: right;
-    width: 130px;
-    overflow: hidden;
-    text-overflow: ellipsis; }
-
-/***
-****
 ****  TORRENT CONTAINER
 ****
 ***/
