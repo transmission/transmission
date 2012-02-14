@@ -138,6 +138,9 @@ tr_session * fHandle;
             [fDefaults removeObjectForKey: @"CheckForUpdates"];
         }
         
+        //set built-in Growl
+        [GrowlApplicationBridge setShouldUseBuiltInNotifications: [fDefaults boolForKey: @"DisplayNotifications"]];
+        
         [self setAutoUpdateToBeta: nil];
     }
     
@@ -177,7 +180,7 @@ tr_session * fHandle;
     
     [self setPrefView: nil];
     
-    [fBuiltInGrowlButton setState: [GrowlApplicationBridge shouldUseBuiltInNotifications]];
+    [fBuiltInGrowlButton setState: [fDefaults boolForKey: @"DisplayNotifications"]];
     const BOOL growlRunning = [GrowlApplicationBridge isGrowlRunning];
     [fBuiltInGrowlButton setHidden: growlRunning];
     [fGrowlInstalledField setHidden: !growlRunning];
@@ -732,7 +735,9 @@ tr_session * fHandle;
 
 - (IBAction) setBuiltInGrowlEnabled: (id) sender
 {
-    [GrowlApplicationBridge setShouldUseBuiltInNotifications: [sender state] == NSOnState];
+    const BOOL enable = [sender state] == NSOnState;
+    [fDefaults setBool: enable forKey: @"DisplayNotifications"];
+    [GrowlApplicationBridge setShouldUseBuiltInNotifications: enable];
 }
 
 - (void) resetWarnings: (id) sender

@@ -42,6 +42,8 @@
 	<true/>
 	<key>DisplayGroupRowRatio</key>
 	<false/>
+	<key>DisplayNotifications</key>
+	<true/>
 	<key>DisplayPeerProgressBarNumber</key>
 	<false/>
 	<key>DisplayProgressBarAvailable</key>
