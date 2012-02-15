@@ -1,4 +1,4 @@
-=== Transmission 2.50 (2012/02/xx) ===
+=== Transmission 2.50 (2012/02/14) ===
 [http://trac.transmissionbt.com/query?milestone=2.50&group=component&order=severity All tickets closed by this release]
 ==== All Platforms ====
   * Fix crash when adding some magnet links
