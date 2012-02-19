@@ -2,13 +2,13 @@
 <archive type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="8.00">
 	<data>
 		<int key="IBDocument.SystemTarget">1060</int>
-		<string key="IBDocument.SystemVersion">11B26</string>
-		<string key="IBDocument.InterfaceBuilderVersion">1617</string>
-		<string key="IBDocument.AppKitVersion">1138</string>
-		<string key="IBDocument.HIToolboxVersion">566.00</string>
+		<string key="IBDocument.SystemVersion">11D50</string>
+		<string key="IBDocument.InterfaceBuilderVersion">1938</string>
+		<string key="IBDocument.AppKitVersion">1138.32</string>
+		<string key="IBDocument.HIToolboxVersion">568.00</string>
 		<object class="NSMutableDictionary" key="IBDocument.PluginVersions">
 			<string key="NS.key.0">com.apple.InterfaceBuilder.CocoaPlugin</string>
-			<string key="NS.object.0">1617</string>
+			<string key="NS.object.0">1938</string>
 		</object>
 		<array key="IBDocument.IntegratedClassDependencies">
 			<string>NSTextField</string>
@@ -26,7 +26,10 @@
 		<array key="IBDocument.PluginDependencies">
 			<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 		</array>
-		<dictionary class="NSMutableDictionary" key="IBDocument.Metadata"/>
+		<object class="NSMutableDictionary" key="IBDocument.Metadata">
+			<string key="NS.key.0">PluginDependencyRecalculationVersion</string>
+			<integer value="1" key="NS.object.0"/>
+		</object>
 		<array class="NSMutableArray" key="IBDocument.RootObjects" id="1000">
 			<object class="NSCustomObject" id="1001">
 				<string key="NSClassName">InfoOptionsViewController</string>
@@ -81,7 +84,7 @@
 								</object>
 								<object class="NSAttributedString" key="NS.nan">
 									<string key="NSString">NaN</string>
-									<dictionary key="NSAttributes" id="772238287"/>
+									<dictionary key="NSAttributes" id="57262134"/>
 								</object>
 								<real value="1" key="NS.min"/>
 								<real value="10000" key="NS.max"/>
@@ -262,7 +265,7 @@
 								<nil key="NS.nil"/>
 								<object class="NSAttributedString" key="NS.nan">
 									<string key="NSString">NaN</string>
-									<reference key="NSAttributes" ref="772238287"/>
+									<reference key="NSAttributes" ref="57262134"/>
 								</object>
 								<integer value="0" key="NS.min"/>
 								<real value="10000" key="NS.max"/>
@@ -368,7 +371,7 @@
 								<nil key="NS.nil"/>
 								<object class="NSAttributedString" key="NS.nan">
 									<string key="NSString">NaN</string>
-									<reference key="NSAttributes" ref="772238287"/>
+									<reference key="NSAttributes" ref="57262134"/>
 								</object>
 								<integer value="0" key="NS.min"/>
 								<real value="10000" key="NS.max"/>
@@ -436,7 +439,7 @@
 								<nil key="NS.nil"/>
 								<object class="NSAttributedString" key="NS.nan">
 									<string key="NSString">NaN</string>
-									<reference key="NSAttributes" ref="772238287"/>
+									<reference key="NSAttributes" ref="57262134"/>
 								</object>
 								<integer value="0" key="NS.min"/>
 								<real value="10000" key="NS.max"/>
@@ -622,14 +625,14 @@
 					<object class="NSTextField" id="340525598">
 						<reference key="NSNextResponder" ref="617828785"/>
 						<int key="NSvFlags">268</int>
-						<string key="NSFrame">{{10, 201}, {137, 17}}</string>
+						<string key="NSFrame">{{10, 206}, {103, 12}}</string>
 						<reference key="NSSuperview" ref="617828785"/>
 						<reference key="NSNextKeyView" ref="529271757"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSTextFieldCell" key="NSCell" id="780052505">
 							<int key="NSCellFlags">67239424</int>
 							<int key="NSCellFlags2">272629760</int>
-							<string key="NSContents">Totale transfer prioriteit:</string>
+							<string key="NSContents">Transfer prioriteit:</string>
 							<reference key="NSSupport" ref="26"/>
 							<reference key="NSControlView" ref="340525598"/>
 							<reference key="NSBackgroundColor" ref="874092629"/>
@@ -698,7 +701,7 @@
 								<nil key="NS.nil"/>
 								<object class="NSAttributedString" key="NS.nan">
 									<string key="NSString">NaN</string>
-									<reference key="NSAttributes" ref="772238287"/>
+									<reference key="NSAttributes" ref="57262134"/>
 								</object>
 								<integer value="1" key="NS.min"/>
 								<real value="3000" key="NS.max"/>
@@ -813,7 +816,7 @@
 					<object class="NSPopUpButton" id="529271757">
 						<reference key="NSNextResponder" ref="617828785"/>
 						<int key="NSvFlags">268</int>
-						<string key="NSFrame">{{152, 200}, {98, 22}}</string>
+						<string key="NSFrame">{{118, 200}, {98, 22}}</string>
 						<reference key="NSSuperview" ref="617828785"/>
 						<reference key="NSNextKeyView" ref="1004759797"/>
 						<bool key="NSEnabled">YES</bool>
@@ -829,43 +832,43 @@
 							<string key="NSKeyEquivalent"/>
 							<int key="NSPeriodicDelay">400</int>
 							<int key="NSPeriodicInterval">75</int>
-							<object class="NSMenuItem" key="NSMenuItem" id="329620563">
+							<object class="NSMenuItem" key="NSMenuItem" id="884480943">
 								<reference key="NSMenu" ref="355652245"/>
-								<string key="NSTitle">Normaal</string>
+								<string key="NSTitle">Hoog</string>
 								<string key="NSKeyEquiv"/>
 								<int key="NSKeyEquivModMask">1048576</int>
 								<int key="NSMnemonicLoc">2147483647</int>
 								<int key="NSState">1</int>
 								<object class="NSCustomResource" key="NSImage">
 									<string key="NSClassName">NSImage</string>
-									<string key="NSResourceName">PriorityNormal</string>
+									<string key="NSResourceName">PriorityHighTemplate</string>
 								</object>
 								<reference key="NSOnImage" ref="662512792"/>
 								<reference key="NSMixedImage" ref="999867276"/>
 								<string key="NSAction">_popUpItemAction:</string>
-								<int key="NSTag">1</int>
 								<reference key="NSTarget" ref="545585394"/>
 							</object>
 							<bool key="NSMenuItemRespectAlignment">YES</bool>
 							<object class="NSMenu" key="NSMenu" id="355652245">
 								<string key="NSTitle">OtherViews</string>
 								<array class="NSMutableArray" key="NSMenuItems">
-									<object class="NSMenuItem" id="884480943">
+									<reference ref="884480943"/>
+									<object class="NSMenuItem" id="329620563">
 										<reference key="NSMenu" ref="355652245"/>
-										<string key="NSTitle">Hoog</string>
+										<string key="NSTitle">Normaal</string>
 										<string key="NSKeyEquiv"/>
 										<int key="NSKeyEquivModMask">1048576</int>
 										<int key="NSMnemonicLoc">2147483647</int>
 										<object class="NSCustomResource" key="NSImage">
 											<string key="NSClassName">NSImage</string>
-											<string key="NSResourceName">PriorityHigh</string>
+											<string key="NSResourceName">PriorityNormalTemplate</string>
 										</object>
 										<reference key="NSOnImage" ref="662512792"/>
 										<reference key="NSMixedImage" ref="999867276"/>
 										<string key="NSAction">_popUpItemAction:</string>
+										<int key="NSTag">1</int>
 										<reference key="NSTarget" ref="545585394"/>
 									</object>
-									<reference ref="329620563"/>
 									<object class="NSMenuItem" id="434558061">
 										<reference key="NSMenu" ref="355652245"/>
 										<string key="NSTitle">Laag</string>
@@ -874,7 +877,7 @@
 										<int key="NSMnemonicLoc">2147483647</int>
 										<object class="NSCustomResource" key="NSImage">
 											<string key="NSClassName">NSImage</string>
-											<string key="NSResourceName">PriorityLow</string>
+											<string key="NSResourceName">PriorityLowTemplate</string>
 										</object>
 										<reference key="NSOnImage" ref="662512792"/>
 										<reference key="NSMixedImage" ref="999867276"/>
@@ -884,7 +887,6 @@
 									</object>
 								</array>
 							</object>
-							<int key="NSSelectedIndex">1</int>
 							<int key="NSPreferredEdge">1</int>
 							<bool key="NSUsesItemFromMenu">YES</bool>
 							<bool key="NSAltersState">YES</bool>
@@ -902,38 +904,6 @@
 		</array>
 		<object class="IBObjectContainer" key="IBDocument.Objects">
 			<array class="NSMutableArray" key="connectionRecords">
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">delegate</string>
-						<reference key="source" ref="520423397"/>
-						<reference key="destination" ref="1001"/>
-					</object>
-					<int key="connectionID">53</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">delegate</string>
-						<reference key="source" ref="38678337"/>
-						<reference key="destination" ref="1001"/>
-					</object>
-					<int key="connectionID">54</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">delegate</string>
-						<reference key="source" ref="787858145"/>
-						<reference key="destination" ref="1001"/>
-					</object>
-					<int key="connectionID">55</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">delegate</string>
-						<reference key="source" ref="300762075"/>
-						<reference key="destination" ref="1001"/>
-					</object>
-					<int key="connectionID">56</int>
-				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBActionConnection" key="connection">
 						<string key="label">setPriority:</string>
@@ -1112,14 +1082,6 @@
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
-						<string key="label">delegate</string>
-						<reference key="source" ref="317277208"/>
-						<reference key="destination" ref="1001"/>
-					</object>
-					<int key="connectionID">90</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
 						<string key="label">fIdleLimitField</string>
 						<reference key="source" ref="1001"/>
 						<reference key="destination" ref="317277208"/>
@@ -1173,6 +1135,46 @@
 						<reference key="destination" ref="760004836"/>
 					</object>
 					<int key="connectionID">112</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">delegate</string>
+						<reference key="source" ref="787858145"/>
+						<reference key="destination" ref="1001"/>
+					</object>
+					<int key="connectionID">55</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">delegate</string>
+						<reference key="source" ref="300762075"/>
+						<reference key="destination" ref="1001"/>
+					</object>
+					<int key="connectionID">56</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">delegate</string>
+						<reference key="source" ref="520423397"/>
+						<reference key="destination" ref="1001"/>
+					</object>
+					<int key="connectionID">53</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">delegate</string>
+						<reference key="source" ref="38678337"/>
+						<reference key="destination" ref="1001"/>
+					</object>
+					<int key="connectionID">54</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">delegate</string>
+						<reference key="source" ref="317277208"/>
+						<reference key="destination" ref="1001"/>
+					</object>
+					<int key="connectionID">90</int>
 				</object>
 			</array>
 			<object class="IBMutableOrderedSet" key="objectRecords">
@@ -1888,19 +1890,15 @@
 			<string key="NS.key.0">com.apple.InterfaceBuilder.CocoaPlugin.macosx</string>
 			<real value="1060" key="NS.object.0"/>
 		</object>
-		<object class="NSMutableDictionary" key="IBDocument.PluginDeclaredDependencyDefaults">
-			<string key="NS.key.0">com.apple.InterfaceBuilder.CocoaPlugin.macosx</string>
-			<real value="1070" key="NS.object.0"/>
-		</object>
 		<bool key="IBDocument.PluginDeclaredDependenciesTrackSystemTargetVersion">YES</bool>
 		<int key="IBDocument.defaultPropertyAccessControl">3</int>
 		<dictionary class="NSMutableDictionary" key="IBDocument.LastKnownImageSizes">
-			<string key="NSMenuCheckmark">{9, 8}</string>
-			<string key="NSMenuMixedState">{7, 2}</string>
+			<string key="NSMenuCheckmark">{11, 11}</string>
+			<string key="NSMenuMixedState">{10, 3}</string>
 			<string key="NSSwitch">{15, 15}</string>
-			<string key="PriorityHigh">{14, 14}</string>
-			<string key="PriorityLow">{14, 14}</string>
-			<string key="PriorityNormal">{14, 14}</string>
+			<string key="PriorityHighTemplate">{128, 128}</string>
+			<string key="PriorityLowTemplate">{128, 128}</string>
+			<string key="PriorityNormalTemplate">{128, 128}</string>
 		</dictionary>
 	</data>
 </archive>
