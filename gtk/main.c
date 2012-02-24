@@ -487,7 +487,7 @@ on_startup( GApplication * application, gpointer user_data )
     struct cbdata * cbdata = user_data;
 
     signal( SIGINT, signal_handler );
-    signal( SIGKILL, signal_handler );
+    signal( SIGTERM, signal_handler );
 
     sighandler_cbdata = cbdata;
 
