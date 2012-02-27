@@ -2,13 +2,13 @@
 <archive type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="8.00">
 	<data>
 		<int key="IBDocument.SystemTarget">1070</int>
-		<string key="IBDocument.SystemVersion">11B26</string>
-		<string key="IBDocument.InterfaceBuilderVersion">1617</string>
-		<string key="IBDocument.AppKitVersion">1138</string>
-		<string key="IBDocument.HIToolboxVersion">566.00</string>
+		<string key="IBDocument.SystemVersion">11D50</string>
+		<string key="IBDocument.InterfaceBuilderVersion">2177</string>
+		<string key="IBDocument.AppKitVersion">1138.32</string>
+		<string key="IBDocument.HIToolboxVersion">568.00</string>
 		<object class="NSMutableDictionary" key="IBDocument.PluginVersions">
 			<string key="NS.key.0">com.apple.InterfaceBuilder.CocoaPlugin</string>
-			<string key="NS.object.0">1617</string>
+			<string key="NS.object.0">2177</string>
 		</object>
 		<array key="IBDocument.IntegratedClassDependencies">
 			<string>NSTextField</string>
@@ -24,7 +24,10 @@
 		<array key="IBDocument.PluginDependencies">
 			<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 		</array>
-		<dictionary class="NSMutableDictionary" key="IBDocument.Metadata"/>
+		<object class="NSMutableDictionary" key="IBDocument.Metadata">
+			<string key="NS.key.0">PluginDependencyRecalculationVersion</string>
+			<integer value="1" key="NS.object.0"/>
+		</object>
 		<array class="NSMutableArray" key="IBDocument.RootObjects" id="1000">
 			<object class="NSCustomObject" id="1001">
 				<string key="NSClassName">GlobalOptionsPopoverViewController</string>
@@ -169,7 +172,7 @@
 									<boolean value="YES" key="allowsFloats"/>
 									<integer value="1040" key="formatterBehavior"/>
 									<boolean value="NO" key="lenient"/>
-									<real value="10000" key="maximum"/>
+									<real value="99999" key="maximum"/>
 									<real value="1" key="minimum"/>
 									<string key="negativeInfinitySymbol">-∞</string>
 									<string key="nilSymbol"/>
@@ -189,7 +192,7 @@
 									<dictionary key="NSAttributes" id="684876044"/>
 								</object>
 								<real value="1" key="NS.min"/>
-								<real value="10000" key="NS.max"/>
+								<real value="99999" key="NS.max"/>
 								<object class="NSDecimalNumberHandler" key="NS.rounding">
 									<int key="NS.roundingmode">3</int>
 									<bool key="NS.raise.overflow">YES</bool>
@@ -243,7 +246,7 @@
 									<object class="NSLocale" key="locale" id="979917424">
 										<string key="NS.identifier"/>
 									</object>
-									<real value="10000" key="maximum"/>
+									<real value="99999" key="maximum"/>
 									<integer value="2" key="maximumFractionDigits"/>
 									<integer value="0" key="minimum"/>
 									<integer value="2" key="minimumFractionDigits"/>
@@ -261,7 +264,7 @@
 									<reference key="NSAttributes" ref="684876044"/>
 								</object>
 								<integer value="0" key="NS.min"/>
-								<real value="10000" key="NS.max"/>
+								<real value="99999" key="NS.max"/>
 								<object class="NSDecimalNumberHandler" key="NS.rounding">
 									<int key="NS.roundingmode">3</int>
 									<bool key="NS.raise.overflow">YES</bool>
@@ -350,7 +353,7 @@
 									<integer value="0" key="allowsFloats"/>
 									<integer value="1040" key="formatterBehavior"/>
 									<reference key="locale" ref="979917424"/>
-									<real value="10000" key="maximum"/>
+									<real value="99999" key="maximum"/>
 									<integer value="0" key="minimum"/>
 									<integer value="1" key="minimumIntegerDigits"/>
 								</dictionary>
@@ -365,7 +368,7 @@
 									<reference key="NSAttributes" ref="684876044"/>
 								</object>
 								<integer value="0" key="NS.min"/>
-								<real value="10000" key="NS.max"/>
+								<real value="99999" key="NS.max"/>
 								<object class="NSDecimalNumberHandler" key="NS.rounding">
 									<int key="NS.roundingmode">3</int>
 									<bool key="NS.raise.overflow">YES</bool>
@@ -437,7 +440,7 @@
 									<integer value="0" key="allowsFloats"/>
 									<integer value="1040" key="formatterBehavior"/>
 									<reference key="locale" ref="979917424"/>
-									<real value="10000" key="maximum"/>
+									<real value="99999" key="maximum"/>
 									<integer value="0" key="minimum"/>
 									<integer value="1" key="minimumIntegerDigits"/>
 								</dictionary>
@@ -452,7 +455,7 @@
 									<reference key="NSAttributes" ref="684876044"/>
 								</object>
 								<integer value="0" key="NS.min"/>
-								<real value="10000" key="NS.max"/>
+								<real value="99999" key="NS.max"/>
 								<object class="NSDecimalNumberHandler" key="NS.rounding">
 									<int key="NS.roundingmode">3</int>
 									<bool key="NS.raise.overflow">YES</bool>
@@ -555,30 +558,6 @@
 			<array class="NSMutableArray" key="connectionRecords">
 				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
-						<string key="label">delegate</string>
-						<reference key="source" ref="520423397"/>
-						<reference key="destination" ref="1001"/>
-					</object>
-					<int key="connectionID">53</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">delegate</string>
-						<reference key="source" ref="38678337"/>
-						<reference key="destination" ref="1001"/>
-					</object>
-					<int key="connectionID">54</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">delegate</string>
-						<reference key="source" ref="787858145"/>
-						<reference key="destination" ref="1001"/>
-					</object>
-					<int key="connectionID">55</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
 						<string key="label">fDownloadLimitField</string>
 						<reference key="source" ref="1001"/>
 						<reference key="destination" ref="520423397"/>
@@ -600,126 +579,6 @@
 						<reference key="destination" ref="617828785"/>
 					</object>
 					<int key="connectionID">73</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">delegate</string>
-						<reference key="source" ref="317277208"/>
-						<reference key="destination" ref="1001"/>
-					</object>
-					<int key="connectionID">90</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBBindingConnection" key="connection">
-						<string key="label">value: values.RatioCheck</string>
-						<reference key="source" ref="934892604"/>
-						<reference key="destination" ref="355540060"/>
-						<object class="NSNibBindingConnector" key="connector">
-							<reference key="NSSource" ref="934892604"/>
-							<reference key="NSDestination" ref="355540060"/>
-							<string key="NSLabel">value: values.RatioCheck</string>
-							<string key="NSBinding">value</string>
-							<string key="NSKeyPath">values.RatioCheck</string>
-							<int key="NSNibBindingConnectorVersion">2</int>
-						</object>
-					</object>
-					<int key="connectionID">121</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBBindingConnection" key="connection">
-						<string key="label">enabled: values.RatioCheck</string>
-						<reference key="source" ref="787858145"/>
-						<reference key="destination" ref="355540060"/>
-						<object class="NSNibBindingConnector" key="connector">
-							<reference key="NSSource" ref="787858145"/>
-							<reference key="NSDestination" ref="355540060"/>
-							<string key="NSLabel">enabled: values.RatioCheck</string>
-							<string key="NSBinding">enabled</string>
-							<string key="NSKeyPath">values.RatioCheck</string>
-							<int key="NSNibBindingConnectorVersion">2</int>
-						</object>
-					</object>
-					<int key="connectionID">124</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBBindingConnection" key="connection">
-						<string key="label">value: values.IdleLimitCheck</string>
-						<reference key="source" ref="160955753"/>
-						<reference key="destination" ref="355540060"/>
-						<object class="NSNibBindingConnector" key="connector">
-							<reference key="NSSource" ref="160955753"/>
-							<reference key="NSDestination" ref="355540060"/>
-							<string key="NSLabel">value: values.IdleLimitCheck</string>
-							<string key="NSBinding">value</string>
-							<string key="NSKeyPath">values.IdleLimitCheck</string>
-							<int key="NSNibBindingConnectorVersion">2</int>
-						</object>
-					</object>
-					<int key="connectionID">126</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBBindingConnection" key="connection">
-						<string key="label">enabled: values.IdleLimitCheck</string>
-						<reference key="source" ref="317277208"/>
-						<reference key="destination" ref="355540060"/>
-						<object class="NSNibBindingConnector" key="connector">
-							<reference key="NSSource" ref="317277208"/>
-							<reference key="NSDestination" ref="355540060"/>
-							<string key="NSLabel">enabled: values.IdleLimitCheck</string>
-							<string key="NSBinding">enabled</string>
-							<string key="NSKeyPath">values.IdleLimitCheck</string>
-							<int key="NSNibBindingConnectorVersion">2</int>
-						</object>
-					</object>
-					<int key="connectionID">128</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBBindingConnection" key="connection">
-						<string key="label">value: values.CheckDownload</string>
-						<reference key="source" ref="818727845"/>
-						<reference key="destination" ref="355540060"/>
-						<object class="NSNibBindingConnector" key="connector">
-							<reference key="NSSource" ref="818727845"/>
-							<reference key="NSDestination" ref="355540060"/>
-							<string key="NSLabel">value: values.CheckDownload</string>
-							<string key="NSBinding">value</string>
-							<string key="NSKeyPath">values.CheckDownload</string>
-							<int key="NSNibBindingConnectorVersion">2</int>
-						</object>
-					</object>
-					<int key="connectionID">145</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBBindingConnection" key="connection">
-						<string key="label">enabled: values.CheckUpload</string>
-						<reference key="source" ref="531478243"/>
-						<reference key="destination" ref="355540060"/>
-						<object class="NSNibBindingConnector" key="connector">
-							<reference key="NSSource" ref="531478243"/>
-							<reference key="NSDestination" ref="355540060"/>
-							<string key="NSLabel">enabled: values.CheckUpload</string>
-							<string key="NSBinding">enabled</string>
-							<string key="NSKeyPath">values.CheckUpload</string>
-							<int key="NSNibBindingConnectorVersion">2</int>
-						</object>
-					</object>
-					<int key="connectionID">149</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBBindingConnection" key="connection">
-						<string key="label">enabled: values.IdleLimitCheck</string>
-						<reference key="source" ref="706967535"/>
-						<reference key="destination" ref="355540060"/>
-						<object class="NSNibBindingConnector" key="connector">
-							<reference key="NSSource" ref="706967535"/>
-							<reference key="NSDestination" ref="355540060"/>
-							<string key="NSLabel">enabled: values.IdleLimitCheck</string>
-							<string key="NSBinding">enabled</string>
-							<string key="NSKeyPath">values.IdleLimitCheck</string>
-							<int key="NSNibBindingConnectorVersion">2</int>
-						</object>
-					</object>
-					<int key="connectionID">151</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBActionConnection" key="connection">
@@ -752,138 +611,6 @@
 						<reference key="destination" ref="38678337"/>
 					</object>
 					<int key="connectionID">155</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBBindingConnection" key="connection">
-						<string key="label">hidden: values.SmallView</string>
-						<reference key="source" ref="122634398"/>
-						<reference key="destination" ref="355540060"/>
-						<object class="NSNibBindingConnector" key="connector">
-							<reference key="NSSource" ref="122634398"/>
-							<reference key="NSDestination" ref="355540060"/>
-							<string key="NSLabel">hidden: values.SmallView</string>
-							<string key="NSBinding">hidden</string>
-							<string key="NSKeyPath">values.SmallView</string>
-							<int key="NSNibBindingConnectorVersion">2</int>
-						</object>
-					</object>
-					<int key="connectionID">157</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBBindingConnection" key="connection">
-						<string key="label">value: values.DisplayStatusProgressSelected</string>
-						<reference key="source" ref="122634398"/>
-						<reference key="destination" ref="355540060"/>
-						<object class="NSNibBindingConnector" key="connector">
-							<reference key="NSSource" ref="122634398"/>
-							<reference key="NSDestination" ref="355540060"/>
-							<string key="NSLabel">value: values.DisplayStatusProgressSelected</string>
-							<string key="NSBinding">value</string>
-							<string key="NSKeyPath">values.DisplayStatusProgressSelected</string>
-							<int key="NSNibBindingConnectorVersion">2</int>
-						</object>
-					</object>
-					<int key="connectionID">160</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBBindingConnection" key="connection">
-						<string key="label">hidden: values.SmallView</string>
-						<reference key="source" ref="293769057"/>
-						<reference key="destination" ref="355540060"/>
-						<object class="NSNibBindingConnector" key="connector">
-							<reference key="NSSource" ref="293769057"/>
-							<reference key="NSDestination" ref="355540060"/>
-							<string key="NSLabel">hidden: values.SmallView</string>
-							<string key="NSBinding">hidden</string>
-							<string key="NSKeyPath">values.SmallView</string>
-							<object class="NSDictionary" key="NSOptions">
-								<string key="NS.key.0">NSValueTransformerName</string>
-								<string key="NS.object.0">NSNegateBoolean</string>
-							</object>
-							<int key="NSNibBindingConnectorVersion">2</int>
-						</object>
-					</object>
-					<int key="connectionID">164</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBBindingConnection" key="connection">
-						<string key="label">value: values.CheckUpload</string>
-						<reference key="source" ref="166572511"/>
-						<reference key="destination" ref="355540060"/>
-						<object class="NSNibBindingConnector" key="connector">
-							<reference key="NSSource" ref="166572511"/>
-							<reference key="NSDestination" ref="355540060"/>
-							<string key="NSLabel">value: values.CheckUpload</string>
-							<string key="NSBinding">value</string>
-							<string key="NSKeyPath">values.CheckUpload</string>
-							<int key="NSNibBindingConnectorVersion">2</int>
-						</object>
-					</object>
-					<int key="connectionID">169</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBBindingConnection" key="connection">
-						<string key="label">value: values.CheckDownload</string>
-						<reference key="source" ref="614569420"/>
-						<reference key="destination" ref="355540060"/>
-						<object class="NSNibBindingConnector" key="connector">
-							<reference key="NSSource" ref="614569420"/>
-							<reference key="NSDestination" ref="355540060"/>
-							<string key="NSLabel">value: values.CheckDownload</string>
-							<string key="NSBinding">value</string>
-							<string key="NSKeyPath">values.CheckDownload</string>
-							<int key="NSNibBindingConnectorVersion">2</int>
-						</object>
-					</object>
-					<int key="connectionID">171</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBBindingConnection" key="connection">
-						<string key="label">enabled: values.CheckUpload</string>
-						<reference key="source" ref="38678337"/>
-						<reference key="destination" ref="355540060"/>
-						<object class="NSNibBindingConnector" key="connector">
-							<reference key="NSSource" ref="38678337"/>
-							<reference key="NSDestination" ref="355540060"/>
-							<string key="NSLabel">enabled: values.CheckUpload</string>
-							<string key="NSBinding">enabled</string>
-							<string key="NSKeyPath">values.CheckUpload</string>
-							<int key="NSNibBindingConnectorVersion">2</int>
-						</object>
-					</object>
-					<int key="connectionID">174</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBBindingConnection" key="connection">
-						<string key="label">enabled: values.CheckDownload</string>
-						<reference key="source" ref="520423397"/>
-						<reference key="destination" ref="355540060"/>
-						<object class="NSNibBindingConnector" key="connector">
-							<reference key="NSSource" ref="520423397"/>
-							<reference key="NSDestination" ref="355540060"/>
-							<string key="NSLabel">enabled: values.CheckDownload</string>
-							<string key="NSBinding">enabled</string>
-							<string key="NSKeyPath">values.CheckDownload</string>
-							<int key="NSNibBindingConnectorVersion">2</int>
-						</object>
-					</object>
-					<int key="connectionID">175</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBBindingConnection" key="connection">
-						<string key="label">enabled: values.CheckDownload</string>
-						<reference key="source" ref="326856988"/>
-						<reference key="destination" ref="355540060"/>
-						<object class="NSNibBindingConnector" key="connector">
-							<reference key="NSSource" ref="326856988"/>
-							<reference key="NSDestination" ref="355540060"/>
-							<string key="NSLabel">enabled: values.CheckDownload</string>
-							<string key="NSBinding">enabled</string>
-							<string key="NSKeyPath">values.CheckDownload</string>
-							<int key="NSNibBindingConnectorVersion">2</int>
-						</object>
-					</object>
-					<int key="connectionID">182</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
@@ -951,6 +678,266 @@
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBBindingConnection" key="connection">
+						<string key="label">value: values.CheckDownload</string>
+						<reference key="source" ref="614569420"/>
+						<reference key="destination" ref="355540060"/>
+						<object class="NSNibBindingConnector" key="connector">
+							<reference key="NSSource" ref="614569420"/>
+							<reference key="NSDestination" ref="355540060"/>
+							<string key="NSLabel">value: values.CheckDownload</string>
+							<string key="NSBinding">value</string>
+							<string key="NSKeyPath">values.CheckDownload</string>
+							<int key="NSNibBindingConnectorVersion">2</int>
+						</object>
+					</object>
+					<int key="connectionID">171</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBBindingConnection" key="connection">
+						<string key="label">value: values.CheckUpload</string>
+						<reference key="source" ref="166572511"/>
+						<reference key="destination" ref="355540060"/>
+						<object class="NSNibBindingConnector" key="connector">
+							<reference key="NSSource" ref="166572511"/>
+							<reference key="NSDestination" ref="355540060"/>
+							<string key="NSLabel">value: values.CheckUpload</string>
+							<string key="NSBinding">value</string>
+							<string key="NSKeyPath">values.CheckUpload</string>
+							<int key="NSNibBindingConnectorVersion">2</int>
+						</object>
+					</object>
+					<int key="connectionID">169</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">delegate</string>
+						<reference key="source" ref="787858145"/>
+						<reference key="destination" ref="1001"/>
+					</object>
+					<int key="connectionID">55</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBBindingConnection" key="connection">
+						<string key="label">enabled: values.RatioCheck</string>
+						<reference key="source" ref="787858145"/>
+						<reference key="destination" ref="355540060"/>
+						<object class="NSNibBindingConnector" key="connector">
+							<reference key="NSSource" ref="787858145"/>
+							<reference key="NSDestination" ref="355540060"/>
+							<string key="NSLabel">enabled: values.RatioCheck</string>
+							<string key="NSBinding">enabled</string>
+							<string key="NSKeyPath">values.RatioCheck</string>
+							<int key="NSNibBindingConnectorVersion">2</int>
+						</object>
+					</object>
+					<int key="connectionID">124</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">delegate</string>
+						<reference key="source" ref="520423397"/>
+						<reference key="destination" ref="1001"/>
+					</object>
+					<int key="connectionID">53</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBBindingConnection" key="connection">
+						<string key="label">enabled: values.CheckDownload</string>
+						<reference key="source" ref="520423397"/>
+						<reference key="destination" ref="355540060"/>
+						<object class="NSNibBindingConnector" key="connector">
+							<reference key="NSSource" ref="520423397"/>
+							<reference key="NSDestination" ref="355540060"/>
+							<string key="NSLabel">enabled: values.CheckDownload</string>
+							<string key="NSBinding">enabled</string>
+							<string key="NSKeyPath">values.CheckDownload</string>
+							<int key="NSNibBindingConnectorVersion">2</int>
+						</object>
+					</object>
+					<int key="connectionID">175</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBBindingConnection" key="connection">
+						<string key="label">enabled: values.CheckUpload</string>
+						<reference key="source" ref="531478243"/>
+						<reference key="destination" ref="355540060"/>
+						<object class="NSNibBindingConnector" key="connector">
+							<reference key="NSSource" ref="531478243"/>
+							<reference key="NSDestination" ref="355540060"/>
+							<string key="NSLabel">enabled: values.CheckUpload</string>
+							<string key="NSBinding">enabled</string>
+							<string key="NSKeyPath">values.CheckUpload</string>
+							<int key="NSNibBindingConnectorVersion">2</int>
+						</object>
+					</object>
+					<int key="connectionID">149</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">delegate</string>
+						<reference key="source" ref="38678337"/>
+						<reference key="destination" ref="1001"/>
+					</object>
+					<int key="connectionID">54</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBBindingConnection" key="connection">
+						<string key="label">enabled: values.CheckUpload</string>
+						<reference key="source" ref="38678337"/>
+						<reference key="destination" ref="355540060"/>
+						<object class="NSNibBindingConnector" key="connector">
+							<reference key="NSSource" ref="38678337"/>
+							<reference key="NSDestination" ref="355540060"/>
+							<string key="NSLabel">enabled: values.CheckUpload</string>
+							<string key="NSBinding">enabled</string>
+							<string key="NSKeyPath">values.CheckUpload</string>
+							<int key="NSNibBindingConnectorVersion">2</int>
+						</object>
+					</object>
+					<int key="connectionID">174</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBBindingConnection" key="connection">
+						<string key="label">value: values.CheckDownload</string>
+						<reference key="source" ref="818727845"/>
+						<reference key="destination" ref="355540060"/>
+						<object class="NSNibBindingConnector" key="connector">
+							<reference key="NSSource" ref="818727845"/>
+							<reference key="NSDestination" ref="355540060"/>
+							<string key="NSLabel">value: values.CheckDownload</string>
+							<string key="NSBinding">value</string>
+							<string key="NSKeyPath">values.CheckDownload</string>
+							<int key="NSNibBindingConnectorVersion">2</int>
+						</object>
+					</object>
+					<int key="connectionID">145</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">delegate</string>
+						<reference key="source" ref="317277208"/>
+						<reference key="destination" ref="1001"/>
+					</object>
+					<int key="connectionID">90</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBBindingConnection" key="connection">
+						<string key="label">enabled: values.IdleLimitCheck</string>
+						<reference key="source" ref="317277208"/>
+						<reference key="destination" ref="355540060"/>
+						<object class="NSNibBindingConnector" key="connector">
+							<reference key="NSSource" ref="317277208"/>
+							<reference key="NSDestination" ref="355540060"/>
+							<string key="NSLabel">enabled: values.IdleLimitCheck</string>
+							<string key="NSBinding">enabled</string>
+							<string key="NSKeyPath">values.IdleLimitCheck</string>
+							<int key="NSNibBindingConnectorVersion">2</int>
+						</object>
+					</object>
+					<int key="connectionID">128</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBBindingConnection" key="connection">
+						<string key="label">enabled: values.IdleLimitCheck</string>
+						<reference key="source" ref="706967535"/>
+						<reference key="destination" ref="355540060"/>
+						<object class="NSNibBindingConnector" key="connector">
+							<reference key="NSSource" ref="706967535"/>
+							<reference key="NSDestination" ref="355540060"/>
+							<string key="NSLabel">enabled: values.IdleLimitCheck</string>
+							<string key="NSBinding">enabled</string>
+							<string key="NSKeyPath">values.IdleLimitCheck</string>
+							<int key="NSNibBindingConnectorVersion">2</int>
+						</object>
+					</object>
+					<int key="connectionID">151</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBBindingConnection" key="connection">
+						<string key="label">hidden: values.SmallView</string>
+						<reference key="source" ref="122634398"/>
+						<reference key="destination" ref="355540060"/>
+						<object class="NSNibBindingConnector" key="connector">
+							<reference key="NSSource" ref="122634398"/>
+							<reference key="NSDestination" ref="355540060"/>
+							<string key="NSLabel">hidden: values.SmallView</string>
+							<string key="NSBinding">hidden</string>
+							<string key="NSKeyPath">values.SmallView</string>
+							<int key="NSNibBindingConnectorVersion">2</int>
+						</object>
+					</object>
+					<int key="connectionID">157</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBBindingConnection" key="connection">
+						<string key="label">value: values.DisplayStatusProgressSelected</string>
+						<reference key="source" ref="122634398"/>
+						<reference key="destination" ref="355540060"/>
+						<object class="NSNibBindingConnector" key="connector">
+							<reference key="NSSource" ref="122634398"/>
+							<reference key="NSDestination" ref="355540060"/>
+							<string key="NSLabel">value: values.DisplayStatusProgressSelected</string>
+							<string key="NSBinding">value</string>
+							<string key="NSKeyPath">values.DisplayStatusProgressSelected</string>
+							<int key="NSNibBindingConnectorVersion">2</int>
+						</object>
+					</object>
+					<int key="connectionID">160</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBBindingConnection" key="connection">
+						<string key="label">value: values.RatioCheck</string>
+						<reference key="source" ref="934892604"/>
+						<reference key="destination" ref="355540060"/>
+						<object class="NSNibBindingConnector" key="connector">
+							<reference key="NSSource" ref="934892604"/>
+							<reference key="NSDestination" ref="355540060"/>
+							<string key="NSLabel">value: values.RatioCheck</string>
+							<string key="NSBinding">value</string>
+							<string key="NSKeyPath">values.RatioCheck</string>
+							<int key="NSNibBindingConnectorVersion">2</int>
+						</object>
+					</object>
+					<int key="connectionID">121</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBBindingConnection" key="connection">
+						<string key="label">value: values.IdleLimitCheck</string>
+						<reference key="source" ref="160955753"/>
+						<reference key="destination" ref="355540060"/>
+						<object class="NSNibBindingConnector" key="connector">
+							<reference key="NSSource" ref="160955753"/>
+							<reference key="NSDestination" ref="355540060"/>
+							<string key="NSLabel">value: values.IdleLimitCheck</string>
+							<string key="NSBinding">value</string>
+							<string key="NSKeyPath">values.IdleLimitCheck</string>
+							<int key="NSNibBindingConnectorVersion">2</int>
+						</object>
+					</object>
+					<int key="connectionID">126</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBBindingConnection" key="connection">
+						<string key="label">hidden: values.SmallView</string>
+						<reference key="source" ref="293769057"/>
+						<reference key="destination" ref="355540060"/>
+						<object class="NSNibBindingConnector" key="connector">
+							<reference key="NSSource" ref="293769057"/>
+							<reference key="NSDestination" ref="355540060"/>
+							<string key="NSLabel">hidden: values.SmallView</string>
+							<string key="NSBinding">hidden</string>
+							<string key="NSKeyPath">values.SmallView</string>
+							<object class="NSDictionary" key="NSOptions">
+								<string key="NS.key.0">NSValueTransformerName</string>
+								<string key="NS.object.0">NSNegateBoolean</string>
+							</object>
+							<int key="NSNibBindingConnectorVersion">2</int>
+						</object>
+					</object>
+					<int key="connectionID">164</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBBindingConnection" key="connection">
 						<string key="label">value: values.DisplaySmallStatusRegular</string>
 						<reference key="source" ref="293769057"/>
 						<reference key="destination" ref="355540060"/>
@@ -968,6 +955,22 @@
 						</object>
 					</object>
 					<int key="connectionID">193</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBBindingConnection" key="connection">
+						<string key="label">enabled: values.CheckDownload</string>
+						<reference key="source" ref="326856988"/>
+						<reference key="destination" ref="355540060"/>
+						<object class="NSNibBindingConnector" key="connector">
+							<reference key="NSSource" ref="326856988"/>
+							<reference key="NSDestination" ref="355540060"/>
+							<string key="NSLabel">enabled: values.CheckDownload</string>
+							<string key="NSBinding">enabled</string>
+							<string key="NSKeyPath">values.CheckDownload</string>
+							<int key="NSNibBindingConnectorVersion">2</int>
+						</object>
+					</object>
+					<int key="connectionID">182</int>
 				</object>
 			</array>
 			<object class="IBMutableOrderedSet" key="objectRecords">
@@ -1027,6 +1030,7 @@
 								</object>
 								<float key="priority">1000</float>
 								<int key="scoringType">3</int>
+								<float key="scoringTypeFloat">9</float>
 								<int key="contentType">3</int>
 								<reference key="containingView" ref="617828785"/>
 							</object>
@@ -1042,6 +1046,7 @@
 								</object>
 								<float key="priority">1000</float>
 								<int key="scoringType">9</int>
+								<float key="scoringTypeFloat">40</float>
 								<int key="contentType">3</int>
 								<reference key="containingView" ref="617828785"/>
 							</object>
@@ -1057,6 +1062,7 @@
 								</object>
 								<float key="priority">1000</float>
 								<int key="scoringType">9</int>
+								<float key="scoringTypeFloat">40</float>
 								<int key="contentType">3</int>
 								<reference key="containingView" ref="617828785"/>
 							</object>
@@ -1072,6 +1078,7 @@
 								</object>
 								<float key="priority">1000</float>
 								<int key="scoringType">6</int>
+								<float key="scoringTypeFloat">24</float>
 								<int key="contentType">2</int>
 								<reference key="containingView" ref="617828785"/>
 							</object>
@@ -1087,6 +1094,7 @@
 								</object>
 								<float key="priority">1000</float>
 								<int key="scoringType">6</int>
+								<float key="scoringTypeFloat">24</float>
 								<int key="contentType">2</int>
 								<reference key="containingView" ref="617828785"/>
 							</object>
@@ -1102,6 +1110,7 @@
 								</object>
 								<float key="priority">1000</float>
 								<int key="scoringType">6</int>
+								<float key="scoringTypeFloat">24</float>
 								<int key="contentType">3</int>
 								<reference key="containingView" ref="617828785"/>
 							</object>
@@ -1117,6 +1126,7 @@
 								</object>
 								<float key="priority">1000</float>
 								<int key="scoringType">9</int>
+								<float key="scoringTypeFloat">40</float>
 								<int key="contentType">3</int>
 								<reference key="containingView" ref="617828785"/>
 							</object>
@@ -1132,6 +1142,7 @@
 								</object>
 								<float key="priority">1000</float>
 								<int key="scoringType">9</int>
+								<float key="scoringTypeFloat">40</float>
 								<int key="contentType">3</int>
 								<reference key="containingView" ref="617828785"/>
 							</object>
@@ -1147,6 +1158,7 @@
 								</object>
 								<float key="priority">1000</float>
 								<int key="scoringType">9</int>
+								<float key="scoringTypeFloat">40</float>
 								<int key="contentType">3</int>
 								<reference key="containingView" ref="617828785"/>
 							</object>
@@ -1162,6 +1174,7 @@
 								</object>
 								<float key="priority">1000</float>
 								<int key="scoringType">9</int>
+								<float key="scoringTypeFloat">40</float>
 								<int key="contentType">3</int>
 								<reference key="containingView" ref="617828785"/>
 							</object>
@@ -1177,6 +1190,7 @@
 								</object>
 								<float key="priority">1000</float>
 								<int key="scoringType">9</int>
+								<float key="scoringTypeFloat">40</float>
 								<int key="contentType">3</int>
 								<reference key="containingView" ref="617828785"/>
 							</object>
@@ -1192,6 +1206,7 @@
 								</object>
 								<float key="priority">1000</float>
 								<int key="scoringType">6</int>
+								<float key="scoringTypeFloat">24</float>
 								<int key="contentType">2</int>
 								<reference key="containingView" ref="617828785"/>
 							</object>
@@ -1207,6 +1222,7 @@
 								</object>
 								<float key="priority">1000</float>
 								<int key="scoringType">6</int>
+								<float key="scoringTypeFloat">24</float>
 								<int key="contentType">2</int>
 								<reference key="containingView" ref="617828785"/>
 							</object>
@@ -1222,6 +1238,7 @@
 								</object>
 								<float key="priority">1000</float>
 								<int key="scoringType">3</int>
+								<float key="scoringTypeFloat">9</float>
 								<int key="contentType">3</int>
 								<reference key="containingView" ref="617828785"/>
 							</object>
@@ -1237,6 +1254,7 @@
 								</object>
 								<float key="priority">1000</float>
 								<int key="scoringType">6</int>
+								<float key="scoringTypeFloat">24</float>
 								<int key="contentType">2</int>
 								<reference key="containingView" ref="617828785"/>
 							</object>
@@ -1252,6 +1270,7 @@
 								</object>
 								<float key="priority">1000</float>
 								<int key="scoringType">9</int>
+								<float key="scoringTypeFloat">40</float>
 								<int key="contentType">3</int>
 								<reference key="containingView" ref="617828785"/>
 							</object>
@@ -1267,6 +1286,7 @@
 								</object>
 								<float key="priority">1000</float>
 								<int key="scoringType">3</int>
+								<float key="scoringTypeFloat">9</float>
 								<int key="contentType">3</int>
 								<reference key="containingView" ref="617828785"/>
 							</object>
@@ -1282,6 +1302,7 @@
 								</object>
 								<float key="priority">1000</float>
 								<int key="scoringType">3</int>
+								<float key="scoringTypeFloat">9</float>
 								<int key="contentType">3</int>
 								<reference key="containingView" ref="617828785"/>
 							</object>
@@ -1297,6 +1318,7 @@
 								</object>
 								<float key="priority">1000</float>
 								<int key="scoringType">3</int>
+								<float key="scoringTypeFloat">9</float>
 								<int key="contentType">3</int>
 								<reference key="containingView" ref="617828785"/>
 							</object>
@@ -1312,6 +1334,7 @@
 								</object>
 								<float key="priority">1000</float>
 								<int key="scoringType">6</int>
+								<float key="scoringTypeFloat">24</float>
 								<int key="contentType">2</int>
 								<reference key="containingView" ref="617828785"/>
 							</object>
@@ -1327,6 +1350,7 @@
 								</object>
 								<float key="priority">1000</float>
 								<int key="scoringType">6</int>
+								<float key="scoringTypeFloat">24</float>
 								<int key="contentType">2</int>
 								<reference key="containingView" ref="617828785"/>
 							</object>
@@ -1342,6 +1366,7 @@
 								</object>
 								<float key="priority">1000</float>
 								<int key="scoringType">3</int>
+								<float key="scoringTypeFloat">9</float>
 								<int key="contentType">1</int>
 								<reference key="containingView" ref="617828785"/>
 							</object>
@@ -1357,6 +1382,7 @@
 								</object>
 								<float key="priority">1000</float>
 								<int key="scoringType">6</int>
+								<float key="scoringTypeFloat">24</float>
 								<int key="contentType">2</int>
 								<reference key="containingView" ref="617828785"/>
 							</object>
@@ -1372,6 +1398,7 @@
 								</object>
 								<float key="priority">1000</float>
 								<int key="scoringType">3</int>
+								<float key="scoringTypeFloat">9</float>
 								<int key="contentType">3</int>
 								<reference key="containingView" ref="617828785"/>
 							</object>
@@ -1387,6 +1414,7 @@
 								</object>
 								<float key="priority">1000</float>
 								<int key="scoringType">6</int>
+								<float key="scoringTypeFloat">24</float>
 								<int key="contentType">2</int>
 								<reference key="containingView" ref="617828785"/>
 							</object>
@@ -1402,6 +1430,7 @@
 								</object>
 								<float key="priority">1000</float>
 								<int key="scoringType">6</int>
+								<float key="scoringTypeFloat">24</float>
 								<int key="contentType">2</int>
 								<reference key="containingView" ref="617828785"/>
 							</object>
@@ -1417,6 +1446,7 @@
 								</object>
 								<float key="priority">1000</float>
 								<int key="scoringType">6</int>
+								<float key="scoringTypeFloat">24</float>
 								<int key="contentType">3</int>
 								<reference key="containingView" ref="617828785"/>
 							</object>
@@ -1432,6 +1462,7 @@
 								</object>
 								<float key="priority">1000</float>
 								<int key="scoringType">6</int>
+								<float key="scoringTypeFloat">24</float>
 								<int key="contentType">2</int>
 								<reference key="containingView" ref="617828785"/>
 							</object>
@@ -1447,6 +1478,7 @@
 								</object>
 								<float key="priority">1000</float>
 								<int key="scoringType">3</int>
+								<float key="scoringTypeFloat">9</float>
 								<int key="contentType">1</int>
 								<reference key="containingView" ref="617828785"/>
 							</object>
@@ -1462,6 +1494,7 @@
 								</object>
 								<float key="priority">1000</float>
 								<int key="scoringType">3</int>
+								<float key="scoringTypeFloat">9</float>
 								<int key="contentType">1</int>
 								<reference key="containingView" ref="617828785"/>
 							</object>
@@ -1477,6 +1510,7 @@
 								</object>
 								<float key="priority">1000</float>
 								<int key="scoringType">6</int>
+								<float key="scoringTypeFloat">24</float>
 								<int key="contentType">2</int>
 								<reference key="containingView" ref="617828785"/>
 							</object>
@@ -1492,6 +1526,7 @@
 								</object>
 								<float key="priority">1000</float>
 								<int key="scoringType">3</int>
+								<float key="scoringTypeFloat">9</float>
 								<int key="contentType">1</int>
 								<reference key="containingView" ref="617828785"/>
 							</object>
@@ -1507,6 +1542,7 @@
 								</object>
 								<float key="priority">1000</float>
 								<int key="scoringType">6</int>
+								<float key="scoringTypeFloat">24</float>
 								<int key="contentType">3</int>
 								<reference key="containingView" ref="617828785"/>
 							</object>
@@ -1522,6 +1558,7 @@
 								</object>
 								<float key="priority">1000</float>
 								<int key="scoringType">3</int>
+								<float key="scoringTypeFloat">9</float>
 								<int key="contentType">1</int>
 								<reference key="containingView" ref="617828785"/>
 							</object>
@@ -1537,6 +1574,7 @@
 								</object>
 								<float key="priority">1000</float>
 								<int key="scoringType">6</int>
+								<float key="scoringTypeFloat">24</float>
 								<int key="contentType">3</int>
 								<reference key="containingView" ref="617828785"/>
 							</object>
@@ -1552,6 +1590,7 @@
 								</object>
 								<float key="priority">1000</float>
 								<int key="scoringType">9</int>
+								<float key="scoringTypeFloat">40</float>
 								<int key="contentType">3</int>
 								<reference key="containingView" ref="617828785"/>
 							</object>
@@ -1567,6 +1606,7 @@
 								</object>
 								<float key="priority">1000</float>
 								<int key="scoringType">6</int>
+								<float key="scoringTypeFloat">24</float>
 								<int key="contentType">3</int>
 								<reference key="containingView" ref="617828785"/>
 							</object>
@@ -1582,6 +1622,7 @@
 								</object>
 								<float key="priority">1000</float>
 								<int key="scoringType">3</int>
+								<float key="scoringTypeFloat">9</float>
 								<int key="contentType">1</int>
 								<reference key="containingView" ref="617828785"/>
 							</object>
@@ -1597,6 +1638,7 @@
 								</object>
 								<float key="priority">1000</float>
 								<int key="scoringType">6</int>
+								<float key="scoringTypeFloat">24</float>
 								<int key="contentType">2</int>
 								<reference key="containingView" ref="617828785"/>
 							</object>
@@ -1612,6 +1654,7 @@
 								</object>
 								<float key="priority">1000</float>
 								<int key="scoringType">3</int>
+								<float key="scoringTypeFloat">9</float>
 								<int key="contentType">1</int>
 								<reference key="containingView" ref="617828785"/>
 							</object>
@@ -1627,6 +1670,7 @@
 								</object>
 								<float key="priority">1000</float>
 								<int key="scoringType">6</int>
+								<float key="scoringTypeFloat">24</float>
 								<int key="contentType">2</int>
 								<reference key="containingView" ref="617828785"/>
 							</object>
@@ -1642,6 +1686,7 @@
 								</object>
 								<float key="priority">1000</float>
 								<int key="scoringType">3</int>
+								<float key="scoringTypeFloat">9</float>
 								<int key="contentType">1</int>
 								<reference key="containingView" ref="617828785"/>
 							</object>
@@ -1657,6 +1702,7 @@
 								</object>
 								<float key="priority">1000</float>
 								<int key="scoringType">6</int>
+								<float key="scoringTypeFloat">24</float>
 								<int key="contentType">3</int>
 								<reference key="containingView" ref="617828785"/>
 							</object>
@@ -1672,6 +1718,7 @@
 								</object>
 								<float key="priority">1000</float>
 								<int key="scoringType">6</int>
+								<float key="scoringTypeFloat">24</float>
 								<int key="contentType">2</int>
 								<reference key="containingView" ref="617828785"/>
 							</object>
@@ -1687,6 +1734,7 @@
 								</object>
 								<float key="priority">1000</float>
 								<int key="scoringType">6</int>
+								<float key="scoringTypeFloat">24</float>
 								<int key="contentType">3</int>
 								<reference key="containingView" ref="617828785"/>
 							</object>
@@ -1702,6 +1750,7 @@
 								</object>
 								<float key="priority">1000</float>
 								<int key="scoringType">6</int>
+								<float key="scoringTypeFloat">24</float>
 								<int key="contentType">3</int>
 								<reference key="containingView" ref="617828785"/>
 							</object>
@@ -1717,6 +1766,7 @@
 								</object>
 								<float key="priority">1000</float>
 								<int key="scoringType">6</int>
+								<float key="scoringTypeFloat">24</float>
 								<int key="contentType">2</int>
 								<reference key="containingView" ref="617828785"/>
 							</object>
@@ -2468,7 +2518,7 @@
 		</object>
 		<object class="NSMutableDictionary" key="IBDocument.PluginDeclaredDependencyDefaults">
 			<string key="NS.key.0">com.apple.InterfaceBuilder.CocoaPlugin.macosx</string>
-			<integer value="1060" key="NS.object.0"/>
+			<real value="1070" key="NS.object.0"/>
 		</object>
 		<bool key="IBDocument.PluginDeclaredDependenciesTrackSystemTargetVersion">YES</bool>
 		<int key="IBDocument.defaultPropertyAccessControl">3</int>
