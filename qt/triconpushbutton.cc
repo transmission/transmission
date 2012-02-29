@@ -48,9 +48,6 @@ TrIconPushButton :: paintEvent( QPaintEvent * )
     QIcon::Mode mode = opt.state & QStyle::State_Enabled ? QIcon::Normal : QIcon::Disabled;
     if( ( mode == QIcon::Normal ) && ( opt.state & QStyle::State_HasFocus ) )
         mode = QIcon::Active;
-    QIcon::State state = QIcon::Off;
-    if( opt.state & QStyle::State_On )
-        state = QIcon::On;
     QPixmap pixmap = opt.icon.pixmap( opt.iconSize, QIcon::Active, QIcon::On );
     QRect iconRect( opt.rect.x() + HIG::PAD_SMALL,
                     opt.rect.y() + (opt.rect.height() - pixmap.height())/2,
