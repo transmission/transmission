@@ -95,6 +95,8 @@ task_free( struct tr_web_task * task )
 struct tr_web
 {
     bool curl_verbose;
+    bool curl_ssl_verify;
+    const char * curl_ca_bundle;
     int close_mode;
     struct tr_web_task * tasks;
     tr_lock * taskLock;
@@ -171,8 +173,12 @@ createEasy( tr_session * s, struct tr_web * web, struct tr_web_task * task )
     curl_easy_setopt( e, CURLOPT_SOCKOPTFUNCTION, sockoptfunction );
     curl_easy_setopt( e, CURLOPT_SOCKOPTDATA, task );
 #endif
-    curl_easy_setopt( e, CURLOPT_SSL_VERIFYHOST, 0L );
-    curl_easy_setopt( e, CURLOPT_SSL_VERIFYPEER, 0L );
+    if( web->curl_ssl_verify )
+        curl_easy_setopt( e, CURLOPT_CAINFO, web->curl_ca_bundle );
+    else {
+        curl_easy_setopt( e, CURLOPT_SSL_VERIFYHOST, 0L );
+        curl_easy_setopt( e, CURLOPT_SSL_VERIFYPEER, 0L );
+    }
     curl_easy_setopt( e, CURLOPT_TIMEOUT, task->timeout_secs );
     curl_easy_setopt( e, CURLOPT_URL, task->url );
     curl_easy_setopt( e, CURLOPT_USERAGENT, TR_NAME "/" SHORT_VERSION_STRING );
@@ -321,6 +327,14 @@ tr_webThreadFunc( void * vsession )
     web->taskLock = tr_lockNew( );
     web->tasks = NULL;
     web->curl_verbose = getenv( "TR_CURL_VERBOSE" ) != NULL;
+    web->curl_ssl_verify = getenv( "TR_CURL_SSL_VERIFY" ) != NULL;
+    web->curl_ca_bundle = getenv( "CURL_CA_BUNDLE" );
+    if( web->curl_ssl_verify ) {
+        tr_ninf( "web", "will verify tracker certs using envvar CURL_CA_BUNDLE: %s",
+                  web->curl_ca_bundle == NULL ? "none" : web->curl_ca_bundle );
+        tr_ninf( "web", "NB: this only works if you built against libcurl with openssl or gnutls, NOT nss" );
+        tr_ninf( "web", "NB: invalid certs will show up as 'Could not connect to tracker' like many other errors" );
+    }
     web->cookie_filename = tr_buildPath( session->configDir, "cookies.txt", NULL );
 
     multi = curl_multi_init( );
