@@ -41,6 +41,7 @@ enum
 {
     FC_ICON,
     FC_LABEL,
+    FC_LABEL_ESC,
     FC_PROG,
     FC_INDEX,
     FC_SIZE,
@@ -443,12 +444,14 @@ buildTree( GNode * node, gpointer gdata )
     const tr_info * inf = tr_torrentInfo( build->tor );
     const int priority = isLeaf ? inf->files[ child_data->index ].priority : 0;
     const gboolean enabled = isLeaf ? !inf->files[ child_data->index ].dnd : TRUE;
+    char * name_esc = g_markup_escape_text( child_data->name, -1 );
 
     tr_strlsize( size_str, child_data->length, sizeof size_str );
 
     gtk_tree_store_insert_with_values( build->store, &child_iter, build->iter, INT_MAX,
                                        FC_INDEX, child_data->index,
                                        FC_LABEL, child_data->name,
+                                       FC_LABEL_ESC, name_esc,
                                        FC_SIZE, child_data->length,
                                        FC_SIZE_STR, size_str,
                                        FC_ICON, icon,
@@ -463,6 +466,7 @@ buildTree( GNode * node, gpointer gdata )
         g_node_children_foreach( node, G_TRAVERSE_ALL, buildTree, &b );
     }
 
+    g_free( name_esc );
     g_object_unref( icon );
 
     /* we're done with this node */
@@ -496,6 +500,7 @@ gtr_file_list_set_torrent( GtkWidget * w, int torrentId )
     store = gtk_tree_store_new ( N_FILE_COLS,
                                  GDK_TYPE_PIXBUF,  /* icon */
                                  G_TYPE_STRING,    /* label */
+                                 G_TYPE_STRING,    /* label esc */
                                  G_TYPE_INT,       /* prog [0..100] */
                                  G_TYPE_UINT,      /* index */
                                  G_TYPE_UINT64,    /* size */
@@ -893,6 +898,9 @@ gtr_file_list_new( TrCore * core, int torrentId )
     gtk_tree_view_column_set_sort_column_id( col, FC_PRIORITY );
     gtk_tree_view_column_set_cell_data_func( col, rend, renderPriority, NULL, NULL );
     gtk_tree_view_append_column( tree_view, col );
+
+    /* add tooltip to tree */
+    gtk_tree_view_set_tooltip_column( tree_view, FC_LABEL_ESC );
 
     /* create the scrolled window and stick the view in it */
     scroll = gtk_scrolled_window_new( NULL, NULL );
