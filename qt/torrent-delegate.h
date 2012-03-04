@@ -13,7 +13,7 @@
 #ifndef QTR_TORRENT_DELEGATE_H
 #define QTR_TORRENT_DELEGATE_H
 
-#include <QItemDelegate>
+#include <QStyledItemDelegate>
 #include <QSize>
 
 class QStyleOptionProgressBarV2;
@@ -22,9 +22,13 @@ class QStyle;
 class Session;
 class Torrent;
 
-class TorrentDelegate: public QItemDelegate
+class TorrentDelegate: public QStyledItemDelegate
 {
         Q_OBJECT
+
+    public:
+      static QColor blueBrush, greenBrush;
+      static QColor blueBack,  greenBack;
 
     protected:
         QStyleOptionProgressBarV2 * myProgressBarStyle;
@@ -47,6 +51,7 @@ class TorrentDelegate: public QItemDelegate
 
         QSize sizeHint(const QStyleOptionViewItem& option, const QModelIndex& index) const;
         void paint(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const;
+
 };
 
 #endif

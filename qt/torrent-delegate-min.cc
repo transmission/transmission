@@ -154,9 +154,16 @@ TorrentDelegateMin :: drawTorrent( QPainter * painter, const QStyleOptionViewIte
     painter->setFont( statusFont );
     painter->drawText( statusArea, 0, statusStr );
     myProgressBarStyle->rect = barArea;
-    myProgressBarStyle->direction = option.direction;
-    myProgressBarStyle->palette = option.palette;
-    myProgressBarStyle->palette.setCurrentColorGroup( cg );
+    if ( tor.isDownloading() ) {
+        myProgressBarStyle->palette.setBrush( QPalette::Highlight, blueBrush );
+        myProgressBarStyle->palette.setColor( QPalette::Base, blueBack );
+        myProgressBarStyle->palette.setColor( QPalette::Background, blueBack );
+    }
+    else if ( tor.isSeeding() ) {
+        myProgressBarStyle->palette.setBrush( QPalette::Highlight, greenBrush );
+        myProgressBarStyle->palette.setColor( QPalette::Base, greenBack );
+        myProgressBarStyle->palette.setColor( QPalette::Background, greenBack );
+    }
     myProgressBarStyle->state = progressBarState;
     char buf[32];
     tr_snprintf( buf, sizeof( buf ), "%d%%", (int)tr_truncd( 100.0 * tor.percentDone( ), 0 ) );

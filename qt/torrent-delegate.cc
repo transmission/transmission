@@ -13,7 +13,6 @@
 #include <iostream>
 
 #include <QApplication>
-#include <QBrush>
 #include <QFont>
 #include <QFontMetrics>
 #include <QIcon>
@@ -34,12 +33,23 @@ enum
    BAR_HEIGHT = 12
 };
 
+QColor TorrentDelegate :: greenBrush;
+QColor TorrentDelegate :: blueBrush;
+QColor TorrentDelegate :: greenBack;
+QColor TorrentDelegate :: blueBack;
+
 TorrentDelegate :: TorrentDelegate( QObject * parent ):
-    QItemDelegate( parent ),
+    QStyledItemDelegate( parent ),
     myProgressBarStyle( new QStyleOptionProgressBarV2 )
 {
     myProgressBarStyle->minimum = 0;
     myProgressBarStyle->maximum = 1000;
+
+    greenBrush = QColor("forestgreen");
+    greenBack = QColor("darkseagreen");
+
+    blueBrush = QColor("steelblue");
+    blueBack = QColor("lightgrey");
 }
 
 TorrentDelegate :: ~TorrentDelegate( )
@@ -314,9 +324,7 @@ TorrentDelegate :: paint( QPainter                    * painter,
     const Torrent * tor( index.data( TorrentModel::TorrentRole ).value<const Torrent*>() );
     painter->save( );
     painter->setClipRect( option.rect );
-    drawBackground( painter, option, index );
     drawTorrent( painter, option, *tor );
-    drawFocus(painter, option, option.rect );
     painter->restore( );
 }
 
@@ -327,8 +335,7 @@ TorrentDelegate :: setProgressBarPercentDone( const QStyleOptionViewItem& option
     if (tor.isSeeding() && tor.getSeedRatio(seedRatioLimit))
     {
         const double seedRateRatio = tor.ratio() / seedRatioLimit;
-        const double invertedRatio = 1. - seedRateRatio;
-        const int scaledProgress = invertedRatio * (myProgressBarStyle->maximum - myProgressBarStyle->minimum);
+        const int scaledProgress = seedRateRatio * (myProgressBarStyle->maximum - myProgressBarStyle->minimum);
         myProgressBarStyle->progress = myProgressBarStyle->minimum + scaledProgress;
     }
     else
@@ -419,8 +426,16 @@ TorrentDelegate :: drawTorrent( QPainter * painter, const QStyleOptionViewItem& 
     painter->setFont( progressFont );
     painter->drawText( progArea, 0, progressFM.elidedText( progressStr, Qt::ElideRight, progArea.width( ) ) );
     myProgressBarStyle->rect = barArea;
-    myProgressBarStyle->palette = option.palette;
-    myProgressBarStyle->palette.setCurrentColorGroup( cg );
+    if ( tor.isDownloading() ) {
+        myProgressBarStyle->palette.setBrush( QPalette::Highlight, blueBrush );
+        myProgressBarStyle->palette.setColor( QPalette::Base, blueBack );
+        myProgressBarStyle->palette.setColor( QPalette::Background, blueBack );
+    }
+    else if ( tor.isSeeding() ) {
+        myProgressBarStyle->palette.setBrush( QPalette::Highlight, greenBrush );
+        myProgressBarStyle->palette.setColor( QPalette::Base, greenBack );
+        myProgressBarStyle->palette.setColor( QPalette::Background, greenBack );
+    }
     myProgressBarStyle->state = progressBarState;
     setProgressBarPercentDone( option, tor );
 
