@@ -8,3 +8,11 @@ Terminal=false
 Type=Application
 MimeType=application/x-bittorrent;
 Categories=Network;FileTransfer;P2P;Qt;
+X-AppInstall-Keywords=torrent
+Actions=Minimize;
+
+[Desktop Action Minimize]
+Name=Start Transmission Minimized
+Exec=transmission-qt --minimized
+OnlyShowIn=Unity
+
