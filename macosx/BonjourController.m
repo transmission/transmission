@@ -26,6 +26,7 @@
 
 @implementation BonjourController
 
+#warning make gcd singleton
 BonjourController * fDefaultController = nil;
 + (BonjourController *) defaultController
 {
@@ -34,11 +35,6 @@ BonjourController * fDefaultController = nil;
     return fDefaultController;
 }
 
-- (void) dealloc
-{
-    [fService release];
-    [super dealloc];
-}
 
 - (void) startWithPort: (NSInteger) port
 {
@@ -55,7 +51,6 @@ BonjourController * fDefaultController = nil;
 - (void) stop
 {
     [fService stop];
-    [fService release];
     fService = nil;
 }
 

@@ -54,10 +54,10 @@ GroupsController * fGroupsInstance = nil;
     {
         NSData * data;
         if ((data = [[NSUserDefaults standardUserDefaults] dataForKey: @"GroupDicts"]))
-            fGroups = [[NSKeyedUnarchiver unarchiveObjectWithData: data] retain];
+            fGroups = [NSKeyedUnarchiver unarchiveObjectWithData: data];
         else if ((data = [[NSUserDefaults standardUserDefaults] dataForKey: @"Groups"])) //handle old groups
         {
-            fGroups = [[NSUnarchiver unarchiveObjectWithData: data] retain];
+            fGroups = [NSUnarchiver unarchiveObjectWithData: data];
             [[NSUserDefaults standardUserDefaults] removeObjectForKey: @"Groups"];
             [self saveGroups];
         }
@@ -107,11 +107,6 @@ GroupsController * fGroupsInstance = nil;
     return self;
 }
 
-- (void) dealloc
-{
-    [fGroups release];
-    [super dealloc];
-}
 
 - (NSInteger) numberOfGroups
 {
@@ -304,13 +299,11 @@ GroupsController * fGroupsInstance = nil;
         [icon setSize: NSMakeSize(ICON_WIDTH_SMALL, ICON_WIDTH_SMALL)];
         
         [item setImage: icon];
-        [icon release];
     }
     else
         [item setImage: icon];
     
     [menu addItem: item];
-    [item release];
     
     for (NSMutableDictionary * dict in fGroups)
     {
@@ -326,16 +319,14 @@ GroupsController * fGroupsInstance = nil;
             [icon setSize: NSMakeSize(ICON_WIDTH_SMALL, ICON_WIDTH_SMALL)];
             
             [item setImage: icon];
-            [icon release];
         }
         else
             [item setImage: icon];
         
         [menu addItem: item];
-        [item release];
     }
     
-    return [menu autorelease];
+    return menu;
 }
 
 - (NSInteger) groupIndexForTorrent: (Torrent *) torrent;
@@ -362,7 +353,6 @@ GroupsController * fGroupsInstance = nil;
         NSMutableDictionary * tempDict = [dict mutableCopy];
         [tempDict removeObjectForKey: @"Icon"];
         [groups addObject: tempDict];
-        [tempDict release];
     }
     
     [[NSUserDefaults standardUserDefaults] setObject: [NSKeyedArchiver archivedDataWithRootObject: groups] forKey: @"GroupDicts"];
@@ -387,19 +377,16 @@ GroupsController * fGroupsInstance = nil;
     NSGradient * gradient = [[NSGradient alloc] initWithStartingColor: [color blendedColorWithFraction: 0.45 ofColor:
                                 [NSColor whiteColor]] endingColor: color];
     [gradient drawInBezierPath: bp angle: 270.0];
-    [gradient release];
     
     //inside
     bp = [NSBezierPath bezierPathWithRoundedRect: NSInsetRect(rect, 1.0, 1.0) xRadius: 3.0 yRadius: 3.0];
     gradient = [[NSGradient alloc] initWithStartingColor: [color blendedColorWithFraction: 0.75 ofColor: [NSColor whiteColor]]
                 endingColor: [color blendedColorWithFraction: 0.2 ofColor: [NSColor whiteColor]]];
     [gradient drawInBezierPath: bp angle: 270.0];
-    [gradient release];
     
     [icon unlockFocus];
     
     [dict setObject: icon forKey: @"Icon"];
-    [icon release];
     
     return icon;
 }

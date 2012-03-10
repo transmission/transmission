@@ -34,7 +34,7 @@ typedef enum
 
 @interface PortChecker : NSObject
 {    
-    id fDelegate;
+    __unsafe_unretained id fDelegate;
     port_status_t fStatus;
     
     NSURLConnection * fConnection;

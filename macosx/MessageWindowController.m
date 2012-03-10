@@ -104,8 +104,8 @@
     filterButtonFrame.origin.x -= NSWidth(clearButtonFrame) - oldClearButtonWidth;
     [fFilterField setFrame: filterButtonFrame];
     
-    fAttributes = [[[[[fMessageTable tableColumnWithIdentifier: @"Message"] dataCell] attributedStringValue]
-                    attributesAtIndex: 0 effectiveRange: NULL] retain];
+    fAttributes = [[[[fMessageTable tableColumnWithIdentifier: @"Message"] dataCell] attributedStringValue]
+                    attributesAtIndex: 0 effectiveRange: NULL];
     
     //select proper level in popup button
     switch ([[NSUserDefaults standardUserDefaults] integerForKey: @"MessageLevel"])
@@ -135,14 +135,9 @@
     [[NSNotificationCenter defaultCenter] removeObserver: self];
     
     [fTimer invalidate];
-    [fLock release];
     
-    [fMessages release];
-    [fDisplayedMessages release];
     
-    [fAttributes release];
     
-    [super dealloc];
 }
 
 - (void) windowDidBecomeKey: (NSNotification *) notification
@@ -391,7 +386,6 @@
             NSSortDescriptor * descriptor = [NSSortDescriptor sortDescriptorWithKey: @"Index" ascending: YES];
             NSArray * descriptors = [[NSArray alloc] initWithObjects: descriptor, nil];
             NSArray * sortedMessages = [fDisplayedMessages sortedArrayUsingDescriptors: descriptors];
-            [descriptors release];
             
             //create the text to output
             NSMutableArray * messageStrings = [NSMutableArray arrayWithCapacity: [sortedMessages count]];
@@ -411,7 +405,6 @@
                 [alert setAlertStyle: NSWarningAlertStyle];
                 
                 [alert runModal];
-                [alert release];
             }
         }
     }];

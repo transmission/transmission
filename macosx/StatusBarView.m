@@ -52,8 +52,6 @@
 {
     [[NSNotificationCenter defaultCenter] removeObserver: self];
     
-    [fGradient release];
-    [super dealloc];
 }
 
 - (BOOL) mouseDownCanMoveWindow

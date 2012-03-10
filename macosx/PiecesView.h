@@ -32,7 +32,7 @@
     
     NSColor * fGreenAvailabilityColor, * fBluePieceColor;
     
-    Torrent * fTorrent;
+    __unsafe_unretained Torrent * fTorrent;
     NSInteger fNumPieces, fAcross, fWidth, fExtraBorder;
 }
 

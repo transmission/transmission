@@ -28,6 +28,7 @@
 @implementation TrackerNode
 
 #warning remove ivars in header when 64-bit only (or it compiles in 32-bit mode)
+#warning make weak when 10.7-only (not assign)
 @synthesize torrent = fTorrent;
 
 - (id) initWithTrackerStat: (tr_tracker_stat *) stat torrent: (Torrent *) torrent
@@ -35,7 +36,8 @@
     if ((self = [super init]))
     {
         fStat = *stat;
-        fTorrent = torrent; //weak reference
+        #warning make __weak when 10.7-only
+        fTorrent = torrent;
     }
     
     return self;
@@ -49,7 +51,7 @@
 - (id) copyWithZone: (NSZone *) zone
 {
     //this object is essentially immutable after initial setup
-    return [self retain];
+    return self;
 }
 
 - (BOOL) isEqual: (id) object
@@ -112,7 +114,6 @@
         [dateFormatter setDoesRelativeDateFormatting: YES];
         
         dateString = [dateFormatter stringFromDate: [NSDate dateWithTimeIntervalSince1970: fStat.lastAnnounceTime]];
-        [dateFormatter release];
     }
     else
         dateString = NSLocalizedString(@"N/A", "Tracker last announce");
@@ -183,7 +184,6 @@
         [dateFormatter setDoesRelativeDateFormatting: YES];
         
         dateString = [dateFormatter stringFromDate: [NSDate dateWithTimeIntervalSince1970: fStat.lastScrapeTime]];
-        [dateFormatter release];
     }
     else
         dateString = NSLocalizedString(@"N/A", "Tracker last scrape");

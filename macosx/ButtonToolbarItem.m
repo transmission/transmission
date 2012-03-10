@@ -37,7 +37,7 @@
     [menuItem setTarget: [self target]];
     [menuItem setEnabled: [[self target] validateToolbarItem: self]];
     
-    return [menuItem autorelease];
+    return menuItem;
 }
 
 @end

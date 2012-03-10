@@ -62,7 +62,7 @@
 
 void startQueueCallback(tr_torrent * torrent, void * torrentData)
 {
-    [(Torrent *)torrentData performSelectorOnMainThread: @selector(startQueue) withObject: nil waitUntilDone: NO];
+    [(__bridge Torrent *)torrentData performSelectorOnMainThread: @selector(startQueue) withObject: nil waitUntilDone: NO];
 }
 
 void completenessChangeCallback(tr_torrent * torrent, tr_completeness status, bool wasRunning, void * torrentData)
@@ -71,23 +71,23 @@ void completenessChangeCallback(tr_torrent * torrent, tr_completeness status, bo
     {
         NSDictionary * dict = [[NSDictionary alloc] initWithObjectsAndKeys: [NSNumber numberWithInt: status], @"Status",
                                [NSNumber numberWithBool: wasRunning], @"WasRunning", nil];
-        [(Torrent *)torrentData performSelectorOnMainThread: @selector(completenessChange:) withObject: dict waitUntilDone: NO];
+        [(__bridge Torrent *)torrentData performSelectorOnMainThread: @selector(completenessChange:) withObject: dict waitUntilDone: NO];
     }
 }
 
 void ratioLimitHitCallback(tr_torrent * torrent, void * torrentData)
 {
-    [(Torrent *)torrentData performSelectorOnMainThread: @selector(ratioLimitHit) withObject: nil waitUntilDone: NO];
+    [(__bridge Torrent *)torrentData performSelectorOnMainThread: @selector(ratioLimitHit) withObject: nil waitUntilDone: NO];
 }
 
 void idleLimitHitCallback(tr_torrent * torrent, void * torrentData)
 {
-    [(Torrent *)torrentData performSelectorOnMainThread: @selector(idleLimitHit) withObject: nil waitUntilDone: NO];
+    [(__bridge Torrent *)torrentData performSelectorOnMainThread: @selector(idleLimitHit) withObject: nil waitUntilDone: NO];
 }
 
 void metadataCallback(tr_torrent * torrent, void * torrentData)
 {
-    [(Torrent *)torrentData performSelectorOnMainThread: @selector(metadataRetrieved) withObject: nil waitUntilDone: NO];
+    [(__bridge Torrent *)torrentData performSelectorOnMainThread: @selector(metadataRetrieved) withObject: nil waitUntilDone: NO];
 }
 
 int trashDataFile(const char * filename)
@@ -211,20 +211,6 @@ int trashDataFile(const char * filename)
     
     if (fFileStat)
         tr_torrentFilesFree(fFileStat, [self fileCount]);
-    
-    [fPreviousFinishedIndexes release];
-    [fPreviousFinishedIndexesDate release];
-    
-    [fHashString release];
-    
-    [fIcon release];
-    
-    [fFileList release];
-    [fFlatFileList release];
-    
-    [fTimeMachineExclude release];
-    
-    [super dealloc];
 }
 
 - (NSString *) description
@@ -234,7 +220,7 @@ int trashDataFile(const char * filename)
 
 - (id) copyWithZone: (NSZone *) zone
 {
-    return [self retain];
+    return self;
 }
 
 - (void) closeRemoveTorrent: (BOOL) trashFiles
@@ -243,7 +229,6 @@ int trashDataFile(const char * filename)
     if (fTimeMachineExclude)
     {
         [self setTimeMachineExclude: NO forPath: fTimeMachineExclude];
-        [fTimeMachineExclude release];
         fTimeMachineExclude = nil;
     }
     
@@ -282,10 +267,8 @@ int trashDataFile(const char * filename)
 
 - (void) setPreviousFinishedPieces: (NSIndexSet *) indexes
 {
-    [fPreviousFinishedIndexes release];
-    fPreviousFinishedIndexes = [indexes retain];
+    fPreviousFinishedIndexes = indexes;
     
-    [fPreviousFinishedIndexesDate release];
     fPreviousFinishedIndexesDate = indexes != nil ? [[NSDate alloc] init] : nil;
 }
 
@@ -530,7 +513,6 @@ int trashDataFile(const char * filename)
         [alert addButtonWithTitle: NSLocalizedString(@"OK", "Move inside itself alert -> button")];
         
         [alert runModal];
-        [alert release];
         
         return;
     }
@@ -552,7 +534,6 @@ int trashDataFile(const char * filename)
         [alert addButtonWithTitle: NSLocalizedString(@"OK", "Move error alert -> button")];
         
         [alert runModal];
-        [alert release];
     }
     
     [self updateTimeMachineExclude];
@@ -596,7 +577,6 @@ int trashDataFile(const char * filename)
             const NSInteger result = [alert runModal];
             if ([[alert suppressionButton] state] == NSOnState)
                 [fDefaults setBool: NO forKey: @"WarningRemainingSpace"];
-            [alert release];
             
             return result != NSAlertFirstButtonReturn;
         }
@@ -611,8 +591,8 @@ int trashDataFile(const char * filename)
     
     #warning replace kGenericFolderIcon stuff with NSImageNameFolder on 10.6
     if (!fIcon)
-        fIcon = [[[NSWorkspace sharedWorkspace] iconForFileType: [self isFolder] ? NSFileTypeForHFSTypeCode(kGenericFolderIcon)
-                                                                                : [[self name] pathExtension]] retain];
+        fIcon = [[NSWorkspace sharedWorkspace] iconForFileType: [self isFolder] ? NSFileTypeForHFSTypeCode(kGenericFolderIcon)
+                                                                                : [[self name] pathExtension]];
     return fIcon;
 }
 
@@ -655,7 +635,6 @@ int trashDataFile(const char * filename)
         
         TrackerNode * tracker = [[TrackerNode alloc] initWithTrackerStat: &stats[i] torrent: self];
         [trackers addObject: tracker];
-        [tracker release];
     }
     
     tr_torrentTrackersFree(stats, count);
@@ -1548,7 +1527,6 @@ int trashDataFile(const char * filename)
     if (fTimeMachineExclude)
     {
         [self setTimeMachineExclude: NO forPath: fTimeMachineExclude];
-        [fTimeMachineExclude release];
         fTimeMachineExclude = nil;
     }
     
@@ -1556,7 +1534,7 @@ int trashDataFile(const char * filename)
     if (currentLocation)
     {
         [self setTimeMachineExclude: YES forPath: currentLocation];
-        fTimeMachineExclude = [currentLocation retain];
+        fTimeMachineExclude = currentLocation;
     }
 }
 
@@ -1651,18 +1629,17 @@ int trashDataFile(const char * filename)
         
         if (!fHandle)
         {
-            [self release];
             return nil;
         }
     }
 
     fInfo = tr_torrentInfo(fHandle);
     
-    tr_torrentSetQueueStartCallback(fHandle, startQueueCallback, self);
-    tr_torrentSetCompletenessCallback(fHandle, completenessChangeCallback, self);
-    tr_torrentSetRatioLimitHitCallback(fHandle, ratioLimitHitCallback, self);
-    tr_torrentSetIdleLimitHitCallback(fHandle, idleLimitHitCallback, self);
-    tr_torrentSetMetadataCallback(fHandle, metadataCallback, self);
+    tr_torrentSetQueueStartCallback(fHandle, startQueueCallback, (__bridge void *)(self));
+    tr_torrentSetCompletenessCallback(fHandle, completenessChangeCallback, (__bridge void *)(self));
+    tr_torrentSetRatioLimitHitCallback(fHandle, ratioLimitHitCallback, (__bridge void *)(self));
+    tr_torrentSetIdleLimitHitCallback(fHandle, idleLimitHitCallback, (__bridge void *)(self));
+    tr_torrentSetMetadataCallback(fHandle, metadataCallback, (__bridge void *)(self));
     
     fHashString = [[NSString alloc] initWithUTF8String: fInfo->hashString];
     
@@ -1677,7 +1654,7 @@ int trashDataFile(const char * filename)
     [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(checkGroupValueForRemoval:)
         name: @"GroupValueRemoved" object: nil];
     
-    fTimeMachineExclude = [timeMachineExclude retain];
+    fTimeMachineExclude = timeMachineExclude;
     [self update];
     
     return self;
@@ -1720,7 +1697,6 @@ int trashDataFile(const char * filename)
                 {
                     node = [[FileListNode alloc] initWithFolderName: name path: path torrent: self];
                     [fileList addObject: node];
-                    [node release];
                 }
                 
                 NSMutableArray * trimmedComponents = [NSMutableArray arrayWithArray: [pathComponents subarrayWithRange: NSMakeRange(2, [pathComponents count]-2)]];
@@ -1733,7 +1709,6 @@ int trashDataFile(const char * filename)
                 FileListNode * node = [[FileListNode alloc] initWithFileName: name path: path size: file->length index: i torrent: self];
                 [fileList addObject: node];
                 [flatFileList addObject: node];
-                [node release];
             }
         }
         
@@ -1746,9 +1721,8 @@ int trashDataFile(const char * filename)
     else
     {
         FileListNode * node = [[FileListNode alloc] initWithFileName: [self name] path: @"" size: [self size] index: 0 torrent: self];
-        fFileList = [[NSArray arrayWithObject: node] retain];
-        fFlatFileList = [fFileList retain];
-        [node release];
+        fFileList = [NSArray arrayWithObject: node];
+        fFlatFileList = fFileList;
     }
 }
 
@@ -1784,7 +1758,6 @@ int trashDataFile(const char * filename)
         }
         
         [parent insertChild: node];
-        [node release];
     }
     
     if (isFolder)
@@ -1821,6 +1794,7 @@ int trashDataFile(const char * filename)
     {
         case TR_SEED:
         case TR_PARTIAL_SEED:
+        {
             //simpler to create a new dictionary than to use statusInfo - avoids retention chicanery
             [[NSNotificationCenter defaultCenter] postNotificationName: @"TorrentFinishedDownloading" object: self
                 userInfo: [NSDictionary dictionaryWithObject: [statusInfo objectForKey: @"WasRunning"] forKey: @"WasRunning"]];
@@ -1831,19 +1805,19 @@ int trashDataFile(const char * filename)
             if (FSPathMakeRef((const UInt8 *)[dataLocation UTF8String], &ref, NULL) == noErr)
             {
                 NSDictionary * quarantineProperties = [NSDictionary dictionaryWithObject: (NSString *)kLSQuarantineTypeOtherDownload forKey: (NSString *)kLSQuarantineTypeKey];
-                if (LSSetItemAttribute(&ref, kLSRolesAll, kLSItemQuarantineProperties, quarantineProperties) != noErr)
+                if (LSSetItemAttribute(&ref, kLSRolesAll, kLSItemQuarantineProperties, (__bridge void *)quarantineProperties) != noErr)
                     NSLog(@"Failed to quarantine: %@", dataLocation);
             }
             else
                 NSLog(@"Could not find file to quarantine: %@", dataLocation);
             
             break;
+        }
         
         case TR_LEECH:
             [[NSNotificationCenter defaultCenter] postNotificationName: @"TorrentRestartedDownloading" object: self];
             break;
     }
-    [statusInfo release];
     
     [self update];
     [self updateTimeMachineExclude];
@@ -1918,7 +1892,7 @@ int trashDataFile(const char * filename)
 
 - (void) setTimeMachineExclude: (BOOL) exclude forPath: (NSString *) path
 {
-    CSBackupSetItemExcluded((CFURLRef)[NSURL fileURLWithPath: path], exclude, true);
+    CSBackupSetItemExcluded((__bridge CFURLRef)[NSURL fileURLWithPath: path], exclude, true);
 }
 
 @end

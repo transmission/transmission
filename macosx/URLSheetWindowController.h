@@ -32,13 +32,14 @@
     IBOutlet NSTextField * fTextField;
     IBOutlet NSButton * fOpenButton, * fCancelButton;
     
-    Controller * fController;
+    __unsafe_unretained Controller * fController;
 }
 
 - (id) initWithController: (Controller *) controller;
-- (void) beginSheetForWindow: (NSWindow *) window;
 
-- (void) openURLEndSheet: (id) sender;
-- (void) openURLCancelEndSheet: (id) sender;
+- (IBAction) openURLEndSheet: (id) sender;
+- (IBAction) openURLCancelEndSheet: (id) sender;
+
+- (NSString *) urlString;
 
 @end

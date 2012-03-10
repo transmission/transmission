@@ -90,7 +90,6 @@ typedef enum
 {
     [[NSNotificationCenter defaultCenter] removeObserver: self];
     
-    [super dealloc];
 }
 
 - (void) updateWithDownload: (CGFloat) dlRate upload: (CGFloat) ulRate

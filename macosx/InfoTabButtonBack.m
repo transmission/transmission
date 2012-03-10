@@ -37,11 +37,6 @@
     return self;
 }
 
-- (void) dealloc
-{
-    [fGradient release];
-    [super dealloc];
-}
 
 - (void) drawRect: (NSRect) rect
 {

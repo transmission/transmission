@@ -90,16 +90,10 @@
 {
     [[NSNotificationCenter defaultCenter] removeObserver: self];
     
-    [fCollapsedGroups release];
     
-    [fPiecesBarAnimation release];
-    [fMenuTorrent release];
     
-    [fSelectedValues release];
     
-    [fTorrentCell release];
     
-    [super dealloc];
 }
 
 - (void) awakeFromNib
@@ -391,11 +385,10 @@
     
     //if pushing a button, don't change the selected rows
     if (pushed)
-        fSelectedValues = [[self selectedValues] retain];
+        fSelectedValues = [self selectedValues];
     
     [super mouseDown: event];
     
-    [fSelectedValues release];
     fSelectedValues = nil;
     
     //avoid weird behavior when showing menu by doing this after mouse down
@@ -637,13 +630,11 @@
         [infoViewController setInfoForTorrents: [NSArray arrayWithObject: torrent]];
         [infoViewController updateInfo];
         
-        [infoViewController release];
-        [popover release];
     }
     else
     {
         //update file action menu
-        fMenuTorrent = [[self itemAtRow: row] retain];
+        fMenuTorrent = [self itemAtRow: row];
         
         //update global limit check
         [fGlobalLimitItem setState: [fMenuTorrent usesGlobalSpeedLimit] ? NSOnState : NSOffState];
@@ -655,7 +646,6 @@
         location = [self convertPoint: location toView: self];
         [fActionMenu popUpMenuPositioningItem: nil atLocation: location inView: self];
         
-        [fMenuTorrent release];
         fMenuTorrent = nil;
     }
 }
@@ -694,7 +684,6 @@
                 [item setTarget: self];
                 [item setRepresentedObject: [NSNumber numberWithInt: speedLimitActionValue[i]]];
                 [menu addItem: item];
-                [item release];
             }
         }
         
@@ -723,7 +712,6 @@
                 [item setTarget: self];
                 [item setRepresentedObject: [NSNumber numberWithFloat: ratioLimitActionValue[i]]];
                 [menu addItem: item];
-                [item release];
             }
         }
         
@@ -836,12 +824,8 @@
 
 - (void) togglePiecesBar
 {
-    //stop previous animation
-    if (fPiecesBarAnimation)
-        [fPiecesBarAnimation release];
-    
     NSMutableArray * progressMarks = [NSMutableArray arrayWithCapacity: 16];
-    for (NSAnimationProgress i = 0.0625; i <= 1.0; i += 0.0625)
+    for (NSAnimationProgress i = 1.0/16; i <= 1.0; i += 1.0/16)
         [progressMarks addObject: [NSNumber numberWithFloat: i]];
     
     fPiecesBarAnimation = [[NSAnimation alloc] initWithDuration: TOGGLE_PROGRESS_SECONDS animationCurve: NSAnimationEaseIn];
@@ -856,7 +840,6 @@
 {
     if (animation == fPiecesBarAnimation)
     {
-        [fPiecesBarAnimation release];
         fPiecesBarAnimation = nil;
     }
 }

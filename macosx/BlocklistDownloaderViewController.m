@@ -37,6 +37,7 @@
 
 @implementation BlocklistDownloaderViewController
 
+#warning make gcd singleton
 + (void) downloadWithPrefsController: (PrefsController *) prefsController
 {
     BlocklistDownloaderViewController * downloader = [[BlocklistDownloaderViewController alloc] initWithPrefsController: prefsController];
@@ -101,7 +102,6 @@
     [NSApp endSheet: fStatusWindow];
     [fStatusWindow orderOut: self];
     
-    [self release];
 }
 
 - (void) setFailed: (NSString *) error
@@ -109,7 +109,7 @@
     [NSApp endSheet: fStatusWindow];
     [fStatusWindow orderOut: self];
     
-    NSAlert * alert = [[[NSAlert alloc] init] autorelease];
+    NSAlert * alert = [[NSAlert alloc] init];
     [alert addButtonWithTitle: NSLocalizedString(@"OK", "Blocklist -> button")];
     [alert setMessageText: NSLocalizedString(@"Download of the blocklist failed.", "Blocklist -> message")];
     [alert setAlertStyle: NSWarningAlertStyle];
@@ -148,7 +148,6 @@
 - (void) failureSheetClosed: (NSAlert *) alert returnCode: (NSInteger) code contextInfo: (void *) info
 {
     [[alert window] orderOut: self];
-    [self release];
 }
 
 @end

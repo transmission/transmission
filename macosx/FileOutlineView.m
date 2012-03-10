@@ -35,11 +35,9 @@
 {
     FileNameCell * nameCell = [[FileNameCell alloc] init];
     [[self tableColumnWithIdentifier: @"Name"] setDataCell: nameCell];
-    [nameCell release];
     
     FilePriorityCell * priorityCell = [[FilePriorityCell alloc] init];
     [[self tableColumnWithIdentifier: @"Priority"] setDataCell: priorityCell];
-    [priorityCell release];
     
     [self setAutoresizesOutlineColumn: NO];
     [self setIndentationPerLevel: 14.0];
@@ -47,10 +45,6 @@
     fMouseRow = -1;
 }
 
-- (void) dealloc
-{
-    [super dealloc];
-}
 
 - (void) mouseDown: (NSEvent *) event
 {

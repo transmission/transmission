@@ -68,16 +68,13 @@
 {
     [[NSNotificationCenter defaultCenter] removeObserver: self];
     
-    [fTorrents release];
     
-    [super dealloc];
 }
 
 - (void) setInfoForTorrents: (NSArray *) torrents
 {
     //don't check if it's the same in case the metadata changed
-    [fTorrents release];
-    fTorrents = [torrents retain];
+    fTorrents = torrents;
     
     fSet = NO;
 }
@@ -446,8 +443,7 @@
 
 - (BOOL) control: (NSControl *) control textShouldBeginEditing: (NSText *) fieldEditor
 {
-    [fInitialString release];
-    fInitialString = [[control stringValue] retain];
+    fInitialString = [control stringValue];
     
     return YES;
 }
@@ -458,7 +454,6 @@
     if (fInitialString)
     {
         [control setStringValue: fInitialString];
-        [fInitialString release];
         fInitialString = nil;
     }
     return NO;

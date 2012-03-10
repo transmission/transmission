@@ -127,7 +127,7 @@ tr_session * fHandle;
         
         fRPCWhitelistArray = [[fDefaults arrayForKey: @"RPCWhitelist"] mutableCopy];
         if (!fRPCWhitelistArray)
-            fRPCWhitelistArray = [[NSMutableArray arrayWithObject: @"127.0.0.1"] retain];
+            fRPCWhitelistArray = [NSMutableArray arrayWithObject: @"127.0.0.1"];
         [self updateRPCWhitelist];
         
         //reset old Sparkle settings from previous versions
@@ -155,14 +155,10 @@ tr_session * fHandle;
     if (fPortChecker)
     {
         [fPortChecker cancelProbe];
-        [fPortChecker release];
     }
     
-    [fRPCWhitelistArray release];
     
-    [fRPCPassword release];
     
-    [super dealloc];
 }
 
 - (void) awakeFromNib
@@ -176,7 +172,6 @@ tr_session * fHandle;
     [toolbar setSizeMode: NSToolbarSizeModeRegular];
     [toolbar setSelectedItemIdentifier: TOOLBAR_GENERAL];
     [[self window] setToolbar: toolbar];
-    [toolbar release];
     
     [self setPrefView: nil];
     
@@ -311,11 +306,10 @@ tr_session * fHandle;
     }
     else
     {
-        [item release];
         return nil;
     }
 
-    return [item autorelease];
+    return item;
 }
 
 - (NSArray *) toolbarAllowedItemIdentifiers: (NSToolbar *) toolbar
@@ -397,7 +391,6 @@ tr_session * fHandle;
         if (fPortChecker)
         {
             [fPortChecker cancelProbe];
-            [fPortChecker release];
         }
         BOOL delay = natStatusChanged || tr_sessionIsPortForwardingEnabled(fHandle);
         fPortChecker = [[PortChecker alloc] initForPort: fPeerPort delay: delay withDelegate: self];
@@ -425,7 +418,6 @@ tr_session * fHandle;
             NSAssert1(NO, @"Port checker returned invalid status: %d", [fPortChecker status]);
             break;
     }
-    [fPortChecker release];
     fPortChecker = nil;
 }
 
@@ -436,7 +428,7 @@ tr_session * fHandle;
     NSArray * directories = NSSearchPathForDirectoriesInDomains(NSAllLibrariesDirectory,
                                 NSUserDomainMask | NSLocalDomainMask | NSSystemDomainMask, YES);
     
-    for (NSString * directory in directories)
+    for (__strong NSString * directory in directories)
     {
         directory = [directory stringByAppendingPathComponent: @"Sounds"];
         
@@ -444,7 +436,7 @@ tr_session * fHandle;
         if ([[NSFileManager defaultManager] fileExistsAtPath: directory isDirectory: &isDirectory] && isDirectory)
         {
             NSArray * directoryContents = [[NSFileManager defaultManager] contentsOfDirectoryAtPath: directory error: NULL];
-            for (NSString * sound in directoryContents)
+            for (__strong NSString * sound in directoryContents)
             {
                 sound = [sound stringByDeletingPathExtension];
                 if ([NSSound soundNamed: sound])
@@ -701,7 +693,7 @@ tr_session * fHandle;
 
 + (NSDate *) timeSumToDate: (NSInteger) sum
 {
-    NSDateComponents * comps = [[[NSDateComponents alloc] init] autorelease];
+    NSDateComponents * comps = [[NSDateComponents alloc] init];
     [comps setHour: sum / 60];
     [comps setMinute: sum % 60];
     
@@ -710,8 +702,7 @@ tr_session * fHandle;
 
 - (BOOL) control: (NSControl *) control textShouldBeginEditing: (NSText *) fieldEditor
 {
-    [fInitialString release];
-    fInitialString = [[control stringValue] retain];
+    fInitialString = [control stringValue];
     
     return YES;
 }
@@ -722,7 +713,6 @@ tr_session * fHandle;
     if (fInitialString)
     {
         [control setStringValue: fInitialString];
-        [fInitialString release];
         fInitialString = nil;
     }
     return NO;
@@ -758,7 +748,7 @@ tr_session * fHandle;
 - (void) setDefaultForMagnets: (id) sender
 {
     NSString * bundleID = [[NSBundle mainBundle] bundleIdentifier];
-    const OSStatus result = LSSetDefaultHandlerForURLScheme((CFStringRef)@"magnet", (CFStringRef)bundleID);
+    const OSStatus result = LSSetDefaultHandlerForURLScheme((CFStringRef)@"magnet", (__bridge CFStringRef)bundleID);
     if (result != noErr)
         NSLog(@"Failed setting default magnet link handler");
 }
@@ -982,7 +972,6 @@ tr_session * fHandle;
 
 - (void) setRPCPassword: (id) sender
 {
-    [fRPCPassword release];
     fRPCPassword = [[sender stringValue] copy];
     
     const char * password = [[sender stringValue] UTF8String];
@@ -998,7 +987,6 @@ tr_session * fHandle;
     SecKeychainFindGenericPassword(NULL, strlen(RPC_KEYCHAIN_SERVICE), RPC_KEYCHAIN_SERVICE,
         strlen(RPC_KEYCHAIN_NAME), RPC_KEYCHAIN_NAME, &passwordLength, (void **)&password, NULL);
     
-    [fRPCPassword release];
     if (password != NULL)
     {
         char fullPassword[passwordLength+1];

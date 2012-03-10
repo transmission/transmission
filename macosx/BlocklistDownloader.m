@@ -74,12 +74,6 @@ BlocklistDownloader * fDownloader = nil;
     }
 }
 
-- (void) dealloc
-{
-    [fDownload release];
-    [fDestination release];
-    [super dealloc];
-}
 
 - (void) cancelDownload
 {
@@ -90,7 +84,6 @@ BlocklistDownloader * fDownloader = nil;
     [[BlocklistScheduler scheduler] updateSchedule];
     
     fDownloader = nil;
-    [self release];
 }
 
 //using the actual filename is the best bet
@@ -101,8 +94,7 @@ BlocklistDownloader * fDownloader = nil;
 
 - (void) download: (NSURLDownload *) download didCreateDestination: (NSString *) path
 {
-    [fDestination release];
-    fDestination = [path retain];
+    fDestination = path;
 }
 
 - (void) download: (NSURLDownload *) download didReceiveResponse: (NSURLResponse *) response
@@ -129,7 +121,6 @@ BlocklistDownloader * fDownloader = nil;
     [[BlocklistScheduler scheduler] updateSchedule];
     
     fDownloader = nil;
-    [self release];
 }
 
 - (void) downloadDidFinish: (NSURLDownload *) download
@@ -195,7 +186,6 @@ BlocklistDownloader * fDownloader = nil;
 		{
 			success = NO;
 		}
-		[unzip release];
 		
 		if (success) {
 			//Now find out what file we actually extracted; don't just assume it matches the zipfile's name
@@ -216,19 +206,17 @@ BlocklistDownloader * fDownloader = nil;
 				[zipinfo launch];
 				[zipinfo waitUntilExit];
 				
-				NSString * actualFilename = [[[NSString alloc] initWithData: [zipinfoOutput readDataToEndOfFile]
-                                                encoding: NSUTF8StringEncoding] autorelease];
+				NSString * actualFilename = [[NSString alloc] initWithData: [zipinfoOutput readDataToEndOfFile]
+                                                encoding: NSUTF8StringEncoding];
 				actualFilename = [actualFilename stringByTrimmingCharactersInSet: [NSCharacterSet whitespaceAndNewlineCharacterSet]];
 				NSString * newBlocklistPath = [workingDirectory stringByAppendingPathComponent: actualFilename];
 				
 				//Finally, delete the ZIP file; we're done with it, and we'll return the unzipped blocklist
 				[[NSFileManager defaultManager] removeItemAtPath: fDestination error: NULL];
                 
-                [fDestination release];
-                fDestination = [newBlocklistPath retain];
+                fDestination = newBlocklistPath;
 			}
             @catch(id exc) {}
-			[zipinfo release];
 		}		
 	}
 }
@@ -266,7 +254,6 @@ BlocklistDownloader * fDownloader = nil;
     }
     
     fDownloader = nil;
-    [self release];
 }
 
 @end

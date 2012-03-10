@@ -37,7 +37,7 @@
     fSelected = NO;
     
     //expects the icon to currently be set as the image
-    fIcon = [[self image] retain];
+    fIcon = [self image];
     [self setSelectedTab: fSelected];
 }
 
@@ -45,8 +45,6 @@
 {
     [[NSNotificationCenter defaultCenter] removeObserver: self];
     
-    [fIcon release];
-    [super dealloc];
 }
 
 - (void) setSelectedTab: (BOOL) selected
@@ -85,7 +83,6 @@
     tabRect = NSMakeRect(0.0, 1.0, NSWidth(tabRect) - 1.0, NSHeight(tabRect) - 2.0);
     
     [gradient drawInRect: tabRect angle: 270.0];
-    [gradient release];
     
     if (fIcon)
     {
@@ -101,7 +98,6 @@
     [tabImage unlockFocus];
     
     [self setImage: tabImage];
-    [tabImage release];
 }
 
 - (void) updateControlTint: (NSNotification *) notification

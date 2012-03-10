@@ -40,7 +40,7 @@
     
     NSGradient * progressGradient = [[NSGradient alloc] initWithColorsAndLocations: baseColor, 0.0, color2, 0.5, color3, 0.5,
                                         baseColor, 1.0, nil];
-    return [progressGradient autorelease];
+    return progressGradient;
 }
 
 @end

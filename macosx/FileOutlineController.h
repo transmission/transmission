@@ -29,7 +29,7 @@
 
 @interface FileOutlineController : NSObject
 {
-    Torrent * fTorrent;
+    __unsafe_unretained Torrent * fTorrent;
     NSMutableArray * fFileList;
     
     IBOutlet FileOutlineView * fOutline;

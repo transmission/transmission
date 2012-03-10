@@ -69,28 +69,8 @@
                                 [NSFont messageFontOfSize: 9.0], NSFontAttributeName,
                                 statusParagraphStyle, NSParagraphStyleAttributeName,  nil];
         
-        [paragraphStyle release];
-        [statusParagraphStyle release];
     }
     return self;
-}
-
-- (void) dealloc
-{
-    [fTitleAttributes release];
-    [fStatusAttributes release];
-    
-    [super dealloc];
-}
-
-- (id) copyWithZone: (NSZone *) zone
-{
-    FileNameCell * copy = [super copyWithZone: zone];
-    
-    copy->fTitleAttributes = [fTitleAttributes retain];
-    copy->fStatusAttributes = [fStatusAttributes retain];
-    
-    return copy;
 }
 
 - (NSImage *) image
@@ -193,7 +173,7 @@
 - (NSAttributedString *) attributedTitle
 {
     NSString * title = [(FileListNode *)[self objectValue] name];
-    return [[[NSAttributedString alloc] initWithString: title attributes: fTitleAttributes] autorelease];
+    return [[NSAttributedString alloc] initWithString: title attributes: fTitleAttributes];
 }
 
 - (NSAttributedString *) attributedStatus
@@ -207,7 +187,7 @@
     NSString * status = [NSString stringWithFormat: NSLocalizedString(@"%@ of %@",
                             "Inspector -> Files tab -> file status string"), percentString, [NSString stringForFileSize: [node size]]];
     
-    return [[[NSAttributedString alloc] initWithString: status attributes: fStatusAttributes] autorelease];
+    return [[NSAttributedString alloc] initWithString: status attributes: fStatusAttributes];
 }
 
 @end

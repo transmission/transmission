@@ -41,11 +41,6 @@
     return self;
 }
 
-- (void) dealloc
-{
-    [fTorrents release];
-    [super dealloc];
-}
 
 - (NSString *) description
 {

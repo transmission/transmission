@@ -140,16 +140,8 @@ typedef enum
     if ([fViewController respondsToSelector: @selector(saveViewSize)])
         [fViewController saveViewSize];
     
-    [fGeneralViewController dealloc];
-    [fActivityViewController dealloc];
-    [fTrackersViewController dealloc];
-    [fPeersViewController dealloc];
-    [fFileViewController dealloc];
-    [fOptionsViewController dealloc];
     
-    [fTorrents release];
     
-    [super dealloc];
 }
 
 - (void) setInfoForTorrents: (NSArray *) torrents
@@ -157,8 +149,7 @@ typedef enum
     if (fTorrents && [fTorrents isEqualToArray: torrents])
         return;
     
-    [fTorrents release];
-    fTorrents = [torrents retain];
+    fTorrents = torrents;
     
     [self resetInfo];
 }
