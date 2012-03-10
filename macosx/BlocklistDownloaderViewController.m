@@ -37,11 +37,15 @@
 
 @implementation BlocklistDownloaderViewController
 
-#warning make gcd singleton
+#warning make gcd singleton?
+BlocklistDownloaderViewController * fDLViewController = nil;
 + (void) downloadWithPrefsController: (PrefsController *) prefsController
 {
-    BlocklistDownloaderViewController * downloader = [[BlocklistDownloaderViewController alloc] initWithPrefsController: prefsController];
-    [downloader startDownload];
+    if (!fDLViewController)
+    {
+        fDLViewController = [[BlocklistDownloaderViewController alloc] initWithPrefsController: prefsController];
+        [fDLViewController startDownload];
+    }
 }
 
 - (void) awakeFromNib
@@ -102,6 +106,7 @@
     [NSApp endSheet: fStatusWindow];
     [fStatusWindow orderOut: self];
     
+    fDLViewController = nil;
 }
 
 - (void) setFailed: (NSString *) error
@@ -148,6 +153,8 @@
 - (void) failureSheetClosed: (NSAlert *) alert returnCode: (NSInteger) code contextInfo: (void *) info
 {
     [[alert window] orderOut: self];
+    
+    fDLViewController = nil;
 }
 
 @end

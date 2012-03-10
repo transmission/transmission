@@ -89,11 +89,6 @@
 - (void) dealloc
 {
     [[NSNotificationCenter defaultCenter] removeObserver: self];
-    
-    
-    
-    
-    
 }
 
 - (void) awakeFromNib

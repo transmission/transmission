@@ -25,9 +25,6 @@
 #import "PeerProgressIndicatorCell.h"
 #import "NSStringAdditions.h"
 
-#import "transmission.h" // required by utils.h
-#import "utils.h"
-
 @implementation PeerProgressIndicatorCell
 
 - (void) setSeed: (BOOL) seed
@@ -53,10 +50,7 @@
     else
     {
         //attributes not needed anymore
-        if (fAttributes)
-        {
-            fAttributes = nil;
-        }
+        fAttributes = nil;
         
         [super drawWithFrame: cellFrame inView: controlView];
         if (fSeed)

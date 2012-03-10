@@ -26,12 +26,14 @@
 
 @implementation BonjourController
 
-#warning make gcd singleton
 BonjourController * fDefaultController = nil;
 + (BonjourController *) defaultController
 {
-    if (!fDefaultController)
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
         fDefaultController = [[BonjourController alloc] init];
+    });
+    
     return fDefaultController;
 }
 
