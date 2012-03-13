@@ -140,12 +140,12 @@ typedef enum
     if ([fViewController respondsToSelector: @selector(saveViewSize)])
         [fViewController saveViewSize];
     
-    [fGeneralViewController dealloc];
-    [fActivityViewController dealloc];
-    [fTrackersViewController dealloc];
-    [fPeersViewController dealloc];
-    [fFileViewController dealloc];
-    [fOptionsViewController dealloc];
+    [fGeneralViewController release];
+    [fActivityViewController release];
+    [fTrackersViewController release];
+    [fPeersViewController release];
+    [fFileViewController release];
+    [fOptionsViewController release];
     
     [fTorrents release];
     
