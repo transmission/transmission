@@ -58,6 +58,9 @@
 {
     [fTimer invalidate];
     
+    [fConnection release];
+    [fPortProbeData release];
+    [super dealloc];
 }
 
 - (port_status_t) status
@@ -92,6 +95,7 @@
 - (void) connectionDidFinishLoading: (NSURLConnection *) connection
 {
     NSString * probeString = [[NSString alloc] initWithData: fPortProbeData encoding: NSUTF8StringEncoding];
+    [fPortProbeData release];
     fPortProbeData = nil;
     
     if (probeString)
@@ -105,6 +109,7 @@
             NSLog(@"Unable to get port status: invalid response (%@)", probeString);
             [self callBackWithStatus: PORT_STATUS_ERROR];
         }
+        [probeString release];
     }
     else
     {

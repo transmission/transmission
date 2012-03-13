@@ -37,14 +37,10 @@
 
 @implementation BlocklistDownloaderViewController
 
-BlocklistDownloaderViewController * fBLViewController = nil;
 + (void) downloadWithPrefsController: (PrefsController *) prefsController
 {
-    if (!fBLViewController)
-    {
-        fBLViewController = [[BlocklistDownloaderViewController alloc] initWithPrefsController: prefsController];
-        [fBLViewController startDownload];
-    }
+    BlocklistDownloaderViewController * downloader = [[BlocklistDownloaderViewController alloc] initWithPrefsController: prefsController];
+    [downloader startDownload];
 }
 
 - (void) awakeFromNib
@@ -105,7 +101,7 @@ BlocklistDownloaderViewController * fBLViewController = nil;
     [NSApp endSheet: fStatusWindow];
     [fStatusWindow orderOut: self];
     
-    fBLViewController = nil;
+    [self release];
 }
 
 - (void) setFailed: (NSString *) error
@@ -113,7 +109,7 @@ BlocklistDownloaderViewController * fBLViewController = nil;
     [NSApp endSheet: fStatusWindow];
     [fStatusWindow orderOut: self];
     
-    NSAlert * alert = [[NSAlert alloc] init];
+    NSAlert * alert = [[[NSAlert alloc] init] autorelease];
     [alert addButtonWithTitle: NSLocalizedString(@"OK", "Blocklist -> button")];
     [alert setMessageText: NSLocalizedString(@"Download of the blocklist failed.", "Blocklist -> message")];
     [alert setAlertStyle: NSWarningAlertStyle];
@@ -152,8 +148,7 @@ BlocklistDownloaderViewController * fBLViewController = nil;
 - (void) failureSheetClosed: (NSAlert *) alert returnCode: (NSInteger) code contextInfo: (void *) info
 {
     [[alert window] orderOut: self];
-    
-    fBLViewController = nil;
+    [self release];
 }
 
 @end

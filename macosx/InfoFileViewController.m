@@ -61,11 +61,18 @@
     [[fFileFilterField cell] setPlaceholderString: NSLocalizedString(@"Filter", "inspector -> file filter")];
 }
 
+- (void) dealloc
+{
+    [fTorrents release];
+    
+    [super dealloc];
+}
 
 - (void) setInfoForTorrents: (NSArray *) torrents
 {
     //don't check if it's the same in case the metadata changed
-    fTorrents = torrents;
+    [fTorrents release];
+    fTorrents = [torrents retain];
     
     fSet = NO;
 }

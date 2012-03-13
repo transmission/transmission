@@ -109,10 +109,11 @@
         [fStatusAttributes setObject: [NSFont messageFontOfSize: 9.0] forKey: NSFontAttributeName];
         [fStatusAttributes setObject: paragraphStyle forKey: NSParagraphStyleAttributeName];
         
+        [paragraphStyle release];
         
-        fBluePieceColor = [NSColor colorWithCalibratedRed: 0.0 green: 0.4 blue: 0.8 alpha: 1.0];
-        fBarBorderColor = [NSColor colorWithCalibratedWhite: 0.0 alpha: 0.2];
-        fBarMinimalBorderColor = [NSColor colorWithCalibratedWhite: 0.0 alpha: 0.015];
+        fBluePieceColor = [[NSColor colorWithCalibratedRed: 0.0 green: 0.4 blue: 0.8 alpha: 1.0] retain];
+        fBarBorderColor = [[NSColor colorWithCalibratedWhite: 0.0 alpha: 0.2] retain];
+        fBarMinimalBorderColor = [[NSColor colorWithCalibratedWhite: 0.0 alpha: 0.015] retain];
     }
 	return self;
 }
@@ -241,6 +242,8 @@
         [rowInfo setObject: @"Row" forKey: @"Type"];
         NSTrackingArea * area = [[NSTrackingArea alloc] initWithRect: cellFrame options: rowOptions owner: controlView userInfo: rowInfo];
         [controlView addTrackingArea: area];
+        [rowInfo release];
+        [area release];
     }
     
     //control button
@@ -257,6 +260,8 @@
     NSTrackingArea * area = [[NSTrackingArea alloc] initWithRect: controlButtonRect options: controlOptions owner: controlView
                                 userInfo: controlInfo];
     [controlView addTrackingArea: area];
+    [controlInfo release];
+    [area release];
     
     //reveal button
     NSRect revealButtonRect = [self revealButtonRectForBounds: cellFrame];
@@ -272,6 +277,8 @@
     area = [[NSTrackingArea alloc] initWithRect: revealButtonRect options: revealOptions owner: controlView
                                 userInfo: revealInfo];
     [controlView addTrackingArea: area];
+    [revealInfo release];
+    [area release];
     
     //action button
     NSRect actionButtonRect = [self iconRectForBounds: cellFrame]; //use the whole icon
@@ -286,6 +293,8 @@
     [actionInfo setObject: @"Action" forKey: @"Type"];
     area = [[NSTrackingArea alloc] initWithRect: actionButtonRect options: actionOptions owner: controlView userInfo: actionInfo];
     [controlView addTrackingArea: area];
+    [actionInfo release];
+    [area release];
 }
 
 - (void) setHover: (BOOL) hover
@@ -351,6 +360,7 @@
         NSGradient * gradient = [[NSGradient alloc] initWithStartingColor: [groupColor blendedColorWithFraction: 0.7
                                     ofColor: [NSColor whiteColor]] endingColor: darkGroupColor];
         [gradient drawInBezierPath: bp angle: 90.0];
+        [gradient release];
     }
     
     const BOOL error = [torrent isAnyErrorOrWarning];
@@ -683,6 +693,7 @@
     [bitmap drawInRect: barRect fromRect: NSZeroRect operation: NSCompositeSourceOver
         fraction: ([fDefaults boolForKey: @"SmallView"] ? 0.25 : 1.0) respectFlipped: YES hints: nil];
 
+    [bitmap release];
 }
 
 - (NSRect) rectForMinimalStatusWithString: (NSAttributedString *) string inBounds: (NSRect) bounds
@@ -817,12 +828,12 @@
 - (NSAttributedString *) attributedTitle
 {
     NSString * title = [(Torrent *)[self representedObject] name];
-    return [[NSAttributedString alloc] initWithString: title attributes: fTitleAttributes];
+    return [[[NSAttributedString alloc] initWithString: title attributes: fTitleAttributes] autorelease];
 }
 
 - (NSAttributedString *) attributedStatusString: (NSString *) string
 {
-    return [[NSAttributedString alloc] initWithString: string attributes: fStatusAttributes];
+    return [[[NSAttributedString alloc] initWithString: string attributes: fStatusAttributes] autorelease];
 }
 
 - (NSString *) buttonString

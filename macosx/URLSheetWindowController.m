@@ -80,21 +80,29 @@ NSString * urlString = nil;
     [fCancelButton setFrame: cancelFrame];
 }
 
-- (IBAction) openURLEndSheet: (id) sender
+- (IBAction) beginSheetForWindow: (NSWindow *) window
+{
+    [NSApp beginSheet: [self window] modalForWindow: window modalDelegate: self
+        didEndSelector: @selector(sheetDidEnd:returnCode:contextInfo:) contextInfo: nil];
+}
+
+- (void) openURLEndSheet: (id) sender
 {
     [[self window] orderOut: sender];
     [NSApp endSheet: [self window] returnCode: 1];
 }
 
-- (IBAction) openURLCancelEndSheet: (id) sender
+- (void) openURLCancelEndSheet: (id) sender
 {
     [[self window] orderOut: sender];
     [NSApp endSheet: [self window] returnCode: 0];
 }
 
-- (NSString *) urlString
+- (void) sheetDidEnd: (NSWindow *) sheet returnCode: (NSInteger) returnCode contextInfo: (void *) contextInfo
 {
-    return [fTextField stringValue];
+    [urlString release];
+    urlString = [[fTextField stringValue] retain];
+    [fController urlSheetDidEnd: self url: urlString returnCode: returnCode];
 }
 
 - (void) controlTextDidChange: (NSNotification *) notification

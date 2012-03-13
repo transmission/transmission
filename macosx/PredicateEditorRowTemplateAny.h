@@ -25,5 +25,7 @@
 #import <Cocoa/Cocoa.h>
 
 @interface PredicateEditorRowTemplateAny : NSPredicateEditorRowTemplate
+{
+}
 
 @end

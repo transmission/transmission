@@ -34,7 +34,7 @@
     
     NSString * fName;
     NSString * fPath;
-    Torrent * __unsafe_unretained fTorrent;
+    Torrent * fTorrent;
     uint64_t fSize;
     NSImage * fIcon;
     BOOL fIsFolder;
@@ -43,7 +43,7 @@
 @property (nonatomic, readonly) NSString * name;
 @property (nonatomic, readonly) NSString * path;
 
-@property (nonatomic, readonly, unsafe_unretained) Torrent * torrent;
+@property (nonatomic, readonly) Torrent * torrent;
 
 @property (nonatomic, readonly) uint64_t size;
 @property (nonatomic, readonly) NSImage * icon;

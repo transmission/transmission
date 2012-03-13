@@ -54,13 +54,25 @@
                                 smallFont, NSFontAttributeName, stringShadow, NSShadowAttributeName,
                                 paragraphStyle, NSParagraphStyleAttributeName, nil];
         
+        [stringShadow release];
+        [paragraphStyle release];
     }
     return self;
 }
 
+- (void) dealloc
+{
+    [fBadge release];
+    
+    [fMainLineAttributes release];
+    [fSubLineAttributes release];
+    
+    [super dealloc];
+}
 
 - (void) setOverlay: (NSImage *) icon mainLine: (NSString *) mainLine subLine: (NSString *) subLine
 {
+    [fBadge release];
     
     //create badge
     const NSRect badgeRect = NSMakeRect(0.0, 0.0, 325.0, 84.0);

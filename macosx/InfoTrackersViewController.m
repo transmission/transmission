@@ -74,11 +74,20 @@
     }
 }
 
+- (void) dealloc
+{
+    [fTorrents release];
+    [fTrackers release];
+    [fTrackerCell release];
+    
+    [super dealloc];
+}
 
 - (void) setInfoForTorrents: (NSArray *) torrents
 {
     //don't check if it's the same in case the metadata changed
-    fTorrents = torrents;
+    [fTorrents release];
+    fTorrents = [torrents retain];
     
     fSet = NO;
 }
@@ -97,7 +106,7 @@
         NSArray * oldTrackers = fTrackers;
         
         if ([fTorrents count] == 1)
-            fTrackers = [[fTorrents objectAtIndex: 0] allTrackerStats];
+            fTrackers = [[[fTorrents objectAtIndex: 0] allTrackerStats] retain];
         else
         {
             fTrackers = [[NSMutableArray alloc] init];
@@ -112,6 +121,7 @@
         else
             [fTrackerTable reloadData];
         
+        [oldTrackers release];
     }
     else
     {
@@ -120,7 +130,8 @@
         NSIndexSet * addedIndexes = [NSIndexSet indexSetWithIndexesInRange: NSMakeRange([fTrackers count]-2, 2)];
         NSArray * tierAndTrackerBeingAdded = [fTrackers objectsAtIndexes: addedIndexes];
         
-        fTrackers = [[fTorrents objectAtIndex: 0] allTrackerStats];
+        [fTrackers release];
+        fTrackers = [[[fTorrents objectAtIndex: 0] allTrackerStats] retain];
         [fTrackers addObjectsFromArray: tierAndTrackerBeingAdded];
         
         [fTrackerTable setTrackers: fTrackers];
@@ -138,6 +149,7 @@
 
 - (void) clearView
 {
+    [fTrackers release];
     fTrackers = nil;
 }
 
@@ -219,7 +231,8 @@
         NSBeep();
     
     //reset table with either new or old value
-    fTrackers = [torrent allTrackerStats];
+    [fTrackers release];
+    fTrackers = [[torrent allTrackerStats] retain];
     
     [fTrackerTable setTrackers: fTrackers];
     [fTrackerTable reloadData];
@@ -253,6 +266,7 @@
     {
         if (numberSelected == 0)
         {
+            [fTrackers release];
             fTrackers = nil;
             
             [fTrackerTable setTrackers: nil];
@@ -379,6 +393,7 @@
         NSInteger result = [alert runModal];
         if ([[alert suppressionButton] state] == NSOnState)
             [[NSUserDefaults standardUserDefaults] setBool: NO forKey: @"WarningRemoveTrackers"];
+        [alert release];
         
         if (result != NSAlertFirstButtonReturn)
             return;
@@ -392,6 +407,7 @@
         [torrent removeTrackers: [removeIdentifiers objectForKey: torrent]];
     
     //reset table with either new or old value
+    [fTrackers release];
     fTrackers = [[NSMutableArray alloc] init];
     for (Torrent * torrent in fTorrents)
         [fTrackers addObjectsFromArray: [torrent allTrackerStats]];

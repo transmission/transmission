@@ -38,7 +38,7 @@
     
     IBOutlet FileOutlineController * fFileController;
     
-    __unsafe_unretained Controller * fController;
+    Controller * fController;
     
     Torrent * fTorrent;
     NSString * fDestination, * fTorrentFile;

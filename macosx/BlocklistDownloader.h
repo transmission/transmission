@@ -37,7 +37,7 @@ typedef enum
 {
     NSURLDownload * fDownload;
     
-    __unsafe_unretained BlocklistDownloaderViewController * fViewController;
+    BlocklistDownloaderViewController * fViewController;
     
     NSString * fDestination;
     NSUInteger fCurrentSize;

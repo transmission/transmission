@@ -48,6 +48,7 @@
         
         DragOverlayView * view = [[DragOverlayView alloc] initWithFrame: [self frame]];
         [self setContentView: view];
+        [view release];
         
         [self setReleasedWhenClosed: NO];
         [self setIgnoresMouseEvents: YES];
@@ -76,7 +77,10 @@
 {
     [[NSNotificationCenter defaultCenter] removeObserver: self];
     
+    [fFadeInAnimation release];
+    [fFadeOutAnimation release];
     
+    [super dealloc];
 }
 
 - (void) setTorrents: (NSArray *) files

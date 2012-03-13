@@ -25,7 +25,24 @@
 #import "PeerProgressIndicatorCell.h"
 #import "NSStringAdditions.h"
 
+#import "transmission.h" // required by utils.h
+#import "utils.h"
+
 @implementation PeerProgressIndicatorCell
+
+- (id) copyWithZone: (NSZone *) zone
+{
+    PeerProgressIndicatorCell * copy = [super copyWithZone: zone];
+    copy->fAttributes = [fAttributes retain];
+    
+    return copy;
+}
+
+- (void) dealloc
+{
+    [fAttributes release];
+    [super dealloc];
+}
 
 - (void) setSeed: (BOOL) seed
 {
@@ -43,6 +60,7 @@
             
             fAttributes = [[NSDictionary alloc] initWithObjectsAndKeys: [NSFont systemFontOfSize: 11.0], NSFontAttributeName,
                                                                             paragraphStyle, NSParagraphStyleAttributeName, nil];
+            [paragraphStyle release];
         }
         
         [[NSString percentString: [self floatValue] longDecimals: NO] drawInRect: cellFrame withAttributes: fAttributes];
@@ -50,7 +68,11 @@
     else
     {
         //attributes not needed anymore
-        fAttributes = nil;
+        if (fAttributes)
+        {
+            [fAttributes release];
+            fAttributes = nil;
+        }
         
         [super drawWithFrame: cellFrame inView: controlView];
         if (fSeed)

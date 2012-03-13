@@ -139,20 +139,20 @@ static void altSpeedToggledCallback(tr_session * handle UNUSED, bool active, boo
 {
     NSDictionary * dict = [[NSDictionary alloc] initWithObjectsAndKeys: [[NSNumber alloc] initWithBool: active], @"Active",
                                 [[NSNumber alloc] initWithBool: byUser], @"ByUser", nil];
-    [(__bridge Controller *)controller performSelectorOnMainThread: @selector(altSpeedToggledCallbackIsLimited:)
+    [(Controller *)controller performSelectorOnMainThread: @selector(altSpeedToggledCallbackIsLimited:)
         withObject: dict waitUntilDone: NO];
 }
 
 static tr_rpc_callback_status rpcCallback(tr_session * handle UNUSED, tr_rpc_callback_type type, struct tr_torrent * torrentStruct,
                                             void * controller)
 {
-    [(__bridge Controller *)controller rpcCallback: type forTorrentStruct: torrentStruct];
+    [(Controller *)controller rpcCallback: type forTorrentStruct: torrentStruct];
     return TR_RPC_NOREMOVE; //we'll do the remove manually
 }
 
 static void sleepCallback(void * controller, io_service_t y, natural_t messageType, void * messageArgument)
 {
-    [(__bridge Controller *)controller sleepCallback: messageType argument: messageArgument];
+    [(Controller *)controller sleepCallback: messageType argument: messageArgument];
 }
 
 @implementation Controller
@@ -172,6 +172,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         [alert setAlertStyle: NSCriticalAlertStyle];
         
         [alert runModal];
+        [alert release];
         
         //kill ourselves right away
         exit(0);
@@ -181,10 +182,10 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         [[NSBundle mainBundle] pathForResource: @"Defaults" ofType: @"plist"]]];
     
     //set custom value transformers
-    ExpandedPathToPathTransformer * pathTransformer = [[ExpandedPathToPathTransformer alloc] init];
+    ExpandedPathToPathTransformer * pathTransformer = [[[ExpandedPathToPathTransformer alloc] init] autorelease];
     [NSValueTransformer setValueTransformer: pathTransformer forName: @"ExpandedPathToPathTransformer"];
     
-    ExpandedPathToIconTransformer * iconTransformer = [[ExpandedPathToIconTransformer alloc] init];
+    ExpandedPathToIconTransformer * iconTransformer = [[[ExpandedPathToIconTransformer alloc] init] autorelease];
     [NSValueTransformer setValueTransformer: iconTransformer forName: @"ExpandedPathToIconTransformer"];
     
     //cover our asses
@@ -202,6 +203,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         
         if ([alert runModal] == NSAlertSecondButtonReturn)
             exit(0);
+        [alert release];
         
         [[NSUserDefaults standardUserDefaults] setBool: NO forKey: @"WarningLegal"];
     }
@@ -340,11 +342,11 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         fGlobalPopoverShown = NO;
         fSoundPlaying = NO;
         
-        tr_sessionSetAltSpeedFunc(fLib, altSpeedToggledCallback, (__bridge void *)(self));
+        tr_sessionSetAltSpeedFunc(fLib, altSpeedToggledCallback, self);
         if (usesSpeedLimitSched)
             [fDefaults setBool: tr_sessionUsesAltSpeed(fLib) forKey: @"SpeedLimit"];
         
-        tr_sessionSetRPCCallback(fLib, rpcCallback, (__bridge void *)(self));
+        tr_sessionSetRPCCallback(fLib, rpcCallback, self);
         
         [GrowlApplicationBridge setGrowlDelegate: self];
         
@@ -366,6 +368,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     [toolbar setAutosavesConfiguration: YES];
     [toolbar setDisplayMode: NSToolbarDisplayModeIconOnly];
     [fWindow setToolbar: toolbar];
+    [toolbar release];
     
     [fWindow setDelegate: self]; //do manually to avoid placement issue
     
@@ -435,7 +438,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     //register for sleep notifications
     IONotificationPortRef notify;
     io_object_t iterator;
-    if ((fRootPort = IORegisterForSystemPower((__bridge void *)(self), & notify, sleepCallback, &iterator)))
+    if ((fRootPort = IORegisterForSystemPower(self, & notify, sleepCallback, &iterator)))
         CFRunLoopAddSource(CFRunLoopGetCurrent(), IONotificationPortGetRunLoopSource(notify), kCFRunLoopCommonModes);
     else
         NSLog(@"Could not IORegisterForSystemPower");
@@ -465,6 +468,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
                 if (!fPauseOnLaunch && (waitToStart = [historyItem objectForKey: @"WaitToStart"]) && [waitToStart boolValue])
                     [waitToStartTorrents addObject: torrent];
                 
+                [torrent release];
             }
         }
         
@@ -595,6 +599,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
             if (allowNeverAgain)
                 [fDefaults setBool: ([[alert suppressionButton] state] != NSOnState) forKey: @"WarningDonate"];
             
+            [alert release];
         }
     }
 }
@@ -665,6 +670,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     {   
         if ([fAutoImportTimer isValid])
             [fAutoImportTimer invalidate];
+        [fAutoImportTimer release];
     }
     
     [fBadger setQuitting];
@@ -676,7 +682,9 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         {
             NSURLDownload * download = [downloadDict objectForKey: @"Download"];
             [download cancel];
+            [download release];
         }
+        [fPendingTorrentDownloads release];
     }
     
     //remember window states and close all windows
@@ -694,6 +702,26 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     //save history
     [self updateTorrentHistory];
     [fTableView saveCollapsedGroups];
+    
+    //remaining calls the same as dealloc 
+    [fInfoController release];
+    [fMessageController release];
+    [fPrefsController release];
+    
+    [fStatusBar release];
+    [fFilterBar release];
+    
+    [fTorrents release];
+    [fDisplayedTorrents release];
+    
+    [fAddingTransfers release];
+    
+    [fOverlayWindow release];
+    [fBadger release];
+    
+    [fAutoImportedNames release];
+    
+    [fPreviewPanel release];
     
     //complete cleanup
     tr_sessionClose(fLib);
@@ -723,15 +751,13 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     {
         [download cancel];
         
-        [fPendingTorrentDownloads removeObjectForKey: [[download request] URL]];
-        if ([fPendingTorrentDownloads count] == 0)
-            fPendingTorrentDownloads = nil;
-        
         NSRunAlertPanel(NSLocalizedString(@"Torrent download failed", "Download not a torrent -> title"),
             [NSString stringWithFormat: NSLocalizedString(@"It appears that the file \"%@\" from %@ is not a torrent file.",
             "Download not a torrent -> message"), suggestedName,
             [[[[download request] URL] absoluteString] stringByReplacingPercentEscapesUsingEncoding: NSUTF8StringEncoding]],
             NSLocalizedString(@"OK", "Download not a torrent -> button"), nil, nil);
+        
+        [download release];
     }
     else
         [download setDestination: [NSTemporaryDirectory() stringByAppendingPathComponent: [suggestedName lastPathComponent]]
@@ -740,7 +766,11 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 
 -(void) download: (NSURLDownload *) download didCreateDestination: (NSString *) path
 {
-    [(NSMutableDictionary *)[fPendingTorrentDownloads objectForKey: [[download request] URL]] setObject: path forKey: @"Path"];
+    if (!fPendingTorrentDownloads)
+        fPendingTorrentDownloads = [[NSMutableDictionary alloc] init];
+    
+    [fPendingTorrentDownloads setObject: [NSDictionary dictionaryWithObjectsAndKeys:
+                    path, @"Path", download, @"Download", nil] forKey: [[download request] URL]];
 }
 
 - (void) download: (NSURLDownload *) download didFailWithError: (NSError *) error
@@ -753,7 +783,12 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     
     [fPendingTorrentDownloads removeObjectForKey: [[download request] URL]];
     if ([fPendingTorrentDownloads count] == 0)
+    {
+        [fPendingTorrentDownloads release];
         fPendingTorrentDownloads = nil;
+    }
+    
+    [download release];
 }
 
 - (void) downloadDidFinish: (NSURLDownload *) download
@@ -767,7 +802,12 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     
     [fPendingTorrentDownloads removeObjectForKey: [[download request] URL]];
     if ([fPendingTorrentDownloads count] == 0)
+    {
+        [fPendingTorrentDownloads release];
         fPendingTorrentDownloads = nil;
+    }
+    
+    [download release];
 }
 
 - (void) application: (NSApplication *) app openFiles: (NSArray *) filenames
@@ -861,10 +901,6 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
                                                     lockDestination: lockDestination controller: self torrentFile: torrentPath
                                                     deleteTorrent: deleteTorrentFile canToggleDelete: canToggleDelete];
             [addController showWindow: self];
-            
-            if (!fAddWindows)
-                fAddWindows = [NSMutableSet set];
-            [fAddWindows addObject: addController];
         }
         else
         {
@@ -873,6 +909,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
             
             [torrent update];
             [fTorrents addObject: torrent];
+            [torrent release];
             
             if (!fAddingTransfers)
                 fAddingTransfers = [[NSMutableSet alloc] init];
@@ -886,6 +923,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 - (void) askOpenConfirmed: (AddWindowController *) addController add: (BOOL) add
 {
     Torrent * torrent = [addController torrent];
+    [addController autorelease];
     
     if (add)
     {
@@ -893,6 +931,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         
         [torrent update];
         [fTorrents addObject: torrent];
+        [torrent release];
         
         if (!fAddingTransfers)
             fAddingTransfers = [[NSMutableSet alloc] init];
@@ -903,11 +942,8 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     else
     {
         [torrent closeRemoveTorrent: NO];
+        [torrent release];
     }
-    
-    [fAddWindows removeObject: addController];
-    if ([fAddWindows count] == 0)
-        fAddWindows = nil;
 }
 
 - (void) openMagnet: (NSString *) address
@@ -945,10 +981,6 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         AddMagnetWindowController * addController = [[AddMagnetWindowController alloc] initWithTorrent: torrent destination: location
                                                         controller: self];
         [addController showWindow: self];
-        
-        if (!fAddWindows)
-            fAddWindows = [NSMutableSet set];
-        [fAddWindows addObject: addController];
     }
     else
     {
@@ -957,6 +989,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         
         [torrent update];
         [fTorrents addObject: torrent];
+        [torrent release];
         
         if (!fAddingTransfers)
             fAddingTransfers = [[NSMutableSet alloc] init];
@@ -969,6 +1002,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 - (void) askOpenMagnetConfirmed: (AddMagnetWindowController *) addController add: (BOOL) add
 {
     Torrent * torrent = [addController torrent];
+    [addController autorelease];
     
     if (add)
     {
@@ -976,6 +1010,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         
         [torrent update];
         [fTorrents addObject: torrent];
+        [torrent release];
         
         if (!fAddingTransfers)
             fAddingTransfers = [[NSMutableSet alloc] init];
@@ -986,22 +1021,23 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     else
     {
         [torrent closeRemoveTorrent: NO];
+        [torrent release];
     }
-    
-    [fAddWindows removeObject: addController];
-    if ([fAddWindows count] == 0)
-        fAddWindows = nil;
 }
 
 - (void) openCreatedFile: (NSNotification *) notification
 {
     NSDictionary * dict = [notification userInfo];
-    [self openFiles: [NSArray arrayWithObject: [dict objectForKey: @"File"]] addType: ADD_CREATED forcePath: [dict objectForKey: @"Path"]];
+    [self openFiles: [NSArray arrayWithObject: [dict objectForKey: @"File"]] addType: ADD_CREATED
+                        forcePath: [dict objectForKey: @"Path"]];
+    [dict release];
 }
 
 - (void) openFilesWithDict: (NSDictionary *) dictionary
 {
     [self openFiles: [dictionary objectForKey: @"Filenames"] addType: [[dictionary objectForKey: @"AddType"] intValue] forcePath: nil];
+    
+    [dictionary release];
 }
 
 //called on by applescript
@@ -1053,6 +1089,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     [alert runModal];
     if ([[alert suppressionButton] state] == NSOnState)
         [fDefaults setBool: NO forKey: @"WarningInvalidOpen"];
+    [alert release];
 }
 
 - (void) invalidOpenMagnetAlert: (NSString *) address
@@ -1070,6 +1107,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     [alert runModal];
     if ([[alert suppressionButton] state] == NSOnState)
         [fDefaults setBool: NO forKey: @"WarningInvalidOpen"];
+    [alert release];
 }
 
 - (void) duplicateOpenAlert: (NSString *) name
@@ -1090,6 +1128,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     [alert runModal];
     if ([[alert suppressionButton] state])
         [fDefaults setBool: NO forKey: @"WarningDuplicate"];
+    [alert release];
 }
 
 - (void) duplicateOpenMagnetAlert: (NSString *) address transferName: (NSString *) name
@@ -1114,6 +1153,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     [alert runModal];
     if ([[alert suppressionButton] state])
         [fDefaults setBool: NO forKey: @"WarningDuplicate"];
+    [alert release];
 }
 
 - (void) openURL: (NSString *) urlString
@@ -1140,41 +1180,21 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         
         NSURLRequest * request = [NSURLRequest requestWithURL: [NSURL URLWithString: urlString]
                                     cachePolicy: NSURLRequestReloadIgnoringLocalAndRemoteCacheData timeoutInterval: 60];
-        
-        if ([fPendingTorrentDownloads objectForKey: [request URL]])
-        {
-            NSLog(@"Already downloading %@", [request URL]);
-            return;
-        }
-        
-        NSURLDownload * download = [[NSURLDownload alloc] initWithRequest: request delegate: self];
-        
-        if (!fPendingTorrentDownloads)
-            fPendingTorrentDownloads = [[NSMutableDictionary alloc] init];
-        
-        [fPendingTorrentDownloads setObject: [NSMutableDictionary dictionaryWithObject: download forKey: @"Download"] forKey: [request URL]];
+        [[NSURLDownload alloc] initWithRequest: request delegate: self];
     }
 }
 
 - (void) openURLShowSheet: (id) sender
 {
-    if (!fUrlSheetController)
-    {
-        fUrlSheetController = [[URLSheetWindowController alloc] initWithController: self];
-        
-        [NSApp beginSheet: [fUrlSheetController window] modalForWindow: fWindow modalDelegate: self didEndSelector: @selector(urlSheetDidEnd:returnCode:contextInfo:) contextInfo: nil];
-    }
+    [[[URLSheetWindowController alloc] initWithController: self] beginSheetForWindow: fWindow];
 }
 
-- (void) urlSheetDidEnd: (NSWindow *) sheet returnCode: (NSInteger) returnCode contextInfo: (void *) contextInfo
+- (void) urlSheetDidEnd: (URLSheetWindowController *) controller url: (NSString *) urlString returnCode: (NSInteger) returnCode
 {
     if (returnCode == 1)
-    {
-        NSString * urlString = [fUrlSheetController urlString];
         [self performSelectorOnMainThread: @selector(openURL:) withObject: urlString waitUntilDone: NO];
-    }
     
-    fUrlSheetController = nil;
+    [controller release];
 }
 
 - (void) createFile: (id) sender
@@ -1256,6 +1276,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 
 - (void) removeTorrents: (NSArray *) torrents deleteData: (BOOL) deleteData
 {
+    [torrents retain];
 
     if ([fDefaults boolForKey: @"CheckRemove"])
     {
@@ -1318,7 +1339,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
             
             NSBeginAlertSheet(title, NSLocalizedString(@"Remove", "Removal confirm panel -> button"),
                 NSLocalizedString(@"Cancel", "Removal confirm panel -> button"), nil, fWindow, self,
-                nil, @selector(removeSheetDidEnd:returnCode:contextInfo:), (__bridge void *)dict, message);
+                nil, @selector(removeSheetDidEnd:returnCode:contextInfo:), dict, message);
             return;
         }
     }
@@ -1331,6 +1352,10 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     NSArray * torrents = [dict objectForKey: @"Torrents"];
     if (returnCode == NSAlertDefaultReturn)
         [self confirmRemoveTorrents: torrents deleteData: [[dict objectForKey: @"DeleteData"] boolValue]];
+    else
+        [torrents release];
+    
+    [dict release];
 }
 
 - (void) confirmRemoveTorrents: (NSArray *) torrents deleteData: (BOOL) deleteData
@@ -1418,6 +1443,9 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         [fTableView selectValues: selectedValues];
     
     [self fullUpdateUI];
+    
+    #warning why do we need them retained?
+    [torrents autorelease];
 }
 
 - (void) removeNoDelete: (id) sender
@@ -1459,7 +1487,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
                                      "Remove completed confirm panel -> message");
         }
         
-        NSAlert * alert = [[NSAlert alloc] init];
+        NSAlert * alert = [[[NSAlert alloc] init] autorelease];
         [alert setMessageText: message];
         [alert setInformativeText: info];
         [alert setAlertStyle: NSWarningAlertStyle];
@@ -1473,6 +1501,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         
         if (returnCode != NSAlertFirstButtonReturn)
         {
+            [torrents release];
             return;
         }
     }
@@ -1520,6 +1549,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 {
     if ([torrents count] == 0)
     {
+        [torrents release];
         return;
     }
     
@@ -1556,6 +1586,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
             [alert setAlertStyle: NSWarningAlertStyle];
             
             [alert runModal];
+            [alert release];
         }
         
         [torrents removeObjectAtIndex: 0];
@@ -2269,7 +2300,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
                         TorrentGroup * newGroup = [groupsByIndex objectForKey: [NSNumber numberWithInteger: groupValue]];
                         if (!newGroup)
                         {
-                            newGroup = [[TorrentGroup alloc] initWithGroup: groupValue];
+                            newGroup = [[[TorrentGroup alloc] initWithGroup: groupValue] autorelease];
                             [groupsByIndex setObject: newGroup forKey: [NSNumber numberWithInteger: groupValue]];
                             [fDisplayedTorrents addObject: newGroup];
                             
@@ -2315,7 +2346,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
             TorrentGroup * group = [groupsByIndex objectForKey: [NSNumber numberWithInteger: groupValue]];
             if (!group)
             {
-                group = [[TorrentGroup alloc] initWithGroup: groupValue];
+                group = [[[TorrentGroup alloc] initWithGroup: groupValue] autorelease];
                 [groupsByIndex setObject: group forKey: [NSNumber numberWithInteger: groupValue]];
                 [fDisplayedTorrents addObject: group];
                 
@@ -2378,7 +2409,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
                 TorrentGroup * group = [groupsByIndex objectForKey: [NSNumber numberWithInteger: groupValue]];
                 if (!group)
                 {
-                    group = [[TorrentGroup alloc] initWithGroup: groupValue];
+                    group = [[[TorrentGroup alloc] initWithGroup: groupValue] autorelease];
                     [groupsByIndex setObject: group forKey: [NSNumber numberWithInteger: groupValue]];
                 }
                 
@@ -2446,6 +2477,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     
     if (fAddingTransfers)
     {
+        [fAddingTransfers release];
         fAddingTransfers = nil;
     }
 }
@@ -2470,6 +2502,8 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         
         [popover showRelativeToRect: [sender frame] ofView: sender preferredEdge: NSMaxYEdge];
         
+        [viewController release];
+        [popover release];
     }
     else
     {
@@ -2505,9 +2539,10 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         const NSInteger groupMenuCount = [groupMenu numberOfItems];
         for (NSInteger i = 0; i < groupMenuCount; i++)
         {
-            NSMenuItem * item = [groupMenu itemAtIndex: 0];
+            NSMenuItem * item = [[groupMenu itemAtIndex: 0] retain];
             [groupMenu removeItemAtIndex: 0];
             [menu addItem: item];
+            [item release];
         }
     }
     else if (menu == fUploadMenu || menu == fDownloadMenu)
@@ -2526,6 +2561,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
             [item setTarget: self];
             [item setRepresentedObject: [NSNumber numberWithInt: speedLimitActionValue[i]]];
             [menu addItem: item];
+            [item release];
         }
     }
     else if (menu == fRatioStopMenu)
@@ -2543,6 +2579,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
             [item setTarget: self];
             [item setRepresentedObject: [NSNumber numberWithFloat: ratioLimitActionValue[i]]];
             [menu addItem: item];
+            [item release];
         }
     }
     else;
@@ -2589,6 +2626,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
             description: NSLocalizedString(@"Bandwidth settings changed", "Growl notification description")
             notificationName: GROWL_AUTO_SPEED_LIMIT iconData: nil priority: 0 isSticky: NO clickContext: nil];
     
+    [dict release];
 }
 
 - (void) setLimitGlobalEnabled: (id) sender
@@ -2640,12 +2678,13 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         {
             if ([fAutoImportTimer isValid])
                 [fAutoImportTimer invalidate];
+            [fAutoImportTimer release];
             fAutoImportTimer = nil;
         }
         
         //check again in 10 seconds in case torrent file wasn't complete
-        fAutoImportTimer = [NSTimer scheduledTimerWithTimeInterval: 10.0 target: self 
-            selector: @selector(checkAutoImportDirectory) userInfo: nil repeats: NO];
+        fAutoImportTimer = [[NSTimer scheduledTimerWithTimeInterval: 10.0 target: self 
+            selector: @selector(checkAutoImportDirectory) userInfo: nil repeats: NO] retain];
         
         [self checkAutoImportDirectory];
     }
@@ -2657,10 +2696,15 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     {
         if ([fAutoImportTimer isValid])
             [fAutoImportTimer invalidate];
+        [fAutoImportTimer release];
         fAutoImportTimer = nil;
     }
     
-    fAutoImportedNames = nil;
+    if (fAutoImportedNames)
+    {
+        [fAutoImportedNames release];
+        fAutoImportedNames = nil;
+    }
     
     [self checkAutoImportDirectory];
 }
@@ -2721,6 +2765,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         tr_ctorFree(ctor);
     }
     
+    [newNames release];
 }
 
 - (void) beginCreateFile: (NSNotification *) notification
@@ -3258,6 +3303,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     if (!show)
     {
         [[fStatusBar view] removeFromSuperviewWithoutNeedingDisplay];
+        [fStatusBar release];
         fStatusBar = nil;
     }
     
@@ -3355,6 +3401,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     if (!show)
     {
         [[fFilterBar view] removeFromSuperviewWithoutNeedingDisplay];
+        [fFilterBar release];
         fFilterBar = nil;
     }
     
@@ -3383,13 +3430,14 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 
 - (void) beginPreviewPanelControl: (QLPreviewPanel *) panel
 {
-    fPreviewPanel = panel;
+    fPreviewPanel = [panel retain];
     [fPreviewPanel setDelegate: self];
     [fPreviewPanel setDataSource: self];
 }
 
 - (void) endPreviewPanelControl: (QLPreviewPanel *) panel
 {
+    [fPreviewPanel release];
     fPreviewPanel = nil;
 }
 
@@ -3466,12 +3514,13 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     [button setStringValue: @""];
     
     [item setView: button];
+    [button release];
     
     const NSSize buttonSize = NSMakeSize(36.0, 25.0);
     [item setMinSize: buttonSize];
     [item setMaxSize: buttonSize];
     
-    return item;
+    return [item autorelease];
 }
 
 - (NSToolbarItem *) toolbar: (NSToolbar *) toolbar itemForItemIdentifier: (NSString *) ident willBeInsertedIntoToolbar: (BOOL) flag
@@ -3551,7 +3600,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         GroupToolbarItem * groupItem = [[GroupToolbarItem alloc] initWithItemIdentifier: ident];
         
         NSSegmentedControl * segmentedControl = [[NSSegmentedControl alloc] initWithFrame: NSZeroRect];
-        [segmentedControl setCell: [[ToolbarSegmentedCell alloc] init]];
+        [segmentedControl setCell: [[[ToolbarSegmentedCell alloc] init] autorelease]];
         [groupItem setView: segmentedControl];
         NSSegmentedCell * segmentedCell = (NSSegmentedCell *)[segmentedControl cell];
         
@@ -3582,17 +3631,18 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         [groupItem createMenu: [NSArray arrayWithObjects: NSLocalizedString(@"Pause All", "All toolbar item -> label"),
                                         NSLocalizedString(@"Resume All", "All toolbar item -> label"), nil]];
         
+        [segmentedControl release];
         
         [groupItem setVisibilityPriority: NSToolbarItemVisibilityPriorityHigh];
         
-        return groupItem;
+        return [groupItem autorelease];
     }
     else if ([ident isEqualToString: TOOLBAR_PAUSE_RESUME_SELECTED])
     {
         GroupToolbarItem * groupItem = [[GroupToolbarItem alloc] initWithItemIdentifier: ident];
         
         NSSegmentedControl * segmentedControl = [[NSSegmentedControl alloc] initWithFrame: NSZeroRect];
-        [segmentedControl setCell: [[ToolbarSegmentedCell alloc] init]];
+        [segmentedControl setCell: [[[ToolbarSegmentedCell alloc] init] autorelease]];
         [groupItem setView: segmentedControl];
         NSSegmentedCell * segmentedCell = (NSSegmentedCell *)[segmentedControl cell];
         
@@ -3623,10 +3673,11 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         [groupItem createMenu: [NSArray arrayWithObjects: NSLocalizedString(@"Pause Selected", "Selected toolbar item -> label"),
                                         NSLocalizedString(@"Resume Selected", "Selected toolbar item -> label"), nil]];
         
+        [segmentedControl release];
         
         [groupItem setVisibilityPriority: NSToolbarItemVisibilityPriorityHigh];
         
-        return groupItem;
+        return [groupItem autorelease];
     }
     else if ([ident isEqualToString: TOOLBAR_FILTER])
     {
@@ -4224,7 +4275,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     [menu addItem: [NSMenuItem separatorItem]];
     [menu addItemWithTitle: NSLocalizedString(@"Speed Limit", "Dock item") action: @selector(toggleSpeedLimit:) keyEquivalent: @""];
     
-    return menu;
+    return [menu autorelease];
 }
 
 - (NSRect) windowWillUseStandardFrame: (NSWindow *) window defaultFrame: (NSRect) defaultFrame
@@ -4387,6 +4438,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
             for (torrent in fTorrents)
                 if (torrentStruct == [torrent torrentStruct])
                 {
+                    [torrent retain];
                     break;
                 }
             
@@ -4401,7 +4453,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         {
             case TR_RPC_TORRENT_ADDED:
                 [self performSelectorOnMainThread: @selector(rpcAddTorrentStruct:) withObject:
-                    [NSValue valueWithPointer: torrentStruct] waitUntilDone: NO];
+                    [[NSValue valueWithPointer: torrentStruct] retain] waitUntilDone: NO];
                 break;
             
             case TR_RPC_TORRENT_STARTED:
@@ -4440,6 +4492,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
             
             default:
                 NSAssert1(NO, @"Unknown RPC command received: %d", type);
+                [torrent release];
         }
     }
 }
@@ -4447,6 +4500,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 - (void) rpcAddTorrentStruct: (NSValue *) torrentStructPtr
 {
     tr_torrent * torrentStruct = (tr_torrent *)[torrentStructPtr pointerValue];
+    [torrentStructPtr release];
     
     NSString * location = nil;
     if (tr_torrentGetDownloadDir(torrentStruct) != NULL)
@@ -4463,6 +4517,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     
     [torrent update];
     [fTorrents addObject: torrent];
+    [torrent release];
     
     if (!fAddingTransfers)
         fAddingTransfers = [[NSMutableSet alloc] init];
@@ -4473,17 +4528,20 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 
 - (void) rpcRemoveTorrent: (Torrent *) torrent
 {
-    [self confirmRemoveTorrents: [NSArray arrayWithObject: torrent] deleteData: NO];
+    [self confirmRemoveTorrents: [[NSArray arrayWithObject: torrent] retain] deleteData: NO];
+    [torrent release];
 }
 
 - (void) rpcRemoveTorrentDeleteData: (Torrent *) torrent
 {
-    [self confirmRemoveTorrents: [NSArray arrayWithObject: torrent] deleteData: YES];
+    [self confirmRemoveTorrents: [[NSArray arrayWithObject: torrent] retain] deleteData: YES];
+    [torrent release];
 }
 
 - (void) rpcStartedStoppedTorrent: (Torrent *) torrent
 {
     [torrent update];
+    [torrent release];
     
     [self updateUI];
     [self applyFilter];
@@ -4500,6 +4558,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         [fInfoController updateOptions];
     }
     
+    [torrent release];
 }
 
 - (void) rpcMovedTorrent: (Torrent *) torrent
@@ -4510,6 +4569,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     if ([[fTableView selectedTorrents] containsObject: torrent])
         [fInfoController updateInfoStats];
     
+    [torrent release];
 }
 
 - (void) rpcUpdateQueue

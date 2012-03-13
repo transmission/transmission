@@ -29,7 +29,7 @@
 
 @interface BlocklistDownloaderViewController : NSObject
 {    
-    __unsafe_unretained PrefsController * fPrefsController;
+    PrefsController * fPrefsController;
     
     IBOutlet NSWindow * fStatusWindow;
     IBOutlet NSProgressIndicator * fProgressBar;

@@ -73,6 +73,14 @@ typedef enum
     [self setTorrent: nil];
 }
 
+- (void) dealloc
+{
+    [fFileList release];
+    [fFilterText release];
+    
+    [super dealloc];
+}
+
 - (FileOutlineView *) outlineView
 {
     return fOutline;
@@ -84,6 +92,7 @@ typedef enum
     
     [fFileList setArray: [fTorrent fileList]];
     
+    [fFilterText release];
     fFilterText = nil;
     
     [fOutline reloadData];
@@ -198,7 +207,8 @@ typedef enum
     else
         [fOutline reloadData];
     
-    fFilterText = text;
+    [fFilterText release];
+    fFilterText = [text retain];
 }
 
 - (void) refresh
@@ -511,18 +521,21 @@ typedef enum
     [item setTarget: self];
     [item setTag: FILE_CHECK_TAG];
     [menu addItem: item];
+    [item release];
     
     item = [[NSMenuItem alloc] initWithTitle: NSLocalizedString(@"Uncheck Selected", "File Outline -> Menu")
             action: @selector(setCheck:) keyEquivalent: @""];
     [item setTarget: self];
     [item setTag: FILE_UNCHECK_TAG];
     [menu addItem: item];
+    [item release];
     
     //only check selected
     item = [[NSMenuItem alloc] initWithTitle: NSLocalizedString(@"Only Check Selected", "File Outline -> Menu")
             action: @selector(setOnlySelectedCheck:) keyEquivalent: @""];
     [item setTarget: self];
     [menu addItem: item];
+    [item release];
     
     [menu addItem: [NSMenuItem separatorItem]];
     
@@ -531,6 +544,7 @@ typedef enum
     NSMenu * priorityMenu = [[NSMenu alloc] initWithTitle: @"File Priority Menu"];
     [item setSubmenu: priorityMenu];
     [menu addItem: item];
+    [item release];
     
     item = [[NSMenuItem alloc] initWithTitle: NSLocalizedString(@"High", "File Outline -> Priority Menu")
             action: @selector(setPriority:) keyEquivalent: @""];
@@ -538,6 +552,7 @@ typedef enum
     [item setTag: FILE_PRIORITY_HIGH_TAG];
     [item setImage: [NSImage imageNamed: @"PriorityHighTemplate.png"]];
     [priorityMenu addItem: item];
+    [item release];
     
     item = [[NSMenuItem alloc] initWithTitle: NSLocalizedString(@"Normal", "File Outline -> Priority Menu")
             action: @selector(setPriority:) keyEquivalent: @""];
@@ -545,6 +560,7 @@ typedef enum
     [item setTag: FILE_PRIORITY_NORMAL_TAG];
     [item setImage: [NSImage imageNamed: @"PriorityNormalTemplate.png"]];
     [priorityMenu addItem: item];
+    [item release];
     
     item = [[NSMenuItem alloc] initWithTitle: NSLocalizedString(@"Low", "File Outline -> Priority Menu")
             action: @selector(setPriority:) keyEquivalent: @""];
@@ -552,7 +568,9 @@ typedef enum
     [item setTag: FILE_PRIORITY_LOW_TAG];
     [item setImage: [NSImage imageNamed: @"PriorityLowTemplate.png"]];
     [priorityMenu addItem: item];
+    [item release];
     
+    [priorityMenu release];
     
     [menu addItem: [NSMenuItem separatorItem]];
     
@@ -561,8 +579,9 @@ typedef enum
             action: @selector(revealFile:) keyEquivalent: @""];
     [item setTarget: self];
     [menu addItem: item];
+    [item release];
     
-    return menu;
+    return [menu autorelease];
 }
 
 - (NSUInteger) findFileNode: (FileListNode *) node inList: (NSArray *) list atIndexes: (NSIndexSet *) indexes currentParent: (FileListNode *) currentParent finalParent: (FileListNode **) parent

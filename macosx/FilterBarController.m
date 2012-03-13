@@ -128,6 +128,7 @@
 {
     [[NSNotificationCenter defaultCenter] removeObserver: self];
     
+    [super dealloc];
 }
 
 - (void) setFilter: (id) sender
@@ -264,9 +265,10 @@
         const NSInteger groupMenuCount = [groupMenu numberOfItems];
         for (NSInteger i = 0; i < groupMenuCount; i++)
         {
-            NSMenuItem * item = [groupMenu itemAtIndex: 0];
+            NSMenuItem * item = [[groupMenu itemAtIndex: 0] retain];
             [groupMenu removeItemAtIndex: 0];
             [menu addItem: item];
+            [item release];
         }
     }
 }

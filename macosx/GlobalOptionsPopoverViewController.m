@@ -140,7 +140,8 @@
 
 - (BOOL) control: (NSControl *) control textShouldBeginEditing: (NSText *) fieldEditor
 {
-    fInitialString = [control stringValue];
+    [fInitialString release];
+    fInitialString = [[control stringValue] retain];
     
     return YES;
 }
@@ -151,6 +152,7 @@
     if (fInitialString)
     {
         [control setStringValue: fInitialString];
+        [fInitialString release];
         fInitialString = nil;
     }
     return NO;

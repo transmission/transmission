@@ -80,9 +80,21 @@
 - (id) copyWithZone: (NSZone *) zone
 {
     //this object is essentially immutable after initial setup
-    return self;
+    return [self retain];
 }
 
+- (void) dealloc
+{
+    [fName release];
+    [fPath release];
+    [fIndexes release];
+    
+    [fIcon release];
+    
+    [fChildren release];
+    
+    [super dealloc];
+}
 
 - (NSString *) description
 {
@@ -100,8 +112,8 @@
 - (NSImage *) icon
 {
     if (!fIcon)
-        fIcon = [[NSWorkspace sharedWorkspace] iconForFileType: fIsFolder ? NSFileTypeForHFSTypeCode(kGenericFolderIcon)
-                                                                            : [fName pathExtension]];
+        fIcon = [[[NSWorkspace sharedWorkspace] iconForFileType: fIsFolder ? NSFileTypeForHFSTypeCode(kGenericFolderIcon)
+                                                                            : [fName pathExtension]] retain];
     return fIcon;
 }
 
@@ -121,8 +133,8 @@
     if ((self = [super init]))
     {
         fIsFolder = isFolder;
-        fName = name;
-        fPath = path;
+        fName = [name retain];
+        fPath = [path retain];
         
         fIndexes = [[NSMutableIndexSet alloc] init];
         

@@ -101,6 +101,7 @@
     
     NSTrackingArea * area = [[NSTrackingArea alloc] initWithRect: cellFrame options: options owner: controlView userInfo: userInfo];
     [controlView addTrackingArea: area];
+    [area release];
 }
 
 - (void) setHovered: (BOOL) hovered

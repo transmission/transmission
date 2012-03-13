@@ -34,7 +34,7 @@
     IBOutlet NSButton * fStartCheck;
     IBOutlet NSPopUpButton * fGroupPopUp, * fPriorityPopUp;
     
-    __unsafe_unretained Controller * fController;
+    Controller * fController;
     
     Torrent * fTorrent;
     NSString * fDestination;

@@ -98,12 +98,24 @@
     [self setWebSeedTableHidden: YES animate: NO];
 }
 
+- (void) dealloc
+{
+    [fTorrents release];
+    
+    [fPeers release];
+    [fWebSeeds release];
+    
+    [fWebSeedTableAnimation release];
+    
+    [super dealloc];
+}
 
 #warning subclass?
 - (void) setInfoForTorrents: (NSArray *) torrents
 {
     //don't check if it's the same in case the metadata changed
-    fTorrents = torrents;
+    [fTorrents release];
+    fTorrents = [torrents retain];
     
     fSet = NO;
 }
@@ -231,7 +243,9 @@
     if (fWebSeedTableAnimation)
         [self setWebSeedTableHidden: !fWebSeeds animate: NO];
     
+    [fPeers release];
     fPeers = nil;
+    [fWebSeeds release];
     fWebSeeds = nil;
 }
 
@@ -436,6 +450,7 @@
 {
     if (animation == fWebSeedTableAnimation)
     {
+        [fWebSeedTableAnimation release];
         fWebSeedTableAnimation = nil;
     }
 }
@@ -445,6 +460,7 @@
     if (fWebSeedTableAnimation)
     {
         [fWebSeedTableAnimation stopAnimation]; // jumps to end frame
+        [fWebSeedTableAnimation release];
         fWebSeedTableAnimation = nil;
     }
 }
@@ -459,6 +475,7 @@
     
     if ([fTorrents count] == 0)
     {
+        [fPeers release];
         fPeers = nil;
         [fPeerTable reloadData];
         
@@ -476,6 +493,7 @@
     
     if (!hasWebSeeds)
     {
+        [fWebSeeds release];
         fWebSeeds = nil;
         [fWebSeedTable reloadData];
     }
@@ -492,6 +510,7 @@
     if (fWebSeedTableAnimation)
     {
         [fWebSeedTableAnimation stopAnimation];
+        [fWebSeedTableAnimation release];
         fWebSeedTableAnimation = nil;
     }
     

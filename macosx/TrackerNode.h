@@ -31,10 +31,10 @@
 {
     tr_tracker_stat fStat;
     
-    __unsafe_unretained Torrent * fTorrent;
+    Torrent * fTorrent;
 }
 
-@property (nonatomic, readonly, assign) Torrent * torrent;
+@property (nonatomic, readonly) Torrent * torrent;
 
 - (id) initWithTrackerStat: (tr_tracker_stat *) stat torrent: (Torrent *) torrent;
 

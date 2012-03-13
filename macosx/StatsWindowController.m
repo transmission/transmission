@@ -126,6 +126,7 @@ tr_session * fLib;
 {
     [fTimer invalidate];
     
+    [fStatsWindowInstance autorelease];
     fStatsWindowInstance = nil;
 }
 
