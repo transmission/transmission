@@ -36,9 +36,10 @@
 }
 
 - (id) initWithController: (Controller *) controller;
-- (void) beginSheetForWindow: (NSWindow *) window;
 
 - (void) openURLEndSheet: (id) sender;
 - (void) openURLCancelEndSheet: (id) sender;
+
+- (NSString *) urlString;
 
 @end

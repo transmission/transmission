@@ -105,7 +105,9 @@ typedef enum
     NSMutableDictionary             * fPendingTorrentDownloads;
     
     NSMutableSet                    * fAddingTransfers;
+    
     NSMutableSet                    * fAddWindows;
+    URLSheetWindowController        * fUrlSheetController;
     
     BOOL                            fGlobalPopoverShown;
     BOOL                            fSoundPlaying;
@@ -128,7 +130,6 @@ typedef enum
 
 - (void) openURL: (NSString *) urlString;
 - (void) openURLShowSheet: (id) sender;
-- (void) urlSheetDidEnd: (URLSheetWindowController *) controller url: (NSString *) urlString returnCode: (NSInteger) returnCode;
 
 - (void) quitSheetDidEnd: (NSWindow *) sheet returnCode: (NSInteger) returnCode contextInfo: (void *) contextInfo;
 
