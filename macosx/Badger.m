@@ -47,10 +47,7 @@
 
 - (void) dealloc
 {
-    [[NSNotificationCenter defaultCenter] removeObserver: self];
-    
     [fHashes release];
-    
     [super dealloc];
 }
 

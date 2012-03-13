@@ -836,14 +836,12 @@
 
 - (void) togglePiecesBar
 {
-    //stop previous animation
-    if (fPiecesBarAnimation)
-        [fPiecesBarAnimation release];
-    
     NSMutableArray * progressMarks = [NSMutableArray arrayWithCapacity: 16];
     for (NSAnimationProgress i = 0.0625; i <= 1.0; i += 0.0625)
         [progressMarks addObject: [NSNumber numberWithFloat: i]];
     
+    //this stops a previous animation
+    [fPiecesBarAnimation release];
     fPiecesBarAnimation = [[NSAnimation alloc] initWithDuration: TOGGLE_PROGRESS_SECONDS animationCurve: NSAnimationEaseIn];
     [fPiecesBarAnimation setAnimationBlockingMode: NSAnimationNonblocking];
     [fPiecesBarAnimation setProgressMarks: progressMarks];

@@ -1397,10 +1397,9 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 {
     NSArray * torrents = [dict objectForKey: @"Torrents"];
     if (returnCode == NSAlertDefaultReturn)
-        [self confirmRemoveTorrents: torrents deleteData: [[dict objectForKey: @"DeleteData"] boolValue]];
-    else
-        [torrents release];
+        [self confirmRemoveTorrents: [torrents retain] deleteData: [[dict objectForKey: @"DeleteData"] boolValue]];
     
+    [torrents release];
     [dict release];
 }
 
@@ -2745,12 +2744,8 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         [fAutoImportTimer release];
         fAutoImportTimer = nil;
     }
-    
-    if (fAutoImportedNames)
-    {
-        [fAutoImportedNames release];
-        fAutoImportedNames = nil;
-    }
+    [fAutoImportedNames release];
+    fAutoImportedNames = nil;
     
     [self checkAutoImportDirectory];
 }
