@@ -25,9 +25,6 @@
 #import "PeerProgressIndicatorCell.h"
 #import "NSStringAdditions.h"
 
-#import "transmission.h" // required by utils.h
-#import "utils.h"
-
 @implementation PeerProgressIndicatorCell
 
 - (id) copyWithZone: (NSZone *) zone

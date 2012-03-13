@@ -105,6 +105,7 @@ typedef enum
     NSMutableDictionary             * fPendingTorrentDownloads;
     
     NSMutableSet                    * fAddingTransfers;
+    NSMutableSet                    * fAddWindows;
     
     BOOL                            fGlobalPopoverShown;
     BOOL                            fSoundPlaying;

@@ -714,6 +714,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     [fTorrents release];
     [fDisplayedTorrents release];
     
+    [fAddWindows release];
     [fAddingTransfers release];
     
     [fOverlayWindow release];
@@ -901,6 +902,11 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
                                                     lockDestination: lockDestination controller: self torrentFile: torrentPath
                                                     deleteTorrent: deleteTorrentFile canToggleDelete: canToggleDelete];
             [addController showWindow: self];
+            
+            if (!fAddWindows)
+                fAddWindows = [[NSMutableSet alloc] init];
+            [fAddWindows addObject: addController];
+            [addController release];
         }
         else
         {
@@ -923,7 +929,6 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 - (void) askOpenConfirmed: (AddWindowController *) addController add: (BOOL) add
 {
     Torrent * torrent = [addController torrent];
-    [addController autorelease];
     
     if (add)
     {
@@ -943,6 +948,13 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     {
         [torrent closeRemoveTorrent: NO];
         [torrent release];
+    }
+    
+    [fAddWindows removeObject: addController];
+    if ([fAddWindows count] == 0)
+    {
+        [fAddWindows release];
+        fAddWindows = nil;
     }
 }
 
@@ -981,6 +993,11 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         AddMagnetWindowController * addController = [[AddMagnetWindowController alloc] initWithTorrent: torrent destination: location
                                                         controller: self];
         [addController showWindow: self];
+        
+        if (!fAddWindows)
+            fAddWindows = [[NSMutableSet alloc] init];
+        [fAddWindows addObject: addController];
+        [addController release];
     }
     else
     {
@@ -1002,7 +1019,6 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 - (void) askOpenMagnetConfirmed: (AddMagnetWindowController *) addController add: (BOOL) add
 {
     Torrent * torrent = [addController torrent];
-    [addController autorelease];
     
     if (add)
     {
@@ -1022,6 +1038,13 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     {
         [torrent closeRemoveTorrent: NO];
         [torrent release];
+    }
+    
+    [fAddWindows removeObject: addController];
+    if ([fAddWindows count] == 0)
+    {
+        [fAddWindows release];
+        fAddWindows = nil;
     }
 }
 
