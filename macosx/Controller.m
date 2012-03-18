@@ -324,6 +324,8 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         fLib = tr_sessionInit("macosx", configDir, YES, &settings);
         tr_bencFree(&settings);
         
+        fConfigDirectory = [[NSString alloc] initWithUTF8String: configDir];
+        
         [NSApp setDelegate: self];
         
         //register for magnet URLs (has to be in init)
@@ -444,8 +446,8 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         NSLog(@"Could not IORegisterForSystemPower");
     
     //load previous transfers
-    NSURL * historyURL = [[[[[NSFileManager defaultManager] URLsForDirectory: NSApplicationSupportDirectory inDomains: NSUserDomainMask] objectAtIndex: 0] URLByAppendingPathComponent: @"Transmission"] URLByAppendingPathComponent: TRANSFER_PLIST];
-    NSArray * history = [NSArray arrayWithContentsOfURL: historyURL];
+    NSString * historyFile = [fConfigDirectory stringByAppendingPathComponent: TRANSFER_PLIST];
+    NSArray * history = [NSArray arrayWithContentsOfFile: historyFile];
     if (!history)
     {
         //old version saved transfer info in prefs file
@@ -723,6 +725,8 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     [fAutoImportedNames release];
     
     [fPreviewPanel release];
+    
+    [fConfigDirectory release];
     
     //complete cleanup
     tr_sessionClose(fLib);
@@ -1903,8 +1907,8 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     for (Torrent * torrent in fTorrents)
         [history addObject: [torrent history]];
     
-    NSURL * historyURL = [[[[[NSFileManager defaultManager] URLsForDirectory: NSApplicationSupportDirectory inDomains: NSUserDomainMask] objectAtIndex: 0] URLByAppendingPathComponent: @"Transmission"] URLByAppendingPathComponent: TRANSFER_PLIST];
-    [history writeToURL: historyURL atomically: YES];
+    NSString * historyFile = [fConfigDirectory stringByAppendingPathComponent: TRANSFER_PLIST];
+    [history writeToFile: historyFile atomically: YES];
 }
 
 - (void) setSort: (id) sender

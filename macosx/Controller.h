@@ -61,6 +61,8 @@ typedef enum
     
     NSUserDefaults                  * fDefaults;
     
+    NSString                        * fConfigDirectory;
+    
     IBOutlet NSWindow               * fWindow;
     DragOverlayWindow               * fOverlayWindow;
     IBOutlet TorrentTableView       * fTableView;
