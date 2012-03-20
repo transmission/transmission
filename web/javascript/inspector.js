@@ -203,8 +203,8 @@ function Inspector(controller) {
         else {
             d = f = 0;
             for(i=0; t=torrents[i]; ++i) {
-                d = t.getDownloadedEver();
-                f = t.getFailedEver();
+                d += t.getDownloadedEver();
+                f += t.getFailedEver();
             }
             if(f)
                 str = fmt.size(d) + ' (' + fmt.size(f) + ' corrupt)';
@@ -221,10 +221,19 @@ function Inspector(controller) {
             str = none;
         else {
             d = u = 0;
-            for(i=0; t=torrents[i]; ++i) {
-                d = t.getDownloadedEver();
-                u = t.getUploadedEver();
+            if(torrents.length == 1) {
+				d = torrents[0].getDownloadedEver();
+				u = torrents[0].getUploadedEver();
+				
+				if (d == 0)
+					d = torrents[0].getHaveValid();
             }
+            else {
+				for(i=0; t=torrents[i]; ++i) {
+					d += t.getDownloadedEver();
+					u += t.getUploadedEver();
+				}
+			}
             str = fmt.size(u) + ' (Ratio: ' + fmt.ratioString( Math.ratio(u,d))+')';
         }
         setInnerHTML(e.uploaded_lb, str);
