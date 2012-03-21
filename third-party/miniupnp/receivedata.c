@@ -1,12 +1,13 @@
-/* $Id: receivedata.c,v 1.1 2011/04/11 08:21:47 nanard Exp $ */
+/* $Id: receivedata.c,v 1.3 2012/03/05 19:42:47 nanard Exp $ */
 /* Project : miniupnp
+ * Website : http://miniupnp.free.fr/
  * Author : Thomas Bernard
- * Copyright (c) 2011 Thomas Bernard
+ * Copyright (c) 2011-2012 Thomas Bernard
  * This software is subject to the conditions detailed in the
  * LICENCE file provided in this distribution. */
 
 #include <stdio.h>
-#ifdef WIN32
+#ifdef _WIN32
 #include <winsock2.h>
 #include <ws2tcpip.h>
 #else
@@ -24,7 +25,7 @@
 #define MINIUPNPC_IGNORE_EINTR
 #endif
 
-#ifdef WIN32
+#ifdef _WIN32
 #define PRINT_SOCKET_ERROR(x)    printf("Socket error: %s, %d\n", x, WSAGetLastError());
 #else
 #define PRINT_SOCKET_ERROR(x) perror(x)
@@ -36,7 +37,7 @@ int
 receivedata(int socket, char * data, int length, int timeout)
 {
     int n;
-#if !defined(WIN32) && !defined(__amigaos__) && !defined(__amigaos4__)
+#if !defined(_WIN32) && !defined(__amigaos__) && !defined(__amigaos4__)
 	/* using poll */
     struct pollfd fds[1]; /* for the poll */
 #ifdef MINIUPNPC_IGNORE_EINTR
@@ -55,8 +56,8 @@ receivedata(int socket, char * data, int length, int timeout)
 		/* timeout */
         return 0;
     }
-#else /* !defined(WIN32) && !defined(__amigaos__) && !defined(__amigaos4__) */
-	/* using select under WIN32 and amigaos */
+#else /* !defined(_WIN32) && !defined(__amigaos__) && !defined(__amigaos4__) */
+	/* using select under _WIN32 and amigaos */
     fd_set socketSet;
     TIMEVAL timeval;
     FD_ZERO(&socketSet);
@@ -69,7 +70,7 @@ receivedata(int socket, char * data, int length, int timeout)
         return -1;
     } else if(n == 0) {
         return 0;
-    }    
+    }
 #endif
 	n = recv(socket, data, length, 0);
 	if(n<0) {

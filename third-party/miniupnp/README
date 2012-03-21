@@ -43,7 +43,7 @@ Discovery process is speeded up when MiniSSDPd is running on the machine.
 
 * Python module *
 
-you can build a python module with 'make pythonmodule' 
+you can build a python module with 'make pythonmodule'
 and install it with 'make installpythonmodule'.
 setup.py (and setupmingw32.py) are included in the distribution.
 

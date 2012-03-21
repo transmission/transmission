@@ -1,7 +1,7 @@
-/* $Id: portlistingparse.h,v 1.4 2011/02/15 23:03:56 nanard Exp $ */
+/* $Id: portlistingparse.h,v 1.6 2012/03/05 19:42:47 nanard Exp $ */
 /* MiniUPnP project
  * http://miniupnp.free.fr/ or http://miniupnp.tuxfamily.org/
- * (c) 2011 Thomas Bernard 
+ * (c) 2011-2012 Thomas Bernard
  * This software is subject to the conditions detailed
  * in the LICENCE file provided within the distribution */
 #ifndef __PORTLISTINGPARSE_H__
@@ -11,7 +11,7 @@
 /* for the definition of UNSIGNED_INTEGER */
 #include "miniupnpctypes.h"
 
-#if defined(NO_SYS_QUEUE_H) || defined(WIN32) || defined(__HAIKU__) 
+#if defined(NO_SYS_QUEUE_H) || defined(_WIN32) || defined(__HAIKU__)
 #include "bsdqueue.h"
 #else
 #include <sys/queue.h>
@@ -37,7 +37,7 @@ typedef enum { PortMappingEltNone,
        PortMappingEntry, NewRemoteHost,
        NewExternalPort, NewProtocol,
        NewInternalPort, NewInternalClient,
-       NewEnabled, NewDescription, 
+       NewEnabled, NewDescription,
        NewLeaseTime } portMappingElt;
 
 struct PortMapping {

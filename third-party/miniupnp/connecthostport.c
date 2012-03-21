@@ -1,7 +1,7 @@
-/* $Id: connecthostport.c,v 1.5 2011/04/09 08:49:50 nanard Exp $ */
+/* $Id: connecthostport.c,v 1.7 2012/03/05 19:42:46 nanard Exp $ */
 /* Project : miniupnp
  * Author : Thomas Bernard
- * Copyright (c) 2010-2011 Thomas Bernard
+ * Copyright (c) 2010-2012 Thomas Bernard
  * This software is subject to the conditions detailed in the
  * LICENCE file provided in this distribution. */
 
@@ -13,7 +13,7 @@
 
 #include <string.h>
 #include <stdio.h>
-#ifdef WIN32
+#ifdef _WIN32
 #include <winsock2.h>
 #include <ws2tcpip.h>
 #include <io.h>
@@ -21,7 +21,7 @@
 #define snprintf _snprintf
 #define herror
 #define socklen_t int
-#else /* #ifdef WIN32 */
+#else /* #ifdef _WIN32 */
 #include <unistd.h>
 #include <sys/param.h>
 #include <errno.h>
@@ -34,10 +34,10 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #endif /* #ifndef USE_GETHOSTBYNAME */
-#endif /* #else WIN32 */
+#endif /* #else _WIN32 */
 
 /* definition of PRINT_SOCKET_ERROR */
-#ifdef WIN32
+#ifdef _WIN32
 #define PRINT_SOCKET_ERROR(x)    printf("Socket error: %s, %d\n", x, WSAGetLastError());
 #else
 #define PRINT_SOCKET_ERROR(x) perror(x)
@@ -67,7 +67,7 @@ int connecthostport(const char * host, unsigned short port)
 #ifdef MINIUPNPC_SET_SOCKET_TIMEOUT
 	struct timeval timeout;
 #endif /* #ifdef MINIUPNPC_SET_SOCKET_TIMEOUT */
-	
+
 #ifdef USE_GETHOSTBYNAME
 	hp = gethostbyname(host);
 	if(hp == NULL)
@@ -160,7 +160,7 @@ int connecthostport(const char * host, unsigned short port)
 	n = getaddrinfo(tmp_host, port_str, &hints, &ai);
 	if(n != 0)
 	{
-#ifdef WIN32
+#ifdef _WIN32
 		fprintf(stderr, "getaddrinfo() error : %d\n", n);
 #else
 		fprintf(stderr, "getaddrinfo() error : %s\n", gai_strerror(n));

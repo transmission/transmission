@@ -1,14 +1,14 @@
-/* $Id: upnpreplyparse.h,v 1.11 2011/02/07 16:17:06 nanard Exp $ */
+/* $Id: upnpreplyparse.h,v 1.13 2012/03/05 19:42:48 nanard Exp $ */
 /* MiniUPnP project
  * http://miniupnp.free.fr/ or http://miniupnp.tuxfamily.org/
- * (c) 2006-2011 Thomas Bernard 
+ * (c) 2006-2012 Thomas Bernard
  * This software is subject to the conditions detailed
  * in the LICENCE file provided within the distribution */
 
 #ifndef __UPNPREPLYPARSE_H__
 #define __UPNPREPLYPARSE_H__
 
-#if defined(NO_SYS_QUEUE_H) || defined(WIN32) || defined(__HAIKU__) 
+#if defined(NO_SYS_QUEUE_H) || defined(_WIN32) || defined(__HAIKU__)
 #include "bsdqueue.h"
 #else
 #include <sys/queue.h>

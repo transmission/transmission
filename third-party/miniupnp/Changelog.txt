@@ -1,5 +1,39 @@
-$Id: Changelog.txt,v 1.152 2011/07/25 18:02:11 nanard Exp $
+$Id: Changelog.txt,v 1.163 2012/03/15 01:02:02 nanard Exp $
 miniUPnP client Changelog.
+
+2012/03/15:
+  upnperrors.c returns valid error string for unrecognized error codes 
+
+2012/03/08:
+  make minihttptestserver listen on loopback interface instead of 0.0.0.0
+
+2012/01/25:
+  Maven installation thanks to Alexey Kuznetsov
+
+2012/01/21:
+  Replace WIN32 macro by _WIN32
+
+2012/01/19:
+  Fixes in java wrappers thanks to Alexey Kuznetsov :
+    https://github.com/axet/miniupnp/tree/fix-javatest/miniupnpc
+  Make and install .deb packages (python) thanks to Alexey Kuznetsov :
+    https://github.com/axet/miniupnp/tree/feature-debbuild/miniupnpc
+
+2012/01/07:
+  The multicast interface can now be specified by name with IPv4.
+
+2012/01/02:
+  Install man page
+
+2011/11/25:
+  added header to Port Mappings list in upnpc.c
+
+2011/10/09:
+  Makefile : make clean now removes jnaerator generated files.
+  MINIUPNPC_VERSION in miniupnpc.h (updated by make)
+
+2011/09/12:
+  added rootdescURL to UPNPUrls structure.
 
 VERSION 1.6 : released 2011/07/25
 

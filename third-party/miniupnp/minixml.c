@@ -1,10 +1,10 @@
-/* $Id: minixml.c,v 1.9 2011/02/07 13:44:57 nanard Exp $ */
+/* $Id: minixml.c,v 1.10 2012/03/05 19:42:47 nanard Exp $ */
 /* minixml.c : the minimum size a xml parser can be ! */
 /* Project : miniupnp
  * webpage: http://miniupnp.free.fr/ or http://miniupnp.tuxfamily.org/
  * Author : Thomas Bernard
 
-Copyright (c) 2005-2011, Thomas BERNARD 
+Copyright (c) 2005-2011, Thomas BERNARD
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -149,7 +149,7 @@ static void parseelt(struct xmlparser * p)
 							return;
 					}
 					if(memcmp(p->xml, "<![CDATA[", 9) == 0)
-					{ 
+					{
 						/* CDATA handling */
 						p->xml += 9;
 						data = p->xml;

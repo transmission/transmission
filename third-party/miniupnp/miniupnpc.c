@@ -1,7 +1,8 @@
-/* $Id: miniupnpc.c,v 1.95 2011/05/15 21:42:26 nanard Exp $ */
+/* $Id: miniupnpc.c,v 1.103 2012/03/05 19:42:46 nanard Exp $ */
 /* Project : miniupnp
+ * Web : http://miniupnp.free.fr/
  * Author : Thomas BERNARD
- * copyright (c) 2005-2011 Thomas Bernard
+ * copyright (c) 2005-2012 Thomas Bernard
  * This software is subjet to the conditions detailed in the
  * provided LICENSE file. */
 #define __EXTENSIONS__ 1
@@ -16,10 +17,14 @@
 #endif
 #endif
 
+#if !defined(__OpenBSD__) && !defined(__NetBSD__) && !defined(MACOSX) && !defined(_WIN32)
+#define HAS_IP_MREQN
+#endif
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#ifdef WIN32
+#ifdef _WIN32
 /* Win32 Specific includes and defines */
 #include <winsock2.h>
 #include <ws2tcpip.h>
@@ -34,7 +39,7 @@
 #endif /* defined(_MSC_VER) && (_MSC_VER >= 1400) */
 #endif /* #ifndef strncasecmp */
 #define MAXHOSTNAMELEN 64
-#else /* #ifdef WIN32 */
+#else /* #ifdef _WIN32 */
 /* Standard POSIX includes */
 #include <unistd.h>
 #if defined(__amigaos__) && !defined(__amigaos4__)
@@ -56,7 +61,7 @@
 #include <strings.h>
 #include <errno.h>
 #define closesocket close
-#endif /* #else WIN32 */
+#endif /* #else _WIN32 */
 #ifdef MINIUPNPC_SET_SOCKET_TIMEOUT
 #include <sys/time.h>
 #endif
@@ -74,7 +79,7 @@
 #include "connecthostport.h"
 #include "receivedata.h"
 
-#ifdef WIN32
+#ifdef _WIN32
 #define PRINT_SOCKET_ERROR(x)    printf("Socket error: %s, %d\n", x, WSAGetLastError());
 #else
 #define PRINT_SOCKET_ERROR(x) perror(x)
@@ -323,7 +328,7 @@ upnpDiscover(int delay, const char * multicastif,
 	struct UPNPDev * tmp;
 	struct UPNPDev * devlist = 0;
 	int opt = 1;
-	static const char MSearchMsgFmt[] = 
+	static const char MSearchMsgFmt[] =
 	"M-SEARCH * HTTP/1.1\r\n"
 	"HOST: %s:" XSTR(PORT) "\r\n"
 	"ST: %s\r\n"
@@ -353,14 +358,14 @@ upnpDiscover(int delay, const char * multicastif,
 	int rv;
 	struct addrinfo hints, *servinfo, *p;
 #endif
-#ifdef WIN32
+#ifdef _WIN32
 	MIB_IPFORWARDROW ip_forward;
 #endif
 	int linklocal = 1;
 
 	if(error)
 		*error = UPNPDISCOVER_UNKNOWN_ERROR;
-#if !defined(WIN32) && !defined(__amigaos__) && !defined(__amigaos4__)
+#if !defined(_WIN32) && !defined(__amigaos__) && !defined(__amigaos4__)
 	/* first try to get infos from minissdpd ! */
 	if(!minissdpdsock)
 		minissdpdsock = "/var/run/minissdpd.sock";
@@ -378,7 +383,7 @@ upnpDiscover(int delay, const char * multicastif,
 	deviceIndex = 0;
 #endif
 	/* fallback to direct discovery */
-#ifdef WIN32
+#ifdef _WIN32
 	sudp = socket(ipv6 ? PF_INET6 : PF_INET, SOCK_DGRAM, IPPROTO_UDP);
 #else
 	sudp = socket(ipv6 ? PF_INET6 : PF_INET, SOCK_DGRAM, 0);
@@ -405,8 +410,8 @@ upnpDiscover(int delay, const char * multicastif,
 			p->sin_port = htons(PORT);
 		p->sin_addr.s_addr = INADDR_ANY;
 	}
-#ifdef WIN32
-/* This code could help us to use the right Network interface for 
+#ifdef _WIN32
+/* This code could help us to use the right Network interface for
  * SSDP multicast traffic */
 /* Get IP associated with the index given in the ip_forward struct
  * in order to give this ip to setsockopt(sudp, IPPROTO_IP, IP_MULTICAST_IF) */
@@ -465,7 +470,7 @@ upnpDiscover(int delay, const char * multicastif,
 	}
 #endif
 
-#ifdef WIN32
+#ifdef _WIN32
 	if (setsockopt(sudp, SOL_SOCKET, SO_REUSEADDR, (const char *)&opt, sizeof (opt)) < 0)
 #else
 	if (setsockopt(sudp, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof (opt)) < 0)
@@ -480,7 +485,7 @@ upnpDiscover(int delay, const char * multicastif,
 	if(multicastif)
 	{
 		if(ipv6) {
-#if !defined(WIN32)
+#if !defined(_WIN32)
 			/* according to MSDN, if_nametoindex() is supported since
 			 * MS Windows Vista and MS Windows Server 2008.
 			 * http://msdn.microsoft.com/en-us/library/bb408409%28v=vs.85%29.aspx */
@@ -497,10 +502,28 @@ upnpDiscover(int delay, const char * multicastif,
 		} else {
 			struct in_addr mc_if;
 			mc_if.s_addr = inet_addr(multicastif); /* ex: 192.168.x.x */
-			((struct sockaddr_in *)&sockudp_r)->sin_addr.s_addr = mc_if.s_addr;
-			if(setsockopt(sudp, IPPROTO_IP, IP_MULTICAST_IF, (const char *)&mc_if, sizeof(mc_if)) < 0)
+			if(mc_if.s_addr != INADDR_NONE)
 			{
-				PRINT_SOCKET_ERROR("setsockopt");
+				((struct sockaddr_in *)&sockudp_r)->sin_addr.s_addr = mc_if.s_addr;
+				if(setsockopt(sudp, IPPROTO_IP, IP_MULTICAST_IF, (const char *)&mc_if, sizeof(mc_if)) < 0)
+				{
+					PRINT_SOCKET_ERROR("setsockopt");
+				}
+			} else {
+#ifdef HAS_IP_MREQN
+				/* was not an ip address, try with an interface name */
+				struct ip_mreqn reqn;	/* only defined with -D_BSD_SOURCE or -D_GNU_SOURCE */
+				memset(&reqn, 0, sizeof(struct ip_mreqn));
+				reqn.imr_ifindex = if_nametoindex(multicastif);
+				if(setsockopt(sudp, IPPROTO_IP, IP_MULTICAST_IF, (const char *)&reqn, sizeof(reqn)) < 0)
+				{
+					PRINT_SOCKET_ERROR("setsockopt");
+				}
+#else
+#ifdef DEBUG
+				printf("Setting of multicast interface not supported with interface name.\n");
+#endif
+#endif
 			}
 		}
 	}
@@ -572,7 +595,7 @@ upnpDiscover(int delay, const char * multicastif,
 		                      XSTR(PORT), &hints, &servinfo)) != 0) {
 			if(error)
 				*error = UPNPDISCOVER_SOCKET_ERROR;
-#ifdef WIN32
+#ifdef _WIN32
 		    fprintf(stderr, "getaddrinfo() failed: %d\n", rv);
 #else
 		    fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(rv));
@@ -706,6 +729,7 @@ LIBSPEC void GetUPNPUrls(struct UPNPUrls * urls, struct IGDdatas * data,
 {
 	char * p;
 	int n1, n2, n3, n4;
+
 	n1 = strlen(data->urlbase);
 	if(n1==0)
 		n1 = strlen(descURL);
@@ -716,11 +740,16 @@ LIBSPEC void GetUPNPUrls(struct UPNPUrls * urls, struct IGDdatas * data,
 	n3 += strlen(data->CIF.controlurl);
 	n4 += strlen(data->IPv6FC.controlurl);
 
+	/* allocate memory to store URLs */
 	urls->ipcondescURL = (char *)malloc(n1);
 	urls->controlURL = (char *)malloc(n2);
 	urls->controlURL_CIF = (char *)malloc(n3);
 	urls->controlURL_6FC = (char *)malloc(n4);
-	/* maintenant on chope la desc du WANIPConnection */
+
+	/* strdup descURL */
+	urls->rootdescURL = strdup(descURL);
+
+	/* get description of WANIPConnection */
 	if(data->urlbase[0] != '\0')
 		strncpy(urls->ipcondescURL, data->urlbase, n1);
 	else
@@ -730,7 +759,7 @@ LIBSPEC void GetUPNPUrls(struct UPNPUrls * urls, struct IGDdatas * data,
 	strncpy(urls->controlURL, urls->ipcondescURL, n2);
 	strncpy(urls->controlURL_CIF, urls->ipcondescURL, n3);
 	strncpy(urls->controlURL_6FC, urls->ipcondescURL, n4);
-	
+
 	url_cpy_or_cat(urls->ipcondescURL, data->first.scpdurl, n1);
 
 	url_cpy_or_cat(urls->controlURL, data->first.controlurl, n2);
@@ -764,6 +793,8 @@ FreeUPNPUrls(struct UPNPUrls * urls)
 	urls->controlURL_CIF = 0;
 	free(urls->controlURL_6FC);
 	urls->controlURL_6FC = 0;
+	free(urls->rootdescURL);
+	urls->rootdescURL = 0;
 }
 
 int

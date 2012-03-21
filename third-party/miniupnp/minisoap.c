@@ -1,7 +1,7 @@
-/* $Id: minisoap.c,v 1.21 2011/03/22 19:15:35 nanard Exp $ */
+/* $Id: minisoap.c,v 1.22 2012/01/21 13:30:31 nanard Exp $ */
 /* Project : miniupnp
  * Author : Thomas Bernard
- * Copyright (c) 2005-2009 Thomas Bernard
+ * Copyright (c) 2005-2012 Thomas Bernard
  * This software is subject to the conditions detailed in the
  * LICENCE file provided in this distribution.
  *
@@ -9,7 +9,7 @@
  */
 #include <stdio.h>
 #include <string.h>
-#ifdef WIN32
+#ifdef _WIN32
 #include <io.h>
 #include <winsock2.h>
 #define snprintf _snprintf
@@ -24,7 +24,7 @@
 /* only for malloc */
 #include <stdlib.h>
 
-#ifdef WIN32
+#ifdef _WIN32
 #define PRINT_SOCKET_ERROR(x)    printf("Socket error: %s, %d\n", x, WSAGetLastError());
 #else
 #define PRINT_SOCKET_ERROR(x) perror(x)
@@ -57,7 +57,7 @@ httpWrite(int fd, const char * body, int bodysize,
 	/* disable send on the socket */
 	/* draytek routers dont seems to like that... */
 #if 0
-#ifdef WIN32
+#ifdef _WIN32
 	if(shutdown(fd, SD_SEND)<0) {
 #else
 	if(shutdown(fd, SHUT_WR)<0)	{ /*SD_SEND*/

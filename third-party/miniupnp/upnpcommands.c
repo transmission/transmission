@@ -1,4 +1,4 @@
-/* $Id: upnpcommands.c,v 1.37 2011/06/04 15:56:23 nanard Exp $ */
+/* $Id: upnpcommands.c,v 1.38 2012/03/05 19:42:47 nanard Exp $ */
 /* Project : miniupnp
  * Author : Thomas Bernard
  * Copyright (c) 2005-2011 Thomas Bernard
@@ -119,7 +119,7 @@ UPNP_GetTotalPacketsReceived(const char * controlURL,
 LIBSPEC int
 UPNP_GetStatusInfo(const char * controlURL,
 				const char * servicetype,
-				char * status, 
+				char * status,
 				unsigned int * uptime,
 				char * lastconnerror)
 {
@@ -221,8 +221,8 @@ UPNP_GetConnectionTypeInfo(const char * controlURL,
 
 /* UPNP_GetLinkLayerMaxBitRate() call the corresponding UPNP method.
  * Returns 2 values: Downloadlink bandwidth and Uplink bandwidth.
- * One of the values can be null 
- * Note : GetLinkLayerMaxBitRates belongs to WANPPPConnection:1 only 
+ * One of the values can be null
+ * Note : GetLinkLayerMaxBitRates belongs to WANPPPConnection:1 only
  * We can use the GetCommonLinkProperties from WANCommonInterfaceConfig:1 */
 LIBSPEC int
 UPNP_GetLinkLayerMaxBitRates(const char * controlURL,
@@ -285,7 +285,7 @@ UPNP_GetLinkLayerMaxBitRates(const char * controlURL,
 /* UPNP_GetExternalIPAddress() call the corresponding UPNP method.
  * if the third arg is not null the value is copied to it.
  * at least 16 bytes must be available
- * 
+ *
  * Return values :
  * 0 : SUCCESS
  * NON ZERO : ERROR Either an UPnP error code or an unknown error.
@@ -746,11 +746,11 @@ UPNP_GetListOfPortMappings(const char * controlURL,
 	return ret;
 }
 
-/* IGD:2, functions for service WANIPv6FirewallControl:1 */ 
+/* IGD:2, functions for service WANIPv6FirewallControl:1 */
 LIBSPEC int
 UPNP_GetFirewallStatus(const char * controlURL,
 				const char * servicetype,
-				int * firewallEnabled, 
+				int * firewallEnabled,
 				int * inboundPinholeAllowed)
 {
 	struct NameValueParserData pdata;
@@ -912,7 +912,7 @@ UPNP_AddPinhole(const char * controlURL, const char * servicetype,
 	resVal = GetValueFromNameValueList(&pdata, "errorCode");
 	if(resVal)
 	{
-		//printf("AddPortMapping errorCode = '%s'\n", resVal); 
+		//printf("AddPortMapping errorCode = '%s'\n", resVal);
 		ret = UPNPCOMMAND_UNKNOWN_ERROR;
 		sscanf(resVal, "%d", &ret);
 	}
