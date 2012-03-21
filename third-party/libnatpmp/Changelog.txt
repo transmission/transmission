@@ -1,4 +1,29 @@
-$Id: Changelog.txt,v 1.21 2010/02/02 18:24:43 nanard Exp $
+$Id: Changelog.txt,v 1.29 2011/08/07 16:59:33 nanard Exp $
+
+2011/08/07:
+  Patch to build on debian/kFreeBSD.
+
+2011/07/15:
+  Put 3 clauses BSD licence at the top of source files.
+
+2011/06/18:
+  --no-undefined => -Wl,--no-undefined
+  adding a natpmpc.1 man page
+
+2011/05/19:
+  Small fix in libnatpmpmodule.c thanks to Manuel Mausz
+
+2011/01/03:
+  Added an argument to initnatpmp() in order to force the gateway to be used
+
+2011/01/01:
+  fix in make install
+
+2010/05/21:
+  make install now working under MacOSX (and BSD)
+
+2010/04/12:
+  cplusplus stuff in natpmp.h
 
 2010/02/02:
   Fixed compilation under Mac OS X

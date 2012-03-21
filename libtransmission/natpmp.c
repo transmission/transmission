@@ -120,7 +120,7 @@ tr_natpmpPulse( struct tr_natpmp * nat, tr_port private_port, bool is_enabled, t
 
     if( is_enabled && ( nat->state == TR_NATPMP_DISCOVER ) )
     {
-        int val = initnatpmp( &nat->natpmp );
+        int val = initnatpmp( &nat->natpmp, 0, NULL );
         logVal( "initnatpmp", val );
         val = sendpublicaddressrequest( &nat->natpmp );
         logVal( "sendpublicaddressrequest", val );
