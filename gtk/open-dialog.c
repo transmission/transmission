@@ -471,6 +471,11 @@ onOpenURLResponse( GtkDialog * dialog, int response, gpointer user_data )
             g_free( url );
         }
     }
+    else if( response == GTK_RESPONSE_CANCEL )
+    {
+        handled = TRUE;
+    }
+        
 
     if( handled )
         gtk_widget_destroy( GTK_WIDGET( dialog ) );
