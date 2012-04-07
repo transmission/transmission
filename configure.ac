@@ -73,7 +73,13 @@ AC_SUBST(LIBAPPINDICATOR_MINIMUM)
 
 AC_PROG_CC
 AC_PROG_CXX
-AC_CHECK_PROG([HAVE_CXX],[$CXX],[yes],[no])
+AC_MSG_CHECKING([for $CXX])
+if test -f "$CXX"; then
+    HAVE_CXX="yes"
+else
+    HAVE_CXX="no"
+fi
+AC_MSG_RESULT([$HAVE_CXX])
 AC_C_INLINE
 if test "x$GCC" = "xyes" ; then
 
