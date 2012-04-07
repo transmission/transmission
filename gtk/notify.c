@@ -189,7 +189,9 @@ gtr_notify_torrent_completed( TrCore * core, int torrent_id )
     TrNotification * n;
     tr_torrent * tor;
     const char * cmd = gtr_pref_string_get( PREF_KEY_TORRENT_COMPLETE_SOUND_COMMAND );
-    g_spawn_command_line_async( cmd, NULL );
+
+    if( gtr_pref_flag_get( PREF_KEY_TORRENT_COMPLETE_SOUND_ENABLED ) )
+        g_spawn_command_line_async( cmd, NULL );
 
     if( ! gtr_pref_flag_get( PREF_KEY_TORRENT_COMPLETE_NOTIFICATION_ENABLED ) )
         return;
