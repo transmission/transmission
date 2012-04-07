@@ -15,11 +15,11 @@ X-AppInstall-Keywords=torrent
 Actions=Pause;Minimize;
 
 [Desktop Action Pause]
-Name=Start Transmission with all Torrents Paused
+_Name=Start Transmission with All Torrents Paused
 Exec=transmission-gtk --paused
 OnlyShowIn=Unity
 
 [Desktop Action Minimize]
-Name=Start Transmission Minimized
+_Name=Start Transmission Minimized
 Exec=transmission-gtk --minimized
-OnlyShowIn=Unity 
+OnlyShowIn=Unity;
