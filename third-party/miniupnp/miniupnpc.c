@@ -18,6 +18,10 @@
 #endif
 
 #if !defined(__OpenBSD__) && !defined(__NetBSD__) && !defined(MACOSX) && !defined(_WIN32)
+/* miniupnpc's unmodified source says _BSD_SOURCE or _GNU_SOURCE is needed
+   for struct ip_mreqn... since the above #if chain rules out the former,
+   use the latter here */
+#define _GNU_SOURCE
 #define HAS_IP_MREQN
 #endif
 
@@ -112,9 +116,10 @@ LIBSPEC void parserootdesc(const char * buffer, int bufsize, struct IGDdatas * d
  * return values :
  *   pointer - OK
  *   NULL - error */
-char * simpleUPnPcommand2(int s, const char * url, const char * service,
-		       const char * action, struct UPNParg * args,
-		       int * bufsize, const char * httpversion)
+static char *
+simpleUPnPcommand2(int s, const char * url, const char * service,
+                   const char * action, struct UPNParg * args,
+                   int * bufsize, const char * httpversion)
 {
 	char hostname[MAXHOSTNAMELEN+1];
 	unsigned short port = 0;
