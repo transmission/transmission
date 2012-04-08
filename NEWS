@@ -17,6 +17,7 @@
   * Progressbar colors are now similar to the Mac and Web clients'
   * Improve the "Open Folder" behavior
 ==== Web Client ====
+  * Fix global-seed-ratio progressbars
   * Fix sometimes-incorrect ratio being displayed in the Inspector
   * If multiple torrents are selected, show the aggregate info in the Inspector
   * Upgrade to jQuery 1.7.2
