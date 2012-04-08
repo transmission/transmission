@@ -745,6 +745,9 @@ div.torrent_footer
 	#turtle-button {
 		@include roundedBox(5px);
 		@include buttonImage('images/turtle.png', $idle-color-top, $idle-color-bottom, $active-color-top, $active-color-bottom);
+		&:active, &.selected {
+			@include imageOnVerticalGradient('images/blue-turtle.png', $active-color-top, $active-color-bottom);
+		}
 	}
 
 	#compact-button {

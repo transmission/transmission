@@ -857,6 +857,22 @@ div.torrent_footer {
       /* Opera 11.10+ */
       background-position: center;
       background-repeat: no-repeat; }
+    div.torrent_footer #turtle-button:active, div.torrent_footer #turtle-button.selected {
+      background-color: #e6e6ff;
+      background-image: url("images/blue-turtle.png");
+      /* fallback */
+      background-image: url("images/blue-turtle.png"), -webkit-gradient(linear, left top, left bottom, from(#cdcdff), to(white));
+      /* Saf4+, Chrome */
+      background-image: url("images/blue-turtle.png"), -webkit-linear-gradient(top, #cdcdff, white);
+      /* Chrome 10+, Saf5.1+ */
+      background-image: url("images/blue-turtle.png"), -moz-linear-gradient(top, #cdcdff, white);
+      /* FF3.6+ */
+      background-image: url("images/blue-turtle.png"), -ms-linear-gradient(top, #cdcdff, white);
+      /* IE10 */
+      background-image: url("images/blue-turtle.png"), -o-linear-gradient(top, #cdcdff, white);
+      /* Opera 11.10+ */
+      background-position: center;
+      background-repeat: no-repeat; }
   div.torrent_footer #compact-button {
     -moz-border-radius: 5px;
     border-radius: 5px;
