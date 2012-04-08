@@ -400,7 +400,7 @@ div#torrent_inspector {
         background-position: center;
         background-repeat: no-repeat;
         border-left-width: 1px; }
-        div#torrent_inspector #inspector-tabs-wrapper #inspector-tabs > #inspector-tab-info:active, div#torrent_inspector #inspector-tabs-wrapper #inspector-tabs > #inspector-tab-info:hover, div#torrent_inspector #inspector-tabs-wrapper #inspector-tabs > #inspector-tab-info.selected {
+        div#torrent_inspector #inspector-tabs-wrapper #inspector-tabs > #inspector-tab-info:active, div#torrent_inspector #inspector-tabs-wrapper #inspector-tabs > #inspector-tab-info.selected {
           background-color: #e6e6ff;
           background-image: url("images/inspector-info.png");
           /* fallback */
@@ -432,7 +432,7 @@ div#torrent_inspector {
         /* Opera 11.10+ */
         background-position: center;
         background-repeat: no-repeat; }
-        div#torrent_inspector #inspector-tabs-wrapper #inspector-tabs > #inspector-tab-peers:active, div#torrent_inspector #inspector-tabs-wrapper #inspector-tabs > #inspector-tab-peers:hover, div#torrent_inspector #inspector-tabs-wrapper #inspector-tabs > #inspector-tab-peers.selected {
+        div#torrent_inspector #inspector-tabs-wrapper #inspector-tabs > #inspector-tab-peers:active, div#torrent_inspector #inspector-tabs-wrapper #inspector-tabs > #inspector-tab-peers.selected {
           background-color: #e6e6ff;
           background-image: url("images/inspector-peers.png");
           /* fallback */
@@ -464,7 +464,7 @@ div#torrent_inspector {
         /* Opera 11.10+ */
         background-position: center;
         background-repeat: no-repeat; }
-        div#torrent_inspector #inspector-tabs-wrapper #inspector-tabs > #inspector-tab-trackers:active, div#torrent_inspector #inspector-tabs-wrapper #inspector-tabs > #inspector-tab-trackers:hover, div#torrent_inspector #inspector-tabs-wrapper #inspector-tabs > #inspector-tab-trackers.selected {
+        div#torrent_inspector #inspector-tabs-wrapper #inspector-tabs > #inspector-tab-trackers:active, div#torrent_inspector #inspector-tabs-wrapper #inspector-tabs > #inspector-tab-trackers.selected {
           background-color: #e6e6ff;
           background-image: url("images/inspector-trackers.png");
           /* fallback */
@@ -500,7 +500,7 @@ div#torrent_inspector {
         /* Opera 11.10+ */
         background-position: center;
         background-repeat: no-repeat; }
-        div#torrent_inspector #inspector-tabs-wrapper #inspector-tabs > #inspector-tab-files:active, div#torrent_inspector #inspector-tabs-wrapper #inspector-tabs > #inspector-tab-files:hover, div#torrent_inspector #inspector-tabs-wrapper #inspector-tabs > #inspector-tab-files.selected {
+        div#torrent_inspector #inspector-tabs-wrapper #inspector-tabs > #inspector-tab-files:active, div#torrent_inspector #inspector-tabs-wrapper #inspector-tabs > #inspector-tab-files.selected {
           background-color: #e6e6ff;
           background-image: url("images/inspector-files.png");
           /* fallback */
@@ -714,7 +714,7 @@ div.file-priority-radiobox {
     background-position: center;
     background-repeat: no-repeat;
     border-right-width: 0px; }
-    div.file-priority-radiobox > div.low:active, div.file-priority-radiobox > div.low:hover, div.file-priority-radiobox > div.low.selected {
+    div.file-priority-radiobox > div.low:active, div.file-priority-radiobox > div.low.selected {
       background-color: #e6e6ff;
       background-image: url("images/file-priority-low.png");
       /* fallback */
@@ -746,7 +746,7 @@ div.file-priority-radiobox {
     /* Opera 11.10+ */
     background-position: center;
     background-repeat: no-repeat; }
-    div.file-priority-radiobox > div.normal:active, div.file-priority-radiobox > div.normal:hover, div.file-priority-radiobox > div.normal.selected {
+    div.file-priority-radiobox > div.normal:active, div.file-priority-radiobox > div.normal.selected {
       background-color: #e6e6ff;
       background-image: url("images/file-priority-normal.png");
       /* fallback */
@@ -783,7 +783,7 @@ div.file-priority-radiobox {
     background-position: center;
     background-repeat: no-repeat;
     border-left-width: 0px; }
-    div.file-priority-radiobox > div.high:active, div.file-priority-radiobox > div.high:hover, div.file-priority-radiobox > div.high.selected {
+    div.file-priority-radiobox > div.high:active, div.file-priority-radiobox > div.high.selected {
       background-color: #e6e6ff;
       background-image: url("images/file-priority-high.png");
       /* fallback */
@@ -847,7 +847,7 @@ div.torrent_footer {
     /* Opera 11.10+ */
     background-position: center;
     background-repeat: no-repeat; }
-    div.torrent_footer div.main_container:active, div.torrent_footer div.main_container:hover, div.torrent_footer div.main_container.selected {
+    div.torrent_footer div.main_container:active, div.torrent_footer div.main_container.selected {
       background-color: #e6e6ff;
       background-image: url("images/settings.png");
       /* fallback */
@@ -881,7 +881,7 @@ div.torrent_footer {
     /* Opera 11.10+ */
     background-position: center;
     background-repeat: no-repeat; }
-    div.torrent_footer #prefs-button:active, div.torrent_footer #prefs-button:hover, div.torrent_footer #prefs-button.selected {
+    div.torrent_footer #prefs-button:active, div.torrent_footer #prefs-button.selected {
       background-color: #e6e6ff;
       background-image: url("images/wrench.png");
       /* fallback */
@@ -915,7 +915,7 @@ div.torrent_footer {
     /* Opera 11.10+ */
     background-position: center;
     background-repeat: no-repeat; }
-    div.torrent_footer #turtle-button:active, div.torrent_footer #turtle-button:hover, div.torrent_footer #turtle-button.selected {
+    div.torrent_footer #turtle-button:active, div.torrent_footer #turtle-button.selected {
       background-color: #e6e6ff;
       background-image: url("images/turtle.png");
       /* fallback */
@@ -949,7 +949,7 @@ div.torrent_footer {
     /* Opera 11.10+ */
     background-position: center;
     background-repeat: no-repeat; }
-    div.torrent_footer #compact-button:active, div.torrent_footer #compact-button:hover, div.torrent_footer #compact-button.selected {
+    div.torrent_footer #compact-button:active, div.torrent_footer #compact-button.selected {
       background-color: #e6e6ff;
       background-image: url("images/compact.png");
       /* fallback */

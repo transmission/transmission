@@ -22,7 +22,7 @@
 
 @mixin buttonImage($image-url, $idle-color-top, $idle-color-bottom, $active-color-top, $active-color-bottom) {
 	@include imageOnVerticalGradient($image-url, $idle-color-top, $idle-color-bottom);
-	&:active, &:hover, &.selected {
+	&:active, &.selected {
 		@include imageOnVerticalGradient($image-url, $active-color-top, $active-color-bottom);
 	}
 }
