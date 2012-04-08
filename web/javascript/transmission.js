@@ -111,6 +111,7 @@ Transmission.prototype =
 			var o = data['arguments'];
 			Prefs.getClutchPrefs(o);
 			this.updateGuiFromSession(o);
+			this.sessionProperties = o;
 		}, this, async);
 	},
 
@@ -254,7 +255,7 @@ Transmission.prototype =
 	},
 
 	seedRatioLimit: function() {
-		var p = this._prefs;
+		var p = this.sessionProperties;
 		if (p && p.seedRatioLimited)
 			return p.seedRatioLimit;
 		return -1;
