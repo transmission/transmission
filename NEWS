@@ -5,7 +5,7 @@
   * Add environment variable options to have libcurl verify SSL certs
   * Support user-specified CXX environment variables during compile time
 ==== Mac ====
-  * Raise the number formatter limits for configuration options
+  * Raise the limits for many configuration options
   * Fix regression that ignored user-specified TRANSMISSION_HOME environment
 ==== GTK+ ====
   * Fix crash when adding torrents on systems without G_USER_DIRECTORY_DOWNLOAD
@@ -15,7 +15,7 @@
   * Improve support for Gnome Shell and Unity
   * Catch SIGTERM instead of SIGKILL
 ==== Qt ====
-  * Progressbar colors are now similar to the Mac and Web clients'
+  * Progress bar colors are now similar to the Mac and Web clients'
   * Improve the "Open Folder" behavior
 ==== Web Client ====
   * Fix global-seed-ratio progressbars
