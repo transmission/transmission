@@ -67,6 +67,7 @@ static void
 tr_prefs_init_defaults( tr_benc * d )
 {
     const char * str;
+    const char * special_dl_dir = g_get_user_special_dir( G_USER_DIRECTORY_DOWNLOAD );
 
     cf_check_older_configs( );
 
@@ -106,8 +107,7 @@ tr_prefs_init_defaults( tr_benc * d )
     tr_bencDictAddInt( d, PREF_KEY_MAIN_WINDOW_X, 50 );
     tr_bencDictAddInt( d, PREF_KEY_MAIN_WINDOW_Y, 50 );
 
-    str = g_get_user_special_dir( G_USER_DIRECTORY_DOWNLOAD );
-    tr_bencDictAddStr( d, TR_PREFS_KEY_DOWNLOAD_DIR, str );
+    tr_bencDictAddStr( d, TR_PREFS_KEY_DOWNLOAD_DIR, special_dl_dir ? special_dl_dir : str );
 
     tr_bencDictAddStr( d, PREF_KEY_SORT_MODE, "sort-by-name" );
     tr_bencDictAddBool( d, PREF_KEY_SORT_REVERSED, FALSE );

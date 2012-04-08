@@ -8,6 +8,7 @@
   * Raise the number formatter limits for configuration options
   * Fix regression that ignored user-specified TRANSMISSION_HOME environment
 ==== GTK+ ====
+  * Fix crash when adding torrents on systems without G_USER_DIRECTORY_DOWNLOAD
   * Honor the notification sound setting
   * Add a tooltip to files in the torrents' file list
   * Fix broken handling of the Cancel button in the "Open URL" dialog
