@@ -73,13 +73,15 @@ AC_SUBST(LIBAPPINDICATOR_MINIMUM)
 
 AC_PROG_CC
 AC_PROG_CXX
-AC_MSG_CHECKING([for $CXX])
-if test -f "$CXX"; then
+if test "x$CXX" != "x"; then # CXX is set...
+  if test -f "$CXX"; then # maybe it's an absolute path passed in env variables...
+    AC_MSG_CHECKING([for $CXX])
     HAVE_CXX="yes"
-else
-    HAVE_CXX="no"
+    AC_MSG_RESULT([$HAVE_CXX])
+  else
+    AC_CHECK_PROG([HAVE_CXX],[$CXX],[yes],[no])
+  fi
 fi
-AC_MSG_RESULT([$HAVE_CXX])
 AC_C_INLINE
 if test "x$GCC" = "xyes" ; then
 
