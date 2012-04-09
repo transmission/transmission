@@ -15,8 +15,8 @@ msgstr ""
 "Content-Type: text/plain; charset=UTf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n > 1;\n"
-"X-Launchpad-Export-Date: 2012-02-13 20:42+0000\n"
-"X-Generator: Launchpad (build 14781)\n"
+"X-Launchpad-Export-Date: 2012-04-09 01:44+0000\n"
+"X-Generator: Launchpad (build 15060)\n"
 
 #: ../gtk/actions.c:45
 msgid "Sort by _Activity"
@@ -72,7 +72,7 @@ msgstr "Visão _compacta"
 
 #: ../gtk/actions.c:88
 msgid "Re_verse Sort Order"
-msgstr "In_verter ordem de ordenação"
+msgstr "In_verter ordenação"
 
 #: ../gtk/actions.c:89
 msgid "_Filterbar"
@@ -120,11 +120,11 @@ msgstr "Copiar _Magnet link para a área de transferência"
 
 #: ../gtk/actions.c:104
 msgid "Open _URL…"
-msgstr ""
+msgstr "Abrir _URL…"
 
 #: ../gtk/actions.c:104
 msgid "Open URL…"
-msgstr ""
+msgstr "Abrir URL…"
 
 #: ../gtk/actions.c:105 ../gtk/actions.c:106
 msgid "Open a torrent"
@@ -184,7 +184,7 @@ msgstr "Iniciar todos torrents"
 
 #: ../gtk/actions.c:115
 msgid "Set _Location…"
-msgstr ""
+msgstr "Definir _local..."
 
 #: ../gtk/actions.c:116
 msgid "Remove torrent"
@@ -196,7 +196,7 @@ msgstr "_Remover e excluir arquivos"
 
 #: ../gtk/actions.c:118
 msgid "_New…"
-msgstr ""
+msgstr "_Novo…"
 
 #: ../gtk/actions.c:118
 msgid "Create a torrent"
@@ -273,7 +273,7 @@ msgstr "Semeie independente da atividade"
 
 #: ../gtk/details.c:462
 msgid "Stop seeding if idle for N minutes:"
-msgstr "Parar de semear se inativo por N minutes:"
+msgstr "Parar de semear se inativo por N minutos:"
 
 #: ../gtk/details.c:478 ../gtk/tr-prefs.c:1287
 msgid "Speed"
@@ -291,7 +291,7 @@ msgstr "Limite a _velocidade para baixar (%s)"
 #: ../gtk/details.c:498
 #, c-format
 msgid "Limit _upload speed (%s):"
-msgstr "Limite a _velocidade de envio (%s)"
+msgstr "Limite a _velocidade de envio (%s):"
 
 #: ../gtk/details.c:511 ../gtk/open-dialog.c:351
 msgid "Torrent _priority:"
@@ -299,7 +299,7 @@ msgstr "_Prioridade do torrent:"
 
 #: ../gtk/details.c:515
 msgid "Seeding Limits"
-msgstr "Limites semeados"
+msgstr "Limites para semear"
 
 #: ../gtk/details.c:525
 msgid "_Ratio:"
@@ -307,7 +307,7 @@ msgstr "P_roporção:"
 
 #: ../gtk/details.c:534
 msgid "_Idle:"
-msgstr "Oc_íoso:"
+msgstr "Oc_ioso:"
 
 #: ../gtk/details.c:537
 msgid "Peer Connections"
@@ -324,7 +324,7 @@ msgstr "Na fila para verificação"
 
 #: ../gtk/details.c:561
 msgid "Verifying local data"
-msgstr "Verificar dados locais"
+msgstr "Verificando dados locais"
 
 #: ../gtk/details.c:562 ../gtk/torrent-cell-renderer.c:204
 msgid "Queued for download"
@@ -333,7 +333,7 @@ msgstr "Na fila para baixar"
 #: ../gtk/details.c:563 ../gtk/filter.c:698
 msgctxt "Verb"
 msgid "Downloading"
-msgstr ""
+msgstr "Baixando"
 
 #: ../gtk/details.c:564 ../gtk/torrent-cell-renderer.c:207
 msgid "Queued for seeding"
@@ -342,7 +342,7 @@ msgstr "Na fila para semear"
 #: ../gtk/details.c:565 ../gtk/filter.c:699
 msgctxt "Verb"
 msgid "Seeding"
-msgstr ""
+msgstr "Semeando"
 
 #: ../gtk/details.c:566 ../gtk/filter.c:701 ../gtk/torrent-cell-renderer.c:198
 msgid "Finished"
@@ -513,7 +513,7 @@ msgstr "Comentário:"
 
 #: ../gtk/details.c:1056
 msgid "Webseeds"
-msgstr "Fontes Web"
+msgstr "Sementes web"
 
 #: ../gtk/details.c:1058 ../gtk/details.c:1111
 msgid "Down"
@@ -545,11 +545,11 @@ msgstr "Reqs baixados"
 
 #: ../gtk/details.c:1121
 msgid "Dn Blocks"
-msgstr "Blocos Dn"
+msgstr "Blocos baixados"
 
 #: ../gtk/details.c:1123
 msgid "Up Blocks"
-msgstr "Blocos Up"
+msgstr "Blocos enviados"
 
 #: ../gtk/details.c:1125
 msgid "We Cancelled"
@@ -581,7 +581,7 @@ msgstr "Enviando ao par"
 
 #: ../gtk/details.c:1487
 msgid "We would upload to this peer if they asked"
-msgstr "Poderíamos enviar para este par se ele nos solicitar"
+msgstr "Poderíamos enviar para este par se ele nos solicitasse"
 
 #: ../gtk/details.c:1488
 msgid "Peer has unchoked us, but we're not interested"
@@ -648,7 +648,7 @@ msgstr "Em fila de espera para pedir mais peers"
 #: ../gtk/details.c:1843
 #, c-format
 msgid "Asking for more peers now… <small>%s</small>"
-msgstr ""
+msgstr "Pedir mais pares agora... <small>%s</small>"
 
 #: ../gtk/details.c:1853
 #, c-format
@@ -672,7 +672,7 @@ msgstr "Contabilização de pares em lista de espera"
 #: ../gtk/details.c:1876
 #, c-format
 msgid "Asking for peer counts now… <small>%s</small>"
-msgstr ""
+msgstr "Pedindo a contagem de pares agora... <small>%s</small>"
 
 #: ../gtk/details.c:2146
 msgid "List contains invalid URLs"
@@ -728,7 +728,7 @@ msgstr "_Remover"
 msgid "Show _backup trackers"
 msgstr "Mostrar cópia de segurança de rastreadores"
 
-#: ../gtk/details.c:2543 ../gtk/msgwin.c:418
+#: ../gtk/details.c:2543 ../gtk/msgwin.c:429
 msgid "Information"
 msgstr "Informação"
 
@@ -871,9 +871,9 @@ msgstr "Ativo"
 #: ../gtk/filter.c:702
 msgctxt "Verb"
 msgid "Verifying"
-msgstr ""
+msgstr "Verificando"
 
-#: ../gtk/filter.c:703 ../gtk/msgwin.c:417
+#: ../gtk/filter.c:703 ../gtk/msgwin.c:428
 msgid "Error"
 msgstr "Erro"
 
@@ -882,46 +882,46 @@ msgstr "Erro"
 msgid "_Show:"
 msgstr "Mo_strar:"
 
-#: ../gtk/main.c:303
+#: ../gtk/main.c:307
 #, c-format
 msgid "Error registering Transmission as x-scheme-handler/magnet handler: %s"
 msgstr ""
 "Erro ao registrar o manipulador do Transmission como x-scheme-"
 "handler/magnet: %s"
 
-#: ../gtk/main.c:468
+#: ../gtk/main.c:472
 #, c-format
 msgid ""
 "Got signal %d; trying to shut down cleanly. Do it again if it gets stuck."
 msgstr ""
 "Obteve sinal %d; tentando fechar corretamente. Faça novamente se ficar preso."
 
-#: ../gtk/main.c:596
+#: ../gtk/main.c:604
 msgid "Where to look for configuration files"
 msgstr "Onde olhar para arquivos de configuração"
 
-#: ../gtk/main.c:597
+#: ../gtk/main.c:605
 msgid "Start with all torrents paused"
 msgstr "Iniciar todos os torrents pausados"
 
-#: ../gtk/main.c:598
+#: ../gtk/main.c:606
 msgid "Start minimized in notification area"
 msgstr "Iniciar minimizado na área de notificação"
 
-#: ../gtk/main.c:599
+#: ../gtk/main.c:607
 msgid "Show version number and exit"
 msgstr "Mostrar o número da versão e sair"
 
-#: ../gtk/main.c:617 ../gtk/transmission-gtk.desktop.in.h:1
+#: ../gtk/main.c:625 ../gtk/transmission-gtk.desktop.in.h:1
 msgid "Transmission"
 msgstr "Transmission"
 
 #. parse the command line
-#: ../gtk/main.c:621
+#: ../gtk/main.c:629
 msgid "[torrent files or urls]"
 msgstr "[arquivos ou urls de torrents]"
 
-#: ../gtk/main.c:625
+#: ../gtk/main.c:633
 #, c-format
 msgid ""
 "%s\n"
@@ -931,7 +931,7 @@ msgstr ""
 "Execute '%s --help'  para ver a lista completa de opções para linha de "
 "comando.\n"
 
-#: ../gtk/main.c:722
+#: ../gtk/main.c:730
 msgid ""
 "Transmission is a file-sharing program. When you run a torrent, its data "
 "will be made available to others by means of upload. You and you alone are "
@@ -943,46 +943,46 @@ msgstr ""
 "upload. Você e só você é totalmente responsável por exercer um juízo "
 "adequado e respeitando as leis locais."
 
-#: ../gtk/main.c:724
+#: ../gtk/main.c:732
 msgid "I _Accept"
 msgstr "Eu _concordo"
 
-#: ../gtk/main.c:933
+#: ../gtk/main.c:941
 msgid "<b>Closing Connections</b>"
 msgstr "<b>Fechando conexões</b>"
 
-#: ../gtk/main.c:937
+#: ../gtk/main.c:945
 msgid "Sending upload/download totals to tracker…"
-msgstr ""
+msgstr "Enviando total de baixados/enviados ao rastreador..."
 
-#: ../gtk/main.c:942
+#: ../gtk/main.c:950
 msgid "_Quit Now"
 msgstr "Sair _agora"
 
-#: ../gtk/main.c:1000
+#: ../gtk/main.c:1008
 msgid "Couldn't add corrupt torrent"
 msgid_plural "Couldn't add corrupt torrents"
 msgstr[0] "Não foi possível adicionar torrent corrompido"
 msgstr[1] "Não foi possível adicionar torrents corrompidos"
 
-#: ../gtk/main.c:1007
+#: ../gtk/main.c:1015
 msgid "Couldn't add duplicate torrent"
 msgid_plural "Couldn't add duplicate torrents"
 msgstr[0] "Não foi possível adicionar torrent duplicado"
 msgstr[1] "Não foi possível adicionar torrents duplicados"
 
-#: ../gtk/main.c:1308
+#: ../gtk/main.c:1316
 msgid "A fast and easy BitTorrent client"
 msgstr "Um cliente BitTorrent rápido e fácil"
 
-#: ../gtk/main.c:1309
+#: ../gtk/main.c:1317
 msgid "Copyright (c) The Transmission Project"
 msgstr "Copyright (c) O Projeto Transmission"
 
 #. Translators: translate "translator-credits" as your name
 #. to have it appear in the credits in the "About"
 #. dialog
-#: ../gtk/main.c:1315
+#: ../gtk/main.c:1323
 msgid "translator-credits"
 msgstr ""
 "Raphael Higino <phhigino@gmail.com>\n"
@@ -1007,6 +1007,7 @@ msgstr ""
 "  Enrico Nicoletto https://launchpad.net/~liverig\n"
 "  Eugênio F https://launchpad.net/~eugf\n"
 "  Fabio M. P. Bugnon https://launchpad.net/~fbugnon\n"
+"  Fred Ulisses Maranhão https://launchpad.net/~fred-maranhao\n"
 "  Gerson \"fserve\" Barreiros https://launchpad.net/~fserve\n"
 "  Guilherme Gonçalves https://launchpad.net/~guilherme08\n"
 "  Gustavo Brandão https://launchpad.net/~gustavobrandao\n"
@@ -1014,8 +1015,10 @@ msgstr ""
 "  Heder Dorneles Soares https://launchpad.net/~heder-to\n"
 "  Henrique P. Machado https://launchpad.net/~zehrique\n"
 "  Hutley https://launchpad.net/~helderc\n"
+"  Luiz Rodrigo https://launchpad.net/~luizrodri-go\n"
 "  Olívio Farias https://launchpad.net/~oliviofarias\n"
 "  Paulo de Lima Cavalcanti https://launchpad.net/~paulocarpina\n"
+"  Renato Krupa https://launchpad.net/~renatokrupa\n"
 "  Robert Ancell https://launchpad.net/~robert-ancell\n"
 "  Rogério Theodoro de Brito https://launchpad.net/~rbrito\n"
 "  Ugo https://launchpad.net/~ugosan\n"
@@ -1064,7 +1067,7 @@ msgstr "Novo torrent"
 
 #: ../gtk/makemeta-ui.c:183
 msgid "Creating torrent…"
-msgstr ""
+msgstr "Criando torrent..."
 
 #: ../gtk/makemeta-ui.c:292
 msgid "No source selected"
@@ -1133,15 +1136,15 @@ msgstr "Tempo"
 msgid "Message"
 msgstr "Mensagem"
 
-#: ../gtk/msgwin.c:419
+#: ../gtk/msgwin.c:430
 msgid "Debug"
 msgstr "Depurar"
 
-#: ../gtk/msgwin.c:445
+#: ../gtk/msgwin.c:456
 msgid "Message Log"
 msgstr "Mensagem de registro"
 
-#: ../gtk/msgwin.c:482
+#: ../gtk/msgwin.c:493
 msgid "Level"
 msgstr "Nível"
 
@@ -1229,7 +1232,7 @@ msgstr "Não pode mover o torrent"
 
 #: ../gtk/relocate.c:125
 msgid "This may take a moment…"
-msgstr ""
+msgstr "Isso pode levar um tempo..."
 
 #: ../gtk/relocate.c:156 ../gtk/relocate.c:176
 msgid "Set Torrent Location"
@@ -1506,7 +1509,7 @@ msgstr "Chamar _script quando o torrent for concluído:"
 #: ../gtk/tr-prefs.c:325
 msgctxt "Gerund"
 msgid "Adding"
-msgstr ""
+msgstr "Adicionando"
 
 #: ../gtk/tr-prefs.c:339
 msgid "Automatically _add torrents from:"
@@ -1515,7 +1518,7 @@ msgstr "Adicion_ar torrents automaticamente de:"
 #: ../gtk/tr-prefs.c:347
 msgctxt "Gerund"
 msgid "Seeding"
-msgstr ""
+msgstr "Semeando"
 
 #: ../gtk/tr-prefs.c:349
 msgid "Stop seeding at _ratio:"
@@ -1581,7 +1584,7 @@ msgstr "Atualizar lista de bloqueios"
 
 #: ../gtk/tr-prefs.c:484
 msgid "Getting new blocklist…"
-msgstr ""
+msgstr "Obtendo nova lista de bloqueio..."
 
 #: ../gtk/tr-prefs.c:512
 msgid "Allow encryption"
@@ -1786,7 +1789,7 @@ msgstr "A porta está <b>fechada</b>"
 
 #: ../gtk/tr-prefs.c:1185
 msgid "<i>Testing TCP port…</i>"
-msgstr ""
+msgstr "<i>Testando porta TCP…</i>"
 
 #: ../gtk/tr-prefs.c:1208
 msgid "Listening Port"
@@ -1840,7 +1843,7 @@ msgstr "Torrents"
 #: ../gtk/tr-prefs.c:1284
 msgctxt "Gerund"
 msgid "Downloading"
-msgstr ""
+msgstr "Baixando"
 
 #: ../gtk/tr-prefs.c:1293
 msgid "Network"
@@ -1965,35 +1968,35 @@ msgstr "TiB"
 
 #: ../gtk/util.c:44
 msgid "kB"
-msgstr ""
+msgstr "kB"
 
 #: ../gtk/util.c:45
 msgid "MB"
-msgstr ""
+msgstr "MB"
 
 #: ../gtk/util.c:46
 msgid "GB"
-msgstr ""
+msgstr "GB"
 
 #: ../gtk/util.c:47
 msgid "TB"
-msgstr ""
+msgstr "TB"
 
 #: ../gtk/util.c:50
 msgid "kB/s"
-msgstr ""
+msgstr "kB/s"
 
 #: ../gtk/util.c:51
 msgid "MB/s"
-msgstr ""
+msgstr "MB/s"
 
 #: ../gtk/util.c:52
 msgid "GB/s"
-msgstr ""
+msgstr "GB/s"
 
 #: ../gtk/util.c:53
 msgid "TB/s"
-msgstr ""
+msgstr "TB/s"
 
 #: ../gtk/util.c:87 ../libtransmission/utils.c:1485
 msgid "None"
@@ -2079,17 +2082,17 @@ msgstr ""
 msgid "Invalid metadata"
 msgstr "Metadados inválidos"
 
-#: ../libtransmission/bencode.c:1706 ../libtransmission/bencode.c:1734
+#: ../libtransmission/bencode.c:1716 ../libtransmission/bencode.c:1744
 #, c-format
 msgid "Couldn't save temporary file \"%1$s\": %2$s"
 msgstr "Não foi possível salvar arquivo temporário \"%1$s\": %2$s"
 
-#: ../libtransmission/bencode.c:1721
+#: ../libtransmission/bencode.c:1731
 #, c-format
 msgid "Saved \"%s\""
 msgstr "\"%s\" salvo"
 
-#: ../libtransmission/bencode.c:1726 ../libtransmission/blocklist.c:417
+#: ../libtransmission/bencode.c:1736 ../libtransmission/blocklist.c:417
 #, c-format
 msgid "Couldn't save file \"%1$s\": %2$s"
 msgstr "Não foi possível salvar o arquivo \"%1$s\": %2$s"

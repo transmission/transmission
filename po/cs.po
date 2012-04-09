@@ -8,15 +8,15 @@ msgstr ""
 "Project-Id-Version: transmission\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2012-02-03 15:22-0600\n"
-"PO-Revision-Date: 2011-06-03 17:55+0000\n"
-"Last-Translator: Adrian Guniš <andygun696@gmail.com>\n"
+"PO-Revision-Date: 2012-03-04 18:53+0000\n"
+"Last-Translator: Mafiosso <pavelvonlostice@seznam.cz>\n"
 "Language-Team: Czech <cs@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
-"X-Launchpad-Export-Date: 2012-02-13 20:41+0000\n"
-"X-Generator: Launchpad (build 14781)\n"
+"X-Launchpad-Export-Date: 2012-04-09 01:45+0000\n"
+"X-Generator: Launchpad (build 15060)\n"
 
 #: ../gtk/actions.c:45
 msgid "Sort by _Activity"
@@ -32,7 +32,7 @@ msgstr "Řadit dle _průběhu"
 
 #: ../gtk/actions.c:48
 msgid "Sort by _Queue"
-msgstr ""
+msgstr "Třídit podle fronty"
 
 #: ../gtk/actions.c:49
 msgid "Sort by Rati_o"
@@ -104,7 +104,7 @@ msgstr "Řadit torrenty _dle"
 
 #: ../gtk/actions.c:100
 msgid "_Queue"
-msgstr ""
+msgstr "_Fronta"
 
 #: ../gtk/actions.c:101 ../gtk/details.c:2436
 msgid "_Edit"
@@ -120,11 +120,11 @@ msgstr "Kopírovat _magnet link do schránky"
 
 #: ../gtk/actions.c:104
 msgid "Open _URL…"
-msgstr ""
+msgstr "Otevřít _URL..."
 
 #: ../gtk/actions.c:104
 msgid "Open URL…"
-msgstr ""
+msgstr "Otevřít _URL..."
 
 #: ../gtk/actions.c:105 ../gtk/actions.c:106
 msgid "Open a torrent"
@@ -140,11 +140,11 @@ msgstr "Spustit torrent"
 
 #: ../gtk/actions.c:108
 msgid "Start _Now"
-msgstr ""
+msgstr "Začít _teď"
 
 #: ../gtk/actions.c:108
 msgid "Start torrent now"
-msgstr ""
+msgstr "Spustit torrent nyní"
 
 #: ../gtk/actions.c:109
 msgid "_Statistics"
@@ -184,7 +184,7 @@ msgstr "Spustit všechny torrenty"
 
 #: ../gtk/actions.c:115
 msgid "Set _Location…"
-msgstr ""
+msgstr "Nastavit _umístění..."
 
 #: ../gtk/actions.c:116
 msgid "Remove torrent"
@@ -196,7 +196,7 @@ msgstr "Sma_zat soubory a odstranit"
 
 #: ../gtk/actions.c:118
 msgid "_New…"
-msgstr ""
+msgstr "_Nový..."
 
 #: ../gtk/actions.c:118
 msgid "Create a torrent"
@@ -232,23 +232,23 @@ msgstr "Požádat tracker o ví_ce protějšků"
 
 #: ../gtk/actions.c:128
 msgid "Move to _Top"
-msgstr ""
+msgstr "Přesunout _nahoru"
 
 #: ../gtk/actions.c:129
 msgid "Move _Up"
-msgstr ""
+msgstr "Přesunout _výše"
 
 #: ../gtk/actions.c:130
 msgid "Move _Down"
-msgstr ""
+msgstr "Přesunout _níže"
 
 #: ../gtk/actions.c:131
 msgid "Move to _Bottom"
-msgstr ""
+msgstr "Přesunout _dolů"
 
 #: ../gtk/actions.c:132
 msgid "Present Main Window"
-msgstr ""
+msgstr "Zobrazovat hlavní okno"
 
 #: ../gtk/conf.c:317 ../gtk/conf.c:322
 #, c-format
@@ -328,21 +328,21 @@ msgstr "Ověřování místních dat"
 
 #: ../gtk/details.c:562 ../gtk/torrent-cell-renderer.c:204
 msgid "Queued for download"
-msgstr ""
+msgstr "Zařazeno pro stažení"
 
 #: ../gtk/details.c:563 ../gtk/filter.c:698
 msgctxt "Verb"
 msgid "Downloading"
-msgstr ""
+msgstr "Stahování"
 
 #: ../gtk/details.c:564 ../gtk/torrent-cell-renderer.c:207
 msgid "Queued for seeding"
-msgstr ""
+msgstr "Zařazeno do fronty pro sdílení"
 
 #: ../gtk/details.c:565 ../gtk/filter.c:699
 msgctxt "Verb"
 msgid "Seeding"
-msgstr ""
+msgstr "Sdílení"
 
 #: ../gtk/details.c:566 ../gtk/filter.c:701 ../gtk/torrent-cell-renderer.c:198
 msgid "Finished"
@@ -543,11 +543,11 @@ msgstr "Žádosti o upload"
 
 #: ../gtk/details.c:1119
 msgid "Dn Reqs"
-msgstr "Žádosti o download"
+msgstr "Žádosti o stahování"
 
 #: ../gtk/details.c:1121
 msgid "Dn Blocks"
-msgstr "Dn bloky"
+msgstr "Stahované bloky"
 
 #: ../gtk/details.c:1123
 msgid "Up Blocks"
@@ -649,7 +649,7 @@ msgstr "Žádost o více protějšků zařazena do fronty"
 #: ../gtk/details.c:1843
 #, c-format
 msgid "Asking for more peers now… <small>%s</small>"
-msgstr ""
+msgstr "Dotazuji se o více peerů... <small>%s</small>"
 
 #: ../gtk/details.c:1853
 #, c-format
@@ -673,7 +673,7 @@ msgstr "Dotaz na počet protějšků zařazen do fronty"
 #: ../gtk/details.c:1876
 #, c-format
 msgid "Asking for peer counts now… <small>%s</small>"
-msgstr ""
+msgstr "Dotazuji se na počet peerů... <small>%s</small>"
 
 #: ../gtk/details.c:2146
 msgid "List contains invalid URLs"
@@ -729,7 +729,7 @@ msgstr "_Odebrat"
 msgid "Show _backup trackers"
 msgstr "Zobrazit zá_ložní trackery"
 
-#: ../gtk/details.c:2543 ../gtk/msgwin.c:418
+#: ../gtk/details.c:2543 ../gtk/msgwin.c:429
 msgid "Information"
 msgstr "Informace"
 
@@ -879,9 +879,9 @@ msgstr "Aktivní"
 #: ../gtk/filter.c:702
 msgctxt "Verb"
 msgid "Verifying"
-msgstr ""
+msgstr "Ověřování"
 
-#: ../gtk/filter.c:703 ../gtk/msgwin.c:417
+#: ../gtk/filter.c:703 ../gtk/msgwin.c:428
 msgid "Error"
 msgstr "Chyba"
 
@@ -890,12 +890,12 @@ msgstr "Chyba"
 msgid "_Show:"
 msgstr "_Zobrazit:"
 
-#: ../gtk/main.c:303
+#: ../gtk/main.c:307
 #, c-format
 msgid "Error registering Transmission as x-scheme-handler/magnet handler: %s"
-msgstr ""
+msgstr "Chyba při spouštění programu x-scheme-handler/magnet handler: %s"
 
-#: ../gtk/main.c:468
+#: ../gtk/main.c:472
 #, c-format
 msgid ""
 "Got signal %d; trying to shut down cleanly. Do it again if it gets stuck."
@@ -903,39 +903,42 @@ msgstr ""
 "Obdržen signál %d; pokuste se ukončit aplikaci klasickým způsobem. Dojde-li "
 "k zaseknutí, zkuste to znovu."
 
-#: ../gtk/main.c:596
+#: ../gtk/main.c:604
 msgid "Where to look for configuration files"
 msgstr "Kde hledat konfigurační soubory"
 
-#: ../gtk/main.c:597
+#: ../gtk/main.c:605
 msgid "Start with all torrents paused"
 msgstr "Spustit se všemi torrenty pozastavenými"
 
-#: ../gtk/main.c:598
+#: ../gtk/main.c:606
 msgid "Start minimized in notification area"
 msgstr "Spustit minimalizovaně v oznamovací oblasti"
 
-#: ../gtk/main.c:599
+#: ../gtk/main.c:607
 msgid "Show version number and exit"
 msgstr "Zobrazit číslo verze a ukončit"
 
-#: ../gtk/main.c:617 ../gtk/transmission-gtk.desktop.in.h:1
+#: ../gtk/main.c:625 ../gtk/transmission-gtk.desktop.in.h:1
 msgid "Transmission"
 msgstr "Transmission"
 
 #. parse the command line
-#: ../gtk/main.c:621
+#: ../gtk/main.c:629
 msgid "[torrent files or urls]"
 msgstr "[soubory torrent nebo url]"
 
-#: ../gtk/main.c:625
+#: ../gtk/main.c:633
 #, c-format
 msgid ""
 "%s\n"
 "Run '%s --help' to see a full list of available command line options.\n"
 msgstr ""
+"%s\n"
+"Spusťte „%s --help“ pro zobrazení seznamu dostupných přepínačů příkazového "
+"řádku.\n"
 
-#: ../gtk/main.c:722
+#: ../gtk/main.c:730
 msgid ""
 "Transmission is a file-sharing program. When you run a torrent, its data "
 "will be made available to others by means of upload. You and you alone are "
@@ -946,48 +949,48 @@ msgstr ""
 "budou dostupná ostatním pomocí odesílání. Vy a pouze vy sami jste plně "
 "odpovědný za správné posouzení a dodržování místních zákonů."
 
-#: ../gtk/main.c:724
+#: ../gtk/main.c:732
 msgid "I _Accept"
 msgstr "_Přijímám"
 
-#: ../gtk/main.c:933
+#: ../gtk/main.c:941
 msgid "<b>Closing Connections</b>"
 msgstr "<b>Ukončování spojení</b>"
 
-#: ../gtk/main.c:937
+#: ../gtk/main.c:945
 msgid "Sending upload/download totals to tracker…"
-msgstr ""
+msgstr "Posílání upload/download statistik trackeru..."
 
-#: ../gtk/main.c:942
+#: ../gtk/main.c:950
 msgid "_Quit Now"
 msgstr "U_končit hned"
 
-#: ../gtk/main.c:1000
+#: ../gtk/main.c:1008
 msgid "Couldn't add corrupt torrent"
 msgid_plural "Couldn't add corrupt torrents"
 msgstr[0] "Nelze přidat poškozený torrent"
 msgstr[1] "Nelze přidat poškozené torrenty"
 msgstr[2] "Nelze přidat poškozené torrenty"
 
-#: ../gtk/main.c:1007
+#: ../gtk/main.c:1015
 msgid "Couldn't add duplicate torrent"
 msgid_plural "Couldn't add duplicate torrents"
 msgstr[0] "Nelze přidat duplicitní torrent"
 msgstr[1] "Nelze přidat duplicitní torrenty"
 msgstr[2] "Nelze přidat duplicitní torrenty"
 
-#: ../gtk/main.c:1308
+#: ../gtk/main.c:1316
 msgid "A fast and easy BitTorrent client"
 msgstr "Rychlý a jednoduchý BitTorrent klient"
 
-#: ../gtk/main.c:1309
+#: ../gtk/main.c:1317
 msgid "Copyright (c) The Transmission Project"
 msgstr "Copyright (c) The Transmission Project"
 
 #. Translators: translate "translator-credits" as your name
 #. to have it appear in the credits in the "About"
 #. dialog
-#: ../gtk/main.c:1315
+#: ../gtk/main.c:1323
 msgid "translator-credits"
 msgstr ""
 "Launchpad Contributions:\n"
@@ -998,11 +1001,13 @@ msgstr ""
 "  Jezevec https://launchpad.net/~trnslt\n"
 "  Konki https://launchpad.net/~pavel-konkol\n"
 "  Kuvaly [LCT] https://launchpad.net/~kuvaly\n"
+"  Mafiosso https://launchpad.net/~pavelvonlostice\n"
 "  Matěj Božik https://launchpad.net/~matejovo\n"
 "  Michal Kundrat https://launchpad.net/~dreit\n"
 "  Peter Mráz https://launchpad.net/~etki\n"
 "  Roman Horník https://launchpad.net/~roman.hornik\n"
 "  Valerie Engel https://launchpad.net/~en-valeri\n"
+"  Vojtěch Trefný https://launchpad.net/~vojtech.trefny\n"
 "  adam.havelka https://launchpad.net/~adam-havelka\n"
 "  jirihuf https://launchpad.net/~jirihuf\n"
 "  schunka https://launchpad.net/~schunka"
@@ -1049,7 +1054,7 @@ msgstr "Nový torrent"
 
 #: ../gtk/makemeta-ui.c:183
 msgid "Creating torrent…"
-msgstr ""
+msgstr "Vytvářím torrent..."
 
 #: ../gtk/makemeta-ui.c:292
 msgid "No source selected"
@@ -1120,15 +1125,15 @@ msgstr "Čas"
 msgid "Message"
 msgstr "Zpráva"
 
-#: ../gtk/msgwin.c:419
+#: ../gtk/msgwin.c:430
 msgid "Debug"
 msgstr "Ladění"
 
-#: ../gtk/msgwin.c:445
+#: ../gtk/msgwin.c:456
 msgid "Message Log"
 msgstr "Protokol zpráv"
 
-#: ../gtk/msgwin.c:482
+#: ../gtk/msgwin.c:493
 msgid "Level"
 msgstr "Úroveň"
 
@@ -1142,7 +1147,7 @@ msgstr "Otevřít složku"
 
 #: ../gtk/notify.c:226
 msgid "Torrent Complete"
-msgstr "Torrent je úplný"
+msgstr "Torrent kompletní"
 
 #: ../gtk/notify.c:248
 msgid "Torrent Added"
@@ -1216,7 +1221,7 @@ msgstr "Nelze přesunout torrent"
 
 #: ../gtk/relocate.c:125
 msgid "This may take a moment…"
-msgstr ""
+msgstr "Toto může chvíli trvat..."
 
 #: ../gtk/relocate.c:156 ../gtk/relocate.c:176
 msgid "Set Torrent Location"
@@ -1422,21 +1427,21 @@ msgstr "Stahovat a sdílet soubory přes BitTorrent"
 #: ../gtk/tr-core.c:1083
 #, c-format
 msgid "Couldn't read \"%s\": %s"
-msgstr ""
+msgstr "Nelze přečíst \"%s\":%s"
 
 #: ../gtk/tr-core.c:1175
 #, c-format
 msgid "Skipping unknown torrent \"%s\""
-msgstr ""
+msgstr "Přeskakování neznámého torentu \"%s\""
 
 #: ../gtk/tr-core.c:1411
 msgid "Inhibiting desktop hibernation"
-msgstr ""
+msgstr "Potlačování hibernace prostředí"
 
 #: ../gtk/tr-core.c:1413
 #, c-format
 msgid "Couldn't inhibit desktop hibernation: %s"
-msgstr ""
+msgstr "Nelze potlačit hibernaci prostředí: %s"
 
 #: ../gtk/tr-core.c:1446
 msgid "Allowing desktop hibernation"
@@ -1468,15 +1473,15 @@ msgstr "Uložit do _umístění:"
 
 #: ../gtk/tr-prefs.c:275
 msgid "Queue"
-msgstr ""
+msgstr "Fronta"
 
 #: ../gtk/tr-prefs.c:277
 msgid "Maximum active _downloads:"
-msgstr ""
+msgstr "Maximum aktivních _stahování:"
 
 #: ../gtk/tr-prefs.c:281
 msgid "Downloads sharing data in the last N minutes are _active:"
-msgstr ""
+msgstr "Sdílená data o stahování v posledních N minutách jsou _aktivní:"
 
 #: ../gtk/tr-prefs.c:286 ../libtransmission/torrent.c:1903
 msgid "Incomplete"
@@ -1492,12 +1497,12 @@ msgstr "Ponechat _neúplné torrenty v:"
 
 #: ../gtk/tr-prefs.c:299
 msgid "Call _script when torrent is completed:"
-msgstr ""
+msgstr "Spustit _skript, jakmile je torrent hotov:"
 
 #: ../gtk/tr-prefs.c:325
 msgctxt "Gerund"
 msgid "Adding"
-msgstr ""
+msgstr "Přidává se"
 
 #: ../gtk/tr-prefs.c:339
 msgid "Automatically _add torrents from:"
@@ -1506,7 +1511,7 @@ msgstr "Automaticky přid_at torrenty z:"
 #: ../gtk/tr-prefs.c:347
 msgctxt "Gerund"
 msgid "Seeding"
-msgstr ""
+msgstr "Sdílí se"
 
 #: ../gtk/tr-prefs.c:349
 msgid "Stop seeding at _ratio:"
@@ -1522,7 +1527,7 @@ msgstr "Pracovní prostředí"
 
 #: ../gtk/tr-prefs.c:382
 msgid "_Inhibit hibernation when torrents are active"
-msgstr ""
+msgstr "_Potlačit hibernaci, když jsou torrenty aktivní"
 
 #: ../gtk/tr-prefs.c:386
 msgid "Show Transmission icon in the _notification area"
@@ -1530,19 +1535,19 @@ msgstr "Zobrazit ikonu Transmission v _oznamovací oblasti"
 
 #: ../gtk/tr-prefs.c:391
 msgid "Notification"
-msgstr ""
+msgstr "Oznámení"
 
 #: ../gtk/tr-prefs.c:393
 msgid "Show a notification when torrents are a_dded"
-msgstr ""
+msgstr "Ukázat oznámení, když jsou torenty _přidány"
 
 #: ../gtk/tr-prefs.c:397
 msgid "Show a notification when torrents _finish"
-msgstr ""
+msgstr "Ukázat oznámení, když jsou torenty _hotovy"
 
 #: ../gtk/tr-prefs.c:401
 msgid "Play a _sound when torrents finish"
-msgstr ""
+msgstr "Přehrát _zvuk, když jsou torenty hotovy"
 
 #: ../gtk/tr-prefs.c:430
 #, c-format
@@ -1574,7 +1579,7 @@ msgstr "Aktualizovat seznam blokovaných"
 
 #: ../gtk/tr-prefs.c:484
 msgid "Getting new blocklist…"
-msgstr ""
+msgstr "Stahuji nový blokový seznam..."
 
 #: ../gtk/tr-prefs.c:512
 msgid "Allow encryption"
@@ -1780,7 +1785,7 @@ msgstr "Port je <b>uzavřen</b>"
 
 #: ../gtk/tr-prefs.c:1185
 msgid "<i>Testing TCP port…</i>"
-msgstr ""
+msgstr "<i>Testování TCP portu...</i>"
 
 #: ../gtk/tr-prefs.c:1208
 msgid "Listening Port"
@@ -1833,7 +1838,7 @@ msgstr "Torrenty"
 #: ../gtk/tr-prefs.c:1284
 msgctxt "Gerund"
 msgid "Downloading"
-msgstr ""
+msgstr "Stahuje se"
 
 #: ../gtk/tr-prefs.c:1293
 msgid "Network"
@@ -1935,7 +1940,7 @@ msgstr "Poměr: %s"
 #: ../gtk/tr-window.c:814
 #, c-format
 msgid "Down: %1$s, Up: %2$s"
-msgstr ""
+msgstr "Staženo: %1$s, Nahráno: %2$s"
 
 #: ../gtk/tr-window.c:825
 #, c-format
@@ -1960,35 +1965,35 @@ msgstr "TiB"
 
 #: ../gtk/util.c:44
 msgid "kB"
-msgstr ""
+msgstr "kB"
 
 #: ../gtk/util.c:45
 msgid "MB"
-msgstr ""
+msgstr "MB"
 
 #: ../gtk/util.c:46
 msgid "GB"
-msgstr ""
+msgstr "GB"
 
 #: ../gtk/util.c:47
 msgid "TB"
-msgstr ""
+msgstr "TB"
 
 #: ../gtk/util.c:50
 msgid "kB/s"
-msgstr ""
+msgstr "kB/s"
 
 #: ../gtk/util.c:51
 msgid "MB/s"
-msgstr ""
+msgstr "MB/s"
 
 #: ../gtk/util.c:52
 msgid "GB/s"
-msgstr ""
+msgstr "GB/s"
 
 #: ../gtk/util.c:53
 msgid "TB/s"
-msgstr ""
+msgstr "TB/s"
 
 #: ../gtk/util.c:87 ../libtransmission/utils.c:1485
 msgid "None"
@@ -2078,17 +2083,17 @@ msgstr ""
 msgid "Invalid metadata"
 msgstr "Neplatná metadata"
 
-#: ../libtransmission/bencode.c:1706 ../libtransmission/bencode.c:1734
+#: ../libtransmission/bencode.c:1716 ../libtransmission/bencode.c:1744
 #, c-format
 msgid "Couldn't save temporary file \"%1$s\": %2$s"
 msgstr "Nelze uložit dočasný soubor \"%1$s\": %2$s"
 
-#: ../libtransmission/bencode.c:1721
+#: ../libtransmission/bencode.c:1731
 #, c-format
 msgid "Saved \"%s\""
 msgstr "Uloženo \"%s\""
 
-#: ../libtransmission/bencode.c:1726 ../libtransmission/blocklist.c:417
+#: ../libtransmission/bencode.c:1736 ../libtransmission/blocklist.c:417
 #, c-format
 msgid "Couldn't save file \"%1$s\": %2$s"
 msgstr "Nelze uložit soubor \"%1$s\": %2$s"
@@ -2129,7 +2134,7 @@ msgstr "Nelze otevřít \"%1$s\": %2$s"
 #: ../libtransmission/fdlimit.c:396
 #, c-format
 msgid "Couldn't truncate \"%1$s\": %2$s"
-msgstr ""
+msgstr "Nelze zmenšit \"%1$s\": %2$s"
 
 #: ../libtransmission/fdlimit.c:682
 #, c-format

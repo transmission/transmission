@@ -8,28 +8,28 @@ msgstr ""
 "Project-Id-Version: transmission\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2012-02-03 15:22-0600\n"
-"PO-Revision-Date: 2009-11-18 01:36+0000\n"
-"Last-Translator: Khaled Hosny <khaledhosny@eglug.org>\n"
+"PO-Revision-Date: 2012-03-30 13:12+0000\n"
+"Last-Translator: Ahmed Mohammed <Unknown>\n"
 "Language-Team: Arabic <ar@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n % 100 >= "
 "3 && n % 100 <= 10 ? 3 : n % 100 >= 11 && n % 100 <= 99 ? 4 : 5;\n"
-"X-Launchpad-Export-Date: 2012-02-13 20:42+0000\n"
-"X-Generator: Launchpad (build 14781)\n"
+"X-Launchpad-Export-Date: 2012-04-09 01:45+0000\n"
+"X-Generator: Launchpad (build 15060)\n"
 
 #: ../gtk/actions.c:45
 msgid "Sort by _Activity"
-msgstr "رتّب حسب النشاط"
+msgstr "رتّب حسب ال_نشاط"
 
 #: ../gtk/actions.c:46
 msgid "Sort by _Name"
-msgstr "رتّب حسب الاسم"
+msgstr "رتّب حسب الا_سم"
 
 #: ../gtk/actions.c:47
 msgid "Sort by _Progress"
-msgstr "رتّب حسب التقدم"
+msgstr "رتّب حسب ال_تقدم"
 
 #: ../gtk/actions.c:48
 msgid "Sort by _Queue"
@@ -37,11 +37,11 @@ msgstr ""
 
 #: ../gtk/actions.c:49
 msgid "Sort by Rati_o"
-msgstr ""
+msgstr "رتِّب حسب ال_نسبة"
 
 #: ../gtk/actions.c:50
 msgid "Sort by Stat_e"
-msgstr ""
+msgstr "رتِّب حسب ال_حالة"
 
 #: ../gtk/actions.c:51
 msgid "Sort by A_ge"
@@ -49,7 +49,7 @@ msgstr "رتب حسب ال_عمر"
 
 #: ../gtk/actions.c:52
 msgid "Sort by Time _Left"
-msgstr ""
+msgstr "رتِّب حسب الوقت المت_بقي"
 
 #: ../gtk/actions.c:53
 msgid "Sort by Si_ze"
@@ -57,15 +57,15 @@ msgstr "رتب حسب ال_حجم"
 
 #: ../gtk/actions.c:70
 msgid "_Show Transmission"
-msgstr ""
+msgstr "أ_ظهر النقل"
 
 #: ../gtk/actions.c:71
 msgid "Message _Log"
-msgstr "سجل الرسائل"
+msgstr "_سجل الرسائل"
 
 #: ../gtk/actions.c:86
 msgid "Enable Alternative Speed _Limits"
-msgstr ""
+msgstr "فعّل _حدود السرعة البديلة"
 
 #: ../gtk/actions.c:87
 msgid "_Compact View"
@@ -73,11 +73,11 @@ msgstr ""
 
 #: ../gtk/actions.c:88
 msgid "Re_verse Sort Order"
-msgstr ""
+msgstr "ا_عكس الترتيب"
 
 #: ../gtk/actions.c:89
 msgid "_Filterbar"
-msgstr "شريط الترشيح"
+msgstr "شريط الت_رشيح"
 
 #: ../gtk/actions.c:90
 msgid "_Statusbar"
@@ -97,7 +97,7 @@ msgstr "_تورنت"
 
 #: ../gtk/actions.c:98
 msgid "_View"
-msgstr "ا_عرض"
+msgstr "_عرض"
 
 #: ../gtk/actions.c:99
 msgid "_Sort Torrents By"
@@ -109,7 +109,7 @@ msgstr ""
 
 #: ../gtk/actions.c:101 ../gtk/details.c:2436
 msgid "_Edit"
-msgstr "_حرّر"
+msgstr "ت_حرير"
 
 #: ../gtk/actions.c:102
 msgid "_Help"
@@ -121,15 +121,15 @@ msgstr ""
 
 #: ../gtk/actions.c:104
 msgid "Open _URL…"
-msgstr ""
+msgstr "افتح _عنوان..."
 
 #: ../gtk/actions.c:104
 msgid "Open URL…"
-msgstr ""
+msgstr "افتح عنوان..."
 
 #: ../gtk/actions.c:105 ../gtk/actions.c:106
 msgid "Open a torrent"
-msgstr ""
+msgstr "افتح تورنت"
 
 #: ../gtk/actions.c:107
 msgid "_Start"
@@ -141,19 +141,19 @@ msgstr "ابدأ تنزيل التورنت"
 
 #: ../gtk/actions.c:108
 msgid "Start _Now"
-msgstr ""
+msgstr "ابدأ الآ_ن"
 
 #: ../gtk/actions.c:108
 msgid "Start torrent now"
-msgstr ""
+msgstr "ابدأ التورنت الآن"
 
 #: ../gtk/actions.c:109
 msgid "_Statistics"
-msgstr "إحصائيات"
+msgstr "إ_حصائيات"
 
 #: ../gtk/actions.c:110
 msgid "_Donate"
-msgstr ""
+msgstr "_تبرّع"
 
 #: ../gtk/actions.c:111
 msgid "_Verify Local Data"
@@ -197,7 +197,7 @@ msgstr "أزل و ا_حذف الملفات"
 
 #: ../gtk/actions.c:118
 msgid "_New…"
-msgstr ""
+msgstr "_جديد..."
 
 #: ../gtk/actions.c:118
 msgid "Create a torrent"
@@ -254,7 +254,7 @@ msgstr ""
 #: ../gtk/conf.c:317 ../gtk/conf.c:322
 #, c-format
 msgid "Importing \"%s\""
-msgstr ""
+msgstr "يستورد \"%s\""
 
 #: ../gtk/details.c:448 ../gtk/details.c:460
 msgid "Use global settings"
@@ -287,12 +287,12 @@ msgstr ""
 #: ../gtk/details.c:485
 #, c-format
 msgid "Limit _download speed (%s):"
-msgstr ""
+msgstr "حد سرعة ال_تنزيل (%s):"
 
 #: ../gtk/details.c:498
 #, c-format
 msgid "Limit _upload speed (%s):"
-msgstr ""
+msgstr "حد سرعة ال_رفع (%s):"
 
 #: ../gtk/details.c:511 ../gtk/open-dialog.c:351
 msgid "Torrent _priority:"
@@ -334,7 +334,7 @@ msgstr ""
 #: ../gtk/details.c:563 ../gtk/filter.c:698
 msgctxt "Verb"
 msgid "Downloading"
-msgstr ""
+msgstr "ينزل"
 
 #: ../gtk/details.c:564 ../gtk/torrent-cell-renderer.c:207
 msgid "Queued for seeding"
@@ -347,7 +347,7 @@ msgstr ""
 
 #: ../gtk/details.c:566 ../gtk/filter.c:701 ../gtk/torrent-cell-renderer.c:198
 msgid "Finished"
-msgstr ""
+msgstr "انتهى"
 
 #: ../gtk/details.c:566 ../gtk/filter.c:700 ../gtk/torrent-cell-renderer.c:198
 msgid "Paused"
@@ -376,17 +376,17 @@ msgstr "تورنت عمومي"
 #: ../gtk/details.c:659
 #, c-format
 msgid "Created by %1$s"
-msgstr ""
+msgstr "أنشأه %1$s"
 
 #: ../gtk/details.c:661
 #, c-format
 msgid "Created on %1$s"
-msgstr ""
+msgstr "أنشئ في %1$s"
 
 #: ../gtk/details.c:663
 #, c-format
 msgid "Created by %1$s on %2$s"
-msgstr ""
+msgstr "أنشأه %1$s في %2$s"
 
 #: ../gtk/details.c:749
 msgid "Unknown"
@@ -433,15 +433,15 @@ msgstr ""
 
 #: ../gtk/details.c:890
 msgid "No errors"
-msgstr ""
+msgstr "لا أخطاء"
 
 #: ../gtk/details.c:903
 msgid "Never"
-msgstr ""
+msgstr "أبدًا"
 
 #: ../gtk/details.c:907
 msgid "Active now"
-msgstr ""
+msgstr "نشّط الآن"
 
 #: ../gtk/details.c:911
 #, c-format
@@ -474,15 +474,15 @@ msgstr "الحالة:"
 
 #: ../gtk/details.c:960
 msgid "Running time:"
-msgstr ""
+msgstr "زمن التشغيل:"
 
 #: ../gtk/details.c:965
 msgid "Remaining time:"
-msgstr ""
+msgstr "الوقت المتبقى:"
 
 #: ../gtk/details.c:970
 msgid "Last activity:"
-msgstr ""
+msgstr "آخر نشاط:"
 
 #: ../gtk/details.c:976
 msgid "Error:"
@@ -614,7 +614,7 @@ msgstr ""
 
 #: ../gtk/details.c:1743 ../gtk/details.c:2451
 msgid "Show _more details"
-msgstr ""
+msgstr "أظهر _مزيد من التفاصيل"
 
 #: ../gtk/details.c:1814
 #, c-format
@@ -725,7 +725,7 @@ msgstr ""
 msgid "Show _backup trackers"
 msgstr ""
 
-#: ../gtk/details.c:2543 ../gtk/msgwin.c:418
+#: ../gtk/details.c:2543 ../gtk/msgwin.c:429
 msgid "Information"
 msgstr "معلومات"
 
@@ -864,7 +864,7 @@ msgctxt "Verb"
 msgid "Verifying"
 msgstr ""
 
-#: ../gtk/filter.c:703 ../gtk/msgwin.c:417
+#: ../gtk/filter.c:703 ../gtk/msgwin.c:428
 msgid "Error"
 msgstr "عطل"
 
@@ -873,50 +873,50 @@ msgstr "عطل"
 msgid "_Show:"
 msgstr ""
 
-#: ../gtk/main.c:303
+#: ../gtk/main.c:307
 #, c-format
 msgid "Error registering Transmission as x-scheme-handler/magnet handler: %s"
 msgstr ""
 
-#: ../gtk/main.c:468
+#: ../gtk/main.c:472
 #, c-format
 msgid ""
 "Got signal %d; trying to shut down cleanly. Do it again if it gets stuck."
 msgstr ""
 
-#: ../gtk/main.c:596
+#: ../gtk/main.c:604
 msgid "Where to look for configuration files"
 msgstr "موضع ملفات التضبيطات"
 
-#: ../gtk/main.c:597
+#: ../gtk/main.c:605
 msgid "Start with all torrents paused"
 msgstr "ابدأ بكل التورنتات الملبثة"
 
-#: ../gtk/main.c:598
+#: ../gtk/main.c:606
 msgid "Start minimized in notification area"
 msgstr ""
 
-#: ../gtk/main.c:599
+#: ../gtk/main.c:607
 msgid "Show version number and exit"
 msgstr ""
 
-#: ../gtk/main.c:617 ../gtk/transmission-gtk.desktop.in.h:1
+#: ../gtk/main.c:625 ../gtk/transmission-gtk.desktop.in.h:1
 msgid "Transmission"
 msgstr "ترانزميشن"
 
 #. parse the command line
-#: ../gtk/main.c:621
+#: ../gtk/main.c:629
 msgid "[torrent files or urls]"
 msgstr ""
 
-#: ../gtk/main.c:625
+#: ../gtk/main.c:633
 #, c-format
 msgid ""
 "%s\n"
 "Run '%s --help' to see a full list of available command line options.\n"
 msgstr ""
 
-#: ../gtk/main.c:722
+#: ../gtk/main.c:730
 msgid ""
 "Transmission is a file-sharing program. When you run a torrent, its data "
 "will be made available to others by means of upload. You and you alone are "
@@ -924,52 +924,55 @@ msgid ""
 "laws."
 msgstr ""
 
-#: ../gtk/main.c:724
+#: ../gtk/main.c:732
 msgid "I _Accept"
 msgstr ""
 
-#: ../gtk/main.c:933
+#: ../gtk/main.c:941
 msgid "<b>Closing Connections</b>"
 msgstr "<b>يجري غلق الاتصالات</b>"
 
-#: ../gtk/main.c:937
+#: ../gtk/main.c:945
 msgid "Sending upload/download totals to tracker…"
 msgstr ""
 
-#: ../gtk/main.c:942
+#: ../gtk/main.c:950
 msgid "_Quit Now"
 msgstr "مغ_ادرة الآن"
 
-#: ../gtk/main.c:1000
+#: ../gtk/main.c:1008
 msgid "Couldn't add corrupt torrent"
 msgid_plural "Couldn't add corrupt torrents"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../gtk/main.c:1007
+#: ../gtk/main.c:1015
 msgid "Couldn't add duplicate torrent"
 msgid_plural "Couldn't add duplicate torrents"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../gtk/main.c:1308
+#: ../gtk/main.c:1316
 msgid "A fast and easy BitTorrent client"
 msgstr "عميل «بت تورنت» سريع وسهل الاستخدام"
 
-#: ../gtk/main.c:1309
+#: ../gtk/main.c:1317
 msgid "Copyright (c) The Transmission Project"
 msgstr ""
 
 #. Translators: translate "translator-credits" as your name
 #. to have it appear in the credits in the "About"
 #. dialog
-#: ../gtk/main.c:1315
+#: ../gtk/main.c:1323
 msgid "translator-credits"
 msgstr ""
 "Launchpad Contributions:\n"
 "  Ahmed Mohammed https://launchpad.net/~ahmedqatar\n"
+"  Alamoudi https://launchpad.net/~alamoudei\n"
 "  Amir Elsayed https://launchpad.net/~levancharly\n"
+"  Benjamin Geer https://launchpad.net/~benjamin-geer\n"
 "  Ibrahim Saed https://launchpad.net/~ibraheem5000\n"
+"  Khaled Hosny https://launchpad.net/~khaledhosny\n"
 "  Mohammad Alhobayyeb https://launchpad.net/~mih1406\n"
 "  Mohammed Mehdi Zaddem https://launchpad.net/~darkphoenix7878\n"
 "  blackhorse07 https://launchpad.net/~htm004\n"
@@ -1087,15 +1090,15 @@ msgstr "الوقت"
 msgid "Message"
 msgstr "الرسالة"
 
-#: ../gtk/msgwin.c:419
+#: ../gtk/msgwin.c:430
 msgid "Debug"
 msgstr "تنقيح"
 
-#: ../gtk/msgwin.c:445
+#: ../gtk/msgwin.c:456
 msgid "Message Log"
 msgstr "سِجل الرسائل"
 
-#: ../gtk/msgwin.c:482
+#: ../gtk/msgwin.c:493
 msgid "Level"
 msgstr "المستوى"
 
@@ -1848,7 +1851,7 @@ msgstr "سيسمح المتتبع بالطلبات بعد %s"
 
 #: ../gtk/tr-window.c:423
 msgid "Unlimited"
-msgstr ""
+msgstr "غير محدودة"
 
 #: ../gtk/tr-window.c:490
 msgid "Seed Forever"
@@ -1856,11 +1859,11 @@ msgstr ""
 
 #: ../gtk/tr-window.c:528
 msgid "Limit Download Speed"
-msgstr ""
+msgstr "حد سرعة التنزيل"
 
 #: ../gtk/tr-window.c:532
 msgid "Limit Upload Speed"
-msgstr ""
+msgstr "حد سرعة الرفع"
 
 #: ../gtk/tr-window.c:539
 msgid "Stop Seeding at Ratio"
@@ -1910,51 +1913,51 @@ msgstr "منزَّل: %1$s، مرفوع: %2$s"
 
 #: ../gtk/util.c:38
 msgid "KiB"
-msgstr ""
+msgstr "ك.بايت"
 
 #: ../gtk/util.c:39
 msgid "MiB"
-msgstr ""
+msgstr "م.بايت"
 
 #: ../gtk/util.c:40
 msgid "GiB"
-msgstr ""
+msgstr "ج.بايت"
 
 #: ../gtk/util.c:41
 msgid "TiB"
-msgstr ""
+msgstr "ت.بايت"
 
 #: ../gtk/util.c:44
 msgid "kB"
-msgstr ""
+msgstr "ك.بايت"
 
 #: ../gtk/util.c:45
 msgid "MB"
-msgstr ""
+msgstr "م.بايت"
 
 #: ../gtk/util.c:46
 msgid "GB"
-msgstr ""
+msgstr "ج.بايت"
 
 #: ../gtk/util.c:47
 msgid "TB"
-msgstr ""
+msgstr "ت.بايت"
 
 #: ../gtk/util.c:50
 msgid "kB/s"
-msgstr ""
+msgstr "ك.بايت/ث"
 
 #: ../gtk/util.c:51
 msgid "MB/s"
-msgstr ""
+msgstr "م.بايت/ث"
 
 #: ../gtk/util.c:52
 msgid "GB/s"
-msgstr ""
+msgstr "ج.بايت/ث"
 
 #: ../gtk/util.c:53
 msgid "TB/s"
-msgstr ""
+msgstr "ت.بايت/ث"
 
 #: ../gtk/util.c:87 ../libtransmission/utils.c:1485
 msgid "None"
@@ -2035,7 +2038,7 @@ msgstr ""
 
 #: ../gtk/util.c:577
 msgid "Unrecognized URL"
-msgstr ""
+msgstr "عنوان غير معروف"
 
 #: ../gtk/util.c:579
 #, c-format
@@ -2054,17 +2057,17 @@ msgstr ""
 msgid "Invalid metadata"
 msgstr "البيانات الشارحة غير صالحة"
 
-#: ../libtransmission/bencode.c:1706 ../libtransmission/bencode.c:1734
+#: ../libtransmission/bencode.c:1716 ../libtransmission/bencode.c:1744
 #, c-format
 msgid "Couldn't save temporary file \"%1$s\": %2$s"
 msgstr ""
 
-#: ../libtransmission/bencode.c:1721
+#: ../libtransmission/bencode.c:1731
 #, c-format
 msgid "Saved \"%s\""
 msgstr ""
 
-#: ../libtransmission/bencode.c:1726 ../libtransmission/blocklist.c:417
+#: ../libtransmission/bencode.c:1736 ../libtransmission/blocklist.c:417
 #, c-format
 msgid "Couldn't save file \"%1$s\": %2$s"
 msgstr "تعذّر حفظ الملف ‏\"%1$s\": ‏%2$s"
