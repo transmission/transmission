@@ -1,4 +1,4 @@
-=== Transmission 2.51 (2012/xx/yy) ===
+=== Transmission 2.51 (2012/04/08) ===
 [http://trac.transmissionbt.com/query?milestone=2.51&group=component&order=severity All tickets closed by this release]
 ==== All Platforms ====
   * Update the bundled libnatpmp and miniupnp libraries for port forwarding
@@ -18,7 +18,7 @@
   * Progress bar colors are now similar to the Mac and Web clients'
   * Improve the "Open Folder" behavior
 ==== Web Client ====
-  * Fix global-seed-ratio progressbars
+  * Fix global seed ratio progress bars
   * Fix sometimes-incorrect ratio being displayed in the Inspector
   * If multiple torrents are selected, show the aggregate info in the Inspector
   * Upgrade to jQuery 1.7.2
