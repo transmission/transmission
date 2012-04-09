@@ -1,11 +1,11 @@
 === Transmission 2.51 (2012/04/08) ===
 [http://trac.transmissionbt.com/query?milestone=2.51&group=component&order=severity All tickets closed by this release]
 ==== All Platforms ====
-  * Update the bundled libnatpmp and miniupnp libraries for port forwarding
+  * Update the bundled libnatpmp and miniupnp port forwarding libraries
   * Add environment variable options to have libcurl verify SSL certs
   * Support user-specified CXX environment variables during compile time
 ==== Mac ====
-  * Raise the limits for many configuration options
+  * Raise the allowed limits for many configuration options
   * Fix regression that ignored user-specified TRANSMISSION_HOME environment
 ==== GTK+ ====
   * Fix crash when adding torrents on systems without G_USER_DIRECTORY_DOWNLOAD
@@ -19,8 +19,8 @@
   * Improve the "Open Folder" behavior
 ==== Web Client ====
   * Fix global seed ratio progress bars
-  * Fix sometimes-incorrect ratio being displayed in the Inspector
-  * If multiple torrents are selected, show the aggregate info in the Inspector
+  * Fix sometimes-incorrect ratio being displayed in the inspector
+  * If multiple torrents are selected, show the aggregate info in the inspector
   * Upgrade to jQuery 1.7.2
 ==== Daemon ====
   * Show magnet link information in transmission-remote -i
