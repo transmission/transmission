@@ -539,6 +539,7 @@
     cellFrame.origin.x += PADDING_EXPANSION_FRAME;
     cellFrame.origin.y += PADDING_EXPANSION_FRAME;
     
+    [fTitleAttributes setObject: [NSColor controlTextColor] forKey: NSForegroundColorAttributeName];
     NSAttributedString * titleString = [self attributedTitle];
     [titleString drawInRect: cellFrame];
 }
