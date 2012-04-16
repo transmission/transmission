@@ -143,6 +143,7 @@ gtr_icon_new( TrCore * core)
     app_indicator_set_status( indicator, APP_INDICATOR_STATUS_ACTIVE );
     w = gtr_action_get_widget( "/icon-popup" );
     app_indicator_set_menu( indicator, GTK_MENU ( w ) );
+    app_indicator_set_title( indicator, g_get_application_name( ) );
     g_object_set_qdata( G_OBJECT( indicator ), get_core_quark( ), core );
     return indicator;
 #else
