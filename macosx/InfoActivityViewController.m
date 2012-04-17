@@ -142,6 +142,9 @@
         
         [fDateCompletedField setObjectValue: [torrent dateCompleted]];
         
+        //uses a relative date, so can't be set once
+        [fDateAddedField setObjectValue: [torrent dateAdded]];
+        
         [fDownloadTimeField setStringValue: [NSString timeString: [torrent secondsDownloading] showSeconds: YES]];
         [fSeedTimeField setStringValue: [NSString timeString: [torrent secondsSeeding] showSeconds: YES]];
         
@@ -205,8 +208,6 @@
     else
     {
         Torrent * torrent = [fTorrents objectAtIndex: 0];
-        
-        [fDateAddedField setObjectValue: [torrent dateAdded]];
         
         const BOOL piecesAvailableSegment = [[NSUserDefaults standardUserDefaults] boolForKey: @"PiecesViewShowAvailability"];
         [fPiecesControl setSelected: piecesAvailableSegment forSegment: PIECES_CONTROL_AVAILABLE];
