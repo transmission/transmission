@@ -181,17 +181,18 @@
             [fDownloadedTotalField setStringValue: @""];
             [fUploadedTotalField setStringValue: @""];
             [fFailedHashField setStringValue: @""];
-            [fDateActivityField setStringValue: @""];
+            [fDateActivityField setObjectValue: @""]; //using [field setStringValue: @""] causes "December 31, 1969 7:00 PM" to be displayed, at least on 10.7.3
             [fRatioField setStringValue: @""];
         }
-    
+        
         [fStateField setStringValue: @""];
         [fProgressField setStringValue: @""];
         
         [fErrorMessageView setString: @""];
         
-        [fDateAddedField setStringValue: @""];
-        [fDateCompletedField setStringValue: @""];
+        //using [field setStringValue: @""] causes "December 31, 1969 7:00 PM" to be displayed, at least on 10.7.3
+        [fDateAddedField setObjectValue: @""];
+        [fDateCompletedField setObjectValue: @""];
         
         [fDownloadTimeField setStringValue: @""];
         [fSeedTimeField setStringValue: @""];
