@@ -1,4 +1,4 @@
-/* $Id: upnpcommands.c,v 1.38 2012/03/05 19:42:47 nanard Exp $ */
+/* $Id: upnpcommands.c,v 1.39 2012/04/09 12:49:27 nanard Exp $ */
 /* Project : miniupnp
  * Author : Thomas Bernard
  * Copyright (c) 2005-2011 Thomas Bernard
@@ -741,7 +741,7 @@ UPNP_GetListOfPortMappings(const char * controlURL,
 	}
 	ClearNameValueList(&pdata);
 
-	//printf("%.*s", bufsize, buffer);
+	/*printf("%.*s", bufsize, buffer);*/
 
 	return ret;
 }
@@ -868,7 +868,7 @@ UPNP_AddPinhole(const char * controlURL, const char * servicetype,
 		return UPNPCOMMAND_INVALID_ARGS;
 
 	AddPinholeArgs = calloc(7, sizeof(struct UPNParg));
-	// RemoteHost can be wilcarded
+	/* RemoteHost can be wilcarded */
 	if(strncmp(remoteHost, "empty", 5)==0)
 	{
 		AddPinholeArgs[0].elt = "RemoteHost";
@@ -912,7 +912,7 @@ UPNP_AddPinhole(const char * controlURL, const char * servicetype,
 	resVal = GetValueFromNameValueList(&pdata, "errorCode");
 	if(resVal)
 	{
-		//printf("AddPortMapping errorCode = '%s'\n", resVal);
+		/*printf("AddPortMapping errorCode = '%s'\n", resVal);*/
 		ret = UPNPCOMMAND_UNKNOWN_ERROR;
 		sscanf(resVal, "%d", &ret);
 	}

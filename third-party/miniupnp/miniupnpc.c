@@ -1,4 +1,4 @@
-/* $Id: miniupnpc.c,v 1.103 2012/03/05 19:42:46 nanard Exp $ */
+/* $Id: miniupnpc.c,v 1.104 2012/04/09 12:40:11 nanard Exp $ */
 /* Project : miniupnp
  * Web : http://miniupnp.free.fr/
  * Author : Thomas BERNARD
@@ -18,10 +18,6 @@
 #endif
 
 #if !defined(__OpenBSD__) && !defined(__NetBSD__) && !defined(MACOSX) && !defined(_WIN32)
-/* miniupnpc's unmodified source says _BSD_SOURCE or _GNU_SOURCE is needed
-   for struct ip_mreqn... since the above #if chain rules out the former,
-   use the latter here */
-#define _GNU_SOURCE
 #define HAS_IP_MREQN
 #endif
 
@@ -116,10 +112,9 @@ LIBSPEC void parserootdesc(const char * buffer, int bufsize, struct IGDdatas * d
  * return values :
  *   pointer - OK
  *   NULL - error */
-static char *
-simpleUPnPcommand2(int s, const char * url, const char * service,
-                   const char * action, struct UPNParg * args,
-                   int * bufsize, const char * httpversion)
+char * simpleUPnPcommand2(int s, const char * url, const char * service,
+		       const char * action, struct UPNParg * args,
+		       int * bufsize, const char * httpversion)
 {
 	char hostname[MAXHOSTNAMELEN+1];
 	unsigned short port = 0;
@@ -591,7 +586,7 @@ upnpDiscover(int delay, const char * multicastif,
 		}
 #else /* #ifdef NO_GETADDRINFO */
 		memset(&hints, 0, sizeof(hints));
-		hints.ai_family = AF_UNSPEC; // AF_INET6 or AF_INET
+		hints.ai_family = AF_UNSPEC; /* AF_INET6 or AF_INET */
 		hints.ai_socktype = SOCK_DGRAM;
 		/*hints.ai_flags = */
 		if ((rv = getaddrinfo(ipv6
@@ -610,6 +605,13 @@ upnpDiscover(int delay, const char * multicastif,
 		for(p = servinfo; p; p = p->ai_next) {
 			n = sendto(sudp, bufr, n, 0, p->ai_addr, p->ai_addrlen);
 			if (n < 0) {
+#ifdef DEBUG
+				char hbuf[NI_MAXHOST], sbuf[NI_MAXSERV];
+				if (getnameinfo(p->ai_addr, p->ai_addrlen, hbuf, sizeof(hbuf), sbuf,
+						sizeof(sbuf), NI_NUMERICHOST | NI_NUMERICSERV) == 0) {
+					fprintf(stderr, "host:%s port:%s\n", hbuf, sbuf);
+				}
+#endif
 				PRINT_SOCKET_ERROR("sendto");
 				continue;
 			}
@@ -821,6 +823,7 @@ UPNPIGD_IsConnected(struct UPNPUrls * urls, struct IGDdatas * data)
 
 /* UPNP_GetValidIGD() :
  * return values :
+ *    -1 = Internal error
  *     0 = NO IGD found
  *     1 = A valid connected IGD has been found
  *     2 = A valid IGD has been found but it reported as
@@ -837,11 +840,14 @@ UPNP_GetValidIGD(struct UPNPDev * devlist,
 				 struct IGDdatas * data,
 				 char * lanaddr, int lanaddrlen)
 {
-	char * descXML;
-	int descXMLsize = 0;
+	struct xml_desc {
+		char * xml;
+		int size;
+	} * desc = NULL;
 	struct UPNPDev * dev;
 	int ndev = 0;
-	int state; /* state 1 : IGD connected. State 2 : IGD. State 3 : anything */
+	int i;
+	int state = -1; /* state 1 : IGD connected. State 2 : IGD. State 3 : anything */
 	if(!devlist)
 	{
 #ifdef DEBUG
@@ -849,22 +855,36 @@ UPNP_GetValidIGD(struct UPNPDev * devlist,
 #endif
 		return 0;
 	}
+	for(dev = devlist; dev; dev = dev->pNext)
+		ndev++;
+	if(ndev > 0)
+	{
+		desc = calloc(ndev, sizeof(struct xml_desc));
+		if(!desc)
+			return -1; /* memory allocation error */
+	}
 	for(state = 1; state <= 3; state++)
 	{
-		for(dev = devlist; dev; dev = dev->pNext)
+		for(dev = devlist, i = 0; dev; dev = dev->pNext, i++)
 		{
 			/* we should choose an internet gateway device.
 		 	* with st == urn:schemas-upnp-org:device:InternetGatewayDevice:1 */
-			descXML = miniwget_getaddr(dev->descURL, &descXMLsize,
-			   	                        lanaddr, lanaddrlen);
-			if(descXML)
+			if(state == 1)
 			{
-				ndev++;
+				desc[i].xml = miniwget_getaddr(dev->descURL, &(desc[i].size),
+				   	                           lanaddr, lanaddrlen);
+#ifdef DEBUG
+				if(!desc[i].xml)
+				{
+					printf("error getting XML description %s\n", dev->descURL);
+				}
+#endif
+			}
+			if(desc[i].xml)
+			{
 				memset(data, 0, sizeof(struct IGDdatas));
 				memset(urls, 0, sizeof(struct UPNPUrls));
-				parserootdesc(descXML, descXMLsize, data);
-				free(descXML);
-				descXML = NULL;
+				parserootdesc(desc[i].xml, desc[i].size, data);
 				if(0==strcmp(data->CIF.servicetype,
 				   "urn:schemas-upnp-org:service:WANCommonInterfaceConfig:1")
 				   || state >= 3 )
@@ -877,7 +897,7 @@ UPNP_GetValidIGD(struct UPNPDev * devlist,
 			         UPNPIGD_IsConnected(urls, data));
 #endif
 				  if((state >= 2) || UPNPIGD_IsConnected(urls, data))
-					return state;
+					goto free_and_return;
 				  FreeUPNPUrls(urls);
 				  if(data->second.servicetype[0] != '\0') {
 #ifdef DEBUG
@@ -895,21 +915,18 @@ UPNP_GetValidIGD(struct UPNPDev * devlist,
 			           UPNPIGD_IsConnected(urls, data));
 #endif
 				    if((state >= 2) || UPNPIGD_IsConnected(urls, data))
-					  return state;
+					  goto free_and_return;
 				    FreeUPNPUrls(urls);
 				  }
 				}
 				memset(data, 0, sizeof(struct IGDdatas));
 			}
-#ifdef DEBUG
-			else
-			{
-				printf("error getting XML description %s\n", dev->descURL);
-			}
-#endif
 		}
 	}
-	return 0;
+	state = 0;
+free_and_return:
+	free(desc);
+	return state;
 }
 
 /* UPNP_GetIGDFromUrl()

@@ -1,8 +1,15 @@
-$Id: Changelog.txt,v 1.163 2012/03/15 01:02:02 nanard Exp $
+$Id: Changelog.txt,v 1.166 2012/04/09 12:49:26 nanard Exp $
 miniUPnP client Changelog.
 
+2012/04/09:
+  Only try to fetch XML description once in UPNP_GetValidIGD()
+  Added -ansi flag to compilation, and fixed C++ comments to ANSI C comments.
+
+2012/04/05:
+  minor improvements to minihttptestserver.c
+
 2012/03/15:
-  upnperrors.c returns valid error string for unrecognized error codes 
+  upnperrors.c returns valid error string for unrecognized error codes
 
 2012/03/08:
   make minihttptestserver listen on loopback interface instead of 0.0.0.0
@@ -270,7 +277,7 @@ VERSION 1.2 :
   small modif to make Clang happy :)
 
 2008/07/17:
-  #define SOAPPREFIX "s" in miniupnpc.c in order to remove SOAP-ENV... 
+  #define SOAPPREFIX "s" in miniupnpc.c in order to remove SOAP-ENV...
 
 2008/07/14:
   include declspec.h in installation (to /usr/include/miniupnpc)
@@ -292,7 +299,7 @@ VERSION 1.1 :
   improved python module error/exception reporting.
 
 2008/04/23:
-  Completely rewrite igd_desc_parse.c in order to be compatible with 
+  Completely rewrite igd_desc_parse.c in order to be compatible with
   Linksys WAG200G
   Added testigddescparse
   updated python module
@@ -315,7 +322,7 @@ VERSION 1.0 :
   improved make install :)
 
 2007/12/22:
-  Adding upnperrors.c/h to provide a strupnperror() function 
+  Adding upnperrors.c/h to provide a strupnperror() function
   used to translate UPnP error codes to string.
 
 2007/12/19:
