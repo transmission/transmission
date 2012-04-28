@@ -3264,7 +3264,6 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
                     maxSize.height -= FILTER_BAR_HEIGHT;
                 if (windowSize.height > maxSize.height)
                     windowSize.height = maxSize.height;
-                NSLog(@"%f %f", windowSize.height, [screen visibleFrame].size.height);
             }
         }
     }
