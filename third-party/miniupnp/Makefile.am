@@ -1,6 +1,6 @@
 noinst_LIBRARIES = libminiupnp.a
 
-AM_CFLAGS = @PTHREAD_CFLAGS@ -DNDEBUG
+AM_CFLAGS = @PTHREAD_CFLAGS@ -DNDEBUG -D_GNU_SOURCE
 
 libminiupnp_a_SOURCES = \
     connecthostport.c \
