@@ -279,6 +279,9 @@
 		A2D307A40D9EC6870051FD27 /* BlocklistDownloader.m in Sources */ = {isa = PBXBuildFile; fileRef = A2D307A30D9EC6870051FD27 /* BlocklistDownloader.m */; };
 		A2D307B10D9EC9F50051FD27 /* BlocklistStatusWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = A2D307B00D9EC9F50051FD27 /* BlocklistStatusWindow.xib */; };
 		A2D5972A0F5AE49E0001AB3C /* watch.c in Sources */ = {isa = PBXBuildFile; fileRef = A2D597280F5AE49E0001AB3C /* watch.c */; };
+		A2D77451154CC25700A62B93 /* WebSeedTableView.h in Headers */ = {isa = PBXBuildFile; fileRef = A2D7744F154CC25700A62B93 /* WebSeedTableView.h */; };
+		A2D77452154CC25700A62B93 /* WebSeedTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = A2D77450154CC25700A62B93 /* WebSeedTableView.m */; };
+		A2D77453154CC72B00A62B93 /* WebSeedTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = A2D77450154CC25700A62B93 /* WebSeedTableView.m */; };
 		A2DA362A0CBC674900C2ED41 /* InfoActivity.png in Resources */ = {isa = PBXBuildFile; fileRef = A2DA36270CBC674900C2ED41 /* InfoActivity.png */; };
 		A2DA362B0CBC674900C2ED41 /* InfoFiles.png in Resources */ = {isa = PBXBuildFile; fileRef = A2DA36280CBC674900C2ED41 /* InfoFiles.png */; };
 		A2DA362C0CBC674900C2ED41 /* InfoPeers.png in Resources */ = {isa = PBXBuildFile; fileRef = A2DA36290CBC674900C2ED41 /* InfoPeers.png */; };
@@ -874,6 +877,8 @@
 		A2D307B00D9EC9F50051FD27 /* BlocklistStatusWindow.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = BlocklistStatusWindow.xib; path = macosx/BlocklistStatusWindow.xib; sourceTree = "<group>"; };
 		A2D597280F5AE49E0001AB3C /* watch.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = watch.c; path = daemon/watch.c; sourceTree = "<group>"; };
 		A2D597290F5AE49E0001AB3C /* watch.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = watch.h; path = daemon/watch.h; sourceTree = "<group>"; };
+		A2D7744F154CC25700A62B93 /* WebSeedTableView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = WebSeedTableView.h; path = macosx/WebSeedTableView.h; sourceTree = "<group>"; };
+		A2D77450154CC25700A62B93 /* WebSeedTableView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = WebSeedTableView.m; path = macosx/WebSeedTableView.m; sourceTree = "<group>"; };
 		A2DA36270CBC674900C2ED41 /* InfoActivity.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = InfoActivity.png; path = macosx/Images/InfoActivity.png; sourceTree = "<group>"; };
 		A2DA36280CBC674900C2ED41 /* InfoFiles.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = InfoFiles.png; path = macosx/Images/InfoFiles.png; sourceTree = "<group>"; };
 		A2DA36290CBC674900C2ED41 /* InfoPeers.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = InfoPeers.png; path = macosx/Images/InfoPeers.png; sourceTree = "<group>"; };
@@ -1660,6 +1665,8 @@
 				A2725D5C0DE7507C003445E7 /* TrackerTableView.m */,
 				A21A9D3F106EC2E800F1C3C1 /* TrackerCell.h */,
 				A21A9D40106EC2E800F1C3C1 /* TrackerCell.m */,
+				A2D7744F154CC25700A62B93 /* WebSeedTableView.h */,
+				A2D77450154CC25700A62B93 /* WebSeedTableView.m */,
 				A263CFBE10DD67670038DE27 /* InfoTextField.h */,
 				A263CFBF10DD67670038DE27 /* InfoTextField.m */,
 			);
@@ -1756,6 +1763,7 @@
 				A2679295130E00A000CB7464 /* tr-utp.h in Headers */,
 				A23F29A1132A447400E9A83B /* announcer-common.h in Headers */,
 				A2EE726F14DCCC950093C99A /* natpmp_local.h in Headers */,
+				A2D77451154CC25700A62B93 /* WebSeedTableView.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2263,6 +2271,7 @@
 				A2679294130E00A000CB7464 /* tr-utp.c in Sources */,
 				A23F29A2132A447400E9A83B /* announcer-http.c in Sources */,
 				A2AA9BE1132CAC8E00FA131E /* announcer-udp.c in Sources */,
+				A2D77452154CC25700A62B93 /* WebSeedTableView.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2278,6 +2287,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A2D77453154CC72B00A62B93 /* WebSeedTableView.m in Sources */,
 				8D11072D0486CEB800E47090 /* main.m in Sources */,
 				4DF0C5AB0899190500DD8943 /* Controller.m in Sources */,
 				4D118E1A08CB46B20033958F /* PrefsController.m in Sources */,
@@ -2737,7 +2747,6 @@
 					"$(inherited)",
 					"\"$(SRCROOT)/third-party/curl/lib\"",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				OTHER_CFLAGS = (
 					"$(inherited)",
 					"-DSYS_DARWIN",
@@ -2895,7 +2904,6 @@
 					"$(inherited)",
 					"\"$(SRCROOT)/third-party/curl/lib\"",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				OTHER_CFLAGS = (
 					"$(inherited)",
 					"-DSYS_DARWIN",
@@ -3004,7 +3012,6 @@
 					"$(inherited)",
 					"\"$(SRCROOT)/third-party/curl/lib\"",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				OTHER_CFLAGS = (
 					"$(inherited)",
 					"-DSYS_DARWIN",

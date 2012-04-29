@@ -27,6 +27,7 @@
 #import "NSStringAdditions.h"
 #import "PeerProgressIndicatorCell.h"
 #import "Torrent.h"
+#import "WebSeedTableView.h"
 
 #import "transmission.h" // required by utils.h
 #import "utils.h"
@@ -174,6 +175,7 @@
     
     [fWebSeeds sortUsingDescriptors: [fWebSeedTable sortDescriptors]];
     [fWebSeedTable reloadData];
+    [fWebSeedTable setWebSeeds: fWebSeeds];
     
     if (anyActive)
     {
@@ -335,7 +337,7 @@
 
 - (BOOL) tableView: (NSTableView *) tableView shouldSelectRow: (NSInteger) row
 {
-    return NO;
+    return tableView != fPeerTable;
 }
 
 - (NSString *) tableView: (NSTableView *) tableView toolTipForCell: (NSCell *) cell rect: (NSRectPointer) rect
@@ -471,7 +473,7 @@
 
 - (void) setupInfo
 {
-    BOOL hasWebSeeds = NO;
+    __block BOOL hasWebSeeds = NO;
     
     if ([fTorrents count] == 0)
     {
@@ -483,12 +485,13 @@
     }
     else
     {
-        for (Torrent * torrent in fTorrents)
+        [fTorrents enumerateObjectsWithOptions: NSEnumerationConcurrent usingBlock: ^(Torrent * torrent, NSUInteger idx, BOOL *stop) {
             if ([torrent webSeedCount] > 0)
             {
                 hasWebSeeds = YES;
-                break;
+                *stop = YES;
             }
+        }];
     }
     
     if (!hasWebSeeds)
@@ -497,6 +500,8 @@
         fWebSeeds = nil;
         [fWebSeedTable reloadData];
     }
+    else
+        [fWebSeedTable deselectAll: self];
     [self setWebSeedTableHidden: !hasWebSeeds animate: YES];
     
     fSet = YES;

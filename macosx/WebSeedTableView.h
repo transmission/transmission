@@ -1,7 +1,7 @@
 /******************************************************************************
  * $Id$
- *
- * Copyright (c) 2011-2012 Transmission authors and contributors
+ * 
+ * Copyright (c) 2012 Transmission authors and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -22,36 +22,16 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
-#import "NSMutableArrayAdditions.h"
+#import <Cocoa/Cocoa.h>
 
-@implementation NSMutableArray (NSMutableArrayAdditions)
-
-/*
- Note: This assumes Apple implemented this as an array under the hood.
- If the underlying data structure is a linked-list, for example, then this might be less
- efficient than simply removing the object and re-adding it.
- */
-- (void) moveObjectAtIndex: (NSUInteger) fromIndex toIndex: (NSUInteger) toIndex
+@interface WebSeedTableView : NSTableView
 {
-    if (fromIndex == toIndex)
-        return;
-    
-    id object = [[self objectAtIndex: fromIndex] retain];
-    
-    //shift objects - more efficient than simply removing the object and re-inserting the object
-    if (fromIndex < toIndex)
-    {
-        for (NSUInteger i = fromIndex; i < toIndex; ++i)
-            [self replaceObjectAtIndex: i withObject: [self objectAtIndex: i+1]];
-    }
-    else
-    {
-        for (NSUInteger i = fromIndex; i > toIndex; --i)
-            [self replaceObjectAtIndex: i withObject: [self objectAtIndex: i-1]];
-    }
-    [self replaceObjectAtIndex: toIndex withObject: object];
-    
-    [object release];
+    //weak references
+    NSArray * fWebSeeds;
 }
+
+- (void) setWebSeeds: (NSArray *) webSeeds;
+
+- (void) copy: (id) sender;
 
 @end

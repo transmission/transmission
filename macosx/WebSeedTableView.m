@@ -1,7 +1,7 @@
 /******************************************************************************
  * $Id$
- *
- * Copyright (c) 2011-2012 Transmission authors and contributors
+ * 
+ * Copyright (c) 2012 Transmission authors and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -22,36 +22,44 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
-#import "NSMutableArrayAdditions.h"
+#import "WebSeedTableView.h"
 
-@implementation NSMutableArray (NSMutableArrayAdditions)
+@implementation WebSeedTableView
 
-/*
- Note: This assumes Apple implemented this as an array under the hood.
- If the underlying data structure is a linked-list, for example, then this might be less
- efficient than simply removing the object and re-adding it.
- */
-- (void) moveObjectAtIndex: (NSUInteger) fromIndex toIndex: (NSUInteger) toIndex
+- (void) mouseDown: (NSEvent *) event
 {
-    if (fromIndex == toIndex)
-        return;
+    [[self window] makeKeyWindow];
+    [super mouseDown: event];
+}
+
+- (void) setWebSeeds: (NSArray *) webSeeds
+{
+    fWebSeeds = webSeeds;
+}
+
+- (void) copy: (id) sender
+{
+    NSIndexSet * indexes = [self selectedRowIndexes];
+    NSMutableArray * addresses = [NSMutableArray arrayWithCapacity: [indexes count]];
+    [fWebSeeds enumerateObjectsAtIndexes: indexes options: 0 usingBlock: ^(NSDictionary * webSeed, NSUInteger idx, BOOL * stop) {
+        [addresses addObject: [webSeed objectForKey: @"Address"]];
+    }];
     
-    id object = [[self objectAtIndex: fromIndex] retain];
+    NSString * text = [addresses componentsJoinedByString: @"\n"];
     
-    //shift objects - more efficient than simply removing the object and re-inserting the object
-    if (fromIndex < toIndex)
-    {
-        for (NSUInteger i = fromIndex; i < toIndex; ++i)
-            [self replaceObjectAtIndex: i withObject: [self objectAtIndex: i+1]];
-    }
-    else
-    {
-        for (NSUInteger i = fromIndex; i > toIndex; --i)
-            [self replaceObjectAtIndex: i withObject: [self objectAtIndex: i-1]];
-    }
-    [self replaceObjectAtIndex: toIndex withObject: object];
+    NSPasteboard * pb = [NSPasteboard generalPasteboard];
+    [pb clearContents];
+    [pb writeObjects: [NSArray arrayWithObject: text]];
+}
+
+- (BOOL) validateMenuItem: (NSMenuItem *) menuItem
+{
+    const SEL action = [menuItem action];
     
-    [object release];
+    if (action == @selector(copy:))
+        return [self numberOfSelectedRows] > 0;
+    
+    return YES;
 }
 
 @end

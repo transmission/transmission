@@ -25,6 +25,8 @@
 #import <Cocoa/Cocoa.h>
 #import "InfoViewController.h"
 
+@class WebSeedTableView;
+
 @interface InfoPeersViewController : NSViewController <InfoViewController, NSAnimationDelegate>
 {
     NSArray * fTorrents;
@@ -33,7 +35,8 @@
     
     NSMutableArray * fPeers, * fWebSeeds;
     
-    IBOutlet NSTableView * fPeerTable, * fWebSeedTable;
+    IBOutlet NSTableView * fPeerTable;
+    IBOutlet WebSeedTableView * fWebSeedTable;
     CGFloat fWebSeedTableHeight, fSpaceBetweenWebSeedAndPeer;
     
     NSViewAnimation * fWebSeedTableAnimation;
