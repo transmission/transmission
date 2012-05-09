@@ -235,7 +235,7 @@ PrefsDialog :: createSpeedTab( )
     label->setPixmap( QPixmap( QString::fromAscii( ":/icons/alt-limit-off.png" ) ) );
     label->setAlignment( Qt::AlignLeft|Qt::AlignVCenter );
     h->addWidget( label );
-    label = new QLabel( tr( "Temporary Speed Limits" ) );
+    label = new QLabel( tr( "Alternative Speed Limits" ) );
     label->setStyleSheet( QString::fromAscii( "font: bold" ) );
     label->setAlignment( Qt::AlignLeft|Qt::AlignVCenter );
     h->addWidget( label );
