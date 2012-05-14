@@ -64,8 +64,8 @@
     [fCheckAllButton setTitle: NSLocalizedString(@"All", "inspector -> check all")];
     [fUncheckAllButton setTitle: NSLocalizedString(@"None", "inspector -> check all")];
     
-    CGRect checkAllFrame = [fCheckAllButton frame];
-    CGRect uncheckAllFrame = [fUncheckAllButton frame];
+    NSRect checkAllFrame = [fCheckAllButton frame];
+    NSRect uncheckAllFrame = [fUncheckAllButton frame];
     const CGFloat oldAllWidth = checkAllFrame.size.width;
     const CGFloat oldNoneWidth = uncheckAllFrame.size.width;
     
