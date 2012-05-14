@@ -378,6 +378,20 @@ typedef enum
     [fOutline setNeedsDisplay: YES];
 }
 
+- (void) checkAll
+{
+    NSIndexSet * indexSet = [NSIndexSet indexSetWithIndexesInRange: NSMakeRange(0, [fTorrent fileCount])];
+    [fTorrent setFileCheckState: NSOnState forIndexes: indexSet];
+    [fOutline setNeedsDisplay: YES];
+}
+
+- (void) uncheckAll
+{
+    NSIndexSet * indexSet = [NSIndexSet indexSetWithIndexesInRange: NSMakeRange(0, [fTorrent fileCount])];
+    [fTorrent setFileCheckState: NSOffState forIndexes: indexSet];
+    [fOutline setNeedsDisplay: YES];
+}
+
 - (void) setPriority: (id) sender
 {
     tr_priority_t priority;

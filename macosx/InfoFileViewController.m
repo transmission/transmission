@@ -83,7 +83,17 @@
         [self setupInfo];
     
     if ([fTorrents count] == 1)
+    {
         [fFileController refresh];
+        
+        Torrent * torrent = [fTorrents objectAtIndex: 0];
+        if ([torrent isFolder])
+        {
+            const NSInteger filesCheckState = [torrent checkForFiles: [NSIndexSet indexSetWithIndexesInRange: NSMakeRange(0, [torrent fileCount])]];
+            [fCheckAllButton setEnabled: filesCheckState != NSOnState]; //if anything is unchecked
+            [fUncheckAllButton setEnabled: ![torrent allDownloaded]]; //if there are any checked files that aren't finished
+        }
+    }
 }
 
 - (void) saveViewSize
@@ -94,6 +104,16 @@
 - (void) setFileFilterText: (id) sender
 {
     [fFileController setFilterText: [sender stringValue]];
+}
+
+- (IBAction) checkAll: (id) sender
+{
+    [fFileController checkAll];
+}
+
+- (IBAction) uncheckAll: (id) sender
+{
+    [fFileController uncheckAll];
 }
 
 - (NSArray *) quickLookURLs
@@ -173,12 +193,24 @@
         Torrent * torrent = [fTorrents objectAtIndex: 0];
         
         [fFileController setTorrent: torrent];
-        [fFileFilterField setEnabled: [torrent isFolder]];
+        
+        const BOOL isFolder = [torrent isFolder];
+        [fFileFilterField setEnabled: isFolder];
+        
+        if (!isFolder)
+        {
+            [fCheckAllButton setEnabled: NO];
+            [fUncheckAllButton setEnabled: NO];
+        }
     }
     else
     {
         [fFileController setTorrent: nil];
+        
         [fFileFilterField setEnabled: NO];
+        
+        [fCheckAllButton setEnabled: NO];
+        [fUncheckAllButton setEnabled: NO];
     }
     
     fSet = YES;

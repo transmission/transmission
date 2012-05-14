@@ -37,6 +37,7 @@
     IBOutlet FileOutlineController * fFileController;
     
     IBOutlet NSSearchField * fFileFilterField;
+    IBOutlet NSButton * fCheckAllButton, *fUncheckAllButton;
 }
 
 - (void) setInfoForTorrents: (NSArray *) torrents;
@@ -44,7 +45,9 @@
 
 - (void) saveViewSize;
 
-- (void) setFileFilterText: (id) sender;
+- (IBAction) setFileFilterText: (id) sender;
+- (IBAction) checkAll: (id) sender;
+- (IBAction) uncheckAll: (id) sender;
 
 - (NSArray *) quickLookURLs;
 - (BOOL) canQuickLook;
