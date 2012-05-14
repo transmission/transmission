@@ -59,6 +59,29 @@
     }
     
     [[fFileFilterField cell] setPlaceholderString: NSLocalizedString(@"Filter", "inspector -> file filter")];
+    
+    //localize and place all and none buttons
+    [fCheckAllButton setTitle: NSLocalizedString(@"All", "inspector -> check all")];
+    [fUncheckAllButton setTitle: NSLocalizedString(@"None", "inspector -> check all")];
+    
+    CGRect checkAllFrame = [fCheckAllButton frame];
+    CGRect uncheckAllFrame = [fUncheckAllButton frame];
+    const CGFloat oldAllWidth = checkAllFrame.size.width;
+    const CGFloat oldNoneWidth = uncheckAllFrame.size.width;
+    
+    [fCheckAllButton sizeToFit];
+    [fUncheckAllButton sizeToFit];
+    const CGFloat newWidth = MAX([fCheckAllButton bounds].size.width, [fUncheckAllButton bounds].size.width);
+    
+    const CGFloat uncheckAllChange = newWidth - oldNoneWidth;
+    uncheckAllFrame.size.width = newWidth;
+    uncheckAllFrame.origin.x -= uncheckAllChange;
+    [fUncheckAllButton setFrame: uncheckAllFrame];
+    
+    const CGFloat checkAllChange = newWidth - oldAllWidth;
+    checkAllFrame.size.width = newWidth;
+    checkAllFrame.origin.x -= (checkAllChange + uncheckAllChange);
+    [fCheckAllButton setFrame: checkAllFrame];
 }
 
 - (void) dealloc
