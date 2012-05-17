@@ -232,7 +232,6 @@ tr_deepLog( const char  * file,
         struct evbuffer * buf = evbuffer_new( );
         char *            base = tr_basename( file );
         char *            message;
-        const char      * str;
 
         evbuffer_add_printf( buf, "[%s] ",
                             tr_getLogTimeStr( timestr, sizeof( timestr ) ) );
