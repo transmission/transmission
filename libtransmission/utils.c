@@ -231,6 +231,8 @@ tr_deepLog( const char  * file,
         char              timestr[64];
         struct evbuffer * buf = evbuffer_new( );
         char *            base = tr_basename( file );
+        char *            message;
+        const char      * str;
 
         evbuffer_add_printf( buf, "[%s] ",
                             tr_getLogTimeStr( timestr, sizeof( timestr ) ) );
@@ -241,12 +243,13 @@ tr_deepLog( const char  * file,
         va_end( args );
         evbuffer_add_printf( buf, " (%s:%d)\n", base, line );
         /* FIXME(libevent2) ifdef this out for nonwindows platforms */
-        OutputDebugString( evbuffer_pullup( buf, -1 ) );
+        message = evbuffer_free_to_str( buf );
+        OutputDebugString( message );
         if( fp )
-            fputs( (const char*)evbuffer_pullup( buf, -1 ), fp );
+            fputs( message, fp );
 
+        tr_free( message );
         tr_free( base );
-        evbuffer_free( buf );
     }
 }
 

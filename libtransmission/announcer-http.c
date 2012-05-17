@@ -50,7 +50,7 @@ get_event_string( const tr_announce_request * req )
     return tr_announce_event_get_string( req->event );
 }
 
-static struct evbuffer *
+static char*
 announce_url_new( const tr_session * session, const tr_announce_request * req )
 {
     const char * str;
@@ -116,7 +116,7 @@ announce_url_new( const tr_session * session, const tr_announce_request * req )
         tr_http_escape( buf, ipv6_readable, -1, true );
     }
 
-    return buf;
+    return evbuffer_free_to_str( buf );
 }
 
 static tr_pex*
@@ -287,8 +287,7 @@ tr_tracker_http_announce( tr_session                 * session,
                           void                       * response_func_user_data )
 {
     struct announce_data * d;
-    struct evbuffer * buf = announce_url_new( session, request );
-    const char * url = (const char *) evbuffer_pullup( buf, -1 );
+    char * url = announce_url_new( session, request );
 
     d = tr_new0( struct announce_data, 1 );
     d->response.seeders = -1;
@@ -302,7 +301,7 @@ tr_tracker_http_announce( tr_session                 * session,
     dbgmsg( request->log_name, "Sending announce to libcurl: \"%s\"", url );
     tr_webRun( session, url, NULL, NULL, on_announce_done, d );
 
-    evbuffer_free( buf );
+    tr_free( url );
 }
 
 /****
@@ -429,7 +428,7 @@ on_scrape_done( tr_session   * session,
     tr_runInEventThread( session, on_scrape_done_eventthread, data );
 }
 
-static struct evbuffer *
+static char *
 scrape_url_new( const tr_scrape_request * req )
 {
     int i;
@@ -446,7 +445,7 @@ scrape_url_new( const tr_scrape_request * req )
         delimiter = '&';
     }
 
-    return buf;
+    return evbuffer_free_to_str( buf );
 }
 
 void
@@ -457,8 +456,7 @@ tr_tracker_http_scrape( tr_session               * session,
 {
     int i;
     struct scrape_data * d;
-    struct evbuffer * buf = scrape_url_new( request );
-    const char * url = (const char *) evbuffer_pullup( buf, -1 );
+    char * url = scrape_url_new( request );
 
     d = tr_new0( struct scrape_data, 1 );
     d->response.url = tr_strdup( request->url );
@@ -477,5 +475,5 @@ tr_tracker_http_scrape( tr_session               * session,
     dbgmsg( request->log_name, "Sending scrape to libcurl: \"%s\"", url );
     tr_webRun( session, url, NULL, NULL, on_scrape_done, d );
 
-    evbuffer_free( buf );
+    tr_free( url );
 }
