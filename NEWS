@@ -1,3 +1,12 @@
+=== Transmission 2.52 (2012/05/19) ===
+[http://trac.transmissionbt.com/query?milestone=2.52&group=component&order=severity All tickets closed by this release]
+==== All Platforms ====
+  * Fix bug with zero termination of multiscrape strings
+  * Update the bundled libnatpmp and miniupnp port forwarding libraries
+==== Mac ====
+  * Add Select All / Deselect All buttons to the file inspector tab
+  * Minor interface tweaks and bug fixes
+
 === Transmission 2.51 (2012/04/08) ===
 [http://trac.transmissionbt.com/query?milestone=2.51&group=component&order=severity All tickets closed by this release]
 ==== All Platforms ====
