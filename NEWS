@@ -7,6 +7,8 @@
   * Add Select All / Deselect All buttons to the file inspector tab
   * Minor interface tweaks and bug fixes
   * Danish localization
+==== GTK+ ====
+  * Fix minor bug in Ubuntu app indicator support
 
 === Transmission 2.51 (2012/04/08) ===
 [http://trac.transmissionbt.com/query?milestone=2.51&group=component&order=severity All tickets closed by this release]
