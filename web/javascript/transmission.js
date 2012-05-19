@@ -680,6 +680,10 @@ Transmission.prototype =
 				this.setSortDirection(dir);
 				break;
 
+			case 'toggle_notifications':
+				Notifications && Notifications.toggle();
+				break;
+
 			default:
 				console.log('unhandled: ' + id);
 				break;
@@ -723,6 +727,16 @@ Transmission.prototype =
 				// do we need more info for this torrent?
 				if(!('name' in t.fields) || !('status' in t.fields))
 					needinfo.push(id);
+
+				t.notifyOnFieldChange('status', $.proxy(function (newValue, oldValue) {
+					if (oldValue === Torrent._StatusDownload && (newValue == Torrent._StatusSeed || newValue == Torrent._StatusSeedWait)) {
+						$(this).trigger('downloadComplete', [t]);
+					} else if (oldValue === Torrent._StatusSeed && newValue === Torrent._StatusStopped && t.isFinished()) {
+						$(this).trigger('seedingComplete', [t]);
+					} else {
+						$(this).trigger('statusChange', [t]);
+					}
+				}, this));
 			}
 		}
 

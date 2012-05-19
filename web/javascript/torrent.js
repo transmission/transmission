@@ -119,13 +119,26 @@ Torrent.prototype =
 	initialize: function(data)
 	{
 		this.fields = {};
+		this.fieldObservers = {};
 		this.refresh (data);
+	},
+
+	notifyOnFieldChange: function(field, callback) {
+		this.fieldObservers[field] = this.fieldObservers[field] || [];
+		this.fieldObservers[field].push(callback);
 	},
 
 	setField: function(o, name, value)
 	{
+		var i, observer;
+		
 		if (o[name] === value)
 			return false;
+		if (o == this.fields && this.fieldObservers[name] && this.fieldObservers[name].length) {
+			for (i=0; observer=this.fieldObservers[name][i]; ++i) {
+				observer.call(this, value, o[name], name);
+			}
+		}
 		o[name] = value;
 		return true;
 	},
