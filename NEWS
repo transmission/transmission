@@ -4,7 +4,7 @@
   * Fix bug with zero termination of multiscrape strings
   * Update the bundled libnatpmp and miniupnp port forwarding libraries
 ==== Mac ====
-  * Add Select All / Deselect All buttons to the file inspector tab
+  * Add select all and deselect all buttons to the file inspector tab
   * Minor interface tweaks and bug fixes
   * Danish localization
 ==== GTK+ ====
