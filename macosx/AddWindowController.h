@@ -36,6 +36,9 @@
     IBOutlet NSPopUpButton * fGroupPopUp, * fPriorityPopUp;
     IBOutlet NSProgressIndicator * fVerifyIndicator;
     
+    IBOutlet NSTextField * fFileFilterField;
+    IBOutlet NSButton * fCheckAllButton, *fUncheckAllButton;
+    
     IBOutlet FileOutlineController * fFileController;
     
     Controller * fController;
@@ -61,11 +64,15 @@
 - (void) add: (id) sender;
 - (void) cancelAdd: (id) sender;
 
+- (IBAction) setFileFilterText: (id) sender;
+- (IBAction) checkAll: (id) sender;
+- (IBAction) uncheckAll: (id) sender;
+
 - (void) verifyLocalData: (id) sender;
 
 - (void) changePriority: (id) sender;
 
-- (void) updateStatusField: (NSNotification *) notification;
+- (void) updateCheckButtons: (NSNotification *) notification;
 
 - (void) updateGroupMenu: (NSNotification *) notification;
 

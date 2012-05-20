@@ -1759,7 +1759,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 - (void) updateUI
 {
     CGFloat dlRate = 0.0, ulRate = 0.0;
-    BOOL completed = NO;
+    BOOL anyCompleted = NO, anyActive = NO;
     for (Torrent * torrent in fTorrents)
     {
         [torrent update];
@@ -1768,7 +1768,8 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         dlRate += [torrent downloadRate];
         ulRate += [torrent uploadRate];
         
-        completed |= [torrent isFinishedSeeding];
+        anyCompleted |= [torrent isFinishedSeeding];
+        anyActive |= [torrent isActive];
     }
     
     if (![NSApp isHidden])
@@ -1779,7 +1780,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
             
             [fStatusBar updateWithDownload: dlRate upload: ulRate];
             
-            [fClearCompletedButton setHidden: !completed];
+            [fClearCompletedButton setHidden: !anyCompleted];
         }
 
         //update non-constant parts of info window

@@ -79,11 +79,9 @@
 
 - (void) awakeFromNib
 {
-    [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(updateStatusField:)
-        name: @"TorrentFileCheckChange" object: fTorrent];
+    [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(updateCheckButtons:) name: @"TorrentFileCheckChange" object: fTorrent];
     
-    [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(updateGroupMenu:)
-        name: @"UpdateGroups" object: nil];
+    [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(updateGroupMenu:) name: @"UpdateGroups" object: nil];
     
     [fFileController setTorrent: fTorrent];
     
@@ -94,7 +92,9 @@
     
     [fIconView setImage: [fTorrent icon]];
     
-    [self updateStatusField: nil];
+    [fFileFilterField setEnabled: [fTorrent isFolder]];
+    
+    [self updateCheckButtons: nil];
     
     [self setGroupsMenu];
     [fGroupPopUp selectItemWithTag: fGroupValue];
@@ -217,6 +217,21 @@
     return YES;
 }
 
+- (void) setFileFilterText: (id) sender
+{
+    [fFileController setFilterText: [sender stringValue]];
+}
+
+- (IBAction) checkAll: (id) sender
+{
+    [fFileController checkAll];
+}
+
+- (IBAction) uncheckAll: (id) sender
+{
+    [fFileController uncheckAll];
+}
+
 - (void) verifyLocalData: (id) sender
 {
     [fTorrent resetCache];
@@ -236,11 +251,18 @@
     [fTorrent setPriority: priority];
 }
 
-- (void) updateStatusField: (NSNotification *) notification
+- (void) updateCheckButtons: (NSNotification *) notification
 {
     NSString * statusString = [NSString stringForFileSize: [fTorrent size]];
     if ([fTorrent isFolder])
     {
+        //check buttons
+        //keep synced with identical code in InfoFileViewController.m
+        const NSInteger filesCheckState = [fTorrent checkForFiles: [NSIndexSet indexSetWithIndexesInRange: NSMakeRange(0, [fTorrent fileCount])]];
+        [fCheckAllButton setEnabled: filesCheckState != NSOnState]; //if anything is unchecked
+        [fUncheckAllButton setEnabled: ![fTorrent allDownloaded]]; //if there are any checked files that aren't finished
+        
+        //status field
         NSString * fileString;
         NSInteger count = [fTorrent fileCount];
         if (count != 1)
@@ -277,6 +299,8 @@
     [fTorrent update];
     
     [fFileController refresh];
+    
+    [self updateCheckButtons: nil]; //call in case button state changed by checking
     
     if ([fTorrent isChecking])
     {

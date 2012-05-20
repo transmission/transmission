@@ -109,6 +109,7 @@
     {
         [fFileController refresh];
         
+        #warning use TorrentFileCheckChange notification as well
         Torrent * torrent = [fTorrents objectAtIndex: 0];
         if ([torrent isFolder])
         {
