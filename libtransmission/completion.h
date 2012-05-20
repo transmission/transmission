@@ -89,12 +89,6 @@ tr_cpHaveTotal( const tr_completion * cp )
     return cp->sizeNow;
 }
 
-static inline uint64_t
-tr_cpLeftUntilComplete( const tr_completion * cp )
-{
-    return tr_torrentInfo(cp->tor)->totalSize - cp->sizeNow;
-}
-
 static inline bool tr_cpHasAll( const tr_completion * cp )
 {
     return tr_bitfieldHasAll( &cp->blockBitfield );

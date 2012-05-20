@@ -148,7 +148,7 @@ typedef struct
     uint64_t corrupt;
 
     /* the total size of the torrent minus the number of bytes completed */
-    uint64_t left;
+    uint64_t leftUntilComplete;
 
     /* the tracker's announce URL */
     char * url;

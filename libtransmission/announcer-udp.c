@@ -323,7 +323,7 @@ tau_announce_request_new( const tr_announce_request  * in,
     evbuffer_add        ( buf, in->info_hash, SHA_DIGEST_LENGTH );
     evbuffer_add        ( buf, in->peer_id, PEER_ID_LEN );
     evbuffer_add_hton_64( buf, in->down );
-    evbuffer_add_hton_64( buf, in->left );
+    evbuffer_add_hton_64( buf, in->leftUntilComplete );
     evbuffer_add_hton_64( buf, in->up );
     evbuffer_add_hton_32( buf, get_tau_announce_event( in->event ) );
     evbuffer_add_hton_32( buf, 0 );

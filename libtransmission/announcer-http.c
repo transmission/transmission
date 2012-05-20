@@ -81,7 +81,7 @@ announce_url_new( const tr_session * session, const tr_announce_request * req )
                               req->port,
                               req->up,
                               req->down,
-                              req->left,
+                              req->leftUntilComplete,
                               req->numwant,
                               req->key );
 
