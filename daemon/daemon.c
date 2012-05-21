@@ -59,6 +59,7 @@
 
 static bool paused = false;
 static bool closing = false;
+static bool seenHUP = false;
 static tr_session * mySession = NULL;
 
 /***
@@ -141,19 +142,32 @@ gotsig( int sig )
     {
         case SIGHUP:
         {
-            tr_benc settings;
-            const char * configDir = tr_sessionGetConfigDir( mySession );
-            tr_inf( "Reloading settings from \"%s\"", configDir );
-            tr_bencInitDict( &settings, 0 );
-            tr_bencDictAddBool( &settings, TR_PREFS_KEY_RPC_ENABLED, true );
-            tr_sessionLoadSettings( &settings, configDir, MY_NAME );
-            tr_sessionSet( mySession, &settings );
-            tr_bencFree( &settings );
-            tr_sessionReloadBlocklists( mySession );
+            if( !mySession )
+            {
+                tr_inf( "Deferring reload until session is fully started." );
+                seenHUP = true;
+            }
+            else
+            {
+                tr_benc settings;
+                const char * configDir = tr_sessionGetConfigDir( mySession );
+                tr_inf( "Reloading settings from \"%s\"", configDir );
+                tr_bencInitDict( &settings, 0 );
+                tr_bencDictAddBool( &settings, TR_PREFS_KEY_RPC_ENABLED, true );
+                tr_sessionLoadSettings( &settings, configDir, MY_NAME );
+                tr_sessionSet( mySession, &settings );
+                tr_bencFree( &settings );
+                tr_sessionReloadBlocklists( mySession );
+            }
             break;
         }
 
         default:
+            tr_err( "Unexpected signal(%d) in daemon, closing.", sig);
+            /* no break */
+
+        case SIGINT:
+        case SIGTERM:
             closing = true;
             break;
     }
@@ -341,6 +355,7 @@ main( int argc, char ** argv )
     dtr_watchdir * watchdir = NULL;
     FILE * logfile = NULL;
     bool pidfile_created = false;
+    tr_session * session = NULL;
 
     signal( SIGINT, gotsig );
     signal( SIGTERM, gotsig );
@@ -483,10 +498,10 @@ main( int argc, char ** argv )
     tr_formatter_mem_init( MEM_K, MEM_K_STR, MEM_M_STR, MEM_G_STR, MEM_T_STR );
     tr_formatter_size_init( DISK_K, DISK_K_STR, DISK_M_STR, DISK_G_STR, DISK_T_STR );
     tr_formatter_speed_init( SPEED_K, SPEED_K_STR, SPEED_M_STR, SPEED_G_STR, SPEED_T_STR );
-    mySession = tr_sessionInit( "daemon", configDir, true, &settings );
-    tr_sessionSetRPCCallback( mySession, on_rpc_callback, NULL );
+    session = tr_sessionInit( "daemon", configDir, true, &settings );
+    tr_sessionSetRPCCallback( session, on_rpc_callback, NULL );
     tr_ninf( NULL, "Using settings from \"%s\"", configDir );
-    tr_sessionSaveSettings( mySession, configDir, &settings );
+    tr_sessionSaveSettings( session, configDir, &settings );
 
     pid_filename = NULL;
     tr_bencDictFindStr( &settings, PREF_KEY_PIDFILE, &pid_filename );
@@ -506,6 +521,12 @@ main( int argc, char ** argv )
 
     if( tr_bencDictFindBool( &settings, TR_PREFS_KEY_RPC_AUTH_REQUIRED, &boolVal ) && boolVal )
         tr_ninf( MY_NAME, "requiring authentication" );
+
+    mySession = session;
+
+    /* If we got a SIGHUP during startup, process that now. */
+    if( seenHUP )
+        gotsig( SIGHUP );
 
     /* maybe add a watchdir */
     {
