@@ -1143,7 +1143,7 @@ on_announce_done( const tr_announce_response  * response,
 
             /* if the tracker included scrape fields in its announce response,
                then a separate scrape isn't needed */
-            if( scrape_fields >= 3 )
+            if( ( scrape_fields >= 3 ) || ( !tracker->scrape && ( scrape_fields >= 1 ) ) )
             {
                 tr_tordbg( tier->tor, "Announce response contained scrape info; "
                                       "rescheduling next scrape to %d seconds from now.",
