@@ -2,10 +2,10 @@
 <archive type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="8.00">
 	<data>
 		<int key="IBDocument.SystemTarget">1060</int>
-		<string key="IBDocument.SystemVersion">11D50</string>
+		<string key="IBDocument.SystemVersion">11E53</string>
 		<string key="IBDocument.InterfaceBuilderVersion">2182</string>
-		<string key="IBDocument.AppKitVersion">1138.32</string>
-		<string key="IBDocument.HIToolboxVersion">568.00</string>
+		<string key="IBDocument.AppKitVersion">1138.47</string>
+		<string key="IBDocument.HIToolboxVersion">569.00</string>
 		<object class="NSMutableDictionary" key="IBDocument.PluginVersions">
 			<string key="NS.key.0">com.apple.InterfaceBuilder.CocoaPlugin</string>
 			<string key="NS.object.0">2182</string>
@@ -148,6 +148,7 @@
 							<string key="NSFrame">{{118, 5}, {279, 14}}</string>
 							<reference key="NSSuperview" ref="303120456"/>
 							<reference key="NSWindow"/>
+							<reference key="NSNextKeyView"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSTextFieldCell" key="NSCell" id="696487414">
 								<int key="NSCellFlags">67239488</int>
@@ -193,7 +194,7 @@
 											<string key="NSFrameSize">{515, 224}</string>
 											<reference key="NSSuperview" ref="306237956"/>
 											<reference key="NSWindow"/>
-											<reference key="NSNextKeyView" ref="365285506"/>
+											<reference key="NSNextKeyView" ref="1068338331"/>
 											<bool key="NSEnabled">YES</bool>
 											<object class="_NSCornerView" key="NSCornerView">
 												<nil key="NSNextResponder"/>
@@ -394,7 +395,7 @@ ptzUTw49zt214F4AgIAADwEAAAMAAAABAD4AAAEBAAMAAAABAD4AAAECAAMAAAAEAAAkpAEDAAMAAAAB
 AAUAAAEGAAMAAAABAAIAAAERAAQAAAABAAAACAESAAMAAAABAAEAAAEVAAMAAAABAAQAAAEWAAMAAAAB
 AD4AAAEXAAQAAAABAAAj4gEcAAMAAAABAAEAAAE9AAMAAAABAAIAAAFSAAMAAAABAAEAAAFTAAMAAAAE
 AAAkrIdzAAcAABq0AAAktAAAAAAACAAIAAgACAABAAEAAQABAAAatGFwcGwCEAAAbW50clJHQiBYWVog
-B9wABAATAAwAIAAoYWNzcEFQUEwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPbWAAEAAAAA0y1hcHBs
+B9wABQAKAAkADgAZYWNzcEFQUEwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPbWAAEAAAAA0y1hcHBs
 AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAARZGVzYwAAAVAAAABi
 ZHNjbQAAAbQAAAO4Y3BydAAABWwAAAAkd3RwdAAABZAAAAAUclhZWgAABaQAAAAUZ1hZWgAABbgAAAAU
 YlhZWgAABcwAAAAUclRSQwAABeAAAAgMYWFyZwAADewAAAAgdmNndAAADgwAAAYSbmRpbgAAFCAAAAY+
@@ -727,7 +728,7 @@ AAAGEAAAnM0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA</bytes>
 							<string key="NSFrame">{{0, 24}, {515, 224}}</string>
 							<reference key="NSSuperview" ref="303120456"/>
 							<reference key="NSWindow"/>
-							<reference key="NSNextKeyView" ref="306237956"/>
+							<reference key="NSNextKeyView" ref="365285506"/>
 							<int key="NSsFlags">133648</int>
 							<reference key="NSVScroller" ref="1068338331"/>
 							<reference key="NSHScroller" ref="365285506"/>
@@ -916,7 +917,7 @@ AAAGEAAAnM0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA</bytes>
 							<array class="NSMutableArray" key="NSMenuItems">
 								<object class="NSMenuItem" id="690856088">
 									<reference key="NSMenu" ref="455126894"/>
-									<string key="NSTitle">Opret torrent…</string>
+									<string key="NSTitle">Opret ny torrent…</string>
 									<string key="NSKeyEquiv">n</string>
 									<int key="NSKeyEquivModMask">1048576</int>
 									<int key="NSMnemonicLoc">2147483647</int>
@@ -1830,7 +1831,7 @@ AAAGEAAAnM0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA</bytes>
 								</object>
 								<object class="NSMenuItem" id="86328102">
 									<reference key="NSMenu" ref="393698794"/>
-									<string key="NSTitle">Support &amp; udvikling</string>
+									<string key="NSTitle">Support og udvikling</string>
 									<string key="NSKeyEquiv"/>
 									<int key="NSKeyEquivModMask">1048576</int>
 									<int key="NSMnemonicLoc">2147483647</int>
@@ -2053,7 +2054,7 @@ AAAGEAAAnM0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA</bytes>
 				<array class="NSMutableArray" key="NSMenuItems">
 					<object class="NSMenuItem" id="808803107">
 						<reference key="NSMenu" ref="439147874"/>
-						<string key="NSTitle">Opret torrent...</string>
+						<string key="NSTitle">Opret ny torrent...</string>
 						<string key="NSKeyEquiv"/>
 						<int key="NSKeyEquivModMask">1048576</int>
 						<int key="NSMnemonicLoc">2147483647</int>
