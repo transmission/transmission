@@ -1759,7 +1759,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 - (void) updateUI
 {
     CGFloat dlRate = 0.0, ulRate = 0.0;
-    BOOL anyCompleted = NO, anyActive = NO;
+    BOOL anyCompleted = NO;
     for (Torrent * torrent in fTorrents)
     {
         [torrent update];
@@ -1769,7 +1769,6 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         ulRate += [torrent uploadRate];
         
         anyCompleted |= [torrent isFinishedSeeding];
-        anyActive |= [torrent isActive];
     }
     
     if (![NSApp isHidden])
