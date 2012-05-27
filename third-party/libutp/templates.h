@@ -43,7 +43,11 @@ template <typename T> static inline T clamp(T v, T mi, T ma)
 	return v;
 }
 
+#if (defined(__SVR4) && defined(__sun))
+#pragma pack(1)
+#else
 #pragma pack(push,1)
+#endif
 
 namespace aux
 {
@@ -68,7 +72,11 @@ typedef big_endian<int32> int32_big;
 typedef big_endian<uint32> uint32_big;
 typedef big_endian<uint16> uint16_big;
 
+#if (defined(__SVR4) && defined(__sun))
+#pragma pack(0)
+#else
 #pragma pack(pop)
+#endif
 
 template<typename T> static inline void zeromem(T *a, size_t count = 1) { memset(a, 0, count * sizeof(T)); }
 
