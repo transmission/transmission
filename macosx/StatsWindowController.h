@@ -34,7 +34,7 @@
     NSTimer * fTimer;
 }
 
-+ (StatsWindowController *) statsWindow: (tr_session *) lib;
++ (StatsWindowController *) statsWindow;
 
 - (void) resetStats: (id) sender;
 

@@ -23,6 +23,7 @@
  *****************************************************************************/
 
 #import "MessageWindowController.h"
+#import "Controller.h"
 #import "NSApplicationAdditions.h"
 #import "NSMutableArrayAdditions.h"
 #import "NSStringAdditions.h"
@@ -56,6 +57,8 @@
     NSWindow * window = [self window];
     [window setFrameAutosaveName: @"MessageWindowFrame"];
     [window setFrameUsingName: @"MessageWindowFrame"];
+    
+    [window setRestorationClass: [self class]];
     
     [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(resizeColumn)
         name: @"NSTableViewColumnDidResizeNotification" object: fMessageTable];
@@ -149,8 +152,7 @@
 {
     if (!fTimer)
     {
-        fTimer = [NSTimer scheduledTimerWithTimeInterval: UPDATE_SECONDS target: self
-                    selector: @selector(updateLog:) userInfo: nil repeats: YES];
+        fTimer = [NSTimer scheduledTimerWithTimeInterval: UPDATE_SECONDS target: self selector: @selector(updateLog:) userInfo: nil repeats: YES];
         [self updateLog: nil];
     }
 }
@@ -159,6 +161,21 @@
 {
     [fTimer invalidate];
     fTimer = nil;
+}
+
++ (void) restoreWindowWithIdentifier: (NSString *) identifier state: (NSCoder *) state completionHandler: (void (^)(NSWindow *, NSError *)) completionHandler
+{
+    NSAssert1([identifier isEqualToString: @"MessageWindow"], @"Trying to restore unexpected identifier %@", identifier);
+    
+    NSWindow * window = [[(Controller *)[NSApp delegate] messageWindowController] window];
+    completionHandler(window, nil);
+}
+
+- (void) window: (NSWindow *) window didDecodeRestorableState: (NSCoder *) coder
+{
+    [fTimer invalidate];
+    fTimer = [NSTimer scheduledTimerWithTimeInterval: UPDATE_SECONDS target: self selector: @selector(updateLog:) userInfo: nil repeats: YES];
+    [self updateLog: nil];
 }
 
 - (void) updateLog: (NSTimer *) timer

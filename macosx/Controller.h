@@ -57,7 +57,6 @@ typedef enum
     
     PrefsController                 * fPrefsController;
     InfoWindowController            * fInfoController;
-    MessageWindowController         * fMessageController;
     
     NSUserDefaults                  * fDefaults;
     
@@ -135,6 +134,8 @@ typedef enum
 
 - (void) quitSheetDidEnd: (NSWindow *) sheet returnCode: (NSInteger) returnCode contextInfo: (void *) contextInfo;
 
+- (tr_session *) sessionHandle;
+
 - (void) createFile: (id) sender;
 
 - (void) resumeSelectedTorrents:    (id) sender;
@@ -181,6 +182,7 @@ typedef enum
 - (void) resetInfo;
 - (void) setInfoTab: (id) sender;
 
+@property (retain, readonly) MessageWindowController * messageWindowController;
 - (void) showMessageWindow: (id) sender;
 - (void) showStatsWindow: (id) sender;
 

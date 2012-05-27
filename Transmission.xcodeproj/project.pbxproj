@@ -2767,7 +2767,6 @@
 			buildSettings = {
 				FRAMEWORK_SEARCH_PATHS = macosx;
 				GCC_PREFIX_HEADER = macosx/Transmission_Prefix.pch;
-				INFOPLIST_FILE = macosx/Info.plist;
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)/third-party/curl/lib\"",
@@ -2924,7 +2923,6 @@
 			buildSettings = {
 				FRAMEWORK_SEARCH_PATHS = macosx;
 				GCC_PREFIX_HEADER = macosx/Transmission_Prefix.pch;
-				INFOPLIST_FILE = macosx/Info.plist;
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)/third-party/curl/lib\"",
@@ -3032,7 +3030,6 @@
 			buildSettings = {
 				FRAMEWORK_SEARCH_PATHS = macosx;
 				GCC_PREFIX_HEADER = macosx/Transmission_Prefix.pch;
-				INFOPLIST_FILE = macosx/Info.plist;
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)/third-party/curl/lib\"",

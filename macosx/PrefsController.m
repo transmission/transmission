@@ -65,6 +65,7 @@
 
 @implementation PrefsController
 
+#warning just call method in Controller?
 tr_session * fHandle;
 + (void) setHandle: (tr_session *) handle
 {

@@ -157,6 +157,8 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 
 @implementation Controller
 
+@synthesize messageWindowController = fMessageController;
+
 + (void) initialize
 {
     //make sure another Transmission.app isn't running already
@@ -730,6 +732,11 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     
     //complete cleanup
     tr_sessionClose(fLib);
+}
+
+- (tr_session *) sessionHandle
+{
+    return fLib;
 }
 
 - (void) handleOpenContentsEvent: (NSAppleEventDescriptor *) event replyEvent: (NSAppleEventDescriptor *) replyEvent
@@ -1744,16 +1751,22 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         [fInfoController setPreviousTab];
 }
 
-- (void) showMessageWindow: (id) sender
+- (MessageWindowController *) messageWindowController
 {
     if (!fMessageController)
         fMessageController = [[MessageWindowController alloc] init];
-    [fMessageController showWindow: nil];
+    
+    return fMessageController;
+}
+
+- (void) showMessageWindow: (id) sender
+{
+    [[self messageWindowController] showWindow: nil];
 }
 
 - (void) showStatsWindow: (id) sender
 {
-    [[StatsWindowController statsWindow: fLib] showWindow: nil];
+    [[StatsWindowController statsWindow] showWindow: nil];
 }
 
 - (void) updateUI
