@@ -40,6 +40,7 @@
     IBOutlet NSButton * fCheckAllButton, *fUncheckAllButton;
     
     IBOutlet FileOutlineController * fFileController;
+    IBOutlet NSScrollView * fFileScrollView;
     
     Controller * fController;
     

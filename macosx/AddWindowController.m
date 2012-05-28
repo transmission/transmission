@@ -92,9 +92,20 @@
     
     [fIconView setImage: [fTorrent icon]];
     
-    [fFileFilterField setEnabled: [fTorrent isFolder]];
-    
-    [self updateCheckButtons: nil];
+    if (![fTorrent isFolder])
+    {
+        [fFileFilterField setHidden: YES];
+        [fCheckAllButton setHidden: YES];
+        [fUncheckAllButton setHidden: YES];
+        
+        NSRect scrollFrame = [fFileScrollView frame];
+        const CGFloat diff = NSMinY([fFileScrollView frame]) - NSMinY([fFileFilterField frame]);
+        scrollFrame.origin.y -= diff;
+        scrollFrame.size.height += diff;
+        [fFileScrollView setFrame: scrollFrame];
+    }
+    else
+        [self updateCheckButtons: nil];
     
     [self setGroupsMenu];
     [fGroupPopUp selectItemWithTag: fGroupValue];
