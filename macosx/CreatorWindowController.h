@@ -39,7 +39,7 @@
     IBOutlet NSProgressIndicator * fProgressIndicator;
     
     tr_metainfo_builder * fInfo;
-    NSString * fPath, * fLocation;
+    NSURL * fPath, * fLocation;
     NSMutableArray * fTrackers;
     
     NSTimer * fTimer;
@@ -48,17 +48,17 @@
     NSUserDefaults * fDefaults;
 }
 
-+ (void) createTorrentFile: (tr_session *) handle;
-+ (void) createTorrentFile: (tr_session *) handle forFile: (NSString *) file;
++ (CreatorWindowController *) createTorrentFile: (tr_session *) handle;
++ (CreatorWindowController *) createTorrentFile: (tr_session *) handle forFile: (NSURL *) file;
 
-- (id) initWithHandle: (tr_session *) handle path: (NSString *) path;
+- (id) initWithHandle: (tr_session *) handle path: (NSURL *) path;
 
-- (void) setLocation: (id) sender;
-- (void) create: (id) sender;
-- (void) cancelCreateWindow: (id) sender;
-- (void) cancelCreateProgress: (id) sender;
+- (IBAction) setLocation: (id) sender;
+- (IBAction) create: (id) sender;
+- (IBAction) cancelCreateWindow: (id) sender;
+- (IBAction) cancelCreateProgress: (id) sender;
 
-- (void) addRemoveTracker: (id) sender;
+- (IBAction) addRemoveTracker: (id) sender;
 
 - (void) copy: (id) sender;
 - (void) paste: (id) sender;

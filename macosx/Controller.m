@@ -1065,8 +1065,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 - (void) openCreatedFile: (NSNotification *) notification
 {
     NSDictionary * dict = [notification userInfo];
-    [self openFiles: [NSArray arrayWithObject: [dict objectForKey: @"File"]] addType: ADD_CREATED
-                        forcePath: [dict objectForKey: @"Path"]];
+    [self openFiles: [NSArray arrayWithObject: [dict objectForKey: @"File"]] addType: ADD_CREATED forcePath: [dict objectForKey: @"Path"]];
     [dict release];
 }
 
@@ -2831,7 +2830,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     if (![fDefaults boolForKey: @"AutoImport"])
         return;
     
-    NSString * location = [notification object],
+    NSString * location = [(NSURL *)[notification object] path],
             * path = [fDefaults stringForKey: @"AutoImportDirectory"];
     
     if (location && path && [[[location stringByDeletingLastPathComponent] stringByExpandingTildeInPath]
@@ -3165,7 +3164,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         else
         {
             if (!torrent && [files count] == 1)
-                [CreatorWindowController createTorrentFile: fLib forFile: [files objectAtIndex: 0]];
+                [CreatorWindowController createTorrentFile: fLib forFile: [NSURL fileURLWithPath: [files objectAtIndex: 0]]];
             else
                 accept = NO;
         }
