@@ -157,6 +157,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 
 @implementation Controller
 
+#warning remove ivars in header when 64-bit only (or it compiles in 32-bit mode)
 @synthesize messageWindowController = fMessageController;
 
 + (void) initialize

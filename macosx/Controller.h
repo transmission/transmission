@@ -57,6 +57,7 @@ typedef enum
     
     PrefsController                 * fPrefsController;
     InfoWindowController            * fInfoController;
+    MessageWindowController         * fMessageController;
     
     NSUserDefaults                  * fDefaults;
     
