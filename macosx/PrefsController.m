@@ -103,10 +103,9 @@ tr_session * fHandle;
             [fDefaults setObject: blocklistDate forKey: @"BlocklistNewLastUpdate"];
             [fDefaults removeObjectForKey: @"BlocklistLastUpdate"];
             
-            NSString * blocklistDir = [NSHomeDirectory() stringByAppendingPathComponent:
-                                        @"/Library/Application Support/Transmission/blocklists/"];
-            [[NSFileManager defaultManager] moveItemAtPath: [blocklistDir stringByAppendingPathComponent: @"level1.bin"]
-                toPath: [blocklistDir stringByAppendingPathComponent: [NSString stringWithUTF8String: DEFAULT_BLOCKLIST_FILENAME]]
+            NSURL * blocklistDir = [[[[NSFileManager defaultManager] URLsForDirectory: NSApplicationDirectory inDomains: NSUserDomainMask] objectAtIndex: 0] URLByAppendingPathComponent: @"Transmission/blocklists/"];
+            [[NSFileManager defaultManager] moveItemAtURL: [blocklistDir URLByAppendingPathComponent: @"level1.bin"]
+                toURL: [blocklistDir URLByAppendingPathComponent: [NSString stringWithUTF8String: DEFAULT_BLOCKLIST_FILENAME]]
                 error: nil];
         }
         
@@ -444,8 +443,7 @@ tr_session * fHandle;
 {
     NSMutableArray * sounds = [NSMutableArray array];
     
-    NSArray * directories = NSSearchPathForDirectoriesInDomains(NSAllLibrariesDirectory,
-                                NSUserDomainMask | NSLocalDomainMask | NSSystemDomainMask, YES);
+    NSArray * directories = NSSearchPathForDirectoriesInDomains(NSAllLibrariesDirectory, NSUserDomainMask | NSLocalDomainMask | NSSystemDomainMask, YES);
     
     for (NSString * directory in directories)
     {
