@@ -158,6 +158,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 @implementation Controller
 
 #warning remove ivars in header when 64-bit only (or it compiles in 32-bit mode)
+@synthesize prefsController = fPrefsController;
 @synthesize messageWindowController = fMessageController;
 
 + (void) initialize
@@ -2558,7 +2559,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         
         NSPopover * popover = [[NSPopoverLion alloc] init];
         [popover setBehavior: NSPopoverBehaviorTransient];
-        GlobalOptionsPopoverViewController * viewController = [[GlobalOptionsPopoverViewController alloc] initWithHandle: [PrefsController handle]];
+        GlobalOptionsPopoverViewController * viewController = [[GlobalOptionsPopoverViewController alloc] initWithHandle: fLib];
         [popover setContentViewController: viewController];
         [popover setDelegate: self];
         

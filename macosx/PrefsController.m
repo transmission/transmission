@@ -25,6 +25,7 @@
 #import "PrefsController.h"
 #import "BlocklistDownloaderViewController.h"
 #import "BlocklistScheduler.h"
+#import "Controller.h"
 #import "PortChecker.h"
 #import "BonjourController.h"
 #import "NSStringAdditions.h"
@@ -72,6 +73,7 @@ tr_session * fHandle;
     fHandle = handle;
 }
 
+#warning elliminate?
 + (tr_session *) handle
 {
     return fHandle;
@@ -169,6 +171,8 @@ tr_session * fHandle;
 - (void) awakeFromNib
 {
     fHasLoaded = YES;
+    
+    [[self window] setRestorationClass: [self class]];
     
     NSToolbar * toolbar = [[NSToolbar alloc] initWithIdentifier: @"Preferences Toolbar"];
     [toolbar setDelegate: self];
@@ -335,6 +339,12 @@ tr_session * fHandle;
     return [self toolbarAllowedItemIdentifiers: toolbar];
 }
 
++ (void) restoreWindowWithIdentifier: (NSString *) identifier state: (NSCoder *) state completionHandler: (void (^)(NSWindow *, NSError *)) completionHandler
+{
+    NSWindow * window = [[(Controller *)[NSApp delegate] prefsController] window];
+    completionHandler(window, nil);
+}
+
 //for a beta release, always use the beta appcast
 #if defined(TR_BETA_RELEASE)
 #define SPARKLE_TAG YES
@@ -368,7 +378,7 @@ tr_session * fHandle;
 
 - (void) setRandomPortOnStart: (id) sender
 {
-    tr_sessionSetPeerPortRandomOnStart(fHandle, [sender state] == NSOnState);
+    tr_sessionSetPeerPortRandomOnStart(fHandle, [(NSButton *)sender state] == NSOnState);
 }
 
 - (void) setNat: (id) sender
