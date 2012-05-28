@@ -43,7 +43,7 @@
     NSMutableArray * fTrackers;
     
     NSTimer * fTimer;
-    BOOL fStarted;
+    BOOL fStarted, fOpenWhenCreated;
     
     NSUserDefaults * fDefaults;
 }

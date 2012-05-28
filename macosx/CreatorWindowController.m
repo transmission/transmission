@@ -36,6 +36,7 @@
 
 + (NSURL *) chooseFile;
 
+- (void) updateLocationField;
 - (void) createBlankAddressAlertDidEnd: (NSAlert *) alert returnCode: (NSInteger) returnCode contextInfo: (void *) contextInfo;
 - (void) createReal;
 - (void) checkProgress;
@@ -183,9 +184,7 @@
         NSString * location = [fDefaults stringForKey: @"CreatorLocation"];
         fLocation = [[NSURL alloc] initFileURLWithPath: [[location stringByExpandingTildeInPath] stringByAppendingPathComponent: [name stringByAppendingPathExtension: @"torrent"]]];
     }
-    NSString * pathString = [fLocation path];
-    [fLocationField setStringValue: [pathString stringByAbbreviatingWithTildeInPath]];
-    [fLocationField setToolTip: pathString];
+    [self updateLocationField];
     
     //set previously saved values
     if ([fDefaults objectForKey: @"CreatorPrivate"])
@@ -234,12 +233,9 @@
 
 - (void) window: (NSWindow *) window didDecodeRestorableState: (NSCoder *) coder
 {
-    #warning done in 3 places - make a separate method
     [fLocation release];
     fLocation = [[coder decodeObjectForKey: @"TRCreatorLocation"] retain];
-    NSString * pathString = [fLocation path];
-    [fLocationField setStringValue: [pathString stringByAbbreviatingWithTildeInPath]];
-    [fLocationField setToolTip: pathString];
+    [self updateLocationField];
     
     [fTrackers release];
     fTrackers = [[coder decodeObjectForKey: @"TRCreatorTrackers"] retain];
@@ -269,10 +265,7 @@
         {
             [fLocation release];
             fLocation = [[panel URL] retain];
-            
-            NSString * pathString = [fLocation path];
-            [fLocationField setStringValue: [pathString stringByAbbreviatingWithTildeInPath]];
-            [fLocationField setToolTip: pathString];
+            [self updateLocationField];
         }
     }];
 }
@@ -453,6 +446,13 @@
 
 @implementation CreatorWindowController (Private)
 
+- (void) updateLocationField
+{
+    NSString * pathString = [fLocation path];
+    [fLocationField setStringValue: [pathString stringByAbbreviatingWithTildeInPath]];
+    [fLocationField setToolTip: pathString];
+}
+
 + (NSURL *) chooseFile
 {
     NSOpenPanel * panel = [NSOpenPanel openPanel];
@@ -539,11 +539,11 @@
     [fDefaults setObject: fTrackers forKey: @"CreatorTrackers"];
     [fDefaults setBool: [fPrivateCheck state] == NSOnState forKey: @"CreatorPrivate"];
     [fDefaults setBool: [fOpenCheck state] == NSOnState forKey: @"CreatorOpen"];
+    fOpenWhenCreated = [fOpenCheck state] == NSOnState; //need this since the check box might not exist, and value in prefs might have changed from another creator window
     [fDefaults setURL: [fLocation URLByDeletingLastPathComponent] forKey: @"CreatorLocationURL"];
     
     [[NSNotificationCenter defaultCenter] postNotificationName: @"BeginCreateTorrentFile" object: fLocation userInfo: nil];
-    tr_makeMetaInfo(fInfo, [[fLocation path] UTF8String], trackerInfo, [fTrackers count], [[fCommentView string] UTF8String],
-                    [fPrivateCheck state] == NSOnState);
+    tr_makeMetaInfo(fInfo, [[fLocation path] UTF8String], trackerInfo, [fTrackers count], [[fCommentView string] UTF8String], [fPrivateCheck state] == NSOnState);
     tr_free(trackerInfo);
     
     fTimer = [NSTimer scheduledTimerWithTimeInterval: 0.1 target: self selector: @selector(checkProgress)
@@ -561,8 +561,7 @@
         switch (fInfo->result)
         {
             case TR_MAKEMETA_OK:
-                #warning this isn't safe - what if another window changes it after hitting the create button on this window?
-                if ([fDefaults boolForKey: @"CreatorOpen"])
+                if (fOpenWhenCreated)
                 {
                     NSDictionary * dict = [[NSDictionary alloc] initWithObjectsAndKeys: [fLocation path], @"File",
                                             [[fPath URLByDeletingLastPathComponent] path], @"Path", nil];
