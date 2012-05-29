@@ -744,7 +744,7 @@ tr_session * fHandle;
 
 - (IBAction) setBuiltInGrowlEnabled: (id) sender
 {
-    const BOOL enable = [sender state] == NSOnState;
+    const BOOL enable = [(NSButton *)sender state] == NSOnState;
     [fDefaults setBool: enable forKey: @"DisplayNotifications"];
     [GrowlApplicationBridge setShouldUseBuiltInNotifications: enable];
 }

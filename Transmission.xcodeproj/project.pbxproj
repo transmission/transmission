@@ -736,7 +736,7 @@
 		A2623B3E0D3DC5930045D19A /* PauseHover.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = PauseHover.png; path = macosx/Images/PauseHover.png; sourceTree = "<group>"; };
 		A2623B4D0D3DC6DF0045D19A /* ActionHover.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = ActionHover.png; path = macosx/Images/ActionHover.png; sourceTree = "<group>"; };
 		A263C5651560A35B0082A3D1 /* da */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = da; path = macosx/da.lproj/MainMenu.xib; sourceTree = "<group>"; };
-		A263C5661560A3CF0082A3D1 /* da */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = da; path = macosx/da.lproj/Localizable.strings; sourceTree = "<group>"; };
+		A263C5661560A3CF0082A3D1 /* da */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = da; path = macosx/da.lproj/Localizable.strings; sourceTree = "<group>"; };
 		A263C5671560A4210082A3D1 /* da */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = da; path = macosx/da.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		A263C5681560A4290082A3D1 /* da */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = da; path = macosx/da.lproj/PrefsWindow.xib; sourceTree = "<group>"; };
 		A263C5691560A4310082A3D1 /* da */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = da; path = macosx/da.lproj/Creator.xib; sourceTree = "<group>"; };
