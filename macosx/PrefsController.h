@@ -29,6 +29,7 @@
 
 @interface PrefsController : NSWindowController <NSToolbarDelegate>
 {
+    tr_session * fHandle;
     NSUserDefaults * fDefaults;
     BOOL fHasLoaded;
     
@@ -67,8 +68,7 @@
     NSString * fRPCPassword;
 }
 
-+ (void) setHandle: (tr_session *) handle;
-+ (tr_session *) handle;
+- (id) initWithHandle: (tr_session *) handle;
 
 - (void) setAutoUpdateToBeta: (id) sender;
 

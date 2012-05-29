@@ -25,7 +25,7 @@
 #import "BlocklistDownloader.h"
 #import "BlocklistDownloaderViewController.h"
 #import "BlocklistScheduler.h"
-#import "PrefsController.h"
+#import "Controller.h"
 
 @interface BlocklistDownloader (Private)
 
@@ -143,7 +143,7 @@ BlocklistDownloader * fBLDownloader = nil;
         [self decompressBlocklist];
         
         dispatch_async(dispatch_get_main_queue(), ^{
-            const int count = tr_blocklistSetContent([PrefsController handle], [fDestination UTF8String]);
+            const int count = tr_blocklistSetContent([(Controller *)[NSApp delegate] sessionHandle], [fDestination UTF8String]);
             
             //delete downloaded file
             [[NSFileManager defaultManager] removeItemAtPath: fDestination error: NULL];

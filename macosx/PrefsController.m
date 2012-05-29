@@ -66,23 +66,12 @@
 
 @implementation PrefsController
 
-#warning just call method in Controller?
-tr_session * fHandle;
-+ (void) setHandle: (tr_session *) handle
-{
-    fHandle = handle;
-}
-
-#warning elliminate?
-+ (tr_session *) handle
-{
-    return fHandle;
-}
-
-- (id) init
+- (id) initWithHandle: (tr_session *) handle
 {
     if ((self = [super initWithWindowNibName: @"PrefsWindow"]))
     {
+        fHandle = handle;
+        
         fDefaults = [NSUserDefaults standardUserDefaults];
         
         //check for old version download location (before 1.1)

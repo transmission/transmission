@@ -341,8 +341,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         
         fInfoController = [[InfoWindowController alloc] init];
         
-        [PrefsController setHandle: fLib];
-        fPrefsController = [[PrefsController alloc] init];
+        fPrefsController = [[PrefsController alloc] initWithHandle: fLib];
         
         fQuitting = NO;
         fGlobalPopoverShown = NO;
