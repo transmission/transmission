@@ -45,7 +45,8 @@
     Controller * fController;
     
     Torrent * fTorrent;
-    NSString * fDestination, * fTorrentFile;
+    NSURL * fTorrentFile;
+    NSString * fDestination;
     BOOL fLockDestination;
     
     BOOL fDeleteTorrentInitial, fDeleteEnableInitial;

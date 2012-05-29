@@ -94,8 +94,12 @@ int trashDataFile(const char * filename)
 {
     @autoreleasepool
     {
+        NSLog(@"%s", filename);
         if (filename != NULL)
-            [Torrent trashFile: [NSString stringWithUTF8String: filename]];
+        {
+            [Torrent trashFile: [NSURL fileURLWithPath: [NSString stringWithUTF8String: filename]]];
+            NSLog(@"%@\n%@", [NSString stringWithUTF8String: filename], [NSURL fileURLWithPath: [NSString stringWithUTF8String: filename]]);
+        }
     }
     return 0;
 }
@@ -114,7 +118,7 @@ int trashDataFile(const char * filename)
     if (self)
     {
         if (torrentDelete && ![[self torrentLocation] isEqualToString: path])
-            [Torrent trashFile: path];
+            [Torrent trashFile: [NSURL fileURLWithPath: path]];
     }
     return self;
 }
@@ -492,19 +496,12 @@ int trashDataFile(const char * filename)
     return tr_torrentSetPriority(fHandle, priority);
 }
 
-#warning when 10.6-only use recycleURLs:completionHandler:
-+ (void) trashFile: (NSString *) path
++ (void) trashFile: (NSURL *) fileURL
 {
-    //attempt to move to trash
-    if (![[NSWorkspace sharedWorkspace] performFileOperation: NSWorkspaceRecycleOperation
-        source: [path stringByDeletingLastPathComponent] destination: @""
-        files: [NSArray arrayWithObject: [path lastPathComponent]] tag: nil])
-    {
-        //if cannot trash, just delete it (will work if it's on a remote volume)
-        NSError * error;
-        if (![[NSFileManager defaultManager] removeItemAtPath: path error: &error])
-            NSLog(@"Could not trash %@: %@", path, [error localizedDescription]);
-    }
+    [[NSWorkspace sharedWorkspace] recycleURLs: [NSArray arrayWithObject: fileURL] completionHandler: ^(NSDictionary * newURLs, NSError * error) {
+        if (error)
+            NSLog(@"Could not trash %@: %@", [fileURL path], [error localizedDescription]);
+    }];
 }
 
 - (void) moveTorrentDataFileTo: (NSString *) folder
