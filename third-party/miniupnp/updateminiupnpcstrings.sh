@@ -1,11 +1,11 @@
 #! /bin/sh
-# $Id: updateminiupnpcstrings.sh,v 1.7 2011/01/04 11:41:53 nanard Exp $
-# project miniupnp : http://miniupnp.free.fr/
-# (c) 2009 Thomas Bernard
+# $Id: updateminiupnpcstrings.sh,v 1.4 2009/07/29 08:34:01 nanard Exp $
 
-FILE=miniupnpcstrings.h
-TMPFILE=miniupnpcstrings.h.tmp
-TEMPLATE_FILE=${FILE}.in
+VERSION_FILE=$1
+TEMPLATE_FILE=$2
+FILE=$3
+TMPFILE=$3.tmp
+
 
 # detecting the OS name and version
 OS_NAME=`uname -s`
@@ -37,7 +37,7 @@ if [ "$OS_NAME" = "AmigaOS" ]; then
 fi
 
 echo "Detected OS [$OS_NAME] version [$OS_VERSION]"
-MINIUPNPC_VERSION=`cat VERSION`
+MINIUPNPC_VERSION=`cat $VERSION_FILE`
 echo "MiniUPnPc version [${MINIUPNPC_VERSION}]"
 
 EXPR="s|OS_STRING \".*\"|OS_STRING \"${OS_NAME}/${OS_VERSION}\"|"

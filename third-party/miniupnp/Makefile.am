@@ -42,6 +42,6 @@ BUILT_SOURCES = \
     miniupnpcstrings.h
 
 miniupnpcstrings.h: Makefile
-	$(srcdir)/updateminiupnpcstrings.sh $(srcdir)/miniupnpcstrings.h.in $@
+	$(srcdir)/updateminiupnpcstrings.sh $(srcdir)/VERSION $(srcdir)/miniupnpcstrings.h.in $@
 
 DISTCLEANFILES = $(builddir)/miniupnpcstrings.h
