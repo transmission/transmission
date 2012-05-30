@@ -7,10 +7,18 @@
 
    The JSON terminology in RFC 4627 is used.
 
-   In benc terms, a JSON "array" is equivalent to a benc list,
-   a JSON "object" is equivalent to a benc dictionary,
-   and a JSON object's "keys" are the dictionary's string keys.
+   JSON is fairly common now, but for the benefit of
+   torrent developers familiar with benc:
+   a JSON array is equivalent to a benc list,
+   a JSON object is equivalent to a benc dictionary,
+   and a JSON object's keys are the dictionary's string keys.
 
+1.2  Resources
+
+   The command-line utility "transmission-remote" uses this RPC API.
+   Several developers have reported using its --debug JSON output as
+   a reference when developing/debugging their own code.
+   
 2.  Message Format
 
    Messages are formatted as objects.  There are two types:
