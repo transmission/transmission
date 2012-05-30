@@ -57,9 +57,13 @@
 #define SPEED_G_STR "GB/s"
 #define SPEED_T_STR "TB/s"
 
+#define LOGFILE_MODE_STR "a+"
+
 static bool paused = false;
 static bool closing = false;
 static bool seenHUP = false;
+static const char *logfileName = NULL;
+static FILE *logfile = NULL;
 static tr_session * mySession = NULL;
 
 /***
@@ -150,7 +154,16 @@ gotsig( int sig )
             else
             {
                 tr_benc settings;
-                const char * configDir = tr_sessionGetConfigDir( mySession );
+                const char * configDir;
+
+                /* reopen the logfile to allow for log rotation */
+                if( logfileName ) {
+                    logfile = freopen( logfileName, LOGFILE_MODE_STR, logfile );
+                    if( !logfile )
+                        fprintf( stderr, "Couldn't reopen \"%s\": %s\n", logfileName, tr_strerror( errno ) );
+                }
+
+                configDir = tr_sessionGetConfigDir( mySession );
                 tr_inf( "Reloading settings from \"%s\"", configDir );
                 tr_bencInitDict( &settings, 0 );
                 tr_bencDictAddBool( &settings, TR_PREFS_KEY_RPC_ENABLED, true );
@@ -353,7 +366,6 @@ main( int argc, char ** argv )
     const char * configDir = NULL;
     const char * pid_filename;
     dtr_watchdir * watchdir = NULL;
-    FILE * logfile = NULL;
     bool pidfile_created = false;
     tr_session * session = NULL;
 
@@ -392,8 +404,10 @@ main( int argc, char ** argv )
                       break;
             case 'd': dumpSettings = true;
                       break;
-            case 'e': logfile = fopen( optarg, "a+" );
-                      if( logfile == NULL )
+            case 'e': logfile = fopen( optarg, LOGFILE_MODE_STR );
+                      if( logfile )
+                          logfileName = optarg;
+                      else
                           fprintf( stderr, "Couldn't open \"%s\": %s\n", optarg, tr_strerror( errno ) );
                       break;
             case 'f': foreground = true;
