@@ -38,6 +38,8 @@
 
 #include <event2/util.h>
 
+#include <libutp/utp.h>
+
 #include "transmission.h"
 #include "fdlimit.h" /* tr_fdSocketClose() */
 #include "net.h"

@@ -29,6 +29,8 @@ THE SOFTWARE.
 
 #include <event2/event.h>
 
+#include <libutp/utp.h>
+
 #include "transmission.h"
 #include "net.h"
 #include "session.h"

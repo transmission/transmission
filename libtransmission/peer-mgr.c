@@ -18,6 +18,8 @@
 
 #include <event2/event.h>
 
+#include <libutp/utp.h>
+
 #include "transmission.h"
 #include "announcer.h"
 #include "bandwidth.h"
