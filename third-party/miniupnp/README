@@ -1,18 +1,24 @@
 Project: miniupnp
 Project web page: http://miniupnp.free.fr/ or http://miniupnp.tuxfamily.org/
+github: https://github.com/miniupnp/miniupnp
+freecode: http://freecode.com/projects/miniupnp
 Author: Thomas Bernard
-Copyright (c) 2005-2011 Thomas Bernard
+Copyright (c) 2005-2012 Thomas Bernard
 This software is subject to the conditions detailed in the
 LICENSE file provided within this distribution.
+
 
 For the comfort of Win32 users, bsdqueue.h is included in the distribution.
 Its licence is included in the header of the file.
 bsdqueue.h is a copy of the sys/queue.h of an OpenBSD system.
 
-* miniupnp Client *
+
+* miniUPnP Client - miniUPnPc *
 
 To compile, simply run 'gmake' (could be 'make' on your system).
 Under win32, to compile with MinGW, type "mingw32make.bat".
+MS Visual C solution and project files are supplied in the msvc/ subdirectory.
+
 The compilation is known to work under linux, FreeBSD,
 OpenBSD, MacOS X, AmigaOS and cygwin.
 The official AmigaOS4.1 SDK was used for AmigaOS4 and GeekGadgets for AmigaOS3.
@@ -23,7 +29,7 @@ To install the library and headers on the system use :
 > make install
 > exit
 
-alternatively, to install in a specific location, use :
+alternatively, to install into a specific location, use :
 > INSTALLPREFIX=/usr/local make install
 
 upnpc.c is a sample client using the libminiupnpc.
@@ -40,6 +46,7 @@ Note : use #include <miniupnpc/miniupnpc.h> etc... for the includes
 and -lminiupnpc for the link
 
 Discovery process is speeded up when MiniSSDPd is running on the machine.
+
 
 * Python module *
 

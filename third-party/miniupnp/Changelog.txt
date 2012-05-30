@@ -1,5 +1,14 @@
-$Id: Changelog.txt,v 1.166 2012/04/09 12:49:26 nanard Exp $
+$Id: Changelog.txt,v 1.169 2012/05/24 18:08:49 nanard Exp $
 miniUPnP client Changelog.
+
+VERSION 1.7 : released 2012/05/24
+
+2012/05/01:
+  Cleanup settings of CFLAGS in Makefile
+  Fix signed/unsigned integer comparaisons
+
+2012/04/20:
+  Allow to specify protocol with TCP or UDP for -A option
 
 2012/04/09:
   Only try to fetch XML description once in UPNP_GetValidIGD()
