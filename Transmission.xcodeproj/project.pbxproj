@@ -2196,6 +2196,7 @@
 			files = (
 			);
 			inputPaths = (
+				"$(SRCROOT)/third-party/miniupnp/VERSION",
 				"$(SRCROOT)/third-party/miniupnp/miniupnpcstrings.h.in",
 			);
 			outputPaths = (
@@ -2203,7 +2204,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "sh third-party/miniupnp/updateminiupnpcstrings.sh \"$SCRIPT_INPUT_FILE_0\" \"$SCRIPT_OUTPUT_FILE_0\"";
+			shellScript = "sh third-party/miniupnp/updateminiupnpcstrings.sh \"$SCRIPT_INPUT_FILE_0\" \"$SCRIPT_INPUT_FILE_1\" \"$SCRIPT_OUTPUT_FILE_0\"";
 		};
 		BE75C3510C729EE100DBEFE0 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
