@@ -94,11 +94,8 @@ int trashDataFile(const char * filename)
 {
     @autoreleasepool
     {
-        NSLog(@"%s", filename);
         if (filename != NULL)
-        {
-            [Torrent trashFile: [NSURL fileURLWithPath: [NSString stringWithUTF8String: filename]]];
-            NSLog(@"%@\n%@", [NSString stringWithUTF8String: filename], [NSURL fileURLWithPath: [NSString stringWithUTF8String: filename]]);
+            [Torrent trashFile: [NSString stringWithUTF8String: filename]];
         }
     }
     return 0;
@@ -118,7 +115,7 @@ int trashDataFile(const char * filename)
     if (self)
     {
         if (torrentDelete && ![[self torrentLocation] isEqualToString: path])
-            [Torrent trashFile: [NSURL fileURLWithPath: path]];
+            [Torrent trashFile: path];
     }
     return self;
 }
@@ -496,12 +493,19 @@ int trashDataFile(const char * filename)
     return tr_torrentSetPriority(fHandle, priority);
 }
 
-+ (void) trashFile: (NSURL *) fileURL
++ (void) trashFile: (NSString *) path
 {
-    [[NSWorkspace sharedWorkspace] recycleURLs: [NSArray arrayWithObject: fileURL] completionHandler: ^(NSDictionary * newURLs, NSError * error) {
-        if (error)
-            NSLog(@"Could not trash %@: %@", [fileURL path], [error localizedDescription]);
-    }];
+    //attempt to move to trash
+    if (![[NSWorkspace sharedWorkspace] performFileOperation: NSWorkspaceRecycleOperation
+                                                      source: [path stringByDeletingLastPathComponent] destination: @""
+                                                       files: [NSArray arrayWithObject: [path lastPathComponent]] tag: nil])
+    {
+        //if cannot trash, just delete it (will work if it's on a remote volume)
+        NSError * error;
+        if (![[NSFileManager defaultManager] removeItemAtPath: path error: &error])
+            NSLog(@"old Could not trash %@: %@", path, [error localizedDescription]);
+        else {NSLog(@"old removed %@", path);}
+    }
 }
 
 - (void) moveTorrentDataFileTo: (NSString *) folder

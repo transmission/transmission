@@ -119,7 +119,7 @@
 - (tr_priority_t) priority;
 - (void) setPriority: (tr_priority_t) priority;
 
-+ (void) trashFile: (NSURL *) fileURL;
++ (void) trashFile: (NSString *) path;
 - (void) moveTorrentDataFileTo: (NSString *) folder;
 - (void) copyTorrentFileTo: (NSString *) path;
 

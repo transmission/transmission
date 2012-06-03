@@ -65,7 +65,7 @@
         
         fController = controller;
         
-        fTorrentFile = [[NSURL alloc] initFileURLWithPath: [torrentFile stringByExpandingTildeInPath]];
+        fTorrentFile = [[torrentFile stringByExpandingTildeInPath] retain];
         
         fDeleteTorrentInitial = deleteTorrent;
         fDeleteEnableInitial = canToggleDelete;
