@@ -96,7 +96,6 @@ int trashDataFile(const char * filename)
     {
         if (filename != NULL)
             [Torrent trashFile: [NSString stringWithUTF8String: filename]];
-        }
     }
     return 0;
 }
