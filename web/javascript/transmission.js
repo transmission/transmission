@@ -183,7 +183,9 @@ Transmission.prototype =
 			context_move_top:             function() { tr.moveTop(); },
 			context_move_up:              function() { tr.moveUp(); },
 			context_move_down:            function() { tr.moveDown(); },
-			context_move_bottom:          function() { tr.moveBottom(); }
+			context_move_bottom:          function() { tr.moveBottom(); },
+			context_select_all:           function() { tr.selectAll(); },
+			context_deselect_all:         function() { tr.deselectAll(); }
 		};
 
 		// Set up the context menu
