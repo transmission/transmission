@@ -76,6 +76,8 @@ typedef enum
     [[fStatusButton cell] setBackgroundStyle: NSBackgroundStyleRaised];
     [[fTotalDLField cell] setBackgroundStyle: NSBackgroundStyleRaised];
     [[fTotalULField cell] setBackgroundStyle: NSBackgroundStyleRaised];
+    [[fTotalDLImageView cell] setBackgroundStyle: NSBackgroundStyleRaised];
+    [[fTotalULImageView cell] setBackgroundStyle: NSBackgroundStyleRaised];
     
     [self updateSpeedFieldsToolTips];
     

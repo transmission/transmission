@@ -30,7 +30,7 @@
 {
     IBOutlet NSButton * fStatusButton;
     IBOutlet NSTextField * fTotalDLField, * fTotalULField;
-    IBOutlet NSImageView * fTotalDLImageView;
+    IBOutlet NSImageView * fTotalDLImageView, * fTotalULImageView;
     
     tr_session * fLib;
     
