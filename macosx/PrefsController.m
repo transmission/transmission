@@ -173,10 +173,19 @@
     
     [self setPrefView: nil];
     
-    [fBuiltInGrowlButton setState: [fDefaults boolForKey: @"DisplayNotifications"]];
-    const BOOL growlRunning = [GrowlApplicationBridge isGrowlRunning];
-    [fBuiltInGrowlButton setHidden: growlRunning];
-    [fGrowlInstalledField setHidden: !growlRunning];
+    if ([GrowlApplicationBridge isGrowlRunning])
+    {
+        [fBuiltInGrowlButton setHidden: YES];
+        [fGrowlAppButton setHidden: NO];
+#warning remove NO
+        [fGrowlAppButton setEnabled:NO && [GrowlApplicationBridge isGrowlURLSchemeAvailable]];
+    }
+    else
+    {
+        [fBuiltInGrowlButton setHidden: NO];
+        [fGrowlAppButton setHidden: YES];
+        [fBuiltInGrowlButton setState: [fDefaults boolForKey: @"DisplayNotifications"]];
+    }
     
     //set download folder
     [fFolderPopUp selectItemAtIndex: [fDefaults boolForKey: @"DownloadLocationConstant"] ? DOWNLOAD_FOLDER : DOWNLOAD_TORRENT];
@@ -736,6 +745,11 @@
     const BOOL enable = [(NSButton *)sender state] == NSOnState;
     [fDefaults setBool: enable forKey: @"DisplayNotifications"];
     [GrowlApplicationBridge setShouldUseBuiltInNotifications: enable];
+}
+
+- (IBAction) openGrowlApp: (id) sender
+{
+    [GrowlApplicationBridge openGrowlPreferences: YES];
 }
 
 - (void) resetWarnings: (id) sender
