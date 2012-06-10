@@ -266,7 +266,7 @@
     else if ([ident isEqualToString: TOOLBAR_TRANSFERS])
     {
         [item setLabel: NSLocalizedString(@"Transfers", "Preferences -> toolbar item title")];
-        [item setImage: [NSImage imageNamed: @"Transfers.png"]];
+        [item setImage: [NSImage imageNamed: @"Transfers"]];
         [item setTarget: self];
         [item setAction: @selector(setPrefView:)];
         [item setAutovalidates: NO];
@@ -274,7 +274,7 @@
     else if ([ident isEqualToString: TOOLBAR_GROUPS])
     {
         [item setLabel: NSLocalizedString(@"Groups", "Preferences -> toolbar item title")];
-        [item setImage: [NSImage imageNamed: @"Groups.png"]];
+        [item setImage: [NSImage imageNamed: @"Groups"]];
         [item setTarget: self];
         [item setAction: @selector(setPrefView:)];
         [item setAutovalidates: NO];
@@ -282,7 +282,7 @@
     else if ([ident isEqualToString: TOOLBAR_BANDWIDTH])
     {
         [item setLabel: NSLocalizedString(@"Bandwidth", "Preferences -> toolbar item title")];
-        [item setImage: [NSImage imageNamed: @"Bandwidth.png"]];
+        [item setImage: [NSImage imageNamed: @"Bandwidth"]];
         [item setTarget: self];
         [item setAction: @selector(setPrefView:)];
         [item setAutovalidates: NO];
@@ -306,7 +306,7 @@
     else if ([ident isEqualToString: TOOLBAR_REMOTE])
     {
         [item setLabel: NSLocalizedString(@"Remote", "Preferences -> toolbar item title")];
-        [item setImage: [NSImage imageNamed: @"Remote.png"]];
+        [item setImage: [NSImage imageNamed: @"Remote"]];
         [item setTarget: self];
         [item setAction: @selector(setPrefView:)];
         [item setAutovalidates: NO];
@@ -419,15 +419,15 @@
     {
         case PORT_STATUS_OPEN:
             [fPortStatusField setStringValue: NSLocalizedString(@"Port is open", "Preferences -> Network -> port status")];
-            [fPortStatusImage setImage: [NSImage imageNamed: @"GreenDot.png"]];
+            [fPortStatusImage setImage: [NSImage imageNamed: @"GreenDot"]];
             break;
         case PORT_STATUS_CLOSED:
             [fPortStatusField setStringValue: NSLocalizedString(@"Port is closed", "Preferences -> Network -> port status")];
-            [fPortStatusImage setImage: [NSImage imageNamed: @"RedDot.png"]];
+            [fPortStatusImage setImage: [NSImage imageNamed: @"RedDot"]];
             break;
         case PORT_STATUS_ERROR:
             [fPortStatusField setStringValue: NSLocalizedString(@"Port check site is down", "Preferences -> Network -> port status")];
-            [fPortStatusImage setImage: [NSImage imageNamed: @"YellowDot.png"]];
+            [fPortStatusImage setImage: [NSImage imageNamed: @"YellowDot"]];
             break;
         default:
             NSAssert1(NO, @"Port checker returned invalid status: %d", [fPortChecker status]);

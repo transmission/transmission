@@ -607,7 +607,7 @@ int trashDataFile(const char * filename)
 - (NSImage *) icon
 {
     if ([self isMagnet])
-        return [NSImage imageNamed: @"Magnet.png"];
+        return [NSImage imageNamed: @"Magnet"];
     
     #warning replace kGenericFolderIcon stuff with NSImageNameFolder on 10.6
     if (!fIcon)

@@ -151,14 +151,14 @@
 
 - (void) setFile: (NSString *) file
 {
-    [[self contentView] setOverlay: [NSImage imageNamed: @"CreateLarge.png"]
+    [[self contentView] setOverlay: [NSImage imageNamed: @"CreateLarge"]
         mainLine: NSLocalizedString(@"Create a Torrent File", "Drag overlay -> file") subLine: file];
     [self fadeIn];
 }
 
 - (void) setURL: (NSString *) url
 {
-    [[self contentView] setOverlay: [NSImage imageNamed: @"Globe.png"]
+    [[self contentView] setOverlay: [NSImage imageNamed: @"Globe"]
         mainLine: NSLocalizedString(@"Web Address", "Drag overlay -> url") subLine: url];
     [self fadeIn];
 }

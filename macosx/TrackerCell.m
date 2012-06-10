@@ -212,7 +212,7 @@ NSMutableSet * fTrackerIconLoading;
         }
     }
         
-    return (icon && icon != [NSNull null]) ? icon : [NSImage imageNamed: @"FavIcon.png"];
+    return (icon && icon != [NSNull null]) ? icon : [NSImage imageNamed: @"FavIcon"];
 }
 
 #warning better favicon detection

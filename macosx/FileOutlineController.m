@@ -564,7 +564,7 @@ typedef enum
             action: @selector(setPriority:) keyEquivalent: @""];
     [item setTarget: self];
     [item setTag: FILE_PRIORITY_HIGH_TAG];
-    [item setImage: [NSImage imageNamed: @"PriorityHighTemplate.png"]];
+    [item setImage: [NSImage imageNamed: @"PriorityHighTemplate"]];
     [priorityMenu addItem: item];
     [item release];
     
@@ -572,7 +572,7 @@ typedef enum
             action: @selector(setPriority:) keyEquivalent: @""];
     [item setTarget: self];
     [item setTag: FILE_PRIORITY_NORMAL_TAG];
-    [item setImage: [NSImage imageNamed: @"PriorityNormalTemplate.png"]];
+    [item setImage: [NSImage imageNamed: @"PriorityNormalTemplate"]];
     [priorityMenu addItem: item];
     [item release];
     
@@ -580,7 +580,7 @@ typedef enum
             action: @selector(setPriority:) keyEquivalent: @""];
     [item setTarget: self];
     [item setTag: FILE_PRIORITY_LOW_TAG];
-    [item setImage: [NSImage imageNamed: @"PriorityLowTemplate.png"]];
+    [item setImage: [NSImage imageNamed: @"PriorityLowTemplate"]];
     [priorityMenu addItem: item];
     [item release];
     

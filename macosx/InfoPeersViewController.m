@@ -280,7 +280,7 @@
         NSDictionary * peer = [fPeers objectAtIndex: row];
         
         if ([ident isEqualToString: @"Encryption"])
-            return [[peer objectForKey: @"Encryption"] boolValue] ? [NSImage imageNamed: @"Lock.png"] : nil;
+            return [[peer objectForKey: @"Encryption"] boolValue] ? [NSImage imageNamed: @"Lock"] : nil;
         else if ([ident isEqualToString: @"Client"])
             return [peer objectForKey: @"Client"];
         else if  ([ident isEqualToString: @"Progress"])

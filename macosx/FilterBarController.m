@@ -374,7 +374,7 @@
     NSString * toolTip;
     if (groupIndex == GROUP_FILTER_ALL_TAG)
     {
-        icon = [NSImage imageNamed: @"PinTemplate.png"];
+        icon = [NSImage imageNamed: @"PinTemplate"];
         toolTip = NSLocalizedString(@"All Groups", "Groups -> Button");
     }
     else

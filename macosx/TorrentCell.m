@@ -421,11 +421,11 @@
         //control button
         NSString * controlImageSuffix;
         if (fMouseDownControlButton)
-            controlImageSuffix = @"On.png";
+            controlImageSuffix = @"On";
         else if (!fTracking && fHoverControl)
-            controlImageSuffix = @"Hover.png";
+            controlImageSuffix = @"Hover";
         else
-            controlImageSuffix = @"Off.png";
+            controlImageSuffix = @"Off";
         
         NSImage * controlImage;
         if ([torrent isActive])
@@ -447,11 +447,11 @@
         //reveal button
         NSString * revealImageString;
         if (fMouseDownRevealButton)
-            revealImageString = @"RevealOn.png";
+            revealImageString = @"RevealOn";
         else if (!fTracking && fHoverReveal)
-            revealImageString = @"RevealHover.png";
+            revealImageString = @"RevealHover";
         else
-            revealImageString = @"RevealOff.png";
+            revealImageString = @"RevealOff";
         
         NSImage * revealImage = [NSImage imageNamed: revealImageString];
         [revealImage drawInRect: [self revealButtonRectForBounds: cellFrame] fromRect: NSZeroRect operation: NSCompositeSourceOver fraction: 1.0 respectFlipped: YES hints: nil];
@@ -461,9 +461,9 @@
         NSString * actionImageString;
         if (fMouseDownActionButton)
             #warning we can get rid of this on 10.7
-            actionImageString = @"ActionOn.png";
+            actionImageString = @"ActionOn";
         else if (!fTracking && fHoverAction)
-            actionImageString = @"ActionHover.png";
+            actionImageString = @"ActionHover";
         else
             actionImageString = nil;
         
@@ -487,7 +487,7 @@
                                                PRIORITY_ICON_WIDTH, PRIORITY_ICON_HEIGHT);
         
         NSColor * priorityColor = [self backgroundStyle] == NSBackgroundStyleDark ? [NSColor whiteColor] : [NSColor darkGrayColor];
-        NSImage * priorityImage = [[NSImage imageNamed: ([torrent priority] == TR_PRI_HIGH ? @"PriorityHighTemplate.png" : @"PriorityLowTemplate.png")] imageWithColor: priorityColor];
+        NSImage * priorityImage = [[NSImage imageNamed: ([torrent priority] == TR_PRI_HIGH ? @"PriorityHighTemplate" : @"PriorityLowTemplate")] imageWithColor: priorityColor];
         [priorityImage drawInRect: priorityRect fromRect: NSZeroRect operation: NSCompositeSourceOver fraction: 1.0 respectFlipped: YES hints: nil];
     }
     

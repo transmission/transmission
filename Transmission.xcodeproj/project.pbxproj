@@ -329,7 +329,7 @@
 		A2DC49A315842F9E00758FF1 /* RevealOff@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = A2DC49A015842F9D00758FF1 /* RevealOff@2x.png */; };
 		A2DC49A415842F9E00758FF1 /* RevealOn@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = A2DC49A115842F9D00758FF1 /* RevealOn@2x.png */; };
 		A2DC49A815842FC300758FF1 /* ToolbarCreateTemplate@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = A2DC49A515842FC300758FF1 /* ToolbarCreateTemplate@2x.png */; };
-		A2DC49A915842FC300758FF1 /* ToolbarFiltertemplate@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = A2DC49A615842FC300758FF1 /* ToolbarFiltertemplate@2x.png */; };
+		A2DC49A915842FC300758FF1 /* ToolbarFilterTemplate@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = A2DC49A615842FC300758FF1 /* ToolbarFilterTemplate@2x.png */; };
 		A2DC49AA15842FC300758FF1 /* ToolbarInfoTemplate@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = A2DC49A715842FC300758FF1 /* ToolbarInfoTemplate@2x.png */; };
 		A2DC49AD15842FF200758FF1 /* ToolbarOpenTemplate@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = A2DC49AB15842FF200758FF1 /* ToolbarOpenTemplate@2x.png */; };
 		A2DC49AE15842FF200758FF1 /* ToolbarOpenWebTemplate@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = A2DC49AC15842FF200758FF1 /* ToolbarOpenWebTemplate@2x.png */; };
@@ -1005,7 +1005,7 @@
 		A2DC49A015842F9D00758FF1 /* RevealOff@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "RevealOff@2x.png"; path = "macosx/Images/RevealOff@2x.png"; sourceTree = "<group>"; };
 		A2DC49A115842F9D00758FF1 /* RevealOn@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "RevealOn@2x.png"; path = "macosx/Images/RevealOn@2x.png"; sourceTree = "<group>"; };
 		A2DC49A515842FC300758FF1 /* ToolbarCreateTemplate@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "ToolbarCreateTemplate@2x.png"; path = "macosx/Images/ToolbarCreateTemplate@2x.png"; sourceTree = "<group>"; };
-		A2DC49A615842FC300758FF1 /* ToolbarFiltertemplate@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "ToolbarFiltertemplate@2x.png"; path = "macosx/Images/ToolbarFiltertemplate@2x.png"; sourceTree = "<group>"; };
+		A2DC49A615842FC300758FF1 /* ToolbarFilterTemplate@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "ToolbarFilterTemplate@2x.png"; path = "macosx/Images/ToolbarFilterTemplate@2x.png"; sourceTree = "<group>"; };
 		A2DC49A715842FC300758FF1 /* ToolbarInfoTemplate@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "ToolbarInfoTemplate@2x.png"; path = "macosx/Images/ToolbarInfoTemplate@2x.png"; sourceTree = "<group>"; };
 		A2DC49AB15842FF200758FF1 /* ToolbarOpenTemplate@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "ToolbarOpenTemplate@2x.png"; path = "macosx/Images/ToolbarOpenTemplate@2x.png"; sourceTree = "<group>"; };
 		A2DC49AC15842FF200758FF1 /* ToolbarOpenWebTemplate@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "ToolbarOpenWebTemplate@2x.png"; path = "macosx/Images/ToolbarOpenWebTemplate@2x.png"; sourceTree = "<group>"; };
@@ -1484,7 +1484,7 @@
 				4DDFDD21099A5D8E00189D81 /* UploadBadge.png */,
 				A24B655F0D3F30870079EA4D /* QuitBadge.png */,
 				A232D29D0A70903E00973B12 /* ToolbarFilterTemplate.png */,
-				A2DC49A615842FC300758FF1 /* ToolbarFiltertemplate@2x.png */,
+				A2DC49A615842FC300758FF1 /* ToolbarFilterTemplate@2x.png */,
 				4DF7500808A103AD007B0D70 /* ToolbarInfoTemplate.png */,
 				A2DC49A715842FC300758FF1 /* ToolbarInfoTemplate@2x.png */,
 				4DF7500708A103AD007B0D70 /* ToolbarOpenTemplate.png */,
@@ -2395,7 +2395,7 @@
 				A2DC49A315842F9E00758FF1 /* RevealOff@2x.png in Resources */,
 				A2DC49A415842F9E00758FF1 /* RevealOn@2x.png in Resources */,
 				A2DC49A815842FC300758FF1 /* ToolbarCreateTemplate@2x.png in Resources */,
-				A2DC49A915842FC300758FF1 /* ToolbarFiltertemplate@2x.png in Resources */,
+				A2DC49A915842FC300758FF1 /* ToolbarFilterTemplate@2x.png in Resources */,
 				A2DC49AA15842FC300758FF1 /* ToolbarInfoTemplate@2x.png in Resources */,
 				A2DC49AD15842FF200758FF1 /* ToolbarOpenTemplate@2x.png in Resources */,
 				A2DC49AE15842FF200758FF1 /* ToolbarOpenWebTemplate@2x.png in Resources */,

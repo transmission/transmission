@@ -267,11 +267,11 @@
         switch (level)
         {
             case TR_MSG_ERR:
-                return [NSImage imageNamed: @"RedDot.png"];
+                return [NSImage imageNamed: @"RedDot"];
             case TR_MSG_INF:
-                return [NSImage imageNamed: @"YellowDot.png"];
+                return [NSImage imageNamed: @"YellowDot"];
             case TR_MSG_DBG:
-                return [NSImage imageNamed: @"PurpleDot.png"];
+                return [NSImage imageNamed: @"PurpleDot"];
             default:
                 NSAssert1(NO, @"Unknown message log level: %d", level);
                 return nil;

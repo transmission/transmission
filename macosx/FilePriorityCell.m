@@ -46,9 +46,9 @@
             [self setWidth: 9.0f forSegment: i]; //9 is minimum size to get proper look
         }
         
-        [self setImage: [NSImage imageNamed: @"PriorityControlLow.png"] forSegment: 0];
-        [self setImage: [NSImage imageNamed: @"PriorityControlNormal.png"] forSegment: 1];
-        [self setImage: [NSImage imageNamed: @"PriorityControlHigh.png"] forSegment: 2];
+        [self setImage: [NSImage imageNamed: @"PriorityControlLow"] forSegment: 0];
+        [self setImage: [NSImage imageNamed: @"PriorityControlNormal"] forSegment: 1];
+        [self setImage: [NSImage imageNamed: @"PriorityControlHigh"] forSegment: 2];
         
         fHoverRow = NO;
     }
@@ -133,7 +133,7 @@
         {
             //if ([self backgroundStyle] != NSBackgroundStyleDark)
             {
-                NSImage * image = [[NSImage imageNamed: @"PriorityNormalTemplate.png"] imageWithColor: [NSColor lightGrayColor]];
+                NSImage * image = [[NSImage imageNamed: @"PriorityNormalTemplate"] imageWithColor: [NSColor lightGrayColor]];
                 [images addObject: image];
                 totalWidth = [image size].width;
             }
@@ -145,19 +145,19 @@
             totalWidth = 0.0;
             if ([priorities containsObject: [NSNumber numberWithInteger: TR_PRI_LOW]])
             {
-                NSImage * image = [[NSImage imageNamed: @"PriorityLowTemplate.png"] imageWithColor: priorityColor];
+                NSImage * image = [[NSImage imageNamed: @"PriorityLowTemplate"] imageWithColor: priorityColor];
                 [images addObject: image];
                 totalWidth += [image size].width;
             }
             if ([priorities containsObject: [NSNumber numberWithInteger: TR_PRI_NORMAL]])
             {
-                NSImage * image = [[NSImage imageNamed: @"PriorityNormalTemplate.png"] imageWithColor: priorityColor];
+                NSImage * image = [[NSImage imageNamed: @"PriorityNormalTemplate"] imageWithColor: priorityColor];
                 [images addObject: image];
                 totalWidth += [image size].width;
             }
             if ([priorities containsObject: [NSNumber numberWithInteger: TR_PRI_HIGH]])
             {
-                NSImage * image = [[NSImage imageNamed: @"PriorityHighTemplate.png"] imageWithColor: priorityColor];
+                NSImage * image = [[NSImage imageNamed: @"PriorityHighTemplate"] imageWithColor: priorityColor];
                 [images addObject: image];
                 totalWidth += [image size].width;
             }

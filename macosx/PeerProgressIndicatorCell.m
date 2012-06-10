@@ -74,7 +74,7 @@
         [super drawWithFrame: cellFrame inView: controlView];
         if (fSeed)
         {
-            NSImage * checkImage = [NSImage imageNamed: @"CompleteCheck.png"];
+            NSImage * checkImage = [NSImage imageNamed: @"CompleteCheck"];
             
             const NSSize imageSize = [checkImage size];
             const NSRect rect = NSMakeRect(floor(NSMidX(cellFrame) - imageSize.width * 0.5),
