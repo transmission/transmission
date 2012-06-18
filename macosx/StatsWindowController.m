@@ -24,6 +24,7 @@
 
 #import "StatsWindowController.h"
 #import "Controller.h"
+#import "NSApplicationAdditions.h"
 #import "NSStringAdditions.h"
 
 #define UPDATE_SECONDS 1.0
@@ -66,7 +67,8 @@ tr_session * fLib = NULL;
     [[NSRunLoop currentRunLoop] addTimer: fTimer forMode: NSModalPanelRunLoopMode];
     [[NSRunLoop currentRunLoop] addTimer: fTimer forMode: NSEventTrackingRunLoopMode];
     
-    [[self window] setRestorationClass: [self class]];
+    if ([NSApp isOnLionOrBetter])
+        [[self window] setRestorationClass: [self class]];
     
     [[self window] setTitle: NSLocalizedString(@"Statistics", "Stats window -> title")];
     

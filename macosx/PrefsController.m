@@ -28,6 +28,7 @@
 #import "Controller.h"
 #import "PortChecker.h"
 #import "BonjourController.h"
+#import "NSApplicationAdditions.h"
 #import "NSStringAdditions.h"
 #import "UKKQueue.h"
 
@@ -160,7 +161,8 @@
 {
     fHasLoaded = YES;
     
-    [[self window] setRestorationClass: [self class]];
+    if ([NSApp isOnLionOrBetter])
+        [[self window] setRestorationClass: [self class]];
     
     NSToolbar * toolbar = [[NSToolbar alloc] initWithIdentifier: @"Preferences Toolbar"];
     [toolbar setDelegate: self];

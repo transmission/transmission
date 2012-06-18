@@ -58,7 +58,8 @@
     [window setFrameAutosaveName: @"MessageWindowFrame"];
     [window setFrameUsingName: @"MessageWindowFrame"];
     
-    [window setRestorationClass: [self class]];
+    if ([NSApp isOnLionOrBetter])
+        [window setRestorationClass: [self class]];
     
     [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(resizeColumn)
         name: @"NSTableViewColumnDidResizeNotification" object: fMessageTable];

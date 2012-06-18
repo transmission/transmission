@@ -24,6 +24,7 @@
 
 #import "CreatorWindowController.h"
 #import "Controller.h"
+#import "NSApplicationAdditions.h"
 #import "NSStringAdditions.h"
 
 #import "transmission.h" // required by utils.h
@@ -139,7 +140,8 @@
 
 - (void) awakeFromNib
 {
-    [[self window] setRestorationClass: [self class]];
+    if ([NSApp isOnLionOrBetter])
+        [[self window] setRestorationClass: [self class]];
     
     NSString * name = [fPath lastPathComponent];
     
