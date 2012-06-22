@@ -2090,7 +2090,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     for (NSUInteger currentIndex = 1; currentIndex < [rearrangeArray count]; ++currentIndex)
     {
         //manually do the sorting in-place
-        const NSUInteger insertIndex = [rearrangeArray indexOfObject: [rearrangeArray objectAtIndex: currentIndex] inSortedRange: NSMakeRange(0, currentIndex) options: (NSBinarySearchingInsertionIndex | NSBinarySearchingLastEqual) usingComparator: ^(id obj1, id obj2) {
+        const NSUInteger insertIndex = [rearrangeArray indexOfObject: [rearrangeArray objectAtIndex: currentIndex] inSortedRange: NSMakeRange(0, currentIndex) options: (NSBinarySearchingInsertionIndex | NSBinarySearchingLastEqual) usingComparator: ^NSComparisonResult(id obj1, id obj2) {
             for (NSSortDescriptor * descriptor in descriptors)
             {
                 const NSComparisonResult result = [descriptor compareObject: obj1 toObject: obj2];
