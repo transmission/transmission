@@ -48,11 +48,16 @@
 	return [self stringByAppendingString: [NSString ellipsis]];
 }
 
+#warning use localizedStringWithFormat: directly in roardacted
 + (NSString *) formattedUInteger: (NSUInteger) value
 {
-    NSNumberFormatter * numberFormatter = [[[NSNumberFormatter alloc] init] autorelease];
-    [numberFormatter setNumberStyle: NSNumberFormatterDecimalStyle];
-    [numberFormatter setMaximumFractionDigits: 0];
+    static NSNumberFormatter * numberFormatter;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        numberFormatter = [[NSNumberFormatter alloc] init];
+        [numberFormatter setNumberStyle: NSNumberFormatterDecimalStyle];
+        [numberFormatter setMaximumFractionDigits: 0];
+    });
     
     return [numberFormatter stringFromNumber: [NSNumber numberWithUnsignedInteger: value]];
 }
