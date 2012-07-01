@@ -2494,10 +2494,20 @@ tr_peerUpdateProgress( tr_torrent * tor, tr_peer * peer )
         const float true_count = tr_bitfieldCountTrueBits( have );
 
         if( tr_torrentHasMetadata( tor ) )
+        {
             peer->progress = true_count / tor->info.pieceCount;
+        }
         else /* without pieceCount, this result is only a best guess... */
+        {
             peer->progress = true_count / ( have->bit_count + 1 );
+        }
     }
+
+    /* clamp the progress range */
+    if ( peer->progress < 0.0 )
+        peer->progress = 0.0;
+    if ( peer->progress > 1.0 )
+        peer->progress = 1.0;
 
     if( peer->atom && ( peer->progress >= 1.0 ) )
         atomSetSeed( tor->torrentPeers, peer->atom );
