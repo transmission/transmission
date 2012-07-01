@@ -239,6 +239,9 @@ uint8_t* tr_loadFile( const char * filename, size_t * size ) TR_GNUC_MALLOC
 char* tr_buildPath( const char * first_element, ... ) TR_GNUC_NULL_TERMINATED
                                                       TR_GNUC_MALLOC;
 
+bool tr_fileExists( const char * filename, time_t * mtime );
+
+
 struct event;
 
 /**

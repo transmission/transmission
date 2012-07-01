@@ -638,6 +638,24 @@ tr_buildPath( const char *first_element, ... )
     return buf;
 }
 
+#ifdef SYS_DARWIN
+ #define TR_STAT_MTIME(sb) ((sb).st_mtimespec.tv_sec)
+#else
+ #define TR_STAT_MTIME(sb) ((sb).st_mtime)
+#endif
+
+bool
+tr_fileExists( const char * filename, time_t * mtime )
+{
+    struct stat sb;
+    const bool ok = !stat( filename, &sb );
+
+    if( ok && ( mtime != NULL ) )
+        *mtime = TR_STAT_MTIME( sb );
+
+    return ok;
+}
+
 /****
 *****
 ****/
