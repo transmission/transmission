@@ -211,7 +211,7 @@ refreshOptions( struct DetailsImpl * di, tr_torrent ** torrents, int n )
 
     /* down_limit_spin */
     if( n ) {
-        const int baseline = tr_torrentGetSpeedLimit_KBps( torrents[0], TR_DOWN );
+        const unsigned int baseline = tr_torrentGetSpeedLimit_KBps( torrents[0], TR_DOWN );
         int i;
         for( i=1; i<n; ++i )
             if( baseline != ( tr_torrentGetSpeedLimit_KBps( torrents[i], TR_DOWN ) ) )
@@ -235,7 +235,7 @@ refreshOptions( struct DetailsImpl * di, tr_torrent ** torrents, int n )
 
     /* up_limit_sping */
     if( n ) {
-        const int baseline = tr_torrentGetSpeedLimit_KBps( torrents[0], TR_UP );
+        const unsigned int  baseline = tr_torrentGetSpeedLimit_KBps( torrents[0], TR_UP );
         int i;
         for( i=1; i<n; ++i )
             if( baseline != ( tr_torrentGetSpeedLimit_KBps( torrents[i], TR_UP ) ) )

@@ -414,8 +414,8 @@ char* tr_torrentBuildPartial( const tr_torrent *, tr_file_index_t fileNo );
  * piece size, etc. such as in BEP 9 where peers exchange metadata */
 void tr_torrentGotNewInfoDict( tr_torrent * tor );
 
-void tr_torrentSetSpeedLimit_Bps  ( tr_torrent *, tr_direction, int Bps );
-int tr_torrentGetSpeedLimit_Bps  ( const tr_torrent *, tr_direction );
+void tr_torrentSetSpeedLimit_Bps  ( tr_torrent *, tr_direction, unsigned int Bps );
+unsigned int tr_torrentGetSpeedLimit_Bps  ( const tr_torrent *, tr_direction );
 
 /**
  * @return true if this piece needs to be tested

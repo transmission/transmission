@@ -2676,7 +2676,7 @@ tr_peerMgrWebSpeeds_KBps( const tr_torrent * tor )
     assert( webseedCount == tor->info.webseedCount );
 
     for( i=0; i<webseedCount; ++i ) {
-        int Bps;
+        unsigned int Bps;
         if( tr_webseedGetSpeed_Bps( webseeds[i], now, &Bps ) )
             ret[i] = Bps / (double)tr_speed_K;
         else
@@ -2686,7 +2686,7 @@ tr_peerMgrWebSpeeds_KBps( const tr_torrent * tor )
     return ret;
 }
 
-int
+unsigned int
 tr_peerGetPieceSpeed_Bps( const tr_peer * peer, uint64_t now, tr_direction direction )
 {
     return peer->io ? tr_peerIoGetPieceSpeed_Bps( peer->io, now, direction ) : 0.0;
@@ -3023,7 +3023,7 @@ isNew( const tr_peer * peer )
 static int
 getRate( const tr_torrent * tor, struct peer_atom * atom, uint64_t now )
 {
-    int Bps;
+    unsigned int Bps;
 
     if( tr_torrentIsSeed( tor ) )
         Bps = tr_peerGetPieceSpeed_Bps( atom->peer, now, TR_CLIENT_TO_PEER );
@@ -3049,8 +3049,8 @@ isBandwidthMaxedOut( const tr_bandwidth * b,
     if( !tr_bandwidthIsLimited( b, dir ) )
         return false;
     else {
-        const int got = tr_bandwidthGetPieceSpeed_Bps( b, now_msec, dir );
-        const int want = tr_bandwidthGetDesiredSpeed_Bps( b, dir );
+        const unsigned int got = tr_bandwidthGetPieceSpeed_Bps( b, now_msec, dir );
+        const unsigned int want = tr_bandwidthGetDesiredSpeed_Bps( b, dir );
         return got >= want;
     }
 }

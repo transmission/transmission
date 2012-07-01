@@ -56,7 +56,7 @@ typedef void ( tr_web_config_func )( tr_session * session, void * curl_pointer, 
 struct tr_turtle_info
 {
     /* TR_UP and TR_DOWN speed limits */
-    int speedLimit_Bps[2];
+    unsigned int speedLimit_Bps[2];
 
     /* is turtle mode on right now? */
     bool isEnabled;
@@ -118,7 +118,7 @@ struct tr_session
 
     int                          umask;
 
-    int                          speedLimit_Bps[2];
+    unsigned int                 speedLimit_Bps[2];
     bool                         speedLimitEnabled[2];
 
     struct tr_turtle_info        turtle;
@@ -292,26 +292,30 @@ static inline bool tr_isPriority( tr_priority_t p )
 ****
 ***/
 
-static inline unsigned int toSpeedBytes ( unsigned int KBps ) { return KBps * tr_speed_K; }
-static inline double       toSpeedKBps  ( unsigned int Bps )  { return Bps / (double)tr_speed_K; }
+static inline unsigned int
+toSpeedBytes ( unsigned int KBps ) { return KBps * tr_speed_K; }
+static inline double
+toSpeedKBps  ( unsigned int Bps )  { return Bps / (double)tr_speed_K; }
 
-static inline uint64_t toMemBytes ( unsigned int MB ) { uint64_t B = tr_mem_K * tr_mem_K; B *= MB; return B; }
-static inline int      toMemMB    ( uint64_t B )      { return B / ( tr_mem_K * tr_mem_K ); }
+static inline uint64_t
+toMemBytes ( unsigned int MB ) { uint64_t B = tr_mem_K * tr_mem_K; B *= MB; return B; }
+static inline int
+toMemMB    ( uint64_t B )      { return B / ( tr_mem_K * tr_mem_K ); }
 
 /**
 **/
 
-int  tr_sessionGetSpeedLimit_Bps( const tr_session *, tr_direction );
-int  tr_sessionGetAltSpeed_Bps  ( const tr_session *, tr_direction );
-int  tr_sessionGetRawSpeed_Bps  ( const tr_session *, tr_direction );
-int  tr_sessionGetPieceSpeed_Bps( const tr_session *, tr_direction );
+unsigned int  tr_sessionGetSpeedLimit_Bps( const tr_session *, tr_direction );
+unsigned int  tr_sessionGetAltSpeed_Bps  ( const tr_session *, tr_direction );
+unsigned int  tr_sessionGetRawSpeed_Bps  ( const tr_session *, tr_direction );
+unsigned int  tr_sessionGetPieceSpeed_Bps( const tr_session *, tr_direction );
 
-void tr_sessionSetSpeedLimit_Bps( tr_session *, tr_direction, int Bps );
-void tr_sessionSetAltSpeed_Bps  ( tr_session *, tr_direction, int Bps );
+void tr_sessionSetSpeedLimit_Bps( tr_session *, tr_direction, unsigned int Bps );
+void tr_sessionSetAltSpeed_Bps  ( tr_session *, tr_direction, unsigned int Bps );
 
 bool  tr_sessionGetActiveSpeedLimit_Bps( const tr_session  * session,
                                          tr_direction        dir,
-                                         int               * setme );
+                                         unsigned int      * setme );
 
 tr_torrent * tr_sessionGetNextQueuedSeed( tr_session * session );
 tr_torrent * tr_sessionGetNextQueuedTorrent( tr_session * session, tr_direction );

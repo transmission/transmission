@@ -153,7 +153,7 @@ bool
 tr_torrentIsPieceTransferAllowed( const tr_torrent  * tor,
                                   tr_direction        direction )
 {
-    int limit;
+    unsigned int limit;
     bool allowed = true;
 
     if( tr_torrentUsesSpeedLimit( tor, direction ) )
@@ -173,22 +173,21 @@ tr_torrentIsPieceTransferAllowed( const tr_torrent  * tor,
 ***/
 
 void
-tr_torrentSetSpeedLimit_Bps( tr_torrent * tor, tr_direction dir, int Bps )
+tr_torrentSetSpeedLimit_Bps( tr_torrent * tor, tr_direction dir, unsigned int Bps )
 {
     assert( tr_isTorrent( tor ) );
     assert( tr_isDirection( dir ) );
-    assert( Bps >= 0 );
 
     if( tr_bandwidthSetDesiredSpeed_Bps( &tor->bandwidth, dir, Bps ) )
         tr_torrentSetDirty( tor );
 }
 void
-tr_torrentSetSpeedLimit_KBps( tr_torrent * tor, tr_direction dir, int KBps )
+tr_torrentSetSpeedLimit_KBps( tr_torrent * tor, tr_direction dir, unsigned int KBps )
 {
     tr_torrentSetSpeedLimit_Bps( tor, dir, toSpeedBytes( KBps ) );
 }
 
-int
+unsigned int
 tr_torrentGetSpeedLimit_Bps( const tr_torrent * tor, tr_direction dir )
 {
     assert( tr_isTorrent( tor ) );
@@ -196,7 +195,7 @@ tr_torrentGetSpeedLimit_Bps( const tr_torrent * tor, tr_direction dir )
 
     return tr_bandwidthGetDesiredSpeed_Bps( &tor->bandwidth, dir );
 }
-int
+unsigned int
 tr_torrentGetSpeedLimit_KBps( const tr_torrent * tor, tr_direction dir )
 {
     return toSpeedKBps( tr_torrentGetSpeedLimit_Bps( tor, dir ) );

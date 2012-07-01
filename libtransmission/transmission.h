@@ -652,8 +652,8 @@ tr_direction;
 ****  Primary session speed limits
 ***/
 
-void  tr_sessionSetSpeedLimit_KBps ( tr_session *, tr_direction, int KBps );
-int   tr_sessionGetSpeedLimit_KBps ( const tr_session *, tr_direction );
+void         tr_sessionSetSpeedLimit_KBps ( tr_session *, tr_direction, unsigned int KBps );
+unsigned int tr_sessionGetSpeedLimit_KBps ( const tr_session *, tr_direction );
 
 void  tr_sessionLimitSpeed         ( tr_session *, tr_direction, bool );
 bool  tr_sessionIsSpeedLimited     ( const tr_session *, tr_direction );
@@ -663,8 +663,8 @@ bool  tr_sessionIsSpeedLimited     ( const tr_session *, tr_direction );
 ****  Alternative speed limits that are used during scheduled times
 ***/
 
-void     tr_sessionSetAltSpeed_KBps   ( tr_session *, tr_direction, int Bps );
-int      tr_sessionGetAltSpeed_KBps   ( const tr_session *, tr_direction );
+void         tr_sessionSetAltSpeed_KBps   ( tr_session *, tr_direction, unsigned int Bps );
+unsigned int tr_sessionGetAltSpeed_KBps   ( const tr_session *, tr_direction );
 
 void     tr_sessionUseAltSpeed        ( tr_session *, bool );
 bool     tr_sessionUsesAltSpeed       ( const tr_session * );
@@ -1227,8 +1227,8 @@ char* tr_torrentFindFile( const tr_torrent * tor, tr_file_index_t fileNo );
 ****
 ***/
 
-void     tr_torrentSetSpeedLimit_KBps  ( tr_torrent *, tr_direction, int KBps );
-int      tr_torrentGetSpeedLimit_KBps  ( const tr_torrent *, tr_direction );
+void         tr_torrentSetSpeedLimit_KBps  ( tr_torrent *, tr_direction, unsigned int KBps );
+unsigned int tr_torrentGetSpeedLimit_KBps  ( const tr_torrent *, tr_direction );
 
 void     tr_torrentUseSpeedLimit      ( tr_torrent *, tr_direction, bool );
 bool     tr_torrentUsesSpeedLimit     ( const tr_torrent *, tr_direction );

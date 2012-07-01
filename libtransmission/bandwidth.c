@@ -174,8 +174,8 @@ allocateBandwidth( tr_bandwidth  * b,
     /* set the available bandwidth */
     if( b->band[dir].isLimited )
     {
-        const unsigned int nextPulseSpeed = b->band[dir].desiredSpeed_Bps;
-        b->band[dir].bytesLeft = ( nextPulseSpeed * period_msec ) / 1000u;
+        const uint64_t nextPulseSpeed = b->band[dir].desiredSpeed_Bps;
+        b->band[dir].bytesLeft = (unsigned int)( nextPulseSpeed * period_msec ) / 1000u;
     }
 
     /* add this bandwidth's peer, if any, to the peer pool */

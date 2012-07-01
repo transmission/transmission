@@ -1217,7 +1217,7 @@ tr_sessionGetIdleLimit( const tr_session * session )
 ***/
 
 bool
-tr_sessionGetActiveSpeedLimit_Bps( const tr_session * session, tr_direction dir, int * setme_Bps )
+tr_sessionGetActiveSpeedLimit_Bps( const tr_session * session, tr_direction dir, unsigned int * setme_Bps )
 {
     int isLimited = true;
 
@@ -1238,7 +1238,7 @@ tr_sessionGetActiveSpeedLimit_KBps( const tr_session  * session,
                                     tr_direction        dir,
                                     double            * setme_KBps )
 {
-    int Bps = 0;
+    unsigned int Bps = 0;
     const bool is_active = tr_sessionGetActiveSpeedLimit_Bps( session, dir, &Bps );
     *setme_KBps = toSpeedKBps( Bps );
     return is_active;
@@ -1247,7 +1247,7 @@ tr_sessionGetActiveSpeedLimit_KBps( const tr_session  * session,
 static void
 updateBandwidth( tr_session * session, tr_direction dir )
 {
-    int limit_Bps = 0;
+    unsigned int limit_Bps = 0;
     const bool isLimited = tr_sessionGetActiveSpeedLimit_Bps( session, dir, &limit_Bps );
     const bool zeroCase = isLimited && !limit_Bps;
 
@@ -1394,23 +1394,22 @@ turtleBootstrap( tr_session * session, struct tr_turtle_info * turtle )
 ***/
 
 void
-tr_sessionSetSpeedLimit_Bps( tr_session * s, tr_direction d, int Bps )
+tr_sessionSetSpeedLimit_Bps( tr_session * s, tr_direction d, unsigned int Bps )
 {
     assert( tr_isSession( s ) );
     assert( tr_isDirection( d ) );
-    assert( Bps >= 0 );
 
     s->speedLimit_Bps[d] = Bps;
 
     updateBandwidth( s, d );
 }
 void
-tr_sessionSetSpeedLimit_KBps( tr_session * s, tr_direction d, int KBps )
+tr_sessionSetSpeedLimit_KBps( tr_session * s, tr_direction d, unsigned int KBps )
 {
     tr_sessionSetSpeedLimit_Bps( s, d, toSpeedBytes( KBps ) );
 }
 
-int
+unsigned int
 tr_sessionGetSpeedLimit_Bps( const tr_session * s, tr_direction d )
 {
     assert( tr_isSession( s ) );
@@ -1418,7 +1417,7 @@ tr_sessionGetSpeedLimit_Bps( const tr_session * s, tr_direction d )
 
     return s->speedLimit_Bps[d];
 }
-int
+unsigned int
 tr_sessionGetSpeedLimit_KBps( const tr_session * s, tr_direction d )
 {
     return toSpeedKBps( tr_sessionGetSpeedLimit_Bps( s, d ) );
@@ -1450,11 +1449,10 @@ tr_sessionIsSpeedLimited( const tr_session * s, tr_direction d )
 ***/
 
 void
-tr_sessionSetAltSpeed_Bps( tr_session * s, tr_direction d, int Bps )
+tr_sessionSetAltSpeed_Bps( tr_session * s, tr_direction d, unsigned int Bps )
 {
     assert( tr_isSession( s ) );
     assert( tr_isDirection( d ) );
-    assert( Bps >= 0 );
 
     s->turtle.speedLimit_Bps[d] = Bps;
 
@@ -1462,12 +1460,12 @@ tr_sessionSetAltSpeed_Bps( tr_session * s, tr_direction d, int Bps )
 }
 
 void
-tr_sessionSetAltSpeed_KBps( tr_session * s, tr_direction d, int KBps )
+tr_sessionSetAltSpeed_KBps( tr_session * s, tr_direction d, unsigned int KBps )
 {
     tr_sessionSetAltSpeed_Bps( s, d, toSpeedBytes( KBps ) );
 }
 
-int
+unsigned int
 tr_sessionGetAltSpeed_Bps( const tr_session * s, tr_direction d )
 {
     assert( tr_isSession( s ) );
@@ -1475,7 +1473,7 @@ tr_sessionGetAltSpeed_Bps( const tr_session * s, tr_direction d )
 
     return s->turtle.speedLimit_Bps[d];
 }
-int
+unsigned int
 tr_sessionGetAltSpeed_KBps( const tr_session * s, tr_direction d )
 {
     return toSpeedKBps( tr_sessionGetAltSpeed_Bps( s, d ) );
@@ -1684,13 +1682,13 @@ tr_sessionGetDeleteSource( const tr_session * session )
 ****
 ***/
 
-int
+unsigned int
 tr_sessionGetPieceSpeed_Bps( const tr_session * session, tr_direction dir )
 {
     return tr_isSession( session ) ? tr_bandwidthGetPieceSpeed_Bps( &session->bandwidth, 0, dir ) : 0;
 }
 
-int
+unsigned int
 tr_sessionGetRawSpeed_Bps( const tr_session * session, tr_direction dir )
 {
     return tr_isSession( session ) ? tr_bandwidthGetRawSpeed_Bps( &session->bandwidth, 0, dir ) : 0;
