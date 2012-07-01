@@ -210,6 +210,7 @@ tr_sessionClearStats( tr_session * session )
     zero.sessionCount = 0;
     zero.secondsActive = 0;
 
+    session->sessionStats->isDirty = true;
     session->sessionStats->single = session->sessionStats->old = zero;
     session->sessionStats->startTime = tr_time( );
 }
