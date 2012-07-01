@@ -31,6 +31,10 @@ and
 .Op Fl GSR
 .Op Fl h
 .Op Fl i
+.Op Fl ic
+.Op Fl if
+.Op Fl ip
+.Op Fl it
 .Op Fl l
 .Op Fl m | M
 .Op Fl n Ar user:pass
@@ -160,6 +164,14 @@ All torrents, unless overridden by a per-torrent setting, should seed regardless
 Print command-line option descriptions.
 .It Fl i Fl -info Ar id | torrent-hash
 Show details of the current torrent(s)
+.It Fl if Fl -info-files Ar id | torrent-hash
+List the specified torrent's files
+.It Fl ip Fl -info-peers Ar id | torrent-hash
+List the specified torrent's peers
+.It Fl ic Fl -info-pieces Ar id | torrent-hash
+List the specified torrent's pieces
+.It Fl it Fl -info-trackers Ar id | torrent-hash
+List the specified torrent's trackers
 .It Fl si Fl -session-info
 List session information from the server
 .It Fl st Fl -session-stats
