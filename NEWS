@@ -1,3 +1,19 @@
+=== Transmission 2.60 (2012/07/dd) ===
+[http://trac.transmissionbt.com/query?milestone=2.60&group=component&order=severity All tickets closed by this release]
+==== All Platforms ====
+  * Fix issues when adding magnet links
+  * Fix bug where cleared statistics might not save
+  * Improved scraping behavior for certain trackers
+  * Fixed compilation issues with Solaris and FreeBSD
+  * Other minor fixes
+==== Mac ====
+  * Retina display compatibility
+  * Add a filter and select all/deselect all buttons to the add window
+  * Support Lion's window restoration for several windows
+==== Web Client ====
+  * Notification of downloading and seeding completion (requires browser support of notifications)
+  * Re-add select all and deselect all buttons to the file inspector tab
+
 === Transmission 2.52 (2012/05/19) ===
 [http://trac.transmissionbt.com/query?milestone=2.52&group=component&order=severity All tickets closed by this release]
 ==== All Platforms ====
