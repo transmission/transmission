@@ -870,9 +870,9 @@
 							<object class="NSSearchFieldCell" key="NSCell" id="546465028">
 								<int key="NSCellFlags">343014976</int>
 								<int key="NSCellFlags2">268567552</int>
-								<string key="NSContents">Filtrar</string>
+								<string key="NSContents"/>
 								<reference key="NSSupport" ref="26"/>
-								<string key="NSPlaceholderString">Filter</string>
+								<string key="NSPlaceholderString">Filtrar</string>
 								<reference key="NSControlView" ref="290897607"/>
 								<bool key="NSDrawsBackground">YES</bool>
 								<int key="NSTextBezelStyle">1</int>

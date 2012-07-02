@@ -2,13 +2,13 @@
 <archive type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="8.00">
 	<data>
 		<int key="IBDocument.SystemTarget">1070</int>
-		<string key="IBDocument.SystemVersion">11D50</string>
-		<string key="IBDocument.InterfaceBuilderVersion">1938</string>
-		<string key="IBDocument.AppKitVersion">1138.32</string>
-		<string key="IBDocument.HIToolboxVersion">568.00</string>
+		<string key="IBDocument.SystemVersion">11E53</string>
+		<string key="IBDocument.InterfaceBuilderVersion">2182</string>
+		<string key="IBDocument.AppKitVersion">1138.47</string>
+		<string key="IBDocument.HIToolboxVersion">569.00</string>
 		<object class="NSMutableDictionary" key="IBDocument.PluginVersions">
 			<string key="NS.key.0">com.apple.InterfaceBuilder.CocoaPlugin</string>
-			<string key="NS.object.0">1938</string>
+			<string key="NS.object.0">2182</string>
 		</object>
 		<array key="IBDocument.IntegratedClassDependencies">
 			<string>NSTextField</string>
@@ -45,7 +45,7 @@
 					<object class="NSButton" id="160955753">
 						<reference key="NSNextResponder" ref="617828785"/>
 						<int key="NSvFlags">268</int>
-						<string key="NSFrame">{{9, 11}, {191, 18}}</string>
+						<string key="NSFrame">{{9, 11}, {187, 18}}</string>
 						<reference key="NSSuperview" ref="617828785"/>
 						<reference key="NSWindow"/>
 						<reference key="NSNextKeyView" ref="317277208"/>
@@ -54,7 +54,7 @@
 						<object class="NSButtonCell" key="NSCell" id="875862048">
 							<int key="NSCellFlags">-2080244224</int>
 							<int key="NSCellFlags2">131072</int>
-							<string key="NSContents">Parar de enviar se inactivo por::</string>
+							<string key="NSContents">Parar de enviar se inactivo por:</string>
 							<object class="NSFont" key="NSSupport" id="26">
 								<string key="NSName">LucidaGrande</string>
 								<double key="NSSize">11</double>
@@ -158,7 +158,7 @@
 					<object class="NSTextField" id="317277208">
 						<reference key="NSNextResponder" ref="617828785"/>
 						<int key="NSvFlags">268</int>
-						<string key="NSFrame">{{206, 10}, {45, 20}}</string>
+						<string key="NSFrame">{{202, 10}, {45, 20}}</string>
 						<reference key="NSSuperview" ref="617828785"/>
 						<reference key="NSWindow"/>
 						<reference key="NSNextKeyView" ref="706967535"/>
@@ -172,7 +172,7 @@
 									<boolean value="YES" key="allowsFloats"/>
 									<integer value="1040" key="formatterBehavior"/>
 									<boolean value="NO" key="lenient"/>
-									<real value="10000" key="maximum"/>
+									<real value="99999" key="maximum"/>
 									<real value="1" key="minimum"/>
 									<string key="negativeInfinitySymbol">-∞</string>
 									<string key="nilSymbol"/>
@@ -192,7 +192,7 @@
 									<dictionary key="NSAttributes" id="684876044"/>
 								</object>
 								<real value="1" key="NS.min"/>
-								<real value="10000" key="NS.max"/>
+								<real value="99999" key="NS.max"/>
 								<object class="NSDecimalNumberHandler" key="NS.rounding">
 									<int key="NS.roundingmode">3</int>
 									<bool key="NS.raise.overflow">YES</bool>
@@ -246,7 +246,7 @@
 									<object class="NSLocale" key="locale" id="979917424">
 										<string key="NS.identifier"/>
 									</object>
-									<real value="10000" key="maximum"/>
+									<real value="99999" key="maximum"/>
 									<integer value="2" key="maximumFractionDigits"/>
 									<integer value="0" key="minimum"/>
 									<integer value="2" key="minimumFractionDigits"/>
@@ -264,7 +264,7 @@
 									<reference key="NSAttributes" ref="684876044"/>
 								</object>
 								<integer value="0" key="NS.min"/>
-								<real value="10000" key="NS.max"/>
+								<real value="99999" key="NS.max"/>
 								<object class="NSDecimalNumberHandler" key="NS.rounding">
 									<int key="NS.roundingmode">3</int>
 									<bool key="NS.raise.overflow">YES</bool>
@@ -353,7 +353,7 @@
 									<integer value="0" key="allowsFloats"/>
 									<integer value="1040" key="formatterBehavior"/>
 									<reference key="locale" ref="979917424"/>
-									<real value="10000" key="maximum"/>
+									<real value="99999" key="maximum"/>
 									<integer value="0" key="minimum"/>
 									<integer value="1" key="minimumIntegerDigits"/>
 								</dictionary>
@@ -368,7 +368,7 @@
 									<reference key="NSAttributes" ref="684876044"/>
 								</object>
 								<integer value="0" key="NS.min"/>
-								<real value="10000" key="NS.max"/>
+								<real value="99999" key="NS.max"/>
 								<object class="NSDecimalNumberHandler" key="NS.rounding">
 									<int key="NS.roundingmode">3</int>
 									<bool key="NS.raise.overflow">YES</bool>
@@ -440,7 +440,7 @@
 									<integer value="0" key="allowsFloats"/>
 									<integer value="1040" key="formatterBehavior"/>
 									<reference key="locale" ref="979917424"/>
-									<real value="10000" key="maximum"/>
+									<real value="99999" key="maximum"/>
 									<integer value="0" key="minimum"/>
 									<integer value="1" key="minimumIntegerDigits"/>
 								</dictionary>
@@ -455,7 +455,7 @@
 									<reference key="NSAttributes" ref="684876044"/>
 								</object>
 								<integer value="0" key="NS.min"/>
-								<real value="10000" key="NS.max"/>
+								<real value="99999" key="NS.max"/>
 								<object class="NSDecimalNumberHandler" key="NS.rounding">
 									<int key="NS.roundingmode">3</int>
 									<bool key="NS.raise.overflow">YES</bool>
@@ -477,7 +477,7 @@
 					<object class="NSTextField" id="706967535">
 						<reference key="NSNextResponder" ref="617828785"/>
 						<int key="NSvFlags">268</int>
-						<string key="NSFrame">{{256, 13}, {48, 14}}</string>
+						<string key="NSFrame">{{252, 13}, {48, 14}}</string>
 						<reference key="NSSuperview" ref="617828785"/>
 						<reference key="NSWindow"/>
 						<bool key="NSEnabled">YES</bool>
@@ -540,7 +540,7 @@
 						</object>
 					</object>
 				</array>
-				<string key="NSFrameSize">{313, 161}</string>
+				<string key="NSFrameSize">{311, 161}</string>
 				<reference key="NSSuperview"/>
 				<reference key="NSWindow"/>
 				<reference key="NSNextKeyView" ref="122634398"/>
@@ -2026,11 +2026,6 @@
 						<reference key="parent" ref="617828785"/>
 					</object>
 					<object class="IBObjectRecord">
-						<int key="objectID">272</int>
-						<reference key="object" ref="928564396"/>
-						<reference key="parent" ref="617828785"/>
-					</object>
-					<object class="IBObjectRecord">
 						<int key="objectID">273</int>
 						<reference key="object" ref="836369625"/>
 						<reference key="parent" ref="617828785"/>
@@ -2121,11 +2116,6 @@
 						<reference key="parent" ref="617828785"/>
 					</object>
 					<object class="IBObjectRecord">
-						<int key="objectID">319</int>
-						<reference key="object" ref="731668852"/>
-						<reference key="parent" ref="617828785"/>
-					</object>
-					<object class="IBObjectRecord">
 						<int key="objectID">320</int>
 						<reference key="object" ref="901029065"/>
 						<reference key="parent" ref="617828785"/>
@@ -2136,21 +2126,6 @@
 						<reference key="parent" ref="617828785"/>
 					</object>
 					<object class="IBObjectRecord">
-						<int key="objectID">322</int>
-						<reference key="object" ref="725312163"/>
-						<reference key="parent" ref="617828785"/>
-					</object>
-					<object class="IBObjectRecord">
-						<int key="objectID">323</int>
-						<reference key="object" ref="395214492"/>
-						<reference key="parent" ref="617828785"/>
-					</object>
-					<object class="IBObjectRecord">
-						<int key="objectID">324</int>
-						<reference key="object" ref="429777809"/>
-						<reference key="parent" ref="617828785"/>
-					</object>
-					<object class="IBObjectRecord">
 						<int key="objectID">325</int>
 						<reference key="object" ref="948113248"/>
 						<reference key="parent" ref="617828785"/>
@@ -2158,11 +2133,6 @@
 					<object class="IBObjectRecord">
 						<int key="objectID">326</int>
 						<reference key="object" ref="1023183873"/>
-						<reference key="parent" ref="617828785"/>
-					</object>
-					<object class="IBObjectRecord">
-						<int key="objectID">327</int>
-						<reference key="object" ref="834843172"/>
 						<reference key="parent" ref="617828785"/>
 					</object>
 					<object class="IBObjectRecord">
@@ -2238,6 +2208,36 @@
 					<object class="IBObjectRecord">
 						<int key="objectID">343</int>
 						<reference key="object" ref="488999101"/>
+						<reference key="parent" ref="617828785"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">319</int>
+						<reference key="object" ref="731668852"/>
+						<reference key="parent" ref="617828785"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">272</int>
+						<reference key="object" ref="928564396"/>
+						<reference key="parent" ref="617828785"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">324</int>
+						<reference key="object" ref="429777809"/>
+						<reference key="parent" ref="617828785"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">327</int>
+						<reference key="object" ref="834843172"/>
+						<reference key="parent" ref="617828785"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">323</int>
+						<reference key="object" ref="395214492"/>
+						<reference key="parent" ref="617828785"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">322</int>
+						<reference key="object" ref="725312163"/>
 						<reference key="parent" ref="617828785"/>
 					</object>
 				</array>
@@ -2406,7 +2406,7 @@
 			<nil key="activeLocalization"/>
 			<dictionary class="NSMutableDictionary" key="localizations"/>
 			<nil key="sourceID"/>
-			<int key="maxID">343</int>
+			<int key="maxID">350</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<array class="NSMutableArray" key="referencedPartialClassDescriptions">
