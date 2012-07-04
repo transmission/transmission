@@ -7,7 +7,8 @@
   * Fixed compilation issues with Solaris and FreeBSD
   * Other minor fixes
 ==== Mac ====
-  * Retina display compatibility
+  * Ready for Gatekeeper on Mountain Lion
+  * Retina graphics
   * Add a filter and select all/deselect all buttons to the add window
   * Support Lion's window restoration for several windows
 ==== Web Client ====
