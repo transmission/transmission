@@ -29,8 +29,7 @@
 
 @interface NSString (Private)
 
-+ (NSString *) stringForFileSize: (uint64_t) size showUnitUnless: (NSString *) notAllowedUnit
-    unitsUsed: (NSString **) unitUsed;
++ (NSString *) stringForFileSize: (uint64_t) size showUnitUnless: (NSString *) notAllowedUnit unitsUsed: (NSString **) unitUsed;
 
 + (NSString *) stringForSpeed: (CGFloat) speed kb: (NSString *) kb mb: (NSString *) mb gb: (NSString *) gb;
 
@@ -205,8 +204,7 @@
 
 @implementation NSString (Private)
 
-+ (NSString *) stringForFileSize: (uint64_t) size showUnitUnless: (NSString *) notAllowedUnit
-    unitsUsed: (NSString **) unitUsed
++ (NSString *) stringForFileSize: (uint64_t) size showUnitUnless: (NSString *) notAllowedUnit unitsUsed: (NSString **) unitUsed
 {
     double convertedSize;
     NSString * unit;
@@ -233,7 +231,7 @@
     {
         convertedSize = size / powf(1000.0, 4);
         unit = NSLocalizedString(@"TB", "File size - terabytes");
-        decimals = 3; //guessing on this one
+        decimals = 2;
     }
     
     //match Finder's behavior
