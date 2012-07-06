@@ -2,8 +2,9 @@
 [http://trac.transmissionbt.com/query?milestone=2.60&group=component&order=severity All tickets closed by this release]
 ==== All Platforms ====
   * Fix issues when adding magnet links
-  * Fix bug where cleared statistics might not save
   * Improved scraping behavior for certain trackers
+  * Fix bug where cleared statistics might not save
+  * Updated versions of libminiupnpc and libutp
   * Fixed compilation issues with Solaris and FreeBSD
   * Other minor fixes
 ==== Mac ====
@@ -14,6 +15,8 @@
 ==== Web Client ====
   * Notification of downloading and seeding completion (requires browser support of notifications)
   * Re-add select all and deselect all buttons to the file inspector tab
+==== Qt ====
+  * Add Basque translation
 
 === Transmission 2.52 (2012/05/19) ===
 [http://trac.transmissionbt.com/query?milestone=2.52&group=component&order=severity All tickets closed by this release]
