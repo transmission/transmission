@@ -1,10 +1,10 @@
-=== Transmission 2.60 (2012/07/dd) ===
+=== Transmission 2.60 (2012/07/05) ===
 [http://trac.transmissionbt.com/query?milestone=2.60&group=component&order=severity All tickets closed by this release]
 ==== All Platforms ====
   * Fix issues when adding magnet links
   * Improved scraping behavior for certain trackers
   * Fix bug where cleared statistics might not save
-  * Updated versions of libminiupnpc and libutp
+  * Updated versions of miniupnpc and libuTP
   * Fixed compilation issues with Solaris and FreeBSD
   * Other minor fixes
 ==== Mac ====
