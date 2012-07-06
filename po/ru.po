@@ -18,8 +18,8 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
 "n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
-"X-Launchpad-Export-Date: 2012-04-09 01:44+0000\n"
-"X-Generator: Launchpad (build 15060)\n"
+"X-Launchpad-Export-Date: 2012-07-06 01:09+0000\n"
+"X-Generator: Launchpad (build 15544)\n"
 "X-Poedit-Country: RUSSIAN FEDERATION\n"
 "X-Poedit-Language: Russian\n"
 "X-Poedit-SourceCharset: utf-8\n"
@@ -336,7 +336,7 @@ msgstr "Проверка загруженных данных"
 msgid "Queued for download"
 msgstr "Поставлено в очередь на загрузку"
 
-#: ../gtk/details.c:563 ../gtk/filter.c:698
+#: ../gtk/details.c:563 ../gtk/filter.c:699
 msgctxt "Verb"
 msgid "Downloading"
 msgstr "Сохранение"
@@ -345,16 +345,16 @@ msgstr "Сохранение"
 msgid "Queued for seeding"
 msgstr "Поставлено в очередь для раздачи"
 
-#: ../gtk/details.c:565 ../gtk/filter.c:699
+#: ../gtk/details.c:565 ../gtk/filter.c:700
 msgctxt "Verb"
 msgid "Seeding"
 msgstr "Раздача"
 
-#: ../gtk/details.c:566 ../gtk/filter.c:701 ../gtk/torrent-cell-renderer.c:198
+#: ../gtk/details.c:566 ../gtk/filter.c:702 ../gtk/torrent-cell-renderer.c:198
 msgid "Finished"
 msgstr "Завершено"
 
-#: ../gtk/details.c:566 ../gtk/filter.c:700 ../gtk/torrent-cell-renderer.c:198
+#: ../gtk/details.c:566 ../gtk/filter.c:701 ../gtk/torrent-cell-renderer.c:198
 msgid "Paused"
 msgstr "Приостановлен"
 
@@ -362,7 +362,7 @@ msgstr "Приостановлен"
 msgid "N/A"
 msgstr "Н/Д"
 
-#: ../gtk/details.c:611 ../gtk/file-list.c:605
+#: ../gtk/details.c:611 ../gtk/file-list.c:610
 msgid "Mixed"
 msgstr "Смешанный"
 
@@ -827,43 +827,43 @@ msgstr[0] "Загрузка одного из этих торрентов не �
 msgstr[1] "Загрузка некоторых из этих торрентов не завершена."
 msgstr[2] "Загрузка некоторых из этих торрентов не завершена."
 
-#: ../gtk/file-list.c:602 ../gtk/filter.c:347 ../gtk/util.c:465
+#: ../gtk/file-list.c:607 ../gtk/filter.c:347 ../gtk/util.c:465
 msgid "High"
 msgstr "Высокий"
 
-#: ../gtk/file-list.c:603 ../gtk/filter.c:351 ../gtk/util.c:466
+#: ../gtk/file-list.c:608 ../gtk/filter.c:351 ../gtk/util.c:466
 msgid "Normal"
 msgstr "Обычный"
 
-#: ../gtk/file-list.c:604 ../gtk/filter.c:355 ../gtk/util.c:467
+#: ../gtk/file-list.c:609 ../gtk/filter.c:355 ../gtk/util.c:467
 msgid "Low"
 msgstr "Низкий"
 
-#: ../gtk/file-list.c:822 ../gtk/msgwin.c:295
+#: ../gtk/file-list.c:827 ../gtk/msgwin.c:295
 msgid "Name"
 msgstr "Источник"
 
 #. add "size" column
-#: ../gtk/file-list.c:837
+#: ../gtk/file-list.c:842
 msgid "Size"
 msgstr "Размер"
 
 #. add "progress" column
-#: ../gtk/file-list.c:852
+#: ../gtk/file-list.c:857
 msgid "Have"
 msgstr "Содержит"
 
 #. add "enabled" column
-#: ../gtk/file-list.c:865
+#: ../gtk/file-list.c:870
 msgid "Download"
 msgstr "Скачать"
 
 #. add priority column
-#: ../gtk/file-list.c:881 ../gtk/filter.c:342
+#: ../gtk/file-list.c:886 ../gtk/filter.c:342
 msgid "Priority"
 msgstr "Приоритет"
 
-#: ../gtk/filter.c:314 ../gtk/filter.c:695
+#: ../gtk/filter.c:314 ../gtk/filter.c:696
 msgid "All"
 msgstr "Все"
 
@@ -879,64 +879,64 @@ msgstr "Публичный"
 msgid "Private"
 msgstr "Закрытый"
 
-#: ../gtk/filter.c:697
+#: ../gtk/filter.c:698
 msgid "Active"
 msgstr "Активен"
 
-#: ../gtk/filter.c:702
+#: ../gtk/filter.c:703
 msgctxt "Verb"
 msgid "Verifying"
 msgstr "Проверка"
 
-#: ../gtk/filter.c:703 ../gtk/msgwin.c:428
+#: ../gtk/filter.c:704 ../gtk/msgwin.c:428
 msgid "Error"
 msgstr "ошибок"
 
 #. add the activity combobox
-#: ../gtk/filter.c:990
+#: ../gtk/filter.c:994
 msgid "_Show:"
 msgstr "_Показать:"
 
-#: ../gtk/main.c:307
+#: ../gtk/main.c:303
 #, c-format
 msgid "Error registering Transmission as x-scheme-handler/magnet handler: %s"
 msgstr ""
 "Ошибка регистрирования Transmission в качестве обработчика x-scheme-"
 "handler/magnet: %s"
 
-#: ../gtk/main.c:472
+#: ../gtk/main.c:468
 #, c-format
 msgid ""
 "Got signal %d; trying to shut down cleanly. Do it again if it gets stuck."
 msgstr ""
 "Получен сигнал %d; при попытке выключения. При необходимости повторите."
 
-#: ../gtk/main.c:604
+#: ../gtk/main.c:596
 msgid "Where to look for configuration files"
 msgstr "Где искать файлы конфигурации"
 
-#: ../gtk/main.c:605
+#: ../gtk/main.c:597
 msgid "Start with all torrents paused"
 msgstr "Начать с приостановленными торрентами"
 
-#: ../gtk/main.c:606
+#: ../gtk/main.c:598
 msgid "Start minimized in notification area"
 msgstr "Запускать свёрнутой в области уведомлений"
 
-#: ../gtk/main.c:607
+#: ../gtk/main.c:599
 msgid "Show version number and exit"
 msgstr "Вывести номер версии и завершить работу"
 
-#: ../gtk/main.c:625 ../gtk/transmission-gtk.desktop.in.h:1
+#: ../gtk/main.c:617 ../gtk/transmission-gtk.desktop.in.h:1
 msgid "Transmission"
 msgstr "Transmission"
 
 #. parse the command line
-#: ../gtk/main.c:629
+#: ../gtk/main.c:621
 msgid "[torrent files or urls]"
 msgstr "[торрент-файлы или ссылки]"
 
-#: ../gtk/main.c:633
+#: ../gtk/main.c:625
 #, c-format
 msgid ""
 "%s\n"
@@ -946,7 +946,7 @@ msgstr ""
 "Выполните «%s --help», чтобы увидеть список всех доступных команд командной "
 "строки.\n"
 
-#: ../gtk/main.c:730
+#: ../gtk/main.c:722
 msgid ""
 "Transmission is a file-sharing program. When you run a torrent, its data "
 "will be made available to others by means of upload. You and you alone are "
@@ -958,84 +958,111 @@ msgstr ""
 "несете полную ответственность за соблюдение действующих федеральных или "
 "местных законов."
 
-#: ../gtk/main.c:732
+#: ../gtk/main.c:724
 msgid "I _Accept"
 msgstr "Я _принимаю"
 
-#: ../gtk/main.c:941
+#: ../gtk/main.c:933
 msgid "<b>Closing Connections</b>"
 msgstr "<b>Завершение соединений</b>"
 
-#: ../gtk/main.c:945
+#: ../gtk/main.c:937
 msgid "Sending upload/download totals to tracker…"
 msgstr "Отправка сводки о выгрузке/загрузке на сервер"
 
-#: ../gtk/main.c:950
+#: ../gtk/main.c:942
 msgid "_Quit Now"
 msgstr "_Выйти сейчас"
 
-#: ../gtk/main.c:1008
+#: ../gtk/main.c:1000
 msgid "Couldn't add corrupt torrent"
 msgid_plural "Couldn't add corrupt torrents"
 msgstr[0] "Невозможно добавить поврежденный торрент"
 msgstr[1] "Невозможно добавить поврежденные торренты"
 msgstr[2] "Невозможно добавить поврежденные торренты"
 
-#: ../gtk/main.c:1015
+#: ../gtk/main.c:1007
 msgid "Couldn't add duplicate torrent"
 msgid_plural "Couldn't add duplicate torrents"
 msgstr[0] "Невозможно добавить дублирующийся торрент"
 msgstr[1] "Невозможно добавить дублирующиеся торренты"
 msgstr[2] "Невозможно добавить дублирующиеся торренты"
 
-#: ../gtk/main.c:1316
+#: ../gtk/main.c:1308
 msgid "A fast and easy BitTorrent client"
 msgstr "Быстрый и простой BitTorrent-клиент"
 
-#: ../gtk/main.c:1317
+#: ../gtk/main.c:1309
 msgid "Copyright (c) The Transmission Project"
 msgstr "Copyright © The Transmission Project"
 
 #. Translators: translate "translator-credits" as your name
 #. to have it appear in the credits in the "About"
 #. dialog
-#: ../gtk/main.c:1323
+#: ../gtk/main.c:1315
 msgid "translator-credits"
 msgstr ""
 "Anton Shestakov <engored@ya.ru>\n"
 "\n"
 "Launchpad Contributions:\n"
 "  .silent https://launchpad.net/~me-silentroach\n"
+"  Abaza https://launchpad.net/~abazinchik\n"
+"  Alex Nikolaenko https://launchpad.net/~ceekay80\n"
+"  Alexander Semyonov https://launchpad.net/~rotuka\n"
 "  Alexey Ivanov https://launchpad.net/~alexey-ivanov\n"
+"  Alexey Kotlyarov https://launchpad.net/~koterpillar\n"
+"  Alexey Torkhov https://launchpad.net/~atorkhov\n"
+"  Andrei Dziahel https://launchpad.net/~develop7\n"
+"  Andrey Olykainen https://launchpad.net/~andrey.olykainen\n"
 "  Andrey Sitnik https://launchpad.net/~iskin\n"
 "  Anton Shestakov https://launchpad.net/~engored\n"
 "  Arseny Solokha https://launchpad.net/~asolokha\n"
+"  Artem Popov https://launchpad.net/~artfwo\n"
 "  ArtemZ https://launchpad.net/~zhirkow-yahoo\n"
+"  AsstZD https://launchpad.net/~eskaer-spamsink\n"
 "  Bashtannik Andrew S. https://launchpad.net/~bashtannik\n"
 "  Capone https://launchpad.net/~bolshakov-alexey\n"
 "  DIX2005 https://launchpad.net/~dimail-box\n"
 "  DooMka https://launchpad.net/~xpym-xpym\n"
+"  Dr Gregory House https://launchpad.net/~greghouse\n"
+"  Egor Bushmelyov https://launchpad.net/~skipper95\n"
+"  Eugene Marshal https://launchpad.net/~lowrider\n"
+"  Evgeniy Devyatkin https://launchpad.net/~edevyatkin\n"
 "  Evgeny https://launchpad.net/~evgeny-ig\n"
 "  Fatroll https://launchpad.net/~fatroll\n"
 "  Fortress https://launchpad.net/~fortress\n"
+"  Grigorev Mihail https://launchpad.net/~grigorevmn\n"
 "  Ignat Loskutov https://launchpad.net/~softwayer\n"
 "  Igor Butvin https://launchpad.net/~bootwin\n"
 "  Igor Zubarev https://launchpad.net/~igor.zubarev\n"
+"  Igor Zubarev https://launchpad.net/~igor4u\n"
+"  Ilya Barygin https://launchpad.net/~randomaction\n"
+"  Ivan https://launchpad.net/~trurl-master\n"
 "  Ivan Kliouchenkov https://launchpad.net/~quick\n"
-"  JIesnik https://launchpad.net/~jiesnik\n"
-"  KEIII https://launchpad.net/~cashagent\n"
+"  Kirill Holodilin https://launchpad.net/~charlie-chrl\n"
+"  Krzysztof Klimonda https://launchpad.net/~kklimonda\n"
 "  Litvinov Sergey Sergeevich https://launchpad.net/~srgltv05\n"
+"  Max Riveiro https://launchpad.net/~kavu\n"
 "  Max Schukin https://launchpad.net/~schukin\n"
 "  Maxim Petrov https://launchpad.net/~maximpetrov\n"
+"  Maxim Prokopyev https://launchpad.net/~xjazz\n"
 "  Maxim S. https://launchpad.net/~luvme-nn\n"
+"  Nikita Putko https://launchpad.net/~ktototam98\n"
+"  NoIndex https://launchpad.net/~nikolai-serov\n"
 "  Nosferatu https://launchpad.net/~nusferatu\n"
 "  Oleg Koptev https://launchpad.net/~koptev-oleg\n"
+"  Pavel Dmitriev https://launchpad.net/~dmitrievp\n"
 "  Pavel Kurashov https://launchpad.net/~pavell\n"
+"  Pavels Sevcuks https://launchpad.net/~stlwrt\n"
 "  Phenomen https://launchpad.net/~xphenomen\n"
+"  Roman A. aka BasicXP https://launchpad.net/~basicxp\n"
 "  Rustam Vafin https://launchpad.net/~vafin-rustam\n"
+"  Sergei Medvedev https://launchpad.net/~smedvedeff\n"
 "  Sergey \"Shnatsel\" Davidoff https://launchpad.net/~shnatsel\n"
+"  Sergey Sedov https://launchpad.net/~serg-sedov\n"
 "  Shu https://launchpad.net/~shu3k\n"
 "  Spector https://launchpad.net/~spector\n"
+"  Vadim Rutkovsky https://launchpad.net/~roignac\n"
 "  Victor N. https://launchpad.net/~d447224\n"
 "  Vladimir https://launchpad.net/~vladimir-bezuglyi\n"
 "  Vladimir Yatulchik https://launchpad.net/~yatul\n"
@@ -1046,7 +1073,13 @@ msgstr ""
 "  jmb_kz https://launchpad.net/~jmb-kz\n"
 "  nickkon https://launchpad.net/~nickkon\n"
 "  stmc https://launchpad.net/~whats-up\n"
-"  Андрей https://launchpad.net/~user843"
+"  ttg https://launchpad.net/~xvttgvx\n"
+"  ujin https://launchpad.net/~koshelev-e\n"
+"  Андрей https://launchpad.net/~user843\n"
+"  Андрей Калинин https://launchpad.net/~prize2step\n"
+"  Артём Воротников https://launchpad.net/~vorot93\n"
+"  Денис Победря https://launchpad.net/~arcticfox\n"
+"  Коренберг Марк https://launchpad.net/~socketpair"
 
 #: ../gtk/makemeta-ui.c:75
 #, c-format
@@ -1173,19 +1206,19 @@ msgstr "Журнал сообщений"
 msgid "Level"
 msgstr "Уровень"
 
-#: ../gtk/notify.c:213
+#: ../gtk/notify.c:215
 msgid "Open File"
 msgstr "Открыть файл"
 
-#: ../gtk/notify.c:218
+#: ../gtk/notify.c:220
 msgid "Open Folder"
 msgstr "Открыть папку"
 
-#: ../gtk/notify.c:226
+#: ../gtk/notify.c:228
 msgid "Torrent Complete"
 msgstr "Торрент завершён"
 
-#: ../gtk/notify.c:248
+#: ../gtk/notify.c:250
 msgid "Torrent Added"
 msgstr "Добавлен торрент"
 
@@ -1234,15 +1267,15 @@ msgstr "Открыть торрент"
 msgid "Show _options dialog"
 msgstr "Показать диалог _настроек"
 
-#: ../gtk/open-dialog.c:487
+#: ../gtk/open-dialog.c:492
 msgid "Open URL"
 msgstr "Открыть URL"
 
-#: ../gtk/open-dialog.c:500
+#: ../gtk/open-dialog.c:505
 msgid "Open torrent from URL"
 msgstr "Открыть торрент из URL"
 
-#: ../gtk/open-dialog.c:505
+#: ../gtk/open-dialog.c:510
 msgid "_URL"
 msgstr "_Ссылка"
 
@@ -2030,7 +2063,7 @@ msgstr "ГБ/с"
 msgid "TB/s"
 msgstr "ТБ/с"
 
-#: ../gtk/util.c:87 ../libtransmission/utils.c:1485
+#: ../gtk/util.c:87 ../libtransmission/utils.c:1487
 msgid "None"
 msgstr "Н/Д"
 
@@ -2134,7 +2167,7 @@ msgid "Couldn't save file \"%1$s\": %2$s"
 msgstr "Не удалось сохранить файл «%1$s»: %2$s"
 
 #: ../libtransmission/blocklist.c:86 ../libtransmission/blocklist.c:325
-#: ../libtransmission/utils.c:436
+#: ../libtransmission/utils.c:438
 #, c-format
 msgid "Couldn't read \"%1$s\": %2$s"
 msgstr "Не удалось прочитать «%1$s»: %2$s"
@@ -2156,7 +2189,7 @@ msgid "Blocklist \"%s\" updated with %zu entries"
 msgstr "Чёрный список \"%s\" обновлён %zu записями"
 
 #: ../libtransmission/fdlimit.c:360 ../libtransmission/metainfo.c:112
-#: ../libtransmission/utils.c:568 ../libtransmission/utils.c:579
+#: ../libtransmission/utils.c:570 ../libtransmission/utils.c:581
 #, c-format
 msgid "Couldn't create \"%1$s\": %2$s"
 msgstr "Не удалось создать «%1$s»: %2$s"
@@ -2234,7 +2267,7 @@ msgstr "Не удалось открыть порт %d на %s: %s"
 msgid "Couldn't bind port %d on %s: %s (%s)"
 msgstr "Не удалось привязать порт %d к %s: %s (%s)"
 
-#: ../libtransmission/peer-msgs.c:1893
+#: ../libtransmission/peer-msgs.c:1896
 #, c-format
 msgid "Please Verify Local Data! Piece #%zu is corrupt."
 msgstr "Проверьте локальные данные! Часть #%zu повреждена."
@@ -2350,16 +2383,16 @@ msgstr ""
 msgid "Port forwarding successful!"
 msgstr "Перенаправление портов работает!"
 
-#: ../libtransmission/utils.c:450
+#: ../libtransmission/utils.c:452
 msgid "Not a regular file"
 msgstr "Не является обычным файлом"
 
-#: ../libtransmission/utils.c:468
+#: ../libtransmission/utils.c:470
 msgid "Memory allocation failed"
 msgstr "Не удалось выделить память"
 
 #. Node exists but isn't a folder
-#: ../libtransmission/utils.c:578
+#: ../libtransmission/utils.c:580
 #, c-format
 msgid "File \"%s\" is in the way"
 msgstr "Файл «%s» в пути"

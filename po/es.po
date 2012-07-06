@@ -19,8 +19,8 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2012-04-09 01:44+0000\n"
-"X-Generator: Launchpad (build 15060)\n"
+"X-Launchpad-Export-Date: 2012-07-06 01:08+0000\n"
+"X-Generator: Launchpad (build 15544)\n"
 "X-Poedit-Country: SPAIN\n"
 "X-Poedit-Language: Spanish\n"
 
@@ -70,7 +70,7 @@ msgstr "_Registro de mensajes"
 
 #: ../gtk/actions.c:86
 msgid "Enable Alternative Speed _Limits"
-msgstr "Activa los _límites de velocidad alternativos"
+msgstr "Activar _límites de velocidad alternativos"
 
 #: ../gtk/actions.c:87
 msgid "_Compact View"
@@ -336,7 +336,7 @@ msgstr "Verificar datos locales"
 msgid "Queued for download"
 msgstr "Encolado para descargar"
 
-#: ../gtk/details.c:563 ../gtk/filter.c:698
+#: ../gtk/details.c:563 ../gtk/filter.c:699
 msgctxt "Verb"
 msgid "Downloading"
 msgstr "Descargar"
@@ -345,16 +345,16 @@ msgstr "Descargar"
 msgid "Queued for seeding"
 msgstr "En cola para sembrado"
 
-#: ../gtk/details.c:565 ../gtk/filter.c:699
+#: ../gtk/details.c:565 ../gtk/filter.c:700
 msgctxt "Verb"
 msgid "Seeding"
 msgstr "Compartiendo"
 
-#: ../gtk/details.c:566 ../gtk/filter.c:701 ../gtk/torrent-cell-renderer.c:198
+#: ../gtk/details.c:566 ../gtk/filter.c:702 ../gtk/torrent-cell-renderer.c:198
 msgid "Finished"
 msgstr "Terminado"
 
-#: ../gtk/details.c:566 ../gtk/filter.c:700 ../gtk/torrent-cell-renderer.c:198
+#: ../gtk/details.c:566 ../gtk/filter.c:701 ../gtk/torrent-cell-renderer.c:198
 msgid "Paused"
 msgstr "Pausado"
 
@@ -362,7 +362,7 @@ msgstr "Pausado"
 msgid "N/A"
 msgstr "N/D"
 
-#: ../gtk/details.c:611 ../gtk/file-list.c:605
+#: ../gtk/details.c:611 ../gtk/file-list.c:610
 msgid "Mixed"
 msgstr "Mixto"
 
@@ -820,43 +820,43 @@ msgid_plural "Some of these torrents have not finished downloading."
 msgstr[0] "Uno de estos torrents no ha terminado de descargarse."
 msgstr[1] "Algunos torrents no se han descargado todavía."
 
-#: ../gtk/file-list.c:602 ../gtk/filter.c:347 ../gtk/util.c:465
+#: ../gtk/file-list.c:607 ../gtk/filter.c:347 ../gtk/util.c:465
 msgid "High"
 msgstr "Alta"
 
-#: ../gtk/file-list.c:603 ../gtk/filter.c:351 ../gtk/util.c:466
+#: ../gtk/file-list.c:608 ../gtk/filter.c:351 ../gtk/util.c:466
 msgid "Normal"
 msgstr "Normal"
 
-#: ../gtk/file-list.c:604 ../gtk/filter.c:355 ../gtk/util.c:467
+#: ../gtk/file-list.c:609 ../gtk/filter.c:355 ../gtk/util.c:467
 msgid "Low"
 msgstr "Baja"
 
-#: ../gtk/file-list.c:822 ../gtk/msgwin.c:295
+#: ../gtk/file-list.c:827 ../gtk/msgwin.c:295
 msgid "Name"
 msgstr "Nombre"
 
 #. add "size" column
-#: ../gtk/file-list.c:837
+#: ../gtk/file-list.c:842
 msgid "Size"
 msgstr "Tamaño"
 
 #. add "progress" column
-#: ../gtk/file-list.c:852
+#: ../gtk/file-list.c:857
 msgid "Have"
 msgstr "Progreso"
 
 #. add "enabled" column
-#: ../gtk/file-list.c:865
+#: ../gtk/file-list.c:870
 msgid "Download"
 msgstr "Descargar"
 
 #. add priority column
-#: ../gtk/file-list.c:881 ../gtk/filter.c:342
+#: ../gtk/file-list.c:886 ../gtk/filter.c:342
 msgid "Priority"
 msgstr "Prioridad"
 
-#: ../gtk/filter.c:314 ../gtk/filter.c:695
+#: ../gtk/filter.c:314 ../gtk/filter.c:696
 msgid "All"
 msgstr "Todos"
 
@@ -872,31 +872,31 @@ msgstr "Público"
 msgid "Private"
 msgstr "Privado"
 
-#: ../gtk/filter.c:697
+#: ../gtk/filter.c:698
 msgid "Active"
 msgstr "Activo"
 
-#: ../gtk/filter.c:702
+#: ../gtk/filter.c:703
 msgctxt "Verb"
 msgid "Verifying"
 msgstr "Verificando"
 
-#: ../gtk/filter.c:703 ../gtk/msgwin.c:428
+#: ../gtk/filter.c:704 ../gtk/msgwin.c:428
 msgid "Error"
 msgstr "Error"
 
 #. add the activity combobox
-#: ../gtk/filter.c:990
+#: ../gtk/filter.c:994
 msgid "_Show:"
 msgstr "Mo_strar:"
 
-#: ../gtk/main.c:307
+#: ../gtk/main.c:303
 #, c-format
 msgid "Error registering Transmission as x-scheme-handler/magnet handler: %s"
 msgstr ""
 "Error registrando Transmission como un manejador de x-scheme y/o magnets: %s"
 
-#: ../gtk/main.c:472
+#: ../gtk/main.c:468
 #, c-format
 msgid ""
 "Got signal %d; trying to shut down cleanly. Do it again if it gets stuck."
@@ -904,32 +904,32 @@ msgstr ""
 "Se ha obtenido la señal %d y se está intentando detener limpiamente. "
 "Vuélvalo a hacer si se bloquea."
 
-#: ../gtk/main.c:604
+#: ../gtk/main.c:596
 msgid "Where to look for configuration files"
 msgstr "Dónde buscar los archivos de configuración"
 
-#: ../gtk/main.c:605
+#: ../gtk/main.c:597
 msgid "Start with all torrents paused"
 msgstr "Comenzar con todos los torrents pausados"
 
-#: ../gtk/main.c:606
+#: ../gtk/main.c:598
 msgid "Start minimized in notification area"
 msgstr "Iniciar minimizado en el área de notificación"
 
-#: ../gtk/main.c:607
+#: ../gtk/main.c:599
 msgid "Show version number and exit"
 msgstr "Mostrar número de versión y salir"
 
-#: ../gtk/main.c:625 ../gtk/transmission-gtk.desktop.in.h:1
+#: ../gtk/main.c:617 ../gtk/transmission-gtk.desktop.in.h:1
 msgid "Transmission"
 msgstr "Transmission"
 
 #. parse the command line
-#: ../gtk/main.c:629
+#: ../gtk/main.c:621
 msgid "[torrent files or urls]"
 msgstr "[archivos torrent o url]"
 
-#: ../gtk/main.c:633
+#: ../gtk/main.c:625
 #, c-format
 msgid ""
 "%s\n"
@@ -939,7 +939,7 @@ msgstr ""
 "Ejecute «%s --help» para ver una lista completa de las opciones de línea de "
 "órdenes disponibles.\n"
 
-#: ../gtk/main.c:730
+#: ../gtk/main.c:722
 msgid ""
 "Transmission is a file-sharing program. When you run a torrent, its data "
 "will be made available to others by means of upload. You and you alone are "
@@ -951,46 +951,46 @@ msgstr ""
 "subirlos. Usted y solo usted es totalmente responsable de ejercer un "
 "criterio correcto y cumplir las leyes locales."
 
-#: ../gtk/main.c:732
+#: ../gtk/main.c:724
 msgid "I _Accept"
 msgstr "_Acepto"
 
-#: ../gtk/main.c:941
+#: ../gtk/main.c:933
 msgid "<b>Closing Connections</b>"
 msgstr "<b>Cerrando conexiones</b>"
 
-#: ../gtk/main.c:945
+#: ../gtk/main.c:937
 msgid "Sending upload/download totals to tracker…"
 msgstr "Enviando totales de subida/bajada al rastreador..."
 
-#: ../gtk/main.c:950
+#: ../gtk/main.c:942
 msgid "_Quit Now"
 msgstr "_Salir inmediatamente"
 
-#: ../gtk/main.c:1008
+#: ../gtk/main.c:1000
 msgid "Couldn't add corrupt torrent"
 msgid_plural "Couldn't add corrupt torrents"
 msgstr[0] "No se pudo añadir el torrent dañado"
 msgstr[1] "No se pudieron añadir los torrents dañados"
 
-#: ../gtk/main.c:1015
+#: ../gtk/main.c:1007
 msgid "Couldn't add duplicate torrent"
 msgid_plural "Couldn't add duplicate torrents"
 msgstr[0] "No su pudo añadir el torrent duplicado"
 msgstr[1] "No se pudieron añadir los torrents duplicados"
 
-#: ../gtk/main.c:1316
+#: ../gtk/main.c:1308
 msgid "A fast and easy BitTorrent client"
 msgstr "Un cliente de BitTorrent rápido y sencillo"
 
-#: ../gtk/main.c:1317
+#: ../gtk/main.c:1309
 msgid "Copyright (c) The Transmission Project"
-msgstr "Copyright (c) The Transmission Project"
+msgstr "Copyright (c) El proyecto Transmission"
 
 #. Translators: translate "translator-credits" as your name
 #. to have it appear in the credits in the "About"
 #. dialog
-#: ../gtk/main.c:1323
+#: ../gtk/main.c:1315
 msgid "translator-credits"
 msgstr ""
 "Vicente Carro Fernandez <vicentecarro@andaluciajunta.es>, 2006\n"
@@ -1000,36 +1000,73 @@ msgstr ""
 "Launchpad Contributions:\n"
 "  51114u9 https://launchpad.net/~marcoantoniofrias\n"
 "  Abel O'Rian https://launchpad.net/~abel-orian\n"
+"  Adolfo Jayme Barrientos https://launchpad.net/~fitoschido\n"
+"  Aiguanachein https://launchpad.net/~aiguanachein\n"
+"  Alain Bustamante https://launchpad.net/~webmaster-inkedcity\n"
+"  AlexMorphine https://launchpad.net/~alecapi1\n"
+"  Alfonso Moratalla https://launchpad.net/~vanhell\n"
 "  Alfredo Hernández https://launchpad.net/~aldomann\n"
-"  Cristian AB https://launchpad.net/~cristian-a-b\n"
+"  Antonio Maldonado https://launchpad.net/~a.m.\n"
+"  Beto https://launchpad.net/~es-beto\n"
+"  Boris Da Silva Perez https://launchpad.net/~borisdsp\n"
+"  Carlos Zúñiga https://launchpad.net/~carlos-zun\n"
+"  Chaoxic https://launchpad.net/~chaotic-harmony\n"
+"  Daniel Artamendi https://launchpad.net/~danimon\n"
+"  Darío Ortega https://launchpad.net/~dario.ortega\n"
 "  DiegoJ https://launchpad.net/~diegojromerolopez\n"
+"  DruiD https://launchpad.net/~kike-edf\n"
+"  Erick Aguilar Bravo https://launchpad.net/~xenokyron\n"
 "  Eugenio M. Vigo https://launchpad.net/~evigo\n"
-"  Fitoschido https://launchpad.net/~fitoschido\n"
+"  Federico Bond https://launchpad.net/~federico-bond\n"
+"  Fernando Muñoz https://launchpad.net/~munozferna\n"
+"  Francisco José Rey https://launchpad.net/~fcojreyg\n"
+"  FreeFri https://launchpad.net/~freefri\n"
 "  Gabriel https://launchpad.net/~galvarez-mdp\n"
+"  Helmy Giacoman || Eos87 https://launchpad.net/~eos87\n"
 "  J https://launchpad.net/~nnnn-deactivatedaccount\n"
-"  Jordi Diaz https://launchpad.net/~jordi-diaz-casaubon\n"
+"  J Álvaro Fernández https://launchpad.net/~jalvarof\n"
+"  J. Cappelletto https://launchpad.net/~cappelletto\n"
+"  Jamie Strandboge https://launchpad.net/~jdstrand\n"
+"  Javier Aravena Claramunt https://launchpad.net/~phrodo-00\n"
+"  Javier García Díaz https://launchpad.net/~jgd\n"
+"  Jochen Schäfer https://launchpad.net/~lemecje83\n"
+"  Jorge González https://launchpad.net/~jorge-gonzalez-gonzalez\n"
 "  Jorge González https://launchpad.net/~jorgegonz\n"
+"  Jorge_C https://launchpad.net/~jorge.c\n"
 "  Joseph https://launchpad.net/~josephmail7\n"
+"  José Humberto Oliveros Magaña https://launchpad.net/~holiveros\n"
+"  Juan Alfredo Salas Santillana https://launchpad.net/~ratasxy\n"
 "  Juan Eduardo Riva https://launchpad.net/~juaneduardoriva\n"
-"  Juan Sebastián Marulanda https://launchpad.net/~juanchito2006\n"
 "  Julian Alarcon https://launchpad.net/~alarconj\n"
-"  Luis Landero https://launchpad.net/~landero\n"
+"  Kevin https://launchpad.net/~kevin64-deactivatedaccount\n"
+"  Kislev https://launchpad.net/~1hrevs-launchpad-deactivatedaccount\n"
+"  Leo Arias https://launchpad.net/~elopio\n"
+"  Manuel Alejandro Jiménez Quintero https://launchpad.net/~alejanjim-san\n"
+"  Marcos Escalier https://launchpad.net/~marcosescalier\n"
 "  Martín V. https://launchpad.net/~martinvukovic\n"
+"  Miguel A. Alvarado V. https://launchpad.net/~exodus\n"
 "  Miguel Anxo Bouzada https://launchpad.net/~mbouzada\n"
+"  Miguel Herrero https://launchpad.net/~miguel-herrerobaena\n"
+"  Monkey https://launchpad.net/~monkey-libre\n"
+"  Nicolás M. Zahlut https://launchpad.net/~nzahlut\n"
+"  Nicolás Rigalli https://launchpad.net/~hellknight1991\n"
 "  Paco Molinero https://launchpad.net/~franciscomol\n"
 "  Ramón Calderón https://launchpad.net/~rcalderon\n"
 "  Raúl Pedroche https://launchpad.net/~pedroche\n"
 "  Ricardo A. Hermosilla Carrillo https://launchpad.net/~rahermosillac\n"
 "  Ricardo Pérez López https://launchpad.net/~ricardo\n"
-"  Rodrigo Testa https://launchpad.net/~rod-95\n"
 "  Santiago Riega https://launchpad.net/~sriega\n"
+"  Santiago Ward https://launchpad.net/~santiagoward2000\n"
 "  Shaun Mallette https://launchpad.net/~chicagonpg\n"
 "  Takmadeus https://launchpad.net/~takmadeus\n"
 "  Xoan Sampaiño https://launchpad.net/~xoan\n"
 "  abasfe https://launchpad.net/~abasfe\n"
-"  evaristo arroyo https://launchpad.net/~evarroyo\n"
+"  fosk https://launchpad.net/~oscarrdg\n"
 "  fran https://launchpad.net/~franmacia\n"
+"  g.chavira https://launchpad.net/~g-chavira-p\n"
 "  jedelwey https://launchpad.net/~jedelwey\n"
+"  kitzOgen https://launchpad.net/~kitzogen\n"
+"  matbonucci https://launchpad.net/~matbonucci\n"
 "  maty1206 https://launchpad.net/~maty1206\n"
 "  pico.dev https://launchpad.net/~pico.dev\n"
 "  sebikul https://launchpad.net/~sebikul\n"
@@ -1158,19 +1195,19 @@ msgstr "Registro de mensajes"
 msgid "Level"
 msgstr "Nivel"
 
-#: ../gtk/notify.c:213
+#: ../gtk/notify.c:215
 msgid "Open File"
 msgstr "Abrir archivo"
 
-#: ../gtk/notify.c:218
+#: ../gtk/notify.c:220
 msgid "Open Folder"
 msgstr "Abrir carpeta"
 
-#: ../gtk/notify.c:226
+#: ../gtk/notify.c:228
 msgid "Torrent Complete"
 msgstr "Torrent completo"
 
-#: ../gtk/notify.c:248
+#: ../gtk/notify.c:250
 msgid "Torrent Added"
 msgstr "Torrent añadido"
 
@@ -1219,15 +1256,15 @@ msgstr "Abrir un Torrent"
 msgid "Show _options dialog"
 msgstr "Mostrar el diálogo de _opciones"
 
-#: ../gtk/open-dialog.c:487
+#: ../gtk/open-dialog.c:492
 msgid "Open URL"
 msgstr "Abrir URL"
 
-#: ../gtk/open-dialog.c:500
+#: ../gtk/open-dialog.c:505
 msgid "Open torrent from URL"
 msgstr "Abrir torrent desde una URL"
 
-#: ../gtk/open-dialog.c:505
+#: ../gtk/open-dialog.c:510
 msgid "_URL"
 msgstr "_URL"
 
@@ -2009,7 +2046,7 @@ msgstr "GB/s"
 msgid "TB/s"
 msgstr "TB/s"
 
-#: ../gtk/util.c:87 ../libtransmission/utils.c:1485
+#: ../gtk/util.c:87 ../libtransmission/utils.c:1487
 msgid "None"
 msgstr "Ninguno"
 
@@ -2109,7 +2146,7 @@ msgid "Couldn't save file \"%1$s\": %2$s"
 msgstr "No se pudo guardar el archivo «%1$s»: %2$s"
 
 #: ../libtransmission/blocklist.c:86 ../libtransmission/blocklist.c:325
-#: ../libtransmission/utils.c:436
+#: ../libtransmission/utils.c:438
 #, c-format
 msgid "Couldn't read \"%1$s\": %2$s"
 msgstr "No se pudo leer «%1$s»: %2$s"
@@ -2131,7 +2168,7 @@ msgid "Blocklist \"%s\" updated with %zu entries"
 msgstr "Lista negra «%s» actualizada con %zu entradas"
 
 #: ../libtransmission/fdlimit.c:360 ../libtransmission/metainfo.c:112
-#: ../libtransmission/utils.c:568 ../libtransmission/utils.c:579
+#: ../libtransmission/utils.c:570 ../libtransmission/utils.c:581
 #, c-format
 msgid "Couldn't create \"%1$s\": %2$s"
 msgstr "No se pudo crear «%1$s»: %2$s"
@@ -2210,7 +2247,7 @@ msgstr "No se pudo enlazar el puerto %d en %s: %s"
 msgid "Couldn't bind port %d on %s: %s (%s)"
 msgstr "No se pudo vincular al puerto %d en %s: %s (%s)"
 
-#: ../libtransmission/peer-msgs.c:1893
+#: ../libtransmission/peer-msgs.c:1896
 #, c-format
 msgid "Please Verify Local Data! Piece #%zu is corrupt."
 msgstr "¡Verifique sus datos locales! La pieza #%zu está dañada."
@@ -2327,16 +2364,16 @@ msgstr ""
 msgid "Port forwarding successful!"
 msgstr "Reenvío de puertos realizado con éxito"
 
-#: ../libtransmission/utils.c:450
+#: ../libtransmission/utils.c:452
 msgid "Not a regular file"
 msgstr "No es un archivo regular"
 
-#: ../libtransmission/utils.c:468
+#: ../libtransmission/utils.c:470
 msgid "Memory allocation failed"
 msgstr "Falló la asignación de memoria"
 
 #. Node exists but isn't a folder
-#: ../libtransmission/utils.c:578
+#: ../libtransmission/utils.c:580
 #, c-format
 msgid "File \"%s\" is in the way"
 msgstr "El archivo «%s» estorba"

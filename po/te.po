@@ -8,15 +8,15 @@ msgstr ""
 "Project-Id-Version: transmission\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2012-02-03 15:22-0600\n"
-"PO-Revision-Date: 2012-03-09 09:26+0000\n"
+"PO-Revision-Date: 2012-07-01 21:43+0000\n"
 "Last-Translator: Praveen Illa <mail2ipn@gmail.com>\n"
 "Language-Team: Telugu <te@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2012-04-09 01:44+0000\n"
-"X-Generator: Launchpad (build 15060)\n"
+"X-Launchpad-Export-Date: 2012-07-06 01:09+0000\n"
+"X-Generator: Launchpad (build 15544)\n"
 
 #: ../gtk/actions.c:45
 msgid "Sort by _Activity"
@@ -32,7 +32,7 @@ msgstr "ప్రగతిని బట్టి క్రమబద్దీక�
 
 #: ../gtk/actions.c:48
 msgid "Sort by _Queue"
-msgstr ""
+msgstr "వరుసని బట్టి క్రమబద్దీకరించు (_Q)"
 
 #: ../gtk/actions.c:49
 msgid "Sort by Rati_o"
@@ -56,11 +56,11 @@ msgstr "పరిమాణాన్ని బట్టి క్రమబద్�
 
 #: ../gtk/actions.c:70
 msgid "_Show Transmission"
-msgstr "ట్రాన్స్ మిషన్ ను చూపించు(_S)"
+msgstr "ట్రాన్స్‍మిషన్‌ను చూపించు (_S)"
 
 #: ../gtk/actions.c:71
 msgid "Message _Log"
-msgstr "సందేశాల నమోదు(_L)"
+msgstr "సందేశాల చిట్టా (_L)"
 
 #: ../gtk/actions.c:86
 msgid "Enable Alternative Speed _Limits"
@@ -68,7 +68,7 @@ msgstr "ప్రత్యామ్నాయ వేగ పరిమితుల�
 
 #: ../gtk/actions.c:87
 msgid "_Compact View"
-msgstr "కాంపాక్ట్ వీక్షణ(_C)"
+msgstr "దట్టమైన వీక్షణం (_C)"
 
 #: ../gtk/actions.c:88
 msgid "Re_verse Sort Order"
@@ -84,19 +84,19 @@ msgstr "స్థితిపట్టీ (_S)"
 
 #: ../gtk/actions.c:91
 msgid "_Toolbar"
-msgstr "సాధనపట్టీ (_T)"
+msgstr "పనిముట్ల పట్టీ (_T)"
 
 #: ../gtk/actions.c:96
 msgid "_File"
-msgstr "ఫైల్(_F)"
+msgstr "దస్త్రం (_F)"
 
 #: ../gtk/actions.c:97
 msgid "_Torrent"
-msgstr "టోరెంట్(_T)"
+msgstr "టోరెంట్ (_T)"
 
 #: ../gtk/actions.c:98
 msgid "_View"
-msgstr "వీక్షణ(_V)"
+msgstr "వీక్షణం (_V)"
 
 #: ../gtk/actions.c:99
 msgid "_Sort Torrents By"
@@ -104,7 +104,7 @@ msgstr "టోరెంట్లను ఇలా క్రమబద్దీక�
 
 #: ../gtk/actions.c:100
 msgid "_Queue"
-msgstr ""
+msgstr "వరుస (_Q)"
 
 #: ../gtk/actions.c:101 ../gtk/details.c:2436
 msgid "_Edit"
@@ -128,7 +128,7 @@ msgstr "URL తెరవండి..."
 
 #: ../gtk/actions.c:105 ../gtk/actions.c:106
 msgid "Open a torrent"
-msgstr "ఒక టోరెంట్ను తెరుచు"
+msgstr "ఒక టోరెంట్ను తెరువు"
 
 #: ../gtk/actions.c:107
 msgid "_Start"
@@ -136,7 +136,7 @@ msgstr "ప్రారంభించు (_S)"
 
 #: ../gtk/actions.c:107
 msgid "Start torrent"
-msgstr "టోరెంట్ ని ప్రారంభించు"
+msgstr "టోరెంటును ప్రారంభించు"
 
 #: ../gtk/actions.c:108
 msgid "Start _Now"
@@ -152,7 +152,7 @@ msgstr "గణాంకాలు(_S)"
 
 #: ../gtk/actions.c:110
 msgid "_Donate"
-msgstr "విరాలం యివ్వు(_D)"
+msgstr "విరాలమివ్వండి (_D)"
 
 #: ../gtk/actions.c:111
 msgid "_Verify Local Data"
@@ -160,27 +160,27 @@ msgstr "స్థానిక సమాచారాన్ని తనిఖీ 
 
 #: ../gtk/actions.c:112
 msgid "_Pause"
-msgstr "నిలిపివేయి(_P)"
+msgstr "నిలిపివేయి (_P)"
 
 #: ../gtk/actions.c:112
 msgid "Pause torrent"
-msgstr "టోరెంట్ని నిలిపివుంచు"
+msgstr "టోరెంటును నిలిపివేయి"
 
 #: ../gtk/actions.c:113
 msgid "_Pause All"
-msgstr "అన్నింటినీ నిలిపివుంచు(_P)"
+msgstr "అన్నీ నిలిపివేయి (_P)"
 
 #: ../gtk/actions.c:113
 msgid "Pause all torrents"
-msgstr "అన్ని టోరెంట్లను నిలిపిఉంచు"
+msgstr "అన్ని టోరెంట్లను నిలిపివేయి"
 
 #: ../gtk/actions.c:114
 msgid "_Start All"
-msgstr "అన్నింటినీ ప్రారంభించు(_S)"
+msgstr "అన్నీ ప్రారంభించు(_S)"
 
 #: ../gtk/actions.c:114
 msgid "Start all torrents"
-msgstr "టోరెంట్లన్నింటినీ ప్రారంభించు"
+msgstr "అన్ని టోరెంట్లను ప్రారంభించు"
 
 #: ../gtk/actions.c:115
 msgid "Set _Location…"
@@ -188,11 +188,11 @@ msgstr "ప్రదేశాన్ని అమర్చండి...(_L)"
 
 #: ../gtk/actions.c:116
 msgid "Remove torrent"
-msgstr "టోరెంట్ని తొలగించు"
+msgstr "టోరెంటును తీసివేయి"
 
 #: ../gtk/actions.c:117
 msgid "_Delete Files and Remove"
-msgstr "ఫైళ్ళను తొలగించు మరియు తీసెయ్(_D)"
+msgstr "దస్త్రాలను తొలగించు మరియు తీసివేయి (_D)"
 
 #: ../gtk/actions.c:118
 msgid "_New…"
@@ -208,11 +208,11 @@ msgstr "నిష్క్రమించు (_Q)"
 
 #: ../gtk/actions.c:120
 msgid "Select _All"
-msgstr "అన్నింటినీ ఎంచుకో(_A)"
+msgstr "అన్నీ ఎంపికచేయి (_A)"
 
 #: ../gtk/actions.c:121
 msgid "Dese_lect All"
-msgstr "ఎంపిక నుండి అన్నింటినీ తొలగించు(_L)"
+msgstr "ఎంపికనంతటినీ రద్దుచేయి (_l)"
 
 #: ../gtk/actions.c:123
 msgid "Torrent properties"
@@ -224,11 +224,11 @@ msgstr "సంచయాన్ని తెరువు (_O)"
 
 #: ../gtk/actions.c:126
 msgid "_Contents"
-msgstr "విషయములు(_C)"
+msgstr "విషయసూచిక (_C)"
 
 #: ../gtk/actions.c:127
 msgid "Ask Tracker for _More Peers"
-msgstr "మరిన్ని పీర్ల కోసం ట్రాకర్ని అడుగు(_M)"
+msgstr "మరిన్ని పీర్ల కోసం జాడకాన్ని అడుగు (_M)"
 
 #: ../gtk/actions.c:128
 msgid "Move to _Top"
@@ -248,7 +248,7 @@ msgstr "బాగా క్రిందికి జరపండి (_B)"
 
 #: ../gtk/actions.c:132
 msgid "Present Main Window"
-msgstr ""
+msgstr "ప్రస్తుత ప్రధాన కిటికీ"
 
 #: ../gtk/conf.c:317 ../gtk/conf.c:322
 #, c-format
@@ -257,7 +257,7 @@ msgstr "\"%s\" దిగుమతి అవుతున్నది"
 
 #: ../gtk/details.c:448 ../gtk/details.c:460
 msgid "Use global settings"
-msgstr "సర్వన్వయ అమరికలను వాడు"
+msgstr "సార్వత్రిక అమరికలను వాడు"
 
 #: ../gtk/details.c:449
 msgid "Seed regardless of ratio"
@@ -281,7 +281,7 @@ msgstr "వేగం"
 
 #: ../gtk/details.c:480
 msgid "Honor global _limits"
-msgstr "సర్వన్వయ పరిమితులను గౌరవించు(_l)"
+msgstr "సార్వత్రిక పరిమితులను గౌరవించు (_l)"
 
 #: ../gtk/details.c:485
 #, c-format
@@ -307,7 +307,7 @@ msgstr "నిష్పత్తి(_R):"
 
 #: ../gtk/details.c:534
 msgid "_Idle:"
-msgstr "వాడకం లేని(_I):"
+msgstr "జడం (_I):"
 
 #: ../gtk/details.c:537
 msgid "Peer Connections"
@@ -330,7 +330,7 @@ msgstr "స్థానిక సమాచారం తనిఖీ చేయబ
 msgid "Queued for download"
 msgstr "దింపుకొనుటకు వరుసలో చేర్చబడింది"
 
-#: ../gtk/details.c:563 ../gtk/filter.c:698
+#: ../gtk/details.c:563 ../gtk/filter.c:699
 msgctxt "Verb"
 msgid "Downloading"
 msgstr "దింపుకుంటున్నది"
@@ -339,24 +339,24 @@ msgstr "దింపుకుంటున్నది"
 msgid "Queued for seeding"
 msgstr "సీడింగు కొరకు వరుసలో చేర్చబడింది"
 
-#: ../gtk/details.c:565 ../gtk/filter.c:699
+#: ../gtk/details.c:565 ../gtk/filter.c:700
 msgctxt "Verb"
 msgid "Seeding"
 msgstr "సీడింగు చేస్తున్నది"
 
-#: ../gtk/details.c:566 ../gtk/filter.c:701 ../gtk/torrent-cell-renderer.c:198
+#: ../gtk/details.c:566 ../gtk/filter.c:702 ../gtk/torrent-cell-renderer.c:198
 msgid "Finished"
 msgstr "పూర్తయింది"
 
-#: ../gtk/details.c:566 ../gtk/filter.c:700 ../gtk/torrent-cell-renderer.c:198
+#: ../gtk/details.c:566 ../gtk/filter.c:701 ../gtk/torrent-cell-renderer.c:198
 msgid "Paused"
 msgstr "నిలిపివేయబడింది"
 
 #: ../gtk/details.c:599
 msgid "N/A"
-msgstr "N/A"
+msgstr "వర్తించదు"
 
-#: ../gtk/details.c:611 ../gtk/file-list.c:605
+#: ../gtk/details.c:611 ../gtk/file-list.c:610
 msgid "Mixed"
 msgstr "మిశ్రమ"
 
@@ -389,7 +389,7 @@ msgstr "%2$s న %1$s చే సృష్టించబడింది"
 
 #: ../gtk/details.c:749
 msgid "Unknown"
-msgstr "తెలియని"
+msgstr "తెలియదు"
 
 #: ../gtk/details.c:777
 #, c-format
@@ -457,7 +457,7 @@ msgstr "టోరెంట్ పరిమాణం:"
 
 #: ../gtk/details.c:940
 msgid "Have:"
-msgstr "కలిగి ఉన్నది:"
+msgstr "ఉన్నది:"
 
 #: ../gtk/details.c:945 ../gtk/stats.c:155 ../gtk/stats.c:172
 msgid "Downloaded:"
@@ -561,7 +561,7 @@ msgstr "వారు రద్దుచేశారు"
 
 #: ../gtk/details.c:1128
 msgid "Flags"
-msgstr "ఫ్లాగ్‌లు"
+msgstr "కేతనాలు"
 
 #: ../gtk/details.c:1483
 msgid "Optimistic unchoke"
@@ -569,15 +569,15 @@ msgstr ""
 
 #: ../gtk/details.c:1484
 msgid "Downloading from this peer"
-msgstr "ఈ పీర్ నుంచి దిగుమతి జరుగుతోంది"
+msgstr "ఈ పీర్ నుండి దింపుకుంటున్నది"
 
 #: ../gtk/details.c:1485
 msgid "We would download from this peer if they would let us"
-msgstr "ఈ పీర్ అనుమతి ఇస్తే ఇతడి నుంచి దిగుమతి చేసుకుంటాం"
+msgstr "వారు అనుమతి ఇస్తే ఈ పీర్ నుండి దింపుకుంటాము"
 
 #: ../gtk/details.c:1486
 msgid "Uploading to peer"
-msgstr "పీర్ కి ఎగుమతి చేస్తోంది"
+msgstr "పీర్‌కి ఎక్కిస్తోంది"
 
 #: ../gtk/details.c:1487
 msgid "We would upload to this peer if they asked"
@@ -647,7 +647,7 @@ msgstr "మరిన్ని పీర్ల కోసం వరుసలో �
 #: ../gtk/details.c:1843
 #, c-format
 msgid "Asking for more peers now… <small>%s</small>"
-msgstr ""
+msgstr "మరిన్ని పీర్ల కోసం ఇప్పుడే అడుగు... <small>%s</small>"
 
 #: ../gtk/details.c:1853
 #, c-format
@@ -671,7 +671,7 @@ msgstr "మరిన్ని పీర్ల సంఖ్యల కోసం �
 #: ../gtk/details.c:1876
 #, c-format
 msgid "Asking for peer counts now… <small>%s</small>"
-msgstr ""
+msgstr "పీర్ లెక్కలు ఇప్పుడే అడుగు... <small>%s</small>"
 
 #: ../gtk/details.c:2146
 msgid "List contains invalid URLs"
@@ -684,7 +684,7 @@ msgstr "దయచేసి దోషాలను సరిచేసి మరల
 #: ../gtk/details.c:2201
 #, c-format
 msgid "%s - Edit Trackers"
-msgstr "%s - ట్రాకర్లను సరిచేయు"
+msgstr "%s - ట్రాకర్లను సవరించు"
 
 #: ../gtk/details.c:2211
 msgid "Tracker Announce URLs"
@@ -705,7 +705,7 @@ msgstr "%s - ట్రాకరు కలుపు"
 
 #: ../gtk/details.c:2326
 msgid "Tracker"
-msgstr "ట్రాకర్"
+msgstr "జాడకం"
 
 #: ../gtk/details.c:2332
 msgid "_Announce URL:"
@@ -713,19 +713,19 @@ msgstr "URL ప్రకటించు(_A):"
 
 #: ../gtk/details.c:2407 ../gtk/details.c:2551 ../gtk/filter.c:322
 msgid "Trackers"
-msgstr "ట్రాకర్స్"
+msgstr "జాడకాలు"
 
 #: ../gtk/details.c:2431
 msgid "_Add"
-msgstr "కలుపు(_A)"
+msgstr "జతచేయి (_A)"
 
 #: ../gtk/details.c:2442
 msgid "_Remove"
-msgstr "తొలగించు(_R)"
+msgstr "తీసివేయి (_R)"
 
 #: ../gtk/details.c:2458
 msgid "Show _backup trackers"
-msgstr "ప్రత్యామ్నాయ ట్రాకర్లను చూపించు(_b)"
+msgstr "ప్రత్యామ్నాయ జాడకాలను చూపించు(_b)"
 
 #: ../gtk/details.c:2543 ../gtk/msgwin.c:429
 msgid "Information"
@@ -784,64 +784,64 @@ msgstr[1] ""
 #: ../gtk/dialogs.c:117
 msgid "This torrent has not finished downloading."
 msgid_plural "These torrents have not finished downloading."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "ఈ టోరెంటు దింపుకోలు ఇంకా పూర్తికాలేదు."
+msgstr[1] "ఈ టోరెంట్ల దింపుకోలు ఇంకా పూర్తికాలేదు."
 
 #: ../gtk/dialogs.c:123
 msgid "This torrent is connected to peers."
 msgid_plural "These torrents are connected to peers."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "ఈ టోరెంటు పీర్లకు అనుసంధానించబడింది"
+msgstr[1] "ఈ టోరెంట్లు పీర్లకు అనుసంధానించబడ్డాయి"
 
 #: ../gtk/dialogs.c:130
 msgid "One of these torrents is connected to peers."
 msgid_plural "Some of these torrents are connected to peers."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "ఈ టోరెంట్లలో ఒకటి పీర్లకు అనుసంధానమైంది"
+msgstr[1] "ఈ టోరెంట్లలో కొన్ని పీర్లకు అనుసంధానమయ్యాయి"
 
 #: ../gtk/dialogs.c:137
 msgid "One of these torrents has not finished downloading."
 msgid_plural "Some of these torrents have not finished downloading."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "ఈ టోరెంట్లలో ఒకటి దింపుకొనుట పూర్తికాలేదు"
+msgstr[1] "ఈ టోరెంట్లలో కొన్ని దింపుకొనుట పూర్తికాలేదు"
 
-#: ../gtk/file-list.c:602 ../gtk/filter.c:347 ../gtk/util.c:465
+#: ../gtk/file-list.c:607 ../gtk/filter.c:347 ../gtk/util.c:465
 msgid "High"
-msgstr "అధిక"
+msgstr "ఎక్కువ"
 
-#: ../gtk/file-list.c:603 ../gtk/filter.c:351 ../gtk/util.c:466
+#: ../gtk/file-list.c:608 ../gtk/filter.c:351 ../gtk/util.c:466
 msgid "Normal"
-msgstr "సాధారణ"
+msgstr "సాధారణం"
 
-#: ../gtk/file-list.c:604 ../gtk/filter.c:355 ../gtk/util.c:467
+#: ../gtk/file-list.c:609 ../gtk/filter.c:355 ../gtk/util.c:467
 msgid "Low"
 msgstr "తక్కువ"
 
-#: ../gtk/file-list.c:822 ../gtk/msgwin.c:295
+#: ../gtk/file-list.c:827 ../gtk/msgwin.c:295
 msgid "Name"
 msgstr "పేరు"
 
 #. add "size" column
-#: ../gtk/file-list.c:837
+#: ../gtk/file-list.c:842
 msgid "Size"
 msgstr "పరిమాణం"
 
 #. add "progress" column
-#: ../gtk/file-list.c:852
+#: ../gtk/file-list.c:857
 msgid "Have"
-msgstr "కలిగిఉన్నది"
+msgstr "అయినది"
 
 #. add "enabled" column
-#: ../gtk/file-list.c:865
+#: ../gtk/file-list.c:870
 msgid "Download"
-msgstr "డౌన్లోడు"
+msgstr "దింపుకొను"
 
 #. add priority column
-#: ../gtk/file-list.c:881 ../gtk/filter.c:342
+#: ../gtk/file-list.c:886 ../gtk/filter.c:342
 msgid "Priority"
 msgstr "ప్రాధాన్యత"
 
-#: ../gtk/filter.c:314 ../gtk/filter.c:695
+#: ../gtk/filter.c:314 ../gtk/filter.c:696
 msgid "All"
 msgstr "అన్నీ"
 
@@ -857,68 +857,71 @@ msgstr "బహిరంగ"
 msgid "Private"
 msgstr "రహస్య"
 
-#: ../gtk/filter.c:697
+#: ../gtk/filter.c:698
 msgid "Active"
 msgstr "క్రియాశీల"
 
-#: ../gtk/filter.c:702
+#: ../gtk/filter.c:703
 msgctxt "Verb"
 msgid "Verifying"
 msgstr "సరిచూస్తోంది"
 
-#: ../gtk/filter.c:703 ../gtk/msgwin.c:428
+#: ../gtk/filter.c:704 ../gtk/msgwin.c:428
 msgid "Error"
 msgstr "దోషం"
 
 #. add the activity combobox
-#: ../gtk/filter.c:990
+#: ../gtk/filter.c:994
 msgid "_Show:"
 msgstr "చూపించు(_S):"
 
-#: ../gtk/main.c:307
+#: ../gtk/main.c:303
 #, c-format
 msgid "Error registering Transmission as x-scheme-handler/magnet handler: %s"
 msgstr ""
 
-#: ../gtk/main.c:472
+#: ../gtk/main.c:468
 #, c-format
 msgid ""
 "Got signal %d; trying to shut down cleanly. Do it again if it gets stuck."
 msgstr ""
 
-#: ../gtk/main.c:604
+#: ../gtk/main.c:596
 msgid "Where to look for configuration files"
 msgstr "కాన్ఫిగరేషన్ ఫైళ్ళ కోసం ఎక్కడ చూడాలి"
 
-#: ../gtk/main.c:605
+#: ../gtk/main.c:597
 msgid "Start with all torrents paused"
 msgstr "నిలిపివేయబడిన అన్ని టోరెంట్లతో ప్రారంభించు"
 
-#: ../gtk/main.c:606
+#: ../gtk/main.c:598
 msgid "Start minimized in notification area"
 msgstr "కనిష్టీకరించబడిన ప్రకటిత ప్రాంతంలో ప్రారంభించు"
 
-#: ../gtk/main.c:607
+#: ../gtk/main.c:599
 msgid "Show version number and exit"
 msgstr "వెర్షన్ సంఖ్యను చూపించు మరియు నిష్క్రమించు"
 
-#: ../gtk/main.c:625 ../gtk/transmission-gtk.desktop.in.h:1
+#: ../gtk/main.c:617 ../gtk/transmission-gtk.desktop.in.h:1
 msgid "Transmission"
-msgstr "ట్రాన్స్ మిషన్"
+msgstr "ట్రాన్స్‍మిషన్"
 
 #. parse the command line
-#: ../gtk/main.c:629
+#: ../gtk/main.c:621
 msgid "[torrent files or urls]"
 msgstr "[టోరెంట్ ఫైళ్ళు లేదా urls]"
 
-#: ../gtk/main.c:633
+#: ../gtk/main.c:625
 #, c-format
 msgid ""
 "%s\n"
 "Run '%s --help' to see a full list of available command line options.\n"
 msgstr ""
+"%s\n"
+"అందుబాటులో వున్న ఆదేశ వరుస ఐచ్చికముల పూర్తి జాబితా కొరకు '%s --help' "
+"నడుపండి.\n"
 
-#: ../gtk/main.c:730
+#: ../gtk/main.c:722
 msgid ""
 "Transmission is a file-sharing program. When you run a torrent, its data "
 "will be made available to others by means of upload. You and you alone are "
@@ -930,51 +933,53 @@ msgstr ""
 "ఎగుమతి.  ఈ విధంగా ఇతరులతో పంచుకున్నందుకు మీ స్థానిక చట్టాల సముచితమైన "
 "శాశ్వతమైన నిర్ణయాలకు మీరే పూర్తి భాధ్యత వహించాల్సి ఉంటుంది"
 
-#: ../gtk/main.c:732
+#: ../gtk/main.c:724
 msgid "I _Accept"
 msgstr "నేను అంగీకరిస్తున్నాను(_A)"
 
-#: ../gtk/main.c:941
+#: ../gtk/main.c:933
 msgid "<b>Closing Connections</b>"
 msgstr "<b>అనుసంధానాలు మూసివేయబడుతున్నాయి</b>"
 
-#: ../gtk/main.c:945
+#: ../gtk/main.c:937
 msgid "Sending upload/download totals to tracker…"
-msgstr ""
+msgstr "ఎక్కించిన/దింపుకున్న మొత్తాలను జాడకానికి పంపుతోంది..."
 
-#: ../gtk/main.c:950
+#: ../gtk/main.c:942
 msgid "_Quit Now"
 msgstr "ఇపుడు నిష్క్రమించు(_Q)"
 
-#: ../gtk/main.c:1008
+#: ../gtk/main.c:1000
 msgid "Couldn't add corrupt torrent"
 msgid_plural "Couldn't add corrupt torrents"
 msgstr[0] "పాడయిన ప్రవాహాన్ని చేర్చలేక పోతోంది"
 msgstr[1] "పాడయిన ప్రవాహాలను చేర్చలేక పోతోంది"
 
-#: ../gtk/main.c:1015
+#: ../gtk/main.c:1007
 msgid "Couldn't add duplicate torrent"
 msgid_plural "Couldn't add duplicate torrents"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "నకిలీ టోరెంటును జతచేయుట వీలుకాదు"
+msgstr[1] "నకిలీ టోరెంట్లను జతచేయుట వీలుకాదు"
 
-#: ../gtk/main.c:1316
+#: ../gtk/main.c:1308
 msgid "A fast and easy BitTorrent client"
 msgstr "ఒక వేగవంతమైన & సులభమైన బిట్ టోరెంట్ క్లైంట్"
 
-#: ../gtk/main.c:1317
+#: ../gtk/main.c:1309
 msgid "Copyright (c) The Transmission Project"
 msgstr "నకలుహక్కులు (c) The Transmission Project"
 
 #. Translators: translate "translator-credits" as your name
 #. to have it appear in the credits in the "About"
 #. dialog
-#: ../gtk/main.c:1323
+#: ../gtk/main.c:1315
 msgid "translator-credits"
 msgstr ""
 "Launchpad Contributions:\n"
 "  Arun Mummidi(అరుణ్ ముమ్మిడి) https://launchpad.net/~aruncn1\n"
-"  Praveen Illa https://launchpad.net/~telugulinux"
+"  Chaduvari https://launchpad.net/~sirishtummala\n"
+"  Praveen Illa https://launchpad.net/~telugulinux\n"
+"  వీవెన్ (Veeven) https://launchpad.net/~veeven"
 
 #: ../gtk/makemeta-ui.c:75
 #, c-format
@@ -1018,7 +1023,7 @@ msgstr "క్రొత్త టోరెంట్"
 
 #: ../gtk/makemeta-ui.c:183
 msgid "Creating torrent…"
-msgstr ""
+msgstr "టోరెంటును సృష్టిస్తోంది..."
 
 #: ../gtk/makemeta-ui.c:292
 msgid "No source selected"
@@ -1035,8 +1040,8 @@ msgstr[1] "%1$s; %2$'d ఫైళ్ళు"
 #, c-format
 msgid "%1$'d Piece @ %2$s"
 msgid_plural "%1$'d Pieces @ %2$s"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$'d ముక్క @ %2$s"
+msgstr[1] "%1$'d ముక్కలు @ %2$s"
 
 #: ../gtk/makemeta-ui.c:439
 msgid "Sa_ve to:"
@@ -1060,7 +1065,7 @@ msgstr "లక్షణాలు"
 
 #: ../gtk/makemeta-ui.c:475
 msgid "_Trackers:"
-msgstr "ట్రాకర్లు(_T):"
+msgstr "జాడకాలు (_T):"
 
 #: ../gtk/makemeta-ui.c:497
 msgid "Co_mment:"
@@ -1073,11 +1078,11 @@ msgstr "రహస్య టోరెంట్(_P)"
 #: ../gtk/msgwin.c:144
 #, c-format
 msgid "Couldn't save \"%s\""
-msgstr "\"%s\" దాచుట వీలుపడదు"
+msgstr "\"%s\" భద్రపరుచుట వీలుపడదు"
 
 #: ../gtk/msgwin.c:195
 msgid "Save Log"
-msgstr "నమోదును దాచు"
+msgstr "చిట్టాను భద్రపరుచు"
 
 #: ../gtk/msgwin.c:291
 msgid "Time"
@@ -1089,31 +1094,31 @@ msgstr "సందేశం"
 
 #: ../gtk/msgwin.c:430
 msgid "Debug"
-msgstr "డీబగ్"
+msgstr "దోషశోధన"
 
 #: ../gtk/msgwin.c:456
 msgid "Message Log"
-msgstr "సందేశాల నమోదు"
+msgstr "సందేశాల చిట్టా"
 
 #: ../gtk/msgwin.c:493
 msgid "Level"
 msgstr "స్థాయి"
 
-#: ../gtk/notify.c:213
+#: ../gtk/notify.c:215
 msgid "Open File"
-msgstr "పైల్ తెరుచు"
+msgstr "పైల్ తెరువు"
 
-#: ../gtk/notify.c:218
+#: ../gtk/notify.c:220
 msgid "Open Folder"
-msgstr "సంచయాన్ని తెరుచు"
+msgstr "సంచయాన్ని తెరువు"
 
-#: ../gtk/notify.c:226
+#: ../gtk/notify.c:228
 msgid "Torrent Complete"
 msgstr "టోరెంట్ పూర్తయింది"
 
-#: ../gtk/notify.c:248
+#: ../gtk/notify.c:250
 msgid "Torrent Added"
-msgstr "టోరెంట్ కలుపబడింది"
+msgstr "టోరెంట్ జతచేయబడింది"
 
 #: ../gtk/open-dialog.c:240
 msgid "Torrent files"
@@ -1142,40 +1147,40 @@ msgstr "టోరెంట్ ఫైల్(_T):"
 
 #: ../gtk/open-dialog.c:314
 msgid "Select Source File"
-msgstr "మూల ఫైల్ని ఎంచుకో"
+msgstr "మూల ఫైల్ని ఎంచుకోండి"
 
 #: ../gtk/open-dialog.c:325
 msgid "_Destination folder:"
-msgstr "గమ్య సముచ్చయం(_D)"
+msgstr "గమ్య సంచయం (_D):"
 
 #: ../gtk/open-dialog.c:329
 msgid "Select Destination Folder"
-msgstr "గమ్య సముచ్చయాన్ని ఎంచుకో"
+msgstr "గమ్య సంచయాన్ని ఎంచుకోండి"
 
 #: ../gtk/open-dialog.c:427
 msgid "Open a Torrent"
-msgstr "ఒక టోరెంట్ని తెరుచు"
+msgstr "ఒక టోరెంట్ని తెరువు"
 
 #: ../gtk/open-dialog.c:443 ../gtk/tr-prefs.c:331
 msgid "Show _options dialog"
-msgstr "ఐచ్ఛికాల డైలాగ్ చూపించు(_o)"
+msgstr "ఐచ్ఛికాల సంవాదాన్ని చూపించు (_o)"
 
-#: ../gtk/open-dialog.c:487
+#: ../gtk/open-dialog.c:492
 msgid "Open URL"
-msgstr "URL తెరుచు"
-
-#: ../gtk/open-dialog.c:500
-msgid "Open torrent from URL"
-msgstr "URL నుండి టోరెంట్ తెరుచు"
+msgstr "URL తెరువు"
 
 #: ../gtk/open-dialog.c:505
+msgid "Open torrent from URL"
+msgstr "URL నుండి టోరెంట్ తెరువు"
+
+#: ../gtk/open-dialog.c:510
 msgid "_URL"
 msgstr "URL(_U)"
 
 #: ../gtk/relocate.c:62
 #, c-format
 msgid "Moving \"%s\""
-msgstr "\"%s\"తరలించబడుతున్నది"
+msgstr "\"%s\" తరలించబడుతున్నది"
 
 #: ../gtk/relocate.c:84
 msgid "Couldn't move torrent"
@@ -1183,7 +1188,7 @@ msgstr "టోరెంట్ తరలించుట వీలుపడదు"
 
 #: ../gtk/relocate.c:125
 msgid "This may take a moment…"
-msgstr ""
+msgstr "ఇందుకు కొంత సమయం పట్టవచ్చు..."
 
 #: ../gtk/relocate.c:156 ../gtk/relocate.c:176
 msgid "Set Torrent Location"
@@ -1214,7 +1219,7 @@ msgstr[1] ""
 
 #: ../gtk/stats.c:97
 msgid "Reset your statistics?"
-msgstr "మీ గణాంకాలను పున:నిర్ణయించు?"
+msgstr "మీ గణాంకాలను తిరిగి అమర్చు?"
 
 #: ../gtk/stats.c:98
 msgid ""
@@ -1226,7 +1231,7 @@ msgstr ""
 
 #: ../gtk/stats.c:109 ../gtk/stats.c:137
 msgid "_Reset"
-msgstr "పున:నిర్ణయించు(_R)"
+msgstr "తిరిగిఅమర్చు (_R)"
 
 #: ../gtk/stats.c:134 ../gtk/tr-window.c:705
 msgid "Statistics"
@@ -1254,7 +1259,7 @@ msgstr "మొత్తం"
 #: ../gtk/torrent-cell-renderer.c:61
 #, c-format
 msgid "%1$s of %2$s (%3$s%%)"
-msgstr "%1$s కి %2$s (%3$s%%)"
+msgstr "దింపుకున్నది %1$s మొత్తం %2$s (%3$s%%)"
 
 #. %1$s is how much we've got,
 #. %2$s is the torrent's total size,
@@ -1319,11 +1324,11 @@ msgstr "%1$s %2$s"
 
 #: ../gtk/torrent-cell-renderer.c:179
 msgid "Stalled"
-msgstr ""
+msgstr "నిలిచిపోయింది"
 
 #: ../gtk/torrent-cell-renderer.c:181 ../gtk/tr-icon.c:69
 msgid "Idle"
-msgstr "వాడుక లేని"
+msgstr "వాడుకలేదు"
 
 #: ../gtk/torrent-cell-renderer.c:211
 #, c-format
@@ -1373,25 +1378,25 @@ msgstr[1] ""
 
 #: ../gtk/transmission-gtk.desktop.in.h:2
 msgid "BitTorrent Client"
-msgstr "బిట్ టోరెంట్ క్లైంట్"
+msgstr "బిట్ టోరెంట్ క్లయింటు"
 
 #: ../gtk/transmission-gtk.desktop.in.h:3
 msgid "Transmission BitTorrent Client"
-msgstr "ట్రాన్స్ మిషన్ బిట్ టోరెంట్ క్లైంట్"
+msgstr "ట్రాన్స్‍మిషన్ బిట్ టోరెంట్ క్లయింటు"
 
 #: ../gtk/transmission-gtk.desktop.in.h:4
 msgid "Download and share files over BitTorrent"
-msgstr "దిగుమతిచేయి మరియు ఫైళ్ళను బిట్ టోరెంట్ మీదుగా పంచుకో"
+msgstr "దిగుమతిచేయి మరియు ఫైళ్ళను బిట్ టోరెంట్ మీదుగా పంచుకొను"
 
 #: ../gtk/tr-core.c:1083
 #, c-format
 msgid "Couldn't read \"%s\": %s"
-msgstr ""
+msgstr "\"%s\" చదువుటు వీలుకాదు: %s"
 
 #: ../gtk/tr-core.c:1175
 #, c-format
 msgid "Skipping unknown torrent \"%s\""
-msgstr ""
+msgstr "తెలియని టోరెంటు \"%s\" ను దాటవేస్తుంది"
 
 #: ../gtk/tr-core.c:1411
 msgid "Inhibiting desktop hibernation"
@@ -1432,11 +1437,11 @@ msgstr "ఈ ప్రదేశంలో దాచుము(_L):"
 
 #: ../gtk/tr-prefs.c:275
 msgid "Queue"
-msgstr ""
+msgstr "వరుస"
 
 #: ../gtk/tr-prefs.c:277
 msgid "Maximum active _downloads:"
-msgstr ""
+msgstr "గరిష్ఠ క్రియాశీల దింపుకోళ్ళు (_d):"
 
 #: ../gtk/tr-prefs.c:281
 msgid "Downloads sharing data in the last N minutes are _active:"
@@ -1444,7 +1449,7 @@ msgstr ""
 
 #: ../gtk/tr-prefs.c:286 ../libtransmission/torrent.c:1903
 msgid "Incomplete"
-msgstr "అసంపూర్తి"
+msgstr "అసంపూర్ణం"
 
 #: ../gtk/tr-prefs.c:288
 msgid "Append \"._part\" to incomplete files' names"
@@ -1456,12 +1461,12 @@ msgstr "అసంపూర్ణ టోరెంట్లను ఇందుల�
 
 #: ../gtk/tr-prefs.c:299
 msgid "Call _script when torrent is completed:"
-msgstr ""
+msgstr "టోరెంటు పూర్తయినపుడు స్క్రిప్టును పిలువు (_s):"
 
 #: ../gtk/tr-prefs.c:325
 msgctxt "Gerund"
 msgid "Adding"
-msgstr ""
+msgstr "జతచేస్తోంది"
 
 #: ../gtk/tr-prefs.c:339
 msgid "Automatically _add torrents from:"
@@ -1470,11 +1475,11 @@ msgstr "స్వయంచాలకంగా ఇక్కడ నుండి ట
 #: ../gtk/tr-prefs.c:347
 msgctxt "Gerund"
 msgid "Seeding"
-msgstr ""
+msgstr "సీడింగు చేస్తున్నది"
 
 #: ../gtk/tr-prefs.c:349
 msgid "Stop seeding at _ratio:"
-msgstr "ఈ నిష్పత్తి వద్ద సీడింగ్ ఆపుము:(_r)"
+msgstr "ఈ నిష్పత్తి వద్ద సీడింగ్ ఆపుము (_r):"
 
 #: ../gtk/tr-prefs.c:356
 msgid "Stop seeding if idle for _N minutes:"
@@ -1482,7 +1487,7 @@ msgstr "N నిముషాలు కనుక వాడుకలో లేక�
 
 #: ../gtk/tr-prefs.c:380 ../gtk/tr-prefs.c:1296
 msgid "Desktop"
-msgstr "రంగస్థలం"
+msgstr "డెస్క్‍టాప్"
 
 #: ../gtk/tr-prefs.c:382
 msgid "_Inhibit hibernation when torrents are active"
@@ -1494,19 +1499,19 @@ msgstr "గమనికల ప్రాంతంలో ట్రాన్స్ 
 
 #: ../gtk/tr-prefs.c:391
 msgid "Notification"
-msgstr ""
+msgstr "గమనిక"
 
 #: ../gtk/tr-prefs.c:393
 msgid "Show a notification when torrents are a_dded"
-msgstr ""
+msgstr "టోరెంట్లను జతచేసినపుడు గమనికను చూపించు (_d)"
 
 #: ../gtk/tr-prefs.c:397
 msgid "Show a notification when torrents _finish"
-msgstr ""
+msgstr "టోరెంట్లు పూర్తయినపుడు గమనికను చూపించు (_f)"
 
 #: ../gtk/tr-prefs.c:401
 msgid "Play a _sound when torrents finish"
-msgstr ""
+msgstr "టోరెంట్లు పూర్తయినపుడు శబ్దాన్ని ఆడించు (_s)"
 
 #: ../gtk/tr-prefs.c:430
 #, c-format
@@ -1612,7 +1617,7 @@ msgstr "వెబ్ క్లైంటు తెరుచు(_O)"
 
 #: ../gtk/tr-prefs.c:825
 msgid "HTTP _port:"
-msgstr ""
+msgstr "HTTP పోర్టు (_p):"
 
 #. require authentication
 #: ../gtk/tr-prefs.c:829
@@ -1689,12 +1694,12 @@ msgstr "వేగ పరిమితులు"
 #: ../gtk/tr-prefs.c:1059
 #, c-format
 msgid "_Upload (%s):"
-msgstr "అప్లోడు (%s) (_U):"
+msgstr "ఎక్కింపు (%s) (_U):"
 
 #: ../gtk/tr-prefs.c:1066
 #, c-format
 msgid "_Download (%s):"
-msgstr "డౌన్లోడు (%s) (_D):"
+msgstr "దింపుకోలు (%s) (_D):"
 
 #: ../gtk/tr-prefs.c:1077
 msgid "Alternative Speed Limits"
@@ -1707,16 +1712,16 @@ msgstr ""
 #: ../gtk/tr-prefs.c:1091
 #, c-format
 msgid "U_pload (%s):"
-msgstr "అప్లోడు (%s) (_p):"
+msgstr "ఎక్కింపు (%s) (_p):"
 
 #: ../gtk/tr-prefs.c:1095
 #, c-format
 msgid "Do_wnload (%s):"
-msgstr "డౌన్లోడు (%s) (_w):"
+msgstr "దింపుకోలు (%s) (_w):"
 
 #: ../gtk/tr-prefs.c:1099
 msgid "_Scheduled times:"
-msgstr ""
+msgstr "ప్రణాళికా సమయాలు (_S):"
 
 #: ../gtk/tr-prefs.c:1104
 msgid " _to "
@@ -1740,7 +1745,7 @@ msgstr "మార్గం <b>మూసివేయబడింది</b>"
 
 #: ../gtk/tr-prefs.c:1185
 msgid "<i>Testing TCP port…</i>"
-msgstr ""
+msgstr "<i>TCP పోర్టును పరీక్షిస్తోంది…</i>"
 
 #: ../gtk/tr-prefs.c:1208
 msgid "Listening Port"
@@ -1786,7 +1791,7 @@ msgstr ""
 
 #: ../gtk/tr-prefs.c:1267
 msgid "Transmission Preferences"
-msgstr "ట్రాన్స్ మిషన్ ప్రాధాన్యతలు"
+msgstr "ట్రాన్స్‍మిషన్ ప్రాధాన్యతలు"
 
 #: ../gtk/tr-prefs.c:1281
 msgid "Torrents"
@@ -1795,15 +1800,15 @@ msgstr "టోరెంట్లు"
 #: ../gtk/tr-prefs.c:1284
 msgctxt "Gerund"
 msgid "Downloading"
-msgstr ""
+msgstr "దింపుకుంటున్నది"
 
 #: ../gtk/tr-prefs.c:1293
 msgid "Network"
-msgstr "నెట్వర్కు"
+msgstr "నెట్‌వర్క్"
 
 #: ../gtk/tr-prefs.c:1299
 msgid "Web"
-msgstr "వెబ్"
+msgstr "జాలం"
 
 #: ../gtk/tr-window.c:148
 msgid "Torrent"
@@ -1854,11 +1859,11 @@ msgstr "ఎల్లప్పటికీ సీడు చేయి"
 
 #: ../gtk/tr-window.c:528
 msgid "Limit Download Speed"
-msgstr "డౌన్లోడు వేగాన్ని పరిమితంచేయి"
+msgstr "దింపుకోలు వేగాన్ని పరిమితంచేయి"
 
 #: ../gtk/tr-window.c:532
 msgid "Limit Upload Speed"
-msgstr "అప్లోడు వేగాన్ని పరిమితంచేయి"
+msgstr "ఎక్కించు వేగాన్ని పరిమితంచేయి"
 
 #: ../gtk/tr-window.c:539
 msgid "Stop Seeding at Ratio"
@@ -1891,7 +1896,7 @@ msgstr "నిష్పత్తి: %s"
 #: ../gtk/tr-window.c:814
 #, c-format
 msgid "Down: %1$s, Up: %2$s"
-msgstr ""
+msgstr "క్రిందికి: %1$s, పైకి: %2$s"
 
 #: ../gtk/tr-window.c:825
 #, c-format
@@ -1916,37 +1921,37 @@ msgstr "టెబై"
 
 #: ../gtk/util.c:44
 msgid "kB"
-msgstr ""
+msgstr "కిబై"
 
 #: ../gtk/util.c:45
 msgid "MB"
-msgstr ""
+msgstr "మెబై"
 
 #: ../gtk/util.c:46
 msgid "GB"
-msgstr ""
+msgstr "గిబై"
 
 #: ../gtk/util.c:47
 msgid "TB"
-msgstr ""
+msgstr "టెబై"
 
 #: ../gtk/util.c:50
 msgid "kB/s"
-msgstr ""
+msgstr "కిబై/సె"
 
 #: ../gtk/util.c:51
 msgid "MB/s"
-msgstr ""
+msgstr "మెబై/సె"
 
 #: ../gtk/util.c:52
 msgid "GB/s"
-msgstr ""
+msgstr "గిబై/సె"
 
 #: ../gtk/util.c:53
 msgid "TB/s"
-msgstr ""
+msgstr "టెబై/సె"
 
-#: ../gtk/util.c:87 ../libtransmission/utils.c:1485
+#: ../gtk/util.c:87 ../libtransmission/utils.c:1487
 msgid "None"
 msgstr "ఏదీకాదు"
 
@@ -2044,7 +2049,7 @@ msgid "Couldn't save file \"%1$s\": %2$s"
 msgstr "\"%1$s\"ఫైలు దాచుటవీలుపడదు: %2$s"
 
 #: ../libtransmission/blocklist.c:86 ../libtransmission/blocklist.c:325
-#: ../libtransmission/utils.c:436
+#: ../libtransmission/utils.c:438
 #, c-format
 msgid "Couldn't read \"%1$s\": %2$s"
 msgstr "\"%1$s\" చదువుట వీలుపడదు: %2$s"
@@ -2066,7 +2071,7 @@ msgid "Blocklist \"%s\" updated with %zu entries"
 msgstr ""
 
 #: ../libtransmission/fdlimit.c:360 ../libtransmission/metainfo.c:112
-#: ../libtransmission/utils.c:568 ../libtransmission/utils.c:579
+#: ../libtransmission/utils.c:570 ../libtransmission/utils.c:581
 #, c-format
 msgid "Couldn't create \"%1$s\": %2$s"
 msgstr "\"%1$s\" ని సృష్టించుట వీలుకాదు: %2$s"
@@ -2144,7 +2149,7 @@ msgstr "%d మార్గాన్ని %s మీద నిర్భంధి�
 msgid "Couldn't bind port %d on %s: %s (%s)"
 msgstr ""
 
-#: ../libtransmission/peer-msgs.c:1893
+#: ../libtransmission/peer-msgs.c:1896
 #, c-format
 msgid "Please Verify Local Data! Piece #%zu is corrupt."
 msgstr ""
@@ -2209,6 +2214,7 @@ msgstr ""
 #: ../libtransmission/torrent.c:1661
 msgid "Restarted manually -- disabling its seed ratio"
 msgstr ""
+"మానవీయంగా పునఃప్రారంభించబడింది -- సీడింగు నిష్పత్తిని అచేతనపరుస్తోంది"
 
 #: ../libtransmission/torrent.c:1813
 msgid "Removing torrent"
@@ -2256,16 +2262,16 @@ msgstr ""
 msgid "Port forwarding successful!"
 msgstr "పోర్ట్ ఫోర్వార్దింగ్ విజయవంతం!"
 
-#: ../libtransmission/utils.c:450
+#: ../libtransmission/utils.c:452
 msgid "Not a regular file"
 msgstr "ఒక సాధారణ ఫైలు కాదు"
 
-#: ../libtransmission/utils.c:468
+#: ../libtransmission/utils.c:470
 msgid "Memory allocation failed"
 msgstr "మెమొరి కేటాయింపు విఫలమైనది"
 
 #. Node exists but isn't a folder
-#: ../libtransmission/utils.c:578
+#: ../libtransmission/utils.c:580
 #, c-format
 msgid "File \"%s\" is in the way"
 msgstr ""

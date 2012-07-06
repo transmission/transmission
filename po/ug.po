@@ -15,8 +15,8 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Launchpad-Export-Date: 2012-04-09 01:44+0000\n"
-"X-Generator: Launchpad (build 15060)\n"
+"X-Launchpad-Export-Date: 2012-07-06 01:08+0000\n"
+"X-Generator: Launchpad (build 15544)\n"
 
 #: ../gtk/actions.c:45
 msgid "Sort by _Activity"
@@ -330,7 +330,7 @@ msgstr "يەرلىك سانلىق-مەلۇماتنى تەكشۈرۈۋاتىدۇ"
 msgid "Queued for download"
 msgstr "چۈشۈرۈش ئۈچۈن قاتارغا قوشۇلدى"
 
-#: ../gtk/details.c:563 ../gtk/filter.c:698
+#: ../gtk/details.c:563 ../gtk/filter.c:699
 msgctxt "Verb"
 msgid "Downloading"
 msgstr "چۈشۈرۈۋاتىدۇ"
@@ -339,16 +339,16 @@ msgstr "چۈشۈرۈۋاتىدۇ"
 msgid "Queued for seeding"
 msgstr ""
 
-#: ../gtk/details.c:565 ../gtk/filter.c:699
+#: ../gtk/details.c:565 ../gtk/filter.c:700
 msgctxt "Verb"
 msgid "Seeding"
 msgstr ""
 
-#: ../gtk/details.c:566 ../gtk/filter.c:701 ../gtk/torrent-cell-renderer.c:198
+#: ../gtk/details.c:566 ../gtk/filter.c:702 ../gtk/torrent-cell-renderer.c:198
 msgid "Finished"
 msgstr "تاماملاندى"
 
-#: ../gtk/details.c:566 ../gtk/filter.c:700 ../gtk/torrent-cell-renderer.c:198
+#: ../gtk/details.c:566 ../gtk/filter.c:701 ../gtk/torrent-cell-renderer.c:198
 msgid "Paused"
 msgstr "ۋاقىتلىق توختىدى"
 
@@ -356,7 +356,7 @@ msgstr "ۋاقىتلىق توختىدى"
 msgid "N/A"
 msgstr "ئۇچۇر يوق"
 
-#: ../gtk/details.c:611 ../gtk/file-list.c:605
+#: ../gtk/details.c:611 ../gtk/file-list.c:610
 msgid "Mixed"
 msgstr "ئارىلاش"
 
@@ -799,43 +799,43 @@ msgid "One of these torrents has not finished downloading."
 msgid_plural "Some of these torrents have not finished downloading."
 msgstr[0] "بۇلارنىڭ بەزىلىرى تېخى تولۇق چۈشۈرۈلمىدى."
 
-#: ../gtk/file-list.c:602 ../gtk/filter.c:347 ../gtk/util.c:465
+#: ../gtk/file-list.c:607 ../gtk/filter.c:347 ../gtk/util.c:465
 msgid "High"
 msgstr "يۇقىرى"
 
-#: ../gtk/file-list.c:603 ../gtk/filter.c:351 ../gtk/util.c:466
+#: ../gtk/file-list.c:608 ../gtk/filter.c:351 ../gtk/util.c:466
 msgid "Normal"
 msgstr "نورمال"
 
-#: ../gtk/file-list.c:604 ../gtk/filter.c:355 ../gtk/util.c:467
+#: ../gtk/file-list.c:609 ../gtk/filter.c:355 ../gtk/util.c:467
 msgid "Low"
 msgstr "تۆۋەن"
 
-#: ../gtk/file-list.c:822 ../gtk/msgwin.c:295
+#: ../gtk/file-list.c:827 ../gtk/msgwin.c:295
 msgid "Name"
 msgstr "ئاتى"
 
 #. add "size" column
-#: ../gtk/file-list.c:837
+#: ../gtk/file-list.c:842
 msgid "Size"
 msgstr "چوڭلۇقى"
 
 #. add "progress" column
-#: ../gtk/file-list.c:852
+#: ../gtk/file-list.c:857
 msgid "Have"
 msgstr ""
 
 #. add "enabled" column
-#: ../gtk/file-list.c:865
+#: ../gtk/file-list.c:870
 msgid "Download"
 msgstr "چۈشۈرۈش"
 
 #. add priority column
-#: ../gtk/file-list.c:881 ../gtk/filter.c:342
+#: ../gtk/file-list.c:886 ../gtk/filter.c:342
 msgid "Priority"
 msgstr "مەرتىۋىسى"
 
-#: ../gtk/filter.c:314 ../gtk/filter.c:695
+#: ../gtk/filter.c:314 ../gtk/filter.c:696
 msgid "All"
 msgstr "ھەممىسى"
 
@@ -851,32 +851,32 @@ msgstr "ئاممىۋى"
 msgid "Private"
 msgstr "شەخسىي"
 
-#: ../gtk/filter.c:697
+#: ../gtk/filter.c:698
 msgid "Active"
 msgstr "ئاكتىپ"
 
-#: ../gtk/filter.c:702
+#: ../gtk/filter.c:703
 msgctxt "Verb"
 msgid "Verifying"
 msgstr "تەكشۈرۈۋاتىدۇ"
 
-#: ../gtk/filter.c:703 ../gtk/msgwin.c:428
+#: ../gtk/filter.c:704 ../gtk/msgwin.c:428
 msgid "Error"
 msgstr "خاتالىق"
 
 #. add the activity combobox
-#: ../gtk/filter.c:990
+#: ../gtk/filter.c:994
 msgid "_Show:"
 msgstr "كۆرسەت(_S):"
 
-#: ../gtk/main.c:307
+#: ../gtk/main.c:303
 #, c-format
 msgid "Error registering Transmission as x-scheme-handler/magnet handler: %s"
 msgstr ""
 "Transmission نى x-scheme-handler/magnet نى بىر تەرەپ قىلغۇچىسى قىلىپ "
 "خەتلىتىشتە خاتالىق كۆرۈلدى: %s"
 
-#: ../gtk/main.c:472
+#: ../gtk/main.c:468
 #, c-format
 msgid ""
 "Got signal %d; trying to shut down cleanly. Do it again if it gets stuck."
@@ -884,32 +884,32 @@ msgstr ""
 "سىگنال %d نى قوبۇل قىلدى؛ پاكىز تاقاشقا تىرىشىۋاتىدۇ. ئەگەر تۇيۇق يولغا "
 "كىرىپ قالسا، يەنە قايتا قىلىڭ."
 
-#: ../gtk/main.c:604
+#: ../gtk/main.c:596
 msgid "Where to look for configuration files"
 msgstr "سەپلىمە ھۆججەتلەرنى ئوقۇيدىغان ئورۇن"
 
-#: ../gtk/main.c:605
+#: ../gtk/main.c:597
 msgid "Start with all torrents paused"
 msgstr "توختىتىلغان بارلىق توررېنتلارنى باشلاش"
 
-#: ../gtk/main.c:606
+#: ../gtk/main.c:598
 msgid "Start minimized in notification area"
 msgstr "باشلانغاندا سىستېما ئۇقتۇرۇش رايونىدا تۇرسۇن"
 
-#: ../gtk/main.c:607
+#: ../gtk/main.c:599
 msgid "Show version number and exit"
 msgstr "نەشرىنى كۆرسىتىپ ئاخىرلاشسۇن"
 
-#: ../gtk/main.c:625 ../gtk/transmission-gtk.desktop.in.h:1
+#: ../gtk/main.c:617 ../gtk/transmission-gtk.desktop.in.h:1
 msgid "Transmission"
 msgstr "Transmission"
 
 #. parse the command line
-#: ../gtk/main.c:629
+#: ../gtk/main.c:621
 msgid "[torrent files or urls]"
 msgstr "[توررېنت ھۆججەتلىرى ياكى url لار]"
 
-#: ../gtk/main.c:633
+#: ../gtk/main.c:625
 #, c-format
 msgid ""
 "%s\n"
@@ -918,7 +918,7 @@ msgstr ""
 "%s\n"
 "'%s --help' ئىجرا قىلىپ بۇيرۇق قۇرىنىڭ تولۇق تاللانما تىزىمىنى كۆرۈڭ.\n"
 
-#: ../gtk/main.c:730
+#: ../gtk/main.c:722
 msgid ""
 "Transmission is a file-sharing program. When you run a torrent, its data "
 "will be made available to others by means of upload. You and you alone are "
@@ -930,44 +930,44 @@ msgstr ""
 "كېلىدۇ. شۇڭا سىلەر ۋە سىز چوقۇم يەرلىك قانۇنلارغا بويسۇنۇپ، مۇۋاپىق مەشغۇلات "
 "ئېلىپ بېرىشىڭىزلار كېرەك."
 
-#: ../gtk/main.c:732
+#: ../gtk/main.c:724
 msgid "I _Accept"
 msgstr "قوشۇلىمەن(_M)"
 
-#: ../gtk/main.c:941
+#: ../gtk/main.c:933
 msgid "<b>Closing Connections</b>"
 msgstr "<b>باغلىنىشلارنى يېپىۋاتىدۇ</b>"
 
-#: ../gtk/main.c:945
+#: ../gtk/main.c:937
 msgid "Sending upload/download totals to tracker…"
 msgstr ""
 
-#: ../gtk/main.c:950
+#: ../gtk/main.c:942
 msgid "_Quit Now"
 msgstr "ھازىرلا ئاخىرلاشتۇر(_Q)"
 
-#: ../gtk/main.c:1008
+#: ../gtk/main.c:1000
 msgid "Couldn't add corrupt torrent"
 msgid_plural "Couldn't add corrupt torrents"
 msgstr[0] "بۇزۇلغان توررېنتلارنى قوشقىلى بولمىدى"
 
-#: ../gtk/main.c:1015
+#: ../gtk/main.c:1007
 msgid "Couldn't add duplicate torrent"
 msgid_plural "Couldn't add duplicate torrents"
 msgstr[0] "تەكرارلانغان توررېنتلارنى قوشقىلى بولمىدى"
 
-#: ../gtk/main.c:1316
+#: ../gtk/main.c:1308
 msgid "A fast and easy BitTorrent client"
 msgstr "تېز ۋە ئىشلىتىش ئوڭاي بولغان BitTorrent خېرىدارى"
 
-#: ../gtk/main.c:1317
+#: ../gtk/main.c:1309
 msgid "Copyright (c) The Transmission Project"
 msgstr "نەشر ھوقۇقى (c) Transmission قۇرۇلۇشىغا تەۋە"
 
 #. Translators: translate "translator-credits" as your name
 #. to have it appear in the credits in the "About"
 #. dialog
-#: ../gtk/main.c:1323
+#: ../gtk/main.c:1315
 msgid "translator-credits"
 msgstr ""
 "Launchpad Contributions:\n"
@@ -1096,19 +1096,19 @@ msgstr "ئۇچۇر خاتىرىسى"
 msgid "Level"
 msgstr "دەرىجە"
 
-#: ../gtk/notify.c:213
+#: ../gtk/notify.c:215
 msgid "Open File"
 msgstr "ھۆججەت ئېچىش"
 
-#: ../gtk/notify.c:218
+#: ../gtk/notify.c:220
 msgid "Open Folder"
 msgstr "قىسقۇچ ئېچىش"
 
-#: ../gtk/notify.c:226
+#: ../gtk/notify.c:228
 msgid "Torrent Complete"
 msgstr "توررېنت تامام"
 
-#: ../gtk/notify.c:248
+#: ../gtk/notify.c:250
 msgid "Torrent Added"
 msgstr "توررېنت قوشۇلدى"
 
@@ -1157,15 +1157,15 @@ msgstr "توررېنت ئاچىدۇ"
 msgid "Show _options dialog"
 msgstr "تاللانما سۆزلەشكۈسىنى كۆرسەت(_O)"
 
-#: ../gtk/open-dialog.c:487
+#: ../gtk/open-dialog.c:492
 msgid "Open URL"
 msgstr "URL ئېچىش"
 
-#: ../gtk/open-dialog.c:500
+#: ../gtk/open-dialog.c:505
 msgid "Open torrent from URL"
 msgstr "توررېنتنى URL دىن ئاچىدۇ"
 
-#: ../gtk/open-dialog.c:505
+#: ../gtk/open-dialog.c:510
 msgid "_URL"
 msgstr "_URL"
 
@@ -1938,7 +1938,7 @@ msgstr "گىگابايت/سېكۇنت"
 msgid "TB/s"
 msgstr "تېرابايت/سېكۇنت"
 
-#: ../gtk/util.c:87 ../libtransmission/utils.c:1485
+#: ../gtk/util.c:87 ../libtransmission/utils.c:1487
 msgid "None"
 msgstr "يوق"
 
@@ -2034,7 +2034,7 @@ msgid "Couldn't save file \"%1$s\": %2$s"
 msgstr "ھۆججەت «%1$s» نى ساقلىغىلى بولمىدى: %2$s"
 
 #: ../libtransmission/blocklist.c:86 ../libtransmission/blocklist.c:325
-#: ../libtransmission/utils.c:436
+#: ../libtransmission/utils.c:438
 #, c-format
 msgid "Couldn't read \"%1$s\": %2$s"
 msgstr "ھۆججەت «%1$s» نى ئوقۇغىلى بولمىدى: %2$s"
@@ -2056,7 +2056,7 @@ msgid "Blocklist \"%s\" updated with %zu entries"
 msgstr "قارا تىزىملىك \"%s\" تە %zu تۈر يېڭىلاندى"
 
 #: ../libtransmission/fdlimit.c:360 ../libtransmission/metainfo.c:112
-#: ../libtransmission/utils.c:568 ../libtransmission/utils.c:579
+#: ../libtransmission/utils.c:570 ../libtransmission/utils.c:581
 #, c-format
 msgid "Couldn't create \"%1$s\": %2$s"
 msgstr "«%1$s» نى قۇرغىلى بولمىدى: %2$s"
@@ -2134,7 +2134,7 @@ msgstr "%d[%s] ئېغىزنى باغلىيالمايدۇ: %s"
 msgid "Couldn't bind port %d on %s: %s (%s)"
 msgstr "%d[%s] ئېغىزنى باغلىيالمايدۇ: %s (%s)"
 
-#: ../libtransmission/peer-msgs.c:1893
+#: ../libtransmission/peer-msgs.c:1896
 #, c-format
 msgid "Please Verify Local Data! Piece #%zu is corrupt."
 msgstr "يەرلىك سانلىق-مەلۇماتنى تەكشۈرۈڭ! بۆلەك #%zu بۇزۇلۇپتۇ."
@@ -2248,16 +2248,16 @@ msgstr "ئېغىزنى «%s» (مۇلازىمەت «%s») ئارقىلىق بۇ�
 msgid "Port forwarding successful!"
 msgstr "ئېغىزنى بۇراش مۇۋەپپەقىيەتلىك بولدى!"
 
-#: ../libtransmission/utils.c:450
+#: ../libtransmission/utils.c:452
 msgid "Not a regular file"
 msgstr "ئادەتتىكى ھۆججەت ئەمەس"
 
-#: ../libtransmission/utils.c:468
+#: ../libtransmission/utils.c:470
 msgid "Memory allocation failed"
 msgstr "ئەسلەك تەقسىملەش مەغلۇپ بولدى"
 
 #. Node exists but isn't a folder
-#: ../libtransmission/utils.c:578
+#: ../libtransmission/utils.c:580
 #, c-format
 msgid "File \"%s\" is in the way"
 msgstr ""

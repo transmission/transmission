@@ -16,8 +16,8 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
 "(n%100<10 || n%100>=20) ? 1 : 2;\n"
-"X-Launchpad-Export-Date: 2012-04-09 01:45+0000\n"
-"X-Generator: Launchpad (build 15060)\n"
+"X-Launchpad-Export-Date: 2012-07-06 01:09+0000\n"
+"X-Generator: Launchpad (build 15544)\n"
 "Language: lt\n"
 
 #: ../gtk/actions.c:45
@@ -332,7 +332,7 @@ msgstr "Tikrinami vietiniai duomenys"
 msgid "Queued for download"
 msgstr "Eilėje atsiuntimui"
 
-#: ../gtk/details.c:563 ../gtk/filter.c:698
+#: ../gtk/details.c:563 ../gtk/filter.c:699
 msgctxt "Verb"
 msgid "Downloading"
 msgstr "Atsiunčiama"
@@ -341,16 +341,16 @@ msgstr "Atsiunčiama"
 msgid "Queued for seeding"
 msgstr "Eilėje skleidimui"
 
-#: ../gtk/details.c:565 ../gtk/filter.c:699
+#: ../gtk/details.c:565 ../gtk/filter.c:700
 msgctxt "Verb"
 msgid "Seeding"
 msgstr "Skleidžiama"
 
-#: ../gtk/details.c:566 ../gtk/filter.c:701 ../gtk/torrent-cell-renderer.c:198
+#: ../gtk/details.c:566 ../gtk/filter.c:702 ../gtk/torrent-cell-renderer.c:198
 msgid "Finished"
 msgstr "Baigtas"
 
-#: ../gtk/details.c:566 ../gtk/filter.c:700 ../gtk/torrent-cell-renderer.c:198
+#: ../gtk/details.c:566 ../gtk/filter.c:701 ../gtk/torrent-cell-renderer.c:198
 msgid "Paused"
 msgstr "Pristabdytas"
 
@@ -358,7 +358,7 @@ msgstr "Pristabdytas"
 msgid "N/A"
 msgstr "N/D"
 
-#: ../gtk/details.c:611 ../gtk/file-list.c:605
+#: ../gtk/details.c:611 ../gtk/file-list.c:610
 msgid "Mixed"
 msgstr "įvairuoja"
 
@@ -824,43 +824,43 @@ msgstr[0] "Kai kurie šių torentų dar neatsiųsti."
 msgstr[1] "Kai kurie šių torentų dar neatsiųsti."
 msgstr[2] "Kai kurie šių torentų dar neatsiųsti."
 
-#: ../gtk/file-list.c:602 ../gtk/filter.c:347 ../gtk/util.c:465
+#: ../gtk/file-list.c:607 ../gtk/filter.c:347 ../gtk/util.c:465
 msgid "High"
 msgstr "aukštas"
 
-#: ../gtk/file-list.c:603 ../gtk/filter.c:351 ../gtk/util.c:466
+#: ../gtk/file-list.c:608 ../gtk/filter.c:351 ../gtk/util.c:466
 msgid "Normal"
 msgstr "normalus"
 
-#: ../gtk/file-list.c:604 ../gtk/filter.c:355 ../gtk/util.c:467
+#: ../gtk/file-list.c:609 ../gtk/filter.c:355 ../gtk/util.c:467
 msgid "Low"
 msgstr "žemas"
 
-#: ../gtk/file-list.c:822 ../gtk/msgwin.c:295
+#: ../gtk/file-list.c:827 ../gtk/msgwin.c:295
 msgid "Name"
 msgstr "Pavadinimas"
 
 #. add "size" column
-#: ../gtk/file-list.c:837
+#: ../gtk/file-list.c:842
 msgid "Size"
 msgstr "Dydis"
 
 #. add "progress" column
-#: ../gtk/file-list.c:852
+#: ../gtk/file-list.c:857
 msgid "Have"
 msgstr "Turima"
 
 #. add "enabled" column
-#: ../gtk/file-list.c:865
+#: ../gtk/file-list.c:870
 msgid "Download"
 msgstr "Atsiuntimas"
 
 #. add priority column
-#: ../gtk/file-list.c:881 ../gtk/filter.c:342
+#: ../gtk/file-list.c:886 ../gtk/filter.c:342
 msgid "Priority"
 msgstr "Prioritetas"
 
-#: ../gtk/filter.c:314 ../gtk/filter.c:695
+#: ../gtk/filter.c:314 ../gtk/filter.c:696
 msgid "All"
 msgstr "visus"
 
@@ -876,31 +876,31 @@ msgstr "viešas"
 msgid "Private"
 msgstr "privatus"
 
-#: ../gtk/filter.c:697
+#: ../gtk/filter.c:698
 msgid "Active"
 msgstr "aktyvius"
 
-#: ../gtk/filter.c:702
+#: ../gtk/filter.c:703
 msgctxt "Verb"
 msgid "Verifying"
 msgstr "Tikrinama"
 
-#: ../gtk/filter.c:703 ../gtk/msgwin.c:428
+#: ../gtk/filter.c:704 ../gtk/msgwin.c:428
 msgid "Error"
 msgstr "Klaida"
 
 #. add the activity combobox
-#: ../gtk/filter.c:990
+#: ../gtk/filter.c:994
 msgid "_Show:"
 msgstr "Ro_dyti:"
 
-#: ../gtk/main.c:307
+#: ../gtk/main.c:303
 #, c-format
 msgid "Error registering Transmission as x-scheme-handler/magnet handler: %s"
 msgstr ""
 "Klaida bandant susieti „Transmission“ su „x-scheme-handler/magnet“: %s"
 
-#: ../gtk/main.c:472
+#: ../gtk/main.c:468
 #, c-format
 msgid ""
 "Got signal %d; trying to shut down cleanly. Do it again if it gets stuck."
@@ -908,32 +908,32 @@ msgstr ""
 "Gautas signalas %d. Bandoma tvarkingai išjungti. Bandykite dar kartą, jei "
 "programa užstrigs."
 
-#: ../gtk/main.c:604
+#: ../gtk/main.c:596
 msgid "Where to look for configuration files"
 msgstr "Kur ieškoti konfigūracijos failų"
 
-#: ../gtk/main.c:605
+#: ../gtk/main.c:597
 msgid "Start with all torrents paused"
 msgstr "Paleisti pristabdžius visus torentus"
 
-#: ../gtk/main.c:606
+#: ../gtk/main.c:598
 msgid "Start minimized in notification area"
 msgstr "Paleisti sumažintą pranešimų srityje"
 
-#: ../gtk/main.c:607
+#: ../gtk/main.c:599
 msgid "Show version number and exit"
 msgstr "Parodyti laidos numerį ir baigti darbą"
 
-#: ../gtk/main.c:625 ../gtk/transmission-gtk.desktop.in.h:1
+#: ../gtk/main.c:617 ../gtk/transmission-gtk.desktop.in.h:1
 msgid "Transmission"
 msgstr "Transmission"
 
 #. parse the command line
-#: ../gtk/main.c:629
+#: ../gtk/main.c:621
 msgid "[torrent files or urls]"
 msgstr "[torentų failai arba URL adresai]"
 
-#: ../gtk/main.c:633
+#: ../gtk/main.c:625
 #, c-format
 msgid ""
 "%s\n"
@@ -943,7 +943,7 @@ msgstr ""
 "Paleiskite „%s --help“, jei norite susipažinti su visais galimais komandinės "
 "eilutės parametrais.\n"
 
-#: ../gtk/main.c:730
+#: ../gtk/main.c:722
 msgid ""
 "Transmission is a file-sharing program. When you run a torrent, its data "
 "will be made available to others by means of upload. You and you alone are "
@@ -955,64 +955,67 @@ msgstr ""
 "Jūs esate atsakingi už atitinkamus savo sprendimus ir vietinių įstatymų "
 "laikymąsi."
 
-#: ../gtk/main.c:732
+#: ../gtk/main.c:724
 msgid "I _Accept"
 msgstr "Aš _sutinku"
 
-#: ../gtk/main.c:941
+#: ../gtk/main.c:933
 msgid "<b>Closing Connections</b>"
 msgstr "<b>Užveriami ryšiai</b>"
 
-#: ../gtk/main.c:945
+#: ../gtk/main.c:937
 msgid "Sending upload/download totals to tracker…"
 msgstr "Siunčiamos išsiuntimo/atsiuntimo sumos sekikliui..."
 
-#: ../gtk/main.c:950
+#: ../gtk/main.c:942
 msgid "_Quit Now"
 msgstr "_Baigti darbą dabar"
 
-#: ../gtk/main.c:1008
+#: ../gtk/main.c:1000
 msgid "Couldn't add corrupt torrent"
 msgid_plural "Couldn't add corrupt torrents"
 msgstr[0] "Nepavyko pridėti sugadintų torentų"
 msgstr[1] "Nepavyko pridėti sugadintų torentų"
 msgstr[2] "Nepavyko pridėti sugadintų torentų"
 
-#: ../gtk/main.c:1015
+#: ../gtk/main.c:1007
 msgid "Couldn't add duplicate torrent"
 msgid_plural "Couldn't add duplicate torrents"
 msgstr[0] "Nepavyko pridėti besidubliuojančių torentų"
 msgstr[1] "Nepavyko pridėti besidubliuojančių torentų"
 msgstr[2] "Nepavyko pridėti besidubliuojančių torentų"
 
-#: ../gtk/main.c:1316
+#: ../gtk/main.c:1308
 msgid "A fast and easy BitTorrent client"
 msgstr "Sparti ir paprasta „BitTorrent“ klientinė programa"
 
-#: ../gtk/main.c:1317
+#: ../gtk/main.c:1309
 msgid "Copyright (c) The Transmission Project"
 msgstr "© „Transmission“ projektas"
 
 #. Translators: translate "translator-credits" as your name
 #. to have it appear in the credits in the "About"
 #. dialog
-#: ../gtk/main.c:1323
+#: ../gtk/main.c:1315
 msgid "translator-credits"
 msgstr ""
 "Žygimantas Beručka\n"
 "\n"
 "Launchpad Contributions:\n"
 "  Adomas Jackevičius https://launchpad.net/~adomas-jackevicius\n"
-"  Ignas J. https://launchpad.net/~ignas-jsl\n"
+"  Algimantas Margevičius https://launchpad.net/~gymka\n"
+"  Aurimas Fišeras https://launchpad.net/~aurimas-gmail\n"
+"  Gintautas Miliauskas https://launchpad.net/~gintas\n"
 "  Izumi https://launchpad.net/~reyfantasy\n"
 "  Julius Vitkauskas https://launchpad.net/~julius-vitkauskas\n"
+"  Mantas Kriaučiūnas https://launchpad.net/~mantas\n"
 "  Mantas Tumas https://launchpad.net/~ozarux\n"
 "  Ovidijus https://launchpad.net/~ocepukas\n"
 "  Rimas Kudelis https://launchpad.net/~rq\n"
 "  Sigitas Kalinas https://launchpad.net/~skalinas\n"
 "  Viktoras Jakovlevas https://launchpad.net/~viktoras-jakovlevas\n"
 "  Vytautas https://launchpad.net/~vytautasjc\n"
-"  netikras https://launchpad.net/~netikras"
+"  Žygimantas Beručka https://launchpad.net/~zygis"
 
 #: ../gtk/makemeta-ui.c:75
 #, c-format
@@ -1139,19 +1142,19 @@ msgstr "Pranešimų žurnalas"
 msgid "Level"
 msgstr "Lygmuo"
 
-#: ../gtk/notify.c:213
+#: ../gtk/notify.c:215
 msgid "Open File"
 msgstr "Atverti failą"
 
-#: ../gtk/notify.c:218
+#: ../gtk/notify.c:220
 msgid "Open Folder"
 msgstr "Atverti aplanką"
 
-#: ../gtk/notify.c:226
+#: ../gtk/notify.c:228
 msgid "Torrent Complete"
 msgstr "Torentas baigtas"
 
-#: ../gtk/notify.c:248
+#: ../gtk/notify.c:250
 msgid "Torrent Added"
 msgstr "Torentas pridėtas"
 
@@ -1200,15 +1203,15 @@ msgstr "Torento atvėrimas"
 msgid "Show _options dialog"
 msgstr "Rodyti _parinkčių langą"
 
-#: ../gtk/open-dialog.c:487
+#: ../gtk/open-dialog.c:492
 msgid "Open URL"
 msgstr "URL atvėrimas"
 
-#: ../gtk/open-dialog.c:500
+#: ../gtk/open-dialog.c:505
 msgid "Open torrent from URL"
 msgstr "Atverti torentą iš URL"
 
-#: ../gtk/open-dialog.c:505
+#: ../gtk/open-dialog.c:510
 msgid "_URL"
 msgstr "_URL"
 
@@ -1998,7 +2001,7 @@ msgstr "GB/s"
 msgid "TB/s"
 msgstr "TB/s"
 
-#: ../gtk/util.c:87 ../libtransmission/utils.c:1485
+#: ../gtk/util.c:87 ../libtransmission/utils.c:1487
 msgid "None"
 msgstr "nėra"
 
@@ -2102,7 +2105,7 @@ msgid "Couldn't save file \"%1$s\": %2$s"
 msgstr "Nepavyko įrašyti failo „%1$s“: %2$s"
 
 #: ../libtransmission/blocklist.c:86 ../libtransmission/blocklist.c:325
-#: ../libtransmission/utils.c:436
+#: ../libtransmission/utils.c:438
 #, c-format
 msgid "Couldn't read \"%1$s\": %2$s"
 msgstr "Nepavyko perskaityti „%1$s“: %2$s"
@@ -2124,7 +2127,7 @@ msgid "Blocklist \"%s\" updated with %zu entries"
 msgstr "Blokavimo sąrašas „%s“ papildytas %zu įrašais(-ų)"
 
 #: ../libtransmission/fdlimit.c:360 ../libtransmission/metainfo.c:112
-#: ../libtransmission/utils.c:568 ../libtransmission/utils.c:579
+#: ../libtransmission/utils.c:570 ../libtransmission/utils.c:581
 #, c-format
 msgid "Couldn't create \"%1$s\": %2$s"
 msgstr "Nepavyko sukurti „%1$s“: %2$s"
@@ -2202,7 +2205,7 @@ msgstr "Nepavyko %2$s susieti prievado %1$d: %3$s"
 msgid "Couldn't bind port %d on %s: %s (%s)"
 msgstr "Nepavyko %2$s susieti prievado %1$d: %3$s (%4$s)"
 
-#: ../libtransmission/peer-msgs.c:1893
+#: ../libtransmission/peer-msgs.c:1896
 #, c-format
 msgid "Please Verify Local Data! Piece #%zu is corrupt."
 msgstr "Patikrinkite vietinius duomenis! %zu-oji dalis yra sugadinta."
@@ -2319,16 +2322,16 @@ msgstr ""
 msgid "Port forwarding successful!"
 msgstr "Prievado persiuntimas įjungtas sėkmingai!"
 
-#: ../libtransmission/utils.c:450
+#: ../libtransmission/utils.c:452
 msgid "Not a regular file"
 msgstr "Tai nėra įprastas failas"
 
-#: ../libtransmission/utils.c:468
+#: ../libtransmission/utils.c:470
 msgid "Memory allocation failed"
 msgstr "Nepavyko rezervuoti atminties"
 
 #. Node exists but isn't a folder
-#: ../libtransmission/utils.c:578
+#: ../libtransmission/utils.c:580
 #, c-format
 msgid "File \"%s\" is in the way"
 msgstr "Operacijai trukdo failas „%s“"

@@ -16,8 +16,8 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2012-04-09 01:45+0000\n"
-"X-Generator: Launchpad (build 15060)\n"
+"X-Launchpad-Export-Date: 2012-07-06 01:09+0000\n"
+"X-Generator: Launchpad (build 15544)\n"
 
 #: ../gtk/actions.c:45
 msgid "Sort by _Activity"
@@ -331,7 +331,7 @@ msgstr "Helyi adatok ellenőrzése"
 msgid "Queued for download"
 msgstr "Sorba állítva letöltéshez"
 
-#: ../gtk/details.c:563 ../gtk/filter.c:698
+#: ../gtk/details.c:563 ../gtk/filter.c:699
 msgctxt "Verb"
 msgid "Downloading"
 msgstr "Letöltés"
@@ -340,16 +340,16 @@ msgstr "Letöltés"
 msgid "Queued for seeding"
 msgstr "Sorba állítva megosztáshoz"
 
-#: ../gtk/details.c:565 ../gtk/filter.c:699
+#: ../gtk/details.c:565 ../gtk/filter.c:700
 msgctxt "Verb"
 msgid "Seeding"
 msgstr "Megosztás"
 
-#: ../gtk/details.c:566 ../gtk/filter.c:701 ../gtk/torrent-cell-renderer.c:198
+#: ../gtk/details.c:566 ../gtk/filter.c:702 ../gtk/torrent-cell-renderer.c:198
 msgid "Finished"
 msgstr "Befejezve"
 
-#: ../gtk/details.c:566 ../gtk/filter.c:700 ../gtk/torrent-cell-renderer.c:198
+#: ../gtk/details.c:566 ../gtk/filter.c:701 ../gtk/torrent-cell-renderer.c:198
 msgid "Paused"
 msgstr "Felfüggesztett"
 
@@ -357,7 +357,7 @@ msgstr "Felfüggesztett"
 msgid "N/A"
 msgstr "Nincs adat"
 
-#: ../gtk/details.c:611 ../gtk/file-list.c:605
+#: ../gtk/details.c:611 ../gtk/file-list.c:610
 msgid "Mixed"
 msgstr "Vegyes"
 
@@ -813,43 +813,43 @@ msgid_plural "Some of these torrents have not finished downloading."
 msgstr[0] "Egy torrent letöltése még nem fejeződött be."
 msgstr[1] "Néhány torrent letöltése még nem fejeződött be."
 
-#: ../gtk/file-list.c:602 ../gtk/filter.c:347 ../gtk/util.c:465
+#: ../gtk/file-list.c:607 ../gtk/filter.c:347 ../gtk/util.c:465
 msgid "High"
 msgstr "Magas"
 
-#: ../gtk/file-list.c:603 ../gtk/filter.c:351 ../gtk/util.c:466
+#: ../gtk/file-list.c:608 ../gtk/filter.c:351 ../gtk/util.c:466
 msgid "Normal"
 msgstr "Közepes"
 
-#: ../gtk/file-list.c:604 ../gtk/filter.c:355 ../gtk/util.c:467
+#: ../gtk/file-list.c:609 ../gtk/filter.c:355 ../gtk/util.c:467
 msgid "Low"
 msgstr "Alacsony"
 
-#: ../gtk/file-list.c:822 ../gtk/msgwin.c:295
+#: ../gtk/file-list.c:827 ../gtk/msgwin.c:295
 msgid "Name"
 msgstr "Név"
 
 #. add "size" column
-#: ../gtk/file-list.c:837
+#: ../gtk/file-list.c:842
 msgid "Size"
 msgstr "Méret"
 
 #. add "progress" column
-#: ../gtk/file-list.c:852
+#: ../gtk/file-list.c:857
 msgid "Have"
 msgstr "Meglévő"
 
 #. add "enabled" column
-#: ../gtk/file-list.c:865
+#: ../gtk/file-list.c:870
 msgid "Download"
 msgstr "Letöltés"
 
 #. add priority column
-#: ../gtk/file-list.c:881 ../gtk/filter.c:342
+#: ../gtk/file-list.c:886 ../gtk/filter.c:342
 msgid "Priority"
 msgstr "Prioritás"
 
-#: ../gtk/filter.c:314 ../gtk/filter.c:695
+#: ../gtk/filter.c:314 ../gtk/filter.c:696
 msgid "All"
 msgstr "Összes"
 
@@ -865,31 +865,31 @@ msgstr "Publikus"
 msgid "Private"
 msgstr "Magánjellegű"
 
-#: ../gtk/filter.c:697
+#: ../gtk/filter.c:698
 msgid "Active"
 msgstr "Aktív"
 
-#: ../gtk/filter.c:702
+#: ../gtk/filter.c:703
 msgctxt "Verb"
 msgid "Verifying"
 msgstr "Ellenőrzés"
 
-#: ../gtk/filter.c:703 ../gtk/msgwin.c:428
+#: ../gtk/filter.c:704 ../gtk/msgwin.c:428
 msgid "Error"
 msgstr "Hiba"
 
 #. add the activity combobox
-#: ../gtk/filter.c:990
+#: ../gtk/filter.c:994
 msgid "_Show:"
 msgstr "_Megjelenítés:"
 
-#: ../gtk/main.c:307
+#: ../gtk/main.c:303
 #, c-format
 msgid "Error registering Transmission as x-scheme-handler/magnet handler: %s"
 msgstr ""
 "Hiba a Transmission regisztrálásában, mint x-scheme és mágnes link kezelő: %s"
 
-#: ../gtk/main.c:472
+#: ../gtk/main.c:468
 #, c-format
 msgid ""
 "Got signal %d; trying to shut down cleanly. Do it again if it gets stuck."
@@ -897,32 +897,32 @@ msgstr ""
 "A következő jelzés érkezett: %d. Kísérlet a leállításra, ha elakad, próbálja "
 "újra!"
 
-#: ../gtk/main.c:604
+#: ../gtk/main.c:596
 msgid "Where to look for configuration files"
 msgstr "Hol keresse a beállításfájlokat"
 
-#: ../gtk/main.c:605
+#: ../gtk/main.c:597
 msgid "Start with all torrents paused"
 msgstr "Az összes torrent indítása felfüggesztettként"
 
-#: ../gtk/main.c:606
+#: ../gtk/main.c:598
 msgid "Start minimized in notification area"
 msgstr "Az értesítési területen minimalizálva induljon"
 
-#: ../gtk/main.c:607
+#: ../gtk/main.c:599
 msgid "Show version number and exit"
 msgstr "Verziószám megjelenítése és kilépés"
 
-#: ../gtk/main.c:625 ../gtk/transmission-gtk.desktop.in.h:1
+#: ../gtk/main.c:617 ../gtk/transmission-gtk.desktop.in.h:1
 msgid "Transmission"
 msgstr "Transmission"
 
 #. parse the command line
-#: ../gtk/main.c:629
+#: ../gtk/main.c:621
 msgid "[torrent files or urls]"
 msgstr "[torrent fájl vagy url]"
 
-#: ../gtk/main.c:633
+#: ../gtk/main.c:625
 #, c-format
 msgid ""
 "%s\n"
@@ -931,7 +931,7 @@ msgstr ""
 "%s\n"
 "A parancssori kapcsolók teljes listájáért adja ki a „%s --help” parancsot.\n"
 
-#: ../gtk/main.c:730
+#: ../gtk/main.c:722
 msgid ""
 "Transmission is a file-sharing program. When you run a torrent, its data "
 "will be made available to others by means of upload. You and you alone are "
@@ -943,60 +943,80 @@ msgstr ""
 "is. Ön, és csak Ön felelős a program használatáért és a helyi törvények "
 "betartásáért."
 
-#: ../gtk/main.c:732
+#: ../gtk/main.c:724
 msgid "I _Accept"
 msgstr "_Elfogadom"
 
-#: ../gtk/main.c:941
+#: ../gtk/main.c:933
 msgid "<b>Closing Connections</b>"
 msgstr "<b>Kapcsolatok lezárása</b>"
 
-#: ../gtk/main.c:945
+#: ../gtk/main.c:937
 msgid "Sending upload/download totals to tracker…"
 msgstr "Feltöltési/letöltési értékek elküldése a követőnek…"
 
-#: ../gtk/main.c:950
+#: ../gtk/main.c:942
 msgid "_Quit Now"
 msgstr "_Kilépés most"
 
-#: ../gtk/main.c:1008
+#: ../gtk/main.c:1000
 msgid "Couldn't add corrupt torrent"
 msgid_plural "Couldn't add corrupt torrents"
 msgstr[0] "A sérült torrent hozzáadása sikertelen"
 msgstr[1] "A sérült torrentek hozzáadása sikertelen"
 
-#: ../gtk/main.c:1015
+#: ../gtk/main.c:1007
 msgid "Couldn't add duplicate torrent"
 msgid_plural "Couldn't add duplicate torrents"
 msgstr[0] "A már meglévő torrent hozzáadása sikertelen"
 msgstr[1] "A már meglévő torrentek hozzáadása sikertelen"
 
-#: ../gtk/main.c:1316
+#: ../gtk/main.c:1308
 msgid "A fast and easy BitTorrent client"
 msgstr "Gyors és egyszerű  BitTorrent kliens"
 
-#: ../gtk/main.c:1317
+#: ../gtk/main.c:1309
 msgid "Copyright (c) The Transmission Project"
 msgstr "Copyright (c) The Transmission Project"
 
 #. Translators: translate "translator-credits" as your name
 #. to have it appear in the credits in the "About"
 #. dialog
-#: ../gtk/main.c:1323
+#: ../gtk/main.c:1315
 msgid "translator-credits"
 msgstr ""
 "Kéménczy Kálmán <kkemenczy@openscope.org>\n"
 "\n"
 "Launchpad Contributions:\n"
+"  Baranyai Márk https://launchpad.net/~baranyai-mark\n"
 "  Bence Lukács https://launchpad.net/~lukacs-bence1\n"
+"  CruelAngel https://launchpad.net/~hendricha\n"
+"  Crystal https://launchpad.net/~ebence88\n"
 "  DCWM https://launchpad.net/~dcwm\n"
+"  Dr. Gráf https://launchpad.net/~dr-graf-nxt\n"
 "  Fejes Jozsef https://launchpad.net/~fejesjoco\n"
+"  Ferenc Karsany https://launchpad.net/~fkarsany\n"
+"  Freeman07 https://launchpad.net/~csatarij\n"
+"  G. U. https://launchpad.net/~gergo86\n"
+"  Gabor Kelemen https://launchpad.net/~kelemeng\n"
+"  Gergely Janossy https://launchpad.net/~marcabru\n"
+"  Incze GASPAR https://launchpad.net/~inczegaspar\n"
 "  Krasznecz Zoltán https://launchpad.net/~krasznecz-zoltan\n"
+"  Kárász Gábor https://launchpad.net/~fendrus\n"
+"  Muszela Balázs https://launchpad.net/~bazsi86-deactivatedaccount\n"
+"  Nagy.Zsolt https://launchpad.net/~nagy-zsolt-hun\n"
 "  Papp Bence https://launchpad.net/~sclegnrbs\n"
 "  Pittmann Tamás https://launchpad.net/~zaivaldi\n"
+"  Ricco https://launchpad.net/~ricco79\n"
 "  Richard Somlói https://launchpad.net/~ricsipontaz\n"
+"  Robert Roth https://launchpad.net/~evfool\n"
 "  Token https://launchpad.net/~kozmad\n"
-"  Úr Balázs https://launchpad.net/~urbalazs"
+"  Tomas Poczos https://launchpad.net/~tommii\n"
+"  TÖRÖK Attila https://launchpad.net/~torokati44\n"
+"  blaselinux https://launchpad.net/~blaselinux\n"
+"  ifj. Kálmán Tarnay https://launchpad.net/~kalmisoft\n"
+"  Úr Balázs https://launchpad.net/~urbalazs\n"
+"  Γριφεγ https://launchpad.net/~grfgguvf"
 
 #: ../gtk/makemeta-ui.c:75
 #, c-format
@@ -1121,19 +1141,19 @@ msgstr "Üzenetnapló"
 msgid "Level"
 msgstr "Szint"
 
-#: ../gtk/notify.c:213
+#: ../gtk/notify.c:215
 msgid "Open File"
 msgstr "Fájl megnyitása"
 
-#: ../gtk/notify.c:218
+#: ../gtk/notify.c:220
 msgid "Open Folder"
 msgstr "Mappa megnyitása"
 
-#: ../gtk/notify.c:226
+#: ../gtk/notify.c:228
 msgid "Torrent Complete"
 msgstr "Torrent kész"
 
-#: ../gtk/notify.c:248
+#: ../gtk/notify.c:250
 msgid "Torrent Added"
 msgstr "Torrent hozzáadva"
 
@@ -1182,15 +1202,15 @@ msgstr "Torrent megnyitása"
 msgid "Show _options dialog"
 msgstr "_Beállítások ablak megjelenítése"
 
-#: ../gtk/open-dialog.c:487
+#: ../gtk/open-dialog.c:492
 msgid "Open URL"
 msgstr "URL megnyitása"
 
-#: ../gtk/open-dialog.c:500
+#: ../gtk/open-dialog.c:505
 msgid "Open torrent from URL"
 msgstr "Torrent megnyitása URL-ről"
 
-#: ../gtk/open-dialog.c:505
+#: ../gtk/open-dialog.c:510
 msgid "_URL"
 msgstr "_URL"
 
@@ -1971,7 +1991,7 @@ msgstr "GB/s"
 msgid "TB/s"
 msgstr "TB/s"
 
-#: ../gtk/util.c:87 ../libtransmission/utils.c:1485
+#: ../gtk/util.c:87 ../libtransmission/utils.c:1487
 msgid "None"
 msgstr "Nincs"
 
@@ -2071,7 +2091,7 @@ msgid "Couldn't save file \"%1$s\": %2$s"
 msgstr "A fájl („%1$s”) nem menthető: %2$s"
 
 #: ../libtransmission/blocklist.c:86 ../libtransmission/blocklist.c:325
-#: ../libtransmission/utils.c:436
+#: ../libtransmission/utils.c:438
 #, c-format
 msgid "Couldn't read \"%1$s\": %2$s"
 msgstr "„%1$s” nem olvasható be: %2$s"
@@ -2093,7 +2113,7 @@ msgid "Blocklist \"%s\" updated with %zu entries"
 msgstr "„%s” tiltólista frissítve %zu bejegyzéssel"
 
 #: ../libtransmission/fdlimit.c:360 ../libtransmission/metainfo.c:112
-#: ../libtransmission/utils.c:568 ../libtransmission/utils.c:579
+#: ../libtransmission/utils.c:570 ../libtransmission/utils.c:581
 #, c-format
 msgid "Couldn't create \"%1$s\": %2$s"
 msgstr "„%1$s” nem hozható létre: %2$s"
@@ -2173,7 +2193,7 @@ msgstr "Nem lehet csatlakoztatni a portot (%d) ezen: %s: %s"
 msgid "Couldn't bind port %d on %s: %s (%s)"
 msgstr "Nem lehet csatlakozni %2$s %1$d portjához: %3$s (%4$s)"
 
-#: ../libtransmission/peer-msgs.c:1893
+#: ../libtransmission/peer-msgs.c:1896
 #, c-format
 msgid "Please Verify Local Data! Piece #%zu is corrupt."
 msgstr "Ellenőrizze a helyi adatot! A következő darab sérült: #%zu"
@@ -2289,16 +2309,16 @@ msgstr ""
 msgid "Port forwarding successful!"
 msgstr "A portátirányítás sikeres!"
 
-#: ../libtransmission/utils.c:450
+#: ../libtransmission/utils.c:452
 msgid "Not a regular file"
 msgstr "Nem szabályos fájl"
 
-#: ../libtransmission/utils.c:468
+#: ../libtransmission/utils.c:470
 msgid "Memory allocation failed"
 msgstr "A memóriafoglalás meghiúsult"
 
 #. Node exists but isn't a folder
-#: ../libtransmission/utils.c:578
+#: ../libtransmission/utils.c:580
 #, c-format
 msgid "File \"%s\" is in the way"
 msgstr "A(z) „%s” fájl útban van"

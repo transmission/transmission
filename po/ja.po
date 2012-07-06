@@ -15,8 +15,8 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Launchpad-Export-Date: 2012-04-09 01:45+0000\n"
-"X-Generator: Launchpad (build 15060)\n"
+"X-Launchpad-Export-Date: 2012-07-06 01:08+0000\n"
+"X-Generator: Launchpad (build 15544)\n"
 
 #: ../gtk/actions.c:45
 msgid "Sort by _Activity"
@@ -120,11 +120,11 @@ msgstr ""
 
 #: ../gtk/actions.c:104
 msgid "Open _URL…"
-msgstr ""
+msgstr "URLを開く(_U)…"
 
 #: ../gtk/actions.c:104
 msgid "Open URL…"
-msgstr ""
+msgstr "URLを開く…"
 
 #: ../gtk/actions.c:105 ../gtk/actions.c:106
 msgid "Open a torrent"
@@ -144,7 +144,7 @@ msgstr "今すぐ開始(_N)"
 
 #: ../gtk/actions.c:108
 msgid "Start torrent now"
-msgstr ""
+msgstr "torrentをすぐに開始する"
 
 #: ../gtk/actions.c:109
 msgid "_Statistics"
@@ -196,7 +196,7 @@ msgstr "ファイルの削除(_D)"
 
 #: ../gtk/actions.c:118
 msgid "_New…"
-msgstr ""
+msgstr "新規(_N)…"
 
 #: ../gtk/actions.c:118
 msgid "Create a torrent"
@@ -330,7 +330,7 @@ msgstr "ローカルデータの検証中"
 msgid "Queued for download"
 msgstr ""
 
-#: ../gtk/details.c:563 ../gtk/filter.c:698
+#: ../gtk/details.c:563 ../gtk/filter.c:699
 msgctxt "Verb"
 msgid "Downloading"
 msgstr "ダウンロード中"
@@ -339,16 +339,16 @@ msgstr "ダウンロード中"
 msgid "Queued for seeding"
 msgstr ""
 
-#: ../gtk/details.c:565 ../gtk/filter.c:699
+#: ../gtk/details.c:565 ../gtk/filter.c:700
 msgctxt "Verb"
 msgid "Seeding"
 msgstr "シード中"
 
-#: ../gtk/details.c:566 ../gtk/filter.c:701 ../gtk/torrent-cell-renderer.c:198
+#: ../gtk/details.c:566 ../gtk/filter.c:702 ../gtk/torrent-cell-renderer.c:198
 msgid "Finished"
 msgstr "終了"
 
-#: ../gtk/details.c:566 ../gtk/filter.c:700 ../gtk/torrent-cell-renderer.c:198
+#: ../gtk/details.c:566 ../gtk/filter.c:701 ../gtk/torrent-cell-renderer.c:198
 msgid "Paused"
 msgstr "一時停止"
 
@@ -356,7 +356,7 @@ msgstr "一時停止"
 msgid "N/A"
 msgstr "N/A"
 
-#: ../gtk/details.c:611 ../gtk/file-list.c:605
+#: ../gtk/details.c:611 ../gtk/file-list.c:610
 msgid "Mixed"
 msgstr "混合"
 
@@ -793,43 +793,43 @@ msgid "One of these torrents has not finished downloading."
 msgid_plural "Some of these torrents have not finished downloading."
 msgstr[0] "これらのtorrentのどれかはダウンロードが完了していません。"
 
-#: ../gtk/file-list.c:602 ../gtk/filter.c:347 ../gtk/util.c:465
+#: ../gtk/file-list.c:607 ../gtk/filter.c:347 ../gtk/util.c:465
 msgid "High"
 msgstr "高"
 
-#: ../gtk/file-list.c:603 ../gtk/filter.c:351 ../gtk/util.c:466
+#: ../gtk/file-list.c:608 ../gtk/filter.c:351 ../gtk/util.c:466
 msgid "Normal"
 msgstr "通常"
 
-#: ../gtk/file-list.c:604 ../gtk/filter.c:355 ../gtk/util.c:467
+#: ../gtk/file-list.c:609 ../gtk/filter.c:355 ../gtk/util.c:467
 msgid "Low"
 msgstr "低"
 
-#: ../gtk/file-list.c:822 ../gtk/msgwin.c:295
+#: ../gtk/file-list.c:827 ../gtk/msgwin.c:295
 msgid "Name"
 msgstr "名前"
 
 #. add "size" column
-#: ../gtk/file-list.c:837
+#: ../gtk/file-list.c:842
 msgid "Size"
 msgstr "サイズ"
 
 #. add "progress" column
-#: ../gtk/file-list.c:852
+#: ../gtk/file-list.c:857
 msgid "Have"
 msgstr "保持"
 
 #. add "enabled" column
-#: ../gtk/file-list.c:865
+#: ../gtk/file-list.c:870
 msgid "Download"
 msgstr "ダウンロード"
 
 #. add priority column
-#: ../gtk/file-list.c:881 ../gtk/filter.c:342
+#: ../gtk/file-list.c:886 ../gtk/filter.c:342
 msgid "Priority"
 msgstr "優先度"
 
-#: ../gtk/filter.c:314 ../gtk/filter.c:695
+#: ../gtk/filter.c:314 ../gtk/filter.c:696
 msgid "All"
 msgstr "全て"
 
@@ -845,68 +845,68 @@ msgstr "公開"
 msgid "Private"
 msgstr "プライベート"
 
-#: ../gtk/filter.c:697
+#: ../gtk/filter.c:698
 msgid "Active"
 msgstr "アクティブ"
 
-#: ../gtk/filter.c:702
+#: ../gtk/filter.c:703
 msgctxt "Verb"
 msgid "Verifying"
 msgstr ""
 
-#: ../gtk/filter.c:703 ../gtk/msgwin.c:428
+#: ../gtk/filter.c:704 ../gtk/msgwin.c:428
 msgid "Error"
 msgstr "エラー"
 
 #. add the activity combobox
-#: ../gtk/filter.c:990
+#: ../gtk/filter.c:994
 msgid "_Show:"
 msgstr "表示(_S):"
 
-#: ../gtk/main.c:307
+#: ../gtk/main.c:303
 #, c-format
 msgid "Error registering Transmission as x-scheme-handler/magnet handler: %s"
 msgstr ""
 
-#: ../gtk/main.c:472
+#: ../gtk/main.c:468
 #, c-format
 msgid ""
 "Got signal %d; trying to shut down cleanly. Do it again if it gets stuck."
 msgstr ""
 
-#: ../gtk/main.c:604
+#: ../gtk/main.c:596
 msgid "Where to look for configuration files"
 msgstr "探している設定ファイルの場所"
 
-#: ../gtk/main.c:605
+#: ../gtk/main.c:597
 msgid "Start with all torrents paused"
 msgstr "すべての一時停止したtorrentを再開"
 
-#: ../gtk/main.c:606
+#: ../gtk/main.c:598
 msgid "Start minimized in notification area"
 msgstr ""
 
-#: ../gtk/main.c:607
+#: ../gtk/main.c:599
 msgid "Show version number and exit"
 msgstr "バージョンを表示して終了"
 
-#: ../gtk/main.c:625 ../gtk/transmission-gtk.desktop.in.h:1
+#: ../gtk/main.c:617 ../gtk/transmission-gtk.desktop.in.h:1
 msgid "Transmission"
 msgstr "Transmission"
 
 #. parse the command line
-#: ../gtk/main.c:629
+#: ../gtk/main.c:621
 msgid "[torrent files or urls]"
 msgstr "[torrent ファイルまたは url]"
 
-#: ../gtk/main.c:633
+#: ../gtk/main.c:625
 #, c-format
 msgid ""
 "%s\n"
 "Run '%s --help' to see a full list of available command line options.\n"
 msgstr ""
 
-#: ../gtk/main.c:730
+#: ../gtk/main.c:722
 msgid ""
 "Transmission is a file-sharing program. When you run a torrent, its data "
 "will be made available to others by means of upload. You and you alone are "
@@ -916,61 +916,75 @@ msgstr ""
 "Transmissionはファイル共有プログラムです。torrentを実行する際、そのデータはアップロードで他の人に利用できるようになります。あなたやあな"
 "た自身は、適切な判断の行使とあなたの地域法を遵守することに全面的に責任があります。"
 
-#: ../gtk/main.c:732
+#: ../gtk/main.c:724
 msgid "I _Accept"
 msgstr ""
 
-#: ../gtk/main.c:941
+#: ../gtk/main.c:933
 msgid "<b>Closing Connections</b>"
 msgstr "<b>コネクション切断中</b>"
 
-#: ../gtk/main.c:945
+#: ../gtk/main.c:937
 msgid "Sending upload/download totals to tracker…"
 msgstr ""
 
-#: ../gtk/main.c:950
+#: ../gtk/main.c:942
 msgid "_Quit Now"
 msgstr "今すぐ終了(_Q)"
 
-#: ../gtk/main.c:1008
+#: ../gtk/main.c:1000
 msgid "Couldn't add corrupt torrent"
 msgid_plural "Couldn't add corrupt torrents"
 msgstr[0] "破損したtorrentは追加できません"
 
-#: ../gtk/main.c:1015
+#: ../gtk/main.c:1007
 msgid "Couldn't add duplicate torrent"
 msgid_plural "Couldn't add duplicate torrents"
 msgstr[0] "重複したtorrentは追加できません"
 
-#: ../gtk/main.c:1316
+#: ../gtk/main.c:1308
 msgid "A fast and easy BitTorrent client"
 msgstr "速くて簡単な BitTorrent クライアント"
 
-#: ../gtk/main.c:1317
+#: ../gtk/main.c:1309
 msgid "Copyright (c) The Transmission Project"
 msgstr "Copyright (c) The Transmission Project"
 
 #. Translators: translate "translator-credits" as your name
 #. to have it appear in the credits in the "About"
 #. dialog
-#: ../gtk/main.c:1323
+#: ../gtk/main.c:1315
 msgid "translator-credits"
 msgstr ""
 "Launchpad Contributions:\n"
 "  Akira Tanaka https://launchpad.net/~akira-tanaka\n"
+"  Chris Coulson https://launchpad.net/~chrisccoulson\n"
 "  Dereck Wonnacott https://launchpad.net/~dereck\n"
 "  Fumihito YOSHIDA https://launchpad.net/~hito\n"
 "  Hidehiko Tsushima https://launchpad.net/~hidehiko-betsukai\n"
 "  Hiroshi Tagawa https://launchpad.net/~kuponuga\n"
 "  ISHII Hironaga https://launchpad.net/~hinomiya-gla\n"
+"  Jun Kobayashi https://launchpad.net/~jkbys\n"
+"  Kentaro Kazuhama https://launchpad.net/~kazken3\n"
 "  Koichi Akabe https://launchpad.net/~vbkaisetsu\n"
+"  Krzysztof Klimonda https://launchpad.net/~kklimonda\n"
 "  Linux Lover https://launchpad.net/~obake\n"
 "  Makoto Kato https://launchpad.net/~makoto-kt\n"
+"  Masato HASHIMOTO https://launchpad.net/~hashimo\n"
+"  Masatoshi Haraoka https://launchpad.net/~f99aq8ove\n"
+"  Mitsuya Shibata https://launchpad.net/~cosmos-door\n"
+"  N.Nakata https://launchpad.net/~nnakata\n"
 "  OKANO Takayoshi https://launchpad.net/~kano\n"
-"  Ryunosuke Tanaka https://launchpad.net/~aozora-genei\n"
+"  Ryunosuke Tanaka https://launchpad.net/~ryunosuke-tnk\n"
 "  Shota Mihara https://launchpad.net/~amg966\n"
+"  Shushi Kurose https://launchpad.net/~kuromabo\n"
 "  Toshiharu Kudoh https://launchpad.net/~toshi-kd2\n"
-"  Tosiki Iga https://launchpad.net/~tosiki-iga"
+"  Tosiki Iga https://launchpad.net/~tosiki-iga\n"
+"  Y.Nishiwaki https://launchpad.net/~y.nishiwaki\n"
+"  Yuji Kaneko https://launchpad.net/~yujikaneko\n"
+"  afujihara https://launchpad.net/~afujihara\n"
+"  epii https://launchpad.net/~epii\n"
+"  sunatomo https://launchpad.net/~naiyu"
 
 #: ../gtk/makemeta-ui.c:75
 #, c-format
@@ -1094,19 +1108,19 @@ msgstr "メッセージ ログ"
 msgid "Level"
 msgstr "レベル"
 
-#: ../gtk/notify.c:213
+#: ../gtk/notify.c:215
 msgid "Open File"
 msgstr "ファイルを開く"
 
-#: ../gtk/notify.c:218
+#: ../gtk/notify.c:220
 msgid "Open Folder"
 msgstr "フォルダを開く"
 
-#: ../gtk/notify.c:226
+#: ../gtk/notify.c:228
 msgid "Torrent Complete"
 msgstr "完了"
 
-#: ../gtk/notify.c:248
+#: ../gtk/notify.c:250
 msgid "Torrent Added"
 msgstr "Torrent が追加されました"
 
@@ -1155,15 +1169,15 @@ msgstr "Torrent を開く"
 msgid "Show _options dialog"
 msgstr ""
 
-#: ../gtk/open-dialog.c:487
+#: ../gtk/open-dialog.c:492
 msgid "Open URL"
 msgstr "URLを開く"
 
-#: ../gtk/open-dialog.c:500
+#: ../gtk/open-dialog.c:505
 msgid "Open torrent from URL"
 msgstr "URL から Torrent を開く"
 
-#: ../gtk/open-dialog.c:505
+#: ../gtk/open-dialog.c:510
 msgid "_URL"
 msgstr "_URL"
 
@@ -1931,7 +1945,7 @@ msgstr ""
 msgid "TB/s"
 msgstr ""
 
-#: ../gtk/util.c:87 ../libtransmission/utils.c:1485
+#: ../gtk/util.c:87 ../libtransmission/utils.c:1487
 msgid "None"
 msgstr "なし"
 
@@ -2027,7 +2041,7 @@ msgid "Couldn't save file \"%1$s\": %2$s"
 msgstr "\"%1$s\" 保存失敗: %2$s"
 
 #: ../libtransmission/blocklist.c:86 ../libtransmission/blocklist.c:325
-#: ../libtransmission/utils.c:436
+#: ../libtransmission/utils.c:438
 #, c-format
 msgid "Couldn't read \"%1$s\": %2$s"
 msgstr "\"%1$s\" 読み込み失敗: %2$s"
@@ -2049,7 +2063,7 @@ msgid "Blocklist \"%s\" updated with %zu entries"
 msgstr "ブロックリスト\"%s\"の%zu個のエントリを更新しました"
 
 #: ../libtransmission/fdlimit.c:360 ../libtransmission/metainfo.c:112
-#: ../libtransmission/utils.c:568 ../libtransmission/utils.c:579
+#: ../libtransmission/utils.c:570 ../libtransmission/utils.c:581
 #, c-format
 msgid "Couldn't create \"%1$s\": %2$s"
 msgstr "\"%1$s\" 作成失敗: %2$s"
@@ -2127,7 +2141,7 @@ msgstr ""
 msgid "Couldn't bind port %d on %s: %s (%s)"
 msgstr "ポート%d、アドレス%sのbind()に失敗しました： %s (%s)"
 
-#: ../libtransmission/peer-msgs.c:1893
+#: ../libtransmission/peer-msgs.c:1896
 #, c-format
 msgid "Please Verify Local Data! Piece #%zu is corrupt."
 msgstr "ローカルデータを検証してください! ピース #%zu は破損しています。"
@@ -2239,16 +2253,16 @@ msgstr ""
 msgid "Port forwarding successful!"
 msgstr "ポートフォワーディングは成功しました!"
 
-#: ../libtransmission/utils.c:450
+#: ../libtransmission/utils.c:452
 msgid "Not a regular file"
 msgstr ""
 
-#: ../libtransmission/utils.c:468
+#: ../libtransmission/utils.c:470
 msgid "Memory allocation failed"
 msgstr "メモリ割り当てに失敗しました"
 
 #. Node exists but isn't a folder
-#: ../libtransmission/utils.c:578
+#: ../libtransmission/utils.c:580
 #, c-format
 msgid "File \"%s\" is in the way"
 msgstr ""

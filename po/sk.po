@@ -15,13 +15,13 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n==1) ? 1 : (n>=2 && n<=4) ? 2 : 0;\n"
-"X-Launchpad-Export-Date: 2012-04-09 01:44+0000\n"
-"X-Generator: Launchpad (build 15060)\n"
+"X-Launchpad-Export-Date: 2012-07-06 01:08+0000\n"
+"X-Generator: Launchpad (build 15544)\n"
 "X-Poedit-Country: SLOVAKIA\n"
 "X-Poedit-Language: Slovak\n"
 "X-Poedit-SourceCharset: utf-8\n"
 
-#: ../gtk/util.c:87 ../libtransmission/utils.c:1485
+#: ../gtk/util.c:87 ../libtransmission/utils.c:1487
 msgid "None"
 msgstr "Žiadny"
 
@@ -337,25 +337,25 @@ msgstr "Overujú sa lokálne dáta"
 msgid "Queued for download"
 msgstr "Zaradené na sťahovanie"
 
-#: ../gtk/details.c:563 ../gtk/filter.c:698
+#: ../gtk/details.c:563 ../gtk/filter.c:699
 msgctxt "Verb"
 msgid "Downloading"
-msgstr "Sťahovanie"
+msgstr "Sťahuje sa"
 
 #: ../gtk/details.c:564 ../gtk/torrent-cell-renderer.c:207
 msgid "Queued for seeding"
 msgstr "Zaradené na zdieľanie"
 
-#: ../gtk/details.c:565 ../gtk/filter.c:699
+#: ../gtk/details.c:565 ../gtk/filter.c:700
 msgctxt "Verb"
 msgid "Seeding"
-msgstr "Zdielanie"
+msgstr "Zdieľa sa"
 
-#: ../gtk/details.c:566 ../gtk/filter.c:701 ../gtk/torrent-cell-renderer.c:198
+#: ../gtk/details.c:566 ../gtk/filter.c:702 ../gtk/torrent-cell-renderer.c:198
 msgid "Finished"
 msgstr "Dokončené"
 
-#: ../gtk/details.c:566 ../gtk/filter.c:700 ../gtk/torrent-cell-renderer.c:198
+#: ../gtk/details.c:566 ../gtk/filter.c:701 ../gtk/torrent-cell-renderer.c:198
 msgid "Paused"
 msgstr "Pozastavené"
 
@@ -363,7 +363,7 @@ msgstr "Pozastavené"
 msgid "N/A"
 msgstr "-"
 
-#: ../gtk/details.c:611 ../gtk/file-list.c:605
+#: ../gtk/details.c:611 ../gtk/file-list.c:610
 msgid "Mixed"
 msgstr "Zmiešaná"
 
@@ -657,7 +657,7 @@ msgstr "Zaradený do radu na požiadanie o viac partnerov"
 #: ../gtk/details.c:1843
 #, c-format
 msgid "Asking for more peers now… <small>%s</small>"
-msgstr ""
+msgstr "Prebieha žiadanie o viac partnerov… <small>%s</small>"
 
 #: ../gtk/details.c:1853
 #, c-format
@@ -683,7 +683,7 @@ msgstr "Zaradený do radu na zistenie počtu partnerov"
 #: ../gtk/details.c:1876
 #, c-format
 msgid "Asking for peer counts now… <small>%s</small>"
-msgstr ""
+msgstr "Prebieha zisťovanie počtu partnerov… <small>%s</small>"
 
 #: ../gtk/details.c:2146
 msgid "List contains invalid URLs"
@@ -832,43 +832,43 @@ msgstr[0] "Niektoré z týchto torrentov sa ešte nestiahli."
 msgstr[1] "Jeden z týchto torrentov sa ešte nestiahol."
 msgstr[2] "Niektoré z týchto torrentov sa ešte nestiahli."
 
-#: ../gtk/file-list.c:602 ../gtk/filter.c:347 ../gtk/util.c:465
+#: ../gtk/file-list.c:607 ../gtk/filter.c:347 ../gtk/util.c:465
 msgid "High"
 msgstr "Vysoká"
 
-#: ../gtk/file-list.c:603 ../gtk/filter.c:351 ../gtk/util.c:466
+#: ../gtk/file-list.c:608 ../gtk/filter.c:351 ../gtk/util.c:466
 msgid "Normal"
 msgstr "Normálna"
 
-#: ../gtk/file-list.c:604 ../gtk/filter.c:355 ../gtk/util.c:467
+#: ../gtk/file-list.c:609 ../gtk/filter.c:355 ../gtk/util.c:467
 msgid "Low"
 msgstr "Nízka"
 
-#: ../gtk/file-list.c:822 ../gtk/msgwin.c:295
+#: ../gtk/file-list.c:827 ../gtk/msgwin.c:295
 msgid "Name"
 msgstr "Názov"
 
 #. add "size" column
-#: ../gtk/file-list.c:837
+#: ../gtk/file-list.c:842
 msgid "Size"
 msgstr "Veľkosť"
 
 #. add "progress" column
-#: ../gtk/file-list.c:852
+#: ../gtk/file-list.c:857
 msgid "Have"
 msgstr "Dokončenosť"
 
 #. add "enabled" column
-#: ../gtk/file-list.c:865
+#: ../gtk/file-list.c:870
 msgid "Download"
 msgstr "Stiahnuť"
 
 #. add priority column
-#: ../gtk/file-list.c:881 ../gtk/filter.c:342
+#: ../gtk/file-list.c:886 ../gtk/filter.c:342
 msgid "Priority"
 msgstr "Priorita"
 
-#: ../gtk/filter.c:314 ../gtk/filter.c:695
+#: ../gtk/filter.c:314 ../gtk/filter.c:696
 msgid "All"
 msgstr "Všetky"
 
@@ -884,32 +884,32 @@ msgstr "Verejné"
 msgid "Private"
 msgstr "Súkromné"
 
-#: ../gtk/filter.c:697
+#: ../gtk/filter.c:698
 msgid "Active"
 msgstr "Aktívne"
 
-#: ../gtk/filter.c:702
+#: ../gtk/filter.c:703
 msgctxt "Verb"
 msgid "Verifying"
 msgstr "Overovanie"
 
-#: ../gtk/filter.c:703 ../gtk/msgwin.c:428
+#: ../gtk/filter.c:704 ../gtk/msgwin.c:428
 msgid "Error"
 msgstr "Chybné"
 
 #. add the activity combobox
-#: ../gtk/filter.c:990
+#: ../gtk/filter.c:994
 msgid "_Show:"
 msgstr "_Zobraziť:"
 
-#: ../gtk/main.c:307
+#: ../gtk/main.c:303
 #, c-format
 msgid "Error registering Transmission as x-scheme-handler/magnet handler: %s"
 msgstr ""
 "Chyba pri registrovaní programu Transmission pre spracovanie x-scheme-"
 "handler/magnet: %s"
 
-#: ../gtk/main.c:472
+#: ../gtk/main.c:468
 #, c-format
 msgid ""
 "Got signal %d; trying to shut down cleanly. Do it again if it gets stuck."
@@ -917,32 +917,32 @@ msgstr ""
 "Program dostal signál %d; snaží sa o korektné vypnutie. Ak to uviazne, "
 "urobte to znova."
 
-#: ../gtk/main.c:604
+#: ../gtk/main.c:596
 msgid "Where to look for configuration files"
 msgstr "Kde hľadať konfiguračné súbory"
 
-#: ../gtk/main.c:605
+#: ../gtk/main.c:597
 msgid "Start with all torrents paused"
 msgstr "Spustiť s pozastavenými všetkými torrentmi"
 
-#: ../gtk/main.c:606
+#: ../gtk/main.c:598
 msgid "Start minimized in notification area"
 msgstr "Spustiť minimalizovaný v oblasti upozornení"
 
-#: ../gtk/main.c:607
+#: ../gtk/main.c:599
 msgid "Show version number and exit"
 msgstr "Zobraziť číslo verzie a skončiť"
 
-#: ../gtk/main.c:625 ../gtk/transmission-gtk.desktop.in.h:1
+#: ../gtk/main.c:617 ../gtk/transmission-gtk.desktop.in.h:1
 msgid "Transmission"
 msgstr "Transmission"
 
 #. parse the command line
-#: ../gtk/main.c:629
+#: ../gtk/main.c:621
 msgid "[torrent files or urls]"
 msgstr "[súbory s torentami alebo URL adresy]"
 
-#: ../gtk/main.c:633
+#: ../gtk/main.c:625
 #, c-format
 msgid ""
 "%s\n"
@@ -952,7 +952,7 @@ msgstr ""
 "Úplný zoznam dostupných volieb príkazového riadka zobrazíte spustením „%s --"
 "help“.\n"
 
-#: ../gtk/main.c:730
+#: ../gtk/main.c:722
 msgid ""
 "Transmission is a file-sharing program. When you run a torrent, its data "
 "will be made available to others by means of upload. You and you alone are "
@@ -963,54 +963,59 @@ msgstr ""
 "jeho dáta sprístupnené ostatným formou odosielania. Vy a len vy sami ste "
 "plne zodpovedný dodržiavanie miestnych zákonov a právnych predpisov."
 
-#: ../gtk/main.c:732
+#: ../gtk/main.c:724
 msgid "I _Accept"
 msgstr "_Súhlasím"
 
-#: ../gtk/main.c:941
+#: ../gtk/main.c:933
 msgid "<b>Closing Connections</b>"
 msgstr "<b>Ukončovanie spojení</b>"
 
-#: ../gtk/main.c:945
+#: ../gtk/main.c:937
 msgid "Sending upload/download totals to tracker…"
-msgstr ""
+msgstr "Odosielanie súčtu odosielania/sťahovania trackeru…"
 
-#: ../gtk/main.c:950
+#: ../gtk/main.c:942
 msgid "_Quit Now"
 msgstr "U_končiť ihneď"
 
-#: ../gtk/main.c:1008
+#: ../gtk/main.c:1000
 msgid "Couldn't add corrupt torrent"
 msgid_plural "Couldn't add corrupt torrents"
 msgstr[0] "Nepodarilo sa pridať poškodené torrenty"
 msgstr[1] "Nepodarilo sa pridať poškodený torrent"
 msgstr[2] "Nepodarilo sa pridať poškodené torrenty"
 
-#: ../gtk/main.c:1015
+#: ../gtk/main.c:1007
 msgid "Couldn't add duplicate torrent"
 msgid_plural "Couldn't add duplicate torrents"
 msgstr[0] "Nepodarilo sa pridať rovnaké torrenty"
 msgstr[1] "Nepodarilo sa pridať rovnaký torrent"
 msgstr[2] "Nepodarilo sa pridať rovnaké torrenty"
 
-#: ../gtk/main.c:1316
+#: ../gtk/main.c:1308
 msgid "A fast and easy BitTorrent client"
 msgstr "Rýchly a jednoduchý BitTorrent klient"
 
-#: ../gtk/main.c:1317
+#: ../gtk/main.c:1309
 msgid "Copyright (c) The Transmission Project"
 msgstr "Copyright (c) The Transmission Project"
 
 #. Translators: translate "translator-credits" as your name
 #. to have it appear in the credits in the "About"
 #. dialog
-#: ../gtk/main.c:1323
+#: ../gtk/main.c:1315
 msgid "translator-credits"
 msgstr ""
 "Launchpad Contributions:\n"
+"  6205 https://launchpad.net/~6205-reactivated-deactivatedaccount\n"
 "  Eduard Hummel https://launchpad.net/~eduardhummel\n"
+"  Krzysztof Klimonda https://launchpad.net/~kklimonda\n"
 "  Martin Šturcel https://launchpad.net/~martin-sturcel\n"
-"  Peter Júnoš https://launchpad.net/~petoju\n"
+"  Matej Krajčovič https://launchpad.net/~elbarto512\n"
+"  Milan Slovák https://launchpad.net/~milboys\n"
+"  Pavol Klačanský https://launchpad.net/~pavolzetor\n"
+"  Peter Mráz https://launchpad.net/~etki\n"
 "  Tomas Hasko https://launchpad.net/~thasko\n"
 "  helix84 https://launchpad.net/~helix84\n"
 "  mirek https://launchpad.net/~bletvaska"
@@ -1140,19 +1145,19 @@ msgstr "Záznamník"
 msgid "Level"
 msgstr "Úroveň"
 
-#: ../gtk/notify.c:213
+#: ../gtk/notify.c:215
 msgid "Open File"
 msgstr "Otvoriť súbor"
 
-#: ../gtk/notify.c:218
+#: ../gtk/notify.c:220
 msgid "Open Folder"
 msgstr "Otvoriť priečinok"
 
-#: ../gtk/notify.c:226
+#: ../gtk/notify.c:228
 msgid "Torrent Complete"
 msgstr "Torrent bol dokončený"
 
-#: ../gtk/notify.c:248
+#: ../gtk/notify.c:250
 msgid "Torrent Added"
 msgstr "Torrent pridaný"
 
@@ -1201,15 +1206,15 @@ msgstr "Otvoriť torrent"
 msgid "Show _options dialog"
 msgstr "Zobraziť okno s _voľbami"
 
-#: ../gtk/open-dialog.c:487
+#: ../gtk/open-dialog.c:492
 msgid "Open URL"
 msgstr "Otvoriť URL"
 
-#: ../gtk/open-dialog.c:500
+#: ../gtk/open-dialog.c:505
 msgid "Open torrent from URL"
 msgstr "Otvoriť torrent z URL adrsy"
 
-#: ../gtk/open-dialog.c:505
+#: ../gtk/open-dialog.c:510
 msgid "_URL"
 msgstr "_URL"
 
@@ -1484,7 +1489,7 @@ msgstr "Maximum aktívnych _sťahovaní:"
 
 #: ../gtk/tr-prefs.c:281
 msgid "Downloads sharing data in the last N minutes are _active:"
-msgstr ""
+msgstr "Sťahovania zdieľajúce dáta _aktívne posledných N minút:"
 
 #: ../gtk/tr-prefs.c:286 ../libtransmission/torrent.c:1903
 msgid "Incomplete"
@@ -1514,7 +1519,7 @@ msgstr "_Automaticky pridávať torrenty z:"
 #: ../gtk/tr-prefs.c:347
 msgctxt "Gerund"
 msgid "Seeding"
-msgstr ""
+msgstr "Zdielanie"
 
 #: ../gtk/tr-prefs.c:349
 msgid "Stop seeding at _ratio:"
@@ -1839,7 +1844,7 @@ msgstr "Torrenty"
 #: ../gtk/tr-prefs.c:1284
 msgctxt "Gerund"
 msgid "Downloading"
-msgstr ""
+msgstr "Sťahovanie"
 
 #: ../gtk/tr-prefs.c:1293
 msgid "Network"
@@ -2096,7 +2101,7 @@ msgid "Couldn't save file \"%1$s\": %2$s"
 msgstr "Nepodarilo sa uložiť súbor \"%1$s\": %2$s"
 
 #: ../libtransmission/blocklist.c:86 ../libtransmission/blocklist.c:325
-#: ../libtransmission/utils.c:436
+#: ../libtransmission/utils.c:438
 #, c-format
 msgid "Couldn't read \"%1$s\": %2$s"
 msgstr "Nepodarilo sa prečítať \"%1$s\": %2$s"
@@ -2118,7 +2123,7 @@ msgid "Blocklist \"%s\" updated with %zu entries"
 msgstr "Zoznam blokovaní \"%s\" bol aktualizovaný %zu položkami"
 
 #: ../libtransmission/fdlimit.c:360 ../libtransmission/metainfo.c:112
-#: ../libtransmission/utils.c:568 ../libtransmission/utils.c:579
+#: ../libtransmission/utils.c:570 ../libtransmission/utils.c:581
 #, c-format
 msgid "Couldn't create \"%1$s\": %2$s"
 msgstr "Nepodarilo sa vytvoriť \"%1$s\": %2$s"
@@ -2196,7 +2201,7 @@ msgstr "Nepodarilo sa naviazať port %d na %s: %s"
 msgid "Couldn't bind port %d on %s: %s (%s)"
 msgstr "Nepodarilo sa naviazať port %d na %s: %s (%s)"
 
-#: ../libtransmission/peer-msgs.c:1893
+#: ../libtransmission/peer-msgs.c:1896
 #, c-format
 msgid "Please Verify Local Data! Piece #%zu is corrupt."
 msgstr "Prosím, overte miestne dáta! Časť #%zu je poškodená."
@@ -2312,16 +2317,16 @@ msgstr ""
 msgid "Port forwarding successful!"
 msgstr "Presmerovanie portu úspešné!"
 
-#: ../libtransmission/utils.c:450
+#: ../libtransmission/utils.c:452
 msgid "Not a regular file"
 msgstr "Nie je platný súbor"
 
-#: ../libtransmission/utils.c:468
+#: ../libtransmission/utils.c:470
 msgid "Memory allocation failed"
 msgstr "Alokácia pamäte zlyhala"
 
 #. Node exists but isn't a folder
-#: ../libtransmission/utils.c:578
+#: ../libtransmission/utils.c:580
 #, c-format
 msgid "File \"%s\" is in the way"
 msgstr "Súbor \"%s\" je na ceste"

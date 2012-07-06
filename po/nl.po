@@ -15,15 +15,15 @@ msgstr ""
 "Project-Id-Version: Transmission 1.40b1 (7032)\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2012-02-03 15:22-0600\n"
-"PO-Revision-Date: 2012-01-28 12:07+0000\n"
-"Last-Translator: Benno Schulenberg <benno@vertaalt.nl>\n"
+"PO-Revision-Date: 2012-06-17 10:43+0000\n"
+"Last-Translator: Pjotr <Unknown>\n"
 "Language-Team: Ubuntu Dutch Translators\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2012-04-09 01:45+0000\n"
-"X-Generator: Launchpad (build 15060)\n"
+"X-Launchpad-Export-Date: 2012-07-06 01:09+0000\n"
+"X-Generator: Launchpad (build 15544)\n"
 
 #: ../gtk/actions.c:45
 msgid "Sort by _Activity"
@@ -337,7 +337,7 @@ msgstr "Lokale gegevens aan het verifiëren"
 msgid "Queued for download"
 msgstr "In de wachtrij gezet voor download"
 
-#: ../gtk/details.c:563 ../gtk/filter.c:698
+#: ../gtk/details.c:563 ../gtk/filter.c:699
 msgctxt "Verb"
 msgid "Downloading"
 msgstr "Aan het downloaden"
@@ -346,16 +346,16 @@ msgstr "Aan het downloaden"
 msgid "Queued for seeding"
 msgstr "In de wachtrij gezet voor seeden"
 
-#: ../gtk/details.c:565 ../gtk/filter.c:699
+#: ../gtk/details.c:565 ../gtk/filter.c:700
 msgctxt "Verb"
 msgid "Seeding"
 msgstr "Seeden"
 
-#: ../gtk/details.c:566 ../gtk/filter.c:701 ../gtk/torrent-cell-renderer.c:198
+#: ../gtk/details.c:566 ../gtk/filter.c:702 ../gtk/torrent-cell-renderer.c:198
 msgid "Finished"
 msgstr "Voltooid"
 
-#: ../gtk/details.c:566 ../gtk/filter.c:700 ../gtk/torrent-cell-renderer.c:198
+#: ../gtk/details.c:566 ../gtk/filter.c:701 ../gtk/torrent-cell-renderer.c:198
 msgid "Paused"
 msgstr "Gepauzeerd"
 
@@ -363,7 +363,7 @@ msgstr "Gepauzeerd"
 msgid "N/A"
 msgstr "n.v.t"
 
-#: ../gtk/details.c:611 ../gtk/file-list.c:605
+#: ../gtk/details.c:611 ../gtk/file-list.c:610
 msgid "Mixed"
 msgstr "Gemengd"
 
@@ -817,43 +817,43 @@ msgid_plural "Some of these torrents have not finished downloading."
 msgstr[0] "Een van deze torrents is nog niet klaar met downloaden."
 msgstr[1] "Enkele van deze torrents zijn nog niet klaar met downloaden."
 
-#: ../gtk/file-list.c:602 ../gtk/filter.c:347 ../gtk/util.c:465
+#: ../gtk/file-list.c:607 ../gtk/filter.c:347 ../gtk/util.c:465
 msgid "High"
 msgstr "Hoog"
 
-#: ../gtk/file-list.c:603 ../gtk/filter.c:351 ../gtk/util.c:466
+#: ../gtk/file-list.c:608 ../gtk/filter.c:351 ../gtk/util.c:466
 msgid "Normal"
 msgstr "Normaal"
 
-#: ../gtk/file-list.c:604 ../gtk/filter.c:355 ../gtk/util.c:467
+#: ../gtk/file-list.c:609 ../gtk/filter.c:355 ../gtk/util.c:467
 msgid "Low"
 msgstr "Laag"
 
-#: ../gtk/file-list.c:822 ../gtk/msgwin.c:295
+#: ../gtk/file-list.c:827 ../gtk/msgwin.c:295
 msgid "Name"
 msgstr "Naam"
 
 #. add "size" column
-#: ../gtk/file-list.c:837
+#: ../gtk/file-list.c:842
 msgid "Size"
 msgstr "Grootte"
 
 #. add "progress" column
-#: ../gtk/file-list.c:852
+#: ../gtk/file-list.c:857
 msgid "Have"
 msgstr "In bezit"
 
 #. add "enabled" column
-#: ../gtk/file-list.c:865
+#: ../gtk/file-list.c:870
 msgid "Download"
 msgstr "Downloaden"
 
 #. add priority column
-#: ../gtk/file-list.c:881 ../gtk/filter.c:342
+#: ../gtk/file-list.c:886 ../gtk/filter.c:342
 msgid "Priority"
 msgstr "Prioriteit"
 
-#: ../gtk/filter.c:314 ../gtk/filter.c:695
+#: ../gtk/filter.c:314 ../gtk/filter.c:696
 msgid "All"
 msgstr "Alles"
 
@@ -869,32 +869,32 @@ msgstr "Publiek"
 msgid "Private"
 msgstr "Privé"
 
-#: ../gtk/filter.c:697
+#: ../gtk/filter.c:698
 msgid "Active"
 msgstr "Actief"
 
-#: ../gtk/filter.c:702
+#: ../gtk/filter.c:703
 msgctxt "Verb"
 msgid "Verifying"
 msgstr "Aan het verifiëren"
 
-#: ../gtk/filter.c:703 ../gtk/msgwin.c:428
+#: ../gtk/filter.c:704 ../gtk/msgwin.c:428
 msgid "Error"
 msgstr "Foutmelding"
 
 #. add the activity combobox
-#: ../gtk/filter.c:990
+#: ../gtk/filter.c:994
 msgid "_Show:"
 msgstr "T_onen:"
 
-#: ../gtk/main.c:307
+#: ../gtk/main.c:303
 #, c-format
 msgid "Error registering Transmission as x-scheme-handler/magnet handler: %s"
 msgstr ""
 "Fout bij het registreren van Transmission als x-scheme-handler/magnet "
 "handler: %s"
 
-#: ../gtk/main.c:472
+#: ../gtk/main.c:468
 #, c-format
 msgid ""
 "Got signal %d; trying to shut down cleanly. Do it again if it gets stuck."
@@ -902,32 +902,32 @@ msgstr ""
 "Signaal %d binnengekregen; aan het proberen om netjes af te sluiten. Doe het "
 "nogmaals als dit niet lukt."
 
-#: ../gtk/main.c:604
+#: ../gtk/main.c:596
 msgid "Where to look for configuration files"
 msgstr "Locaties voor configuratiebestanden"
 
-#: ../gtk/main.c:605
+#: ../gtk/main.c:597
 msgid "Start with all torrents paused"
 msgstr "Starten met alle torrents gepauzeerd"
 
-#: ../gtk/main.c:606
+#: ../gtk/main.c:598
 msgid "Start minimized in notification area"
 msgstr "Geminimaliseerd in het mededelingengebied starten"
 
-#: ../gtk/main.c:607
+#: ../gtk/main.c:599
 msgid "Show version number and exit"
 msgstr "Versienummer tonen en afsluiten"
 
-#: ../gtk/main.c:625 ../gtk/transmission-gtk.desktop.in.h:1
+#: ../gtk/main.c:617 ../gtk/transmission-gtk.desktop.in.h:1
 msgid "Transmission"
 msgstr "Transmission"
 
 #. parse the command line
-#: ../gtk/main.c:629
+#: ../gtk/main.c:621
 msgid "[torrent files or urls]"
 msgstr "[torrentbestanden of url's]"
 
-#: ../gtk/main.c:633
+#: ../gtk/main.c:625
 #, c-format
 msgid ""
 "%s\n"
@@ -937,7 +937,7 @@ msgstr ""
 "Gebruik ‘%s --help’ voor een volledige lijst van beschikbare opties voor de "
 "opdrachtregel.\n"
 
-#: ../gtk/main.c:730
+#: ../gtk/main.c:722
 msgid ""
 "Transmission is a file-sharing program. When you run a torrent, its data "
 "will be made available to others by means of upload. You and you alone are "
@@ -949,46 +949,46 @@ msgstr ""
 "middels uploaden. U alleen bent ervoor verantwoordelijk dat u zich houdt aan "
 "de bij u geldende wetten."
 
-#: ../gtk/main.c:732
+#: ../gtk/main.c:724
 msgid "I _Accept"
 msgstr "Ik ga _akkoord"
 
-#: ../gtk/main.c:941
+#: ../gtk/main.c:933
 msgid "<b>Closing Connections</b>"
 msgstr "<b>Verbindingen aan het afsluiten</b>"
 
-#: ../gtk/main.c:945
+#: ../gtk/main.c:937
 msgid "Sending upload/download totals to tracker…"
 msgstr "Upload/download-totalen versturen naar tracker…"
 
-#: ../gtk/main.c:950
+#: ../gtk/main.c:942
 msgid "_Quit Now"
 msgstr "_Direct afsluiten"
 
-#: ../gtk/main.c:1008
+#: ../gtk/main.c:1000
 msgid "Couldn't add corrupt torrent"
 msgid_plural "Couldn't add corrupt torrents"
 msgstr[0] "Kon corrupte torrent niet toevoegen"
 msgstr[1] "Kon corrupte torrents niet toevoegen"
 
-#: ../gtk/main.c:1015
+#: ../gtk/main.c:1007
 msgid "Couldn't add duplicate torrent"
 msgid_plural "Couldn't add duplicate torrents"
 msgstr[0] "Kon dubbele torrent niet toevoegen"
 msgstr[1] "Kon dubbele torrents niet toevoegen"
 
-#: ../gtk/main.c:1316
+#: ../gtk/main.c:1308
 msgid "A fast and easy BitTorrent client"
 msgstr "Een simpele en snelle BitTorrent-client"
 
-#: ../gtk/main.c:1317
+#: ../gtk/main.c:1309
 msgid "Copyright (c) The Transmission Project"
 msgstr "Auteursrecht (c) Het Transmission-project"
 
 #. Translators: translate "translator-credits" as your name
 #. to have it appear in the credits in the "About"
 #. dialog
-#: ../gtk/main.c:1323
+#: ../gtk/main.c:1315
 msgid "translator-credits"
 msgstr ""
 "Jan Geboers\n"
@@ -996,18 +996,32 @@ msgstr ""
 "Maarten Van Coile\n"
 "\n"
 "Launchpad Contributions:\n"
+"  Andrew Starr-Bochicchio https://launchpad.net/~andrewsomething\n"
+"  Arien Lam https://launchpad.net/~h-a-lam\n"
 "  Arnout Lok https://launchpad.net/~arnout-lok\n"
+"  Balaam's Miracle https://launchpad.net/~balaam-balaamsmiracle\n"
 "  Benno Schulenberg https://launchpad.net/~bennoschulenberg\n"
+"  Hannie Dumoleyn https://launchpad.net/~lafeber-dumoleyn\n"
+"  Jamie Strandboge https://launchpad.net/~jdstrand\n"
+"  Jan Klopper https://launchpad.net/~janklopper-innerheight\n"
+"  Krzysztof Klimonda https://launchpad.net/~kklimonda\n"
 "  Pjotr https://launchpad.net/~a5on\n"
 "  Pjotr12345 https://launchpad.net/~computertip\n"
+"  Rachid https://launchpad.net/~rachidbm\n"
 "  Redmar https://launchpad.net/~redmar\n"
+"  Robert Ancell https://launchpad.net/~robert-ancell\n"
+"  Sander Wiering https://launchpad.net/~sanderwiering\n"
 "  Taygeto https://launchpad.net/~taygeto\n"
+"  Tim van de Kamp https://launchpad.net/~timvandekamp\n"
+"  Toorgedm https://launchpad.net/~toorgedm\n"
+"  Tralalalala https://launchpad.net/~tralalalala\n"
 "  Ward De Ridder https://launchpad.net/~warddr\n"
+"  Wouter Bolsterlee (uws) https://launchpad.net/~uws\n"
 "  Yentl https://launchpad.net/~yentlvt\n"
 "  dvdmeer https://launchpad.net/~dennis-dvdmeer\n"
+"  friendly demon https://launchpad.net/~verstraete-kenny\n"
 "  korst https://launchpad.net/~jasperkorst\n"
-"  rob https://launchpad.net/~rvdb\n"
-"  zwaardmeester https://launchpad.net/~zwaardmeester"
+"  rob https://launchpad.net/~rvdb"
 
 #: ../gtk/makemeta-ui.c:75
 #, c-format
@@ -1132,19 +1146,19 @@ msgstr "Berichtenlogboek"
 msgid "Level"
 msgstr "Niveau"
 
-#: ../gtk/notify.c:213
+#: ../gtk/notify.c:215
 msgid "Open File"
 msgstr "Bestand openen"
 
-#: ../gtk/notify.c:218
+#: ../gtk/notify.c:220
 msgid "Open Folder"
 msgstr "Map openen"
 
-#: ../gtk/notify.c:226
+#: ../gtk/notify.c:228
 msgid "Torrent Complete"
 msgstr "Torrent voltooid"
 
-#: ../gtk/notify.c:248
+#: ../gtk/notify.c:250
 msgid "Torrent Added"
 msgstr "Torrent toegevoegd"
 
@@ -1193,15 +1207,15 @@ msgstr "Een torrent openen"
 msgid "Show _options dialog"
 msgstr "_Optievenster tonen"
 
-#: ../gtk/open-dialog.c:487
+#: ../gtk/open-dialog.c:492
 msgid "Open URL"
 msgstr "URL openen"
 
-#: ../gtk/open-dialog.c:500
+#: ../gtk/open-dialog.c:505
 msgid "Open torrent from URL"
 msgstr "Torrent vanaf URL openen"
 
-#: ../gtk/open-dialog.c:505
+#: ../gtk/open-dialog.c:510
 msgid "_URL"
 msgstr "_URL"
 
@@ -1319,7 +1333,7 @@ msgstr "%1$s van %2$s (%3$s%%), opgestuurd %4$s (verhouding: %5$s)"
 #: ../gtk/torrent-cell-renderer.c:110
 #, c-format
 msgid "%1$s, uploaded %2$s (Ratio: %3$s Goal: %4$s)"
-msgstr "%1$s, geüpload %2$s (ratio: %3$s doel: %4$s)"
+msgstr "%1$s, geüpload %2$s (verhouding: %3$s doel: %4$s)"
 
 #. %1$s is the torrent's total size,
 #. %2$s is how much we've uploaded,
@@ -1327,7 +1341,7 @@ msgstr "%1$s, geüpload %2$s (ratio: %3$s doel: %4$s)"
 #: ../gtk/torrent-cell-renderer.c:122
 #, c-format
 msgid "%1$s, uploaded %2$s (Ratio: %3$s)"
-msgstr "%1$s, %2$s geüpload (ratio: %3$s)"
+msgstr "%1$s, %2$s geüpload (verhouding: %3$s)"
 
 #: ../gtk/torrent-cell-renderer.c:136
 msgid "Remaining time unknown"
@@ -1367,7 +1381,7 @@ msgstr "Bezig met verifiëren van lokale gegevens (%.1f%% getest)"
 #: ../gtk/torrent-cell-renderer.c:222
 #, c-format
 msgid "Ratio %s"
-msgstr "Ratio %s"
+msgstr "Verhouding %s"
 
 #: ../gtk/torrent-cell-renderer.c:244
 #, c-format
@@ -1987,7 +2001,7 @@ msgstr "GB/s"
 msgid "TB/s"
 msgstr "TB/s"
 
-#: ../gtk/util.c:87 ../libtransmission/utils.c:1485
+#: ../gtk/util.c:87 ../libtransmission/utils.c:1487
 msgid "None"
 msgstr "Geen"
 
@@ -2087,7 +2101,7 @@ msgid "Couldn't save file \"%1$s\": %2$s"
 msgstr "Kon bestand \"%1$s\" niet opslaan: %2$s"
 
 #: ../libtransmission/blocklist.c:86 ../libtransmission/blocklist.c:325
-#: ../libtransmission/utils.c:436
+#: ../libtransmission/utils.c:438
 #, c-format
 msgid "Couldn't read \"%1$s\": %2$s"
 msgstr "Kan \"%1$s\" niet lezen: %2$s"
@@ -2110,7 +2124,7 @@ msgstr ""
 "De lijst van geblokkeerde adressen \"%s\" is aangevuld met %zu elementen"
 
 #: ../libtransmission/fdlimit.c:360 ../libtransmission/metainfo.c:112
-#: ../libtransmission/utils.c:568 ../libtransmission/utils.c:579
+#: ../libtransmission/utils.c:570 ../libtransmission/utils.c:581
 #, c-format
 msgid "Couldn't create \"%1$s\": %2$s"
 msgstr "Kon \"%1$s\" niet aanmaken: %2$s"
@@ -2188,7 +2202,7 @@ msgstr "Kon poort %d niet koppelen op %s: %s"
 msgid "Couldn't bind port %d on %s: %s (%s)"
 msgstr "Kon poort %d niet koppelen op %s: %s (%s)"
 
-#: ../libtransmission/peer-msgs.c:1893
+#: ../libtransmission/peer-msgs.c:1896
 #, c-format
 msgid "Please Verify Local Data! Piece #%zu is corrupt."
 msgstr "Verifieer a.u.b. de lokale gegevens! Deel #%zu is corrupt."
@@ -2302,16 +2316,16 @@ msgstr "Poort doorsturen via \"%s\", dienst \"%s\". (lokaal adres: %s:%d)"
 msgid "Port forwarding successful!"
 msgstr "Poort doorsturen is geslaagd!"
 
-#: ../libtransmission/utils.c:450
+#: ../libtransmission/utils.c:452
 msgid "Not a regular file"
 msgstr "Geen normaal bestand"
 
-#: ../libtransmission/utils.c:468
+#: ../libtransmission/utils.c:470
 msgid "Memory allocation failed"
 msgstr "Geheugentoewijzing mislukt"
 
 #. Node exists but isn't a folder
-#: ../libtransmission/utils.c:578
+#: ../libtransmission/utils.c:580
 #, c-format
 msgid "File \"%s\" is in the way"
 msgstr "Bestand \"%s\" staat in de weg"

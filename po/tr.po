@@ -15,8 +15,8 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Launchpad-Export-Date: 2012-04-09 01:44+0000\n"
-"X-Generator: Launchpad (build 15060)\n"
+"X-Launchpad-Export-Date: 2012-07-06 01:08+0000\n"
+"X-Generator: Launchpad (build 15544)\n"
 
 #: ../gtk/actions.c:45
 msgid "Sort by _Activity"
@@ -330,7 +330,7 @@ msgstr "Yerel veriyi doğrula"
 msgid "Queued for download"
 msgstr "İndirme sırasına eklendi"
 
-#: ../gtk/details.c:563 ../gtk/filter.c:698
+#: ../gtk/details.c:563 ../gtk/filter.c:699
 msgctxt "Verb"
 msgid "Downloading"
 msgstr "İndiriliyor"
@@ -339,16 +339,16 @@ msgstr "İndiriliyor"
 msgid "Queued for seeding"
 msgstr "Gönderme kuyruğuna eklendi"
 
-#: ../gtk/details.c:565 ../gtk/filter.c:699
+#: ../gtk/details.c:565 ../gtk/filter.c:700
 msgctxt "Verb"
 msgid "Seeding"
 msgstr "Gönderiliyor"
 
-#: ../gtk/details.c:566 ../gtk/filter.c:701 ../gtk/torrent-cell-renderer.c:198
+#: ../gtk/details.c:566 ../gtk/filter.c:702 ../gtk/torrent-cell-renderer.c:198
 msgid "Finished"
 msgstr "Bitti"
 
-#: ../gtk/details.c:566 ../gtk/filter.c:700 ../gtk/torrent-cell-renderer.c:198
+#: ../gtk/details.c:566 ../gtk/filter.c:701 ../gtk/torrent-cell-renderer.c:198
 msgid "Paused"
 msgstr "Duraklatıldı"
 
@@ -356,7 +356,7 @@ msgstr "Duraklatıldı"
 msgid "N/A"
 msgstr "YOK"
 
-#: ../gtk/details.c:611 ../gtk/file-list.c:605
+#: ../gtk/details.c:611 ../gtk/file-list.c:610
 msgid "Mixed"
 msgstr "Karıştırılmış"
 
@@ -799,43 +799,43 @@ msgid "One of these torrents has not finished downloading."
 msgid_plural "Some of these torrents have not finished downloading."
 msgstr[0] "İndirilen torrent bulunuyor."
 
-#: ../gtk/file-list.c:602 ../gtk/filter.c:347 ../gtk/util.c:465
+#: ../gtk/file-list.c:607 ../gtk/filter.c:347 ../gtk/util.c:465
 msgid "High"
 msgstr "Yüksek"
 
-#: ../gtk/file-list.c:603 ../gtk/filter.c:351 ../gtk/util.c:466
+#: ../gtk/file-list.c:608 ../gtk/filter.c:351 ../gtk/util.c:466
 msgid "Normal"
 msgstr "Normal"
 
-#: ../gtk/file-list.c:604 ../gtk/filter.c:355 ../gtk/util.c:467
+#: ../gtk/file-list.c:609 ../gtk/filter.c:355 ../gtk/util.c:467
 msgid "Low"
 msgstr "Düşük"
 
-#: ../gtk/file-list.c:822 ../gtk/msgwin.c:295
+#: ../gtk/file-list.c:827 ../gtk/msgwin.c:295
 msgid "Name"
 msgstr "Ad"
 
 #. add "size" column
-#: ../gtk/file-list.c:837
+#: ../gtk/file-list.c:842
 msgid "Size"
 msgstr "Boyut"
 
 #. add "progress" column
-#: ../gtk/file-list.c:852
+#: ../gtk/file-list.c:857
 msgid "Have"
 msgstr "Tamamlanma"
 
 #. add "enabled" column
-#: ../gtk/file-list.c:865
+#: ../gtk/file-list.c:870
 msgid "Download"
 msgstr "İndirme"
 
 #. add priority column
-#: ../gtk/file-list.c:881 ../gtk/filter.c:342
+#: ../gtk/file-list.c:886 ../gtk/filter.c:342
 msgid "Priority"
 msgstr "Öncelik"
 
-#: ../gtk/filter.c:314 ../gtk/filter.c:695
+#: ../gtk/filter.c:314 ../gtk/filter.c:696
 msgid "All"
 msgstr "Tümü"
 
@@ -851,64 +851,64 @@ msgstr "Herkese açık"
 msgid "Private"
 msgstr "Özel"
 
-#: ../gtk/filter.c:697
+#: ../gtk/filter.c:698
 msgid "Active"
 msgstr "Etkin"
 
-#: ../gtk/filter.c:702
+#: ../gtk/filter.c:703
 msgctxt "Verb"
 msgid "Verifying"
 msgstr "Doğrulanıyor"
 
-#: ../gtk/filter.c:703 ../gtk/msgwin.c:428
+#: ../gtk/filter.c:704 ../gtk/msgwin.c:428
 msgid "Error"
 msgstr "Hata"
 
 #. add the activity combobox
-#: ../gtk/filter.c:990
+#: ../gtk/filter.c:994
 msgid "_Show:"
 msgstr "_Göster"
 
-#: ../gtk/main.c:307
+#: ../gtk/main.c:303
 #, c-format
 msgid "Error registering Transmission as x-scheme-handler/magnet handler: %s"
 msgstr ""
 "Transmission'un bir x-scheme-handler/magnet işleyicisi olarak kaydında hata: "
 "%s"
 
-#: ../gtk/main.c:472
+#: ../gtk/main.c:468
 #, c-format
 msgid ""
 "Got signal %d; trying to shut down cleanly. Do it again if it gets stuck."
 msgstr ""
 "%d sinyali alındı; düzgünce kapatmaya çalışılıyor. Takılırsa tekrar deneyin."
 
-#: ../gtk/main.c:604
+#: ../gtk/main.c:596
 msgid "Where to look for configuration files"
 msgstr "Yapılandırma dosyalarının bakılacağı yer"
 
-#: ../gtk/main.c:605
+#: ../gtk/main.c:597
 msgid "Start with all torrents paused"
 msgstr "Tüm torrentleri duraklatılmış olarak başlat"
 
-#: ../gtk/main.c:606
+#: ../gtk/main.c:598
 msgid "Start minimized in notification area"
 msgstr "Bildirim alanında küçültülmüş olarak başlat"
 
-#: ../gtk/main.c:607
+#: ../gtk/main.c:599
 msgid "Show version number and exit"
 msgstr "Sürüm numarasını göster ve çık"
 
-#: ../gtk/main.c:625 ../gtk/transmission-gtk.desktop.in.h:1
+#: ../gtk/main.c:617 ../gtk/transmission-gtk.desktop.in.h:1
 msgid "Transmission"
 msgstr "Transmission"
 
 #. parse the command line
-#: ../gtk/main.c:629
+#: ../gtk/main.c:621
 msgid "[torrent files or urls]"
 msgstr "[torrent dosyaları veya ağ adresleri]"
 
-#: ../gtk/main.c:633
+#: ../gtk/main.c:625
 #, c-format
 msgid ""
 "%s\n"
@@ -918,7 +918,7 @@ msgstr ""
 "Kullanılabilir komut satırı seçeneklerini görmek için '%s --help' komutunu "
 "çalıştırın.\n"
 
-#: ../gtk/main.c:730
+#: ../gtk/main.c:722
 msgid ""
 "Transmission is a file-sharing program. When you run a torrent, its data "
 "will be made available to others by means of upload. You and you alone are "
@@ -929,74 +929,95 @@ msgstr ""
 "veriler karşıya yükleme yoluyla herkesin erişimine açılacaktır. Uygun karar "
 "verme ve yerel yasalarınıza uyma konusunda tüm sorumluluk yalnız size aittir."
 
-#: ../gtk/main.c:732
+#: ../gtk/main.c:724
 msgid "I _Accept"
 msgstr "Kabul _Ediyorum"
 
-#: ../gtk/main.c:941
+#: ../gtk/main.c:933
 msgid "<b>Closing Connections</b>"
 msgstr "<b>Bağlantılar Kapanıyor</b>"
 
-#: ../gtk/main.c:945
+#: ../gtk/main.c:937
 msgid "Sending upload/download totals to tracker…"
 msgstr "Toplam yükleme/indirme sayısı izleyiciye gönderiliyor..."
 
-#: ../gtk/main.c:950
+#: ../gtk/main.c:942
 msgid "_Quit Now"
 msgstr "_Şimdi Çık"
 
-#: ../gtk/main.c:1008
+#: ../gtk/main.c:1000
 msgid "Couldn't add corrupt torrent"
 msgid_plural "Couldn't add corrupt torrents"
 msgstr[0] "Bozuk torrent eklenemiyor"
 
-#: ../gtk/main.c:1015
+#: ../gtk/main.c:1007
 msgid "Couldn't add duplicate torrent"
 msgid_plural "Couldn't add duplicate torrents"
 msgstr[0] "Aynı torrent eklenemiyor"
 
-#: ../gtk/main.c:1316
+#: ../gtk/main.c:1308
 msgid "A fast and easy BitTorrent client"
 msgstr "Hızlı ve kolay bir BitTorrent istemcisi"
 
-#: ../gtk/main.c:1317
+#: ../gtk/main.c:1309
 msgid "Copyright (c) The Transmission Project"
 msgstr "(c) Telif Hakkı Transmission projesine aittir."
 
 #. Translators: translate "translator-credits" as your name
 #. to have it appear in the credits in the "About"
 #. dialog
-#: ../gtk/main.c:1323
+#: ../gtk/main.c:1315
 msgid "translator-credits"
 msgstr ""
 "Can Duruk\n"
 "\n"
 "Launchpad Contributions:\n"
 "  Ali Arisoy https://launchpad.net/~aarisoy\n"
+"  Attila C. YILMAZLAR https://launchpad.net/~attilayilmazlar\n"
 "  Bugra Gokalp Okcu https://launchpad.net/~bugra\n"
-"  Can Bülbül https://launchpad.net/~a.bulbul\n"
 "  Can Kaya https://launchpad.net/~ckaya\n"
 "  Caner GÜRAL https://launchpad.net/~canergural\n"
 "  Charles Kerr https://launchpad.net/~charlesk\n"
+"  Chris Coulson https://launchpad.net/~chrisccoulson\n"
+"  Cihan Ersoy https://launchpad.net/~cihan.ersoy\n"
+"  Emre Ayca https://launchpad.net/~anatolica\n"
+"  Engin BAHADIR https://launchpad.net/~enginbah\n"
+"  EsatYuce https://launchpad.net/~esat\n"
+"  Fatih Bostancı https://launchpad.net/~fbostanci\n"
+"  Fatih Dayioglu https://launchpad.net/~fthd\n"
 "  Fatih Emre https://launchpad.net/~fatihemreoner\n"
 "  Gökhan KILINÇ https://launchpad.net/~kilincgokhan\n"
+"  Hakan Altindas https://launchpad.net/~hakanaltindas\n"
 "  Hasan Tayyar BEŞİK https://launchpad.net/~hasantayyar\n"
 "  Hasan Yılmaz https://launchpad.net/~hasanyilmaz\n"
+"  Hew McLachlan https://launchpad.net/~hew\n"
 "  Holy Penguin https://launchpad.net/~holypenguin\n"
 "  Irfan Durmus https://launchpad.net/~irfandurmus\n"
 "  Irmak Bıçakçıgil https://launchpad.net/~irmak\n"
 "  Jamie Strandboge https://launchpad.net/~jdstrand\n"
 "  Kadir Yucel https://launchpad.net/~atomkarinca\n"
 "  Koray Kalmaz https://launchpad.net/~vanwarantion\n"
-"  Mehmet Altan Pire https://launchpad.net/~zippidi\n"
+"  Krzysztof Klimonda https://launchpad.net/~kklimonda\n"
+"  Meric Kutyar Gul https://launchpad.net/~meric\n"
 "  Mert Bozkurt https://launchpad.net/~aquacultural\n"
 "  Muhammed YÜRÜRDURMAZ https://launchpad.net/~myururdurmaz\n"
 "  Muhammet Kara https://launchpad.net/~muhammet-k\n"
 "  Mustafa Yılmaz https://launchpad.net/~apshalasha\n"
+"  Ongun Kanat https://launchpad.net/~ongun-kanat\n"
 "  Osman Tosun https://launchpad.net/~rainman-neu\n"
+"  Pheadrus https://launchpad.net/~atalaykendir\n"
+"  Selim Sercan Suerkan https://launchpad.net/~mokoko\n"
 "  Such https://launchpad.net/~cancerus\n"
+"  Yigit Güneli https://launchpad.net/~yiit\n"
+"  Yiğit Ateş https://launchpad.net/~yigitates52\n"
 "  Yusuf ÜLKÜ https://launchpad.net/~yusufulku\n"
 "  alp eren özalp https://launchpad.net/~alperenoz93\n"
+"  aylincan https://launchpad.net/~sevencan83\n"
+"  ertankan https://launchpad.net/~tosss-beee\n"
+"  ggokcay https://launchpad.net/~ggokcay\n"
+"  rayyildiz https://launchpad.net/~rayyildiz\n"
+"  ubuntuki https://launchpad.net/~aleverzurumlu\n"
+"  webdr https://launchpad.net/~drumut\n"
 "  Şâkir Aşçı https://launchpad.net/~sakirasci"
 
 #: ../gtk/makemeta-ui.c:75
@@ -1120,19 +1141,19 @@ msgstr "İleti Kayıtları"
 msgid "Level"
 msgstr "Seviye"
 
-#: ../gtk/notify.c:213
+#: ../gtk/notify.c:215
 msgid "Open File"
 msgstr "Dosya Aç"
 
-#: ../gtk/notify.c:218
+#: ../gtk/notify.c:220
 msgid "Open Folder"
 msgstr "Dizin Aç"
 
-#: ../gtk/notify.c:226
+#: ../gtk/notify.c:228
 msgid "Torrent Complete"
 msgstr "Torrent Tamamlandı"
 
-#: ../gtk/notify.c:248
+#: ../gtk/notify.c:250
 msgid "Torrent Added"
 msgstr "Torrent Eklendi"
 
@@ -1181,15 +1202,15 @@ msgstr "Torrent Aç"
 msgid "Show _options dialog"
 msgstr "_Özellikler iletişim kutusunu göster"
 
-#: ../gtk/open-dialog.c:487
+#: ../gtk/open-dialog.c:492
 msgid "Open URL"
 msgstr "Adresi aç"
 
-#: ../gtk/open-dialog.c:500
+#: ../gtk/open-dialog.c:505
 msgid "Open torrent from URL"
 msgstr "URL'den torrent aç"
 
-#: ../gtk/open-dialog.c:505
+#: ../gtk/open-dialog.c:510
 msgid "_URL"
 msgstr "_Web Adresi"
 
@@ -1961,7 +1982,7 @@ msgstr "GB/sn"
 msgid "TB/s"
 msgstr "TB/sn"
 
-#: ../gtk/util.c:87 ../libtransmission/utils.c:1485
+#: ../gtk/util.c:87 ../libtransmission/utils.c:1487
 msgid "None"
 msgstr "Hiçbiri"
 
@@ -2057,7 +2078,7 @@ msgid "Couldn't save file \"%1$s\": %2$s"
 msgstr "Dosya kaydedilemedi \"%1$s\": %2$s"
 
 #: ../libtransmission/blocklist.c:86 ../libtransmission/blocklist.c:325
-#: ../libtransmission/utils.c:436
+#: ../libtransmission/utils.c:438
 #, c-format
 msgid "Couldn't read \"%1$s\": %2$s"
 msgstr "Okunamadı, \"%1$s\": %2$s"
@@ -2080,7 +2101,7 @@ msgid "Blocklist \"%s\" updated with %zu entries"
 msgstr "\"%s\" engelleme listesi %zu öğe ile güncellendi"
 
 #: ../libtransmission/fdlimit.c:360 ../libtransmission/metainfo.c:112
-#: ../libtransmission/utils.c:568 ../libtransmission/utils.c:579
+#: ../libtransmission/utils.c:570 ../libtransmission/utils.c:581
 #, c-format
 msgid "Couldn't create \"%1$s\": %2$s"
 msgstr "Oluşturulamadı, \"%1$s\": %2$s"
@@ -2158,7 +2179,7 @@ msgstr "%d bağlantı noktası %s: %s üzerine bağlanamadı"
 msgid "Couldn't bind port %d on %s: %s (%s)"
 msgstr "%d bağlantı noktası %s üzerine bağlanamaz: %s (%s)"
 
-#: ../libtransmission/peer-msgs.c:1893
+#: ../libtransmission/peer-msgs.c:1896
 #, c-format
 msgid "Please Verify Local Data! Piece #%zu is corrupt."
 msgstr "Lütfen Yerel Veriyi Doğrulayın! #%zu parçası bozuk."
@@ -2274,16 +2295,16 @@ msgstr "\"%s\" portu üzerinden, \"%s\" servisi. (yerel adres: %s:%d)"
 msgid "Port forwarding successful!"
 msgstr "Bağlantı noktası yönlendirme başarılı!"
 
-#: ../libtransmission/utils.c:450
+#: ../libtransmission/utils.c:452
 msgid "Not a regular file"
 msgstr "Düzenli bir dosya değil"
 
-#: ../libtransmission/utils.c:468
+#: ../libtransmission/utils.c:470
 msgid "Memory allocation failed"
 msgstr "Bellek tahsisi başarısız"
 
 #. Node exists but isn't a folder
-#: ../libtransmission/utils.c:578
+#: ../libtransmission/utils.c:580
 #, c-format
 msgid "File \"%s\" is in the way"
 msgstr "Dosya \"%s\" yol üstünde bulunuyor"

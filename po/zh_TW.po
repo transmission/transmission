@@ -15,8 +15,8 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Launchpad-Export-Date: 2012-04-09 01:44+0000\n"
-"X-Generator: Launchpad (build 15060)\n"
+"X-Launchpad-Export-Date: 2012-07-06 01:08+0000\n"
+"X-Generator: Launchpad (build 15544)\n"
 "X-Poedit-Bookmarks: 131,-1,-1,-1,-1,-1,-1,-1,-1,-1\n"
 
 #: ../gtk/actions.c:45
@@ -331,7 +331,7 @@ msgstr "正在驗證本地資料"
 msgid "Queued for download"
 msgstr "佇列等候下載"
 
-#: ../gtk/details.c:563 ../gtk/filter.c:698
+#: ../gtk/details.c:563 ../gtk/filter.c:699
 msgctxt "Verb"
 msgid "Downloading"
 msgstr "正在下載"
@@ -340,16 +340,16 @@ msgstr "正在下載"
 msgid "Queued for seeding"
 msgstr "佇列等候播種"
 
-#: ../gtk/details.c:565 ../gtk/filter.c:699
+#: ../gtk/details.c:565 ../gtk/filter.c:700
 msgctxt "Verb"
 msgid "Seeding"
 msgstr "正在播種"
 
-#: ../gtk/details.c:566 ../gtk/filter.c:701 ../gtk/torrent-cell-renderer.c:198
+#: ../gtk/details.c:566 ../gtk/filter.c:702 ../gtk/torrent-cell-renderer.c:198
 msgid "Finished"
 msgstr "已完成"
 
-#: ../gtk/details.c:566 ../gtk/filter.c:700 ../gtk/torrent-cell-renderer.c:198
+#: ../gtk/details.c:566 ../gtk/filter.c:701 ../gtk/torrent-cell-renderer.c:198
 msgid "Paused"
 msgstr "已暫停"
 
@@ -357,7 +357,7 @@ msgstr "已暫停"
 msgid "N/A"
 msgstr "不明"
 
-#: ../gtk/details.c:611 ../gtk/file-list.c:605
+#: ../gtk/details.c:611 ../gtk/file-list.c:610
 msgid "Mixed"
 msgstr "混合"
 
@@ -796,43 +796,43 @@ msgid "One of these torrents has not finished downloading."
 msgid_plural "Some of these torrents have not finished downloading."
 msgstr[0] "這些 torrent 其中有些已經完成下載。"
 
-#: ../gtk/file-list.c:602 ../gtk/filter.c:347 ../gtk/util.c:465
+#: ../gtk/file-list.c:607 ../gtk/filter.c:347 ../gtk/util.c:465
 msgid "High"
 msgstr "高"
 
-#: ../gtk/file-list.c:603 ../gtk/filter.c:351 ../gtk/util.c:466
+#: ../gtk/file-list.c:608 ../gtk/filter.c:351 ../gtk/util.c:466
 msgid "Normal"
 msgstr "中"
 
-#: ../gtk/file-list.c:604 ../gtk/filter.c:355 ../gtk/util.c:467
+#: ../gtk/file-list.c:609 ../gtk/filter.c:355 ../gtk/util.c:467
 msgid "Low"
 msgstr "低"
 
-#: ../gtk/file-list.c:822 ../gtk/msgwin.c:295
+#: ../gtk/file-list.c:827 ../gtk/msgwin.c:295
 msgid "Name"
 msgstr "檔名"
 
 #. add "size" column
-#: ../gtk/file-list.c:837
+#: ../gtk/file-list.c:842
 msgid "Size"
 msgstr "大小"
 
 #. add "progress" column
-#: ../gtk/file-list.c:852
+#: ../gtk/file-list.c:857
 msgid "Have"
 msgstr "已有"
 
 #. add "enabled" column
-#: ../gtk/file-list.c:865
+#: ../gtk/file-list.c:870
 msgid "Download"
 msgstr "下載"
 
 #. add priority column
-#: ../gtk/file-list.c:881 ../gtk/filter.c:342
+#: ../gtk/file-list.c:886 ../gtk/filter.c:342
 msgid "Priority"
 msgstr "優先序"
 
-#: ../gtk/filter.c:314 ../gtk/filter.c:695
+#: ../gtk/filter.c:314 ../gtk/filter.c:696
 msgid "All"
 msgstr "全部"
 
@@ -848,61 +848,61 @@ msgstr "公眾"
 msgid "Private"
 msgstr "私人"
 
-#: ../gtk/filter.c:697
+#: ../gtk/filter.c:698
 msgid "Active"
 msgstr "活動中"
 
-#: ../gtk/filter.c:702
+#: ../gtk/filter.c:703
 msgctxt "Verb"
 msgid "Verifying"
 msgstr "正在驗證"
 
-#: ../gtk/filter.c:703 ../gtk/msgwin.c:428
+#: ../gtk/filter.c:704 ../gtk/msgwin.c:428
 msgid "Error"
 msgstr "錯誤"
 
 #. add the activity combobox
-#: ../gtk/filter.c:990
+#: ../gtk/filter.c:994
 msgid "_Show:"
 msgstr "顯示(_S)："
 
-#: ../gtk/main.c:307
+#: ../gtk/main.c:303
 #, c-format
 msgid "Error registering Transmission as x-scheme-handler/magnet handler: %s"
 msgstr "註冊 Transmission 為 x-scheme-handler/magnet 處理程式時發生錯誤：%s"
 
-#: ../gtk/main.c:472
+#: ../gtk/main.c:468
 #, c-format
 msgid ""
 "Got signal %d; trying to shut down cleanly. Do it again if it gets stuck."
 msgstr "已取得訊號 %d；正嘗試乾淨地關閉。若中途停滯請再做一次。"
 
-#: ../gtk/main.c:604
+#: ../gtk/main.c:596
 msgid "Where to look for configuration files"
 msgstr "在哪裡找設定檔"
 
-#: ../gtk/main.c:605
+#: ../gtk/main.c:597
 msgid "Start with all torrents paused"
 msgstr "啟動時暫停所有 Torrent"
 
-#: ../gtk/main.c:606
+#: ../gtk/main.c:598
 msgid "Start minimized in notification area"
 msgstr "以最小化到通知區域啟動"
 
-#: ../gtk/main.c:607
+#: ../gtk/main.c:599
 msgid "Show version number and exit"
 msgstr "顯示版本號碼並離開"
 
-#: ../gtk/main.c:625 ../gtk/transmission-gtk.desktop.in.h:1
+#: ../gtk/main.c:617 ../gtk/transmission-gtk.desktop.in.h:1
 msgid "Transmission"
 msgstr "Transmission"
 
 #. parse the command line
-#: ../gtk/main.c:629
+#: ../gtk/main.c:621
 msgid "[torrent files or urls]"
 msgstr "[torrent 檔或是網址]"
 
-#: ../gtk/main.c:633
+#: ../gtk/main.c:625
 #, c-format
 msgid ""
 "%s\n"
@@ -911,7 +911,7 @@ msgstr ""
 "%s\n"
 "執行 「%s --help」以查看完整的命令列可用選項清單。\n"
 
-#: ../gtk/main.c:730
+#: ../gtk/main.c:722
 msgid ""
 "Transmission is a file-sharing program. When you run a torrent, its data "
 "will be made available to others by means of upload. You and you alone are "
@@ -921,60 +921,67 @@ msgstr ""
 "Transmission 是個檔案分享程式。每當您執行 torrent "
 "檔案時，其資料會透過上傳的方式讓其他人取得。您與您自身必須對行使正確判斷、遵守當地法律這兩點負起完全責任。"
 
-#: ../gtk/main.c:732
+#: ../gtk/main.c:724
 msgid "I _Accept"
 msgstr "我接受(_A)"
 
-#: ../gtk/main.c:941
+#: ../gtk/main.c:933
 msgid "<b>Closing Connections</b>"
 msgstr "<b>關閉連線</b>"
 
-#: ../gtk/main.c:945
+#: ../gtk/main.c:937
 msgid "Sending upload/download totals to tracker…"
 msgstr "正在傳送上傳/下載總量至追蹤器..."
 
-#: ../gtk/main.c:950
+#: ../gtk/main.c:942
 msgid "_Quit Now"
 msgstr "現在離開 (_Q)"
 
-#: ../gtk/main.c:1008
+#: ../gtk/main.c:1000
 msgid "Couldn't add corrupt torrent"
 msgid_plural "Couldn't add corrupt torrents"
 msgstr[0] "無法新增已損壞的 torrent"
 
-#: ../gtk/main.c:1015
+#: ../gtk/main.c:1007
 msgid "Couldn't add duplicate torrent"
 msgid_plural "Couldn't add duplicate torrents"
 msgstr[0] "無法新增重複的 torrent"
 
-#: ../gtk/main.c:1316
+#: ../gtk/main.c:1308
 msgid "A fast and easy BitTorrent client"
 msgstr "一個快速簡單的 BitTorrent 用戶端"
 
-#: ../gtk/main.c:1317
+#: ../gtk/main.c:1309
 msgid "Copyright (c) The Transmission Project"
 msgstr "版權所有 (c) Transmission 專案"
 
 #. Translators: translate "translator-credits" as your name
 #. to have it appear in the credits in the "About"
 #. dialog
-#: ../gtk/main.c:1323
+#: ../gtk/main.c:1315
 msgid "translator-credits"
 msgstr ""
 "Launchpad Contributions:\n"
 "  Andrew Liu https://launchpad.net/~andrewliu33\n"
+"  Andrew Starr-Bochicchio https://launchpad.net/~andrewsomething\n"
 "  Cheng-Chia Tseng https://launchpad.net/~zerng07\n"
+"  Eason Lai https://launchpad.net/~eason-freezone\n"
+"  Elmaz Yu https://launchpad.net/~elmazyu\n"
 "  Gavin Chan https://launchpad.net/~bitrevo\n"
 "  Kakurady Drakenar https://launchpad.net/~kakurady\n"
+"  Krzysztof Klimonda https://launchpad.net/~kklimonda\n"
 "  Neil Lin https://launchpad.net/~neillin\n"
 "  Pin-hsien Li https://launchpad.net/~plesry\n"
 "  Rick W. Chen https://launchpad.net/~stuffcorpse\n"
+"  Robert Ancell https://launchpad.net/~robert-ancell\n"
+"  Roy Chan https://launchpad.net/~roy-chan-linux\n"
 "  Tse-Hsien Chiang https://launchpad.net/~jackblackevo\n"
 "  Walter Cheuk https://launchpad.net/~wwycheuk\n"
 "  Yao Wei https://launchpad.net/~medicalwei\n"
 "  mike0 https://launchpad.net/~mike0\n"
 "  missmomo0911 https://launchpad.net/~missmomo0911\n"
-"  tonywcm https://launchpad.net/~tonywcm"
+"  tonywcm https://launchpad.net/~tonywcm\n"
+"  蔡查理 https://launchpad.net/~charlie-tsai"
 
 #: ../gtk/makemeta-ui.c:75
 #, c-format
@@ -1097,19 +1104,19 @@ msgstr "訊息日誌"
 msgid "Level"
 msgstr "階級"
 
-#: ../gtk/notify.c:213
+#: ../gtk/notify.c:215
 msgid "Open File"
 msgstr "開啟檔案"
 
-#: ../gtk/notify.c:218
+#: ../gtk/notify.c:220
 msgid "Open Folder"
 msgstr "開啟資料夾"
 
-#: ../gtk/notify.c:226
+#: ../gtk/notify.c:228
 msgid "Torrent Complete"
 msgstr "Torrent 完成"
 
-#: ../gtk/notify.c:248
+#: ../gtk/notify.c:250
 msgid "Torrent Added"
 msgstr "Torrent 已加入"
 
@@ -1158,15 +1165,15 @@ msgstr "開啟 Torrent"
 msgid "Show _options dialog"
 msgstr "顯示選項對話窗(_O)"
 
-#: ../gtk/open-dialog.c:487
+#: ../gtk/open-dialog.c:492
 msgid "Open URL"
 msgstr "開啟網址"
 
-#: ../gtk/open-dialog.c:500
+#: ../gtk/open-dialog.c:505
 msgid "Open torrent from URL"
 msgstr "從網址開啟 torrent"
 
-#: ../gtk/open-dialog.c:505
+#: ../gtk/open-dialog.c:510
 msgid "_URL"
 msgstr "網址(_U)"
 
@@ -1933,7 +1940,7 @@ msgstr "GB/s"
 msgid "TB/s"
 msgstr "TB/s"
 
-#: ../gtk/util.c:87 ../libtransmission/utils.c:1485
+#: ../gtk/util.c:87 ../libtransmission/utils.c:1487
 msgid "None"
 msgstr "無"
 
@@ -2027,7 +2034,7 @@ msgid "Couldn't save file \"%1$s\": %2$s"
 msgstr "無法儲存檔案「%1$s」；%2$s"
 
 #: ../libtransmission/blocklist.c:86 ../libtransmission/blocklist.c:325
-#: ../libtransmission/utils.c:436
+#: ../libtransmission/utils.c:438
 #, c-format
 msgid "Couldn't read \"%1$s\": %2$s"
 msgstr "無法讀取「%1$s」：%2$s"
@@ -2049,7 +2056,7 @@ msgid "Blocklist \"%s\" updated with %zu entries"
 msgstr "「%s」黑名單已更新，有 %zu 條規則"
 
 #: ../libtransmission/fdlimit.c:360 ../libtransmission/metainfo.c:112
-#: ../libtransmission/utils.c:568 ../libtransmission/utils.c:579
+#: ../libtransmission/utils.c:570 ../libtransmission/utils.c:581
 #, c-format
 msgid "Couldn't create \"%1$s\": %2$s"
 msgstr "無法建立「%1$s」：%2$s"
@@ -2127,7 +2134,7 @@ msgstr "無法 bind 連接埠 %d 於 %s：%s"
 msgid "Couldn't bind port %d on %s: %s (%s)"
 msgstr "無法綁定連接埠 %d 於 %s：%s (%s)"
 
-#: ../libtransmission/peer-msgs.c:1893
+#: ../libtransmission/peer-msgs.c:1896
 #, c-format
 msgid "Please Verify Local Data! Piece #%zu is corrupt."
 msgstr "請驗證本地資料！第 #%zu 片段已損毀。"
@@ -2239,16 +2246,16 @@ msgstr "透過「%s」、服務「%s」進行連接埠轉送。(本地位址：%
 msgid "Port forwarding successful!"
 msgstr "連接轉送成功！"
 
-#: ../libtransmission/utils.c:450
+#: ../libtransmission/utils.c:452
 msgid "Not a regular file"
 msgstr "不是正規的檔案"
 
-#: ../libtransmission/utils.c:468
+#: ../libtransmission/utils.c:470
 msgid "Memory allocation failed"
 msgstr "記憶體配置失敗"
 
 #. Node exists but isn't a folder
-#: ../libtransmission/utils.c:578
+#: ../libtransmission/utils.c:580
 #, c-format
 msgid "File \"%s\" is in the way"
 msgstr "檔案「%s」已存在"

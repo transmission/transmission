@@ -16,8 +16,8 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
 "n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
-"X-Launchpad-Export-Date: 2012-04-09 01:44+0000\n"
-"X-Generator: Launchpad (build 15060)\n"
+"X-Launchpad-Export-Date: 2012-07-06 01:09+0000\n"
+"X-Generator: Launchpad (build 15544)\n"
 
 #: ../gtk/actions.c:45
 msgid "Sort by _Activity"
@@ -33,7 +33,7 @@ msgstr "Sortiraj po _napretku"
 
 #: ../gtk/actions.c:48
 msgid "Sort by _Queue"
-msgstr ""
+msgstr "Sortiraj prema _redu čekanja"
 
 #: ../gtk/actions.c:49
 msgid "Sort by Rati_o"
@@ -97,7 +97,7 @@ msgstr "_Torrent"
 
 #: ../gtk/actions.c:98
 msgid "_View"
-msgstr "_Prikaz"
+msgstr "P_ogled"
 
 #: ../gtk/actions.c:99
 msgid "_Sort Torrents By"
@@ -105,7 +105,7 @@ msgstr "_Sortiraj torrente po"
 
 #: ../gtk/actions.c:100
 msgid "_Queue"
-msgstr ""
+msgstr "_Red čekanja"
 
 #: ../gtk/actions.c:101 ../gtk/details.c:2436
 msgid "_Edit"
@@ -121,11 +121,11 @@ msgstr "Kopiraj _Magnet poveznicu u međuspremnik"
 
 #: ../gtk/actions.c:104
 msgid "Open _URL…"
-msgstr ""
+msgstr "Otvori _URL…"
 
 #: ../gtk/actions.c:104
 msgid "Open URL…"
-msgstr ""
+msgstr "Otvori URL…"
 
 #: ../gtk/actions.c:105 ../gtk/actions.c:106
 msgid "Open a torrent"
@@ -141,11 +141,11 @@ msgstr "Pokreni torrent"
 
 #: ../gtk/actions.c:108
 msgid "Start _Now"
-msgstr ""
+msgstr "Pokre_ni odmah"
 
 #: ../gtk/actions.c:108
 msgid "Start torrent now"
-msgstr ""
+msgstr "Pokreni torrent odmah"
 
 #: ../gtk/actions.c:109
 msgid "_Statistics"
@@ -185,7 +185,7 @@ msgstr "Pokreni sve torrente"
 
 #: ../gtk/actions.c:115
 msgid "Set _Location…"
-msgstr ""
+msgstr "Postavi _lokaciju..."
 
 #: ../gtk/actions.c:116
 msgid "Remove torrent"
@@ -197,7 +197,7 @@ msgstr "_Obriši i ukloni datoteke"
 
 #: ../gtk/actions.c:118
 msgid "_New…"
-msgstr ""
+msgstr "_Novi…"
 
 #: ../gtk/actions.c:118
 msgid "Create a torrent"
@@ -233,23 +233,23 @@ msgstr "Pitaj pratitelja za _još točaka"
 
 #: ../gtk/actions.c:128
 msgid "Move to _Top"
-msgstr ""
+msgstr "Pomakni na _vrh"
 
 #: ../gtk/actions.c:129
 msgid "Move _Up"
-msgstr ""
+msgstr "Pomakni _gore"
 
 #: ../gtk/actions.c:130
 msgid "Move _Down"
-msgstr ""
+msgstr "Pomakni _dolje"
 
 #: ../gtk/actions.c:131
 msgid "Move to _Bottom"
-msgstr ""
+msgstr "Pomakni na  dn_o"
 
 #: ../gtk/actions.c:132
 msgid "Present Main Window"
-msgstr ""
+msgstr "Predstavi glavni prozor"
 
 #: ../gtk/conf.c:317 ../gtk/conf.c:322
 #, c-format
@@ -329,27 +329,27 @@ msgstr "Provjera lokalnih podataka"
 
 #: ../gtk/details.c:562 ../gtk/torrent-cell-renderer.c:204
 msgid "Queued for download"
-msgstr ""
+msgstr "Čeka za preuzimanje"
 
-#: ../gtk/details.c:563 ../gtk/filter.c:698
+#: ../gtk/details.c:563 ../gtk/filter.c:699
 msgctxt "Verb"
 msgid "Downloading"
-msgstr ""
+msgstr "Preuzimanje"
 
 #: ../gtk/details.c:564 ../gtk/torrent-cell-renderer.c:207
 msgid "Queued for seeding"
-msgstr ""
+msgstr "Čeka za dijeljenje"
 
-#: ../gtk/details.c:565 ../gtk/filter.c:699
+#: ../gtk/details.c:565 ../gtk/filter.c:700
 msgctxt "Verb"
 msgid "Seeding"
-msgstr ""
+msgstr "Dijeljenje"
 
-#: ../gtk/details.c:566 ../gtk/filter.c:701 ../gtk/torrent-cell-renderer.c:198
+#: ../gtk/details.c:566 ../gtk/filter.c:702 ../gtk/torrent-cell-renderer.c:198
 msgid "Finished"
 msgstr "Dovršeno"
 
-#: ../gtk/details.c:566 ../gtk/filter.c:700 ../gtk/torrent-cell-renderer.c:198
+#: ../gtk/details.c:566 ../gtk/filter.c:701 ../gtk/torrent-cell-renderer.c:198
 msgid "Paused"
 msgstr "Pauzirano"
 
@@ -357,7 +357,7 @@ msgstr "Pauzirano"
 msgid "N/A"
 msgstr "Nedostupno"
 
-#: ../gtk/details.c:611 ../gtk/file-list.c:605
+#: ../gtk/details.c:611 ../gtk/file-list.c:610
 msgid "Mixed"
 msgstr "Izmješano"
 
@@ -650,7 +650,7 @@ msgstr "Upit za dodatnim točaka stavljen u red čekanja"
 #: ../gtk/details.c:1843
 #, c-format
 msgid "Asking for more peers now… <small>%s</small>"
-msgstr ""
+msgstr "Slanje upita za više čvorova (upravo)… <small>%s</small>"
 
 #: ../gtk/details.c:1853
 #, c-format
@@ -674,7 +674,7 @@ msgstr "Upit broja točaka stavljen u red čekanja"
 #: ../gtk/details.c:1876
 #, c-format
 msgid "Asking for peer counts now… <small>%s</small>"
-msgstr ""
+msgstr "Slanje upita za broj čvorova (upravo)… <small>%s</small>"
 
 #: ../gtk/details.c:2146
 msgid "List contains invalid URLs"
@@ -821,43 +821,43 @@ msgstr[0] "Preuzimanje jednog od ovih torrenta nije završeno."
 msgstr[1] "Preuzimanje nekih od ovih torrenata nije završeno."
 msgstr[2] "Preuzimanje nekih od ovih torrenata nije završeno."
 
-#: ../gtk/file-list.c:602 ../gtk/filter.c:347 ../gtk/util.c:465
+#: ../gtk/file-list.c:607 ../gtk/filter.c:347 ../gtk/util.c:465
 msgid "High"
 msgstr "Visok"
 
-#: ../gtk/file-list.c:603 ../gtk/filter.c:351 ../gtk/util.c:466
+#: ../gtk/file-list.c:608 ../gtk/filter.c:351 ../gtk/util.c:466
 msgid "Normal"
 msgstr "Normalan"
 
-#: ../gtk/file-list.c:604 ../gtk/filter.c:355 ../gtk/util.c:467
+#: ../gtk/file-list.c:609 ../gtk/filter.c:355 ../gtk/util.c:467
 msgid "Low"
 msgstr "Nizak"
 
-#: ../gtk/file-list.c:822 ../gtk/msgwin.c:295
+#: ../gtk/file-list.c:827 ../gtk/msgwin.c:295
 msgid "Name"
 msgstr "Naziv"
 
 #. add "size" column
-#: ../gtk/file-list.c:837
+#: ../gtk/file-list.c:842
 msgid "Size"
 msgstr "Veličina"
 
 #. add "progress" column
-#: ../gtk/file-list.c:852
+#: ../gtk/file-list.c:857
 msgid "Have"
 msgstr "Ima"
 
 #. add "enabled" column
-#: ../gtk/file-list.c:865
+#: ../gtk/file-list.c:870
 msgid "Download"
 msgstr "Preuzmi"
 
 #. add priority column
-#: ../gtk/file-list.c:881 ../gtk/filter.c:342
+#: ../gtk/file-list.c:886 ../gtk/filter.c:342
 msgid "Priority"
 msgstr "Prioritet"
 
-#: ../gtk/filter.c:314 ../gtk/filter.c:695
+#: ../gtk/filter.c:314 ../gtk/filter.c:696
 msgid "All"
 msgstr "Sve"
 
@@ -873,71 +873,73 @@ msgstr "Javni"
 msgid "Private"
 msgstr "Privatni"
 
-#: ../gtk/filter.c:697
+#: ../gtk/filter.c:698
 msgid "Active"
 msgstr "Aktivan"
 
-#: ../gtk/filter.c:702
+#: ../gtk/filter.c:703
 msgctxt "Verb"
 msgid "Verifying"
-msgstr ""
+msgstr "Provjera"
 
-#: ../gtk/filter.c:703 ../gtk/msgwin.c:428
+#: ../gtk/filter.c:704 ../gtk/msgwin.c:428
 msgid "Error"
 msgstr "Greška"
 
 #. add the activity combobox
-#: ../gtk/filter.c:990
+#: ../gtk/filter.c:994
 msgid "_Show:"
 msgstr "_Prikaži:"
 
-#: ../gtk/main.c:307
+#: ../gtk/main.c:303
 #, c-format
 msgid "Error registering Transmission as x-scheme-handler/magnet handler: %s"
 msgstr ""
 "Greška pri registraciji Transmissiona kao aplikacije za x-scheme-"
 "handler/magnet: %s"
 
-#: ../gtk/main.c:472
+#: ../gtk/main.c:468
 #, c-format
 msgid ""
 "Got signal %d; trying to shut down cleanly. Do it again if it gets stuck."
 msgstr ""
 "Dobiven signal %d; pokušaj urednog zatvaranja. Ponovite ako se zaglavi."
 
-#: ../gtk/main.c:604
+#: ../gtk/main.c:596
 msgid "Where to look for configuration files"
 msgstr "Gdje tražiti konfiguracijske datoteke"
 
-#: ../gtk/main.c:605
+#: ../gtk/main.c:597
 msgid "Start with all torrents paused"
 msgstr "Pokreni sa svim torrentima pauziranim"
 
-#: ../gtk/main.c:606
+#: ../gtk/main.c:598
 msgid "Start minimized in notification area"
 msgstr "Pokreni minimiziranog u području obavijesti"
 
-#: ../gtk/main.c:607
+#: ../gtk/main.c:599
 msgid "Show version number and exit"
 msgstr "Prikaži broj inačice i izađi"
 
-#: ../gtk/main.c:625 ../gtk/transmission-gtk.desktop.in.h:1
+#: ../gtk/main.c:617 ../gtk/transmission-gtk.desktop.in.h:1
 msgid "Transmission"
 msgstr "Transmission"
 
 #. parse the command line
-#: ../gtk/main.c:629
+#: ../gtk/main.c:621
 msgid "[torrent files or urls]"
 msgstr "[torrent datoteke ili url-ovi]"
 
-#: ../gtk/main.c:633
+#: ../gtk/main.c:625
 #, c-format
 msgid ""
 "%s\n"
 "Run '%s --help' to see a full list of available command line options.\n"
 msgstr ""
+"%s\n"
+"Pokrenite '%s --help' za popis svih mogućih naredbi naredbenog retka.\n"
 
-#: ../gtk/main.c:730
+#: ../gtk/main.c:722
 msgid ""
 "Transmission is a file-sharing program. When you run a torrent, its data "
 "will be made available to others by means of upload. You and you alone are "
@@ -948,56 +950,60 @@ msgstr ""
 "njegovi podaci su dostupni drugim korisnicima. Vi i isključivo vi ste u "
 "potpunosti odgovorni za razumnu procjenu i poštivanje lokalnih zakona."
 
-#: ../gtk/main.c:732
+#: ../gtk/main.c:724
 msgid "I _Accept"
 msgstr "Prihv_aćam"
 
-#: ../gtk/main.c:941
+#: ../gtk/main.c:933
 msgid "<b>Closing Connections</b>"
 msgstr "<b>Zatvaranje veza</b>"
 
-#: ../gtk/main.c:945
+#: ../gtk/main.c:937
 msgid "Sending upload/download totals to tracker…"
-msgstr ""
+msgstr "Slanje zbroja slanja/preuzimanja na tracker..."
 
-#: ../gtk/main.c:950
+#: ../gtk/main.c:942
 msgid "_Quit Now"
 msgstr "_Izađi odmah"
 
-#: ../gtk/main.c:1008
+#: ../gtk/main.c:1000
 msgid "Couldn't add corrupt torrent"
 msgid_plural "Couldn't add corrupt torrents"
 msgstr[0] "Nemoguće dodati oštećeni torrent"
 msgstr[1] "Nemoguće dodati oštećene torrente"
 msgstr[2] "Nemoguće dodati oštećene torrente"
 
-#: ../gtk/main.c:1015
+#: ../gtk/main.c:1007
 msgid "Couldn't add duplicate torrent"
 msgid_plural "Couldn't add duplicate torrents"
 msgstr[0] "Nemoguće dodati duplikat torrenta"
 msgstr[1] "Nemoguće dodati duplikate torrenata"
 msgstr[2] "Nemoguće dodati duplikate torrenata"
 
-#: ../gtk/main.c:1316
+#: ../gtk/main.c:1308
 msgid "A fast and easy BitTorrent client"
 msgstr "Jednostavan i brz BitTorrent klijent"
 
-#: ../gtk/main.c:1317
+#: ../gtk/main.c:1309
 msgid "Copyright (c) The Transmission Project"
 msgstr "Autorska prava (c) Transmission projekt"
 
 #. Translators: translate "translator-credits" as your name
 #. to have it appear in the credits in the "About"
 #. dialog
-#: ../gtk/main.c:1323
+#: ../gtk/main.c:1315
 msgid "translator-credits"
 msgstr ""
 "Launchpad Contributions:\n"
 "  Denis Štogl https://launchpad.net/~denisstogl\n"
+"  Krzysztof Klimonda https://launchpad.net/~kklimonda\n"
 "  Miroslav Matejaš https://launchpad.net/~silverspace+amd64\n"
+"  Saša Mofardin - Mofa https://launchpad.net/~sasa-mofardin\n"
 "  Saša Teković https://launchpad.net/~hseagle2015\n"
-"  gogo https://launchpad.net/~trebelnik-stefina\n"
-"  nafterburner https://launchpad.net/~nafterburner"
+"  antisa https://launchpad.net/~antisa\n"
+"  damir https://launchpad.net/~markovi-damir\n"
+"  freedomrun https://launchpad.net/~freedomrun\n"
+"  gogo https://launchpad.net/~trebelnik-stefina"
 
 #: ../gtk/makemeta-ui.c:75
 #, c-format
@@ -1041,7 +1047,7 @@ msgstr "Novi torrent"
 
 #: ../gtk/makemeta-ui.c:183
 msgid "Creating torrent…"
-msgstr ""
+msgstr "Stvaranje torrenta..."
 
 #: ../gtk/makemeta-ui.c:292
 msgid "No source selected"
@@ -1124,19 +1130,19 @@ msgstr "Zapisnik poruka"
 msgid "Level"
 msgstr "Razina"
 
-#: ../gtk/notify.c:213
+#: ../gtk/notify.c:215
 msgid "Open File"
 msgstr "Otvori datoteku"
 
-#: ../gtk/notify.c:218
+#: ../gtk/notify.c:220
 msgid "Open Folder"
 msgstr "Otvori mapu"
 
-#: ../gtk/notify.c:226
+#: ../gtk/notify.c:228
 msgid "Torrent Complete"
 msgstr "Torrent završen"
 
-#: ../gtk/notify.c:248
+#: ../gtk/notify.c:250
 msgid "Torrent Added"
 msgstr "Torrent dodan"
 
@@ -1185,15 +1191,15 @@ msgstr "Otvori Torrent"
 msgid "Show _options dialog"
 msgstr "Prikaži dijalog _mogućnosti"
 
-#: ../gtk/open-dialog.c:487
+#: ../gtk/open-dialog.c:492
 msgid "Open URL"
 msgstr "Otvori URL"
 
-#: ../gtk/open-dialog.c:500
+#: ../gtk/open-dialog.c:505
 msgid "Open torrent from URL"
 msgstr "Otvori torrent iz URL-a"
 
-#: ../gtk/open-dialog.c:505
+#: ../gtk/open-dialog.c:510
 msgid "_URL"
 msgstr "_URL"
 
@@ -1208,7 +1214,7 @@ msgstr "Premještanje torrenta nije moguće"
 
 #: ../gtk/relocate.c:125
 msgid "This may take a moment…"
-msgstr ""
+msgstr "Ovo može potrajati nekoliko trenutaka..."
 
 #: ../gtk/relocate.c:156 ../gtk/relocate.c:176
 msgid "Set Torrent Location"
@@ -1344,7 +1350,7 @@ msgstr "%1$s %2$s"
 
 #: ../gtk/torrent-cell-renderer.c:179
 msgid "Stalled"
-msgstr ""
+msgstr "Zaustavljeno"
 
 #: ../gtk/torrent-cell-renderer.c:181 ../gtk/tr-icon.c:69
 msgid "Idle"
@@ -1414,21 +1420,21 @@ msgstr "Preuzimajte i dijelite datoteke preko BitTorrenta"
 #: ../gtk/tr-core.c:1083
 #, c-format
 msgid "Couldn't read \"%s\": %s"
-msgstr ""
+msgstr "Nije moguće pročitati \"%s\": %s"
 
 #: ../gtk/tr-core.c:1175
 #, c-format
 msgid "Skipping unknown torrent \"%s\""
-msgstr ""
+msgstr "Preskakanje nepoznator torrenta \"%s\""
 
 #: ../gtk/tr-core.c:1411
 msgid "Inhibiting desktop hibernation"
-msgstr ""
+msgstr "Naslijeđivanje hibernacije radne površine"
 
 #: ../gtk/tr-core.c:1413
 #, c-format
 msgid "Couldn't inhibit desktop hibernation: %s"
-msgstr ""
+msgstr "Naslijeđivanje hibernacije radne površine nije uspjelo: %s"
 
 #: ../gtk/tr-core.c:1446
 msgid "Allowing desktop hibernation"
@@ -1460,15 +1466,16 @@ msgstr "Spremi u _lokaciju:"
 
 #: ../gtk/tr-prefs.c:275
 msgid "Queue"
-msgstr ""
+msgstr "Red čekanja"
 
 #: ../gtk/tr-prefs.c:277
 msgid "Maximum active _downloads:"
-msgstr ""
+msgstr "Najveći broj aktivnih preu_zimanja:"
 
 #: ../gtk/tr-prefs.c:281
 msgid "Downloads sharing data in the last N minutes are _active:"
 msgstr ""
+"Preuzimanja koja dijele podatke tijekom posljednjih N minuta su _aktivni:"
 
 #: ../gtk/tr-prefs.c:286 ../libtransmission/torrent.c:1903
 msgid "Incomplete"
@@ -1484,12 +1491,12 @@ msgstr "Čuvaj _nedovršene torrente u:"
 
 #: ../gtk/tr-prefs.c:299
 msgid "Call _script when torrent is completed:"
-msgstr ""
+msgstr "Pozovi _skriptu nakon što se torrent dovrši:"
 
 #: ../gtk/tr-prefs.c:325
 msgctxt "Gerund"
 msgid "Adding"
-msgstr ""
+msgstr "Dodavanje"
 
 #: ../gtk/tr-prefs.c:339
 msgid "Automatically _add torrents from:"
@@ -1498,7 +1505,7 @@ msgstr "Automatski _dodaj torrent sa:"
 #: ../gtk/tr-prefs.c:347
 msgctxt "Gerund"
 msgid "Seeding"
-msgstr ""
+msgstr "Dijeljenje"
 
 #: ../gtk/tr-prefs.c:349
 msgid "Stop seeding at _ratio:"
@@ -1514,7 +1521,7 @@ msgstr "Radna površina"
 
 #: ../gtk/tr-prefs.c:382
 msgid "_Inhibit hibernation when torrents are active"
-msgstr ""
+msgstr "Nasl_ijedi hibernaciju kada su torrenti aktivni"
 
 #: ../gtk/tr-prefs.c:386
 msgid "Show Transmission icon in the _notification area"
@@ -1522,19 +1529,19 @@ msgstr "Prikaži Transmissionovu ikonu u _području obavijesti"
 
 #: ../gtk/tr-prefs.c:391
 msgid "Notification"
-msgstr ""
+msgstr "Obavijest"
 
 #: ../gtk/tr-prefs.c:393
 msgid "Show a notification when torrents are a_dded"
-msgstr ""
+msgstr "Prikaži obavijest kada su novi torrenti _dodani"
 
 #: ../gtk/tr-prefs.c:397
 msgid "Show a notification when torrents _finish"
-msgstr ""
+msgstr "Prikaži obavijest kada se torrent d_ovrši"
 
 #: ../gtk/tr-prefs.c:401
 msgid "Play a _sound when torrents finish"
-msgstr ""
+msgstr "Reproduciraj _zvuk kada se torrent dovrši"
 
 #: ../gtk/tr-prefs.c:430
 #, c-format
@@ -1566,7 +1573,7 @@ msgstr "Ažuriraj popis blokiranih"
 
 #: ../gtk/tr-prefs.c:484
 msgid "Getting new blocklist…"
-msgstr ""
+msgstr "Preuzimanje nove liste blokiranja..."
 
 #: ../gtk/tr-prefs.c:512
 msgid "Allow encryption"
@@ -1768,7 +1775,7 @@ msgstr "Ulaz je <b>zatvoren</b>"
 
 #: ../gtk/tr-prefs.c:1185
 msgid "<i>Testing TCP port…</i>"
-msgstr ""
+msgstr "<i>testiranje TCP porta…</i>"
 
 #: ../gtk/tr-prefs.c:1208
 msgid "Listening Port"
@@ -1821,7 +1828,7 @@ msgstr "Torrenti"
 #: ../gtk/tr-prefs.c:1284
 msgctxt "Gerund"
 msgid "Downloading"
-msgstr ""
+msgstr "Preuzimanje"
 
 #: ../gtk/tr-prefs.c:1293
 msgid "Network"
@@ -1923,7 +1930,7 @@ msgstr "Omjer: %s"
 #: ../gtk/tr-window.c:814
 #, c-format
 msgid "Down: %1$s, Up: %2$s"
-msgstr ""
+msgstr "Preuzimanje: %1$s, Slanje: %2$s"
 
 #: ../gtk/tr-window.c:825
 #, c-format
@@ -1948,37 +1955,37 @@ msgstr "TiB"
 
 #: ../gtk/util.c:44
 msgid "kB"
-msgstr ""
+msgstr "kB"
 
 #: ../gtk/util.c:45
 msgid "MB"
-msgstr ""
+msgstr "MB"
 
 #: ../gtk/util.c:46
 msgid "GB"
-msgstr ""
+msgstr "GB"
 
 #: ../gtk/util.c:47
 msgid "TB"
-msgstr ""
+msgstr "TB"
 
 #: ../gtk/util.c:50
 msgid "kB/s"
-msgstr ""
+msgstr "kB/s"
 
 #: ../gtk/util.c:51
 msgid "MB/s"
-msgstr ""
+msgstr "MB/s"
 
 #: ../gtk/util.c:52
 msgid "GB/s"
-msgstr ""
+msgstr "GB/s"
 
 #: ../gtk/util.c:53
 msgid "TB/s"
-msgstr ""
+msgstr "TB/s"
 
-#: ../gtk/util.c:87 ../libtransmission/utils.c:1485
+#: ../gtk/util.c:87 ../libtransmission/utils.c:1487
 msgid "None"
 msgstr "Nijedan"
 
@@ -2082,7 +2089,7 @@ msgid "Couldn't save file \"%1$s\": %2$s"
 msgstr "Nemoguće spremiti datoteku \"%1$s\": %2$s"
 
 #: ../libtransmission/blocklist.c:86 ../libtransmission/blocklist.c:325
-#: ../libtransmission/utils.c:436
+#: ../libtransmission/utils.c:438
 #, c-format
 msgid "Couldn't read \"%1$s\": %2$s"
 msgstr "Nemoguće očitati \"%1$s\": %2$s"
@@ -2104,7 +2111,7 @@ msgid "Blocklist \"%s\" updated with %zu entries"
 msgstr "Popis blokiranja \"%s\" je ažuriran s %zu zapisa"
 
 #: ../libtransmission/fdlimit.c:360 ../libtransmission/metainfo.c:112
-#: ../libtransmission/utils.c:568 ../libtransmission/utils.c:579
+#: ../libtransmission/utils.c:570 ../libtransmission/utils.c:581
 #, c-format
 msgid "Couldn't create \"%1$s\": %2$s"
 msgstr "Nemoguće stvoriti \"%1$s\": %2$s"
@@ -2182,7 +2189,7 @@ msgstr "Nemoguće vezati ulaz %d na %s: %s"
 msgid "Couldn't bind port %d on %s: %s (%s)"
 msgstr "Nemoguće spajanje ulaza %d na %s: %s (%s)"
 
-#: ../libtransmission/peer-msgs.c:1893
+#: ../libtransmission/peer-msgs.c:1896
 #, c-format
 msgid "Please Verify Local Data! Piece #%zu is corrupt."
 msgstr "Provjerite lokalne podatke! Dio #%zu je oštećen."
@@ -2298,16 +2305,16 @@ msgstr ""
 msgid "Port forwarding successful!"
 msgstr "Prosljeđivanje ulaza uspješno!"
 
-#: ../libtransmission/utils.c:450
+#: ../libtransmission/utils.c:452
 msgid "Not a regular file"
 msgstr "Nije regularna datoteka"
 
-#: ../libtransmission/utils.c:468
+#: ../libtransmission/utils.c:470
 msgid "Memory allocation failed"
 msgstr "Dodijeljivanje memorije neuspjelo"
 
 #. Node exists but isn't a folder
-#: ../libtransmission/utils.c:578
+#: ../libtransmission/utils.c:580
 #, c-format
 msgid "File \"%s\" is in the way"
 msgstr "Smeta datoteka \"%s\""

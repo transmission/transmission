@@ -16,8 +16,8 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n != 0 ? 1 : 2;\n"
-"X-Launchpad-Export-Date: 2012-04-09 01:45+0000\n"
-"X-Generator: Launchpad (build 15060)\n"
+"X-Launchpad-Export-Date: 2012-07-06 01:09+0000\n"
+"X-Generator: Launchpad (build 15544)\n"
 
 #: ../gtk/actions.c:45
 msgid "Sort by _Activity"
@@ -331,7 +331,7 @@ msgstr "Pārbauda lokālos datus"
 msgid "Queued for download"
 msgstr "Ielikts rindā uz lejupielādēšanu"
 
-#: ../gtk/details.c:563 ../gtk/filter.c:698
+#: ../gtk/details.c:563 ../gtk/filter.c:699
 msgctxt "Verb"
 msgid "Downloading"
 msgstr "Lejupielādē"
@@ -340,16 +340,16 @@ msgstr "Lejupielādē"
 msgid "Queued for seeding"
 msgstr "Ielikts rindā uz došanu"
 
-#: ../gtk/details.c:565 ../gtk/filter.c:699
+#: ../gtk/details.c:565 ../gtk/filter.c:700
 msgctxt "Verb"
 msgid "Seeding"
 msgstr "Dod"
 
-#: ../gtk/details.c:566 ../gtk/filter.c:701 ../gtk/torrent-cell-renderer.c:198
+#: ../gtk/details.c:566 ../gtk/filter.c:702 ../gtk/torrent-cell-renderer.c:198
 msgid "Finished"
 msgstr "Pabeigts"
 
-#: ../gtk/details.c:566 ../gtk/filter.c:700 ../gtk/torrent-cell-renderer.c:198
+#: ../gtk/details.c:566 ../gtk/filter.c:701 ../gtk/torrent-cell-renderer.c:198
 msgid "Paused"
 msgstr "Pauzēts"
 
@@ -357,7 +357,7 @@ msgstr "Pauzēts"
 msgid "N/A"
 msgstr "N/P"
 
-#: ../gtk/details.c:611 ../gtk/file-list.c:605
+#: ../gtk/details.c:611 ../gtk/file-list.c:610
 msgid "Mixed"
 msgstr "Jaukts"
 
@@ -823,43 +823,43 @@ msgstr[0] "Viens no šiem torrentiem nav beidzis lejupielādi."
 msgstr[1] "Daži no šiem torrentiem nav beiguši lejupielādi."
 msgstr[2] "Daži no šiem torrentiem nav beiguši lejupielādi."
 
-#: ../gtk/file-list.c:602 ../gtk/filter.c:347 ../gtk/util.c:465
+#: ../gtk/file-list.c:607 ../gtk/filter.c:347 ../gtk/util.c:465
 msgid "High"
 msgstr "Augsta"
 
-#: ../gtk/file-list.c:603 ../gtk/filter.c:351 ../gtk/util.c:466
+#: ../gtk/file-list.c:608 ../gtk/filter.c:351 ../gtk/util.c:466
 msgid "Normal"
 msgstr "Normāla"
 
-#: ../gtk/file-list.c:604 ../gtk/filter.c:355 ../gtk/util.c:467
+#: ../gtk/file-list.c:609 ../gtk/filter.c:355 ../gtk/util.c:467
 msgid "Low"
 msgstr "Zema"
 
-#: ../gtk/file-list.c:822 ../gtk/msgwin.c:295
+#: ../gtk/file-list.c:827 ../gtk/msgwin.c:295
 msgid "Name"
 msgstr "Nosaukums"
 
 #. add "size" column
-#: ../gtk/file-list.c:837
+#: ../gtk/file-list.c:842
 msgid "Size"
 msgstr "Izmērs"
 
 #. add "progress" column
-#: ../gtk/file-list.c:852
+#: ../gtk/file-list.c:857
 msgid "Have"
 msgstr "Ir"
 
 #. add "enabled" column
-#: ../gtk/file-list.c:865
+#: ../gtk/file-list.c:870
 msgid "Download"
 msgstr "Lejupielādēt"
 
 #. add priority column
-#: ../gtk/file-list.c:881 ../gtk/filter.c:342
+#: ../gtk/file-list.c:886 ../gtk/filter.c:342
 msgid "Priority"
 msgstr "Prioritāte"
 
-#: ../gtk/filter.c:314 ../gtk/filter.c:695
+#: ../gtk/filter.c:314 ../gtk/filter.c:696
 msgid "All"
 msgstr "Visi"
 
@@ -875,31 +875,31 @@ msgstr "Publisks"
 msgid "Private"
 msgstr "Privāts"
 
-#: ../gtk/filter.c:697
+#: ../gtk/filter.c:698
 msgid "Active"
 msgstr "Aktīvs"
 
-#: ../gtk/filter.c:702
+#: ../gtk/filter.c:703
 msgctxt "Verb"
 msgid "Verifying"
 msgstr "Pārbauda"
 
-#: ../gtk/filter.c:703 ../gtk/msgwin.c:428
+#: ../gtk/filter.c:704 ../gtk/msgwin.c:428
 msgid "Error"
 msgstr "Kļūda"
 
 #. add the activity combobox
-#: ../gtk/filter.c:990
+#: ../gtk/filter.c:994
 msgid "_Show:"
 msgstr "_Rādīt:"
 
-#: ../gtk/main.c:307
+#: ../gtk/main.c:303
 #, c-format
 msgid "Error registering Transmission as x-scheme-handler/magnet handler: %s"
 msgstr ""
 "Kļūda, reģistrējot Transmission kā x-scheme-handler/magnet handler: %s"
 
-#: ../gtk/main.c:472
+#: ../gtk/main.c:468
 #, c-format
 msgid ""
 "Got signal %d; trying to shut down cleanly. Do it again if it gets stuck."
@@ -907,32 +907,32 @@ msgstr ""
 "Saņēma signālu %d; mēģina izslēgties korekti. Ja iestrēgst, izdariet to "
 "atkal."
 
-#: ../gtk/main.c:604
+#: ../gtk/main.c:596
 msgid "Where to look for configuration files"
 msgstr "Kur meklēt konfigurācijas failus"
 
-#: ../gtk/main.c:605
+#: ../gtk/main.c:597
 msgid "Start with all torrents paused"
 msgstr "Palaižot apturēt visus torrentus"
 
-#: ../gtk/main.c:606
+#: ../gtk/main.c:598
 msgid "Start minimized in notification area"
 msgstr "Palaist minimizētu paziņojumu laukā"
 
-#: ../gtk/main.c:607
+#: ../gtk/main.c:599
 msgid "Show version number and exit"
 msgstr "Rādīt versijas numuru un iziet"
 
-#: ../gtk/main.c:625 ../gtk/transmission-gtk.desktop.in.h:1
+#: ../gtk/main.c:617 ../gtk/transmission-gtk.desktop.in.h:1
 msgid "Transmission"
 msgstr "Transmission"
 
 #. parse the command line
-#: ../gtk/main.c:629
+#: ../gtk/main.c:621
 msgid "[torrent files or urls]"
 msgstr "[torrentu faili vai url]"
 
-#: ../gtk/main.c:633
+#: ../gtk/main.c:625
 #, c-format
 msgid ""
 "%s\n"
@@ -941,7 +941,7 @@ msgstr ""
 "%s\n"
 "Izpildiet '%s --help', lai redzētu pieejamo komandrindas opciju sarakstu.\n"
 
-#: ../gtk/main.c:730
+#: ../gtk/main.c:722
 msgid ""
 "Transmission is a file-sharing program. When you run a torrent, its data "
 "will be made available to others by means of upload. You and you alone are "
@@ -952,53 +952,60 @@ msgstr ""
 "augšupielādējot tā dati būs pieejami cietiem. Jūs un tikai jūs esat "
 "atbildīgi par sekām likuma priekšā."
 
-#: ../gtk/main.c:732
+#: ../gtk/main.c:724
 msgid "I _Accept"
 msgstr "Es _piekrītu"
 
-#: ../gtk/main.c:941
+#: ../gtk/main.c:933
 msgid "<b>Closing Connections</b>"
 msgstr "<b>Aizver savienojumus</b>"
 
-#: ../gtk/main.c:945
+#: ../gtk/main.c:937
 msgid "Sending upload/download totals to tracker…"
 msgstr "Sūta augšupielādes/lejupielādes summas sekotājam..."
 
-#: ../gtk/main.c:950
+#: ../gtk/main.c:942
 msgid "_Quit Now"
 msgstr "_Aizvērt uzreiz"
 
-#: ../gtk/main.c:1008
+#: ../gtk/main.c:1000
 msgid "Couldn't add corrupt torrent"
 msgid_plural "Couldn't add corrupt torrents"
 msgstr[0] "Nevar pievienot bojātu torrentu"
 msgstr[1] "Nevar pievienot bojātus torrentus"
 msgstr[2] "Nevar pievienot bojātus torrentus"
 
-#: ../gtk/main.c:1015
+#: ../gtk/main.c:1007
 msgid "Couldn't add duplicate torrent"
 msgid_plural "Couldn't add duplicate torrents"
 msgstr[0] "Nevar pievienot torrenta dublikātu"
 msgstr[1] "Nevar pievienot torrentu dublikātus"
 msgstr[2] "Nevar pievienot torrentu dublikātus"
 
-#: ../gtk/main.c:1316
+#: ../gtk/main.c:1308
 msgid "A fast and easy BitTorrent client"
 msgstr "Ātrs un vienkāršs BitTorrent klients"
 
-#: ../gtk/main.c:1317
+#: ../gtk/main.c:1309
 msgid "Copyright (c) The Transmission Project"
 msgstr "Autortiesības (c) The Transmission Project"
 
 #. Translators: translate "translator-credits" as your name
 #. to have it appear in the credits in the "About"
 #. dialog
-#: ../gtk/main.c:1323
+#: ../gtk/main.c:1315
 msgid "translator-credits"
 msgstr ""
 "Launchpad Contributions:\n"
 "  ARMANDS https://launchpad.net/~bibis2003\n"
+"  HX_unbanned https://launchpad.net/~linards-liepins\n"
+"  Ken VanDine https://launchpad.net/~ken-vandine\n"
 "  Kristaps https://launchpad.net/~retail\n"
+"  Krzysztof Klimonda https://launchpad.net/~kklimonda\n"
+"  Mārtiņš Bruņenieks https://launchpad.net/~papuass\n"
+"  Mārtiņš Gailītis https://launchpad.net/~snpz\n"
+"  Raivis Dejus https://launchpad.net/~orvils\n"
+"  Rihards Pfeifle https://launchpad.net/~spr1nt3r\n"
 "  Rūdolfs Mazurs https://launchpad.net/~rudolfs-mazurs\n"
 "  vestel https://launchpad.net/~vestel"
 
@@ -1127,19 +1134,19 @@ msgstr "Ziņojumu žurnāls"
 msgid "Level"
 msgstr "Līmenis"
 
-#: ../gtk/notify.c:213
+#: ../gtk/notify.c:215
 msgid "Open File"
 msgstr "Atvērt failu"
 
-#: ../gtk/notify.c:218
+#: ../gtk/notify.c:220
 msgid "Open Folder"
 msgstr "Atvērt mapi"
 
-#: ../gtk/notify.c:226
+#: ../gtk/notify.c:228
 msgid "Torrent Complete"
 msgstr "Torrents pabeigts"
 
-#: ../gtk/notify.c:248
+#: ../gtk/notify.c:250
 msgid "Torrent Added"
 msgstr "Torrents pievienots"
 
@@ -1188,15 +1195,15 @@ msgstr "Atvērt torrentu"
 msgid "Show _options dialog"
 msgstr "Rādīt _opciju dialogu"
 
-#: ../gtk/open-dialog.c:487
+#: ../gtk/open-dialog.c:492
 msgid "Open URL"
 msgstr "Atvērt URL"
 
-#: ../gtk/open-dialog.c:500
+#: ../gtk/open-dialog.c:505
 msgid "Open torrent from URL"
 msgstr "Atvērt torrentu no URL"
 
-#: ../gtk/open-dialog.c:505
+#: ../gtk/open-dialog.c:510
 msgid "_URL"
 msgstr "_URL"
 
@@ -1985,7 +1992,7 @@ msgstr "GB/s"
 msgid "TB/s"
 msgstr "TB/s"
 
-#: ../gtk/util.c:87 ../libtransmission/utils.c:1485
+#: ../gtk/util.c:87 ../libtransmission/utils.c:1487
 msgid "None"
 msgstr "Nekas"
 
@@ -2089,7 +2096,7 @@ msgid "Couldn't save file \"%1$s\": %2$s"
 msgstr "Nevarēja saglabāt failu \"%1$s\": %2$s"
 
 #: ../libtransmission/blocklist.c:86 ../libtransmission/blocklist.c:325
-#: ../libtransmission/utils.c:436
+#: ../libtransmission/utils.c:438
 #, c-format
 msgid "Couldn't read \"%1$s\": %2$s"
 msgstr "Nevar nolasīt \"%1$s\": %2$s"
@@ -2111,7 +2118,7 @@ msgid "Blocklist \"%s\" updated with %zu entries"
 msgstr "Bloķēšanas saraksts \"%s\" ir atjaunināts ar %zu ierakstiem"
 
 #: ../libtransmission/fdlimit.c:360 ../libtransmission/metainfo.c:112
-#: ../libtransmission/utils.c:568 ../libtransmission/utils.c:579
+#: ../libtransmission/utils.c:570 ../libtransmission/utils.c:581
 #, c-format
 msgid "Couldn't create \"%1$s\": %2$s"
 msgstr "Nevar izveidot \"%1$s\": %2$s"
@@ -2189,7 +2196,7 @@ msgstr "Nevar piesaistīt portu %d uz %s: %s"
 msgid "Couldn't bind port %d on %s: %s (%s)"
 msgstr "Nevar piesaistīt portu %d uz %s: %s (%s)"
 
-#: ../libtransmission/peer-msgs.c:1893
+#: ../libtransmission/peer-msgs.c:1896
 #, c-format
 msgid "Please Verify Local Data! Piece #%zu is corrupt."
 msgstr "Lūdzu, pārbaudiet lokālos datus. Daļa #%zu ir bojāta."
@@ -2305,16 +2312,16 @@ msgstr ""
 msgid "Port forwarding successful!"
 msgstr "Portu pārsūtīšana veiksmīga!"
 
-#: ../libtransmission/utils.c:450
+#: ../libtransmission/utils.c:452
 msgid "Not a regular file"
 msgstr "Neparasts fails"
 
-#: ../libtransmission/utils.c:468
+#: ../libtransmission/utils.c:470
 msgid "Memory allocation failed"
 msgstr "Neizdevās rezervēt atmiņu"
 
 #. Node exists but isn't a folder
-#: ../libtransmission/utils.c:578
+#: ../libtransmission/utils.c:580
 #, c-format
 msgid "File \"%s\" is in the way"
 msgstr "Fails \"%s\" ir ceļā"

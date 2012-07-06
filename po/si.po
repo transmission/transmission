@@ -15,48 +15,48 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2012-04-09 01:44+0000\n"
-"X-Generator: Launchpad (build 15060)\n"
+"X-Launchpad-Export-Date: 2012-07-06 01:09+0000\n"
+"X-Generator: Launchpad (build 15544)\n"
 
 #: ../gtk/actions.c:45
 msgid "Sort by _Activity"
-msgstr ""
+msgstr "ක්‍රියාකාරිත්වය අනුව පෙලගස්වන්න (_A)"
 
 #: ../gtk/actions.c:46
 msgid "Sort by _Name"
-msgstr ""
+msgstr "නම අනුව පෙලගස්වන්න (_N)"
 
 #: ../gtk/actions.c:47
 msgid "Sort by _Progress"
-msgstr ""
+msgstr "ප්‍රගතිය අනුව පෙලගස්වන්න (_P)"
 
 #: ../gtk/actions.c:48
 msgid "Sort by _Queue"
-msgstr ""
+msgstr "පෝලිම  අනුව පෙලගස්වන්න (_Q)"
 
 #: ../gtk/actions.c:49
 msgid "Sort by Rati_o"
-msgstr ""
+msgstr "අනුපාතය අනුව පෙලගස්වන්න (_o)"
 
 #: ../gtk/actions.c:50
 msgid "Sort by Stat_e"
-msgstr ""
+msgstr "තත්වය අනුව පෙලගස්වන්න (_e)"
 
 #: ../gtk/actions.c:51
 msgid "Sort by A_ge"
-msgstr ""
+msgstr "වයස අනුව පෙලගස්වන්න (_g)"
 
 #: ../gtk/actions.c:52
 msgid "Sort by Time _Left"
-msgstr ""
+msgstr "ඉතිරිව ඇති කාලය අනුව පෙලගස්වන්න (_L)"
 
 #: ../gtk/actions.c:53
 msgid "Sort by Si_ze"
-msgstr ""
+msgstr "ප්රමාණය අනුව පෙලගස්වන්න (_z)"
 
 #: ../gtk/actions.c:70
 msgid "_Show Transmission"
-msgstr ""
+msgstr "ට්‍රාන්ස්මිෂන් පෙන්වන්න (_S)"
 
 #: ../gtk/actions.c:71
 msgid "Message _Log"
@@ -64,7 +64,7 @@ msgstr ""
 
 #: ../gtk/actions.c:86
 msgid "Enable Alternative Speed _Limits"
-msgstr ""
+msgstr "විකල්ප වේග සීමා ක්රියාත්මක කරන්න (_L)"
 
 #: ../gtk/actions.c:87
 msgid "_Compact View"
@@ -92,7 +92,7 @@ msgstr ""
 
 #: ../gtk/actions.c:97
 msgid "_Torrent"
-msgstr ""
+msgstr "ටොරන්ට් (_T)"
 
 #: ../gtk/actions.c:98
 msgid "_View"
@@ -100,11 +100,11 @@ msgstr ""
 
 #: ../gtk/actions.c:99
 msgid "_Sort Torrents By"
-msgstr ""
+msgstr "අනුව ටොරන්ට් පෙලගස්වන්න (_S)"
 
 #: ../gtk/actions.c:100
 msgid "_Queue"
-msgstr ""
+msgstr "පෝලිම (_Q)"
 
 #: ../gtk/actions.c:101 ../gtk/details.c:2436
 msgid "_Edit"
@@ -120,15 +120,15 @@ msgstr ""
 
 #: ../gtk/actions.c:104
 msgid "Open _URL…"
-msgstr ""
+msgstr "URL විවෘත කරන්න... (_U)"
 
 #: ../gtk/actions.c:104
 msgid "Open URL…"
-msgstr ""
+msgstr "URL විවෘත කරන්න..."
 
 #: ../gtk/actions.c:105 ../gtk/actions.c:106
 msgid "Open a torrent"
-msgstr ""
+msgstr "ටොරන්ට් විවෘත තරන්න"
 
 #: ../gtk/actions.c:107
 msgid "_Start"
@@ -136,23 +136,23 @@ msgstr ""
 
 #: ../gtk/actions.c:107
 msgid "Start torrent"
-msgstr ""
+msgstr "ටොරන්ට් ආරම්භ කරන්න"
 
 #: ../gtk/actions.c:108
 msgid "Start _Now"
-msgstr ""
+msgstr "දැන් ආරම්භ කරන්න (_N)"
 
 #: ../gtk/actions.c:108
 msgid "Start torrent now"
-msgstr ""
+msgstr "ටොරන්ට් දැන් ආරම්භ කරන්න"
 
 #: ../gtk/actions.c:109
 msgid "_Statistics"
-msgstr ""
+msgstr "සංඛ්‍යාලේඛන (_S)"
 
 #: ../gtk/actions.c:110
 msgid "_Donate"
-msgstr ""
+msgstr "පරිත්යාග කරන්න (_N)"
 
 #: ../gtk/actions.c:111
 msgid "_Verify Local Data"
@@ -176,11 +176,11 @@ msgstr ""
 
 #: ../gtk/actions.c:114
 msgid "_Start All"
-msgstr ""
+msgstr "සියල්ල ආරම්භ කරන්න (_S)"
 
 #: ../gtk/actions.c:114
 msgid "Start all torrents"
-msgstr ""
+msgstr "ටොරන්ට් සියල්ල ආරම්භ කරන්න"
 
 #: ../gtk/actions.c:115
 msgid "Set _Location…"
@@ -188,7 +188,7 @@ msgstr ""
 
 #: ../gtk/actions.c:116
 msgid "Remove torrent"
-msgstr ""
+msgstr "ටොරන්ට් ඉවත්කරන්න"
 
 #: ../gtk/actions.c:117
 msgid "_Delete Files and Remove"
@@ -196,7 +196,7 @@ msgstr ""
 
 #: ../gtk/actions.c:118
 msgid "_New…"
-msgstr ""
+msgstr "අලුත්... (_N)"
 
 #: ../gtk/actions.c:118
 msgid "Create a torrent"
@@ -216,11 +216,11 @@ msgstr ""
 
 #: ../gtk/actions.c:123
 msgid "Torrent properties"
-msgstr ""
+msgstr "ටොරන්ට් වත්කම්"
 
 #: ../gtk/actions.c:124
 msgid "Open Fold_er"
-msgstr ""
+msgstr "බහාලුම විවෘත කරන්න (_e)"
 
 #: ../gtk/actions.c:126
 msgid "_Contents"
@@ -232,7 +232,7 @@ msgstr ""
 
 #: ../gtk/actions.c:128
 msgid "Move to _Top"
-msgstr ""
+msgstr "ඉහළටම ගෙනියන්න (_T)"
 
 #: ../gtk/actions.c:129
 msgid "Move _Up"
@@ -240,11 +240,11 @@ msgstr ""
 
 #: ../gtk/actions.c:130
 msgid "Move _Down"
-msgstr ""
+msgstr "පහලට ගෙනියන්න (_D)"
 
 #: ../gtk/actions.c:131
 msgid "Move to _Bottom"
-msgstr ""
+msgstr "පහලටම ගෙනියන්න (_B)"
 
 #: ../gtk/actions.c:132
 msgid "Present Main Window"
@@ -286,7 +286,7 @@ msgstr ""
 #: ../gtk/details.c:485
 #, c-format
 msgid "Limit _download speed (%s):"
-msgstr ""
+msgstr "බාගතකිරීමේ වේගය සීමා කරන්න (%s): (_d)"
 
 #: ../gtk/details.c:498
 #, c-format
@@ -295,7 +295,7 @@ msgstr ""
 
 #: ../gtk/details.c:511 ../gtk/open-dialog.c:351
 msgid "Torrent _priority:"
-msgstr ""
+msgstr "ටොරන්ට් ප්‍රමුඛතාව (_p)"
 
 #: ../gtk/details.c:515
 msgid "Seeding Limits"
@@ -303,11 +303,11 @@ msgstr ""
 
 #: ../gtk/details.c:525
 msgid "_Ratio:"
-msgstr ""
+msgstr "අනුපාතය (_R):"
 
 #: ../gtk/details.c:534
 msgid "_Idle:"
-msgstr ""
+msgstr "අක්‍රිය: (_I)"
 
 #: ../gtk/details.c:537
 msgid "Peer Connections"
@@ -330,7 +330,7 @@ msgstr ""
 msgid "Queued for download"
 msgstr ""
 
-#: ../gtk/details.c:563 ../gtk/filter.c:698
+#: ../gtk/details.c:563 ../gtk/filter.c:699
 msgctxt "Verb"
 msgid "Downloading"
 msgstr ""
@@ -339,16 +339,16 @@ msgstr ""
 msgid "Queued for seeding"
 msgstr ""
 
-#: ../gtk/details.c:565 ../gtk/filter.c:699
+#: ../gtk/details.c:565 ../gtk/filter.c:700
 msgctxt "Verb"
 msgid "Seeding"
 msgstr ""
 
-#: ../gtk/details.c:566 ../gtk/filter.c:701 ../gtk/torrent-cell-renderer.c:198
+#: ../gtk/details.c:566 ../gtk/filter.c:702 ../gtk/torrent-cell-renderer.c:198
 msgid "Finished"
 msgstr ""
 
-#: ../gtk/details.c:566 ../gtk/filter.c:700 ../gtk/torrent-cell-renderer.c:198
+#: ../gtk/details.c:566 ../gtk/filter.c:701 ../gtk/torrent-cell-renderer.c:198
 msgid "Paused"
 msgstr ""
 
@@ -356,9 +356,9 @@ msgstr ""
 msgid "N/A"
 msgstr ""
 
-#: ../gtk/details.c:611 ../gtk/file-list.c:605
+#: ../gtk/details.c:611 ../gtk/file-list.c:610
 msgid "Mixed"
-msgstr ""
+msgstr "මිශ්‍ර"
 
 #: ../gtk/details.c:612
 msgid "No Torrents Selected"
@@ -370,7 +370,7 @@ msgstr ""
 
 #: ../gtk/details.c:636
 msgid "Public torrent"
-msgstr ""
+msgstr "පොදු ටොරන්ට්"
 
 #: ../gtk/details.c:659
 #, c-format
@@ -395,25 +395,25 @@ msgstr ""
 #, c-format
 msgid "%1$s (%2$'d piece @ %3$s)"
 msgid_plural "%1$s (%2$'d pieces @ %3$s)"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s (%2$'d කොටස @ %3$s)"
+msgstr[1] "%1$s (%2$'d කොටස් @ %3$s)"
 
 #: ../gtk/details.c:783
 #, c-format
 msgid "%1$s (%2$'d piece)"
 msgid_plural "%1$s (%2$'d pieces)"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s (%2$'d කොටස)"
+msgstr[1] "%1$s (%2$'d කොටස්)"
 
 #: ../gtk/details.c:817
 #, c-format
 msgid "%1$s (%2$s%%)"
-msgstr ""
+msgstr "%1$s (%2$s%%)"
 
 #: ../gtk/details.c:819
 #, c-format
 msgid "%1$s (%2$s%% of %3$s%% Available)"
-msgstr ""
+msgstr "%1$s (%3$s%% න් %2$s%% ක් ලබාගතහැක)"
 
 #: ../gtk/details.c:821
 #, c-format
@@ -423,16 +423,16 @@ msgstr ""
 #: ../gtk/details.c:840
 #, c-format
 msgid "%1$s (+%2$s corrupt)"
-msgstr ""
+msgstr "%1$s (+%2$s නරක් වූ)"
 
 #: ../gtk/details.c:862
 #, c-format
 msgid "%s (Ratio: %s)"
-msgstr ""
+msgstr "%s (අනුපාතය: %s)"
 
 #: ../gtk/details.c:890
 msgid "No errors"
-msgstr ""
+msgstr "දෝශ නොමැත"
 
 #: ../gtk/details.c:903
 msgid "Never"
@@ -440,7 +440,7 @@ msgstr ""
 
 #: ../gtk/details.c:907
 msgid "Active now"
-msgstr ""
+msgstr "දැන් ක්රියාකාරී"
 
 #: ../gtk/details.c:911
 #, c-format
@@ -449,11 +449,11 @@ msgstr ""
 
 #: ../gtk/details.c:930
 msgid "Activity"
-msgstr ""
+msgstr "ක්‍රියාකාරිත්වය"
 
 #: ../gtk/details.c:935
 msgid "Torrent size:"
-msgstr ""
+msgstr "ටොරන්ට් විශාලත්වය:"
 
 #: ../gtk/details.c:940
 msgid "Have:"
@@ -469,19 +469,19 @@ msgstr ""
 
 #: ../gtk/details.c:955
 msgid "State:"
-msgstr ""
+msgstr "තත්ත්වය:"
 
 #: ../gtk/details.c:960
 msgid "Running time:"
-msgstr ""
+msgstr "ධාවනය වන කාලය:"
 
 #: ../gtk/details.c:965
 msgid "Remaining time:"
-msgstr ""
+msgstr "ඉතිරිව ඇති කාලය:"
 
 #: ../gtk/details.c:970
 msgid "Last activity:"
-msgstr ""
+msgstr "අවසාන ක්රියාකාරකම:"
 
 #: ../gtk/details.c:976
 msgid "Error:"
@@ -501,7 +501,7 @@ msgstr ""
 
 #: ../gtk/details.c:1000
 msgid "Privacy:"
-msgstr ""
+msgstr "පෞද්ගලිකත්වය:"
 
 #: ../gtk/details.c:1007
 msgid "Origin:"
@@ -553,11 +553,11 @@ msgstr ""
 
 #: ../gtk/details.c:1125
 msgid "We Cancelled"
-msgstr ""
+msgstr "අපි අවලංගු කලා"
 
 #: ../gtk/details.c:1127
 msgid "They Cancelled"
-msgstr ""
+msgstr "ඔවුන් අවලංගු කලා"
 
 #: ../gtk/details.c:1128
 msgid "Flags"
@@ -613,7 +613,7 @@ msgstr ""
 
 #: ../gtk/details.c:1743 ../gtk/details.c:2451
 msgid "Show _more details"
-msgstr ""
+msgstr "වැඩි විස්තර පෙන්වන්න (_m)"
 
 #: ../gtk/details.c:1814
 #, c-format
@@ -628,7 +628,7 @@ msgstr ""
 #: ../gtk/details.c:1821
 #, c-format
 msgid "Got an error %1$s\"%2$s\"%3$s %4$s ago"
-msgstr ""
+msgstr "%1$s\"%2$s\"%3$s %4$s කට පෙර දෝශයක් ලැබුණි"
 
 #: ../gtk/details.c:1829
 msgid "No updates scheduled"
@@ -674,11 +674,11 @@ msgstr ""
 
 #: ../gtk/details.c:2146
 msgid "List contains invalid URLs"
-msgstr ""
+msgstr "ලැයිස්තුවේ වලංගු නැති URLs අඩංගුයි"
 
 #: ../gtk/details.c:2151
 msgid "Please correct the errors and try again."
-msgstr ""
+msgstr "කරුණාකර දෝෂ නිවැරදි කර නැවත උත්සාහ කරන්න."
 
 #: ../gtk/details.c:2201
 #, c-format
@@ -752,14 +752,14 @@ msgstr ""
 #: ../gtk/details.c:2599
 #, c-format
 msgid "%'d Torrent Properties"
-msgstr ""
+msgstr "%'d ටොරන්ට් වත්කම්"
 
 #: ../gtk/dialogs.c:95
 #, c-format
 msgid "Remove torrent?"
 msgid_plural "Remove %d torrents?"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "ටොරන්ට් ඉවත්කරන්නද ?"
+msgstr[1] "ටොරන්ට් %d ඉවත්කරන්නද ?"
 
 #: ../gtk/dialogs.c:101
 #, c-format
@@ -802,43 +802,43 @@ msgid_plural "Some of these torrents have not finished downloading."
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../gtk/file-list.c:602 ../gtk/filter.c:347 ../gtk/util.c:465
+#: ../gtk/file-list.c:607 ../gtk/filter.c:347 ../gtk/util.c:465
 msgid "High"
 msgstr ""
 
-#: ../gtk/file-list.c:603 ../gtk/filter.c:351 ../gtk/util.c:466
+#: ../gtk/file-list.c:608 ../gtk/filter.c:351 ../gtk/util.c:466
 msgid "Normal"
 msgstr ""
 
-#: ../gtk/file-list.c:604 ../gtk/filter.c:355 ../gtk/util.c:467
+#: ../gtk/file-list.c:609 ../gtk/filter.c:355 ../gtk/util.c:467
 msgid "Low"
 msgstr ""
 
-#: ../gtk/file-list.c:822 ../gtk/msgwin.c:295
+#: ../gtk/file-list.c:827 ../gtk/msgwin.c:295
 msgid "Name"
 msgstr ""
 
 #. add "size" column
-#: ../gtk/file-list.c:837
+#: ../gtk/file-list.c:842
 msgid "Size"
 msgstr ""
 
 #. add "progress" column
-#: ../gtk/file-list.c:852
+#: ../gtk/file-list.c:857
 msgid "Have"
 msgstr ""
 
 #. add "enabled" column
-#: ../gtk/file-list.c:865
+#: ../gtk/file-list.c:870
 msgid "Download"
 msgstr ""
 
 #. add priority column
-#: ../gtk/file-list.c:881 ../gtk/filter.c:342
+#: ../gtk/file-list.c:886 ../gtk/filter.c:342
 msgid "Priority"
 msgstr ""
 
-#: ../gtk/filter.c:314 ../gtk/filter.c:695
+#: ../gtk/filter.c:314 ../gtk/filter.c:696
 msgid "All"
 msgstr ""
 
@@ -854,68 +854,68 @@ msgstr ""
 msgid "Private"
 msgstr ""
 
-#: ../gtk/filter.c:697
+#: ../gtk/filter.c:698
 msgid "Active"
 msgstr ""
 
-#: ../gtk/filter.c:702
+#: ../gtk/filter.c:703
 msgctxt "Verb"
 msgid "Verifying"
 msgstr ""
 
-#: ../gtk/filter.c:703 ../gtk/msgwin.c:428
+#: ../gtk/filter.c:704 ../gtk/msgwin.c:428
 msgid "Error"
 msgstr ""
 
 #. add the activity combobox
-#: ../gtk/filter.c:990
+#: ../gtk/filter.c:994
 msgid "_Show:"
-msgstr ""
+msgstr "පෙන්වන්න (_S)"
 
-#: ../gtk/main.c:307
+#: ../gtk/main.c:303
 #, c-format
 msgid "Error registering Transmission as x-scheme-handler/magnet handler: %s"
 msgstr ""
 
-#: ../gtk/main.c:472
+#: ../gtk/main.c:468
 #, c-format
 msgid ""
 "Got signal %d; trying to shut down cleanly. Do it again if it gets stuck."
 msgstr ""
 
-#: ../gtk/main.c:604
+#: ../gtk/main.c:596
 msgid "Where to look for configuration files"
 msgstr ""
 
-#: ../gtk/main.c:605
+#: ../gtk/main.c:597
 msgid "Start with all torrents paused"
 msgstr ""
 
-#: ../gtk/main.c:606
+#: ../gtk/main.c:598
 msgid "Start minimized in notification area"
 msgstr ""
 
-#: ../gtk/main.c:607
+#: ../gtk/main.c:599
 msgid "Show version number and exit"
 msgstr ""
 
-#: ../gtk/main.c:625 ../gtk/transmission-gtk.desktop.in.h:1
+#: ../gtk/main.c:617 ../gtk/transmission-gtk.desktop.in.h:1
 msgid "Transmission"
-msgstr ""
+msgstr "ට්‍රාන්ස්මිෂන්"
 
 #. parse the command line
-#: ../gtk/main.c:629
+#: ../gtk/main.c:621
 msgid "[torrent files or urls]"
-msgstr ""
+msgstr "[ටොතන්ට් ගොනු හෝ urls]"
 
-#: ../gtk/main.c:633
+#: ../gtk/main.c:625
 #, c-format
 msgid ""
 "%s\n"
 "Run '%s --help' to see a full list of available command line options.\n"
 msgstr ""
 
-#: ../gtk/main.c:730
+#: ../gtk/main.c:722
 msgid ""
 "Transmission is a file-sharing program. When you run a torrent, its data "
 "will be made available to others by means of upload. You and you alone are "
@@ -923,50 +923,51 @@ msgid ""
 "laws."
 msgstr ""
 
-#: ../gtk/main.c:732
+#: ../gtk/main.c:724
 msgid "I _Accept"
-msgstr ""
+msgstr "මම පිළිගන්නවා (_A)"
 
-#: ../gtk/main.c:941
+#: ../gtk/main.c:933
 msgid "<b>Closing Connections</b>"
 msgstr ""
 
-#: ../gtk/main.c:945
+#: ../gtk/main.c:937
 msgid "Sending upload/download totals to tracker…"
 msgstr ""
 
-#: ../gtk/main.c:950
+#: ../gtk/main.c:942
 msgid "_Quit Now"
-msgstr ""
+msgstr "දැන් ඉවත්වන්න (_Q)"
 
-#: ../gtk/main.c:1008
+#: ../gtk/main.c:1000
 msgid "Couldn't add corrupt torrent"
 msgid_plural "Couldn't add corrupt torrents"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../gtk/main.c:1015
+#: ../gtk/main.c:1007
 msgid "Couldn't add duplicate torrent"
 msgid_plural "Couldn't add duplicate torrents"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../gtk/main.c:1316
+#: ../gtk/main.c:1308
 msgid "A fast and easy BitTorrent client"
 msgstr ""
 
-#: ../gtk/main.c:1317
+#: ../gtk/main.c:1309
 msgid "Copyright (c) The Transmission Project"
-msgstr ""
+msgstr "ප්‍රකාශන හිමිකම් (c) Transmission ව්‍යාපෘතිය"
 
 #. Translators: translate "translator-credits" as your name
 #. to have it appear in the credits in the "About"
 #. dialog
-#: ../gtk/main.c:1323
+#: ../gtk/main.c:1315
 msgid "translator-credits"
 msgstr ""
 "Launchpad Contributions:\n"
-"  Mohamed Rizmi https://launchpad.net/~mhmdrizmi50"
+"  Mohamed Rizmi https://launchpad.net/~mhmdrizmi50\n"
+"  පසිඳු කාවින්ද https://launchpad.net/~pkavinda"
 
 #: ../gtk/makemeta-ui.c:75
 #, c-format
@@ -991,7 +992,7 @@ msgstr ""
 #: ../gtk/makemeta-ui.c:83
 #, c-format
 msgid "Error reading \"%s\": %s"
-msgstr ""
+msgstr "කියවීමේ දෝෂය \"%s\": %s"
 
 #: ../gtk/makemeta-ui.c:85
 #, c-format
@@ -1020,15 +1021,15 @@ msgstr ""
 #, c-format
 msgid "%1$s; %2$'d File"
 msgid_plural "%1$s; %2$'d Files"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s; %2$'d ගොනුව"
+msgstr[1] "%1$s; %2$'d ගොනු"
 
 #: ../gtk/makemeta-ui.c:305
 #, c-format
 msgid "%1$'d Piece @ %2$s"
 msgid_plural "%1$'d Pieces @ %2$s"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$'d කොටස @ %2$s"
+msgstr[1] "%1$'d කොටස් @ %2$s"
 
 #: ../gtk/makemeta-ui.c:439
 msgid "Sa_ve to:"
@@ -1036,11 +1037,11 @@ msgstr ""
 
 #: ../gtk/makemeta-ui.c:445
 msgid "Source F_older:"
-msgstr ""
+msgstr "මූල බහාලුම: (_o)"
 
 #: ../gtk/makemeta-ui.c:457
 msgid "Source _File:"
-msgstr ""
+msgstr "මූල ගොනුව: (_F)"
 
 #: ../gtk/makemeta-ui.c:469
 msgid "<i>No source selected</i>"
@@ -1060,12 +1061,12 @@ msgstr ""
 
 #: ../gtk/makemeta-ui.c:506
 msgid "_Private torrent"
-msgstr ""
+msgstr "පුද්ගලික ටොරන්ට් (_P)"
 
 #: ../gtk/msgwin.c:144
 #, c-format
 msgid "Couldn't save \"%s\""
-msgstr ""
+msgstr "\"%s\" සුරැකිය නොහැක"
 
 #: ../gtk/msgwin.c:195
 msgid "Save Log"
@@ -1091,25 +1092,25 @@ msgstr ""
 msgid "Level"
 msgstr ""
 
-#: ../gtk/notify.c:213
+#: ../gtk/notify.c:215
 msgid "Open File"
 msgstr ""
 
-#: ../gtk/notify.c:218
+#: ../gtk/notify.c:220
 msgid "Open Folder"
 msgstr ""
 
-#: ../gtk/notify.c:226
+#: ../gtk/notify.c:228
 msgid "Torrent Complete"
 msgstr ""
 
-#: ../gtk/notify.c:248
+#: ../gtk/notify.c:250
 msgid "Torrent Added"
 msgstr ""
 
 #: ../gtk/open-dialog.c:240
 msgid "Torrent files"
-msgstr ""
+msgstr "ටොරන්ට් ගොනු"
 
 #: ../gtk/open-dialog.c:245
 msgid "All files"
@@ -1130,11 +1131,11 @@ msgstr ""
 
 #: ../gtk/open-dialog.c:310
 msgid "_Torrent file:"
-msgstr ""
+msgstr "ටොරන්ට් ගොනුව: (_T)"
 
 #: ../gtk/open-dialog.c:314
 msgid "Select Source File"
-msgstr ""
+msgstr "මූල ගොනුව තෝරන්න"
 
 #: ../gtk/open-dialog.c:325
 msgid "_Destination folder:"
@@ -1152,17 +1153,17 @@ msgstr ""
 msgid "Show _options dialog"
 msgstr ""
 
-#: ../gtk/open-dialog.c:487
+#: ../gtk/open-dialog.c:492
 msgid "Open URL"
-msgstr ""
+msgstr "URL විවෘත කරන්න"
 
-#: ../gtk/open-dialog.c:500
+#: ../gtk/open-dialog.c:505
 msgid "Open torrent from URL"
 msgstr ""
 
-#: ../gtk/open-dialog.c:505
+#: ../gtk/open-dialog.c:510
 msgid "_URL"
-msgstr ""
+msgstr "_URL"
 
 #: ../gtk/relocate.c:62
 #, c-format
@@ -1175,7 +1176,7 @@ msgstr ""
 
 #: ../gtk/relocate.c:125
 msgid "This may take a moment…"
-msgstr ""
+msgstr "මේ සදහා මොහොතක් ගතවිය හැක..."
 
 #: ../gtk/relocate.c:156 ../gtk/relocate.c:176
 msgid "Set Torrent Location"
@@ -1228,7 +1229,7 @@ msgstr ""
 
 #: ../gtk/stats.c:158 ../gtk/stats.c:175
 msgid "Ratio:"
-msgstr ""
+msgstr "අනුපාතය:"
 
 #: ../gtk/stats.c:161 ../gtk/stats.c:178
 msgid "Duration:"
@@ -1244,7 +1245,7 @@ msgstr ""
 #: ../gtk/torrent-cell-renderer.c:61
 #, c-format
 msgid "%1$s of %2$s (%3$s%%)"
-msgstr ""
+msgstr "%2$s න් %1$s (%3$s%%)"
 
 #. %1$s is how much we've got,
 #. %2$s is the torrent's total size,
@@ -1286,25 +1287,25 @@ msgstr ""
 
 #: ../gtk/torrent-cell-renderer.c:136
 msgid "Remaining time unknown"
-msgstr ""
+msgstr "ඉතිරිව ඇති කාලය නොදනී"
 
 #. time remaining
 #: ../gtk/torrent-cell-renderer.c:142
 #, c-format
 msgid "%s remaining"
-msgstr ""
+msgstr "%s ඉතිරිව ඇත"
 
 #. 1==down arrow, 2==down speed, 3==up arrow, 4==down speed
 #: ../gtk/torrent-cell-renderer.c:167
 #, c-format
 msgid "%1$s %2$s, %3$s %4$s"
-msgstr ""
+msgstr "%1$s %2$s, %3$s %4$s"
 
 #. bandwidth speed + unicode arrow
 #: ../gtk/torrent-cell-renderer.c:172 ../gtk/torrent-cell-renderer.c:176
 #, c-format
 msgid "%1$s %2$s"
-msgstr ""
+msgstr "%1$s %2$s"
 
 #: ../gtk/torrent-cell-renderer.c:179
 msgid "Stalled"
@@ -1322,7 +1323,7 @@ msgstr ""
 #: ../gtk/torrent-cell-renderer.c:222
 #, c-format
 msgid "Ratio %s"
-msgstr ""
+msgstr "අනුපාතය %s"
 
 #: ../gtk/torrent-cell-renderer.c:244
 #, c-format
@@ -1366,7 +1367,7 @@ msgstr ""
 
 #: ../gtk/transmission-gtk.desktop.in.h:3
 msgid "Transmission BitTorrent Client"
-msgstr ""
+msgstr "ට්‍රාන්ස්මිෂන් බිට්ටොරන්ට් සේවාදායක"
 
 #: ../gtk/transmission-gtk.desktop.in.h:4
 msgid "Download and share files over BitTorrent"
@@ -1375,7 +1376,7 @@ msgstr ""
 #: ../gtk/tr-core.c:1083
 #, c-format
 msgid "Couldn't read \"%s\": %s"
-msgstr ""
+msgstr "\"%s\": %s කියවිය නොහැක"
 
 #: ../gtk/tr-core.c:1175
 #, c-format
@@ -1398,7 +1399,7 @@ msgstr ""
 #: ../gtk/tr-icon.c:86 ../gtk/tr-icon.c:102
 #, c-format
 msgid "(Limit: %s)"
-msgstr ""
+msgstr "(සීමා: %s)"
 
 #. %1$s: current upload speed
 #. * %2$s: current upload limit, if any
@@ -1411,6 +1412,9 @@ msgid ""
 "Up: %1$s %2$s\n"
 "Down: %3$s %4$s"
 msgstr ""
+"ට්‍රාන්ස්මිෂන්\n"
+"උඩු: %1$s %2$s\n"
+"බා: %3$s %4$s"
 
 #: ../gtk/tr-prefs.c:272
 msgid "Save to _Location:"
@@ -1422,7 +1426,7 @@ msgstr ""
 
 #: ../gtk/tr-prefs.c:277
 msgid "Maximum active _downloads:"
-msgstr ""
+msgstr "උපරිම ක්රියාකාරී බාගතකිරීම්: (_d)"
 
 #: ../gtk/tr-prefs.c:281
 msgid "Downloads sharing data in the last N minutes are _active:"
@@ -1430,7 +1434,7 @@ msgstr ""
 
 #: ../gtk/tr-prefs.c:286 ../libtransmission/torrent.c:1903
 msgid "Incomplete"
-msgstr ""
+msgstr "අසම්පූර්ණ"
 
 #: ../gtk/tr-prefs.c:288
 msgid "Append \"._part\" to incomplete files' names"
@@ -1624,19 +1628,19 @@ msgstr ""
 
 #: ../gtk/tr-prefs.c:899
 msgid "Addresses:"
-msgstr ""
+msgstr "ලිපිනයන්:"
 
 #: ../gtk/tr-prefs.c:1017
 msgid "Every Day"
-msgstr ""
+msgstr "සැමදා"
 
 #: ../gtk/tr-prefs.c:1018
 msgid "Weekdays"
-msgstr ""
+msgstr "සතියේ දින"
 
 #: ../gtk/tr-prefs.c:1019
 msgid "Weekends"
-msgstr ""
+msgstr "සති අන්තයන්"
 
 #: ../gtk/tr-prefs.c:1020
 msgid "Sunday"
@@ -1668,7 +1672,7 @@ msgstr ""
 
 #: ../gtk/tr-prefs.c:1057
 msgid "Speed Limits"
-msgstr ""
+msgstr "වේග සීමා"
 
 #: ../gtk/tr-prefs.c:1059
 #, c-format
@@ -1682,7 +1686,7 @@ msgstr ""
 
 #: ../gtk/tr-prefs.c:1077
 msgid "Alternative Speed Limits"
-msgstr ""
+msgstr "විකල්ප වේග සීමා"
 
 #: ../gtk/tr-prefs.c:1084
 msgid "Override normal speed limits manually or at scheduled times"
@@ -1708,11 +1712,11 @@ msgstr ""
 
 #: ../gtk/tr-prefs.c:1115
 msgid "_On days:"
-msgstr ""
+msgstr "දිනයන්හී : (_O)"
 
 #: ../gtk/tr-prefs.c:1149 ../gtk/tr-prefs.c:1215
 msgid "Status unknown"
-msgstr ""
+msgstr "තත්ත්වය නොදනී"
 
 #: ../gtk/tr-prefs.c:1171
 msgid "Port is <b>open</b>"
@@ -1789,15 +1793,15 @@ msgstr ""
 
 #: ../gtk/tr-window.c:148
 msgid "Torrent"
-msgstr ""
+msgstr "ටොරන්ට්"
 
 #: ../gtk/tr-window.c:256
 msgid "Total Ratio"
-msgstr ""
+msgstr "මුලු අනුපාතය"
 
 #: ../gtk/tr-window.c:257
 msgid "Session Ratio"
-msgstr ""
+msgstr "සැසියේ අනුපාතය"
 
 #: ../gtk/tr-window.c:258
 msgid "Total Transfer"
@@ -1836,7 +1840,7 @@ msgstr ""
 
 #: ../gtk/tr-window.c:528
 msgid "Limit Download Speed"
-msgstr ""
+msgstr "බාගතකිරීමේ වේගය සීමා කරන්න"
 
 #: ../gtk/tr-window.c:532
 msgid "Limit Upload Speed"
@@ -1868,7 +1872,7 @@ msgstr[1] ""
 #: ../gtk/tr-window.c:803 ../gtk/tr-window.c:831
 #, c-format
 msgid "Ratio: %s"
-msgstr ""
+msgstr "අනුපාතය: %s"
 
 #: ../gtk/tr-window.c:814
 #, c-format
@@ -1894,11 +1898,11 @@ msgstr ""
 
 #: ../gtk/util.c:41
 msgid "TiB"
-msgstr ""
+msgstr "TiB"
 
 #: ../gtk/util.c:44
 msgid "kB"
-msgstr ""
+msgstr "kB"
 
 #: ../gtk/util.c:45
 msgid "MB"
@@ -1910,25 +1914,25 @@ msgstr ""
 
 #: ../gtk/util.c:47
 msgid "TB"
-msgstr ""
+msgstr "TB"
 
 #: ../gtk/util.c:50
 msgid "kB/s"
-msgstr ""
+msgstr "kB/s"
 
 #: ../gtk/util.c:51
 msgid "MB/s"
-msgstr ""
+msgstr "MB/s"
 
 #: ../gtk/util.c:52
 msgid "GB/s"
-msgstr ""
+msgstr "GB/s"
 
 #: ../gtk/util.c:53
 msgid "TB/s"
-msgstr ""
+msgstr "TB/s"
 
-#: ../gtk/util.c:87 ../libtransmission/utils.c:1485
+#: ../gtk/util.c:87 ../libtransmission/utils.c:1487
 msgid "None"
 msgstr ""
 
@@ -1936,29 +1940,29 @@ msgstr ""
 #, c-format
 msgid "%'d day"
 msgid_plural "%'d days"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "දින %'d"
+msgstr[1] "දින %'d"
 
 #: ../gtk/util.c:109
 #, c-format
 msgid "%'d hour"
 msgid_plural "%'d hours"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "පැය %'d"
+msgstr[1] "පැය %'d"
 
 #: ../gtk/util.c:110
 #, c-format
 msgid "%'d minute"
 msgid_plural "%'d minutes"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "මිනිත්තු %'d"
+msgstr[1] "මිනිත්තු %'d"
 
 #: ../gtk/util.c:111
 #, c-format
 msgid "%'d second"
 msgid_plural "%'d seconds"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "තත්පර %'d"
+msgstr[1] "තත්පර %'d"
 
 #: ../gtk/util.c:221
 #, c-format
@@ -1991,7 +1995,7 @@ msgstr ""
 
 #: ../gtk/util.c:577
 msgid "Unrecognized URL"
-msgstr ""
+msgstr "හදුනානොගත් URL"
 
 #: ../gtk/util.c:579
 #, c-format
@@ -2023,13 +2027,13 @@ msgstr ""
 #: ../libtransmission/bencode.c:1736 ../libtransmission/blocklist.c:417
 #, c-format
 msgid "Couldn't save file \"%1$s\": %2$s"
-msgstr ""
+msgstr "\"%1$s\": %2$s ගොනුව සුරැකිය නොහැක"
 
 #: ../libtransmission/blocklist.c:86 ../libtransmission/blocklist.c:325
-#: ../libtransmission/utils.c:436
+#: ../libtransmission/utils.c:438
 #, c-format
 msgid "Couldn't read \"%1$s\": %2$s"
-msgstr ""
+msgstr "\"%1$s\": %2$s කියවිය නොහැක"
 
 #: ../libtransmission/blocklist.c:115
 #, c-format
@@ -2048,7 +2052,7 @@ msgid "Blocklist \"%s\" updated with %zu entries"
 msgstr ""
 
 #: ../libtransmission/fdlimit.c:360 ../libtransmission/metainfo.c:112
-#: ../libtransmission/utils.c:568 ../libtransmission/utils.c:579
+#: ../libtransmission/utils.c:570 ../libtransmission/utils.c:581
 #, c-format
 msgid "Couldn't create \"%1$s\": %2$s"
 msgstr ""
@@ -2056,7 +2060,7 @@ msgstr ""
 #: ../libtransmission/fdlimit.c:381
 #, c-format
 msgid "Couldn't open \"%1$s\": %2$s"
-msgstr ""
+msgstr "\"%1$s\": %2$s විවෘතකල නොහැක"
 
 #: ../libtransmission/fdlimit.c:396
 #, c-format
@@ -2085,7 +2089,7 @@ msgstr ""
 #: ../libtransmission/natpmp.c:72
 #, c-format
 msgid "%s succeeded (%d)"
-msgstr ""
+msgstr "%s සාරථකයි (%d)"
 
 #: ../libtransmission/natpmp.c:141
 #, c-format
@@ -2126,7 +2130,7 @@ msgstr ""
 msgid "Couldn't bind port %d on %s: %s (%s)"
 msgstr ""
 
-#: ../libtransmission/peer-msgs.c:1893
+#: ../libtransmission/peer-msgs.c:1896
 #, c-format
 msgid "Please Verify Local Data! Piece #%zu is corrupt."
 msgstr ""
@@ -2145,7 +2149,7 @@ msgstr ""
 
 #: ../libtransmission/port-forwarding.c:60
 msgid "Stopping"
-msgstr ""
+msgstr "නවත්වමින්"
 
 #: ../libtransmission/port-forwarding.c:61
 msgid "Not forwarded"
@@ -2238,16 +2242,16 @@ msgstr ""
 msgid "Port forwarding successful!"
 msgstr ""
 
-#: ../libtransmission/utils.c:450
+#: ../libtransmission/utils.c:452
 msgid "Not a regular file"
 msgstr ""
 
-#: ../libtransmission/utils.c:468
+#: ../libtransmission/utils.c:470
 msgid "Memory allocation failed"
 msgstr ""
 
 #. Node exists but isn't a folder
-#: ../libtransmission/utils.c:578
+#: ../libtransmission/utils.c:580
 #, c-format
 msgid "File \"%s\" is in the way"
 msgstr ""
