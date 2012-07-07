@@ -114,6 +114,8 @@
 - (void) setMaxPeerConnect: (uint16_t) count;
 - (uint16_t) maxPeerConnect;
 
+@property (nonatomic) BOOL removeWhenFinishSeeding;
+
 - (BOOL) waitingToStart;
 
 - (tr_priority_t) priority;

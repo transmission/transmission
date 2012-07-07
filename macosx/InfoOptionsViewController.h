@@ -32,7 +32,7 @@
     BOOL fSet;
     
     IBOutlet NSPopUpButton * fPriorityPopUp, * fRatioPopUp, * fIdlePopUp;
-    IBOutlet NSButton * fUploadLimitCheck, * fDownloadLimitCheck, * fGlobalLimitCheck;
+    IBOutlet NSButton * fUploadLimitCheck, * fDownloadLimitCheck, * fGlobalLimitCheck, * fRemoveSeedingCompleteCheck;
     IBOutlet NSTextField * fUploadLimitField, * fDownloadLimitField, * fRatioLimitField, * fIdleLimitField,
                         * fUploadLimitLabel, * fDownloadLimitLabel, * fIdleLimitLabel,
                         * fRatioLimitGlobalLabel, * fIdleLimitGlobalLabel,
@@ -45,18 +45,20 @@
 - (void) updateInfo;
 - (void) updateOptions;
 
-- (void) setUseSpeedLimit: (id) sender;
-- (void) setSpeedLimit: (id) sender;
-- (void) setUseGlobalSpeedLimit: (id) sender;
+- (IBAction) setUseSpeedLimit: (id) sender;
+- (IBAction) setSpeedLimit: (id) sender;
+- (IBAction) setUseGlobalSpeedLimit: (id) sender;
 
-- (void) setRatioSetting: (id) sender;
-- (void) setRatioLimit: (id) sender;
+- (IBAction) setRatioSetting: (id) sender;
+- (IBAction) setRatioLimit: (id) sender;
 
-- (void) setIdleSetting: (id) sender;
-- (void) setIdleLimit: (id) sender;
+- (IBAction) setIdleSetting: (id) sender;
+- (IBAction) setIdleLimit: (id) sender;
 
-- (void) setPriority: (id) sender;
+- (IBAction) setRemoveWhenSeedingCompletes: (id) sender;
 
-- (void) setPeersConnectLimit: (id) sender;
+- (IBAction) setPriority: (id) sender;
+
+- (IBAction) setPeersConnectLimit: (id) sender;
 
 @end

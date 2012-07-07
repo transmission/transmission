@@ -1881,15 +1881,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 
 - (void) torrentFinishedSeeding: (NSNotification *) notification
 {
-    Torrent * torrent = [notification object];
-    
-    [self fullUpdateUI];
-    
-    if ([[fTableView selectedTorrents] containsObject: torrent])
-    {
-        [fInfoController updateInfoStats];
-        [fInfoController updateOptions];
-    }
+    Torrent * torrent = [[notification object] retain];
     
     if (!fSoundPlaying && [fDefaults boolForKey: @"PlaySeedingSound"])
     {
@@ -1909,8 +1901,24 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         [clickContext setObject: location forKey: @"Location"];
     
     [GrowlApplicationBridge notifyWithTitle: NSLocalizedString(@"Seeding Complete", "Growl notification title")
-                        description: [torrent name] notificationName: GROWL_SEEDING_COMPLETE
-                        iconData: nil priority: 0 isSticky: NO clickContext: clickContext];
+                                description: [torrent name] notificationName: GROWL_SEEDING_COMPLETE
+                                   iconData: nil priority: 0 isSticky: NO clickContext: clickContext];
+    
+    //removing for the list calls fullUpdateUI
+    if ([torrent removeWhenFinishSeeding])
+        [self confirmRemoveTorrents: [[NSArray arrayWithObject: torrent] retain] deleteData: NO];
+    else
+    {
+        [self fullUpdateUI];
+        
+        if ([[fTableView selectedTorrents] containsObject: torrent])
+        {
+            [fInfoController updateInfoStats];
+            [fInfoController updateOptions];
+        }
+    }
+    
+    [torrent release];
 }
 
 - (void) updateTorrentHistory

@@ -128,6 +128,8 @@
 	<false/>
 	<key>RatioLimit</key>
 	<integer>2</integer>
+	<key>RemoveWhenFinishSeeding</key>
+	<false/>
 	<key>RenamePartialFiles</key>
 	<true/>
 	<key>RPC</key>
