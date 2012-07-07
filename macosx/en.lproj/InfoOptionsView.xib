@@ -470,7 +470,7 @@
 					<object class="NSTextField" id="760004836">
 						<reference key="NSNextResponder" ref="617828785"/>
 						<int key="NSvFlags">266</int>
-						<string key="NSFrame">{{214, 96}, {90, 14}}</string>
+						<string key="NSFrame">{{214, 96}, {101, 14}}</string>
 						<reference key="NSSuperview" ref="617828785"/>
 						<reference key="NSWindow"/>
 						<reference key="NSNextKeyView" ref="787858145"/>
@@ -491,7 +491,7 @@
 					<object class="NSTextField" id="620344525">
 						<reference key="NSNextResponder" ref="617828785"/>
 						<int key="NSvFlags">266</int>
-						<string key="NSFrame">{{214, 74}, {90, 14}}</string>
+						<string key="NSFrame">{{214, 74}, {101, 14}}</string>
 						<reference key="NSSuperview" ref="617828785"/>
 						<reference key="NSWindow"/>
 						<reference key="NSNextKeyView" ref="317277208"/>
@@ -515,7 +515,7 @@
 						<string key="NSFrame">{{267, 74}, {47, 14}}</string>
 						<reference key="NSSuperview" ref="617828785"/>
 						<reference key="NSWindow"/>
-						<reference key="NSNextKeyView" ref="559285401"/>
+						<reference key="NSNextKeyView" ref="733590464"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSTextFieldCell" key="NSCell" id="38211108">
 							<int key="NSCellFlags">67239424</int>
@@ -744,6 +744,7 @@
 						<string key="NSFrame">{{194, 13}, {34, 14}}</string>
 						<reference key="NSSuperview" ref="617828785"/>
 						<reference key="NSWindow"/>
+						<reference key="NSNextKeyView"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSTextFieldCell" key="NSCell" id="276464263">
 							<int key="NSCellFlags">67239424</int>
@@ -784,20 +785,20 @@
 							<int key="NSPeriodicInterval">25</int>
 						</object>
 					</object>
-					<object class="NSButton" id="559285401">
+					<object class="NSButton" id="733590464">
 						<reference key="NSNextResponder" ref="617828785"/>
 						<int key="NSvFlags">268</int>
-						<string key="NSFrame">{{10, 52}, {248, 18}}</string>
+						<string key="NSFrame">{{10, 52}, {314, 18}}</string>
 						<reference key="NSSuperview" ref="617828785"/>
 						<reference key="NSWindow"/>
 						<reference key="NSNextKeyView" ref="249386201"/>
 						<bool key="NSEnabled">YES</bool>
-						<object class="NSButtonCell" key="NSCell" id="714926037">
+						<object class="NSButtonCell" key="NSCell" id="303019042">
 							<int key="NSCellFlags">-2080244224</int>
 							<int key="NSCellFlags2">16908288</int>
-							<string key="NSContents">Remove from list when seeding completes</string>
+							<string key="NSContents">Remove from the transfer list when seeding completes</string>
 							<reference key="NSSupport" ref="26"/>
-							<reference key="NSControlView" ref="559285401"/>
+							<reference key="NSControlView" ref="733590464"/>
 							<int key="NSButtonFlags">1211912703</int>
 							<int key="NSButtonFlags2">2</int>
 							<reference key="NSNormalImage" ref="253859348"/>
@@ -939,7 +940,7 @@
 						</object>
 					</object>
 				</array>
-				<string key="NSFrameSize">{321, 258}</string>
+				<string key="NSFrameSize">{332, 258}</string>
 				<reference key="NSSuperview"/>
 				<reference key="NSWindow"/>
 				<reference key="NSNextKeyView" ref="234468111"/>
@@ -1187,7 +1188,7 @@
 					<object class="IBOutletConnection" key="connection">
 						<string key="label">fRemovesSeedingCompleteCheck</string>
 						<reference key="source" ref="1001"/>
-						<reference key="destination" ref="559285401"/>
+						<reference key="destination" ref="733590464"/>
 					</object>
 					<int key="connectionID">117</int>
 				</object>
@@ -1195,7 +1196,7 @@
 					<object class="IBOutletConnection" key="connection">
 						<string key="label">fRemoveSeedingCompleteCheck</string>
 						<reference key="source" ref="1001"/>
-						<reference key="destination" ref="559285401"/>
+						<reference key="destination" ref="733590464"/>
 					</object>
 					<int key="connectionID">118</int>
 				</object>
@@ -1203,7 +1204,7 @@
 					<object class="IBActionConnection" key="connection">
 						<string key="label">setRemoveWhenSeedingCompletes:</string>
 						<reference key="source" ref="1001"/>
-						<reference key="destination" ref="559285401"/>
+						<reference key="destination" ref="733590464"/>
 					</object>
 					<int key="connectionID">119</int>
 				</object>
@@ -1303,7 +1304,7 @@
 							<reference ref="706967535"/>
 							<reference ref="620344525"/>
 							<reference ref="760004836"/>
-							<reference ref="559285401"/>
+							<reference ref="733590464"/>
 						</array>
 						<reference key="parent" ref="0"/>
 						<string key="objectName">Options</string>
@@ -1759,16 +1760,16 @@
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">113</int>
-						<reference key="object" ref="559285401"/>
+						<reference key="object" ref="733590464"/>
 						<array class="NSMutableArray" key="children">
-							<reference ref="714926037"/>
+							<reference ref="303019042"/>
 						</array>
 						<reference key="parent" ref="617828785"/>
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">114</int>
-						<reference key="object" ref="714926037"/>
-						<reference key="parent" ref="559285401"/>
+						<reference key="object" ref="303019042"/>
+						<reference key="parent" ref="733590464"/>
 					</object>
 				</array>
 			</object>
