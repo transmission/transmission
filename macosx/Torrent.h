@@ -46,6 +46,8 @@
     NSIndexSet * fPreviousFinishedIndexes;
     NSDate * fPreviousFinishedIndexesDate;
     
+    BOOL fRemoveWhenFinishSeeding;
+    
     NSInteger fGroupValue;
     
     BOOL fResumeOnWake;

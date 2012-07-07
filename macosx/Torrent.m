@@ -103,6 +103,7 @@ int trashDataFile(const char * filename)
 
 @implementation Torrent
 
+#warning remove ivars in header when 64-bit only (or it compiles in 32-bit mode)
 @synthesize removeWhenFinishSeeding = fRemoveWhenFinishSeeding;
 
 - (id) initWithPath: (NSString *) path location: (NSString *) location deleteTorrentFile: (BOOL) torrentDelete
