@@ -27,6 +27,7 @@
 #include <QCryptographicHash>
 #include <QFile>
 #include <QTimer>
+#include <QLineEdit>
 
 #include "add-data.h" // AddData
 #include "file-tree.h" // FileList
@@ -82,6 +83,7 @@ class Options: public QDialog
         QComboBox * myPriorityCombo;
         QPushButton * myFileButton;
         QPushButton * myDestinationButton;
+        QLineEdit * myDestinationEdit;
         QPushButton * myVerifyButton;
         QVector<int> myPriorities;
         QVector<bool> myWanted;
