@@ -17,6 +17,7 @@
 #include <QObject>
 #include <QItemDelegate>
 #include <QList>
+#include <QHash>
 #include <QSet>
 #include <QSize>
 #include <QString>
@@ -43,7 +44,8 @@ class FileTreeItem: public QObject
         FileTreeItem( int fileIndex, const QString& name="" ):
             myIndex(fileIndex), myParent(0), myName(name),
             myPriority(0), myIsWanted(0),
-            myHaveSize(0), myTotalSize(0) { }
+            myHaveSize(0), myTotalSize(0),
+            myChildRowsDirty(false) { }
 
     public:
         void appendChild( FileTreeItem *child );
@@ -72,11 +74,14 @@ class FileTreeItem: public QObject
         int myIndex;
         FileTreeItem * myParent;
         QList<FileTreeItem*> myChildren;
+        QHash<QString,int> myChildRows;
+        QHash<QString,int>& getMyChildRows();
         const QString myName;
         int myPriority;
         bool myIsWanted;
         uint64_t myHaveSize;
         uint64_t myTotalSize;
+        bool myChildRowsDirty;
 };
 
 class FileTreeModel: public QAbstractItemModel

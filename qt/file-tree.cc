@@ -41,16 +41,31 @@ enum
 *****
 ****/
 
+QHash<QString,int>&
+FileTreeItem :: getMyChildRows()
+{
+  // if necessary, revalidate the name-to-row mapping
+  if( myChildRowsDirty ) {
+      myChildRows.clear();
+      for (size_t i=0, n=childCount(); i<n; ++i)
+          myChildRows.insert (child(i)->name(), i);
+      myChildRowsDirty = false;
+    }
+
+  return myChildRows;
+}
+
+
 FileTreeItem :: ~FileTreeItem( )
 {
     assert( myChildren.isEmpty( ) );
 
-    if( myParent ) {
-        const int pos = myParent->myChildren.indexOf( this );
-        if( pos >= 0 )
-            myParent->myChildren.removeAt( pos );
-        else
-            assert( 0 && "failed to remove" );
+    const int pos = row();
+    if( pos < 0 )
+        assert (0 && "failed to remove");
+    else {
+        myParent->myChildren.removeAt( pos );
+        myParent->myChildRowsDirty = true;
     }
 }
 
@@ -58,26 +73,35 @@ void
 FileTreeItem :: appendChild( FileTreeItem * child )
 {
     child->myParent = this;
-    myChildren.append( child );
+    const size_t n = childCount();
+    myChildren.append (child);
+    myChildRows.insert (child->name(), n);
 }
 
 FileTreeItem *
-FileTreeItem :: child( const QString& filename )
+FileTreeItem :: child (const QString& filename )
 {
-    foreach( FileTreeItem * c, myChildren )
-        if( c->name() == filename )
-            return c;
+  FileTreeItem * item(0);
 
-    return 0;
+  const int row = getMyChildRows().value (filename, -1);
+  if (row != -1)
+    {
+      item = child (row);
+      assert (filename == item->name());
+    }
+
+  return item;
 }
 
 int
 FileTreeItem :: row( ) const
 {
-    int i(0);
+    int i(-1);
 
     if( myParent )
-        i = myParent->myChildren.indexOf( const_cast<FileTreeItem*>(this) );
+      {
+        i = myParent->getMyChildRows().value (name(), -1);
+      }
 
     return i;
 }
