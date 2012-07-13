@@ -51,7 +51,7 @@
      <x>0</x>
      <y>0</y>
      <width>792</width>
-     <height>25</height>
+     <height>20</height>
     </rect>
    </property>
    <property name="sizePolicy">
@@ -182,6 +182,7 @@
     <bool>false</bool>
    </attribute>
    <addaction name="action_OpenFile"/>
+   <addaction name="action_AddURL"/>
    <addaction name="action_Start"/>
    <addaction name="action_Pause"/>
    <addaction name="action_Remove"/>

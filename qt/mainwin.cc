@@ -1145,11 +1145,12 @@ TrMainWindow :: openURL( QString url )
 {
     bool ok;
     const QString key = QInputDialog::getText( this,
-                                               tr( "Open URL or Magnet Link" ),
+                                               tr( "Open Link" ),
                                                tr( "Open URL or Magnet Link" ),
                                                QLineEdit::Normal,
                                                url,
-                                               &ok );
+                                               &ok,
+                                               Qt::WindowStaysOnTopHint );
     if( ok && !key.isEmpty( ) )
         mySession.addTorrent( key );
 }
@@ -1336,7 +1337,8 @@ TrMainWindow :: dragEnterEvent( QDragEnterEvent * event )
     const QMimeData * mime = event->mimeData( );
 
     if( mime->hasFormat("application/x-bittorrent")
-            || mime->text().trimmed().endsWith(".torrent", Qt::CaseInsensitive) )
+            || mime->text().trimmed().endsWith(".torrent", Qt::CaseInsensitive)
+            || mime->text().startsWith("magnet:", Qt::CaseInsensitive) )
         event->acceptProposedAction();
 }
 

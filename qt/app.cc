@@ -415,6 +415,10 @@ MyApp :: addTorrent( const AddData& addme )
     {
         myWindow->openURL( addme.url.toString( ) );
     }
+    else if( addme.type == addme.MAGNET )
+    {
+        myWindow->openURL( addme.magnet );
+    }
     else
     {
         Options * o = new Options( *mySession, *myPrefs, addme, myWindow );
