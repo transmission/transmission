@@ -8,6 +8,7 @@ Icon=transmission
 Terminal=false
 TryExec=transmission-gtk
 Type=Application
+StartupNotify=true
 MimeType=application/x-bittorrent;x-scheme-handler/magnet;
 Categories=Network;FileTransfer;P2P;GTK;
 X-Ubuntu-Gettext-Domain=transmission
