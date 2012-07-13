@@ -45,7 +45,7 @@ class FileTreeItem: public QObject
             myIndex(fileIndex), myParent(0), myName(name),
             myPriority(0), myIsWanted(0),
             myHaveSize(0), myTotalSize(0),
-            myChildRowsDirty(false) { }
+            myFirstUnhashedRow(0) { }
 
     public:
         void appendChild( FileTreeItem *child );
@@ -81,7 +81,7 @@ class FileTreeItem: public QObject
         bool myIsWanted;
         uint64_t myHaveSize;
         uint64_t myTotalSize;
-        bool myChildRowsDirty;
+        size_t myFirstUnhashedRow;
 };
 
 class FileTreeModel: public QAbstractItemModel

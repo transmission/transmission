@@ -44,15 +44,16 @@ enum
 QHash<QString,int>&
 FileTreeItem :: getMyChildRows()
 {
-  // if necessary, revalidate the name-to-row mapping
-  if( myChildRowsDirty ) {
-      myChildRows.clear();
-      for (size_t i=0, n=childCount(); i<n; ++i)
-          myChildRows.insert (child(i)->name(), i);
-      myChildRowsDirty = false;
+    const size_t n = childCount( );
+
+    // ensure that all the rows are hashed
+    while( myFirstUnhashedRow < n )
+    {
+      myChildRows.insert (myChildren[myFirstUnhashedRow]->name(), myFirstUnhashedRow);
+      myFirstUnhashedRow++;
     }
 
-  return myChildRows;
+    return myChildRows;
 }
 
 
@@ -60,22 +61,23 @@ FileTreeItem :: ~FileTreeItem( )
 {
     assert( myChildren.isEmpty( ) );
 
-    const int pos = row();
-    if( pos < 0 )
-        assert (0 && "failed to remove");
-    else {
+    if( myParent != 0 )
+    {
+        const int pos = row( );
+        assert ((pos>=0) && "couldn't find child in parent's lookup");
         myParent->myChildren.removeAt( pos );
-        myParent->myChildRowsDirty = true;
+        myParent->myChildRows.remove( name() );
+        myParent->myFirstUnhashedRow = pos;
     }
 }
 
 void
 FileTreeItem :: appendChild( FileTreeItem * child )
 {
-    child->myParent = this;
     const size_t n = childCount();
+    child->myParent = this;
     myChildren.append (child);
-    myChildRows.insert (child->name(), n);
+    myFirstUnhashedRow = n;
 }
 
 FileTreeItem *
@@ -99,9 +101,10 @@ FileTreeItem :: row( ) const
     int i(-1);
 
     if( myParent )
-      {
+    {
         i = myParent->getMyChildRows().value (name(), -1);
-      }
+        assert (this == myParent->myChildren[i]);
+    }
 
     return i;
 }
@@ -418,8 +421,10 @@ FileTreeModel :: indexOf( FileTreeItem * item, int column ) const
 void
 FileTreeModel :: clearSubtree( const QModelIndex& top )
 {
-    while( hasChildren( top ) )
-        clearSubtree( index( 0, 0, top ) );
+    size_t i = rowCount( top );
+
+    while( i > 0 )
+        clearSubtree( index( --i, 0, top ) );
 
     delete static_cast<FileTreeItem*>(top.internalPointer());
 }
