@@ -76,7 +76,7 @@ get_private_data_key( void )
 }
 
 static PrivateData*
-get_private_data( TrWindow * w )
+get_private_data( GtkWindow * w )
 {
     return g_object_get_qdata ( G_OBJECT( w ), get_private_data_key( ) );
 }
@@ -215,7 +215,7 @@ prefsChanged( TrCore * core UNUSED,
     }
     else if( !strcmp( key, PREF_KEY_STATUSBAR_STATS ) )
     {
-        gtr_window_refresh( (TrWindow*)wind );
+        gtr_window_refresh( wind );
     }
     else if( !strcmp( key, TR_PREFS_KEY_ALT_SPEED_ENABLED ) ||
              !strcmp( key, TR_PREFS_KEY_ALT_SPEED_UP_KBps ) ||
@@ -859,7 +859,7 @@ updateSpeeds( PrivateData * p )
 }
 
 void
-gtr_window_refresh( TrWindow * self )
+gtr_window_refresh( GtkWindow * self )
 {
     PrivateData * p = get_private_data( self );
 
@@ -872,13 +872,13 @@ gtr_window_refresh( TrWindow * self )
 }
 
 GtkTreeSelection*
-gtr_window_get_selection( TrWindow * w )
+gtr_window_get_selection( GtkWindow * w )
 {
     return get_private_data( w )->selection;
 }
 
 void
-gtr_window_set_busy( TrWindow * w, gboolean isBusy )
+gtr_window_set_busy( GtkWindow * w, gboolean isBusy )
 {
     if( w && gtk_widget_get_realized( GTK_WIDGET( w ) ) )
     {

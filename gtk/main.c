@@ -476,7 +476,7 @@ signal_handler( int sig )
 *****
 ****/
 
-static void app_setup( TrWindow * wind, struct cbdata  * cbdata );
+static void app_setup( GtkWindow * wind, struct cbdata  * cbdata );
 
 static void
 on_startup( GApplication * application, gpointer user_data )
@@ -669,12 +669,12 @@ on_core_busy( TrCore * core UNUSED, gboolean busy, struct cbdata * c )
 static void on_core_error( TrCore *, guint, const char *, struct cbdata * );
 static void on_add_torrent( TrCore *, tr_ctor *, gpointer );
 static void on_prefs_changed( TrCore * core, const char * key, gpointer );
-static void main_window_setup( struct cbdata * cbdata, TrWindow * wind );
+static void main_window_setup( struct cbdata * cbdata, GtkWindow * wind );
 static gboolean update_model_loop( gpointer gdata );
 static gboolean update_model_once( gpointer gdata );
 
 static void
-app_setup( TrWindow * wind, struct cbdata * cbdata )
+app_setup( GtkWindow * wind, struct cbdata * cbdata )
 {
     if( cbdata->is_iconified )
         gtr_pref_flag_set( PREF_KEY_SHOW_TRAY_ICON, TRUE );
@@ -834,14 +834,14 @@ on_drag_data_received( GtkWidget         * widget          UNUSED,
 }
 
 static void
-main_window_setup( struct cbdata * cbdata, TrWindow * wind )
+main_window_setup( struct cbdata * cbdata, GtkWindow * wind )
 {
     GtkWidget * w;
     GtkTreeModel * model;
     GtkTreeSelection * sel;
 
     g_assert( NULL == cbdata->wind );
-    cbdata->wind = GTK_WINDOW( wind );
+    cbdata->wind = wind;
     cbdata->sel = sel = GTK_TREE_SELECTION( gtr_window_get_selection( cbdata->wind ) );
 
     g_signal_connect( sel, "changed", G_CALLBACK( on_selection_changed ), cbdata );

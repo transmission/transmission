@@ -28,11 +28,9 @@
 #include <gtk/gtk.h>
 #include "tr-core.h"
 
-typedef GtkWindow TrWindow;
-
 GtkWidget        * gtr_window_new( GtkUIManager * uim, TrCore * core );
-GtkTreeSelection * gtr_window_get_selection( TrWindow * );
-void               gtr_window_set_busy( TrWindow *, gboolean isBusy );
-void               gtr_window_refresh( TrWindow * );
+GtkTreeSelection * gtr_window_get_selection( GtkWindow * );
+void               gtr_window_set_busy( GtkWindow *, gboolean isBusy );
+void               gtr_window_refresh( GtkWindow * );
 
 #endif /* GTR_WINDOW_H */
