@@ -512,7 +512,7 @@ on_startup( GApplication * application, gpointer user_data )
     gtk_ui_manager_ensure_update ( ui_manager );
 
     /* create main window now to be a parent to any error dialogs */
-    win = GTK_WINDOW( gtr_window_new( ui_manager, cbdata->core ) );
+    win = GTK_WINDOW( gtr_window_new( GTK_APPLICATION( application ), ui_manager, cbdata->core ) );
     g_signal_connect( win, "size-allocate", G_CALLBACK( on_main_window_size_allocated ), cbdata );
     g_application_hold( application );
     g_object_weak_ref( G_OBJECT( win ), (GWeakNotify)g_application_release, application );
@@ -587,7 +587,7 @@ main( int argc, char ** argv )
     int ret;
     struct stat sb;
     char * application_id;
-    GApplication * app;
+    GtkApplication * app;
     GOptionContext * option_context;
     bool show_version = false;
     GError * error = NULL;
@@ -650,11 +650,11 @@ main( int argc, char ** argv )
     /* init the application for the specified config dir */
     stat( cbdata.config_dir, &sb );
     application_id = g_strdup_printf( "com.transmissionbt.transmission_%lu_%lu", (unsigned long)sb.st_dev, (unsigned long)sb.st_ino );
-    app = g_application_new( application_id, G_APPLICATION_HANDLES_OPEN );
+    app = gtk_application_new( application_id, G_APPLICATION_HANDLES_OPEN );
     g_signal_connect( app, "open", G_CALLBACK(on_open), &cbdata );
     g_signal_connect( app, "startup", G_CALLBACK(on_startup), &cbdata );
     g_signal_connect( app, "activate", G_CALLBACK(on_activate), &cbdata );
-    ret = g_application_run (app, argc, argv);
+    ret = g_application_run( G_APPLICATION( app ), argc, argv);
     g_object_unref( app );
     g_free( application_id );
     return ret;

@@ -580,7 +580,7 @@ onOptionsClicked( GtkButton * button UNUSED, gpointer vp )
 ***/
 
 GtkWidget *
-gtr_window_new( GtkUIManager * ui_mgr, TrCore * core )
+gtr_window_new( GtkApplication * app, GtkUIManager * ui_mgr, TrCore * core )
 {
     int           i, n;
     const char  * pch;
@@ -593,7 +593,7 @@ gtr_window_new( GtkUIManager * ui_mgr, TrCore * core )
     p = g_new0( PrivateData, 1 );
 
     /* make the window */
-    self = gtk_window_new ( GTK_WINDOW_TOPLEVEL );
+    self = gtk_application_window_new ( app );
     g_object_set_qdata_full( G_OBJECT(self), get_private_data_key( ), p, privateFree );
     win = GTK_WINDOW( self );
     gtk_window_set_title( win, g_get_application_name( ) );
