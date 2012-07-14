@@ -1145,16 +1145,23 @@ tr_torrentIsStalled( const tr_torrent * tor )
 static double
 getVerifyProgress( const tr_torrent * tor )
 {
-    tr_piece_index_t i, n;
-    tr_piece_index_t checked = 0;
+    double d = 0;
 
     assert( tr_isTorrent( tor ) );
 
-    for( i=0, n=tor->info.pieceCount; i!=n; ++i )
-        if( tor->info.pieces[i].timeChecked )
-            ++checked;
+    if( tr_torrentHasMetadata( tor ) )
+    {
+        tr_piece_index_t i, n;
+        tr_piece_index_t checked = 0;
 
-    return checked / (double)tor->info.pieceCount;
+        for( i=0, n=tor->info.pieceCount; i!=n; ++i )
+            if( tor->info.pieces[i].timeChecked )
+                ++checked;
+
+        d = checked / (double)tor->info.pieceCount;
+    }
+
+    return d;
 }
 
 const tr_stat *
