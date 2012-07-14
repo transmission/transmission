@@ -303,7 +303,6 @@ downloadPage( GObject * core )
     g_signal_connect( l, "toggled", G_CALLBACK( target_cb ), w );
     hig_workarea_add_row_w( t, &row, l, w, NULL );
 
-    hig_workarea_finish( t, &row );
     return t;
 }
 
@@ -360,7 +359,6 @@ torrentPage( GObject * core )
     g_signal_connect( w, "toggled", G_CALLBACK( target_cb ), w2 );
     hig_workarea_add_row_w( t, &row, w, w2, NULL );
 
-    hig_workarea_finish( t, &row );
     return t;
 }
 
@@ -402,7 +400,6 @@ desktopPage( GObject * core )
     w = new_check_button( s, PREF_KEY_TORRENT_COMPLETE_SOUND_ENABLED, core );
     hig_workarea_add_wide_control( t, &row, w );
 
-    hig_workarea_finish( t, &row );
     return t;
 }
 
@@ -549,7 +546,7 @@ privacyPage( GObject * core )
     gtk_misc_set_alignment( GTK_MISC( w ), 0.0f, 0.5f );
     updateBlocklistText( w, TR_CORE( core ) );
     data->label = w;
-    h = gtr_hbox_new( FALSE, GUI_PAD_BIG );
+    h = gtk_box_new( GTK_ORIENTATION_HORIZONTAL, GUI_PAD_BIG );
     gtk_box_pack_start( GTK_BOX( h ), w, TRUE, TRUE, 0 );
     b = data->updateBlocklistButton = gtk_button_new_with_mnemonic( _( "_Update" ) );
     g_object_set_data( G_OBJECT( b ), "session", gtr_core_session( TR_CORE( core ) ) );
@@ -591,7 +588,6 @@ privacyPage( GObject * core )
     gtk_widget_set_tooltip_text( w, s );
     hig_workarea_add_wide_control( t, &row, w );
 
-    hig_workarea_finish( t, &row );
     g_object_weak_ref( G_OBJECT( t ), privacyPageDestroyed, data );
     return t;
 }
@@ -811,7 +807,7 @@ webPage( GObject * core )
     w = new_check_button( s, TR_PREFS_KEY_RPC_ENABLED, core );
     page->rpc_tb = GTK_TOGGLE_BUTTON( w );
     g_signal_connect( w, "clicked", G_CALLBACK( onRPCToggled ), page );
-    h = gtr_hbox_new( FALSE, GUI_PAD_BIG );
+    h = gtk_box_new( GTK_ORIENTATION_HORIZONTAL, GUI_PAD_BIG );
     gtk_box_pack_start( GTK_BOX( h ), w, TRUE, TRUE, 0 );
     w = gtk_button_new_with_mnemonic( _( "_Open web client" ) );
     page->widgets = g_slist_prepend( page->widgets, w );
@@ -902,7 +898,7 @@ webPage( GObject * core )
         gtk_misc_set_padding( GTK_MISC( w ), 0, GUI_PAD );
         page->whitelist_widgets = g_slist_prepend( page->whitelist_widgets, w );
 
-        h = gtr_hbox_new( TRUE, GUI_PAD );
+        h = gtk_box_new( GTK_ORIENTATION_HORIZONTAL, GUI_PAD );
         w = gtk_button_new_from_stock( GTK_STOCK_REMOVE );
         g_signal_connect( w, "clicked", G_CALLBACK(
                               onRemoveWhitelistClicked ), page );
@@ -913,7 +909,7 @@ webPage( GObject * core )
         page->whitelist_widgets = g_slist_prepend( page->whitelist_widgets, w );
         g_signal_connect( w, "clicked", G_CALLBACK( onAddWhitelistClicked ), page );
         gtk_box_pack_start( GTK_BOX( h ), w, TRUE, TRUE, 0 );
-        w = gtr_hbox_new( FALSE, 0 );
+        w = gtk_box_new( GTK_ORIENTATION_HORIZONTAL, 0 );
         gtk_box_pack_start( GTK_BOX( w ), gtk_alignment_new( 0, 0, 0, 0 ),
                             TRUE, TRUE, 0 );
         gtk_box_pack_start( GTK_BOX( w ), h, FALSE, FALSE, 0 );
@@ -921,7 +917,6 @@ webPage( GObject * core )
     }
 
     refreshRPCSensitivity( page );
-    hig_workarea_finish( t, &row );
     return t;
 }
 
@@ -1071,7 +1066,7 @@ bandwidthPage( GObject * core )
         hig_workarea_add_row_w( t, &row, w, w2, NULL );
 
     hig_workarea_add_section_divider( t, &row );
-    h = gtr_hbox_new( FALSE, GUI_PAD );
+    h = gtk_box_new( GTK_ORIENTATION_HORIZONTAL, GUI_PAD );
     w = gtk_image_new_from_stock( "alt-speed-on", -1 );
     gtk_box_pack_start( GTK_BOX( h ), w, FALSE, FALSE, 0 );
     g_snprintf( buf, sizeof( buf ), "<b>%s</b>", _( "Alternative Speed Limits" ) );
@@ -1097,7 +1092,7 @@ bandwidthPage( GObject * core )
         hig_workarea_add_row( t, &row, buf, w, NULL );
 
         s = _( "_Scheduled times:" );
-        h = gtr_hbox_new( FALSE, 0 );
+        h = gtk_box_new( GTK_ORIENTATION_HORIZONTAL, 0 );
         w2 = new_time_combo( core, TR_PREFS_KEY_ALT_SPEED_TIME_BEGIN );
         page->sched_widgets = g_slist_prepend( page->sched_widgets, w2 );
         gtk_box_pack_start( GTK_BOX( h ), w2, TRUE, TRUE, 0 );
@@ -1118,7 +1113,6 @@ bandwidthPage( GObject * core )
         w = hig_workarea_add_row( t, &row, s, w, NULL );
         page->sched_widgets = g_slist_prepend( page->sched_widgets, w );
 
-    hig_workarea_finish( t, &row );
     g_object_set_data_full( G_OBJECT( t ), "page", page, bandwidthPageFree );
 
     refreshSchedSensitivity( page );
@@ -1211,7 +1205,7 @@ networkPage( GObject * core )
     w = data->portSpin = new_spin_button( TR_PREFS_KEY_PEER_PORT, core, 1, USHRT_MAX, 1 );
     hig_workarea_add_row( t, &row, s, w, NULL );
 
-    h = gtr_hbox_new( FALSE, GUI_PAD_BIG );
+    h = gtk_box_new( GTK_ORIENTATION_HORIZONTAL, GUI_PAD_BIG );
     l = data->portLabel = gtk_label_new( _( "Status unknown" ) );
     gtk_misc_set_alignment( GTK_MISC( l ), 0.0f, 0.5f );
     gtk_box_pack_start( GTK_BOX( h ), l, TRUE, TRUE, 0 );
@@ -1249,7 +1243,6 @@ networkPage( GObject * core )
     hig_workarea_add_wide_control( t, &row, w );
 #endif
 
-    hig_workarea_finish( t, &row );
     return t;
 }
 

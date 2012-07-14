@@ -12,17 +12,17 @@
 
 #include <gtk/gtk.h>
 #include "hig.h"
-#include "util.h" /* gtr_hbox_new */
 
 GtkWidget*
 hig_workarea_create( void )
 {
-    GtkWidget * t = gtk_table_new( 1, 2, FALSE );
+    GtkWidget * grid = gtk_grid_new( );
 
-    gtk_container_set_border_width( GTK_CONTAINER( t ), GUI_PAD_BIG );
-    gtk_table_set_col_spacing( GTK_TABLE( t ), 0, GUI_PAD_BIG );
-    gtk_table_set_row_spacings( GTK_TABLE( t ), GUI_PAD );
-    return t;
+    gtk_container_set_border_width( GTK_CONTAINER( grid ), GUI_PAD_BIG );
+    gtk_grid_set_row_spacing( GTK_GRID( grid ), GUI_PAD );
+    gtk_grid_set_column_spacing( GTK_GRID( grid ), GUI_PAD_BIG );
+
+    return grid;
 }
 
 void
@@ -31,14 +31,15 @@ hig_workarea_add_section_divider( GtkWidget * t, guint * row )
     GtkWidget * w = gtk_alignment_new( 0.0f, 0.0f, 0.0f, 0.0f );
 
     gtk_widget_set_size_request( w, 0u, 6u );
-    gtk_table_attach( GTK_TABLE( t ), w, 0, 2, *row, *row + 1, 0, 0, 0, 0 );
+    gtk_grid_attach( GTK_GRID( t ), w, 0, *row, 2, 1 );
     ++ * row;
 }
 
 void
 hig_workarea_add_section_title_widget( GtkWidget * t, guint * row, GtkWidget * w )
 {
-    gtk_table_attach( GTK_TABLE( t ), w, 0, 2, *row, *row + 1, ~0, 0, 0, 0 );
+    gtk_widget_set_hexpand( w, TRUE );
+    gtk_grid_attach( GTK_GRID( t ), w, 0, *row, 2, 1 );
     ++ * row;
 }
 
@@ -55,47 +56,19 @@ hig_workarea_add_section_title( GtkWidget *  t, guint * row, const char * sectio
     hig_workarea_add_section_title_widget( t, row, l );
 }
 
-static GtkWidget*
-rowNew( GtkWidget * w )
-{
-    GtkWidget * a;
-    GtkWidget * h = gtr_hbox_new( FALSE, 0 );
-
-    /* spacer */
-    a = gtk_alignment_new( 0.0f, 0.0f, 0.0f, 0.0f );
-    gtk_widget_set_size_request( a, 18u, 0u );
-    gtk_box_pack_start( GTK_BOX( h ), a, FALSE, FALSE, 0 );
-
-    /* lhs widget */
-    if( GTK_IS_MISC( w ) )
-        gtk_misc_set_alignment( GTK_MISC( w ), 0.0f, 0.5f );
-    if( GTK_IS_LABEL( w ) )
-        gtk_label_set_use_markup( GTK_LABEL( w ), TRUE );
-    gtk_box_pack_start( GTK_BOX( h ), w, TRUE, TRUE, 0 );
-
-    return h;
-}
-
 void
 hig_workarea_add_wide_control( GtkWidget * t, guint * row, GtkWidget * w )
 {
-    GtkWidget * r = rowNew( w );
-
-    gtk_table_attach( GTK_TABLE( t ), r, 0, 2, *row, *row + 1, GTK_FILL, 0, 0, 0 );
+    gtk_widget_set_hexpand( w, TRUE );
+    gtk_widget_set_margin_left( w, 18 );
+    gtk_grid_attach( GTK_GRID( t ), w, 0, *row, 2, 1 );
     ++ * row;
 }
-
 void
 hig_workarea_add_wide_tall_control( GtkWidget * t, guint * row, GtkWidget * w )
 {
-    GtkWidget * r = rowNew( w );
-
-    gtk_table_attach( GTK_TABLE( t ), r, 0, 2, *row, *row + 1,
-                      GTK_EXPAND | GTK_SHRINK | GTK_FILL,
-                      GTK_EXPAND | GTK_SHRINK | GTK_FILL,
-                      0, 0 );
-
-    ++ * row;
+    gtk_widget_set_hexpand( w, TRUE );
+    hig_workarea_add_wide_control( t, row, w );
 }
 
 GtkWidget *
@@ -112,20 +85,14 @@ hig_workarea_add_wide_checkbutton( GtkWidget  * t,
 }
 
 void
-hig_workarea_add_label_w( GtkWidget * t, guint row, GtkWidget * l )
+hig_workarea_add_label_w( GtkWidget * t, guint row, GtkWidget * w )
 {
-    GtkWidget * w = rowNew( l );
-
-    gtk_table_attach( GTK_TABLE( t ), w, 0, 1, row, row + 1, GTK_FILL, GTK_FILL, 0, 0 );
-}
-
-GtkWidget*
-hig_workarea_add_label( GtkWidget * t, guint row, const char * mnemonic_string )
-{
-    GtkWidget * l = gtk_label_new_with_mnemonic( mnemonic_string );
-
-    hig_workarea_add_label_w( t, row, l );
-    return l;
+    gtk_widget_set_margin_left( w, 18 );
+    if( GTK_IS_MISC( w ) )
+        gtk_misc_set_alignment( GTK_MISC( w ), 0.0f, 0.5f );
+    if( GTK_IS_LABEL( w ) )
+        gtk_label_set_use_markup( GTK_LABEL( w ), TRUE );
+    gtk_grid_attach( GTK_GRID( t ), w, 0, row, 1, 1 );
 }
 
 static void
@@ -134,11 +101,8 @@ hig_workarea_add_tall_control( GtkWidget * t, guint row, GtkWidget * control )
     if( GTK_IS_MISC( control ) )
         gtk_misc_set_alignment( GTK_MISC( control ), 0.0f, 0.5f );
 
-    gtk_table_attach( GTK_TABLE( t ), control,
-                      1, 2, row, row + 1,
-                      GTK_EXPAND | GTK_SHRINK | GTK_FILL,
-                      GTK_EXPAND | GTK_SHRINK | GTK_FILL,
-                      0, 0 );
+    g_object_set( control, "expand", TRUE, NULL );
+    gtk_grid_attach( GTK_GRID( t ), control, 1, row, 1, 1 );
 }
 
 static void
@@ -147,9 +111,8 @@ hig_workarea_add_control( GtkWidget * t, guint row, GtkWidget * control )
     if( GTK_IS_MISC( control ) )
         gtk_misc_set_alignment( GTK_MISC( control ), 0.0f, 0.5f );
 
-    gtk_table_attach( GTK_TABLE( t ), control,
-                      1, 2, row, row + 1,
-                      GTK_EXPAND | GTK_SHRINK | GTK_FILL, 0, 0, 0 );
+    gtk_widget_set_hexpand( control, TRUE );
+    gtk_grid_attach( GTK_GRID( t ), control, 1, row, 1, 1 );
 }
 
 void
@@ -188,8 +151,8 @@ hig_workarea_add_tall_row( GtkWidget  * table,
                            GtkWidget  * mnemonic )
 {
     GtkWidget * l = gtk_label_new_with_mnemonic( mnemonic_string );
-    GtkWidget * h = gtr_hbox_new( FALSE, 0 );
-    GtkWidget * v = gtr_vbox_new( FALSE, 0 );
+    GtkWidget * h = gtk_box_new( GTK_ORIENTATION_HORIZONTAL, 0 );
+    GtkWidget * v = gtk_box_new( GTK_ORIENTATION_VERTICAL, 0 );
     gtk_box_pack_start( GTK_BOX( h ), l, FALSE, FALSE, 0 );
     gtk_box_pack_start( GTK_BOX( v ), h, FALSE, FALSE, GUI_PAD_SMALL );
 
@@ -202,10 +165,4 @@ hig_workarea_add_tall_row( GtkWidget  * table,
 
     ++ * row;
     return l;
-}
-
-void
-hig_workarea_finish( GtkWidget * t, guint * row )
-{
-    gtk_table_resize( GTK_TABLE( t ), *row, 2 );
 }

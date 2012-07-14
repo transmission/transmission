@@ -46,10 +46,6 @@ GtkWidget* hig_workarea_add_wide_checkbutton( GtkWidget  * table,
                                               const char * mnemonic_string,
                                               gboolean     is_active );
 
-GtkWidget* hig_workarea_add_label( GtkWidget  * table,
-                                   guint        row,
-                                   const char * mnemonic_string );
-
 void       hig_workarea_add_label_w( GtkWidget * table,
                                      guint       row,
                                      GtkWidget * label_widget );
@@ -71,9 +67,6 @@ void       hig_workarea_add_row_w( GtkWidget * table,
                                    GtkWidget * label,
                                    GtkWidget * control,
                                    GtkWidget * mnemonic_or_null_for_control );
-
-void       hig_workarea_finish( GtkWidget * table,
-                                guint     * row );
 
 enum
 {

@@ -514,7 +514,7 @@ options_page_new( struct DetailsImpl * d )
     hig_workarea_add_section_divider( t, &row );
     hig_workarea_add_section_title( t, &row, _( "Seeding Limits" ) );
 
-    h = gtr_hbox_new( FALSE, GUI_PAD );
+    h = gtk_box_new( GTK_ORIENTATION_HORIZONTAL, GUI_PAD );
     w = d->ratio_combo = ratio_combo_new( );
     d->ratio_combo_tag = g_signal_connect( w, "changed", G_CALLBACK( onComboEnumChanged ), d );
     gtk_box_pack_start( GTK_BOX( h ), w, TRUE, TRUE, 0 );
@@ -524,7 +524,7 @@ options_page_new( struct DetailsImpl * d )
     gtk_box_pack_start( GTK_BOX( h ), w, FALSE, FALSE, 0 );
     hig_workarea_add_row( t, &row, _( "_Ratio:" ), h, NULL );
 
-    h = gtr_hbox_new( FALSE, GUI_PAD );
+    h = gtk_box_new( GTK_ORIENTATION_HORIZONTAL, GUI_PAD );
     w = d->idle_combo = idle_combo_new( );
     d->idle_combo_tag = g_signal_connect( w, "changed", G_CALLBACK( onComboEnumChanged ), d );
     gtk_box_pack_start( GTK_BOX( h ), w, TRUE, TRUE, 0 );
@@ -542,7 +542,6 @@ options_page_new( struct DetailsImpl * d )
     d->max_peers_spin = w;
     d->max_peers_spin_tag = tag;
 
-    hig_workarea_finish( t, &row );
     return t;
 }
 
@@ -1025,10 +1024,6 @@ info_page_new( struct DetailsImpl * di )
         gtk_misc_set_alignment( GTK_MISC( w ), 0.0f, 0.0f );
 
     hig_workarea_add_section_divider( t, &row );
-    hig_workarea_finish( t, &row );
-    return t;
-
-    hig_workarea_finish( t, &row );
     return t;
 }
 
@@ -1728,14 +1723,10 @@ peer_page_new( struct DetailsImpl * di )
                                          GTK_SHADOW_IN );
     gtk_container_add( GTK_CONTAINER( w ), v );
 
-    vbox = gtr_vbox_new( FALSE, GUI_PAD );
+    vbox = gtk_box_new( GTK_ORIENTATION_VERTICAL, GUI_PAD );
     gtk_container_set_border_width( GTK_CONTAINER( vbox ), GUI_PAD_BIG );
 
-#if GTK_CHECK_VERSION(3,2,0)
     v = gtk_paned_new( GTK_ORIENTATION_VERTICAL );
-#else
-    v = gtk_vpaned_new( );
-#endif
     gtk_paned_pack1( GTK_PANED( v ), webtree, FALSE, TRUE );
     gtk_paned_pack2( GTK_PANED( v ), sw, TRUE, TRUE );
     gtk_box_pack_start( GTK_BOX( vbox ), v, TRUE, TRUE, 0 );
@@ -2232,7 +2223,6 @@ on_edit_trackers( GtkButton * button, gpointer data )
         gtk_container_add( GTK_CONTAINER( fr ), sw );
         hig_workarea_add_wide_tall_control( t, &row, fr );
 
-        hig_workarea_finish( t, &row );
         gtr_dialog_set_content( GTK_DIALOG( d ), t );
 
         g_object_set_qdata( G_OBJECT( d ), TORRENT_ID_KEY, GINT_TO_POINTER( torrent_id ) );
@@ -2373,7 +2363,7 @@ tracker_page_new( struct DetailsImpl * di )
     GtkWidget *vbox, *sw, *w, *v, *hbox;
     const int pad = ( GUI_PAD + GUI_PAD_BIG ) / 2;
 
-    vbox = gtr_vbox_new( FALSE, GUI_PAD );
+    vbox = gtk_box_new( GTK_ORIENTATION_VERTICAL, GUI_PAD );
     gtk_container_set_border_width( GTK_CONTAINER( vbox ), GUI_PAD_BIG );
 
     di->tracker_store = gtk_list_store_new( TRACKER_N_COLS, G_TYPE_INT,
@@ -2391,7 +2381,7 @@ tracker_page_new( struct DetailsImpl * di )
     gtk_tree_model_filter_set_visible_func( GTK_TREE_MODEL_FILTER( di->trackers_filtered ),
                                             trackerVisibleFunc, di, NULL );
 
-    hbox = gtr_hbox_new( FALSE, GUI_PAD_BIG );
+    hbox = gtk_box_new( GTK_ORIENTATION_HORIZONTAL, GUI_PAD_BIG );
 
         v = di->tracker_view = gtk_tree_view_new_with_model( GTK_TREE_MODEL( di->trackers_filtered ) );
         g_object_unref( di->trackers_filtered );
@@ -2426,7 +2416,7 @@ tracker_page_new( struct DetailsImpl * di )
 
     gtk_box_pack_start( GTK_BOX( hbox ), w, TRUE, TRUE, 0 );
 
-        v = gtr_vbox_new( FALSE, GUI_PAD );
+        v = gtk_box_new( GTK_ORIENTATION_VERTICAL, GUI_PAD );
 
         w = gtk_button_new_with_mnemonic( _( "_Add" ) );
         di->add_tracker_button = w;
@@ -2551,7 +2541,7 @@ gtr_torrent_details_dialog_new( GtkWindow * parent, TrCore * core )
     l = gtk_label_new( _( "Trackers" ) );
     gtk_notebook_append_page( GTK_NOTEBOOK( n ), w, l );
 
-    v = gtr_vbox_new( FALSE, 0 );
+    v = gtk_box_new( GTK_ORIENTATION_VERTICAL, 0 );
     di->file_list = gtr_file_list_new( core, 0 );
     di->file_label = gtk_label_new( _( "File listing not available for combined torrent properties" ) );
     gtk_box_pack_start( GTK_BOX( v ), di->file_list, TRUE, TRUE, 0 );

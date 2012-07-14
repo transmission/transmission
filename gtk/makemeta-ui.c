@@ -177,7 +177,7 @@ makeProgressDialog( GtkWidget * parent, MakeMetaUI * ui )
     fr = gtk_frame_new( NULL );
     gtk_container_set_border_width( GTK_CONTAINER( fr ), GUI_PAD_BIG );
     gtk_frame_set_shadow_type( GTK_FRAME( fr ), GTK_SHADOW_NONE );
-    v = gtr_vbox_new( TRUE, GUI_PAD );
+    v = gtk_box_new( GTK_ORIENTATION_VERTICAL, GUI_PAD );
     gtk_container_add( GTK_CONTAINER( fr ), v );
 
     l = gtk_label_new( _( "Creating torrent…" ) );
@@ -473,7 +473,7 @@ gtr_torrent_creation_dialog_new( GtkWindow  * parent, TrCore * core )
     hig_workarea_add_section_title ( t, &row, _( "Properties" ) );
 
         str = _( "_Trackers:" );
-        v = gtr_vbox_new( FALSE, GUI_PAD_SMALL );
+        v = gtk_box_new( GTK_ORIENTATION_VERTICAL, GUI_PAD_SMALL );
         ui->announce_text_buffer = gtk_text_buffer_new( NULL );
         w = gtk_text_view_new_with_buffer( ui->announce_text_buffer );
         gtk_widget_set_size_request( w, -1, 80 );
@@ -506,7 +506,6 @@ gtr_torrent_creation_dialog_new( GtkWindow  * parent, TrCore * core )
         w = hig_workarea_add_wide_checkbutton( t, &row, _( "_Private torrent" ), FALSE );
         ui->private_check = w;
 
-    hig_workarea_finish( t, &row );
     gtr_dialog_set_content( GTK_DIALOG( d ), t );
 
     gtk_drag_dest_set( d, GTK_DEST_DEFAULT_ALL, NULL, 0, GDK_ACTION_COPY );

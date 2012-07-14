@@ -51,11 +51,9 @@ AC_SUBST(OPENSSL_MINIMUM)
 ##
 ##
 
-GTK2_MINIMUM=2.22.0
-AC_SUBST(GTK2_MINIMUM)
-GTK3_MINIMUM=3.2.0
-AC_SUBST(GTK3_MINIMUM)
-GLIB_MINIMUM=2.28.0
+GTK_MINIMUM=3.2.0
+AC_SUBST(GTK_MINIMUM)
+GLIB_MINIMUM=2.32.0
 AC_SUBST(GLIB_MINIMUM)
 GIO_MINIMUM=2.26.0
 AC_SUBST(GIO_MINIMUM)
@@ -351,60 +349,31 @@ dnl ----------------------------------------------------------------------------
 dnl
 dnl  detection for the GTK+ client
 
-
-gtk_version="none"
-with_gtk_default="no"
-PKG_CHECK_EXISTS([gtk+-2.0 >= $GTK2_MINIMUM],[gtk_version="2" with_gtk_default="yes"])
-PKG_CHECK_EXISTS([gtk+-3.0 >= $GTK3_MINIMUM],[gtk_version="3" with_gtk_default="yes"])
-AC_ARG_WITH([gtk], AC_HELP_STRING([--with-gtk],[with Gtk]),
-            [with_gtk=$withval],
-            [with_gtk=$with_gtk_default])
-if test "x$with_gtk" = "x2" ; then
-    PKG_CHECK_EXISTS([gtk+-2.0 >= $GTK2_MINIMUM],[gtk_version="2" with_gtk="yes"],[gtk_version="none" with_gtk="no"])
-fi
-if test "x$with_gtk" = "x3" ; then
-    PKG_CHECK_EXISTS([gtk+-3.0 >= $GTK3_MINIMUM],[gtk_version="3" with_gtk="yes"],[gtk_version="none" with_gtk="no"])
-fi
 AC_ARG_ENABLE([nls],
               [AS_HELP_STRING([--enable-nls],[enable native language support])],,
               [enable_nls=yes])
+AC_ARG_WITH([gtk],
+            AC_HELP_STRING([--with-gtk],[with Gtk]),
+            [with_gtk=$withval],
+            [with_gtk=yes])
 AM_CONDITIONAL([BUILD_GTK],[test "x$with_gtk" = "xyes"])
 use_libappindicator=no
 if test "x$with_gtk" = "xyes" ; then
 
-    if test "x$gtk_version" = "xnone" ; then
-        AC_MSG_ERROR("GTK+ not found!")
-    fi
     if test "x$enable_nls" = "xno" ; then
         AC_MSG_ERROR("The gtk client cannot be built without nls support.  Try adding either --enable-nls or --without-gtk" )
     fi
 
-    if test "x$gtk_version" = "x3"; then
-
-        PKG_CHECK_MODULES([GTK], [gtk+-3.0 >= $GTK3_MINIMUM
-                                  glib-2.0 >= $GLIB_MINIMUM
-                                  gio-2.0 >= $GIO_MINIMUM,
-                                  gmodule-2.0 >= $GLIB_MINIMUM
-                                  gthread-2.0 >= $GLIB_MINIMUM])
-        PKG_CHECK_MODULES([LIBAPPINDICATOR],
-                          [appindicator3-0.1 >= $LIBAPPINDICATOR_MINIMUM],
-                          [have_libappindicator=yes],
-                          [have_libappindicator=no])
-        AC_MSG_NOTICE([using GTK+ 3])
-    else
-
-        PKG_CHECK_MODULES([GTK], [gtk+-2.0 >= $GTK2_MINIMUM
-                                  glib-2.0 >= $GLIB_MINIMUM
-                                  gio-2.0 >= $GIO_MINIMUM,
-                                  gmodule-2.0 >= $GLIB_MINIMUM
-                                  gthread-2.0 >= $GLIB_MINIMUM])
-        PKG_CHECK_MODULES([LIBAPPINDICATOR],
-                          [appindicator-0.1 >= $LIBAPPINDICATOR_MINIMUM],
-                          [have_libappindicator=yes],
-                          [have_libappindicator=no])
-        AC_MSG_NOTICE([using GTK+ 2])
-
-    fi
+    PKG_CHECK_MODULES([GTK], [gtk+-3.0 >= $GTK_MINIMUM
+                              glib-2.0 >= $GLIB_MINIMUM
+                              gio-2.0 >= $GIO_MINIMUM,
+                              gmodule-2.0 >= $GLIB_MINIMUM
+                              gthread-2.0 >= $GLIB_MINIMUM])
+    PKG_CHECK_MODULES([LIBAPPINDICATOR],
+                      [appindicator3-0.1 >= $LIBAPPINDICATOR_MINIMUM],
+                      [have_libappindicator=yes],
+                      [have_libappindicator=no])
+    AC_MSG_NOTICE([using GTK+ 3])
 
     if test "x$have_libappindicator" = "xyes"; then
         use_libappindicator=yes
@@ -569,7 +538,7 @@ Configuration:
 
    Build Command-Line client:                         ${build_cli}
 
-   Build GTK+ client:                                 ${with_gtk} (GTK+ $gtk_version)
+   Build GTK+ client:                                 ${with_gtk}
       * libappindicator for an Ubuntu-style tray:     ${use_libappindicator}
 
    Build Daemon:                                      ${build_daemon}

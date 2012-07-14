@@ -988,7 +988,7 @@ gtr_filter_bar_new( tr_session * session, GtkTreeModel * tmodel, GtkTreeModel **
     g_signal_connect( data->activity, "changed", G_CALLBACK( selection_changed_cb ), data );
 
 
-    h = gtr_hbox_new( FALSE, GUI_PAD_SMALL );
+    h = gtk_box_new( GTK_ORIENTATION_HORIZONTAL, GUI_PAD_SMALL );
 
     /* add the activity combobox */
     str = _( "_Show:" );

@@ -176,7 +176,6 @@ gtr_stats_dialog_new( GtkWindow * parent, TrCore * core )
     l = ui->all_time_lb = gtk_label_new( NULL );
     gtk_label_set_single_line_mode( GTK_LABEL( l ), TRUE );
     hig_workarea_add_row( t, &row, _( "Duration:" ), l, NULL );
-    hig_workarea_finish( t, &row );
     gtr_dialog_set_content( GTK_DIALOG( d ), t );
 
     updateStats( ui );

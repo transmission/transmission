@@ -440,6 +440,7 @@ on_rpc_changed( tr_session            * session,
         case TR_RPC_TORRENT_MOVED:
         case TR_RPC_TORRENT_STARTED:
         case TR_RPC_TORRENT_STOPPED:
+        case TR_RPC_SESSION_QUEUE_POSITIONS_CHANGED:
             /* nothing interesting to do here */
             break;
     }
@@ -611,7 +612,6 @@ main( int argc, char ** argv )
     textdomain( MY_READABLE_NAME );
 
     /* init glib/gtk */
-    g_thread_init (NULL);
     g_type_init ();
     gtk_init (&argc, &argv);
     g_set_application_name (_( "Transmission" ));
@@ -922,27 +922,27 @@ on_app_exit( gpointer vdata )
     r = gtk_alignment_new( 0.5, 0.5, 0.01, 0.01 );
     gtk_container_add( GTK_CONTAINER( c ), r );
 
-    p = gtk_table_new( 3, 2, FALSE );
-    gtk_table_set_col_spacings( GTK_TABLE( p ), GUI_PAD_BIG );
+    p = gtk_grid_new( );
+    gtk_grid_set_column_spacing( GTK_GRID( p ), GUI_PAD_BIG );
     gtk_container_add( GTK_CONTAINER( r ), p );
 
     w = gtk_image_new_from_stock( GTK_STOCK_NETWORK, GTK_ICON_SIZE_DIALOG );
-    gtk_table_attach_defaults( GTK_TABLE( p ), w, 0, 1, 0, 2 );
+    gtk_grid_attach( GTK_GRID( p ), w, 0, 0, 1, 2 );
 
     w = gtk_label_new( NULL );
     gtk_label_set_markup( GTK_LABEL( w ), _( "<b>Closing Connections</b>" ) );
     gtk_misc_set_alignment( GTK_MISC( w ), 0.0, 0.5 );
-    gtk_table_attach_defaults( GTK_TABLE( p ), w, 1, 2, 0, 1 );
+    gtk_grid_attach( GTK_GRID( p ), w, 1, 0, 1, 1 );
 
     w = gtk_label_new( _( "Sending upload/download totals to tracker…" ) );
     gtk_misc_set_alignment( GTK_MISC( w ), 0.0, 0.5 );
-    gtk_table_attach_defaults( GTK_TABLE( p ), w, 1, 2, 1, 2 );
+    gtk_grid_attach( GTK_GRID( p ), w, 1, 1, 1, 1 );
 
     b = gtk_alignment_new( 0.0, 1.0, 0.01, 0.01 );
     w = gtk_button_new_with_mnemonic( _( "_Quit Now" ) );
     g_signal_connect( w, "clicked", G_CALLBACK( exit_now_cb ), NULL );
     gtk_container_add( GTK_CONTAINER( b ), w );
-    gtk_table_attach( GTK_TABLE( p ), b, 1, 2, 2, 3, GTK_FILL, GTK_FILL, 0, 10 );
+    gtk_grid_attach( GTK_GRID( p ), b, 1, 2, 1, 1 );
 
     gtk_widget_show_all( r );
     gtk_widget_grab_focus( w );
@@ -959,7 +959,7 @@ on_app_exit( gpointer vdata )
                                    gtr_pref_int_get( PREF_KEY_MAIN_WINDOW_Y ) );
 
     /* shut down libT */
-    g_thread_create( session_close_threadfunc, vdata, TRUE, NULL );
+    g_thread_new( "shutdown-thread", session_close_threadfunc, vdata );
 }
 
 static void

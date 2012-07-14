@@ -88,12 +88,6 @@ const char* gtr_get_help_uri( void );
 ****
 ***/
 
-/* backwards-compatible wrapper around gtk_hbox_new() */
-GtkWidget* gtr_hbox_new( gboolean homogenous, gint spacing );
-
-/* backwards-compatible wrapper around gtk_vbox_new() */
-GtkWidget* gtr_vbox_new( gboolean homogenous, gint spacing );
-
 /* backwards-compatible wrapper around gtk_widget_set_visible() */
 void gtr_widget_set_visible( GtkWidget *, gboolean );
 

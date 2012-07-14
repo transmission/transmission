@@ -254,12 +254,11 @@ addTorrentFilters( GtkFileChooser * chooser )
 GtkWidget*
 gtr_torrent_options_dialog_new( GtkWindow * parent, TrCore * core, tr_ctor * ctor )
 {
-    guint            row;
-    guint            col;
     const char *     str;
     GtkWidget *      w;
     GtkWidget *      d;
-    GtkWidget *      t;
+    GtkGrid        * grid;
+    int              row;
     GtkWidget *      l;
     GtkWidget *      source_chooser;
     struct OpenData * data;
@@ -301,31 +300,31 @@ gtr_torrent_options_dialog_new( GtkWindow * parent, TrCore * core, tr_ctor * cto
     g_signal_connect( G_OBJECT( d ), "response",
                       G_CALLBACK( addResponseCB ), data );
 
-    t = gtk_table_new( 6, 2, FALSE );
-    gtk_container_set_border_width( GTK_CONTAINER( t ), GUI_PAD_BIG );
-    gtk_table_set_row_spacings( GTK_TABLE( t ), GUI_PAD );
-    gtk_table_set_col_spacings( GTK_TABLE( t ), GUI_PAD_BIG );
+    row = 0;
+    grid = GTK_GRID( gtk_grid_new( ) );
+    gtk_container_set_border_width( GTK_CONTAINER( grid ), GUI_PAD_BIG );
+    gtk_grid_set_row_spacing( grid, GUI_PAD );
+    gtk_grid_set_column_spacing( grid, GUI_PAD_BIG );
 
-    row = col = 0;
+    // "torrent file" row
     l = gtk_label_new_with_mnemonic( _( "_Torrent file:" ) );
     gtk_misc_set_alignment( GTK_MISC( l ), 0.0f, 0.5f );
-    gtk_table_attach( GTK_TABLE( t ), l, col, col + 1, row, row + 1, GTK_FILL, 0, 0, 0 );
-    ++col;
+    gtk_grid_attach( grid, l, 0, row, 1, 1 );
     w = gtk_file_chooser_button_new( _( "Select Source File" ),
                                      GTK_FILE_CHOOSER_ACTION_OPEN );
     source_chooser = w;
-    gtk_table_attach( GTK_TABLE( t ), w, col, col + 1, row, row + 1, ~0, 0, 0, 0 );
+    gtk_widget_set_hexpand( w, TRUE );
+    gtk_grid_attach_next_to( grid, w, l, GTK_POS_RIGHT, 1, 1 );
     gtk_label_set_mnemonic_widget( GTK_LABEL( l ), w );
     addTorrentFilters( GTK_FILE_CHOOSER( w ) );
     g_signal_connect( w, "selection-changed",
                       G_CALLBACK( sourceChanged ), data );
 
-    ++row;
-    col = 0;
+    // "destination folder" row
+    row++;
     l = gtk_label_new_with_mnemonic( _( "_Destination folder:" ) );
     gtk_misc_set_alignment( GTK_MISC( l ), 0.0f, 0.5f );
-    gtk_table_attach( GTK_TABLE( t ), l, col, col + 1, row, row + 1, GTK_FILL, 0, 0, 0 );
-    ++col;
+    gtk_grid_attach( grid, l, 0, row, 1, 1 );
     w = gtk_file_chooser_button_new( _( "Select Destination Folder" ),
                                      GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER );
     if( !gtk_file_chooser_set_current_folder( GTK_FILE_CHOOSER( w ),
@@ -335,41 +334,42 @@ gtr_torrent_options_dialog_new( GtkWindow * parent, TrCore * core, tr_ctor * cto
     for( walk = list; walk; walk = walk->next )
         gtk_file_chooser_add_shortcut_folder( GTK_FILE_CHOOSER( w ), walk->data, NULL );
     g_slist_free( list );
-    gtk_table_attach( GTK_TABLE( t ), w, col, col + 1, row, row + 1, ~0, 0, 0, 0 );
+    gtk_grid_attach_next_to( grid, w, l, GTK_POS_RIGHT, 1, 1 );
     gtk_label_set_mnemonic_widget( GTK_LABEL( l ), w );
     g_signal_connect( w, "selection-changed",
                       G_CALLBACK( downloadDirChanged ), data );
 
-    ++row;
-    col = 0;
+    // file list row
+    row++;
     w = data->file_list;
+    gtk_widget_set_vexpand( w, TRUE );
     gtk_widget_set_size_request ( w, 466u, 300u );
-    gtk_table_attach_defaults( GTK_TABLE( t ), w, col, col + 2, row, row + 1 );
+    gtk_grid_attach( grid, w, 0, row, 2, 1 );
 
-    ++row;
-    col = 0;
-    w = gtk_label_new_with_mnemonic( _( "Torrent _priority:" ) );
-    gtk_misc_set_alignment( GTK_MISC( w ), 0.0f, 0.5f );
-    gtk_table_attach( GTK_TABLE( t ), w, col, col + 1, row, row + 1, ~0, 0, 0, 0 );
-    ++col;
-    gtk_table_attach( GTK_TABLE( t ), data->priority_combo, col, col + 1, row, row + 1, ~0, 0, 0, 0 );
-    gtk_label_set_mnemonic_widget( GTK_LABEL( w ), data->priority_combo );
+    // torrent priority row
+    row++;
+    l = gtk_label_new_with_mnemonic( _( "Torrent _priority:" ) );
+    gtk_misc_set_alignment( GTK_MISC( l ), 0.0f, 0.5f );
+    gtk_grid_attach( grid, l, 0, row, 1, 1 );
+    w = data->priority_combo;
+    gtk_label_set_mnemonic_widget( GTK_LABEL( l ), w );
+    gtk_grid_attach_next_to( grid, w, l, GTK_POS_RIGHT, 1, 1 );
 
-    ++row;
-    col = 0;
+    // torrent priority row
+    row++;
     w = data->run_check;
     if( tr_ctorGetPaused( ctor, TR_FORCE, &flag ) )
         g_assert_not_reached( );
     gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON( w ), !flag );
-    gtk_table_attach( GTK_TABLE( t ), w, col, col + 2, row, row + 1, GTK_FILL, 0, 0, 0 );
+    gtk_grid_attach( grid, w, 0, row, 2, 1 );
 
-    ++row;
-    col = 0;
+    // "trash .torrent file" row
+    row++;
     w = data->trash_check;
     if( tr_ctorGetDeleteSource( ctor, &flag ) )
         g_assert_not_reached( );
     gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON( w ), flag );
-    gtk_table_attach( GTK_TABLE( t ), w, col, col + 2, row, row + 1, GTK_FILL, 0, 0, 0 );
+    gtk_grid_attach( grid, w, 0, row, 2, 1 );
 
     /* trigger sourceChanged, either directly or indirectly,
      * so that it creates the tor/gtor objects */
@@ -379,7 +379,7 @@ gtr_torrent_options_dialog_new( GtkWindow * parent, TrCore * core, tr_ctor * cto
     else
         sourceChanged( GTK_FILE_CHOOSER_BUTTON( w ), data );
 
-    gtr_dialog_set_content( GTK_DIALOG( d ), t );
+    gtr_dialog_set_content( GTK_DIALOG( d ), GTK_WIDGET( grid ) );
     w = gtk_dialog_get_widget_for_response( GTK_DIALOG( d ), GTK_RESPONSE_ACCEPT );
     gtk_widget_grab_focus( w );
     return d;
