@@ -73,7 +73,7 @@ function FileRow(torrent, i)
 			  ' (',
 			  Transmission.fmt.percentString(pct),
 			  '%)' ].join('');
-		setInnerHTML(elements.progress, c);
+		setTextContent(elements.progress, c);
 	},
 	refreshHTML = function() {
 		if (fields.isDirty) {
@@ -140,7 +140,7 @@ function FileRow(torrent, i)
 		name = name.replace(/([\/_\.])/g, "$1&#8203;");
 		e = document.createElement('div');
 		e.className = "inspector_torrent_file_list_entry_name";
-		e.innerHTML = name;
+		setTextContent(e, name);
 		root.appendChild(e);
 
 		e = document.createElement('div');

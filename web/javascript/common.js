@@ -79,9 +79,7 @@ $(document).ready(function() {
 });
 
 /**
- * "innerHTML = html" is pretty slow in FF.  Happily a lot of our innerHTML
- * changes are triggered by periodic refreshes on torrents whose state hasn't
- * changed since the last update, so even this simple test helps a lot.
+ * Checks to see if the content actually changed before poking the DOM.
  */
 function setInnerHTML(e, html)
 {
@@ -96,6 +94,22 @@ function setInnerHTML(e, html)
 		e.currentHTML = html;
 		e.innerHTML = html;
 	}
+};
+
+function sanitizeText(text)
+{
+	return text.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+};
+
+/**
+ * Many of our text changes are triggered by periodic refreshes
+ * on torrents whose state hasn't changed since the last update,
+ * so see if the text actually changed before poking the DOM.
+ */
+function setTextContent(e, text)
+{
+	if (e && (e.textContent != text))
+		e.textContent = text;
 };
 
 /*

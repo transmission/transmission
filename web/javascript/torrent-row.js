@@ -230,7 +230,7 @@ TorrentRendererFull.prototype =
 	render: function(controller, t, root)
 	{
 		// name
-		setInnerHTML(root._name_container, t.getName());
+		setTextContent(root._name_container, t.getName());
 
 		// progressbar
 		TorrentRendererHelper.renderProgressbar(controller, t, root._progressbar);
@@ -239,11 +239,11 @@ TorrentRendererFull.prototype =
 		var has_error = t.getError() !== Torrent._ErrNone;
 		var e = root._peer_details_container;
 		$(e).toggleClass('error',has_error);
-		setInnerHTML(e, this.getPeerDetails(t));
+		setTextContent(e, this.getPeerDetails(t));
 
 		// progress details
 		e = root._progress_details_container;
-		setInnerHTML(e, this.getProgressDetails(controller, t));
+		setTextContent(e, this.getProgressDetails(controller, t));
 
 		// pause/resume button
 		var is_stopped = t.isStopped();
@@ -319,13 +319,13 @@ TorrentRendererCompact.prototype =
 		var is_stopped = t.isStopped();
 		var e = root._name_container;
 		$(e).toggleClass('paused', is_stopped);
-		setInnerHTML(e, t.getName());
+		setTextContent(e, t.getName());
 
 		// peer details
 		var has_error = t.getError() !== Torrent._ErrNone;
 		e = root._details_container;
 		$(e).toggleClass('error', has_error);
-		setInnerHTML(e, this.getPeerDetails(t));
+		setTextContent(e, this.getPeerDetails(t));
 
 		// progressbar
 		TorrentRendererHelper.renderProgressbar(controller, t, root._progressbar);
