@@ -352,10 +352,16 @@ dnl  detection for the GTK+ client
 AC_ARG_ENABLE([nls],
               [AS_HELP_STRING([--enable-nls],[enable native language support])],,
               [enable_nls=yes])
-AC_ARG_WITH([gtk],
-            AC_HELP_STRING([--with-gtk],[with Gtk]),
+PKG_CHECK_EXISTS([gtk+-3.0 >= $GTK_MINIMUM
+                  glib-2.0 >= $GLIB_MINIMUM
+                  gio-2.0 >= $GIO_MINIMUM,
+                  gmodule-2.0 >= $GLIB_MINIMUM
+                  gthread-2.0 >= $GLIB_MINIMUM],
+                 [have_gtk=yes],
+                 [have_gtk=no])
+AC_ARG_WITH([gtk], AC_HELP_STRING([--with-gtk],[with Gtk]),
             [with_gtk=$withval],
-            [with_gtk=yes])
+            [with_gtk=$have_gtk])
 AM_CONDITIONAL([BUILD_GTK],[test "x$with_gtk" = "xyes"])
 use_libappindicator=no
 if test "x$with_gtk" = "xyes" ; then
@@ -373,8 +379,6 @@ if test "x$with_gtk" = "xyes" ; then
                       [appindicator3-0.1 >= $LIBAPPINDICATOR_MINIMUM],
                       [have_libappindicator=yes],
                       [have_libappindicator=no])
-    AC_MSG_NOTICE([using GTK+ 3])
-
     if test "x$have_libappindicator" = "xyes"; then
         use_libappindicator=yes
         AC_DEFINE([HAVE_LIBAPPINDICATOR], 1)
