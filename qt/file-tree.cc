@@ -671,7 +671,7 @@ FileTreeView :: FileTreeView( QWidget * parent ):
     installEventFilter( this );
 
     for( int i=0; i<NUM_COLUMNS; ++i )
-        header()->setResizeMode( i, QHeaderView::Fixed );
+        header()->setResizeMode( i, QHeaderView::Interactive );
 
     connect( this, SIGNAL(clicked(const QModelIndex&)),
              this, SLOT(onClicked(const QModelIndex&)) );
