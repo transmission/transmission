@@ -8,6 +8,7 @@
 .Bk -words
 .Nm
 .Op Fl h
+.Op Fl m
 .Op Fl s
 .Op Ar torrentfile
 .Ek
@@ -18,6 +19,8 @@ shows BitTorrent .torrent file metadata
 .Bl -tag -width Ds
 .It Fl h Fl -help
 Show a short help page and exit.
+.It Fl m Fl -magnet
+Show a magnet link for the specified .torrent file
 .It Fl s Fl -scrape
 Ask the torrent's trackers how many peers are in the torrent's swarm
 .El

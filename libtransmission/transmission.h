@@ -1362,11 +1362,17 @@ const char * tr_torrentGetDownloadDir( const tr_torrent * torrent );
 const char * tr_torrentGetCurrentDir( const tr_torrent * tor );
 
 
+char* tr_torrentInfoGetMagnetLink( const tr_info * inf );
+
 /**
  * Returns a newly-allocated string with a magnet link of the torrent.
  * Use tr_free() to free the string when done.
  */
-char* tr_torrentGetMagnetLink( const tr_torrent * tor );
+static inline
+char* tr_torrentGetMagnetLink( const tr_torrent * tor )
+{
+    return tr_torrentInfoGetMagnetLink( tr_torrentInfo( tor ) );
+}
 
 /**
 ***

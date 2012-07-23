@@ -369,26 +369,25 @@ tr_torrentGetMetadataPercent( const tr_torrent * tor )
 }
 
 char*
-tr_torrentGetMagnetLink( const tr_torrent * tor )
+tr_torrentInfoGetMagnetLink( const tr_info * inf )
 {
     int i;
     const char * name;
-    struct evbuffer * s;
+    struct evbuffer * s = evbuffer_new( );
 
-    assert( tr_isTorrent( tor ) );
+    evbuffer_add_printf( s, "magnet:?xt=urn:btih:%s", inf->hashString );
 
-    s = evbuffer_new( );
-    evbuffer_add_printf( s, "magnet:?xt=urn:btih:%s", tor->info.hashString );
-    name = tr_torrentName( tor );
+    name = inf->name;
     if( name && *name )
     {
         evbuffer_add_printf( s, "%s", "&dn=" );
-        tr_http_escape( s, tr_torrentName( tor ), -1, true );
+        tr_http_escape( s, name, -1, true );
     }
-    for( i=0; i<tor->info.trackerCount; ++i )
+
+    for( i=0; i<inf->trackerCount; ++i )
     {
         evbuffer_add_printf( s, "%s", "&tr=" );
-        tr_http_escape( s, tor->info.trackers[i].announce, -1, true );
+        tr_http_escape( s, inf->trackers[i].announce, -1, true );
     }
 
     return evbuffer_free_to_str( s );

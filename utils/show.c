@@ -52,6 +52,7 @@
 
 static tr_option options[] =
 {
+  { 'm', "magnet", "Give a magnet link for the specified torrent", "m", 0, NULL },
   { 's', "scrape", "Ask the torrent's trackers how many peers are in the torrent's swarm", "s", 0, NULL },
   { 'V', "version", "Show version number and exit", "V", 0, NULL },
   { 0, NULL, NULL, NULL, 0, NULL }
@@ -63,6 +64,7 @@ getUsage( void )
     return "Usage: " MY_NAME " [options] <.torrent file>";
 }
 
+static bool magnetFlag = false;
 static bool scrapeFlag = false;
 static bool showVersion = false;
 const char * filename = NULL;
@@ -77,6 +79,7 @@ parseCommandLine( int argc, const char ** argv )
     {
         switch( c )
         {
+            case 'm': magnetFlag = true; break;
             case 's': scrapeFlag = true; break;
             case 'V': showVersion = true; break;
             case TR_OPT_UNK: filename = optarg; break;
@@ -85,6 +88,14 @@ parseCommandLine( int argc, const char ** argv )
     }
 
     return 0;
+}
+
+static void
+doShowMagnet( const tr_info * inf )
+{
+    char * str = tr_torrentInfoGetMagnetLink( inf );
+    printf( "%s", str );
+    tr_free( str );
 }
 
 static int
@@ -318,15 +329,22 @@ main( int argc, char * argv[] )
         return 1;
     }
 
-    printf( "Name: %s\n", inf.name );
-    printf( "File: %s\n", filename );
-    printf( "\n" );
-    fflush( stdout );
-
-    if( scrapeFlag )
-        doScrape( &inf );
+    if( magnetFlag )
+    {
+        doShowMagnet( &inf );
+    }
     else
-        showInfo( &inf );
+    {
+        printf( "Name: %s\n", inf.name );
+        printf( "File: %s\n", filename );
+        printf( "\n" );
+        fflush( stdout );
+
+        if( scrapeFlag )
+            doScrape( &inf );
+        else 
+            showInfo( &inf );
+    }
 
     /* cleanup */
     putc( '\n', stdout );
