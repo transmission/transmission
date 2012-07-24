@@ -2,19 +2,19 @@
 [http://trac.transmissionbt.com/query?milestone=2.61&group=component&order=severity All tickets closed by this release]
 ==== All Platforms ====
 ==== Mac ====
- - Fix crash when creating a .torrent on OS X 10.7
+  * Fix crash when creating a torrent files on Lion or newer
 ==== GTK+ ====
- - Support starutp notification
- - Require GTK+ 3
+  * Support startup notification
+  * Require GTK+ 3
 ==== Qt ====
- - Fix bug when opening the web client via the Preferences dialog
- - Better opening of magnet links
- - The Torrent File list now handles very long lists faster
- - Revert i18n problem introduced in 2.60
+  * Fix bug when opening the web client via the Preferences dialog
+  * Better opening of magnet links
+  * The Torrent File list now handles very long lists faster
+  * Revert i18n problem introduced in 2.60
 ==== Web Client ====
- - Close potential cross-scripting vulnerability from malicious .torrent files
+  * Close potential cross-scripting vulnerability from malicious torrent files
 ==== Utils ====
- - Add magnet link generation to the transmission-show command line tool
+  * Add magnet link generation to the transmission-show command line tool
 
 === Transmission 2.60 (2012/07/05) ===
 [http://trac.transmissionbt.com/query?milestone=2.60&group=component&order=severity All tickets closed by this release]
