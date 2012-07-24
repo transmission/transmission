@@ -10,7 +10,7 @@
   * Fix bug when opening the web client via the Preferences dialog
   * Better opening of magnet links
   * The Torrent File list now handles very long lists faster
-  * Revert i18n problem introduced in 2.60
+  * Fix i18n problem introduced in 2.60
 ==== Web Client ====
   * Close potential cross-scripting vulnerability from malicious torrent files
 ==== Utils ====
