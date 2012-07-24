@@ -2,7 +2,7 @@
 [http://trac.transmissionbt.com/query?milestone=2.61&group=component&order=severity All tickets closed by this release]
 ==== All Platforms ====
 ==== Mac ====
-  * Fix crash when creating a torrent files on Lion or newer
+  * Fix crash when creating a torrent file on Lion or newer
 ==== GTK+ ====
   * Support startup notification
   * Require GTK+ 3
