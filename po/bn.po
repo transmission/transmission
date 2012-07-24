@@ -15,8 +15,8 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2012-07-06 01:09+0000\n"
-"X-Generator: Launchpad (build 15544)\n"
+"X-Launchpad-Export-Date: 2012-07-24 00:33+0000\n"
+"X-Generator: Launchpad (build 15654)\n"
 
 #: ../gtk/actions.c:45
 msgid "Sort by _Activity"
@@ -1457,7 +1457,7 @@ msgid "Downloads sharing data in the last N minutes are _active:"
 msgstr ""
 "শেষ এন মিনিটের মধ্যে ডাউনলোডের অংশগ্রহন করা উপাত্ত সক্রিয় হয়েছে (_a):"
 
-#: ../gtk/tr-prefs.c:286 ../libtransmission/torrent.c:1903
+#: ../gtk/tr-prefs.c:286 ../libtransmission/torrent.c:1902
 msgid "Incomplete"
 msgstr "অসম্পূর্ণ"
 
@@ -1964,7 +1964,7 @@ msgstr "GB/s"
 msgid "TB/s"
 msgstr "TB/s"
 
-#: ../gtk/util.c:87 ../libtransmission/utils.c:1487
+#: ../gtk/util.c:87 ../libtransmission/utils.c:1505
 msgid "None"
 msgstr "কোনটিই নয়"
 
@@ -2111,7 +2111,7 @@ msgstr "সকেট তৈরি করা যায়নি: %s"
 msgid "Torrent Creator is skipping file \"%s\": %s"
 msgstr "টরেন্ট নির্মাতা \"%s\" ফাইল এড়িয়ে যাচ্ছে: %s"
 
-#: ../libtransmission/metainfo.c:587
+#: ../libtransmission/metainfo.c:592
 #, c-format
 msgid "Invalid metadata entry \"%s\""
 msgstr "অকার্যকর মেটাডাটা এন্ট্রি করা হচ্ছে \"%s\""
@@ -2140,26 +2140,26 @@ msgstr "অনুবর্তন পোর্ট নেই %d"
 msgid "Port %d forwarded successfully"
 msgstr "পোর্ট %d পুন:প্রেরণ সফল হয়েছে"
 
-#: ../libtransmission/net.c:266
+#: ../libtransmission/net.c:268
 #, c-format
 msgid "Couldn't set source address %s on %d: %s"
 msgstr "%s সোর্স অ্যাড্রেস %d এর উপর নির্ধারণ করা যায়নি: %s"
 
-#: ../libtransmission/net.c:282
+#: ../libtransmission/net.c:284
 #, c-format
 msgid "Couldn't connect socket %d to %s, port %d (errno %d - %s)"
 msgstr "%d থেকে %s তে সকেট সংযোগ দেয়া যায়নি, পোর্ট %d (errno %d - %s)"
 
-#: ../libtransmission/net.c:354
+#: ../libtransmission/net.c:356
 msgid "Is another copy of Transmission already running?"
 msgstr "ট্রান্সমিশনের অন্য অনুলিপি কি ইতোমধ্যে চলমান?"
 
-#: ../libtransmission/net.c:359
+#: ../libtransmission/net.c:361
 #, c-format
 msgid "Couldn't bind port %d on %s: %s"
 msgstr "%d পোর্ট %s এ আবদ্ধ করা যায়নি: %s"
 
-#: ../libtransmission/net.c:361
+#: ../libtransmission/net.c:363
 #, c-format
 msgid "Couldn't bind port %d on %s: %s (%s)"
 msgstr "Couldn't bind port %d on %s: %s (%s)"
@@ -2189,7 +2189,7 @@ msgstr "বন্ধ করা হচ্ছে"
 msgid "Not forwarded"
 msgstr "সম্মুখে নয়"
 
-#: ../libtransmission/port-forwarding.c:91 ../libtransmission/torrent.c:2040
+#: ../libtransmission/port-forwarding.c:91 ../libtransmission/torrent.c:2039
 #, c-format
 msgid "State changed from \"%1$s\" to \"%2$s\""
 msgstr "অবস্হা \"%2$s\" হতে \"%1$s\" পরিবর্তিত হয়েছে"
@@ -2200,7 +2200,7 @@ msgstr "বন্ধ"
 
 #. first %s is the application name
 #. second %s is the version number
-#: ../libtransmission/session.c:718
+#: ../libtransmission/session.c:720
 #, c-format
 msgid "%s %s started"
 msgstr "%s %s শুরু করা হয়েছে"
@@ -2210,17 +2210,17 @@ msgstr "%s %s শুরু করা হয়েছে"
 msgid "Loaded %d torrents"
 msgstr "%d টরেন্ট লোড হয়েছে"
 
-#: ../libtransmission/torrent.c:524
+#: ../libtransmission/torrent.c:523
 #, c-format
 msgid "Tracker warning: \"%s\""
 msgstr "ট্র্যাকার সতর্কীকরণ: \"%s\""
 
-#: ../libtransmission/torrent.c:531
+#: ../libtransmission/torrent.c:530
 #, c-format
 msgid "Tracker error: \"%s\""
 msgstr "ট্র্যাকারের ত্রুটি: \"%s\""
 
-#: ../libtransmission/torrent.c:778
+#: ../libtransmission/torrent.c:777
 msgid ""
 "No data found! Ensure your drives are connected or use \"Set Location\". To "
 "re-download, remove the torrent and re-add it."
@@ -2229,20 +2229,20 @@ msgstr ""
 "ব্যবহার করুন \"Set Location\"। পুনরায় ডাউনলোডের জন্য টরেন্ট অপসারণ করুন এবং "
 "পুনরায় যোগ করুন।"
 
-#: ../libtransmission/torrent.c:1661
+#: ../libtransmission/torrent.c:1660
 msgid "Restarted manually -- disabling its seed ratio"
 msgstr ""
 "স্বয়ংক্রিয় ভাবে পনরায় চালু হয়েছে -- এটির সীড অনুপাত নিস্ক্রিয় করা হচ্ছে"
 
-#: ../libtransmission/torrent.c:1813
+#: ../libtransmission/torrent.c:1812
 msgid "Removing torrent"
 msgstr "টরেন্ট অপসারণ করা হচ্ছে"
 
-#: ../libtransmission/torrent.c:1897
+#: ../libtransmission/torrent.c:1896
 msgid "Done"
 msgstr "সম্পন্ন"
 
-#: ../libtransmission/torrent.c:1900
+#: ../libtransmission/torrent.c:1899
 msgid "Complete"
 msgstr "সম্পন্ন করা"
 

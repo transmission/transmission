@@ -15,13 +15,13 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n==1) ? 1 : (n>=2 && n<=4) ? 2 : 0;\n"
-"X-Launchpad-Export-Date: 2012-07-06 01:08+0000\n"
-"X-Generator: Launchpad (build 15544)\n"
+"X-Launchpad-Export-Date: 2012-07-24 00:32+0000\n"
+"X-Generator: Launchpad (build 15654)\n"
 "X-Poedit-Country: SLOVAKIA\n"
 "X-Poedit-Language: Slovak\n"
 "X-Poedit-SourceCharset: utf-8\n"
 
-#: ../gtk/util.c:87 ../libtransmission/utils.c:1487
+#: ../gtk/util.c:87 ../libtransmission/utils.c:1505
 msgid "None"
 msgstr "Žiadny"
 
@@ -1491,7 +1491,7 @@ msgstr "Maximum aktívnych _sťahovaní:"
 msgid "Downloads sharing data in the last N minutes are _active:"
 msgstr "Sťahovania zdieľajúce dáta _aktívne posledných N minút:"
 
-#: ../gtk/tr-prefs.c:286 ../libtransmission/torrent.c:1903
+#: ../gtk/tr-prefs.c:286 ../libtransmission/torrent.c:1902
 msgid "Incomplete"
 msgstr "Neúplný"
 
@@ -2148,7 +2148,7 @@ msgstr "Nepodarilo sa vytvoriť soket: %s"
 msgid "Torrent Creator is skipping file \"%s\": %s"
 msgstr "Pri vytváraní torrentu bol preskočený súbor \"%s\": %s"
 
-#: ../libtransmission/metainfo.c:587
+#: ../libtransmission/metainfo.c:592
 #, c-format
 msgid "Invalid metadata entry \"%s\""
 msgstr "Neplatné metadáta položky \"%s\""
@@ -2177,26 +2177,26 @@ msgstr "port %d sa už viac nepresmerúva"
 msgid "Port %d forwarded successfully"
 msgstr "Port %d bol úspešne presmerovaný"
 
-#: ../libtransmission/net.c:266
+#: ../libtransmission/net.c:268
 #, c-format
 msgid "Couldn't set source address %s on %d: %s"
 msgstr "Nepodarilo sa nastaviť adresu zdroja %s na %d: %s"
 
-#: ../libtransmission/net.c:282
+#: ../libtransmission/net.c:284
 #, c-format
 msgid "Couldn't connect socket %d to %s, port %d (errno %d - %s)"
 msgstr "Nepodarilo sa pripojiť soket %d na %s, port %d (chyba č. %d - %s)"
 
-#: ../libtransmission/net.c:354
+#: ../libtransmission/net.c:356
 msgid "Is another copy of Transmission already running?"
 msgstr "Je už spustená aj iná kópia programu Transmission?"
 
-#: ../libtransmission/net.c:359
+#: ../libtransmission/net.c:361
 #, c-format
 msgid "Couldn't bind port %d on %s: %s"
 msgstr "Nepodarilo sa naviazať port %d na %s: %s"
 
-#: ../libtransmission/net.c:361
+#: ../libtransmission/net.c:363
 #, c-format
 msgid "Couldn't bind port %d on %s: %s (%s)"
 msgstr "Nepodarilo sa naviazať port %d na %s: %s (%s)"
@@ -2226,7 +2226,7 @@ msgstr "Zastavuje sa"
 msgid "Not forwarded"
 msgstr "Nepresmerovaný"
 
-#: ../libtransmission/port-forwarding.c:91 ../libtransmission/torrent.c:2040
+#: ../libtransmission/port-forwarding.c:91 ../libtransmission/torrent.c:2039
 #, c-format
 msgid "State changed from \"%1$s\" to \"%2$s\""
 msgstr "Stav sa zmenil zo stavu \"%1$s\" na \"%2$s\""
@@ -2237,7 +2237,7 @@ msgstr "Zastavený"
 
 #. first %s is the application name
 #. second %s is the version number
-#: ../libtransmission/session.c:718
+#: ../libtransmission/session.c:720
 #, c-format
 msgid "%s %s started"
 msgstr "%s %s spustený"
@@ -2247,17 +2247,17 @@ msgstr "%s %s spustený"
 msgid "Loaded %d torrents"
 msgstr "Počet načítaných torrentov je %d"
 
-#: ../libtransmission/torrent.c:524
+#: ../libtransmission/torrent.c:523
 #, c-format
 msgid "Tracker warning: \"%s\""
 msgstr "Varovanie trackera: \"%s\""
 
-#: ../libtransmission/torrent.c:531
+#: ../libtransmission/torrent.c:530
 #, c-format
 msgid "Tracker error: \"%s\""
 msgstr "Chyba trackera: \"%s\""
 
-#: ../libtransmission/torrent.c:778
+#: ../libtransmission/torrent.c:777
 msgid ""
 "No data found! Ensure your drives are connected or use \"Set Location\". To "
 "re-download, remove the torrent and re-add it."
@@ -2266,19 +2266,19 @@ msgstr ""
 "alebo použite \"Nastaviť umiestnenie\". Ak chcete dáta znova stiahnuť, "
 "odstráňte torrent a pridajte ho znova."
 
-#: ../libtransmission/torrent.c:1661
+#: ../libtransmission/torrent.c:1660
 msgid "Restarted manually -- disabling its seed ratio"
 msgstr "Ručne reštartovaný - vypnutiie jeho pomeru zdieľania"
 
-#: ../libtransmission/torrent.c:1813
+#: ../libtransmission/torrent.c:1812
 msgid "Removing torrent"
 msgstr "Odstraňuje sa torrent"
 
-#: ../libtransmission/torrent.c:1897
+#: ../libtransmission/torrent.c:1896
 msgid "Done"
 msgstr "Dokončený"
 
-#: ../libtransmission/torrent.c:1900
+#: ../libtransmission/torrent.c:1899
 msgid "Complete"
 msgstr "Úplný"
 

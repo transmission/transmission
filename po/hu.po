@@ -16,8 +16,8 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2012-07-06 01:09+0000\n"
-"X-Generator: Launchpad (build 15544)\n"
+"X-Launchpad-Export-Date: 2012-07-24 00:33+0000\n"
+"X-Generator: Launchpad (build 15654)\n"
 
 #: ../gtk/actions.c:45
 msgid "Sort by _Activity"
@@ -1483,7 +1483,7 @@ msgstr "_Aktív letöltések maximum:"
 msgid "Downloads sharing data in the last N minutes are _active:"
 msgstr "Az adatokat megosztó letöltések az utolsó N percben _aktívak:"
 
-#: ../gtk/tr-prefs.c:286 ../libtransmission/torrent.c:1903
+#: ../gtk/tr-prefs.c:286 ../libtransmission/torrent.c:1902
 msgid "Incomplete"
 msgstr "Hiányos"
 
@@ -1991,7 +1991,7 @@ msgstr "GB/s"
 msgid "TB/s"
 msgstr "TB/s"
 
-#: ../gtk/util.c:87 ../libtransmission/utils.c:1487
+#: ../gtk/util.c:87 ../libtransmission/utils.c:1505
 msgid "None"
 msgstr "Nincs"
 
@@ -2138,7 +2138,7 @@ msgstr "A socket létrehozása sikertelen: %s"
 msgid "Torrent Creator is skipping file \"%s\": %s"
 msgstr "A torrentkészítő kihagyja a(z) „%s” fájlt: %s"
 
-#: ../libtransmission/metainfo.c:587
+#: ../libtransmission/metainfo.c:592
 #, c-format
 msgid "Invalid metadata entry \"%s\""
 msgstr "Érvénytelen metaadat-bejegyzés „%s”"
@@ -2167,28 +2167,28 @@ msgstr "a port (%d) már nincs átirányítva"
 msgid "Port %d forwarded successfully"
 msgstr "A port (%d) sikeresen átirányítva"
 
-#: ../libtransmission/net.c:266
+#: ../libtransmission/net.c:268
 #, c-format
 msgid "Couldn't set source address %s on %d: %s"
 msgstr "Nem állítható be a forráscím (%s) ezen: %d: %s"
 
-#: ../libtransmission/net.c:282
+#: ../libtransmission/net.c:284
 #, c-format
 msgid "Couldn't connect socket %d to %s, port %d (errno %d - %s)"
 msgstr ""
 "A foglalat (%d) nem csatlakoztatható a következőhöz: %s, port: %d (hibaszám: "
 "%d - %s)"
 
-#: ../libtransmission/net.c:354
+#: ../libtransmission/net.c:356
 msgid "Is another copy of Transmission already running?"
 msgstr "Már fut a Transmisson egy példánya?"
 
-#: ../libtransmission/net.c:359
+#: ../libtransmission/net.c:361
 #, c-format
 msgid "Couldn't bind port %d on %s: %s"
 msgstr "Nem lehet csatlakoztatni a portot (%d) ezen: %s: %s"
 
-#: ../libtransmission/net.c:361
+#: ../libtransmission/net.c:363
 #, c-format
 msgid "Couldn't bind port %d on %s: %s (%s)"
 msgstr "Nem lehet csatlakozni %2$s %1$d portjához: %3$s (%4$s)"
@@ -2218,7 +2218,7 @@ msgstr "Leállítás"
 msgid "Not forwarded"
 msgstr "Nincs átirányítva"
 
-#: ../libtransmission/port-forwarding.c:91 ../libtransmission/torrent.c:2040
+#: ../libtransmission/port-forwarding.c:91 ../libtransmission/torrent.c:2039
 #, c-format
 msgid "State changed from \"%1$s\" to \"%2$s\""
 msgstr "Az állapot megváltoztatva: „%1$s” -> „%2$s”"
@@ -2229,7 +2229,7 @@ msgstr "Leállítva"
 
 #. first %s is the application name
 #. second %s is the version number
-#: ../libtransmission/session.c:718
+#: ../libtransmission/session.c:720
 #, c-format
 msgid "%s %s started"
 msgstr "%s %s elindítva"
@@ -2239,17 +2239,17 @@ msgstr "%s %s elindítva"
 msgid "Loaded %d torrents"
 msgstr "%d torrent betöltve"
 
-#: ../libtransmission/torrent.c:524
+#: ../libtransmission/torrent.c:523
 #, c-format
 msgid "Tracker warning: \"%s\""
 msgstr "Követőfigyelmeztetés: „%s”"
 
-#: ../libtransmission/torrent.c:531
+#: ../libtransmission/torrent.c:530
 #, c-format
 msgid "Tracker error: \"%s\""
 msgstr "Követőhiba: „%s”"
 
-#: ../libtransmission/torrent.c:778
+#: ../libtransmission/torrent.c:777
 msgid ""
 "No data found! Ensure your drives are connected or use \"Set Location\". To "
 "re-download, remove the torrent and re-add it."
@@ -2258,19 +2258,19 @@ msgstr ""
 "„Hely megadása” lehetőséget. Újbóli letöltéshez távolítsa el, majd újra adja "
 "hozzá a torrent fájlt."
 
-#: ../libtransmission/torrent.c:1661
+#: ../libtransmission/torrent.c:1660
 msgid "Restarted manually -- disabling its seed ratio"
 msgstr "Újraindítva kézzel -- a seed arány kikapcsolása"
 
-#: ../libtransmission/torrent.c:1813
+#: ../libtransmission/torrent.c:1812
 msgid "Removing torrent"
 msgstr "Torrent eltávolítása"
 
-#: ../libtransmission/torrent.c:1897
+#: ../libtransmission/torrent.c:1896
 msgid "Done"
 msgstr "Kész"
 
-#: ../libtransmission/torrent.c:1900
+#: ../libtransmission/torrent.c:1899
 msgid "Complete"
 msgstr "Befejezve"
 

@@ -12,8 +12,8 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Launchpad-Export-Date: 2012-07-06 01:09+0000\n"
-"X-Generator: Launchpad (build 15544)\n"
+"X-Launchpad-Export-Date: 2012-07-24 00:33+0000\n"
+"X-Generator: Launchpad (build 15654)\n"
 
 #: ../gtk/actions.c:45
 msgid "Sort by _Activity"
@@ -1458,7 +1458,7 @@ msgstr "最大活动任务数(_D)："
 msgid "Downloads sharing data in the last N minutes are _active:"
 msgstr "判断为活跃状态的最后活动时间范围："
 
-#: ../gtk/tr-prefs.c:286 ../libtransmission/torrent.c:1903
+#: ../gtk/tr-prefs.c:286 ../libtransmission/torrent.c:1902
 msgid "Incomplete"
 msgstr "未完成"
 
@@ -1960,7 +1960,7 @@ msgstr "GB/s"
 msgid "TB/s"
 msgstr "TB/s"
 
-#: ../gtk/util.c:87 ../libtransmission/utils.c:1487
+#: ../gtk/util.c:87 ../libtransmission/utils.c:1505
 msgid "None"
 msgstr "无"
 
@@ -2101,7 +2101,7 @@ msgstr "无法创建套接字: %s"
 msgid "Torrent Creator is skipping file \"%s\": %s"
 msgstr "种子创建器跳过文件“%s”：%s"
 
-#: ../libtransmission/metainfo.c:587
+#: ../libtransmission/metainfo.c:592
 #, c-format
 msgid "Invalid metadata entry \"%s\""
 msgstr "无效的元数据项“%s”"
@@ -2130,26 +2130,26 @@ msgstr "不再转发端口%d"
 msgid "Port %d forwarded successfully"
 msgstr "端口 %d 成功转发"
 
-#: ../libtransmission/net.c:266
+#: ../libtransmission/net.c:268
 #, c-format
 msgid "Couldn't set source address %s on %d: %s"
 msgstr "无法在 %2$d 上设置源地址 %1$s：%3$s"
 
-#: ../libtransmission/net.c:282
+#: ../libtransmission/net.c:284
 #, c-format
 msgid "Couldn't connect socket %d to %s, port %d (errno %d - %s)"
 msgstr "无法连接套接字 %d 到 %s，端口 %d (错误 %d - %s)"
 
-#: ../libtransmission/net.c:354
+#: ../libtransmission/net.c:356
 msgid "Is another copy of Transmission already running?"
 msgstr "是否有另外一个 Transmission 实例已经在运行？"
 
-#: ../libtransmission/net.c:359
+#: ../libtransmission/net.c:361
 #, c-format
 msgid "Couldn't bind port %d on %s: %s"
 msgstr "无法绑定端口 %d[%s]：%s"
 
-#: ../libtransmission/net.c:361
+#: ../libtransmission/net.c:363
 #, c-format
 msgid "Couldn't bind port %d on %s: %s (%s)"
 msgstr "无法绑定端口 %d[%s]：%s (%s)"
@@ -2179,7 +2179,7 @@ msgstr "正在停止"
 msgid "Not forwarded"
 msgstr "未转发"
 
-#: ../libtransmission/port-forwarding.c:91 ../libtransmission/torrent.c:2040
+#: ../libtransmission/port-forwarding.c:91 ../libtransmission/torrent.c:2039
 #, c-format
 msgid "State changed from \"%1$s\" to \"%2$s\""
 msgstr "状态从 %1$s 改变为 %2$s"
@@ -2190,7 +2190,7 @@ msgstr "已停止"
 
 #. first %s is the application name
 #. second %s is the version number
-#: ../libtransmission/session.c:718
+#: ../libtransmission/session.c:720
 #, c-format
 msgid "%s %s started"
 msgstr "%s %s 已开始"
@@ -2200,35 +2200,35 @@ msgstr "%s %s 已开始"
 msgid "Loaded %d torrents"
 msgstr "载入了 %d 个种子"
 
-#: ../libtransmission/torrent.c:524
+#: ../libtransmission/torrent.c:523
 #, c-format
 msgid "Tracker warning: \"%s\""
 msgstr "Tracker 警告：%s"
 
-#: ../libtransmission/torrent.c:531
+#: ../libtransmission/torrent.c:530
 #, c-format
 msgid "Tracker error: \"%s\""
 msgstr "Tracker 错误：%s"
 
-#: ../libtransmission/torrent.c:778
+#: ../libtransmission/torrent.c:777
 msgid ""
 "No data found! Ensure your drives are connected or use \"Set Location\". To "
 "re-download, remove the torrent and re-add it."
 msgstr "未找到数据！请确保您的驱动器已经连接，或使用“设置位置”进行选择。如需重新下载，请删除此任务后重新添加。"
 
-#: ../libtransmission/torrent.c:1661
+#: ../libtransmission/torrent.c:1660
 msgid "Restarted manually -- disabling its seed ratio"
 msgstr "手工重启 -- 已禁用做种比率限制"
 
-#: ../libtransmission/torrent.c:1813
+#: ../libtransmission/torrent.c:1812
 msgid "Removing torrent"
 msgstr "正在删除种子"
 
-#: ../libtransmission/torrent.c:1897
+#: ../libtransmission/torrent.c:1896
 msgid "Done"
 msgstr "完成"
 
-#: ../libtransmission/torrent.c:1900
+#: ../libtransmission/torrent.c:1899
 msgid "Complete"
 msgstr "完成"
 

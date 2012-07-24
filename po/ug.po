@@ -15,8 +15,8 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Launchpad-Export-Date: 2012-07-06 01:08+0000\n"
-"X-Generator: Launchpad (build 15544)\n"
+"X-Launchpad-Export-Date: 2012-07-24 00:32+0000\n"
+"X-Generator: Launchpad (build 15654)\n"
 
 #: ../gtk/actions.c:45
 msgid "Sort by _Activity"
@@ -1437,7 +1437,7 @@ msgstr "ئاكتىپ چۈشۈرۈشنىڭ ئەڭ چوڭ سانى(_S):"
 msgid "Downloads sharing data in the last N minutes are _active:"
 msgstr ""
 
-#: ../gtk/tr-prefs.c:286 ../libtransmission/torrent.c:1903
+#: ../gtk/tr-prefs.c:286 ../libtransmission/torrent.c:1902
 msgid "Incomplete"
 msgstr "چالا"
 
@@ -1938,7 +1938,7 @@ msgstr "گىگابايت/سېكۇنت"
 msgid "TB/s"
 msgstr "تېرابايت/سېكۇنت"
 
-#: ../gtk/util.c:87 ../libtransmission/utils.c:1487
+#: ../gtk/util.c:87 ../libtransmission/utils.c:1505
 msgid "None"
 msgstr "يوق"
 
@@ -2081,7 +2081,7 @@ msgstr "سوكېت قۇرغىلى بولمىدى: %s"
 msgid "Torrent Creator is skipping file \"%s\": %s"
 msgstr "توررېنت قۇرغۇچ ھۆججەت «%s» نى ئۆتكۈزۈۋەتتى: %s"
 
-#: ../libtransmission/metainfo.c:587
+#: ../libtransmission/metainfo.c:592
 #, c-format
 msgid "Invalid metadata entry \"%s\""
 msgstr "مېتا سانلىق-مەلۇمات كىرگۈسى ئىناۋەتسىز «%s»"
@@ -2110,26 +2110,26 @@ msgstr "ئېغىز %d نى ئەمدى بۇرىمايدۇ"
 msgid "Port %d forwarded successfully"
 msgstr "ئېغىز %d نى بۇراش مۇۋەپپەقىيەتلىك بولدى"
 
-#: ../libtransmission/net.c:266
+#: ../libtransmission/net.c:268
 #, c-format
 msgid "Couldn't set source address %s on %d: %s"
 msgstr "%2$d دىكى مەنبە ئادرېس %1$s  نى تەڭشىيەلمەيدۇ: %3$s"
 
-#: ../libtransmission/net.c:282
+#: ../libtransmission/net.c:284
 #, c-format
 msgid "Couldn't connect socket %d to %s, port %d (errno %d - %s)"
 msgstr "سوكېت %d نى %s، ئېغىز %d غا باغلىغىلى بولمىدى(خاتالىق %d - %s)"
 
-#: ../libtransmission/net.c:354
+#: ../libtransmission/net.c:356
 msgid "Is another copy of Transmission already running?"
 msgstr "يەنە بىر Transmission ئىجرا بولۇۋاتامدۇ؟"
 
-#: ../libtransmission/net.c:359
+#: ../libtransmission/net.c:361
 #, c-format
 msgid "Couldn't bind port %d on %s: %s"
 msgstr "%d[%s] ئېغىزنى باغلىيالمايدۇ: %s"
 
-#: ../libtransmission/net.c:361
+#: ../libtransmission/net.c:363
 #, c-format
 msgid "Couldn't bind port %d on %s: %s (%s)"
 msgstr "%d[%s] ئېغىزنى باغلىيالمايدۇ: %s (%s)"
@@ -2159,7 +2159,7 @@ msgstr "توختىتىۋاتىدۇ"
 msgid "Not forwarded"
 msgstr "بۇرالمىغان"
 
-#: ../libtransmission/port-forwarding.c:91 ../libtransmission/torrent.c:2040
+#: ../libtransmission/port-forwarding.c:91 ../libtransmission/torrent.c:2039
 #, c-format
 msgid "State changed from \"%1$s\" to \"%2$s\""
 msgstr "ھالەت «%1$s» دىن «%2$s» غا ئۆزگەردى"
@@ -2170,7 +2170,7 @@ msgstr "توختىدى"
 
 #. first %s is the application name
 #. second %s is the version number
-#: ../libtransmission/session.c:718
+#: ../libtransmission/session.c:720
 #, c-format
 msgid "%s %s started"
 msgstr "%s %s  باشلاندى"
@@ -2180,17 +2180,17 @@ msgstr "%s %s  باشلاندى"
 msgid "Loaded %d torrents"
 msgstr "%d توررېنت ئوقۇدى"
 
-#: ../libtransmission/torrent.c:524
+#: ../libtransmission/torrent.c:523
 #, c-format
 msgid "Tracker warning: \"%s\""
 msgstr "ئىزلىغۇچ ئاگاھلاندۇرۇشى: «%s»"
 
-#: ../libtransmission/torrent.c:531
+#: ../libtransmission/torrent.c:530
 #, c-format
 msgid "Tracker error: \"%s\""
 msgstr "ئىزلىغۇچ خاتالىقى: «%s»"
 
-#: ../libtransmission/torrent.c:778
+#: ../libtransmission/torrent.c:777
 msgid ""
 "No data found! Ensure your drives are connected or use \"Set Location\". To "
 "re-download, remove the torrent and re-add it."
@@ -2198,19 +2198,19 @@ msgstr ""
 "سانلىق-مەلۇمات يوق! قوزغاتقۇچىڭىز چېتىلغانمۇ ياكى «ئورۇن بېكىتىش» نى "
 "ئىشلىتىڭ. قايتا چۈشۈرۈش ئۈچۈن، توررېنتنى چىقىرىۋېتىپ قايتا قوشۇڭ."
 
-#: ../libtransmission/torrent.c:1661
+#: ../libtransmission/torrent.c:1660
 msgid "Restarted manually -- disabling its seed ratio"
 msgstr ""
 
-#: ../libtransmission/torrent.c:1813
+#: ../libtransmission/torrent.c:1812
 msgid "Removing torrent"
 msgstr "توررېنتنى چىقىرىۋېتىش"
 
-#: ../libtransmission/torrent.c:1897
+#: ../libtransmission/torrent.c:1896
 msgid "Done"
 msgstr "تامام"
 
-#: ../libtransmission/torrent.c:1900
+#: ../libtransmission/torrent.c:1899
 msgid "Complete"
 msgstr "تولۇق"
 

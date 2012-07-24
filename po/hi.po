@@ -15,8 +15,8 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2012-07-06 01:08+0000\n"
-"X-Generator: Launchpad (build 15544)\n"
+"X-Launchpad-Export-Date: 2012-07-24 00:32+0000\n"
+"X-Generator: Launchpad (build 15654)\n"
 
 #: ../gtk/actions.c:45
 msgid "Sort by _Activity"
@@ -1441,7 +1441,7 @@ msgstr ""
 msgid "Downloads sharing data in the last N minutes are _active:"
 msgstr ""
 
-#: ../gtk/tr-prefs.c:286 ../libtransmission/torrent.c:1903
+#: ../gtk/tr-prefs.c:286 ../libtransmission/torrent.c:1902
 msgid "Incomplete"
 msgstr "अपूर्ण"
 
@@ -1944,7 +1944,7 @@ msgstr ""
 msgid "TB/s"
 msgstr ""
 
-#: ../gtk/util.c:87 ../libtransmission/utils.c:1487
+#: ../gtk/util.c:87 ../libtransmission/utils.c:1505
 msgid "None"
 msgstr "कोई नहीं"
 
@@ -2089,7 +2089,7 @@ msgstr "सॉकेट का सृजन नहीं हुआ: %s"
 msgid "Torrent Creator is skipping file \"%s\": %s"
 msgstr "टोरेंट सर्जक संचिका छोड़ रहा है \"%s\": %s"
 
-#: ../libtransmission/metainfo.c:587
+#: ../libtransmission/metainfo.c:592
 #, c-format
 msgid "Invalid metadata entry \"%s\""
 msgstr "अमान्य मेटासमंक प्रविष्टि \"%s\""
@@ -2118,26 +2118,26 @@ msgstr "पोर्ट %d को अब अग्रसारित नही�
 msgid "Port %d forwarded successfully"
 msgstr "पोर्ट %d सफलतापुर्वक अग्रसारित हो गया"
 
-#: ../libtransmission/net.c:266
+#: ../libtransmission/net.c:268
 #, c-format
 msgid "Couldn't set source address %s on %d: %s"
 msgstr "नियत नहीं कर सका स्रोत पता %s को %d पर: %s"
 
-#: ../libtransmission/net.c:282
+#: ../libtransmission/net.c:284
 #, c-format
 msgid "Couldn't connect socket %d to %s, port %d (errno %d - %s)"
 msgstr "संयोजित नहीं कर सका सॉकेट %d को %s से, पोर्ट %d (errno %d - %s)"
 
-#: ../libtransmission/net.c:354
+#: ../libtransmission/net.c:356
 msgid "Is another copy of Transmission already running?"
 msgstr "क्या ट्रांसमिशन की कोई अन्य प्रतिलिपि पहले से चल रही है?"
 
-#: ../libtransmission/net.c:359
+#: ../libtransmission/net.c:361
 #, c-format
 msgid "Couldn't bind port %d on %s: %s"
 msgstr "चिह्नित नहीं कर सका पोर्ट %d को %s पर: %s"
 
-#: ../libtransmission/net.c:361
+#: ../libtransmission/net.c:363
 #, c-format
 msgid "Couldn't bind port %d on %s: %s (%s)"
 msgstr "चिह्नित नहीं कर सका पोर्ट %d को %s पर: %s (%s)"
@@ -2167,7 +2167,7 @@ msgstr "रोक रहा है"
 msgid "Not forwarded"
 msgstr "अग्रसारित नहीं"
 
-#: ../libtransmission/port-forwarding.c:91 ../libtransmission/torrent.c:2040
+#: ../libtransmission/port-forwarding.c:91 ../libtransmission/torrent.c:2039
 #, c-format
 msgid "State changed from \"%1$s\" to \"%2$s\""
 msgstr "स्थिति परिवर्तन \"%1$s\" से \"%2$s\" हो गया है"
@@ -2178,7 +2178,7 @@ msgstr "रुक गया"
 
 #. first %s is the application name
 #. second %s is the version number
-#: ../libtransmission/session.c:718
+#: ../libtransmission/session.c:720
 #, c-format
 msgid "%s %s started"
 msgstr "%s %s शुरु है"
@@ -2188,35 +2188,35 @@ msgstr "%s %s शुरु है"
 msgid "Loaded %d torrents"
 msgstr "%d टोरेंट लोड हुआ"
 
-#: ../libtransmission/torrent.c:524
+#: ../libtransmission/torrent.c:523
 #, c-format
 msgid "Tracker warning: \"%s\""
 msgstr "खोजी चेतावनी: \"%s\""
 
-#: ../libtransmission/torrent.c:531
+#: ../libtransmission/torrent.c:530
 #, c-format
 msgid "Tracker error: \"%s\""
 msgstr "खोजी त्रुटि: \"%s\""
 
-#: ../libtransmission/torrent.c:778
+#: ../libtransmission/torrent.c:777
 msgid ""
 "No data found! Ensure your drives are connected or use \"Set Location\". To "
 "re-download, remove the torrent and re-add it."
 msgstr ""
 
-#: ../libtransmission/torrent.c:1661
+#: ../libtransmission/torrent.c:1660
 msgid "Restarted manually -- disabling its seed ratio"
 msgstr ""
 
-#: ../libtransmission/torrent.c:1813
+#: ../libtransmission/torrent.c:1812
 msgid "Removing torrent"
 msgstr "टोरेंट हटा रहा है"
 
-#: ../libtransmission/torrent.c:1897
+#: ../libtransmission/torrent.c:1896
 msgid "Done"
 msgstr "किया गया"
 
-#: ../libtransmission/torrent.c:1900
+#: ../libtransmission/torrent.c:1899
 msgid "Complete"
 msgstr "पूर्ण"
 

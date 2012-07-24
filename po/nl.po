@@ -22,8 +22,8 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2012-07-06 01:09+0000\n"
-"X-Generator: Launchpad (build 15544)\n"
+"X-Launchpad-Export-Date: 2012-07-24 00:33+0000\n"
+"X-Generator: Launchpad (build 15654)\n"
 
 #: ../gtk/actions.c:45
 msgid "Sort by _Activity"
@@ -1490,7 +1490,7 @@ msgstr "Maximum aantal actieve _downloads:"
 msgid "Downloads sharing data in the last N minutes are _active:"
 msgstr "Downloads die gegevens delen in de laatste N minuten zijn _actief:"
 
-#: ../gtk/tr-prefs.c:286 ../libtransmission/torrent.c:1903
+#: ../gtk/tr-prefs.c:286 ../libtransmission/torrent.c:1902
 msgid "Incomplete"
 msgstr "Incompleet"
 
@@ -2001,7 +2001,7 @@ msgstr "GB/s"
 msgid "TB/s"
 msgstr "TB/s"
 
-#: ../gtk/util.c:87 ../libtransmission/utils.c:1487
+#: ../gtk/util.c:87 ../libtransmission/utils.c:1505
 msgid "None"
 msgstr "Geen"
 
@@ -2149,7 +2149,7 @@ msgstr "Aanmaken van socket mislukt: %s"
 msgid "Torrent Creator is skipping file \"%s\": %s"
 msgstr "Torrent Creator slaat bestand \"%s\" over: %s"
 
-#: ../libtransmission/metainfo.c:587
+#: ../libtransmission/metainfo.c:592
 #, c-format
 msgid "Invalid metadata entry \"%s\""
 msgstr "Ongeldige invoer van metagegegevens \"%s\""
@@ -2178,26 +2178,26 @@ msgstr "poort %d wordt niet langer doorgestuurd"
 msgid "Port %d forwarded successfully"
 msgstr "Poort %d succesvol doorgestuurd"
 
-#: ../libtransmission/net.c:266
+#: ../libtransmission/net.c:268
 #, c-format
 msgid "Couldn't set source address %s on %d: %s"
 msgstr "Kon bronadres %s op %d niet instellen: %s"
 
-#: ../libtransmission/net.c:282
+#: ../libtransmission/net.c:284
 #, c-format
 msgid "Couldn't connect socket %d to %s, port %d (errno %d - %s)"
 msgstr "Kon socket %d niet verbinden met %s, poort %d (foutnr. %d - %s)"
 
-#: ../libtransmission/net.c:354
+#: ../libtransmission/net.c:356
 msgid "Is another copy of Transmission already running?"
 msgstr "Is er reeds een andere sessie van Transmission actief?"
 
-#: ../libtransmission/net.c:359
+#: ../libtransmission/net.c:361
 #, c-format
 msgid "Couldn't bind port %d on %s: %s"
 msgstr "Kon poort %d niet koppelen op %s: %s"
 
-#: ../libtransmission/net.c:361
+#: ../libtransmission/net.c:363
 #, c-format
 msgid "Couldn't bind port %d on %s: %s (%s)"
 msgstr "Kon poort %d niet koppelen op %s: %s (%s)"
@@ -2227,7 +2227,7 @@ msgstr "Aan het stoppen"
 msgid "Not forwarded"
 msgstr "Niet doorgestuurd"
 
-#: ../libtransmission/port-forwarding.c:91 ../libtransmission/torrent.c:2040
+#: ../libtransmission/port-forwarding.c:91 ../libtransmission/torrent.c:2039
 #, c-format
 msgid "State changed from \"%1$s\" to \"%2$s\""
 msgstr "Status gewijzigd van \"%1$s\" naar \"%2$s\""
@@ -2238,7 +2238,7 @@ msgstr "Gestopt"
 
 #. first %s is the application name
 #. second %s is the version number
-#: ../libtransmission/session.c:718
+#: ../libtransmission/session.c:720
 #, c-format
 msgid "%s %s started"
 msgstr "%s %s gestart"
@@ -2248,17 +2248,17 @@ msgstr "%s %s gestart"
 msgid "Loaded %d torrents"
 msgstr "%d torrents geladen"
 
-#: ../libtransmission/torrent.c:524
+#: ../libtransmission/torrent.c:523
 #, c-format
 msgid "Tracker warning: \"%s\""
 msgstr "Trackerwaarschuwing: \"%s\""
 
-#: ../libtransmission/torrent.c:531
+#: ../libtransmission/torrent.c:530
 #, c-format
 msgid "Tracker error: \"%s\""
 msgstr "Trackerfout: \"%s\""
 
-#: ../libtransmission/torrent.c:778
+#: ../libtransmission/torrent.c:777
 msgid ""
 "No data found! Ensure your drives are connected or use \"Set Location\". To "
 "re-download, remove the torrent and re-add it."
@@ -2266,19 +2266,19 @@ msgstr ""
 "Geen gegevens gevonden! Ga na of uw stations zijn aangesloten of gebruik "
 "‘Locatie instellen’. Of wis de torrent en herbegin."
 
-#: ../libtransmission/torrent.c:1661
+#: ../libtransmission/torrent.c:1660
 msgid "Restarted manually -- disabling its seed ratio"
 msgstr "Handmatige herstart -- seedverhouding wordt uitgeschakeld"
 
-#: ../libtransmission/torrent.c:1813
+#: ../libtransmission/torrent.c:1812
 msgid "Removing torrent"
 msgstr "Bezig met verwijderen van torrent"
 
-#: ../libtransmission/torrent.c:1897
+#: ../libtransmission/torrent.c:1896
 msgid "Done"
 msgstr "Klaar"
 
-#: ../libtransmission/torrent.c:1900
+#: ../libtransmission/torrent.c:1899
 msgid "Complete"
 msgstr "Voltooid"
 

@@ -18,8 +18,8 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
 "n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
-"X-Launchpad-Export-Date: 2012-07-06 01:09+0000\n"
-"X-Generator: Launchpad (build 15544)\n"
+"X-Launchpad-Export-Date: 2012-07-24 00:33+0000\n"
+"X-Generator: Launchpad (build 15654)\n"
 "X-Poedit-Country: RUSSIAN FEDERATION\n"
 "X-Poedit-Language: Russian\n"
 "X-Poedit-SourceCharset: utf-8\n"
@@ -1552,7 +1552,7 @@ msgstr "Максимальное число активных _загрузок:"
 msgid "Downloads sharing data in the last N minutes are _active:"
 msgstr "Загрузить данные о раздаче за последние N минут _активности:"
 
-#: ../gtk/tr-prefs.c:286 ../libtransmission/torrent.c:1903
+#: ../gtk/tr-prefs.c:286 ../libtransmission/torrent.c:1902
 msgid "Incomplete"
 msgstr "Не завершено"
 
@@ -2063,7 +2063,7 @@ msgstr "ГБ/с"
 msgid "TB/s"
 msgstr "ТБ/с"
 
-#: ../gtk/util.c:87 ../libtransmission/utils.c:1487
+#: ../gtk/util.c:87 ../libtransmission/utils.c:1505
 msgid "None"
 msgstr "Н/Д"
 
@@ -2214,7 +2214,7 @@ msgstr "Не удалось создать сокет: %s"
 msgid "Torrent Creator is skipping file \"%s\": %s"
 msgstr "При создании торрента пропущен файл «%s»: %s"
 
-#: ../libtransmission/metainfo.c:587
+#: ../libtransmission/metainfo.c:592
 #, c-format
 msgid "Invalid metadata entry \"%s\""
 msgstr "Запись метаданных «%s» некорректна"
@@ -2243,26 +2243,26 @@ msgstr "перенаправление порта %d прекращено"
 msgid "Port %d forwarded successfully"
 msgstr "Порт %d успешно перенаправлен"
 
-#: ../libtransmission/net.c:266
+#: ../libtransmission/net.c:268
 #, c-format
 msgid "Couldn't set source address %s on %d: %s"
 msgstr "Невозможно изменить адрес источника с %s на %d: %s"
 
-#: ../libtransmission/net.c:282
+#: ../libtransmission/net.c:284
 #, c-format
 msgid "Couldn't connect socket %d to %s, port %d (errno %d - %s)"
 msgstr "Не удалось подключить сокет %d к %s на порт %d (код ошибки %d - %s)"
 
-#: ../libtransmission/net.c:354
+#: ../libtransmission/net.c:356
 msgid "Is another copy of Transmission already running?"
 msgstr "Уже запущена другая копия Transmission?"
 
-#: ../libtransmission/net.c:359
+#: ../libtransmission/net.c:361
 #, c-format
 msgid "Couldn't bind port %d on %s: %s"
 msgstr "Не удалось открыть порт %d на %s: %s"
 
-#: ../libtransmission/net.c:361
+#: ../libtransmission/net.c:363
 #, c-format
 msgid "Couldn't bind port %d on %s: %s (%s)"
 msgstr "Не удалось привязать порт %d к %s: %s (%s)"
@@ -2292,7 +2292,7 @@ msgstr "Останавливается"
 msgid "Not forwarded"
 msgstr "Не перенаправляется"
 
-#: ../libtransmission/port-forwarding.c:91 ../libtransmission/torrent.c:2040
+#: ../libtransmission/port-forwarding.c:91 ../libtransmission/torrent.c:2039
 #, c-format
 msgid "State changed from \"%1$s\" to \"%2$s\""
 msgstr "Состояние изменилось с «%1$s» на «%2$s»"
@@ -2303,7 +2303,7 @@ msgstr "Остановлен"
 
 #. first %s is the application name
 #. second %s is the version number
-#: ../libtransmission/session.c:718
+#: ../libtransmission/session.c:720
 #, c-format
 msgid "%s %s started"
 msgstr "%s %s запущен"
@@ -2313,17 +2313,17 @@ msgstr "%s %s запущен"
 msgid "Loaded %d torrents"
 msgstr "Загружено торрентов: %d"
 
-#: ../libtransmission/torrent.c:524
+#: ../libtransmission/torrent.c:523
 #, c-format
 msgid "Tracker warning: \"%s\""
 msgstr "Предупреждение трекера: «%s»"
 
-#: ../libtransmission/torrent.c:531
+#: ../libtransmission/torrent.c:530
 #, c-format
 msgid "Tracker error: \"%s\""
 msgstr "Ошибка трекера: «%s»"
 
-#: ../libtransmission/torrent.c:778
+#: ../libtransmission/torrent.c:777
 msgid ""
 "No data found! Ensure your drives are connected or use \"Set Location\". To "
 "re-download, remove the torrent and re-add it."
@@ -2332,19 +2332,19 @@ msgstr ""
 "\"Установить местоположение\". Для того, чтобы повторно загрузить файл, "
 "удалите торрент, а затем добавьте его еще раз."
 
-#: ../libtransmission/torrent.c:1661
+#: ../libtransmission/torrent.c:1660
 msgid "Restarted manually -- disabling its seed ratio"
 msgstr "Перезагружено вручную -- отключение рейтинга раздачи"
 
-#: ../libtransmission/torrent.c:1813
+#: ../libtransmission/torrent.c:1812
 msgid "Removing torrent"
 msgstr "Удаление торрента"
 
-#: ../libtransmission/torrent.c:1897
+#: ../libtransmission/torrent.c:1896
 msgid "Done"
 msgstr "Готово"
 
-#: ../libtransmission/torrent.c:1900
+#: ../libtransmission/torrent.c:1899
 msgid "Complete"
 msgstr "Завершено"
 

@@ -16,8 +16,8 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n == 1 ? 0: (((n % 100 > 19) || ((n % 100 "
 "== 0) && (n != 0))) ? 2: 1));\n"
-"X-Launchpad-Export-Date: 2012-07-06 01:09+0000\n"
-"X-Generator: Launchpad (build 15544)\n"
+"X-Launchpad-Export-Date: 2012-07-24 00:33+0000\n"
+"X-Generator: Launchpad (build 15654)\n"
 
 #: ../gtk/actions.c:45
 msgid "Sort by _Activity"
@@ -1498,7 +1498,7 @@ msgstr "Maxim de _descărcări active:"
 msgid "Downloads sharing data in the last N minutes are _active:"
 msgstr "Descărcările de date partajate în ultimile N minute sunt _active:"
 
-#: ../gtk/tr-prefs.c:286 ../libtransmission/torrent.c:1903
+#: ../gtk/tr-prefs.c:286 ../libtransmission/torrent.c:1902
 msgid "Incomplete"
 msgstr "Incomplet"
 
@@ -2013,7 +2013,7 @@ msgstr "GO/s"
 msgid "TB/s"
 msgstr "TO/s"
 
-#: ../gtk/util.c:87 ../libtransmission/utils.c:1487
+#: ../gtk/util.c:87 ../libtransmission/utils.c:1505
 msgid "None"
 msgstr "Nimic"
 
@@ -2165,7 +2165,7 @@ msgstr "Nu s-a putut crea socketul: %s"
 msgid "Torrent Creator is skipping file \"%s\": %s"
 msgstr "Creatorul de torente ignoră fişierul „%s”: %s"
 
-#: ../libtransmission/metainfo.c:587
+#: ../libtransmission/metainfo.c:592
 #, c-format
 msgid "Invalid metadata entry \"%s\""
 msgstr "Intrare metadate nevalidă „%s”"
@@ -2194,27 +2194,27 @@ msgstr "nu se mai înaintează portul %d"
 msgid "Port %d forwarded successfully"
 msgstr "Portul %d a fost înaintat cu succes"
 
-#: ../libtransmission/net.c:266
+#: ../libtransmission/net.c:268
 #, c-format
 msgid "Couldn't set source address %s on %d: %s"
 msgstr "Nu s-a putut defini adresa sursă %s pe %d: %s"
 
-#: ../libtransmission/net.c:282
+#: ../libtransmission/net.c:284
 #, c-format
 msgid "Couldn't connect socket %d to %s, port %d (errno %d - %s)"
 msgstr ""
 "Nu s-a putut conecta socketul %d la %s, portul %d (eroare nr %d - %s)"
 
-#: ../libtransmission/net.c:354
+#: ../libtransmission/net.c:356
 msgid "Is another copy of Transmission already running?"
 msgstr ""
 
-#: ../libtransmission/net.c:359
+#: ../libtransmission/net.c:361
 #, c-format
 msgid "Couldn't bind port %d on %s: %s"
 msgstr "Nu s-a putut lega la portul %d pe %s: %s"
 
-#: ../libtransmission/net.c:361
+#: ../libtransmission/net.c:363
 #, c-format
 msgid "Couldn't bind port %d on %s: %s (%s)"
 msgstr ""
@@ -2244,7 +2244,7 @@ msgstr "În curs de oprire"
 msgid "Not forwarded"
 msgstr "Nu s-a înaintat"
 
-#: ../libtransmission/port-forwarding.c:91 ../libtransmission/torrent.c:2040
+#: ../libtransmission/port-forwarding.c:91 ../libtransmission/torrent.c:2039
 #, c-format
 msgid "State changed from \"%1$s\" to \"%2$s\""
 msgstr "Starea s-a schimbat de la „%1$s” la „%2$s”"
@@ -2255,7 +2255,7 @@ msgstr "Oprit"
 
 #. first %s is the application name
 #. second %s is the version number
-#: ../libtransmission/session.c:718
+#: ../libtransmission/session.c:720
 #, c-format
 msgid "%s %s started"
 msgstr "%s %s pornit"
@@ -2265,17 +2265,17 @@ msgstr "%s %s pornit"
 msgid "Loaded %d torrents"
 msgstr "S-au incărcat %d torente"
 
-#: ../libtransmission/torrent.c:524
+#: ../libtransmission/torrent.c:523
 #, c-format
 msgid "Tracker warning: \"%s\""
 msgstr "Avertisment tracker: „%s”"
 
-#: ../libtransmission/torrent.c:531
+#: ../libtransmission/torrent.c:530
 #, c-format
 msgid "Tracker error: \"%s\""
 msgstr "Eroare tracker: „%s”"
 
-#: ../libtransmission/torrent.c:778
+#: ../libtransmission/torrent.c:777
 msgid ""
 "No data found! Ensure your drives are connected or use \"Set Location\". To "
 "re-download, remove the torrent and re-add it."
@@ -2284,19 +2284,19 @@ msgstr ""
 "utilizați „Stabiliți locul”. Pentru a relua descărcarea, ștergeți torentul "
 "și adăugați-l din nou."
 
-#: ../libtransmission/torrent.c:1661
+#: ../libtransmission/torrent.c:1660
 msgid "Restarted manually -- disabling its seed ratio"
 msgstr "Repornire manuală -- se deazctivează rația"
 
-#: ../libtransmission/torrent.c:1813
+#: ../libtransmission/torrent.c:1812
 msgid "Removing torrent"
 msgstr ""
 
-#: ../libtransmission/torrent.c:1897
+#: ../libtransmission/torrent.c:1896
 msgid "Done"
 msgstr "Terminat"
 
-#: ../libtransmission/torrent.c:1900
+#: ../libtransmission/torrent.c:1899
 msgid "Complete"
 msgstr "Complet"
 
