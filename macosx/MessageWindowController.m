@@ -62,7 +62,7 @@
         [window setRestorationClass: [self class]];
     
     [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(resizeColumn)
-        name: @"NSTableViewColumnDidResizeNotification" object: fMessageTable];
+        name: NSTableViewColumnDidResizeNotification object: fMessageTable];
     
     [window setContentBorderThickness: NSMinY([[fMessageTable enclosingScrollView] frame]) forEdge: NSMinYEdge];
     
