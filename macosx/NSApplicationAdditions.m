@@ -31,4 +31,9 @@
 	return floor(NSAppKitVersionNumber) > NSAppKitVersionNumber10_6;
 }
 
+- (BOOL) isOnMountainLionOrBetter
+{
+	return floor(NSAppKitVersionNumber) > NSAppKitVersionNumber10_7;
+}
+
 @end

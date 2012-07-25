@@ -22,6 +22,7 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
+#import "NSApplicationAdditions.h"
 #import "NSStringAdditions.h"
 
 #import <transmission.h>
@@ -29,7 +30,7 @@
 
 @interface NSString (Private)
 
-+ (NSString *) stringForFileSize: (uint64_t) size showUnitUnless: (NSString *) notAllowedUnit unitsUsed: (NSString **) unitUsed;
++ (NSString *) stringForFileSizeLion: (uint64_t) size showUnitUnless: (NSString *) notAllowedUnit unitsUsed: (NSString **) unitUsed;
 
 + (NSString *) stringForSpeed: (CGFloat) speed kb: (NSString *) kb mb: (NSString *) mb gb: (NSString *) gb;
 
@@ -47,30 +48,60 @@
 	return [self stringByAppendingString: [NSString ellipsis]];
 }
 
-#warning use localizedStringWithFormat: directly in roardacted
+#warning use localizedStringWithFormat: directly when 10.8-only
 + (NSString *) formattedUInteger: (NSUInteger) value
 {
-    static NSNumberFormatter * numberFormatter;
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        numberFormatter = [[NSNumberFormatter alloc] init];
-        [numberFormatter setNumberStyle: NSNumberFormatterDecimalStyle];
-        [numberFormatter setMaximumFractionDigits: 0];
-    });
-    
-    return [numberFormatter stringFromNumber: [NSNumber numberWithUnsignedInteger: value]];
+    if ([NSApp isOnMountainLionOrBetter])
+        return [NSString localizedStringWithFormat: @"%lu", value];
+    else
+    {
+        static NSNumberFormatter * numberFormatter;
+        static dispatch_once_t onceToken;
+        dispatch_once(&onceToken, ^{
+            numberFormatter = [[NSNumberFormatter alloc] init];
+            [numberFormatter setNumberStyle: NSNumberFormatterDecimalStyle];
+            [numberFormatter setMaximumFractionDigits: 0];
+        });
+        
+        return [numberFormatter stringFromNumber: [NSNumber numberWithUnsignedInteger: value]];
+    }
 }
 
+#warning should we take long long instead?
 + (NSString *) stringForFileSize: (uint64_t) size
 {
-    return [self stringForFileSize: size showUnitUnless: nil unitsUsed: nil];
+    if ([NSApp isOnMountainLionOrBetter])
+        return [NSByteCountFormatterMtLion stringFromByteCount: size countStyle: NSByteCountFormatterCountStyleFile];
+    else
+        return [self stringForFileSizeLion: size showUnitUnless: nil unitsUsed: nil];
 }
 
+#warning should we take long long instead?
 + (NSString *) stringForFilePartialSize: (uint64_t) partialSize fullSize: (uint64_t) fullSize
 {
-    NSString * units;
-    NSString * fullString = [self stringForFileSize: fullSize showUnitUnless: nil unitsUsed: &units];
-    NSString * partialString = [self stringForFileSize: partialSize showUnitUnless: units unitsUsed: nil];
+    NSString * partialString, * fullString;
+    if ([NSApp isOnMountainLionOrBetter])
+    {
+        NSByteCountFormatter *fileSizeFormatter = [[NSByteCountFormatterMtLion alloc] init];
+        
+        //only show units for the partial file size if it's different than the full file size's
+        [fileSizeFormatter setIncludesCount: NO];
+        const BOOL partialUnitsDifferent = ![[fileSizeFormatter stringFromByteCount: partialSize] isEqualToString: [fileSizeFormatter stringFromByteCount: fullSize]];
+        
+        [fileSizeFormatter setIncludesCount: YES];
+        fullString = [fileSizeFormatter stringFromByteCount: fullSize];
+        
+        [fileSizeFormatter setIncludesUnit: partialUnitsDifferent];
+        partialString = [fileSizeFormatter stringFromByteCount: partialSize];
+        
+        [fileSizeFormatter release];
+    }
+    else
+    {
+        NSString * units;
+        fullString = [self stringForFileSizeLion: fullSize showUnitUnless: nil unitsUsed: &units];
+        partialString = [self stringForFileSizeLion: partialSize showUnitUnless: units unitsUsed: nil];
+    }
     
     return [NSString stringWithFormat: NSLocalizedString(@"%@ of %@", "file size string"), partialString, fullString];
 }
@@ -109,7 +140,7 @@
 + (NSString *) percentString: (CGFloat) progress longDecimals: (BOOL) longDecimals
 {
     if (progress >= 1.0)
-        return @"100%";
+        return [NSString localizedStringWithFormat: @"%d%%", 100];
     else if (longDecimals)
         return [NSString localizedStringWithFormat: @"%.2f%%", tr_truncd(progress * 100.0, 2)];
     else
@@ -123,7 +154,7 @@
 
 + (NSString *) timeString: (uint64_t) seconds showSeconds: (BOOL) showSeconds maxFields: (NSUInteger) max
 {
-    NSAssert(max > 0, @"Cannot generate a time string with no fields");
+    NSParameterAssert(max > 0);
     
     NSMutableArray * timeArray = [NSMutableArray arrayWithCapacity: MIN(max, 5)];
     NSUInteger remaining = seconds; //causes problems for some users when it's a uint64_t
@@ -204,7 +235,7 @@
 
 @implementation NSString (Private)
 
-+ (NSString *) stringForFileSize: (uint64_t) size showUnitUnless: (NSString *) notAllowedUnit unitsUsed: (NSString **) unitUsed
++ (NSString *) stringForFileSizeLion: (uint64_t) size showUnitUnless: (NSString *) notAllowedUnit unitsUsed: (NSString **) unitUsed
 {
     double convertedSize;
     NSString * unit;

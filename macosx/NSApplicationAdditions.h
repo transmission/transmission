@@ -24,9 +24,13 @@
 
 #define NSPopoverLion NSClassFromString(@"NSPopover")
 #define NSDataDetectorLion NSClassFromString(@"NSDataDetector")
+#define NSByteCountFormatterMtLion NSClassFromString(@"NSByteCountFormatter")
+#define NSUserNotificationMtLion NSClassFromString(@"NSUserNotification")
+#define NSUserNotificationCenterMtLion NSClassFromString(@"NSUserNotificationCenter")
 
 @interface NSApplication (NSApplicationAdditions)
 
 - (BOOL) isOnLionOrBetter;
+- (BOOL) isOnMountainLionOrBetter;
 
 @end
