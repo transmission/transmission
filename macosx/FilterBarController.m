@@ -238,6 +238,26 @@
     [[NSNotificationCenter defaultCenter] postNotificationName: @"ApplyFilter" object: nil];
 }
 
+- (void) reset: (BOOL) updateUI
+{
+    [[NSUserDefaults standardUserDefaults] setInteger: GROUP_FILTER_ALL_TAG forKey: @"FilterGroup"];
+    
+    if (updateUI)
+    {   
+        [self updateGroupsButton];
+        
+        [self setFilter: fNoFilterButton];
+        
+        [fSearchField setStringValue: @""];
+        [self setSearchText: fSearchField];
+    }
+    else
+    {
+        [[NSUserDefaults standardUserDefaults] setObject: FILTER_NONE forKey: @"Filter"];
+        [[NSUserDefaults standardUserDefaults] removeObjectForKey: @"FilterSearchString"];
+    }
+}
+
 - (NSArray *) searchStrings
 {
     return [[fSearchField stringValue] betterComponentsSeparatedByCharactersInSet: [NSCharacterSet whitespaceAndNewlineCharacterSet]];

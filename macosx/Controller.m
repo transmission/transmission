@@ -484,6 +484,9 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     
     fBadger = [[Badger alloc] initWithLib: fLib];
     
+    if ([NSApp isOnMountainLionOrBetter])
+        [[NSUserNotificationCenterMtLion defaultUserNotificationCenter] setDelegate: self];
+    
     //observe notifications
     NSNotificationCenter * nc = [NSNotificationCenter defaultCenter];
     
@@ -554,6 +557,14 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     //register for dock icon drags (has to be in applicationDidFinishLaunching: to work)
     [[NSAppleEventManager sharedAppleEventManager] setEventHandler: self andSelector: @selector(handleOpenContentsEvent:replyEvent:)
         forEventClass: kCoreEventClass andEventID: kAEOpenContents];
+    
+    //if we were opened from a user notification, do the corresponding action
+    if ([NSApp isOnMountainLionOrBetter])
+    {
+        NSUserNotification * launchNotification = [[notification userInfo] objectForKey: NSApplicationLaunchUserNotificationKey];
+        if (launchNotification)
+            [self userNotificationCenter: nil didActivateNotification: launchNotification];
+    }
     
     //auto importing
     [self checkAutoImportDirectory];
@@ -1836,6 +1847,101 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     [fTotalTorrentsField setStringValue: totalTorrentsString];
 }
 
+- (BOOL) userNotificationCenter: (NSUserNotificationCenter *) center shouldPresentNotification:(NSUserNotification *) notification
+{
+    return YES;
+}
+
+- (void) userNotificationCenter: (NSUserNotificationCenter *) center didActivateNotification: (NSUserNotification *) notification
+{
+    if (![notification userInfo])
+        return;
+    
+    if ([notification activationType] == NSUserNotificationActivationTypeActionButtonClicked) //reveal
+    {
+        Torrent * torrent = [self torrentForHash: [[notification userInfo] objectForKey: @"Hash"]];
+        NSString * location = [torrent dataLocation];
+        if (!location)
+            location = [[notification userInfo] objectForKey: @"Location"];
+        if (location)
+            [[NSWorkspace sharedWorkspace] activateFileViewerSelectingURLs: @[[NSURL fileURLWithPath: location]]];
+    }
+    else if ([notification activationType] == NSUserNotificationActivationTypeContentsClicked)
+    {
+        Torrent * torrent = [self torrentForHash: [[notification userInfo] objectForKey: @"Hash"]];
+        if (torrent)
+        {
+            //select in the table - first see if it's already shown
+            NSInteger row = [fTableView rowForItem: torrent];
+            if (row == -1)
+            {
+                //if it's not shown, see if it's in a collapsed row
+                if ([fDefaults boolForKey: @"SortByGroup"])
+                {
+                    __block TorrentGroup * parent = nil;
+                    [fDisplayedTorrents enumerateObjectsWithOptions: NSEnumerationConcurrent usingBlock: ^(TorrentGroup * group, NSUInteger idx, BOOL *stop) {
+                        if ([[group torrents] containsObject: torrent])
+                        {
+                            parent = group;
+                            *stop = YES;
+                        }
+                    }];
+                    if (parent)
+                    {
+                        [[fTableView animator] expandItem: parent];
+                        row = [fTableView rowForItem: torrent];
+                    }
+                }
+                
+                if (row == -1)
+                {
+                    //not found - must be filtering
+                    NSAssert([fDefaults boolForKey: @"FilterBar"], @"expected the filter to be enabled");
+                    [fFilterBar reset: YES];
+                    
+                    row = [fTableView rowForItem: torrent];
+                    
+                    //if it's not shown, it has to be in a collapsed row...again
+                    if ([fDefaults boolForKey: @"SortByGroup"])
+                    {
+                        __block TorrentGroup * parent = nil;
+                        [fDisplayedTorrents enumerateObjectsWithOptions: NSEnumerationConcurrent usingBlock: ^(TorrentGroup * group, NSUInteger idx, BOOL *stop) {
+                            if ([[group torrents] containsObject: torrent])
+                            {
+                                parent = group;
+                                *stop = YES;
+                            }
+                        }];
+                        if (parent)
+                        {
+                            [[fTableView animator] expandItem: parent];
+                            row = [fTableView rowForItem: torrent];
+                        }
+                    }
+                }
+            }
+            
+            NSAssert1(row != -1, @"expected a row to be found for torrent %@", torrent);
+            [fTableView selectRowIndexes: [NSIndexSet indexSetWithIndex: row] byExtendingSelection:NO];
+        }
+    }
+}
+
+- (Torrent *) torrentForHash: (NSString *) hash
+{
+    NSParameterAssert(hash != nil);
+    
+    __block Torrent * torrent = nil;
+    [fTorrents enumerateObjectsWithOptions: NSEnumerationConcurrent usingBlock: ^(id obj, NSUInteger idx, BOOL * stop) {
+        if ([[(Torrent *)obj hashString] isEqualToString: hash])
+        {
+            torrent = obj;
+            *stop = YES;
+        }
+    }];
+    return torrent;
+}
+
 - (void) torrentFinishedDownloading: (NSNotification *) notification
 {
     Torrent * torrent = [notification object];
@@ -1853,9 +1959,28 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
             }
         }
         
+        NSString * location = [torrent dataLocation];
+        
+        if ([NSApp isOnMountainLionOrBetter])
+        {
+            NSUserNotification * notification = [[NSUserNotificationMtLion alloc] init];
+            [notification setTitle: NSLocalizedString(@"Download Complete", "notification title")];
+            [notification setSubtitle: [torrent name]];
+            
+            [notification setHasActionButton: YES];
+            [notification setActionButtonTitle: NSLocalizedString(@"Reveal", "notification button")];
+            
+            NSMutableDictionary * userInfo = [NSMutableDictionary dictionaryWithObject: [torrent hashString] forKey: @"Hash"];
+            if (location)
+                [userInfo setObject: location forKey: @"Location"];
+            [notification setUserInfo: userInfo];
+            
+            [[NSUserNotificationCenterMtLion defaultUserNotificationCenter] deliverNotification: notification];
+            [notification release];
+        }
+        
         NSMutableDictionary * clickContext = [NSMutableDictionary dictionaryWithObject: GROWL_DOWNLOAD_COMPLETE forKey: @"Type"];
         
-        NSString * location = [torrent dataLocation];
         if (location)
             [clickContext setObject: location forKey: @"Location"];
         
@@ -1894,9 +2019,28 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         }
     }
     
+    NSString * location = [torrent dataLocation];
+    
+    if ([NSApp isOnMountainLionOrBetter])
+    {
+        NSUserNotification * notification = [[NSUserNotificationMtLion alloc] init];
+        [notification setTitle: NSLocalizedString(@"Seeding Complete", "notification title")];
+        [notification setSubtitle: [torrent name]];
+        
+        [notification setHasActionButton: YES];
+        [notification setActionButtonTitle: NSLocalizedString(@"Reveal", "notification button")];
+        
+        NSMutableDictionary * userInfo = [NSMutableDictionary dictionaryWithObject: [torrent hashString] forKey: @"Hash"];
+        if (location)
+            [userInfo setObject: location forKey: @"Location"];
+        [notification setUserInfo: userInfo];
+        
+        [[NSUserNotificationCenterMtLion defaultUserNotificationCenter] deliverNotification: notification];
+        [notification release];
+    }
+    
     NSMutableDictionary * clickContext = [NSMutableDictionary dictionaryWithObject: GROWL_SEEDING_COMPLETE forKey: @"Type"];
     
-    NSString * location = [torrent dataLocation];
     if (location)
         [clickContext setObject: location forKey: @"Location"];
     
@@ -2815,6 +2959,18 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
             case TR_PARSE_OK:
                 [self openFiles: [NSArray arrayWithObject: fullFile] addType: ADD_AUTO forcePath: nil];
                 
+                if ([NSApp isOnMountainLionOrBetter])
+                {
+                    NSUserNotification* notification = [[NSUserNotificationMtLion alloc] init];
+                    [notification setTitle: NSLocalizedString(@"Torrent File Auto Added", "notification title")];
+                    [notification setSubtitle: file];
+                    
+                    [notification setHasActionButton: NO];
+                    
+                    [[NSUserNotificationCenterMtLion defaultUserNotificationCenter] deliverNotification: notification];
+                    [notification release];
+                }
+                
                 [GrowlApplicationBridge notifyWithTitle: NSLocalizedString(@"Torrent File Auto Added", "Growl notification title")
                     description: file notificationName: GROWL_AUTO_ADD iconData: nil priority: 0 isSticky: NO
                     clickContext: nil];
@@ -3402,11 +3558,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     
     //disable filtering when hiding
     if (!show)
-    {
-        [[NSUserDefaults standardUserDefaults] setObject: FILTER_NONE forKey: @"Filter"];
-        [[NSUserDefaults standardUserDefaults] setInteger: GROUP_FILTER_ALL_TAG forKey: @"FilterGroup"];
-        [[NSUserDefaults standardUserDefaults] removeObjectForKey: @"FilterSearchString"];
-    }
+        [fFilterBar reset: NO];
     
     [self applyFilter]; //do even if showing to ensure tooltips are updated
 }
@@ -4494,7 +4646,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 
 - (void) growlNotificationWasClicked: (id) clickContext
 {
-    if (!clickContext || ![clickContext isKindOfClass: [NSDictionary class]])
+    if (![clickContext isKindOfClass: [NSDictionary class]])
         return;
     
     NSString * type = [clickContext objectForKey: @"Type"], * location;

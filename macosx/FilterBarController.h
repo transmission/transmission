@@ -54,11 +54,13 @@
 - (void) setSearchText: (id) sender;
 - (void) setSearchType: (id) sender;
 - (void) setGroupFilter: (id) sender;
+- (void) reset: (BOOL) updateUI;
 
 - (NSArray *) searchStrings;
 - (void) focusSearchField;
 
 - (void) setCountAll: (NSUInteger) all active: (NSUInteger) active downloading: (NSUInteger) downloading
         seeding: (NSUInteger) seeding paused: (NSUInteger) paused;
+
 
 @end
