@@ -133,7 +133,7 @@
         }
         
         //set built-in Growl
-        [GrowlApplicationBridge setShouldUseBuiltInNotifications: [fDefaults boolForKey: @"DisplayNotifications"]];
+        [GrowlApplicationBridge setShouldUseBuiltInNotifications: ![NSApp isOnMountainLionOrBetter] && [fDefaults boolForKey: @"DisplayNotifications"]];
         
         [self setAutoUpdateToBeta: nil];
     }
@@ -1463,7 +1463,10 @@
     {
         [fBuiltInGrowlButton setHidden: NO];
         [fGrowlAppButton setHidden: YES];
-        [fBuiltInGrowlButton setState: [fDefaults boolForKey: @"DisplayNotifications"]];
+        
+        const BOOL onMtLion = [NSApp isOnMountainLionOrBetter];
+        [fBuiltInGrowlButton setState: !onMtLion && [fDefaults boolForKey: @"DisplayNotifications"]];
+        [fBuiltInGrowlButton setEnabled: !onMtLion];
     }
 }
 
