@@ -1965,7 +1965,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         {
             NSUserNotification * notification = [[NSUserNotificationMtLion alloc] init];
             [notification setTitle: NSLocalizedString(@"Download Complete", "notification title")];
-            [notification setSubtitle: [torrent name]];
+            [notification setInformativeText: [torrent name]];
             
             [notification setHasActionButton: YES];
             [notification setActionButtonTitle: NSLocalizedString(@"Reveal", "notification button")];
@@ -2025,7 +2025,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     {
         NSUserNotification * notification = [[NSUserNotificationMtLion alloc] init];
         [notification setTitle: NSLocalizedString(@"Seeding Complete", "notification title")];
-        [notification setSubtitle: [torrent name]];
+        [notification setInformativeText: [torrent name]];
         
         [notification setHasActionButton: YES];
         [notification setActionButtonTitle: NSLocalizedString(@"Reveal", "notification button")];
@@ -2963,7 +2963,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
                 {
                     NSUserNotification* notification = [[NSUserNotificationMtLion alloc] init];
                     [notification setTitle: NSLocalizedString(@"Torrent File Auto Added", "notification title")];
-                    [notification setSubtitle: file];
+                    [notification setInformativeText: file];
                     
                     [notification setHasActionButton: NO];
                     
