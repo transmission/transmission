@@ -926,7 +926,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         {
             AddWindowController * addController = [[AddWindowController alloc] initWithTorrent: torrent destination: location
                                                     lockDestination: lockDestination controller: self torrentFile: torrentPath
-                                                    deleteTorrent: deleteTorrentFile canToggleDelete: canToggleDelete];
+                                                    deleteTorrentCheckEnableInitially: deleteTorrentFile canToggleDelete: canToggleDelete];
             [addController showWindow: self];
             
             if (!fAddWindows)

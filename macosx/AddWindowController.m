@@ -55,7 +55,7 @@
 
 - (id) initWithTorrent: (Torrent *) torrent destination: (NSString *) path lockDestination: (BOOL) lockDestination
     controller: (Controller *) controller torrentFile: (NSString *) torrentFile
-    deleteTorrent: (BOOL) deleteTorrent canToggleDelete: (BOOL) canToggleDelete
+    deleteTorrentCheckEnableInitially: (BOOL) deleteTorrent canToggleDelete: (BOOL) canToggleDelete
 {
     if ((self = [super initWithWindowNibName: @"AddWindow"]))
     {
@@ -67,8 +67,8 @@
         
         fTorrentFile = [[torrentFile stringByExpandingTildeInPath] retain];
         
-        fDeleteTorrentInitial = deleteTorrent;
-        fDeleteEnableInitial = canToggleDelete;
+        fDeleteTorrentEnableInitially = deleteTorrent;
+        fCanToggleDelete = canToggleDelete;
         
         fGroupValue = [torrent groupValue];
         
@@ -122,8 +122,8 @@
     
     [fStartCheck setState: [[NSUserDefaults standardUserDefaults] boolForKey: @"AutoStartDownload"] ? NSOnState : NSOffState];
     
-    [fDeleteCheck setState: fDeleteTorrentInitial ? NSOnState : NSOffState];
-    [fDeleteCheck setEnabled: fDeleteEnableInitial];
+    [fDeleteCheck setState: fDeleteTorrentEnableInitially ? NSOnState : NSOffState];
+    [fDeleteCheck setEnabled: fCanToggleDelete];
     
     if (fDestination)
         [self setDestinationPath: fDestination];
@@ -334,7 +334,7 @@
     fTimer = nil;
     [fTorrent setGroupValue: fGroupValue];
     
-    if (fTorrentFile && [fDeleteCheck state] == NSOnState)
+    if (fTorrentFile && fCanToggleDelete && [fDeleteCheck state] == NSOnState)
         [Torrent trashFile: fTorrentFile];
     
     if ([fStartCheck state] == NSOnState)
