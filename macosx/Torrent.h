@@ -52,7 +52,7 @@
     
     BOOL fResumeOnWake;
     
-    NSString * fTimeMachineExclude;
+    BOOL fTimeMachineExcludeInitialized;
 }
 
 - (id) initWithPath: (NSString *) path location: (NSString *) location deleteTorrentFile: (BOOL) torrentDelete
