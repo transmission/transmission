@@ -44,7 +44,7 @@
         legacyIncompleteFolder: (NSString *) incompleteFolder;
 
 - (void) createFileList;
-- (void) insertPath: (NSMutableArray *) components forParent: (FileListNode *) parent fileSize: (uint64_t) size
+- (void) insertPathForComponents: (NSArray *) components withComponentIndex: (NSUInteger) componentIndex forParent: (FileListNode *) parent fileSize: (uint64_t) size
     index: (NSInteger) index flatList: (NSMutableArray *) flatFileList;
 - (void) sortFileList: (NSMutableArray *) fileNodes;
 
@@ -1713,8 +1713,8 @@ int trashDataFile(const char * filename)
             NSArray * pathComponents = [fullPath pathComponents];
             NSAssert1([pathComponents count] >= 2, @"Not enough components in path %@", fullPath);
             
-            NSString * path = [pathComponents objectAtIndex: 0];
-            NSString * name = [pathComponents objectAtIndex: 1];
+            NSString * path = pathComponents[0];
+            NSString * name = pathComponents[1];
             
             if ([pathComponents count] > 2)
             {
@@ -1735,10 +1735,8 @@ int trashDataFile(const char * filename)
                     [node release];
                 }
                 
-                NSMutableArray * trimmedComponents = [NSMutableArray arrayWithArray: [pathComponents subarrayWithRange: NSMakeRange(2, [pathComponents count]-2)]];
-                
                 [node insertIndex: i withSize: file->length];
-                [self insertPath: trimmedComponents forParent: node fileSize: file->length index: i flatList: flatFileList];
+                [self insertPathForComponents: pathComponents withComponentIndex: 2 forParent: node fileSize: file->length index: i flatList: flatFileList];
             }
             else
             {
@@ -1764,11 +1762,14 @@ int trashDataFile(const char * filename)
     }
 }
 
-- (void) insertPath: (NSMutableArray *) components forParent: (FileListNode *) parent fileSize: (uint64_t) size
+- (void) insertPathForComponents: (NSArray *) components withComponentIndex: (NSUInteger) componentIndex forParent: (FileListNode *) parent fileSize: (uint64_t) size
     index: (NSInteger) index flatList: (NSMutableArray *) flatFileList
 {
-    NSString * name = [components objectAtIndex: 0];
-    const BOOL isFolder = [components count] > 1;
+    NSParameterAssert([components count] > 0);
+    NSParameterAssert(componentIndex < [components count]);
+    
+    NSString * name = components[componentIndex];
+    const BOOL isFolder = componentIndex < ([components count]-1);
     
     //determine if folder node already exists
     __block FileListNode * node = nil;
@@ -1788,23 +1789,21 @@ int trashDataFile(const char * filename)
     {
         NSString * path = [[parent path] stringByAppendingPathComponent: [parent name]];
         if (isFolder)
-            node = [[FileListNode alloc] initWithFolderName: name path: path torrent: self];
+            node = [[[FileListNode alloc] initWithFolderName: name path: path torrent: self] autorelease];
         else
         {
-            node = [[FileListNode alloc] initWithFileName: name path: path size: size index: index torrent: self];
+            node = [[[FileListNode alloc] initWithFileName: name path: path size: size index: index torrent: self] autorelease];
             [flatFileList addObject: node];
         }
         
         [parent insertChild: node];
-        [node release];
     }
     
     if (isFolder)
     {
         [node insertIndex: index withSize: size];
         
-        [components removeObjectAtIndex: 0];
-        [self insertPath: components forParent: node fileSize: size index: index flatList: flatFileList];
+        [self insertPathForComponents: components withComponentIndex: (componentIndex+1) forParent: node fileSize: size index: index flatList: flatFileList];
     }
 }
 
