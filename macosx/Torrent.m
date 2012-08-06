@@ -400,7 +400,8 @@ int trashDataFile(const char * filename)
 
 - (void) setRatioLimit: (CGFloat) limit
 {
-    NSAssert(limit >= 0, @"Ratio cannot be negative");
+    NSParameterAssert(limit >= 0);
+    
     tr_torrentSetRatioLimit(fHandle, limit);
 }
 
@@ -426,7 +427,8 @@ int trashDataFile(const char * filename)
 
 - (void) setIdleLimitMinutes: (NSUInteger) limit
 {
-    NSAssert(limit > 0, @"Idle limit must be greater than zero");
+    NSParameterAssert(limit > 0);
+    
     tr_torrentSetIdleLimit(fHandle, limit);
 }
 
@@ -462,7 +464,7 @@ int trashDataFile(const char * filename)
 
 - (void) setMaxPeerConnect: (uint16_t) count
 {
-    NSAssert(count > 0, @"max peer count must be greater than 0");
+    NSParameterAssert(count > 0);
     
     tr_torrentSetPeerLimit(fHandle, count);
 }
@@ -1587,7 +1589,6 @@ int trashDataFile(const char * filename)
         magnetAddress: (NSString *) magnetAddress lib: (tr_session *) lib
         groupValue: (NSNumber *) groupValue
         removeWhenFinishSeeding: (NSNumber *) removeWhenFinishSeeding
-        timeMachineExcludeLocation: (NSString *) timeMachineExclude
         downloadFolder: (NSString *) downloadFolder
         legacyIncompleteFolder: (NSString *) incompleteFolder
 {
