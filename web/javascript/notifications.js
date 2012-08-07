@@ -11,15 +11,17 @@ $(document).ready(function () {
   toggle.show();
   updateMenuTitle();
   $(transmission).bind('downloadComplete seedingComplete', function (event, torrent) {
-    var title = (event.type == 'downloadComplete' ? 'Download' : 'Seeding') + ' complete',
-        content = torrent.getName(),
-        notification;
-
-    notification = window.webkitNotifications.createNotification('style/transmission/images/logo.png', title, content);
-    notification.show();
-    setTimeout(function () {
-      notification.cancel();
-    }, 5000);
+  	if (notificationsEnabled) {
+		var title = (event.type == 'downloadComplete' ? 'Download' : 'Seeding') + ' complete',
+			content = torrent.getName(),
+			notification;
+	
+		notification = window.webkitNotifications.createNotification('style/transmission/images/logo.png', title, content);
+		notification.show(); 
+		setTimeout(function () {
+		  notification.cancel();
+		}, 5000);
+	};
   });
 
   function updateMenuTitle() {
