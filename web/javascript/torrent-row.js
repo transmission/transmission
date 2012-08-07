@@ -90,12 +90,12 @@ TorrentRendererHelper.renderProgressbar = function(controller, t, progressbar)
 
 TorrentRendererHelper.formatUL = function(t)
 {
-	return '&uarr; ' + Transmission.fmt.speedBps(t.getUploadSpeed());
+	return '↑ ' + Transmission.fmt.speedBps(t.getUploadSpeed());
 };
 
 TorrentRendererHelper.formatDL = function(t)
 {
-	return '&darr; ' + Transmission.fmt.speedBps(t.getDownloadSpeed());
+	return '↓ ' + Transmission.fmt.speedBps(t.getDownloadSpeed());
 };
 
 /****
