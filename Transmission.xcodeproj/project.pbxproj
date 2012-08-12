@@ -261,7 +261,7 @@
 		A2AAB65E0DE0CF6200E04DDA /* rpc-server.h in Headers */ = {isa = PBXBuildFile; fileRef = A2AAB65A0DE0CF6200E04DDA /* rpc-server.h */; };
 		A2AAB65F0DE0CF6200E04DDA /* rpcimpl.c in Sources */ = {isa = PBXBuildFile; fileRef = A2AAB65B0DE0CF6200E04DDA /* rpcimpl.c */; };
 		A2AAB6650DE0D08B00E04DDA /* blocklist.h in Headers */ = {isa = PBXBuildFile; fileRef = A2D307930D9EC4860051FD27 /* blocklist.h */; };
-		A2AB76B715D7F6DF009EFC95 /* libcurl.4.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A2AB76B615D7F6DF009EFC95 /* libcurl.4.dylib */; };
+		A2AB76EA15D8130B009EFC95 /* libcurl.4.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A2290D2D1442B23200B95A09 /* libcurl.4.dylib */; };
 		A2AF1C390A3D0F6200F1575D /* FileOutlineView.m in Sources */ = {isa = PBXBuildFile; fileRef = A2AF1C370A3D0F6200F1575D /* FileOutlineView.m */; };
 		A2B3FB460E5901E700FF78FB /* cli.c in Sources */ = {isa = PBXBuildFile; fileRef = A2B3FB450E5901E700FF78FB /* cli.c */; };
 		A2B3FB4C0E59023000FF78FB /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */; };
@@ -961,7 +961,6 @@
 		A2AAB6590DE0CF6200E04DDA /* rpcimpl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = rpcimpl.h; path = libtransmission/rpcimpl.h; sourceTree = "<group>"; };
 		A2AAB65A0DE0CF6200E04DDA /* rpc-server.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "rpc-server.h"; path = "libtransmission/rpc-server.h"; sourceTree = "<group>"; };
 		A2AAB65B0DE0CF6200E04DDA /* rpcimpl.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = rpcimpl.c; path = libtransmission/rpcimpl.c; sourceTree = "<group>"; };
-		A2AB76B615D7F6DF009EFC95 /* libcurl.4.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libcurl.4.dylib; path = "third-party/curl/lib/libcurl.4.dylib"; sourceTree = SOURCE_ROOT; };
 		A2AC81D60D987E2D00A2878C /* nl */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = nl; path = macosx/nl.lproj/AddWindow.xib; sourceTree = "<group>"; };
 		A2AF1C360A3D0F6200F1575D /* FileOutlineView.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = FileOutlineView.h; path = macosx/FileOutlineView.h; sourceTree = "<group>"; };
 		A2AF1C370A3D0F6200F1575D /* FileOutlineView.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = FileOutlineView.m; path = macosx/FileOutlineView.m; sourceTree = "<group>"; };
@@ -1248,7 +1247,7 @@
 				A2F35BDB15C5A4A000EBF632 /* libiconv.dylib in Frameworks */,
 				A2F35BDA15C5A49200EBF632 /* libz.dylib in Frameworks */,
 				A2F35BD715C5A46D00EBF632 /* libcrypto.dylib in Frameworks */,
-				A2AB76B715D7F6DF009EFC95 /* libcurl.4.dylib in Frameworks */,
+				A2AB76EA15D8130B009EFC95 /* libcurl.4.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1780,16 +1779,6 @@
 			name = Additions;
 			sourceTree = "<group>";
 		};
-		A245B88615C5A94A008747AC /* Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-				A2AB76B615D7F6DF009EFC95 /* libcurl.4.dylib */,
-				A2F35BE215C5A7F900EBF632 /* Foundation.framework */,
-				A2F35BE015C5A7ED00EBF632 /* Cocoa.framework */,
-			);
-			name = Frameworks;
-			sourceTree = "<group>";
-		};
 		A26AF2220D2DA42800FF7140 /* File Outline View */ = {
 			isa = PBXGroup;
 			children = (
@@ -1825,6 +1814,8 @@
 			isa = PBXGroup;
 			children = (
 				A2F35BBB15C5A0A100EBF632 /* QuickLook.framework */,
+				A2F35BE215C5A7F900EBF632 /* Foundation.framework */,
+				A2F35BE015C5A7ED00EBF632 /* Cocoa.framework */,
 				A2F35BBD15C5A0A100EBF632 /* ApplicationServices.framework */,
 				A2F35BBF15C5A0A100EBF632 /* CoreServices.framework */,
 				A2F35BC115C5A0A100EBF632 /* CoreFoundation.framework */,
@@ -1839,7 +1830,6 @@
 				A2F35BCB15C5A0A100EBF632 /* GeneratePreviewForURL.m */,
 				A2F35BCD15C5A0A100EBF632 /* main.c */,
 				A2F35BC415C5A0A100EBF632 /* Supporting Files */,
-				A245B88615C5A94A008747AC /* Frameworks */,
 			);
 			path = QuickLookPlugin;
 			sourceTree = "<group>";
@@ -3590,6 +3580,10 @@
 					"$(inherited)",
 					"\"$(SRCROOT)/third-party/curl/lib\"",
 				);
+				OTHER_LDFLAGS = (
+					"-read_only_relocs",
+					suppress,
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = qlgenerator;
 			};
@@ -3605,6 +3599,10 @@
 					"$(inherited)",
 					"\"$(SRCROOT)/third-party/curl/lib\"",
 				);
+				OTHER_LDFLAGS = (
+					"-read_only_relocs",
+					suppress,
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = qlgenerator;
 			};
@@ -3619,6 +3617,10 @@
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)/third-party/curl/lib\"",
+				);
+				OTHER_LDFLAGS = (
+					"-read_only_relocs",
+					suppress,
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = qlgenerator;
