@@ -9,7 +9,7 @@ NSString * generateIconData(NSString * fileExtension, NSUInteger width, NSMutabl
     NSString * rawFilename = ![fileExtension isEqualToString: @""] ? fileExtension : @"blank_file_name_transmission";
     NSString * iconFileName = [NSString stringWithFormat: @"%ldx%@.tiff", width, rawFilename]; //we need to do this once per file extension, per size
     
-    if (!allImgProps[iconFileName])
+    if (![allImgProps objectForKey: iconFileName])
     {
         NSImage * icon = [[NSWorkspace sharedWorkspace] iconForFileType: fileExtension];
         
@@ -71,6 +71,20 @@ OSStatus GeneratePreviewForURL(void *thisInterface, QLPreviewRequestRef preview,
         fileSizeString = [NSString stringWithFormat: @"%@, %@", fileCountString, fileSizeString];
     }
     [htmlString appendFormat: @"<p>%@</p>", fileSizeString];
+    
+    NSString * dateCreatedString = inf.dateCreated > 0 ? [NSDateFormatter localizedStringFromDate: [NSDate dateWithTimeIntervalSince1970: inf.dateCreated] dateStyle: NSDateFormatterLongStyle timeStyle: NSDateFormatterShortStyle] : nil;
+    NSString * creatorString = inf.creator ? [NSString stringWithUTF8String: inf.creator] : nil;
+    if ([creatorString isEqualToString: @""]) creatorString = nil;
+    NSString * creationString = nil;
+    if (dateCreatedString && creatorString)
+        creationString = [NSString stringWithFormat: NSLocalizedString(@"Created on %@ with %@", "quicklook creation info"), dateCreatedString, creatorString];
+    else if (dateCreatedString)
+        creationString = [NSString stringWithFormat: NSLocalizedString(@"Created on %@", "quicklook creation info"), dateCreatedString];
+    else if (creatorString)
+        creationString = [NSString stringWithFormat: NSLocalizedString(@"Created with %@", "quicklook creation info"), creatorString];
+    if (creationString)
+        [htmlString appendFormat: @"<p>%@</p>", creationString];
+    
     if (inf.comment)
     {
         NSString * comment = [NSString stringWithUTF8String: inf.comment];
