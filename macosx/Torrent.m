@@ -1680,8 +1680,8 @@ int trashDataFile(const char * filename)
             NSArray * pathComponents = [fullPath pathComponents];
             NSAssert1([pathComponents count] >= 2, @"Not enough components in path %@", fullPath);
             
-            NSString * path = pathComponents[0];
-            NSString * name = pathComponents[1];
+            NSString * path = [pathComponents objectAtIndex: 0];
+            NSString * name = [pathComponents objectAtIndex: 1];
             
             if ([pathComponents count] > 2)
             {
@@ -1735,7 +1735,7 @@ int trashDataFile(const char * filename)
     NSParameterAssert([components count] > 0);
     NSParameterAssert(componentIndex < [components count]);
     
-    NSString * name = components[componentIndex];
+    NSString * name = [components objectAtIndex: componentIndex];
     const BOOL isFolder = componentIndex < ([components count]-1);
     
     //determine if folder node already exists
