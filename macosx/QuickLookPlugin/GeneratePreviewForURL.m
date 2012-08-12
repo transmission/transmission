@@ -58,7 +58,7 @@ OSStatus GeneratePreviewForURL(void *thisInterface, QLPreviewRequestRef preview,
     NSString * fileTypeString = inf.isMultifile ? NSFileTypeForHFSTypeCode(kGenericFolderIcon) : [name pathExtension];
     
     const NSUInteger width = 32;
-    [htmlString appendFormat: @"<h2><img class=\"icon\" src=\"%@\" width=\"%ld\" height=\"%ld\">%@</h2>", generateIconData(fileTypeString, width, allImgProps), width, width, name];
+    [htmlString appendFormat: @"<h2><img class=\"icon\" src=\"%@\" width=\"%ld\" height=\"%ld\" />%@</h2>", generateIconData(fileTypeString, width, allImgProps), width, width, name];
     
     NSString * fileSizeString = [NSString stringForFileSize: inf.totalSize];
     if (inf.isMultifile)
@@ -92,41 +92,48 @@ OSStatus GeneratePreviewForURL(void *thisInterface, QLPreviewRequestRef preview,
             [htmlString appendFormat: @"<p>%@</p>", comment];
     }
     
-    [htmlString appendString: @"<hr/>"];
+    NSMutableArray * lists = [NSMutableArray array];
     
     if (inf.webseedCount > 0)
     {
-        [htmlString appendString: @"<br><br><table>"];
+        NSMutableString * listSection = [NSMutableString string];
+        [listSection appendString: @"<table>"];
         
         NSString * headerTitleString = inf.webseedCount == 1 ? NSLocalizedString(@"1 Web Seed", "quicklook web seed header") : [NSString stringWithFormat: NSLocalizedString(@"%@ Web Seeds", "quicklook web seed header"), [NSString formattedUInteger: inf.webseedCount]];
-        [htmlString appendFormat: @"<tr><th>%@</th></tr>", headerTitleString];
+        [listSection appendFormat: @"<tr><th>%@</th></tr>", headerTitleString];
         
         for (int i = 0; i < inf.webseedCount; ++i)
-            [htmlString appendFormat: @"<tr><td>%s<td></tr>", inf.webseeds[i]];
+            [listSection appendFormat: @"<tr><td>%s<td></tr>", inf.webseeds[i]];
         
-        [htmlString appendString:@"</table>"];
+        [listSection appendString:@"</table>"];
+        
+        [lists addObject: listSection];
     }
     
     if (inf.trackerCount > 0)
     {
-        [htmlString appendString: @"<br><br><table>"];
+        NSMutableString * listSection = [NSMutableString string];
+        [listSection appendString: @"<table>"];
         
         NSString * headerTitleString = inf.trackerCount == 1 ? NSLocalizedString(@"1 Tracker", "quicklook tracker header") : [NSString stringWithFormat: NSLocalizedString(@"%@ Trackers", "quicklook tracker header"), [NSString formattedUInteger: inf.trackerCount]];
-        [htmlString appendFormat: @"<tr><th>%@</th></tr>", headerTitleString];
+        [listSection appendFormat: @"<tr><th>%@</th></tr>", headerTitleString];
         
 #warning handle tiers?
         for (int i = 0; i < inf.trackerCount; ++i)
-            [htmlString appendFormat: @"<tr><td>%s<td></tr>", inf.trackers[i].announce];
+            [listSection appendFormat: @"<tr><td>%s<td></tr>", inf.trackers[i].announce];
         
-        [htmlString appendString:@"</table>"];
+        [listSection appendString:@"</table>"];
+        
+        [lists addObject: listSection];
     }
     
     if (inf.isMultifile)
     {
-        [htmlString appendString: @"<br><br><table>"];
+        NSMutableString * listSection = [NSMutableString string];
+        [listSection appendString: @"<table>"];
         
         NSString * fileTitleString = inf.fileCount == 1 ? NSLocalizedString(@"1 File", "quicklook file header") : [NSString stringWithFormat: NSLocalizedString(@"%@ Files", "quicklook file header"), [NSString formattedUInteger: inf.fileCount]];
-        [htmlString appendFormat: @"<tr><th>%@</th></tr>", fileTitleString];
+        [listSection appendFormat: @"<tr><th>%@</th></tr>", fileTitleString];
         
 #warning display size?
 #warning display folders?
@@ -138,11 +145,16 @@ OSStatus GeneratePreviewForURL(void *thisInterface, QLPreviewRequestRef preview,
             NSString * shortenedFilePath = [fullFilePath substringFromIndex: [name length]+1];
             
             const NSUInteger width = 16;
-            [htmlString appendFormat: @"<tr><td><img class=\"icon\" src=\"%@\" width=\"%ld\" height=\"%ld\">%@<td></tr>", generateIconData([shortenedFilePath pathExtension], width, allImgProps), width, width, shortenedFilePath];
+            [listSection appendFormat: @"<tr><td><img class=\"icon\" src=\"%@\" width=\"%ld\" height=\"%ld\" />%@<td></tr>", generateIconData([shortenedFilePath pathExtension], width, allImgProps), width, width, shortenedFilePath];
         }
         
-        [htmlString appendString:@"</table>"];
+        [listSection appendString:@"</table>"];
+        
+        [lists addObject: listSection];
     }
+    
+    if ([lists count] > 0)
+        [htmlString appendFormat: @"<hr/><br>%@", [lists componentsJoinedByString: @"<br><br>"]];
     
     [htmlString appendString: @"</body></html>"];
     
