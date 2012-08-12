@@ -1108,7 +1108,7 @@
 		A2F35BC715C5A0A100EBF632 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		A2F35BC915C5A0A100EBF632 /* GenerateThumbnailForURL.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = GenerateThumbnailForURL.m; path = macosx/QuickLookPlugin/GenerateThumbnailForURL.m; sourceTree = SOURCE_ROOT; };
 		A2F35BCB15C5A0A100EBF632 /* GeneratePreviewForURL.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = GeneratePreviewForURL.m; path = macosx/QuickLookPlugin/GeneratePreviewForURL.m; sourceTree = SOURCE_ROOT; };
-		A2F35BCD15C5A0A100EBF632 /* main.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = main.c; path = macosx/QuickLookPlugin/main.c; sourceTree = SOURCE_ROOT; };
+		A2F35BCD15C5A0A100EBF632 /* main.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = main.c; path = macosx/QuickLookPlugin/main.c; sourceTree = "<group>"; };
 		A2F35BCF15C5A0A100EBF632 /* QuickLookPlugin-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "QuickLookPlugin-Prefix.pch"; path = "macosx/QuickLookPlugin/QuickLookPlugin-Prefix.pch"; sourceTree = SOURCE_ROOT; };
 		A2F35BE015C5A7ED00EBF632 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
 		A2F35BE215C5A7F900EBF632 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
