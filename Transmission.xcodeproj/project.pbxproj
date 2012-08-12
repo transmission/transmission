@@ -262,6 +262,7 @@
 		A2AAB65F0DE0CF6200E04DDA /* rpcimpl.c in Sources */ = {isa = PBXBuildFile; fileRef = A2AAB65B0DE0CF6200E04DDA /* rpcimpl.c */; };
 		A2AAB6650DE0D08B00E04DDA /* blocklist.h in Headers */ = {isa = PBXBuildFile; fileRef = A2D307930D9EC4860051FD27 /* blocklist.h */; };
 		A2AB76B715D7F6DF009EFC95 /* libcurl.4.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A2AB76B615D7F6DF009EFC95 /* libcurl.4.dylib */; };
+		A2AB76B915D7F9ED009EFC95 /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2AB76B815D7F9ED009EFC95 /* AppKit.framework */; };
 		A2AF1C390A3D0F6200F1575D /* FileOutlineView.m in Sources */ = {isa = PBXBuildFile; fileRef = A2AF1C370A3D0F6200F1575D /* FileOutlineView.m */; };
 		A2B3FB460E5901E700FF78FB /* cli.c in Sources */ = {isa = PBXBuildFile; fileRef = A2B3FB450E5901E700FF78FB /* cli.c */; };
 		A2B3FB4C0E59023000FF78FB /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */; };
@@ -965,6 +966,7 @@
 		A2AAB65A0DE0CF6200E04DDA /* rpc-server.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "rpc-server.h"; path = "libtransmission/rpc-server.h"; sourceTree = "<group>"; };
 		A2AAB65B0DE0CF6200E04DDA /* rpcimpl.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = rpcimpl.c; path = libtransmission/rpcimpl.c; sourceTree = "<group>"; };
 		A2AB76B615D7F6DF009EFC95 /* libcurl.4.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libcurl.4.dylib; path = "third-party/curl/lib/libcurl.4.dylib"; sourceTree = SOURCE_ROOT; };
+		A2AB76B815D7F9ED009EFC95 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
 		A2AC81D60D987E2D00A2878C /* nl */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = nl; path = macosx/nl.lproj/AddWindow.xib; sourceTree = "<group>"; };
 		A2AF1C360A3D0F6200F1575D /* FileOutlineView.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = FileOutlineView.h; path = macosx/FileOutlineView.h; sourceTree = "<group>"; };
 		A2AF1C370A3D0F6200F1575D /* FileOutlineView.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = FileOutlineView.m; path = macosx/FileOutlineView.m; sourceTree = "<group>"; };
@@ -1244,6 +1246,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A2AB76B915D7F9ED009EFC95 /* AppKit.framework in Frameworks */,
 				A2F35BBC15C5A0A100EBF632 /* QuickLook.framework in Frameworks */,
 				A2F35BBE15C5A0A100EBF632 /* ApplicationServices.framework in Frameworks */,
 				A2F35BC015C5A0A100EBF632 /* CoreServices.framework in Frameworks */,
@@ -1790,6 +1793,7 @@
 			isa = PBXGroup;
 			children = (
 				A2AB76B615D7F6DF009EFC95 /* libcurl.4.dylib */,
+				A2AB76B815D7F9ED009EFC95 /* AppKit.framework */,
 				A2F35BE215C5A7F900EBF632 /* Foundation.framework */,
 				A2F35BE015C5A7ED00EBF632 /* Cocoa.framework */,
 			);
