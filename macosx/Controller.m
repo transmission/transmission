@@ -1923,6 +1923,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
             
             NSAssert1(row != -1, @"expected a row to be found for torrent %@", torrent);
             [fTableView selectRowIndexes: [NSIndexSet indexSetWithIndex: row] byExtendingSelection:NO];
+            #warning focus the window
         }
     }
 }
@@ -1961,14 +1962,15 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         
         NSString * location = [torrent dataLocation];
         
+        NSString *notificationTitle = NSLocalizedString(@"Download Complete", "notification title");
         if ([NSApp isOnMountainLionOrBetter])
         {
             NSUserNotification * notification = [[NSUserNotificationMtLion alloc] init];
-            [notification setTitle: NSLocalizedString(@"Download Complete", "notification title")];
+            [notification setTitle: notificationTitle];
             [notification setInformativeText: [torrent name]];
             
             [notification setHasActionButton: YES];
-            [notification setActionButtonTitle: NSLocalizedString(@"Reveal", "notification button")];
+            [notification setActionButtonTitle: NSLocalizedString(@"Show", "notification button")];
             
             NSMutableDictionary * userInfo = [NSMutableDictionary dictionaryWithObject: [torrent hashString] forKey: @"Hash"];
             if (location)
@@ -1977,16 +1979,21 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
             
             [[NSUserNotificationCenterMtLion defaultUserNotificationCenter] deliverNotification: notification];
             [notification release];
+            
+            NSLog(@"delegate: %@", [[NSUserNotificationCenterMtLion defaultUserNotificationCenter] delegate]);
         }
         
-        NSMutableDictionary * clickContext = [NSMutableDictionary dictionaryWithObject: GROWL_DOWNLOAD_COMPLETE forKey: @"Type"];
+        NSMutableDictionary * clickContext = [NSMutableDictionary dictionaryWithObjectsAndKeys:
+                                              GROWL_DOWNLOAD_COMPLETE, @"Type", nil];
         
         if (location)
             [clickContext setObject: location forKey: @"Location"];
         
-        [GrowlApplicationBridge notifyWithTitle: NSLocalizedString(@"Download Complete", "Growl notification title")
+        [GrowlApplicationBridge notifyWithTitle: notificationTitle
                                     description: [torrent name] notificationName: GROWL_DOWNLOAD_COMPLETE
                                     iconData: nil priority: 0 isSticky: NO clickContext: clickContext];
+        
+        NSLog(@"delegate: %@", [[NSUserNotificationCenterMtLion defaultUserNotificationCenter] delegate]);
         
         if (![fWindow isMainWindow])
             [fBadger addCompletedTorrent: torrent];
@@ -2021,10 +2028,11 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     
     NSString * location = [torrent dataLocation];
     
+    NSString *notificationTitle = NSLocalizedString(@"Seeding Complete", "notification title");
     if ([NSApp isOnMountainLionOrBetter])
     {
         NSUserNotification * notification = [[NSUserNotificationMtLion alloc] init];
-        [notification setTitle: NSLocalizedString(@"Seeding Complete", "notification title")];
+        [notification setTitle: notificationTitle];
         [notification setInformativeText: [torrent name]];
         
         [notification setHasActionButton: YES];
@@ -2044,7 +2052,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     if (location)
         [clickContext setObject: location forKey: @"Location"];
     
-    [GrowlApplicationBridge notifyWithTitle: NSLocalizedString(@"Seeding Complete", "Growl notification title")
+    [GrowlApplicationBridge notifyWithTitle: notificationTitle
                                 description: [torrent name] notificationName: GROWL_SEEDING_COMPLETE
                                    iconData: nil priority: 0 isSticky: NO clickContext: clickContext];
     
@@ -2959,10 +2967,11 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
             case TR_PARSE_OK:
                 [self openFiles: [NSArray arrayWithObject: fullFile] addType: ADD_AUTO forcePath: nil];
                 
+                NSString *notificationTitle = NSLocalizedString(@"Torrent File Auto Added", "notification title");
                 if ([NSApp isOnMountainLionOrBetter])
                 {
                     NSUserNotification* notification = [[NSUserNotificationMtLion alloc] init];
-                    [notification setTitle: NSLocalizedString(@"Torrent File Auto Added", "notification title")];
+                    [notification setTitle: notificationTitle];
                     [notification setInformativeText: file];
                     
                     [notification setHasActionButton: NO];
@@ -2971,7 +2980,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
                     [notification release];
                 }
                 
-                [GrowlApplicationBridge notifyWithTitle: NSLocalizedString(@"Torrent File Auto Added", "Growl notification title")
+                [GrowlApplicationBridge notifyWithTitle: notificationTitle
                     description: file notificationName: GROWL_AUTO_ADD iconData: nil priority: 0 isSticky: NO
                     clickContext: nil];
                 break;
@@ -4638,10 +4647,10 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 
 - (NSDictionary *) registrationDictionaryForGrowl
 {
-    NSArray * notifications = [NSArray arrayWithObjects: GROWL_DOWNLOAD_COMPLETE, GROWL_SEEDING_COMPLETE,
-                                                            GROWL_AUTO_ADD, GROWL_AUTO_SPEED_LIMIT, nil];
-    return [NSDictionary dictionaryWithObjectsAndKeys: notifications, GROWL_NOTIFICATIONS_ALL,
-                                notifications, GROWL_NOTIFICATIONS_DEFAULT, nil];
+    NSArray * notifications = @[GROWL_DOWNLOAD_COMPLETE, GROWL_SEEDING_COMPLETE, GROWL_AUTO_ADD, GROWL_AUTO_SPEED_LIMIT];
+    
+    return @{GROWL_NOTIFICATIONS_ALL : notifications,
+                GROWL_NOTIFICATIONS_DEFAULT : notifications };
 }
 
 - (void) growlNotificationWasClicked: (id) clickContext
