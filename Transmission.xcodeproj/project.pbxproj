@@ -223,6 +223,8 @@
 		A284214512DA663E00FBDDBB /* tr-udp.h in Headers */ = {isa = PBXBuildFile; fileRef = A284214312DA663E00FBDDBB /* tr-udp.h */; };
 		A28F4F770E085BDC003A3882 /* ColorTextField.m in Sources */ = {isa = PBXBuildFile; fileRef = A28F4F760E085BDC003A3882 /* ColorTextField.m */; };
 		A292A6E80DFB45FC004B9C0A /* webseed.c in Sources */ = {isa = PBXBuildFile; fileRef = A292A6E50DFB45EC004B9C0A /* webseed.c */; };
+		A29304ED15D7465100B1F726 /* style.css in Resources */ = {isa = PBXBuildFile; fileRef = A29304EC15D7465100B1F726 /* style.css */; };
+		A29304EE15D7497C00B1F726 /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = A2F35BCD15C5A0A100EBF632 /* main.c */; };
 		A29576030D11D63C0093B167 /* Creator.xib in Resources */ = {isa = PBXBuildFile; fileRef = A29576010D11D63C0093B167 /* Creator.xib */; };
 		A2966E8713DAF74C007B52DF /* GlobalOptionsPopoverViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A2966E8613DAF74C007B52DF /* GlobalOptionsPopoverViewController.m */; };
 		A296EF3B11E560A7004A2781 /* libiconv.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A296EF3411E5605E004A2781 /* libiconv.dylib */; };
@@ -364,6 +366,7 @@
 		A2E57BA713109E6B00A7DAB1 /* FilterBarController.m in Sources */ = {isa = PBXBuildFile; fileRef = A2E57BA613109E6B00A7DAB1 /* FilterBarController.m */; };
 		A2E669790F5B8E5A00B4251A /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2E669780F5B8E5A00B4251A /* Security.framework */; };
 		A2E9AA760C249AF400085DCF /* ToolbarCreateTemplate.png in Resources */ = {isa = PBXBuildFile; fileRef = A2E9AA750C249AF400085DCF /* ToolbarCreateTemplate.png */; };
+		A2EB2E7715C8CF2C00FBD5B4 /* QuickLookPlugin.qlgenerator in CopyFiles */ = {isa = PBXBuildFile; fileRef = A2F35BB915C5A0A100EBF632 /* QuickLookPlugin.qlgenerator */; };
 		A2ED7D8F0CEF431B00970975 /* FilterButton.m in Sources */ = {isa = PBXBuildFile; fileRef = A2ED7D8E0CEF431B00970975 /* FilterButton.m */; };
 		A2EE726F14DCCC950093C99A /* natpmp_local.h in Headers */ = {isa = PBXBuildFile; fileRef = A2EE726E14DCCC950093C99A /* natpmp_local.h */; };
 		A2EF7DEC0C96297400FA9811 /* PurpleDot.png in Resources */ = {isa = PBXBuildFile; fileRef = A2EF7DEB0C96297400FA9811 /* PurpleDot.png */; };
@@ -372,6 +375,22 @@
 		A2F151190CD438A4001F3B0E /* RedDot.png in Resources */ = {isa = PBXBuildFile; fileRef = A2F151160CD438A4001F3B0E /* RedDot.png */; };
 		A2F1511A0CD438A4001F3B0E /* GreenDot.png in Resources */ = {isa = PBXBuildFile; fileRef = A2F151170CD438A4001F3B0E /* GreenDot.png */; };
 		A2F151200CD438BA001F3B0E /* Lock.png in Resources */ = {isa = PBXBuildFile; fileRef = A2F1511F0CD438BA001F3B0E /* Lock.png */; };
+		A2F35BBC15C5A0A100EBF632 /* QuickLook.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2F35BBB15C5A0A100EBF632 /* QuickLook.framework */; };
+		A2F35BBE15C5A0A100EBF632 /* ApplicationServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2F35BBD15C5A0A100EBF632 /* ApplicationServices.framework */; };
+		A2F35BC015C5A0A100EBF632 /* CoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2F35BBF15C5A0A100EBF632 /* CoreServices.framework */; };
+		A2F35BC215C5A0A100EBF632 /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2F35BC115C5A0A100EBF632 /* CoreFoundation.framework */; };
+		A2F35BC815C5A0A100EBF632 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = A2F35BC615C5A0A100EBF632 /* InfoPlist.strings */; };
+		A2F35BCA15C5A0A100EBF632 /* GenerateThumbnailForURL.m in Sources */ = {isa = PBXBuildFile; fileRef = A2F35BC915C5A0A100EBF632 /* GenerateThumbnailForURL.m */; };
+		A2F35BCC15C5A0A100EBF632 /* GeneratePreviewForURL.m in Sources */ = {isa = PBXBuildFile; fileRef = A2F35BCB15C5A0A100EBF632 /* GeneratePreviewForURL.m */; };
+		A2F35BD415C5A19A00EBF632 /* libtransmission.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D18389709DEC0030047D688 /* libtransmission.a */; };
+		A2F35BD715C5A46D00EBF632 /* libcrypto.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A27653A714369C5C009D3CCF /* libcrypto.dylib */; };
+		A2F35BD915C5A48400EBF632 /* libcurl.4.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A2F35BD815C5A48400EBF632 /* libcurl.4.dylib */; };
+		A2F35BDA15C5A49200EBF632 /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A2B6141B1395ADE9000E0975 /* libz.dylib */; };
+		A2F35BDB15C5A4A000EBF632 /* libiconv.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A296EF3411E5605E004A2781 /* libiconv.dylib */; };
+		A2F35BDE15C5A67100EBF632 /* NSStringAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DE5CC9C0980656F00BE280E /* NSStringAdditions.m */; };
+		A2F35BDF15C5A7C400EBF632 /* NSApplicationAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = A29D84031049C25600D1987A /* NSApplicationAdditions.m */; };
+		A2F35BE115C5A7ED00EBF632 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2F35BE015C5A7ED00EBF632 /* Cocoa.framework */; };
+		A2F35BE315C5A7F900EBF632 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2F35BE215C5A7F900EBF632 /* Foundation.framework */; };
 		A2F40AE40A361C00006B8288 /* Transmission.icns in Resources */ = {isa = PBXBuildFile; fileRef = 4D2784360905709500687951 /* Transmission.icns */; };
 		A2F41DAB0D0B916B006CE378 /* YingYangTemplate.png in Resources */ = {isa = PBXBuildFile; fileRef = A2F41DAA0D0B916B006CE378 /* YingYangTemplate.png */; };
 		A2F41F8E0D73595100B82116 /* InfoTracker.png in Resources */ = {isa = PBXBuildFile; fileRef = A2F41F8D0D73595100B82116 /* InfoTracker.png */; };
@@ -472,6 +491,20 @@
 			remoteGlobalIDString = A2E384CD130DFB1D001F501B;
 			remoteInfo = libutp;
 		};
+		A2EB2E7415C8CCE900FBD5B4 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = A2F35BB815C5A0A100EBF632;
+			remoteInfo = QuickLookPlugin;
+		};
+		A2F35BD515C5A1A100EBF632 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 4D18389609DEC0030047D688;
+			remoteInfo = libtransmission;
+		};
 		BE1183750CE161040002D0F3 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
@@ -513,6 +546,16 @@
 				A24F19210A3A796800C9C145 /* Sparkle.framework in Copy Files */,
 			);
 			name = "Copy Files";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A2EB2E7615C8CF1C00FBD5B4 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = Contents/Library/QuickLook;
+			dstSubfolderSpec = 1;
+			files = (
+				A2EB2E7715C8CF2C00FBD5B4 /* QuickLookPlugin.qlgenerator in CopyFiles */,
+			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXCopyFilesBuildPhase section */
@@ -877,6 +920,7 @@
 		A292C9E01413BA5F00EF710F /* es */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = es; path = macosx/es.lproj/GlobalOptionsPopover.xib; sourceTree = "<group>"; };
 		A292C9E2141593DA00EF710F /* de */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = de; path = macosx/de.lproj/GlobalOptionsPopover.xib; sourceTree = "<group>"; };
 		A292C9E414163AE500EF710F /* it */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = it; path = macosx/it.lproj/GlobalOptionsPopover.xib; sourceTree = "<group>"; };
+		A29304EC15D7465100B1F726 /* style.css */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.css; name = style.css; path = macosx/QuickLookPlugin/style.css; sourceTree = SOURCE_ROOT; };
 		A29443271419746A0016143A /* ru */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = ru; path = macosx/ru.lproj/GlobalOptionsPopover.xib; sourceTree = "<group>"; };
 		A294432E141B23CD0016143A /* pt_PT */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = pt_PT; path = macosx/pt_PT.lproj/GlobalOptionsPopover.xib; sourceTree = "<group>"; };
 		A2963CFD1423F2BB00C497B5 /* fr */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = fr; path = macosx/fr.lproj/GlobalOptionsPopover.xib; sourceTree = "<group>"; };
@@ -1057,6 +1101,20 @@
 		A2F151160CD438A4001F3B0E /* RedDot.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = RedDot.png; path = macosx/Images/RedDot.png; sourceTree = "<group>"; };
 		A2F151170CD438A4001F3B0E /* GreenDot.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = GreenDot.png; path = macosx/Images/GreenDot.png; sourceTree = "<group>"; };
 		A2F1511F0CD438BA001F3B0E /* Lock.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Lock.png; path = macosx/Images/Lock.png; sourceTree = "<group>"; };
+		A2F35BB915C5A0A100EBF632 /* QuickLookPlugin.qlgenerator */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = QuickLookPlugin.qlgenerator; sourceTree = BUILT_PRODUCTS_DIR; };
+		A2F35BBB15C5A0A100EBF632 /* QuickLook.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuickLook.framework; path = System/Library/Frameworks/QuickLook.framework; sourceTree = SDKROOT; };
+		A2F35BBD15C5A0A100EBF632 /* ApplicationServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ApplicationServices.framework; path = System/Library/Frameworks/ApplicationServices.framework; sourceTree = SDKROOT; };
+		A2F35BBF15C5A0A100EBF632 /* CoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreServices.framework; path = System/Library/Frameworks/CoreServices.framework; sourceTree = SDKROOT; };
+		A2F35BC115C5A0A100EBF632 /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = System/Library/Frameworks/CoreFoundation.framework; sourceTree = SDKROOT; };
+		A2F35BC515C5A0A100EBF632 /* QuickLookPlugin-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "QuickLookPlugin-Info.plist"; path = "macosx/QuickLookPlugin/QuickLookPlugin-Info.plist"; sourceTree = SOURCE_ROOT; };
+		A2F35BC715C5A0A100EBF632 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		A2F35BC915C5A0A100EBF632 /* GenerateThumbnailForURL.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = GenerateThumbnailForURL.m; path = macosx/QuickLookPlugin/GenerateThumbnailForURL.m; sourceTree = SOURCE_ROOT; };
+		A2F35BCB15C5A0A100EBF632 /* GeneratePreviewForURL.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = GeneratePreviewForURL.m; path = macosx/QuickLookPlugin/GeneratePreviewForURL.m; sourceTree = SOURCE_ROOT; };
+		A2F35BCD15C5A0A100EBF632 /* main.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = main.c; path = macosx/QuickLookPlugin/main.c; sourceTree = SOURCE_ROOT; };
+		A2F35BCF15C5A0A100EBF632 /* QuickLookPlugin-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "QuickLookPlugin-Prefix.pch"; path = "macosx/QuickLookPlugin/QuickLookPlugin-Prefix.pch"; sourceTree = SOURCE_ROOT; };
+		A2F35BD815C5A48400EBF632 /* libcurl.4.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libcurl.4.dylib; path = usr/lib/libcurl.4.dylib; sourceTree = SDKROOT; };
+		A2F35BE015C5A7ED00EBF632 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
+		A2F35BE215C5A7F900EBF632 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		A2F41DAA0D0B916B006CE378 /* YingYangTemplate.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = YingYangTemplate.png; path = macosx/Images/YingYangTemplate.png; sourceTree = "<group>"; };
 		A2F41F8D0D73595100B82116 /* InfoTracker.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = InfoTracker.png; path = macosx/Images/InfoTracker.png; sourceTree = "<group>"; };
 		A2F7CF5413035F7B0016FF10 /* URLSheetWindow.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = URLSheetWindow.xib; path = macosx/URLSheetWindow.xib; sourceTree = "<group>"; };
@@ -1179,6 +1237,24 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A2F35BB415C5A0A100EBF632 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A2F35BBC15C5A0A100EBF632 /* QuickLook.framework in Frameworks */,
+				A2F35BBE15C5A0A100EBF632 /* ApplicationServices.framework in Frameworks */,
+				A2F35BC015C5A0A100EBF632 /* CoreServices.framework in Frameworks */,
+				A2F35BC215C5A0A100EBF632 /* CoreFoundation.framework in Frameworks */,
+				A2F35BE115C5A7ED00EBF632 /* Cocoa.framework in Frameworks */,
+				A2F35BE315C5A7F900EBF632 /* Foundation.framework in Frameworks */,
+				A2F35BD415C5A19A00EBF632 /* libtransmission.a in Frameworks */,
+				A2F35BDB15C5A4A000EBF632 /* libiconv.dylib in Frameworks */,
+				A2F35BDA15C5A49200EBF632 /* libz.dylib in Frameworks */,
+				A2F35BD915C5A48400EBF632 /* libcurl.4.dylib in Frameworks */,
+				A2F35BD715C5A46D00EBF632 /* libcrypto.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1335,6 +1411,7 @@
 				3C7A118D0D0B2EB800B5701F /* libnatpmp.a */,
 				A22CFCBA0FC24F710009BD3E /* libdht.a */,
 				A2E38544130DFEE3001F501B /* libutp.a */,
+				A2F35BB915C5A0A100EBF632 /* QuickLookPlugin.qlgenerator */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1343,6 +1420,7 @@
 			isa = PBXGroup;
 			children = (
 				4DDBB70A09E16B3200284745 /* GUI */,
+				A2F35BC315C5A0A100EBF632 /* QuickLookPlugin */,
 				4D1838DC09DEC04A0047D688 /* libtransmission */,
 				4DDBB71F09E16BFE00284745 /* CLI */,
 				BEFC1C0B0C07754700B0BB3C /* daemon */,
@@ -1352,6 +1430,7 @@
 				BE1183410CE15DF00002D0F3 /* libminiupnp */,
 				3C7A11880D0B2E6700B5701F /* libnatpmp */,
 				4DDBB71509E16B3F00284745 /* Libraries */,
+				A2F35BBA15C5A0A100EBF632 /* Frameworks */,
 				19C28FACFE9D520D11CA2CBB /* Products */,
 			);
 			name = Transmission;
@@ -1707,6 +1786,16 @@
 			name = Additions;
 			sourceTree = "<group>";
 		};
+		A245B88615C5A94A008747AC /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				A2F35BE215C5A7F900EBF632 /* Foundation.framework */,
+				A2F35BE015C5A7ED00EBF632 /* Cocoa.framework */,
+				A2F35BD815C5A48400EBF632 /* libcurl.4.dylib */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		A26AF2220D2DA42800FF7140 /* File Outline View */ = {
 			isa = PBXGroup;
 			children = (
@@ -1736,6 +1825,40 @@
 				A2E3850B130DFCCB001F501B /* StdAfx.h */,
 			);
 			name = libutp;
+			sourceTree = "<group>";
+		};
+		A2F35BBA15C5A0A100EBF632 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				A2F35BBB15C5A0A100EBF632 /* QuickLook.framework */,
+				A2F35BBD15C5A0A100EBF632 /* ApplicationServices.framework */,
+				A2F35BBF15C5A0A100EBF632 /* CoreServices.framework */,
+				A2F35BC115C5A0A100EBF632 /* CoreFoundation.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		A2F35BC315C5A0A100EBF632 /* QuickLookPlugin */ = {
+			isa = PBXGroup;
+			children = (
+				A2F35BC915C5A0A100EBF632 /* GenerateThumbnailForURL.m */,
+				A2F35BCB15C5A0A100EBF632 /* GeneratePreviewForURL.m */,
+				A2F35BCD15C5A0A100EBF632 /* main.c */,
+				A2F35BC415C5A0A100EBF632 /* Supporting Files */,
+				A245B88615C5A94A008747AC /* Frameworks */,
+			);
+			path = QuickLookPlugin;
+			sourceTree = "<group>";
+		};
+		A2F35BC415C5A0A100EBF632 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				A29304EC15D7465100B1F726 /* style.css */,
+				A2F35BC515C5A0A100EBF632 /* QuickLookPlugin-Info.plist */,
+				A2F35BC615C5A0A100EBF632 /* InfoPlist.strings */,
+				A2F35BCF15C5A0A100EBF632 /* QuickLookPlugin-Prefix.pch */,
+			);
+			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
 		BE1183410CE15DF00002D0F3 /* libminiupnp */ = {
@@ -2078,10 +2201,12 @@
 				8D11072C0486CEB800E47090 /* Sources */,
 				8D11072E0486CEB800E47090 /* Frameworks */,
 				A24F191B0A3A792300C9C145 /* Copy Files */,
+				A2EB2E7615C8CF1C00FBD5B4 /* CopyFiles */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				A2EB2E7515C8CCE900FBD5B4 /* PBXTargetDependency */,
 				4D1838E609DEC1170047D688 /* PBXTargetDependency */,
 			);
 			name = Transmission;
@@ -2123,6 +2248,24 @@
 			productName = libutp;
 			productReference = A2E38544130DFEE3001F501B /* libutp.a */;
 			productType = "com.apple.product-type.library.static";
+		};
+		A2F35BB815C5A0A100EBF632 /* QuickLookPlugin */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A2F35BD015C5A0A100EBF632 /* Build configuration list for PBXNativeTarget "QuickLookPlugin" */;
+			buildPhases = (
+				A2F35BB315C5A0A100EBF632 /* Sources */,
+				A2F35BB415C5A0A100EBF632 /* Frameworks */,
+				A2F35BB615C5A0A100EBF632 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				A2F35BD615C5A1A100EBF632 /* PBXTargetDependency */,
+			);
+			name = QuickLookPlugin;
+			productName = QuickLookPlugin;
+			productReference = A2F35BB915C5A0A100EBF632 /* QuickLookPlugin.qlgenerator */;
+			productType = "com.apple.product-type.bundle";
 		};
 		BE1183470CE160960002D0F3 /* miniupnp */ = {
 			isa = PBXNativeTarget;
@@ -2239,6 +2382,7 @@
 			projectRoot = "";
 			targets = (
 				8D1107260486CEB800E47090 /* Transmission */,
+				A2F35BB815C5A0A100EBF632 /* QuickLookPlugin */,
 				4D18389609DEC0030047D688 /* libtransmission */,
 				4DDBB71809E16BAE00284745 /* transmissioncli */,
 				BEFC1BFF0C07750000B0BB3C /* transmission-daemon */,
@@ -2411,6 +2555,15 @@
 				A2DC49C2158430CB00758FF1 /* YellowDot@2x.png in Resources */,
 				A2DC49C4158430E200758FF1 /* YingYangGroupTemplate@2x.png in Resources */,
 				A2DC49C6158430FB00758FF1 /* YingYangTemplate@2x.png in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A2F35BB615C5A0A100EBF632 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A2F35BC815C5A0A100EBF632 /* InfoPlist.strings in Resources */,
+				A29304ED15D7465100B1F726 /* style.css in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2631,6 +2784,18 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		A2F35BB315C5A0A100EBF632 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A29304EE15D7497C00B1F726 /* main.c in Sources */,
+				A2F35BCA15C5A0A100EBF632 /* GenerateThumbnailForURL.m in Sources */,
+				A2F35BCC15C5A0A100EBF632 /* GeneratePreviewForURL.m in Sources */,
+				A2F35BDF15C5A7C400EBF632 /* NSApplicationAdditions.m in Sources */,
+				A2F35BDE15C5A67100EBF632 /* NSStringAdditions.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		BE1183450CE160960002D0F3 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -2720,6 +2885,16 @@
 			isa = PBXTargetDependency;
 			target = A2E384CD130DFB1D001F501B /* utp */;
 			targetProxy = A2E384E3130DFB51001F501B /* PBXContainerItemProxy */;
+		};
+		A2EB2E7515C8CCE900FBD5B4 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = A2F35BB815C5A0A100EBF632 /* QuickLookPlugin */;
+			targetProxy = A2EB2E7415C8CCE900FBD5B4 /* PBXContainerItemProxy */;
+		};
+		A2F35BD615C5A1A100EBF632 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 4D18389609DEC0030047D688 /* libtransmission */;
+			targetProxy = A2F35BD515C5A1A100EBF632 /* PBXContainerItemProxy */;
 		};
 		BE1183760CE161040002D0F3 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -2960,6 +3135,15 @@
 			name = Creator.xib;
 			sourceTree = "<group>";
 		};
+		A2F35BC615C5A0A100EBF632 /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				A2F35BC715C5A0A100EBF632 /* en */,
+			);
+			name = InfoPlist.strings;
+			path = macosx/QuickLookPlugin;
+			sourceTree = SOURCE_ROOT;
+		};
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
@@ -3077,6 +3261,7 @@
 				GCC_UNROLL_LOOPS = YES;
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				GCC_WARN_INITIALIZER_NOT_FULLY_BRACKETED = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				HEADER_SEARCH_PATHS = "third-party/curl/include";
 				IBC_FLATTEN_NIBS = YES;
@@ -3196,6 +3381,7 @@
 				GCC_UNROLL_LOOPS = YES;
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				GCC_WARN_INITIALIZER_NOT_FULLY_BRACKETED = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				HEADER_SEARCH_PATHS = "third-party/curl/include";
 				IBC_FLATTEN_NIBS = YES;
@@ -3250,6 +3436,7 @@
 				GCC_UNROLL_LOOPS = YES;
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				GCC_WARN_INITIALIZER_NOT_FULLY_BRACKETED = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				HEADER_SEARCH_PATHS = "third-party/curl/include";
 				IBC_FLATTEN_NIBS = YES;
@@ -3396,6 +3583,45 @@
 			};
 			name = Release;
 		};
+		A2F35BD115C5A0A100EBF632 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				GCC_PREFIX_HEADER = "$(SRCROOT)/macosx/QuickLookPlugin/QuickLookPlugin-Prefix.pch";
+				INFOPLIST_FILE = "$(SRCROOT)/macosx/QuickLookPlugin/QuickLookPlugin-Info.plist";
+				INSTALL_PATH = /Library/QuickLook;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = qlgenerator;
+			};
+			name = Debug;
+		};
+		A2F35BD215C5A0A100EBF632 /* Release - Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				GCC_PREFIX_HEADER = "$(SRCROOT)/macosx/QuickLookPlugin/QuickLookPlugin-Prefix.pch";
+				INFOPLIST_FILE = "$(SRCROOT)/macosx/QuickLookPlugin/QuickLookPlugin-Info.plist";
+				INSTALL_PATH = /Library/QuickLook;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = qlgenerator;
+			};
+			name = "Release - Debug";
+		};
+		A2F35BD315C5A0A100EBF632 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				GCC_PREFIX_HEADER = "$(SRCROOT)/macosx/QuickLookPlugin/QuickLookPlugin-Prefix.pch";
+				INFOPLIST_FILE = "$(SRCROOT)/macosx/QuickLookPlugin/QuickLookPlugin-Info.plist";
+				INSTALL_PATH = /Library/QuickLook;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = qlgenerator;
+			};
+			name = Release;
+		};
 		BE1183490CE160960002D0F3 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -3523,6 +3749,16 @@
 				A2E384CF130DFB1D001F501B /* Debug */,
 				A2E384D0130DFB1D001F501B /* Release - Debug */,
 				A2E384D1130DFB1D001F501B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		A2F35BD015C5A0A100EBF632 /* Build configuration list for PBXNativeTarget "QuickLookPlugin" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A2F35BD115C5A0A100EBF632 /* Debug */,
+				A2F35BD215C5A0A100EBF632 /* Release - Debug */,
+				A2F35BD315C5A0A100EBF632 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;

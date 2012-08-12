@@ -1,0 +1,22 @@
+html
+{
+	color: rgb(0,0,0);
+	font-family:'Lucida Grande';
+    text-align:left;
+}
+th
+{
+	color: rgb(50,50,50);
+	font-weight: bold;
+    text-align:left; 
+}
+td
+{
+	color: rgb(80,80,80);
+    text-align:left; 
+}
+img.icon
+{
+    vertical-align:text-bottom;
+    margin-right:8px;
+}
