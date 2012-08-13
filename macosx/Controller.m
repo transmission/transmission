@@ -653,7 +653,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
             NSBeginAlertSheet(NSLocalizedString(@"Are you sure you want to quit?", "Confirm Quit panel -> title"),
                                 NSLocalizedString(@"Quit", "Confirm Quit panel -> button"),
                                 NSLocalizedString(@"Cancel", "Confirm Quit panel -> button"), nil, fWindow, self,
-                                @selector(quitSheetDidEnd:returnCode:contextInfo:), nil, nil, message);
+                                @selector(quitSheetDidEnd:returnCode:contextInfo:), nil, nil, @"%@", message);
             return NSTerminateLater;
         }
     }
@@ -1407,7 +1407,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
             
             NSBeginAlertSheet(title, NSLocalizedString(@"Remove", "Removal confirm panel -> button"),
                 NSLocalizedString(@"Cancel", "Removal confirm panel -> button"), nil, fWindow, self,
-                nil, @selector(removeSheetDidEnd:returnCode:contextInfo:), dict, message);
+                nil, @selector(removeSheetDidEnd:returnCode:contextInfo:), dict, @"%@", message);
             return;
         }
     }
