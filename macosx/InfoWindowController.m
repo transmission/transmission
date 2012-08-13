@@ -277,7 +277,7 @@ typedef enum
             identifier = TAB_OPTIONS_IDENT;
             break;
         default:
-            NSAssert1(NO, @"Unknown info tab selected: %d", fCurrentTabTag);
+            NSAssert1(NO, @"Unknown info tab selected: %ld", fCurrentTabTag);
             return;
     }
     

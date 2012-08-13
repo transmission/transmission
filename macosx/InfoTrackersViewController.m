@@ -125,7 +125,7 @@
     }
     else
     {
-        NSAssert1([fTorrents count] == 1, @"Attempting to add tracker with %d transfers selected", [fTorrents count]);
+        NSAssert1([fTorrents count] == 1, @"Attempting to add tracker with %ld transfers selected", [fTorrents count]);
         
         NSIndexSet * addedIndexes = [NSIndexSet indexSetWithIndexesInRange: NSMakeRange([fTrackers count]-2, 2)];
         NSArray * tierAndTrackerBeingAdded = [fTrackers objectsAtIndexes: addedIndexes];
@@ -296,7 +296,7 @@
 {
     [[[self view] window] makeKeyWindow];
     
-    NSAssert1([fTorrents count] == 1, @"Attempting to add tracker with %d transfers selected", [fTorrents count]);
+    NSAssert1([fTorrents count] == 1, @"Attempting to add tracker with %ld transfers selected", [fTorrents count]);
     
     [fTrackers addObject: [NSDictionary dictionaryWithObject: [NSNumber numberWithInteger: -1] forKey: @"Tier"]];
     [fTrackers addObject: @""];

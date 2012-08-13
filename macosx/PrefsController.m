@@ -55,7 +55,7 @@
 #define RPC_KEYCHAIN_SERVICE    "Transmission:Remote"
 #define RPC_KEYCHAIN_NAME       "Remote"
 
-#define WEBUI_URL   @"http://localhost:%d/"
+#define WEBUI_URL   @"http://localhost:%ld/"
 
 @interface PrefsController (Private)
 

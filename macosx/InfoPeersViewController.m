@@ -373,7 +373,7 @@
         NSString * portString;
         NSInteger port;
         if ((port = [[peer objectForKey: @"Port"] intValue]) > 0)
-            portString = [NSString stringWithFormat: @"%d", port];
+            portString = [NSString stringWithFormat: @"%ld", port];
         else
             portString = NSLocalizedString(@"N/A", "Inspector -> Peers tab -> table row tooltip");
         [components addObject: [NSString stringWithFormat: @"%@: %@", NSLocalizedString(@"Port",
@@ -405,7 +405,7 @@
                                         "Inspector -> Peers tab -> table row tooltip")];
                 break;
             default:
-                NSAssert1(NO, @"Peer from unknown source: %d", peerFrom);
+                NSAssert1(NO, @"Peer from unknown source: %ld", peerFrom);
         }
         
         //determing status strings from flags

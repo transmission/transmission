@@ -2115,7 +2115,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
             sortType = SORT_SIZE;
             break;
         default:
-            NSAssert1(NO, @"Unknown sort tag received: %d", [(NSMenuItem *)sender tag]);
+            NSAssert1(NO, @"Unknown sort tag received: %ld", [(NSMenuItem *)sender tag]);
             return;
     }
     
@@ -4118,7 +4118,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
                 sortType = SORT_SIZE;
                 break;
             default:
-                NSAssert1(NO, @"Unknown sort tag received: %d", [menuItem tag]);
+                NSAssert1(NO, @"Unknown sort tag received: %ld", [menuItem tag]);
         }
         
         [menuItem setState: [sortType isEqualToString: [fDefaults stringForKey: @"Sort"]] ? NSOnState : NSOffState];

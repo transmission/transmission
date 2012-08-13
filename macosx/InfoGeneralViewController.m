@@ -98,7 +98,7 @@
     {
         Torrent * torrent = [fTorrents objectAtIndex: 0];
         
-        NSString * piecesString = ![torrent isMagnet] ? [NSString stringWithFormat: @"%d, %@", [torrent pieceCount],
+        NSString * piecesString = ![torrent isMagnet] ? [NSString stringWithFormat: @"%ld, %@", [torrent pieceCount],
                                         [NSString stringForFileSize: [torrent pieceSize]]] : @"";
         [fPiecesField setStringValue: piecesString];
                                         

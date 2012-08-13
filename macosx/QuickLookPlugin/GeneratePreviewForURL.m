@@ -154,7 +154,7 @@ OSStatus GeneratePreviewForURL(void *thisInterface, QLPreviewRequestRef preview,
     }
     
     if ([lists count] > 0)
-        [htmlString appendFormat: @"<hr/><br>%@", [lists componentsJoinedByString: @"<br><br>"]];
+        [htmlString appendFormat: @"<hr/><br>%@", [lists componentsJoinedByString: @"<br>"]];
     
     [htmlString appendString: @"</body></html>"];
     

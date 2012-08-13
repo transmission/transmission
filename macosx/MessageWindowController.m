@@ -274,7 +274,7 @@
             case TR_MSG_DBG:
                 return [NSImage imageNamed: @"PurpleDot"];
             default:
-                NSAssert1(NO, @"Unknown message log level: %d", level);
+                NSAssert1(NO, @"Unknown message log level: %ld", level);
                 return nil;
         }
     }
@@ -347,7 +347,7 @@
             level = TR_MSG_DBG;
             break;
         default:
-            NSAssert1(NO, @"Unknown message log level: %d", [fLevelButton indexOfSelectedItem]);
+            NSAssert1(NO, @"Unknown message log level: %ld", [fLevelButton indexOfSelectedItem]);
     }
     
     if ([[NSUserDefaults standardUserDefaults] integerForKey: @"MessageLevel"] == level)
@@ -541,7 +541,7 @@
             levelString = NSLocalizedString(@"Debug", "Message window -> level");
             break;
         default:
-            NSAssert1(NO, @"Unknown message log level: %d", level);
+            NSAssert1(NO, @"Unknown message log level: %ld", level);
     }
     
     return [NSString stringWithFormat: @"%@ %@ [%@] %@: %@", [message objectForKey: @"Date"],

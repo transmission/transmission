@@ -339,7 +339,7 @@
             setting = TR_RATIOLIMIT_GLOBAL;
             break;
         default:
-            NSAssert1(NO, @"Unknown option selected in ratio popup: %d", [sender indexOfSelectedItem]);
+            NSAssert1(NO, @"Unknown option selected in ratio popup: %ld", [sender indexOfSelectedItem]);
             return;
     }
     
@@ -385,7 +385,7 @@
             setting = TR_IDLELIMIT_GLOBAL;
             break;
         default:
-            NSAssert1(NO, @"Unknown option selected in idle popup: %d", [sender indexOfSelectedItem]);
+            NSAssert1(NO, @"Unknown option selected in idle popup: %ld", [sender indexOfSelectedItem]);
             return;
     }
     
@@ -442,7 +442,7 @@
             priority = TR_PRI_LOW;
             break;
         default:
-            NSAssert1(NO, @"Unknown option selected in priority popup: %d", [sender indexOfSelectedItem]);
+            NSAssert1(NO, @"Unknown option selected in priority popup: %ld", [sender indexOfSelectedItem]);
             return;
     }
     

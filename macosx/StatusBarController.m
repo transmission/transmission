@@ -165,7 +165,7 @@ typedef enum
             statusLabel = STATUS_TRANSFER_SESSION;
             break;
         default:
-            NSAssert1(NO, @"Unknown status label tag received: %d", [sender tag]);
+            NSAssert1(NO, @"Unknown status label tag received: %ld", [sender tag]);
             return;
     }
     
@@ -235,7 +235,7 @@ typedef enum
                 statusLabel = STATUS_TRANSFER_SESSION;
                 break;
             default:
-                NSAssert1(NO, @"Unknown status label tag received: %d", [menuItem tag]);
+                NSAssert1(NO, @"Unknown status label tag received: %ld", [menuItem tag]);
         }
         
         [menuItem setState: [statusLabel isEqualToString: [[NSUserDefaults standardUserDefaults] stringForKey: @"StatusLabel"]]

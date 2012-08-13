@@ -49,7 +49,7 @@
 
 - (NSString *) description
 {
-    return [NSString stringWithFormat: @"Torrent Group %d: %@", fGroup, fTorrents];
+    return [NSString stringWithFormat: @"Torrent Group %ld: %@", fGroup, fTorrents];
 }
 
 - (NSInteger) groupIndex

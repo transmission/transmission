@@ -1373,7 +1373,7 @@ int trashDataFile(const char * filename)
 
 - (BOOL) canChangeDownloadCheckForFile: (NSUInteger) index
 {
-    NSAssert2(index < [self fileCount], @"Index %d is greater than file count %d", index, [self fileCount]);
+    NSAssert2(index < [self fileCount], @"Index %ld is greater than file count %ld", index, [self fileCount]);
     
     return [self canChangeDownloadCheckForFiles: [NSIndexSet indexSetWithIndex: index]];
 }
@@ -1475,7 +1475,7 @@ int trashDataFile(const char * filename)
                 high = YES;
                 break;
             default:
-                NSAssert2(NO, @"Unknown priority %d for file index %d", priority, index);
+                NSAssert2(NO, @"Unknown priority %d for file index %ld", priority, index);
         }
         
         [priorities addObject: [NSNumber numberWithInteger: priority]];
