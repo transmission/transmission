@@ -76,6 +76,7 @@ Torrent.Fields.Stats = [
 	'sizeWhenDone',
 	'status',
 	'trackers',
+	'downloadDir',
 	'uploadedEver',
 	'uploadRatio'
 ];
@@ -97,7 +98,6 @@ Torrent.Fields.StatsExtra = [
 	'activityDate',
 	'corruptEver',
 	'desiredAvailable',
-	'downloadDir',
 	'downloadedEver',
 	'fileStats',
 	'haveUnchecked',

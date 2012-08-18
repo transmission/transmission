@@ -103,6 +103,7 @@ Dialog.prototype = {
 		setTextContent(this._cancel_button[0], cancel_button_label);
 		// Just in case
 		$('#upload_container').hide();
+		$('#move_container').hide();
 		$('body').addClass('dialog_showing');
 		transmission.updateButtonStates();
 		if (isMobileDevice)

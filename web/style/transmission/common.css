@@ -1083,6 +1083,10 @@ div.dialog_container div.dialog_window form {
   margin: 0;
   padding: 0px; }
 
+div#move_container input#torrent_path {
+  width: 286px;
+  padding: 2px; }
+
 iframe#torrent_upload_frame {
   display: block;
   /* Don't change this : safari forms won't target hidden frames (they open a new window) */

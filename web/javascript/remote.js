@@ -157,6 +157,13 @@ TransmissionRemote.prototype =
 	stopTorrents: function(torrent_ids, callback, context) {
 		this.sendTorrentActionRequests('torrent-stop', torrent_ids, callback, context);
 	},
+
+	moveTorrents: function(torrent_ids, new_location, callback, context) {
+		var remote = this;
+		this.sendTorrentSetRequests( 'torrent-set-location', torrent_ids, 
+			{"move": true, "location": new_location}, callback, context);
+	},
+
 	removeTorrents: function(torrent_ids, callback, context) {
 		this.sendTorrentActionRequests('torrent-remove', torrent_ids, callback, context);
 	},

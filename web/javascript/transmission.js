@@ -53,6 +53,10 @@ Transmission.prototype =
 
 		$('#upload_confirm_button').click($.proxy(this.confirmUploadClicked,this));
 		$('#upload_cancel_button').click($.proxy(this.hideUploadDialog,this));
+
+		$('#move_confirm_button').click($.proxy(this.confirmMoveClicked,this));
+		$('#move_cancel_button').click($.proxy(this.hideMoveDialog,this));
+
 		$('#turtle-button').click($.proxy(this.toggleTurtleClicked,this));
 		$('#compact-button').click($.proxy(this.toggleCompactClicked,this));
 
@@ -176,6 +180,7 @@ Transmission.prototype =
 			context_pause_selected:       function() { tr.stopSelectedTorrents(); },
 			context_resume_selected:      function() { tr.startSelectedTorrents(false); },
 			context_resume_now_selected:  function() { tr.startSelectedTorrents(true); },
+			context_move:                 function() { tr.moveSelectedTorrents(false); },
 			context_remove:               function() { tr.removeSelectedTorrents(); },
 			context_removedata:           function() { tr.removeSelectedTorrentsAndData(); },
 			context_verify:               function() { tr.verifySelectedTorrents(); },
@@ -500,7 +505,7 @@ Transmission.prototype =
 	drop: function(ev)
 	{
 		var i, uri, uris=null,
-		    types = ["text/uri-list", "text/plain"];
+		    types = ["text/uri-list", "text/plain"],
 		    paused = this.shouldAddedTorrentsStart();
 
 		if (!ev.dataTransfer || !ev.dataTransfer.types)
@@ -529,6 +534,16 @@ Transmission.prototype =
 
 	confirmUploadClicked: function() {
 		this.uploadTorrentFile(true);
+		this.hideUploadDialog();
+	},
+
+	hideMoveDialog: function() {
+		$('#move_container').hide();
+		this.updateButtonStates();
+	},
+
+	confirmMoveClicked: function() {
+		this.moveSelectedTorrents(true);
 		this.hideUploadDialog();
 	},
 
@@ -887,6 +902,34 @@ Transmission.prototype =
 		}
 	},
 
+	promptSetLocation: function(confirmed, torrents) {
+		if (! confirmed) {
+			var path;
+			if (torrents.length === 1) {
+				path = torrents[0].getDownloadDir();
+			} else {
+				path = $("#download-dir").val();
+			}
+			$('input#torrent_path').attr('value', path);
+			$('#move_container').show();
+			$('#torrent_path').focus();
+		} else {
+			var ids = this.getTorrentIds(torrents);
+			this.remote.moveTorrents(
+				ids, 
+				$("input#torrent_path").val(), 
+				this.refreshTorrents, 
+				this);
+			$('#move_container').hide();
+		}
+	},
+
+	moveSelectedTorrents: function(confirmed) {
+		var torrents = this.getSelectedTorrents();
+		if (torrents.length)
+			this.promptSetLocation(confirmed, torrents);
+	},
+
 	removeSelectedTorrents: function() {
 		var torrents = this.getSelectedTorrents();
 		if (torrents.length)
@@ -899,8 +942,7 @@ Transmission.prototype =
 			this.promptToRemoveTorrentsAndData(torrents);
 	},
 
-	promptToRemoveTorrents:function(torrents)
-	{
+	promptToRemoveTorrents: function(torrents) {
 		if (torrents.length === 1)
 		{
 			var torrent = torrents[0],

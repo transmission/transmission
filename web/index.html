@@ -304,6 +304,23 @@
 			</div>
 		</div>
 
+		<div class="dialog_container" id="move_container" style="display:none;">
+			<div class="dialog_top_bar"></div>
+			<div class="dialog_window">
+				<div class="dialog_logo" id="move_dialog_logo"></div>
+				<h2 class="dialog_heading">Set Location</h2>
+				<form action="#" method="post" id="torrent_move_form"
+					enctype="multipart/form-data" target="torrent_move_frame">
+					<div class="dialog_message">
+						<label for="torrent_path">Location:</label>
+						<input type="text" id="torrent_path"/>
+					</div>
+					<a href="#move" id="move_confirm_button">Apply</a>
+					<a href="#cancel" id="move_cancel_button">Cancel</a>
+				</form>
+			</div>
+		</div>
+
 		<div class="torrent_footer">
 			<ul id="settings_menu" title="Settings Menu">
 				<li id="button">&nbsp;
@@ -394,6 +411,7 @@
 				<li id="context_removedata">Trash Data & Remove From List...</li>
 				<li class="separator"></li>
 				<li id="context_verify">Verify Local Data</li>
+				<li id="context_move">Set Location...</li>
 				<li class="separator"></li>
 				<li id="context_reannounce">Ask tracker for more peers</li>
 				<li class="separator"></li>
