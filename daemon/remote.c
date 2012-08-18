@@ -89,12 +89,13 @@ etaToString( char *  buf, size_t  buflen, int64_t eta )
 static char*
 tr_strltime( char * buf, int seconds, size_t buflen )
 {
-    int  days, hours, minutes;
-    char d[128], h[128], m[128], s[128];
+    int  days, hours, minutes, total_seconds;
+    char b[128], d[128], h[128], m[128], s[128], t[128];
 
     if( seconds < 0 )
         seconds = 0;
 
+    total_seconds = seconds;
     days = seconds / 86400;
     hours = ( seconds % 86400 ) / 3600;
     minutes = ( seconds % 3600 ) / 60;
@@ -103,31 +104,33 @@ tr_strltime( char * buf, int seconds, size_t buflen )
     tr_snprintf( d, sizeof( d ), "%d %s", days, days==1?"day":"days" );
     tr_snprintf( h, sizeof( h ), "%d %s", hours, hours==1?"hour":"hours" );
     tr_snprintf( m, sizeof( m ), "%d %s", minutes, minutes==1?"minute":"minutes" );
-    tr_snprintf( s, sizeof( s ), "%d %s", seconds, seconds==1?"seconds":"seconds" );
+    tr_snprintf( s, sizeof( s ), "%d %s", seconds, seconds==1?"second":"seconds" );
+    tr_snprintf( t, sizeof( t ), "%d %s", total_seconds, total_seconds==1?"seconds":"seconds" );
 
     if( days )
     {
         if( days >= 4 || !hours )
-            tr_strlcpy( buf, d, buflen );
+            tr_strlcpy( b, d, sizeof( b ) );
         else
-            tr_snprintf( buf, buflen, "%s, %s", d, h );
+            tr_snprintf( b, sizeof( b ), "%s, %s", d, h );
     }
     else if( hours )
     {
         if( hours >= 4 || !minutes )
-            tr_strlcpy( buf, h, buflen );
+            tr_strlcpy( b, h, sizeof( b ) );
         else
-            tr_snprintf( buf, buflen, "%s, %s", h, m );
+            tr_snprintf( b, sizeof( b ), "%s, %s", h, m );
     }
     else if( minutes )
     {
         if( minutes >= 4 || !seconds )
-            tr_strlcpy( buf, m, buflen );
+            tr_strlcpy( b, m, sizeof( b ) );
         else
-            tr_snprintf( buf, buflen, "%s, %s", m, s );
+            tr_snprintf( b, sizeof( b ), "%s, %s", m, s );
     }
-    else tr_strlcpy( buf, s, buflen );
+    else tr_strlcpy( b, s, sizeof( b ) );
 
+    tr_snprintf( buf, buflen, "%s (%s)", b, t );
     return buf;
 }
 
