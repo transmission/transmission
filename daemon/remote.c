@@ -105,7 +105,7 @@ tr_strltime( char * buf, int seconds, size_t buflen )
     tr_snprintf( h, sizeof( h ), "%d %s", hours, hours==1?"hour":"hours" );
     tr_snprintf( m, sizeof( m ), "%d %s", minutes, minutes==1?"minute":"minutes" );
     tr_snprintf( s, sizeof( s ), "%d %s", seconds, seconds==1?"second":"seconds" );
-    tr_snprintf( t, sizeof( t ), "%d %s", total_seconds, total_seconds==1?"seconds":"seconds" );
+    tr_snprintf( t, sizeof( t ), "%d %s", total_seconds, total_seconds==1?"second":"seconds" );
 
     if( days )
     {
