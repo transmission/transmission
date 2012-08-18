@@ -42,7 +42,7 @@
 <context>
     <name>Details</name>
     <message>
-        <location filename="../details.cc" line="+153"/>
+        <location filename="../details.cc" line="+158"/>
         <source>Torrent Properties</source>
         <translation>Propiedades del Torrent</translation>
     </message>
@@ -73,7 +73,7 @@
         <translation>Opciones</translation>
     </message>
     <message>
-        <location line="+176"/>
+        <location line="+179"/>
         <source>None</source>
         <translation>Ninguno</translation>
     </message>
@@ -84,12 +84,12 @@
     </message>
     <message>
         <location line="+1"/>
-        <location line="+175"/>
+        <location line="+177"/>
         <source>Unknown</source>
         <translation>Desconocido</translation>
     </message>
     <message>
-        <location line="-143"/>
+        <location line="-144"/>
         <source>Finished</source>
         <translation>Terminado</translation>
     </message>
@@ -99,7 +99,7 @@
         <translation>Detenido</translation>
     </message>
     <message>
-        <location line="+97"/>
+        <location line="+98"/>
         <source>%1 (Ratio: %2)</source>
         <translatorcomment>Fracción</translatorcomment>
         <translation>%1 (Proporción: %2)</translation>
@@ -228,7 +228,7 @@
         <translation>Actividad</translation>
     </message>
     <message>
-        <location line="-445"/>
+        <location line="-446"/>
         <source>%1 (100%)</source>
         <translation></translation>
     </message>
@@ -243,7 +243,7 @@
         <translation>%1 de %2 (%3%), %4 Sin verificar</translation>
     </message>
     <message>
-        <location line="+33"/>
+        <location line="+34"/>
         <source>%1 (%2 corrupt)</source>
         <translation>%1 (%2 corrupto)</translation>
     </message>
@@ -378,12 +378,12 @@
     <message>
         <location line="+5"/>
         <source>Limit &amp;download speed (%1):</source>
-        <translation>Limitar velocidad de &amp;descarga (%1):</translation>
+        <translation>Limitar &amp;descarga (%1):</translation>
     </message>
     <message>
         <location line="+12"/>
         <source>Limit &amp;upload speed (%1):</source>
-        <translation>Limitar velocidad de &amp;carga (%1):</translation>
+        <translation>Limitar &amp;carga (%1):</translation>
     </message>
     <message>
         <location line="+13"/>
@@ -419,12 +419,12 @@
     <message>
         <location line="-14"/>
         <source>Seed regardless of ratio</source>
-        <translation>Compartir sin importar proporción</translation>
+        <translation>Compartir sin límite</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Stop seeding at ratio:</source>
-        <translation>Dejar de compartir llegando a proporción:</translation>
+        <translation>Detener llegando a:</translation>
     </message>
     <message>
         <location line="+8"/>
@@ -500,7 +500,7 @@
 <context>
     <name>FileAdded</name>
     <message>
-        <location filename="../options.cc" line="+68"/>
+        <location filename="../options.cc" line="+75"/>
         <source>Error Adding Torrent</source>
         <translation>Error al añadir torrent</translation>
     </message>
@@ -543,7 +543,7 @@
     <message>
         <location line="+1"/>
         <source>Download</source>
-        <translation>Descargado</translation>
+        <translation>Descargar</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -603,12 +603,13 @@
 <context>
     <name>Formatter</name>
     <message>
-        <location filename="../formatter.cc" line="+38"/>
+        <location filename="../formatter.cc" line="+40"/>
+        <location line="+8"/>
         <source>B/s</source>
         <translation>B/s</translation>
     </message>
     <message>
-        <location line="+1"/>
+        <location line="-7"/>
         <source>KiB/s</source>
         <translation>KiB/s</translation>
     </message>
@@ -628,37 +629,78 @@
         <translation>TiB/s</translation>
     </message>
     <message>
+        <location line="+5"/>
+        <source>kB/s</source>
+        <translation>kB/s</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>MB/s</source>
+        <translation>MB/s</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>GB/s</source>
+        <translation>GB/s</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>TB/s</source>
+        <translation>TB/s</translation>
+    </message>
+    <message>
+        <location line="+11"/>
         <location line="+8"/>
-        <location line="+12"/>
+        <location line="+13"/>
         <source>B</source>
         <translation>B</translation>
     </message>
     <message>
-        <location line="-11"/>
-        <location line="+12"/>
+        <location line="-20"/>
+        <location line="+21"/>
         <source>KiB</source>
         <translation>KiB</translation>
     </message>
     <message>
-        <location line="-11"/>
-        <location line="+12"/>
+        <location line="-20"/>
+        <location line="+21"/>
         <source>MiB</source>
         <translation>MiB</translation>
     </message>
     <message>
-        <location line="-11"/>
-        <location line="+12"/>
+        <location line="-20"/>
+        <location line="+21"/>
         <source>GiB</source>
         <translation>GiB</translation>
     </message>
     <message>
-        <location line="-11"/>
-        <location line="+12"/>
+        <location line="-20"/>
+        <location line="+21"/>
         <source>TiB</source>
         <translation>TiB</translation>
     </message>
     <message>
-        <location line="+32"/>
+        <location line="-16"/>
+        <source>kB</source>
+        <translation>kB</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>MB</source>
+        <translation>MB</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>GB</source>
+        <translation>GB</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>TB</source>
+        <translation>TB</translation>
+    </message>
+    <message>
+        <location line="+45"/>
         <location line="+14"/>
         <source>Unknown</source>
         <translation>Desconocido</translation>
@@ -746,7 +788,7 @@
         <translation>&amp;Ver</translation>
     </message>
     <message>
-        <location line="+22"/>
+        <location line="+23"/>
         <source>&amp;File</source>
         <translation>&amp;Archivo</translation>
     </message>
@@ -756,7 +798,7 @@
         <translation>Barra de Herramientas</translation>
     </message>
     <message>
-        <location line="+49"/>
+        <location line="+50"/>
         <source>&amp;New...</source>
         <translation>&amp;Nuevo...</translation>
     </message>
@@ -796,12 +838,12 @@
         <translation>Ctrl+O</translation>
     </message>
     <message>
-        <location line="-133"/>
+        <location line="-135"/>
         <source>Queue</source>
         <translation>Cola</translation>
     </message>
     <message>
-        <location line="+124"/>
+        <location line="+126"/>
         <source>&amp;Open...</source>
         <translation>&amp;Abrir...</translation>
     </message>
@@ -1180,13 +1222,13 @@
     <message>
         <location line="+8"/>
         <source>Sort by &amp;Queue</source>
-        <translation>Ordenar por &amp;cola</translation>
+        <translation>Ordenar por &amp;Cola</translation>
     </message>
 </context>
 <context>
     <name>MakeDialog</name>
     <message>
-        <location filename="../make-dialog.cc" line="+86"/>
+        <location filename="../make-dialog.cc" line="+85"/>
         <source>Creating &quot;%1&quot;</source>
         <translation>Creando &quot;%1&quot;</translation>
     </message>
@@ -1217,7 +1259,7 @@
     </message>
     <message>
         <location line="+33"/>
-        <location line="+196"/>
+        <location line="+195"/>
         <source>New Torrent</source>
         <translation>Nuevo torrent</translation>
     </message>
@@ -1313,9 +1355,77 @@ Para agregar otro URL primario, agrueguelo después de una línea en blanco.</tr
     </message>
 </context>
 <context>
+    <name>MessageLogDialog</name>
+    <message>
+        <location filename="../messagelog-dialog.cc" line="+38"/>
+        <source>Message Log</source>
+        <translation>Bitácora</translation>
+    </message>
+    <message>
+        <location line="+19"/>
+        <source>Error</source>
+        <translation>Error</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Info</source>
+        <translation>Info</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Debug</source>
+        <translation>Debug</translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>Filter</source>
+        <translation>Filtro</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Clear</source>
+        <translation>Borrar</translation>
+    </message>
+    <message>
+        <location line="+47"/>
+        <source>Save</source>
+        <translation>Guardar</translation>
+    </message>
+    <message>
+        <location line="+8"/>
+        <source>Transmission</source>
+        <translation>Transmission</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Cannot write file %1:
+%2.</source>
+        <translation>Error escribiendo &quot;%1&quot;:\n%2.</translation>
+    </message>
+</context>
+<context>
+    <name>MessageLogModel</name>
+    <message>
+        <location filename="../messagelog-model.cc" line="+87"/>
+        <source>Date</source>
+        <translation>Fecha</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Process</source>
+        <translatorcomment>Proceso no tiene sentido (tampoco en inglés)</translatorcomment>
+        <translation>Componente</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Message</source>
+        <translation>Mensaje</translation>
+    </message>
+</context>
+<context>
     <name>MyApp</name>
     <message>
-        <location filename="../app.cc" line="+227"/>
+        <location filename="../app.cc" line="+238"/>
         <source>Transmission is a file-sharing program.  When you run a torrent, its data will be made available to others by means of upload.  You and you alone are fully responsible for exercising proper judgement and abiding by your local laws.</source>
         <translation>Transmission es un programa para compartir archivos.  Cuando activas un torrent, sus datos van a ponerse disponibles para otros.  Usted y sólo usted es completamente responsable para usar su juicio y cumplir las leyes locales.</translation>
     </message>
@@ -1343,23 +1453,23 @@ Para agregar otro URL primario, agrueguelo después de una línea en blanco.</tr
 <context>
     <name>Options</name>
     <message>
-        <location filename="../options.cc" line="+22"/>
-        <location line="+314"/>
+        <location filename="../options.cc" line="+23"/>
+        <location line="+357"/>
         <source>Open Torrent</source>
         <translation>Abrir Torrent</translation>
     </message>
     <message>
-        <location line="-303"/>
+        <location line="-345"/>
         <source>&amp;Torrent file:</source>
         <translation>&amp;Archivo .torrent:</translation>
     </message>
     <message>
-        <location line="+18"/>
+        <location line="+16"/>
         <source>&amp;Destination folder:</source>
         <translation>Folder de &amp;destino:</translation>
     </message>
     <message>
-        <location line="+18"/>
+        <location line="+46"/>
         <source>High</source>
         <translation>Alta</translation>
     </message>
@@ -1394,7 +1504,7 @@ Para agregar otro URL primario, agrueguelo después de una línea en blanco.</tr
         <translation>M&amp;over archivo .torrent al basurero</translation>
     </message>
     <message>
-        <location line="+248"/>
+        <location line="+264"/>
         <source>Torrent Files (*.torrent);;All Files (*.*)</source>
         <translation>Archivos torrent (*.torrent);;Todos los archivos (*.*)</translation>
     </message>
@@ -1452,22 +1562,34 @@ Para agregar otro URL primario, agrueguelo después de una línea en blanco.</tr
         <translation>Direcciones:</translation>
     </message>
     <message>
-        <location line="+24"/>
+        <location line="+56"/>
         <source>Speed Limits</source>
         <translation>Límites de velocidad</translation>
     </message>
     <message>
-        <location line="+3"/>
+        <location line="-15"/>
+        <location line="+18"/>
         <source>Limit &amp;download speed (%1):</source>
         <translation>Limite para &amp;bajada (%1):</translation>
     </message>
     <message>
-        <location line="+5"/>
+        <location line="-17"/>
+        <location line="+23"/>
         <source>Limit &amp;upload speed (%1):</source>
         <translation>Límite para &amp;subida (%1):</translation>
     </message>
     <message>
-        <location line="+12"/>
+        <location line="+7"/>
+        <source>Speed and Size Units</source>
+        <translation>Unidades de velocidad y tamaño</translation>
+    </message>
+    <message>
+        <location line="+8"/>
+        <source>Standard:</source>
+        <translation>Estándar:</translation>
+    </message>
+    <message>
+        <location line="+9"/>
         <source>Temporary Speed Limits</source>
         <translation>Límites temporales de velocidad</translation>
     </message>
@@ -1477,17 +1599,29 @@ Para agregar otro URL primario, agrueguelo después de una línea en blanco.</tr
         <translation>&lt;small&gt;Ignorar límites normales de velocidad manualmente o en horarios programados&lt;/small&gt;</translation>
     </message>
     <message>
-        <location line="+3"/>
+        <location line="-50"/>
+        <location line="+53"/>
         <source>Limit do&amp;wnload speed (%1):</source>
         <translation>Limitar velocidad de &amp;bajada (%1):</translation>
     </message>
     <message>
-        <location line="+4"/>
+        <location line="-52"/>
+        <location line="+57"/>
         <source>Limit u&amp;pload speed (%1):</source>
         <translation>Limitar velocidad de &amp;subida (%1):</translation>
     </message>
     <message>
-        <location line="+4"/>
+        <location line="-29"/>
+        <source>IEC (multiples of 1024)</source>
+        <translation>IEC (múltiplos de 1024)</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>SI  (multiples of 1000)</source>
+        <translation>SI (múltiplos de 1000)</translation>
+    </message>
+    <message>
+        <location line="+33"/>
         <source>&amp;Scheduled times:</source>
         <translation>&amp;Horarios programados:</translation>
     </message>
@@ -1553,12 +1687,12 @@ Para agregar otro URL primario, agrueguelo después de una línea en blanco.</tr
     </message>
     <message>
         <location line="+18"/>
-        <location line="+334"/>
+        <location line="+338"/>
         <source>Desktop</source>
         <translation>Escritorio</translation>
     </message>
     <message>
-        <location line="-332"/>
+        <location line="-336"/>
         <source>Show Transmission icon in the &amp;notification area</source>
         <translation>Mostrar ícono de Transmission en el área de &amp;notificaciones</translation>
     </message>
@@ -1566,6 +1700,13 @@ Para agregar otro URL primario, agrueguelo después de una línea en blanco.</tr
         <location line="+1"/>
         <source>Show &amp;popup notifications</source>
         <translation>Mostrar notificaciones por medio de &amp;popup</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Use &amp;Recycle Bin when deleting files
+Warning: This will remove all files under the torrent top directory.</source>
+        <translation>Usar la Papelera de &amp;Reciclaje al borrar archivos
+Advertencia: Se removerán todos los archivos encontrados.</translation>
     </message>
     <message>
         <location line="+15"/>
@@ -1585,7 +1726,7 @@ Para agregar otro URL primario, agrueguelo después de una línea en blanco.</tr
     <message>
         <location line="+10"/>
         <source>Incoming Peers</source>
-        <translatorcomment>Compañeros entrando</translatorcomment>
+        <translatorcomment>Compañeros conectados</translatorcomment>
         <translation>Conexiones de entrada</translation>
     </message>
     <message>
@@ -1595,12 +1736,12 @@ Para agregar otro URL primario, agrueguelo después de una línea en blanco.</tr
     </message>
     <message>
         <location line="+1"/>
-        <location line="+397"/>
+        <location line="+400"/>
         <source>Status unknown</source>
         <translation>Estado desconocido</translation>
     </message>
     <message>
-        <location line="-389"/>
+        <location line="-392"/>
         <source>&amp;Port for incoming connections:</source>
         <translation>&amp;Puerto para recibir conexiones:</translation>
     </message>
@@ -1637,7 +1778,7 @@ Para agregar otro URL primario, agrueguelo después de una línea en blanco.</tr
     <message>
         <location line="+3"/>
         <source>Enable &amp;uTP for peer connections</source>
-        <translation>Habilitar uTP en conexiones de compañeros</translation>
+        <translation>Habilitar &amp;uTP en conexiones con compañeros</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -1679,12 +1820,12 @@ Para agregar otro URL primario, agrueguelo después de una línea en blanco.</tr
     </message>
     <message>
         <location line="+5"/>
-        <location line="+187"/>
+        <location line="+190"/>
         <source>Privacy</source>
         <translation>Privacia</translation>
     </message>
     <message>
-        <location line="-184"/>
+        <location line="-187"/>
         <source>Allow encryption</source>
         <translation>Permitir cifrado</translation>
     </message>
@@ -1779,17 +1920,17 @@ Para agregar otro URL primario, agrueguelo después de una línea en blanco.</tr
         <translation>Mo&amp;ver archivo .torrent a la basura</translation>
     </message>
     <message>
-        <location line="+56"/>
+        <location line="+58"/>
         <source>Append &quot;.&amp;part&quot; to incomplete files&apos; names</source>
         <translation>Agregar .&amp;part al nombre de archivos incompletos</translation>
     </message>
     <message>
-        <location line="-11"/>
+        <location line="-13"/>
         <source>Save to &amp;Location:</source>
         <translation>Guardar en &amp;locación:</translation>
     </message>
     <message>
-        <location line="+13"/>
+        <location line="+15"/>
         <source>Keep &amp;incomplete files in:</source>
         <translation>Mantener archivos &amp;incompletos en:</translation>
     </message>
@@ -1799,7 +1940,7 @@ Para agregar otro URL primario, agrueguelo después de una línea en blanco.</tr
         <translation>Ejecutar scrip&amp;t cuando el torrent esté completo:</translation>
     </message>
     <message>
-        <location line="-55"/>
+        <location line="-57"/>
         <source>Seeding Limits</source>
         <translation>Límites para compartir</translation>
     </message>
@@ -1819,7 +1960,12 @@ Para agregar otro URL primario, agrueguelo después de una línea en blanco.</tr
         <translation>Localización</translation>
     </message>
     <message>
-        <location line="+9"/>
+        <location line="+8"/>
+        <source>Download to &amp;previous location</source>
+        <translation>Bajar a locación &amp;previa</translation>
+    </message>
+    <message>
+        <location line="+3"/>
         <source>Queue</source>
         <translatorcomment>Fila</translatorcomment>
         <translation>Cola</translation>
@@ -1827,12 +1973,12 @@ Para agregar otro URL primario, agrueguelo después de una línea en blanco.</tr
     <message>
         <location line="+2"/>
         <source>Maximum active &amp;downloads:</source>
-        <translation>Máx.&amp;descargas activas:</translation>
+        <translation>Máximu número de &amp;descargas activas:</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Downloads sharing data in the last N minutes are &amp;active:</source>
-        <translation>Descargas compartiendo en los últimos N minutos se consideran &amp;activas:</translation>
+        <translation>Compartiendo datos en los últimos N min. son &amp;activos:</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -1845,7 +1991,7 @@ Para agregar otro URL primario, agrueguelo después de una línea en blanco.</tr
         <translation>Preferencias del programa</translation>
     </message>
     <message>
-        <location line="+3"/>
+        <location line="+4"/>
         <source>Torrents</source>
         <translation>Torrents</translation>
     </message>
@@ -1886,7 +2032,7 @@ Para agregar otro URL primario, agrueguelo después de una línea en blanco.</tr
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../app.cc" line="-163"/>
+        <location filename="../app.cc" line="-165"/>
         <source>Invalid option</source>
         <translation>Opción inválida</translation>
     </message>
@@ -1927,7 +2073,7 @@ Para agregar otro URL primario, agrueguelo después de una línea en blanco.</tr
 <context>
     <name>Session</name>
     <message>
-        <location filename="../session.cc" line="+797"/>
+        <location filename="../session.cc" line="+820"/>
         <source>Add Torrent</source>
         <translation>Agregar torrent</translation>
     </message>
@@ -2035,7 +2181,7 @@ Para agregar otro URL primario, agrueguelo después de una línea en blanco.</tr
 <context>
     <name>Torrent</name>
     <message>
-        <location filename="../torrent.cc" line="+708"/>
+        <location filename="../torrent.cc" line="+709"/>
         <source>Verifying local data</source>
         <translation>Verificando datos locales</translation>
     </message>
@@ -2094,7 +2240,7 @@ Para agregar otro URL primario, agrueguelo después de una línea en blanco.</tr
 <context>
     <name>TorrentDelegate</name>
     <message>
-        <location filename="../torrent-delegate.cc" line="+76"/>
+        <location filename="../torrent-delegate.cc" line="+86"/>
         <source>Magnetized transfer - retrieving metadata (%1%)</source>
         <translation>Transferencia magnética - descargando metadata (%1%)</translation>
     </message>
@@ -2153,7 +2299,7 @@ Para agregar otro URL primario, agrueguelo después de una línea en blanco.</tr
     <message>
         <location line="+2"/>
         <source>Stalled</source>
-        <translation>Atorado</translation>
+        <translation>Inactivo</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -2203,7 +2349,7 @@ Para agregar otro URL primario, agrueguelo después de una línea en blanco.</tr
 <context>
     <name>TrMainWindow</name>
     <message>
-        <location filename="../mainwin.cc" line="+446"/>
+        <location filename="../mainwin.cc" line="+477"/>
         <source>Limit Download Speed</source>
         <translation>Limitar velocidad de descarga</translation>
     </message>
@@ -2216,13 +2362,13 @@ Para agregar otro URL primario, agrueguelo después de una línea en blanco.</tr
     <message>
         <location line="-15"/>
         <location line="+20"/>
-        <location line="+502"/>
+        <location line="+546"/>
         <location line="+8"/>
         <source>Limited at %1</source>
         <translation>Limitada a %1</translation>
     </message>
     <message>
-        <location line="-518"/>
+        <location line="-562"/>
         <source>Limit Upload Speed</source>
         <translation>Limitar velocidad de carga</translation>
     </message>
@@ -2239,12 +2385,12 @@ Para agregar otro URL primario, agrueguelo después de una línea en blanco.</tr
     </message>
     <message>
         <location line="+5"/>
-        <location line="+496"/>
+        <location line="+540"/>
         <source>Stop at Ratio (%1)</source>
         <translation>Detener a la proporción (%1)</translation>
     </message>
     <message>
-        <location line="-371"/>
+        <location line="-383"/>
         <source> - %1:%2</source>
         <translation> - %1:%2</translation>
     </message>
@@ -2291,7 +2437,7 @@ Bajada: %2</translation>
         <translation>Bajada: %1, Subida: %2</translation>
     </message>
     <message>
-        <location line="+359"/>
+        <location line="+371"/>
         <source>Click to disable Temporary Speed Limits
 (%1 down, %2 up)</source>
         <translation>Presione para deshabilitar límites temporales de velocidad
@@ -2311,17 +2457,21 @@ Bajada: %2</translation>
     </message>
     <message>
         <location line="+36"/>
+        <source>Open Link</source>
+        <translation>Abrir liga</translation>
+    </message>
+    <message>
         <location line="+1"/>
         <source>Open URL or Magnet Link</source>
         <translation>Abrir URL o Liga Magnetizada</translation>
     </message>
     <message>
-        <location line="+224"/>
+        <location line="+232"/>
         <source>Queue</source>
         <translation>Cola</translation>
     </message>
     <message>
-        <location line="-259"/>
+        <location line="-267"/>
         <source>Torrent Files (*.torrent);;All Files (*.*)</source>
         <translation>Archivos de torrent (*.torrent);;Todos los archivos (*.*)</translation>
     </message>
@@ -2331,7 +2481,7 @@ Bajada: %2</translation>
         <translation>Mostar diálogo de &amp;opciones</translation>
     </message>
     <message>
-        <location line="+87"/>
+        <location line="+88"/>
         <source>Remove torrent?</source>
         <translation>¿Remover torrent?</translation>
     </message>
@@ -2401,7 +2551,7 @@ Bajada: %2</translation>
         <translation>Algunos de estos torrents no han terminado su descarga.</translation>
     </message>
     <message>
-        <location line="+48"/>
+        <location line="+54"/>
         <source>Transmission server is responding</source>
         <translation>El servidor Transmission está respondiendo</translation>
     </message>
@@ -2436,7 +2586,7 @@ Bajada: %2</translation>
     <message>
         <location line="+6"/>
         <source>Asking for more peers in %1</source>
-        <translation>Pidiendo más compañeros en %1</translation>
+        <translation>Solicitando más compañeros en %1</translation>
     </message>
     <message>
         <location line="+6"/>
@@ -2446,7 +2596,7 @@ Bajada: %2</translation>
     <message>
         <location line="+6"/>
         <source>Asking for more peers now... &lt;small&gt;%1&lt;/small&gt;</source>
-        <translation>Pidiendo más compañeros ahora... &lt;small&gt;%1&lt;/small&gt;</translation>
+        <translation>Solicitando más compañeros ahora... &lt;small&gt;%1&lt;/small&gt;</translation>
     </message>
     <message>
         <location line="+13"/>
@@ -2463,23 +2613,23 @@ Bajada: %2</translation>
     <message>
         <location line="+16"/>
         <source>Asking for peer counts in %1</source>
-        <translation>Pidiendo cuenta de compañeros en %1</translation>
+        <translation>Solicitando cuenta de compañeros en %1</translation>
     </message>
     <message>
         <location line="+6"/>
         <source>Queued to ask for peer counts</source>
-        <translation>En cola para pedir cuenta de compañeros</translation>
+        <translation>En cola para pedirr cuenta de compañeros</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Asking for peer counts now... &lt;small&gt;%1&lt;/small&gt;</source>
-        <translation>Pidiendo cuenta de compañeros ahora... &lt;small&gt;%1&lt;/small&gt;</translation>
+        <translation>Solicitando cuenta de compañeros ahora... &lt;small&gt;%1&lt;/small&gt;</translation>
     </message>
 </context>
 <context>
     <name>Utils</name>
     <message>
-        <location filename="../utils.cc" line="+47"/>
+        <location filename="../utils.cc" line="+52"/>
         <source>Enter a location:</source>
         <translation>Escriba una localización:</translation>
     </message>
