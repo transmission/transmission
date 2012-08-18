@@ -5,28 +5,16 @@
 #include "utils.h"
 
 #undef VERBOSE
+#include "libtransmission-test.h"
 
-#ifdef VERBOSE
-  #define check( A ) \
-    { \
-        ++test; \
-        if( A ){ \
-            fprintf( stderr, "PASS test #%d (%s, %d)\n", test, __FILE__, __LINE__ ); \
-        } else { \
-            fprintf( stderr, "FAIL test #%d (%s, %d)\n", test, __FILE__, __LINE__ ); \
-            return test; \
-        } \
-    }
+#ifndef WIN32
+    #define TEMPDIR_PREFIX "/tmp/"
 #else
-  #define check( A )\
-    { \
-        ++test; \
-        if( !( A ) ){ \
-            fprintf( stderr, "FAIL test #%d (%s, %d)\n", test, __FILE__, __LINE__ ); \
-            return test; \
-        } \
-    }
+    #define TEMPDIR_PREFIX 
 #endif
+
+#define TEMPFILE_TXT  TEMPDIR_PREFIX "transmission-blocklist-test.txt"
+#define TEMPFILE_BIN  TEMPDIR_PREFIX "transmission-blocklist-test.bin"
 
 static void
 createTestBlocklist( const char * tmpfile )
@@ -46,18 +34,12 @@ createTestBlocklist( const char * tmpfile )
     fclose( out );
 }
 
-int
-main( void )
+static int
+testBlockList( void )
 {
-#ifndef WIN32
-    const char *   tmpfile_txt = "/tmp/transmission-blocklist-test.txt";
-    const char *   tmpfile_bin = "/tmp/transmission-blocklist-test.bin";
-#else
-    const char *   tmpfile_txt = "transmission-blocklist-test.txt";
-    const char *   tmpfile_bin = "transmission-blocklist-test.bin";
-#endif
+    const char * tmpfile_txt = TEMPFILE_TXT;
+    const char * tmpfile_bin = TEMPFILE_BIN;
     struct tr_address addr;
-    int            test = 0;
     tr_blocklist * b;
 
     remove( tmpfile_txt );
@@ -100,4 +82,6 @@ main( void )
     remove( tmpfile_bin );
     return 0;
 }
+
+MAIN_SINGLE_TEST(testBlockList)
 

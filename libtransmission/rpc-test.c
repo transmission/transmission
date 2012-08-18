@@ -6,30 +6,7 @@
 #include "utils.h"
 
 #undef VERBOSE
-
-static int test = 0;
-
-#ifdef VERBOSE
-  #define check( A ) \
-    { \
-        ++test; \
-        if( A ){ \
-            fprintf( stderr, "PASS test #%d (%s, %d)\n", test, __FILE__, __LINE__ ); \
-        } else { \
-            fprintf( stderr, "FAIL test #%d (%s, %d)\n", test, __FILE__, __LINE__ ); \
-            return test; \
-        } \
-    }
-#else
-  #define check( A ) \
-    { \
-        ++test; \
-        if( !( A ) ){ \
-            fprintf( stderr, "FAIL test #%d (%s, %d)\n", test, __FILE__, __LINE__ ); \
-            return test; \
-        } \
-    }
-#endif
+#include "libtransmission-test.h"
 
 static int
 test_list( void )
@@ -81,14 +58,4 @@ test_list( void )
     return 0;
 }
 
-int
-main( void )
-{
-    int i;
-
-    if( ( i = test_list( ) ) )
-        return i;
-
-    return 0;
-}
-
+MAIN_SINGLE_TEST(test_list)

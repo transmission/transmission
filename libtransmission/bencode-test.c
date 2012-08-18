@@ -9,30 +9,13 @@
 #include "bencode.h"
 #include "utils.h" /* tr_free */
 
-/* #define VERBOSE */
+// #define VERBOSE
+#include "libtransmission-test.h"
 
-static int test = 0;
-
-#ifdef VERBOSE
-  #define check( A ) \
-    { \
-        ++test; \
-        if( A ){ \
-            fprintf( stderr, "PASS test #%d (%s, %d)\n", test, __FILE__, __LINE__ ); \
-        } else { \
-            fprintf( stderr, "FAIL test #%d (%s, %d)\n", test, __FILE__, __LINE__ ); \
-            return test; \
-        } \
-    }
+#ifndef WIN32
+#define STACK_SMASH_DEPTH (1 * 1000 * 1000)
 #else
-  #define check( A ) \
-    { \
-        ++test; \
-        if( !( A ) ){ \
-            fprintf( stderr, "FAIL test #%d (%s, %d)\n", test, __FILE__, __LINE__ ); \
-            return test; \
-        } \
-    }
+#define STACK_SMASH_DEPTH (     100 * 1000)
 #endif
 
 static int
@@ -423,7 +406,7 @@ testMerge( void )
 }
 
 static int
-testStackSmash( int depth )
+testStackSmash( void )
 {
     int             i;
     int             len;
@@ -432,6 +415,7 @@ testStackSmash( int depth )
     const uint8_t * end;
     tr_benc         val;
     char *          saved;
+    const int       depth = STACK_SMASH_DEPTH;
 
     in = tr_new( uint8_t, depth * 2 + 1 );
     for( i = 0; i < depth; ++i )
@@ -465,22 +449,22 @@ testBool( void )
     tr_bencDictAddBool( &top, "key2", 0 );
     tr_bencDictAddInt ( &top, "key3", true );
     tr_bencDictAddInt ( &top, "key4", 1 );
-    check( tr_bencDictFindBool( &top, "key1", &boolVal ) )
-    check( !boolVal )
-    check( tr_bencDictFindBool( &top, "key2", &boolVal ) )
-    check( !boolVal )
-    check( tr_bencDictFindBool( &top, "key3", &boolVal ) )
-    check( boolVal )
-    check( tr_bencDictFindBool( &top, "key4", &boolVal ) )
-    check( boolVal )
-    check( tr_bencDictFindInt( &top, "key1", &intVal ) )
-    check( !intVal)
-    check( tr_bencDictFindInt( &top, "key2", &intVal ) )
-    check( !intVal )
-    check( tr_bencDictFindInt( &top, "key3", &intVal ) )
-    check( intVal )
-    check( tr_bencDictFindInt( &top, "key4", &intVal ) )
-    check( intVal )
+    check( tr_bencDictFindBool( &top, "key1", &boolVal ) );
+    check( !boolVal );
+    check( tr_bencDictFindBool( &top, "key2", &boolVal ) );
+    check( !boolVal );
+    check( tr_bencDictFindBool( &top, "key3", &boolVal ) );
+    check( boolVal );
+    check( tr_bencDictFindBool( &top, "key4", &boolVal ) );
+    check( boolVal );
+    check( tr_bencDictFindInt( &top, "key1", &intVal ) );
+    check( !intVal);
+    check( tr_bencDictFindInt( &top, "key2", &intVal ) );
+    check( !intVal );
+    check( tr_bencDictFindInt( &top, "key3", &intVal ) );
+    check( intVal );
+    check( tr_bencDictFindInt( &top, "key4", &intVal ) );
+    check( intVal );
 
     tr_bencFree( &top );
     return 0;
@@ -506,18 +490,18 @@ testParse2( void )
     tr_bencDictAddStr( &top, "this-is-a-string", "this-is-a-string" );
 
     benc = tr_bencToStr( &top, TR_FMT_BENC, &len );
-    check( !strcmp( benc, "d14:this-is-a-booli1e14:this-is-a-real8:0.50000016:this-is-a-string16:this-is-a-string14:this-is-an-inti1234ee" ) )
-    check( !tr_bencParse( benc, benc+len, &top2, &end ) )
-    check( (char*)end == benc + len )
-    check( tr_bencIsDict( &top2 ) )
-    check( tr_bencDictFindInt( &top, "this-is-an-int", &intVal ) )
-    check( intVal == 1234 )
-    check( tr_bencDictFindBool( &top, "this-is-a-bool", &boolVal ) )
-    check( boolVal == true )
-    check( tr_bencDictFindStr( &top, "this-is-a-string", &strVal ) )
-    check( !strcmp( strVal, "this-is-a-string" ) )
-    check( tr_bencDictFindReal( &top, "this-is-a-real", &realVal ) )
-    check( (int)(realVal*100) == 50 )
+    check( !strcmp( benc, "d14:this-is-a-booli1e14:this-is-a-real8:0.50000016:this-is-a-string16:this-is-a-string14:this-is-an-inti1234ee" ) );
+    check( !tr_bencParse( benc, benc+len, &top2, &end ) );
+    check( (char*)end == benc + len );
+    check( tr_bencIsDict( &top2 ) );
+    check( tr_bencDictFindInt( &top, "this-is-an-int", &intVal ) );
+    check( intVal == 1234 );
+    check( tr_bencDictFindBool( &top, "this-is-a-bool", &boolVal ) );
+    check( boolVal == true );
+    check( tr_bencDictFindStr( &top, "this-is-a-string", &strVal ) );
+    check( !strcmp( strVal, "this-is-a-string" ) );
+    check( tr_bencDictFindReal( &top, "this-is-a-real", &realVal ) );
+    check( (int)(realVal*100) == 50 );
 
     tr_bencFree( &top2 );
     tr_free( benc );
@@ -529,37 +513,10 @@ testParse2( void )
 int
 main( void )
 {
-    int i;
+    static const testFunc tests[] = {
+	testInt, testStr, testParse, testJSON, testMerge, testBool,
+	testParse2, testStackSmash,
+    };
 
-    if(( i = testInt( )))
-        return i;
-
-    if(( i = testStr( )))
-        return i;
-
-    if(( i = testParse( )))
-        return i;
-
-    if(( i = testJSON( )))
-        return i;
-
-    if(( i = testMerge( )))
-        return i;
-
-    if(( i = testBool( )))
-        return i;
-
-    if(( i = testParse2( )))
-        return i;
-
-#ifndef WIN32
-    i = testStackSmash( 1000000 );
-#else
-    i = testStackSmash( 100000 );
-#endif
-    if( i )
-        return i;
-
-    return 0;
+    return runTests(tests, NUM_TESTS(tests));
 }
-

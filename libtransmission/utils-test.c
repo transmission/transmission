@@ -21,29 +21,31 @@
  #define NUM_LOOPS 200
 #endif
 
-static int test = 0;
+#include "libtransmission-test.h"
 
-#ifdef VERBOSE
-  #define check( A ) \
-    { \
-        ++test; \
-        if( A ){ \
-            fprintf( stderr, "PASS test #%d (%s, %d)\n", test, __FILE__, __LINE__ ); \
-        } else { \
-            fprintf( stderr, "FAIL test #%d (%s, %d)\n", test, __FILE__, __LINE__ ); \
-            return test; \
-        } \
-    }
-#else
-  #define check( A ) \
-    { \
-        ++test; \
-        if( !( A ) ){ \
-            fprintf( stderr, "FAIL test #%d (%s, %d)\n", test, __FILE__, __LINE__ ); \
-            return test; \
-        } \
-    }
-#endif
+static int
+test_base64( void )
+{
+    char *in, *out;
+    int   len;
+
+    /* base64 */
+    out = tr_base64_encode( "YOYO!", -1, &len );
+    check( out );
+    check( !strcmp( out, "WU9ZTyE=" ) );
+    check( len == 8 );
+    in = tr_base64_decode( out, -1, &len );
+    check( in );
+    check( !strcmp( in, "YOYO!" ) );
+    check( len == 5 );
+    tr_free( in );
+    tr_free( out );
+    out = tr_base64_encode( NULL, 0, &len );
+    check( out == NULL );
+    check( len == 0 );
+
+    return 0;
+}
 
 static int
 test_bitfield_count_range( void )
@@ -153,14 +155,14 @@ test_strip_positional_args( void )
     in = "Hello %1$s foo %2$.*f";
     expected = "Hello %s foo %.*f";
     out = tr_strip_positional_args( in );
-    check( out != NULL )
-    check( !strcmp( out, expected ) )
+    check( out != NULL );
+    check( !strcmp( out, expected ) );
 
     in = "Hello %1$'d foo %2$'f";
     expected = "Hello %d foo %f";
     out = tr_strip_positional_args( in );
-    check( out != NULL )
-    check( !strcmp( out, expected ) )
+    check( out != NULL );
+    check( !strcmp( out, expected ) );
 
     return 0;
 }
@@ -218,30 +220,30 @@ test_utf8( void )
 
     in = "hello world";
     out = tr_utf8clean( in, -1 );
-    check( out != NULL )
-    check( !strcmp( out, in ) )
+    check( out != NULL );
+    check( !strcmp( out, in ) );
     tr_free( out );
 
     in = "hello world";
     out = tr_utf8clean( in, 5 );
-    check( out != NULL )
-    check( !strcmp( out, "hello" ) )
+    check( out != NULL );
+    check( !strcmp( out, "hello" ) );
     tr_free( out );
 
     /* this version is not utf-8 */
     in = "“Û‰ÌÓ ·˚Ú¸ ¡Ó„ÓÏ";
     out = tr_utf8clean( in, 17 );
-    check( out != NULL )
-    check( ( strlen( out ) == 17 ) || ( strlen( out ) == 32 ) )
-    check( tr_utf8_validate( out, -1, NULL ) )
+    check( out != NULL );
+    check( ( strlen( out ) == 17 ) || ( strlen( out ) == 32 ) );
+    check( tr_utf8_validate( out, -1, NULL ) );
     tr_free( out );
 
     /* same string, but utf-8 clean */
     in = "√í√∞√≥√§√≠√Æ √°√ª√≤√º √Å√Æ√£√Æ√¨";
     out = tr_utf8clean( in, -1 );
-    check( out != NULL )
-    check( tr_utf8_validate( out, -1, NULL ) )
-    check ( !strcmp( in, out ) )
+    check( out != NULL );
+    check( tr_utf8_validate( out, -1, NULL ) );
+    check ( !strcmp( in, out ) );
     tr_free( out );
 
     return 0;
@@ -317,8 +319,8 @@ test_lowerbound( void )
         else
             fprintf( stderr, "which is off the end.\n" );
 #endif
-        check( pos == expected_pos[i-1] )
-        check( exact == expected_exact[i-1] )
+        check( pos == expected_pos[i-1] );
+        check( exact == expected_exact[i-1] );
     }
 
     return 0;
@@ -330,9 +332,9 @@ test_memmem( void )
     char const haystack[12] = "abcabcabcabc";
     char const needle[3] = "cab";
 
-    check( tr_memmem( haystack, sizeof haystack, haystack, sizeof haystack) == haystack )
-    check( tr_memmem( haystack, sizeof haystack, needle, sizeof needle) == haystack + 2 )
-    check( tr_memmem( needle, sizeof needle, haystack, sizeof haystack) == NULL )
+    check( tr_memmem( haystack, sizeof haystack, haystack, sizeof haystack) == haystack );
+    check( tr_memmem( haystack, sizeof haystack, needle, sizeof needle) == haystack + 2 );
+    check( tr_memmem( needle, sizeof needle, haystack, sizeof haystack) == NULL );
 
     return 0;
 }
@@ -348,7 +350,7 @@ test_hex( void )
     memcpy( hex1, "fb5ef5507427b17e04b69cef31fa3379b456735a", 41 );
     tr_hex_to_sha1( sha1, hex1 );
     tr_sha1_to_hex( hex2, sha1 );
-    check( !strcmp( hex1, hex2 ) )
+    check( !strcmp( hex1, hex2 ) );
 
     return 0;
 }
@@ -387,37 +389,37 @@ test_url( void )
 
     url = "http://1";
     check( !tr_urlParse( url, -1, &scheme, &host, &port, &path ) );
-    check( !strcmp( scheme, "http" ) )
-    check( !strcmp( host, "1" ) )
-    check( !strcmp( path, "/" ) )
-    check( port == 80 )
+    check( !strcmp( scheme, "http" ) );
+    check( !strcmp( host, "1" ) );
+    check( !strcmp( path, "/" ) );
+    check( port == 80 );
     tr_free( scheme );
     tr_free( path );
     tr_free( host );
 
     url = "http://www.some-tracker.org/some/path";
-    check( !tr_urlParse( url, -1, &scheme, &host, &port, &path ) )
-    check( !strcmp( scheme, "http" ) )
-    check( !strcmp( host, "www.some-tracker.org" ) )
-    check( !strcmp( path, "/some/path" ) )
-    check( port == 80 )
+    check( !tr_urlParse( url, -1, &scheme, &host, &port, &path ) );
+    check( !strcmp( scheme, "http" ) );
+    check( !strcmp( host, "www.some-tracker.org" ) );
+    check( !strcmp( path, "/some/path" ) );
+    check( port == 80 );
     tr_free( scheme );
     tr_free( path );
     tr_free( host );
 
     url = "http://www.some-tracker.org:80/some/path";
-    check( !tr_urlParse( url, -1, &scheme, &host, &port, &path ) )
-    check( !strcmp( scheme, "http" ) )
-    check( !strcmp( host, "www.some-tracker.org" ) )
-    check( !strcmp( path, "/some/path" ) )
-    check( port == 80 )
+    check( !tr_urlParse( url, -1, &scheme, &host, &port, &path ) );
+    check( !strcmp( scheme, "http" ) );
+    check( !strcmp( host, "www.some-tracker.org" ) );
+    check( !strcmp( path, "/some/path" ) );
+    check( port == 80 );
     tr_free( scheme );
     tr_free( path );
     tr_free( host );
 
     url = "http%3A%2F%2Fwww.example.com%2F~user%2F%3Ftest%3D1%26test1%3D2";
     str = tr_http_unescape( url, strlen( url ) );
-    check( !strcmp( str, "http://www.example.com/~user/?test=1&test1=2" ) )
+    check( !strcmp( str, "http://www.example.com/~user/?test=1&test1=2" ) );
     tr_free( str );
 
     return 0;
@@ -456,60 +458,10 @@ test_truncd( void )
     return 0;
 }
 
-struct blah
+static int
+test_cryptoRand( void )
 {
-    uint8_t  hash[SHA_DIGEST_LENGTH];  /* pieces hash */
-    int8_t   priority;                 /* TR_PRI_HIGH, _NORMAL, or _LOW */
-    int8_t   dnd;                      /* "do not download" flag */
-    time_t   timeChecked;              /* the last time we tested this piece */
-};
-
-
-int
-main( void )
-{
-    char *in, *out;
-    int   len;
-    int   i;
-    int   l;
-
-    /* base64 */
-    out = tr_base64_encode( "YOYO!", -1, &len );
-    check( out );
-    check( !strcmp( out, "WU9ZTyE=" ) );
-    check( len == 8 );
-    in = tr_base64_decode( out, -1, &len );
-    check( in );
-    check( !strcmp( in, "YOYO!" ) );
-    check( len == 5 );
-    tr_free( in );
-    tr_free( out );
-    out = tr_base64_encode( NULL, 0, &len );
-    check( out == NULL );
-    check( len == 0 );
-
-    if( ( i = test_hex( ) ) )
-        return i;
-    if( ( i = test_lowerbound( ) ) )
-        return i;
-    if( ( i = test_strip_positional_args( ) ) )
-        return i;
-    if( ( i = test_strstrip( ) ) )
-        return i;
-    if( ( i = test_buildpath( ) ) )
-        return i;
-    if( ( i = test_utf8( ) ) )
-        return i;
-    if( ( i = test_numbers( ) ) )
-        return i;
-    if( ( i = test_memmem( ) ) )
-        return i;
-    if( ( i = test_array( ) ) )
-        return i;
-    if( ( i = test_url( ) ) )
-        return i;
-    if( ( i = test_truncd( ) ) )
-        return i;
+    int i;
 
     /* test that tr_cryptoRandInt() stays in-bounds */
     for( i = 0; i < 100000; ++i )
@@ -519,15 +471,40 @@ main( void )
         check( val < 100 );
     }
 
+    return 0;
+}
+
+struct blah
+{
+    uint8_t  hash[SHA_DIGEST_LENGTH];  /* pieces hash */
+    int8_t   priority;                 /* TR_PRI_HIGH, _NORMAL, or _LOW */
+    int8_t   dnd;                      /* "do not download" flag */
+    time_t   timeChecked;              /* the last time we tested this piece */
+};
+
+int
+main( void )
+{
+    const testFunc tests[] = {
+	test_base64, test_hex, test_lowerbound, test_strip_positional_args,
+	test_strstrip, test_buildpath, test_utf8, test_numbers, test_memmem,
+	test_array, test_url, test_truncd, test_cryptoRand,
+    };
+    int   ret;
+    int   l;
+
+    if( (ret = runTests(tests, NUM_TESTS(tests))) )
+	return ret;
+
     /* simple bitfield tests */
     for( l = 0; l < NUM_LOOPS; ++l )
-        if( ( i = test_bitfields( ) ) )
-            return i;
+        if( ( ret = test_bitfields( ) ) )
+            return ret;
 
     /* bitfield count range */
     for( l=0; l<10000; ++l )
-        if(( i = test_bitfield_count_range( )))
-            return i;
+        if(( ret = test_bitfield_count_range( )))
+            return ret;
 
     return 0;
 }

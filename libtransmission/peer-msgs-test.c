@@ -4,35 +4,13 @@
 #include "utils.h"
 
 #undef VERBOSE
-
-#ifdef VERBOSE
-  #define check( A ) \
-    { \
-        ++test; \
-        if( A ){ \
-            fprintf( stderr, "PASS test #%d (%s, %d)\n", test, __FILE__, __LINE__ ); \
-        } else { \
-            fprintf( stderr, "FAIL test #%d (%s, %d)\n", test, __FILE__, __LINE__ ); \
-            return test; \
-        } \
-    }
-#else
-  #define check( A ) \
-    { \
-        ++test; \
-        if( !( A ) ){ \
-            fprintf( stderr, "FAIL test #%d (%s, %d)\n", test, __FILE__, __LINE__ ); \
-            return test; \
-        } \
-    }
-#endif
+#include "libtransmission-test.h"
 
 int
 main( void )
 {
 #if 0
     uint32_t           i;
-    int                test = 0;
     uint8_t            infohash[SHA_DIGEST_LENGTH];
     struct tr_address  addr;
     tr_piece_index_t   pieceCount = 1313;

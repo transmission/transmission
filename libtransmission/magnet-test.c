@@ -6,30 +6,7 @@
 
 /* #define VERBOSE */
 #undef VERBOSE
-
-static int test = 0;
-
-#ifdef VERBOSE
-  #define check( A ) \
-    { \
-        ++test; \
-        if( A ){ \
-            fprintf( stderr, "PASS test #%d (%s, %d)\n", test, __FILE__, __LINE__ ); \
-        } else { \
-            fprintf( stderr, "FAIL test #%d (%s, %d)\n", test, __FILE__, __LINE__ ); \
-            return test; \
-        } \
-    }
-#else
-  #define check( A ) \
-    { \
-        ++test; \
-        if( !( A ) ){ \
-            fprintf( stderr, "FAIL test #%d (%s, %d)\n", test, __FILE__, __LINE__ ); \
-            return test; \
-        } \
-    }
-#endif
+#include "libtransmission-test.h"
 
 static int
 test1( void )
@@ -47,13 +24,13 @@ test1( void )
           "&tr=http%3A%2F%2Ftracker.opentracker.org%2Fannounce"
           "&ws=http%3A%2F%2Fserver.webseed.org%2Fpath%2Fto%2Ffile";
     info = tr_magnetParse( uri );
-    check( info != NULL )
+    check( info != NULL );
     check( info->trackerCount == 2 );
-    check( !strcmp( info->trackers[0], "http://tracker.openbittorrent.com/announce" ) )
-    check( !strcmp( info->trackers[1], "http://tracker.opentracker.org/announce" ) )
+    check( !strcmp( info->trackers[0], "http://tracker.openbittorrent.com/announce" ) );
+    check( !strcmp( info->trackers[1], "http://tracker.opentracker.org/announce" ) );
     check( info->webseedCount == 1 );
-    check( !strcmp( info->webseeds[0], "http://server.webseed.org/path/to/file" ) )
-    check( !strcmp( info->displayName, "Display Name" ) )
+    check( !strcmp( info->webseeds[0], "http://server.webseed.org/path/to/file" ) );
+    check( !strcmp( info->displayName, "Display Name" ) );
     for( i=0; i<20; ++i )
         check( info->hash[i] == dec[i] );
     tr_magnetFree( info );
@@ -67,13 +44,13 @@ test1( void )
           "&ws=http%3A%2F%2Fserver.webseed.org%2Fpath%2Fto%2Ffile"
           "&tr=http%3A%2F%2Ftracker.opentracker.org%2Fannounce";
     info = tr_magnetParse( uri );
-    check( info != NULL )
+    check( info != NULL );
     check( info->trackerCount == 2 );
-    check( !strcmp( info->trackers[0], "http://tracker.openbittorrent.com/announce" ) )
-    check( !strcmp( info->trackers[1], "http://tracker.opentracker.org/announce" ) )
+    check( !strcmp( info->trackers[0], "http://tracker.openbittorrent.com/announce" ) );
+    check( !strcmp( info->trackers[1], "http://tracker.opentracker.org/announce" ) );
     check( info->webseedCount == 1 );
-    check( !strcmp( info->webseeds[0], "http://server.webseed.org/path/to/file" ) )
-    check( !strcmp( info->displayName, "Display Name" ) )
+    check( !strcmp( info->webseeds[0], "http://server.webseed.org/path/to/file" ) );
+    check( !strcmp( info->displayName, "Display Name" ) );
     for( i=0; i<20; ++i )
         check( info->hash[i] == dec[i] );
     tr_magnetFree( info );
@@ -85,14 +62,16 @@ test1( void )
 int
 main( void )
 {
-    int i;
+    const testFunc tests[] = { test1 };
+    int ret;
 
-    if( ( i = test1( ) ) )
-        return i;
+    if( (ret = runTests(tests, 1)) )
+        return ret;
 
 #ifdef VERBOSE
     fprintf( stderr, "magnet-test passed\n" );
 #endif
+
     return 0;
 }
 

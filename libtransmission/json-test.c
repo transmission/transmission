@@ -6,30 +6,7 @@
 #include "utils.h" /* tr_free */
 
 #undef VERBOSE
-
-static int test = 0;
-
-#ifdef VERBOSE
-  #define check( A ) \
-    { \
-        ++test; \
-        if( A ){ \
-            fprintf( stderr, "PASS test #%d (%s, %d)\n", test, __FILE__, __LINE__ ); \
-        } else { \
-            fprintf( stderr, "FAIL test #%d (%s, %d)\n", test, __FILE__, __LINE__ ); \
-            return test; \
-        } \
-    }
-#else
-  #define check( A ) \
-    { \
-        ++test; \
-        if( !( A ) ){ \
-            fprintf( stderr, "FAIL test #%d (%s, %d)\n", test, __FILE__, __LINE__ ); \
-            return test; \
-        } \
-    }
-#endif
+#include "libtransmission-test.h"
 
 #include "ConvertUTF.h"
 
@@ -176,20 +153,7 @@ test3( void )
 int
 main( void )
 {
-    int i;
-
-    if( ( i = test_utf8( ) ) )
-        return i;
-
-    if( ( i = test1( ) ) )
-        return i;
-
-    if( ( i = test2( ) ) )
-        return i;
-
-    if( ( i = test3( ) ) )
-        return i;
-
-    return 0;
+    const testFunc tests[] = { test_utf8, test1, test2, test3, };
+    return runTests(tests, NUM_TESTS(tests));
 }
 
