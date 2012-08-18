@@ -18,7 +18,7 @@ Actions=Pause;Minimize;
 [Desktop Action Pause]
 _Name=Start Transmission with All Torrents Paused
 Exec=transmission-gtk --paused
-OnlyShowIn=Unity
+OnlyShowIn=Unity;
 
 [Desktop Action Minimize]
 _Name=Start Transmission Minimized
