@@ -172,6 +172,13 @@ function FileRow(torrent, i)
 	this.isEditable = function () {
 		return (fields.torrent.getFileCount()>1) && !isDone();
 	};
+	this.getPath = function () {
+		var file = torrent.getFile(i);
+        path = file.name.replace(/\/\/+/g,'/')
+		path = path.split('/').slice(0,-1)
+		path.push('t' + fields.torrent.getId() + 'f' + fields.index)
+		return path
+	};
 
 	initialize(torrent, i);
 };

@@ -503,20 +503,133 @@ function Inspector(controller) {
         // build the file list
         tor = torrents[0];
 
+        for (parentid in data.parents) {
+            data.parents[parentid] = $('#'+parentid).children('li').css('display')
+        }
         clearFileList();
         data.file_torrent = tor;
         n = tor.getFileCount();
         data.file_rows = [];
         fragment = document.createDocumentFragment();
-
+		heirarchy = {'/':[]}
+        
         for (i=0; i<n; ++i) {
             row = data.file_rows[i] = new FileRow(tor, i);
             fragment.appendChild(row.getElement());
                     $(row).bind('wantedToggled',onFileWantedToggled);
                     $(row).bind('priorityToggled',onFilePriorityToggled);
+            path = row.getPath();
+            if (path.length == 1) {
+                heirarchy['/'].push(path[0]);
+            } else {
+                subheirarchy = heirarchy;
+                for (j=0; j<path.length; j++) {
+                    if (j<(path.length-1)) {
+                        subheirarchy[path[j]] = (subheirarchy[path[j]] == undefined) ? {'/':[]} : subheirarchy[path[j]];
+                        subheirarchy[path[j]]['PARENT'] = (path[j-1] == undefined) ? [undefined] : [path[j-1].replace(/[\[\] ().]/g,'_')]
+                        subheirarchy = subheirarchy[path[j]];
+                    } else {
+                        parentid  = (path[j-1] == undefined) ? [undefined] : [path[j-1].replace(/[\[\] ().]/g,'_')]
+                        subheirarchy['/'].push([path[j],parentid]);
+                    }
+                }
+            }
         }
+        /*
+        At this point we have a single object containing the whole
+        torrent heirarchy. The '/' key is file element ids as assigned above
+        for the current level. Any other keys are array objects which are
+        directories in the torrent heirarchy, this will also contain a '/'
+        key and potentially more keys for nested directories.
+        */
+        connections = [];
+        parents = {};
+        var recursiveCreate = function(key,val) {
+            if (key == "PARENT") { return; }
+            if (typeof(val) == "object" &&! Array.isArray(val)) {
+                row = document.createElement('li');
+                row.id = key.replace(/[\[\] ().]/g,'_');
+                row.classname = 'inspector_torrent_file_list_entry odd';
 
+                e = document.createElement('input');
+                e.type = 'checkbox';
+                e.className = "file_wanted_control";
+                e.title = 'Download file';
+                e.checked = true;
+                $(e).change(function() { $($(this).parent()).children('li').children('input').click() });
+                row.appendChild(e);
+
+                e = document.createElement('div');
+                e.className = 'file-priority-radiobox';
+                box = e;
+
+                        e = document.createElement('div');
+                        e.className = 'low';
+                        e.title = 'Low Priority';
+                        $(e).click(function(){ $($(this).parent().parent()).children('li').children('div').children('.low').click() });
+                        box.appendChild(e);
+
+                        e = document.createElement('div');
+                        e.className = 'normal';
+                        e.title = 'Normal Priority';
+                        $(e).click(function(){ $($(this).parent().parent()).children('li').children('div').children('.normal').click() });
+                        box.appendChild(e);
+
+                        e = document.createElement('div');
+                        e.title = 'High Priority';
+                        e.className = 'high';
+                        $(e).click(function(){ $($(this).parent().parent()).children('li').children('div').children('.high').click() });
+                        box.appendChild(e);
+
+                row.appendChild(box);
+
+                inner = document.createElement('div');
+                inner.className = "inspector_torrent_file_list_entry_name";
+                inner.innerHTML = key;
+                row.appendChild(inner);
+
+                complete = document.createElement('div');
+                complete.className = "inspector_torrent_file_list_entry_progress";
+                complete.innerHTML = "&nbsp;"
+                row.appendChild(complete)
+
+                fragment.appendChild(row);
+                connections.push([key.replace(/[\[\] ().]/g,'_'),val['PARENT'][0]])
+            } else {
+                for (item in val) {
+                    parents[val[item][1][0]] = ""
+                }
+                connections.push.apply(connections,val)
+            }
+            if (!Array.isArray(val)) {
+                $.each(val,function(key,val) { recursiveCreate(key,val) })
+            }
+        }
+        $.each(heirarchy,function(key,val) { recursiveCreate(key,val) })
         file_list.appendChild(fragment);
+        for (conn in connections) {
+            from = connections[conn][0];
+            to = connections[conn][1];
+            if (to == undefined) { continue; }
+            $('#'+from).appendTo($('#'+to));
+            $('#'+from).css('margin-left','20px')
+        }
+        for (parentid in parents) {
+            $($('.inspector_torrent_file_list_entry_name',$('#'+parentid))[0]).click(function() { $($(this).parent()).children('li').toggle(); })
+
+            sum = 0
+            matches = $('#'+parentid).children('li').text().match(/\([^\)]+\)/g)
+            if (matches == null) { continue; }
+            matches.map(function(word) {return parseFloat(word.slice(1,-2)) }).map(function(perc) {sum+=perc})
+            count = $('#'+parentid).children('li').text().match(/\([^\)]+\)/g).length
+            totalcomplete = (sum/count).toFixed(1)
+
+            $($('.inspector_torrent_file_list_entry_progress',$('#'+parentid))[0]).text('('+totalcomplete+'%)')
+        }
+        for (parentid in data.parents) {
+            $('#'+parentid).children('li').css('display',data.parents[parentid])
+        }
+        data.parents = parents;
     },
 
     /****
