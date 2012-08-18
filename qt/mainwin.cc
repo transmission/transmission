@@ -46,6 +46,27 @@
 
 #define PREFS_KEY "prefs-key";
 
+
+/**
+ * This is a proxy-style for that forces it to be always disabled.
+ * We use this to make our torrent list view behave consistently on
+ * both GTK and Qt implementations.
+ */
+class ListViewProxyStyle: public QProxyStyle
+{
+    public:
+        int styleHint(StyleHint hint,
+                      const QStyleOption *option = 0,
+                      const QWidget *widget = 0,
+                      QStyleHintReturn *returnData = 0) const
+        {
+            if (hint == QStyle::SH_ItemView_ActivateItemOnSingleClick)
+                return 0;
+            return QProxyStyle::styleHint(hint, option, widget, returnData);
+        }
+};
+
+
 QIcon
 TrMainWindow :: getStockIcon( const QString& name, int fallback )
 {
@@ -105,6 +126,8 @@ TrMainWindow :: TrMainWindow( Session& session, Prefs& prefs, TorrentModel& mode
 
     int i = style->pixelMetric( QStyle::PM_SmallIconSize, 0, this );
     const QSize smallIconSize( i, i );
+
+    ui.listView->setStyle(new ListViewProxyStyle);
 
     // icons
     ui.action_OpenFile->setIcon( getStockIcon( "folder-open", QStyle::SP_DialogOpenButton ) );
@@ -171,6 +194,7 @@ TrMainWindow :: TrMainWindow( Session& session, Prefs& prefs, TorrentModel& mode
     connect( ui.action_SetLocation, SIGNAL(triggered()), this, SLOT(setLocation()));
     connect( ui.action_Properties, SIGNAL(triggered()), this, SLOT(openProperties()));
     connect( ui.action_SessionDialog, SIGNAL(triggered()), mySessionDialog, SLOT(show()));
+
     connect( ui.listView, SIGNAL(activated(const QModelIndex&)), ui.action_Properties, SLOT(trigger()));
 
     // signals
