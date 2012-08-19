@@ -751,6 +751,11 @@
     [GrowlApplicationBridge openGrowlPreferences: YES];
 }
 
+- (void) openNotificationSystemPrefs: (id) sender
+{
+    [[NSWorkspace sharedWorkspace] openURL: [NSURL fileURLWithPath:@"/System/Library/PreferencePanes/Notifications.prefPane"]];
+}
+
 - (void) resetWarnings: (id) sender
 {
     [fDefaults removeObjectForKey: @"WarningDuplicate"];
@@ -1456,8 +1461,26 @@
     {
         [fBuiltInGrowlButton setHidden: YES];
         [fGrowlAppButton setHidden: NO];
+        
 #warning remove NO
-        [fGrowlAppButton setEnabled:NO && [GrowlApplicationBridge isGrowlURLSchemeAvailable]];
+        [fGrowlAppButton setEnabled: NO && [GrowlApplicationBridge isGrowlURLSchemeAvailable]];
+        [fGrowlAppButton setTitle: NSLocalizedString(@"Configure In Growl", "Prefs -> Notifications")];
+        [fGrowlAppButton sizeToFit];
+        
+        [fGrowlAppButton setTarget: self];
+        [fGrowlAppButton setAction: @selector(openGrowlApp:)];
+    }
+    else if ([NSApp isOnMountainLionOrBetter])
+    {
+        [fBuiltInGrowlButton setHidden: YES];
+        [fGrowlAppButton setHidden: NO];
+        
+        [fGrowlAppButton setEnabled: YES];
+        [fGrowlAppButton setTitle: NSLocalizedString(@"Configure In System Preferences", "Prefs -> Notifications")];
+        [fGrowlAppButton sizeToFit];
+        
+        [fGrowlAppButton setTarget: self];
+        [fGrowlAppButton setAction: @selector(openNotificationSystemPrefs:)];
     }
     else
     {
@@ -1467,6 +1490,7 @@
         const BOOL onMtLion = [NSApp isOnMountainLionOrBetter];
         [fBuiltInGrowlButton setState: !onMtLion && [fDefaults boolForKey: @"DisplayNotifications"]];
         [fBuiltInGrowlButton setEnabled: !onMtLion];
+        
     }
 }
 

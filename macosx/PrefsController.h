@@ -105,6 +105,7 @@
 
 - (IBAction) setBuiltInGrowlEnabled: (id) sender;
 - (IBAction) openGrowlApp: (id) sender;
+- (void) openNotificationSystemPrefs: (id) sender;
 
 - (void) resetWarnings: (id) sender;
 
