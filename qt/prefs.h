@@ -141,7 +141,7 @@ class Prefs: public QObject
     private:
         QSet<int> myTemporaryPrefs;
         QString myConfigDir;
-        QVariant myValues[PREFS_COUNT];
+        mutable QVariant myValues[PREFS_COUNT];
         void initDefaults( struct tr_benc* );
 
     public:

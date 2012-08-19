@@ -117,3 +117,25 @@ Utils :: guessMimeIcon( const QString& filename )
 
     return fallback;
 }
+
+bool
+Utils :: isValidUtf8 ( const char *s )
+{
+    int n;  // number of bytes in a UTF-8 sequence
+
+    for ( const char *c = s;  *c;  c += n )
+    {
+        if ( (*c & 0x80) == 0x00 )    n = 1;        // ASCII
+        else if ((*c & 0xc0) == 0x80) return false; // not valid
+        else if ((*c & 0xe0) == 0xc0) n = 2;
+        else if ((*c & 0xf0) == 0xe0) n = 3;
+        else if ((*c & 0xf8) == 0xf0) n = 4;
+        else if ((*c & 0xfc) == 0xf8) n = 5;
+        else if ((*c & 0xfe) == 0xfc) n = 6;
+        else return false;
+        for ( int m = 1; m < n; m++ )
+            if ( (c[m] & 0xc0) != 0x80 )
+                return false;
+    } 
+    return true;
+}

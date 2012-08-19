@@ -101,7 +101,7 @@ Session :: sessionSet( const char * key, const QVariant& value )
         case QVariant::Bool:   tr_bencDictAddBool ( args, key, value.toBool() ); break;
         case QVariant::Int:    tr_bencDictAddInt  ( args, key, value.toInt() ); break;
         case QVariant::Double: tr_bencDictAddReal ( args, key, value.toDouble() ); break;
-        case QVariant::String: tr_bencDictAddStr  ( args, key, value.toString().toUtf8() ); break;
+        case QVariant::String: tr_bencDictAddStr  ( args, key, value.toString().toUtf8().constData() ); break;
         default: assert( "unknown type" );
     }
     exec( &top );
@@ -245,7 +245,7 @@ Session :: Session( const char * configDir, Prefs& prefs ):
     myBlocklistSize( -1 ),
     myPrefs( prefs ),
     mySession( 0 ),
-    myConfigDir( configDir ),
+    myConfigDir( QString::fromUtf8( configDir ) ),
     myNAM( 0 )
 {
     myStats.ratio = TR_RATIO_NA;
