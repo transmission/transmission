@@ -151,6 +151,7 @@ class TrMainWindow: public QMainWindow
         QWidget * createStatusBar( void );
         QWidget * myStatusBar;
         QPushButton * myAltSpeedButton;
+        QAction * myAltSpeedAction;
         QPushButton * myOptionsButton;
         QLabel * myVisibleCountLabel;
         QPushButton * myStatsModeButton;

@@ -229,6 +229,10 @@ TrMainWindow :: TrMainWindow( Session& session, Prefs& prefs, TorrentModel& mode
     actionGroup->addAction( ui.action_SortBySize );
     actionGroup->addAction( ui.action_SortByState );
 
+    myAltSpeedAction = new QAction( tr( "Speed Limits" ), this );
+    myAltSpeedAction->setIcon( myPrefs.get<bool>(Prefs::ALT_SPEED_LIMIT_ENABLED) ? mySpeedModeOnIcon : mySpeedModeOffIcon );
+    connect( myAltSpeedAction, SIGNAL(triggered()), this, SLOT(toggleSpeedMode()) );
+
     QMenu * menu = new QMenu( );
     menu->addAction( ui.action_OpenFile );
     menu->addAction( ui.action_AddURL );
@@ -239,6 +243,7 @@ TrMainWindow :: TrMainWindow( Session& session, Prefs& prefs, TorrentModel& mode
     menu->addSeparator( );
     menu->addAction( ui.action_StartAll );
     menu->addAction( ui.action_PauseAll );
+    menu->addAction( myAltSpeedAction );
     menu->addSeparator( );
     menu->addAction( ui.action_Quit );
     myTrayIcon.setContextMenu( menu );
@@ -937,7 +942,11 @@ TrMainWindow :: setCompactView( bool visible )
 void
 TrMainWindow :: toggleSpeedMode( )
 {
+    bool mode;
+    
     myPrefs.toggleBool( Prefs :: ALT_SPEED_LIMIT_ENABLED );
+    mode = myPrefs.get<bool>( Prefs::ALT_SPEED_LIMIT_ENABLED );
+    myAltSpeedAction->setIcon( mode ? mySpeedModeOnIcon : mySpeedModeOffIcon );
 }
 void
 TrMainWindow :: setToolbarVisible( bool visible )
