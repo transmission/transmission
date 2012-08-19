@@ -56,9 +56,11 @@ FileAdded :: executed( int64_t tag, const QString& result, struct tr_benc * argu
     if( tag != myTag )
         return;
 
-    if( result == "success" )
-        if( !myDelFile.isEmpty( ) )
-            QFile( myDelFile ).remove( );
+    if( ( result == "success" ) && !myDelFile.isEmpty( ) ) {
+        QFile file( myDelFile );
+        file.setPermissions( QFile::ReadOwner | QFile::WriteOwner );
+        file.remove();
+    }
 
     if( result != "success" ) {
         QString text = result;
