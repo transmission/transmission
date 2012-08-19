@@ -1488,9 +1488,7 @@
         [fGrowlAppButton setHidden: YES];
         
         const BOOL onMtLion = [NSApp isOnMountainLionOrBetter];
-        [fBuiltInGrowlButton setState: !onMtLion && [fDefaults boolForKey: @"DisplayNotifications"]];
-        [fBuiltInGrowlButton setEnabled: !onMtLion];
-        
+        [fBuiltInGrowlButton setState: [fDefaults boolForKey: @"DisplayNotifications"]];
     }
 }
 
