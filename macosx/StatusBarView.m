@@ -23,6 +23,8 @@
  *****************************************************************************/
 
 #import "StatusBarView.h"
+#import "NSApplicationAdditions.h"
+#import <QuartzCore/QuartzCore.h>
 
 @interface StatusBarView (Private)
 
@@ -40,10 +42,26 @@
         NSColor * darkColor = [NSColor colorWithCalibratedRed: 155.0/255.0 green: 155.0/255.0 blue: 155.0/255.0 alpha: 1.0];
         fGradient = [[NSGradient alloc] initWithStartingColor: lightColor endingColor: darkColor];
         
-        [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(reload)
-            name: NSWindowDidBecomeMainNotification object: [self window]];
-        [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(reload)
-            name: NSWindowDidResignMainNotification object: [self window]];
+        //noise only for 10.7 + 
+        if([NSApp isOnLionOrBetter])
+        {
+            CIFilter * randomFilter = [CIFilter filterWithName: @"CIRandomGenerator"];
+            [randomFilter setDefaults];
+            
+            fNoiseImage = [randomFilter valueForKey: @"outputImage"];
+            
+            CIFilter * monochromeFilter = [CIFilter filterWithName: @"CIColorMonochrome"];
+            [monochromeFilter setDefaults];
+            [monochromeFilter setValue: fNoiseImage forKey: @"inputImage"];
+            CIColor * monoFilterColor = [CIColor colorWithRed:1.0 green:1.0 blue:1.0];
+            [monochromeFilter setValue: monoFilterColor forKey: @"inputColor"];
+            fNoiseImage = [[monochromeFilter valueForKey:@"outputImage"] retain];
+        }
+        else
+            fNoiseImage = nil;
+        
+        [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(reload) name: NSWindowDidBecomeMainNotification object: [self window]];
+        [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(reload) name: NSWindowDidResignMainNotification object: [self window]];
     }
     return self;
 }
@@ -51,7 +69,7 @@
 - (void) dealloc
 {
     [[NSNotificationCenter defaultCenter] removeObserver: self];
-    
+    [fNoiseImage release];
     [fGradient release];
     [super dealloc];
 }
@@ -115,6 +133,11 @@
     }
     
     NSRectFillListWithColors(gridRects, colorRects, count);
+    
+    [fNoiseImage drawInRect: rect
+                   fromRect: [self convertRectToBacking: rect]
+                  operation: NSCompositeSourceOver
+                   fraction: 0.15];
 }
 
 @end
