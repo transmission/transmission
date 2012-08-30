@@ -92,29 +92,31 @@
     NSRect gridRects[active ? 2 : 3];
     NSColor * colorRects[active ? 2 : 3];
     
-    NSRect lineBorderRect = NSMakeRect(NSMinX(rect), NSHeight([self bounds]) - 1.0, NSWidth(rect), 1.0);
+    NSRect lineBorderRect = NSMakeRect(NSMinX(rect), 0.0, NSWidth(rect), 1.0);
+    NSRect intersectLineBorderRect = NSIntersectionRect(lineBorderRect, rect);
+    if (!NSIsEmptyRect(intersectLineBorderRect))
+    {
+        gridRects[count] = intersectLineBorderRect;
+        colorRects[count] = active ? [NSColor colorWithCalibratedWhite: 0.25 alpha: 1.0]
+        : [NSColor colorWithCalibratedWhite: 0.5 alpha: 1.0];
+        ++count;
+        
+        rect.origin.y += intersectLineBorderRect.size.height;
+        rect.size.height -= intersectLineBorderRect.size.height;
+    }
+    
     if (active)
     {
-        if (NSIntersectsRect(lineBorderRect, rect))
+        lineBorderRect.origin.y = NSHeight([self bounds]) - 1.0;
+        intersectLineBorderRect = NSIntersectionRect(lineBorderRect, rect);
+        if (!NSIsEmptyRect(intersectLineBorderRect))
         {
-            gridRects[count] = lineBorderRect;
+            gridRects[count] = intersectLineBorderRect;
             colorRects[count] = [NSColor colorWithCalibratedWhite: 0.75 alpha: 1.0];
             ++count;
             
-            rect.size.height -= 1.0;
+            rect.size.height -= intersectLineBorderRect.size.height;
         }
-    }
-    
-    lineBorderRect.origin.y = 0.0;
-    if (NSIntersectsRect(lineBorderRect, rect))
-    {
-        gridRects[count] = lineBorderRect;
-        colorRects[count] = active ? [NSColor colorWithCalibratedWhite: 0.25 alpha: 1.0]
-                                    : [NSColor colorWithCalibratedWhite: 0.5 alpha: 1.0];
-        ++count;
-        
-        rect.origin.y += 1.0;
-        rect.size.height -= 1.0;
     }
     
     if (!NSIsEmptyRect(rect))
