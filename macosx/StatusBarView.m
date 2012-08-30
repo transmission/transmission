@@ -53,7 +53,7 @@
             CIFilter * monochromeFilter = [CIFilter filterWithName: @"CIColorMonochrome"];
             [monochromeFilter setDefaults];
             [monochromeFilter setValue: fNoiseImage forKey: @"inputImage"];
-            CIColor * monoFilterColor = [CIColor colorWithRed:1.0 green:1.0 blue:1.0];
+            CIColor * monoFilterColor = [CIColor colorWithRed: 1.0 green: 1.0 blue: 1.0];
             [monochromeFilter setValue: monoFilterColor forKey: @"inputColor"];
             fNoiseImage = [[monochromeFilter valueForKey:@"outputImage"] retain];
         }
@@ -137,7 +137,7 @@
     [fNoiseImage drawInRect: rect
                    fromRect: [self convertRectToBacking: rect]
                   operation: NSCompositeSourceOver
-                   fraction: 0.15];
+                   fraction: 0.12];
 }
 
 @end
