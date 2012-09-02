@@ -165,6 +165,7 @@
 		A23F50020D1D99D7002FCB97 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = A23F50000D1D99D7002FCB97 /* MainMenu.xib */; };
 		A23F526F0F14395900AA02E3 /* PredicateEditorRowTemplateAny.m in Sources */ = {isa = PBXBuildFile; fileRef = A23F526E0F14395900AA02E3 /* PredicateEditorRowTemplateAny.m */; };
 		A241528B0C0261B8007DD3B4 /* Globe.png in Resources */ = {isa = PBXBuildFile; fileRef = A2FB06950BFF484A0095564D /* Globe.png */; };
+		A242AD9315F05D23002B3A6C /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = A242AD9115F05D23002B3A6C /* Localizable.strings */; };
 		A245030C0D6A1FB000B49D00 /* UpArrowGroupTemplate.png in Resources */ = {isa = PBXBuildFile; fileRef = A245030B0D6A1FB000B49D00 /* UpArrowGroupTemplate.png */; };
 		A245030E0D6A1FBC00B49D00 /* DownArrowGroupTemplate.png in Resources */ = {isa = PBXBuildFile; fileRef = A245030D0D6A1FBC00B49D00 /* DownArrowGroupTemplate.png */; };
 		A24621410C769D0900088E81 /* trevent.h in Headers */ = {isa = PBXBuildFile; fileRef = A24621350C769CF400088E81 /* trevent.h */; };
@@ -253,6 +254,9 @@
 		A2A4EA0E0DE106EB000CE197 /* ConvertUTF.c in Sources */ = {isa = PBXBuildFile; fileRef = A2A4EA0A0DE106E8000CE197 /* ConvertUTF.c */; };
 		A2A4EA0F0DE106EE000CE197 /* ConvertUTF.h in Headers */ = {isa = PBXBuildFile; fileRef = A2A4EA0B0DE106E8000CE197 /* ConvertUTF.h */; };
 		A2A6321B0CD9751700E3DA60 /* BadgeView.m in Sources */ = {isa = PBXBuildFile; fileRef = A2A6321A0CD9751700E3DA60 /* BadgeView.m */; };
+		A2A90DBF15F3C27F00FB7115 /* style.css in Resources */ = {isa = PBXBuildFile; fileRef = A29304EC15D7465100B1F726 /* style.css */; };
+		A2A90DC015F3C2D300FB7115 /* style.css in Resources */ = {isa = PBXBuildFile; fileRef = A29304EC15D7465100B1F726 /* style.css */; };
+		A2A90DC215F3C3D900FB7115 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = A242AD9115F05D23002B3A6C /* Localizable.strings */; };
 		A2AA579D0ADFCAB400CA59F6 /* PiecesView.m in Sources */ = {isa = PBXBuildFile; fileRef = A2AA579B0ADFCAB400CA59F6 /* PiecesView.m */; };
 		A2AA9BE1132CAC8E00FA131E /* announcer-udp.c in Sources */ = {isa = PBXBuildFile; fileRef = A2AA9BE0132CAC8D00FA131E /* announcer-udp.c */; };
 		A2AA9BE3132CAE2000FA131E /* evdns.c in Sources */ = {isa = PBXBuildFile; fileRef = A2AA9BE2132CAE2000FA131E /* evdns.c */; };
@@ -772,6 +776,7 @@
 		A23F29A0132A447400E9A83B /* announcer-http.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "announcer-http.c"; path = "libtransmission/announcer-http.c"; sourceTree = "<group>"; };
 		A23F526D0F14395900AA02E3 /* PredicateEditorRowTemplateAny.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PredicateEditorRowTemplateAny.h; path = macosx/PredicateEditorRowTemplateAny.h; sourceTree = "<group>"; };
 		A23F526E0F14395900AA02E3 /* PredicateEditorRowTemplateAny.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = PredicateEditorRowTemplateAny.m; path = macosx/PredicateEditorRowTemplateAny.m; sourceTree = "<group>"; };
+		A242AD9215F05D23002B3A6C /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = macosx/QuickLookPlugin/en.lproj/Localizable.strings; sourceTree = SOURCE_ROOT; };
 		A245030B0D6A1FB000B49D00 /* UpArrowGroupTemplate.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = UpArrowGroupTemplate.png; path = macosx/Images/UpArrowGroupTemplate.png; sourceTree = "<group>"; };
 		A245030D0D6A1FBC00B49D00 /* DownArrowGroupTemplate.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = DownArrowGroupTemplate.png; path = macosx/Images/DownArrowGroupTemplate.png; sourceTree = "<group>"; };
 		A24621350C769CF400088E81 /* trevent.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = trevent.h; path = libtransmission/trevent.h; sourceTree = "<group>"; };
@@ -953,6 +958,7 @@
 		A2A4EA0B0DE106E8000CE197 /* ConvertUTF.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ConvertUTF.h; path = libtransmission/ConvertUTF.h; sourceTree = "<group>"; };
 		A2A632190CD9751700E3DA60 /* BadgeView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BadgeView.h; path = macosx/BadgeView.h; sourceTree = "<group>"; };
 		A2A6321A0CD9751700E3DA60 /* BadgeView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = BadgeView.m; path = macosx/BadgeView.m; sourceTree = "<group>"; };
+		A2A90DC115F3C3D900FB7115 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = macosx/QuickLookPlugin/de.lproj/Localizable.strings; sourceTree = SOURCE_ROOT; };
 		A2AA579A0ADFCAB400CA59F6 /* PiecesView.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = PiecesView.h; path = macosx/PiecesView.h; sourceTree = "<group>"; };
 		A2AA579B0ADFCAB400CA59F6 /* PiecesView.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = PiecesView.m; path = macosx/PiecesView.m; sourceTree = "<group>"; };
 		A2AA9BE0132CAC8D00FA131E /* announcer-udp.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "announcer-udp.c"; path = "libtransmission/announcer-udp.c"; sourceTree = "<group>"; };
@@ -1837,6 +1843,7 @@
 		A2F35BC415C5A0A100EBF632 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				A242AD9115F05D23002B3A6C /* Localizable.strings */,
 				A29304EC15D7465100B1F726 /* style.css */,
 				A2F35BC515C5A0A100EBF632 /* QuickLookPlugin-Info.plist */,
 				A2F35BC615C5A0A100EBF632 /* InfoPlist.strings */,
@@ -2548,6 +2555,10 @@
 			files = (
 				A2F35BC815C5A0A100EBF632 /* InfoPlist.strings in Resources */,
 				A29304ED15D7465100B1F726 /* style.css in Resources */,
+				A242AD9315F05D23002B3A6C /* Localizable.strings in Resources */,
+				A2A90DBF15F3C27F00FB7115 /* style.css in Resources */,
+				A2A90DC015F3C2D300FB7115 /* style.css in Resources */,
+				A2A90DC215F3C3D900FB7115 /* Localizable.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3081,6 +3092,15 @@
 				A263C5651560A35B0082A3D1 /* da */,
 			);
 			name = MainMenu.xib;
+			sourceTree = "<group>";
+		};
+		A242AD9115F05D23002B3A6C /* Localizable.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				A242AD9215F05D23002B3A6C /* en */,
+				A2A90DC115F3C3D900FB7115 /* de */,
+			);
+			name = Localizable.strings;
 			sourceTree = "<group>";
 		};
 		A26AF27C0D2DBDDF00FF7140 /* AddWindow.xib */ = {
