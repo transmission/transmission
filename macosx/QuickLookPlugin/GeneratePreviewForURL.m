@@ -46,7 +46,9 @@ OSStatus GeneratePreviewForURL(void *thisInterface, QLPreviewRequestRef preview,
     if (err)
         return noErr;
     
-    NSURL * styleURL = [[NSBundle bundleWithIdentifier: @"org.m0k.transmission.QuickLookPlugin"] URLForResource: @"style" withExtension: @"css"];
+    NSBundle * bundle = [NSBundle bundleWithIdentifier: @"org.m0k.transmission.QuickLookPlugin"];
+    
+    NSURL * styleURL = [bundle URLForResource: @"style" withExtension: @"css"];
     NSString * styleContents = [NSString stringWithContentsOfURL: styleURL encoding: NSUTF8StringEncoding error: NULL];
     
     NSMutableString * htmlString = [NSMutableString string];
@@ -65,9 +67,9 @@ OSStatus GeneratePreviewForURL(void *thisInterface, QLPreviewRequestRef preview,
     {
         NSString * fileCountString;
         if (inf.fileCount == 1)
-            fileCountString = NSLocalizedString(@"1 file", "quicklook file count");
+            fileCountString = NSLocalizedStringFromTableInBundle(@"1 file", nil, bundle, "quicklook file count");
         else
-            fileCountString= [NSString stringWithFormat: NSLocalizedString(@"%@ files", "quicklook file count"), [NSString formattedUInteger: inf.fileCount]];
+            fileCountString= [NSString stringWithFormat: NSLocalizedStringFromTableInBundle(@"%@ files", nil, bundle, "quicklook file count"), [NSString formattedUInteger: inf.fileCount]];
         fileSizeString = [NSString stringWithFormat: @"%@, %@", fileCountString, fileSizeString];
     }
     [htmlString appendFormat: @"<p>%@</p>", fileSizeString];
@@ -77,11 +79,11 @@ OSStatus GeneratePreviewForURL(void *thisInterface, QLPreviewRequestRef preview,
     if ([creatorString isEqualToString: @""]) creatorString = nil;
     NSString * creationString = nil;
     if (dateCreatedString && creatorString)
-        creationString = [NSString stringWithFormat: NSLocalizedString(@"Created on %@ with %@", "quicklook creation info"), dateCreatedString, creatorString];
+        creationString = [NSString stringWithFormat: NSLocalizedStringFromTableInBundle(@"Created on %@ with %@", nil, bundle, "quicklook creation info"), dateCreatedString, creatorString];
     else if (dateCreatedString)
-        creationString = [NSString stringWithFormat: NSLocalizedString(@"Created on %@", "quicklook creation info"), dateCreatedString];
+        creationString = [NSString stringWithFormat: NSLocalizedStringFromTableInBundle(@"Created on %@", nil, bundle, "quicklook creation info"), dateCreatedString];
     else if (creatorString)
-        creationString = [NSString stringWithFormat: NSLocalizedString(@"Created with %@", "quicklook creation info"), creatorString];
+        creationString = [NSString stringWithFormat: NSLocalizedStringFromTableInBundle(@"Created with %@", nil, bundle, "quicklook creation info"), creatorString];
     if (creationString)
         [htmlString appendFormat: @"<p>%@</p>", creationString];
     
@@ -99,7 +101,7 @@ OSStatus GeneratePreviewForURL(void *thisInterface, QLPreviewRequestRef preview,
         NSMutableString * listSection = [NSMutableString string];
         [listSection appendString: @"<table>"];
         
-        NSString * headerTitleString = inf.webseedCount == 1 ? NSLocalizedString(@"1 Web Seed", "quicklook web seed header") : [NSString stringWithFormat: NSLocalizedString(@"%@ Web Seeds", "quicklook web seed header"), [NSString formattedUInteger: inf.webseedCount]];
+        NSString * headerTitleString = inf.webseedCount == 1 ? NSLocalizedStringFromTableInBundle(@"1 Web Seed", nil, bundle, "quicklook web seed header") : [NSString stringWithFormat: NSLocalizedStringFromTableInBundle(@"%@ Web Seeds", nil, bundle, "quicklook web seed header"), [NSString formattedUInteger: inf.webseedCount]];
         [listSection appendFormat: @"<tr><th>%@</th></tr>", headerTitleString];
         
         for (int i = 0; i < inf.webseedCount; ++i)
@@ -115,7 +117,7 @@ OSStatus GeneratePreviewForURL(void *thisInterface, QLPreviewRequestRef preview,
         NSMutableString * listSection = [NSMutableString string];
         [listSection appendString: @"<table>"];
         
-        NSString * headerTitleString = inf.trackerCount == 1 ? NSLocalizedString(@"1 Tracker", "quicklook tracker header") : [NSString stringWithFormat: NSLocalizedString(@"%@ Trackers", "quicklook tracker header"), [NSString formattedUInteger: inf.trackerCount]];
+        NSString * headerTitleString = inf.trackerCount == 1 ? NSLocalizedStringFromTableInBundle(@"1 Tracker", nil, bundle, "quicklook tracker header") : [NSString stringWithFormat: NSLocalizedStringFromTableInBundle(@"%@ Trackers", nil, bundle, "quicklook tracker header"), [NSString formattedUInteger: inf.trackerCount]];
         [listSection appendFormat: @"<tr><th>%@</th></tr>", headerTitleString];
         
 #warning handle tiers?
@@ -132,7 +134,7 @@ OSStatus GeneratePreviewForURL(void *thisInterface, QLPreviewRequestRef preview,
         NSMutableString * listSection = [NSMutableString string];
         [listSection appendString: @"<table>"];
         
-        NSString * fileTitleString = inf.fileCount == 1 ? NSLocalizedString(@"1 File", "quicklook file header") : [NSString stringWithFormat: NSLocalizedString(@"%@ Files", "quicklook file header"), [NSString formattedUInteger: inf.fileCount]];
+        NSString * fileTitleString = inf.fileCount == 1 ? NSLocalizedStringFromTableInBundle(@"1 File", nil, bundle, "quicklook file header") : [NSString stringWithFormat: NSLocalizedStringFromTableInBundle(@"%@ Files", nil, bundle, "quicklook file header"), [NSString formattedUInteger: inf.fileCount]];
         [listSection appendFormat: @"<tr><th>%@</th></tr>", fileTitleString];
         
 #warning display size?
