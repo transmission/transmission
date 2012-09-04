@@ -159,6 +159,7 @@
 		A23547E311CD0B090046EAE6 /* cache.h in Headers */ = {isa = PBXBuildFile; fileRef = A23547E111CD0B090046EAE6 /* cache.h */; };
 		A236D19315F6BB54000C3DD4 /* style.css in Resources */ = {isa = PBXBuildFile; fileRef = A29304EC15D7465100B1F726 /* style.css */; };
 		A236D19515F6BCB2000C3DD4 /* style.css in Resources */ = {isa = PBXBuildFile; fileRef = A29304EC15D7465100B1F726 /* style.css */; };
+		A236D19715F6BD9C000C3DD4 /* style.css in Resources */ = {isa = PBXBuildFile; fileRef = A29304EC15D7465100B1F726 /* style.css */; };
 		A2385DD40BFE06C800B24EF6 /* DragOverlayWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = A2385DD20BFE06C800B24EF6 /* DragOverlayWindow.m */; };
 		A23D5DA71320570800E422BA /* CleanupTemplate.png in Resources */ = {isa = PBXBuildFile; fileRef = A23D5DA61320570800E422BA /* CleanupTemplate.png */; };
 		A23F29A1132A447400E9A83B /* announcer-common.h in Headers */ = {isa = PBXBuildFile; fileRef = A23F299F132A447400E9A83B /* announcer-common.h */; };
@@ -773,6 +774,7 @@
 		A23547E111CD0B090046EAE6 /* cache.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = cache.h; path = libtransmission/cache.h; sourceTree = "<group>"; };
 		A236D19215F6BB54000C3DD4 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = macosx/QuickLookPlugin/es.lproj/Localizable.strings; sourceTree = SOURCE_ROOT; };
 		A236D19415F6BCB2000C3DD4 /* da */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = da; path = macosx/QuickLookPlugin/da.lproj/Localizable.strings; sourceTree = SOURCE_ROOT; };
+		A236D19615F6BD9C000C3DD4 /* it */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = it; path = macosx/QuickLookPlugin/it.lproj/Localizable.strings; sourceTree = SOURCE_ROOT; };
 		A2385DD20BFE06C800B24EF6 /* DragOverlayWindow.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = DragOverlayWindow.m; path = macosx/DragOverlayWindow.m; sourceTree = "<group>"; };
 		A2385DD30BFE06C800B24EF6 /* DragOverlayWindow.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = DragOverlayWindow.h; path = macosx/DragOverlayWindow.h; sourceTree = "<group>"; };
 		A23D5DA61320570800E422BA /* CleanupTemplate.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = CleanupTemplate.png; path = macosx/Images/CleanupTemplate.png; sourceTree = "<group>"; };
@@ -2565,6 +2567,7 @@
 				A2A90DC215F3C3D900FB7115 /* Localizable.strings in Resources */,
 				A236D19315F6BB54000C3DD4 /* style.css in Resources */,
 				A236D19515F6BCB2000C3DD4 /* style.css in Resources */,
+				A236D19715F6BD9C000C3DD4 /* style.css in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3107,6 +3110,7 @@
 				A2A90DC115F3C3D900FB7115 /* de */,
 				A236D19215F6BB54000C3DD4 /* es */,
 				A236D19415F6BCB2000C3DD4 /* da */,
+				A236D19615F6BD9C000C3DD4 /* it */,
 			);
 			name = Localizable.strings;
 			sourceTree = "<group>";
