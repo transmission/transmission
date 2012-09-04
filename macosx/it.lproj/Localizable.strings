@@ -72,7 +72,7 @@
 "%d DHT" = "%d DHT";
 
 /* Dock item - Downloading */
-"%d Downloading" = "%d in download";
+"%d Downloading" = "%d in ricezione";
 
 /* Inspector -> Peers tab -> peers */
 "%d incoming" = "%d in arrivo";
@@ -98,13 +98,13 @@
 "%d pieces, %@ each" = "%1$d parti, %2$@ ciascuna";
 
 /* Dock item - Seeding */
-"%d Seeding" = "%d in seed";
+"%d Seeding" = "%d in distribuzione";
 
 /* Inspector -> Peers tab -> peers */
-"%d tracker" = "%d tracker";
+"%d tracker" = "%d server traccia";
 
 /* Torrent -> status string */
-"%d web seeds" = "%d seed web";
+"%d web seeds" = "%d seeder web";
 
 /* time string */
 "%u days" = "%u giorni";
@@ -174,7 +174,7 @@
 "A torrent file with this name and directory cannot be created." = "Impossibile creare un file torrent con questo nome e cartella.";
 
 /* Create torrent -> blank address -> message */
-"A transfer marked as private with no tracker addresses will be unable to connect to peers. The torrent file will only be useful if you plan to upload the file to a tracker website that will add the addresses for you." = "Un trasferimento marcato come privato e senza tracker non sarà in grado di connettersi ai peer. Il file torrent sarà utile solo se si desidera inviarlo ad un sito web che aggiungerà l'indirizzo del tracker.";
+"A transfer marked as private with no tracker addresses will be unable to connect to peers. The torrent file will only be useful if you plan to upload the file to a tracker website that will add the addresses for you." = "Un trasferimento marcato come privato e senza server traccia non sarà in grado di connettersi ai peer. Il file torrent sarà utile solo se si desidera inviarlo ad un sito web che aggiungerà l'indirizzo del server traccia.";
 
 /* Open duplicate alert -> title
    Open duplicate magnet alert -> title */
@@ -193,12 +193,14 @@
 "Add" = "Aggiungi";
 
 /* Inspector view -> tracker buttons */
-"Add a tracker" = "Aggiungi un tracker";
+"Add a tracker" = "Aggiungi un server traccia";
 
 /* Magnet link failed -> title */
 "Adding magnetized transfer failed." = "L'aggiunta del trasferimento magnetico è fallita.";
 
-/* Filter Bar -> filter button */
+/* Filter Bar -> filter button
+   inspector -> check all */
+
 "All" = "Tutti";
 
 /* Filter Bar -> group filter menu
@@ -243,10 +245,10 @@
 "Are you sure you want to remove %@ transfers from the transfer list?" = "Sei sicuro di voler rimuovere %@ trasferimenti dalla lista?";
 
 /* Remove trackers alert -> title */
-"Are you sure you want to remove %d trackers?" = "Sei sicuro di voler rimuovere %d tracker?";
+"Are you sure you want to remove %d trackers?" = "Sei sicuro di voler rimuovere %d server traccia?";
 
 /* Removal confirm panel -> title */
-"Are you sure you want to remove \"%@\" from the transfer list and trash the data file?" = "Sei sicuro di voler rimuovere \"%@\" dalla lista e cestinare il file?";
+"Are you sure you want to remove \"%@\" from the transfer list and trash the data file?" = "Sei sicuro di voler rimuovere \"%@\" dalla lista e cestinare il file dati?";
 
 /* Removal confirm panel -> title
    Remove completed confirm panel -> title */
@@ -254,7 +256,7 @@
 "Are you sure you want to remove \"%@\" from the transfer list?" = "Sei sicuro di voler rimuovere \"%@\" dalla lista?";
 
 /* Remove trackers alert -> title */
-"Are you sure you want to remove this tracker?" = "Sei sicuro di voler rimuovere questo tracker?";
+"Are you sure you want to remove this tracker?" = "Sei sicuro di voler rimuovere questo server traccia?";
 
 /* Stats reset -> title */
 "Are you sure you want to reset usage statistics?" = "Sei sicuro di voler azzerare le statistiche d'utilizzo?";
@@ -308,6 +310,12 @@
 /* View menu -> Quick Look */
 "Close Quick Look" = "Chiudi Visualizzazione rapida";
 
+/* Prefs -> Notifications */
+"Configure In Growl" = "Configura su Growl";
+
+/* Prefs -> Notifications */
+"Configure In System Preferences" = "Configura nelle Preferenze di Sistema";
+
 /* Blocklist -> message */
 "Connecting to site" = "Connessione al sito";
 
@@ -340,10 +348,10 @@
 "Creation of \"%@\" failed." = "Creazione di \"%@\" fallita.";
 
 /* Inspector -> peer -> status */
-"Currently downloading (interested and not choked)" = "Download in corso (interessato e non scartato)";
+"Currently downloading (interested and not choked)" = "Ricezione in corso (interessato e non limitato)";
 
 /* Inspector -> peer -> status */
-"Currently uploading (interested and not choked)" = "Invio in corso (interessato e non scartato)";
+"Currently uploading (interested and not choked)" = "Invio in corso (interessato e non limitato)";
 
 /* Message window -> table column */
 "Date" = "Data";
@@ -363,10 +371,10 @@
 
 
 
-"DL" = "DL";
+"DL" = "Ricezione";
 
 /* Inspector -> Peers tab -> peers */
-"DL from %d" = "DL da %d";
+"DL from %d" = "Ricezione da %d";
 
 /* Torrent disk space alert -> button */
 "Do not check disk space again" = "Non controllare nuovamente lo spazio su disco";
@@ -386,53 +394,53 @@
 /* file table -> header tool tip
    files tab -> tooltip */
 
-"Download" = "Download";
+"Download" = "Ricezione";
 
 /* Torrent disk space alert -> button */
 "Download Anyway" = "Scarica comunque";
 
-/* Growl notification title */
-"Download Complete" = "Download completato";
+/* notification title */
+"Download Complete" = "Ricezione completata";
 
 /* Blocklist -> message */
-"Download of the blocklist failed." = "Il download della blocklist è fallito.";
+"Download of the blocklist failed." = "La ricezione della blocklist è fallita.";
 
 /* files tab -> tooltip */
 "Download Some" = "Scarica alcuni";
 
 /* Torrent table -> group row -> tooltip */
-"Download speed" = "Velocità download";
+"Download speed" = "Velocità ricezione";
 
 /* Stats window -> label
    tracker peer stat */
 
-"Downloaded" = "Scaricati";
+"Downloaded" = "Ricevuti";
 
 /* Filter Bar -> filter button
    Torrent -> status string */
 
-"Downloading" = "In download";
+"Downloading" = "In ricezione";
 
 /* Blocklist -> message */
-"Downloading blocklist" = "Download della blocklist...";
+"Downloading blocklist" = "Ricezione della blocklist...";
 
 /* Torrent -> status string */
-"Downloading from %d of %d peers" = "In download da %1$d su %2$d peer";
+"Downloading from %d of %d peers" = "In ricezione da %1$d su %2$d peer";
 
 /* Torrent -> status string */
-"Downloading from %d of 1 peer" = "In download da %d su 1 peer";
+"Downloading from %d of 1 peer" = "In ricezione da %d su 1 peer";
 
 /* inspector -> peer table -> header tool tip */
-"Downloading From Peer" = "In download dal peer";
+"Downloading From Peer" = "In ricezione dal peer";
 
 /* inspector -> web seed table -> header tool tip */
-"Downloading From Web Seed" = "Download da seed web";
+"Downloading From Web Seed" = "Ricezione da seeder web";
 
 /* Inspector -> Peers tab -> table row tooltip */
 "encrypted" = "cifrato";
 
 /* inspector -> peer table -> header tool tip */
-"Encrypted Connection" = "Connessione offuscata";
+"Encrypted Connection" = "Connessione cifrata";
 
 /* Message window -> level
    Message window -> level string
@@ -472,7 +480,7 @@
 "From: peer exchange" = "Da: scambio peer";
 
 /* Inspector -> Peers tab -> table row tooltip */
-"From: tracker" = "Da: tracker";
+"From: tracker" = "Da: server traccia";
 
 /* File size - gigabytes
    Memory size - gigabytes */
@@ -491,10 +499,10 @@
 "General Info" = "Informazioni generali";
 
 /* Status Bar -> speed tooltip */
-"Global download limit" = "Limite globale download";
+"Global download limit" = "Limite generale di ricezione";
 
 /* Status Bar -> speed tooltip */
-"Global upload limit" = "Limite globale upload";
+"Global upload limit" = "Limite generale di invio";
 
 /* Tracker last announce */
 "got %d peers" = "presenti %d peer";
@@ -567,7 +575,7 @@
 "Last Announce" = "Ultimo annuncio";
 
 /* Tracker last scrape */
-"Last Scrape" = "Ultimo scrape";
+"Last Scrape" = "Ultima richiesta";
 
 /* Prefs -> blocklist -> message */
 "Last updated" = "Ultimo aggiornamento";
@@ -584,7 +592,7 @@
 "Limit (%d KB/s)" = "Limitata (%d KB/s)";
 
 /* Save log alert panel -> title */
-"Log Could Not Be Saved" = "Il log non può essere salvato";
+"Log Could Not Be Saved" = "Il registro non può essere salvato";
 
 /* File Outline -> Priority Menu */
 "Low" = "Bassa";
@@ -593,7 +601,7 @@
 "Low Priority" = "Priorità bassa";
 
 /* Open duplicate magnet alert -> title */
-"Magnet link is a duplicate of an existing transfer." = "Il link magnetico è una copia di un trasferimento esistente.";
+"Magnet link is a duplicate of an existing transfer." = "Il collegamento magnetico è una copia di un trasferimento esistente.";
 
 /* Inspector -> selected torrents
    Torrent -> progress string */
@@ -612,7 +620,7 @@
 "Message" = "Messaggio";
 
 /* Message window -> title */
-"Message Log" = "Log messaggi";
+"Message Log" = "Registro messaggi";
 
 /* files tab -> tooltip */
 "Multiple Priorities" = "Priorità multiple";
@@ -652,7 +660,9 @@
 "No Torrents Selected" = "Nessun torrent selezionato";
 
 /* Groups -> Button
-   Groups -> Menu */
+   Groups -> Menu
+   inspector -> check all */
+
 
 "None" = "Nessuno";
 
@@ -708,12 +718,12 @@
 "OK" = "Ok";
 
 /* Remove completed confirm panel -> message */
-"Once removed, continuing the transfer will require the torrent file or magnet link." = "Dopo averlo rimosso, continuare il trasferimento richiederà il file torrent o il link magnetico.";
+"Once removed, continuing the transfer will require the torrent file or magnet link." = "Dopo averlo rimosso, continuare il trasferimento richiederà il file torrent o il collegamento magnetico.";
 
 /* Removal confirm panel -> message part 2
    Remove completed confirm panel -> message */
 
-"Once removed, continuing the transfers will require the torrent files or magnet links." = "Dopo averli rimossi, continuare i trasferimenti richiederà i file torrent o i link magnetici.";
+"Once removed, continuing the transfers will require the torrent files or magnet links." = "Dopo averli rimossi, continuare i trasferimenti richiederà i file torrent o i collegamenti magnetici.";
 
 /* Remove trackers alert -> message */
 "Once removed, Transmission will no longer attempt to contact it. This cannot be undone." = "Dopo averlo rimosso, Transmission non tenterà più di contattarlo. Questa azione non può essere annullata. ";
@@ -753,7 +763,7 @@
 "Orange" = "Arancione";
 
 /* Inspector -> Peers tab -> table row tooltip */
-"Partial Seed" = "Seed parziale";
+"Partial Seed" = "Seeder parziale";
 
 /* All toolbar item -> palette label */
 "Pause / Resume All" = "Pausa / Riprendi tutti";
@@ -784,10 +794,10 @@
 "Paused" = "In pausa";
 
 /* Inspector -> peer -> status */
-"Peer is unchoking you, but you are not interested" = "Il peer ti sta sbloccando, ma non sei interessato";
+"Peer is unchoking you, but you are not interested" = "Il peer sta rimuovendo il limite verso di te, ma non sei interessato";
 
 /* Inspector -> peer -> status */
-"Peer wants you to upload, but you do not want to (interested and choked)" = "Il peer vuole dati da parte tua, ma tu non vuoi inviarli (interessato e scartato)";
+"Peer wants you to upload, but you do not want to (interested and choked)" = "Il peer vuole dati da parte tua, ma tu non vuoi inviarli (interessato e limitato)";
 
 /* Inspector -> tab
    Inspector view -> title
@@ -817,7 +827,7 @@
 "Priority Not Available" = "Priorità non disponibile";
 
 /* Inspector -> private torrent */
-"Private Torrent, non-tracker peer discovery disabled" = "Torrent privato, scoperta dei peer non-tracker disabilitata";
+"Private Torrent, non-tracker peer discovery disabled" = "Torrent privato, scoperta dei peer non di tipo server traccia disabilitata";
 
 /* Message window -> table column */
 "Process" = "Elaborazione";
@@ -829,7 +839,7 @@
 "Program Started" = "Programma avviato";
 
 /* Inspector -> Peers tab -> table row tooltip */
-"Progress: %@" = "Progressione: %@";
+"Progress: %@" = "Avanzamento: %@";
 
 /* Inspector -> Peers tab -> table row tooltip */
 "Protocol: %@" = "Protocollo: %@";
@@ -888,13 +898,13 @@
 "Remove" = "Rimuovi";
 
 /* Main window -> 3rd bottom left button (remove all) tooltip */
-"Remove all transfers that have completed seeding." = "Rimuovi tutti i trasferimenti che hanno terminato il seed.";
+"Remove all transfers that have completed seeding." = "Rimuovi tutti i trasferimenti che hanno terminato la distribuzione.";
 
 /* Remove toolbar item -> palette label */
 "Remove Selected" = "Rimuovi selezionati";
 
 /* Inspector view -> tracker buttons */
-"Remove selected trackers" = "Rimuovi i tracker selezionati";
+"Remove selected trackers" = "Rimuovi i server traccia selezionati";
 
 /* Remove toolbar item -> tooltip */
 "Remove selected transfers" = "Rimuovi trasferimenti selezionati";
@@ -931,10 +941,10 @@
 "Save" = "Salva";
 
 /* Tracker last scrape */
-"Scrape error" = "Errore scrape";
+"Scrape error" = "Errore richiesta";
 
 /* Tracker last scrape */
-"Scrape timed out" = "Scrape scaduto";
+"Scrape timed out" = "Richiesta scaduta";
 
 /* tracker peer stat */
 "Seeders" = "Seeder";
@@ -942,19 +952,19 @@
 /* Filter Bar -> filter button
    Torrent -> status string */
 
-"Seeding" = "In seed";
+"Seeding" = "In distribuzione";
 
 /* Torrent -> status string */
-"Seeding complete" = "Seed completato";
+"Seeding complete" = "Distribuzione completata";
 
-/* Growl notification title */
-"Seeding Complete" = "Seed completato";
-
-/* Torrent -> status string */
-"Seeding to %d of %d peers" = "In seed verso %1$d su %2$d peer";
+/* notification title */
+"Seeding Complete" = "Distribuzione completata";
 
 /* Torrent -> status string */
-"Seeding to %d of 1 peer" = "In seed verso %d su 1 peer";
+"Seeding to %d of %d peers" = "In distribuzione verso %1$d su %2$d peer";
+
+/* Torrent -> status string */
+"Seeding to %d of 1 peer" = "In distribuzione verso %d su 1 peer";
 
 /* Create torrent -> location sheet -> button
    Create torrent -> select file
@@ -989,7 +999,10 @@
 "Session Transfer" = "Trasferimento sessione";
 
 /* Main window -> 1st bottom left button (action) tooltip */
-"Shortcuts for changing global settings." = "Scorciatoie per cambiare le impostazioni globali.";
+"Shortcuts for changing global settings." = "Scorciatoie per cambiare le impostazioni generali.";
+
+/* notification button */
+"Show" = "Mostra";
 
 /* View menu -> Filter Bar */
 "Show Filter Bar" = "Mostra la barra dei filtri";
@@ -1018,7 +1031,7 @@
 "Speed Limit Auto Enabled" = "Limite di velocità abilitato automaticamente";
 
 /* Main window -> 2nd bottom left button (turtle) tooltip */
-"Speed Limit overrides the total bandwidth limits with its own limits." = "Il limite di velocità sostituisce i limiti globali di banda con i propri.";
+"Speed Limit overrides the total bandwidth limits with its own limits." = "Il limite di velocità sostituisce i limiti generali di banda.";
 
 /* Torrent -> status string */
 "Stalled" = "In stallo";
@@ -1032,10 +1045,10 @@
 /* Action menu -> ratio stop
    torrent action menu -> ratio stop */
 
-"Stop at Ratio (%.2f)" = "Interrompi a rapporto (%.2f)";
+"Stop at Ratio (%.2f)" = "Ferma al rapporto (%.2f)";
 
 /* Torrent cell -> button info */
-"Stop waiting to start" = "Interrompi di attendere per iniziare";
+"Stop waiting to start" = "Interrompi attesa per iniziare";
 
 /* Donation beg -> title */
 "Support open-source indie software" = "Supporta il software open-source indipendente";
@@ -1058,7 +1071,7 @@
 "The directory \"%@\" does not currently exist. Create this directory or choose a different one to create the torrent file." = "La cartella \"%@\" attualmente non esiste. Creare questa cartella o sceglierne una diversa per creare il file torrent.";
 
 /* Open duplicate magnet alert -> message */
-"The magnet link  \"%@\" cannot be added because it is a duplicate of an already existing transfer." = "Il link magnetico \"%@\" non può essere aggiunto poiché è una copia di un trasferimento già esistente.";
+"The magnet link  \"%@\" cannot be added because it is a duplicate of an already existing transfer." = "Il collegamento magnetico \"%@\" non può essere aggiunto poiché è una copia di un trasferimento già esistente.";
 
 /* Move error alert -> message
    Move inside itself alert -> message */
@@ -1087,7 +1100,7 @@
 "The transfer will be paused. Clear up space on %@ or deselect files in the torrent inspector to continue." = "Il trasferimento sarà messo in pausa. Liberare spazio in %@ o deselezionare alcuni file del torrent nelle proprietà per continuare.";
 
 /* Create torrent -> blank address -> message */
-"The transfer will not contact trackers for peers, and will have to rely solely on non-tracker peer discovery methods such as PEX and DHT to download and seed." = "Il trasferimento non contatterà il tracker per cercare i peer e dovrà fare affidamento unicamente a metodi di scoperta dei peer quali PEX e DHT per scaricare e fare seed.";
+"The transfer will not contact trackers for peers, and will have to rely solely on non-tracker peer discovery methods such as PEX and DHT to download and seed." = "Il trasferimento non contatterà il server traccia per cercare i peer e dovrà fare affidamento unicamente a metodi di scoperta dei peer quali PEX e DHT per ricevere e distribuire dati.";
 
 /* Removal confirm panel -> message part 1 */
 "There are %@ active transfers." = "Ci sono %@ trasferimenti in corso.";
@@ -1099,7 +1112,7 @@
 "There are %d active transfers that will be paused on quit. The transfers will automatically resume on the next launch." = "Ci sono %d trasferimenti in corso che saranno messi in pausa all'uscita. I trasferimenti riprenderanno automaticamente al prossimo avvio.";
 
 /* Create torrent -> blank address -> title */
-"There are no tracker addresses." = "Non ci sono indirizzi tracker.";
+"There are no tracker addresses." = "Non ci sono indirizzi di server traccia.";
 
 /* Transmission already running alert -> message */
 "There is already a copy of Transmission running. This copy cannot be opened until that instance is quit." = "Una copia di Transmission è già in esecuzione. Questa copia non potrà essere eseguita finché non verrà chiusa la prima istanza.";
@@ -1117,16 +1130,16 @@
 "There was an error moving the data file." = "Si è verificato un errore nello spostare il file dati.";
 
 /* Magnet link failed -> message */
-"There was an error when adding the magnet link \"%@\". The transfer will not occur." = "Si è verificato un errore nell'aggiungere il link magnetico \"%@\". Il trasferimento non potrà avvenire.";
+"There was an error when adding the magnet link \"%@\". The transfer will not occur." = "Si è verificato un errore nell'aggiungere il collegamento magnetico \"%@\". Il trasferimento non potrà avvenire.";
 
 /* Create torrent -> no files -> title */
 "This folder contains no files." = "Questa cartella non contiene alcun file.";
 
 /* Removal confirm panel -> message */
-"This transfer is active. Once removed, continuing the transfer will require the torrent file or magnet link." = "Questo trasferimento è in corso. Dopo averlo rimosso, continuare il trasferimento richiederà il file torrent o il link magnetico.";
+"This transfer is active. Once removed, continuing the transfer will require the torrent file or magnet link." = "Questo trasferimento è in corso. Dopo averlo rimosso, continuare il trasferimento richiederà il file torrent o il collegamento magnetico.";
 
 /* Stats reset -> message */
-"This will clear the global statistics displayed by Transmission. Individual transfer statistics will not be affected." = "Questa azione ripulirà le statistiche globali mostrate da Transmission. Le statistiche dei singoli trasferimenti non saranno modificate.";
+"This will clear the global statistics displayed by Transmission. Individual transfer statistics will not be affected." = "Questa azione ripulirà le statistiche generali mostrate da Transmission. Le statistiche dei singoli trasferimenti non saranno modificate.";
 
 /* Inspector -> tracker table */
 "Tier %d" = "Livello %d";
@@ -1146,9 +1159,9 @@
 /* Download not a torrent -> title
    Torrent download error -> title */
 
-"Torrent download failed" = "Download torrent fallito";
+"Torrent download failed" = "Ricezione torrent fallita";
 
-/* Growl notification title */
+/* notification title */
 "Torrent File Auto Added" = "File torrent aggiunto automaticamente";
 
 /* Inspector -> title */
@@ -1167,21 +1180,21 @@
 "Total Transfer" = "Trasferimento totale";
 
 /* Filter Bar -> filter menu */
-"Tracker" = "Tracker";
+"Tracker" = "Server traccia";
 
 /* Torrent -> status string */
-"Tracker returned error" = "Il tracker ha restituito un errore";
+"Tracker returned error" = "Il server traccia ha restituito un errore";
 
 /* Torrent -> status string */
-"Tracker returned warning" = "Il tracker ha restituito un avviso";
+"Tracker returned warning" = "Il server traccia ha restituito un avviso";
 
 /* Tracker next announce */
-"Tracker will be used as a backup" = "Il tracker sarà usato come backup";
+"Tracker will be used as a backup" = "Il server traccia sarà usato come backup";
 
 /* Inspector -> tab
    Inspector view -> title */
 
-"Trackers" = "Tracker";
+"Trackers" = "Server traccia";
 
 /* Inspector -> Peers tab -> peers */
 "Transfer Not Active" = "Trasferimento non in corso";
@@ -1193,7 +1206,7 @@
 "Transfers Not Active" = "Trasferimenti non in corso";
 
 /* Legal alert -> message */
-"Transmission is a file-sharing program. When you run a torrent, its data will be made available to others by means of upload. You and you alone are fully responsible for exercising proper judgement and abiding by your local laws." = "Transmission è un programma di file-sharing. I dati dei torrent saranno messi a disposizione di altri utenti attraverso l'upload. Tu e tu soltanto sei pienamente responsabile di esercitare un giudizio appropriato e rispettare le leggi locali.";
+"Transmission is a file-sharing program. When you run a torrent, its data will be made available to others by means of upload. You and you alone are fully responsible for exercising proper judgement and abiding by your local laws." = "Transmission è un programma di file-sharing. I contenuti dei torrent saranno messi a disposizione di altri utenti attraverso l'invio di dati. L'esercizio di un giudizio appropriato ed il rispetto delle leggi in vigore è di vostra esclusiva responsabilità.";
 
 /* Donation beg -> message */
 "Transmission is a full-featured torrent application. A lot of time and effort have gone into development, coding, and refinement. If you enjoy using it, please consider showing your love with a donation." = "Transmission è una applicazione torrent ricca di funzionalità. Sviluppare, codificare e migliorare il programma ha richiesto molto tempo e molto impegno. Se ti piace usare questo software, per favore considera di mostrare il tuo gradimento tramite una donazione.  ";
@@ -1206,10 +1219,10 @@
    Torrent -> status string */
 
 
-"UL" = "UL";
+"UL" = "Invio";
 
 /* Inspector -> Peers tab -> peers */
-"UL to %d" = "UL a %d";
+"UL to %d" = "Invio a %d";
 
 /* File Outline -> Menu */
 "Uncheck Selected" = "Non spuntare selezionati";
@@ -1224,7 +1237,7 @@
 "untitled" = "senza titolo";
 
 /* Torrent table -> group row -> tooltip */
-"Upload speed" = "Velocità upload";
+"Upload speed" = "Velocità invio";
 
 /* Stats window -> label */
 "Uploaded" = "Inviati";
@@ -1239,19 +1252,19 @@
 "Waiting to check existing data" = "In attesa di verificare i dati esistenti";
 
 /* Torrent -> status string */
-"Waiting to download" = "In attesa di scaricare";
+"Waiting to download" = "In attesa di ricevere";
 
 /* Torrent -> status string */
-"Waiting to seed" = "In attesa di fare seed";
+"Waiting to seed" = "In attesa di effettuare distribuzione";
 
 /* Drag overlay -> url */
 "Web Address" = "Sito web";
 
 /* Torrent -> status string */
-"web seed" = "seed web";
+"web seed" = "seeder web";
 
 /* inspector -> web seed table -> header */
-"Web Seeds" = "Seed web";
+"Web Seeds" = "Seeder web";
 
 /* Legal alert -> title */
 "Welcome to Transmission" = "Benvenuto in Transmission";
@@ -1260,7 +1273,7 @@
 "Yellow" = "Giallo";
 
 /* Inspector -> peer -> status */
-"You unchoked the peer, but the peer is not interested" = "Non stai più scartando il peer, ma il peer non è interessato";
+"You unchoked the peer, but the peer is not interested" = "Non stai più applicando un limite verso il peer, ma il peer non è interessato";
 
 /* Inspector -> peer -> status */
-"You want to download, but peer does not want to send (interested and choked)" = "Vuoi scaricare dati, ma il peer non vuole inviarli (interessato e scartato)";
+"You want to download, but peer does not want to send (interested and choked)" = "Vuoi scaricare dati, ma il peer non vuole inviarli (interessato e limitato)";
