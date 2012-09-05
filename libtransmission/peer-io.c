@@ -454,6 +454,19 @@ utp_get_rb_size(void *closure)
     return UTP_READ_BUFFER_SIZE - bytes;
 }
 
+static int tr_peerIoTryWrite( tr_peerIo * io, size_t howmuch );
+
+static void
+utp_on_writable( tr_peerIo *io )
+{
+    int n;
+
+    dbgmsg( io, "libutp says this peer is ready to write" );
+
+    n = tr_peerIoTryWrite( io, SIZE_MAX );
+    tr_peerIoSetEnabled( io, TR_UP, n && evbuffer_get_length( io->outbuf ) );
+}
+
 static void
 utp_on_state_change(void *closure, int state)
 {
@@ -465,6 +478,8 @@ utp_on_state_change(void *closure, int state)
         io->utpSupported = true;
     } else if( state == UTP_STATE_WRITABLE ) {
         dbgmsg( io, "utp_on_state_change -- changed to writable" );
+        if ( io->pendingEvents & EV_WRITE )
+            utp_on_writable( io );
     } else if( state == UTP_STATE_EOF ) {
         if( io->gotError )
             io->gotError( io, BEV_EVENT_EOF, io->userData );
@@ -695,24 +710,25 @@ event_enable( tr_peerIo * io, short event )
     assert( io->session != NULL );
     assert( io->session->events != NULL );
 
-    if( io->socket < 0 )
-        return;
-
-    assert( io->session->events != NULL );
-    assert( event_initialized( io->event_read ) );
-    assert( event_initialized( io->event_write ) );
+    if( io->socket >= 0 )
+    {
+        assert( event_initialized( io->event_read ) );
+        assert( event_initialized( io->event_write ) );
+    }
 
     if( ( event & EV_READ ) && ! ( io->pendingEvents & EV_READ ) )
     {
-        dbgmsg( io, "enabling libevent ready-to-read polling" );
-        event_add( io->event_read, NULL );
+        dbgmsg( io, "enabling ready-to-read polling" );
+        if( io->socket >= 0 )
+            event_add( io->event_read, NULL );
         io->pendingEvents |= EV_READ;
     }
 
     if( ( event & EV_WRITE ) && ! ( io->pendingEvents & EV_WRITE ) )
     {
-        dbgmsg( io, "enabling libevent ready-to-write polling" );
-        event_add( io->event_write, NULL );
+        dbgmsg( io, "enabling ready-to-write polling" );
+        if( io->socket >= 0 )
+            event_add( io->event_write, NULL );
         io->pendingEvents |= EV_WRITE;
     }
 }
@@ -722,25 +738,27 @@ event_disable( struct tr_peerIo * io, short event )
 {
     assert( tr_amInEventThread( io->session ) );
     assert( io->session != NULL );
-
-    if( io->socket < 0 )
-        return;
-
     assert( io->session->events != NULL );
-    assert( event_initialized( io->event_read ) );
-    assert( event_initialized( io->event_write ) );
+
+    if( io->socket >= 0 )
+    {
+        assert( event_initialized( io->event_read ) );
+        assert( event_initialized( io->event_write ) );
+    }
 
     if( ( event & EV_READ ) && ( io->pendingEvents & EV_READ ) )
     {
-        dbgmsg( io, "disabling libevent ready-to-read polling" );
-        event_del( io->event_read );
+        dbgmsg( io, "disabling ready-to-read polling" );
+        if( io->socket >= 0 )
+            event_del( io->event_read );
         io->pendingEvents &= ~EV_READ;
     }
 
     if( ( event & EV_WRITE ) && ( io->pendingEvents & EV_WRITE ) )
     {
-        dbgmsg( io, "disabling libevent ready-to-write polling" );
-        event_del( io->event_write );
+        dbgmsg( io, "disabling ready-to-write polling" );
+        if( io->socket >= 0 )
+            event_del( io->event_write );
         io->pendingEvents &= ~EV_WRITE;
     }
 }
@@ -1257,7 +1275,6 @@ tr_peerIoTryWrite( tr_peerIo * io, size_t howmuch )
     {
         if( io->utp_socket != NULL ) /* utp peer connection */
         {
-            const size_t old_len = evbuffer_get_length( io->outbuf );
             UTP_Write( io->utp_socket, howmuch );
             n = old_len - evbuffer_get_length( io->outbuf );
         }
