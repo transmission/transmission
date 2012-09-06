@@ -2914,8 +2914,6 @@ setLocation( void * vdata )
     if( !tr_is_same_file( location, tor->currentDir ) )
     {
         tr_file_index_t i;
-        tr_ptrArray copiedxattrs = TR_PTR_ARRAY_INIT;
-        const void * const vstrcmp = strcmp;
 
         /* bad idea to move files while they're being verified... */
         tr_verifyRemove( tor );
@@ -2937,7 +2935,6 @@ setLocation( void * vdata )
 
                 if( do_move && !tr_is_same_file( oldpath, newpath ) )
                 {
-                    char * cursub;
                     bool renamed = false;
                     errno = 0;
                     tr_torinf( tor, "moving \"%s\" to \"%s\"", oldpath, newpath );
@@ -2947,24 +2944,6 @@ setLocation( void * vdata )
                         tr_torerr( tor, "error moving \"%s\" to \"%s\": %s",
                                         oldpath, newpath, tr_strerror( errno ) );
                     }
-
-                    /* copy extended attributes */
-                    cursub = tr_dirname( sub );
-                    while( strcmp( cursub, "." ) != 0 ) {
-                        char * tmp;
-                        if ( tr_ptrArrayFindSorted( &copiedxattrs, cursub, vstrcmp ) == NULL ) {
-                            char * olddir = tr_buildPath( oldbase, cursub, NULL );
-                            char * newdir = tr_buildPath( location, cursub, NULL );
-                            tr_copyXattr( olddir, newdir );
-                            tr_free( olddir );
-                            tr_free( newdir );
-                            tr_ptrArrayInsertSorted( &copiedxattrs, tr_strdup( cursub ), vstrcmp );
-                        }
-                        tmp = tr_dirname( cursub );
-                        tr_free( cursub );
-                        cursub = tmp;
-                    }
-                    tr_free(cursub);
                 }
 
                 tr_free( newpath );
@@ -2988,7 +2967,6 @@ setLocation( void * vdata )
             /* set the new location and reverify */
             tr_torrentSetDownloadDir( tor, location );
         }
-        tr_ptrArrayDestruct( &copiedxattrs, tr_free );
     }
 
     if( !err && do_move )

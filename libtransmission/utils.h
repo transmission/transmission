@@ -482,12 +482,6 @@ struct tm * tr_localtime_r( const time_t *_clock, struct tm *_result );
 
 
 /**
- * @brief copy extended attributes of a file or a folder
- * @return 0 on success; otherwise, return -1 and set errno
- */
-int tr_copyXattr( const char* srcpath, const char* dstpath ) TR_GNUC_NONNULL(1,2);
-
-/**
  * @brief move a file
  * @return 0 on success; otherwise, return -1 and set errno
  */

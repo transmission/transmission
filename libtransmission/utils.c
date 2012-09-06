@@ -19,7 +19,6 @@
  #define HAVE_ICONV_OPEN
  #define HAVE_MKDTEMP
  #define HAVE_VALLOC
- #define HAVE_XATTRS_MACOS
 #endif
 
 #include <assert.h>
@@ -41,9 +40,6 @@
 #include <sys/time.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-#ifdef HAVE_XATTRS_MACOS
- #include <sys/xattr.h> /*  listxattr(), getxattr(), setxattr() */
-#endif
 #include <unistd.h> /* stat(), getcwd(), getpagesize(), unlink() */
 
 #include <event2/buffer.h>
@@ -1514,75 +1510,6 @@ tr_strratio( char * buf, size_t buflen, double ratio, const char * infinity )
     return buf;
 }
 
-int
-tr_copyXattr( const char* srcpath, const char* dstpath )
-{
-    int ret = 0;
-#ifdef HAVE_XATTRS_MACOS
-    char * listbuf = NULL, * valuebuf = NULL;
-    ssize_t listlen = 0, valuelen = 0;
-    char* name;
-
-    listlen = listxattr( srcpath, NULL, 0, 0 );
-
-    if( listlen <= 0 ) {
-        ret = -1;
-        goto out;
-    }
-
-    listbuf = tr_malloc( listlen );
-    if( listbuf == NULL ) {
-        ret = -1;
-        goto out;
-    }
-
-    listlen = listxattr( srcpath, listbuf, listlen, 0 );
-    if( listlen <= 0) {
-        ret = -1;
-        goto out;
-    }
-
-    for( name = listbuf; name < listbuf + listlen; name = strchr( name, '\0' ) + 1) {
-        ssize_t len = getxattr( srcpath, name, NULL, 0, 0, 0);
-        if( len < 0 ) {
-            ret = -1;
-            goto out;
-        }
-
-        if( len > valuelen ) {
-            valuelen = len;
-            valuebuf = reallocf( valuebuf, valuelen );
-            if (valuebuf == NULL) {
-                ret = -1;
-                goto out;
-            }
-        }
-
-        len = getxattr( srcpath, name, valuebuf, valuelen, 0, 0 );
-        if ( len < 0) {
-            ret = -1;
-            goto out;
-        }
-
-        ret = setxattr( dstpath, name, valuebuf, len, 0, 0 );
-        if( ret != 0 ) {
-            ret = -1;
-            goto out;
-        }
-    }
-
-out:
-    tr_free( valuebuf );
-    tr_free( listbuf );
-
-    if( ret != 0 )
-        tr_err( "Couldn't copy xattrs from \"%s\" to \"%s\": %s",
-                srcpath, dstpath, tr_strerror( errno ) );
-
-#endif
-    return ret;
-}
-
 /***
 ****
 ***/
@@ -1651,7 +1578,6 @@ tr_moveFile( const char * oldpath, const char * newpath, bool * renamed )
     if( bytesLeft != 0 )
         return -1;
 
-    tr_copyXattr( oldpath, newpath );
     unlink( oldpath );
     return 0;
 }
