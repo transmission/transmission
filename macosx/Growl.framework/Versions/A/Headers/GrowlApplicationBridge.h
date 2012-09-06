@@ -112,7 +112,7 @@
  *
  *	@param inDelegate The delegate for the GrowlApplicationBridge. It must conform to the GrowlApplicationBridgeDelegate protocol.
  */
-+ (void) setGrowlDelegate:(NSObject<GrowlApplicationBridgeDelegate> *)inDelegate;
++ (void) setGrowlDelegate:(id<GrowlApplicationBridgeDelegate>)inDelegate;
 
 /*!
  *	@method growlDelegate
@@ -120,7 +120,7 @@
  *	@discussion See setGrowlDelegate: for details.
  *	@result The Growl delegate.
  */
-+ (NSObject<GrowlApplicationBridgeDelegate> *) growlDelegate;
++ (id<GrowlApplicationBridgeDelegate>) growlDelegate;
 
 #pragma mark -
 
@@ -260,6 +260,7 @@
  *	 Growl when next it is ready; <code>NO</code> if not.
  */
 + (void) setWillRegisterWhenGrowlIsReady:(BOOL)flag;
+
 /*!	@method	willRegisterWhenGrowlIsReady
  *	@abstract	Reports whether GrowlApplicationBridge will register with Growl
  *	 when Growl next launches.
@@ -361,6 +362,7 @@
  *	 copy of <code>regDict</code>.
  */
 + (NSDictionary *) registrationDictionaryByFillingInDictionary:(NSDictionary *)regDict;
+
 /*!	@method	registrationDictionaryByFillingInDictionary:restrictToKeys:
  *	@abstract	Tries to fill in missing keys in a registration dictionary.
  *	@discussion	This method examines the passed-in dictionary for missing keys,
@@ -400,6 +402,32 @@
 + (NSDictionary *) notificationDictionaryByFillingInDictionary:(NSDictionary *)regDict;
 
 + (NSDictionary *) frameworkInfoDictionary;
+
+#pragma mark -
+
+/*!
+ *@method growlURLSchemeAvailable
+ *@abstract Lets the app know whether growl:// is registered on the system, used for certain methods below this
+ *@return Returns whether growl:// is registered on the system
+ *@discussion Methods such as openGrowlPreferences rely on the growl:// URL scheme to function
+ * Further, this method can provide a check on whether Growl is installed, 
+ * however, the framework will not be relying on this method for choosing when/how to notify, 
+ * and it is not recommended that the app rely on it for other than whether to use growl:// methods
+ *@since Growl.framework 1.4
+ */
++ (BOOL) isGrowlURLSchemeAvailable;
+
+/*!
+ * @method openGrowlPreferences:
+ * @abstract Open Growl preferences, optionally to this app's settings, growl:// method
+ * @param showApp Whether to show the application's settings, otherwise just opens to the last position
+ * @return Return's whether opening the URL was succesfull or not.  
+ * @discussion Will launch if Growl is installed, but not running, and open the preferences window
+ * Uses growl:// URL scheme
+ * @since Growl.framework 1.4
+ */
++ (BOOL) openGrowlPreferences:(BOOL)showApp;
+
 @end
 
 //------------------------------------------------------------------------------
@@ -408,27 +436,15 @@
 /*!
  *	@protocol GrowlApplicationBridgeDelegate
  *	@abstract Required protocol for the Growl delegate.
- *	@discussion The methods in this protocol are required and are called
+ *	@discussion The methods in this protocol are optional and are called
  *	 automatically as needed by GrowlApplicationBridge. See
  *	 <code>+[GrowlApplicationBridge setGrowlDelegate:]</code>.
  *	 See also <code>GrowlApplicationBridgeDelegate_InformalProtocol</code>.
  */
 
-@protocol GrowlApplicationBridgeDelegate
+@protocol GrowlApplicationBridgeDelegate <NSObject>
 
-// -registrationDictionaryForGrowl has moved to the informal protocol as of 0.7.
-
-@end
-
-//------------------------------------------------------------------------------
-#pragma mark -
-
-/*!
- *	@category NSObject(GrowlApplicationBridgeDelegate_InformalProtocol)
- *	@abstract Methods which may be optionally implemented by the GrowlDelegate.
- *	@discussion The methods in this informal protocol will only be called if implemented by the delegate.
- */
-@interface NSObject (GrowlApplicationBridgeDelegate_InformalProtocol)
+@optional
 
 /*!
  *	@method registrationDictionaryForGrowl

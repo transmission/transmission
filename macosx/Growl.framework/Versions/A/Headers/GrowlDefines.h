@@ -99,6 +99,14 @@
 *  This key is optional.
 */
 #define GROWL_NOTIFICATIONS_DESCRIPTIONS		XSTR("NotificationDescriptions")
+/*! @defined GROWL_NOTIFICATIONS_ICONS
+ *  @abstract A dictionary of icons for each notification
+ *  @discussion This is an NSDictionary whose keys are GROWL_NOTIFICATION_NAME strings and whose objects are
+ *  icons for each notification, for GNTP spec
+ *
+ *  This key is optional.
+ */
+#define GROWL_NOTIFICATIONS_ICONS XSTR("NotificationIcons")
 
 /*!	@defined	GROWL_TICKET_VERSION
  *	@abstract	The version of your registration ticket.
@@ -212,6 +220,19 @@
 */
 #define GROWL_NOTIFICATION_PROGRESS		XSTR("NotificationProgress")
 
+/*!	@defined GROWL_NOTIFICATION_ALREADY_SHOWN
+ *	@abstract If this key is set, it should contain a bool value wrapped
+ *   in a NSNumber which describes whether the notification has
+ *   already been displayed, for instance by built in Notification
+ *   Center support.  This value can be used to allow display
+ *   plugins to skip a notification, while still allowing Growl
+ *   actions to run on them.
+ *
+ *	 Optional. Not supported by all display plugins.
+ */
+#define GROWL_NOTIFICATION_ALREADY_SHOWN		XSTR("AlreadyShown")
+
+
 // Notifications
 #pragma mark Notifications
 
@@ -316,6 +337,28 @@
  */
 #define GROWL_DISTRIBUTED_NOTIFICATION_TIMED_OUT_SUFFIX		XSTR("GrowlTimedOut!")
 
+/*!	@defined GROWL_DISTRIBUTED_NOTIFICATION_NOTIFICATIONCENTER_ON
+ *	@abstract The distributed notification sent when the Notification Center support is toggled on in Growl 2.0
+ *	@discussion When the user enables Notification Center support in Growl 2.0, this notification is sent
+ *      to inform all running apps that they should now speak to Notification Center directly.
+ */
+#define GROWL_DISTRIBUTED_NOTIFICATION_NOTIFICATIONCENTER_ON		XSTR("GrowlNotificationCenterOn!")
+
+/*!	@defined GROWL_DISTRIBUTED_NOTIFICATION_NOTIFICATIONCENTER_OFF
+ *	@abstract The distributed notification sent when the Notification Center support is toggled off in Growl 2.0
+ *	@discussion When the user enables Notification Center support in Growl 2.0, this notification is sent
+ *      to inform all running apps that they should no longer speak to Notification Center directly.
+ */
+#define GROWL_DISTRIBUTED_NOTIFICATION_NOTIFICATIONCENTER_OFF		XSTR("GrowlNotificationCenterOff!")
+
+/*!	@defined GROWL_DISTRIBUTED_NOTIFICATION_NOTIFICATIONCENTER_QUERY
+ *	@abstract The distributed notification sent by an application to query Growl 2.0's notification center support.
+ *	@discussion When an app starts up, it will send this query to get Growl 2.0 to spit out whether notification
+ *      center support is on or off.
+ */
+#define GROWL_DISTRIBUTED_NOTIFICATION_NOTIFICATIONCENTER_QUERY		XSTR("GrowlNotificationCenterYN?")
+
+
 /*!	@group Other symbols */
 /* Symbols which don't fit into any of the other categories. */
 
@@ -337,5 +380,7 @@
 
 
 #define GROWL_POSITION_PREFERENCE_KEY			@"GrowlSelectedPosition"
+
+#define GROWL_PLUGIN_CONFIG_ID XSTR("GrowlPluginConfigurationID")
 
 #endif //ndef _GROWLDEFINES_H
