@@ -292,26 +292,7 @@
     NSTableColumn * column = [tableView tableColumnWithIdentifier: @"Message"];
     const CGFloat count = floorf([message sizeWithAttributes: fAttributes].width / [column width]);
     
-    const CGFloat oldHeight = [tableView rowHeight] * (count + 1.0);
-    NSLog(@"oldHeight: %f", oldHeight);
-    
-    NSAttributedString * attributedMessage = [[NSAttributedString alloc] initWithString: message attributes: fAttributes];
-    CTFramesetterRef framesetter = CTFramesetterCreateWithAttributedString((CFAttributedStringRef)attributedMessage);
-    [attributedMessage release];
-    
-    const CGSize size = CTFramesetterSuggestFrameSizeWithConstraints(framesetter, CFRangeMake(0, 0), NULL, CGSizeMake([column width], CGFLOAT_MAX), NULL);
-    CFRelease(framesetter);
-    
-    NSLog(@"new %@", NSStringFromSize(size));
-    //NSLog(@"%@", fAttributes);
-    
-    CGFloat newHeight = size.height;
-    
-    //not sure why this is needed
-    const CGFloat numRows = newHeight / 13.0;
-    newHeight += numRows * 1.0;
-    
-    return newHeight;
+    return [tableView rowHeight] * (count + 1.0);
 }
 
 - (void) tableView: (NSTableView *) tableView sortDescriptorsDidChange: (NSArray *) oldDescriptors
