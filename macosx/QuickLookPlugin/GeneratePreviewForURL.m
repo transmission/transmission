@@ -37,6 +37,9 @@ OSStatus GeneratePreviewForURL(void *thisInterface, QLPreviewRequestRef preview,
     if (QLPreviewRequestIsCancelled(preview))
         return noErr;
     
+    //we need this call to ensure NSApp is initialized (not done automatically for plugins)
+    [NSApplication sharedApplication];
+    
     //try to parse the torrent file
     tr_info inf;
     tr_ctor * ctor = tr_ctorNew(NULL);

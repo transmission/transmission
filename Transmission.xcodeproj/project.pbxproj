@@ -286,6 +286,8 @@
 		A2D77451154CC25700A62B93 /* WebSeedTableView.h in Headers */ = {isa = PBXBuildFile; fileRef = A2D7744F154CC25700A62B93 /* WebSeedTableView.h */; };
 		A2D77452154CC25700A62B93 /* WebSeedTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = A2D77450154CC25700A62B93 /* WebSeedTableView.m */; };
 		A2D77453154CC72B00A62B93 /* WebSeedTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = A2D77450154CC25700A62B93 /* WebSeedTableView.m */; };
+		A2D8CFBA15F82DFA0056E93D /* NSApplicationAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = A29D84031049C25600D1987A /* NSApplicationAdditions.m */; };
+		A2D8CFBB15F82E030056E93D /* NSStringAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DE5CC9C0980656F00BE280E /* NSStringAdditions.m */; };
 		A2DA362A0CBC674900C2ED41 /* InfoActivity.png in Resources */ = {isa = PBXBuildFile; fileRef = A2DA36270CBC674900C2ED41 /* InfoActivity.png */; };
 		A2DA362B0CBC674900C2ED41 /* InfoFiles.png in Resources */ = {isa = PBXBuildFile; fileRef = A2DA36280CBC674900C2ED41 /* InfoFiles.png */; };
 		A2DA362C0CBC674900C2ED41 /* InfoPeers.png in Resources */ = {isa = PBXBuildFile; fileRef = A2DA36290CBC674900C2ED41 /* InfoPeers.png */; };
@@ -385,7 +387,6 @@
 		A2F35BD715C5A46D00EBF632 /* libcrypto.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A27653A714369C5C009D3CCF /* libcrypto.dylib */; };
 		A2F35BDA15C5A49200EBF632 /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A2B6141B1395ADE9000E0975 /* libz.dylib */; };
 		A2F35BDB15C5A4A000EBF632 /* libiconv.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A296EF3411E5605E004A2781 /* libiconv.dylib */; };
-		A2F35BDE15C5A67100EBF632 /* NSStringAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DE5CC9C0980656F00BE280E /* NSStringAdditions.m */; };
 		A2F35BE115C5A7ED00EBF632 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2F35BE015C5A7ED00EBF632 /* Cocoa.framework */; };
 		A2F35BE315C5A7F900EBF632 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2F35BE215C5A7F900EBF632 /* Foundation.framework */; };
 		A2F40AE40A361C00006B8288 /* Transmission.icns in Resources */ = {isa = PBXBuildFile; fileRef = 4D2784360905709500687951 /* Transmission.icns */; };
@@ -393,10 +394,8 @@
 		A2F41F8E0D73595100B82116 /* InfoTracker.png in Resources */ = {isa = PBXBuildFile; fileRef = A2F41F8D0D73595100B82116 /* InfoTracker.png */; };
 		A2F7CF5513035F7B0016FF10 /* URLSheetWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = A2F7CF5413035F7B0016FF10 /* URLSheetWindow.xib */; };
 		A2F7CF5F13035FFD0016FF10 /* URLSheetWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = A2F7CF5E13035FFD0016FF10 /* URLSheetWindowController.m */; };
-		A2F8278515F77E5000B6BD4F /* NSApplicationAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = A29D84031049C25600D1987A /* NSApplicationAdditions.m */; };
 		A2F8CD430F3D0F4A00DB356A /* miniupnpcstrings.h in Headers */ = {isa = PBXBuildFile; fileRef = A2F8CD420F3D0F4A00DB356A /* miniupnpcstrings.h */; };
 		A2FB057F0BFEB6800095564D /* DragOverlayView.m in Sources */ = {isa = PBXBuildFile; fileRef = A2FB057D0BFEB6800095564D /* DragOverlayView.m */; };
-		A2FB07F215F8208300933543 /* style.css in Resources */ = {isa = PBXBuildFile; fileRef = A29304EC15D7465100B1F726 /* style.css */; };
 		A2FB701C0D95CAEA0001F331 /* GroupsController.m in Sources */ = {isa = PBXBuildFile; fileRef = A2FB701B0D95CAEA0001F331 /* GroupsController.m */; };
 		BE1183570CE160C50002D0F3 /* bsdqueue.h in Headers */ = {isa = PBXBuildFile; fileRef = BE11834D0CE160C50002D0F3 /* bsdqueue.h */; };
 		BE1183580CE160C50002D0F3 /* declspec.h in Headers */ = {isa = PBXBuildFile; fileRef = BE11834E0CE160C50002D0F3 /* declspec.h */; };
@@ -2558,7 +2557,6 @@
 				A2F35BC815C5A0A100EBF632 /* InfoPlist.strings in Resources */,
 				A29304ED15D7465100B1F726 /* style.css in Resources */,
 				A242AD9315F05D23002B3A6C /* Localizable.strings in Resources */,
-				A2FB07F215F8208300933543 /* style.css in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2783,11 +2781,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A2D8CFBB15F82E030056E93D /* NSStringAdditions.m in Sources */,
+				A2D8CFBA15F82DFA0056E93D /* NSApplicationAdditions.m in Sources */,
 				A29304EE15D7497C00B1F726 /* main.c in Sources */,
-				A2F35BDE15C5A67100EBF632 /* NSStringAdditions.m in Sources */,
 				A2F35BCA15C5A0A100EBF632 /* GenerateThumbnailForURL.m in Sources */,
 				A2F35BCC15C5A0A100EBF632 /* GeneratePreviewForURL.m in Sources */,
-				A2F8278515F77E5000B6BD4F /* NSApplicationAdditions.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
