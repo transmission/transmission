@@ -146,18 +146,18 @@ getStatusStr( const tr_stat * st,
               char *          buf,
               size_t          buflen )
 {
-    if( st->activity & TR_STATUS_CHECK_WAIT )
+    if( st->activity == TR_STATUS_CHECK_WAIT )
     {
         tr_snprintf( buf, buflen, "Waiting to verify local files" );
     }
-    else if( st->activity & TR_STATUS_CHECK )
+    else if( st->activity == TR_STATUS_CHECK )
     {
         tr_snprintf( buf, buflen,
                      "Verifying local files (%.2f%%, %.2f%% valid)",
                      tr_truncd( 100 * st->recheckProgress, 2 ),
                      tr_truncd( 100 * st->percentDone, 2 ) );
     }
-    else if( st->activity & TR_STATUS_DOWNLOAD )
+    else if( st->activity == TR_STATUS_DOWNLOAD )
     {
         char upStr[80];
         char dnStr[80];
@@ -177,7 +177,7 @@ getStatusStr( const tr_stat * st,
             st->peersGettingFromUs, upStr,
             ratioStr );
     }
-    else if( st->activity & TR_STATUS_SEED )
+    else if( st->activity == TR_STATUS_SEED )
     {
         char upStr[80];
         char ratioStr[80];
