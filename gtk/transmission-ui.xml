@@ -1,0 +1,129 @@
+<ui> 
+  <menubar name='main-window-menu'> 
+    <menu action='file-menu'> 
+      <menuitem action='open-torrent-menu'/> 
+      <menuitem action='open-torrent-from-url'/> 
+      <menuitem action='new-torrent'/> 
+      <separator/> 
+      <menuitem action='start-all-torrents'/> 
+      <menuitem action='pause-all-torrents'/> 
+      <separator/> 
+      <menuitem action='quit'/> 
+    </menu> 
+    <menu action='edit-menu'> 
+      <menuitem action='select-all'/> 
+      <menuitem action='deselect-all'/> 
+      <separator/> 
+      <menuitem action='edit-preferences'/> 
+    </menu> 
+    <menu action='torrent-menu'> 
+      <menuitem action='show-torrent-properties'/> 
+      <menuitem action='open-torrent-folder'/> 
+      <separator/> 
+      <menuitem action='torrent-start'/> 
+      <menuitem action='torrent-start-now'/> 
+      <menuitem action='torrent-reannounce'/> 
+      <menu action='queue-menu'> 
+        <menuitem action='queue-move-top'/> 
+        <menuitem action='queue-move-up'/> 
+        <menuitem action='queue-move-down'/> 
+        <menuitem action='queue-move-bottom'/> 
+      </menu> 
+      <menuitem action='torrent-stop'/> 
+      <separator/> 
+      <menuitem action='relocate-torrent'/> 
+      <menuitem action='torrent-verify'/> 
+      <menuitem action='copy-magnet-link-to-clipboard'/> 
+      <separator/> 
+      <menuitem action='remove-torrent'/> 
+      <menuitem action='delete-torrent'/> 
+    </menu> 
+    <menu action='view-menu'> 
+      <menuitem action='compact-view'/> 
+      <separator/> 
+      <menuitem action='show-toolbar'/> 
+      <menuitem action='show-filterbar'/> 
+      <menuitem action='show-statusbar'/> 
+      <separator/> 
+      <menuitem action='sort-by-activity'/> 
+      <menuitem action='sort-by-age'/> 
+      <menuitem action='sort-by-name'/> 
+      <menuitem action='sort-by-progress'/> 
+      <menuitem action='sort-by-queue'/> 
+      <menuitem action='sort-by-ratio'/> 
+      <menuitem action='sort-by-size'/> 
+      <menuitem action='sort-by-state'/> 
+      <menuitem action='sort-by-time-left'/> 
+      <separator/> 
+      <menuitem action='sort-reversed'/> 
+    </menu> 
+    <menu action='help-menu'> 
+      <menuitem action='toggle-message-log'/> 
+      <menuitem action='show-stats'/> 
+      <separator/> 
+      <menuitem action='donate'/> 
+      <separator/> 
+      <menuitem action='help'/> 
+      <menuitem action='show-about-dialog'/> 
+    </menu> 
+  </menubar> 
+
+  <toolbar name='main-window-toolbar'> 
+    <toolitem action='open-torrent-toolbar'/> 
+    <toolitem action='torrent-start'/> 
+    <toolitem action='torrent-stop'/> 
+    <toolitem action='remove-torrent'/> 
+    <separator/> 
+    <toolitem action='show-torrent-properties'/> 
+  </toolbar> 
+
+  <popup name='main-window-popup'> 
+    <menuitem action='show-torrent-properties'/> 
+    <menuitem action='open-torrent-folder'/> 
+    <separator/> 
+    <menu action='sort-menu'> 
+      <menuitem action='sort-by-activity'/> 
+      <menuitem action='sort-by-age'/> 
+      <menuitem action='sort-by-name'/> 
+      <menuitem action='sort-by-progress'/> 
+      <menuitem action='sort-by-ratio'/> 
+      <menuitem action='sort-by-size'/> 
+      <menuitem action='sort-by-state'/> 
+      <menuitem action='sort-by-time-left'/> 
+      <separator/> 
+      <menuitem action='sort-reversed'/> 
+    </menu> 
+    <separator/> 
+    <menuitem action='torrent-start'/> 
+    <menuitem action='torrent-start-now'/> 
+    <menuitem action='torrent-reannounce'/> 
+    <menu action='queue-menu'> 
+      <menuitem action='queue-move-top'/> 
+      <menuitem action='queue-move-up'/> 
+      <menuitem action='queue-move-down'/> 
+      <menuitem action='queue-move-bottom'/> 
+    </menu> 
+    <menuitem action='torrent-stop'/> 
+    <separator/> 
+    <menuitem action='relocate-torrent'/> 
+    <menuitem action='torrent-verify'/> 
+    <menuitem action='copy-magnet-link-to-clipboard'/> 
+    <separator/> 
+    <menuitem action='remove-torrent'/> 
+    <menuitem action='delete-torrent'/> 
+  </popup> 
+
+  <popup name='icon-popup'> 
+    <menuitem action='toggle-main-window'/> 
+    <separator/> 
+    <menuitem action='open-torrent-menu'/> 
+    <menuitem action='open-torrent-from-url'/> 
+    <separator/> 
+    <menuitem action='pause-all-torrents'/> 
+    <menuitem action='start-all-torrents'/> 
+    <separator/> 
+    <menuitem action='alt-speed-enabled'/> 
+    <separator/> 
+    <menuitem action='quit'/> 
+  </popup> 
+</ui> 

@@ -47,11 +47,11 @@ noinst_HEADERS = \
     relocate.h \
     stats.h \
     torrent-cell-renderer.h \
+    transmission-resources.h \
     tr-core.h \
     tr-icon.h \
     tr-prefs.h \
     tr-window.h \
-    ui.h \
     util.h
 
 bin_PROGRAMS = transmission-gtk
@@ -74,6 +74,7 @@ transmission_gtk_SOURCES = \
     relocate.c \
     stats.c \
     torrent-cell-renderer.c \
+    transmission-resources.c \
     tr-core.c \
     tr-icon.c \
     tr-prefs.c \
@@ -106,6 +107,16 @@ Productivity_DATA = $(DESKTOP_FILES)
 icon_DATA = transmission.png
 icondir = $(datadir)/pixmaps
 
+UI_FILES = transmission-ui.xml 
+
+transmission-resources.c: transmission.gresource.xml $(UI_FILES) 
+	glib-compile-resources --target=$@ --sourcedir=$(srcdir) \ 
+	  --generate-source --c-name transmission $< 
+
+transmission-resources.h: transmission.gresource.xml 
+	glib-compile-resources --target=$@ --sourcedir=$(srcdir) \ 
+	  --generate-header --c-name transmission $< 
+
 EXTRA_DIST = \
     $(DESKTOP_IN_FILES) \
     transmission.png
@@ -119,10 +130,14 @@ transmission.res: transmission.rc
 	$(WINDRES) -J rc -i transmission.rc -O coff -o transmission.res
 
 BUILT_SOURCES = \
-	setransmission.res
+	setransmission.res \
+	transmission-resources.c \
+	transmission-resources.h
 
 CLEANFILES = \
-	transmission.res
+	setransmission.res \
+	transmission-resources.c \
+	transmission-resources.h
 
 transmission_gtk_LDADD += \
 	transmission.res

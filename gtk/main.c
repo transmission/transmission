@@ -55,10 +55,11 @@
 #include "tr-prefs.h"
 #include "tr-window.h"
 #include "util.h"
-#include "ui.h"
 
 #define MY_CONFIG_NAME "transmission"
 #define MY_READABLE_NAME "transmission-gtk"
+
+#define TR_RESOURCE_PATH "/com/transmissionbt/transmission/"
 
 #define SHOW_LICENSE
 static const char * LICENSE =
@@ -481,6 +482,7 @@ static void app_setup( GtkWindow * wind, struct cbdata  * cbdata );
 static void
 on_startup( GApplication * application, gpointer user_data )
 {
+    GError * error;
     const char * str;
     GtkWindow * win;
     GtkUIManager * ui_manager;
@@ -506,9 +508,11 @@ on_startup( GApplication * application, gpointer user_data )
     cbdata->core = gtr_core_new( session );
 
     /* init the ui manager */
+    error = NULL;
     ui_manager = gtk_ui_manager_new ( );
     gtr_actions_init ( ui_manager, cbdata );
-    gtk_ui_manager_add_ui_from_string ( ui_manager, fallback_ui_file, -1, NULL );
+    gtk_ui_manager_add_ui_from_resource ( ui_manager, TR_RESOURCE_PATH "transmission-ui.xml", &error );
+    g_assert_no_error (error);
     gtk_ui_manager_ensure_update ( ui_manager );
 
     /* create main window now to be a parent to any error dialogs */
