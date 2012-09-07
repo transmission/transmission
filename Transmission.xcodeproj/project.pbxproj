@@ -288,6 +288,7 @@
 		A2D77453154CC72B00A62B93 /* WebSeedTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = A2D77450154CC25700A62B93 /* WebSeedTableView.m */; };
 		A2D8CFBA15F82DFA0056E93D /* NSApplicationAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = A29D84031049C25600D1987A /* NSApplicationAdditions.m */; };
 		A2D8CFBB15F82E030056E93D /* NSStringAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DE5CC9C0980656F00BE280E /* NSStringAdditions.m */; };
+		A2D8CFC015FA177A0056E93D /* style.css in Resources */ = {isa = PBXBuildFile; fileRef = A29304EC15D7465100B1F726 /* style.css */; };
 		A2DA362A0CBC674900C2ED41 /* InfoActivity.png in Resources */ = {isa = PBXBuildFile; fileRef = A2DA36270CBC674900C2ED41 /* InfoActivity.png */; };
 		A2DA362B0CBC674900C2ED41 /* InfoFiles.png in Resources */ = {isa = PBXBuildFile; fileRef = A2DA36280CBC674900C2ED41 /* InfoFiles.png */; };
 		A2DA362C0CBC674900C2ED41 /* InfoPeers.png in Resources */ = {isa = PBXBuildFile; fileRef = A2DA36290CBC674900C2ED41 /* InfoPeers.png */; };
@@ -998,6 +999,7 @@
 		A2D597290F5AE49E0001AB3C /* watch.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = watch.h; path = daemon/watch.h; sourceTree = "<group>"; };
 		A2D7744F154CC25700A62B93 /* WebSeedTableView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = WebSeedTableView.h; path = macosx/WebSeedTableView.h; sourceTree = "<group>"; };
 		A2D77450154CC25700A62B93 /* WebSeedTableView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = WebSeedTableView.m; path = macosx/WebSeedTableView.m; sourceTree = "<group>"; };
+		A2D8CFBF15FA177A0056E93D /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = macosx/QuickLookPlugin/ru.lproj/Localizable.strings; sourceTree = SOURCE_ROOT; };
 		A2DA36270CBC674900C2ED41 /* InfoActivity.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = InfoActivity.png; path = macosx/Images/InfoActivity.png; sourceTree = "<group>"; };
 		A2DA36280CBC674900C2ED41 /* InfoFiles.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = InfoFiles.png; path = macosx/Images/InfoFiles.png; sourceTree = "<group>"; };
 		A2DA36290CBC674900C2ED41 /* InfoPeers.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = InfoPeers.png; path = macosx/Images/InfoPeers.png; sourceTree = "<group>"; };
@@ -2557,6 +2559,7 @@
 				A2F35BC815C5A0A100EBF632 /* InfoPlist.strings in Resources */,
 				A29304ED15D7465100B1F726 /* style.css in Resources */,
 				A242AD9315F05D23002B3A6C /* Localizable.strings in Resources */,
+				A2D8CFC015FA177A0056E93D /* style.css in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3101,6 +3104,7 @@
 				A236D19415F6BCB2000C3DD4 /* da */,
 				A236D19615F6BD9C000C3DD4 /* it */,
 				A2FB07F115F8208300933543 /* nl */,
+				A2D8CFBF15FA177A0056E93D /* ru */,
 			);
 			name = Localizable.strings;
 			sourceTree = "<group>";
