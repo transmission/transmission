@@ -494,9 +494,9 @@ on_startup( GApplication * application, gpointer user_data )
 
     /* ensure the directories are created */
     if(( str = gtr_pref_string_get( TR_PREFS_KEY_DOWNLOAD_DIR )))
-	g_mkdir_with_parents( str, 0777 );
+      g_mkdir_with_parents( str, 0777 );
     if(( str = gtr_pref_string_get( TR_PREFS_KEY_INCOMPLETE_DIR )))
-	g_mkdir_with_parents( str, 0777 );
+      g_mkdir_with_parents( str, 0777 );
 
     /* initialize the libtransmission session */
     session = tr_sessionInit( "gtk", cbdata->config_dir, TRUE, gtr_pref_get_all( ) );
@@ -521,13 +521,13 @@ on_startup( GApplication * application, gpointer user_data )
 
     /* check & see if it's time to update the blocklist */
     if( gtr_pref_flag_get( TR_PREFS_KEY_BLOCKLIST_ENABLED ) ) {
-	if( gtr_pref_flag_get( PREF_KEY_BLOCKLIST_UPDATES_ENABLED ) ) {
-	    const int64_t last_time = gtr_pref_int_get( "blocklist-date" );
-	    const int SECONDS_IN_A_WEEK = 7 * 24 * 60 * 60;
-	    const time_t now = time( NULL );
-	if( last_time + SECONDS_IN_A_WEEK < now )
-	    gtr_core_blocklist_update( cbdata->core );
-        }
+      if( gtr_pref_flag_get( PREF_KEY_BLOCKLIST_UPDATES_ENABLED ) ) {
+        const int64_t last_time = gtr_pref_int_get( "blocklist-date" );
+        const int SECONDS_IN_A_WEEK = 7 * 24 * 60 * 60;
+        const time_t now = time( NULL );
+        if( last_time + SECONDS_IN_A_WEEK < now )
+          gtr_core_blocklist_update( cbdata->core );
+      }
     }
 
     /* if there's no magnet link handler registered, register us */
