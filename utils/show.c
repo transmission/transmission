@@ -342,7 +342,7 @@ main( int argc, char * argv[] )
 
         if( scrapeFlag )
             doScrape( &inf );
-        else 
+        else
             showInfo( &inf );
     }
 

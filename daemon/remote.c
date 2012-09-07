@@ -861,8 +861,8 @@ printDetails( tr_benc * top )
                 printf( "  Name: %s\n", str );
             if( tr_bencDictFindStr( t, "hashString", &str ) )
                 printf( "  Hash: %s\n", str );
-            if( tr_bencDictFindStr( t, "magnetLink", &str ) ) 
-                printf( "  Magnet: %s\n", str ); 
+            if( tr_bencDictFindStr( t, "magnetLink", &str ) )
+                printf( "  Magnet: %s\n", str );
             printf( "\n" );
 
             printf( "TRANSFER\n" );

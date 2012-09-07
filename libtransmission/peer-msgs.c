@@ -1689,8 +1689,8 @@ updateDesiredRequestCount( tr_peermsgs * msgs )
             rate_Bps = MIN( rate_Bps, tr_torrentGetSpeedLimit_Bps( torrent, TR_PEER_TO_CLIENT ) );
 
         /* honor the session limits, if enabled */
-        if( tr_torrentUsesSessionLimits( torrent ) 
-	&&  tr_sessionGetActiveSpeedLimit_Bps( torrent->session, TR_PEER_TO_CLIENT, &irate_Bps ) )
+        if( tr_torrentUsesSessionLimits( torrent ) &&
+	    tr_sessionGetActiveSpeedLimit_Bps( torrent->session, TR_PEER_TO_CLIENT, &irate_Bps ) )
                 rate_Bps = MIN( rate_Bps, irate_Bps );
 
         /* use this desired rate to figure out how

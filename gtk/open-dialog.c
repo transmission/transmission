@@ -475,7 +475,6 @@ onOpenURLResponse( GtkDialog * dialog, int response, gpointer user_data )
     {
         handled = TRUE;
     }
-        
 
     if( handled )
         gtk_widget_destroy( GTK_WIDGET( dialog ) );
