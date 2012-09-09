@@ -45,7 +45,7 @@ BonjourController * fDefaultController = nil;
     [super dealloc];
 }
 
-- (void) startWithPort: (NSInteger) port
+- (void) startWithPort: (int) port
 {
     [self stop];
     

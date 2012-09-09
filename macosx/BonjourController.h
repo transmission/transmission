@@ -31,7 +31,7 @@
 
 + (BonjourController *) defaultController;
 
-- (void) startWithPort: (NSInteger) port;
+- (void) startWithPort: (int) port;
 - (void) stop;
 
 @end

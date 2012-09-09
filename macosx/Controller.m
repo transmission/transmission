@@ -1962,7 +1962,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         
         NSString * location = [torrent dataLocation];
         
-        NSString *notificationTitle = NSLocalizedString(@"Download Complete", "notification title");
+        NSString * notificationTitle = NSLocalizedString(@"Download Complete", "notification title");
         if ([NSApp isOnMountainLionOrBetter])
         {
             NSUserNotification * notification = [[NSUserNotificationMtLion alloc] init];
@@ -2028,7 +2028,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     
     NSString * location = [torrent dataLocation];
     
-    NSString *notificationTitle = NSLocalizedString(@"Seeding Complete", "notification title");
+    NSString * notificationTitle = NSLocalizedString(@"Seeding Complete", "notification title");
     if ([NSApp isOnMountainLionOrBetter])
     {
         NSUserNotification * notification = [[NSUserNotificationMtLion alloc] init];
@@ -2967,7 +2967,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
             case TR_PARSE_OK:
                 [self openFiles: [NSArray arrayWithObject: fullFile] addType: ADD_AUTO forcePath: nil];
                 
-                NSString *notificationTitle = NSLocalizedString(@"Torrent File Auto Added", "notification title");
+                NSString * notificationTitle = NSLocalizedString(@"Torrent File Auto Added", "notification title");
                 if ([NSApp isOnMountainLionOrBetter])
                 {
                     NSUserNotification* notification = [[NSUserNotificationMtLion alloc] init];
