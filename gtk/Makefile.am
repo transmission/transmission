@@ -119,6 +119,7 @@ transmission-resources.h: transmission.gresource.xml
 
 EXTRA_DIST = \
     $(DESKTOP_IN_FILES) \
+    transmission.gresource.xml \
     transmission.png
 
 DISTCLEANFILES = \
