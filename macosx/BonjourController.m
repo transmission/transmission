@@ -24,6 +24,8 @@
 
 #import "BonjourController.h"
 
+#define BONJOUR_SERVICE_NAME_MAX_LENGTH 63
+
 @implementation BonjourController
 
 BonjourController * fDefaultController = nil;
@@ -47,7 +49,22 @@ BonjourController * fDefaultController = nil;
 {
     [self stop];
     
-    NSString * serviceName = [NSString stringWithFormat: @"Transmission Web Interface (%@ - %@)", NSUserName(), [[NSHost currentHost] localizedName]];
+    //Attempt full length service name
+    #warning localize?
+    NSString * mainName = @"Transmission Web Interface";
+    NSString * details = [NSString stringWithFormat: @"%@ - %@", NSUserName(), [[NSHost currentHost] localizedName]];
+    NSString * serviceName = [NSString stringWithFormat: @"%@ (%@)", mainName, details];
+    
+    if ([serviceName length] > BONJOUR_SERVICE_NAME_MAX_LENGTH) {
+        //Remove Web Interface to shorten name
+        mainName = @"Transmission";
+        serviceName = [NSString stringWithFormat: @"%@ (%@)", mainName, details];
+        
+        if ([serviceName length] > BONJOUR_SERVICE_NAME_MAX_LENGTH) {
+            //Last resort is to truncate the user name and computer name
+            serviceName = [serviceName substringToIndex: BONJOUR_SERVICE_NAME_MAX_LENGTH];
+        }
+    }NSLog(@"%@", serviceName);
     
     fService = [[NSNetService alloc] initWithDomain: @"" type: @"_http._tcp." name: serviceName port: port];
     [fService setDelegate: self];
