@@ -159,6 +159,7 @@
 		A23547E311CD0B090046EAE6 /* cache.h in Headers */ = {isa = PBXBuildFile; fileRef = A23547E111CD0B090046EAE6 /* cache.h */; };
 		A2385DD40BFE06C800B24EF6 /* DragOverlayWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = A2385DD20BFE06C800B24EF6 /* DragOverlayWindow.m */; };
 		A23D5DA71320570800E422BA /* CleanupTemplate.png in Resources */ = {isa = PBXBuildFile; fileRef = A23D5DA61320570800E422BA /* CleanupTemplate.png */; };
+		A23E75D115FC1A2500E91223 /* style.css in Resources */ = {isa = PBXBuildFile; fileRef = A29304EC15D7465100B1F726 /* style.css */; };
 		A23F29A1132A447400E9A83B /* announcer-common.h in Headers */ = {isa = PBXBuildFile; fileRef = A23F299F132A447400E9A83B /* announcer-common.h */; };
 		A23F29A2132A447400E9A83B /* announcer-http.c in Sources */ = {isa = PBXBuildFile; fileRef = A23F29A0132A447400E9A83B /* announcer-http.c */; };
 		A23F4FF20D1D98AD002FCB97 /* PrefsWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = A23F4FF00D1D98AD002FCB97 /* PrefsWindow.xib */; };
@@ -773,6 +774,7 @@
 		A2385DD20BFE06C800B24EF6 /* DragOverlayWindow.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = DragOverlayWindow.m; path = macosx/DragOverlayWindow.m; sourceTree = "<group>"; };
 		A2385DD30BFE06C800B24EF6 /* DragOverlayWindow.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = DragOverlayWindow.h; path = macosx/DragOverlayWindow.h; sourceTree = "<group>"; };
 		A23D5DA61320570800E422BA /* CleanupTemplate.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = CleanupTemplate.png; path = macosx/Images/CleanupTemplate.png; sourceTree = "<group>"; };
+		A23E75D015FC1A2500E91223 /* pt */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pt; path = macosx/QuickLookPlugin/pt.lproj/Localizable.strings; sourceTree = SOURCE_ROOT; };
 		A23F299F132A447400E9A83B /* announcer-common.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "announcer-common.h"; path = "libtransmission/announcer-common.h"; sourceTree = "<group>"; };
 		A23F29A0132A447400E9A83B /* announcer-http.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "announcer-http.c"; path = "libtransmission/announcer-http.c"; sourceTree = "<group>"; };
 		A23F526D0F14395900AA02E3 /* PredicateEditorRowTemplateAny.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PredicateEditorRowTemplateAny.h; path = macosx/PredicateEditorRowTemplateAny.h; sourceTree = "<group>"; };
@@ -2560,6 +2562,7 @@
 				A29304ED15D7465100B1F726 /* style.css in Resources */,
 				A242AD9315F05D23002B3A6C /* Localizable.strings in Resources */,
 				A2D8CFC015FA177A0056E93D /* style.css in Resources */,
+				A23E75D115FC1A2500E91223 /* style.css in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3105,6 +3108,7 @@
 				A236D19615F6BD9C000C3DD4 /* it */,
 				A2FB07F115F8208300933543 /* nl */,
 				A2D8CFBF15FA177A0056E93D /* ru */,
+				A23E75D015FC1A2500E91223 /* pt */,
 			);
 			name = Localizable.strings;
 			sourceTree = "<group>";
