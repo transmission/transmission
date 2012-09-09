@@ -64,7 +64,7 @@ BonjourController * fDefaultController = nil;
             //Last resort is to truncate the user name and computer name
             serviceName = [serviceName substringToIndex: BONJOUR_SERVICE_NAME_MAX_LENGTH];
         }
-    }NSLog(@"%@", serviceName);
+    }
     
     fService = [[NSNetService alloc] initWithDomain: @"" type: @"_http._tcp." name: serviceName port: port];
     [fService setDelegate: self];
