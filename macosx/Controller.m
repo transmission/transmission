@@ -671,7 +671,8 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     fQuitting = YES;
     
     //stop the Bonjour service
-    [[BonjourController defaultController] stop];
+    if ([BonjourController defaultControllerExists])
+        [[BonjourController defaultController] stop];
 
     //stop blocklist download
     if ([BlocklistDownloader isRunning])
@@ -1472,7 +1473,6 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
                             [torrent closeRemoveTorrent: deleteData];
                     }];
                     
-
                     [fTableView beginUpdates];
                     beganUpdate = YES;
                 }

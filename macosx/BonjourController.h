@@ -30,6 +30,7 @@
 }
 
 + (BonjourController *) defaultController;
++ (BOOL) defaultControllerExists;
 
 - (void) startWithPort: (int) port;
 - (void) stop;

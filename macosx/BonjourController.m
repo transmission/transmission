@@ -39,6 +39,11 @@ BonjourController * fDefaultController = nil;
     return fDefaultController;
 }
 
++ (BOOL) defaultControllerExists
+{
+    return fDefaultController != nil;
+}
+
 - (void) dealloc
 {
     [fService release];

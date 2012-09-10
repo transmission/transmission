@@ -1050,7 +1050,10 @@
     if ([fDefaults boolForKey:@"RPC"] && [fDefaults boolForKey: @"RPCWebDiscovery"])
         [[BonjourController defaultController] startWithPort: [fDefaults integerForKey: @"RPCPort"]];
     else
-        [[BonjourController defaultController] stop];
+    {
+        if ([BonjourController defaultControllerExists])
+            [[BonjourController defaultController] stop];
+    }
 }
 
 - (void) updateRPCWhitelist
