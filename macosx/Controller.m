@@ -318,16 +318,16 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
             [unitFormatter setAllowsNonnumericFormatting: NO];
             
             [unitFormatter setAllowedUnits: NSByteCountFormatterUseKB];
-            kbString = [unitFormatter stringFromByteCount: 0];
+            kbString = [unitFormatter stringFromByteCount: 17]; //use a random value to avoid possible pluralization issues with 1 or 0
             
             [unitFormatter setAllowedUnits: NSByteCountFormatterUseMB];
-            mbString = [unitFormatter stringFromByteCount: 0];
+            mbString = [unitFormatter stringFromByteCount: 17];
             
             [unitFormatter setAllowedUnits: NSByteCountFormatterUseGB];
-            gbString = [unitFormatter stringFromByteCount: 0];
+            gbString = [unitFormatter stringFromByteCount: 17];
             
             [unitFormatter setAllowedUnits: NSByteCountFormatterUseTB];
-            tbString = [unitFormatter stringFromByteCount: 0];
+            tbString = [unitFormatter stringFromByteCount: 17];
             
             [unitFormatter release];
         }
