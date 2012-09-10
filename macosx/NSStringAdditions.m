@@ -82,7 +82,7 @@
     NSString * partialString, * fullString;
     if ([NSApp isOnMountainLionOrBetter])
     {
-        NSByteCountFormatter *fileSizeFormatter = [[NSByteCountFormatterMtLion alloc] init];
+        NSByteCountFormatter * fileSizeFormatter = [[NSByteCountFormatterMtLion alloc] init];
         
         //only show units for the partial file size if it's different than the full file size's
         [fileSizeFormatter setIncludesCount: NO];

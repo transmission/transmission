@@ -309,20 +309,50 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         tr_bencDictAddStr(&settings, TR_PREFS_KEY_SCRIPT_TORRENT_DONE_FILENAME, [[fDefaults stringForKey: @"DoneScriptPath"] UTF8String]);
         tr_bencDictAddBool(&settings, TR_PREFS_KEY_UTP_ENABLED, [fDefaults boolForKey: @"UTPGlobal"]);
         
-        tr_formatter_size_init(1000, [NSLocalizedString(@"KB", "File size - kilobytes") UTF8String],
-                                        [NSLocalizedString(@"MB", "File size - megabytes") UTF8String],
-                                        [NSLocalizedString(@"GB", "File size - gigabytes") UTF8String],
-                                        [NSLocalizedString(@"TB", "File size - terabytes") UTF8String]);
+        
+        NSString * kbString, * mbString, * gbString, * tbString;
+        if ([NSApp isOnMountainLionOrBetter])
+        {
+            NSByteCountFormatter * unitFormatter = [[NSByteCountFormatterMtLion alloc] init];
+            [unitFormatter setIncludesCount: NO];
+            [unitFormatter setAllowsNonnumericFormatting: NO];
+            
+            [unitFormatter setAllowedUnits: NSByteCountFormatterUseKB];
+            kbString = [unitFormatter stringFromByteCount: 0];
+            
+            [unitFormatter setAllowedUnits: NSByteCountFormatterUseMB];
+            mbString = [unitFormatter stringFromByteCount: 0];
+            
+            [unitFormatter setAllowedUnits: NSByteCountFormatterUseGB];
+            gbString = [unitFormatter stringFromByteCount: 0];
+            
+            [unitFormatter setAllowedUnits: NSByteCountFormatterUseTB];
+            tbString = [unitFormatter stringFromByteCount: 0];
+            
+            [unitFormatter release];
+        }
+        else
+        {
+            kbString = NSLocalizedString(@"KB", "file/memory size - kilobytes");
+            mbString = NSLocalizedString(@"MB", "file/memory size - megabytes");
+            gbString = NSLocalizedString(@"GB", "file/memory size - gigabytes");
+            tbString = NSLocalizedString(@"TB", "file/memory size - terabytes");
+        }
+        
+        tr_formatter_size_init(1000, [kbString UTF8String],
+                                        [mbString UTF8String],
+                                        [gbString UTF8String],
+                                        [tbString UTF8String]);
 
         tr_formatter_speed_init(1000, [NSLocalizedString(@"KB/s", "Transfer speed (kilobytes per second)") UTF8String],
                                         [NSLocalizedString(@"MB/s", "Transfer speed (megabytes per second)") UTF8String],
                                         [NSLocalizedString(@"GB/s", "Transfer speed (gigabytes per second)") UTF8String],
                                         [NSLocalizedString(@"TB/s", "Transfer speed (terabytes per second)") UTF8String]); //why not?
 
-        tr_formatter_mem_init(1000, [NSLocalizedString(@"KB", "Memory size - kilobytes") UTF8String],
-                                    [NSLocalizedString(@"MB", "Memory size - megabytes") UTF8String],
-                                    [NSLocalizedString(@"GB", "Memory size - gigabytes") UTF8String],
-                                    [NSLocalizedString(@"TB", "Memory size - terabytes") UTF8String]);
+        tr_formatter_mem_init(1000, [kbString UTF8String],
+                                    [mbString UTF8String],
+                                    [gbString UTF8String],
+                                    [tbString UTF8String]);
         
         const char * configDir = tr_getDefaultConfigDir("Transmission");
         fLib = tr_sessionInit("macosx", configDir, YES, &settings);
