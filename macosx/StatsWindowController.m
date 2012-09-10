@@ -63,7 +63,7 @@ tr_session * fLib = NULL;
 {
     [self updateStats];
     
-    fTimer = [NSTimer scheduledTimerWithTimeInterval: UPDATE_SECONDS target: self selector: @selector(updateStats) userInfo: nil repeats: YES];
+    fTimer = [[NSTimer scheduledTimerWithTimeInterval: UPDATE_SECONDS target: self selector: @selector(updateStats) userInfo: nil repeats: YES] retain];
     [[NSRunLoop currentRunLoop] addTimer: fTimer forMode: NSModalPanelRunLoopMode];
     [[NSRunLoop currentRunLoop] addTimer: fTimer forMode: NSEventTrackingRunLoopMode];
     
@@ -133,6 +133,8 @@ tr_session * fLib = NULL;
 - (void) windowWillClose: (id) sender
 {
     [fTimer invalidate];
+    [fTimer release];
+    fTimer = nil;
     
     [fStatsWindowInstance autorelease];
     fStatsWindowInstance = nil;

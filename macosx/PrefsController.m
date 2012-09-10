@@ -146,6 +146,7 @@
     [[NSNotificationCenter defaultCenter] removeObserver: self];
     
     [fPortStatusTimer invalidate];
+    [fPortStatusTimer release];
     if (fPortChecker)
     {
         [fPortChecker cancelProbe];
@@ -201,8 +202,7 @@
     fNatStatus = -1;
     
     [self updatePortStatus];
-    fPortStatusTimer = [NSTimer scheduledTimerWithTimeInterval: 5.0 target: self
-                        selector: @selector(updatePortStatus) userInfo: nil repeats: YES];
+    fPortStatusTimer = [[NSTimer scheduledTimerWithTimeInterval: 5.0 target: self selector: @selector(updatePortStatus) userInfo: nil repeats: YES] retain];
     
     //set peer connections
     [fPeersGlobalField setIntValue: [fDefaults integerForKey: @"PeersTotal"]];

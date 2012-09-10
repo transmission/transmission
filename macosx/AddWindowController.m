@@ -133,8 +133,8 @@
         [fLocationImageView setImage: nil];
     }
     
-    fTimer = [NSTimer scheduledTimerWithTimeInterval: UPDATE_SECONDS target: self
-                selector: @selector(updateFiles) userInfo: nil repeats: YES];
+    fTimer = [[NSTimer scheduledTimerWithTimeInterval: UPDATE_SECONDS target: self
+                selector: @selector(updateFiles) userInfo: nil repeats: YES] retain];
     [self updateFiles];
 }
 
@@ -150,6 +150,7 @@
     [[NSNotificationCenter defaultCenter] removeObserver: self];
     
     [fTimer invalidate];
+    [fTimer release];
     
     [fDestination release];
     [fTorrentFile release];
@@ -220,6 +221,7 @@
 - (BOOL) windowShouldClose: (id) window
 {
     [fTimer invalidate];
+    [fTimer release];
     fTimer = nil;
     
     [fFileController setTorrent: nil]; //avoid a crash when window tries to update
@@ -331,6 +333,7 @@
 - (void) confirmAdd
 {
     [fTimer invalidate];
+    [fTimer release];
     fTimer = nil;
     [fTorrent setGroupValue: fGroupValue];
     

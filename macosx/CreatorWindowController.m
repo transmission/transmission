@@ -206,6 +206,7 @@
         tr_metaInfoBuilderFree(fInfo);
     
     [fTimer invalidate];
+    [fTimer release];
     
     [super dealloc];
 }
@@ -551,8 +552,7 @@
     tr_makeMetaInfo(fInfo, [[fLocation path] UTF8String], trackerInfo, [fTrackers count], [[fCommentView string] UTF8String], [fPrivateCheck state] == NSOnState);
     tr_free(trackerInfo);
     
-    fTimer = [NSTimer scheduledTimerWithTimeInterval: 0.1 target: self selector: @selector(checkProgress)
-                userInfo: nil repeats: YES];
+    fTimer = [[NSTimer scheduledTimerWithTimeInterval: 0.1 target: self selector: @selector(checkProgress) userInfo: nil repeats: YES] retain];
 }
 
 - (void) checkProgress
@@ -560,6 +560,7 @@
     if (fInfo->isDone)
     {
         [fTimer invalidate];
+        [fTimer release];
         fTimer = nil;
         
         NSAlert * alert;

@@ -537,8 +537,8 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 
     //timer to update the interface every second
     [self updateUI];
-    fTimer = [NSTimer scheduledTimerWithTimeInterval: UPDATE_UI_SECONDS target: self
-                selector: @selector(updateUI) userInfo: nil repeats: YES];
+    fTimer = [[NSTimer scheduledTimerWithTimeInterval: UPDATE_UI_SECONDS target: self
+                selector: @selector(updateUI) userInfo: nil repeats: YES] retain];
     [[NSRunLoop currentRunLoop] addTimer: fTimer forMode: NSModalPanelRunLoopMode];
     [[NSRunLoop currentRunLoop] addTimer: fTimer forMode: NSEventTrackingRunLoopMode];
     
@@ -682,6 +682,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     [[NSNotificationCenter defaultCenter] removeObserver: self];
     
     [fTimer invalidate];
+    [fTimer release];
     
     if (fAutoImportTimer)
     {   

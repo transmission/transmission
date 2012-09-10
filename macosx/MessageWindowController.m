@@ -139,6 +139,7 @@
     [[NSNotificationCenter defaultCenter] removeObserver: self];
     
     [fTimer invalidate];
+    [fTimer release];
     [fLock release];
     
     [fMessages release];
@@ -153,7 +154,7 @@
 {
     if (!fTimer)
     {
-        fTimer = [NSTimer scheduledTimerWithTimeInterval: UPDATE_SECONDS target: self selector: @selector(updateLog:) userInfo: nil repeats: YES];
+        fTimer = [[NSTimer scheduledTimerWithTimeInterval: UPDATE_SECONDS target: self selector: @selector(updateLog:) userInfo: nil repeats: YES] retain];
         [self updateLog: nil];
     }
 }
@@ -161,6 +162,7 @@
 - (void) windowWillClose: (id)sender
 {
     [fTimer invalidate];
+    [fTimer release];
     fTimer = nil;
 }
 
@@ -175,7 +177,8 @@
 - (void) window: (NSWindow *) window didDecodeRestorableState: (NSCoder *) coder
 {
     [fTimer invalidate];
-    fTimer = [NSTimer scheduledTimerWithTimeInterval: UPDATE_SECONDS target: self selector: @selector(updateLog:) userInfo: nil repeats: YES];
+    [fTimer release];
+    fTimer = [[NSTimer scheduledTimerWithTimeInterval: UPDATE_SECONDS target: self selector: @selector(updateLog:) userInfo: nil repeats: YES] retain];
     [self updateLog: nil];
 }
 

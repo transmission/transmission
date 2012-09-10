@@ -69,8 +69,7 @@ BlocklistScheduler * fScheduler = nil;
     
     NSDate * useDate = lastUpdateDate ? [lastUpdateDate laterDate: closeDate] : closeDate;
     
-    fTimer = [[NSTimer alloc] initWithFireDate: useDate interval: 0 target: self selector: @selector(runUpdater)
-                userInfo: nil repeats: NO];
+    fTimer = [[NSTimer alloc] initWithFireDate: useDate interval: 0 target: self selector: @selector(runUpdater) userInfo: nil repeats: NO];
     
     //current run loop usually means a second update won't work
     NSRunLoop * loop = [NSRunLoop mainRunLoop];
@@ -82,6 +81,7 @@ BlocklistScheduler * fScheduler = nil;
 - (void) cancelSchedule
 {
     [fTimer invalidate];
+    [fTimer release];
     fTimer = nil;
 }
 
@@ -91,6 +91,7 @@ BlocklistScheduler * fScheduler = nil;
 
 - (void) runUpdater
 {
+    [fTimer release];
     fTimer = nil;
     [BlocklistDownloader downloader];
 }

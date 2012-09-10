@@ -45,8 +45,7 @@
         
         fStatus = PORT_STATUS_CHECKING;
         
-        fTimer = [NSTimer scheduledTimerWithTimeInterval: CHECK_FIRE target: self selector: @selector(startProbe:)
-                    userInfo: [NSNumber numberWithInteger: portNumber] repeats: NO];
+        fTimer = [[NSTimer scheduledTimerWithTimeInterval: CHECK_FIRE target: self selector: @selector(startProbe:) userInfo: [NSNumber numberWithInteger: portNumber] repeats: NO] retain];
         if (!delay)
             [fTimer fire];
     }
@@ -57,6 +56,7 @@
 - (void) dealloc
 {
     [fTimer invalidate];
+    [fTimer release];
     
     [fConnection release];
     [fPortProbeData release];
@@ -71,6 +71,7 @@
 - (void) cancelProbe
 {
     [fTimer invalidate];
+    [fTimer release];
     fTimer = nil;
     
     [fConnection cancel];
@@ -124,6 +125,7 @@
 
 - (void) startProbe: (NSTimer *) timer
 {
+    [fTimer release];
     fTimer = nil;
     
     NSURLRequest * portProbeRequest = [NSURLRequest requestWithURL: [NSURL URLWithString: CHECKER_URL([[timer userInfo] integerValue])]
