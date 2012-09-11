@@ -84,14 +84,21 @@
     {
         NSByteCountFormatter * fileSizeFormatter = [[NSByteCountFormatterMtLion alloc] init];
         
-        //only show units for the partial file size if it's different than the full file size's
-        [fileSizeFormatter setIncludesCount: NO];
-        const BOOL partialUnitsDifferent = ![[fileSizeFormatter stringFromByteCount: partialSize] isEqualToString: [fileSizeFormatter stringFromByteCount: fullSize]];
-        
-        [fileSizeFormatter setIncludesCount: YES];
         fullString = [fileSizeFormatter stringFromByteCount: fullSize];
         
-        [fileSizeFormatter setIncludesUnit: partialUnitsDifferent];
+        //figure out the magniture of the two, since we can't rely on comparing the units because of localization and pluralization issues (for example, "1 byte of 2 bytes")
+        BOOL partialUnitsSame;
+        if (partialSize == 0)
+            partialUnitsSame = YES; //we want to just show "0" when we have no partial data, so always set to the same units
+        else
+        {
+            //we have to catch 0 with a special case, so might as well avoid the math for all of magnitude 0
+            const unsigned int magnitudePartial = partialSize >= 1000 ? log(partialSize)/log(1000) : 0;
+            const unsigned int magnitudeFull = fullSize >= 1000 ? log(fullSize)/log(1000) : 0;
+            partialUnitsSame = magnitudePartial == magnitudeFull;
+        }
+        
+        [fileSizeFormatter setIncludesUnit: !partialUnitsSame];
         partialString = [fileSizeFormatter stringFromByteCount: partialSize];
         
         [fileSizeFormatter release];

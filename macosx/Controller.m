@@ -318,7 +318,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
             [unitFormatter setAllowsNonnumericFormatting: NO];
             
             [unitFormatter setAllowedUnits: NSByteCountFormatterUseKB];
-            kbString = [unitFormatter stringFromByteCount: 17]; //use a random value to avoid possible pluralization issues with 1 or 0
+            kbString = [unitFormatter stringFromByteCount: 17]; //use a random value to avoid possible pluralization issues with 1 or 0 (an example is if we use 1 for bytes, we'd get "byte" when we'd want "bytes" for the generic libtransmission value at least)
             
             [unitFormatter setAllowedUnits: NSByteCountFormatterUseMB];
             mbString = [unitFormatter stringFromByteCount: 17];
