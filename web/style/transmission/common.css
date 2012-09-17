@@ -156,7 +156,8 @@ div#torrent_container {
   left: 0px;
   padding: 0px;
   margin: 0px;
-  overflow: auto; }
+  overflow: auto;
+  -webkit-overflow-scrolling: touch; }
 
 ul.torrent_list {
   width: 100%;
@@ -350,6 +351,7 @@ ul.torrent_list {
 ***/
 div#torrent_inspector {
   overflow: auto;
+  -webkit-overflow-scrolling: touch;
   text-align: left;
   padding: 15px;
   top: 68px;
