@@ -1321,7 +1321,7 @@ useAltSpeed( tr_session * s, struct tr_turtle_info * t,
 }
 
 /**
- * return whether turtle should be on/off according to the scheduler
+ * @return whether turtle should be on/off according to the scheduler
  */
 static bool
 getInTurtleTime( const struct tr_turtle_info * t )
