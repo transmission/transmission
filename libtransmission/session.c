@@ -1322,7 +1322,6 @@ useAltSpeed( tr_session * s, struct tr_turtle_info * t,
 
 /**
  * @param enabled whether turtle should be on/off according to the scheduler
- * @param changed whether that's different from the previous minute
  */
 static void
 testTurtleTime( const struct tr_turtle_info * t, bool * enabled )
