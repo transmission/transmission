@@ -1321,12 +1321,11 @@ useAltSpeed( tr_session * s, struct tr_turtle_info * t,
 }
 
 /**
- * @param enabled whether turtle should be on/off according to the scheduler
+ * return whether turtle should be on/off according to the scheduler
  */
-static void
-testTurtleTime( const struct tr_turtle_info * t, bool * enabled )
+static bool
+getInTurtleTime( const struct tr_turtle_info * t )
 {
-    bool e;
     struct tm tm;
     size_t minute_of_the_week;
     const time_t now = tr_time( );
@@ -1339,9 +1338,7 @@ testTurtleTime( const struct tr_turtle_info * t, bool * enabled )
     if( minute_of_the_week >= MINUTES_PER_WEEK ) /* leap minutes? */
         minute_of_the_week = MINUTES_PER_WEEK - 1;
 
-    e = tr_bitfieldHas( &t->minutes, minute_of_the_week );
-    if( enabled != NULL )
-        *enabled = e;
+    return tr_bitfieldHas( &t->minutes, minute_of_the_week );
 }
 
 static inline tr_auto_switch_state_t
@@ -1359,7 +1356,7 @@ turtleCheckClock( tr_session * s, struct tr_turtle_info * t )
 
     assert( t->isClockEnabled );
 
-    testTurtleTime( t, &enabled );
+    enabled = getInTurtleTime( t );
     newAutoTurtleState = autoSwitchState( enabled );
     alreadySwitched = ( t->autoTurtleState == newAutoTurtleState );
 
@@ -1386,7 +1383,7 @@ turtleBootstrap( tr_session * session, struct tr_turtle_info * turtle )
 
     if( turtle->isClockEnabled )
     {
-        testTurtleTime( turtle, &turtle->isEnabled );
+        turtle->isEnabled = getInTurtleTime( turtle );
         turtle->autoTurtleState = autoSwitchState( turtle->isEnabled );
     }
 
@@ -1495,8 +1492,7 @@ userPokedTheClock( tr_session * s, struct tr_turtle_info * t )
 
     if( t->isClockEnabled )
     {
-        bool enabled;
-        testTurtleTime( t, &enabled );
+        const bool enabled = getInTurtleTime( t );
         useAltSpeed( s, t, enabled, true );
         t->autoTurtleState = autoSwitchState( enabled );
     }
