@@ -1325,9 +1325,7 @@ useAltSpeed( tr_session * s, struct tr_turtle_info * t,
  * @param changed whether that's different from the previous minute
  */
 static void
-testTurtleTime( const struct tr_turtle_info * t,
-                bool * enabled,
-                bool * changed )
+testTurtleTime( const struct tr_turtle_info * t, bool * enabled )
 {
     bool e;
     struct tm tm;
@@ -1345,28 +1343,31 @@ testTurtleTime( const struct tr_turtle_info * t,
     e = tr_bitfieldHas( &t->minutes, minute_of_the_week );
     if( enabled != NULL )
         *enabled = e;
+}
 
-    if( changed != NULL )
-    {
-        const size_t prev = minute_of_the_week > 0 ? minute_of_the_week - 1
-                                                   : MINUTES_PER_WEEK - 1;
-        *changed = e != tr_bitfieldHas( &t->minutes, prev );
-    }
+static inline tr_auto_switch_state_t
+autoSwitchState( bool enabled )
+{
+    return enabled ? TR_AUTO_SWITCH_ON : TR_AUTO_SWITCH_OFF;
 }
 
 static void
 turtleCheckClock( tr_session * s, struct tr_turtle_info * t )
 {
     bool enabled;
-    bool changed;
+    bool alreadySwitched;
+    tr_auto_switch_state_t newAutoTurtleState;
 
     assert( t->isClockEnabled );
 
-    testTurtleTime( t, &enabled, &changed );
+    testTurtleTime( t, &enabled );
+    newAutoTurtleState = autoSwitchState( enabled );
+    alreadySwitched = ( t->autoTurtleState == newAutoTurtleState );
 
-    if( changed )
+    if( !alreadySwitched )
     {
         tr_inf( "Time to turn %s turtle mode!", (enabled?"on":"off") );
+        t->autoTurtleState = newAutoTurtleState;
         useAltSpeed( s, t, enabled, false );
     }
 }
@@ -1378,15 +1379,20 @@ static void
 turtleBootstrap( tr_session * session, struct tr_turtle_info * turtle )
 {
     turtle->changedByUser = false;
+    turtle->autoTurtleState = TR_AUTO_SWITCH_UNUSED;
 
     tr_bitfieldConstruct( &turtle->minutes, MINUTES_PER_WEEK );
 
     turtleUpdateTable( turtle );
 
     if( turtle->isClockEnabled )
-        testTurtleTime( turtle, &turtle->isEnabled, NULL );
+    {
+        testTurtleTime( turtle, &turtle->isEnabled );
+        turtle->autoTurtleState = autoSwitchState( turtle->isEnabled );
+    }
 
     altSpeedToggled( session );
+
 }
 
 /***
@@ -1484,13 +1490,16 @@ userPokedTheClock( tr_session * s, struct tr_turtle_info * t )
 {
     tr_dbg( "Refreshing the turtle mode clock due to user changes" );
 
+    t->autoTurtleState = TR_AUTO_SWITCH_UNUSED;
+
     turtleUpdateTable( t );
 
     if( t->isClockEnabled )
     {
-        bool enabled, changed;
-        testTurtleTime( t, &enabled, &changed );
+        bool enabled;
+        testTurtleTime( t, &enabled );
         useAltSpeed( s, t, enabled, true );
+        t->autoTurtleState = autoSwitchState( enabled );
     }
 }
 

@@ -34,6 +34,12 @@
 
 typedef enum { TR_NET_OK, TR_NET_ERROR, TR_NET_WAIT } tr_tristate_t;
 
+typedef enum {
+    TR_AUTO_SWITCH_UNUSED,
+    TR_AUTO_SWITCH_ON,
+    TR_AUTO_SWITCH_OFF,
+} tr_auto_switch_state_t;
+
 enum
 {
   PEER_ID_LEN = 20
@@ -87,6 +93,9 @@ struct tr_turtle_info
      * Each bit's value indicates whether the scheduler wants turtle
      * limits on or off at that given minute in the week. */
     tr_bitfield minutes;
+
+    /* recent action that was done by turtle's automatic switch */
+    tr_auto_switch_state_t autoTurtleState;
 };
 
 /** @brief handle to an active libtransmission session */
