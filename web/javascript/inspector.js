@@ -618,10 +618,10 @@ function Inspector(controller) {
             $($('.inspector_torrent_file_list_entry_name',$('#'+parentid))[0]).click(function() { $($(this).parent()).children('li').toggle(); })
 
             sum = 0
-            matches = $('#'+parentid).children('li').text().match(/\([^\)]+\)/g)
+            matches = $('#'+parentid).children('li').text().match(/\([^\.]+\)/g)
             if (matches == null) { continue; }
             matches.map(function(word) {return parseFloat(word.slice(1,-2)) }).map(function(perc) {sum+=perc})
-            count = $('#'+parentid).children('li').text().match(/\([^\)]+\)/g).length
+            count = $('#'+parentid).children('li').text().match(/\([^\.]+\)/g).length
             totalcomplete = (sum/count).toFixed(1)
 
             $($('.inspector_torrent_file_list_entry_progress',$('#'+parentid))[0]).text('('+totalcomplete+'%)')
