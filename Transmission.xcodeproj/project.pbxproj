@@ -901,6 +901,7 @@
 		A279E40A11C8369100D48B1F /* zh_CN */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = zh_CN; path = macosx/zh_CN.lproj/InfoOptionsView.xib; sourceTree = "<group>"; };
 		A27F0F310E19AD9800B2DB97 /* TorrentGroup.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TorrentGroup.h; path = macosx/TorrentGroup.h; sourceTree = "<group>"; };
 		A27F0F320E19AD9800B2DB97 /* TorrentGroup.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TorrentGroup.m; path = macosx/TorrentGroup.m; sourceTree = "<group>"; };
+		A27F4483160B4AF50048CD4C /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = macosx/QuickLookPlugin/fr.lproj/Localizable.strings; sourceTree = SOURCE_ROOT; };
 		A28393F910D54A35005C0240 /* de */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = de; path = macosx/de.lproj/AddWindow.xib; sourceTree = "<group>"; };
 		A28393FA10D54A4B005C0240 /* de */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = de; path = macosx/de.lproj/Creator.xib; sourceTree = "<group>"; };
 		A28393FC10D54A66005C0240 /* de */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = de; path = macosx/de.lproj/GroupRules.xib; sourceTree = "<group>"; };
@@ -3109,6 +3110,7 @@
 				A2FB07F115F8208300933543 /* nl */,
 				A2D8CFBF15FA177A0056E93D /* ru */,
 				A23E75D015FC1A2500E91223 /* pt */,
+				A27F4483160B4AF50048CD4C /* fr */,
 			);
 			name = Localizable.strings;
 			sourceTree = "<group>";
