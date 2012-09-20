@@ -274,7 +274,7 @@ getStatusString( GString           * gstr,
                 g_string_append_printf( gstr,
                     ngettext( "Downloading metadata from %1$'d peer (%2$d%% done)",
                               "Downloading metadata from %1$'d peers (%2$d%% done)",
-                              st->peersConnected + st->peersConnected ),
+                              st->peersConnected + st->webseedsSendingToUs ),
                     st->peersConnected + st->webseedsSendingToUs,
                     (int)(100.0*st->metadataPercentComplete) );
             }
