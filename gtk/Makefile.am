@@ -1,3 +1,5 @@
+BUILT_SOURCES =
+CLEANFILES =
 SUBDIRS = icons
 
 if TR_UNSTABLE
@@ -110,41 +112,37 @@ icondir = $(datadir)/pixmaps
 UI_FILES = transmission-ui.xml 
 
 transmission-resources.c: transmission.gresource.xml $(UI_FILES) 
-	glib-compile-resources --target=$@ --sourcedir=$(srcdir) \
+	$(AM_V_GEN)glib-compile-resources --target=$@ --sourcedir=$(srcdir) \
 	  --generate-source --c-name transmission $< 
 
-transmission-resources.h: transmission.gresource.xml 
-	glib-compile-resources --target=$@ --sourcedir=$(srcdir) \
+transmission-resources.h: transmission.gresource.xml $(UI_FILES) 
+	$(AM_V_GEN)glib-compile-resources --target=$@ --sourcedir=$(srcdir) \
 	  --generate-header --c-name transmission $< 
 
+CLEANFILES += \
+	transmission-resources.c \
+	transmission-resources.h
+BUILT_SOURCES += \
+	transmission-resources.c \
+	transmission-resources.h
+
 EXTRA_DIST = \
-    $(DESKTOP_IN_FILES) \
-    $(UI_FILES) \
-    transmission.gresource.xml \
-    transmission.png
+	$(DESKTOP_IN_FILES) \
+	$(UI_FILES) \
+	transmission.gresource.xml \
+	transmission.png
 
 DISTCLEANFILES = \
-    transmission-gtk.desktop
+	transmission-gtk.desktop
 
 if WIN32
 
 transmission.res: transmission.rc
 	$(WINDRES) -J rc -i transmission.rc -O coff -o transmission.res
 
-BUILT_SOURCES = \
-	setransmission.res \
-	transmission-resources.c \
-	transmission-resources.h
-
-CLEANFILES = \
-	setransmission.res \
-	transmission-resources.c \
-	transmission-resources.h
-
-transmission_gtk_LDADD += \
-	transmission.res
-
-transmission_gtk_LDFLAGS = \
-	-mwindows
+BUILT_SOURCES += transmission.res
+CLEANFILES += transmission.res
+transmission_gtk_LDADD += transmission.res
+transmission_gtk_LDFLAGS = -mwindows
 
 endif
