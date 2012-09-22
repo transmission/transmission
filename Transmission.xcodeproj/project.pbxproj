@@ -911,6 +911,7 @@
 		A283940110D54AA7005C0240 /* de */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = de; path = macosx/de.lproj/PrefsWindow.xib; sourceTree = "<group>"; };
 		A284214212DA663E00FBDDBB /* tr-udp.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "tr-udp.c"; path = "libtransmission/tr-udp.c"; sourceTree = "<group>"; };
 		A284214312DA663E00FBDDBB /* tr-udp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "tr-udp.h"; path = "libtransmission/tr-udp.h"; sourceTree = "<group>"; };
+		A28B3A2D160E1BC900D4A2BC /* pt_PT */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pt_PT; path = macosx/QuickLookPlugin/pt_PT.lproj/Localizable.strings; sourceTree = SOURCE_ROOT; };
 		A28E1DDF0CFFD8EC00E16385 /* ButtonToolbarItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ButtonToolbarItem.h; path = macosx/ButtonToolbarItem.h; sourceTree = "<group>"; };
 		A28F4F750E085BDC003A3882 /* ColorTextField.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ColorTextField.h; path = macosx/ColorTextField.h; sourceTree = "<group>"; };
 		A28F4F760E085BDC003A3882 /* ColorTextField.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ColorTextField.m; path = macosx/ColorTextField.m; sourceTree = "<group>"; };
@@ -2373,6 +2374,7 @@
 				zh_CN,
 				pt_PT,
 				da,
+				"pt-PT",
 			);
 			mainGroup = 29B97314FDCFA39411CA2CEA /* Transmission */;
 			projectDirPath = "";
@@ -3111,6 +3113,7 @@
 				A2D8CFBF15FA177A0056E93D /* ru */,
 				A23E75D015FC1A2500E91223 /* pt */,
 				A27F4483160B4AF50048CD4C /* fr */,
+				A28B3A2D160E1BC900D4A2BC /* pt_PT */,
 			);
 			name = Localizable.strings;
 			sourceTree = "<group>";
