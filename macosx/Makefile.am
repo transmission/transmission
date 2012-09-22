@@ -160,7 +160,9 @@ EXTRA_DIST = \
     TrackerTableView.h \
     TrackerTableView.m \
     URLSheetWindowController.h \
-    URLSheetWindowController.m
+    URLSheetWindowController.m \
+    WebSeedTableView.h \
+    WebSeedTableView.m
 
 dist-hook:
 	rm -rf `find $(distdir)/ -type d -name .svn`
