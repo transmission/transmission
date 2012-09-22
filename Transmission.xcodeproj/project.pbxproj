@@ -890,15 +890,10 @@
 		A27653A714369C5C009D3CCF /* libcrypto.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libcrypto.dylib; path = usr/lib/libcrypto.dylib; sourceTree = SDKROOT; };
 		A2768AAE140DCB6A00F82413 /* pt */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = pt; path = macosx/pt.lproj/GlobalOptionsPopover.xib; sourceTree = "<group>"; };
 		A277DA090C693D9C00DA2CD4 /* ActionOn.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = ActionOn.png; path = macosx/Images/ActionOn.png; sourceTree = "<group>"; };
-		A2794147140B3E1E00554E76 /* zh_CN */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = zh_CN; path = macosx/zh_CN.lproj/GlobalOptionsPopover.xib; sourceTree = "<group>"; };
 		A279E3D011C3BDC300D48B1F /* nl */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = nl; path = macosx/nl.lproj/AddMagnetWindow.xib; sourceTree = "<group>"; };
 		A279E3D111C3BDC300D48B1F /* nl */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = nl; path = macosx/nl.lproj/InfoActivityView.xib; sourceTree = "<group>"; };
 		A279E3D211C3BDC300D48B1F /* nl */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = nl; path = macosx/nl.lproj/InfoGeneralView.xib; sourceTree = "<group>"; };
 		A279E3D311C3BDC300D48B1F /* nl */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = nl; path = macosx/nl.lproj/InfoOptionsView.xib; sourceTree = "<group>"; };
-		A279E40711C8369100D48B1F /* zh_CN */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = zh_CN; path = macosx/zh_CN.lproj/AddMagnetWindow.xib; sourceTree = "<group>"; };
-		A279E40811C8369100D48B1F /* zh_CN */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = zh_CN; path = macosx/zh_CN.lproj/InfoActivityView.xib; sourceTree = "<group>"; };
-		A279E40911C8369100D48B1F /* zh_CN */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = zh_CN; path = macosx/zh_CN.lproj/InfoGeneralView.xib; sourceTree = "<group>"; };
-		A279E40A11C8369100D48B1F /* zh_CN */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = zh_CN; path = macosx/zh_CN.lproj/InfoOptionsView.xib; sourceTree = "<group>"; };
 		A27F0F310E19AD9800B2DB97 /* TorrentGroup.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TorrentGroup.h; path = macosx/TorrentGroup.h; sourceTree = "<group>"; };
 		A27F0F320E19AD9800B2DB97 /* TorrentGroup.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TorrentGroup.m; path = macosx/TorrentGroup.m; sourceTree = "<group>"; };
 		A27F4483160B4AF50048CD4C /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = macosx/QuickLookPlugin/fr.lproj/Localizable.strings; sourceTree = SOURCE_ROOT; };
@@ -1007,13 +1002,6 @@
 		A2DA36270CBC674900C2ED41 /* InfoActivity.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = InfoActivity.png; path = macosx/Images/InfoActivity.png; sourceTree = "<group>"; };
 		A2DA36280CBC674900C2ED41 /* InfoFiles.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = InfoFiles.png; path = macosx/Images/InfoFiles.png; sourceTree = "<group>"; };
 		A2DA36290CBC674900C2ED41 /* InfoPeers.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = InfoPeers.png; path = macosx/Images/InfoPeers.png; sourceTree = "<group>"; };
-		A2DC1E4510E6731000DFB18C /* zh_CN */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = zh_CN; path = macosx/zh_CN.lproj/AddWindow.xib; sourceTree = "<group>"; };
-		A2DC1E4610E6731000DFB18C /* zh_CN */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = zh_CN; path = macosx/zh_CN.lproj/Creator.xib; sourceTree = "<group>"; };
-		A2DC1E4710E6731000DFB18C /* zh_CN */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = zh_CN; path = macosx/zh_CN.lproj/GroupRules.xib; sourceTree = "<group>"; };
-		A2DC1E4810E6731000DFB18C /* zh_CN */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = zh_CN; path = macosx/zh_CN.lproj/InfoPlist.strings; sourceTree = "<group>"; };
-		A2DC1E4A10E6731000DFB18C /* zh_CN */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = zh_CN; path = macosx/zh_CN.lproj/Localizable.strings; sourceTree = "<group>"; };
-		A2DC1E4B10E6731000DFB18C /* zh_CN */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = zh_CN; path = macosx/zh_CN.lproj/MainMenu.xib; sourceTree = "<group>"; };
-		A2DC1E4C10E6731000DFB18C /* zh_CN */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = zh_CN; path = macosx/zh_CN.lproj/PrefsWindow.xib; sourceTree = "<group>"; };
 		A2DC494715842ABD00758FF1 /* ActionHover@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "ActionHover@2x.png"; path = "macosx/Images/ActionHover@2x.png"; sourceTree = "<group>"; };
 		A2DC494915842BE900758FF1 /* ActionOn@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "ActionOn@2x.png"; path = "macosx/Images/ActionOn@2x.png"; sourceTree = "<group>"; };
 		A2DC494B15842BF700758FF1 /* Bandwidth@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Bandwidth@2x.png"; path = "macosx/Images/Bandwidth@2x.png"; sourceTree = "<group>"; };
@@ -2932,7 +2920,6 @@
 				A202FF5D0DDA9275009938FF /* it */,
 				A251A65E0F9E8FDA004F5973 /* pt */,
 				A28393FD10D54A79005C0240 /* de */,
-				A2DC1E4810E6731000DFB18C /* zh_CN */,
 				A2613F9811B3383200472893 /* pt_PT */,
 				A263C5671560A4210082A3D1 /* da */,
 			);
@@ -2951,7 +2938,6 @@
 				A2613F9511B3383200472893 /* pt_PT */,
 				A2B9F90411BD10BE003FC8CA /* fr */,
 				A279E3D111C3BDC300D48B1F /* nl */,
-				A279E40811C8369100D48B1F /* zh_CN */,
 				A263C56E1560A4470082A3D1 /* da */,
 			);
 			name = InfoActivityView.xib;
@@ -2969,7 +2955,6 @@
 				A2613F9611B3383200472893 /* pt_PT */,
 				A2B9F90511BD10BE003FC8CA /* fr */,
 				A279E3D211C3BDC300D48B1F /* nl */,
-				A279E40911C8369100D48B1F /* zh_CN */,
 				A263C56D1560A4420082A3D1 /* da */,
 			);
 			name = InfoGeneralView.xib;
@@ -2987,7 +2972,6 @@
 				A2613F9711B3383200472893 /* pt_PT */,
 				A2B9F90611BD10BE003FC8CA /* fr */,
 				A279E3D311C3BDC300D48B1F /* nl */,
-				A279E40A11C8369100D48B1F /* zh_CN */,
 				A263C56F1560A44B0082A3D1 /* da */,
 			);
 			name = InfoOptionsView.xib;
@@ -3004,7 +2988,6 @@
 				A22CF7CC0FA5E2DB0009BD3E /* nl */,
 				A22CF7D10FA6A19B0009BD3E /* ru */,
 				A28393FC10D54A66005C0240 /* de */,
-				A2DC1E4710E6731000DFB18C /* zh_CN */,
 				A2613F9411B3383200472893 /* pt_PT */,
 				A263C56C1560A43E0082A3D1 /* da */,
 			);
@@ -3023,7 +3006,6 @@
 				A2613F9111B3383200472893 /* pt_PT */,
 				A2B9F90311BD10BE003FC8CA /* fr */,
 				A279E3D011C3BDC300D48B1F /* nl */,
-				A279E40711C8369100D48B1F /* zh_CN */,
 				A263C56B1560A43A0082A3D1 /* da */,
 			);
 			name = AddMagnetWindow.xib;
@@ -3033,7 +3015,6 @@
 			isa = PBXVariantGroup;
 			children = (
 				A220AF7A13D7CC460035C512 /* en */,
-				A2794147140B3E1E00554E76 /* zh_CN */,
 				A2768AAE140DCB6A00F82413 /* pt */,
 				A292C9E01413BA5F00EF710F /* es */,
 				A292C9E2141593DA00EF710F /* de */,
@@ -3058,7 +3039,6 @@
 				A291477F0E195A0C00F60CB2 /* en */,
 				A251A6620F9E8FED004F5973 /* pt */,
 				A28393FF10D54A96005C0240 /* de */,
-				A2DC1E4A10E6731000DFB18C /* zh_CN */,
 				A2613F9911B3383200472893 /* pt_PT */,
 				A263C5661560A3CF0082A3D1 /* da */,
 			);
@@ -3076,7 +3056,6 @@
 				A202FF610DDA9275009938FF /* it */,
 				A251A65D0F9E8FD5004F5973 /* pt */,
 				A283940110D54AA7005C0240 /* de */,
-				A2DC1E4C10E6731000DFB18C /* zh_CN */,
 				A2613F9B11B3383200472893 /* pt_PT */,
 				A263C5681560A4290082A3D1 /* da */,
 			);
@@ -3094,7 +3073,6 @@
 				A202FF600DDA9275009938FF /* it */,
 				A251A65C0F9E8FD5004F5973 /* pt */,
 				A283940010D54A9D005C0240 /* de */,
-				A2DC1E4B10E6731000DFB18C /* zh_CN */,
 				A2613F9A11B3383200472893 /* pt_PT */,
 				A263C5651560A35B0082A3D1 /* da */,
 			);
@@ -3129,7 +3107,6 @@
 				A202FF5B0DDA9275009938FF /* it */,
 				A251A6590F9E8FBF004F5973 /* pt */,
 				A28393F910D54A35005C0240 /* de */,
-				A2DC1E4510E6731000DFB18C /* zh_CN */,
 				A2613F9211B3383200472893 /* pt_PT */,
 				A263C56A1560A4370082A3D1 /* da */,
 			);
@@ -3147,7 +3124,6 @@
 				A202FF5C0DDA9275009938FF /* it */,
 				A251A65A0F9E8FCA004F5973 /* pt */,
 				A28393FA10D54A4B005C0240 /* de */,
-				A2DC1E4610E6731000DFB18C /* zh_CN */,
 				A2613F9311B3383200472893 /* pt_PT */,
 				A263C5691560A4310082A3D1 /* da */,
 			);
