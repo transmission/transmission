@@ -19,7 +19,9 @@ EXTRA_DIST = \
     sparkle_dsa_pub.pem \
     UKKQueue \
     TransmissionHelp \
+    QuickLookPlugin \
     Images \
+    da.lproj \
     de.lproj \
     en.lproj \
     es.lproj \
@@ -29,7 +31,6 @@ EXTRA_DIST = \
     pt.lproj \
     pt_PT.lproj \
     ru.lproj \
-    zh_CN.lproj \
     AboutWindowController.h \
     AboutWindowController.m \
     AddMagnetWindowController.h \
