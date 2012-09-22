@@ -171,7 +171,7 @@ dist-hook:
 # Use Xcode do make the actual build
 all:
 	@(cd .. && xcodebuild -alltargets -activeconfiguration | grep -v "^$$")
-clean:
+clean-local:
 	@(cd .. && xcodebuild -alltargets -activeconfiguration clean | grep -v "^$$")
 
 define PACKAGE_RULE1
