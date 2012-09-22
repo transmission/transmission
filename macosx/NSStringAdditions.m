@@ -92,9 +92,8 @@
             partialUnitsSame = YES; //we want to just show "0" when we have no partial data, so always set to the same units
         else
         {
-            //we have to catch 0 with a special case, so might as well avoid the math for all of magnitude 0
-            const unsigned int magnitudePartial = partialSize >= 1000 ? log(partialSize)/log(1000) : 0;
-            const unsigned int magnitudeFull = fullSize >= 1000 ? log(fullSize)/log(1000) : 0;
+            const unsigned int magnitudePartial = log(partialSize)/log(1000);
+            const unsigned int magnitudeFull = fullSize < 1000 ? 0 : log(fullSize)/log(1000); //we have to catch 0 with a special case, so might as well avoid the math for all of magnitude 0
             partialUnitsSame = magnitudePartial == magnitudeFull;
         }
         
