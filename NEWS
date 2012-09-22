@@ -1,6 +1,31 @@
+=== Transmission 2.70 (2012/mm/dd) ===
+[http://trac.transmissionbt.com/query?milestone=2.70&group=component&order=severity All tickets closed by this release]
+==== All Platforms ====
+  * Improved speed with the µTP protocol
+  * Fix bugs with the speed limit scheduler
+  * Fix crasher with magnet links
+==== Mac ====
+  * Notification Center support on Mountain Lion
+  * Torrent files can be previewed with Quick Look in the Finder
+  * Add an option to remove transfers when seeding completes
+  * Fix displaying the Web Client with Bonjour
+  * Fix bugs with Time Machine exclusions
+  * Other minor interface tweaks and bug fixes
+==== GTK+ ====
+  * Require GTK+ 3.4
+==== Qt ====
+  * Control speed limit from the icon tray
+  * Improved behavior when clicking on torrents in the torrent list
+  * Fix bug where torrent files were not deleted
+  * Fix bug with unicode characters in the default location
+==== Web Client ====
+  * The file inspector tab displays files nested under directories
+  * Improved scrolling on iPad
+  * Fix incorrectly rendered characters
+  * Fix bug involving attempts to post notifications without permission
+
 === Transmission 2.61 (2012/07/23) ===
 [http://trac.transmissionbt.com/query?milestone=2.61&group=component&order=severity All tickets closed by this release]
-==== All Platforms ====
 ==== Mac ====
   * Fix crash when creating a torrent file on Lion or newer
 ==== GTK+ ====
@@ -30,11 +55,11 @@
   * Retina graphics
   * Add a filter and select all/deselect all buttons to the add window
   * Support Lion's window restoration for several windows
+==== Qt ====
+  * Add Basque translation
 ==== Web Client ====
   * Notification of downloading and seeding completion (requires browser support of notifications)
   * Re-add select all and deselect all buttons to the file inspector tab
-==== Qt ====
-  * Add Basque translation
 
 === Transmission 2.52 (2012/05/19) ===
 [http://trac.transmissionbt.com/query?milestone=2.52&group=component&order=severity All tickets closed by this release]
