@@ -168,11 +168,13 @@ dist-hook:
 	rm -rf `find $(distdir)/ -type d -name .svn`
 	rm -rf `find $(distdir)/ -type d -name .deps`
 
+if BUILD_MAC
 # Use Xcode do make the actual build
 all:
 	@(cd .. && xcodebuild -alltargets -activeconfiguration | grep -v "^$$")
 clean-local:
 	@(cd .. && xcodebuild -alltargets -activeconfiguration clean | grep -v "^$$")
+endif
 
 define PACKAGE_RULE1
 	$(RM) tmp "Transmission $(VERSION_PACKAGE)" \
