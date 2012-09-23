@@ -562,7 +562,7 @@ function Inspector(controller) {
 
         tor = torrents[0];
         n = tor ? tor.getFileCount() : 0;
-        if (tor!=data.file_torrent || n==data.file_torrent_n) {
+        if (tor!=data.file_torrent || n!=data.file_torrent_n) {
             // rebuild the file list...
             clearFileList();
             data.file_torrent = tor;
