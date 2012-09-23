@@ -5,14 +5,15 @@
  * http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
  */
 
-function FileRow(torrent, i)
+function FileRow(torrent, depth, name, indices, even)
 {
 	var fields = {
 		have: 0,
-		index: 0,
-		isDirty: false,
+		indices: [],
 		isWanted: true,
-		priority: 0,
+		priorityLow: false,
+		priorityNormal: true,
+		priorityHigh: false,
 		me: this,
 		size: 0,
 		torrent: null
@@ -26,29 +27,10 @@ function FileRow(torrent, i)
 		root: null
 	},
 
-	initialize = function(torrent, i) {
+	initialize = function(torrent, depth, name, indices, even) {
 		fields.torrent = torrent;
-		fields.index = i;
-		createRow(torrent, i);
-	},
-
-	readAttributes = function(file) {
-		if (fields.have !== file.bytesCompleted) {
-			fields.have = file.bytesCompleted;
-			fields.isDirty = true;
-		}
-		if (fields.size !== file.length) {
-			fields.size = file.length;
-			fields.isDirty = true;
-		}
-		if (fields.priority !== file.priority) {
-			fields.priority = file.priority;
-			fields.isDirty = true;
-		}
-		if (fields.isWanted !== file.wanted) {
-			fields.isWanted = file.wanted;
-			fields.isDirty = true;
-		}
+		fields.indices = indices;
+		createRow(torrent, depth, name, even);
 	},
 
 	refreshWantedHTML = function()
@@ -57,12 +39,6 @@ function FileRow(torrent, i)
 		e.toggleClass('skip', !fields.isWanted);
 		e.toggleClass('complete', isDone());
 		$(e[0].checkbox).prop('checked', fields.isWanted);
-	},
-	refreshPriorityHTML = function()
-	{
-		$(elements.priority_high_button  ).toggleClass('selected', fields.priority ===  1 );
-		$(elements.priority_normal_button).toggleClass('selected', fields.priority ===  0 );
-		$(elements.priority_low_button   ).toggleClass('selected', fields.priority === -1 );
 	},
 	refreshProgressHTML = function()
 	{
@@ -75,29 +51,65 @@ function FileRow(torrent, i)
 			  '%)' ].join('');
 		setTextContent(elements.progress, c);
 	},
-	refreshHTML = function() {
-		if (fields.isDirty) {
-			fields.isDirty = false;
-			refreshProgressHTML();
-			refreshWantedHTML();
-			refreshPriorityHTML();
+	refreshImpl = function() {
+		var i,
+		    file,
+		    have = 0,
+		    size = 0,
+		    wanted = false,
+		    low = false,
+		    normal = false,
+		    high = false;
+
+		// loop through the file_indices that affect this row
+		for (i=0; i<fields.indices.length; ++i) {
+			file = fields.torrent.getFile (fields.indices[i]);
+			have += file.bytesCompleted;
+			size += file.length;
+			wanted |= file.wanted;
+			switch (file.priority) {
+				case -1: low = true; break;
+				case  0: normal = true; break;
+				case  1: high = true; break;
+			}
 		}
-	},
-	refresh = function() {
-		readAttributes(fields.torrent.getFile(fields.index));
-		refreshHTML();
+
+		if ((fields.have != have) || (fields.size != size)) {
+			fields.have = have;
+			fields.size = size;
+			refreshProgressHTML();
+		}
+
+		if (fields.isWanted !== wanted) {
+			fields.isWanted = wanted;
+			refreshWantedHTML();
+		}
+
+		if (fields.priorityLow !== low) {
+			fields.priorityLow = low;
+			$(elements.priority_low_button).toggleClass('selected', low);
+		}
+
+		if (fields.priorityNormal !== normal) {
+			fields.priorityNormal = normal;
+			$(elements.priority_normal_button).toggleClass('selected', normal);
+		}
+
+		if (fields.priorityHigh !== high) {
+			fields.priorityHigh = high;
+			$(elements.priority_high_button).toggleClass('selected', high);
+		}
 	},
 
 	isDone = function () {
 		return fields.have >= fields.size;
 	},
 
-	createRow = function(torrent, i) {
-		var file = torrent.getFile(i), e, name, root, box;
+	createRow = function(torrent, depth, name, even) {
+		var e, root, box;
 
 		root = document.createElement('li');
-		root.id = 't' + fields.torrent.getId() + 'f' + fields.index;
-		root.className = 'inspector_torrent_file_list_entry ' + ((i%2)?'odd':'even');
+		root.className = 'inspector_torrent_file_list_entry' + (even?'even':'odd');
 		elements.root = root;
 
 		e = document.createElement('input');
@@ -135,28 +147,32 @@ function FileRow(torrent, i)
 
 		root.appendChild(box);
 
-		name = file.name || 'Unknown';
-		name = name.substring(name.lastIndexOf('/')+1);
-		name = name.replace(/([\/_\.])/g, "$1​");
 		e = document.createElement('div');
 		e.className = "inspector_torrent_file_list_entry_name";
 		setTextContent(e, name);
+		$(e).click(function(){ fireNameClicked(-1); });
 		root.appendChild(e);
 
 		e = document.createElement('div');
 		e.className = "inspector_torrent_file_list_entry_progress";
 		root.appendChild(e);
+		$(e).click(function(){ fireNameClicked(-1); });
 		elements.progress = e;
 
-		refresh();
+		$(root).css('margin-left', '' + (depth*16) + 'px');
+
+		refreshImpl();
 		return root;
 	},
 
 	fireWantedChanged = function(do_want) {
-		$(fields.me).trigger('wantedToggled',[ fields.me, do_want ]);
+		$(fields.me).trigger('wantedToggled',[ fields.indices, do_want ]);
 	},
 	firePriorityChanged = function(priority) {
-		$(fields.me).trigger('priorityToggled',[ fields.me, priority ]);
+		$(fields.me).trigger('priorityToggled',[ fields.indices, priority ]);
+	},
+	fireNameClicked = function() {
+		$(fields.me).trigger('nameClicked',[ fields.me, fields.indices ]);
 	};
 
 	/***
@@ -166,19 +182,12 @@ function FileRow(torrent, i)
 	this.getElement = function() {
 		return elements.root;
 	};
-	this.getIndex = function() {
-		return fields.index;
-	};
 	this.isEditable = function () {
 		return (fields.torrent.getFileCount()>1) && !isDone();
 	};
-	this.getPath = function () {
-		var file = torrent.getFile(i);
-		var path = file.name.replace(/\/\/+/g,'/');
-		path = path.split('/').slice(0,-1);
-		path.push('t' + fields.torrent.getId() + 'f' + fields.index);
-		return path;
+	this.refresh = function() {
+		refreshImpl();
 	};
 
-	initialize(torrent, i);
+	initialize(torrent, depth, name, indices, even);
 };
