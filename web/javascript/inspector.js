@@ -491,7 +491,9 @@ function Inspector(controller) {
     },
 
     updateFilesPage = function() {
-        var i, n, sel, row, tor, fragment,
+        var i, j, n, sel, row, tor, fragment,
+            box, complete, conn, connections, e, from, heirarchy, item,
+		    matches, parents, parentid, path, sum, subheirarchy, to, inner,
             file_list = data.elements.file_list,
             torrents = data.torrents;
 
@@ -617,7 +619,7 @@ function Inspector(controller) {
         for (parentid in parents) {
             $($('.inspector_torrent_file_list_entry_name',$('#'+parentid))[0]).click(function() { $($(this).parent()).children('li').toggle(); })
 
-            sum = 0
+            sum = 0;
             matches = $('#'+parentid).children('li').text().match(/\([^\.]+\)/g)
             if (matches == null) { continue; }
             matches.map(function(word) {return parseFloat(word.slice(1,-2)) }).map(function(perc) {sum+=perc})
