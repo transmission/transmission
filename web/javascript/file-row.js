@@ -174,10 +174,10 @@ function FileRow(torrent, i)
 	};
 	this.getPath = function () {
 		var file = torrent.getFile(i);
-        path = file.name.replace(/\/\/+/g,'/')
-		path = path.split('/').slice(0,-1)
-		path.push('t' + fields.torrent.getId() + 'f' + fields.index)
-		return path
+		var path = file.name.replace(/\/\/+/g,'/');
+		path = path.split('/').slice(0,-1);
+		path.push('t' + fields.torrent.getId() + 'f' + fields.index);
+		return path;
 	};
 
 	initialize(torrent, i);

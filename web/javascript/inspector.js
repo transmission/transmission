@@ -513,7 +513,7 @@ function Inspector(controller) {
         n = tor.getFileCount();
         data.file_rows = [];
         fragment = document.createDocumentFragment();
-		heirarchy = {'/':[]}
+        heirarchy = {'/':[]}
         
         for (i=0; i<n; ++i) {
             row = data.file_rows[i] = new FileRow(tor, i);
@@ -537,6 +537,7 @@ function Inspector(controller) {
                 }
             }
         }
+	console.log(heirarchy);
         /*
         At this point we have a single object containing the whole
         torrent heirarchy. The '/' key is file element ids as assigned above
