@@ -12,7 +12,7 @@ function FileRow(torrent, depth, name, indices, even)
 		indices: [],
 		isWanted: true,
 		priorityLow: false,
-		priorityNormal: true,
+		priorityNormal: false,
 		priorityHigh: false,
 		me: this,
 		size: 0,
