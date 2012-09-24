@@ -79,39 +79,26 @@ tr_session * fLib = NULL;
     [fTimeLabelField setStringValue: [NSLocalizedString(@"Running Time", "Stats window -> label") stringByAppendingString: @":"]];
     [fNumOpenedLabelField setStringValue: [NSLocalizedString(@"Program Started", "Stats window -> label") stringByAppendingString: @":"]];
     
-    //size all elements
+    //size of all labels
     const CGFloat oldWidth = [fUploadedLabelField frame].size.width;
     
-    [fUploadedLabelField sizeToFit];
-    [fDownloadedLabelField sizeToFit];
-    [fRatioLabelField sizeToFit];
-    [fTimeLabelField sizeToFit];
-    [fNumOpenedLabelField sizeToFit];
+    NSArray * labels = @[fUploadedLabelField, fDownloadedLabelField, fRatioLabelField, fTimeLabelField, fNumOpenedLabelField];
     
-    CGFloat maxWidth = MAX([fUploadedLabelField frame].size.width, [fDownloadedLabelField frame].size.width);
-    maxWidth = MAX(maxWidth, [fRatioLabelField frame].size.width);
-    maxWidth = MAX(maxWidth, [fTimeLabelField frame].size.width);
-    maxWidth = MAX(maxWidth, [fNumOpenedLabelField frame].size.width);
+    CGFloat maxWidth = CGFLOAT_MIN;
+    for (NSTextField * label in labels)
+    {
+        [label sizeToFit];
+        
+        const CGFloat width = [label frame].size.width;
+        maxWidth = MAX(maxWidth, width);
+    }
     
-    NSRect frame = [fUploadedLabelField frame];
-    frame.size.width = maxWidth;
-    [fUploadedLabelField setFrame: frame];
-    
-    frame = [fDownloadedLabelField frame];
-    frame.size.width = maxWidth;
-    [fDownloadedLabelField setFrame: frame];
-    
-    frame = [fRatioLabelField frame];
-    frame.size.width = maxWidth;
-    [fRatioLabelField setFrame: frame];
-    
-    frame = [fTimeLabelField frame];
-    frame.size.width = maxWidth;
-    [fTimeLabelField setFrame: frame];
-    
-    frame = [fNumOpenedLabelField frame];
-    frame.size.width = maxWidth;
-    [fNumOpenedLabelField setFrame: frame];
+    for (NSTextField * label in labels)
+    {
+        NSRect frame = [label frame];
+        frame.size.width = maxWidth;
+        [label setFrame: frame];
+    }
     
     //resize window for new label width - fields are set in nib to adjust correctly
     NSRect windowRect = [[self window] frame];
