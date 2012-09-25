@@ -868,14 +868,19 @@ static int
 readPadC( tr_handshake *    handshake,
           struct evbuffer * inbuf )
 {
+    char       * padc;
     uint16_t     ia_len;
     const size_t needlen = handshake->pad_c_len + sizeof( uint16_t );
 
     if( evbuffer_get_length( inbuf ) < needlen )
         return READ_LATER;
 
-    evbuffer_drain( inbuf, handshake->pad_c_len );
+    /* read the throwaway padc */
+    padc = tr_new (char, handshake->pad_c_len);
+    tr_peerIoReadBytes (handshake->io, inbuf, padc, handshake->pad_c_len);
+    tr_free (padc);
 
+    /* read ia_len */
     tr_peerIoReadUint16( handshake->io, inbuf, &ia_len );
     dbgmsg( handshake, "ia_len is %d", (int)ia_len );
     handshake->ia_len = ia_len;
