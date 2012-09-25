@@ -2,6 +2,7 @@
 [http://trac.transmissionbt.com/query?milestone=2.70&group=component&order=severity All tickets closed by this release]
 ==== All Platforms ====
   * Improved speed with the µTP protocol
+  * Fix bug that caused some incoming encrypted peer connections to fail
   * Fix bugs with the speed limit scheduler
   * Fix crasher with magnet links
 ==== Mac ====
