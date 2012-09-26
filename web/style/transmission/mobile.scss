@@ -539,17 +539,6 @@ div#torrent_inspector
 		color: #222;
 	}
 
-	#file-list-header {
-		float: right;
-		> * {
-			@include verticalGradient($idle-color-top, $idle-color-bottom);
-			@include roundedButton(5px);
-			&:active {
-				@include verticalGradient($active-color-top, $active-color-bottom);
-			}
-		}
-	}
-
 	/* Files Inspector Tab */
 	#inspector_file_list {
 		padding: 0 0 0 0;

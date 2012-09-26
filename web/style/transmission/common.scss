@@ -601,17 +601,6 @@ div#torrent_inspector
 
 	/* Files Inspector Tab */
 
-	#file-list-header {
-		float: right;
-		> * {
-			@include roundedButton(5px);
-			@include verticalGradient($idle-color-top, $idle-color-bottom);
-			&:active {
-				@include verticalGradient($active-color-top, $active-color-bottom);
-			}
-		}
-	}
-
 	#inspector_file_list {
 		padding: 0 0 0 0;
 		margin: 0 0 0 0;
@@ -621,7 +610,6 @@ div#torrent_inspector
 	}
 
 	#inspector_file_list {
-		border-top: 1px solid #888;
 		width: 100%;
 		margin: 6px 0 0 0;
 		padding-top: 6px;
