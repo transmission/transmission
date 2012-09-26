@@ -51,8 +51,7 @@
     [super dealloc];
 }
 
-#warning uncomment after 2.7
-/*- (void) awakeFromNib
+- (void) awakeFromNib
 {
     #warning remove when 10.7-only with auto layout
     [fInfoSectionLabel sizeToFit];
@@ -94,7 +93,7 @@
         frame.size.width -= widthIncrease;
         [field setFrame: frame];
     }
-}*/
+}
 
 - (void) setInfoForTorrents: (NSArray *) torrents
 {
