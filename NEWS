@@ -12,6 +12,7 @@
   * Fix displaying the Web Client with Bonjour
   * Fix bugs with Time Machine exclusions
   * Other minor interface tweaks and bug fixes
+  * Removed Simplified Chinese localization because of lack of localizer
 ==== GTK+ ====
   * Require GTK+ 3.4
 ==== Qt ====
