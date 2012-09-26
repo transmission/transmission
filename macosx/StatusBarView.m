@@ -139,10 +139,13 @@
     
     NSRectFillListWithColors(gridRects, colorRects, count);
     
-    [fNoiseImage drawInRect: rect
-                   fromRect: [self convertRectToBacking: rect]
-                  operation: NSCompositeSourceOver
-                   fraction: 0.12];
+    if (fNoiseImage) {
+        NSAssert([NSApp isOnLionOrBetter], @"we have a noise image, but we're on 10.6"); //https://trac.transmissionbt.com/ticket/5053
+        [fNoiseImage drawInRect: rect
+                       fromRect: [self convertRectToBacking: rect]
+                      operation: NSCompositeSourceOver
+                       fraction: 0.12];
+    }
 }
 
 @end
