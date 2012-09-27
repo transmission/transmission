@@ -59,15 +59,14 @@
     
     NSArray * labels = @[ fPiecesLabel, fHashLabel, fSecureLabel, fCreatorLabel, fDateCreatedLabel, fCommentLabel, fDataLocationLabel ];
     
-    CGFloat oldMaxWidth = 0.0, newMaxWidth = 0.0;
-    NSTextField * oldLongestLabel = nil;
+    CGFloat oldMaxWidth = 0.0, originX, newMaxWidth = 0.0;
     for (NSTextField * label in labels)
     {
-        const CGFloat oldWidth = [label bounds].size.width;
-        if (oldWidth > oldMaxWidth)
+        const CGRect oldFrame = [label frame];
+        if (oldFrame.size.width > oldMaxWidth)
         {
-            oldMaxWidth = oldWidth;
-            oldLongestLabel = label;
+            oldMaxWidth = oldFrame.size.width;
+            originX = oldFrame.origin.x;
         }
         
         [label sizeToFit];
@@ -79,8 +78,7 @@
     for (NSTextField * label in labels)
     {
         NSRect frame = [label frame];
-        frame.origin.x = [oldLongestLabel frame].origin.x;
-        frame.origin.x += newMaxWidth - frame.size.width;
+        frame.origin.x = originX + (newMaxWidth - frame.size.width);
         [label setFrame: frame];
     }
     
