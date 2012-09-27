@@ -56,6 +56,46 @@
 - (void) awakeFromNib
 {
     [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(updatePiecesView) name: @"UpdatePiecesView" object: nil];
+    
+    #warning remove when 10.7-only with auto layout
+    [fTransferSectionLabel sizeToFit];
+    [fDatesSectionLabel sizeToFit];
+    [fTimeSectionLabel sizeToFit];
+    
+    NSArray * labels = @[ fStateLabel, fProgressLabel, fHaveLabel, fDownloadedLabel, fUploadedLabel, fFailedDLLabel, fRatioLabel, fErrorLabel, fDateAddedLabel, fDateCompletedLabel, fDateActivityLabel, fDownloadTimeLabel, fSeedTimeLabel ];
+    
+    CGFloat oldMaxWidth = 0.0, originX, newMaxWidth = 0.0;
+    for (NSTextField * label in labels)
+    {
+        const CGRect oldFrame = [label frame];
+        if (oldFrame.size.width > oldMaxWidth)
+        {
+            oldMaxWidth = oldFrame.size.width;
+            originX = oldFrame.origin.x;
+        }
+        
+        [label sizeToFit];
+        const CGFloat newWidth = [label bounds].size.width;
+        if (newWidth > newMaxWidth)
+            newMaxWidth = newWidth;
+    }
+    
+    for (NSTextField * label in labels)
+    {
+        NSRect frame = [label frame];
+        frame.origin.x = originX + (newMaxWidth - frame.size.width);
+        [label setFrame: frame];
+    }
+    
+    NSArray * fields = @[ fDateAddedField, fDateCompletedField, fDateActivityField, fStateField, fProgressField, fHaveField, fDownloadedTotalField, fUploadedTotalField, fFailedHashField, fRatioField, fDownloadTimeField, fSeedTimeField, fErrorScrollView ];
+    
+    for (NSView * field in fields) {
+        const CGFloat widthIncrease = newMaxWidth - oldMaxWidth;
+        NSRect frame = [field frame];
+        frame.origin.x += widthIncrease;
+        frame.size.width -= widthIncrease;
+        [field setFrame: frame];
+    }
 }
 
 - (void) dealloc

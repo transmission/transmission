@@ -39,11 +39,18 @@
                         * fHaveField, * fDownloadedTotalField, * fUploadedTotalField, * fFailedHashField,
                         * fRatioField,
                         * fDownloadTimeField, * fSeedTimeField;
-    
     IBOutlet NSTextView * fErrorMessageView;
     
     IBOutlet PiecesView * fPiecesView;
     IBOutlet NSSegmentedControl * fPiecesControl;
+    
+    //remove when we switch to auto layout on 10.7
+    IBOutlet NSTextField * fTransferSectionLabel, * fDatesSectionLabel, * fTimeSectionLabel;
+    IBOutlet NSTextField * fStateLabel, * fProgressLabel, * fHaveLabel, * fDownloadedLabel, * fUploadedLabel,
+                        * fFailedDLLabel, * fRatioLabel, * fErrorLabel,
+                        * fDateAddedLabel, * fDateCompletedLabel, * fDateActivityLabel,
+                        * fDownloadTimeLabel, * fSeedTimeLabel;
+    IBOutlet NSScrollView * fErrorScrollView;
 }
 
 - (void) setInfoForTorrents: (NSArray *) torrents;
