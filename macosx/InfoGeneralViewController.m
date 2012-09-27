@@ -62,7 +62,7 @@
     CGFloat oldMaxWidth = 0.0, originX, newMaxWidth = 0.0;
     for (NSTextField * label in labels)
     {
-        const CGRect oldFrame = [label frame];
+        const NSRect oldFrame = [label frame];
         if (oldFrame.size.width > oldMaxWidth)
         {
             oldMaxWidth = oldFrame.size.width;
