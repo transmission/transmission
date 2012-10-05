@@ -404,7 +404,7 @@ function Inspector(controller) {
         }
         if(!str)
             str = none;  
-        setTextContent(e.comment_lb, str.replace(/(https?|ftp):\/\/([\w\-]+(\.[\w\-]+)*(\.[a-z]{2,4})?)(\d{1,5})?(\/([^<>\s]*))?/g, '<a target="_blank" href="$&">$&</a>'));
+        setTextContent(e.comment_lb, str);
 
         //
         //  origin
