@@ -160,7 +160,7 @@ tr_magnetParse( const char * uri )
                     tr[trCount++] = tr_http_unescape( val, vallen );
             }
 
-            if( ( keylen==2 ) && !memcmp( key, "ws", 2 ) && ( wsCount < MAX_TRACKERS ) )
+            if( ( vallen > 0 ) && ( keylen==2 ) && !memcmp( key, "ws", 2 ) && ( wsCount < MAX_WEBSEEDS ) )
                 ws[wsCount++] = tr_http_unescape( val, vallen );
 
             walk = next != NULL ? next + 1 : NULL;
