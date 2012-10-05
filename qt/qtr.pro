@@ -37,7 +37,8 @@ TRANSLATIONS += translations/transmission_en.ts \
                 translations/transmission_kk.ts \
                 translations/transmission_lt.ts \
                 translations/transmission_pt_BR.ts \
-                translations/transmission_ru.ts
+                translations/transmission_ru.ts \
+                translations/transmission_hu.ts
 
 FORMS += mainwin.ui
 RESOURCES += application.qrc
