@@ -78,7 +78,8 @@ Torrent.Fields.Stats = [
 	'trackers',
 	'downloadDir',
 	'uploadedEver',
-	'uploadRatio'
+	'uploadRatio',
+	'webseedsSendingToUs'
 ];
 
 // fields used by the inspector which only need to be loaded once
@@ -104,8 +105,7 @@ Torrent.Fields.StatsExtra = [
 	'haveValid',
 	'peers',
 	'startDate',
-	'trackerStats',
-	'webseedsSendingToUs'
+	'trackerStats'
 ];
 
 /***

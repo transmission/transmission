@@ -154,11 +154,13 @@ TorrentRendererFull.prototype =
 
 		if (t.isDownloading())
 			return [ 'Downloading from',
-			         t.getPeersSendingToUs() + t.getWebseedsSendingToUs(),
+			         t.getPeersSendingToUs(),
 			         'of',
-			         t.getPeersConnected() + t.getWebseedsSendingToUs(),
+			         t.getPeersConnected(),
 			         'peers',
-			         '-',
+			         ' and ',
+			         t.getWebseedsSendingToUs(),
+			         'webseeds',					 
 			         TorrentRendererHelper.formatDL(t),
 			         TorrentRendererHelper.formatUL(t) ].join(' ');
 
