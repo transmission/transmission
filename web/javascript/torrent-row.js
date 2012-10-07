@@ -148,21 +148,33 @@ TorrentRendererFull.prototype =
 
 	getPeerDetails: function(t)
 	{
-		var err;
+		var err, webseed_count;
+
 		if ((err = t.getErrorMessage()))
 			return err;
 
 		if (t.isDownloading())
-			return [ 'Downloading from',
-			         t.getPeersSendingToUs(),
-			         'of',
-			         t.getPeersConnected(),
-			         'peers',
-			         ' and ',
-			         t.getWebseedsSendingToUs(),
-			         'webseeds',					 
-			         TorrentRendererHelper.formatDL(t),
-			         TorrentRendererHelper.formatUL(t) ].join(' ');
+		{
+			webseed_count = t.getWebseedsSendingToUs();
+
+			if (webseed_count)
+			{
+				return [ 'Downloading from',
+				         t.getPeersSendingToUs(),
+				         'of',
+				         t.getPeersConnected(),
+				         'peers and',
+				         Transmission.fmt.plural (webseed_count, 'webseed') ].join(' ');
+			}
+			else
+			{
+				return [ 'Downloading from',
+				         t.getPeersSendingToUs(),
+				         'of',
+				         t.getPeersConnected(),
+				         'peers' ].join(' ');
+			}
+		}
 
 		if (t.isSeeding())
 			return [ 'Seeding to',
