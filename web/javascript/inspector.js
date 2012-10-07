@@ -670,7 +670,7 @@ function Inspector(controller) {
         if (tracker.hasAnnounced) {
             lastAnnounceTime = Transmission.fmt.timestamp(tracker.lastAnnounceTime);
             if (tracker.lastAnnounceSucceeded) {
-                lastAnnounce = [ lastAnnounceTime, ' (got ',  Transmission.fmt.plural(tracker.lastAnnouncePeerCount, 'peer'), ')' ];
+                lastAnnounce = [ lastAnnounceTime, ' (got ',  Transmission.fmt.countString('peer','peers',tracker.lastAnnouncePeerCount), ')' ];
             } else {
                 lastAnnounceLabel = 'Announce error';
                 lastAnnounce = [ (tracker.lastAnnounceResult ? (tracker.lastAnnounceResult + ' - ') : ''), lastAnnounceTime ];

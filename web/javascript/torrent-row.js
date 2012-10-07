@@ -167,15 +167,15 @@ TorrentRendererFull.prototype =
 				return [ 'Downloading from',
 				         t.getPeersSendingToUs(),
 				         'of',
-				         fmt.plural (peer_count, 'peer'),
+				         fmt.countString('peer','peers',peer_count),
 				         'and',
-				         fmt.plural (webseed_count, 'web seed') ].join(' ');
+				         fmt.countString('web seed','web seeds',webseed_count) ].join(' ');
 			}
 			else if (webseed_count)
 			{
 				// Downloading from 2 webseed(s)
 				return [ 'Downloading from',
-				         fmt.plural (webseed_count, 'web seed') ].join(' ');
+				         fmt.countString('web seed','web seeds',webseed_count) ].join(' ');
 			}
 			else
 			{
@@ -183,7 +183,7 @@ TorrentRendererFull.prototype =
 				return [ 'Downloading from',
 				         t.getPeersSendingToUs(),
 				         'of',
-				         fmt.plural (peer_count, 'peer') ].join(' ');
+				         fmt.countString('peer','peers',peer_count) ].join(' ');
 			}
 		}
 
@@ -191,7 +191,7 @@ TorrentRendererFull.prototype =
 			return [ 'Seeding to',
 			         t.getPeersGettingFromUs(),
 			         'of',
-			         fmt.plural (t.getPeersConnected(), 'peer'),
+			         fmt.countString ('peer','peers',t.getPeersConnected()),
 			         '-',
 			         TorrentRendererHelper.formatUL(t) ].join(' ');
 

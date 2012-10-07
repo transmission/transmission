@@ -1146,7 +1146,7 @@ Transmission.prototype =
 		$('#speed-dn-label').text( fmt.speedBps( d ) );
 
 		// visible torrents
-		$('#filter-count').text( fmt.plural(this._rows.length, 'Transfer') );
+		$('#filter-count').text( fmt.countString('Transfer','Transfers',this._rows.length ) );
 	},
 
 	setEnabled: function(key, flag)
