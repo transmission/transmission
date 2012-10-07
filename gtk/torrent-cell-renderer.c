@@ -260,23 +260,38 @@ getStatusString( GString           * gstr,
 
         case TR_STATUS_DOWNLOAD:
         {
-            if( tr_torrentHasMetadata( tor ) )
+            if( !tr_torrentHasMetadata( tor ) )
             {
-                g_string_append_printf( gstr,
-                    ngettext( "Downloading from %1$'d of %2$'d connected peer",
-                              "Downloading from %1$'d of %2$'d connected peers",
-                              st->webseedsSendingToUs + st->peersSendingToUs ),
-                    st->webseedsSendingToUs + st->peersSendingToUs,
-                    st->webseedsSendingToUs + st->peersConnected );
+                /* Downloading metadata from 2 peer(s) (50% done) */
+                g_string_append_printf( gstr, _("Downloading metadata from %1$'d %2$s (%3$d%% done)"),
+                                        st->peersConnected,
+                                        ngettext("peer","peers",st->peersConnected),
+                                        (int)(100.0*st->metadataPercentComplete) );
+            }
+            else if (st->peersSendingToUs && st->webseedsSendingToUs)
+            {
+                /* Downloading from 2 of 3 peer(s) and 2 webseed(s) */
+                g_string_append_printf (gstr, _("Downloading from %1$'d of %2$'d %3$s and %4$'d %5$s"),
+                                        st->peersSendingToUs,
+                                        st->peersConnected,
+                                        ngettext("peer","peers",st->peersSendingToUs),
+                                        st->webseedsSendingToUs,
+                                        ngettext("web seed","web seeds",st->webseedsSendingToUs));
+            }
+            else if (st->webseedsSendingToUs)
+            {
+                /* Downloading from 3 web seed(s) */
+                g_string_append_printf (gstr, _("Downloading from %1$'d %2$s"),
+                                        st->webseedsSendingToUs,
+                                        ngettext("web seed","web seeds",st->webseedsSendingToUs));
             }
             else
             {
-                g_string_append_printf( gstr,
-                    ngettext( "Downloading metadata from %1$'d peer (%2$d%% done)",
-                              "Downloading metadata from %1$'d peers (%2$d%% done)",
-                              st->peersConnected + st->webseedsSendingToUs ),
-                    st->peersConnected + st->webseedsSendingToUs,
-                    (int)(100.0*st->metadataPercentComplete) );
+                /* Downloading from 2 of 3 peer(s) */
+                g_string_append_printf (gstr, _("Downloading from %1$'d of %2$'d %3$s"),
+                                        st->peersSendingToUs,
+                                        st->peersConnected,
+                                        ngettext("peer","peers",st->peersSendingToUs));
             }
             break;
         }

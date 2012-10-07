@@ -173,7 +173,7 @@ TorrentDelegate :: shortTransferString( const Torrent& tor ) const
     static const QChar upArrow( 0x2191 );
     static const QChar downArrow( 0x2193 );
     const bool haveMeta( tor.hasMetadata( ) );
-    const bool haveDown( haveMeta && tor.peersWeAreDownloadingFrom( ) > 0 );
+    const bool haveDown( haveMeta && ((tor.webseedsWeAreDownloadingFrom()>0) || (tor.peersWeAreDownloadingFrom( )>0)) );
     const bool haveUp( haveMeta && tor.peersWeAreUploadingTo( ) > 0 );
     QString downStr, upStr, str;
 
@@ -242,12 +242,16 @@ TorrentDelegate :: statusString( const Torrent& tor ) const
             break;
 
         case TR_STATUS_DOWNLOAD:
-            if( tor.hasMetadata( ) )
-                str = tr( "Downloading from %1 of %n connected peer(s)", 0, tor.connectedPeersAndWebseeds( ) )
-                        .arg( tor.peersWeAreDownloadingFrom( ) );
-            else
+            if( !tor.hasMetadata() ) {
                 str = tr( "Downloading metadata from %n peer(s) (%1% done)", 0, tor.peersWeAreDownloadingFrom( ) )
                         .arg( Formatter::percentToString( 100.0 * tor.metadataPercentDone( ) ) );
+            } else {
+                /* it would be nicer for translation if this was all one string, but I don't see how to do multiple %n's in tr() */
+                str = tr( "Downloading from %1 of %n connected peer(s)", 0, tor.connectedPeersAndWebseeds( ) )
+                        .arg( tor.peersWeAreDownloadingFrom( ) );
+                if (tor.webseedsWeAreDownloadingFrom())
+                    str += tr(" and %n web seed(s)", "", tor.webseedsWeAreDownloadingFrom());
+            }
             break;
 
         case TR_STATUS_SEED:

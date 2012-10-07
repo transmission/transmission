@@ -282,7 +282,8 @@ class Torrent: public QObject
         QDateTime dateCreated( ) const { return getDateTime( DATE_CREATED ); }
         QDateTime manualAnnounceTime( ) const { return getDateTime( MANUAL_ANNOUNCE_TIME ); }
         bool canManualAnnounce( ) const { return isReadyToTransfer() && (manualAnnounceTime()<=QDateTime::currentDateTime()); }
-        int peersWeAreDownloadingFrom( ) const { return getInt( PEERS_SENDING_TO_US ) + getInt( WEBSEEDS_SENDING_TO_US ); }
+        int peersWeAreDownloadingFrom( ) const { return getInt( PEERS_SENDING_TO_US ); }
+        int webseedsWeAreDownloadingFrom( ) const { return getInt( WEBSEEDS_SENDING_TO_US ); }
         int peersWeAreUploadingTo( ) const { return getInt( PEERS_GETTING_FROM_US ); }
         bool isUploading( ) const { return peersWeAreUploadingTo( ) > 0; }
         int connectedPeers( ) const { return getInt( PEERS_CONNECTED ); }

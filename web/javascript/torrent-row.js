@@ -148,31 +148,42 @@ TorrentRendererFull.prototype =
 
 	getPeerDetails: function(t)
 	{
-		var err, webseed_count;
+		var err,
+		    peer_count,
+		    webseed_count,
+		    fmt = Transmission.fmt;
 
 		if ((err = t.getErrorMessage()))
 			return err;
 
 		if (t.isDownloading())
 		{
+			peer_count = t.getPeersConnected();
 			webseed_count = t.getWebseedsSendingToUs();
 
-			if (webseed_count)
+			if (webseed_count && peer_count)
 			{
+				// Downloading from 2 of 3 peer(s) and 2 webseed(s)
 				return [ 'Downloading from',
 				         t.getPeersSendingToUs(),
 				         'of',
-				         t.getPeersConnected(),
-				         'peers and',
-				         Transmission.fmt.plural (webseed_count, 'webseed') ].join(' ');
+				         fmt.plural (peer_count, 'peer'),
+				         'and',
+				         fmt.plural (webseed_count, 'web seed') ].join(' ');
+			}
+			else if (webseed_count)
+			{
+				// Downloading from 2 webseed(s)
+				return [ 'Downloading from',
+				         fmt.plural (webseed_count, 'web seed') ].join(' ');
 			}
 			else
 			{
+				// Downloading from 2 of 3 peer(s)
 				return [ 'Downloading from',
 				         t.getPeersSendingToUs(),
 				         'of',
-				         t.getPeersConnected(),
-				         'peers' ].join(' ');
+				         fmt.plural (peer_count, 'peer') ].join(' ');
 			}
 		}
 
@@ -180,8 +191,7 @@ TorrentRendererFull.prototype =
 			return [ 'Seeding to',
 			         t.getPeersGettingFromUs(),
 			         'of',
-			         t.getPeersConnected(),
-			         'peers',
+			         fmt.plural (t.getPeersConnected(), 'peer'),
 			         '-',
 			         TorrentRendererHelper.formatUL(t) ].join(' ');
 

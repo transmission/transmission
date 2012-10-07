@@ -1048,7 +1048,7 @@ getWebseedColumnNames( int column )
 {
     switch( column )
     {
-        case WEBSEED_COL_URL: return _( "Webseeds" );
+        case WEBSEED_COL_URL: return _( "Web Seeds" );
         case WEBSEED_COL_DOWNLOAD_RATE_DOUBLE:
         case WEBSEED_COL_DOWNLOAD_RATE_STRING: return _( "Down" );
         default: return "";
