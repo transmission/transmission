@@ -1146,6 +1146,7 @@ TrMainWindow :: openTorrent( )
                                     myPrefs.getString( Prefs::OPEN_DIALOG_FOLDER ),
                                     tr( "Torrent Files (*.torrent);;All Files (*.*)" ) );
     myFileDialog->setFileMode( QFileDialog::ExistingFiles );
+    myFileDialog->setAttribute( Qt::WA_DeleteOnClose );
 
     QCheckBox * button = new QCheckBox( tr( "Show &options dialog" ) );
     button->setChecked( myPrefs.getBool( Prefs::OPTIONS_PROMPT ) );

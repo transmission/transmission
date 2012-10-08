@@ -420,6 +420,7 @@ Options :: onFilenameClicked( )
                                            QFileInfo(myAdd.filename).absolutePath(),
                                            tr( "Torrent Files (*.torrent);;All Files (*.*)" ) );
         d->setFileMode( QFileDialog::ExistingFile );
+        d->setAttribute( Qt::WA_DeleteOnClose );
         connect( d, SIGNAL(filesSelected(const QStringList&)), this, SLOT(onFilesSelected(const QStringList&)) );
         d->show( );
     }
@@ -443,6 +444,7 @@ Options :: onDestinationClicked( )
                                        tr( "Select Destination" ),
                                        myDestination.absolutePath( ) );
     d->setFileMode( QFileDialog::Directory );
+    d->setAttribute( Qt::WA_DeleteOnClose );
     connect( d, SIGNAL(filesSelected(const QStringList&)), this, SLOT(onDestinationsSelected(const QStringList&)) );
     d->show( );
 }
