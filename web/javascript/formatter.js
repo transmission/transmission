@@ -276,7 +276,7 @@ Transmission.fmt = (function()
 
 		countString: function(msgid, msgid_plural, n)
 		{
-			return [ n.toStringWithCommas(), ngettext(msgid,msgid_plural,n) ].join(' ');
+			return [ n.toStringWithCommas(), this.ngettext(msgid,msgid_plural,n) ].join(' ');
 		},
 
 		peerStatus: function( flagStr ) 
