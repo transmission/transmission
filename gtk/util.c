@@ -586,8 +586,8 @@ gtr_paste_clipboard_url_into_entry( GtkWidget * e )
   size_t i;
 
   char * text[] = {
-    gtk_clipboard_wait_for_text( gtk_clipboard_get( GDK_SELECTION_PRIMARY ) ),
-    gtk_clipboard_wait_for_text( gtk_clipboard_get( GDK_SELECTION_CLIPBOARD ) )
+    g_strstrip( gtk_clipboard_wait_for_text( gtk_clipboard_get( GDK_SELECTION_PRIMARY ) ) ),
+    g_strstrip( gtk_clipboard_wait_for_text( gtk_clipboard_get( GDK_SELECTION_CLIPBOARD ) ) )
   };
 
   for( i=0; i<G_N_ELEMENTS(text); ++i ) {
