@@ -564,8 +564,7 @@ tr_metainfoParseImpl( const tr_session  * session,
         return str;
 
     /* get the url-list */
-    if( !isMagnet )
-        geturllist( inf, meta );
+    geturllist( inf, meta );
 
     /* filename of Transmission's copy */
     tr_free( inf->torrent );
