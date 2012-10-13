@@ -13,7 +13,7 @@
 #include <ctype.h> /* isxdigit() */
 #include <errno.h>
 #include <stdarg.h>
-#include <string.h> /* strchr(), strrchr(), strlen(), strncmp(), strstr() */
+#include <string.h> /* strchr(), strrchr(), strlen(), strstr() */
 
 #include <gtk/gtk.h>
 #include <glib/gi18n.h>
@@ -170,15 +170,17 @@ gtr_get_host_from_url( char * buf, size_t buflen, const char * url )
 static gboolean
 gtr_is_supported_url( const char * str )
 {
-    return !strncmp( str, "ftp://", 6 )
-        || !strncmp( str, "http://", 7 )
-        || !strncmp( str, "https://", 8 );
+    return ( ( str != NULL ) &&
+             ( g_str_has_prefix( str, "ftp://" ) ||
+               g_str_has_prefix( str, "http://" ) ||
+               g_str_has_prefix( str, "https://" ) ) );
 }
 
 gboolean
 gtr_is_magnet_link( const char * str )
 {
-    return !strncmp( str, "magnet:?", 8 );
+    return ( str != NULL ) &&
+           ( g_str_has_prefix( str, "magnet:?" ) );
 }
 
 gboolean
