@@ -42,7 +42,6 @@
         NSColor * darkColor = [NSColor colorWithCalibratedRed: 155.0/255.0 green: 155.0/255.0 blue: 155.0/255.0 alpha: 1.0];
         fGradient = [[NSGradient alloc] initWithStartingColor: lightColor endingColor: darkColor];
         
-        //noise only for 10.7 + 
         if([NSApp isOnLionOrBetter])
         {
             CIFilter * randomFilter = [CIFilter filterWithName: @"CIRandomGenerator"];

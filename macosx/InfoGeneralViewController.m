@@ -84,8 +84,8 @@
     
     NSArray * fields = @[ fPiecesField, fHashField, fSecureField, fCreatorField, fDateCreatedField, fCommentScrollView, fDataLocationField ];
     
+    const CGFloat widthIncrease = newMaxWidth - oldMaxWidth;
     for (NSView * field in fields) {
-        const CGFloat widthIncrease = newMaxWidth - oldMaxWidth;
         NSRect frame = [field frame];
         frame.origin.x += widthIncrease;
         frame.size.width -= widthIncrease;
