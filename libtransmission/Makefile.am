@@ -128,6 +128,7 @@ TESTS = \
     history-test \
     json-test \
     magnet-test \
+    metainfo-test \
     peer-msgs-test \
     rpc-test \
     test-peer-id \
@@ -174,6 +175,10 @@ json_test_LDFLAGS = ${apps_ldflags}
 magnet_test_SOURCES = magnet-test.c
 magnet_test_LDADD = ${apps_ldadd}
 magnet_test_LDFLAGS = ${apps_ldflags}
+
+metainfo_test_SOURCES = metainfo-test.c
+metainfo_test_LDADD = ${apps_ldadd}
+metainfo_test_LDFLAGS = ${apps_ldflags}
 
 peer_msgs_test_SOURCES = peer-msgs-test.c
 peer_msgs_test_LDADD = ${apps_ldadd}
