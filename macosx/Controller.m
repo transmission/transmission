@@ -2012,8 +2012,6 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
             
             [[NSUserNotificationCenterMtLion defaultUserNotificationCenter] deliverNotification: notification];
             [notification release];
-            
-            NSLog(@"delegate: %@", [[NSUserNotificationCenterMtLion defaultUserNotificationCenter] delegate]);
         }
         
         NSMutableDictionary * clickContext = [NSMutableDictionary dictionaryWithObjectsAndKeys:
