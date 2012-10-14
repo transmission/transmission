@@ -2026,7 +2026,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
                                     description: [torrent name] notificationName: GROWL_DOWNLOAD_COMPLETE
                                     iconData: nil priority: 0 isSticky: NO clickContext: clickContext];
         
-        NSLog(@"delegate: %@", [[NSUserNotificationCenterMtLion defaultUserNotificationCenter] delegate]);
+        //NSLog(@"delegate: %@", [[NSUserNotificationCenterMtLion defaultUserNotificationCenter] delegate]);
         
         if (![fWindow isMainWindow])
             [fBadger addCompletedTorrent: torrent];
