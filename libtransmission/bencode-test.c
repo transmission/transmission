@@ -1,7 +1,6 @@
-#include <ctype.h>
-#include <errno.h>
-#include <stdio.h>
-#include <string.h>
+#include <ctype.h> /* isspace() */
+#include <errno.h> /* EILSEQ */
+#include <string.h> /* strlen(), strncmp() */
 
 #include <event2/buffer.h>
 
@@ -491,7 +490,7 @@ testParse2( void )
     tr_bencDictAddStr( &top, "this-is-a-string", "this-is-a-string" );
 
     benc = tr_bencToStr( &top, TR_FMT_BENC, &len );
-    check( !strcmp( benc, "d14:this-is-a-booli1e14:this-is-a-real8:0.50000016:this-is-a-string16:this-is-a-string14:this-is-an-inti1234ee" ) );
+    check_streq( "d14:this-is-a-booli1e14:this-is-a-real8:0.50000016:this-is-a-string16:this-is-a-string14:this-is-an-inti1234ee", benc );
     check( !tr_bencParse( benc, benc+len, &top2, &end ) );
     check( (char*)end == benc + len );
     check( tr_bencIsDict( &top2 ) );

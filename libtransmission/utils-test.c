@@ -1,6 +1,5 @@
-#include <math.h>
-#include <stdio.h> /* fprintf */
-#include <string.h> /* strcmp */
+#include <math.h> /* sqrt() */
+#include <string.h> /* strlen() */
 
 #include "transmission.h"
 #include "bitfield.h"
@@ -426,7 +425,6 @@ test_truncd( void )
 
     tr_snprintf( buf, sizeof( buf ), "%.2f%%", 99.999 );
     check_streq("100.00%", buf);
-    check( !strcmp( buf, "100.00%" ) );
 
     tr_snprintf( buf, sizeof( buf ), "%.2f%%", tr_truncd( 99.999, 2 ) );
     check_streq("99.99%", buf);

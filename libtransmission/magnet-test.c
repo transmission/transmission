@@ -1,10 +1,7 @@
-#include <stdio.h>
-#include <string.h>
 #include "transmission.h"
 #include "magnet.h"
 #include "utils.h"
 
-/* #define VERBOSE */
 #undef VERBOSE
 #include "libtransmission-test.h"
 
@@ -59,19 +56,5 @@ test1( void )
     return 0;
 }
 
-int
-main( void )
-{
-    const testFunc tests[] = { test1 };
-    int ret;
-
-    if( (ret = runTests(tests, 1)) )
-        return ret;
-
-#ifdef VERBOSE
-    fprintf( stderr, "magnet-test passed\n" );
-#endif
-
-    return 0;
-}
+MAIN_SINGLE_TEST(test1)
 

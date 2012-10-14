@@ -4,9 +4,7 @@
 #define LIBTRANSMISSION_TEST_H 1
 
 #include <stdio.h>
-#include <string.h>
 
-#include "transmission.h"
 #include "utils.h" /* tr_strcmp0() */
 
 static int current_test = 0;

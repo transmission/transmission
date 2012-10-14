@@ -1,5 +1,4 @@
 #include "transmission.h"
-#include "utils.h" /* tr_strcmp0 */
 
 #undef VERBOSE
 #include "libtransmission-test.h"

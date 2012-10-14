@@ -1,5 +1,3 @@
-#include <stdio.h> /* fprintf */
-#include <string.h> /* strcmp */
 #include "transmission.h"
 #include "bencode.h"
 #include "rpcimpl.h"

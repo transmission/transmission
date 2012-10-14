@@ -1,5 +1,3 @@
-#include <stdio.h>
-#include <string.h>
 #include "transmission.h"
 #include "clients.h"
 
@@ -9,7 +7,7 @@
 
 #define TEST_CLIENT( A, B ) \
     tr_clientForId( buf, sizeof( buf ), A ); \
-    check( !strcmp( buf, B ) );
+    check_streq( B, buf );
 
 int
 main( void )
