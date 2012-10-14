@@ -1,7 +1,7 @@
 #include "transmission.h"
 #include "utils.h" /* tr_strcmp0 */
 
-#define VERBOSE
+#undef VERBOSE
 #include "libtransmission-test.h"
 
 static int

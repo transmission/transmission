@@ -371,10 +371,15 @@ getannounce( tr_info * inf, tr_benc * meta )
  * trailing slash for multifile torrents if omitted by the end user.
  */
 static char*
-fix_webseed_url( const tr_info * inf, const char * url )
+fix_webseed_url( const tr_info * inf, const char * url_in )
 {
+    size_t len;
+    char * url;
     char * ret = NULL;
-    const size_t len = strlen( url );
+
+    url = tr_strdup( url_in );
+    tr_strstrip( url );
+    len = strlen( url );
 
     if( tr_urlIsValid( url, len ) )
     {
@@ -384,6 +389,7 @@ fix_webseed_url( const tr_info * inf, const char * url )
             ret = tr_strndup( url, len );
     }
 
+    tr_free( url );
     return ret;
 }
 
