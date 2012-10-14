@@ -31,18 +31,16 @@ test_base64( void )
 
     /* base64 */
     out = tr_base64_encode( "YOYO!", -1, &len );
-    check( out );
-    check( !strcmp( out, "WU9ZTyE=" ) );
-    check( len == 8 );
+    check_streq ("WU9ZTyE=", out);
+    check_int_eq (8, len);
     in = tr_base64_decode( out, -1, &len );
-    check( in );
-    check( !strcmp( in, "YOYO!" ) );
-    check( len == 5 );
+    check_streq ("YOYO!", in);
+    check_int_eq (5, len);
     tr_free( in );
     tr_free( out );
     out = tr_base64_encode( NULL, 0, &len );
     check( out == NULL );
-    check( len == 0 );
+    check_int_eq (0, len);
 
     return 0;
 }
@@ -155,14 +153,12 @@ test_strip_positional_args( void )
     in = "Hello %1$s foo %2$.*f";
     expected = "Hello %s foo %.*f";
     out = tr_strip_positional_args( in );
-    check( out != NULL );
-    check( !strcmp( out, expected ) );
+    check_streq (expected, out);
 
     in = "Hello %1$'d foo %2$'f";
     expected = "Hello %d foo %f";
     out = tr_strip_positional_args( in );
-    check( out != NULL );
-    check( !strcmp( out, expected ) );
+    check_streq (expected, out);
 
     return 0;
 }
@@ -176,21 +172,21 @@ test_strstrip( void )
     in = tr_strdup( "   test    " );
     out = tr_strstrip( in );
     check( in == out );
-    check( !strcmp( in, "test" ) );
+    check_streq ("test", out);
     tr_free( in );
 
     /* strstrip */
     in = tr_strdup( " test test " );
     out = tr_strstrip( in );
     check( in == out );
-    check( !strcmp( in, "test test" ) );
+    check_streq ("test test", out);
     tr_free( in );
 
     /* strstrip */
     in = tr_strdup( "test" );
     out = tr_strstrip( in );
     check( in == out );
-    check( !strcmp( in, "test" ) );
+    check_streq ("test", out);
     tr_free( in );
 
     return 0;
@@ -202,11 +198,11 @@ test_buildpath( void )
     char * out;
 
     out = tr_buildPath( "foo", "bar", NULL );
-    check( !strcmp( out, "foo" TR_PATH_DELIMITER_STR "bar" ) );
+    check_streq ("foo" TR_PATH_DELIMITER_STR "bar", out);
     tr_free( out );
 
     out = tr_buildPath( "", "foo", "bar", NULL );
-    check( !strcmp( out, TR_PATH_DELIMITER_STR "foo" TR_PATH_DELIMITER_STR "bar" ) );
+    check_streq (TR_PATH_DELIMITER_STR "foo" TR_PATH_DELIMITER_STR "bar", out);
     tr_free( out );
 
     return 0;
@@ -220,14 +216,12 @@ test_utf8( void )
 
     in = "hello world";
     out = tr_utf8clean( in, -1 );
-    check( out != NULL );
-    check( !strcmp( out, in ) );
+    check_streq (in, out);
     tr_free( out );
 
     in = "hello world";
     out = tr_utf8clean( in, 5 );
-    check( out != NULL );
-    check( !strcmp( out, "hello" ) );
+    check_streq ("hello", out);
     tr_free( out );
 
     /* this version is not utf-8 */
@@ -243,7 +237,7 @@ test_utf8( void )
     out = tr_utf8clean( in, -1 );
     check( out != NULL );
     check( tr_utf8_validate( out, -1, NULL ) );
-    check ( !strcmp( in, out ) );
+    check_streq (in, out);
     tr_free( out );
 
     return 0;
@@ -257,33 +251,32 @@ test_numbers( void )
     int * numbers;
 
     numbers = tr_parseNumberRange( "1-10,13,16-19", -1, &count );
-    check( count == 15 );
-    check( numbers != NULL );
-    check( numbers[0] == 1 );
-    check( numbers[5] == 6 );
-    check( numbers[9] == 10 );
-    check( numbers[10] == 13 );
-    check( numbers[11] == 16 );
-    check( numbers[14] == 19 );
+    check_int_eq( 15, count );
+    check_int_eq( 1, numbers[0] );
+    check_int_eq( 6, numbers[5] );
+    check_int_eq( 10, numbers[9] );
+    check_int_eq( 13, numbers[10] );
+    check_int_eq( 16, numbers[11] );
+    check_int_eq( 19, numbers[14] );
     tr_free( numbers );
 
     numbers = tr_parseNumberRange( "1-5,3-7,2-6", -1, &count );
     check( count == 7 );
     check( numbers != NULL );
     for( i=0; i<count; ++i )
-        check( numbers[i] == i+1 );
+        check_int_eq (i+1, numbers[i]);
     tr_free( numbers );
 
     numbers = tr_parseNumberRange( "1-Hello", -1, &count );
-    check( count == 0 );
+    check_int_eq (0, count);
     check( numbers == NULL );
 
     numbers = tr_parseNumberRange( "1-", -1, &count );
-    check( count == 0 );
+    check_int_eq (0, count);
     check( numbers == NULL );
 
     numbers = tr_parseNumberRange( "Hello", -1, &count );
-    check( count == 0 );
+    check_int_eq (0, count);
     check( numbers == NULL );
 
     return 0;
@@ -319,8 +312,8 @@ test_lowerbound( void )
         else
             fprintf( stderr, "which is off the end.\n" );
 #endif
-        check( pos == expected_pos[i-1] );
-        check( exact == expected_exact[i-1] );
+        check_int_eq( expected_pos[i-1], pos );
+        check_int_eq( expected_exact[i-1], exact );
     }
 
     return 0;
@@ -350,7 +343,7 @@ test_hex( void )
     memcpy( hex1, "fb5ef5507427b17e04b69cef31fa3379b456735a", 41 );
     tr_hex_to_sha1( sha1, hex1 );
     tr_sha1_to_hex( hex2, sha1 );
-    check( !strcmp( hex1, hex2 ) );
+    check_streq (hex1, hex2);
 
     return 0;
 }
@@ -364,15 +357,15 @@ test_array( void )
 
     tr_removeElementFromArray( array, 5u, sizeof( int ), n-- );
     for( i=0; i<n; ++i )
-        check( array[i] == ( i<5 ? i : i+1 ) );
+        check_int_eq( ( i<5 ? i : i+1 ), array[i] );
 
     tr_removeElementFromArray( array, 0u, sizeof( int ), n-- );
     for( i=0; i<n; ++i )
-        check( array[i] == ( i<4 ? i+1 : i+2 ) );
+        check_int_eq( ( i<4 ? i+1 : i+2 ), array[i] );
 
     tr_removeElementFromArray( array, n-1, sizeof( int ), n ); n--;
     for( i=0; i<n; ++i )
-        check( array[i] == ( i<4 ? i+1 : i+2 ) );
+        check_int_eq( ( i<4 ? i+1 : i+2 ), array[i] );
 
     return 0;
 }
@@ -389,37 +382,37 @@ test_url( void )
 
     url = "http://1";
     check( !tr_urlParse( url, -1, &scheme, &host, &port, &path ) );
-    check( !strcmp( scheme, "http" ) );
-    check( !strcmp( host, "1" ) );
-    check( !strcmp( path, "/" ) );
-    check( port == 80 );
+    check_streq ("http", scheme);
+    check_streq ("1", host);
+    check_streq ("/", path);
+    check_int_eq (80, port);
     tr_free( scheme );
     tr_free( path );
     tr_free( host );
 
     url = "http://www.some-tracker.org/some/path";
     check( !tr_urlParse( url, -1, &scheme, &host, &port, &path ) );
-    check( !strcmp( scheme, "http" ) );
-    check( !strcmp( host, "www.some-tracker.org" ) );
-    check( !strcmp( path, "/some/path" ) );
-    check( port == 80 );
+    check_streq ("http", scheme);
+    check_streq ("www.some-tracker.org", host);
+    check_streq ("/some/path", path);
+    check_int_eq (80, port);
     tr_free( scheme );
     tr_free( path );
     tr_free( host );
 
     url = "http://www.some-tracker.org:80/some/path";
     check( !tr_urlParse( url, -1, &scheme, &host, &port, &path ) );
-    check( !strcmp( scheme, "http" ) );
-    check( !strcmp( host, "www.some-tracker.org" ) );
-    check( !strcmp( path, "/some/path" ) );
-    check( port == 80 );
+    check_streq ("http", scheme);
+    check_streq ("www.some-tracker.org", host);
+    check_streq ("/some/path", path);
+    check_int_eq (80, port);
     tr_free( scheme );
     tr_free( path );
     tr_free( host );
 
     url = "http%3A%2F%2Fwww.example.com%2F~user%2F%3Ftest%3D1%26test1%3D2";
     str = tr_http_unescape( url, strlen( url ) );
-    check( !strcmp( str, "http://www.example.com/~user/?test=1&test1=2" ) );
+    check_streq ("http://www.example.com/~user/?test=1&test1=2", str);
     tr_free( str );
 
     return 0;
@@ -432,25 +425,26 @@ test_truncd( void )
     const double nan = sqrt( -1 );
 
     tr_snprintf( buf, sizeof( buf ), "%.2f%%", 99.999 );
+    check_streq("100.00%", buf);
     check( !strcmp( buf, "100.00%" ) );
 
     tr_snprintf( buf, sizeof( buf ), "%.2f%%", tr_truncd( 99.999, 2 ) );
-    check( !strcmp( buf, "99.99%" ) );
+    check_streq("99.99%", buf);
 
     tr_snprintf( buf, sizeof( buf ), "%.4f", tr_truncd( 403650.656250, 4 ) );
-    check( !strcmp( buf, "403650.6562" ) );
+    check_streq("403650.6562", buf);
 
     tr_snprintf( buf, sizeof( buf ), "%.2f", tr_truncd( 2.15, 2 ) );
-    check( !strcmp( buf, "2.15" ) );
+    check_streq( "2.15", buf );
 
     tr_snprintf( buf, sizeof( buf ), "%.2f", tr_truncd( 2.05, 2 ) );
-    check( !strcmp( buf, "2.05" ) );
+    check_streq( "2.05", buf );
 
     tr_snprintf( buf, sizeof( buf ), "%.2f", tr_truncd( 3.3333, 2 ) );
-    check( !strcmp( buf, "3.33" ) );
+    check_streq( "3.33", buf );
 
     tr_snprintf( buf, sizeof( buf ), "%.0f", tr_truncd( 3.3333, 0 ) );
-    check( !strcmp( buf, "3" ) );
+    check_streq( "3", buf );
 
     tr_snprintf( buf, sizeof( buf ), "%.2f", tr_truncd( nan, 2 ) );
     check( strstr( buf, "nan" ) != NULL );

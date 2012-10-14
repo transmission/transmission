@@ -23,7 +23,7 @@ test_utf8( void )
     check( !err );
     check( tr_bencIsDict( &top ) );
     check( tr_bencDictFindStr( &top, "key", &str ) );
-    check( !strcmp( str, "Letöltések" ) );
+    check_streq( "Letöltések", str );
     if( !err )
         tr_bencFree( &top );
 
@@ -32,7 +32,7 @@ test_utf8( void )
     check( !err );
     check( tr_bencIsDict( &top ) );
     check( tr_bencDictFindStr( &top, "key", &str ) );
-    check( !strcmp( str, "\\" ) );
+    check_streq( "\\", str );
     if( !err )
         tr_bencFree( &top );
 
@@ -49,7 +49,7 @@ test_utf8( void )
     check( !err );
     check( tr_bencIsDict( &top ) );
     check( tr_bencDictFindStr( &top, "key", &str ) );
-    check( !strcmp( str, "Letöltések" ) );
+    check_streq( "Letöltések", str );
     json = tr_bencToStr( &top, TR_FMT_JSON, NULL );
     if( !err )
         tr_bencFree( &top );
@@ -60,7 +60,7 @@ test_utf8( void )
     check( !err );
     check( tr_bencIsDict( &top ) );
     check( tr_bencDictFindStr( &top, "key", &str ) );
-    check( !strcmp( str, "Letöltések" ) );
+    check_streq( "Letöltések", str );
     if( !err )
         tr_bencFree( &top );
     tr_free( json );
@@ -94,21 +94,21 @@ test1( void )
     check( ( headers = tr_bencDictFind( &top, "headers" ) ) );
     check( tr_bencIsDict( headers ) );
     check( tr_bencDictFindStr( headers, "type", &str ) );
-    check( !strcmp( str, "request" ) );
+    check_streq( "request", str );
     check( tr_bencDictFindInt( headers, "tag", &i ) );
-    check( i == 666 );
+    check_int_eq( 666, i );
     check( ( body = tr_bencDictFind( &top, "body" ) ) );
     check( tr_bencDictFindStr( body, "name", &str ) );
-    check( !strcmp( str, "torrent-info" ) );
+    check_streq( "torrent-info", str );
     check( ( args = tr_bencDictFind( body, "arguments" ) ) );
     check( tr_bencIsDict( args ) );
     check( ( ids = tr_bencDictFind( args, "ids" ) ) );
     check( tr_bencIsList( ids ) );
-    check( tr_bencListSize( ids ) == 2 );
+    check_int_eq( 2, tr_bencListSize( ids ) );
     check( tr_bencGetInt( tr_bencListChild( ids, 0 ), &i ) );
-    check( i == 7 );
+    check_int_eq( 7, i );
     check( tr_bencGetInt( tr_bencListChild( ids, 1 ), &i ) );
-    check( i == 10 );
+    check_int_eq( 10, i );
 
     tr_bencFree( &top );
     return 0;
@@ -144,7 +144,7 @@ test3( void )
     const int err = tr_jsonParse( NULL, in, strlen( in ), &top, NULL );
     check( !err );
     check( tr_bencDictFindStr( &top, "errorString", &str ) );
-    check( !strcmp( str, "torrent not registered with this tracker 6UHsVW'*C" ) );
+    check_streq( "torrent not registered with this tracker 6UHsVW'*C", str );
 
     tr_bencFree( &top );
     return 0;

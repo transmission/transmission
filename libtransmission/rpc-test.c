@@ -18,41 +18,41 @@ test_list( void )
     tr_rpc_parse_list_str( &top, "12", -1 );
     check( tr_bencIsInt( &top ) );
     check( tr_bencGetInt( &top, &i ) );
-    check( i == 12 );
+    check_int_eq ( 12, i );
     tr_bencFree( &top );
 
     tr_rpc_parse_list_str( &top, "12", 1 );
     check( tr_bencIsInt( &top ) );
     check( tr_bencGetInt( &top, &i ) );
-    check( i == 1 );
+    check_int_eq ( 1, i );
     tr_bencFree( &top );
 
     tr_rpc_parse_list_str( &top, "6,7", -1 );
     check( tr_bencIsList( &top ) );
     check( tr_bencListSize( &top ) == 2 );
     check( tr_bencGetInt( tr_bencListChild( &top, 0 ), &i ) );
-    check( i == 6 );
+    check_int_eq ( 6, i );
     check( tr_bencGetInt( tr_bencListChild( &top, 1 ), &i ) );
-    check( i == 7 );
+    check_int_eq ( 7, i );
     tr_bencFree( &top );
 
     tr_rpc_parse_list_str( &top, "asdf", -1 );
     check( tr_bencIsString( &top ) );
     check( tr_bencGetStr( &top, &str ) );
-    check( !strcmp( str, "asdf" ) );
+    check_streq( "asdf", str );
     tr_bencFree( &top );
 
     tr_rpc_parse_list_str( &top, "1,3-5", -1 );
     check( tr_bencIsList( &top ) );
     check( tr_bencListSize( &top ) == 4 );
     check( tr_bencGetInt( tr_bencListChild( &top, 0 ), &i ) );
-    check( i == 1 );
+    check_int_eq( 1, i );
     check( tr_bencGetInt( tr_bencListChild( &top, 1 ), &i ) );
-    check( i == 3 );
+    check_int_eq( 3, i );
     check( tr_bencGetInt( tr_bencListChild( &top, 2 ), &i ) );
-    check( i == 4 );
+    check_int_eq( 4, i );
     check( tr_bencGetInt( tr_bencListChild( &top, 3 ), &i ) );
-    check( i == 5 );
+    check_int_eq( 5, i );
     tr_bencFree( &top );
 
     return 0;

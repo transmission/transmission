@@ -15,14 +15,14 @@ test1( void )
     memset( &h, 0, sizeof( tr_recentHistory ) );
 
     tr_historyAdd( &h, 10000, 1 );
-    check( (int)tr_historyGet( &h, 12000, 1000 ) == 0 );
-    check( (int)tr_historyGet( &h, 12000, 3000 ) == 1 );
-    check( (int)tr_historyGet( &h, 12000, 5000 ) == 1 );
+    check_int_eq( 0, (int)tr_historyGet( &h, 12000, 1000 ) );
+    check_int_eq( 1, (int)tr_historyGet( &h, 12000, 3000 ) );
+    check_int_eq( 1, (int)tr_historyGet( &h, 12000, 5000 ) );
     tr_historyAdd( &h, 20000, 1 );
-    check( (int)tr_historyGet( &h, 22000,  1000 ) == 0 );
-    check( (int)tr_historyGet( &h, 22000,  3000 ) == 1 );
-    check( (int)tr_historyGet( &h, 22000, 15000 ) == 2 );
-    check( (int)tr_historyGet( &h, 22000, 20000 ) == 2 );
+    check_int_eq( 0, (int)tr_historyGet( &h, 22000,  1000 ) );
+    check_int_eq( 1, (int)tr_historyGet( &h, 22000,  3000 ) );
+    check_int_eq( 2, (int)tr_historyGet( &h, 22000, 15000 ) );
+    check_int_eq( 2, (int)tr_historyGet( &h, 22000, 20000 ) );
 
     return 0;
 }
