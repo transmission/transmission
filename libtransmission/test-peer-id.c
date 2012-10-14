@@ -13,7 +13,6 @@ static int
 testPeerId( void )
 {
     int i;
-    int test = 0;
     uint8_t peer_id[PEER_ID_LEN+1];
 
     for( i = 0; i < 100000; ++i )
