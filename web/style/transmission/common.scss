@@ -643,17 +643,8 @@ div#torrent_inspector
 		margin-left: 20px;
 	}
 
-	li.inspector_torrent_file_list_entry.skip>.file_wanted_control {
-		background-position: left top;
-	}
-
-	li.inspector_torrent_file_list_entry.complete>.file_wanted_control {
-		background-position: left -19px;
-	}
-
 	ul.single_file li.inspector_torrent_file_list_entry>.file_wanted_control,
 	li.inspector_torrent_file_list_entry.complete>.file_wanted_control {
-		background-position: left -38px;
 		cursor: default;
 	}
 }

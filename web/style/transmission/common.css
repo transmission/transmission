@@ -593,13 +593,8 @@ div#torrent_inspector {
   div#torrent_inspector div.inspector_torrent_file_list_entry_progress {
     color: #999;
     margin-left: 20px; }
-  div#torrent_inspector li.inspector_torrent_file_list_entry.skip > .file_wanted_control {
-    background-position: left top; }
-  div#torrent_inspector li.inspector_torrent_file_list_entry.complete > .file_wanted_control {
-    background-position: left -19px; }
   div#torrent_inspector ul.single_file li.inspector_torrent_file_list_entry > .file_wanted_control,
   div#torrent_inspector li.inspector_torrent_file_list_entry.complete > .file_wanted_control {
-    background-position: left -38px;
     cursor: default; }
 
 /* Peers Inspector Tab */
