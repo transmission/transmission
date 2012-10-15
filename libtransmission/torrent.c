@@ -1720,6 +1720,7 @@ torrentRecheckDoneCB( tr_torrent * tor )
 static void
 verifyTorrent( void * vtor )
 {
+    bool startAfter;
     tr_torrent * tor = vtor;
 
     tr_sessionLock( tor->session );
@@ -1727,13 +1728,12 @@ verifyTorrent( void * vtor )
     /* if the torrent's already being verified, stop it */
     tr_verifyRemove( tor );
 
-    /* if the torrent's running, stop it & set the restart-after-verify flag */
-    if( tor->startAfterVerify || tor->isRunning ) {
-        /* don't clobber isStopping */
-        const bool startAfter = tor->isStopping ? false : true;
+    startAfter = (tor->isRunning || tor->startAfterVerify) && !tor->isStopping;
+
+    if( tor->isRunning )
         tr_torrentStop( tor );
-        tor->startAfterVerify = startAfter;
-    }
+
+    tor->startAfterVerify = startAfter;
 
     if( setLocalErrorIfFilesDisappeared( tor ) )
         tor->startAfterVerify = false;
