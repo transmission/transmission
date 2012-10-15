@@ -2087,7 +2087,10 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
                                 description: [torrent name] notificationName: GROWL_SEEDING_COMPLETE
                                    iconData: nil priority: 0 isSticky: NO clickContext: clickContext];
     
-    //removing for the list calls fullUpdateUI
+    if (![fWindow isMainWindow])
+        [fBadger addCompletedTorrent: torrent];
+    
+    //removing from the list calls fullUpdateUI
     if ([torrent removeWhenFinishSeeding])
         [self confirmRemoveTorrents: [[NSArray arrayWithObject: torrent] retain] deleteData: NO];
     else

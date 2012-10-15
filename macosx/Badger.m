@@ -65,6 +65,8 @@
 
 - (void) addCompletedTorrent: (Torrent *) torrent
 {
+    NSParameterAssert(torrent != nil);
+    
     [fHashes addObject: [torrent hashString]];
     [[NSApp dockTile] setBadgeLabel: [NSString formattedUInteger: [fHashes count]]];
 }
