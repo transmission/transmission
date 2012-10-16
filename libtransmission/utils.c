@@ -519,13 +519,17 @@ tr_mkdtemp( char * template )
 #endif
 }
 
-int
-tr_mkdir( const char * path,
-          int permissions
-#ifdef WIN32
-                       UNUSED
-#endif
-        )
+/**
+ * @brief Portability wrapper for mkdir()
+ *
+ * A portability wrapper around mkdir().
+ * On WIN32, the `permissions' argument is unused.
+ *
+ * @return zero on success, or -1 if an error occurred
+ * (in which case errno is set appropriately).
+ */
+static int
+tr_mkdir( const char * path, int permissions UNUSED)
 {
 #ifdef WIN32
     if( path && isalpha( path[0] ) && path[1] == ':' && !path[2] )

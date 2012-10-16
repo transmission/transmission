@@ -204,17 +204,6 @@ char* tr_basename( const char * path ) TR_GNUC_MALLOC;
 char* tr_dirname( const char * path ) TR_GNUC_MALLOC;
 
 /**
- * @brief Portability wrapper for mkdir()
- *
- * A portability wrapper around mkdir().
- * On WIN32, the `permissions' argument is unused.
- *
- * @return zero on success, or -1 if an error occurred
- * (in which case errno is set appropriately).
- */
-int tr_mkdir( const char * path, int permissions ) TR_GNUC_NONNULL(1);
-
-/**
  * Like mkdir, but makes parent directories as needed.
  *
  * @return zero on success, or -1 if an error occurred
