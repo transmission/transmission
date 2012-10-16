@@ -30,7 +30,7 @@
 #define dbgmsg( tor, ... ) \
     do { \
         if( tr_deepLoggingIsActive( ) ) \
-            tr_deepLog( __FILE__, __LINE__, tor->info.name, __VA_ARGS__ ); \
+            tr_deepLog( __FILE__, __LINE__, tr_torrentName( tor ), __VA_ARGS__ ); \
     } while( 0 )
 
 /***

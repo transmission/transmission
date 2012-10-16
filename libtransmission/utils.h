@@ -141,19 +141,19 @@ void tr_msg( const char * file, int line,
 #define tr_torerr( tor, ... ) \
     do { \
         if( tr_msgLoggingIsActive( TR_MSG_ERR ) ) \
-            tr_msg( __FILE__, __LINE__, TR_MSG_ERR, tor->info.name, __VA_ARGS__ ); \
+            tr_msg( __FILE__, __LINE__, TR_MSG_ERR, tr_torrentName( tor ), __VA_ARGS__ ); \
     } while( 0 )
 
 #define tr_torinf( tor, ... ) \
     do { \
         if( tr_msgLoggingIsActive( TR_MSG_INF ) ) \
-            tr_msg( __FILE__, __LINE__, TR_MSG_INF, tor->info.name, __VA_ARGS__ ); \
+            tr_msg( __FILE__, __LINE__, TR_MSG_INF, tr_torrentName( tor ), __VA_ARGS__ ); \
     } while( 0 )
 
 #define tr_tordbg( tor, ... ) \
     do { \
         if( tr_msgLoggingIsActive( TR_MSG_DBG ) ) \
-            tr_msg( __FILE__, __LINE__, TR_MSG_DBG, tor->info.name, __VA_ARGS__ ); \
+            tr_msg( __FILE__, __LINE__, TR_MSG_DBG, tr_torrentName( tor ), __VA_ARGS__ ); \
     } while( 0 )
 
 #define tr_err( ... ) \
