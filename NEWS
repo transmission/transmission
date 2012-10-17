@@ -1,17 +1,19 @@
 === Transmission 2.72 (2012/10/16) ===
-[http://trac.transmissionbt.com/query?milestone=2.21&group=component&order=severity All tickets closed by this release]
+[http://trac.transmissionbt.com/query?milestone=2.72&group=component&order=severity All tickets closed by this release]
 ==== All Platforms ====
-  * Show the webseed count in the torrent list When downloading from webseeds
+  * Fix crash when adding magnet links with malformed webseeds
   * Fix handling of magnet links' webseed URLs that contain whitespace
-  * Fix crash when adding magnets with malformed webseeds
+  * Fix remaining time estimates of magnet links that have webseeds
+  * Show the webseed count in the torrent list when downloading from webseeds
 ==== Mac ====
-  * Don't force dual-GPU Macbook Pros to use the discrete GPU
+  * When possible allow automatic switching to the integrated GPU on dual-GPU machines
+  * Include seeding-complete transfers in the badged count on the Dock icon
 ==== GTK+ ====
   * When adding torrents by URL from the clipboard, handle whitespace in the link
 ==== Qt ====
   * Fix dialog memory leaks
 ==== Web Client ====
-  * Minor UX fixes
+  * Minor interface fixes
 
 === Transmission 2.71 (2012/09/26) ===
 [http://trac.transmissionbt.com/query?milestone=2.71&group=component&order=severity All tickets closed by this release]
