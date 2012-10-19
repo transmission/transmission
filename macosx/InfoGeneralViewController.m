@@ -51,6 +51,8 @@
     [super dealloc];
 }
 
+#warning enable after 2.7
+/*
 - (void) awakeFromNib
 {
     #warning remove when 10.7-only with auto layout
@@ -91,7 +93,7 @@
         frame.size.width -= widthIncrease;
         [field setFrame: frame];
     }
-}
+}*/
 
 - (void) setInfoForTorrents: (NSArray *) torrents
 {

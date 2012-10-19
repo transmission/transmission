@@ -58,7 +58,7 @@
     [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(updatePiecesView) name: @"UpdatePiecesView" object: nil];
     
     #warning remove when 10.7-only with auto layout
-    [fTransferSectionLabel sizeToFit];
+    /*[fTransferSectionLabel sizeToFit];
     [fDatesSectionLabel sizeToFit];
     [fTimeSectionLabel sizeToFit];
     
@@ -95,7 +95,7 @@
         frame.origin.x += widthIncrease;
         frame.size.width -= widthIncrease;
         [field setFrame: frame];
-    }
+    }*/
 }
 
 - (void) dealloc
