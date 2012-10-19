@@ -1,4 +1,4 @@
-=== Transmission 2.72 (2012/10/18) ===
+=== Transmission 2.73 (2012/10/18) ===
 [http://trac.transmissionbt.com/query?milestone=2.73&group=component&order=severity All tickets closed by this release]
 ==== Mac ====
   * Fix crash on non-English localizations
