@@ -387,13 +387,6 @@ TorrentRow.prototype =
 	isSelected: function() {
 		return this.getElement().className.indexOf('selected') !== -1;
 	},
-	setSelected: function(flag) {
-		$(this.getElement()).toggleClass('selected', flag);
-	},
-
-	getToggleRunningButton: function() {
-		return this.getElement()._toggle_running_button;
-	},
 
 	getTorrent: function() {
 		return this._torrent;
