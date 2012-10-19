@@ -82,14 +82,6 @@ function Inspector(controller) {
     *****  GENERAL INFO PAGE
     ****/
 
-    accumulateString = function (oldVal, newVal) {
-        if (!oldVal || !oldVal.length)
-            return newVal;
-        if (oldVal === newVal)
-            return newVal;
-        return 'Mixed';
-    },
-
     updateInfoPage = function () {
         var torrents = data.torrents,
             e = data.elements,
