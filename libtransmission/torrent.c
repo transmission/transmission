@@ -549,10 +549,18 @@ onTrackerResponse( tr_torrent * tor, const tr_tracker_event * event, void * unus
 static tr_piece_index_t
 getBytePiece( const tr_info * info, uint64_t byteOffset )
 {
+    tr_piece_index_t piece;
+
     assert( info );
     assert( info->pieceSize != 0 );
 
-    return byteOffset / info->pieceSize;
+    piece = byteOffset / info->pieceSize;
+
+    /* handle 0-byte files at the end of a torrent */
+    if (byteOffset == info->totalSize)
+      piece = info->pieceCount - 1;
+
+    return piece;
 }
 
 static void
