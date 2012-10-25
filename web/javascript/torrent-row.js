@@ -169,13 +169,19 @@ TorrentRendererFull.prototype =
 				         'of',
 				         fmt.countString('peer','peers',peer_count),
 				         'and',
-				         fmt.countString('web seed','web seeds',webseed_count) ].join(' ');
+				         fmt.countString('web seed','web seeds',webseed_count),
+				         '-',
+				         TorrentRendererHelper.formatDL(t),
+				         TorrentRendererHelper.formatUL(t) ].join(' ');
 			}
 			else if (webseed_count)
 			{
 				// Downloading from 2 webseed(s)
 				return [ 'Downloading from',
-				         fmt.countString('web seed','web seeds',webseed_count) ].join(' ');
+				         fmt.countString('web seed','web seeds',webseed_count),
+				         '-',
+				         TorrentRendererHelper.formatDL(t),
+				         TorrentRendererHelper.formatUL(t) ].join(' ');
 			}
 			else
 			{
@@ -183,7 +189,10 @@ TorrentRendererFull.prototype =
 				return [ 'Downloading from',
 				         t.getPeersSendingToUs(),
 				         'of',
-				         fmt.countString('peer','peers',peer_count) ].join(' ');
+				         fmt.countString('peer','peers',peer_count),
+				         '-',
+				         TorrentRendererHelper.formatDL(t),
+				         TorrentRendererHelper.formatUL(t) ].join(' ');
 			}
 		}
 
