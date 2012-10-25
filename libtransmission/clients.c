@@ -299,6 +299,10 @@ tr_clientForId( char * buf, size_t buflen, const void * id_in )
             else if( !memcmp( &id[4], "A0C", 3 ) ) tr_snprintf( buf, buflen, "Bits on Wheels 1.0.6" );
             else                                   tr_snprintf( buf, buflen, "Bits on Wheels %c.%c.%c", id[4], id[5], id[5] );
         }
+        else if( !memcmp( id+1, "MG", 2 ) )
+        {
+            tr_snprintf( buf, buflen, "MediaGet %d.%02d", charint(id[3]), charint(id[4]) );
+        }
 
         if( *buf )
             return;
