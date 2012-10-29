@@ -113,8 +113,7 @@
     {
         const NSRect frame = [self frame];
         const NSSize imageSize = [fBadge size];
-        [fBadge compositeToPoint: NSMakePoint((NSWidth(frame) - imageSize.width) * 0.5,
-                    (NSHeight(frame) - imageSize.height) * 0.5) operation: NSCompositeSourceOver];
+        [fBadge drawAtPoint: NSMakePoint((NSWidth(frame) - imageSize.width) * 0.5, (NSHeight(frame) - imageSize.height) * 0.5) fromRect: NSZeroRect operation: NSCompositeSourceOver fraction: 1.0];
     }
 }
 
