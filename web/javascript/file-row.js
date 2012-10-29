@@ -107,7 +107,7 @@ function FileRow(torrent, depth, name, indices, even)
 	},
 	isEditable = function () {
 		return (fields.torrent.getFileCount()>1) && !isDone();
-	};
+	},
 
 	createRow = function(torrent, depth, name, even) {
 		var e, root, box;
