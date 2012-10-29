@@ -38,6 +38,7 @@
 #define PADDING_ABOVE_TITLE_FILE 2.0
 #define PADDING_BELOW_STATUS_FILE 2.0
 #define PADDING_BETWEEN_NAME_AND_FOLDER_STATUS 4.0
+#define PADDING_EXPANSION_FRAME 2.0
 
 @interface FileNameCell (Private)
 
@@ -140,6 +141,31 @@
     NSAttributedString * statusString = [self attributedStatus];
     NSRect statusRect = [self rectForStatusWithString: statusString withTitleRect: titleRect inBounds: cellFrame];
     [statusString drawInRect: statusRect];
+}
+
+- (NSRect) expansionFrameWithFrame: (NSRect) cellFrame inView: (NSView *) view
+{
+    NSAttributedString * titleString = [self attributedTitle];
+    NSRect realRect = [self rectForTitleWithString: titleString inBounds: cellFrame];
+    
+    if ([titleString size].width > NSWidth(realRect)
+        && NSMouseInRect([view convertPoint: [[view window] convertScreenToBase: [NSEvent mouseLocation]] fromView: nil], realRect, [view isFlipped]))
+    {
+        realRect.size.width = [titleString size].width;
+        return NSInsetRect(realRect, -PADDING_EXPANSION_FRAME, -PADDING_EXPANSION_FRAME);
+    }
+    
+    return NSZeroRect;
+}
+
+- (void) drawWithExpansionFrame: (NSRect) cellFrame inView: (NSView *)view
+{
+    cellFrame.origin.x += PADDING_EXPANSION_FRAME;
+    cellFrame.origin.y += PADDING_EXPANSION_FRAME;
+    
+    [fTitleAttributes setObject: [NSColor controlTextColor] forKey: NSForegroundColorAttributeName];
+    NSAttributedString * titleString = [self attributedTitle];
+    [titleString drawInRect: cellFrame];
 }
 
 @end
