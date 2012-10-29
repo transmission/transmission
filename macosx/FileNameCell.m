@@ -150,18 +150,19 @@
 {
     const NSSize titleSize = [string size];
     
+    //no right padding, so that there's not too much space between this and the priority image
     NSRect result;
     if (![(FileListNode *)[self objectValue] isFolder])
     {
         result.origin.x = NSMinX(bounds) + PADDING_HORIZONAL + IMAGE_ICON_SIZE + PADDING_BETWEEN_IMAGE_AND_TITLE;
         result.origin.y = NSMinY(bounds) + PADDING_ABOVE_TITLE_FILE;
-        result.size.width = NSMaxX(bounds) - NSMinX(result) - PADDING_HORIZONAL;
+        result.size.width = NSMaxX(bounds) - NSMinX(result);
     }
     else
     {
         result.origin.x = NSMinX(bounds) + PADDING_HORIZONAL + IMAGE_FOLDER_SIZE + PADDING_BETWEEN_IMAGE_AND_TITLE;
         result.origin.y = NSMidY(bounds) - titleSize.height * 0.5;
-        result.size.width = MIN(titleSize.width, NSMaxX(bounds) - NSMinX(result) - PADDING_HORIZONAL);
+        result.size.width = MIN(titleSize.width, NSMaxX(bounds) - NSMinX(result));
     }
     result.size.height = titleSize.height;
     
@@ -183,7 +184,7 @@
     {
         result.origin.x = NSMaxX(titleRect) + PADDING_BETWEEN_NAME_AND_FOLDER_STATUS;
         result.origin.y = NSMaxY(titleRect) - statusSize.height - 1.0;
-        result.size.width = NSMaxX(bounds) - NSMaxX(titleRect) - PADDING_HORIZONAL;
+        result.size.width = NSMaxX(bounds) - NSMaxX(titleRect);
     }
     result.size.height = statusSize.height;
     
