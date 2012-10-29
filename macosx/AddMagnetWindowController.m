@@ -95,8 +95,6 @@
         [fLocationImageView setImage: nil];
     }
     
-    #warning enable after 2.7 
-    /*
     #warning when 10.7-only, switch to auto layout
     [fMagnetLinkLabel sizeToFit];
     
@@ -138,7 +136,6 @@
     const CGFloat minButtonWidth = 82.0;
     const CGFloat oldAddButtonWidth = [fAddButton bounds].size.width;
     const CGFloat oldCancelButtonWidth = [fCancelButton bounds].size.width;
-    #warning add "extra" width that sizeToFit loses
     [fAddButton sizeToFit];
     [fCancelButton sizeToFit];
     NSRect addButtonFrame = [fAddButton frame];
@@ -154,7 +151,6 @@
     [fCancelButton setFrame: cancelButtonFrame];
     
     [fStartCheck sizeToFit];
-     */
 }
 
 - (void) windowDidLoad

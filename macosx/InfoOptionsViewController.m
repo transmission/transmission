@@ -63,8 +63,6 @@
     [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(setGlobalLabels) name: @"UpdateGlobalOptions" object: nil];
     [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(updateOptionsNotification:) name: @"UpdateOptionsNotification" object: nil];
     
-    #warning enable after 2.7
-    /*
     #warning remove when 10.7-only with auto layout
     const CGFloat padding = 6.0; //this shows as 8 in IB
     [fPrioritySectionLabel sizeToFit];
@@ -130,7 +128,7 @@
     [fPeersConnectLabel sizeToFit];
     NSRect peersConnectLabelFrame = [fPeersConnectLabel frame];
     peersConnectLabelFrame.origin.x = NSMaxX(peersConnectFrame) + padding;
-    [fPeersConnectLabel setFrame: peersConnectLabelFrame];*/
+    [fPeersConnectLabel setFrame: peersConnectLabelFrame];
 }
 
 - (void) dealloc
