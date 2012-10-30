@@ -1502,9 +1502,11 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
                     [NSAnimationContext beginGrouping]; //this has to be before we set the completion handler (#4874)
                     
                     //we can't closeRemoveTorrent: until it's no longer in the GUI at all
+                    [torrents retain];
                     [[NSAnimationContext currentContext] setCompletionHandler: ^{
                         for (Torrent * torrent in torrents)
                             [torrent closeRemoveTorrent: deleteData];
+                        [torrents release];
                     }];
                     
                     [fTableView beginUpdates];
