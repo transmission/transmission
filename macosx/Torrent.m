@@ -242,12 +242,14 @@ int trashDataFile(const char * filename)
     tr_torrentRemove(fHandle, trashFiles, trashDataFile);
 }
 
-- (void) changeDownloadFolderBeforeUsing: (NSString *) folder
+- (void) changeDownloadFolderBeforeUsing: (NSString *) folder determinationType: (TorrentDeterminationType) determinationType
 {
     //if data existed in original download location, unexclude it before changing the location
     [self setTimeMachineExclude: NO];
     
     tr_torrentSetDownloadDir(fHandle, [folder UTF8String]);
+	
+    fDownloadFolderDetermination = determinationType;
 }
 
 - (NSString *) currentDirectory
@@ -644,8 +646,7 @@ int trashDataFile(const char * filename)
     {
         if (stats[i].tier != prevTier)
         {
-            [trackers addObject: [NSDictionary dictionaryWithObjectsAndKeys: [NSNumber numberWithInteger: stats[i].tier + 1], @"Tier",
-                                    [self name], @"Name", nil]];
+            [trackers addObject: @{ @"Tier" : @(stats[i].tier + 1), @"Name" : [self name] }];
             prevTier = stats[i].tier;
         }
         
@@ -1311,9 +1312,14 @@ int trashDataFile(const char * filename)
     return fGroupValue;
 }
 
-- (void) setGroupValue: (NSInteger) goupValue
+- (void) setGroupValue: (NSInteger) groupValue determinationType: (TorrentDeterminationType) determinationType;
 {
-    fGroupValue = goupValue;
+    if (groupValue != fGroupValue)
+    {
+        fGroupValue = groupValue;
+        [[NSNotificationCenter defaultCenter] postNotificationName: kTorrentDidChangeGroupNotification object: self];
+	}
+    fGroupValueDetermination = determinationType;
 }
 
 - (NSInteger) groupOrderValue
@@ -1649,7 +1655,18 @@ int trashDataFile(const char * filename)
     if (![self isMagnet])
         [self createFileList];
 	
-    fGroupValue = groupValue ? [groupValue intValue] : [[GroupsController groups] groupIndexForTorrent: self]; 
+    fDownloadFolderDetermination = TorrentDeterminationAutomatic;
+    
+    if (groupValue)
+    {
+        fGroupValueDetermination = TorrentDeterminationUserSpecified;
+        fGroupValue = [groupValue intValue];
+    }
+    else
+    {
+        fGroupValueDetermination = TorrentDeterminationAutomatic;
+        fGroupValue = [[GroupsController groups] groupIndexForTorrent: self];
+    }
     
     fRemoveWhenFinishSeeding = removeWhenFinishSeeding ? [removeWhenFinishSeeding boolValue] : [fDefaults boolForKey: @"RemoveWhenFinishSeeding"];
     
@@ -1844,8 +1861,22 @@ int trashDataFile(const char * filename)
 - (void) metadataRetrieved
 {
     fStat = tr_torrentStat(fHandle);
-    
+
     [self createFileList];
+    
+    /* If the torrent is in no group, or the group was automatically determined based on criteria evaluated
+     * before we had metadata for this torrent, redetermine the group
+     */
+    if ((fGroupValueDetermination == TorrentDeterminationAutomatic) || ([self groupValue] == -1))
+        [self setGroupValue: [[GroupsController groups] groupIndexForTorrent: self] determinationType: TorrentDeterminationAutomatic];
+    
+    //change the location if the group calls for it and it's either not already set or was set automatically before
+    if (((fDownloadFolderDetermination == TorrentDeterminationAutomatic) || !tr_torrentGetCurrentDir(fHandle)) &&
+        [[GroupsController groups] usesCustomDownloadLocationForIndex: [self groupValue]])
+    {
+        NSString *location = [[GroupsController groups] customDownloadLocationForIndex: [self groupValue]];
+        [self changeDownloadFolderBeforeUsing: location determinationType:TorrentDeterminationAutomatic];
+    }
     
     [[NSNotificationCenter defaultCenter] postNotificationName: @"ResetInspector" object: self];
 }

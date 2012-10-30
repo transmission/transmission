@@ -42,7 +42,7 @@
 
 - (void) confirmAdd;
 
-- (void) setDestinationPath: (NSString *) destination;
+- (void) setDestinationPath: (NSString *) destination determinationType: (TorrentDeterminationType) determinationType;
 
 - (void) setGroupsMenu;
 - (void) changeGroupValue: (id) sender;
@@ -71,7 +71,8 @@
         fCanToggleDelete = canToggleDelete;
         
         fGroupValue = [torrent groupValue];
-        
+        fGroupValueDetermination = TorrentDeterminationAutomatic;
+
         [fVerifyIndicator setUsesThreadedAnimation: YES];
     }
     return self;
@@ -126,7 +127,7 @@
     [fDeleteCheck setEnabled: fCanToggleDelete];
     
     if (fDestination)
-        [self setDestinationPath: fDestination];
+        [self setDestinationPath: fDestination determinationType: (fLockDestination ? TorrentDeterminationUserSpecified : TorrentDeterminationAutomatic)];
     else
     {
         [fLocationField setStringValue: @""];
@@ -179,8 +180,8 @@
     [panel beginSheetModalForWindow: [self window] completionHandler: ^(NSInteger result) {
         if (result == NSFileHandlingPanelOKButton)
         {
-            fLockDestination = NO;
-            [self setDestinationPath: [[[panel URLs] objectAtIndex: 0] path]];
+            fLockDestination = YES;
+            [self setDestinationPath: [[[panel URLs] objectAtIndex: 0] path] determinationType: TorrentDeterminationUserSpecified];
         }
         else
         {
@@ -299,6 +300,7 @@
     if (![fGroupPopUp selectItemWithTag: fGroupValue])
     {
         fGroupValue = -1;
+		fGroupValueDetermination = TorrentDeterminationAutomatic;
         [fGroupPopUp selectItemWithTag: fGroupValue];
     }
 }
@@ -335,8 +337,8 @@
     [fTimer invalidate];
     [fTimer release];
     fTimer = nil;
-    [fTorrent setGroupValue: fGroupValue];
-    
+    [fTorrent setGroupValue: fGroupValue  determinationType: fGroupValueDetermination];
+
     if (fTorrentFile && fCanToggleDelete && [fDeleteCheck state] == NSOnState)
         [Torrent trashFile: fTorrentFile];
     
@@ -349,7 +351,7 @@
     [fController askOpenConfirmed: self add: YES]; //ensure last, since it releases this controller
 }
 
-- (void) setDestinationPath: (NSString *) destination
+- (void) setDestinationPath: (NSString *) destination determinationType: (TorrentDeterminationType) determinationType
 {
     destination = [destination stringByExpandingTildeInPath];
     if (!fDestination || ![fDestination isEqualToString: destination])
@@ -357,7 +359,7 @@
         [fDestination release];
         fDestination = [destination retain];
         
-        [fTorrent changeDownloadFolderBeforeUsing: fDestination];
+        [fTorrent changeDownloadFolderBeforeUsing: fDestination determinationType: determinationType];
     }
     
     [fLocationField setStringValue: [fDestination stringByAbbreviatingWithTildeInPath]];
@@ -378,13 +380,14 @@
 {
     NSInteger previousGroup = fGroupValue;
     fGroupValue = [sender tag];
-    
+    fGroupValueDetermination = TorrentDeterminationUserSpecified;
+
     if (!fLockDestination)
     {
         if ([[GroupsController groups] usesCustomDownloadLocationForIndex: fGroupValue])
-            [self setDestinationPath: [[GroupsController groups] customDownloadLocationForIndex: fGroupValue]];
+            [self setDestinationPath: [[GroupsController groups] customDownloadLocationForIndex: fGroupValue] determinationType: TorrentDeterminationAutomatic];
         else if ([fDestination isEqualToString: [[GroupsController groups] customDownloadLocationForIndex: previousGroup]])
-            [self setDestinationPath: [[NSUserDefaults standardUserDefaults] stringForKey: @"DownloadFolder"]];
+            [self setDestinationPath: [[NSUserDefaults standardUserDefaults] stringForKey: @"DownloadFolder"] determinationType: TorrentDeterminationAutomatic];
         else;
     }
 }

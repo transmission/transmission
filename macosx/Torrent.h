@@ -28,6 +28,13 @@
 
 @class FileListNode;
 
+typedef enum {
+	TorrentDeterminationAutomatic = 0,
+	TorrentDeterminationUserSpecified
+} TorrentDeterminationType;
+
+#define kTorrentDidChangeGroupNotification @"TorrentDidChangeGroup"
+
 @interface Torrent : NSObject <NSCopying, QLPreviewItem>
 {
     tr_torrent * fHandle;
@@ -49,6 +56,9 @@
     BOOL fRemoveWhenFinishSeeding;
     
     NSInteger fGroupValue;
+	TorrentDeterminationType fGroupValueDetermination;
+	
+	TorrentDeterminationType fDownloadFolderDetermination;
     
     BOOL fResumeOnWake;
     
@@ -65,7 +75,7 @@
 
 - (void) closeRemoveTorrent: (BOOL) trashFiles;
 
-- (void) changeDownloadFolderBeforeUsing: (NSString *) folder;
+- (void) changeDownloadFolderBeforeUsing: (NSString *) folder determinationType: (TorrentDeterminationType) determinationType;
 
 - (NSString *) currentDirectory;
 
@@ -206,7 +216,7 @@
 - (uint64_t) failedHash;
 
 - (NSInteger) groupValue;
-- (void) setGroupValue: (NSInteger) groupValue;
+- (void) setGroupValue: (NSInteger) groupValue determinationType: (TorrentDeterminationType) determinationType;;
 - (NSInteger) groupOrderValue;
 - (void) checkGroupValueForRemoval: (NSNotification *) notification;
 

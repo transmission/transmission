@@ -532,6 +532,9 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     [nc addObserver: self selector: @selector(torrentFinishedSeeding:)
                     name: @"TorrentFinishedSeeding" object: nil];
     
+    [nc addObserver: self selector: @selector(applyFilter)
+                    name: kTorrentDidChangeGroupNotification object: nil];
+    
     //avoids need of setting delegate
     [nc addObserver: self selector: @selector(torrentTableViewSelectionDidChange:)
                     name: NSOutlineViewSelectionDidChangeNotification object: fTableView];
@@ -946,7 +949,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         if (!lockDestination && [[GroupsController groups] usesCustomDownloadLocationForIndex: [torrent groupValue]])
         {
             location = [[GroupsController groups] customDownloadLocationForIndex: [torrent groupValue]];
-            [torrent changeDownloadFolderBeforeUsing: location];
+            [torrent changeDownloadFolderBeforeUsing: location determinationType: TorrentDeterminationAutomatic];
         }
         
         //verify the data right away if it was newly created
@@ -1043,7 +1046,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     if ([[GroupsController groups] usesCustomDownloadLocationForIndex: [torrent groupValue]])
     {
         location = [[GroupsController groups] customDownloadLocationForIndex: [torrent groupValue]];
-        [torrent changeDownloadFolderBeforeUsing: location];
+        [torrent changeDownloadFolderBeforeUsing: location determinationType: TorrentDeterminationAutomatic];
     }
     
     if ([fDefaults boolForKey: @"MagnetOpenAsk"] || !location)
@@ -2847,7 +2850,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     {
         [fTableView removeCollapsedGroup: [torrent groupValue]]; //remove old collapsed group
         
-        [torrent setGroupValue: [(NSMenuItem *)sender tag]];
+        [torrent setGroupValue: [(NSMenuItem *)sender tag] determinationType: TorrentDeterminationUserSpecified];
     }
     
     [self applyFilter];
@@ -3196,7 +3199,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
             
             //change groups
             if (item)
-                [torrent setGroupValue: [item groupIndex]];
+                [torrent setGroupValue: [item groupIndex] determinationType: TorrentDeterminationUserSpecified];
         }
         
         //reorder queue order
@@ -4786,7 +4789,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     if ([[GroupsController groups] usesCustomDownloadLocationForIndex: [torrent groupValue]])
     {
         location = [[GroupsController groups] customDownloadLocationForIndex: [torrent groupValue]];
-        [torrent changeDownloadFolderBeforeUsing: location];
+        [torrent changeDownloadFolderBeforeUsing: location determinationType: TorrentDeterminationAutomatic];
     }
     
     [torrent update];

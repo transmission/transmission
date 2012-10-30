@@ -23,6 +23,7 @@
  *****************************************************************************/
 
 #import <Cocoa/Cocoa.h>
+#import "Torrent.h"
 
 @class Controller;
 @class FileOutlineController;
@@ -52,6 +53,8 @@
     NSInteger fGroupValue;
     
     NSTimer * fTimer;
+	
+    TorrentDeterminationType fGroupValueDetermination;
 }
 
 - (id) initWithTorrent: (Torrent *) torrent destination: (NSString *) path lockDestination: (BOOL) lockDestination
