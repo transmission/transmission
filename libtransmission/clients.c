@@ -267,6 +267,7 @@ tr_clientForId( char * buf, size_t buflen, const void * id_in )
         else if( !memcmp( id+1, "LT", 2 ) ) three_digits( buf, buflen, "libtorrent (Rasterbar)", id+3 );
         else if( !memcmp( id+1, "lt", 2 ) ) three_digits( buf, buflen, "libTorrent (Rakshasa)", id+3 );
         else if( !memcmp( id+1, "MP", 2 ) ) three_digits( buf, buflen, "MooPolice", id+3 );
+        else if( !memcmp( id+1, "pb", 2 ) ) three_digits( buf, buflen, "pbTorrent", id+3 );
         else if( !memcmp( id+1, "TT", 2 ) ) three_digits( buf, buflen, "TuoTu", id+3 );
         else if( !memcmp( id+1, "qB", 2 ) ) three_digits( buf, buflen, "qBittorrent", id+3 );
 
