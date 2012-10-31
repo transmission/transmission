@@ -258,7 +258,7 @@ tr_clientForId( char * buf, size_t buflen, const void * id_in )
         else if( !memcmp( id+1, "XT", 2 ) ) four_digits( buf, buflen, "XanTorrent", id+3 );
         else if( !memcmp( id+1, "XX", 2 ) ) four_digits( buf, buflen, "Xtorrent", id+3 );
         else if( !memcmp( id+1, "ZT", 2 ) ) four_digits( buf, buflen, "Zip Torrent", id+3 );
-        else if( !memcmp( id+1, "ZO", 2 ) ) four_digits( buf, buflen, "Zona:, id+3 );
+        else if( !memcmp( id+1, "ZO", 2 ) ) four_digits( buf, buflen, "Zona", id+3 );
 
         else if( !memcmp( id+1, "AG", 2 ) ) three_digits( buf, buflen, "Ares", id+3 );
         else if( !memcmp( id+1, "A~", 2 ) ) three_digits( buf, buflen, "Ares", id+3 );
