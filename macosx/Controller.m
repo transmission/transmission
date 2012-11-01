@@ -1379,8 +1379,6 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 
 - (void) removeTorrents: (NSArray *) torrents deleteData: (BOOL) deleteData
 {
-    [torrents retain];
-
     if ([fDefaults boolForKey: @"CheckRemove"])
     {
         NSUInteger active = 0, downloading = 0;
@@ -1394,9 +1392,8 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 
         if ([fDefaults boolForKey: @"CheckRemoveDownloading"] ? downloading > 0 : active > 0)
         {
-            NSDictionary * dict = [[NSDictionary alloc] initWithObjectsAndKeys:
-                                    torrents, @"Torrents",
-                                    [NSNumber numberWithBool: deleteData], @"DeleteData", nil];
+            NSDictionary * dict = @{ @"Torrents" : torrents,
+                                    @"DeleteData" : @(deleteData) };
             
             NSString * title, * message;
             
@@ -1442,7 +1439,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
             
             NSBeginAlertSheet(title, NSLocalizedString(@"Remove", "Removal confirm panel -> button"),
                 NSLocalizedString(@"Cancel", "Removal confirm panel -> button"), nil, fWindow, self,
-                nil, @selector(removeSheetDidEnd:returnCode:contextInfo:), dict, @"%@", message);
+                nil, @selector(removeSheetDidEnd:returnCode:contextInfo:), [dict retain], @"%@", message);
             return;
         }
     }
@@ -1454,9 +1451,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 {
     NSArray * torrents = [dict objectForKey: @"Torrents"];
     if (returnCode == NSAlertDefaultReturn)
-        [self confirmRemoveTorrents: [torrents retain] deleteData: [[dict objectForKey: @"DeleteData"] boolValue]];
-    
-    [torrents release];
+        [self confirmRemoveTorrents: torrents deleteData: [[dict objectForKey: @"DeleteData"] boolValue]];
     [dict release];
 }
 
@@ -1546,9 +1541,6 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         [fTableView selectValues: selectedValues];
     
     [self fullUpdateUI];
-    
-    #warning why do we need them retained?
-    [torrents autorelease];
 }
 
 - (void) removeNoDelete: (id) sender
@@ -1563,7 +1555,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 
 - (void) clearCompleted: (id) sender
 {
-    NSMutableArray * torrents = [[NSMutableArray alloc] init];
+    NSMutableArray * torrents = [NSMutableArray array];
     
     for (Torrent * torrent in fTorrents)
         if ([torrent isFinishedSeeding])
@@ -1603,10 +1595,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
             [fDefaults setBool: NO forKey: @"WarningRemoveCompleted"];
         
         if (returnCode != NSAlertFirstButtonReturn)
-        {
-            [torrents release];
             return;
-        }
     }
     
     [self confirmRemoveTorrents: torrents deleteData: NO];
@@ -2047,7 +2036,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 
 - (void) torrentFinishedSeeding: (NSNotification *) notification
 {
-    Torrent * torrent = [[notification object] retain];
+    Torrent * torrent = [notification object];
     
     if (!fSoundPlaying && [fDefaults boolForKey: @"PlaySeedingSound"])
     {
@@ -2092,7 +2081,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     
     //removing from the list calls fullUpdateUI
     if ([torrent removeWhenFinishSeeding])
-        [self confirmRemoveTorrents: [[NSArray arrayWithObject: torrent] retain] deleteData: NO];
+        [self confirmRemoveTorrents: @[ torrent ] deleteData: NO];
     else
     {
         if (![fWindow isMainWindow])
@@ -2106,8 +2095,6 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
             [fInfoController updateOptions];
         }
     }
-    
-    [torrent release];
 }
 
 - (void) updateTorrentHistory
@@ -4805,13 +4792,13 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 
 - (void) rpcRemoveTorrent: (Torrent *) torrent
 {
-    [self confirmRemoveTorrents: [[NSArray arrayWithObject: torrent] retain] deleteData: NO];
+    [self confirmRemoveTorrents: @[ torrent ] deleteData: NO];
     [torrent release];
 }
 
 - (void) rpcRemoveTorrentDeleteData: (Torrent *) torrent
 {
-    [self confirmRemoveTorrents: [[NSArray arrayWithObject: torrent] retain] deleteData: YES];
+    [self confirmRemoveTorrents: @[ torrent ] deleteData: YES];
     [torrent release];
 }
 
