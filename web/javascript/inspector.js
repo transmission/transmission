@@ -719,7 +719,7 @@ function Inspector(controller) {
                     tier = tracker.tier;
 
                     html.push('<div class="inspector_group_label">',
-                          'Tier ', tier, '</div>',
+                          'Tier ', tier+1, '</div>',
                           '<ul class="tier_list">');
                 }
 
