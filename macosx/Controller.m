@@ -4465,19 +4465,26 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     switch (messageType)
     {
         case kIOMessageSystemWillSleep:
-            //if there are any running transfers, wait 15 seconds for them to stop
+        {
+            //stop all transfers (since some are active) before going to sleep and remember to resume when we wake up
+            BOOL anyActive = NO;
             for (Torrent * torrent in fTorrents)
+            {
                 if ([torrent isActive])
-                {
-                    //stop all transfers (since some are active) before going to sleep and remember to resume when we wake up
-                    for (Torrent * torrent in fTorrents)
-                        [torrent sleep];
-                    sleep(15);
-                    break;
-                }
-
+                    anyActive = YES;
+                [torrent sleep]; //have to call on all, regardless if they are active
+            }
+            
+            //if there are any running transfers, wait 15 seconds for them to stop
+            if (anyActive)
+            {
+                sleep(15);
+                break;
+            }
+            
             IOAllowPowerChange(fRootPort, (long) messageArgument);
             break;
+        }
 
         case kIOMessageCanSystemSleep:
             if ([fDefaults boolForKey: @"SleepPrevent"])
