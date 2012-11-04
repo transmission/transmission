@@ -4479,7 +4479,6 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
             if (anyActive)
             {
                 sleep(15);
-                break;
             }
             
             IOAllowPowerChange(fRootPort, (long) messageArgument);
