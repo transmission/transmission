@@ -792,7 +792,7 @@ JSONSL_API
 jsonsl_jpr_match_t
 jsonsl_jpr_match(jsonsl_jpr_t jpr,
                    jsonsl_type_t parent_type,
-                   unsigned int parent_level,
+                   size_t parent_level,
                    const char *key,
                    size_t nkey)
 {
