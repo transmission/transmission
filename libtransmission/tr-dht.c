@@ -352,9 +352,10 @@ tr_dhtUninit(tr_session *ss)
 
     /* Since we only save known good nodes, avoid erasing older data if we
        don't know enough nodes. */
-    if(tr_dhtStatus(ss, AF_INET, NULL) < TR_DHT_FIREWALLED)
+    if ((tr_dhtStatus(ss, AF_INET, NULL) < TR_DHT_FIREWALLED) &&
+        (tr_dhtStatus(ss, AF_INET6, NULL) < TR_DHT_FIREWALLED)) {
         tr_ninf( "DHT", "Not saving nodes, DHT not ready" );
-    else {
+    } else {
         tr_benc benc;
         struct sockaddr_in sins[300];
         struct sockaddr_in6 sins6[300];
