@@ -7,8 +7,52 @@
 #undef VERBOSE
 #include "libtransmission-test.h"
 
-#include "ConvertUTF.h"
+static int
+test_elements (void)
+{
+    const char * in;
+    tr_benc top;
+    const char * str;
+    bool f;
+    double d;
+    int64_t i;
+    int err = 0;
 
+    in = "{ \"string\": \"hello world\","
+         "  \"escaped\": \"bell \\b formfeed \\f linefeed \\n carriage return \\r tab \\t\","
+         "  \"int\": 5, "
+         "  \"float\": 6.5, "
+         "  \"true\": true, "
+         "  \"false\": false, "
+         "  \"null\": null }";
+
+    err = tr_jsonParse (NULL, in, strlen(in), &top, NULL);
+    check_int_eq (0, err);
+    check (tr_bencIsDict (&top));
+    str = NULL;
+    check (tr_bencDictFindStr (&top, "string", &str));
+    check_streq ("hello world", str);
+    check (tr_bencDictFindStr (&top, "escaped", &str));
+    check_streq ("bell \b formfeed \f linefeed \n carriage return \r tab \t", str);
+    i = 0;
+    check (tr_bencDictFindInt (&top, "int", &i));
+    check_int_eq (5, i);
+    d = 0;
+    check (tr_bencDictFindReal (&top, "float", &d));
+    check_int_eq (65, ((int)(d*10)));
+    f = false;
+    check (tr_bencDictFindBool (&top, "true", &f));
+    check_int_eq (true, f);
+    check (tr_bencDictFindBool (&top, "false", &f));
+    check_int_eq (false, f);
+    check (tr_bencDictFindStr (&top, "null", &str));
+    check_streq ("", str);
+
+    if (!err)
+        tr_bencFree (&top);
+
+    return 0;
+}
 static int
 test_utf8( void )
 {
@@ -152,7 +196,11 @@ test3( void )
 int
 main( void )
 {
-    const testFunc tests[] = { test_utf8, test1, test2, test3, };
+    const testFunc tests[] = { test_elements,
+                               test_utf8,
+                               test1,
+                               test2,
+                               test3, };
+
     return runTests(tests, NUM_TESTS(tests));
 }
-
