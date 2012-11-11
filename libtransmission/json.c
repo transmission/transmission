@@ -16,174 +16,297 @@
 #include <string.h>
 #include <errno.h> /* EILSEQ, EINVAL */
 
-#include "JSON_parser.h"
+#include <event2/util.h> /* evutil_strtoll() */
+
+#define JSONSL_STATE_USER_FIELDS /* no fields */
+#include "jsonsl.h"
+#include "jsonsl.c"
 
 #include "transmission.h"
+#include "ConvertUTF.h"
 #include "bencode.h"
 #include "json.h"
 #include "ptrarray.h"
 #include "utils.h"
 
-struct json_benc_data
+/* arbitrary value... this is much deeper than our code goes */
+#define MAX_DEPTH 64
+
+struct json_wrapper_data
 {
-    bool        hasContent;
-    tr_benc      * top;
-    tr_ptrArray    stack;
-    char         * key;
+  int error;
+  bool has_content;
+  tr_benc * top;
+  char * key;
+  const char * source;
+  tr_ptrArray stack;
 };
 
 static tr_benc*
-getNode( struct json_benc_data * data )
+get_node (struct jsonsl_st * jsn)
 {
-    tr_benc * parent;
-    tr_benc * node = NULL;
+  tr_benc * parent;
+  tr_benc * node = NULL;
+  struct json_wrapper_data * data = jsn->data;
 
-    if( tr_ptrArrayEmpty( &data->stack ) )
-        parent = NULL;
-    else
-        parent = tr_ptrArrayBack( &data->stack );
+  parent = tr_ptrArrayEmpty (&data->stack)
+         ? NULL
+         : tr_ptrArrayBack (&data->stack);
 
-    if( !parent )
-        node = data->top;
-    else if( tr_bencIsList( parent ) )
-        node = tr_bencListAdd( parent );
-    else if( tr_bencIsDict( parent ) && data->key )
+  if (!parent)
     {
-        node = tr_bencDictAdd( parent, data->key );
-        tr_free( data->key );
-        data->key = NULL;
+      node = data->top;
+    }
+  else if (tr_bencIsList (parent))
+    {
+      node = tr_bencListAdd (parent);
+    }
+  else if (tr_bencIsDict (parent) && (data->key!=NULL))
+    {
+      node = tr_bencDictAdd (parent, data->key);
+      tr_free (data->key);
+      data->key = NULL;
     }
 
-    return node;
+  return node;
+}
+
+
+static void
+error_handler (jsonsl_t                  jsn,
+               jsonsl_error_t            error,
+               struct jsonsl_state_st  * state   UNUSED,
+               const jsonsl_char_t     * buf)
+{
+  struct json_wrapper_data * data = jsn->data;
+
+  if (data->source)
+    {
+      tr_err ("JSON parse failed in %s at pos %zu: %s -- remaining text \"%.16s\"",
+              data->source,
+              jsn->pos,
+              jsonsl_strerror(error),
+              buf);
+    }
+  else
+    {
+      tr_err ("JSON parse failed at pos %zu: %s -- remaining text \"%.16s\"",
+              jsn->pos,
+              jsonsl_strerror(error),
+              buf);
+    }
+
+  data->error = EILSEQ;
 }
 
 static int
-callback( void *             vdata,
-          int                type,
-          const JSON_value * value )
+error_callback (jsonsl_t                  jsn,
+                jsonsl_error_t            error,
+                struct jsonsl_state_st  * state,
+                jsonsl_char_t           * at)
 {
-    struct json_benc_data * data = vdata;
-    tr_benc *               node;
+  error_handler (jsn, error, state, at);
+  return 0; /* bail */
+}
 
-    switch( type )
+static void
+action_callback_PUSH (jsonsl_t                  jsn,
+                      jsonsl_action_t           action  UNUSED,
+                      struct jsonsl_state_st  * state,
+                      const jsonsl_char_t     * buf     UNUSED)
+{
+  tr_benc * node;
+  struct json_wrapper_data * data = jsn->data;
+
+  switch (state->type)
     {
-        case JSON_T_ARRAY_BEGIN:
-            data->hasContent = true;
-            node = getNode( data );
-            tr_bencInitList( node, 0 );
-            tr_ptrArrayAppend( &data->stack, node );
-            break;
+      case JSONSL_T_LIST:
+        data->has_content = true;
+        node = get_node (jsn);
+        tr_bencInitList (node, 0);
+        tr_ptrArrayAppend (&data->stack, node);
+        break;
 
-        case JSON_T_ARRAY_END:
-            tr_ptrArrayPop( &data->stack );
-            break;
+      case JSONSL_T_OBJECT:
+        data->has_content = true;
+        node = get_node (jsn);
+        tr_bencInitDict (node, 0);
+        tr_ptrArrayAppend (&data->stack, node);
+        break;
 
-        case JSON_T_OBJECT_BEGIN:
-            data->hasContent = true;
-            node = getNode( data );
-            tr_bencInitDict( node, 0 );
-            tr_ptrArrayAppend( &data->stack, node );
-            break;
+      default:
+        /* nothing else interesting on push */
+        break;
+    }
+}
 
-        case JSON_T_OBJECT_END:
-            tr_ptrArrayPop( &data->stack );
-            break;
+static char*
+extract_string (jsonsl_t jsn, struct jsonsl_state_st * state, size_t * len)
+{
+  const char * in_begin;
+  const char * in_end;
+  const char * in_it;
+  size_t out_buflen;
+  char * out_buf;
+  char * out_it;
 
-        case JSON_T_FLOAT:
-            data->hasContent = true;
-            tr_bencInitReal( getNode( data ), value->vu.float_value );
-            break;
+  in_begin = jsn->base + state->pos_begin;
+  if (*in_begin == '"')
+    in_begin++;
+  in_end = jsn->base + state->pos_cur;
 
-        case JSON_T_NULL:
-            data->hasContent = true;
-            tr_bencInitStr( getNode( data ), "", 0 );
-            break;
+  out_buflen = (in_end-in_begin)*3 + 1;
+  out_buf = tr_new0 (char, out_buflen);
+  out_it = out_buf;
 
-        case JSON_T_INTEGER:
-            data->hasContent = true;
-            tr_bencInitInt( getNode( data ), value->vu.integer_value );
-            break;
+  for (in_it=in_begin; in_it!=in_end; )
+    {
+      bool unescaped = false;
 
-        case JSON_T_TRUE:
-            data->hasContent = true;
-            tr_bencInitBool( getNode( data ), 1 );
-            break;
+      if (*in_it=='\\' && in_end-in_it>=2)
+        {
+          switch (in_it[1])
+            {
+              case 'b' : *out_it++ = '\b'; in_it+=2; unescaped = true; break;
+              case 'f' : *out_it++ = '\f'; in_it+=2; unescaped = true; break;
+              case 'n' : *out_it++ = '\n'; in_it+=2; unescaped = true; break;
+              case 'r' : *out_it++ = '\r'; in_it+=2; unescaped = true; break;
+              case 't' : *out_it++ = '\t'; in_it+=2; unescaped = true; break;
+              case '"' : *out_it++ = '"' ; in_it+=2; unescaped = true; break;
+              case '\\': *out_it++ = '\\'; in_it+=2; unescaped = true; break;
+              case 'u':
+                {
+                  if (in_end - in_it >= 6)
+                    {
+                      unsigned int val = 0;
+                      if (sscanf (in_it+2, "%4x", &val) == 1)
+                        {
+                          UTF32 str32_buf[2] = { val, 0 };
+                          const UTF32 * str32_walk = str32_buf;
+                          const UTF32 * str32_end = str32_buf + 1;
+                          UTF8 str8_buf[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
+                          UTF8 * str8_walk = str8_buf;
+                          UTF8 * str8_end = str8_buf + 8;
 
-        case JSON_T_FALSE:
-            data->hasContent = true;
-            tr_bencInitBool( getNode( data ), 0 );
-            break;
+                          if (ConvertUTF32toUTF8 (&str32_walk, str32_end, &str8_walk, str8_end, 0) == 0)
+                            {
+                              const size_t len = str8_walk - str8_buf;
+                              memcpy (out_it, str8_buf, len);
+                              out_it += len;
+                              unescaped = true;
+                            }
 
-        case JSON_T_STRING:
-            data->hasContent = true;
-            tr_bencInitStr( getNode( data ),
-                            value->vu.str.value,
-                            value->vu.str.length );
-            break;
+                          in_it += 6;
+                          break;
+                        }
+                    }
+                }
+            }
+        }
 
-        case JSON_T_KEY:
-            data->hasContent = true;
-            assert( !data->key );
-            data->key = tr_strndup( value->vu.str.value, value->vu.str.length );
-            break;
+      if (!unescaped)
+        *out_it++ = *in_it++;
     }
 
-    return 1;
+  if (len != NULL)
+    *len = out_it - out_buf;
+
+  return out_buf;
+}
+
+static void
+action_callback_POP (jsonsl_t                  jsn,
+                     jsonsl_action_t           action  UNUSED,
+                     struct jsonsl_state_st  * state,
+                     const jsonsl_char_t     * buf     UNUSED)
+{
+  struct json_wrapper_data * data = jsn->data;
+
+  if (state->type == JSONSL_T_STRING)
+    {
+      size_t len = 0;
+      char * str = extract_string (jsn, state, &len);
+      tr_bencInitStr (get_node (jsn), str, len);
+      data->has_content = true;
+      tr_free (str);
+    }
+  else if (state->type == JSONSL_T_HKEY)
+    {
+      char * str = extract_string (jsn, state, NULL);
+      data->has_content = true;
+      data->key = str;
+    }
+  else if ((state->type == JSONSL_T_LIST) || (state->type == JSONSL_T_OBJECT))
+    {
+      tr_ptrArrayPop (&data->stack);
+    }
+  else if (state->type == JSONSL_T_SPECIAL)
+    {
+      if (state->special_flags & JSONSL_SPECIALf_NUMNOINT)
+        {
+          const char * begin = jsn->base + state->pos_begin;
+          data->has_content = true;
+          tr_bencInitReal (get_node (jsn), strtod (begin, NULL));
+        }
+      else if (state->special_flags & JSONSL_SPECIALf_NUMERIC)
+        {
+          const char * begin = jsn->base + state->pos_begin;
+          data->has_content = true;
+          tr_bencInitInt (get_node (jsn), evutil_strtoll (begin, NULL, 10));
+        }
+      else if (state->special_flags & JSONSL_SPECIALf_BOOLEAN)
+        {
+          const bool b = (state->special_flags & JSONSL_SPECIALf_TRUE) != 0;
+          data->has_content = true;
+          tr_bencInitBool (get_node (jsn), b);
+        }
+      else if (state->special_flags & JSONSL_SPECIALf_NULL)
+        {
+          data->has_content = true;
+          tr_bencInitStr (get_node (jsn), "", 0 );
+        }
+    }
 }
 
 int
-tr_jsonParse( const char     * source,
+tr_jsonParse (const char     * source,
               const void     * vbuf,
               size_t           len,
               tr_benc        * setme_benc,
-              const uint8_t ** setme_end )
+              const uint8_t ** setme_end)
 {
-    int                         line = 1;
-    int                         column = 1;
-    int                         err = 0;
-    const unsigned char       * buf = vbuf;
-    const void                * bufend = buf + len;
-    JSON_config                 config;
-    struct JSON_parser_struct * checker;
-    struct json_benc_data       data;
+  int error;
+  jsonsl_t jsn;
+  struct json_wrapper_data data;
 
-    init_JSON_config( &config );
-    config.callback = callback;
-    config.callback_ctx = &data;
-    config.depth = -1;
+  jsn = jsonsl_new (MAX_DEPTH);
+  jsn->action_callback_PUSH = action_callback_PUSH;
+  jsn->action_callback_POP = action_callback_POP;
+  jsn->error_callback = error_callback;
+  jsn->data = &data;
+  jsonsl_enable_all_callbacks (jsn);
 
-    data.hasContent = false;
-    data.key = NULL;
-    data.top = setme_benc;
-    data.stack = TR_PTR_ARRAY_INIT;
+  data.error = 0;
+  data.has_content = false;
+  data.key = NULL;
+  data.top = setme_benc;
+  data.stack = TR_PTR_ARRAY_INIT;
+  data.source = source;
 
-    checker = new_JSON_parser( &config );
-    while( ( buf != bufend ) && JSON_parser_char( checker, *buf ) ) {
-        if( *buf != '\n' )
-            ++column;
-        else {
-            ++line;
-            column = 1;
-        }
-        ++buf;
-    }
+  /* parse it */
+  jsonsl_feed (jsn, vbuf, len);
 
-    if( buf != bufend ) {
-        if( source )
-            tr_err( "JSON parser failed in %s at line %d, column %d: \"%.16s\"", source, line, column, buf );
-        else
-            tr_err( "JSON parser failed at line %d, column %d: \"%.16s\"", line, column, buf );
-        err = EILSEQ;
-    }
+  /* EINVAL if there was no content */
+  if (!data.error && !data.has_content)
+    data.error = EINVAL;
 
-    if( !data.hasContent )
-        err = EINVAL;
+  /* maybe set the end ptr */
+  if (setme_end)
+    *setme_end = ((const uint8_t*)vbuf) + jsn->pos;
 
-    if( setme_end )
-        *setme_end = (const uint8_t*) buf;
-
-    delete_JSON_parser( checker );
-    tr_ptrArrayDestruct( &data.stack, NULL );
-    return err;
+  /* cleanup */
+  error = data.error;
+  tr_ptrArrayDestruct( &data.stack, NULL );
+  jsonsl_destroy (jsn);
+  return error;
 }
-
