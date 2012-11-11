@@ -255,6 +255,8 @@
 		A2A4EA0E0DE106EB000CE197 /* ConvertUTF.c in Sources */ = {isa = PBXBuildFile; fileRef = A2A4EA0A0DE106E8000CE197 /* ConvertUTF.c */; };
 		A2A4EA0F0DE106EE000CE197 /* ConvertUTF.h in Headers */ = {isa = PBXBuildFile; fileRef = A2A4EA0B0DE106E8000CE197 /* ConvertUTF.h */; };
 		A2A6321B0CD9751700E3DA60 /* BadgeView.m in Sources */ = {isa = PBXBuildFile; fileRef = A2A6321A0CD9751700E3DA60 /* BadgeView.m */; };
+		A2A7B32A164F87D400B98C65 /* jsonsl.c in Sources */ = {isa = PBXBuildFile; fileRef = A2A7B328164F87D400B98C65 /* jsonsl.c */; };
+		A2A7B32B164F87D400B98C65 /* jsonsl.h in Headers */ = {isa = PBXBuildFile; fileRef = A2A7B329164F87D400B98C65 /* jsonsl.h */; };
 		A2AA579D0ADFCAB400CA59F6 /* PiecesView.m in Sources */ = {isa = PBXBuildFile; fileRef = A2AA579B0ADFCAB400CA59F6 /* PiecesView.m */; };
 		A2AA9BE1132CAC8E00FA131E /* announcer-udp.c in Sources */ = {isa = PBXBuildFile; fileRef = A2AA9BE0132CAC8D00FA131E /* announcer-udp.c */; };
 		A2AA9BE3132CAE2000FA131E /* evdns.c in Sources */ = {isa = PBXBuildFile; fileRef = A2AA9BE2132CAE2000FA131E /* evdns.c */; };
@@ -354,8 +356,6 @@
 		A2DC49C4158430E200758FF1 /* YingYangGroupTemplate@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = A2DC49C3158430E200758FF1 /* YingYangGroupTemplate@2x.png */; };
 		A2DC49C6158430FB00758FF1 /* YingYangTemplate@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = A2DC49C5158430FB00758FF1 /* YingYangTemplate@2x.png */; };
 		A2DF37070C220D03006523C1 /* CreatorWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = A2DF37050C220D03006523C1 /* CreatorWindowController.m */; };
-		A2DF58580DE4B2B0000795D5 /* JSON_parser.c in Sources */ = {isa = PBXBuildFile; fileRef = A2DF576A0DE468C6000795D5 /* JSON_parser.c */; };
-		A2DF58590DE4B2B1000795D5 /* JSON_parser.h in Headers */ = {isa = PBXBuildFile; fileRef = A2DF576B0DE468C6000795D5 /* JSON_parser.h */; };
 		A2E23AC60CB5E1930002BB25 /* InfoTabButtonCell.m in Sources */ = {isa = PBXBuildFile; fileRef = A2E23AC40CB5E1930002BB25 /* InfoTabButtonCell.m */; };
 		A2E2EA920EE321C200EB6308 /* Groups.png in Resources */ = {isa = PBXBuildFile; fileRef = A2E2EA910EE321C200EB6308 /* Groups.png */; };
 		A2E384DA130DFB3A001F501B /* templates.h in Headers */ = {isa = PBXBuildFile; fileRef = A2E384D2130DFB3A001F501B /* templates.h */; };
@@ -958,6 +958,8 @@
 		A2A4EA0B0DE106E8000CE197 /* ConvertUTF.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ConvertUTF.h; path = libtransmission/ConvertUTF.h; sourceTree = "<group>"; };
 		A2A632190CD9751700E3DA60 /* BadgeView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BadgeView.h; path = macosx/BadgeView.h; sourceTree = "<group>"; };
 		A2A6321A0CD9751700E3DA60 /* BadgeView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = BadgeView.m; path = macosx/BadgeView.m; sourceTree = "<group>"; };
+		A2A7B328164F87D400B98C65 /* jsonsl.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = jsonsl.c; path = libtransmission/jsonsl.c; sourceTree = "<group>"; };
+		A2A7B329164F87D400B98C65 /* jsonsl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = jsonsl.h; path = libtransmission/jsonsl.h; sourceTree = "<group>"; };
 		A2A90DC115F3C3D900FB7115 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = macosx/QuickLookPlugin/de.lproj/Localizable.strings; sourceTree = SOURCE_ROOT; };
 		A2AA579A0ADFCAB400CA59F6 /* PiecesView.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = PiecesView.h; path = macosx/PiecesView.h; sourceTree = "<group>"; };
 		A2AA579B0ADFCAB400CA59F6 /* PiecesView.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = PiecesView.m; path = macosx/PiecesView.m; sourceTree = "<group>"; };
@@ -1064,8 +1066,6 @@
 		A2DC49C5158430FB00758FF1 /* YingYangTemplate@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "YingYangTemplate@2x.png"; path = "macosx/Images/YingYangTemplate@2x.png"; sourceTree = "<group>"; };
 		A2DF37040C220D03006523C1 /* CreatorWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CreatorWindowController.h; path = macosx/CreatorWindowController.h; sourceTree = "<group>"; };
 		A2DF37050C220D03006523C1 /* CreatorWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CreatorWindowController.m; path = macosx/CreatorWindowController.m; sourceTree = "<group>"; };
-		A2DF576A0DE468C6000795D5 /* JSON_parser.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = JSON_parser.c; path = libtransmission/JSON_parser.c; sourceTree = "<group>"; };
-		A2DF576B0DE468C6000795D5 /* JSON_parser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JSON_parser.h; path = libtransmission/JSON_parser.h; sourceTree = "<group>"; };
 		A2E23AC30CB5E1930002BB25 /* InfoTabButtonCell.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = InfoTabButtonCell.h; path = macosx/InfoTabButtonCell.h; sourceTree = "<group>"; };
 		A2E23AC40CB5E1930002BB25 /* InfoTabButtonCell.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = InfoTabButtonCell.m; path = macosx/InfoTabButtonCell.m; sourceTree = "<group>"; };
 		A2E2EA910EE321C200EB6308 /* Groups.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Groups.png; path = macosx/Images/Groups.png; sourceTree = "<group>"; };
@@ -1718,10 +1718,10 @@
 				A25E03E10E4015380086C225 /* tr-getopt.c */,
 				A2A4E9840DE1038C000CE197 /* json.h */,
 				A2A4E9830DE1038C000CE197 /* json.c */,
-				A2DF576A0DE468C6000795D5 /* JSON_parser.c */,
-				A2DF576B0DE468C6000795D5 /* JSON_parser.h */,
-				A2A4EA0A0DE106E8000CE197 /* ConvertUTF.c */,
+				A2A7B329164F87D400B98C65 /* jsonsl.h */,
+				A2A7B328164F87D400B98C65 /* jsonsl.c */,
 				A2A4EA0B0DE106E8000CE197 /* ConvertUTF.h */,
+				A2A4EA0A0DE106E8000CE197 /* ConvertUTF.c */,
 				4DB74F070E8CD75100AEB1A8 /* wildmat.c */,
 			);
 			name = libtransmission;
@@ -2048,7 +2048,6 @@
 				A2A4E9210DE0F7E9000CE197 /* web.h in Headers */,
 				A2A4E9870DE10399000CE197 /* json.h in Headers */,
 				A2A4EA0F0DE106EE000CE197 /* ConvertUTF.h in Headers */,
-				A2DF58590DE4B2B1000795D5 /* JSON_parser.h in Headers */,
 				A25E03E20E4015380086C225 /* tr-getopt.h in Headers */,
 				A21FBBAB0EDA78C300BC3C51 /* bandwidth.h in Headers */,
 				A22CFCA90FC24ED80009BD3E /* tr-dht.h in Headers */,
@@ -2065,6 +2064,7 @@
 				A23F29A1132A447400E9A83B /* announcer-common.h in Headers */,
 				A2EE726F14DCCC950093C99A /* natpmp_local.h in Headers */,
 				A2D77451154CC25700A62B93 /* WebSeedTableView.h in Headers */,
+				A2A7B32B164F87D400B98C65 /* jsonsl.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2651,7 +2651,6 @@
 				A2A4E9220DE0F7EB000CE197 /* web.c in Sources */,
 				A2A4E9880DE1039C000CE197 /* json.c in Sources */,
 				A2A4EA0E0DE106EB000CE197 /* ConvertUTF.c in Sources */,
-				A2DF58580DE4B2B0000795D5 /* JSON_parser.c in Sources */,
 				A292A6E80DFB45FC004B9C0A /* webseed.c in Sources */,
 				A25E03E30E4015380086C225 /* tr-getopt.c in Sources */,
 				4DB74F080E8CD75100AEB1A8 /* wildmat.c in Sources */,
@@ -2669,6 +2668,7 @@
 				A23F29A2132A447400E9A83B /* announcer-http.c in Sources */,
 				A2AA9BE1132CAC8E00FA131E /* announcer-udp.c in Sources */,
 				A2D77452154CC25700A62B93 /* WebSeedTableView.m in Sources */,
+				A2A7B32A164F87D400B98C65 /* jsonsl.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
