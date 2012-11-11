@@ -729,7 +729,7 @@ function Inspector(controller) {
                 lastScrapeStatusHash = lastScrapeStatus(tracker);
                 parity = (j%2) ? 'odd' : 'even';
                 html.push('<li class="inspector_tracker_entry ', parity, '"><div class="tracker_host" title="', sanitizeText(tracker.announce), '">',
-                      sanitizeText(tracker.host), '</div>',
+                      sanitizeText(tracker.host || tracker.announce), '</div>',
                       '<div class="tracker_activity">',
                       '<div>', lastAnnounceStatusHash['label'], ': ', lastAnnounceStatusHash['value'], '</div>',
                       '<div>', announceState, '</div>',
