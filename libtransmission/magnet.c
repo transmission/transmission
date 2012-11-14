@@ -156,7 +156,7 @@ tr_magnetParse( const char * uri )
                 int i;
                 if( ( keylen==2 ) && !memcmp( key, "tr", 2 ) )
                     tr[trCount++] = tr_http_unescape( val, vallen );
-                else if( ( sscanf( key, "tr.%d=", &i ) == 1 ) && ( i > 0 ) ) /* ticket #3341 */
+                else if( ( sscanf( key, "tr.%d=", &i ) == 1 ) && ( i >= 0 ) ) /* ticket #3341 and #5134 */
                     tr[trCount++] = tr_http_unescape( val, vallen );
             }
 
