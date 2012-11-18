@@ -194,7 +194,7 @@ struct PACKED_ATTRIBUTE PackedSockAddr {
 		snprintf(i, len - (i-s), ":%u", _port);
 		return s;
 	}
-};
+} ALIGNED_ATTRIBUTE(4);
 
 struct PACKED_ATTRIBUTE RST_Info {
 	PackedSockAddr addr;

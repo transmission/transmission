@@ -27,6 +27,12 @@
 #define PACKED_ATTRIBUTE
 #endif
 
+#ifdef __GNUC__
+#define ALIGNED_ATTRIBUTE(x)  __attribute__((aligned (x)))
+#else
+#define ALIGNED_ATTRIBUTE(x)
+#endif
+
 // Utility templates
 #undef min
 #undef max
