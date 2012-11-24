@@ -1478,6 +1478,22 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         [fBadger removeTorrent: torrent];
     }
     
+    //#5106 - don't try to remove torrents that have already been removed (fix for a bug, but better safe than crash anyway)
+    NSIndexSet * indexesToRemove = [torrents indexesOfObjectsWithOptions: NSEnumerationConcurrent passingTest: ^BOOL(Torrent * torrent, NSUInteger idx, BOOL * stop) {
+        return [fTorrents indexOfObjectIdenticalTo: torrent] != NSNotFound;
+    }];
+    if ([torrents count] != [indexesToRemove count])
+    {
+        NSLog(@"trying to remove %ld transfers, but %ld have already been removed", [torrents count], [torrents count] - [indexesToRemove count]);
+        torrents = [torrents objectsAtIndexes: indexesToRemove];
+        
+        if ([indexesToRemove count] == 0)
+        {
+            [self fullUpdateUI];
+            return;
+        }
+    }
+    
     [fTorrents removeObjectsInArray: torrents];
     
     //set up helpers to remove from the table
