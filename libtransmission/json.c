@@ -172,6 +172,7 @@ extract_string (jsonsl_t jsn, struct jsonsl_state_st * state, size_t * len)
               case 'n' : *out_it++ = '\n'; in_it+=2; unescaped = true; break;
               case 'r' : *out_it++ = '\r'; in_it+=2; unescaped = true; break;
               case 't' : *out_it++ = '\t'; in_it+=2; unescaped = true; break;
+              case '/' : *out_it++ = '/' ; in_it+=2; unescaped = true; break;
               case '"' : *out_it++ = '"' ; in_it+=2; unescaped = true; break;
               case '\\': *out_it++ = '\\'; in_it+=2; unescaped = true; break;
               case 'u':
