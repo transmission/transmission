@@ -193,6 +193,22 @@ test3( void )
     return 0;
 }
 
+static int
+test_unescape (void)
+{
+    const char * in = "{ \"string-1\": \"\\/usr\\/lib\" }";
+    tr_benc top;
+    const char * str;
+
+    const int err = tr_jsonParse (NULL, in, strlen(in), &top, NULL);
+    check_int_eq (0, err);
+    check (tr_bencDictFindStr (&top, "string-1", &str));
+    check_streq ("/usr/lib", str);
+
+    tr_bencFree (&top);
+    return 0;
+}
+
 int
 main( void )
 {
@@ -200,7 +216,8 @@ main( void )
                                test_utf8,
                                test1,
                                test2,
-                               test3, };
+                               test3,
+                               test_unescape };
 
     return runTests(tests, NUM_TESTS(tests));
 }
