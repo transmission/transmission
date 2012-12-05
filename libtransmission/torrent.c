@@ -440,7 +440,7 @@ tr_torrentCheckSeedLimit (tr_torrent * tor)
 {
     assert (tr_isTorrent (tor));
 
-    if (!tor->isRunning || !tr_torrentIsSeed (tor))
+    if (!tor->isRunning || tor->isStopping || !tr_torrentIsSeed (tor))
         return;
 
     /* if we're seeding and reach our seed ratio limit, stop the torrent */
@@ -2061,6 +2061,8 @@ tr_torrentRecheckCompleteness (tr_torrent * tor)
         tor->completeness = completeness;
         tr_fdTorrentClose (tor->session, tor->uniqueId);
 
+        fireCompletenessChange (tor, completeness, wasRunning);
+
         if (tr_torrentIsSeed (tor))
         {
             if (recentChange)
@@ -2084,8 +2086,6 @@ tr_torrentRecheckCompleteness (tr_torrent * tor)
             if (tr_sessionIsTorrentDoneScriptEnabled (tor->session))
                 torrentCallScript (tor, tr_sessionGetTorrentDoneScript (tor->session));
         }
-
-        fireCompletenessChange (tor, completeness, wasRunning);
 
         tr_torrentSetDirty (tor);
     }
