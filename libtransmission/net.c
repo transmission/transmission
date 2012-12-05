@@ -302,6 +302,10 @@ tr_netOpenPeerUTPSocket (tr_session        * session,
 {
     struct sockaddr_storage ss;
     socklen_t sslen;
+
+    if (!tr_address_is_valid_for_peers (addr, port))
+        return -EINVAL;
+
     sslen = setup_sockaddr (addr, port, &ss);
 
     return UTP_Create (tr_utpSendTo, (void*)session,
