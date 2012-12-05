@@ -6,7 +6,7 @@
 #include "libtransmission-test.h"
 
 static int
-test1( void )
+test1 (void)
 {
     int i;
     const char * uri;
@@ -20,17 +20,17 @@ test1( void )
           "&tr=http%3A%2F%2Ftracker.openbittorrent.com%2Fannounce"
           "&tr=http%3A%2F%2Ftracker.opentracker.org%2Fannounce"
           "&ws=http%3A%2F%2Fserver.webseed.org%2Fpath%2Fto%2Ffile";
-    info = tr_magnetParse( uri );
-    check( info != NULL );
-    check_int_eq( 2, info->trackerCount );
-    check_streq( info->trackers[0], "http://tracker.openbittorrent.com/announce" );
-    check_streq( info->trackers[1], "http://tracker.opentracker.org/announce" );
-    check_int_eq( 1, info->webseedCount );
-    check_streq( "http://server.webseed.org/path/to/file", info->webseeds[0] );
-    check_streq( "Display Name", info->displayName );
-    for( i=0; i<20; ++i )
-        check( info->hash[i] == dec[i] );
-    tr_magnetFree( info );
+    info = tr_magnetParse (uri);
+    check (info != NULL);
+    check_int_eq (2, info->trackerCount);
+    check_streq (info->trackers[0], "http://tracker.openbittorrent.com/announce");
+    check_streq (info->trackers[1], "http://tracker.opentracker.org/announce");
+    check_int_eq (1, info->webseedCount);
+    check_streq ("http://server.webseed.org/path/to/file", info->webseeds[0]);
+    check_streq ("Display Name", info->displayName);
+    for (i=0; i<20; ++i)
+        check (info->hash[i] == dec[i]);
+    tr_magnetFree (info);
     info = NULL;
 
     /* same thing but in base32 encoding */
@@ -40,21 +40,21 @@ test1( void )
           "&tr=http%3A%2F%2Ftracker.openbittorrent.com%2Fannounce"
           "&ws=http%3A%2F%2Fserver.webseed.org%2Fpath%2Fto%2Ffile"
           "&tr=http%3A%2F%2Ftracker.opentracker.org%2Fannounce";
-    info = tr_magnetParse( uri );
-    check( info != NULL );
-    check_int_eq( 2, info->trackerCount );
-    check_streq( "http://tracker.openbittorrent.com/announce", info->trackers[0] );
-    check_streq( "http://tracker.opentracker.org/announce", info->trackers[1] );
-    check_int_eq( 1, info->webseedCount );
-    check_streq( "http://server.webseed.org/path/to/file", info->webseeds[0] );
-    check_streq( "Display Name", info->displayName );
-    for( i=0; i<20; ++i )
-        check( info->hash[i] == dec[i] );
-    tr_magnetFree( info );
+    info = tr_magnetParse (uri);
+    check (info != NULL);
+    check_int_eq (2, info->trackerCount);
+    check_streq ("http://tracker.openbittorrent.com/announce", info->trackers[0]);
+    check_streq ("http://tracker.opentracker.org/announce", info->trackers[1]);
+    check_int_eq (1, info->webseedCount);
+    check_streq ("http://server.webseed.org/path/to/file", info->webseeds[0]);
+    check_streq ("Display Name", info->displayName);
+    for (i=0; i<20; ++i)
+        check (info->hash[i] == dec[i]);
+    tr_magnetFree (info);
     info = NULL;
 
     return 0;
 }
 
-MAIN_SINGLE_TEST(test1)
+MAIN_SINGLE_TEST (test1)
 

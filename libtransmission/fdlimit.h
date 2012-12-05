@@ -2,7 +2,7 @@
  * This file Copyright (C) Mnemosyne LLC
  *
  * This file is licensed by the GPL version 2. Works owned by the
- * Transmission project are granted a special exemption to clause 2(b)
+ * Transmission project are granted a special exemption to clause 2 (b)
  * so that the bulk of its code can remain under the MIT license.
  * This exemption does not extend to derived works not owned by
  * the Transmission project.
@@ -26,19 +26,19 @@
 ****
 ***/
 
-void tr_set_file_for_single_pass( int fd );
+void tr_set_file_for_single_pass (int fd);
 
-int tr_open_file_for_scanning( const char * filename );
+int tr_open_file_for_scanning (const char * filename);
 
-int tr_open_file_for_writing( const char * filename );
+int tr_open_file_for_writing (const char * filename);
 
-void tr_close_file( int fd );
+void tr_close_file (int fd);
 
-int tr_fsync(int fd);
+int tr_fsync (int fd);
 
-ssize_t tr_pread(int fd, void *buf, size_t count, off_t offset);
-ssize_t tr_pwrite(int fd, const void *buf, size_t count, off_t offset);
-int tr_prefetch(int fd, off_t offset, size_t count);
+ssize_t tr_pread (int fd, void *buf, size_t count, off_t offset);
+ssize_t tr_pwrite (int fd, const void *buf, size_t count, off_t offset);
+int tr_prefetch (int fd, off_t offset, size_t count);
 
 
 /**
@@ -56,61 +56,61 @@ int tr_prefetch(int fd, off_t offset, size_t count);
  *
  * @see tr_fdFileClose
  */
-int  tr_fdFileCheckout( tr_session             * session,
+int  tr_fdFileCheckout (tr_session             * session,
                         int                      torrent_id,
                         tr_file_index_t          file_num,
                         const char             * filename,
                         bool                     do_write,
                         tr_preallocation_mode    preallocation_mode,
-                        uint64_t                 preallocation_file_size );
+                        uint64_t                 preallocation_file_size);
 
-int tr_fdFileGetCached( tr_session             * session,
+int tr_fdFileGetCached (tr_session             * session,
                         int                      torrent_id,
                         tr_file_index_t          file_num,
-                        bool                  doWrite );
+                        bool                  doWrite);
 
-bool tr_fdFileGetCachedMTime( tr_session       * session,
+bool tr_fdFileGetCachedMTime (tr_session       * session,
                               int                torrent_id,
                               tr_file_index_t    file_num,
-                              time_t           * mtime );
+                              time_t           * mtime);
 
 
 /**
  * Closes a file that's being held by our file repository.
  *
- * If the file isn't checked out, it's fsync()ed and close()d immediately.
+ * If the file isn't checked out, it's fsync ()ed and close ()d immediately.
  * If the file is currently checked out, it will be closed upon its return.
  *
  * @see tr_fdFileCheckout
  */
-void tr_fdFileClose( tr_session        * session,
+void tr_fdFileClose (tr_session        * session,
                      const tr_torrent  * tor,
-                     tr_file_index_t     file_num );
+                     tr_file_index_t     file_num);
 
 
 /**
  * Closes all the files associated with a given torrent id
  */
-void tr_fdTorrentClose( tr_session * session, int torrentId );
+void tr_fdTorrentClose (tr_session * session, int torrentId);
 
 
 /***********************************************************************
  * Sockets
  **********************************************************************/
-int      tr_fdSocketCreate( tr_session * session, int domain, int type );
+int      tr_fdSocketCreate (tr_session * session, int domain, int type);
 
-int      tr_fdSocketAccept( tr_session  * session,
+int      tr_fdSocketAccept (tr_session  * session,
                             int           listening_sockfd,
                             tr_address  * addr,
-                            tr_port     * port );
+                            tr_port     * port);
 
-void     tr_fdSocketClose( tr_session * session, int s );
+void     tr_fdSocketClose (tr_session * session, int s);
 
 /***********************************************************************
  * tr_fdClose
  ***********************************************************************
  * Frees resources allocated by tr_fdInit.
  **********************************************************************/
-void     tr_fdClose( tr_session * session );
+void     tr_fdClose (tr_session * session);
 
 /* @} */

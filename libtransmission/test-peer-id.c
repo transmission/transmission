@@ -10,31 +10,31 @@
 #include "libtransmission-test.h"
 
 static int
-testPeerId( void )
+testPeerId (void)
 {
     int i;
     uint8_t peer_id[PEER_ID_LEN+1];
 
-    for( i = 0; i < 100000; ++i )
+    for (i = 0; i < 100000; ++i)
     {
         int j;
         int val = 0;
 
-        tr_peerIdInit( peer_id );
+        tr_peerIdInit (peer_id);
 
-        check( strlen( (char*)peer_id ) == PEER_ID_LEN );
-        check( !memcmp( peer_id, PEERID_PREFIX, 8 ) );
+        check (strlen ((char*)peer_id) == PEER_ID_LEN);
+        check (!memcmp (peer_id, PEERID_PREFIX, 8));
 
-        for( j = 8; j < PEER_ID_LEN; ++j )
+        for (j = 8; j < PEER_ID_LEN; ++j)
         {
             char tmp[2] = { peer_id[j], '\0' };
-            val += strtoul( tmp, NULL, 36 );
+            val += strtoul (tmp, NULL, 36);
         }
 
-        check( ( val % 36 ) == 0 );
+        check ((val % 36) == 0);
     }
 
     return 0;
 }
 
-MAIN_SINGLE_TEST(testPeerId)
+MAIN_SINGLE_TEST (testPeerId)

@@ -47,7 +47,7 @@
  #define EWOULDBLOCK             WSAEWOULDBLOCK
  #define EAFNOSUPPORT            WSAEAFNOSUPPORT
  #define ENETUNREACH             WSAENETUNREACH
- #define sockerrno               WSAGetLastError( )
+ #define sockerrno               WSAGetLastError ()
 #else
  #include <errno.h>
  #define sockerrno errno
@@ -81,29 +81,29 @@ typedef struct tr_address
 extern const tr_address tr_inaddr_any;
 extern const tr_address tr_in6addr_any;
 
-const char* tr_address_to_string( const tr_address * addr );
+const char* tr_address_to_string (const tr_address * addr);
 
-const char* tr_address_to_string_with_buf( const tr_address  * addr,
+const char* tr_address_to_string_with_buf (const tr_address  * addr,
                                            char              * buf,
-                                           size_t              buflen );
+                                           size_t              buflen);
 
-bool tr_address_from_string ( tr_address  * setme,
-                              const char  * string );
+bool tr_address_from_string (tr_address  * setme,
+                              const char  * string);
 
-bool tr_address_from_sockaddr_storage( tr_address                     * setme,
+bool tr_address_from_sockaddr_storage (tr_address                     * setme,
                                        tr_port                        * port,
-                                       const struct sockaddr_storage  * src );
+                                       const struct sockaddr_storage  * src);
 
-int tr_address_compare( const tr_address * a,
-                        const tr_address * b );
+int tr_address_compare (const tr_address * a,
+                        const tr_address * b);
 
-bool tr_address_is_valid_for_peers( const tr_address  * addr,
-                                    tr_port             port );
+bool tr_address_is_valid_for_peers (const tr_address  * addr,
+                                    tr_port             port);
 
 static inline bool
-tr_address_is_valid( const tr_address * a )
+tr_address_is_valid (const tr_address * a)
 {
-    return ( a != NULL ) && ( a->type==TR_AF_INET || a->type==TR_AF_INET6 );
+    return (a != NULL) && (a->type==TR_AF_INET || a->type==TR_AF_INET6);
 }
 
 /***********************************************************************
@@ -112,49 +112,49 @@ tr_address_is_valid( const tr_address * a )
 
 struct tr_session;
 
-int  tr_netOpenPeerSocket( tr_session       * session,
+int  tr_netOpenPeerSocket (tr_session       * session,
                            const tr_address * addr,
                            tr_port            port,
-                           bool               clientIsSeed );
+                           bool               clientIsSeed);
 
 struct UTPSocket *
-tr_netOpenPeerUTPSocket( tr_session        * session,
+tr_netOpenPeerUTPSocket (tr_session        * session,
                          const tr_address  * addr,
                          tr_port             port,
                          bool                clientIsSeed);
 
-int  tr_netBindTCP( const tr_address * addr,
+int  tr_netBindTCP (const tr_address * addr,
                     tr_port            port,
-                    bool               suppressMsgs );
+                    bool               suppressMsgs);
 
-int  tr_netAccept( tr_session * session,
+int  tr_netAccept (tr_session * session,
                    int          bound,
                    tr_address * setme_addr,
-                   tr_port    * setme_port );
+                   tr_port    * setme_port);
 
-int  tr_netSetTOS( int s,
-                   int tos );
+int  tr_netSetTOS (int s,
+                   int tos);
 
-int tr_netSetCongestionControl( int s, const char *algorithm );
+int tr_netSetCongestionControl (int s, const char *algorithm);
 
-void tr_netClose( tr_session * session, int s );
+void tr_netClose (tr_session * session, int s);
 
-void tr_netCloseSocket( int fd );
+void tr_netCloseSocket (int fd);
 
-void tr_netInit( void );
+void tr_netInit (void);
 
-bool tr_net_hasIPv6( tr_port );
+bool tr_net_hasIPv6 (tr_port);
 
 
 /**
  * @brief get a human-representable string representing the network error.
  * @param err an errno on Unix/Linux and an WSAError on win32)
  */
-char* tr_net_strerror( char * buf, size_t buflen, int err );
+char* tr_net_strerror (char * buf, size_t buflen, int err);
 
-const unsigned char *tr_globalIPv6( void );
+const unsigned char *tr_globalIPv6 (void);
 
-#if defined( WIN32) && !defined(QT_DLL)
+#if defined (WIN32) && !defined (QT_DLL)
 /* The QT exclusion is because something clashes whith the next include */
 #include <ws2tcpip.h>		/* socklen_t */
 

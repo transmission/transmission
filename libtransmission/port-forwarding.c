@@ -2,7 +2,7 @@
  * This file Copyright (C) Mnemosyne LLC
  *
  * This file is licensed by the GPL version 2. Works owned by the
- * Transmission project are granted a special exemption to clause 2(b)
+ * Transmission project are granted a special exemption to clause 2 (b)
  * so that the bulk of its code can remain under the MIT license.
  * This exemption does not extend to derived works not owned by
  * the Transmission project.
@@ -28,7 +28,7 @@
 #include "utils.h"
 
 static const char *
-getKey( void ) { return _( "Port Forwarding" ); }
+getKey (void) { return _ ("Port Forwarding"); }
 
 struct tr_shared
 {
@@ -51,20 +51,20 @@ struct tr_shared
 ***/
 
 static const char*
-getNatStateStr( int state )
+getNatStateStr (int state)
 {
-    switch( state )
+    switch (state)
     {
-        case TR_PORT_MAPPING:   return _( "Starting" );
-        case TR_PORT_MAPPED:    return _( "Forwarded" );
-        case TR_PORT_UNMAPPING: return _( "Stopping" );
-        case TR_PORT_UNMAPPED:  return _( "Not forwarded" );
+        case TR_PORT_MAPPING:   return _ ("Starting");
+        case TR_PORT_MAPPED:    return _ ("Forwarded");
+        case TR_PORT_UNMAPPING: return _ ("Stopping");
+        case TR_PORT_UNMAPPED:  return _ ("Not forwarded");
         default:                return "???";
     }
 }
 
 static void
-natPulse( tr_shared * s, bool do_check )
+natPulse (tr_shared * s, bool do_check)
 {
     const tr_port private_peer_port = s->session->private_peer_port;
     const int is_enabled = s->isEnabled && !s->isShuttingDown;
@@ -72,34 +72,34 @@ natPulse( tr_shared * s, bool do_check )
     int oldStatus;
     int newStatus;
 
-    if( s->natpmp == NULL )
-        s->natpmp = tr_natpmpInit( );
-    if( s->upnp == NULL )
-        s->upnp = tr_upnpInit( );
+    if (s->natpmp == NULL)
+        s->natpmp = tr_natpmpInit ();
+    if (s->upnp == NULL)
+        s->upnp = tr_upnpInit ();
 
-    oldStatus = tr_sharedTraversalStatus( s );
+    oldStatus = tr_sharedTraversalStatus (s);
 
-    s->natpmpStatus = tr_natpmpPulse( s->natpmp, private_peer_port, is_enabled, &public_peer_port );
-    if( s->natpmpStatus == TR_PORT_MAPPED )
+    s->natpmpStatus = tr_natpmpPulse (s->natpmp, private_peer_port, is_enabled, &public_peer_port);
+    if (s->natpmpStatus == TR_PORT_MAPPED)
         s->session->public_peer_port = public_peer_port;
 
-    s->upnpStatus = tr_upnpPulse( s->upnp, private_peer_port, is_enabled, do_check );
+    s->upnpStatus = tr_upnpPulse (s->upnp, private_peer_port, is_enabled, do_check);
 
-    newStatus = tr_sharedTraversalStatus( s );
+    newStatus = tr_sharedTraversalStatus (s);
 
-    if( newStatus != oldStatus )
-        tr_ninf( getKey( ), _( "State changed from \"%1$s\" to \"%2$s\"" ),
-                getNatStateStr( oldStatus ),
-                getNatStateStr( newStatus ) );
+    if (newStatus != oldStatus)
+        tr_ninf (getKey (), _ ("State changed from \"%1$s\" to \"%2$s\""),
+                getNatStateStr (oldStatus),
+                getNatStateStr (newStatus));
 }
 
 static void
-set_evtimer_from_status( tr_shared * s )
+set_evtimer_from_status (tr_shared * s)
 {
     int sec=0, msec=0;
 
     /* when to wake up again */
-    switch( tr_sharedTraversalStatus( s ) )
+    switch (tr_sharedTraversalStatus (s))
     {
         case TR_PORT_MAPPED:
             /* if we're mapped, everything is fine... check back in 20 minutes
@@ -119,24 +119,24 @@ set_evtimer_from_status( tr_shared * s )
             break;
     }
 
-    if( s->timer != NULL )
-        tr_timerAdd( s->timer, sec, msec );
+    if (s->timer != NULL)
+        tr_timerAdd (s->timer, sec, msec);
 }
 
 static void
-onTimer( int fd UNUSED, short what UNUSED, void * vshared )
+onTimer (int fd UNUSED, short what UNUSED, void * vshared)
 {
     tr_shared * s = vshared;
 
-    assert( s );
-    assert( s->timer );
+    assert (s);
+    assert (s->timer);
 
     /* do something */
-    natPulse( s, s->doPortCheck );
+    natPulse (s, s->doPortCheck);
     s->doPortCheck = false;
 
     /* set up the timer for the next pulse */
-    set_evtimer_from_status( s );
+    set_evtimer_from_status (s);
 }
 
 /***
@@ -144,9 +144,9 @@ onTimer( int fd UNUSED, short what UNUSED, void * vshared )
 ***/
 
 tr_shared *
-tr_sharedInit( tr_session  * session )
+tr_sharedInit (tr_session  * session)
 {
-    tr_shared * s = tr_new0( tr_shared, 1 );
+    tr_shared * s = tr_new0 (tr_shared, 1);
 
     s->session      = session;
     s->isEnabled    = false;
@@ -154,11 +154,11 @@ tr_sharedInit( tr_session  * session )
     s->natpmpStatus = TR_PORT_UNMAPPED;
 
 #if 0
-    if( isEnabled )
+    if (isEnabled)
     {
-        s->timer = tr_new0( struct event, 1 );
-        evtimer_set( s->timer, onTimer, s );
-        tr_timerAdd( s->timer, 0, 333000 );
+        s->timer = tr_new0 (struct event, 1);
+        evtimer_set (s->timer, onTimer, s);
+        tr_timerAdd (s->timer, 0, 333000);
     }
 #endif
 
@@ -166,80 +166,80 @@ tr_sharedInit( tr_session  * session )
 }
 
 static void
-stop_timer( tr_shared * s )
+stop_timer (tr_shared * s)
 {
-    if( s->timer != NULL )
+    if (s->timer != NULL)
     {
-        event_free( s->timer );
+        event_free (s->timer);
         s->timer = NULL;
     }
 }
 
 static void
-stop_forwarding( tr_shared * s )
+stop_forwarding (tr_shared * s)
 {
-    tr_ninf( getKey( ), "%s", _( "Stopped" ) );
-    natPulse( s, false );
+    tr_ninf (getKey (), "%s", _ ("Stopped"));
+    natPulse (s, false);
 
-    tr_natpmpClose( s->natpmp );
+    tr_natpmpClose (s->natpmp);
     s->natpmp = NULL;
     s->natpmpStatus = TR_PORT_UNMAPPED;
 
-    tr_upnpClose( s->upnp );
+    tr_upnpClose (s->upnp);
     s->upnp = NULL;
     s->upnpStatus = TR_PORT_UNMAPPED;
 
-    stop_timer( s );
+    stop_timer (s);
 }
 
 void
-tr_sharedClose( tr_session * session )
+tr_sharedClose (tr_session * session)
 {
     tr_shared * s = session->shared;
 
     s->isShuttingDown = true;
-    stop_forwarding( s );
+    stop_forwarding (s);
     s->session->shared = NULL;
-    tr_free( s );
+    tr_free (s);
 }
 
 static void
-start_timer( tr_shared * s )
+start_timer (tr_shared * s)
 {
-    s->timer = evtimer_new( s->session->event_base, onTimer, s );
-    set_evtimer_from_status( s );
+    s->timer = evtimer_new (s->session->event_base, onTimer, s);
+    set_evtimer_from_status (s);
 }
 
 void
-tr_sharedTraversalEnable( tr_shared * s, bool isEnabled )
+tr_sharedTraversalEnable (tr_shared * s, bool isEnabled)
 {
-    if(( s->isEnabled = isEnabled ))
-        start_timer( s );
+    if ((s->isEnabled = isEnabled))
+        start_timer (s);
     else
-        stop_forwarding( s );
+        stop_forwarding (s);
 }
 
 void
-tr_sharedPortChanged( tr_session * session )
+tr_sharedPortChanged (tr_session * session)
 {
     tr_shared * s = session->shared;
 
-    if( s->isEnabled )
+    if (s->isEnabled)
     {
-        stop_timer( s );
-        natPulse( s, false );
-        start_timer( s );
+        stop_timer (s);
+        natPulse (s, false);
+        start_timer (s);
     }
 }
 
 bool
-tr_sharedTraversalIsEnabled( const tr_shared * s )
+tr_sharedTraversalIsEnabled (const tr_shared * s)
 {
     return s->isEnabled;
 }
 
 int
-tr_sharedTraversalStatus( const tr_shared * s )
+tr_sharedTraversalStatus (const tr_shared * s)
 {
-    return MAX( s->natpmpStatus, s->upnpStatus );
+    return MAX (s->natpmpStatus, s->upnpStatus);
 }

@@ -4,7 +4,7 @@
  #pragma align 4 (tr_icon_lock)
 #endif
 #ifdef __GNUC__
-static const guint8 tr_icon_lock[] __attribute__ ( ( __aligned__ ( 4 ) ) )
+static const guint8 tr_icon_lock[] __attribute__ ((__aligned__ (4)))
     =
 #else
 static const guint8 tr_icon_lock[] =

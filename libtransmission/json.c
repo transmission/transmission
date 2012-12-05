@@ -2,7 +2,7 @@
  * This file Copyright (C) Mnemosyne LLC
  *
  * This file is licensed by the GPL version 2. Works owned by the
- * Transmission project are granted a special exemption to clause 2(b)
+ * Transmission project are granted a special exemption to clause 2 (b)
  * so that the bulk of its code can remain under the MIT license.
  * This exemption does not extend to derived works not owned by
  * the Transmission project.
@@ -16,7 +16,7 @@
 #include <string.h>
 #include <errno.h> /* EILSEQ, EINVAL */
 
-#include <event2/util.h> /* evutil_strtoll() */
+#include <event2/util.h> /* evutil_strtoll () */
 
 #define JSONSL_STATE_USER_FIELDS /* no fields */
 #include "jsonsl.h"
@@ -85,14 +85,14 @@ error_handler (jsonsl_t                  jsn,
       tr_err ("JSON parse failed in %s at pos %zu: %s -- remaining text \"%.16s\"",
               data->source,
               jsn->pos,
-              jsonsl_strerror(error),
+              jsonsl_strerror (error),
               buf);
     }
   else
     {
       tr_err ("JSON parse failed at pos %zu: %s -- remaining text \"%.16s\"",
               jsn->pos,
-              jsonsl_strerror(error),
+              jsonsl_strerror (error),
               buf);
     }
 
@@ -159,7 +159,7 @@ extract_string (jsonsl_t jsn, struct jsonsl_state_st * state, size_t * len)
   out_buf = tr_new0 (char, out_buflen);
   out_it = out_buf;
 
-  for (in_it=in_begin; in_it!=in_end; )
+  for (in_it=in_begin; in_it!=in_end;)
     {
       bool unescaped = false;
 
@@ -264,7 +264,7 @@ action_callback_POP (jsonsl_t                  jsn,
       else if (state->special_flags & JSONSL_SPECIALf_NULL)
         {
           data->has_content = true;
-          tr_bencInitStr (get_node (jsn), "", 0 );
+          tr_bencInitStr (get_node (jsn), "", 0);
         }
     }
 }
@@ -307,7 +307,7 @@ tr_jsonParse (const char     * source,
 
   /* cleanup */
   error = data.error;
-  tr_ptrArrayDestruct( &data.stack, NULL );
+  tr_ptrArrayDestruct (&data.stack, NULL);
   jsonsl_destroy (jsn);
   return error;
 }

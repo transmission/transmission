@@ -2,7 +2,7 @@
  * This file Copyright (C) Mnemosyne LLC
  *
  * This file is licensed by the GPL version 2. Works owned by the
- * Transmission project are granted a special exemption to clause 2(b)
+ * Transmission project are granted a special exemption to clause 2 (b)
  * so that the bulk of its code can remain under the MIT license.
  * This exemption does not extend to derived works not owned by
  * the Transmission project.
@@ -56,63 +56,63 @@ typedef struct
 }
 tr_tracker_event;
 
-typedef void tr_tracker_callback ( tr_torrent              * tor,
+typedef void tr_tracker_callback (tr_torrent              * tor,
                                    const tr_tracker_event  * event,
-                                   void                    * client_data );
+                                   void                    * client_data);
 
 /**
 ***  Session ctor/dtor
 **/
 
-void tr_announcerInit( tr_session * );
+void tr_announcerInit (tr_session *);
 
-void tr_announcerClose( tr_session * );
+void tr_announcerClose (tr_session *);
 
 /**
 ***  For torrent customers
 **/
 
-struct tr_torrent_tiers * tr_announcerAddTorrent( tr_torrent          * torrent,
+struct tr_torrent_tiers * tr_announcerAddTorrent (tr_torrent          * torrent,
                                                   tr_tracker_callback * cb,
-                                                  void                * cbdata );
+                                                  void                * cbdata);
 
-bool tr_announcerHasBacklog( const struct tr_announcer * );
+bool tr_announcerHasBacklog (const struct tr_announcer *);
 
-void tr_announcerResetTorrent( struct tr_announcer*, tr_torrent* );
+void tr_announcerResetTorrent (struct tr_announcer*, tr_torrent*);
 
-void tr_announcerRemoveTorrent( struct tr_announcer * ,
-                                tr_torrent          * );
+void tr_announcerRemoveTorrent (struct tr_announcer * ,
+                                tr_torrent          *);
 
-void tr_announcerChangeMyPort( tr_torrent * );
+void tr_announcerChangeMyPort (tr_torrent *);
 
-bool tr_announcerCanManualAnnounce( const tr_torrent * );
+bool tr_announcerCanManualAnnounce (const tr_torrent *);
 
-void tr_announcerManualAnnounce( tr_torrent * );
+void tr_announcerManualAnnounce (tr_torrent *);
 
-void tr_announcerTorrentStarted( tr_torrent * );
-void tr_announcerTorrentStopped( tr_torrent * );
-void tr_announcerTorrentCompleted( tr_torrent * );
+void tr_announcerTorrentStarted (tr_torrent *);
+void tr_announcerTorrentStopped (tr_torrent *);
+void tr_announcerTorrentCompleted (tr_torrent *);
 
 enum { TR_ANN_UP, TR_ANN_DOWN, TR_ANN_CORRUPT };
-void tr_announcerAddBytes( tr_torrent *, int up_down_or_corrupt, uint32_t byteCount );
+void tr_announcerAddBytes (tr_torrent *, int up_down_or_corrupt, uint32_t byteCount);
 
-time_t tr_announcerNextManualAnnounce( const tr_torrent * );
+time_t tr_announcerNextManualAnnounce (const tr_torrent *);
 
-tr_tracker_stat * tr_announcerStats( const tr_torrent * torrent,
-                                     int              * setmeTrackerCount );
+tr_tracker_stat * tr_announcerStats (const tr_torrent * torrent,
+                                     int              * setmeTrackerCount);
 
-void tr_announcerStatsFree( tr_tracker_stat * trackers,
-                            int               trackerCount );
+void tr_announcerStatsFree (tr_tracker_stat * trackers,
+                            int               trackerCount);
 
 /***
 ****
 ***/
 
-void tr_tracker_udp_upkeep( tr_session * session );
+void tr_tracker_udp_upkeep (tr_session * session);
 
-void tr_tracker_udp_close( tr_session * session );
+void tr_tracker_udp_close (tr_session * session);
 
-bool tr_tracker_udp_is_idle( const tr_session * session );
+bool tr_tracker_udp_is_idle (const tr_session * session);
 
 
 

@@ -23,22 +23,22 @@ THE SOFTWARE.
 /* ansi */
 #include <errno.h>
 #include <stdio.h>
-#include <string.h> /* strlen(), strncpy(), strstr(), memset() */
+#include <string.h> /* strlen (), strncpy (), strstr (), memset () */
 
 /* posix */
 #include <signal.h> /* sig_atomic_t */
 #include <sys/time.h>
-#include <unistd.h> /* close() */
-#include <ctype.h> /* toupper() */
+#include <unistd.h> /* close () */
+#include <ctype.h> /* toupper () */
 #ifdef WIN32
   #include <w32api.h>
-  #define WINDOWS  WindowsXP  /* freeaddrinfo(),getaddrinfo(),getnameinfo() */
+  #define WINDOWS  WindowsXP  /* freeaddrinfo (),getaddrinfo (),getnameinfo () */
   #include <inttypes.h>
   #include <ws2tcpip.h>
   typedef uint16_t in_port_t;			/* all missing */
 #else
   #include <sys/types.h>
-  #include <sys/socket.h> /* socket(), bind() */
+  #include <sys/socket.h> /* socket (), bind () */
   #include <netinet/in.h> /* sockaddr_in */
 #endif
 
@@ -49,9 +49,9 @@ THE SOFTWARE.
 /* libT */
 #include "transmission.h"
 #include "net.h"
-#include "peer-mgr.h" /* tr_peerMgrAddPex() */
+#include "peer-mgr.h" /* tr_peerMgrAddPex () */
 #include "session.h"
-#include "torrent.h" /* tr_torrentFindFromHash() */
+#include "torrent.h" /* tr_torrentFindFromHash () */
 #include "tr-lpd.h"
 #include "utils.h"
 #include "version.h"
@@ -66,7 +66,7 @@ THE SOFTWARE.
 * $Id$
 */
 
-static void event_callback( int, short, void* );
+static void event_callback (int, short, void*);
 
 enum {
    UPKEEP_INTERVAL_SECS = 5
@@ -159,42 +159,42 @@ static int lpd_unsolicitedMsgCounter;
 * If parameter is not NULL, the declared protocol version is returned as part of
 * the lpd_protocolVersion structure.
 */
-static const char* lpd_extractHeader( const char* s, struct lpd_protocolVersion* const ver )
+static const char* lpd_extractHeader (const char* s, struct lpd_protocolVersion* const ver)
 {
     int major = -1, minor = -1;
     size_t len;
 
-    assert( s != NULL );
-    len = strlen( s );
+    assert (s != NULL);
+    len = strlen (s);
 
     /* something might be rotten with this chunk of data */
-    if( len == 0 || len > lpd_maxDatagramLength )
+    if (len == 0 || len > lpd_maxDatagramLength)
         return NULL;
 
     /* now we can attempt to look up the BT-SEARCH header */
-    if( sscanf( s, "BT-SEARCH * HTTP/%d.%d" CRLF, &major, &minor ) != 2 )
+    if (sscanf (s, "BT-SEARCH * HTTP/%d.%d" CRLF, &major, &minor) != 2)
         return NULL;
 
-    if( major < 0 || minor < 0 )
+    if (major < 0 || minor < 0)
         return NULL;
 
     {
         /* a pair of blank lines at the end of the string, no place else */
         const char* const two_blank = CRLF CRLF CRLF;
-        const char* const end = strstr( s, two_blank );
+        const char* const end = strstr (s, two_blank);
 
-        if( end == NULL || strlen( end ) > strlen( two_blank ) )
+        if (end == NULL || strlen (end) > strlen (two_blank))
             return NULL;
     }
 
-    if( ver != NULL )
+    if (ver != NULL)
     {
         ver->major = major;
         ver->minor = minor;
     }
 
     /* separate the header, begins with CRLF */
-    return strstr( s, CRLF );
+    return strstr (s, CRLF);
 }
 
 /**
@@ -211,39 +211,39 @@ static const char* lpd_extractHeader( const char* s, struct lpd_protocolVersion*
 *   - assemble search string "\r\nName: " and locate position
 *   - copy back value from end to next "\r\n"
 */
-static int lpd_extractParam( const char* const str, const char* const name, int n, char* const val )
+static int lpd_extractParam (const char* const str, const char* const name, int n, char* const val)
 {
     /* configure maximum length of search string here */
     enum { maxLength = 30 };
     char sstr[maxLength] = { };
     const char* pos;
 
-    assert( str != NULL && name != NULL );
-    assert( val != NULL );
+    assert (str != NULL && name != NULL);
+    assert (val != NULL);
 
-    if( strlen( name ) > maxLength - strlen( CRLF ": " ) )
+    if (strlen (name) > maxLength - strlen (CRLF ": "))
         return 0;
 
     /* compose the string token to search for */
-    snprintf( sstr, maxLength, CRLF "%s: ", name );
+    snprintf (sstr, maxLength, CRLF "%s: ", name);
 
-    pos = strstr( str, sstr );
-    if( pos == NULL )
+    pos = strstr (str, sstr);
+    if (pos == NULL)
         return 0; /* search was not successful */
 
     {
-        const char* const beg = pos + strlen( sstr );
-        const char* const new_line = strstr( beg, CRLF );
+        const char* const beg = pos + strlen (sstr);
+        const char* const new_line = strstr (beg, CRLF);
 
         /* the value is delimited by the next CRLF */
         int len = new_line - beg;
 
         /* if value string hits the length limit n,
          * leave space for a trailing '\0' character */
-        if( len < n-- )
+        if (len < n--)
             n = len;
 
-        strncpy( val, beg, n );
+        strncpy (val, beg, n);
         val[n] = 0;
     }
 
@@ -254,7 +254,7 @@ static int lpd_extractParam( const char* const str, const char* const name, int 
 /**
 * @} */
 
-static void on_upkeep_timer( int, short, void * );
+static void on_upkeep_timer (int, short, void *);
 
 /**
 * @brief Initializes Local Peer Discovery for this node
@@ -265,57 +265,57 @@ static void on_upkeep_timer( int, short, void * );
 * @remark Since the LPD service does not use another protocol family yet, this code is
 * IPv4 only for the time being.
 */
-int tr_lpdInit( tr_session* ss, tr_address* tr_addr UNUSED )
+int tr_lpdInit (tr_session* ss, tr_address* tr_addr UNUSED)
 {
     struct ip_mreq mcastReq;
     const int opt_on = 1, opt_off = 0;
 
-    if( session ) /* already initialized */
+    if (session) /* already initialized */
         return -1;
 
-    assert( lpd_announceInterval > 0 );
-    assert( lpd_announceScope > 0 );
+    assert (lpd_announceInterval > 0);
+    assert (lpd_announceScope > 0);
 
-    lpd_port = tr_sessionGetPeerPort( ss );
-    if( lpd_port <= 0 )
+    lpd_port = tr_sessionGetPeerPort (ss);
+    if (lpd_port <= 0)
         return -1;
 
-    tr_ndbg( "LPD", "Initialising Local Peer Discovery" );
+    tr_ndbg ("LPD", "Initialising Local Peer Discovery");
 
     /* setup datagram socket (receive) */
     {
-        lpd_socket = socket( PF_INET, SOCK_DGRAM, 0 );
-        if( lpd_socket < 0 )
+        lpd_socket = socket (PF_INET, SOCK_DGRAM, 0);
+        if (lpd_socket < 0)
             goto fail;
 
-        if( evutil_make_socket_nonblocking( lpd_socket ) < 0 )
+        if (evutil_make_socket_nonblocking (lpd_socket) < 0)
             goto fail;
 
-        if( setsockopt( lpd_socket, SOL_SOCKET, SO_REUSEADDR,
-                &opt_on, sizeof opt_on ) < 0 )
+        if (setsockopt (lpd_socket, SOL_SOCKET, SO_REUSEADDR,
+                &opt_on, sizeof opt_on) < 0)
             goto fail;
 
-        memset( &lpd_mcastAddr, 0, sizeof lpd_mcastAddr );
+        memset (&lpd_mcastAddr, 0, sizeof lpd_mcastAddr);
         lpd_mcastAddr.sin_family = AF_INET;
-        lpd_mcastAddr.sin_port = htons( lpd_mcastPort );
-        if( evutil_inet_pton( lpd_mcastAddr.sin_family, lpd_mcastGroup,
-                &lpd_mcastAddr.sin_addr ) < 0 )
+        lpd_mcastAddr.sin_port = htons (lpd_mcastPort);
+        if (evutil_inet_pton (lpd_mcastAddr.sin_family, lpd_mcastGroup,
+                &lpd_mcastAddr.sin_addr) < 0)
             goto fail;
 
-        if( bind( lpd_socket, (struct sockaddr*) &lpd_mcastAddr,
-                sizeof lpd_mcastAddr ) < 0 )
+        if (bind (lpd_socket, (struct sockaddr*) &lpd_mcastAddr,
+                sizeof lpd_mcastAddr) < 0)
             goto fail;
 
         /* we want to join that LPD multicast group */
-        memset( &mcastReq, 0, sizeof mcastReq );
+        memset (&mcastReq, 0, sizeof mcastReq);
         mcastReq.imr_multiaddr = lpd_mcastAddr.sin_addr;
-        mcastReq.imr_interface.s_addr = htonl( INADDR_ANY );
-        if( setsockopt( lpd_socket, IPPROTO_IP, IP_ADD_MEMBERSHIP,
-                &mcastReq, sizeof mcastReq ) < 0 )
+        mcastReq.imr_interface.s_addr = htonl (INADDR_ANY);
+        if (setsockopt (lpd_socket, IPPROTO_IP, IP_ADD_MEMBERSHIP,
+                &mcastReq, sizeof mcastReq) < 0)
             goto fail;
 
-        if( setsockopt( lpd_socket, IPPROTO_IP, IP_MULTICAST_LOOP,
-                &opt_off, sizeof opt_off ) < 0 )
+        if (setsockopt (lpd_socket, IPPROTO_IP, IP_MULTICAST_LOOP,
+                &opt_off, sizeof opt_off) < 0)
             goto fail;
     }
 
@@ -323,20 +323,20 @@ int tr_lpdInit( tr_session* ss, tr_address* tr_addr UNUSED )
     {
         const unsigned char scope = lpd_announceScope;
 
-        lpd_socket2 = socket( PF_INET, SOCK_DGRAM, 0 );
-        if( lpd_socket2 < 0 )
+        lpd_socket2 = socket (PF_INET, SOCK_DGRAM, 0);
+        if (lpd_socket2 < 0)
             goto fail;
 
-        if( evutil_make_socket_nonblocking( lpd_socket2 ) < 0 )
+        if (evutil_make_socket_nonblocking (lpd_socket2) < 0)
             goto fail;
 
         /* configure outbound multicast TTL */
-        if( setsockopt( lpd_socket2, IPPROTO_IP, IP_MULTICAST_TTL,
-                &scope, sizeof scope ) < 0 )
+        if (setsockopt (lpd_socket2, IPPROTO_IP, IP_MULTICAST_TTL,
+                &scope, sizeof scope) < 0)
             goto fail;
 
-        if( setsockopt( lpd_socket2, IPPROTO_IP, IP_MULTICAST_LOOP,
-                &opt_off, sizeof opt_off ) < 0 )
+        if (setsockopt (lpd_socket2, IPPROTO_IP, IP_MULTICAST_LOOP,
+                &opt_off, sizeof opt_off) < 0)
             goto fail;
     }
 
@@ -345,24 +345,24 @@ int tr_lpdInit( tr_session* ss, tr_address* tr_addr UNUSED )
     /* Note: lpd_unsolicitedMsgCounter remains 0 until the first timeout event, thus
      * any announcement received during the initial interval will be discarded. */
 
-    lpd_event = event_new( ss->event_base, lpd_socket, EV_READ | EV_PERSIST, event_callback, NULL );
-    event_add( lpd_event, NULL );
+    lpd_event = event_new (ss->event_base, lpd_socket, EV_READ | EV_PERSIST, event_callback, NULL);
+    event_add (lpd_event, NULL);
 
-    upkeep_timer = evtimer_new( ss->event_base, on_upkeep_timer, ss );
-    tr_timerAdd( upkeep_timer, UPKEEP_INTERVAL_SECS, 0 );
+    upkeep_timer = evtimer_new (ss->event_base, on_upkeep_timer, ss);
+    tr_timerAdd (upkeep_timer, UPKEEP_INTERVAL_SECS, 0);
 
-    tr_ndbg( "LPD", "Local Peer Discovery initialised" );
+    tr_ndbg ("LPD", "Local Peer Discovery initialised");
 
     return 1;
 
     fail:
     {
         const int save = errno;
-        close( lpd_socket );
-        close( lpd_socket2 );
+        close (lpd_socket);
+        close (lpd_socket2);
         lpd_socket = lpd_socket2 = -1;
         session = NULL;
-        tr_ndbg( "LPD", "LPD initialisation failed (errno = %d)", save );
+        tr_ndbg ("LPD", "LPD initialisation failed (errno = %d)", save);
         errno = save;
     }
 
@@ -370,31 +370,31 @@ int tr_lpdInit( tr_session* ss, tr_address* tr_addr UNUSED )
     return -1;
 }
 
-void tr_lpdUninit( tr_session* ss )
+void tr_lpdUninit (tr_session* ss)
 {
-    if( session != ss )
+    if (session != ss)
         return;
 
-    tr_ndbg( "LPD", "Uninitialising Local Peer Discovery" );
+    tr_ndbg ("LPD", "Uninitialising Local Peer Discovery");
 
-    event_free( lpd_event );
+    event_free (lpd_event);
     lpd_event = NULL;
 
-    evtimer_del( upkeep_timer );
+    evtimer_del (upkeep_timer);
     upkeep_timer = NULL;
 
     /* just shut down, we won't remember any former nodes */
-    evutil_closesocket( lpd_socket );
-    evutil_closesocket( lpd_socket2 );
-    tr_ndbg( "LPD", "Done uninitialising Local Peer Discovery" );
+    evutil_closesocket (lpd_socket);
+    evutil_closesocket (lpd_socket2);
+    tr_ndbg ("LPD", "Done uninitialising Local Peer Discovery");
 
     session = NULL;
 }
 
 bool
-tr_lpdEnabled( const tr_session* ss )
+tr_lpdEnabled (const tr_session* ss)
 {
-    return ss && ( ss == session );
+    return ss && (ss == session);
 }
 
 
@@ -404,13 +404,13 @@ tr_lpdEnabled( const tr_session* ss )
 * @remark Declared inline for the compiler not to allege us of feeding unused
 * functions. In any other respect, lpd_consistencyCheck is an orphaned function.
 */
-static inline void lpd_consistencyCheck( void )
+static inline void lpd_consistencyCheck (void)
 {
     /* if the following check fails, the definition of a hash string has changed
      * without our knowledge; revise string handling in functions tr_lpdSendAnnounce
      * and tr_lpdConsiderAnnounce. However, the code is designed to function as long
      * as interfaces to the rest of the lib remain compatible with char* strings. */
-    STATIC_ASSERT( sizeof(lpd_torStaticType->info.hashString[0]) == sizeof(char) );
+    STATIC_ASSERT (sizeof (lpd_torStaticType->info.hashString[0]) == sizeof (char));
 }
 /**
 * @endcond */
@@ -432,7 +432,7 @@ static inline void lpd_consistencyCheck( void )
 * peer pool for torrent t.
 */
 bool
-tr_lpdSendAnnounce( const tr_torrent* t )
+tr_lpdSendAnnounce (const tr_torrent* t)
 {
     size_t i;
     const char fmt[] =
@@ -443,34 +443,34 @@ tr_lpdSendAnnounce( const tr_torrent* t )
         CRLF
         CRLF;
 
-    char hashString[lengthof( t->info.hashString )];
+    char hashString[lengthof (t->info.hashString)];
     char query[lpd_maxDatagramLength + 1] = { };
 
-    if( t == NULL )
+    if (t == NULL)
         return false;
 
     /* make sure the hash string is normalized, just in case */
-    for( i = 0; i < sizeof hashString; i++ )
-        hashString[i] = toupper( t->info.hashString[i] );
+    for (i = 0; i < sizeof hashString; i++)
+        hashString[i] = toupper (t->info.hashString[i]);
 
     /* prepare a zero-terminated announce message */
-    snprintf( query, lpd_maxDatagramLength + 1, fmt, 1, 1,
-        lpd_mcastGroup, lpd_mcastPort, lpd_port, hashString );
+    snprintf (query, lpd_maxDatagramLength + 1, fmt, 1, 1,
+        lpd_mcastGroup, lpd_mcastPort, lpd_port, hashString);
 
     /* actually send the query out using [lpd_socket2] */
     {
-        const int len = strlen( query );
+        const int len = strlen (query);
 
-        /* destination address info has already been set up in tr_lpdInit(),
+        /* destination address info has already been set up in tr_lpdInit (),
          * so we refrain from preparing another sockaddr_in here */
-        int res = sendto( lpd_socket2, query, len, 0,
-            (const struct sockaddr*) &lpd_mcastAddr, sizeof lpd_mcastAddr );
+        int res = sendto (lpd_socket2, query, len, 0,
+          (const struct sockaddr*) &lpd_mcastAddr, sizeof lpd_mcastAddr);
 
-        if( res != len )
+        if (res != len)
             return false;
     }
 
-    tr_tordbg( t, "LPD announce message away" );
+    tr_tordbg (t, "LPD announce message away");
 
     return true;
 }
@@ -489,12 +489,12 @@ tr_lpdSendAnnounce( const tr_torrent* t )
 * is able to extract the necessary information from the announce message. That is, if
 * return != 0, the caller may retrieve the value from the passed structure.
 */
-static int tr_lpdConsiderAnnounce( tr_pex* peer, const char* const msg )
+static int tr_lpdConsiderAnnounce (tr_pex* peer, const char* const msg)
 {
     enum
     {
         maxValueLen = 25,
-        maxHashLen = lengthof(lpd_torStaticType->info.hashString)
+        maxHashLen = lengthof (lpd_torStaticType->info.hashString)
     };
 
     struct lpd_protocolVersion ver = { -1, -1 };
@@ -502,44 +502,44 @@ static int tr_lpdConsiderAnnounce( tr_pex* peer, const char* const msg )
     char hashString[maxHashLen] = { };
     int res = 0, peerPort = 0;
 
-    if( peer != NULL && msg != NULL )
+    if (peer != NULL && msg != NULL)
     {
         tr_torrent* tor = NULL;
 
-        const char* params = lpd_extractHeader( msg, &ver );
-        if( params == NULL || ver.major != 1 ) /* allow messages of protocol v1 */
+        const char* params = lpd_extractHeader (msg, &ver);
+        if (params == NULL || ver.major != 1) /* allow messages of protocol v1 */
             return 0;
 
         /* save the effort to check Host, which seems to be optional anyway */
 
-        if( lpd_extractParam( params, "Port", maxValueLen, value ) == 0 )
+        if (lpd_extractParam (params, "Port", maxValueLen, value) == 0)
             return 0;
 
         /* determine announced peer port, refuse if value too large */
-        if( sscanf( value, "%d", &peerPort ) != 1 || peerPort > (in_port_t)-1 )
+        if (sscanf (value, "%d", &peerPort) != 1 || peerPort > (in_port_t)-1)
             return 0;
 
-        peer->port = htons( peerPort );
+        peer->port = htons (peerPort);
         res = -1; /* signal caller side-effect to peer->port via return != 0 */
 
-        if( lpd_extractParam( params, "Infohash", maxHashLen, hashString ) == 0 )
+        if (lpd_extractParam (params, "Infohash", maxHashLen, hashString) == 0)
             return res;
 
-        tor = tr_torrentFindFromHashString( session, hashString );
+        tor = tr_torrentFindFromHashString (session, hashString);
 
-        if( tr_isTorrent( tor ) && tr_torrentAllowsLPD( tor ) )
+        if (tr_isTorrent (tor) && tr_torrentAllowsLPD (tor))
         {
             /* we found a suitable peer, add it to the torrent */
-            tr_peerMgrAddPex( tor, TR_PEER_FROM_LPD, peer, -1 );
-            tr_tordbg( tor, "Learned %d local peer from LPD (%s:%u)",
-                1, tr_address_to_string( &peer->addr ), peerPort );
+            tr_peerMgrAddPex (tor, TR_PEER_FROM_LPD, peer, -1);
+            tr_tordbg (tor, "Learned %d local peer from LPD (%s:%u)",
+                1, tr_address_to_string (&peer->addr), peerPort);
 
-            /* periodic reconnectPulse() deals with the rest... */
+            /* periodic reconnectPulse () deals with the rest... */
 
             return 1;
         }
         else
-            tr_ndbg( "LPD", "Cannot serve torrent #%s", hashString );
+            tr_ndbg ("LPD", "Cannot serve torrent #%s", hashString);
     }
 
     return res;
@@ -559,26 +559,26 @@ static int tr_lpdConsiderAnnounce( tr_pex* peer, const char* const msg )
 * before. are there cases where we should? if not, should we remove the bells & whistles?
 */
 static int
-tr_lpdAnnounceMore( const time_t now, const int interval )
+tr_lpdAnnounceMore (const time_t now, const int interval)
 {
     tr_torrent* tor = NULL;
     int announcesSent = 0;
 
-    if( !tr_isSession( session ) )
+    if (!tr_isSession (session))
         return -1;
 
-    while(( tor = tr_torrentNext( session, tor ) )
-          && tr_sessionAllowsLPD( session ) )
+    while ((tor = tr_torrentNext (session, tor))
+          && tr_sessionAllowsLPD (session))
     {
-        if( tr_isTorrent( tor ) )
+        if (tr_isTorrent (tor))
         {
             int announcePrio = 0;
 
-            if( !tr_torrentAllowsLPD( tor ) )
+            if (!tr_torrentAllowsLPD (tor))
                 continue;
 
             /* issue #3208: prioritize downloads before seeds */
-            switch( tr_torrentGetActivity( tor ) )
+            switch (tr_torrentGetActivity (tor))
             {
             case TR_STATUS_DOWNLOAD:
                 announcePrio = 1;
@@ -590,9 +590,9 @@ tr_lpdAnnounceMore( const time_t now, const int interval )
                 break;
             }
 
-            if( announcePrio > 0 && tor->lpdAnnounceAt <= now )
+            if (announcePrio > 0 && tor->lpdAnnounceAt <= now)
             {
-                if( tr_lpdSendAnnounce( tor ) )
+                if (tr_lpdSendAnnounce (tor))
                     announcesSent++;
 
                 tor->lpdAnnounceAt = now +
@@ -607,9 +607,9 @@ tr_lpdAnnounceMore( const time_t now, const int interval )
     {
         const int maxAnnounceCap = interval * lpd_announceCapFactor;
 
-        if( lpd_unsolicitedMsgCounter < 0 )
-            tr_ninf( "LPD", "Dropped %d announces in the last interval (max. %d "
-                     "allowed)", -lpd_unsolicitedMsgCounter, maxAnnounceCap );
+        if (lpd_unsolicitedMsgCounter < 0)
+            tr_ninf ("LPD", "Dropped %d announces in the last interval (max. %d "
+                     "allowed)", -lpd_unsolicitedMsgCounter, maxAnnounceCap);
 
         lpd_unsolicitedMsgCounter = maxAnnounceCap;
     }
@@ -618,26 +618,26 @@ tr_lpdAnnounceMore( const time_t now, const int interval )
 }
 
 static void
-on_upkeep_timer( int foo UNUSED, short bar UNUSED, void * vsession UNUSED )
+on_upkeep_timer (int foo UNUSED, short bar UNUSED, void * vsession UNUSED)
 {
-    const time_t now = tr_time( );
-    tr_lpdAnnounceMore( now, UPKEEP_INTERVAL_SECS );
-    tr_timerAdd( upkeep_timer, UPKEEP_INTERVAL_SECS, 0 );
+    const time_t now = tr_time ();
+    tr_lpdAnnounceMore (now, UPKEEP_INTERVAL_SECS);
+    tr_timerAdd (upkeep_timer, UPKEEP_INTERVAL_SECS, 0);
 }
 
 /**
 * @brief Processing of timeout notifications and incoming data on the socket
 * @note maximum rate of read events is limited according to @a lpd_maxAnnounceCap
 * @see DoS */
-static void event_callback( int s UNUSED, short type, void* ignore UNUSED )
+static void event_callback (int s UNUSED, short type, void* ignore UNUSED)
 {
-    assert( tr_isSession( session ) );
+    assert (tr_isSession (session));
 
     /* do not allow announces to be processed if LPD is disabled */
-    if( !tr_sessionAllowsLPD( session ) )
+    if (!tr_sessionAllowsLPD (session))
         return;
 
-    if( ( type & EV_READ ) != 0 )
+    if ((type & EV_READ) != 0)
     {
         struct sockaddr_in foreignAddr;
         int addrLen = sizeof foreignAddr;
@@ -646,14 +646,14 @@ static void event_callback( int s UNUSED, short type, void* ignore UNUSED )
         char foreignMsg[lpd_maxDatagramLength + 1] = { };
 
         /* process local announcement from foreign peer */
-        int res = recvfrom( lpd_socket, foreignMsg, lpd_maxDatagramLength,
-            0, (struct sockaddr*) &foreignAddr, (socklen_t*) &addrLen );
+        int res = recvfrom (lpd_socket, foreignMsg, lpd_maxDatagramLength,
+            0, (struct sockaddr*) &foreignAddr, (socklen_t*) &addrLen);
 
         /* besides, do we get flooded? then bail out! */
-        if( --lpd_unsolicitedMsgCounter < 0 )
+        if (--lpd_unsolicitedMsgCounter < 0)
             return;
 
-        if( res > 0 && res <= lpd_maxDatagramLength )
+        if (res > 0 && res <= lpd_maxDatagramLength)
         {
             struct tr_pex foreignPeer =
                 {
@@ -662,11 +662,11 @@ static void event_callback( int s UNUSED, short type, void* ignore UNUSED )
                 };
 
             foreignPeer.addr.addr.addr4 = foreignAddr.sin_addr;
-            if( tr_lpdConsiderAnnounce( &foreignPeer, foreignMsg ) != 0 )
+            if (tr_lpdConsiderAnnounce (&foreignPeer, foreignMsg) != 0)
                 return; /* OK so far, no log message */
         }
 
-        tr_ndbg( "LPD", "Discarded invalid multicast message" );
+        tr_ndbg ("LPD", "Discarded invalid multicast message");
     }
 }
 

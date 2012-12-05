@@ -2,7 +2,7 @@
  * This file Copyright (C) Mnemosyne LLC
  *
  * This file is licensed by the GPL version 2. Works owned by the
- * Transmission project are granted a special exemption to clause 2(b)
+ * Transmission project are granted a special exemption to clause 2 (b)
  * so that the bulk of its code can remain under the MIT license.
  * This exemption does not extend to derived works not owned by
  * the Transmission project.
@@ -96,18 +96,18 @@ typedef struct
 }
 tr_scrape_response;
 
-typedef void tr_scrape_response_func( const tr_scrape_response  * response,
-                                      void                      * user_data );
+typedef void tr_scrape_response_func (const tr_scrape_response  * response,
+                                      void                      * user_data);
 
-void tr_tracker_http_scrape( tr_session               * session,
+void tr_tracker_http_scrape (tr_session               * session,
                              const tr_scrape_request  * req,
                              tr_scrape_response_func    response_func,
-                             void                     * user_data );
+                             void                     * user_data);
 
-void tr_tracker_udp_scrape( tr_session               * session,
+void tr_tracker_udp_scrape (tr_session               * session,
                             const tr_scrape_request  * req,
                             tr_scrape_response_func    response_func,
-                            void                     * user_data );
+                            void                     * user_data);
 
 /***
 ****  ANNOUNCE
@@ -122,7 +122,7 @@ typedef enum
 }
 tr_announce_event;
 
-const char * tr_announce_event_get_string( tr_announce_event );
+const char * tr_announce_event_get_string (tr_announce_event);
 
 typedef struct
 {
@@ -223,19 +223,19 @@ typedef struct
 }
 tr_announce_response;
 
-typedef void tr_announce_response_func( const tr_announce_response * response,
-                                        void                       * userdata );
+typedef void tr_announce_response_func (const tr_announce_response * response,
+                                        void                       * userdata);
 
-void tr_tracker_http_announce( tr_session                 * session,
+void tr_tracker_http_announce (tr_session                 * session,
                                const tr_announce_request  * req,
                                tr_announce_response_func    response_func,
-                               void                       * user_data );
+                               void                       * user_data);
 
-void tr_tracker_udp_announce( tr_session                 * session,
+void tr_tracker_udp_announce (tr_session                 * session,
                               const tr_announce_request  * req,
                               tr_announce_response_func    response_func,
-                              void                       * user_data );
+                              void                       * user_data);
 
-void tr_tracker_udp_start_shutdown( tr_session * session );
+void tr_tracker_udp_start_shutdown (tr_session * session);
 
 #endif /* _TR_ANNOUNCER_COMMON_H_ */

@@ -42,7 +42,7 @@
 #ifdef CVTUTF_DEBUG
  #include <stdio.h>
 #endif
-#include <string.h> /* strlen() */
+#include <string.h> /* strlen () */
 #include "ConvertUTF.h"
 
 static const int halfShift  = 10; /* used for shifting by 10 bits */
@@ -50,10 +50,10 @@ static const int halfShift  = 10; /* used for shifting by 10 bits */
 static const UTF32 halfBase = 0x0010000UL;
 static const UTF32 halfMask = 0x3FFUL;
 
-#define UNI_SUR_HIGH_START  (UTF32)0xD800
-#define UNI_SUR_HIGH_END    (UTF32)0xDBFF
-#define UNI_SUR_LOW_START   (UTF32)0xDC00
-#define UNI_SUR_LOW_END     (UTF32)0xDFFF
+#define UNI_SUR_HIGH_START (UTF32)0xD800
+#define UNI_SUR_HIGH_END  (UTF32)0xDBFF
+#define UNI_SUR_LOW_START (UTF32)0xDC00
+#define UNI_SUR_LOW_END   (UTF32)0xDFFF
 #define false	   0
 #define true	    1
 
@@ -156,8 +156,8 @@ ConversionResult ConvertUTF16toUTF32 (
     *targetStart = target;
 #ifdef CVTUTF_DEBUG
 if (result == sourceIllegal) {
-    fprintf(stderr, "ConvertUTF16toUTF32 illegal seq 0x%04x,%04x\n", ch, ch2);
-    fflush(stderr);
+    fprintf (stderr, "ConvertUTF16toUTF32 illegal seq 0x%04x,%04x\n", ch, ch2);
+    fflush (stderr);
 }
 #endif
     return result;
@@ -271,7 +271,7 @@ ConversionResult ConvertUTF16toUTF8 (
 	    case 4: *--target = (UTF8)((ch | byteMark) & byteMask); ch >>= 6;
 	    case 3: *--target = (UTF8)((ch | byteMark) & byteMask); ch >>= 6;
 	    case 2: *--target = (UTF8)((ch | byteMark) & byteMask); ch >>= 6;
-	    case 1: *--target =  (UTF8)(ch | firstByteMark[bytesToWrite]);
+	    case 1: *--target = (UTF8)(ch | firstByteMark[bytesToWrite]);
 	}
 	target += bytesToWrite;
     }
@@ -293,7 +293,7 @@ ConversionResult ConvertUTF16toUTF8 (
  * definition of UTF-8 goes up to 4-byte sequences.
  */
 
-static Boolean isLegalUTF8(const UTF8 *source, int length) {
+static Boolean isLegalUTF8 (const UTF8 *source, int length) {
     UTF8 a;
     const UTF8 *srcptr = source+length;
     switch (length) {
@@ -325,7 +325,7 @@ static Boolean isLegalUTF8(const UTF8 *source, int length) {
  * This is not used here; it's just exported.
  */
 
-Boolean isLegalUTF8Sequence(const UTF8 *source, const UTF8 *sourceEnd) {
+Boolean isLegalUTF8Sequence (const UTF8 *source, const UTF8 *sourceEnd) {
     int length;
     if (source == sourceEnd) {
         return true;
@@ -335,7 +335,7 @@ Boolean isLegalUTF8Sequence(const UTF8 *source, const UTF8 *sourceEnd) {
         if (source+length > sourceEnd) {
             return false;
         }
-        if (!isLegalUTF8(source, length)) {
+        if (!isLegalUTF8 (source, length)) {
             return false;
         }
         source += length;
@@ -346,46 +346,46 @@ Boolean isLegalUTF8Sequence(const UTF8 *source, const UTF8 *sourceEnd) {
 }
 
 /**
- * This is a variation of isLegalUTF8Sequence() that behaves like g_utf8_validate().
+ * This is a variation of isLegalUTF8Sequence () that behaves like g_utf8_validate ().
  * In addition to knowing if the sequence is legal, it also tells you the last good character.
  */
 Boolean
-tr_utf8_validate( const char * str, int max_len, const char ** end )
+tr_utf8_validate (const char * str, int max_len, const char ** end)
 {
     const UTF8* source = (const UTF8*) str;
     const UTF8* sourceEnd;
 
-    if( max_len == 0 )
+    if (max_len == 0)
         return true;
 
-    if( str == NULL )
+    if (str == NULL)
         return false;
 
-    sourceEnd = source + ((max_len < 0) ? strlen(str) : (size_t)max_len);
+    sourceEnd = source + ((max_len < 0) ? strlen (str) : (size_t)max_len);
 
-    if( source == sourceEnd )
+    if (source == sourceEnd)
     {
-        if( end != NULL )
+        if (end != NULL)
             *end = (const char*) source;
         return true;
     }
 
-    for( ;; )
+    for (;;)
     {
         const int length = trailingBytesForUTF8[*source] + 1;
         if (source + length > sourceEnd) {
-            if( end != NULL )
+            if (end != NULL)
                 *end = (const char*) source;
             return false;
         }
-        if (!isLegalUTF8(source, length)) {
-            if( end != NULL )
+        if (!isLegalUTF8 (source, length)) {
+            if (end != NULL)
                 *end = (const char*) source;
             return false;
         }
         source += length;
         if (source >= sourceEnd) {
-            if( end != NULL )
+            if (end != NULL)
                 *end = (const char*) source;
             return true;
         }
@@ -410,7 +410,7 @@ ConversionResult ConvertUTF8toUTF16 (
 	    result = sourceExhausted; break;
 	}
 	/* Do this check whether lenient or strict */
-	if (! isLegalUTF8(source, extraBytesToRead+1)) {
+	if (! isLegalUTF8 (source, extraBytesToRead+1)) {
 	    result = sourceIllegal;
 	    break;
 	}
@@ -482,7 +482,7 @@ ConversionResult ConvertUTF32toUTF8 (
 	const UTF32 byteMask = 0xBF;
 	const UTF32 byteMark = 0x80; 
 	ch = *source++;
-	if (flags == strictConversion ) {
+	if (flags == strictConversion) {
 	    /* UTF-16 surrogate values are illegal in UTF-32 */
 	    if (ch >= UNI_SUR_HIGH_START && ch <= UNI_SUR_LOW_END) {
 		--source; /* return to the illegal value itself */
@@ -512,7 +512,7 @@ ConversionResult ConvertUTF32toUTF8 (
 	    case 4: *--target = (UTF8)((ch | byteMark) & byteMask); ch >>= 6;
 	    case 3: *--target = (UTF8)((ch | byteMark) & byteMask); ch >>= 6;
 	    case 2: *--target = (UTF8)((ch | byteMark) & byteMask); ch >>= 6;
-	    case 1: *--target = (UTF8) (ch | firstByteMark[bytesToWrite]);
+	    case 1: *--target = (UTF8)(ch | firstByteMark[bytesToWrite]);
 	}
 	target += bytesToWrite;
     }
@@ -536,7 +536,7 @@ ConversionResult ConvertUTF8toUTF32 (
 	    result = sourceExhausted; break;
 	}
 	/* Do this check whether lenient or strict */
-	if (! isLegalUTF8(source, extraBytesToRead+1)) {
+	if (! isLegalUTF8 (source, extraBytesToRead+1)) {
 	    result = sourceIllegal;
 	    break;
 	}

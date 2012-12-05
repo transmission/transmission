@@ -5,12 +5,12 @@
 
 #include <stdio.h>
 
-#include "utils.h" /* tr_strcmp0() */
+#include "utils.h" /* tr_strcmp0 () */
 
 static int current_test = 0;
 
 #define REPORT_TEST(test, result) \
-    fprintf( stderr, "%s %s:%d\n", result, __FILE__, __LINE__ )
+    fprintf (stderr, "%s %s:%d\n", result, __FILE__, __LINE__)
 
 static inline bool
 should_print (bool pass)
@@ -45,7 +45,7 @@ check_streq_impl (const char * file, int line, const char * expected, const char
     if (pass)
       fprintf (stderr, "PASS %s:%d\n", file, line);
     else
-      fprintf (stderr, "FAIL %s:%d, expected \"%s\", got \"%s\"\n", file, line, expected?expected:"(null)", actual?actual:"(null)");
+      fprintf (stderr, "FAIL %s:%d, expected \"%s\", got \"%s\"\n", file, line, expected?expected:" (null)", actual?actual:" (null)");
   }
 
   return pass;
@@ -75,14 +75,14 @@ check_eq_impl (const char * file, int line, int64_t expected, int64_t actual)
     ++current_test; \
     if (!check_condition_impl (__FILE__, __LINE__, (condition))) \
       return current_test; \
-  } while(0)
+  } while (0)
 
 #define check_streq(expected, actual) \
   do { \
     ++current_test; \
     if (!check_streq_impl (__FILE__, __LINE__, (expected), (actual))) \
       return current_test; \
-  } while(0)
+  } while (0)
 
 #define check_int_eq(expected, actual) \
   do { \
@@ -95,27 +95,27 @@ check_eq_impl (const char * file, int line, int64_t expected, int64_t actual)
 ****
 ***/
 
-typedef int (*testFunc)( void );
-#define NUM_TESTS(tarray) ((int) (sizeof(tarray)/sizeof(tarray[0])))
+typedef int (*testFunc)(void);
+#define NUM_TESTS(tarray)((int)(sizeof (tarray)/sizeof (tarray[0])))
 
 static inline int
-runTests( const testFunc * const tests, int numTests )
+runTests (const testFunc * const tests, int numTests)
 {
     int ret, i;
 
-    (void) current_test; /* Use test even if we don't have any tests to run */
+  (void) current_test; /* Use test even if we don't have any tests to run */
 
-    for( i = 0; i < numTests; i++ )
-	if( (ret = (*tests[i])()) )
+    for (i = 0; i < numTests; i++)
+	if ((ret = (*tests[i])()))
 	    return ret;
 
     return 0; 	/* All tests passed */
 }
 
 #define MAIN_SINGLE_TEST(test) \
-int main( void ) { \
+int main (void) { \
     const testFunc tests[] = { test }; \
-    return runTests(tests, 1); \
+    return runTests (tests, 1); \
 }
 
 #endif /* !LIBTRANSMISSION_TEST_H */

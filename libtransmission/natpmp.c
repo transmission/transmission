@@ -2,7 +2,7 @@
  * This file Copyright (C) Mnemosyne LLC
  *
  * This file is licensed by the GPL version 2. Works owned by the
- * Transmission project are granted a special exemption to clause 2(b)
+ * Transmission project are granted a special exemption to clause 2 (b)
  * so that the bulk of its code can remain under the MIT license.
  * This exemption does not extend to derived works not owned by
  * the Transmission project.
@@ -14,7 +14,7 @@
 #include <time.h>
 #include <inttypes.h>
 
-#include <event2/util.h> /* evutil_inet_ntop() */
+#include <event2/util.h> /* evutil_inet_ntop () */
 
 #define ENABLE_STRNATPMPERR
 #include "natpmp.h"
@@ -29,7 +29,7 @@
 #define COMMAND_WAIT_SECS 8
 
 static const char *
-getKey( void ) { return _( "Port Forwarding (NAT-PMP)" ); }
+getKey (void) { return _ ("Port Forwarding (NAT-PMP)"); }
 
 typedef enum
 {
@@ -63,26 +63,26 @@ struct tr_natpmp
 **/
 
 static void
-logVal( const char * func,
-        int          ret )
+logVal (const char * func,
+        int          ret)
 {
-    if( ret == NATPMP_TRYAGAIN )
+    if (ret == NATPMP_TRYAGAIN)
         return;
-    if( ret >= 0 )
-        tr_ninf( getKey( ), _( "%s succeeded (%d)" ), func, ret );
+    if (ret >= 0)
+        tr_ninf (getKey (), _ ("%s succeeded (%d)"), func, ret);
     else
-        tr_ndbg(
-             getKey( ),
+        tr_ndbg (
+             getKey (),
             "%s failed. Natpmp returned %d (%s); errno is %d (%s)",
-            func, ret, strnatpmperr( ret ), errno, tr_strerror( errno ) );
+            func, ret, strnatpmperr (ret), errno, tr_strerror (errno));
 }
 
 struct tr_natpmp*
-tr_natpmpInit( void )
+tr_natpmpInit (void)
 {
     struct tr_natpmp * nat;
 
-    nat = tr_new0( struct tr_natpmp, 1 );
+    nat = tr_new0 (struct tr_natpmp, 1);
     nat->state = TR_NATPMP_DISCOVER;
     nat->public_port = 0;
     nat->private_port = 0;
@@ -91,91 +91,91 @@ tr_natpmpInit( void )
 }
 
 void
-tr_natpmpClose( tr_natpmp * nat )
+tr_natpmpClose (tr_natpmp * nat)
 {
-    if( nat )
+    if (nat)
     {
-        if( nat->natpmp.s >= 0 )
-            tr_netCloseSocket( nat->natpmp.s );
-        tr_free( nat );
+        if (nat->natpmp.s >= 0)
+            tr_netCloseSocket (nat->natpmp.s);
+        tr_free (nat);
     }
 }
 
 static int
-canSendCommand( const struct tr_natpmp * nat )
+canSendCommand (const struct tr_natpmp * nat)
 {
-    return tr_time( ) >= nat->command_time;
+    return tr_time () >= nat->command_time;
 }
 
 static void
-setCommandTime( struct tr_natpmp * nat )
+setCommandTime (struct tr_natpmp * nat)
 {
-    nat->command_time = tr_time( ) + COMMAND_WAIT_SECS;
+    nat->command_time = tr_time () + COMMAND_WAIT_SECS;
 }
 
 int
-tr_natpmpPulse( struct tr_natpmp * nat, tr_port private_port, bool is_enabled, tr_port * public_port )
+tr_natpmpPulse (struct tr_natpmp * nat, tr_port private_port, bool is_enabled, tr_port * public_port)
 {
     int ret;
 
-    if( is_enabled && ( nat->state == TR_NATPMP_DISCOVER ) )
+    if (is_enabled && (nat->state == TR_NATPMP_DISCOVER))
     {
-        int val = initnatpmp( &nat->natpmp, 0, 0 );
-        logVal( "initnatpmp", val );
-        val = sendpublicaddressrequest( &nat->natpmp );
-        logVal( "sendpublicaddressrequest", val );
+        int val = initnatpmp (&nat->natpmp, 0, 0);
+        logVal ("initnatpmp", val);
+        val = sendpublicaddressrequest (&nat->natpmp);
+        logVal ("sendpublicaddressrequest", val);
         nat->state = val < 0 ? TR_NATPMP_ERR : TR_NATPMP_RECV_PUB;
         nat->has_discovered = true;
-        setCommandTime( nat );
+        setCommandTime (nat);
     }
 
-    if( ( nat->state == TR_NATPMP_RECV_PUB ) && canSendCommand( nat ) )
+    if ((nat->state == TR_NATPMP_RECV_PUB) && canSendCommand (nat))
     {
         natpmpresp_t response;
-        const int val = readnatpmpresponseorretry( &nat->natpmp, &response );
-        logVal( "readnatpmpresponseorretry", val );
-        if( val >= 0 )
+        const int val = readnatpmpresponseorretry (&nat->natpmp, &response);
+        logVal ("readnatpmpresponseorretry", val);
+        if (val >= 0)
         {
             char str[128];
-            evutil_inet_ntop( AF_INET, &response.pnu.publicaddress.addr, str, sizeof( str ) );
-            tr_ninf( getKey( ), _( "Found public address \"%s\"" ), str );
+            evutil_inet_ntop (AF_INET, &response.pnu.publicaddress.addr, str, sizeof (str));
+            tr_ninf (getKey (), _ ("Found public address \"%s\""), str);
             nat->state = TR_NATPMP_IDLE;
         }
-        else if( val != NATPMP_TRYAGAIN )
+        else if (val != NATPMP_TRYAGAIN)
         {
             nat->state = TR_NATPMP_ERR;
         }
     }
 
-    if( ( nat->state == TR_NATPMP_IDLE ) || ( nat->state == TR_NATPMP_ERR ) )
+    if ((nat->state == TR_NATPMP_IDLE) || (nat->state == TR_NATPMP_ERR))
     {
-        if( nat->is_mapped && ( !is_enabled || ( nat->private_port != private_port ) ) )
+        if (nat->is_mapped && (!is_enabled || (nat->private_port != private_port)))
             nat->state = TR_NATPMP_SEND_UNMAP;
     }
 
-    if( ( nat->state == TR_NATPMP_SEND_UNMAP ) && canSendCommand( nat ) )
+    if ((nat->state == TR_NATPMP_SEND_UNMAP) && canSendCommand (nat))
     {
-        const int val = sendnewportmappingrequest( &nat->natpmp, NATPMP_PROTOCOL_TCP,
+        const int val = sendnewportmappingrequest (&nat->natpmp, NATPMP_PROTOCOL_TCP,
                                                    nat->private_port,
                                                    nat->public_port,
-                                                   0 );
-        logVal( "sendnewportmappingrequest", val );
+                                                   0);
+        logVal ("sendnewportmappingrequest", val);
         nat->state = val < 0 ? TR_NATPMP_ERR : TR_NATPMP_RECV_UNMAP;
-        setCommandTime( nat );
+        setCommandTime (nat);
     }
 
-    if( nat->state == TR_NATPMP_RECV_UNMAP )
+    if (nat->state == TR_NATPMP_RECV_UNMAP)
     {
         natpmpresp_t resp;
-        const int val = readnatpmpresponseorretry( &nat->natpmp, &resp );
-        logVal( "readnatpmpresponseorretry", val );
-        if( val >= 0 )
+        const int val = readnatpmpresponseorretry (&nat->natpmp, &resp);
+        logVal ("readnatpmpresponseorretry", val);
+        if (val >= 0)
         {
             const int private_port = resp.pnu.newportmapping.privateport;
 
-            tr_ninf( getKey( ), _( "no longer forwarding port %d" ), private_port );
+            tr_ninf (getKey (), _ ("no longer forwarding port %d"), private_port);
 
-            if( nat->private_port == private_port )
+            if (nat->private_port == private_port)
             {
                 nat->private_port = 0;
                 nat->public_port = 0;
@@ -183,50 +183,50 @@ tr_natpmpPulse( struct tr_natpmp * nat, tr_port private_port, bool is_enabled, t
                 nat->is_mapped = false;
             }
         }
-        else if( val != NATPMP_TRYAGAIN )
+        else if (val != NATPMP_TRYAGAIN)
         {
             nat->state = TR_NATPMP_ERR;
         }
     }
 
-    if( nat->state == TR_NATPMP_IDLE )
+    if (nat->state == TR_NATPMP_IDLE)
     {
-        if( is_enabled && !nat->is_mapped && nat->has_discovered )
+        if (is_enabled && !nat->is_mapped && nat->has_discovered)
             nat->state = TR_NATPMP_SEND_MAP;
 
-        else if( nat->is_mapped && tr_time( ) >= nat->renew_time )
+        else if (nat->is_mapped && tr_time () >= nat->renew_time)
             nat->state = TR_NATPMP_SEND_MAP;
     }
 
-    if( ( nat->state == TR_NATPMP_SEND_MAP ) && canSendCommand( nat ) )
+    if ((nat->state == TR_NATPMP_SEND_MAP) && canSendCommand (nat))
     {
-        const int val = sendnewportmappingrequest( &nat->natpmp, NATPMP_PROTOCOL_TCP, private_port, private_port, LIFETIME_SECS );
-        logVal( "sendnewportmappingrequest", val );
+        const int val = sendnewportmappingrequest (&nat->natpmp, NATPMP_PROTOCOL_TCP, private_port, private_port, LIFETIME_SECS);
+        logVal ("sendnewportmappingrequest", val);
         nat->state = val < 0 ? TR_NATPMP_ERR : TR_NATPMP_RECV_MAP;
-        setCommandTime( nat );
+        setCommandTime (nat);
     }
 
-    if( nat->state == TR_NATPMP_RECV_MAP )
+    if (nat->state == TR_NATPMP_RECV_MAP)
     {
         natpmpresp_t resp;
-        const int    val = readnatpmpresponseorretry( &nat->natpmp, &resp );
-        logVal( "readnatpmpresponseorretry", val );
-        if( val >= 0 )
+        const int    val = readnatpmpresponseorretry (&nat->natpmp, &resp);
+        logVal ("readnatpmpresponseorretry", val);
+        if (val >= 0)
         {
             nat->state = TR_NATPMP_IDLE;
             nat->is_mapped = true;
-            nat->renew_time = tr_time( ) + ( resp.pnu.newportmapping.lifetime / 2 );
+            nat->renew_time = tr_time () + (resp.pnu.newportmapping.lifetime / 2);
             nat->private_port = resp.pnu.newportmapping.privateport;
             nat->public_port = resp.pnu.newportmapping.mappedpublicport;
-            tr_ninf( getKey( ), _( "Port %d forwarded successfully" ), nat->private_port );
+            tr_ninf (getKey (), _ ("Port %d forwarded successfully"), nat->private_port);
         }
-        else if( val != NATPMP_TRYAGAIN )
+        else if (val != NATPMP_TRYAGAIN)
         {
             nat->state = TR_NATPMP_ERR;
         }
     }
 
-    switch( nat->state )
+    switch (nat->state)
     {
         case TR_NATPMP_IDLE:
             *public_port = nat->public_port;

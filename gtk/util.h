@@ -2,7 +2,7 @@
  * This file Copyright (C) Mnemosyne LLC
  *
  * This file is licensed by the GPL version 2. Works owned by the
- * Transmission project are granted a special exemption to clause 2(b)
+ * Transmission project are granted a special exemption to clause 2 (b)
  * so that the bulk of its code can remain under the MIT license.
  * This exemption does not extend to derived works not owned by
  * the Transmission project.
@@ -49,94 +49,94 @@ enum
     GTR_UNICODE_INF,
     GTR_UNICODE_BULLET
 };
-const char * gtr_get_unicode_string( int );
+const char * gtr_get_unicode_string (int);
 
 /* return a percent formatted string of either x.xx, xx.x or xxx */
-char* tr_strlpercent( char * buf, double x, size_t buflen );
+char* tr_strlpercent (char * buf, double x, size_t buflen);
 
 /* return a human-readable string for the size given in bytes. */
-char* tr_strlsize( char * buf, guint64  size, size_t buflen );
+char* tr_strlsize (char * buf, guint64  size, size_t buflen);
 
 /* return a human-readable string for the given ratio. */
-char* tr_strlratio( char * buf, double ratio, size_t buflen );
+char* tr_strlratio (char * buf, double ratio, size_t buflen);
 
 /* return a human-readable string for the time given in seconds. */
-char* tr_strltime( char * buf, int secs, size_t buflen );
+char* tr_strltime (char * buf, int secs, size_t buflen);
 
 /***
 ****
 ***/
 
 /* http://www.legaltorrents.com/some/announce/url --> legaltorrents.com */
-void gtr_get_host_from_url( char * buf, size_t buflen, const char * url );
+void gtr_get_host_from_url (char * buf, size_t buflen, const char * url);
 
-gboolean gtr_is_magnet_link( const char * str );
+gboolean gtr_is_magnet_link (const char * str);
 
-gboolean gtr_is_hex_hashcode( const char * str );
-
-/***
-****
-***/
-
-void        gtr_open_uri( const char * uri );
-
-void        gtr_open_file( const char * path );
-
-const char* gtr_get_help_uri( void );
+gboolean gtr_is_hex_hashcode (const char * str);
 
 /***
 ****
 ***/
 
-/* backwards-compatible wrapper around gtk_widget_set_visible() */
-void gtr_widget_set_visible( GtkWidget *, gboolean );
+void        gtr_open_uri (const char * uri);
 
-void gtr_dialog_set_content( GtkDialog * dialog, GtkWidget * content );
+void        gtr_open_file (const char * path);
 
-/***
-****
-***/
-
-GtkWidget * gtr_priority_combo_new( void );
-#define gtr_priority_combo_get_value(w)     gtr_combo_box_get_active_enum(w)
-#define gtr_priority_combo_set_value(w,val) gtr_combo_box_set_active_enum(w,val)
-
-GtkWidget * gtr_combo_box_new_enum        ( const char * text_1, ... );
-int         gtr_combo_box_get_active_enum ( GtkComboBox * );
-void        gtr_combo_box_set_active_enum ( GtkComboBox *, int value );
+const char* gtr_get_help_uri (void);
 
 /***
 ****
 ***/
 
-void gtr_unrecognized_url_dialog( GtkWidget * parent, const char * url );
+/* backwards-compatible wrapper around gtk_widget_set_visible () */
+void gtr_widget_set_visible (GtkWidget *, gboolean);
 
-void gtr_http_failure_dialog( GtkWidget * parent, const char * url, long response_code );
+void gtr_dialog_set_content (GtkDialog * dialog, GtkWidget * content);
 
-void gtr_add_torrent_error_dialog( GtkWidget  * window_or_child,
+/***
+****
+***/
+
+GtkWidget * gtr_priority_combo_new (void);
+#define gtr_priority_combo_get_value(w)     gtr_combo_box_get_active_enum (w)
+#define gtr_priority_combo_set_value(w,val) gtr_combo_box_set_active_enum (w,val)
+
+GtkWidget * gtr_combo_box_new_enum      (const char * text_1, ...);
+int         gtr_combo_box_get_active_enum (GtkComboBox *);
+void        gtr_combo_box_set_active_enum (GtkComboBox *, int value);
+
+/***
+****
+***/
+
+void gtr_unrecognized_url_dialog (GtkWidget * parent, const char * url);
+
+void gtr_http_failure_dialog (GtkWidget * parent, const char * url, long response_code);
+
+void gtr_add_torrent_error_dialog (GtkWidget  * window_or_child,
                                    int          err,
-                                   const char * filename );
+                                   const char * filename);
 
 /* pop up the context menu if a user right-clicks.
    if the row they right-click on isn't selected, select it. */
-gboolean on_tree_view_button_pressed( GtkWidget      * view,
+gboolean on_tree_view_button_pressed (GtkWidget      * view,
                                       GdkEventButton * event,
-                                      gpointer         unused );
+                                      gpointer         unused);
 
 /* if the click didn't specify a row, clear the selection */
-gboolean on_tree_view_button_released( GtkWidget      * view,
+gboolean on_tree_view_button_released (GtkWidget      * view,
                                        GdkEventButton * event,
-                                       gpointer         unused );
+                                       gpointer         unused);
 
 
 /* move a file to the trashcan if GIO is available; otherwise, delete it */
-int gtr_file_trash_or_remove( const char * filename );
+int gtr_file_trash_or_remove (const char * filename);
 
-void gtr_paste_clipboard_url_into_entry( GtkWidget * entry );
+void gtr_paste_clipboard_url_into_entry (GtkWidget * entry);
 
-/* Only call gtk_label_set_text() if the new text differs from the old.
+/* Only call gtk_label_set_text () if the new text differs from the old.
  * This prevents the label from having to recalculate its size
  * and prevents selected text in the label from being deselected */
-void gtr_label_set_text( GtkLabel * lb, const char * text );
+void gtr_label_set_text (GtkLabel * lb, const char * text);
 
 #endif /* GTR_UTIL_H */

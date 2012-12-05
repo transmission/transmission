@@ -28,21 +28,21 @@
 #include <inttypes.h>
 #include <libtransmission/transmission.h> /* tr_benc, tr_session */
 
-void             gtr_pref_init              ( const char * config_dir );
+void             gtr_pref_init            (const char * config_dir);
 
-int64_t          gtr_pref_int_get           ( const char * key );
-void             gtr_pref_int_set           ( const char * key, int64_t value );
+int64_t          gtr_pref_int_get         (const char * key);
+void             gtr_pref_int_set         (const char * key, int64_t value);
 
-double           gtr_pref_double_get        ( const char * key );
-void             gtr_pref_double_set        ( const char * key, double value );
+double           gtr_pref_double_get      (const char * key);
+void             gtr_pref_double_set      (const char * key, double value);
 
-gboolean         gtr_pref_flag_get          ( const char * key );
-void             gtr_pref_flag_set          ( const char * key, gboolean value );
+gboolean         gtr_pref_flag_get        (const char * key);
+void             gtr_pref_flag_set        (const char * key, gboolean value);
 
-const char*      gtr_pref_string_get        ( const char * key );
-void             gtr_pref_string_set        ( const char * key, const char * value );
+const char*      gtr_pref_string_get      (const char * key);
+void             gtr_pref_string_set      (const char * key, const char * value);
 
-void             gtr_pref_save              ( tr_session * );
-struct tr_benc*  gtr_pref_get_all           ( void );
+void             gtr_pref_save            (tr_session *);
+struct tr_benc*  gtr_pref_get_all         (void);
 
 #endif /* GTR_CONFIG_H */

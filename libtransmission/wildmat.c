@@ -46,7 +46,7 @@
 #define NEGATE_CLASS		'^'
     /* Is "*" a common pattern? */
 #define OPTIMIZE_JUST_STAR
-    /* Do tar(1) matching rules, which ignore a trailing slash? */
+    /* Do tar (1) matching rules, which ignore a trailing slash? */
 #undef MATCH_TAR_PATTERN
 
 
@@ -54,13 +54,13 @@
 **  Match text and p, return true, false, or ABORT.
 */
 static int
-DoMatch( const char * text, const char * p )
+DoMatch (const char * text, const char * p)
 {
     register int	last;
     register int	matched;
     register int	reverse;
 
-    for ( ; *p; text++, p++) {
+    for (; *p; text++, p++) {
 	if (*text == '\0' && *p != '*')
 	    return ABORT;
 	switch (*p) {
@@ -83,7 +83,7 @@ DoMatch( const char * text, const char * p )
 		/* Trailing star matches everything. */
 		return true;
 	    while (*text)
-		if ((matched = DoMatch(text++, p)) != false)
+		if ((matched = DoMatch (text++, p)) != false)
 		    return matched;
 	    return ABORT;
 	case '[':
@@ -111,10 +111,10 @@ DoMatch( const char * text, const char * p )
 
 /* User-level routine. returns whether or not 'text' and 'p' matched */
 bool
-tr_wildmat(const char * text, const char * p )
+tr_wildmat (const char * text, const char * p)
 {
     if (p[0] == '*' && p[1] == '\0')
 	return true;
 
-    return DoMatch(text, p) == true;
+    return DoMatch (text, p) == true;
 }

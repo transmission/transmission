@@ -29,10 +29,10 @@ THE SOFTWARE.
 
 /* $Id$ */
 
-int  tr_lpdInit( tr_session*, tr_address* );
-void tr_lpdUninit( tr_session* );
-bool tr_lpdEnabled( const tr_session* );
-bool tr_lpdSendAnnounce( const tr_torrent* );
+int  tr_lpdInit (tr_session*, tr_address*);
+void tr_lpdUninit (tr_session*);
+bool tr_lpdEnabled (const tr_session*);
+bool tr_lpdSendAnnounce (const tr_torrent*);
 
 /**
 * @defgroup Preproc Helper macros
@@ -40,15 +40,15 @@ bool tr_lpdSendAnnounce( const tr_torrent* );
 *
 * @def lengthof
 * @brief returns the static length of a C array type
-* @note A lower case macro name is tolerable here since this definition of lengthof()
+* @note A lower case macro name is tolerable here since this definition of lengthof ()
 * is intimately related to sizeof semantics.
 * Meaningful return values are only guaranteed for true array types. */
-#define lengthof( arr ) ( sizeof( *(arr) ) > 0 ? sizeof( arr ) / sizeof( *(arr) ) : 0 )
+#define lengthof(arr)(sizeof (* (arr)) > 0 ? sizeof (arr) / sizeof (* (arr)) : 0)
 
 /**
 * @def STATIC_ASSERT
 * @brief This helper allows to perform static checks at compile time */
-#define STATIC_ASSERT( x ) { const char static_check[( (x) ? 1 : -1 )] UNUSED; }
+#define STATIC_ASSERT(x) { const char static_check[ ((x) ? 1 : -1)] UNUSED; }
 
 /**
 * @} */

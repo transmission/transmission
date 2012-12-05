@@ -2,7 +2,7 @@
  * This file Copyright (C) Mnemosyne LLC
  *
  * This file is licensed by the GPL version 2. Works owned by the
- * Transmission project are granted a special exemption to clause 2(b)
+ * Transmission project are granted a special exemption to clause 2 (b)
  * so that the bulk of its code can remain under the MIT license.
  * This exemption does not extend to derived works not owned by
  * the Transmission project.
@@ -21,7 +21,7 @@
 
 #include "transmission.h"
 #include "ptrarray.h"
-#include "utils.h" /* tr_new(), tr_free() */
+#include "utils.h" /* tr_new (), tr_free () */
 
 struct tr_peerIo;
 
@@ -37,7 +37,7 @@ enum
     HISTORY_MSEC = 2000u,
     INTERVAL_MSEC = HISTORY_MSEC,
     GRANULARITY_MSEC = 200,
-    HISTORY_SIZE = ( INTERVAL_MSEC / GRANULARITY_MSEC ),
+    HISTORY_SIZE = (INTERVAL_MSEC / GRANULARITY_MSEC),
     BANDWIDTH_MAGIC_NUMBER = 43143
 };
 
@@ -90,16 +90,16 @@ struct tr_band
  *
  * CONSTRAINING
  *
- *   Call tr_bandwidthAllocate() periodically. tr_bandwidth knows its current
+ *   Call tr_bandwidthAllocate () periodically. tr_bandwidth knows its current
  *   speed and will decide how many bytes to make available over the
  *   user-specified period to reach the user-specified desired speed.
  *   If appropriate, it notifies its peer-ios that new bandwidth is available.
  *
- *   tr_bandwidthAllocate() operates on the tr_bandwidth subtree, so usually
+ *   tr_bandwidthAllocate () operates on the tr_bandwidth subtree, so usually
  *   you'll only need to invoke it for the top-level tr_session bandwidth.
  *
  *   The peer-ios all have a pointer to their associated tr_bandwidth object,
- *   and call tr_bandwidthClamp() before performing I/O to see how much
+ *   and call tr_bandwidthClamp () before performing I/O to see how much
  *   bandwidth they can safely use.
  */
 typedef struct tr_bandwidth
@@ -123,16 +123,16 @@ tr_bandwidth;
 ***
 **/
 
-void tr_bandwidthConstruct( tr_bandwidth * bandwidth,
+void tr_bandwidthConstruct (tr_bandwidth * bandwidth,
                             tr_session   * session,
-                            tr_bandwidth * parent );
+                            tr_bandwidth * parent);
 
-void tr_bandwidthDestruct( tr_bandwidth * bandwidth );
+void tr_bandwidthDestruct (tr_bandwidth * bandwidth);
 
 /** @brief test to see if the pointer refers to a live bandwidth object */
-static inline bool tr_isBandwidth( const tr_bandwidth  * b )
+static inline bool tr_isBandwidth (const tr_bandwidth  * b)
 {
-    return ( b != NULL ) && ( b->magicNumber == BANDWIDTH_MAGIC_NUMBER );
+    return (b != NULL) && (b->magicNumber == BANDWIDTH_MAGIC_NUMBER);
 }
 
 /******
@@ -144,9 +144,9 @@ static inline bool tr_isBandwidth( const tr_bandwidth  * b )
  * @see tr_bandwidthAllocate
  * @see tr_bandwidthGetDesiredSpeed
  */
-static inline bool tr_bandwidthSetDesiredSpeed_Bps( tr_bandwidth        * bandwidth,
+static inline bool tr_bandwidthSetDesiredSpeed_Bps (tr_bandwidth        * bandwidth,
                                                     tr_direction          dir,
-                                                    unsigned int          desiredSpeed )
+                                                    unsigned int          desiredSpeed)
 {
     unsigned int * value = &bandwidth->band[dir].desiredSpeed_Bps;
     const bool didChange = desiredSpeed != *value;
@@ -159,7 +159,7 @@ static inline bool tr_bandwidthSetDesiredSpeed_Bps( tr_bandwidth        * bandwi
  * @see tr_bandwidthSetDesiredSpeed
  */
 static inline double
-tr_bandwidthGetDesiredSpeed_Bps( const tr_bandwidth  * bandwidth, tr_direction dir )
+tr_bandwidthGetDesiredSpeed_Bps (const tr_bandwidth  * bandwidth, tr_direction dir)
 {
     return bandwidth->band[dir].desiredSpeed_Bps;
 }
@@ -167,9 +167,9 @@ tr_bandwidthGetDesiredSpeed_Bps( const tr_bandwidth  * bandwidth, tr_direction d
 /**
  * @brief Set whether or not this bandwidth should throttle its peer-io's speeds
  */
-static inline bool tr_bandwidthSetLimited( tr_bandwidth  * bandwidth,
+static inline bool tr_bandwidthSetLimited (tr_bandwidth  * bandwidth,
                                            tr_direction    dir,
-                                           bool            isLimited )
+                                           bool            isLimited)
 {
     bool * value = &bandwidth->band[dir].isLimited;
     const bool didChange = isLimited != *value;
@@ -180,8 +180,8 @@ static inline bool tr_bandwidthSetLimited( tr_bandwidth  * bandwidth,
 /**
  * @return nonzero if this bandwidth throttles its peer-ios speeds
  */
-static inline bool tr_bandwidthIsLimited( const tr_bandwidth  * bandwidth,
-                                          tr_direction          dir )
+static inline bool tr_bandwidthIsLimited (const tr_bandwidth  * bandwidth,
+                                          tr_direction          dir)
 {
     return bandwidth->band[dir].isLimited;
 }
@@ -189,47 +189,47 @@ static inline bool tr_bandwidthIsLimited( const tr_bandwidth  * bandwidth,
 /**
  * @brief allocate the next period_msec's worth of bandwidth for the peer-ios to consume
  */
-void    tr_bandwidthAllocate          ( tr_bandwidth        * bandwidth,
+void    tr_bandwidthAllocate        (tr_bandwidth        * bandwidth,
                                         tr_direction          direction,
-                                        unsigned int          period_msec );
+                                        unsigned int          period_msec);
 
 /**
  * @brief clamps byteCount down to a number that this bandwidth will allow to be consumed
  */
-unsigned int  tr_bandwidthClamp       ( const tr_bandwidth  * bandwidth,
+unsigned int  tr_bandwidthClamp     (const tr_bandwidth  * bandwidth,
                                         tr_direction          direction,
-                                        unsigned int          byteCount );
+                                        unsigned int          byteCount);
 
 /******
 *******
 ******/
 
 /** @brief Get the raw total of bytes read or sent by this bandwidth subtree. */
-unsigned int tr_bandwidthGetRawSpeed_Bps( const tr_bandwidth  * bandwidth,
+unsigned int tr_bandwidthGetRawSpeed_Bps (const tr_bandwidth  * bandwidth,
                                            const uint64_t        now,
-                                           const tr_direction    direction );
+                                           const tr_direction    direction);
 
 /** @brief Get the number of piece data bytes read or sent by this bandwidth subtree. */
-unsigned int tr_bandwidthGetPieceSpeed_Bps( const tr_bandwidth  * bandwidth,
+unsigned int tr_bandwidthGetPieceSpeed_Bps (const tr_bandwidth  * bandwidth,
                                             const uint64_t        now,
-                                            const tr_direction    direction );
+                                            const tr_direction    direction);
 
 /**
  * @brief Notify the bandwidth object that some of its allocated bandwidth has been consumed.
  * This is is usually invoked by the peer-io after a read or write.
  */
-void    tr_bandwidthUsed              ( tr_bandwidth        * bandwidth,
+void    tr_bandwidthUsed            (tr_bandwidth        * bandwidth,
                                         tr_direction          direction,
                                         size_t                byteCount,
                                         bool                  isPieceData,
-                                        uint64_t              now );
+                                        uint64_t              now);
 
 /******
 *******
 ******/
 
-void    tr_bandwidthSetParent         ( tr_bandwidth        * bandwidth,
-                                        tr_bandwidth        * parent );
+void    tr_bandwidthSetParent       (tr_bandwidth        * bandwidth,
+                                        tr_bandwidth        * parent);
 
 /**
  * Almost all the time we do want to honor a parents' bandwidth cap, so that
@@ -237,9 +237,9 @@ void    tr_bandwidthSetParent         ( tr_bandwidth        * bandwidth,
  * But when we set a torrent's speed mode to TR_SPEEDLIMIT_UNLIMITED, then
  * in that particular case we want to ignore the global speed limit...
  */
-static inline bool tr_bandwidthHonorParentLimits ( tr_bandwidth   * bandwidth,
+static inline bool tr_bandwidthHonorParentLimits (tr_bandwidth   * bandwidth,
                                                    tr_direction     direction,
-                                                   bool             isEnabled )
+                                                   bool             isEnabled)
 {
     bool * value = &bandwidth->band[direction].honorParentLimits;
     const bool didChange = isEnabled != *value;
@@ -247,11 +247,11 @@ static inline bool tr_bandwidthHonorParentLimits ( tr_bandwidth   * bandwidth,
     return didChange;
 }
 
-static inline bool tr_bandwidthAreParentLimitsHonored( const tr_bandwidth  * bandwidth,
-                                                       tr_direction          direction )
+static inline bool tr_bandwidthAreParentLimitsHonored (const tr_bandwidth  * bandwidth,
+                                                       tr_direction          direction)
 {
-    assert( tr_isBandwidth( bandwidth ) );
-    assert( tr_isDirection( direction ) );
+    assert (tr_isBandwidth (bandwidth));
+    assert (tr_isDirection (direction));
 
     return bandwidth->band[direction].honorParentLimits;
 }
@@ -260,8 +260,8 @@ static inline bool tr_bandwidthAreParentLimitsHonored( const tr_bandwidth  * ban
 *******
 ******/
 
-void tr_bandwidthSetPeer( tr_bandwidth        * bandwidth,
-                          struct tr_peerIo    * peerIo );
+void tr_bandwidthSetPeer (tr_bandwidth        * bandwidth,
+                          struct tr_peerIo    * peerIo);
 
 /* @} */
 #endif

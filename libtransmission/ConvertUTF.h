@@ -41,11 +41,11 @@
     Each routine converts the text between *sourceStart and sourceEnd,
     putting the result into the buffer between *targetStart and
     targetEnd. Note: the end pointers are *after* the last item: e.g. 
-    *(sourceEnd - 1) is the last item.
+    * (sourceEnd - 1) is the last item.
 
     The return result indicates whether the conversion was successful,
     and if not, whether the problem was in the source or target buffers.
-    (Only the first encountered problem is indicated.)
+  (Only the first encountered problem is indicated.)
 
     After the conversion, *sourceStart and *targetStart are both
     updated to point to the end of last text successfully converted in
@@ -147,11 +147,11 @@ ConversionResult ConvertUTF32toUTF16 (
 		const UTF32** sourceStart, const UTF32* sourceEnd, 
 		UTF16** targetStart, UTF16* targetEnd, ConversionFlags flags);
 
-Boolean isLegalUTF8Sequence(const UTF8 *source, const UTF8 *sourceEnd);
+Boolean isLegalUTF8Sequence (const UTF8 *source, const UTF8 *sourceEnd);
 
 
 /* intended to work the same as g_utf8_validate */
-Boolean tr_utf8_validate( const char * str, int max_len, const char ** end );
+Boolean tr_utf8_validate (const char * str, int max_len, const char ** end);
 
 
 #ifdef __cplusplus

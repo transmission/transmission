@@ -4,7 +4,7 @@
 #include "libtransmission-test.h"
 
 static int
-test1( void )
+test1 (void)
 {
     tr_info inf;
     tr_ctor * ctor;
@@ -35,4 +35,4 @@ test1( void )
     return 0;
 }
 
-MAIN_SINGLE_TEST(test1)
+MAIN_SINGLE_TEST (test1)
