@@ -300,16 +300,16 @@ tr_netOpenPeerUTPSocket (tr_session        * session,
                          tr_port             port,
                          bool                clientIsSeed UNUSED)
 {
-    struct sockaddr_storage ss;
-    socklen_t sslen;
+  struct UTPSocket * ret = NULL;
 
-    if (!tr_address_is_valid_for_peers (addr, port))
-        return -EINVAL;
+  if (tr_address_is_valid_for_peers (addr, port))
+    {
+      struct sockaddr_storage ss;
+      const socklen_t sslen = setup_sockaddr (addr, port, &ss);
+      ret = UTP_Create (tr_utpSendTo, session, (struct sockaddr*)&ss, sslen);
+    }
 
-    sslen = setup_sockaddr (addr, port, &ss);
-
-    return UTP_Create (tr_utpSendTo, (void*)session,
-                     (struct sockaddr*)&ss, sslen);
+  return ret;
 }
 
 static int
