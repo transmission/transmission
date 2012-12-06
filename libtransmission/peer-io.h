@@ -195,7 +195,7 @@ static inline bool tr_peerIoSupportsDHT (const tr_peerIo * io)
 
 static inline bool tr_peerIoSupportsUTP (const tr_peerIo * io)
 {
-    return io->dhtSupported;
+    return io->utpSupported;
 }
 
 /**
