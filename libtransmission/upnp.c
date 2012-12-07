@@ -32,7 +32,7 @@
 #include "utils.h"
 
 static const char *
-getKey (void) { return _ ("Port Forwarding (UPnP)"); }
+getKey (void) { return _("Port Forwarding (UPnP)"); }
 
 typedef enum
 {
@@ -197,10 +197,10 @@ tr_upnpPulse (tr_upnp * handle,
         if (UPNP_GetValidIGD (devlist, &handle->urls, &handle->data,
                              handle->lanaddr, sizeof (handle->lanaddr)) == UPNP_IGD_VALID_CONNECTED)
         {
-            tr_ninf (getKey (), _ (
+            tr_ninf (getKey (), _(
                          "Found Internet Gateway Device \"%s\""),
                      handle->urls.controlURL);
-            tr_ninf (getKey (), _ (
+            tr_ninf (getKey (), _(
                          "Local Address is \"%s\""), handle->lanaddr);
             handle->state = TR_UPNP_IDLE;
             handle->hasDiscovered = 1;
@@ -230,7 +230,7 @@ tr_upnpPulse (tr_upnp * handle,
         if ((tr_upnpGetSpecificPortMappingEntry (handle, "TCP") != UPNPCOMMAND_SUCCESS) ||
           (tr_upnpGetSpecificPortMappingEntry (handle, "UDP") != UPNPCOMMAND_SUCCESS))
         {
-            tr_ninf (getKey (), _ ("Port %d isn't forwarded"), handle->port);
+            tr_ninf (getKey (), _("Port %d isn't forwarded"), handle->port);
             handle->isMapped = false;
         }
     }
@@ -241,7 +241,7 @@ tr_upnpPulse (tr_upnp * handle,
         tr_upnpDeletePortMapping (handle, "UDP", handle->port);
 
         tr_ninf (getKey (),
-                 _ ("Stopping port forwarding through \"%s\", service \"%s\""),
+                 _("Stopping port forwarding through \"%s\", service \"%s\""),
                  handle->urls.controlURL, handle->data.first.servicetype);
 
         handle->isMapped = 0;
@@ -274,12 +274,12 @@ tr_upnpPulse (tr_upnp * handle,
             handle->isMapped = !err_tcp | !err_udp;
         }
         tr_ninf (getKey (),
-                 _ ("Port forwarding through \"%s\", service \"%s\". (local address: %s:%d)"),
+                 _("Port forwarding through \"%s\", service \"%s\". (local address: %s:%d)"),
                  handle->urls.controlURL, handle->data.first.servicetype,
                  handle->lanaddr, port);
         if (handle->isMapped)
         {
-            tr_ninf (getKey (), "%s", _ ("Port forwarding successful!"));
+            tr_ninf (getKey (), "%s", _("Port forwarding successful!"));
             handle->port = port;
             handle->state = TR_UPNP_IDLE;
         }

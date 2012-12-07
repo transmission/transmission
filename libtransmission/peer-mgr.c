@@ -1805,7 +1805,7 @@ peerCallbackFunc (tr_peer * peer, const tr_peer_event * e, void * vt)
 
                     if (!ok)
                     {
-                        tr_torerr (tor, _ ("Piece %lu, which was just downloaded, failed its checksum test"),
+                        tr_torerr (tor, _("Piece %lu, which was just downloaded, failed its checksum test"),
                                  (unsigned long)p);
                     }
 

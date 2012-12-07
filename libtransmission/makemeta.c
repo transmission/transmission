@@ -60,7 +60,7 @@ getFiles (const char *      dir,
     i = stat (buf, &sb);
     if (i)
     {
-        tr_err (_ ("Torrent Creator is skipping file \"%s\": %s"),
+        tr_err (_("Torrent Creator is skipping file \"%s\": %s"),
                 buf, tr_strerror (errno));
         tr_free (buf);
         return list;

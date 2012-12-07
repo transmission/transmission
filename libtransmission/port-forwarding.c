@@ -28,7 +28,7 @@
 #include "utils.h"
 
 static const char *
-getKey (void) { return _ ("Port Forwarding"); }
+getKey (void) { return _("Port Forwarding"); }
 
 struct tr_shared
 {
@@ -55,10 +55,10 @@ getNatStateStr (int state)
 {
     switch (state)
     {
-        case TR_PORT_MAPPING:   return _ ("Starting");
-        case TR_PORT_MAPPED:    return _ ("Forwarded");
-        case TR_PORT_UNMAPPING: return _ ("Stopping");
-        case TR_PORT_UNMAPPED:  return _ ("Not forwarded");
+        case TR_PORT_MAPPING:   return _("Starting");
+        case TR_PORT_MAPPED:    return _("Forwarded");
+        case TR_PORT_UNMAPPING: return _("Stopping");
+        case TR_PORT_UNMAPPED:  return _("Not forwarded");
         default:                return "???";
     }
 }
@@ -88,7 +88,7 @@ natPulse (tr_shared * s, bool do_check)
     newStatus = tr_sharedTraversalStatus (s);
 
     if (newStatus != oldStatus)
-        tr_ninf (getKey (), _ ("State changed from \"%1$s\" to \"%2$s\""),
+        tr_ninf (getKey (), _("State changed from \"%1$s\" to \"%2$s\""),
                 getNatStateStr (oldStatus),
                 getNatStateStr (newStatus));
 }
@@ -178,7 +178,7 @@ stop_timer (tr_shared * s)
 static void
 stop_forwarding (tr_shared * s)
 {
-    tr_ninf (getKey (), "%s", _ ("Stopped"));
+    tr_ninf (getKey (), "%s", _("Stopped"));
     natPulse (s, false);
 
     tr_natpmpClose (s->natpmp);

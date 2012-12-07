@@ -108,7 +108,7 @@ tr_metainfoMigrate (tr_session * session, tr_info * inf)
           out = fopen (name, "wb+");
           if (!out)
             {
-              tr_nerr (inf->name, _ ("Couldn't create \"%1$s\": %2$s"), name, tr_strerror (errno));
+              tr_nerr (inf->name, _("Couldn't create \"%1$s\": %2$s"), name, tr_strerror (errno));
             }
           else
             {
@@ -604,7 +604,7 @@ tr_metainfoParse (const tr_session * session,
 
   if (badTag)
     {
-      tr_nerr (inf->name, _ ("Invalid metadata entry \"%s\""), badTag);
+      tr_nerr (inf->name, _("Invalid metadata entry \"%s\""), badTag);
       tr_metainfoFree (inf);
     }
 

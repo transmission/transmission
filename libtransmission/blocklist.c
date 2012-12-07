@@ -83,7 +83,7 @@ blocklistLoad (tr_blocklist * b)
     int fd;
     size_t byteCount;
     struct stat st;
-    const char * err_fmt = _ ("Couldn't read \"%1$s\": %2$s");
+    const char * err_fmt = _("Couldn't read \"%1$s\": %2$s");
 
     blocklistClose (b);
 
@@ -112,7 +112,7 @@ blocklistLoad (tr_blocklist * b)
 
     {
         char * base = tr_basename (b->filename);
-        tr_inf (_ ("Blocklist \"%s\" contains %zu entries"), base, b->ruleCount);
+        tr_inf (_("Blocklist \"%s\" contains %zu entries"), base, b->ruleCount);
         tr_free (base);
     }
 }
@@ -322,7 +322,7 @@ _tr_blocklistSetContent (tr_blocklist * b, const char * filename)
     FILE * out;
     int inCount = 0;
     char line[2048];
-    const char * err_fmt = _ ("Couldn't read \"%1$s\": %2$s");
+    const char * err_fmt = _("Couldn't read \"%1$s\": %2$s");
     struct tr_ipv4_range * ranges = NULL;
     size_t ranges_alloc = 0;
     size_t ranges_count = 0;
@@ -365,7 +365,7 @@ _tr_blocklistSetContent (tr_blocklist * b, const char * filename)
         if (!parseLine (line, &range))
         {
             /* don't try to display the actual lines - it causes issues */
-            tr_err (_ ("blocklist skipped invalid address at line %d"), inCount);
+            tr_err (_("blocklist skipped invalid address at line %d"), inCount);
             continue;
         }
 
@@ -414,10 +414,10 @@ _tr_blocklistSetContent (tr_blocklist * b, const char * filename)
     }
 
     if (fwrite (ranges, sizeof (struct tr_ipv4_range), ranges_count, out) != ranges_count)
-        tr_err (_ ("Couldn't save file \"%1$s\": %2$s"), b->filename, tr_strerror (errno));
+        tr_err (_("Couldn't save file \"%1$s\": %2$s"), b->filename, tr_strerror (errno));
     else {
         char * base = tr_basename (b->filename);
-        tr_inf (_ ("Blocklist \"%s\" updated with %zu entries"), base, ranges_count);
+        tr_inf (_("Blocklist \"%s\" updated with %zu entries"), base, ranges_count);
         tr_free (base);
     }
 

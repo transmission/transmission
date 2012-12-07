@@ -258,7 +258,7 @@ on_scrape_response (struct tau_scrape_request  * request,
         if ((action == TAU_ACTION_ERROR) && (buflen > 0))
             errmsg = tr_strndup (evbuffer_pullup (buf, -1), buflen);
         else
-            errmsg = tr_strdup (_ ("Unknown error"));
+            errmsg = tr_strdup (_("Unknown error"));
 
         tau_scrape_request_fail (request, true, false, errmsg);
         tr_free (errmsg);
@@ -408,7 +408,7 @@ on_announce_response (struct tau_announce_request  * request,
         if ((action == TAU_ACTION_ERROR) && (buflen > 0))
             errmsg = tr_strndup (evbuffer_pullup (buf, -1), buflen);
         else
-            errmsg = tr_strdup (_ ("Unknown error"));
+            errmsg = tr_strdup (_("Unknown error"));
 
         tau_announce_request_fail (request, true, false, errmsg);
         tr_free (errmsg);
@@ -495,7 +495,7 @@ tau_tracker_on_dns (int errcode, struct evutil_addrinfo *addr, void * vtracker)
 
     if (errcode)
     {
-        char * errmsg = tr_strdup_printf (_ ("DNS Lookup failed: %s"),
+        char * errmsg = tr_strdup_printf (_("DNS Lookup failed: %s"),
                                           evdns_err_to_string (errcode));
         dbgmsg (tracker->key, "%s", errmsg);
         tau_tracker_fail_all (tracker, false, false, errmsg);
@@ -596,7 +596,7 @@ on_tracker_connection_response (struct tau_tracker  * tracker,
         if ((action == TAU_ACTION_ERROR) && (buflen > 0))
             errmsg = tr_strndup (evbuffer_pullup (buf, -1), buflen);
         else
-            errmsg = tr_strdup (_ ("Connection failed"));
+            errmsg = tr_strdup (_("Connection failed"));
 
         dbgmsg (tracker->key, "%s", errmsg);
         tau_tracker_fail_all (tracker, true, false, errmsg);

@@ -1055,11 +1055,11 @@ on_announce_done (const tr_announce_response  * response,
 
         if (!response->did_connect)
         {
-            on_announce_error (tier, _ ("Could not connect to tracker"), event);
+            on_announce_error (tier, _("Could not connect to tracker"), event);
         }
         else if (response->did_timeout)
         {
-            on_announce_error (tier, _ ("Tracker did not respond"), event);
+            on_announce_error (tier, _("Tracker did not respond"), event);
         }
         else if (response->errmsg)
         {
@@ -1121,7 +1121,7 @@ on_announce_done (const tr_announce_response  * response,
             }
             else
             {
-                tr_strlcpy (tier->lastAnnounceStr, _ ("Success"),
+                tr_strlcpy (tier->lastAnnounceStr, _("Success"),
                             sizeof (tier->lastAnnounceStr));
             }
 
@@ -1330,11 +1330,11 @@ on_scrape_done (const tr_scrape_response * response, void * vsession)
 
                 if (!response->did_connect)
                 {
-                    on_scrape_error (session, tier, _ ("Could not connect to tracker"));
+                    on_scrape_error (session, tier, _("Could not connect to tracker"));
 		}
                 else if (response->did_timeout)
                 {
-                    on_scrape_error (session, tier, _ ("Tracker did not respond"));
+                    on_scrape_error (session, tier, _("Tracker did not respond"));
                 }
                 else if (response->errmsg)
                 {

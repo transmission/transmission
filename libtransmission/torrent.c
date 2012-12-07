@@ -522,14 +522,14 @@ onTrackerResponse (tr_torrent * tor, const tr_tracker_event * event, void * unus
         }
 
         case TR_TRACKER_WARNING:
-            tr_torerr (tor, _ ("Tracker warning: \"%s\""), event->text);
+            tr_torerr (tor, _("Tracker warning: \"%s\""), event->text);
             tor->error = TR_STAT_TRACKER_WARNING;
             tr_strlcpy (tor->errorTracker, event->tracker, sizeof (tor->errorTracker));
             tr_strlcpy (tor->errorString, event->text, sizeof (tor->errorString));
             break;
 
         case TR_TRACKER_ERROR:
-            tr_torerr (tor, _ ("Tracker error: \"%s\""), event->text);
+            tr_torerr (tor, _("Tracker error: \"%s\""), event->text);
             tor->error = TR_STAT_TRACKER_ERROR;
             tr_strlcpy (tor->errorTracker, event->tracker, sizeof (tor->errorTracker));
             tr_strlcpy (tor->errorString, event->text, sizeof (tor->errorString));
@@ -784,7 +784,7 @@ setLocalErrorIfFilesDisappeared (tr_torrent * tor)
     if (disappeared)
     {
         tr_deeplog_tor (tor, "%s", "[LAZY] uh oh, the files disappeared");
-        tr_torrentSetLocalError (tor, "%s", _ ("No data found! Ensure your drives are connected or use \"Set Location\". To re-download, remove the torrent and re-add it."));
+        tr_torrentSetLocalError (tor, "%s", _("No data found! Ensure your drives are connected or use \"Set Location\". To re-download, remove the torrent and re-add it."));
     }
 
     return disappeared;
@@ -1674,7 +1674,7 @@ torrentStart (tr_torrent * tor, bool bypass_queue)
 
     /* allow finished torrents to be resumed */
     if (tr_torrentIsSeedRatioDone (tor)) {
-        tr_torinf (tor, _ ("Restarted manually -- disabling its seed ratio"));
+        tr_torinf (tor, _("Restarted manually -- disabling its seed ratio"));
         tr_torrentSetRatioMode (tor, TR_RATIOLIMIT_UNLIMITED);
     }
 
@@ -1826,7 +1826,7 @@ closeTorrent (void * vtor)
     tr_bencDictAddInt (d, "id", tor->uniqueId);
     tr_bencDictAddInt (d, "date", tr_time ());
 
-    tr_torinf (tor, "%s", _ ("Removing torrent"));
+    tr_torinf (tor, "%s", _("Removing torrent"));
 
     stopTorrent (tor);
 
@@ -1910,13 +1910,13 @@ getCompletionString (int type)
            "Done" means we're done downloading the files we wanted, but NOT all
            that exist */
         case TR_PARTIAL_SEED:
-            return _ ("Done");
+            return _("Done");
 
         case TR_SEED:
-            return _ ("Complete");
+            return _("Complete");
 
         default:
-            return _ ("Incomplete");
+            return _("Incomplete");
     }
 }
 
@@ -2053,7 +2053,7 @@ tr_torrentRecheckCompleteness (tr_torrent * tor)
 
         if (recentChange)
         {
-            tr_torinf (tor, _ ("State changed from \"%1$s\" to \"%2$s\""),
+            tr_torinf (tor, _("State changed from \"%1$s\" to \"%2$s\""),
                       getCompletionString (tor->completeness),
                       getCompletionString (completeness));
         }

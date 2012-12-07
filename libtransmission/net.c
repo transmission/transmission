@@ -265,7 +265,7 @@ tr_netOpenPeerSocket (tr_session        * session,
     sourcelen = setup_sockaddr (source_addr, 0, &source_sock);
     if (bind (s, (struct sockaddr *) &source_sock, sourcelen))
     {
-        tr_err (_ ("Couldn't set source address %s on %d: %s"),
+        tr_err (_("Couldn't set source address %s on %d: %s"),
                 tr_address_to_string (source_addr), s, tr_strerror (errno));
         return -errno;
     }
@@ -281,7 +281,7 @@ tr_netOpenPeerSocket (tr_session        * session,
         tmperrno = sockerrno;
         if ((tmperrno != ENETUNREACH && tmperrno != EHOSTUNREACH)
                 || addr->type == TR_AF_INET)
-            tr_err (_ ("Couldn't connect socket %d to %s, port %d (errno %d - %s)"),
+            tr_err (_("Couldn't connect socket %d to %s, port %d (errno %d - %s)"),
                     s, tr_address_to_string (addr), (int)ntohs (port), tmperrno,
                     tr_strerror (tmperrno));
         tr_netClose (session, s);
@@ -357,14 +357,14 @@ tr_netBindTCPImpl (const tr_address * addr, tr_port port, bool suppressMsgs, int
             const char * hint;
 
             if (err == EADDRINUSE)
-                hint = _ ("Is another copy of Transmission already running?");
+                hint = _("Is another copy of Transmission already running?");
             else
                 hint = NULL;
 
             if (hint == NULL)
-                fmt = _ ("Couldn't bind port %d on %s: %s");
+                fmt = _("Couldn't bind port %d on %s: %s");
             else
-                fmt = _ ("Couldn't bind port %d on %s: %s (%s)");
+                fmt = _("Couldn't bind port %d on %s: %s (%s)");
 
             tr_err (fmt, port, tr_address_to_string (addr), tr_strerror (err), hint);
         }

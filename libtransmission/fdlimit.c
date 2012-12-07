@@ -357,7 +357,7 @@ cached_file_open (struct tr_cached_file  * o,
         char * dir = tr_dirname (filename);
         const int err = tr_mkdirp (dir, 0777) ? errno : 0;
         if (err) {
-            tr_err (_ ("Couldn't create \"%1$s\": %2$s"), dir, tr_strerror (err));
+            tr_err (_("Couldn't create \"%1$s\": %2$s"), dir, tr_strerror (err));
             tr_free (dir);
             return err;
         }
@@ -378,7 +378,7 @@ cached_file_open (struct tr_cached_file  * o,
     if (o->fd == -1)
     {
         const int err = errno;
-        tr_err (_ ("Couldn't open \"%1$s\": %2$s"), filename, tr_strerror (err));
+        tr_err (_("Couldn't open \"%1$s\": %2$s"), filename, tr_strerror (err));
         return err;
     }
 
@@ -393,7 +393,7 @@ cached_file_open (struct tr_cached_file  * o,
         if (ftruncate (o->fd, file_size) == -1)
         {
             const int err = errno;
-            tr_err (_ ("Couldn't truncate \"%1$s\": %2$s"), filename, tr_strerror (err));
+            tr_err (_("Couldn't truncate \"%1$s\": %2$s"), filename, tr_strerror (err));
             return err;
         }
     }
@@ -679,7 +679,7 @@ tr_fdSocketCreate (tr_session * session, int domain, int type)
     if (gFd->peerCount < session->peerLimit)
         if ((s = socket (domain, type, 0)) < 0)
             if (sockerrno != EAFNOSUPPORT)
-                tr_err (_ ("Couldn't create socket: %s"), tr_strerror (sockerrno));
+                tr_err (_("Couldn't create socket: %s"), tr_strerror (sockerrno));
 
     if (s > -1)
         ++gFd->peerCount;

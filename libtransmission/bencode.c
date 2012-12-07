@@ -1114,7 +1114,7 @@ bencWalk (const tr_benc          * top,
 
                 default:
                     /* did caller give us an uninitialized val? */
-                    tr_err ("%s", _ ("Invalid metadata"));
+                    tr_err ("%s", _("Invalid metadata"));
                     break;
             }
     }
@@ -1713,7 +1713,7 @@ tr_bencToFile (const tr_benc * top, tr_fmt_mode mode, const char * filename)
 
         if (nleft > 0)
         {
-            tr_err (_ ("Couldn't save temporary file \"%1$s\": %2$s"), tmp, tr_strerror (err));
+            tr_err (_("Couldn't save temporary file \"%1$s\": %2$s"), tmp, tr_strerror (err));
             tr_close_file (fd);
             unlink (tmp);
         }
@@ -1728,12 +1728,12 @@ tr_bencToFile (const tr_benc * top, tr_fmt_mode mode, const char * filename)
             if (!rename (tmp, filename))
 #endif
             {
-                tr_inf (_ ("Saved \"%s\""), filename);
+                tr_inf (_("Saved \"%s\""), filename);
             }
             else
             {
                 err = errno;
-                tr_err (_ ("Couldn't save file \"%1$s\": %2$s"), filename, tr_strerror (err));
+                tr_err (_("Couldn't save file \"%1$s\": %2$s"), filename, tr_strerror (err));
                 unlink (tmp);
             }
         }
@@ -1741,7 +1741,7 @@ tr_bencToFile (const tr_benc * top, tr_fmt_mode mode, const char * filename)
     else
     {
         err = errno;
-        tr_err (_ ("Couldn't save temporary file \"%1$s\": %2$s"), tmp, tr_strerror (err));
+        tr_err (_("Couldn't save temporary file \"%1$s\": %2$s"), tmp, tr_strerror (err));
     }
 
     tr_free (tmp);

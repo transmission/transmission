@@ -435,7 +435,7 @@ tr_loadFile (const char * path,
     struct stat  sb;
     int fd;
     ssize_t n;
-    const char * const err_fmt = _ ("Couldn't read \"%1$s\": %2$s");
+    const char * const err_fmt = _("Couldn't read \"%1$s\": %2$s");
 
     /* try to stat the file */
     errno = 0;
@@ -449,7 +449,7 @@ tr_loadFile (const char * path,
 
     if ((sb.st_mode & S_IFMT) != S_IFREG)
     {
-        tr_err (err_fmt, path, _ ("Not a regular file"));
+        tr_err (err_fmt, path, _("Not a regular file"));
         errno = EISDIR;
         return NULL;
     }
@@ -467,7 +467,7 @@ tr_loadFile (const char * path,
     if (!buf)
     {
         const int err = errno;
-        tr_err (err_fmt, path, _ ("Memory allocation failed"));
+        tr_err (err_fmt, path, _("Memory allocation failed"));
         tr_close_file (fd);
         errno = err;
         return NULL;
@@ -570,7 +570,7 @@ tr_mkdirp (const char * path_in,
             if (tr_mkdir (path, permissions))
             {
                 const int err = errno;
-                tr_err (_ (
+                tr_err (_(
                            "Couldn't create \"%1$s\": %2$s"), path,
                        tr_strerror (err));
                 tr_free (path);
@@ -581,8 +581,8 @@ tr_mkdirp (const char * path_in,
         else if ((sb.st_mode & S_IFMT) != S_IFDIR)
         {
             /* Node exists but isn't a folder */
-            char * buf = tr_strdup_printf (_ ("File \"%s\" is in the way"), path);
-            tr_err (_ ("Couldn't create \"%1$s\": %2$s"), path_in, buf);
+            char * buf = tr_strdup_printf (_("File \"%s\" is in the way"), path);
+            tr_err (_("Couldn't create \"%1$s\": %2$s"), path_in, buf);
             tr_free (buf);
             tr_free (path);
             errno = ENOTDIR;
@@ -982,7 +982,7 @@ isValidURLChars (const char * url, int url_len)
         "abcdefghijklmnopqrstuvwxyz" /* lowalpha */
         "ABCDEFGHIJKLMNOPQRSTUVWXYZ" /* upalpha */
         "0123456789"                 /* digit */
-        "-_.!~*' ()"                  /* mark */
+        "-_.!~*'()"                  /* mark */
         ";/?:@&=+$,"                 /* reserved */
         "<>#%<\""                    /* delims */
         "{}|\\^[]`";                 /* unwise */
@@ -1506,7 +1506,7 @@ char*
 tr_strratio (char * buf, size_t buflen, double ratio, const char * infinity)
 {
     if ((int)ratio == TR_RATIO_NA)
-        tr_strlcpy (buf, _ ("None"), buflen);
+        tr_strlcpy (buf, _("None"), buflen);
     else if ((int)ratio == TR_RATIO_INF)
         tr_strlcpy (buf, infinity, buflen);
     else

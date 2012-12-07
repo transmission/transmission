@@ -200,7 +200,7 @@ on_announce_done (tr_session   * session,
 
     if (response_code != HTTP_OK)
     {
-        const char * fmt = _ ("Tracker gave HTTP response code %1$ld (%2$s)");
+        const char * fmt = _("Tracker gave HTTP response code %1$ld (%2$s)");
         const char * response_str = tr_webGetResponseStr (response_code);
         response->errmsg = tr_strdup_printf (fmt, response_code, response_str);
     }
@@ -350,7 +350,7 @@ on_scrape_done (tr_session   * session,
 
     if (response_code != HTTP_OK)
     {
-        const char * fmt = _ ("Tracker gave HTTP response code %1$ld (%2$s)");
+        const char * fmt = _("Tracker gave HTTP response code %1$ld (%2$s)");
         const char * response_str = tr_webGetResponseStr (response_code);
         response->errmsg = tr_strdup_printf (fmt, response_code, response_str);
     }

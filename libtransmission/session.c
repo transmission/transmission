@@ -719,7 +719,7 @@ tr_sessionInitImpl (void * vdata)
 
     /* first %s is the application name
        second %s is the version number */
-    tr_inf (_ ("%s %s started"), TR_NAME, LONG_VERSION_STRING);
+    tr_inf (_("%s %s started"), TR_NAME, LONG_VERSION_STRING);
 
     tr_statsInit (session);
 
@@ -1940,7 +1940,7 @@ sessionLoadTorrents (void * vdata)
     tr_list_free (&list, NULL);
 
     if (n)
-        tr_inf (_ ("Loaded %d torrents"), n);
+        tr_inf (_("Loaded %d torrents"), n);
 
     if (data->setmeCount)
         *data->setmeCount = n;

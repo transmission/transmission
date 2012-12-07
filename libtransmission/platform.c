@@ -357,7 +357,7 @@ moveFiles (const char * oldDir, const char * newDir)
             }
 
           if (count)
-            tr_inf (_ ("Migrated %1$d files from \"%2$s\" to \"%3$s\""), count, oldDir, newDir);
+            tr_inf (_("Migrated %1$d files from \"%2$s\" to \"%3$s\""), count, oldDir, newDir);
 
           closedir (dirh);
         }
@@ -532,7 +532,7 @@ isWebClientDir (const char * path)
   struct stat sb;
   char * tmp = tr_buildPath (path, "index.html", NULL);
   const int ret = !stat (tmp, &sb);
-  tr_inf (_ ("Searching for web interface file \"%s\""), tmp);
+  tr_inf (_("Searching for web interface file \"%s\""), tmp);
   tr_free (tmp);
 
   return ret;
@@ -727,7 +727,7 @@ tr_getFreeSpace (const char * path)
 #if defined (_MSC_VER)
 __declspec (align (4)) static LONG volatile g_sl;
 #else
-static LONG volatile g_sl __attribute__ ((aligned (4)));
+static LONG volatile g_sl __attribute__((aligned (4)));
 #endif
 
 /* Wait for spin lock */

@@ -933,75 +933,75 @@ tr_rpcInit (tr_session  * session, tr_benc * settings)
 
     key = TR_PREFS_KEY_RPC_ENABLED;
     if (!tr_bencDictFindBool (settings, key, &boolVal))
-        tr_nerr (MY_NAME, _ ("Couldn't find settings key \"%s\""), key);
+        tr_nerr (MY_NAME, _("Couldn't find settings key \"%s\""), key);
     else
         s->isEnabled = boolVal;
 
     key = TR_PREFS_KEY_RPC_PORT;
     if (!tr_bencDictFindInt (settings, key, &i))
-        tr_nerr (MY_NAME, _ ("Couldn't find settings key \"%s\""), key);
+        tr_nerr (MY_NAME, _("Couldn't find settings key \"%s\""), key);
     else
         s->port = i;
 
     key = TR_PREFS_KEY_RPC_URL;
     if (!tr_bencDictFindStr (settings, TR_PREFS_KEY_RPC_URL, &str))
-        tr_nerr (MY_NAME, _ ("Couldn't find settings key \"%s\""), key);
+        tr_nerr (MY_NAME, _("Couldn't find settings key \"%s\""), key);
     else
         s->url = tr_strdup (str);
 
     key = TR_PREFS_KEY_RPC_WHITELIST_ENABLED;
     if (!tr_bencDictFindBool (settings, key, &boolVal))
-        tr_nerr (MY_NAME, _ ("Couldn't find settings key \"%s\""), key);
+        tr_nerr (MY_NAME, _("Couldn't find settings key \"%s\""), key);
     else
         tr_rpcSetWhitelistEnabled (s, boolVal);
 
     key = TR_PREFS_KEY_RPC_AUTH_REQUIRED;
     if (!tr_bencDictFindBool (settings, key, &boolVal))
-        tr_nerr (MY_NAME, _ ("Couldn't find settings key \"%s\""), key);
+        tr_nerr (MY_NAME, _("Couldn't find settings key \"%s\""), key);
     else
         tr_rpcSetPasswordEnabled (s, boolVal);
 
     key = TR_PREFS_KEY_RPC_WHITELIST;
     if (!tr_bencDictFindStr (settings, key, &str) && str)
-        tr_nerr (MY_NAME, _ ("Couldn't find settings key \"%s\""), key);
+        tr_nerr (MY_NAME, _("Couldn't find settings key \"%s\""), key);
     else
         tr_rpcSetWhitelist (s, str);
 
     key = TR_PREFS_KEY_RPC_USERNAME;
     if (!tr_bencDictFindStr (settings, key, &str))
-        tr_nerr (MY_NAME, _ ("Couldn't find settings key \"%s\""), key);
+        tr_nerr (MY_NAME, _("Couldn't find settings key \"%s\""), key);
     else
         tr_rpcSetUsername (s, str);
 
     key = TR_PREFS_KEY_RPC_PASSWORD;
     if (!tr_bencDictFindStr (settings, key, &str))
-        tr_nerr (MY_NAME, _ ("Couldn't find settings key \"%s\""), key);
+        tr_nerr (MY_NAME, _("Couldn't find settings key \"%s\""), key);
     else
         tr_rpcSetPassword (s, str);
 
     key = TR_PREFS_KEY_RPC_BIND_ADDRESS;
     if (!tr_bencDictFindStr (settings, TR_PREFS_KEY_RPC_BIND_ADDRESS, &str)) {
-        tr_nerr (MY_NAME, _ ("Couldn't find settings key \"%s\""), key);
+        tr_nerr (MY_NAME, _("Couldn't find settings key \"%s\""), key);
         address = tr_inaddr_any;
     } else if (!tr_address_from_string (&address, str)) {
-        tr_nerr (MY_NAME, _ ("%s is not a valid address"), str);
+        tr_nerr (MY_NAME, _("%s is not a valid address"), str);
         address = tr_inaddr_any;
     } else if (address.type != TR_AF_INET) {
-        tr_nerr (MY_NAME, _ ("%s is not an IPv4 address. RPC listeners must be IPv4"), str);
+        tr_nerr (MY_NAME, _("%s is not an IPv4 address. RPC listeners must be IPv4"), str);
         address = tr_inaddr_any;
     }
     s->bindAddress = address.addr.addr4;
 
     if (s->isEnabled)
     {
-        tr_ninf (MY_NAME, _ ("Serving RPC and Web requests on port 127.0.0.1:%d%s"), (int) s->port, s->url);
+        tr_ninf (MY_NAME, _("Serving RPC and Web requests on port 127.0.0.1:%d%s"), (int) s->port, s->url);
         tr_runInEventThread (session, startServer, s);
 
         if (s->isWhitelistEnabled)
-            tr_ninf (MY_NAME, "%s", _ ("Whitelist enabled"));
+            tr_ninf (MY_NAME, "%s", _("Whitelist enabled"));
 
         if (s->isPasswordEnabled)
-            tr_ninf (MY_NAME, "%s", _ ("Password required"));
+            tr_ninf (MY_NAME, "%s", _("Password required"));
     }
 
     return s;

@@ -1257,7 +1257,7 @@ gotNewBlocklist (tr_session       * session,
         filename = tr_buildPath (configDir, "blocklist.tmp", NULL);
         fd = tr_open_file_for_writing (filename);
         if (fd < 0)
-            tr_snprintf (result, sizeof (result), _ ("Couldn't save file \"%1$s\": %2$s"), filename, tr_strerror (errno));
+            tr_snprintf (result, sizeof (result), _("Couldn't save file \"%1$s\": %2$s"), filename, tr_strerror (errno));
 
         for (;;)
         {
@@ -1268,14 +1268,14 @@ gotNewBlocklist (tr_session       * session,
             if (stream.avail_out < buflen) {
                 const int e = write (fd, buf, buflen - stream.avail_out);
                 if (e < 0) {
-                    tr_snprintf (result, sizeof (result), _ ("Couldn't save file \"%1$s\": %2$s"), filename, tr_strerror (errno));
+                    tr_snprintf (result, sizeof (result), _("Couldn't save file \"%1$s\": %2$s"), filename, tr_strerror (errno));
                     break;
                 }
             }
 
             if (err != Z_OK) {
                 if ((err != Z_STREAM_END) && (err != Z_DATA_ERROR))
-                    tr_snprintf (result, sizeof (result), _ ("Error uncompressing blocklist: %s (%d)"), zError (err), err);
+                    tr_snprintf (result, sizeof (result), _("Error uncompressing blocklist: %s (%d)"), zError (err), err);
                 break;
             }
         }
@@ -1284,7 +1284,7 @@ gotNewBlocklist (tr_session       * session,
 
         if (err == Z_DATA_ERROR) /* couldn't inflate it... it's probably already uncompressed */
             if (write (fd, response, response_byte_count) < 0)
-                tr_snprintf (result, sizeof (result), _ ("Couldn't save file \"%1$s\": %2$s"), filename, tr_strerror (errno));
+                tr_snprintf (result, sizeof (result), _("Couldn't save file \"%1$s\": %2$s"), filename, tr_strerror (errno));
 
         if (*result)
             tr_err ("%s", result);
