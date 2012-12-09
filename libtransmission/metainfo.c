@@ -87,49 +87,6 @@ getOldTorrentFilename (const tr_session * session, const tr_info * inf)
   return tr_strdup_printf ("%s%c%s-%s", tr_getTorrentDir (session), '/', inf->hashString, "gtk");
 }
 
-/* this is for really old versions of T and will probably be removed someday */
-void
-tr_metainfoMigrate (tr_session * session, tr_info * inf)
-{
-  struct stat new_sb;
-  char * name = getTorrentFilename (session, inf);
-
-  if (stat (name, &new_sb) || ((new_sb.st_mode & S_IFMT) != S_IFREG))
-    {
-      char * old_name = getOldTorrentFilename (session, inf);
-      size_t contentLen;
-      uint8_t * content;
-
-      tr_mkdirp (tr_getTorrentDir (session), 0777);
-      if ((content = tr_loadFile (old_name, &contentLen)))
-        {
-          FILE * out;
-          errno = 0;
-          out = fopen (name, "wb+");
-          if (!out)
-            {
-              tr_nerr (inf->name, _("Couldn't create \"%1$s\": %2$s"), name, tr_strerror (errno));
-            }
-          else
-            {
-              if (fwrite (content, sizeof (uint8_t), contentLen, out) == contentLen)
-                {
-                  tr_free (inf->torrent);
-                  inf->torrent = tr_strdup (name);
-                  tr_sessionSetTorrentFile (session, inf->hashString, name);
-                  unlink (old_name);
-                }
-              fclose (out);
-            }
-        }
-
-      tr_free (content);
-      tr_free (old_name);
-    }
-
-  tr_free (name);
-}
-
 /***
 ****
 ***/

@@ -30,9 +30,6 @@ bool  tr_metainfoParse (const tr_session     * session,
 void tr_metainfoRemoveSaved (const tr_session * session,
                              const tr_info    * info);
 
-void tr_metainfoMigrate (tr_session * session,
-                         tr_info    * inf);
-
 char* tr_metainfoGetBasename (const tr_info *);
 
 
