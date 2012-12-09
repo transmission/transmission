@@ -16,7 +16,6 @@
 #include <string.h> /* strlen () */
 
 #include <sys/types.h>
-#include <sys/stat.h>
 #include <unistd.h> /* unlink, stat */
 
 #include <event2/buffer.h>
