@@ -90,6 +90,7 @@ countRange (const tr_bitfield * b, size_t begin, size_t end)
     {
       size_t i;
       uint8_t val;
+      const size_t walk_end = MIN (b->alloc_count, last_byte);
 
       /* first byte */
       i = begin - (first_byte * 8);
@@ -99,7 +100,7 @@ countRange (const tr_bitfield * b, size_t begin, size_t end)
       ret += trueBitCount[val];
 
       /* middle bytes */
-      for (i=first_byte+1; i<b->alloc_count && i<last_byte; ++i)
+      for (i=first_byte+1; i<walk_end; ++i)
         ret += trueBitCount[b->bits[i]];
 
       /* last byte */
