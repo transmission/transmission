@@ -165,7 +165,7 @@ static int
 makeroom (tr_benc * val,
           size_t    count)
 {
-    assert (TR_TYPE_LIST == val->type || TR_TYPE_DICT == val->type);
+    assert (isContainer (val));
 
     if (val->val.l.count + count > val->val.l.alloc)
     {
