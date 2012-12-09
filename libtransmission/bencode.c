@@ -1552,6 +1552,8 @@ tr_bencMergeDicts (tr_benc * target, const tr_benc * source)
     assert (tr_bencIsDict (target));
     assert (tr_bencIsDict (source));
 
+    tr_bencDictReserve (target, sourceCount + tr_bencDictSize(target));
+
     for (i=0; i<sourceCount; ++i)
     {
         const char * key;
