@@ -77,6 +77,8 @@ tr_prefs_init_defaults (tr_benc * d)
   if (!str)
     str = tr_getDefaultDownloadDir ();
 
+  tr_bencDictReserve (d, 29);
+
   tr_bencDictAddStr (d, PREF_KEY_DIR_WATCH, str);
   tr_bencDictAddBool (d, PREF_KEY_DIR_WATCH_ENABLED, FALSE);
 

@@ -307,7 +307,7 @@ tr_sessionGetDefaultSettings (tr_benc * d)
 {
     assert (tr_bencIsDict (d));
 
-    tr_bencDictReserve (d, 60);
+    tr_bencDictReserve (d, 62);
     tr_bencDictAddBool (d, TR_PREFS_KEY_BLOCKLIST_ENABLED,               false);
     tr_bencDictAddStr (d, TR_PREFS_KEY_BLOCKLIST_URL,                   "http://www.example.com/blocklist");
     tr_bencDictAddInt (d, TR_PREFS_KEY_MAX_CACHE_SIZE_MB,               DEFAULT_CACHE_SIZE_MB);
