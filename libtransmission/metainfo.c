@@ -57,36 +57,6 @@ getTorrentFilename (const tr_session * session, const tr_info * inf)
   return filename;
 }
 
-static char*
-getOldTorrentFilename (const tr_session * session, const tr_info * inf)
-{
-  int i;
-  char * path;
-  struct stat sb;
-  const int tagCount = 5;
-  const char * tags[] = { "beos", "cli", "daemon", "macosx", "wx" };
-
-  /* test the beos, cli, daemon, macosx, wx tags */
-  for (i=0; i<tagCount; ++i)
-    {
-      path = tr_strdup_printf ("%s%c%s-%s", tr_getTorrentDir (session), '/', inf->hashString, tags[i]);
-      if (!stat (path, &sb) && ((sb.st_mode & S_IFMT) == S_IFREG))
-        return path;
-      tr_free (path);
-    }
-
-  /* test a non-tagged file */
-  path = tr_buildPath (tr_getTorrentDir (session), inf->hashString, NULL);
-  if (!stat (path, &sb) && ((sb.st_mode & S_IFMT) == S_IFREG))
-    return path;
-  tr_free (path);
-
-  /* return the -gtk form by default, since that's the most common case.
-     don't bother testing stat () on it since this is the last candidate
-     and we don't want to return NULL anyway */
-  return tr_strdup_printf ("%s%c%s-%s", tr_getTorrentDir (session), '/', inf->hashString, "gtk");
-}
-
 /***
 ****
 ***/
@@ -604,10 +574,6 @@ tr_metainfoRemoveSaved (const tr_session * session, const tr_info * inf)
   char * filename;
 
   filename = getTorrentFilename (session, inf);
-  unlink (filename);
-  tr_free (filename);
-
-  filename = getOldTorrentFilename (session, inf);
   unlink (filename);
   tr_free (filename);
 }
