@@ -47,10 +47,10 @@ static const int8_t trueBitCount[256] =
 static size_t
 countArray (const tr_bitfield * b)
 {
-  size_t i;
   size_t ret = 0;
+  ssize_t i = b->alloc_count;
 
-  for (i=0; i<b->alloc_count; ++i)
+  while (--i >= 0)
     ret += trueBitCount[b->bits[i]];
 
   return ret;
