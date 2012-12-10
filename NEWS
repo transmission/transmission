@@ -1,24 +1,19 @@
-=== Transmission 2.74 (2012/12/09) ===
-[http://trac.transmissionbt.com/query?milestone=2.74&group=component&order=severity All tickets closed by this release]
+=== Transmission 2.74 (2012/12/10) ===
+[http://trac.transmissionbt.com/query?milestone=2.72&group=component&order=severity All tickets closed by this release]
 ==== All Platforms ====
   * Fix a bug that prevented IPv6 addresses from being saved in dht.dat
   * Better handling of magnet links that contain 'tr.x=' parameters
-  * Add filtering of addresses used for uTP peer connections
+  * Add filtering of addresses used for uTP peer connections 
   * Fix detection of whether or not a peer supports uTP connections
 ==== Mac ====
-  * Fix crash on non-English localizations
-  * FIXME(bmw) descrip the symptom #5146 caused on the Mac client?
-==== Qt ====
-  * New French translations
+  * Auto-grouping won't apply until torrents are demagnetized
+  * Tweak the inspector's and add window's file lists to avoid auto-hiding scrollbars overlapping the priority controls
+  * Fix potential crash when downloading and seeding complete at the same time
+  * Fix bug where stopped torrents might start when waking the computer from sleep
 ==== Web Client ====
   * Fix a multi-file selection bug
-  * Fix 2.72 regression that hid the up/down speed arrows
-  * Fix an javascript error when displaying tracker lists
-
-=== Transmission 2.73 (2012/10/18) ===
-[http://trac.transmissionbt.com/query?milestone=2.73&group=component&order=severity All tickets closed by this release]
-==== Mac ====
-  * Fix crash on non-English localizations
+  * Fix bug where the upload and download arrows and rates would not appear for downloading torrents
+  * Fix bug when displaying the tracker list
 
 === Transmission 2.72 (2012/10/16) ===
 [http://trac.transmissionbt.com/query?milestone=2.72&group=component&order=severity All tickets closed by this release]
