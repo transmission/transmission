@@ -52,7 +52,7 @@ check_streq_impl (const char * file, int line, const char * expected, const char
 }
 
 static inline bool
-check_eq_impl (const char * file, int line, int64_t expected, int64_t actual)
+check_int_eq_impl (const char * file, int line, int64_t expected, int64_t actual)
 {
   const bool pass = expected == actual;
 
@@ -61,6 +61,21 @@ check_eq_impl (const char * file, int line, int64_t expected, int64_t actual)
       fprintf (stderr, "PASS %s:%d\n", file, line);
     else
       fprintf (stderr, "FAIL %s:%d, expected \"%"PRId64"\", got \"%"PRId64"\"\n", file, line, expected, actual);
+  }
+
+  return pass;
+}
+
+static inline bool
+check_ptr_eq_impl (const char * file, int line, const void * expected, const void * actual)
+{
+  const bool pass = expected == actual;
+
+  if (should_print (pass)) {
+    if (pass)
+      fprintf (stderr, "PASS %s:%d\n", file, line);
+    else
+      fprintf (stderr, "FAIL %s:%d, expected \"%p\", got \"%p\"\n", file, line, expected, actual);
   }
 
   return pass;
@@ -87,7 +102,14 @@ check_eq_impl (const char * file, int line, int64_t expected, int64_t actual)
 #define check_int_eq(expected, actual) \
   do { \
     ++current_test; \
-    if (!check_eq_impl (__FILE__, __LINE__, (expected), (actual))) \
+    if (!check_int_eq_impl (__FILE__, __LINE__, (expected), (actual))) \
+      return current_test; \
+  } while (0)
+
+#define check_ptr_eq(expected, actual) \
+  do { \
+    ++current_test; \
+    if (!check_ptr_eq_impl (__FILE__, __LINE__, (expected), (actual))) \
       return current_test; \
   } while (0)
 
