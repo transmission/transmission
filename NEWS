@@ -1,5 +1,5 @@
 === Transmission 2.74 (2012/12/10) ===
-[http://trac.transmissionbt.com/query?milestone=2.72&group=component&order=severity All tickets closed by this release]
+[http://trac.transmissionbt.com/query?milestone=2.74&group=component&order=severity All tickets closed by this release]
 ==== All Platforms ====
   * Fix a bug that prevented IPv6 addresses from being saved in dht.dat
   * Better handling of magnet links that contain 'tr.x=' parameters
