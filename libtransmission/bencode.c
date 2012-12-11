@@ -158,30 +158,32 @@ tr_bencParseStr (const uint8_t *  buf,
     return 0;
 }
 
-/* set to 1 to help expose bugs with tr_bencListAdd and tr_bencDictAdd */
-#define LIST_SIZE 4 /* number of items to increment list/dict buffer by */
-
 static int
-makeroom (tr_benc * val,
-          size_t    count)
+makeroom (tr_benc * container, size_t count)
 {
-    assert (isContainer (val));
+  const size_t needed = container->val.l.count + count;
 
-    if (val->val.l.count + count > val->val.l.alloc)
+  assert (isContainer (container));
+
+  if (needed > container->val.l.alloc)
     {
-        /* We need a bigger boat */
-        const int len = val->val.l.alloc + count +
-                      (count % LIST_SIZE ? LIST_SIZE -
-                        (count % LIST_SIZE) : 0);
-        void * tmp = realloc (val->val.l.vals, len * sizeof (tr_benc));
-        if (!tmp)
-            return 1;
+      size_t n;
+      void * tmp;
 
-        val->val.l.alloc = len;
-        val->val.l.vals  = tmp;
+      /* scale the alloc size in powers-of-2 */
+      n = container->val.l.alloc ? container->val.l.alloc : 8;
+      while (n < needed)
+        n *= 2u;
+
+      tmp = realloc (container->val.l.vals, n * sizeof (tr_benc));
+      if (tmp == NULL)
+        return 1;
+
+      container->val.l.alloc = n;
+      container->val.l.vals = tmp;
     }
 
-    return 0;
+  return 0;
 }
 
 static tr_benc*
@@ -676,7 +678,7 @@ tr_bencListAdd (tr_benc * list)
     assert (tr_bencIsList (list));
 
     if (list->val.l.count == list->val.l.alloc)
-        tr_bencListReserve (list, LIST_SIZE);
+        tr_bencListReserve (list, 4);
 
     assert (list->val.l.count < list->val.l.alloc);
 
