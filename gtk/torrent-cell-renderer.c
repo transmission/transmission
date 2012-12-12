@@ -40,10 +40,10 @@ enum
 ***/
 
 static void
-getProgressString (GString          * gstr,
-                   const tr_torrent * tor,
-                   const tr_info    * info,
-                   const tr_stat    * st)
+getProgressString (GString        * gstr,
+                   tr_torrent     * tor,
+                   const tr_info  * info,
+                   const tr_stat  * st)
 {
     const int      isDone = st->leftUntilDone == 0;
     const uint64_t haveTotal = st->haveUnchecked + st->haveValid;
@@ -443,7 +443,7 @@ get_size_full (TorrentCellRenderer * cell,
     GdkPixbuf * icon;
 
     struct TorrentCellRendererPrivate * p = cell->priv;
-    const tr_torrent * tor = p->tor;
+    tr_torrent * tor = p->tor;
     const tr_stat * st = tr_torrentStatCached ((tr_torrent*)tor);
     const tr_info * inf = tr_torrentInfo (tor);
     GString * gstr_prog = p->gstr1;
@@ -525,33 +525,34 @@ typedef GdkRGBA GtrColor;
 static void
 get_text_color (GtkWidget * w, const tr_stat * st, GtrColor * setme)
 {
-    static const GdkRGBA red = { 1.0, 0, 0, 0 };
-    if (st->error)
-        *setme = red;
-    else if (st->activity == TR_STATUS_STOPPED)
-        gtk_style_context_get_color (gtk_widget_get_style_context (w), GTK_STATE_FLAG_INSENSITIVE, setme);
-    else
-        gtk_style_context_get_color (gtk_widget_get_style_context (w), GTK_STATE_FLAG_NORMAL, setme);
+  static const GdkRGBA red = { 1.0, 0, 0, 0 };
+
+  if (st->error)
+    *setme = red;
+  else if (st->activity == TR_STATUS_STOPPED)
+    gtk_style_context_get_color (gtk_widget_get_style_context (w), GTK_STATE_FLAG_INSENSITIVE, setme);
+  else
+    gtk_style_context_get_color (gtk_widget_get_style_context (w), GTK_STATE_FLAG_NORMAL, setme);
 }
 
 
 static double
-get_percent_done (const tr_torrent * tor, const tr_stat * st, bool * seed)
+get_percent_done (tr_torrent * tor, const tr_stat * st, bool * seed)
 {
-    double d;
+  double d;
 
-    if ((st->activity == TR_STATUS_SEED) && tr_torrentGetSeedRatio (tor, &d))
+  if ((st->activity == TR_STATUS_SEED) && tr_torrentGetSeedRatio (tor, &d))
     {
-        *seed = true;
-        d = MAX (0.0, st->seedRatioPercentDone);
+      *seed = true;
+      d = MAX (0.0, st->seedRatioPercentDone);
     }
-    else
+  else
     {
-        *seed = false;
-        d = MAX (0.0, st->percentDone);
+      *seed = false;
+      d = MAX (0.0, st->percentDone);
     }
 
-    return d;
+  return d;
 }
 
 typedef cairo_t GtrDrawable;
@@ -587,7 +588,7 @@ render_compact (TorrentCellRenderer   * cell,
     bool seed;
 
     struct TorrentCellRendererPrivate * p = cell->priv;
-    const tr_torrent * tor = p->tor;
+    tr_torrent * tor = p->tor;
     const tr_stat * st = tr_torrentStatCached ((tr_torrent*)tor);
     const gboolean active = (st->activity != TR_STATUS_STOPPED) && (st->activity != TR_STATUS_DOWNLOAD_WAIT) && (st->activity != TR_STATUS_SEED_WAIT);
     const double percentDone = get_percent_done (tor, st, &seed);
@@ -665,7 +666,7 @@ render_full (TorrentCellRenderer   * cell,
     bool seed;
 
     struct TorrentCellRendererPrivate * p = cell->priv;
-    const tr_torrent * tor = p->tor;
+    tr_torrent * tor = p->tor;
     const tr_stat * st = tr_torrentStatCached ((tr_torrent*)tor);
     const tr_info * inf = tr_torrentInfo (tor);
     const gboolean active = (st->activity != TR_STATUS_STOPPED) && (st->activity != TR_STATUS_DOWNLOAD_WAIT) && (st->activity != TR_STATUS_SEED_WAIT);

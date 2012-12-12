@@ -225,9 +225,9 @@ void tr_peerMgrAddTorrent (tr_peerMgr         * manager,
 
 void tr_peerMgrRemoveTorrent (tr_torrent * tor);
 
-void tr_peerMgrTorrentAvailability (const tr_torrent * tor,
-                                    int8_t           * tab,
-                                    unsigned int       tabCount);
+void tr_peerMgrTorrentAvailability (tr_torrent   * tor,
+                                    int8_t       * tab,
+                                    unsigned int   tabCount);
 
 uint64_t tr_peerMgrGetDesiredAvailable (const tr_torrent * tor);
 
@@ -242,10 +242,10 @@ void tr_peerMgrTorrentStats (tr_torrent * tor,
                              int * setmePeersGettingFromUs,
                              int * setmePeersFrom); /* TR_PEER_FROM__MAX */
 
-struct tr_peer_stat* tr_peerMgrPeerStats (const tr_torrent * tor,
-                                          int              * setmeCount);
+struct tr_peer_stat* tr_peerMgrPeerStats (tr_torrent * tor,
+                                          int        * setmeCount);
 
-double* tr_peerMgrWebSpeeds_KBps (const tr_torrent * tor);
+double* tr_peerMgrWebSpeeds_KBps (tr_torrent * tor);
 
 
 unsigned int tr_peerGetPieceSpeed_Bps (const tr_peer    * peer,

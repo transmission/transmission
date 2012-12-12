@@ -62,8 +62,8 @@ tr_torrent* tr_torrentFindFromHashString (tr_session * session,
 tr_torrent* tr_torrentFindFromObfuscatedHash (tr_session    * session,
                                               const uint8_t * hash);
 
-bool        tr_torrentIsPieceTransferAllowed (const tr_torrent * torrent,
-                                              tr_direction       direction);
+bool        tr_torrentIsPieceTransferAllowed (tr_torrent    * torrent,
+                                              tr_direction    direction);
 
 
 
@@ -127,7 +127,7 @@ tr_verify_state;
 void             tr_torrentSetVerifyState (tr_torrent      * tor,
                                            tr_verify_state   state);
 
-tr_torrent_activity tr_torrentGetActivity (tr_torrent * tor);
+tr_torrent_activity tr_torrentGetActivity (const tr_torrent * tor);
 
 struct tr_incomplete_metadata;
 
@@ -138,6 +138,8 @@ struct tr_torrent
     tr_info                  info;
 
     int                      magicNumber;
+
+    size_t                   refCount;
 
     tr_stat_errtype          error;
     char                     errorString[128];
@@ -300,10 +302,7 @@ tr_torBlockCountBytes (const tr_torrent * tor, const tr_block_index_t block)
                                         : tor->blockSize;
 }
 
-static inline void tr_torrentLock (const tr_torrent * tor)
-{
-    tr_sessionLock (tor->session);
-}
+bool tr_torrentLock (const tr_torrent * tor);
 
 static inline bool tr_torrentIsLocked (const tr_torrent * tor)
 {
@@ -366,6 +365,7 @@ static inline bool tr_isTorrent (const tr_torrent * tor)
 {
     return (tor != NULL)
         && (tor->magicNumber == TORRENT_MAGIC_NUMBER)
+        && (tor->refCount > 0)
         && (tr_isSession (tor->session));
 }
 

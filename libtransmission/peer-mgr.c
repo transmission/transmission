@@ -2549,36 +2549,42 @@ tr_peerMgrOnTorrentGotMetainfo (tr_torrent * tor)
 }
 
 void
-tr_peerMgrTorrentAvailability (const tr_torrent * tor, int8_t * tab, unsigned int tabCount)
+tr_peerMgrTorrentAvailability (tr_torrent * tor, int8_t * tab, unsigned int tabCount)
 {
-    assert (tr_isTorrent (tor));
-    assert (torrentIsLocked (tor->torrentPeers));
-    assert (tab != NULL);
-    assert (tabCount > 0);
+  assert (tab != NULL);
+  assert (tabCount > 0);
 
-    memset (tab, 0, tabCount);
-
-    if (tr_torrentHasMetadata (tor))
+  if (tr_torrentRef (tor))
     {
-        tr_piece_index_t i;
-        const int peerCount = tr_ptrArraySize (&tor->torrentPeers->peers);
-        const tr_peer ** peers = (const tr_peer**) tr_ptrArrayBase (&tor->torrentPeers->peers);
-        const float interval = tor->info.pieceCount / (float)tabCount;
-        const bool isSeed = tr_cpGetStatus (&tor->completion) == TR_SEED;
+      memset (tab, 0, tabCount);
 
-        for (i=0; i<tabCount; ++i)
+      if (tr_torrentHasMetadata (tor))
         {
-            const int piece = i * interval;
+          tr_piece_index_t i;
+          const int peerCount = tr_ptrArraySize (&tor->torrentPeers->peers);
+          const tr_peer ** peers = (const tr_peer**) tr_ptrArrayBase (&tor->torrentPeers->peers);
+          const float interval = tor->info.pieceCount / (float)tabCount;
+          const bool isSeed = tr_cpGetStatus (&tor->completion) == TR_SEED;
 
-            if (isSeed || tr_cpPieceIsComplete (&tor->completion, piece))
-                tab[i] = -1;
-            else if (peerCount) {
-                int j;
-                for (j=0; j<peerCount; ++j)
+          for (i=0; i<tabCount; ++i)
+            {
+              const int piece = i * interval;
+
+              if (isSeed || tr_cpPieceIsComplete (&tor->completion, piece))
+                {
+                  tab[i] = -1;
+                }
+              else if (peerCount)
+                {
+                  int j;
+                  for (j=0; j<peerCount; ++j)
                     if (tr_bitfieldHas (&peers[j]->have, piece))
-                        ++tab[i];
+                      ++tab[i];
+                }
             }
         }
+
+      tr_torrentUnref (tor);
     }
 }
 
@@ -2643,69 +2649,76 @@ tr_peerMgrTorrentStats (tr_torrent  * tor,
                         int         * setmePeersGettingFromUs,
                         int         * setmePeersFrom)
 {
-    int i, size;
-    const Torrent * t = tor->torrentPeers;
-    const tr_peer ** peers;
+  *setmePeersConnected       = 0;
+  *setmePeersGettingFromUs   = 0;
+  *setmePeersSendingToUs     = 0;
+  *setmeWebseedsSendingToUs  = 0;
 
-    assert (tr_torrentIsLocked (tor));
+  if (tr_torrentRef (tor))
+    {
+      int i;
+      const Torrent * t = tor->torrentPeers;
+      const int size = tr_ptrArraySize (&t->peers);
+      const tr_peer ** peers = (const tr_peer **) tr_ptrArrayBase (&t->peers);
 
-    peers = (const tr_peer **) tr_ptrArrayBase (&t->peers);
-    size = tr_ptrArraySize (&t->peers);
-
-    *setmePeersConnected       = 0;
-    *setmePeersGettingFromUs   = 0;
-    *setmePeersSendingToUs     = 0;
-    *setmeWebseedsSendingToUs  = 0;
-
-    for (i=0; i<TR_PEER_FROM__MAX; ++i)
+      for (i=0; i<TR_PEER_FROM__MAX; ++i)
         setmePeersFrom[i] = 0;
 
-    for (i=0; i<size; ++i)
-    {
-        const tr_peer * peer = peers[i];
-        const struct peer_atom * atom = peer->atom;
+      for (i=0; i<size; ++i)
+        {
+          const tr_peer * peer = peers[i];
+          const struct peer_atom * atom = peer->atom;
 
-        if (peer->io == NULL) /* not connected */
+          if (peer->io == NULL) /* not connected */
             continue;
 
-        ++*setmePeersConnected;
+          ++*setmePeersConnected;
 
-        ++setmePeersFrom[atom->fromFirst];
+          ++setmePeersFrom[atom->fromFirst];
 
-        if (clientIsDownloadingFrom (tor, peer))
+          if (clientIsDownloadingFrom (tor, peer))
             ++*setmePeersSendingToUs;
 
-        if (clientIsUploadingTo (peer))
+          if (clientIsUploadingTo (peer))
             ++*setmePeersGettingFromUs;
-    }
+        }
 
-    *setmeWebseedsSendingToUs = countActiveWebseeds (t);
+      *setmeWebseedsSendingToUs = countActiveWebseeds (t);
+      tr_torrentUnref (tor);
+    }
 }
 
 double*
-tr_peerMgrWebSpeeds_KBps (const tr_torrent * tor)
+tr_peerMgrWebSpeeds_KBps (tr_torrent * tor)
 {
-    int i;
-    const Torrent * t = tor->torrentPeers;
-    const int webseedCount = tr_ptrArraySize (&t->webseeds);
-    const tr_webseed ** webseeds = (const tr_webseed**) tr_ptrArrayBase (&t->webseeds);
-    const uint64_t now = tr_time_msec ();
-    double * ret = tr_new0 (double, webseedCount);
+  double * ret = NULL;
 
-    assert (tr_isTorrent (tor));
-    assert (tr_torrentIsLocked (tor));
-    assert (t->manager != NULL);
-    assert (webseedCount == tor->info.webseedCount);
+  if (tr_torrentRef (tor))
+    {
+      int i;
+      const Torrent * t = tor->torrentPeers;
+      const int webseedCount = tr_ptrArraySize (&t->webseeds);
+      const tr_webseed ** webseeds = (const tr_webseed**) tr_ptrArrayBase (&t->webseeds);
+      const uint64_t now = tr_time_msec ();
 
-    for (i=0; i<webseedCount; ++i) {
-        unsigned int Bps;
-        if (tr_webseedGetSpeed_Bps (webseeds[i], now, &Bps))
+      ret = tr_new0 (double, webseedCount);
+
+      assert (t->manager != NULL);
+      assert (webseedCount == tor->info.webseedCount);
+
+      for (i=0; i<webseedCount; ++i)
+        {
+          unsigned int Bps;
+          if (tr_webseedGetSpeed_Bps (webseeds[i], now, &Bps))
             ret[i] = Bps / (double)tr_speed_K;
-        else
+          else
             ret[i] = -1.0;
+        }
+
+      tr_torrentUnref (tor);
     }
 
-    return ret;
+  return ret;
 }
 
 unsigned int
@@ -2715,73 +2728,78 @@ tr_peerGetPieceSpeed_Bps (const tr_peer * peer, uint64_t now, tr_direction direc
 }
 
 struct tr_peer_stat *
-tr_peerMgrPeerStats (const tr_torrent * tor, int * setmeCount)
+tr_peerMgrPeerStats (tr_torrent * tor, int * setmeCount)
 {
-    int i;
-    const Torrent * t = tor->torrentPeers;
-    const int size = tr_ptrArraySize (&t->peers);
-    const tr_peer ** peers = (const tr_peer**) tr_ptrArrayBase (&t->peers);
-    const uint64_t now_msec = tr_time_msec ();
-    const time_t now = tr_time ();
-    tr_peer_stat * ret = tr_new0 (tr_peer_stat, size);
+  int size = 0;
+  tr_peer_stat * ret = NULL;
 
-    assert (tr_isTorrent (tor));
-    assert (tr_torrentIsLocked (tor));
-    assert (t->manager);
-
-    for (i=0; i<size; ++i)
+  if (tr_torrentRef (tor))
     {
-        char *                   pch;
-        const tr_peer *          peer = peers[i];
-        const struct peer_atom * atom = peer->atom;
-        tr_peer_stat *           stat = ret + i;
+      int i;
+      const Torrent * t = tor->torrentPeers;
+      const tr_peer ** peers = (const tr_peer**) tr_ptrArrayBase (&t->peers);
+      const uint64_t now_msec = tr_time_msec ();
+      const time_t now = tr_time ();
 
-        tr_address_to_string_with_buf (&atom->addr, stat->addr, sizeof (stat->addr));
-        tr_strlcpy (stat->client, (peer->client ? peer->client : ""),
-                   sizeof (stat->client));
-        stat->port                = ntohs (peer->atom->port);
-        stat->from                = atom->fromFirst;
-        stat->progress            = peer->progress;
-        stat->isUTP               = peer->io->utp_socket != NULL;
-        stat->isEncrypted         = tr_peerIoIsEncrypted (peer->io) ? 1 : 0;
-        stat->rateToPeer_KBps     = toSpeedKBps (tr_peerGetPieceSpeed_Bps (peer, now_msec, TR_CLIENT_TO_PEER));
-        stat->rateToClient_KBps   = toSpeedKBps (tr_peerGetPieceSpeed_Bps (peer, now_msec, TR_PEER_TO_CLIENT));
-        stat->peerIsChoked        = peer->peerIsChoked;
-        stat->peerIsInterested    = peer->peerIsInterested;
-        stat->clientIsChoked      = peer->clientIsChoked;
-        stat->clientIsInterested  = peer->clientIsInterested;
-        stat->isIncoming          = tr_peerIoIsIncoming (peer->io);
-        stat->isDownloadingFrom   = clientIsDownloadingFrom (tor, peer);
-        stat->isUploadingTo       = clientIsUploadingTo (peer);
-        stat->isSeed              = peerIsSeed (peer);
+      assert (t->manager != NULL);
 
-        stat->blocksToPeer        = tr_historyGet (&peer->blocksSentToPeer,    now, CANCEL_HISTORY_SEC);
-        stat->blocksToClient      = tr_historyGet (&peer->blocksSentToClient,  now, CANCEL_HISTORY_SEC);
-        stat->cancelsToPeer       = tr_historyGet (&peer->cancelsSentToPeer,   now, CANCEL_HISTORY_SEC);
-        stat->cancelsToClient     = tr_historyGet (&peer->cancelsSentToClient, now, CANCEL_HISTORY_SEC);
+      size = tr_ptrArraySize (&t->peers);
+      ret = tr_new0 (tr_peer_stat, size);
 
-        stat->pendingReqsToPeer   = peer->pendingReqsToPeer;
-        stat->pendingReqsToClient = peer->pendingReqsToClient;
+      for (i=0; i<size; ++i)
+        {
+          char *                   pch;
+          const tr_peer *          peer = peers[i];
+          const struct peer_atom * atom = peer->atom;
+          tr_peer_stat *           stat = ret + i;
 
-        pch = stat->flagStr;
-        if (stat->isUTP) *pch++ = 'T';
-        if (t->optimistic == peer) *pch++ = 'O';
-        if (stat->isDownloadingFrom) *pch++ = 'D';
-        else if (stat->clientIsInterested) *pch++ = 'd';
-        if (stat->isUploadingTo) *pch++ = 'U';
-        else if (stat->peerIsInterested) *pch++ = 'u';
-        if (!stat->clientIsChoked && !stat->clientIsInterested) *pch++ = 'K';
-        if (!stat->peerIsChoked && !stat->peerIsInterested) *pch++ = '?';
-        if (stat->isEncrypted) *pch++ = 'E';
-        if (stat->from == TR_PEER_FROM_DHT) *pch++ = 'H';
-        else if (stat->from == TR_PEER_FROM_PEX) *pch++ = 'X';
-        if (stat->isIncoming) *pch++ = 'I';
-        *pch = '\0';
+          tr_address_to_string_with_buf (&atom->addr, stat->addr, sizeof (stat->addr));
+          tr_strlcpy (stat->client, (peer->client ? peer->client : ""), sizeof (stat->client));
+          stat->port                = ntohs (peer->atom->port);
+          stat->from                = atom->fromFirst;
+          stat->progress            = peer->progress;
+          stat->isUTP               = peer->io->utp_socket != NULL;
+          stat->isEncrypted         = tr_peerIoIsEncrypted (peer->io) ? 1 : 0;
+          stat->rateToPeer_KBps     = toSpeedKBps (tr_peerGetPieceSpeed_Bps (peer, now_msec, TR_CLIENT_TO_PEER));
+          stat->rateToClient_KBps   = toSpeedKBps (tr_peerGetPieceSpeed_Bps (peer, now_msec, TR_PEER_TO_CLIENT));
+          stat->peerIsChoked        = peer->peerIsChoked;
+          stat->peerIsInterested    = peer->peerIsInterested;
+          stat->clientIsChoked      = peer->clientIsChoked;
+          stat->clientIsInterested  = peer->clientIsInterested;
+          stat->isIncoming          = tr_peerIoIsIncoming (peer->io);
+          stat->isDownloadingFrom   = clientIsDownloadingFrom (tor, peer);
+          stat->isUploadingTo       = clientIsUploadingTo (peer);
+          stat->isSeed              = peerIsSeed (peer);
+
+          stat->blocksToPeer        = tr_historyGet (&peer->blocksSentToPeer,    now, CANCEL_HISTORY_SEC);
+          stat->blocksToClient      = tr_historyGet (&peer->blocksSentToClient,  now, CANCEL_HISTORY_SEC);
+          stat->cancelsToPeer       = tr_historyGet (&peer->cancelsSentToPeer,   now, CANCEL_HISTORY_SEC);
+          stat->cancelsToClient     = tr_historyGet (&peer->cancelsSentToClient, now, CANCEL_HISTORY_SEC);
+
+          stat->pendingReqsToPeer   = peer->pendingReqsToPeer;
+          stat->pendingReqsToClient = peer->pendingReqsToClient;
+
+          pch = stat->flagStr;
+          if (stat->isUTP) *pch++ = 'T';
+          if (t->optimistic == peer) *pch++ = 'O';
+          if (stat->isDownloadingFrom) *pch++ = 'D';
+          else if (stat->clientIsInterested) *pch++ = 'd';
+          if (stat->isUploadingTo) *pch++ = 'U';
+          else if (stat->peerIsInterested) *pch++ = 'u';
+          if (!stat->clientIsChoked && !stat->clientIsInterested) *pch++ = 'K';
+          if (!stat->peerIsChoked && !stat->peerIsInterested) *pch++ = '?';
+          if (stat->isEncrypted) *pch++ = 'E';
+          if (stat->from == TR_PEER_FROM_DHT) *pch++ = 'H';
+          else if (stat->from == TR_PEER_FROM_PEX) *pch++ = 'X';
+          if (stat->isIncoming) *pch++ = 'I';
+          *pch = '\0';
+        }
+
+      tr_torrentUnref (tor);
     }
 
-    *setmeCount = size;
-
-    return ret;
+  *setmeCount = size;
+  return ret;
 }
 
 /***
@@ -2808,24 +2826,24 @@ tr_peerMgrClearInterest (tr_torrent * tor)
 
 /* does this peer have any pieces that we want? */
 static bool
-isPeerInteresting (const tr_torrent  * const tor,
-                   const bool        * const piece_is_interesting,
-                   const tr_peer     * const peer)
+isPeerInteresting (tr_torrent     * const tor,
+                   const bool     * const piece_is_interesting,
+                   const tr_peer  * const peer)
 {
-    tr_piece_index_t i, n;
+  tr_piece_index_t i, n;
 
-    /* these cases should have already been handled by the calling code... */
-    assert (!tr_torrentIsSeed (tor));
-    assert (tr_torrentIsPieceTransferAllowed (tor, TR_PEER_TO_CLIENT));
+  /* these cases should have already been handled by the calling code... */
+  assert (!tr_torrentIsSeed (tor));
+  assert (tr_torrentIsPieceTransferAllowed (tor, TR_PEER_TO_CLIENT));
 
-    if (peerIsSeed (peer))
-        return true;
+  if (peerIsSeed (peer))
+    return true;
 
-    for (i=0, n=tor->info.pieceCount; i<n; ++i)
-        if (piece_is_interesting[i] && tr_bitfieldHas (&peer->have, i))
-            return true;
+  for (i=0, n=tor->info.pieceCount; i<n; ++i)
+    if (piece_is_interesting[i] && tr_bitfieldHas (&peer->have, i))
+      return true;
 
-    return false;
+  return false;
 }
 
 typedef enum

@@ -1376,7 +1376,7 @@ refreshWebseedList (struct DetailsImpl * di, tr_torrent ** torrents, int n)
     /* step 3: update the webseeds */
     for (i=0; i<n; ++i) {
         int j;
-        const tr_torrent * tor = torrents[i];
+        tr_torrent * tor = torrents[i];
         const tr_info * inf = tr_torrentInfo (tor);
         double * speeds_KBps = tr_torrentWebSpeeds_KBps (tor);
         for (j=0; j<inf->webseedCount; ++j) {

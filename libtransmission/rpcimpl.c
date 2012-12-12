@@ -512,16 +512,15 @@ addTrackerStats (const tr_tracker_stat * st, int n, tr_benc * list)
 }
 
 static void
-addPeers (const tr_torrent * tor,
-          tr_benc *          list)
+addPeers (tr_torrent * tor, tr_benc * list)
 {
-    int            i;
-    int            peerCount;
-    tr_peer_stat * peers = tr_torrentPeers (tor, &peerCount);
+  int i;
+  int peerCount;
+  tr_peer_stat * peers = tr_torrentPeers (tor, &peerCount);
 
-    tr_bencInitList (list, peerCount);
+  tr_bencInitList (list, peerCount);
 
-    for (i = 0; i < peerCount; ++i)
+  for (i=0; i<peerCount; ++i)
     {
         tr_benc *            d = tr_bencListAddDict (list, 16);
         const tr_peer_stat * peer = peers + i;
@@ -552,7 +551,7 @@ addPeers (const tr_torrent * tor,
 #define tr_streq(a,alen,b)((alen+1==sizeof (b)) && !memcmp (a,b,alen))
 
 static void
-addField (const tr_torrent * const tor,
+addField (tr_torrent       * const tor,
           const tr_info    * const inf,
           const tr_stat    * const st,
           tr_benc          * const d,
@@ -734,7 +733,7 @@ addField (const tr_torrent * const tor,
 }
 
 static void
-addInfo (const tr_torrent * tor, tr_benc * d, tr_benc * fields)
+addInfo (tr_torrent * tor, tr_benc * d, tr_benc * fields)
 {
     const char * str;
     const int n = tr_bencListSize (fields);

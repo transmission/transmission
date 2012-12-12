@@ -263,7 +263,7 @@ loadFilePriorities (tr_benc * dict, tr_torrent * tor)
 ***/
 
 static void
-saveSingleSpeedLimit (tr_benc * d, const tr_torrent * tor, tr_direction dir)
+saveSingleSpeedLimit (tr_benc * d, tr_torrent * tor, tr_direction dir)
 {
     tr_bencDictReserve (d, 3);
     tr_bencDictAddInt (d, KEY_SPEED_Bps, tr_torrentGetSpeedLimit_Bps (tor, dir));
@@ -272,14 +272,14 @@ saveSingleSpeedLimit (tr_benc * d, const tr_torrent * tor, tr_direction dir)
 }
 
 static void
-saveSpeedLimits (tr_benc * dict, const tr_torrent * tor)
+saveSpeedLimits (tr_benc * dict, tr_torrent * tor)
 {
     saveSingleSpeedLimit (tr_bencDictAddDict (dict, KEY_SPEEDLIMIT_DOWN, 0), tor, TR_DOWN);
     saveSingleSpeedLimit (tr_bencDictAddDict (dict, KEY_SPEEDLIMIT_UP, 0), tor, TR_UP);
 }
 
 static void
-saveRatioLimits (tr_benc * dict, const tr_torrent * tor)
+saveRatioLimits (tr_benc * dict, tr_torrent * tor)
 {
     tr_benc * d = tr_bencDictAddDict (dict, KEY_RATIOLIMIT, 2);
     tr_bencDictAddReal (d, KEY_RATIOLIMIT_RATIO, tr_torrentGetRatioLimit (tor));
@@ -287,7 +287,7 @@ saveRatioLimits (tr_benc * dict, const tr_torrent * tor)
 }
 
 static void
-saveIdleLimits (tr_benc * dict, const tr_torrent * tor)
+saveIdleLimits (tr_benc * dict, tr_torrent * tor)
 {
     tr_benc * d = tr_bencDictAddDict (dict, KEY_IDLELIMIT, 2);
     tr_bencDictAddInt (d, KEY_IDLELIMIT_MINS, tr_torrentGetIdleLimit (tor));

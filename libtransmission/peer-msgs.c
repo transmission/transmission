@@ -1666,7 +1666,7 @@ tr_peerMsgsIsReadingBlock (const tr_peermsgs * msgs, tr_block_index_t block)
 static void
 updateDesiredRequestCount (tr_peermsgs * msgs)
 {
-    const tr_torrent * const torrent = msgs->torrent;
+    tr_torrent * const torrent = msgs->torrent;
 
     /* there are lots of reasons we might not want to request any blocks... */
     if (tr_torrentIsSeed (torrent) || !tr_torrentHasMetadata (torrent)

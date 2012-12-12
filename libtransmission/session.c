@@ -1766,7 +1766,7 @@ sessionCloseImpl (void * vsession)
         torrents[i] = tor = tr_torrentNext (session, tor);
     qsort (torrents, n, sizeof (tr_torrent*), compareTorrentByCur);
     for (i = 0; i < n; ++i)
-        tr_torrentFree (torrents[i]);
+        tr_torrentUnref (torrents[i]);
     tr_free (torrents);
 
     /* Close the announcer *after* closing the torrents
