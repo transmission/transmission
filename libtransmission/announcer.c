@@ -1585,7 +1585,6 @@ tr_announcerStats (const tr_torrent * torrent, int * setmeTrackerCount)
     const time_t now = tr_time ();
 
     assert (tr_isTorrent (torrent));
-    assert (tr_torrentIsLocked (torrent));
 
     tt = torrent->tiers;
 

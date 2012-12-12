@@ -359,7 +359,6 @@ getExistingAtom (const Torrent    * t,
                  const tr_address * addr)
 {
     Torrent * tt = (Torrent*)t;
-    assert (torrentIsLocked (t));
     return tr_ptrArrayFindSorted (&tt->pool, addr, comparePeerAtomToAddress);
 }
 
