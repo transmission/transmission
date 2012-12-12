@@ -173,6 +173,8 @@ tr_torrentIsPieceTransferAllowed (tr_torrent   * tor,
         if (tr_sessionGetActiveSpeedLimit_Bps (tor->session, direction, &limit))
           if (limit <= 0)
             allowed = false;
+
+      tr_torrentUnref (tor);
     }
 
   return allowed;
@@ -1876,7 +1878,11 @@ tr_torrentUnref (tr_torrent * tor)
 {
   assert (tr_isTorrent (tor));
 
-  if (--tor->refCount == 0)
+  if (tor->refCount > 1)
+    {
+      --tor->refCount;
+    }
+  else if (tor->refCount == 1)
     {
       tr_session * session = tor->session;
 
@@ -1884,6 +1890,8 @@ tr_torrentUnref (tr_torrent * tor)
       tr_torrentClearCompletenessCallback (tor);
       tr_runInEventThread (session, closeTorrent, tor);
       tr_sessionUnlock (session);
+
+      --tor->refCount;
     }
 }
 
