@@ -12,7 +12,7 @@ static int current_test = 0;
 #define REPORT_TEST(test, result) \
     fprintf (stderr, "%s %s:%d\n", result, __FILE__, __LINE__)
 
-static inline bool
+static bool
 should_print (bool pass)
 {
   if (!pass)
@@ -25,7 +25,7 @@ should_print (bool pass)
 #endif
 }
 
-static inline bool
+static bool
 check_condition_impl (const char * file, int line, bool condition)
 {
   const bool pass = condition;
@@ -36,7 +36,7 @@ check_condition_impl (const char * file, int line, bool condition)
   return pass;
 }
 
-static inline bool
+static bool
 check_streq_impl (const char * file, int line, const char * expected, const char * actual)
 {
   const bool pass = !tr_strcmp0 (expected, actual);
@@ -51,7 +51,7 @@ check_streq_impl (const char * file, int line, const char * expected, const char
   return pass;
 }
 
-static inline bool
+static bool
 check_int_eq_impl (const char * file, int line, int64_t expected, int64_t actual)
 {
   const bool pass = expected == actual;
@@ -66,7 +66,7 @@ check_int_eq_impl (const char * file, int line, int64_t expected, int64_t actual
   return pass;
 }
 
-static inline bool
+static bool
 check_ptr_eq_impl (const char * file, int line, const void * expected, const void * actual)
 {
   const bool pass = expected == actual;
@@ -120,7 +120,7 @@ check_ptr_eq_impl (const char * file, int line, const void * expected, const voi
 typedef int (*testFunc)(void);
 #define NUM_TESTS(tarray)((int)(sizeof (tarray)/sizeof (tarray[0])))
 
-static inline int
+static int
 runTests (const testFunc * const tests, int numTests)
 {
     int ret, i;

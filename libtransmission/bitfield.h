@@ -98,19 +98,6 @@ tr_bitfieldHasNone (const tr_bitfield * b)
   return b->bit_count ? (b->true_count == 0) : b->have_none_hint;
 }
 
-static inline bool
-tr_bitfieldHas (const tr_bitfield * b, size_t n)
-{
-  if (tr_bitfieldHasAll (b))
-    return true;
-
-  if (tr_bitfieldHasNone (b))
-    return false;
-
-  if (n>>3u >= b->alloc_count)
-    return false;
-
-  return (b->bits[n>>3u] << (n & 7u) & 0x80) != 0;
-}
+bool tr_bitfieldHas (const tr_bitfield * b, size_t n);
 
 #endif
