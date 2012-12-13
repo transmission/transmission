@@ -1,3 +1,8 @@
+=== Transmission 2.75 (2012/12/13) ===
+[http://trac.transmissionbt.com/query?milestone=2.75&group=component&order=severity All tickets closed by this release]
+==== Mac ====
+  * Fix crash on non-English localizations
+
 === Transmission 2.74 (2012/12/10) ===
 [http://trac.transmissionbt.com/query?milestone=2.74&group=component&order=severity All tickets closed by this release]
 ==== All Platforms ====
@@ -14,6 +19,11 @@
   * Fix a multi-file selection bug
   * Fix bug where the upload and download arrows and rates would not appear for downloading torrents
   * Fix bug when displaying the tracker list
+
+=== Transmission 2.73 (2012/10/08) ===
+[http://trac.transmissionbt.com/query?milestone=2.73&group=component&order=severity All tickets closed by this release]
+==== Mac ====
+  * Fix crash on non-English localizations
 
 === Transmission 2.72 (2012/10/16) ===
 [http://trac.transmissionbt.com/query?milestone=2.72&group=component&order=severity All tickets closed by this release]
