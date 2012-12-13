@@ -540,10 +540,10 @@ callback (void *ignore UNUSED, int event,
         tr_torrent * tor = tr_torrentFindFromHash (session, info_hash);
         if (tor) {
             if (event == DHT_EVENT_SEARCH_DONE) {
-                tr_torinf (tor, "IPv4 DHT announce done");
+                tr_torinf (tor, "%s", "IPv4 DHT announce done");
                 tor->dhtAnnounceInProgress = 0;
             } else {
-                tr_torinf (tor, "IPv6 DHT announce done");
+                tr_torinf (tor, "%s", "IPv6 DHT announce done");
                 tor->dhtAnnounce6InProgress = 0;
             }
         }

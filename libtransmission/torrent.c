@@ -488,7 +488,7 @@ tr_torrentCheckSeedLimit (tr_torrent * tor)
     /* if we're seeding and reach our seed ratio limit, stop the torrent */
     if (tr_torrentIsSeedRatioDone (tor))
     {
-        tr_torinf (tor, "Seed ratio reached; pausing torrent");
+        tr_torinf (tor, "%s", "Seed ratio reached; pausing torrent");
 
         tor->isStopping = true;
 
@@ -499,7 +499,7 @@ tr_torrentCheckSeedLimit (tr_torrent * tor)
     /* if we're seeding and reach our inactiviy limit, stop the torrent */
     else if (tr_torrentIsSeedIdleLimitDone (tor))
     {
-        tr_torinf (tor, "Seeding idle limit reached; pausing torrent");
+        tr_torinf (tor, "%s", "Seeding idle limit reached; pausing torrent");
 
         tor->isStopping = true;
         tor->finishedSeedingByIdle = true;
@@ -1708,7 +1708,7 @@ torrentStart (tr_torrent * tor, bool bypass_queue)
 
     /* allow finished torrents to be resumed */
     if (tr_torrentIsSeedRatioDone (tor)) {
-        tr_torinf (tor, _("Restarted manually -- disabling its seed ratio"));
+        tr_torinf (tor, "%s", _("Restarted manually -- disabling its seed ratio"));
         tr_torrentSetRatioMode (tor, TR_RATIOLIMIT_UNLIMITED);
     }
 
@@ -1810,7 +1810,7 @@ static void
 stopTorrent (void * vtor)
 {
   tr_torrent * tor = vtor;
-  tr_torinf (tor, "Pausing");
+  tr_torinf (tor, "%s", "Pausing");
 
   if (tr_torrentLock (tor))
     {
