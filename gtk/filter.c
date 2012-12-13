@@ -482,36 +482,40 @@ category_combo_box_new (GtkTreeModel * tmodel)
     GtkWidget * c;
     GtkCellRenderer * r;
     GtkTreeModel * cat_model;
+    GtkCellLayout * c_cell_layout;
+    GtkComboBox * c_combo_box;
 
     /* create the category combobox */
     cat_model = category_filter_model_new (tmodel);
     c = gtk_combo_box_new_with_model (cat_model);
+    c_combo_box = GTK_COMBO_BOX (c);
+    c_cell_layout = GTK_CELL_LAYOUT (c);
     g_object_unref (cat_model);
-    gtk_combo_box_set_row_separator_func (GTK_COMBO_BOX (c),
+    gtk_combo_box_set_row_separator_func (c_combo_box,
                                           is_it_a_separator, NULL, NULL);
-    gtk_combo_box_set_active (GTK_COMBO_BOX (c), 0);
+    gtk_combo_box_set_active (c_combo_box, 0);
 
     r = gtk_cell_renderer_pixbuf_new ();
-    gtk_cell_layout_pack_start (GTK_CELL_LAYOUT (c), r, FALSE);
-    gtk_cell_layout_set_cell_data_func (GTK_CELL_LAYOUT (c), r,
+    gtk_cell_layout_pack_start (c_cell_layout, r, FALSE);
+    gtk_cell_layout_set_cell_data_func (c_cell_layout, r,
                                         render_pixbuf_func, NULL, NULL);
-    gtk_cell_layout_set_attributes (GTK_CELL_LAYOUT (c), r,
+    gtk_cell_layout_set_attributes (c_cell_layout, r,
                                     "pixbuf", CAT_FILTER_COL_PIXBUF,
                                     NULL);
 
     r = gtk_cell_renderer_text_new ();
-    gtk_cell_layout_pack_start (GTK_CELL_LAYOUT (c), r, FALSE);
-    gtk_cell_layout_set_attributes (GTK_CELL_LAYOUT (c), r,
+    gtk_cell_layout_pack_start (c_cell_layout, r, FALSE);
+    gtk_cell_layout_set_attributes (c_cell_layout, r,
                                     "text", CAT_FILTER_COL_NAME,
                                     NULL);
-    gtk_cell_layout_set_cell_data_func (GTK_CELL_LAYOUT (c), r,
+    gtk_cell_layout_set_cell_data_func (c_cell_layout, r,
                                         is_capital_sensitive,
                                         NULL, NULL);
 
 
     r = number_renderer_new ();
-    gtk_cell_layout_pack_end (GTK_CELL_LAYOUT (c), r, TRUE);
-    gtk_cell_layout_set_cell_data_func (GTK_CELL_LAYOUT (c), r,
+    gtk_cell_layout_pack_end (c_cell_layout, r, TRUE);
+    gtk_cell_layout_set_cell_data_func (c_cell_layout, r,
                                         render_number_func, NULL, NULL);
 
     g_object_weak_ref (G_OBJECT (cat_model), disconnect_cat_model_callbacks, tmodel);
@@ -788,31 +792,35 @@ activity_combo_box_new (GtkTreeModel * tmodel)
     GtkWidget * c;
     GtkCellRenderer * r;
     GtkTreeModel * activity_model;
+    GtkComboBox * c_combo_box;
+    GtkCellLayout * c_cell_layout;
 
     activity_model = activity_filter_model_new (tmodel);
     c = gtk_combo_box_new_with_model (activity_model);
+    c_combo_box = GTK_COMBO_BOX (c);
+    c_cell_layout = GTK_CELL_LAYOUT (c);
     g_object_unref (activity_model);
-    gtk_combo_box_set_row_separator_func (GTK_COMBO_BOX (c),
-                                       activity_is_it_a_separator, NULL, NULL);
-    gtk_combo_box_set_active (GTK_COMBO_BOX (c), 0);
+    gtk_combo_box_set_row_separator_func (c_combo_box,
+                                          activity_is_it_a_separator, NULL, NULL);
+    gtk_combo_box_set_active (c_combo_box, 0);
 
     r = gtk_cell_renderer_pixbuf_new ();
-    gtk_cell_layout_pack_start (GTK_CELL_LAYOUT (c), r, FALSE);
-    gtk_cell_layout_set_attributes (GTK_CELL_LAYOUT (c), r,
+    gtk_cell_layout_pack_start (c_cell_layout, r, FALSE);
+    gtk_cell_layout_set_attributes (c_cell_layout, r,
                                     "stock-id", ACTIVITY_FILTER_COL_STOCK_ID,
                                     NULL);
-    gtk_cell_layout_set_cell_data_func (GTK_CELL_LAYOUT (c), r,
+    gtk_cell_layout_set_cell_data_func (c_cell_layout, r,
                                         render_activity_pixbuf_func, NULL, NULL);
 
     r = gtk_cell_renderer_text_new ();
-    gtk_cell_layout_pack_start (GTK_CELL_LAYOUT (c), r, TRUE);
-    gtk_cell_layout_set_attributes (GTK_CELL_LAYOUT (c), r,
+    gtk_cell_layout_pack_start (c_cell_layout, r, TRUE);
+    gtk_cell_layout_set_attributes (c_cell_layout, r,
                                     "text", ACTIVITY_FILTER_COL_NAME,
                                     NULL);
 
     r = number_renderer_new ();
-    gtk_cell_layout_pack_end (GTK_CELL_LAYOUT (c), r, TRUE);
-    gtk_cell_layout_set_cell_data_func (GTK_CELL_LAYOUT (c), r,
+    gtk_cell_layout_pack_end (c_cell_layout, r, TRUE);
+    gtk_cell_layout_set_cell_data_func (c_cell_layout, r,
                                         render_number_func, NULL, NULL);
 
     g_object_weak_ref (G_OBJECT (activity_model), disconnect_activity_model_callbacks, tmodel);
@@ -963,6 +971,7 @@ gtr_filter_bar_new (tr_session * session, GtkTreeModel * tmodel, GtkTreeModel **
     GtkWidget * s;
     GtkWidget * activity;
     GtkWidget * category;
+    GtkBox * h_box;
     const char * str;
     struct filter_data * data;
 
@@ -989,6 +998,7 @@ gtr_filter_bar_new (tr_session * session, GtkTreeModel * tmodel, GtkTreeModel **
 
 
     h = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, GUI_PAD_SMALL);
+    h_box = GTK_BOX (h);
 
     /* add the activity combobox */
     str = _("_Show:");
@@ -996,28 +1006,28 @@ gtr_filter_bar_new (tr_session * session, GtkTreeModel * tmodel, GtkTreeModel **
     l = gtk_label_new (NULL);
     gtk_label_set_markup_with_mnemonic (GTK_LABEL (l), str);
     gtk_label_set_mnemonic_widget (GTK_LABEL (l), w);
-    gtk_box_pack_start (GTK_BOX (h), l, FALSE, FALSE, 0);
-    gtk_box_pack_start (GTK_BOX (h), w, TRUE, TRUE, 0);
+    gtk_box_pack_start (h_box, l, FALSE, FALSE, 0);
+    gtk_box_pack_start (h_box, w, TRUE, TRUE, 0);
 
     /* add a spacer */
     w = gtk_alignment_new (0.0f, 0.0f, 0.0f, 0.0f);
     gtk_widget_set_size_request (w, 0u, GUI_PAD_BIG);
-    gtk_box_pack_start (GTK_BOX (h), w, FALSE, FALSE, 0);
+    gtk_box_pack_start (h_box, w, FALSE, FALSE, 0);
 
     /* add the category combobox */
     w = category;
-    gtk_box_pack_start (GTK_BOX (h), w, TRUE, TRUE, 0);
+    gtk_box_pack_start (h_box, w, TRUE, TRUE, 0);
 
     /* add a spacer */
     w = gtk_alignment_new (0.0f, 0.0f, 0.0f, 0.0f);
     gtk_widget_set_size_request (w, 0u, GUI_PAD_BIG);
-    gtk_box_pack_start (GTK_BOX (h), w, FALSE, FALSE, 0);
+    gtk_box_pack_start (h_box, w, FALSE, FALSE, 0);
 
     /* add the entry field */
     s = gtk_entry_new ();
     gtk_entry_set_icon_from_stock (GTK_ENTRY (s), GTK_ENTRY_ICON_SECONDARY, GTK_STOCK_CLEAR);
     g_signal_connect (s, "icon-release", G_CALLBACK (entry_clear), NULL);
-    gtk_box_pack_start (GTK_BOX (h), s, TRUE, TRUE, 0);
+    gtk_box_pack_start (h_box, s, TRUE, TRUE, 0);
 
     g_signal_connect (s, "changed", G_CALLBACK (filter_entry_changed), data->filter_model);
     selection_changed_cb (NULL, data);

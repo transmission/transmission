@@ -51,10 +51,10 @@ typedef struct
     GtkWidget *           filter;
     GtkWidget *           status;
     GtkWidget *           status_menu;
-    GtkWidget *           ul_lb;
-    GtkWidget *           dl_lb;
-    GtkWidget *           stats_lb;
-    GtkWidget *           gutter_lb;
+    GtkLabel  *           ul_lb;
+    GtkLabel  *           dl_lb;
+    GtkLabel  *           stats_lb;
+    GtkLabel  *           gutter_lb;
     GtkWidget *           alt_speed_image;
     GtkWidget *           alt_speed_button;
     GtkWidget *           options_menu;
@@ -412,26 +412,28 @@ createSpeedMenu (PrivateData * p, tr_direction dir)
 {
     int i, n;
     GtkWidget *w, *m;
+    GtkMenuShell * menu_shell;
     const int speeds_KBps[] = { 5, 10, 20, 30, 40, 50, 75, 100, 150, 200, 250, 500, 750 };
 
     m = gtk_menu_new ();
+    menu_shell = GTK_MENU_SHELL (m);
 
     w = gtk_radio_menu_item_new_with_label (NULL, _("Unlimited"));
     p->speedlimit_off_item[dir] = w;
     g_object_set_data (G_OBJECT (w), DIRECTION_KEY, GINT_TO_POINTER (dir));
     g_object_set_data (G_OBJECT (w), ENABLED_KEY, GINT_TO_POINTER (FALSE));
     g_signal_connect (w, "toggled", G_CALLBACK (onSpeedToggled), p);
-    gtk_menu_shell_append (GTK_MENU_SHELL (m), w);
+    gtk_menu_shell_append (menu_shell, w);
 
     w = gtk_radio_menu_item_new_with_label_from_widget (GTK_RADIO_MENU_ITEM (w), "");
     p->speedlimit_on_item[dir] = w;
     g_object_set_data (G_OBJECT (w), DIRECTION_KEY, GINT_TO_POINTER (dir));
     g_object_set_data (G_OBJECT (w), ENABLED_KEY, GINT_TO_POINTER (TRUE));
     g_signal_connect (w, "toggled", G_CALLBACK (onSpeedToggled), p);
-    gtk_menu_shell_append (GTK_MENU_SHELL (m), w);
+    gtk_menu_shell_append (menu_shell, w);
 
     w = gtk_separator_menu_item_new ();
-    gtk_menu_shell_append (GTK_MENU_SHELL (m), w);
+    gtk_menu_shell_append (menu_shell, w);
 
     for (i=0, n=G_N_ELEMENTS (speeds_KBps); i<n; ++i)
     {
@@ -441,7 +443,7 @@ createSpeedMenu (PrivateData * p, tr_direction dir)
         g_object_set_data (G_OBJECT (w), DIRECTION_KEY, GINT_TO_POINTER (dir));
         g_object_set_data (G_OBJECT (w), SPEED_KEY, GINT_TO_POINTER (speeds_KBps[i]));
         g_signal_connect (w, "activate", G_CALLBACK (onSpeedSet), p);
-        gtk_menu_shell_append (GTK_MENU_SHELL (m), w);
+        gtk_menu_shell_append (menu_shell, w);
     }
 
     return m;
@@ -479,24 +481,26 @@ static GtkWidget*
 createRatioMenu (PrivateData * p)
 {
     int i, n;
-    GtkWidget *m, *w;
+    GtkWidget *m, *w; 
+    GtkMenuShell * menu_shell;
 
     m = gtk_menu_new ();
+    menu_shell = GTK_MENU_SHELL (m);
 
     w = gtk_radio_menu_item_new_with_label (NULL, _("Seed Forever"));
     p->ratio_off_item = w;
     g_object_set_data (G_OBJECT (w), ENABLED_KEY, GINT_TO_POINTER (FALSE));
     g_signal_connect (w, "toggled", G_CALLBACK (onRatioToggled), p);
-    gtk_menu_shell_append (GTK_MENU_SHELL (m), w);
+    gtk_menu_shell_append (menu_shell, w);
 
     w = gtk_radio_menu_item_new_with_label_from_widget (GTK_RADIO_MENU_ITEM (w), "");
     p->ratio_on_item = w;
     g_object_set_data (G_OBJECT (w), ENABLED_KEY, GINT_TO_POINTER (TRUE));
     g_signal_connect (w, "toggled", G_CALLBACK (onRatioToggled), p);
-    gtk_menu_shell_append (GTK_MENU_SHELL (m), w);
+    gtk_menu_shell_append (menu_shell, w);
 
     w = gtk_separator_menu_item_new ();
-    gtk_menu_shell_append (GTK_MENU_SHELL (m), w);
+    gtk_menu_shell_append (menu_shell, w);
 
     for (i=0, n=G_N_ELEMENTS (stockRatios); i<n; ++i)
     {
@@ -505,7 +509,7 @@ createRatioMenu (PrivateData * p)
         w = gtk_menu_item_new_with_label (buf);
         g_object_set_data (G_OBJECT (w), RATIO_KEY, GINT_TO_POINTER (i));
         g_signal_connect (w, "activate", G_CALLBACK (onRatioSet), p);
-        gtk_menu_shell_append (GTK_MENU_SHELL (m), w);
+        gtk_menu_shell_append (menu_shell, w);
     }
 
     return m;
@@ -520,21 +524,22 @@ createOptionsMenu (PrivateData * p)
 {
     GtkWidget * m;
     GtkWidget * top = gtk_menu_new ();
+    GtkMenuShell * menu_shell = GTK_MENU_SHELL (top);
 
     m = gtk_menu_item_new_with_label (_("Limit Download Speed"));
     gtk_menu_item_set_submenu (GTK_MENU_ITEM (m), createSpeedMenu (p, TR_DOWN));
-    gtk_menu_shell_append (GTK_MENU_SHELL (top), m);
+    gtk_menu_shell_append (menu_shell, m);
 
     m = gtk_menu_item_new_with_label (_("Limit Upload Speed"));
     gtk_menu_item_set_submenu (GTK_MENU_ITEM (m), createSpeedMenu (p, TR_UP));
-    gtk_menu_shell_append (GTK_MENU_SHELL (top), m);
+    gtk_menu_shell_append (menu_shell, m);
 
     m = gtk_separator_menu_item_new ();
-    gtk_menu_shell_append (GTK_MENU_SHELL (top), m);
+    gtk_menu_shell_append (menu_shell, m);
 
     m = gtk_menu_item_new_with_label (_("Stop Seeding at Ratio"));
     gtk_menu_item_set_submenu (GTK_MENU_ITEM (m), createRatioMenu (p));
-    gtk_menu_shell_append (GTK_MENU_SHELL (top), m);
+    gtk_menu_shell_append (menu_shell, m);
 
     gtk_widget_show_all (top);
     return top;
@@ -585,6 +590,7 @@ gtr_window_new (GtkApplication * app, GtkUIManager * ui_mgr, TrCore * core)
     int           i, n;
     const char  * pch;
     PrivateData * p;
+    GtkWidget   * ul_lb, * dl_lb;
     GtkWidget   * mainmenu, *toolbar, *filter, *list, *status;
     GtkWidget   * vbox, *w, *self, *h, *hbox, *menu;
     GtkWindow   * win;
@@ -668,16 +674,18 @@ gtr_window_new (GtkApplication * app, GtkUIManager * ui_mgr, TrCore * core)
         g_signal_connect (w, "toggled", G_CALLBACK (alt_speed_toggled_cb), p);
         gtk_box_pack_start (GTK_BOX (h), w, 0, 0, 0);
 
-        w = p->gutter_lb = gtk_label_new ("N Torrents");
-        gtk_label_set_single_line_mode (GTK_LABEL (w), TRUE);
+        w = gtk_label_new ("N Torrents");
+        p->gutter_lb = GTK_LABEL (w);
+        gtk_label_set_single_line_mode (p->gutter_lb, TRUE);
         gtk_box_pack_start (GTK_BOX (h), w, 1, 1, GUI_PAD);
 
         hbox = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, GUI_PAD);
             w = gtk_alignment_new (0.0f, 0.0f, 0.0f, 0.0f);
             gtk_widget_set_size_request (w, GUI_PAD, 0u);
             gtk_box_pack_start (GTK_BOX (hbox), w, FALSE, FALSE, 0);
-            w = p->ul_lb = gtk_label_new (NULL);
-            gtk_label_set_single_line_mode (GTK_LABEL (w), TRUE);
+            w = ul_lb = gtk_label_new (NULL);
+            p->ul_lb = GTK_LABEL (w);
+            gtk_label_set_single_line_mode (p->ul_lb, TRUE);
             gtk_box_pack_start (GTK_BOX (hbox), w, FALSE, FALSE, 0);
             w = gtk_image_new_from_stock (GTK_STOCK_GO_UP, GTK_ICON_SIZE_MENU);
             gtk_box_pack_start (GTK_BOX (hbox), w, FALSE, FALSE, 0);
@@ -687,8 +695,9 @@ gtr_window_new (GtkApplication * app, GtkUIManager * ui_mgr, TrCore * core)
             w = gtk_alignment_new (0.0f, 0.0f, 0.0f, 0.0f);
             gtk_widget_set_size_request (w, GUI_PAD, 0u);
             gtk_box_pack_start (GTK_BOX (hbox), w, FALSE, FALSE, 0);
-            w = p->dl_lb = gtk_label_new (NULL);
-            gtk_label_set_single_line_mode (GTK_LABEL (w), TRUE);
+            w = dl_lb = gtk_label_new (NULL);
+            p->dl_lb = GTK_LABEL (w);
+            gtk_label_set_single_line_mode (p->dl_lb, TRUE);
             gtk_box_pack_start (GTK_BOX (hbox), w, FALSE, FALSE, 0);
             w = gtk_image_new_from_stock (GTK_STOCK_GO_DOWN, GTK_ICON_SIZE_MENU);
             gtk_box_pack_start (GTK_BOX (hbox), w, FALSE, FALSE, 0);
@@ -701,8 +710,9 @@ gtr_window_new (GtkApplication * app, GtkUIManager * ui_mgr, TrCore * core)
             gtk_button_set_relief (GTK_BUTTON (w), GTK_RELIEF_NONE);
             g_signal_connect (w, "clicked", G_CALLBACK (onYinYangReleased), p);
             gtk_box_pack_start (GTK_BOX (hbox), w, FALSE, FALSE, 0);
-            w = p->stats_lb = gtk_label_new (NULL);
-            gtk_label_set_single_line_mode (GTK_LABEL (w), TRUE);
+            w = gtk_label_new (NULL);
+            p->stats_lb = GTK_LABEL (w);
+            gtk_label_set_single_line_mode (p->stats_lb, TRUE);
             gtk_box_pack_end (GTK_BOX (hbox), w, FALSE, FALSE, 0);
         gtk_box_pack_end (GTK_BOX (h), hbox, FALSE, FALSE, 0);
 
@@ -727,12 +737,12 @@ gtr_window_new (GtkApplication * app, GtkUIManager * ui_mgr, TrCore * core)
         /* this is to determine the maximum width/height for the label */
         int w=0, h=0;
         PangoLayout * pango_layout;
-        pango_layout = gtk_widget_create_pango_layout (p->ul_lb, "999.99 kB/s");
+        pango_layout = gtk_widget_create_pango_layout (ul_lb, "999.99 kB/s");
         pango_layout_get_pixel_size (pango_layout, &w, &h);
-        gtk_widget_set_size_request (p->ul_lb, w, h);
-        gtk_widget_set_size_request (p->dl_lb, w, h);
-        gtk_misc_set_alignment (GTK_MISC (p->ul_lb), 1.0, 0.5);
-        gtk_misc_set_alignment (GTK_MISC (p->dl_lb), 1.0, 0.5);
+        gtk_widget_set_size_request (ul_lb, w, h);
+        gtk_widget_set_size_request (dl_lb, w, h);
+        gtk_misc_set_alignment (GTK_MISC (ul_lb), 1.0, 0.5);
+        gtk_misc_set_alignment (GTK_MISC (dl_lb), 1.0, 0.5);
         g_object_unref (G_OBJECT (pango_layout));
     }
 
@@ -758,25 +768,26 @@ gtr_window_new (GtkApplication * app, GtkUIManager * ui_mgr, TrCore * core)
 static void
 updateTorrentCount (PrivateData * p)
 {
-    if (p && p->core)
+  if (p && p->core)
     {
-        char      buf[512];
-        const int torrentCount = gtk_tree_model_iter_n_children (gtr_core_model (p->core), NULL);
-        const int visibleCount = gtk_tree_model_iter_n_children (p->filter_model, NULL);
+      char buf[512];
+      const int torrentCount = gtk_tree_model_iter_n_children (gtr_core_model (p->core), NULL);
+      const int visibleCount = gtk_tree_model_iter_n_children (p->filter_model, NULL);
 
-        if (!torrentCount)
-            *buf = '\0';
-        else if (torrentCount != visibleCount)
-            g_snprintf (buf, sizeof (buf),
-                        ngettext ("%1$'d of %2$'d Torrent",
-                                  "%1$'d of %2$'d Torrents",
-                                  torrentCount),
-                        visibleCount, torrentCount);
-        else
-            g_snprintf (buf, sizeof (buf),
-                        ngettext ("%'d Torrent", "%'d Torrents", torrentCount),
-                        torrentCount);
-        gtr_label_set_text (GTK_LABEL (p->gutter_lb), buf);
+      if (!torrentCount)
+        *buf = '\0';
+      else if (torrentCount != visibleCount)
+        g_snprintf (buf, sizeof (buf),
+                    ngettext ("%1$'d of %2$'d Torrent",
+                              "%1$'d of %2$'d Torrents",
+                              torrentCount),
+                    visibleCount, torrentCount);
+      else
+        g_snprintf (buf, sizeof (buf),
+                    ngettext ("%'d Torrent", "%'d Torrents", torrentCount),
+                    torrentCount);
+
+      gtr_label_set_text (p->gutter_lb, buf);
     }
 }
 
@@ -824,7 +835,7 @@ updateStats (PrivateData * p)
         tr_strlratio (ratio, stats.ratio, sizeof (ratio));
         g_snprintf (buf, sizeof (buf), _("Ratio: %s"), ratio);
     }
-    gtr_label_set_text (GTK_LABEL (p->stats_lb), buf);
+    gtr_label_set_text (p->stats_lb, buf);
 }
 
 static void
@@ -851,10 +862,10 @@ updateSpeeds (PrivateData * p)
         while (gtk_tree_model_iter_next (model, &iter));
 
         tr_formatter_speed_KBps (buf, down, sizeof (buf));
-        gtr_label_set_text (GTK_LABEL (p->dl_lb), buf);
+        gtr_label_set_text (p->dl_lb, buf);
 
         tr_formatter_speed_KBps (buf, up, sizeof (buf));
-        gtr_label_set_text (GTK_LABEL (p->ul_lb), buf);
+        gtr_label_set_text (p->ul_lb, buf);
     }
 }
 
