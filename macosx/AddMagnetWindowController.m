@@ -97,7 +97,7 @@
     }
     
     #warning when 10.7-only, switch to auto layout
-    [fMagnetLinkLabel sizeToFit];
+    /*[fMagnetLinkLabel sizeToFit];
     
     const CGFloat downloadToLabelOldWidth = [fDownloadToLabel frame].size.width;
     [fDownloadToLabel sizeToFit];
@@ -151,7 +151,7 @@
     [fAddButton setFrame: addButtonFrame];
     [fCancelButton setFrame: cancelButtonFrame];
     
-    [fStartCheck sizeToFit];
+    [fStartCheck sizeToFit];*/
 }
 
 - (void) windowDidLoad

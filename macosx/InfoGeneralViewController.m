@@ -50,7 +50,7 @@
     
     [super dealloc];
 }
-
+/*
 - (void) awakeFromNib
 {
     #warning remove when 10.7-only with auto layout
@@ -92,7 +92,7 @@
         [field setFrame: frame];
     }
 }
-
+*/
 - (void) setInfoForTorrents: (NSArray *) torrents
 {
     //don't check if it's the same in case the metadata changed
