@@ -24,9 +24,9 @@
 #include <event2/buffer.h>
 
 #include <libtransmission/transmission.h>
-#include <libtransmission/bencode.h>
 #include <libtransmission/tr-getopt.h>
 #include <libtransmission/utils.h>
+#include <libtransmission/variant.h>
 #include <libtransmission/version.h>
 
 #include "watch.h"
@@ -153,7 +153,7 @@ gotsig (int sig)
             }
             else
             {
-                tr_benc settings;
+                tr_variant settings;
                 const char * configDir;
 
                 /* reopen the logfile to allow for log rotation */
@@ -165,11 +165,11 @@ gotsig (int sig)
 
                 configDir = tr_sessionGetConfigDir (mySession);
                 tr_inf ("Reloading settings from \"%s\"", configDir);
-                tr_bencInitDict (&settings, 0);
-                tr_bencDictAddBool (&settings, TR_PREFS_KEY_RPC_ENABLED, true);
+                tr_variantInitDict (&settings, 0);
+                tr_variantDictAddBool (&settings, TR_PREFS_KEY_RPC_ENABLED, true);
                 tr_sessionLoadSettings (&settings, configDir, MY_NAME);
                 tr_sessionSet (mySession, &settings);
-                tr_bencFree (&settings);
+                tr_variantFree (&settings);
                 tr_sessionReloadBlocklists (mySession);
             }
             break;
@@ -358,7 +358,7 @@ main (int argc, char ** argv)
 {
     int c;
     const char * optarg;
-    tr_benc settings;
+    tr_variant settings;
     bool boolVal;
     bool loaded;
     bool foreground = false;
@@ -376,8 +376,8 @@ main (int argc, char ** argv)
 #endif
 
     /* load settings from defaults + config file */
-    tr_bencInitDict (&settings, 0);
-    tr_bencDictAddBool (&settings, TR_PREFS_KEY_RPC_ENABLED, true);
+    tr_variantInitDict (&settings, 0);
+    tr_variantDictAddBool (&settings, TR_PREFS_KEY_RPC_ENABLED, true);
     configDir = getConfigDir (argc, (const char**)argv);
     loaded = tr_sessionLoadSettings (&settings, configDir, MY_NAME);
 
@@ -385,22 +385,22 @@ main (int argc, char ** argv)
     tr_optind = 1;
     while ((c = tr_getopt (getUsage (), argc, (const char**)argv, options, &optarg))) {
         switch (c) {
-            case 'a': tr_bencDictAddStr (&settings, TR_PREFS_KEY_RPC_WHITELIST, optarg);
-                      tr_bencDictAddBool (&settings, TR_PREFS_KEY_RPC_WHITELIST_ENABLED, true);
+            case 'a': tr_variantDictAddStr (&settings, TR_PREFS_KEY_RPC_WHITELIST, optarg);
+                      tr_variantDictAddBool (&settings, TR_PREFS_KEY_RPC_WHITELIST_ENABLED, true);
                       break;
-            case 'b': tr_bencDictAddBool (&settings, TR_PREFS_KEY_BLOCKLIST_ENABLED, true);
+            case 'b': tr_variantDictAddBool (&settings, TR_PREFS_KEY_BLOCKLIST_ENABLED, true);
                       break;
-            case 'B': tr_bencDictAddBool (&settings, TR_PREFS_KEY_BLOCKLIST_ENABLED, false);
+            case 'B': tr_variantDictAddBool (&settings, TR_PREFS_KEY_BLOCKLIST_ENABLED, false);
                       break;
-            case 'c': tr_bencDictAddStr (&settings, PREF_KEY_DIR_WATCH, optarg);
-                      tr_bencDictAddBool (&settings, PREF_KEY_DIR_WATCH_ENABLED, true);
+            case 'c': tr_variantDictAddStr (&settings, PREF_KEY_DIR_WATCH, optarg);
+                      tr_variantDictAddBool (&settings, PREF_KEY_DIR_WATCH_ENABLED, true);
                       break;
-            case 'C': tr_bencDictAddBool (&settings, PREF_KEY_DIR_WATCH_ENABLED, false);
+            case 'C': tr_variantDictAddBool (&settings, PREF_KEY_DIR_WATCH_ENABLED, false);
                       break;
-            case 941: tr_bencDictAddStr (&settings, TR_PREFS_KEY_INCOMPLETE_DIR, optarg);
-                      tr_bencDictAddBool (&settings, TR_PREFS_KEY_INCOMPLETE_DIR_ENABLED, true);
+            case 941: tr_variantDictAddStr (&settings, TR_PREFS_KEY_INCOMPLETE_DIR, optarg);
+                      tr_variantDictAddBool (&settings, TR_PREFS_KEY_INCOMPLETE_DIR_ENABLED, true);
                       break;
-            case 942: tr_bencDictAddBool (&settings, TR_PREFS_KEY_INCOMPLETE_DIR_ENABLED, false);
+            case 942: tr_variantDictAddBool (&settings, TR_PREFS_KEY_INCOMPLETE_DIR_ENABLED, false);
                       break;
             case 'd': dumpSettings = true;
                       break;
@@ -417,66 +417,66 @@ main (int argc, char ** argv)
             case 'V': /* version */
                       fprintf (stderr, "%s %s\n", MY_NAME, LONG_VERSION_STRING);
                       exit (0);
-            case 'o': tr_bencDictAddBool (&settings, TR_PREFS_KEY_DHT_ENABLED, true);
+            case 'o': tr_variantDictAddBool (&settings, TR_PREFS_KEY_DHT_ENABLED, true);
                       break;
-            case 'O': tr_bencDictAddBool (&settings, TR_PREFS_KEY_DHT_ENABLED, false);
+            case 'O': tr_variantDictAddBool (&settings, TR_PREFS_KEY_DHT_ENABLED, false);
                       break;
-            case 'p': tr_bencDictAddInt (&settings, TR_PREFS_KEY_RPC_PORT, atoi (optarg));
+            case 'p': tr_variantDictAddInt (&settings, TR_PREFS_KEY_RPC_PORT, atoi (optarg));
                       break;
-            case 't': tr_bencDictAddBool (&settings, TR_PREFS_KEY_RPC_AUTH_REQUIRED, true);
+            case 't': tr_variantDictAddBool (&settings, TR_PREFS_KEY_RPC_AUTH_REQUIRED, true);
                       break;
-            case 'T': tr_bencDictAddBool (&settings, TR_PREFS_KEY_RPC_AUTH_REQUIRED, false);
+            case 'T': tr_variantDictAddBool (&settings, TR_PREFS_KEY_RPC_AUTH_REQUIRED, false);
                       break;
-            case 'u': tr_bencDictAddStr (&settings, TR_PREFS_KEY_RPC_USERNAME, optarg);
+            case 'u': tr_variantDictAddStr (&settings, TR_PREFS_KEY_RPC_USERNAME, optarg);
                       break;
-            case 'v': tr_bencDictAddStr (&settings, TR_PREFS_KEY_RPC_PASSWORD, optarg);
+            case 'v': tr_variantDictAddStr (&settings, TR_PREFS_KEY_RPC_PASSWORD, optarg);
                       break;
-            case 'w': tr_bencDictAddStr (&settings, TR_PREFS_KEY_DOWNLOAD_DIR, optarg);
+            case 'w': tr_variantDictAddStr (&settings, TR_PREFS_KEY_DOWNLOAD_DIR, optarg);
                       break;
-            case 'P': tr_bencDictAddInt (&settings, TR_PREFS_KEY_PEER_PORT, atoi (optarg));
+            case 'P': tr_variantDictAddInt (&settings, TR_PREFS_KEY_PEER_PORT, atoi (optarg));
                       break;
-            case 'm': tr_bencDictAddBool (&settings, TR_PREFS_KEY_PORT_FORWARDING, true);
+            case 'm': tr_variantDictAddBool (&settings, TR_PREFS_KEY_PORT_FORWARDING, true);
                       break;
-            case 'M': tr_bencDictAddBool (&settings, TR_PREFS_KEY_PORT_FORWARDING, false);
+            case 'M': tr_variantDictAddBool (&settings, TR_PREFS_KEY_PORT_FORWARDING, false);
                       break;
-            case 'L': tr_bencDictAddInt (&settings, TR_PREFS_KEY_PEER_LIMIT_GLOBAL, atoi (optarg));
+            case 'L': tr_variantDictAddInt (&settings, TR_PREFS_KEY_PEER_LIMIT_GLOBAL, atoi (optarg));
                       break;
-            case 'l': tr_bencDictAddInt (&settings, TR_PREFS_KEY_PEER_LIMIT_TORRENT, atoi (optarg));
+            case 'l': tr_variantDictAddInt (&settings, TR_PREFS_KEY_PEER_LIMIT_TORRENT, atoi (optarg));
                       break;
             case 800: paused = true;
                       break;
-            case 910: tr_bencDictAddInt (&settings, TR_PREFS_KEY_ENCRYPTION, TR_ENCRYPTION_REQUIRED);
+            case 910: tr_variantDictAddInt (&settings, TR_PREFS_KEY_ENCRYPTION, TR_ENCRYPTION_REQUIRED);
                       break;
-            case 911: tr_bencDictAddInt (&settings, TR_PREFS_KEY_ENCRYPTION, TR_ENCRYPTION_PREFERRED);
+            case 911: tr_variantDictAddInt (&settings, TR_PREFS_KEY_ENCRYPTION, TR_ENCRYPTION_PREFERRED);
                       break;
-            case 912: tr_bencDictAddInt (&settings, TR_PREFS_KEY_ENCRYPTION, TR_CLEAR_PREFERRED);
+            case 912: tr_variantDictAddInt (&settings, TR_PREFS_KEY_ENCRYPTION, TR_CLEAR_PREFERRED);
                       break;
-            case 'i': tr_bencDictAddStr (&settings, TR_PREFS_KEY_BIND_ADDRESS_IPV4, optarg);
+            case 'i': tr_variantDictAddStr (&settings, TR_PREFS_KEY_BIND_ADDRESS_IPV4, optarg);
                       break;
-            case 'I': tr_bencDictAddStr (&settings, TR_PREFS_KEY_BIND_ADDRESS_IPV6, optarg);
+            case 'I': tr_variantDictAddStr (&settings, TR_PREFS_KEY_BIND_ADDRESS_IPV6, optarg);
                       break;
-            case 'r': tr_bencDictAddStr (&settings, TR_PREFS_KEY_RPC_BIND_ADDRESS, optarg);
+            case 'r': tr_variantDictAddStr (&settings, TR_PREFS_KEY_RPC_BIND_ADDRESS, optarg);
                       break;
-            case 953: tr_bencDictAddReal (&settings, TR_PREFS_KEY_RATIO, atof (optarg));
-                      tr_bencDictAddBool (&settings, TR_PREFS_KEY_RATIO_ENABLED, true);
+            case 953: tr_variantDictAddReal (&settings, TR_PREFS_KEY_RATIO, atof (optarg));
+                      tr_variantDictAddBool (&settings, TR_PREFS_KEY_RATIO_ENABLED, true);
                       break;
-            case 954: tr_bencDictAddBool (&settings, TR_PREFS_KEY_RATIO_ENABLED, false);
+            case 954: tr_variantDictAddBool (&settings, TR_PREFS_KEY_RATIO_ENABLED, false);
                       break;
-            case 'x': tr_bencDictAddStr (&settings, PREF_KEY_PIDFILE, optarg);
+            case 'x': tr_variantDictAddStr (&settings, PREF_KEY_PIDFILE, optarg);
                       break;
-            case 'y': tr_bencDictAddBool (&settings, TR_PREFS_KEY_LPD_ENABLED, true);
+            case 'y': tr_variantDictAddBool (&settings, TR_PREFS_KEY_LPD_ENABLED, true);
                       break;
-            case 'Y': tr_bencDictAddBool (&settings, TR_PREFS_KEY_LPD_ENABLED, false);
+            case 'Y': tr_variantDictAddBool (&settings, TR_PREFS_KEY_LPD_ENABLED, false);
                       break;
-            case 810: tr_bencDictAddInt (&settings,  TR_PREFS_KEY_MSGLEVEL, TR_MSG_ERR);
+            case 810: tr_variantDictAddInt (&settings,  TR_PREFS_KEY_MSGLEVEL, TR_MSG_ERR);
                       break;
-            case 811: tr_bencDictAddInt (&settings,  TR_PREFS_KEY_MSGLEVEL, TR_MSG_INF);
+            case 811: tr_variantDictAddInt (&settings,  TR_PREFS_KEY_MSGLEVEL, TR_MSG_INF);
                       break;
-            case 812: tr_bencDictAddInt (&settings,  TR_PREFS_KEY_MSGLEVEL, TR_MSG_DBG);
+            case 812: tr_variantDictAddInt (&settings,  TR_PREFS_KEY_MSGLEVEL, TR_MSG_DBG);
                       break;
-            case 830: tr_bencDictAddBool (&settings, TR_PREFS_KEY_UTP_ENABLED, true);
+            case 830: tr_variantDictAddBool (&settings, TR_PREFS_KEY_UTP_ENABLED, true);
                       break;
-            case 831: tr_bencDictAddBool (&settings, TR_PREFS_KEY_UTP_ENABLED, false);
+            case 831: tr_variantDictAddBool (&settings, TR_PREFS_KEY_UTP_ENABLED, false);
                       break;
             default:  showUsage ();
                       break;
@@ -494,7 +494,7 @@ main (int argc, char ** argv)
 
     if (dumpSettings)
     {
-        char * str = tr_bencToStr (&settings, TR_FMT_JSON, NULL);
+        char * str = tr_variantToStr (&settings, TR_VARIANT_FMT_JSON, NULL);
         fprintf (stderr, "%s", str);
         tr_free (str);
         return 0;
@@ -518,7 +518,7 @@ main (int argc, char ** argv)
     tr_sessionSaveSettings (session, configDir, &settings);
 
     pid_filename = NULL;
-    tr_bencDictFindStr (&settings, PREF_KEY_PIDFILE, &pid_filename);
+    tr_variantDictFindStr (&settings, PREF_KEY_PIDFILE, &pid_filename, NULL);
     if (pid_filename && *pid_filename)
     {
         FILE * fp = fopen (pid_filename, "w+");
@@ -533,7 +533,7 @@ main (int argc, char ** argv)
             tr_err ("Unable to save pidfile \"%s\": %s", pid_filename, tr_strerror (errno));
     }
 
-    if (tr_bencDictFindBool (&settings, TR_PREFS_KEY_RPC_AUTH_REQUIRED, &boolVal) && boolVal)
+    if (tr_variantDictFindBool (&settings, TR_PREFS_KEY_RPC_AUTH_REQUIRED, &boolVal) && boolVal)
         tr_ninf (MY_NAME, "requiring authentication");
 
     mySession = session;
@@ -546,9 +546,9 @@ main (int argc, char ** argv)
     {
         const char * dir;
 
-        if (tr_bencDictFindBool (&settings, PREF_KEY_DIR_WATCH_ENABLED, &boolVal)
+        if (tr_variantDictFindBool (&settings, PREF_KEY_DIR_WATCH_ENABLED, &boolVal)
             && boolVal
-            && tr_bencDictFindStr (&settings, PREF_KEY_DIR_WATCH, &dir)
+            && tr_variantDictFindStr (&settings, PREF_KEY_DIR_WATCH, &dir, NULL)
             && dir
             && *dir)
         {
@@ -598,6 +598,6 @@ main (int argc, char ** argv)
     /* cleanup */
     if (pidfile_created)
         remove (pid_filename);
-    tr_bencFree (&settings);
+    tr_variantFree (&settings);
     return 0;
 }

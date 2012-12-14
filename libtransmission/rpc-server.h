@@ -11,8 +11,10 @@
  */
 
 #ifndef __TRANSMISSION__
-#error only libtransmission should #include this header.
+ #error only libtransmission should #include this header.
 #endif
+
+#include "variant.h"
 
 #ifndef TR_RPC_SERVER_H
 #define TR_RPC_SERVER_H
@@ -20,7 +22,7 @@
 typedef struct tr_rpc_server tr_rpc_server;
 
 tr_rpc_server * tr_rpcInit (tr_session  * session,
-                            tr_benc  * settings);
+                            tr_variant  * settings);
 
 void            tr_rpcClose (tr_rpc_server ** freeme);
 

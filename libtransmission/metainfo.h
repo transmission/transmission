@@ -18,14 +18,13 @@
 #define TR_METAINFO_H 1
 
 #include "transmission.h"
+#include "variant.h"
 
-struct tr_benc;
-
-bool  tr_metainfoParse (const tr_session     * session,
-                        const struct tr_benc * benc,
-                        tr_info              * setmeInfo,
-                        bool                 * setmeHasInfoDict,
-                        int                  * setmeInfoDictLength);
+bool  tr_metainfoParse (const tr_session  * session,
+                        const tr_variant  * variant,
+                        tr_info           * setmeInfo,
+                        bool              * setmeHasInfoDict,
+                        int               * setmeInfoDictLength);
 
 void tr_metainfoRemoveSaved (const tr_session * session,
                              const tr_info    * info);

@@ -44,7 +44,6 @@
 #include <QVBoxLayout>
 
 #include <libtransmission/transmission.h>
-#include <libtransmission/bencode.h>
 #include <libtransmission/utils.h> // tr_getRatio()
 
 #include "details.h"

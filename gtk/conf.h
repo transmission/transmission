@@ -26,7 +26,7 @@
 #define GTR_CONFIG_H
 
 #include <inttypes.h>
-#include <libtransmission/transmission.h> /* tr_benc, tr_session */
+#include <libtransmission/transmission.h> /* tr_variant, tr_session */
 
 void             gtr_pref_init            (const char * config_dir);
 
@@ -43,6 +43,6 @@ const char*      gtr_pref_string_get      (const char * key);
 void             gtr_pref_string_set      (const char * key, const char * value);
 
 void             gtr_pref_save            (tr_session *);
-struct tr_benc*  gtr_pref_get_all         (void);
+struct tr_variant*  gtr_pref_get_all         (void);
 
 #endif /* GTR_CONFIG_H */

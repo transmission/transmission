@@ -34,7 +34,7 @@
 #include <glib/gstdio.h>
 
 #include <libtransmission/transmission.h>
-#include <libtransmission/bencode.h>
+#include <libtransmission/variant.h>
 
 #include "conf.h"
 #include "tr-prefs.h"
@@ -64,7 +64,7 @@ static void cf_check_older_configs (void);
  * If you add a new preferences key, you /must/ add a default value here.
  */
 static void
-tr_prefs_init_defaults (tr_benc * d)
+tr_prefs_init_defaults (tr_variant * d)
 {
   const char * str;
   const char * special_dl_dir = g_get_user_special_dir (G_USER_DIRECTORY_DOWNLOAD);
@@ -77,45 +77,45 @@ tr_prefs_init_defaults (tr_benc * d)
   if (!str)
     str = tr_getDefaultDownloadDir ();
 
-  tr_bencDictReserve (d, 29);
+  tr_variantDictReserve (d, 29);
 
-  tr_bencDictAddStr (d, PREF_KEY_DIR_WATCH, str);
-  tr_bencDictAddBool (d, PREF_KEY_DIR_WATCH_ENABLED, FALSE);
+  tr_variantDictAddStr (d, PREF_KEY_DIR_WATCH, str);
+  tr_variantDictAddBool (d, PREF_KEY_DIR_WATCH_ENABLED, FALSE);
 
-  tr_bencDictAddBool (d, PREF_KEY_USER_HAS_GIVEN_INFORMED_CONSENT, FALSE);
-  tr_bencDictAddBool (d, PREF_KEY_INHIBIT_HIBERNATION, FALSE);
-  tr_bencDictAddBool (d, PREF_KEY_BLOCKLIST_UPDATES_ENABLED, TRUE);
+  tr_variantDictAddBool (d, PREF_KEY_USER_HAS_GIVEN_INFORMED_CONSENT, FALSE);
+  tr_variantDictAddBool (d, PREF_KEY_INHIBIT_HIBERNATION, FALSE);
+  tr_variantDictAddBool (d, PREF_KEY_BLOCKLIST_UPDATES_ENABLED, TRUE);
 
-  tr_bencDictAddStr (d, PREF_KEY_OPEN_DIALOG_FOLDER, g_get_home_dir ());
+  tr_variantDictAddStr (d, PREF_KEY_OPEN_DIALOG_FOLDER, g_get_home_dir ());
 
-  tr_bencDictAddBool (d, PREF_KEY_TOOLBAR, TRUE);
-  tr_bencDictAddBool (d, PREF_KEY_FILTERBAR, TRUE);
-  tr_bencDictAddBool (d, PREF_KEY_STATUSBAR, TRUE);
-  tr_bencDictAddBool (d, PREF_KEY_TRASH_CAN_ENABLED, TRUE);
-  tr_bencDictAddBool (d, PREF_KEY_SHOW_TRAY_ICON, FALSE);
-  tr_bencDictAddBool (d, PREF_KEY_SHOW_MORE_TRACKER_INFO, FALSE);
-  tr_bencDictAddBool (d, PREF_KEY_SHOW_MORE_PEER_INFO, FALSE);
-  tr_bencDictAddBool (d, PREF_KEY_SHOW_BACKUP_TRACKERS, FALSE);
-  tr_bencDictAddStr (d, PREF_KEY_STATUSBAR_STATS, "total-ratio");
+  tr_variantDictAddBool (d, PREF_KEY_TOOLBAR, TRUE);
+  tr_variantDictAddBool (d, PREF_KEY_FILTERBAR, TRUE);
+  tr_variantDictAddBool (d, PREF_KEY_STATUSBAR, TRUE);
+  tr_variantDictAddBool (d, PREF_KEY_TRASH_CAN_ENABLED, TRUE);
+  tr_variantDictAddBool (d, PREF_KEY_SHOW_TRAY_ICON, FALSE);
+  tr_variantDictAddBool (d, PREF_KEY_SHOW_MORE_TRACKER_INFO, FALSE);
+  tr_variantDictAddBool (d, PREF_KEY_SHOW_MORE_PEER_INFO, FALSE);
+  tr_variantDictAddBool (d, PREF_KEY_SHOW_BACKUP_TRACKERS, FALSE);
+  tr_variantDictAddStr (d, PREF_KEY_STATUSBAR_STATS, "total-ratio");
 
-  tr_bencDictAddBool (d, PREF_KEY_TORRENT_ADDED_NOTIFICATION_ENABLED, true);
-  tr_bencDictAddBool (d, PREF_KEY_TORRENT_COMPLETE_NOTIFICATION_ENABLED, true);
-  tr_bencDictAddStr (d, PREF_KEY_TORRENT_COMPLETE_SOUND_COMMAND, "canberra-gtk-play -i complete-download -d 'transmission torrent downloaded'");
-  tr_bencDictAddBool (d, PREF_KEY_TORRENT_COMPLETE_SOUND_ENABLED, true);
+  tr_variantDictAddBool (d, PREF_KEY_TORRENT_ADDED_NOTIFICATION_ENABLED, true);
+  tr_variantDictAddBool (d, PREF_KEY_TORRENT_COMPLETE_NOTIFICATION_ENABLED, true);
+  tr_variantDictAddStr (d, PREF_KEY_TORRENT_COMPLETE_SOUND_COMMAND, "canberra-gtk-play -i complete-download -d 'transmission torrent downloaded'");
+  tr_variantDictAddBool (d, PREF_KEY_TORRENT_COMPLETE_SOUND_ENABLED, true);
 
-  tr_bencDictAddBool (d, PREF_KEY_OPTIONS_PROMPT, TRUE);
+  tr_variantDictAddBool (d, PREF_KEY_OPTIONS_PROMPT, TRUE);
 
-  tr_bencDictAddBool (d, PREF_KEY_MAIN_WINDOW_IS_MAXIMIZED, FALSE);
-  tr_bencDictAddInt (d, PREF_KEY_MAIN_WINDOW_HEIGHT, 500);
-  tr_bencDictAddInt (d, PREF_KEY_MAIN_WINDOW_WIDTH, 300);
-  tr_bencDictAddInt (d, PREF_KEY_MAIN_WINDOW_X, 50);
-  tr_bencDictAddInt (d, PREF_KEY_MAIN_WINDOW_Y, 50);
+  tr_variantDictAddBool (d, PREF_KEY_MAIN_WINDOW_IS_MAXIMIZED, FALSE);
+  tr_variantDictAddInt (d, PREF_KEY_MAIN_WINDOW_HEIGHT, 500);
+  tr_variantDictAddInt (d, PREF_KEY_MAIN_WINDOW_WIDTH, 300);
+  tr_variantDictAddInt (d, PREF_KEY_MAIN_WINDOW_X, 50);
+  tr_variantDictAddInt (d, PREF_KEY_MAIN_WINDOW_Y, 50);
 
-  tr_bencDictAddStr (d, TR_PREFS_KEY_DOWNLOAD_DIR, special_dl_dir ? special_dl_dir : str);
+  tr_variantDictAddStr (d, TR_PREFS_KEY_DOWNLOAD_DIR, special_dl_dir ? special_dl_dir : str);
 
-  tr_bencDictAddStr (d, PREF_KEY_SORT_MODE, "sort-by-name");
-  tr_bencDictAddBool (d, PREF_KEY_SORT_REVERSED, FALSE);
-  tr_bencDictAddBool (d, PREF_KEY_COMPACT_VIEW, FALSE);
+  tr_variantDictAddStr (d, PREF_KEY_SORT_MODE, "sort-by-name");
+  tr_variantDictAddBool (d, PREF_KEY_SORT_REVERSED, FALSE);
+  tr_variantDictAddBool (d, PREF_KEY_COMPACT_VIEW, FALSE);
 }
 
 static char*
@@ -125,15 +125,15 @@ getPrefsFilename (void)
   return g_build_filename (gl_confdir, "settings.json", NULL);
 }
 
-static tr_benc*
+static tr_variant*
 getPrefs (void)
 {
-  static tr_benc settings;
+  static tr_variant settings;
   static gboolean loaded = FALSE;
 
   if (!loaded)
     {
-      tr_bencInitDict (&settings, 0);
+      tr_variantInitDict (&settings, 0);
       tr_prefs_init_defaults (&settings);
       tr_sessionLoadSettings (&settings, gl_confdir, MY_CONFIG_NAME);
       loaded = TRUE;
@@ -146,7 +146,7 @@ getPrefs (void)
 ****
 ***/
 
-tr_benc*
+tr_variant*
 gtr_pref_get_all (void)
 {
   return getPrefs ();
@@ -157,7 +157,7 @@ gtr_pref_int_get (const char * key)
 {
   int64_t i = 0;
 
-  tr_bencDictFindInt (getPrefs (), key, &i);
+  tr_variantDictFindInt (getPrefs (), key, &i);
 
   return i;
 }
@@ -165,7 +165,7 @@ gtr_pref_int_get (const char * key)
 void
 gtr_pref_int_set (const char * key, int64_t value)
 {
-  tr_bencDictAddInt (getPrefs (), key, value);
+  tr_variantDictAddInt (getPrefs (), key, value);
 }
 
 double
@@ -173,7 +173,7 @@ gtr_pref_double_get (const char * key)
 {
   double d = 0.0;
 
-  tr_bencDictFindReal (getPrefs (), key, &d);
+  tr_variantDictFindReal (getPrefs (), key, &d);
 
   return d;
 }
@@ -181,7 +181,7 @@ gtr_pref_double_get (const char * key)
 void
 gtr_pref_double_set (const char * key, double value)
 {
-  tr_bencDictAddReal (getPrefs (), key, value);
+  tr_variantDictAddReal (getPrefs (), key, value);
 }
 
 /***
@@ -193,7 +193,7 @@ gtr_pref_flag_get (const char * key)
 {
   bool boolVal;
 
-  tr_bencDictFindBool (getPrefs (), key, &boolVal);
+  tr_variantDictFindBool (getPrefs (), key, &boolVal);
 
   return boolVal != 0;
 }
@@ -201,7 +201,7 @@ gtr_pref_flag_get (const char * key)
 void
 gtr_pref_flag_set (const char * key, gboolean value)
 {
-  tr_bencDictAddBool (getPrefs (), key, value);
+  tr_variantDictAddBool (getPrefs (), key, value);
 }
 
 /***
@@ -213,7 +213,7 @@ gtr_pref_string_get (const char * key)
 {
   const char * str = NULL;
 
-  tr_bencDictFindStr (getPrefs (), key, &str);
+  tr_variantDictFindStr (getPrefs (), key, &str, NULL);
 
   return str;
 }
@@ -221,7 +221,7 @@ gtr_pref_string_get (const char * key)
 void
 gtr_pref_string_set (const char * key, const char * value)
 {
-  tr_bencDictAddStr (getPrefs (), key, value);
+  tr_variantDictAddStr (getPrefs (), key, value);
 }
 
 /***
@@ -255,7 +255,7 @@ getCompat121PrefsFilename (void)
 static void
 translate_keyfile_to_json (const char * old_file, const char * new_file)
 {
-  tr_benc    dict;
+  tr_variant    dict;
   GKeyFile * keyfile;
   gchar **   keys;
   gsize      i;
@@ -279,7 +279,7 @@ translate_keyfile_to_json (const char * old_file, const char * new_file)
   length = 0;
   keys = g_key_file_get_keys (keyfile, "general", &length, NULL);
 
-  tr_bencInitDict (&dict, length);
+  tr_variantInitDict (&dict, length);
   for (i=0; i<length; i++)
     {
       guint j;
@@ -292,7 +292,7 @@ translate_keyfile_to_json (const char * old_file, const char * new_file)
 
       if (!strcmp (val, "true") || !strcmp (val, "false"))
         {
-          tr_bencDictAddInt (&dict, key, !strcmp (val, "true"));
+          tr_variantDictAddInt (&dict, key, !strcmp (val, "true"));
         }
       else
         {
@@ -303,17 +303,17 @@ translate_keyfile_to_json (const char * old_file, const char * new_file)
 
           l = strtol (val, &end, 10);
           if (!errno && end && !*end)
-            tr_bencDictAddInt (&dict, key, l);
+            tr_variantDictAddInt (&dict, key, l);
           else
-            tr_bencDictAddStr (&dict, key, val);
+            tr_variantDictAddStr (&dict, key, val);
         }
 
       g_free (val);
     }
 
   g_key_file_free (keyfile);
-  tr_bencToFile (&dict, TR_FMT_JSON, new_file);
-  tr_bencFree (&dict);
+  tr_variantToFile (&dict, TR_VARIANT_FMT_JSON, new_file);
+  tr_variantFree (&dict);
 }
 
 static void

@@ -23,8 +23,8 @@
 #include <QVariant>
 
 #include <libtransmission/transmission.h>
-#include <libtransmission/bencode.h>
 #include <libtransmission/utils.h> /* tr_new0, tr_strdup */
+#include <libtransmission/variant.h>
 
 #include "app.h"
 #include "prefs.h"
@@ -453,7 +453,7 @@ Torrent :: notifyComplete( ) const
 ***/
 
 void
-Torrent :: update( tr_benc * d )
+Torrent :: update( tr_variant * d )
 {
     bool changed = false;
     const bool was_seed = isSeed( );
@@ -461,7 +461,7 @@ Torrent :: update( tr_benc * d )
 
     for( int  i=0; i<PROPERTY_COUNT; ++i )
     {
-        tr_benc * child = tr_bencDictFind( d, myProperties[i].key );
+        tr_variant * child = tr_variantDictFind( d, myProperties[i].key );
         if( !child )
             continue;
 
@@ -469,42 +469,42 @@ Torrent :: update( tr_benc * d )
         {
             case QVariant :: Int: {
                 int64_t val;
-                if( tr_bencGetInt( child, &val ) )
+                if( tr_variantGetInt( child, &val ) )
                     changed |= setInt( i, val );
                 break;
             }
 
             case QVariant :: Bool: {
                 bool val;
-                if( tr_bencGetBool( child, &val ) )
+                if( tr_variantGetBool( child, &val ) )
                     changed |= setBool( i, val );
                 break;
             }
 
             case QVariant :: String: {
                 const char * val;
-                if( tr_bencGetStr( child, &val ) )
+                if( tr_variantGetStr( child, &val, NULL ) )
                     changed |= setString( i, val );
                 break;
             }
 
             case QVariant :: ULongLong: {
                 int64_t val;
-                if( tr_bencGetInt( child, &val ) )
+                if( tr_variantGetInt( child, &val ) )
                     changed |= setSize( i, val );
                 break;
             }
 
             case QVariant :: Double: {
                 double val;
-                if( tr_bencGetReal( child, &val ) )
+                if( tr_variantGetReal( child, &val ) )
                     changed |= setDouble( i, val );
                 break;
             }
 
             case QVariant :: DateTime: {
                 int64_t val;
-                if( tr_bencGetInt( child, &val ) && val )
+                if( tr_variantGetInt( child, &val ) && val )
                     changed |= setDateTime( i, QDateTime :: fromTime_t( val ) );
                 break;
             }
@@ -518,20 +518,21 @@ Torrent :: update( tr_benc * d )
         }
     }
 
-    tr_benc * files;
+    tr_variant * files;
 
-    if( tr_bencDictFindList( d, "files", &files ) ) {
+    if( tr_variantDictFindList( d, "files", &files ) ) {
         const char * str;
         int64_t intVal;
         int i = 0;
         myFiles.clear( );
-        tr_benc * child;
-        while(( child = tr_bencListChild( files, i ))) {
+        tr_variant * child;
+        while(( child = tr_variantListChild( files, i ))) {
             TrFile file;
+            size_t len;
             file.index = i++;
-            if( tr_bencDictFindStr( child, "name", &str ) )
-                file.filename = QString::fromUtf8( str );
-            if( tr_bencDictFindInt( child, "length", &intVal ) )
+            if( tr_variantDictFindStr( child, "name", &str, &len ) )
+                file.filename = QString::fromUtf8( str, len );
+            if( tr_variantDictFindInt( child, "length", &intVal ) )
                 file.size = intVal;
             myFiles.append( file );
         }
@@ -539,33 +540,34 @@ Torrent :: update( tr_benc * d )
         changed = true;
     }
 
-    if( tr_bencDictFindList( d, "fileStats", &files ) ) {
-        const int n = tr_bencListSize( files );
+    if( tr_variantDictFindList( d, "fileStats", &files ) ) {
+        const int n = tr_variantListSize( files );
         for( int i=0; i<n && i<myFiles.size(); ++i ) {
             int64_t intVal;
             bool boolVal;
-            tr_benc * child = tr_bencListChild( files, i );
+            tr_variant * child = tr_variantListChild( files, i );
             TrFile& file( myFiles[i] );
-            if( tr_bencDictFindInt( child, "bytesCompleted", &intVal ) )
+            if( tr_variantDictFindInt( child, "bytesCompleted", &intVal ) )
                 file.have = intVal;
-            if( tr_bencDictFindBool( child, "wanted", &boolVal ) )
+            if( tr_variantDictFindBool( child, "wanted", &boolVal ) )
                 file.wanted = boolVal;
-            if( tr_bencDictFindInt( child, "priority", &intVal ) )
+            if( tr_variantDictFindInt( child, "priority", &intVal ) )
                 file.priority = intVal;
         }
         changed = true;
     }
 
-    tr_benc * trackers;
-    if( tr_bencDictFindList( d, "trackers", &trackers ) ) {
+    tr_variant * trackers;
+    if( tr_variantDictFindList( d, "trackers", &trackers ) ) {
+        size_t len;
         const char * str;
         int i = 0;
         QStringList list;
-        tr_benc * child;
-        while(( child = tr_bencListChild( trackers, i++ ))) {
-            if( tr_bencDictFindStr( child, "announce", &str )) {
+        tr_variant * child;
+        while(( child = tr_variantListChild( trackers, i++ ))) {
+            if( tr_variantDictFindStr( child, "announce", &str, &len )) {
                 dynamic_cast<MyApp*>(QApplication::instance())->favicons.add( QUrl(QString::fromUtf8(str)) );
-                list.append( QString::fromUtf8( str ) );
+                list.append( QString::fromUtf8( str, len ) );
             }
         }
         if( myValues[TRACKERS] != list ) {
@@ -574,67 +576,68 @@ Torrent :: update( tr_benc * d )
         }
     }
 
-    tr_benc * trackerStats;
-    if( tr_bencDictFindList( d, "trackerStats", &trackerStats ) ) {
-        tr_benc * child;
+    tr_variant * trackerStats;
+    if( tr_variantDictFindList( d, "trackerStats", &trackerStats ) ) {
+        tr_variant * child;
         TrackerStatsList  trackerStatsList;
         int childNum = 0;
-        while(( child = tr_bencListChild( trackerStats, childNum++ ))) {
+        while(( child = tr_variantListChild( trackerStats, childNum++ ))) {
             bool b;
             int64_t i;
+            size_t len;
             const char * str;
             TrackerStat trackerStat;
-            if( tr_bencDictFindStr( child, "announce", &str ) ) {
-                trackerStat.announce = QString::fromUtf8( str );
+            if( tr_variantDictFindStr( child, "announce", &str, &len ) ) {
+                trackerStat.announce = QString::fromUtf8( str, len );
                 dynamic_cast<MyApp*>(QApplication::instance())->favicons.add( QUrl( trackerStat.announce ) );
             }
-            if( tr_bencDictFindInt( child, "announceState", &i ) )
+            if( tr_variantDictFindInt( child, "announceState", &i ) )
                 trackerStat.announceState = i;
-            if( tr_bencDictFindInt( child, "downloadCount", &i ) )
+            if( tr_variantDictFindInt( child, "downloadCount", &i ) )
                 trackerStat.downloadCount = i;
-            if( tr_bencDictFindBool( child, "hasAnnounced", &b ) )
+            if( tr_variantDictFindBool( child, "hasAnnounced", &b ) )
                 trackerStat.hasAnnounced = b;
-            if( tr_bencDictFindBool( child, "hasScraped", &b ) )
+            if( tr_variantDictFindBool( child, "hasScraped", &b ) )
                 trackerStat.hasScraped = b;
-            if( tr_bencDictFindStr( child, "host", &str ) )
-                trackerStat.host = QString::fromUtf8( str );
-            if( tr_bencDictFindInt( child, "id", &i ) )
+            if( tr_variantDictFindStr( child, "host", &str, &len ) )
+                trackerStat.host = QString::fromUtf8( str, len );
+            if( tr_variantDictFindInt( child, "id", &i ) )
                 trackerStat.id = i;
-            if( tr_bencDictFindBool( child, "isBackup", &b ) )
+            if( tr_variantDictFindBool( child, "isBackup", &b ) )
                 trackerStat.isBackup = b;
-            if( tr_bencDictFindInt( child, "lastAnnouncePeerCount", &i ) )
+            if( tr_variantDictFindInt( child, "lastAnnouncePeerCount", &i ) )
                 trackerStat.lastAnnouncePeerCount = i;
-            if( tr_bencDictFindStr( child, "lastAnnounceResult", &str ) )
-                trackerStat.lastAnnounceResult = QString::fromUtf8(str);
-            if( tr_bencDictFindInt( child, "lastAnnounceStartTime", &i ) )
+            if( tr_variantDictFindStr( child, "lastAnnounceResult", &str, &len ) )
+                trackerStat.lastAnnounceResult = QString::fromUtf8(str, len);
+            if( tr_variantDictFindInt( child, "lastAnnounceStartTime", &i ) )
                 trackerStat.lastAnnounceStartTime = i;
-            if( tr_bencDictFindBool( child, "lastAnnounceSucceeded", &b ) )
+            if( tr_variantDictFindBool( child, "lastAnnounceSucceeded", &b ) )
                 trackerStat.lastAnnounceSucceeded = b;
-            if( tr_bencDictFindInt( child, "lastAnnounceTime", &i ) )
+            if( tr_variantDictFindInt( child, "lastAnnounceTime", &i ) )
                 trackerStat.lastAnnounceTime = i;
-            if( tr_bencDictFindBool( child, "lastAnnounceTimedOut", &b ) )
+            if( tr_variantDictFindBool( child, "lastAnnounceTimedOut", &b ) )
                 trackerStat.lastAnnounceTimedOut = b;
-            if( tr_bencDictFindStr( child, "lastScrapeResult", &str ) )
-                trackerStat.lastScrapeResult = QString::fromUtf8( str );
-            if( tr_bencDictFindInt( child, "lastScrapeStartTime", &i ) )
+            if( tr_variantDictFindStr( child, "lastScrapeResult", &str, &len ) )
+                trackerStat.lastScrapeResult = QString::fromUtf8( str, len );
+            if( tr_variantDictFindInt( child, "lastScrapeStartTime", &i ) )
                 trackerStat.lastScrapeStartTime = i;
-            if( tr_bencDictFindBool( child, "lastScrapeSucceeded", &b ) )
+            if( tr_variantDictFindBool( child, "lastScrapeSucceeded", &b ) )
                 trackerStat.lastScrapeSucceeded = b;
-            if( tr_bencDictFindInt( child, "lastScrapeTime", &i ) )
+            if( tr_variantDictFindInt( child, "lastScrapeTime", &i ) )
                 trackerStat.lastScrapeTime = i;
-            if( tr_bencDictFindBool( child, "lastScrapeTimedOut", &b ) )
+            if( tr_variantDictFindBool( child, "lastScrapeTimedOut", &b ) )
                 trackerStat.lastScrapeTimedOut = b;
-            if( tr_bencDictFindInt( child, "leecherCount", &i ) )
+            if( tr_variantDictFindInt( child, "leecherCount", &i ) )
                 trackerStat.leecherCount = i;
-            if( tr_bencDictFindInt( child, "nextAnnounceTime", &i ) )
+            if( tr_variantDictFindInt( child, "nextAnnounceTime", &i ) )
                 trackerStat.nextAnnounceTime = i;
-            if( tr_bencDictFindInt( child, "nextScrapeTime", &i ) )
+            if( tr_variantDictFindInt( child, "nextScrapeTime", &i ) )
                 trackerStat.nextScrapeTime = i;
-            if( tr_bencDictFindInt( child, "scrapeState", &i ) )
+            if( tr_variantDictFindInt( child, "scrapeState", &i ) )
                 trackerStat.scrapeState = i;
-            if( tr_bencDictFindInt( child, "seederCount", &i ) )
+            if( tr_variantDictFindInt( child, "seederCount", &i ) )
                 trackerStat.seederCount = i;
-            if( tr_bencDictFindInt( child, "tier", &i ) )
+            if( tr_variantDictFindInt( child, "tier", &i ) )
                 trackerStat.tier = i;
             trackerStatsList << trackerStat;
         }
@@ -642,46 +645,47 @@ Torrent :: update( tr_benc * d )
         changed = true;
     }
 
-    tr_benc * peers;
-    if( tr_bencDictFindList( d, "peers", &peers ) ) {
-        tr_benc * child;
+    tr_variant * peers;
+    if( tr_variantDictFindList( d, "peers", &peers ) ) {
+        tr_variant * child;
         PeerList peerList;
         int childNum = 0;
-        while(( child = tr_bencListChild( peers, childNum++ ))) {
+        while(( child = tr_variantListChild( peers, childNum++ ))) {
             double d;
             bool b;
             int64_t i;
+            size_t len;
             const char * str;
             Peer peer;
-            if( tr_bencDictFindStr( child, "address", &str ) )
-                peer.address = QString::fromUtf8( str );
-            if( tr_bencDictFindStr( child, "clientName", &str ) )
-                peer.clientName = QString::fromUtf8( str );
-            if( tr_bencDictFindBool( child, "clientIsChoked", &b ) )
+            if( tr_variantDictFindStr( child, "address", &str, &len ) )
+                peer.address = QString::fromUtf8( str, len );
+            if( tr_variantDictFindStr( child, "clientName", &str, &len ) )
+                peer.clientName = QString::fromUtf8( str, len );
+            if( tr_variantDictFindBool( child, "clientIsChoked", &b ) )
                 peer.clientIsChoked = b;
-            if( tr_bencDictFindBool( child, "clientIsInterested", &b ) )
+            if( tr_variantDictFindBool( child, "clientIsInterested", &b ) )
                 peer.clientIsInterested = b;
-            if( tr_bencDictFindStr( child, "flagStr", &str ) )
-                peer.flagStr = QString::fromUtf8( str );
-            if( tr_bencDictFindBool( child, "isDownloadingFrom", &b ) )
+            if( tr_variantDictFindStr( child, "flagStr", &str, &len ) )
+                peer.flagStr = QString::fromUtf8( str, len );
+            if( tr_variantDictFindBool( child, "isDownloadingFrom", &b ) )
                 peer.isDownloadingFrom = b;
-            if( tr_bencDictFindBool( child, "isEncrypted", &b ) )
+            if( tr_variantDictFindBool( child, "isEncrypted", &b ) )
                 peer.isEncrypted = b;
-            if( tr_bencDictFindBool( child, "isIncoming", &b ) )
+            if( tr_variantDictFindBool( child, "isIncoming", &b ) )
                 peer.isIncoming = b;
-            if( tr_bencDictFindBool( child, "isUploadingTo", &b ) )
+            if( tr_variantDictFindBool( child, "isUploadingTo", &b ) )
                 peer.isUploadingTo = b;
-            if( tr_bencDictFindBool( child, "peerIsChoked", &b ) )
+            if( tr_variantDictFindBool( child, "peerIsChoked", &b ) )
                 peer.peerIsChoked = b;
-            if( tr_bencDictFindBool( child, "peerIsInterested", &b ) )
+            if( tr_variantDictFindBool( child, "peerIsInterested", &b ) )
                 peer.peerIsInterested = b;
-            if( tr_bencDictFindInt( child, "port", &i ) )
+            if( tr_variantDictFindInt( child, "port", &i ) )
                 peer.port = i;
-            if( tr_bencDictFindReal( child, "progress", &d ) )
+            if( tr_variantDictFindReal( child, "progress", &d ) )
                 peer.progress = d;
-            if( tr_bencDictFindInt( child, "rateToClient", &i ) )
+            if( tr_variantDictFindInt( child, "rateToClient", &i ) )
                 peer.rateToClient = Speed::fromBps( i );
-            if( tr_bencDictFindInt( child, "rateToPeer", &i ) )
+            if( tr_variantDictFindInt( child, "rateToPeer", &i ) )
                 peer.rateToPeer = Speed::fromBps( i );
             peerList << peer;
         }

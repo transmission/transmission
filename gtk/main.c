@@ -402,26 +402,26 @@ on_rpc_changed (tr_session            * session,
 
       case TR_RPC_SESSION_CHANGED: {
         int i;
-        tr_benc tmp;
-        tr_benc * newval;
-        tr_benc * oldvals = gtr_pref_get_all ();
+        tr_variant tmp;
+        tr_variant * newval;
+        tr_variant * oldvals = gtr_pref_get_all ();
         const char * key;
         GSList * l;
         GSList * changed_keys = NULL;
-        tr_bencInitDict (&tmp, 100);
+        tr_variantInitDict (&tmp, 100);
         tr_sessionGetSettings (session, &tmp);
-        for (i=0; tr_bencDictChild (&tmp, i, &key, &newval); ++i)
+        for (i=0; tr_variantDictChild (&tmp, i, &key, &newval); ++i)
           {
             bool changed;
-            tr_benc * oldval = tr_bencDictFind (oldvals, key);
+            tr_variant * oldval = tr_variantDictFind (oldvals, key);
             if (!oldval)
               {
                 changed = true;
               }
             else
               {
-                char * a = tr_bencToStr (oldval, TR_FMT_BENC, NULL);
-                char * b = tr_bencToStr (newval, TR_FMT_BENC, NULL);
+                char * a = tr_variantToStr (oldval, TR_VARIANT_FMT_BENC, NULL);
+                char * b = tr_variantToStr (newval, TR_VARIANT_FMT_BENC, NULL);
                 changed = strcmp (a, b) != 0;
                 tr_free (b);
                 tr_free (a);
@@ -436,7 +436,7 @@ on_rpc_changed (tr_session            * session,
           gtr_core_pref_changed (cbdata->core, l->data);
 
         g_slist_free (changed_keys);
-        tr_bencFree (&tmp);
+        tr_variantFree (&tmp);
         break;
       }
 
@@ -1343,33 +1343,33 @@ append_id_to_benc_list (GtkTreeModel * m, GtkTreePath * path UNUSED,
 {
   tr_torrent * tor = NULL;
   gtk_tree_model_get (m, iter, MC_TORRENT, &tor, -1);
-  tr_bencListAddInt (list, tr_torrentId (tor));
+  tr_variantListAddInt (list, tr_torrentId (tor));
 }
 
 static gboolean
 call_rpc_for_selected_torrents (struct cbdata * data, const char * method)
 {
-  tr_benc top, *args, *ids;
+  tr_variant top, *args, *ids;
   gboolean invoked = FALSE;
   GtkTreeSelection * s = data->sel;
   tr_session * session = gtr_core_session (data->core);
 
-  tr_bencInitDict (&top, 2);
-  tr_bencDictAddStr (&top, "method", method);
-  args = tr_bencDictAddDict (&top, "arguments", 1);
-  ids = tr_bencDictAddList (args, "ids", 0);
+  tr_variantInitDict (&top, 2);
+  tr_variantDictAddStr (&top, "method", method);
+  args = tr_variantDictAddDict (&top, "arguments", 1);
+  ids = tr_variantDictAddList (args, "ids", 0);
   gtk_tree_selection_selected_foreach (s, append_id_to_benc_list, ids);
 
-  if (tr_bencListSize (ids) != 0)
+  if (tr_variantListSize (ids) != 0)
     {
       int json_len;
-      char * json = tr_bencToStr (&top, TR_FMT_JSON_LEAN, &json_len);
+      char * json = tr_variantToStr (&top, TR_VARIANT_FMT_JSON_LEAN, &json_len);
       tr_rpc_request_exec_json (session, json, json_len, NULL, NULL);
       g_free (json);
       invoked = TRUE;
     }
 
-  tr_bencFree (&top);
+  tr_variantFree (&top);
   return invoked;
 }
 

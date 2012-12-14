@@ -21,7 +21,6 @@ libtransmission_a_SOURCES = \
     announcer-http.c \
     announcer-udp.c \
     bandwidth.c \
-    bencode.c \
     bitfield.c \
     blocklist.c \
     cache.c \
@@ -33,7 +32,6 @@ libtransmission_a_SOURCES = \
     handshake.c \
     history.c \
     inout.c \
-    json.c \
     list.c \
     magnet.c \
     makemeta.c \
@@ -62,6 +60,9 @@ libtransmission_a_SOURCES = \
     trevent.c \
     upnp.c \
     utils.c \
+    variant.c \
+    variant-benc.c \
+    variant-json.c \
     verify.c \
     web.c \
     webseed.c \
@@ -71,7 +72,6 @@ noinst_HEADERS = \
     announcer.h \
     announcer-common.h \
     bandwidth.h \
-    bencode.h \
     bitfield.h \
     blocklist.h \
     cache.h \
@@ -85,7 +85,6 @@ noinst_HEADERS = \
     inout.h \
     jsonsl.c \
     jsonsl.h \
-    json.h \
     libtransmission-test.h \
     list.h \
     magnet.h \
@@ -116,6 +115,8 @@ noinst_HEADERS = \
     trevent.h \
     upnp.h \
     utils.h \
+    variant.h \
+    variant-common.h \
     verify.h \
     version.h \
     web.h \
@@ -124,7 +125,6 @@ noinst_HEADERS = \
 TESTS = \
     bitfield-test \
     blocklist-test \
-    bencode-test \
     clients-test \
     history-test \
     json-test \
@@ -133,7 +133,8 @@ TESTS = \
     peer-msgs-test \
     rpc-test \
     test-peer-id \
-    utils-test
+    utils-test \
+    variant-test
 
 noinst_PROGRAMS = $(TESTS)
 
@@ -153,50 +154,52 @@ apps_ldadd = \
     @PTHREAD_LIBS@ \
     @ZLIB_LIBS@
 
-bencode_test_SOURCES = bencode-test.c
-bencode_test_LDADD = ${apps_ldadd}
-bencode_test_LDFLAGS = ${apps_ldflags}
+TEST_SOURCES = libtransmission-test.c
 
-bitfield_test_SOURCES = bitfield-test.c
+bitfield_test_SOURCES = bitfield-test.c $(TEST_SOURCES)
 bitfield_test_LDADD = ${apps_ldadd}
 bitfield_test_LDFLAGS = ${apps_ldflags}
 
-blocklist_test_SOURCES = blocklist-test.c
+blocklist_test_SOURCES = blocklist-test.c $(TEST_SOURCES)
 blocklist_test_LDADD = ${apps_ldadd}
 blocklist_test_LDFLAGS = ${apps_ldflags}
 
-clients_test_SOURCES = clients-test.c
+clients_test_SOURCES = clients-test.c $(TEST_SOURCES)
 clients_test_LDADD = ${apps_ldadd}
 clients_test_LDFLAGS = ${apps_ldflags}
 
-history_test_SOURCES = history-test.c
+history_test_SOURCES = history-test.c $(TEST_SOURCES)
 history_test_LDADD = ${apps_ldadd}
 history_test_LDFLAGS = ${apps_ldflags}
 
-json_test_SOURCES = json-test.c
+json_test_SOURCES = json-test.c $(TEST_SOURCES)
 json_test_LDADD = ${apps_ldadd}
 json_test_LDFLAGS = ${apps_ldflags}
 
-magnet_test_SOURCES = magnet-test.c
+magnet_test_SOURCES = magnet-test.c $(TEST_SOURCES)
 magnet_test_LDADD = ${apps_ldadd}
 magnet_test_LDFLAGS = ${apps_ldflags}
 
-metainfo_test_SOURCES = metainfo-test.c
+metainfo_test_SOURCES = metainfo-test.c $(TEST_SOURCES)
 metainfo_test_LDADD = ${apps_ldadd}
 metainfo_test_LDFLAGS = ${apps_ldflags}
 
-peer_msgs_test_SOURCES = peer-msgs-test.c
+peer_msgs_test_SOURCES = peer-msgs-test.c $(TEST_SOURCES)
 peer_msgs_test_LDADD = ${apps_ldadd}
 peer_msgs_test_LDFLAGS = ${apps_ldflags}
 
-rpc_test_SOURCES = rpc-test.c
+rpc_test_SOURCES = rpc-test.c $(TEST_SOURCES)
 rpc_test_LDADD = ${apps_ldadd}
 rpc_test_LDFLAGS = ${apps_ldflags}
 
-test_peer_id_SOURCES = test-peer-id.c
+test_peer_id_SOURCES = test-peer-id.c $(TEST_SOURCES)
 test_peer_id_LDADD = ${apps_ldadd}
 test_peer_id_LDFLAGS = ${apps_ldflags}
 
-utils_test_SOURCES = utils-test.c
+utils_test_SOURCES = utils-test.c $(TEST_SOURCES)
 utils_test_LDADD = ${apps_ldadd}
 utils_test_LDFLAGS = ${apps_ldflags}
+
+variant_test_SOURCES = variant-test.c $(TEST_SOURCES)
+variant_test_LDADD = ${apps_ldadd}
+variant_test_LDFLAGS = ${apps_ldflags}

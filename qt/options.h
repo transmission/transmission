@@ -38,7 +38,7 @@ class QCheckBox;
 class QComboBox;
 class Session;
 
-extern "C" { struct tr_benc; };
+extern "C" { struct tr_variant; };
 
 class FileAdded: public QObject
 {
@@ -53,7 +53,7 @@ class FileAdded: public QObject
         void setFileToDelete( const QString& file ) { myDelFile = file; }
 
     public slots:
-        void executed( int64_t tag, const QString& result, struct tr_benc * arguments );
+        void executed( int64_t tag, const QString& result, struct tr_variant * arguments );
 };
 
 class Options: public QDialog

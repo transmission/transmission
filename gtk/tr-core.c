@@ -32,10 +32,9 @@
 #include <event2/buffer.h>
 
 #include <libtransmission/transmission.h>
-#include <libtransmission/bencode.h>
 #include <libtransmission/rpcimpl.h>
-#include <libtransmission/json.h>
 #include <libtransmission/utils.h> /* tr_free */
+#include <libtransmission/variant.h>
 
 #include "actions.h"
 #include "conf.h"
@@ -1665,7 +1664,7 @@ gtr_core_set_pref_double (TrCore * self, const char * key, double newval)
 
 static int nextTag = 1;
 
-typedef void (server_response_func)(TrCore * core, tr_benc * response, gpointer user_data);
+typedef void (server_response_func)(TrCore * core, tr_variant * response, gpointer user_data);
 
 struct pending_request_data
 {
@@ -1679,13 +1678,13 @@ static GHashTable * pendingRequests = NULL;
 static gboolean
 core_read_rpc_response_idle (void * vresponse)
 {
-  tr_benc top;
+  tr_variant top;
   int64_t intVal;
   struct evbuffer * response = vresponse;
 
-  tr_jsonParse (NULL, evbuffer_pullup (response, -1), evbuffer_get_length (response), &top, NULL);
+  tr_variantFromJson (&top, evbuffer_pullup (response, -1), evbuffer_get_length (response));
 
-  if (tr_bencDictFindInt (&top, "tag", &intVal))
+  if (tr_variantDictFindInt (&top, "tag", &intVal))
     {
       const int tag = (int)intVal;
       struct pending_request_data * data = g_hash_table_lookup (pendingRequests, &tag);
@@ -1697,7 +1696,7 @@ core_read_rpc_response_idle (void * vresponse)
         }
     }
 
-  tr_bencFree (&top);
+  tr_variantFree (&top);
   evbuffer_free (response);
   return FALSE;
 }
@@ -1751,13 +1750,13 @@ core_send_rpc_request (TrCore * core, const char * json, int tag,
 ***/
 
 static void
-on_port_test_response (TrCore * core, tr_benc * response, gpointer u UNUSED)
+on_port_test_response (TrCore * core, tr_variant * response, gpointer u UNUSED)
 {
-  tr_benc * args;
+  tr_variant * args;
   bool is_open = FALSE;
 
-  if (tr_bencDictFindDict (response, "arguments", &args))
-    tr_bencDictFindBool (args, "port-is-open", &is_open);
+  if (tr_variantDictFindDict (response, "arguments", &args))
+    tr_variantDictFindBool (args, "port-is-open", &is_open);
 
   core_emit_port_tested (core, is_open);
 }
@@ -1776,13 +1775,13 @@ gtr_core_port_test (TrCore * core)
 ***/
 
 static void
-on_blocklist_response (TrCore * core, tr_benc * response, gpointer data UNUSED)
+on_blocklist_response (TrCore * core, tr_variant * response, gpointer data UNUSED)
 {
-  tr_benc * args;
+  tr_variant * args;
   int64_t ruleCount = -1;
 
-  if (tr_bencDictFindDict (response, "arguments", &args))
-    tr_bencDictFindInt (args, "blocklist-size", &ruleCount);
+  if (tr_variantDictFindDict (response, "arguments", &args))
+    tr_variantDictFindInt (args, "blocklist-size", &ruleCount);
 
   if (ruleCount > 0)
     gtr_pref_int_set ("blocklist-date", tr_time ());
@@ -1811,9 +1810,9 @@ gtr_core_exec_json (TrCore * core, const char * json)
 }
 
 void
-gtr_core_exec (TrCore * core, const tr_benc * top)
+gtr_core_exec (TrCore * core, const tr_variant * top)
 {
-  char * json = tr_bencToStr (top, TR_FMT_JSON_LEAN, NULL);
+  char * json = tr_variantToStr (top, TR_VARIANT_FMT_JSON_LEAN, NULL);
   gtr_core_exec_json (core, json);
   tr_free (json);
 }

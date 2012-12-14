@@ -26,7 +26,7 @@
 #include <QWidgetList>
 
 extern "C" {
-    struct tr_benc;
+    struct tr_variant;
 };
 
 #include "filters.h"

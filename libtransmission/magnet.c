@@ -15,9 +15,9 @@
 #include <stdio.h> /* sscanf () */
 
 #include "transmission.h"
-#include "bencode.h"
 #include "magnet.h"
 #include "utils.h"
+#include "variant.h"
 #include "web.h"
 
 /***
@@ -211,37 +211,37 @@ tr_magnetFree (tr_magnet_info * info)
 }
 
 void
-tr_magnetCreateMetainfo (const tr_magnet_info * info, tr_benc * top)
+tr_magnetCreateMetainfo (const tr_magnet_info * info, tr_variant * top)
 {
   int i;
-  tr_benc * d;
-  tr_bencInitDict (top, 4);
+  tr_variant * d;
+  tr_variantInitDict (top, 4);
 
   /* announce list */
   if (info->trackerCount == 1)
     {
-      tr_bencDictAddStr (top, "announce", info->trackers[0]);
+      tr_variantDictAddStr (top, "announce", info->trackers[0]);
     }
   else
     {
-      tr_benc * trackers = tr_bencDictAddList (top, "announce-list", info->trackerCount);
+      tr_variant * trackers = tr_variantDictAddList (top, "announce-list", info->trackerCount);
       for (i=0; i<info->trackerCount; ++i)
-        tr_bencListAddStr (tr_bencListAddList (trackers, 1), info->trackers[i]);
+        tr_variantListAddStr (tr_variantListAddList (trackers, 1), info->trackers[i]);
     }
 
   /* webseeds */
   if (info->webseedCount > 0)
     {
-      tr_benc * urls = tr_bencDictAddList (top, "url-list", info->webseedCount);
+      tr_variant * urls = tr_variantDictAddList (top, "url-list", info->webseedCount);
       for (i=0; i<info->webseedCount; ++i)
-        tr_bencListAddStr (urls, info->webseeds[i]);
+        tr_variantListAddStr (urls, info->webseeds[i]);
     }
 
   /* nonstandard keys */
-  d = tr_bencDictAddDict (top, "magnet-info", 2);
-  tr_bencDictAddRaw (d, "info_hash", info->hash, 20);
+  d = tr_variantDictAddDict (top, "magnet-info", 2);
+  tr_variantDictAddRaw (d, "info_hash", info->hash, 20);
   if (info->displayName != NULL)
-    tr_bencDictAddStr (d, "display-name", info->displayName);
+    tr_variantDictAddStr (d, "display-name", info->displayName);
 }
 
 

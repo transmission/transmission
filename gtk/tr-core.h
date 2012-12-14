@@ -28,7 +28,7 @@
 #include <gtk/gtk.h>
 
 #include <libtransmission/transmission.h>
-#include <libtransmission/bencode.h>
+#include <libtransmission/variant.h>
 
 G_BEGIN_DECLS
 
@@ -153,7 +153,7 @@ void gtr_core_port_test (TrCore * core);
 
 void gtr_core_blocklist_update (TrCore * core);
 
-void gtr_core_exec (TrCore * core, const tr_benc * benc);
+void gtr_core_exec (TrCore * core, const tr_variant * benc);
 
 void gtr_core_exec_json (TrCore * core, const char * json);
 

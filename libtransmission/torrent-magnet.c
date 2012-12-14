@@ -17,7 +17,6 @@
 #include <event2/buffer.h>
 
 #include "transmission.h"
-#include "bencode.h"
 #include "crypto.h" /* tr_sha1 () */
 #include "magnet.h"
 #include "metainfo.h"
@@ -25,6 +24,7 @@
 #include "torrent.h"
 #include "torrent-magnet.h"
 #include "utils.h"
+#include "variant.h"
 #include "web.h"
 
 #define dbgmsg(tor, ...) \
@@ -109,22 +109,22 @@ findInfoDictOffset (const tr_torrent * tor)
     /* load the file, and find the info dict's offset inside the file */
     if ((fileContents = tr_loadFile (tor->info.torrent, &fileLen)))
     {
-        tr_benc top;
+        tr_variant top;
 
-        if (!tr_bencParse (fileContents, fileContents + fileLen, &top, NULL))
+        if (!tr_variantFromBenc (&top, fileContents, fileLen))
         {
-            tr_benc * infoDict;
+            tr_variant * infoDict;
 
-            if (tr_bencDictFindDict (&top, "info", &infoDict))
+            if (tr_variantDictFindDict (&top, "info", &infoDict))
             {
                 int infoLen;
-                char * infoContents = tr_bencToStr (infoDict, TR_FMT_BENC, &infoLen);
+                char * infoContents = tr_variantToStr (infoDict, TR_VARIANT_FMT_BENC, &infoLen);
                 const uint8_t * i = (const uint8_t*) tr_memmem ((char*)fileContents, fileLen, infoContents, infoLen);
                 offset = i != NULL ? i - fileContents : 0;
                 tr_free (infoContents);
             }
 
-            tr_bencFree (&top);
+            tr_variantFree (&top);
         }
 
         tr_free (fileContents);
@@ -245,16 +245,16 @@ tr_torrentSetMetadataPiece (tr_torrent  * tor, int piece, const void  * data, in
         if ((checksumPassed = !memcmp (sha1, tor->info.hash, SHA_DIGEST_LENGTH)))
         {
             /* checksum passed; now try to parse it as benc */
-            tr_benc infoDict;
-            const int err = tr_bencLoad (m->metadata, m->metadata_size, &infoDict, NULL);
+            tr_variant infoDict;
+            const int err = tr_variantFromBenc (&infoDict, m->metadata, m->metadata_size);
             dbgmsg (tor, "err is %d", err);
             if ((metainfoParsed = !err))
             {
                 /* yay we have bencoded metainfo... merge it into our .torrent file */
-                tr_benc newMetainfo;
+                tr_variant newMetainfo;
                 char * path = tr_strdup (tor->info.torrent);
 
-                if (!tr_bencLoadFile (&newMetainfo, TR_FMT_BENC, path))
+                if (!tr_variantFromFile (&newMetainfo, TR_VARIANT_FMT_BENC, path))
                 {
                     bool hasInfo;
                     tr_info info;
@@ -265,7 +265,7 @@ tr_torrentSetMetadataPiece (tr_torrent  * tor, int piece, const void  * data, in
                     tr_torrentRemoveResume (tor);
 
                     dbgmsg (tor, "Saving completed metadata to \"%s\"", path);
-                    tr_bencMergeDicts (tr_bencDictAddDict (&newMetainfo, "info", 0), &infoDict);
+                    tr_variantMergeDicts (tr_variantDictAddDict (&newMetainfo, "info", 0), &infoDict);
 
                     memset (&info, 0, sizeof (tr_info));
                     success = tr_metainfoParse (tor->session, &newMetainfo, &info, &hasInfo, &infoDictLength);
@@ -283,16 +283,16 @@ tr_torrentSetMetadataPiece (tr_torrent  * tor, int piece, const void  * data, in
                         tor->infoDictLength = infoDictLength;
 
                         /* save the new .torrent file */
-                        tr_bencToFile (&newMetainfo, TR_FMT_BENC, tor->info.torrent);
+                        tr_variantToFile (&newMetainfo, TR_VARIANT_FMT_BENC, tor->info.torrent);
                         tr_sessionSetTorrentFile (tor->session, tor->info.hashString, tor->info.torrent);
                         tr_torrentGotNewInfoDict (tor);
                         tr_torrentSetDirty (tor);
                     }
 
-                    tr_bencFree (&newMetainfo);
+                    tr_variantFree (&newMetainfo);
                 }
 
-                tr_bencFree (&infoDict);
+                tr_variantFree (&infoDict);
                 tr_free (path);
             }
         }

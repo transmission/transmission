@@ -30,7 +30,6 @@
 #include "transmission.h"
 #include "announcer.h"
 #include "bandwidth.h"
-#include "bencode.h"
 #include "blocklist.h"
 #include "cache.h"
 #include "crypto.h"
@@ -51,6 +50,7 @@
 #include "tr-lpd.h"
 #include "trevent.h"
 #include "utils.h"
+#include "variant.h"
 #include "verify.h"
 #include "version.h"
 #include "web.h"
@@ -303,225 +303,228 @@ format_tos (int value)
 }
 
 void
-tr_sessionGetDefaultSettings (tr_benc * d)
+tr_sessionGetDefaultSettings (tr_variant * dict)
 {
-    assert (tr_bencIsDict (d));
+    assert (tr_variantIsDict (dict));
 
-    tr_bencDictReserve (d, 62);
-    tr_bencDictAddBool (d, TR_PREFS_KEY_BLOCKLIST_ENABLED,               false);
-    tr_bencDictAddStr (d, TR_PREFS_KEY_BLOCKLIST_URL,                   "http://www.example.com/blocklist");
-    tr_bencDictAddInt (d, TR_PREFS_KEY_MAX_CACHE_SIZE_MB,               DEFAULT_CACHE_SIZE_MB);
-    tr_bencDictAddBool (d, TR_PREFS_KEY_DHT_ENABLED,                     true);
-    tr_bencDictAddBool (d, TR_PREFS_KEY_UTP_ENABLED,                     true);
-    tr_bencDictAddBool (d, TR_PREFS_KEY_LPD_ENABLED,                     false);
-    tr_bencDictAddStr (d, TR_PREFS_KEY_DOWNLOAD_DIR,                    tr_getDefaultDownloadDir ());
-    tr_bencDictAddInt (d, TR_PREFS_KEY_DSPEED_KBps,                     100);
-    tr_bencDictAddBool (d, TR_PREFS_KEY_DSPEED_ENABLED,                  false);
-    tr_bencDictAddInt (d, TR_PREFS_KEY_ENCRYPTION,                      TR_DEFAULT_ENCRYPTION);
-    tr_bencDictAddInt (d, TR_PREFS_KEY_IDLE_LIMIT,                      30);
-    tr_bencDictAddBool (d, TR_PREFS_KEY_IDLE_LIMIT_ENABLED,              false);
-    tr_bencDictAddStr (d, TR_PREFS_KEY_INCOMPLETE_DIR,                  tr_getDefaultDownloadDir ());
-    tr_bencDictAddBool (d, TR_PREFS_KEY_INCOMPLETE_DIR_ENABLED,          false);
-    tr_bencDictAddInt (d, TR_PREFS_KEY_MSGLEVEL,                        TR_MSG_INF);
-    tr_bencDictAddInt (d, TR_PREFS_KEY_DOWNLOAD_QUEUE_SIZE,             5);
-    tr_bencDictAddBool (d, TR_PREFS_KEY_DOWNLOAD_QUEUE_ENABLED,          true);
-    tr_bencDictAddInt (d, TR_PREFS_KEY_PEER_LIMIT_GLOBAL,               atoi (TR_DEFAULT_PEER_LIMIT_GLOBAL_STR));
-    tr_bencDictAddInt (d, TR_PREFS_KEY_PEER_LIMIT_TORRENT,              atoi (TR_DEFAULT_PEER_LIMIT_TORRENT_STR));
-    tr_bencDictAddInt (d, TR_PREFS_KEY_PEER_PORT,                       atoi (TR_DEFAULT_PEER_PORT_STR));
-    tr_bencDictAddBool (d, TR_PREFS_KEY_PEER_PORT_RANDOM_ON_START,       false);
-    tr_bencDictAddInt (d, TR_PREFS_KEY_PEER_PORT_RANDOM_LOW,            49152);
-    tr_bencDictAddInt (d, TR_PREFS_KEY_PEER_PORT_RANDOM_HIGH,           65535);
-    tr_bencDictAddStr (d, TR_PREFS_KEY_PEER_SOCKET_TOS,                 TR_DEFAULT_PEER_SOCKET_TOS_STR);
-    tr_bencDictAddBool (d, TR_PREFS_KEY_PEX_ENABLED,                     true);
-    tr_bencDictAddBool (d, TR_PREFS_KEY_PORT_FORWARDING,                 true);
-    tr_bencDictAddInt (d, TR_PREFS_KEY_PREALLOCATION,                   TR_PREALLOCATE_SPARSE);
-    tr_bencDictAddBool (d, TR_PREFS_KEY_PREFETCH_ENABLED,                DEFAULT_PREFETCH_ENABLED);
-    tr_bencDictAddBool (d, TR_PREFS_KEY_QUEUE_STALLED_ENABLED,           true);
-    tr_bencDictAddInt (d, TR_PREFS_KEY_QUEUE_STALLED_MINUTES,           30);
-    tr_bencDictAddReal (d, TR_PREFS_KEY_RATIO,                           2.0);
-    tr_bencDictAddBool (d, TR_PREFS_KEY_RATIO_ENABLED,                   false);
-    tr_bencDictAddBool (d, TR_PREFS_KEY_RENAME_PARTIAL_FILES,            true);
-    tr_bencDictAddBool (d, TR_PREFS_KEY_RPC_AUTH_REQUIRED,               false);
-    tr_bencDictAddStr (d, TR_PREFS_KEY_RPC_BIND_ADDRESS,                "0.0.0.0");
-    tr_bencDictAddBool (d, TR_PREFS_KEY_RPC_ENABLED,                     false);
-    tr_bencDictAddStr (d, TR_PREFS_KEY_RPC_PASSWORD,                    "");
-    tr_bencDictAddStr (d, TR_PREFS_KEY_RPC_USERNAME,                    "");
-    tr_bencDictAddStr (d, TR_PREFS_KEY_RPC_WHITELIST,                   TR_DEFAULT_RPC_WHITELIST);
-    tr_bencDictAddBool (d, TR_PREFS_KEY_RPC_WHITELIST_ENABLED,           true);
-    tr_bencDictAddInt (d, TR_PREFS_KEY_RPC_PORT,                        atoi (TR_DEFAULT_RPC_PORT_STR));
-    tr_bencDictAddStr (d, TR_PREFS_KEY_RPC_URL,                         TR_DEFAULT_RPC_URL_STR);
-    tr_bencDictAddBool (d, TR_PREFS_KEY_SCRAPE_PAUSED_TORRENTS,          true);
-    tr_bencDictAddStr (d, TR_PREFS_KEY_SCRIPT_TORRENT_DONE_FILENAME,    "");
-    tr_bencDictAddBool (d, TR_PREFS_KEY_SCRIPT_TORRENT_DONE_ENABLED,     false);
-    tr_bencDictAddInt (d, TR_PREFS_KEY_SEED_QUEUE_SIZE,                 10);
-    tr_bencDictAddBool (d, TR_PREFS_KEY_SEED_QUEUE_ENABLED,              false);
-    tr_bencDictAddBool (d, TR_PREFS_KEY_ALT_SPEED_ENABLED,               false);
-    tr_bencDictAddInt (d, TR_PREFS_KEY_ALT_SPEED_UP_KBps,               50); /* half the regular */
-    tr_bencDictAddInt (d, TR_PREFS_KEY_ALT_SPEED_DOWN_KBps,             50); /* half the regular */
-    tr_bencDictAddInt (d, TR_PREFS_KEY_ALT_SPEED_TIME_BEGIN,            540); /* 9am */
-    tr_bencDictAddBool (d, TR_PREFS_KEY_ALT_SPEED_TIME_ENABLED,          false);
-    tr_bencDictAddInt (d, TR_PREFS_KEY_ALT_SPEED_TIME_END,              1020); /* 5pm */
-    tr_bencDictAddInt (d, TR_PREFS_KEY_ALT_SPEED_TIME_DAY,              TR_SCHED_ALL);
-    tr_bencDictAddInt (d, TR_PREFS_KEY_USPEED_KBps,                     100);
-    tr_bencDictAddBool (d, TR_PREFS_KEY_USPEED_ENABLED,                  false);
-    tr_bencDictAddInt (d, TR_PREFS_KEY_UMASK,                           022);
-    tr_bencDictAddInt (d, TR_PREFS_KEY_UPLOAD_SLOTS_PER_TORRENT,        14);
-    tr_bencDictAddStr (d, TR_PREFS_KEY_BIND_ADDRESS_IPV4,               TR_DEFAULT_BIND_ADDRESS_IPV4);
-    tr_bencDictAddStr (d, TR_PREFS_KEY_BIND_ADDRESS_IPV6,               TR_DEFAULT_BIND_ADDRESS_IPV6);
-    tr_bencDictAddBool (d, TR_PREFS_KEY_START,                           true);
-    tr_bencDictAddBool (d, TR_PREFS_KEY_TRASH_ORIGINAL,                  false);
+    tr_variantDictReserve (dict, 62);
+    tr_variantDictAddBool (dict, TR_PREFS_KEY_BLOCKLIST_ENABLED,               false);
+    tr_variantDictAddStr (dict, TR_PREFS_KEY_BLOCKLIST_URL,                   "http://www.example.com/blocklist");
+    tr_variantDictAddInt (dict, TR_PREFS_KEY_MAX_CACHE_SIZE_MB,               DEFAULT_CACHE_SIZE_MB);
+    tr_variantDictAddBool (dict, TR_PREFS_KEY_DHT_ENABLED,                     true);
+    tr_variantDictAddBool (dict, TR_PREFS_KEY_UTP_ENABLED,                     true);
+    tr_variantDictAddBool (dict, TR_PREFS_KEY_LPD_ENABLED,                     false);
+    tr_variantDictAddStr (dict, TR_PREFS_KEY_DOWNLOAD_DIR,                    tr_getDefaultDownloadDir ());
+    tr_variantDictAddInt (dict, TR_PREFS_KEY_DSPEED_KBps,                     100);
+    tr_variantDictAddBool (dict, TR_PREFS_KEY_DSPEED_ENABLED,                  false);
+    tr_variantDictAddInt (dict, TR_PREFS_KEY_ENCRYPTION,                      TR_DEFAULT_ENCRYPTION);
+    tr_variantDictAddInt (dict, TR_PREFS_KEY_IDLE_LIMIT,                      30);
+    tr_variantDictAddBool (dict, TR_PREFS_KEY_IDLE_LIMIT_ENABLED,              false);
+    tr_variantDictAddStr (dict, TR_PREFS_KEY_INCOMPLETE_DIR,                  tr_getDefaultDownloadDir ());
+    tr_variantDictAddBool (dict, TR_PREFS_KEY_INCOMPLETE_DIR_ENABLED,          false);
+    tr_variantDictAddInt (dict, TR_PREFS_KEY_MSGLEVEL,                        TR_MSG_INF);
+    tr_variantDictAddInt (dict, TR_PREFS_KEY_DOWNLOAD_QUEUE_SIZE,             5);
+    tr_variantDictAddBool (dict, TR_PREFS_KEY_DOWNLOAD_QUEUE_ENABLED,          true);
+    tr_variantDictAddInt (dict, TR_PREFS_KEY_PEER_LIMIT_GLOBAL,               atoi (TR_DEFAULT_PEER_LIMIT_GLOBAL_STR));
+    tr_variantDictAddInt (dict, TR_PREFS_KEY_PEER_LIMIT_TORRENT,              atoi (TR_DEFAULT_PEER_LIMIT_TORRENT_STR));
+    tr_variantDictAddInt (dict, TR_PREFS_KEY_PEER_PORT,                       atoi (TR_DEFAULT_PEER_PORT_STR));
+    tr_variantDictAddBool (dict, TR_PREFS_KEY_PEER_PORT_RANDOM_ON_START,       false);
+    tr_variantDictAddInt (dict, TR_PREFS_KEY_PEER_PORT_RANDOM_LOW,            49152);
+    tr_variantDictAddInt (dict, TR_PREFS_KEY_PEER_PORT_RANDOM_HIGH,           65535);
+    tr_variantDictAddStr (dict, TR_PREFS_KEY_PEER_SOCKET_TOS,                 TR_DEFAULT_PEER_SOCKET_TOS_STR);
+    tr_variantDictAddBool (dict, TR_PREFS_KEY_PEX_ENABLED,                     true);
+    tr_variantDictAddBool (dict, TR_PREFS_KEY_PORT_FORWARDING,                 true);
+    tr_variantDictAddInt (dict, TR_PREFS_KEY_PREALLOCATION,                   TR_PREALLOCATE_SPARSE);
+    tr_variantDictAddBool (dict, TR_PREFS_KEY_PREFETCH_ENABLED,                DEFAULT_PREFETCH_ENABLED);
+    tr_variantDictAddBool (dict, TR_PREFS_KEY_QUEUE_STALLED_ENABLED,           true);
+    tr_variantDictAddInt (dict, TR_PREFS_KEY_QUEUE_STALLED_MINUTES,           30);
+    tr_variantDictAddReal (dict, TR_PREFS_KEY_RATIO,                           2.0);
+    tr_variantDictAddBool (dict, TR_PREFS_KEY_RATIO_ENABLED,                   false);
+    tr_variantDictAddBool (dict, TR_PREFS_KEY_RENAME_PARTIAL_FILES,            true);
+    tr_variantDictAddBool (dict, TR_PREFS_KEY_RPC_AUTH_REQUIRED,               false);
+    tr_variantDictAddStr (dict, TR_PREFS_KEY_RPC_BIND_ADDRESS,                "0.0.0.0");
+    tr_variantDictAddBool (dict, TR_PREFS_KEY_RPC_ENABLED,                     false);
+    tr_variantDictAddStr (dict, TR_PREFS_KEY_RPC_PASSWORD,                    "");
+    tr_variantDictAddStr (dict, TR_PREFS_KEY_RPC_USERNAME,                    "");
+    tr_variantDictAddStr (dict, TR_PREFS_KEY_RPC_WHITELIST,                   TR_DEFAULT_RPC_WHITELIST);
+    tr_variantDictAddBool (dict, TR_PREFS_KEY_RPC_WHITELIST_ENABLED,           true);
+    tr_variantDictAddInt (dict, TR_PREFS_KEY_RPC_PORT,                        atoi (TR_DEFAULT_RPC_PORT_STR));
+    tr_variantDictAddStr (dict, TR_PREFS_KEY_RPC_URL,                         TR_DEFAULT_RPC_URL_STR);
+    tr_variantDictAddBool (dict, TR_PREFS_KEY_SCRAPE_PAUSED_TORRENTS,          true);
+    tr_variantDictAddStr (dict, TR_PREFS_KEY_SCRIPT_TORRENT_DONE_FILENAME,    "");
+    tr_variantDictAddBool (dict, TR_PREFS_KEY_SCRIPT_TORRENT_DONE_ENABLED,     false);
+    tr_variantDictAddInt (dict, TR_PREFS_KEY_SEED_QUEUE_SIZE,                 10);
+    tr_variantDictAddBool (dict, TR_PREFS_KEY_SEED_QUEUE_ENABLED,              false);
+    tr_variantDictAddBool (dict, TR_PREFS_KEY_ALT_SPEED_ENABLED,               false);
+    tr_variantDictAddInt (dict, TR_PREFS_KEY_ALT_SPEED_UP_KBps,               50); /* half the regular */
+    tr_variantDictAddInt (dict, TR_PREFS_KEY_ALT_SPEED_DOWN_KBps,             50); /* half the regular */
+    tr_variantDictAddInt (dict, TR_PREFS_KEY_ALT_SPEED_TIME_BEGIN,            540); /* 9am */
+    tr_variantDictAddBool (dict, TR_PREFS_KEY_ALT_SPEED_TIME_ENABLED,          false);
+    tr_variantDictAddInt (dict, TR_PREFS_KEY_ALT_SPEED_TIME_END,              1020); /* 5pm */
+    tr_variantDictAddInt (dict, TR_PREFS_KEY_ALT_SPEED_TIME_DAY,              TR_SCHED_ALL);
+    tr_variantDictAddInt (dict, TR_PREFS_KEY_USPEED_KBps,                     100);
+    tr_variantDictAddBool (dict, TR_PREFS_KEY_USPEED_ENABLED,                  false);
+    tr_variantDictAddInt (dict, TR_PREFS_KEY_UMASK,                           022);
+    tr_variantDictAddInt (dict, TR_PREFS_KEY_UPLOAD_SLOTS_PER_TORRENT,        14);
+    tr_variantDictAddStr (dict, TR_PREFS_KEY_BIND_ADDRESS_IPV4,               TR_DEFAULT_BIND_ADDRESS_IPV4);
+    tr_variantDictAddStr (dict, TR_PREFS_KEY_BIND_ADDRESS_IPV6,               TR_DEFAULT_BIND_ADDRESS_IPV6);
+    tr_variantDictAddBool (dict, TR_PREFS_KEY_START,                           true);
+    tr_variantDictAddBool (dict, TR_PREFS_KEY_TRASH_ORIGINAL,                  false);
 }
 
 void
-tr_sessionGetSettings (tr_session * s, struct tr_benc * d)
+tr_sessionGetSettings (tr_session * s, tr_variant * dict)
 {
-    assert (tr_bencIsDict (d));
+  assert (tr_variantIsDict (dict));
 
-    tr_bencDictReserve (d, 60);
-    tr_bencDictAddBool (d, TR_PREFS_KEY_BLOCKLIST_ENABLED,                tr_blocklistIsEnabled (s));
-    tr_bencDictAddStr (d, TR_PREFS_KEY_BLOCKLIST_URL,                    tr_blocklistGetURL (s));
-    tr_bencDictAddInt (d, TR_PREFS_KEY_MAX_CACHE_SIZE_MB,                tr_sessionGetCacheLimit_MB (s));
-    tr_bencDictAddBool (d, TR_PREFS_KEY_DHT_ENABLED,                      s->isDHTEnabled);
-    tr_bencDictAddBool (d, TR_PREFS_KEY_UTP_ENABLED,                      s->isUTPEnabled);
-    tr_bencDictAddBool (d, TR_PREFS_KEY_LPD_ENABLED,                      s->isLPDEnabled);
-    tr_bencDictAddStr (d, TR_PREFS_KEY_DOWNLOAD_DIR,                     s->downloadDir);
-    tr_bencDictAddInt (d, TR_PREFS_KEY_DOWNLOAD_QUEUE_SIZE,              tr_sessionGetQueueSize (s, TR_DOWN));
-    tr_bencDictAddBool (d, TR_PREFS_KEY_DOWNLOAD_QUEUE_ENABLED,           tr_sessionGetQueueEnabled (s, TR_DOWN));
-    tr_bencDictAddInt (d, TR_PREFS_KEY_DSPEED_KBps,                      tr_sessionGetSpeedLimit_KBps (s, TR_DOWN));
-    tr_bencDictAddBool (d, TR_PREFS_KEY_DSPEED_ENABLED,                   tr_sessionIsSpeedLimited (s, TR_DOWN));
-    tr_bencDictAddInt (d, TR_PREFS_KEY_ENCRYPTION,                       s->encryptionMode);
-    tr_bencDictAddInt (d, TR_PREFS_KEY_IDLE_LIMIT,                       tr_sessionGetIdleLimit (s));
-    tr_bencDictAddBool (d, TR_PREFS_KEY_IDLE_LIMIT_ENABLED,               tr_sessionIsIdleLimited (s));
-    tr_bencDictAddStr (d, TR_PREFS_KEY_INCOMPLETE_DIR,                   tr_sessionGetIncompleteDir (s));
-    tr_bencDictAddBool (d, TR_PREFS_KEY_INCOMPLETE_DIR_ENABLED,           tr_sessionIsIncompleteDirEnabled (s));
-    tr_bencDictAddInt (d, TR_PREFS_KEY_MSGLEVEL,                         tr_getMessageLevel ());
-    tr_bencDictAddInt (d, TR_PREFS_KEY_PEER_LIMIT_GLOBAL,                s->peerLimit);
-    tr_bencDictAddInt (d, TR_PREFS_KEY_PEER_LIMIT_TORRENT,               s->peerLimitPerTorrent);
-    tr_bencDictAddInt (d, TR_PREFS_KEY_PEER_PORT,                        tr_sessionGetPeerPort (s));
-    tr_bencDictAddBool (d, TR_PREFS_KEY_PEER_PORT_RANDOM_ON_START,        s->isPortRandom);
-    tr_bencDictAddInt (d, TR_PREFS_KEY_PEER_PORT_RANDOM_LOW,             s->randomPortLow);
-    tr_bencDictAddInt (d, TR_PREFS_KEY_PEER_PORT_RANDOM_HIGH,            s->randomPortHigh);
-    tr_bencDictAddStr (d, TR_PREFS_KEY_PEER_SOCKET_TOS,                  format_tos (s->peerSocketTOS));
-    tr_bencDictAddStr (d, TR_PREFS_KEY_PEER_CONGESTION_ALGORITHM,        s->peer_congestion_algorithm);
-    tr_bencDictAddBool (d, TR_PREFS_KEY_PEX_ENABLED,                      s->isPexEnabled);
-    tr_bencDictAddBool (d, TR_PREFS_KEY_PORT_FORWARDING,                  tr_sessionIsPortForwardingEnabled (s));
-    tr_bencDictAddInt (d, TR_PREFS_KEY_PREALLOCATION,                    s->preallocationMode);
-    tr_bencDictAddInt (d, TR_PREFS_KEY_PREFETCH_ENABLED,                 s->isPrefetchEnabled);
-    tr_bencDictAddBool (d, TR_PREFS_KEY_QUEUE_STALLED_ENABLED,            tr_sessionGetQueueStalledEnabled (s));
-    tr_bencDictAddInt (d, TR_PREFS_KEY_QUEUE_STALLED_MINUTES,            tr_sessionGetQueueStalledMinutes (s));
-    tr_bencDictAddReal (d, TR_PREFS_KEY_RATIO,                            s->desiredRatio);
-    tr_bencDictAddBool (d, TR_PREFS_KEY_RATIO_ENABLED,                    s->isRatioLimited);
-    tr_bencDictAddBool (d, TR_PREFS_KEY_RENAME_PARTIAL_FILES,             tr_sessionIsIncompleteFileNamingEnabled (s));
-    tr_bencDictAddBool (d, TR_PREFS_KEY_RPC_AUTH_REQUIRED,                tr_sessionIsRPCPasswordEnabled (s));
-    tr_bencDictAddStr (d, TR_PREFS_KEY_RPC_BIND_ADDRESS,                 tr_sessionGetRPCBindAddress (s));
-    tr_bencDictAddBool (d, TR_PREFS_KEY_RPC_ENABLED,                      tr_sessionIsRPCEnabled (s));
-    tr_bencDictAddStr (d, TR_PREFS_KEY_RPC_PASSWORD,                     tr_sessionGetRPCPassword (s));
-    tr_bencDictAddInt (d, TR_PREFS_KEY_RPC_PORT,                         tr_sessionGetRPCPort (s));
-    tr_bencDictAddStr (d, TR_PREFS_KEY_RPC_URL,                          tr_sessionGetRPCUrl (s));
-    tr_bencDictAddStr (d, TR_PREFS_KEY_RPC_USERNAME,                     tr_sessionGetRPCUsername (s));
-    tr_bencDictAddStr (d, TR_PREFS_KEY_RPC_WHITELIST,                    tr_sessionGetRPCWhitelist (s));
-    tr_bencDictAddBool (d, TR_PREFS_KEY_RPC_WHITELIST_ENABLED,            tr_sessionGetRPCWhitelistEnabled (s));
-    tr_bencDictAddBool (d, TR_PREFS_KEY_SCRAPE_PAUSED_TORRENTS,           s->scrapePausedTorrents);
-    tr_bencDictAddBool (d, TR_PREFS_KEY_SCRIPT_TORRENT_DONE_ENABLED,      tr_sessionIsTorrentDoneScriptEnabled (s));
-    tr_bencDictAddStr (d, TR_PREFS_KEY_SCRIPT_TORRENT_DONE_FILENAME,     tr_sessionGetTorrentDoneScript (s));
-    tr_bencDictAddInt (d, TR_PREFS_KEY_SEED_QUEUE_SIZE,                  tr_sessionGetQueueSize (s, TR_UP));
-    tr_bencDictAddBool (d, TR_PREFS_KEY_SEED_QUEUE_ENABLED,               tr_sessionGetQueueEnabled (s, TR_UP));
-    tr_bencDictAddBool (d, TR_PREFS_KEY_ALT_SPEED_ENABLED,                tr_sessionUsesAltSpeed (s));
-    tr_bencDictAddInt (d, TR_PREFS_KEY_ALT_SPEED_UP_KBps,                tr_sessionGetAltSpeed_KBps (s, TR_UP));
-    tr_bencDictAddInt (d, TR_PREFS_KEY_ALT_SPEED_DOWN_KBps,              tr_sessionGetAltSpeed_KBps (s, TR_DOWN));
-    tr_bencDictAddInt (d, TR_PREFS_KEY_ALT_SPEED_TIME_BEGIN,             tr_sessionGetAltSpeedBegin (s));
-    tr_bencDictAddBool (d, TR_PREFS_KEY_ALT_SPEED_TIME_ENABLED,           tr_sessionUsesAltSpeedTime (s));
-    tr_bencDictAddInt (d, TR_PREFS_KEY_ALT_SPEED_TIME_END,               tr_sessionGetAltSpeedEnd (s));
-    tr_bencDictAddInt (d, TR_PREFS_KEY_ALT_SPEED_TIME_DAY,               tr_sessionGetAltSpeedDay (s));
-    tr_bencDictAddInt (d, TR_PREFS_KEY_USPEED_KBps,                      tr_sessionGetSpeedLimit_KBps (s, TR_UP));
-    tr_bencDictAddBool (d, TR_PREFS_KEY_USPEED_ENABLED,                   tr_sessionIsSpeedLimited (s, TR_UP));
-    tr_bencDictAddInt (d, TR_PREFS_KEY_UMASK,                            s->umask);
-    tr_bencDictAddInt (d, TR_PREFS_KEY_UPLOAD_SLOTS_PER_TORRENT,         s->uploadSlotsPerTorrent);
-    tr_bencDictAddStr (d, TR_PREFS_KEY_BIND_ADDRESS_IPV4,                tr_address_to_string (&s->public_ipv4->addr));
-    tr_bencDictAddStr (d, TR_PREFS_KEY_BIND_ADDRESS_IPV6,                tr_address_to_string (&s->public_ipv6->addr));
-    tr_bencDictAddBool (d, TR_PREFS_KEY_START,                            !tr_sessionGetPaused (s));
-    tr_bencDictAddBool (d, TR_PREFS_KEY_TRASH_ORIGINAL,                   tr_sessionGetDeleteSource (s));
+  tr_variantDictReserve (dict, 63);
+  tr_variantDictAddBool (dict, TR_PREFS_KEY_BLOCKLIST_ENABLED,            tr_blocklistIsEnabled (s));
+  tr_variantDictAddStr  (dict, TR_PREFS_KEY_BLOCKLIST_URL,                tr_blocklistGetURL (s));
+  tr_variantDictAddInt  (dict, TR_PREFS_KEY_MAX_CACHE_SIZE_MB,            tr_sessionGetCacheLimit_MB (s));
+  tr_variantDictAddBool (dict, TR_PREFS_KEY_DHT_ENABLED,                  s->isDHTEnabled);
+  tr_variantDictAddBool (dict, TR_PREFS_KEY_UTP_ENABLED,                  s->isUTPEnabled);
+  tr_variantDictAddBool (dict, TR_PREFS_KEY_LPD_ENABLED,                  s->isLPDEnabled);
+  tr_variantDictAddStr  (dict, TR_PREFS_KEY_DOWNLOAD_DIR,                 s->downloadDir);
+  tr_variantDictAddInt  (dict, TR_PREFS_KEY_DOWNLOAD_QUEUE_SIZE,          tr_sessionGetQueueSize (s, TR_DOWN));
+  tr_variantDictAddBool (dict, TR_PREFS_KEY_DOWNLOAD_QUEUE_ENABLED,       tr_sessionGetQueueEnabled (s, TR_DOWN));
+  tr_variantDictAddInt  (dict, TR_PREFS_KEY_DSPEED_KBps,                  tr_sessionGetSpeedLimit_KBps (s, TR_DOWN));
+  tr_variantDictAddBool (dict, TR_PREFS_KEY_DSPEED_ENABLED,               tr_sessionIsSpeedLimited (s, TR_DOWN));
+  tr_variantDictAddInt  (dict, TR_PREFS_KEY_ENCRYPTION,                   s->encryptionMode);
+  tr_variantDictAddInt  (dict, TR_PREFS_KEY_IDLE_LIMIT,                   tr_sessionGetIdleLimit (s));
+  tr_variantDictAddBool (dict, TR_PREFS_KEY_IDLE_LIMIT_ENABLED,           tr_sessionIsIdleLimited (s));
+  tr_variantDictAddStr  (dict, TR_PREFS_KEY_INCOMPLETE_DIR,               tr_sessionGetIncompleteDir (s));
+  tr_variantDictAddBool (dict, TR_PREFS_KEY_INCOMPLETE_DIR_ENABLED,       tr_sessionIsIncompleteDirEnabled (s));
+  tr_variantDictAddInt  (dict, TR_PREFS_KEY_MSGLEVEL,                     tr_getMessageLevel ());
+  tr_variantDictAddInt  (dict, TR_PREFS_KEY_PEER_LIMIT_GLOBAL,            s->peerLimit);
+  tr_variantDictAddInt  (dict, TR_PREFS_KEY_PEER_LIMIT_TORRENT,           s->peerLimitPerTorrent);
+  tr_variantDictAddInt  (dict, TR_PREFS_KEY_PEER_PORT,                    tr_sessionGetPeerPort (s));
+  tr_variantDictAddBool (dict, TR_PREFS_KEY_PEER_PORT_RANDOM_ON_START,    s->isPortRandom);
+  tr_variantDictAddInt  (dict, TR_PREFS_KEY_PEER_PORT_RANDOM_LOW,         s->randomPortLow);
+  tr_variantDictAddInt  (dict, TR_PREFS_KEY_PEER_PORT_RANDOM_HIGH,        s->randomPortHigh);
+  tr_variantDictAddStr  (dict, TR_PREFS_KEY_PEER_SOCKET_TOS,              format_tos (s->peerSocketTOS));
+  tr_variantDictAddStr  (dict, TR_PREFS_KEY_PEER_CONGESTION_ALGORITHM,    s->peer_congestion_algorithm);
+  tr_variantDictAddBool (dict, TR_PREFS_KEY_PEX_ENABLED,                  s->isPexEnabled);
+  tr_variantDictAddBool (dict, TR_PREFS_KEY_PORT_FORWARDING,              tr_sessionIsPortForwardingEnabled (s));
+  tr_variantDictAddInt  (dict, TR_PREFS_KEY_PREALLOCATION,                s->preallocationMode);
+  tr_variantDictAddInt  (dict, TR_PREFS_KEY_PREFETCH_ENABLED,             s->isPrefetchEnabled);
+  tr_variantDictAddBool (dict, TR_PREFS_KEY_QUEUE_STALLED_ENABLED,        tr_sessionGetQueueStalledEnabled (s));
+  tr_variantDictAddInt  (dict, TR_PREFS_KEY_QUEUE_STALLED_MINUTES,        tr_sessionGetQueueStalledMinutes (s));
+  tr_variantDictAddReal (dict, TR_PREFS_KEY_RATIO,                        s->desiredRatio);
+  tr_variantDictAddBool (dict, TR_PREFS_KEY_RATIO_ENABLED,                s->isRatioLimited);
+  tr_variantDictAddBool (dict, TR_PREFS_KEY_RENAME_PARTIAL_FILES,         tr_sessionIsIncompleteFileNamingEnabled (s));
+  tr_variantDictAddBool (dict, TR_PREFS_KEY_RPC_AUTH_REQUIRED,            tr_sessionIsRPCPasswordEnabled (s));
+  tr_variantDictAddStr  (dict, TR_PREFS_KEY_RPC_BIND_ADDRESS,             tr_sessionGetRPCBindAddress (s));
+  tr_variantDictAddBool (dict, TR_PREFS_KEY_RPC_ENABLED,                  tr_sessionIsRPCEnabled (s));
+  tr_variantDictAddStr  (dict, TR_PREFS_KEY_RPC_PASSWORD,                 tr_sessionGetRPCPassword (s));
+  tr_variantDictAddInt  (dict, TR_PREFS_KEY_RPC_PORT,                     tr_sessionGetRPCPort (s));
+  tr_variantDictAddStr  (dict, TR_PREFS_KEY_RPC_URL,                      tr_sessionGetRPCUrl (s));
+  tr_variantDictAddStr  (dict, TR_PREFS_KEY_RPC_USERNAME,                 tr_sessionGetRPCUsername (s));
+  tr_variantDictAddStr  (dict, TR_PREFS_KEY_RPC_WHITELIST,                tr_sessionGetRPCWhitelist (s));
+  tr_variantDictAddBool (dict, TR_PREFS_KEY_RPC_WHITELIST_ENABLED,        tr_sessionGetRPCWhitelistEnabled (s));
+  tr_variantDictAddBool (dict, TR_PREFS_KEY_SCRAPE_PAUSED_TORRENTS,       s->scrapePausedTorrents);
+  tr_variantDictAddBool (dict, TR_PREFS_KEY_SCRIPT_TORRENT_DONE_ENABLED,  tr_sessionIsTorrentDoneScriptEnabled (s));
+  tr_variantDictAddStr  (dict, TR_PREFS_KEY_SCRIPT_TORRENT_DONE_FILENAME, tr_sessionGetTorrentDoneScript (s));
+  tr_variantDictAddInt  (dict, TR_PREFS_KEY_SEED_QUEUE_SIZE,              tr_sessionGetQueueSize (s, TR_UP));
+  tr_variantDictAddBool (dict, TR_PREFS_KEY_SEED_QUEUE_ENABLED,           tr_sessionGetQueueEnabled (s, TR_UP));
+  tr_variantDictAddBool (dict, TR_PREFS_KEY_ALT_SPEED_ENABLED,            tr_sessionUsesAltSpeed (s));
+  tr_variantDictAddInt  (dict, TR_PREFS_KEY_ALT_SPEED_UP_KBps,            tr_sessionGetAltSpeed_KBps (s, TR_UP));
+  tr_variantDictAddInt  (dict, TR_PREFS_KEY_ALT_SPEED_DOWN_KBps,          tr_sessionGetAltSpeed_KBps (s, TR_DOWN));
+  tr_variantDictAddInt  (dict, TR_PREFS_KEY_ALT_SPEED_TIME_BEGIN,         tr_sessionGetAltSpeedBegin (s));
+  tr_variantDictAddBool (dict, TR_PREFS_KEY_ALT_SPEED_TIME_ENABLED,       tr_sessionUsesAltSpeedTime (s));
+  tr_variantDictAddInt  (dict, TR_PREFS_KEY_ALT_SPEED_TIME_END,           tr_sessionGetAltSpeedEnd (s));
+  tr_variantDictAddInt  (dict, TR_PREFS_KEY_ALT_SPEED_TIME_DAY,           tr_sessionGetAltSpeedDay (s));
+  tr_variantDictAddInt  (dict, TR_PREFS_KEY_USPEED_KBps,                  tr_sessionGetSpeedLimit_KBps (s, TR_UP));
+  tr_variantDictAddBool (dict, TR_PREFS_KEY_USPEED_ENABLED,               tr_sessionIsSpeedLimited (s, TR_UP));
+  tr_variantDictAddInt  (dict, TR_PREFS_KEY_UMASK,                        s->umask);
+  tr_variantDictAddInt  (dict, TR_PREFS_KEY_UPLOAD_SLOTS_PER_TORRENT,     s->uploadSlotsPerTorrent);
+  tr_variantDictAddStr  (dict, TR_PREFS_KEY_BIND_ADDRESS_IPV4,            tr_address_to_string (&s->public_ipv4->addr));
+  tr_variantDictAddStr  (dict, TR_PREFS_KEY_BIND_ADDRESS_IPV6,            tr_address_to_string (&s->public_ipv6->addr));
+  tr_variantDictAddBool (dict, TR_PREFS_KEY_START,                        !tr_sessionGetPaused (s));
+  tr_variantDictAddBool (dict, TR_PREFS_KEY_TRASH_ORIGINAL,               tr_sessionGetDeleteSource (s));
 }
 
 bool
-tr_sessionLoadSettings (tr_benc * d, const char * configDir, const char * appName)
+tr_sessionLoadSettings (tr_variant * dict, const char * configDir, const char * appName)
 {
-    int err = 0;
-    char * filename;
-    tr_benc fileSettings;
-    tr_benc sessionDefaults;
-    tr_benc tmp;
-    bool success = false;
+  int err = 0;
+  char * filename;
+  tr_variant fileSettings;
+  tr_variant sessionDefaults;
+  tr_variant tmp;
+  bool success = false;
 
-    assert (tr_bencIsDict (d));
+  assert (tr_variantIsDict (dict));
 
-    /* initializing the defaults: caller may have passed in some app-level defaults.
-     * preserve those and use the session defaults to fill in any missing gaps. */
-    tr_bencInitDict (&sessionDefaults, 0);
-    tr_sessionGetDefaultSettings (&sessionDefaults);
-    tr_bencMergeDicts (&sessionDefaults, d);
-    tmp = *d; *d = sessionDefaults; sessionDefaults = tmp;
+  /* initializing the defaults: caller may have passed in some app-level defaults.
+   * preserve those and use the session defaults to fill in any missing gaps. */
+  tr_variantInitDict (&sessionDefaults, 0);
+  tr_sessionGetDefaultSettings (&sessionDefaults);
+  tr_variantMergeDicts (&sessionDefaults, dict);
+  tmp = *dict;
+  *dict = sessionDefaults;
+  sessionDefaults = tmp;
 
-    /* if caller didn't specify a config dir, use the default */
-    if (!configDir || !*configDir)
-        configDir = tr_getDefaultConfigDir (appName);
+  /* if caller didn't specify a config dir, use the default */
+  if (!configDir || !*configDir)
+    configDir = tr_getDefaultConfigDir (appName);
 
-    /* file settings override the defaults */
-    filename = tr_buildPath (configDir, "settings.json", NULL);
-    err = tr_bencLoadFile (&fileSettings, TR_FMT_JSON, filename);
-    if (!err) {
-        tr_bencMergeDicts (d, &fileSettings);
-        tr_bencFree (&fileSettings);
+  /* file settings override the defaults */
+  filename = tr_buildPath (configDir, "settings.json", NULL);
+  err = tr_variantFromFile (&fileSettings, TR_VARIANT_FMT_JSON, filename);
+  if (!err)
+    {
+      tr_variantMergeDicts (dict, &fileSettings);
+      tr_variantFree (&fileSettings);
     }
 
-    /* cleanup */
-    tr_bencFree (&sessionDefaults);
-    tr_free (filename);
-    success = (err==0) || (err==ENOENT);
-    return success;
+  /* cleanup */
+  tr_variantFree (&sessionDefaults);
+  tr_free (filename);
+  success = (err==0) || (err==ENOENT);
+  return success;
 }
 
 void
-tr_sessionSaveSettings (tr_session    * session,
-                        const char    * configDir,
-                        const tr_benc * clientSettings)
+tr_sessionSaveSettings (tr_session       * session,
+                        const char       * configDir,
+                        const tr_variant * clientSettings)
 {
-    tr_benc settings;
-    char * filename = tr_buildPath (configDir, "settings.json", NULL);
+  tr_variant settings;
+  char * filename = tr_buildPath (configDir, "settings.json", NULL);
 
-    assert (tr_bencIsDict (clientSettings));
+  assert (tr_variantIsDict (clientSettings));
 
-    tr_bencInitDict (&settings, 0);
+  tr_variantInitDict (&settings, 0);
 
-    /* the existing file settings are the fallback values */
-    {
-        tr_benc fileSettings;
-        const int err = tr_bencLoadFile (&fileSettings, TR_FMT_JSON, filename);
-        if (!err)
-        {
-            tr_bencMergeDicts (&settings, &fileSettings);
-            tr_bencFree (&fileSettings);
-        }
-    }
+  /* the existing file settings are the fallback values */
+  {
+    tr_variant fileSettings;
+    const int err = tr_variantFromFile (&fileSettings, TR_VARIANT_FMT_JSON, filename);
+    if (!err)
+      {
+        tr_variantMergeDicts (&settings, &fileSettings);
+        tr_variantFree (&fileSettings);
+      }
+  }
 
-    /* the client's settings override the file settings */
-    tr_bencMergeDicts (&settings, clientSettings);
+  /* the client's settings override the file settings */
+  tr_variantMergeDicts (&settings, clientSettings);
 
-    /* the session's true values override the file & client settings */
-    {
-        tr_benc sessionSettings;
-        tr_bencInitDict (&sessionSettings, 0);
-        tr_sessionGetSettings (session, &sessionSettings);
-        tr_bencMergeDicts (&settings, &sessionSettings);
-        tr_bencFree (&sessionSettings);
-    }
+  /* the session's true values override the file & client settings */
+  {
+    tr_variant sessionSettings;
+    tr_variantInitDict (&sessionSettings, 0);
+    tr_sessionGetSettings (session, &sessionSettings);
+    tr_variantMergeDicts (&settings, &sessionSettings);
+    tr_variantFree (&sessionSettings);
+  }
 
-    /* save the result */
-    tr_bencToFile (&settings, TR_FMT_JSON, filename);
+  /* save the result */
+  tr_variantToFile (&settings, TR_VARIANT_FMT_JSON, filename);
 
-    /* cleanup */
-    tr_free (filename);
-    tr_bencFree (&settings);
+  /* cleanup */
+  tr_free (filename);
+  tr_variantFree (&settings);
 }
 
 /***
@@ -562,20 +565,20 @@ struct init_data
     const char  * configDir;
     bool          done;
     bool          messageQueuingEnabled;
-    tr_benc     * clientSettings;
+    tr_variant  * clientSettings;
 };
 
 tr_session *
 tr_sessionInit (const char  * tag,
                 const char  * configDir,
                 bool          messageQueuingEnabled,
-                tr_benc     * clientSettings)
+                tr_variant     * clientSettings)
 {
     int64_t i;
     tr_session * session;
     struct init_data data;
 
-    assert (tr_bencIsDict (clientSettings));
+    assert (tr_variantIsDict (clientSettings));
 
     tr_timeUpdate (time (NULL));
 
@@ -589,10 +592,10 @@ tr_sessionInit (const char  * tag,
     session->magicNumber = SESSION_MAGIC_NUMBER;
     tr_bandwidthConstruct (&session->bandwidth, session, NULL);
     tr_peerIdInit (session->peer_id);
-    tr_bencInitList (&session->removedTorrents, 0);
+    tr_variantInitList (&session->removedTorrents, 0);
 
     /* nice to start logging at the very beginning */
-    if (tr_bencDictFindInt (clientSettings, TR_PREFS_KEY_MSGLEVEL, &i))
+    if (tr_variantDictFindInt (clientSettings, TR_PREFS_KEY_MSGLEVEL, &i))
         tr_setMessageLevel (i);
 
     /* start the libtransmission thread */
@@ -667,20 +670,20 @@ static void loadBlocklists (tr_session * session);
 static void
 tr_sessionInitImpl (void * vdata)
 {
-    tr_benc settings;
+    tr_variant settings;
     struct init_data * data = vdata;
-    tr_benc * clientSettings = data->clientSettings;
+    tr_variant * clientSettings = data->clientSettings;
     tr_session * session = data->session;
 
     assert (tr_amInEventThread (session));
-    assert (tr_bencIsDict (clientSettings));
+    assert (tr_variantIsDict (clientSettings));
 
     dbgmsg ("tr_sessionInit: the session's top-level bandwidth object is %p",
             &session->bandwidth);
 
-    tr_bencInitDict (&settings, 0);
+    tr_variantInitDict (&settings, 0);
     tr_sessionGetDefaultSettings (&settings);
-    tr_bencMergeDicts (&settings, clientSettings);
+    tr_variantMergeDicts (&settings, clientSettings);
 
     assert (session->event_base != NULL);
     session->nowTimer = evtimer_new (session->event_base, onNowTimer, session);
@@ -733,7 +736,7 @@ tr_sessionInitImpl (void * vdata)
         tr_lpdInit (session, &session->public_ipv4->addr);
 
     /* cleanup */
-    tr_bencFree (&settings);
+    tr_variantFree (&settings);
     data->done = true;
 }
 
@@ -750,77 +753,77 @@ sessionSetImpl (void * vdata)
     struct tr_bindinfo b;
     struct init_data * data = vdata;
     tr_session * session = data->session;
-    tr_benc * settings = data->clientSettings;
+    tr_variant * settings = data->clientSettings;
     struct tr_turtle_info * turtle = &session->turtle;
 
     assert (tr_isSession (session));
-    assert (tr_bencIsDict (settings));
+    assert (tr_variantIsDict (settings));
     assert (tr_amInEventThread (session));
 
-    if (tr_bencDictFindInt (settings, TR_PREFS_KEY_MSGLEVEL, &i))
+    if (tr_variantDictFindInt (settings, TR_PREFS_KEY_MSGLEVEL, &i))
         tr_setMessageLevel (i);
 
-    if (tr_bencDictFindInt (settings, TR_PREFS_KEY_UMASK, &i)) {
+    if (tr_variantDictFindInt (settings, TR_PREFS_KEY_UMASK, &i)) {
         session->umask = (mode_t)i;
         umask (session->umask);
     }
 
     /* misc features */
-    if (tr_bencDictFindInt (settings, TR_PREFS_KEY_MAX_CACHE_SIZE_MB, &i))
+    if (tr_variantDictFindInt (settings, TR_PREFS_KEY_MAX_CACHE_SIZE_MB, &i))
         tr_sessionSetCacheLimit_MB (session, i);
-    if (tr_bencDictFindInt (settings, TR_PREFS_KEY_PEER_LIMIT_TORRENT, &i))
+    if (tr_variantDictFindInt (settings, TR_PREFS_KEY_PEER_LIMIT_TORRENT, &i))
         tr_sessionSetPeerLimitPerTorrent (session, i);
-    if (tr_bencDictFindBool (settings, TR_PREFS_KEY_PEX_ENABLED, &boolVal))
+    if (tr_variantDictFindBool (settings, TR_PREFS_KEY_PEX_ENABLED, &boolVal))
         tr_sessionSetPexEnabled (session, boolVal);
-    if (tr_bencDictFindBool (settings, TR_PREFS_KEY_DHT_ENABLED, &boolVal))
+    if (tr_variantDictFindBool (settings, TR_PREFS_KEY_DHT_ENABLED, &boolVal))
         tr_sessionSetDHTEnabled (session, boolVal);
-    if (tr_bencDictFindBool (settings, TR_PREFS_KEY_UTP_ENABLED, &boolVal))
+    if (tr_variantDictFindBool (settings, TR_PREFS_KEY_UTP_ENABLED, &boolVal))
         tr_sessionSetUTPEnabled (session, boolVal);
-    if (tr_bencDictFindBool (settings, TR_PREFS_KEY_LPD_ENABLED, &boolVal))
+    if (tr_variantDictFindBool (settings, TR_PREFS_KEY_LPD_ENABLED, &boolVal))
         tr_sessionSetLPDEnabled (session, boolVal);
-    if (tr_bencDictFindInt (settings, TR_PREFS_KEY_ENCRYPTION, &i))
+    if (tr_variantDictFindInt (settings, TR_PREFS_KEY_ENCRYPTION, &i))
         tr_sessionSetEncryption (session, i);
-    if (tr_bencDictFindStr (settings, TR_PREFS_KEY_PEER_SOCKET_TOS, &str))
+    if (tr_variantDictFindStr (settings, TR_PREFS_KEY_PEER_SOCKET_TOS, &str, NULL))
         session->peerSocketTOS = parse_tos (str);
-    if (tr_bencDictFindStr (settings, TR_PREFS_KEY_PEER_CONGESTION_ALGORITHM, &str))
+    if (tr_variantDictFindStr (settings, TR_PREFS_KEY_PEER_CONGESTION_ALGORITHM, &str, NULL))
         session->peer_congestion_algorithm = tr_strdup (str);
     else
         session->peer_congestion_algorithm = tr_strdup ("");
-    if (tr_bencDictFindBool (settings, TR_PREFS_KEY_BLOCKLIST_ENABLED, &boolVal))
+    if (tr_variantDictFindBool (settings, TR_PREFS_KEY_BLOCKLIST_ENABLED, &boolVal))
         tr_blocklistSetEnabled (session, boolVal);
-    if (tr_bencDictFindStr (settings, TR_PREFS_KEY_BLOCKLIST_URL, &str))
+    if (tr_variantDictFindStr (settings, TR_PREFS_KEY_BLOCKLIST_URL, &str, NULL))
         tr_blocklistSetURL (session, str);
-    if (tr_bencDictFindBool (settings, TR_PREFS_KEY_START, &boolVal))
+    if (tr_variantDictFindBool (settings, TR_PREFS_KEY_START, &boolVal))
         tr_sessionSetPaused (session, !boolVal);
-    if (tr_bencDictFindBool (settings, TR_PREFS_KEY_TRASH_ORIGINAL, &boolVal))
+    if (tr_variantDictFindBool (settings, TR_PREFS_KEY_TRASH_ORIGINAL, &boolVal))
         tr_sessionSetDeleteSource (session, boolVal);
 
     /* torrent queues */
-    if (tr_bencDictFindInt (settings, TR_PREFS_KEY_QUEUE_STALLED_MINUTES, &i))
+    if (tr_variantDictFindInt (settings, TR_PREFS_KEY_QUEUE_STALLED_MINUTES, &i))
         tr_sessionSetQueueStalledMinutes (session, i);
-    if (tr_bencDictFindBool (settings, TR_PREFS_KEY_QUEUE_STALLED_ENABLED, &boolVal))
+    if (tr_variantDictFindBool (settings, TR_PREFS_KEY_QUEUE_STALLED_ENABLED, &boolVal))
         tr_sessionSetQueueStalledEnabled (session, boolVal);
-    if (tr_bencDictFindInt (settings, TR_PREFS_KEY_DOWNLOAD_QUEUE_SIZE, &i))
+    if (tr_variantDictFindInt (settings, TR_PREFS_KEY_DOWNLOAD_QUEUE_SIZE, &i))
         tr_sessionSetQueueSize (session, TR_DOWN, i);
-    if (tr_bencDictFindBool (settings, TR_PREFS_KEY_DOWNLOAD_QUEUE_ENABLED, &boolVal))
+    if (tr_variantDictFindBool (settings, TR_PREFS_KEY_DOWNLOAD_QUEUE_ENABLED, &boolVal))
         tr_sessionSetQueueEnabled (session, TR_DOWN, boolVal);
-    if (tr_bencDictFindInt (settings, TR_PREFS_KEY_SEED_QUEUE_SIZE, &i))
+    if (tr_variantDictFindInt (settings, TR_PREFS_KEY_SEED_QUEUE_SIZE, &i))
         tr_sessionSetQueueSize (session, TR_UP, i);
-    if (tr_bencDictFindBool (settings, TR_PREFS_KEY_SEED_QUEUE_ENABLED, &boolVal))
+    if (tr_variantDictFindBool (settings, TR_PREFS_KEY_SEED_QUEUE_ENABLED, &boolVal))
         tr_sessionSetQueueEnabled (session, TR_UP, boolVal);
 
     /* files and directories */
-    if (tr_bencDictFindBool (settings, TR_PREFS_KEY_PREFETCH_ENABLED, &boolVal))
+    if (tr_variantDictFindBool (settings, TR_PREFS_KEY_PREFETCH_ENABLED, &boolVal))
         session->isPrefetchEnabled = boolVal;
-    if (tr_bencDictFindInt (settings, TR_PREFS_KEY_PREALLOCATION, &i))
+    if (tr_variantDictFindInt (settings, TR_PREFS_KEY_PREALLOCATION, &i))
         session->preallocationMode = i;
-    if (tr_bencDictFindStr (settings, TR_PREFS_KEY_DOWNLOAD_DIR, &str))
+    if (tr_variantDictFindStr (settings, TR_PREFS_KEY_DOWNLOAD_DIR, &str, NULL))
         tr_sessionSetDownloadDir (session, str);
-    if (tr_bencDictFindStr (settings, TR_PREFS_KEY_INCOMPLETE_DIR, &str))
+    if (tr_variantDictFindStr (settings, TR_PREFS_KEY_INCOMPLETE_DIR, &str, NULL))
         tr_sessionSetIncompleteDir (session, str);
-    if (tr_bencDictFindBool (settings, TR_PREFS_KEY_INCOMPLETE_DIR_ENABLED, &boolVal))
+    if (tr_variantDictFindBool (settings, TR_PREFS_KEY_INCOMPLETE_DIR_ENABLED, &boolVal))
         tr_sessionSetIncompleteDirEnabled (session, boolVal);
-    if (tr_bencDictFindBool (settings, TR_PREFS_KEY_RENAME_PARTIAL_FILES, &boolVal))
+    if (tr_variantDictFindBool (settings, TR_PREFS_KEY_RENAME_PARTIAL_FILES, &boolVal))
         tr_sessionSetIncompleteFileNamingEnabled (session, boolVal);
 
     /* rpc server */
@@ -833,59 +836,59 @@ sessionSetImpl (void * vdata)
     free_incoming_peer_port (session);
 
     str = TR_PREFS_KEY_BIND_ADDRESS_IPV4;
-    tr_bencDictFindStr (settings, TR_PREFS_KEY_BIND_ADDRESS_IPV4, &str);
+    tr_variantDictFindStr (settings, TR_PREFS_KEY_BIND_ADDRESS_IPV4, &str, NULL);
     if (!tr_address_from_string (&b.addr, str) || (b.addr.type != TR_AF_INET))
         b.addr = tr_inaddr_any;
     b.socket = -1;
     session->public_ipv4 = tr_memdup (&b, sizeof (struct tr_bindinfo));
 
     str = TR_PREFS_KEY_BIND_ADDRESS_IPV6;
-    tr_bencDictFindStr (settings, TR_PREFS_KEY_BIND_ADDRESS_IPV6, &str);
+    tr_variantDictFindStr (settings, TR_PREFS_KEY_BIND_ADDRESS_IPV6, &str, NULL);
     if (!tr_address_from_string (&b.addr, str) || (b.addr.type != TR_AF_INET6))
         b.addr = tr_in6addr_any;
     b.socket = -1;
     session->public_ipv6 = tr_memdup (&b, sizeof (struct tr_bindinfo));
 
     /* incoming peer port */
-    if (tr_bencDictFindInt (settings, TR_PREFS_KEY_PEER_PORT_RANDOM_LOW, &i))
+    if (tr_variantDictFindInt (settings, TR_PREFS_KEY_PEER_PORT_RANDOM_LOW, &i))
         session->randomPortLow = i;
-    if (tr_bencDictFindInt (settings, TR_PREFS_KEY_PEER_PORT_RANDOM_HIGH, &i))
+    if (tr_variantDictFindInt (settings, TR_PREFS_KEY_PEER_PORT_RANDOM_HIGH, &i))
         session->randomPortHigh = i;
-    if (tr_bencDictFindBool (settings, TR_PREFS_KEY_PEER_PORT_RANDOM_ON_START, &boolVal))
+    if (tr_variantDictFindBool (settings, TR_PREFS_KEY_PEER_PORT_RANDOM_ON_START, &boolVal))
         tr_sessionSetPeerPortRandomOnStart (session, boolVal);
-    if (!tr_bencDictFindInt (settings, TR_PREFS_KEY_PEER_PORT, &i))
+    if (!tr_variantDictFindInt (settings, TR_PREFS_KEY_PEER_PORT, &i))
         i = session->private_peer_port;
     setPeerPort (session, boolVal ? getRandomPort (session) : i);
-    if (tr_bencDictFindBool (settings, TR_PREFS_KEY_PORT_FORWARDING, &boolVal))
+    if (tr_variantDictFindBool (settings, TR_PREFS_KEY_PORT_FORWARDING, &boolVal))
         tr_sessionSetPortForwardingEnabled (session, boolVal);
 
-    if (tr_bencDictFindInt (settings, TR_PREFS_KEY_PEER_LIMIT_GLOBAL, &i))
+    if (tr_variantDictFindInt (settings, TR_PREFS_KEY_PEER_LIMIT_GLOBAL, &i))
         session->peerLimit = i;
 
     /**
     **/
 
-    if (tr_bencDictFindInt (settings, TR_PREFS_KEY_UPLOAD_SLOTS_PER_TORRENT, &i))
+    if (tr_variantDictFindInt (settings, TR_PREFS_KEY_UPLOAD_SLOTS_PER_TORRENT, &i))
         session->uploadSlotsPerTorrent = i;
 
-    if (tr_bencDictFindInt (settings, TR_PREFS_KEY_USPEED_KBps, &i))
+    if (tr_variantDictFindInt (settings, TR_PREFS_KEY_USPEED_KBps, &i))
         tr_sessionSetSpeedLimit_KBps (session, TR_UP, i);
-    if (tr_bencDictFindBool (settings, TR_PREFS_KEY_USPEED_ENABLED, &boolVal))
+    if (tr_variantDictFindBool (settings, TR_PREFS_KEY_USPEED_ENABLED, &boolVal))
         tr_sessionLimitSpeed (session, TR_UP, boolVal);
 
-    if (tr_bencDictFindInt (settings, TR_PREFS_KEY_DSPEED_KBps, &i))
+    if (tr_variantDictFindInt (settings, TR_PREFS_KEY_DSPEED_KBps, &i))
         tr_sessionSetSpeedLimit_KBps (session, TR_DOWN, i);
-    if (tr_bencDictFindBool (settings, TR_PREFS_KEY_DSPEED_ENABLED, &boolVal))
+    if (tr_variantDictFindBool (settings, TR_PREFS_KEY_DSPEED_ENABLED, &boolVal))
         tr_sessionLimitSpeed (session, TR_DOWN, boolVal);
 
-    if (tr_bencDictFindReal (settings, TR_PREFS_KEY_RATIO, &d))
+    if (tr_variantDictFindReal (settings, TR_PREFS_KEY_RATIO, &d))
         tr_sessionSetRatioLimit (session, d);
-    if (tr_bencDictFindBool (settings, TR_PREFS_KEY_RATIO_ENABLED, &boolVal))
+    if (tr_variantDictFindBool (settings, TR_PREFS_KEY_RATIO_ENABLED, &boolVal))
         tr_sessionSetRatioLimited (session, boolVal);
 
-    if (tr_bencDictFindInt (settings, TR_PREFS_KEY_IDLE_LIMIT, &i))
+    if (tr_variantDictFindInt (settings, TR_PREFS_KEY_IDLE_LIMIT, &i))
         tr_sessionSetIdleLimit (session, i);
-    if (tr_bencDictFindBool (settings, TR_PREFS_KEY_IDLE_LIMIT_ENABLED, &boolVal))
+    if (tr_variantDictFindBool (settings, TR_PREFS_KEY_IDLE_LIMIT_ENABLED, &boolVal))
         tr_sessionSetIdleLimited (session, boolVal);
 
     /**
@@ -893,19 +896,19 @@ sessionSetImpl (void * vdata)
     **/
 
     /* update the turtle mode's fields */
-    if (tr_bencDictFindInt (settings, TR_PREFS_KEY_ALT_SPEED_UP_KBps, &i))
+    if (tr_variantDictFindInt (settings, TR_PREFS_KEY_ALT_SPEED_UP_KBps, &i))
         turtle->speedLimit_Bps[TR_UP] = toSpeedBytes (i);
-    if (tr_bencDictFindInt (settings, TR_PREFS_KEY_ALT_SPEED_DOWN_KBps, &i))
+    if (tr_variantDictFindInt (settings, TR_PREFS_KEY_ALT_SPEED_DOWN_KBps, &i))
         turtle->speedLimit_Bps[TR_DOWN] = toSpeedBytes (i);
-    if (tr_bencDictFindInt (settings, TR_PREFS_KEY_ALT_SPEED_TIME_BEGIN, &i))
+    if (tr_variantDictFindInt (settings, TR_PREFS_KEY_ALT_SPEED_TIME_BEGIN, &i))
         turtle->beginMinute = i;
-    if (tr_bencDictFindInt (settings, TR_PREFS_KEY_ALT_SPEED_TIME_END, &i))
+    if (tr_variantDictFindInt (settings, TR_PREFS_KEY_ALT_SPEED_TIME_END, &i))
         turtle->endMinute = i;
-    if (tr_bencDictFindInt (settings, TR_PREFS_KEY_ALT_SPEED_TIME_DAY, &i))
+    if (tr_variantDictFindInt (settings, TR_PREFS_KEY_ALT_SPEED_TIME_DAY, &i))
         turtle->days = i;
-    if (tr_bencDictFindBool (settings, TR_PREFS_KEY_ALT_SPEED_TIME_ENABLED, &boolVal))
+    if (tr_variantDictFindBool (settings, TR_PREFS_KEY_ALT_SPEED_TIME_ENABLED, &boolVal))
         turtle->isClockEnabled = boolVal;
-    if (tr_bencDictFindBool (settings, TR_PREFS_KEY_ALT_SPEED_ENABLED, &boolVal))
+    if (tr_variantDictFindBool (settings, TR_PREFS_KEY_ALT_SPEED_ENABLED, &boolVal))
         turtle->isEnabled = boolVal;
     turtleBootstrap (session, turtle);
 
@@ -913,30 +916,30 @@ sessionSetImpl (void * vdata)
     ***  Scripts
     **/
 
-    if (tr_bencDictFindBool (settings, TR_PREFS_KEY_SCRIPT_TORRENT_DONE_ENABLED, &boolVal))
+    if (tr_variantDictFindBool (settings, TR_PREFS_KEY_SCRIPT_TORRENT_DONE_ENABLED, &boolVal))
         tr_sessionSetTorrentDoneScriptEnabled (session, boolVal);
-    if (tr_bencDictFindStr (settings, TR_PREFS_KEY_SCRIPT_TORRENT_DONE_FILENAME, &str))
+    if (tr_variantDictFindStr (settings, TR_PREFS_KEY_SCRIPT_TORRENT_DONE_FILENAME, &str, NULL))
         tr_sessionSetTorrentDoneScript (session, str);
 
 
-    if (tr_bencDictFindBool (settings, TR_PREFS_KEY_SCRAPE_PAUSED_TORRENTS, &boolVal))
+    if (tr_variantDictFindBool (settings, TR_PREFS_KEY_SCRAPE_PAUSED_TORRENTS, &boolVal))
         session->scrapePausedTorrents = boolVal;
 
     data->done = true;
 }
 
 void
-tr_sessionSet (tr_session * session, struct tr_benc  * settings)
+tr_sessionSet (tr_session * session, tr_variant  * settings)
 {
-    struct init_data data;
-    data.done = false;
-    data.session = session;
-    data.clientSettings = settings;
+  struct init_data data;
+  data.done = false;
+  data.session = session;
+  data.clientSettings = settings;
 
-    /* run the rest in the libtransmission thread */
-    tr_runInEventThread (session, sessionSetImpl, &data);
-    while (!data.done)
-        tr_wait_msec (100);
+  /* run the rest in the libtransmission thread */
+  tr_runInEventThread (session, sessionSetImpl, &data);
+  while (!data.done)
+    tr_wait_msec (100);
 }
 
 /***
@@ -1864,12 +1867,12 @@ tr_sessionClose (tr_session * session)
     }
 
     /* free the session memory */
-    tr_bencFree (&session->removedTorrents);
+    tr_variantFree (&session->removedTorrents);
     tr_bandwidthDestruct (&session->bandwidth);
     tr_bitfieldDestruct (&session->turtle.minutes);
     tr_lockFree (session->lock);
     if (session->metainfoLookup) {
-        tr_bencFree (session->metainfoLookup);
+        tr_variantFree (session->metainfoLookup);
         tr_free (session->metainfoLookup);
     }
     tr_free (session->torrentDoneScript);
@@ -2375,14 +2378,14 @@ metainfoLookupInit (tr_session * session)
     const char * dirname = tr_getTorrentDir (session);
     DIR *        odir = NULL;
     tr_ctor *    ctor = NULL;
-    tr_benc * lookup;
+    tr_variant * lookup;
     int n = 0;
 
     assert (tr_isSession (session));
 
     /* walk through the directory and find the mappings */
-    lookup = tr_new0 (tr_benc, 1);
-    tr_bencInitDict (lookup, 0);
+    lookup = tr_new0 (tr_variant, 1);
+    tr_variantInitDict (lookup, 0);
     ctor = tr_ctorNew (session);
     tr_ctorSetSave (ctor, false); /* since we already have them */
     if (!stat (dirname, &sb) && S_ISDIR (sb.st_mode) && ((odir = opendir (dirname))))
@@ -2398,7 +2401,7 @@ metainfoLookupInit (tr_session * session)
                 if (!tr_torrentParse (ctor, &inf))
                 {
                     ++n;
-                    tr_bencDictAddStr (lookup, inf.hashString, path);
+                    tr_variantDictAddStr (lookup, inf.hashString, path);
                 }
                 tr_free (path);
             }
@@ -2418,7 +2421,7 @@ tr_sessionFindTorrentFile (const tr_session * session,
     const char * filename = NULL;
     if (!session->metainfoLookup)
         metainfoLookupInit ((tr_session*)session);
-    tr_bencDictFindStr (session->metainfoLookup, hashString, &filename);
+    tr_variantDictFindStr (session->metainfoLookup, hashString, &filename, NULL);
     return filename;
 }
 
@@ -2432,7 +2435,7 @@ tr_sessionSetTorrentFile (tr_session * session,
      * in that same directory, we don't need to do anything here if the
      * lookup table hasn't been built yet */
     if (session->metainfoLookup)
-        tr_bencDictAddStr (session->metainfoLookup, hashString, filename);
+        tr_variantDictAddStr (session->metainfoLookup, hashString, filename);
 }
 
 /***

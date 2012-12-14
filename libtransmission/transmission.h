@@ -83,7 +83,7 @@ typedef struct tr_info tr_info;
 typedef struct tr_torrent tr_torrent;
 typedef struct tr_session tr_session;
 
-struct tr_benc;
+struct tr_variant;
 
 typedef int8_t tr_priority_t;
 
@@ -226,22 +226,22 @@ const char* tr_getDefaultDownloadDir (void);
  *
  * Example:
  * @code
- *     tr_benc settings;
+ *     tr_variant settings;
  *     int64_t i;
  *
- *     tr_bencInitDict (&settings, 0);
+ *     tr_variantInitDict (&settings, 0);
  *     tr_sessionGetDefaultSettings (&settings);
- *     if (tr_bencDictFindInt (&settings, TR_PREFS_KEY_PEER_PORT, &i))
+ *     if (tr_variantDictFindInt (&settings, TR_PREFS_KEY_PEER_PORT, &i))
  *         fprintf (stderr, "the default peer port is %d\n", (int)i);
- *     tr_bencFree (&settings);
+ *     tr_variantFree (&settings);
  * @endcode
  *
- * @param initme pointer to a tr_benc dictionary
+ * @param initme pointer to a tr_variant dictionary
  * @see tr_sessionLoadSettings ()
  * @see tr_sessionInit ()
  * @see tr_getDefaultConfigDir ()
  */
-void tr_sessionGetDefaultSettings (struct tr_benc * dictionary);
+void tr_sessionGetDefaultSettings (struct tr_variant * dictionary);
 
 /**
  * Add the session's current configuration settings to the benc dictionary.
@@ -252,7 +252,7 @@ void tr_sessionGetDefaultSettings (struct tr_benc * dictionary);
  * @param dictionary
  * @see tr_sessionGetDefaultSettings ()
  */
-void tr_sessionGetSettings (tr_session *, struct tr_benc * dictionary);
+void tr_sessionGetSettings (tr_session *, struct tr_variant * dictionary);
 
 /**
  * Load settings from the configuration directory's settings.json file,
@@ -260,7 +260,7 @@ void tr_sessionGetSettings (tr_session *, struct tr_benc * dictionary);
  *
  * FIXME: this belongs in libtransmissionapp
  *
- * @param dictionary pointer to an uninitialized tr_benc
+ * @param dictionary pointer to an uninitialized tr_variant
  * @param configDir the configuration directory to find settings.json
  * @param appName if configDir is empty, appName is used to find the default dir.
  * @return success true if the settings were loaded, false otherwise
@@ -268,9 +268,9 @@ void tr_sessionGetSettings (tr_session *, struct tr_benc * dictionary);
  * @see tr_sessionInit ()
  * @see tr_sessionSaveSettings ()
  */
-bool tr_sessionLoadSettings (struct tr_benc  * dictionary,
-                             const char      * configDir,
-                             const char      * appName);
+bool tr_sessionLoadSettings (struct tr_variant  * dictionary,
+                             const char         * configDir,
+                             const char         * appName);
 
 /**
  * Add the session's configuration settings to the benc dictionary
@@ -282,25 +282,25 @@ bool tr_sessionLoadSettings (struct tr_benc  * dictionary,
  * @param dictionary
  * @see tr_sessionLoadSettings ()
  */
-void tr_sessionSaveSettings (tr_session           * session,
-                             const char           * configDir,
-                             const struct tr_benc * dictonary);
+void tr_sessionSaveSettings (tr_session              * session,
+                             const char              * configDir,
+                             const struct tr_variant * dictonary);
 
 /**
  * @brief Initialize a libtransmission session.
  *
  * For example, this will instantiate a session with all the default values:
  * @code
- *     tr_benc settings;
+ *     tr_variant settings;
  *     tr_session * session;
  *     const char * configDir;
  *
- *     tr_bencInitDict (&settings, 0);
+ *     tr_variantInitDict (&settings, 0);
  *     tr_sessionGetDefaultSettings (&settings);
  *     configDir = tr_getDefaultConfigDir ("Transmission");
  *     session = tr_sessionInit ("mac", configDir, true, &settings);
  *
- *     tr_bencFree (&settings);
+ *     tr_variantFree (&settings);
  * @endcode
  *
  * @param tag "gtk", "macosx", "daemon", etc... this is only for pre-1.30 resume files
@@ -311,15 +311,15 @@ void tr_sessionSaveSettings (tr_session           * session,
  * @see tr_sessionLoadSettings ()
  * @see tr_getDefaultConfigDir ()
  */
-tr_session * tr_sessionInit (const char     * tag,
-                             const char     * configDir,
-                             bool             messageQueueingEnabled,
-                             struct tr_benc * settings);
+tr_session * tr_sessionInit (const char        * tag,
+                             const char        * configDir,
+                             bool                messageQueueingEnabled,
+                             struct tr_variant * settings);
 
 /** @brief Update a session's settings from a benc dictionary
            like to the one used in tr_sessionInit () */
-void tr_sessionSet (tr_session      * session,
-                    struct tr_benc  * settings);
+void tr_sessionSet (tr_session         * session,
+                    struct tr_variant  * settings);
 
 /** @brief Rescan the blocklists directory and
            reload whatever blocklist files are found there */
@@ -989,8 +989,6 @@ typedef enum
 }
 tr_ctorMode;
 
-struct tr_benc;
-
 /** @brief Create a torrent constructor object used to instantiate a tr_torrent
     @param session the tr_session. This is required if you're going to call
                    tr_torrentNew (), but you can use NULL for tr_torrentParse ().
@@ -1080,8 +1078,8 @@ int         tr_ctorGetIncompleteDir (const tr_ctor  * ctor,
                                      const char    ** setmeIncompleteDir);
 
 /** @brief Get the metainfo from this peer constructor */
-int         tr_ctorGetMetainfo (const tr_ctor         * ctor,
-                                const struct tr_benc ** setme);
+int         tr_ctorGetMetainfo (const tr_ctor            * ctor,
+                                const struct tr_variant ** setme);
 
 /** @brief Get the "delete .torrent file" flag from this peer constructor */
 int         tr_ctorGetDeleteSource (const tr_ctor  * ctor,

@@ -3,7 +3,6 @@
 #include "transmission.h"
 #include "history.h"
 
-#undef VERBOSE
 #include "libtransmission-test.h"
 
 static int

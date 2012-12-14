@@ -14,7 +14,7 @@
 #include <iostream>
 
 #include <libtransmission/transmission.h>
-#include <libtransmission/bencode.h>
+#include <libtransmission/variant.h>
 
 #include "torrent-delegate.h"
 #include "torrent-model.h"
@@ -124,19 +124,19 @@ TorrentModel :: onTorrentChanged( int torrentId )
 }
 
 void
-TorrentModel :: removeTorrents( tr_benc * torrents )
+TorrentModel :: removeTorrents( tr_variant * torrents )
 {
     int i = 0;
-    tr_benc * child;
-    while(( child = tr_bencListChild( torrents, i++ ))) {
+    tr_variant * child;
+    while(( child = tr_variantListChild( torrents, i++ ))) {
         int64_t intVal;
-        if( tr_bencGetInt( child, &intVal ) )
+        if( tr_variantGetInt( child, &intVal ) )
             removeTorrent( intVal );
     }
 }
 
 void
-TorrentModel :: updateTorrents( tr_benc * torrents, bool isCompleteList )
+TorrentModel :: updateTorrents( tr_variant * torrents, bool isCompleteList )
 {
     QList<Torrent*> newTorrents;
     QSet<int> oldIds( getIds( ) );
@@ -144,14 +144,14 @@ TorrentModel :: updateTorrents( tr_benc * torrents, bool isCompleteList )
     QSet<int> newIds;
     int updatedCount = 0;
 
-    if( tr_bencIsList( torrents ) )
+    if( tr_variantIsList( torrents ) )
     {
         size_t i( 0 );
-        tr_benc * child;
-        while(( child = tr_bencListChild( torrents, i++ )))
+        tr_variant * child;
+        while(( child = tr_variantListChild( torrents, i++ )))
         {
             int64_t id;
-            if( tr_bencDictFindInt( child, "id", &id ) )
+            if( tr_variantDictFindInt( child, "id", &id ) )
             {
                 newIds.insert( id );
 

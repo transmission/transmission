@@ -27,6 +27,7 @@
 #include "torrent.h"
 #include "trevent.h" /* tr_runInEventThread () */
 #include "utils.h"
+#include "variant.h"
 #include "web.h" /* tr_http_escape () */
 
 #define dbgmsg(name, ...) \
@@ -120,11 +121,11 @@ announce_url_new (const tr_session * session, const tr_announce_request * req)
 }
 
 static tr_pex*
-listToPex (tr_benc * peerList, size_t * setme_len)
+listToPex (tr_variant * peerList, size_t * setme_len)
 {
     size_t i;
     size_t n;
-    const size_t len = tr_bencListSize (peerList);
+    const size_t len = tr_variantListSize (peerList);
     tr_pex * pex = tr_new0 (tr_pex, len);
 
     for (i=n=0; i<len; ++i)
@@ -132,15 +133,15 @@ listToPex (tr_benc * peerList, size_t * setme_len)
         int64_t port;
         const char * ip;
         tr_address addr;
-        tr_benc * peer = tr_bencListChild (peerList, i);
+        tr_variant * peer = tr_variantListChild (peerList, i);
 
         if (peer == NULL)
             continue;
-        if (!tr_bencDictFindStr (peer, "ip", &ip))
+        if (!tr_variantDictFindStr (peer, "ip", &ip, NULL))
             continue;
         if (!tr_address_from_string (&addr, ip))
             continue;
-        if (!tr_bencDictFindInt (peer, "port", &port))
+        if (!tr_variantDictFindInt (peer, "port", &port))
             continue;
         if ((port < 0) || (port > USHRT_MAX))
             continue;
@@ -206,16 +207,16 @@ on_announce_done (tr_session   * session,
     }
     else
     {
-        tr_benc benc;
-        const int benc_loaded = !tr_bencLoad (msg, msglen, &benc, NULL);
+        tr_variant benc;
+        const bool variant_loaded = !tr_variantFromBenc (&benc, msg, msglen);
 
         if (getenv ("TR_CURL_VERBOSE") != NULL)
         {
-            if (!benc_loaded)
+            if (!variant_loaded)
                 fprintf (stderr, "%s", "Announce response was not in benc format\n");
             else {
                 int i, len;
-                char * str = tr_bencToStr (&benc, TR_FMT_JSON, &len);
+                char * str = tr_variantToStr (&benc, TR_VARIANT_FMT_JSON, &len);
                 fprintf (stderr, "%s", "Announce response:\n< ");
                 for (i=0; i<len; ++i)
                     fputc (str[i], stderr);
@@ -224,57 +225,57 @@ on_announce_done (tr_session   * session,
             }
         }
 
-        if (benc_loaded && tr_bencIsDict (&benc))
+        if (variant_loaded && tr_variantIsDict (&benc))
         {
             int64_t i;
-            size_t rawlen;
-            tr_benc * tmp;
+            size_t len;
+            tr_variant * tmp;
             const char * str;
             const uint8_t * raw;
 
-            if (tr_bencDictFindStr (&benc, "failure reason", &str))
-                response->errmsg = tr_strdup (str);
+            if (tr_variantDictFindStr (&benc, "failure reason", &str, &len))
+                response->errmsg = tr_strndup (str, len);
 
-            if (tr_bencDictFindStr (&benc, "warning message", &str))
-                response->warning = tr_strdup (str);
+            if (tr_variantDictFindStr (&benc, "warning message", &str, &len))
+                response->warning = tr_strndup (str, len);
 
-            if (tr_bencDictFindInt (&benc, "interval", &i))
+            if (tr_variantDictFindInt (&benc, "interval", &i))
                 response->interval = i;
 
-            if (tr_bencDictFindInt (&benc, "min interval", &i))
+            if (tr_variantDictFindInt (&benc, "min interval", &i))
                 response->min_interval = i;
 
-            if (tr_bencDictFindStr (&benc, "tracker id", &str))
-                response->tracker_id_str = tr_strdup (str);
+            if (tr_variantDictFindStr (&benc, "tracker id", &str, &len))
+                response->tracker_id_str = tr_strndup (str, len);
 
-            if (tr_bencDictFindInt (&benc, "complete", &i))
+            if (tr_variantDictFindInt (&benc, "complete", &i))
                 response->seeders = i;
 
-            if (tr_bencDictFindInt (&benc, "incomplete", &i))
+            if (tr_variantDictFindInt (&benc, "incomplete", &i))
                 response->leechers = i;
 
-            if (tr_bencDictFindInt (&benc, "downloaded", &i))
+            if (tr_variantDictFindInt (&benc, "downloaded", &i))
                 response->downloads = i;
 
-            if (tr_bencDictFindRaw (&benc, "peers6", &raw, &rawlen)) {
-                dbgmsg (data->log_name, "got a peers6 length of %zu", rawlen);
-                response->pex6 = tr_peerMgrCompact6ToPex (raw, rawlen,
+            if (tr_variantDictFindRaw (&benc, "peers6", &raw, &len)) {
+                dbgmsg (data->log_name, "got a peers6 length of %zu", len);
+                response->pex6 = tr_peerMgrCompact6ToPex (raw, len,
                                               NULL, 0, &response->pex6_count);
             }
 
-            if (tr_bencDictFindRaw (&benc, "peers", &raw, &rawlen)) {
-                dbgmsg (data->log_name, "got a compact peers length of %zu", rawlen);
-                response->pex = tr_peerMgrCompactToPex (raw, rawlen,
+            if (tr_variantDictFindRaw (&benc, "peers", &raw, &len)) {
+                dbgmsg (data->log_name, "got a compact peers length of %zu", len);
+                response->pex = tr_peerMgrCompactToPex (raw, len,
                                                NULL, 0, &response->pex_count);
-            } else if (tr_bencDictFindList (&benc, "peers", &tmp)) {
+            } else if (tr_variantDictFindList (&benc, "peers", &tmp)) {
                 response->pex = listToPex (tmp, &response->pex_count);
                 dbgmsg (data->log_name, "got a peers list with %zu entries",
                         response->pex_count);
             }
         }
 
-        if (benc_loaded)
-            tr_bencFree (&benc);
+        if (variant_loaded)
+            tr_variantFree (&benc);
     }
 
     tr_runInEventThread (session, on_announce_done_eventthread, data);
@@ -356,20 +357,21 @@ on_scrape_done (tr_session   * session,
     }
     else
     {
-        tr_benc top;
+        tr_variant top;
         int64_t intVal;
-        tr_benc * files;
-        tr_benc * flags;
+        tr_variant * files;
+        tr_variant * flags;
+        size_t len;
         const char * str;
-        const int benc_loaded = !tr_bencLoad (msg, msglen, &top, NULL);
+        const bool variant_loaded = !tr_variantFromBenc (&top, msg, msglen);
 
         if (getenv ("TR_CURL_VERBOSE") != NULL)
         {
-            if (!benc_loaded)
+            if (!variant_loaded)
                 fprintf (stderr, "%s", "Scrape response was not in benc format\n");
             else {
                 int i, len;
-                char * str = tr_bencToStr (&top, TR_FMT_JSON, &len);
+                char * str = tr_variantToStr (&top, TR_VARIANT_FMT_JSON, &len);
                 fprintf (stderr, "%s", "Scrape response:\n< ");
                 for (i=0; i<len; ++i)
                     fputc (str[i], stderr);
@@ -378,27 +380,27 @@ on_scrape_done (tr_session   * session,
             }
         }
 
-        if (benc_loaded)
+        if (variant_loaded)
         {
-            if (tr_bencDictFindStr (&top, "failure reason", &str))
-                response->errmsg = tr_strdup (str);
+            if (tr_variantDictFindStr (&top, "failure reason", &str, &len))
+                response->errmsg = tr_strndup (str, len);
 
-            if (tr_bencDictFindDict (&top, "flags", &flags))
-                if (tr_bencDictFindInt (flags, "min_request_interval", &intVal))
+            if (tr_variantDictFindDict (&top, "flags", &flags))
+                if (tr_variantDictFindInt (flags, "min_request_interval", &intVal))
                     response->min_request_interval = intVal;
 
-            if (tr_bencDictFindDict (&top, "files", &files))
+            if (tr_variantDictFindDict (&top, "files", &files))
             {
                 int i = 0;
 
                 for (;;)
                 {
                     int j;
-                    tr_benc * val;
+                    tr_variant * val;
                     const char * key;
 
                     /* get the next "file" */
-                    if (!tr_bencDictChild (files, i++, &key, &val))
+                    if (!tr_variantDictChild (files, i++, &key, &val))
                         break;
 
                     /* populate the corresponding row in our response array */
@@ -407,13 +409,13 @@ on_scrape_done (tr_session   * session,
                         struct tr_scrape_response_row * row = &response->rows[j];
                         if (!memcmp (key, row->info_hash, SHA_DIGEST_LENGTH))
                         {
-                            if (tr_bencDictFindInt (val, "complete", &intVal))
+                            if (tr_variantDictFindInt (val, "complete", &intVal))
                                 row->seeders = intVal;
-                            if (tr_bencDictFindInt (val, "incomplete", &intVal))
+                            if (tr_variantDictFindInt (val, "incomplete", &intVal))
                                 row->leechers = intVal;
-                            if (tr_bencDictFindInt (val, "downloaded", &intVal))
+                            if (tr_variantDictFindInt (val, "downloaded", &intVal))
                                 row->downloads = intVal;
-                            if (tr_bencDictFindInt (val, "downloaders", &intVal))
+                            if (tr_variantDictFindInt (val, "downloaders", &intVal))
                                 row->downloaders = intVal;
                             break;
                         }
@@ -421,7 +423,7 @@ on_scrape_done (tr_session   * session,
                 }
             }
 
-            tr_bencFree (&top);
+            tr_variantFree (&top);
         }
     }
 

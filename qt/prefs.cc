@@ -17,9 +17,8 @@
 #include <QFile>
 
 #include <libtransmission/transmission.h>
-#include <libtransmission/bencode.h>
-#include <libtransmission/json.h>
 #include <libtransmission/utils.h>
+#include <libtransmission/variant.h>
 #include <stdlib.h>
 #include "prefs.h"
 #include "types.h"
@@ -136,8 +135,8 @@ Prefs :: Prefs( const char * configDir ):
     // when the application exits.
     myTemporaryPrefs << FILTER_TEXT;
 
-    tr_benc top;
-    tr_bencInitDict( &top, 0 );
+    tr_variant top;
+    tr_variantInitDict( &top, 0 );
     initDefaults( &top );
     tr_sessionLoadSettings( &top, configDir, NULL );
     for( int i=0; i<PREFS_COUNT; ++i )
@@ -146,36 +145,37 @@ Prefs :: Prefs( const char * configDir ):
         bool boolVal;
         int64_t intVal;
         const char * str;
-        tr_benc * b( tr_bencDictFind( &top, myItems[i].key ) );
+        size_t strLen;
+        tr_variant * b( tr_variantDictFind( &top, myItems[i].key ) );
 
         switch( myItems[i].type )
         {
             case QVariant::Int:
-                if( tr_bencGetInt( b, &intVal ) )
+                if( tr_variantGetInt( b, &intVal ) )
                     myValues[i].setValue( qlonglong(intVal) );
                 break;
             case TrTypes::SortModeType:
-                if( tr_bencGetStr( b, &str ) )
+                if( tr_variantGetStr( b, &str, NULL ) )
                     myValues[i] = QVariant::fromValue( SortMode( str ) );
                 break;
             case TrTypes::FilterModeType:
-                if( tr_bencGetStr( b, &str ) )
+                if( tr_variantGetStr( b, &str, NULL ) )
                     myValues[i] = QVariant::fromValue( FilterMode( str ) );
                 break;
             case QVariant::String:
-                if( tr_bencGetStr( b, &str ) )
-                    myValues[i].setValue( QString::fromUtf8( str ) );
+                if( tr_variantGetStr( b, &str, &strLen ) )
+                    myValues[i].setValue( QString::fromUtf8( str, strLen ) );
                 break;
             case QVariant::Bool:
-                if( tr_bencGetBool( b, &boolVal ) )
+                if( tr_variantGetBool( b, &boolVal ) )
                     myValues[i].setValue( bool(boolVal) );
                 break;
             case QVariant::Double:
-                if( tr_bencGetReal( b, &d ) )
+                if( tr_variantGetReal( b, &d ) )
                     myValues[i].setValue( d );
                 break;
             case QVariant::DateTime:
-                if( tr_bencGetInt( b, &intVal ) )
+                if( tr_variantGetInt( b, &intVal ) )
                     myValues[i].setValue( QDateTime :: fromTime_t( intVal ) );
                 break;
             default:
@@ -184,20 +184,20 @@ Prefs :: Prefs( const char * configDir ):
         }
     }
 
-    tr_bencFree( &top );
+    tr_variantFree( &top );
 }
 
 Prefs :: ~Prefs( )
 {
-    tr_benc top;
+    tr_variant top;
 
     /* load in the existing preferences file */
     QFile file( QDir( myConfigDir ).absoluteFilePath( "settings.json" ) );
     file.open( QIODevice::ReadOnly | QIODevice::Text );
     const QByteArray oldPrefs = file.readAll( );
     file.close( );
-    if( tr_jsonParse( "settings.json", oldPrefs.data(), oldPrefs.length(), &top, NULL ) )
-        tr_bencInitDict( &top, PREFS_COUNT );
+    if (tr_variantFromJsonFull (&top, oldPrefs.data(), oldPrefs.length(), "settings.json", NULL))
+        tr_variantInitDict( &top, PREFS_COUNT );
 
     /* merge our own settings with the ones already in the file */
     for( int i=0; i<PREFS_COUNT; ++i )
@@ -211,30 +211,30 @@ Prefs :: ~Prefs( )
         switch( myItems[i].type )
         {
             case QVariant::Int:
-                tr_bencDictAddInt( &top, key, val.toInt() );
+                tr_variantDictAddInt( &top, key, val.toInt() );
                 break;
             case TrTypes::SortModeType:
-                tr_bencDictAddStr( &top, key, val.value<SortMode>().name().toUtf8().constData() );
+                tr_variantDictAddStr( &top, key, val.value<SortMode>().name().toUtf8().constData() );
                 break;
             case TrTypes::FilterModeType:
-                tr_bencDictAddStr( &top, key, val.value<FilterMode>().name().toUtf8().constData() );
+                tr_variantDictAddStr( &top, key, val.value<FilterMode>().name().toUtf8().constData() );
                 break;
             case QVariant::String:
                 {   const char * s = val.toByteArray().constData();
                     if ( Utils::isValidUtf8( s ) )
-                        tr_bencDictAddStr( &top, key, s );
+                        tr_variantDictAddStr( &top, key, s );
                     else
-                        tr_bencDictAddStr( &top, key, val.toString().toUtf8().constData() );
+                        tr_variantDictAddStr( &top, key, val.toString().toUtf8().constData() );
                 }
                 break;
             case QVariant::Bool:
-                tr_bencDictAddBool( &top, key, val.toBool() );
+                tr_variantDictAddBool( &top, key, val.toBool() );
                 break;
             case QVariant::Double:
-                tr_bencDictAddReal( &top, key, val.toDouble() );
+                tr_variantDictAddReal( &top, key, val.toDouble() );
                 break;
             case QVariant::DateTime:
-                tr_bencDictAddInt( &top, key, val.toDateTime().toTime_t() );
+                tr_variantDictAddInt( &top, key, val.toDateTime().toTime_t() );
                 break;
             default:
                 assert( "unhandled type" && 0 );
@@ -243,8 +243,8 @@ Prefs :: ~Prefs( )
     }
 
     /* write back out the serialized preferences */
-    tr_bencToFile( &top, TR_FMT_JSON, file.fileName().toUtf8().constData() );
-    tr_bencFree( &top );
+    tr_variantToFile( &top, TR_VARIANT_FMT_JSON, file.fileName().toUtf8().constData() );
+    tr_variantFree( &top );
 }
 
 /**
@@ -252,40 +252,40 @@ Prefs :: ~Prefs( )
  * If you add a new preferences key, you /must/ add a default value here.
  */
 void
-Prefs :: initDefaults( tr_benc * d )
+Prefs :: initDefaults( tr_variant * d )
 {
-    tr_bencDictAddStr ( d, keyStr(DIR_WATCH), tr_getDefaultDownloadDir( ) );
-    tr_bencDictAddBool( d, keyStr(DIR_WATCH_ENABLED), false );
-    tr_bencDictAddBool( d, keyStr(INHIBIT_HIBERNATION), false );
-    tr_bencDictAddInt ( d, keyStr(BLOCKLIST_DATE), 0 );
-    tr_bencDictAddBool( d, keyStr(BLOCKLIST_UPDATES_ENABLED), true );
-    tr_bencDictAddStr ( d, keyStr(OPEN_DIALOG_FOLDER), QDir::home().absolutePath().toUtf8() );
-    tr_bencDictAddInt ( d, keyStr(SHOW_TRACKER_SCRAPES), false );
-    tr_bencDictAddBool( d, keyStr(TOOLBAR), true );
-    tr_bencDictAddBool( d, keyStr(FILTERBAR), true );
-    tr_bencDictAddBool( d, keyStr(STATUSBAR), true );
-    tr_bencDictAddBool( d, keyStr(SHOW_TRAY_ICON), false );
-    tr_bencDictAddBool( d, keyStr(SHOW_DESKTOP_NOTIFICATION), true );
-    tr_bencDictAddStr ( d, keyStr(STATUSBAR_STATS), "total-ratio" );
-    tr_bencDictAddBool( d, keyStr(SHOW_TRACKER_SCRAPES), false );
-    tr_bencDictAddBool( d, keyStr(SHOW_BACKUP_TRACKERS), false );
-    tr_bencDictAddBool( d, keyStr(OPTIONS_PROMPT), true );
-    tr_bencDictAddInt ( d, keyStr(MAIN_WINDOW_HEIGHT), 500 );
-    tr_bencDictAddInt ( d, keyStr(MAIN_WINDOW_WIDTH), 300 );
-    tr_bencDictAddInt ( d, keyStr(MAIN_WINDOW_X), 50 );
-    tr_bencDictAddInt ( d, keyStr(MAIN_WINDOW_Y), 50 );
-    tr_bencDictAddStr ( d, keyStr(FILTER_MODE), "all" );
-    tr_bencDictAddStr ( d, keyStr(MAIN_WINDOW_LAYOUT_ORDER), "menu,toolbar,filter,list,statusbar" );
-    tr_bencDictAddStr ( d, keyStr(DOWNLOAD_DIR), tr_getDefaultDownloadDir( ) );
-    tr_bencDictAddBool( d, keyStr(ASKQUIT), true );
-    tr_bencDictAddStr ( d, keyStr(SORT_MODE), "sort-by-name" );
-    tr_bencDictAddBool( d, keyStr(SORT_REVERSED), false );
-    tr_bencDictAddBool( d, keyStr(COMPACT_VIEW), false );
-    tr_bencDictAddStr ( d, keyStr(SESSION_REMOTE_HOST), "localhost" );
-    tr_bencDictAddInt ( d, keyStr(SESSION_REMOTE_PORT), atoi(TR_DEFAULT_RPC_PORT_STR) );
-    tr_bencDictAddBool( d, keyStr(SESSION_IS_REMOTE), false );
-    tr_bencDictAddBool( d, keyStr(SESSION_REMOTE_AUTH), false );
-    tr_bencDictAddBool( d, keyStr(USER_HAS_GIVEN_INFORMED_CONSENT), false );
+    tr_variantDictAddStr ( d, keyStr(DIR_WATCH), tr_getDefaultDownloadDir( ) );
+    tr_variantDictAddBool( d, keyStr(DIR_WATCH_ENABLED), false );
+    tr_variantDictAddBool( d, keyStr(INHIBIT_HIBERNATION), false );
+    tr_variantDictAddInt ( d, keyStr(BLOCKLIST_DATE), 0 );
+    tr_variantDictAddBool( d, keyStr(BLOCKLIST_UPDATES_ENABLED), true );
+    tr_variantDictAddStr ( d, keyStr(OPEN_DIALOG_FOLDER), QDir::home().absolutePath().toUtf8() );
+    tr_variantDictAddInt ( d, keyStr(SHOW_TRACKER_SCRAPES), false );
+    tr_variantDictAddBool( d, keyStr(TOOLBAR), true );
+    tr_variantDictAddBool( d, keyStr(FILTERBAR), true );
+    tr_variantDictAddBool( d, keyStr(STATUSBAR), true );
+    tr_variantDictAddBool( d, keyStr(SHOW_TRAY_ICON), false );
+    tr_variantDictAddBool( d, keyStr(SHOW_DESKTOP_NOTIFICATION), true );
+    tr_variantDictAddStr ( d, keyStr(STATUSBAR_STATS), "total-ratio" );
+    tr_variantDictAddBool( d, keyStr(SHOW_TRACKER_SCRAPES), false );
+    tr_variantDictAddBool( d, keyStr(SHOW_BACKUP_TRACKERS), false );
+    tr_variantDictAddBool( d, keyStr(OPTIONS_PROMPT), true );
+    tr_variantDictAddInt ( d, keyStr(MAIN_WINDOW_HEIGHT), 500 );
+    tr_variantDictAddInt ( d, keyStr(MAIN_WINDOW_WIDTH), 300 );
+    tr_variantDictAddInt ( d, keyStr(MAIN_WINDOW_X), 50 );
+    tr_variantDictAddInt ( d, keyStr(MAIN_WINDOW_Y), 50 );
+    tr_variantDictAddStr ( d, keyStr(FILTER_MODE), "all" );
+    tr_variantDictAddStr ( d, keyStr(MAIN_WINDOW_LAYOUT_ORDER), "menu,toolbar,filter,list,statusbar" );
+    tr_variantDictAddStr ( d, keyStr(DOWNLOAD_DIR), tr_getDefaultDownloadDir( ) );
+    tr_variantDictAddBool( d, keyStr(ASKQUIT), true );
+    tr_variantDictAddStr ( d, keyStr(SORT_MODE), "sort-by-name" );
+    tr_variantDictAddBool( d, keyStr(SORT_REVERSED), false );
+    tr_variantDictAddBool( d, keyStr(COMPACT_VIEW), false );
+    tr_variantDictAddStr ( d, keyStr(SESSION_REMOTE_HOST), "localhost" );
+    tr_variantDictAddInt ( d, keyStr(SESSION_REMOTE_PORT), atoi(TR_DEFAULT_RPC_PORT_STR) );
+    tr_variantDictAddBool( d, keyStr(SESSION_IS_REMOTE), false );
+    tr_variantDictAddBool( d, keyStr(SESSION_REMOTE_AUTH), false );
+    tr_variantDictAddBool( d, keyStr(USER_HAS_GIVEN_INFORMED_CONSENT), false );
 }
 
 /***

@@ -506,7 +506,7 @@ utp_on_error (void *closure, int errcode)
 }
 
 static void
-utp_on_overhead (void *closure, bool send, size_t count, int type UNUSED)
+utp_on_overhead (void *closure, uint8_t send, size_t count, int type UNUSED)
 {
     tr_peerIo *io = closure;
     assert (tr_isPeerIo (io));
@@ -567,7 +567,7 @@ dummy_on_error (void * closure UNUSED, int errcode UNUSED)
 }
 
 static void
-dummy_on_overhead (void *closure UNUSED, bool send UNUSED, size_t count UNUSED, int type UNUSED)
+dummy_on_overhead (void *closure UNUSED, uint8_t send UNUSED, size_t count UNUSED, int type UNUSED)
 {
     return;
 }

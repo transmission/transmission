@@ -21,10 +21,10 @@
 #include <event2/buffer.h>
 
 #include <libtransmission/transmission.h>
-#include <libtransmission/bencode.h>
 #include <libtransmission/tr-getopt.h>
 #include <libtransmission/utils.h>
 #include <libtransmission/web.h> /* tr_webGetResponseStr () */
+#include <libtransmission/variant.h>
 #include <libtransmission/version.h>
 
 #define MY_NAME "transmission-show"
@@ -262,35 +262,34 @@ doScrape (const tr_info * inf)
             }
           else /* HTTP OK */
             {
-              tr_benc top;
-              tr_benc * files;
+              tr_variant top;
+              tr_variant * files;
               bool matched = false;
               const char * begin = (const char*) evbuffer_pullup (buf, -1);
-              const char * end = begin + evbuffer_get_length (buf);
 
-              if (!tr_bencParse (begin, end, &top, NULL))
+              if (!tr_variantFromBenc (&top, begin, evbuffer_get_length(buf)))
                 {
-                  if (tr_bencDictFindDict (&top, "files", &files))
+                  if (tr_variantDictFindDict (&top, "files", &files))
                     {
                       int i = 0;
-                      tr_benc * val;
+                      tr_variant * val;
                       const char * key;
 
-                      while (tr_bencDictChild (files, i++, &key, &val))
+                      while (tr_variantDictChild (files, i++, &key, &val))
                         {
                           if (!memcmp (inf->hash, key, SHA_DIGEST_LENGTH))
                             {
                               int64_t seeders = -1;
                               int64_t leechers = -1;
-                              tr_bencDictFindInt (val, "complete", &seeders);
-                              tr_bencDictFindInt (val, "incomplete", &leechers);
+                              tr_variantDictFindInt (val, "complete", &seeders);
+                              tr_variantDictFindInt (val, "incomplete", &leechers);
                               printf ("%d seeders, %d leechers\n", (int)seeders, (int)leechers);
                               matched = true;
                             }
                         }
                     }
 
-                  tr_bencFree (&top);
+                  tr_variantFree (&top);
                 }
 
               if (!matched)

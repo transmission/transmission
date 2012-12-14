@@ -30,7 +30,7 @@
 
 extern "C"
 {
-    struct tr_benc;
+    struct tr_variant;
 }
 
 class Prefs;
@@ -326,7 +326,7 @@ class Torrent: public QObject
         void notifyComplete( ) const;
 
     public:
-        void update( tr_benc * dict );
+        void update( tr_variant * dict );
         void setMagnet( bool magnet ) { magnetTorrent = magnet; }
 
     private:

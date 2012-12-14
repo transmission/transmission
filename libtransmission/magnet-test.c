@@ -2,7 +2,6 @@
 #include "magnet.h"
 #include "utils.h"
 
-#undef VERBOSE
 #include "libtransmission-test.h"
 
 static int

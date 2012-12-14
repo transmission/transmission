@@ -24,7 +24,6 @@ gtk/util.c
 libtransmission/announcer.c
 libtransmission/announcer-http.c
 libtransmission/announcer-udp.c
-libtransmission/bencode.c
 libtransmission/blocklist.c
 libtransmission/fdlimit.c
 libtransmission/makemeta.c
@@ -42,4 +41,5 @@ libtransmission/torrent.c
 libtransmission/torrent-magnet.c
 libtransmission/upnp.c
 libtransmission/utils.c
+libtransmission/variant.c
 libtransmission/verify.c

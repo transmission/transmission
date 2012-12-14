@@ -28,9 +28,9 @@
 #endif
 
 #include "bandwidth.h"
-#include "bencode.h"
 #include "bitfield.h"
 #include "utils.h"
+#include "variant.h"
 
 typedef enum { TR_NET_OK, TR_NET_ERROR, TR_NET_WAIT } tr_tristate_t;
 
@@ -118,7 +118,7 @@ struct tr_session
     bool                         deleteSourceTorrent;
     bool                         scrapePausedTorrents;
 
-    tr_benc                      removedTorrents;
+    tr_variant                   removedTorrents;
 
     bool                         stalledEnabled;
     bool                         queueEnabled[2];
@@ -207,7 +207,7 @@ struct tr_session
     struct tr_announcer        * announcer;
     struct tr_announcer_udp    * announcer_udp;
 
-    tr_benc                    * metainfoLookup;
+    tr_variant                 * metainfoLookup;
 
     struct event               * nowTimer;
     struct event               * saveTimer;

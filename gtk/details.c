@@ -318,54 +318,54 @@ static void
 torrent_set_bool (struct DetailsImpl * di, const char * key, gboolean value)
 {
     GSList *l;
-    tr_benc top, *args, *ids;
+    tr_variant top, *args, *ids;
 
-    tr_bencInitDict (&top, 2);
-    tr_bencDictAddStr (&top, "method", "torrent-set");
-    args = tr_bencDictAddDict (&top, "arguments", 2);
-    tr_bencDictAddBool (args, key, value);
-    ids = tr_bencDictAddList (args, "ids", g_slist_length (di->ids));
+    tr_variantInitDict (&top, 2);
+    tr_variantDictAddStr (&top, "method", "torrent-set");
+    args = tr_variantDictAddDict (&top, "arguments", 2);
+    tr_variantDictAddBool (args, key, value);
+    ids = tr_variantDictAddList (args, "ids", g_slist_length (di->ids));
     for (l=di->ids; l; l=l->next)
-        tr_bencListAddInt (ids, GPOINTER_TO_INT (l->data));
+        tr_variantListAddInt (ids, GPOINTER_TO_INT (l->data));
 
     gtr_core_exec (di->core, &top);
-    tr_bencFree (&top);
+    tr_variantFree (&top);
 }
 
 static void
 torrent_set_int (struct DetailsImpl * di, const char * key, int value)
 {
     GSList *l;
-    tr_benc top, *args, *ids;
+    tr_variant top, *args, *ids;
 
-    tr_bencInitDict (&top, 2);
-    tr_bencDictAddStr (&top, "method", "torrent-set");
-    args = tr_bencDictAddDict (&top, "arguments", 2);
-    tr_bencDictAddInt (args, key, value);
-    ids = tr_bencDictAddList (args, "ids", g_slist_length (di->ids));
+    tr_variantInitDict (&top, 2);
+    tr_variantDictAddStr (&top, "method", "torrent-set");
+    args = tr_variantDictAddDict (&top, "arguments", 2);
+    tr_variantDictAddInt (args, key, value);
+    ids = tr_variantDictAddList (args, "ids", g_slist_length (di->ids));
     for (l=di->ids; l; l=l->next)
-        tr_bencListAddInt (ids, GPOINTER_TO_INT (l->data));
+        tr_variantListAddInt (ids, GPOINTER_TO_INT (l->data));
 
     gtr_core_exec (di->core, &top);
-    tr_bencFree (&top);
+    tr_variantFree (&top);
 }
 
 static void
 torrent_set_real (struct DetailsImpl * di, const char * key, double value)
 {
     GSList *l;
-    tr_benc top, *args, *ids;
+    tr_variant top, *args, *ids;
 
-    tr_bencInitDict (&top, 2);
-    tr_bencDictAddStr (&top, "method", "torrent-set");
-    args = tr_bencDictAddDict (&top, "arguments", 2);
-    tr_bencDictAddReal (args, key, value);
-    ids = tr_bencDictAddList (args, "ids", g_slist_length (di->ids));
+    tr_variantInitDict (&top, 2);
+    tr_variantDictAddStr (&top, "method", "torrent-set");
+    args = tr_variantDictAddDict (&top, "arguments", 2);
+    tr_variantDictAddReal (args, key, value);
+    ids = tr_variantDictAddList (args, "ids", g_slist_length (di->ids));
     for (l=di->ids; l; l=l->next)
-        tr_bencListAddInt (ids, GPOINTER_TO_INT (l->data));
+        tr_variantListAddInt (ids, GPOINTER_TO_INT (l->data));
 
     gtr_core_exec (di->core, &top);
-    tr_bencFree (&top);
+    tr_variantFree (&top);
 }
 
 static void

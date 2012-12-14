@@ -34,7 +34,6 @@
 #include "transmission.h"
 #include "announcer.h"
 #include "bandwidth.h"
-#include "bencode.h"
 #include "cache.h"
 #include "completion.h"
 #include "crypto.h" /* for tr_sha1 */
@@ -52,6 +51,7 @@
 #include "torrent-magnet.h"
 #include "trevent.h" /* tr_runInEventThread () */
 #include "utils.h"
+#include "variant.h"
 #include "verify.h"
 #include "version.h"
 
@@ -935,11 +935,11 @@ torrentInit (tr_torrent * tor, const tr_ctor * ctor)
     /* maybe save our own copy of the metainfo */
     if (tr_ctorGetSave (ctor))
     {
-        const tr_benc * val;
+        const tr_variant * val;
         if (!tr_ctorGetMetainfo (ctor, &val))
         {
             const char * path = tor->info.torrent;
-            const int err = tr_bencToFile (val, TR_FMT_BENC, path);
+            const int err = tr_variantToFile (val, TR_VARIANT_FMT_BENC, path);
             if (err)
                 tr_torrentSetLocalError (tor, "Unable to save torrent file: %s", tr_strerror (err));
             tr_sessionSetTorrentFile (tor->session, tor->info.hashString, path);
@@ -969,7 +969,7 @@ torrentParseImpl (const tr_ctor * ctor, tr_info * setmeInfo,
     bool            didParse;
     bool            hasInfo = false;
     tr_info         tmp;
-    const tr_benc * metainfo;
+    const tr_variant * metainfo;
     tr_session    * session = tr_ctorGetSession (ctor);
     tr_parse_result result = TR_PARSE_OK;
 
@@ -1850,14 +1850,14 @@ tr_torrentStop (tr_torrent * tor)
 static void
 closeTorrent (void * vtor)
 {
-    tr_benc * d;
+    tr_variant * d;
     tr_torrent * tor = vtor;
 
     assert (tr_isTorrent (tor));
 
-    d = tr_bencListAddDict (&tor->session->removedTorrents, 2);
-    tr_bencDictAddInt (d, "id", tor->uniqueId);
-    tr_bencDictAddInt (d, "date", tr_time ());
+    d = tr_variantListAddDict (&tor->session->removedTorrents, 2);
+    tr_variantDictAddInt (d, "id", tor->uniqueId);
+    tr_variantDictAddInt (d, "date", tr_time ());
 
     tr_torinf (tor, "%s", _("Removing torrent"));
 
@@ -2585,7 +2585,7 @@ tr_torrentSetAnnounceList (tr_torrent             * tor,
                            int                      trackerCount)
 {
     int i;
-    tr_benc metainfo;
+    tr_variant metainfo;
     bool ok = true;
     tr_tracker_info * trackers;
 
@@ -2603,33 +2603,33 @@ tr_torrentSetAnnounceList (tr_torrent             * tor,
             ok = false;
 
     /* save to the .torrent file */
-    if (ok && !tr_bencLoadFile (&metainfo, TR_FMT_BENC, tor->info.torrent))
+    if (ok && !tr_variantFromFile (&metainfo, TR_VARIANT_FMT_BENC, tor->info.torrent))
     {
         bool hasInfo;
         tr_info tmpInfo;
 
         /* remove the old fields */
-        tr_bencDictRemove (&metainfo, "announce");
-        tr_bencDictRemove (&metainfo, "announce-list");
+        tr_variantDictRemove (&metainfo, "announce");
+        tr_variantDictRemove (&metainfo, "announce-list");
 
         /* add the new fields */
         if (trackerCount > 0)
         {
-            tr_bencDictAddStr (&metainfo, "announce", trackers[0].announce);
+            tr_variantDictAddStr (&metainfo, "announce", trackers[0].announce);
         }
         if (trackerCount > 1)
         {
             int i;
             int prevTier = -1;
-            tr_benc * tier = NULL;
-            tr_benc * announceList = tr_bencDictAddList (&metainfo, "announce-list", 0);
+            tr_variant * tier = NULL;
+            tr_variant * announceList = tr_variantDictAddList (&metainfo, "announce-list", 0);
 
             for (i=0; i<trackerCount; ++i) {
                 if (prevTier != trackers[i].tier) {
                     prevTier = trackers[i].tier;
-                    tier = tr_bencListAddList (announceList, 0);
+                    tier = tr_variantListAddList (announceList, 0);
                 }
-                tr_bencListAddStr (tier, trackers[i].announce);
+                tr_variantListAddStr (tier, trackers[i].announce);
             }
         }
 
@@ -2649,11 +2649,11 @@ tr_torrentSetAnnounceList (tr_torrent             * tor,
             tmpInfo.trackerCount = swap.trackerCount;
 
             tr_metainfoFree (&tmpInfo);
-            tr_bencToFile (&metainfo, TR_FMT_BENC, tor->info.torrent);
+            tr_variantToFile (&metainfo, TR_VARIANT_FMT_BENC, tor->info.torrent);
         }
 
         /* cleanup */
-        tr_bencFree (&metainfo);
+        tr_variantFree (&metainfo);
 
         /* if we had a tracker-related error on this torrent,
          * and that tracker's been removed,

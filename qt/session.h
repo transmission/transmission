@@ -30,7 +30,7 @@ class AddData;
 extern "C"
 {
     struct evbuffer;
-    struct tr_benc;
+    struct tr_variant;
 }
 
 class Prefs;
@@ -72,14 +72,14 @@ class Session: public QObject
         bool isLocal( ) const;
 
     private:
-        void updateStats( struct tr_benc * args );
-        void updateInfo( struct tr_benc * args );
+        void updateStats( struct tr_variant * args );
+        void updateInfo( struct tr_variant * args );
         void parseResponse( const char * json, size_t len );
         static void localSessionCallback( tr_session *, struct evbuffer *, void * );
 
     public:
         void exec( const char * json );
-        void exec( const struct tr_benc * request );
+        void exec( const struct tr_variant * request );
 
     public:
         int64_t getUniqueTag( ) { return nextUniqueTag++; }
@@ -88,7 +88,7 @@ class Session: public QObject
         void sessionSet( const char * key, const QVariant& variant );
         void pumpRequests( );
         void sendTorrentRequest( const char * request, const QSet<int>& torrentIds );
-        static void updateStats( struct tr_benc * d, struct tr_session_stats * stats );
+        static void updateStats( struct tr_variant * d, struct tr_session_stats * stats );
         void refreshTorrents( const QSet<int>& torrentIds );
         QNetworkAccessManager * networkAccessManager( );
 
@@ -130,14 +130,14 @@ class Session: public QObject
         void onFinished( QNetworkReply * reply );
 
     signals:
-        void executed( int64_t tag, const QString& result, struct tr_benc * arguments );
+        void executed( int64_t tag, const QString& result, struct tr_variant * arguments );
         void sourceChanged( );
         void portTested( bool isOpen );
         void statsUpdated( );
         void sessionUpdated( );
         void blocklistUpdated( int );
-        void torrentsUpdated( struct tr_benc * torrentList, bool completeList );
-        void torrentsRemoved( struct tr_benc * torrentList );
+        void torrentsUpdated( struct tr_variant * torrentList, bool completeList );
+        void torrentsRemoved( struct tr_variant * torrentList );
         void dataReadProgress( );
         void dataSendProgress( );
         void httpAuthenticationRequired( );

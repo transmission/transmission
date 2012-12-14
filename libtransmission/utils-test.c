@@ -8,8 +8,6 @@
 #include "utils.h"
 #include "web.h"
 
-/* #define VERBOSE */
-#undef VERBOSE
 #define NUM_LOOPS 1
 #define SPEED_TEST 0
 

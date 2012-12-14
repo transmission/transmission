@@ -165,9 +165,9 @@ MyApp :: MyApp( int& argc, char ** argv ):
     myWatchDir = new WatchDir( *myModel );
 
     // when the session gets torrent info, update the model
-    connect( mySession, SIGNAL(torrentsUpdated(tr_benc*,bool)), myModel, SLOT(updateTorrents(tr_benc*,bool)) );
-    connect( mySession, SIGNAL(torrentsUpdated(tr_benc*,bool)), myWindow, SLOT(refreshActionSensitivity()) );
-    connect( mySession, SIGNAL(torrentsRemoved(tr_benc*)), myModel, SLOT(removeTorrents(tr_benc*)) );
+    connect( mySession, SIGNAL(torrentsUpdated(tr_variant*,bool)), myModel, SLOT(updateTorrents(tr_variant*,bool)) );
+    connect( mySession, SIGNAL(torrentsUpdated(tr_variant*,bool)), myWindow, SLOT(refreshActionSensitivity()) );
+    connect( mySession, SIGNAL(torrentsRemoved(tr_variant*)), myModel, SLOT(removeTorrents(tr_variant*)) );
     // when the session source gets changed, request a full refresh
     connect( mySession, SIGNAL(sourceChanged()), this, SLOT(onSessionSourceChanged()) );
     // when the model sees a torrent for the first time, ask the session for full info on it

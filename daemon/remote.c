@@ -30,11 +30,10 @@
 #include <curl/curl.h>
 
 #include <libtransmission/transmission.h>
-#include <libtransmission/bencode.h>
 #include <libtransmission/rpcimpl.h>
-#include <libtransmission/json.h>
 #include <libtransmission/tr-getopt.h>
 #include <libtransmission/utils.h>
+#include <libtransmission/variant.h>
 #include <libtransmission/version.h>
 
 #define MY_NAME "transmission-remote"
@@ -546,7 +545,7 @@ getEncodedMetainfo (const char * filename)
 }
 
 static void
-addIdArg (tr_benc * args, const char * id)
+addIdArg (tr_variant * args, const char * id)
 {
     if (!*id)
     {
@@ -564,14 +563,14 @@ addIdArg (tr_benc * args, const char * id)
             if (!isdigit (*pch))
                 isNum = false;
         if (isNum || isList)
-            tr_rpc_parse_list_str (tr_bencDictAdd (args, "ids"), id, strlen (id));
+            tr_rpc_parse_list_str (tr_variantDictAdd (args, "ids"), id, strlen (id));
         else
-            tr_bencDictAddStr (args, "ids", id); /* it's a torrent sha hash */
+            tr_variantDictAddStr (args, "ids", id); /* it's a torrent sha hash */
     }
 }
 
 static void
-addTime (tr_benc * args, const char * key, const char * arg)
+addTime (tr_variant * args, const char * key, const char * arg)
 {
     int time;
     bool success = false;
@@ -591,13 +590,13 @@ addTime (tr_benc * args, const char * key, const char * arg)
     }
 
     if (success)
-        tr_bencDictAddInt (args, key, time);
+        tr_variantDictAddInt (args, key, time);
     else
         fprintf (stderr, "Please specify the time of day in 'hhmm' format.\n");
 }
 
 static void
-addDays (tr_benc * args, const char * key, const char * arg)
+addDays (tr_variant * args, const char * key, const char * arg)
 {
     int days = 0;
 
@@ -617,17 +616,17 @@ addDays (tr_benc * args, const char * key, const char * arg)
     }
 
     if (days)
-        tr_bencDictAddInt (args, key, days);
+        tr_variantDictAddInt (args, key, days);
     else
         fprintf (stderr, "Please specify the days of the week in '1-3,4,7' format.\n");
 }
 
 static void
-addFiles (tr_benc *    args,
+addFiles (tr_variant *    args,
           const char * key,
           const char * arg)
 {
-    tr_benc * files = tr_bencDictAddList (args, key, 100);
+    tr_variant * files = tr_variantDictAddList (args, key, 100);
 
     if (!*arg)
     {
@@ -640,7 +639,7 @@ addFiles (tr_benc *    args,
         int valueCount;
         int * values = tr_parseNumberRange (arg, -1, &valueCount);
         for (i=0; i<valueCount; ++i)
-            tr_bencListAddInt (files, values[i]);
+            tr_variantListAddInt (files, values[i]);
         tr_free (values);
     }
 }
@@ -762,12 +761,12 @@ getTimeoutSecs (const char * req)
 }
 
 static char*
-getStatusString (tr_benc * t, char * buf, size_t buflen)
+getStatusString (tr_variant * t, char * buf, size_t buflen)
 {
     int64_t status;
     bool boolVal;
 
-    if (!tr_bencDictFindInt (t, "status", &status))
+    if (!tr_variantDictFindInt (t, "status", &status))
     {
         *buf = '\0';
     }
@@ -779,7 +778,7 @@ getStatusString (tr_benc * t, char * buf, size_t buflen)
             break;
 
         case TR_STATUS_STOPPED:
-            if (tr_bencDictFindBool (t, "isFinished", &boolVal) && boolVal)
+            if (tr_variantDictFindBool (t, "isFinished", &boolVal) && boolVal)
                 tr_strlcpy (buf, "Finished", buflen);
             else
                 tr_strlcpy (buf, "Stopped", buflen);
@@ -791,7 +790,7 @@ getStatusString (tr_benc * t, char * buf, size_t buflen)
                              ? "Will Verify"
                              : "Verifying";
             double percent;
-            if (tr_bencDictFindReal (t, "recheckProgress", &percent))
+            if (tr_variantDictFindReal (t, "recheckProgress", &percent))
                 tr_snprintf (buf, buflen, "%s (%.0f%%)", str, floor (percent*100.0));
             else
                 tr_strlcpy (buf, str, buflen);
@@ -803,15 +802,15 @@ getStatusString (tr_benc * t, char * buf, size_t buflen)
         case TR_STATUS_SEED: {
             int64_t fromUs = 0;
             int64_t toUs = 0;
-            tr_bencDictFindInt (t, "peersGettingFromUs", &fromUs);
-            tr_bencDictFindInt (t, "peersSendingToUs", &toUs);
+            tr_variantDictFindInt (t, "peersGettingFromUs", &fromUs);
+            tr_variantDictFindInt (t, "peersSendingToUs", &toUs);
             if (fromUs && toUs)
                 tr_strlcpy (buf, "Up & Down", buflen);
             else if (toUs)
                 tr_strlcpy (buf, "Downloading", buflen);
             else if (fromUs) {
                 int64_t leftUntilDone = 0;
-                tr_bencDictFindInt (t, "leftUntilDone", &leftUntilDone);
+                tr_variantDictFindInt (t, "leftUntilDone", &leftUntilDone);
                 if (leftUntilDone > 0)
                     tr_strlcpy (buf, "Uploading", buflen);
                 else
@@ -834,19 +833,19 @@ static const char *bandwidthPriorityNames[] =
     { "Low", "Normal", "High", "Invalid" };
 
 static void
-printDetails (tr_benc * top)
+printDetails (tr_variant * top)
 {
-    tr_benc *args, *torrents;
+    tr_variant *args, *torrents;
 
-    if ((tr_bencDictFindDict (top, "arguments", &args))
-      && (tr_bencDictFindList (args, "torrents", &torrents)))
+    if ((tr_variantDictFindDict (top, "arguments", &args))
+      && (tr_variantDictFindList (args, "torrents", &torrents)))
     {
         int ti, tCount;
-        for (ti = 0, tCount = tr_bencListSize (torrents); ti < tCount;
+        for (ti = 0, tCount = tr_variantListSize (torrents); ti < tCount;
              ++ti)
         {
-            tr_benc *    t = tr_bencListChild (torrents, ti);
-            tr_benc *    l;
+            tr_variant *    t = tr_variantListChild (torrents, ti);
+            tr_variant *    l;
             const char * str;
             char         buf[512];
             char         buf2[512];
@@ -855,13 +854,13 @@ printDetails (tr_benc * top)
             double       d;
 
             printf ("NAME\n");
-            if (tr_bencDictFindInt (t, "id", &i))
+            if (tr_variantDictFindInt (t, "id", &i))
                 printf ("  Id: %" PRId64 "\n", i);
-            if (tr_bencDictFindStr (t, "name", &str))
+            if (tr_variantDictFindStr (t, "name", &str, NULL))
                 printf ("  Name: %s\n", str);
-            if (tr_bencDictFindStr (t, "hashString", &str))
+            if (tr_variantDictFindStr (t, "hashString", &str, NULL))
                 printf ("  Hash: %s\n", str);
-            if (tr_bencDictFindStr (t, "magnetLink", &str))
+            if (tr_variantDictFindStr (t, "magnetLink", &str, NULL))
                 printf ("  Magnet: %s\n", str);
             printf ("\n");
 
@@ -869,50 +868,50 @@ printDetails (tr_benc * top)
             getStatusString (t, buf, sizeof (buf));
             printf ("  State: %s\n", buf);
 
-            if (tr_bencDictFindStr (t, "downloadDir", &str))
+            if (tr_variantDictFindStr (t, "downloadDir", &str, NULL))
                 printf ("  Location: %s\n", str);
 
-            if (tr_bencDictFindInt (t, "sizeWhenDone", &i)
-              && tr_bencDictFindInt (t, "leftUntilDone", &j))
+            if (tr_variantDictFindInt (t, "sizeWhenDone", &i)
+              && tr_variantDictFindInt (t, "leftUntilDone", &j))
             {
                 strlpercent (buf, 100.0 * (i - j) / i, sizeof (buf));
                 printf ("  Percent Done: %s%%\n", buf);
             }
 
-            if (tr_bencDictFindInt (t, "eta", &i))
+            if (tr_variantDictFindInt (t, "eta", &i))
                 printf ("  ETA: %s\n", tr_strltime (buf, i, sizeof (buf)));
-            if (tr_bencDictFindInt (t, "rateDownload", &i))
+            if (tr_variantDictFindInt (t, "rateDownload", &i))
                 printf ("  Download Speed: %s\n", tr_formatter_speed_KBps (buf, i/ (double)tr_speed_K, sizeof (buf)));
-            if (tr_bencDictFindInt (t, "rateUpload", &i))
+            if (tr_variantDictFindInt (t, "rateUpload", &i))
                 printf ("  Upload Speed: %s\n", tr_formatter_speed_KBps (buf, i/ (double)tr_speed_K, sizeof (buf)));
-            if (tr_bencDictFindInt (t, "haveUnchecked", &i)
-              && tr_bencDictFindInt (t, "haveValid", &j))
+            if (tr_variantDictFindInt (t, "haveUnchecked", &i)
+              && tr_variantDictFindInt (t, "haveValid", &j))
             {
                 strlsize (buf, i + j, sizeof (buf));
                 strlsize (buf2, j, sizeof (buf2));
                 printf ("  Have: %s (%s verified)\n", buf, buf2);
             }
 
-            if (tr_bencDictFindInt (t, "sizeWhenDone", &i))
+            if (tr_variantDictFindInt (t, "sizeWhenDone", &i))
             {
                 if (i < 1)
                     printf ("  Availability: None\n");
-                if (tr_bencDictFindInt (t, "desiredAvailable", &j)
-                    && tr_bencDictFindInt (t, "leftUntilDone", &k))
+                if (tr_variantDictFindInt (t, "desiredAvailable", &j)
+                    && tr_variantDictFindInt (t, "leftUntilDone", &k))
                 {
                     j += i - k;
                     strlpercent (buf, 100.0 * j / i, sizeof (buf));
                     printf ("  Availability: %s%%\n", buf);
                 }
-                if (tr_bencDictFindInt (t, "totalSize", &j))
+                if (tr_variantDictFindInt (t, "totalSize", &j))
                 {
                     strlsize (buf2, i, sizeof (buf2));
                     strlsize (buf, j, sizeof (buf));
                     printf ("  Total size: %s (%s wanted)\n", buf, buf2);
                 }
             }
-            if (tr_bencDictFindInt (t, "downloadedEver", &i)
-              && tr_bencDictFindInt (t, "uploadedEver", &j))
+            if (tr_variantDictFindInt (t, "downloadedEver", &i)
+              && tr_variantDictFindInt (t, "uploadedEver", &j))
             {
                 strlsize (buf, i, sizeof (buf));
                 printf ("  Downloaded: %s\n", buf);
@@ -921,13 +920,13 @@ printDetails (tr_benc * top)
                 strlratio (buf, j, i, sizeof (buf));
                 printf ("  Ratio: %s\n", buf);
             }
-            if (tr_bencDictFindInt (t, "corruptEver", &i))
+            if (tr_variantDictFindInt (t, "corruptEver", &i))
             {
                 strlsize (buf, i, sizeof (buf));
                 printf ("  Corrupt DL: %s\n", buf);
             }
-            if (tr_bencDictFindStr (t, "errorString", &str) && str && *str &&
-                tr_bencDictFindInt (t, "error", &i) && i)
+            if (tr_variantDictFindStr (t, "errorString", &str, NULL) && str && *str &&
+                tr_variantDictFindInt (t, "error", &i) && i)
             {
                 switch (i) {
                     case TR_STAT_TRACKER_WARNING: printf ("  Tracker gave a warning: %s\n", str); break;
@@ -936,9 +935,9 @@ printDetails (tr_benc * top)
                     default: break; /* no error */
                 }
             }
-            if (tr_bencDictFindInt (t, "peersConnected", &i)
-              && tr_bencDictFindInt (t, "peersGettingFromUs", &j)
-              && tr_bencDictFindInt (t, "peersSendingToUs", &k))
+            if (tr_variantDictFindInt (t, "peersConnected", &i)
+              && tr_variantDictFindInt (t, "peersGettingFromUs", &j)
+              && tr_variantDictFindInt (t, "peersSendingToUs", &k))
             {
                 printf (
                     "  Peers: "
@@ -950,10 +949,10 @@ printDetails (tr_benc * top)
                     i, j, k);
             }
 
-            if (tr_bencDictFindList (t, "webseeds", &l)
-              && tr_bencDictFindInt (t, "webseedsSendingToUs", &i))
+            if (tr_variantDictFindList (t, "webseeds", &l)
+              && tr_variantDictFindInt (t, "webseedsSendingToUs", &i))
             {
-                const int64_t n = tr_bencListSize (l);
+                const int64_t n = tr_variantListSize (l);
                 if (n > 0)
                     printf (
                         "  Web Seeds: downloading from %" PRId64 " of %"
@@ -963,53 +962,53 @@ printDetails (tr_benc * top)
             printf ("\n");
 
             printf ("HISTORY\n");
-            if (tr_bencDictFindInt (t, "addedDate", &i) && i)
+            if (tr_variantDictFindInt (t, "addedDate", &i) && i)
             {
                 const time_t tt = i;
                 printf ("  Date added:       %s", ctime (&tt));
             }
-            if (tr_bencDictFindInt (t, "doneDate", &i) && i)
+            if (tr_variantDictFindInt (t, "doneDate", &i) && i)
             {
                 const time_t tt = i;
                 printf ("  Date finished:    %s", ctime (&tt));
             }
-            if (tr_bencDictFindInt (t, "startDate", &i) && i)
+            if (tr_variantDictFindInt (t, "startDate", &i) && i)
             {
                 const time_t tt = i;
                 printf ("  Date started:     %s", ctime (&tt));
             }
-            if (tr_bencDictFindInt (t, "activityDate", &i) && i)
+            if (tr_variantDictFindInt (t, "activityDate", &i) && i)
             {
                 const time_t tt = i;
                 printf ("  Latest activity:  %s", ctime (&tt));
             }
-            if (tr_bencDictFindInt (t, "secondsDownloading", &i) && (i > 0))
+            if (tr_variantDictFindInt (t, "secondsDownloading", &i) && (i > 0))
                 printf ("  Downloading Time: %s\n", tr_strltime (buf, i, sizeof (buf)));
-            if (tr_bencDictFindInt (t, "secondsSeeding", &i) && (i > 0))
+            if (tr_variantDictFindInt (t, "secondsSeeding", &i) && (i > 0))
                 printf ("  Seeding Time:     %s\n", tr_strltime (buf, i, sizeof (buf)));
             printf ("\n");
 
             printf ("ORIGINS\n");
-            if (tr_bencDictFindInt (t, "dateCreated", &i) && i)
+            if (tr_variantDictFindInt (t, "dateCreated", &i) && i)
             {
                 const time_t tt = i;
                 printf ("  Date created: %s", ctime (&tt));
             }
-            if (tr_bencDictFindBool (t, "isPrivate", &boolVal))
+            if (tr_variantDictFindBool (t, "isPrivate", &boolVal))
                 printf ("  Public torrent: %s\n", (boolVal ? "No" : "Yes"));
-            if (tr_bencDictFindStr (t, "comment", &str) && str && *str)
+            if (tr_variantDictFindStr (t, "comment", &str, NULL) && str && *str)
                 printf ("  Comment: %s\n", str);
-            if (tr_bencDictFindStr (t, "creator", &str) && str && *str)
+            if (tr_variantDictFindStr (t, "creator", &str, NULL) && str && *str)
                 printf ("  Creator: %s\n", str);
-            if (tr_bencDictFindInt (t, "pieceCount", &i))
+            if (tr_variantDictFindInt (t, "pieceCount", &i))
                 printf ("  Piece Count: %" PRId64 "\n", i);
-            if (tr_bencDictFindInt (t, "pieceSize", &i))
+            if (tr_variantDictFindInt (t, "pieceSize", &i))
                 printf ("  Piece Size: %s\n", strlmem (buf, i, sizeof (buf)));
             printf ("\n");
 
             printf ("LIMITS & BANDWIDTH\n");
-            if (tr_bencDictFindBool (t, "downloadLimited", &boolVal)
-                && tr_bencDictFindInt (t, "downloadLimit", &i))
+            if (tr_variantDictFindBool (t, "downloadLimited", &boolVal)
+                && tr_variantDictFindInt (t, "downloadLimit", &i))
             {
                 printf ("  Download Limit: ");
                 if (boolVal)
@@ -1017,8 +1016,8 @@ printDetails (tr_benc * top)
                 else
                     printf ("Unlimited\n");
             }
-            if (tr_bencDictFindBool (t, "uploadLimited", &boolVal)
-                && tr_bencDictFindInt (t, "uploadLimit", &i))
+            if (tr_variantDictFindBool (t, "uploadLimited", &boolVal)
+                && tr_variantDictFindInt (t, "uploadLimit", &i))
             {
                 printf ("  Upload Limit: ");
                 if (boolVal)
@@ -1026,14 +1025,14 @@ printDetails (tr_benc * top)
                 else
                     printf ("Unlimited\n");
             }
-            if (tr_bencDictFindInt (t, "seedRatioMode", &i))
+            if (tr_variantDictFindInt (t, "seedRatioMode", &i))
             {
                 switch (i) {
                     case TR_RATIOLIMIT_GLOBAL:
                         printf ("  Ratio Limit: Default\n");
                         break;
                     case TR_RATIOLIMIT_SINGLE:
-                        if (tr_bencDictFindReal (t, "seedRatioLimit", &d))
+                        if (tr_variantDictFindReal (t, "seedRatioLimit", &d))
                             printf ("  Ratio Limit: %.2f\n", d);
                         break;
                     case TR_RATIOLIMIT_UNLIMITED:
@@ -1042,11 +1041,11 @@ printDetails (tr_benc * top)
                     default: break;
                 }
             }
-            if (tr_bencDictFindBool (t, "honorsSessionLimits", &boolVal))
+            if (tr_variantDictFindBool (t, "honorsSessionLimits", &boolVal))
                 printf ("  Honors Session Limits: %s\n", (boolVal ? "Yes" : "No"));
-            if (tr_bencDictFindInt (t, "peer-limit", &i))
+            if (tr_variantDictFindInt (t, "peer-limit", &i))
                 printf ("  Peer limit: %" PRId64 "\n", i);
-            if (tr_bencDictFindInt (t, "bandwidthPriority", &i))
+            if (tr_variantDictFindInt (t, "bandwidthPriority", &i))
                 printf ("  Bandwidth Priority: %s\n",
                         bandwidthPriorityNames[ (i + 1) & 3]);
 
@@ -1056,43 +1055,43 @@ printDetails (tr_benc * top)
 }
 
 static void
-printFileList (tr_benc * top)
+printFileList (tr_variant * top)
 {
-    tr_benc *args, *torrents;
+    tr_variant *args, *torrents;
 
-    if ((tr_bencDictFindDict (top, "arguments", &args))
-      && (tr_bencDictFindList (args, "torrents", &torrents)))
+    if ((tr_variantDictFindDict (top, "arguments", &args))
+      && (tr_variantDictFindList (args, "torrents", &torrents)))
     {
         int i, in;
-        for (i = 0, in = tr_bencListSize (torrents); i < in; ++i)
+        for (i = 0, in = tr_variantListSize (torrents); i < in; ++i)
         {
-            tr_benc *    d = tr_bencListChild (torrents, i);
-            tr_benc *    files, *priorities, *wanteds;
+            tr_variant *    d = tr_variantListChild (torrents, i);
+            tr_variant *    files, *priorities, *wanteds;
             const char * name;
-            if (tr_bencDictFindStr (d, "name", &name)
-              && tr_bencDictFindList (d, "files", &files)
-              && tr_bencDictFindList (d, "priorities", &priorities)
-              && tr_bencDictFindList (d, "wanted", &wanteds))
+            if (tr_variantDictFindStr (d, "name", &name, NULL)
+              && tr_variantDictFindList (d, "files", &files)
+              && tr_variantDictFindList (d, "priorities", &priorities)
+              && tr_variantDictFindList (d, "wanted", &wanteds))
             {
-                int j = 0, jn = tr_bencListSize (files);
+                int j = 0, jn = tr_variantListSize (files);
                 printf ("%s (%d files):\n", name, jn);
                 printf ("%3s  %4s %8s %3s %9s  %s\n", "#", "Done",
                         "Priority", "Get", "Size",
                         "Name");
-                for (j = 0, jn = tr_bencListSize (files); j < jn; ++j)
+                for (j = 0, jn = tr_variantListSize (files); j < jn; ++j)
                 {
                     int64_t      have;
                     int64_t      length;
                     int64_t      priority;
                     int64_t      wanted;
                     const char * filename;
-                    tr_benc *    file = tr_bencListChild (files, j);
-                    if (tr_bencDictFindInt (file, "length", &length)
-                      && tr_bencDictFindStr (file, "name", &filename)
-                      && tr_bencDictFindInt (file, "bytesCompleted", &have)
-                      && tr_bencGetInt (tr_bencListChild (priorities,
+                    tr_variant *    file = tr_variantListChild (files, j);
+                    if (tr_variantDictFindInt (file, "length", &length)
+                      && tr_variantDictFindStr (file, "name", &filename, NULL)
+                      && tr_variantDictFindInt (file, "bytesCompleted", &have)
+                      && tr_variantGetInt (tr_variantListChild (priorities,
                                                           j), &priority)
-                      && tr_bencGetInt (tr_bencListChild (wanteds,
+                      && tr_variantGetInt (tr_variantListChild (wanteds,
                                                           j), &wanted))
                     {
                         char         sizestr[64];
@@ -1125,24 +1124,24 @@ printFileList (tr_benc * top)
 }
 
 static void
-printPeersImpl (tr_benc * peers)
+printPeersImpl (tr_variant * peers)
 {
     int i, n;
     printf ("%-20s  %-12s  %-5s %-6s  %-6s  %s\n",
             "Address", "Flags", "Done", "Down", "Up", "Client");
-    for (i = 0, n = tr_bencListSize (peers); i < n; ++i)
+    for (i = 0, n = tr_variantListSize (peers); i < n; ++i)
     {
         double progress;
         const char * address, * client, * flagstr;
         int64_t rateToClient, rateToPeer;
-        tr_benc * d = tr_bencListChild (peers, i);
+        tr_variant * d = tr_variantListChild (peers, i);
 
-        if (tr_bencDictFindStr (d, "address", &address)
-          && tr_bencDictFindStr (d, "clientName", &client)
-          && tr_bencDictFindReal (d, "progress", &progress)
-          && tr_bencDictFindStr (d, "flagStr", &flagstr)
-          && tr_bencDictFindInt (d, "rateToClient", &rateToClient)
-          && tr_bencDictFindInt (d, "rateToPeer", &rateToPeer))
+        if (tr_variantDictFindStr (d, "address", &address, NULL)
+          && tr_variantDictFindStr (d, "clientName", &client, NULL)
+          && tr_variantDictFindReal (d, "progress", &progress)
+          && tr_variantDictFindStr (d, "flagStr", &flagstr, NULL)
+          && tr_variantDictFindInt (d, "rateToClient", &rateToClient)
+          && tr_variantDictFindInt (d, "rateToPeer", &rateToPeer))
         {
             printf ("%-20s  %-12s  %-5.1f %6.1f  %6.1f  %s\n",
                     address, flagstr, (progress*100.0),
@@ -1154,19 +1153,19 @@ printPeersImpl (tr_benc * peers)
 }
 
 static void
-printPeers (tr_benc * top)
+printPeers (tr_variant * top)
 {
-    tr_benc *args, *torrents;
+    tr_variant *args, *torrents;
 
-    if (tr_bencDictFindDict (top, "arguments", &args)
-      && tr_bencDictFindList (args, "torrents", &torrents))
+    if (tr_variantDictFindDict (top, "arguments", &args)
+      && tr_variantDictFindList (args, "torrents", &torrents))
     {
         int i, n;
-        for (i=0, n=tr_bencListSize (torrents); i<n; ++i)
+        for (i=0, n=tr_variantListSize (torrents); i<n; ++i)
         {
-            tr_benc * peers;
-            tr_benc * torrent = tr_bencListChild (torrents, i);
-            if (tr_bencDictFindList (torrent, "peers", &peers)) {
+            tr_variant * peers;
+            tr_variant * torrent = tr_variantListChild (torrents, i);
+            if (tr_variantDictFindList (torrent, "peers", &peers)) {
                 printPeersImpl (peers);
                 if (i+1<n)
                     printf ("\n");
@@ -1194,22 +1193,22 @@ printPiecesImpl (const uint8_t * raw, size_t rawlen, int64_t j)
 }
 
 static void
-printPieces (tr_benc * top)
+printPieces (tr_variant * top)
 {
-    tr_benc *args, *torrents;
+    tr_variant *args, *torrents;
 
-    if (tr_bencDictFindDict (top, "arguments", &args)
-      && tr_bencDictFindList (args, "torrents", &torrents))
+    if (tr_variantDictFindDict (top, "arguments", &args)
+      && tr_variantDictFindList (args, "torrents", &torrents))
     {
         int i, n;
-        for (i=0, n=tr_bencListSize (torrents); i<n; ++i)
+        for (i=0, n=tr_variantListSize (torrents); i<n; ++i)
         {
             int64_t j;
             const uint8_t * raw;
             size_t       rawlen;
-            tr_benc * torrent = tr_bencListChild (torrents, i);
-            if (tr_bencDictFindRaw (torrent, "pieces", &raw, &rawlen) &&
-                tr_bencDictFindInt (torrent, "pieceCount", &j)) {
+            tr_variant * torrent = tr_variantListChild (torrents, i);
+            if (tr_variantDictFindRaw (torrent, "pieces", &raw, &rawlen) &&
+                tr_variantDictFindInt (torrent, "pieceCount", &j)) {
                 printPiecesImpl (raw, rawlen, j);
                 if (i+1<n)
                     printf ("\n");
@@ -1219,25 +1218,25 @@ printPieces (tr_benc * top)
 }
 
 static void
-printPortTest (tr_benc * top)
+printPortTest (tr_variant * top)
 {
-    tr_benc *args;
-    if ((tr_bencDictFindDict (top, "arguments", &args)))
+    tr_variant *args;
+    if ((tr_variantDictFindDict (top, "arguments", &args)))
     {
         bool      boolVal;
 
-        if (tr_bencDictFindBool (args, "port-is-open", &boolVal))
+        if (tr_variantDictFindBool (args, "port-is-open", &boolVal))
             printf ("Port is open: %s\n", (boolVal ? "Yes" : "No"));
     }
 }
 
 static void
-printTorrentList (tr_benc * top)
+printTorrentList (tr_variant * top)
 {
-    tr_benc *args, *list;
+    tr_variant *args, *list;
 
-    if ((tr_bencDictFindDict (top, "arguments", &args))
-      && (tr_bencDictFindList (args, "torrents", &list)))
+    if ((tr_variantDictFindDict (top, "arguments", &args))
+      && (tr_variantDictFindList (args, "torrents", &list)))
     {
         int i, n;
         int64_t total_size=0;
@@ -1248,22 +1247,22 @@ printTorrentList (tr_benc * top)
                 "ID", "Done", "Have", "ETA", "Up", "Down", "Ratio", "Status",
                 "Name");
 
-        for (i = 0, n = tr_bencListSize (list); i < n; ++i)
+        for (i = 0, n = tr_variantListSize (list); i < n; ++i)
         {
             int64_t      id, eta, status, up, down;
             int64_t      sizeWhenDone, leftUntilDone;
             double       ratio;
             const char * name;
-            tr_benc *   d = tr_bencListChild (list, i);
-            if (tr_bencDictFindInt (d, "eta", &eta)
-              && tr_bencDictFindInt (d, "id", &id)
-              && tr_bencDictFindInt (d, "leftUntilDone", &leftUntilDone)
-              && tr_bencDictFindStr (d, "name", &name)
-              && tr_bencDictFindInt (d, "rateDownload", &down)
-              && tr_bencDictFindInt (d, "rateUpload", &up)
-              && tr_bencDictFindInt (d, "sizeWhenDone", &sizeWhenDone)
-              && tr_bencDictFindInt (d, "status", &status)
-              && tr_bencDictFindReal (d, "uploadRatio", &ratio))
+            tr_variant *   d = tr_variantListChild (list, i);
+            if (tr_variantDictFindInt (d, "eta", &eta)
+              && tr_variantDictFindInt (d, "id", &id)
+              && tr_variantDictFindInt (d, "leftUntilDone", &leftUntilDone)
+              && tr_variantDictFindStr (d, "name", &name, NULL)
+              && tr_variantDictFindInt (d, "rateDownload", &down)
+              && tr_variantDictFindInt (d, "rateUpload", &up)
+              && tr_variantDictFindInt (d, "sizeWhenDone", &sizeWhenDone)
+              && tr_variantDictFindInt (d, "status", &status)
+              && tr_variantDictFindReal (d, "uploadRatio", &ratio))
             {
                 char etaStr[16];
                 char statusStr[64];
@@ -1283,7 +1282,7 @@ printTorrentList (tr_benc * top)
                     etaToString (etaStr, sizeof (etaStr), eta);
                 else
                     tr_snprintf (etaStr, sizeof (etaStr), "Done");
-                if (tr_bencDictFindInt (d, "error", &error) && error)
+                if (tr_variantDictFindInt (d, "error", &error) && error)
                     errorMark = '*';
                 else
                     errorMark = ' ';
@@ -1313,13 +1312,13 @@ printTorrentList (tr_benc * top)
 }
 
 static void
-printTrackersImpl (tr_benc * trackerStats)
+printTrackersImpl (tr_variant * trackerStats)
 {
     int i;
     char         buf[512];
-    tr_benc * t;
+    tr_variant * t;
 
-    for (i=0; ((t = tr_bencListChild (trackerStats, i))); ++i)
+    for (i=0; ((t = tr_variantListChild (trackerStats, i))); ++i)
     {
         int64_t downloadCount;
         bool hasAnnounced;
@@ -1346,30 +1345,30 @@ printTrackersImpl (tr_benc * trackerStats)
         int64_t announceState;
         int64_t scrapeState;
 
-        if (tr_bencDictFindInt (t, "downloadCount", &downloadCount) &&
-            tr_bencDictFindBool (t, "hasAnnounced", &hasAnnounced) &&
-            tr_bencDictFindBool (t, "hasScraped", &hasScraped) &&
-            tr_bencDictFindStr (t, "host", &host) &&
-            tr_bencDictFindInt (t, "id", &id) &&
-            tr_bencDictFindBool (t, "isBackup", &isBackup) &&
-            tr_bencDictFindInt (t, "announceState", &announceState) &&
-            tr_bencDictFindInt (t, "scrapeState", &scrapeState) &&
-            tr_bencDictFindInt (t, "lastAnnouncePeerCount", &lastAnnouncePeerCount) &&
-            tr_bencDictFindStr (t, "lastAnnounceResult", &lastAnnounceResult) &&
-            tr_bencDictFindInt (t, "lastAnnounceStartTime", &lastAnnounceStartTime) &&
-            tr_bencDictFindBool (t, "lastAnnounceSucceeded", &lastAnnounceSucceeded) &&
-            tr_bencDictFindInt (t, "lastAnnounceTime", &lastAnnounceTime) &&
-            tr_bencDictFindBool (t, "lastAnnounceTimedOut", &lastAnnounceTimedOut) &&
-            tr_bencDictFindStr (t, "lastScrapeResult", &lastScrapeResult) &&
-            tr_bencDictFindInt (t, "lastScrapeStartTime", &lastScrapeStartTime) &&
-            tr_bencDictFindBool (t, "lastScrapeSucceeded", &lastScrapeSucceeded) &&
-            tr_bencDictFindInt (t, "lastScrapeTime", &lastScrapeTime) &&
-            tr_bencDictFindBool (t, "lastScrapeTimedOut", &lastScrapeTimedOut) &&
-            tr_bencDictFindInt (t, "leecherCount", &leecherCount) &&
-            tr_bencDictFindInt (t, "nextAnnounceTime", &nextAnnounceTime) &&
-            tr_bencDictFindInt (t, "nextScrapeTime", &nextScrapeTime) &&
-            tr_bencDictFindInt (t, "seederCount", &seederCount) &&
-            tr_bencDictFindInt (t, "tier", &tier))
+        if (tr_variantDictFindInt (t, "downloadCount", &downloadCount) &&
+            tr_variantDictFindBool (t, "hasAnnounced", &hasAnnounced) &&
+            tr_variantDictFindBool (t, "hasScraped", &hasScraped) &&
+            tr_variantDictFindStr (t, "host", &host, NULL) &&
+            tr_variantDictFindInt (t, "id", &id) &&
+            tr_variantDictFindBool (t, "isBackup", &isBackup) &&
+            tr_variantDictFindInt (t, "announceState", &announceState) &&
+            tr_variantDictFindInt (t, "scrapeState", &scrapeState) &&
+            tr_variantDictFindInt (t, "lastAnnouncePeerCount", &lastAnnouncePeerCount) &&
+            tr_variantDictFindStr (t, "lastAnnounceResult", &lastAnnounceResult, NULL) &&
+            tr_variantDictFindInt (t, "lastAnnounceStartTime", &lastAnnounceStartTime) &&
+            tr_variantDictFindBool (t, "lastAnnounceSucceeded", &lastAnnounceSucceeded) &&
+            tr_variantDictFindInt (t, "lastAnnounceTime", &lastAnnounceTime) &&
+            tr_variantDictFindBool (t, "lastAnnounceTimedOut", &lastAnnounceTimedOut) &&
+            tr_variantDictFindStr (t, "lastScrapeResult", &lastScrapeResult, NULL) &&
+            tr_variantDictFindInt (t, "lastScrapeStartTime", &lastScrapeStartTime) &&
+            tr_variantDictFindBool (t, "lastScrapeSucceeded", &lastScrapeSucceeded) &&
+            tr_variantDictFindInt (t, "lastScrapeTime", &lastScrapeTime) &&
+            tr_variantDictFindBool (t, "lastScrapeTimedOut", &lastScrapeTimedOut) &&
+            tr_variantDictFindInt (t, "leecherCount", &leecherCount) &&
+            tr_variantDictFindInt (t, "nextAnnounceTime", &nextAnnounceTime) &&
+            tr_variantDictFindInt (t, "nextScrapeTime", &nextScrapeTime) &&
+            tr_variantDictFindInt (t, "seederCount", &seederCount) &&
+            tr_variantDictFindInt (t, "tier", &tier))
         {
             const time_t now = time (NULL);
 
@@ -1448,19 +1447,19 @@ printTrackersImpl (tr_benc * trackerStats)
 }
 
 static void
-printTrackers (tr_benc * top)
+printTrackers (tr_variant * top)
 {
-    tr_benc *args, *torrents;
+    tr_variant *args, *torrents;
 
-    if (tr_bencDictFindDict (top, "arguments", &args)
-      && tr_bencDictFindList (args, "torrents", &torrents))
+    if (tr_variantDictFindDict (top, "arguments", &args)
+      && tr_variantDictFindList (args, "torrents", &torrents))
     {
         int i, n;
-        for (i=0, n=tr_bencListSize (torrents); i<n; ++i)
+        for (i=0, n=tr_variantListSize (torrents); i<n; ++i)
         {
-            tr_benc * trackerStats;
-            tr_benc * torrent = tr_bencListChild (torrents, i);
-            if (tr_bencDictFindList (torrent, "trackerStats", &trackerStats)) {
+            tr_variant * trackerStats;
+            tr_variant * torrent = tr_variantListChild (torrents, i);
+            if (tr_variantDictFindList (torrent, "trackerStats", &trackerStats)) {
                 printTrackersImpl (trackerStats);
                 if (i+1<n)
                     printf ("\n");
@@ -1470,10 +1469,10 @@ printTrackers (tr_benc * top)
 }
 
 static void
-printSession (tr_benc * top)
+printSession (tr_variant * top)
 {
-    tr_benc *args;
-    if ((tr_bencDictFindDict (top, "arguments", &args)))
+    tr_variant *args;
+    if ((tr_variantDictFindDict (top, "arguments", &args)))
     {
         int64_t i;
         char buf[64];
@@ -1481,36 +1480,36 @@ printSession (tr_benc * top)
         const char * str;
 
         printf ("VERSION\n");
-        if (tr_bencDictFindStr (args,  "version", &str))
+        if (tr_variantDictFindStr (args,  "version", &str, NULL))
             printf ("  Daemon version: %s\n", str);
-        if (tr_bencDictFindInt (args, "rpc-version", &i))
+        if (tr_variantDictFindInt (args, "rpc-version", &i))
             printf ("  RPC version: %" PRId64 "\n", i);
-        if (tr_bencDictFindInt (args, "rpc-version-minimum", &i))
+        if (tr_variantDictFindInt (args, "rpc-version-minimum", &i))
             printf ("  RPC minimum version: %" PRId64 "\n", i);
         printf ("\n");
 
         printf ("CONFIG\n");
-        if (tr_bencDictFindStr (args, "config-dir", &str))
+        if (tr_variantDictFindStr (args, "config-dir", &str, NULL))
             printf ("  Configuration directory: %s\n", str);
-        if (tr_bencDictFindStr (args,  TR_PREFS_KEY_DOWNLOAD_DIR, &str))
+        if (tr_variantDictFindStr (args,  TR_PREFS_KEY_DOWNLOAD_DIR, &str, NULL))
             printf ("  Download directory: %s\n", str);
-        if (tr_bencDictFindInt (args,  "download-dir-free-space", &i))
+        if (tr_variantDictFindInt (args,  "download-dir-free-space", &i))
             printf ("  Download directory free space: %s\n",  strlsize (buf, i, sizeof buf));
-        if (tr_bencDictFindInt (args, TR_PREFS_KEY_PEER_PORT, &i))
+        if (tr_variantDictFindInt (args, TR_PREFS_KEY_PEER_PORT, &i))
             printf ("  Listenport: %" PRId64 "\n", i);
-        if (tr_bencDictFindBool (args, TR_PREFS_KEY_PORT_FORWARDING, &boolVal))
+        if (tr_variantDictFindBool (args, TR_PREFS_KEY_PORT_FORWARDING, &boolVal))
             printf ("  Portforwarding enabled: %s\n", (boolVal ? "Yes" : "No"));
-        if (tr_bencDictFindBool (args, TR_PREFS_KEY_UTP_ENABLED, &boolVal))
+        if (tr_variantDictFindBool (args, TR_PREFS_KEY_UTP_ENABLED, &boolVal))
             printf ("  uTP enabled: %s\n", (boolVal ? "Yes" : "No"));
-        if (tr_bencDictFindBool (args, TR_PREFS_KEY_DHT_ENABLED, &boolVal))
+        if (tr_variantDictFindBool (args, TR_PREFS_KEY_DHT_ENABLED, &boolVal))
             printf ("  Distributed hash table enabled: %s\n", (boolVal ? "Yes" : "No"));
-        if (tr_bencDictFindBool (args, TR_PREFS_KEY_LPD_ENABLED, &boolVal))
+        if (tr_variantDictFindBool (args, TR_PREFS_KEY_LPD_ENABLED, &boolVal))
             printf ("  Local peer discovery enabled: %s\n", (boolVal ? "Yes" : "No"));
-        if (tr_bencDictFindBool (args, TR_PREFS_KEY_PEX_ENABLED, &boolVal))
+        if (tr_variantDictFindBool (args, TR_PREFS_KEY_PEX_ENABLED, &boolVal))
             printf ("  Peer exchange allowed: %s\n", (boolVal ? "Yes" : "No"));
-        if (tr_bencDictFindStr (args,  TR_PREFS_KEY_ENCRYPTION, &str))
+        if (tr_variantDictFindStr (args,  TR_PREFS_KEY_ENCRYPTION, &str, NULL))
             printf ("  Encryption: %s\n", str);
-        if (tr_bencDictFindInt (args, TR_PREFS_KEY_MAX_CACHE_SIZE_MB, &i))
+        if (tr_variantDictFindInt (args, TR_PREFS_KEY_MAX_CACHE_SIZE_MB, &i))
             printf ("  Maximum memory cache size: %s\n", tr_formatter_mem_MB (buf, i, sizeof (buf)));
         printf ("\n");
 
@@ -1519,20 +1518,20 @@ printSession (tr_benc * top)
             int64_t altDown, altUp, altBegin, altEnd, altDay, upLimit, downLimit, peerLimit;
             double seedRatioLimit;
 
-            if (tr_bencDictFindInt (args, TR_PREFS_KEY_ALT_SPEED_DOWN_KBps, &altDown) &&
-                tr_bencDictFindBool (args, TR_PREFS_KEY_ALT_SPEED_ENABLED, &altEnabled) &&
-                tr_bencDictFindInt (args, TR_PREFS_KEY_ALT_SPEED_TIME_BEGIN, &altBegin) &&
-                tr_bencDictFindBool (args, TR_PREFS_KEY_ALT_SPEED_TIME_ENABLED, &altTimeEnabled) &&
-                tr_bencDictFindInt (args, TR_PREFS_KEY_ALT_SPEED_TIME_END, &altEnd) &&
-                tr_bencDictFindInt (args, TR_PREFS_KEY_ALT_SPEED_TIME_DAY, &altDay) &&
-                tr_bencDictFindInt (args, TR_PREFS_KEY_ALT_SPEED_UP_KBps, &altUp) &&
-                tr_bencDictFindInt (args, TR_PREFS_KEY_PEER_LIMIT_GLOBAL, &peerLimit) &&
-                tr_bencDictFindInt (args, TR_PREFS_KEY_DSPEED_KBps, &downLimit) &&
-                tr_bencDictFindBool (args, TR_PREFS_KEY_DSPEED_ENABLED, &downEnabled) &&
-                tr_bencDictFindInt (args, TR_PREFS_KEY_USPEED_KBps, &upLimit) &&
-                tr_bencDictFindBool (args, TR_PREFS_KEY_USPEED_ENABLED, &upEnabled) &&
-                tr_bencDictFindReal (args, "seedRatioLimit", &seedRatioLimit) &&
-                tr_bencDictFindBool (args, "seedRatioLimited", &seedRatioLimited))
+            if (tr_variantDictFindInt (args, TR_PREFS_KEY_ALT_SPEED_DOWN_KBps, &altDown) &&
+                tr_variantDictFindBool (args, TR_PREFS_KEY_ALT_SPEED_ENABLED, &altEnabled) &&
+                tr_variantDictFindInt (args, TR_PREFS_KEY_ALT_SPEED_TIME_BEGIN, &altBegin) &&
+                tr_variantDictFindBool (args, TR_PREFS_KEY_ALT_SPEED_TIME_ENABLED, &altTimeEnabled) &&
+                tr_variantDictFindInt (args, TR_PREFS_KEY_ALT_SPEED_TIME_END, &altEnd) &&
+                tr_variantDictFindInt (args, TR_PREFS_KEY_ALT_SPEED_TIME_DAY, &altDay) &&
+                tr_variantDictFindInt (args, TR_PREFS_KEY_ALT_SPEED_UP_KBps, &altUp) &&
+                tr_variantDictFindInt (args, TR_PREFS_KEY_PEER_LIMIT_GLOBAL, &peerLimit) &&
+                tr_variantDictFindInt (args, TR_PREFS_KEY_DSPEED_KBps, &downLimit) &&
+                tr_variantDictFindBool (args, TR_PREFS_KEY_DSPEED_ENABLED, &downEnabled) &&
+                tr_variantDictFindInt (args, TR_PREFS_KEY_USPEED_KBps, &upLimit) &&
+                tr_variantDictFindBool (args, TR_PREFS_KEY_USPEED_ENABLED, &upEnabled) &&
+                tr_variantDictFindReal (args, "seedRatioLimit", &seedRatioLimit) &&
+                tr_variantDictFindBool (args, "seedRatioLimited", &seedRatioLimited))
             {
                 char buf[128];
                 char buf2[128];
@@ -1591,26 +1590,26 @@ printSession (tr_benc * top)
         printf ("\n");
 
         printf ("MISC\n");
-        if (tr_bencDictFindBool (args, TR_PREFS_KEY_START, &boolVal))
+        if (tr_variantDictFindBool (args, TR_PREFS_KEY_START, &boolVal))
             printf ("  Autostart added torrents: %s\n", (boolVal ? "Yes" : "No"));
-        if (tr_bencDictFindBool (args, TR_PREFS_KEY_TRASH_ORIGINAL, &boolVal))
+        if (tr_variantDictFindBool (args, TR_PREFS_KEY_TRASH_ORIGINAL, &boolVal))
             printf ("  Delete automatically added torrents: %s\n", (boolVal ? "Yes" : "No"));
     }
 }
 
 static void
-printSessionStats (tr_benc * top)
+printSessionStats (tr_variant * top)
 {
-    tr_benc *args, *d;
-    if ((tr_bencDictFindDict (top, "arguments", &args)))
+    tr_variant *args, *d;
+    if ((tr_variantDictFindDict (top, "arguments", &args)))
     {
         char buf[512];
         int64_t up, down, secs, sessions;
 
-        if (tr_bencDictFindDict (args, "current-stats", &d)
-            && tr_bencDictFindInt (d, "uploadedBytes", &up)
-            && tr_bencDictFindInt (d, "downloadedBytes", &down)
-            && tr_bencDictFindInt (d, "secondsActive", &secs))
+        if (tr_variantDictFindDict (args, "current-stats", &d)
+            && tr_variantDictFindInt (d, "uploadedBytes", &up)
+            && tr_variantDictFindInt (d, "downloadedBytes", &down)
+            && tr_variantDictFindInt (d, "secondsActive", &secs))
         {
             printf ("\nCURRENT SESSION\n");
             printf ("  Uploaded:   %s\n", strlsize (buf, up, sizeof (buf)));
@@ -1619,11 +1618,11 @@ printSessionStats (tr_benc * top)
             printf ("  Duration:   %s\n", tr_strltime (buf, secs, sizeof (buf)));
         }
 
-        if (tr_bencDictFindDict (args, "cumulative-stats", &d)
-            && tr_bencDictFindInt (d, "sessionCount", &sessions)
-            && tr_bencDictFindInt (d, "uploadedBytes", &up)
-            && tr_bencDictFindInt (d, "downloadedBytes", &down)
-            && tr_bencDictFindInt (d, "secondsActive", &secs))
+        if (tr_variantDictFindDict (args, "cumulative-stats", &d)
+            && tr_variantDictFindInt (d, "sessionCount", &sessions)
+            && tr_variantDictFindInt (d, "uploadedBytes", &up)
+            && tr_variantDictFindInt (d, "downloadedBytes", &down)
+            && tr_variantDictFindInt (d, "secondsActive", &secs))
         {
             printf ("\nTOTAL\n");
             printf ("  Started %lu times\n", (unsigned long)sessions);
@@ -1640,14 +1639,14 @@ static char id[4096];
 static int
 processResponse (const char * rpcurl, const void * response, size_t len)
 {
-    tr_benc top;
+    tr_variant top;
     int status = EXIT_SUCCESS;
 
     if (debug)
         fprintf (stderr, "got response (len %d):\n--------\n%*.*s\n--------\n",
                (int)len, (int)len, (int)len, (const char*) response);
 
-    if (tr_jsonParse (NULL, response, len, &top, NULL))
+    if (tr_variantFromJson (&top, response, len))
     {
         tr_nerr (MY_NAME, "Unable to parse response \"%*.*s\"", (int)len,
                (int)len, (char*)response);
@@ -1658,7 +1657,7 @@ processResponse (const char * rpcurl, const void * response, size_t len)
         int64_t      tag = -1;
         const char * str;
 
-        if (tr_bencDictFindStr (&top, "result", &str))
+        if (tr_variantDictFindStr (&top, "result", &str, NULL))
         {
             if (strcmp (str, "success"))
             {
@@ -1667,7 +1666,7 @@ processResponse (const char * rpcurl, const void * response, size_t len)
             }
             else
             {
-        tr_bencDictFindInt (&top, "tag", &tag);
+        tr_variantDictFindInt (&top, "tag", &tag);
 
         switch (tag)
         {
@@ -1700,15 +1699,15 @@ processResponse (const char * rpcurl, const void * response, size_t len)
 
             case TAG_TORRENT_ADD: {
                 int64_t i;
-                tr_benc * b = &top;
-                if (tr_bencDictFindDict (&top, ARGUMENTS, &b)
-                        && tr_bencDictFindDict (b, "torrent-added", &b)
-                        && tr_bencDictFindInt (b, "id", &i))
+                tr_variant * b = &top;
+                if (tr_variantDictFindDict (&top, ARGUMENTS, &b)
+                        && tr_variantDictFindDict (b, "torrent-added", &b)
+                        && tr_variantDictFindInt (b, "id", &i))
                     tr_snprintf (id, sizeof (id), "%"PRId64, i);
                 /* fall-through to default: to give success or failure msg */
             }
             default:
-                if (!tr_bencDictFindStr (&top, "result", &str))
+                if (!tr_variantDictFindStr (&top, "result", &str, NULL))
                     status |= EXIT_FAILURE;
                 else {
                     printf ("%s responded: \"%s\"\n", rpcurl, str);
@@ -1717,7 +1716,7 @@ processResponse (const char * rpcurl, const void * response, size_t len)
                 }
         }
 
-        tr_bencFree (&top);
+        tr_variantFree (&top);
     }
         }
         else
@@ -1756,13 +1755,13 @@ tr_curl_easy_init (struct evbuffer * writebuf)
 }
 
 static int
-flush (const char * rpcurl, tr_benc ** benc)
+flush (const char * rpcurl, tr_variant ** benc)
 {
     CURLcode res;
     CURL * curl;
     int status = EXIT_SUCCESS;
     struct evbuffer * buf = evbuffer_new ();
-    char * json = tr_bencToStr (*benc, TR_FMT_JSON_LEAN, NULL);
+    char * json = tr_variantToStr (*benc, TR_VARIANT_FMT_JSON_LEAN, NULL);
     char *rpcurl_http =  tr_strdup_printf (UseSSL? "https://%s" : "http://%s", rpcurl);
 
     curl = tr_curl_easy_init (buf);
@@ -1809,41 +1808,41 @@ flush (const char * rpcurl, tr_benc ** benc)
     if (curl != 0)
         curl_easy_cleanup (curl);
     if (benc != NULL) {
-        tr_bencFree (*benc);
+        tr_variantFree (*benc);
         *benc = 0;
     }
     return status;
 }
 
-static tr_benc*
-ensure_sset (tr_benc ** sset)
+static tr_variant*
+ensure_sset (tr_variant ** sset)
 {
-    tr_benc * args;
+    tr_variant * args;
 
     if (*sset)
-        args = tr_bencDictFind (*sset, ARGUMENTS);
+        args = tr_variantDictFind (*sset, ARGUMENTS);
     else {
-        *sset = tr_new0 (tr_benc, 1);
-        tr_bencInitDict (*sset, 3);
-        tr_bencDictAddStr (*sset, "method", "session-set");
-        args = tr_bencDictAddDict (*sset, ARGUMENTS, 0);
+        *sset = tr_new0 (tr_variant, 1);
+        tr_variantInitDict (*sset, 3);
+        tr_variantDictAddStr (*sset, "method", "session-set");
+        args = tr_variantDictAddDict (*sset, ARGUMENTS, 0);
     }
 
     return args;
 }
 
-static tr_benc*
-ensure_tset (tr_benc ** tset)
+static tr_variant*
+ensure_tset (tr_variant ** tset)
 {
-    tr_benc * args;
+    tr_variant * args;
 
     if (*tset)
-        args = tr_bencDictFind (*tset, ARGUMENTS);
+        args = tr_variantDictFind (*tset, ARGUMENTS);
     else {
-        *tset = tr_new0 (tr_benc, 1);
-        tr_bencInitDict (*tset, 3);
-        tr_bencDictAddStr (*tset, "method", "torrent-set");
-        args = tr_bencDictAddDict (*tset, ARGUMENTS, 1);
+        *tset = tr_new0 (tr_variant, 1);
+        tr_variantInitDict (*tset, 3);
+        tr_variantDictAddStr (*tset, "method", "torrent-set");
+        args = tr_variantDictAddDict (*tset, ARGUMENTS, 1);
     }
 
     return args;
@@ -1855,9 +1854,9 @@ processArgs (const char * rpcurl, int argc, const char ** argv)
     int c;
     int status = EXIT_SUCCESS;
     const char * optarg;
-    tr_benc *sset = 0;
-    tr_benc *tset = 0;
-    tr_benc *tadd = 0;
+    tr_variant *sset = 0;
+    tr_variant *tset = 0;
+    tr_variant *tadd = 0;
 
     *id = '\0';
 
@@ -1872,12 +1871,12 @@ processArgs (const char * rpcurl, int argc, const char ** argv)
                 case 'a': /* add torrent */
                     if (sset != 0) status |= flush (rpcurl, &sset);
                     if (tadd != 0) status |= flush (rpcurl, &tadd);
-                    if (tset != 0) { addIdArg (tr_bencDictFind (tset, ARGUMENTS), id); status |= flush (rpcurl, &tset); }
-                    tadd = tr_new0 (tr_benc, 1);
-                    tr_bencInitDict (tadd, 3);
-                    tr_bencDictAddStr (tadd, "method", "torrent-add");
-                    tr_bencDictAddInt (tadd, "tag", TAG_TORRENT_ADD);
-                    tr_bencDictAddDict (tadd, ARGUMENTS, 0);
+                    if (tset != 0) { addIdArg (tr_variantDictFind (tset, ARGUMENTS), id); status |= flush (rpcurl, &tset); }
+                    tadd = tr_new0 (tr_variant, 1);
+                    tr_variantInitDict (tadd, 3);
+                    tr_variantDictAddStr (tadd, "method", "torrent-add");
+                    tr_variantDictAddInt (tadd, "tag", TAG_TORRENT_ADD);
+                    tr_variantDictAddDict (tadd, ARGUMENTS, 0);
                     break;
 
                 case 'b': /* debug */
@@ -1909,7 +1908,7 @@ processArgs (const char * rpcurl, int argc, const char ** argv)
 
                 case 't': /* set current torrent */
                     if (tadd != 0) status |= flush (rpcurl, &tadd);
-                    if (tset != 0) { addIdArg (tr_bencDictFind (tset, ARGUMENTS), id); status |= flush (rpcurl, &tset); }
+                    if (tset != 0) { addIdArg (tr_variantDictFind (tset, ARGUMENTS), id); status |= flush (rpcurl, &tset); }
                     tr_strlcpy (id, optarg, sizeof (id));
                     break;
 
@@ -1926,12 +1925,12 @@ processArgs (const char * rpcurl, int argc, const char ** argv)
 
                 case TR_OPT_UNK:
                     if (tadd) {
-                        tr_benc * args = tr_bencDictFind (tadd, ARGUMENTS);
+                        tr_variant * args = tr_variantDictFind (tadd, ARGUMENTS);
                         char * tmp = getEncodedMetainfo (optarg);
                         if (tmp)
-                            tr_bencDictAddStr (args, "metainfo", tmp);
+                            tr_variantDictAddStr (args, "metainfo", tmp);
                         else
-                            tr_bencDictAddStr (args, "filename", optarg);
+                            tr_variantDictAddStr (args, "filename", optarg);
                         tr_free (tmp);
                     } else {
                         fprintf (stderr, "Unknown option: %s\n", optarg);
@@ -1943,43 +1942,43 @@ processArgs (const char * rpcurl, int argc, const char ** argv)
         else if (stepMode == MODE_TORRENT_GET)
         {
             size_t i, n;
-            tr_benc * top = tr_new0 (tr_benc, 1);
-            tr_benc * args;
-            tr_benc * fields;
-            tr_bencInitDict (top, 3);
-            tr_bencDictAddStr (top, "method", "torrent-get");
-            args = tr_bencDictAddDict (top, ARGUMENTS, 0);
-            fields = tr_bencDictAddList (args, "fields", 0);
+            tr_variant * top = tr_new0 (tr_variant, 1);
+            tr_variant * args;
+            tr_variant * fields;
+            tr_variantInitDict (top, 3);
+            tr_variantDictAddStr (top, "method", "torrent-get");
+            args = tr_variantDictAddDict (top, ARGUMENTS, 0);
+            fields = tr_variantDictAddList (args, "fields", 0);
 
-            if (tset != 0) { addIdArg (tr_bencDictFind (tset, ARGUMENTS), id); status |= flush (rpcurl, &tset); }
+            if (tset != 0) { addIdArg (tr_variantDictFind (tset, ARGUMENTS), id); status |= flush (rpcurl, &tset); }
 
             switch (c)
             {
-                case 'i': tr_bencDictAddInt (top, "tag", TAG_DETAILS);
+                case 'i': tr_variantDictAddInt (top, "tag", TAG_DETAILS);
                           n = TR_N_ELEMENTS (details_keys);
-                          for (i=0; i<n; ++i) tr_bencListAddStr (fields, details_keys[i]);
+                          for (i=0; i<n; ++i) tr_variantListAddStr (fields, details_keys[i]);
                           addIdArg (args, id);
                           break;
-                case 'l': tr_bencDictAddInt (top, "tag", TAG_LIST);
+                case 'l': tr_variantDictAddInt (top, "tag", TAG_LIST);
                           n = TR_N_ELEMENTS (list_keys);
-                          for (i=0; i<n; ++i) tr_bencListAddStr (fields, list_keys[i]);
+                          for (i=0; i<n; ++i) tr_variantListAddStr (fields, list_keys[i]);
                           break;
-                case 940: tr_bencDictAddInt (top, "tag", TAG_FILES);
+                case 940: tr_variantDictAddInt (top, "tag", TAG_FILES);
                           n = TR_N_ELEMENTS (files_keys);
-                          for (i=0; i<n; ++i) tr_bencListAddStr (fields, files_keys[i]);
+                          for (i=0; i<n; ++i) tr_variantListAddStr (fields, files_keys[i]);
                           addIdArg (args, id);
                           break;
-                case 941: tr_bencDictAddInt (top, "tag", TAG_PEERS);
-                          tr_bencListAddStr (fields, "peers");
+                case 941: tr_variantDictAddInt (top, "tag", TAG_PEERS);
+                          tr_variantListAddStr (fields, "peers");
                           addIdArg (args, id);
                           break;
-                case 942: tr_bencDictAddInt (top, "tag", TAG_PIECES);
-                          tr_bencListAddStr (fields, "pieces");
-                          tr_bencListAddStr (fields, "pieceCount");
+                case 942: tr_variantDictAddInt (top, "tag", TAG_PIECES);
+                          tr_variantListAddStr (fields, "pieces");
+                          tr_variantListAddStr (fields, "pieceCount");
                           addIdArg (args, id);
                           break;
-                case 943: tr_bencDictAddInt (top, "tag", TAG_TRACKERS);
-                          tr_bencListAddStr (fields, "trackerStats");
+                case 943: tr_variantDictAddInt (top, "tag", TAG_TRACKERS);
+                          tr_variantListAddStr (fields, "trackerStats");
                           addIdArg (args, id);
                           break;
                 default:  assert ("unhandled value" && 0);
@@ -1989,26 +1988,26 @@ processArgs (const char * rpcurl, int argc, const char ** argv)
         }
         else if (stepMode == MODE_SESSION_SET)
         {
-            tr_benc * args = ensure_sset (&sset);
+            tr_variant * args = ensure_sset (&sset);
 
             switch (c)
             {
-                case 800: tr_bencDictAddStr (args, TR_PREFS_KEY_SCRIPT_TORRENT_DONE_FILENAME, optarg);
-                          tr_bencDictAddBool (args, TR_PREFS_KEY_SCRIPT_TORRENT_DONE_ENABLED, true);
+                case 800: tr_variantDictAddStr (args, TR_PREFS_KEY_SCRIPT_TORRENT_DONE_FILENAME, optarg);
+                          tr_variantDictAddBool (args, TR_PREFS_KEY_SCRIPT_TORRENT_DONE_ENABLED, true);
                           break;
-                case 801: tr_bencDictAddBool (args, TR_PREFS_KEY_SCRIPT_TORRENT_DONE_ENABLED, false);
+                case 801: tr_variantDictAddBool (args, TR_PREFS_KEY_SCRIPT_TORRENT_DONE_ENABLED, false);
                           break;
-                case 970: tr_bencDictAddBool (args, TR_PREFS_KEY_ALT_SPEED_ENABLED, true);
+                case 970: tr_variantDictAddBool (args, TR_PREFS_KEY_ALT_SPEED_ENABLED, true);
                           break;
-                case 971: tr_bencDictAddBool (args, TR_PREFS_KEY_ALT_SPEED_ENABLED, false);
+                case 971: tr_variantDictAddBool (args, TR_PREFS_KEY_ALT_SPEED_ENABLED, false);
                           break;
-                case 972: tr_bencDictAddInt (args, TR_PREFS_KEY_ALT_SPEED_DOWN_KBps, numarg (optarg));
+                case 972: tr_variantDictAddInt (args, TR_PREFS_KEY_ALT_SPEED_DOWN_KBps, numarg (optarg));
                           break;
-                case 973: tr_bencDictAddInt (args, TR_PREFS_KEY_ALT_SPEED_UP_KBps, numarg (optarg));
+                case 973: tr_variantDictAddInt (args, TR_PREFS_KEY_ALT_SPEED_UP_KBps, numarg (optarg));
                           break;
-                case 974: tr_bencDictAddBool (args, TR_PREFS_KEY_ALT_SPEED_TIME_ENABLED, true);
+                case 974: tr_variantDictAddBool (args, TR_PREFS_KEY_ALT_SPEED_TIME_ENABLED, true);
                           break;
-                case 975: tr_bencDictAddBool (args, TR_PREFS_KEY_ALT_SPEED_TIME_ENABLED, false);
+                case 975: tr_variantDictAddBool (args, TR_PREFS_KEY_ALT_SPEED_TIME_ENABLED, false);
                           break;
                 case 976: addTime (args, TR_PREFS_KEY_ALT_SPEED_TIME_BEGIN, optarg);
                           break;
@@ -2016,55 +2015,55 @@ processArgs (const char * rpcurl, int argc, const char ** argv)
                           break;
                 case 978: addDays (args, TR_PREFS_KEY_ALT_SPEED_TIME_DAY, optarg);
                           break;
-                case 'c': tr_bencDictAddStr (args, TR_PREFS_KEY_INCOMPLETE_DIR, optarg);
-                          tr_bencDictAddBool (args, TR_PREFS_KEY_INCOMPLETE_DIR_ENABLED, true);
+                case 'c': tr_variantDictAddStr (args, TR_PREFS_KEY_INCOMPLETE_DIR, optarg);
+                          tr_variantDictAddBool (args, TR_PREFS_KEY_INCOMPLETE_DIR_ENABLED, true);
                           break;
-                case 'C': tr_bencDictAddBool (args, TR_PREFS_KEY_INCOMPLETE_DIR_ENABLED, false);
+                case 'C': tr_variantDictAddBool (args, TR_PREFS_KEY_INCOMPLETE_DIR_ENABLED, false);
                           break;
-                case 'e': tr_bencDictAddInt (args, TR_PREFS_KEY_MAX_CACHE_SIZE_MB, atoi (optarg));
+                case 'e': tr_variantDictAddInt (args, TR_PREFS_KEY_MAX_CACHE_SIZE_MB, atoi (optarg));
                           break;
-                case 910: tr_bencDictAddStr (args, TR_PREFS_KEY_ENCRYPTION, "required");
+                case 910: tr_variantDictAddStr (args, TR_PREFS_KEY_ENCRYPTION, "required");
                           break;
-                case 911: tr_bencDictAddStr (args, TR_PREFS_KEY_ENCRYPTION, "preferred");
+                case 911: tr_variantDictAddStr (args, TR_PREFS_KEY_ENCRYPTION, "preferred");
                           break;
-                case 912: tr_bencDictAddStr (args, TR_PREFS_KEY_ENCRYPTION, "tolerated");
+                case 912: tr_variantDictAddStr (args, TR_PREFS_KEY_ENCRYPTION, "tolerated");
                           break;
-                case 'm': tr_bencDictAddBool (args, TR_PREFS_KEY_PORT_FORWARDING, true);
+                case 'm': tr_variantDictAddBool (args, TR_PREFS_KEY_PORT_FORWARDING, true);
                           break;
-                case 'M': tr_bencDictAddBool (args, TR_PREFS_KEY_PORT_FORWARDING, false);
+                case 'M': tr_variantDictAddBool (args, TR_PREFS_KEY_PORT_FORWARDING, false);
                           break;
-                case 'o': tr_bencDictAddBool (args, TR_PREFS_KEY_DHT_ENABLED, true);
+                case 'o': tr_variantDictAddBool (args, TR_PREFS_KEY_DHT_ENABLED, true);
                           break;
-                case 'O': tr_bencDictAddBool (args, TR_PREFS_KEY_DHT_ENABLED, false);
+                case 'O': tr_variantDictAddBool (args, TR_PREFS_KEY_DHT_ENABLED, false);
                           break;
-                case 830: tr_bencDictAddBool (args, TR_PREFS_KEY_UTP_ENABLED, true);
+                case 830: tr_variantDictAddBool (args, TR_PREFS_KEY_UTP_ENABLED, true);
                           break;
-                case 831: tr_bencDictAddBool (args, TR_PREFS_KEY_UTP_ENABLED, false);
+                case 831: tr_variantDictAddBool (args, TR_PREFS_KEY_UTP_ENABLED, false);
                           break;
-                case 'p': tr_bencDictAddInt (args, TR_PREFS_KEY_PEER_PORT, numarg (optarg));
+                case 'p': tr_variantDictAddInt (args, TR_PREFS_KEY_PEER_PORT, numarg (optarg));
                           break;
-                case 'P': tr_bencDictAddBool (args, TR_PREFS_KEY_PEER_PORT_RANDOM_ON_START, true);
+                case 'P': tr_variantDictAddBool (args, TR_PREFS_KEY_PEER_PORT_RANDOM_ON_START, true);
                           break;
-                case 'x': tr_bencDictAddBool (args, TR_PREFS_KEY_PEX_ENABLED, true);
+                case 'x': tr_variantDictAddBool (args, TR_PREFS_KEY_PEX_ENABLED, true);
                           break;
-                case 'X': tr_bencDictAddBool (args, TR_PREFS_KEY_PEX_ENABLED, false);
+                case 'X': tr_variantDictAddBool (args, TR_PREFS_KEY_PEX_ENABLED, false);
                           break;
-                case 'y': tr_bencDictAddBool (args, TR_PREFS_KEY_LPD_ENABLED, true);
+                case 'y': tr_variantDictAddBool (args, TR_PREFS_KEY_LPD_ENABLED, true);
                           break;
-                case 'Y': tr_bencDictAddBool (args, TR_PREFS_KEY_LPD_ENABLED, false);
+                case 'Y': tr_variantDictAddBool (args, TR_PREFS_KEY_LPD_ENABLED, false);
                           break;
-                case 953: tr_bencDictAddReal (args, "seedRatioLimit", atof (optarg));
-                          tr_bencDictAddBool (args, "seedRatioLimited", true);
+                case 953: tr_variantDictAddReal (args, "seedRatioLimit", atof (optarg));
+                          tr_variantDictAddBool (args, "seedRatioLimited", true);
                           break;
-                case 954: tr_bencDictAddBool (args, "seedRatioLimited", false);
+                case 954: tr_variantDictAddBool (args, "seedRatioLimited", false);
                           break;
-                case 990: tr_bencDictAddBool (args, TR_PREFS_KEY_START, false);
+                case 990: tr_variantDictAddBool (args, TR_PREFS_KEY_START, false);
                           break;
-                case 991: tr_bencDictAddBool (args, TR_PREFS_KEY_START, true);
+                case 991: tr_variantDictAddBool (args, TR_PREFS_KEY_START, true);
                           break;
-                case 992: tr_bencDictAddBool (args, TR_PREFS_KEY_TRASH_ORIGINAL, true);
+                case 992: tr_variantDictAddBool (args, TR_PREFS_KEY_TRASH_ORIGINAL, true);
                           break;
-                case 993: tr_bencDictAddBool (args, TR_PREFS_KEY_TRASH_ORIGINAL, false);
+                case 993: tr_variantDictAddBool (args, TR_PREFS_KEY_TRASH_ORIGINAL, false);
                           break;
                 default:  assert ("unhandled value" && 0);
                           break;
@@ -2072,8 +2071,8 @@ processArgs (const char * rpcurl, int argc, const char ** argv)
         }
         else if (stepMode == (MODE_SESSION_SET | MODE_TORRENT_SET))
         {
-            tr_benc * targs = 0;
-            tr_benc * sargs = 0;
+            tr_variant * targs = 0;
+            tr_variant * sargs = 0;
 
             if (*id)
                 targs = ensure_tset (&tset);
@@ -2083,35 +2082,35 @@ processArgs (const char * rpcurl, int argc, const char ** argv)
             switch (c)
             {
                 case 'd': if (targs) {
-                              tr_bencDictAddInt (targs, "downloadLimit", numarg (optarg));
-                              tr_bencDictAddBool (targs, "downloadLimited", true);
+                              tr_variantDictAddInt (targs, "downloadLimit", numarg (optarg));
+                              tr_variantDictAddBool (targs, "downloadLimited", true);
                           } else {
-                              tr_bencDictAddInt (sargs, TR_PREFS_KEY_DSPEED_KBps, numarg (optarg));
-                              tr_bencDictAddBool (sargs, TR_PREFS_KEY_DSPEED_ENABLED, true);
+                              tr_variantDictAddInt (sargs, TR_PREFS_KEY_DSPEED_KBps, numarg (optarg));
+                              tr_variantDictAddBool (sargs, TR_PREFS_KEY_DSPEED_ENABLED, true);
                           }
                           break;
                 case 'D': if (targs)
-                              tr_bencDictAddBool (targs, "downloadLimited", false);
+                              tr_variantDictAddBool (targs, "downloadLimited", false);
                           else
-                              tr_bencDictAddBool (sargs, TR_PREFS_KEY_DSPEED_ENABLED, false);
+                              tr_variantDictAddBool (sargs, TR_PREFS_KEY_DSPEED_ENABLED, false);
                           break;
                 case 'u': if (targs) {
-                              tr_bencDictAddInt (targs, "uploadLimit", numarg (optarg));
-                              tr_bencDictAddBool (targs, "uploadLimited", true);
+                              tr_variantDictAddInt (targs, "uploadLimit", numarg (optarg));
+                              tr_variantDictAddBool (targs, "uploadLimited", true);
                           } else {
-                              tr_bencDictAddInt (sargs, TR_PREFS_KEY_USPEED_KBps, numarg (optarg));
-                              tr_bencDictAddBool (sargs, TR_PREFS_KEY_USPEED_ENABLED, true);
+                              tr_variantDictAddInt (sargs, TR_PREFS_KEY_USPEED_KBps, numarg (optarg));
+                              tr_variantDictAddBool (sargs, TR_PREFS_KEY_USPEED_ENABLED, true);
                           }
                           break;
                 case 'U': if (targs)
-                              tr_bencDictAddBool (targs, "uploadLimited", false);
+                              tr_variantDictAddBool (targs, "uploadLimited", false);
                           else
-                              tr_bencDictAddBool (sargs, TR_PREFS_KEY_USPEED_ENABLED, false);
+                              tr_variantDictAddBool (sargs, TR_PREFS_KEY_USPEED_ENABLED, false);
                           break;
                 case 930: if (targs)
-                              tr_bencDictAddInt (targs, "peer-limit", atoi (optarg));
+                              tr_variantDictAddInt (targs, "peer-limit", atoi (optarg));
                           else
-                              tr_bencDictAddInt (sargs, TR_PREFS_KEY_PEER_LIMIT_GLOBAL, atoi (optarg));
+                              tr_variantDictAddInt (sargs, TR_PREFS_KEY_PEER_LIMIT_GLOBAL, atoi (optarg));
                           break;
                 default:  assert ("unhandled value" && 0);
                           break;
@@ -2119,22 +2118,22 @@ processArgs (const char * rpcurl, int argc, const char ** argv)
         }
         else if (stepMode == MODE_TORRENT_SET)
         {
-            tr_benc * args = ensure_tset (&tset);
+            tr_variant * args = ensure_tset (&tset);
 
             switch (c)
             {
-                case 712: tr_bencListAddInt (tr_bencDictAddList (args, "trackerRemove", 1), atoi (optarg));
+                case 712: tr_variantListAddInt (tr_variantDictAddList (args, "trackerRemove", 1), atoi (optarg));
                           break;
-                case 950: tr_bencDictAddReal (args, "seedRatioLimit", atof (optarg));
-                          tr_bencDictAddInt (args, "seedRatioMode", TR_RATIOLIMIT_SINGLE);
+                case 950: tr_variantDictAddReal (args, "seedRatioLimit", atof (optarg));
+                          tr_variantDictAddInt (args, "seedRatioMode", TR_RATIOLIMIT_SINGLE);
                           break;
-                case 951: tr_bencDictAddInt (args, "seedRatioMode", TR_RATIOLIMIT_GLOBAL);
+                case 951: tr_variantDictAddInt (args, "seedRatioMode", TR_RATIOLIMIT_GLOBAL);
                           break;
-                case 952: tr_bencDictAddInt (args, "seedRatioMode", TR_RATIOLIMIT_UNLIMITED);
+                case 952: tr_variantDictAddInt (args, "seedRatioMode", TR_RATIOLIMIT_UNLIMITED);
                           break;
-                case 984: tr_bencDictAddBool (args, "honorsSessionLimits", true);
+                case 984: tr_variantDictAddBool (args, "honorsSessionLimits", true);
                           break;
-                case 985: tr_bencDictAddBool (args, "honorsSessionLimits", false);
+                case 985: tr_variantDictAddBool (args, "honorsSessionLimits", false);
                           break;
                 default:  assert ("unhandled value" && 0);
                           break;
@@ -2142,10 +2141,10 @@ processArgs (const char * rpcurl, int argc, const char ** argv)
         }
         else if (stepMode == (MODE_TORRENT_SET | MODE_TORRENT_ADD))
         {
-            tr_benc * args;
+            tr_variant * args;
 
             if (tadd)
-                args = tr_bencDictFind (tadd, ARGUMENTS);
+                args = tr_variantDictFind (tadd, ARGUMENTS);
             else
                 args = ensure_tset (&tset);
 
@@ -2161,13 +2160,13 @@ processArgs (const char * rpcurl, int argc, const char ** argv)
                           break;
                 case 902: addFiles (args, "priority-low", optarg);
                           break;
-                case 700: tr_bencDictAddInt (args, "bandwidthPriority",  1);
+                case 700: tr_variantDictAddInt (args, "bandwidthPriority",  1);
                           break;
-                case 701: tr_bencDictAddInt (args, "bandwidthPriority",  0);
+                case 701: tr_variantDictAddInt (args, "bandwidthPriority",  0);
                           break;
-                case 702: tr_bencDictAddInt (args, "bandwidthPriority", -1);
+                case 702: tr_variantDictAddInt (args, "bandwidthPriority", -1);
                           break;
-                case 710: tr_bencListAddStr (tr_bencDictAddList (args, "trackerAdd", 1), optarg);
+                case 710: tr_variantListAddStr (tr_variantDictAddList (args, "trackerAdd", 1), optarg);
                           break;
                 default:  assert ("unhandled value" && 0);
                           break;
@@ -2177,18 +2176,18 @@ processArgs (const char * rpcurl, int argc, const char ** argv)
         {
             if (tadd)
             {
-                tr_benc * args = tr_bencDictFind (tadd, ARGUMENTS);
-                tr_bencDictAddStr (args, "download-dir", optarg);
+                tr_variant * args = tr_variantDictFind (tadd, ARGUMENTS);
+                tr_variantDictAddStr (args, "download-dir", optarg);
             }
             else
             {
-                tr_benc * args;
-                tr_benc * top = tr_new0 (tr_benc, 1);
-                tr_bencInitDict (top, 2);
-                tr_bencDictAddStr (top, "method", "torrent-set-location");
-                args = tr_bencDictAddDict (top, ARGUMENTS, 3);
-                tr_bencDictAddStr (args, "location", optarg);
-                tr_bencDictAddBool (args, "move", false);
+                tr_variant * args;
+                tr_variant * top = tr_new0 (tr_variant, 1);
+                tr_variantInitDict (top, 2);
+                tr_variantDictAddStr (top, "method", "torrent-set-location");
+                args = tr_variantDictAddDict (top, ARGUMENTS, 3);
+                tr_variantDictAddStr (args, "location", optarg);
+                tr_variantDictAddBool (args, "move", false);
                 addIdArg (args, id);
                 status |= flush (rpcurl, &top);
                 break;
@@ -2198,22 +2197,22 @@ processArgs (const char * rpcurl, int argc, const char ** argv)
         {
             case 920: /* session-info */
             {
-                tr_benc * top = tr_new0 (tr_benc, 1);
-                tr_bencInitDict (top, 2);
-                tr_bencDictAddStr (top, "method", "session-get");
-                tr_bencDictAddInt (top, "tag", TAG_SESSION);
+                tr_variant * top = tr_new0 (tr_variant, 1);
+                tr_variantInitDict (top, 2);
+                tr_variantDictAddStr (top, "method", "session-get");
+                tr_variantDictAddInt (top, "tag", TAG_SESSION);
                 status |= flush (rpcurl, &top);
                 break;
             }
             case 's': /* start */
             {
                 if (tadd)
-                    tr_bencDictAddBool (tr_bencDictFind (tadd, "arguments"), "paused", false);
+                    tr_variantDictAddBool (tr_variantDictFind (tadd, "arguments"), "paused", false);
                 else {
-                    tr_benc * top = tr_new0 (tr_benc, 1);
-                    tr_bencInitDict (top, 2);
-                    tr_bencDictAddStr (top, "method", "torrent-start");
-                    addIdArg (tr_bencDictAddDict (top, ARGUMENTS, 1), id);
+                    tr_variant * top = tr_new0 (tr_variant, 1);
+                    tr_variantInitDict (top, 2);
+                    tr_variantDictAddStr (top, "method", "torrent-start");
+                    addIdArg (tr_variantDictAddDict (top, ARGUMENTS, 1), id);
                     status |= flush (rpcurl, &top);
                 }
                 break;
@@ -2221,12 +2220,12 @@ processArgs (const char * rpcurl, int argc, const char ** argv)
             case 'S': /* stop */
             {
                 if (tadd)
-                    tr_bencDictAddBool (tr_bencDictFind (tadd, "arguments"), "paused", true);
+                    tr_variantDictAddBool (tr_variantDictFind (tadd, "arguments"), "paused", true);
                 else {
-                    tr_benc * top = tr_new0 (tr_benc, 1);
-                    tr_bencInitDict (top, 2);
-                    tr_bencDictAddStr (top, "method", "torrent-stop");
-                    addIdArg (tr_bencDictAddDict (top, ARGUMENTS, 1), id);
+                    tr_variant * top = tr_new0 (tr_variant, 1);
+                    tr_variantInitDict (top, 2);
+                    tr_variantDictAddStr (top, "method", "torrent-stop");
+                    addIdArg (tr_variantDictAddDict (top, ARGUMENTS, 1), id);
                     status |= flush (rpcurl, &top);
                 }
                 break;
@@ -2235,92 +2234,92 @@ processArgs (const char * rpcurl, int argc, const char ** argv)
             {
                 char * path = absolutify (optarg);
                 if (tadd)
-                    tr_bencDictAddStr (tr_bencDictFind (tadd, "arguments"), "download-dir", path);
+                    tr_variantDictAddStr (tr_variantDictFind (tadd, "arguments"), "download-dir", path);
                 else {
-                    tr_benc * args = ensure_sset (&sset);
-                    tr_bencDictAddStr (args, "download-dir", path);
+                    tr_variant * args = ensure_sset (&sset);
+                    tr_variantDictAddStr (args, "download-dir", path);
                 }
                 tr_free (path);
                 break;
             }
             case 850:
             {
-                tr_benc * top = tr_new0 (tr_benc, 1);
-                tr_bencInitDict (top, 1);
-                tr_bencDictAddStr (top, "method", "session-close");
+                tr_variant * top = tr_new0 (tr_variant, 1);
+                tr_variantInitDict (top, 1);
+                tr_variantDictAddStr (top, "method", "session-close");
                 status |= flush (rpcurl, &top);
                 break;
             }
             case 963:
             {
-                tr_benc * top = tr_new0 (tr_benc, 1);
-                tr_bencInitDict (top, 1);
-                tr_bencDictAddStr (top, "method", "blocklist-update");
+                tr_variant * top = tr_new0 (tr_variant, 1);
+                tr_variantInitDict (top, 1);
+                tr_variantDictAddStr (top, "method", "blocklist-update");
                 status |= flush (rpcurl, &top);
                 break;
             }
             case 921:
             {
-                tr_benc * top = tr_new0 (tr_benc, 1);
-                tr_bencInitDict (top, 2);
-                tr_bencDictAddStr (top, "method", "session-stats");
-                tr_bencDictAddInt (top, "tag", TAG_STATS);
+                tr_variant * top = tr_new0 (tr_variant, 1);
+                tr_variantInitDict (top, 2);
+                tr_variantDictAddStr (top, "method", "session-stats");
+                tr_variantDictAddInt (top, "tag", TAG_STATS);
                 status |= flush (rpcurl, &top);
                 break;
             }
             case 962:
             {
-                tr_benc * top = tr_new0 (tr_benc, 1);
-                tr_bencInitDict (top, 2);
-                tr_bencDictAddStr (top, "method", "port-test");
-                tr_bencDictAddInt (top, "tag", TAG_PORTTEST);
+                tr_variant * top = tr_new0 (tr_variant, 1);
+                tr_variantInitDict (top, 2);
+                tr_variantDictAddStr (top, "method", "port-test");
+                tr_variantDictAddInt (top, "tag", TAG_PORTTEST);
                 status |= flush (rpcurl, &top);
                 break;
             }
             case 600:
             {
-                tr_benc * top;
-                if (tset != 0) { addIdArg (tr_bencDictFind (tset, ARGUMENTS), id); status |= flush (rpcurl, &tset); }
-                top = tr_new0 (tr_benc, 1);
-                tr_bencInitDict (top, 2);
-                tr_bencDictAddStr (top, "method", "torrent-reannounce");
-                addIdArg (tr_bencDictAddDict (top, ARGUMENTS, 1), id);
+                tr_variant * top;
+                if (tset != 0) { addIdArg (tr_variantDictFind (tset, ARGUMENTS), id); status |= flush (rpcurl, &tset); }
+                top = tr_new0 (tr_variant, 1);
+                tr_variantInitDict (top, 2);
+                tr_variantDictAddStr (top, "method", "torrent-reannounce");
+                addIdArg (tr_variantDictAddDict (top, ARGUMENTS, 1), id);
                 status |= flush (rpcurl, &top);
                 break;
             }
             case 'v':
             {
-                tr_benc * top;
-                if (tset != 0) { addIdArg (tr_bencDictFind (tset, ARGUMENTS), id); status |= flush (rpcurl, &tset); }
-                top = tr_new0 (tr_benc, 1);
-                tr_bencInitDict (top, 2);
-                tr_bencDictAddStr (top, "method", "torrent-verify");
-                addIdArg (tr_bencDictAddDict (top, ARGUMENTS, 1), id);
+                tr_variant * top;
+                if (tset != 0) { addIdArg (tr_variantDictFind (tset, ARGUMENTS), id); status |= flush (rpcurl, &tset); }
+                top = tr_new0 (tr_variant, 1);
+                tr_variantInitDict (top, 2);
+                tr_variantDictAddStr (top, "method", "torrent-verify");
+                addIdArg (tr_variantDictAddDict (top, ARGUMENTS, 1), id);
                 status |= flush (rpcurl, &top);
                 break;
             }
             case 'r':
             case 'R':
             {
-                tr_benc * args;
-                tr_benc * top = tr_new0 (tr_benc, 1);
-                tr_bencInitDict (top, 2);
-                tr_bencDictAddStr (top, "method", "torrent-remove");
-                args = tr_bencDictAddDict (top, ARGUMENTS, 2);
-                tr_bencDictAddBool (args, "delete-local-data", c=='R');
+                tr_variant * args;
+                tr_variant * top = tr_new0 (tr_variant, 1);
+                tr_variantInitDict (top, 2);
+                tr_variantDictAddStr (top, "method", "torrent-remove");
+                args = tr_variantDictAddDict (top, ARGUMENTS, 2);
+                tr_variantDictAddBool (args, "delete-local-data", c=='R');
                 addIdArg (args, id);
                 status |= flush (rpcurl, &top);
                 break;
             }
             case 960:
             {
-                tr_benc * args;
-                tr_benc * top = tr_new0 (tr_benc, 1);
-                tr_bencInitDict (top, 2);
-                tr_bencDictAddStr (top, "method", "torrent-set-location");
-                args = tr_bencDictAddDict (top, ARGUMENTS, 3);
-                tr_bencDictAddStr (args, "location", optarg);
-                tr_bencDictAddBool (args, "move", true);
+                tr_variant * args;
+                tr_variant * top = tr_new0 (tr_variant, 1);
+                tr_variantInitDict (top, 2);
+                tr_variantDictAddStr (top, "method", "torrent-set-location");
+                args = tr_variantDictAddDict (top, ARGUMENTS, 3);
+                tr_variantDictAddStr (args, "location", optarg);
+                tr_variantDictAddBool (args, "move", true);
                 addIdArg (args, id);
                 status |= flush (rpcurl, &top);
                 break;
@@ -2335,7 +2334,7 @@ processArgs (const char * rpcurl, int argc, const char ** argv)
     }
 
     if (tadd != 0) status |= flush (rpcurl, &tadd);
-    if (tset != 0) { addIdArg (tr_bencDictFind (tset, ARGUMENTS), id); status |= flush (rpcurl, &tset); }
+    if (tset != 0) { addIdArg (tr_variantDictFind (tset, ARGUMENTS), id); status |= flush (rpcurl, &tset); }
     if (sset != 0) status |= flush (rpcurl, &sset);
     return status;
 }

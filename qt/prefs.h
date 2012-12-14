@@ -23,7 +23,7 @@
 
 extern "C"
 {
-    struct tr_benc;
+    struct tr_variant;
 }
 
 class Prefs: public QObject
@@ -142,7 +142,7 @@ class Prefs: public QObject
         QSet<int> myTemporaryPrefs;
         QString myConfigDir;
         mutable QVariant myValues[PREFS_COUNT];
-        void initDefaults( struct tr_benc* );
+        void initDefaults( struct tr_variant* );
 
     public:
         bool isCore( int key ) const { return FIRST_CORE_PREF<=key && key<=LAST_CORE_PREF; }

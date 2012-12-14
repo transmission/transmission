@@ -17,9 +17,9 @@
 #include <event2/buffer.h>
 
 #include <libtransmission/transmission.h>
-#include <libtransmission/bencode.h>
 #include <libtransmission/tr-getopt.h>
 #include <libtransmission/utils.h>
+#include <libtransmission/variant.h>
 #include <libtransmission/version.h>
 
 #define MY_NAME "transmission-edit"
@@ -89,42 +89,42 @@ parseCommandLine (int argc, const char ** argv)
 }
 
 static bool
-removeURL (tr_benc * metainfo, const char * url)
+removeURL (tr_variant * metainfo, const char * url)
 {
   const char * str;
-  tr_benc * announce_list;
+  tr_variant * announce_list;
   bool changed = false;
 
-  if (tr_bencDictFindStr (metainfo, "announce", &str) && !strcmp (str, url))
+  if (tr_variantDictFindStr (metainfo, "announce", &str, NULL) && !strcmp (str, url))
     {
       printf ("\tRemoved \"%s\" from \"announce\"\n", str);
-      tr_bencDictRemove (metainfo, "announce");
+      tr_variantDictRemove (metainfo, "announce");
       changed = true;
     }
 
-  if (tr_bencDictFindList (metainfo, "announce-list", &announce_list))
+  if (tr_variantDictFindList (metainfo, "announce-list", &announce_list))
     {
-      tr_benc * tier;
+      tr_variant * tier;
       int tierIndex = 0;
-      while ((tier = tr_bencListChild (announce_list, tierIndex)))
+      while ((tier = tr_variantListChild (announce_list, tierIndex)))
         {
-          tr_benc * node;
+          tr_variant * node;
           int nodeIndex = 0;
-          while ((node = tr_bencListChild (tier, nodeIndex)))
+          while ((node = tr_variantListChild (tier, nodeIndex)))
             {
-              if (tr_bencGetStr (node, &str) && !strcmp (str, url))
+              if (tr_variantGetStr (node, &str, NULL) && !strcmp (str, url))
                 {
                   printf ("\tRemoved \"%s\" from \"announce-list\" tier #%d\n", str, (tierIndex+1));
-                  tr_bencListRemove (tier, nodeIndex);
+                  tr_variantListRemove (tier, nodeIndex);
                   changed = true;
                 }
               else ++nodeIndex;
             }
 
-          if (tr_bencListSize (tier) == 0)
+          if (tr_variantListSize (tier) == 0)
             {
               printf ("\tNo URLs left in tier #%d... removing tier\n", (tierIndex+1));
-              tr_bencListRemove (announce_list, tierIndex);
+              tr_variantListRemove (announce_list, tierIndex);
             }
           else
             {
@@ -132,27 +132,27 @@ removeURL (tr_benc * metainfo, const char * url)
             }
         }
 
-      if (tr_bencListSize (announce_list) == 0)
+      if (tr_variantListSize (announce_list) == 0)
         {
           printf ("\tNo tiers left... removing announce-list\n");
-          tr_bencDictRemove (metainfo, "announce-list");
+          tr_variantDictRemove (metainfo, "announce-list");
         }
     }
 
   /* if we removed the "announce" field and there's still another track left,
    * use it as the "announce" field */
-  if (changed && !tr_bencDictFindStr (metainfo, "announce", &str))
+  if (changed && !tr_variantDictFindStr (metainfo, "announce", &str, NULL))
     {
-      tr_benc * tier;
-      tr_benc * node;
+      tr_variant * tier;
+      tr_variant * node;
 
-      if ((tier = tr_bencListChild (announce_list, 0)))
+      if ((tier = tr_variantListChild (announce_list, 0)))
         {
-          if ((node = tr_bencListChild (tier, 0)))
+          if ((node = tr_variantListChild (tier, 0)))
             {
-              if (tr_bencGetStr (node, &str))
+              if (tr_variantGetStr (node, &str, NULL))
                 {
-                  tr_bencDictAddStr (metainfo, "announce", str);
+                  tr_variantDictAddStr (metainfo, "announce", str);
                   printf ("\tAdded \"%s\" to announce\n", str);
                 }
             }
@@ -183,37 +183,37 @@ replaceSubstr (const char * str, const char * in, const char * out)
 }
 
 static bool
-replaceURL (tr_benc * metainfo, const char * in, const char * out)
+replaceURL (tr_variant * metainfo, const char * in, const char * out)
 {
   const char * str;
-  tr_benc * announce_list;
+  tr_variant * announce_list;
   bool changed = false;
 
-  if (tr_bencDictFindStr (metainfo, "announce", &str) && strstr (str, in))
+  if (tr_variantDictFindStr (metainfo, "announce", &str, NULL) && strstr (str, in))
     {
       char * newstr = replaceSubstr (str, in, out);
       printf ("\tReplaced in \"announce\": \"%s\" --> \"%s\"\n", str, newstr);
-      tr_bencDictAddStr (metainfo, "announce", newstr);
+      tr_variantDictAddStr (metainfo, "announce", newstr);
       tr_free (newstr);
       changed = true;
     }
 
-  if (tr_bencDictFindList (metainfo, "announce-list", &announce_list))
+  if (tr_variantDictFindList (metainfo, "announce-list", &announce_list))
     {
-      tr_benc * tier;
+      tr_variant * tier;
       int tierCount = 0;
-      while ((tier = tr_bencListChild (announce_list, tierCount++)))
+      while ((tier = tr_variantListChild (announce_list, tierCount++)))
         {
-          tr_benc * node;
+          tr_variant * node;
           int nodeCount = 0;
-          while ((node = tr_bencListChild (tier, nodeCount++)))
+          while ((node = tr_variantListChild (tier, nodeCount++)))
             {
-              if (tr_bencGetStr (node, &str) && strstr (str, in))
+              if (tr_variantGetStr (node, &str, NULL) && strstr (str, in))
                 {
                   char * newstr = replaceSubstr (str, in, out);
                   printf ("\tReplaced in \"announce-list\" tier %d: \"%s\" --> \"%s\"\n", tierCount, str, newstr);
-                  tr_bencFree (node);
-                  tr_bencInitStr (node, newstr, -1);
+                  tr_variantFree (node);
+                  tr_variantInitStr (node, newstr, -1);
                   tr_free (newstr);
                   changed = true;
                 }
@@ -225,17 +225,17 @@ replaceURL (tr_benc * metainfo, const char * in, const char * out)
 }
 
 static bool
-announce_list_has_url (tr_benc * announce_list, const char * url)
+announce_list_has_url (tr_variant * announce_list, const char * url)
 {
-  tr_benc * tier;
+  tr_variant * tier;
   int tierCount = 0;
-  while ((tier = tr_bencListChild (announce_list, tierCount++)))
+  while ((tier = tr_variantListChild (announce_list, tierCount++)))
     {
-      tr_benc * node;
+      tr_variant * node;
       const char * str;
       int nodeCount = 0;
-      while ((node = tr_bencListChild (tier, nodeCount++)))
-        if (tr_bencGetStr (node, &str) && !strcmp (str, url))
+      while ((node = tr_variantListChild (tier, nodeCount++)))
+        if (tr_variantGetStr (node, &str, NULL) && !strcmp (str, url))
           return true;
     }
 
@@ -243,33 +243,33 @@ announce_list_has_url (tr_benc * announce_list, const char * url)
 }
 
 static bool
-addURL (tr_benc * metainfo, const char * url)
+addURL (tr_variant * metainfo, const char * url)
 {
   const char * announce = NULL;
-  tr_benc * announce_list = NULL;
+  tr_variant * announce_list = NULL;
   bool changed = false;
-  const bool had_announce = tr_bencDictFindStr (metainfo, "announce", &announce);
-  const bool had_announce_list = tr_bencDictFindList (metainfo, "announce-list", &announce_list);
+  const bool had_announce = tr_variantDictFindStr (metainfo, "announce", &announce, NULL);
+  const bool had_announce_list = tr_variantDictFindList (metainfo, "announce-list", &announce_list);
 
   if (!had_announce && !had_announce_list)
     {
       /* this new tracker is the only one, so add it to "announce"... */
       printf ("\tAdded \"%s\" in \"announce\"\n", url);
-      tr_bencDictAddStr (metainfo, "announce", url);
+      tr_variantDictAddStr (metainfo, "announce", url);
       changed = true;
     }
   else
     {
       if (!had_announce_list)
         {
-          announce_list = tr_bencDictAddList (metainfo, "announce-list", 2);
+          announce_list = tr_variantDictAddList (metainfo, "announce-list", 2);
 
           if (had_announce)
             {
               /* we're moving from an 'announce' to an 'announce-list',
                * so copy the old announce URL to the list */
-              tr_benc * tier = tr_bencListAddList (announce_list, 1);
-              tr_bencListAddStr (tier, announce);
+              tr_variant * tier = tr_variantListAddList (announce_list, 1);
+              tr_variantListAddStr (tier, announce);
               changed = true;
             }
         }
@@ -277,9 +277,9 @@ addURL (tr_benc * metainfo, const char * url)
       /* If the user-specified URL isn't in the announce list yet, add it */
       if (!announce_list_has_url (announce_list, url))
         {
-          tr_benc * tier = tr_bencListAddList (announce_list, 1);
-          tr_bencListAddStr (tier, url);
-          printf ("\tAdded \"%s\" to \"announce-list\" tier %zu\n", url, tr_bencListSize (announce_list));
+          tr_variant * tier = tr_variantListAddList (announce_list, 1);
+          tr_variantListAddStr (tier, url);
+          printf ("\tAdded \"%s\" to \"announce-list\" tier %zu\n", url, tr_variantListSize (announce_list));
           changed = true;
         }
     }
@@ -324,13 +324,13 @@ main (int argc, char * argv[])
 
   for (i=0; i<fileCount; ++i)
     {
-      tr_benc top;
+      tr_variant top;
       bool changed = false;
       const char * filename = files[i];
 
       printf ("%s\n", filename);
 
-      if (tr_bencLoadFile (&top, TR_FMT_BENC, filename))
+      if (tr_variantFromFile (&top, TR_VARIANT_FMT_BENC, filename))
         {
           printf ("\tError reading file\n");
           continue;
@@ -348,10 +348,10 @@ main (int argc, char * argv[])
       if (changed)
         {
           ++changedCount;
-          tr_bencToFile (&top, TR_FMT_BENC, filename);
+          tr_variantToFile (&top, TR_VARIANT_FMT_BENC, filename);
         }
 
-      tr_bencFree (&top);
+      tr_variantFree (&top);
     }
 
   printf ("Changed %d files\n", changedCount);

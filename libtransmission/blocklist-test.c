@@ -4,7 +4,6 @@
 #include "net.h"
 #include "utils.h"
 
-#undef VERBOSE
 #include "libtransmission-test.h"
 
 #ifndef WIN32

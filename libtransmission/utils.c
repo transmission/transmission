@@ -53,12 +53,12 @@
 #endif
 
 #include "transmission.h"
-#include "bencode.h"
 #include "fdlimit.h"
 #include "ConvertUTF.h"
 #include "list.h"
 #include "utils.h"
 #include "platform.h" /* tr_lockLock (), TR_PATH_MAX */
+#include "variant.h"
 #include "version.h"
 
 
@@ -1821,23 +1821,27 @@ tr_formatter_mem_B (char * buf, int64_t bytes_per_second, size_t buflen)
 }
 
 void
-tr_formatter_get_units (tr_benc * d)
+tr_formatter_get_units (void * vdict)
 {
-    int i;
-    tr_benc * l;
+  int i;
+  tr_variant * l;
+  tr_variant * dict = vdict;
 
-    tr_bencDictReserve (d, 6);
+  tr_variantDictReserve (dict, 6);
 
-    tr_bencDictAddInt (d, "memory-bytes", mem_units.units[TR_FMT_KB].value);
-    l = tr_bencDictAddList (d, "memory-units", 4);
-    for (i=0; i<4; i++) tr_bencListAddStr (l, mem_units.units[i].name);
+  tr_variantDictAddInt (dict, "memory-bytes", mem_units.units[TR_FMT_KB].value);
+  l = tr_variantDictAddList (dict, "memory-units", 4);
+  for (i=0; i<4; i++)
+    tr_variantListAddStr (l, mem_units.units[i].name);
 
-    tr_bencDictAddInt (d, "size-bytes",   size_units.units[TR_FMT_KB].value);
-    l = tr_bencDictAddList (d, "size-units", 4);
-    for (i=0; i<4; i++) tr_bencListAddStr (l, size_units.units[i].name);
+  tr_variantDictAddInt (dict, "size-bytes",   size_units.units[TR_FMT_KB].value);
+  l = tr_variantDictAddList (dict, "size-units", 4);
+  for (i=0; i<4; i++)
+    tr_variantListAddStr (l, size_units.units[i].name);
 
-    tr_bencDictAddInt (d, "speed-bytes",  speed_units.units[TR_FMT_KB].value);
-    l = tr_bencDictAddList (d, "speed-units", 4);
-    for (i=0; i<4; i++) tr_bencListAddStr (l, speed_units.units[i].name);
+  tr_variantDictAddInt (dict, "speed-bytes",  speed_units.units[TR_FMT_KB].value);
+  l = tr_variantDictAddList (dict, "speed-units", 4);
+  for (i=0; i<4; i++)
+    tr_variantListAddStr (l, speed_units.units[i].name);
 }
 
