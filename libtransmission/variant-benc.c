@@ -49,31 +49,31 @@ tr_bencParseInt (const uint8_t  * buf,
                  const uint8_t ** setme_end,
                  int64_t        * setme_val)
 {
-    char *       endptr;
-    const void * begin;
-    const void * end;
-    int64_t      val;
+  char * endptr;
+  const void * begin;
+  const void * end;
+  int64_t val;
 
-    if (buf >= bufend)
-        return EILSEQ;
-    if (*buf != 'i')
-        return EILSEQ;
+  if (buf >= bufend)
+    return EILSEQ;
+  if (*buf != 'i')
+    return EILSEQ;
 
-    begin = buf + 1;
-    end = memchr (begin, 'e', (bufend - buf) - 1);
-    if (end == NULL)
-        return EILSEQ;
+  begin = buf + 1;
+  end = memchr (begin, 'e', (bufend - buf) - 1);
+  if (end == NULL)
+    return EILSEQ;
 
-    errno = 0;
-    val = evutil_strtoll (begin, &endptr, 10);
-    if (errno || (endptr != end)) /* incomplete parse */
-        return EILSEQ;
-    if (val && * (const char*)begin == '0') /* no leading zeroes! */
-        return EILSEQ;
+  errno = 0;
+  val = evutil_strtoll (begin, &endptr, 10);
+  if (errno || (endptr != end)) /* incomplete parse */
+    return EILSEQ;
+  if (val && * (const char*)begin == '0') /* no leading zeroes! */
+    return EILSEQ;
 
-    *setme_end = (const uint8_t*)end + 1;
-    *setme_val = val;
-    return 0;
+  *setme_end = (const uint8_t*)end + 1;
+  *setme_val = val;
+  return 0;
 }
 
 /**
@@ -89,32 +89,32 @@ tr_bencParseStr (const uint8_t  * buf,
                  const uint8_t ** setme_str,
                  size_t *         setme_strlen)
 {
-    size_t       len;
-    const void * end;
-    char *       endptr;
+  size_t len;
+  const void * end;
+  char * endptr;
 
-    if (buf >= bufend)
-        return EILSEQ;
+  if (buf >= bufend)
+    return EILSEQ;
 
-    if (!isdigit (*buf))
-        return EILSEQ;
+  if (!isdigit (*buf))
+    return EILSEQ;
 
-    end = memchr (buf, ':', bufend - buf);
-    if (end == NULL)
-        return EILSEQ;
+  end = memchr (buf, ':', bufend - buf);
+  if (end == NULL)
+    return EILSEQ;
 
-    errno = 0;
-    len = strtoul ((const char*)buf, &endptr, 10);
-    if (errno || endptr != end)
-        return EILSEQ;
+  errno = 0;
+  len = strtoul ((const char*)buf, &endptr, 10);
+  if (errno || endptr != end)
+    return EILSEQ;
 
-    if ((const uint8_t*)end + 1 + len > bufend)
-        return EILSEQ;
+  if ((const uint8_t*)end + 1 + len > bufend)
+    return EILSEQ;
 
-    *setme_end = (const uint8_t*)end + 1 + len;
-    *setme_str = (const uint8_t*)end + 1;
-    *setme_strlen = len;
-    return 0;
+  *setme_end = (const uint8_t*)end + 1 + len;
+  *setme_str = (const uint8_t*)end + 1;
+  *setme_strlen = len;
+  return 0;
 }
 
 static int
@@ -150,25 +150,25 @@ getNode (tr_variant  * top,
          tr_ptrArray * parentStack,
          int           type)
 {
-    tr_variant * parent;
+  tr_variant * parent;
 
-    assert (top);
-    assert (parentStack);
+  assert (top);
+  assert (parentStack);
 
-    if (tr_ptrArrayEmpty (parentStack))
-        return top;
+  if (tr_ptrArrayEmpty (parentStack))
+    return top;
 
-    parent = tr_ptrArrayBack (parentStack);
-    assert (parent);
+  parent = tr_ptrArrayBack (parentStack);
+  assert (parent);
 
-    /* dictionary keys must be strings */
-    if ((parent->type == TR_VARIANT_TYPE_DICT)
+  /* dictionary keys must be strings */
+  if ((parent->type == TR_VARIANT_TYPE_DICT)
       && (type != TR_VARIANT_TYPE_STR)
       && (! (parent->val.l.count % 2)))
-        return NULL;
+    return NULL;
 
-    makeroom (parent, 1);
-    return parent->val.l.vals + parent->val.l.count++;
+  makeroom (parent, 1);
+  return parent->val.l.vals + parent->val.l.count++;
 }
 
 /**
@@ -183,105 +183,107 @@ tr_variantParseImpl (const void    * buf_in,
                      tr_ptrArray   * parentStack,
                      const char   ** setme_end)
 {
-    int             err;
-    const uint8_t * buf = buf_in;
-    const uint8_t * bufend = bufend_in;
+  int err;
+  const uint8_t * buf = buf_in;
+  const uint8_t * bufend = bufend_in;
 
-    tr_variantInit (top, 0);
+  tr_variantInit (top, 0);
 
-    while (buf != bufend)
+  while (buf != bufend)
     {
-        if (buf > bufend) /* no more text to parse... */
-            return 1;
+      if (buf > bufend) /* no more text to parse... */
+        return 1;
 
-        if (*buf == 'i') /* int */
+      if (*buf == 'i') /* int */
         {
-            int64_t         val;
-            const uint8_t * end;
-            tr_variant *       node;
+          int64_t val;
+          const uint8_t * end;
+          tr_variant * node;
 
-            if ((err = tr_bencParseInt (buf, bufend, &end, &val)))
-                return err;
+          if ((err = tr_bencParseInt (buf, bufend, &end, &val)))
+            return err;
 
-            node = getNode (top, parentStack, TR_VARIANT_TYPE_INT);
-            if (!node)
-                return EILSEQ;
+          node = getNode (top, parentStack, TR_VARIANT_TYPE_INT);
+          if (!node)
+            return EILSEQ;
 
-            tr_variantInitInt (node, val);
-            buf = end;
+          tr_variantInitInt (node, val);
+          buf = end;
 
-            if (tr_ptrArrayEmpty (parentStack))
-                break;
+          if (tr_ptrArrayEmpty (parentStack))
+            break;
         }
-        else if (*buf == 'l') /* list */
+      else if (*buf == 'l') /* list */
         {
-            tr_variant * node = getNode (top, parentStack, TR_VARIANT_TYPE_LIST);
-            if (!node)
-                return EILSEQ;
-            tr_variantInit (node, TR_VARIANT_TYPE_LIST);
-            tr_ptrArrayAppend (parentStack, node);
-            ++buf;
-        }
-        else if (*buf == 'd') /* dict */
-        {
-            tr_variant * node = getNode (top, parentStack, TR_VARIANT_TYPE_DICT);
-            if (!node)
-                return EILSEQ;
-            tr_variantInit (node, TR_VARIANT_TYPE_DICT);
-            tr_ptrArrayAppend (parentStack, node);
-            ++buf;
-        }
-        else if (*buf == 'e') /* end of list or dict */
-        {
-            tr_variant * node;
-            ++buf;
-            if (tr_ptrArrayEmpty (parentStack))
-                return EILSEQ;
+          tr_variant * node = getNode (top, parentStack, TR_VARIANT_TYPE_LIST);
+          if (!node)
+            return EILSEQ;
 
-            node = tr_ptrArrayBack (parentStack);
-            if (tr_variantIsDict (node) && (node->val.l.count % 2))
+          tr_variantInit (node, TR_VARIANT_TYPE_LIST);
+          tr_ptrArrayAppend (parentStack, node);
+          ++buf;
+        }
+      else if (*buf == 'd') /* dict */
+        {
+          tr_variant * node = getNode (top, parentStack, TR_VARIANT_TYPE_DICT);
+          if (!node)
+            return EILSEQ;
+
+          tr_variantInit (node, TR_VARIANT_TYPE_DICT);
+          tr_ptrArrayAppend (parentStack, node);
+          ++buf;
+        }
+      else if (*buf == 'e') /* end of list or dict */
+        {
+          tr_variant * node;
+          ++buf;
+          if (tr_ptrArrayEmpty (parentStack))
+              return EILSEQ;
+
+          node = tr_ptrArrayBack (parentStack);
+          if (tr_variantIsDict (node) && (node->val.l.count % 2))
             {
-                /* odd # of children in dict */
-                tr_variantFree (&node->val.l.vals[--node->val.l.count]);
-                return EILSEQ;
+              /* odd # of children in dict */
+              tr_variantFree (&node->val.l.vals[--node->val.l.count]);
+              return EILSEQ;
             }
 
-            tr_ptrArrayPop (parentStack);
-            if (tr_ptrArrayEmpty (parentStack))
-                break;
+          tr_ptrArrayPop (parentStack);
+          if (tr_ptrArrayEmpty (parentStack))
+            break;
         }
-        else if (isdigit (*buf)) /* string? */
+      else if (isdigit (*buf)) /* string? */
         {
-            const uint8_t * end;
-            const uint8_t * str;
-            size_t          str_len;
-            tr_variant *       node;
+          const uint8_t * end;
+          const uint8_t * str;
+          size_t str_len;
+          tr_variant * node;
 
-            if ((err = tr_bencParseStr (buf, bufend, &end, &str, &str_len)))
-                return err;
+          if ((err = tr_bencParseStr (buf, bufend, &end, &str, &str_len)))
+            return err;
 
-            node = getNode (top, parentStack, TR_VARIANT_TYPE_STR);
-            if (!node)
-                return EILSEQ;
+          node = getNode (top, parentStack, TR_VARIANT_TYPE_STR);
+          if (!node)
+            return EILSEQ;
 
-            tr_variantInitStr (node, str, str_len);
-            buf = end;
+          tr_variantInitStr (node, str, str_len);
+          buf = end;
 
-            if (tr_ptrArrayEmpty (parentStack))
-                break;
+          if (tr_ptrArrayEmpty (parentStack))
+            break;
         }
-        else /* invalid bencoded text... march past it */
+      else /* invalid bencoded text... march past it */
         {
-            ++buf;
+          ++buf;
         }
     }
 
-    err = !tr_variantIsSomething (top) || !tr_ptrArrayEmpty (parentStack);
+  err = !tr_variantIsSomething (top) || !tr_ptrArrayEmpty (parentStack);
 
-    if (!err && setme_end)
-        *setme_end = (const char*) buf;
+  if (!err && setme_end)
+    *setme_end = (const char*) buf;
 
-    return err;
+  return err;
 }
 
 

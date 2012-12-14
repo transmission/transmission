@@ -146,7 +146,7 @@ action_callback_PUSH (jsonsl_t                  jsn,
     }
 }
 
-/* so sscanf(in+2, "%4x", &val) was showing up at the top of the profiler... *shrug* */
+/* like sscanf(in+2, "%4x", &val) but less slow */
 static bool
 decode_hex_string (const char * in, unsigned int * setme)
 {
@@ -342,7 +342,6 @@ tr_jsonParse (const char     * source,
 *****
 ****/
 
-/** @brief Implementation helper class for tr_variantToBuffer (TR_VARIANT_FMT_JSON) */
 struct ParentState
 {
   int bencType;
@@ -350,7 +349,6 @@ struct ParentState
   int childCount;
 };
 
-/** @brief Implementation helper class for tr_variantToBuffer (TR_VARIANT_FMT_JSON) */
 struct jsonWalk
 {
   bool doIndent;
@@ -377,20 +375,20 @@ jsonChildFunc (struct jsonWalk * data)
 {
   if (data->parents && data->parents->data)
     {
-      struct ParentState * parentState = data->parents->data;
+      struct ParentState * pstate = data->parents->data;
 
-      switch (parentState->bencType)
+      switch (pstate->bencType)
         {
           case TR_VARIANT_TYPE_DICT:
             {
-              const int i = parentState->childIndex++;
+              const int i = pstate->childIndex++;
               if (! (i % 2))
                 {
                   evbuffer_add (data->out, ": ", data->doIndent ? 2 : 1);
                 }
               else
                 {
-                  const bool isLast = parentState->childIndex == parentState->childCount;
+                  const bool isLast = pstate->childIndex == pstate->childCount;
 
                   if (!isLast)
                     {
@@ -403,7 +401,7 @@ jsonChildFunc (struct jsonWalk * data)
 
           case TR_VARIANT_TYPE_LIST:
             {
-              const bool isLast = ++parentState->childIndex == parentState->childCount;
+              const bool isLast = ++pstate->childIndex == pstate->childCount;
               if (!isLast)
                 {
                   evbuffer_add (data->out, ", ", data->doIndent ? 2 : 1);
@@ -422,12 +420,12 @@ static void
 jsonPushParent (struct jsonWalk  * data,
                 const tr_variant * benc)
 {
-  struct ParentState * parentState = tr_new (struct ParentState, 1);
+  struct ParentState * pstate = tr_new (struct ParentState, 1);
 
-  parentState->bencType = benc->type;
-  parentState->childIndex = 0;
-  parentState->childCount = benc->val.l.count;
-  tr_list_prepend (&data->parents, parentState);
+  pstate->bencType = benc->type;
+  pstate->childIndex = 0;
+  pstate->childCount = benc->val.l.count;
+  tr_list_prepend (&data->parents, pstate);
 }
 
 static void
