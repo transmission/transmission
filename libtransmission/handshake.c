@@ -1129,10 +1129,8 @@ gotError (tr_peerIo  * io,
                                     tr_peerIoGetTorrentHash (io)) :
             NULL;
         /* Don't mark a peer as non-uTP unless it's really a connect failure. */
-        if ((errcode == ETIMEDOUT || errcode == ECONNREFUSED) && tr_torrentRef(tor)) {
+        if ((errcode == ETIMEDOUT || errcode == ECONNREFUSED) && tr_isTorrent(tor))
             tr_peerMgrSetUtpFailed (tor, tr_peerIoGetAddress (io, NULL), true);
-            tr_torrentUnref (tor);
-        }
 
         if (!tr_peerIoReconnect (handshake->io)) {
             uint8_t msg[HANDSHAKE_SIZE];

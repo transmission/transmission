@@ -1145,26 +1145,9 @@ tr_torrent * tr_torrentNew (const tr_ctor   * ctor,
 /** @addtogroup tr_torrent Torrents
     @{ */
 
-/**
- * @brief Decrements a torrent's refcount.
- *
- * If its refcount becomes zero, the torrent is stopped and its memory is freed.
- */
-void tr_torrentUnref (tr_torrent * torrent);
-
-/**
- * @brief Increments a torrent's refcount.
- *
- * @return true if the pointer is a live torrent object.
- *         This is a convenience for validity checking before use:
- *         if (tr_torrentRef (tor)) { foo(); bar(); tr_torrentUnref(tor); }
- */
-bool tr_torrentRef (tr_torrent * torrent);
-
 typedef int tr_fileFunc (const char * filename);
 
-/** @brief Removes our .torrent and .resume files for
-           this torrent, then calls tr_torrentFree (). */
+/** @brief Removes our .torrent and .resume files for this torrent */
 void tr_torrentRemove (tr_torrent  * torrent,
                        bool          removeLocalData,
                        tr_fileFunc   removeFunc);
@@ -1238,13 +1221,13 @@ char* tr_torrentFindFile (const tr_torrent * tor, tr_file_index_t fileNo);
 ***/
 
 void         tr_torrentSetSpeedLimit_KBps (tr_torrent *, tr_direction, unsigned int KBps);
-unsigned int tr_torrentGetSpeedLimit_KBps (tr_torrent *, tr_direction);
+unsigned int tr_torrentGetSpeedLimit_KBps (const tr_torrent *, tr_direction);
 
 void         tr_torrentUseSpeedLimit      (tr_torrent *, tr_direction, bool);
-bool         tr_torrentUsesSpeedLimit     (tr_torrent *, tr_direction);
+bool         tr_torrentUsesSpeedLimit     (const tr_torrent *, tr_direction);
 
 void         tr_torrentUseSessionLimits   (tr_torrent *, bool);
-bool         tr_torrentUsesSessionLimits  (tr_torrent *);
+bool         tr_torrentUsesSessionLimits  (const tr_torrent *);
 
 
 /****
@@ -1272,10 +1255,10 @@ tr_ratiolimit tr_torrentGetRatioMode (const tr_torrent   * tor);
 void          tr_torrentSetRatioLimit (tr_torrent        * tor,
                                        double              ratio);
 
-double        tr_torrentGetRatioLimit (tr_torrent  * tor);
+double        tr_torrentGetRatioLimit (const tr_torrent  * tor);
 
 
-bool          tr_torrentGetSeedRatio  (tr_torrent *, double * ratio);
+bool          tr_torrentGetSeedRatio  (const tr_torrent *, double * ratio);
 
 
 /****
@@ -1344,7 +1327,7 @@ void tr_torrentSetFilePriorities (tr_torrent             * torrent,
  *         each holding a TR_PRI_NORMAL, TR_PRI_HIGH, or TR_PRI_LOW.
  *         It's the caller's responsibility to free () this.
  */
-tr_priority_t*  tr_torrentGetFilePriorities (tr_torrent * torrent);
+tr_priority_t*  tr_torrentGetFilePriorities (const tr_torrent * torrent);
 
 /** @brief Set a batch of files to be downloaded or not. */
 void tr_torrentSetFileDLs (tr_torrent             * torrent,
@@ -1579,8 +1562,8 @@ typedef struct tr_peer_stat
 }
 tr_peer_stat;
 
-tr_peer_stat * tr_torrentPeers (tr_torrent * torrent,
-                                int        * peerCount);
+tr_peer_stat * tr_torrentPeers (const tr_torrent * torrent,
+                                int              * peerCount);
 
 void           tr_torrentPeersFree (tr_peer_stat * peerStats,
                                     int            peerCount);
@@ -1702,8 +1685,8 @@ typedef struct
 }
 tr_tracker_stat;
 
-tr_tracker_stat * tr_torrentTrackers (tr_torrent * torrent,
-                                      int        * setmeTrackerCount);
+tr_tracker_stat * tr_torrentTrackers (const tr_torrent * torrent,
+                                      int              * setmeTrackerCount);
 
 void tr_torrentTrackersFree (tr_tracker_stat * trackerStats,
                              int               trackerCount);
@@ -1720,7 +1703,7 @@ void tr_torrentTrackersFree (tr_tracker_stat * trackerStats,
  *         return -1 instead of 0 KiB/s.
  *         NOTE: always free this array with tr_free () when you're done with it.
  */
-double*  tr_torrentWebSpeeds_KBps (tr_torrent * torrent);
+double*  tr_torrentWebSpeeds_KBps (const tr_torrent * torrent);
 
 typedef struct tr_file_stat
 {
@@ -1744,13 +1727,13 @@ void tr_torrentFilesFree (tr_file_stat     * files,
  * to either -1 if we have the piece, otherwise it is set to the number
  * of connected peers who have the piece.
  **********************************************************************/
-void tr_torrentAvailability (tr_torrent  * torrent,
-                             int8_t      * tab,
-                             int           size);
+void tr_torrentAvailability (const tr_torrent  * torrent,
+                             int8_t            * tab,
+                             int                 size);
 
-void tr_torrentAmountFinished (tr_torrent  * torrent,
-                               float       * tab,
-                               int           size);
+void tr_torrentAmountFinished (const tr_torrent  * torrent,
+                               float             * tab,
+                               int                 size);
 
 void tr_torrentVerify (tr_torrent * torrent);
 

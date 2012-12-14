@@ -29,6 +29,8 @@ struct tr_magnet_info;
 ***  Package-visible ctor API
 **/
 
+void        tr_torrentFree (tr_torrent * tor);
+
 void        tr_ctorSetSave (tr_ctor * ctor,
                             bool      saveMetadataInOurTorrentsDir);
 
@@ -62,8 +64,8 @@ tr_torrent* tr_torrentFindFromHashString (tr_session * session,
 tr_torrent* tr_torrentFindFromObfuscatedHash (tr_session    * session,
                                               const uint8_t * hash);
 
-bool        tr_torrentIsPieceTransferAllowed (tr_torrent    * torrent,
-                                              tr_direction    direction);
+bool        tr_torrentIsPieceTransferAllowed (const tr_torrent  * torrent,
+                                              tr_direction        direction);
 
 
 
@@ -138,8 +140,6 @@ struct tr_torrent
     tr_info                  info;
 
     int                      magicNumber;
-
-    size_t                   refCount;
 
     tr_stat_errtype          error;
     char                     errorString[128];
@@ -302,16 +302,17 @@ tr_torBlockCountBytes (const tr_torrent * tor, const tr_block_index_t block)
                                         : tor->blockSize;
 }
 
-bool tr_torrentLock (const tr_torrent * tor);
-
+static inline void tr_torrentLock (const tr_torrent * tor) 
+{ 
+  tr_sessionLock (tor->session); 
+} 
 static inline bool tr_torrentIsLocked (const tr_torrent * tor)
 {
-    return tr_sessionIsLocked (tor->session);
+  return tr_sessionIsLocked (tor->session);
 }
-
 static inline void tr_torrentUnlock (const tr_torrent * tor)
 {
-    tr_sessionUnlock (tor->session);
+  tr_sessionUnlock (tor->session);
 }
 
 static inline bool
@@ -365,7 +366,6 @@ static inline bool tr_isTorrent (const tr_torrent * tor)
 {
     return (tor != NULL)
         && (tor->magicNumber == TORRENT_MAGIC_NUMBER)
-        && (tor->refCount > 0)
         && (tr_isSession (tor->session));
 }
 
