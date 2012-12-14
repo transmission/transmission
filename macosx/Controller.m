@@ -57,8 +57,8 @@
 #import "ExpandedPathToIconTransformer.h"
 
 #import "transmission.h"
-#import "bencode.h"
 #import "utils.h"
+#import "variant.h"
 
 #import "UKKQueue.h"
 #import <Sparkle/Sparkle.h>
