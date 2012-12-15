@@ -171,7 +171,10 @@ decode_hex_string (const char * in, unsigned int * setme)
 }
 
 static char*
-extract_escaped_string (const char * in, size_t in_len, size_t * len, struct evbuffer * buf)
+extract_escaped_string (const char       * in,
+                        size_t             in_len,
+                        size_t           * len,
+                        struct evbuffer  * buf)
 {
   const char * const in_end = in + in_len;
 
@@ -234,8 +237,11 @@ extract_escaped_string (const char * in, size_t in_len, size_t * len, struct evb
   return (char*) evbuffer_pullup (buf, -1);
 }
 
-static const char*
-extract_string (jsonsl_t jsn, struct jsonsl_state_st * state, size_t * len, struct evbuffer * buf)
+static const char *
+extract_string (jsonsl_t                  jsn,
+                struct jsonsl_state_st  * state,
+                size_t                  * len,
+                struct evbuffer         * buf)
 {
   const char * ret;
   const char * in_begin;
@@ -319,8 +325,8 @@ int
 tr_jsonParse (const char     * source,
               const void     * vbuf,
               size_t           len,
-              tr_variant        * setme_benc,
-              const char ** setme_end)
+              tr_variant     * setme_variant,
+              const char    ** setme_end)
 {
   int error;
   jsonsl_t jsn;
@@ -336,7 +342,7 @@ tr_jsonParse (const char     * source,
   data.error = 0;
   data.has_content = false;
   data.key = NULL;
-  data.top = setme_benc;
+  data.top = setme_variant;
   data.stack = TR_PTR_ARRAY_INIT;
   data.source = source;
   data.keybuf = evbuffer_new ();
@@ -368,7 +374,7 @@ tr_jsonParse (const char     * source,
 
 struct ParentState
 {
-  int bencType;
+  int variantType;
   int childIndex;
   int childCount;
 };
@@ -401,7 +407,7 @@ jsonChildFunc (struct jsonWalk * data)
     {
       struct ParentState * pstate = data->parents->data;
 
-      switch (pstate->bencType)
+      switch (pstate->variantType)
         {
           case TR_VARIANT_TYPE_DICT:
             {
@@ -442,13 +448,13 @@ jsonChildFunc (struct jsonWalk * data)
 
 static void
 jsonPushParent (struct jsonWalk  * data,
-                const tr_variant * benc)
+                const tr_variant * v)
 {
   struct ParentState * pstate = tr_new (struct ParentState, 1);
 
-  pstate->bencType = benc->type;
+  pstate->variantType = v->type;
   pstate->childIndex = 0;
-  pstate->childCount = benc->val.l.count;
+  pstate->childCount = v->val.l.count;
   tr_list_prepend (&data->parents, pstate);
 }
 
@@ -467,7 +473,8 @@ jsonIntFunc (const tr_variant * val, void * vdata)
 }
 
 static void
-jsonBoolFunc (const tr_variant * val, void * vdata)
+jsonBoolFunc (const tr_variant * val,
+              void             * vdata)
 {
   struct jsonWalk * data = vdata;
 
@@ -480,7 +487,8 @@ jsonBoolFunc (const tr_variant * val, void * vdata)
 }
 
 static void
-jsonRealFunc (const tr_variant * val, void * vdata)
+jsonRealFunc (const tr_variant * val,
+              void             * vdata)
 {
   struct jsonWalk * data = vdata;
   char locale[128];
@@ -502,7 +510,8 @@ jsonRealFunc (const tr_variant * val, void * vdata)
 }
 
 static void
-jsonStringFunc (const tr_variant * val, void * vdata)
+jsonStringFunc (const tr_variant * val,
+                void             * vdata)
 {
   char * out;
   char * outwalk;
@@ -567,7 +576,7 @@ jsonStringFunc (const tr_variant * val, void * vdata)
 
 static void
 jsonDictBeginFunc (const tr_variant * val,
-                   void *          vdata)
+                   void             * vdata)
 {
   struct jsonWalk * data = vdata;
 
@@ -579,7 +588,7 @@ jsonDictBeginFunc (const tr_variant * val,
 
 static void
 jsonListBeginFunc (const tr_variant * val,
-                   void *          vdata)
+                   void             * vdata)
 {
   const size_t nChildren = tr_variantListSize (val);
   struct jsonWalk * data = vdata;
@@ -592,7 +601,7 @@ jsonListBeginFunc (const tr_variant * val,
 
 static void
 jsonContainerEndFunc (const tr_variant * val,
-                      void *          vdata)
+                      void             * vdata)
 {
   struct jsonWalk * data = vdata;
   int emptyContainer = false;
