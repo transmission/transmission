@@ -102,11 +102,13 @@ tr_cpBlockAdd (tr_completion * cp, tr_block_index_t block)
 
     if (!tr_cpBlockIsComplete (cp, block))
     {
+        const tr_piece_index_t piece = tr_torBlockPiece (cp->tor, block);
+
         tr_bitfieldAdd (&cp->blockBitfield, block);
         cp->sizeNow += tr_torBlockCountBytes (tor, block);
 
         cp->haveValidIsDirty = true;
-        cp->sizeWhenDoneIsDirty = true;
+        cp->sizeWhenDoneIsDirty |= tor->info.pieces[piece].dnd;
     }
 }
 
