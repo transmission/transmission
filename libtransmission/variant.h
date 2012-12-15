@@ -320,7 +320,8 @@ int          tr_variantDictRemove      (tr_variant       * dict,
                                         const char       * key);
 
 tr_variant * tr_variantDictAdd         (tr_variant       * dict,
-                                        const char       * key);
+                                        const char       * key,
+                                        int                keylen);
 
 tr_variant * tr_variantDictAddReal     (tr_variant       * dict,
                                         const char       * key,

@@ -336,8 +336,8 @@ makeInfoDict (tr_variant *             dict,
         for (i = 0; i < builder->fileCount; ++i)
         {
             tr_variant * d = tr_variantListAddDict (list, 2);
-            tr_variant * length = tr_variantDictAdd (d, "length");
-            tr_variant * pathVal = tr_variantDictAdd (d, "path");
+            tr_variant * length = tr_variantDictAdd (d, "length", 6);
+            tr_variant * pathVal = tr_variantDictAdd (d, "path", 4);
             getFileInfo (builder->top, &builder->files[i], length, pathVal);
         }
     }

@@ -563,7 +563,7 @@ addIdArg (tr_variant * args, const char * id)
             if (!isdigit (*pch))
                 isNum = false;
         if (isNum || isList)
-            tr_rpc_parse_list_str (tr_variantDictAdd (args, "ids"), id, strlen (id));
+            tr_rpc_parse_list_str (tr_variantDictAdd (args, "ids", 3), id, strlen (id));
         else
             tr_variantDictAddStr (args, "ids", id); /* it's a torrent sha hash */
     }

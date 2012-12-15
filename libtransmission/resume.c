@@ -66,6 +66,7 @@
 #define KEY_PROGRESS_MTIMES    "mtimes"
 #define KEY_PROGRESS_BITFIELD  "bitfield"
 #define KEY_PROGRESS_BLOCKS    "blocks"
+#define KEY_PROGRESS_BLOCKS_STRLEN 6
 #define KEY_PROGRESS_HAVE      "have"
 
 enum
@@ -480,7 +481,7 @@ saveProgress (tr_variant * dict, tr_torrent * tor)
 
     /* add the blocks bitfield */
     bitfieldToBenc (&tor->completion.blockBitfield,
-                    tr_variantDictAdd (prog, KEY_PROGRESS_BLOCKS));
+                    tr_variantDictAdd (prog, KEY_PROGRESS_BLOCKS, KEY_PROGRESS_BLOCKS_STRLEN));
 }
 
 static uint64_t

@@ -630,7 +630,7 @@ addField (tr_torrent       * const tor,
     else if (tr_streq (key, keylen, "peer-limit"))
         tr_variantDictAddInt (d, key, tr_torrentGetPeerLimit (tor));
     else if (tr_streq (key, keylen, "peers"))
-        addPeers (tor, tr_variantDictAdd (d, key));
+        addPeers (tor, tr_variantDictAdd (d, key, keylen));
     else if (tr_streq (key, keylen, "peersConnected"))
         tr_variantDictAddInt (d, key, st->peersConnected);
     else if (tr_streq (key, keylen, "peersFrom"))
@@ -1332,7 +1332,7 @@ addTorrentImpl (struct tr_rpc_idle_data * data, tr_ctor * ctor)
         tr_variantListAddStr (&fields, "id");
         tr_variantListAddStr (&fields, "name");
         tr_variantListAddStr (&fields, "hashString");
-        addInfo (tor, tr_variantDictAdd (data->args_out, "torrent-added"), &fields);
+        addInfo (tor, tr_variantDictAdd (data->args_out, "torrent-added", 13), &fields);
         notify (data->session, TR_RPC_TORRENT_ADDED, tor);
         tr_variantFree (&fields);
     }
@@ -1970,7 +1970,7 @@ tr_rpc_request_exec_uri (tr_session           * session,
             char *    key = tr_strndup (pch, delim - pch);
             int       isArg = strcmp (key, "method") && strcmp (key, "tag");
             tr_variant * parent = isArg ? args : &top;
-            tr_rpc_parse_list_str (tr_variantDictAdd (parent, key),
+            tr_rpc_parse_list_str (tr_variantDictAdd (parent, key, delim-pch),
                                   delim + 1,
                                   next ? (size_t)(
                                        next -

@@ -88,17 +88,18 @@ dictIndexOf (const tr_variant * dict, const char * key)
 {
   if (tr_variantIsDict (dict))
     {
-      size_t i;
+      const tr_variant * walk;
+      const tr_variant * const begin = dict->val.l.vals;
+      const tr_variant * const end = begin + dict->val.l.count;
       const size_t len = strlen (key);
 
-      for (i=0; (i+1) < dict->val.l.count; i += 2)
-        {
-          const tr_variant * child = dict->val.l.vals + i;
-          if ((child->type == TR_VARIANT_TYPE_STR) 
-              && (child->val.s.len == len)
-              && !memcmp (getStr (child), key, len))
-            return i;
-        }
+      for (walk=begin; walk!=end; walk+=2)
+      {
+        assert (walk->type == TR_VARIANT_TYPE_STR);
+
+        if ((walk->val.s.len==len) && !memcmp (getStr(walk), key, len))
+          return walk - begin;
+      }
     }
 
   return -1;
@@ -527,7 +528,8 @@ tr_variantListAddDict (tr_variant  * list,
 
 tr_variant *
 tr_variantDictAdd (tr_variant  * dict,
-                   const char  * key)
+                   const char  * key,
+                   int           keylen)
 {
   tr_variant * child_key;
   tr_variant * child_val;
@@ -537,7 +539,7 @@ tr_variantDictAdd (tr_variant  * dict,
   containerReserve (dict, 2);
 
   child_key = dict->val.l.vals + dict->val.l.count++;
-  tr_variantInitStr (child_key, key, -1);
+  tr_variantInitStr (child_key, key, keylen);
 
   child_val = dict->val.l.vals + dict->val.l.count++;
   tr_variantInit (child_val, TR_VARIANT_TYPE_INT);
@@ -561,7 +563,7 @@ dictFindOrAdd (tr_variant * dict, const char * key, int type)
 
   /* if it doesn't exist, create it */
   if (child == NULL)
-    child = tr_variantDictAdd (dict, key);
+    child = tr_variantDictAdd (dict, key, -1);
 
   return child;
 }
@@ -614,7 +616,7 @@ dictRecycleOrAdd (tr_variant * dict, const char * key)
 
   /* if it doesn't exist, create it */
   if (child == NULL)
-    child = tr_variantDictAdd (dict, key);
+    child = tr_variantDictAdd (dict, key, -1);
 
   return child;
 }
@@ -644,7 +646,7 @@ tr_variantDictAddList (tr_variant * dict,
                        const char * key,
                        size_t       reserve_count)
 {
-  tr_variant * child = tr_variantDictAdd (dict, key);
+  tr_variant * child = tr_variantDictAdd (dict, key, -1);
   tr_variantInitList (child, reserve_count);
   return child;
 }
@@ -654,7 +656,7 @@ tr_variantDictAddDict (tr_variant * dict,
                        const char * key,
                        size_t       reserve_count)
 {
-  tr_variant * child = tr_variantDictAdd (dict, key);
+  tr_variant * child = tr_variantDictAdd (dict, key, -1);
   tr_variantInitDict (child, reserve_count);
   return child;
 }

@@ -43,7 +43,10 @@ struct json_wrapper_data
   int error;
   bool has_content;
   tr_variant * top;
-  char * key;
+  const char * key;
+  size_t keylen;
+  struct evbuffer * keybuf;
+  struct evbuffer * strbuf;
   const char * source;
   tr_ptrArray stack;
 };
@@ -69,9 +72,10 @@ get_node (struct jsonsl_st * jsn)
     }
   else if (tr_variantIsDict (parent) && (data->key!=NULL))
     {
-      node = tr_variantDictAdd (parent, data->key);
-      tr_free (data->key);
+      node = tr_variantDictAdd (parent, data->key, data->keylen);
+
       data->key = NULL;
+      data->keylen = 0;
     }
 
   return node;
@@ -167,46 +171,35 @@ decode_hex_string (const char * in, unsigned int * setme)
 }
 
 static char*
-extract_string (jsonsl_t jsn, struct jsonsl_state_st * state, size_t * len)
+extract_escaped_string (const char * in, size_t in_len, size_t * len, struct evbuffer * buf)
 {
-  const char * in_begin;
-  const char * in_end;
-  const char * in_it;
-  size_t out_buflen;
-  char * out_buf;
-  char * out_it;
+  const char * const in_end = in + in_len;
 
-  in_begin = jsn->base + state->pos_begin;
-  if (*in_begin == '"')
-    in_begin++;
-  in_end = jsn->base + state->pos_cur;
+  evbuffer_drain (buf, evbuffer_get_length (buf));
 
-  out_buflen = (in_end-in_begin)*3 + 1;
-  out_buf = tr_new0 (char, out_buflen);
-  out_it = out_buf;
-
-  for (in_it=in_begin; in_it!=in_end;)
+  while (in < in_end)
     {
       bool unescaped = false;
 
-      if (*in_it=='\\' && in_end-in_it>=2)
+      if (*in=='\\' && in_end-in>=2)
         {
-          switch (in_it[1])
+          switch (in[1])
             {
-              case 'b' : *out_it++ = '\b'; in_it+=2; unescaped = true; break;
-              case 'f' : *out_it++ = '\f'; in_it+=2; unescaped = true; break;
-              case 'n' : *out_it++ = '\n'; in_it+=2; unescaped = true; break;
-              case 'r' : *out_it++ = '\r'; in_it+=2; unescaped = true; break;
-              case 't' : *out_it++ = '\t'; in_it+=2; unescaped = true; break;
-              case '/' : *out_it++ = '/' ; in_it+=2; unescaped = true; break;
-              case '"' : *out_it++ = '"' ; in_it+=2; unescaped = true; break;
-              case '\\': *out_it++ = '\\'; in_it+=2; unescaped = true; break;
+              case 'b' : evbuffer_add (buf, "\b", 1); in+=2; unescaped = true; break;
+              case 'f' : evbuffer_add (buf, "\f", 1); in+=2; unescaped = true; break;
+              case 'n' : evbuffer_add (buf, "\n", 1); in+=2; unescaped = true; break;
+              case 'r' : evbuffer_add (buf, "\r", 1); in+=2; unescaped = true; break;
+              case 't' : evbuffer_add (buf, "\t", 1); in+=2; unescaped = true; break;
+              case '/' : evbuffer_add (buf, "/" , 1); in+=2; unescaped = true; break;
+              case '"' : evbuffer_add (buf, "\"" , 1); in+=2; unescaped = true; break;
+              case '\\': evbuffer_add (buf, "\\", 1); in+=2; unescaped = true; break;
               case 'u':
                 {
-                  if (in_end - in_it >= 6)
+                  if (in_end - in >= 6)
                     {
                       unsigned int val = 0;
-                      if (decode_hex_string (in_it, &val))
+
+                      if (decode_hex_string (in, &val))
                         {
                           UTF32 str32_buf[2] = { val, 0 };
                           const UTF32 * str32_walk = str32_buf;
@@ -214,16 +207,15 @@ extract_string (jsonsl_t jsn, struct jsonsl_state_st * state, size_t * len)
                           UTF8 str8_buf[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
                           UTF8 * str8_walk = str8_buf;
                           UTF8 * str8_end = str8_buf + 8;
-
+    
                           if (ConvertUTF32toUTF8 (&str32_walk, str32_end, &str8_walk, str8_end, 0) == 0)
                             {
                               const size_t len = str8_walk - str8_buf;
-                              memcpy (out_it, str8_buf, len);
-                              out_it += len;
+                              evbuffer_add (buf, str8_buf, len);
                               unescaped = true;
                             }
-
-                          in_it += 6;
+    
+                          in += 6;
                           break;
                         }
                     }
@@ -232,13 +224,43 @@ extract_string (jsonsl_t jsn, struct jsonsl_state_st * state, size_t * len)
         }
 
       if (!unescaped)
-        *out_it++ = *in_it++;
+        {
+          evbuffer_add (buf, in, 1);
+          ++in;
+        }
     }
 
-  if (len != NULL)
-    *len = out_it - out_buf;
+  *len = evbuffer_get_length (buf);
+  return (char*) evbuffer_pullup (buf, -1);
+}
 
-  return out_buf;
+static const char*
+extract_string (jsonsl_t jsn, struct jsonsl_state_st * state, size_t * len, struct evbuffer * buf)
+{
+  const char * ret;
+  const char * in_begin;
+  const char * in_end;
+  size_t in_len;
+
+  /* figure out where the string is */
+  in_begin = jsn->base + state->pos_begin;
+  if (*in_begin == '"')
+    in_begin++;
+  in_end = jsn->base + state->pos_cur;
+  in_len = in_end - in_begin;
+
+  if (memchr (in_begin, '\\', in_len) == NULL)
+    {
+      /* it's not escaped */
+      ret = in_begin;
+      *len = in_len;
+    }
+  else
+    {
+      ret = extract_escaped_string (in_begin, in_len, len, buf);
+    }
+
+  return ret;
 }
 
 static void
@@ -251,17 +273,15 @@ action_callback_POP (jsonsl_t                  jsn,
 
   if (state->type == JSONSL_T_STRING)
     {
-      size_t len = 0;
-      char * str = extract_string (jsn, state, &len);
+      size_t len;
+      const char * str = extract_string (jsn, state, &len, data->strbuf);
       tr_variantInitStr (get_node (jsn), str, len);
       data->has_content = true;
-      tr_free (str);
     }
   else if (state->type == JSONSL_T_HKEY)
     {
-      char * str = extract_string (jsn, state, NULL);
       data->has_content = true;
-      data->key = str;
+      data->key = extract_string (jsn, state, &data->keylen, data->keybuf);
     }
   else if ((state->type == JSONSL_T_LIST) || (state->type == JSONSL_T_OBJECT))
     {
@@ -319,6 +339,8 @@ tr_jsonParse (const char     * source,
   data.top = setme_benc;
   data.stack = TR_PTR_ARRAY_INIT;
   data.source = source;
+  data.keybuf = evbuffer_new ();
+  data.strbuf = evbuffer_new ();
 
   /* parse it */
   jsonsl_feed (jsn, vbuf, len);
@@ -333,6 +355,8 @@ tr_jsonParse (const char     * source,
 
   /* cleanup */
   error = data.error;
+  evbuffer_free (data.keybuf);
+  evbuffer_free (data.strbuf);
   tr_ptrArrayDestruct (&data.stack, NULL);
   jsonsl_destroy (jsn);
   return error;
