@@ -2209,7 +2209,6 @@ on_edit_trackers (GtkButton * button, gpointer data)
         hig_workarea_add_wide_control (t, &row, l);
 
         w = gtk_text_view_new ();
-        gtk_widget_set_size_request (w, 500u, 166u);
         g_string_truncate (gstr, 0);
         get_editable_tracker_list (gstr, tor);
         gtk_text_buffer_set_text (gtk_text_view_get_buffer (GTK_TEXT_VIEW (w)), gstr->str, -1);
@@ -2221,6 +2220,7 @@ on_edit_trackers (GtkButton * button, gpointer data)
                                         GTK_POLICY_AUTOMATIC);
         gtk_container_add (GTK_CONTAINER (sw), w);
         gtk_container_add (GTK_CONTAINER (fr), sw);
+        gtk_widget_set_size_request (fr, 500u, 166u);
         hig_workarea_add_wide_tall_control (t, &row, fr);
 
         gtr_dialog_set_content (GTK_DIALOG (d), t);

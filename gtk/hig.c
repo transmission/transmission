@@ -68,6 +68,7 @@ void
 hig_workarea_add_wide_tall_control (GtkWidget * t, guint * row, GtkWidget * w)
 {
     gtk_widget_set_hexpand (w, TRUE);
+    gtk_widget_set_vexpand (w, TRUE);
     hig_workarea_add_wide_control (t, row, w);
 }
 
