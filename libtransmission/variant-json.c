@@ -491,20 +491,11 @@ jsonRealFunc (const tr_variant * val,
               void             * vdata)
 {
   struct jsonWalk * data = vdata;
-  char locale[128];
 
   if (fabs (val->val.d - (int)val->val.d) < 0.00001)
-    {
-      evbuffer_add_printf (data->out, "%d", (int)val->val.d);
-    }
+    evbuffer_add_printf (data->out, "%d", (int)val->val.d);
   else
-    {
-      /* json requires a '.' decimal point regardless of locale */
-      tr_strlcpy (locale, setlocale (LC_NUMERIC, NULL), sizeof (locale));
-      setlocale (LC_NUMERIC, "POSIX");
-      evbuffer_add_printf (data->out, "%.4f", tr_truncd (val->val.d, 4));
-      setlocale (LC_NUMERIC, locale);
-    }
+    evbuffer_add_printf (data->out, "%.4f", tr_truncd (val->val.d, 4));
 
   jsonChildFunc (data);
 }
@@ -629,11 +620,19 @@ static const struct VariantWalkFuncs walk_funcs = { jsonIntFunc,
 void
 tr_variantToBufJson (const tr_variant * top, struct evbuffer * buf, bool lean)
 {
+  char lc_numeric[128];
   struct jsonWalk data;
+
   data.doIndent = !lean;
   data.out = buf;
   data.parents = NULL;
+
+  /* json requires a '.' decimal point regardless of locale */
+  tr_strlcpy (lc_numeric, setlocale (LC_NUMERIC, NULL), sizeof (lc_numeric));
+  setlocale (LC_NUMERIC, "POSIX");
   tr_variantWalk (top, &walk_funcs, &data, true);
+  setlocale (LC_NUMERIC, lc_numeric);
+
   if (evbuffer_get_length (buf))
     evbuffer_add_printf (buf, "\n");
 }
