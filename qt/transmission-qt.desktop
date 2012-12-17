@@ -2,7 +2,7 @@
 Name=Qtransmission Bittorrent Client
 GenericName=BitTorrent Client
 Comment=Download and share files over BitTorrent
-Exec=transmission-qt %F
+Exec=transmission-qt %U
 Icon=transmission-qt
 Terminal=false
 Type=Application
