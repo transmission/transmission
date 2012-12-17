@@ -34,6 +34,7 @@ win32:LIBS += -lidn -liconv -lwldap32 -liphlpapi
 TRANSLATIONS += translations/transmission_en.ts \
                 translations/transmission_es.ts \
                 translations/transmission_eu.ts \
+                translations/transmission_fr.ts \
                 translations/transmission_kk.ts \
                 translations/transmission_lt.ts \
                 translations/transmission_pt_BR.ts \
