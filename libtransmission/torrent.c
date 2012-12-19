@@ -2232,6 +2232,7 @@ tr_torrentSetFileDLs (tr_torrent             * tor,
 
     tr_torrentInitFileDLs (tor, files, fileCount, doDownload);
     tr_torrentSetDirty (tor);
+    tr_torrentRecheckCompleteness (tor);
     tr_peerMgrRebuildRequests (tor);
 
     tr_torrentUnlock (tor);
