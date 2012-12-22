@@ -21,6 +21,8 @@
 
 #include "filters.h"
 
+#include <libtransmission/quark.h>
+
 extern "C"
 {
     struct tr_variant;
@@ -132,7 +134,7 @@ class Prefs: public QObject
 
         struct PrefItem {
             int id;
-            const char * key;
+            tr_quark key;
             int type;
         };
 
@@ -147,7 +149,8 @@ class Prefs: public QObject
     public:
         bool isCore( int key ) const { return FIRST_CORE_PREF<=key && key<=LAST_CORE_PREF; }
         bool isClient( int key ) const { return !isCore( key ); }
-        const char * keyStr( int i ) const { return myItems[i].key; }
+        const char * keyStr( int i ) const { return tr_quark_get_string(myItems[i].key,NULL); }
+        tr_quark getKey (int i) const { return myItems[i].key; }
         int type( int i ) const { return myItems[i].type; }
         const QVariant& variant( int i ) const { return myValues[i]; }
 

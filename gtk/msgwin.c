@@ -112,7 +112,7 @@ level_combo_changed_cb (GtkComboBox * combo_box, gpointer gdata)
   const gboolean pinned_to_new = is_pinned_to_new (data);
 
   tr_setMessageLevel (level);
-  gtr_core_set_pref_int (data->core, TR_PREFS_KEY_MSGLEVEL, level);
+  gtr_core_set_pref_int (data->core, TR_KEY_message_level, level);
   data->maxLevel = level;
   gtk_tree_model_filter_refilter (GTK_TREE_MODEL_FILTER (data->filter));
 
@@ -440,7 +440,7 @@ debug_level_combo_new (void)
                                           _("Information"), TR_MSG_INF,
                                           _("Debug"),       TR_MSG_DBG,
                                           NULL);
-  gtr_combo_box_set_active_enum (GTK_COMBO_BOX (w), gtr_pref_int_get (TR_PREFS_KEY_MSGLEVEL));
+  gtr_combo_box_set_active_enum (GTK_COMBO_BOX (w), gtr_pref_int_get (TR_KEY_message_level));
   return w;
 }
 
@@ -532,7 +532,7 @@ gtr_message_log_window_new (GtkWindow * parent, TrCore * core)
   gtk_tree_sortable_set_sort_column_id (GTK_TREE_SORTABLE (data->sort),
                                         COL_SEQUENCE,
                                         GTK_SORT_ASCENDING);
-  data->maxLevel = gtr_pref_int_get (TR_PREFS_KEY_MSGLEVEL);
+  data->maxLevel = gtr_pref_int_get (TR_KEY_message_level);
   gtk_tree_model_filter_set_visible_func (GTK_TREE_MODEL_FILTER (data->filter),
                                           isRowVisible, data, NULL);
 

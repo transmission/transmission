@@ -71,18 +71,18 @@ namespace
 
 namespace
 {
-    typedef Torrent::KeyList KeyList;
-    const KeyList& getInfoKeys( ) { return Torrent::getInfoKeys( ); }
-    const KeyList& getStatKeys( ) { return Torrent::getStatKeys( ); }
-    const KeyList& getExtraStatKeys( ) { return Torrent::getExtraStatKeys( ); }
+  typedef Torrent::KeyList KeyList;
+  const KeyList& getInfoKeys() { return Torrent::getInfoKeys(); }
+  const KeyList& getStatKeys() { return Torrent::getStatKeys(); }
+  const KeyList& getExtraStatKeys() { return Torrent::getExtraStatKeys(); }
 
-    void
-    addList( tr_variant * list, const KeyList& strings )
-    {
-        tr_variantListReserve( list, strings.size( ) );
-        foreach( const char * str, strings )
-            tr_variantListAddStr( list, str );
-    }
+  void
+  addList (tr_variant * list, const KeyList& keys)
+  {
+    tr_variantListReserve (list, keys.size());
+    foreach (tr_quark key, keys)
+      tr_variantListAddQuark (list, key);
+  }
 }
 
 /***
@@ -90,12 +90,12 @@ namespace
 ***/
 
 void
-Session :: sessionSet( const char * key, const QVariant& value )
+Session :: sessionSet( const tr_quark key, const QVariant& value )
 {
     tr_variant top;
     tr_variantInitDict( &top, 2 );
-    tr_variantDictAddStr( &top, "method", "session-set" );
-    tr_variant * args( tr_variantDictAddDict( &top, "arguments", 1 ) );
+    tr_variantDictAddStr( &top, TR_KEY_method, "session-set" );
+    tr_variant * args( tr_variantDictAddDict( &top, TR_KEY_arguments, 1 ) );
     switch( value.type( ) ) {
         case QVariant::Bool:   tr_variantDictAddBool ( args, key, value.toBool() ); break;
         case QVariant::Int:    tr_variantDictAddInt  ( args, key, value.toInt() ); break;
@@ -112,8 +112,8 @@ Session :: portTest( )
 {
     tr_variant top;
     tr_variantInitDict( &top, 2 );
-    tr_variantDictAddStr( &top, "method", "port-test" );
-    tr_variantDictAddInt( &top, "tag", TAG_PORT_TEST );
+    tr_variantDictAddStr( &top, TR_KEY_method, "port-test" );
+    tr_variantDictAddInt( &top, TR_KEY_tag, TAG_PORT_TEST );
     exec( &top );
     tr_variantFree( &top );
 }
@@ -123,11 +123,11 @@ Session :: copyMagnetLinkToClipboard( int torrentId )
 {
     tr_variant top;
     tr_variantInitDict( &top, 3 );
-    tr_variantDictAddStr( &top, "method", "torrent-get" );
-    tr_variantDictAddInt( &top, "tag", TAG_MAGNET_LINK );
-    tr_variant * args = tr_variantDictAddDict( &top, "arguments", 2 );
-    tr_variantListAddInt( tr_variantDictAddList( args, "ids", 1 ), torrentId );
-    tr_variantListAddStr( tr_variantDictAddList( args, "fields", 1 ), "magnetLink" );
+    tr_variantDictAddQuark( &top, TR_KEY_method, TR_KEY_torrent_get );
+    tr_variantDictAddInt( &top, TR_KEY_tag, TAG_MAGNET_LINK );
+    tr_variant * args = tr_variantDictAddDict( &top, TR_KEY_arguments, 2 );
+    tr_variantListAddInt( tr_variantDictAddList( args, TR_KEY_ids, 1 ), torrentId );
+    tr_variantListAddStr( tr_variantDictAddList( args, TR_KEY_fields, 1 ), "magnetLink" );
 
     exec( &top );
     tr_variantFree( &top );
@@ -173,14 +173,14 @@ Session :: updatePref( int key )
         case Prefs :: USPEED:
         case Prefs :: USPEED_ENABLED:
         case Prefs :: UTP_ENABLED:
-            sessionSet( myPrefs.keyStr(key), myPrefs.variant(key) );
+            sessionSet( myPrefs.getKey(key), myPrefs.variant(key) );
             break;
 
         case Prefs :: RATIO:
-            sessionSet( "seedRatioLimit", myPrefs.variant(key) );
+            sessionSet( TR_KEY_seedRatioLimit, myPrefs.variant(key) );
             break;
         case Prefs :: RATIO_ENABLED:
-            sessionSet( "seedRatioLimited", myPrefs.variant(key) );
+            sessionSet( TR_KEY_seedRatioLimited, myPrefs.variant(key) );
             break;
 
         case Prefs :: ENCRYPTION:
@@ -189,13 +189,13 @@ Session :: updatePref( int key )
                 switch( i )
                 {
                     case 0:
-                        sessionSet( myPrefs.keyStr(key), "tolerated" );
+                        sessionSet( myPrefs.getKey(key), "tolerated" );
                         break;
                     case 1:
-                        sessionSet( myPrefs.keyStr(key), "preferred" );
+                        sessionSet( myPrefs.getKey(key), "preferred" );
                         break;
                     case 2:
-                        sessionSet( myPrefs.keyStr(key), "required" );
+                        sessionSet( myPrefs.getKey(key), "required" );
                         break;
                 }
                 break;
@@ -371,76 +371,78 @@ Session :: isLocal( ) const
 
 namespace
 {
-    tr_variant *
-    buildRequest( const char * method, tr_variant& top, int tag=-1 )
-    {
-        tr_variantInitDict( &top, 3 );
-        tr_variantDictAddStr( &top, "method", method );
-        if( tag >= 0 )
-            tr_variantDictAddInt( &top, "tag", tag );
-        return tr_variantDictAddDict( &top, "arguments", 0 );
-    }
+  tr_variant *
+  buildRequest (const char * method, tr_variant& top, int tag=-1)
+  {
+    tr_variantInitDict (&top, 3);
+    tr_variantDictAddStr (&top, TR_KEY_method, method);
 
-    void
-    addOptionalIds( tr_variant * args, const QSet<int>& ids )
-    {
-        if( !ids.isEmpty( ) )
-        {
-            tr_variant * idList( tr_variantDictAddList( args, "ids", ids.size( ) ) );
-            foreach( int i, ids )
-                tr_variantListAddInt( idList, i );
-        }
-    }
+    if (tag >= 0)
+      tr_variantDictAddInt (&top, TR_KEY_tag, tag);
+
+    return tr_variantDictAddDict (&top, TR_KEY_arguments, 0);
+  }
+
+  void
+  addOptionalIds( tr_variant * args, const QSet<int>& ids )
+  {
+    if (!ids.isEmpty())
+      {
+        tr_variant * idList (tr_variantDictAddList (args, TR_KEY_ids, ids.size()));
+        foreach (int i, ids)
+          tr_variantListAddInt (idList, i);
+      }
+  }
 }
 
 void
-Session :: torrentSet( const QSet<int>& ids, const QString& key, double value )
+Session :: torrentSet( const QSet<int>& ids, const tr_quark key, double value )
 {
     tr_variant top;
     tr_variantInitDict( &top, 2 );
-    tr_variantDictAddStr( &top, "method", "torrent-set" );
-    tr_variant * args = tr_variantDictAddDict( &top, "arguments", 2 );
-    tr_variantDictAddReal( args, key.toUtf8().constData(), value );
+    tr_variantDictAddQuark( &top, TR_KEY_method, TR_KEY_torrent_set );
+    tr_variant * args = tr_variantDictAddDict( &top, TR_KEY_arguments, 2 );
+    tr_variantDictAddReal( args, key, value );
     addOptionalIds( args, ids );
     exec( &top );
     tr_variantFree( &top );
 }
 
 void
-Session :: torrentSet( const QSet<int>& ids, const QString& key, int value )
+Session :: torrentSet( const QSet<int>& ids, const tr_quark key, int value )
 {
     tr_variant top;
     tr_variantInitDict( &top, 2 );
-    tr_variantDictAddStr( &top, "method", "torrent-set" );
-    tr_variant * args = tr_variantDictAddDict( &top, "arguments", 2 );
-    tr_variantDictAddInt( args, key.toUtf8().constData(), value );
+    tr_variantDictAddQuark( &top, TR_KEY_method, TR_KEY_torrent_set );
+    tr_variant * args = tr_variantDictAddDict( &top, TR_KEY_arguments, 2 );
+    tr_variantDictAddInt( args, key, value );
     addOptionalIds( args, ids );
     exec( &top );
     tr_variantFree( &top );
 }
 
 void
-Session :: torrentSet( const QSet<int>& ids, const QString& key, bool value )
+Session :: torrentSet( const QSet<int>& ids, const tr_quark key, bool value )
 {
     tr_variant top;
     tr_variantInitDict( &top, 2 );
-    tr_variantDictAddStr( &top, "method", "torrent-set" );
-    tr_variant * args = tr_variantDictAddDict( &top, "arguments", 2 );
-    tr_variantDictAddBool( args, key.toUtf8().constData(), value );
+    tr_variantDictAddQuark( &top, TR_KEY_method, TR_KEY_torrent_set );
+    tr_variant * args = tr_variantDictAddDict( &top, TR_KEY_arguments, 2 );
+    tr_variantDictAddBool( args, key, value );
     addOptionalIds( args, ids );
     exec( &top );
     tr_variantFree( &top );
 }
 
 void
-Session :: torrentSet( const QSet<int>& ids, const QString& key, const QStringList& value )
+Session :: torrentSet( const QSet<int>& ids, const tr_quark key, const QStringList& value )
 {
     tr_variant top;
     tr_variantInitDict( &top, 2 );
-    tr_variantDictAddStr( &top, "method", "torrent-set" );
-    tr_variant * args = tr_variantDictAddDict( &top, "arguments", 2 );
+    tr_variantDictAddQuark( &top, TR_KEY_method, TR_KEY_torrent_set );
+    tr_variant * args = tr_variantDictAddDict( &top, TR_KEY_arguments, 2 );
     addOptionalIds( args, ids );
-    tr_variant * list( tr_variantDictAddList( args, key.toUtf8().constData(), value.size( ) ) );
+    tr_variant * list( tr_variantDictAddList( args, key, value.size( ) ) );
     foreach( const QString str, value )
         tr_variantListAddStr( list, str.toUtf8().constData() );
     exec( &top );
@@ -448,14 +450,14 @@ Session :: torrentSet( const QSet<int>& ids, const QString& key, const QStringLi
 }
 
 void
-Session :: torrentSet( const QSet<int>& ids, const QString& key, const QList<int>& value )
+Session :: torrentSet( const QSet<int>& ids, const tr_quark key, const QList<int>& value )
 {
     tr_variant top;
     tr_variantInitDict( &top, 2 );
-    tr_variantDictAddStr( &top, "method", "torrent-set" );
-    tr_variant * args( tr_variantDictAddDict( &top, "arguments", 2 ) );
+    tr_variantDictAddQuark( &top, TR_KEY_method, TR_KEY_torrent_set );
+    tr_variant * args( tr_variantDictAddDict( &top, TR_KEY_arguments, 2 ) );
     addOptionalIds( args, ids );
-    tr_variant * list( tr_variantDictAddList( args, key.toUtf8().constData(), value.size( ) ) );
+    tr_variant * list( tr_variantDictAddList( args, key, value.size( ) ) );
     foreach( int i, value )
         tr_variantListAddInt( list, i );
     exec( &top );
@@ -463,32 +465,32 @@ Session :: torrentSet( const QSet<int>& ids, const QString& key, const QList<int
 }
 
 void
-Session :: torrentSet( const QSet<int>& ids, const QString& key, const QPair<int,QString>& value )
+Session :: torrentSet( const QSet<int>& ids, const tr_quark key, const QPair<int,QString>& value )
 {
-    tr_variant top;
-    tr_variantInitDict( &top, 2 );
-    tr_variantDictAddStr( &top, "method", "torrent-set" );
-    tr_variant * args( tr_variantDictAddDict( &top, "arguments", 2 ) );
-    addOptionalIds( args, ids );
-    tr_variant * list( tr_variantDictAddList( args, key.toUtf8().constData(), 2 ) );
-    tr_variantListAddInt( list, value.first );
-    tr_variantListAddStr( list, value.second.toUtf8().constData() );
-    exec( &top );
-    tr_variantFree( &top );
+  tr_variant top;
+  tr_variantInitDict (&top, 2);
+  tr_variantDictAddQuark (&top, TR_KEY_method, TR_KEY_torrent_set);
+  tr_variant * args (tr_variantDictAddDict (&top, TR_KEY_arguments, 2));
+  addOptionalIds (args, ids);
+  tr_variant * list (tr_variantDictAddList (args, key, 2));
+  tr_variantListAddInt (list, value.first);
+  tr_variantListAddStr (list, value.second.toUtf8().constData());
+  exec (&top);
+  tr_variantFree (&top);
 }
 
 void
-Session :: torrentSetLocation( const QSet<int>& ids, const QString& location, bool doMove )
+Session :: torrentSetLocation( const QSet<int>& ids, const QString& location, bool doMove)
 {
-    tr_variant top;
-    tr_variantInitDict( &top, 2 );
-    tr_variantDictAddStr( &top, "method", "torrent-set-location" );
-    tr_variant * args( tr_variantDictAddDict( &top, "arguments", 3 ) );
-    addOptionalIds( args, ids );
-    tr_variantDictAddStr( args, "location", location.toUtf8().constData() );
-    tr_variantDictAddBool( args, "move", doMove );
-    exec( &top );
-    tr_variantFree( &top );
+  tr_variant top;
+  tr_variantInitDict (&top, 2);
+  tr_variantDictAddQuark (&top, TR_KEY_method, TR_KEY_torrent_set);
+  tr_variant * args (tr_variantDictAddDict(&top, TR_KEY_arguments, 3));
+  addOptionalIds (args, ids);
+  tr_variantDictAddStr (args, TR_KEY_location, location.toUtf8().constData());
+  tr_variantDictAddBool (args, TR_KEY_move, doMove);
+  exec (&top);
+  tr_variantFree (&top);
 }
 
 void
@@ -502,10 +504,10 @@ Session :: refreshTorrents( const QSet<int>& ids )
     {
         tr_variant top;
         tr_variantInitDict( &top, 3 );
-        tr_variantDictAddStr( &top, "method", "torrent-get" );
-        tr_variantDictAddInt( &top, "tag", TAG_SOME_TORRENTS );
-        tr_variant * args( tr_variantDictAddDict( &top, "arguments", 2 ) );
-        addList( tr_variantDictAddList( args, "fields", 0 ), getStatKeys( ) );
+        tr_variantDictAddQuark( &top, TR_KEY_method, TR_KEY_torrent_get );
+        tr_variantDictAddInt( &top, TR_KEY_tag, TAG_SOME_TORRENTS );
+        tr_variant * args( tr_variantDictAddDict( &top, TR_KEY_arguments, 2 ) );
+        addList( tr_variantDictAddList( args, TR_KEY_fields, 0 ), getStatKeys( ) );
         addOptionalIds( args, ids );
         exec( &top );
         tr_variantFree( &top );
@@ -517,45 +519,46 @@ Session :: refreshExtraStats( const QSet<int>& ids )
 {
     tr_variant top;
     tr_variantInitDict( &top, 3 );
-    tr_variantDictAddStr( &top, "method", "torrent-get" );
-    tr_variantDictAddInt( &top, "tag", TAG_SOME_TORRENTS );
-    tr_variant * args( tr_variantDictAddDict( &top, "arguments", 2 ) );
+    tr_variantDictAddQuark( &top, TR_KEY_method, TR_KEY_torrent_get );
+    tr_variantDictAddInt( &top, TR_KEY_tag, TAG_SOME_TORRENTS );
+    tr_variant * args( tr_variantDictAddDict( &top, TR_KEY_arguments, 2 ) );
     addOptionalIds( args, ids );
-    addList( tr_variantDictAddList( args, "fields", 0 ), getStatKeys( ) + getExtraStatKeys( ));
+    addList( tr_variantDictAddList( args, TR_KEY_fields, 0 ), getStatKeys( ) + getExtraStatKeys( ));
     exec( &top );
     tr_variantFree( &top );
 }
 
 void
-Session :: sendTorrentRequest( const char * request, const QSet<int>& ids )
+Session :: sendTorrentRequest (const char * request, const QSet<int>& ids )
 {
-    tr_variant top;
-    tr_variant * args( buildRequest( request, top ) );
-    addOptionalIds( args, ids );
-    exec( &top );
-    tr_variantFree( &top );
+  tr_variant top;
 
-    refreshTorrents( ids );
+  tr_variant * args (buildRequest (request, top));
+  addOptionalIds (args, ids);
+  exec (&top);
+  tr_variantFree (&top);
+
+  refreshTorrents (ids);
 }
 
-void Session :: pauseTorrents    ( const QSet<int>& ids ) { sendTorrentRequest( "torrent-stop", ids ); }
-void Session :: startTorrents    ( const QSet<int>& ids ) { sendTorrentRequest( "torrent-start", ids ); } 
-void Session :: startTorrentsNow ( const QSet<int>& ids ) { sendTorrentRequest( "torrent-start-now", ids ); }
-void Session :: queueMoveTop     ( const QSet<int>& ids ) { sendTorrentRequest( "queue-move-top", ids ); } 
-void Session :: queueMoveUp      ( const QSet<int>& ids ) { sendTorrentRequest( "queue-move-up", ids ); } 
-void Session :: queueMoveDown    ( const QSet<int>& ids ) { sendTorrentRequest( "queue-move-down", ids ); } 
-void Session :: queueMoveBottom  ( const QSet<int>& ids ) { sendTorrentRequest( "queue-move-bottom", ids ); } 
+void Session :: pauseTorrents    (const QSet<int>& ids) { sendTorrentRequest ("torrent-stop",        ids); }
+void Session :: startTorrents    (const QSet<int>& ids) { sendTorrentRequest ("torrent-start",       ids); } 
+void Session :: startTorrentsNow (const QSet<int>& ids) { sendTorrentRequest ("torrent-start-now",   ids); }
+void Session :: queueMoveTop     (const QSet<int>& ids) { sendTorrentRequest ("torrent-move-top",    ids); } 
+void Session :: queueMoveUp      (const QSet<int>& ids) { sendTorrentRequest ("torrent-move-up",     ids); } 
+void Session :: queueMoveDown    (const QSet<int>& ids) { sendTorrentRequest ("torrent-move-down",   ids); } 
+void Session :: queueMoveBottom  (const QSet<int>& ids) { sendTorrentRequest ("torrent-move-bottom", ids); } 
 
 void
 Session :: refreshActiveTorrents( )
 {
     tr_variant top;
     tr_variantInitDict( &top, 3 );
-    tr_variantDictAddStr( &top, "method", "torrent-get" );
-    tr_variantDictAddInt( &top, "tag", TAG_SOME_TORRENTS );
-    tr_variant * args( tr_variantDictAddDict( &top, "arguments", 2 ) );
-    tr_variantDictAddStr( args, "ids", "recently-active" );
-    addList( tr_variantDictAddList( args, "fields", 0 ), getStatKeys( ) );
+    tr_variantDictAddQuark( &top, TR_KEY_method, TR_KEY_torrent_get );
+    tr_variantDictAddInt( &top, TR_KEY_tag, TAG_SOME_TORRENTS );
+    tr_variant * args( tr_variantDictAddDict( &top, TR_KEY_arguments, 2 ) );
+    tr_variantDictAddStr( args, TR_KEY_ids, "recently-active" );
+    addList( tr_variantDictAddList( args, TR_KEY_fields, 0 ), getStatKeys( ) );
     exec( &top );
     tr_variantFree( &top );
 }
@@ -565,10 +568,10 @@ Session :: refreshAllTorrents( )
 {
     tr_variant top;
     tr_variantInitDict( &top, 3 );
-    tr_variantDictAddStr( &top, "method", "torrent-get" );
-    tr_variantDictAddInt( &top, "tag", TAG_ALL_TORRENTS );
-    tr_variant * args( tr_variantDictAddDict( &top, "arguments", 1 ) );
-    addList( tr_variantDictAddList( args, "fields", 0 ), getStatKeys( ) );
+    tr_variantDictAddQuark( &top, TR_KEY_method, TR_KEY_torrent_get );
+    tr_variantDictAddInt( &top, TR_KEY_tag, TAG_ALL_TORRENTS );
+    tr_variant * args( tr_variantDictAddDict( &top, TR_KEY_arguments, 1 ) );
+    addList( tr_variantDictAddList( args, TR_KEY_fields, 0 ), getStatKeys( ) );
     exec( &top );
     tr_variantFree( &top );
 }
@@ -580,7 +583,7 @@ Session :: initTorrents( const QSet<int>& ids )
     const int tag( ids.isEmpty() ? TAG_ALL_TORRENTS : TAG_SOME_TORRENTS );
     tr_variant * args( buildRequest( "torrent-get", top, tag ) );
     addOptionalIds( args, ids );
-    addList( tr_variantDictAddList( args, "fields", 0 ), getStatKeys()+getInfoKeys() );
+    addList( tr_variantDictAddList( args, TR_KEY_fields, 0 ), getStatKeys()+getInfoKeys() );
     exec( &top );
     tr_variantFree( &top );
 }
@@ -590,8 +593,8 @@ Session :: refreshSessionStats( )
 {
     tr_variant top;
     tr_variantInitDict( &top, 2 );
-    tr_variantDictAddStr( &top, "method", "session-stats" );
-    tr_variantDictAddInt( &top, "tag", TAG_SESSION_STATS );
+    tr_variantDictAddStr( &top, TR_KEY_method, "session-stats" );
+    tr_variantDictAddInt( &top, TR_KEY_tag, TAG_SESSION_STATS );
     exec( &top );
     tr_variantFree( &top );
 }
@@ -601,8 +604,8 @@ Session :: refreshSessionInfo( )
 {
     tr_variant top;
     tr_variantInitDict( &top, 2 );
-    tr_variantDictAddStr( &top, "method", "session-get" );
-    tr_variantDictAddInt( &top, "tag", TAG_SESSION_INFO );
+    tr_variantDictAddStr( &top, TR_KEY_method, "session-get" );
+    tr_variantDictAddInt( &top, TR_KEY_tag, TAG_SESSION_INFO );
     exec( &top );
     tr_variantFree( &top );
 }
@@ -612,8 +615,8 @@ Session :: updateBlocklist( )
 {
     tr_variant top;
     tr_variantInitDict( &top, 2 );
-    tr_variantDictAddStr( &top, "method", "blocklist-update" );
-    tr_variantDictAddInt( &top, "tag", TAG_BLOCKLIST_UPDATE );
+    tr_variantDictAddStr( &top, TR_KEY_method, "blocklist-update" );
+    tr_variantDictAddInt( &top, TR_KEY_tag, TAG_BLOCKLIST_UPDATE );
     exec( &top );
     tr_variantFree( &top );
 }
@@ -722,51 +725,51 @@ Session :: parseResponse( const char * json, size_t jsonLength )
         const char * result = NULL;
         tr_variant * args = NULL;
 
-        tr_variantDictFindInt ( &top, "tag", &tag );
-        tr_variantDictFindStr ( &top, "result", &result, NULL );
-        tr_variantDictFindDict( &top, "arguments", &args );
+        tr_variantDictFindInt ( &top, TR_KEY_tag, &tag );
+        tr_variantDictFindStr ( &top, TR_KEY_result, &result, NULL );
+        tr_variantDictFindDict( &top, TR_KEY_arguments, &args );
 
         emit executed( tag, result, args );
 
         tr_variant * torrents;
         const char * str;
 
-        if( tr_variantDictFindInt( &top, "tag", &tag ) )
+        if( tr_variantDictFindInt( &top, TR_KEY_tag, &tag ) )
         {
             switch( tag )
             {
                 case TAG_SOME_TORRENTS:
                 case TAG_ALL_TORRENTS:
-                    if( tr_variantDictFindDict( &top, "arguments", &args ) ) {
-                        if( tr_variantDictFindList( args, "torrents", &torrents ) )
+                    if( tr_variantDictFindDict( &top, TR_KEY_arguments, &args ) ) {
+                        if( tr_variantDictFindList( args, TR_KEY_torrents, &torrents ) )
                             emit torrentsUpdated( torrents, tag==TAG_ALL_TORRENTS );
-                        if( tr_variantDictFindList( args, "removed", &torrents ) )
+                        if( tr_variantDictFindList( args, TR_KEY_removed, &torrents ) )
                             emit torrentsRemoved( torrents );
                     }
                     break;
 
                 case TAG_SESSION_STATS:
-                    if( tr_variantDictFindDict( &top, "arguments", &args ) )
+                    if( tr_variantDictFindDict( &top, TR_KEY_arguments, &args ) )
                         updateStats( args );
                     break;
 
                 case TAG_SESSION_INFO:
-                    if( tr_variantDictFindDict( &top, "arguments", &args ) )
+                    if( tr_variantDictFindDict( &top, TR_KEY_arguments, &args ) )
                         updateInfo( args );
                     break;
 
                 case TAG_BLOCKLIST_UPDATE: {
                     int64_t intVal = 0;
-                    if( tr_variantDictFindDict( &top, "arguments", &args ) )
-                        if( tr_variantDictFindInt( args, "blocklist-size", &intVal ) )
+                    if( tr_variantDictFindDict( &top, TR_KEY_arguments, &args ) )
+                        if( tr_variantDictFindInt( args, TR_KEY_blocklist_size, &intVal ) )
                             setBlocklistSize( intVal );
                     break;
                 }
 
                 case TAG_PORT_TEST: {
                     bool isOpen = 0;
-                    if( tr_variantDictFindDict( &top, "arguments", &args ) )
-                        tr_variantDictFindBool( args, "port-is-open", &isOpen );
+                    if( tr_variantDictFindDict( &top, TR_KEY_arguments, &args ) )
+                        tr_variantDictFindBool( args, TR_KEY_port_is_open, &isOpen );
                     emit portTested( (bool)isOpen );
                 }
 
@@ -775,17 +778,17 @@ Session :: parseResponse( const char * json, size_t jsonLength )
                     tr_variant * torrents;
                     tr_variant * child;
                     const char * str;
-                    if( tr_variantDictFindDict( &top, "arguments", &args )
-                        && tr_variantDictFindList( args, "torrents", &torrents )
+                    if( tr_variantDictFindDict( &top, TR_KEY_arguments, &args )
+                        && tr_variantDictFindList( args, TR_KEY_torrents, &torrents )
                         && (( child = tr_variantListChild( torrents, 0 )))
-                        && tr_variantDictFindStr( child, "magnetLink", &str, NULL ) )
+                        && tr_variantDictFindStr( child, TR_KEY_magnetLink, &str, NULL ) )
                             QApplication::clipboard()->setText( str );
                     break;
                 }
 
                 case TAG_ADD_TORRENT:
                     str = "";
-                    if( tr_variantDictFindStr( &top, "result", &str, NULL ) && strcmp( str, "success" ) ) {
+                    if( tr_variantDictFindStr( &top, TR_KEY_result, &str, NULL ) && strcmp( str, "success" ) ) {
                         QMessageBox * d = new QMessageBox( QMessageBox::Information,
                                                            tr( "Add Torrent" ),
                                                            QString::fromUtf8(str),
@@ -809,15 +812,15 @@ Session :: updateStats( tr_variant * d, struct tr_session_stats * stats )
 {
     int64_t i;
 
-    if( tr_variantDictFindInt( d, "uploadedBytes", &i ) )
+    if( tr_variantDictFindInt( d, TR_KEY_uploadedBytes, &i ) )
         stats->uploadedBytes = i;
-    if( tr_variantDictFindInt( d, "downloadedBytes", &i ) )
+    if( tr_variantDictFindInt( d, TR_KEY_downloadedBytes, &i ) )
         stats->downloadedBytes = i;
-    if( tr_variantDictFindInt( d, "filesAdded", &i ) )
+    if( tr_variantDictFindInt( d, TR_KEY_filesAdded, &i ) )
         stats->filesAdded = i;
-    if( tr_variantDictFindInt( d, "sessionCount", &i ) )
+    if( tr_variantDictFindInt( d, TR_KEY_sessionCount, &i ) )
         stats->sessionCount = i;
-    if( tr_variantDictFindInt( d, "secondsActive", &i ) )
+    if( tr_variantDictFindInt( d, TR_KEY_secondsActive, &i ) )
         stats->secondsActive = i;
 
     stats->ratio = tr_getRatio( stats->uploadedBytes, stats->downloadedBytes );
@@ -829,42 +832,43 @@ Session :: updateStats( tr_variant * d )
 {
     tr_variant * c;
 
-    if( tr_variantDictFindDict( d, "current-stats", &c ) )
+    if( tr_variantDictFindDict( d, TR_KEY_current_stats, &c ) )
         updateStats( c, &myStats );
 
-    if( tr_variantDictFindDict( d, "cumulative-stats", &c ) )
+    if( tr_variantDictFindDict( d, TR_KEY_cumulative_stats, &c ) )
         updateStats( c, &myCumulativeStats );
 
     emit statsUpdated( );
 }
 
 void
-Session :: updateInfo( tr_variant * d )
+Session :: updateInfo (tr_variant * d)
 {
-    int64_t i;
-    const char * str;
-    disconnect( &myPrefs, SIGNAL(changed(int)), this, SLOT(updatePref(int)) );
+  int64_t i;
+  const char * str;
 
-    for( int i=Prefs::FIRST_CORE_PREF; i<=Prefs::LAST_CORE_PREF; ++i )
+  disconnect (&myPrefs, SIGNAL(changed(int)), this, SLOT(updatePref(int)));
+
+  for (int i=Prefs::FIRST_CORE_PREF; i<=Prefs::LAST_CORE_PREF; ++i)
     {
-        const tr_variant * b( tr_variantDictFind( d, myPrefs.keyStr( i ) ) );
+      const tr_variant * b( tr_variantDictFind (d, myPrefs.getKey(i)));
 
-        if( !b )
-            continue;
+      if (!b)
+        continue;
 
-        if( i == Prefs :: ENCRYPTION )
+      if (i == Prefs :: ENCRYPTION)
         {
-            const char * val;
-            if( tr_variantGetStr( b, &val, NULL ) )
+          const char * val;
+          if( tr_variantGetStr( b, &val, NULL ) )
             {
-                if( !qstrcmp( val , "required" ) )
-                    myPrefs.set( i, 2 );
-                else if( !qstrcmp( val , "preferred" ) )
-                    myPrefs.set( i, 1 );
-                else if( !qstrcmp( val , "tolerated" ) )
-                    myPrefs.set( i, 0 );
+              if( !qstrcmp( val , "required" ) )
+                myPrefs.set( i, 2 );
+              else if( !qstrcmp( val , "preferred" ) )
+                myPrefs.set( i, 1 );
+              else if( !qstrcmp( val , "tolerated" ) )
+                myPrefs.set( i, 0 );
             }
-            continue;
+          continue;
         }
 
         switch( myPrefs.type( i ) )
@@ -902,9 +906,9 @@ Session :: updateInfo( tr_variant * d )
 
     bool b;
     double x;
-    if( tr_variantDictFindBool( d, "seedRatioLimited", &b ) )
+    if( tr_variantDictFindBool( d, TR_KEY_seedRatioLimited, &b ) )
         myPrefs.set( Prefs::RATIO_ENABLED, b ? true : false );
-    if( tr_variantDictFindReal( d, "seedRatioLimit", &x ) )
+    if( tr_variantDictFindReal( d, TR_KEY_seedRatioLimit, &x ) )
         myPrefs.set( Prefs::RATIO, x );
 
     /* Use the C API to get settings that, for security reasons, aren't supported by RPC */
@@ -919,10 +923,10 @@ Session :: updateInfo( tr_variant * d )
         myPrefs.set( Prefs::RPC_WHITELIST,         tr_sessionGetRPCWhitelist        ( mySession ) );
     }
 
-    if( tr_variantDictFindInt( d, "blocklist-size", &i ) && i!=blocklistSize( ) )
+    if( tr_variantDictFindInt( d, TR_KEY_blocklist_size, &i ) && i!=blocklistSize( ) )
         setBlocklistSize( i );
 
-    if( tr_variantDictFindStr( d, "version", &str, NULL ) && ( mySessionVersion != str ) )
+    if( tr_variantDictFindStr( d, TR_KEY_version, &str, NULL ) && ( mySessionVersion != str ) )
         mySessionVersion = str;
 
     //std::cerr << "Session :: updateInfo end" << std::endl;
@@ -946,14 +950,14 @@ Session :: addTorrent( const AddData& addMe )
 
     tr_variant top, *args;
     tr_variantInitDict( &top, 2 );
-    tr_variantDictAddStr( &top, "method", "torrent-add" );
-    args = tr_variantDictAddDict( &top, "arguments", 2 );
-    tr_variantDictAddBool( args, "paused", !myPrefs.getBool( Prefs::START ) );
+    tr_variantDictAddStr( &top, TR_KEY_method, "torrent-add" );
+    args = tr_variantDictAddDict( &top, TR_KEY_arguments, 2 );
+    tr_variantDictAddBool( args, TR_KEY_paused, !myPrefs.getBool( Prefs::START ) );
     switch( addMe.type ) {
-        case AddData::MAGNET:   tr_variantDictAddStr( args, "filename", addMe.magnet.toUtf8().constData() ); break;
-        case AddData::URL:      tr_variantDictAddStr( args, "filename", addMe.url.toString().toUtf8().constData() ); break;
+        case AddData::MAGNET:   tr_variantDictAddStr( args, TR_KEY_filename, addMe.magnet.toUtf8().constData() ); break;
+        case AddData::URL:      tr_variantDictAddStr( args, TR_KEY_filename, addMe.url.toString().toUtf8().constData() ); break;
         case AddData::FILENAME: /* fall-through */
-        case AddData::METAINFO: tr_variantDictAddRaw( args, "metainfo", b64.constData(), b64.size() ); break;
+        case AddData::METAINFO: tr_variantDictAddRaw( args, TR_KEY_metainfo, b64.constData(), b64.size() ); break;
         default: std::cerr << "Unhandled AddData type: " << addMe.type << std::endl;
     }
     exec( &top );
@@ -967,11 +971,11 @@ Session :: addNewlyCreatedTorrent( const QString& filename, const QString& local
 
     tr_variant top, *args;
     tr_variantInitDict( &top, 2 );
-    tr_variantDictAddStr( &top, "method", "torrent-add" );
-    args = tr_variantDictAddDict( &top, "arguments", 3 );
-    tr_variantDictAddStr( args, "download-dir", qPrintable(localPath) );
-    tr_variantDictAddBool( args, "paused", !myPrefs.getBool( Prefs::START ) );
-    tr_variantDictAddRaw( args, "metainfo", b64.constData(), b64.size() );
+    tr_variantDictAddStr( &top, TR_KEY_method, "torrent-add" );
+    args = tr_variantDictAddDict( &top, TR_KEY_arguments, 3 );
+    tr_variantDictAddStr( args, TR_KEY_download_dir, qPrintable(localPath) );
+    tr_variantDictAddBool( args, TR_KEY_paused, !myPrefs.getBool( Prefs::START ) );
+    tr_variantDictAddRaw( args, TR_KEY_metainfo, b64.constData(), b64.size() );
     exec( &top );
     tr_variantFree( &top );
 }
@@ -983,10 +987,10 @@ Session :: removeTorrents( const QSet<int>& ids, bool deleteFiles )
     {
         tr_variant top, *args;
         tr_variantInitDict( &top, 2 );
-        tr_variantDictAddStr( &top, "method", "torrent-remove" );
-        args = tr_variantDictAddDict( &top, "arguments", 2 );
+        tr_variantDictAddStr( &top, TR_KEY_method, "torrent-remove" );
+        args = tr_variantDictAddDict( &top, TR_KEY_arguments, 2 );
         addOptionalIds( args, ids );
-        tr_variantDictAddInt( args, "delete-local-data", deleteFiles );
+        tr_variantDictAddInt( args, TR_KEY_delete_local_data, deleteFiles );
         exec( &top );
         tr_variantFree( &top );
     }
@@ -999,8 +1003,8 @@ Session :: verifyTorrents( const QSet<int>& ids )
     {
         tr_variant top, *args;
         tr_variantInitDict( &top, 2 );
-        tr_variantDictAddStr( &top, "method", "torrent-verify" );
-        args = tr_variantDictAddDict( &top, "arguments", 1 );
+        tr_variantDictAddStr( &top, TR_KEY_method, "torrent-verify" );
+        args = tr_variantDictAddDict( &top, TR_KEY_arguments, 1 );
         addOptionalIds( args, ids );
         exec( &top );
         tr_variantFree( &top );
@@ -1014,8 +1018,8 @@ Session :: reannounceTorrents( const QSet<int>& ids )
     {
         tr_variant top, *args;
         tr_variantInitDict( &top, 2 );
-        tr_variantDictAddStr( &top, "method", "torrent-reannounce" );
-        args = tr_variantDictAddDict( &top, "arguments", 1 );
+        tr_variantDictAddStr( &top, TR_KEY_method, "torrent-reannounce" );
+        args = tr_variantDictAddDict( &top, TR_KEY_arguments, 1 );
         addOptionalIds( args, ids );
         exec( &top );
         tr_variantFree( &top );

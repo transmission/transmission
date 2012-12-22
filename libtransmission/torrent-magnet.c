@@ -115,7 +115,7 @@ findInfoDictOffset (const tr_torrent * tor)
         {
             tr_variant * infoDict;
 
-            if (tr_variantDictFindDict (&top, "info", &infoDict))
+            if (tr_variantDictFindDict (&top, TR_KEY_info, &infoDict))
             {
                 int infoLen;
                 char * infoContents = tr_variantToStr (infoDict, TR_VARIANT_FMT_BENC, &infoLen);
@@ -265,7 +265,7 @@ tr_torrentSetMetadataPiece (tr_torrent  * tor, int piece, const void  * data, in
                     tr_torrentRemoveResume (tor);
 
                     dbgmsg (tor, "Saving completed metadata to \"%s\"", path);
-                    tr_variantMergeDicts (tr_variantDictAddDict (&newMetainfo, "info", 0), &infoDict);
+                    tr_variantMergeDicts (tr_variantDictAddDict (&newMetainfo, TR_KEY_info, 0), &infoDict);
 
                     memset (&info, 0, sizeof (tr_info));
                     success = tr_metainfoParse (tor->session, &newMetainfo, &info, &hasInfo, &infoDictLength);

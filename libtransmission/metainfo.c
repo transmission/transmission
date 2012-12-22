@@ -131,14 +131,14 @@ parseFiles (tr_info * inf, tr_variant * files, const tr_variant * length)
           if (!tr_variantIsDict (file))
             return "files";
 
-          if (!tr_variantDictFindList (file, "path.utf-8", &path))
-            if (!tr_variantDictFindList (file, "path", &path))
+          if (!tr_variantDictFindList (file, TR_KEY_path_utf_8, &path))
+            if (!tr_variantDictFindList (file, TR_KEY_path, &path))
               return "path";
 
           if (!getfile (&inf->files[i].name, inf->name, path, buf))
             return "path";
 
-          if (!tr_variantDictFindInt (file, "length", &len))
+          if (!tr_variantDictFindInt (file, TR_KEY_length, &len))
             return "length";
 
           inf->files[i].length = len;
@@ -212,7 +212,7 @@ getannounce (tr_info * inf, tr_variant * meta)
   tr_variant * tiers;
 
   /* Announce-list */
-  if (tr_variantDictFindList (meta, "announce-list", &tiers))
+  if (tr_variantDictFindList (meta, TR_KEY_announce_list, &tiers))
     {
       int n;
       int i, j, validTiers;
@@ -265,7 +265,7 @@ getannounce (tr_info * inf, tr_variant * meta)
     }
 
   /* Regular announce value */
-  if (!trackerCount && tr_variantDictFindStr (meta, "announce", &str, &len))
+  if (!trackerCount && tr_variantDictFindStr (meta, TR_KEY_announce, &str, &len))
     {
       char * url = tr_strstrip (tr_strndup (str, len));
       if (!tr_urlIsValidTracker (url))
@@ -330,7 +330,7 @@ geturllist (tr_info * inf, tr_variant * meta)
   tr_variant * urls;
   const char * url;
 
-  if (tr_variantDictFindList (meta, "url-list", &urls))
+  if (tr_variantDictFindList (meta, TR_KEY_url_list, &urls))
     {
       int i;
       const int n = tr_variantListSize (urls);
@@ -349,7 +349,7 @@ geturllist (tr_info * inf, tr_variant * meta)
             }
         }
     }
-  else if (tr_variantDictFindStr (meta, "url-list", &url, NULL)) /* handle single items in webseeds */
+  else if (tr_variantDictFindStr (meta, TR_KEY_url_list, &url, NULL)) /* handle single items in webseeds */
     {
       char * fixed_url = fix_webseed_url (inf, url);
 
@@ -382,19 +382,19 @@ tr_metainfoParseImpl (const tr_session  * session,
   /* info_hash: urlencoded 20-byte SHA1 hash of the value of the info key
    * from the Metainfo file. Note that the value will be a bencoded
    * dictionary, given the definition of the info key above. */
-  b = tr_variantDictFindDict (meta, "info", &infoDict);
+  b = tr_variantDictFindDict (meta, TR_KEY_info, &infoDict);
   if (hasInfoDict != NULL)
     *hasInfoDict = b;
 
   if (!b)
     {
       /* no info dictionary... is this a magnet link? */
-      if (tr_variantDictFindDict (meta, "magnet-info", &d))
+      if (tr_variantDictFindDict (meta, TR_KEY_magnet_info, &d))
         {
           isMagnet = true;
 
           /* get the info-hash */
-          if (!tr_variantDictFindRaw (d, "info_hash", &raw, &len))
+          if (!tr_variantDictFindRaw (d, TR_KEY_info_hash, &raw, &len))
             return "info_hash";
           if (len != SHA_DIGEST_LENGTH)
             return "info_hash";
@@ -402,7 +402,7 @@ tr_metainfoParseImpl (const tr_session  * session,
           tr_sha1_to_hex (inf->hashString, inf->hash);
 
           /* maybe get the display name */
-          if (tr_variantDictFindStr (d, "display-name", &str, &len))
+          if (tr_variantDictFindStr (d, TR_KEY_display_name, &str, &len))
             {
               tr_free (inf->name);
               inf->name = tr_strndup (str, len);
@@ -433,8 +433,8 @@ tr_metainfoParseImpl (const tr_session  * session,
   if (!isMagnet)
     {
       len = 0;
-      if (!tr_variantDictFindStr (infoDict, "name.utf-8", &str, &len))
-        if (!tr_variantDictFindStr (infoDict, "name", &str, &len))
+      if (!tr_variantDictFindStr (infoDict, TR_KEY_name_utf_8, &str, &len))
+        if (!tr_variantDictFindStr (infoDict, TR_KEY_name, &str, &len))
           str = "";
       if (!str || !*str)
         return "name";
@@ -444,35 +444,35 @@ tr_metainfoParseImpl (const tr_session  * session,
 
   /* comment */
   len = 0;
-  if (!tr_variantDictFindStr (meta, "comment.utf-8", &str, &len))
-    if (!tr_variantDictFindStr (meta, "comment", &str, &len))
+  if (!tr_variantDictFindStr (meta, TR_KEY_comment_utf_8, &str, &len))
+    if (!tr_variantDictFindStr (meta, TR_KEY_comment, &str, &len))
       str = "";
   tr_free (inf->comment);
   inf->comment = tr_utf8clean (str, len);
 
   /* created by */
   len = 0;
-  if (!tr_variantDictFindStr (meta, "created by.utf-8", &str, &len))
-    if (!tr_variantDictFindStr (meta, "created by", &str, &len))
+  if (!tr_variantDictFindStr (meta, TR_KEY_created_by_utf_8, &str, &len))
+    if (!tr_variantDictFindStr (meta, TR_KEY_created_by, &str, &len))
       str = "";
   tr_free (inf->creator);
   inf->creator = tr_utf8clean (str, len);
 
   /* creation date */
-  if (!tr_variantDictFindInt (meta, "creation date", &i))
+  if (!tr_variantDictFindInt (meta, TR_KEY_creation_date, &i))
     i = 0;
   inf->dateCreated = i;
 
   /* private */
-  if (!tr_variantDictFindInt (infoDict, "private", &i))
-    if (!tr_variantDictFindInt (meta, "private", &i))
+  if (!tr_variantDictFindInt (infoDict, TR_KEY_private, &i))
+    if (!tr_variantDictFindInt (meta, TR_KEY_private, &i))
       i = 0;
   inf->isPrivate = i != 0;
 
   /* piece length */
   if (!isMagnet)
     {
-      if (!tr_variantDictFindInt (infoDict, "piece length", &i) || (i < 1))
+      if (!tr_variantDictFindInt (infoDict, TR_KEY_piece_length, &i) || (i < 1))
         return "piece length";
       inf->pieceSize = i;
     }
@@ -480,7 +480,7 @@ tr_metainfoParseImpl (const tr_session  * session,
   /* pieces */
   if (!isMagnet)
     {
-      if (!tr_variantDictFindRaw (infoDict, "pieces", &raw, &len))
+      if (!tr_variantDictFindRaw (infoDict, TR_KEY_pieces, &raw, &len))
         return "pieces";
       if (len % SHA_DIGEST_LENGTH)
         return "pieces";
@@ -494,8 +494,8 @@ tr_metainfoParseImpl (const tr_session  * session,
   /* files */
   if (!isMagnet)
     {
-      if ((str = parseFiles (inf, tr_variantDictFind (infoDict, "files"),
-                                  tr_variantDictFind (infoDict, "length"))))
+      if ((str = parseFiles (inf, tr_variantDictFind (infoDict, TR_KEY_files),
+                                  tr_variantDictFind (infoDict, TR_KEY_length))))
         return str;
 
       if (!inf->fileCount || !inf->totalSize)

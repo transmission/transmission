@@ -220,11 +220,11 @@ tr_magnetCreateMetainfo (const tr_magnet_info * info, tr_variant * top)
   /* announce list */
   if (info->trackerCount == 1)
     {
-      tr_variantDictAddStr (top, "announce", info->trackers[0]);
+      tr_variantDictAddStr (top, TR_KEY_announce, info->trackers[0]);
     }
   else
     {
-      tr_variant * trackers = tr_variantDictAddList (top, "announce-list", info->trackerCount);
+      tr_variant * trackers = tr_variantDictAddList (top, TR_KEY_announce_list, info->trackerCount);
       for (i=0; i<info->trackerCount; ++i)
         tr_variantListAddStr (tr_variantListAddList (trackers, 1), info->trackers[i]);
     }
@@ -232,16 +232,16 @@ tr_magnetCreateMetainfo (const tr_magnet_info * info, tr_variant * top)
   /* webseeds */
   if (info->webseedCount > 0)
     {
-      tr_variant * urls = tr_variantDictAddList (top, "url-list", info->webseedCount);
+      tr_variant * urls = tr_variantDictAddList (top, TR_KEY_url_list, info->webseedCount);
       for (i=0; i<info->webseedCount; ++i)
         tr_variantListAddStr (urls, info->webseeds[i]);
     }
 
   /* nonstandard keys */
-  d = tr_variantDictAddDict (top, "magnet-info", 2);
-  tr_variantDictAddRaw (d, "info_hash", info->hash, 20);
+  d = tr_variantDictAddDict (top, TR_KEY_magnet_info, 2);
+  tr_variantDictAddRaw (d, TR_KEY_info_hash, info->hash, 20);
   if (info->displayName != NULL)
-    tr_variantDictAddStr (d, "display-name", info->displayName);
+    tr_variantDictAddStr (d, TR_KEY_display_name, info->displayName);
 }
 
 

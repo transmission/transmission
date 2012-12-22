@@ -137,11 +137,11 @@ listToPex (tr_variant * peerList, size_t * setme_len)
 
         if (peer == NULL)
             continue;
-        if (!tr_variantDictFindStr (peer, "ip", &ip, NULL))
+        if (!tr_variantDictFindStr (peer, TR_KEY_ip, &ip, NULL))
             continue;
         if (!tr_address_from_string (&addr, ip))
             continue;
-        if (!tr_variantDictFindInt (peer, "port", &port))
+        if (!tr_variantDictFindInt (peer, TR_KEY_port, &port))
             continue;
         if ((port < 0) || (port > USHRT_MAX))
             continue;
@@ -233,41 +233,41 @@ on_announce_done (tr_session   * session,
             const char * str;
             const uint8_t * raw;
 
-            if (tr_variantDictFindStr (&benc, "failure reason", &str, &len))
+            if (tr_variantDictFindStr (&benc, TR_KEY_failure_reason, &str, &len))
                 response->errmsg = tr_strndup (str, len);
 
-            if (tr_variantDictFindStr (&benc, "warning message", &str, &len))
+            if (tr_variantDictFindStr (&benc, TR_KEY_warning_message, &str, &len))
                 response->warning = tr_strndup (str, len);
 
-            if (tr_variantDictFindInt (&benc, "interval", &i))
+            if (tr_variantDictFindInt (&benc, TR_KEY_interval, &i))
                 response->interval = i;
 
-            if (tr_variantDictFindInt (&benc, "min interval", &i))
+            if (tr_variantDictFindInt (&benc, TR_KEY_min_interval, &i))
                 response->min_interval = i;
 
-            if (tr_variantDictFindStr (&benc, "tracker id", &str, &len))
+            if (tr_variantDictFindStr (&benc, TR_KEY_tracker_id, &str, &len))
                 response->tracker_id_str = tr_strndup (str, len);
 
-            if (tr_variantDictFindInt (&benc, "complete", &i))
+            if (tr_variantDictFindInt (&benc, TR_KEY_complete, &i))
                 response->seeders = i;
 
-            if (tr_variantDictFindInt (&benc, "incomplete", &i))
+            if (tr_variantDictFindInt (&benc, TR_KEY_incomplete, &i))
                 response->leechers = i;
 
-            if (tr_variantDictFindInt (&benc, "downloaded", &i))
+            if (tr_variantDictFindInt (&benc, TR_KEY_downloaded, &i))
                 response->downloads = i;
 
-            if (tr_variantDictFindRaw (&benc, "peers6", &raw, &len)) {
+            if (tr_variantDictFindRaw (&benc, TR_KEY_peers6, &raw, &len)) {
                 dbgmsg (data->log_name, "got a peers6 length of %zu", len);
                 response->pex6 = tr_peerMgrCompact6ToPex (raw, len,
                                               NULL, 0, &response->pex6_count);
             }
 
-            if (tr_variantDictFindRaw (&benc, "peers", &raw, &len)) {
+            if (tr_variantDictFindRaw (&benc, TR_KEY_peers, &raw, &len)) {
                 dbgmsg (data->log_name, "got a compact peers length of %zu", len);
                 response->pex = tr_peerMgrCompactToPex (raw, len,
                                                NULL, 0, &response->pex_count);
-            } else if (tr_variantDictFindList (&benc, "peers", &tmp)) {
+            } else if (tr_variantDictFindList (&benc, TR_KEY_peers, &tmp)) {
                 response->pex = listToPex (tmp, &response->pex_count);
                 dbgmsg (data->log_name, "got a peers list with %zu entries",
                         response->pex_count);
@@ -382,22 +382,22 @@ on_scrape_done (tr_session   * session,
 
         if (variant_loaded)
         {
-            if (tr_variantDictFindStr (&top, "failure reason", &str, &len))
+            if (tr_variantDictFindStr (&top, TR_KEY_failure_reason, &str, &len))
                 response->errmsg = tr_strndup (str, len);
 
-            if (tr_variantDictFindDict (&top, "flags", &flags))
-                if (tr_variantDictFindInt (flags, "min_request_interval", &intVal))
+            if (tr_variantDictFindDict (&top, TR_KEY_flags, &flags))
+                if (tr_variantDictFindInt (flags, TR_KEY_min_request_interval, &intVal))
                     response->min_request_interval = intVal;
 
-            if (tr_variantDictFindDict (&top, "files", &files))
+            if (tr_variantDictFindDict (&top, TR_KEY_files, &files))
             {
                 int i = 0;
 
                 for (;;)
                 {
                     int j;
+                    tr_quark key;
                     tr_variant * val;
-                    const char * key;
 
                     /* get the next "file" */
                     if (!tr_variantDictChild (files, i++, &key, &val))
@@ -407,15 +407,15 @@ on_scrape_done (tr_session   * session,
                     for (j=0; j<response->row_count; ++j)
                     {
                         struct tr_scrape_response_row * row = &response->rows[j];
-                        if (!memcmp (key, row->info_hash, SHA_DIGEST_LENGTH))
+                        if (!memcmp (tr_quark_get_string(key,NULL), row->info_hash, SHA_DIGEST_LENGTH))
                         {
-                            if (tr_variantDictFindInt (val, "complete", &intVal))
+                            if (tr_variantDictFindInt (val, TR_KEY_complete, &intVal))
                                 row->seeders = intVal;
-                            if (tr_variantDictFindInt (val, "incomplete", &intVal))
+                            if (tr_variantDictFindInt (val, TR_KEY_incomplete, &intVal))
                                 row->leechers = intVal;
-                            if (tr_variantDictFindInt (val, "downloaded", &intVal))
+                            if (tr_variantDictFindInt (val, TR_KEY_downloaded, &intVal))
                                 row->downloads = intVal;
-                            if (tr_variantDictFindInt (val, "downloaders", &intVal))
+                            if (tr_variantDictFindInt (val, TR_KEY_downloaders, &intVal))
                                 row->downloaders = intVal;
                             break;
                         }

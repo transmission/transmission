@@ -25,50 +25,6 @@
 #include "utils.h" /* tr_buildPath */
 #include "variant.h"
 
-#define KEY_ACTIVITY_DATE       "activity-date"
-#define KEY_ADDED_DATE          "added-date"
-#define KEY_CORRUPT             "corrupt"
-#define KEY_DONE_DATE           "done-date"
-#define KEY_DOWNLOAD_DIR        "destination"
-#define KEY_DND                 "dnd"
-#define KEY_DOWNLOADED          "downloaded"
-#define KEY_INCOMPLETE_DIR      "incomplete-dir"
-#define KEY_MAX_PEERS           "max-peers"
-#define KEY_PAUSED              "paused"
-#define KEY_PEERS               "peers2"
-#define KEY_PEERS6              "peers2-6"
-#define KEY_FILE_PRIORITIES     "priority"
-#define KEY_BANDWIDTH_PRIORITY  "bandwidth-priority"
-#define KEY_PROGRESS            "progress"
-#define KEY_SPEEDLIMIT_OLD      "speed-limit"
-#define KEY_SPEEDLIMIT_UP       "speed-limit-up"
-#define KEY_SPEEDLIMIT_DOWN     "speed-limit-down"
-#define KEY_RATIOLIMIT          "ratio-limit"
-#define KEY_IDLELIMIT           "idle-limit"
-#define KEY_UPLOADED            "uploaded"
-
-#define KEY_SPEED_KiBps            "speed"
-#define KEY_SPEED_Bps              "speed-Bps"
-#define KEY_USE_GLOBAL_SPEED_LIMIT "use-global-speed-limit"
-#define KEY_USE_SPEED_LIMIT        "use-speed-limit"
-#define KEY_TIME_SEEDING           "seeding-time-seconds"
-#define KEY_TIME_DOWNLOADING       "downloading-time-seconds"
-#define KEY_SPEEDLIMIT_DOWN_SPEED  "down-speed"
-#define KEY_SPEEDLIMIT_DOWN_MODE   "down-mode"
-#define KEY_SPEEDLIMIT_UP_SPEED    "up-speed"
-#define KEY_SPEEDLIMIT_UP_MODE     "up-mode"
-#define KEY_RATIOLIMIT_RATIO       "ratio-limit"
-#define KEY_RATIOLIMIT_MODE        "ratio-mode"
-#define KEY_IDLELIMIT_MINS         "idle-limit"
-#define KEY_IDLELIMIT_MODE         "idle-mode"
-
-#define KEY_PROGRESS_CHECKTIME "time-checked"
-#define KEY_PROGRESS_MTIMES    "mtimes"
-#define KEY_PROGRESS_BITFIELD  "bitfield"
-#define KEY_PROGRESS_BLOCKS    "blocks"
-#define KEY_PROGRESS_BLOCKS_STRLEN 6
-#define KEY_PROGRESS_HAVE      "have"
-
 enum
 {
     MAX_REMEMBERED_PEERS = 200
@@ -96,12 +52,12 @@ savePeers (tr_variant * dict, const tr_torrent * tor)
 
     count = tr_peerMgrGetPeers ((tr_torrent*) tor, &pex, TR_AF_INET, TR_PEERS_INTERESTING, MAX_REMEMBERED_PEERS);
     if (count > 0)
-        tr_variantDictAddRaw (dict, KEY_PEERS, pex, sizeof (tr_pex) * count);
+        tr_variantDictAddRaw (dict, TR_KEY_peers2, pex, sizeof (tr_pex) * count);
     tr_free (pex);
 
     count = tr_peerMgrGetPeers ((tr_torrent*) tor, &pex, TR_AF_INET6, TR_PEERS_INTERESTING, MAX_REMEMBERED_PEERS);
     if (count > 0)
-        tr_variantDictAddRaw (dict, KEY_PEERS6, pex, sizeof (tr_pex) * count);
+        tr_variantDictAddRaw (dict, TR_KEY_peers2_6, pex, sizeof (tr_pex) * count);
 
     tr_free (pex);
 }
@@ -135,14 +91,14 @@ loadPeers (tr_variant * dict, tr_torrent * tor)
     const uint8_t * str;
     size_t          len;
 
-    if (tr_variantDictFindRaw (dict, KEY_PEERS, &str, &len))
+    if (tr_variantDictFindRaw (dict, TR_KEY_peers, &str, &len))
     {
         const int numAdded = addPeers (tor, str, len);
         tr_tordbg (tor, "Loaded %d IPv4 peers from resume file", numAdded);
         ret = TR_FR_PEERS;
     }
 
-    if (tr_variantDictFindRaw (dict, KEY_PEERS6, &str, &len))
+    if (tr_variantDictFindRaw (dict, TR_KEY_peers6, &str, &len))
     {
         const int numAdded = addPeers (tor, str, len);
         tr_tordbg (tor, "Loaded %d IPv6 peers from resume file", numAdded);
@@ -164,7 +120,7 @@ saveDND (tr_variant * dict, const tr_torrent * tor)
     const tr_info * const inf = tr_torrentInfo (tor);
     const tr_file_index_t n = inf->fileCount;
 
-    list = tr_variantDictAddList (dict, KEY_DND, n);
+    list = tr_variantDictAddList (dict, TR_KEY_dnd, n);
     for (i=0; i<n; ++i)
         tr_variantListAddInt (list, inf->files[i].dnd ? 1 : 0);
 }
@@ -176,7 +132,7 @@ loadDND (tr_variant * dict, tr_torrent * tor)
     tr_variant * list = NULL;
     const tr_file_index_t n = tor->info.fileCount;
 
-    if (tr_variantDictFindList (dict, KEY_DND, &list)
+    if (tr_variantDictFindList (dict, TR_KEY_dnd, &list)
       && (tr_variantListSize (list) == n))
     {
         int64_t           tmp;
@@ -233,7 +189,7 @@ saveFilePriorities (tr_variant * dict, const tr_torrent * tor)
     const tr_info * const inf = tr_torrentInfo (tor);
     const tr_file_index_t n = inf->fileCount;
 
-    list = tr_variantDictAddList (dict, KEY_FILE_PRIORITIES, n);
+    list = tr_variantDictAddList (dict, TR_KEY_priority, n);
     for (i = 0; i < n; ++i)
         tr_variantListAddInt (list, inf->files[i].priority);
 }
@@ -245,7 +201,7 @@ loadFilePriorities (tr_variant * dict, tr_torrent * tor)
     uint64_t ret = 0;
     const tr_file_index_t n = tor->info.fileCount;
 
-    if (tr_variantDictFindList (dict, KEY_FILE_PRIORITIES, &list)
+    if (tr_variantDictFindList (dict, TR_KEY_priority, &list)
       && (tr_variantListSize (list) == n))
     {
         int64_t priority;
@@ -267,32 +223,32 @@ static void
 saveSingleSpeedLimit (tr_variant * d, tr_torrent * tor, tr_direction dir)
 {
     tr_variantDictReserve (d, 3);
-    tr_variantDictAddInt (d, KEY_SPEED_Bps, tr_torrentGetSpeedLimit_Bps (tor, dir));
-    tr_variantDictAddBool (d, KEY_USE_GLOBAL_SPEED_LIMIT, tr_torrentUsesSessionLimits (tor));
-    tr_variantDictAddBool (d, KEY_USE_SPEED_LIMIT, tr_torrentUsesSpeedLimit (tor, dir));
+    tr_variantDictAddInt (d, TR_KEY_speed_Bps, tr_torrentGetSpeedLimit_Bps (tor, dir));
+    tr_variantDictAddBool (d, TR_KEY_use_global_speed_limit, tr_torrentUsesSessionLimits (tor));
+    tr_variantDictAddBool (d, TR_KEY_use_speed_limit, tr_torrentUsesSpeedLimit (tor, dir));
 }
 
 static void
 saveSpeedLimits (tr_variant * dict, tr_torrent * tor)
 {
-    saveSingleSpeedLimit (tr_variantDictAddDict (dict, KEY_SPEEDLIMIT_DOWN, 0), tor, TR_DOWN);
-    saveSingleSpeedLimit (tr_variantDictAddDict (dict, KEY_SPEEDLIMIT_UP, 0), tor, TR_UP);
+    saveSingleSpeedLimit (tr_variantDictAddDict (dict, TR_KEY_speed_limit_down, 0), tor, TR_DOWN);
+    saveSingleSpeedLimit (tr_variantDictAddDict (dict, TR_KEY_speed_limit_up, 0), tor, TR_UP);
 }
 
 static void
 saveRatioLimits (tr_variant * dict, tr_torrent * tor)
 {
-    tr_variant * d = tr_variantDictAddDict (dict, KEY_RATIOLIMIT, 2);
-    tr_variantDictAddReal (d, KEY_RATIOLIMIT_RATIO, tr_torrentGetRatioLimit (tor));
-    tr_variantDictAddInt (d, KEY_RATIOLIMIT_MODE, tr_torrentGetRatioMode (tor));
+    tr_variant * d = tr_variantDictAddDict (dict, TR_KEY_ratio_limit, 2);
+    tr_variantDictAddReal (d, TR_KEY_ratio_limit, tr_torrentGetRatioLimit (tor));
+    tr_variantDictAddInt (d, TR_KEY_ratio_mode, tr_torrentGetRatioMode (tor));
 }
 
 static void
 saveIdleLimits (tr_variant * dict, tr_torrent * tor)
 {
-    tr_variant * d = tr_variantDictAddDict (dict, KEY_IDLELIMIT, 2);
-    tr_variantDictAddInt (d, KEY_IDLELIMIT_MINS, tr_torrentGetIdleLimit (tor));
-    tr_variantDictAddInt (d, KEY_IDLELIMIT_MODE, tr_torrentGetIdleMode (tor));
+    tr_variant * d = tr_variantDictAddDict (dict, TR_KEY_idle_limit, 2);
+    tr_variantDictAddInt (d, TR_KEY_idle_limit, tr_torrentGetIdleLimit (tor));
+    tr_variantDictAddInt (d, TR_KEY_idle_mode, tr_torrentGetIdleMode (tor));
 }
 
 static void
@@ -301,15 +257,15 @@ loadSingleSpeedLimit (tr_variant * d, tr_direction dir, tr_torrent * tor)
     int64_t i;
     bool boolVal;
 
-    if (tr_variantDictFindInt (d, KEY_SPEED_Bps, &i))
+    if (tr_variantDictFindInt (d, TR_KEY_speed_Bps, &i))
         tr_torrentSetSpeedLimit_Bps (tor, dir, i);
-    else if (tr_variantDictFindInt (d, KEY_SPEED_KiBps, &i))
+    else if (tr_variantDictFindInt (d, TR_KEY_speed, &i))
         tr_torrentSetSpeedLimit_Bps (tor, dir, i*1024);
 
-    if (tr_variantDictFindBool (d, KEY_USE_SPEED_LIMIT, &boolVal))
+    if (tr_variantDictFindBool (d, TR_KEY_use_speed_limit, &boolVal))
         tr_torrentUseSpeedLimit (tor, dir, boolVal);
 
-    if (tr_variantDictFindBool (d, KEY_USE_GLOBAL_SPEED_LIMIT, &boolVal))
+    if (tr_variantDictFindBool (d, TR_KEY_use_global_speed_limit, &boolVal))
         tr_torrentUseSessionLimits (tor, boolVal);
 }
 
@@ -326,34 +282,14 @@ loadSpeedLimits (tr_variant * dict, tr_torrent * tor)
     uint64_t ret = 0;
 
 
-    if (tr_variantDictFindDict (dict, KEY_SPEEDLIMIT_UP, &d))
+    if (tr_variantDictFindDict (dict, TR_KEY_speed_limit_up, &d))
     {
         loadSingleSpeedLimit (d, TR_UP, tor);
         ret = TR_FR_SPEEDLIMIT;
     }
-    if (tr_variantDictFindDict (dict, KEY_SPEEDLIMIT_DOWN, &d))
+    if (tr_variantDictFindDict (dict, TR_KEY_speed_limit_down, &d))
     {
         loadSingleSpeedLimit (d, TR_DOWN, tor);
-        ret = TR_FR_SPEEDLIMIT;
-    }
-
-    /* older speedlimit structure */
-    if (!ret && tr_variantDictFindDict (dict, KEY_SPEEDLIMIT_OLD, &d))
-    {
-
-        int64_t i;
-        if (tr_variantDictFindInt (d, KEY_SPEEDLIMIT_DOWN_SPEED, &i))
-            tr_torrentSetSpeedLimit_Bps (tor, TR_DOWN, i*1024);
-        if (tr_variantDictFindInt (d, KEY_SPEEDLIMIT_DOWN_MODE, &i)) {
-            tr_torrentUseSpeedLimit (tor, TR_DOWN, i==TR_SPEEDLIMIT_SINGLE);
-            tr_torrentUseSessionLimits (tor, i==TR_SPEEDLIMIT_GLOBAL);
-         }
-        if (tr_variantDictFindInt (d, KEY_SPEEDLIMIT_UP_SPEED, &i))
-            tr_torrentSetSpeedLimit_Bps (tor, TR_UP, i*1024);
-        if (tr_variantDictFindInt (d, KEY_SPEEDLIMIT_UP_MODE, &i)) {
-            tr_torrentUseSpeedLimit (tor, TR_UP, i==TR_SPEEDLIMIT_SINGLE);
-            tr_torrentUseSessionLimits (tor, i==TR_SPEEDLIMIT_GLOBAL);
-        }
         ret = TR_FR_SPEEDLIMIT;
     }
 
@@ -366,13 +302,13 @@ loadRatioLimits (tr_variant * dict, tr_torrent * tor)
     tr_variant * d;
     uint64_t ret = 0;
 
-    if (tr_variantDictFindDict (dict, KEY_RATIOLIMIT, &d))
+    if (tr_variantDictFindDict (dict, TR_KEY_ratio_limit, &d))
     {
         int64_t i;
         double dratio;
-        if (tr_variantDictFindReal (d, KEY_RATIOLIMIT_RATIO, &dratio))
+        if (tr_variantDictFindReal (d, TR_KEY_ratio_limit, &dratio))
             tr_torrentSetRatioLimit (tor, dratio);
-        if (tr_variantDictFindInt (d, KEY_RATIOLIMIT_MODE, &i))
+        if (tr_variantDictFindInt (d, TR_KEY_ratio_mode, &i))
             tr_torrentSetRatioMode (tor, i);
       ret = TR_FR_RATIOLIMIT;
     }
@@ -386,13 +322,13 @@ loadIdleLimits (tr_variant * dict, tr_torrent * tor)
     tr_variant * d;
     uint64_t ret = 0;
 
-    if (tr_variantDictFindDict (dict, KEY_IDLELIMIT, &d))
+    if (tr_variantDictFindDict (dict, TR_KEY_idle_limit, &d))
     {
         int64_t i;
         int64_t imin;
-        if (tr_variantDictFindInt (d, KEY_IDLELIMIT_MINS, &imin))
+        if (tr_variantDictFindInt (d, TR_KEY_idle_limit, &imin))
             tr_torrentSetIdleLimit (tor, imin);
-        if (tr_variantDictFindInt (d, KEY_IDLELIMIT_MODE, &i))
+        if (tr_variantDictFindInt (d, TR_KEY_idle_mode, &i))
             tr_torrentSetIdleMode (tor, i);
       ret = TR_FR_IDLELIMIT;
     }
@@ -428,10 +364,10 @@ saveProgress (tr_variant * dict, tr_torrent * tor)
     const tr_info * inf = tr_torrentInfo (tor);
     const time_t now = tr_time ();
 
-    prog = tr_variantDictAddDict (dict, KEY_PROGRESS, 3);
+    prog = tr_variantDictAddDict (dict, TR_KEY_progress, 3);
 
     /* add the file/piece check timestamps... */
-    l = tr_variantDictAddList (prog, KEY_PROGRESS_CHECKTIME, inf->fileCount);
+    l = tr_variantDictAddList (prog, TR_KEY_time_checked, inf->fileCount);
     for (fi=0; fi<inf->fileCount; ++fi)
     {
         const tr_piece * p;
@@ -477,11 +413,10 @@ saveProgress (tr_variant * dict, tr_torrent * tor)
 
     /* add the progress */
     if (tor->completeness == TR_SEED)
-        tr_variantDictAddStr (prog, KEY_PROGRESS_HAVE, "all");
+        tr_variantDictAddStr (prog, TR_KEY_have, "all");
 
     /* add the blocks bitfield */
-    bitfieldToBenc (&tor->completion.blockBitfield,
-                    tr_variantDictAdd (prog, KEY_PROGRESS_BLOCKS, KEY_PROGRESS_BLOCKS_STRLEN));
+    bitfieldToBenc (&tor->completion.blockBitfield, tr_variantDictAdd (prog, TR_KEY_blocks));
 }
 
 static uint64_t
@@ -495,7 +430,7 @@ loadProgress (tr_variant * dict, tr_torrent * tor)
     for (i=0, n=inf->pieceCount; i<n; ++i)
         inf->pieces[i].timeChecked = 0;
 
-    if (tr_variantDictFindDict (dict, KEY_PROGRESS, &prog))
+    if (tr_variantDictFindDict (dict, TR_KEY_progress, &prog))
     {
         const char * err;
         const char * str;
@@ -505,7 +440,7 @@ loadProgress (tr_variant * dict, tr_torrent * tor)
         tr_variant * b;
         struct tr_bitfield blocks = TR_BITFIELD_INIT;
 
-        if (tr_variantDictFindList (prog, KEY_PROGRESS_CHECKTIME, &l))
+        if (tr_variantDictFindList (prog, TR_KEY_time_checked, &l))
         {
             /* per-piece timestamps were added in 2.20.
 
@@ -551,7 +486,7 @@ loadProgress (tr_variant * dict, tr_torrent * tor)
                 }
             }
         }
-        else if (tr_variantDictFindList (prog, KEY_PROGRESS_MTIMES, &l))
+        else if (tr_variantDictFindList (prog, TR_KEY_mtimes, &l))
         {
             tr_file_index_t fi;
 
@@ -580,7 +515,7 @@ loadProgress (tr_variant * dict, tr_torrent * tor)
         err = NULL;
         tr_bitfieldConstruct (&blocks, tor->blockCount);
 
-        if ((b = tr_variantDictFind (prog, KEY_PROGRESS_BLOCKS)))
+        if ((b = tr_variantDictFind (prog, TR_KEY_blocks)))
         {
             size_t buflen;
             const uint8_t * buf;
@@ -594,14 +529,14 @@ loadProgress (tr_variant * dict, tr_torrent * tor)
             else
                 tr_bitfieldSetRaw (&blocks, buf, buflen, true);
         }
-        else if (tr_variantDictFindStr (prog, KEY_PROGRESS_HAVE, &str, NULL))
+        else if (tr_variantDictFindStr (prog, TR_KEY_have, &str, NULL))
         {
             if (!strcmp (str, "all"))
                 tr_bitfieldSetHasAll (&blocks);
             else
                 err = "Invalid value for HAVE";
         }
-        else if (tr_variantDictFindRaw (prog, KEY_PROGRESS_BITFIELD, &raw, &rawlen))
+        else if (tr_variantDictFindRaw (prog, TR_KEY_bitfield, &raw, &rawlen))
         {
             tr_bitfieldSetRaw (&blocks, raw, rawlen, true);
         }
@@ -634,20 +569,20 @@ tr_torrentSaveResume (tr_torrent * tor)
         return;
 
     tr_variantInitDict (&top, 50); /* arbitrary "big enough" number */
-    tr_variantDictAddInt (&top, KEY_TIME_SEEDING, tor->secondsSeeding);
-    tr_variantDictAddInt (&top, KEY_TIME_DOWNLOADING, tor->secondsDownloading);
-    tr_variantDictAddInt (&top, KEY_ACTIVITY_DATE, tor->activityDate);
-    tr_variantDictAddInt (&top, KEY_ADDED_DATE, tor->addedDate);
-    tr_variantDictAddInt (&top, KEY_CORRUPT, tor->corruptPrev + tor->corruptCur);
-    tr_variantDictAddInt (&top, KEY_DONE_DATE, tor->doneDate);
-    tr_variantDictAddStr (&top, KEY_DOWNLOAD_DIR, tor->downloadDir);
+    tr_variantDictAddInt (&top, TR_KEY_seeding_time_seconds, tor->secondsSeeding);
+    tr_variantDictAddInt (&top, TR_KEY_downloading_time_seconds, tor->secondsDownloading);
+    tr_variantDictAddInt (&top, TR_KEY_activity_date, tor->activityDate);
+    tr_variantDictAddInt (&top, TR_KEY_added_date, tor->addedDate);
+    tr_variantDictAddInt (&top, TR_KEY_corrupt, tor->corruptPrev + tor->corruptCur);
+    tr_variantDictAddInt (&top, TR_KEY_done_date, tor->doneDate);
+    tr_variantDictAddStr (&top, TR_KEY_destination, tor->downloadDir);
     if (tor->incompleteDir != NULL)
-        tr_variantDictAddStr (&top, KEY_INCOMPLETE_DIR, tor->incompleteDir);
-    tr_variantDictAddInt (&top, KEY_DOWNLOADED, tor->downloadedPrev + tor->downloadedCur);
-    tr_variantDictAddInt (&top, KEY_UPLOADED, tor->uploadedPrev + tor->uploadedCur);
-    tr_variantDictAddInt (&top, KEY_MAX_PEERS, tor->maxConnectedPeers);
-    tr_variantDictAddInt (&top, KEY_BANDWIDTH_PRIORITY, tr_torrentGetPriority (tor));
-    tr_variantDictAddBool (&top, KEY_PAUSED, !tor->isRunning);
+        tr_variantDictAddStr (&top, TR_KEY_incomplete_dir, tor->incompleteDir);
+    tr_variantDictAddInt (&top, TR_KEY_downloaded, tor->downloadedPrev + tor->downloadedCur);
+    tr_variantDictAddInt (&top, TR_KEY_uploaded, tor->uploadedPrev + tor->uploadedCur);
+    tr_variantDictAddInt (&top, TR_KEY_max_peers, tor->maxConnectedPeers);
+    tr_variantDictAddInt (&top, TR_KEY_bandwidth_priority, tr_torrentGetPriority (tor));
+    tr_variantDictAddBool (&top, TR_KEY_paused, !tor->isRunning);
     savePeers (&top, tor);
     if (tr_torrentHasMetadata (tor))
     {
@@ -694,14 +629,14 @@ loadFromFile (tr_torrent * tor, uint64_t fieldsToLoad)
     tr_tordbg (tor, "Read resume file \"%s\"", filename);
 
     if ((fieldsToLoad & TR_FR_CORRUPT)
-      && tr_variantDictFindInt (&top, KEY_CORRUPT, &i))
+      && tr_variantDictFindInt (&top, TR_KEY_corrupt, &i))
     {
         tor->corruptPrev = i;
         fieldsLoaded |= TR_FR_CORRUPT;
     }
 
     if ((fieldsToLoad & (TR_FR_PROGRESS | TR_FR_DOWNLOAD_DIR))
-      && (tr_variantDictFindStr (&top, KEY_DOWNLOAD_DIR, &str, &len))
+      && (tr_variantDictFindStr (&top, TR_KEY_destination, &str, &len))
       && (str && *str))
     {
         tr_free (tor->downloadDir);
@@ -710,7 +645,7 @@ loadFromFile (tr_torrent * tor, uint64_t fieldsToLoad)
     }
 
     if ((fieldsToLoad & (TR_FR_PROGRESS | TR_FR_INCOMPLETE_DIR))
-      && (tr_variantDictFindStr (&top, KEY_INCOMPLETE_DIR, &str, &len))
+      && (tr_variantDictFindStr (&top, TR_KEY_incomplete_dir, &str, &len))
       && (str && *str))
     {
         tr_free (tor->incompleteDir);
@@ -719,70 +654,70 @@ loadFromFile (tr_torrent * tor, uint64_t fieldsToLoad)
     }
 
     if ((fieldsToLoad & TR_FR_DOWNLOADED)
-      && tr_variantDictFindInt (&top, KEY_DOWNLOADED, &i))
+      && tr_variantDictFindInt (&top, TR_KEY_downloaded, &i))
     {
         tor->downloadedPrev = i;
         fieldsLoaded |= TR_FR_DOWNLOADED;
     }
 
     if ((fieldsToLoad & TR_FR_UPLOADED)
-      && tr_variantDictFindInt (&top, KEY_UPLOADED, &i))
+      && tr_variantDictFindInt (&top, TR_KEY_uploaded, &i))
     {
         tor->uploadedPrev = i;
         fieldsLoaded |= TR_FR_UPLOADED;
     }
 
     if ((fieldsToLoad & TR_FR_MAX_PEERS)
-      && tr_variantDictFindInt (&top, KEY_MAX_PEERS, &i))
+      && tr_variantDictFindInt (&top, TR_KEY_max_peers, &i))
     {
         tor->maxConnectedPeers = i;
         fieldsLoaded |= TR_FR_MAX_PEERS;
     }
 
     if ((fieldsToLoad & TR_FR_RUN)
-      && tr_variantDictFindBool (&top, KEY_PAUSED, &boolVal))
+      && tr_variantDictFindBool (&top, TR_KEY_paused, &boolVal))
     {
         tor->isRunning = !boolVal;
         fieldsLoaded |= TR_FR_RUN;
     }
 
     if ((fieldsToLoad & TR_FR_ADDED_DATE)
-      && tr_variantDictFindInt (&top, KEY_ADDED_DATE, &i))
+      && tr_variantDictFindInt (&top, TR_KEY_added_date, &i))
     {
         tor->addedDate = i;
         fieldsLoaded |= TR_FR_ADDED_DATE;
     }
 
     if ((fieldsToLoad & TR_FR_DONE_DATE)
-      && tr_variantDictFindInt (&top, KEY_DONE_DATE, &i))
+      && tr_variantDictFindInt (&top, TR_KEY_done_date, &i))
     {
         tor->doneDate = i;
         fieldsLoaded |= TR_FR_DONE_DATE;
     }
 
     if ((fieldsToLoad & TR_FR_ACTIVITY_DATE)
-      && tr_variantDictFindInt (&top, KEY_ACTIVITY_DATE, &i))
+      && tr_variantDictFindInt (&top, TR_KEY_activity_date, &i))
     {
         tr_torrentSetActivityDate (tor, i);
         fieldsLoaded |= TR_FR_ACTIVITY_DATE;
     }
 
     if ((fieldsToLoad & TR_FR_TIME_SEEDING)
-      && tr_variantDictFindInt (&top, KEY_TIME_SEEDING, &i))
+      && tr_variantDictFindInt (&top, TR_KEY_seeding_time_seconds, &i))
     {
         tor->secondsSeeding = i;
         fieldsLoaded |= TR_FR_TIME_SEEDING;
     }
 
     if ((fieldsToLoad & TR_FR_TIME_DOWNLOADING)
-      && tr_variantDictFindInt (&top, KEY_TIME_DOWNLOADING, &i))
+      && tr_variantDictFindInt (&top, TR_KEY_downloading_time_seconds, &i))
     {
         tor->secondsDownloading = i;
         fieldsLoaded |= TR_FR_TIME_DOWNLOADING;
     }
 
     if ((fieldsToLoad & TR_FR_BANDWIDTH_PRIORITY)
-      && tr_variantDictFindInt (&top, KEY_BANDWIDTH_PRIORITY, &i)
+      && tr_variantDictFindInt (&top, TR_KEY_bandwidth_priority, &i)
       && tr_isPriority (i))
     {
         tr_torrentSetPriority (tor, i);

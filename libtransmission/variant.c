@@ -67,37 +67,133 @@ tr_variantInit (tr_variant * v, char type)
 ****
 ***/
 
-/* returns true if the variant's string was malloced.
- * this occurs when the string is too long for our string buffer */
-static inline int
-stringIsAlloced (const tr_variant * variant)
+/*
+zzz
+
+typedef enum
 {
-  return variant->val.s.len >= sizeof (variant->val.s.str.buf);
+  TR_STRING_TYPE_KEY,
+  TR_STRING_TYPE_HEAP,
+  TR_STRING_TYPE_BUF
+}
+tr_string_type;
+
+struct tr_variant_string
+{
+  tr_key key;
+  tr_string_type type;
+  size_t len;
+  union { char buf[8]; char * ptr; } str;
+};
+*/
+
+static const struct tr_variant_string STRING_INIT =
+{
+  .type = TR_STRING_TYPE_QUARK,
+  .quark = TR_KEY_NONE,
+  .len = 0,
+  .str.str = ""
+};
+
+static void
+tr_variant_string_clear (struct tr_variant_string * str)
+{
+  if (str->type == TR_STRING_TYPE_HEAP)
+    tr_free ((char*)(str->str.str));
+
+  *str = STRING_INIT;
 }
 
 /* returns a const pointer to the variant's string */
-static inline const char*
-getStr (const tr_variant* variant)
+static const char *
+tr_variant_string_get_string (const struct tr_variant_string * str)
 {
-  return stringIsAlloced (variant) ? variant->val.s.str.ptr
-                                   : variant->val.s.str.buf;
+  const char * ret;
+
+  switch (str->type)
+    {
+      case TR_STRING_TYPE_BUF: ret = str->str.buf; break;
+      case TR_STRING_TYPE_HEAP: ret = str->str.str; break;
+      case TR_STRING_TYPE_QUARK: ret = str->str.str; break;
+      default: ret = NULL;
+    }
+
+  return ret;
+}
+
+static void
+tr_variant_string_set_quark (struct tr_variant_string * str, const tr_quark quark)
+{
+  tr_variant_string_clear (str);
+
+  str->type = TR_STRING_TYPE_QUARK;
+  str->quark = quark;
+  str->str.str = tr_quark_get_string (quark, &str->len);
+}
+
+static void
+tr_variant_string_set_string (struct tr_variant_string * str, const char * bytes, int len)
+{
+  tr_quark quark;
+  tr_variant_string_clear (str);
+
+  if (bytes == NULL)
+    len = 0;
+  else if (len < 0)
+    len = strlen (bytes);
+
+  if (tr_quark_lookup (bytes, len, &quark))
+    {
+      str->type = TR_STRING_TYPE_QUARK;
+      str->quark = quark;
+      str->str.str = tr_quark_get_string (quark, &str->len);
+    }
+  else if ((size_t)len < sizeof(str->str.buf))
+    {
+      str->type = TR_STRING_TYPE_BUF;
+      memcpy (str->str.buf, bytes, len);
+      str->str.buf[len] = '\0';
+      str->len = len;
+    }
+  else
+    {
+      char * tmp = tr_new (char, len+1);
+      memcpy (tmp, bytes, len);
+      tmp[len] = '\0';
+      str->type = TR_STRING_TYPE_HEAP;
+      str->str.str = tmp;
+      str->len = len;
+    }
+}
+
+
+/***
+****
+***/
+
+static inline const char *
+getStr (const tr_variant * v)
+{
+  assert (tr_variantIsString (v));
+
+  return tr_variant_string_get_string (&v->val.s);
 }
 
 static int
-dictIndexOf (const tr_variant * dict, const char * key)
+dictIndexOf (const tr_variant * dict, const tr_quark key)
 {
   if (tr_variantIsDict (dict))
     {
       const tr_variant * walk;
       const tr_variant * const begin = dict->val.l.vals;
       const tr_variant * const end = begin + dict->val.l.count;
-      const size_t len = strlen (key);
 
       for (walk=begin; walk!=end; walk+=2)
       {
         assert (walk->type == TR_VARIANT_TYPE_STR);
+        assert (walk->val.s.type == TR_STRING_TYPE_QUARK);
 
-        if ((walk->val.s.len==len) && !memcmp (getStr(walk), key, len))
+        if (walk->val.s.quark == key)
           return walk - begin;
       }
     }
@@ -106,8 +202,7 @@ dictIndexOf (const tr_variant * dict, const char * key)
 }
 
 tr_variant *
-tr_variantDictFind (tr_variant * dict,
-                    const char * key)
+tr_variantDictFind (tr_variant * dict, const tr_quark key)
 {
   const int i = dictIndexOf (dict, key);
 
@@ -115,10 +210,10 @@ tr_variantDictFind (tr_variant * dict,
 }
 
 static bool
-tr_variantDictFindType (tr_variant   * dict,
-                        const char   * key,
-                        int            type,
-                        tr_variant  ** setme)
+tr_variantDictFindType (tr_variant      * dict,
+                        const tr_quark    key,
+                        int               type,
+                        tr_variant     ** setme)
 {
   return tr_variantIsType (*setme = tr_variantDictFind (dict, key), type);
 }
@@ -265,46 +360,46 @@ tr_variantGetReal (const tr_variant * val, double * setme)
 }
 
 bool
-tr_variantDictFindInt (tr_variant * dict,
-                       const char * key,
-                       int64_t    * setme)
+tr_variantDictFindInt (tr_variant      * dict,
+                       const tr_quark    key,
+                       int64_t         * setme)
 {
   tr_variant * child = tr_variantDictFind (dict, key);
   return tr_variantGetInt (child, setme);
 }
 
 bool
-tr_variantDictFindBool (tr_variant * dict,
-                        const char * key,
-                        bool       * setme)
+tr_variantDictFindBool (tr_variant      * dict,
+                        const tr_quark    key,
+                        bool            * setme)
 {
   tr_variant * child = tr_variantDictFind (dict, key);
   return tr_variantGetBool (child, setme);
 }
 
 bool
-tr_variantDictFindReal (tr_variant * dict,
-                       const char  * key,
-                       double      * setme)
+tr_variantDictFindReal (tr_variant      * dict,
+                        const tr_quark    key,
+                        double          * setme)
 {
   tr_variant * child = tr_variantDictFind (dict, key);
   return tr_variantGetReal (child, setme);
 }
 
 bool
-tr_variantDictFindStr (tr_variant  * dict,
-                       const char  * key,
-                       const char ** setme,
-                       size_t      * len)
+tr_variantDictFindStr (tr_variant       * dict,
+                        const tr_quark    key,
+                        const char     ** setme,
+                        size_t          * len)
 {
   tr_variant * child = tr_variantDictFind (dict, key);
   return tr_variantGetStr (child, setme, len);
 }
 
 bool
-tr_variantDictFindList (tr_variant   * dict,
-                        const char   * key,
-                        tr_variant  ** setme)
+tr_variantDictFindList (tr_variant       * dict,
+                        const tr_quark     key,
+                        tr_variant      ** setme)
 {
   return tr_variantDictFindType (dict,
                                  key,
@@ -313,9 +408,9 @@ tr_variantDictFindList (tr_variant   * dict,
 }
 
 bool
-tr_variantDictFindDict (tr_variant   * dict,
-                        const char   * key,
-                        tr_variant  ** setme)
+tr_variantDictFindDict (tr_variant       * dict,
+                        const tr_quark     key,
+                        tr_variant      ** setme)
 {
   return tr_variantDictFindType (dict,
                                  key,
@@ -325,7 +420,7 @@ tr_variantDictFindDict (tr_variant   * dict,
 
 bool
 tr_variantDictFindRaw (tr_variant      * dict,
-                       const char      * key,
+                       const tr_quark    key,
                        const uint8_t  ** setme_raw,
                        size_t          * setme_len)
 {
@@ -338,36 +433,24 @@ tr_variantDictFindRaw (tr_variant      * dict,
 ***/
 
 void
-tr_variantInitRaw (tr_variant * variant, const void * src, size_t byteCount)
+tr_variantInitRaw (tr_variant * v, const void * src, size_t byteCount)
 {
-  char * setme;
-  tr_variantInit (variant, TR_VARIANT_TYPE_STR);
-
-  /* There's no way in benc notation to distinguish between
-   * zero-terminated strings and raw byte arrays.
-   * Because of this, tr_variantMergeDicts () and tr_variantListCopy ()
-   * don't know whether or not a TR_VARIANT_TYPE_STR node needs a '\0'.
-   * Append one, een to the raw arrays, just to be safe. */
-
-  if (byteCount < sizeof (variant->val.s.str.buf))
-    setme = variant->val.s.str.buf;
-  else
-    setme = variant->val.s.str.ptr = tr_new (char, byteCount + 1);
-
-  memcpy (setme, src, byteCount);
-  setme[byteCount] = '\0';
-  variant->val.s.len = byteCount;
+  tr_variantInit (v, TR_VARIANT_TYPE_STR);
+  tr_variant_string_set_string (&v->val.s, src, byteCount);
 }
 
 void
-tr_variantInitStr (tr_variant * variant, const void * str, int len)
+tr_variantInitQuark (tr_variant * v, const tr_quark q)
 {
-  if (str == NULL)
-    len = 0;
-  else if (len < 0)
-    len = strlen (str);
+  tr_variantInit (v, TR_VARIANT_TYPE_STR);
+  tr_variant_string_set_quark (&v->val.s, q);
+}
 
-  tr_variantInitRaw (variant, str, len);
+void
+tr_variantInitStr (tr_variant * v, const void * str, int len)
+{
+  tr_variantInit (v, TR_VARIANT_TYPE_STR);
+  tr_variant_string_set_string (&v->val.s, str, len);
 }
 
 void
@@ -415,7 +498,7 @@ containerReserve (tr_variant * container, size_t count)
       while (n < needed)
         n *= 2u;
 
-      tmp = realloc (container->val.l.vals, n * sizeof (tr_variant));
+      tmp = tr_renew (tr_variant, container->val.l.vals, n);
       if (tmp == NULL)
         return 1;
 
@@ -499,6 +582,15 @@ tr_variantListAddStr (tr_variant  * list,
 }
 
 tr_variant *
+tr_variantListAddQuark (tr_variant     * list,
+                        const tr_quark   val)
+{
+  tr_variant * child = tr_variantListAdd (list);
+  tr_variantInitQuark (child, val);
+  return child;
+}
+
+tr_variant *
 tr_variantListAddRaw (tr_variant  * list,
                       const void  * val,
                       size_t        len)
@@ -527,9 +619,8 @@ tr_variantListAddDict (tr_variant  * list,
 }
 
 tr_variant *
-tr_variantDictAdd (tr_variant  * dict,
-                   const char  * key,
-                   int           keylen)
+tr_variantDictAdd (tr_variant      * dict,
+                   const tr_quark    key)
 {
   tr_variant * child_key;
   tr_variant * child_val;
@@ -539,7 +630,7 @@ tr_variantDictAdd (tr_variant  * dict,
   containerReserve (dict, 2);
 
   child_key = dict->val.l.vals + dict->val.l.count++;
-  tr_variantInitStr (child_key, key, keylen);
+  tr_variantInitQuark (child_key, key);
 
   child_val = dict->val.l.vals + dict->val.l.count++;
   tr_variantInit (child_val, TR_VARIANT_TYPE_INT);
@@ -547,7 +638,7 @@ tr_variantDictAdd (tr_variant  * dict,
 }
 
 static tr_variant*
-dictFindOrAdd (tr_variant * dict, const char * key, int type)
+dictFindOrAdd (tr_variant * dict, const tr_quark key, int type)
 {
   tr_variant * child;
 
@@ -559,19 +650,23 @@ dictFindOrAdd (tr_variant * dict, const char * key, int type)
           tr_variantDictRemove (dict, key);
           child = NULL;
         }
+      else if (child->type == TR_VARIANT_TYPE_STR)
+        {
+          tr_variant_string_clear (&child->val.s);
+        }
     }
 
   /* if it doesn't exist, create it */
   if (child == NULL)
-    child = tr_variantDictAdd (dict, key, -1);
+    child = tr_variantDictAdd (dict, key);
 
   return child;
 }
 
 tr_variant*
-tr_variantDictAddInt (tr_variant * dict,
-                      const char * key,
-                      int64_t      val)
+tr_variantDictAddInt (tr_variant      * dict,
+                      const tr_quark    key,
+                      int64_t           val)
 {
   tr_variant * child = dictFindOrAdd (dict, key, TR_VARIANT_TYPE_INT);
   tr_variantInitInt (child, val);
@@ -579,7 +674,7 @@ tr_variantDictAddInt (tr_variant * dict,
 }
 
 tr_variant*
-tr_variantDictAddBool (tr_variant * dict, const char * key, bool val)
+tr_variantDictAddBool (tr_variant * dict, const tr_quark key, bool val)
 {
   tr_variant * child = dictFindOrAdd (dict, key, TR_VARIANT_TYPE_BOOL);
   tr_variantInitBool (child, val);
@@ -587,83 +682,63 @@ tr_variantDictAddBool (tr_variant * dict, const char * key, bool val)
 }
 
 tr_variant*
-tr_variantDictAddReal (tr_variant * dict, const char * key, double val)
+tr_variantDictAddReal (tr_variant * dict, const tr_quark key, double val)
 {
   tr_variant * child = dictFindOrAdd (dict, key, TR_VARIANT_TYPE_REAL);
   tr_variantInitReal (child, val);
   return child;
 }
 
-static tr_variant *
-dictRecycleOrAdd (tr_variant * dict, const char * key)
+tr_variant*
+tr_variantDictAddQuark (tr_variant * dict, const tr_quark key, const tr_quark val)
 {
-  tr_variant * child;
-
-  /* see if it already exists, and if so, try to reuse it */
-  if ((child = tr_variantDictFind (dict, key)))
-    {
-      if (tr_variantIsString (child))
-        {
-          if (stringIsAlloced (child))
-            tr_free (child->val.s.str.ptr);
-        }
-      else
-        {
-          tr_variantDictRemove (dict, key);
-          child = NULL;
-        }
-    }
-
-  /* if it doesn't exist, create it */
-  if (child == NULL)
-    child = tr_variantDictAdd (dict, key, -1);
-
+  tr_variant * child = dictFindOrAdd (dict, key, TR_VARIANT_TYPE_STR);
+  tr_variantInitQuark (child, val);
   return child;
 }
 
-
 tr_variant*
-tr_variantDictAddStr (tr_variant * dict, const char * key, const char * val)
+tr_variantDictAddStr (tr_variant * dict, const tr_quark key, const char * val)
 {
-  tr_variant * child = dictRecycleOrAdd (dict, key);
+  tr_variant * child = dictFindOrAdd (dict, key, TR_VARIANT_TYPE_STR);
   tr_variantInitStr (child, val, -1);
   return child;
 }
 
 tr_variant*
-tr_variantDictAddRaw (tr_variant * dict,
-                      const char * key,
-                      const void * src,
-                      size_t       len)
+tr_variantDictAddRaw (tr_variant      * dict,
+                      const tr_quark    key,
+                      const void      * src,
+                      size_t            len)
 {
-  tr_variant * child = dictRecycleOrAdd (dict, key);
+  tr_variant * child = dictFindOrAdd (dict, key, TR_VARIANT_TYPE_STR);
   tr_variantInitRaw (child, src, len);
   return child;
 }
 
 tr_variant*
-tr_variantDictAddList (tr_variant * dict,
-                       const char * key,
-                       size_t       reserve_count)
+tr_variantDictAddList (tr_variant     * dict,
+                       const tr_quark   key,
+                       size_t           reserve_count)
 {
-  tr_variant * child = tr_variantDictAdd (dict, key, -1);
+  tr_variant * child = tr_variantDictAdd (dict, key);
   tr_variantInitList (child, reserve_count);
   return child;
 }
 
 tr_variant*
-tr_variantDictAddDict (tr_variant * dict,
-                       const char * key,
-                       size_t       reserve_count)
+tr_variantDictAddDict (tr_variant     * dict,
+                       const tr_quark   key,
+                       size_t           reserve_count)
 {
-  tr_variant * child = tr_variantDictAdd (dict, key, -1);
+  tr_variant * child = tr_variantDictAdd (dict, key);
   tr_variantInitDict (child, reserve_count);
   return child;
 }
 
 int
-tr_variantDictRemove (tr_variant * dict,
-                      const char * key)
+tr_variantDictRemove (tr_variant     * dict,
+                      const tr_quark   key)
 {
   const int i = dictIndexOf (dict, key);
 
@@ -906,20 +981,19 @@ tr_variantWalk (const tr_variant               * top,
 ****/
 
 static void
-freeDummyFunc (const tr_variant * val UNUSED, void * buf UNUSED)
+freeDummyFunc (const tr_variant * v UNUSED, void * buf UNUSED)
 {}
 
 static void
-freeStringFunc (const tr_variant * val, void * unused UNUSED)
+freeStringFunc (const tr_variant * v, void * unused UNUSED)
 {
-  if (stringIsAlloced (val))
-    tr_free (val->val.s.str.ptr);
+  tr_variant_string_clear (&((tr_variant*)v)->val.s);
 }
 
 static void
-freeContainerEndFunc (const tr_variant * val, void * unused UNUSED)
+freeContainerEndFunc (const tr_variant * v, void * unused UNUSED)
 {
-  tr_free (val->val.l.vals);
+  tr_free (v->val.l.vals);
 }
 
 static const struct VariantWalkFuncs freeWalkFuncs = { freeDummyFunc,
@@ -1003,7 +1077,7 @@ tr_variantDictSize (const tr_variant * dict)
 bool
 tr_variantDictChild (tr_variant   * dict,
                      size_t         n,
-                     const char  ** key,
+                     tr_quark     * key,
                      tr_variant  ** val)
 {
   bool success = 0;
@@ -1014,8 +1088,12 @@ tr_variantDictChild (tr_variant   * dict,
     {
       tr_variant * k = dict->val.l.vals + (n*2);
       tr_variant * v = dict->val.l.vals + (n*2) + 1;
-      if ((success = tr_variantGetStr (k, key, NULL) && tr_variantIsSomething (v)))
-        *val = v;
+      if ((k->val.s.type == TR_STRING_TYPE_QUARK) && tr_variantIsSomething (v))
+        {
+          *key = k->val.s.quark;
+          *val = v;
+          success = true;
+        }
     }
 
   return success;
@@ -1034,7 +1112,7 @@ tr_variantMergeDicts (tr_variant * target, const tr_variant * source)
 
   for (i=0; i<sourceCount; ++i)
     {
-      const char * key;
+      tr_quark key;
       tr_variant * val;
       tr_variant * t;
 
@@ -1086,7 +1164,7 @@ tr_variantMergeDicts (tr_variant * target, const tr_variant * source)
             }
           else
             {
-              tr_dbg ("tr_variantMergeDicts skipping \"%s\"", key);
+              tr_dbg ("tr_variantMergeDicts skipping \"%s\"", tr_quark_get_string(key,NULL));
             }
         }
     }

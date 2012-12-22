@@ -18,6 +18,7 @@ extern "C" {
 #endif
 
 #include <inttypes.h> /* for int64_t */
+#include <libtransmission/quark.h>
 
 struct evbuffer;
 
@@ -32,6 +33,26 @@ struct evbuffer;
  *
  * @{
  */
+
+typedef enum
+{
+  TR_STRING_TYPE_QUARK,
+  TR_STRING_TYPE_HEAP,
+  TR_STRING_TYPE_BUF
+}
+tr_string_type;
+
+/* these are PRIVATE IMPLEMENTATION details that should not be touched.
+ * I'll probably change them just to break your code! HA HA HA!
+ * it's included in the header for inlining and composition */
+struct tr_variant_string
+{
+  tr_string_type type;
+  tr_quark quark;
+  size_t len;
+  union { char buf[16]; const char * str; } str;
+};
+  
 
 /* these are PRIVATE IMPLEMENTATION details that should not be touched.
  * I'll probably change them just to break your code! HA HA HA!
@@ -61,17 +82,7 @@ typedef struct tr_variant
 
       int64_t i;
 
-      struct
-        {
-          size_t len; /* the string length */
-          union
-            {
-              char buf[16]; /* local buffer for short strings */
-              char * ptr; /* alloc'ed pointer for long strings */
-            }
-          str;
-        }
-      s;
+      struct tr_variant_string s;
 
       struct
         {
@@ -184,7 +195,7 @@ tr_variantIsType (const tr_variant * b, int type)
 static inline bool
 tr_variantIsString (const tr_variant * b)
 {
-  return tr_variantIsType (b, TR_VARIANT_TYPE_STR);
+  return (b != NULL) && (b->type == TR_VARIANT_TYPE_STR);
 }
 
 bool         tr_variantGetStr          (const tr_variant * variant,
@@ -194,6 +205,9 @@ bool         tr_variantGetStr          (const tr_variant * variant,
 void         tr_variantInitStr         (tr_variant       * initme,
                                         const void       * str,
                                         int                str_len);
+
+void         tr_variantInitQuark       (tr_variant       * initme,
+                                        const tr_quark     quark);
 
 void         tr_variantInitRaw         (tr_variant       * initme,
                                         const void       * raw,
@@ -207,9 +221,9 @@ bool         tr_variantGetRaw          (const tr_variant * variant,
 ***/
 
 static inline bool
-tr_variantIsReal (const tr_variant * b)
+tr_variantIsReal (const tr_variant * v)
 {
-  return tr_variantIsType (b, TR_VARIANT_TYPE_REAL);
+  return (v != NULL) && (v->type == TR_VARIANT_TYPE_REAL);
 }
 
 void         tr_variantInitReal        (tr_variant       * initme,
@@ -223,9 +237,9 @@ bool         tr_variantGetReal         (const tr_variant * variant,
 ***/
 
 static inline bool
-tr_variantIsBool (const tr_variant * b)
+tr_variantIsBool (const tr_variant * v)
 {
-  return tr_variantIsType (b, TR_VARIANT_TYPE_BOOL);
+  return (v != NULL) && (v->type == TR_VARIANT_TYPE_BOOL);
 }
 
 void         tr_variantInitBool        (tr_variant       * initme,
@@ -240,9 +254,9 @@ bool         tr_variantGetBool         (const tr_variant * variant,
 ***/
 
 static inline bool
-tr_variantIsInt (const tr_variant * b)
+tr_variantIsInt (const tr_variant * v)
 {
-  return tr_variantIsType (b, TR_VARIANT_TYPE_INT);
+  return (v != NULL) && (v->type == TR_VARIANT_TYPE_INT);
 }
 
 void         tr_variantInitInt         (tr_variant       * variant,
@@ -256,9 +270,9 @@ bool         tr_variantGetInt          (const tr_variant * val,
 ***/
 
 static inline bool
-tr_variantIsList (const tr_variant * b)
+tr_variantIsList (const tr_variant * v)
 {
-  return tr_variantIsType (b, TR_VARIANT_TYPE_LIST);
+  return (v != NULL) && (v->type == TR_VARIANT_TYPE_LIST);
 }
 
 int          tr_variantInitList        (tr_variant       * list,
@@ -280,6 +294,9 @@ tr_variant * tr_variantListAddReal     (tr_variant       * list,
 
 tr_variant * tr_variantListAddStr      (tr_variant       * list,
                                         const char       * addme);
+
+tr_variant * tr_variantListAddQuark    (tr_variant       * list,
+                                        const tr_quark     addme);
 
 tr_variant * tr_variantListAddRaw      (tr_variant       * list,
                                         const void       * addme_value,
@@ -305,9 +322,9 @@ size_t       tr_variantListSize        (const tr_variant * list);
 ***/
 
 static inline bool
-tr_variantIsDict (const tr_variant * b)
+tr_variantIsDict (const tr_variant * v)
 {
-  return tr_variantIsType (b, TR_VARIANT_TYPE_DICT);
+  return (v != NULL) && (v->type == TR_VARIANT_TYPE_DICT);
 }
 
 int          tr_variantInitDict        (tr_variant       * initme,
@@ -317,76 +334,79 @@ int          tr_variantDictReserve     (tr_variant       * dict,
                                         size_t             reserve_count);
 
 int          tr_variantDictRemove      (tr_variant       * dict,
-                                        const char       * key);
+                                        const tr_quark     key);
 
 tr_variant * tr_variantDictAdd         (tr_variant       * dict,
-                                        const char       * key,
-                                        int                keylen);
+                                        const tr_quark     key);
 
 tr_variant * tr_variantDictAddReal     (tr_variant       * dict,
-                                        const char       * key,
+                                        const tr_quark     key,
                                         double             value);
 
 tr_variant * tr_variantDictAddInt      (tr_variant       * dict,
-                                        const char       * key,
+                                        const tr_quark     key,
                                         int64_t            value);
 
 tr_variant * tr_variantDictAddBool     (tr_variant       * dict,
-                                        const char       * key,
+                                        const tr_quark     key,
                                         bool               value);
 
 tr_variant * tr_variantDictAddStr      (tr_variant       * dict,
-                                        const char       * key,
+                                        const tr_quark     key,
                                         const char       * value);
 
+tr_variant * tr_variantDictAddQuark    (tr_variant       * dict,
+                                        const tr_quark     key,
+                                        const tr_quark     val);
+
 tr_variant * tr_variantDictAddList     (tr_variant       * dict,
-                                        const char       * key,
+                                        const tr_quark     key,
                                         size_t             reserve_count);
 
 tr_variant * tr_variantDictAddDict     (tr_variant       * dict,
-                                        const char       * key,
+                                        const tr_quark     key,
                                         size_t             reserve_count);
 
 tr_variant * tr_variantDictAddRaw      (tr_variant       * dict,
-                                        const char       * key,
+                                        const tr_quark     key,
                                         const void       * value,
                                         size_t             len);
 
 bool         tr_variantDictChild       (tr_variant       * dict,
                                         size_t             pos,
-                                        const char      ** setme_key,
+                                        tr_quark         * setme_key,
                                         tr_variant      ** setme_value);
 
 tr_variant * tr_variantDictFind        (tr_variant       * dict,
-                                        const char       * key);
+                                        const tr_quark     key);
 
 bool         tr_variantDictFindList    (tr_variant       * dict,
-                                        const char       * key,
+                                        const tr_quark     key,
                                         tr_variant      ** setme);
 
 bool         tr_variantDictFindDict    (tr_variant       * dict,
-                                        const char       * key,
+                                        const tr_quark     key,
                                         tr_variant      ** setme_value);
 
 bool         tr_variantDictFindInt     (tr_variant       * dict,
-                                        const char       * key,
+                                        const tr_quark     key,
                                         int64_t          * setme);
 
 bool         tr_variantDictFindReal    (tr_variant       * dict,
-                                        const char       * key,
+                                        const tr_quark     key,
                                         double           * setme);
 
 bool         tr_variantDictFindBool    (tr_variant       * dict,
-                                        const char       * key,
+                                        const tr_quark     key,
                                         bool             * setme);
 
 bool         tr_variantDictFindStr     (tr_variant       * dict,
-                                        const char       * key,
+                                        const tr_quark     key,
                                         const char      ** setme,
                                         size_t           * len);
 
 bool         tr_variantDictFindRaw     (tr_variant       * dict,
-                                        const char       * key,
+                                        const tr_quark     key,
                                         const uint8_t   ** setme_raw,
                                         size_t           * setme_len);
 

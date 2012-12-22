@@ -1795,8 +1795,8 @@ closeTorrent (void * vtor)
     assert (tr_isTorrent (tor));
 
     d = tr_variantListAddDict (&tor->session->removedTorrents, 2);
-    tr_variantDictAddInt (d, "id", tor->uniqueId);
-    tr_variantDictAddInt (d, "date", tr_time ());
+    tr_variantDictAddInt (d, TR_KEY_id, tor->uniqueId);
+    tr_variantDictAddInt (d, TR_KEY_date, tr_time ());
 
     tr_torinf (tor, "%s", _("Removing torrent"));
 
@@ -2520,20 +2520,20 @@ tr_torrentSetAnnounceList (tr_torrent             * tor,
         tr_info tmpInfo;
 
         /* remove the old fields */
-        tr_variantDictRemove (&metainfo, "announce");
-        tr_variantDictRemove (&metainfo, "announce-list");
+        tr_variantDictRemove (&metainfo, TR_KEY_announce);
+        tr_variantDictRemove (&metainfo, TR_KEY_announce_list);
 
         /* add the new fields */
         if (trackerCount > 0)
         {
-            tr_variantDictAddStr (&metainfo, "announce", trackers[0].announce);
+            tr_variantDictAddStr (&metainfo, TR_KEY_announce, trackers[0].announce);
         }
         if (trackerCount > 1)
         {
             int i;
             int prevTier = -1;
             tr_variant * tier = NULL;
-            tr_variant * announceList = tr_variantDictAddList (&metainfo, "announce-list", 0);
+            tr_variant * announceList = tr_variantDictAddList (&metainfo, TR_KEY_announce_list, 0);
 
             for (i=0; i<trackerCount; ++i) {
                 if (prevTier != trackers[i].tier) {

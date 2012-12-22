@@ -95,14 +95,14 @@ removeURL (tr_variant * metainfo, const char * url)
   tr_variant * announce_list;
   bool changed = false;
 
-  if (tr_variantDictFindStr (metainfo, "announce", &str, NULL) && !strcmp (str, url))
+  if (tr_variantDictFindStr (metainfo, TR_KEY_announce, &str, NULL) && !strcmp (str, url))
     {
       printf ("\tRemoved \"%s\" from \"announce\"\n", str);
-      tr_variantDictRemove (metainfo, "announce");
+      tr_variantDictRemove (metainfo, TR_KEY_announce);
       changed = true;
     }
 
-  if (tr_variantDictFindList (metainfo, "announce-list", &announce_list))
+  if (tr_variantDictFindList (metainfo, TR_KEY_announce_list, &announce_list))
     {
       tr_variant * tier;
       int tierIndex = 0;
@@ -135,13 +135,13 @@ removeURL (tr_variant * metainfo, const char * url)
       if (tr_variantListSize (announce_list) == 0)
         {
           printf ("\tNo tiers left... removing announce-list\n");
-          tr_variantDictRemove (metainfo, "announce-list");
+          tr_variantDictRemove (metainfo, TR_KEY_announce_list);
         }
     }
 
   /* if we removed the "announce" field and there's still another track left,
    * use it as the "announce" field */
-  if (changed && !tr_variantDictFindStr (metainfo, "announce", &str, NULL))
+  if (changed && !tr_variantDictFindStr (metainfo, TR_KEY_announce, &str, NULL))
     {
       tr_variant * tier;
       tr_variant * node;
@@ -152,7 +152,7 @@ removeURL (tr_variant * metainfo, const char * url)
             {
               if (tr_variantGetStr (node, &str, NULL))
                 {
-                  tr_variantDictAddStr (metainfo, "announce", str);
+                  tr_variantDictAddStr (metainfo, TR_KEY_announce, str);
                   printf ("\tAdded \"%s\" to announce\n", str);
                 }
             }
@@ -189,16 +189,16 @@ replaceURL (tr_variant * metainfo, const char * in, const char * out)
   tr_variant * announce_list;
   bool changed = false;
 
-  if (tr_variantDictFindStr (metainfo, "announce", &str, NULL) && strstr (str, in))
+  if (tr_variantDictFindStr (metainfo, TR_KEY_announce, &str, NULL) && strstr (str, in))
     {
       char * newstr = replaceSubstr (str, in, out);
       printf ("\tReplaced in \"announce\": \"%s\" --> \"%s\"\n", str, newstr);
-      tr_variantDictAddStr (metainfo, "announce", newstr);
+      tr_variantDictAddStr (metainfo, TR_KEY_announce, newstr);
       tr_free (newstr);
       changed = true;
     }
 
-  if (tr_variantDictFindList (metainfo, "announce-list", &announce_list))
+  if (tr_variantDictFindList (metainfo, TR_KEY_announce_list, &announce_list))
     {
       tr_variant * tier;
       int tierCount = 0;
@@ -248,21 +248,21 @@ addURL (tr_variant * metainfo, const char * url)
   const char * announce = NULL;
   tr_variant * announce_list = NULL;
   bool changed = false;
-  const bool had_announce = tr_variantDictFindStr (metainfo, "announce", &announce, NULL);
-  const bool had_announce_list = tr_variantDictFindList (metainfo, "announce-list", &announce_list);
+  const bool had_announce = tr_variantDictFindStr (metainfo, TR_KEY_announce, &announce, NULL);
+  const bool had_announce_list = tr_variantDictFindList (metainfo, TR_KEY_announce_list, &announce_list);
 
   if (!had_announce && !had_announce_list)
     {
       /* this new tracker is the only one, so add it to "announce"... */
       printf ("\tAdded \"%s\" in \"announce\"\n", url);
-      tr_variantDictAddStr (metainfo, "announce", url);
+      tr_variantDictAddStr (metainfo, TR_KEY_announce, url);
       changed = true;
     }
   else
     {
       if (!had_announce_list)
         {
-          announce_list = tr_variantDictAddList (metainfo, "announce-list", 2);
+          announce_list = tr_variantDictAddList (metainfo, TR_KEY_announce_list, 2);
 
           if (had_announce)
             {

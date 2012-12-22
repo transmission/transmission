@@ -269,20 +269,20 @@ doScrape (const tr_info * inf)
 
               if (!tr_variantFromBenc (&top, begin, evbuffer_get_length(buf)))
                 {
-                  if (tr_variantDictFindDict (&top, "files", &files))
+                  if (tr_variantDictFindDict (&top, TR_KEY_files, &files))
                     {
                       int i = 0;
+                      tr_quark key;
                       tr_variant * val;
-                      const char * key;
 
                       while (tr_variantDictChild (files, i++, &key, &val))
                         {
-                          if (!memcmp (inf->hash, key, SHA_DIGEST_LENGTH))
+                          if (!memcmp (inf->hash, tr_quark_get_string(key,NULL), SHA_DIGEST_LENGTH))
                             {
                               int64_t seeders = -1;
                               int64_t leechers = -1;
-                              tr_variantDictFindInt (val, "complete", &seeders);
-                              tr_variantDictFindInt (val, "incomplete", &leechers);
+                              tr_variantDictFindInt (val, TR_KEY_complete, &seeders);
+                              tr_variantDictFindInt (val, TR_KEY_incomplete, &leechers);
                               printf ("%d seeders, %d leechers\n", (int)seeders, (int)leechers);
                               matched = true;
                             }

@@ -24,6 +24,7 @@
 #include <QVariant>
 
 #include <libtransmission/transmission.h>
+#include <libtransmission/quark.h>
 
 #include "speed.h"
 #include "types.h"
@@ -199,7 +200,7 @@ class Torrent: public QObject
         struct Property
         {
             int id;
-            const char * key;
+            tr_quark key;
             int type;
             int group;
         };
@@ -209,7 +210,7 @@ class Torrent: public QObject
         bool magnetTorrent;
 
     public:
-        typedef QList<const char*> KeyList;
+        typedef QList<tr_quark> KeyList;
         static const KeyList& getInfoKeys( );
         static const KeyList& getStatKeys( );
         static const KeyList& getExtraStatKeys( );

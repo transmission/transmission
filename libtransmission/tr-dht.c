@@ -282,15 +282,15 @@ tr_dhtInit (tr_session *ss)
     rc = tr_variantFromFile (&benc, TR_VARIANT_FMT_BENC, dat_file);
     tr_free (dat_file);
     if (rc == 0) {
-        have_id = tr_variantDictFindRaw (&benc, "id", &raw, &len);
+        have_id = tr_variantDictFindRaw (&benc, TR_KEY_id, &raw, &len);
         if (have_id && len==20)
             memcpy (myid, raw, len);
         if (ss->udp_socket >= 0 &&
-            tr_variantDictFindRaw (&benc, "nodes", &raw, &len) && ! (len%6)) {
+            tr_variantDictFindRaw (&benc, TR_KEY_nodes, &raw, &len) && ! (len%6)) {
                 nodes = tr_memdup (raw, len);
         }
         if (ss->udp6_socket > 0 &&
-            tr_variantDictFindRaw (&benc, "nodes6", &raw, &len6) && ! (len6%18)) {
+            tr_variantDictFindRaw (&benc, TR_KEY_nodes6, &raw, &len6) && ! (len6%18)) {
             nodes6 = tr_memdup (raw, len6);
         }
         tr_variantFree (&benc);
@@ -379,11 +379,11 @@ tr_dhtUninit (tr_session *ss)
             j += 18;
         }
         tr_variantInitDict (&benc, 3);
-        tr_variantDictAddRaw (&benc, "id", myid, 20);
+        tr_variantDictAddRaw (&benc, TR_KEY_id, myid, 20);
         if (num > 0)
-            tr_variantDictAddRaw (&benc, "nodes", compact, num * 6);
+            tr_variantDictAddRaw (&benc, TR_KEY_nodes, compact, num * 6);
         if (num6 > 0)
-            tr_variantDictAddRaw (&benc, "nodes6", compact6, num6 * 18);
+            tr_variantDictAddRaw (&benc, TR_KEY_nodes6, compact6, num6 * 18);
         dat_file = tr_buildPath (ss->configDir, "dht.dat", NULL);
         tr_variantToFile (&benc, TR_VARIANT_FMT_BENC, dat_file);
         tr_variantFree (&benc);

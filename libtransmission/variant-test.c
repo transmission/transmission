@@ -357,45 +357,53 @@ testMerge (void)
   tr_variant dest, src;
   int64_t i;
   const char * s;
+  const tr_quark i1 = tr_quark_new ("i1", 2);
+  const tr_quark i2 = tr_quark_new ("i2", 2);
+  const tr_quark i3 = tr_quark_new ("i3", 2);
+  const tr_quark i4 = tr_quark_new ("i4", 2);
+  const tr_quark s5 = tr_quark_new ("s5", 2);
+  const tr_quark s6 = tr_quark_new ("s6", 2);
+  const tr_quark s7 = tr_quark_new ("s7", 2);
+  const tr_quark s8 = tr_quark_new ("s8", 2);
 
   /* initial dictionary (default values)  */
   tr_variantInitDict (&dest, 10);
-  tr_variantDictAddInt (&dest, "i1", 1);
-  tr_variantDictAddInt (&dest, "i2", 2);
-  tr_variantDictAddInt (&dest, "i4", -35); /* remains untouched */
-  tr_variantDictAddStr (&dest, "s5", "abc");
-  tr_variantDictAddStr (&dest, "s6", "def");
-  tr_variantDictAddStr (&dest, "s7", "127.0.0.1"); /* remains untouched */
+  tr_variantDictAddInt (&dest, i1, 1);
+  tr_variantDictAddInt (&dest, i2, 2);
+  tr_variantDictAddInt (&dest, i4, -35); /* remains untouched */
+  tr_variantDictAddStr (&dest, s5, "abc");
+  tr_variantDictAddStr (&dest, s6, "def");
+  tr_variantDictAddStr (&dest, s7, "127.0.0.1"); /* remains untouched */
 
   /* new dictionary, will overwrite items in dest  */
   tr_variantInitDict (&src, 10);
-  tr_variantDictAddInt (&src, "i1", 1);     /* same value */
-  tr_variantDictAddInt (&src, "i2", 4);     /* new value */
-  tr_variantDictAddInt (&src, "i3", 3);     /* new key:value */
-  tr_variantDictAddStr (&src, "s5", "abc"); /* same value */
-  tr_variantDictAddStr (&src, "s6", "xyz"); /* new value */
-  tr_variantDictAddStr (&src, "s8", "ghi"); /* new key:value */
+  tr_variantDictAddInt (&src, i1, 1);     /* same value */
+  tr_variantDictAddInt (&src, i2, 4);     /* new value */
+  tr_variantDictAddInt (&src, i3, 3);     /* new key:value */
+  tr_variantDictAddStr (&src, s5, "abc"); /* same value */
+  tr_variantDictAddStr (&src, s6, "xyz"); /* new value */
+  tr_variantDictAddStr (&src, s8, "ghi"); /* new key:value */
 
   tr_variantMergeDicts (&dest, /*const*/ &src);
 
-  check (tr_variantDictFindInt (&dest, "i1", &i));
+  check (tr_variantDictFindInt (&dest, i1, &i));
   check_int_eq (1, i);
-  check (tr_variantDictFindInt (&dest, "i2", &i));
+  check (tr_variantDictFindInt (&dest, i2, &i));
   check_int_eq (4, i);
-  check (tr_variantDictFindInt (&dest, "i3", &i));
+  check (tr_variantDictFindInt (&dest, i3, &i));
   check_int_eq (3, i);
-  check (tr_variantDictFindInt (&dest, "i4", &i));
+  check (tr_variantDictFindInt (&dest, i4, &i));
   check_int_eq (-35, i);
-  check (tr_variantDictFindStr (&dest, "s5", &s, &len));
+  check (tr_variantDictFindStr (&dest, s5, &s, &len));
   check_int_eq (3, len);
   check_streq ("abc", s);
-  check (tr_variantDictFindStr (&dest, "s6", &s, &len));
+  check (tr_variantDictFindStr (&dest, s6, &s, &len));
   check_int_eq (3, len);
   check_streq ("xyz", s);
-  check (tr_variantDictFindStr (&dest, "s7", &s,  &len));
+  check (tr_variantDictFindStr (&dest, s7, &s,  &len));
   check_int_eq (9, len);
   check_streq ("127.0.0.1", s);
-  check (tr_variantDictFindStr (&dest, "s8", &s, &len));
+  check (tr_variantDictFindStr (&dest, s8, &s, &len));
   check_int_eq (3, len);
   check_streq ("ghi", s);
 
@@ -441,28 +449,32 @@ testBool (void)
   tr_variant top;
   int64_t intVal;
   bool boolVal;
+  const tr_quark key1 = tr_quark_new ("key1", 4);
+  const tr_quark key2 = tr_quark_new ("key2", 4);
+  const tr_quark key3 = tr_quark_new ("key3", 4);
+  const tr_quark key4 = tr_quark_new ("key4", 4);
 
   tr_variantInitDict (&top, 0);
 
-  tr_variantDictAddBool (&top, "key1", false);
-  tr_variantDictAddBool (&top, "key2", 0);
-  tr_variantDictAddInt (&top, "key3", true);
-  tr_variantDictAddInt (&top, "key4", 1);
-  check (tr_variantDictFindBool (&top, "key1", &boolVal));
+  tr_variantDictAddBool (&top, key1, false);
+  tr_variantDictAddBool (&top, key2, 0);
+  tr_variantDictAddInt  (&top, key3, true);
+  tr_variantDictAddInt  (&top, key4, 1);
+  check (tr_variantDictFindBool (&top, key1, &boolVal));
   check (!boolVal);
-  check (tr_variantDictFindBool (&top, "key2", &boolVal));
+  check (tr_variantDictFindBool (&top, key2, &boolVal));
   check (!boolVal);
-  check (tr_variantDictFindBool (&top, "key3", &boolVal));
+  check (tr_variantDictFindBool (&top, key3, &boolVal));
   check (boolVal);
-  check (tr_variantDictFindBool (&top, "key4", &boolVal));
+  check (tr_variantDictFindBool (&top, key4, &boolVal));
   check (boolVal);
-  check (tr_variantDictFindInt (&top, "key1", &intVal));
+  check (tr_variantDictFindInt (&top, key1, &intVal));
   check (!intVal);
-  check (tr_variantDictFindInt (&top, "key2", &intVal));
+  check (tr_variantDictFindInt (&top, key2, &intVal));
   check (!intVal);
-  check (tr_variantDictFindInt (&top, "key3", &intVal));
+  check (tr_variantDictFindInt (&top, key3, &intVal));
   check (intVal);
-  check (tr_variantDictFindInt (&top, "key4", &intVal));
+  check (tr_variantDictFindInt (&top, key4, &intVal));
   check (intVal);
 
   tr_variantFree (&top);
@@ -482,26 +494,30 @@ testParse2 (void)
   char * benc;
   const char * end;
   size_t strLen;
+  const tr_quark key_bool = tr_quark_new ("this-is-a-bool", -1);
+  const tr_quark key_real = tr_quark_new ("this-is-a-real", -1);
+  const tr_quark key_int  = tr_quark_new ("this-is-an-int", -1);
+  const tr_quark key_str  = tr_quark_new ("this-is-a-string", -1);
 
   tr_variantInitDict (&top, 0);
-  tr_variantDictAddBool (&top, "this-is-a-bool", true);
-  tr_variantDictAddInt (&top, "this-is-an-int", 1234);
-  tr_variantDictAddReal (&top, "this-is-a-real", 0.5);
-  tr_variantDictAddStr (&top, "this-is-a-string", "this-is-a-string");
+  tr_variantDictAddBool (&top, key_bool, true);
+  tr_variantDictAddInt  (&top, key_int,  1234);
+  tr_variantDictAddReal (&top, key_real, 0.5);
+  tr_variantDictAddStr  (&top, key_str, "this-is-a-string");
 
   benc = tr_variantToStr (&top, TR_VARIANT_FMT_BENC, &len);
   check_streq ("d14:this-is-a-booli1e14:this-is-a-real8:0.50000016:this-is-a-string16:this-is-a-string14:this-is-an-inti1234ee", benc);
   check (!tr_variantFromBencFull (&top2, benc, len, NULL, &end));
   check (end == benc + len);
   check (tr_variantIsDict (&top2));
-  check (tr_variantDictFindInt (&top, "this-is-an-int", &intVal));
+  check (tr_variantDictFindInt (&top, key_int, &intVal));
   check_int_eq (1234, intVal);
-  check (tr_variantDictFindBool (&top, "this-is-a-bool", &boolVal));
+  check (tr_variantDictFindBool (&top, key_bool, &boolVal));
   check (boolVal == true);
-  check (tr_variantDictFindStr (&top, "this-is-a-string", &strVal, &strLen));
+  check (tr_variantDictFindStr (&top, key_str, &strVal, &strLen));
   check_int_eq (16, strLen);
   check_streq ("this-is-a-string", strVal);
-  check (tr_variantDictFindReal (&top, "this-is-a-real", &realVal));
+  check (tr_variantDictFindReal (&top, key_real, &realVal));
   check_int_eq (50, (int)(realVal*100));
 
   tr_variantFree (&top2);
@@ -522,6 +538,5 @@ main (void)
                                     testBool,
                                     testParse2,
                                     testStackSmash };
-
   return runTests (tests, NUM_TESTS (tests));
 }

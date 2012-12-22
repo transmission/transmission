@@ -151,7 +151,7 @@ TorrentModel :: updateTorrents( tr_variant * torrents, bool isCompleteList )
         while(( child = tr_variantListChild( torrents, i++ )))
         {
             int64_t id;
-            if( tr_variantDictFindInt( child, "id", &id ) )
+            if( tr_variantDictFindInt( child, TR_KEY_id, &id ) )
             {
                 newIds.insert( id );
 

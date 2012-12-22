@@ -39,6 +39,8 @@ tr_ptrArray;
 
 typedef void (*PtrArrayForeachFunc)(void *);
 
+#define TR_PTR_ARRAY_INIT_STATIC { NULL, 0, 0 }
+
 extern const tr_ptrArray TR_PTR_ARRAY_INIT;
 
 /** @brief Destructor to free a tr_ptrArray's internal memory */

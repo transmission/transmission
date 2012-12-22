@@ -315,16 +315,16 @@ refreshOptions (struct DetailsImpl * di, tr_torrent ** torrents, int n)
 }
 
 static void
-torrent_set_bool (struct DetailsImpl * di, const char * key, gboolean value)
+torrent_set_bool (struct DetailsImpl * di, const tr_quark key, gboolean value)
 {
     GSList *l;
     tr_variant top, *args, *ids;
 
     tr_variantInitDict (&top, 2);
-    tr_variantDictAddStr (&top, "method", "torrent-set");
-    args = tr_variantDictAddDict (&top, "arguments", 2);
+    tr_variantDictAddStr (&top, TR_KEY_method, "torrent-set");
+    args = tr_variantDictAddDict (&top, TR_KEY_arguments, 2);
     tr_variantDictAddBool (args, key, value);
-    ids = tr_variantDictAddList (args, "ids", g_slist_length (di->ids));
+    ids = tr_variantDictAddList (args, TR_KEY_ids, g_slist_length (di->ids));
     for (l=di->ids; l; l=l->next)
         tr_variantListAddInt (ids, GPOINTER_TO_INT (l->data));
 
@@ -333,16 +333,16 @@ torrent_set_bool (struct DetailsImpl * di, const char * key, gboolean value)
 }
 
 static void
-torrent_set_int (struct DetailsImpl * di, const char * key, int value)
+torrent_set_int (struct DetailsImpl * di, const tr_quark key, int value)
 {
     GSList *l;
     tr_variant top, *args, *ids;
 
     tr_variantInitDict (&top, 2);
-    tr_variantDictAddStr (&top, "method", "torrent-set");
-    args = tr_variantDictAddDict (&top, "arguments", 2);
+    tr_variantDictAddStr (&top, TR_KEY_method, "torrent-set");
+    args = tr_variantDictAddDict (&top, TR_KEY_arguments, 2);
     tr_variantDictAddInt (args, key, value);
-    ids = tr_variantDictAddList (args, "ids", g_slist_length (di->ids));
+    ids = tr_variantDictAddList (args, TR_KEY_ids, g_slist_length (di->ids));
     for (l=di->ids; l; l=l->next)
         tr_variantListAddInt (ids, GPOINTER_TO_INT (l->data));
 
@@ -351,16 +351,16 @@ torrent_set_int (struct DetailsImpl * di, const char * key, int value)
 }
 
 static void
-torrent_set_real (struct DetailsImpl * di, const char * key, double value)
+torrent_set_real (struct DetailsImpl * di, const tr_quark key, double value)
 {
     GSList *l;
     tr_variant top, *args, *ids;
 
     tr_variantInitDict (&top, 2);
-    tr_variantDictAddStr (&top, "method", "torrent-set");
-    args = tr_variantDictAddDict (&top, "arguments", 2);
+    tr_variantDictAddStr (&top, TR_KEY_method, "torrent-set");
+    args = tr_variantDictAddDict (&top, TR_KEY_arguments, 2);
     tr_variantDictAddReal (args, key, value);
-    ids = tr_variantDictAddList (args, "ids", g_slist_length (di->ids));
+    ids = tr_variantDictAddList (args, TR_KEY_ids, g_slist_length (di->ids));
     for (l=di->ids; l; l=l->next)
         tr_variantListAddInt (ids, GPOINTER_TO_INT (l->data));
 
@@ -371,56 +371,56 @@ torrent_set_real (struct DetailsImpl * di, const char * key, double value)
 static void
 up_speed_toggled_cb (GtkToggleButton * tb, gpointer d)
 {
-    torrent_set_bool (d, "uploadLimited", gtk_toggle_button_get_active (tb));
+    torrent_set_bool (d, TR_KEY_uploadLimited, gtk_toggle_button_get_active (tb));
 }
 
 static void
 down_speed_toggled_cb (GtkToggleButton *tb, gpointer d)
 {
-    torrent_set_bool (d, "downloadLimited", gtk_toggle_button_get_active (tb));
+    torrent_set_bool (d, TR_KEY_downloadLimited, gtk_toggle_button_get_active (tb));
 }
 
 static void
 global_speed_toggled_cb (GtkToggleButton * tb, gpointer d)
 {
-    torrent_set_bool (d, "honorsSessionLimits", gtk_toggle_button_get_active (tb));
+    torrent_set_bool (d, TR_KEY_honorsSessionLimits, gtk_toggle_button_get_active (tb));
 }
 
 static void
 up_speed_spun_cb (GtkSpinButton * s, struct DetailsImpl * di)
 {
-    torrent_set_int (di, "uploadLimit", gtk_spin_button_get_value_as_int (s));
+    torrent_set_int (di, TR_KEY_uploadLimit, gtk_spin_button_get_value_as_int (s));
 }
 
 static void
 down_speed_spun_cb (GtkSpinButton * s, struct DetailsImpl * di)
 {
-    torrent_set_int (di, "downloadLimit", gtk_spin_button_get_value_as_int (s));
+    torrent_set_int (di, TR_KEY_downloadLimit, gtk_spin_button_get_value_as_int (s));
 }
 
 static void
 idle_spun_cb (GtkSpinButton * s, struct DetailsImpl * di)
 {
-    torrent_set_int (di, "seedIdleLimit", gtk_spin_button_get_value_as_int (s));
+    torrent_set_int (di, TR_KEY_seedIdleLimit, gtk_spin_button_get_value_as_int (s));
 }
 
 static void
 ratio_spun_cb (GtkSpinButton * s, struct DetailsImpl * di)
 {
-    torrent_set_real (di, "seedRatioLimit", gtk_spin_button_get_value (s));
+    torrent_set_real (di, TR_KEY_seedRatioLimit, gtk_spin_button_get_value (s));
 }
 
 static void
 max_peers_spun_cb (GtkSpinButton * s, struct DetailsImpl * di)
 {
-    torrent_set_int (di, "peer-limit", gtk_spin_button_get_value (s));
+    torrent_set_int (di, TR_KEY_peer_limit, gtk_spin_button_get_value (s));
 }
 
 static void
 onPriorityChanged (GtkComboBox * combo_box, struct DetailsImpl * di)
 {
     const tr_priority_t priority = gtr_priority_combo_get_value (combo_box);
-    torrent_set_int (di, "bandwidthPriority", priority);
+    torrent_set_int (di, TR_KEY_bandwidthPriority, priority);
 }
 
 static GtkWidget*
@@ -436,7 +436,7 @@ static void refresh (struct DetailsImpl * di);
 static void
 onComboEnumChanged (GtkComboBox * combo_box, struct DetailsImpl * di)
 {
-    const char * key = g_object_get_qdata (G_OBJECT (combo_box), ARG_KEY);
+    const tr_quark key = GPOINTER_TO_INT (g_object_get_qdata (G_OBJECT (combo_box), ARG_KEY));
     torrent_set_int (di, key, gtr_combo_box_get_active_enum (combo_box));
     refresh (di);
 }
@@ -449,7 +449,7 @@ ratio_combo_new (void)
         _("Seed regardless of ratio"),  TR_RATIOLIMIT_UNLIMITED,
         _("Stop seeding at ratio:"),    TR_RATIOLIMIT_SINGLE,
         NULL);
-    g_object_set_qdata (G_OBJECT (w), ARG_KEY, (gpointer)"seedRatioMode");
+    g_object_set_qdata (G_OBJECT (w), ARG_KEY, GINT_TO_POINTER(TR_KEY_seedRatioMode));
     return w;
 }
 
@@ -461,7 +461,7 @@ idle_combo_new (void)
         _("Seed regardless of activity"),         TR_IDLELIMIT_UNLIMITED,
         _("Stop seeding if idle for N minutes:"), TR_IDLELIMIT_SINGLE,
         NULL);
-    g_object_set_qdata (G_OBJECT (w), ARG_KEY, (gpointer)"seedIdleMode");
+    g_object_set_qdata (G_OBJECT (w), ARG_KEY, GINT_TO_POINTER(TR_KEY_seedIdleMode));
     return w;
 }
 
@@ -1510,7 +1510,7 @@ setPeerViewColumns (GtkTreeView * peer_view)
 {
     int i;
     int n = 0;
-    const bool more = gtr_pref_flag_get (PREF_KEY_SHOW_MORE_PEER_INFO);
+    const bool more = gtr_pref_flag_get (TR_KEY_show_extra_peer_details);
     int view_columns[32];
     GtkTreeViewColumn * c;
     GtkCellRenderer *   r;
@@ -1642,7 +1642,7 @@ setPeerViewColumns (GtkTreeView * peer_view)
 static void
 onMorePeerInfoToggled (GtkToggleButton * button, struct DetailsImpl * di)
 {
-    const char * key = PREF_KEY_SHOW_MORE_PEER_INFO;
+    const tr_quark key = TR_KEY_show_extra_peer_details;
     const gboolean value = gtk_toggle_button_get_active (button);
     gtr_core_set_pref_bool (di->core, key, value);
     setPeerViewColumns (GTK_TREE_VIEW (di->peer_view));
@@ -1733,7 +1733,7 @@ peer_page_new (struct DetailsImpl * di)
 
     w = gtk_check_button_new_with_mnemonic (_("Show _more details"));
     di->more_peer_details_check = w;
-    b = gtr_pref_flag_get (PREF_KEY_SHOW_MORE_PEER_INFO);
+    b = gtr_pref_flag_get (TR_KEY_show_extra_peer_details);
     gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (w), b);
     g_signal_connect (w, "toggled", G_CALLBACK (onMorePeerInfoToggled), di);
     gtk_box_pack_start (GTK_BOX (vbox), w, FALSE, FALSE, 0);
@@ -2075,19 +2075,19 @@ refreshTracker (struct DetailsImpl * di, tr_torrent ** torrents, int n)
 static void
 onScrapeToggled (GtkToggleButton * button, struct DetailsImpl * di)
 {
-    const char * key = PREF_KEY_SHOW_MORE_TRACKER_INFO;
-    const gboolean value = gtk_toggle_button_get_active (button);
-    gtr_core_set_pref_bool (di->core, key, value);
-    refresh (di);
+  const tr_quark key = TR_KEY_show_tracker_scrapes;
+  const gboolean value = gtk_toggle_button_get_active (button);
+  gtr_core_set_pref_bool (di->core, key, value);
+  refresh (di);
 }
 
 static void
 onBackupToggled (GtkToggleButton * button, struct DetailsImpl * di)
 {
-    const char * key = PREF_KEY_SHOW_BACKUP_TRACKERS;
-    const gboolean value = gtk_toggle_button_get_active (button);
-    gtr_core_set_pref_bool (di->core, key, value);
-    refresh (di);
+  const tr_quark key = TR_KEY_show_backup_trackers;
+  const gboolean value = gtk_toggle_button_get_active (button);
+  gtr_core_set_pref_bool (di->core, key, value);
+  refresh (di);
 }
 
 static void
@@ -2440,14 +2440,14 @@ tracker_page_new (struct DetailsImpl * di)
 
     w = gtk_check_button_new_with_mnemonic (_("Show _more details"));
     di->scrape_check = w;
-    b = gtr_pref_flag_get (PREF_KEY_SHOW_MORE_TRACKER_INFO);
+    b = gtr_pref_flag_get (TR_KEY_show_tracker_scrapes);
     gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (w), b);
     g_signal_connect (w, "toggled", G_CALLBACK (onScrapeToggled), di);
     gtk_box_pack_start (GTK_BOX (vbox), w, FALSE, FALSE, 0);
 
     w = gtk_check_button_new_with_mnemonic (_("Show _backup trackers"));
     di->all_check = w;
-    b = gtr_pref_flag_get (PREF_KEY_SHOW_BACKUP_TRACKERS);
+    b = gtr_pref_flag_get (TR_KEY_show_backup_trackers);
     gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (w), b);
     g_signal_connect (w, "toggled", G_CALLBACK (onBackupToggled), di);
     gtk_box_pack_start (GTK_BOX (vbox), w, FALSE, FALSE, 0);

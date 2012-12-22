@@ -41,7 +41,7 @@
 #define DEFAULT_PORT atoi (TR_DEFAULT_RPC_PORT_STR)
 #define DEFAULT_URL TR_DEFAULT_RPC_URL_STR "rpc/"
 
-#define ARGUMENTS "arguments"
+#define ARGUMENTS TR_KEY_arguments
 
 #define MEM_K 1024
 #define MEM_B_STR   "B"
@@ -323,169 +323,170 @@ showUsage (void)
 static int
 numarg (const char * arg)
 {
-    char *     end = NULL;
-    const long num = strtol (arg, &end, 10);
+  char * end = NULL;
+  const long num = strtol (arg, &end, 10);
 
-    if (*end)
+  if (*end)
     {
-        fprintf (stderr, "Not a number: \"%s\"\n", arg);
-        showUsage ();
-        exit (EXIT_FAILURE);
+      fprintf (stderr, "Not a number: \"%s\"\n", arg);
+      showUsage ();
+      exit (EXIT_FAILURE);
     }
-    return num;
+
+  return num;
 }
 
 enum
 {
-    MODE_TORRENT_START         = (1<<0),
-    MODE_TORRENT_STOP          = (1<<1),
-    MODE_TORRENT_VERIFY        = (1<<2),
-    MODE_TORRENT_REANNOUNCE    = (1<<3),
-    MODE_TORRENT_SET           = (1<<4),
-    MODE_TORRENT_GET           = (1<<5),
-    MODE_TORRENT_ADD           = (1<<6),
-    MODE_TORRENT_REMOVE        = (1<<7),
-    MODE_TORRENT_SET_LOCATION  = (1<<8),
-    MODE_SESSION_SET           = (1<<9),
-    MODE_SESSION_GET           = (1<<10),
-    MODE_SESSION_STATS         = (1<<11),
-    MODE_SESSION_CLOSE         = (1<<12),
-    MODE_BLOCKLIST_UPDATE      = (1<<13),
-    MODE_PORT_TEST             = (1<<14)
+  MODE_TORRENT_START         = (1<<0),
+  MODE_TORRENT_STOP          = (1<<1),
+  MODE_TORRENT_VERIFY        = (1<<2),
+  MODE_TORRENT_REANNOUNCE    = (1<<3),
+  MODE_TORRENT_SET           = (1<<4),
+  MODE_TORRENT_GET           = (1<<5),
+  MODE_TORRENT_ADD           = (1<<6),
+  MODE_TORRENT_REMOVE        = (1<<7),
+  MODE_TORRENT_SET_LOCATION  = (1<<8),
+  MODE_SESSION_SET           = (1<<9),
+  MODE_SESSION_GET           = (1<<10),
+  MODE_SESSION_STATS         = (1<<11),
+  MODE_SESSION_CLOSE         = (1<<12),
+  MODE_BLOCKLIST_UPDATE      = (1<<13),
+  MODE_PORT_TEST             = (1<<14)
 };
 
 static int
 getOptMode (int val)
 {
-    switch (val)
+  switch (val)
     {
-        case TR_OPT_ERR:
-        case TR_OPT_UNK:
-        case 'a': /* add torrent */
-        case 'b': /* debug */
-        case 'n': /* auth */
-        case 810: /* authenv */
-        case 'N': /* netrc */
-        case 820: /* UseSSL */
-        case 't': /* set current torrent */
-        case 'V': /* show version number */
-            return 0;
+      case TR_OPT_ERR:
+      case TR_OPT_UNK:
+      case 'a': /* add torrent */
+      case 'b': /* debug */
+      case 'n': /* auth */
+      case 810: /* authenv */
+      case 'N': /* netrc */
+      case 820: /* UseSSL */
+      case 't': /* set current torrent */
+      case 'V': /* show version number */
+        return 0;
 
-        case 'c': /* incomplete-dir */
-        case 'C': /* no-incomplete-dir */
-        case 'e': /* cache */
-        case 'm': /* portmap */
-        case 'M': /* "no-portmap */
-        case 'o': /* dht */
-        case 'O': /* no-dht */
-        case 'p': /* incoming peer port */
-        case 'P': /* random incoming peer port */
-        case 'x': /* pex */
-        case 'X': /* no-pex */
-        case 'y': /* lpd */
-        case 'Y': /* no-lpd */
-        case 800: /* torrent-done-script */
-        case 801: /* no-torrent-done-script */
-        case 830: /* utp */
-        case 831: /* no-utp */
-        case 970: /* alt-speed */
-        case 971: /* no-alt-speed */
-        case 972: /* alt-speed-downlimit */
-        case 973: /* alt-speed-uplimit */
-        case 974: /* alt-speed-scheduler */
-        case 975: /* no-alt-speed-scheduler */
-        case 976: /* alt-speed-time-begin */
-        case 977: /* alt-speed-time-end */
-        case 978: /* alt-speed-days */
-        case 910: /* encryption-required */
-        case 911: /* encryption-preferred */
-        case 912: /* encryption-tolerated */
-        case 953: /* global-seedratio */
-        case 954: /* no-global-seedratio */
-        case 990: /* start-paused */
-        case 991: /* no-start-paused */
-        case 992: /* trash-torrent */
-        case 993: /* no-trash-torrent */
-            return MODE_SESSION_SET;
+      case 'c': /* incomplete-dir */
+      case 'C': /* no-incomplete-dir */
+      case 'e': /* cache */
+      case 'm': /* portmap */
+      case 'M': /* "no-portmap */
+      case 'o': /* dht */
+      case 'O': /* no-dht */
+      case 'p': /* incoming peer port */
+      case 'P': /* random incoming peer port */
+      case 'x': /* pex */
+      case 'X': /* no-pex */
+      case 'y': /* lpd */
+      case 'Y': /* no-lpd */
+      case 800: /* torrent-done-script */
+      case 801: /* no-torrent-done-script */
+      case 830: /* utp */
+      case 831: /* no-utp */
+      case 970: /* alt-speed */
+      case 971: /* no-alt-speed */
+      case 972: /* alt-speed-downlimit */
+      case 973: /* alt-speed-uplimit */
+      case 974: /* alt-speed-scheduler */
+      case 975: /* no-alt-speed-scheduler */
+      case 976: /* alt-speed-time-begin */
+      case 977: /* alt-speed-time-end */
+      case 978: /* alt-speed-days */
+      case 910: /* encryption-required */
+      case 911: /* encryption-preferred */
+      case 912: /* encryption-tolerated */
+      case 953: /* global-seedratio */
+      case 954: /* no-global-seedratio */
+      case 990: /* start-paused */
+      case 991: /* no-start-paused */
+      case 992: /* trash-torrent */
+      case 993: /* no-trash-torrent */
+        return MODE_SESSION_SET;
 
-        case 712: /* tracker-remove */
-        case 950: /* seedratio */
-        case 951: /* seedratio-default */
-        case 952: /* no-seedratio */
-        case 984: /* honor-session */
-        case 985: /* no-honor-session */
-            return MODE_TORRENT_SET;
+      case 712: /* tracker-remove */
+      case 950: /* seedratio */
+      case 951: /* seedratio-default */
+      case 952: /* no-seedratio */
+      case 984: /* honor-session */
+      case 985: /* no-honor-session */
+        return MODE_TORRENT_SET;
 
-        case 920: /* session-info */
-            return MODE_SESSION_GET;
+      case 920: /* session-info */
+        return MODE_SESSION_GET;
 
-        case 'g': /* get */
-        case 'G': /* no-get */
-        case 700: /* torrent priority-high */
-        case 701: /* torrent priority-normal */
-        case 702: /* torrent priority-low */
-        case 710: /* tracker-add */
-        case 900: /* file priority-high */
-        case 901: /* file priority-normal */
-        case 902: /* file priority-low */
-            return MODE_TORRENT_SET | MODE_TORRENT_ADD;
+      case 'g': /* get */
+      case 'G': /* no-get */
+      case 700: /* torrent priority-high */
+      case 701: /* torrent priority-normal */
+      case 702: /* torrent priority-low */
+      case 710: /* tracker-add */
+      case 900: /* file priority-high */
+      case 901: /* file priority-normal */
+      case 902: /* file priority-low */
+        return MODE_TORRENT_SET | MODE_TORRENT_ADD;
 
-        case 961: /* find */
-            return MODE_TORRENT_SET_LOCATION | MODE_TORRENT_ADD;
+      case 961: /* find */
+        return MODE_TORRENT_SET_LOCATION | MODE_TORRENT_ADD;
 
-        case 'i': /* info */
-        case 'l': /* list all torrents */
-        case 940: /* info-files */
-        case 941: /* info-peer */
-        case 942: /* info-pieces */
-        case 943: /* info-tracker */
-            return MODE_TORRENT_GET;
+      case 'i': /* info */
+      case 'l': /* list all torrents */
+      case 940: /* info-files */
+      case 941: /* info-peer */
+      case 942: /* info-pieces */
+      case 943: /* info-tracker */
+        return MODE_TORRENT_GET;
 
-        case 'd': /* download speed limit */
-        case 'D': /* no download speed limit */
-        case 'u': /* upload speed limit */
-        case 'U': /* no upload speed limit */
-        case 930: /* peers */
-            return MODE_SESSION_SET | MODE_TORRENT_SET;
+      case 'd': /* download speed limit */
+      case 'D': /* no download speed limit */
+      case 'u': /* upload speed limit */
+      case 'U': /* no upload speed limit */
+      case 930: /* peers */
+        return MODE_SESSION_SET | MODE_TORRENT_SET;
 
-        case 's': /* start */
-            return MODE_TORRENT_START | MODE_TORRENT_ADD;
+      case 's': /* start */
+        return MODE_TORRENT_START | MODE_TORRENT_ADD;
 
-        case 'S': /* stop */
-            return MODE_TORRENT_STOP | MODE_TORRENT_ADD;
+      case 'S': /* stop */
+        return MODE_TORRENT_STOP | MODE_TORRENT_ADD;
 
-        case 'w': /* download-dir */
-            return MODE_SESSION_SET | MODE_TORRENT_ADD;
+      case 'w': /* download-dir */
+        return MODE_SESSION_SET | MODE_TORRENT_ADD;
 
-        case 850: /* session-close */
-            return MODE_SESSION_CLOSE;
+      case 850: /* session-close */
+        return MODE_SESSION_CLOSE;
 
-        case 963: /* blocklist-update */
-            return MODE_BLOCKLIST_UPDATE;
+      case 963: /* blocklist-update */
+        return MODE_BLOCKLIST_UPDATE;
 
-        case 921: /* session-stats */
-            return MODE_SESSION_STATS;
+      case 921: /* session-stats */
+        return MODE_SESSION_STATS;
 
-        case 'v': /* verify */
-            return MODE_TORRENT_VERIFY;
+      case 'v': /* verify */
+        return MODE_TORRENT_VERIFY;
 
-        case 600: /* reannounce */
-            return MODE_TORRENT_REANNOUNCE;
+      case 600: /* reannounce */
+        return MODE_TORRENT_REANNOUNCE;
 
-        case 962: /* port-test */
-            return MODE_PORT_TEST;
+      case 962: /* port-test */
+        return MODE_PORT_TEST;
 
-        case 'r': /* remove */
-        case 'R': /* remove and delete */
-            return MODE_TORRENT_REMOVE;
+      case 'r': /* remove */
+      case 'R': /* remove and delete */
+        return MODE_TORRENT_REMOVE;
 
-        case 960: /* move */
-            return MODE_TORRENT_SET_LOCATION;
+      case 960: /* move */
+        return MODE_TORRENT_SET_LOCATION;
 
-        default:
-            fprintf (stderr, "unrecognized argument %d\n", val);
-            assert ("unrecognized argument" && 0);
-            return 0;
+      default:
+        fprintf (stderr, "unrecognized argument %d\n", val);
+        assert ("unrecognized argument" && 0);
+        return 0;
     }
 }
 
@@ -498,35 +499,41 @@ static bool UseSSL = false;
 static char*
 tr_getcwd (void)
 {
-    char * result;
-    char buf[2048];
+  char * result;
+  char buf[2048];
+
 #ifdef WIN32
-    result = _getcwd (buf, sizeof (buf));
+  result = _getcwd (buf, sizeof (buf));
 #else
-    result = getcwd (buf, sizeof (buf));
+  result = getcwd (buf, sizeof (buf));
 #endif
-    if (result == NULL)
+
+  if (result == NULL)
     {
-        fprintf (stderr, "getcwd error: \"%s\"", tr_strerror (errno));
-        *buf = '\0';
+      fprintf (stderr, "getcwd error: \"%s\"", tr_strerror (errno));
+      *buf = '\0';
     }
-    return tr_strdup (buf);
+
+  return tr_strdup (buf);
 }
 
 static char*
 absolutify (const char * path)
 {
-    char * buf;
+  char * buf;
 
-    if (*path == '/')
-        buf = tr_strdup (path);
-    else {
-        char * cwd = tr_getcwd ();
-        buf = tr_buildPath (cwd, path, NULL);
-        tr_free (cwd);
+  if (*path == '/')
+    {
+      buf = tr_strdup (path);
+    }
+  else
+    {
+      char * cwd = tr_getcwd ();
+      buf = tr_buildPath (cwd, path, NULL);
+      tr_free (cwd);
     }
 
-    return buf;
+  return buf;
 }
 
 static char*
@@ -563,14 +570,14 @@ addIdArg (tr_variant * args, const char * id)
             if (!isdigit (*pch))
                 isNum = false;
         if (isNum || isList)
-            tr_rpc_parse_list_str (tr_variantDictAdd (args, "ids", 3), id, strlen (id));
+            tr_rpc_parse_list_str (tr_variantDictAdd (args, TR_KEY_ids), id, strlen (id));
         else
-            tr_variantDictAddStr (args, "ids", id); /* it's a torrent sha hash */
+            tr_variantDictAddStr (args, TR_KEY_ids, id); /* it's a torrent sha hash */
     }
 }
 
 static void
-addTime (tr_variant * args, const char * key, const char * arg)
+addTime (tr_variant * args, const tr_quark key, const char * arg)
 {
     int time;
     bool success = false;
@@ -596,129 +603,138 @@ addTime (tr_variant * args, const char * key, const char * arg)
 }
 
 static void
-addDays (tr_variant * args, const char * key, const char * arg)
+addDays (tr_variant * args, const tr_quark key, const char * arg)
 {
-    int days = 0;
+  int days = 0;
 
-    if (arg)
+  if (arg)
     {
-        int i;
-        int valueCount;
-        int * values = tr_parseNumberRange (arg, -1, &valueCount);
-        for (i=0; i<valueCount; ++i)
-        {
-            if (values[i] < 0 || values[i] > 7) continue;
-            if (values[i] == 7) values[i] = 0;
+      int i;
+      int valueCount;
+      int * values;
 
-            days |= 1 << values[i];
+      values = tr_parseNumberRange (arg, -1, &valueCount);
+      for (i=0; i<valueCount; ++i)
+        {
+          if (values[i] < 0 || values[i] > 7)
+            continue;
+
+          if (values[i] == 7)
+            values[i] = 0;
+
+          days |= 1 << values[i];
         }
-        tr_free (values);
+
+      tr_free (values);
     }
 
-    if (days)
-        tr_variantDictAddInt (args, key, days);
-    else
-        fprintf (stderr, "Please specify the days of the week in '1-3,4,7' format.\n");
+  if (days)
+    tr_variantDictAddInt (args, key, days);
+  else
+    fprintf (stderr, "Please specify the days of the week in '1-3,4,7' format.\n");
 }
 
 static void
-addFiles (tr_variant *    args,
-          const char * key,
-          const char * arg)
+addFiles (tr_variant      * args,
+          const tr_quark    key,
+          const char      * arg)
 {
-    tr_variant * files = tr_variantDictAddList (args, key, 100);
+  tr_variant * files = tr_variantDictAddList (args, key, 100);
 
-    if (!*arg)
+  if (!*arg)
     {
-        fprintf (stderr, "No files specified!\n");
-        arg = "-1"; /* no file will have this index, so should be a no-op */
+      fprintf (stderr, "No files specified!\n");
+      arg = "-1"; /* no file will have this index, so should be a no-op */
     }
-    if (strcmp (arg, "all"))
+
+  if (strcmp (arg, "all"))
     {
-        int i;
-        int valueCount;
-        int * values = tr_parseNumberRange (arg, -1, &valueCount);
-        for (i=0; i<valueCount; ++i)
-            tr_variantListAddInt (files, values[i]);
-        tr_free (values);
+      int i;
+      int valueCount;
+      int * values = tr_parseNumberRange (arg, -1, &valueCount);
+
+      for (i=0; i<valueCount; ++i)
+        tr_variantListAddInt (files, values[i]);
+
+      tr_free (values);
     }
 }
 
 #define TR_N_ELEMENTS(ary) (sizeof (ary) / sizeof (*ary))
 
-static const char * files_keys[] = {
-    "files",
-    "name",
-    "priorities",
-    "wanted"
+static const tr_quark files_keys[] = {
+    TR_KEY_files,
+    TR_KEY_name,
+    TR_KEY_priorities,
+    TR_KEY_wanted
 };
 
-static const char * details_keys[] = {
-    "activityDate",
-    "addedDate",
-    "bandwidthPriority",
-    "comment",
-    "corruptEver",
-    "creator",
-    "dateCreated",
-    "desiredAvailable",
-    "doneDate",
-    "downloadDir",
-    "downloadedEver",
-    "downloadLimit",
-    "downloadLimited",
-    "error",
-    "errorString",
-    "eta",
-    "hashString",
-    "haveUnchecked",
-    "haveValid",
-    "honorsSessionLimits",
-    "id",
-    "isFinished",
-    "isPrivate",
-    "leftUntilDone",
-    "magnetLink",
-    "name",
-    "peersConnected",
-    "peersGettingFromUs",
-    "peersSendingToUs",
-    "peer-limit",
-    "pieceCount",
-    "pieceSize",
-    "rateDownload",
-    "rateUpload",
-    "recheckProgress",
-    "secondsDownloading",
-    "secondsSeeding",
-    "seedRatioMode",
-    "seedRatioLimit",
-    "sizeWhenDone",
-    "startDate",
-    "status",
-    "totalSize",
-    "uploadedEver",
-    "uploadLimit",
-    "uploadLimited",
-    "webseeds",
-    "webseedsSendingToUs"
+static const tr_quark details_keys[] = {
+    TR_KEY_activityDate,
+    TR_KEY_addedDate,
+    TR_KEY_bandwidthPriority,
+    TR_KEY_comment,
+    TR_KEY_corruptEver,
+    TR_KEY_creator,
+    TR_KEY_dateCreated,
+    TR_KEY_desiredAvailable,
+    TR_KEY_doneDate,
+    TR_KEY_downloadDir,
+    TR_KEY_downloadedEver,
+    TR_KEY_downloadLimit,
+    TR_KEY_downloadLimited,
+    TR_KEY_error,
+    TR_KEY_errorString,
+    TR_KEY_eta,
+    TR_KEY_hashString,
+    TR_KEY_haveUnchecked,
+    TR_KEY_haveValid,
+    TR_KEY_honorsSessionLimits,
+    TR_KEY_id,
+    TR_KEY_isFinished,
+    TR_KEY_isPrivate,
+    TR_KEY_leftUntilDone,
+    TR_KEY_magnetLink,
+    TR_KEY_name,
+    TR_KEY_peersConnected,
+    TR_KEY_peersGettingFromUs,
+    TR_KEY_peersSendingToUs,
+    TR_KEY_peer_limit,
+    TR_KEY_pieceCount,
+    TR_KEY_pieceSize,
+    TR_KEY_rateDownload,
+    TR_KEY_rateUpload,
+    TR_KEY_recheckProgress,
+    TR_KEY_secondsDownloading,
+    TR_KEY_secondsSeeding,
+    TR_KEY_seedRatioMode,
+    TR_KEY_seedRatioLimit,
+    TR_KEY_sizeWhenDone,
+    TR_KEY_startDate,
+    TR_KEY_status,
+    TR_KEY_totalSize,
+    TR_KEY_uploadedEver,
+    TR_KEY_uploadLimit,
+    TR_KEY_uploadLimited,
+    TR_KEY_webseeds,
+    TR_KEY_webseedsSendingToUs
 };
 
-static const char * list_keys[] = {
-    "error",
-    "errorString",
-    "eta",
-    "id",
-    "isFinished",
-    "leftUntilDone",
-    "name",
-    "peersGettingFromUs",
-    "peersSendingToUs",
-    "rateDownload",
-    "rateUpload",
-    "sizeWhenDone",
-    "status",
-    "uploadRatio"
+static const tr_quark list_keys[] = {
+    TR_KEY_error,
+    TR_KEY_errorString,
+    TR_KEY_eta,
+    TR_KEY_id,
+    TR_KEY_isFinished,
+    TR_KEY_leftUntilDone,
+    TR_KEY_name,
+    TR_KEY_peersGettingFromUs,
+    TR_KEY_peersSendingToUs,
+    TR_KEY_rateDownload,
+    TR_KEY_rateUpload,
+    TR_KEY_sizeWhenDone,
+    TR_KEY_status,
+    TR_KEY_uploadRatio
 };
 
 static size_t
@@ -766,7 +782,7 @@ getStatusString (tr_variant * t, char * buf, size_t buflen)
     int64_t status;
     bool boolVal;
 
-    if (!tr_variantDictFindInt (t, "status", &status))
+    if (!tr_variantDictFindInt (t, TR_KEY_status, &status))
     {
         *buf = '\0';
     }
@@ -778,7 +794,7 @@ getStatusString (tr_variant * t, char * buf, size_t buflen)
             break;
 
         case TR_STATUS_STOPPED:
-            if (tr_variantDictFindBool (t, "isFinished", &boolVal) && boolVal)
+            if (tr_variantDictFindBool (t, TR_KEY_isFinished, &boolVal) && boolVal)
                 tr_strlcpy (buf, "Finished", buflen);
             else
                 tr_strlcpy (buf, "Stopped", buflen);
@@ -790,7 +806,7 @@ getStatusString (tr_variant * t, char * buf, size_t buflen)
                              ? "Will Verify"
                              : "Verifying";
             double percent;
-            if (tr_variantDictFindReal (t, "recheckProgress", &percent))
+            if (tr_variantDictFindReal (t, TR_KEY_recheckProgress, &percent))
                 tr_snprintf (buf, buflen, "%s (%.0f%%)", str, floor (percent*100.0));
             else
                 tr_strlcpy (buf, str, buflen);
@@ -802,15 +818,15 @@ getStatusString (tr_variant * t, char * buf, size_t buflen)
         case TR_STATUS_SEED: {
             int64_t fromUs = 0;
             int64_t toUs = 0;
-            tr_variantDictFindInt (t, "peersGettingFromUs", &fromUs);
-            tr_variantDictFindInt (t, "peersSendingToUs", &toUs);
+            tr_variantDictFindInt (t, TR_KEY_peersGettingFromUs, &fromUs);
+            tr_variantDictFindInt (t, TR_KEY_peersSendingToUs, &toUs);
             if (fromUs && toUs)
                 tr_strlcpy (buf, "Up & Down", buflen);
             else if (toUs)
                 tr_strlcpy (buf, "Downloading", buflen);
             else if (fromUs) {
                 int64_t leftUntilDone = 0;
-                tr_variantDictFindInt (t, "leftUntilDone", &leftUntilDone);
+                tr_variantDictFindInt (t, TR_KEY_leftUntilDone, &leftUntilDone);
                 if (leftUntilDone > 0)
                     tr_strlcpy (buf, "Uploading", buflen);
                 else
@@ -837,8 +853,8 @@ printDetails (tr_variant * top)
 {
     tr_variant *args, *torrents;
 
-    if ((tr_variantDictFindDict (top, "arguments", &args))
-      && (tr_variantDictFindList (args, "torrents", &torrents)))
+    if ((tr_variantDictFindDict (top, TR_KEY_arguments, &args))
+      && (tr_variantDictFindList (args, TR_KEY_torrents, &torrents)))
     {
         int ti, tCount;
         for (ti = 0, tCount = tr_variantListSize (torrents); ti < tCount;
@@ -854,13 +870,13 @@ printDetails (tr_variant * top)
             double       d;
 
             printf ("NAME\n");
-            if (tr_variantDictFindInt (t, "id", &i))
+            if (tr_variantDictFindInt (t, TR_KEY_id, &i))
                 printf ("  Id: %" PRId64 "\n", i);
-            if (tr_variantDictFindStr (t, "name", &str, NULL))
+            if (tr_variantDictFindStr (t, TR_KEY_name, &str, NULL))
                 printf ("  Name: %s\n", str);
-            if (tr_variantDictFindStr (t, "hashString", &str, NULL))
+            if (tr_variantDictFindStr (t, TR_KEY_hashString, &str, NULL))
                 printf ("  Hash: %s\n", str);
-            if (tr_variantDictFindStr (t, "magnetLink", &str, NULL))
+            if (tr_variantDictFindStr (t, TR_KEY_magnetLink, &str, NULL))
                 printf ("  Magnet: %s\n", str);
             printf ("\n");
 
@@ -868,50 +884,50 @@ printDetails (tr_variant * top)
             getStatusString (t, buf, sizeof (buf));
             printf ("  State: %s\n", buf);
 
-            if (tr_variantDictFindStr (t, "downloadDir", &str, NULL))
+            if (tr_variantDictFindStr (t, TR_KEY_downloadDir, &str, NULL))
                 printf ("  Location: %s\n", str);
 
-            if (tr_variantDictFindInt (t, "sizeWhenDone", &i)
-              && tr_variantDictFindInt (t, "leftUntilDone", &j))
+            if (tr_variantDictFindInt (t, TR_KEY_sizeWhenDone, &i)
+              && tr_variantDictFindInt (t, TR_KEY_leftUntilDone, &j))
             {
                 strlpercent (buf, 100.0 * (i - j) / i, sizeof (buf));
                 printf ("  Percent Done: %s%%\n", buf);
             }
 
-            if (tr_variantDictFindInt (t, "eta", &i))
+            if (tr_variantDictFindInt (t, TR_KEY_eta, &i))
                 printf ("  ETA: %s\n", tr_strltime (buf, i, sizeof (buf)));
-            if (tr_variantDictFindInt (t, "rateDownload", &i))
+            if (tr_variantDictFindInt (t, TR_KEY_rateDownload, &i))
                 printf ("  Download Speed: %s\n", tr_formatter_speed_KBps (buf, i/ (double)tr_speed_K, sizeof (buf)));
-            if (tr_variantDictFindInt (t, "rateUpload", &i))
+            if (tr_variantDictFindInt (t, TR_KEY_rateUpload, &i))
                 printf ("  Upload Speed: %s\n", tr_formatter_speed_KBps (buf, i/ (double)tr_speed_K, sizeof (buf)));
-            if (tr_variantDictFindInt (t, "haveUnchecked", &i)
-              && tr_variantDictFindInt (t, "haveValid", &j))
+            if (tr_variantDictFindInt (t, TR_KEY_haveUnchecked, &i)
+              && tr_variantDictFindInt (t, TR_KEY_haveValid, &j))
             {
                 strlsize (buf, i + j, sizeof (buf));
                 strlsize (buf2, j, sizeof (buf2));
                 printf ("  Have: %s (%s verified)\n", buf, buf2);
             }
 
-            if (tr_variantDictFindInt (t, "sizeWhenDone", &i))
+            if (tr_variantDictFindInt (t, TR_KEY_sizeWhenDone, &i))
             {
                 if (i < 1)
                     printf ("  Availability: None\n");
-                if (tr_variantDictFindInt (t, "desiredAvailable", &j)
-                    && tr_variantDictFindInt (t, "leftUntilDone", &k))
+                if (tr_variantDictFindInt (t, TR_KEY_desiredAvailable, &j)
+                    && tr_variantDictFindInt (t, TR_KEY_leftUntilDone, &k))
                 {
                     j += i - k;
                     strlpercent (buf, 100.0 * j / i, sizeof (buf));
                     printf ("  Availability: %s%%\n", buf);
                 }
-                if (tr_variantDictFindInt (t, "totalSize", &j))
+                if (tr_variantDictFindInt (t, TR_KEY_totalSize, &j))
                 {
                     strlsize (buf2, i, sizeof (buf2));
                     strlsize (buf, j, sizeof (buf));
                     printf ("  Total size: %s (%s wanted)\n", buf, buf2);
                 }
             }
-            if (tr_variantDictFindInt (t, "downloadedEver", &i)
-              && tr_variantDictFindInt (t, "uploadedEver", &j))
+            if (tr_variantDictFindInt (t, TR_KEY_downloadedEver, &i)
+              && tr_variantDictFindInt (t, TR_KEY_uploadedEver, &j))
             {
                 strlsize (buf, i, sizeof (buf));
                 printf ("  Downloaded: %s\n", buf);
@@ -920,13 +936,13 @@ printDetails (tr_variant * top)
                 strlratio (buf, j, i, sizeof (buf));
                 printf ("  Ratio: %s\n", buf);
             }
-            if (tr_variantDictFindInt (t, "corruptEver", &i))
+            if (tr_variantDictFindInt (t, TR_KEY_corruptEver, &i))
             {
                 strlsize (buf, i, sizeof (buf));
                 printf ("  Corrupt DL: %s\n", buf);
             }
-            if (tr_variantDictFindStr (t, "errorString", &str, NULL) && str && *str &&
-                tr_variantDictFindInt (t, "error", &i) && i)
+            if (tr_variantDictFindStr (t, TR_KEY_errorString, &str, NULL) && str && *str &&
+                tr_variantDictFindInt (t, TR_KEY_error, &i) && i)
             {
                 switch (i) {
                     case TR_STAT_TRACKER_WARNING: printf ("  Tracker gave a warning: %s\n", str); break;
@@ -935,9 +951,9 @@ printDetails (tr_variant * top)
                     default: break; /* no error */
                 }
             }
-            if (tr_variantDictFindInt (t, "peersConnected", &i)
-              && tr_variantDictFindInt (t, "peersGettingFromUs", &j)
-              && tr_variantDictFindInt (t, "peersSendingToUs", &k))
+            if (tr_variantDictFindInt (t, TR_KEY_peersConnected, &i)
+              && tr_variantDictFindInt (t, TR_KEY_peersGettingFromUs, &j)
+              && tr_variantDictFindInt (t, TR_KEY_peersSendingToUs, &k))
             {
                 printf (
                     "  Peers: "
@@ -949,8 +965,8 @@ printDetails (tr_variant * top)
                     i, j, k);
             }
 
-            if (tr_variantDictFindList (t, "webseeds", &l)
-              && tr_variantDictFindInt (t, "webseedsSendingToUs", &i))
+            if (tr_variantDictFindList (t, TR_KEY_webseeds, &l)
+              && tr_variantDictFindInt (t, TR_KEY_webseedsSendingToUs, &i))
             {
                 const int64_t n = tr_variantListSize (l);
                 if (n > 0)
@@ -962,53 +978,53 @@ printDetails (tr_variant * top)
             printf ("\n");
 
             printf ("HISTORY\n");
-            if (tr_variantDictFindInt (t, "addedDate", &i) && i)
+            if (tr_variantDictFindInt (t, TR_KEY_addedDate, &i) && i)
             {
                 const time_t tt = i;
                 printf ("  Date added:       %s", ctime (&tt));
             }
-            if (tr_variantDictFindInt (t, "doneDate", &i) && i)
+            if (tr_variantDictFindInt (t, TR_KEY_doneDate, &i) && i)
             {
                 const time_t tt = i;
                 printf ("  Date finished:    %s", ctime (&tt));
             }
-            if (tr_variantDictFindInt (t, "startDate", &i) && i)
+            if (tr_variantDictFindInt (t, TR_KEY_startDate, &i) && i)
             {
                 const time_t tt = i;
                 printf ("  Date started:     %s", ctime (&tt));
             }
-            if (tr_variantDictFindInt (t, "activityDate", &i) && i)
+            if (tr_variantDictFindInt (t, TR_KEY_activityDate, &i) && i)
             {
                 const time_t tt = i;
                 printf ("  Latest activity:  %s", ctime (&tt));
             }
-            if (tr_variantDictFindInt (t, "secondsDownloading", &i) && (i > 0))
+            if (tr_variantDictFindInt (t, TR_KEY_secondsDownloading, &i) && (i > 0))
                 printf ("  Downloading Time: %s\n", tr_strltime (buf, i, sizeof (buf)));
-            if (tr_variantDictFindInt (t, "secondsSeeding", &i) && (i > 0))
+            if (tr_variantDictFindInt (t, TR_KEY_secondsSeeding, &i) && (i > 0))
                 printf ("  Seeding Time:     %s\n", tr_strltime (buf, i, sizeof (buf)));
             printf ("\n");
 
             printf ("ORIGINS\n");
-            if (tr_variantDictFindInt (t, "dateCreated", &i) && i)
+            if (tr_variantDictFindInt (t, TR_KEY_dateCreated, &i) && i)
             {
                 const time_t tt = i;
                 printf ("  Date created: %s", ctime (&tt));
             }
-            if (tr_variantDictFindBool (t, "isPrivate", &boolVal))
+            if (tr_variantDictFindBool (t, TR_KEY_isPrivate, &boolVal))
                 printf ("  Public torrent: %s\n", (boolVal ? "No" : "Yes"));
-            if (tr_variantDictFindStr (t, "comment", &str, NULL) && str && *str)
+            if (tr_variantDictFindStr (t, TR_KEY_comment, &str, NULL) && str && *str)
                 printf ("  Comment: %s\n", str);
-            if (tr_variantDictFindStr (t, "creator", &str, NULL) && str && *str)
+            if (tr_variantDictFindStr (t, TR_KEY_creator, &str, NULL) && str && *str)
                 printf ("  Creator: %s\n", str);
-            if (tr_variantDictFindInt (t, "pieceCount", &i))
+            if (tr_variantDictFindInt (t, TR_KEY_pieceCount, &i))
                 printf ("  Piece Count: %" PRId64 "\n", i);
-            if (tr_variantDictFindInt (t, "pieceSize", &i))
+            if (tr_variantDictFindInt (t, TR_KEY_pieceSize, &i))
                 printf ("  Piece Size: %s\n", strlmem (buf, i, sizeof (buf)));
             printf ("\n");
 
             printf ("LIMITS & BANDWIDTH\n");
-            if (tr_variantDictFindBool (t, "downloadLimited", &boolVal)
-                && tr_variantDictFindInt (t, "downloadLimit", &i))
+            if (tr_variantDictFindBool (t, TR_KEY_downloadLimited, &boolVal)
+                && tr_variantDictFindInt (t, TR_KEY_downloadLimit, &i))
             {
                 printf ("  Download Limit: ");
                 if (boolVal)
@@ -1016,8 +1032,8 @@ printDetails (tr_variant * top)
                 else
                     printf ("Unlimited\n");
             }
-            if (tr_variantDictFindBool (t, "uploadLimited", &boolVal)
-                && tr_variantDictFindInt (t, "uploadLimit", &i))
+            if (tr_variantDictFindBool (t, TR_KEY_uploadLimited, &boolVal)
+                && tr_variantDictFindInt (t, TR_KEY_uploadLimit, &i))
             {
                 printf ("  Upload Limit: ");
                 if (boolVal)
@@ -1025,14 +1041,14 @@ printDetails (tr_variant * top)
                 else
                     printf ("Unlimited\n");
             }
-            if (tr_variantDictFindInt (t, "seedRatioMode", &i))
+            if (tr_variantDictFindInt (t, TR_KEY_seedRatioMode, &i))
             {
                 switch (i) {
                     case TR_RATIOLIMIT_GLOBAL:
                         printf ("  Ratio Limit: Default\n");
                         break;
                     case TR_RATIOLIMIT_SINGLE:
-                        if (tr_variantDictFindReal (t, "seedRatioLimit", &d))
+                        if (tr_variantDictFindReal (t, TR_KEY_seedRatioLimit, &d))
                             printf ("  Ratio Limit: %.2f\n", d);
                         break;
                     case TR_RATIOLIMIT_UNLIMITED:
@@ -1041,11 +1057,11 @@ printDetails (tr_variant * top)
                     default: break;
                 }
             }
-            if (tr_variantDictFindBool (t, "honorsSessionLimits", &boolVal))
+            if (tr_variantDictFindBool (t, TR_KEY_honorsSessionLimits, &boolVal))
                 printf ("  Honors Session Limits: %s\n", (boolVal ? "Yes" : "No"));
-            if (tr_variantDictFindInt (t, "peer-limit", &i))
+            if (tr_variantDictFindInt (t, TR_KEY_peer_limit, &i))
                 printf ("  Peer limit: %" PRId64 "\n", i);
-            if (tr_variantDictFindInt (t, "bandwidthPriority", &i))
+            if (tr_variantDictFindInt (t, TR_KEY_bandwidthPriority, &i))
                 printf ("  Bandwidth Priority: %s\n",
                         bandwidthPriorityNames[ (i + 1) & 3]);
 
@@ -1059,8 +1075,8 @@ printFileList (tr_variant * top)
 {
     tr_variant *args, *torrents;
 
-    if ((tr_variantDictFindDict (top, "arguments", &args))
-      && (tr_variantDictFindList (args, "torrents", &torrents)))
+    if ((tr_variantDictFindDict (top, TR_KEY_arguments, &args))
+      && (tr_variantDictFindList (args, TR_KEY_torrents, &torrents)))
     {
         int i, in;
         for (i = 0, in = tr_variantListSize (torrents); i < in; ++i)
@@ -1068,10 +1084,10 @@ printFileList (tr_variant * top)
             tr_variant *    d = tr_variantListChild (torrents, i);
             tr_variant *    files, *priorities, *wanteds;
             const char * name;
-            if (tr_variantDictFindStr (d, "name", &name, NULL)
-              && tr_variantDictFindList (d, "files", &files)
-              && tr_variantDictFindList (d, "priorities", &priorities)
-              && tr_variantDictFindList (d, "wanted", &wanteds))
+            if (tr_variantDictFindStr (d, TR_KEY_name, &name, NULL)
+              && tr_variantDictFindList (d, TR_KEY_files, &files)
+              && tr_variantDictFindList (d, TR_KEY_priorities, &priorities)
+              && tr_variantDictFindList (d, TR_KEY_wanted, &wanteds))
             {
                 int j = 0, jn = tr_variantListSize (files);
                 printf ("%s (%d files):\n", name, jn);
@@ -1086,13 +1102,11 @@ printFileList (tr_variant * top)
                     int64_t      wanted;
                     const char * filename;
                     tr_variant *    file = tr_variantListChild (files, j);
-                    if (tr_variantDictFindInt (file, "length", &length)
-                      && tr_variantDictFindStr (file, "name", &filename, NULL)
-                      && tr_variantDictFindInt (file, "bytesCompleted", &have)
-                      && tr_variantGetInt (tr_variantListChild (priorities,
-                                                          j), &priority)
-                      && tr_variantGetInt (tr_variantListChild (wanteds,
-                                                          j), &wanted))
+                    if (tr_variantDictFindInt (file, TR_KEY_length, &length)
+                      && tr_variantDictFindStr (file, TR_KEY_name, &filename, NULL)
+                      && tr_variantDictFindInt (file, TR_KEY_bytesCompleted, &have)
+                      && tr_variantGetInt (tr_variantListChild (priorities, j), &priority)
+                      && tr_variantGetInt (tr_variantListChild (wanteds, j), &wanted))
                     {
                         char         sizestr[64];
                         double       percent = (double)have / length;
@@ -1126,28 +1140,29 @@ printFileList (tr_variant * top)
 static void
 printPeersImpl (tr_variant * peers)
 {
-    int i, n;
-    printf ("%-20s  %-12s  %-5s %-6s  %-6s  %s\n",
-            "Address", "Flags", "Done", "Down", "Up", "Client");
-    for (i = 0, n = tr_variantListSize (peers); i < n; ++i)
-    {
-        double progress;
-        const char * address, * client, * flagstr;
-        int64_t rateToClient, rateToPeer;
-        tr_variant * d = tr_variantListChild (peers, i);
+  int i, n;
+  printf ("%-20s  %-12s  %-5s %-6s  %-6s  %s\n",
+          "Address", "Flags", "Done", "Down", "Up", "Client");
 
-        if (tr_variantDictFindStr (d, "address", &address, NULL)
-          && tr_variantDictFindStr (d, "clientName", &client, NULL)
-          && tr_variantDictFindReal (d, "progress", &progress)
-          && tr_variantDictFindStr (d, "flagStr", &flagstr, NULL)
-          && tr_variantDictFindInt (d, "rateToClient", &rateToClient)
-          && tr_variantDictFindInt (d, "rateToPeer", &rateToPeer))
+  for (i=0, n=tr_variantListSize(peers); i<n; ++i)
+    {
+      double progress;
+      const char * address, * client, * flagstr;
+      int64_t rateToClient, rateToPeer;
+      tr_variant * d = tr_variantListChild (peers, i);
+
+      if  (tr_variantDictFindStr  (d, TR_KEY_address, &address, NULL)
+        && tr_variantDictFindStr  (d, TR_KEY_clientName, &client, NULL)
+        && tr_variantDictFindReal (d, TR_KEY_progress, &progress)
+        && tr_variantDictFindStr  (d, TR_KEY_flagStr, &flagstr, NULL)
+        && tr_variantDictFindInt  (d, TR_KEY_rateToClient, &rateToClient)
+        && tr_variantDictFindInt  (d, TR_KEY_rateToPeer, &rateToPeer))
         {
-            printf ("%-20s  %-12s  %-5.1f %6.1f  %6.1f  %s\n",
-                    address, flagstr, (progress*100.0),
-                    rateToClient / (double)tr_speed_K,
-                    rateToPeer / (double)tr_speed_K,
-                    client);
+          printf ("%-20s  %-12s  %-5.1f %6.1f  %6.1f  %s\n",
+                  address, flagstr, (progress*100.0),
+                  rateToClient / (double)tr_speed_K,
+                  rateToPeer / (double)tr_speed_K,
+                  client);
         }
     }
 }
@@ -1155,20 +1170,21 @@ printPeersImpl (tr_variant * peers)
 static void
 printPeers (tr_variant * top)
 {
-    tr_variant *args, *torrents;
+  tr_variant *args, *torrents;
 
-    if (tr_variantDictFindDict (top, "arguments", &args)
-      && tr_variantDictFindList (args, "torrents", &torrents))
+  if (tr_variantDictFindDict (top, TR_KEY_arguments, &args)
+      && tr_variantDictFindList (args, TR_KEY_torrents, &torrents))
     {
-        int i, n;
-        for (i=0, n=tr_variantListSize (torrents); i<n; ++i)
+      int i, n;
+      for (i=0, n=tr_variantListSize (torrents); i<n; ++i)
         {
-            tr_variant * peers;
-            tr_variant * torrent = tr_variantListChild (torrents, i);
-            if (tr_variantDictFindList (torrent, "peers", &peers)) {
-                printPeersImpl (peers);
-                if (i+1<n)
-                    printf ("\n");
+          tr_variant * peers;
+          tr_variant * torrent = tr_variantListChild (torrents, i);
+          if (tr_variantDictFindList (torrent, TR_KEY_peers, &peers))
+            {
+              printPeersImpl (peers);
+              if (i+1<n)
+                printf ("\n");
             }
         }
     }
@@ -1197,8 +1213,8 @@ printPieces (tr_variant * top)
 {
     tr_variant *args, *torrents;
 
-    if (tr_variantDictFindDict (top, "arguments", &args)
-      && tr_variantDictFindList (args, "torrents", &torrents))
+    if (tr_variantDictFindDict (top, TR_KEY_arguments, &args)
+      && tr_variantDictFindList (args, TR_KEY_torrents, &torrents))
     {
         int i, n;
         for (i=0, n=tr_variantListSize (torrents); i<n; ++i)
@@ -1207,8 +1223,8 @@ printPieces (tr_variant * top)
             const uint8_t * raw;
             size_t       rawlen;
             tr_variant * torrent = tr_variantListChild (torrents, i);
-            if (tr_variantDictFindRaw (torrent, "pieces", &raw, &rawlen) &&
-                tr_variantDictFindInt (torrent, "pieceCount", &j)) {
+            if (tr_variantDictFindRaw (torrent, TR_KEY_pieces, &raw, &rawlen) &&
+                tr_variantDictFindInt (torrent, TR_KEY_pieceCount, &j)) {
                 printPiecesImpl (raw, rawlen, j);
                 if (i+1<n)
                     printf ("\n");
@@ -1221,11 +1237,11 @@ static void
 printPortTest (tr_variant * top)
 {
     tr_variant *args;
-    if ((tr_variantDictFindDict (top, "arguments", &args)))
+    if ((tr_variantDictFindDict (top, TR_KEY_arguments, &args)))
     {
         bool      boolVal;
 
-        if (tr_variantDictFindBool (args, "port-is-open", &boolVal))
+        if (tr_variantDictFindBool (args, TR_KEY_port_is_open, &boolVal))
             printf ("Port is open: %s\n", (boolVal ? "Yes" : "No"));
     }
 }
@@ -1235,8 +1251,8 @@ printTorrentList (tr_variant * top)
 {
     tr_variant *args, *list;
 
-    if ((tr_variantDictFindDict (top, "arguments", &args))
-      && (tr_variantDictFindList (args, "torrents", &list)))
+    if ((tr_variantDictFindDict (top, TR_KEY_arguments, &args))
+      && (tr_variantDictFindList (args, TR_KEY_torrents, &list)))
     {
         int i, n;
         int64_t total_size=0;
@@ -1254,15 +1270,15 @@ printTorrentList (tr_variant * top)
             double       ratio;
             const char * name;
             tr_variant *   d = tr_variantListChild (list, i);
-            if (tr_variantDictFindInt (d, "eta", &eta)
-              && tr_variantDictFindInt (d, "id", &id)
-              && tr_variantDictFindInt (d, "leftUntilDone", &leftUntilDone)
-              && tr_variantDictFindStr (d, "name", &name, NULL)
-              && tr_variantDictFindInt (d, "rateDownload", &down)
-              && tr_variantDictFindInt (d, "rateUpload", &up)
-              && tr_variantDictFindInt (d, "sizeWhenDone", &sizeWhenDone)
-              && tr_variantDictFindInt (d, "status", &status)
-              && tr_variantDictFindReal (d, "uploadRatio", &ratio))
+            if  (tr_variantDictFindInt  (d, TR_KEY_eta, &eta)
+              && tr_variantDictFindInt  (d, TR_KEY_id, &id)
+              && tr_variantDictFindInt  (d, TR_KEY_leftUntilDone, &leftUntilDone)
+              && tr_variantDictFindStr  (d, TR_KEY_name, &name, NULL)
+              && tr_variantDictFindInt  (d, TR_KEY_rateDownload, &down)
+              && tr_variantDictFindInt  (d, TR_KEY_rateUpload, &up)
+              && tr_variantDictFindInt  (d, TR_KEY_sizeWhenDone, &sizeWhenDone)
+              && tr_variantDictFindInt  (d, TR_KEY_status, &status)
+              && tr_variantDictFindReal (d, TR_KEY_uploadRatio, &ratio))
             {
                 char etaStr[16];
                 char statusStr[64];
@@ -1282,7 +1298,7 @@ printTorrentList (tr_variant * top)
                     etaToString (etaStr, sizeof (etaStr), eta);
                 else
                     tr_snprintf (etaStr, sizeof (etaStr), "Done");
-                if (tr_variantDictFindInt (d, "error", &error) && error)
+                if (tr_variantDictFindInt (d, TR_KEY_error, &error) && error)
                     errorMark = '*';
                 else
                     errorMark = ' ';
@@ -1345,30 +1361,30 @@ printTrackersImpl (tr_variant * trackerStats)
         int64_t announceState;
         int64_t scrapeState;
 
-        if (tr_variantDictFindInt (t, "downloadCount", &downloadCount) &&
-            tr_variantDictFindBool (t, "hasAnnounced", &hasAnnounced) &&
-            tr_variantDictFindBool (t, "hasScraped", &hasScraped) &&
-            tr_variantDictFindStr (t, "host", &host, NULL) &&
-            tr_variantDictFindInt (t, "id", &id) &&
-            tr_variantDictFindBool (t, "isBackup", &isBackup) &&
-            tr_variantDictFindInt (t, "announceState", &announceState) &&
-            tr_variantDictFindInt (t, "scrapeState", &scrapeState) &&
-            tr_variantDictFindInt (t, "lastAnnouncePeerCount", &lastAnnouncePeerCount) &&
-            tr_variantDictFindStr (t, "lastAnnounceResult", &lastAnnounceResult, NULL) &&
-            tr_variantDictFindInt (t, "lastAnnounceStartTime", &lastAnnounceStartTime) &&
-            tr_variantDictFindBool (t, "lastAnnounceSucceeded", &lastAnnounceSucceeded) &&
-            tr_variantDictFindInt (t, "lastAnnounceTime", &lastAnnounceTime) &&
-            tr_variantDictFindBool (t, "lastAnnounceTimedOut", &lastAnnounceTimedOut) &&
-            tr_variantDictFindStr (t, "lastScrapeResult", &lastScrapeResult, NULL) &&
-            tr_variantDictFindInt (t, "lastScrapeStartTime", &lastScrapeStartTime) &&
-            tr_variantDictFindBool (t, "lastScrapeSucceeded", &lastScrapeSucceeded) &&
-            tr_variantDictFindInt (t, "lastScrapeTime", &lastScrapeTime) &&
-            tr_variantDictFindBool (t, "lastScrapeTimedOut", &lastScrapeTimedOut) &&
-            tr_variantDictFindInt (t, "leecherCount", &leecherCount) &&
-            tr_variantDictFindInt (t, "nextAnnounceTime", &nextAnnounceTime) &&
-            tr_variantDictFindInt (t, "nextScrapeTime", &nextScrapeTime) &&
-            tr_variantDictFindInt (t, "seederCount", &seederCount) &&
-            tr_variantDictFindInt (t, "tier", &tier))
+        if (tr_variantDictFindInt  (t, TR_KEY_downloadCount, &downloadCount) &&
+            tr_variantDictFindBool (t, TR_KEY_hasAnnounced, &hasAnnounced) &&
+            tr_variantDictFindBool (t, TR_KEY_hasScraped, &hasScraped) &&
+            tr_variantDictFindStr  (t, TR_KEY_host, &host, NULL) &&
+            tr_variantDictFindInt  (t, TR_KEY_id, &id) &&
+            tr_variantDictFindBool (t, TR_KEY_isBackup, &isBackup) &&
+            tr_variantDictFindInt  (t, TR_KEY_announceState, &announceState) &&
+            tr_variantDictFindInt  (t, TR_KEY_scrapeState, &scrapeState) &&
+            tr_variantDictFindInt  (t, TR_KEY_lastAnnouncePeerCount, &lastAnnouncePeerCount) &&
+            tr_variantDictFindStr  (t, TR_KEY_lastAnnounceResult, &lastAnnounceResult, NULL) &&
+            tr_variantDictFindInt  (t, TR_KEY_lastAnnounceStartTime, &lastAnnounceStartTime) &&
+            tr_variantDictFindBool (t, TR_KEY_lastAnnounceSucceeded, &lastAnnounceSucceeded) &&
+            tr_variantDictFindInt  (t, TR_KEY_lastAnnounceTime, &lastAnnounceTime) &&
+            tr_variantDictFindBool (t, TR_KEY_lastAnnounceTimedOut, &lastAnnounceTimedOut) &&
+            tr_variantDictFindStr  (t, TR_KEY_lastScrapeResult, &lastScrapeResult, NULL) &&
+            tr_variantDictFindInt  (t, TR_KEY_lastScrapeStartTime, &lastScrapeStartTime) &&
+            tr_variantDictFindBool (t, TR_KEY_lastScrapeSucceeded, &lastScrapeSucceeded) &&
+            tr_variantDictFindInt  (t, TR_KEY_lastScrapeTime, &lastScrapeTime) &&
+            tr_variantDictFindBool (t, TR_KEY_lastScrapeTimedOut, &lastScrapeTimedOut) &&
+            tr_variantDictFindInt  (t, TR_KEY_leecherCount, &leecherCount) &&
+            tr_variantDictFindInt  (t, TR_KEY_nextAnnounceTime, &nextAnnounceTime) &&
+            tr_variantDictFindInt  (t, TR_KEY_nextScrapeTime, &nextScrapeTime) &&
+            tr_variantDictFindInt  (t, TR_KEY_seederCount, &seederCount) &&
+            tr_variantDictFindInt  (t, TR_KEY_tier, &tier))
         {
             const time_t now = time (NULL);
 
@@ -1449,20 +1465,23 @@ printTrackersImpl (tr_variant * trackerStats)
 static void
 printTrackers (tr_variant * top)
 {
-    tr_variant *args, *torrents;
+  tr_variant *args, *torrents;
 
-    if (tr_variantDictFindDict (top, "arguments", &args)
-      && tr_variantDictFindList (args, "torrents", &torrents))
+  if (tr_variantDictFindDict (top, TR_KEY_arguments, &args)
+      && tr_variantDictFindList (args, TR_KEY_torrents, &torrents))
     {
-        int i, n;
-        for (i=0, n=tr_variantListSize (torrents); i<n; ++i)
+      int i, n;
+      for (i=0, n=tr_variantListSize (torrents); i<n; ++i)
         {
-            tr_variant * trackerStats;
-            tr_variant * torrent = tr_variantListChild (torrents, i);
-            if (tr_variantDictFindList (torrent, "trackerStats", &trackerStats)) {
-                printTrackersImpl (trackerStats);
-                if (i+1<n)
-                    printf ("\n");
+          tr_variant * trackerStats;
+          tr_variant * torrent = tr_variantListChild (torrents, i);
+
+          if (tr_variantDictFindList (torrent, TR_KEY_trackerStats, &trackerStats))
+            {
+              printTrackersImpl (trackerStats);
+
+              if (i+1<n)
+                printf ("\n");
             }
         }
     }
@@ -1471,67 +1490,67 @@ printTrackers (tr_variant * top)
 static void
 printSession (tr_variant * top)
 {
-    tr_variant *args;
-    if ((tr_variantDictFindDict (top, "arguments", &args)))
+  tr_variant *args;
+  if ((tr_variantDictFindDict (top, TR_KEY_arguments, &args)))
     {
-        int64_t i;
-        char buf[64];
-        bool boolVal;
-        const char * str;
+      int64_t i;
+      char buf[64];
+      bool boolVal;
+      const char * str;
 
-        printf ("VERSION\n");
-        if (tr_variantDictFindStr (args,  "version", &str, NULL))
-            printf ("  Daemon version: %s\n", str);
-        if (tr_variantDictFindInt (args, "rpc-version", &i))
-            printf ("  RPC version: %" PRId64 "\n", i);
-        if (tr_variantDictFindInt (args, "rpc-version-minimum", &i))
-            printf ("  RPC minimum version: %" PRId64 "\n", i);
-        printf ("\n");
+      printf ("VERSION\n");
+      if (tr_variantDictFindStr (args, TR_KEY_version, &str, NULL))
+        printf ("  Daemon version: %s\n", str);
+      if (tr_variantDictFindInt (args, TR_KEY_rpc_version, &i))
+        printf ("  RPC version: %" PRId64 "\n", i);
+      if (tr_variantDictFindInt (args, TR_KEY_rpc_version_minimum, &i))
+        printf ("  RPC minimum version: %" PRId64 "\n", i);
+      printf ("\n");
 
-        printf ("CONFIG\n");
-        if (tr_variantDictFindStr (args, "config-dir", &str, NULL))
-            printf ("  Configuration directory: %s\n", str);
-        if (tr_variantDictFindStr (args,  TR_PREFS_KEY_DOWNLOAD_DIR, &str, NULL))
-            printf ("  Download directory: %s\n", str);
-        if (tr_variantDictFindInt (args,  "download-dir-free-space", &i))
-            printf ("  Download directory free space: %s\n",  strlsize (buf, i, sizeof buf));
-        if (tr_variantDictFindInt (args, TR_PREFS_KEY_PEER_PORT, &i))
-            printf ("  Listenport: %" PRId64 "\n", i);
-        if (tr_variantDictFindBool (args, TR_PREFS_KEY_PORT_FORWARDING, &boolVal))
-            printf ("  Portforwarding enabled: %s\n", (boolVal ? "Yes" : "No"));
-        if (tr_variantDictFindBool (args, TR_PREFS_KEY_UTP_ENABLED, &boolVal))
-            printf ("  uTP enabled: %s\n", (boolVal ? "Yes" : "No"));
-        if (tr_variantDictFindBool (args, TR_PREFS_KEY_DHT_ENABLED, &boolVal))
-            printf ("  Distributed hash table enabled: %s\n", (boolVal ? "Yes" : "No"));
-        if (tr_variantDictFindBool (args, TR_PREFS_KEY_LPD_ENABLED, &boolVal))
-            printf ("  Local peer discovery enabled: %s\n", (boolVal ? "Yes" : "No"));
-        if (tr_variantDictFindBool (args, TR_PREFS_KEY_PEX_ENABLED, &boolVal))
-            printf ("  Peer exchange allowed: %s\n", (boolVal ? "Yes" : "No"));
-        if (tr_variantDictFindStr (args,  TR_PREFS_KEY_ENCRYPTION, &str, NULL))
-            printf ("  Encryption: %s\n", str);
-        if (tr_variantDictFindInt (args, TR_PREFS_KEY_MAX_CACHE_SIZE_MB, &i))
-            printf ("  Maximum memory cache size: %s\n", tr_formatter_mem_MB (buf, i, sizeof (buf)));
-        printf ("\n");
+      printf ("CONFIG\n");
+      if (tr_variantDictFindStr (args, TR_KEY_config_dir, &str, NULL))
+        printf ("  Configuration directory: %s\n", str);
+      if (tr_variantDictFindStr (args,  TR_KEY_download_dir, &str, NULL))
+        printf ("  Download directory: %s\n", str);
+      if (tr_variantDictFindInt (args,  TR_KEY_download_dir_free_space, &i))
+        printf ("  Download directory free space: %s\n",  strlsize (buf, i, sizeof buf));
+      if (tr_variantDictFindInt (args, TR_KEY_peer_port, &i))
+        printf ("  Listenport: %" PRId64 "\n", i);
+      if (tr_variantDictFindBool (args, TR_KEY_port_forwarding_enabled, &boolVal))
+        printf ("  Portforwarding enabled: %s\n", (boolVal ? "Yes" : "No"));
+      if (tr_variantDictFindBool (args, TR_KEY_utp_enabled, &boolVal))
+        printf ("  uTP enabled: %s\n", (boolVal ? "Yes" : "No"));
+      if (tr_variantDictFindBool (args, TR_KEY_dht_enabled, &boolVal))
+        printf ("  Distributed hash table enabled: %s\n", (boolVal ? "Yes" : "No"));
+      if (tr_variantDictFindBool (args, TR_KEY_lpd_enabled, &boolVal))
+        printf ("  Local peer discovery enabled: %s\n", (boolVal ? "Yes" : "No"));
+      if (tr_variantDictFindBool (args, TR_KEY_pex_enabled, &boolVal))
+        printf ("  Peer exchange allowed: %s\n", (boolVal ? "Yes" : "No"));
+      if (tr_variantDictFindStr (args,  TR_KEY_encryption, &str, NULL))
+        printf ("  Encryption: %s\n", str);
+      if (tr_variantDictFindInt (args, TR_KEY_cache_size_mb, &i))
+        printf ("  Maximum memory cache size: %s\n", tr_formatter_mem_MB (buf, i, sizeof (buf)));
+      printf ("\n");
 
         {
             bool altEnabled, altTimeEnabled, upEnabled, downEnabled, seedRatioLimited;
             int64_t altDown, altUp, altBegin, altEnd, altDay, upLimit, downLimit, peerLimit;
             double seedRatioLimit;
 
-            if (tr_variantDictFindInt (args, TR_PREFS_KEY_ALT_SPEED_DOWN_KBps, &altDown) &&
-                tr_variantDictFindBool (args, TR_PREFS_KEY_ALT_SPEED_ENABLED, &altEnabled) &&
-                tr_variantDictFindInt (args, TR_PREFS_KEY_ALT_SPEED_TIME_BEGIN, &altBegin) &&
-                tr_variantDictFindBool (args, TR_PREFS_KEY_ALT_SPEED_TIME_ENABLED, &altTimeEnabled) &&
-                tr_variantDictFindInt (args, TR_PREFS_KEY_ALT_SPEED_TIME_END, &altEnd) &&
-                tr_variantDictFindInt (args, TR_PREFS_KEY_ALT_SPEED_TIME_DAY, &altDay) &&
-                tr_variantDictFindInt (args, TR_PREFS_KEY_ALT_SPEED_UP_KBps, &altUp) &&
-                tr_variantDictFindInt (args, TR_PREFS_KEY_PEER_LIMIT_GLOBAL, &peerLimit) &&
-                tr_variantDictFindInt (args, TR_PREFS_KEY_DSPEED_KBps, &downLimit) &&
-                tr_variantDictFindBool (args, TR_PREFS_KEY_DSPEED_ENABLED, &downEnabled) &&
-                tr_variantDictFindInt (args, TR_PREFS_KEY_USPEED_KBps, &upLimit) &&
-                tr_variantDictFindBool (args, TR_PREFS_KEY_USPEED_ENABLED, &upEnabled) &&
-                tr_variantDictFindReal (args, "seedRatioLimit", &seedRatioLimit) &&
-                tr_variantDictFindBool (args, "seedRatioLimited", &seedRatioLimited))
+            if (tr_variantDictFindInt  (args, TR_KEY_alt_speed_down, &altDown) &&
+                tr_variantDictFindBool (args, TR_KEY_alt_speed_enabled, &altEnabled) &&
+                tr_variantDictFindInt  (args, TR_KEY_alt_speed_time_begin, &altBegin) &&
+                tr_variantDictFindBool (args, TR_KEY_alt_speed_time_enabled, &altTimeEnabled) &&
+                tr_variantDictFindInt  (args, TR_KEY_alt_speed_time_end, &altEnd) &&
+                tr_variantDictFindInt  (args, TR_KEY_alt_speed_time_day, &altDay) &&
+                tr_variantDictFindInt  (args, TR_KEY_alt_speed_up, &altUp) &&
+                tr_variantDictFindInt  (args, TR_KEY_peer_limit_global, &peerLimit) &&
+                tr_variantDictFindInt  (args, TR_KEY_speed_limit_down, &downLimit) &&
+                tr_variantDictFindBool (args, TR_KEY_speed_limit_down_enabled, &downEnabled) &&
+                tr_variantDictFindInt  (args, TR_KEY_speed_limit_up, &upLimit) &&
+                tr_variantDictFindBool (args, TR_KEY_speed_limit_up_enabled, &upEnabled) &&
+                tr_variantDictFindReal (args, TR_KEY_seedRatioLimit, &seedRatioLimit) &&
+                tr_variantDictFindBool (args, TR_KEY_seedRatioLimited, &seedRatioLimited))
             {
                 char buf[128];
                 char buf2[128];
@@ -1590,9 +1609,9 @@ printSession (tr_variant * top)
         printf ("\n");
 
         printf ("MISC\n");
-        if (tr_variantDictFindBool (args, TR_PREFS_KEY_START, &boolVal))
+        if (tr_variantDictFindBool (args, TR_KEY_start_added_torrents, &boolVal))
             printf ("  Autostart added torrents: %s\n", (boolVal ? "Yes" : "No"));
-        if (tr_variantDictFindBool (args, TR_PREFS_KEY_TRASH_ORIGINAL, &boolVal))
+        if (tr_variantDictFindBool (args, TR_KEY_trash_original_torrent_files, &boolVal))
             printf ("  Delete automatically added torrents: %s\n", (boolVal ? "Yes" : "No"));
     }
 }
@@ -1600,36 +1619,36 @@ printSession (tr_variant * top)
 static void
 printSessionStats (tr_variant * top)
 {
-    tr_variant *args, *d;
-    if ((tr_variantDictFindDict (top, "arguments", &args)))
+  tr_variant *args, *d;
+  if ((tr_variantDictFindDict (top, TR_KEY_arguments, &args)))
     {
-        char buf[512];
-        int64_t up, down, secs, sessions;
+      char buf[512];
+      int64_t up, down, secs, sessions;
 
-        if (tr_variantDictFindDict (args, "current-stats", &d)
-            && tr_variantDictFindInt (d, "uploadedBytes", &up)
-            && tr_variantDictFindInt (d, "downloadedBytes", &down)
-            && tr_variantDictFindInt (d, "secondsActive", &secs))
+      if (tr_variantDictFindDict (args, TR_KEY_current_stats, &d)
+          && tr_variantDictFindInt (d, TR_KEY_uploadedBytes, &up)
+          && tr_variantDictFindInt (d, TR_KEY_downloadedBytes, &down)
+          && tr_variantDictFindInt (d, TR_KEY_secondsActive, &secs))
         {
-            printf ("\nCURRENT SESSION\n");
-            printf ("  Uploaded:   %s\n", strlsize (buf, up, sizeof (buf)));
-            printf ("  Downloaded: %s\n", strlsize (buf, down, sizeof (buf)));
-            printf ("  Ratio:      %s\n", strlratio (buf, up, down, sizeof (buf)));
-            printf ("  Duration:   %s\n", tr_strltime (buf, secs, sizeof (buf)));
+          printf ("\nCURRENT SESSION\n");
+          printf ("  Uploaded:   %s\n", strlsize (buf, up, sizeof (buf)));
+          printf ("  Downloaded: %s\n", strlsize (buf, down, sizeof (buf)));
+          printf ("  Ratio:      %s\n", strlratio (buf, up, down, sizeof (buf)));
+          printf ("  Duration:   %s\n", tr_strltime (buf, secs, sizeof (buf)));
         }
 
-        if (tr_variantDictFindDict (args, "cumulative-stats", &d)
-            && tr_variantDictFindInt (d, "sessionCount", &sessions)
-            && tr_variantDictFindInt (d, "uploadedBytes", &up)
-            && tr_variantDictFindInt (d, "downloadedBytes", &down)
-            && tr_variantDictFindInt (d, "secondsActive", &secs))
+      if (tr_variantDictFindDict (args, TR_KEY_cumulative_stats, &d)
+            && tr_variantDictFindInt (d, TR_KEY_sessionCount, &sessions)
+            && tr_variantDictFindInt (d, TR_KEY_uploadedBytes, &up)
+            && tr_variantDictFindInt (d, TR_KEY_downloadedBytes, &down)
+            && tr_variantDictFindInt (d, TR_KEY_secondsActive, &secs))
         {
-            printf ("\nTOTAL\n");
-            printf ("  Started %lu times\n", (unsigned long)sessions);
-            printf ("  Uploaded:   %s\n", strlsize (buf, up, sizeof (buf)));
-            printf ("  Downloaded: %s\n", strlsize (buf, down, sizeof (buf)));
-            printf ("  Ratio:      %s\n", strlratio (buf, up, down, sizeof (buf)));
-            printf ("  Duration:   %s\n", tr_strltime (buf, secs, sizeof (buf)));
+          printf ("\nTOTAL\n");
+          printf ("  Started %lu times\n", (unsigned long)sessions);
+          printf ("  Uploaded:   %s\n", strlsize (buf, up, sizeof (buf)));
+          printf ("  Downloaded: %s\n", strlsize (buf, down, sizeof (buf)));
+          printf ("  Ratio:      %s\n", strlratio (buf, up, down, sizeof (buf)));
+          printf ("  Duration:   %s\n", tr_strltime (buf, secs, sizeof (buf)));
         }
     }
 }
@@ -1657,7 +1676,7 @@ processResponse (const char * rpcurl, const void * response, size_t len)
         int64_t      tag = -1;
         const char * str;
 
-        if (tr_variantDictFindStr (&top, "result", &str, NULL))
+        if (tr_variantDictFindStr (&top, TR_KEY_result, &str, NULL))
         {
             if (strcmp (str, "success"))
             {
@@ -1666,7 +1685,7 @@ processResponse (const char * rpcurl, const void * response, size_t len)
             }
             else
             {
-        tr_variantDictFindInt (&top, "tag", &tag);
+        tr_variantDictFindInt (&top, TR_KEY_tag, &tag);
 
         switch (tag)
         {
@@ -1701,13 +1720,13 @@ processResponse (const char * rpcurl, const void * response, size_t len)
                 int64_t i;
                 tr_variant * b = &top;
                 if (tr_variantDictFindDict (&top, ARGUMENTS, &b)
-                        && tr_variantDictFindDict (b, "torrent-added", &b)
-                        && tr_variantDictFindInt (b, "id", &i))
+                        && tr_variantDictFindDict (b, TR_KEY_torrent_added, &b)
+                        && tr_variantDictFindInt (b, TR_KEY_id, &i))
                     tr_snprintf (id, sizeof (id), "%"PRId64, i);
                 /* fall-through to default: to give success or failure msg */
             }
             default:
-                if (!tr_variantDictFindStr (&top, "result", &str, NULL))
+                if (!tr_variantDictFindStr (&top, TR_KEY_result, &str, NULL))
                     status |= EXIT_FAILURE;
                 else {
                     printf ("%s responded: \"%s\"\n", rpcurl, str);
@@ -1824,7 +1843,7 @@ ensure_sset (tr_variant ** sset)
     else {
         *sset = tr_new0 (tr_variant, 1);
         tr_variantInitDict (*sset, 3);
-        tr_variantDictAddStr (*sset, "method", "session-set");
+        tr_variantDictAddStr (*sset, TR_KEY_method, "session-set");
         args = tr_variantDictAddDict (*sset, ARGUMENTS, 0);
     }
 
@@ -1841,7 +1860,7 @@ ensure_tset (tr_variant ** tset)
     else {
         *tset = tr_new0 (tr_variant, 1);
         tr_variantInitDict (*tset, 3);
-        tr_variantDictAddStr (*tset, "method", "torrent-set");
+        tr_variantDictAddStr (*tset, TR_KEY_method, "torrent-set");
         args = tr_variantDictAddDict (*tset, ARGUMENTS, 1);
     }
 
@@ -1874,8 +1893,8 @@ processArgs (const char * rpcurl, int argc, const char ** argv)
                     if (tset != 0) { addIdArg (tr_variantDictFind (tset, ARGUMENTS), id); status |= flush (rpcurl, &tset); }
                     tadd = tr_new0 (tr_variant, 1);
                     tr_variantInitDict (tadd, 3);
-                    tr_variantDictAddStr (tadd, "method", "torrent-add");
-                    tr_variantDictAddInt (tadd, "tag", TAG_TORRENT_ADD);
+                    tr_variantDictAddStr (tadd, TR_KEY_method, "torrent-add");
+                    tr_variantDictAddInt (tadd, TR_KEY_tag, TAG_TORRENT_ADD);
                     tr_variantDictAddDict (tadd, ARGUMENTS, 0);
                     break;
 
@@ -1928,9 +1947,9 @@ processArgs (const char * rpcurl, int argc, const char ** argv)
                         tr_variant * args = tr_variantDictFind (tadd, ARGUMENTS);
                         char * tmp = getEncodedMetainfo (optarg);
                         if (tmp)
-                            tr_variantDictAddStr (args, "metainfo", tmp);
+                            tr_variantDictAddStr (args, TR_KEY_metainfo, tmp);
                         else
-                            tr_variantDictAddStr (args, "filename", optarg);
+                            tr_variantDictAddStr (args, TR_KEY_filename, optarg);
                         tr_free (tmp);
                     } else {
                         fprintf (stderr, "Unknown option: %s\n", optarg);
@@ -1946,38 +1965,38 @@ processArgs (const char * rpcurl, int argc, const char ** argv)
             tr_variant * args;
             tr_variant * fields;
             tr_variantInitDict (top, 3);
-            tr_variantDictAddStr (top, "method", "torrent-get");
+            tr_variantDictAddStr (top, TR_KEY_method, "torrent-get");
             args = tr_variantDictAddDict (top, ARGUMENTS, 0);
-            fields = tr_variantDictAddList (args, "fields", 0);
+            fields = tr_variantDictAddList (args, TR_KEY_fields, 0);
 
             if (tset != 0) { addIdArg (tr_variantDictFind (tset, ARGUMENTS), id); status |= flush (rpcurl, &tset); }
 
             switch (c)
             {
-                case 'i': tr_variantDictAddInt (top, "tag", TAG_DETAILS);
+                case 'i': tr_variantDictAddInt (top, TR_KEY_tag, TAG_DETAILS);
                           n = TR_N_ELEMENTS (details_keys);
-                          for (i=0; i<n; ++i) tr_variantListAddStr (fields, details_keys[i]);
+                          for (i=0; i<n; ++i) tr_variantListAddQuark (fields, details_keys[i]);
                           addIdArg (args, id);
                           break;
-                case 'l': tr_variantDictAddInt (top, "tag", TAG_LIST);
+                case 'l': tr_variantDictAddInt (top, TR_KEY_tag, TAG_LIST);
                           n = TR_N_ELEMENTS (list_keys);
-                          for (i=0; i<n; ++i) tr_variantListAddStr (fields, list_keys[i]);
+                          for (i=0; i<n; ++i) tr_variantListAddQuark (fields, list_keys[i]);
                           break;
-                case 940: tr_variantDictAddInt (top, "tag", TAG_FILES);
+                case 940: tr_variantDictAddInt (top, TR_KEY_tag, TAG_FILES);
                           n = TR_N_ELEMENTS (files_keys);
-                          for (i=0; i<n; ++i) tr_variantListAddStr (fields, files_keys[i]);
+                          for (i=0; i<n; ++i) tr_variantListAddQuark (fields, files_keys[i]);
                           addIdArg (args, id);
                           break;
-                case 941: tr_variantDictAddInt (top, "tag", TAG_PEERS);
+                case 941: tr_variantDictAddInt (top, TR_KEY_tag, TAG_PEERS);
                           tr_variantListAddStr (fields, "peers");
                           addIdArg (args, id);
                           break;
-                case 942: tr_variantDictAddInt (top, "tag", TAG_PIECES);
+                case 942: tr_variantDictAddInt (top, TR_KEY_tag, TAG_PIECES);
                           tr_variantListAddStr (fields, "pieces");
                           tr_variantListAddStr (fields, "pieceCount");
                           addIdArg (args, id);
                           break;
-                case 943: tr_variantDictAddInt (top, "tag", TAG_TRACKERS);
+                case 943: tr_variantDictAddInt (top, TR_KEY_tag, TAG_TRACKERS);
                           tr_variantListAddStr (fields, "trackerStats");
                           addIdArg (args, id);
                           break;
@@ -1992,78 +2011,78 @@ processArgs (const char * rpcurl, int argc, const char ** argv)
 
             switch (c)
             {
-                case 800: tr_variantDictAddStr (args, TR_PREFS_KEY_SCRIPT_TORRENT_DONE_FILENAME, optarg);
-                          tr_variantDictAddBool (args, TR_PREFS_KEY_SCRIPT_TORRENT_DONE_ENABLED, true);
+                case 800: tr_variantDictAddStr (args, TR_KEY_script_torrent_done_filename, optarg);
+                          tr_variantDictAddBool (args, TR_KEY_script_torrent_done_enabled, true);
                           break;
-                case 801: tr_variantDictAddBool (args, TR_PREFS_KEY_SCRIPT_TORRENT_DONE_ENABLED, false);
+                case 801: tr_variantDictAddBool (args, TR_KEY_script_torrent_done_enabled, false);
                           break;
-                case 970: tr_variantDictAddBool (args, TR_PREFS_KEY_ALT_SPEED_ENABLED, true);
+                case 970: tr_variantDictAddBool (args, TR_KEY_alt_speed_enabled, true);
                           break;
-                case 971: tr_variantDictAddBool (args, TR_PREFS_KEY_ALT_SPEED_ENABLED, false);
+                case 971: tr_variantDictAddBool (args, TR_KEY_alt_speed_enabled, false);
                           break;
-                case 972: tr_variantDictAddInt (args, TR_PREFS_KEY_ALT_SPEED_DOWN_KBps, numarg (optarg));
+                case 972: tr_variantDictAddInt (args, TR_KEY_alt_speed_down, numarg (optarg));
                           break;
-                case 973: tr_variantDictAddInt (args, TR_PREFS_KEY_ALT_SPEED_UP_KBps, numarg (optarg));
+                case 973: tr_variantDictAddInt (args, TR_KEY_alt_speed_up, numarg (optarg));
                           break;
-                case 974: tr_variantDictAddBool (args, TR_PREFS_KEY_ALT_SPEED_TIME_ENABLED, true);
+                case 974: tr_variantDictAddBool (args, TR_KEY_alt_speed_time_enabled, true);
                           break;
-                case 975: tr_variantDictAddBool (args, TR_PREFS_KEY_ALT_SPEED_TIME_ENABLED, false);
+                case 975: tr_variantDictAddBool (args, TR_KEY_alt_speed_time_enabled, false);
                           break;
-                case 976: addTime (args, TR_PREFS_KEY_ALT_SPEED_TIME_BEGIN, optarg);
+                case 976: addTime (args, TR_KEY_alt_speed_time_begin, optarg);
                           break;
-                case 977: addTime (args, TR_PREFS_KEY_ALT_SPEED_TIME_END, optarg);
+                case 977: addTime (args, TR_KEY_alt_speed_time_end, optarg);
                           break;
-                case 978: addDays (args, TR_PREFS_KEY_ALT_SPEED_TIME_DAY, optarg);
+                case 978: addDays (args, TR_KEY_alt_speed_time_day, optarg);
                           break;
-                case 'c': tr_variantDictAddStr (args, TR_PREFS_KEY_INCOMPLETE_DIR, optarg);
-                          tr_variantDictAddBool (args, TR_PREFS_KEY_INCOMPLETE_DIR_ENABLED, true);
+                case 'c': tr_variantDictAddStr (args, TR_KEY_incomplete_dir, optarg);
+                          tr_variantDictAddBool (args, TR_KEY_incomplete_dir_enabled, true);
                           break;
-                case 'C': tr_variantDictAddBool (args, TR_PREFS_KEY_INCOMPLETE_DIR_ENABLED, false);
+                case 'C': tr_variantDictAddBool (args, TR_KEY_incomplete_dir_enabled, false);
                           break;
-                case 'e': tr_variantDictAddInt (args, TR_PREFS_KEY_MAX_CACHE_SIZE_MB, atoi (optarg));
+                case 'e': tr_variantDictAddInt (args, TR_KEY_cache_size_mb, atoi (optarg));
                           break;
-                case 910: tr_variantDictAddStr (args, TR_PREFS_KEY_ENCRYPTION, "required");
+                case 910: tr_variantDictAddStr (args, TR_KEY_encryption, "required");
                           break;
-                case 911: tr_variantDictAddStr (args, TR_PREFS_KEY_ENCRYPTION, "preferred");
+                case 911: tr_variantDictAddStr (args, TR_KEY_encryption, "preferred");
                           break;
-                case 912: tr_variantDictAddStr (args, TR_PREFS_KEY_ENCRYPTION, "tolerated");
+                case 912: tr_variantDictAddStr (args, TR_KEY_encryption, "tolerated");
                           break;
-                case 'm': tr_variantDictAddBool (args, TR_PREFS_KEY_PORT_FORWARDING, true);
+                case 'm': tr_variantDictAddBool (args, TR_KEY_port_forwarding_enabled, true);
                           break;
-                case 'M': tr_variantDictAddBool (args, TR_PREFS_KEY_PORT_FORWARDING, false);
+                case 'M': tr_variantDictAddBool (args, TR_KEY_port_forwarding_enabled, false);
                           break;
-                case 'o': tr_variantDictAddBool (args, TR_PREFS_KEY_DHT_ENABLED, true);
+                case 'o': tr_variantDictAddBool (args, TR_KEY_dht_enabled, true);
                           break;
-                case 'O': tr_variantDictAddBool (args, TR_PREFS_KEY_DHT_ENABLED, false);
+                case 'O': tr_variantDictAddBool (args, TR_KEY_dht_enabled, false);
                           break;
-                case 830: tr_variantDictAddBool (args, TR_PREFS_KEY_UTP_ENABLED, true);
+                case 830: tr_variantDictAddBool (args, TR_KEY_utp_enabled, true);
                           break;
-                case 831: tr_variantDictAddBool (args, TR_PREFS_KEY_UTP_ENABLED, false);
+                case 831: tr_variantDictAddBool (args, TR_KEY_utp_enabled, false);
                           break;
-                case 'p': tr_variantDictAddInt (args, TR_PREFS_KEY_PEER_PORT, numarg (optarg));
+                case 'p': tr_variantDictAddInt (args, TR_KEY_peer_port, numarg (optarg));
                           break;
-                case 'P': tr_variantDictAddBool (args, TR_PREFS_KEY_PEER_PORT_RANDOM_ON_START, true);
+                case 'P': tr_variantDictAddBool (args, TR_KEY_peer_port_random_on_start, true);
                           break;
-                case 'x': tr_variantDictAddBool (args, TR_PREFS_KEY_PEX_ENABLED, true);
+                case 'x': tr_variantDictAddBool (args, TR_KEY_pex_enabled, true);
                           break;
-                case 'X': tr_variantDictAddBool (args, TR_PREFS_KEY_PEX_ENABLED, false);
+                case 'X': tr_variantDictAddBool (args, TR_KEY_pex_enabled, false);
                           break;
-                case 'y': tr_variantDictAddBool (args, TR_PREFS_KEY_LPD_ENABLED, true);
+                case 'y': tr_variantDictAddBool (args, TR_KEY_lpd_enabled, true);
                           break;
-                case 'Y': tr_variantDictAddBool (args, TR_PREFS_KEY_LPD_ENABLED, false);
+                case 'Y': tr_variantDictAddBool (args, TR_KEY_lpd_enabled, false);
                           break;
-                case 953: tr_variantDictAddReal (args, "seedRatioLimit", atof (optarg));
-                          tr_variantDictAddBool (args, "seedRatioLimited", true);
+                case 953: tr_variantDictAddReal (args, TR_KEY_seedRatioLimit, atof (optarg));
+                          tr_variantDictAddBool (args, TR_KEY_seedRatioLimited, true);
                           break;
-                case 954: tr_variantDictAddBool (args, "seedRatioLimited", false);
+                case 954: tr_variantDictAddBool (args, TR_KEY_seedRatioLimited, false);
                           break;
-                case 990: tr_variantDictAddBool (args, TR_PREFS_KEY_START, false);
+                case 990: tr_variantDictAddBool (args, TR_KEY_start_added_torrents, false);
                           break;
-                case 991: tr_variantDictAddBool (args, TR_PREFS_KEY_START, true);
+                case 991: tr_variantDictAddBool (args, TR_KEY_start_added_torrents, true);
                           break;
-                case 992: tr_variantDictAddBool (args, TR_PREFS_KEY_TRASH_ORIGINAL, true);
+                case 992: tr_variantDictAddBool (args, TR_KEY_trash_original_torrent_files, true);
                           break;
-                case 993: tr_variantDictAddBool (args, TR_PREFS_KEY_TRASH_ORIGINAL, false);
+                case 993: tr_variantDictAddBool (args, TR_KEY_trash_original_torrent_files, false);
                           break;
                 default:  assert ("unhandled value" && 0);
                           break;
@@ -2082,35 +2101,35 @@ processArgs (const char * rpcurl, int argc, const char ** argv)
             switch (c)
             {
                 case 'd': if (targs) {
-                              tr_variantDictAddInt (targs, "downloadLimit", numarg (optarg));
-                              tr_variantDictAddBool (targs, "downloadLimited", true);
+                              tr_variantDictAddInt (targs, TR_KEY_downloadLimit, numarg (optarg));
+                              tr_variantDictAddBool (targs, TR_KEY_downloadLimited, true);
                           } else {
-                              tr_variantDictAddInt (sargs, TR_PREFS_KEY_DSPEED_KBps, numarg (optarg));
-                              tr_variantDictAddBool (sargs, TR_PREFS_KEY_DSPEED_ENABLED, true);
+                              tr_variantDictAddInt (sargs, TR_KEY_speed_limit_down, numarg (optarg));
+                              tr_variantDictAddBool (sargs, TR_KEY_speed_limit_down_enabled, true);
                           }
                           break;
                 case 'D': if (targs)
-                              tr_variantDictAddBool (targs, "downloadLimited", false);
+                              tr_variantDictAddBool (targs, TR_KEY_downloadLimited, false);
                           else
-                              tr_variantDictAddBool (sargs, TR_PREFS_KEY_DSPEED_ENABLED, false);
+                              tr_variantDictAddBool (sargs, TR_KEY_speed_limit_down_enabled, false);
                           break;
                 case 'u': if (targs) {
-                              tr_variantDictAddInt (targs, "uploadLimit", numarg (optarg));
-                              tr_variantDictAddBool (targs, "uploadLimited", true);
+                              tr_variantDictAddInt (targs, TR_KEY_uploadLimit, numarg (optarg));
+                              tr_variantDictAddBool (targs, TR_KEY_uploadLimited, true);
                           } else {
-                              tr_variantDictAddInt (sargs, TR_PREFS_KEY_USPEED_KBps, numarg (optarg));
-                              tr_variantDictAddBool (sargs, TR_PREFS_KEY_USPEED_ENABLED, true);
+                              tr_variantDictAddInt (sargs, TR_KEY_speed_limit_up, numarg (optarg));
+                              tr_variantDictAddBool (sargs, TR_KEY_speed_limit_up_enabled, true);
                           }
                           break;
                 case 'U': if (targs)
-                              tr_variantDictAddBool (targs, "uploadLimited", false);
+                              tr_variantDictAddBool (targs, TR_KEY_uploadLimited, false);
                           else
-                              tr_variantDictAddBool (sargs, TR_PREFS_KEY_USPEED_ENABLED, false);
+                              tr_variantDictAddBool (sargs, TR_KEY_speed_limit_up_enabled, false);
                           break;
                 case 930: if (targs)
-                              tr_variantDictAddInt (targs, "peer-limit", atoi (optarg));
+                              tr_variantDictAddInt (targs, TR_KEY_peer_limit, atoi (optarg));
                           else
-                              tr_variantDictAddInt (sargs, TR_PREFS_KEY_PEER_LIMIT_GLOBAL, atoi (optarg));
+                              tr_variantDictAddInt (sargs, TR_KEY_peer_limit_global, atoi (optarg));
                           break;
                 default:  assert ("unhandled value" && 0);
                           break;
@@ -2122,18 +2141,18 @@ processArgs (const char * rpcurl, int argc, const char ** argv)
 
             switch (c)
             {
-                case 712: tr_variantListAddInt (tr_variantDictAddList (args, "trackerRemove", 1), atoi (optarg));
+                case 712: tr_variantListAddInt (tr_variantDictAddList (args, TR_KEY_trackerRemove, 1), atoi (optarg));
                           break;
-                case 950: tr_variantDictAddReal (args, "seedRatioLimit", atof (optarg));
-                          tr_variantDictAddInt (args, "seedRatioMode", TR_RATIOLIMIT_SINGLE);
+                case 950: tr_variantDictAddReal (args, TR_KEY_seedRatioLimit, atof (optarg));
+                          tr_variantDictAddInt (args, TR_KEY_seedRatioMode, TR_RATIOLIMIT_SINGLE);
                           break;
-                case 951: tr_variantDictAddInt (args, "seedRatioMode", TR_RATIOLIMIT_GLOBAL);
+                case 951: tr_variantDictAddInt (args, TR_KEY_seedRatioMode, TR_RATIOLIMIT_GLOBAL);
                           break;
-                case 952: tr_variantDictAddInt (args, "seedRatioMode", TR_RATIOLIMIT_UNLIMITED);
+                case 952: tr_variantDictAddInt (args, TR_KEY_seedRatioMode, TR_RATIOLIMIT_UNLIMITED);
                           break;
-                case 984: tr_variantDictAddBool (args, "honorsSessionLimits", true);
+                case 984: tr_variantDictAddBool (args, TR_KEY_honorsSessionLimits, true);
                           break;
-                case 985: tr_variantDictAddBool (args, "honorsSessionLimits", false);
+                case 985: tr_variantDictAddBool (args, TR_KEY_honorsSessionLimits, false);
                           break;
                 default:  assert ("unhandled value" && 0);
                           break;
@@ -2150,23 +2169,23 @@ processArgs (const char * rpcurl, int argc, const char ** argv)
 
             switch (c)
             {
-                case 'g': addFiles (args, "files-wanted", optarg);
+                case 'g': addFiles (args, TR_KEY_files_wanted, optarg);
                           break;
-                case 'G': addFiles (args, "files-unwanted", optarg);
+                case 'G': addFiles (args, TR_KEY_files_unwanted, optarg);
                           break;
-                case 900: addFiles (args, "priority-high", optarg);
+                case 900: addFiles (args, TR_KEY_priority_high, optarg);
                           break;
-                case 901: addFiles (args, "priority-normal", optarg);
+                case 901: addFiles (args, TR_KEY_priority_normal, optarg);
                           break;
-                case 902: addFiles (args, "priority-low", optarg);
+                case 902: addFiles (args, TR_KEY_priority_low, optarg);
                           break;
-                case 700: tr_variantDictAddInt (args, "bandwidthPriority",  1);
+                case 700: tr_variantDictAddInt (args, TR_KEY_bandwidthPriority,  1);
                           break;
-                case 701: tr_variantDictAddInt (args, "bandwidthPriority",  0);
+                case 701: tr_variantDictAddInt (args, TR_KEY_bandwidthPriority,  0);
                           break;
-                case 702: tr_variantDictAddInt (args, "bandwidthPriority", -1);
+                case 702: tr_variantDictAddInt (args, TR_KEY_bandwidthPriority, -1);
                           break;
-                case 710: tr_variantListAddStr (tr_variantDictAddList (args, "trackerAdd", 1), optarg);
+                case 710: tr_variantListAddStr (tr_variantDictAddList (args, TR_KEY_trackerAdd, 1), optarg);
                           break;
                 default:  assert ("unhandled value" && 0);
                           break;
@@ -2177,17 +2196,17 @@ processArgs (const char * rpcurl, int argc, const char ** argv)
             if (tadd)
             {
                 tr_variant * args = tr_variantDictFind (tadd, ARGUMENTS);
-                tr_variantDictAddStr (args, "download-dir", optarg);
+                tr_variantDictAddStr (args, TR_KEY_download_dir, optarg);
             }
             else
             {
                 tr_variant * args;
                 tr_variant * top = tr_new0 (tr_variant, 1);
                 tr_variantInitDict (top, 2);
-                tr_variantDictAddStr (top, "method", "torrent-set-location");
+                tr_variantDictAddStr (top, TR_KEY_method, "torrent-set-location");
                 args = tr_variantDictAddDict (top, ARGUMENTS, 3);
-                tr_variantDictAddStr (args, "location", optarg);
-                tr_variantDictAddBool (args, "move", false);
+                tr_variantDictAddStr (args, TR_KEY_location, optarg);
+                tr_variantDictAddBool (args, TR_KEY_move, false);
                 addIdArg (args, id);
                 status |= flush (rpcurl, &top);
                 break;
@@ -2199,19 +2218,19 @@ processArgs (const char * rpcurl, int argc, const char ** argv)
             {
                 tr_variant * top = tr_new0 (tr_variant, 1);
                 tr_variantInitDict (top, 2);
-                tr_variantDictAddStr (top, "method", "session-get");
-                tr_variantDictAddInt (top, "tag", TAG_SESSION);
+                tr_variantDictAddStr (top, TR_KEY_method, "session-get");
+                tr_variantDictAddInt (top, TR_KEY_tag, TAG_SESSION);
                 status |= flush (rpcurl, &top);
                 break;
             }
             case 's': /* start */
             {
                 if (tadd)
-                    tr_variantDictAddBool (tr_variantDictFind (tadd, "arguments"), "paused", false);
+                    tr_variantDictAddBool (tr_variantDictFind (tadd, TR_KEY_arguments), TR_KEY_paused, false);
                 else {
                     tr_variant * top = tr_new0 (tr_variant, 1);
                     tr_variantInitDict (top, 2);
-                    tr_variantDictAddStr (top, "method", "torrent-start");
+                    tr_variantDictAddStr (top, TR_KEY_method, "torrent-start");
                     addIdArg (tr_variantDictAddDict (top, ARGUMENTS, 1), id);
                     status |= flush (rpcurl, &top);
                 }
@@ -2220,11 +2239,11 @@ processArgs (const char * rpcurl, int argc, const char ** argv)
             case 'S': /* stop */
             {
                 if (tadd)
-                    tr_variantDictAddBool (tr_variantDictFind (tadd, "arguments"), "paused", true);
+                    tr_variantDictAddBool (tr_variantDictFind (tadd, TR_KEY_arguments), TR_KEY_paused, true);
                 else {
                     tr_variant * top = tr_new0 (tr_variant, 1);
                     tr_variantInitDict (top, 2);
-                    tr_variantDictAddStr (top, "method", "torrent-stop");
+                    tr_variantDictAddStr (top, TR_KEY_method, "torrent-stop");
                     addIdArg (tr_variantDictAddDict (top, ARGUMENTS, 1), id);
                     status |= flush (rpcurl, &top);
                 }
@@ -2234,10 +2253,10 @@ processArgs (const char * rpcurl, int argc, const char ** argv)
             {
                 char * path = absolutify (optarg);
                 if (tadd)
-                    tr_variantDictAddStr (tr_variantDictFind (tadd, "arguments"), "download-dir", path);
+                    tr_variantDictAddStr (tr_variantDictFind (tadd, TR_KEY_arguments), TR_KEY_download_dir, path);
                 else {
                     tr_variant * args = ensure_sset (&sset);
-                    tr_variantDictAddStr (args, "download-dir", path);
+                    tr_variantDictAddStr (args, TR_KEY_download_dir, path);
                 }
                 tr_free (path);
                 break;
@@ -2246,7 +2265,7 @@ processArgs (const char * rpcurl, int argc, const char ** argv)
             {
                 tr_variant * top = tr_new0 (tr_variant, 1);
                 tr_variantInitDict (top, 1);
-                tr_variantDictAddStr (top, "method", "session-close");
+                tr_variantDictAddStr (top, TR_KEY_method, "session-close");
                 status |= flush (rpcurl, &top);
                 break;
             }
@@ -2254,7 +2273,7 @@ processArgs (const char * rpcurl, int argc, const char ** argv)
             {
                 tr_variant * top = tr_new0 (tr_variant, 1);
                 tr_variantInitDict (top, 1);
-                tr_variantDictAddStr (top, "method", "blocklist-update");
+                tr_variantDictAddStr (top, TR_KEY_method, "blocklist-update");
                 status |= flush (rpcurl, &top);
                 break;
             }
@@ -2262,8 +2281,8 @@ processArgs (const char * rpcurl, int argc, const char ** argv)
             {
                 tr_variant * top = tr_new0 (tr_variant, 1);
                 tr_variantInitDict (top, 2);
-                tr_variantDictAddStr (top, "method", "session-stats");
-                tr_variantDictAddInt (top, "tag", TAG_STATS);
+                tr_variantDictAddStr (top, TR_KEY_method, "session-stats");
+                tr_variantDictAddInt (top, TR_KEY_tag, TAG_STATS);
                 status |= flush (rpcurl, &top);
                 break;
             }
@@ -2271,8 +2290,8 @@ processArgs (const char * rpcurl, int argc, const char ** argv)
             {
                 tr_variant * top = tr_new0 (tr_variant, 1);
                 tr_variantInitDict (top, 2);
-                tr_variantDictAddStr (top, "method", "port-test");
-                tr_variantDictAddInt (top, "tag", TAG_PORTTEST);
+                tr_variantDictAddStr (top, TR_KEY_method, "port-test");
+                tr_variantDictAddInt (top, TR_KEY_tag, TAG_PORTTEST);
                 status |= flush (rpcurl, &top);
                 break;
             }
@@ -2282,7 +2301,7 @@ processArgs (const char * rpcurl, int argc, const char ** argv)
                 if (tset != 0) { addIdArg (tr_variantDictFind (tset, ARGUMENTS), id); status |= flush (rpcurl, &tset); }
                 top = tr_new0 (tr_variant, 1);
                 tr_variantInitDict (top, 2);
-                tr_variantDictAddStr (top, "method", "torrent-reannounce");
+                tr_variantDictAddStr (top, TR_KEY_method, "torrent-reannounce");
                 addIdArg (tr_variantDictAddDict (top, ARGUMENTS, 1), id);
                 status |= flush (rpcurl, &top);
                 break;
@@ -2293,7 +2312,7 @@ processArgs (const char * rpcurl, int argc, const char ** argv)
                 if (tset != 0) { addIdArg (tr_variantDictFind (tset, ARGUMENTS), id); status |= flush (rpcurl, &tset); }
                 top = tr_new0 (tr_variant, 1);
                 tr_variantInitDict (top, 2);
-                tr_variantDictAddStr (top, "method", "torrent-verify");
+                tr_variantDictAddStr (top, TR_KEY_method, "torrent-verify");
                 addIdArg (tr_variantDictAddDict (top, ARGUMENTS, 1), id);
                 status |= flush (rpcurl, &top);
                 break;
@@ -2304,9 +2323,9 @@ processArgs (const char * rpcurl, int argc, const char ** argv)
                 tr_variant * args;
                 tr_variant * top = tr_new0 (tr_variant, 1);
                 tr_variantInitDict (top, 2);
-                tr_variantDictAddStr (top, "method", "torrent-remove");
+                tr_variantDictAddStr (top, TR_KEY_method, "torrent-remove");
                 args = tr_variantDictAddDict (top, ARGUMENTS, 2);
-                tr_variantDictAddBool (args, "delete-local-data", c=='R');
+                tr_variantDictAddBool (args, TR_KEY_delete_local_data, c=='R');
                 addIdArg (args, id);
                 status |= flush (rpcurl, &top);
                 break;
@@ -2316,10 +2335,10 @@ processArgs (const char * rpcurl, int argc, const char ** argv)
                 tr_variant * args;
                 tr_variant * top = tr_new0 (tr_variant, 1);
                 tr_variantInitDict (top, 2);
-                tr_variantDictAddStr (top, "method", "torrent-set-location");
+                tr_variantDictAddStr (top, TR_KEY_method, "torrent-set-location");
                 args = tr_variantDictAddDict (top, ARGUMENTS, 3);
-                tr_variantDictAddStr (args, "location", optarg);
-                tr_variantDictAddBool (args, "move", true);
+                tr_variantDictAddStr (args, TR_KEY_location, optarg);
+                tr_variantDictAddBool (args, TR_KEY_move, true);
                 addIdArg (args, id);
                 status |= flush (rpcurl, &top);
                 break;

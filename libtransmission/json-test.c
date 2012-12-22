@@ -1,9 +1,17 @@
 #include <string.h> /* strlen () */
+
+#define __LIBTRANSMISSION_VARIANT_MODULE___
 #include "transmission.h"
 #include "utils.h" /* tr_free */
 #include "variant.h"
-
+#include "variant-common.h"
 #include "libtransmission-test.h"
+
+static inline tr_quark
+toQuark (const char * str)
+{
+  return tr_quark_new (str, strlen(str));
+}
 
 static int
 test_elements (void)
@@ -15,6 +23,7 @@ test_elements (void)
     double d;
     int64_t i;
     int err = 0;
+    tr_quark key;
 
     in = "{ \"string\": \"hello world\","
          "  \"escaped\": \"bell \\b formfeed \\f linefeed \\n carriage return \\r tab \\t\","
@@ -28,22 +37,23 @@ test_elements (void)
     check_int_eq (0, err);
     check (tr_variantIsDict (&top));
     str = NULL;
-    check (tr_variantDictFindStr (&top, "string", &str, NULL));
+    key = tr_quark_new ("string", 6);
+    check (tr_variantDictFindStr (&top, key, &str, NULL));
     check_streq ("hello world", str);
-    check (tr_variantDictFindStr (&top, "escaped", &str, NULL));
+    check (tr_variantDictFindStr (&top, tr_quark_new("escaped",7), &str, NULL));
     check_streq ("bell \b formfeed \f linefeed \n carriage return \r tab \t", str);
     i = 0;
-    check (tr_variantDictFindInt (&top, "int", &i));
+    check (tr_variantDictFindInt (&top, tr_quark_new("int",3), &i));
     check_int_eq (5, i);
     d = 0;
-    check (tr_variantDictFindReal (&top, "float", &d));
+    check (tr_variantDictFindReal (&top, tr_quark_new("float",5), &d));
     check_int_eq (65, ((int)(d*10)));
     f = false;
-    check (tr_variantDictFindBool (&top, "true", &f));
+    check (tr_variantDictFindBool (&top, tr_quark_new("true",4), &f));
     check_int_eq (true, f);
-    check (tr_variantDictFindBool (&top, "false", &f));
+    check (tr_variantDictFindBool (&top, tr_quark_new("false",5), &f));
     check_int_eq (false, f);
-    check (tr_variantDictFindStr (&top, "null", &str, NULL));
+    check (tr_variantDictFindStr (&top, tr_quark_new("null",4), &str, NULL));
     check_streq ("", str);
 
     if (!err)
@@ -59,11 +69,12 @@ test_utf8 (void)
     const char      * str;
     char            * json;
     int               err;
+    const tr_quark key = tr_quark_new ("key", 3);
 
     err = tr_variantFromJson (&top, in, strlen(in));
     check (!err);
     check (tr_variantIsDict (&top));
-    check (tr_variantDictFindStr (&top, "key", &str, NULL));
+    check (tr_variantDictFindStr (&top, key, &str, NULL));
     check_streq ("Letöltések", str);
     if (!err)
         tr_variantFree (&top);
@@ -72,7 +83,7 @@ test_utf8 (void)
     err = tr_variantFromJson (&top, in, strlen(in));
     check (!err);
     check (tr_variantIsDict (&top));
-    check (tr_variantDictFindStr (&top, "key", &str, NULL));
+    check (tr_variantDictFindStr (&top, key, &str, NULL));
     check_streq ("\\", str);
     if (!err)
         tr_variantFree (&top);
@@ -89,7 +100,7 @@ test_utf8 (void)
     err = tr_variantFromJson (&top, in, strlen(in));
     check (!err);
     check (tr_variantIsDict (&top));
-    check (tr_variantDictFindStr (&top, "key", &str, NULL));
+    check (tr_variantDictFindStr (&top, key, &str, NULL));
     check_streq ("Letöltések", str);
     json = tr_variantToStr (&top, TR_VARIANT_FMT_JSON, NULL);
     if (!err)
@@ -100,7 +111,7 @@ test_utf8 (void)
     err = tr_variantFromJson (&top, json, strlen(json));
     check (!err);
     check (tr_variantIsDict (&top));
-    check (tr_variantDictFindStr (&top, "key", &str, NULL));
+    check (tr_variantDictFindStr (&top, key, &str, NULL));
     check_streq ("Letöltések", str);
     if (!err)
         tr_variantFree (&top);
@@ -132,18 +143,18 @@ test1 (void)
 
     check (!err);
     check (tr_variantIsDict (&top));
-    check ((headers = tr_variantDictFind (&top, "headers")));
+    check ((headers = tr_variantDictFind (&top, tr_quark_new("headers",7))));
     check (tr_variantIsDict (headers));
-    check (tr_variantDictFindStr (headers, "type", &str, NULL));
+    check (tr_variantDictFindStr (headers, tr_quark_new("type",4), &str, NULL));
     check_streq ("request", str);
-    check (tr_variantDictFindInt (headers, "tag", &i));
+    check (tr_variantDictFindInt (headers, TR_KEY_tag, &i));
     check_int_eq (666, i);
-    check ((body = tr_variantDictFind (&top, "body")));
-    check (tr_variantDictFindStr (body, "name", &str, NULL));
+    check ((body = tr_variantDictFind (&top, tr_quark_new("body",4))));
+    check (tr_variantDictFindStr (body, TR_KEY_name, &str, NULL));
     check_streq ("torrent-info", str);
-    check ((args = tr_variantDictFind (body, "arguments")));
+    check ((args = tr_variantDictFind (body, tr_quark_new("arguments",9))));
     check (tr_variantIsDict (args));
-    check ((ids = tr_variantDictFind (args, "ids")));
+    check ((ids = tr_variantDictFind (args, TR_KEY_ids)));
     check (tr_variantIsList (ids));
     check_int_eq (2, tr_variantListSize (ids));
     check (tr_variantGetInt (tr_variantListChild (ids, 0), &i));
@@ -184,7 +195,7 @@ test3 (void)
 
     const int err = tr_variantFromJson (&top, in, strlen(in));
     check (!err);
-    check (tr_variantDictFindStr (&top, "errorString", &str, NULL));
+    check (tr_variantDictFindStr (&top, TR_KEY_errorString, &str, NULL));
     check_streq ("torrent not registered with this tracker 6UHsVW'*C", str);
 
     tr_variantFree (&top);
@@ -200,7 +211,7 @@ test_unescape (void)
 
     const int err = tr_variantFromJson (&top, in, strlen(in));
     check_int_eq (0, err);
-    check (tr_variantDictFindStr (&top, "string-1", &str, NULL));
+    check (tr_variantDictFindStr (&top, tr_quark_new("string-1",8), &str, NULL));
     check_streq ("/usr/lib", str);
 
     tr_variantFree (&top);

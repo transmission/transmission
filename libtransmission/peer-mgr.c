@@ -433,7 +433,6 @@ tr_peerDestruct (tr_torrent * tor, tr_peer * peer)
 
     tr_bitfieldDestruct (&peer->have);
     tr_bitfieldDestruct (&peer->blame);
-    tr_free (peer->client);
 
     if (peer->atom)
         peer->atom->peer = NULL;
@@ -2049,14 +2048,13 @@ myHandshakeDoneCB (tr_handshake  * handshake,
             else
             {
                 peer = getPeer (t, atom);
-                tr_free (peer->client);
 
                 if (!peer_id)
-                    peer->client = NULL;
+                    peer->client = TR_KEY_NONE;
                 else {
                     char client[128];
                     tr_clientForId (client, sizeof (client), peer_id);
-                    peer->client = tr_strdup (client);
+                    peer->client = tr_quark_new (client, -1);
                 }
 
                 peer->io = tr_handshakeStealIO (handshake); /* this steals its refcount too, which is
@@ -2752,7 +2750,7 @@ tr_peerMgrPeerStats (const tr_torrent * tor, int * setmeCount)
       tr_peer_stat *           stat = ret + i;
 
       tr_address_to_string_with_buf (&atom->addr, stat->addr, sizeof (stat->addr));
-      tr_strlcpy (stat->client, (peer->client ? peer->client : ""), sizeof (stat->client));
+      tr_strlcpy (stat->client, tr_quark_get_string(peer->client,NULL), sizeof (stat->client));
       stat->port                = ntohs (peer->atom->port);
       stat->from                = atom->fromFirst;
       stat->progress            = peer->progress;

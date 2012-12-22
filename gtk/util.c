@@ -301,33 +301,37 @@ on_tree_view_button_released (GtkWidget *      view,
 int
 gtr_file_trash_or_remove (const char * filename)
 {
-    GFile * file;
-    gboolean trashed = FALSE;
+  GFile * file;
+  gboolean trashed = FALSE;
 
-    g_return_val_if_fail (filename && *filename, 0);
+  g_return_val_if_fail (filename && *filename, 0);
 
-    file = g_file_new_for_path (filename);
+  file = g_file_new_for_path (filename);
 
-    if (gtr_pref_flag_get (PREF_KEY_TRASH_CAN_ENABLED)) {
-        GError * err = NULL;
-        trashed = g_file_trash (file, NULL, &err);
-        if (err) {
-            g_message ("Unable to trash file \"%s\": %s", filename, err->message);
-            g_clear_error (&err);
+  if (gtr_pref_flag_get (TR_KEY_trash_can_enabled))
+    {
+      GError * err = NULL;
+      trashed = g_file_trash (file, NULL, &err);
+      if (err)
+        {
+          g_message ("Unable to trash file \"%s\": %s", filename, err->message);
+          g_clear_error (&err);
         }
     }
 
-    if (!trashed) {
-        GError * err = NULL;
-        g_file_delete (file, NULL, &err);
-        if (err) {
-            g_message ("Unable to delete file \"%s\": %s", filename, err->message);
-            g_clear_error (&err);
+  if (!trashed)
+    {
+      GError * err = NULL;
+      g_file_delete (file, NULL, &err);
+      if (err)
+        {
+          g_message ("Unable to delete file \"%s\": %s", filename, err->message);
+          g_clear_error (&err);
         }
     }
 
-    g_object_unref (G_OBJECT (file));
-    return 0;
+  g_object_unref (G_OBJECT (file));
+  return 0;
 }
 
 const char*

@@ -1829,18 +1829,18 @@ tr_formatter_get_units (void * vdict)
 
   tr_variantDictReserve (dict, 6);
 
-  tr_variantDictAddInt (dict, "memory-bytes", mem_units.units[TR_FMT_KB].value);
-  l = tr_variantDictAddList (dict, "memory-units", 4);
+  tr_variantDictAddInt (dict, TR_KEY_memory_bytes, mem_units.units[TR_FMT_KB].value);
+  l = tr_variantDictAddList (dict, TR_KEY_memory_units, 4);
   for (i=0; i<4; i++)
     tr_variantListAddStr (l, mem_units.units[i].name);
 
-  tr_variantDictAddInt (dict, "size-bytes",   size_units.units[TR_FMT_KB].value);
-  l = tr_variantDictAddList (dict, "size-units", 4);
+  tr_variantDictAddInt (dict, TR_KEY_size_bytes,   size_units.units[TR_FMT_KB].value);
+  l = tr_variantDictAddList (dict, TR_KEY_size_units, 4);
   for (i=0; i<4; i++)
     tr_variantListAddStr (l, size_units.units[i].name);
 
-  tr_variantDictAddInt (dict, "speed-bytes",  speed_units.units[TR_FMT_KB].value);
-  l = tr_variantDictAddList (dict, "speed-units", 4);
+  tr_variantDictAddInt (dict, TR_KEY_speed_bytes,  speed_units.units[TR_FMT_KB].value);
+  l = tr_variantDictAddList (dict, TR_KEY_speed_units, 4);
   for (i=0; i<4; i++)
     tr_variantListAddStr (l, speed_units.units[i].name);
 }

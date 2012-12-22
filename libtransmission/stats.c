@@ -66,15 +66,15 @@ loadCumulativeStats (const tr_session * session, tr_session_stats * setme)
     {
       int64_t i;
 
-      if (tr_variantDictFindInt (&top, "downloaded-bytes", &i))
+      if (tr_variantDictFindInt (&top, TR_KEY_downloaded_bytes, &i))
         setme->downloadedBytes = (uint64_t) i;
-      if (tr_variantDictFindInt (&top, "files-added", &i))
+      if (tr_variantDictFindInt (&top, TR_KEY_files_added, &i))
         setme->filesAdded = (uint64_t) i;
-      if (tr_variantDictFindInt (&top, "seconds-active", &i))
+      if (tr_variantDictFindInt (&top, TR_KEY_seconds_active, &i))
         setme->secondsActive = (uint64_t) i;
-      if (tr_variantDictFindInt (&top, "session-count", &i))
+      if (tr_variantDictFindInt (&top, TR_KEY_session_count, &i))
         setme->sessionCount = (uint64_t) i;
-      if (tr_variantDictFindInt (&top, "uploaded-bytes", &i))
+      if (tr_variantDictFindInt (&top, TR_KEY_uploaded_bytes, &i))
         setme->uploadedBytes = (uint64_t) i;
 
       tr_variantFree (&top);
@@ -88,11 +88,11 @@ saveCumulativeStats (const tr_session * session, const tr_session_stats * s)
   tr_variant top;
 
   tr_variantInitDict (&top, 5);
-  tr_variantDictAddInt (&top, "downloaded-bytes", s->downloadedBytes);
-  tr_variantDictAddInt (&top, "files-added",      s->filesAdded);
-  tr_variantDictAddInt (&top, "seconds-active",   s->secondsActive);
-  tr_variantDictAddInt (&top, "session-count",    s->sessionCount);
-  tr_variantDictAddInt (&top, "uploaded-bytes",   s->uploadedBytes);
+  tr_variantDictAddInt (&top, TR_KEY_downloaded_bytes, s->downloadedBytes);
+  tr_variantDictAddInt (&top, TR_KEY_files_added,      s->filesAdded);
+  tr_variantDictAddInt (&top, TR_KEY_seconds_active,   s->secondsActive);
+  tr_variantDictAddInt (&top, TR_KEY_session_count,    s->sessionCount);
+  tr_variantDictAddInt (&top, TR_KEY_uploaded_bytes,   s->uploadedBytes);
 
   filename = getFilename (session);
   tr_deepLog (__FILE__, __LINE__, NULL, "Saving stats to \"%s\"", filename);

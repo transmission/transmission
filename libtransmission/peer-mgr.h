@@ -27,6 +27,7 @@
 #include "history.h"
 #include "net.h" /* tr_address */
 #include "peer-common.h" /* struct peer_request */
+#include "quark.h"
 
 /**
  * @addtogroup peers Peers
@@ -116,7 +117,7 @@ typedef struct tr_peer
     float                    progress;
 
     /* the client name from the `v' string in LTEP's handshake dictionary */
-    char                   * client;
+    tr_quark                 client;
 
     time_t                   chokeChangedAt;
 

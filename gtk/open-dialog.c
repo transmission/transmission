@@ -42,7 +42,7 @@ get_recent_destinations (void)
         char key[64];
         const char * val;
         g_snprintf (key, sizeof (key), "recent-download-dir-%d", i+1);
-        if ((val = gtr_pref_string_get (key)))
+        if ((val = gtr_pref_string_get (tr_quark_new(key,-1))))
             list = g_slist_append (list, (void*)val);
     }
     return list;
@@ -74,7 +74,7 @@ save_recent_destination (TrCore * core, const char * dir)
     for (l=list, i=0; l && (i<N_RECENT); ++i, l=l->next) {
         char key[64];
         g_snprintf (key, sizeof (key), "recent-download-dir-%d", i + 1);
-        gtr_pref_string_set (key, l->data);
+        gtr_pref_string_set (tr_quark_new(key,-1), l->data);
     }
     gtr_pref_save (gtr_core_session (core));
 
@@ -396,7 +396,7 @@ onOpenDialogResponse (GtkDialog * dialog, int response, gpointer core)
 
     /* remember this folder the next time we use this dialog */
     folder = gtk_file_chooser_get_current_folder (GTK_FILE_CHOOSER (dialog));
-    gtr_pref_string_set (PREF_KEY_OPEN_DIALOG_FOLDER, folder);
+    gtr_pref_string_set (TR_KEY_open_dialog_dir, folder);
     g_free (folder);
 
     if (response == GTK_RESPONSE_ACCEPT)
@@ -404,7 +404,7 @@ onOpenDialogResponse (GtkDialog * dialog, int response, gpointer core)
         GtkFileChooser  * chooser = GTK_FILE_CHOOSER (dialog);
         GtkWidget       * w = gtk_file_chooser_get_extra_widget (chooser);
         GtkToggleButton * tb = GTK_TOGGLE_BUTTON (w);
-        const gboolean    do_start = gtr_pref_flag_get (TR_PREFS_KEY_START);
+        const gboolean    do_start = gtr_pref_flag_get (TR_KEY_start_added_torrents);
         const gboolean    do_prompt = gtk_toggle_button_get_active (tb);
         const gboolean    do_notify = FALSE;
         GSList * files = gtk_file_chooser_get_files (chooser);
@@ -437,12 +437,12 @@ gtr_torrent_open_from_file_dialog_new (GtkWindow * parent, TrCore * core)
     addTorrentFilters (GTK_FILE_CHOOSER (w));
     g_signal_connect (w, "response", G_CALLBACK (onOpenDialogResponse), core);
 
-    if ((folder = gtr_pref_string_get (PREF_KEY_OPEN_DIALOG_FOLDER)))
+    if ((folder = gtr_pref_string_get (TR_KEY_open_dialog_dir)))
         gtk_file_chooser_set_current_folder (GTK_FILE_CHOOSER (w), folder);
 
     c = gtk_check_button_new_with_mnemonic (_("Show _options dialog"));
     gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (c),
-                                 gtr_pref_flag_get (PREF_KEY_OPTIONS_PROMPT));
+                                 gtr_pref_flag_get (TR_KEY_show_options_window));
     gtk_file_chooser_set_extra_widget (GTK_FILE_CHOOSER (w), c);
     gtk_widget_show (c);
 

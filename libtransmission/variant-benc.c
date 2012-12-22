@@ -145,6 +145,16 @@ makeroom (tr_variant * container, size_t count)
   return 0;
 }
 
+static inline bool
+isReadyForDictKey (tr_ptrArray * parentStack)
+{
+  tr_variant * parent = tr_ptrArrayBack (parentStack);
+
+  return (parent != NULL)
+      && (tr_variantIsDict(parent))
+      && ((parent->val.l.count%2)==0);
+}
+
 static tr_variant*
 getNode (tr_variant  * top,
          tr_ptrArray * parentStack,
@@ -258,6 +268,7 @@ tr_variantParseImpl (const void    * buf_in,
           const uint8_t * str;
           size_t str_len;
           tr_variant * node;
+          const bool is_key = isReadyForDictKey (parentStack);
 
           if ((err = tr_bencParseStr (buf, bufend, &end, &str, &str_len)))
             return err;
@@ -266,7 +277,11 @@ tr_variantParseImpl (const void    * buf_in,
           if (!node)
             return EILSEQ;
 
-          tr_variantInitStr (node, str, str_len);
+          if (is_key)
+            tr_variantInitQuark (node, tr_quark_new (str, str_len));
+          else
+            tr_variantInitStr (node, str, str_len);
+
           buf = end;
 
           if (tr_ptrArrayEmpty (parentStack))

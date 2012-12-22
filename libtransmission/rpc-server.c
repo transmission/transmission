@@ -251,19 +251,19 @@ handle_upload (struct evhttp_request * req,
                 body_len -= 2;
 
             tr_variantInitDict (&top, 2);
-            tr_variantDictAddStr (&top, "method", "torrent-add");
-            args = tr_variantDictAddDict (&top, "arguments", 2);
-            tr_variantDictAddBool (args, "paused", paused);
+            tr_variantDictAddStr (&top, TR_KEY_method, "torrent-add");
+            args = tr_variantDictAddDict (&top, TR_KEY_arguments, 2);
+            tr_variantDictAddBool (args, TR_KEY_paused, paused);
 
             if (tr_urlIsValid (body, body_len))
             {
-                tr_variantDictAddRaw (args, "filename", body, body_len);
+                tr_variantDictAddRaw (args, TR_KEY_filename, body, body_len);
                 have_source = true;
             }
             else if (!tr_variantFromBenc (&test, body, body_len))
             {
                 char * b64 = tr_base64_encode (body, body_len, NULL);
-                tr_variantDictAddStr (args, "metainfo", b64);
+                tr_variantDictAddStr (args, TR_KEY_metainfo, b64);
                 tr_free (b64);
                 have_source = true;
             }
@@ -918,6 +918,13 @@ tr_rpcClose (tr_rpc_server ** ps)
     *ps = NULL;
 }
 
+static void
+missing_settings_key (const tr_quark q)
+{
+  const char * str = tr_quark_get_string (q, NULL);
+  tr_nerr (MY_NAME, _("Couldn't find settings key \"%s\""), str);
+} 
+
 tr_rpc_server *
 tr_rpcInit (tr_session  * session, tr_variant * settings)
 {
@@ -925,63 +932,63 @@ tr_rpcInit (tr_session  * session, tr_variant * settings)
     bool boolVal;
     int64_t i;
     const char * str;
-    const char * key;
+    tr_quark key;
     tr_address address;
 
     s = tr_new0 (tr_rpc_server, 1);
     s->session = session;
 
-    key = TR_PREFS_KEY_RPC_ENABLED;
+    key = TR_KEY_rpc_enabled;
     if (!tr_variantDictFindBool (settings, key, &boolVal))
-        tr_nerr (MY_NAME, _("Couldn't find settings key \"%s\""), key);
+        missing_settings_key (key);
     else
         s->isEnabled = boolVal;
 
-    key = TR_PREFS_KEY_RPC_PORT;
+    key = TR_KEY_rpc_port;
     if (!tr_variantDictFindInt (settings, key, &i))
-        tr_nerr (MY_NAME, _("Couldn't find settings key \"%s\""), key);
+        missing_settings_key (key);
     else
         s->port = i;
 
-    key = TR_PREFS_KEY_RPC_URL;
-    if (!tr_variantDictFindStr (settings, TR_PREFS_KEY_RPC_URL, &str, NULL))
-        tr_nerr (MY_NAME, _("Couldn't find settings key \"%s\""), key);
+    key = TR_KEY_rpc_url;
+    if (!tr_variantDictFindStr (settings, key, &str, NULL))
+        missing_settings_key (key);
     else
         s->url = tr_strdup (str);
 
-    key = TR_PREFS_KEY_RPC_WHITELIST_ENABLED;
+    key = TR_KEY_rpc_whitelist_enabled;
     if (!tr_variantDictFindBool (settings, key, &boolVal))
-        tr_nerr (MY_NAME, _("Couldn't find settings key \"%s\""), key);
+        missing_settings_key (key);
     else
         tr_rpcSetWhitelistEnabled (s, boolVal);
 
-    key = TR_PREFS_KEY_RPC_AUTH_REQUIRED;
+    key = TR_KEY_rpc_authentication_required;
     if (!tr_variantDictFindBool (settings, key, &boolVal))
-        tr_nerr (MY_NAME, _("Couldn't find settings key \"%s\""), key);
+        missing_settings_key (key);
     else
         tr_rpcSetPasswordEnabled (s, boolVal);
 
-    key = TR_PREFS_KEY_RPC_WHITELIST;
+    key = TR_KEY_rpc_whitelist;
     if (!tr_variantDictFindStr (settings, key, &str, NULL) && str)
-        tr_nerr (MY_NAME, _("Couldn't find settings key \"%s\""), key);
+        missing_settings_key (key);
     else
         tr_rpcSetWhitelist (s, str);
 
-    key = TR_PREFS_KEY_RPC_USERNAME;
+    key = TR_KEY_rpc_username;
     if (!tr_variantDictFindStr (settings, key, &str, NULL))
-        tr_nerr (MY_NAME, _("Couldn't find settings key \"%s\""), key);
+        missing_settings_key (key);
     else
         tr_rpcSetUsername (s, str);
 
-    key = TR_PREFS_KEY_RPC_PASSWORD;
+    key = TR_KEY_rpc_password;
     if (!tr_variantDictFindStr (settings, key, &str, NULL))
-        tr_nerr (MY_NAME, _("Couldn't find settings key \"%s\""), key);
+        missing_settings_key (key);
     else
         tr_rpcSetPassword (s, str);
 
-    key = TR_PREFS_KEY_RPC_BIND_ADDRESS;
-    if (!tr_variantDictFindStr (settings, TR_PREFS_KEY_RPC_BIND_ADDRESS, &str, NULL)) {
-        tr_nerr (MY_NAME, _("Couldn't find settings key \"%s\""), key);
+    key = TR_KEY_rpc_bind_address;
+    if (!tr_variantDictFindStr (settings, key, &str, NULL)) {
+        missing_settings_key (key);
         address = tr_inaddr_any;
     } else if (!tr_address_from_string (&address, str)) {
         tr_nerr (MY_NAME, _("%s is not a valid address"), str);

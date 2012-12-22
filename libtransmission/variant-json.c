@@ -72,7 +72,7 @@ get_node (struct jsonsl_st * jsn)
     }
   else if (tr_variantIsDict (parent) && (data->key!=NULL))
     {
-      node = tr_variantDictAdd (parent, data->key, data->keylen);
+      node = tr_variantDictAdd (parent, tr_quark_new (data->key, data->keylen));
 
       data->key = NULL;
       data->keylen = 0;
@@ -316,7 +316,7 @@ action_callback_POP (jsonsl_t                  jsn,
       else if (state->special_flags & JSONSL_SPECIALf_NULL)
         {
           data->has_content = true;
-          tr_variantInitStr (get_node (jsn), "", 0);
+          tr_variantInitQuark (get_node (jsn), TR_KEY_NONE);
         }
     }
 }

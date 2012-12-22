@@ -151,16 +151,16 @@ tr_ctorSetMetainfoFromFile (tr_ctor *    ctor,
     if (ctor->isSet_metainfo)
     {
         tr_variant * info;
-        if (tr_variantDictFindDict (&ctor->metainfo, "info", &info))
+        if (tr_variantDictFindDict (&ctor->metainfo, TR_KEY_info, &info))
         {
             const char * name;
-            if (!tr_variantDictFindStr (info, "name.utf-8", &name, NULL))
-                if (!tr_variantDictFindStr (info, "name", &name, NULL))
+            if (!tr_variantDictFindStr (info, TR_KEY_name_utf_8, &name, NULL))
+                if (!tr_variantDictFindStr (info, TR_KEY_name, &name, NULL))
                     name = NULL;
             if (!name || !*name)
             {
                 char * base = tr_basename (filename);
-                tr_variantDictAddStr (info, "name", base);
+                tr_variantDictAddStr (info, TR_KEY_name, base);
                 tr_free (base);
             }
         }

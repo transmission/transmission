@@ -44,6 +44,7 @@ libtransmission_a_SOURCES = \
     platform.c \
     port-forwarding.c \
     ptrarray.c \
+    quark.c \
     resume.c \
     rpcimpl.c \
     rpc-server.c \
@@ -99,6 +100,7 @@ noinst_HEADERS = \
     platform.h \
     port-forwarding.h \
     ptrarray.h \
+    quark.h \
     resume.h \
     rpcimpl.h \
     rpc-server.h \
@@ -131,6 +133,7 @@ TESTS = \
     magnet-test \
     metainfo-test \
     peer-msgs-test \
+    quark-test \
     rpc-test \
     test-peer-id \
     utils-test \
@@ -175,6 +178,10 @@ history_test_LDFLAGS = ${apps_ldflags}
 json_test_SOURCES = json-test.c $(TEST_SOURCES)
 json_test_LDADD = ${apps_ldadd}
 json_test_LDFLAGS = ${apps_ldflags}
+
+quark_test_SOURCES = quark-test.c $(TEST_SOURCES)
+quark_test_LDADD = ${apps_ldadd}
+quark_test_LDFLAGS = ${apps_ldflags}
 
 magnet_test_SOURCES = magnet-test.c $(TEST_SOURCES)
 magnet_test_LDADD = ${apps_ldadd}

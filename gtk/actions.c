@@ -55,12 +55,12 @@ static GtkRadioActionEntry sort_radio_entries[] =
 
 static void
 sort_changed_cb (GtkAction            * action UNUSED,
-                 GtkRadioAction *              current,
-                 gpointer user_data            UNUSED)
+                 GtkRadioAction       * current,
+                 gpointer               user_data UNUSED)
 {
-    const char * key = PREF_KEY_SORT_MODE;
-    const int    i = gtk_radio_action_get_current_value (current);
-    const char * val = sort_radio_entries[i].name;
+  const tr_quark key = TR_KEY_sort_mode;
+  const int i = gtk_radio_action_get_current_value (current);
+  const char * val = sort_radio_entries[i].name;
 
     gtr_core_set_pref (myCore, key, val);
 }
@@ -78,7 +78,7 @@ toggle_pref_cb (GtkToggleAction *  action,
     const char *   key = gtk_action_get_name (GTK_ACTION (action));
     const gboolean val = gtk_toggle_action_get_active (action);
 
-    gtr_core_set_pref_bool (myCore, key, val);
+    gtr_core_set_pref_bool (myCore, tr_quark_new(key,-1), val);
 }
 
 static GtkToggleActionEntry  pref_toggle_entries[] =
@@ -212,8 +212,7 @@ gtr_actions_init (GtkUIManager * ui_manager, gpointer callback_user_data)
     action_group = myGroup = gtk_action_group_new ("Actions");
     gtk_action_group_set_translation_domain (action_group, NULL);
 
-
-    match = gtr_pref_string_get (PREF_KEY_SORT_MODE);
+    match = gtr_pref_string_get (TR_KEY_sort_mode);
     for (i = 0, n = G_N_ELEMENTS (sort_radio_entries), active = -1;
          active == -1 && i < n; ++i)
         if (!strcmp (sort_radio_entries[i].name, match))
@@ -233,7 +232,7 @@ gtr_actions_init (GtkUIManager * ui_manager, gpointer callback_user_data)
 
     for (i = 0, n = G_N_ELEMENTS (pref_toggle_entries); i < n; ++i)
         pref_toggle_entries[i].is_active =
-            gtr_pref_flag_get (pref_toggle_entries[i].name);
+            gtr_pref_flag_get (tr_quark_new (pref_toggle_entries[i].name, -1));
 
     gtk_action_group_add_toggle_actions (action_group,
                                          pref_toggle_entries,

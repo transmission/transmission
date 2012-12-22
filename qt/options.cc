@@ -326,34 +326,34 @@ Options :: onAccepted( )
 
     const int64_t tag = mySession.getUniqueTag( );
     tr_variant top;
-    tr_variantInitDict( &top, 3 );
-    tr_variantDictAddStr( &top, "method", "torrent-add" );
-    tr_variantDictAddInt( &top, "tag", tag );
-    tr_variant * args( tr_variantDictAddDict( &top, "arguments", 10 ) );
+    tr_variantInitDict (&top, 3);
+    tr_variantDictAddStr (&top, TR_KEY_method, "torrent-add" );
+    tr_variantDictAddInt (&top, TR_KEY_tag, tag );
+    tr_variant * args (tr_variantDictAddDict(&top, TR_KEY_arguments, 10));
     QString downloadDir;
 
     // "download-dir"
-    if( myDestinationButton )
+    if (myDestinationButton)
         downloadDir = myDestination.absolutePath();
     else
         downloadDir = myDestinationEdit->text();
-    tr_variantDictAddStr( args, "download-dir", downloadDir.toUtf8().constData() );
+    tr_variantDictAddStr (args, TR_KEY_download_dir, downloadDir.toUtf8().constData() );
 
     // "metainfo"
     switch( myAdd.type )
     {
         case AddData::MAGNET:
-            tr_variantDictAddStr( args, "filename", myAdd.magnet.toUtf8().constData() );
+            tr_variantDictAddStr (args, TR_KEY_filename, myAdd.magnet.toUtf8().constData());
             break;
 
         case AddData::URL:
-            tr_variantDictAddStr( args, "filename", myAdd.url.toString().toUtf8().constData() );
+            tr_variantDictAddStr (args, TR_KEY_filename, myAdd.url.toString().toUtf8().constData());
             break;
 
         case AddData::FILENAME:
         case AddData::METAINFO: {
             const QByteArray b64 = myAdd.toBase64( );
-            tr_variantDictAddRaw( args, "metainfo", b64.constData(), b64.size() );
+            tr_variantDictAddRaw( args, TR_KEY_metainfo, b64.constData(), b64.size() );
             break;
         }
 
@@ -362,17 +362,17 @@ Options :: onAccepted( )
     }
 
     // paused
-    tr_variantDictAddBool( args, "paused", !myStartCheck->isChecked( ) );
+    tr_variantDictAddBool( args, TR_KEY_paused, !myStartCheck->isChecked( ) );
 
     // priority
     const int index = myPriorityCombo->currentIndex( );
     const int priority = myPriorityCombo->itemData(index).toInt( );
-    tr_variantDictAddInt( args, "bandwidthPriority", priority );
+    tr_variantDictAddInt( args, TR_KEY_bandwidthPriority, priority );
 
     // files-unwanted
     int count = myWanted.count( false );
     if( count > 0 ) {
-        tr_variant * l = tr_variantDictAddList( args, "files-unwanted", count );
+        tr_variant * l = tr_variantDictAddList( args, TR_KEY_files_unwanted, count );
         for( int i=0, n=myWanted.size(); i<n; ++i )
             if( myWanted.at(i) == false )
                 tr_variantListAddInt( l, i );
@@ -381,7 +381,7 @@ Options :: onAccepted( )
     // priority-low
     count = myPriorities.count( TR_PRI_LOW );
     if( count > 0 ) {
-        tr_variant * l = tr_variantDictAddList( args, "priority-low", count );
+        tr_variant * l = tr_variantDictAddList( args, TR_KEY_priority_low, count );
         for( int i=0, n=myPriorities.size(); i<n; ++i )
             if( myPriorities.at(i) == TR_PRI_LOW )
                 tr_variantListAddInt( l, i );
@@ -390,7 +390,7 @@ Options :: onAccepted( )
     // priority-high
     count = myPriorities.count( TR_PRI_HIGH );
     if( count > 0 ) {
-        tr_variant * l = tr_variantDictAddList( args, "priority-high", count );
+        tr_variant * l = tr_variantDictAddList( args, TR_KEY_priority_high, count );
         for( int i=0, n=myPriorities.size(); i<n; ++i )
             if( myPriorities.at(i) == TR_PRI_HIGH )
                 tr_variantListAddInt( l, i );

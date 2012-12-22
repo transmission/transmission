@@ -26,6 +26,7 @@ class QStringList;
 class AddData;
 
 #include <libtransmission/transmission.h>
+#include <libtransmission/quark.h>
 
 extern "C"
 {
@@ -85,7 +86,7 @@ class Session: public QObject
         int64_t getUniqueTag( ) { return nextUniqueTag++; }
 
     private:
-        void sessionSet( const char * key, const QVariant& variant );
+        void sessionSet( const tr_quark key, const QVariant& variant );
         void pumpRequests( );
         void sendTorrentRequest( const char * request, const QSet<int>& torrentIds );
         static void updateStats( struct tr_variant * d, struct tr_session_stats * stats );
@@ -93,12 +94,12 @@ class Session: public QObject
         QNetworkAccessManager * networkAccessManager( );
 
     public:
-        void torrentSet( const QSet<int>& ids, const QString& key, bool val );
-        void torrentSet( const QSet<int>& ids, const QString& key, int val );
-        void torrentSet( const QSet<int>& ids, const QString& key, double val );
-        void torrentSet( const QSet<int>& ids, const QString& key, const QList<int>& val );
-        void torrentSet( const QSet<int>& ids, const QString& key, const QStringList& val );
-        void torrentSet( const QSet<int>& ids, const QString& key, const QPair<int,QString>& val);
+        void torrentSet( const QSet<int>& ids, const tr_quark key, bool val );
+        void torrentSet( const QSet<int>& ids, const tr_quark key, int val );
+        void torrentSet( const QSet<int>& ids, const tr_quark key, double val );
+        void torrentSet( const QSet<int>& ids, const tr_quark key, const QList<int>& val );
+        void torrentSet( const QSet<int>& ids, const tr_quark key, const QStringList& val );
+        void torrentSet( const QSet<int>& ids, const tr_quark key, const QPair<int,QString>& val);
         void torrentSetLocation( const QSet<int>& ids, const QString& path, bool doMove );
 
 

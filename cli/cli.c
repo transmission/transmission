@@ -265,13 +265,13 @@ main (int argc, char ** argv)
       return EXIT_FAILURE;
     }
 
-  if (tr_variantDictFindStr (&settings, TR_PREFS_KEY_DOWNLOAD_DIR, &str, NULL))
+  if (tr_variantDictFindStr (&settings, TR_KEY_download_dir, &str, NULL))
     {
       str = tr_realpath (str, buf);
 
       if (str != NULL)
         {
-          tr_variantDictAddStr (&settings, TR_PREFS_KEY_DOWNLOAD_DIR, str);
+          tr_variantDictAddStr (&settings, TR_KEY_download_dir, str);
         }
       else
         {
@@ -399,51 +399,51 @@ parseCommandLine (tr_variant * d, int argc, const char ** argv)
       switch (c)
         {
           case 'b':
-            tr_variantDictAddBool (d, TR_PREFS_KEY_BLOCKLIST_ENABLED, true);
+            tr_variantDictAddBool (d, TR_KEY_blocklist_enabled, true);
             break;
 
-          case 'B': tr_variantDictAddBool (d, TR_PREFS_KEY_BLOCKLIST_ENABLED, false);
+          case 'B': tr_variantDictAddBool (d, TR_KEY_blocklist_enabled, false);
             break;
 
           case 'd':
-            tr_variantDictAddInt (d, TR_PREFS_KEY_DSPEED_KBps, atoi (optarg));
-            tr_variantDictAddBool (d, TR_PREFS_KEY_DSPEED_ENABLED, true);
+            tr_variantDictAddInt (d, TR_KEY_speed_limit_down, atoi (optarg));
+            tr_variantDictAddBool (d, TR_KEY_speed_limit_down_enabled, true);
             break;
 
-          case 'D': tr_variantDictAddBool (d, TR_PREFS_KEY_DSPEED_ENABLED, false);
+          case 'D': tr_variantDictAddBool (d, TR_KEY_speed_limit_down_enabled, false);
             break;
 
           case 'f':
-            tr_variantDictAddStr (d, TR_PREFS_KEY_SCRIPT_TORRENT_DONE_FILENAME, optarg);
-            tr_variantDictAddBool (d, TR_PREFS_KEY_SCRIPT_TORRENT_DONE_ENABLED, true);
+            tr_variantDictAddStr (d, TR_KEY_script_torrent_done_filename, optarg);
+            tr_variantDictAddBool (d, TR_KEY_script_torrent_done_enabled, true);
             break;
 
           case 'g': /* handled above */
             break;
 
           case 'm':
-            tr_variantDictAddBool (d, TR_PREFS_KEY_PORT_FORWARDING, true);
+            tr_variantDictAddBool (d, TR_KEY_port_forwarding_enabled, true);
             break;
 
           case 'M':
-            tr_variantDictAddBool (d, TR_PREFS_KEY_PORT_FORWARDING, false);
+            tr_variantDictAddBool (d, TR_KEY_port_forwarding_enabled, false);
             break;
 
           case 'p':
-            tr_variantDictAddInt (d, TR_PREFS_KEY_PEER_PORT, atoi (optarg));
+            tr_variantDictAddInt (d, TR_KEY_peer_port, atoi (optarg));
             break;
 
           case 't':
-            tr_variantDictAddInt (d, TR_PREFS_KEY_PEER_SOCKET_TOS, atoi (optarg));
+            tr_variantDictAddInt (d, TR_KEY_peer_socket_tos, atoi (optarg));
             break;
 
           case 'u':
-            tr_variantDictAddInt (d, TR_PREFS_KEY_USPEED_KBps, atoi (optarg));
-            tr_variantDictAddBool (d, TR_PREFS_KEY_USPEED_ENABLED, true);
+            tr_variantDictAddInt (d, TR_KEY_speed_limit_up, atoi (optarg));
+            tr_variantDictAddBool (d, TR_KEY_speed_limit_up_enabled, true);
             break;
 
           case 'U':
-            tr_variantDictAddBool (d, TR_PREFS_KEY_USPEED_ENABLED, false);
+            tr_variantDictAddBool (d, TR_KEY_speed_limit_up_enabled, false);
             break;
 
           case 'v':
@@ -455,19 +455,19 @@ parseCommandLine (tr_variant * d, int argc, const char ** argv)
             break;
 
           case 'w':
-            tr_variantDictAddStr (d, TR_PREFS_KEY_DOWNLOAD_DIR, optarg);
+            tr_variantDictAddStr (d, TR_KEY_download_dir, optarg);
             break;
 
           case 910:
-            tr_variantDictAddInt (d, TR_PREFS_KEY_ENCRYPTION, TR_ENCRYPTION_REQUIRED);
+            tr_variantDictAddInt (d, TR_KEY_encryption, TR_ENCRYPTION_REQUIRED);
             break;
 
           case 911:
-            tr_variantDictAddInt (d, TR_PREFS_KEY_ENCRYPTION, TR_ENCRYPTION_PREFERRED);
+            tr_variantDictAddInt (d, TR_KEY_encryption, TR_ENCRYPTION_PREFERRED);
             break;
 
           case 912:
-            tr_variantDictAddInt (d, TR_PREFS_KEY_ENCRYPTION, TR_CLEAR_PREFERRED);
+            tr_variantDictAddInt (d, TR_KEY_encryption, TR_CLEAR_PREFERRED);
             break;
 
           case TR_OPT_UNK:

@@ -19,7 +19,7 @@
 
 #define FLOOR 32
 
-const tr_ptrArray TR_PTR_ARRAY_INIT = { NULL, 0, 0 };
+const tr_ptrArray TR_PTR_ARRAY_INIT = TR_PTR_ARRAY_INIT_STATIC;
 
 void
 tr_ptrArrayDestruct (tr_ptrArray * p, PtrArrayForeachFunc func)

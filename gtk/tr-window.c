@@ -187,44 +187,50 @@ makeview (PrivateData * p)
 static void syncAltSpeedButton (PrivateData * p);
 
 static void
-prefsChanged (TrCore     * core UNUSED,
-              const char *  key,
-              gpointer      wind)
+prefsChanged (TrCore           * core UNUSED,
+              const tr_quark     key,
+              gpointer           wind)
 {
+  gboolean isEnabled;
   PrivateData * p = get_private_data (GTK_WINDOW (wind));
 
-  if (!strcmp (key, PREF_KEY_COMPACT_VIEW))
+  switch (key)
     {
-      g_object_set (p->renderer, "compact", gtr_pref_flag_get (key), NULL);
-      /* since the cell size has changed, we need gtktreeview to revalidate
-       * its fixed-height mode values. Unfortunately there's not an API call
-       * for that, but it *does* revalidate when it thinks the style's been tweaked */
-      g_signal_emit_by_name (p->view, "style-updated", NULL, NULL);
-    }
-  else if (!strcmp (key, PREF_KEY_STATUSBAR))
-    {
-      const gboolean isEnabled = gtr_pref_flag_get (key);
-      g_object_set (p->status, "visible", isEnabled, NULL);
-    }
-  else if (!strcmp (key, PREF_KEY_FILTERBAR))
-    {
-      const gboolean isEnabled = gtr_pref_flag_get (key);
-      g_object_set (p->filter, "visible", isEnabled, NULL);
-    }
-  else if (!strcmp (key, PREF_KEY_TOOLBAR))
-    {
-      const gboolean isEnabled = gtr_pref_flag_get (key);
-      g_object_set (p->toolbar, "visible", isEnabled, NULL);
-    }
-  else if (!strcmp (key, PREF_KEY_STATUSBAR_STATS))
-    {
-      gtr_window_refresh (wind);
-    }
-  else if (!strcmp (key, TR_PREFS_KEY_ALT_SPEED_ENABLED) ||
-           !strcmp (key, TR_PREFS_KEY_ALT_SPEED_UP_KBps) ||
-           !strcmp (key, TR_PREFS_KEY_ALT_SPEED_DOWN_KBps))
-    {
-      syncAltSpeedButton (p);
+      case TR_KEY_compact_view:
+        g_object_set (p->renderer, "compact", gtr_pref_flag_get (key), NULL);
+        /* since the cell size has changed, we need gtktreeview to revalidate
+         * its fixed-height mode values. Unfortunately there's not an API call
+         * for that, but it *does* revalidate when it thinks the style's been tweaked */
+        g_signal_emit_by_name (p->view, "style-updated", NULL, NULL);
+        break;
+
+      case TR_KEY_show_statusbar:
+        isEnabled = gtr_pref_flag_get (key);
+        g_object_set (p->status, "visible", isEnabled, NULL);
+        break;
+
+      case TR_KEY_show_filterbar:
+        isEnabled = gtr_pref_flag_get (key);
+        g_object_set (p->filter, "visible", isEnabled, NULL);
+        break;
+
+      case TR_KEY_show_toolbar:
+        isEnabled = gtr_pref_flag_get (key);
+        g_object_set (p->toolbar, "visible", isEnabled, NULL);
+        break;
+
+      case TR_KEY_statusbar_stats:
+        gtr_window_refresh (wind);
+        break;
+
+      case TR_KEY_alt_speed_enabled:
+      case TR_KEY_alt_speed_up:
+      case TR_KEY_alt_speed_down:
+        syncAltSpeedButton (p);
+        break;
+
+      default:
+        break;
     }
 }
 
@@ -266,7 +272,7 @@ status_menu_toggled_cb (GtkCheckMenuItem * menu_item,
     {
       PrivateData * p = vprivate;
       const char *  val = g_object_get_data (G_OBJECT (menu_item), STATS_MODE);
-      gtr_core_set_pref (p->core, PREF_KEY_STATUSBAR_STATS, val);
+      gtr_core_set_pref (p->core, TR_KEY_statusbar_stats, val);
     }
 }
 
@@ -277,12 +283,12 @@ syncAltSpeedButton (PrivateData * p)
   char d[32];
   char * str;
   const char * fmt;
-  const gboolean b = gtr_pref_flag_get (TR_PREFS_KEY_ALT_SPEED_ENABLED);
+  const gboolean b = gtr_pref_flag_get (TR_KEY_alt_speed_enabled);
   const char * stock = b ? "alt-speed-on" : "alt-speed-off";
   GtkWidget * w = p->alt_speed_button;
 
-  tr_formatter_speed_KBps (u, gtr_pref_int_get (TR_PREFS_KEY_ALT_SPEED_UP_KBps), sizeof (u));
-  tr_formatter_speed_KBps (d, gtr_pref_int_get (TR_PREFS_KEY_ALT_SPEED_DOWN_KBps), sizeof (d));
+  tr_formatter_speed_KBps (u, gtr_pref_int_get (TR_KEY_alt_speed_up), sizeof (u));
+  tr_formatter_speed_KBps (d, gtr_pref_int_get (TR_KEY_alt_speed_down), sizeof (d));
   fmt = b ? _("Click to disable Alternative Speed Limits\n (%1$s down, %2$s up)")
           : _("Click to enable Alternative Speed Limits\n (%1$s down, %2$s up)");
   str = g_strdup_printf (fmt, d, u);
@@ -300,7 +306,7 @@ alt_speed_toggled_cb (GtkToggleButton * button, gpointer vprivate)
 {
   PrivateData * p = vprivate;
   const gboolean b = gtk_toggle_button_get_active (button);
-  gtr_core_set_pref_bool (p->core, TR_PREFS_KEY_ALT_SPEED_ENABLED,  b);
+  gtr_core_set_pref_bool (p->core, TR_KEY_alt_speed_enabled,  b);
 }
 
 /***
@@ -363,7 +369,7 @@ onAltSpeedToggledIdle (gpointer vp)
 {
   PrivateData * p = vp;
   gboolean b = tr_sessionUsesAltSpeed (gtr_core_session (p->core));
-  gtr_core_set_pref_bool (p->core, TR_PREFS_KEY_ALT_SPEED_ENABLED, b);
+  gtr_core_set_pref_bool (p->core, TR_KEY_alt_speed_enabled, b);
 
   return FALSE;
 }
@@ -389,8 +395,8 @@ onSpeedToggled (GtkCheckMenuItem * check, gpointer vp)
   GObject * o = G_OBJECT (check);
   gboolean isEnabled = g_object_get_data (o, ENABLED_KEY) != 0;
   tr_direction dir = GPOINTER_TO_INT (g_object_get_data (o, DIRECTION_KEY));
-  const char * key = dir == TR_UP ? TR_PREFS_KEY_USPEED_ENABLED
-                                  : TR_PREFS_KEY_DSPEED_ENABLED;
+  const tr_quark key = dir == TR_UP ? TR_KEY_speed_limit_up_enabled
+                                    : TR_KEY_speed_limit_down_enabled;
 
   if (gtk_check_menu_item_get_active (check))
     gtr_core_set_pref_bool (p->core, key, isEnabled);
@@ -399,16 +405,16 @@ onSpeedToggled (GtkCheckMenuItem * check, gpointer vp)
 static void
 onSpeedSet (GtkCheckMenuItem * check, gpointer vp)
 {
-  const char * key;
+  tr_quark key;
   PrivateData * p = vp;
   GObject * o = G_OBJECT (check);
   const int KBps = GPOINTER_TO_INT (g_object_get_data (o, SPEED_KEY));
   tr_direction dir = GPOINTER_TO_INT (g_object_get_data (o, DIRECTION_KEY));
 
-  key = dir==TR_UP ? TR_PREFS_KEY_USPEED_KBps : TR_PREFS_KEY_DSPEED_KBps;
+  key = dir==TR_UP ? TR_KEY_speed_limit_up : TR_KEY_speed_limit_down;
   gtr_core_set_pref_int (p->core, key, KBps);
 
-  key = dir==TR_UP ? TR_PREFS_KEY_USPEED_ENABLED : TR_PREFS_KEY_DSPEED_ENABLED;
+  key = dir==TR_UP ? TR_KEY_speed_limit_up_enabled : TR_KEY_speed_limit_down_enabled;
   gtr_core_set_pref_bool (p->core, key, TRUE);
 }
 
@@ -475,7 +481,7 @@ onRatioToggled (GtkCheckMenuItem * check, gpointer vp)
   if (gtk_check_menu_item_get_active (check))
     {
       gboolean f = g_object_get_data (G_OBJECT (check), ENABLED_KEY) != 0;
-      gtr_core_set_pref_bool (p->core, TR_PREFS_KEY_RATIO_ENABLED, f);
+      gtr_core_set_pref_bool (p->core, TR_KEY_ratio_limit_enabled, f);
     }
 }
 static void
@@ -484,8 +490,8 @@ onRatioSet (GtkCheckMenuItem * check, gpointer vp)
   PrivateData * p = vp;
   int i = GPOINTER_TO_INT (g_object_get_data (G_OBJECT (check), RATIO_KEY));
   const double ratio = stockRatios[i];
-  gtr_core_set_pref_double (p->core, TR_PREFS_KEY_RATIO, ratio);
-  gtr_core_set_pref_bool (p->core, TR_PREFS_KEY_RATIO_ENABLED, TRUE);
+  gtr_core_set_pref_double (p->core, TR_KEY_ratio_limit, ratio);
+  gtr_core_set_pref_bool (p->core, TR_KEY_ratio_limit_enabled, TRUE);
 }
 
 static GtkWidget*
@@ -566,26 +572,26 @@ onOptionsClicked (GtkButton * button UNUSED, gpointer vp)
   PrivateData * p = vp;
 
   w = p->speedlimit_on_item[TR_DOWN];
-  tr_formatter_speed_KBps (buf1, gtr_pref_int_get (TR_PREFS_KEY_DSPEED_KBps), sizeof (buf1));
+  tr_formatter_speed_KBps (buf1, gtr_pref_int_get (TR_KEY_speed_limit_down), sizeof (buf1));
   gtr_label_set_text (GTK_LABEL (gtk_bin_get_child (GTK_BIN (w))), buf1);
 
-  b = gtr_pref_flag_get (TR_PREFS_KEY_DSPEED_ENABLED);
+  b = gtr_pref_flag_get (TR_KEY_speed_limit_down_enabled);
   w = b ? p->speedlimit_on_item[TR_DOWN] : p->speedlimit_off_item[TR_DOWN];
   gtk_check_menu_item_set_active (GTK_CHECK_MENU_ITEM (w), TRUE);
 
   w = p->speedlimit_on_item[TR_UP];
-  tr_formatter_speed_KBps (buf1, gtr_pref_int_get (TR_PREFS_KEY_USPEED_KBps), sizeof (buf1));
+  tr_formatter_speed_KBps (buf1, gtr_pref_int_get (TR_KEY_speed_limit_up), sizeof (buf1));
   gtr_label_set_text (GTK_LABEL (gtk_bin_get_child (GTK_BIN (w))), buf1);
 
-  b = gtr_pref_flag_get (TR_PREFS_KEY_USPEED_ENABLED);
+  b = gtr_pref_flag_get (TR_KEY_speed_limit_up_enabled);
   w = b ? p->speedlimit_on_item[TR_UP] : p->speedlimit_off_item[TR_UP];
   gtk_check_menu_item_set_active (GTK_CHECK_MENU_ITEM (w), TRUE);
 
-  tr_strlratio (buf1, gtr_pref_double_get (TR_PREFS_KEY_RATIO), sizeof (buf1));
+  tr_strlratio (buf1, gtr_pref_double_get (TR_KEY_ratio_limit), sizeof (buf1));
   g_snprintf (buf2, sizeof (buf2), _("Stop at Ratio (%s)"), buf1);
   gtr_label_set_text (GTK_LABEL (gtk_bin_get_child (GTK_BIN (p->ratio_on_item))), buf2);
 
-  b = gtr_pref_flag_get (TR_PREFS_KEY_RATIO_ENABLED);
+  b = gtr_pref_flag_get (TR_KEY_ratio_limit_enabled);
   gtk_check_menu_item_set_active (GTK_CHECK_MENU_ITEM (b ? p->ratio_on_item : p->ratio_off_item), TRUE);
 
   gtk_menu_popup (GTK_MENU (p->options_menu), NULL, NULL, NULL, NULL, 0, gtk_get_current_event_time ());
@@ -616,11 +622,11 @@ gtr_window_new (GtkApplication * app, GtkUIManager * ui_mgr, TrCore * core)
   gtk_window_set_title (win, g_get_application_name ());
   gtk_window_set_role (win, "tr-main");
   gtk_window_set_default_size (win,
-                               gtr_pref_int_get (PREF_KEY_MAIN_WINDOW_WIDTH),
-                               gtr_pref_int_get (PREF_KEY_MAIN_WINDOW_HEIGHT));
-  gtk_window_move (win, gtr_pref_int_get (PREF_KEY_MAIN_WINDOW_X),
-                        gtr_pref_int_get (PREF_KEY_MAIN_WINDOW_Y));
-  if (gtr_pref_flag_get (PREF_KEY_MAIN_WINDOW_IS_MAXIMIZED))
+                               gtr_pref_int_get (TR_KEY_main_window_width),
+                               gtr_pref_int_get (TR_KEY_main_window_height));
+  gtk_window_move (win, gtr_pref_int_get (TR_KEY_main_window_x),
+                        gtr_pref_int_get (TR_KEY_main_window_y));
+  if (gtr_pref_flag_get (TR_KEY_main_window_is_maximized))
     gtk_window_maximize (win);
   gtk_window_add_accel_group (win, gtk_ui_manager_get_accel_group (ui_mgr));
 
@@ -649,7 +655,7 @@ gtr_window_new (GtkApplication * app, GtkUIManager * ui_mgr, TrCore * core)
   /* status menu */
   menu = p->status_menu = gtk_menu_new ();
   l = NULL;
-  pch = gtr_pref_string_get (PREF_KEY_STATUSBAR_STATS);
+  pch = gtr_pref_string_get (TR_KEY_statusbar_stats);
   for (i=0, n=G_N_ELEMENTS (stats_modes); i<n; ++i)
     {
       const char * val = stats_modes[i].val;
@@ -758,12 +764,12 @@ gtr_window_new (GtkApplication * app, GtkUIManager * ui_mgr, TrCore * core)
 
   /* listen for prefs changes that affect the window */
   p->core = core;
-  prefsChanged (core, PREF_KEY_COMPACT_VIEW, self);
-  prefsChanged (core, PREF_KEY_FILTERBAR, self);
-  prefsChanged (core, PREF_KEY_STATUSBAR, self);
-  prefsChanged (core, PREF_KEY_STATUSBAR_STATS, self);
-  prefsChanged (core, PREF_KEY_TOOLBAR, self);
-  prefsChanged (core, TR_PREFS_KEY_ALT_SPEED_ENABLED, self);
+  prefsChanged (core, TR_KEY_compact_view, self);
+  prefsChanged (core, TR_KEY_show_filterbar, self);
+  prefsChanged (core, TR_KEY_show_statusbar, self);
+  prefsChanged (core, TR_KEY_statusbar_stats, self);
+  prefsChanged (core, TR_KEY_show_toolbar, self);
+  prefsChanged (core, TR_KEY_alt_speed_enabled, self);
   p->pref_handler_id = g_signal_connect (core, "prefs-changed",
                                          G_CALLBACK (prefsChanged), self);
 
@@ -810,7 +816,7 @@ updateStats (PrivateData * p)
   tr_session * session = gtr_core_session (p->core);
 
   /* update the stats */
-  pch = gtr_pref_string_get (PREF_KEY_STATUSBAR_STATS);
+  pch = gtr_pref_string_get (TR_KEY_statusbar_stats);
   if (!strcmp (pch, "session-ratio"))
     {
       tr_sessionGetStats (session, &stats);

@@ -192,12 +192,12 @@ gtr_notify_torrent_completed (TrCore * core, int torrent_id)
   GVariantBuilder actions_builder;
   TrNotification * n;
   tr_torrent * tor;
-  const char * cmd = gtr_pref_string_get (PREF_KEY_TORRENT_COMPLETE_SOUND_COMMAND);
+  const char * cmd = gtr_pref_string_get (TR_KEY_torrent_complete_sound_command);
 
-  if (gtr_pref_flag_get (PREF_KEY_TORRENT_COMPLETE_SOUND_ENABLED))
+  if (gtr_pref_flag_get (TR_KEY_torrent_complete_sound_enabled))
     g_spawn_command_line_async (cmd, NULL);
 
-  if (!gtr_pref_flag_get (PREF_KEY_TORRENT_COMPLETE_NOTIFICATION_ENABLED))
+  if (!gtr_pref_flag_get (TR_KEY_torrent_complete_notification_enabled))
       return;
 
   g_return_if_fail (G_IS_DBUS_PROXY (proxy));
@@ -243,7 +243,7 @@ gtr_notify_torrent_added (const char * name)
 
   g_return_if_fail (G_IS_DBUS_PROXY (proxy));
 
-  if (!gtr_pref_flag_get (PREF_KEY_TORRENT_ADDED_NOTIFICATION_ENABLED))
+  if (!gtr_pref_flag_get (TR_KEY_torrent_added_notification_enabled))
     return;
 
   n = g_new0 (TrNotification, 1);

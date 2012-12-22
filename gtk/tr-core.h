@@ -59,7 +59,7 @@ typedef struct _TrCoreClass
     void (* add_prompt)      (TrCore*, gpointer ctor);
     void (* blocklist_updated)(TrCore*, int ruleCount);
     void (* busy)            (TrCore*, gboolean is_busy);
-    void (* prefs_changed)   (TrCore*, const char* key);
+    void (* prefs_changed)   (TrCore*, const tr_quark key);
     void (* port_tested)     (TrCore*, gboolean is_open);
     void (* quit)            (TrCore*);
 }
@@ -84,7 +84,7 @@ size_t         gtr_core_get_torrent_count (TrCore * self);
 
 tr_torrent *   gtr_core_find_torrent (TrCore * core, int id);
 
-void           gtr_core_pref_changed (TrCore * core, const char * key);
+void           gtr_core_pref_changed (TrCore * core, const tr_quark key);
 
 
 /******
@@ -140,10 +140,10 @@ void gtr_core_update (TrCore * self);
 ***  Set a preference value, save the prefs file, and emit the "prefs-changed" signal
 **/
 
-void gtr_core_set_pref     (TrCore * self, const char * key, const char * val);
-void gtr_core_set_pref_bool (TrCore * self, const char * key, gboolean val);
-void gtr_core_set_pref_int (TrCore * self, const char * key, int val);
-void gtr_core_set_pref_double (TrCore * self, const char * key, double val);
+void gtr_core_set_pref        (TrCore * self, const tr_quark key, const char * val);
+void gtr_core_set_pref_bool   (TrCore * self, const tr_quark key, gboolean val);
+void gtr_core_set_pref_int    (TrCore * self, const tr_quark key, int val);
+void gtr_core_set_pref_double (TrCore * self, const tr_quark key, double val);
 
 /**
 ***
