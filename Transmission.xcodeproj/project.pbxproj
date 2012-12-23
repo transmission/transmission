@@ -375,6 +375,8 @@
 		A2E57BA713109E6B00A7DAB1 /* FilterBarController.m in Sources */ = {isa = PBXBuildFile; fileRef = A2E57BA613109E6B00A7DAB1 /* FilterBarController.m */; };
 		A2E669790F5B8E5A00B4251A /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2E669780F5B8E5A00B4251A /* Security.framework */; };
 		A2E9AA760C249AF400085DCF /* ToolbarCreateTemplate.png in Resources */ = {isa = PBXBuildFile; fileRef = A2E9AA750C249AF400085DCF /* ToolbarCreateTemplate.png */; };
+		A2EA52311686AC0D00180493 /* quark.c in Sources */ = {isa = PBXBuildFile; fileRef = A2EA522F1686AC0D00180493 /* quark.c */; };
+		A2EA52321686AC0D00180493 /* quark.h in Headers */ = {isa = PBXBuildFile; fileRef = A2EA52301686AC0D00180493 /* quark.h */; };
 		A2EB2E7715C8CF2C00FBD5B4 /* QuickLookPlugin.qlgenerator in CopyFiles */ = {isa = PBXBuildFile; fileRef = A2F35BB915C5A0A100EBF632 /* QuickLookPlugin.qlgenerator */; };
 		A2ED7D8F0CEF431B00970975 /* FilterButton.m in Sources */ = {isa = PBXBuildFile; fileRef = A2ED7D8E0CEF431B00970975 /* FilterButton.m */; };
 		A2EE726F14DCCC950093C99A /* natpmp_local.h in Headers */ = {isa = PBXBuildFile; fileRef = A2EE726E14DCCC950093C99A /* natpmp_local.h */; };
@@ -1091,6 +1093,8 @@
 		A2E57BA613109E6B00A7DAB1 /* FilterBarController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = FilterBarController.m; path = macosx/FilterBarController.m; sourceTree = "<group>"; };
 		A2E669780F5B8E5A00B4251A /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = /System/Library/Frameworks/Security.framework; sourceTree = "<absolute>"; };
 		A2E9AA750C249AF400085DCF /* ToolbarCreateTemplate.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = ToolbarCreateTemplate.png; path = macosx/Images/ToolbarCreateTemplate.png; sourceTree = "<group>"; };
+		A2EA522F1686AC0D00180493 /* quark.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = quark.c; path = libtransmission/quark.c; sourceTree = "<group>"; };
+		A2EA52301686AC0D00180493 /* quark.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = quark.h; path = libtransmission/quark.h; sourceTree = "<group>"; };
 		A2EA8E3C0CC3C9830081201C /* fr */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = fr; path = macosx/fr.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		A2EA8E3E0CC3C9830081201C /* fr */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = fr; path = macosx/fr.lproj/Localizable.strings; sourceTree = "<group>"; };
 		A2ED7D8D0CEF431B00970975 /* FilterButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FilterButton.h; path = macosx/FilterButton.h; sourceTree = "<group>"; };
@@ -1723,6 +1727,8 @@
 				A25BFD65167BED3B0039D1AA /* variant-json.c */,
 				A25BFD67167BED3B0039D1AA /* variant.c */,
 				A25BFD68167BED3B0039D1AA /* variant.h */,
+				A2EA522F1686AC0D00180493 /* quark.c */,
+				A2EA52301686AC0D00180493 /* quark.h */,
 				A2A4EA0B0DE106E8000CE197 /* ConvertUTF.h */,
 				A2A4EA0A0DE106E8000CE197 /* ConvertUTF.c */,
 				4DB74F070E8CD75100AEB1A8 /* wildmat.c */,
@@ -2068,6 +2074,7 @@
 				A2A7B32B164F87D400B98C65 /* jsonsl.h in Headers */,
 				A25BFD6A167BED3B0039D1AA /* variant-common.h in Headers */,
 				A25BFD6E167BED3B0039D1AA /* variant.h in Headers */,
+				A2EA52321686AC0D00180493 /* quark.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2673,6 +2680,7 @@
 				A25BFD69167BED3B0039D1AA /* variant-benc.c in Sources */,
 				A25BFD6B167BED3B0039D1AA /* variant-json.c in Sources */,
 				A25BFD6D167BED3B0039D1AA /* variant.c in Sources */,
+				A2EA52311686AC0D00180493 /* quark.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
