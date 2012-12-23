@@ -18,7 +18,7 @@ extern "C" {
 #endif
 
 #include <inttypes.h> /* for int64_t */
-#include <libtransmission/quark.h>
+#include "quark.h"
 
 struct evbuffer;
 
