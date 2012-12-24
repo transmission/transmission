@@ -224,9 +224,11 @@ Prefs :: ~Prefs ()
           case TrTypes::FilterModeType:
             tr_variantDictAddStr (&current_settings, key, val.value<FilterMode>().name().toUtf8().constData());
             break;
+
           case QVariant::String:
             {
-              const char * s = val.toByteArray().constData();
+              const QByteArray ba (val.toByteArray());
+              const char * s = ba.constData();
               if (Utils::isValidUtf8 (s))
                 tr_variantDictAddStr (&current_settings, key, s);
               else
@@ -323,7 +325,7 @@ QString
 Prefs :: getString (int key) const
 {
   assert (myItems[key].type == QVariant::String);
-  QByteArray b = myValues[key].toByteArray();
+  const QByteArray b = myValues[key].toByteArray();
   if (Utils::isValidUtf8 (b.constData()))
     myValues[key].setValue (QString::fromUtf8 (b.constData()));
   return myValues[key].toString();
