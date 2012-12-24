@@ -11,12 +11,10 @@
  */
 
 #include <assert.h>
-#include <ctype.h> /* isdigit () */
+#include <ctype.h> /* isdigit() */
 #include <errno.h>
-#include <stdlib.h> /* strtoul (), strtod (), realloc (), qsort (), mkstemp () */
-#include <string.h> /* strlen (), memchr () */
-
-#include <locale.h> /* setlocale () */
+#include <stdlib.h> /* strtoul(), strtod(), realloc(), qsort(), mkstemp() */
+#include <string.h> /* strlen(), memchr() */
 
 #include <event2/buffer.h>
 
@@ -25,13 +23,13 @@
 #define __LIBTRANSMISSION_VARIANT_MODULE___
 #include "transmission.h"
 #include "ptrarray.h"
-#include "utils.h" /* tr_strlcpy () */
+#include "utils.h" /* tr_snprintf() */
 #include "variant.h"
 #include "variant-common.h"
 
 /***
-****  tr_variantParse ()
-****  tr_variantLoad ()
+****  tr_variantParse()
+****  tr_variantLoad()
 ***/
 
 /**
@@ -117,68 +115,35 @@ tr_bencParseStr (const uint8_t  * buf,
   return 0;
 }
 
-static int
-makeroom (tr_variant * container, size_t count)
+static tr_variant*
+get_node (tr_ptrArray * stack, tr_quark * key, tr_variant * top, int * err)
 {
-  const size_t needed = container->val.l.count + count;
+  tr_variant * node = NULL;
 
-  assert (tr_variantIsContainer (container));
-
-  if (needed > container->val.l.alloc)
+  if (tr_ptrArrayEmpty (stack))
     {
-      size_t n;
-      void * tmp;
+      node = top;
+    }
+  else
+    {
+      tr_variant * parent = tr_ptrArrayBack (stack);
 
-      /* scale the alloc size in powers-of-2 */
-      n = container->val.l.alloc ? container->val.l.alloc : 8;
-      while (n < needed)
-        n *= 2u;
-
-      tmp = realloc (container->val.l.vals, n * sizeof (tr_variant));
-      if (tmp == NULL)
-        return 1;
-
-      container->val.l.alloc = n;
-      container->val.l.vals = tmp;
+      if (tr_variantIsList (parent))
+        {
+          node = tr_variantListAdd (parent);
+        }
+      else if (*key && tr_variantIsDict (parent))
+        {
+          node = tr_variantDictAdd (parent, *key);
+          *key = 0;
+        }
+      else
+        {
+          *err = EILSEQ;
+        }
     }
 
-  return 0;
-}
-
-static inline bool
-isReadyForDictKey (tr_ptrArray * parentStack)
-{
-  tr_variant * parent = tr_ptrArrayBack (parentStack);
-
-  return (parent != NULL)
-      && (tr_variantIsDict(parent))
-      && ((parent->val.l.count%2)==0);
-}
-
-static tr_variant*
-getNode (tr_variant  * top,
-         tr_ptrArray * parentStack,
-         int           type)
-{
-  tr_variant * parent;
-
-  assert (top);
-  assert (parentStack);
-
-  if (tr_ptrArrayEmpty (parentStack))
-    return top;
-
-  parent = tr_ptrArrayBack (parentStack);
-  assert (parent);
-
-  /* dictionary keys must be strings */
-  if ((parent->type == TR_VARIANT_TYPE_DICT)
-      && (type != TR_VARIANT_TYPE_STR)
-      && (! (parent->val.l.count % 2)))
-    return NULL;
-
-  makeroom (parent, 1);
-  return parent->val.l.vals + parent->val.l.count++;
+  return node;
 }
 
 /**
@@ -186,137 +151,113 @@ getNode (tr_variant  * top,
  * easier to read, but was vulnerable to a smash-stacking
  * attack via maliciously-crafted bencoded data. (#667)
  */
-static int
-tr_variantParseImpl (const void    * buf_in,
+int
+tr_variantParseBenc (const void    * buf_in,
                      const void    * bufend_in,
                      tr_variant    * top,
-                     tr_ptrArray   * parentStack,
                      const char   ** setme_end)
 {
-  int err;
+  int err = 0;
   const uint8_t * buf = buf_in;
   const uint8_t * bufend = bufend_in;
+  tr_ptrArray stack = TR_PTR_ARRAY_INIT;
+  tr_quark key = 0;
 
   tr_variantInit (top, 0);
 
   while (buf != bufend)
     {
       if (buf > bufend) /* no more text to parse... */
-        return 1;
+        err = EILSEQ;
+
+      if (err)
+        break;
 
       if (*buf == 'i') /* int */
         {
           int64_t val;
           const uint8_t * end;
-          tr_variant * node;
+          tr_variant * v;
 
           if ((err = tr_bencParseInt (buf, bufend, &end, &val)))
-            return err;
-
-          node = getNode (top, parentStack, TR_VARIANT_TYPE_INT);
-          if (!node)
-            return EILSEQ;
-
-          tr_variantInitInt (node, val);
+            break;
           buf = end;
 
-          if (tr_ptrArrayEmpty (parentStack))
-            break;
+          if ((v = get_node (&stack, &key, top, &err)))
+            tr_variantInitInt (v, val);
         }
       else if (*buf == 'l') /* list */
         {
-          tr_variant * node = getNode (top, parentStack, TR_VARIANT_TYPE_LIST);
-          if (!node)
-            return EILSEQ;
+          tr_variant * v;
 
-          tr_variantInit (node, TR_VARIANT_TYPE_LIST);
-          tr_ptrArrayAppend (parentStack, node);
           ++buf;
+
+          if ((v = get_node (&stack, &key, top, &err)))
+            {
+              tr_variantInitList (v, 0);
+              tr_ptrArrayAppend (&stack, v);
+            }
         }
       else if (*buf == 'd') /* dict */
         {
-          tr_variant * node = getNode (top, parentStack, TR_VARIANT_TYPE_DICT);
-          if (!node)
-            return EILSEQ;
+          tr_variant * v;
 
-          tr_variantInit (node, TR_VARIANT_TYPE_DICT);
-          tr_ptrArrayAppend (parentStack, node);
           ++buf;
+
+          if ((v = get_node (&stack, &key, top, &err)))
+            {
+              tr_variantInitDict (v, 0);
+              tr_ptrArrayAppend (&stack, v);
+            }
         }
       else if (*buf == 'e') /* end of list or dict */
         {
-          tr_variant * node;
           ++buf;
-          if (tr_ptrArrayEmpty (parentStack))
-              return EILSEQ;
 
-          node = tr_ptrArrayBack (parentStack);
-          if (tr_variantIsDict (node) && (node->val.l.count % 2))
+          if (tr_ptrArrayEmpty (&stack) || (key != 0))
             {
-              /* odd # of children in dict */
-              tr_variantFree (&node->val.l.vals[--node->val.l.count]);
-              return EILSEQ;
+              err = EILSEQ;
+              break;
             }
-
-          tr_ptrArrayPop (parentStack);
-          if (tr_ptrArrayEmpty (parentStack))
-            break;
+          else
+            {
+              tr_ptrArrayPop (&stack);
+              if (tr_ptrArrayEmpty (&stack))
+                break;
+            }
         }
       else if (isdigit (*buf)) /* string? */
         {
+          tr_variant * v;
           const uint8_t * end;
           const uint8_t * str;
           size_t str_len;
-          tr_variant * node;
-          const bool is_key = isReadyForDictKey (parentStack);
 
           if ((err = tr_bencParseStr (buf, bufend, &end, &str, &str_len)))
-            return err;
-
-          node = getNode (top, parentStack, TR_VARIANT_TYPE_STR);
-          if (!node)
-            return EILSEQ;
-
-          if (is_key)
-            tr_variantInitQuark (node, tr_quark_new (str, str_len));
-          else
-            tr_variantInitStr (node, str, str_len);
-
+            break;
           buf = end;
 
-          if (tr_ptrArrayEmpty (parentStack))
-            break;
+          if (!key && !tr_ptrArrayEmpty(&stack) && tr_variantIsDict(tr_ptrArrayBack(&stack)))
+            key = tr_quark_new (str, str_len);
+          else if ((v = get_node (&stack, &key, top, &err)))
+            tr_variantInitStr (v, str, str_len);
         }
       else /* invalid bencoded text... march past it */
         {
           ++buf;
         }
+
+      if (tr_ptrArrayEmpty (&stack))
+        break;
     }
 
-  err = !tr_variantIsSomething (top) || !tr_ptrArrayEmpty (parentStack);
+  if (!err)
+    err = !top->type || !tr_ptrArrayEmpty(&stack);
 
   if (!err && setme_end)
     *setme_end = (const char*) buf;
 
-  return err;
-}
-
-
-int
-tr_variantParseBenc (const void     * buf,
-                     const void     * end,
-                     tr_variant     * top,
-                     const char    ** setme_end)
-{
-  int err;
-  tr_ptrArray parentStack = TR_PTR_ARRAY_INIT;
-
-  top->type = 0; /* set to `uninitialized' */
-  err = tr_variantParseImpl (buf, end, top, &parentStack, setme_end);
-  if (err)
-    tr_variantFree (top);
-
-  tr_ptrArrayDestruct (&parentStack, NULL);
+  tr_ptrArrayDestruct (&stack, NULL);
   return err;
 }
 
@@ -342,18 +283,11 @@ saveBoolFunc (const tr_variant * val, void * evbuf)
 static void
 saveRealFunc (const tr_variant * val, void * evbuf)
 {
+  int len;
   char buf[128];
-  char locale[128];
-  size_t len;
 
-  /* always use a '.' decimal point s.t. locale-hopping doesn't bite us */
-  tr_strlcpy (locale, setlocale (LC_NUMERIC, NULL), sizeof (locale));
-  setlocale (LC_NUMERIC, "POSIX");
-  tr_snprintf (buf, sizeof (buf), "%f", val->val.d);
-  setlocale (LC_NUMERIC, locale);
-
-  len = strlen (buf);
-  evbuffer_add_printf (evbuf, "%lu:", (unsigned long)len);
+  len = tr_snprintf (buf, sizeof (buf), "%f", val->val.d);
+  evbuffer_add_printf (evbuf, "%d:", len);
   evbuffer_add (evbuf, buf, len);
 }
 

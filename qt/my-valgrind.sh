@@ -1,2 +1,3 @@
 #/bin/sh
-valgrind --tool=cachegrind ./transmission-qt
+valgrind --tool=cachegrind ./transmission-qt 2>&1 | tee runlog
+#valgrind --tool=memcheck --leak-check=full --leak-resolution=high --num-callers=48 --log-file=x-valgrind --show-reachable=no ./transmission-qt 2>&1 | tee runlog

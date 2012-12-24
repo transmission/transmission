@@ -17,8 +17,6 @@
 #include <string.h>
 #include <errno.h> /* EILSEQ, EINVAL */
 
-#include <locale.h> /* setlocale() */
-
 #include <event2/buffer.h> /* evbuffer_add() */
 #include <event2/util.h> /* evutil_strtoll () */
 
@@ -389,15 +387,15 @@ struct jsonWalk
 static void
 jsonIndent (struct jsonWalk * data)
 {
-  if (data->doIndent)
+  static char buf[1024] = { '\0' };
+  if (!*buf)
     {
-      char buf[1024];
-      const int width = tr_list_size (data->parents) * 4;
-
+      memset (buf, ' ', sizeof(buf));
       buf[0] = '\n';
-      memset (buf+1, ' ', width);
-      evbuffer_add (data->out, buf, 1+width);
     }
+
+  if (data->doIndent)
+    evbuffer_add (data->out, buf, tr_list_size(data->parents)*4 + 1);
 }
 
 static void
@@ -455,6 +453,9 @@ jsonPushParent (struct jsonWalk  * data,
   pstate->variantType = v->type;
   pstate->childIndex = 0;
   pstate->childCount = v->val.l.count;
+  if (tr_variantIsDict (v))
+    pstate->childCount *= 2;
+
   tr_list_prepend (&data->parents, pstate);
 }
 
@@ -620,18 +621,13 @@ static const struct VariantWalkFuncs walk_funcs = { jsonIntFunc,
 void
 tr_variantToBufJson (const tr_variant * top, struct evbuffer * buf, bool lean)
 {
-  char lc_numeric[128];
   struct jsonWalk data;
 
   data.doIndent = !lean;
   data.out = buf;
   data.parents = NULL;
 
-  /* json requires a '.' decimal point regardless of locale */
-  tr_strlcpy (lc_numeric, setlocale (LC_NUMERIC, NULL), sizeof (lc_numeric));
-  setlocale (LC_NUMERIC, "POSIX");
   tr_variantWalk (top, &walk_funcs, &data, true);
-  setlocale (LC_NUMERIC, lc_numeric);
 
   if (evbuffer_get_length (buf))
     evbuffer_add_printf (buf, "\n");

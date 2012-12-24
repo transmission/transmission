@@ -40,10 +40,6 @@ void tr_variantToBufJson (const tr_variant * top, struct evbuffer * buf, bool le
 
 void tr_variantToBufBenc (const tr_variant * top, struct evbuffer * buf);
 
-bool tr_variantIsSomething (const tr_variant * v);
-
-bool tr_variantIsContainer (const tr_variant * v);
-
 void tr_variantInit (tr_variant * v, char type);
 
 int tr_jsonParse (const char    * source, /* Such as a filename. Only when logging an error */

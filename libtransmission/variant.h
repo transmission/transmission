@@ -74,6 +74,8 @@ typedef struct tr_variant
 {
   char type;
 
+  tr_quark key;
+
   union
     {
       bool b;
@@ -86,9 +88,9 @@ typedef struct tr_variant
 
       struct
         {
-          struct tr_variant * vals; /* nodes */
-          size_t alloc; /* nodes allocated */
-          size_t count; /* nodes used */
+          size_t alloc;
+          size_t count;
+          struct tr_variant * vals;
         } l;
     }
   val;
@@ -275,10 +277,10 @@ tr_variantIsList (const tr_variant * v)
   return (v != NULL) && (v->type == TR_VARIANT_TYPE_LIST);
 }
 
-int          tr_variantInitList        (tr_variant       * list,
+void         tr_variantInitList        (tr_variant       * list,
                                         size_t             reserve_count);
 
-int          tr_variantListReserve     (tr_variant       * list,
+void         tr_variantListReserve     (tr_variant       * list,
                                         size_t             reserve_count);
 
 tr_variant * tr_variantListAdd         (tr_variant       * list);
@@ -311,7 +313,7 @@ tr_variant * tr_variantListAddDict     (tr_variant       * list,
 tr_variant * tr_variantListChild       (tr_variant       * list,
                                         size_t             pos);
 
-int          tr_variantListRemove      (tr_variant       * list,
+bool         tr_variantListRemove      (tr_variant       * list,
                                         size_t             pos);
 
 size_t       tr_variantListSize        (const tr_variant * list);
@@ -327,13 +329,13 @@ tr_variantIsDict (const tr_variant * v)
   return (v != NULL) && (v->type == TR_VARIANT_TYPE_DICT);
 }
 
-int          tr_variantInitDict        (tr_variant       * initme,
+void         tr_variantInitDict        (tr_variant       * initme,
                                         size_t             reserve_count);
 
-int          tr_variantDictReserve     (tr_variant       * dict,
+void         tr_variantDictReserve     (tr_variant       * dict,
                                         size_t             reserve_count);
 
-int          tr_variantDictRemove      (tr_variant       * dict,
+bool         tr_variantDictRemove      (tr_variant       * dict,
                                         const tr_quark     key);
 
 tr_variant * tr_variantDictAdd         (tr_variant       * dict,
