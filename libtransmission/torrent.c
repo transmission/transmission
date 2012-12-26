@@ -1256,7 +1256,7 @@ tr_torrentStat (tr_torrent * tor)
             tor->etaDLSpeedCalculatedAt = now;
           }
 
-        if (s->leftUntilDone > s->desiredAvailable)
+        if ((s->leftUntilDone > s->desiredAvailable) && (tor->info.webseedCount < 0))
           s->eta = TR_ETA_NOT_AVAIL;
         else if (tor->etaDLSpeed_KBps < 1)
           s->eta = TR_ETA_UNKNOWN;
