@@ -719,238 +719,246 @@ tr_getWebClientDir (const tr_session * session UNUSED)
 
 #ifndef WIN32
 static char *
-getdev( const char * path )
+getdev (const char * path)
 {
 #ifdef HAVE_GETMNTENT
-	FILE *fp;
-	struct mntent *mnt;
 
-	if ((fp = setmntent(_PATH_MOUNTED, "r")) == NULL)
-	{
-		return NULL;
-	}
-	while ((mnt = getmntent(fp)) != NULL)
-	{
-		if (strcmp(path, mnt->mnt_dir) == 0)
-		{
-			break;
-		}
-	}
-	endmntent(fp);
-	return mnt ? mnt->mnt_fsname : NULL;
+  FILE * fp;
+  struct mntent * mnt;
+
+  fp = setmntent(_PATH_MOUNTED, "r");
+  if (fp == NULL)
+    return NULL;
+
+  while ((mnt = getmntent(fp)) != NULL)
+    if (!tr_strcmp0 (path, mnt->mnt_dir))
+      break;
+
+  endmntent(fp);
+  return mnt ? mnt->mnt_fsname : NULL;
+
 #else /* BSD derived systems */
-	int n, i;
-	struct statfs *mnt;
 
-	if ((n = getmntinfo(&mnt, MNT_WAIT)) == 0)
-	{
-		return NULL;
-	}
-	for (i=0; i<n; i++)
-	{
-		if (strcmp(path, mnt[i].f_mntonname) == 0)
-		{
-			break;
-		}
-	}
-	return (i < n) ? mnt[i].f_mntfromname : NULL;
+  int i;
+  int n;
+  struct statfs * mnt;
+
+  n = getmntinfo(&mnt, MNT_WAIT);
+  if (!n)
+    return NULL;
+
+  for (i=0; i<n; i++)
+    if (!tr_strcmp0 (path, mnt[i].f_mntonname))
+      break;
+
+  return (i < n) ? mnt[i].f_mntfromname : NULL;
+
 #endif
 }
 
 static char *
-getfstype( const char * device )
+getfstype (const char * device)
 {
+
 #ifdef HAVE_GETMNTENT
-	FILE *fp;
-	struct mntent *mnt;
 
-	if ((fp = setmntent(_PATH_MOUNTED, "r")) == NULL)
-	{
-		return NULL;
-	}
-	while ((mnt = getmntent(fp)) != NULL)
-	{
-		if (strcmp(device, mnt->mnt_fsname) == 0)
-		{
-			break;
-		}
-	}
-	endmntent(fp);
-	return mnt ? mnt->mnt_type : NULL;
+  FILE * fp;
+  struct mntent *mnt;
+
+  fp = setmntent (_PATH_MOUNTED, "r");
+  if (fp == NULL)
+    return NULL;
+
+  while ((mnt = getmntent (fp)) != NULL)
+    if (!tr_strcmp0 (device, mnt->mnt_fsname))
+      break;
+
+  endmntent(fp);
+  return mnt ? mnt->mnt_type : NULL;
+
 #else /* BSD derived systems */
-	int n, i;
-	struct statfs *mnt;
 
-	if ((n = getmntinfo(&mnt, MNT_WAIT)) == 0)
-	{
-		return NULL;
-	}
-	for (i=0; i<n; i++)
-	{
-		if (strcmp(device, mnt[i].f_mntfromname) == 0)
-		{
-			break;
-		}
-	}
-	return (i < n) ? mnt[i].f_fstypename : NULL;
+  int i;
+  int n;
+  struct statfs *mnt;
+
+  n = getmntinfo(&mnt, MNT_WAIT);
+  if (!n)
+    return NULL;
+
+  for (i=0; i<n; i++)
+    if (!tr_strcmp0 (device, mnt[i].f_mntfromname))
+      break;
+
+  return (i < n) ? mnt[i].f_fstypename : NULL;
+
 #endif
 }
 
 static char *
-getblkdev( const char * path )
+getblkdev (const char * path)
 {
-	char *dir, *c;
-	char *device;
+  char * c;
+  char * dir;
+  char * device;
 
-	dir = tr_strdup(path);
-	while (1)
-	{
-		if ((device = getdev(dir)) != NULL)
-		{
-			break;
-		}
-		if ((c = strrchr(dir, '/')) != NULL)
-		{
-			*c = '\0';
-		}
-		else
-		{
-			break;
-		}
-	}
-	tr_free(dir);
-	return device;
+  dir = tr_strdup(path);
+
+  for (;;)
+    {
+      device = getdev (dir);
+      if (device != NULL)
+        break;
+
+      c = strrchr (dir, '/');
+      if (c != NULL)
+        *c = '\0';
+      else
+         break;
+    }
+
+  tr_free (dir);
+  return device;
 }
 
 static int64_t
-getquota( char * device )
+getquota (char * device)
 {
-	struct dqblk dq;
-	int64_t freespace, limit;
+  struct dqblk dq;
+  int64_t limit;
+  int64_t freespace;
 
-	if (quotactl(QCMD(Q_GETQUOTA, USRQUOTA), device, getuid(),
-			(caddr_t) & dq) == 0)
-	{
-		if (dq.dqb_bsoftlimit > 0)
-		{
-			/* Use soft limit first */
-			limit = dq.dqb_bsoftlimit;
-		}
-		else if (dq.dqb_bhardlimit > 0)
-		{
-			limit = dq.dqb_bhardlimit;
-		}
-		else
-		{
-			/* No quota enabled for this user */
-			return -1;
-		}
-		freespace = limit - btodb(dq.dqb_curspace);
-		return (freespace < 0) ? 0 : freespace * 1024;
-	}
+  if (quotactl(QCMD(Q_GETQUOTA, USRQUOTA), device, getuid(), (caddr_t) & dq) == 0)
+    {
+      if (dq.dqb_bsoftlimit > 0)
+        {
+          /* Use soft limit first */
+          limit = dq.dqb_bsoftlimit;
+        }
+      else if (dq.dqb_bhardlimit > 0)
+        {
+          limit = dq.dqb_bhardlimit;
+        }
+      else
+        {
+          /* No quota enabled for this user */
+          return -1;
+        }
 
-	/* Something went wrong */
-	return -1;
+      freespace = limit - btodb(dq.dqb_curspace);
+      return (freespace < 0) ? 0 : freespace * 1024;
+    }
+
+  /* something went wrong */
+  return -1;
 }
 
 #ifdef HAVE_XQM
 static int64_t
-getxfsquota( char * device )
+getxfsquota (char * device)
 {
-	struct fs_disk_quota dq;
-	int64_t freespace, limit;
+  int64_t limit;
+  int64_t freespace;
+  struct fs_disk_quota dq;
 
-	if (quotactl(QCMD(Q_XGETQUOTA, USRQUOTA), device, getuid(),
-			(caddr_t) &dq) == 0)
-	{
-		if (dq.d_blk_softlimit > 0)
-		{
-			/* Use soft limit first */
-			limit = dq.d_blk_softlimit >> 1;
-		}
-		else if (dq.d_blk_hardlimit > 0)
-		{
-			limit = dq.d_blk_hardlimit >> 1;
-		}
-		else
-		{
-			/* No quota enabled for this user */
-			return -1;
-		}
-		freespace = limit - (dq.d_bcount >> 1);
-		return (freespace < 0) ? 0 : freespace * 1024;
-	}
+  if (quotactl(QCMD(Q_XGETQUOTA, USRQUOTA), device, getuid(), (caddr_t) &dq) == 0)
+    {
+      if (dq.d_blk_softlimit > 0)
+        {
+          /* Use soft limit first */
+          limit = dq.d_blk_softlimit >> 1;
+        }
+      else if (dq.d_blk_hardlimit > 0)
+        {
+          limit = dq.d_blk_hardlimit >> 1;
+        }
+      else
+        {
+          /* No quota enabled for this user */
+          return -1;
+        }
 
-	/* Something went wrong */
-	return -1;
+      freespace = limit - (dq.d_bcount >> 1);
+      return (freespace < 0) ? 0 : freespace * 1024;
+    }
+
+  /* something went wrong */
+  return -1;
 }
 #endif /* HAVE_XQM */
 #endif /* WIN32 */
 
 static int64_t
-tr_getQuotaFreeSpace( const char * path, char * device, char * fstype )
+tr_getQuotaFreeSpace (const char * path, char * device, char * fstype)
 {
-    int64_t ret=-1;
+  int64_t ret=-1;
+
 #ifndef WIN32
-    char *d;
-    char *fs;
 
-    if (strlen(device) == 0)
+  /* save device for future use */
+  if (!*device)
     {
-	if ((d = getblkdev(path)) == NULL)
-	{
-	    return ret;
-	}
-	/* Save device for future use */
-	tr_strlcpy(device, d, PATH_MAX + 1);
+      char * d = getblkdev (path);
+      if (d == NULL)
+        return ret;
+      tr_strlcpy (device, d, PATH_MAX + 1);
     }
 
-    if (strlen(fstype) == 0)
+  /* save FS type for future use */
+  if (!*fstype)
     {
-	if ((fs = getfstype(device)) != NULL)
-	{
-	     /* Save FS type for future use */
-	     tr_strlcpy(fstype, fs, PATH_MAX + 1);
-	}
+      char * fs = getfstype (device);
+      if (fs != NULL)
+        tr_strlcpy (fstype, fs, PATH_MAX + 1);
     }
 
-    if (strcasecmp(fstype, "xfs") == 0)
+  if (strcasecmp(fstype, "xfs") == 0)
     {
 #ifdef HAVE_XQM
-	ret = getxfsquota(device);
+      ret = getxfsquota(device);
 #endif
-    } else {
-	ret = getquota(device);
+    }
+  else
+    {
+      ret = getquota(device);
     }
 
 #endif /* WIN32 */
-    return ret;
+  return ret;
 }
 
 static int64_t
-tr_getDiskFreeSpace( const char * path )
+tr_getDiskFreeSpace (const char * path)
 {
 #ifdef WIN32
-    uint64_t freeBytesAvailable = 0;
-    return GetDiskFreeSpaceEx( path, &freeBytesAvailable, NULL, NULL)
-        ? (int64_t)freeBytesAvailable
-        : -1;
+
+  uint64_t freeBytesAvailable = 0;
+  return GetDiskFreeSpaceEx (path, &freeBytesAvailable, NULL, NULL)
+    ? (int64_t)freeBytesAvailable
+    : -1;
+
 #elif defined(HAVE_STATVFS)
-    struct statvfs buf;
-    return statvfs( path, &buf ) ? -1 : (int64_t)buf.f_bavail * (int64_t)buf.f_frsize;
+
+  struct statvfs buf;
+  return statvfs(path, &buf) ? -1 : (int64_t)buf.f_bavail * (int64_t)buf.f_frsize;
+
 #else
-    #warning FIXME: not implemented
-    return -1;
+
+  #warning FIXME: not implemented
+  return -1;
+
 #endif
 }
 
 int64_t
-tr_getFreeSpace( const char * path, char * device, char * fstype )
+tr_getFreeSpace (const char * path, char * device, char * fstype)
 {
-    int64_t i = tr_getQuotaFreeSpace( path, device, fstype );
-    if( i < 0 )
-	i = tr_getDiskFreeSpace( path );
-    return i;
+  int64_t i = tr_getQuotaFreeSpace (path, device, fstype);
+
+  if (i < 0)
+    i = tr_getDiskFreeSpace (path);
+
+  return i;
 }
 
 /***
