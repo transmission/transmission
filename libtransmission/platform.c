@@ -10,6 +10,18 @@
  * $Id$
  */
 
+#ifndef WIN32
+ #include <sys/quota.h> /* quotactl */
+ #ifdef HAVE_GETMNTENT
+  #include <mntent.h>
+  #include <paths.h> /* _PATH_MOUNTED */
+ #else /* BSD derived systems */
+  #include <sys/param.h>
+  #include <sys/ucred.h>
+  #include <sys/mount.h>
+ #endif
+#endif
+
 #ifdef WIN32
  #include <w32api.h>
  #define WINVER  WindowsXP
@@ -700,21 +712,143 @@ tr_getWebClientDir (const tr_session * session UNUSED)
 ****
 ***/
 
-int64_t
-tr_getFreeSpace (const char * path)
+#ifndef WIN32
+static char *
+getdev( const char * path )
+{
+#ifdef HAVE_GETMNTENT
+	FILE *fp;
+	struct mntent *mnt;
+
+	if ((fp = setmntent(_PATH_MOUNTED, "r")) == NULL)
+	{
+		return NULL;
+	}
+	while ((mnt = getmntent(fp)) != NULL)
+	{
+		if (strcmp(path, mnt->mnt_dir) == 0)
+		{
+			break;
+		}
+	}
+	endmntent(fp);
+	return mnt ? mnt->mnt_fsname : NULL;
+#else /* BSD derived systems */
+	int n, i;
+	struct statfs *mnt;
+
+	if ((n = getmntinfo(&mnt, MNT_WAIT)) == 0)
+	{
+		return NULL;
+	}
+	for (i=0; i<n; i++)
+	{
+		if (strcmp(path, mnt[i].f_mntonname) == 0)
+		{
+			break;
+		}
+	}
+	return (i < n) ? mnt[i].f_mntfromname : NULL;
+#endif
+}
+
+static char *
+getblkdev( const char * path )
+{
+	char *dir, *c;
+	char *device;
+
+	dir = tr_strdup(path);
+	while (1)
+	{
+		if ((device = getdev(dir)) != NULL)
+		{
+			break;
+		}
+		if ((c = strrchr(dir, '/')) != NULL)
+		{
+			*c = '\0';
+		}
+		else
+		{
+			break;
+		}
+	}
+	tr_free(dir);
+	return device;
+}
+
+static int64_t
+getquota( char * device )
+{
+	struct dqblk dq;
+	int64_t freespace, limit;
+
+	if (quotactl(QCMD(Q_GETQUOTA, USRQUOTA), device, getuid(),
+			(caddr_t) & dq) == 0)
+	{
+		if (dq.dqb_bsoftlimit > 0)
+		{
+			/* Use soft limit first */
+			limit = dq.dqb_bsoftlimit;
+		}
+		else if (dq.dqb_bhardlimit > 0)
+		{
+			limit = dq.dqb_bhardlimit;
+		}
+		else
+		{
+			/* No quota enabled for this user */
+			return -1;
+		}
+		freespace = limit - btodb(dq.dqb_curspace);
+		return (freespace < 0) ? 0 : freespace * 1024;
+	}
+
+	/* Something went wrong */
+	return -1;
+}
+#endif
+
+static int64_t
+tr_getQuotaFreeSpace( const char * path )
+{
+    int64_t ret=-1;
+#ifndef WIN32
+    char *device;
+
+    if ((device = getblkdev(path)) != NULL)
+    {
+	ret = getquota(device);
+    }
+#endif
+    return ret;
+}
+
+static int64_t
+tr_getDiskFreeSpace( const char * path )
 {
 #ifdef WIN32
-  uint64_t freeBytesAvailable = 0;
-  return GetDiskFreeSpaceEx (path, &freeBytesAvailable, NULL, NULL)
-    ? (int64_t)freeBytesAvailable
-    : -1;
-#elif defined (HAVE_STATVFS)
-  struct statvfs buf;
-  return statvfs (path, &buf) ? -1 : (int64_t)buf.f_bavail * (int64_t)buf.f_frsize;
+    uint64_t freeBytesAvailable = 0;
+    return GetDiskFreeSpaceEx( path, &freeBytesAvailable, NULL, NULL)
+        ? (int64_t)freeBytesAvailable
+        : -1;
+#elif defined(HAVE_STATVFS)
+    struct statvfs buf;
+    return statvfs( path, &buf ) ? -1 : (int64_t)buf.f_bavail * (int64_t)buf.f_frsize;
 #else
-  #warning FIXME: not implemented
-  return -1;
+    #warning FIXME: not implemented
+    return -1;
 #endif
+}
+
+int64_t
+tr_getFreeSpace( const char * path )
+{
+    int64_t i = tr_getQuotaFreeSpace( path );
+    if( i < 0 )
+	i = tr_getDiskFreeSpace( path );
+    return i;
 }
 
 /***
