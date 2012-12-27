@@ -63,6 +63,11 @@
 #include <fcntl.h>
 #include <unistd.h> /* getuid getpid close */
 
+#ifdef HAVE_XFS_XFS_H
+ #define HAVE_XQM
+ #include <xfs/xqm.h>
+#endif
+
 #include "transmission.h"
 #include "session.h"
 #include "list.h"
@@ -753,6 +758,45 @@ getdev( const char * path )
 }
 
 static char *
+getfstype( const char * device )
+{
+#ifdef HAVE_GETMNTENT
+	FILE *fp;
+	struct mntent *mnt;
+
+	if ((fp = setmntent(_PATH_MOUNTED, "r")) == NULL)
+	{
+		return NULL;
+	}
+	while ((mnt = getmntent(fp)) != NULL)
+	{
+		if (strcmp(device, mnt->mnt_fsname) == 0)
+		{
+			break;
+		}
+	}
+	endmntent(fp);
+	return mnt ? mnt->mnt_type : NULL;
+#else /* BSD derived systems */
+	int n, i;
+	struct statfs *mnt;
+
+	if ((n = getmntinfo(&mnt, MNT_WAIT)) == 0)
+	{
+		return NULL;
+	}
+	for (i=0; i<n; i++)
+	{
+		if (strcmp(device, mnt[i].f_mntfromname) == 0)
+		{
+			break;
+		}
+	}
+	return (i < n) ? mnt[i].f_fstypename : NULL;
+#endif
+}
+
+static char *
 getblkdev( const char * path )
 {
 	char *dir, *c;
@@ -808,20 +852,68 @@ getquota( char * device )
 	/* Something went wrong */
 	return -1;
 }
-#endif
+
+#ifdef HAVE_XQM
+static int64_t
+getxfsquota( char * device )
+{
+	struct fs_disk_quota dq;
+	int64_t freespace, limit;
+
+	if (quotactl(QCMD(Q_XGETQUOTA, USRQUOTA), device, getuid(),
+			(caddr_t) &dq) == 0)
+	{
+		if (dq.d_blk_softlimit > 0)
+		{
+			/* Use soft limit first */
+			limit = dq.d_blk_softlimit >> 1;
+		}
+		else if (dq.d_blk_hardlimit > 0)
+		{
+			limit = dq.d_blk_hardlimit >> 1;
+		}
+		else
+		{
+			/* No quota enabled for this user */
+			return -1;
+		}
+		freespace = limit - (dq.d_bcount >> 1);
+		return (freespace < 0) ? 0 : freespace * 1024;
+	}
+
+	/* Something went wrong */
+	return -1;
+}
+#endif /* HAVE_XQM */
+#endif /* WIN32 */
 
 static int64_t
 tr_getQuotaFreeSpace( const char * path )
 {
     int64_t ret=-1;
 #ifndef WIN32
-    char *device;
+    char *d, *device;
+    char *fstype;
 
-    if ((device = getblkdev(path)) != NULL)
+    if ((d = getblkdev(path)) == NULL)
     {
+	return ret;
+    }
+    /* 'd' points to static area of memory, so copy it */
+    device = tr_strdup(d);
+
+    fstype = getfstype(device);
+    if (fstype != NULL && strcasecmp(fstype, "xfs") == 0)
+    {
+#ifdef HAVE_XQM
+	ret = getxfsquota(device);
+#endif
+    } else {
 	ret = getquota(device);
     }
-#endif
+
+    tr_free(device);
+#endif /* WIN32 */
     return ret;
 }
 
