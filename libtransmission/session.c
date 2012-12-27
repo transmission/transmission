@@ -590,8 +590,8 @@ tr_sessionInit (const char  * tag,
     session->cache = tr_cacheNew (1024*1024*2);
     session->tag = tr_strdup (tag);
     session->magicNumber = SESSION_MAGIC_NUMBER;
-    session->downloadDirBlkDev = tr_malloc (PATH_MAX + 1);
-    session->downloadDirFsType = tr_malloc (PATH_MAX + 1);
+    session->downloadDirBlkDev = tr_malloc (TR_PATH_MAX + 1);
+    session->downloadDirFsType = tr_malloc (TR_PATH_MAX + 1);
     tr_bandwidthConstruct (&session->bandwidth, session, NULL);
     tr_peerIdInit (session->peer_id);
     tr_variantInitList (&session->removedTorrents, 0);
