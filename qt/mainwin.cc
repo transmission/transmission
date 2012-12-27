@@ -638,14 +638,15 @@ TrMainWindow :: openFolder( )
 {
     const int torrentId( *getSelectedTorrents().begin() );
     const Torrent * tor( myModel.getTorrentFromId( torrentId ) );
-    const QString path( tor->getPath( ) );
+    QString path( tor->getPath( ) );
     const FileList files = tor->files();
+    const QString firstfile = files.at(0).filename;
+    int slashIndex = firstfile.indexOf('/');
     if (files.size() == 1)
         openSelect( path + "/" + files.at(0).filename );
     else {
-        QDir dir( path + "/" + files.at(0).filename );
-        dir.cdUp();
-        openSelect( dir.path() );
+        path = path + "/" + firstfile.left(slashIndex);
+        openSelect( path );
     }
 }
 
