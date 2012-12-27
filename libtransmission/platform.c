@@ -888,22 +888,33 @@ getxfsquota( char * device )
 #endif /* WIN32 */
 
 static int64_t
-tr_getQuotaFreeSpace( const char * path )
+tr_getQuotaFreeSpace( const char * path, char * device, char * fstype )
 {
     int64_t ret=-1;
 #ifndef WIN32
-    char *d, *device;
-    char *fstype;
+    char *d;
+    char *fs;
 
-    if ((d = getblkdev(path)) == NULL)
+    if (strlen(device) == 0)
     {
-	return ret;
+	if ((d = getblkdev(path)) == NULL)
+	{
+	    return ret;
+	}
+	/* Save device for future use */
+	tr_strlcpy(device, d, PATH_MAX + 1);
     }
-    /* 'd' points to static area of memory, so copy it */
-    device = tr_strdup(d);
 
-    fstype = getfstype(device);
-    if (fstype != NULL && strcasecmp(fstype, "xfs") == 0)
+    if (strlen(fstype) == 0)
+    {
+	if ((fs = getfstype(device)) != NULL)
+	{
+	     /* Save FS type for future use */
+	     tr_strlcpy(fstype, fs, PATH_MAX + 1);
+	}
+    }
+
+    if (strcasecmp(fstype, "xfs") == 0)
     {
 #ifdef HAVE_XQM
 	ret = getxfsquota(device);
@@ -912,7 +923,6 @@ tr_getQuotaFreeSpace( const char * path )
 	ret = getquota(device);
     }
 
-    tr_free(device);
 #endif /* WIN32 */
     return ret;
 }
@@ -935,9 +945,9 @@ tr_getDiskFreeSpace( const char * path )
 }
 
 int64_t
-tr_getFreeSpace( const char * path )
+tr_getFreeSpace( const char * path, char * device, char * fstype )
 {
-    int64_t i = tr_getQuotaFreeSpace( path );
+    int64_t i = tr_getQuotaFreeSpace( path, device, fstype );
     if( i < 0 )
 	i = tr_getDiskFreeSpace( path );
     return i;

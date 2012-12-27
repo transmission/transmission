@@ -590,6 +590,8 @@ tr_sessionInit (const char  * tag,
     session->cache = tr_cacheNew (1024*1024*2);
     session->tag = tr_strdup (tag);
     session->magicNumber = SESSION_MAGIC_NUMBER;
+    session->downloadDirBlkDev = tr_malloc (PATH_MAX + 1);
+    session->downloadDirFsType = tr_malloc (PATH_MAX + 1);
     tr_bandwidthConstruct (&session->bandwidth, session, NULL);
     tr_peerIdInit (session->peer_id);
     tr_variantInitList (&session->removedTorrents, 0);
@@ -953,6 +955,8 @@ tr_sessionSetDownloadDir (tr_session * session, const char * dir)
     {
         tr_free (session->downloadDir);
         session->downloadDir = tr_strdup (dir);
+        memset (session->downloadDirBlkDev, 0, sizeof(session->downloadDirBlkDev));
+        memset (session->downloadDirFsType, 0, sizeof(session->downloadDirFsType));
     }
 }
 
@@ -969,7 +973,8 @@ tr_sessionGetDownloadDirFreeSpace (const tr_session * session)
 {
     assert (tr_isSession (session));
 
-    return tr_getFreeSpace (session->downloadDir);
+    return tr_getFreeSpace (session->downloadDir, session->downloadDirBlkDev,
+    session->downloadDirFsType);
 }
 
 /***
@@ -1879,6 +1884,8 @@ tr_sessionClose (tr_session * session)
     tr_free (session->resumeDir);
     tr_free (session->torrentDir);
     tr_free (session->downloadDir);
+    tr_free (session->downloadDirBlkDev);
+    tr_free (session->downloadDirFsType);
     tr_free (session->incompleteDir);
     tr_free (session->blocklist_url);
     tr_free (session->peer_congestion_algorithm);

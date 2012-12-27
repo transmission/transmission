@@ -44,7 +44,7 @@ const char * tr_getWebClientDir (const tr_session *);
 
 /** If the disk quota is enabled and readable, this returns how much is available in the quota.
     Otherwise, it returns how much is available on the disk, or -1 on error. */
-int64_t tr_getFreeSpace (const char * path);
+int64_t tr_getFreeSpace (const char * path, char * device, char * fstype);
 
 
 /** @} */

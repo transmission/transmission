@@ -182,6 +182,8 @@ struct tr_session
     char *                       tag;
     char *                       configDir;
     char *                       downloadDir;
+    char *                       downloadDirBlkDev;
+    char *                       downloadDirFsType;
     char *                       resumeDir;
     char *                       torrentDir;
     char *                       incompleteDir;
