@@ -609,16 +609,24 @@ TrMainWindow :: setLocation( )
 }
 
 // Open Folder & select torrent's file or top folder
+#undef HAVE_OPEN_SELECT
+#if defined(Q_OS_WIN)
+# define HAVE_OPEN_SELECT
+static
 void openSelect(const QString& path)
 {
-#if defined(Q_OS_WIN)
     const QString explorer = "explorer";
         QString param;
         if (!QFileInfo(path).isDir())
             param = QLatin1String("/select,");
         param += QDir::toNativeSeparators(path);
         QProcess::startDetached(explorer, QStringList(param));
+}
 #elif defined(Q_OS_MAC)
+# define HAVE_OPEN_SELECT
+static
+void openSelect(const QString& path)
+{
     QStringList scriptArgs;
         scriptArgs << QLatin1String("-e")
                    << QString::fromLatin1("tell application \"Finder\" to reveal POSIX file \"%1\"")
@@ -628,10 +636,8 @@ void openSelect(const QString& path)
         scriptArgs << QLatin1String("-e")
                    << QLatin1String("tell application \"Finder\" to activate");
         QProcess::execute("/usr/bin/osascript", scriptArgs);
-#elif defined(Q_OS_UNIX)
-    QDesktopServices :: openUrl( QUrl::fromLocalFile( path ) );
-#endif
 }
+#endif
 
 void
 TrMainWindow :: openFolder( )
@@ -642,12 +648,17 @@ TrMainWindow :: openFolder( )
     const FileList files = tor->files();
     const QString firstfile = files.at(0).filename;
     int slashIndex = firstfile.indexOf('/');
-    if (files.size() == 1)
-        openSelect( path + "/" + files.at(0).filename );
-    else {
+    if (files.size() > 1)
+    {
         path = path + "/" + firstfile.left(slashIndex);
-        openSelect( path );
     }
+#ifdef HAVE_OPEN_SELECT
+    else {
+        openSelect( path + "/" + firstfile );
+        return;
+    }
+#endif
+    QDesktopServices :: openUrl( QUrl::fromLocalFile( path ) );
 }
 
 void
