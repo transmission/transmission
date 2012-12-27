@@ -11,6 +11,7 @@
  */
 
 #ifndef WIN32
+ #include <stdint.h>
  #include <sys/quota.h> /* quotactl */
  #ifdef HAVE_GETMNTENT
   #include <mntent.h>
