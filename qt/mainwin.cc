@@ -648,8 +648,7 @@ TrMainWindow :: openFolder( )
     const FileList files = tor->files();
     const QString firstfile = files.at(0).filename;
     int slashIndex = firstfile.indexOf('/');
-    if (files.size() > 1)
-    {
+    if (slashIndex > -1) {
         path = path + "/" + firstfile.left(slashIndex);
     }
 #ifdef HAVE_OPEN_SELECT
