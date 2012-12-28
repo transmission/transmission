@@ -2713,33 +2713,74 @@ tr_sessionGetQueueStalledMinutes (const tr_session * session)
     return session->queueStalledMinutes;
 }
 
-tr_torrent *
-tr_sessionGetNextQueuedTorrent (tr_session * session, tr_direction direction)
+struct TorrentAndPosition
 {
-    tr_torrent * tor = NULL;
-    tr_torrent * best_tor = NULL;
-    int best_position = INT_MAX;
+  tr_torrent * tor;
+  int position;
+};
 
-    assert (tr_isSession (session));
-    assert (tr_isDirection (direction));
+/* higher positions come first */
+static int
+compareTorrentAndPositions (const void * va, const void * vb)
+{
+  int ret;
+  const struct TorrentAndPosition * a = va;
+  const struct TorrentAndPosition * b = vb;
 
-    while ((tor = tr_torrentNext (session, tor)))
+  if (a->position > b->position)
+    ret = -1;
+  else if (a->position < b->position)
+    ret = 1;
+  else
+    ret = 0;
+
+  return ret;
+}
+
+
+void
+tr_sessionGetNextQueuedTorrents (tr_session   * session,
+                                 tr_direction   direction,
+                                 size_t         num_wanted,
+                                 tr_ptrArray  * setme)
+{
+  size_t i;
+  tr_torrent * tor;
+  struct TorrentAndPosition * candidates;
+
+  assert (tr_isSession (session));
+  assert (tr_isDirection (direction));
+
+  /* build an array of the candidates */
+  candidates = tr_new (struct TorrentAndPosition, session->torrentCount);
+  tor = NULL;
+  while ((tor = tr_torrentNext (session, tor)))
     {
-        int position;
+      if (!tr_torrentIsQueued (tor))
+        continue;
 
-        if (!tr_torrentIsQueued (tor))
-            continue;
-        if (direction != tr_torrentGetQueueDirection (tor))
-            continue;
+      if (direction != tr_torrentGetQueueDirection (tor))
+        continue;
 
-        position = tr_torrentGetQueuePosition (tor);
-        if (best_position > position) {
-            best_position = position;
-            best_tor = tor;
-        }
+      candidates[i].tor = tor;
+      candidates[i].position = tr_torrentGetQueuePosition (tor);
+      ++i;
     }
 
-    return best_tor;
+  /* find the best n candidates */
+  if (num_wanted > i)
+    num_wanted = i;
+  else if (num_wanted < i)
+    tr_quickfindFirstK (candidates, i,
+                        sizeof(struct TorrentAndPosition),
+                        compareTorrentAndPositions, num_wanted);
+
+  /* add them to the return array */
+  for (i=0; i<num_wanted; ++i)
+    tr_ptrArrayAppend (setme, candidates[i].tor);
+
+  /* cleanup */
+  tr_free (candidates);
 }
 
 int

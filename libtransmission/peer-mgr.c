@@ -3590,24 +3590,36 @@ pumpAllPeers (tr_peerMgr * mgr)
     }
 }
 
+
+static void
+queuePulseForeach (void * vtor)
+{
+  tr_torrent * tor = vtor;
+
+  tr_torrentStartNow (tor);
+
+  if (tor->queue_started_callback != NULL)
+    (*tor->queue_started_callback)(tor, tor->queue_started_user_data);
+}
+
 static void
 queuePulse (tr_session * session, tr_direction dir)
 {
-    assert (tr_isSession (session));
-    assert (tr_isDirection (dir));
+  assert (tr_isSession (session));
+  assert (tr_isDirection (dir));
 
-    if (tr_sessionGetQueueEnabled (session, dir))
+  if (tr_sessionGetQueueEnabled (session, dir))
     {
-        int i;
-        const int n = tr_sessionCountQueueFreeSlots (session, dir);
-        for (i=0; i<n; i++) {
-            tr_torrent * tor = tr_sessionGetNextQueuedTorrent (session, dir);
-            if (tor != NULL) {
-                tr_torrentStartNow (tor);
-                if (tor->queue_started_callback != NULL)
-                  (*tor->queue_started_callback)(tor, tor->queue_started_user_data);
-            }
-        }
+      tr_ptrArray torrents = TR_PTR_ARRAY_INIT;
+
+      tr_sessionGetNextQueuedTorrents (session,
+                                       dir,
+                                       tr_sessionCountQueueFreeSlots (session, dir),
+                                       &torrents);
+
+      tr_ptrArrayForeach (&torrents, queuePulseForeach);
+
+      tr_ptrArrayDestruct (&torrents, NULL);
     }
 }
 
@@ -3877,79 +3889,33 @@ getPeerCandidateScore (const tr_torrent * tor, const struct peer_atom * atom, ui
     return score;
 }
 
-#ifndef NDEBUG
 static int
-checkPartition (const struct peer_candidate * candidates, int left, int right, uint64_t pivotScore, int storeIndex)
+comparePeerCandidates (const void * va, const void * vb)
 {
-    int i;
+  int ret;
+  const struct peer_candidate * a = va;
+  const struct peer_candidate * b = vb;
 
-    assert (storeIndex >= left);
-    assert (storeIndex <= right);
-    assert (candidates[storeIndex].score == pivotScore);
+  if (a->score < b->score)
+    ret = -1;
+  else if (a->score > b->score)
+    ret = 1;
+  else
+    ret = 0;
 
-    for (i=left; i<storeIndex; ++i)
-        assert (candidates[i].score < pivotScore);
-    for (i=storeIndex+1; i<=right; ++i)
-        assert (candidates[i].score >= pivotScore);
-
-    return true;
-}
-#endif
-
-/* Helper to selectPeerCandidates().
- * Adapted from http://en.wikipedia.org/wiki/Selection_algorithm */
-static int
-partitionPeerCandidates (struct peer_candidate * candidates, int left, int right, int pivotIndex)
-{
-    int i;
-    int storeIndex;
-    struct peer_candidate tmp;
-    const struct peer_candidate pivotValue = candidates[pivotIndex];
-
-    /* move pivot to end */
-    tmp = candidates[right];
-    candidates[right] = pivotValue;
-    candidates[pivotIndex] = tmp;
-
-    storeIndex = left;
-    for (i=left; i<=right; ++i)
-    {
-        if (candidates[i].score < pivotValue.score)
-        {
-            tmp = candidates[storeIndex];
-            candidates[storeIndex] = candidates[i];
-            candidates[i] = tmp;
-            storeIndex++;
-        }
-    }
-
-    /* move pivot to its final place */
-    tmp = candidates[right];
-    candidates[right] = candidates[storeIndex];
-    candidates[storeIndex] = tmp;
-
-    /* sanity check */
-    assert (checkPartition (candidates, left, right, pivotValue.score, storeIndex));
-
-    return storeIndex;
+  return ret;
 }
 
 /* Partial sorting -- selecting the k best candidates
    Adapted from http://en.wikipedia.org/wiki/Selection_algorithm */
 static void
-selectPeerCandidates (struct peer_candidate * candidates, int left, int right, int k)
+selectPeerCandidates (struct peer_candidate * candidates, int candidate_count, int select_count)
 {
-    if (right > left)
-    {
-        const int pivotIndex = left + (right-left)/2;
-
-        int pivotNewIndex = partitionPeerCandidates (candidates, left, right, pivotIndex);
-
-        if (pivotNewIndex > left + k) /* new condition */
-            selectPeerCandidates (candidates, left, pivotNewIndex-1, k);
-        else if (pivotNewIndex < left + k)
-            selectPeerCandidates (candidates, pivotNewIndex+1, right, k+left-pivotNewIndex-1);
-    }
+  tr_quickfindFirstK (candidates,
+                      candidate_count,
+                      sizeof(struct peer_candidate),
+                      comparePeerCandidates,
+                      select_count);
 }
 
 #ifndef NDEBUG
@@ -4042,7 +4008,7 @@ getPeerCandidates (tr_session * session, int * candidateCount, int max)
 
     *candidateCount = walk - candidates;
     if (walk != candidates)
-        selectPeerCandidates (candidates, 0, (walk-candidates)-1, max);
+        selectPeerCandidates (candidates, walk-candidates, max);
 
     assert (checkBestScoresComeFirst (candidates, *candidateCount, max));
 

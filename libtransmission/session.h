@@ -329,7 +329,7 @@ bool  tr_sessionGetActiveSpeedLimit_Bps (const tr_session  * session,
                                          unsigned int      * setme);
 
 tr_torrent * tr_sessionGetNextQueuedSeed (tr_session * session);
-tr_torrent * tr_sessionGetNextQueuedTorrent (tr_session * session, tr_direction);
+void tr_sessionGetNextQueuedTorrents (tr_session * session, tr_direction, size_t n, tr_ptrArray * steme);
 
 int tr_sessionCountQueueFreeSlots (tr_session * session, tr_direction);
 
