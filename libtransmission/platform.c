@@ -11,7 +11,7 @@
  */
 
 #ifndef WIN32
- #include <stdint.h>
+ #include <sys/types.h> /* types needed by quota.h */
  #include <sys/quota.h> /* quotactl */
  #ifdef HAVE_GETMNTENT
   #include <mntent.h>
