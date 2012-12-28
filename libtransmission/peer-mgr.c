@@ -3896,7 +3896,7 @@ checkPartition (const struct peer_candidate * candidates, int left, int right, u
 }
 #endif
 
-/* Helper to selectBestCandidates ().
+/* Helper to selectPeerCandidates().
  * Adapted from http://en.wikipedia.org/wiki/Selection_algorithm */
 static int
 partitionPeerCandidates (struct peer_candidate * candidates, int left, int right, int pivotIndex)
@@ -3934,7 +3934,8 @@ partitionPeerCandidates (struct peer_candidate * candidates, int left, int right
     return storeIndex;
 }
 
-/* Adapted from http://en.wikipedia.org/wiki/Selection_algorithm */
+/* Partial sorting -- selecting the k best candidates
+   Adapted from http://en.wikipedia.org/wiki/Selection_algorithm */
 static void
 selectPeerCandidates (struct peer_candidate * candidates, int left, int right, int k)
 {
