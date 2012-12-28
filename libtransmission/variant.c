@@ -117,7 +117,6 @@ tr_variant_string_set_string (struct tr_variant_string  * str,
                               const char                * bytes,
                               int                         len)
 {
-  tr_quark quark;
   tr_variant_string_clear (str);
 
   if (bytes == NULL)
@@ -125,13 +124,7 @@ tr_variant_string_set_string (struct tr_variant_string  * str,
   else if (len < 0)
     len = strlen (bytes);
 
-  if (tr_quark_lookup (bytes, len, &quark))
-    {
-      str->type = TR_STRING_TYPE_QUARK;
-      str->quark = quark;
-      str->str.str = tr_quark_get_string (quark, &str->len);
-    }
-  else if ((size_t)len < sizeof(str->str.buf))
+  if ((size_t)len < sizeof(str->str.buf))
     {
       str->type = TR_STRING_TYPE_BUF;
       memcpy (str->str.buf, bytes, len);
