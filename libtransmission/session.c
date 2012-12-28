@@ -2753,6 +2753,7 @@ tr_sessionGetNextQueuedTorrents (tr_session   * session,
 
   /* build an array of the candidates */
   candidates = tr_new (struct TorrentAndPosition, session->torrentCount);
+  i = 0;
   tor = NULL;
   while ((tor = tr_torrentNext (session, tor)))
     {
