@@ -218,6 +218,53 @@ test_lowerbound (void)
 }
 
 static int
+test_quickFindFirst_Iteration (const size_t k, const size_t n, int * buf, int range)
+{
+  size_t i;
+  int highest_low;
+  int lowest_high;
+
+  /* populate buf with random ints */
+  for (i=0; i<n; ++i)
+    buf[i] = tr_cryptoWeakRandInt (range);
+
+  /* find the best k */
+  tr_quickfindFirstK (buf, n, sizeof(int), compareInts, k);
+
+  /* confirm that the smallest K ints are in the first slots K slots in buf */
+
+  highest_low = INT_MIN;
+  for (i=0; i<k; ++i)
+    if (highest_low < buf[i])
+      highest_low = buf[i];
+
+  lowest_high = INT_MAX;
+  for (i=k; i<n; ++i)
+    if (lowest_high > buf[i])
+      lowest_high = buf[i];
+
+  check (highest_low <= lowest_high);
+
+  return 0;
+}
+
+static int
+test_quickfindFirst (void)
+{
+  size_t i;
+  const size_t k = 10;
+  const size_t n = 100;
+  const size_t n_trials = 1000;
+  int * buf = tr_new (int, n);
+
+  for (i=0; i<n_trials; ++i)
+    check_int_eq (0, test_quickFindFirst_Iteration (k, n, buf, 100));
+
+  tr_free (buf);
+  return 0;
+}
+
+static int
 test_memmem (void)
 {
   char const haystack[12] = "abcabcabcabc";
@@ -373,6 +420,7 @@ main (void)
                              test_cryptoRand,
                              test_hex,
                              test_lowerbound,
+                             test_quickfindFirst,
                              test_memmem,
                              test_numbers,
                              test_strip_positional_args,

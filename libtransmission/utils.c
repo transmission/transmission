@@ -1253,6 +1253,112 @@ tr_lowerBound (const void * key,
 
 /***
 ****
+****
+***/
+
+/* Byte-wise swap two items of size SIZE.
+   From glibc, written by Douglas C. Schmidt, LGPL 2.1 or higher */
+#define SWAP(a, b, size) \
+  do { \
+    register size_t __size = (size); \
+    register char *__a = (a), *__b = (b); \
+    if (__a != __b) do { \
+      char __tmp = *__a; \
+      *__a++ = *__b; \
+      *__b++ = __tmp; \
+    } while (--__size > 0); \
+  } while (0)
+
+
+static size_t
+quickfindPartition (char * base, size_t left, size_t right, size_t size,
+                    int (*compar)(const void *, const void *), size_t pivotIndex)
+{
+  size_t i;
+  size_t storeIndex;
+
+  /* move pivot to the end */
+  SWAP (base+(size*pivotIndex), base+(size*right), size);
+
+  storeIndex = left;
+  for (i=left; i<=right-1; ++i)
+    {
+      if (compar (base+(size*i), base+(size*right)) <= 0)
+        {
+          SWAP (base+(size*storeIndex), base+(size*i), size);
+          ++storeIndex;
+        }
+    }
+
+  /* move pivot to its final place */
+  SWAP (base+(size*right), base+(size*storeIndex), size);
+
+  /* sanity check the partition */
+#ifndef NDEBUG
+  assert (storeIndex >= left);
+  assert (storeIndex <= right);
+
+  for (i=left; i<storeIndex; ++i)
+    assert (compar (base+(size*i), base+(size*storeIndex)) <= 0);
+  for (i=storeIndex+1; i<=right; ++i)
+    assert (compar (base+(size*i), base+(size*storeIndex)) >= 0);
+#endif
+
+  return storeIndex;
+}
+
+static void
+quickfindFirstK (char * base, size_t left, size_t right, size_t size,
+                 int (*compar)(const void *, const void *), size_t k)
+{
+  if (right > left)
+    {
+      const size_t pivotIndex = left + (right-left)/2u;
+
+      const size_t pivotNewIndex = quickfindPartition (base, left, right, size, compar, pivotIndex);
+
+      if (pivotNewIndex > left + k) /* new condition */
+        quickfindFirstK (base, left, pivotNewIndex-1, size, compar, k);
+      else if (pivotNewIndex < left + k)
+        quickfindFirstK (base, pivotNewIndex+1, right, size, compar, k+left-pivotNewIndex-1);
+    }
+}
+
+#ifndef NDEBUG
+static void
+checkBestScoresComeFirst (char * base, size_t nmemb, size_t size,
+                          int (*compar)(const void *, const void *), size_t k)
+{
+  size_t i;
+  size_t worstFirstPos = 0;
+
+  for (i=1; i<k; ++i)
+    if (compar (base+(size*worstFirstPos), base+(size*i)) < 0)
+      worstFirstPos = i;
+
+  for (i=0; i<k; ++i)
+    assert (compar (base+(size*i), base+(size*worstFirstPos)) <= 0);
+  for (i=k; i<nmemb; ++i)
+    assert (compar (base+(size*i), base+(size*worstFirstPos)) >= 0);
+}
+#endif
+
+void
+tr_quickfindFirstK (void * base, size_t nmemb, size_t size,
+                    int (*compar)(const void *, const void *), size_t k)
+{
+  if (k < nmemb)
+    {
+      quickfindFirstK (base, 0, nmemb-1, size, compar, k);
+
+#ifndef NDEBUG
+      checkBestScoresComeFirst (base, nmemb, size, compar, k);
+#endif
+    }
+}
+
+/***
+****
 ***/
 
 static char*
