@@ -472,7 +472,7 @@ FilterBar :: refreshPref( int key )
         case Prefs :: FILTER_MODE: {
             const FilterMode m = myPrefs.get<FilterMode>( key );
             QAbstractItemModel * model = myActivityCombo->model( );
-            QModelIndexList indices = model->match( model->index(0,0), ActivityRole, m.mode(), -1 );
+            QModelIndexList indices = model->match( model->index(0,0), ActivityRole, m.mode() );
             myActivityCombo->setCurrentIndex( indices.isEmpty() ? 0 : indices.first().row( ) );
             break;
         }
@@ -544,23 +544,22 @@ FilterBar :: recountSoon( )
     if( !myRecountTimer->isActive( ) )
     {
         myRecountTimer->setSingleShot( true );
-        myRecountTimer->start( 500 );
+        myRecountTimer->start( 800 );
     }
 }
 void
-FilterBar :: recount ( )
+FilterBar :: recount ()
 {
-    // recount the activity combobox...
-    for( int i=0, n=FilterMode::NUM_MODES; i<n; ++i )
+  QAbstractItemModel * model = myActivityCombo->model();
+
+  for (int row=0, n=model->rowCount(); row<n; ++row)
     {
-        const FilterMode m( i );
-        QAbstractItemModel * model = myActivityCombo->model( );
-        QModelIndexList indices = model->match( model->index(0,0), ActivityRole, m.mode(), -1 );
-        if( !indices.isEmpty( ) )
-            model->setData( indices.first(), getCountString(myFilter.count(m)), TorrentCountRole );
+      QModelIndex index = model->index (row, 0);
+      const int mode = index.data(ActivityRole).toInt();
+      model->setData (index, getCountString(myFilter.count(mode)), TorrentCountRole);
     }
 
-    refreshTrackers( );
+  refreshTrackers ();
 }
 
 QString
