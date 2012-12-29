@@ -138,10 +138,13 @@ void
 TorrentModel :: updateTorrents( tr_variant * torrents, bool isCompleteList )
 {
     QList<Torrent*> newTorrents;
-    QSet<int> oldIds( getIds( ) );
+    QSet<int> oldIds;
     QSet<int> addIds;
     QSet<int> newIds;
     int updatedCount = 0;
+
+    if ( isCompleteList )
+      oldIds = getIds( );
 
     if( tr_variantIsList( torrents ) )
     {
@@ -246,12 +249,15 @@ TorrentModel :: getDownloadSpeed( ) const
 }
 
 QSet<int>
-TorrentModel :: getIds( ) const
+TorrentModel :: getIds () const
 {
-    QSet<int> ids;
-    foreach( const Torrent * tor, myTorrents )
-        ids.insert( tor->id( ) );
-    return ids;
+  QSet<int> ids;
+
+  ids.reserve (myTorrents.size());
+  foreach (const Torrent * tor, myTorrents)
+    ids.insert (tor->id());
+
+  return ids;
 }
 
 bool

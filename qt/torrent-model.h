@@ -51,10 +51,10 @@ class TorrentModel: public QAbstractListModel
     public:
         Torrent* getTorrentFromId( int id );
         const Torrent* getTorrentFromId( int id ) const;
-        QSet<int> getIds( ) const;
 
     private:
         void addTorrent( Torrent * );
+        QSet<int> getIds( ) const;
 
     public:
         Speed getUploadSpeed( ) const;
