@@ -13,6 +13,11 @@
 #ifndef WIN32
  #include <sys/types.h> /* types needed by quota.h */
  #include <sys/quota.h> /* quotactl */
+ #ifdef __FreeBSD__
+  #include <ufs/ufs/quota.h> /* quotactl() */
+ #else
+  #include <sys/quota.h> /* quotactl() */
+ #endif
  #ifdef HAVE_GETMNTENT
   #include <mntent.h>
   #include <paths.h> /* _PATH_MOUNTED */
@@ -828,8 +833,13 @@ getquota (char * device)
   struct dqblk dq;
   int64_t limit;
   int64_t freespace;
+  int64_t spaceused;
 
-  if (quotactl(QCMD(Q_GETQUOTA, USRQUOTA), device, getuid(), (caddr_t) & dq) == 0)
+#if defined(__FreeBSD__) || defined(SYS_DARWIN)
+  if (quotactl(device, QCMD(Q_GETQUOTA, USRQUOTA), getuid(), &dq) == 0)
+#else
+  if (quotactl(QCMD(Q_GETQUOTA, USRQUOTA), device, getuid(), (caddr_t) &dq) == 0)
+#endif
     {
       if (dq.dqb_bsoftlimit > 0)
         {
@@ -845,8 +855,12 @@ getquota (char * device)
           /* No quota enabled for this user */
           return -1;
         }
-
-      freespace = limit - btodb(dq.dqb_curspace);
+#if defined(__FreeBSD__) || defined(SYS_DARWIN)
+      spaceused = (int64_t) dqb_curblocks >> 1;
+#else
+      spaceused = btodb(dq.dqb_curspace);
+#endif
+      freespace = limit - spaceused;
       return (freespace < 0) ? 0 : freespace * 1024;
     }
 
