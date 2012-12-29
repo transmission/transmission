@@ -89,6 +89,7 @@ Torrent :: myProperties[] =
   { UPLOADED_EVER, TR_KEY_uploadedEver, QVariant::ULongLong, STAT },
   { FAILED_EVER, TR_KEY_corruptEver, QVariant::ULongLong, STAT_EXTRA },
   { TRACKERS, TR_KEY_trackers, QVariant::StringList, STAT },
+  { HOSTS, TR_KEY_NONE, QVariant::StringList, DERIVED },
   { TRACKERSTATS, TR_KEY_trackerStats, TrTypes::TrackerStatsList, STAT_EXTRA },
   { MIME_ICON, TR_KEY_NONE, QVariant::Icon, DERIVED },
   { SEED_RATIO_LIMIT, TR_KEY_seedRatioLimit, QVariant::Double, STAT },
@@ -614,7 +615,17 @@ Torrent :: update (tr_variant * d)
 
       if (myValues[TRACKERS] != list)
         {
+          QStringList hosts;
+          foreach (QString tracker, list)
+            {
+              const QString host = Favicons::getHost (QUrl (tracker));
+              if (!host.isEmpty())
+                hosts.append (host);
+            }
+          hosts.removeDuplicates();
+
           myValues[TRACKERS].setValue (list);
+          myValues[HOSTS].setValue (hosts);
           changed = true;
         }
     }

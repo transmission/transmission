@@ -152,6 +152,7 @@ class Torrent: public QObject
             UPLOADED_EVER,
             FAILED_EVER,
             TRACKERS,
+            HOSTS,
             TRACKERSTATS,
             MIME_ICON,
             SEED_RATIO_LIMIT,
@@ -306,6 +307,7 @@ class Torrent: public QObject
         tr_idlelimit seedIdleMode( ) const { return (tr_idlelimit) getInt( SEED_IDLE_MODE ); }
         TrackerStatsList trackerStats( ) const{ return myValues[TRACKERSTATS].value<TrackerStatsList>(); }
         QStringList trackers() const { return myValues[TRACKERS].value<QStringList>(); }
+        QStringList hosts() const { return myValues[HOSTS].value<QStringList>(); }
         PeerList peers( ) const{ return myValues[PEERS].value<PeerList>(); }
         const FileList& files( ) const { return myFiles; }
         int queuePosition( ) const { return getInt( QUEUE_POSITION ); }
