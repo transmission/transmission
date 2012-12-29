@@ -12,7 +12,6 @@
 
 #ifndef WIN32
  #include <sys/types.h> /* types needed by quota.h */
- #include <sys/quota.h> /* quotactl */
  #ifdef __FreeBSD__
   #include <ufs/ufs/quota.h> /* quotactl() */
  #else
@@ -58,7 +57,6 @@
 #endif
 
 #include <sys/stat.h>
-#include <sys/types.h>
 #ifdef HAVE_SYS_STATVFS_H
  #include <sys/statvfs.h>
 #endif
