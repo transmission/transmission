@@ -836,7 +836,7 @@ getquota (char * device)
   int64_t spaceused;
 
 #if defined(__FreeBSD__) || defined(SYS_DARWIN)
-  if (quotactl(device, QCMD(Q_GETQUOTA, USRQUOTA), getuid(), &dq) == 0)
+  if (quotactl(device, QCMD(Q_GETQUOTA, USRQUOTA), getuid(), (caddr_t) &dq) == 0)
 #else
   if (quotactl(QCMD(Q_GETQUOTA, USRQUOTA), device, getuid(), (caddr_t) &dq) == 0)
 #endif
@@ -855,8 +855,12 @@ getquota (char * device)
           /* No quota enabled for this user */
           return -1;
         }
-#if defined(__FreeBSD__) || defined(SYS_DARWIN)
-      spaceused = (int64_t) dqb_curblocks >> 1;
+#if defined(__FreeBSD__)
+      spaceused = (int64_t) dq.dqb_curblocks >> 1;
+#elif defined(SYS_DARWIN)
+      spaceused = (int64_t) dq.dqb_curbytes >> 1;
+#elif defined(__UCLIBC__)
+      spaceused = (int64_t) btodb(dq.dqb_curblocks);
 #else
       spaceused = btodb(dq.dqb_curspace);
 #endif
