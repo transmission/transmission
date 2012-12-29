@@ -720,14 +720,9 @@ TrMainWindow :: refreshTrayIconSoon( )
 void
 TrMainWindow :: refreshTrayIcon( )
 {
-    Speed u, d;
     const QString idle = tr( "Idle" );
-
-    foreach( int id, myModel.getIds( ) ) {
-        const Torrent * tor = myModel.getTorrentFromId( id );
-        u += tor->uploadSpeed( );
-        d += tor->downloadSpeed( );
-    }
+    const Speed u (myModel.getUploadSpeed());
+    const Speed d (myModel.getDownloadSpeed());
 
     myTrayIcon.setToolTip( tr( "Transmission\nUp: %1\nDown: %2" )
                            .arg( u.isZero() ? idle : Formatter::speedToString( u ) )
