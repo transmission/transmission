@@ -513,7 +513,7 @@ static void peerCallbackFunc (tr_peer *, const tr_peer_event *, void *);
 static void
 rebuildWebseedArray (Torrent * t, tr_torrent * tor)
 {
-    int i;
+    unsigned int i;
     const tr_info * inf = &tor->info;
 
     /* clear the array */
@@ -2688,8 +2688,8 @@ tr_peerMgrTorrentStats (tr_torrent  * tor,
 double*
 tr_peerMgrWebSpeeds_KBps (const tr_torrent * tor)
 {
-  int i;
-  int webseedCount;
+  unsigned int i;
+  unsigned int webseedCount;
   const Torrent * t;
   const tr_webseed ** webseeds;
   double * ret = NULL;

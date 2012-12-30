@@ -555,6 +555,7 @@ Torrent :: update (tr_variant * d)
       tr_variant * child;
 
       myFiles.clear ();
+      myFiles.reserve (tr_variantListSize (files));
 
       while ((child = tr_variantListChild (files, i)))
         {

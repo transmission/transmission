@@ -469,6 +469,16 @@ MyApp :: notify( const QString& title, const QString& body ) const
 int
 main( int argc, char * argv[] )
 {
+std::cerr << "sizeof double " << sizeof(double) << std::endl;
+std::cerr << "sizeof Speed " << sizeof(Speed) << std::endl;
+std::cerr << "sizeof int " << sizeof(int) << std::endl;
+std::cerr << "sizeof bool " << sizeof(bool) << std::endl;
+std::cerr << "sizeof uint64_t " << sizeof(uint64_t) << std::endl;
+std::cerr << "sizeof QString is " << sizeof(QString) << std::endl;
+std::cerr << "sizeof TrFile is " << sizeof(struct TrFile) << std::endl;
+std::cerr << "sizeof Peer is " << sizeof(Peer) << std::endl;
+std::cerr << "sizeof TrackerStat is " << sizeof(TrackerStat) << std::endl;
+
     // find .torrents, URLs, magnet links, etc in the command-line args
     int c;
     QStringList addme;

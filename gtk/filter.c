@@ -552,7 +552,7 @@ test_category (tr_torrent * tor, int active_category_type, const char * host)
             return tr_torrentGetPriority (tor) == TR_PRI_LOW;
 
         case CAT_FILTER_TYPE_HOST: {
-            int i;
+            unsigned int i;
             char tmp[1024];
             for (i=0; i<inf->trackerCount; ++i) {
                 gtr_get_host_from_url (tmp, sizeof (tmp), inf->trackers[i].announce);

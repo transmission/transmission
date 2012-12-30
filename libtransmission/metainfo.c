@@ -545,7 +545,7 @@ tr_metainfoParse (const tr_session * session,
 void
 tr_metainfoFree (tr_info * inf)
 {
-  int i;
+  unsigned int i;
   tr_file_index_t ff;
 
   for (i=0; i<inf->webseedCount; i++)

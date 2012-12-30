@@ -446,29 +446,29 @@ addFiles (const tr_torrent * tor,
 }
 
 static void
-addWebseeds (const tr_info * info,
-             tr_variant *       webseeds)
+addWebseeds (const tr_info  * info,
+             tr_variant     * webseeds)
 {
-    int i;
+  unsigned int i;
 
-    for (i = 0; i < info->webseedCount; ++i)
-        tr_variantListAddStr (webseeds, info->webseeds[i]);
+  for (i=0; i< info->webseedCount; ++i)
+    tr_variantListAddStr (webseeds, info->webseeds[i]);
 }
 
 static void
-addTrackers (const tr_info * info,
-             tr_variant *       trackers)
+addTrackers (const tr_info  * info,
+             tr_variant     * trackers)
 {
-    int i;
+  unsigned int i;
 
-    for (i = 0; i < info->trackerCount; ++i)
+  for (i=0; i<info->trackerCount; ++i)
     {
-        const tr_tracker_info * t = &info->trackers[i];
-        tr_variant *               d = tr_variantListAddDict (trackers, 4);
-        tr_variantDictAddStr (d, TR_KEY_announce, t->announce);
-        tr_variantDictAddInt (d, TR_KEY_id, t->id);
-        tr_variantDictAddStr (d, TR_KEY_scrape, t->scrape);
-        tr_variantDictAddInt (d, TR_KEY_tier, t->tier);
+      const tr_tracker_info * t = &info->trackers[i];
+      tr_variant * d = tr_variantListAddDict (trackers, 4);
+      tr_variantDictAddStr (d, TR_KEY_announce, t->announce);
+      tr_variantDictAddInt (d, TR_KEY_id, t->id);
+      tr_variantDictAddStr (d, TR_KEY_scrape, t->scrape);
+      tr_variantDictAddInt (d, TR_KEY_tier, t->tier);
     }
 }
 

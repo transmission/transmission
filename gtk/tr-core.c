@@ -1011,7 +1011,7 @@ on_torrent_metadata_changed (tr_torrent * tor, void * gcore)
 static unsigned int
 build_torrent_trackers_hash (tr_torrent * tor)
 {
-  int i;
+  unsigned int i;
   const char * pch;
   uint64_t hash = 0;
   const tr_info * const inf = tr_torrentInfo (tor);

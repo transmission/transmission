@@ -1351,7 +1351,7 @@ refreshWebseedList (struct DetailsImpl * di, tr_torrent ** torrents, int n)
 
     /* step 2: add any new webseeds */
     for (i=0; i<n; ++i) {
-        int j;
+        unsigned int j;
         const tr_torrent * tor = torrents[i];
         const tr_info * inf = tr_torrentInfo (tor);
         total += inf->webseedCount;
@@ -1375,7 +1375,7 @@ refreshWebseedList (struct DetailsImpl * di, tr_torrent ** torrents, int n)
 
     /* step 3: update the webseeds */
     for (i=0; i<n; ++i) {
-        int j;
+        unsigned int j;
         tr_torrent * tor = torrents[i];
         const tr_info * inf = tr_torrentInfo (tor);
         double * speeds_KBps = tr_torrentWebSpeeds_KBps (tor);
@@ -2159,7 +2159,7 @@ on_edit_trackers_response (GtkDialog * dialog, int response, gpointer data)
 static void
 get_editable_tracker_list (GString * gstr, const tr_torrent * tor)
 {
-    int i;
+    unsigned int i;
     int tier = 0;
     const tr_info * inf = tr_torrentInfo (tor);
     for (i=0; i<inf->trackerCount; ++i) {

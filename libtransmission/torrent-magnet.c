@@ -373,7 +373,7 @@ tr_torrentGetMetadataPercent (const tr_torrent * tor)
 char*
 tr_torrentInfoGetMagnetLink (const tr_info * inf)
 {
-    int i;
+    unsigned int i;
     const char * name;
     struct evbuffer * s = evbuffer_new ();
 

@@ -1724,8 +1724,8 @@ struct tr_info
     /* Torrent info */
     time_t             dateCreated;
 
-    int                trackerCount;
-    int                webseedCount;
+    unsigned int       trackerCount;
+    unsigned int       webseedCount;
     tr_file_index_t    fileCount;
     uint32_t           pieceSize;
     tr_piece_index_t   pieceCount;
