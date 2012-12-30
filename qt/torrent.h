@@ -40,21 +40,21 @@ class QStyle;
 
 struct Peer
 {
-    QString address;
-    QString clientName;
-    bool clientIsChoked;
-    bool clientIsInterested;
-    QString flagStr;
-    bool isDownloadingFrom;
-    bool isEncrypted;
-    bool isIncoming;
-    bool isUploadingTo;
-    bool peerIsChoked;
-    bool peerIsInterested;
-    int port;
-    double progress;
-    Speed rateToClient;
-    Speed rateToPeer;
+  bool clientIsChoked;
+  bool clientIsInterested;
+  bool isDownloadingFrom;
+  bool isEncrypted;
+  bool isIncoming;
+  bool isUploadingTo;
+  bool peerIsChoked;
+  bool peerIsInterested;
+  QString address;
+  QString clientName;
+  QString flagStr;
+  int port;
+  Speed rateToClient;
+  Speed rateToPeer;
+  double progress;
 };
 
 typedef QList<Peer> PeerList;
@@ -63,32 +63,32 @@ Q_DECLARE_METATYPE(PeerList)
 
 struct TrackerStat
 {
-    QString announce;
-    int announceState;
-    int downloadCount;
-    bool hasAnnounced;
-    bool hasScraped;
-    QString host;
-    int id;
-    bool isBackup;
-    int lastAnnouncePeerCount;
-    QString lastAnnounceResult;
-    int lastAnnounceStartTime;
-    bool lastAnnounceSucceeded;
-    int lastAnnounceTime;
-    bool lastAnnounceTimedOut;
-    QString lastScrapeResult;
-    int lastScrapeStartTime;
-    bool lastScrapeSucceeded;
-    int lastScrapeTime;
-    bool lastScrapeTimedOut;
-    int leecherCount;
-    int nextAnnounceTime;
-    int nextScrapeTime;
-    int scrapeState;
-    int seederCount;
-    int tier;
-    QPixmap getFavicon( ) const;
+  bool hasAnnounced;
+  bool hasScraped;
+  bool isBackup;
+  bool lastAnnounceSucceeded;
+  bool lastAnnounceTimedOut;
+  bool lastScrapeSucceeded;
+  bool lastScrapeTimedOut;
+  int announceState;
+  int downloadCount;
+  int id;
+  int lastAnnouncePeerCount;
+  int lastAnnounceStartTime;
+  int lastAnnounceTime;
+  int lastScrapeStartTime;
+  int lastScrapeTime;
+  int leecherCount;
+  int nextAnnounceTime;
+  int nextScrapeTime;
+  int scrapeState;
+  int seederCount;
+  int tier;
+  QString announce;
+  QString host;
+  QString lastAnnounceResult;
+  QString lastScrapeResult;
+  QPixmap getFavicon( ) const;
 };
 
 typedef QList<TrackerStat> TrackerStatsList;
@@ -97,13 +97,14 @@ Q_DECLARE_METATYPE(TrackerStatsList)
 
 struct TrFile
 {
-    TrFile(): index(-1), priority(0), wanted(true), size(0), have(0) { }
-    int index;
-    int priority;
-    bool wanted;
-    uint64_t size;
-    uint64_t have;
-    QString filename;
+  TrFile(): wanted(true), index(-1), priority(0), size(0), have(0) { }
+
+  bool wanted;
+  int index;
+  int priority;
+  QString filename;
+  uint64_t size;
+  uint64_t have;
 };
 
 typedef QList<TrFile> FileList;
