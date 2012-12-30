@@ -12,7 +12,7 @@ X-AppInstall-Keywords=torrent
 Actions=Minimize;
 
 [Desktop Action Minimize]
-_Name=Start Transmission Minimized
+Name=Start Transmission Minimized
 Exec=transmission-qt --minimized
 OnlyShowIn=Unity;
 
