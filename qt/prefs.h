@@ -43,6 +43,7 @@ class Prefs: public QObject
             DIR_WATCH,
             DIR_WATCH_ENABLED,
             SHOW_TRAY_ICON,
+            START_MINIMIZED,
             SHOW_DESKTOP_NOTIFICATION,
             ASKQUIT,
             SORT_MODE,

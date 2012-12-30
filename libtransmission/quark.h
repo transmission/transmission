@@ -340,6 +340,7 @@ enum
   TR_KEY_speed_limit_up_enabled,
   TR_KEY_speed_units,
   TR_KEY_start_added_torrents,
+  TR_KEY_start_minimized,
   TR_KEY_startDate,
   TR_KEY_status,
   TR_KEY_statusbar_stats,

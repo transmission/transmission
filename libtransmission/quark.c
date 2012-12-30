@@ -330,6 +330,7 @@ static const struct tr_key_struct my_static[] =
   { "speed-limit-up-enabled", 22 },
   { "speed-units", 11 },
   { "start-added-torrents", 20 },
+  { "start-minimized", 15 },
   { "startDate", 9 },
   { "status", 6 },
   { "statusbar-stats", 15 },

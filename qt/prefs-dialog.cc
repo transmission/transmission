@@ -300,6 +300,7 @@ PrefsDialog :: createDesktopTab( )
     hig->addSectionTitle( tr( "Desktop" ) );
 
     hig->addWideControl( checkBoxNew( tr( "Show Transmission icon in the &notification area" ), Prefs::SHOW_TRAY_ICON ) );
+    hig->addWideControl( checkBoxNew( tr( "Start &minimized in notification area" ), Prefs::START_MINIMIZED ) );
     hig->addWideControl( checkBoxNew( tr( "Show &popup notifications" ), Prefs::SHOW_DESKTOP_NOTIFICATION ) );
 
     hig->finish( );

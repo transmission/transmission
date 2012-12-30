@@ -158,6 +158,12 @@ MyApp :: MyApp( int& argc, char ** argv ):
         myPrefs->set( Prefs::SESSION_REMOTE_PASSWORD, password );
     if( ( host != 0 ) || ( port != 0 ) || ( username != 0 ) || ( password != 0 ) )
         myPrefs->set( Prefs::SESSION_IS_REMOTE, true );
+    if ( myPrefs->getBool( Prefs::START_MINIMIZED) )
+        minimized = true;
+
+    // start as minimized only if the system tray present
+    if ( !myPrefs->getBool( Prefs::SHOW_TRAY_ICON ) )
+      minimized = false;
 
     mySession = new Session( configDir, *myPrefs );
     myModel = new TorrentModel( *myPrefs );

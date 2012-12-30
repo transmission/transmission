@@ -37,6 +37,7 @@ Prefs::PrefItem Prefs::myItems[] =
   { DIR_WATCH, TR_KEY_watch_dir, QVariant::String },
   { DIR_WATCH_ENABLED, TR_KEY_watch_dir_enabled, QVariant::Bool },
   { SHOW_TRAY_ICON, TR_KEY_show_notification_area_icon, QVariant::Bool },
+  { START_MINIMIZED, TR_KEY_start_minimized, QVariant::Bool },
   { SHOW_DESKTOP_NOTIFICATION, TR_KEY_show_desktop_notification, QVariant::Bool },
   { ASKQUIT, TR_KEY_prompt_before_exit, QVariant::Bool },
   { SORT_MODE, TR_KEY_sort_mode, TrTypes::SortModeType },
@@ -274,6 +275,7 @@ Prefs :: ~Prefs ()
 void
 Prefs :: initDefaults (tr_variant * d)
 {
+  tr_variantDictReserve (d, 35);
   tr_variantDictAddBool (d, TR_KEY_blocklist_updates_enabled, true);
   tr_variantDictAddBool (d, TR_KEY_compact_view, false);
   tr_variantDictAddBool (d, TR_KEY_inhibit_desktop_hibernation, false);
@@ -285,6 +287,7 @@ Prefs :: initDefaults (tr_variant * d)
   tr_variantDictAddBool (d, TR_KEY_show_extra_peer_details, false),
   tr_variantDictAddBool (d, TR_KEY_show_filterbar, true);
   tr_variantDictAddBool (d, TR_KEY_show_notification_area_icon, false);
+  tr_variantDictAddBool (d, TR_KEY_start_minimized, false);
   tr_variantDictAddBool (d, TR_KEY_show_options_window, true);
   tr_variantDictAddBool (d, TR_KEY_show_statusbar, true);
   tr_variantDictAddBool (d, TR_KEY_show_toolbar, true);
