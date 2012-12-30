@@ -546,11 +546,14 @@ FilterBar :: recount ()
 {
   QAbstractItemModel * model = myActivityCombo->model();
 
+  int torrentsPerMode[FilterMode::NUM_MODES] = { };
+  myFilter.countTorrentsPerMode (torrentsPerMode);
+
   for (int row=0, n=model->rowCount(); row<n; ++row)
     {
       QModelIndex index = model->index (row, 0);
       const int mode = index.data(ActivityRole).toInt();
-      model->setData (index, getCountString(myFilter.count(mode)), TorrentCountRole);
+      model->setData (index, getCountString(torrentsPerMode[mode]), TorrentCountRole);
     }
 
   refreshTrackers ();

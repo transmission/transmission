@@ -48,7 +48,7 @@ class TorrentFilter: public QSortFilterProxyModel
         bool trackerFilterAcceptsTorrent( const Torrent * tor, const QString& tracker ) const;
 
     public:
-        int count( const FilterMode& ) const;
+        void countTorrentsPerMode (int * setmeCounts) const;
 
     private:
         Prefs& myPrefs;
