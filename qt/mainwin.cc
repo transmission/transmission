@@ -1319,8 +1319,10 @@ TrMainWindow :: updateNetworkIcon( )
 {
     const time_t now = time( NULL );
     const int period = 3;
-    const bool isSending = now - myLastSendTime <= period;
-    const bool isReading = now - myLastReadTime <= period;
+    const time_t secondsSinceLastSend = now - myLastSendTime;
+    const time_t secondsSinceLastRead = now - myLastReadTime;
+    const bool isSending = secondsSinceLastSend <= period;
+    const bool isReading = secondsSinceLastRead <= period;
     const char * key;
 
     if( isSending && isReading )
@@ -1335,9 +1337,18 @@ TrMainWindow :: updateNetworkIcon( )
     QIcon icon = getStockIcon( key, QStyle::SP_DriveNetIcon );
     QPixmap pixmap = icon.pixmap ( 16, 16 );
     myNetworkLabel->setPixmap( pixmap );
-    myNetworkLabel->setToolTip( isSending || isReading
-        ? tr( "Transmission server is responding" )
-        : tr( "Last response from server was %1 ago" ).arg( Formatter::timeToString( now-std::max(myLastReadTime,myLastSendTime))));
+
+    QString tip;
+    const QString url = mySession.getRemoteUrl().host();
+    if( !myLastReadTime )
+      tip = tr( "Server '%1' has not responded yet" ).arg (url);
+    else if( secondsSinceLastRead < 60 )
+      tip = tr( "Server '%1' is responding" ).arg (url);
+    else if( secondsSinceLastRead < (60*10) )
+      tip = tr( "Server '%1' last responded %2 ago" ).arg(url).arg(Formatter::timeToString(secondsSinceLastRead));
+    else
+      tip = tr( "Server '%1' is not responding" ).arg (url);
+    myNetworkLabel->setToolTip (tip);
 }
 
 void
