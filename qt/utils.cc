@@ -84,7 +84,7 @@ Utils :: guessMimeIcon( const QString& filename )
         fileIcons[PICTURE]  = QIcon::fromTheme( QString::fromAscii("image-x-generic"), fallback );
 
         const char * vid_types[] = {
-            "3gp", "asf", "avi", "mov", "mpeg", "mpg", "mp4" "mkv", "mov",
+            "3gp", "asf", "avi", "mov", "mpeg", "mpg", "mp4", "mkv", "mov",
             "ogm", "ogv", "qt", "rm", "wmv" };
         for( int i=0, n=sizeof(vid_types)/sizeof(vid_types[0]); i<n; ++i )
             suffixes[VIDEO] << QString::fromAscii(vid_types[i]);
@@ -93,7 +93,7 @@ Utils :: guessMimeIcon( const QString& filename )
         const char * arc_types[] = {
             "7z", "ace", "bz2", "cbz", "gz", "gzip", "lzma", "rar", "sft", "tar", "zip" };
         for( int i=0, n=sizeof(arc_types)/sizeof(arc_types[0]); i<n; ++i )
-            suffixes[VIDEO] << QString::fromAscii(arc_types[i]);
+            suffixes[ARCHIVE] << QString::fromAscii(arc_types[i]);
         fileIcons[ARCHIVE]  = QIcon::fromTheme( QString::fromAscii("package-x-generic"), fallback );
 
         const char * aud_types[] = {
