@@ -180,7 +180,7 @@ tr_core_class_init (TrCoreClass * core_class)
                   NULL, NULL,
                   g_cclosure_marshal_VOID__INT,
                   G_TYPE_NONE,
-                  1, G_TYPE_STRING);
+                  1, G_TYPE_INT);
 }
 
 static void
