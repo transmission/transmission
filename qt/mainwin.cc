@@ -250,11 +250,11 @@ TrMainWindow :: TrMainWindow( Session& session, Prefs& prefs, TorrentModel& mode
     myTrayIcon.setIcon( QApplication::windowIcon( ) );
 
     connect( &myPrefs, SIGNAL(changed(int)), this, SLOT(refreshPref(int)) );
-    connect( ui.action_ShowMainWindow, SIGNAL(toggled(bool)), this, SLOT(toggleWindows(bool)));
+    connect( ui.action_ShowMainWindow, SIGNAL(triggered(bool)), this, SLOT(toggleWindows(bool)));
     connect( &myTrayIcon, SIGNAL(activated(QSystemTrayIcon::ActivationReason)),
              this, SLOT(trayActivated(QSystemTrayIcon::ActivationReason)));
 
-    ui.action_ShowMainWindow->setChecked( !minimized );
+    toggleWindows( !minimized );
     ui.action_TrayIcon->setChecked( minimized || prefs.getBool( Prefs::SHOW_TRAY_ICON ) );
 
     ui.verticalLayout->addWidget( createStatusBar( ) );
@@ -306,23 +306,6 @@ TrMainWindow :: TrMainWindow( Session& session, Prefs& prefs, TorrentModel& mode
 
 TrMainWindow :: ~TrMainWindow( )
 {
-}
-
-/****
-*****
-****/
-
-void
-TrMainWindow :: closeEvent( QCloseEvent * event )
-{
-    // if they're using a tray icon, close to the tray
-    // instead of exiting
-    if( !myPrefs.getBool( Prefs :: SHOW_TRAY_ICON ) )
-        event->accept( );
-    else {
-        toggleWindows( false );
-        event->ignore( );
-    }
 }
 
 /****
@@ -560,6 +543,31 @@ void
 TrMainWindow :: setSortAscendingPref( bool b )
 {
     myPrefs.set( Prefs::SORT_REVERSED, b );
+}
+
+/****
+*****
+****/
+
+void
+TrMainWindow :: showEvent( QShowEvent * event )
+{
+    Q_UNUSED (event);
+
+    ui.action_ShowMainWindow->setChecked(true);
+}
+
+/****
+*****
+****/
+
+void
+TrMainWindow :: hideEvent( QHideEvent * event )
+{
+    Q_UNUSED (event);
+
+    if (!isVisible())
+        ui.action_ShowMainWindow->setChecked(false);
 }
 
 /****
@@ -999,7 +1007,7 @@ TrMainWindow :: trayActivated( QSystemTrayIcon::ActivationReason reason )
         if( isMinimized ( ) )
             toggleWindows( true );
         else
-            ui.action_ShowMainWindow->toggle( );
+            toggleWindows( !isVisible() );
     }
 }
 
@@ -1085,6 +1093,7 @@ TrMainWindow :: refreshPref( int key )
             b = myPrefs.getBool( key );
             ui.action_TrayIcon->setChecked( b );
             myTrayIcon.setVisible( b );
+            dynamic_cast<MyApp*>(QCoreApplication::instance())->setQuitOnLastWindowClosed(!b);
             refreshTrayIconSoon( );
             break;
 

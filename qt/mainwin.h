@@ -52,7 +52,8 @@ class TrMainWindow: public QMainWindow
         Q_OBJECT
 
     private:
-        virtual void closeEvent( QCloseEvent * event );
+        virtual void hideEvent( QHideEvent * event );
+        virtual void showEvent( QShowEvent * event );
 
     private:
         time_t myLastFullUpdateTime;
