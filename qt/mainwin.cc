@@ -1326,38 +1326,38 @@ TrMainWindow :: removeTorrents( const bool deleteFiles )
 void
 TrMainWindow :: updateNetworkIcon( )
 {
-    const time_t now = time( NULL );
-    const int period = 3;
-    const time_t secondsSinceLastSend = now - myLastSendTime;
-    const time_t secondsSinceLastRead = now - myLastReadTime;
-    const bool isSending = secondsSinceLastSend <= period;
-    const bool isReading = secondsSinceLastRead <= period;
-    const char * key;
+  const time_t now = time( NULL );
+  const int period = 3;
+  const time_t secondsSinceLastSend = now - myLastSendTime;
+  const time_t secondsSinceLastRead = now - myLastReadTime;
+  const bool isSending = secondsSinceLastSend <= period;
+  const bool isReading = secondsSinceLastRead <= period;
+  const char * key;
 
-    if( isSending && isReading )
-        key = "network-transmit-receive";
-    else if( isSending )
-        key = "network-transmit";
-    else if( isReading )
-        key = "network-receive";
-    else
-        key = "network-idle";
+  if( isSending && isReading )
+    key = "network-transmit-receive";
+  else if( isSending )
+    key = "network-transmit";
+  else if( isReading )
+    key = "network-receive";
+  else
+    key = "network-idle";
+  const QIcon icon = getStockIcon (key, QStyle::SP_DriveNetIcon);
+  const QPixmap pixmap = icon.pixmap (16, 16);
 
-    QIcon icon = getStockIcon( key, QStyle::SP_DriveNetIcon );
-    QPixmap pixmap = icon.pixmap ( 16, 16 );
-    myNetworkLabel->setPixmap( pixmap );
+  QString tip;
+  const QString url = mySession.getRemoteUrl().host();
+  if( !myLastReadTime )
+    tip = tr( "%1 has not responded yet" ).arg (url);
+  else if( secondsSinceLastRead < 60 )
+    tip = tr( "%1 is responding" ).arg (url);
+  else if( secondsSinceLastRead < (60*10) )
+    tip = tr( "%1 last responded %2 ago" ).arg(url).arg(Formatter::timeToString(secondsSinceLastRead));
+  else
+    tip = tr( "%1 is not responding" ).arg (url);
 
-    QString tip;
-    const QString url = mySession.getRemoteUrl().host();
-    if( !myLastReadTime )
-      tip = tr( "Server '%1' has not responded yet" ).arg (url);
-    else if( secondsSinceLastRead < 60 )
-      tip = tr( "Server '%1' is responding" ).arg (url);
-    else if( secondsSinceLastRead < (60*10) )
-      tip = tr( "Server '%1' last responded %2 ago" ).arg(url).arg(Formatter::timeToString(secondsSinceLastRead));
-    else
-      tip = tr( "Server '%1' is not responding" ).arg (url);
-    myNetworkLabel->setToolTip (tip);
+  myNetworkLabel->setPixmap (pixmap);
+  myNetworkLabel->setToolTip (tip);
 }
 
 void
