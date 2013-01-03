@@ -55,7 +55,7 @@ struct dtr_watchdir
 /* reasonable guess as to size of 50 events */
 #define BUF_LEN (EVENT_BATCH_COUNT * (EVENT_SIZE + 16) + 2048)
 
-#define DTR_INOTIFY_MASK (IN_CLOSE_WRITE|IN_MOVED_TO|IN_ONLYDIR)
+#define DTR_INOTIFY_MASK (IN_CLOSE_WRITE|IN_MOVED_TO|IN_CREATE|IN_ONLYDIR)
 
 static void
 watchdir_new_impl (dtr_watchdir * w)
