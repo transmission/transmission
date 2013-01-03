@@ -502,6 +502,8 @@ tr_getDefaultDownloadDir (void)
 
                   if (!memcmp (value, "$HOME/", 6))
                     user_dir = tr_buildPath (getHomeDir (), value+6, NULL);
+                  else if (!strcmp (value, "$HOME"))
+                    user_dir = tr_strdup (getHomeDir ());
                   else
                     user_dir = tr_strdup (value);
                 }
