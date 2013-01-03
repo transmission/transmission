@@ -215,7 +215,7 @@ Options :: refreshFileButton( int width )
 
     switch( myAdd.type )
     {
-        case AddData::FILENAME: text = QFileInfo(myAdd.filename).fileName(); break;
+        case AddData::FILENAME: text = QFileInfo(myAdd.filename).completeBaseName(); break;
         case AddData::URL:      text = myAdd.url.toString(); break;
         case AddData::MAGNET:   text = myAdd.magnet; break;
         default:                break;
