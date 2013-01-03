@@ -490,10 +490,6 @@ FilterBar :: refreshPref( int key )
             }
             break;
         }
-
-        case Prefs :: FILTER_TEXT:
-            myLineEdit->setText( myPrefs.getString( key ) );
-            break;
     }
 }
 
