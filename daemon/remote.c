@@ -554,25 +554,29 @@ getEncodedMetainfo (const char * filename)
 static void
 addIdArg (tr_variant * args, const char * id)
 {
-    if (!*id)
+  if (!*id)
     {
-        fprintf (
-            stderr,
-            "No torrent specified!  Please use the -t option first.\n");
-        id = "-1"; /* no torrent will have this ID, so should be a no-op */
+      fprintf (stderr, "No torrent specified!  Please use the -t option first.\n");
+      id = "-1"; /* no torrent will have this ID, so should be a no-op */
     }
-    if (strcmp (id, "all"))
+  else if (!tr_strcmp0 (id, "active"))
     {
-        const char * pch;
-        bool isList = strchr (id,',') || strchr (id,'-');
-        bool isNum = true;
-        for (pch=id; isNum && *pch; ++pch)
-            if (!isdigit (*pch))
-                isNum = false;
-        if (isNum || isList)
-            tr_rpc_parse_list_str (tr_variantDictAdd (args, TR_KEY_ids), id, strlen (id));
-        else
-            tr_variantDictAddStr (args, TR_KEY_ids, id); /* it's a torrent sha hash */
+      tr_variantDictAddStr (args, TR_KEY_ids, "recently-active");
+    }
+  else if (strcmp (id, "all"))
+    {
+      const char * pch;
+      bool isList = strchr (id,',') || strchr (id,'-');
+      bool isNum = true;
+
+      for (pch=id; isNum && *pch; ++pch)
+        if (!isdigit (*pch))
+          isNum = false;
+
+      if (isNum || isList)
+        tr_rpc_parse_list_str (tr_variantDictAdd (args, TR_KEY_ids), id, strlen (id));
+      else
+        tr_variantDictAddStr (args, TR_KEY_ids, id); /* it's a torrent sha hash */
     }
 }
 
@@ -1981,6 +1985,7 @@ processArgs (const char * rpcurl, int argc, const char ** argv)
                 case 'l': tr_variantDictAddInt (top, TR_KEY_tag, TAG_LIST);
                           n = TR_N_ELEMENTS (list_keys);
                           for (i=0; i<n; ++i) tr_variantListAddQuark (fields, list_keys[i]);
+                          addIdArg (args, id);
                           break;
                 case 940: tr_variantDictAddInt (top, TR_KEY_tag, TAG_FILES);
                           n = TR_N_ELEMENTS (files_keys);

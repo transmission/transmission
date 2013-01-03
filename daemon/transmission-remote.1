@@ -57,7 +57,7 @@ and
 .Op Fl srd
 .Op Fl si
 .Op Fl st
-.Op Fl t Ar all | Ar id | Ar hash
+.Op Fl t Ar all | active | Ar id | Ar hash
 .Op Fl hl
 .Op Fl HL
 .Op Fl u Ar number | Fl U
@@ -256,10 +256,12 @@ Stop the current torrent(s) from downloading or seeding
 Start added torrents paused
 .It Fl -no-start-paused
 Start added torrents unpaused
-.It Fl t Fl -torrent Ar all | id | torrent-hash
-Set the current torrent(s) for use by subsequent options.
+.It Fl t Fl -torrent Ar all | active | id | torrent-hash
+Set the current torrent(s) for use by subsequent options. The literal
 .Ar all
-will apply following requests to all torrents, while specific torrents can be chosen by
+will apply following requests to all torrents; the literal
+.Ar active
+will apply following requests to recently-active torrents; and specific torrents can be chosen by
 .Ar id
 or
 .Ar hash .
@@ -318,6 +320,14 @@ In the `status' section of the list, the following shorthand is used:
 .D1 ?: We unchoked this peer, but they're not interested
 .El
 .Sh EXAMPLES
+List all torrents:
+.Bd -literal -offset indent
+$ transmission-remote \-l
+.Ed
+List all active torrents:
+.Bd -literal -offset indent
+$ transmission-remote \-tactive \-l
+.Ed
 Set download and upload limits to 400 kB/sec and 60 kB/sec:
 .Bd -literal -offset indent
 $ transmission-remote \-d400 \-u60
