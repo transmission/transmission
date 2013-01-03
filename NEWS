@@ -1,3 +1,24 @@
+=== Transmission 2.xx (2013/yy/zz) ===
+[http://trac.transmissionbt.com/query?milestone=2.xx&group=component&order=severity All tickets closed by this release]
+==== All Platforms ====
+  * Reduce the number of blocking API calls in libtransmission (FIXME: translate this into human... fewer beachballs)
+  * The "Time Remaining" property wasn't set for torrents with webseeds but no peers
+==== GTK+ ====
+  * Fix sorting by age
+  * Fix the Edit Trackers dialog to handle resizing properly.
+  * Better support for XDG_DOWNLOAD_DIR
+==== Qt ====
+  * Fix notification area bug that inhibited desktop hibernation
+  * Fix .desktop file to accept adding magnet links from a web browser
+  * Use the `video' icon when the torrent is an mkv or mp4 file
+  * Fix rendering of filename in the options dialog when adding a torrent
+  * Fix selection point bug in the filterbar's entry field
+==== Daemon ====
+  * Improved watchdir support
+  * Documentation fixes in transmission-remote's manpage
+
+==== Web Client ====
+
 === Transmission 2.75 (2012/12/13) ===
 [http://trac.transmissionbt.com/query?milestone=2.75&group=component&order=severity All tickets closed by this release]
 ==== Mac ====
