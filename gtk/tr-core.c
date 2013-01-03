@@ -404,7 +404,7 @@ compare_time (time_t a, time_t b)
 
   if (a < b)
     ret = -1;
-  if (a > b)
+  else if (a > b)
     ret = 1;
   else
     ret = 0;
