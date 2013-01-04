@@ -164,7 +164,7 @@ ul.torrent_list {
    */ }
   ul.torrent_list li.torrent {
     border-bottom: 1px solid #ccc;
-    padding: 4px 30px 5px 0px;
+    padding: 4px 30px 5px 14px;
     color: #666;
     background-color: white; }
     ul.torrent_list li.torrent.compact {
