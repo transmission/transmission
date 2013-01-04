@@ -856,14 +856,18 @@ getquota (char * device)
 #if defined(__FreeBSD__)
       spaceused = (int64_t) dq.dqb_curblocks >> 1;
 #elif defined(SYS_DARWIN)
-      spaceused = (int64_t) dq.dqb_curbytes >> 1;
+      spaceused = (int64_t) dq.dqb_curbytes;
 #elif defined(__UCLIBC__)
       spaceused = (int64_t) btodb(dq.dqb_curblocks);
 #else
       spaceused = btodb(dq.dqb_curspace);
 #endif
       freespace = limit - spaceused;
+#ifdef SYS_DARWIN
+      return (freespace < 0) ? 0 : freespace;
+#else
       return (freespace < 0) ? 0 : freespace * 1024;
+#endif
     }
 
   /* something went wrong */
