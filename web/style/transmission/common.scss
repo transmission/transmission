@@ -143,6 +143,8 @@ div#toolbar
 		float: left;
 		border: none;
 		padding: 0px 3px;
+		background-position: center center;
+		background-repeat: no-repeat;
 	}
 
         >div#toolbar-separator {
@@ -154,27 +156,26 @@ div#toolbar
         }
 
 	> div#toolbar-open {
-		background: url('images/toolbar-folder.png') no-repeat;
-		margin-left: 4px;
+		background-image: url('images/toolbar-folder.png');
 	}
 	> div#toolbar-remove {
-		background: url('images/toolbar-close.png') no-repeat;
+		background-image: url('images/toolbar-close.png');
 	}
 	> div#toolbar-start {
-		background: url('images/toolbar-start.png') no-repeat;
+		background-image: url('images/toolbar-start.png');
 	}
 	> div#toolbar-pause {
-		background: url('images/toolbar-pause.png') no-repeat;
+		background-image: url('images/toolbar-pause.png');
 	}
 	> div#toolbar-start-all {
-		background: url('images/toolbar-start-all.png') no-repeat;
+		background-image: url('images/toolbar-start-all.png');
 	}
 	> div#toolbar-pause-all {
-		background: url('images/toolbar-pause-all.png') no-repeat;
+		background-image: url('images/toolbar-pause-all.png');
 	}
 
 	> div#toolbar-inspector {
-		background: url('images/toolbar-info.png') no-repeat;
+		background-image: url('images/toolbar-info.png');
 		float: right;
 		margin-right: 4px;
 	}
