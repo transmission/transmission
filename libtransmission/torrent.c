@@ -1988,7 +1988,7 @@ torrentCallScript (const tr_torrent * tor, const char * script)
         tr_torinf (tor, "Calling script \"%s\"", script);
 
 #ifdef WIN32
-        if (spawnvpe (_P_NOWAIT, script, (const char*)cmd, env) == -1)
+        if (_spawnvpe (_P_NOWAIT, script, (const char*)cmd, env) == -1)
           tr_torerr (tor, "error executing script \"%s\": %s", cmd[0], tr_strerror (errno));
 #else
         signal (SIGCHLD, onSigCHLD);
