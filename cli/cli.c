@@ -231,7 +231,6 @@ main (int argc, char ** argv)
   uint8_t     * fileContents;
   size_t        fileLength;
   const char  * str;
-  char          buf[TR_PATH_MAX];
 
   tr_formatter_mem_init (MEM_K, MEM_K_STR, MEM_M_STR, MEM_G_STR, MEM_T_STR);
   tr_formatter_size_init (DISK_K,DISK_K_STR, DISK_M_STR, DISK_G_STR, DISK_T_STR);
@@ -267,15 +266,16 @@ main (int argc, char ** argv)
 
   if (tr_variantDictFindStr (&settings, TR_KEY_download_dir, &str, NULL))
     {
-      str = tr_realpath (str, buf);
+      if (!tr_fileExists (str, NULL))
+        tr_mkdirp (str, 0700);
 
-      if (str != NULL)
+      if (tr_fileExists (str, NULL))
         {
           tr_variantDictAddStr (&settings, TR_KEY_download_dir, str);
         }
       else
         {
-          fprintf (stderr, "Download directory does not exist!\n");
+          fprintf (stderr, "Unable to create download directory \"%s\"!\n", str);
           return EXIT_FAILURE;
         }
     }
