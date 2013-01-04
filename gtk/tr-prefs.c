@@ -1135,11 +1135,9 @@ onCorePrefsChanged (TrCore * core UNUSED, const tr_quark key, gpointer gdata)
   if (key == TR_KEY_peer_port)
     {
       struct network_page_data * data = gdata;
-      gdk_threads_enter ();
       gtr_label_set_text (GTK_LABEL (data->portLabel), _("Status unknown"));
       gtk_widget_set_sensitive (data->portButton, TRUE);
       gtk_widget_set_sensitive (data->portSpin, TRUE);
-      gdk_threads_leave ();
     }
 }
 
