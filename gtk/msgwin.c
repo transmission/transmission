@@ -28,23 +28,23 @@
 
 enum
 {
-    COL_SEQUENCE,
-    COL_NAME,
-    COL_MESSAGE,
-    COL_TR_MSG,
-    N_COLUMNS
+  COL_SEQUENCE,
+  COL_NAME,
+  COL_MESSAGE,
+  COL_TR_MSG,
+  N_COLUMNS
 };
 
 struct MsgData
 {
-    TrCore        * core;
-    GtkTreeView   * view;
-    GtkListStore  * store;
-    GtkTreeModel  * filter;
-    GtkTreeModel  * sort;
-    tr_msg_level    maxLevel;
-    gboolean        isPaused;
-    guint           refresh_tag;
+  TrCore        * core;
+  GtkTreeView   * view;
+  GtkListStore  * store;
+  GtkTreeModel  * filter;
+  GtkTreeModel  * sort;
+  tr_msg_level    maxLevel;
+  gboolean        isPaused;
+  guint           refresh_tag;
 };
 
 static struct tr_msg_list * myTail = NULL;
@@ -64,7 +64,7 @@ is_pinned_to_new (struct MsgData * data)
     {
       pinned_to_new = TRUE;
     }
-    else
+  else
     {
       GtkTreePath * last_visible;
       if (gtk_tree_view_get_visible_range (data->view, NULL, &last_visible))
