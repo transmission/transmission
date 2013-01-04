@@ -334,71 +334,37 @@ on_main_window_size_allocated (GtkWidget      * gtk_window,
 **** listen to changes that come from RPC
 ***/
 
-struct rpc_idle_data
+struct on_rpc_changed_struct
 {
   TrCore * core;
-  int id;
-  gboolean delete_files;
+  tr_rpc_callback_type type;
+  int torrent_id;
 };
 
 static gboolean
-rpc_torrent_remove_idle (gpointer gdata)
-{
-  struct rpc_idle_data * data = gdata;
-
-  gtr_core_remove_torrent (data->core, data->id, data->delete_files);
-
-  g_free (data);
-  return FALSE; /* tell g_idle not to call this func twice */
-}
-
-static gboolean
-rpc_torrent_add_idle (gpointer gdata)
+on_rpc_changed_idle (gpointer gdata)
 {
   tr_torrent * tor;
-  struct rpc_idle_data * data = gdata;
+  struct on_rpc_changed_struct * data = gdata;
 
-  if ((tor = gtr_core_find_torrent (data->core, data->id)))
-    gtr_core_add_torrent (data->core, tor, TRUE);
-
-  g_free (data);
-  return FALSE; /* tell g_idle not to call this func twice */
-}
-
-static tr_rpc_callback_status
-on_rpc_changed (tr_session            * session,
-                tr_rpc_callback_type    type,
-                struct tr_torrent     * tor,
-                void                  * gdata)
-{
-  tr_rpc_callback_status status = TR_RPC_OK;
-  struct cbdata * cbdata = gdata;
-  gdk_threads_enter ();
-
-  switch (type)
+  switch (data->type)
     {
       case TR_RPC_SESSION_CLOSE:
         gtr_action_activate ("quit");
         break;
 
-      case TR_RPC_TORRENT_ADDED: {
-        struct rpc_idle_data * data = g_new0 (struct rpc_idle_data, 1);
-        data->id = tr_torrentId (tor);
-        data->core = cbdata->core;
-        gdk_threads_add_idle (rpc_torrent_add_idle, data);
+      case TR_RPC_TORRENT_ADDED:
+        if ((tor = gtr_core_find_torrent (data->core, data->torrent_id)))
+          gtr_core_add_torrent (data->core, tor, true);
         break;
-      }
 
       case TR_RPC_TORRENT_REMOVING:
-      case TR_RPC_TORRENT_TRASHING: {
-        struct rpc_idle_data * data = g_new0 (struct rpc_idle_data, 1);
-        data->id = tr_torrentId (tor);
-        data->core = cbdata->core;
-        data->delete_files = type == TR_RPC_TORRENT_TRASHING;
-        gdk_threads_add_idle (rpc_torrent_remove_idle, data);
-        status = TR_RPC_NOREMOVE;
+        gtr_core_remove_torrent (data->core, data->torrent_id, false);
         break;
-      }
+
+      case TR_RPC_TORRENT_TRASHING:
+        gtr_core_remove_torrent (data->core, data->torrent_id, true);
+        break;
 
       case TR_RPC_SESSION_CHANGED: {
         int i;
@@ -408,6 +374,7 @@ on_rpc_changed (tr_session            * session,
         tr_quark key;
         GSList * l;
         GSList * changed_keys = NULL;
+        tr_session * session = gtr_core_session (data->core);
         tr_variantInitDict (&tmp, 100);
         tr_sessionGetSettings (session, &tmp);
         for (i=0; tr_variantDictChild (&tmp, i, &key, &newval); ++i)
@@ -433,7 +400,7 @@ on_rpc_changed (tr_session            * session,
         tr_sessionGetSettings (session, oldvals);
 
         for (l=changed_keys; l!=NULL; l=l->next)
-          gtr_core_pref_changed (cbdata->core, GPOINTER_TO_INT(l->data));
+          gtr_core_pref_changed (data->core, GPOINTER_TO_INT(l->data));
 
         g_slist_free (changed_keys);
         tr_variantFree (&tmp);
@@ -449,8 +416,26 @@ on_rpc_changed (tr_session            * session,
         break;
     }
 
-  gdk_threads_leave ();
-  return status;
+  g_free (data);
+  return G_SOURCE_REMOVE;
+}
+
+static tr_rpc_callback_status
+on_rpc_changed (tr_session            * session G_GNUC_UNUSED,
+                tr_rpc_callback_type    type,
+                struct tr_torrent     * tor,
+                void                  * gdata)
+{
+  struct cbdata * cbdata = gdata;
+  struct on_rpc_changed_struct * data;
+
+  data = g_new (struct on_rpc_changed_struct, 1);
+  data->core = cbdata->core;
+  data->type = type;
+  data->torrent_id = tr_torrentId (tor);
+  gdk_threads_add_idle (on_rpc_changed_idle, data);
+  
+  return TR_RPC_NOREMOVE;
 }
 
 /***
