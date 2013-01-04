@@ -81,7 +81,7 @@ updateStats (gpointer gdata)
     setLabel (ui->all_time_lb, tr_strltime (buf, all.secondsActive, buflen));
     setLabelFromRatio (ui->all_ratio_lb, all.ratio);
 
-    return TRUE;
+    return G_SOURCE_CONTINUE;
 }
 
 static void

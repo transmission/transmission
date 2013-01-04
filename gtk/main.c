@@ -267,7 +267,7 @@ refresh_actions (gpointer gdata)
   gtr_action_set_sensitive ("torrent-reannounce", canUpdate != 0);
 
   data->refresh_actions_tag = 0;
-  return FALSE;
+  return G_SOURCE_REMOVE;
 }
 
 static void
@@ -881,7 +881,7 @@ on_session_closed (gpointer gdata)
   g_slist_foreach (cbdata->duplicates_list, (GFunc)g_free, NULL);
   g_slist_free (cbdata->duplicates_list);
 
-  return FALSE;
+  return G_SOURCE_REMOVE;
 }
 
 struct session_close_struct
@@ -1289,7 +1289,7 @@ update_model_once (gpointer gdata)
     gtr_icon_refresh (data->icon);
 
   data->update_model_soon_tag = 0;
-  return FALSE;
+  return G_SOURCE_REMOVE;
 }
 
 static void

@@ -99,7 +99,7 @@ onTimer (gpointer gdata)
         }
     }
 
-    return TRUE; /* keep looping */
+    return G_SOURCE_CONTINUE;
 }
 
 static void

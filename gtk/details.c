@@ -2481,7 +2481,8 @@ static gboolean
 periodic_refresh (gpointer data)
 {
     refresh (data);
-    return TRUE;
+
+    return G_SOURCE_CONTINUE;
 }
 
 static void

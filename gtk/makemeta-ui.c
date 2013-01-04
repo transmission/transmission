@@ -111,7 +111,8 @@ onProgressDialogRefresh (gpointer data)
     gtk_dialog_set_response_sensitive (d, GTK_RESPONSE_ACCEPT, b->isDone && !b->result);
 
     g_free (base);
-    return TRUE;
+
+    return G_SOURCE_CONTINUE;
 }
 
 static void

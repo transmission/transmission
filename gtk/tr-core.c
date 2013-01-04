@@ -706,9 +706,9 @@ core_watchdir_idle (gpointer gcore)
 
   /* if monitor_files is nonempty, keep checking every second */
   if (core->priv->monitor_files)
-    return TRUE;
+    return G_SOURCE_CONTINUE;
   core->priv->monitor_idle_tag = 0;
-  return FALSE;
+  return G_SOURCE_REMOVE;
 }
 
 /* If this file is a torrent, add it to our list */

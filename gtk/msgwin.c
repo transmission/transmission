@@ -430,7 +430,7 @@ onRefresh (gpointer gdata)
         scroll_to_bottom (data);
     }
 
-  return TRUE;
+  return G_SOURCE_CONTINUE;
 }
 
 static GtkWidget*
