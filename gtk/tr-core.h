@@ -69,7 +69,7 @@ GType          tr_core_get_type (void) G_GNUC_CONST;
 
 TrCore *       gtr_core_new (tr_session *);
 
-void           gtr_core_close (TrCore*);
+tr_session *   gtr_core_close (TrCore*);
 
 /* Return the model used without incrementing the reference count */
 GtkTreeModel * gtr_core_model (TrCore * self);

@@ -871,7 +871,7 @@ gtr_core_new (tr_session * session)
   return core;
 }
 
-void
+tr_session *
 gtr_core_close (TrCore * core)
 {
   tr_session * session = gtr_core_session (core);
@@ -880,8 +880,9 @@ gtr_core_close (TrCore * core)
     {
       core->priv->session = NULL;
       gtr_pref_save (session);
-      tr_sessionClose (session);
     }
+
+  return session;
 }
 
 /***

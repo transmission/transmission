@@ -884,17 +884,22 @@ on_session_closed (gpointer gdata)
   return FALSE;
 }
 
+struct session_close_struct
+{
+  tr_session * session;
+  struct cbdata * cbdata;
+};
+
+/* since tr_sessionClose () is a blocking function,
+ * delegate its call to another thread here... when it's done,
+ * punt the GUI teardown back to the GTK+ thread */
 static gpointer
 session_close_threadfunc (gpointer gdata)
 {
-  /* since tr_sessionClose () is a blocking function,
-   * call it from another thread... when it's done,
-   * punt the GUI teardown back to the GTK+ thread */
-  struct cbdata * cbdata = gdata;
-  gdk_threads_enter ();
-  gtr_core_close (cbdata->core);
-  gdk_threads_add_idle (on_session_closed, gdata);
-  gdk_threads_leave ();
+  struct session_close_struct * data = gdata;
+  tr_sessionClose (data->session);
+  gdk_threads_add_idle (on_session_closed, data->cbdata);
+  g_free (data);
   return NULL;
 }
 
@@ -909,6 +914,7 @@ on_app_exit (gpointer vdata)
 {
   GtkWidget *r, *p, *b, *w, *c;
   struct cbdata *cbdata = vdata;
+  struct session_close_struct * session_close_data;
 
   /* stop the update timer */
   if (cbdata->timer)
@@ -960,7 +966,10 @@ on_app_exit (gpointer vdata)
                                  gtr_pref_int_get (TR_KEY_main_window_y));
 
   /* shut down libT */
-  g_thread_new ("shutdown-thread", session_close_threadfunc, vdata);
+  session_close_data = g_new (struct session_close_struct, 1);
+  session_close_data->cbdata = cbdata;
+  session_close_data->session = gtr_core_close (cbdata->core);
+  g_thread_new ("shutdown-thread", session_close_threadfunc, session_close_data);
 }
 
 static void
