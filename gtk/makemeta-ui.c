@@ -326,7 +326,11 @@ updatePiecesLabel (MakeMetaUI * ui)
 static void
 setFilename (MakeMetaUI * ui, const char * filename)
 {
-  g_clear_pointer (&ui->builder, (GDestroyNotify)tr_metaInfoBuilderFree);
+  if (ui->builder != NULL)
+    {
+      tr_metaInfoBuilderFree (ui->builder);
+      ui->builder = NULL;
+    }
 
   if (filename)
     ui->builder = tr_metaInfoBuilderCreate (filename);
