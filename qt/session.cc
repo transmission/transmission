@@ -167,6 +167,7 @@ Session :: updatePref( int key )
         case Prefs :: QUEUE_STALLED_MINUTES:
         case Prefs :: PEX_ENABLED:
         case Prefs :: PORT_FORWARDING:
+        case Prefs :: RENAME_PARTIAL_FILES:
         case Prefs :: SCRIPT_TORRENT_DONE_ENABLED:
         case Prefs :: SCRIPT_TORRENT_DONE_FILENAME:
         case Prefs :: START:
