@@ -17,6 +17,7 @@
   * Fix display of the torrent name in the Torrent Options dialog
   * Fix cursor point bug in the filterbar's entry field
   * Fix crash when adding a magnet link while Transmission was only visible in the system tray
+  * Fix free-memory-read error on shutdown
 ==== Daemon ====
   * Better watchdir support
   * Documentation fixes in transmission-remote's manpage
