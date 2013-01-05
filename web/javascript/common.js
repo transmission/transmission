@@ -196,9 +196,8 @@ Prefs.setValue = function(key, val)
 	if (!(key in Prefs._Defaults))
 		console.warn("unrecognized preference key '%s'", key);
 
-	var days = 30;
 	var date = new Date();
-	date.setTime(date.getTime()+(days*24*60*60*1000));
+	date.setFullYear (date.getFullYear() + 1);
 	document.cookie = key+"="+val+"; expires="+date.toGMTString()+"; path=/";
 };
 
