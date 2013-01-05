@@ -102,7 +102,7 @@ div#toolbar {
 ****
 ***/
 #statusbar {
-  height: 26px;
+  height: 24px;
   width: 100%;
   border-bottom: 1px solid #AAA;
   overflow: hidden;
