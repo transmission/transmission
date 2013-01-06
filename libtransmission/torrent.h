@@ -211,9 +211,9 @@ struct tr_torrent
     uint64_t                   corruptPrev;
 
     uint64_t                   etaDLSpeedCalculatedAt;
-    float                      etaDLSpeed_KBps;
+    unsigned int               etaDLSpeed_Bps;
     uint64_t                   etaULSpeedCalculatedAt;
-    float                      etaULSpeed_KBps;
+    unsigned int               etaULSpeed_Bps;
 
     time_t                     addedDate;
     time_t                     activityDate;
