@@ -1102,7 +1102,7 @@ Details :: createOptionsTab( )
     s = new QSpinBox( );
     s->setSingleStep( 5 );
     s->setRange( 0, INT_MAX );
-    s->setProperty( PREF_KEY, QString( "uploadLimit" ) );
+    s->setProperty( PREF_KEY, TR_KEY_uploadLimit );
     mySingleUpSpin = s;
     hig->addRow( c, s );
     enableWhenChecked( c, s );
@@ -1130,7 +1130,7 @@ Details :: createOptionsTab( )
     h->addWidget( myRatioCombo = m );
     ds = new QDoubleSpinBox( );
     ds->setRange( 0.5, INT_MAX );
-    ds->setProperty( PREF_KEY, QString( "seedRatioLimit" ) );
+    ds->setProperty( PREF_KEY, TR_KEY_seedRatioLimit );
     connect( ds, SIGNAL(editingFinished()), this, SLOT(onSpinBoxEditingFinished()));
     h->addWidget( myRatioSpin = ds );
     hig->addRow( tr( "&Ratio:" ), h, m );
@@ -1146,7 +1146,7 @@ Details :: createOptionsTab( )
     s = new QSpinBox( );
     s->setSingleStep( 5 );
     s->setRange( 1, 9999 );
-    s->setProperty( PREF_KEY, QString( "seedIdleLimit" ) );
+    s->setProperty( PREF_KEY, TR_KEY_seedIdleLimit );
     connect( s, SIGNAL(editingFinished()), this, SLOT(onSpinBoxEditingFinished()));
     h->addWidget( myIdleSpin = s );
     hig->addRow( tr( "&Idle:" ), h, m );
@@ -1158,7 +1158,7 @@ Details :: createOptionsTab( )
     s = new QSpinBox( );
     s->setSingleStep( 5 );
     s->setRange( 1, 300 );
-    s->setProperty( PREF_KEY, QString( "peer-limit" ) );
+    s->setProperty( PREF_KEY, TR_KEY_peer_limit );
     connect( s, SIGNAL(editingFinished()), this, SLOT(onSpinBoxEditingFinished()));
     myPeerLimitSpin = s;
     hig->addRow( tr( "&Maximum peers:" ), s );
@@ -1207,14 +1207,14 @@ Details :: createTrackerTab( )
 
     p = new QPushButton();
     p->setIcon( getStockIcon( "list-add", QStyle::SP_DialogOpenButton ) );
-    p->setToolTip( "Add Tracker" );
+    p->setToolTip( tr( "Add Tracker" ));
     myAddTrackerButton = p;
     v2->addWidget( p, 1 );
     connect( p, SIGNAL(clicked(bool)), this, SLOT(onAddTrackerClicked()));
 
     p = new QPushButton();
     p->setIcon( getStockIcon( "document-properties", QStyle::SP_DesktopIcon ) );
-    p->setToolTip( "Edit Tracker" );
+    p->setToolTip( tr( "Edit Tracker" ));
     myAddTrackerButton = p;
     p->setEnabled( false );
     myEditTrackerButton = p;
@@ -1223,7 +1223,7 @@ Details :: createTrackerTab( )
 
     p = new QPushButton();
     p->setIcon( getStockIcon( "list-remove", QStyle::SP_TrashIcon ) );
-    p->setToolTip( "Remove Trackers" );
+    p->setToolTip( tr( "Remove Trackers" ));
     p->setEnabled( false );
     myRemoveTrackerButton = p;
     v2->addWidget( p, 1 );
