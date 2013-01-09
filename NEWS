@@ -1,4 +1,4 @@
-=== Transmission 2.76 (2013/01/xx) ===
+=== Transmission 2.76 (2013/01/08) ===
 [http://trac.transmissionbt.com/query?milestone=2.76&group=component&order=severity All tickets closed by this release]
 ==== All Platforms ====
   * Better error logging when user-provided scripts can't be executed
