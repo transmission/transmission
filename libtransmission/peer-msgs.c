@@ -86,6 +86,9 @@ enum
     /* number of pieces we'll allow in our fast set */
     MAX_FAST_SET_SIZE = 3,
 
+    /* how many blocks to keep prefetched per peer */
+    PREFETCH_SIZE = 18,
+
     /* defined in BEP #9 */
     METADATA_MSG_TYPE_REQUEST = 0,
     METADATA_MSG_TYPE_DATA = 1,
@@ -1198,8 +1201,7 @@ prefetchPieces (tr_peermsgs *msgs)
     if (!getSession (msgs)->isPrefetchEnabled)
         return;
 
-    /* Maintain 12 prefetched blocks per unchoked peer */
-    for (i=msgs->prefetchCount; i<msgs->peer->pendingReqsToClient && i<12; ++i)
+    for (i=msgs->prefetchCount; i<msgs->peer->pendingReqsToClient && i<PREFETCH_SIZE; ++i)
     {
         const struct peer_request * req = msgs->peerAskedFor + i;
         if (requestIsValid (msgs, req))
