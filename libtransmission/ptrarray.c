@@ -160,17 +160,34 @@ tr_ptrArrayLowerBound (const tr_ptrArray  * t,
   return pos;
 }
 
+#ifdef NDEBUG
+#define assertArrayIsSortedAndUnique(array,compare) /* no-op */
+#define assertIndexIsSortedAndUnique(array,pos,compare) /* no-op */
+#else
+
 static void
-assertSortedAndUnique (const tr_ptrArray * t UNUSED,
-                       int compare (const void*, const void*) UNUSED)
+assertArrayIsSortedAndUnique (const tr_ptrArray * t,
+                              int compare (const void*, const void*))
 {
-#ifndef NDEBUG
   int i;
 
   for (i=0; i<t->n_items-2; ++i)
     assert (compare (t->items[i], t->items[i+1]) < 0);
-#endif
 }
+
+static void
+assertIndexIsSortedAndUnique (const tr_ptrArray * t,
+                              int pos,
+                              int compare (const void*, const void*))
+{
+  if (pos > 0)
+    assert (compare (t->items[pos-1], t->items[pos]) < 0);
+
+  if ((pos + 1) < t->n_items)
+    assert (compare (t->items[pos], t->items[pos+1]) < 0);
+}
+
+#endif
 
 int
 tr_ptrArrayInsertSorted (tr_ptrArray * t,
@@ -179,13 +196,12 @@ tr_ptrArrayInsertSorted (tr_ptrArray * t,
 {
   int pos;
   int ret;
-
-  assertSortedAndUnique (t, compare);
+  assertArrayIsSortedAndUnique (t, compare);
 
   pos = tr_ptrArrayLowerBound (t, ptr, compare, NULL);
   ret = tr_ptrArrayInsert (t, ptr, pos);
 
-  assertSortedAndUnique (t, compare);
+  assertIndexIsSortedAndUnique (t, ret, compare);
   return ret;
 }
 
@@ -204,11 +220,13 @@ tr_ptrArrayRemoveSorted (tr_ptrArray * t,
                          const void  * ptr,
                          int           compare (const void*, const void*))
 {
+  int pos;
   bool match;
   void * ret = NULL;
-  const int pos = tr_ptrArrayLowerBound (t, ptr, compare, &match);
 
-  assertSortedAndUnique (t, compare);
+  assertArrayIsSortedAndUnique (t, compare);
+
+  pos = tr_ptrArrayLowerBound (t, ptr, compare, &match);
 
   if (match)
     {
@@ -217,7 +235,6 @@ tr_ptrArrayRemoveSorted (tr_ptrArray * t,
       tr_ptrArrayErase (t, pos, pos + 1);
     }
 
-  assertSortedAndUnique (t, compare);
   assert ((ret == NULL) || (compare (ret, ptr) == 0));
   return ret;
 }
