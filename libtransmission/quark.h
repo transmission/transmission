@@ -110,6 +110,7 @@ enum
   TR_KEY_error,
   TR_KEY_errorString,
   TR_KEY_eta,
+  TR_KEY_etaIdle,
   TR_KEY_failure_reason,
   TR_KEY_fields,
   TR_KEY_fileStats,

@@ -163,6 +163,7 @@
    error                       | number                      | tr_stat
    errorString                 | string                      | tr_stat
    eta                         | number                      | tr_stat
+   etaIdle                     | number                      | tr_stat
    files                       | array (see below)           | n/a
    fileStats                   | array (see below)           | n/a
    hashString                  | string                      | tr_info
@@ -715,3 +716,6 @@
          |         | yes       |                | new method "queue-move-down"
          |         | yes       |                | new method "queue-move-bottom"
          |         | yes       |                | new method "torrent-start-now"
+   ------+---------+-----------+----------------+-------------------------------
+   15    | 2.80    | yes       | torrent-get    | new arg "etaIdle"
+

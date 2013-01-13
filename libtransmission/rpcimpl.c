@@ -34,7 +34,7 @@
 #include "version.h"
 #include "web.h"
 
-#define RPC_VERSION     14
+#define RPC_VERSION     15
 #define RPC_VERSION_MIN 1
 
 #define RECENTLY_ACTIVE_SECONDS 60
@@ -758,6 +758,10 @@ addField (tr_torrent       * const tor,
 
       case TR_KEY_queuePosition:
         tr_variantDictAddInt (d, key, st->queuePosition);
+        break;
+
+      case TR_KEY_etaIdle:
+        tr_variantDictAddInt (d, key, st->etaIdle);
         break;
 
       case TR_KEY_rateDownload:
