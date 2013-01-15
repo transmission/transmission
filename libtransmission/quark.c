@@ -347,6 +347,7 @@ static const struct tr_key_struct my_static[] =
   { "torrent-complete-sound-enabled", 30 },
   { "torrent-get", 11 },
   { "torrent-set", 11 },
+  { "torrent-set-location", 20 },
   { "torrentCount", 12 },
   { "torrentFile", 11 },
   { "torrents", 8 },
