@@ -552,14 +552,20 @@ getEncodedMetainfo (const char * filename)
 }
 
 static void
-addIdArg (tr_variant * args, const char * id)
+addIdArg (tr_variant * args, const char * id, const char * fallback)
 {
-  if (!*id)
+  if (!id || !*id)
     {
-      fprintf (stderr, "No torrent specified!  Please use the -t option first.\n");
-      id = "-1"; /* no torrent will have this ID, so should be a no-op */
+      id = fallback;
+
+      if (!id || !*id)
+        {
+          fprintf (stderr, "No torrent specified!  Please use the -t option first.\n");
+          id = "-1"; /* no torrent will have this ID, so will act as a no-op */
+        }
     }
-  else if (!tr_strcmp0 (id, "active"))
+
+  if (!tr_strcmp0 (id, "active"))
     {
       tr_variantDictAddStr (args, TR_KEY_ids, "recently-active");
     }
@@ -1894,7 +1900,7 @@ processArgs (const char * rpcurl, int argc, const char ** argv)
                 case 'a': /* add torrent */
                     if (sset != 0) status |= flush (rpcurl, &sset);
                     if (tadd != 0) status |= flush (rpcurl, &tadd);
-                    if (tset != 0) { addIdArg (tr_variantDictFind (tset, ARGUMENTS), id); status |= flush (rpcurl, &tset); }
+                    if (tset != 0) { addIdArg (tr_variantDictFind (tset, ARGUMENTS), id, NULL); status |= flush (rpcurl, &tset); }
                     tadd = tr_new0 (tr_variant, 1);
                     tr_variantInitDict (tadd, 3);
                     tr_variantDictAddStr (tadd, TR_KEY_method, "torrent-add");
@@ -1931,7 +1937,7 @@ processArgs (const char * rpcurl, int argc, const char ** argv)
 
                 case 't': /* set current torrent */
                     if (tadd != 0) status |= flush (rpcurl, &tadd);
-                    if (tset != 0) { addIdArg (tr_variantDictFind (tset, ARGUMENTS), id); status |= flush (rpcurl, &tset); }
+                    if (tset != 0) { addIdArg (tr_variantDictFind (tset, ARGUMENTS), id, NULL); status |= flush (rpcurl, &tset); }
                     tr_strlcpy (id, optarg, sizeof (id));
                     break;
 
@@ -1973,37 +1979,37 @@ processArgs (const char * rpcurl, int argc, const char ** argv)
             args = tr_variantDictAddDict (top, ARGUMENTS, 0);
             fields = tr_variantDictAddList (args, TR_KEY_fields, 0);
 
-            if (tset != 0) { addIdArg (tr_variantDictFind (tset, ARGUMENTS), id); status |= flush (rpcurl, &tset); }
+            if (tset != 0) { addIdArg (tr_variantDictFind (tset, ARGUMENTS), id, NULL); status |= flush (rpcurl, &tset); }
 
             switch (c)
             {
                 case 'i': tr_variantDictAddInt (top, TR_KEY_tag, TAG_DETAILS);
                           n = TR_N_ELEMENTS (details_keys);
                           for (i=0; i<n; ++i) tr_variantListAddQuark (fields, details_keys[i]);
-                          addIdArg (args, id);
+                          addIdArg (args, id, NULL);
                           break;
                 case 'l': tr_variantDictAddInt (top, TR_KEY_tag, TAG_LIST);
                           n = TR_N_ELEMENTS (list_keys);
                           for (i=0; i<n; ++i) tr_variantListAddQuark (fields, list_keys[i]);
-                          addIdArg (args, id);
+                          addIdArg (args, id, "all");
                           break;
                 case 940: tr_variantDictAddInt (top, TR_KEY_tag, TAG_FILES);
                           n = TR_N_ELEMENTS (files_keys);
                           for (i=0; i<n; ++i) tr_variantListAddQuark (fields, files_keys[i]);
-                          addIdArg (args, id);
+                          addIdArg (args, id, NULL);
                           break;
                 case 941: tr_variantDictAddInt (top, TR_KEY_tag, TAG_PEERS);
                           tr_variantListAddStr (fields, "peers");
-                          addIdArg (args, id);
+                          addIdArg (args, id, NULL);
                           break;
                 case 942: tr_variantDictAddInt (top, TR_KEY_tag, TAG_PIECES);
                           tr_variantListAddStr (fields, "pieces");
                           tr_variantListAddStr (fields, "pieceCount");
-                          addIdArg (args, id);
+                          addIdArg (args, id, NULL);
                           break;
                 case 943: tr_variantDictAddInt (top, TR_KEY_tag, TAG_TRACKERS);
                           tr_variantListAddStr (fields, "trackerStats");
-                          addIdArg (args, id);
+                          addIdArg (args, id, NULL);
                           break;
                 default:  assert ("unhandled value" && 0);
             }
@@ -2212,7 +2218,7 @@ processArgs (const char * rpcurl, int argc, const char ** argv)
                 args = tr_variantDictAddDict (top, ARGUMENTS, 3);
                 tr_variantDictAddStr (args, TR_KEY_location, optarg);
                 tr_variantDictAddBool (args, TR_KEY_move, false);
-                addIdArg (args, id);
+                addIdArg (args, id, NULL);
                 status |= flush (rpcurl, &top);
                 break;
             }
@@ -2236,7 +2242,7 @@ processArgs (const char * rpcurl, int argc, const char ** argv)
                     tr_variant * top = tr_new0 (tr_variant, 1);
                     tr_variantInitDict (top, 2);
                     tr_variantDictAddStr (top, TR_KEY_method, "torrent-start");
-                    addIdArg (tr_variantDictAddDict (top, ARGUMENTS, 1), id);
+                    addIdArg (tr_variantDictAddDict (top, ARGUMENTS, 1), id, NULL);
                     status |= flush (rpcurl, &top);
                 }
                 break;
@@ -2249,7 +2255,7 @@ processArgs (const char * rpcurl, int argc, const char ** argv)
                     tr_variant * top = tr_new0 (tr_variant, 1);
                     tr_variantInitDict (top, 2);
                     tr_variantDictAddStr (top, TR_KEY_method, "torrent-stop");
-                    addIdArg (tr_variantDictAddDict (top, ARGUMENTS, 1), id);
+                    addIdArg (tr_variantDictAddDict (top, ARGUMENTS, 1), id, NULL);
                     status |= flush (rpcurl, &top);
                 }
                 break;
@@ -2303,22 +2309,22 @@ processArgs (const char * rpcurl, int argc, const char ** argv)
             case 600:
             {
                 tr_variant * top;
-                if (tset != 0) { addIdArg (tr_variantDictFind (tset, ARGUMENTS), id); status |= flush (rpcurl, &tset); }
+                if (tset != 0) { addIdArg (tr_variantDictFind (tset, ARGUMENTS), id, NULL); status |= flush (rpcurl, &tset); }
                 top = tr_new0 (tr_variant, 1);
                 tr_variantInitDict (top, 2);
                 tr_variantDictAddStr (top, TR_KEY_method, "torrent-reannounce");
-                addIdArg (tr_variantDictAddDict (top, ARGUMENTS, 1), id);
+                addIdArg (tr_variantDictAddDict (top, ARGUMENTS, 1), id, NULL);
                 status |= flush (rpcurl, &top);
                 break;
             }
             case 'v':
             {
                 tr_variant * top;
-                if (tset != 0) { addIdArg (tr_variantDictFind (tset, ARGUMENTS), id); status |= flush (rpcurl, &tset); }
+                if (tset != 0) { addIdArg (tr_variantDictFind (tset, ARGUMENTS), id, NULL); status |= flush (rpcurl, &tset); }
                 top = tr_new0 (tr_variant, 1);
                 tr_variantInitDict (top, 2);
                 tr_variantDictAddStr (top, TR_KEY_method, "torrent-verify");
-                addIdArg (tr_variantDictAddDict (top, ARGUMENTS, 1), id);
+                addIdArg (tr_variantDictAddDict (top, ARGUMENTS, 1), id, NULL);
                 status |= flush (rpcurl, &top);
                 break;
             }
@@ -2331,7 +2337,7 @@ processArgs (const char * rpcurl, int argc, const char ** argv)
                 tr_variantDictAddStr (top, TR_KEY_method, "torrent-remove");
                 args = tr_variantDictAddDict (top, ARGUMENTS, 2);
                 tr_variantDictAddBool (args, TR_KEY_delete_local_data, c=='R');
-                addIdArg (args, id);
+                addIdArg (args, id, NULL);
                 status |= flush (rpcurl, &top);
                 break;
             }
@@ -2344,7 +2350,7 @@ processArgs (const char * rpcurl, int argc, const char ** argv)
                 args = tr_variantDictAddDict (top, ARGUMENTS, 3);
                 tr_variantDictAddStr (args, TR_KEY_location, optarg);
                 tr_variantDictAddBool (args, TR_KEY_move, true);
-                addIdArg (args, id);
+                addIdArg (args, id, NULL);
                 status |= flush (rpcurl, &top);
                 break;
             }
@@ -2358,7 +2364,7 @@ processArgs (const char * rpcurl, int argc, const char ** argv)
     }
 
     if (tadd != 0) status |= flush (rpcurl, &tadd);
-    if (tset != 0) { addIdArg (tr_variantDictFind (tset, ARGUMENTS), id); status |= flush (rpcurl, &tset); }
+    if (tset != 0) { addIdArg (tr_variantDictFind (tset, ARGUMENTS), id, NULL); status |= flush (rpcurl, &tset); }
     if (sset != 0) status |= flush (rpcurl, &sset);
     return status;
 }
