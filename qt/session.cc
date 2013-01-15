@@ -485,7 +485,7 @@ Session :: torrentSetLocation( const QSet<int>& ids, const QString& location, bo
 {
   tr_variant top;
   tr_variantInitDict (&top, 2);
-  tr_variantDictAddQuark (&top, TR_KEY_method, TR_KEY_torrent_set);
+  tr_variantDictAddQuark (&top, TR_KEY_method, TR_KEY_torrent_set_location);
   tr_variant * args (tr_variantDictAddDict(&top, TR_KEY_arguments, 3));
   addOptionalIds (args, ids);
   tr_variantDictAddStr (args, TR_KEY_location, location.toUtf8().constData());
