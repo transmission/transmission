@@ -267,16 +267,14 @@ main (int argc, char ** argv)
   if (tr_variantDictFindStr (&settings, TR_KEY_download_dir, &str, NULL))
     {
       if (!tr_fileExists (str, NULL))
-        tr_mkdirp (str, 0700);
+        {
+          tr_mkdirp (str, 0700);
 
-      if (tr_fileExists (str, NULL))
-        {
-          tr_variantDictAddStr (&settings, TR_KEY_download_dir, str);
-        }
-      else
-        {
-          fprintf (stderr, "Unable to create download directory \"%s\"!\n", str);
-          return EXIT_FAILURE;
+          if (!tr_fileExists (str, NULL))
+            {
+              fprintf (stderr, "Unable to create download directory \"%s\"!\n", str);
+              return EXIT_FAILURE;
+            }
         }
     }
 
