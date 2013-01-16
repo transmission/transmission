@@ -267,16 +267,14 @@ main (int argc, char ** argv)
   if (tr_bencDictFindStr (&settings, TR_PREFS_KEY_DOWNLOAD_DIR, &str))
     {
       if (!tr_fileExists (str, NULL))
-        tr_mkdirp (str, 0700);
+        {
+          tr_mkdirp (str, 0700);
 
-      if (tr_fileExists (str, NULL))
-        {
-          tr_bencDictAddStr (&settings, TR_PREFS_KEY_DOWNLOAD_DIR, str);
-        }
-      else
-        {
-          fprintf (stderr, "Unable to create download directory \"%s\"!\n", str);
-          return EXIT_FAILURE;
+          if (!tr_fileExists (str, NULL))
+            {
+              fprintf (stderr, "Unable to create download directory \"%s\"!\n", str);
+              return EXIT_FAILURE;
+            }
         }
     }
 
