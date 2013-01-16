@@ -256,34 +256,52 @@ target_cb (GtkWidget * tb, gpointer target)
 ****/
 
 static GtkWidget*
-downloadPage (GObject * core)
+downloadingPage (GObject * core)
 {
-    GtkWidget * t;
-    GtkWidget * w;
-    GtkWidget * l;
-    const char * s;
-    guint row = 0;
+  GtkWidget * t;
+  GtkWidget * w;
+  GtkWidget * l;
+  const char * s;
+  guint row = 0;
 
-    t = hig_workarea_create ();
+  t = hig_workarea_create ();
+  hig_workarea_add_section_title (t, &row, C_("Gerund", "Adding"));
 
-    hig_workarea_add_section_title (t, &row, _("Location"));
+    s = _("Automatically add .torrent files _from:");
+    l = new_check_button (s, TR_KEY_watch_dir_enabled, core);
+    w = new_path_chooser_button (TR_KEY_watch_dir, core);
+    gtk_widget_set_sensitive (GTK_WIDGET (w), gtr_pref_flag_get (TR_KEY_watch_dir_enabled));
+    g_signal_connect (l, "toggled", G_CALLBACK (target_cb), w);
+    hig_workarea_add_row_w (t, &row, l, w, NULL);
+
+    s = _("Show the Torrent Options _dialog");
+    w = new_check_button (s, TR_KEY_show_options_window, core);
+    hig_workarea_add_wide_control (t, &row, w);
+
+    s = _("_Start added torrents");
+    w = new_check_button (s, TR_KEY_start_added_torrents, core);
+    hig_workarea_add_wide_control (t, &row, w);
+
+    s = _("Mo_ve .torrent file to the trash");
+    w = new_check_button (s, TR_KEY_trash_original_torrent_files, core);
+    hig_workarea_add_wide_control (t, &row, w);
 
     w = new_path_chooser_button (TR_KEY_download_dir, core);
     hig_workarea_add_row (t, &row, _("Save to _Location:"), w, NULL);
 
-    hig_workarea_add_section_divider (t, &row);
-    hig_workarea_add_section_title (t, &row, _("Queue"));
+  hig_workarea_add_section_divider (t, &row);
+  hig_workarea_add_section_title (t, &row, _("Download Queue"));
 
-    s = _("Maximum active _downloads:");
+    s = _("Ma_ximum active downloads:");
     w = new_spin_button (TR_KEY_download_queue_size, core, 0, INT_MAX, 1);
     hig_workarea_add_row (t, &row, s, w, NULL);
 
-    s = _("Downloads sharing data in the last N minutes are _active:");
+    s = _("Downloads sharing data in the last _N minutes are active:");
     w = new_spin_button (TR_KEY_queue_stalled_minutes, core, 1, INT_MAX, 15);
     hig_workarea_add_row (t, &row, s, w, NULL);
 
-    hig_workarea_add_section_divider (t, &row);
-    hig_workarea_add_section_title (t, &row, _("Incomplete"));
+  hig_workarea_add_section_divider (t, &row);
+  hig_workarea_add_section_title (t, &row, _("Incomplete"));
 
     s = _("Append \"._part\" to incomplete files' names");
     w = new_check_button (s, TR_KEY_rename_partial_files, core);
@@ -296,14 +314,14 @@ downloadPage (GObject * core)
     g_signal_connect (l, "toggled", G_CALLBACK (target_cb), w);
     hig_workarea_add_row_w (t, &row, l, w, NULL);
 
-    s = _("Call _script when torrent is completed:");
+    s = _("Call scrip_t when torrent is completed:");
     l = new_check_button (s, TR_KEY_script_torrent_done_enabled, core);
     w = new_file_chooser_button (TR_KEY_script_torrent_done_filename, core);
     gtk_widget_set_sensitive (GTK_WIDGET (w), gtr_pref_flag_get (TR_KEY_script_torrent_done_enabled));
     g_signal_connect (l, "toggled", G_CALLBACK (target_cb), w);
     hig_workarea_add_row_w (t, &row, l, w, NULL);
 
-    return t;
+  return t;
 }
 
 /****
@@ -311,39 +329,16 @@ downloadPage (GObject * core)
 ****/
 
 static GtkWidget*
-torrentPage (GObject * core)
+seedingPage (GObject * core)
 {
-    const char * s;
-    GtkWidget *  t;
-    GtkWidget *  w;
-    GtkWidget *  w2;
-    GtkWidget *  l;
-    guint row = 0;
+  GtkWidget * t;
+  GtkWidget * w;
+  GtkWidget * w2;
+  const char * s;
+  guint row = 0;
 
-    t = hig_workarea_create ();
-    hig_workarea_add_section_title (t, &row, C_("Gerund", "Adding"));
-
-    s = _("_Start when added");
-    w = new_check_button (s, TR_KEY_start_added_torrents, core);
-    hig_workarea_add_wide_control (t, &row, w);
-
-    s = _("Show _options dialog");
-    w = new_check_button (s, TR_KEY_show_options_window, core);
-    hig_workarea_add_wide_control (t, &row, w);
-
-    s = _("Mo_ve .torrent file to the trash");
-    w = new_check_button (s, TR_KEY_trash_original_torrent_files, core);
-    hig_workarea_add_wide_control (t, &row, w);
-
-    s = _("Automatically _add torrents from:");
-    l = new_check_button (s, TR_KEY_watch_dir_enabled, core);
-    w = new_path_chooser_button (TR_KEY_watch_dir, core);
-    gtk_widget_set_sensitive (GTK_WIDGET (w), gtr_pref_flag_get (TR_KEY_watch_dir_enabled));
-    g_signal_connect (l, "toggled", G_CALLBACK (target_cb), w);
-    hig_workarea_add_row_w (t, &row, l, w, NULL);
-
-    hig_workarea_add_section_divider (t, &row);
-    hig_workarea_add_section_title (t, &row, C_("Gerund", "Seeding"));
+  t = hig_workarea_create ();
+  hig_workarea_add_section_title (t, &row, _("Limits"));
 
     s = _("Stop seeding at _ratio:");
     w = new_check_button (s, TR_KEY_ratio_limit_enabled, core);
@@ -359,7 +354,7 @@ torrentPage (GObject * core)
     g_signal_connect (w, "toggled", G_CALLBACK (target_cb), w2);
     hig_workarea_add_row_w (t, &row, w, w2, NULL);
 
-    return t;
+  return t;
 }
 
 /****
@@ -519,20 +514,27 @@ new_encryption_combo (GObject * core, const tr_quark key)
 static GtkWidget*
 privacyPage (GObject * core)
 {
-    const char * s;
-    GtkWidget * t;
-    GtkWidget * w;
-    GtkWidget * b;
-    GtkWidget * h;
-    GtkWidget * e;
-    struct blocklist_data * data;
-    guint row = 0;
+  const char * s;
+  GtkWidget * t;
+  GtkWidget * w;
+  GtkWidget * b;
+  GtkWidget * h;
+  GtkWidget * e;
+  struct blocklist_data * data;
+  guint row = 0;
 
-    data = g_new0 (struct blocklist_data, 1);
-    data->core = TR_CORE (core);
+  data = g_new0 (struct blocklist_data, 1);
+  data->core = TR_CORE (core);
 
-    t = hig_workarea_create ();
-    hig_workarea_add_section_title (t, &row, _("Blocklist"));
+  t = hig_workarea_create ();
+  hig_workarea_add_section_title (t, &row, _("Privacy"));
+
+    s = _("_Encryption mode:");
+    w = new_encryption_combo (core, TR_KEY_encryption);
+    hig_workarea_add_row (t, &row, s, w, NULL);
+
+  hig_workarea_add_section_divider (t, &row);
+  hig_workarea_add_section_title (t, &row, _("Blocklist"));
 
     b = new_check_button (_("Enable _blocklist:"), TR_KEY_blocklist_enabled, core);
     e = new_entry (TR_KEY_blocklist_url, core);
@@ -563,37 +565,12 @@ privacyPage (GObject * core)
     hig_workarea_add_wide_control (t, &row, w);
     g_signal_connect (data->check, "toggled", G_CALLBACK (target_cb), w); target_cb (data->check, w);
 
-    hig_workarea_add_section_divider (t, &row);
-    hig_workarea_add_section_title (t, &row, _("Privacy"));
-
-    s = _("_Encryption mode:");
-    w = new_encryption_combo (core, TR_KEY_encryption);
-    hig_workarea_add_row (t, &row, s, w, NULL);
-
-    s = _("Use PE_X to find more peers");
-    w = new_check_button (s, TR_KEY_pex_enabled, core);
-    s = _("PEX is a tool for exchanging peer lists with the peers you're connected to.");
-    gtk_widget_set_tooltip_text (w, s);
-    hig_workarea_add_wide_control (t, &row, w);
-
-    s = _("Use _DHT to find more peers");
-    w = new_check_button (s, TR_KEY_dht_enabled, core);
-    s = _("DHT is a tool for finding peers without a tracker.");
-    gtk_widget_set_tooltip_text (w, s);
-    hig_workarea_add_wide_control (t, &row, w);
-
-    s = _("Use _Local Peer Discovery to find more peers");
-    w = new_check_button (s, TR_KEY_lpd_enabled, core);
-    s = _("LPD is a tool for finding peers on your local network.");
-    gtk_widget_set_tooltip_text (w, s);
-    hig_workarea_add_wide_control (t, &row, w);
-
-    g_object_weak_ref (G_OBJECT (t), privacyPageDestroyed, data);
-    return t;
+  g_object_weak_ref (G_OBJECT (t), privacyPageDestroyed, data);
+  return t;
 }
 
 /****
-*****  Web Tab
+*****  Remote Tab
 ****/
 
 enum
@@ -787,7 +764,7 @@ remotePageFree (gpointer gpage)
 }
 
 static GtkWidget*
-webPage (GObject * core)
+remotePage (GObject * core)
 {
     GtkWidget * t;
     GtkWidget * w;
@@ -801,10 +778,10 @@ webPage (GObject * core)
     t = hig_workarea_create ();
     g_object_set_data_full (G_OBJECT (t), "page", page, remotePageFree);
 
-    hig_workarea_add_section_title (t, &row, _("Web Client"));
+    hig_workarea_add_section_title (t, &row, _("Remote Control"));
 
     /* "enabled" checkbutton */
-    s = _("_Enable web client");
+    s = _("Allow _remote access");
     w = new_check_button (s, TR_KEY_rpc_enabled, core);
     page->rpc_tb = GTK_TOGGLE_BUTTON (w);
     g_signal_connect (w, "clicked", G_CALLBACK (onRPCToggled), page);
@@ -846,7 +823,7 @@ webPage (GObject * core)
     page->auth_widgets = g_slist_prepend (page->auth_widgets, w);
 
     /* require authentication */
-    s = _("Only allow these IP a_ddresses to connect:");
+    s = _("Only allow these IP a_ddresses:");
     w = new_check_button (s, TR_KEY_rpc_whitelist_enabled, core);
     hig_workarea_add_wide_control (t, &row, w);
     page->whitelist_tb = GTK_TOGGLE_BUTTON (w);
@@ -1023,7 +1000,7 @@ new_week_combo (GObject * core, const tr_quark key)
 }
 
 static void
-bandwidthPageFree (gpointer gpage)
+speedPageFree (gpointer gpage)
 {
     struct BandwidthPage * page = gpage;
 
@@ -1032,7 +1009,7 @@ bandwidthPageFree (gpointer gpage)
 }
 
 static GtkWidget*
-bandwidthPage (GObject * core)
+speedPage (GObject * core)
 {
     const char * s;
     GtkWidget * t;
@@ -1063,12 +1040,12 @@ bandwidthPage (GObject * core)
 
     hig_workarea_add_section_divider (t, &row);
     h = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, GUI_PAD);
-    w = gtk_image_new_from_stock ("alt-speed-on", -1);
-    gtk_box_pack_start (GTK_BOX (h), w, FALSE, FALSE, 0);
     g_snprintf (buf, sizeof (buf), "<b>%s</b>", _("Alternative Speed Limits"));
     w = gtk_label_new (buf);
     gtk_misc_set_alignment (GTK_MISC (w), 0.0f, 0.5f);
     gtk_label_set_use_markup (GTK_LABEL (w), TRUE);
+    gtk_box_pack_start (GTK_BOX (h), w, FALSE, FALSE, 0);
+    w = gtk_image_new_from_stock ("alt-speed-on", -1);
     gtk_box_pack_start (GTK_BOX (h), w, FALSE, FALSE, 0);
     hig_workarea_add_section_title_widget (t, &row, h);
 
@@ -1076,7 +1053,7 @@ bandwidthPage (GObject * core)
         g_snprintf (buf, sizeof (buf), "<small>%s</small>", s);
         w = gtk_label_new (buf);
         gtk_label_set_use_markup (GTK_LABEL (w), TRUE);
-        gtk_misc_set_alignment (GTK_MISC (w), 0.5f, 0.5f);
+        gtk_misc_set_alignment (GTK_MISC (w), 0.0f, 0.5f);
         hig_workarea_add_wide_control (t, &row, w);
 
         g_snprintf (buf, sizeof (buf), _("U_pload (%s):"), _ (speed_K_str));
@@ -1109,7 +1086,7 @@ bandwidthPage (GObject * core)
         w = hig_workarea_add_row (t, &row, s, w, NULL);
         page->sched_widgets = g_slist_prepend (page->sched_widgets, w);
 
-    g_object_set_data_full (G_OBJECT (t), "page", page, bandwidthPageFree);
+    g_object_set_data_full (G_OBJECT (t), "page", page, speedPageFree);
 
     refreshSchedSensitivity (page);
     return t;
@@ -1240,6 +1217,24 @@ networkPage (GObject * core)
   hig_workarea_add_wide_control (t, &row, w);
 #endif
 
+  s = _("Use PE_X to find more peers");
+  w = new_check_button (s, TR_KEY_pex_enabled, core);
+  s = _("PEX is a tool for exchanging peer lists with the peers you're connected to.");
+  gtk_widget_set_tooltip_text (w, s);
+  hig_workarea_add_wide_control (t, &row, w);
+
+  s = _("Use _DHT to find more peers");
+  w = new_check_button (s, TR_KEY_dht_enabled, core);
+  s = _("DHT is a tool for finding peers without a tracker.");
+  gtk_widget_set_tooltip_text (w, s);
+  hig_workarea_add_wide_control (t, &row, w);
+
+  s = _("Use _Local Peer Discovery to find more peers");
+  w = new_check_button (s, TR_KEY_lpd_enabled, core);
+  s = _("LPD is a tool for finding peers on your local network.");
+  gtk_widget_set_tooltip_text (w, s);
+  hig_workarea_add_wide_control (t, &row, w);
+
   return t;
 }
 
@@ -1265,30 +1260,23 @@ gtr_prefs_dialog_new (GtkWindow * parent, GObject * core)
   n = gtk_notebook_new ();
   gtk_container_set_border_width (GTK_CONTAINER (n), GUI_PAD);
 
-  gtk_notebook_append_page (GTK_NOTEBOOK (n),
-                            torrentPage (core),
-                            gtk_label_new (_("Torrents")));
-  gtk_notebook_append_page (GTK_NOTEBOOK (n),
-                            downloadPage (core),
+  gtk_notebook_append_page (GTK_NOTEBOOK (n), speedPage (core),
+                            gtk_label_new (_("Speed")));
+  gtk_notebook_append_page (GTK_NOTEBOOK (n), downloadingPage (core),
                             gtk_label_new (C_("Gerund", "Downloading")));
-    gtk_notebook_append_page (GTK_NOTEBOOK (n),
-                              bandwidthPage (core),
-                              gtk_label_new (_("Speed")));
-    gtk_notebook_append_page (GTK_NOTEBOOK (n),
-                              privacyPage (core),
-                              gtk_label_new (_("Privacy")));
-    gtk_notebook_append_page (GTK_NOTEBOOK (n),
-                              networkPage (core),
-                              gtk_label_new (_("Network")));
-    gtk_notebook_append_page (GTK_NOTEBOOK (n),
-                              desktopPage (core),
-                              gtk_label_new (_("Desktop")));
-    gtk_notebook_append_page (GTK_NOTEBOOK (n),
-                              webPage (core),
-                              gtk_label_new (_("Web")));
+  gtk_notebook_append_page (GTK_NOTEBOOK (n), seedingPage (core),
+                            gtk_label_new (C_("Gerund", "Seeding")));
+  gtk_notebook_append_page (GTK_NOTEBOOK (n), privacyPage (core),
+                            gtk_label_new (_("Privacy")));
+  gtk_notebook_append_page (GTK_NOTEBOOK (n), networkPage (core),
+                            gtk_label_new (_("Network")));
+  gtk_notebook_append_page (GTK_NOTEBOOK (n), desktopPage (core),
+                            gtk_label_new (_("Desktop")));
+  gtk_notebook_append_page (GTK_NOTEBOOK (n), remotePage (core),
+                            gtk_label_new (_("Remote")));
 
-    g_signal_connect (d, "response", G_CALLBACK (response_cb), core);
-    gtr_dialog_set_content (GTK_DIALOG (d), n);
-    return d;
+  g_signal_connect (d, "response", G_CALLBACK (response_cb), core);
+  gtr_dialog_set_content (GTK_DIALOG (d), n);
+  return d;
 }
 

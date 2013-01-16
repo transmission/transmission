@@ -77,13 +77,13 @@ class PrefsDialog: public QDialog
     private:
         void setPref( int key, const QVariant& v );
         bool isAllowed( int key ) const;
-        QWidget * createTorrentsTab( );
-        QWidget * createDownloadTab( );
+        QWidget * createDownloadingTab( );
+        QWidget * createSeedingTab( );
         QWidget * createSpeedTab( );
         QWidget * createPrivacyTab( );
         QWidget * createNetworkTab( );
         QWidget * createDesktopTab( );
-        QWidget * createWebTab( Session& );
+        QWidget * createRemoteTab( Session& );
 
     private:
         typedef QMap<int,QWidget*> key2widget_t;
