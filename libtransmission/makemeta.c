@@ -162,13 +162,22 @@ tr_metaInfoBuilderCreate (const char * topFileArg)
            sizeof (tr_metainfo_builder_file),
            builderFileCompare);
 
-    ret->pieceSize = bestPieceSize (ret->totalSize);
-    ret->pieceCount = (int)(ret->totalSize / ret->pieceSize);
-    if (ret->totalSize % ret->pieceSize)
-        ++ret->pieceCount;
+    tr_metaInfoBuilderSetPieceSize (ret, bestPieceSize (ret->totalSize));
 
     return ret;
 }
+
+void
+tr_metaInfoBuilderSetPieceSize (tr_metainfo_builder * b,
+                                uint32_t              bytes)
+{
+  b->pieceSize = bytes;
+
+  b->pieceCount = (int)(b->totalSize / b->pieceSize);
+  if (b->totalSize % b->pieceSize)
+    ++b->pieceCount;
+}
+
 
 void
 tr_metaInfoBuilderFree (tr_metainfo_builder * builder)

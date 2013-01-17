@@ -12,6 +12,7 @@
 .Op Fl o Ar file
 .Op Fl c Ar comment
 .Op Fl t Ar tracker
+.Op Fl s Ar piece-size-KiB
 .Op Ar source file or directory
 .Ek
 .Sh DESCRIPTION
@@ -27,6 +28,8 @@ Save the generated .torrent to this filename.
 Flag the torrent as intended for use on private trackers.
 .It Fl c Fl -comment
 Add a comment to the torrent file.
+.It Fl s Fl -piecesize
+Set how many KiB each piece should be, overriding the preferred default
 .It Fl t Fl -tracker
 Add a tracker's
 .Ar announce URL
