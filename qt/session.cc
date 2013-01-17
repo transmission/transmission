@@ -969,12 +969,13 @@ void
 Session :: addNewlyCreatedTorrent( const QString& filename, const QString& localPath )
 {
     const QByteArray b64 = AddData(filename).toBase64();
+    const QByteArray localPathUtf8 = localPath.toUtf8();
 
     tr_variant top, *args;
     tr_variantInitDict( &top, 2 );
     tr_variantDictAddStr( &top, TR_KEY_method, "torrent-add" );
     args = tr_variantDictAddDict( &top, TR_KEY_arguments, 3 );
-    tr_variantDictAddStr( args, TR_KEY_download_dir, qPrintable(localPath) );
+    tr_variantDictAddStr( args, TR_KEY_download_dir, localPathUtf8.constData() );
     tr_variantDictAddBool( args, TR_KEY_paused, !myPrefs.getBool( Prefs::START ) );
     tr_variantDictAddRaw( args, TR_KEY_metainfo, b64.constData(), b64.size() );
     exec( &top );
