@@ -93,7 +93,7 @@ enum
     MINIMUM_RECONNECT_INTERVAL_SECS = 5,
 
     /** how long we'll let requests we've made linger before we cancel them */
-    REQUEST_TTL_SECS = 120,
+    REQUEST_TTL_SECS = 90,
 
     NO_BLOCKS_CANCEL_HISTORY = 120,
 
@@ -3293,36 +3293,39 @@ getPeersToClose (Torrent * t, const time_t now_sec, int * setmeSize)
 static int
 getReconnectIntervalSecs (const struct peer_atom * atom, const time_t now)
 {
-    int sec;
+  int sec;
+  const bool unreachable = (atom->flags2 & MYFLAG_UNREACHABLE) != 0;
 
-    /* if we were recently connected to this peer and transferring piece
-     * data, try to reconnect to them sooner rather that later -- we don't
-     * want network troubles to get in the way of a good peer. */
-    if ((now - atom->piece_data_time) <= (MINIMUM_RECONNECT_INTERVAL_SECS * 2))
-        sec = MINIMUM_RECONNECT_INTERVAL_SECS;
+  /* if we were recently connected to this peer and transferring piece
+   * data, try to reconnect to them sooner rather that later -- we don't
+   * want network troubles to get in the way of a good peer. */
+  if (!unreachable && ((now - atom->piece_data_time) <= (MINIMUM_RECONNECT_INTERVAL_SECS * 2)))
+    sec = MINIMUM_RECONNECT_INTERVAL_SECS;
 
-    /* don't allow reconnects more often than our minimum */
-    else if ((now - atom->time) < MINIMUM_RECONNECT_INTERVAL_SECS)
-        sec = MINIMUM_RECONNECT_INTERVAL_SECS;
+  /* otherwise, the interval depends on how many times we've tried
+   * and failed to connect to the peer */
+  else
+    {
+      int step = atom->numFails;
 
-    /* otherwise, the interval depends on how many times we've tried
-     * and failed to connect to the peer */
-    else switch (atom->numFails) {
-        case 0: sec = 0; break;
-        case 1: sec = 5; break;
-        case 2: sec = 2 * 60; break;
-        case 3: sec = 15 * 60; break;
-        case 4: sec = 30 * 60; break;
-        case 5: sec = 60 * 60; break;
-        default: sec = 120 * 60; break;
+      /* penalize peers that were unreachable the last time we tried */
+      if (unreachable)
+        step += 2;
+ 
+      switch (step)
+        {
+          case 0: sec = 0; break;
+          case 1: sec = 10; break;
+          case 2: sec = 60 * 2; break;
+          case 3: sec = 60 * 15; break;
+          case 4: sec = 60 * 30; break;
+          case 5: sec = 60 * 60; break;
+          default: sec = 60 * 120; break;
+        }
     }
 
-    /* penalize peers that were unreachable the last time we tried */
-    if (atom->flags2 & MYFLAG_UNREACHABLE)
-        sec += sec;
-
-    dbgmsg ("reconnect interval for %s is %d seconds", tr_atomAddrStr (atom), sec);
-    return sec;
+  dbgmsg ("reconnect interval for %s is %d seconds", tr_atomAddrStr (atom), sec);
+  return sec;
 }
 
 static void
