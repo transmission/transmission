@@ -284,18 +284,6 @@ tr_open_file_for_scanning (const char * filename)
 void
 tr_close_file (int fd)
 {
-#if defined (HAVE_POSIX_FADVISE)
-  /* Set hint about not caching this file.
-     It's okay for this to fail silently, so don't let it affect errno */
-  const int err = errno;
-  posix_fadvise (fd, 0, 0, POSIX_FADV_DONTNEED);
-  errno = err;
-#endif
-#ifdef SYS_DARWIN
-  /* it's unclear to me from the man pages if this actually flushes out the cache,
-   * but it couldn't hurt... */
-  fcntl (fd, F_NOCACHE, 1);
-#endif
   close (fd);
 }
 
