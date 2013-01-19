@@ -777,6 +777,105 @@ onViewButtonPressed (GtkWidget * w, GdkEventButton * event, gpointer gdata)
     return handled;
 }
 
+struct rename_data
+{
+  int error;
+  char * newname;
+  char * path_string;
+  FileData * file_data;
+};
+
+static int
+on_rename_done_idle (struct rename_data * data)
+{
+  if (data->error == 0)
+    {
+      GtkTreeIter iter;
+
+      if (gtk_tree_model_get_iter_from_string (data->file_data->model, &iter, data->path_string))
+        gtk_tree_store_set (data->file_data->store, &iter, FC_LABEL, data->newname, -1);
+    }
+  else
+    {
+      GtkWidget * w = gtk_message_dialog_new (
+        GTK_WINDOW (gtk_widget_get_toplevel(data->file_data->top)),
+        GTK_DIALOG_MODAL,
+        GTK_MESSAGE_ERROR,
+        GTK_BUTTONS_CLOSE,
+        _("Unable to rename file as \"%s\": %s"),
+        data->newname,
+        tr_strerror(data->error));
+      gtk_message_dialog_format_secondary_text (
+        GTK_MESSAGE_DIALOG (w), "%s",
+        _("Please correct the errors and try again."));
+      gtk_dialog_run (GTK_DIALOG (w));
+      gtk_widget_destroy (w);
+    }
+
+  /* cleanup */
+  g_free (data->path_string);
+  g_free (data->newname);
+  g_free (data);
+  return G_SOURCE_REMOVE;
+}
+
+static void
+on_rename_done (tr_torrent          * tor          G_GNUC_UNUSED,
+                const char          * oldpath      G_GNUC_UNUSED,
+                const char          * newname      G_GNUC_UNUSED,
+                int                   error,
+                struct rename_data  * rename_data)
+{
+  rename_data->error = error;
+  gdk_threads_add_idle ((GSourceFunc)on_rename_done_idle, rename_data);
+}
+
+static void
+cell_edited_callback (GtkCellRendererText * cell G_GNUC_UNUSED,
+                      gchar               * path_string,
+                      gchar               * newname,
+                      FileData            * data)
+{
+  tr_torrent * tor;
+  GString * oldpath;
+  GtkTreeIter iter;
+  struct rename_data * rename_data;
+
+  tor = gtr_core_find_torrent (data->core, data->torrentId);
+  if (tor == NULL)
+    return;
+  if (!gtk_tree_model_get_iter_from_string (data->model, &iter, path_string))
+    return;
+
+  /* build oldpath */
+  oldpath = g_string_new (NULL);
+  for (;;)
+    {
+      char * token = NULL;
+      GtkTreeIter child;
+      gtk_tree_model_get (data->model, &iter, FC_LABEL, &token, -1);
+      g_string_prepend (oldpath, token);
+      g_free (token);
+
+      child = iter;
+      if (!gtk_tree_model_iter_parent (data->model, &iter, &child))
+        break;
+
+      g_string_prepend_c (oldpath, G_DIR_SEPARATOR);
+    }
+
+  /* do the renaming */
+  rename_data = g_new0 (struct rename_data, 1);
+  rename_data->newname = g_strdup (newname);
+  rename_data->file_data = data;
+  rename_data->path_string = g_strdup (path_string);
+  tr_torrentRenamePath (tor, oldpath->str, newname, (tr_torrent_rename_done_func*)on_rename_done, rename_data);
+
+  /* cleanup */
+  g_string_free (oldpath, TRUE);
+}
+
+
 GtkWidget *
 gtr_file_list_new (TrCore * core, int torrentId)
 {
@@ -833,7 +932,9 @@ gtr_file_list_new (TrCore * core, int torrentId)
     gtk_tree_view_column_add_attribute (col, rend, "pixbuf", FC_ICON);
     /* add text renderer */
     rend = gtk_cell_renderer_text_new ();
+    g_object_set (rend, "editable", TRUE, NULL);
     g_object_set (rend, "ellipsize", PANGO_ELLIPSIZE_END, "font-desc", pango_font_description, NULL);
+    g_signal_connect (rend, "edited", (GCallback)cell_edited_callback, data);
     gtk_tree_view_column_pack_start (col, rend, TRUE);
     gtk_tree_view_column_set_attributes (col, rend, "text", FC_LABEL, NULL);
     gtk_tree_view_column_set_sort_column_id (col, FC_LABEL);
