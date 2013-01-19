@@ -406,13 +406,32 @@
 
    Request arguments:
 
-   string                     | value type & description
-   ---------------------------+-------------------------------------------------
-   "ids"                      | array      torrent list, as described in 3.1
-   "location"                 | string     the new torrent location
-   "move"                     | boolean    if true, move from previous location.
-                              |            otherwise, search "location" for files
-                              |            (default: false)
+   string                           | value type & description
+   ---------------------------------+-------------------------------------------------
+   "ids"                            | array      torrent list, as described in 3.1
+   "location"                       | string     the new torrent location
+   "move"                           | boolean    if true, move from previous location.
+                                    |            otherwise, search "location" for files
+                                    |            (default: false)
+
+   Response arguments: none
+
+
+3.7.  Renaming a Torrent's Path
+
+   Method name: "torrent-rename-path"
+
+   For more information on the use of this function, see the
+   transmission.h documentation of tr_torrentRenamePath()
+
+   Request arguments:
+
+   string                           | value type & description
+   ---------------------------------+-------------------------------------------------
+   "ids"                            | array      the torrent torrent list, as described in 3.1
+                                    |            (though, this function doesn't make sense for >1 torrent)
+   "path"                           | string     the path to the file or folder that will be renamed
+   "name"                           | string     the file or folder's new name
 
    Response arguments: none
 
@@ -581,141 +600,142 @@
 
   The following changes have been made to the RPC interface:
 
-   RPC   | Release | Backwards |                |
-   Vers. | Version | Compat?   | Method         | Description
-   ------+---------+-----------+----------------+-------------------------------
-   1     | 1.30    | n/a       | n/a            | Initial version
-   ------+---------+-----------+----------------+-------------------------------
-   2     | 1.34    | yes       | torrent-get    | new arg "peers"
-   ------+---------+-----------+----------------+-------------------------------
-   3     | 1.41    | yes       | torrent-get    | added "port" to "peers"
-         |         | yes       | torrent-get    | new arg "downloaders"
-         |         | yes       | session-get    | new arg "version"
-         |         | yes       | torrent-remove | new method
-   ------+---------+-----------+----------------+-------------------------------
-   4     | 1.50    | yes       | session-get    | new arg "rpc-version"
-         |         | yes       | session-get    | new arg "rpc-version-minimum"
-         |         | yes       | session-stats  | added "cumulative-stats"
-         |         | yes       | session-stats  | added "current-stats"
-         |         | yes       | torrent-get    | new arg "downloadDir"
-   ------+---------+-----------+----------------+-------------------------------
-   5     | 1.60    | yes       |                | new method "torrent-reannounce"
-         |         | yes       |                | new method "blocklist-update"
-         |         | yes       |                | new method "port-test"
-         |         |           |                |
-         |         | yes       | session-get    | new arg "alt-speed-begin"
-         |         | yes       | session-get    | new arg "alt-speed-down"
-         |         | yes       | session-get    | new arg "alt-speed-enabled"
-         |         | yes       | session-get    | new arg "alt-speed-end"
-         |         | yes       | session-get    | new arg "alt-speed-time-enabled"
-         |         | yes       | session-get    | new arg "alt-speed-up"
-         |         | yes       | session-get    | new arg "blocklist-enabled"
-         |         | yes       | session-get    | new arg "blocklist-size"
-         |         | yes       | session-get    | new arg "peer-limit-per-torrent"
-         |         | yes       | session-get    | new arg "seedRatioLimit"
-         |         | yes       | session-get    | new arg "seedRatioLimited"
-         |         |        NO | session-get    | renamed "pex-allowed" to "pex-enabled"
-         |         |        NO | session-get    | renamed "port" to "peer-port"
-         |         |        NO | session-get    | renamed "peer-limit" to "peer-limit-global"
-         |         |           |                |
-         |         | yes       | torrent-add    | new arg "files-unwanted"
-         |         | yes       | torrent-add    | new arg "files-wanted"
-         |         | yes       | torrent-add    | new arg "priority-high"
-         |         | yes       | torrent-add    | new arg "priority-low"
-         |         | yes       | torrent-add    | new arg "priority-normal"
-         |         |           |                |
-         |         | yes       | torrent-set    | new arg "bandwidthPriority"
-         |         | yes       | torrent-set    | new arg "honorsSessionLimits"
-         |         | yes       | torrent-set    | new arg "seedRatioLimit" 
-         |         | yes       | torrent-set    | new arg "seedRatioLimited" 
-         |         |        NO | torrent-set    | renamed "speed-limit-down" to "downloadLimit" 
-         |         |        NO | torrent-set    | renamed "speed-limit-down-enabled" to "downloadLimited" 
-         |         |        NO | torrent-set    | renamed "speed-limit-up" to "uploadLimit" 
-         |         |        NO | torrent-set    | renamed "speed-limit-up-enabled" to "uploadLimited" 
-         |         |           |                |
-         |         | yes       | torrent-get    | new arg "bandwidthPriority"
-         |         | yes       | torrent-get    | new arg "fileStats"
-         |         | yes       | torrent-get    | new arg "honorsSessionLimits"
-         |         | yes       | torrent-get    | new arg "percentDone"
-         |         | yes       | torrent-get    | new arg "pieces"
-         |         | yes       | torrent-get    | new arg "seedRatioLimit"
-         |         | yes       | torrent-get    | new arg "seedRatioMode"
-         |         | yes       | torrent-get    | new arg "torrentFile"
-         |         | yes       | torrent-get    | new ids option "recently-active"
-         |         |        NO | torrent-get    | removed arg "downloadLimitMode"
-         |         |        NO | torrent-get    | removed arg "uploadLimitMode"
-   ------+---------+-----------+----------------+-------------------------------
-   6     | 1.70    | yes       |                | new "method torrent-set-location"
-   ------+---------+-----------+----------------+-------------------------------
-   7     | 1.80    |        NO | torrent-get    | removed arg "announceResponse"
-         |         |        NO | torrent-get    | removed arg "announceURL"
-         |         |        NO | torrent-get    | removed arg "downloaders"
-         |         |        NO | torrent-get    | removed arg "lastAnnounceTime"
-         |         |        NO | torrent-get    | removed arg "lastScrapeTime"
-         |         |        NO | torrent-get    | removed arg "leechers"
-         |         |        NO | torrent-get    | removed arg "nextAnnounceTime"
-         |         |        NO | torrent-get    | removed arg "nextScrapeTime"
-         |         |        NO | torrent-get    | removed arg "scrapeResponse"
-         |         |        NO | torrent-get    | removed arg "scrapeURL"
-         |         |        NO | torrent-get    | removed arg "seeders"
-         |         |        NO | torrent-get    | removed arg "timesCompleted"
-         |         |        NO | torrent-get    | removed arg "swarmSpeed"
-         |         | yes       | torrent-get    | new arg "magnetLink"
-         |         | yes       | torrent-get    | new arg "metadataPercentComplete"
-         |         | yes       | torrent-get    | new arg "trackerStats"
-         |         | yes       | session-set    | new arg "incomplete-dir"
-         |         | yes       | session-set    | new arg "incomplete-dir-enabled"
-   ------+---------+-----------+----------------+-------------------------------
-   8     | 1.90    | yes       | session-set    | new arg "rename-partial-files"
-         |         | yes       | session-get    | new arg "rename-partial-files"
-         |         | yes       | session-get    | new arg "config-dir"
-         |         | yes       | torrent-add    | new arg "bandwidthPriority"
-         |         | yes       | torrent-get    | new trackerStats arg "lastAnnounceTimedOut"
-   ------+---------+-----------+----------------+-------------------------------
-   8     | 1.92    | yes       | torrent-get    | new trackerStats arg "lastScrapeTimedOut"
-   ------+---------+-----------+----------------+-------------------------------
-   9     | 2.00    | yes       | session-set    | new arg "start-added-torrents"
-         |         | yes       | session-set    | new arg "trash-original-torrent-files"
-         |         | yes       | session-get    | new arg "start-added-torrents"
-         |         | yes       | session-get    | new arg "trash-original-torrent-files"
-         |         | yes       | torrent-get    | new arg "isFinished"
-   ------+---------+-----------+----------------+-------------------------------
-   10    | 2.10    | yes       | session-get    | new arg "cache-size-mb"
-         |         | yes       | torrent-set    | new arg "trackerAdd"
-         |         | yes       | torrent-set    | new arg "trackerRemove"
-         |         | yes       | torrent-set    | new arg "trackerReplace"
-         |         | yes       | session-set    | new arg "idle-seeding-limit"
-         |         | yes       | session-set    | new arg "idle-seeding-limit-enabled"
-         |         | yes       | session-get    | new arg "units"
-         |         | yes       | torrent-set    | new arg "seedIdleLimit"
-         |         | yes       | torrent-set    | new arg "seedIdleMode"
-   ------+---------+-----------+----------------+-------------------------------
-   11    | 2.12    | yes       | session-get    | new arg "blocklist-url"
-         |         | yes       | session-set    | new arg "blocklist-url"
-   ------+---------+-----------+----------------+-------------------------------
-   12    | 2.20    | yes       | session-get    | new arg "download-dir-free-space"
-         |         | yes       | session-close  | new method
-   ------+---------+-----------+----------------+-------------------------------
-   13    | 2.30    | yes       | session-get    | new arg "isUTP" to the "peers" list
-         |         | yes       | torrent-add    | new arg "cookies"
-         |         |        NO | torrent-get    | removed arg "peersKnown"
-   ------+---------+-----------+----------------+-------------------------------
-   14    | 2.40    |        NO | torrent-get    | values of "status" field changed
-         |         | yes       | torrent-get    | new arg "queuePosition"
-         |         | yes       | torrent-get    | new arg "isStalled"
-         |         | yes       | torrent-get    | new arg "fromLpd" in peersFrom
-         |         | yes       | torrent-set    | new arg "queuePosition"
-         |         | yes       | session-set    | new arg "download-queue-size"
-         |         | yes       | session-set    | new arg "download-queue-enabled"
-         |         | yes       | session-set    | new arg "seed-queue-size"
-         |         | yes       | session-set    | new arg "seed-queue-enabled"
-         |         | yes       | session-set    | new arg "queue-stalled-enabled"
-         |         | yes       | session-set    | new arg "queue-stalled-minutes"
-         |         | yes       |                | new method "queue-move-top"
-         |         | yes       |                | new method "queue-move-up"
-         |         | yes       |                | new method "queue-move-down"
-         |         | yes       |                | new method "queue-move-bottom"
-         |         | yes       |                | new method "torrent-start-now"
-   ------+---------+-----------+----------------+-------------------------------
-   15    | 2.80    | yes       | torrent-get    | new arg "etaIdle"
+   RPC   | Release | Backwards |                      |
+   Vers. | Version | Compat?   | Method               | Description
+   ------+---------+-----------+----------------------+-------------------------------
+   1     | 1.30    | n/a       | n/a                  | Initial version
+   ------+---------+-----------+----------------------+-------------------------------
+   2     | 1.34    | yes       | torrent-get          | new arg "peers"
+   ------+---------+-----------+----------------------+-------------------------------
+   3     | 1.41    | yes       | torrent-get          | added "port" to "peers"
+         |         | yes       | torrent-get          | new arg "downloaders"
+         |         | yes       | session-get          | new arg "version"
+         |         | yes       | torrent-remove       | new method
+   ------+---------+-----------+----------------------+-------------------------------
+   4     | 1.50    | yes       | session-get          | new arg "rpc-version"
+         |         | yes       | session-get          | new arg "rpc-version-minimum"
+         |         | yes       | session-stats        | added "cumulative-stats"
+         |         | yes       | session-stats        | added "current-stats"
+         |         | yes       | torrent-get          | new arg "downloadDir"
+   ------+---------+-----------+----------------------+-------------------------------
+   5     | 1.60    | yes       |                      | new method "torrent-reannounce"
+         |         | yes       |                      | new method "blocklist-update"
+         |         | yes       |                      | new method "port-test"
+         |         |           |                      |
+         |         | yes       | session-get          | new arg "alt-speed-begin"
+         |         | yes       | session-get          | new arg "alt-speed-down"
+         |         | yes       | session-get          | new arg "alt-speed-enabled"
+         |         | yes       | session-get          | new arg "alt-speed-end"
+         |         | yes       | session-get          | new arg "alt-speed-time-enabled"
+         |         | yes       | session-get          | new arg "alt-speed-up"
+         |         | yes       | session-get          | new arg "blocklist-enabled"
+         |         | yes       | session-get          | new arg "blocklist-size"
+         |         | yes       | session-get          | new arg "peer-limit-per-torrent"
+         |         | yes       | session-get          | new arg "seedRatioLimit"
+         |         | yes       | session-get          | new arg "seedRatioLimited"
+         |         |        NO | session-get          | renamed "pex-allowed" to "pex-enabled"
+         |         |        NO | session-get          | renamed "port" to "peer-port"
+         |         |        NO | session-get          | renamed "peer-limit" to "peer-limit-global"
+         |         |           |                      |
+         |         | yes       | torrent-add          | new arg "files-unwanted"
+         |         | yes       | torrent-add          | new arg "files-wanted"
+         |         | yes       | torrent-add          | new arg "priority-high"
+         |         | yes       | torrent-add          | new arg "priority-low"
+         |         | yes       | torrent-add          | new arg "priority-normal"
+         |         |           |                      |
+         |         | yes       | torrent-set          | new arg "bandwidthPriority"
+         |         | yes       | torrent-set          | new arg "honorsSessionLimits"
+         |         | yes       | torrent-set          | new arg "seedRatioLimit" 
+         |         | yes       | torrent-set          | new arg "seedRatioLimited" 
+         |         |        NO | torrent-set          | renamed "speed-limit-down" to "downloadLimit" 
+         |         |        NO | torrent-set          | renamed "speed-limit-down-enabled" to "downloadLimited" 
+         |         |        NO | torrent-set          | renamed "speed-limit-up" to "uploadLimit" 
+         |         |        NO | torrent-set          | renamed "speed-limit-up-enabled" to "uploadLimited" 
+         |         |           |                      |
+         |         | yes       | torrent-get          | new arg "bandwidthPriority"
+         |         | yes       | torrent-get          | new arg "fileStats"
+         |         | yes       | torrent-get          | new arg "honorsSessionLimits"
+         |         | yes       | torrent-get          | new arg "percentDone"
+         |         | yes       | torrent-get          | new arg "pieces"
+         |         | yes       | torrent-get          | new arg "seedRatioLimit"
+         |         | yes       | torrent-get          | new arg "seedRatioMode"
+         |         | yes       | torrent-get          | new arg "torrentFile"
+         |         | yes       | torrent-get          | new ids option "recently-active"
+         |         |        NO | torrent-get          | removed arg "downloadLimitMode"
+         |         |        NO | torrent-get          | removed arg "uploadLimitMode"
+   ------+---------+-----------+----------------------+-------------------------------
+   6     | 1.70    | yes       |                      | new "method torrent-set-location"
+   ------+---------+-----------+----------------------+-------------------------------
+   7     | 1.80    |        NO | torrent-get          | removed arg "announceResponse"
+         |         |        NO | torrent-get          | removed arg "announceURL"
+         |         |        NO | torrent-get          | removed arg "downloaders"
+         |         |        NO | torrent-get          | removed arg "lastAnnounceTime"
+         |         |        NO | torrent-get          | removed arg "lastScrapeTime"
+         |         |        NO | torrent-get          | removed arg "leechers"
+         |         |        NO | torrent-get          | removed arg "nextAnnounceTime"
+         |         |        NO | torrent-get          | removed arg "nextScrapeTime"
+         |         |        NO | torrent-get          | removed arg "scrapeResponse"
+         |         |        NO | torrent-get          | removed arg "scrapeURL"
+         |         |        NO | torrent-get          | removed arg "seeders"
+         |         |        NO | torrent-get          | removed arg "timesCompleted"
+         |         |        NO | torrent-get          | removed arg "swarmSpeed"
+         |         | yes       | torrent-get          | new arg "magnetLink"
+         |         | yes       | torrent-get          | new arg "metadataPercentComplete"
+         |         | yes       | torrent-get          | new arg "trackerStats"
+         |         | yes       | session-set          | new arg "incomplete-dir"
+         |         | yes       | session-set          | new arg "incomplete-dir-enabled"
+   ------+---------+-----------+----------------------+-------------------------------
+   8     | 1.90    | yes       | session-set          | new arg "rename-partial-files"
+         |         | yes       | session-get          | new arg "rename-partial-files"
+         |         | yes       | session-get          | new arg "config-dir"
+         |         | yes       | torrent-add          | new arg "bandwidthPriority"
+         |         | yes       | torrent-get          | new trackerStats arg "lastAnnounceTimedOut"
+   ------+---------+-----------+----------------------+-------------------------------
+   8     | 1.92    | yes       | torrent-get          | new trackerStats arg "lastScrapeTimedOut"
+   ------+---------+-----------+----------------------+-------------------------------
+   9     | 2.00    | yes       | session-set          | new arg "start-added-torrents"
+         |         | yes       | session-set          | new arg "trash-original-torrent-files"
+         |         | yes       | session-get          | new arg "start-added-torrents"
+         |         | yes       | session-get          | new arg "trash-original-torrent-files"
+         |         | yes       | torrent-get          | new arg "isFinished"
+   ------+---------+-----------+----------------------+-------------------------------
+   10    | 2.10    | yes       | session-get          | new arg "cache-size-mb"
+         |         | yes       | torrent-set          | new arg "trackerAdd"
+         |         | yes       | torrent-set          | new arg "trackerRemove"
+         |         | yes       | torrent-set          | new arg "trackerReplace"
+         |         | yes       | session-set          | new arg "idle-seeding-limit"
+         |         | yes       | session-set          | new arg "idle-seeding-limit-enabled"
+         |         | yes       | session-get          | new arg "units"
+         |         | yes       | torrent-set          | new arg "seedIdleLimit"
+         |         | yes       | torrent-set          | new arg "seedIdleMode"
+   ------+---------+-----------+----------------------+-------------------------------
+   11    | 2.12    | yes       | session-get          | new arg "blocklist-url"
+         |         | yes       | session-set          | new arg "blocklist-url"
+   ------+---------+-----------+----------------------+-------------------------------
+   12    | 2.20    | yes       | session-get          | new arg "download-dir-free-space"
+         |         | yes       | session-close        | new method
+   ------+---------+-----------+----------------------+-------------------------------
+   13    | 2.30    | yes       | session-get          | new arg "isUTP" to the "peers" list
+         |         | yes       | torrent-add          | new arg "cookies"
+         |         |        NO | torrent-get          | removed arg "peersKnown"
+   ------+---------+-----------+--------------------------+-------------------------------
+   14    | 2.40    |        NO | torrent-get          | values of "status" field changed
+         |         | yes       | torrent-get          | new arg "queuePosition"
+         |         | yes       | torrent-get          | new arg "isStalled"
+         |         | yes       | torrent-get          | new arg "fromLpd" in peersFrom
+         |         | yes       | torrent-set          | new arg "queuePosition"
+         |         | yes       | session-set          | new arg "download-queue-size"
+         |         | yes       | session-set          | new arg "download-queue-enabled"
+         |         | yes       | session-set          | new arg "seed-queue-size"
+         |         | yes       | session-set          | new arg "seed-queue-enabled"
+         |         | yes       | session-set          | new arg "queue-stalled-enabled"
+         |         | yes       | session-set          | new arg "queue-stalled-minutes"
+         |         | yes       |                      | new method "queue-move-top"
+         |         | yes       |                      | new method "queue-move-up"
+         |         | yes       |                      | new method "queue-move-down"
+         |         | yes       |                      | new method "queue-move-bottom"
+         |         | yes       |                      | new method "torrent-start-now"
+   ------+---------+-----------+--------------------------+-------------------------------
+   15    | 2.80    | yes       | torrent-get          | new arg "etaIdle"
+         |         | yes       | torrent-rename-path  | new method
 

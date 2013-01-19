@@ -84,8 +84,8 @@ notify (tr_session * session,
 struct tr_rpc_idle_data
 {
     tr_session            * session;
-    tr_variant               * response;
-    tr_variant               * args_out;
+    tr_variant            * response;
+    tr_variant            * args_out;
     tr_rpc_response_func    callback;
     void                  * callback_user_data;
 };
@@ -114,7 +114,7 @@ tr_idle_function_done (struct tr_rpc_idle_data * data, const char * result)
 
 static tr_torrent **
 getTorrents (tr_session * session,
-             tr_variant    * args,
+             tr_variant * args,
              int        * setmeCount)
 {
     int           torrentCount = 0;
@@ -196,8 +196,8 @@ notifyBatchQueueChange (tr_session * session, tr_torrent ** torrents, int n)
 
 static const char*
 queueMoveTop (tr_session               * session,
-              tr_variant                  * args_in,
-              tr_variant                  * args_out UNUSED,
+              tr_variant               * args_in,
+              tr_variant               * args_out UNUSED,
               struct tr_rpc_idle_data  * idle_data UNUSED)
 {
     int n;
@@ -210,8 +210,8 @@ queueMoveTop (tr_session               * session,
 
 static const char*
 queueMoveUp (tr_session               * session,
-             tr_variant                  * args_in,
-             tr_variant                  * args_out UNUSED,
+             tr_variant               * args_in,
+             tr_variant               * args_out UNUSED,
              struct tr_rpc_idle_data  * idle_data UNUSED)
 {
     int n;
@@ -224,8 +224,8 @@ queueMoveUp (tr_session               * session,
 
 static const char*
 queueMoveDown (tr_session               * session,
-               tr_variant                  * args_in,
-               tr_variant                  * args_out UNUSED,
+               tr_variant               * args_in,
+               tr_variant               * args_out UNUSED,
                struct tr_rpc_idle_data  * idle_data UNUSED)
 {
     int n;
@@ -238,8 +238,8 @@ queueMoveDown (tr_session               * session,
 
 static const char*
 queueMoveBottom (tr_session               * session,
-                 tr_variant                  * args_in,
-                 tr_variant                  * args_out UNUSED,
+                 tr_variant               * args_in,
+                 tr_variant               * args_out UNUSED,
                  struct tr_rpc_idle_data  * idle_data UNUSED)
 {
     int n;
@@ -252,8 +252,8 @@ queueMoveBottom (tr_session               * session,
 
 static const char*
 torrentStart (tr_session               * session,
-              tr_variant                  * args_in,
-              tr_variant                  * args_out UNUSED,
+              tr_variant               * args_in,
+              tr_variant               * args_out UNUSED,
               struct tr_rpc_idle_data  * idle_data UNUSED)
 {
     int           i, torrentCount;
@@ -276,8 +276,8 @@ torrentStart (tr_session               * session,
 
 static const char*
 torrentStartNow (tr_session               * session,
-                 tr_variant                  * args_in,
-                 tr_variant                  * args_out UNUSED,
+                 tr_variant               * args_in,
+                 tr_variant               * args_out UNUSED,
                  struct tr_rpc_idle_data  * idle_data UNUSED)
 {
     int           i, torrentCount;
@@ -300,8 +300,8 @@ torrentStartNow (tr_session               * session,
 
 static const char*
 torrentStop (tr_session               * session,
-             tr_variant                  * args_in,
-             tr_variant                  * args_out UNUSED,
+             tr_variant               * args_in,
+             tr_variant               * args_out UNUSED,
              struct tr_rpc_idle_data  * idle_data UNUSED)
 {
     int           i, torrentCount;
@@ -325,8 +325,8 @@ torrentStop (tr_session               * session,
 
 static const char*
 torrentRemove (tr_session               * session,
-               tr_variant                  * args_in,
-               tr_variant                  * args_out UNUSED,
+               tr_variant               * args_in,
+               tr_variant               * args_out UNUSED,
                struct tr_rpc_idle_data  * idle_data UNUSED)
 {
     int i;
@@ -353,10 +353,63 @@ torrentRemove (tr_session               * session,
     return NULL;
 }
 
+static void
+torrentRenamePathDone (tr_torrent  * tor        UNUSED,
+                       const char  * oldpath    UNUSED,
+                       const char  * newname    UNUSED,
+                       int           error,
+                       void        * user_data)
+{
+  *(int*)user_data = error;
+}
+
+static const char *
+torrentRenamePath (tr_session               * session,
+                   tr_variant               * args_in,
+                   tr_variant               * args_out UNUSED,
+                   struct tr_rpc_idle_data  * idle_data UNUSED)
+{
+  const char * oldpath;
+  const char * newname;
+  const char * ret = NULL;
+
+  if (!tr_variantDictFindStr (args_in, TR_KEY_path, &oldpath, NULL))
+    {
+      ret = "no path specified";
+    }
+  else if (!tr_variantDictFindStr (args_in, TR_KEY_name, &newname, NULL))
+    {
+      ret = "no name specified";
+    }
+  else
+    {
+      int torrentCount;
+      tr_torrent ** torrents = getTorrents (session, args_in, &torrentCount);
+
+      if (torrentCount != 1)
+        {
+          ret = "torent-rename-path requires 1 torrent";
+        }
+      else
+        {
+          int error = -1;
+          tr_torrentRenamePath (torrents[0], oldpath, newname, torrentRenamePathDone, &error);
+          assert (error != -1);
+
+          if (error != 0)
+            ret = tr_strerror (error);
+        }
+
+      tr_free (torrents);
+    }
+
+  return ret;
+}
+
 static const char*
 torrentReannounce (tr_session               * session,
-                   tr_variant                  * args_in,
-                   tr_variant                  * args_out UNUSED,
+                   tr_variant               * args_in,
+                   tr_variant               * args_out UNUSED,
                    struct tr_rpc_idle_data  * idle_data UNUSED)
 {
     int i, torrentCount;
@@ -380,8 +433,8 @@ torrentReannounce (tr_session               * session,
 
 static const char*
 torrentVerify (tr_session               * session,
-               tr_variant                  * args_in,
-               tr_variant                  * args_out UNUSED,
+               tr_variant               * args_in,
+               tr_variant               * args_out UNUSED,
                struct tr_rpc_idle_data  * idle_data UNUSED)
 {
     int           i, torrentCount;
@@ -1933,6 +1986,7 @@ methods[] =
     { "torrent-add",           false, torrentAdd          },
     { "torrent-get",           true,  torrentGet          },
     { "torrent-remove",        true,  torrentRemove       },
+    { "torrent-rename-path",   true,  torrentRenamePath   },
     { "torrent-set",           true,  torrentSet          },
     { "torrent-set-location",  true,  torrentSetLocation  },
     { "torrent-start",         true,  torrentStart        },

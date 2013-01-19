@@ -38,7 +38,8 @@ enum
     TR_FR_RATIOLIMIT          = (1 << 16),
     TR_FR_IDLELIMIT           = (1 << 17),
     TR_FR_TIME_SEEDING        = (1 << 18),
-    TR_FR_TIME_DOWNLOADING    = (1 << 19)
+    TR_FR_TIME_DOWNLOADING    = (1 << 19),
+    TR_FR_FILENAMES           = (1 << 20)
 };
 
 /**

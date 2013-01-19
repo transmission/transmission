@@ -1093,6 +1093,57 @@ void tr_torrentStart (tr_torrent * torrent);
 /** @brief Stop (pause) a torrent */
 void tr_torrentStop (tr_torrent * torrent);
 
+
+typedef void (tr_torrent_rename_done_func)(tr_torrent  * torrent,
+                                           const char  * oldpath,
+                                           const char  * newname,
+                                           int           error,
+                                           void        * user_data);
+
+/**
+ * @brief Rename a file or directory in a torrent.
+ *
+ * @tor: the torrent whose path will be renamed.
+ * @oldpath: the path to the file or folder that will be renamed
+ * @newname: the file or folder's new name
+ * @callback: the callback invoked when the renaming finishes, or NULL
+ * @callback_data: the pointer to pass in the callback's user_data arg
+ *
+ * EXAMPLES
+ *
+ *   Consider a torrent where
+ *   files[0].path is "frobnitz-linux/checksum" and
+ *   files[1].path is "frobnitz-linux/frobnitz.iso".
+ *
+ *   1. tr_torrentRenamePath (tor, "frobnitz-linux", "foo") will rename
+ *      the "frotbnitz-linux" folder as "foo" and update files[*].path.
+ *
+ *   2. tr_torrentRenamePath (tor, "frobnitz-linux/checksum", "foo") will
+ *      rename the "frobnitz-linux/checksum" file as "foo" and update
+ *      files[0].path to "frobnitz-linux/foo".
+ *
+ * RETURN
+ *
+ *   Changing tr_info's contents requires a session lock, so this function
+ *   returns asynchronously to avoid blocking. If you don't care about error
+ *   checking, you can pass NULL as the callback and callback_user_data arg.
+ *
+ *   On success, the callback's error argument will be 0.
+ *
+ *   If oldpath can't be found in files[*].path, or if newname is already
+ *   in files[*].path, or contains a directory separator, or is NULL, "",
+ *   ".", or "..", the error argument will be EINVAL.
+ *
+ *   If the path exists on disk but can't be renamed, the error argument
+ *   will be the errno set by rename().
+ */
+void tr_torrentRenamePath (tr_torrent                  * tor,
+                           const char                  * oldpath,
+                           const char                  * newname,
+                           tr_torrent_rename_done_func   callback,
+                           void                        * callback_user_data);
+
+
 enum
 {
     TR_LOC_MOVING,
@@ -1353,15 +1404,15 @@ tr_completeness;
  *                   it changed its completeness state
  */
 typedef void (tr_torrent_completeness_func)(tr_torrent       * torrent,
-                                               tr_completeness    completeness,
-                                               bool               wasRunning,
-                                               void             * user_data);
+                                            tr_completeness    completeness,
+                                            bool               wasRunning,
+                                            void             * user_data);
 
 typedef void (tr_torrent_ratio_limit_hit_func)(tr_torrent   * torrent,
-                                                  void         * user_data);
+                                               void         * user_data);
 
 typedef void (tr_torrent_idle_limit_hit_func)(tr_torrent   * torrent,
-                                                 void         * user_data);
+                                              void         * user_data);
 
 
 /**
@@ -1683,6 +1734,7 @@ typedef struct tr_file
     char *            name;        /* Path to the file */
     int8_t            priority;    /* TR_PRI_HIGH, _NORMAL, or _LOW */
     int8_t            dnd;         /* "do not download" flag */
+    int8_t            is_renamed;  /* true if we're using a different path from the one in the metainfo; ie, if the user has renamed it */
     tr_piece_index_t  firstPiece;  /* We need pieces [firstPiece... */
     tr_piece_index_t  lastPiece;   /* ...lastPiece] to dl this file */
     uint64_t          offset;      /* file begins at the torrent's nth byte */

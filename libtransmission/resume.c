@@ -335,6 +335,62 @@ loadIdleLimits (tr_variant * dict, tr_torrent * tor)
 
     return ret;
 }
+
+/***
+****
+***/
+
+static void
+saveFilenames (tr_variant * dict, const tr_torrent * tor)
+{
+  tr_file_index_t i;
+  bool any_renamed;
+  const tr_file_index_t n = tor->info.fileCount;
+  const tr_file * files = tor->info.files;
+
+  any_renamed = false;
+  for (i=0; !any_renamed && i<n; ++i)
+    any_renamed = files[i].is_renamed;
+
+  if (any_renamed)
+    {
+      tr_variant * list = tr_variantDictAddList (dict, TR_KEY_files, n);
+
+      for (i=0; i<n; ++i)
+        tr_variantListAddStr (list, files[i].is_renamed ? files[i].name : "");
+    }
+}
+
+static uint64_t
+loadFilenames (tr_variant * dict, tr_torrent * tor)
+{
+  tr_variant * list;
+  uint64_t ret = 0;
+
+  if (tr_variantDictFindList (dict, TR_KEY_files, &list))
+    {
+      size_t i;
+      const size_t n = tr_variantListSize (list);
+      tr_file * files = tor->info.files;
+
+      for (i=0; i<tor->info.fileCount && i<n; ++i)
+        {
+          const char * str;
+          size_t str_len;
+          if (tr_variantGetStr (tr_variantListChild (list, i), &str, &str_len) && str && str_len)
+            {
+              tr_free (files[i].name);
+              files[i].name = tr_strndup (str, str_len);
+              files[i].is_renamed = true;
+            }
+        }
+
+      ret = TR_FR_FILENAMES;
+    }
+
+  return ret;
+}
+
 /***
 ****
 ***/
@@ -593,6 +649,7 @@ tr_torrentSaveResume (tr_torrent * tor)
     saveSpeedLimits (&top, tor);
     saveRatioLimits (&top, tor);
     saveIdleLimits (&top, tor);
+    saveFilenames (&top, tor);
 
     filename = getResumeFilename (tor);
     if ((err = tr_variantToFile (&top, TR_VARIANT_FMT_BENC, filename)))
@@ -744,6 +801,9 @@ loadFromFile (tr_torrent * tor, uint64_t fieldsToLoad)
 
     if (fieldsToLoad & TR_FR_IDLELIMIT)
         fieldsLoaded |= loadIdleLimits (&top, tor);
+
+    if (fieldsToLoad & TR_FR_FILENAMES)
+        fieldsLoaded |= loadFilenames (&top, tor);
 
     /* loading the resume file triggers of a lot of changes,
      * but none of them needs to trigger a re-saving of the

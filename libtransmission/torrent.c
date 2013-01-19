@@ -3302,3 +3302,220 @@ tr_torrentSetQueueStartCallback (tr_torrent * torrent, void (*callback)(tr_torre
 }
 
 
+/***
+****
+****  RENAME
+****
+***/
+
+static bool
+renameArgsAreValid (const char * oldpath, const char * newname)
+{
+  return (oldpath && *oldpath)
+      && (newname && *newname)
+      && (strcmp (newname, "."))
+      && (strcmp (newname, ".."))
+      && (strchr (newname, TR_PATH_DELIMITER) == NULL);
+}
+
+static tr_file_index_t *
+renameFindAffectedFiles (tr_torrent * tor, const char * oldpath, size_t * setme_n)
+{
+  size_t n;
+  size_t oldpath_len;
+  tr_file_index_t i;
+  tr_file_index_t * indices = tr_new0 (tr_file_index_t, tor->info.fileCount);
+
+  n = 0;
+  oldpath_len = strlen (oldpath);
+  for (i=0; i!=tor->info.fileCount; ++i)
+    {
+      const char * name = tor->info.files[i].name;
+      const size_t len = strlen (name);
+      if ((len >= oldpath_len) && !memcmp (oldpath, name, oldpath_len))
+        indices[n++] = i;
+    }
+
+  *setme_n = n;
+  return indices;
+}
+
+static int
+renamePath (tr_torrent  * tor,
+            const char  * oldpath,
+            const char  * newname)
+{
+  char * src;
+  const char * base;
+  int error = 0;
+
+  if (!tr_torrentIsSeed(tor) && (tor->incompleteDir != NULL))
+    base = tor->incompleteDir;
+  else
+    base = tor->downloadDir;
+
+  src = tr_buildPath (base, oldpath, NULL);
+  /*fprintf (stderr, "%s:%d src \"%s\"\n", __FILE__, __LINE__, src);*/
+
+  if (tr_fileExists (src, NULL))
+    {
+      int tmp;
+      bool tgt_exists;
+      char * parent = tr_dirname (src);
+      char * tgt = tr_buildPath (parent, newname, NULL);
+
+      tmp = errno;
+      tgt_exists = tr_fileExists (tgt, NULL);
+      errno = tmp;
+      /*fprintf (stderr, "%s:%d tgt \"%s\"\n", __FILE__, __LINE__, tgt);*/
+
+      if (!tgt_exists)
+        {
+          int rv;
+
+          tmp = errno;
+          rv = rename (src, tgt);
+          /*fprintf (stderr, "%s:%d rv \"%d\"\n", __FILE__, __LINE__, rv);*/
+          if (rv != 0)
+            error = errno;
+          errno = tmp;
+        }
+
+      tr_free (tgt);
+      tr_free (parent);
+    }
+
+  tr_free (src);
+
+  return error;
+}
+
+static void
+renameTorrentFileString (tr_torrent       * tor,
+                         const char       * oldpath,
+                         const char       * newname,
+                         tr_file_index_t    fileIndex)
+{
+  char * name;
+  tr_file * file = &tor->info.files[fileIndex];
+  const size_t oldpath_len = strlen (oldpath);
+
+  if (strchr (oldpath, TR_PATH_DELIMITER) == NULL)
+    {
+      if (oldpath_len >= strlen(file->name))
+        name = tr_buildPath (newname, NULL);
+      else
+        name = tr_buildPath (newname, file->name + oldpath_len + 1, NULL);
+    }
+  else
+    {
+      char * tmp = tr_dirname (oldpath);
+
+      if (oldpath_len >= strlen(file->name))
+        name = tr_buildPath (tmp, newname, NULL);
+      else
+        name = tr_buildPath (tmp, newname, file->name + oldpath_len + 1, NULL);
+
+      tr_free (tmp);
+    }
+     
+  if (!strcmp (file->name, name))
+    {
+      tr_free (name);
+    }
+  else
+    { 
+      tr_free (file->name);
+      file->name = name;
+      file->is_renamed = true;
+    }
+}
+
+struct rename_data
+{
+  tr_torrent * tor;
+  char * oldpath;
+  char * newname;
+  tr_torrent_rename_done_func * callback;
+  void * callback_user_data;
+};
+
+static void
+torrentRenamePath (void * vdata)
+{
+  int error = 0;
+  struct rename_data * data = vdata;
+  tr_torrent * const tor = data->tor;
+  const char * const oldpath = data->oldpath;
+  const char * const newname = data->newname;
+
+  /***
+  ****
+  ***/
+
+  assert (tr_isTorrent (tor));
+
+  if (!renameArgsAreValid (oldpath, newname))
+    {
+      error = EINVAL;
+    }
+  else
+    {
+      size_t n;
+      tr_file_index_t * file_indices;
+
+      file_indices = renameFindAffectedFiles (tor, oldpath, &n);
+      if (n == 0)
+        {
+          errno = EINVAL;
+        }
+      else
+        {
+          size_t i;
+
+          error = renamePath (tor, oldpath, newname);
+
+          if (!error)
+            {
+              for (i=0; i<n; ++i)
+                renameTorrentFileString(tor, oldpath, newname, file_indices[i]);
+              tr_torrentSetDirty (tor);
+            }
+        }
+
+      tr_free (file_indices);
+    }
+
+
+  /***
+  ****
+  ***/
+
+  /* callback */
+  if (data->callback != NULL)
+    (*data->callback)(tor, data->oldpath, data->newname, error, data->callback_user_data);
+
+  /* cleanup */
+  tr_free (data->oldpath);
+  tr_free (data->newname);
+  tr_free (data);
+}
+
+void
+tr_torrentRenamePath (tr_torrent                  * tor,
+                      const char                  * oldpath,
+                      const char                  * newname,
+                      tr_torrent_rename_done_func   callback,
+                      void                        * callback_user_data)
+{
+  struct rename_data * data;
+
+  data = tr_new0 (struct rename_data, 1);
+  data->tor = tor;
+  data->oldpath = tr_strdup (oldpath);
+  data->newname = tr_strdup (newname);
+  data->callback = callback;
+  data->callback_user_data = callback_user_data;
+
+  tr_runInEventThread (tor->session, torrentRenamePath, data);
+}
