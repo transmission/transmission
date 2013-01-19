@@ -1111,16 +1111,16 @@ typedef void (tr_torrent_rename_done_func)(tr_torrent  * torrent,
  *
  * EXAMPLES
  *
- *   Consider a torrent where
- *   files[0].path is "frobnitz-linux/checksum" and
- *   files[1].path is "frobnitz-linux/frobnitz.iso".
+ *   Consider a tr_torrent where its
+ *   info.files[0].name is "frobnitz-linux/checksum" and
+ *   info.files[1].name is "frobnitz-linux/frobnitz.iso".
  *
  *   1. tr_torrentRenamePath (tor, "frobnitz-linux", "foo") will rename
- *      the "frotbnitz-linux" folder as "foo" and update files[*].path.
+ *      the "frotbnitz-linux" folder as "foo" and update files[*].name.
  *
  *   2. tr_torrentRenamePath (tor, "frobnitz-linux/checksum", "foo") will
  *      rename the "frobnitz-linux/checksum" file as "foo" and update
- *      files[0].path to "frobnitz-linux/foo".
+ *      files[0].name to "frobnitz-linux/foo".
  *
  * RETURN
  *
@@ -1130,8 +1130,8 @@ typedef void (tr_torrent_rename_done_func)(tr_torrent  * torrent,
  *
  *   On success, the callback's error argument will be 0.
  *
- *   If oldpath can't be found in files[*].path, or if newname is already
- *   in files[*].path, or contains a directory separator, or is NULL, "",
+ *   If oldpath can't be found in files[*].name, or if newname is already
+ *   in files[*].name, or contains a directory separator, or is NULL, "",
  *   ".", or "..", the error argument will be EINVAL.
  *
  *   If the path exists on disk but can't be renamed, the error argument
