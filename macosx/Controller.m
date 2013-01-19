@@ -60,7 +60,7 @@
 #import "utils.h"
 #import "variant.h"
 
-#import "UKKQueue.h"
+#import "VDKQueue.h"
 #import <Sparkle/Sparkle.h>
 
 #define TOOLBAR_CREATE                  @"Toolbar Create"
@@ -160,6 +160,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 #warning remove ivars in header when 64-bit only (or it compiles in 32-bit mode)
 @synthesize prefsController = fPrefsController;
 @synthesize messageWindowController = fMessageController;
+@synthesize fileWatcherQueue = fFileWatcherQueue;
 
 + (void) initialize
 {
@@ -371,6 +372,10 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         
         fInfoController = [[InfoWindowController alloc] init];
         
+        //needs to be done before init-ing the prefs controller
+        fFileWatcherQueue = [[[VDKQueue alloc] init] autorelease];
+        [fFileWatcherQueue setDelegate: self];
+        
         fPrefsController = [[PrefsController alloc] initWithHandle: fLib];
         
         fQuitting = NO;
@@ -384,8 +389,6 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         tr_sessionSetRPCCallback(fLib, rpcCallback, self);
         
         [GrowlApplicationBridge setGrowlDelegate: self];
-        
-        [[UKKQueue sharedFileWatcher] setDelegate: self];
         
         [[SUUpdater sharedUpdater] setDelegate: self];
         fQuitRequested = NO;
@@ -776,6 +779,8 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     [fPreviewPanel release];
     
     [fConfigDirectory release];
+    
+    [fFileWatcherQueue release];
     
     //complete cleanup
     tr_sessionClose(fLib);
@@ -2929,27 +2934,26 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     fSoundPlaying = NO;
 }
 
-- (void) watcher: (id<UKFileWatcher>) watcher receivedNotification: (NSString *) notification forPath: (NSString *) path
+-(void) VDKQueue: (VDKQueue *) queue receivedNotification: (NSString*) notification forPath: (NSString*) fpath
 {
-    if ([notification isEqualToString: UKFileWatcherWriteNotification])
+    NSParameterAssert([notification isEqualToString:VDKQueueWriteNotification]);NSLog(@"%@",notification);
+    
+    if (![fDefaults boolForKey: @"AutoImport"] || ![fDefaults stringForKey: @"AutoImportDirectory"])
+        return;
+    
+    if (fAutoImportTimer)
     {
-        if (![fDefaults boolForKey: @"AutoImport"] || ![fDefaults stringForKey: @"AutoImportDirectory"])
-            return;
-        
-        if (fAutoImportTimer)
-        {
-            if ([fAutoImportTimer isValid])
-                [fAutoImportTimer invalidate];
-            [fAutoImportTimer release];
-            fAutoImportTimer = nil;
-        }
-        
-        //check again in 10 seconds in case torrent file wasn't complete
-        fAutoImportTimer = [[NSTimer scheduledTimerWithTimeInterval: 10.0 target: self 
-            selector: @selector(checkAutoImportDirectory) userInfo: nil repeats: NO] retain];
-        
-        [self checkAutoImportDirectory];
+        if ([fAutoImportTimer isValid])
+            [fAutoImportTimer invalidate];
+        [fAutoImportTimer release];
+        fAutoImportTimer = nil;
     }
+    
+    //check again in 10 seconds in case torrent file wasn't complete
+    fAutoImportTimer = [[NSTimer scheduledTimerWithTimeInterval: 10.0 target: self 
+        selector: @selector(checkAutoImportDirectory) userInfo: nil repeats: NO] retain];
+    
+    [self checkAutoImportDirectory];
 }
 
 - (void) changeAutoImport

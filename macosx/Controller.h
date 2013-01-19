@@ -26,6 +26,7 @@
 #import <transmission.h>
 #import <Quartz/Quartz.h>
 #import <Growl/Growl.h>
+#import "VDKQueue.h"
 
 @class AddMagnetWindowController;
 @class AddWindowController;
@@ -49,7 +50,7 @@ typedef enum
     ADD_CREATED
 } addType;
 
-@interface Controller : NSObject <GrowlApplicationBridgeDelegate, NSURLDownloadDelegate, NSUserNotificationCenterDelegate, NSPopoverDelegate, NSSoundDelegate, NSToolbarDelegate, NSWindowDelegate, QLPreviewPanelDataSource, QLPreviewPanelDelegate>
+@interface Controller : NSObject <GrowlApplicationBridgeDelegate, NSURLDownloadDelegate, NSUserNotificationCenterDelegate, NSPopoverDelegate, NSSoundDelegate, NSToolbarDelegate, NSWindowDelegate, QLPreviewPanelDataSource, QLPreviewPanelDelegate, VDKQueueDelegate>
 {
     tr_session                      * fLib;
     
@@ -232,6 +233,8 @@ typedef enum
 - (void) beginCreateFile: (NSNotification *) notification;
 
 - (void) sleepCallback: (natural_t) messageType argument: (void *) messageArgument;
+
+@property (retain, readonly) VDKQueue * fileWatcherQueue;
 
 - (void) torrentTableViewSelectionDidChange: (NSNotification *) notification;
 
