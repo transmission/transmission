@@ -17,9 +17,9 @@ EXTRA_DIST = \
     Growl.framework \
     Sparkle.framework \
     sparkle_dsa_pub.pem \
-    UKKQueue \
     TransmissionHelp \
     QuickLookPlugin \
+    VDKQueue \
     Images \
     da.lproj \
     de.lproj \
