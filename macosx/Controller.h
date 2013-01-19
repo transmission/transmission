@@ -71,6 +71,8 @@ typedef enum
     io_connect_t                    fRootPort;
     NSTimer                         * fTimer;
     
+    VDKQueue                        * fFileWatcherQueue;
+    
     IBOutlet NSMenuItem             * fOpenIgnoreDownloadFolder;
     IBOutlet NSButton               * fActionButton, * fSpeedLimitButton, * fClearCompletedButton;
     IBOutlet NSTextField            * fTotalTorrentsField;
