@@ -646,29 +646,49 @@ core_set_sort_mode (TrCore * core, const char * mode, gboolean is_reversed)
 static time_t
 get_file_mtime (GFile * file)
 {
-  time_t mtime;
-  GFileInfo * info = g_file_query_info (file, G_FILE_ATTRIBUTE_TIME_MODIFIED, 0, NULL, NULL);
-  mtime = g_file_info_get_attribute_uint64 (info, G_FILE_ATTRIBUTE_TIME_MODIFIED);
-  g_object_unref (G_OBJECT (info));
+  GFileInfo * info;
+  time_t mtime = 0;
+
+  info = g_file_query_info (file, G_FILE_ATTRIBUTE_TIME_MODIFIED, 0, NULL, NULL);
+  if (info != NULL)
+    {
+      mtime = g_file_info_get_attribute_uint64 (info, G_FILE_ATTRIBUTE_TIME_MODIFIED);
+      g_object_unref (G_OBJECT (info));
+    }
+
   return mtime;
 }
 
 static void
 rename_torrent_and_unref_file (GFile * file)
 {
-  GError * error = NULL;
-  GFileInfo * info = g_file_query_info (file, G_FILE_ATTRIBUTE_STANDARD_EDIT_NAME, 0, NULL, NULL);
-  const char * old_name = g_file_info_get_attribute_string (info, G_FILE_ATTRIBUTE_STANDARD_EDIT_NAME);
-  char * new_name = g_strdup_printf ("%s.added", old_name);
-  GFile * new_file = g_file_set_display_name (file, new_name, NULL, &error);
-  if (error != NULL)
-    g_message ("Unable to rename \"%s\" as \"%s\": %s", old_name, new_name, error->message);
-  if (new_file != NULL)
-    g_object_unref (G_OBJECT (new_file));
-  g_free (new_name);
-  g_object_unref (G_OBJECT (info));
-  g_object_unref (G_OBJECT (file));
-  g_clear_error (&error);
+  GFileInfo * info;
+
+  info = g_file_query_info (file, G_FILE_ATTRIBUTE_STANDARD_EDIT_NAME, 0, NULL, NULL);
+  if (info != NULL)
+    {
+      GError * error;
+      const char * old_name;
+      char * new_name;
+      GFile * new_file;
+
+      old_name = g_file_info_get_attribute_string (info, G_FILE_ATTRIBUTE_STANDARD_EDIT_NAME);
+      new_name = g_strdup_printf ("%s.added", old_name);
+      new_file = g_file_set_display_name (file, new_name, NULL, &error);
+
+      if (error != NULL)
+        {
+          g_message ("Unable to rename \"%s\" as \"%s\": %s", old_name, new_name, error->message);
+          g_error_free (error);
+        }
+
+      if (new_file != NULL)
+        g_object_unref (G_OBJECT (new_file));
+      g_free (new_name);
+      g_object_unref (G_OBJECT(info));
+    }
+
+  g_object_unref (G_OBJECT(file));
 }
 
 static gboolean
