@@ -65,4 +65,9 @@ int main (void) { \
     return runTests (tests, 1); \
 }
 
+extern tr_session * session;
+void libtransmission_test_session_init (void);
+void libtransmission_test_session_close (void);
+
+
 #endif /* !LIBTRANSMISSION_TEST_H */

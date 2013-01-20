@@ -4,10 +4,7 @@
 #include <string.h> /* strcmp() */
 #include <stdio.h>
 
-#include <sys/types.h> /* stat(), opendir() */
-#include <sys/stat.h> /* stat() */
-#include <dirent.h> /* opendir() */
-#include <unistd.h> /* getcwd() */
+#include <unistd.h> /* sync() */
 
 #include "transmission.h"
 #include "resume.h"
@@ -16,29 +13,6 @@
 #include "variant.h"
 
 #include "libtransmission-test.h"
-
-static tr_session * session = NULL;
-
-static char*
-tr_getcwd (void)
-{
-  char * result;
-  char buf[2048];
-
-#ifdef WIN32
-  result = _getcwd (buf, sizeof (buf));
-#else
-  result = getcwd (buf, sizeof (buf));
-#endif
-
-  if (result == NULL)
-    {
-      fprintf (stderr, "getcwd error: \"%s\"", tr_strerror (errno));
-      *buf = '\0';
-    }
-
-  return tr_strdup (buf);
-}
 
 /***
 ****
@@ -449,72 +423,16 @@ test_multifile_torrent (void)
 ****
 ***/
 
-static void
-rm_rf (const char * killme)
-{
-  struct stat sb;
-
-  if (!stat (killme, &sb))
-    {
-      DIR * odir;
-
-      if (S_ISDIR (sb.st_mode) && ((odir = opendir (killme))))
-        {
-          struct dirent *d;
-          for (d = readdir(odir); d != NULL; d=readdir(odir))
-            {
-              if (d->d_name && strcmp(d->d_name,".") && strcmp(d->d_name,".."))
-                {
-                  char * tmp = tr_buildPath (killme, d->d_name, NULL);
-                  rm_rf (tmp);
-                  tr_free (tmp);
-                }
-            }
-          closedir (odir);
-        }
-
-      if (verbose)
-        fprintf (stderr, "cleanup: removing %s\n", killme);
-
-      remove (killme);
-    }
-}
-
 int
 main (void)
 {
   int ret;
-  char * cwd;
-  char * sandbox;
-  char * downloadDir;
-  tr_variant dict;
   const testFunc tests[] = { test_single_filename_torrent,
                              test_multifile_torrent };
 
-  /* create a sandbox for the test session */
-  cwd = tr_getcwd ();
-  sandbox = tr_buildPath (cwd, "sandbox-XXXXXX", NULL);
-  tr_mkdtemp (sandbox);
-  downloadDir = tr_buildPath (sandbox, "Downloads", NULL);
-  tr_mkdirp (downloadDir, 0700);
-
-  /* create a test session */
-  tr_variantInitDict    (&dict, 3);
-  tr_variantDictAddStr  (&dict, TR_KEY_download_dir, downloadDir);
-  tr_variantDictAddBool (&dict, TR_KEY_port_forwarding_enabled, false);
-  tr_variantDictAddBool (&dict, TR_KEY_dht_enabled, false);
-  session = tr_sessionInit ("rename-test", sandbox, true, &dict);
-
-  /* run the tests */
+  libtransmission_test_session_init ();
   ret = runTests (tests, NUM_TESTS (tests));
+  libtransmission_test_session_close ();
 
-  /* cleanup */
-  tr_sessionClose (session);
-  tr_freeMessageList (tr_getQueuedMessages ());
-  tr_variantFree (&dict);
-  rm_rf (sandbox);
-  tr_free (downloadDir);
-  tr_free (sandbox);
-  tr_free (cwd);
   return ret;
 }
