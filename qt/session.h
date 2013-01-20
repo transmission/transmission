@@ -19,6 +19,8 @@
 #include <QFileInfoList>
 #include <QNetworkAccessManager>
 #include <QString>
+#include <QStringList>
+#include <QTimer>
 #include <QUrl>
 
 class QStringList;
@@ -101,7 +103,7 @@ class Session: public QObject
         void torrentSet( const QSet<int>& ids, const tr_quark key, const QStringList& val );
         void torrentSet( const QSet<int>& ids, const tr_quark key, const QPair<int,QString>& val);
         void torrentSetLocation( const QSet<int>& ids, const QString& path, bool doMove );
-
+        void torrentRenamePath( const QSet<int>& ids, const QString& oldpath, const QString& newname );
 
     public slots:
         void pauseTorrents( const QSet<int>& torrentIds = QSet<int>() );
@@ -129,6 +131,7 @@ class Session: public QObject
 
     private slots:
         void onFinished( QNetworkReply * reply );
+        void onResponseTimer( );
 
     signals:
         void executed( int64_t tag, const QString& result, struct tr_variant * arguments );
@@ -150,11 +153,13 @@ class Session: public QObject
         tr_session * mySession;
         QString myConfigDir;
         QString mySessionId;
+        QStringList myIdleJSON;
         QUrl myUrl;
         QNetworkAccessManager * myNAM;
         struct tr_session_stats myStats;
         struct tr_session_stats myCumulativeStats;
         QString mySessionVersion;
+        QTimer myResponseTimer;
 };
 
 #endif

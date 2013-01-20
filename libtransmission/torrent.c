@@ -3491,6 +3491,8 @@ torrentRenamePath (void * vdata)
   ****
   ***/
 
+  tor->anyDate = tr_time ();
+
   /* callback */
   if (data->callback != NULL)
     (*data->callback)(tor, data->oldpath, data->newname, error, data->callback_user_data);

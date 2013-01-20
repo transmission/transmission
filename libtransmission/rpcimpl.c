@@ -353,59 +353,6 @@ torrentRemove (tr_session               * session,
     return NULL;
 }
 
-static void
-torrentRenamePathDone (tr_torrent  * tor        UNUSED,
-                       const char  * oldpath    UNUSED,
-                       const char  * newname    UNUSED,
-                       int           error,
-                       void        * user_data)
-{
-  *(int*)user_data = error;
-}
-
-static const char *
-torrentRenamePath (tr_session               * session,
-                   tr_variant               * args_in,
-                   tr_variant               * args_out UNUSED,
-                   struct tr_rpc_idle_data  * idle_data UNUSED)
-{
-  const char * oldpath;
-  const char * newname;
-  const char * ret = NULL;
-
-  if (!tr_variantDictFindStr (args_in, TR_KEY_path, &oldpath, NULL))
-    {
-      ret = "no path specified";
-    }
-  else if (!tr_variantDictFindStr (args_in, TR_KEY_name, &newname, NULL))
-    {
-      ret = "no name specified";
-    }
-  else
-    {
-      int torrentCount;
-      tr_torrent ** torrents = getTorrents (session, args_in, &torrentCount);
-
-      if (torrentCount != 1)
-        {
-          ret = "torent-rename-path requires 1 torrent";
-        }
-      else
-        {
-          int error = -1;
-          tr_torrentRenamePath (torrents[0], oldpath, newname, torrentRenamePathDone, &error);
-          assert (error != -1);
-
-          if (error != 0)
-            ret = tr_strerror (error);
-        }
-
-      tr_free (torrents);
-    }
-
-  return ret;
-}
-
 static const char*
 torrentReannounce (tr_session               * session,
                    tr_variant               * args_in,
@@ -478,8 +425,7 @@ addFileStats (const tr_torrent * tor, tr_variant * list)
 }
 
 static void
-addFiles (const tr_torrent * tor,
-          tr_variant *          list)
+addFiles (const tr_torrent * tor, tr_variant * list)
 {
     tr_file_index_t i;
     tr_file_index_t n;
@@ -1366,6 +1312,57 @@ torrentSetLocation (tr_session               * session,
 ***/
 
 static void
+torrentRenamePathDone (tr_torrent  * tor,
+                       const char  * oldpath,
+                       const char  * newname,
+                       int           error,
+                       void        * user_data)
+{
+  const char * result;
+  struct tr_rpc_idle_data * data = user_data;
+
+  tr_variantDictAddInt (data->args_out, TR_KEY_id, tr_torrentId(tor));
+  tr_variantDictAddStr (data->args_out, TR_KEY_path, oldpath);
+  tr_variantDictAddStr (data->args_out, TR_KEY_name, newname);
+
+  if (error == 0)
+    result = NULL;
+  else
+    result = tr_strerror (error);
+
+  tr_idle_function_done (data, result);
+}
+
+static const char*
+torrentRenamePath (tr_session               * session,
+                   tr_variant               * args_in,
+                   tr_variant               * args_out UNUSED,
+                   struct tr_rpc_idle_data  * idle_data)
+{
+  int torrentCount;
+  tr_torrent ** torrents;
+  const char * oldpath = NULL;
+  const char * newname = NULL;
+
+  tr_variantDictFindStr (args_in, TR_KEY_path, &oldpath, NULL);
+  tr_variantDictFindStr (args_in, TR_KEY_name, &newname, NULL);
+  torrents = getTorrents (session, args_in, &torrentCount);
+
+  if (torrentCount == 1)
+    tr_torrentRenamePath (torrents[0], oldpath, newname, torrentRenamePathDone, idle_data);
+  else
+    tr_idle_function_done (idle_data, "torrent-rename-path requires 1 torrent");
+
+  /* cleanup */
+  tr_free (torrents);
+  return NULL; /* ignored */
+}
+
+/***
+****
+***/
+
+static void
 portTested (tr_session       * session UNUSED,
             bool               did_connect UNUSED,
             bool               did_timeout UNUSED,
@@ -1394,8 +1391,8 @@ portTested (tr_session       * session UNUSED,
 
 static const char*
 portTest (tr_session               * session,
-          tr_variant                  * args_in UNUSED,
-          tr_variant                  * args_out UNUSED,
+          tr_variant               * args_in UNUSED,
+          tr_variant               * args_out UNUSED,
           struct tr_rpc_idle_data  * idle_data)
 {
     const int port = tr_sessionGetPeerPort (session);
@@ -1612,8 +1609,8 @@ fileListFromList (tr_variant * list, tr_file_index_t * setmeCount)
 
 static const char*
 torrentAdd (tr_session               * session,
-            tr_variant                  * args_in,
-            tr_variant                  * args_out UNUSED,
+            tr_variant               * args_in,
+            tr_variant               * args_out UNUSED,
             struct tr_rpc_idle_data  * idle_data)
 {
     const char * filename = NULL;
@@ -1986,7 +1983,7 @@ methods[] =
     { "torrent-add",           false, torrentAdd          },
     { "torrent-get",           true,  torrentGet          },
     { "torrent-remove",        true,  torrentRemove       },
-    { "torrent-rename-path",   true,  torrentRenamePath   },
+    { "torrent-rename-path",   false, torrentRenamePath   },
     { "torrent-set",           true,  torrentSet          },
     { "torrent-set-location",  true,  torrentSetLocation  },
     { "torrent-start",         true,  torrentStart        },
@@ -2069,7 +2066,7 @@ request_exec (tr_session             * session,
             tr_variantDictAddInt (&response, TR_KEY_tag, tag);
 
         buf = tr_variantToBuf (&response, TR_VARIANT_FMT_JSON_LEAN);
-      (*callback)(session, buf, callback_user_data);
+        (*callback)(session, buf, callback_user_data);
         evbuffer_free (buf);
 
         tr_variantFree (&response);
@@ -2086,7 +2083,7 @@ request_exec (tr_session             * session,
         data->args_out = tr_variantDictAddDict (data->response, TR_KEY_arguments, 0);
         data->callback = callback;
         data->callback_user_data = callback_user_data;
-      (*methods[i].func)(session, args_in, data->args_out, data);
+        (*methods[i].func)(session, args_in, data->args_out, data);
     }
 }
 

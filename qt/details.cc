@@ -202,8 +202,10 @@ Details :: setIds( const QSet<int>& ids )
     // stop listening to the old torrents
     foreach( int id, myIds ) {
         const Torrent * tor = myModel.getTorrentFromId( id );
-        if( tor )
+        if( tor ) {
             disconnect( tor, SIGNAL(torrentChanged(int)), this, SLOT(onTorrentChanged()) );
+            disconnect( tor, SIGNAL(torrentFileListRebuilt(int)), this, SLOT(onTorrentFileListRebuilt()) );
+        }
     }
 
     myFileTreeView->clear( );
@@ -213,8 +215,10 @@ Details :: setIds( const QSet<int>& ids )
     // listen to the new torrents
     foreach( int id, myIds ) {
         const Torrent * tor = myModel.getTorrentFromId( id );
-        if( tor )
+        if( tor ) {
             connect( tor, SIGNAL(torrentChanged(int)), this, SLOT(onTorrentChanged()) );
+            connect( tor, SIGNAL(torrentFileListRebuilt(int)), this, SLOT(onTorrentFileListRebuilt()) );
+        }
     }
 
     foreach( QWidget * w, myWidgets )
@@ -293,6 +297,13 @@ Details :: onTorrentChanged( )
         myHavePendingRefresh = true;
         QTimer::singleShot( 100, this, SLOT(refresh()));
     }
+}
+
+void
+Details :: onTorrentFileListRebuilt( )
+{
+  myFilesDirty = true;
+  onTorrentChanged( );
 }
 
 namespace
@@ -829,10 +840,11 @@ Details :: refresh( )
     }
     myPeers = peers2;
 
+    if( !single || myFilesDirty )
+        myFileTreeView->clear( );
     if( single )
         myFileTreeView->update( torrents[0]->files( ) , myChangedTorrents );
-    else
-        myFileTreeView->clear( );
+    myFilesDirty = false;
 
     myChangedTorrents = false;
     myHavePendingRefresh = false;
@@ -1307,6 +1319,9 @@ Details :: createFilesTab( )
     connect( myFileTreeView, SIGNAL(      wantedChanged(const QSet<int>&, bool)),
              this,           SLOT(  onFileWantedChanged(const QSet<int>&, bool)));
 
+    connect( myFileTreeView, SIGNAL( pathEdited(const QString&, const QString&)),
+             this,           SLOT (onPathEdited(const QString&, const QString&)));
+
     return myFileTreeView;
 }
 
@@ -1340,4 +1355,10 @@ Details :: onFileWantedChanged (const QSet<int>& indices, bool wanted)
   const tr_quark key = wanted ? TR_KEY_files_wanted : TR_KEY_files_unwanted;
   mySession.torrentSet (myIds, key, indices.toList());
   getNewData ();
+}
+
+void
+Details :: onPathEdited (const QString& oldpath, const QString& newname)
+{
+  mySession.torrentRenamePath (myIds, oldpath, newname);
 }

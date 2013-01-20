@@ -101,10 +101,12 @@ class FileTreeModel: public QAbstractItemModel
         QModelIndex parent( const QModelIndex& child, int column ) const;
         int rowCount( const QModelIndex& parent = QModelIndex( ) ) const;
         int columnCount( const QModelIndex &parent = QModelIndex( ) ) const;
+        virtual bool setData ( const QModelIndex & index, const QVariant & value, int role = Qt::EditRole );
 
     signals:
         void priorityChanged( const QSet<int>& fileIndices, int );
         void wantedChanged( const QSet<int>& fileIndices, bool );
+        void pathEdited (const QString& oldpath, const QString& newname);
 
     public:
         void clear( );
@@ -154,6 +156,7 @@ class FileTreeView: public QTreeView
     signals:
         void priorityChanged( const QSet<int>& fileIndices, int );
         void wantedChanged( const QSet<int>& fileIndices, bool );
+        void pathEdited (const QString& oldpath, const QString& newname);
 
     protected:
         bool eventFilter( QObject *, QEvent * );

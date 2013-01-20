@@ -318,10 +318,37 @@ FileTreeModel :: flags( const QModelIndex& index ) const
 {
     int i( Qt::ItemIsSelectable | Qt::ItemIsEnabled );
 
+    if( index.column( ) == COL_NAME )
+        i |= Qt::ItemIsEditable;
+
     if( index.column( ) == COL_WANTED )
         i |= Qt::ItemIsUserCheckable | Qt::ItemIsTristate;
 
     return (Qt::ItemFlags)i;
+}
+
+bool
+FileTreeModel :: setData (const QModelIndex& index, const QVariant& newname, int role)
+{
+  if (role == Qt::EditRole)
+    {
+      QString oldpath;
+      QModelIndex walk = index;
+      FileTreeItem * item = static_cast<FileTreeItem*>(index.internalPointer());
+
+      while (item && !item->name().isEmpty())
+        {
+          if (oldpath.isEmpty())
+            oldpath = item->name();
+          else
+            oldpath = item->name() + "/" + oldpath;
+          item = item->parent ();
+        }
+
+      emit pathEdited (oldpath, newname.toString());
+    }
+
+  return false; // don't update the view until the session confirms the change
 }
 
 QVariant
@@ -681,6 +708,9 @@ FileTreeView :: FileTreeView( QWidget * parent ):
 
     connect( &myModel, SIGNAL(wantedChanged(const QSet<int>&, bool)),
              this,     SIGNAL(wantedChanged(const QSet<int>&, bool)));
+
+    connect( &myModel, SIGNAL(pathEdited(const QString&, const QString&)),
+             this,     SIGNAL(pathEdited(const QString&, const QString&)));
 }
 
 FileTreeView :: ~FileTreeView( )

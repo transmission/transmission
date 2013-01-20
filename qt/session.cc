@@ -27,6 +27,7 @@
 #include <QStringList>
 #include <QStyle>
 #include <QTextStream>
+#include <QTimer>
 
 #include <curl/curl.h>
 
@@ -60,6 +61,7 @@ namespace
         TAG_ADD_TORRENT,
         TAG_PORT_TEST,
         TAG_MAGNET_LINK,
+        TAG_RENAME_PATH,
 
         FIRST_UNIQUE_TAG
     };
@@ -246,7 +248,8 @@ Session :: Session( const char * configDir, Prefs& prefs ):
     myPrefs( prefs ),
     mySession( 0 ),
     myConfigDir( QString::fromUtf8( configDir ) ),
-    myNAM( 0 )
+    myNAM( 0 ),
+    myResponseTimer (this)
 {
     myStats.ratio = TR_RATIO_NA;
     myStats.uploadedBytes = 0;
@@ -257,6 +260,9 @@ Session :: Session( const char * configDir, Prefs& prefs ):
     myCumulativeStats = myStats;
 
     connect( &myPrefs, SIGNAL(changed(int)), this, SLOT(updatePref(int)) );
+
+    connect (&myResponseTimer, SIGNAL(timeout()), this, SLOT(onResponseTimer()));
+    myResponseTimer.setSingleShot (true);
 }
 
 Session :: ~Session( )
@@ -495,6 +501,21 @@ Session :: torrentSetLocation( const QSet<int>& ids, const QString& location, bo
 }
 
 void
+Session :: torrentRenamePath (const QSet<int>& ids, const QString& oldpath, const QString& newname)
+{
+  tr_variant top;
+  tr_variantInitDict (&top, 2);
+  tr_variantDictAddStr (&top, TR_KEY_method, "torrent-rename-path");
+  tr_variantDictAddInt (&top, TR_KEY_tag, TAG_RENAME_PATH);
+  tr_variant * args (tr_variantDictAddDict(&top, TR_KEY_arguments, 3));
+  addOptionalIds (args, ids);
+  tr_variantDictAddStr (args, TR_KEY_path, oldpath.toUtf8().constData());
+  tr_variantDictAddStr (args, TR_KEY_name, newname.toUtf8().constData());
+  exec (&top);
+  tr_variantFree (&top);
+}
+
+void
 Session :: refreshTorrents( const QSet<int>& ids )
 {
     if( ids.empty( ) )
@@ -635,11 +656,16 @@ Session :: exec( const tr_variant * request )
 }
 
 void
-Session :: localSessionCallback( tr_session * session, struct evbuffer * json, void * self )
+Session :: localSessionCallback( tr_session * session, struct evbuffer * json, void * vself )
 {
-    Q_UNUSED( session );
+  Q_UNUSED (session);
 
-    ((Session*)self)->parseResponse( (const char*) evbuffer_pullup( json, -1 ), evbuffer_get_length( json ) );
+  Session * self = static_cast<Session*>(vself);
+
+  self->myIdleJSON.append (QString ((const char*) evbuffer_pullup (json, -1)));
+
+  if (!self->myResponseTimer.isActive())
+    self->myResponseTimer.start(50);
 }
 
 #define REQUEST_DATA_PROPERTY_KEY "requestData"
@@ -716,6 +742,19 @@ Session :: onFinished( QNetworkReply * reply )
 }
 
 void
+Session :: onResponseTimer ()
+{
+  QStringList responses = myIdleJSON;
+  myIdleJSON.clear();
+
+  foreach (QString response, responses)
+    {
+      const QByteArray utf8 (response.toUtf8());
+      parseResponse (utf8.constData(), utf8.length());
+    }
+}
+
+void
 Session :: parseResponse( const char * json, size_t jsonLength )
 {
     tr_variant top;
@@ -767,11 +806,43 @@ Session :: parseResponse( const char * json, size_t jsonLength )
                     break;
                 }
 
+                case TAG_RENAME_PATH:
+                  {
+                    int64_t id = 0;
+                    const char * result = 0;
+                    if( tr_variantDictFindStr (&top, TR_KEY_result, &result, 0) && strcmp (result, "success") )
+                      {
+                        const char * path = "";
+                        const char * name = "";
+                        tr_variantDictFindStr (args, TR_KEY_path, &path, 0);
+                        tr_variantDictFindStr (args, TR_KEY_name, &name, 0);
+                        const QString title = tr("Error Renaming Path");
+                        const QString text = tr("<p><b>Unable to rename \"%1\" as \"%2\": %3.</b></p> <p>Please correct the errors and try again.</p>").arg(path).arg(name).arg(result);
+                        QMessageBox * d = new QMessageBox( QMessageBox::Information, title, text,
+                                                           QMessageBox::Close,
+                                                           QApplication::activeWindow());
+                        connect( d, SIGNAL(rejected()), d, SLOT(deleteLater()) );
+                        d->show( );
+                      }
+                    else if (tr_variantDictFindInt (args, TR_KEY_id, &id) && id)
+                      {
+                        // let's get the updated file list
+                        char * req = tr_strdup_printf ("{ \"arguments\": { \"fields\": [ \"files\", \"id\" ], \"ids\": %d }, \"method\": \"torrent-get\", \"tag\": %d }",
+                                                       int(id),
+                                                       int(TAG_SOME_TORRENTS));
+                        exec (req);
+                        tr_free (req);
+                      }
+
+                    break;
+                }
+
                 case TAG_PORT_TEST: {
                     bool isOpen = 0;
                     if( tr_variantDictFindDict( &top, TR_KEY_arguments, &args ) )
                         tr_variantDictFindBool( args, TR_KEY_port_is_open, &isOpen );
                     emit portTested( (bool)isOpen );
+                    break;
                 }
 
                 case TAG_MAGNET_LINK: {

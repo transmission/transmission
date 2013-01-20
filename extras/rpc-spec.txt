@@ -429,11 +429,11 @@
    string                           | value type & description
    ---------------------------------+-------------------------------------------------
    "ids"                            | array      the torrent torrent list, as described in 3.1
-                                    |            (though, this function doesn't make sense for >1 torrent)
+                                    |            (must only be 1 torrent)
    "path"                           | string     the path to the file or folder that will be renamed
    "name"                           | string     the file or folder's new name
 
-   Response arguments: none
+   Response arguments: "path", "name", and "id", holding the torrent ID integer
 
 
 4.   Session Requests

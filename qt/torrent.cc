@@ -573,6 +573,7 @@ Torrent :: update (tr_variant * d)
 
       updateMimeIcon ();
       changed = true;
+      emit torrentFileListRebuilt (id ());
     }
 
   if (tr_variantDictFindList (d, TR_KEY_fileStats, &files))
