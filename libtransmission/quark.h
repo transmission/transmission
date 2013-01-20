@@ -319,7 +319,6 @@ enum
   TR_KEY_session_count,
   TR_KEY_sessionCount,
   TR_KEY_show_backup_trackers,
-  TR_KEY_show_desktop_notification,
   TR_KEY_show_extra_peer_details,
   TR_KEY_show_filterbar,
   TR_KEY_show_notification_area_icon,

@@ -44,7 +44,8 @@ class Prefs: public QObject
             DIR_WATCH_ENABLED,
             SHOW_TRAY_ICON,
             START_MINIMIZED,
-            SHOW_DESKTOP_NOTIFICATION,
+            SHOW_NOTIFICATION_ON_ADD,
+            SHOW_NOTIFICATION_ON_COMPLETE,
             ASKQUIT,
             SORT_MODE,
             SORT_REVERSED,
@@ -71,6 +72,8 @@ class Prefs: public QObject
             SESSION_REMOTE_AUTH,
             SESSION_REMOTE_USERNAME,
             SESSION_REMOTE_PASSWORD,
+            COMPLETE_SOUND_COMMAND,
+            COMPLETE_SOUND_ENABLED,
             USER_HAS_GIVEN_INFORMED_CONSENT,
 
             /* core prefs */

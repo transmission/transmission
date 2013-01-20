@@ -22,6 +22,7 @@
 #include <QIcon>
 #include <QLabel>
 #include <QLibraryInfo>
+#include <QProcess>
 #include <QRect>
 
 #include <libtransmission/transmission.h>
@@ -259,7 +260,7 @@ MyApp :: MyApp( int& argc, char ** argv ):
 void
 MyApp :: onTorrentsAdded( QSet<int> torrents )
 {
-    if( !myPrefs->getBool( Prefs::SHOW_DESKTOP_NOTIFICATION ) )
+    if( !myPrefs->getBool( Prefs::SHOW_NOTIFICATION_ON_ADD ) )
         return;
 
     foreach( int id, torrents )
@@ -279,13 +280,17 @@ MyApp :: onTorrentsAdded( QSet<int> torrents )
 void
 MyApp :: onTorrentCompleted( int id )
 {
-    Torrent * tor = myModel->getTorrentFromId( id );
+  Torrent * tor = myModel->getTorrentFromId (id);
 
-    if( tor && !tor->name().isEmpty() )
+  if (tor)
     {
-        notify( tr( "Torrent Completed" ), tor->name( ) );
+      if (myPrefs->getBool (Prefs::SHOW_NOTIFICATION_ON_COMPLETE))
+        notify (tr("Torrent Completed"), tor->name());
 
-        disconnect( tor, SIGNAL(torrentCompleted(int)), this, SLOT(onTorrentCompleted(int)) );
+      if (myPrefs->getBool (Prefs::COMPLETE_SOUND_ENABLED))
+        QProcess::execute (myPrefs->getString(Prefs::COMPLETE_SOUND_COMMAND));
+
+      disconnect( tor, SIGNAL(torrentCompleted(int)), this, SLOT(onTorrentCompleted(int)) );
     }
 }
 

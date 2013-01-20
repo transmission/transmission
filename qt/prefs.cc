@@ -38,7 +38,8 @@ Prefs::PrefItem Prefs::myItems[] =
   { DIR_WATCH_ENABLED, TR_KEY_watch_dir_enabled, QVariant::Bool },
   { SHOW_TRAY_ICON, TR_KEY_show_notification_area_icon, QVariant::Bool },
   { START_MINIMIZED, TR_KEY_start_minimized, QVariant::Bool },
-  { SHOW_DESKTOP_NOTIFICATION, TR_KEY_show_desktop_notification, QVariant::Bool },
+  { SHOW_NOTIFICATION_ON_ADD, TR_KEY_torrent_added_notification_enabled, QVariant::Bool },
+  { SHOW_NOTIFICATION_ON_COMPLETE, TR_KEY_torrent_complete_notification_enabled, QVariant::Bool },
   { ASKQUIT, TR_KEY_prompt_before_exit, QVariant::Bool },
   { SORT_MODE, TR_KEY_sort_mode, TrTypes::SortModeType },
   { SORT_REVERSED, TR_KEY_sort_reversed, QVariant::Bool },
@@ -65,6 +66,8 @@ Prefs::PrefItem Prefs::myItems[] =
   { SESSION_REMOTE_AUTH, TR_KEY_remote_session_requres_authentication, QVariant::Bool },
   { SESSION_REMOTE_USERNAME, TR_KEY_remote_session_username, QVariant::String },
   { SESSION_REMOTE_PASSWORD, TR_KEY_remote_session_password, QVariant::String },
+  { COMPLETE_SOUND_COMMAND, TR_KEY_torrent_complete_sound_command, QVariant::String },
+  { COMPLETE_SOUND_ENABLED, TR_KEY_torrent_complete_sound_enabled, QVariant::Bool },
   { USER_HAS_GIVEN_INFORMED_CONSENT, TR_KEY_user_has_given_informed_consent, QVariant::Bool },
 
   /* libtransmission settings */
@@ -275,7 +278,7 @@ Prefs :: ~Prefs ()
 void
 Prefs :: initDefaults (tr_variant * d)
 {
-  tr_variantDictReserve (d, 35);
+  tr_variantDictReserve (d, 38);
   tr_variantDictAddBool (d, TR_KEY_blocklist_updates_enabled, true);
   tr_variantDictAddBool (d, TR_KEY_compact_view, false);
   tr_variantDictAddBool (d, TR_KEY_inhibit_desktop_hibernation, false);
@@ -283,7 +286,6 @@ Prefs :: initDefaults (tr_variant * d)
   tr_variantDictAddBool (d, TR_KEY_remote_session_enabled, false);
   tr_variantDictAddBool (d, TR_KEY_remote_session_requres_authentication, false);
   tr_variantDictAddBool (d, TR_KEY_show_backup_trackers, false);
-  tr_variantDictAddBool (d, TR_KEY_show_desktop_notification, true);
   tr_variantDictAddBool (d, TR_KEY_show_extra_peer_details, false),
   tr_variantDictAddBool (d, TR_KEY_show_filterbar, true);
   tr_variantDictAddBool (d, TR_KEY_show_notification_area_icon, false);
@@ -293,6 +295,10 @@ Prefs :: initDefaults (tr_variant * d)
   tr_variantDictAddBool (d, TR_KEY_show_toolbar, true);
   tr_variantDictAddBool (d, TR_KEY_show_tracker_scrapes, false);
   tr_variantDictAddBool (d, TR_KEY_sort_reversed, false);
+  tr_variantDictAddBool (d, TR_KEY_torrent_added_notification_enabled, true);
+  tr_variantDictAddBool (d, TR_KEY_torrent_complete_notification_enabled, true);
+  tr_variantDictAddStr  (d, TR_KEY_torrent_complete_sound_command, "canberra-gtk-play -i complete-download -d 'transmission torrent downloaded'");
+  tr_variantDictAddBool (d, TR_KEY_torrent_complete_sound_enabled, true);
   tr_variantDictAddBool (d, TR_KEY_user_has_given_informed_consent, false);
   tr_variantDictAddBool (d, TR_KEY_watch_dir_enabled, false);
   tr_variantDictAddInt  (d, TR_KEY_blocklist_date, 0);

@@ -309,7 +309,6 @@ static const struct tr_key_struct my_static[] =
   { "session-count", 13 },
   { "sessionCount", 12 },
   { "show-backup-trackers", 20 },
-  { "show-desktop-notification", 25 },
   { "show-extra-peer-details", 23 },
   { "show-filterbar", 14 },
   { "show-notification-area-icon", 27 },

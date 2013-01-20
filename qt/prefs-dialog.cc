@@ -299,9 +299,15 @@ PrefsDialog :: createDesktopTab( )
     HIG * hig = new HIG( this );
     hig->addSectionTitle( tr( "Desktop" ) );
 
-    hig->addWideControl( checkBoxNew( tr( "Show Transmission icon in the &notification area" ), Prefs::SHOW_TRAY_ICON ) );
-    hig->addWideControl( checkBoxNew( tr( "Start &minimized in notification area" ), Prefs::START_MINIMIZED ) );
-    hig->addWideControl( checkBoxNew( tr( "Show &popup notifications" ), Prefs::SHOW_DESKTOP_NOTIFICATION ) );
+      hig->addWideControl( checkBoxNew( tr( "Show Transmission icon in the &notification area" ), Prefs::SHOW_TRAY_ICON ) );
+      hig->addWideControl( checkBoxNew( tr( "Start &minimized in notification area" ), Prefs::START_MINIMIZED ) );
+
+    hig->addSectionDivider( );
+    hig->addSectionTitle( tr ("Notification") );
+
+      hig->addWideControl( checkBoxNew( tr( "Show a notification when torrents are a&dded" ), Prefs::SHOW_NOTIFICATION_ON_ADD ) );
+      hig->addWideControl( checkBoxNew( tr( "Show a notification when torrents &finish" ), Prefs::SHOW_NOTIFICATION_ON_COMPLETE ) );
+      hig->addWideControl( checkBoxNew( tr( "Play a &sound when torrents finish" ), Prefs::COMPLETE_SOUND_ENABLED ) );
 
     hig->finish( );
     return hig;
