@@ -39,44 +39,44 @@ testBlockList (void)
     const char * tmpfile_txt = TEMPFILE_TXT;
     const char * tmpfile_bin = TEMPFILE_BIN;
     struct tr_address addr;
-    tr_blocklist * b;
+    tr_blocklistFile * b;
 
     remove (tmpfile_txt);
     remove (tmpfile_bin);
 
-    b = _tr_blocklistNew (tmpfile_bin, true);
+    b = tr_blocklistFileNew (tmpfile_bin, true);
     createTestBlocklist (tmpfile_txt);
-    _tr_blocklistSetContent (b, tmpfile_txt);
+    tr_blocklistFileSetContent (b, tmpfile_txt);
 
     /* now run some tests */
     check (tr_address_from_string (&addr, "216.16.1.143"));
-    check (!_tr_blocklistHasAddress (b, &addr));
+    check (!tr_blocklistFileHasAddress (b, &addr));
     check (tr_address_from_string (&addr, "216.16.1.144"));
-    check (_tr_blocklistHasAddress (b, &addr));
+    check (tr_blocklistFileHasAddress (b, &addr));
     check (tr_address_from_string (&addr, "216.16.1.145"));
-    check (_tr_blocklistHasAddress (b, &addr));
+    check (tr_blocklistFileHasAddress (b, &addr));
     check (tr_address_from_string (&addr, "216.16.1.146"));
-    check (_tr_blocklistHasAddress (b, &addr));
+    check (tr_blocklistFileHasAddress (b, &addr));
     check (tr_address_from_string (&addr, "216.16.1.147"));
-    check (_tr_blocklistHasAddress (b, &addr));
+    check (tr_blocklistFileHasAddress (b, &addr));
     check (tr_address_from_string (&addr, "216.16.1.148"));
-    check (_tr_blocklistHasAddress (b, &addr));
+    check (tr_blocklistFileHasAddress (b, &addr));
     check (tr_address_from_string (&addr, "216.16.1.149"));
-    check (_tr_blocklistHasAddress (b, &addr));
+    check (tr_blocklistFileHasAddress (b, &addr));
     check (tr_address_from_string (&addr, "216.16.1.150"));
-    check (_tr_blocklistHasAddress (b, &addr));
+    check (tr_blocklistFileHasAddress (b, &addr));
     check (tr_address_from_string (&addr, "216.16.1.151"));
-    check (_tr_blocklistHasAddress (b, &addr));
+    check (tr_blocklistFileHasAddress (b, &addr));
     check (tr_address_from_string (&addr, "216.16.1.152"));
-    check (!_tr_blocklistHasAddress (b, &addr));
+    check (!tr_blocklistFileHasAddress (b, &addr));
     check (tr_address_from_string (&addr, "216.16.1.153"));
-    check (!_tr_blocklistHasAddress (b, &addr));
+    check (!tr_blocklistFileHasAddress (b, &addr));
     check (tr_address_from_string (&addr, "217.0.0.1"));
-    check (!_tr_blocklistHasAddress (b, &addr));
+    check (!tr_blocklistFileHasAddress (b, &addr));
     check (tr_address_from_string (&addr, "255.0.0.1"));
 
     /* cleanup */
-    _tr_blocklistFree (b);
+    tr_blocklistFileFree (b);
     remove (tmpfile_txt);
     remove (tmpfile_bin);
     return 0;

@@ -53,7 +53,7 @@ struct tr_ipv4_range
   uint32_t end;
 };
 
-struct tr_blocklist
+struct tr_blocklistFile
 {
   bool                   isEnabled;
   int                    fd;
@@ -64,7 +64,7 @@ struct tr_blocklist
 };
 
 static void
-blocklistClose (tr_blocklist * b)
+blocklistClose (tr_blocklistFile * b)
 {
   if (b->rules != NULL)
     {
@@ -78,7 +78,7 @@ blocklistClose (tr_blocklist * b)
 }
 
 static void
-blocklistLoad (tr_blocklist * b)
+blocklistLoad (tr_blocklistFile * b)
 {
   int fd;
   size_t byteCount;
@@ -117,7 +117,7 @@ blocklistLoad (tr_blocklist * b)
 }
 
 static void
-blocklistEnsureLoaded (tr_blocklist * b)
+blocklistEnsureLoaded (tr_blocklistFile * b)
 {
   if (b->rules == NULL)
     blocklistLoad (b);
@@ -135,7 +135,7 @@ compareAddressToRange (const void * va, const void * vb)
 }
 
 static void
-blocklistDelete (tr_blocklist * b)
+blocklistDelete (tr_blocklistFile * b)
 {
   blocklistClose (b);
   unlink (b->filename);
@@ -145,12 +145,12 @@ blocklistDelete (tr_blocklist * b)
 ****  PACKAGE-VISIBLE
 ***/
 
-tr_blocklist *
-_tr_blocklistNew (const char * filename, bool isEnabled)
+tr_blocklistFile *
+tr_blocklistFileNew (const char * filename, bool isEnabled)
 {
-  tr_blocklist * b;
+  tr_blocklistFile * b;
 
-  b = tr_new0 (tr_blocklist, 1);
+  b = tr_new0 (tr_blocklistFile, 1);
   b->fd = -1;
   b->filename = tr_strdup (filename);
   b->isEnabled = isEnabled;
@@ -159,13 +159,13 @@ _tr_blocklistNew (const char * filename, bool isEnabled)
 }
 
 const char*
-_tr_blocklistGetFilename (const tr_blocklist * b)
+tr_blocklistFileGetFilename (const tr_blocklistFile * b)
 {
   return b->filename;
 }
 
 void
-_tr_blocklistFree (tr_blocklist * b)
+tr_blocklistFileFree (tr_blocklistFile * b)
 {
   blocklistClose (b);
   tr_free (b->filename);
@@ -173,7 +173,7 @@ _tr_blocklistFree (tr_blocklist * b)
 }
 
 int
-_tr_blocklistExists (const tr_blocklist * b)
+tr_blocklistFileExists (const tr_blocklistFile * b)
 {
   struct stat st;
 
@@ -181,27 +181,27 @@ _tr_blocklistExists (const tr_blocklist * b)
 }
 
 int
-_tr_blocklistGetRuleCount (const tr_blocklist * b)
+tr_blocklistFileGetRuleCount (const tr_blocklistFile * b)
 {
-  blocklistEnsureLoaded ((tr_blocklist*)b);
+  blocklistEnsureLoaded ((tr_blocklistFile*)b);
 
   return b->ruleCount;
 }
 
 int
-_tr_blocklistIsEnabled (tr_blocklist * b)
+tr_blocklistFileIsEnabled (tr_blocklistFile * b)
 {
   return b->isEnabled;
 }
 
 void
-_tr_blocklistSetEnabled (tr_blocklist * b, bool isEnabled)
+tr_blocklistFileSetEnabled (tr_blocklistFile * b, bool isEnabled)
 {
   b->isEnabled = isEnabled ? 1 : 0;
 }
 
 int
-_tr_blocklistHasAddress (tr_blocklist * b, const tr_address * addr)
+tr_blocklistFileHasAddress (tr_blocklistFile * b, const tr_address * addr)
 {
   uint32_t needle;
   const struct tr_ipv4_range * range;
@@ -314,7 +314,7 @@ compareAddressRangesByFirstAddress (const void * va, const void * vb)
 }
 
 int
-_tr_blocklistSetContent (tr_blocklist * b, const char * filename)
+tr_blocklistFileSetContent (tr_blocklistFile * b, const char * filename)
 {
   FILE * in;
   FILE * out;

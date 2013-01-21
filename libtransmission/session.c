@@ -2215,7 +2215,7 @@ loadBlocklists (tr_session * session)
                                  (TrListCompareFunc)strcmp))
                 {
                     tr_list_append (&list,
-                                   _tr_blocklistNew (filename, isEnabled));
+                                   tr_blocklistFileNew (filename, isEnabled));
                     ++binCount;
                 }
             }
@@ -2223,15 +2223,15 @@ loadBlocklists (tr_session * session)
             {
                 /* strip out the file suffix, if there is one, and add ".bin"
                   instead */
-                tr_blocklist * b;
+                tr_blocklistFile * b;
                 const char *   dot = strrchr (d->d_name, '.');
                 const int      len = dot ? dot - d->d_name
                                          : (int)strlen (d->d_name);
                 char         * tmp = tr_strdup_printf (
                                         "%s" TR_PATH_DELIMITER_STR "%*.*s.bin",
                                         dirname, len, len, d->d_name);
-                b = _tr_blocklistNew (tmp, isEnabled);
-                _tr_blocklistSetContent (b, filename);
+                b = tr_blocklistFileNew (tmp, isEnabled);
+                tr_blocklistFileSetContent (b, filename);
                 tr_list_append (&list, b);
                 ++newCount;
                 tr_free (tmp);
@@ -2257,7 +2257,7 @@ static void
 closeBlocklists (tr_session * session)
 {
     tr_list_free (&session->blocklists,
-                (TrListForeachFunc)_tr_blocklistFree);
+                (TrListForeachFunc)tr_blocklistFileFree);
 }
 
 void
@@ -2278,7 +2278,7 @@ tr_blocklistGetRuleCount (const tr_session * session)
     assert (tr_isSession (session));
 
     for (l = session->blocklists; l; l = l->next)
-        n += _tr_blocklistGetRuleCount (l->data);
+        n += tr_blocklistFileGetRuleCount (l->data);
     return n;
 }
 
@@ -2300,7 +2300,7 @@ tr_blocklistSetEnabled (tr_session * session, bool isEnabled)
     session->isBlocklistEnabled = isEnabled != 0;
 
     for (l=session->blocklists; l!=NULL; l=l->next)
-        _tr_blocklistSetEnabled (l->data, isEnabled);
+        tr_blocklistFileSetEnabled (l->data, isEnabled);
 }
 
 bool
@@ -2316,24 +2316,24 @@ tr_blocklistSetContent (tr_session * session, const char * contentFilename)
 {
     tr_list * l;
     int ruleCount;
-    tr_blocklist * b;
+    tr_blocklistFile * b;
     const char * defaultName = DEFAULT_BLOCKLIST_FILENAME;
     tr_sessionLock (session);
 
     for (b = NULL, l = session->blocklists; !b && l; l = l->next)
-        if (tr_stringEndsWith (_tr_blocklistGetFilename (l->data),
+        if (tr_stringEndsWith (tr_blocklistFileGetFilename (l->data),
                                defaultName))
             b = l->data;
 
     if (!b)
     {
         char * path = tr_buildPath (session->configDir, "blocklists", defaultName, NULL);
-        b = _tr_blocklistNew (path, session->isBlocklistEnabled);
+        b = tr_blocklistFileNew (path, session->isBlocklistEnabled);
         tr_list_append (&session->blocklists, b);
         tr_free (path);
     }
 
-    ruleCount = _tr_blocklistSetContent (b, contentFilename);
+    ruleCount = tr_blocklistFileSetContent (b, contentFilename);
     tr_sessionUnlock (session);
     return ruleCount;
 }
@@ -2347,7 +2347,7 @@ tr_sessionIsAddressBlocked (const tr_session * session,
     assert (tr_isSession (session));
 
     for (l = session->blocklists; l; l = l->next)
-        if (_tr_blocklistHasAddress (l->data, addr))
+        if (tr_blocklistFileHasAddress (l->data, addr))
             return true;
     return false;
 }
