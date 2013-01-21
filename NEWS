@@ -1,3 +1,48 @@
+=== Transmission 2.80 (2013/xx/yy) ===
+[http://trac.transmissionbt.com/query?milestone=2.80&group=component&order=severity All tickets closed by this release]
+==== All Platforms ====
+  * Support renaming a transfer's files and folders
+  * Better use of the OS' filesystem cache
+  * Lengthen the prefetch cache for data sent to peers
+  * Faster parsing of JSON data and bencoded data
+  * Fewer public API calls in libtransmission need thread locks (ie, fewer beachballs)
+  * Other CPU speedups
+  * Replace the previous JSON parser with jsonsl to resolve DFSG license issue
+  * Fix FTBFS when compiling with -Werror=format-security
+  * Add 'freespace' argument to session-get in the Remote API
+  * Improved unit tests in libtransmission
+  * Tarballs are now released only in .xz format
+==== Mac Client ====
+  * VDKQueue
+==== GTK+ Client ====
+  * Simplify the tracker filter pulldown's interface; now matches the Qt client
+  * Synced preferences text & shortcuts in the GTK+ and Qt clients
+  * Remove deprecated calls to gdk_threads_enter()
+  * Silence a handful of console warnings
+==== Qt Client ====
+  * More efficient updates when receiving information from the server
+  * Add an option to play a sound when a torrent finishes downloading
+  * Add an option to start up iconified into the notification area
+  * Fix an issue with the tray icon preventing hibernation/logout
+  * Other CPU speedups
+  * Open the correct folder when clicking on single-file torrents
+  * Synced preferences text & shortcuts in the GTK+ and Qt clients
+  * Fix non Latin-1 unit strings
+==== Daemon ====
+  * Add support for specifying recently-active torrents in transmission-remote
+==== Web Client ====
+  * Exend the cookie lifespan so that settings like sort order don't get lost
+==== Utils ====
+  * Support user-defined piece sizes in transmission-create
+
+
+2.7x backport list... if this gets long enough, we'll do 2.77
+  #5238 'tr_inactvelimit in rpc-spec' -- fix obsolete documentation. 
+  #5235 'Plural wrong in torrent-cell-renderer'
+  #5219 'QPrintable and non Latin-1 symbols on Ubuntu'
+  #5215 fix a transmission-cli regression from 2.76
+
+
 === Transmission 2.76 (2013/01/08) ===
 [http://trac.transmissionbt.com/query?milestone=2.76&group=component&order=severity All tickets closed by this release]
 ==== All Platforms ====
