@@ -498,7 +498,7 @@ static GtkWidget*
 createRatioMenu (PrivateData * p)
 {
   int i, n;
-  GtkWidget *m, *w; 
+  GtkWidget *m, *w;
   GtkMenuShell * menu_shell;
 
   m = gtk_menu_new ();
@@ -604,14 +604,15 @@ onOptionsClicked (GtkButton * button UNUSED, gpointer vp)
 GtkWidget *
 gtr_window_new (GtkApplication * app, GtkUIManager * ui_mgr, TrCore * core)
 {
-  int           i, n;
-  const char  * pch;
-  PrivateData * p;
-  GtkWidget   * ul_lb, * dl_lb;
-  GtkWidget   * mainmenu, *toolbar, *filter, *list, *status;
-  GtkWidget   * vbox, *w, *self, *h, *hbox, *menu;
-  GtkWindow   * win;
-  GSList      * l;
+  int              i, n;
+  const char     * pch, * style;
+  PrivateData    * p;
+  GtkWidget      * ul_lb, * dl_lb;
+  GtkWidget      * mainmenu, *toolbar, *filter, *list, *status;
+  GtkWidget      * vbox, *w, *self, *h, *hbox, *menu;
+  GtkWindow      * win;
+  GtkCssProvider * css_provider;
+  GSList         * l;
 
   p = g_new0 (PrivateData, 1);
 
@@ -629,6 +630,15 @@ gtr_window_new (GtkApplication * app, GtkUIManager * ui_mgr, TrCore * core)
   if (gtr_pref_flag_get (TR_KEY_main_window_is_maximized))
     gtk_window_maximize (win);
   gtk_window_add_accel_group (win, gtk_ui_manager_get_accel_group (ui_mgr));
+  /* Add style provider to the window. */
+  /* Please move it to separate .css file if you’re adding more styles here. */
+  style = ".tr-workarea {border-width: 1px 0; border-style: solid; border-radius: 0;}";
+  css_provider = gtk_css_provider_new ();
+  gtk_css_provider_load_from_data (css_provider, style,
+                                   strlen (style), NULL);
+  gtk_style_context_add_provider_for_screen(gdk_screen_get_default (),
+                                            GTK_STYLE_PROVIDER (css_provider),
+                                            GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
 
   /* window's main container */
   vbox = gtk_box_new (GTK_ORIENTATION_VERTICAL, 0);
@@ -736,7 +746,8 @@ gtr_window_new (GtkApplication * app, GtkUIManager * ui_mgr, TrCore * core)
   gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (w),
                                   GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC);
   gtk_scrolled_window_set_shadow_type (GTK_SCROLLED_WINDOW (w),
-                                       GTK_SHADOW_IN);
+                                       GTK_SHADOW_OUT);
+  gtk_style_context_add_class (gtk_widget_get_style_context (w), "tr-workarea");
   gtk_container_add (GTK_CONTAINER (w), p->view);
 
   /* lay out the widgets */
