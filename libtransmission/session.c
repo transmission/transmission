@@ -611,7 +611,7 @@ tr_sessionInit (const char  * tag,
     data.clientSettings = clientSettings;
     tr_runInEventThread (session, tr_sessionInitImpl, &data);
     while (!data.done)
-        tr_wait_msec (100);
+        tr_wait_msec (50);
 
     return session;
 }
@@ -727,6 +727,8 @@ tr_sessionInitImpl (void * vdata)
     tr_statsInit (session);
 
     tr_webInit (session);
+    while (session->web == NULL)
+      tr_wait_msec (50);
 
     tr_sessionSet (session, &settings);
 
@@ -1843,7 +1845,7 @@ tr_sessionClose (tr_session * session)
     {
         dbgmsg ("waiting on port unmap (%p) or announcer (%p)... now %zu deadline %zu",
                 session->shared, session->announcer, (size_t)time (NULL), (size_t)deadline);
-        tr_wait_msec (100);
+        tr_wait_msec (50);
     }
 
     tr_webClose (session, TR_WEB_CLOSE_NOW);
@@ -1854,7 +1856,7 @@ tr_sessionClose (tr_session * session)
     {
         static bool forced = false;
         dbgmsg ("waiting for libtransmission thread to finish... now %zu deadline %zu", (size_t)time (NULL), (size_t)deadline);
-        tr_wait_msec (500);
+        tr_wait_msec (100);
         if (deadlineReached (deadline) && !forced)
         {
             dbgmsg ("calling event_loopbreak ()");
@@ -2183,74 +2185,102 @@ tr_stringEndsWith (const char * str, const char * end)
 static void
 loadBlocklists (tr_session * session)
 {
-    int         binCount = 0;
-    int         newCount = 0;
-    struct stat sb;
-    char      * dirname;
-    DIR *       odir = NULL;
-    tr_list *   list = NULL;
-    const bool  isEnabled = session->isBlocklistEnabled;
+  DIR * odir;
+  char * dirname;
+  struct dirent * d;
+  tr_list * blocklists = NULL;
+  tr_ptrArray loadme = TR_PTR_ARRAY_INIT;
+  const bool isEnabled = session->isBlocklistEnabled;
 
-    /* walk through the directory and find blocklists */
-    dirname = tr_buildPath (session->configDir, "blocklists", NULL);
-    if (!stat (dirname,
-               &sb) && S_ISDIR (sb.st_mode)
-      && ((odir = opendir (dirname))))
+  /* walk the blocklist directory... */
+  dirname = tr_buildPath (session->configDir, "blocklists", NULL);
+  odir = opendir (dirname);
+  while ((d = readdir (odir)))
     {
-        struct dirent *d;
-        for (d = readdir (odir); d; d = readdir (odir))
+      char * path;
+      char * load = NULL;
+ 
+      if (!d->d_name || (d->d_name[0]=='.')) /* ignore dotfiles */
+        continue;
+
+      path = tr_buildPath (dirname, d->d_name, NULL);
+
+      if (tr_stringEndsWith (path, ".bin"))
         {
-            char * filename;
+          load = tr_strdup (path);
+        }
+      else
+        {
+          char * binname;
+          char * basename;
+          time_t path_mtime = 0;
+          time_t binname_mtime = 0;
 
-            if (!d->d_name || d->d_name[0] == '.') /* skip dotfiles, ., and ..
-                                                      */
-                continue;
+          basename = tr_basename (d->d_name);
+          binname = tr_strdup_printf ("%s" TR_PATH_DELIMITER_STR "%s.bin", dirname, basename);
 
-            filename = tr_buildPath (dirname, d->d_name, NULL);
-
-            if (tr_stringEndsWith (filename, ".bin"))
+          if (!tr_fileExists (binname, &binname_mtime)) /* create it */
             {
-                /* if we don't already have this blocklist, add it */
-                if (!tr_list_find (list, filename,
-                                 (TrListCompareFunc)strcmp))
+              tr_blocklistFile * b = tr_blocklistFileNew (binname, isEnabled);
+              const int n = tr_blocklistFileSetContent (b, path);
+              if (n > 0)
+                load = tr_strdup (binname);
+
+              tr_blocklistFileFree (b);
+            }
+          else if (tr_fileExists(path,&path_mtime) && (path_mtime>=binname_mtime)) /* update it */
+            {
+              char * old;
+              tr_blocklistFile * b;
+
+              old = tr_strdup_printf ("%s.old", binname);
+              remove (old);
+              rename (binname, old);
+              b = tr_blocklistFileNew (binname, isEnabled);
+              if (tr_blocklistFileSetContent (b, path) > 0)
                 {
-                    tr_list_append (&list,
-                                   tr_blocklistFileNew (filename, isEnabled));
-                    ++binCount;
+                  remove (old);
                 }
-            }
-            else
-            {
-                /* strip out the file suffix, if there is one, and add ".bin"
-                  instead */
-                tr_blocklistFile * b;
-                const char *   dot = strrchr (d->d_name, '.');
-                const int      len = dot ? dot - d->d_name
-                                         : (int)strlen (d->d_name);
-                char         * tmp = tr_strdup_printf (
-                                        "%s" TR_PATH_DELIMITER_STR "%*.*s.bin",
-                                        dirname, len, len, d->d_name);
-                b = tr_blocklistFileNew (tmp, isEnabled);
-                tr_blocklistFileSetContent (b, filename);
-                tr_list_append (&list, b);
-                ++newCount;
-                tr_free (tmp);
+              else
+                {
+                  remove (binname);
+                  rename (old, binname);
+                }
+
+              tr_blocklistFileFree (b);
+              tr_free (old);
             }
 
-            tr_free (filename);
+          tr_free (basename);
+          tr_free (binname);
         }
 
-        closedir (odir);
+      if (load != NULL)
+        {
+          if (tr_ptrArrayFindSorted (&loadme, load, (PtrArrayCompareFunc)strcmp) == NULL)
+            tr_ptrArrayInsertSorted (&loadme, load, (PtrArrayCompareFunc)strcmp);
+          else
+            tr_free (load);
+        }
+
+      tr_free (path);
     }
 
-    session->blocklists = list;
+  if (!tr_ptrArrayEmpty (&loadme))
+    {
+      int i;
+      const int n = tr_ptrArraySize (&loadme);
+      const char ** paths = (const char **) tr_ptrArrayBase (&loadme);
 
-    if (binCount)
-        tr_dbg ("Found %d blocklists in \"%s\"", binCount, dirname);
-    if (newCount)
-        tr_dbg ("Found %d new blocklists in \"%s\"", newCount, dirname);
+      for (i=0; i<n; ++i)
+        tr_list_append (&blocklists, tr_blocklistFileNew (paths[i], isEnabled));
+    }
 
-    tr_free (dirname);
+  /* cleanup */
+  closedir (odir);
+  tr_free (dirname);
+  tr_ptrArrayDestruct (&loadme, (PtrArrayForeachFunc)tr_free);
+  session->blocklists = blocklists;
 }
 
 static void

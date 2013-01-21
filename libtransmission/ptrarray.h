@@ -37,6 +37,8 @@ typedef struct tr_ptrArray
 }
 tr_ptrArray;
 
+typedef int (*PtrArrayCompareFunc)(const void * a, const void * b);
+
 typedef void (*PtrArrayForeachFunc)(void *);
 
 #define TR_PTR_ARRAY_INIT_STATIC { NULL, 0, 0 }
