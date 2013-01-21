@@ -1911,7 +1911,7 @@ sessionGet (tr_session               * s,
     tr_variantDictAddBool (d, TR_KEY_pex_enabled, tr_sessionIsPexEnabled (s));
     tr_variantDictAddBool (d, TR_KEY_utp_enabled, tr_sessionIsUTPEnabled (s));
     tr_variantDictAddBool (d, TR_KEY_dht_enabled, tr_sessionIsDHTEnabled (s));
-    tr_variantDictAddBool (d, TR_KEY_ldp_enabled, tr_sessionIsLPDEnabled (s));
+    tr_variantDictAddBool (d, TR_KEY_lpd_enabled, tr_sessionIsLPDEnabled (s));
     tr_variantDictAddInt  (d, TR_KEY_peer_port, tr_sessionGetPeerPort (s));
     tr_variantDictAddBool (d, TR_KEY_peer_port_random_on_start, tr_sessionGetPeerPortRandomOnStart (s));
     tr_variantDictAddBool (d, TR_KEY_port_forwarding_enabled, tr_sessionIsPortForwardingEnabled (s));
