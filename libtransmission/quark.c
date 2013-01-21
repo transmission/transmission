@@ -166,7 +166,6 @@ static const struct tr_key_struct my_static[] =
   { "lastScrapeSucceeded", 19 },
   { "lastScrapeTime", 14 },
   { "lastScrapeTimedOut", 18 },
-  { "ldp-enabled", 11 },
   { "leecherCount", 12 },
   { "leftUntilDone", 13 },
   { "length", 6 },

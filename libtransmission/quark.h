@@ -176,7 +176,6 @@ enum
   TR_KEY_lastScrapeSucceeded,
   TR_KEY_lastScrapeTime,
   TR_KEY_lastScrapeTimedOut,
-  TR_KEY_ldp_enabled,
   TR_KEY_leecherCount,
   TR_KEY_leftUntilDone,
   TR_KEY_length,
