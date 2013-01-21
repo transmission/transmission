@@ -274,7 +274,7 @@ getStatusString (GString           * gstr,
                 g_string_append_printf (gstr, _("Downloading from %1$'d of %2$'d %3$s and %4$'d %5$s"),
                                         st->peersSendingToUs,
                                         st->peersConnected,
-                                        ngettext ("peer","peers",st->peersSendingToUs),
+                                        ngettext ("peer","peers",st->peersConnected),
                                         st->webseedsSendingToUs,
                                         ngettext ("web seed","web seeds",st->webseedsSendingToUs));
             }
@@ -291,7 +291,7 @@ getStatusString (GString           * gstr,
                 g_string_append_printf (gstr, _("Downloading from %1$'d of %2$'d %3$s"),
                                         st->peersSendingToUs,
                                         st->peersConnected,
-                                        ngettext ("peer","peers",st->peersSendingToUs));
+                                        ngettext ("peer","peers",st->peersConnected));
             }
             break;
         }
