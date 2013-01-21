@@ -667,7 +667,7 @@ rename_torrent_and_unref_file (GFile * file)
   info = g_file_query_info (file, G_FILE_ATTRIBUTE_STANDARD_EDIT_NAME, 0, NULL, NULL);
   if (info != NULL)
     {
-      GError * error;
+      GError * error = NULL;
       const char * old_name;
       char * new_name;
       GFile * new_file;
