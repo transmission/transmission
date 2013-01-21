@@ -288,7 +288,13 @@ MyApp :: onTorrentCompleted( int id )
         notify (tr("Torrent Completed"), tor->name());
 
       if (myPrefs->getBool (Prefs::COMPLETE_SOUND_ENABLED))
-        QProcess::execute (myPrefs->getString(Prefs::COMPLETE_SOUND_COMMAND));
+        {
+#if defined( Q_OS_WIN ) || defined( Q_OS_MAC )
+          QApplication::beep();
+#else
+          QProcess::execute (myPrefs->getString(Prefs::COMPLETE_SOUND_COMMAND));
+#endif
+        }
 
       disconnect( tor, SIGNAL(torrentCompleted(int)), this, SLOT(onTorrentCompleted(int)) );
     }
