@@ -37,6 +37,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stddef.h>
 #include <string.h>
 #include <sys/types.h>
 #include <wchar.h>
@@ -54,7 +55,7 @@ typedef unsigned char jsonsl_uchar_t;
 #endif /* JSONSL_USE_WCHAR */
 
 /* Stolen from http-parser.h, and possibly others */
-#if defined(_WIN32) && !defined(__MINGW32__) && (!defined(_MSC_VER) || _MSC_VER<1600)
+#if defined(_WIN32) && !defined(__MINGW32__) 
 typedef __int8 int8_t;
 typedef unsigned __int8 uint8_t;
 typedef __int16 int16_t;
@@ -63,9 +64,10 @@ typedef __int32 int32_t;
 typedef unsigned __int32 uint32_t;
 typedef __int64 int64_t;
 typedef unsigned __int64 uint64_t;
-
+#if !defined(_MSC_VER) || _MSC_VER<1400
 typedef unsigned int size_t;
 typedef int ssize_t;
+#endif
 #else
 #include <stdint.h>
 #endif
@@ -236,7 +238,14 @@ typedef enum {
 
 
 /**
- * A state is a single level of the stack
+ * A state is a single level of the stack.
+ * Non-private data (i.e. the 'data' field, see the STATE_GENERIC section)
+ * will remain in tact until the item is popped.
+ *
+ * As a result, it means a parent state object may be accessed from a child
+ * object, (the parents fields will all be valid). This allows a user to create
+ * an ad-hoc hierarchy on top of the JSON one.
+ *
  */
 struct jsonsl_state_st {
     /**
@@ -260,7 +269,8 @@ struct jsonsl_state_st {
     size_t pos_begin;
 
     /**
-     * The position at which any immediate child was last POPped
+     * The position at which any immediate child was last POPped.
+     * Note that this field is only set when the item is popped.
      */
     size_t pos_cur;
 
@@ -270,7 +280,7 @@ struct jsonsl_state_st {
      * variable, as this can technically be deduced from the lexer's
      * level parameter (though the logic is not that simple)
      */
-    size_t level;
+    unsigned int level;
 
 
     /**
@@ -304,7 +314,14 @@ struct jsonsl_state_st {
 
     /**
      * Put anything you want here. if JSONSL_STATE_USER_FIELDS is here, then
-     * the macro expansion happens here
+     * the macro expansion happens here.
+     *
+     * You can use these fields to store hierarchical or 'tagging' information
+     * for specific objects.
+     *
+     * See the documentation above for the lifetime of the state object (i.e.
+     * if the private data points to allocated memory, it should be freed
+     * when the object is popped, as the state object will be re-used)
      */
 #ifndef JSONSL_STATE_GENERIC
     JSONSL_STATE_USER_FIELDS
@@ -391,7 +408,7 @@ struct jsonsl_st {
     /** Public, read-only */
 
     /** This is the current level of the stack */
-    size_t level;
+    unsigned int level;
 
     /**
      * This is the current position, relative to the beginning
@@ -471,10 +488,10 @@ struct jsonsl_st {
     char expecting;
     char tok_last;
     int can_insert;
-    size_t levels_max;
+    unsigned int levels_max;
 
 #ifndef JSONSL_NO_JPR
-    unsigned int jpr_count;
+    size_t jpr_count;
     jsonsl_jpr_t *jprs;
 
     /* Root pointer for JPR matching information */
@@ -497,7 +514,7 @@ struct jsonsl_st {
  * @param nlevels maximum recursion depth
  */
 JSONSL_API
-jsonsl_t jsonsl_new(size_t nlevels);
+jsonsl_t jsonsl_new(int nlevels);
 
 /**
  * Feeds data into the lexer.
@@ -697,13 +714,17 @@ void jsonsl_jpr_destroy(jsonsl_jpr_t jpr);
  * @param nkey - the length of the key. If the parent is an array (T_LIST), then
  * this should be the current index.
  *
+ * NOTE: The key of the child means any kind of associative data related to the
+ * element. Thus: <<< { "foo" : [ >>,
+ * the opening array's key is "foo".
+ *
  * @return a status constant. This indicates whether a match was excluded, possible,
  * or successful.
  */
 JSONSL_API
 jsonsl_jpr_match_t jsonsl_jpr_match(jsonsl_jpr_t jpr,
                                     jsonsl_type_t parent_type,
-                                    size_t parent_level,
+                                    unsigned int parent_level,
                                     const char *key, size_t nkey);
 
 

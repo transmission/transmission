@@ -147,7 +147,7 @@ static int *Allowed_Escapes;
     Allowed_Escapes[(unsigned int)c & 0xff]
 
 JSONSL_API
-jsonsl_t jsonsl_new(size_t nlevels)
+jsonsl_t jsonsl_new(int nlevels)
 {
     struct jsonsl_st *jsn =
             calloc(1, sizeof (*jsn) +
@@ -163,7 +163,7 @@ jsonsl_t jsonsl_new(size_t nlevels)
 JSONSL_API
 void jsonsl_reset(jsonsl_t jsn)
 {
-    size_t ii;
+    unsigned int ii;
     jsn->tok_last = 0;
     jsn->can_insert = 1;
     jsn->pos = 0;
@@ -681,7 +681,7 @@ populate_component(char *in,
         pctval = strtoul(c+1, NULL, 16);
         *(c+3) = origc;
 
-        *outp = pctval;
+        *outp = (char) pctval;
         c += 2;
         continue;
 
@@ -792,7 +792,7 @@ JSONSL_API
 jsonsl_jpr_match_t
 jsonsl_jpr_match(jsonsl_jpr_t jpr,
                    jsonsl_type_t parent_type,
-                   size_t parent_level,
+                   unsigned int parent_level,
                    const char *key,
                    size_t nkey)
 {
@@ -939,7 +939,7 @@ jsonsl_jpr_t jsonsl_jpr_match_state(jsonsl_t jsn,
     parent_state = jsn->stack + state->level - 1;
 
     if (parent_state->type == JSONSL_T_LIST) {
-        nkey = parent_state->nelem;
+        nkey = (size_t) parent_state->nelem;
     }
 
     *jmptable = 0;
@@ -1013,7 +1013,7 @@ size_t jsonsl_util_unescape_ex(const char *in,
 #define UNESCAPE_BAIL(e,offset) \
     *err = JSONSL_ERROR_##e; \
     if (errat) { \
-        *errat = (const char*)(c+ (ssize_t)(offset)); \
+        *errat = (const char*)(c+ (ptrdiff_t)(offset)); \
     } \
     return 0;
 
