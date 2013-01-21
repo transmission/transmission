@@ -5,6 +5,7 @@
 
 #include <stdio.h>
 
+#include "transmission.h"
 #include "utils.h" /* tr_strcmp0 () */
 
 extern int current_test;
@@ -68,6 +69,8 @@ int main (void) { \
 extern tr_session * session;
 void libtransmission_test_session_init (void);
 void libtransmission_test_session_close (void);
+tr_torrent * libtransmission_test_zero_torrent_init (void);
+
 
 
 #endif /* !LIBTRANSMISSION_TEST_H */
