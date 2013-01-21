@@ -67,7 +67,15 @@ int main (void) { \
 }
 
 extern tr_session * session;
-void libtransmission_test_session_init (void);
+extern char * sandbox;
+extern char * downloadDir;
+extern char * blocklistDir;
+
+void libtransmission_test_session_init_formatters (void);
+void libtransmission_test_session_init_sandbox (void);
+void libtransmission_test_session_init_session (void);
+void libtransmission_test_session_init (void); /* utility; calls the other 3 */
+
 void libtransmission_test_session_close (void);
 tr_torrent * libtransmission_test_zero_torrent_init (void);
 

@@ -111,7 +111,9 @@ runTests (const testFunc * const tests, int numTests)
 #include "variant.h"
 
 tr_session * session = NULL;
-static char * sandbox = NULL;
+char * sandbox = NULL;
+char * downloadDir = NULL;
+char * blocklistDir = NULL;
 
 static char*
 tr_getcwd (void)
@@ -187,15 +189,17 @@ rm_rf (const char * killme)
 #define SPEED_T_STR "TB/s"
 
 void
-libtransmission_test_session_init (void)
+libtransmission_test_session_init_formatters (void)
 {
-  char * cwd;
-  char * downloadDir;
-  tr_variant dict;
-
   tr_formatter_mem_init (MEM_K, MEM_K_STR, MEM_M_STR, MEM_G_STR, MEM_T_STR);
   tr_formatter_size_init (DISK_K,DISK_K_STR, DISK_M_STR, DISK_G_STR, DISK_T_STR);
   tr_formatter_speed_init (SPEED_K, SPEED_K_STR, SPEED_M_STR, SPEED_G_STR, SPEED_T_STR);
+}
+
+void
+libtransmission_test_session_init_sandbox (void)
+{
+  char * cwd;
 
   /* create a sandbox for the test session */
   cwd = tr_getcwd ();
@@ -203,18 +207,40 @@ libtransmission_test_session_init (void)
   tr_mkdtemp (sandbox);
   downloadDir = tr_buildPath (sandbox, "Downloads", NULL);
   tr_mkdirp (downloadDir, 0700);
+  blocklistDir = tr_buildPath (sandbox, "blocklists", NULL);
+  tr_mkdirp (blocklistDir, 0700);
 
-  /* create a test session */
-  tr_variantInitDict    (&dict, 3);
+  /* cleanup locals*/
+  tr_free (cwd);
+}
+
+void
+libtransmission_test_session_init_session (void)
+{
+  tr_variant dict;
+
+  /* libtransmission_test_session_init_sandbox() has to be called first */
+  assert (sandbox != NULL);
+  assert (session == NULL);
+
+  /* init the session */
+  tr_variantInitDict    (&dict, 4);
   tr_variantDictAddStr  (&dict, TR_KEY_download_dir, downloadDir);
   tr_variantDictAddBool (&dict, TR_KEY_port_forwarding_enabled, false);
   tr_variantDictAddBool (&dict, TR_KEY_dht_enabled, false);
-  session = tr_sessionInit ("rename-test", sandbox, true, &dict);
+  tr_variantDictAddInt  (&dict, TR_KEY_message_level, verbose ? TR_MSG_DBG : TR_MSG_ERR);
+  session = tr_sessionInit ("libtransmission-test", sandbox, !verbose, &dict);
 
   /* cleanup locals*/
   tr_variantFree (&dict);
-  tr_free (downloadDir);
-  tr_free (cwd);
+}
+
+void
+libtransmission_test_session_init (void)
+{
+  libtransmission_test_session_init_formatters ();
+  libtransmission_test_session_init_sandbox ();
+  libtransmission_test_session_init_session ();
 }
 
 void
@@ -222,8 +248,18 @@ libtransmission_test_session_close (void)
 {
   tr_sessionClose (session);
   tr_freeMessageList (tr_getQueuedMessages ());
+  session = NULL;
+
   rm_rf (sandbox);
+
+  tr_free (blocklistDir);
+  blocklistDir = NULL;
+
+  tr_free (downloadDir);
+  downloadDir = NULL;
+
   tr_free (sandbox);
+  sandbox = NULL;
 }
 
 /***
