@@ -109,7 +109,7 @@
    "priority-normal"     | array      indices of normal-priority file(s)
    "queuePosition"       | number     position of this torrent in its queue [0...n)
    "seedIdleLimit"       | number     torrent-level number of minutes of seeding inactivity
-   "seedIdleMode"        | number     which seeding inactivity to use.  See tr_inactvelimit
+   "seedIdleMode"        | number     which seeding inactivity to use.  See tr_idlelimit
    "seedRatioLimit"      | double     torrent-level seeding ratio
    "seedRatioMode"       | number     which ratio to use.  See tr_ratiolimit
    "trackerAdd"          | array      strings of announce URLs to add
