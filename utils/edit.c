@@ -43,7 +43,7 @@ static tr_option options[] =
 static const char *
 getUsage (void)
 {
-  return "Usage: " MY_NAME " [options] torrent-file (s)";
+  return "Usage: " MY_NAME " [options] torrent-file(s)";
 }
 
 static int
