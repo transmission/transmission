@@ -185,7 +185,7 @@ getStatusStr (const tr_stat * st,
       tr_strlratio (ratioStr, st->ratio, sizeof (ratioStr));
 
       tr_snprintf (buf, buflen,
-                   "Seeding, uploading to %d of %d peer (s), %s [%s]",
+                   "Seeding, uploading to %d of %d peer(s), %s [%s]",
                    st->peersGettingFromUs, st->peersConnected, upStr, ratioStr);
     }
   else
