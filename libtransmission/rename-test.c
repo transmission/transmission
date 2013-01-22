@@ -285,6 +285,7 @@ test_multifile_torrent (void)
   char * tmp;
   static const size_t totalSize = 67;
   const tr_file * files;
+  const char * strings[4];
   const char * expected_files[4] = {
     "Felidae/Felinae/Acinonyx/Cheetah/Chester",
     "Felidae/Felinae/Felis/catus/Kyphi",
@@ -413,10 +414,29 @@ test_multifile_torrent (void)
     check_streq (expected_files[i], files[i].name);
 
   check_int_eq (0, torrentRenameAndWait (tor, "Felidae", "gabba"));
-  check_streq ("gabba/Felinae/Acinonyx/Cheetah/Chester",  files[0].name);
-  check_streq ("gabba/Felinae/Felis/catus/Kyphi",         files[1].name);
-  check_streq ("gabba/Felinae/Felis/catus/Saffron",       files[2].name);
-  check_streq ("gabba/Pantherinae/Panthera/Tiger/Tony", files[3].name);
+  strings[0] = "gabba/Felinae/Acinonyx/Cheetah/Chester";
+  strings[1] = "gabba/Felinae/Felis/catus/Kyphi";
+  strings[2] = "gabba/Felinae/Felis/catus/Saffron";
+  strings[3] = "gabba/Pantherinae/Panthera/Tiger/Tony";
+  for (i=0; i<4; ++i)
+    {
+      check_streq (strings[i], files[i].name);
+      testFileExistsAndConsistsOfThisString (tor, i, expected_contents[i]);
+    }
+
+  /* rename the root, then a branch, and then a leaf... */
+  check_int_eq (0, torrentRenameAndWait (tor, "gabba", "Felidae"));
+  check_int_eq (0, torrentRenameAndWait (tor, "Felidae/Pantherinae/Panthera/Tiger", "Snow Leopard"));
+  check_int_eq (0, torrentRenameAndWait (tor, "Felidae/Pantherinae/Panthera/Snow Leopard/Tony", "10.6"));
+  strings[0] = "Felidae/Felinae/Acinonyx/Cheetah/Chester";
+  strings[1] = "Felidae/Felinae/Felis/catus/Kyphi";
+  strings[2] = "Felidae/Felinae/Felis/catus/Saffron";
+  strings[3] = "Felidae/Pantherinae/Panthera/Snow Leopard/10.6";
+  for (i=0; i<4; ++i)
+    {
+      check_streq (strings[i], files[i].name);
+      testFileExistsAndConsistsOfThisString (tor, i, expected_contents[i]);
+    }
 
   /***
   ****
