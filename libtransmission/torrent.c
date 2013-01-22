@@ -3548,17 +3548,18 @@ torrentRename (void * vdata)
   int error = 0;
   struct rename_data * data = vdata;
   tr_torrent * const tor = data->tor;
+  char * const oldname = tor->info.name;
 
-  tr_free (tor->info.name);
   tor->info.name = data->newname;
   tr_torrentSetDirty (tor);
   tor->anyDate = tr_time ();
 
   /* callback */
   if (data->callback != NULL)
-    (*data->callback)(tor, data->oldpath, data->newname, error, data->callback_user_data);
+    (*data->callback)(tor, oldname, data->newname, error, data->callback_user_data);
 
   /* cleanup */
+  tr_free (oldname);
   tr_free (data);
 }
 
