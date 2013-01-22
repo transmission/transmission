@@ -4304,7 +4304,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         return canUseTable && [fTableView numberOfSelectedRows] > 0;
     
     //enable renaming file/folder
-    if (action == @selector(renameSelectedTorrent:))
+    if (action == @selector(renameSelected:))
         return canUseTable && [fTableView numberOfSelectedRows] == 1;
 
     //enable remove items
