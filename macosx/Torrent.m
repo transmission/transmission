@@ -849,7 +849,7 @@ int trashDataFile(const char * filename)
     
     NSDictionary * contextInfo = [@{ @"Nodes" : fFileList, @"CompletionHandler" : [[completionHandler copy] autorelease] } retain];
     
-    tr_torrentRenamePath(fHandle, fInfo->name, [newName UTF8String], renameCallback, contextInfo);
+    tr_torrentRename(fHandle, [newName UTF8String], renameCallback, contextInfo);
 }
 
 - (void) renameFileNode: (FileListNode *) node withName: (NSString *) newName completionHandler: (void (^)(BOOL didRename)) completionHandler

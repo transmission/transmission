@@ -1748,7 +1748,12 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     Torrent * torrent = selected[0];
     
     [FileRenameSheetController presentSheetForTorrent:torrent modalForWindow: fWindow completionHandler: ^(BOOL didRename) {
-        NSLog(@"finished");
+        if (didRename)
+        {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [self fullUpdateUI];
+            });
+        }
     }];
 }
 

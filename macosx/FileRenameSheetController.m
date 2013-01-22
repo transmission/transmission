@@ -85,6 +85,10 @@ typedef void (^CompletionBlock)(BOOL);
     
     [self.inputField setStringValue: name];
     [self.renameButton setEnabled: NO];
+    
+    #warning size these
+    [self.renameButton setStringValue: NSLocalizedString(@"Rename", "rename sheet button")];
+    [self.cancelButton setStringValue: NSLocalizedString(@"Cancel", "rename sheet button")];
 }
 
 - (IBAction) rename: (id) sender;
