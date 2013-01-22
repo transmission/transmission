@@ -106,7 +106,7 @@ MyApp :: MyApp( int& argc, char ** argv ):
     // set the default icon
     QIcon icon;
     QList<int> sizes;
-    sizes << 16 << 22 << 24 << 32 << 48;
+    sizes << 16 << 22 << 24 << 32 << 48 << 64 << 72 << 96 << 128 << 192 << 256;
     foreach( int size, sizes )
         icon.addPixmap( QPixmap( QString::fromAscii(":/icons/transmission-%1.png" ).arg(size) ) );
     setWindowIcon( icon );
