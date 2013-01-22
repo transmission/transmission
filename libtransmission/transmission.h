@@ -1109,8 +1109,8 @@ typedef void (tr_torrent_rename_done_func)(tr_torrent  * torrent,
  * @callback: the callback invoked when the renaming finishes, or NULL
  * @callback_data: the pointer to pass in the callback's user_data arg
  *
- * As a special case, renaming the root file in a torrent will call
- * tr_torrentRename (tor, newname).
+ * As a special case, renaming the root file in a torrent will allso
+ * update tr_info.name.
  *
  * EXAMPLES
  *
@@ -1119,8 +1119,8 @@ typedef void (tr_torrent_rename_done_func)(tr_torrent  * torrent,
  *   info.files[1].name is "frobnitz-linux/frobnitz.iso".
  *
  *   1. tr_torrentRenamePath (tor, "frobnitz-linux", "foo") will rename
- *      the "frotbnitz-linux" folder as "foo", update info.files[*].name,
- *      and also call tr_torrentRename(tor,"foo").
+ *      the "frotbnitz-linux" folder as "foo", and update both info.name
+ *      and info.files[*].name.
  *
  *   2. tr_torrentRenamePath (tor, "frobnitz-linux/checksum", "foo") will
  *      rename the "frobnitz-linux/checksum" file as "foo" and update
@@ -1146,22 +1146,6 @@ void tr_torrentRenamePath (tr_torrent                  * tor,
                            const char                  * newname,
                            tr_torrent_rename_done_func   callback,
                            void                        * callback_user_data);
-
-
-/**
- * @brief Changes the torrent's name.
- * @see-also tr_torrentRenamePath
- *
- * This function changes tr_info.name.
- *
- * Changing tr_info's contents requires a session lock, so this function
- * returns asynchronously to avoid blocking. If you don't want to be notified
- * when the function has finished, you can pass NULL as the callback arg.
- */
-void tr_torrentRename (tr_torrent                   * tor,
-                       const char                   * newname,
-                       tr_torrent_rename_done_func    callback,
-                       void                         * callback_user_data);
 
 enum
 {
@@ -1777,7 +1761,6 @@ struct tr_info
     uint64_t           totalSize;
 
     /* The original name that came in this torrent's metainfo.
-     * This may differ from "name" if tr_torrentRename() is called.
      * CLIENT CODE: NOT USE THIS FIELD. */
     char             * originalName;
 
