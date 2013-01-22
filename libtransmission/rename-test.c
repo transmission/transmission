@@ -209,13 +209,13 @@ test_single_filename_torrent (void)
   tmpstr = tr_buildPath (tor->downloadDir, "hello-world.txt", NULL); 
   check (tr_fileExists (tmpstr, NULL));
   check_streq ("hello-world.txt", tr_torrentName(tor));
-  check_int_eq (0, torrentRenameAndWait (tor, "hello-world.txt", "foobar"));
-  check (!tr_fileExists (tmpstr, NULL));
-  check (tor->info.files[0].is_renamed);
-  check_streq ("foobar", tor->info.files[0].name);
-  check_streq ("foobar", tr_torrentName(tor));
-  check (strstr (tor->info.torrent, "foobar") == NULL);
-  check (testFileExistsAndConsistsOfThisString (tor, 0, "hello, world!\n"));
+  check_int_eq (0, torrentRenameAndWait (tor, tor->info.name, "foobar"));
+  check (!tr_fileExists (tmpstr, NULL)); /* confirm the old filename can't be found */
+  check (tor->info.files[0].is_renamed); /* confirm the file's 'renamed' flag is set */
+  check_streq ("foobar", tr_torrentName(tor)); /* confirm the torrent's name is now 'foobar' */
+  check_streq ("foobar", tor->info.files[0].name); /* confirm the file's name is now 'foobar' */
+  check (strstr (tor->info.torrent, "foobar") == NULL); /* confirm the name in the .torrent file hasn't changed */
+  check (testFileExistsAndConsistsOfThisString (tor, 0, "hello, world!\n")); /* confirm the contents are right */
   tr_free (tmpstr);
 
   /* (while it's renamed: confirm that the .resume file remembers the changes) */
