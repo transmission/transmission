@@ -827,7 +827,7 @@ Session :: parseResponse( const char * json, size_t jsonLength )
                     else if (tr_variantDictFindInt (args, TR_KEY_id, &id) && id)
                       {
                         // let's get the updated file list
-                        char * req = tr_strdup_printf ("{ \"arguments\": { \"fields\": [ \"files\", \"id\" ], \"ids\": %d }, \"method\": \"torrent-get\", \"tag\": %d }",
+                        char * req = tr_strdup_printf ("{ \"arguments\": { \"fields\": [ \"files\", \"id\", \"name\" ], \"ids\": %d }, \"method\": \"torrent-get\", \"tag\": %d }",
                                                        int(id),
                                                        int(TAG_SOME_TORRENTS));
                         exec (req);

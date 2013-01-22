@@ -154,6 +154,7 @@ create_torrent_from_base64_metainfo (tr_ctor * ctor, const char * metainfo_base6
 static int
 test_single_filename_torrent (void)
 {
+  uint64_t loaded;
   tr_torrent * tor;
   char * tmpstr;
   const size_t totalSize = 14;
@@ -207,12 +208,22 @@ test_single_filename_torrent (void)
 
   tmpstr = tr_buildPath (tor->downloadDir, "hello-world.txt", NULL); 
   check (tr_fileExists (tmpstr, NULL));
+  check_streq ("hello-world.txt", tr_torrentName(tor));
   check_int_eq (0, torrentRenameAndWait (tor, "hello-world.txt", "foobar"));
   check (!tr_fileExists (tmpstr, NULL));
   check (tor->info.files[0].is_renamed);
   check_streq ("foobar", tor->info.files[0].name);
-  tr_free (tmpstr);
+  check_streq ("foobar", tr_torrentName(tor));
+  check (strstr (tor->info.torrent, "foobar") == NULL);
   check (testFileExistsAndConsistsOfThisString (tor, 0, "hello, world!\n"));
+  tr_free (tmpstr);
+
+  /* (while it's renamed: confirm that the .resume file remembers the changes) */
+  tr_torrentSaveResume (tor);
+  sync ();
+  loaded = tr_torrentLoadResume (tor, ~0, ctor);
+  check_streq ("foobar", tr_torrentName(tor));
+  check ((loaded & TR_FR_NAME) != 0);
 
   /***
   ****  ...and rename it back again
@@ -224,6 +235,7 @@ test_single_filename_torrent (void)
   check (!tr_fileExists (tmpstr, NULL));
   check (tor->info.files[0].is_renamed);
   check_streq ("hello-world.txt", tor->info.files[0].name);
+  check_streq ("hello-world.txt", tr_torrentName(tor));
   tr_free (tmpstr);
   check (testFileExistsAndConsistsOfThisString (tor, 0, "hello, world!\n"));
 
@@ -265,12 +277,9 @@ create_multifile_torrent_contents (const char * top)
 static int
 test_multifile_torrent (void)
 {
-  //tr_file_stat * file_stats;
-  //tr_file_index_t n;
   tr_file_index_t i;
   uint64_t loaded;
   tr_torrent * tor;
-  //tr_file_index_t i;
   tr_ctor * ctor;
   char * str;
   char * tmp;

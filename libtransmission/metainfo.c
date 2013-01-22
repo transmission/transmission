@@ -36,8 +36,9 @@ char*
 tr_metainfoGetBasename (const tr_info * inf)
 {
   size_t i;
-  const size_t name_len = strlen (inf->name);
-  char * ret = tr_strdup_printf ("%s.%16.16s", inf->name, inf->hashString);
+  const char * name = inf->originalName;
+  const size_t name_len = strlen (name);
+  char * ret = tr_strdup_printf ("%s.%16.16s", name, inf->hashString);
 
   for (i=0; i<name_len; ++i)
     if (ret[i] == '/')
@@ -405,11 +406,15 @@ tr_metainfoParseImpl (const tr_session  * session,
           if (tr_variantDictFindStr (d, TR_KEY_display_name, &str, &len))
             {
               tr_free (inf->name);
+              tr_free (inf->originalName);
               inf->name = tr_strndup (str, len);
+              inf->originalName = tr_strndup (str, len);
             }
 
           if (!inf->name)
-            inf->name = tr_strdup (inf->hashString);
+              inf->name = tr_strdup (inf->hashString);
+          if (!inf->originalName)
+              inf->originalName = tr_strdup (inf->hashString);
         }
       else /* not a magnet link and has no info dict... */
         {
@@ -439,7 +444,9 @@ tr_metainfoParseImpl (const tr_session  * session,
       if (!str || !*str)
         return "name";
       tr_free (inf->name);
+      tr_free (inf->originalName);
       inf->name = tr_utf8clean (str, len);
+      inf->originalName = tr_strdup (inf->name);
     }
 
   /* comment */
@@ -560,6 +567,7 @@ tr_metainfoFree (tr_info * inf)
   tr_free (inf->comment);
   tr_free (inf->creator);
   tr_free (inf->torrent);
+  tr_free (inf->originalName);
   tr_free (inf->name);
 
   for (i=0; i<inf->trackerCount; i++)

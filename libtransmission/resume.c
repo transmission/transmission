@@ -341,6 +341,36 @@ loadIdleLimits (tr_variant * dict, tr_torrent * tor)
 ***/
 
 static void
+saveName (tr_variant * dict, const tr_torrent * tor)
+{
+  tr_variantDictAddStr (dict, TR_KEY_name, tr_torrentName(tor));
+}
+
+static uint64_t
+loadName (tr_variant * dict, tr_torrent * tor)
+{
+  uint64_t ret = 0;
+  const char * name;
+
+  if (tr_variantDictFindStr (dict, TR_KEY_name, &name, NULL))
+    {
+      ret = TR_FR_NAME;
+
+      if (tr_strcmp0 (tr_torrentName(tor), name))
+        {
+          tr_free (tor->info.name);
+          tor->info.name = tr_strdup (name);
+        }
+    }
+
+  return ret;
+}
+
+/***
+****
+***/
+
+static void
 saveFilenames (tr_variant * dict, const tr_torrent * tor)
 {
   tr_file_index_t i;
@@ -650,6 +680,7 @@ tr_torrentSaveResume (tr_torrent * tor)
     saveRatioLimits (&top, tor);
     saveIdleLimits (&top, tor);
     saveFilenames (&top, tor);
+    saveName (&top, tor);
 
     filename = getResumeFilename (tor);
     if ((err = tr_variantToFile (&top, TR_VARIANT_FMT_BENC, filename)))
@@ -804,6 +835,9 @@ loadFromFile (tr_torrent * tor, uint64_t fieldsToLoad)
 
     if (fieldsToLoad & TR_FR_FILENAMES)
         fieldsLoaded |= loadFilenames (&top, tor);
+
+    if (fieldsToLoad & TR_FR_NAME)
+        fieldsLoaded |= loadName (&top, tor);
 
     /* loading the resume file triggers of a lot of changes,
      * but none of them needs to trigger a re-saving of the

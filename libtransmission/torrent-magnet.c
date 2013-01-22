@@ -374,6 +374,7 @@ tr_torrentGetMetadataPercent (const tr_torrent * tor)
   return ret;
 }
 
+/* FIXME: this should be renamed tr_metainfoGetMagnetLink() and moved to metainfo.c for consistency */
 char *
 tr_torrentInfoGetMagnetLink (const tr_info * inf)
 {

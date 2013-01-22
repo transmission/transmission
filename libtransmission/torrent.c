@@ -3441,6 +3441,16 @@ struct rename_data
 };
 
 static void
+torrentRenameDone (tr_torrent * tor UNUSED,
+                   const char * oldpath UNUSED,
+                   const char * newname UNUSED,
+                   int          error,
+                   void       * user_data)
+{
+  *(int*)user_data = error;
+}
+
+static void
 torrentRenamePath (void * vdata)
 {
   int error = 0;
@@ -3477,8 +3487,14 @@ torrentRenamePath (void * vdata)
 
           if (!error)
             {
+              /* update tr_info.files */
               for (i=0; i<n; ++i)
                 renameTorrentFileString(tor, oldpath, newname, file_indices[i]);
+
+              /* update tr_info.name if user changed the toplevel */
+              if ((n == tor->info.fileCount) && (strchr(oldpath,'/')==NULL))
+                tr_torrentRename (tor, newname, torrentRenameDone, &error);
+
               tr_torrentSetDirty (tor);
             }
         }
@@ -3520,4 +3536,45 @@ tr_torrentRenamePath (tr_torrent                  * tor,
   data->callback_user_data = callback_user_data;
 
   tr_runInEventThread (tor->session, torrentRenamePath, data);
+}
+
+/**
+***
+**/
+
+static void
+torrentRename (void * vdata)
+{
+  int error = 0;
+  struct rename_data * data = vdata;
+  tr_torrent * const tor = data->tor;
+
+  tr_free (tor->info.name);
+  tor->info.name = data->newname;
+  tr_torrentSetDirty (tor);
+  tor->anyDate = tr_time ();
+
+  /* callback */
+  if (data->callback != NULL)
+    (*data->callback)(tor, data->oldpath, data->newname, error, data->callback_user_data);
+
+  /* cleanup */
+  tr_free (data);
+}
+
+void
+tr_torrentRename (tr_torrent                   * tor,
+                  const char                   * newname,
+                  tr_torrent_rename_done_func    callback,
+                  void                         * callback_user_data)
+{
+  struct rename_data * data;
+
+  data = tr_new0 (struct rename_data, 1);
+  data->tor = tor;
+  data->newname = tr_strdup (newname);
+  data->callback = callback;
+  data->callback_user_data = callback_user_data;
+
+  tr_runInEventThread (tor->session, torrentRename, data);
 }
