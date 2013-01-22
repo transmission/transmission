@@ -213,7 +213,7 @@ getUsage (void)
                 "       "
         MY_NAME " [host:port] [options]\n"
                 "       "
-        MY_NAME " [http (s?)://host:port/transmission/] [options]\n"
+        MY_NAME " [http(s?)://host:port/transmission/] [options]\n"
                 "\n"
                 "See the man page for detailed explanations and many examples.";
 }
