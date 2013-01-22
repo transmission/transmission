@@ -3355,19 +3355,28 @@ renamePath (tr_torrent  * tor,
     base = tor->downloadDir;
 
   src = tr_buildPath (base, oldpath, NULL);
-  /*fprintf (stderr, "%s:%d src \"%s\"\n", __FILE__, __LINE__, src);*/
+  if (!tr_fileExists (src, NULL)) /* check for it as a partial */
+    {
+      char * tmp = tr_strdup_printf ("%s.part", src);
+      tr_free (src);
+      src = tmp;
+    }
 
   if (tr_fileExists (src, NULL))
     {
       int tmp;
       bool tgt_exists;
       char * parent = tr_dirname (src);
-      char * tgt = tr_buildPath (parent, newname, NULL);
+      char * tgt;
+
+      if (tr_str_has_suffix (src, ".part"))
+        tgt = tr_strdup_printf ("%s" TR_PATH_DELIMITER_STR "%s.part", parent, newname);
+      else
+        tgt = tr_buildPath (parent, newname, NULL);
 
       tmp = errno;
       tgt_exists = tr_fileExists (tgt, NULL);
       errno = tmp;
-      /*fprintf (stderr, "%s:%d tgt \"%s\"\n", __FILE__, __LINE__, tgt);*/
 
       if (!tgt_exists)
         {
@@ -3375,7 +3384,6 @@ renamePath (tr_torrent  * tor,
 
           tmp = errno;
           rv = rename (src, tgt);
-          /*fprintf (stderr, "%s:%d rv \"%d\"\n", __FILE__, __LINE__, rv);*/
           if (rv != 0)
             error = errno;
           errno = tmp;
