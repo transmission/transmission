@@ -421,8 +421,10 @@
 
    Method name: "torrent-rename-path"
 
-   For more information on the use of this function, see the
-   transmission.h documentation of tr_torrentRenamePath()
+   For more information on the use of this function, see the transmission.h
+   documentation of tr_torrentRenamePath(). In particular, note that if this
+   call succeeds you'll want to update the torrent's "files" and "name" field
+   with torrent-get.
 
    Request arguments:
 
