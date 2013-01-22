@@ -47,6 +47,7 @@
 #import "BlocklistDownloader.h"
 #import "StatusBarController.h"
 #import "FilterBarController.h"
+#import "FileRenameSheetController.h"
 #import "BonjourController.h"
 #import "Badger.h"
 #import "DragOverlayWindow.h"
@@ -1738,6 +1739,17 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     
     if ([paths count] > 0)
         [[NSWorkspace sharedWorkspace] activateFileViewerSelectingURLs: paths];
+}
+
+- (IBAction) renameSelected: (id) sender
+{
+    NSArray * selected = [fTableView selectedTorrents];
+    NSAssert([selected count] == 1, @"1 transfer needs to be selected to rename, but %ld are selected", [selected count]);
+    Torrent * torrent = selected[0];
+    
+    [FileRenameSheetController presentSheetForTorrent:torrent modalForWindow: fWindow completionHandler: ^(BOOL didRename) {
+        NSLog(@"finished");
+    }];
 }
 
 - (void) announceSelectedTorrents: (id) sender
@@ -4285,6 +4297,10 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     //enable reveal in finder
     if (action == @selector(revealFile:))
         return canUseTable && [fTableView numberOfSelectedRows] > 0;
+    
+    //enable renaming file/folder
+    if (action == @selector(renameSelectedTorrent:))
+        return canUseTable && [fTableView numberOfSelectedRows] == 1;
 
     //enable remove items
     if (action == @selector(removeNoDelete:) || action == @selector(removeDeleteData:))

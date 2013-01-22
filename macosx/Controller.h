@@ -173,6 +173,8 @@ typedef enum
 
 - (void) revealFile: (id) sender;
 
+- (IBAction) renameSelected: (id) sender;
+
 - (void) announceSelectedTorrents: (id) sender;
 
 - (void) verifySelectedTorrents: (id) sender;

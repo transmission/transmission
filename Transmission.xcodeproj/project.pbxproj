@@ -169,6 +169,8 @@
 		A242AD9315F05D23002B3A6C /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = A242AD9115F05D23002B3A6C /* Localizable.strings */; };
 		A245030C0D6A1FB000B49D00 /* UpArrowGroupTemplate.png in Resources */ = {isa = PBXBuildFile; fileRef = A245030B0D6A1FB000B49D00 /* UpArrowGroupTemplate.png */; };
 		A245030E0D6A1FBC00B49D00 /* DownArrowGroupTemplate.png in Resources */ = {isa = PBXBuildFile; fileRef = A245030D0D6A1FBC00B49D00 /* DownArrowGroupTemplate.png */; };
+		A2451E6916ACE4EB00586E0E /* FileRenameSheetController.m in Sources */ = {isa = PBXBuildFile; fileRef = A2451E6716ACE4EB00586E0E /* FileRenameSheetController.m */; };
+		A2451E6A16ACE4EB00586E0E /* FileRenameSheetController.xib in Resources */ = {isa = PBXBuildFile; fileRef = A2451E6816ACE4EB00586E0E /* FileRenameSheetController.xib */; };
 		A24621410C769D0900088E81 /* trevent.h in Headers */ = {isa = PBXBuildFile; fileRef = A24621350C769CF400088E81 /* trevent.h */; };
 		A24621420C769D0900088E81 /* trevent.c in Sources */ = {isa = PBXBuildFile; fileRef = A24621360C769CF400088E81 /* trevent.c */; };
 		A247A443114C701800547DFC /* InfoViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = A247A442114C701800547DFC /* InfoViewController.h */; };
@@ -782,6 +784,9 @@
 		A242AD9215F05D23002B3A6C /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = macosx/QuickLookPlugin/en.lproj/Localizable.strings; sourceTree = SOURCE_ROOT; };
 		A245030B0D6A1FB000B49D00 /* UpArrowGroupTemplate.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = UpArrowGroupTemplate.png; path = macosx/Images/UpArrowGroupTemplate.png; sourceTree = "<group>"; };
 		A245030D0D6A1FBC00B49D00 /* DownArrowGroupTemplate.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = DownArrowGroupTemplate.png; path = macosx/Images/DownArrowGroupTemplate.png; sourceTree = "<group>"; };
+		A2451E6616ACE4EB00586E0E /* FileRenameSheetController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FileRenameSheetController.h; path = macosx/FileRenameSheetController.h; sourceTree = "<group>"; };
+		A2451E6716ACE4EB00586E0E /* FileRenameSheetController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = FileRenameSheetController.m; path = macosx/FileRenameSheetController.m; sourceTree = "<group>"; };
+		A2451E6816ACE4EB00586E0E /* FileRenameSheetController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = FileRenameSheetController.xib; path = macosx/FileRenameSheetController.xib; sourceTree = "<group>"; };
 		A24621350C769CF400088E81 /* trevent.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = trevent.h; path = libtransmission/trevent.h; sourceTree = "<group>"; };
 		A24621360C769CF400088E81 /* trevent.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = trevent.c; path = libtransmission/trevent.c; sourceTree = "<group>"; };
 		A247A442114C701800547DFC /* InfoViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = InfoViewController.h; path = macosx/InfoViewController.h; sourceTree = "<group>"; };
@@ -1410,6 +1415,9 @@
 		29B97314FDCFA39411CA2CEA /* Transmission */ = {
 			isa = PBXGroup;
 			children = (
+				A2451E6616ACE4EB00586E0E /* FileRenameSheetController.h */,
+				A2451E6716ACE4EB00586E0E /* FileRenameSheetController.m */,
+				A2451E6816ACE4EB00586E0E /* FileRenameSheetController.xib */,
 				4DDBB70A09E16B3200284745 /* GUI */,
 				A2F35BC315C5A0A100EBF632 /* QuickLookPlugin */,
 				4D1838DC09DEC04A0047D688 /* libtransmission */,
@@ -2538,6 +2546,7 @@
 				A2DC49C2158430CB00758FF1 /* YellowDot@2x.png in Resources */,
 				A2DC49C4158430E200758FF1 /* YingYangGroupTemplate@2x.png in Resources */,
 				A2DC49C6158430FB00758FF1 /* YingYangTemplate@2x.png in Resources */,
+				A2451E6A16ACE4EB00586E0E /* FileRenameSheetController.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2749,6 +2758,7 @@
 				A2966E8713DAF74C007B52DF /* GlobalOptionsPopoverViewController.m in Sources */,
 				A234EA541453563B000F3E97 /* NSImageAdditions.m in Sources */,
 				A2AB883E16A399A6008FAD50 /* VDKQueue.m in Sources */,
+				A2451E6916ACE4EB00586E0E /* FileRenameSheetController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

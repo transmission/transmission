@@ -90,6 +90,45 @@ void metadataCallback(tr_torrent * torrent, void * torrentData)
     [(Torrent *)torrentData performSelectorOnMainThread: @selector(metadataRetrieved) withObject: nil waitUntilDone: NO];
 }
 
+void renameCallback(tr_torrent * torrent, const char * oldPathCharString, const char * newNameCharString, int error, void * contextInfo)
+{
+    @autoreleasepool
+    {
+        NSDictionary * contextDict = (NSDictionary *)contextInfo;
+        
+        NSString * oldPath = [NSString stringWithUTF8String: oldPathCharString];
+        NSString * path = [oldPath stringByDeletingLastPathComponent];
+        NSString * oldName = [oldPath lastPathComponent];
+        NSString * newName = [NSString stringWithUTF8String: newNameCharString];
+        
+        if (error == 0)
+        {
+            void (^__block updateNodeAndChildrenForRename)(FileListNode *) = ^(FileListNode * node) {
+                [node updateFromOldName: oldName toNewName: newName inPath: path];
+                
+                if ([node isFolder]) {
+                    [[node children] enumerateObjectsWithOptions: NSEnumerationConcurrent usingBlock: ^(FileListNode * childNode, NSUInteger idx, BOOL * stop) {
+                        updateNodeAndChildrenForRename(childNode);
+                    }];
+                }
+            };
+            
+            NSArray * nodes = contextDict[@"Nodes"];
+            [nodes enumerateObjectsWithOptions: NSEnumerationConcurrent usingBlock: ^(FileListNode * node, NSUInteger idx, BOOL *stop) {
+                updateNodeAndChildrenForRename(node);
+            }];
+        }
+        else
+            NSLog(@"Error renaming %@ to %@", oldPath, [path stringByAppendingPathComponent: newName]);
+        
+        typedef void (^RenameCompletionBlock)(BOOL);
+        RenameCompletionBlock completionHandler = contextDict[@"CompletionHandler"];
+        completionHandler(error == 0);
+        
+        [contextDict release];
+    }
+}
+
 int trashDataFile(const char * filename)
 {
     @autoreleasepool
@@ -801,6 +840,29 @@ int trashDataFile(const char * filename)
         
         return dataLocation;
     }
+}
+
+- (void) renameTorrent: (NSString *) newName completionHandler: (void (^)(BOOL didRename)) completionHandler
+{
+    NSParameterAssert(newName != nil);
+    NSParameterAssert(![newName isEqualToString: @""]);
+    
+    NSDictionary * contextInfo = [@{ @"Nodes" : fFileList, @"CompletionHandler" : [[completionHandler copy] autorelease] } retain];
+    
+    tr_torrentRenamePath(fHandle, fInfo->name, [newName UTF8String], renameCallback, contextInfo);
+}
+
+- (void) renameFileNode: (FileListNode *) node withName: (NSString *) newName completionHandler: (void (^)(BOOL didRename)) completionHandler
+{
+    NSParameterAssert(node != nil);
+    NSParameterAssert([node torrent] == self);
+    NSParameterAssert(newName != nil);
+    NSParameterAssert(![newName isEqualToString: @""]);
+    
+    NSDictionary * contextInfo = [@{ @"Nodes" : @[ node ], @"CompletionHandler" : [[completionHandler copy] autorelease] } retain];
+    
+    NSString * oldName = [[node path] stringByAppendingPathComponent: [node name]];
+    tr_torrentRenamePath(fHandle, [oldName UTF8String], [newName UTF8String], renameCallback, contextInfo);
 }
 
 - (CGFloat) progress

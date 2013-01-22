@@ -2,6 +2,7 @@ EXTRA_DIST = \
     Credits.rtf \
     AboutWindow.xib \
     BlocklistStatusWindow.xib \
+    FileRenameSheetController.xib \
     FilterBar.xib \
     InfoFileView.xib \
     InfoPeersView.xib \
@@ -65,6 +66,8 @@ EXTRA_DIST = \
     ExpandedPathToIconTransformer.m \
     ExpandedPathToPathTransformer.h \
     ExpandedPathToPathTransformer.m \
+    FileRenameSheetController.h \
+    FileRenameSheetController.m \
     FileListNode.h \
     FileListNode.m \
     FileNameCell.h \
