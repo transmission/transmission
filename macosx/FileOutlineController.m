@@ -442,17 +442,19 @@ typedef enum
     if (![torrent isFolder])
     {
         [FileRenameSheetController presentSheetForTorrent: torrent modalForWindow: [fOutline window] completionHandler: ^(BOOL didRename) {
-#warning need to re-sort
             if (didRename)
-                [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateUI" object: nil];
+            {
+                [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateQueue" object: self];
+                [[NSNotificationCenter defaultCenter] postNotificationName: @"ResetInspector" object: self userInfo: @{ @"Torrent" : torrent }];
+            }
         }];
     }
     else
     {
         [FileRenameSheetController presentSheetForFileListNode: node modalForWindow: [fOutline window] completionHandler: ^(BOOL didRename) {
-#warning need to re-sort
+            #warning instead of calling reset inspector, just resort?
             if (didRename)
-                [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateUI" object: nil];
+                [[NSNotificationCenter defaultCenter] postNotificationName: @"ResetInspector" object: self userInfo: @{ @"Torrent" : torrent }];
         }];
     }
 }

@@ -1940,7 +1940,7 @@ int trashDataFile(const char * filename)
         [self changeDownloadFolderBeforeUsing: location determinationType:TorrentDeterminationAutomatic];
     }
     
-    [[NSNotificationCenter defaultCenter] postNotificationName: @"ResetInspector" object: self];
+    [[NSNotificationCenter defaultCenter] postNotificationName: @"ResetInspector" object: self userInfo: @{ @"Torrent" : self }];
 }
 
 - (BOOL) shouldShowEta

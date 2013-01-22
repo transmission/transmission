@@ -1558,7 +1558,7 @@ AADAcW1tb2QAAAAAAAAGEAAAoAcAAAAAySceAAAAAAAAAAAAAAAAAAAAAAA</bytes>
 									<reference key="NSOnImage" ref="246127200"/>
 									<reference key="NSMixedImage" ref="330170270"/>
 								</object>
-								<object class="NSMenuItem" id="974370788">
+								<object class="NSMenuItem" id="279484089">
 									<reference key="NSMenu" ref="335948734"/>
 									<string key="NSTitle">Rename Selected…</string>
 									<string key="NSKeyEquiv"/>
@@ -1975,7 +1975,7 @@ AADAcW1tb2QAAAAAAAAGEAAAoAcAAAAAySceAAAAAAAAAAAAAAAAAAAAAAA</bytes>
 						<reference key="NSOnImage" ref="246127200"/>
 						<reference key="NSMixedImage" ref="330170270"/>
 					</object>
-					<object class="NSMenuItem" id="266554750">
+					<object class="NSMenuItem" id="762842238">
 						<reference key="NSMenu" ref="434296936"/>
 						<string key="NSTitle">Rename Selected…</string>
 						<string key="NSKeyEquiv"/>
@@ -3683,7 +3683,7 @@ AADAcW1tb2QAAAAAAAAGEAAAoAcAAAAAySceAAAAAAAAAAAAAAAAAAAAAAA</bytes>
 					<object class="IBActionConnection" key="connection">
 						<string key="label">renameSelected:</string>
 						<reference key="source" ref="30116300"/>
-						<reference key="destination" ref="974370788"/>
+						<reference key="destination" ref="279484089"/>
 					</object>
 					<int key="connectionID">3444</int>
 				</object>
@@ -3691,7 +3691,7 @@ AADAcW1tb2QAAAAAAAAGEAAAoAcAAAAAySceAAAAAAAAAAAAAAAAAAAAAAA</bytes>
 					<object class="IBActionConnection" key="connection">
 						<string key="label">renameSelected:</string>
 						<reference key="source" ref="30116300"/>
-						<reference key="destination" ref="266554750"/>
+						<reference key="destination" ref="762842238"/>
 					</object>
 					<int key="connectionID">3447</int>
 				</object>
@@ -4492,7 +4492,7 @@ AADAcW1tb2QAAAAAAAAGEAAAoAcAAAAAySceAAAAAAAAAAAAAAAAAAAAAAA</bytes>
 							<reference ref="349340971"/>
 							<reference ref="245039314"/>
 							<reference ref="96633809"/>
-							<reference ref="974370788"/>
+							<reference ref="279484089"/>
 						</array>
 						<reference key="parent" ref="249425108"/>
 					</object>
@@ -4723,7 +4723,7 @@ AADAcW1tb2QAAAAAAAAGEAAAoAcAAAAAySceAAAAAAAAAAAAAAAAAAAAAAA</bytes>
 							<reference ref="24108443"/>
 							<reference ref="922629505"/>
 							<reference ref="143702072"/>
-							<reference ref="266554750"/>
+							<reference ref="762842238"/>
 						</array>
 						<reference key="parent" ref="0"/>
 						<string key="objectName">ContextRowMenu</string>
@@ -5506,12 +5506,12 @@ AADAcW1tb2QAAAAAAAAGEAAAoAcAAAAAySceAAAAAAAAAAAAAAAAAAAAAAA</bytes>
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">3441</int>
-						<reference key="object" ref="974370788"/>
+						<reference key="object" ref="279484089"/>
 						<reference key="parent" ref="335948734"/>
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">3445</int>
-						<reference key="object" ref="266554750"/>
+						<reference key="object" ref="762842238"/>
 						<reference key="parent" ref="434296936"/>
 					</object>
 				</array>

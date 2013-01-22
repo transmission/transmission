@@ -555,6 +555,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     [nc addObserver: fWindow selector: @selector(makeKeyWindow)
                     name: @"MakeWindowKey" object: nil];
     
+    #warning rename
     [nc addObserver: self selector: @selector(fullUpdateUI)
                     name: @"UpdateQueue" object: nil];
     
@@ -1752,6 +1753,8 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         {
             dispatch_async(dispatch_get_main_queue(), ^{
                 [self fullUpdateUI];
+                
+                [[NSNotificationCenter defaultCenter] postNotificationName: @"ResetInspector" object: self userInfo: @{ @"Torrent" : torrent }];
             });
         }
     }];
