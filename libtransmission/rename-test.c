@@ -461,15 +461,19 @@ create_zero_torrent_partial_contents (const char * top)
   char * path;
   char buf[32];
 
+fprintf (stderr, "top %s exists %d\n", top, (int)tr_fileExists(top,NULL));
+
 errno = 0;
   path = tr_buildPath (top, "files-filled-with-zeroes", NULL);
   tr_mkdirp (path, 0700);
+fprintf (stderr, "%s:%d %s\n", __FILE__, __LINE__, path);
+fprintf (stderr, "errno is %d (%s)\n", errno, tr_strerror (errno));
   tr_free (path);
 
   n = 512;
   tr_snprintf (buf, sizeof(buf), "%d", n);
   path = tr_buildPath (top, "files-filled-with-zeroes", buf, NULL);
-fprintf (stderr, "%s\n", path);
+fprintf (stderr, "%s:%d %s\n", __FILE__, __LINE__, path);
 fprintf (stderr, "errno is %d (%s)\n", errno, tr_strerror (errno));
   fp = fopen (path, "wb+");
   for (i=0; i<n; ++i)
