@@ -168,7 +168,6 @@ test_single_filename_torrent (void)
     "OmhlbGxvLXdvcmxkLnR4dDEyOnBpZWNlIGxlbmd0aGkzMjc2OGU2OnBpZWNlczIwOukboJcrkFUY"
     "f6LvqLXBVvSHqCk6Nzpwcml2YXRlaTBlZWU=");
   check (tr_isTorrent (tor));
-  tr_ctorFree (ctor);
 
   /* sanity check the info */
   check_int_eq (1, tor->info.fileCount);
@@ -240,6 +239,7 @@ test_single_filename_torrent (void)
   check (testFileExistsAndConsistsOfThisString (tor, 0, "hello, world!\n"));
 
   /* cleanup */
+  tr_ctorFree (ctor);
   tr_torrentRemove (tor, false, NULL);
   return 0;
 }
@@ -452,12 +452,114 @@ test_multifile_torrent (void)
 ****
 ***/
 
+static void
+create_zero_torrent_partial_contents (const char * top)
+{
+  int i;
+  int n;
+  FILE * fp;
+  char * path;
+  char buf[32];
+
+  path = tr_buildPath (top, "files-filled-with-zeroes", NULL);
+  tr_mkdirp (path, 0700);
+  tr_free (path);
+
+  n = 512;
+  tr_snprintf (buf, sizeof(buf), "%d", n);
+  path = tr_buildPath (top, "files-filled-with-zeroes", buf, NULL);
+  fp = fopen (path, "wb+");
+  for (i=0; i<n; ++i)
+    fputc ('\0', fp);
+  fclose (fp);
+  tr_free (path);
+
+  n = 4096;
+  tr_snprintf (buf, sizeof(buf), "%d", n);
+  path = tr_buildPath (top, "files-filled-with-zeroes", buf, NULL);
+  fp = fopen (path, "wb+");
+  for (i=0; i<n; ++i)
+    fputc ('\0', fp);
+  fclose (fp);
+  tr_free (path);
+
+  n = 1048576;
+  tr_snprintf (buf, sizeof(buf), "%d.part", n);
+  path = tr_buildPath (top, "files-filled-with-zeroes", buf, NULL);
+  fp = fopen (path, "wb+");
+  n -= 100;
+  for (i=0; i<n; ++i)
+    fputc ('\0', fp);
+  fclose (fp);
+  tr_free (path);
+
+  sync ();
+}
+
+static int
+test_partial_file (void)
+{
+  tr_file_index_t i;
+  tr_torrent * tor;
+  const tr_stat * st;
+  const uint32_t pieceSize = 32768;
+  const uint64_t totalSize = 1048576 + 4096 + 512;
+  const char * strings[3];
+
+  /***
+  ****  create our test torrent with an incomplete .part file 
+  ***/
+
+  tor = libtransmission_test_zero_torrent_init ();
+  check_int_eq (3, tor->info.fileCount);
+  check_int_eq (totalSize, tor->info.totalSize);
+  check_int_eq (pieceSize, tor->info.pieceSize);
+  check_streq ("files-filled-with-zeroes/1048576", tor->info.files[0].name);
+  check_streq ("files-filled-with-zeroes/4096",    tor->info.files[1].name);
+  check_streq ("files-filled-with-zeroes/512",     tor->info.files[2].name);
+
+  create_zero_torrent_partial_contents (tor->downloadDir);
+  verify_and_block_until_done (tor);
+  check (!tr_torrentIsSeed (tor));
+  st = tr_torrentStat (tor);
+  check_int_eq (totalSize, st->sizeWhenDone);
+  check_int_eq (pieceSize, st->leftUntilDone);
+
+  check_int_eq (0, torrentRenameAndWait (tor, "files-filled-with-zeroes", "foo"));
+  check_int_eq (0, torrentRenameAndWait (tor, "foo/1048576", "bar"));
+  strings[0] = "foo/bar";
+  strings[1] = "foo/4096";
+  strings[2] = "foo/512";
+  for (i=0; i<3; ++i)
+    {
+      check_streq (strings[i], tor->info.files[i].name);
+    }
+
+  strings[0] = "foo/bar.part";
+  for (i=0; i<3; ++i)
+    {
+      char * expected = tr_buildPath (tor->downloadDir, strings[i], NULL);
+      char * path = tr_torrentFindFile (tor, i);
+      check_streq (expected, path);
+      tr_free (path);
+      tr_free (expected);
+    }
+
+  tr_torrentRemove (tor, false, NULL);
+  return 0;
+}
+
+/***
+****
+***/
+
 int
 main (void)
 {
   int ret;
   const testFunc tests[] = { test_single_filename_torrent,
-                             test_multifile_torrent };
+                             test_multifile_torrent,
+                             test_partial_file };
 
   libtransmission_test_session_init ();
   ret = runTests (tests, NUM_TESTS (tests));
