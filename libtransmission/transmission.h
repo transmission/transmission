@@ -1109,7 +1109,7 @@ typedef void (tr_torrent_rename_done_func)(tr_torrent  * torrent,
  * @callback: the callback invoked when the renaming finishes, or NULL
  * @callback_data: the pointer to pass in the callback's user_data arg
  *
- * As a special case, renaming the root file in a torrent will allso
+ * As a special case, renaming the root file in a torrent will also
  * update tr_info.name.
  *
  * EXAMPLES
