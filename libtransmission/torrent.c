@@ -1732,8 +1732,11 @@ verifyTorrent (void * vtor)
 void
 tr_torrentVerify (tr_torrent * tor)
 {
-    if (tr_isTorrent (tor))
-        tr_runInEventThread (tor->session, verifyTorrent, tor);
+  if (tr_isTorrent (tor))
+    {
+      tr_verifyRemove (tor);
+      tr_runInEventThread (tor->session, verifyTorrent, tor);
+    }
 }
 
 void
