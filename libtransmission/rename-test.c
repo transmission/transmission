@@ -463,6 +463,7 @@ static void
 create_zero_torrent_partial_contents (tr_torrent * tor, bool incomplete)
 {
   tr_file_index_t i;
+  const tr_stat * st;
 
   for (i=0; i<tor->info.fileCount; ++i)
     {
@@ -486,7 +487,8 @@ create_zero_torrent_partial_contents (tr_torrent * tor, bool incomplete)
     }
 
   verify_and_block_until_done (tor);
-  assert (tr_torrentIsSeed (tor));
+  st = tr_torrentStat (tor);
+  assert (st->leftUntilDone == 0);
 
   if (incomplete)
     {
@@ -506,7 +508,8 @@ create_zero_torrent_partial_contents (tr_torrent * tor, bool incomplete)
       tr_free (oldpath);
 
       verify_and_block_until_done (tor);
-      assert (!tr_torrentIsSeed (tor));
+      st = tr_torrentStat (tor);
+      assert (st->leftUntilDone == tor->info.pieceSize);
     }
 }
 
