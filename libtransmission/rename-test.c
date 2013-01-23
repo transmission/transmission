@@ -4,7 +4,9 @@
 #include <string.h> /* strcmp() */
 #include <stdio.h>
 
-#include <unistd.h> /* sync() */
+#include <sys/types.h> /* stat() */
+#include <sys/stat.h> /* stat() */
+#include <unistd.h> /* stat(), sync() */
 
 #include "transmission.h"
 #include "resume.h"
@@ -464,14 +466,17 @@ create_zero_torrent_partial_contents (tr_torrent * tor, bool incomplete)
 {
   tr_file_index_t i;
   const tr_stat * st;
+  tr_file_stat * fst;
 
   for (i=0; i<tor->info.fileCount; ++i)
     {
+      int rv;
       uint64_t j;
       FILE * fp;
       char * path;
       char * dirname;
       const tr_file * file = &tor->info.files[i];
+      struct stat sb;
 
       path = tr_buildPath (tor->downloadDir, file->name, NULL);
       dirname = tr_dirname (path);
@@ -480,14 +485,25 @@ create_zero_torrent_partial_contents (tr_torrent * tor, bool incomplete)
       for (j=0; j<file->length; ++j)
         fputc ('\0', fp);
       fclose (fp);
-      sync ();
 
       tr_free (dirname);
       tr_free (path);
+
+      path = tr_torrentFindFile (tor, i);
+      assert (path != NULL);
+      rv = stat (path, &sb);
+      assert (rv == 0);
+      fprintf (stderr, "%s:%d file %s size is %zu\n", __FILE__, __LINE__, path, (size_t)sb.st_size);
+      tr_free (path);
     }
 
+  sync ();
   verify_and_block_until_done (tor);
   st = tr_torrentStat (tor);
+fprintf (stderr, "%s:%d leftUntilDone %zu\n", __FILE__, __LINE__, (size_t)st->leftUntilDone);
+fst = tr_torrentFiles (tor, NULL);
+for (i=0; i<3; ++i)
+  fprintf (stderr, "%s:%d %d %zu\n", __FILE__, __LINE__, (int)i, (size_t)fst[i].bytesCompleted);
   assert (st->leftUntilDone == 0);
 
   if (incomplete)
@@ -502,14 +518,15 @@ create_zero_torrent_partial_contents (tr_torrent * tor, bool incomplete)
       fp = fopen (newpath, "rb+");
       fputc ('\1', fp);
       fclose (fp);
-      sync ();
 
       tr_free (newpath);
       tr_free (oldpath);
 
+      sync ();
       verify_and_block_until_done (tor);
       st = tr_torrentStat (tor);
       assert (st->leftUntilDone == tor->info.pieceSize);
+fprintf (stderr, "%s:%d leftUntilDone %zu\n", __FILE__, __LINE__, (size_t)st->leftUntilDone);
     }
 }
 
