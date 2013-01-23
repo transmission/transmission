@@ -110,18 +110,38 @@ FileTreeItem :: row( ) const
 }
 
 QVariant
-FileTreeItem :: data( int column ) const
+FileTreeItem :: data (int column, int role) const
 {
-    QVariant value;
+  QVariant value;
 
-    switch( column ) {
-        case COL_NAME: value.setValue( fileSizeName( ) ); break;
-        case COL_PROGRESS: value.setValue( progress( ) ); break;
-        case COL_WANTED: value.setValue( isSubtreeWanted( ) ); break;
-        case COL_PRIORITY: value.setValue( priorityString( ) ); break;
+  if (role == Qt::EditRole)
+    {
+      if (column == 0)
+        value.setValue (name());
+    }
+  else if (role == Qt::DisplayRole)
+    {
+      switch( column )
+       {
+         case COL_NAME:
+           value.setValue (fileSizeName());
+           break;
+
+         case COL_PROGRESS:
+           value.setValue (progress());
+           break;
+
+         case COL_WANTED:
+           value.setValue (isSubtreeWanted());
+           break;
+
+         case COL_PRIORITY:
+           value.setValue (priorityString());
+           break;
+        }
     }
 
-    return value;
+  return value;
 }
 
 void
@@ -304,11 +324,11 @@ FileTreeModel :: data( const QModelIndex &index, int role ) const
 {
     QVariant value;
 
-    if( index.isValid() && role==Qt::DisplayRole )
-    {
-        FileTreeItem *item = static_cast<FileTreeItem*>(index.internalPointer());
-        value = item->data( index.column( ) );
-    }
+    if (index.isValid())
+      {
+        FileTreeItem * i = static_cast<FileTreeItem*>(index.internalPointer());
+        value = i->data (index.column(), role);
+      }
 
     return value;
 }
