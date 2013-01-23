@@ -547,7 +547,9 @@ tr_mkdirp (const char * path_in,
     char *      path = tr_strdup (path_in);
     char *      p, * pp;
     struct stat sb;
-    int         done;
+    bool        done;
+    int         tmperr;
+    int         rv;
 
     /* walk past the root */
     p = path;
@@ -555,26 +557,26 @@ tr_mkdirp (const char * path_in,
         ++p;
 
     pp = p;
-    done = 0;
-    while ((p =
-                strchr (pp, TR_PATH_DELIMITER)) || (p = strchr (pp, '\0')))
+    done = false;
+    while ((p = strchr (pp, TR_PATH_DELIMITER)) || (p = strchr (pp, '\0')))
     {
         if (!*p)
-            done = 1;
+            done = true;
         else
             *p = '\0';
 
-        if (stat (path, &sb))
+        tmperr = errno;
+        rv = stat (path, &sb);
+        errno = tmperr;
+        if (rv)
         {
             /* Folder doesn't exist yet */
             if (tr_mkdir (path, permissions))
             {
-                const int err = errno;
-                tr_err (_(
-                           "Couldn't create \"%1$s\": %2$s"), path,
-                       tr_strerror (err));
+                tmperr = errno;
+                tr_err (_("Couldn't create \"%1$s\": %2$s"), path, tr_strerror (tmperr));
                 tr_free (path);
-                errno = err;
+                errno = tmperr;
                 return -1;
             }
         }

@@ -102,11 +102,16 @@ torrentRenameAndWait (tr_torrent * tor,
 static void
 create_file_with_contents (const char * path, const char * str)
 {
+  int rv;
   FILE * fp;
   char * dir;
+  const int tmperr = errno;
 
   dir = tr_dirname (path);
-  tr_mkdirp (dir, 0700);
+  errno = 0;
+  rv = tr_mkdirp (dir, 0700);
+  assert (errno == 0);
+  assert (rv == 0);
   tr_free (dir);
 
   remove (path);
@@ -115,6 +120,8 @@ create_file_with_contents (const char * path, const char * str)
   fclose (fp);
 
   sync ();
+
+  errno = tmperr;
 }
 
 static void
@@ -457,15 +464,18 @@ create_zero_torrent_partial_contents (const char * top)
 {
   int i;
   int n;
+  int rv;
   FILE * fp;
   char * path;
   char buf[32];
 
 fprintf (stderr, "top %s exists %d\n", top, (int)tr_fileExists(top,NULL));
 
-errno = 0;
+  errno = 0;
   path = tr_buildPath (top, "files-filled-with-zeroes", NULL);
-  tr_mkdirp (path, 0700);
+  rv = tr_mkdirp (path, 0700);
+  assert (rv == 0);
+  assert (errno == 0);
 fprintf (stderr, "%s:%d %s\n", __FILE__, __LINE__, path);
 fprintf (stderr, "errno is %d (%s)\n", errno, tr_strerror (errno));
   tr_free (path);
