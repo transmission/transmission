@@ -461,6 +461,7 @@ create_zero_torrent_partial_contents (const char * top)
   char * path;
   char buf[32];
 
+errno = 0;
   path = tr_buildPath (top, "files-filled-with-zeroes", NULL);
   tr_mkdirp (path, 0700);
   tr_free (path);
@@ -468,6 +469,8 @@ create_zero_torrent_partial_contents (const char * top)
   n = 512;
   tr_snprintf (buf, sizeof(buf), "%d", n);
   path = tr_buildPath (top, "files-filled-with-zeroes", buf, NULL);
+fprintf (stderr, "%s\n", path);
+fprintf (stderr, "errno is %d (%s)\n", errno, tr_strerror (errno));
   fp = fopen (path, "wb+");
   for (i=0; i<n; ++i)
     fputc ('\0', fp);
@@ -477,6 +480,8 @@ create_zero_torrent_partial_contents (const char * top)
   n = 4096;
   tr_snprintf (buf, sizeof(buf), "%d", n);
   path = tr_buildPath (top, "files-filled-with-zeroes", buf, NULL);
+fprintf (stderr, "%s\n", path);
+fprintf (stderr, "errno is %d (%s)\n", errno, tr_strerror (errno));
   fp = fopen (path, "wb+");
   for (i=0; i<n; ++i)
     fputc ('\0', fp);
@@ -486,12 +491,15 @@ create_zero_torrent_partial_contents (const char * top)
   n = 1048576;
   tr_snprintf (buf, sizeof(buf), "%d.part", n);
   path = tr_buildPath (top, "files-filled-with-zeroes", buf, NULL);
+fprintf (stderr, "%s\n", path);
+fprintf (stderr, "errno is %d (%s)\n", errno, tr_strerror (errno));
   fp = fopen (path, "wb+");
   n -= 100;
   for (i=0; i<n; ++i)
     fputc ('\0', fp);
   fclose (fp);
   tr_free (path);
+fprintf (stderr, "errno is %d (%s)\n", errno, tr_strerror (errno));
 
   sync ();
 }
@@ -560,6 +568,8 @@ main (void)
   const testFunc tests[] = { test_single_filename_torrent,
                              test_multifile_torrent,
                              test_partial_file };
+
+  verbose = 1;
 
   libtransmission_test_session_init ();
   ret = runTests (tests, NUM_TESTS (tests));
