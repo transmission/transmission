@@ -465,8 +465,6 @@ static void
 create_zero_torrent_partial_contents (tr_torrent * tor, bool incomplete)
 {
   tr_file_index_t i;
-  const tr_stat * st;
-  tr_file_stat * fst;
 
   for (i=0; i<tor->info.fileCount; ++i)
     {
@@ -493,18 +491,12 @@ create_zero_torrent_partial_contents (tr_torrent * tor, bool incomplete)
       assert (path != NULL);
       rv = stat (path, &sb);
       assert (rv == 0);
-      fprintf (stderr, "%s:%d file %s size is %zu\n", __FILE__, __LINE__, path, (size_t)sb.st_size);
       tr_free (path);
     }
 
   sync ();
   verify_and_block_until_done (tor);
-  st = tr_torrentStat (tor);
-fprintf (stderr, "%s:%d leftUntilDone %zu\n", __FILE__, __LINE__, (size_t)st->leftUntilDone);
-fst = tr_torrentFiles (tor, NULL);
-for (i=0; i<3; ++i)
-  fprintf (stderr, "%s:%d %d %zu\n", __FILE__, __LINE__, (int)i, (size_t)fst[i].bytesCompleted);
-  assert (st->leftUntilDone == 0);
+  assert (tr_torrentStat(tor)->leftUntilDone == 0);
 
   if (incomplete)
     {
@@ -524,9 +516,7 @@ for (i=0; i<3; ++i)
 
       sync ();
       verify_and_block_until_done (tor);
-      st = tr_torrentStat (tor);
-      assert (st->leftUntilDone == tor->info.pieceSize);
-fprintf (stderr, "%s:%d leftUntilDone %zu\n", __FILE__, __LINE__, (size_t)st->leftUntilDone);
+      assert (tr_torrentStat(tor)->leftUntilDone == tor->info.pieceSize);
     }
 }
 
@@ -601,11 +591,9 @@ int
 main (void)
 {
   int ret;
-  const testFunc tests[] = { //test_single_filename_torrent,
-                             //test_multifile_torrent,
+  const testFunc tests[] = { test_single_filename_torrent,
+                             test_multifile_torrent,
                              test_partial_file };
-
-  verbose = 1;
 
   libtransmission_test_session_init ();
   ret = runTests (tests, NUM_TESTS (tests));
