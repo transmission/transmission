@@ -563,7 +563,7 @@ typedef enum
     NSMenu * menu = [[NSMenu alloc] initWithTitle: @"File Outline Menu"];
     
     //rename
-    NSMenuItem * item = [[NSMenuItem alloc] initWithTitle: [NSLocalizedString(@"Rename", "File Outline -> Menu") stringByAppendingEllipsis]
+    NSMenuItem * item = [[NSMenuItem alloc] initWithTitle: [NSLocalizedString(@"Rename File", "File Outline -> Menu") stringByAppendingEllipsis]
                                                    action: @selector(renameSelected:) keyEquivalent: @""];
     [item setTarget: self];
     [menu addItem: item];
