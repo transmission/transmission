@@ -297,7 +297,7 @@ format_tos (int value)
     case 0x04: return "reliability";
     case 0x02: return "lowdelay";
     default:
-        snprintf (buf, 8, "%d", value);
+        tr_snprintf (buf, 8, "%d", value);
         return buf;
     }
 }

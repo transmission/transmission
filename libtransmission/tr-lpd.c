@@ -225,7 +225,7 @@ static int lpd_extractParam (const char* const str, const char* const name, int 
         return 0;
 
     /* compose the string token to search for */
-    snprintf (sstr, maxLength, CRLF "%s: ", name);
+    tr_snprintf (sstr, maxLength, CRLF "%s: ", name);
 
     pos = strstr (str, sstr);
     if (pos == NULL)
@@ -454,8 +454,8 @@ tr_lpdSendAnnounce (const tr_torrent* t)
         hashString[i] = toupper (t->info.hashString[i]);
 
     /* prepare a zero-terminated announce message */
-    snprintf (query, lpd_maxDatagramLength + 1, fmt, 1, 1,
-        lpd_mcastGroup, lpd_mcastPort, lpd_port, hashString);
+    tr_snprintf (query, lpd_maxDatagramLength + 1, fmt, 1, 1,
+                 lpd_mcastGroup, lpd_mcastPort, lpd_port, hashString);
 
     /* actually send the query out using [lpd_socket2] */
     {
