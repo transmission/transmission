@@ -806,7 +806,7 @@ tr_variantWalk (const tr_variant               * v,
 
   /* always use a '.' decimal point s.t. locale-hopping doesn't bite us */
   tr_strlcpy (lc_numeric, setlocale (LC_NUMERIC, NULL), sizeof (lc_numeric));
-  setlocale (LC_NUMERIC, "POSIX");
+  setlocale (LC_NUMERIC, "C");
 
   nodeConstruct (&stack[stackSize++], v, sort_dicts);
 

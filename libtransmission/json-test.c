@@ -1,5 +1,7 @@
 #include <string.h> /* strlen () */
 
+#include <locale.h> /* setlocale() */
+
 #define __LIBTRANSMISSION_VARIANT_MODULE___
 #include "transmission.h"
 #include "utils.h" /* tr_free */
@@ -221,12 +223,36 @@ test_unescape (void)
 int
 main (void)
 {
-    const testFunc tests[] = { test_elements,
-                               test_utf8,
-                               test1,
-                               test2,
-                               test3,
-                               test_unescape };
+  int i;
+  int n;
+  int rv;
+  char lc_numeric[128];
+  const char * comma_locales[] = { "da_DK.UTF-8", "fr_FR.UTF-8", "ru_RU.UTF-8"};
 
-    return runTests (tests, NUM_TESTS (tests));
+  const testFunc tests[] = { test_elements,
+                             test_utf8,
+                             test1,
+                             test2,
+                             test3,
+                             test_unescape };
+
+  /* run the tests in a locale with a decimal point of '.' */
+  tr_strlcpy (lc_numeric, setlocale (LC_NUMERIC, NULL), sizeof (lc_numeric));
+  setlocale (LC_NUMERIC, "C");
+  if ((rv = runTests (tests, NUM_TESTS (tests))))
+    return rv;
+
+  /* run the tests in a locale with a decimal point of ',' */
+  n = sizeof(comma_locales) / sizeof(comma_locales[0]);
+  for (i=0; i<n; ++i)
+    if (setlocale (LC_NUMERIC, comma_locales[i]) != NULL)
+      break;
+  if (i==n)
+    fprintf (stderr, "WARNING: unable to run locale-specific json tests.\n");
+  else if ((rv = runTests (tests, NUM_TESTS(tests))))
+    return rv;
+  setlocale (LC_NUMERIC, lc_numeric);
+
+  /* success */
+  return 0;
 }
