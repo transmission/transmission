@@ -152,20 +152,30 @@ action_callback_PUSH (jsonsl_t                  jsn,
 static bool
 decode_hex_string (const char * in, unsigned int * setme)
 {
-  bool success;
-  char buf[5];
-  char * end;
+  unsigned int val = 0;
+  const char * const end = in + 6;
 
   assert (in != NULL);
   assert (in[0] == '\\');
   assert (in[1] == 'u');
+  in += 2;
 
-  memcpy (buf, in+2, 4);
-  buf[4] = '\0';
-  *setme = strtoul (buf, &end, 16);
-  success = end == buf+4;
+  do
+    {
+      val <<= 4;
+      if (('0'<=*in) && (*in<='9'))
+        val += (*in-'0');
+      else if (('a'<=*in) && (*in<='f'))
+        val += (*in-'a') + 10u;
+      else if (('A'<=*in) && (*in<='F'))
+        val += (*in-'A') + 10u;
+      else
+        return false;
+    }
+  while (++in != end);
 
-  return success;
+  *setme = val;
+  return true;
 }
 
 static char*
