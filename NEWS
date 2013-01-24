@@ -41,6 +41,8 @@
   #5235 'Plural wrong in torrent-cell-renderer'
   #5219 'QPrintable and non Latin-1 symbols on Ubuntu'
   #5215 fix a transmission-cli regression from 2.76
+  #5248 'fails to create torrent with multiple trackers'
+  #5249 'error parsing json in some locales'
 
 
 === Transmission 2.76 (2013/01/08) ===
