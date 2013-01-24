@@ -226,8 +226,10 @@ main (void)
   int i;
   int n;
   int rv;
-  char lc_numeric[128];
-  const char * comma_locales[] = { "da_DK.UTF-8", "fr_FR.UTF-8", "ru_RU.UTF-8"};
+
+  const char * comma_locales[] = { "da_DK.UTF-8",
+                                   "fr_FR.UTF-8",
+                                   "ru_RU.UTF-8"};
 
   const testFunc tests[] = { test_elements,
                              test_utf8,
@@ -237,7 +239,6 @@ main (void)
                              test_unescape };
 
   /* run the tests in a locale with a decimal point of '.' */
-  tr_strlcpy (lc_numeric, setlocale (LC_NUMERIC, NULL), sizeof (lc_numeric));
   setlocale (LC_NUMERIC, "C");
   if ((rv = runTests (tests, NUM_TESTS (tests))))
     return rv;
@@ -251,7 +252,6 @@ main (void)
     fprintf (stderr, "WARNING: unable to run locale-specific json tests.\n");
   else if ((rv = runTests (tests, NUM_TESTS(tests))))
     return rv;
-  setlocale (LC_NUMERIC, lc_numeric);
 
   /* success */
   return 0;

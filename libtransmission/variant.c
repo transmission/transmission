@@ -801,12 +801,7 @@ tr_variantWalk (const tr_variant               * v,
 {
   int stackSize = 0;
   int stackAlloc = 64;
-  char lc_numeric[128];
   struct SaveNode * stack = tr_new (struct SaveNode, stackAlloc);
-
-  /* always use a '.' decimal point s.t. locale-hopping doesn't bite us */
-  tr_strlcpy (lc_numeric, setlocale (LC_NUMERIC, NULL), sizeof (lc_numeric));
-  setlocale (LC_NUMERIC, "C");
 
   nodeConstruct (&stack[stackSize++], v, sort_dicts);
 
@@ -897,9 +892,6 @@ tr_variantWalk (const tr_variant               * v,
             break;
         }
     }
-
-  /* restore the locale... */
-  setlocale (LC_NUMERIC, lc_numeric);
 
   tr_free (stack);
 }
@@ -1095,7 +1087,12 @@ tr_variantMergeDicts (tr_variant * target, const tr_variant * source)
 struct evbuffer *
 tr_variantToBuf (const tr_variant * v, tr_variant_fmt fmt)
 {
+  char lc_numeric[128];
   struct evbuffer * buf = evbuffer_new();
+
+  /* parse with LC_NUMERIC="C" to ensure a "." decimal separator */
+  tr_strlcpy (lc_numeric, setlocale (LC_NUMERIC, NULL), sizeof (lc_numeric));
+  setlocale (LC_NUMERIC, "C");
 
   evbuffer_expand (buf, 4096); /* alloc a little memory to start off with */
 
@@ -1114,6 +1111,8 @@ tr_variantToBuf (const tr_variant * v, tr_variant_fmt fmt)
         break;
     }
 
+  /* restore the previous locale */
+  setlocale (LC_NUMERIC, lc_numeric);
   return buf;
 }
 
@@ -1261,6 +1260,11 @@ tr_variantFromBuf (tr_variant      * setme,
                    const char     ** setme_end)
 {
   int err;
+  char lc_numeric[128];
+
+  /* parse with LC_NUMERIC="C" to ensure a "." decimal separator */
+  tr_strlcpy (lc_numeric, setlocale (LC_NUMERIC, NULL), sizeof (lc_numeric));
+  setlocale (LC_NUMERIC, "C");
 
   switch (fmt)
     {
@@ -1274,5 +1278,7 @@ tr_variantFromBuf (tr_variant      * setme,
         break;
     }
 
+  /* restore the previous locale */
+  setlocale (LC_NUMERIC, lc_numeric);
   return err;
 }
