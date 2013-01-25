@@ -21,6 +21,7 @@
 #include "clients.h"
 #include "crypto.h"
 #include "handshake.h"
+#include "log.h"
 #include "peer-io.h"
 #include "peer-mgr.h"
 #include "session.h"
@@ -148,8 +149,8 @@ enum
 
 #define dbgmsg(handshake, ...) \
   do { \
-    if (tr_deepLoggingIsActive ()) \
-      tr_deepLog (__FILE__, __LINE__, tr_peerIoGetAddrStr (handshake->io), __VA_ARGS__); \
+    if (tr_logGetDeepEnabled ()) \
+      tr_logAddDeep (__FILE__, __LINE__, tr_peerIoGetAddrStr (handshake->io), __VA_ARGS__); \
   } while (0)
 
 static const char*

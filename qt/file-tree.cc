@@ -183,9 +183,11 @@ FileTreeItem :: update (int      index,
                         int      priority,
                         uint64_t totalSize,
                         uint64_t haveSize,
-                        bool     torrentChanged)
+                        bool     updateFields)
 {
   bool changed = false;
+
+std::cerr << __FILE__ << ':' << __LINE__ << " index " << index << " wanted " << wanted << " myIndex " << myIndex << " myWanted" << myIsWanted << std::endl;
 
   if (myIndex != index)
     {
@@ -193,13 +195,14 @@ FileTreeItem :: update (int      index,
       changed = true;
     }
 
-  if (torrentChanged && myIsWanted != wanted)
+  if (updateFields && myIsWanted != wanted)
     {
       myIsWanted = wanted;
       changed = true;
+std::cerr << __FILE__ << ':' << __LINE__ << " setting myIsWanted to " << myIsWanted << std::endl;
     }
 
-  if (torrentChanged && myPriority != priority)
+  if (updateFields && myPriority != priority)
     {
       myPriority = priority;
       changed = true;
@@ -285,6 +288,7 @@ FileTreeItem :: twiddlePriority (QSet<int>& ids, int& p)
     p = TR_PRI_HIGH;
   else
     p = TR_PRI_LOW;
+std::cerr << __FILE__ << ':' << __LINE__ << " twiddlePriority, p " << p << std::endl;
 
   setSubtreePriority (p, ids);
 }
@@ -316,7 +320,8 @@ FileTreeItem :: isSubtreeWanted () const
 void
 FileTreeItem :: setSubtreeWanted (bool b, QSet<int>& ids)
 {
-  if(myIsWanted != b)
+std::cerr << __FILE__ << ':' << __LINE__ << " twiddleWanted, wanted " << b << std::endl;
+  if (myIsWanted != b)
     {
       myIsWanted = b;
 
@@ -331,6 +336,7 @@ FileTreeItem :: setSubtreeWanted (bool b, QSet<int>& ids)
 void
 FileTreeItem :: twiddleWanted (QSet<int>& ids, bool& wanted)
 {
+std::cerr << __FILE__ << ':' << __LINE__ << " twiddleWanted" << std::endl;
   wanted = isSubtreeWanted() != Qt::Checked;
   setSubtreeWanted (wanted, ids);
 }
@@ -348,6 +354,7 @@ FileTreeModel :: FileTreeModel (QObject *parent):
 
 FileTreeModel :: ~FileTreeModel()
 {
+std::cerr << __FILE__ << ':' << __LINE__ << " dtor " << std::endl;
   clear();
 
   delete rootItem;
@@ -516,16 +523,18 @@ void
 FileTreeModel :: clearSubtree (const QModelIndex& top)
 {
   size_t i = rowCount (top);
+std::cerr << __FILE__ << ':' << __LINE__ << " clearSubtree " << i << std::endl;
 
   while (i > 0)
     clearSubtree(index(--i, 0, top));
 
-    delete static_cast<FileTreeItem*>(top.internalPointer());
+  delete static_cast<FileTreeItem*>(top.internalPointer());
 }
 
 void
 FileTreeModel :: clear ()
 {
+std::cerr << __FILE__ << ':' << __LINE__ << " clear"  << std::endl;
   clearSubtree (QModelIndex());
 
   reset ();
@@ -539,8 +548,9 @@ FileTreeModel :: addFile (int                   index,
                           uint64_t              size,
                           uint64_t              have,
                           QList<QModelIndex>  & rowsAdded,
-                          bool                  torrentChanged)
+                          bool                  updateFields)
 {
+  bool added = false;
   FileTreeItem * i (rootItem);
 
   foreach (QString token, filename.split (QChar::fromAscii('/')))
@@ -548,6 +558,7 @@ FileTreeModel :: addFile (int                   index,
       FileTreeItem * child(i->child(token));
       if (!child)
         {
+          added = true;
           QModelIndex parentIndex (indexOf(i, 0));
           const int n (i->childCount());
           beginInsertRows (parentIndex, n, n);
@@ -559,8 +570,13 @@ FileTreeModel :: addFile (int                   index,
     }
 
   if (i != rootItem)
-    if (i->update (index, wanted, priority, size, have, torrentChanged))
-      dataChanged (indexOf(i, 0), indexOf(i, NUM_COLUMNS-1));
+    {
+      if (i->update (index, wanted, priority, size, have, added || updateFields))
+        {
+          std::cerr << __FILE__ << ':' << __LINE__ << " emitting dataChanged for row " << i << std::endl;
+          dataChanged (indexOf(i, 0), indexOf(i, NUM_COLUMNS-1));
+        }
+    }
 }
 
 void
@@ -621,6 +637,7 @@ FileTreeModel :: clicked (const QModelIndex& index)
       QSet<int> file_ids;
       FileTreeItem * item;
 
+std::cerr << "clicked in COL_PRIORITY" << std::endl;
       item = static_cast<FileTreeItem*>(index.internalPointer());
       item->twiddlePriority (file_ids, priority);
       emit priorityChanged (file_ids, priority);
@@ -799,8 +816,9 @@ FileTreeView :: ~FileTreeView ()
 void
 FileTreeView :: onClicked (const QModelIndex& proxyIndex)
 {
-  const QModelIndex modelIndex = myProxy->mapToSource(proxyIndex);
-  myModel.clicked(modelIndex);
+  const QModelIndex modelIndex = myProxy->mapToSource (proxyIndex);
+std::cerr << __FILE__ << ':' << __LINE__ << " calling myModel.clicked()" << std::endl;
+  myModel.clicked (modelIndex);
 }
 
 bool
@@ -835,24 +853,29 @@ FileTreeView :: eventFilter (QObject * o, QEvent * event)
       return false;
     }
 
+#if 0
   // handle using the keyboard to toggle the
   // wanted/unwanted state or the file priority
-  else if(event->type() == QEvent::KeyPress)
+  else if (event->type() == QEvent::KeyPress)
     {
+std::cerr << __FILE__ << ':' << __LINE__ << " " << qPrintable(dynamic_cast<QKeyEvent*>(event)->text()) << std::endl;
       switch(dynamic_cast<QKeyEvent*>(event)->key())
         {
           case Qt::Key_Space:
+            std::cerr << __FILE__ << ':' << __LINE__ << " calling COL_WANTED.clicked()" << std::endl;
             foreach (QModelIndex i, selectionModel()->selectedRows(COL_WANTED))
               clicked (i);
             return false;
 
           case Qt::Key_Enter:
           case Qt::Key_Return:
+            std::cerr << __FILE__ << ':' << __LINE__ << " calling COL_PRIORITY.clicked()" << std::endl;
             foreach (QModelIndex i, selectionModel()->selectedRows(COL_PRIORITY))
               clicked (i);
             return false;
         }
     }
+#endif
 
   return false;
 }
@@ -864,12 +887,14 @@ FileTreeView :: update (const FileList& files)
 }
 
 void
-FileTreeView :: update (const FileList& files, bool torrentChanged)
+FileTreeView :: update (const FileList& files, bool updateFields)
 {
+std::cerr << "update updateFields " << updateFields << std::endl;
   foreach (const TrFile file, files)
     {
       QList<QModelIndex> added;
-      myModel.addFile (file.index, file.filename, file.wanted, file.priority, file.size, file.have, added, torrentChanged);
+std::cerr << __FILE__ << ':' << __LINE__ << " add file " << qPrintable(file.filename) << " wanted " << file.wanted << std::endl;
+      myModel.addFile (file.index, file.filename, file.wanted, file.priority, file.size, file.have, added, updateFields);
       foreach (QModelIndex i, added)
         expand (myProxy->mapFromSource(i));
     }
@@ -878,5 +903,6 @@ FileTreeView :: update (const FileList& files, bool torrentChanged)
 void
 FileTreeView :: clear ()
 {
+std::cerr << __FILE__ << ':' << __LINE__ << " clear" << std::endl;
   myModel.clear();
 }

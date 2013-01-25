@@ -63,7 +63,7 @@ class FileTreeItem: public QObject
     int row () const;
     const QString& name () const { return myName; }
     QVariant data (int column, int role) const;
-    bool update (int index, bool want, int priority, uint64_t total, uint64_t have, bool torrentChanged);
+    bool update (int index, bool want, int priority, uint64_t total, uint64_t have, bool updateFields);
     void twiddleWanted (QSet<int>& fileIds, bool&);
     void twiddlePriority (QSet<int>& fileIds, int&);
 

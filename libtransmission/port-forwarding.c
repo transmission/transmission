@@ -19,6 +19,7 @@
 
 #include "transmission.h"
 #include "natpmp_local.h"
+#include "log.h"
 #include "net.h"
 #include "peer-mgr.h"
 #include "port-forwarding.h"
@@ -89,7 +90,7 @@ natPulse (tr_shared * s, bool do_check)
   newStatus = tr_sharedTraversalStatus (s);
 
   if (newStatus != oldStatus)
-    tr_ninf (getKey (), _("State changed from \"%1$s\" to \"%2$s\""),
+    tr_logAddNamedInfo (getKey (), _("State changed from \"%1$s\" to \"%2$s\""),
              getNatStateStr (oldStatus),
              getNatStateStr (newStatus));
 }
@@ -179,7 +180,7 @@ stop_timer (tr_shared * s)
 static void
 stop_forwarding (tr_shared * s)
 {
-  tr_ninf (getKey (), "%s", _("Stopped"));
+  tr_logAddNamedInfo (getKey (), "%s", _("Stopped"));
   natPulse (s, false);
 
   tr_natpmpClose (s->natpmp);

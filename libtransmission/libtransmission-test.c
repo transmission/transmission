@@ -228,7 +228,7 @@ libtransmission_test_session_init_session (void)
   tr_variantDictAddStr  (&dict, TR_KEY_download_dir, downloadDir);
   tr_variantDictAddBool (&dict, TR_KEY_port_forwarding_enabled, false);
   tr_variantDictAddBool (&dict, TR_KEY_dht_enabled, false);
-  tr_variantDictAddInt  (&dict, TR_KEY_message_level, verbose ? TR_MSG_DBG : TR_MSG_ERR);
+  tr_variantDictAddInt  (&dict, TR_KEY_message_level, verbose ? TR_LOG_DEBUG : TR_LOG_ERROR);
   session = tr_sessionInit ("libtransmission-test", sandbox, !verbose, &dict);
 
   /* cleanup locals*/
@@ -247,7 +247,7 @@ void
 libtransmission_test_session_close (void)
 {
   tr_sessionClose (session);
-  tr_freeMessageList (tr_getQueuedMessages ());
+  tr_logFreeQueue (tr_logGetQueue ());
   session = NULL;
 
   rm_rf (sandbox);

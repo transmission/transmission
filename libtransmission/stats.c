@@ -12,6 +12,7 @@
 
 #include "transmission.h"
 #include "session.h"
+#include "log.h"
 #include "platform.h" /* tr_sessionGetConfigDir () */
 #include "stats.h"
 #include "utils.h" /* tr_buildPath */
@@ -95,7 +96,7 @@ saveCumulativeStats (const tr_session * session, const tr_session_stats * s)
   tr_variantDictAddInt (&top, TR_KEY_uploaded_bytes,   s->uploadedBytes);
 
   filename = getFilename (session);
-  tr_deepLog (__FILE__, __LINE__, NULL, "Saving stats to \"%s\"", filename);
+  tr_logAddDeep (__FILE__, __LINE__, NULL, "Saving stats to \"%s\"", filename);
   tr_variantToFile (&top, TR_VARIANT_FMT_JSON, filename);
 
   tr_free (filename);

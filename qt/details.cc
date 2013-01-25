@@ -843,9 +843,9 @@ Details :: refresh( )
     if( !single || myFilesDirty )
         myFileTreeView->clear( );
     if( single )
-        myFileTreeView->update( torrents[0]->files( ) , myChangedTorrents );
-    myFilesDirty = false;
+        myFileTreeView->update( torrents[0]->files( ) , myFilesDirty || myChangedTorrents );
 
+    myFilesDirty = false;
     myChangedTorrents = false;
     myHavePendingRefresh = false;
     foreach( QWidget * w, myWidgets )

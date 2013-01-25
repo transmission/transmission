@@ -30,6 +30,7 @@
 #include "crypto.h" /* tr_cryptoRandBuf (), tr_ssha1_matches () */
 #include "fdlimit.h"
 #include "list.h"
+#include "log.h"
 #include "net.h"
 #include "platform.h" /* tr_getWebClientDir () */
 #include "ptrarray.h"
@@ -78,8 +79,8 @@ struct tr_rpc_server
 
 #define dbgmsg(...) \
     do { \
-        if (tr_deepLoggingIsActive ()) \
-            tr_deepLog (__FILE__, __LINE__, MY_NAME, __VA_ARGS__); \
+        if (tr_logGetDeepEnabled ()) \
+            tr_logAddDeep (__FILE__, __LINE__, MY_NAME, __VA_ARGS__); \
     } while (0)
 
 
@@ -798,9 +799,9 @@ tr_rpcSetWhitelist (tr_rpc_server * server, const char * whitelistStr)
         char * token = tr_strndup (walk, len);
         tr_list_append (&server->whitelist, token);
         if (strcspn (token, "+-") < len)
-            tr_ninf (MY_NAME, "Adding address to whitelist: %s (And it has a '+' or '-'!  Are you using an old ACL by mistake?)", token);
+            tr_logAddNamedInfo (MY_NAME, "Adding address to whitelist: %s (And it has a '+' or '-'!  Are you using an old ACL by mistake?)", token);
         else
-            tr_ninf (MY_NAME, "Adding address to whitelist: %s", token);
+            tr_logAddNamedInfo (MY_NAME, "Adding address to whitelist: %s", token);
 
         if (walk[len]=='\0')
             break;
@@ -922,7 +923,7 @@ static void
 missing_settings_key (const tr_quark q)
 {
   const char * str = tr_quark_get_string (q, NULL);
-  tr_nerr (MY_NAME, _("Couldn't find settings key \"%s\""), str);
+  tr_logAddNamedError (MY_NAME, _("Couldn't find settings key \"%s\""), str);
 } 
 
 tr_rpc_server *
@@ -991,24 +992,24 @@ tr_rpcInit (tr_session  * session, tr_variant * settings)
         missing_settings_key (key);
         address = tr_inaddr_any;
     } else if (!tr_address_from_string (&address, str)) {
-        tr_nerr (MY_NAME, _("%s is not a valid address"), str);
+        tr_logAddNamedError (MY_NAME, _("%s is not a valid address"), str);
         address = tr_inaddr_any;
     } else if (address.type != TR_AF_INET) {
-        tr_nerr (MY_NAME, _("%s is not an IPv4 address. RPC listeners must be IPv4"), str);
+        tr_logAddNamedError (MY_NAME, _("%s is not an IPv4 address. RPC listeners must be IPv4"), str);
         address = tr_inaddr_any;
     }
     s->bindAddress = address.addr.addr4;
 
     if (s->isEnabled)
     {
-        tr_ninf (MY_NAME, _("Serving RPC and Web requests on port 127.0.0.1:%d%s"), (int) s->port, s->url);
+        tr_logAddNamedInfo (MY_NAME, _("Serving RPC and Web requests on port 127.0.0.1:%d%s"), (int) s->port, s->url);
         tr_runInEventThread (session, startServer, s);
 
         if (s->isWhitelistEnabled)
-            tr_ninf (MY_NAME, "%s", _("Whitelist enabled"));
+            tr_logAddNamedInfo (MY_NAME, "%s", _("Whitelist enabled"));
 
         if (s->isPasswordEnabled)
-            tr_ninf (MY_NAME, "%s", _("Password required"));
+            tr_logAddNamedInfo (MY_NAME, "%s", _("Password required"));
     }
 
     return s;

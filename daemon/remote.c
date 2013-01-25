@@ -30,6 +30,7 @@
 #include <curl/curl.h>
 
 #include <libtransmission/transmission.h>
+#include <libtransmission/log.h>
 #include <libtransmission/rpcimpl.h>
 #include <libtransmission/tr-getopt.h>
 #include <libtransmission/utils.h>
@@ -1677,7 +1678,7 @@ processResponse (const char * rpcurl, const void * response, size_t len)
 
     if (tr_variantFromJson (&top, response, len))
     {
-        tr_nerr (MY_NAME, "Unable to parse response \"%*.*s\"", (int)len,
+        tr_logAddNamedError (MY_NAME, "Unable to parse response \"%*.*s\"", (int)len,
                (int)len, (char*)response);
         status |= EXIT_FAILURE;
     }
@@ -1803,7 +1804,7 @@ flush (const char * rpcurl, tr_variant ** benc)
 
     if ((res = curl_easy_perform (curl)))
     {
-        tr_nerr (MY_NAME, " (%s) %s", rpcurl_http, curl_easy_strerror (res));
+        tr_logAddNamedError (MY_NAME, " (%s) %s", rpcurl_http, curl_easy_strerror (res));
         status |= EXIT_FAILURE;
     }
     else

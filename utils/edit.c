@@ -295,7 +295,7 @@ main (int argc, char * argv[])
 
   files = tr_new0 (const char*, argc);
 
-  tr_setMessageLevel (TR_MSG_ERR);
+  tr_logSetLevel (TR_LOG_ERROR);
 
   if (parseCommandLine (argc, (const char**)argv))
     return EXIT_FAILURE;

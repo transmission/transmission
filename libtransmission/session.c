@@ -35,6 +35,7 @@
 #include "crypto.h"
 #include "fdlimit.h"
 #include "list.h"
+#include "log.h"
 #include "net.h"
 #include "peer-io.h"
 #include "peer-mgr.h"
@@ -71,8 +72,8 @@ enum
 #define dbgmsg(...) \
   do \
     { \
-      if (tr_deepLoggingIsActive ()) \
-        tr_deepLog (__FILE__, __LINE__, NULL, __VA_ARGS__); \
+      if (tr_logGetDeepEnabled ()) \
+        tr_logAddDeep (__FILE__, __LINE__, NULL, __VA_ARGS__); \
     } \
   while (0)
 
@@ -185,8 +186,8 @@ accept_incoming_peer (int fd, short what UNUSED, void * vsession)
 
     clientSocket = tr_netAccept (session, fd, &clientAddr, &clientPort);
     if (clientSocket > 0) {
-        tr_deepLog (__FILE__, __LINE__, NULL, "new incoming connection %d (%s)",
-                   clientSocket, tr_peerIoAddrStr (&clientAddr, clientPort));
+        tr_logAddDeep (__FILE__, __LINE__, NULL, "new incoming connection %d (%s)",
+                       clientSocket, tr_peerIoAddrStr (&clientAddr, clientPort));
         tr_peerMgrAddIncoming (session->peerMgr, &clientAddr, clientPort,
                                clientSocket, NULL);
     }
@@ -322,7 +323,7 @@ tr_sessionGetDefaultSettings (tr_variant * d)
     tr_variantDictAddBool (d, TR_KEY_idle_seeding_limit_enabled,      false);
     tr_variantDictAddStr  (d, TR_KEY_incomplete_dir,                  tr_getDefaultDownloadDir ());
     tr_variantDictAddBool (d, TR_KEY_incomplete_dir_enabled,          false);
-    tr_variantDictAddInt  (d, TR_KEY_message_level,                   TR_MSG_INF);
+    tr_variantDictAddInt  (d, TR_KEY_message_level,                   TR_LOG_INFO);
     tr_variantDictAddInt  (d, TR_KEY_download_queue_size,             5);
     tr_variantDictAddBool (d, TR_KEY_download_queue_enabled,          true);
     tr_variantDictAddInt  (d, TR_KEY_peer_limit_global,               atoi (TR_DEFAULT_PEER_LIMIT_GLOBAL_STR));
@@ -394,7 +395,7 @@ tr_sessionGetSettings (tr_session * s, tr_variant * d)
   tr_variantDictAddBool (d, TR_KEY_idle_seeding_limit_enabled,   tr_sessionIsIdleLimited (s));
   tr_variantDictAddStr  (d, TR_KEY_incomplete_dir,               tr_sessionGetIncompleteDir (s));
   tr_variantDictAddBool (d, TR_KEY_incomplete_dir_enabled,       tr_sessionIsIncompleteDirEnabled (s));
-  tr_variantDictAddInt  (d, TR_KEY_message_level,                tr_getMessageLevel ());
+  tr_variantDictAddInt  (d, TR_KEY_message_level,                tr_logGetLevel ());
   tr_variantDictAddInt  (d, TR_KEY_peer_limit_global,            s->peerLimit);
   tr_variantDictAddInt  (d, TR_KEY_peer_limit_per_torrent,       s->peerLimitPerTorrent);
   tr_variantDictAddInt  (d, TR_KEY_peer_port,                    tr_sessionGetPeerPort (s));
@@ -543,7 +544,7 @@ onSaveTimer (int foo UNUSED, short bar UNUSED, void * vsession)
     tr_session * session = vsession;
 
     if (tr_cacheFlushDone (session->cache))
-        tr_err ("Error while flushing completed pieces from cache");
+        tr_logAddError ("Error while flushing completed pieces from cache");
 
     while ((tor = tr_torrentNext (session, tor)))
         tr_torrentSave (tor);
@@ -596,7 +597,7 @@ tr_sessionInit (const char  * tag,
 
     /* nice to start logging at the very beginning */
     if (tr_variantDictFindInt (clientSettings, TR_KEY_message_level, &i))
-        tr_setMessageLevel (i);
+        tr_logSetLevel (i);
 
     /* start the libtransmission thread */
     tr_netInit (); /* must go before tr_eventInit */
@@ -694,7 +695,7 @@ tr_sessionInitImpl (void * vdata)
     signal (SIGPIPE, SIG_IGN);
 #endif
 
-    tr_setMessageQueuing (data->messageQueuingEnabled);
+    tr_logSetQueueEnabled (data->messageQueuingEnabled);
 
     tr_setConfigDir (session, data->configDir);
 
@@ -722,7 +723,7 @@ tr_sessionInitImpl (void * vdata)
 
     /* first %s is the application name
        second %s is the version number */
-    tr_inf (_("%s %s started"), TR_NAME, LONG_VERSION_STRING);
+    tr_logAddInfo (_("%s %s started"), TR_NAME, LONG_VERSION_STRING);
 
     tr_statsInit (session);
 
@@ -763,7 +764,7 @@ sessionSetImpl (void * vdata)
     assert (tr_amInEventThread (session));
 
     if (tr_variantDictFindInt (settings, TR_KEY_message_level, &i))
-        tr_setMessageLevel (i);
+        tr_logSetLevel (i);
 
     if (tr_variantDictFindInt (settings, TR_KEY_umask, &i)) {
         session->umask = (mode_t)i;
@@ -1371,7 +1372,7 @@ turtleCheckClock (tr_session * s, struct tr_turtle_info * t)
 
     if (!alreadySwitched)
     {
-        tr_inf ("Time to turn %s turtle mode!", (enabled?"on":"off"));
+        tr_logAddInfo ("Time to turn %s turtle mode!", (enabled?"on":"off"));
         t->autoTurtleState = newAutoTurtleState;
         useAltSpeed (s, t, enabled, false);
     }
@@ -1493,7 +1494,7 @@ tr_sessionGetAltSpeed_KBps (const tr_session * s, tr_direction d)
 static void
 userPokedTheClock (tr_session * s, struct tr_turtle_info * t)
 {
-    tr_dbg ("Refreshing the turtle mode clock due to user changes");
+    tr_logAddDebug ("Refreshing the turtle mode clock due to user changes");
 
     t->autoTurtleState = TR_AUTO_SWITCH_UNUSED;
 
@@ -1947,7 +1948,7 @@ sessionLoadTorrents (void * vdata)
     tr_list_free (&list, NULL);
 
     if (n)
-        tr_inf (_("Loaded %d torrents"), n);
+        tr_logAddInfo (_("Loaded %d torrents"), n);
 
     if (data->setmeCount)
         *data->setmeCount = n;
@@ -2443,7 +2444,7 @@ metainfoLookupInit (tr_session * session)
     tr_ctorFree (ctor);
 
     session->metainfoLookup = lookup;
-    tr_dbg ("Found %d torrents in \"%s\"", n, dirname);
+    tr_logAddDebug ("Found %d torrents in \"%s\"", n, dirname);
 }
 
 const char*

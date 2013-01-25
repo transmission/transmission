@@ -35,6 +35,7 @@
 
 #include "transmission.h"
 #include "blocklist.h"
+#include "log.h"
 #include "net.h"
 #include "utils.h"
 
@@ -94,7 +95,7 @@ blocklistLoad (tr_blocklistFile * b)
   fd = open (b->filename, O_RDONLY | O_BINARY);
   if (fd == -1)
     {
-      tr_err (err_fmt, b->filename, tr_strerror (errno));
+      tr_logAddError (err_fmt, b->filename, tr_strerror (errno));
       return;
     }
 
@@ -102,7 +103,7 @@ blocklistLoad (tr_blocklistFile * b)
   b->rules = mmap (NULL, byteCount, PROT_READ, MAP_PRIVATE, fd, 0);
   if (!b->rules)
     {
-      tr_err (err_fmt, b->filename, tr_strerror (errno));
+      tr_logAddError (err_fmt, b->filename, tr_strerror (errno));
       close (fd);
       return;
     }
@@ -112,7 +113,7 @@ blocklistLoad (tr_blocklistFile * b)
   b->ruleCount = byteCount / sizeof (struct tr_ipv4_range);
 
   base = tr_basename (b->filename);
-  tr_inf (_("Blocklist \"%s\" contains %zu entries"), base, b->ruleCount);
+  tr_logAddInfo (_("Blocklist \"%s\" contains %zu entries"), base, b->ruleCount);
   tr_free (base);
 }
 
@@ -334,7 +335,7 @@ tr_blocklistFileSetContent (tr_blocklistFile * b, const char * filename)
   in = fopen (filename, "rb");
   if (in == NULL)
     {
-      tr_err (err_fmt, filename, tr_strerror (errno));
+      tr_logAddError (err_fmt, filename, tr_strerror (errno));
       return 0;
     }
 
@@ -343,7 +344,7 @@ tr_blocklistFileSetContent (tr_blocklistFile * b, const char * filename)
   out = fopen (b->filename, "wb+");
   if (out == NULL)
     {
-      tr_err (err_fmt, b->filename, tr_strerror (errno));
+      tr_logAddError (err_fmt, b->filename, tr_strerror (errno));
       fclose (in);
       return 0;
     }
@@ -363,7 +364,7 @@ tr_blocklistFileSetContent (tr_blocklistFile * b, const char * filename)
       if (!parseLine (line, &range))
         {
           /* don't try to display the actual lines - it causes issues */
-          tr_err (_("blocklist skipped invalid address at line %d"), inCount);
+          tr_logAddError (_("blocklist skipped invalid address at line %d"), inCount);
           continue;
         }
 
@@ -413,12 +414,12 @@ tr_blocklistFileSetContent (tr_blocklistFile * b, const char * filename)
 
   if (fwrite (ranges, sizeof (struct tr_ipv4_range), ranges_count, out) != ranges_count)
     {
-      tr_err (_("Couldn't save file \"%1$s\": %2$s"), b->filename, tr_strerror (errno));
+      tr_logAddError (_("Couldn't save file \"%1$s\": %2$s"), b->filename, tr_strerror (errno));
     }
   else
     {
       char * base = tr_basename (b->filename);
-      tr_inf (_("Blocklist \"%s\" updated with %zu entries"), base, ranges_count);
+      tr_logAddInfo (_("Blocklist \"%s\" updated with %zu entries"), base, ranges_count);
       tr_free (base);
     }
 

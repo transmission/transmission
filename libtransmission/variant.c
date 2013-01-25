@@ -31,6 +31,7 @@
 #include "transmission.h"
 #include "ConvertUTF.h"  
 #include "fdlimit.h" /* tr_close_file() */
+#include "log.h"
 #include "platform.h" /* TR_PATH_MAX */
 #include "utils.h" /* tr_new(), tr_free() */
 #include "variant.h"
@@ -888,7 +889,7 @@ tr_variantWalk (const tr_variant               * v,
 
           default:
             /* did caller give us an uninitialized val? */
-            tr_err ("%s", _("Invalid metadata"));
+            tr_logAddError ("%s", _("Invalid metadata"));
             break;
         }
     }
@@ -978,7 +979,7 @@ tr_variantListCopy (tr_variant * target, const tr_variant * src)
        }
      else
        {
-         tr_err ("tr_variantListCopy skipping item");
+         tr_logAddError ("tr_variantListCopy skipping item");
        }
    }
 }
@@ -1074,7 +1075,7 @@ tr_variantMergeDicts (tr_variant * target, const tr_variant * source)
             }
           else
             {
-              tr_dbg ("tr_variantMergeDicts skipping \"%s\"", tr_quark_get_string(key,NULL));
+              tr_logAddDebug ("tr_variantMergeDicts skipping \"%s\"", tr_quark_get_string(key,NULL));
             }
         }
     }
@@ -1190,7 +1191,7 @@ tr_variantToFile (const tr_variant  * v,
 
       if (nleft > 0)
         {
-          tr_err (_("Couldn't save temporary file \"%1$s\": %2$s"), tmp, tr_strerror (err));
+          tr_logAddError (_("Couldn't save temporary file \"%1$s\": %2$s"), tmp, tr_strerror (err));
           tr_close_file (fd);
           unlink (tmp);
         }
@@ -1204,12 +1205,12 @@ tr_variantToFile (const tr_variant  * v,
           if (!rename (tmp, filename))
 #endif
             {
-              tr_inf (_("Saved \"%s\""), filename);
+              tr_logAddInfo (_("Saved \"%s\""), filename);
             }
           else
             {
               err = errno;
-              tr_err (_("Couldn't save file \"%1$s\": %2$s"), filename, tr_strerror (err));
+              tr_logAddError (_("Couldn't save file \"%1$s\": %2$s"), filename, tr_strerror (err));
               unlink (tmp);
             }
         }
@@ -1217,7 +1218,7 @@ tr_variantToFile (const tr_variant  * v,
   else
     {
       err = errno;
-      tr_err (_("Couldn't save temporary file \"%1$s\": %2$s"), tmp, tr_strerror (err));
+      tr_logAddError (_("Couldn't save temporary file \"%1$s\": %2$s"), tmp, tr_strerror (err));
     }
 
   tr_free (tmp);

@@ -24,6 +24,7 @@
 #include "completion.h"
 #include "fdlimit.h"
 #include "list.h"
+#include "log.h"
 #include "platform.h" /* tr_lock () */
 #include "torrent.h"
 #include "utils.h" /* tr_valloc (), tr_free () */
@@ -58,7 +59,7 @@ verifyTorrent (tr_torrent * tor, bool * stopFlag)
 
   SHA1_Init (&sha);
 
-  tr_tordbg (tor, "%s", "verifying torrent...");
+  tr_logAddTorDbg (tor, "%s", "verifying torrent...");
   tr_torrentSetChecked (tor, 0);
   while (!*stopFlag && (pieceIndex < tor->info.pieceCount))
     {
@@ -159,7 +160,7 @@ verifyTorrent (tr_torrent * tor, bool * stopFlag)
 
   /* stopwatch */
   end = tr_time ();
-  tr_tordbg (tor, "Verification is done. It took %d seconds to verify %"PRIu64" bytes (%"PRIu64" bytes per second)",
+  tr_logAddTorDbg (tor, "Verification is done. It took %d seconds to verify %"PRIu64" bytes (%"PRIu64" bytes per second)",
              (int)(end-begin), tor->info.totalSize,
              (uint64_t)(tor->info.totalSize/ (1+ (end-begin))));
 
@@ -226,7 +227,7 @@ verifyThreadFunc (void * unused UNUSED)
       tr_free (node);
       tr_lockUnlock (getVerifyLock ());
 
-      tr_torinf (tor, "%s", _("Verifying torrent"));
+      tr_logAddTorInfo (tor, "%s", _("Verifying torrent"));
       tr_torrentSetVerifyState (tor, TR_VERIFY_NOW);
       changed = verifyTorrent (tor, &stopCurrent);
       tr_torrentSetVerifyState (tor, TR_VERIFY_NONE);
@@ -270,7 +271,7 @@ tr_verifyAdd (tr_torrent * tor, tr_verify_done_cb verify_done_cb)
   struct verify_node * node;
 
   assert (tr_isTorrent (tor));
-  tr_torinf (tor, "%s", _("Queued for verification"));
+  tr_logAddTorInfo (tor, "%s", _("Queued for verification"));
 
   node = tr_new (struct verify_node, 1);
   node->torrent = tor;

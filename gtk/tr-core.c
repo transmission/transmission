@@ -32,6 +32,7 @@
 #include <event2/buffer.h>
 
 #include <libtransmission/transmission.h>
+#include <libtransmission/log.h>
 #include <libtransmission/rpcimpl.h>
 #include <libtransmission/utils.h> /* tr_free */
 #include <libtransmission/variant.h>
@@ -1548,11 +1549,11 @@ gtr_inhibit_hibernation (guint * cookie)
   /* logging */
   if (success)
     {
-      tr_inf ("%s", _("Inhibiting desktop hibernation"));
+      tr_logAddInfo ("%s", _("Inhibiting desktop hibernation"));
     }
   else
     {
-      tr_err (_("Couldn't inhibit desktop hibernation: %s"), err->message);
+      tr_logAddError (_("Couldn't inhibit desktop hibernation: %s"), err->message);
       g_error_free (err);
     }
 
@@ -1586,7 +1587,7 @@ gtr_uninhibit_hibernation (guint inhibit_cookie)
   /* logging */
   if (err == NULL)
     {
-      tr_inf ("%s", _("Allowing desktop hibernation"));
+      tr_logAddInfo ("%s", _("Allowing desktop hibernation"));
     }
   else
     {

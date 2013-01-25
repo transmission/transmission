@@ -26,7 +26,8 @@
 #include <dirent.h> /* readdir */
 
 #include <libtransmission/transmission.h>
-#include <libtransmission/utils.h> /* tr_buildPath (), tr_inf () */
+#include <libtransmission/log.h>
+#include <libtransmission/utils.h> /* tr_buildPath (), tr_logAddInfo () */
 #include "watch.h"
 
 struct dtr_watchdir
@@ -70,13 +71,13 @@ watchdir_new_impl (dtr_watchdir * w)
     }
     else
     {
-        tr_inf ("Using inotify to watch directory \"%s\"", w->dir);
+        tr_logAddInfo ("Using inotify to watch directory \"%s\"", w->dir);
         i = inotify_add_watch (w->inotify_fd, w->dir, DTR_INOTIFY_MASK);
     }
 
     if (i < 0)
     {
-        tr_err ("Unable to watch \"%s\": %s", w->dir, tr_strerror (errno));
+        tr_logAddError ("Unable to watch \"%s\": %s", w->dir, tr_strerror (errno));
     }
     else if ((odir = opendir (w->dir)))
     {
@@ -89,7 +90,7 @@ watchdir_new_impl (dtr_watchdir * w)
             if (!tr_str_has_suffix (name, ".torrent")) /* skip non-torrents */
                 continue;
 
-            tr_inf ("Found new .torrent file \"%s\" in watchdir \"%s\"", name, w->dir);
+            tr_logAddInfo ("Found new .torrent file \"%s\" in watchdir \"%s\"", name, w->dir);
             w->callback (w->session, w->dir, name);
         }
 
@@ -138,7 +139,7 @@ watchdir_update_impl (dtr_watchdir * w)
             const char * name = event->name;
             if (tr_str_has_suffix (name, ".torrent"))
             {
-                tr_inf ("Found new .torrent file \"%s\" in watchdir \"%s\"", name, w->dir);
+                tr_logAddInfo ("Found new .torrent file \"%s\" in watchdir \"%s\"", name, w->dir);
                 w->callback (w->session, w->dir, name);
             }
             i += EVENT_SIZE +  event->len;
@@ -159,7 +160,7 @@ watchdir_update_impl (dtr_watchdir * w)
 static void
 watchdir_new_impl (dtr_watchdir * w UNUSED)
 {
-    tr_inf ("Using readdir to watch directory \"%s\"", w->dir);
+    tr_logAddInfo ("Using readdir to watch directory \"%s\"", w->dir);
     w->lastFiles = evbuffer_new ();
 }
 static void
@@ -225,7 +226,7 @@ watchdir_update_impl (dtr_watchdir * w)
 
             /* if this file wasn't here last time, try adding it */
             if (!is_file_in_list (w->lastFiles, name, len)) {
-                tr_inf ("Found new .torrent file \"%s\" in watchdir \"%s\"", name, w->dir);
+                tr_logAddInfo ("Found new .torrent file \"%s\" in watchdir \"%s\"", name, w->dir);
                 w->callback (w->session, w->dir, name);
             }
         }

@@ -26,6 +26,7 @@
 #include "transmission.h"
 #include "completion.h"
 #include "fdlimit.h"
+#include "log.h"
 #include "rpcimpl.h"
 #include "session.h"
 #include "torrent.h"
@@ -49,10 +50,12 @@
     } while (0)
 #else
 #define dbgmsg(...) \
-    do { \
-        if (tr_deepLoggingIsActive ()) \
-            tr_deepLog (__FILE__, __LINE__, "RPC", __VA_ARGS__); \
-    } while (0)
+  do \
+    { \
+      if (tr_logGetDeepEnabled ()) \
+        tr_logAddDeep (__FILE__, __LINE__, "RPC", __VA_ARGS__); \
+    } \
+  while (0)
 #endif
 
 
@@ -1479,7 +1482,7 @@ gotNewBlocklist (tr_session       * session,
                 tr_snprintf (result, sizeof (result), _("Couldn't save file \"%1$s\": %2$s"), filename, tr_strerror (errno));
 
         if (*result)
-            tr_err ("%s", result);
+            tr_logAddError ("%s", result);
         else {
             /* feed it to the session and give the client a response */
             const int rule_count = tr_blocklistSetContent (session, filename);

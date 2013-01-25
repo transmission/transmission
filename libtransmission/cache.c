@@ -17,6 +17,7 @@
 #include "transmission.h"
 #include "cache.h"
 #include "inout.h"
+#include "log.h"
 #include "peer-common.h" /* MAX_BLOCK_SIZE */
 #include "ptrarray.h"
 #include "torrent.h"
@@ -27,8 +28,8 @@
 #define dbgmsg(...) \
   do \
     { \
-      if (tr_deepLoggingIsActive ()) \
-        tr_deepLog (__FILE__, __LINE__, MY_NAME, __VA_ARGS__); \
+      if (tr_logGetDeepEnabled ()) \
+        tr_logAddDeep (__FILE__, __LINE__, MY_NAME, __VA_ARGS__); \
     } \
   while (0)
 
@@ -259,7 +260,7 @@ tr_cacheSetLimit (tr_cache * cache, int64_t max_bytes)
   cache->max_blocks = getMaxBlocks (max_bytes);
 
   tr_formatter_mem_B (buf, cache->max_bytes, sizeof (buf));
-  tr_ndbg (MY_NAME, "Maximum cache size set to %s (%d blocks)", buf, cache->max_blocks);
+  tr_logAddNamedDbg (MY_NAME, "Maximum cache size set to %s (%d blocks)", buf, cache->max_blocks);
 
   return cacheTrim (cache);
 }

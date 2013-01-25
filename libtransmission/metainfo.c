@@ -23,6 +23,7 @@
 #include "transmission.h"
 #include "session.h"
 #include "crypto.h" /* tr_sha1 */
+#include "log.h"
 #include "metainfo.h"
 #include "platform.h" /* tr_getTorrentDir () */
 #include "utils.h"
@@ -542,7 +543,7 @@ tr_metainfoParse (const tr_session * session,
 
   if (badTag)
     {
-      tr_nerr (inf->name, _("Invalid metadata entry \"%s\""), badTag);
+      tr_logAddNamedError (inf->name, _("Invalid metadata entry \"%s\""), badTag);
       tr_metainfoFree (inf);
     }
 

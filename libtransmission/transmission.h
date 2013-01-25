@@ -801,48 +801,46 @@ void tr_sessionSetTorrentDoneScript (tr_session *, const char * scriptFilename);
 
 typedef enum
 {
-    TR_MSG_ERR = 1,
-    TR_MSG_INF = 2,
-    TR_MSG_DBG = 3
+  TR_LOG_ERROR    = 1,
+  TR_LOG_INFO     = 2,
+  TR_LOG_DEBUG    = 3,
+  TR_LOG_FIREHOSE = 4
 }
-tr_msg_level;
+tr_log_level;
 
-void tr_setMessageLevel (tr_msg_level);
+void tr_logSetLevel (tr_log_level);
 
-typedef struct tr_msg_list
+typedef struct tr_log_message
 {
-    /* TR_MSG_ERR, TR_MSG_INF, or TR_MSG_DBG */
-    tr_msg_level level;
+  /* TR_LOG_ERROR, TR_LOG_INFO, or TR_LOG_DEBUG */
+  tr_log_level level;
 
-    /* The line number in the source file where this message originated */
-    int line;
+  /* The line number in the source file where this message originated */
+  int line;
 
-    /* Time the message was generated */
-    time_t when;
+  /* Time the message was generated */
+  time_t when;
 
-    /* The torrent associated with this message,
-     * or a module name such as "Port Forwarding" for non-torrent messages,
-     * or NULL. */
-    char *  name;
+  /* The torrent associated with this message,
+   * or a module name such as "Port Forwarding" for non-torrent messages,
+   * or NULL. */
+  char * name;
 
-    /* The message */
-    char *  message;
+  /* The message */
+  char *  message;
 
-    /* The source file where this message originated */
-    const char * file;
+  /* The source file where this message originated */
+  const char * file;
 
-    /* linked list of messages */
-    struct tr_msg_list * next;
+  /* linked list of messages */
+  struct tr_log_message * next;
 }
-tr_msg_list;
+tr_log_message;
 
-void          tr_setMessageQueuing (bool isEnabled);
-
-bool          tr_getMessageQueuing (void);
-
-tr_msg_list * tr_getQueuedMessages (void);
-
-void          tr_freeMessageList (tr_msg_list * freeme);
+tr_log_message * tr_logGetQueue        (void);
+bool             tr_logGetQueueEnabled (void);
+void             tr_logSetQueueEnabled (bool isEnabled);
+void             tr_logFreeQueue       (tr_log_message * freeme);
 
 /** @addtogroup Blocklists
     @{ */

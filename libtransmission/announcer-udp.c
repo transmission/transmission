@@ -22,6 +22,7 @@
 #include "announcer.h"
 #include "announcer-common.h"
 #include "crypto.h" /* tr_cryptoRandBuf () */
+#include "log.h"
 #include "peer-io.h"
 #include "peer-mgr.h" /* tr_peerMgrCompactToPex () */
 #include "ptrarray.h"
@@ -29,9 +30,12 @@
 #include "utils.h"
 
 #define dbgmsg(name, ...) \
-if (tr_deepLoggingIsActive ()) do { \
-  tr_deepLog (__FILE__, __LINE__, name, __VA_ARGS__); \
-} while (0)
+  do \
+    { \
+      if (tr_logGetDeepEnabled ()) \
+        tr_logAddDeep (__FILE__, __LINE__, name, __VA_ARGS__); \
+    } \
+  while (0)
 
 /****
 *****

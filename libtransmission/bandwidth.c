@@ -17,14 +17,15 @@
 #include "transmission.h"
 #include "bandwidth.h"
 #include "crypto.h" /* tr_cryptoWeakRandInt () */
+#include "log.h"
 #include "peer-io.h"
 #include "utils.h"
 
 #define dbgmsg(...) \
   do \
     { \
-      if (tr_deepLoggingIsActive ()) \
-        tr_deepLog (__FILE__, __LINE__, NULL, __VA_ARGS__); \
+      if (tr_logGetDeepEnabled ()) \
+        tr_logAddDeep (__FILE__, __LINE__, NULL, __VA_ARGS__); \
     } \
   while (0)
 

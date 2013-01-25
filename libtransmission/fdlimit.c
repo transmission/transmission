@@ -43,15 +43,17 @@
 
 #include "transmission.h"
 #include "fdlimit.h"
-#include "net.h"
+#include "log.h"
 #include "session.h"
 #include "torrent.h" /* tr_isTorrent () */
 
 #define dbgmsg(...) \
-    do { \
-        if (tr_deepLoggingIsActive ()) \
-            tr_deepLog (__FILE__, __LINE__, NULL, __VA_ARGS__); \
-    } while (0)
+  do \
+    { \
+      if (tr_logGetDeepEnabled ()) \
+        tr_logAddDeep (__FILE__, __LINE__, NULL, __VA_ARGS__); \
+    } \
+  while (0)
 
 /***
 ****
@@ -342,7 +344,7 @@ cached_file_open (struct tr_cached_file  * o,
       const int err = tr_mkdirp (dir, 0777) ? errno : 0;
       if (err)
         {
-          tr_err (_("Couldn't create \"%1$s\": %2$s"), dir, tr_strerror (err));
+          tr_logAddError (_("Couldn't create \"%1$s\": %2$s"), dir, tr_strerror (err));
           tr_free (dir);
           return err;
         }
@@ -353,7 +355,7 @@ cached_file_open (struct tr_cached_file  * o,
 
   if (writable && !alreadyExisted && (allocation == TR_PREALLOCATE_FULL))
     if (preallocate_file_full (filename, file_size))
-      tr_dbg ("Preallocated file \"%s\"", filename);
+      tr_logAddDebug ("Preallocated file \"%s\"", filename);
 
   /* open the file */
   flags = writable ? (O_RDWR | O_CREAT) : O_RDONLY;
@@ -363,7 +365,7 @@ cached_file_open (struct tr_cached_file  * o,
   if (o->fd == -1)
     {
       const int err = errno;
-      tr_err (_("Couldn't open \"%1$s\": %2$s"), filename, tr_strerror (err));
+      tr_logAddError (_("Couldn't open \"%1$s\": %2$s"), filename, tr_strerror (err));
       return err;
     }
 
@@ -378,7 +380,7 @@ cached_file_open (struct tr_cached_file  * o,
       if (ftruncate (o->fd, file_size) == -1)
         {
           const int err = errno;
-          tr_err (_("Couldn't truncate \"%1$s\": %2$s"), filename, tr_strerror (err));
+          tr_logAddError (_("Couldn't truncate \"%1$s\": %2$s"), filename, tr_strerror (err));
           return err;
         }
     }
@@ -523,7 +525,7 @@ ensureSessionFdInfoExists (tr_session * session)
               limit.rlim_cur = new_limit;
               setrlimit (RLIMIT_NOFILE, &limit);
               getrlimit (RLIMIT_NOFILE, &limit);
-              tr_inf ("Changed open file limit from %d to %d", old_limit, (int)limit.rlim_cur);
+              tr_logAddInfo ("Changed open file limit from %d to %d", old_limit, (int)limit.rlim_cur);
             }
         }
     }
@@ -665,7 +667,7 @@ tr_fdSocketCreate (tr_session * session, int domain, int type)
   if (gFd->peerCount < session->peerLimit)
     if ((s = socket (domain, type, 0)) < 0)
       if (sockerrno != EAFNOSUPPORT)
-        tr_err (_("Couldn't create socket: %s"), tr_strerror (sockerrno));
+        tr_logAddError (_("Couldn't create socket: %s"), tr_strerror (sockerrno));
 
   if (s > -1)
     ++gFd->peerCount;
@@ -681,9 +683,9 @@ tr_fdSocketCreate (tr_session * session, int domain, int type)
           socklen_t size = sizeof (int);
           buf_logged = true;
           getsockopt (s, SOL_SOCKET, SO_SNDBUF, &i, &size);
-          tr_dbg ("SO_SNDBUF size is %d", i);
+          tr_logAddDebug ("SO_SNDBUF size is %d", i);
           getsockopt (s, SOL_SOCKET, SO_RCVBUF, &i, &size);
-          tr_dbg ("SO_RCVBUF size is %d", i);
+          tr_logAddDebug ("SO_RCVBUF size is %d", i);
         }
     }
 

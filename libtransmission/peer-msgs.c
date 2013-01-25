@@ -24,6 +24,7 @@
 #include "cache.h"
 #include "completion.h"
 #include "crypto.h" /* tr_sha1 () */
+#include "log.h"
 #include "peer-io.h"
 #include "peer-mgr.h"
 #include "peer-msgs.h"
@@ -234,7 +235,7 @@ myDebug (const char * file, int line,
          const struct tr_peermsgs * msgs,
          const char * fmt, ...)
 {
-    FILE * fp = tr_getLog ();
+    FILE * fp = tr_logGetFile ();
 
     if (fp)
     {
@@ -245,7 +246,7 @@ myDebug (const char * file, int line,
         char *            message;
 
         evbuffer_add_printf (buf, "[%s] %s - %s [%s]: ",
-                             tr_getLogTimeStr (timestr, sizeof (timestr)),
+                             tr_logGetTimeStr (timestr, sizeof (timestr)),
                              tr_torrentName (msgs->torrent),
                              tr_peerIoGetAddrStr (msgs->peer->io),
                              tr_quark_get_string (msgs->peer->client, NULL));
@@ -265,7 +266,7 @@ myDebug (const char * file, int line,
 #define dbgmsg(msgs, ...) \
   do \
     { \
-      if (tr_deepLoggingIsActive ()) \
+      if (tr_logGetDeepEnabled ()) \
         myDebug (__FILE__, __LINE__, msgs, __VA_ARGS__); \
     } \
   while (0)

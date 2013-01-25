@@ -26,6 +26,7 @@
 
 #include "transmission.h"
 #include "crypto.h"
+#include "log.h"
 #include "utils.h"
 
 #define MY_NAME "tr_crypto"
@@ -83,10 +84,10 @@ static const uint8_t dh_G[] = { 2 };
 
 #define logErrorFromSSL(...) \
   do { \
-    if (tr_msgLoggingIsActive (TR_MSG_ERR)) { \
+    if (tr_logLevelIsActive (TR_LOG_ERROR)) { \
       char buf[512]; \
       ERR_error_string_n (ERR_get_error (), buf, sizeof (buf)); \
-      tr_msg (__FILE__, __LINE__, TR_MSG_ERR, MY_NAME, "%s", buf); \
+      tr_logAddMessage (__FILE__, __LINE__, TR_LOG_ERROR, MY_NAME, "%s", buf); \
     } \
   } while (0)
 

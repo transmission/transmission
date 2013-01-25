@@ -606,7 +606,9 @@ main (int argc, char ** argv)
   textdomain (MY_READABLE_NAME);
 
   /* init glib/gtk */
+#if !GLIB_CHECK_VERSION(2,35,4)
   g_type_init ();
+#endif
   gtk_init (&argc, &argv);
   g_set_application_name (_("Transmission"));
   gtk_window_set_default_icon_name (MY_CONFIG_NAME);
@@ -1088,7 +1090,7 @@ on_prefs_changed (TrCore * core UNUSED, const tr_quark key, gpointer data)
         break;
 
       case TR_KEY_message_level:
-        tr_setMessageLevel (gtr_pref_int_get (key));
+        tr_logSetLevel (gtr_pref_int_get (key));
         break;
 
       case TR_KEY_peer_port:

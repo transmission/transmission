@@ -26,6 +26,7 @@
 #include "transmission.h"
 #include "crypto.h" /* tr_sha1 */
 #include "fdlimit.h" /* tr_open_file_for_scanning () */
+#include "log.h"
 #include "session.h"
 #include "makemeta.h"
 #include "platform.h" /* threads, locks */
@@ -60,7 +61,7 @@ getFiles (const char      * dir,
   i = stat (buf, &sb);
   if (i)
     {
-      tr_err (_("Torrent Creator is skipping file \"%s\": %s"),
+      tr_logAddError (_("Torrent Creator is skipping file \"%s\": %s"),
                 buf, tr_strerror (errno));
       tr_free (buf);
       return list;

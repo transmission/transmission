@@ -32,6 +32,7 @@ THE SOFTWARE.
 #include <libutp/utp.h>
 
 #include "transmission.h"
+#include "log.h"
 #include "net.h"
 #include "session.h"
 #include "tr-dht.h"
@@ -54,13 +55,13 @@ set_socket_buffers (int fd, int large)
     size = large ? RECV_BUFFER_SIZE : SMALL_BUFFER_SIZE;
     rc = setsockopt (fd, SOL_SOCKET, SO_RCVBUF, &size, sizeof (size));
     if (rc < 0)
-        tr_nerr ("UDP", "Failed to set receive buffer: %s",
+        tr_logAddNamedError ("UDP", "Failed to set receive buffer: %s",
                 tr_strerror (errno));
 
     size = large ? SEND_BUFFER_SIZE : SMALL_BUFFER_SIZE;
     rc = setsockopt (fd, SOL_SOCKET, SO_SNDBUF, &size, sizeof (size));
     if (rc < 0)
-        tr_nerr ("UDP", "Failed to set send buffer: %s",
+        tr_logAddNamedError ("UDP", "Failed to set send buffer: %s",
                 tr_strerror (errno));
 
     if (large) {
@@ -73,10 +74,10 @@ set_socket_buffers (int fd, int large)
             sbuf = 0;
 
         if (rbuf < RECV_BUFFER_SIZE) {
-            tr_nerr ("UDP", "Failed to set receive buffer: requested %d, got %d",
+            tr_logAddNamedError ("UDP", "Failed to set receive buffer: requested %d, got %d",
                     RECV_BUFFER_SIZE, rbuf);
 #ifdef __linux__
-            tr_ninf ("UDP",
+            tr_logAddNamedInfo ("UDP",
                     "Please add the line "
                     "\"net.core.rmem_max = %d\" to /etc/sysctl.conf",
                     RECV_BUFFER_SIZE);
@@ -84,10 +85,10 @@ set_socket_buffers (int fd, int large)
         }
 
         if (sbuf < SEND_BUFFER_SIZE) {
-            tr_nerr ("UDP", "Failed to set send buffer: requested %d, got %d",
+            tr_logAddNamedError ("UDP", "Failed to set send buffer: requested %d, got %d",
                     SEND_BUFFER_SIZE, sbuf);
 #ifdef __linux__
-            tr_ninf ("UDP",
+            tr_logAddNamedInfo ("UDP",
                     "Please add the line "
                     "\"net.core.wmem_max = %d\" to /etc/sysctl.conf",
                     SEND_BUFFER_SIZE);
@@ -177,7 +178,7 @@ rebind_ipv6 (tr_session *ss, bool force)
  fail:
     /* Something went wrong.  It's difficult to recover, so let's simply
        set things up so that we try again next time. */
-    tr_nerr ("UDP", "Couldn't rebind IPv6 socket");
+    tr_logAddNamedError ("UDP", "Couldn't rebind IPv6 socket");
     if (s >= 0)
         close (s);
     if (ss->udp6_bound) {
@@ -219,12 +220,12 @@ event_callback (int s, short type UNUSED, void *sv)
                    buf[0] == 0 && buf[1] == 0 && buf[2] == 0 && buf[3] <= 3) {
             rc = tau_handle_message (ss, buf, rc);
             if (!rc)
-                tr_ndbg ("UDP", "Couldn't parse UDP tracker packet.");
+                tr_logAddNamedDbg ("UDP", "Couldn't parse UDP tracker packet.");
         } else {
             if (tr_sessionIsUTPEnabled (ss)) {
                 rc = tr_utpPacket (buf, rc, (struct sockaddr*)&from, fromlen, ss);
                 if (!rc)
-                    tr_ndbg ("UDP", "Unexpected UDP packet");
+                    tr_logAddNamedDbg ("UDP", "Unexpected UDP packet");
             }
         }
     }
@@ -247,7 +248,7 @@ tr_udpInit (tr_session *ss)
 
     ss->udp_socket = socket (PF_INET, SOCK_DGRAM, 0);
     if (ss->udp_socket < 0) {
-        tr_nerr ("UDP", "Couldn't create IPv4 socket");
+        tr_logAddNamedError ("UDP", "Couldn't create IPv4 socket");
         goto ipv6;
     }
 
@@ -259,7 +260,7 @@ tr_udpInit (tr_session *ss)
     sin.sin_port = htons (ss->udp_port);
     rc = bind (ss->udp_socket, (struct sockaddr*)&sin, sizeof (sin));
     if (rc < 0) {
-        tr_nerr ("UDP", "Couldn't bind IPv4 socket");
+        tr_logAddNamedError ("UDP", "Couldn't bind IPv4 socket");
         close (ss->udp_socket);
         ss->udp_socket = -1;
         goto ipv6;
@@ -268,7 +269,7 @@ tr_udpInit (tr_session *ss)
         event_new (ss->event_base, ss->udp_socket, EV_READ | EV_PERSIST,
                   event_callback, ss);
     if (ss->udp_event == NULL)
-        tr_nerr ("UDP", "Couldn't allocate IPv4 event");
+        tr_logAddNamedError ("UDP", "Couldn't allocate IPv4 event");
 
  ipv6:
     if (tr_globalIPv6 ())
@@ -278,7 +279,7 @@ tr_udpInit (tr_session *ss)
             event_new (ss->event_base, ss->udp6_socket, EV_READ | EV_PERSIST,
                       event_callback, ss);
         if (ss->udp6_event == NULL)
-            tr_nerr ("UDP", "Couldn't allocate IPv6 event");
+            tr_logAddNamedError ("UDP", "Couldn't allocate IPv6 event");
     }
 
     tr_udpSetSocketBuffers (ss);

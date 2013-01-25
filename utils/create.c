@@ -135,7 +135,7 @@ main (int argc, char * argv[])
   char * out2 = NULL;
   tr_metainfo_builder * b = NULL;
 
-  tr_setMessageLevel (TR_MSG_ERR);
+  tr_logSetLevel (TR_LOG_ERROR);
 
   if (parseCommandLine (argc, (const char**)argv))
     return EXIT_FAILURE;

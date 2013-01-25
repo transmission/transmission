@@ -75,6 +75,7 @@
 #include "transmission.h"
 #include "session.h"
 #include "list.h"
+#include "log.h"
 #include "platform.h"
 #include "utils.h"
 
@@ -378,7 +379,7 @@ moveFiles (const char * oldDir, const char * newDir)
             }
 
           if (count)
-            tr_inf (_("Migrated %1$d files from \"%2$s\" to \"%3$s\""), count, oldDir, newDir);
+            tr_logAddInfo (_("Migrated %1$d files from \"%2$s\" to \"%3$s\""), count, oldDir, newDir);
 
           closedir (dirh);
         }
@@ -555,7 +556,7 @@ isWebClientDir (const char * path)
   struct stat sb;
   char * tmp = tr_buildPath (path, "index.html", NULL);
   const int ret = !stat (tmp, &sb);
-  tr_inf (_("Searching for web interface file \"%s\""), tmp);
+  tr_logAddInfo (_("Searching for web interface file \"%s\""), tmp);
   tr_free (tmp);
 
   return ret;

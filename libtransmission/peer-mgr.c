@@ -29,6 +29,7 @@
 #include "completion.h"
 #include "crypto.h"
 #include "handshake.h"
+#include "log.h"
 #include "net.h"
 #include "peer-io.h"
 #include "peer-mgr.h"
@@ -237,16 +238,16 @@ struct tr_peerMgr
 #define tordbg(t, ...) \
   do \
     { \
-      if (tr_deepLoggingIsActive ()) \
-        tr_deepLog (__FILE__, __LINE__, tr_torrentName (t->tor), __VA_ARGS__); \
+      if (tr_logGetDeepEnabled ()) \
+        tr_logAddDeep (__FILE__, __LINE__, tr_torrentName (t->tor), __VA_ARGS__); \
     } \
   while (0)
 
 #define dbgmsg(...) \
   do \
     { \
-      if (tr_deepLoggingIsActive ()) \
-        tr_deepLog (__FILE__, __LINE__, NULL, __VA_ARGS__); \
+      if (tr_logGetDeepEnabled ()) \
+        tr_logAddDeep (__FILE__, __LINE__, NULL, __VA_ARGS__); \
     } \
   while (0)
 
@@ -1805,7 +1806,7 @@ peerCallbackFunc (tr_peer * peer, const tr_peer_event * e, void * vt)
 
                     if (!ok)
                     {
-                        tr_torerr (tor, _("Piece %lu, which was just downloaded, failed its checksum test"),
+                        tr_logAddTorErr (tor, _("Piece %lu, which was just downloaded, failed its checksum test"),
                                  (unsigned long)p);
                     }
 
@@ -2091,7 +2092,7 @@ tr_peerMgrAddIncoming (tr_peerMgr * manager,
 
     if (tr_sessionIsAddressBlocked (session, addr))
     {
-        tr_dbg ("Banned IP address \"%s\" tried to connect to us", tr_address_to_string (addr));
+        tr_logAddDebug ("Banned IP address \"%s\" tried to connect to us", tr_address_to_string (addr));
         if (socket >= 0)
             tr_netClose (session, socket);
         else

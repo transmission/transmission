@@ -16,6 +16,7 @@
 
 #include "transmission.h"
 #include "completion.h"
+#include "log.h"
 #include "metainfo.h" /* tr_metainfoGetBasename () */
 #include "peer-mgr.h" /* pex */
 #include "platform.h" /* tr_getResumeDir () */
@@ -94,14 +95,14 @@ loadPeers (tr_variant * dict, tr_torrent * tor)
     if (tr_variantDictFindRaw (dict, TR_KEY_peers, &str, &len))
     {
         const int numAdded = addPeers (tor, str, len);
-        tr_tordbg (tor, "Loaded %d IPv4 peers from resume file", numAdded);
+        tr_logAddTorDbg (tor, "Loaded %d IPv4 peers from resume file", numAdded);
         ret = TR_FR_PEERS;
     }
 
     if (tr_variantDictFindRaw (dict, TR_KEY_peers6, &str, &len))
     {
         const int numAdded = addPeers (tor, str, len);
-        tr_tordbg (tor, "Loaded %d IPv6 peers from resume file", numAdded);
+        tr_logAddTorDbg (tor, "Loaded %d IPv6 peers from resume file", numAdded);
         ret = TR_FR_PEERS;
     }
 
@@ -151,13 +152,13 @@ loadDND (tr_variant * dict, tr_torrent * tor)
         if (dndCount)
         {
             tr_torrentInitFileDLs (tor, dnd, dndCount, false);
-            tr_tordbg (tor, "Resume file found %d files listed as dnd",
+            tr_logAddTorDbg (tor, "Resume file found %d files listed as dnd",
                        dndCount);
         }
         if (dlCount)
         {
             tr_torrentInitFileDLs (tor, dl, dlCount, true);
-            tr_tordbg (tor,
+            tr_logAddTorDbg (tor,
                        "Resume file found %d files marked for download",
                        dlCount);
         }
@@ -168,7 +169,7 @@ loadDND (tr_variant * dict, tr_torrent * tor)
     }
     else
     {
-        tr_tordbg (
+        tr_logAddTorDbg (
             tor,
             "Couldn't load DND flags. DND list (%p) has %zu children; torrent has %d files",
             list, tr_variantListSize (list), (int)n);
@@ -629,7 +630,7 @@ loadProgress (tr_variant * dict, tr_torrent * tor)
         else err = "Couldn't find 'pieces' or 'have' or 'bitfield'";
 
         if (err != NULL)
-            tr_tordbg (tor, "Torrent needs to be verified - %s", err);
+            tr_logAddTorDbg (tor, "Torrent needs to be verified - %s", err);
         else
             tr_cpBlockInit (&tor->completion, &blocks);
 
@@ -708,13 +709,13 @@ loadFromFile (tr_torrent * tor, uint64_t fieldsToLoad)
 
     if (tr_variantFromFile (&top, TR_VARIANT_FMT_BENC, filename))
     {
-        tr_tordbg (tor, "Couldn't read \"%s\"", filename);
+        tr_logAddTorDbg (tor, "Couldn't read \"%s\"", filename);
 
         tr_free (filename);
         return fieldsLoaded;
     }
 
-    tr_tordbg (tor, "Read resume file \"%s\"", filename);
+    tr_logAddTorDbg (tor, "Read resume file \"%s\"", filename);
 
     if ((fieldsToLoad & TR_FR_CORRUPT)
       && tr_variantDictFindInt (&top, TR_KEY_corrupt, &i))

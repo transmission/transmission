@@ -21,6 +21,7 @@
 
 #include "transmission.h"
 #include "natpmp_local.h"
+#include "log.h"
 #include "net.h" /* tr_netCloseSocket */
 #include "port-forwarding.h"
 #include "utils.h"
@@ -69,9 +70,9 @@ logVal (const char * func,
     if (ret == NATPMP_TRYAGAIN)
         return;
     if (ret >= 0)
-        tr_ninf (getKey (), _("%s succeeded (%d)"), func, ret);
+        tr_logAddNamedInfo (getKey (), _("%s succeeded (%d)"), func, ret);
     else
-        tr_ndbg (
+        tr_logAddNamedDbg (
              getKey (),
             "%s failed. Natpmp returned %d (%s); errno is %d (%s)",
             func, ret, strnatpmperr (ret), errno, tr_strerror (errno));
@@ -138,7 +139,7 @@ tr_natpmpPulse (struct tr_natpmp * nat, tr_port private_port, bool is_enabled, t
         {
             char str[128];
             evutil_inet_ntop (AF_INET, &response.pnu.publicaddress.addr, str, sizeof (str));
-            tr_ninf (getKey (), _("Found public address \"%s\""), str);
+            tr_logAddNamedInfo (getKey (), _("Found public address \"%s\""), str);
             nat->state = TR_NATPMP_IDLE;
         }
         else if (val != NATPMP_TRYAGAIN)
@@ -173,7 +174,7 @@ tr_natpmpPulse (struct tr_natpmp * nat, tr_port private_port, bool is_enabled, t
         {
             const int private_port = resp.pnu.newportmapping.privateport;
 
-            tr_ninf (getKey (), _("no longer forwarding port %d"), private_port);
+            tr_logAddNamedInfo (getKey (), _("no longer forwarding port %d"), private_port);
 
             if (nat->private_port == private_port)
             {
@@ -218,7 +219,7 @@ tr_natpmpPulse (struct tr_natpmp * nat, tr_port private_port, bool is_enabled, t
             nat->renew_time = tr_time () + (resp.pnu.newportmapping.lifetime / 2);
             nat->private_port = resp.pnu.newportmapping.privateport;
             nat->public_port = resp.pnu.newportmapping.mappedpublicport;
-            tr_ninf (getKey (), _("Port %d forwarded successfully"), nat->private_port);
+            tr_logAddNamedInfo (getKey (), _("Port %d forwarded successfully"), nat->private_port);
         }
         else if (val != NATPMP_TRYAGAIN)
         {

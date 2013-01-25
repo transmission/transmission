@@ -40,6 +40,7 @@
 #include "resume.h"
 #include "fdlimit.h" /* tr_fdTorrentClose */
 #include "inout.h" /* tr_ioTestPiece () */
+#include "log.h"
 #include "magnet.h"
 #include "metainfo.h"
 #include "peer-common.h" /* MAX_BLOCK_SIZE */
@@ -62,8 +63,8 @@
 #define tr_deeplog_tor(tor, ...) \
   do \
     { \
-      if (tr_deepLoggingIsActive ()) \
-        tr_deepLog (__FILE__, __LINE__, tr_torrentName (tor), __VA_ARGS__); \
+      if (tr_logGetDeepEnabled ()) \
+        tr_logAddDeep (__FILE__, __LINE__, tr_torrentName (tor), __VA_ARGS__); \
     } \
   while (0)
 
@@ -455,7 +456,7 @@ tr_torrentCheckSeedLimit (tr_torrent * tor)
     /* if we're seeding and reach our seed ratio limit, stop the torrent */
     if (tr_torrentIsSeedRatioDone (tor))
     {
-        tr_torinf (tor, "%s", "Seed ratio reached; pausing torrent");
+        tr_logAddTorInfo (tor, "%s", "Seed ratio reached; pausing torrent");
 
         tor->isStopping = true;
 
@@ -466,7 +467,7 @@ tr_torrentCheckSeedLimit (tr_torrent * tor)
     /* if we're seeding and reach our inactiviy limit, stop the torrent */
     else if (tr_torrentIsSeedIdleLimitDone (tor))
     {
-        tr_torinf (tor, "%s", "Seeding idle limit reached; pausing torrent");
+        tr_logAddTorInfo (tor, "%s", "Seeding idle limit reached; pausing torrent");
 
         tor->isStopping = true;
         tor->finishedSeedingByIdle = true;
@@ -494,7 +495,7 @@ tr_torrentSetLocalError (tr_torrent * tor, const char * fmt, ...)
     evutil_vsnprintf (tor->errorString, sizeof (tor->errorString), fmt, ap);
     va_end (ap);
 
-    tr_torerr (tor, "%s", tor->errorString);
+    tr_logAddTorErr (tor, "%s", tor->errorString);
 
     if (tor->isRunning)
         tor->isStopping = true;
@@ -520,9 +521,9 @@ onTrackerResponse (tr_torrent * tor, const tr_tracker_event * event, void * unus
             const bool allAreSeeds = seedProbability == 100;
 
              if (allAreSeeds)
-                tr_tordbg (tor, "Got %zu seeds from tracker", event->pexCount);
+                tr_logAddTorDbg (tor, "Got %zu seeds from tracker", event->pexCount);
             else
-                tr_tordbg (tor, "Got %zu peers from tracker", event->pexCount);
+                tr_logAddTorDbg (tor, "Got %zu peers from tracker", event->pexCount);
 
             for (i = 0; i < event->pexCount; ++i)
                 tr_peerMgrAddPex (tor, TR_PEER_FROM_TRACKER, &event->pex[i], seedProbability);
@@ -531,14 +532,14 @@ onTrackerResponse (tr_torrent * tor, const tr_tracker_event * event, void * unus
         }
 
         case TR_TRACKER_WARNING:
-            tr_torerr (tor, _("Tracker warning: \"%s\""), event->text);
+            tr_logAddTorErr (tor, _("Tracker warning: \"%s\""), event->text);
             tor->error = TR_STAT_TRACKER_WARNING;
             tr_strlcpy (tor->errorTracker, event->tracker, sizeof (tor->errorTracker));
             tr_strlcpy (tor->errorString, event->text, sizeof (tor->errorString));
             break;
 
         case TR_TRACKER_ERROR:
-            tr_torerr (tor, _("Tracker error: \"%s\""), event->text);
+            tr_logAddTorErr (tor, _("Tracker error: \"%s\""), event->text);
             tor->error = TR_STAT_TRACKER_ERROR;
             tr_strlcpy (tor->errorTracker, event->tracker, sizeof (tor->errorTracker));
             tr_strlcpy (tor->errorString, event->text, sizeof (tor->errorString));
@@ -1650,7 +1651,7 @@ torrentStart (tr_torrent * tor, bool bypass_queue)
 
     /* allow finished torrents to be resumed */
     if (tr_torrentIsSeedRatioDone (tor)) {
-        tr_torinf (tor, "%s", _("Restarted manually -- disabling its seed ratio"));
+        tr_logAddTorInfo (tor, "%s", _("Restarted manually -- disabling its seed ratio"));
         tr_torrentSetRatioMode (tor, TR_RATIOLIMIT_UNLIMITED);
     }
 
@@ -1755,7 +1756,7 @@ static void
 stopTorrent (void * vtor)
 {
   tr_torrent * tor = vtor;
-  tr_torinf (tor, "%s", "Pausing");
+  tr_logAddTorInfo (tor, "%s", "Pausing");
 
   assert (tr_isTorrent (tor));
 
@@ -1805,7 +1806,7 @@ closeTorrent (void * vtor)
     tr_variantDictAddInt (d, TR_KEY_id, tor->uniqueId);
     tr_variantDictAddInt (d, TR_KEY_date, tr_time ());
 
-    tr_torinf (tor, "%s", _("Removing torrent"));
+    tr_logAddTorInfo (tor, "%s", _("Removing torrent"));
 
     stopTorrent (tor);
 
@@ -1992,11 +1993,11 @@ torrentCallScript (const tr_torrent * tor, const char * script)
             tr_strdup_printf ("TR_TORRENT_NAME=%s", tr_torrentName (tor)),
             NULL };
 
-        tr_torinf (tor, "Calling script \"%s\"", script);
+        tr_logAddTorInfo (tor, "Calling script \"%s\"", script);
 
 #ifdef WIN32
         if (_spawnvpe (_P_NOWAIT, script, (const char*)cmd, env) == -1)
-          tr_torerr (tor, "error executing script \"%s\": %s", cmd[0], tr_strerror (errno));
+          tr_logAddTorErr (tor, "error executing script \"%s\": %s", cmd[0], tr_strerror (errno));
 #else
         signal (SIGCHLD, onSigCHLD);
 
@@ -2006,7 +2007,7 @@ torrentCallScript (const tr_torrent * tor, const char * script)
                 putenv (env[i]);
 
             if (execvp (script, cmd) == -1)
-              tr_torerr (tor, "error executing script \"%s\": %s", cmd[0], tr_strerror (errno));
+              tr_logAddTorErr (tor, "error executing script \"%s\": %s", cmd[0], tr_strerror (errno));
 
             _exit (0);
         }
@@ -2032,7 +2033,7 @@ tr_torrentRecheckCompleteness (tr_torrent * tor)
       const bool wasRunning = tor->isRunning;
 
       if (recentChange)
-        tr_torinf (tor, _("State changed from \"%1$s\" to \"%2$s\""),
+        tr_logAddTorInfo (tor, _("State changed from \"%1$s\" to \"%2$s\""),
                    getCompletionString (tor->completeness),
                    getCompletionString (completeness));
 
@@ -2356,7 +2357,7 @@ tr_torrentReqIsValid (const tr_torrent * tor,
     else if (tr_pieceOffset (tor, index, offset, length) > tor->info.totalSize)
         err = 5;
 
-    if (err) tr_tordbg (tor, "index %lu offset %lu length %lu err %d\n",
+    if (err) tr_logAddTorDbg (tor, "index %lu offset %lu length %lu err %d\n",
                             (unsigned long)index,
                             (unsigned long)offset,
                             (unsigned long)length,
@@ -2891,7 +2892,7 @@ setLocation (void * vdata)
 
     assert (tr_isTorrent (tor));
 
-    tr_dbg ("Moving \"%s\" location from currentDir \"%s\" to \"%s\"",
+    tr_logAddDebug ("Moving \"%s\" location from currentDir \"%s\" to \"%s\"",
             tr_torrentName (tor), tor->currentDir, location);
 
     tr_mkdirp (location, 0777);
@@ -2916,17 +2917,17 @@ setLocation (void * vdata)
                 char * oldpath = tr_buildPath (oldbase, sub, NULL);
                 char * newpath = tr_buildPath (location, sub, NULL);
 
-                tr_dbg ("Found file #%d: %s", (int)i, oldpath);
+                tr_logAddDebug ("Found file #%d: %s", (int)i, oldpath);
 
                 if (do_move && !tr_is_same_file (oldpath, newpath))
                 {
                     bool renamed = false;
                     errno = 0;
-                    tr_torinf (tor, "moving \"%s\" to \"%s\"", oldpath, newpath);
+                    tr_logAddTorInfo (tor, "moving \"%s\" to \"%s\"", oldpath, newpath);
                     if (tr_moveFile (oldpath, newpath, &renamed))
                     {
                         err = true;
-                        tr_torerr (tor, "error moving \"%s\" to \"%s\": %s",
+                        tr_logAddTorErr (tor, "error moving \"%s\" to \"%s\": %s",
                                         oldpath, newpath, tr_strerror (errno));
                     }
                 }
@@ -3029,7 +3030,7 @@ tr_torrentFileCompleted (tr_torrent * tor, tr_file_index_t fileNum)
             char * newpath = tr_buildPath (base, f->name, NULL);
 
             if (rename (oldpath, newpath))
-                tr_torerr (tor, "Error moving \"%s\" to \"%s\": %s", oldpath, newpath, tr_strerror (errno));
+                tr_logAddTorErr (tor, "Error moving \"%s\" to \"%s\": %s", oldpath, newpath, tr_strerror (errno));
 
             tr_free (newpath);
             tr_free (oldpath);

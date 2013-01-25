@@ -25,6 +25,7 @@
 #include "announcer.h"
 #include "announcer-common.h"
 #include "crypto.h" /* tr_cryptoRandInt (), tr_cryptoWeakRandInt () */
+#include "log.h"
 #include "peer-mgr.h" /* tr_peerMgrCompactToPex () */
 #include "ptrarray.h"
 #include "session.h"
@@ -37,11 +38,16 @@ static void tier_build_log_name (const struct tr_tier * tier,
                                  char * buf, size_t buflen);
 
 #define dbgmsg(tier, ...) \
-if (tr_deepLoggingIsActive ()) do { \
-  char name[128]; \
-  tier_build_log_name (tier, name, sizeof (name)); \
-  tr_deepLog (__FILE__, __LINE__, name, __VA_ARGS__); \
-} while (0)
+  do \
+    { \
+      if (tr_logGetDeepEnabled ()) \
+        { \
+          char name[128]; \
+          tier_build_log_name (tier, name, sizeof (name)); \
+          tr_logAddDeep (__FILE__, __LINE__, name, __VA_ARGS__); \
+        } \
+    } \
+  while (0)
 
 enum
 {
@@ -749,7 +755,7 @@ tr_announcerNextManualAnnounce (const tr_torrent * tor)
 static void
 dbgmsg_tier_announce_queue (const tr_tier * tier)
 {
-    if (tr_deepLoggingIsActive ())
+    if (tr_logGetDeepEnabled ())
     {
         int i;
         char name[128];
@@ -765,7 +771,7 @@ dbgmsg_tier_announce_queue (const tr_tier * tier)
         }
 
         message = evbuffer_free_to_str (buf);
-        tr_deepLog (__FILE__, __LINE__, name, "announce queue is %s", message);
+        tr_logAddDeep (__FILE__, __LINE__, name, "announce queue is %s", message);
         tr_free (message);
     }
 }
@@ -991,7 +997,7 @@ on_announce_error (tr_tier * tier, const char * err, tr_announce_event e)
 
     /* set the error message */
     dbgmsg (tier, "%s", err);
-    tr_torinf (tier->tor, "%s", err);
+    tr_logAddTorInfo (tier->tor, "%s", err);
     tr_strlcpy (tier->lastAnnounceStr, err, sizeof (tier->lastAnnounceStr));
 
     /* switch to the next tracker */
@@ -1000,7 +1006,7 @@ on_announce_error (tr_tier * tier, const char * err, tr_announce_event e)
     /* schedule a reannounce */
     interval = getRetryInterval (tier->currentTracker);
     dbgmsg (tier, "Retrying announce in %d seconds.", interval);
-    tr_torinf (tier->tor, "Retrying announce in %d seconds.", interval);
+    tr_logAddTorInfo (tier->tor, "Retrying announce in %d seconds.", interval);
     tier_announce_event_push (tier, e, tr_time () + interval);
 }
 
@@ -1145,7 +1151,7 @@ on_announce_done (const tr_announce_response  * response,
                then a separate scrape isn't needed */
             if ((scrape_fields >= 3) || (!tracker->scrape && (scrape_fields >= 1)))
             {
-                tr_tordbg (tier->tor, "Announce response contained scrape info; "
+                tr_logAddTorDbg (tier->tor, "Announce response contained scrape info; "
                                       "rescheduling next scrape to %d seconds from now.",
                                       tier->scrapeIntervalSec);
                 tier->scrapeAt = get_next_scrape_time (announcer->session, tier, tier->scrapeIntervalSec);
@@ -1205,7 +1211,7 @@ announce_request_delegate (tr_announcer               * announcer,
     else if (!memcmp (request->url, "udp://", 6))
         tr_tracker_udp_announce (session, request, callback, callback_data);
     else
-        tr_err ("Unsupported url: %s", request->url);
+        tr_logAddError ("Unsupported url: %s", request->url);
 
     announce_request_free (request);
 }
@@ -1256,7 +1262,7 @@ on_scrape_error (tr_session * session, tr_tier * tier, const char * errmsg)
 
     /* set the error message */
     dbgmsg (tier, "Scrape error: %s", errmsg);
-    tr_torinf (tier->tor, "Scrape error: %s", errmsg);
+    tr_logAddTorInfo (tier->tor, "Scrape error: %s", errmsg);
     tr_strlcpy (tier->lastScrapeStr, errmsg, sizeof (tier->lastScrapeStr));
 
     /* switch to the next tracker */
@@ -1265,7 +1271,7 @@ on_scrape_error (tr_session * session, tr_tier * tier, const char * errmsg)
     /* schedule a rescrape */
     interval = getRetryInterval (tier->currentTracker);
     dbgmsg (tier, "Retrying scrape in %zu seconds.", (size_t)interval);
-    tr_torinf (tier->tor, "Retrying scrape in %zu seconds.", (size_t)interval);
+    tr_logAddTorInfo (tier->tor, "Retrying scrape in %zu seconds.", (size_t)interval);
     tier->lastScrapeSucceeded = false;
     tier->scrapeAt = get_next_scrape_time (session, tier, interval);
 }
@@ -1348,7 +1354,7 @@ on_scrape_done (const tr_scrape_response * response, void * vsession)
                     tier->scrapeIntervalSec = MAX (DEFAULT_SCRAPE_INTERVAL_SEC,
                                                    response->min_request_interval);
                     tier->scrapeAt = get_next_scrape_time (session, tier, tier->scrapeIntervalSec);
-                    tr_tordbg (tier->tor, "Scrape successful. Rescraping in %d seconds.",
+                    tr_logAddTorDbg (tier->tor, "Scrape successful. Rescraping in %d seconds.",
                                tier->scrapeIntervalSec);
 
                     if ((tracker = tier->currentTracker))
@@ -1384,7 +1390,7 @@ scrape_request_delegate (tr_announcer             * announcer,
     else if (!memcmp (request->url, "udp://", 6))
         tr_tracker_udp_scrape (session, request, callback, callback_data);
     else
-        tr_err ("Unsupported url: %s", request->url);
+        tr_logAddError ("Unsupported url: %s", request->url);
 }
 
 static void
@@ -1529,7 +1535,7 @@ announceMore (tr_announcer * announcer)
     n = MIN (tr_ptrArraySize (&announceMe), announcer->slotsAvailable);
     for (i=0; i<n; ++i) {
         tr_tier * tier = tr_ptrArrayNth (&announceMe, i);
-        tr_tordbg (tier->tor, "%s", "Announcing to tracker");
+        tr_logAddTorDbg (tier->tor, "%s", "Announcing to tracker");
         dbgmsg (tier, "announcing tier %d of %d", i, n);
         tierAnnounce (announcer, tier);
     }

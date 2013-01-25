@@ -20,6 +20,7 @@
 #include <event2/event.h>
 
 #include "transmission.h"
+#include "log.h"
 #include "net.h"
 #include "session.h"
 
@@ -39,7 +40,7 @@ pgpipe (int handles[2])
 
     if ((s = socket (AF_INET, SOCK_STREAM, 0)) == INVALID_SOCKET)
     {
-        tr_dbg ("pgpipe failed to create socket: %ui", WSAGetLastError ());
+        tr_logAddDebug ("pgpipe failed to create socket: %ui", WSAGetLastError ());
         return -1;
     }
 
@@ -49,38 +50,38 @@ pgpipe (int handles[2])
     serv_addr.sin_addr.s_addr = htonl (INADDR_LOOPBACK);
     if (bind (s, (SOCKADDR *) & serv_addr, len) == SOCKET_ERROR)
     {
-        tr_dbg ("pgpipe failed to bind: %ui", WSAGetLastError ());
+        tr_logAddDebug ("pgpipe failed to bind: %ui", WSAGetLastError ());
         closesocket (s);
         return -1;
     }
     if (listen (s, 1) == SOCKET_ERROR)
     {
-        tr_ndbg ("event","pgpipe failed to listen: %ui", WSAGetLastError ());
+        tr_logAddNamedDbg ("event","pgpipe failed to listen: %ui", WSAGetLastError ());
         closesocket (s);
         return -1;
     }
     if (getsockname (s, (SOCKADDR *) & serv_addr, &len) == SOCKET_ERROR)
     {
-        tr_dbg ("pgpipe failed to getsockname: %ui", WSAGetLastError ());
+        tr_logAddDebug ("pgpipe failed to getsockname: %ui", WSAGetLastError ());
         closesocket (s);
         return -1;
     }
     if ((handles[1] = socket (PF_INET, SOCK_STREAM, 0)) == INVALID_SOCKET)
     {
-        tr_dbg ("pgpipe failed to create socket 2: %ui", WSAGetLastError ());
+        tr_logAddDebug ("pgpipe failed to create socket 2: %ui", WSAGetLastError ());
         closesocket (s);
         return -1;
     }
 
     if (connect (handles[1], (SOCKADDR *) & serv_addr, len) == SOCKET_ERROR)
     {
-        tr_dbg ("pgpipe failed to connect socket: %ui", WSAGetLastError ());
+        tr_logAddDebug ("pgpipe failed to connect socket: %ui", WSAGetLastError ());
         closesocket (s);
         return -1;
     }
     if ((handles[0] = accept (s, (SOCKADDR *) & serv_addr, &len)) == INVALID_SOCKET)
     {
-        tr_dbg ("pgpipe failed to accept socket: %ui", WSAGetLastError ());
+        tr_logAddDebug ("pgpipe failed to accept socket: %ui", WSAGetLastError ());
         closesocket (handles[1]);
         handles[1] = INVALID_SOCKET;
         closesocket (s);
@@ -154,8 +155,8 @@ struct tr_run_data
 
 #define dbgmsg(...) \
     do { \
-        if (tr_deepLoggingIsActive ()) \
-            tr_deepLog (__FILE__, __LINE__, "event", __VA_ARGS__); \
+        if (tr_logGetDeepEnabled ()) \
+            tr_logAddDeep (__FILE__, __LINE__, "event", __VA_ARGS__); \
     } while (0)
 
 static void
@@ -213,9 +214,9 @@ static void
 logFunc (int severity, const char * message)
 {
     if (severity >= _EVENT_LOG_ERR)
-        tr_err ("%s", message);
+        tr_logAddError ("%s", message);
     else
-        tr_dbg ("%s", message);
+        tr_logAddDebug ("%s", message);
 }
 
 static void
@@ -252,7 +253,7 @@ libeventThreadFunc (void * veh)
     event_base_free (base);
     eh->session->events = NULL;
     tr_free (eh);
-    tr_dbg ("Closing libevent thread");
+    tr_logAddDebug ("Closing libevent thread");
 }
 
 void
@@ -279,7 +280,7 @@ tr_eventClose (tr_session * session)
     assert (tr_isSession (session));
 
     session->events->die = true;
-    tr_deepLog (__FILE__, __LINE__, NULL, "closing trevent pipe");
+    tr_logAddDeep (__FILE__, __LINE__, NULL, "closing trevent pipe");
     tr_netCloseSocket (session->events->fds[1]);
 }
 

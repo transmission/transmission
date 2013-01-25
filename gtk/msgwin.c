@@ -18,6 +18,7 @@
 #include <gtk/gtk.h>
 
 #include <libtransmission/transmission.h>
+#include <libtransmission/log.h>
 
 #include "conf.h"
 #include "hig.h"
@@ -42,13 +43,13 @@ struct MsgData
   GtkListStore  * store;
   GtkTreeModel  * filter;
   GtkTreeModel  * sort;
-  tr_msg_level    maxLevel;
+  tr_log_level    maxLevel;
   gboolean        isPaused;
   guint           refresh_tag;
 };
 
-static struct tr_msg_list * myTail = NULL;
-static struct tr_msg_list * myHead = NULL;
+static struct tr_log_message * myTail = NULL;
+static struct tr_log_message * myHead = NULL;
 
 /****
 *****
@@ -111,7 +112,7 @@ level_combo_changed_cb (GtkComboBox * combo_box, gpointer gdata)
   const int level = gtr_combo_box_get_active_enum (combo_box);
   const gboolean pinned_to_new = is_pinned_to_new (data);
 
-  tr_setMessageLevel (level);
+  tr_logSetLevel (level);
   gtr_core_set_pref_int (data->core, TR_KEY_message_level, level);
   data->maxLevel = level;
   gtk_tree_model_filter_refilter (GTK_TREE_MODEL_FILTER (data->filter));
@@ -154,17 +155,17 @@ doSave (GtkWindow * parent, struct MsgData * data, const char * filename)
         {
           char * date;
           const char * levelStr;
-          const struct tr_msg_list * node;
+          const struct tr_log_message * node;
 
           gtk_tree_model_get (model, &iter, COL_TR_MSG, &node, -1);
           date = gtr_localtime (node->when);
           switch (node->level)
            {
-             case TR_MSG_DBG:
+             case TR_LOG_DEBUG:
                levelStr = "debug";
                break;
 
-             case TR_MSG_ERR:
+             case TR_LOG_ERROR:
                levelStr = "error";
                break;
 
@@ -225,7 +226,7 @@ onClearRequest (GtkWidget * w UNUSED, gpointer gdata)
   struct MsgData * data = gdata;
 
   gtk_list_store_clear (data->store);
-  tr_freeMessageList (myHead);
+  tr_logFreeQueue (myHead);
   myHead = myTail = NULL;
 }
 
@@ -242,9 +243,9 @@ getForegroundColor (int msgLevel)
 {
   switch (msgLevel)
     {
-      case TR_MSG_DBG: return "forestgreen";
-      case TR_MSG_INF: return "black";
-      case TR_MSG_ERR: return "red";
+      case TR_LOG_DEBUG: return "forestgreen";
+      case TR_LOG_INFO:  return "black";
+      case TR_LOG_ERROR: return "red";
       default: g_assert_not_reached (); return "black";
     }
 }
@@ -258,7 +259,7 @@ renderText (GtkTreeViewColumn  * column UNUSED,
 {
   const int col = GPOINTER_TO_INT (gcol);
   char * str = NULL;
-  const struct tr_msg_list * node;
+  const struct tr_log_message * node;
 
   gtk_tree_model_get (tree_model, iter, col, &str, COL_TR_MSG, &node, -1);
   g_object_set (renderer, "text", str,
@@ -276,7 +277,7 @@ renderTime (GtkTreeViewColumn  * column UNUSED,
 {
   struct tm tm;
   char buf[16];
-  const struct tr_msg_list * node;
+  const struct tr_log_message * node;
 
   gtk_tree_model_get (tree_model, iter, COL_TR_MSG, &node, -1);
   tm = *localtime (&node->when);
@@ -354,7 +355,7 @@ appendColumn (GtkTreeView * view, int col)
 static gboolean
 isRowVisible (GtkTreeModel * model, GtkTreeIter * iter, gpointer gdata)
 {
-  const struct tr_msg_list * node;
+  const struct tr_log_message * node;
   const struct MsgData * data = gdata;
 
   gtk_tree_model_get (model, iter, COL_TR_MSG, &node, -1);
@@ -372,10 +373,10 @@ onWindowDestroyed (gpointer gdata, GObject * deadWindow UNUSED)
   g_free (data);
 }
 
-static tr_msg_list *
-addMessages (GtkListStore * store, struct tr_msg_list * head)
+static tr_log_message *
+addMessages (GtkListStore * store, struct tr_log_message * head)
 {
-  tr_msg_list * i;
+  tr_log_message * i;
   static unsigned int sequence = 0;
   const char * default_name = g_get_application_name ();
 
@@ -391,7 +392,7 @@ addMessages (GtkListStore * store, struct tr_msg_list * head)
                                          -1);
 
       /* if it's an error message, dump it to the terminal too */
-      if (i->level == TR_MSG_ERR)
+      if (i->level == TR_LOG_ERROR)
         {
           GString * gstr = g_string_sized_new (512);
           g_string_append_printf (gstr, "%s:%d %s", i->file, i->line, i->message);
@@ -413,12 +414,12 @@ onRefresh (gpointer gdata)
 
   if (!data->isPaused)
     {
-      tr_msg_list * msgs = tr_getQueuedMessages ();
+      tr_log_message * msgs = tr_logGetQueue ();
       if (msgs)
         {
           /* add the new messages and append them to the end of
            * our persistent list */
-          tr_msg_list * tail = addMessages (data->store, msgs);
+          tr_log_message * tail = addMessages (data->store, msgs);
           if (myTail)
               myTail->next = msgs;
           else
@@ -436,9 +437,9 @@ onRefresh (gpointer gdata)
 static GtkWidget*
 debug_level_combo_new (void)
 {
-  GtkWidget * w = gtr_combo_box_new_enum (_("Error"),       TR_MSG_ERR,
-                                          _("Information"), TR_MSG_INF,
-                                          _("Debug"),       TR_MSG_DBG,
+  GtkWidget * w = gtr_combo_box_new_enum (_("Error"),       TR_LOG_ERROR,
+                                          _("Information"), TR_LOG_INFO,
+                                          _("Debug"),       TR_LOG_DEBUG,
                                           NULL);
   gtr_combo_box_set_active_enum (GTK_COMBO_BOX (w), gtr_pref_int_get (TR_KEY_message_level));
   return w;
@@ -521,7 +522,7 @@ gtr_message_log_window_new (GtkWindow * parent, TrCore * core)
                                     G_TYPE_UINT,       /* sequence */
                                     G_TYPE_POINTER,    /* category */
                                     G_TYPE_POINTER,    /* message */
-                                    G_TYPE_POINTER);   /* struct tr_msg_list */
+                                    G_TYPE_POINTER);   /* struct tr_log_message */
 
   addMessages (data->store, myHead);
   onRefresh (data); /* much faster to populate *before* it has listeners */

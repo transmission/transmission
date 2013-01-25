@@ -24,6 +24,7 @@
 #include <event2/buffer.h>
 
 #include "transmission.h"
+#include "log.h"
 #include "net.h" /* tr_address */
 #include "platform.h" /* mutex */
 #include "session.h"
@@ -50,8 +51,8 @@ enum
 #else
 #define dbgmsg(...) \
   do { \
-    if (tr_deepLoggingIsActive ()) \
-      tr_deepLog (__FILE__, __LINE__, "web", __VA_ARGS__); \
+    if (tr_logGetDeepEnabled ()) \
+      tr_logAddDeep (__FILE__, __LINE__, "web", __VA_ARGS__); \
   } while (0)
 #endif
 
@@ -336,10 +337,10 @@ tr_webThreadFunc (void * vsession)
   web->curl_ca_bundle = getenv ("CURL_CA_BUNDLE");
   if (web->curl_ssl_verify)
     {
-      tr_ninf ("web", "will verify tracker certs using envvar CURL_CA_BUNDLE: %s",
+      tr_logAddNamedInfo ("web", "will verify tracker certs using envvar CURL_CA_BUNDLE: %s",
                web->curl_ca_bundle == NULL ? "none" : web->curl_ca_bundle);
-      tr_ninf ("web", "NB: this only works if you built against libcurl with openssl or gnutls, NOT nss");
-      tr_ninf ("web", "NB: invalid certs will show up as 'Could not connect to tracker' like many other errors");
+      tr_logAddNamedInfo ("web", "NB: this only works if you built against libcurl with openssl or gnutls, NOT nss");
+      tr_logAddNamedInfo ("web", "NB: invalid certs will show up as 'Could not connect to tracker' like many other errors");
     }
   web->cookie_filename = tr_buildPath (session->configDir, "cookies.txt", NULL);
 

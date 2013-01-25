@@ -24,6 +24,7 @@
 #include "session.h"
 #include "bandwidth.h"
 #include "crypto.h"
+#include "log.h"
 #include "net.h"
 #include "peer-common.h" /* MAX_BLOCK_SIZE */
 #include "peer-io.h"
@@ -72,10 +73,12 @@ guessPacketOverhead (size_t d)
 **/
 
 #define dbgmsg(io, ...) \
-    do { \
-        if (tr_deepLoggingIsActive ()) \
-            tr_deepLog (__FILE__, __LINE__, tr_peerIoGetAddrStr (io), __VA_ARGS__); \
-    } while (0)
+  do \
+    { \
+      if (tr_logGetDeepEnabled ()) \
+        tr_logAddDeep (__FILE__, __LINE__, tr_peerIoGetAddrStr (io), __VA_ARGS__); \
+    } \
+  while (0)
 
 /**
 ***
@@ -397,7 +400,7 @@ maybeSetCongestionAlgorithm (int socket, const char * algorithm)
         const int rc = tr_netSetCongestionControl (socket, algorithm);
 
         if (rc < 0)
-            tr_ninf ("Net", "Can't set congestion control algorithm '%s': %s",
+            tr_logAddNamedInfo ("Net", "Can't set congestion control algorithm '%s': %s",
                      algorithm, tr_strerror (errno));
     }
 }
@@ -416,7 +419,7 @@ utp_on_read (void *closure, const unsigned char *buf, size_t buflen)
     dbgmsg (io, "utp_on_read got %zu bytes", buflen);
 
     if (rc < 0) {
-        tr_nerr ("UTP", "On read evbuffer_add");
+        tr_logAddNamedError ("UTP", "On read evbuffer_add");
         return;
     }
 
@@ -435,7 +438,7 @@ utp_on_write (void *closure, unsigned char *buf, size_t buflen)
     dbgmsg (io, "utp_on_write sending %zu bytes... evbuffer_remove returned %d", buflen, rc);
     assert (rc == (int)buflen); /* if this fails, we've corrupted our bookkeeping somewhere */
     if (rc < (long)buflen) {
-        tr_nerr ("UTP", "Short write: %d < %ld", rc, (long)buflen);
+        tr_logAddNamedError ("UTP", "Short write: %d < %ld", rc, (long)buflen);
     }
 
     didWriteWrapper (io, buflen);
@@ -484,10 +487,10 @@ utp_on_state_change (void *closure, int state)
         if (io->gotError)
             io->gotError (io, BEV_EVENT_EOF, io->userData);
     } else if (state == UTP_STATE_DESTROYING) {
-        tr_nerr ("UTP", "Impossible state UTP_STATE_DESTROYING");
+        tr_logAddNamedError ("UTP", "Impossible state UTP_STATE_DESTROYING");
         return;
     } else {
-        tr_nerr ("UTP", "Unknown state %d", state);
+        tr_logAddNamedError ("UTP", "Unknown state %d", state);
     }
 }
 
@@ -535,7 +538,7 @@ static void
 dummy_read (void * closure UNUSED, const unsigned char *buf UNUSED, size_t buflen UNUSED)
 {
     /* This cannot happen, as far as I'm aware. */
-    tr_nerr ("UTP", "On_read called on closed socket");
+    tr_logAddNamedError ("UTP", "On_read called on closed socket");
 
 }
 
@@ -544,7 +547,7 @@ dummy_write (void * closure UNUSED, unsigned char *buf, size_t buflen)
 {
     /* This can very well happen if we've shut down a peer connection that
        had unflushed buffers.  Complain and send zeroes. */
-    tr_ndbg ("UTP", "On_write called on closed socket");
+    tr_logAddNamedDbg ("UTP", "On_write called on closed socket");
     memset (buf, 0, buflen);
 }
 

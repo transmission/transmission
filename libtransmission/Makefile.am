@@ -33,6 +33,7 @@ libtransmission_a_SOURCES = \
   history.c \
   inout.c \
   list.c \
+  log.c \
   magnet.c \
   makemeta.c \
   metainfo.c \
@@ -88,6 +89,7 @@ noinst_HEADERS = \
   jsonsl.h \
   libtransmission-test.h \
   list.h \
+  log.h \
   magnet.h \
   makemeta.h \
   metainfo.h \

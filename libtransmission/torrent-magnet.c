@@ -18,6 +18,7 @@
 
 #include "transmission.h"
 #include "crypto.h" /* tr_sha1 () */
+#include "log.h"
 #include "magnet.h"
 #include "metainfo.h"
 #include "resume.h"
@@ -30,8 +31,8 @@
 #define dbgmsg(tor, ...) \
   do \
     { \
-      if (tr_deepLoggingIsActive ()) \
-        tr_deepLog (__FILE__, __LINE__, tr_torrentName (tor), __VA_ARGS__); \
+      if (tr_logGetDeepEnabled ()) \
+        tr_logAddDeep (__FILE__, __LINE__, tr_torrentName (tor), __VA_ARGS__); \
     } \
   while (0)
 
@@ -314,7 +315,7 @@ tr_torrentSetMetadataPiece (tr_torrent  * tor, int piece, const void  * data, in
           m->piecesNeededCount = n;
           dbgmsg (tor, "metadata error; trying again. %d pieces left", n);
 
-          tr_err ("magnet status: checksum passed %d, metainfo parsed %d",
+          tr_logAddError ("magnet status: checksum passed %d, metainfo parsed %d",
                   (int)checksumPassed, (int)metainfoParsed);
         }
     }

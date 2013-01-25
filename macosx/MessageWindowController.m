@@ -184,8 +184,8 @@
 
 - (void) updateLog: (NSTimer *) timer
 {
-    tr_msg_list * messages;
-    if ((messages = tr_getQueuedMessages()) == NULL)
+    tr_log_message * messages;
+    if ((messages = tr_logGetQueue()) == NULL)
         return;
     
     [fLock lock];
@@ -201,7 +201,7 @@
     
     BOOL changed = NO;
     
-    for (tr_msg_list * currentMessage = messages; currentMessage != NULL; currentMessage = currentMessage->next)
+    for (tr_log_message * currentMessage = messages; currentMessage != NULL; currentMessage = currentMessage->next)
     {
         NSString * name = currentMessage->name != NULL ? [NSString stringWithUTF8String: currentMessage->name]
                             : [[NSProcessInfo processInfo] processName];
@@ -226,11 +226,11 @@
         }
     }
     
-    if ([fMessages count] > TR_MAX_MSG_LOG)
+    if ([fMessages count] > TR_LOG_MAX_QUEUE_LENGTH)
     {
         const NSUInteger oldCount = [fDisplayedMessages count];
         
-        NSIndexSet * removeIndexes = [NSIndexSet indexSetWithIndexesInRange: NSMakeRange(0, [fMessages count]-TR_MAX_MSG_LOG)];
+        NSIndexSet * removeIndexes = [NSIndexSet indexSetWithIndexesInRange: NSMakeRange(0, [fMessages count]-TR_LOG_MAX_QUEUE_LENGTH)];
         NSArray * itemsToRemove = [fMessages objectsAtIndexes: removeIndexes];
         
         [fMessages removeObjectsAtIndexes: removeIndexes];
@@ -250,7 +250,7 @@
     
     [fLock unlock];
     
-    tr_freeMessageList(messages);
+    tr_logFreeQueue (messages);
 }
 
 - (NSInteger) numberOfRowsInTableView: (NSTableView *) tableView

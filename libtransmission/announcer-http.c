@@ -22,6 +22,7 @@
 
 #include "transmission.h"
 #include "announcer-common.h"
+#include "log.h"
 #include "net.h" /* tr_globalIPv6 () */
 #include "peer-mgr.h" /* pex */
 #include "torrent.h"
@@ -31,9 +32,12 @@
 #include "web.h" /* tr_http_escape () */
 
 #define dbgmsg(name, ...) \
-if (tr_deepLoggingIsActive ()) do { \
-  tr_deepLog (__FILE__, __LINE__, name, __VA_ARGS__); \
-} while (0)
+  do \
+    { \
+      if (tr_logGetDeepEnabled ()) \
+        tr_logAddDeep (__FILE__, __LINE__, name, __VA_ARGS__); \
+    } \
+  while (0)
 
 /****
 *****
