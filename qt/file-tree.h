@@ -35,139 +35,145 @@ class QStyle;
 
 class FileTreeItem: public QObject
 {
-        Q_OBJECT;
+    Q_OBJECT;
 
-        enum { LOW=(1<<0), NORMAL=(1<<1), HIGH=(1<<2) };
+    enum { LOW=(1<<0), NORMAL=(1<<1), HIGH=(1<<2) };
 
-    public:
-        virtual ~FileTreeItem( );
-        FileTreeItem( int fileIndex, const QString& name="" ):
-            myIndex(fileIndex), myParent(0), myName(name),
-            myPriority(0), myIsWanted(0),
-            myHaveSize(0), myTotalSize(0),
-            myFirstUnhashedRow(0) { }
+  public:
 
-    public:
-        void appendChild( FileTreeItem *child );
-        FileTreeItem * child( const QString& filename );
-        FileTreeItem * child( int row ) { return myChildren.at( row ); }
-        int childCount( ) const { return myChildren.size( ); }
-        FileTreeItem * parent( ) { return myParent; }
-        const FileTreeItem * parent( ) const { return myParent; }
-        int row( ) const;
-        const QString& name( ) const { return myName; }
-        QVariant data( int column, int role ) const;
-        bool update( int index, bool want, int priority, uint64_t total, uint64_t have, bool torrentChanged );
-        void twiddleWanted( QSet<int>& fileIds, bool& );
-        void twiddlePriority( QSet<int>& fileIds, int& );
+    virtual ~FileTreeItem();
 
-    private:
-        void setSubtreePriority( int priority, QSet<int>& fileIds );
-        void setSubtreeWanted( bool, QSet<int>& fileIds );
-        QString priorityString( ) const;
-        void getSubtreeSize( uint64_t& have, uint64_t& total ) const;
-        QString fileSizeName( ) const;
-        double progress( ) const;
-        int priority( ) const;
-        int isSubtreeWanted( ) const;
+    FileTreeItem (int fileIndex, const QString& name=""):
+      myIndex (fileIndex),
+      myParent (0),
+      myName (name),
+      myPriority (0),
+      myIsWanted (0),
+      myHaveSize (0),
+      myTotalSize (0),
+      myFirstUnhashedRow (0) { }
 
-        int myIndex;
-        FileTreeItem * myParent;
-        QList<FileTreeItem*> myChildren;
-        QHash<QString,int> myChildRows;
-        QHash<QString,int>& getMyChildRows();
-        const QString myName;
-        int myPriority;
-        bool myIsWanted;
-        uint64_t myHaveSize;
-        uint64_t myTotalSize;
-        size_t myFirstUnhashedRow;
+  public:
+    void appendChild (FileTreeItem *child);
+    FileTreeItem * child (const QString& filename);
+    FileTreeItem * child (int row) { return myChildren.at(row); }
+    int childCount () const { return myChildren.size(); }
+    FileTreeItem * parent () { return myParent; }
+    const FileTreeItem * parent () const { return myParent; }
+    int row () const;
+    const QString& name () const { return myName; }
+    QVariant data (int column, int role) const;
+    bool update (int index, bool want, int priority, uint64_t total, uint64_t have, bool torrentChanged);
+    void twiddleWanted (QSet<int>& fileIds, bool&);
+    void twiddlePriority (QSet<int>& fileIds, int&);
+
+  private:
+    void setSubtreePriority (int priority, QSet<int>& fileIds);
+    void setSubtreeWanted (bool, QSet<int>& fileIds);
+    QString priorityString () const;
+    void getSubtreeSize (uint64_t& have, uint64_t& total) const;
+    QString fileSizeName () const;
+    double progress () const;
+    int priority () const;
+    int isSubtreeWanted () const;
+
+    int myIndex;
+    FileTreeItem * myParent;
+    QList<FileTreeItem*> myChildren;
+    QHash<QString,int> myChildRows;
+    QHash<QString,int>& getMyChildRows();
+    const QString myName;
+    int myPriority;
+    bool myIsWanted;
+    uint64_t myHaveSize;
+    uint64_t myTotalSize;
+    size_t myFirstUnhashedRow;
 };
 
 class FileTreeModel: public QAbstractItemModel
 {
-        Q_OBJECT
+    Q_OBJECT
 
-    public:
-        FileTreeModel( QObject *parent = 0);
-        ~FileTreeModel( );
+  public:
+    FileTreeModel (QObject *parent = 0);
+    ~FileTreeModel ();
 
-    public:
-        QVariant data( const QModelIndex &index, int role = Qt::DisplayRole ) const;
-        Qt::ItemFlags flags( const QModelIndex& index ) const;
-        QVariant headerData( int section, Qt::Orientation orientation, int role = Qt::DisplayRole ) const;
-        QModelIndex index( int row, int column, const QModelIndex& parent = QModelIndex() ) const;
-        QModelIndex parent( const QModelIndex& child ) const;
-        QModelIndex parent( const QModelIndex& child, int column ) const;
-        int rowCount( const QModelIndex& parent = QModelIndex( ) ) const;
-        int columnCount( const QModelIndex &parent = QModelIndex( ) ) const;
-        virtual bool setData ( const QModelIndex & index, const QVariant & value, int role = Qt::EditRole );
+  public:
+    QVariant data (const QModelIndex &index, int role = Qt::DisplayRole) const;
+    Qt::ItemFlags flags (const QModelIndex& index) const;
+    QVariant headerData (int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
+    QModelIndex index (int row, int column, const QModelIndex& parent = QModelIndex()) const;
+    QModelIndex parent (const QModelIndex& child) const;
+    QModelIndex parent (const QModelIndex& child, int column) const;
+    int rowCount (const QModelIndex& parent = QModelIndex()) const;
+    int columnCount (const QModelIndex &parent = QModelIndex()) const;
+    virtual bool setData (const QModelIndex & index, const QVariant & value, int role = Qt::EditRole);
 
-    signals:
-        void priorityChanged( const QSet<int>& fileIndices, int );
-        void wantedChanged( const QSet<int>& fileIndices, bool );
-        void pathEdited (const QString& oldpath, const QString& newname);
+  signals:
+    void priorityChanged (const QSet<int>& fileIndices, int);
+    void wantedChanged (const QSet<int>& fileIndices, bool);
+    void pathEdited (const QString& oldpath, const QString& newname);
 
-    public:
-        void clear( );
-        void addFile( int index, const QString& filename,
-                      bool wanted, int priority,
-                      uint64_t size, uint64_t have,
-                      QList<QModelIndex>& rowsAdded,
-                      bool torrentChanged );
+  public:
+    void clear ();
+    void addFile (int index, const QString& filename,
+                  bool wanted, int priority,
+                  uint64_t size, uint64_t have,
+                  QList<QModelIndex>& rowsAdded,
+                  bool torrentChanged);
 
-    private:
-        void clearSubtree( const QModelIndex & );
-        QModelIndex indexOf( FileTreeItem *, int column ) const;
-        void parentsChanged( const QModelIndex &, int column );
-        void subtreeChanged( const QModelIndex &, int column );
+  private:
+    void clearSubtree (const QModelIndex &);
+    QModelIndex indexOf (FileTreeItem *, int column) const;
+    void parentsChanged (const QModelIndex &, int column);
+    void subtreeChanged (const QModelIndex &, int column);
 
-    private:
-        FileTreeItem * rootItem;
+  private:
+    FileTreeItem * rootItem;
 
-    public slots:
-        void clicked ( const QModelIndex & index );
+  public slots:
+    void clicked (const QModelIndex & index);
 };
 
 class FileTreeDelegate: public QItemDelegate
 {
-        Q_OBJECT
+    Q_OBJECT
 
-    public:
-        FileTreeDelegate( QObject * parent=0 ): QItemDelegate( parent ) { }
-        virtual ~FileTreeDelegate( ) { }
+  public:
+    FileTreeDelegate (QObject * parent=0): QItemDelegate(parent) { }
+    virtual ~FileTreeDelegate() { }
 
-    public:
-        virtual QSize sizeHint(const QStyleOptionViewItem&, const QModelIndex&) const;
-        virtual void paint(QPainter*, const QStyleOptionViewItem&, const QModelIndex&) const;
+  public:
+    virtual QSize sizeHint (const QStyleOptionViewItem&, const QModelIndex&) const;
+    virtual void paint (QPainter*, const QStyleOptionViewItem&, const QModelIndex&) const;
 };
 
 class FileTreeView: public QTreeView
 {
-        Q_OBJECT
+    Q_OBJECT
 
-    public:
-        FileTreeView( QWidget * parent=0 );
-        virtual ~FileTreeView( );
-        void clear( );
-        void update( const FileList& files );
-        void update( const FileList& files, bool torrentChanged );
+  public:
+    FileTreeView (QWidget * parent=0);
+    virtual ~FileTreeView ();
+    void clear ();
+    void update (const FileList& files);
+    void update (const FileList& files, bool torrentChanged);
 
-    signals:
-        void priorityChanged( const QSet<int>& fileIndices, int );
-        void wantedChanged( const QSet<int>& fileIndices, bool );
-        void pathEdited (const QString& oldpath, const QString& newname);
+  signals:
+    void priorityChanged (const QSet<int>& fileIndices, int);
+    void wantedChanged (const QSet<int>& fileIndices, bool);
+    void pathEdited (const QString& oldpath, const QString& newname);
 
-    protected:
-        bool eventFilter( QObject *, QEvent * );
+  protected:
+    bool eventFilter (QObject *, QEvent *);
 
-    private:
-        FileTreeModel myModel;
-        QSortFilterProxyModel * myProxy;
-        FileTreeDelegate myDelegate;
+  private:
+    FileTreeModel myModel;
+    QSortFilterProxyModel * myProxy;
+    FileTreeDelegate myDelegate;
 
-    public slots:
-        void onClicked ( const QModelIndex & index );
+  public slots:
+    void onClicked (const QModelIndex & index);
 };
 
 #endif
