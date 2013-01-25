@@ -27,7 +27,6 @@
 #include <QStringList>
 #include <QStyle>
 #include <QTextStream>
-#include <QTimer>
 
 #include <curl/curl.h>
 
@@ -248,8 +247,7 @@ Session :: Session( const char * configDir, Prefs& prefs ):
     myPrefs( prefs ),
     mySession( 0 ),
     myConfigDir( QString::fromUtf8( configDir ) ),
-    myNAM( 0 ),
-    myResponseTimer (this)
+    myNAM( 0 )
 {
     myStats.ratio = TR_RATIO_NA;
     myStats.uploadedBytes = 0;
@@ -261,8 +259,8 @@ Session :: Session( const char * configDir, Prefs& prefs ):
 
     connect( &myPrefs, SIGNAL(changed(int)), this, SLOT(updatePref(int)) );
 
-    connect (&myResponseTimer, SIGNAL(timeout()), this, SLOT(onResponseTimer()));
-    myResponseTimer.setSingleShot (true);
+    connect (this, SIGNAL(responseReceived(const QByteArray&)),
+             this, SLOT(onResponseReceived(const QByteArray&)));
 }
 
 Session :: ~Session( )
@@ -656,16 +654,16 @@ Session :: exec( const tr_variant * request )
 }
 
 void
-Session :: localSessionCallback( tr_session * session, struct evbuffer * json, void * vself )
+Session :: localSessionCallback( tr_session * s, struct evbuffer * json, void * vself )
 {
-  Q_UNUSED (session);
+  Q_UNUSED (s);
 
   Session * self = static_cast<Session*>(vself);
 
-  self->myIdleJSON.append (QString ((const char*) evbuffer_pullup (json, -1)));
-
-  if (!self->myResponseTimer.isActive())
-    self->myResponseTimer.start(50);
+  /* this callback is invoked in the libtransmission thread, so we don't want
+     to process the response here... let's push it over to the Qt thread. */
+  self->responseReceived (QByteArray ((const char *)evbuffer_pullup (json, -1),
+                                      (int)evbuffer_get_length (json)));
 }
 
 #define REQUEST_DATA_PROPERTY_KEY "requestData"
@@ -742,16 +740,9 @@ Session :: onFinished( QNetworkReply * reply )
 }
 
 void
-Session :: onResponseTimer ()
+Session :: onResponseReceived (const QByteArray& utf8)
 {
-  QStringList responses = myIdleJSON;
-  myIdleJSON.clear();
-
-  foreach (QString response, responses)
-    {
-      const QByteArray utf8 (response.toUtf8());
-      parseResponse (utf8.constData(), utf8.length());
-    }
+  parseResponse (utf8.constData(), utf8.length());
 }
 
 void

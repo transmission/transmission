@@ -20,7 +20,6 @@
 #include <QNetworkAccessManager>
 #include <QString>
 #include <QStringList>
-#include <QTimer>
 #include <QUrl>
 
 class QStringList;
@@ -131,9 +130,10 @@ class Session: public QObject
 
     private slots:
         void onFinished( QNetworkReply * reply );
-        void onResponseTimer( );
+        void onResponseReceived (const QByteArray& json);
 
     signals:
+        void responseReceived (const QByteArray& json);
         void executed( int64_t tag, const QString& result, struct tr_variant * arguments );
         void sourceChanged( );
         void portTested( bool isOpen );
@@ -159,7 +159,6 @@ class Session: public QObject
         struct tr_session_stats myStats;
         struct tr_session_stats myCumulativeStats;
         QString mySessionVersion;
-        QTimer myResponseTimer;
 };
 
 #endif
