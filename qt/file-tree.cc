@@ -42,7 +42,7 @@ enum
 ****/
 
 QHash<QString,int>&
-FileTreeItem :: getMyChildRows()
+FileTreeItem :: getMyChildRows ()
 {
   const size_t n = childCount();
 
@@ -57,7 +57,7 @@ FileTreeItem :: getMyChildRows()
 }
 
 
-FileTreeItem :: ~FileTreeItem()
+FileTreeItem :: ~FileTreeItem ()
 {
   assert(myChildren.isEmpty());
 
@@ -96,7 +96,7 @@ FileTreeItem :: child (const QString& filename)
 }
 
 int
-FileTreeItem :: row() const
+FileTreeItem :: row () const
 {
   int i(-1);
 
@@ -235,22 +235,25 @@ FileTreeItem :: priority () const
 {
   int i(0);
 
-  if(myChildren.isEmpty()) switch(myPriority)
+  if (myChildren.isEmpty())
     {
-      case TR_PRI_LOW:
-        i |= LOW;
-        break;
+      switch (myPriority)
+        {
+          case TR_PRI_LOW:
+            i |= LOW;
+            break;
 
-      case TR_PRI_HIGH:
-        i |= HIGH;
-        break;
+          case TR_PRI_HIGH:
+            i |= HIGH;
+            break;
 
-      default:
-        i |= NORMAL;
-        break;
+          default:
+            i |= NORMAL;
+            break;
+        }
     }
 
-  foreach(const FileTreeItem * child, myChildren)
+  foreach (const FileTreeItem * child, myChildren)
     i |= child->priority();
 
   return i;
@@ -297,13 +300,13 @@ FileTreeItem :: isSubtreeWanted () const
     {
       const int childWanted = child->isSubtreeWanted();
 
-      if(wanted == -1)
+      if (wanted == -1)
         wanted = childWanted;
 
-      if(wanted != childWanted)
+      if (wanted != childWanted)
         wanted = Qt::PartiallyChecked;
 
-      if(wanted == Qt::PartiallyChecked)
+      if (wanted == Qt::PartiallyChecked)
         return wanted;
     }
 
@@ -403,11 +406,11 @@ FileTreeModel :: setData (const QModelIndex& index, const QVariant& newname, int
 }
 
 QVariant
-FileTreeModel :: headerData(int column, Qt::Orientation orientation, int role) const
+FileTreeModel :: headerData (int column, Qt::Orientation orientation, int role) const
 {
   QVariant data;
 
-  if(orientation==Qt::Horizontal && role==Qt::DisplayRole)
+  if (orientation==Qt::Horizontal && role==Qt::DisplayRole)
     {
       switch (column)
         {
@@ -538,9 +541,9 @@ FileTreeModel :: addFile (int                   index,
                           QList<QModelIndex>  & rowsAdded,
                           bool                  torrentChanged)
 {
-  FileTreeItem * i(rootItem);
+  FileTreeItem * i (rootItem);
 
-  foreach (QString token, filename.split(QChar::fromAscii('/')))
+  foreach (QString token, filename.split (QChar::fromAscii('/')))
     {
       FileTreeItem * child(i->child(token));
       if (!child)
@@ -680,20 +683,20 @@ FileTreeDelegate :: paint (QPainter                    * painter,
       return;
     }
 
-  QStyle * style(QApplication :: style());
+  QStyle * style (QApplication :: style());
   if (option.state & QStyle::State_Selected)
-    painter->fillRect(option.rect, option.palette.highlight());
+    painter->fillRect (option.rect, option.palette.highlight());
   painter->save();
   if (option.state & QStyle::State_Selected)
-    painter->setBrush(option.palette.highlightedText());
+    painter->setBrush (option.palette.highlightedText());
 
   if (column == COL_NAME)
     {
       // draw the file icon
-      static const int iconSize(style->pixelMetric(QStyle :: PM_SmallIconSize));
-      const QRect iconArea(option.rect.x(),
-                           option.rect.y() + (option.rect.height()-iconSize)/2,
-                           iconSize, iconSize);
+      static const int iconSize (style->pixelMetric(QStyle :: PM_SmallIconSize));
+      const QRect iconArea (option.rect.x(),
+                            option.rect.y() + (option.rect.height()-iconSize)/2,
+                            iconSize, iconSize);
       QIcon icon;
       if (index.model()->hasChildren(index))
         {
@@ -704,13 +707,13 @@ FileTreeDelegate :: paint (QPainter                    * painter,
           QString name = index.data().toString();
           icon = Utils :: guessMimeIcon (name.left(name.lastIndexOf(" (")));
         }
-      icon.paint(painter, iconArea, Qt::AlignCenter, QIcon::Normal, QIcon::On);
+      icon.paint (painter, iconArea, Qt::AlignCenter, QIcon::Normal, QIcon::On);
 
       // draw the name
-      QStyleOptionViewItem tmp(option);
-      tmp.rect.setWidth(option.rect.width() - iconArea.width() - HIG::PAD_SMALL);
-      tmp.rect.moveRight(option.rect.right());
-      QItemDelegate::paint(painter, tmp, index);
+      QStyleOptionViewItem tmp (option);
+      tmp.rect.setWidth (option.rect.width() - iconArea.width() - HIG::PAD_SMALL);
+      tmp.rect.moveRight (option.rect.right());
+      QItemDelegate::paint (painter, tmp, index);
     }
   else if(column == COL_PROGRESS)
     {
@@ -718,8 +721,8 @@ FileTreeDelegate :: paint (QPainter                    * painter,
       p.state = option.state | QStyle::State_Small;
       p.direction = QApplication::layoutDirection();
       p.rect = option.rect;
-      p.rect.setSize(QSize(option.rect.width()-2, option.rect.height()-8));
-      p.rect.moveCenter(option.rect.center());
+      p.rect.setSize (QSize(option.rect.width()-2, option.rect.height()-8));
+      p.rect.moveCenter (option.rect.center());
       p.fontMetrics = QApplication::fontMetrics();
       p.minimum = 0;
       p.maximum = 100;
@@ -734,16 +737,16 @@ FileTreeDelegate :: paint (QPainter                    * painter,
       QStyleOptionButton o;
       o.state = option.state;
       o.direction = QApplication::layoutDirection();
-      o.rect.setSize(QSize(20, option.rect.height()));
-      o.rect.moveCenter(option.rect.center());
+      o.rect.setSize (QSize(20, option.rect.height()));
+      o.rect.moveCenter (option.rect.center());
       o.fontMetrics = QApplication::fontMetrics();
-      switch(index.data().toInt())
+      switch (index.data().toInt())
         {
           case Qt::Unchecked: o.state |= QStyle::State_Off; break;
           case Qt::Checked:   o.state |= QStyle::State_On; break;
           default:            o.state |= QStyle::State_NoChange;break;
         }
-      style->drawControl(QStyle::CE_CheckBox, &o, painter);
+      style->drawControl (QStyle::CE_CheckBox, &o, painter);
     }
 
   painter->restore();
@@ -818,8 +821,10 @@ FileTreeView :: eventFilter (QObject * o, QEvent * event)
         {
           if (column == COL_NAME)
             continue;
-          if (isColumnHidden(column))
+
+          if (isColumnHidden (column))
             continue;
+
           const QString header = myModel.headerData (column, Qt::Horizontal).toString() + "    ";
           const int width = fontMetrics.size (0, header).width();
           setColumnWidth (column, width);
@@ -855,7 +860,7 @@ FileTreeView :: eventFilter (QObject * o, QEvent * event)
 void
 FileTreeView :: update (const FileList& files)
 {
-  update(files, true);
+  update (files, true);
 }
 
 void
@@ -866,7 +871,7 @@ FileTreeView :: update (const FileList& files, bool torrentChanged)
       QList<QModelIndex> added;
       myModel.addFile (file.index, file.filename, file.wanted, file.priority, file.size, file.have, added, torrentChanged);
       foreach (QModelIndex i, added)
-        expand(myProxy->mapFromSource(i));
+        expand (myProxy->mapFromSource(i));
     }
 }
 
