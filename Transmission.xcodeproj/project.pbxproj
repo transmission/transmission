@@ -269,6 +269,8 @@
 		A2AB76EA15D8130B009EFC95 /* libcurl.4.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A2290D2D1442B23200B95A09 /* libcurl.4.dylib */; };
 		A2AB883E16A399A6008FAD50 /* VDKQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = A2AB883C16A399A6008FAD50 /* VDKQueue.m */; };
 		A2AF1C390A3D0F6200F1575D /* FileOutlineView.m in Sources */ = {isa = PBXBuildFile; fileRef = A2AF1C370A3D0F6200F1575D /* FileOutlineView.m */; };
+		A2AF23C816B44FA0003BC59E /* log.c in Sources */ = {isa = PBXBuildFile; fileRef = A2AF23C616B44FA0003BC59E /* log.c */; };
+		A2AF23C916B44FA0003BC59E /* log.h in Headers */ = {isa = PBXBuildFile; fileRef = A2AF23C716B44FA0003BC59E /* log.h */; };
 		A2B3FB460E5901E700FF78FB /* cli.c in Sources */ = {isa = PBXBuildFile; fileRef = A2B3FB450E5901E700FF78FB /* cli.c */; };
 		A2B3FB4C0E59023000FF78FB /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */; };
 		A2B3FB530E59027100FF78FB /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */; };
@@ -974,6 +976,8 @@
 		A2AC81D60D987E2D00A2878C /* nl */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = nl; path = macosx/nl.lproj/AddWindow.xib; sourceTree = "<group>"; };
 		A2AF1C360A3D0F6200F1575D /* FileOutlineView.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = FileOutlineView.h; path = macosx/FileOutlineView.h; sourceTree = "<group>"; };
 		A2AF1C370A3D0F6200F1575D /* FileOutlineView.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = FileOutlineView.m; path = macosx/FileOutlineView.m; sourceTree = "<group>"; };
+		A2AF23C616B44FA0003BC59E /* log.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = log.c; path = libtransmission/log.c; sourceTree = "<group>"; };
+		A2AF23C716B44FA0003BC59E /* log.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = log.h; path = libtransmission/log.h; sourceTree = "<group>"; };
 		A2B3FB450E5901E700FF78FB /* cli.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = cli.c; path = cli/cli.c; sourceTree = "<group>"; };
 		A2B5BB7A0D9C7C2300FCB650 /* es */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = es; path = macosx/es.lproj/AddWindow.xib; sourceTree = "<group>"; };
 		A2B6141B1395ADE9000E0975 /* libz.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.dylib; path = usr/lib/libz.dylib; sourceTree = SDKROOT; };
@@ -1728,6 +1732,8 @@
 				A25BFD68167BED3B0039D1AA /* variant.h */,
 				A2EA522F1686AC0D00180493 /* quark.c */,
 				A2EA52301686AC0D00180493 /* quark.h */,
+				A2AF23C616B44FA0003BC59E /* log.c */,
+				A2AF23C716B44FA0003BC59E /* log.h */,
 				A2A4EA0B0DE106E8000CE197 /* ConvertUTF.h */,
 				A2A4EA0A0DE106E8000CE197 /* ConvertUTF.c */,
 				4DB74F070E8CD75100AEB1A8 /* wildmat.c */,
@@ -2069,6 +2075,7 @@
 				A25BFD6A167BED3B0039D1AA /* variant-common.h in Headers */,
 				A25BFD6E167BED3B0039D1AA /* variant.h in Headers */,
 				A2EA52321686AC0D00180493 /* quark.h in Headers */,
+				A2AF23C916B44FA0003BC59E /* log.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2676,6 +2683,7 @@
 				A25BFD6B167BED3B0039D1AA /* variant-json.c in Sources */,
 				A25BFD6D167BED3B0039D1AA /* variant.c in Sources */,
 				A2EA52311686AC0D00180493 /* quark.c in Sources */,
+				A2AF23C816B44FA0003BC59E /* log.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

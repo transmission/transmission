@@ -27,8 +27,8 @@
 #import "NSApplicationAdditions.h"
 #import "NSMutableArrayAdditions.h"
 #import "NSStringAdditions.h"
+#import <log.h>
 #import <transmission.h>
-#import <utils.h>
 
 #define LEVEL_ERROR 0
 #define LEVEL_INFO  1
@@ -114,17 +114,17 @@
     //select proper level in popup button
     switch ([[NSUserDefaults standardUserDefaults] integerForKey: @"MessageLevel"])
     {
-        case TR_MSG_ERR:
+        case TR_LOG_ERROR:
             [fLevelButton selectItemAtIndex: LEVEL_ERROR];
             break;
-        case TR_MSG_INF:
+        case TR_LOG_INFO:
             [fLevelButton selectItemAtIndex: LEVEL_INFO];
             break;
-        case TR_MSG_DBG:
+        case TR_LOG_DEBUG:
             [fLevelButton selectItemAtIndex: LEVEL_DEBUG];
             break;
         default: //safety
-            [[NSUserDefaults standardUserDefaults] setInteger: TR_MSG_ERR forKey: @"MessageLevel"];
+            [[NSUserDefaults standardUserDefaults] setInteger: TR_LOG_ERROR forKey: @"MessageLevel"];
             [fLevelButton selectItemAtIndex: LEVEL_ERROR];
     }
     
@@ -270,11 +270,11 @@
         const NSInteger level = [[message objectForKey: @"Level"] integerValue];
         switch (level)
         {
-            case TR_MSG_ERR:
+            case TR_LOG_ERROR:
                 return [NSImage imageNamed: @"RedDot"];
-            case TR_MSG_INF:
+            case TR_LOG_INFO:
                 return [NSImage imageNamed: @"YellowDot"];
-            case TR_MSG_DBG:
+            case TR_LOG_DEBUG:
                 return [NSImage imageNamed: @"PurpleDot"];
             default:
                 NSAssert1(NO, @"Unknown message log level: %ld", level);
@@ -342,13 +342,13 @@
     switch ([fLevelButton indexOfSelectedItem])
     {
         case LEVEL_ERROR:
-            level = TR_MSG_ERR;
+            level = TR_LOG_ERROR;
             break;
         case LEVEL_INFO:
-            level = TR_MSG_INF;
+            level = TR_LOG_INFO;
             break;
         case LEVEL_DEBUG:
-            level = TR_MSG_DBG;
+            level = TR_LOG_DEBUG;
             break;
         default:
             NSAssert1(NO, @"Unknown message log level: %ld", [fLevelButton indexOfSelectedItem]);
@@ -535,13 +535,13 @@
     const NSInteger level = [[message objectForKey: @"Level"] integerValue];
     switch (level)
     {
-        case TR_MSG_ERR:
+        case TR_LOG_ERROR:
             levelString = NSLocalizedString(@"Error", "Message window -> level");
             break;
-        case TR_MSG_INF:
+        case TR_LOG_INFO:
             levelString = NSLocalizedString(@"Info", "Message window -> level");
             break;
-        case TR_MSG_DBG:
+        case TR_LOG_DEBUG:
             levelString = NSLocalizedString(@"Debug", "Message window -> level");
             break;
         default:

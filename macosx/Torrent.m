@@ -28,6 +28,7 @@
 #import "NSStringAdditions.h"
 #import "TrackerNode.h"
 
+#import "log.h"
 #import "transmission.h" // required by utils.h
 #import "utils.h" // tr_new()
 
@@ -98,11 +99,11 @@ void renameCallback(tr_torrent * torrent, const char * oldPathCharString, const 
         
         NSString * oldPath = [NSString stringWithUTF8String: oldPathCharString];
         NSString * path = [oldPath stringByDeletingLastPathComponent];
-        NSString * oldName = [oldPath lastPathComponent];
         NSString * newName = [NSString stringWithUTF8String: newNameCharString];
         
         if (error == 0)
         {
+            NSString * oldName = [oldPath lastPathComponent];
             void (^__block updateNodeAndChildrenForRename)(FileListNode *) = ^(FileListNode * node) {
                 [node updateFromOldName: oldName toNewName: newName inPath: path];
                 
@@ -378,7 +379,7 @@ int trashDataFile(const char * filename)
 {
     if (fResumeOnWake)
     {
-        tr_ninf( fInfo->name, "restarting because of wakeUp" );
+        tr_logAddNamedInfo( fInfo->name, "restarting because of wakeUp" );
         tr_torrentStart(fHandle);
     }
 }
@@ -854,7 +855,6 @@ int trashDataFile(const char * filename)
 
 - (void) renameFileNode: (FileListNode *) node withName: (NSString *) newName completionHandler: (void (^)(BOOL didRename)) completionHandler
 {
-    NSParameterAssert(node != nil);
     NSParameterAssert([node torrent] == self);
     NSParameterAssert(newName != nil);
     NSParameterAssert(![newName isEqualToString: @""]);

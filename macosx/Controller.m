@@ -279,7 +279,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
                                                                     stringByExpandingTildeInPath] UTF8String]);
         tr_variantDictAddBool(&settings, TR_KEY_incomplete_dir_enabled, [fDefaults boolForKey: @"UseIncompleteDownloadFolder"]);
         tr_variantDictAddBool(&settings, TR_KEY_lpd_enabled, [fDefaults boolForKey: @"LocalPeerDiscoveryGlobal"]);
-        tr_variantDictAddInt(&settings, TR_KEY_message_level, TR_MSG_DBG);
+        tr_variantDictAddInt(&settings, TR_KEY_message_level, TR_LOG_DEBUG);
         tr_variantDictAddInt(&settings, TR_KEY_peer_limit_global, [fDefaults integerForKey: @"PeersTotal"]);
         tr_variantDictAddInt(&settings, TR_KEY_peer_limit_per_torrent, [fDefaults integerForKey: @"PeersTorrent"]);
         
