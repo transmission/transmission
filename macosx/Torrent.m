@@ -114,7 +114,7 @@ void renameCallback(tr_torrent * torrent, const char * oldPathCharString, const 
                 }
             };
             
-            NSArray * nodes = contextDict[@"Nodes"];
+            NSArray * nodes = [contextDict objectForKey: @"Nodes"];
             [nodes enumerateObjectsWithOptions: NSEnumerationConcurrent usingBlock: ^(FileListNode * node, NSUInteger idx, BOOL *stop) {
                 updateNodeAndChildrenForRename(node);
             }];
@@ -123,7 +123,7 @@ void renameCallback(tr_torrent * torrent, const char * oldPathCharString, const 
             NSLog(@"Error renaming %@ to %@", oldPath, [path stringByAppendingPathComponent: newName]);
         
         typedef void (^RenameCompletionBlock)(BOOL);
-        RenameCompletionBlock completionHandler = contextDict[@"CompletionHandler"];
+        RenameCompletionBlock completionHandler = [contextDict objectForKey: @"CompletionHandler"];
         completionHandler(error == 0);
         
         [contextDict release];
