@@ -255,6 +255,12 @@ unsigned int tr_peerGetPieceSpeed_Bps (const tr_peer    * peer,
 
 void tr_peerMgrClearInterest (tr_torrent * tor);
 
+void tr_peerMgrGotBadPiece (tr_torrent * tor, tr_piece_index_t pieceIndex);
+
+void tr_peerMgrPieceCompleted (tr_torrent * tor, tr_piece_index_t pieceIndex);
+ 
+
+
 /* @} */
 
 #endif

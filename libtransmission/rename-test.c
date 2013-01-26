@@ -187,7 +187,7 @@ test_single_filename_torrent (void)
   verify_and_block_until_done (tor);
   check_have_none (tor, totalSize);
 
-  create_single_file_torrent_contents (tor->downloadDir);
+  create_single_file_torrent_contents (tor->currentDir);
 
   /* sanity check the stats again, now that we've added the file */
   verify_and_block_until_done (tor);
@@ -214,7 +214,7 @@ test_single_filename_torrent (void)
   ****  Now try a rename that should succeed
   ***/
 
-  tmpstr = tr_buildPath (tor->downloadDir, "hello-world.txt", NULL); 
+  tmpstr = tr_buildPath (tor->currentDir, "hello-world.txt", NULL); 
   check (tr_fileExists (tmpstr, NULL));
   check_streq ("hello-world.txt", tr_torrentName(tor));
   check_int_eq (0, torrentRenameAndWait (tor, tor->info.name, "foobar"));
@@ -237,7 +237,7 @@ test_single_filename_torrent (void)
   ****  ...and rename it back again
   ***/
 
-  tmpstr = tr_buildPath (tor->downloadDir, "foobar", NULL); 
+  tmpstr = tr_buildPath (tor->currentDir, "foobar", NULL); 
   check (tr_fileExists (tmpstr, NULL));
   check_int_eq (0, torrentRenameAndWait (tor, "foobar", "hello-world.txt"));
   check (!tr_fileExists (tmpstr, NULL));
@@ -333,7 +333,7 @@ test_multifile_torrent (void)
   check_have_none (tor, totalSize);
 
   /* build the local data */
-  create_multifile_torrent_contents (tor->downloadDir);
+  create_multifile_torrent_contents (tor->currentDir);
 
   /* sanity check the (full) stats */
   verify_and_block_until_done (tor);
@@ -395,10 +395,10 @@ test_multifile_torrent (void)
   ***/
 
   /* remove the directory Felidae/Felinae/Felis/catus */
-  str = tr_buildPath (tor->downloadDir, files[1].name, NULL);
+  str = tr_buildPath (tor->currentDir, files[1].name, NULL);
   remove (str);
   tr_free (str);
-  str = tr_buildPath (tor->downloadDir, files[2].name, NULL);
+  str = tr_buildPath (tor->currentDir, files[2].name, NULL);
   remove (str);
   tmp = tr_dirname (str);
   remove (tmp);
@@ -461,65 +461,6 @@ test_multifile_torrent (void)
 ****
 ***/
 
-static void
-create_zero_torrent_partial_contents (tr_torrent * tor, bool incomplete)
-{
-  tr_file_index_t i;
-
-  for (i=0; i<tor->info.fileCount; ++i)
-    {
-      int rv;
-      uint64_t j;
-      FILE * fp;
-      char * path;
-      char * dirname;
-      const tr_file * file = &tor->info.files[i];
-      struct stat sb;
-
-      path = tr_buildPath (tor->downloadDir, file->name, NULL);
-      dirname = tr_dirname (path);
-      tr_mkdirp (dirname, 0700);
-      fp = fopen (path, "wb+");
-      for (j=0; j<file->length; ++j)
-        fputc ('\0', fp);
-      fclose (fp);
-
-      tr_free (dirname);
-      tr_free (path);
-
-      path = tr_torrentFindFile (tor, i);
-      assert (path != NULL);
-      rv = stat (path, &sb);
-      assert (rv == 0);
-      tr_free (path);
-    }
-
-  sync ();
-  verify_and_block_until_done (tor);
-  assert (tr_torrentStat(tor)->leftUntilDone == 0);
-
-  if (incomplete)
-    {
-      FILE * fp;
-      char * oldpath = tr_torrentFindFile (tor, 0);
-      char * newpath = tr_strdup_printf ("%s.part", oldpath);
-
-      rename (oldpath, newpath);
-
-      /* invalidate one piece */
-      fp = fopen (newpath, "rb+");
-      fputc ('\1', fp);
-      fclose (fp);
-
-      tr_free (newpath);
-      tr_free (oldpath);
-
-      sync ();
-      verify_and_block_until_done (tor);
-      assert (tr_torrentStat(tor)->leftUntilDone == tor->info.pieceSize);
-    }
-}
-
 static int
 test_partial_file (void)
 {
@@ -545,7 +486,7 @@ test_partial_file (void)
   check_streq ("files-filled-with-zeroes/4096",    tor->info.files[1].name);
   check_streq ("files-filled-with-zeroes/512",     tor->info.files[2].name);
 
-  create_zero_torrent_partial_contents (tor, true);
+  libtransmission_test_zero_torrent_populate (tor, false);
   fst = tr_torrentFiles (tor, NULL);
   check_int_eq (length[0] - pieceSize, fst[0].bytesCompleted);
   check_int_eq (length[1],             fst[1].bytesCompleted);
@@ -572,7 +513,7 @@ test_partial_file (void)
   strings[0] = "foo/bar.part";
   for (i=0; i<3; ++i)
     {
-      char * expected = tr_buildPath (tor->downloadDir, strings[i], NULL);
+      char * expected = tr_buildPath (tor->currentDir, strings[i], NULL);
       char * path = tr_torrentFindFile (tor, i);
       check_streq (expected, path);
       tr_free (path);

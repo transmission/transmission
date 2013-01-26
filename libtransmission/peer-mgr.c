@@ -1558,18 +1558,6 @@ addStrike (Torrent * t, tr_peer * peer)
 }
 
 static void
-gotBadPiece (Torrent * t, tr_piece_index_t pieceIndex)
-{
-    tr_torrent *   tor = t->tor;
-    const uint32_t byteCount = tr_torPieceCountBytes (tor, pieceIndex);
-
-    tor->corruptCur += byteCount;
-    tor->downloadedCur -= MIN (tor->downloadedCur, byteCount);
-
-    tr_announcerAddBytes (tor, TR_ANN_CORRUPT, byteCount);
-}
-
-static void
 peerSuggestedPiece (Torrent            * t UNUSED,
                     tr_peer            * peer UNUSED,
                     tr_piece_index_t     pieceIndex UNUSED,
@@ -1644,7 +1632,53 @@ peerDeclinedAllRequests (Torrent * t, const tr_peer * peer)
     tr_free (blocks);
 }
 
-static void tr_peerMgrSetBlame (tr_torrent *, tr_piece_index_t, int);
+static void
+cancelAllRequestsForBlock (struct tr_torrent_peers * t,
+                           tr_block_index_t          block,
+                           tr_peer                 * no_notify)
+{
+  int i;
+  int peerCount;
+  tr_peer ** peers;
+  tr_ptrArray peerArr;
+
+  peerArr = TR_PTR_ARRAY_INIT;
+  getBlockRequestPeers (t, block, &peerArr);
+  peers = (tr_peer **) tr_ptrArrayPeek (&peerArr, &peerCount);
+  for (i=0; i<peerCount; ++i)
+    {
+      tr_peer * p = peers[i];
+
+      if ((p != no_notify) && (p->msgs != NULL))
+        {
+          tr_historyAdd (&p->cancelsSentToPeer, tr_time (), 1);
+          tr_peerMsgsCancel (p->msgs, block);
+        }
+
+      removeRequestFromTables (t, block, p);
+    }
+
+  tr_ptrArrayDestruct (&peerArr, NULL);
+}
+
+void
+tr_peerMgrPieceCompleted (tr_torrent * tor, tr_piece_index_t p)
+{
+  int i;
+  int peerCount;
+  tr_peer ** peers;
+  struct tr_torrent_peers * t = tor->torrentPeers;
+
+  /* notify the peers that we now have this piece */
+  peerCount = tr_ptrArraySize (&t->peers);
+  peers = (tr_peer**) tr_ptrArrayBase (&t->peers);
+  for (i=0; i<peerCount; ++i)
+    tr_peerMsgsHave (peers[i]->msgs, p);
+
+  /* bookkeeping */
+  pieceListRemovePiece (t, p);
+  t->needsCompletenessCheck = true;
+}
 
 static void
 peerCallbackFunc (tr_peer * peer, const tr_peer_event * e, void * vt)
@@ -1758,105 +1792,14 @@ peerCallbackFunc (tr_peer * peer, const tr_peer_event * e, void * vt)
         }
 
         case TR_PEER_CLIENT_GOT_BLOCK:
-        {
-            tr_torrent * tor = t->tor;
-            tr_block_index_t block = _tr_block (tor, e->pieceIndex, e->offset);
-            int i, peerCount;
-            tr_peer ** peers;
-            tr_ptrArray peerArr = TR_PTR_ARRAY_INIT;
-
-            removeRequestFromTables (t, block, peer);
-            getBlockRequestPeers (t, block, &peerArr);
-            peers = (tr_peer **) tr_ptrArrayPeek (&peerArr, &peerCount);
-
-            /* remove additional block requests and send cancel to peers */
-            for (i=0; i<peerCount; i++) {
-                tr_peer * p = peers[i];
-                assert (p != peer);
-                if (p->msgs) {
-                    tr_historyAdd (&p->cancelsSentToPeer, tr_time (), 1);
-                    tr_peerMsgsCancel (p->msgs, block);
-                }
-                removeRequestFromTables (t, block, p);
-            }
-
-            tr_ptrArrayDestruct (&peerArr, false);
-
-            tr_historyAdd (&peer->blocksSentToClient, tr_time (), 1);
-
-            if (tr_cpBlockIsComplete (&tor->completion, block))
-            {
-                /* we already have this block... */
-                const uint32_t n = tr_torBlockCountBytes (tor, block);
-                tor->downloadedCur -= MIN (tor->downloadedCur, n);
-                tordbg (t, "we have this block already...");
-            }
-            else
-            {
-                tr_cpBlockAdd (&tor->completion, block);
-                pieceListResortPiece (t, pieceListLookup (t, e->pieceIndex));
-                tr_torrentSetDirty (tor);
-
-                if (tr_cpPieceIsComplete (&tor->completion, e->pieceIndex))
-                {
-                    const tr_piece_index_t p = e->pieceIndex;
-                    const bool ok = tr_torrentCheckPiece (tor, p);
-
-                    tordbg (t, "[LAZY] checked just-completed piece %zu", (size_t)p);
-
-                    if (!ok)
-                    {
-                        tr_logAddTorErr (tor, _("Piece %lu, which was just downloaded, failed its checksum test"),
-                                 (unsigned long)p);
-                    }
-
-                    tr_peerMgrSetBlame (tor, p, ok);
-
-                    if (!ok)
-                    {
-                        gotBadPiece (t, p);
-                    }
-                    else
-                    {
-                        int i;
-                        int peerCount;
-                        tr_peer ** peers;
-                        tr_file_index_t fileIndex;
-
-                        /* only add this to downloadedCur if we got it from a peer --
-                         * webseeds shouldn't count against our ratio. As one tracker
-                         * admin put it, "Those pieces are downloaded directly from the
-                         * content distributor, not the peers, it is the tracker's job
-                         * to manage the swarms, not the web server and does not fit
-                         * into the jurisdiction of the tracker." */
-                        if (peer->msgs != NULL) {
-                            const uint32_t n = tr_torPieceCountBytes (tor, p);
-                            tr_announcerAddBytes (tor, TR_ANN_DOWN, n);
-                        }
-
-                        peerCount = tr_ptrArraySize (&t->peers);
-                        peers = (tr_peer**) tr_ptrArrayBase (&t->peers);
-                        for (i=0; i<peerCount; ++i)
-                            tr_peerMsgsHave (peers[i]->msgs, p);
-
-                        for (fileIndex=0; fileIndex<tor->info.fileCount; ++fileIndex) {
-                            const tr_file * file = &tor->info.files[fileIndex];
-                            if ((file->firstPiece <= p) && (p <= file->lastPiece)) {
-                                if (tr_cpFileIsComplete (&tor->completion, fileIndex)) {
-                                    tr_cacheFlushFile (tor->session->cache, tor, fileIndex);
-                                    tr_torrentFileCompleted (tor, fileIndex);
-                                }
-                            }
-                        }
-
-                        pieceListRemovePiece (t, p);
-                    }
-                }
-
-                t->needsCompletenessCheck = true;
-            }
+          {
+            const tr_block_index_t block = _tr_block (t->tor, e->pieceIndex, e->offset);
+            cancelAllRequestsForBlock (t, block, peer);
+            tr_historyAdd (&peer->blocksSentToClient, tr_time(), 1);
+            pieceListResortPiece (t, pieceListLookup (t, e->pieceIndex));
+            tr_torrentGotBlock (t->tor, block);
             break;
-        }
+          }
 
         case TR_PEER_ERROR:
             if ((e->err == ERANGE) || (e->err == EMSGSIZE) || (e->err == ENOTCONN))
@@ -2231,32 +2174,28 @@ tr_peerMgrArrayToPex (const void * array,
 ***
 **/
 
-static void
-tr_peerMgrSetBlame (tr_torrent     * tor,
-                    tr_piece_index_t pieceIndex,
-                    int              success)
+void
+tr_peerMgrGotBadPiece (tr_torrent * tor, tr_piece_index_t pieceIndex)
 {
-    if (!success)
+  int i;
+  int n;
+  Torrent * t = tor->torrentPeers;
+  const uint32_t byteCount = tr_torPieceCountBytes (tor, pieceIndex);
+
+  for (i=0, n=tr_ptrArraySize(&t->peers); i!=n; ++i)
     {
-        int        peerCount, i;
-        Torrent *  t = tor->torrentPeers;
-        tr_peer ** peers;
+      tr_peer * peer = tr_ptrArrayNth (&t->peers, i);
 
-        assert (torrentIsLocked (t));
-
-        peers = (tr_peer **) tr_ptrArrayPeek (&t->peers, &peerCount);
-        for (i = 0; i < peerCount; ++i)
+      if (tr_bitfieldHas (&peer->blame, pieceIndex))
         {
-            tr_peer * peer = peers[i];
-            if (tr_bitfieldHas (&peer->blame, pieceIndex))
-            {
-                tordbg (t, "peer %s contributed to corrupt piece (%d); now has %d strikes",
-                        tr_atomAddrStr (peer->atom),
-                        pieceIndex, (int)peer->strikes + 1);
-                addStrike (t, peer);
-            }
+          tordbg (t, "peer %s contributed to corrupt piece (%d); now has %d strikes",
+                  tr_atomAddrStr(peer->atom), pieceIndex, (int)peer->strikes + 1);
+          addStrike (t, peer);
         }
     }
+
+
+  tr_announcerAddBytes (tor, TR_ANN_CORRUPT, byteCount);
 }
 
 int

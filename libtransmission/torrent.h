@@ -382,9 +382,10 @@ void tr_torrentSetDirty (tr_torrent * tor)
 uint32_t tr_getBlockSize (uint32_t pieceSize);
 
 /**
- * Tell the tr_torrent that one of its files has become complete
+ * Tell the tr_torrent that it's gotten a block
  */
-void tr_torrentFileCompleted (tr_torrent * tor, tr_file_index_t fileNo);
+void tr_torrentGotBlock (tr_torrent * tor, tr_block_index_t blockIndex);
+
 
 
 /**

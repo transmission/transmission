@@ -2,6 +2,7 @@
 #include <stdio.h>
 
 #include "transmission.h"
+#include "torrent.h"
 #include "libtransmission-test.h"
 
 bool verbose = false;
@@ -319,4 +320,70 @@ libtransmission_test_zero_torrent_init (void)
   tr_free (metainfo);
   tr_ctorFree (ctor);
   return tor;
+}
+
+#define verify_and_block_until_done(tor) \
+  do { \
+    tr_torrentVerify (tor); \
+    do { \
+      tr_wait_msec (10); \
+    } while (tor->verifyState != TR_VERIFY_NONE); \
+  } while (0)
+
+
+void
+libtransmission_test_zero_torrent_populate (tr_torrent * tor, bool complete)
+{
+  tr_file_index_t i;
+
+  for (i=0; i<tor->info.fileCount; ++i)
+    {
+      int rv;
+      uint64_t j;
+      FILE * fp;
+      char * path;
+      char * dirname;
+      const tr_file * file = &tor->info.files[i];
+      struct stat sb;
+
+      path = tr_buildPath (tor->currentDir, file->name, NULL);
+      dirname = tr_dirname (path);
+      tr_mkdirp (dirname, 0700);
+      fp = fopen (path, "wb+");
+      for (j=0; j<file->length; ++j)
+        fputc ('\0', fp);
+      fclose (fp);
+
+      tr_free (dirname);
+      tr_free (path);
+
+      path = tr_torrentFindFile (tor, i);
+      assert (path != NULL);
+      rv = stat (path, &sb);
+      assert (rv == 0);
+      tr_free (path);
+    }
+
+  sync ();
+
+  if (!complete)
+    {
+      FILE * fp;
+      char * oldpath = tr_torrentFindFile (tor, 0);
+      char * newpath = tr_strdup_printf ("%s.part", oldpath);
+
+      rename (oldpath, newpath);
+
+      /* invalidate one piece */
+      fp = fopen (newpath, "rb+");
+      fputc ('\1', fp);
+      fclose (fp);
+
+      tr_free (newpath);
+      tr_free (oldpath);
+
+      sync ();
+      verify_and_block_until_done (tor);
+      assert (tr_torrentStat(tor)->leftUntilDone == tor->info.pieceSize);
+    }
 }

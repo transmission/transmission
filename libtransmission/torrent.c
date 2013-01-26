@@ -1328,7 +1328,7 @@ tr_torrentStat (tr_torrent * tor)
 ***/
 
 static uint64_t
-fileBytesCompleted (const tr_torrent * tor, tr_file_index_t index)
+countFileBytesCompleted (const tr_torrent * tor, tr_file_index_t index)
 {
     uint64_t total = 0;
     const tr_file * f = &tor->info.files[index];
@@ -1379,7 +1379,7 @@ tr_torrentFiles (const tr_torrent * tor,
     assert (tr_isTorrent (tor));
 
     for (i=0; i<n; ++i, ++walk) {
-        const uint64_t b = isSeed ? tor->info.files[i].length : fileBytesCompleted (tor, i);
+        const uint64_t b = isSeed ? tor->info.files[i].length : countFileBytesCompleted (tor, i);
         walk->bytesCompleted = b;
         walk->progress = tor->info.files[i].length > 0 ? ((float)b / tor->info.files[i].length) : 1.0f;
     }
@@ -3000,19 +3000,20 @@ tr_torrentSetLocation (tr_torrent       * tor,
 ****
 ***/
 
-void
-tr_torrentFileCompleted (tr_torrent * tor, tr_file_index_t fileNum)
+static void
+tr_torrentFileCompleted (tr_torrent * tor, tr_file_index_t fileIndex)
 {
     char * sub;
     const char * base;
     const tr_info * inf = &tor->info;
-    const tr_file * f = &inf->files[fileNum];
+    const tr_file * f = &inf->files[fileIndex];
     tr_piece * p;
     const tr_piece * pend;
     const time_t now = tr_time ();
 
     /* close the file so that we can reopen in read-only mode as needed */
-    tr_fdFileClose (tor->session, tor, fileNum);
+    tr_cacheFlushFile (tor->session->cache, tor, fileIndex);
+    tr_fdFileClose (tor->session, tor, fileIndex);
 
     /* now that the file is complete and closed, we can start watching its
      * mtime timestamp for changes to know if we need to reverify pieces */
@@ -3022,7 +3023,7 @@ tr_torrentFileCompleted (tr_torrent * tor, tr_file_index_t fileNum)
     /* if the torrent's current filename isn't the same as the one in the
      * metadata -- for example, if it had the ".part" suffix appended to
      * it until now -- then rename it to match the one in the metadata */
-    if (tr_torrentFindFile2 (tor, fileNum, &base, &sub, NULL))
+    if (tr_torrentFindFile2 (tor, fileIndex, &base, &sub, NULL))
     {
         if (strcmp (sub, f->name))
         {
@@ -3037,6 +3038,63 @@ tr_torrentFileCompleted (tr_torrent * tor, tr_file_index_t fileNum)
         }
 
         tr_free (sub);
+    }
+}
+
+static void
+tr_torrentPieceCompleted (tr_torrent * tor, tr_piece_index_t pieceIndex)
+{
+  tr_file_index_t i;
+
+  tr_peerMgrPieceCompleted (tor, pieceIndex);
+
+  /* if this piece completes any file, invoke the fileCompleted func for it */
+  for (i=0; i<tor->info.fileCount; ++i)
+    {
+      const tr_file * file = &tor->info.files[i];
+
+      if ((file->firstPiece <= pieceIndex) && (pieceIndex <= file->lastPiece))
+        if (tr_cpFileIsComplete (&tor->completion, i))
+          tr_torrentFileCompleted (tor, i);
+    }
+}
+
+void
+tr_torrentGotBlock (tr_torrent * tor, tr_block_index_t block)
+{
+  const bool block_is_new = !tr_cpBlockIsComplete (&tor->completion, block);
+
+  if (block_is_new)
+    {
+      tr_piece_index_t p;
+
+      tr_cpBlockAdd (&tor->completion, block);
+      tr_torrentSetDirty (tor);
+
+      p = tr_torBlockPiece (tor, block);
+      if (tr_cpPieceIsComplete (&tor->completion, p))
+        {
+          tr_logAddTorDbg (tor, "[LAZY] checking just-completed piece %zu", (size_t)p);
+
+          if (tr_torrentCheckPiece (tor, p))
+            {
+              tr_torrentPieceCompleted (tor, p);
+            }
+          else
+            {
+              const uint32_t n = tr_torPieceCountBytes (tor, p);
+              tr_logAddTorErr (tor, _("Piece %"PRIu32", which was just downloaded, failed its checksum test"), p);
+              tor->corruptCur += n;
+              tor->downloadedCur -= MIN (tor->downloadedCur, n);
+              tr_peerMgrGotBadPiece (tor, p);
+            }
+        }
+    }
+  else
+    {
+      const uint32_t n = tr_torBlockCountBytes (tor, block);
+      tor->downloadedCur -= MIN (tor->downloadedCur, n);
+      tr_logAddTorDbg (tor, "we have this block already...");
     }
 }
 
