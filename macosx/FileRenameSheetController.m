@@ -12,7 +12,12 @@
 
 typedef void (^CompletionBlock)(BOOL);
 
-@interface FileRenameSheetController ()
+@interface FileRenameSheetController () {
+    #warning remove when 64-it
+    Torrent * _torrent;
+    FileListNode * _node;
+    CompletionBlock _completionHandler;
+}
 
 @property (nonatomic, retain) Torrent * torrent;
 @property (nonatomic, retain) FileListNode * node;
@@ -42,7 +47,6 @@ typedef void (^CompletionBlock)(BOOL);
 
 + (void) presentSheetForFileListNode: (FileListNode *) node modalForWindow: (NSWindow *) window completionHandler: (void (^)(BOOL didRename)) completionHandler
 {
-    
     NSParameterAssert(node != nil);
     NSParameterAssert(window != nil);
     
