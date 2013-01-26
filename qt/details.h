@@ -42,121 +42,121 @@ class TrackerModelFilter;
 
 class Details: public QDialog
 {
-        Q_OBJECT
+    Q_OBJECT
 
-    private:
-        void getNewData( );
+  private:
+    void getNewData ();
 
-    private slots:
-        void onTorrentChanged( );
-        void onTorrentFileListRebuilt( );
-        void onTimer( );
+  private slots:
+    void onTorrentChanged ();
+    void onTorrentFileListRebuilt ();
+    void onTimer ();
 
-    public:
-        Details( Session&, Prefs&, TorrentModel&, QWidget * parent = 0 );
-        ~Details( );
-        void setIds( const QSet<int>& ids );
+  public:
+    Details (Session&, Prefs&, TorrentModel&, QWidget * parent = 0);
+    ~Details ();
+    void setIds (const QSet<int>& ids);
 
-    private:
-        QWidget * createPeersTab( );
-        QWidget * createTrackerTab( );
-        QWidget * createInfoTab( );
-        QWidget * createFilesTab( );
-        QWidget * createOptionsTab( );
+  private:
+    QWidget * createPeersTab ();
+    QWidget * createTrackerTab ();
+    QWidget * createInfoTab ();
+    QWidget * createFilesTab ();
+    QWidget * createOptionsTab ();
 
-    private:
-        QIcon getStockIcon( const QString& freedesktop_name, int fallback );
-        QString timeToStringRounded( int seconds );
-        QString trimToDesiredWidth( const QString& str );
-        void enableWhenChecked( QCheckBox *, QWidget * );
+  private:
+    QIcon getStockIcon (const QString& freedesktop_name, int fallback);
+    QString timeToStringRounded (int seconds);
+    QString trimToDesiredWidth (const QString& str);
+    void enableWhenChecked (QCheckBox *, QWidget *);
 
-    private:
-        Session& mySession;
-        Prefs& myPrefs;
-        TorrentModel& myModel;
-        QSet<int> myIds;
-        QTimer myTimer;
-        bool myChangedTorrents;
-        bool myHavePendingRefresh;
+  private:
+    Session& mySession;
+    Prefs& myPrefs;
+    TorrentModel& myModel;
+    QSet<int> myIds;
+    QTimer myTimer;
+    bool myChangedTorrents;
+    bool myHavePendingRefresh;
 
-        QLabel * myStateLabel;
-        QLabel * myHaveLabel;
-        QLabel * myAvailabilityLabel;
-        QLabel * myDownloadedLabel;
-        QLabel * myUploadedLabel;
-        QLabel * myErrorLabel;
-        QLabel * myRunTimeLabel;
-        QLabel * myETALabel;
-        QLabel * myLastActivityLabel;
+    QLabel * myStateLabel;
+    QLabel * myHaveLabel;
+    QLabel * myAvailabilityLabel;
+    QLabel * myDownloadedLabel;
+    QLabel * myUploadedLabel;
+    QLabel * myErrorLabel;
+    QLabel * myRunTimeLabel;
+    QLabel * myETALabel;
+    QLabel * myLastActivityLabel;
 
-        QCheckBox * mySessionLimitCheck;
-        QCheckBox * mySingleDownCheck;
-        QCheckBox * mySingleUpCheck;
-        QCheckBox * myShowTrackerScrapesCheck;
-        QCheckBox * myShowBackupTrackersCheck;
-        QPushButton * myAddTrackerButton;
-        QPushButton * myEditTrackerButton;
-        QPushButton * myRemoveTrackerButton;
-        QSpinBox * mySingleDownSpin;
-        QSpinBox * mySingleUpSpin;
-        QComboBox * myRatioCombo;
-        QDoubleSpinBox * myRatioSpin;
-        QComboBox * myIdleCombo;
-        QSpinBox * myIdleSpin;
-        QSpinBox * myPeerLimitSpin;
-        QComboBox * myBandwidthPriorityCombo;
+    QCheckBox * mySessionLimitCheck;
+    QCheckBox * mySingleDownCheck;
+    QCheckBox * mySingleUpCheck;
+    QCheckBox * myShowTrackerScrapesCheck;
+    QCheckBox * myShowBackupTrackersCheck;
+    QPushButton * myAddTrackerButton;
+    QPushButton * myEditTrackerButton;
+    QPushButton * myRemoveTrackerButton;
+    QSpinBox * mySingleDownSpin;
+    QSpinBox * mySingleUpSpin;
+    QComboBox * myRatioCombo;
+    QDoubleSpinBox * myRatioSpin;
+    QComboBox * myIdleCombo;
+    QSpinBox * myIdleSpin;
+    QSpinBox * myPeerLimitSpin;
+    QComboBox * myBandwidthPriorityCombo;
 
-        QLabel * mySizeLabel;
-        QLabel * myHashLabel;
-        QLabel * myPrivacyLabel;
-        QLabel * myOriginLabel;
-        QLabel * myLocationLabel;
-        QTextBrowser * myCommentBrowser;
+    QLabel * mySizeLabel;
+    QLabel * myHashLabel;
+    QLabel * myPrivacyLabel;
+    QLabel * myOriginLabel;
+    QLabel * myLocationLabel;
+    QTextBrowser * myCommentBrowser;
 
-        QLabel * myTrackerLabel;
-        QLabel * myScrapeTimePrevLabel;
-        QLabel * myScrapeTimeNextLabel;
-        QLabel * myScrapeResponseLabel;
-        QLabel * myAnnounceTimePrevLabel;
-        QLabel * myAnnounceTimeNextLabel;
-        QLabel * myAnnounceResponseLabel;
-        QLabel * myAnnounceManualLabel;
+    QLabel * myTrackerLabel;
+    QLabel * myScrapeTimePrevLabel;
+    QLabel * myScrapeTimeNextLabel;
+    QLabel * myScrapeResponseLabel;
+    QLabel * myAnnounceTimePrevLabel;
+    QLabel * myAnnounceTimeNextLabel;
+    QLabel * myAnnounceResponseLabel;
+    QLabel * myAnnounceManualLabel;
 
-        TrackerModel * myTrackerModel;
-        TrackerModelFilter * myTrackerFilter;
-        TrackerDelegate * myTrackerDelegate;
-        QTreeView * myTrackerView;
-        //QMap<QString,QTreeWidgetItem*> myTrackerTiers;
-        //QMap<QString,QTreeWidgetItem*> myTrackerItems;
+    TrackerModel * myTrackerModel;
+    TrackerModelFilter * myTrackerFilter;
+    TrackerDelegate * myTrackerDelegate;
+    QTreeView * myTrackerView;
+    //QMap<QString,QTreeWidgetItem*> myTrackerTiers;
+    //QMap<QString,QTreeWidgetItem*> myTrackerItems;
 
-        QTreeWidget * myPeerTree;
-        QMap<QString,QTreeWidgetItem*> myPeers;
+    QTreeWidget * myPeerTree;
+    QMap<QString,QTreeWidgetItem*> myPeers;
 
-        QWidgetList myWidgets;
+    QWidgetList myWidgets;
 
-        FileTreeView * myFileTreeView;
+    FileTreeView * myFileTreeView;
 
-        bool myFilesDirty;
+    bool myFilesDirty;
 
-    private slots:
-        void refreshPref( int key );
-        void onBandwidthPriorityChanged( int );
-        void onFilePriorityChanged( const QSet<int>& fileIndices, int );
-        void onFileWantedChanged( const QSet<int>& fileIndices, bool );
-        void onPathEdited (const QString& oldpath, const QString& newname);
-        void onHonorsSessionLimitsToggled( bool );
-        void onDownloadLimitedToggled( bool );
-        void onSpinBoxEditingFinished( );
-        void onUploadLimitedToggled( bool );
-        void onRatioModeChanged( int );
-        void onIdleModeChanged( int );
-        void onShowTrackerScrapesToggled( bool );
-        void onShowBackupTrackersToggled( bool );
-        void onTrackerSelectionChanged( );
-        void onAddTrackerClicked( );
-        void onEditTrackerClicked( );
-        void onRemoveTrackerClicked( );
-        void refresh( );
+  private slots:
+    void refreshPref (int key);
+    void onBandwidthPriorityChanged (int);
+    void onFilePriorityChanged (const QSet<int>& fileIndices, int);
+    void onFileWantedChanged (const QSet<int>& fileIndices, bool);
+    void onPathEdited (const QString& oldpath, const QString& newname);
+    void onHonorsSessionLimitsToggled (bool);
+    void onDownloadLimitedToggled (bool);
+    void onSpinBoxEditingFinished ();
+    void onUploadLimitedToggled (bool);
+    void onRatioModeChanged (int);
+    void onIdleModeChanged (int);
+    void onShowTrackerScrapesToggled (bool);
+    void onShowBackupTrackersToggled (bool);
+    void onTrackerSelectionChanged ();
+    void onAddTrackerClicked ();
+    void onEditTrackerClicked ();
+    void onRemoveTrackerClicked ();
+    void refresh ();
 };
 
 #endif

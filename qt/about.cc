@@ -28,67 +28,68 @@
 #include "hig.h"
 #include "license.h"
 
-AboutDialog :: AboutDialog( QWidget * parent ):
-    QDialog( parent, Qt::Dialog ),
-    myLicenseDialog( new LicenseDialog( this ) )
+AboutDialog :: AboutDialog (QWidget * parent):
+  QDialog (parent, Qt::Dialog),
+  myLicenseDialog (new LicenseDialog (this))
 {
-    setWindowTitle( tr( "About Transmission" ) );
-    QLabel * l;
-    QVBoxLayout * v = new QVBoxLayout( this );
+  setWindowTitle (tr ("About Transmission"));
+  QLabel * l;
+  QVBoxLayout * v = new QVBoxLayout (this);
 
-    l = new QLabel;
-    l->setPixmap( QPixmap( QString::fromAscii( ":/icons/transmission-48.png" ) ) );
-    l->setAlignment( Qt::AlignCenter );
-    v->addWidget( l );
+  l = new QLabel;
+  l->setPixmap (QPixmap (QString::fromAscii (":/icons/transmission-48.png")));
+  l->setAlignment (Qt::AlignCenter);
+  v->addWidget (l);
 
-    QFont f( font( ) );
-    f.setWeight( QFont::Bold );
-    f.setPointSize( int( f.pointSize( ) * 1.2 ) );
-    l = new QLabel( tr( "<big>Transmission %1</big>" ).arg( QString::fromAscii( LONG_VERSION_STRING ) ) );
-    l->setAlignment( Qt::AlignCenter );
-    l->setFont( f );
-    l->setMargin( 8 );
-    v->addWidget( l );
+  QFont f (font ());
+  f.setWeight (QFont::Bold);
+  f.setPointSize (int (f.pointSize () * 1.2));
+  l = new QLabel (tr ("<big>Transmission %1</big>").arg (QString::fromAscii (LONG_VERSION_STRING)));
+  l->setAlignment (Qt::AlignCenter);
+  l->setFont (f);
+  l->setMargin (8);
+  v->addWidget (l);
 
-    l = new QLabel( tr( "A fast and easy BitTorrent client" ) );
-    l->setStyleSheet( QString::fromAscii( "text-align: center" ) );
-    l->setAlignment( Qt::AlignCenter );
-    v->addWidget( l );
+  l = new QLabel (tr ("A fast and easy BitTorrent client"));
+  l->setStyleSheet (QString::fromAscii ("text-align: center"));
+  l->setAlignment (Qt::AlignCenter);
+  v->addWidget (l);
 
-    l = new QLabel( tr( "Copyright (c) The Transmission Project" ) );
-    l->setAlignment( Qt::AlignCenter );
-    v->addWidget( l );
+  l = new QLabel (tr ("Copyright (c) The Transmission Project"));
+  l->setAlignment (Qt::AlignCenter);
+  v->addWidget (l);
 
-    l = new QLabel( QString::fromAscii( "<a href=\"http://www.transmissionbt.com/\">http://www.transmissionbt.com/</a>" ) );
-    l->setOpenExternalLinks( true );
-    l->setAlignment( Qt::AlignCenter );
-    v->addWidget( l );
+  l = new QLabel (QString::fromAscii ("<a href=\"http://www.transmissionbt.com/\">http://www.transmissionbt.com/</a>"));
+  l->setOpenExternalLinks (true);
+  l->setAlignment (Qt::AlignCenter);
+  v->addWidget (l);
 
-    v->addSpacing( HIG::PAD_BIG );
+  v->addSpacing (HIG::PAD_BIG);
 
-    QPushButton * b;
-    QDialogButtonBox * box = new QDialogButtonBox;
+  QPushButton * b;
+  QDialogButtonBox * box = new QDialogButtonBox;
 
-    b = new QPushButton( tr( "C&redits" ), this );
-    box->addButton( b, QDialogButtonBox::ActionRole );
-    connect( b, SIGNAL(clicked()), this, SLOT(showCredits()) );
+  b = new QPushButton (tr ("C&redits"), this);
+  box->addButton (b, QDialogButtonBox::ActionRole);
+  connect (b, SIGNAL (clicked ()), this, SLOT (showCredits ()));
 
-    b = new QPushButton( tr( "&License" ), this );
-    box->addButton( b, QDialogButtonBox::ActionRole );
-    connect( b, SIGNAL(clicked()), myLicenseDialog, SLOT(show()) );
+  b = new QPushButton (tr ("&License"), this);
+  box->addButton (b, QDialogButtonBox::ActionRole);
+  connect (b, SIGNAL (clicked ()), myLicenseDialog, SLOT (show ()));
 
-    box->addButton( QDialogButtonBox::Close );
-    box->setCenterButtons( true );
-    v->addWidget( box );
-    connect( box, SIGNAL(rejected()), this, SLOT(hide()) );
+  box->addButton (QDialogButtonBox::Close);
+  box->setCenterButtons (true);
+  v->addWidget (box);
+  connect (box, SIGNAL (rejected ()), this, SLOT (hide ()));
 }
 
 void
-AboutDialog :: showCredits( )
+AboutDialog :: showCredits ()
 {
-    QMessageBox::about( this, tr( "Credits" ),
-        QString::fromAscii( "Jordan Lee (Backend; Daemon; GTK+; Qt)\n"
-                            "Michell Livingston (Backend; OS X)\n"
-                            "Kevin Glowacz (Web client)" ) );
+  QMessageBox::about (
+    this,
+    tr ("Credits"),
+    QString::fromAscii ("Jordan Lee (Backend; Daemon; GTK+; Qt)\n"
+                        "Michell Livingston (OS X)\n"));
 }
 

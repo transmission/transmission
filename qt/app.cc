@@ -45,276 +45,285 @@
 
 namespace
 {
-    const QString DBUS_SERVICE     = QString::fromAscii( "com.transmissionbt.Transmission"  );
-    const QString DBUS_OBJECT_PATH = QString::fromAscii( "/com/transmissionbt/Transmission" );
-    const QString DBUS_INTERFACE   = QString::fromAscii( "com.transmissionbt.Transmission"  );
+  const QString DBUS_SERVICE     = QString::fromAscii ("com.transmissionbt.Transmission" );
+  const QString DBUS_OBJECT_PATH = QString::fromAscii ("/com/transmissionbt/Transmission");
+  const QString DBUS_INTERFACE   = QString::fromAscii ("com.transmissionbt.Transmission" );
 
-    const char * MY_READABLE_NAME( "transmission-qt" );
+  const char * MY_READABLE_NAME ("transmission-qt");
 
-    const tr_option opts[] =
-    {
-        { 'g', "config-dir", "Where to look for configuration files", "g", 1, "<path>" },
-        { 'm', "minimized",  "Start minimized in system tray", "m", 0, NULL },
-        { 'p', "port",  "Port to use when connecting to an existing session", "p", 1, "<port>" },
-        { 'r', "remote",  "Connect to an existing session at the specified hostname", "r", 1, "<host>" },
-        { 'u', "username", "Username to use when connecting to an existing session", "u", 1, "<username>" },
-        { 'v', "version", "Show version number and exit", "v", 0, NULL },
-        { 'w', "password", "Password to use when connecting to an existing session", "w", 1, "<password>" },
-        { 0, NULL, NULL, NULL, 0, NULL }
-    };
+  const tr_option opts[] =
+  {
+    { 'g', "config-dir", "Where to look for configuration files", "g", 1, "<path>" },
+    { 'm', "minimized",  "Start minimized in system tray", "m", 0, NULL },
+    { 'p', "port",  "Port to use when connecting to an existing session", "p", 1, "<port>" },
+    { 'r', "remote",  "Connect to an existing session at the specified hostname", "r", 1, "<host>" },
+    { 'u', "username", "Username to use when connecting to an existing session", "u", 1, "<username>" },
+    { 'v', "version", "Show version number and exit", "v", 0, NULL },
+    { 'w', "password", "Password to use when connecting to an existing session", "w", 1, "<password>" },
+    { 0, NULL, NULL, NULL, 0, NULL }
+  };
 
-    const char*
-    getUsage( void )
-    {
-        return "Usage:\n"
-               "  transmission [OPTIONS...] [torrent files]";
-    }
+  const char*
+  getUsage (void)
+  {
+    return "Usage:\n"
+           "  transmission [OPTIONS...] [torrent files]";
+  }
 
-    void
-    showUsage( void )
-    {
-        tr_getopt_usage( MY_READABLE_NAME, getUsage( ), opts );
-        exit( 0 );
-    }
+  void
+  showUsage (void)
+  {
+    tr_getopt_usage (MY_READABLE_NAME, getUsage (), opts);
+    exit (0);
+  }
 
-    enum
-    {
-        STATS_REFRESH_INTERVAL_MSEC = 3000,
-        SESSION_REFRESH_INTERVAL_MSEC = 3000,
-        MODEL_REFRESH_INTERVAL_MSEC = 3000
-    };
+  enum
+  {
+    STATS_REFRESH_INTERVAL_MSEC   = 3000,
+    SESSION_REFRESH_INTERVAL_MSEC = 3000,
+    MODEL_REFRESH_INTERVAL_MSEC   = 3000
+  };
 }
 
-MyApp :: MyApp( int& argc, char ** argv ):
-    QApplication( argc, argv ),
-    myLastFullUpdateTime( 0 )
+MyApp :: MyApp (int& argc, char ** argv):
+  QApplication (argc, argv),
+  myLastFullUpdateTime (0)
 {
-    const QString MY_CONFIG_NAME = QString::fromAscii( "transmission" );
+  const QString MY_CONFIG_NAME = QString::fromAscii ("transmission");
 
-    setApplicationName( MY_CONFIG_NAME );
+  setApplicationName (MY_CONFIG_NAME);
 
-    // install the qt translator
-    qtTranslator.load( "qt_" + QLocale::system().name(), QLibraryInfo::location(QLibraryInfo::TranslationsPath));
-    installTranslator( &qtTranslator );
+  // install the qt translator
+  qtTranslator.load ("qt_" + QLocale::system ().name (), QLibraryInfo::location (QLibraryInfo::TranslationsPath));
+  installTranslator (&qtTranslator);
 
-    // install the transmission translator
-    appTranslator.load( QString(MY_CONFIG_NAME) + "_" + QLocale::system().name(), QCoreApplication::applicationDirPath() + "/translations" );
-    installTranslator( &appTranslator );
+  // install the transmission translator
+  appTranslator.load (QString (MY_CONFIG_NAME) + "_" + QLocale::system ().name (), QCoreApplication::applicationDirPath () + "/translations");
+  installTranslator (&appTranslator);
 
-    Formatter::initUnits( );
+  Formatter::initUnits ();
 
-    // set the default icon
-    QIcon icon;
-    QList<int> sizes;
-    sizes << 16 << 22 << 24 << 32 << 48 << 64 << 72 << 96 << 128 << 192 << 256;
-    foreach( int size, sizes )
-        icon.addPixmap( QPixmap( QString::fromAscii(":/icons/transmission-%1.png" ).arg(size) ) );
-    setWindowIcon( icon );
+  // set the default icon
+  QIcon icon;
+  QList<int> sizes;
+  sizes << 16 << 22 << 24 << 32 << 48 << 64 << 72 << 96 << 128 << 192 << 256;
+  foreach (int size, sizes)
+    icon.addPixmap (QPixmap (QString::fromAscii (":/icons/transmission-%1.png").arg (size)));
+  setWindowIcon (icon);
 
-    // parse the command-line arguments
-    int c;
-    bool minimized = false;
-    const char * optarg;
-    const char * host = 0;
-    const char * port = 0;
-    const char * username = 0;
-    const char * password = 0;
-    const char * configDir = 0;
-    QStringList filenames;
-    while( ( c = tr_getopt( getUsage( ), argc, (const char**)argv, opts, &optarg ) ) ) {
-        switch( c ) {
-            case 'g': configDir = optarg; break;
-            case 'p': port = optarg; break;
-            case 'r': host = optarg; break;
-            case 'u': username = optarg; break;
-            case 'w': password = optarg; break;
-            case 'm': minimized = true; break;
-            case 'v': std::cerr << MY_READABLE_NAME << ' ' << LONG_VERSION_STRING << std::endl; ::exit( 0 ); break;
-            case TR_OPT_ERR: Utils::toStderr( QObject::tr( "Invalid option" ) ); showUsage( ); break;
-            default:         filenames.append( optarg ); break;
+  // parse the command-line arguments
+  int c;
+  bool minimized = false;
+  const char * optarg;
+  const char * host = 0;
+  const char * port = 0;
+  const char * username = 0;
+  const char * password = 0;
+  const char * configDir = 0;
+  QStringList filenames;
+  while ((c = tr_getopt (getUsage(), argc, (const char**)argv, opts, &optarg)))
+    {
+      switch (c)
+        {
+          case 'g': configDir = optarg; break;
+          case 'p': port = optarg; break;
+          case 'r': host = optarg; break;
+          case 'u': username = optarg; break;
+          case 'w': password = optarg; break;
+          case 'm': minimized = true; break;
+          case 'v': std::cerr << MY_READABLE_NAME << ' ' << LONG_VERSION_STRING << std::endl; ::exit (0); break;
+          case TR_OPT_ERR: Utils::toStderr (QObject::tr ("Invalid option")); showUsage (); break;
+          default:         filenames.append (optarg); break;
         }
     }
 
-    // set the fallback config dir
-    if( configDir == 0 )
-        configDir = tr_getDefaultConfigDir( "transmission" );
+  // set the fallback config dir
+  if (configDir == 0)
+    configDir = tr_getDefaultConfigDir ("transmission");
 
-    // ensure our config directory exists
-    QDir dir( configDir );
-    if( !dir.exists() )
-        dir.mkpath( configDir );
+  // ensure our config directory exists
+  QDir dir (configDir);
+  if (!dir.exists ())
+    dir.mkpath (configDir);
 
-    // is this the first time we've run transmission?
-    const bool firstTime = !QFile(QDir(configDir).absoluteFilePath("settings.json")).exists();
+  // is this the first time we've run transmission?
+  const bool firstTime = !QFile (QDir (configDir).absoluteFilePath ("settings.json")).exists ();
 
-    // initialize the prefs
-    myPrefs = new Prefs ( configDir );
-    if( host != 0 )
-        myPrefs->set( Prefs::SESSION_REMOTE_HOST, host );
-    if( port != 0 )
-        myPrefs->set( Prefs::SESSION_REMOTE_PORT, port );
-    if( username != 0 )
-        myPrefs->set( Prefs::SESSION_REMOTE_USERNAME, username );
-    if( password != 0 )
-        myPrefs->set( Prefs::SESSION_REMOTE_PASSWORD, password );
-    if( ( host != 0 ) || ( port != 0 ) || ( username != 0 ) || ( password != 0 ) )
-        myPrefs->set( Prefs::SESSION_IS_REMOTE, true );
-    if ( myPrefs->getBool( Prefs::START_MINIMIZED) )
-        minimized = true;
+  // initialize the prefs
+  myPrefs = new Prefs (configDir);
+  if (host != 0)
+    myPrefs->set (Prefs::SESSION_REMOTE_HOST, host);
+  if (port != 0)
+    myPrefs->set (Prefs::SESSION_REMOTE_PORT, port);
+  if (username != 0)
+    myPrefs->set (Prefs::SESSION_REMOTE_USERNAME, username);
+  if (password != 0)
+    myPrefs->set (Prefs::SESSION_REMOTE_PASSWORD, password);
+  if ((host != 0) || (port != 0) || (username != 0) || (password != 0))
+    myPrefs->set (Prefs::SESSION_IS_REMOTE, true);
+  if (myPrefs->getBool (Prefs::START_MINIMIZED))
+    minimized = true;
 
-    // start as minimized only if the system tray present
-    if ( !myPrefs->getBool( Prefs::SHOW_TRAY_ICON ) )
-      minimized = false;
+  // start as minimized only if the system tray present
+  if (!myPrefs->getBool (Prefs::SHOW_TRAY_ICON))
+    minimized = false;
 
-    mySession = new Session( configDir, *myPrefs );
-    myModel = new TorrentModel( *myPrefs );
-    myWindow = new TrMainWindow( *mySession, *myPrefs, *myModel, minimized );
-    myWatchDir = new WatchDir( *myModel );
+  mySession = new Session (configDir, *myPrefs);
+  myModel = new TorrentModel (*myPrefs);
+  myWindow = new TrMainWindow (*mySession, *myPrefs, *myModel, minimized);
+  myWatchDir = new WatchDir (*myModel);
 
-    // when the session gets torrent info, update the model
-    connect( mySession, SIGNAL(torrentsUpdated(tr_variant*,bool)), myModel, SLOT(updateTorrents(tr_variant*,bool)) );
-    connect( mySession, SIGNAL(torrentsUpdated(tr_variant*,bool)), myWindow, SLOT(refreshActionSensitivity()) );
-    connect( mySession, SIGNAL(torrentsRemoved(tr_variant*)), myModel, SLOT(removeTorrents(tr_variant*)) );
-    // when the session source gets changed, request a full refresh
-    connect( mySession, SIGNAL(sourceChanged()), this, SLOT(onSessionSourceChanged()) );
-    // when the model sees a torrent for the first time, ask the session for full info on it
-    connect( myModel, SIGNAL(torrentsAdded(QSet<int>)), mySession, SLOT(initTorrents(QSet<int>)) );
-    connect( myModel, SIGNAL(torrentsAdded(QSet<int>)), this, SLOT(onTorrentsAdded(QSet<int>)) );
+  // when the session gets torrent info, update the model
+  connect (mySession, SIGNAL (torrentsUpdated (tr_variant*,bool)), myModel, SLOT (updateTorrents (tr_variant*,bool)));
+  connect (mySession, SIGNAL (torrentsUpdated (tr_variant*,bool)), myWindow, SLOT (refreshActionSensitivity ()));
+  connect (mySession, SIGNAL (torrentsRemoved (tr_variant*)), myModel, SLOT (removeTorrents (tr_variant*)));
+  // when the session source gets changed, request a full refresh
+  connect (mySession, SIGNAL (sourceChanged ()), this, SLOT (onSessionSourceChanged ()));
+  // when the model sees a torrent for the first time, ask the session for full info on it
+  connect (myModel, SIGNAL (torrentsAdded (QSet<int>)), mySession, SLOT (initTorrents (QSet<int>)));
+  connect (myModel, SIGNAL (torrentsAdded (QSet<int>)), this, SLOT (onTorrentsAdded (QSet<int>)));
 
-    mySession->initTorrents( );
-    mySession->refreshSessionStats( );
+  mySession->initTorrents ();
+  mySession->refreshSessionStats ();
 
-    // when torrents are added to the watch directory, tell the session
-    connect( myWatchDir, SIGNAL(torrentFileAdded(QString)), this, SLOT(addTorrent(QString)) );
+  // when torrents are added to the watch directory, tell the session
+  connect (myWatchDir, SIGNAL (torrentFileAdded (QString)), this, SLOT (addTorrent (QString)));
 
-    // init from preferences
-    QList<int> initKeys;
-    initKeys << Prefs::DIR_WATCH;
-    foreach( int key, initKeys )
-        refreshPref( key );
-    connect( myPrefs, SIGNAL(changed(int)), this, SLOT(refreshPref(const int)) );
+  // init from preferences
+  QList<int> initKeys;
+  initKeys << Prefs::DIR_WATCH;
+  foreach (int key, initKeys)
+    refreshPref (key);
+  connect (myPrefs, SIGNAL (changed (int)), this, SLOT (refreshPref (const int)));
 
-    QTimer * timer = &myModelTimer;
-    connect( timer, SIGNAL(timeout()), this, SLOT(refreshTorrents()) );
-    timer->setSingleShot( false );
-    timer->setInterval( MODEL_REFRESH_INTERVAL_MSEC );
-    timer->start( );
+  QTimer * timer = &myModelTimer;
+  connect (timer, SIGNAL (timeout ()), this, SLOT (refreshTorrents ()));
+  timer->setSingleShot (false);
+  timer->setInterval (MODEL_REFRESH_INTERVAL_MSEC);
+  timer->start ();
 
-    timer = &myStatsTimer;
-    connect( timer, SIGNAL(timeout()), mySession, SLOT(refreshSessionStats()) );
-    timer->setSingleShot( false );
-    timer->setInterval( STATS_REFRESH_INTERVAL_MSEC );
-    timer->start( );
+  timer = &myStatsTimer;
+  connect (timer, SIGNAL (timeout ()), mySession, SLOT (refreshSessionStats ()));
+  timer->setSingleShot (false);
+  timer->setInterval (STATS_REFRESH_INTERVAL_MSEC);
+  timer->start ();
 
-    timer = &mySessionTimer;
-    connect( timer, SIGNAL(timeout()), mySession, SLOT(refreshSessionInfo()) );
-    timer->setSingleShot( false );
-    timer->setInterval( SESSION_REFRESH_INTERVAL_MSEC );
-    timer->start( );
+  timer = &mySessionTimer;
+  connect (timer, SIGNAL (timeout ()), mySession, SLOT (refreshSessionInfo ()));
+  timer->setSingleShot (false);
+  timer->setInterval (SESSION_REFRESH_INTERVAL_MSEC);
+  timer->start ();
 
-    maybeUpdateBlocklist( );
+  maybeUpdateBlocklist ();
 
-    if( !firstTime )
-        mySession->restart( );
-    else {
-        QDialog * d = new SessionDialog( *mySession, *myPrefs, myWindow );
-        d->show( );
-    }
-
-    if( !myPrefs->getBool( Prefs::USER_HAS_GIVEN_INFORMED_CONSENT ))
+  if (!firstTime)
     {
-        QDialog * dialog = new QDialog( myWindow );
-        dialog->setModal( true );
-        QVBoxLayout * v = new QVBoxLayout( dialog );
-        QLabel * l = new QLabel(tr("Transmission is a file sharing program. When you run a torrent, its data will be made available to others by means of upload. Any content you share is your sole responsibility."));
-        l->setWordWrap( true );
-        v->addWidget( l );
-        QDialogButtonBox * box = new QDialogButtonBox;
-        box->addButton( new QPushButton( tr( "&Cancel" ) ), QDialogButtonBox::RejectRole );
-        QPushButton * agree = new QPushButton( tr( "I &Agree" ) );
-        agree->setDefault( true );
-        box->addButton( agree, QDialogButtonBox::AcceptRole );
-        box->setSizePolicy( QSizePolicy::Expanding, QSizePolicy::Fixed );
-        box->setOrientation( Qt::Horizontal );
-        v->addWidget( box );
-        connect( box, SIGNAL(rejected()), this, SLOT(quit()) );
-        connect( box, SIGNAL(accepted()), dialog, SLOT(deleteLater()) );
-        connect( box, SIGNAL(accepted()), this, SLOT(consentGiven()) );
-        dialog->show();
+      mySession->restart ();
+    }
+  else
+    {
+      QDialog * d = new SessionDialog (*mySession, *myPrefs, myWindow);
+      d->show ();
     }
 
-    for( QStringList::const_iterator it=filenames.begin(), end=filenames.end(); it!=end; ++it )
-        addTorrent( *it );
+  if (!myPrefs->getBool (Prefs::USER_HAS_GIVEN_INFORMED_CONSENT))
+    {
+      QDialog * dialog = new QDialog (myWindow);
+      dialog->setModal (true);
+      QVBoxLayout * v = new QVBoxLayout (dialog);
+      QLabel * l = new QLabel (tr ("Transmission is a file sharing program. When you run a torrent, its data will be made available to others by means of upload. Any content you share is your sole responsibility."));
+      l->setWordWrap (true);
+      v->addWidget (l);
+      QDialogButtonBox * box = new QDialogButtonBox;
+      box->addButton (new QPushButton (tr ("&Cancel")), QDialogButtonBox::RejectRole);
+      QPushButton * agree = new QPushButton (tr ("I &Agree"));
+      agree->setDefault (true);
+      box->addButton (agree, QDialogButtonBox::AcceptRole);
+      box->setSizePolicy (QSizePolicy::Expanding, QSizePolicy::Fixed);
+      box->setOrientation (Qt::Horizontal);
+      v->addWidget (box);
+      connect (box, SIGNAL (rejected ()), this, SLOT (quit ()));
+      connect (box, SIGNAL (accepted ()), dialog, SLOT (deleteLater ()));
+      connect (box, SIGNAL (accepted ()), this, SLOT (consentGiven ()));
+      dialog->show ();
+    }
 
-    // register as the dbus handler for Transmission
-    new TrDBusAdaptor( this );
-    QDBusConnection bus = QDBusConnection::sessionBus();
-    if( !bus.registerService( DBUS_SERVICE ) )
-        std::cerr << "couldn't register " << qPrintable(DBUS_SERVICE) << std::endl;
-    if( !bus.registerObject( DBUS_OBJECT_PATH, this ) )
-        std::cerr << "couldn't register " << qPrintable(DBUS_OBJECT_PATH) << std::endl;
+  for (QStringList::const_iterator it=filenames.begin (), end=filenames.end (); it!=end; ++it)
+    addTorrent (*it);
+
+  // register as the dbus handler for Transmission
+  new TrDBusAdaptor (this);
+  QDBusConnection bus = QDBusConnection::sessionBus ();
+  if (!bus.registerService (DBUS_SERVICE))
+    std::cerr << "couldn't register " << qPrintable (DBUS_SERVICE) << std::endl;
+  if (!bus.registerObject (DBUS_OBJECT_PATH, this))
+    std::cerr << "couldn't register " << qPrintable (DBUS_OBJECT_PATH) << std::endl;
 }
 
 /* these functions are for popping up desktop notifications */
 
 void
-MyApp :: onTorrentsAdded( QSet<int> torrents )
+MyApp :: onTorrentsAdded (QSet<int> torrents)
 {
-    if( !myPrefs->getBool( Prefs::SHOW_NOTIFICATION_ON_ADD ) )
-        return;
+  if (!myPrefs->getBool (Prefs::SHOW_NOTIFICATION_ON_ADD))
+    return;
 
-    foreach( int id, torrents )
+  foreach (int id, torrents)
     {
-        Torrent * tor = myModel->getTorrentFromId( id );
+      Torrent * tor = myModel->getTorrentFromId (id);
 
-        if( tor->name().isEmpty( ) ) // wait until the torrent's INFO fields are loaded
-            connect( tor, SIGNAL(torrentChanged(int)), this, SLOT(onNewTorrentChanged(int)) );
-        else {
-            onNewTorrentChanged( id );
-            if( !tor->isSeed( ) )
-	        connect( tor, SIGNAL(torrentCompleted(int)), this, SLOT(onTorrentCompleted(int)) );
+      if (tor->name ().isEmpty ()) // wait until the torrent's INFO fields are loaded
+        {
+          connect (tor, SIGNAL (torrentChanged (int)), this, SLOT (onNewTorrentChanged (int)));
+        }
+      else
+        {
+          onNewTorrentChanged (id);
+
+          if (!tor->isSeed ())
+	    connect (tor, SIGNAL (torrentCompleted (int)), this, SLOT (onTorrentCompleted (int)));
         }
     }
 }
 
 void
-MyApp :: onTorrentCompleted( int id )
+MyApp :: onTorrentCompleted (int id)
 {
   Torrent * tor = myModel->getTorrentFromId (id);
 
   if (tor)
     {
       if (myPrefs->getBool (Prefs::SHOW_NOTIFICATION_ON_COMPLETE))
-        notify (tr("Torrent Completed"), tor->name());
+        notify (tr ("Torrent Completed"), tor->name ());
 
       if (myPrefs->getBool (Prefs::COMPLETE_SOUND_ENABLED))
         {
-#if defined( Q_OS_WIN ) || defined( Q_OS_MAC )
-          QApplication::beep();
+#if defined (Q_OS_WIN) || defined (Q_OS_MAC)
+          QApplication::beep ();
 #else
-          QProcess::execute (myPrefs->getString(Prefs::COMPLETE_SOUND_COMMAND));
+          QProcess::execute (myPrefs->getString (Prefs::COMPLETE_SOUND_COMMAND));
 #endif
         }
 
-      disconnect( tor, SIGNAL(torrentCompleted(int)), this, SLOT(onTorrentCompleted(int)) );
+      disconnect (tor, SIGNAL (torrentCompleted (int)), this, SLOT (onTorrentCompleted (int)));
     }
 }
 
 void
-MyApp :: onNewTorrentChanged( int id )
+MyApp :: onNewTorrentChanged (int id)
 {
-    Torrent * tor = myModel->getTorrentFromId( id );
+  Torrent * tor = myModel->getTorrentFromId (id);
 
-    if( tor && !tor->name().isEmpty() )
+  if (tor && !tor->name ().isEmpty ())
     {
-        const int age_secs = tor->dateAdded().secsTo(QDateTime::currentDateTime());
-        if( age_secs < 30 )
-            notify( tr( "Torrent Added" ), tor->name( ) );
+      const int age_secs = tor->dateAdded ().secsTo (QDateTime::currentDateTime ());
+      if (age_secs < 30)
+        notify (tr ("Torrent Added"), tor->name ());
 
-        disconnect( tor, SIGNAL(torrentChanged(int)), this, SLOT(onNewTorrentChanged(int)) );
+      disconnect (tor, SIGNAL (torrentChanged (int)), this, SLOT (onNewTorrentChanged (int)));
 
-        if( !tor->isSeed( ) )
-            connect( tor, SIGNAL(torrentCompleted(int)), this, SLOT(onTorrentCompleted(int)) );
+      if (!tor->isSeed ())
+        connect (tor, SIGNAL (torrentCompleted (int)), this, SLOT (onTorrentCompleted (int)));
     }
 }
 
@@ -323,24 +332,24 @@ MyApp :: onNewTorrentChanged( int id )
 ***/
 
 void
-MyApp :: consentGiven( )
+MyApp :: consentGiven ()
 {
-    myPrefs->set<bool>( Prefs::USER_HAS_GIVEN_INFORMED_CONSENT, true );
+  myPrefs->set<bool> (Prefs::USER_HAS_GIVEN_INFORMED_CONSENT, true);
 }
 
-MyApp :: ~MyApp( )
+MyApp :: ~MyApp ()
 {
-    const QRect mainwinRect( myWindow->geometry( ) );
-    delete myWatchDir;
-    delete myWindow;
-    delete myModel;
-    delete mySession;
+  const QRect mainwinRect (myWindow->geometry ());
+  delete myWatchDir;
+  delete myWindow;
+  delete myModel;
+  delete mySession;
 
-    myPrefs->set( Prefs :: MAIN_WINDOW_HEIGHT, std::max( 100, mainwinRect.height( ) ) );
-    myPrefs->set( Prefs :: MAIN_WINDOW_WIDTH, std::max( 100, mainwinRect.width( ) ) );
-    myPrefs->set( Prefs :: MAIN_WINDOW_X, mainwinRect.x( ) );
-    myPrefs->set( Prefs :: MAIN_WINDOW_Y, mainwinRect.y( ) );
-    delete myPrefs;
+  myPrefs->set (Prefs :: MAIN_WINDOW_HEIGHT, std::max (100, mainwinRect.height ()));
+  myPrefs->set (Prefs :: MAIN_WINDOW_WIDTH, std::max (100, mainwinRect.width ()));
+  myPrefs->set (Prefs :: MAIN_WINDOW_X, mainwinRect.x ());
+  myPrefs->set (Prefs :: MAIN_WINDOW_Y, mainwinRect.y ());
+  delete myPrefs;
 }
 
 /***
@@ -348,63 +357,68 @@ MyApp :: ~MyApp( )
 ***/
 
 void
-MyApp :: refreshPref( int key )
+MyApp :: refreshPref (int key)
 {
-    switch( key )
+  switch (key)
     {
-        case Prefs :: BLOCKLIST_UPDATES_ENABLED:
-            maybeUpdateBlocklist( );
-            break;
+      case Prefs :: BLOCKLIST_UPDATES_ENABLED:
+        maybeUpdateBlocklist ();
+        break;
 
-        case Prefs :: DIR_WATCH:
-        case Prefs :: DIR_WATCH_ENABLED: {
-            const QString path( myPrefs->getString( Prefs::DIR_WATCH ) );
-            const bool isEnabled( myPrefs->getBool( Prefs::DIR_WATCH_ENABLED ) );
-            myWatchDir->setPath( path, isEnabled );
-            break;
+      case Prefs :: DIR_WATCH:
+      case Prefs :: DIR_WATCH_ENABLED:
+        {
+          const QString path (myPrefs->getString (Prefs::DIR_WATCH));
+          const bool isEnabled (myPrefs->getBool (Prefs::DIR_WATCH_ENABLED));
+          myWatchDir->setPath (path, isEnabled);
+          break;
         }
 
-        default:
-            break;
+      default:
+        break;
     }
 }
 
 void
-MyApp :: maybeUpdateBlocklist( )
+MyApp :: maybeUpdateBlocklist ()
 {
-    if( !myPrefs->getBool( Prefs :: BLOCKLIST_UPDATES_ENABLED ) )
-        return;
+  if (!myPrefs->getBool (Prefs :: BLOCKLIST_UPDATES_ENABLED))
+    return;
 
-     const QDateTime lastUpdatedAt = myPrefs->getDateTime( Prefs :: BLOCKLIST_DATE );
-     const QDateTime nextUpdateAt = lastUpdatedAt.addDays( 7 );
-     const QDateTime now = QDateTime::currentDateTime( );
-     if( now < nextUpdateAt )
-     {
-         mySession->updateBlocklist( );
-         myPrefs->set( Prefs :: BLOCKLIST_DATE, now );
-     }
+  const QDateTime lastUpdatedAt = myPrefs->getDateTime (Prefs :: BLOCKLIST_DATE);
+  const QDateTime nextUpdateAt = lastUpdatedAt.addDays (7);
+  const QDateTime now = QDateTime::currentDateTime ();
+
+  if (now < nextUpdateAt)
+    {
+      mySession->updateBlocklist ();
+      myPrefs->set (Prefs :: BLOCKLIST_DATE, now);
+    }
 }
 
 void
-MyApp :: onSessionSourceChanged( )
+MyApp :: onSessionSourceChanged ()
 {
-    mySession->initTorrents( );
-    mySession->refreshSessionStats( );
-    mySession->refreshSessionInfo( );
+  mySession->initTorrents ();
+  mySession->refreshSessionStats ();
+  mySession->refreshSessionInfo ();
 }
 
 void
-MyApp :: refreshTorrents( )
+MyApp :: refreshTorrents ()
 {
-    // usually we just poll the torrents that have shown recent activity,
-    // but we also periodically ask for updates on the others to ensure
-    // nothing's falling through the cracks.
-    const time_t now = time( NULL );
-    if( myLastFullUpdateTime + 60 >= now )
-        mySession->refreshActiveTorrents( );
-    else {
-        myLastFullUpdateTime = now;
-        mySession->refreshAllTorrents( );
+  // usually we just poll the torrents that have shown recent activity,
+  // but we also periodically ask for updates on the others to ensure
+  // nothing's falling through the cracks.
+  const time_t now = time (NULL);
+  if (myLastFullUpdateTime + 60 >= now)
+    {
+      mySession->refreshActiveTorrents ();
+    }
+  else
+    {
+      myLastFullUpdateTime = now;
+      mySession->refreshAllTorrents ();
     }
 }
 
@@ -413,36 +427,36 @@ MyApp :: refreshTorrents( )
 ***/
 
 void
-MyApp :: addTorrent( const QString& key )
+MyApp :: addTorrent (const QString& key)
 {
-    const AddData addme( key );
+  const AddData addme (key);
 
-    if( addme.type != addme.NONE )
-        addTorrent( addme );
+  if (addme.type != addme.NONE)
+    addTorrent (addme);
 }
 
 void
-MyApp :: addTorrent( const AddData& addme )
+MyApp :: addTorrent (const AddData& addme)
 {
-    if( !myPrefs->getBool( Prefs :: OPTIONS_PROMPT ) )
+  if (!myPrefs->getBool (Prefs :: OPTIONS_PROMPT))
     {
-        mySession->addTorrent( addme );
+      mySession->addTorrent (addme);
     }
-    else if( addme.type == addme.URL )
+  else if (addme.type == addme.URL)
     {
-        myWindow->openURL( addme.url.toString( ) );
+      myWindow->openURL (addme.url.toString ());
     }
-    else if( addme.type == addme.MAGNET )
+  else if (addme.type == addme.MAGNET)
     {
-        myWindow->openURL( addme.magnet );
+      myWindow->openURL (addme.magnet);
     }
-    else
+  else
     {
-        Options * o = new Options( *mySession, *myPrefs, addme, myWindow );
-        o->show( );
+      Options * o = new Options (*mySession, *myPrefs, addme, myWindow);
+      o->show ();
     }
 
-    raise( );
+  raise ();
 }
 
 /***
@@ -450,33 +464,33 @@ MyApp :: addTorrent( const AddData& addme )
 ***/
 
 void
-MyApp :: raise( )
+MyApp :: raise ()
 {
-    QApplication :: alert ( myWindow );
+  QApplication :: alert (myWindow);
 }
 
 bool
-MyApp :: notify( const QString& title, const QString& body ) const
+MyApp :: notify (const QString& title, const QString& body) const
 {
-    const QString dbusServiceName   = QString::fromAscii( "org.freedesktop.Notifications" );
-    const QString dbusInterfaceName = QString::fromAscii( "org.freedesktop.Notifications" );
-    const QString dbusPath          = QString::fromAscii( "/org/freedesktop/Notifications" );
+  const QString dbusServiceName   = QString::fromAscii ("org.freedesktop.Notifications");
+  const QString dbusInterfaceName = QString::fromAscii ("org.freedesktop.Notifications");
+  const QString dbusPath          = QString::fromAscii ("/org/freedesktop/Notifications");
 
-    QDBusMessage m = QDBusMessage::createMethodCall(dbusServiceName, dbusPath, dbusInterfaceName, QString::fromAscii("Notify"));
-    QList<QVariant> args;
-    args.append( QString::fromAscii( "Transmission" ) ); // app_name
-    args.append( 0U );                                   // replaces_id
-    args.append( QString::fromAscii( "transmission" ) ); // icon
-    args.append( title );                                // summary
-    args.append( body );                                 // body
-    args.append( QStringList( ) );                       // actions - unused for plain passive popups
-    args.append( QVariantMap( ) );                       // hints - unused atm
-    args.append( int32_t(-1) );                          // use the default timeout period
-    m.setArguments( args );
-    QDBusMessage replyMsg = QDBusConnection::sessionBus().call(m);
-    //std::cerr << qPrintable(replyMsg.errorName()) << std::endl;
-    //std::cerr << qPrintable(replyMsg.errorMessage()) << std::endl;
-    return (replyMsg.type() == QDBusMessage::ReplyMessage) && !replyMsg.arguments().isEmpty();
+  QDBusMessage m = QDBusMessage::createMethodCall (dbusServiceName, dbusPath, dbusInterfaceName, QString::fromAscii ("Notify"));
+  QList<QVariant> args;
+  args.append (QString::fromAscii ("Transmission")); // app_name
+  args.append (0U);                                   // replaces_id
+  args.append (QString::fromAscii ("transmission")); // icon
+  args.append (title);                                // summary
+  args.append (body);                                 // body
+  args.append (QStringList ());                       // actions - unused for plain passive popups
+  args.append (QVariantMap ());                       // hints - unused atm
+  args.append (int32_t (-1));                          // use the default timeout period
+  m.setArguments (args);
+  QDBusMessage replyMsg = QDBusConnection::sessionBus ().call (m);
+  //std::cerr << qPrintable (replyMsg.errorName ()) << std::endl;
+  //std::cerr << qPrintable (replyMsg.errorMessage ()) << std::endl;
+  return (replyMsg.type () == QDBusMessage::ReplyMessage) && !replyMsg.arguments ().isEmpty ();
 }
 
 /***
@@ -484,49 +498,50 @@ MyApp :: notify( const QString& title, const QString& body ) const
 ***/
 
 int
-main( int argc, char * argv[] )
+main (int argc, char * argv[])
 {
-    // find .torrents, URLs, magnet links, etc in the command-line args
-    int c;
-    QStringList addme;
-    const char * optarg;
-    char ** argvv = argv;
-    while( ( c = tr_getopt( getUsage( ), argc, (const char **)argvv, opts, &optarg ) ) )
-        if( c == TR_OPT_UNK )
-            addme.append( optarg );
+  // find .torrents, URLs, magnet links, etc in the command-line args
+  int c;
+  QStringList addme;
+  const char * optarg;
+  char ** argvv = argv;
+  while ( (c = tr_getopt (getUsage (), argc, (const char **)argvv, opts, &optarg)))
+    if (c == TR_OPT_UNK)
+      addme.append (optarg);
 
-    // try to delegate the work to an existing copy of Transmission
-    // before starting ourselves...
-    bool delegated = false;
-    QDBusConnection bus = QDBusConnection::sessionBus();
-    for( int i=0, n=addme.size(); i<n; ++i )
+  // try to delegate the work to an existing copy of Transmission
+  // before starting ourselves...
+  bool delegated = false;
+  QDBusConnection bus = QDBusConnection::sessionBus ();
+  for (int i=0, n=addme.size (); i<n; ++i)
     {
-        QDBusMessage request = QDBusMessage::createMethodCall( DBUS_SERVICE,
-                                                               DBUS_OBJECT_PATH,
-                                                               DBUS_INTERFACE,
-                                                               QString::fromAscii("AddMetainfo") );
-        QList<QVariant> arguments;
-        AddData a( addme[i] );
-        switch( a.type ) {
-            case AddData::URL:      arguments.push_back( a.url.toString( ) ); break;
-            case AddData::MAGNET:   arguments.push_back( a.magnet ); break;
-            case AddData::FILENAME: arguments.push_back( a.toBase64().constData() ); break;
-            case AddData::METAINFO: arguments.push_back( a.toBase64().constData() ); break;
-            default:                break;
+      QDBusMessage request = QDBusMessage::createMethodCall (DBUS_SERVICE,
+                                                             DBUS_OBJECT_PATH,
+                                                             DBUS_INTERFACE,
+                                                             QString::fromAscii ("AddMetainfo"));
+      QList<QVariant> arguments;
+      AddData a (addme[i]);
+      switch (a.type)
+        {
+          case AddData::URL:      arguments.push_back (a.url.toString ()); break;
+          case AddData::MAGNET:   arguments.push_back (a.magnet); break;
+          case AddData::FILENAME: arguments.push_back (a.toBase64 ().constData ()); break;
+          case AddData::METAINFO: arguments.push_back (a.toBase64 ().constData ()); break;
+          default:                break;
         }
-        request.setArguments( arguments );
+      request.setArguments (arguments);
 
-        QDBusMessage response = bus.call( request );
-        //std::cerr << qPrintable(response.errorName()) << std::endl;
-        //std::cerr << qPrintable(response.errorMessage()) << std::endl;
-        arguments = response.arguments( );
-        delegated |= (arguments.size()==1) && arguments[0].toBool();
+      QDBusMessage response = bus.call (request);
+      //std::cerr << qPrintable (response.errorName ()) << std::endl;
+      //std::cerr << qPrintable (response.errorMessage ()) << std::endl;
+      arguments = response.arguments ();
+      delegated |= (arguments.size ()==1) && arguments[0].toBool ();
     }
 
-    if( delegated )
-        return 0;
+  if (delegated)
+    return 0;
 
-    tr_optind = 1;
-    MyApp app( argc, argv );
-    return app.exec( );
+  tr_optind = 1;
+  MyApp app (argc, argv);
+  return app.exec ();
 }

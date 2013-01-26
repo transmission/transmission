@@ -17,20 +17,20 @@
 
 class AboutDialog: public QDialog
 {
-        Q_OBJECT
+    Q_OBJECT
 
-    private:
-        QDialog * myLicenseDialog;
+  private:
+    QDialog * myLicenseDialog;
 
-    public:
-        AboutDialog( QWidget * parent = 0 );
-        ~AboutDialog( ) { }
-        QWidget * createAboutTab( );
-        QWidget * createAuthorsTab( );
-        QWidget * createLicenseTab( );
+  public:
+    AboutDialog (QWidget * parent = 0);
+    ~AboutDialog () {}
+    QWidget * createAboutTab ();
+    QWidget * createAuthorsTab ();
+    QWidget * createLicenseTab ();
 
-    public slots:
-        void showCredits( );
+  public slots:
+    void showCredits ();
 
 };
 
