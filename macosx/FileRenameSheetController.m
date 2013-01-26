@@ -12,12 +12,7 @@
 
 typedef void (^CompletionBlock)(BOOL);
 
-@interface FileRenameSheetController () {
-    #warning remove when 64-it
-    Torrent * _torrent;
-    FileListNode * _node;
-    CompletionBlock _completionHandler;
-}
+@interface FileRenameSheetController ()
 
 @property (nonatomic, retain) Torrent * torrent;
 @property (nonatomic, retain) FileListNode * node;
@@ -31,6 +26,10 @@ typedef void (^CompletionBlock)(BOOL);
 @synthesize torrent = _torrent;
 @synthesize node = _node;
 @synthesize completionHandler = _completionHandler;
+@synthesize labelField = _labelField;
+@synthesize inputField = _inputField;
+@synthesize renameButton = _renameButton;
+@synthesize cancelButton = _cancelButton;
 
 + (void) presentSheetForTorrent: (Torrent *) torrent modalForWindow: (NSWindow *) window completionHandler: (void (^)(BOOL didRename)) completionHandler
 {

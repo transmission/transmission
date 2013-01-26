@@ -12,6 +12,16 @@
 @class Torrent;
 
 @interface FileRenameSheetController : NSWindowController
+{
+    Torrent * _torrent;
+    FileListNode * _node;
+    void (^_completionHandler)(BOOL);
+    
+    IBOutlet NSTextField * _labelField;
+    IBOutlet NSTextField * _inputField;
+    IBOutlet NSButton * _renameButton;
+    IBOutlet NSButton * _cancelButton;
+}
 
 + (void) presentSheetForTorrent: (Torrent *) torrent modalForWindow: (NSWindow *) window completionHandler: (void (^)(BOOL didRename)) completionHandler;
 + (void) presentSheetForFileListNode: (FileListNode *) node modalForWindow: (NSWindow *) window completionHandler: (void (^)(BOOL didRename)) completionHandler;
