@@ -562,17 +562,8 @@ typedef enum
 {
     NSMenu * menu = [[NSMenu alloc] initWithTitle: @"File Outline Menu"];
     
-    //rename
-    NSMenuItem * item = [[NSMenuItem alloc] initWithTitle: [NSLocalizedString(@"Rename File", "File Outline -> Menu") stringByAppendingEllipsis]
-                                                   action: @selector(renameSelected:) keyEquivalent: @""];
-    [item setTarget: self];
-    [menu addItem: item];
-    [item release];
-    
-    [menu addItem: [NSMenuItem separatorItem]];
-    
     //check and uncheck
-    item = [[NSMenuItem alloc] initWithTitle: NSLocalizedString(@"Check Selected", "File Outline -> Menu")
+    NSMenuItem * item = [[NSMenuItem alloc] initWithTitle: NSLocalizedString(@"Check Selected", "File Outline -> Menu")
             action: @selector(setCheck:) keyEquivalent: @""];
     [item setTarget: self];
     [item setTag: FILE_CHECK_TAG];
@@ -632,7 +623,16 @@ typedef enum
     
     //reveal in finder
     item = [[NSMenuItem alloc] initWithTitle: NSLocalizedString(@"Show in Finder", "File Outline -> Menu")
-            action: @selector(revealFile:) keyEquivalent: @""];
+                                      action: @selector(revealFile:) keyEquivalent: @""];
+    [item setTarget: self];
+    [menu addItem: item];
+    [item release];
+    
+    [menu addItem: [NSMenuItem separatorItem]];
+    
+    //rename
+    item = [[NSMenuItem alloc] initWithTitle: [NSLocalizedString(@"Rename File", "File Outline -> Menu") stringByAppendingEllipsis]
+                                                   action: @selector(renameSelected:) keyEquivalent: @""];
     [item setTarget: self];
     [menu addItem: item];
     [item release];
