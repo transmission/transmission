@@ -1746,7 +1746,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 {
     NSArray * selected = [fTableView selectedTorrents];
     NSAssert([selected count] == 1, @"1 transfer needs to be selected to rename, but %ld are selected", [selected count]);
-    Torrent * torrent = selected[0];
+    Torrent * torrent = [selected objectAtIndex:0];
     
     [FileRenameSheetController presentSheetForTorrent:torrent modalForWindow: fWindow completionHandler: ^(BOOL didRename) {
         if (didRename)
