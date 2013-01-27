@@ -57,6 +57,7 @@ class Session: public QObject
         const struct tr_session_stats& getStats( ) const { return myStats; }
         const struct tr_session_stats& getCumulativeStats( ) const { return myCumulativeStats; }
         const QString& sessionVersion( ) const { return mySessionVersion; }
+        int64_t downloadDirFreeSpace( ) const { return myDownloadDirFreeSpace; }
 
     public:
         int64_t blocklistSize( ) const { return myBlocklistSize; }
@@ -159,6 +160,7 @@ class Session: public QObject
         struct tr_session_stats myStats;
         struct tr_session_stats myCumulativeStats;
         QString mySessionVersion;
+        int64_t myDownloadDirFreeSpace;
 };
 
 #endif

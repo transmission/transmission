@@ -282,6 +282,7 @@ TrMainWindow :: TrMainWindow( Session& session, Prefs& prefs, TorrentModel& mode
 
     connect( &mySession, SIGNAL(sourceChanged()), this, SLOT(onSessionSourceChanged()) );
     connect( &mySession, SIGNAL(statsUpdated()), this, SLOT(refreshStatusBar()) );
+    connect( &mySession, SIGNAL(sessionUpdated()), this, SLOT(refreshFreeSpace()) );
     connect( &mySession, SIGNAL(dataReadProgress()), this, SLOT(dataReadProgress()) );
     connect( &mySession, SIGNAL(dataSendProgress()), this, SLOT(dataSendProgress()) );
     connect( &mySession, SIGNAL(httpAuthenticationRequired()), this, SLOT(wrongAuthentication()) );
@@ -300,6 +301,7 @@ TrMainWindow :: TrMainWindow( Session& session, Prefs& prefs, TorrentModel& mode
     refreshActionSensitivitySoon( );
     refreshTrayIconSoon( );
     refreshStatusBar( );
+    refreshFreeSpace( );
     refreshTitle( );
     refreshVisibleCount( );
 }
@@ -392,8 +394,21 @@ TrMainWindow :: createStatusBar( )
         l = myVisibleCountLabel = new QLabel( this );
         h->addWidget( l );
 
+    //h->addStretch( 1 );
+    h->addSpacing ( HIG::PAD_BIG );
+
+        l = myFreeSpaceTextLabel = new QLabel (this);
+        const int minimumFreeSpaceWidth = l->fontMetrics().width( Formatter::sizeToString(1024 * 1024));
+        l->setMinimumWidth( minimumFreeSpaceWidth );
+        h->addWidget( l );
+        l = myFreeSpaceIconLabel = new QLabel (this);
+        l->setPixmap( getStockIcon( "drive-harddisk", QStyle::SP_DriveHDIcon ).pixmap( smallIconSize ) );
+        h->addWidget( l );
+
     h->addStretch( 1 );
 
+        l = myStatsLabel = new QLabel( this );
+        h->addWidget( l );
         a = new QActionGroup( this );
         a->addAction( ui.action_TotalRatio );
         a->addAction( ui.action_TotalTransfer );
@@ -414,10 +429,9 @@ TrMainWindow :: createStatusBar( )
         p->setFlat( true );
         p->setMenu( m );
         h->addWidget( p );
-        l = myStatsLabel = new QLabel( this );
-        h->addWidget( l );
 
-    h->addStretch( 1 );
+    //h->addStretch( 1 );
+    h->addSpacing ( HIG::PAD );
 
         l = myDownloadSpeedLabel = new QLabel( this );
         const int minimumSpeedWidth = l->fontMetrics().width( Formatter::speedToString(Speed::fromKBps(999.99)));
@@ -428,7 +442,7 @@ TrMainWindow :: createStatusBar( )
         l->setPixmap( getStockIcon( "go-down", QStyle::SP_ArrowDown ).pixmap( smallIconSize ) );
         h->addWidget( l );
 
-    h->addStretch( 1 );
+    h->addSpacing ( HIG::PAD );
 
         l = myUploadSpeedLabel = new QLabel;
         l->setMinimumWidth( minimumSpeedWidth );
@@ -714,6 +728,28 @@ TrMainWindow :: refreshVisibleCount( )
         str = tr( "%L1 of %Ln Torrent(s)", 0, totalCount ).arg( visibleCount );
     myVisibleCountLabel->setText( str );
     myVisibleCountLabel->setVisible( totalCount > 0 );
+}
+
+void
+TrMainWindow :: refreshFreeSpace( )
+{
+  const int64_t bytes (mySession.downloadDirFreeSpace());
+
+  if (bytes >= 0)
+    {
+      const QString text = Formatter::sizeToString (bytes);
+
+      const QString tip = tr("Download directory \"%1\" has %2 space free")
+        .arg(myPrefs.getString(Prefs::DOWNLOAD_DIR))
+        .arg(text);
+
+      myFreeSpaceTextLabel->setText (text);
+      myFreeSpaceTextLabel->setToolTip (tip);
+      myFreeSpaceIconLabel->setToolTip (tip);
+    }
+
+  myFreeSpaceTextLabel->setVisible (bytes >= 0);
+  myFreeSpaceIconLabel->setVisible (bytes >= 0);
 }
 
 void

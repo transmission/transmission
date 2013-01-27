@@ -247,7 +247,8 @@ Session :: Session( const char * configDir, Prefs& prefs ):
     myPrefs( prefs ),
     mySession( 0 ),
     myConfigDir( QString::fromUtf8( configDir ) ),
-    myNAM( 0 )
+    myNAM( 0 ),
+    myDownloadDirFreeSpace( -1 )
 {
     myStats.ratio = TR_RATIO_NA;
     myStats.uploadedBytes = 0;
@@ -991,6 +992,9 @@ Session :: updateInfo (tr_variant * d)
 
     if( tr_variantDictFindStr( d, TR_KEY_version, &str, NULL ) && ( mySessionVersion != str ) )
         mySessionVersion = str;
+
+    if( tr_variantDictFindInt( d, TR_KEY_download_dir_free_space, &i ) && ( myDownloadDirFreeSpace != i ) )
+        myDownloadDirFreeSpace = i;
 
     //std::cerr << "Session :: updateInfo end" << std::endl;
     connect( &myPrefs, SIGNAL(changed(int)), this, SLOT(updatePref(int)) );

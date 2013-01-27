@@ -105,6 +105,7 @@ class TrMainWindow: public QMainWindow
         void showSessionRatio( );
         void showSessionTransfer( );
         void refreshVisibleCount( );
+        void refreshFreeSpace( );
         void refreshTitle( );
         void refreshStatusBar( );
         void refreshTrayIcon( );
@@ -159,6 +160,8 @@ class TrMainWindow: public QMainWindow
         QLabel * myStatsLabel;
         QLabel * myDownloadSpeedLabel;
         QLabel * myUploadSpeedLabel;
+        QLabel * myFreeSpaceTextLabel;
+        QLabel * myFreeSpaceIconLabel;
         QLabel * myNetworkLabel;
 
     public slots:
