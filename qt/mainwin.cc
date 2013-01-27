@@ -750,7 +750,7 @@ TrMainWindow :: refreshFreeSpace ()
     {
       const QString text = Formatter::sizeToString (bytes);
 
-      const QString tip = tr ("Download directory \"%1\" has %2 space free")
+      const QString tip = tr ("Download folder \"%1\" has %2 free")
         .arg (myPrefs.getString (Prefs::DOWNLOAD_DIR))
         .arg (text);
 
