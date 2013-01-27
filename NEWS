@@ -43,6 +43,8 @@
   #5215 fix a transmission-cli regression from 2.76
   #5248 'fails to create torrent with multiple trackers'
   #5249 'error parsing json in some locales'
+  #5259 minor memory leak in tr_torrentDeleteLocalData()
+  #5260 improved documentation for -w argument in transmission-remote
 
 
 === Transmission 2.76 (2013/01/08) ===
