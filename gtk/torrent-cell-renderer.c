@@ -152,37 +152,54 @@ getShortTransferString (const tr_torrent  * tor,
                         char              * buf,
                         size_t              buflen)
 {
-    char downStr[32], upStr[32];
-    const int haveMeta = tr_torrentHasMetadata (tor);
-    const int haveUp = haveMeta && st->peersGettingFromUs > 0;
-    const int haveDown = haveMeta && ((st->peersSendingToUs > 0) || (st->webseedsSendingToUs > 0));
+  char dnStr[32], upStr[32];
+  const int haveMeta = tr_torrentHasMetadata (tor);
+  const int haveUp = haveMeta && st->peersGettingFromUs > 0;
+  const int haveDown = haveMeta && ((st->peersSendingToUs > 0) || (st->webseedsSendingToUs > 0));
 
-    if (haveDown)
-        tr_formatter_speed_KBps (downStr, downloadSpeed_KBps, sizeof (downStr));
-    if (haveUp)
-        tr_formatter_speed_KBps (upStr, uploadSpeed_KBps, sizeof (upStr));
+  if (haveDown)
+    tr_formatter_speed_KBps (dnStr, downloadSpeed_KBps, sizeof (dnStr));
 
-    if (haveDown && haveUp)
-        /* 1==down arrow, 2==down speed, 3==up arrow, 4==down speed */
-        g_snprintf (buf, buflen, _("%1$s %2$s, %3$s %4$s"),
-                    gtr_get_unicode_string (GTR_UNICODE_DOWN), downStr,
-                    gtr_get_unicode_string (GTR_UNICODE_UP), upStr);
-    else if (haveDown)
-        /* bandwidth speed + unicode arrow */
-        g_snprintf (buf, buflen, _("%1$s %2$s"),
-                    gtr_get_unicode_string (GTR_UNICODE_DOWN), downStr);
-    else if (haveUp)
-        /* bandwidth speed + unicode arrow */
-        g_snprintf (buf, buflen, _("%1$s %2$s"),
-                    gtr_get_unicode_string (GTR_UNICODE_UP), upStr);
-    else if (st->isStalled)
-        g_strlcpy (buf, _("Stalled"), buflen);
-    else if (haveMeta)
-        g_strlcpy (buf, _("Idle"), buflen);
-    else
-        *buf = '\0';
+  if (haveUp)
+    tr_formatter_speed_KBps (upStr, uploadSpeed_KBps, sizeof (upStr));
 
-    return buf;
+  if (haveDown && haveUp)
+    {
+      /* 1==up speed, 2==up arrow, 3==down speed, 4==down arrow */
+      g_snprintf (buf, buflen, _("%1$s %2$s    %3$s %4$s"),
+                  upStr,
+                  gtr_get_unicode_string (GTR_UNICODE_UP),
+                  dnStr,
+                  gtr_get_unicode_string (GTR_UNICODE_DOWN));
+    }
+  else if (haveDown)
+    {
+      /* unicode down arrow + bandwidth speed */
+      g_snprintf (buf, buflen, _("%1$s %2$s"),
+                  dnStr,
+                  gtr_get_unicode_string (GTR_UNICODE_DOWN));
+    }
+  else if (haveUp)
+    {
+      /* unicode up arrow + bandwidth speed */
+      g_snprintf (buf, buflen, _("%1$s %2$s"),
+                  upStr,
+                  gtr_get_unicode_string (GTR_UNICODE_UP));
+    }
+  else if (st->isStalled)
+    {
+      g_strlcpy (buf, _("Stalled"), buflen);
+    }
+  else if (haveMeta)
+    {
+      g_strlcpy (buf, _("Idle"), buflen);
+    }
+  else
+    {
+      *buf = '\0';
+    }
+
+  return buf;
 }
 
 static void
@@ -219,8 +236,7 @@ getShortStatusString (GString           * gstr,
             if (st->activity != TR_STATUS_DOWNLOAD)
             {
                 tr_strlratio (buf, st->ratio, sizeof (buf));
-                g_string_append_printf (gstr, _("Ratio %s"), buf);
-                g_string_append (gstr, ", ");
+                g_string_append_printf (gstr, _("Ratio: %s,   "), buf);
             }
             getShortTransferString (tor, st, uploadSpeed_KBps, downloadSpeed_KBps, buf, sizeof (buf));
             g_string_append (gstr, buf);

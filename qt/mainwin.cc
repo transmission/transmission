@@ -435,23 +435,23 @@ TrMainWindow :: createStatusBar ()
 
   h->addSpacing (HIG::PAD);
 
-    l = myDownloadSpeedLabel = new QLabel (this);
-    const int minimumSpeedWidth = l->fontMetrics ().width (Formatter::speedToString (Speed::fromKBps (999.99)));
-    l->setMinimumWidth (minimumSpeedWidth);
-    l->setAlignment (Qt::AlignRight|Qt::AlignVCenter);
-    h->addWidget (l);
-    l = new QLabel (this);
-    l->setPixmap (getStockIcon ("go-down", QStyle::SP_ArrowDown).pixmap (smallIconSize));
-    h->addWidget (l);
-
-  h->addSpacing (HIG::PAD);
-
     l = myUploadSpeedLabel = new QLabel;
+    const int minimumSpeedWidth = l->fontMetrics ().width (Formatter::speedToString (Speed::fromKBps (999.99)));
     l->setMinimumWidth (minimumSpeedWidth);
     l->setAlignment (Qt::AlignRight|Qt::AlignVCenter);
     h->addWidget (l);
     l = new QLabel;
     l->setPixmap (getStockIcon ("go-up", QStyle::SP_ArrowUp).pixmap (smallIconSize));
+    h->addWidget (l);
+
+  h->addSpacing (HIG::PAD);
+
+    l = myDownloadSpeedLabel = new QLabel (this);
+    l->setMinimumWidth (minimumSpeedWidth);
+    l->setAlignment (Qt::AlignRight|Qt::AlignVCenter);
+    h->addWidget (l);
+    l = new QLabel (this);
+    l->setPixmap (getStockIcon ("go-down", QStyle::SP_ArrowDown).pixmap (smallIconSize));
     h->addWidget (l);
 
   return top;

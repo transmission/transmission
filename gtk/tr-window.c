@@ -54,7 +54,9 @@ typedef struct
     GtkLabel           * ul_lb;
     GtkLabel           * dl_lb;
     GtkLabel           * stats_lb;
-    GtkLabel           * gutter_lb;
+    GtkLabel           * freespace_lb;
+    GtkWidget          * freespace_icon;
+    GtkLabel           * count_lb;
     GtkWidget          * alt_speed_image;
     GtkWidget          * alt_speed_button;
     GtkWidget          * options_menu;
@@ -607,12 +609,15 @@ gtr_window_new (GtkApplication * app, GtkUIManager * ui_mgr, TrCore * core)
   int              i, n;
   const char     * pch, * style;
   PrivateData    * p;
+  GtkWidget      * sibling = NULL;
   GtkWidget      * ul_lb, * dl_lb;
   GtkWidget      * mainmenu, *toolbar, *filter, *list, *status;
-  GtkWidget      * vbox, *w, *self, *h, *hbox, *menu;
+  GtkWidget      * vbox, *w, *self, *menu;
+  GtkWidget      * grid_w;
   GtkWindow      * win;
   GtkCssProvider * css_provider;
   GSList         * l;
+  GtkGrid        * grid;
 
   p = g_new0 (PrivateData, 1);
 
@@ -657,10 +662,10 @@ gtr_window_new (GtkApplication * app, GtkUIManager * ui_mgr, TrCore * core)
   gtr_action_set_important ("show-torrent-properties", TRUE);
 
   /* filter */
-  h = filter = p->filter = gtr_filter_bar_new (gtr_core_session (core),
+  w = filter = p->filter = gtr_filter_bar_new (gtr_core_session (core),
                                                gtr_core_model (core),
                                                &p->filter_model);
-  gtk_container_set_border_width (GTK_CONTAINER (h), GUI_PAD_SMALL);
+  gtk_container_set_border_width (GTK_CONTAINER (w), GUI_PAD_SMALL);
 
   /* status menu */
   menu = p->status_menu = gtk_menu_new ();
@@ -678,67 +683,100 @@ gtr_window_new (GtkApplication * app, GtkUIManager * ui_mgr, TrCore * core)
       gtk_widget_show (w);
     }
 
-  /* status */
-  h = status = p->status = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, GUI_PAD_BIG);
-  gtk_container_set_border_width (GTK_CONTAINER (h), GUI_PAD_SMALL);
+  /**
+  *** Statusbar
+  **/
 
+  grid_w = status = p->status = gtk_grid_new ();
+  grid = GTK_GRID (grid_w);
+  gtk_container_set_border_width (GTK_CONTAINER (grid), GUI_PAD_SMALL);
+
+  /* gear */
   w = gtk_button_new ();
   gtk_container_add (GTK_CONTAINER (w), gtk_image_new_from_stock ("utilities", -1));
   gtk_widget_set_tooltip_text (w, _("Options"));
-  gtk_box_pack_start (GTK_BOX (h), w, 0, 0, 0);
+  gtk_grid_attach_next_to (grid, w, sibling, GTK_POS_RIGHT, 1, 1);
   gtk_button_set_relief (GTK_BUTTON (w), GTK_RELIEF_NONE);
   p->options_menu = createOptionsMenu (p);
   g_signal_connect (w, "clicked", G_CALLBACK (onOptionsClicked), p);
+  sibling = w;
 
+  /* turtle */
   p->alt_speed_image = gtk_image_new ();
   w = p->alt_speed_button = gtk_toggle_button_new ();
   gtk_button_set_image (GTK_BUTTON (w), p->alt_speed_image);
   gtk_button_set_relief (GTK_BUTTON (w), GTK_RELIEF_NONE);
   g_signal_connect (w, "toggled", G_CALLBACK (alt_speed_toggled_cb), p);
-  gtk_box_pack_start (GTK_BOX (h), w, 0, 0, 0);
+  gtk_grid_attach_next_to (grid, w, sibling, GTK_POS_RIGHT, 1, 1);
+  sibling = w;
 
+  /* spacer */
+  w = gtk_alignment_new (0.0f, 0.0f, 0.0f, 0.0f);
+  gtk_widget_set_hexpand (w, TRUE);
+  gtk_grid_attach_next_to (grid, w, sibling, GTK_POS_RIGHT, 1, 1);
+  sibling = w;
+
+  /* torrent count */
   w = gtk_label_new ("N Torrents");
-  p->gutter_lb = GTK_LABEL (w);
-  gtk_label_set_single_line_mode (p->gutter_lb, TRUE);
-  gtk_box_pack_start (GTK_BOX (h), w, 1, 1, GUI_PAD);
+  p->count_lb = GTK_LABEL (w);
+  gtk_label_set_single_line_mode (p->count_lb, TRUE);
+  gtk_grid_attach_next_to (grid, w, sibling, GTK_POS_RIGHT, 1, 1);
+  sibling = w;
 
-  hbox = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, GUI_PAD);
-    w = gtk_alignment_new (0.0f, 0.0f, 0.0f, 0.0f);
-    gtk_widget_set_size_request (w, GUI_PAD, 0u);
-    gtk_box_pack_start (GTK_BOX (hbox), w, FALSE, FALSE, 0);
-    w = ul_lb = gtk_label_new (NULL);
-    p->ul_lb = GTK_LABEL (w);
-    gtk_label_set_single_line_mode (p->ul_lb, TRUE);
-    gtk_box_pack_start (GTK_BOX (hbox), w, FALSE, FALSE, 0);
-    w = gtk_image_new_from_stock (GTK_STOCK_GO_UP, GTK_ICON_SIZE_MENU);
-    gtk_box_pack_start (GTK_BOX (hbox), w, FALSE, FALSE, 0);
-  gtk_box_pack_end (GTK_BOX (h), hbox, FALSE, FALSE, 0);
+  /* freespace */
+  w = gtk_label_new (NULL);
+  g_object_set (G_OBJECT(w), "margin-left", GUI_PAD_BIG*2, NULL);
+  p->freespace_lb = GTK_LABEL (w);
+  gtk_label_set_single_line_mode (p->freespace_lb, TRUE);
+  gtk_grid_attach_next_to (grid, w, sibling, GTK_POS_RIGHT, 1, 1);
+  sibling = w;
+  w = gtk_image_new_from_stock (GTK_STOCK_HARDDISK, GTK_ICON_SIZE_MENU);
+  p->freespace_icon = w;
+  g_object_set (G_OBJECT(w), "margin-left", GUI_PAD, NULL);
+  gtk_grid_attach_next_to (grid, w, sibling, GTK_POS_RIGHT, 1, 1);
+  sibling = w;
 
-  hbox = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, GUI_PAD);
-    w = gtk_alignment_new (0.0f, 0.0f, 0.0f, 0.0f);
-    gtk_widget_set_size_request (w, GUI_PAD, 0u);
-    gtk_box_pack_start (GTK_BOX (hbox), w, FALSE, FALSE, 0);
-    w = dl_lb = gtk_label_new (NULL);
-    p->dl_lb = GTK_LABEL (w);
-    gtk_label_set_single_line_mode (p->dl_lb, TRUE);
-    gtk_box_pack_start (GTK_BOX (hbox), w, FALSE, FALSE, 0);
-    w = gtk_image_new_from_stock (GTK_STOCK_GO_DOWN, GTK_ICON_SIZE_MENU);
-    gtk_box_pack_start (GTK_BOX (hbox), w, FALSE, FALSE, 0);
-  gtk_box_pack_end (GTK_BOX (h), hbox, FALSE, FALSE, 0);
+  /* spacer */
+  w = gtk_alignment_new (0.0f, 0.0f, 0.0f, 0.0f);
+  gtk_widget_set_hexpand (w, TRUE);
+  gtk_grid_attach_next_to (grid, w, sibling, GTK_POS_RIGHT, 1, 1);
+  sibling = w;
 
-  hbox = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, GUI_PAD);
-    w = gtk_button_new ();
-    gtk_widget_set_tooltip_text (w, _("Statistics"));
-    gtk_container_add (GTK_CONTAINER (w), gtk_image_new_from_stock ("ratio", -1));
-    gtk_button_set_relief (GTK_BUTTON (w), GTK_RELIEF_NONE);
-    g_signal_connect (w, "clicked", G_CALLBACK (onYinYangReleased), p);
-    gtk_box_pack_start (GTK_BOX (hbox), w, FALSE, FALSE, 0);
-    w = gtk_label_new (NULL);
-    p->stats_lb = GTK_LABEL (w);
-    gtk_label_set_single_line_mode (p->stats_lb, TRUE);
-    gtk_box_pack_end (GTK_BOX (hbox), w, FALSE, FALSE, 0);
-  gtk_box_pack_end (GTK_BOX (h), hbox, FALSE, FALSE, 0);
+  /* ratio */
+  w = gtk_label_new (NULL);
+  p->stats_lb = GTK_LABEL (w);
+  gtk_label_set_single_line_mode (p->stats_lb, TRUE);
+  gtk_grid_attach_next_to (grid, w, sibling, GTK_POS_RIGHT, 1, 1);
+  sibling = w;
+  w = gtk_button_new ();
+  gtk_widget_set_tooltip_text (w, _("Statistics"));
+  gtk_container_add (GTK_CONTAINER (w), gtk_image_new_from_stock ("ratio", -1));
+  gtk_button_set_relief (GTK_BUTTON (w), GTK_RELIEF_NONE);
+  g_signal_connect (w, "clicked", G_CALLBACK (onYinYangReleased), p);
+  gtk_grid_attach_next_to (grid, w, sibling, GTK_POS_RIGHT, 1, 1);
+  sibling = w;
 
+  /* upload */
+  w = ul_lb = gtk_label_new (NULL);
+  p->ul_lb = GTK_LABEL (w);
+  gtk_label_set_single_line_mode (p->ul_lb, TRUE);
+  gtk_grid_attach_next_to (grid, w, sibling, GTK_POS_RIGHT, 1, 1);
+  sibling = w;
+  w = gtk_image_new_from_stock (GTK_STOCK_GO_UP, GTK_ICON_SIZE_MENU);
+  g_object_set (G_OBJECT(w), "margin-left", GUI_PAD, NULL);
+  gtk_grid_attach_next_to (grid, w, sibling, GTK_POS_RIGHT, 1, 1);
+  sibling = w;
+
+  /* download */
+  w = dl_lb = gtk_label_new (NULL);
+  p->dl_lb = GTK_LABEL (w);
+  gtk_label_set_single_line_mode (p->dl_lb, TRUE);
+  gtk_grid_attach_next_to (grid, w, sibling, GTK_POS_RIGHT, 1, 1);
+  sibling = w;
+  w = gtk_image_new_from_stock (GTK_STOCK_GO_DOWN, GTK_ICON_SIZE_MENU);
+  g_object_set (G_OBJECT(w), "margin-left", GUI_PAD, NULL);
+  gtk_grid_attach_next_to (grid, w, sibling, GTK_POS_RIGHT, 1, 1);
+  sibling = w;
 
   /* workarea */
   p->view = makeview (p);
@@ -792,27 +830,71 @@ gtr_window_new (GtkApplication * app, GtkUIManager * ui_mgr, TrCore * core)
 static void
 updateTorrentCount (PrivateData * p)
 {
-  if (p && p->core)
+  bool visible = false;
+
+  g_return_if_fail (p != NULL);
+
+  if (p->core != NULL)
     {
-      char buf[512];
       const int torrentCount = gtk_tree_model_iter_n_children (gtr_core_model (p->core), NULL);
       const int visibleCount = gtk_tree_model_iter_n_children (p->filter_model, NULL);
 
-      if (!torrentCount)
-        *buf = '\0';
-      else if (torrentCount != visibleCount)
-        g_snprintf (buf, sizeof (buf),
-                    ngettext ("%1$'d of %2$'d Torrent",
-                              "%1$'d of %2$'d Torrents",
-                              torrentCount),
-                    visibleCount, torrentCount);
-      else
-        g_snprintf (buf, sizeof (buf),
-                    ngettext ("%'d Torrent", "%'d Torrents", torrentCount),
-                    torrentCount);
+      visible = torrentCount > 0;
 
-      gtr_label_set_text (p->gutter_lb, buf);
+      if (visible)
+        {
+          char countStr[512];
+
+          if (torrentCount != visibleCount)
+            g_snprintf (countStr, sizeof (countStr),
+                        ngettext ("%1$'d of %2$'d Torrent",
+                                  "%1$'d of %2$'d Torrents",
+                                  torrentCount),
+                        visibleCount, torrentCount);
+          else
+            g_snprintf (countStr, sizeof (countStr),
+                        ngettext ("%'d Torrent", "%'d Torrents", torrentCount),
+                        torrentCount);
+
+          gtr_label_set_text (p->count_lb, countStr);
+        }
     }
+
+  gtk_widget_set_visible (GTK_WIDGET(p->count_lb), visible);
+}
+
+static void
+updateFreeSpace (PrivateData * p)
+{
+  GtkWidget * w;
+  bool visible = false;
+
+  g_return_if_fail (p != NULL);
+
+  w = GTK_WIDGET (p->freespace_lb);
+
+  if (p->core != NULL)
+    {
+      tr_session * session = gtr_core_session (p->core);
+      const int64_t n = tr_sessionGetDownloadDirFreeSpace (session);
+      const char * downloadDir = tr_sessionGetDownloadDir (session);
+
+      visible = n >= 0;
+
+      if (visible)
+        {
+          char * tip;
+          char sizeStr[32];
+          tr_strlsize (sizeStr, n, sizeof(sizeStr));
+          gtk_label_set_text (p->freespace_lb, sizeStr);
+          tip = tr_strdup_printf (_("Download folder \"%1$s\" has %2$s free"), downloadDir, sizeStr);
+          gtk_widget_set_tooltip_text (w, tip);
+          g_free (tip);
+        }
+    }
+
+  gtk_widget_set_visible (w, visible);
+  gtk_widget_set_visible (p->freespace_icon, visible);
 }
 
 static void
@@ -907,6 +989,7 @@ gtr_window_refresh (GtkWindow * self)
       updateSpeeds (p);
       updateTorrentCount (p);
       updateStats (p);
+      updateFreeSpace (p);
     }
 }
 

@@ -183,11 +183,11 @@ TorrentDelegate :: shortTransferString( const Torrent& tor ) const
         upStr = Formatter::speedToString( tor.uploadSpeed( ) );
 
     if( haveDown && haveUp )
-        str = tr( "%1 %2, %3 %4" ).arg(downArrow).arg(downStr).arg(upArrow).arg(upStr);
+        str = tr( "%1%2,   %3%4" ).arg(upStr).arg(upArrow).arg(downStr).arg(downArrow);
     else if( haveDown )
-        str = tr( "%1 %2" ).arg(downArrow).arg(downStr);
+        str = tr( "%1%2" ).arg(downStr).arg(downArrow);
     else if( haveUp )
-        str = tr( "%1 %2" ).arg(upArrow).arg(upStr);
+        str = tr( "%1%2" ).arg(upStr).arg(upArrow);
     else if( tor.isStalled( ) )
         str = tr( "Stalled" );
     else if( tor.hasMetadata( ) )
@@ -210,7 +210,7 @@ TorrentDelegate :: shortStatusString( const Torrent& tor ) const
         case TR_STATUS_DOWNLOAD:
         case TR_STATUS_SEED:
             if( !tor.isDownloading( ) )
-                str = tr( "Ratio: %1, " ).arg( Formatter::ratioToString( tor.ratio( ) ) );
+              str = tr( "Ratio: %1,   " ).arg( Formatter::ratioToString( tor.ratio( ) ) );
             str += shortTransferString( tor );
             break;
 
