@@ -150,7 +150,6 @@ Session :: updatePref( int key )
         case Prefs :: BLOCKLIST_ENABLED:
         case Prefs :: BLOCKLIST_URL:
         case Prefs :: DHT_ENABLED:
-        case Prefs :: DOWNLOAD_DIR:
         case Prefs :: DOWNLOAD_QUEUE_ENABLED:
         case Prefs :: DOWNLOAD_QUEUE_SIZE:
         case Prefs :: DSPEED:
@@ -176,6 +175,12 @@ Session :: updatePref( int key )
         case Prefs :: USPEED_ENABLED:
         case Prefs :: UTP_ENABLED:
             sessionSet( myPrefs.getKey(key), myPrefs.variant(key) );
+            break;
+
+        case Prefs :: DOWNLOAD_DIR:
+            sessionSet (myPrefs.getKey(key), myPrefs.variant(key));
+            /* this will change the 'freespace' argument, so refresh */
+            refreshSessionInfo ();
             break;
 
         case Prefs :: RATIO:
