@@ -2028,19 +2028,17 @@ tr_torrentRecheckCompleteness (tr_torrent * tor)
   completeness = tr_cpGetStatus (&tor->completion);
   if (completeness != tor->completeness)
     {
-      const int recentChange = tor->downloadedCur != 0;
+      const bool recentChange = tor->downloadedCur != 0;
       const bool wasLeeching = !tr_torrentIsSeed (tor);
       const bool wasRunning = tor->isRunning;
 
       if (recentChange)
         tr_logAddTorInfo (tor, _("State changed from \"%1$s\" to \"%2$s\""),
-                   getCompletionString (tor->completeness),
-                   getCompletionString (completeness));
+                          getCompletionString (tor->completeness),
+                          getCompletionString (completeness));
 
       tor->completeness = completeness;
       tr_fdTorrentClose (tor->session, tor->uniqueId);
-
-      fireCompletenessChange (tor, completeness, wasRunning);
 
       if (tr_torrentIsSeed (tor))
         {
@@ -2065,6 +2063,9 @@ tr_torrentRecheckCompleteness (tr_torrent * tor)
           if (tr_sessionIsTorrentDoneScriptEnabled (tor->session))
             torrentCallScript (tor, tr_sessionGetTorrentDoneScript (tor->session));
         }
+
+
+      fireCompletenessChange (tor, completeness, wasRunning);
 
       tr_torrentSetDirty (tor);
     }
