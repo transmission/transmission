@@ -143,6 +143,13 @@ div#toolbar {
       background: url("images/arrow-down.png") bottom no-repeat; }
     #statusbar #speed-info #speed-up-container, #statusbar #speed-info #speed-dn-container {
       display: inline; }
+  #statusbar #freespace-info {
+    float: right;
+    margin-top: 5px;
+    margin-right: 10px;
+    display: inline; }
+    #statusbar #freespace-info * {
+      display: inline-block; }
 
 /***
 ****

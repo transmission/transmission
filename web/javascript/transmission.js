@@ -1080,6 +1080,7 @@ Transmission.prototype =
                     menu = $('#settings_menu');
 
 		this.serverVersion = o.version;
+		this.freeSpace = o[RPC._DownloadDirFreeSpace];
 
 		this.prefsDialog.set(o);
 
@@ -1144,6 +1145,12 @@ Transmission.prototype =
 
 		$('#speed-dn-container').toggleClass('active', d>0 );
 		$('#speed-dn-label').text( fmt.speedBps( d ) );
+
+		if (this.freeSpace > 0)
+			text = fmt.size (this.freeSpace);
+		else
+			text = '';
+		$('#freespace-info').text( text);
 
 		// visible torrents
 		$('#filter-count').text( fmt.countString('Transfer','Transfers',this._rows.length ) );
