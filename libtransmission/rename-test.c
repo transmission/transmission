@@ -39,18 +39,6 @@
     check_int_eq (0, st->haveValid); \
   } while (0)
 
-#define check_have_all(tor, totalSize) \
-  do { \
-    const tr_stat * st = tr_torrentStat(tor); \
-    check_int_eq (TR_STATUS_STOPPED, st->activity); \
-    check_int_eq (TR_STAT_OK, st->error); \
-    check_int_eq (0, st->leftUntilDone); \
-    check_int_eq (0, st->haveUnchecked); \
-    check_int_eq (0, st->desiredAvailable); \
-    check_int_eq (totalSize, st->sizeWhenDone); \
-    check_int_eq (totalSize, st->haveValid); \
-  } while (0)
-
 static bool
 testFileExistsAndConsistsOfThisString (const tr_torrent * tor, tr_file_index_t fileIndex, const char * str)
 {
@@ -168,6 +156,7 @@ test_single_filename_torrent (void)
   char * tmpstr;
   const size_t totalSize = 14;
   tr_ctor * ctor;
+  const tr_stat * st;
 
   /* this is a single-file torrent whose file is hello-world.txt, holding the string "hello, world!" */
   ctor = tr_ctorNew (session);
@@ -191,7 +180,14 @@ test_single_filename_torrent (void)
 
   /* sanity check the stats again, now that we've added the file */
   verify_and_block_until_done (tor);
-  check_have_all (tor, totalSize);
+  st = tr_torrentStat (tor);
+  check_int_eq (TR_STATUS_STOPPED, st->activity);
+  check_int_eq (TR_STAT_OK, st->error);
+  check_int_eq (0, st->leftUntilDone);
+  check_int_eq (0, st->haveUnchecked);
+  check_int_eq (0, st->desiredAvailable);
+  check_int_eq (totalSize, st->sizeWhenDone);
+  check_int_eq (totalSize, st->haveValid);
 
   /**
   ***  okay! we've finally put together all the scaffolding to test
@@ -293,6 +289,7 @@ test_multifile_torrent (void)
   char * str;
   char * tmp;
   static const size_t totalSize = 67;
+  const tr_stat * st;
   const tr_file * files;
   const char * strings[4];
   const char * expected_files[4] = {
@@ -337,7 +334,15 @@ test_multifile_torrent (void)
 
   /* sanity check the (full) stats */
   verify_and_block_until_done (tor);
-  check_have_all (tor, totalSize);
+  st = tr_torrentStat (tor);
+  check_int_eq (TR_STATUS_STOPPED, st->activity);
+  check_int_eq (TR_STAT_OK, st->error);
+  check_int_eq (0, st->leftUntilDone);
+  check_int_eq (0, st->haveUnchecked);
+  check_int_eq (0, st->desiredAvailable);
+  check_int_eq (totalSize, st->sizeWhenDone);
+  check_int_eq (totalSize, st->haveValid);
+
 
   /**
   ***  okay! let's test renaming.
