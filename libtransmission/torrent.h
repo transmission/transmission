@@ -263,7 +263,7 @@ struct tr_torrent
 
     struct tr_bandwidth        bandwidth;
 
-    struct tr_torrent_peers  * torrentPeers;
+    struct tr_swarm          * swarm;
 
     float                      desiredRatio;
     tr_ratiolimit              ratioLimitMode;

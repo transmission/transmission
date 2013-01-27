@@ -182,7 +182,7 @@ enum piece_sort_state
 };
 
 /** @brief Opaque, per-torrent data structure for peer connection information */
-typedef struct tr_torrent_peers
+typedef struct tr_swarm
 {
   tr_ptrArray                outgoingHandshakes; /* tr_handshake */
   tr_ptrArray                pool; /* struct peer_atom */
@@ -223,7 +223,7 @@ typedef struct tr_torrent_peers
    * already been requested from another (slower?) peer. */
   int                        endgame;
 }
-Torrent;
+tr_swarm;
 
 struct tr_peerMgr
 {
@@ -268,21 +268,21 @@ managerUnlock (const struct tr_peerMgr * manager)
 }
 
 static inline void
-torrentLock (Torrent * torrent)
+swarmLock (tr_swarm * swarm)
 {
-  managerLock (torrent->manager);
+  managerLock (swarm->manager);
 }
 
 static inline void
-torrentUnlock (Torrent * torrent)
+swarmUnlock (tr_swarm * swarm)
 {
-  managerUnlock (torrent->manager);
+  managerUnlock (swarm->manager);
 }
 
 static inline int
-torrentIsLocked (const Torrent * t)
+swarmIsLocked (const tr_swarm * swarm)
 {
-  return tr_sessionIsLocked (t->manager->session);
+  return tr_sessionIsLocked (swarm->manager->session);
 }
 
 /**
@@ -340,13 +340,13 @@ tr_peerAddress (const tr_peer * peer)
   return &peer->atom->addr;
 }
 
-static Torrent*
-getExistingTorrent (tr_peerMgr *    manager,
-                    const uint8_t * hash)
+static tr_swarm *
+getExistingSwarm (tr_peerMgr *    manager,
+                  const uint8_t * hash)
 {
   tr_torrent * tor = tr_torrentFindFromHash (manager->session, hash);
 
-  return tor == NULL ? NULL : tor->torrentPeers;
+  return tor == NULL ? NULL : tor->swarm;
 }
 
 static int
@@ -356,23 +356,23 @@ peerCompare (const void * a, const void * b)
 }
 
 static struct peer_atom*
-getExistingAtom (const Torrent    * t,
+getExistingAtom (const tr_swarm   * cswarm,
                  const tr_address * addr)
 {
-  Torrent * tt = (Torrent*)t;
-  return tr_ptrArrayFindSorted (&tt->pool, addr, comparePeerAtomToAddress);
+  tr_swarm * swarm = (tr_swarm*) cswarm;
+  return tr_ptrArrayFindSorted (&swarm->pool, addr, comparePeerAtomToAddress);
 }
 
 static bool
-peerIsInUse (const Torrent * ct, const struct peer_atom * atom)
+peerIsInUse (const tr_swarm * cs, const struct peer_atom * atom)
 {
-  Torrent * t = (Torrent*) ct;
+  tr_swarm * s = (tr_swarm*) cs;
 
-  assert (torrentIsLocked (t));
+  assert (swarmIsLocked (s));
 
   return (atom->peer != NULL)
-      || getExistingHandshake (&t->outgoingHandshakes, &atom->addr)
-      || getExistingHandshake (&t->manager->incomingHandshakes, &atom->addr);
+      || getExistingHandshake (&s->outgoingHandshakes, &atom->addr)
+      || getExistingHandshake (&s->manager->incomingHandshakes, &atom->addr);
 }
 
 void
@@ -396,33 +396,33 @@ peerNew (struct peer_atom * atom)
 }
 
 static tr_peer*
-getPeer (Torrent * torrent, struct peer_atom * atom)
+getPeer (tr_swarm * s, struct peer_atom * atom)
 {
   tr_peer * peer;
 
-  assert (torrentIsLocked (torrent));
+  assert (swarmIsLocked (s));
 
   peer = atom->peer;
 
   if (peer == NULL)
     {
       peer = peerNew (atom);
-      tr_bitfieldConstruct (&peer->have, torrent->tor->info.pieceCount);
-      tr_bitfieldConstruct (&peer->blame, torrent->tor->blockCount);
-      tr_ptrArrayInsertSorted (&torrent->peers, peer, peerCompare);
+      tr_bitfieldConstruct (&peer->have, s->tor->info.pieceCount);
+      tr_bitfieldConstruct (&peer->blame, s->tor->blockCount);
+      tr_ptrArrayInsertSorted (&s->peers, peer, peerCompare);
     }
 
   return peer;
 }
 
-static void peerDeclinedAllRequests (Torrent *, const tr_peer *);
+static void peerDeclinedAllRequests (tr_swarm *, const tr_peer *);
 
 void
 tr_peerDestruct (tr_torrent * tor, tr_peer * peer)
 {
   assert (peer != NULL);
 
-  peerDeclinedAllRequests (tor->torrentPeers, peer);
+  peerDeclinedAllRequests (tor->swarm, peer);
 
   if (peer->msgs != NULL)
     tr_peerMsgsFree (peer->msgs);
@@ -441,38 +441,38 @@ tr_peerDestruct (tr_torrent * tor, tr_peer * peer)
 }
 
 static void
-peerDelete (Torrent * t, tr_peer * peer)
+peerDelete (tr_swarm * s, tr_peer * peer)
 {
-  tr_peerDestruct (t->tor, peer);
+  tr_peerDestruct (s->tor, peer);
   tr_free (peer);
 }
 
-static bool
-replicationExists (const Torrent * t)
+static inline bool
+replicationExists (const tr_swarm * s)
 {
-  return t->pieceReplication != NULL;
+  return s->pieceReplication != NULL;
 }
 
 static void
-replicationFree (Torrent * t)
+replicationFree (tr_swarm * s)
 {
-  tr_free (t->pieceReplication);
-  t->pieceReplication = NULL;
-  t->pieceReplicationSize = 0;
+  tr_free (s->pieceReplication);
+  s->pieceReplication = NULL;
+  s->pieceReplicationSize = 0;
 }
 
 static void
-replicationNew (Torrent * t)
+replicationNew (tr_swarm * s)
 {
   tr_piece_index_t piece_i;
-  const tr_piece_index_t piece_count = t->tor->info.pieceCount;
-  tr_peer ** peers = (tr_peer**) tr_ptrArrayBase (&t->peers);
-  const int peer_count = tr_ptrArraySize (&t->peers);
+  const tr_piece_index_t piece_count = s->tor->info.pieceCount;
+  tr_peer ** peers = (tr_peer**) tr_ptrArrayBase (&s->peers);
+  const int peer_count = tr_ptrArraySize (&s->peers);
 
-  assert (!replicationExists (t));
+  assert (!replicationExists (s));
 
-  t->pieceReplicationSize = piece_count;
-  t->pieceReplication = tr_new0 (uint16_t, piece_count);
+  s->pieceReplicationSize = piece_count;
+  s->pieceReplication = tr_new0 (uint16_t, piece_count);
 
   for (piece_i=0; piece_i<piece_count; ++piece_i)
     {
@@ -483,69 +483,69 @@ replicationNew (Torrent * t)
         if (tr_bitfieldHas (&peers[peer_i]->have, piece_i))
           ++r;
 
-      t->pieceReplication[piece_i] = r;
+      s->pieceReplication[piece_i] = r;
     }
 }
 
 static void
-torrentFree (void * vt)
+swarmFree (void * vs)
 {
-  Torrent * t = vt;
+  tr_swarm * s = vs;
 
-  assert (t);
-  assert (!t->isRunning);
-  assert (torrentIsLocked (t));
-  assert (tr_ptrArrayEmpty (&t->outgoingHandshakes));
-  assert (tr_ptrArrayEmpty (&t->peers));
+  assert (s);
+  assert (!s->isRunning);
+  assert (swarmIsLocked (s));
+  assert (tr_ptrArrayEmpty (&s->outgoingHandshakes));
+  assert (tr_ptrArrayEmpty (&s->peers));
 
-  tr_ptrArrayDestruct (&t->webseeds, (PtrArrayForeachFunc)tr_webseedFree);
-  tr_ptrArrayDestruct (&t->pool, (PtrArrayForeachFunc)tr_free);
-  tr_ptrArrayDestruct (&t->outgoingHandshakes, NULL);
-  tr_ptrArrayDestruct (&t->peers, NULL);
+  tr_ptrArrayDestruct (&s->webseeds, (PtrArrayForeachFunc)tr_webseedFree);
+  tr_ptrArrayDestruct (&s->pool, (PtrArrayForeachFunc)tr_free);
+  tr_ptrArrayDestruct (&s->outgoingHandshakes, NULL);
+  tr_ptrArrayDestruct (&s->peers, NULL);
 
-  replicationFree (t);
+  replicationFree (s);
 
-  tr_free (t->requests);
-  tr_free (t->pieces);
-  tr_free (t);
+  tr_free (s->requests);
+  tr_free (s->pieces);
+  tr_free (s);
 }
 
 static void peerCallbackFunc (tr_peer *, const tr_peer_event *, void *);
 
 static void
-rebuildWebseedArray (Torrent * t, tr_torrent * tor)
+rebuildWebseedArray (tr_swarm * s, tr_torrent * tor)
 {
   unsigned int i;
   const tr_info * inf = &tor->info;
 
   /* clear the array */
-  tr_ptrArrayDestruct (&t->webseeds, (PtrArrayForeachFunc)tr_webseedFree);
-  t->webseeds = TR_PTR_ARRAY_INIT;
+  tr_ptrArrayDestruct (&s->webseeds, (PtrArrayForeachFunc)tr_webseedFree);
+  s->webseeds = TR_PTR_ARRAY_INIT;
 
   /* repopulate it */
   for (i = 0; i < inf->webseedCount; ++i)
     {
-      tr_webseed * w = tr_webseedNew (tor, inf->webseeds[i], peerCallbackFunc, t);
-      tr_ptrArrayAppend (&t->webseeds, w);
+      tr_webseed * w = tr_webseedNew (tor, inf->webseeds[i], peerCallbackFunc, s);
+      tr_ptrArrayAppend (&s->webseeds, w);
     }
 }
 
-static Torrent*
-torrentNew (tr_peerMgr * manager, tr_torrent * tor)
+static tr_swarm *
+swarmNew (tr_peerMgr * manager, tr_torrent * tor)
 {
-  Torrent * t;
+  tr_swarm * s;
 
-  t = tr_new0 (Torrent, 1);
-  t->manager = manager;
-  t->tor = tor;
-  t->pool = TR_PTR_ARRAY_INIT;
-  t->peers = TR_PTR_ARRAY_INIT;
-  t->webseeds = TR_PTR_ARRAY_INIT;
-  t->outgoingHandshakes = TR_PTR_ARRAY_INIT;
+  s = tr_new0 (tr_swarm, 1);
+  s->manager = manager;
+  s->tor = tor;
+  s->pool = TR_PTR_ARRAY_INIT;
+  s->peers = TR_PTR_ARRAY_INIT;
+  s->webseeds = TR_PTR_ARRAY_INIT;
+  s->outgoingHandshakes = TR_PTR_ARRAY_INIT;
 
-  rebuildWebseedArray (t, tor);
+  rebuildWebseedArray (s, tor);
 
-  return t;
+  return s;
 }
 
 static void ensureMgrTimersExist (struct tr_peerMgr * m);
@@ -627,11 +627,11 @@ tr_peerMgrOnBlocklistChanged (tr_peerMgr * mgr)
   while ((tor = tr_torrentNext (session, tor)))
     {
       int i;
-      Torrent * t = tor->torrentPeers;
-      const int n = tr_ptrArraySize (&t->pool);
+      tr_swarm * s = tor->swarm;
+      const int n = tr_ptrArraySize (&s->pool);
       for (i=0; i<n; ++i)
         {
-          struct peer_atom * atom = tr_ptrArrayNth (&t->pool, i);
+          struct peer_atom * atom = tr_ptrArrayNth (&s->pool, i);
           atom->blocklisted = -1;
         }
     }
@@ -673,11 +673,11 @@ atomIsSeed (const struct peer_atom * atom)
 }
 
 static void
-atomSetSeed (const Torrent * t, struct peer_atom * atom)
+atomSetSeed (const tr_swarm * s, struct peer_atom * atom)
 {
   if (!atomIsSeed (atom))
     {
-      tordbg (t, "marking peer %s as a seed", tr_atomAddrStr (atom));
+      tordbg (s, "marking peer %s as a seed", tr_atomAddrStr (atom));
 
       atomSetSeedProbability (atom, 100);
     }
@@ -689,8 +689,8 @@ tr_peerMgrPeerIsSeed (const tr_torrent  * tor,
                       const tr_address  * addr)
 {
   bool isSeed = false;
-  const Torrent * t = tor->torrentPeers;
-  const struct peer_atom * atom = getExistingAtom (t, addr);
+  const tr_swarm * s = tor->swarm;
+  const struct peer_atom * atom = getExistingAtom (s, addr);
 
   if (atom)
     isSeed = atomIsSeed (atom);
@@ -701,7 +701,7 @@ tr_peerMgrPeerIsSeed (const tr_torrent  * tor,
 void
 tr_peerMgrSetUtpSupported (tr_torrent * tor, const tr_address * addr)
 {
-  struct peer_atom * atom = getExistingAtom (tor->torrentPeers, addr);
+  struct peer_atom * atom = getExistingAtom (tor->swarm, addr);
 
   if (atom)
     atom->flags |= ADDED_F_UTP_FLAGS;
@@ -710,7 +710,7 @@ tr_peerMgrSetUtpSupported (tr_torrent * tor, const tr_address * addr)
 void
 tr_peerMgrSetUtpFailed (tr_torrent *tor, const tr_address *addr, bool failed)
 {
-  struct peer_atom * atom = getExistingAtom (tor->torrentPeers, addr);
+  struct peer_atom * atom = getExistingAtom (tor->swarm, addr);
 
   if (atom)
     atom->utp_failed = failed;
@@ -722,12 +722,12 @@ tr_peerMgrSetUtpFailed (tr_torrent *tor, const tr_address *addr, bool failed)
 ***
 *** There are two data structures associated with managing block requests:
 ***
-*** 1. Torrent::requests, an array of "struct block_request" which keeps
+*** 1. tr_swarm::requests, an array of "struct block_request" which keeps
 ***    track of which blocks have been requested, and when, and by which peers.
 ***    This is list is used for (a) cancelling requests that have been pending
 ***    for too long and (b) avoiding duplicate requests before endgame.
 ***
-*** 2. Torrent::pieces, an array of "struct weighted_piece" which lists the
+*** 2. tr_swarm::pieces, an array of "struct weighted_piece" which lists the
 ***    pieces that we want to request. It's used to decide which blocks to
 ***    return next when tr_peerMgrGetBlockRequests () is called.
 **/
@@ -739,73 +739,73 @@ tr_peerMgrSetUtpFailed (tr_torrent *tor, const tr_address *addr, bool failed)
 static int
 compareReqByBlock (const void * va, const void * vb)
 {
-    const struct block_request * a = va;
-    const struct block_request * b = vb;
+  const struct block_request * a = va;
+  const struct block_request * b = vb;
 
-    /* primary key: block */
-    if (a->block < b->block) return -1;
-    if (a->block > b->block) return 1;
+  /* primary key: block */
+  if (a->block < b->block) return -1;
+  if (a->block > b->block) return 1;
 
-    /* secondary key: peer */
-    if (a->peer < b->peer) return -1;
-    if (a->peer > b->peer) return 1;
+  /* secondary key: peer */
+  if (a->peer < b->peer) return -1;
+  if (a->peer > b->peer) return 1;
 
-    return 0;
+  return 0;
 }
 
 static void
-requestListAdd (Torrent * t, tr_block_index_t block, tr_peer * peer)
+requestListAdd (tr_swarm * s, tr_block_index_t block, tr_peer * peer)
 {
-    struct block_request key;
+  struct block_request key;
 
-    /* ensure enough room is available... */
-    if (t->requestCount + 1 >= t->requestAlloc)
+  /* ensure enough room is available... */
+  if (s->requestCount + 1 >= s->requestAlloc)
     {
-        const int CHUNK_SIZE = 128;
-        t->requestAlloc += CHUNK_SIZE;
-        t->requests = tr_renew (struct block_request,
-                                t->requests, t->requestAlloc);
+      const int CHUNK_SIZE = 128;
+      s->requestAlloc += CHUNK_SIZE;
+      s->requests = tr_renew (struct block_request,
+                              s->requests, s->requestAlloc);
     }
 
-    /* populate the record we're inserting */
-    key.block = block;
-    key.peer = peer;
-    key.sentAt = tr_time ();
+  /* populate the record we're inserting */
+  key.block = block;
+  key.peer = peer;
+  key.sentAt = tr_time ();
 
-    /* insert the request to our array... */
+  /* insert the request to our array... */
+  {
+    bool exact;
+    const int pos = tr_lowerBound (&key, s->requests, s->requestCount,
+                                   sizeof (struct block_request),
+                                   compareReqByBlock, &exact);
+    assert (!exact);
+    memmove (s->requests + pos + 1,
+             s->requests + pos,
+             sizeof (struct block_request) * (s->requestCount++ - pos));
+    s->requests[pos] = key;
+  }
+
+  if (peer != NULL)
     {
-        bool exact;
-        const int pos = tr_lowerBound (&key, t->requests, t->requestCount,
-                                       sizeof (struct block_request),
-                                       compareReqByBlock, &exact);
-        assert (!exact);
-        memmove (t->requests + pos + 1,
-                 t->requests + pos,
-                 sizeof (struct block_request) * (t->requestCount++ - pos));
-        t->requests[pos] = key;
+      ++peer->pendingReqsToPeer;
+      assert (peer->pendingReqsToPeer >= 0);
     }
 
-    if (peer != NULL)
-    {
-        ++peer->pendingReqsToPeer;
-        assert (peer->pendingReqsToPeer >= 0);
-    }
-
-    /*fprintf (stderr, "added request of block %lu from peer %s... "
-                       "there are now %d block\n",
-                     (unsigned long)block, tr_atomAddrStr (peer->atom), t->requestCount);*/
+  /*fprintf (stderr, "added request of block %lu from peer %s... "
+                     "there are now %d block\n",
+                     (unsigned long)block, tr_atomAddrStr (peer->atom), s->requestCount);*/
 }
 
 static struct block_request *
-requestListLookup (Torrent * t, tr_block_index_t block, const tr_peer * peer)
+requestListLookup (tr_swarm * s, tr_block_index_t block, const tr_peer * peer)
 {
-    struct block_request key;
-    key.block = block;
-    key.peer = (tr_peer*) peer;
+  struct block_request key;
+  key.block = block;
+  key.peer = (tr_peer*) peer;
 
-    return bsearch (&key, t->requests, t->requestCount,
-                    sizeof (struct block_request),
-                    compareReqByBlock);
+  return bsearch (&key, s->requests, s->requestCount,
+                  sizeof (struct block_request),
+                  compareReqByBlock);
 }
 
 /**
@@ -813,108 +813,109 @@ requestListLookup (Torrent * t, tr_block_index_t block, const tr_peer * peer)
  * with index @a block from and append them to @a peerArr.
  */
 static void
-getBlockRequestPeers (Torrent * t, tr_block_index_t block,
+getBlockRequestPeers (tr_swarm * s, tr_block_index_t block,
                       tr_ptrArray * peerArr)
 {
-    bool exact;
-    int i, pos;
-    struct block_request key;
+  bool exact;
+  int i, pos;
+  struct block_request key;
 
-    key.block = block;
-    key.peer = NULL;
-    pos = tr_lowerBound (&key, t->requests, t->requestCount,
-                         sizeof (struct block_request),
-                         compareReqByBlock, &exact);
+  key.block = block;
+  key.peer = NULL;
+  pos = tr_lowerBound (&key, s->requests, s->requestCount,
+                       sizeof (struct block_request),
+                       compareReqByBlock, &exact);
 
-    assert (!exact); /* shouldn't have a request with .peer == NULL */
+  assert (!exact); /* shouldn't have a request with .peer == NULL */
 
-    for (i = pos; i < t->requestCount; ++i)
+  for (i=pos; i<s->requestCount; ++i)
     {
-        if (t->requests[i].block != block)
-            break;
-        tr_ptrArrayAppend (peerArr, t->requests[i].peer);
+      if (s->requests[i].block != block)
+        break;
+      tr_ptrArrayAppend (peerArr, s->requests[i].peer);
     }
 }
 
 static void
 decrementPendingReqCount (const struct block_request * b)
 {
-    if (b->peer != NULL)
-        if (b->peer->pendingReqsToPeer > 0)
-            --b->peer->pendingReqsToPeer;
+  if (b->peer != NULL)
+    if (b->peer->pendingReqsToPeer > 0)
+      --b->peer->pendingReqsToPeer;
 }
 
 static void
-requestListRemove (Torrent * t, tr_block_index_t block, const tr_peer * peer)
+requestListRemove (tr_swarm * s, tr_block_index_t block, const tr_peer * peer)
 {
-    const struct block_request * b = requestListLookup (t, block, peer);
-    if (b != NULL)
+  const struct block_request * b = requestListLookup (s, block, peer);
+
+  if (b != NULL)
     {
-        const int pos = b - t->requests;
-        assert (pos < t->requestCount);
+      const int pos = b - s->requests;
+      assert (pos < s->requestCount);
 
-        decrementPendingReqCount (b);
+      decrementPendingReqCount (b);
 
-        tr_removeElementFromArray (t->requests,
-                                   pos,
-                                   sizeof (struct block_request),
-                                   t->requestCount--);
+      tr_removeElementFromArray (s->requests,
+                                 pos,
+                                 sizeof (struct block_request),
+                                 s->requestCount--);
 
-        /*fprintf (stderr, "removing request of block %lu from peer %s... "
-                           "there are now %d block requests left\n",
+      /*fprintf (stderr, "removing request of block %lu from peer %s... "
+                         "there are now %d block requests left\n",
                          (unsigned long)block, tr_atomAddrStr (peer->atom), t->requestCount);*/
     }
 }
 
 static int
-countActiveWebseeds (const Torrent * t)
+countActiveWebseeds (const tr_swarm * s)
 {
-    int activeCount = 0;
-    const tr_webseed ** w = (const tr_webseed **) tr_ptrArrayBase (&t->webseeds);
-    const tr_webseed ** const wend = w + tr_ptrArraySize (&t->webseeds);
+  int activeCount = 0;
+  const tr_webseed ** w = (const tr_webseed **) tr_ptrArrayBase (&s->webseeds);
+  const tr_webseed ** const wend = w + tr_ptrArraySize (&s->webseeds);
 
-    for (; w!=wend; ++w)
-        if (tr_webseedIsActive (*w))
-            ++activeCount;
+  for (; w!=wend; ++w)
+    if (tr_webseedIsActive (*w))
+      ++activeCount;
 
-    return activeCount;
+  return activeCount;
 }
 
 static bool
-testForEndgame (const Torrent * t)
+testForEndgame (const tr_swarm * s)
 {
-    /* we consider ourselves to be in endgame if the number of bytes
-       we've got requested is >= the number of bytes left to download */
-    return (t->requestCount * t->tor->blockSize)
-               >= tr_cpLeftUntilDone (&t->tor->completion);
+  /* we consider ourselves to be in endgame if the number of bytes
+     we've got requested is >= the number of bytes left to download */
+  return (s->requestCount * s->tor->blockSize)
+               >= tr_cpLeftUntilDone (&s->tor->completion);
 }
 
 static void
-updateEndgame (Torrent * t)
+updateEndgame (tr_swarm * s)
 {
-    assert (t->requestCount >= 0);
+  assert (s->requestCount >= 0);
 
-    if (!testForEndgame (t))
+  if (!testForEndgame (s))
     {
-        /* not in endgame */
-        t->endgame = 0;
+      /* not in endgame */
+      s->endgame = 0;
     }
-    else if (!t->endgame) /* only recalculate when endgame first begins */
+  else if (!s->endgame) /* only recalculate when endgame first begins */
     {
-        int numDownloading = 0;
-        const tr_peer ** p = (const tr_peer **) tr_ptrArrayBase (&t->peers);
-        const tr_peer ** const pend = p + tr_ptrArraySize (&t->peers);
+      int numDownloading = 0;
+      const tr_peer ** p = (const tr_peer **) tr_ptrArrayBase (&s->peers);
+      const tr_peer ** const pend = p + tr_ptrArraySize (&s->peers);
 
-        /* add the active bittorrent peers... */
-        for (; p!=pend; ++p)
-            if ((*p)->pendingReqsToPeer > 0)
-                ++numDownloading;
+      /* add the active bittorrent peers... */
+      for (; p!=pend; ++p)
+        if ((*p)->pendingReqsToPeer > 0)
+          ++numDownloading;
 
-        /* add the active webseeds... */
-        numDownloading += countActiveWebseeds (t);
+      /* add the active webseeds... */
+      numDownloading += countActiveWebseeds (s);
 
-        /* average number of pending requests per downloading peer */
-        t->endgame = t->requestCount / MAX (numDownloading, 1);
+      /* average number of pending requests per downloading peer */
+      s->endgame = s->requestCount / MAX (numDownloading, 1);
     }
 }
 
@@ -926,9 +927,9 @@ updateEndgame (Torrent * t)
 ****/
 
 static inline void
-invalidatePieceSorting (Torrent * t)
+invalidatePieceSorting (tr_swarm * s)
 {
-    t->pieceSortState = PIECES_UNSORTED;
+  s->pieceSortState = PIECES_UNSORTED;
 }
 
 static const tr_torrent * weightTorrent;
@@ -936,13 +937,13 @@ static const tr_torrent * weightTorrent;
 static const uint16_t * weightReplication;
 
 static void
-setComparePieceByWeightTorrent (Torrent * t)
+setComparePieceByWeightTorrent (tr_swarm * s)
 {
-    if (!replicationExists (t))
-        replicationNew (t);
+  if (!replicationExists (s))
+    replicationNew (s);
 
-    weightTorrent = t->tor;
-    weightReplication = t->pieceReplication;
+  weightTorrent = s->tor;
+  weightReplication = s->pieceReplication;
 }
 
 /* we try to create a "weight" s.t. high-priority pieces come before others,
@@ -950,68 +951,69 @@ setComparePieceByWeightTorrent (Torrent * t)
 static int
 comparePieceByWeight (const void * va, const void * vb)
 {
-    const struct weighted_piece * a = va;
-    const struct weighted_piece * b = vb;
-    int ia, ib, missing, pending;
-    const tr_torrent * tor = weightTorrent;
-    const uint16_t * rep = weightReplication;
+  const struct weighted_piece * a = va;
+  const struct weighted_piece * b = vb;
+  int ia, ib, missing, pending;
+  const tr_torrent * tor = weightTorrent;
+  const uint16_t * rep = weightReplication;
 
-    /* primary key: weight */
-    missing = tr_cpMissingBlocksInPiece (&tor->completion, a->index);
-    pending = a->requestCount;
-    ia = missing > pending ? missing - pending : (tor->blockCountInPiece + pending);
-    missing = tr_cpMissingBlocksInPiece (&tor->completion, b->index);
-    pending = b->requestCount;
-    ib = missing > pending ? missing - pending : (tor->blockCountInPiece + pending);
-    if (ia < ib) return -1;
-    if (ia > ib) return 1;
+  /* primary key: weight */
+  missing = tr_cpMissingBlocksInPiece (&tor->completion, a->index);
+  pending = a->requestCount;
+  ia = missing > pending ? missing - pending : (tor->blockCountInPiece + pending);
+  missing = tr_cpMissingBlocksInPiece (&tor->completion, b->index);
+  pending = b->requestCount;
+  ib = missing > pending ? missing - pending : (tor->blockCountInPiece + pending);
+  if (ia < ib) return -1;
+  if (ia > ib) return 1;
 
-    /* secondary key: higher priorities go first */
-    ia = tor->info.pieces[a->index].priority;
-    ib = tor->info.pieces[b->index].priority;
-    if (ia > ib) return -1;
-    if (ia < ib) return 1;
+  /* secondary key: higher priorities go first */
+  ia = tor->info.pieces[a->index].priority;
+  ib = tor->info.pieces[b->index].priority;
+  if (ia > ib) return -1;
+  if (ia < ib) return 1;
 
-    /* tertiary key: rarest first. */
-    ia = rep[a->index];
-    ib = rep[b->index];
-    if (ia < ib) return -1;
-    if (ia > ib) return 1;
+  /* tertiary key: rarest first. */
+  ia = rep[a->index];
+  ib = rep[b->index];
+  if (ia < ib) return -1;
+  if (ia > ib) return 1;
 
-    /* quaternary key: random */
-    if (a->salt < b->salt) return -1;
-    if (a->salt > b->salt) return 1;
+  /* quaternary key: random */
+  if (a->salt < b->salt) return -1;
+  if (a->salt > b->salt) return 1;
 
-    /* okay, they're equal */
-    return 0;
+  /* okay, they're equal */
+  return 0;
 }
 
 static int
 comparePieceByIndex (const void * va, const void * vb)
 {
-    const struct weighted_piece * a = va;
-    const struct weighted_piece * b = vb;
-    if (a->index < b->index) return -1;
-    if (a->index > b->index) return 1;
-    return 0;
+  const struct weighted_piece * a = va;
+  const struct weighted_piece * b = vb;
+  if (a->index < b->index) return -1;
+  if (a->index > b->index) return 1;
+  return 0;
 }
 
 static void
-pieceListSort (Torrent * t, enum piece_sort_state state)
+pieceListSort (tr_swarm * s, enum piece_sort_state state)
 {
-    assert (state==PIECES_SORTED_BY_INDEX
-         || state==PIECES_SORTED_BY_WEIGHT);
+  assert (state==PIECES_SORTED_BY_INDEX
+       || state==PIECES_SORTED_BY_WEIGHT);
 
-
-    if (state == PIECES_SORTED_BY_WEIGHT)
+  if (state == PIECES_SORTED_BY_WEIGHT)
     {
-        setComparePieceByWeightTorrent (t);
-        qsort (t->pieces, t->pieceCount, sizeof (struct weighted_piece), comparePieceByWeight);
+      setComparePieceByWeightTorrent (s);
+      qsort (s->pieces, s->pieceCount, sizeof (struct weighted_piece), comparePieceByWeight);
     }
-    else
-        qsort (t->pieces, t->pieceCount, sizeof (struct weighted_piece), comparePieceByIndex);
+  else
+    {
+      qsort (s->pieces, s->pieceCount, sizeof (struct weighted_piece), comparePieceByIndex);
+    }
 
-    t->pieceSortState = state;
+  s->pieceSortState = state;
 }
 
 /**
@@ -1064,159 +1066,160 @@ assertReplicationCountIsExact (Torrent * t)
 #endif
 
 static struct weighted_piece *
-pieceListLookup (Torrent * t, tr_piece_index_t index)
+pieceListLookup (tr_swarm * s, tr_piece_index_t index)
 {
-    int i;
+  int i;
 
-    for (i=0; i<t->pieceCount; ++i)
-        if (t->pieces[i].index == index)
-            return &t->pieces[i];
+  for (i=0; i<s->pieceCount; ++i)
+    if (s->pieces[i].index == index)
+      return &s->pieces[i];
 
-    return NULL;
+  return NULL;
 }
 
 static void
-pieceListRebuild (Torrent * t)
+pieceListRebuild (tr_swarm * s)
 {
-
-    if (!tr_torrentIsSeed (t->tor))
+  if (!tr_torrentIsSeed (s->tor))
     {
-        tr_piece_index_t i;
-        tr_piece_index_t * pool;
-        tr_piece_index_t poolCount = 0;
-        const tr_torrent * tor = t->tor;
-        const tr_info * inf = tr_torrentInfo (tor);
-        struct weighted_piece * pieces;
-        int pieceCount;
+      tr_piece_index_t i;
+      tr_piece_index_t * pool;
+      tr_piece_index_t poolCount = 0;
+      const tr_torrent * tor = s->tor;
+      const tr_info * inf = tr_torrentInfo (tor);
+      struct weighted_piece * pieces;
+      int pieceCount;
 
-        /* build the new list */
-        pool = tr_new (tr_piece_index_t, inf->pieceCount);
-        for (i=0; i<inf->pieceCount; ++i)
-            if (!inf->pieces[i].dnd)
-                if (!tr_cpPieceIsComplete (&tor->completion, i))
-                    pool[poolCount++] = i;
-        pieceCount = poolCount;
-        pieces = tr_new0 (struct weighted_piece, pieceCount);
-        for (i=0; i<poolCount; ++i) {
-            struct weighted_piece * piece = pieces + i;
-            piece->index = pool[i];
-            piece->requestCount = 0;
-            piece->salt = tr_cryptoWeakRandInt (4096);
+      /* build the new list */
+      pool = tr_new (tr_piece_index_t, inf->pieceCount);
+      for (i=0; i<inf->pieceCount; ++i)
+        if (!inf->pieces[i].dnd)
+          if (!tr_cpPieceIsComplete (&tor->completion, i))
+            pool[poolCount++] = i;
+      pieceCount = poolCount;
+      pieces = tr_new0 (struct weighted_piece, pieceCount);
+      for (i=0; i<poolCount; ++i)
+        {
+          struct weighted_piece * piece = pieces + i;
+          piece->index = pool[i];
+          piece->requestCount = 0;
+          piece->salt = tr_cryptoWeakRandInt (4096);
         }
 
-        /* if we already had a list of pieces, merge it into
-         * the new list so we don't lose its requestCounts */
-        if (t->pieces != NULL)
+      /* if we already had a list of pieces, merge it into
+       * the new list so we don't lose its requestCounts */
+      if (s->pieces != NULL)
         {
-            struct weighted_piece * o = t->pieces;
-            struct weighted_piece * oend = o + t->pieceCount;
-            struct weighted_piece * n = pieces;
-            struct weighted_piece * nend = n + pieceCount;
+          struct weighted_piece * o = s->pieces;
+          struct weighted_piece * oend = o + s->pieceCount;
+          struct weighted_piece * n = pieces;
+          struct weighted_piece * nend = n + pieceCount;
 
-            pieceListSort (t, PIECES_SORTED_BY_INDEX);
+          pieceListSort (s, PIECES_SORTED_BY_INDEX);
 
-            while (o!=oend && n!=nend) {
-                if (o->index < n->index)
-                    ++o;
-                else if (o->index > n->index)
-                    ++n;
-                else
-                    *n++ = *o++;
+          while (o!=oend && n!=nend)
+            {
+              if (o->index < n->index)
+                ++o;
+              else if (o->index > n->index)
+                ++n;
+              else
+                *n++ = *o++;
             }
 
-            tr_free (t->pieces);
+          tr_free (s->pieces);
         }
 
-        t->pieces = pieces;
-        t->pieceCount = pieceCount;
+      s->pieces = pieces;
+      s->pieceCount = pieceCount;
 
-        pieceListSort (t, PIECES_SORTED_BY_WEIGHT);
+      pieceListSort (s, PIECES_SORTED_BY_WEIGHT);
 
-        /* cleanup */
-        tr_free (pool);
+      /* cleanup */
+      tr_free (pool);
     }
 }
 
 static void
-pieceListRemovePiece (Torrent * t, tr_piece_index_t piece)
+pieceListRemovePiece (tr_swarm * s, tr_piece_index_t piece)
 {
-    struct weighted_piece * p;
+  struct weighted_piece * p;
 
-    if ((p = pieceListLookup (t, piece)))
+  if ((p = pieceListLookup (s, piece)))
     {
-        const int pos = p - t->pieces;
+      const int pos = p - s->pieces;
 
-        tr_removeElementFromArray (t->pieces,
-                                   pos,
-                                   sizeof (struct weighted_piece),
-                                   t->pieceCount--);
+      tr_removeElementFromArray (s->pieces,
+                                 pos,
+                                 sizeof (struct weighted_piece),
+                                 s->pieceCount--);
 
-        if (t->pieceCount == 0)
+      if (s->pieceCount == 0)
         {
-            tr_free (t->pieces);
-            t->pieces = NULL;
+          tr_free (s->pieces);
+          s->pieces = NULL;
         }
     }
 }
 
 static void
-pieceListResortPiece (Torrent * t, struct weighted_piece * p)
+pieceListResortPiece (tr_swarm * s, struct weighted_piece * p)
 {
-    int pos;
-    bool isSorted = true;
+  int pos;
+  bool isSorted = true;
 
-    if (p == NULL)
-        return;
+  if (p == NULL)
+    return;
 
-    /* is the torrent already sorted? */
-    pos = p - t->pieces;
-    setComparePieceByWeightTorrent (t);
-    if (isSorted && (pos > 0) && (comparePieceByWeight (p-1, p) > 0))
-        isSorted = false;
-    if (isSorted && (pos < t->pieceCount - 1) && (comparePieceByWeight (p, p+1) > 0))
-        isSorted = false;
+  /* is the torrent already sorted? */
+  pos = p - s->pieces;
+  setComparePieceByWeightTorrent (s);
+  if (isSorted && (pos > 0) && (comparePieceByWeight (p-1, p) > 0))
+    isSorted = false;
+  if (isSorted && (pos < s->pieceCount - 1) && (comparePieceByWeight (p, p+1) > 0))
+    isSorted = false;
 
-    if (t->pieceSortState != PIECES_SORTED_BY_WEIGHT)
+  if (s->pieceSortState != PIECES_SORTED_BY_WEIGHT)
     {
-       pieceListSort (t, PIECES_SORTED_BY_WEIGHT);
-       isSorted = true;
+      pieceListSort (s, PIECES_SORTED_BY_WEIGHT);
+      isSorted = true;
     }
 
-    /* if it's not sorted, move it around */
-    if (!isSorted)
+  /* if it's not sorted, move it around */
+  if (!isSorted)
     {
-        bool exact;
-        const struct weighted_piece tmp = *p;
+      bool exact;
+      const struct weighted_piece tmp = *p;
 
-        tr_removeElementFromArray (t->pieces,
-                                   pos,
-                                   sizeof (struct weighted_piece),
-                                   t->pieceCount--);
+      tr_removeElementFromArray (s->pieces,
+                                 pos,
+                                 sizeof (struct weighted_piece),
+                                 s->pieceCount--);
 
-        pos = tr_lowerBound (&tmp, t->pieces, t->pieceCount,
-                             sizeof (struct weighted_piece),
-                             comparePieceByWeight, &exact);
+      pos = tr_lowerBound (&tmp, s->pieces, s->pieceCount,
+                           sizeof (struct weighted_piece),
+                           comparePieceByWeight, &exact);
 
-        memmove (&t->pieces[pos + 1],
-                 &t->pieces[pos],
-                 sizeof (struct weighted_piece) * (t->pieceCount++ - pos));
+      memmove (&s->pieces[pos + 1],
+               &s->pieces[pos],
+               sizeof (struct weighted_piece) * (s->pieceCount++ - pos));
 
-        t->pieces[pos] = tmp;
+      s->pieces[pos] = tmp;
     }
 
-    assertWeightedPiecesAreSorted (t);
+  assertWeightedPiecesAreSorted (s);
 }
 
 static void
-pieceListRemoveRequest (Torrent * t, tr_block_index_t block)
+pieceListRemoveRequest (tr_swarm * s, tr_block_index_t block)
 {
-    struct weighted_piece * p;
-    const tr_piece_index_t index = tr_torBlockPiece (t->tor, block);
+  struct weighted_piece * p;
+  const tr_piece_index_t index = tr_torBlockPiece (s->tor, block);
 
-    if (((p = pieceListLookup (t, index))) && (p->requestCount > 0))
+  if (((p = pieceListLookup (s, index))) && (p->requestCount > 0))
     {
-        --p->requestCount;
-        pieceListResortPiece (t, p);
+      --p->requestCount;
+      pieceListResortPiece (s, p);
     }
 }
 
@@ -1232,80 +1235,80 @@ pieceListRemoveRequest (Torrent * t, tr_block_index_t block)
  * piece list is already sorted
  */
 static void
-tr_incrReplicationOfPiece (Torrent * t, const size_t index)
+tr_incrReplicationOfPiece (tr_swarm * s, const size_t index)
 {
-    assert (replicationExists (t));
-    assert (t->pieceReplicationSize == t->tor->info.pieceCount);
+  assert (replicationExists (s));
+  assert (s->pieceReplicationSize == s->tor->info.pieceCount);
 
-    /* One more replication of this piece is present in the swarm */
-    ++t->pieceReplication[index];
+  /* One more replication of this piece is present in the swarm */
+  ++s->pieceReplication[index];
 
-    /* we only resort the piece if the list is already sorted */
-    if (t->pieceSortState == PIECES_SORTED_BY_WEIGHT)
-        pieceListResortPiece (t, pieceListLookup (t, index));
+  /* we only resort the piece if the list is already sorted */
+  if (s->pieceSortState == PIECES_SORTED_BY_WEIGHT)
+    pieceListResortPiece (s, pieceListLookup (s, index));
 }
 
 /**
  * Increases the replication count of pieces present in the bitfield
  */
 static void
-tr_incrReplicationFromBitfield (Torrent * t, const tr_bitfield * b)
+tr_incrReplicationFromBitfield (tr_swarm * s, const tr_bitfield * b)
 {
-    size_t i;
-    uint16_t * rep = t->pieceReplication;
-    const size_t n = t->tor->info.pieceCount;
+  size_t i;
+  uint16_t * rep = s->pieceReplication;
+  const size_t n = s->tor->info.pieceCount;
 
-    assert (replicationExists (t));
+  assert (replicationExists (s));
 
-    for (i=0; i<n; ++i)
-        if (tr_bitfieldHas (b, i))
-            ++rep[i];
+  for (i=0; i<n; ++i)
+    if (tr_bitfieldHas (b, i))
+      ++rep[i];
 
-    if (t->pieceSortState == PIECES_SORTED_BY_WEIGHT)
-        invalidatePieceSorting (t);
+  if (s->pieceSortState == PIECES_SORTED_BY_WEIGHT)
+    invalidatePieceSorting (s);
 }
 
 /**
  * Increase the replication count of every piece
  */
 static void
-tr_incrReplication (Torrent * t)
+tr_incrReplication (tr_swarm * s)
 {
-    int i;
-    const int n = t->pieceReplicationSize;
+  int i;
+  const int n = s->pieceReplicationSize;
 
-    assert (replicationExists (t));
-    assert (t->pieceReplicationSize == t->tor->info.pieceCount);
+  assert (replicationExists (s));
+  assert (s->pieceReplicationSize == s->tor->info.pieceCount);
 
-    for (i=0; i<n; ++i)
-        ++t->pieceReplication[i];
+  for (i=0; i<n; ++i)
+    ++s->pieceReplication[i];
 }
 
 /**
  * Decrease the replication count of pieces present in the bitset.
  */
 static void
-tr_decrReplicationFromBitfield (Torrent * t, const tr_bitfield * b)
+tr_decrReplicationFromBitfield (tr_swarm * s, const tr_bitfield * b)
 {
-    int i;
-    const int n = t->pieceReplicationSize;
+  int i;
+  const int n = s->pieceReplicationSize;
 
-    assert (replicationExists (t));
-    assert (t->pieceReplicationSize == t->tor->info.pieceCount);
+  assert (replicationExists (s));
+  assert (s->pieceReplicationSize == s->tor->info.pieceCount);
 
-    if (tr_bitfieldHasAll (b))
+  if (tr_bitfieldHasAll (b))
     {
-        for (i=0; i<n; ++i)
-            --t->pieceReplication[i];
+      for (i=0; i<n; ++i)
+        --s->pieceReplication[i];
     }
-    else if (!tr_bitfieldHasNone (b))
+  else if (!tr_bitfieldHasNone (b))
     {
-        for (i=0; i<n; ++i)
-            if (tr_bitfieldHas (b, i))
-                --t->pieceReplication[i];
+      for (i=0; i<n; ++i)
+        if (tr_bitfieldHas (b, i))
+          --s->pieceReplication[i];
 
-        if (t->pieceSortState == PIECES_SORTED_BY_WEIGHT)
-            invalidatePieceSorting (t);
+      if (s->pieceSortState == PIECES_SORTED_BY_WEIGHT)
+        invalidatePieceSorting (s);
     }
 }
 
@@ -1316,9 +1319,9 @@ tr_decrReplicationFromBitfield (Torrent * t, const tr_bitfield * b)
 void
 tr_peerMgrRebuildRequests (tr_torrent * tor)
 {
-    assert (tr_isTorrent (tor));
+  assert (tr_isTorrent (tor));
 
-    pieceListRebuild (tor->torrentPeers);
+  pieceListRebuild (tor->swarm);
 }
 
 void
@@ -1329,138 +1332,142 @@ tr_peerMgrGetNextRequests (tr_torrent           * tor,
                            int                  * numgot,
                            bool                   get_intervals)
 {
-    int i;
-    int got;
-    Torrent * t;
-    struct weighted_piece * pieces;
-    const tr_bitfield * const have = &peer->have;
+  int i;
+  int got;
+  tr_swarm * s;
+  struct weighted_piece * pieces;
+  const tr_bitfield * const have = &peer->have;
 
-    /* sanity clause */
-    assert (tr_isTorrent (tor));
-    assert (peer->clientIsInterested);
-    assert (!peer->clientIsChoked);
-    assert (numwant > 0);
+  /* sanity clause */
+  assert (tr_isTorrent (tor));
+  assert (peer->clientIsInterested);
+  assert (!peer->clientIsChoked);
+  assert (numwant > 0);
 
-    /* walk through the pieces and find blocks that should be requested */
-    got = 0;
-    t = tor->torrentPeers;
+  /* walk through the pieces and find blocks that should be requested */
+  got = 0;
+  s = tor->swarm;
 
-    /* prep the pieces list */
-    if (t->pieces == NULL)
-        pieceListRebuild (t);
+  /* prep the pieces list */
+  if (s->pieces == NULL)
+    pieceListRebuild (s);
 
-    if (t->pieceSortState != PIECES_SORTED_BY_WEIGHT)
-        pieceListSort (t, PIECES_SORTED_BY_WEIGHT);
+  if (s->pieceSortState != PIECES_SORTED_BY_WEIGHT)
+    pieceListSort (s, PIECES_SORTED_BY_WEIGHT);
 
-    assertReplicationCountIsExact (t);
-    assertWeightedPiecesAreSorted (t);
+  assertReplicationCountIsExact (s);
+  assertWeightedPiecesAreSorted (s);
 
-    updateEndgame (t);
-    pieces = t->pieces;
-    for (i=0; i<t->pieceCount && got<numwant; ++i)
+  updateEndgame (s);
+  pieces = s->pieces;
+  for (i=0; i<s->pieceCount && got<numwant; ++i)
     {
-        struct weighted_piece * p = pieces + i;
+      struct weighted_piece * p = pieces + i;
 
-        /* if the peer has this piece that we want... */
-        if (tr_bitfieldHas (have, p->index))
+      /* if the peer has this piece that we want... */
+      if (tr_bitfieldHas (have, p->index))
         {
-            tr_block_index_t b;
-            tr_block_index_t first;
-            tr_block_index_t last;
-            tr_ptrArray peerArr = TR_PTR_ARRAY_INIT;
+          tr_block_index_t b;
+          tr_block_index_t first;
+          tr_block_index_t last;
+          tr_ptrArray peerArr = TR_PTR_ARRAY_INIT;
 
-            tr_torGetPieceBlockRange (tor, p->index, &first, &last);
+          tr_torGetPieceBlockRange (tor, p->index, &first, &last);
 
-            for (b=first; b<=last && (got<numwant || (get_intervals && setme[2*got-1] == b-1)); ++b)
+          for (b=first; b<=last && (got<numwant || (get_intervals && setme[2*got-1] == b-1)); ++b)
             {
-                int peerCount;
-                tr_peer ** peers;
+              int peerCount;
+              tr_peer ** peers;
 
-                /* don't request blocks we've already got */
-                if (tr_cpBlockIsComplete (&tor->completion, b))
+              /* don't request blocks we've already got */
+              if (tr_cpBlockIsComplete (&tor->completion, b))
+                continue;
+
+              /* always add peer if this block has no peers yet */
+              tr_ptrArrayClear (&peerArr);
+              getBlockRequestPeers (s, b, &peerArr);
+              peers = (tr_peer **) tr_ptrArrayPeek (&peerArr, &peerCount);
+              if (peerCount != 0)
+                {
+                  /* don't make a second block request until the endgame */
+                  if (!s->endgame)
                     continue;
 
-                /* always add peer if this block has no peers yet */
-                tr_ptrArrayClear (&peerArr);
-                getBlockRequestPeers (t, b, &peerArr);
-                peers = (tr_peer **) tr_ptrArrayPeek (&peerArr, &peerCount);
-                if (peerCount != 0)
+                  /* don't have more than two peers requesting this block */
+                  if (peerCount > 1)
+                    continue;
+
+                  /* don't send the same request to the same peer twice */
+                  if (peer == peers[0])
+                    continue;
+
+                  /* in the endgame allow an additional peer to download a
+                     block but only if the peer seems to be handling requests
+                     relatively fast */
+                  if (peer->pendingReqsToPeer + numwant - got < s->endgame)
+                    continue;
+                }
+
+              /* update the caller's table */
+              if (!get_intervals)
                 {
-                    /* don't make a second block request until the endgame */
-                    if (!t->endgame)
-                        continue;
-
-                    /* don't have more than two peers requesting this block */
-                    if (peerCount > 1)
-                        continue;
-
-                    /* don't send the same request to the same peer twice */
-                    if (peer == peers[0])
-                        continue;
-
-                    /* in the endgame allow an additional peer to download a
-                       block but only if the peer seems to be handling requests
-                       relatively fast */
-                    if (peer->pendingReqsToPeer + numwant - got < t->endgame)
-                        continue;
+                  setme[got++] = b;
+                }
+              /* if intervals are requested two array entries are necessarry:
+                 one for the interval's starting block and one for its end block */
+              else if (got && setme[2 * got - 1] == b - 1 && b != first)
+                {
+                  /* expand the last interval */
+                  ++setme[2 * got - 1];
+                }
+              else
+                {
+                  /* begin a new interval */
+                  setme[2 * got] = setme[2 * got + 1] = b;
+                  ++got;
                 }
 
-                /* update the caller's table */
-                if (!get_intervals) {
-                    setme[got++] = b;
-                }
-                /* if intervals are requested two array entries are necessarry:
-                   one for the interval's starting block and one for its end block */
-                else if (got && setme[2 * got - 1] == b - 1 && b != first) {
-                    /* expand the last interval */
-                    ++setme[2 * got - 1];
-                }
-                else {
-                    /* begin a new interval */
-                    setme[2 * got] = setme[2 * got + 1] = b;
-                    ++got;
-                }
-
-                /* update our own tables */
-                requestListAdd (t, b, peer);
-                ++p->requestCount;
+              /* update our own tables */
+              requestListAdd (s, b, peer);
+              ++p->requestCount;
             }
 
-            tr_ptrArrayDestruct (&peerArr, NULL);
+          tr_ptrArrayDestruct (&peerArr, NULL);
         }
     }
 
-    /* In most cases we've just changed the weights of a small number of pieces.
-     * So rather than qsort ()ing the entire array, it's faster to apply an
-     * adaptive insertion sort algorithm. */
-    if (got > 0)
+  /* In most cases we've just changed the weights of a small number of pieces.
+   * So rather than qsort ()ing the entire array, it's faster to apply an
+   * adaptive insertion sort algorithm. */
+  if (got > 0)
     {
-        /* not enough requests || last piece modified */
-        if (i == t->pieceCount) --i;
+      /* not enough requests || last piece modified */
+      if (i == s->pieceCount)
+        --i;
 
-        setComparePieceByWeightTorrent (t);
-        while (--i >= 0)
+      setComparePieceByWeightTorrent (s);
+      while (--i >= 0)
         {
-            bool exact;
+          bool exact;
 
-            /* relative position! */
-            const int newpos = tr_lowerBound (&t->pieces[i], &t->pieces[i + 1],
-                                              t->pieceCount - (i + 1),
-                                              sizeof (struct weighted_piece),
-                                              comparePieceByWeight, &exact);
-            if (newpos > 0)
+          /* relative position! */
+          const int newpos = tr_lowerBound (&s->pieces[i], &s->pieces[i + 1],
+                                            s->pieceCount - (i + 1),
+                                            sizeof (struct weighted_piece),
+                                            comparePieceByWeight, &exact);
+          if (newpos > 0)
             {
-                const struct weighted_piece piece = t->pieces[i];
-                memmove (&t->pieces[i],
-                         &t->pieces[i + 1],
-                         sizeof (struct weighted_piece) * (newpos));
-                t->pieces[i + newpos] = piece;
+              const struct weighted_piece piece = s->pieces[i];
+              memmove (&s->pieces[i],
+                       &s->pieces[i + 1],
+                       sizeof (struct weighted_piece) * (newpos));
+              s->pieces[i + newpos] = piece;
             }
         }
     }
 
-    assertWeightedPiecesAreSorted (t);
-    *numgot = got;
+  assertWeightedPiecesAreSorted (t);
+  *numgot = got;
 }
 
 bool
@@ -1468,8 +1475,7 @@ tr_peerMgrDidPeerRequest (const tr_torrent  * tor,
                           const tr_peer     * peer,
                           tr_block_index_t    block)
 {
-    const Torrent * t = tor->torrentPeers;
-    return requestListLookup ((Torrent*)t, block, peer) != NULL;
+  return requestListLookup ((tr_swarm*)tor->swarm, block, peer) != NULL;
 }
 
 /* cancel requests that are too old */
@@ -1490,7 +1496,7 @@ refillUpkeep (int foo UNUSED, short bar UNUSED, void * vmgr)
     /* alloc the temporary "cancel" buffer */
     tor = NULL;
     while ((tor = tr_torrentNext (mgr->session, tor)))
-        cancel_buflen = MAX (cancel_buflen, tor->torrentPeers->requestCount);
+        cancel_buflen = MAX (cancel_buflen, tor->swarm->requestCount);
     if (cancel_buflen > 0)
         cancel = tr_new (struct block_request, cancel_buflen);
 
@@ -1498,8 +1504,8 @@ refillUpkeep (int foo UNUSED, short bar UNUSED, void * vmgr)
     tor = NULL;
     while ((tor = tr_torrentNext (mgr->session, tor)))
     {
-        Torrent * t = tor->torrentPeers;
-        const int n = t->requestCount;
+        tr_swarm * s = tor->swarm;
+        const int n = s->requestCount;
         if (n > 0)
         {
             int keepCount = 0;
@@ -1507,20 +1513,20 @@ refillUpkeep (int foo UNUSED, short bar UNUSED, void * vmgr)
             const struct block_request * it;
             const struct block_request * end;
 
-            for (it=t->requests, end=it+n; it!=end; ++it)
+            for (it=s->requests, end=it+n; it!=end; ++it)
             {
                 if ((it->sentAt <= too_old) && it->peer->msgs && !tr_peerMsgsIsReadingBlock (it->peer->msgs, it->block))
                     cancel[cancelCount++] = *it;
                 else
                 {
-                    if (it != &t->requests[keepCount])
-                        t->requests[keepCount] = *it;
+                    if (it != &s->requests[keepCount])
+                        s->requests[keepCount] = *it;
                     keepCount++;
                 }
             }
 
             /* prune out the ones we aren't keeping */
-            t->requestCount = keepCount;
+            s->requestCount = keepCount;
 
             /* send cancel messages for all the "cancel" ones */
             for (it=cancel, end=it+cancelCount; it!=end; ++it) {
@@ -1533,7 +1539,7 @@ refillUpkeep (int foo UNUSED, short bar UNUSED, void * vmgr)
 
             /* decrement the pending request counts for the timed-out blocks */
             for (it=cancel, end=it+cancelCount; it!=end; ++it)
-                pieceListRemoveRequest (t, it->block);
+                pieceListRemoveRequest (s, it->block);
         }
     }
 
@@ -1543,22 +1549,22 @@ refillUpkeep (int foo UNUSED, short bar UNUSED, void * vmgr)
 }
 
 static void
-addStrike (Torrent * t, tr_peer * peer)
+addStrike (tr_swarm * s, tr_peer * peer)
 {
-    tordbg (t, "increasing peer %s strike count to %d",
-            tr_atomAddrStr (peer->atom), peer->strikes + 1);
+  tordbg (s, "increasing peer %s strike count to %d",
+          tr_atomAddrStr (peer->atom), peer->strikes + 1);
 
-    if (++peer->strikes >= MAX_BAD_PIECES_PER_PEER)
+  if (++peer->strikes >= MAX_BAD_PIECES_PER_PEER)
     {
-        struct peer_atom * atom = peer->atom;
-        atom->flags2 |= MYFLAG_BANNED;
-        peer->doPurge = 1;
-        tordbg (t, "banning peer %s", tr_atomAddrStr (atom));
+      struct peer_atom * atom = peer->atom;
+      atom->flags2 |= MYFLAG_BANNED;
+      peer->doPurge = 1;
+      tordbg (s, "banning peer %s", tr_atomAddrStr (atom));
     }
 }
 
 static void
-peerSuggestedPiece (Torrent            * t UNUSED,
+peerSuggestedPiece (tr_swarm           * s UNUSED,
                     tr_peer            * peer UNUSED,
                     tr_piece_index_t     pieceIndex UNUSED,
                     int                  isFastAllowed UNUSED)
@@ -1608,34 +1614,34 @@ peerSuggestedPiece (Torrent            * t UNUSED,
 }
 
 static void
-removeRequestFromTables (Torrent * t, tr_block_index_t block, const tr_peer * peer)
+removeRequestFromTables (tr_swarm * s, tr_block_index_t block, const tr_peer * peer)
 {
-    requestListRemove (t, block, peer);
-    pieceListRemoveRequest (t, block);
+  requestListRemove (s, block, peer);
+  pieceListRemoveRequest (s, block);
 }
 
 /* peer choked us, or maybe it disconnected.
    either way we need to remove all its requests */
 static void
-peerDeclinedAllRequests (Torrent * t, const tr_peer * peer)
+peerDeclinedAllRequests (tr_swarm * s, const tr_peer * peer)
 {
-    int i, n;
-    tr_block_index_t * blocks = tr_new (tr_block_index_t, t->requestCount);
+  int i, n;
+  tr_block_index_t * blocks = tr_new (tr_block_index_t, s->requestCount);
 
-    for (i=n=0; i<t->requestCount; ++i)
-        if (peer == t->requests[i].peer)
-            blocks[n++] = t->requests[i].block;
+  for (i=n=0; i<s->requestCount; ++i)
+    if (peer == s->requests[i].peer)
+      blocks[n++] = s->requests[i].block;
 
-    for (i=0; i<n; ++i)
-        removeRequestFromTables (t, blocks[i], peer);
+  for (i=0; i<n; ++i)
+    removeRequestFromTables (s, blocks[i], peer);
 
-    tr_free (blocks);
+  tr_free (blocks);
 }
 
 static void
-cancelAllRequestsForBlock (struct tr_torrent_peers * t,
-                           tr_block_index_t          block,
-                           tr_peer                 * no_notify)
+cancelAllRequestsForBlock (tr_swarm          * s,
+                           tr_block_index_t    block,
+                           tr_peer           * no_notify)
 {
   int i;
   int peerCount;
@@ -1643,7 +1649,7 @@ cancelAllRequestsForBlock (struct tr_torrent_peers * t,
   tr_ptrArray peerArr;
 
   peerArr = TR_PTR_ARRAY_INIT;
-  getBlockRequestPeers (t, block, &peerArr);
+  getBlockRequestPeers (s, block, &peerArr);
   peers = (tr_peer **) tr_ptrArrayPeek (&peerArr, &peerCount);
   for (i=0; i<peerCount; ++i)
     {
@@ -1655,7 +1661,7 @@ cancelAllRequestsForBlock (struct tr_torrent_peers * t,
           tr_peerMsgsCancel (p->msgs, block);
         }
 
-      removeRequestFromTables (t, block, p);
+      removeRequestFromTables (s, block, p);
     }
 
   tr_ptrArrayDestruct (&peerArr, NULL);
@@ -1667,159 +1673,163 @@ tr_peerMgrPieceCompleted (tr_torrent * tor, tr_piece_index_t p)
   int i;
   int peerCount;
   tr_peer ** peers;
-  struct tr_torrent_peers * t = tor->torrentPeers;
+  tr_swarm * s = tor->swarm;
 
   /* notify the peers that we now have this piece */
-  peerCount = tr_ptrArraySize (&t->peers);
-  peers = (tr_peer**) tr_ptrArrayBase (&t->peers);
+  peerCount = tr_ptrArraySize (&s->peers);
+  peers = (tr_peer**) tr_ptrArrayBase (&s->peers);
   for (i=0; i<peerCount; ++i)
     tr_peerMsgsHave (peers[i]->msgs, p);
 
   /* bookkeeping */
-  pieceListRemovePiece (t, p);
-  t->needsCompletenessCheck = true;
+  pieceListRemovePiece (s, p);
+  s->needsCompletenessCheck = true;
 }
 
 static void
-peerCallbackFunc (tr_peer * peer, const tr_peer_event * e, void * vt)
+peerCallbackFunc (tr_peer * peer, const tr_peer_event * e, void * vs)
 {
-    Torrent * t = vt;
+  tr_swarm * s = vs;
 
-    torrentLock (t);
+  swarmLock (s);
 
-    assert (peer != NULL);
+  assert (peer != NULL);
 
-    switch (e->eventType)
+  switch (e->eventType)
     {
-        case TR_PEER_PEER_GOT_DATA:
+      case TR_PEER_PEER_GOT_DATA:
         {
-            const time_t now = tr_time ();
-            tr_torrent * tor = t->tor;
+          const time_t now = tr_time ();
+          tr_torrent * tor = s->tor;
 
-            if (e->wasPieceData)
+          if (e->wasPieceData)
             {
-                tor->uploadedCur += e->length;
-                tr_announcerAddBytes (tor, TR_ANN_UP, e->length);
-                tr_torrentSetActivityDate (tor, now);
-                tr_torrentSetDirty (tor);
+              tor->uploadedCur += e->length;
+              tr_announcerAddBytes (tor, TR_ANN_UP, e->length);
+              tr_torrentSetActivityDate (tor, now);
+              tr_torrentSetDirty (tor);
             }
 
-            /* update the stats */
-            if (e->wasPieceData)
-                tr_statsAddUploaded (tor->session, e->length);
+          /* update the stats */
+          if (e->wasPieceData)
+            tr_statsAddUploaded (tor->session, e->length);
 
-            /* update our atom */
-            if (peer->atom && e->wasPieceData)
-                peer->atom->piece_data_time = now;
+          /* update our atom */
+          if (peer->atom && e->wasPieceData)
+            peer->atom->piece_data_time = now;
 
-            break;
+          break;
         }
 
-        case TR_PEER_CLIENT_GOT_HAVE:
-            if (replicationExists (t)) {
-                tr_incrReplicationOfPiece (t, e->pieceIndex);
-                assertReplicationCountIsExact (t);
-            }
-            break;
-
-        case TR_PEER_CLIENT_GOT_HAVE_ALL:
-            if (replicationExists (t)) {
-                tr_incrReplication (t);
-                assertReplicationCountIsExact (t);
-            }
-            break;
-
-        case TR_PEER_CLIENT_GOT_HAVE_NONE:
-            /* noop */
-            break;
-
-        case TR_PEER_CLIENT_GOT_BITFIELD:
-            assert (e->bitfield != NULL);
-            if (replicationExists (t)) {
-                tr_incrReplicationFromBitfield (t, e->bitfield);
-                assertReplicationCountIsExact (t);
-            }
-            break;
-
-        case TR_PEER_CLIENT_GOT_REJ: {
-            tr_block_index_t b = _tr_block (t->tor, e->pieceIndex, e->offset);
-            if (b < t->tor->blockCount)
-                removeRequestFromTables (t, b, peer);
-            else
-                tordbg (t, "Peer %s sent an out-of-range reject message",
-                           tr_atomAddrStr (peer->atom));
-            break;
-        }
-
-        case TR_PEER_CLIENT_GOT_CHOKE:
-            peerDeclinedAllRequests (t, peer);
-            break;
-
-        case TR_PEER_CLIENT_GOT_PORT:
-            if (peer->atom)
-                peer->atom->port = e->port;
-            break;
-
-        case TR_PEER_CLIENT_GOT_SUGGEST:
-            peerSuggestedPiece (t, peer, e->pieceIndex, false);
-            break;
-
-        case TR_PEER_CLIENT_GOT_ALLOWED_FAST:
-            peerSuggestedPiece (t, peer, e->pieceIndex, true);
-            break;
-
-        case TR_PEER_CLIENT_GOT_DATA:
-        {
-            const time_t now = tr_time ();
-            tr_torrent * tor = t->tor;
-
-            if (e->wasPieceData)
-            {
-                tor->downloadedCur += e->length;
-                tr_torrentSetActivityDate (tor, now);
-                tr_torrentSetDirty (tor);
-            }
-
-            /* update the stats */
-            if (e->wasPieceData)
-                tr_statsAddDownloaded (tor->session, e->length);
-
-            /* update our atom */
-            if (peer->atom && e->wasPieceData)
-                peer->atom->piece_data_time = now;
-
-            break;
-        }
-
-        case TR_PEER_CLIENT_GOT_BLOCK:
+      case TR_PEER_CLIENT_GOT_HAVE:
+        if (replicationExists (s))
           {
-            const tr_block_index_t block = _tr_block (t->tor, e->pieceIndex, e->offset);
-            cancelAllRequestsForBlock (t, block, peer);
-            tr_historyAdd (&peer->blocksSentToClient, tr_time(), 1);
-            pieceListResortPiece (t, pieceListLookup (t, e->pieceIndex));
-            tr_torrentGotBlock (t->tor, block);
-            break;
+            tr_incrReplicationOfPiece (s, e->pieceIndex);
+            assertReplicationCountIsExact (s);
           }
+        break;
 
-        case TR_PEER_ERROR:
-            if ((e->err == ERANGE) || (e->err == EMSGSIZE) || (e->err == ENOTCONN))
-            {
-                /* some protocol error from the peer */
-                peer->doPurge = 1;
-                tordbg (t, "setting %s doPurge flag because we got an ERANGE, EMSGSIZE, or ENOTCONN error",
-                        tr_atomAddrStr (peer->atom));
-            }
-            else
-            {
-                tordbg (t, "unhandled error: %s", tr_strerror (e->err));
-            }
-            break;
+      case TR_PEER_CLIENT_GOT_HAVE_ALL:
+        if (replicationExists (s))
+          {
+            tr_incrReplication (s);
+            assertReplicationCountIsExact (s);
+          }
+        break;
 
-        default:
-            assert (0);
+      case TR_PEER_CLIENT_GOT_HAVE_NONE:
+        /* noop */
+        break;
+
+      case TR_PEER_CLIENT_GOT_BITFIELD:
+        assert (e->bitfield != NULL);
+        if (replicationExists (s))
+          {
+            tr_incrReplicationFromBitfield (s, e->bitfield);
+            assertReplicationCountIsExact (s);
+          }
+        break;
+
+      case TR_PEER_CLIENT_GOT_REJ:
+        {
+          tr_block_index_t b = _tr_block (s->tor, e->pieceIndex, e->offset);
+          if (b < s->tor->blockCount)
+            removeRequestFromTables (s, b, peer);
+          else
+            tordbg (s, "Peer %s sent an out-of-range reject message",
+                    tr_atomAddrStr (peer->atom));
+          break;
+        }
+
+      case TR_PEER_CLIENT_GOT_CHOKE:
+        peerDeclinedAllRequests (s, peer);
+        break;
+
+      case TR_PEER_CLIENT_GOT_PORT:
+        if (peer->atom)
+          peer->atom->port = e->port;
+        break;
+
+      case TR_PEER_CLIENT_GOT_SUGGEST:
+        peerSuggestedPiece (s, peer, e->pieceIndex, false);
+        break;
+
+      case TR_PEER_CLIENT_GOT_ALLOWED_FAST:
+        peerSuggestedPiece (s, peer, e->pieceIndex, true);
+        break;
+
+      case TR_PEER_CLIENT_GOT_DATA:
+        {
+          const time_t now = tr_time ();
+          tr_torrent * tor = s->tor;
+
+          if (e->wasPieceData)
+            {
+              tor->downloadedCur += e->length;
+              tr_torrentSetActivityDate (tor, now);
+              tr_torrentSetDirty (tor);
+            }
+
+          /* update the stats */
+          if (e->wasPieceData)
+            tr_statsAddDownloaded (tor->session, e->length);
+
+          /* update our atom */
+          if (peer->atom && e->wasPieceData)
+            peer->atom->piece_data_time = now;
+
+          break;
+        }
+
+      case TR_PEER_CLIENT_GOT_BLOCK:
+        {
+          const tr_block_index_t block = _tr_block (s->tor, e->pieceIndex, e->offset);
+          cancelAllRequestsForBlock (s, block, peer);
+          tr_historyAdd (&peer->blocksSentToClient, tr_time(), 1);
+          pieceListResortPiece (s, pieceListLookup (s, e->pieceIndex));
+          tr_torrentGotBlock (s->tor, block);
+          break;
+        }
+
+      case TR_PEER_ERROR:
+        if ((e->err == ERANGE) || (e->err == EMSGSIZE) || (e->err == ENOTCONN))
+          {
+            /* some protocol error from the peer */
+            peer->doPurge = 1;
+            tordbg (s, "setting %s doPurge flag because we got an ERANGE, EMSGSIZE, or ENOTCONN error",
+                    tr_atomAddrStr (peer->atom));
+          }
+        else
+          {
+            tordbg (s, "unhandled error: %s", tr_strerror (e->err));
+          }
+        break;
+
+      default:
+        assert (0);
     }
 
-    torrentUnlock (t);
+  swarmUnlock (s);
 }
 
 static int
@@ -1841,58 +1851,58 @@ getDefaultShelfLife (uint8_t from)
 }
 
 static void
-ensureAtomExists (Torrent           * t,
+ensureAtomExists (tr_swarm          * s,
                   const tr_address  * addr,
                   const tr_port       port,
                   const uint8_t       flags,
                   const int8_t        seedProbability,
                   const uint8_t       from)
 {
-    struct peer_atom * a;
+  struct peer_atom * a;
 
-    assert (tr_address_is_valid (addr));
-    assert (from < TR_PEER_FROM__MAX);
+  assert (tr_address_is_valid (addr));
+  assert (from < TR_PEER_FROM__MAX);
 
-    a = getExistingAtom (t, addr);
+  a = getExistingAtom (s, addr);
 
-    if (a == NULL)
+  if (a == NULL)
     {
-        const int jitter = tr_cryptoWeakRandInt (60*10);
-        a = tr_new0 (struct peer_atom, 1);
-        a->addr = *addr;
-        a->port = port;
-        a->flags = flags;
-        a->fromFirst = from;
-        a->fromBest = from;
-        a->shelf_date = tr_time () + getDefaultShelfLife (from) + jitter;
-        a->blocklisted = -1;
-        atomSetSeedProbability (a, seedProbability);
-        tr_ptrArrayInsertSorted (&t->pool, a, compareAtomsByAddress);
+      const int jitter = tr_cryptoWeakRandInt (60*10);
+      a = tr_new0 (struct peer_atom, 1);
+      a->addr = *addr;
+      a->port = port;
+      a->flags = flags;
+      a->fromFirst = from;
+      a->fromBest = from;
+      a->shelf_date = tr_time () + getDefaultShelfLife (from) + jitter;
+      a->blocklisted = -1;
+      atomSetSeedProbability (a, seedProbability);
+      tr_ptrArrayInsertSorted (&s->pool, a, compareAtomsByAddress);
 
-        tordbg (t, "got a new atom: %s", tr_atomAddrStr (a));
+      tordbg (s, "got a new atom: %s", tr_atomAddrStr (a));
     }
-    else
+  else
     {
-        if (from < a->fromBest)
-            a->fromBest = from;
+      if (from < a->fromBest)
+        a->fromBest = from;
 
-        if (a->seedProbability == -1)
-            atomSetSeedProbability (a, seedProbability);
+      if (a->seedProbability == -1)
+        atomSetSeedProbability (a, seedProbability);
 
-        a->flags |= flags;
+      a->flags |= flags;
     }
 }
 
 static int
 getMaxPeerCount (const tr_torrent * tor)
 {
-    return tor->maxConnectedPeers;
+  return tor->maxConnectedPeers;
 }
 
 static int
-getPeerCount (const Torrent * t)
+getPeerCount (const tr_swarm * s)
 {
-    return tr_ptrArraySize (&t->peers);/* + tr_ptrArraySize (&t->outgoingHandshakes); */
+  return tr_ptrArraySize (&s->peers);/* + tr_ptrArraySize (&t->outgoingHandshakes); */
 }
 
 /* FIXME: this is kind of a mess. */
@@ -1904,223 +1914,222 @@ myHandshakeDoneCB (tr_handshake  * handshake,
                    const uint8_t * peer_id,
                    void          * vmanager)
 {
-    bool               ok = isConnected;
-    bool               success = false;
-    tr_port            port;
-    const tr_address * addr;
-    tr_peerMgr       * manager = vmanager;
-    Torrent          * t;
-    tr_handshake     * ours;
+  bool ok = isConnected;
+  bool success = false;
+  tr_port port;
+  const tr_address * addr;
+  tr_peerMgr * manager = vmanager;
+  tr_swarm  * s;
+  tr_handshake * ours;
 
-    assert (io);
-    assert (tr_isBool (ok));
+  assert (io);
+  assert (tr_isBool (ok));
 
-    t = tr_peerIoHasTorrentHash (io)
-        ? getExistingTorrent (manager, tr_peerIoGetTorrentHash (io))
-        : NULL;
+  s = tr_peerIoHasTorrentHash (io)
+    ? getExistingSwarm (manager, tr_peerIoGetTorrentHash (io))
+    : NULL;
 
-    if (tr_peerIoIsIncoming (io))
-        ours = tr_ptrArrayRemoveSorted (&manager->incomingHandshakes,
-                                        handshake, handshakeCompare);
-    else if (t)
-        ours = tr_ptrArrayRemoveSorted (&t->outgoingHandshakes,
-                                        handshake, handshakeCompare);
-    else
-        ours = handshake;
+  if (tr_peerIoIsIncoming (io))
+    ours = tr_ptrArrayRemoveSorted (&manager->incomingHandshakes,
+                                    handshake, handshakeCompare);
+  else if (s)
+    ours = tr_ptrArrayRemoveSorted (&s->outgoingHandshakes,
+                                    handshake, handshakeCompare);
+  else
+    ours = handshake;
 
-    assert (ours);
-    assert (ours == handshake);
+  assert (ours);
+  assert (ours == handshake);
 
-    if (t)
-        torrentLock (t);
+  if (s)
+    swarmLock (s);
 
-    addr = tr_peerIoGetAddress (io, &port);
+  addr = tr_peerIoGetAddress (io, &port);
 
-    if (!ok || !t || !t->isRunning)
+  if (!ok || !s || !s->isRunning)
     {
-        if (t)
+      if (s)
         {
-            struct peer_atom * atom = getExistingAtom (t, addr);
-            if (atom)
+          struct peer_atom * atom = getExistingAtom (s, addr);
+          if (atom)
             {
-                ++atom->numFails;
+              ++atom->numFails;
 
-                if (!readAnythingFromPeer)
+              if (!readAnythingFromPeer)
                 {
-                    tordbg (t, "marking peer %s as unreachable... numFails is %d", tr_atomAddrStr (atom), (int)atom->numFails);
-                    atom->flags2 |= MYFLAG_UNREACHABLE;
+                  tordbg (s, "marking peer %s as unreachable... numFails is %d", tr_atomAddrStr (atom), (int)atom->numFails);
+                  atom->flags2 |= MYFLAG_UNREACHABLE;
                 }
             }
         }
     }
-    else /* looking good */
+  else /* looking good */
     {
-        struct peer_atom * atom;
+      struct peer_atom * atom;
 
-        ensureAtomExists (t, addr, port, 0, -1, TR_PEER_FROM_INCOMING);
-        atom = getExistingAtom (t, addr);
-        atom->time = tr_time ();
-        atom->piece_data_time = 0;
-        atom->lastConnectionAt = tr_time ();
+      ensureAtomExists (s, addr, port, 0, -1, TR_PEER_FROM_INCOMING);
+      atom = getExistingAtom (s, addr);
+      atom->time = tr_time ();
+      atom->piece_data_time = 0;
+      atom->lastConnectionAt = tr_time ();
 
-        if (!tr_peerIoIsIncoming (io))
+      if (!tr_peerIoIsIncoming (io))
         {
-            atom->flags |= ADDED_F_CONNECTABLE;
-            atom->flags2 &= ~MYFLAG_UNREACHABLE;
+          atom->flags |= ADDED_F_CONNECTABLE;
+          atom->flags2 &= ~MYFLAG_UNREACHABLE;
         }
 
-        /* In principle, this flag specifies whether the peer groks uTP,
-           not whether it's currently connected over uTP. */
-        if (io->utp_socket)
-            atom->flags |= ADDED_F_UTP_FLAGS;
+      /* In principle, this flag specifies whether the peer groks uTP,
+         not whether it's currently connected over uTP. */
+      if (io->utp_socket)
+        atom->flags |= ADDED_F_UTP_FLAGS;
 
-        if (atom->flags2 & MYFLAG_BANNED)
+      if (atom->flags2 & MYFLAG_BANNED)
         {
-            tordbg (t, "banned peer %s tried to reconnect",
-                    tr_atomAddrStr (atom));
+          tordbg (s, "banned peer %s tried to reconnect",
+                  tr_atomAddrStr (atom));
         }
-        else if (tr_peerIoIsIncoming (io)
-               && (getPeerCount (t) >= getMaxPeerCount (t->tor)))
-
+      else if (tr_peerIoIsIncoming (io) && (getPeerCount (s) >= getMaxPeerCount (s->tor)))
         {
         }
-        else
+      else
         {
-            tr_peer * peer = atom->peer;
+          tr_peer * peer = atom->peer;
 
-            if (peer) /* we already have this peer */
+          if (peer) /* we already have this peer */
             {
             }
-            else
+          else
             {
-                peer = getPeer (t, atom);
+              peer = getPeer (s, atom);
 
-                if (!peer_id)
-                    peer->client = TR_KEY_NONE;
-                else {
-                    char client[128];
-                    tr_clientForId (client, sizeof (client), peer_id);
-                    peer->client = tr_quark_new (client, -1);
+              if (!peer_id)
+                peer->client = TR_KEY_NONE;
+              else
+                {
+                  char client[128];
+                  tr_clientForId (client, sizeof (client), peer_id);
+                  peer->client = tr_quark_new (client, -1);
                 }
 
-                peer->io = tr_handshakeStealIO (handshake); /* this steals its refcount too, which is
+              peer->io = tr_handshakeStealIO (handshake); /* this steals its refcount too, which is
                                                                 balanced by our unref in peerDelete ()  */
-                tr_peerIoSetParent (peer->io, &t->tor->bandwidth);
-                tr_peerMsgsNew (t->tor, peer, peerCallbackFunc, t);
+              tr_peerIoSetParent (peer->io, &s->tor->bandwidth);
+              tr_peerMsgsNew (s->tor, peer, peerCallbackFunc, s);
 
-                success = true;
+              success = true;
             }
         }
     }
 
-    if (t)
-        torrentUnlock (t);
+  if (s != NULL)
+    swarmUnlock (s);
 
-    return success;
+  return success;
 }
 
 void
-tr_peerMgrAddIncoming (tr_peerMgr * manager,
-                       tr_address * addr,
-                       tr_port      port,
-                       int          socket,
+tr_peerMgrAddIncoming (tr_peerMgr       * manager,
+                       tr_address       * addr,
+                       tr_port            port,
+                       int                socket,
                        struct UTPSocket * utp_socket)
 {
-    tr_session * session;
+  tr_session * session;
 
-    managerLock (manager);
+  managerLock (manager);
 
-    assert (tr_isSession (manager->session));
-    session = manager->session;
+  assert (tr_isSession (manager->session));
+  session = manager->session;
 
-    if (tr_sessionIsAddressBlocked (session, addr))
+  if (tr_sessionIsAddressBlocked (session, addr))
     {
-        tr_logAddDebug ("Banned IP address \"%s\" tried to connect to us", tr_address_to_string (addr));
-        if (socket >= 0)
-            tr_netClose (session, socket);
-        else
-            UTP_Close (utp_socket);
+      tr_logAddDebug ("Banned IP address \"%s\" tried to connect to us", tr_address_to_string (addr));
+      if (socket >= 0)
+        tr_netClose (session, socket);
+      else
+        UTP_Close (utp_socket);
     }
-    else if (getExistingHandshake (&manager->incomingHandshakes, addr))
+  else if (getExistingHandshake (&manager->incomingHandshakes, addr))
     {
-        if (socket >= 0)
-            tr_netClose (session, socket);
-        else
-            UTP_Close (utp_socket);
+      if (socket >= 0)
+        tr_netClose (session, socket);
+      else
+        UTP_Close (utp_socket);
     }
-    else /* we don't have a connection to them yet... */
+  else /* we don't have a connection to them yet... */
     {
-        tr_peerIo *    io;
-        tr_handshake * handshake;
+      tr_peerIo *    io;
+      tr_handshake * handshake;
 
-        io = tr_peerIoNewIncoming (session, &session->bandwidth, addr, port, socket, utp_socket);
+      io = tr_peerIoNewIncoming (session, &session->bandwidth, addr, port, socket, utp_socket);
 
-        handshake = tr_handshakeNew (io,
-                                     session->encryptionMode,
-                                     myHandshakeDoneCB,
-                                     manager);
+      handshake = tr_handshakeNew (io,
+                                   session->encryptionMode,
+                                   myHandshakeDoneCB,
+                                   manager);
 
-        tr_peerIoUnref (io); /* balanced by the implicit ref in tr_peerIoNewIncoming () */
+      tr_peerIoUnref (io); /* balanced by the implicit ref in tr_peerIoNewIncoming () */
 
-        tr_ptrArrayInsertSorted (&manager->incomingHandshakes, handshake,
-                                 handshakeCompare);
+      tr_ptrArrayInsertSorted (&manager->incomingHandshakes, handshake,
+                               handshakeCompare);
     }
 
-    managerUnlock (manager);
+  managerUnlock (manager);
 }
 
 void
 tr_peerMgrAddPex (tr_torrent * tor, uint8_t from,
                   const tr_pex * pex, int8_t seedProbability)
 {
-    if (tr_isPex (pex)) /* safeguard against corrupt data */
+  if (tr_isPex (pex)) /* safeguard against corrupt data */
     {
-        Torrent * t = tor->torrentPeers;
-        managerLock (t->manager);
+      tr_swarm * s = tor->swarm;
+      managerLock (s->manager);
 
-        if (!tr_sessionIsAddressBlocked (t->manager->session, &pex->addr))
-            if (tr_address_is_valid_for_peers (&pex->addr, pex->port))
-                ensureAtomExists (t, &pex->addr, pex->port, pex->flags, seedProbability, from);
+      if (!tr_sessionIsAddressBlocked (s->manager->session, &pex->addr))
+        if (tr_address_is_valid_for_peers (&pex->addr, pex->port))
+          ensureAtomExists (s, &pex->addr, pex->port, pex->flags, seedProbability, from);
 
-        managerUnlock (t->manager);
+      managerUnlock (s->manager);
     }
 }
 
 void
 tr_peerMgrMarkAllAsSeeds (tr_torrent * tor)
 {
-    Torrent * t = tor->torrentPeers;
-    const int n = tr_ptrArraySize (&t->pool);
-    struct peer_atom ** it = (struct peer_atom**) tr_ptrArrayBase (&t->pool);
-    struct peer_atom ** end = it + n;
+  tr_swarm * s = tor->swarm;
+  const int n = tr_ptrArraySize (&s->pool);
+  struct peer_atom ** it = (struct peer_atom**) tr_ptrArrayBase (&s->pool);
+  struct peer_atom ** end = it + n;
 
-    while (it != end)
-        atomSetSeed (t, *it++);
+  while (it != end)
+    atomSetSeed (s, *it++);
 }
 
 tr_pex *
-tr_peerMgrCompactToPex (const void *    compact,
+tr_peerMgrCompactToPex (const void    * compact,
                         size_t          compactLen,
                         const uint8_t * added_f,
                         size_t          added_f_len,
-                        size_t *        pexCount)
+                        size_t        * pexCount)
 {
-    size_t          i;
-    size_t          n = compactLen / 6;
-    const uint8_t * walk = compact;
-    tr_pex *        pex = tr_new0 (tr_pex, n);
+  size_t i;
+  size_t n = compactLen / 6;
+  const uint8_t * walk = compact;
+  tr_pex * pex = tr_new0 (tr_pex, n);
 
-    for (i = 0; i < n; ++i)
+  for (i=0; i<n; ++i)
     {
-        pex[i].addr.type = TR_AF_INET;
-        memcpy (&pex[i].addr.addr, walk, 4); walk += 4;
-        memcpy (&pex[i].port, walk, 2); walk += 2;
-        if (added_f && (n == added_f_len))
-            pex[i].flags = added_f[i];
+      pex[i].addr.type = TR_AF_INET;
+      memcpy (&pex[i].addr.addr, walk, 4); walk += 4;
+      memcpy (&pex[i].port, walk, 2); walk += 2;
+      if (added_f && (n == added_f_len))
+        pex[i].flags = added_f[i];
     }
 
-    *pexCount = n;
-    return pex;
+  *pexCount = n;
+  return pex;
 }
 
 tr_pex *
@@ -2130,44 +2139,44 @@ tr_peerMgrCompact6ToPex (const void    * compact,
                          size_t          added_f_len,
                          size_t        * pexCount)
 {
-    size_t          i;
-    size_t          n = compactLen / 18;
-    const uint8_t * walk = compact;
-    tr_pex *        pex = tr_new0 (tr_pex, n);
+  size_t i;
+  size_t n = compactLen / 18;
+  const uint8_t * walk = compact;
+  tr_pex * pex = tr_new0 (tr_pex, n);
 
-    for (i = 0; i < n; ++i)
+  for (i=0; i<n; ++i)
     {
-        pex[i].addr.type = TR_AF_INET6;
-        memcpy (&pex[i].addr.addr.addr6.s6_addr, walk, 16); walk += 16;
-        memcpy (&pex[i].port, walk, 2); walk += 2;
-        if (added_f && (n == added_f_len))
-            pex[i].flags = added_f[i];
+      pex[i].addr.type = TR_AF_INET6;
+      memcpy (&pex[i].addr.addr.addr6.s6_addr, walk, 16); walk += 16;
+      memcpy (&pex[i].port, walk, 2); walk += 2;
+      if (added_f && (n == added_f_len))
+        pex[i].flags = added_f[i];
     }
 
-    *pexCount = n;
-    return pex;
+  *pexCount = n;
+  return pex;
 }
 
 tr_pex *
-tr_peerMgrArrayToPex (const void * array,
-                      size_t       arrayLen,
+tr_peerMgrArrayToPex (const void  * array,
+                      size_t        arrayLen,
                       size_t      * pexCount)
 {
-    size_t          i;
-    size_t          n = arrayLen / (sizeof (tr_address) + 2);
-    /*size_t          n = arrayLen / sizeof (tr_peerArrayElement);*/
-    const uint8_t * walk = array;
-    tr_pex        * pex = tr_new0 (tr_pex, n);
+  size_t i;
+  size_t n = arrayLen / (sizeof (tr_address) + 2);
+  const uint8_t * walk = array;
+  tr_pex * pex = tr_new0 (tr_pex, n);
 
-    for (i = 0 ; i < n ; i++) {
-        memcpy (&pex[i].addr, walk, sizeof (tr_address));
-        memcpy (&pex[i].port, walk + sizeof (tr_address), 2);
-        pex[i].flags = 0x00;
-        walk += sizeof (tr_address) + 2;
+  for (i=0 ; i<n ; ++i)
+    {
+      memcpy (&pex[i].addr, walk, sizeof (tr_address));
+      memcpy (&pex[i].port, walk + sizeof (tr_address), 2);
+      pex[i].flags = 0x00;
+      walk += sizeof (tr_address) + 2;
     }
 
-    *pexCount = n;
-    return pex;
+  *pexCount = n;
+  return pex;
 }
 
 /**
@@ -2179,18 +2188,18 @@ tr_peerMgrGotBadPiece (tr_torrent * tor, tr_piece_index_t pieceIndex)
 {
   int i;
   int n;
-  Torrent * t = tor->torrentPeers;
+  tr_swarm * s = tor->swarm;
   const uint32_t byteCount = tr_torPieceCountBytes (tor, pieceIndex);
 
-  for (i=0, n=tr_ptrArraySize(&t->peers); i!=n; ++i)
+  for (i=0, n=tr_ptrArraySize(&s->peers); i!=n; ++i)
     {
-      tr_peer * peer = tr_ptrArrayNth (&t->peers, i);
+      tr_peer * peer = tr_ptrArrayNth (&s->peers, i);
 
       if (tr_bitfieldHas (&peer->blame, pieceIndex))
         {
-          tordbg (t, "peer %s contributed to corrupt piece (%d); now has %d strikes",
+          tordbg (s, "peer %s contributed to corrupt piece (%d); now has %d strikes",
                   tr_atomAddrStr(peer->atom), pieceIndex, (int)peer->strikes + 1);
-          addStrike (t, peer);
+          addStrike (s, peer);
         }
     }
 
@@ -2201,58 +2210,58 @@ tr_peerMgrGotBadPiece (tr_torrent * tor, tr_piece_index_t pieceIndex)
 int
 tr_pexCompare (const void * va, const void * vb)
 {
-    const tr_pex * a = va;
-    const tr_pex * b = vb;
-    int i;
+  int i;
+  const tr_pex * a = va;
+  const tr_pex * b = vb;
 
-    assert (tr_isPex (a));
-    assert (tr_isPex (b));
+  assert (tr_isPex (a));
+  assert (tr_isPex (b));
 
-    if ((i = tr_address_compare (&a->addr, &b->addr)))
-        return i;
+  if ((i = tr_address_compare (&a->addr, &b->addr)))
+    return i;
 
-    if (a->port != b->port)
-        return a->port < b->port ? -1 : 1;
+  if (a->port != b->port)
+    return a->port < b->port ? -1 : 1;
 
-    return 0;
+  return 0;
 }
 
 /* better goes first */
 static int
 compareAtomsByUsefulness (const void * va, const void *vb)
 {
-    const struct peer_atom * a = * (const struct peer_atom**) va;
-    const struct peer_atom * b = * (const struct peer_atom**) vb;
+  const struct peer_atom * a = * (const struct peer_atom**) va;
+  const struct peer_atom * b = * (const struct peer_atom**) vb;
 
-    assert (tr_isAtom (a));
-    assert (tr_isAtom (b));
+  assert (tr_isAtom (a));
+  assert (tr_isAtom (b));
 
-    if (a->piece_data_time != b->piece_data_time)
-        return a->piece_data_time > b->piece_data_time ? -1 : 1;
-    if (a->fromBest != b->fromBest)
-        return a->fromBest < b->fromBest ? -1 : 1;
-    if (a->numFails != b->numFails)
-        return a->numFails < b->numFails ? -1 : 1;
+  if (a->piece_data_time != b->piece_data_time)
+    return a->piece_data_time > b->piece_data_time ? -1 : 1;
+  if (a->fromBest != b->fromBest)
+    return a->fromBest < b->fromBest ? -1 : 1;
+  if (a->numFails != b->numFails)
+    return a->numFails < b->numFails ? -1 : 1;
 
-    return 0;
+  return 0;
 }
 
 static bool
 isAtomInteresting (const tr_torrent * tor, struct peer_atom * atom)
 {
-    if (tr_torrentIsSeed (tor) && atomIsSeed (atom))
-        return false;
+  if (tr_torrentIsSeed (tor) && atomIsSeed (atom))
+    return false;
 
-    if (peerIsInUse (tor->torrentPeers, atom))
-        return true;
-
-    if (isAtomBlocklisted (tor->session, atom))
-        return false;
-
-    if (atom->flags2 & MYFLAG_BANNED)
-        return false;
-
+  if (peerIsInUse (tor->swarm, atom))
     return true;
+
+  if (isAtomBlocklisted (tor->session, atom))
+    return false;
+
+  if (atom->flags2 & MYFLAG_BANNED)
+    return false;
+
+  return true;
 }
 
 int
@@ -2262,78 +2271,78 @@ tr_peerMgrGetPeers (tr_torrent   * tor,
                     uint8_t        list_mode,
                     int            maxCount)
 {
-    int i;
-    int n;
-    int count = 0;
-    int atomCount = 0;
-    const Torrent * t = tor->torrentPeers;
-    struct peer_atom ** atoms = NULL;
-    tr_pex * pex;
-    tr_pex * walk;
+  int i;
+  int n;
+  int count = 0;
+  int atomCount = 0;
+  const tr_swarm * s = tor->swarm;
+  struct peer_atom ** atoms = NULL;
+  tr_pex * pex;
+  tr_pex * walk;
 
-    assert (tr_isTorrent (tor));
-    assert (setme_pex != NULL);
-    assert (af==TR_AF_INET || af==TR_AF_INET6);
-    assert (list_mode==TR_PEERS_CONNECTED || list_mode==TR_PEERS_INTERESTING);
+  assert (tr_isTorrent (tor));
+  assert (setme_pex != NULL);
+  assert (af==TR_AF_INET || af==TR_AF_INET6);
+  assert (list_mode==TR_PEERS_CONNECTED || list_mode==TR_PEERS_INTERESTING);
 
-    managerLock (t->manager);
+  managerLock (s->manager);
 
-    /**
-    ***  build a list of atoms
-    **/
+  /**
+  ***  build a list of atoms
+  **/
 
-    if (list_mode == TR_PEERS_CONNECTED) /* connected peers only */
+  if (list_mode == TR_PEERS_CONNECTED) /* connected peers only */
     {
-        int i;
-        const tr_peer ** peers = (const tr_peer **) tr_ptrArrayBase (&t->peers);
-        atomCount = tr_ptrArraySize (&t->peers);
-        atoms = tr_new (struct peer_atom *, atomCount);
-        for (i=0; i<atomCount; ++i)
-            atoms[i] = peers[i]->atom;
+      int i;
+      const tr_peer ** peers = (const tr_peer **) tr_ptrArrayBase (&s->peers);
+      atomCount = tr_ptrArraySize (&s->peers);
+      atoms = tr_new (struct peer_atom *, atomCount);
+      for (i=0; i<atomCount; ++i)
+        atoms[i] = peers[i]->atom;
     }
-    else /* TR_PEERS_INTERESTING */
+  else /* TR_PEERS_INTERESTING */
     {
-        int i;
-        struct peer_atom ** atomBase = (struct peer_atom**) tr_ptrArrayBase (&t->pool);
-        n = tr_ptrArraySize (&t->pool);
-        atoms = tr_new (struct peer_atom *, n);
-        for (i=0; i<n; ++i)
-            if (isAtomInteresting (tor, atomBase[i]))
-                atoms[atomCount++] = atomBase[i];
+      int i;
+      struct peer_atom ** atomBase = (struct peer_atom**) tr_ptrArrayBase (&s->pool);
+      n = tr_ptrArraySize (&s->pool);
+      atoms = tr_new (struct peer_atom *, n);
+      for (i=0; i<n; ++i)
+        if (isAtomInteresting (tor, atomBase[i]))
+          atoms[atomCount++] = atomBase[i];
     }
 
-    qsort (atoms, atomCount, sizeof (struct peer_atom *), compareAtomsByUsefulness);
+  qsort (atoms, atomCount, sizeof (struct peer_atom *), compareAtomsByUsefulness);
 
-    /**
-    ***  add the first N of them into our return list
-    **/
+  /**
+  ***  add the first N of them into our return list
+  **/
 
-    n = MIN (atomCount, maxCount);
-    pex = walk = tr_new0 (tr_pex, n);
+  n = MIN (atomCount, maxCount);
+  pex = walk = tr_new0 (tr_pex, n);
 
-    for (i=0; i<atomCount && count<n; ++i)
+  for (i=0; i<atomCount && count<n; ++i)
     {
-        const struct peer_atom * atom = atoms[i];
-        if (atom->addr.type == af)
+      const struct peer_atom * atom = atoms[i];
+      if (atom->addr.type == af)
         {
-            assert (tr_address_is_valid (&atom->addr));
-            walk->addr = atom->addr;
-            walk->port = atom->port;
-            walk->flags = atom->flags;
-            ++count;
-            ++walk;
+          assert (tr_address_is_valid (&atom->addr));
+          walk->addr = atom->addr;
+          walk->port = atom->port;
+          walk->flags = atom->flags;
+          ++count;
+          ++walk;
         }
     }
 
-    qsort (pex, count, sizeof (tr_pex), tr_pexCompare);
+  qsort (pex, count, sizeof (tr_pex), tr_pexCompare);
 
-    assert ((walk - pex) == count);
-    *setme_pex = pex;
+  assert ((walk - pex) == count);
+  *setme_pex = pex;
 
-    /* cleanup */
-    tr_free (atoms);
-    managerUnlock (t->manager);
-    return count;
+  /* cleanup */
+  tr_free (atoms);
+  managerUnlock (s->manager);
+  return count;
 }
 
 static void atomPulse    (int, short, void *);
@@ -2344,147 +2353,147 @@ static void reconnectPulse (int, short, void *);
 static struct event *
 createTimer (tr_session * session, int msec, void (*callback)(int, short, void *), void * cbdata)
 {
-    struct event * timer = evtimer_new (session->event_base, callback, cbdata);
-    tr_timerAddMsec (timer, msec);
-    return timer;
+  struct event * timer = evtimer_new (session->event_base, callback, cbdata);
+  tr_timerAddMsec (timer, msec);
+  return timer;
 }
 
 static void
 ensureMgrTimersExist (struct tr_peerMgr * m)
 {
-    if (m->atomTimer == NULL)
-        m->atomTimer = createTimer (m->session, ATOM_PERIOD_MSEC, atomPulse, m);
+  if (m->atomTimer == NULL)
+    m->atomTimer = createTimer (m->session, ATOM_PERIOD_MSEC, atomPulse, m);
 
-    if (m->bandwidthTimer == NULL)
-        m->bandwidthTimer = createTimer (m->session, BANDWIDTH_PERIOD_MSEC, bandwidthPulse, m);
+  if (m->bandwidthTimer == NULL)
+    m->bandwidthTimer = createTimer (m->session, BANDWIDTH_PERIOD_MSEC, bandwidthPulse, m);
 
-    if (m->rechokeTimer == NULL)
-        m->rechokeTimer = createTimer (m->session, RECHOKE_PERIOD_MSEC, rechokePulse, m);
+  if (m->rechokeTimer == NULL)
+    m->rechokeTimer = createTimer (m->session, RECHOKE_PERIOD_MSEC, rechokePulse, m);
 
-    if (m->refillUpkeepTimer == NULL)
-        m->refillUpkeepTimer = createTimer (m->session, REFILL_UPKEEP_PERIOD_MSEC, refillUpkeep, m);
+  if (m->refillUpkeepTimer == NULL)
+    m->refillUpkeepTimer = createTimer (m->session, REFILL_UPKEEP_PERIOD_MSEC, refillUpkeep, m);
 }
 
 void
 tr_peerMgrStartTorrent (tr_torrent * tor)
 {
-    Torrent * t = tor->torrentPeers;
+  tr_swarm * s;
 
-    assert (tr_isTorrent (tor));
-    assert (tr_torrentIsLocked (tor));
+  assert (tr_isTorrent (tor));
+  assert (tr_torrentIsLocked (tor));
 
-    ensureMgrTimersExist (t->manager);
+  s = tor->swarm;
+  ensureMgrTimersExist (s->manager);
 
-    t->isRunning = true;
-    t->maxPeers = t->tor->maxConnectedPeers;
-    t->pieceSortState = PIECES_UNSORTED;
+  s->isRunning = true;
+  s->maxPeers = tor->maxConnectedPeers;
+  s->pieceSortState = PIECES_UNSORTED;
 
-    rechokePulse (0, 0, t->manager);
+  rechokePulse (0, 0, s->manager);
 }
 
 static void
-stopTorrent (Torrent * t)
+stopSwarm (tr_swarm * swarm)
 {
-    tr_peer * peer;
+  tr_peer * peer;
 
-    t->isRunning = false;
+  swarm->isRunning = false;
 
-    replicationFree (t);
-    invalidatePieceSorting (t);
+  replicationFree (swarm);
+  invalidatePieceSorting (swarm);
 
-    /* disconnect the peers. */
-    while ((peer = tr_ptrArrayPop (&t->peers)))
-        peerDelete (t, peer);
+  /* disconnect the peers. */
+  while ((peer = tr_ptrArrayPop (&swarm->peers)))
+    peerDelete (swarm, peer);
 
-    /* disconnect the handshakes. handshakeAbort calls handshakeDoneCB (),
-     * which removes the handshake from t->outgoingHandshakes... */
-    while (!tr_ptrArrayEmpty (&t->outgoingHandshakes))
-        tr_handshakeAbort (tr_ptrArrayNth (&t->outgoingHandshakes, 0));
+  /* disconnect the handshakes. handshakeAbort calls handshakeDoneCB (),
+   * which removes the handshake from t->outgoingHandshakes... */
+  while (!tr_ptrArrayEmpty (&swarm->outgoingHandshakes))
+    tr_handshakeAbort (tr_ptrArrayNth (&swarm->outgoingHandshakes, 0));
 }
 
 void
 tr_peerMgrStopTorrent (tr_torrent * tor)
 {
-    assert (tr_isTorrent (tor));
-    assert (tr_torrentIsLocked (tor));
+  assert (tr_isTorrent (tor));
+  assert (tr_torrentIsLocked (tor));
 
-    stopTorrent (tor->torrentPeers);
+  stopSwarm (tor->swarm);
 }
 
 void
 tr_peerMgrAddTorrent (tr_peerMgr * manager, tr_torrent * tor)
 {
-    assert (tr_isTorrent (tor));
-    assert (tr_torrentIsLocked (tor));
-    assert (tor->torrentPeers == NULL);
+  assert (tr_isTorrent (tor));
+  assert (tr_torrentIsLocked (tor));
+  assert (tor->swarm == NULL);
 
-    tor->torrentPeers = torrentNew (manager, tor);
+  tor->swarm = swarmNew (manager, tor);
 }
 
 void
 tr_peerMgrRemoveTorrent (tr_torrent * tor)
 {
-    assert (tr_isTorrent (tor));
-    assert (tr_torrentIsLocked (tor));
+  assert (tr_isTorrent (tor));
+  assert (tr_torrentIsLocked (tor));
 
-    stopTorrent (tor->torrentPeers);
-    torrentFree (tor->torrentPeers);
+  stopSwarm (tor->swarm);
+  swarmFree (tor->swarm);
 }
 
 void
 tr_peerUpdateProgress (tr_torrent * tor, tr_peer * peer)
 {
-    const tr_bitfield * have = &peer->have;
+  const tr_bitfield * have = &peer->have;
 
-    if (tr_bitfieldHasAll (have))
+  if (tr_bitfieldHasAll (have))
     {
-        peer->progress = 1.0;
+      peer->progress = 1.0;
     }
-    else if (tr_bitfieldHasNone (have))
+  else if (tr_bitfieldHasNone (have))
     {
-        peer->progress = 0.0;
+      peer->progress = 0.0;
     }
-    else
+  else
     {
-        const float true_count = tr_bitfieldCountTrueBits (have);
+      const float true_count = tr_bitfieldCountTrueBits (have);
 
-        if (tr_torrentHasMetadata (tor))
+      if (tr_torrentHasMetadata (tor))
         {
-            peer->progress = true_count / tor->info.pieceCount;
+          peer->progress = true_count / tor->info.pieceCount;
         }
-        else /* without pieceCount, this result is only a best guess... */
+      else /* without pieceCount, this result is only a best guess... */
         {
-            peer->progress = true_count / (have->bit_count + 1);
+          peer->progress = true_count / (have->bit_count + 1);
         }
     }
 
-    /* clamp the progress range */
-    if (peer->progress < 0.0)
-        peer->progress = 0.0;
-    if (peer->progress > 1.0)
-        peer->progress = 1.0;
+  /* clamp the progress range */
+  if (peer->progress < 0.0)
+    peer->progress = 0.0;
+  if (peer->progress > 1.0)
+    peer->progress = 1.0;
 
-    if (peer->atom && (peer->progress >= 1.0))
-        atomSetSeed (tor->torrentPeers, peer->atom);
+  if (peer->atom && (peer->progress >= 1.0))
+    atomSetSeed (tor->swarm, peer->atom);
 }
 
 void
 tr_peerMgrOnTorrentGotMetainfo (tr_torrent * tor)
 {
-    int i;
-    int peerCount;
-    tr_peer ** peers;
+  int i;
+  int peerCount;
+  tr_peer ** peers;
 
-    /* the webseed list may have changed... */
-    rebuildWebseedArray (tor->torrentPeers, tor);
+  /* the webseed list may have changed... */
+  rebuildWebseedArray (tor->swarm, tor);
 
-    /* some peer_msgs' progress fields may not be accurate if we
-       didn't have the metadata before now... so refresh them all... */
-    peerCount = tr_ptrArraySize (&tor->torrentPeers->peers);
-    peers = (tr_peer**) tr_ptrArrayBase (&tor->torrentPeers->peers);
-    for (i=0; i<peerCount; ++i)
-        tr_peerUpdateProgress (tor, peers[i]);
-
+  /* some peer_msgs' progress fields may not be accurate if we
+     didn't have the metadata before now... so refresh them all... */
+  peerCount = tr_ptrArraySize (&tor->swarm->peers);
+  peers = (tr_peer**) tr_ptrArrayBase (&tor->swarm->peers);
+  for (i=0; i<peerCount; ++i)
+    tr_peerUpdateProgress (tor, peers[i]);
 }
 
 void
@@ -2501,8 +2510,8 @@ tr_peerMgrTorrentAvailability (const tr_torrent  * tor,
   if (tr_torrentHasMetadata (tor))
     {
       tr_piece_index_t i;
-      const int peerCount = tr_ptrArraySize (&tor->torrentPeers->peers);
-      const tr_peer ** peers = (const tr_peer**) tr_ptrArrayBase (&tor->torrentPeers->peers);
+      const int peerCount = tr_ptrArraySize (&tor->swarm->peers);
+      const tr_peer ** peers = (const tr_peer**) tr_ptrArrayBase (&tor->swarm->peers);
       const float interval = tor->info.pieceCount / (float)tabCount;
       const bool isSeed = tr_cpGetStatus (&tor->completion) == TR_SEED;
 
@@ -2541,41 +2550,44 @@ peerIsSeed (const tr_peer * peer)
 uint64_t
 tr_peerMgrGetDesiredAvailable (const tr_torrent * tor)
 {
-    size_t i;
-    size_t n;
-    uint64_t desiredAvailable;
-    const Torrent * t = tor->torrentPeers;
+  size_t i;
+  size_t n;
+  uint64_t desiredAvailable;
+  const tr_swarm * s = tor->swarm;
 
-    /* common shortcuts... */
+  /* common shortcuts... */
 
-    if (tr_torrentIsSeed (t->tor))
-        return 0;
+  if (tr_torrentIsSeed (s->tor))
+    return 0;
 
-    if (!tr_torrentHasMetadata (tor))
-        return 0;
+  if (!tr_torrentHasMetadata (tor))
+    return 0;
 
-    n = tr_ptrArraySize (&t->peers);
-    if (n == 0)
-        return 0;
-    else {
-        const tr_peer ** peers = (const tr_peer**) tr_ptrArrayBase (&t->peers);
-        for (i=0; i<n; ++i)
-            if (peers[i]->atom && atomIsSeed (peers[i]->atom))
-                return tr_cpLeftUntilDone (&tor->completion);
+  n = tr_ptrArraySize (&s->peers);
+  if (n == 0)
+    {
+      return 0;
+    }
+  else
+    {
+      const tr_peer ** peers = (const tr_peer**) tr_ptrArrayBase (&s->peers);
+      for (i=0; i<n; ++i)
+        if (peers[i]->atom && atomIsSeed (peers[i]->atom))
+          return tr_cpLeftUntilDone (&tor->completion);
     }
 
-    if (!t->pieceReplication || !t->pieceReplicationSize)
-        return 0;
+  if (!s->pieceReplication || !s->pieceReplicationSize)
+    return 0;
 
-    /* do it the hard way */
+  /* do it the hard way */
 
-    desiredAvailable = 0;
-    for (i=0, n=MIN (tor->info.pieceCount, t->pieceReplicationSize); i<n; ++i)
-        if (!tor->info.pieces[i].dnd && (t->pieceReplication[i] > 0))
-            desiredAvailable += tr_cpMissingBytesInPiece (&t->tor->completion, i);
+  desiredAvailable = 0;
+  for (i=0, n=MIN (tor->info.pieceCount, s->pieceReplicationSize); i<n; ++i)
+    if (!tor->info.pieces[i].dnd && (s->pieceReplication[i] > 0))
+      desiredAvailable += tr_cpMissingBytesInPiece (&s->tor->completion, i);
 
-    assert (desiredAvailable <= tor->info.totalSize);
-    return desiredAvailable;
+  assert (desiredAvailable <= tor->info.totalSize);
+  return desiredAvailable;
 }
 
 void
@@ -2588,7 +2600,7 @@ tr_peerMgrTorrentStats (tr_torrent  * tor,
 {
   int i;
   int size;
-  Torrent * t;
+  tr_swarm * s;
   const tr_peer ** peers;
 
   assert (tr_isTorrent (tor));
@@ -2598,9 +2610,9 @@ tr_peerMgrTorrentStats (tr_torrent  * tor,
   *setmePeersSendingToUs     = 0;
   *setmeWebseedsSendingToUs  = 0;
 
-  t = tor->torrentPeers;
-  size = tr_ptrArraySize (&t->peers);
-  peers = (const tr_peer **) tr_ptrArrayBase (&t->peers);
+  s = tor->swarm;
+  size = tr_ptrArraySize (&s->peers);
+  peers = (const tr_peer **) tr_ptrArrayBase (&s->peers);
 
   for (i=0; i<TR_PEER_FROM__MAX; ++i)
     setmePeersFrom[i] = 0;
@@ -2624,7 +2636,7 @@ tr_peerMgrTorrentStats (tr_torrent  * tor,
         ++*setmePeersGettingFromUs;
     }
 
-  *setmeWebseedsSendingToUs = countActiveWebseeds (t);
+  *setmeWebseedsSendingToUs = countActiveWebseeds (s);
 }
 
 double*
@@ -2632,19 +2644,19 @@ tr_peerMgrWebSpeeds_KBps (const tr_torrent * tor)
 {
   unsigned int i;
   unsigned int webseedCount;
-  const Torrent * t;
+  const tr_swarm * s;
   const tr_webseed ** webseeds;
   double * ret = NULL;
   const uint64_t now = tr_time_msec ();
 
   assert (tr_isTorrent (tor));
 
-  t = tor->torrentPeers;
-  webseedCount = tr_ptrArraySize (&t->webseeds);
-  webseeds = (const tr_webseed**) tr_ptrArrayBase (&t->webseeds);
+  s = tor->swarm;
+  webseedCount = tr_ptrArraySize (&s->webseeds);
+  webseeds = (const tr_webseed**) tr_ptrArrayBase (&s->webseeds);
   ret = tr_new0 (double, webseedCount);
 
-  assert (t->manager != NULL);
+  assert (s->manager != NULL);
   assert (webseedCount == tor->info.webseedCount);
 
   for (i=0; i<webseedCount; ++i)
@@ -2671,17 +2683,17 @@ tr_peerMgrPeerStats (const tr_torrent * tor, int * setmeCount)
   int i;
   int size = 0;
   tr_peer_stat * ret;
-  const Torrent * t;
+  const tr_swarm * s;
   const tr_peer ** peers;
   const time_t now = tr_time ();
   const uint64_t now_msec = tr_time_msec ();
 
   assert (tr_isTorrent (tor));
-  assert (tor->torrentPeers->manager != NULL);
+  assert (tor->swarm->manager != NULL);
 
-  t = tor->torrentPeers;
-  peers = (const tr_peer**) tr_ptrArrayBase (&t->peers);
-  size = tr_ptrArraySize (&t->peers);
+  s = tor->swarm;
+  peers = (const tr_peer**) tr_ptrArrayBase (&s->peers);
+  size = tr_ptrArraySize (&s->peers);
   ret = tr_new0 (tr_peer_stat, size);
 
   for (i=0; i<size; ++i)
@@ -2719,7 +2731,7 @@ tr_peerMgrPeerStats (const tr_torrent * tor, int * setmeCount)
 
       pch = stat->flagStr;
       if (stat->isUTP) *pch++ = 'T';
-      if (t->optimistic == peer) *pch++ = 'O';
+      if (s->optimistic == peer) *pch++ = 'O';
       if (stat->isDownloadingFrom) *pch++ = 'D';
       else if (stat->clientIsInterested) *pch++ = 'd';
       if (stat->isUploadingTo) *pch++ = 'U';
@@ -2745,17 +2757,17 @@ tr_peerMgrPeerStats (const tr_torrent * tor, int * setmeCount)
 void
 tr_peerMgrClearInterest (tr_torrent * tor)
 {
-    int i;
-    Torrent * t = tor->torrentPeers;
-    const int peerCount = tr_ptrArraySize (&t->peers);
+  int i;
+  tr_swarm * s = tor->swarm;
+  const int peerCount = tr_ptrArraySize (&s->peers);
 
-    assert (tr_isTorrent (tor));
-    assert (tr_torrentIsLocked (tor));
+  assert (tr_isTorrent (tor));
+  assert (tr_torrentIsLocked (tor));
 
-    for (i=0; i<peerCount; ++i)
+  for (i=0; i<peerCount; ++i)
     {
-        const tr_peer * peer = tr_ptrArrayNth (&t->peers, i);
-        tr_peerMsgsSetInterested (peer->msgs, false);
+      const tr_peer * peer = tr_ptrArrayNth (&s->peers, i);
+      tr_peerMsgsSetInterested (peer->msgs, false);
     }
 }
 
@@ -2783,176 +2795,176 @@ isPeerInteresting (tr_torrent     * const tor,
 
 typedef enum
 {
-    RECHOKE_STATE_GOOD,
-    RECHOKE_STATE_UNTESTED,
-    RECHOKE_STATE_BAD
+  RECHOKE_STATE_GOOD,
+  RECHOKE_STATE_UNTESTED,
+  RECHOKE_STATE_BAD
 }
 tr_rechoke_state;
 
 struct tr_rechoke_info
 {
-    tr_peer * peer;
-    int salt;
-    int rechoke_state;
+  tr_peer * peer;
+  int salt;
+  int rechoke_state;
 };
 
 static int
 compare_rechoke_info (const void * va, const void * vb)
 {
-    const struct tr_rechoke_info * a = va;
-    const struct tr_rechoke_info * b = vb;
+  const struct tr_rechoke_info * a = va;
+  const struct tr_rechoke_info * b = vb;
 
-    if (a->rechoke_state != b->rechoke_state)
-        return a->rechoke_state - b->rechoke_state;
+  if (a->rechoke_state != b->rechoke_state)
+    return a->rechoke_state - b->rechoke_state;
 
-    return a->salt - b->salt;
+  return a->salt - b->salt;
 }
 
 /* determines who we send "interested" messages to */
 static void
-rechokeDownloads (Torrent * t)
+rechokeDownloads (tr_swarm * s)
 {
-    int i;
-    int maxPeers = 0;
-    int rechoke_count = 0;
-    struct tr_rechoke_info * rechoke = NULL;
-    const int MIN_INTERESTING_PEERS = 5;
-    const int peerCount = tr_ptrArraySize (&t->peers);
-    const time_t now = tr_time ();
+  int i;
+  int maxPeers = 0;
+  int rechoke_count = 0;
+  struct tr_rechoke_info * rechoke = NULL;
+  const int MIN_INTERESTING_PEERS = 5;
+  const int peerCount = tr_ptrArraySize (&s->peers);
+  const time_t now = tr_time ();
 
-    /* some cases where this function isn't necessary */
-    if (tr_torrentIsSeed (t->tor))
-        return;
-    if (!tr_torrentIsPieceTransferAllowed (t->tor, TR_PEER_TO_CLIENT))
-        return;
+  /* some cases where this function isn't necessary */
+  if (tr_torrentIsSeed (s->tor))
+    return;
+  if (!tr_torrentIsPieceTransferAllowed (s->tor, TR_PEER_TO_CLIENT))
+    return;
 
-    /* decide HOW MANY peers to be interested in */
+  /* decide HOW MANY peers to be interested in */
+  {
+    int blocks = 0;
+    int cancels = 0;
+    time_t timeSinceCancel;
+
+    /* Count up how many blocks & cancels each peer has.
+     *
+     * There are two situations where we send out cancels --
+     *
+     * 1. We've got unresponsive peers, which is handled by deciding
+     *    -which- peers to be interested in.
+     *
+     * 2. We've hit our bandwidth cap, which is handled by deciding
+     *    -how many- peers to be interested in.
+     *
+     * We're working on 2. here, so we need to ignore unresponsive
+     * peers in our calculations lest they confuse Transmission into
+     * thinking it's hit its bandwidth cap.
+     */
+    for (i=0; i<peerCount; ++i)
+      {
+        const tr_peer * peer = tr_ptrArrayNth (&s->peers, i);
+        const int b = tr_historyGet (&peer->blocksSentToClient, now, CANCEL_HISTORY_SEC);
+        const int c = tr_historyGet (&peer->cancelsSentToPeer, now, CANCEL_HISTORY_SEC);
+
+        if (b == 0) /* ignore unresponsive peers, as described above */
+          continue;
+
+        blocks += b;
+        cancels += c;
+      }
+
+    if (cancels > 0)
+      {
+        /* cancelRate: of the block requests we've recently made, the percentage we cancelled.
+         * higher values indicate more congestion. */
+        const double cancelRate = cancels / (double)(cancels + blocks);
+        const double mult = 1 - MIN (cancelRate, 0.5);
+        maxPeers = s->interestedCount * mult;
+        tordbg (s, "cancel rate is %.3f -- reducing the "
+                   "number of peers we're interested in by %.0f percent",
+                   cancelRate, mult * 100);
+        s->lastCancel = now;
+      }
+
+    timeSinceCancel = now - s->lastCancel;
+    if (timeSinceCancel)
+      {
+        const int maxIncrease = 15;
+        const time_t maxHistory = 2 * CANCEL_HISTORY_SEC;
+        const double mult = MIN (timeSinceCancel, maxHistory) / (double) maxHistory;
+        const int inc = maxIncrease * mult;
+        maxPeers = s->maxPeers + inc;
+        tordbg (s, "time since last cancel is %li -- increasing the "
+                   "number of peers we're interested in by %d",
+                   timeSinceCancel, inc);
+      }
+  }
+
+  /* don't let the previous section's number tweaking go too far... */
+  if (maxPeers < MIN_INTERESTING_PEERS)
+    maxPeers = MIN_INTERESTING_PEERS;
+  if (maxPeers > s->tor->maxConnectedPeers)
+    maxPeers = s->tor->maxConnectedPeers;
+
+  s->maxPeers = maxPeers;
+
+  if (peerCount > 0)
     {
-        int blocks = 0;
-        int cancels = 0;
-        time_t timeSinceCancel;
+      bool * piece_is_interesting;
+      const tr_torrent * const tor = s->tor;
+      const int n = tor->info.pieceCount;
 
-        /* Count up how many blocks & cancels each peer has.
-         *
-         * There are two situations where we send out cancels --
-         *
-         * 1. We've got unresponsive peers, which is handled by deciding
-         *    -which- peers to be interested in.
-         *
-         * 2. We've hit our bandwidth cap, which is handled by deciding
-         *    -how many- peers to be interested in.
-         *
-         * We're working on 2. here, so we need to ignore unresponsive
-         * peers in our calculations lest they confuse Transmission into
-         * thinking it's hit its bandwidth cap.
-         */
-        for (i=0; i<peerCount; ++i)
+      /* build a bitfield of interesting pieces... */
+      piece_is_interesting = tr_new (bool, n);
+      for (i=0; i<n; i++)
+        piece_is_interesting[i] = !tor->info.pieces[i].dnd && !tr_cpPieceIsComplete (&tor->completion, i);
+
+      /* decide WHICH peers to be interested in (based on their cancel-to-block ratio) */
+      for (i=0; i<peerCount; ++i)
         {
-            const tr_peer * peer = tr_ptrArrayNth (&t->peers, i);
-            const int b = tr_historyGet (&peer->blocksSentToClient, now, CANCEL_HISTORY_SEC);
-            const int c = tr_historyGet (&peer->cancelsSentToPeer, now, CANCEL_HISTORY_SEC);
+          tr_peer * peer = tr_ptrArrayNth (&s->peers, i);
 
-            if (b == 0) /* ignore unresponsive peers, as described above */
-                continue;
+          if (!isPeerInteresting (s->tor, piece_is_interesting, peer))
+            {
+              tr_peerMsgsSetInterested (peer->msgs, false);
+            }
+          else
+            {
+              tr_rechoke_state rechoke_state;
+              const int blocks = tr_historyGet (&peer->blocksSentToClient, now, CANCEL_HISTORY_SEC);
+              const int cancels = tr_historyGet (&peer->cancelsSentToPeer, now, CANCEL_HISTORY_SEC);
 
-            blocks += b;
-            cancels += c;
+              if (!blocks && !cancels)
+                rechoke_state = RECHOKE_STATE_UNTESTED;
+              else if (!cancels)
+                rechoke_state = RECHOKE_STATE_GOOD;
+              else if (!blocks)
+                rechoke_state = RECHOKE_STATE_BAD;
+              else if ((cancels * 10) < blocks)
+                rechoke_state = RECHOKE_STATE_GOOD;
+              else
+                rechoke_state = RECHOKE_STATE_BAD;
+
+              if (rechoke == NULL)
+                rechoke = tr_new (struct tr_rechoke_info, peerCount);
+
+              rechoke[rechoke_count].peer = peer;
+              rechoke[rechoke_count].rechoke_state = rechoke_state;
+              rechoke[rechoke_count].salt = tr_cryptoWeakRandInt (INT_MAX);
+              rechoke_count++;
+            }
+
         }
 
-        if (cancels > 0)
-        {
-            /* cancelRate: of the block requests we've recently made, the percentage we cancelled.
-             * higher values indicate more congestion. */
-            const double cancelRate = cancels / (double)(cancels + blocks);
-            const double mult = 1 - MIN (cancelRate, 0.5);
-            maxPeers = t->interestedCount * mult;
-            tordbg (t, "cancel rate is %.3f -- reducing the "
-                       "number of peers we're interested in by %.0f percent",
-                       cancelRate, mult * 100);
-            t->lastCancel = now;
-        }
-
-        timeSinceCancel = now - t->lastCancel;
-        if (timeSinceCancel)
-        {
-            const int maxIncrease = 15;
-            const time_t maxHistory = 2 * CANCEL_HISTORY_SEC;
-            const double mult = MIN (timeSinceCancel, maxHistory) / (double) maxHistory;
-            const int inc = maxIncrease * mult;
-            maxPeers = t->maxPeers + inc;
-            tordbg (t, "time since last cancel is %li -- increasing the "
-                       "number of peers we're interested in by %d",
-                       timeSinceCancel, inc);
-        }
+      tr_free (piece_is_interesting);
     }
 
-    /* don't let the previous section's number tweaking go too far... */
-    if (maxPeers < MIN_INTERESTING_PEERS)
-        maxPeers = MIN_INTERESTING_PEERS;
-    if (maxPeers > t->tor->maxConnectedPeers)
-        maxPeers = t->tor->maxConnectedPeers;
+  /* now that we know which & how many peers to be interested in... update the peer interest */
+  qsort (rechoke, rechoke_count, sizeof (struct tr_rechoke_info), compare_rechoke_info);
+  s->interestedCount = MIN (maxPeers, rechoke_count);
+  for (i=0; i<rechoke_count; ++i)
+    tr_peerMsgsSetInterested (rechoke[i].peer->msgs, i<s->interestedCount);
 
-    t->maxPeers = maxPeers;
-
-    if (peerCount > 0)
-    {
-        bool * piece_is_interesting;
-        const tr_torrent * const tor = t->tor;
-        const int n = tor->info.pieceCount;
-
-        /* build a bitfield of interesting pieces... */
-        piece_is_interesting = tr_new (bool, n);
-        for (i=0; i<n; i++)
-            piece_is_interesting[i] = !tor->info.pieces[i].dnd && !tr_cpPieceIsComplete (&tor->completion, i);
-
-        /* decide WHICH peers to be interested in (based on their cancel-to-block ratio) */
-        for (i=0; i<peerCount; ++i)
-        {
-            tr_peer * peer = tr_ptrArrayNth (&t->peers, i);
-
-            if (!isPeerInteresting (t->tor, piece_is_interesting, peer))
-            {
-                tr_peerMsgsSetInterested (peer->msgs, false);
-            }
-            else
-            {
-                tr_rechoke_state rechoke_state;
-                const int blocks = tr_historyGet (&peer->blocksSentToClient, now, CANCEL_HISTORY_SEC);
-                const int cancels = tr_historyGet (&peer->cancelsSentToPeer, now, CANCEL_HISTORY_SEC);
-
-                if (!blocks && !cancels)
-                    rechoke_state = RECHOKE_STATE_UNTESTED;
-                else if (!cancels)
-                    rechoke_state = RECHOKE_STATE_GOOD;
-                else if (!blocks)
-                    rechoke_state = RECHOKE_STATE_BAD;
-                else if ((cancels * 10) < blocks)
-                    rechoke_state = RECHOKE_STATE_GOOD;
-                else
-                    rechoke_state = RECHOKE_STATE_BAD;
-
-                if (rechoke == NULL)
-                    rechoke = tr_new (struct tr_rechoke_info, peerCount);
-
-                 rechoke[rechoke_count].peer = peer;
-                 rechoke[rechoke_count].rechoke_state = rechoke_state;
-                 rechoke[rechoke_count].salt = tr_cryptoWeakRandInt (INT_MAX);
-                 rechoke_count++;
-            }
-
-        }
-
-        tr_free (piece_is_interesting);
-    }
-
-    /* now that we know which & how many peers to be interested in... update the peer interest */
-    qsort (rechoke, rechoke_count, sizeof (struct tr_rechoke_info), compare_rechoke_info);
-    t->interestedCount = MIN (maxPeers, rechoke_count);
-    for (i=0; i<rechoke_count; ++i)
-        tr_peerMsgsSetInterested (rechoke[i].peer->msgs, i<t->interestedCount);
-
-    /* cleanup */
-    tr_free (rechoke);
+  /* cleanup */
+  tr_free (rechoke);
 }
 
 /**
@@ -2961,203 +2973,210 @@ rechokeDownloads (Torrent * t)
 
 struct ChokeData
 {
-    bool            isInterested;
-    bool            wasChoked;
-    bool            isChoked;
-    int             rate;
-    int             salt;
-    tr_peer *       peer;
+  bool      isInterested;
+  bool      wasChoked;
+  bool      isChoked;
+  int       rate;
+  int       salt;
+  tr_peer * peer;
 };
 
 static int
 compareChoke (const void * va, const void * vb)
 {
-    const struct ChokeData * a = va;
-    const struct ChokeData * b = vb;
+  const struct ChokeData * a = va;
+  const struct ChokeData * b = vb;
 
-    if (a->rate != b->rate) /* prefer higher overall speeds */
-        return a->rate > b->rate ? -1 : 1;
+  if (a->rate != b->rate) /* prefer higher overall speeds */
+    return a->rate > b->rate ? -1 : 1;
 
-    if (a->wasChoked != b->wasChoked) /* prefer unchoked */
-        return a->wasChoked ? 1 : -1;
+  if (a->wasChoked != b->wasChoked) /* prefer unchoked */
+    return a->wasChoked ? 1 : -1;
 
-    if (a->salt != b->salt) /* random order */
-        return a->salt - b->salt;
+  if (a->salt != b->salt) /* random order */
+    return a->salt - b->salt;
 
-    return 0;
+  return 0;
 }
 
 /* is this a new connection? */
 static int
 isNew (const tr_peer * peer)
 {
-    return peer && peer->io && tr_peerIoGetAge (peer->io) < 45;
+  return peer && peer->io && tr_peerIoGetAge (peer->io) < 45;
 }
 
 /* get a rate for deciding which peers to choke and unchoke. */
 static int
 getRate (const tr_torrent * tor, struct peer_atom * atom, uint64_t now)
 {
-    unsigned int Bps;
+  unsigned int Bps;
 
-    if (tr_torrentIsSeed (tor))
-        Bps = tr_peerGetPieceSpeed_Bps (atom->peer, now, TR_CLIENT_TO_PEER);
+  if (tr_torrentIsSeed (tor))
+    Bps = tr_peerGetPieceSpeed_Bps (atom->peer, now, TR_CLIENT_TO_PEER);
 
-    /* downloading a private torrent... take upload speed into account
-     * because there may only be a small window of opportunity to share */
-    else if (tr_torrentIsPrivate (tor))
-        Bps = tr_peerGetPieceSpeed_Bps (atom->peer, now, TR_PEER_TO_CLIENT)
-            + tr_peerGetPieceSpeed_Bps (atom->peer, now, TR_CLIENT_TO_PEER);
+  /* downloading a private torrent... take upload speed into account
+   * because there may only be a small window of opportunity to share */
+  else if (tr_torrentIsPrivate (tor))
+    Bps = tr_peerGetPieceSpeed_Bps (atom->peer, now, TR_PEER_TO_CLIENT)
+        + tr_peerGetPieceSpeed_Bps (atom->peer, now, TR_CLIENT_TO_PEER);
 
-    /* downloading a public torrent */
-    else
-        Bps = tr_peerGetPieceSpeed_Bps (atom->peer, now, TR_PEER_TO_CLIENT);
+  /* downloading a public torrent */
+  else
+    Bps = tr_peerGetPieceSpeed_Bps (atom->peer, now, TR_PEER_TO_CLIENT);
 
-    /* convert it to bytes per second */
-    return Bps;
+  /* convert it to bytes per second */
+  return Bps;
 }
 
 static inline bool
 isBandwidthMaxedOut (const tr_bandwidth * b,
                      const uint64_t now_msec, tr_direction dir)
 {
-    if (!tr_bandwidthIsLimited (b, dir))
-        return false;
-    else {
-        const unsigned int got = tr_bandwidthGetPieceSpeed_Bps (b, now_msec, dir);
-        const unsigned int want = tr_bandwidthGetDesiredSpeed_Bps (b, dir);
-        return got >= want;
+  if (!tr_bandwidthIsLimited (b, dir))
+    {
+      return false;
+    }
+  else
+    {
+      const unsigned int got = tr_bandwidthGetPieceSpeed_Bps (b, now_msec, dir);
+      const unsigned int want = tr_bandwidthGetDesiredSpeed_Bps (b, dir);
+      return got >= want;
     }
 }
 
 static void
-rechokeUploads (Torrent * t, const uint64_t now)
+rechokeUploads (tr_swarm * s, const uint64_t now)
 {
-    int i, size, unchokedInterested;
-    const int peerCount = tr_ptrArraySize (&t->peers);
-    tr_peer ** peers = (tr_peer**) tr_ptrArrayBase (&t->peers);
-    struct ChokeData * choke = tr_new0 (struct ChokeData, peerCount);
-    const tr_session * session = t->manager->session;
-    const int chokeAll = !tr_torrentIsPieceTransferAllowed (t->tor, TR_CLIENT_TO_PEER);
-    const bool isMaxedOut = isBandwidthMaxedOut (&t->tor->bandwidth, now, TR_UP);
+  int i, size, unchokedInterested;
+  const int peerCount = tr_ptrArraySize (&s->peers);
+  tr_peer ** peers = (tr_peer**) tr_ptrArrayBase (&s->peers);
+  struct ChokeData * choke = tr_new0 (struct ChokeData, peerCount);
+  const tr_session * session = s->manager->session;
+  const int chokeAll = !tr_torrentIsPieceTransferAllowed (s->tor, TR_CLIENT_TO_PEER);
+  const bool isMaxedOut = isBandwidthMaxedOut (&s->tor->bandwidth, now, TR_UP);
 
-    assert (torrentIsLocked (t));
+  assert (swarmIsLocked (s));
 
-    /* an optimistic unchoke peer's "optimistic"
-     * state lasts for N calls to rechokeUploads (). */
-    if (t->optimisticUnchokeTimeScaler > 0)
-        t->optimisticUnchokeTimeScaler--;
-    else
-        t->optimistic = NULL;
+  /* an optimistic unchoke peer's "optimistic"
+   * state lasts for N calls to rechokeUploads (). */
+  if (s->optimisticUnchokeTimeScaler > 0)
+    s->optimisticUnchokeTimeScaler--;
+  else
+    s->optimistic = NULL;
 
-    /* sort the peers by preference and rate */
-    for (i = 0, size = 0; i < peerCount; ++i)
+  /* sort the peers by preference and rate */
+  for (i=0, size=0; i<peerCount; ++i)
     {
-        tr_peer * peer = peers[i];
-        struct peer_atom * atom = peer->atom;
+      tr_peer * peer = peers[i];
+      struct peer_atom * atom = peer->atom;
 
-        if (peerIsSeed (peer)) /* choke seeds and partial seeds */
+      if (peerIsSeed (peer)) /* choke seeds and partial seeds */
         {
-            tr_peerMsgsSetChoke (peer->msgs, true);
+          tr_peerMsgsSetChoke (peer->msgs, true);
         }
-        else if (chokeAll) /* choke everyone if we're not uploading */
+      else if (chokeAll) /* choke everyone if we're not uploading */
         {
-            tr_peerMsgsSetChoke (peer->msgs, true);
+          tr_peerMsgsSetChoke (peer->msgs, true);
         }
-        else if (peer != t->optimistic)
+      else if (peer != s->optimistic)
         {
-            struct ChokeData * n = &choke[size++];
-            n->peer         = peer;
-            n->isInterested = peer->peerIsInterested;
-            n->wasChoked    = peer->peerIsChoked;
-            n->rate         = getRate (t->tor, atom, now);
-            n->salt         = tr_cryptoWeakRandInt (INT_MAX);
-            n->isChoked     = true;
+          struct ChokeData * n = &choke[size++];
+          n->peer         = peer;
+          n->isInterested = peer->peerIsInterested;
+          n->wasChoked    = peer->peerIsChoked;
+          n->rate         = getRate (s->tor, atom, now);
+          n->salt         = tr_cryptoWeakRandInt (INT_MAX);
+          n->isChoked     = true;
         }
     }
 
-    qsort (choke, size, sizeof (struct ChokeData), compareChoke);
+  qsort (choke, size, sizeof (struct ChokeData), compareChoke);
 
-    /**
-     * Reciprocation and number of uploads capping is managed by unchoking
-     * the N peers which have the best upload rate and are interested.
-     * This maximizes the client's download rate. These N peers are
-     * referred to as downloaders, because they are interested in downloading
-     * from the client.
-     *
-     * Peers which have a better upload rate (as compared to the downloaders)
-     * but aren't interested get unchoked. If they become interested, the
-     * downloader with the worst upload rate gets choked. If a client has
-     * a complete file, it uses its upload rate rather than its download
-     * rate to decide which peers to unchoke.
-     *
-     * If our bandwidth is maxed out, don't unchoke any more peers.
-     */
-    unchokedInterested = 0;
-    for (i=0; i<size && unchokedInterested<session->uploadSlotsPerTorrent; ++i) {
-        choke[i].isChoked = isMaxedOut ? choke[i].wasChoked : false;
-        if (choke[i].isInterested)
-            ++unchokedInterested;
+  /**
+   * Reciprocation and number of uploads capping is managed by unchoking
+   * the N peers which have the best upload rate and are interested.
+   * This maximizes the client's download rate. These N peers are
+   * referred to as downloaders, because they are interested in downloading
+   * from the client.
+   *
+   * Peers which have a better upload rate (as compared to the downloaders)
+   * but aren't interested get unchoked. If they become interested, the
+   * downloader with the worst upload rate gets choked. If a client has
+   * a complete file, it uses its upload rate rather than its download
+   * rate to decide which peers to unchoke.
+   *
+   * If our bandwidth is maxed out, don't unchoke any more peers.
+   */
+  unchokedInterested = 0;
+  for (i=0; i<size && unchokedInterested<session->uploadSlotsPerTorrent; ++i)
+    {
+      choke[i].isChoked = isMaxedOut ? choke[i].wasChoked : false;
+      if (choke[i].isInterested)
+        ++unchokedInterested;
     }
 
-    /* optimistic unchoke */
-    if (!t->optimistic && !isMaxedOut && (i<size))
+  /* optimistic unchoke */
+  if (!s->optimistic && !isMaxedOut && (i<size))
     {
-        int n;
-        struct ChokeData * c;
-        tr_ptrArray randPool = TR_PTR_ARRAY_INIT;
+      int n;
+      struct ChokeData * c;
+      tr_ptrArray randPool = TR_PTR_ARRAY_INIT;
 
-        for (; i<size; ++i)
+      for (; i<size; ++i)
         {
-            if (choke[i].isInterested)
+          if (choke[i].isInterested)
             {
-                const tr_peer * peer = choke[i].peer;
-                int x = 1, y;
-                if (isNew (peer)) x *= 3;
-                for (y=0; y<x; ++y)
-                    tr_ptrArrayAppend (&randPool, &choke[i]);
+              const tr_peer * peer = choke[i].peer;
+              int x = 1, y;
+              if (isNew (peer)) x *= 3;
+              for (y=0; y<x; ++y)
+                tr_ptrArrayAppend (&randPool, &choke[i]);
             }
         }
 
-        if ((n = tr_ptrArraySize (&randPool)))
+      if ((n = tr_ptrArraySize (&randPool)))
         {
-            c = tr_ptrArrayNth (&randPool, tr_cryptoWeakRandInt (n));
-            c->isChoked = false;
-            t->optimistic = c->peer;
-            t->optimisticUnchokeTimeScaler = OPTIMISTIC_UNCHOKE_MULTIPLIER;
+          c = tr_ptrArrayNth (&randPool, tr_cryptoWeakRandInt (n));
+          c->isChoked = false;
+          s->optimistic = c->peer;
+          s->optimisticUnchokeTimeScaler = OPTIMISTIC_UNCHOKE_MULTIPLIER;
         }
 
-        tr_ptrArrayDestruct (&randPool, NULL);
+      tr_ptrArrayDestruct (&randPool, NULL);
     }
 
-    for (i=0; i<size; ++i)
-        tr_peerMsgsSetChoke (choke[i].peer->msgs, choke[i].isChoked);
+  for (i=0; i<size; ++i)
+    tr_peerMsgsSetChoke (choke[i].peer->msgs, choke[i].isChoked);
 
-    /* cleanup */
-    tr_free (choke);
+  /* cleanup */
+  tr_free (choke);
 }
 
 static void
 rechokePulse (int foo UNUSED, short bar UNUSED, void * vmgr)
 {
-    tr_torrent * tor = NULL;
-    tr_peerMgr * mgr = vmgr;
-    const uint64_t now = tr_time_msec ();
+  tr_torrent * tor = NULL;
+  tr_peerMgr * mgr = vmgr;
+  const uint64_t now = tr_time_msec ();
 
-    managerLock (mgr);
+  managerLock (mgr);
 
-    while ((tor = tr_torrentNext (mgr->session, tor))) {
-        if (tor->isRunning) {
-            Torrent * t = tor->torrentPeers;
-            if (!tr_ptrArrayEmpty (&t->peers)) {
-                rechokeUploads (t, now);
-                rechokeDownloads (t);
+  while ((tor = tr_torrentNext (mgr->session, tor)))
+    {
+      if (tor->isRunning)
+        {
+          tr_swarm * s = tor->swarm;
+          if (!tr_ptrArrayEmpty (&s->peers))
+            {
+              rechokeUploads (s, now);
+              rechokeDownloads (s);
             }
         }
     }
 
-    tr_timerAddMsec (mgr->rechokeTimer, RECHOKE_PERIOD_MSEC);
-    managerUnlock (mgr);
+  tr_timerAddMsec (mgr->rechokeTimer, RECHOKE_PERIOD_MSEC);
+  managerUnlock (mgr);
 }
 
 /***
@@ -3167,69 +3186,72 @@ rechokePulse (int foo UNUSED, short bar UNUSED, void * vmgr)
 ***/
 
 static bool
-shouldPeerBeClosed (const Torrent    * t,
+shouldPeerBeClosed (const tr_swarm   * s,
                     const tr_peer    * peer,
                     int                peerCount,
                     const time_t       now)
 {
-    const tr_torrent *       tor = t->tor;
-    const struct peer_atom * atom = peer->atom;
+  const tr_torrent * tor = s->tor;
+  const struct peer_atom * atom = peer->atom;
 
-    /* if it's marked for purging, close it */
-    if (peer->doPurge)
+  /* if it's marked for purging, close it */
+  if (peer->doPurge)
     {
-        tordbg (t, "purging peer %s because its doPurge flag is set",
-                tr_atomAddrStr (atom));
-        return true;
+      tordbg (s, "purging peer %s because its doPurge flag is set",
+              tr_atomAddrStr (atom));
+      return true;
     }
 
-    /* disconnect if we're both seeds and enough time has passed for PEX */
-    if (tr_torrentIsSeed (tor) && peerIsSeed (peer))
-        return !tr_torrentAllowsPex (tor) || (now-atom->time>=30);
+  /* disconnect if we're both seeds and enough time has passed for PEX */
+  if (tr_torrentIsSeed (tor) && peerIsSeed (peer))
+    return !tr_torrentAllowsPex (tor) || (now-atom->time>=30);
 
-    /* disconnect if it's been too long since piece data has been transferred.
-     * this is on a sliding scale based on number of available peers... */
-    {
-        const int relaxStrictnessIfFewerThanN = (int)((getMaxPeerCount (tor) * 0.9) + 0.5);
-        /* if we have >= relaxIfFewerThan, strictness is 100%.
-         * if we have zero connections, strictness is 0% */
-        const float strictness = peerCount >= relaxStrictnessIfFewerThanN
-                               ? 1.0
-                               : peerCount / (float)relaxStrictnessIfFewerThanN;
-        const int lo = MIN_UPLOAD_IDLE_SECS;
-        const int hi = MAX_UPLOAD_IDLE_SECS;
-        const int limit = hi - ((hi - lo) * strictness);
-        const int idleTime = now - MAX (atom->time, atom->piece_data_time);
+  /* disconnect if it's been too long since piece data has been transferred.
+   * this is on a sliding scale based on number of available peers... */
+  {
+    const int relaxStrictnessIfFewerThanN = (int)((getMaxPeerCount (tor) * 0.9) + 0.5);
+    /* if we have >= relaxIfFewerThan, strictness is 100%.
+     * if we have zero connections, strictness is 0% */
+    const float strictness = peerCount >= relaxStrictnessIfFewerThanN
+                           ? 1.0
+                           : peerCount / (float)relaxStrictnessIfFewerThanN;
+    const int lo = MIN_UPLOAD_IDLE_SECS;
+    const int hi = MAX_UPLOAD_IDLE_SECS;
+    const int limit = hi - ((hi - lo) * strictness);
+    const int idleTime = now - MAX (atom->time, atom->piece_data_time);
 /*fprintf (stderr, "strictness is %.3f, limit is %d seconds... time since connect is %d, time since piece is %d ... idleTime is %d, doPurge is %d\n", (double)strictness, limit, (int)(now - atom->time), (int)(now - atom->piece_data_time), idleTime, idleTime > limit);*/
-        if (idleTime > limit) {
-            tordbg (t, "purging peer %s because it's been %d secs since we shared anything",
-                       tr_atomAddrStr (atom), idleTime);
-            return true;
-        }
-    }
+    if (idleTime > limit)
+      {
+        tordbg (s, "purging peer %s because it's been %d secs since we shared anything",
+                tr_atomAddrStr (atom), idleTime);
+        return true;
+      }
+  }
 
-    return false;
+  return false;
 }
 
 static tr_peer **
-getPeersToClose (Torrent * t, const time_t now_sec, int * setmeSize)
+getPeersToClose (tr_swarm * s, const time_t now_sec, int * setmeSize)
 {
-    int i, peerCount, outsize;
-    struct tr_peer ** ret = NULL;
-    tr_peer ** peers = (tr_peer**) tr_ptrArrayPeek (&t->peers, &peerCount);
+  int i, peerCount, outsize;
+  struct tr_peer ** ret = NULL;
+  tr_peer ** peers = (tr_peer**) tr_ptrArrayPeek (&s->peers, &peerCount);
 
-    assert (torrentIsLocked (t));
+  assert (swarmIsLocked (s));
 
-    for (i = outsize = 0; i < peerCount; ++i) {
-        if (shouldPeerBeClosed (t, peers[i], peerCount, now_sec)) {
-            if (ret == NULL)
-                ret = tr_new (tr_peer *, peerCount);
-            ret[outsize++] = peers[i];
+  for (i=outsize=0; i<peerCount; ++i)
+    {
+      if (shouldPeerBeClosed (s, peers[i], peerCount, now_sec))
+        {
+          if (ret == NULL)
+            ret = tr_new (tr_peer *, peerCount);
+          ret[outsize++] = peers[i];
         }
     }
 
-    *setmeSize = outsize;
-    return ret;
+  *setmeSize = outsize;
+  return ret;
 }
 
 static int
@@ -3271,102 +3293,107 @@ getReconnectIntervalSecs (const struct peer_atom * atom, const time_t now)
 }
 
 static void
-removePeer (Torrent * t, tr_peer * peer)
+removePeer (tr_swarm * s, tr_peer * peer)
 {
-    tr_peer * removed;
-    struct peer_atom * atom = peer->atom;
+  tr_peer * removed;
+  struct peer_atom * atom = peer->atom;
 
-    assert (torrentIsLocked (t));
-    assert (atom);
+  assert (swarmIsLocked (s));
+  assert (atom);
 
-    atom->time = tr_time ();
+  atom->time = tr_time ();
 
-    removed = tr_ptrArrayRemoveSorted (&t->peers, peer, peerCompare);
+  removed = tr_ptrArrayRemoveSorted (&s->peers, peer, peerCompare);
 
-    if (replicationExists (t))
-        tr_decrReplicationFromBitfield (t, &peer->have);
+  if (replicationExists (s))
+    tr_decrReplicationFromBitfield (s, &peer->have);
 
-    assert (removed == peer);
-    peerDelete (t, removed);
+  assert (removed == peer);
+  peerDelete (s, removed);
 }
 
 static void
-closePeer (Torrent * t, tr_peer * peer)
+closePeer (tr_swarm * s, tr_peer * peer)
 {
-    struct peer_atom * atom;
+  struct peer_atom * atom;
 
-    assert (t != NULL);
-    assert (peer != NULL);
+  assert (s != NULL);
+  assert (peer != NULL);
 
-    atom = peer->atom;
+  atom = peer->atom;
 
-    /* if we transferred piece data, then they might be good peers,
-       so reset their `numFails' weight to zero. otherwise we connected
-       to them fruitlessly, so mark it as another fail */
-    if (atom->piece_data_time) {
-        tordbg (t, "resetting atom %s numFails to 0", tr_atomAddrStr (atom));
-        atom->numFails = 0;
-    } else {
-        ++atom->numFails;
-        tordbg (t, "incremented atom %s numFails to %d", tr_atomAddrStr (atom), (int)atom->numFails);
+  /* if we transferred piece data, then they might be good peers,
+     so reset their `numFails' weight to zero. otherwise we connected
+     to them fruitlessly, so mark it as another fail */
+  if (atom->piece_data_time)
+    {
+      tordbg (s, "resetting atom %s numFails to 0", tr_atomAddrStr (atom));
+      atom->numFails = 0;
+    }
+  else
+    {
+      ++atom->numFails;
+      tordbg (s, "incremented atom %s numFails to %d", tr_atomAddrStr (atom), (int)atom->numFails);
     }
 
-    tordbg (t, "removing bad peer %s", tr_peerIoGetAddrStr (peer->io));
-    removePeer (t, peer);
+  tordbg (s, "removing bad peer %s", tr_peerIoGetAddrStr (peer->io));
+  removePeer (s, peer);
 }
 
 static void
-removeAllPeers (Torrent * t)
+removeAllPeers (tr_swarm * s)
 {
-    while (!tr_ptrArrayEmpty (&t->peers))
-        removePeer (t, tr_ptrArrayNth (&t->peers, 0));
+  while (!tr_ptrArrayEmpty (&s->peers))
+    removePeer (s, tr_ptrArrayNth (&s->peers, 0));
 }
 
 static void
-closeBadPeers (Torrent * t, const time_t now_sec)
+closeBadPeers (tr_swarm * s, const time_t now_sec)
 {
-    if (!tr_ptrArrayEmpty (&t->peers))
+  if (!tr_ptrArrayEmpty (&s->peers))
     {
-        int i;
-        int peerCount;
-        struct tr_peer ** peers = getPeersToClose (t, now_sec, &peerCount);
-        for (i=0; i<peerCount; ++i)
-            closePeer (t, peers[i]);
-        tr_free (peers);
+      int i;
+      int peerCount;
+      struct tr_peer ** peers;
+
+      peers = getPeersToClose (s, now_sec, &peerCount);
+      for (i=0; i<peerCount; ++i)
+        closePeer (s, peers[i]);
+      tr_free (peers);
     }
 }
 
 struct peer_liveliness
 {
-    tr_peer * peer;
-    void * clientData;
-    time_t pieceDataTime;
-    time_t time;
-    int speed;
-    bool doPurge;
+  tr_peer * peer;
+  void * clientData;
+  time_t pieceDataTime;
+  time_t time;
+  int speed;
+  bool doPurge;
 };
 
 static int
 comparePeerLiveliness (const void * va, const void * vb)
 {
-    const struct peer_liveliness * a = va;
-    const struct peer_liveliness * b = vb;
+  const struct peer_liveliness * a = va;
+  const struct peer_liveliness * b = vb;
 
-    if (a->doPurge != b->doPurge)
-        return a->doPurge ? 1 : -1;
+  if (a->doPurge != b->doPurge)
+    return a->doPurge ? 1 : -1;
 
-    if (a->speed != b->speed) /* faster goes first */
-        return a->speed > b->speed ? -1 : 1;
+  if (a->speed != b->speed) /* faster goes first */
+    return a->speed > b->speed ? -1 : 1;
 
-    /* the one to give us data more recently goes first */
-    if (a->pieceDataTime != b->pieceDataTime)
-        return a->pieceDataTime > b->pieceDataTime ? -1 : 1;
+  /* the one to give us data more recently goes first */
+  if (a->pieceDataTime != b->pieceDataTime)
+    return a->pieceDataTime > b->pieceDataTime ? -1 : 1;
 
-    /* the one we connected to most recently goes first */
-    if (a->time != b->time)
-        return a->time > b->time ? -1 : 1;
+  /* the one we connected to most recently goes first */
+  if (a->time != b->time)
+    return a->time > b->time ? -1 : 1;
 
-    return 0;
+  return 0;
 }
 
 static void
@@ -3376,103 +3403,106 @@ sortPeersByLivelinessImpl (tr_peer  ** peers,
                            uint64_t    now,
                            int (*compare)(const void *va, const void *vb))
 {
-    int i;
-    struct peer_liveliness *lives, *l;
+  int i;
+  struct peer_liveliness *lives, *l;
 
-    /* build a sortable array of peer + extra info */
-    lives = l = tr_new0 (struct peer_liveliness, n);
-    for (i=0; i<n; ++i, ++l)
+  /* build a sortable array of peer + extra info */
+  lives = l = tr_new0 (struct peer_liveliness, n);
+  for (i=0; i<n; ++i, ++l)
     {
-        tr_peer * p = peers[i];
-        l->peer = p;
-        l->doPurge = p->doPurge;
-        l->pieceDataTime = p->atom->piece_data_time;
-        l->time = p->atom->time;
-        l->speed = tr_peerGetPieceSpeed_Bps (p, now, TR_UP)
-                 + tr_peerGetPieceSpeed_Bps (p, now, TR_DOWN);
-        if (clientData)
-            l->clientData = clientData[i];
+      tr_peer * p = peers[i];
+      l->peer = p;
+      l->doPurge = p->doPurge;
+      l->pieceDataTime = p->atom->piece_data_time;
+      l->time = p->atom->time;
+      l->speed = tr_peerGetPieceSpeed_Bps (p, now, TR_UP)
+               + tr_peerGetPieceSpeed_Bps (p, now, TR_DOWN);
+      if (clientData)
+        l->clientData = clientData[i];
     }
 
-    /* sort 'em */
-    assert (n == (l - lives));
-    qsort (lives, n, sizeof (struct peer_liveliness), compare);
+  /* sort 'em */
+  assert (n == (l - lives));
+  qsort (lives, n, sizeof (struct peer_liveliness), compare);
 
-    /* build the peer array */
-    for (i=0, l=lives; i<n; ++i, ++l) {
-        peers[i] = l->peer;
-        if (clientData)
-            clientData[i] = l->clientData;
+  /* build the peer array */
+  for (i=0, l=lives; i<n; ++i, ++l)
+    {
+      peers[i] = l->peer;
+      if (clientData)
+        clientData[i] = l->clientData;
     }
-    assert (n == (l - lives));
+  assert (n == (l - lives));
 
-    /* cleanup */
-    tr_free (lives);
+  /* cleanup */
+  tr_free (lives);
 }
 
 static void
 sortPeersByLiveliness (tr_peer ** peers, void ** clientData, int n, uint64_t now)
 {
-    sortPeersByLivelinessImpl (peers, clientData, n, now, comparePeerLiveliness);
+  sortPeersByLivelinessImpl (peers, clientData, n, now, comparePeerLiveliness);
 }
 
 
 static void
-enforceTorrentPeerLimit (Torrent * t, uint64_t now)
+enforceTorrentPeerLimit (tr_swarm * s, uint64_t now)
 {
-    int n = tr_ptrArraySize (&t->peers);
-    const int max = tr_torrentGetPeerLimit (t->tor);
-    if (n > max)
+  int n = tr_ptrArraySize (&s->peers);
+  const int max = tr_torrentGetPeerLimit (s->tor);
+  if (n > max)
     {
-        void * base = tr_ptrArrayBase (&t->peers);
-        tr_peer ** peers = tr_memdup (base, n*sizeof (tr_peer*));
-        sortPeersByLiveliness (peers, NULL, n, now);
-        while (n > max)
-            closePeer (t, peers[--n]);
-        tr_free (peers);
+      void * base = tr_ptrArrayBase (&s->peers);
+      tr_peer ** peers = tr_memdup (base, n*sizeof (tr_peer*));
+      sortPeersByLiveliness (peers, NULL, n, now);
+      while (n > max)
+        closePeer (s, peers[--n]);
+      tr_free (peers);
     }
 }
 
 static void
 enforceSessionPeerLimit (tr_session * session, uint64_t now)
 {
-    int n = 0;
-    tr_torrent * tor = NULL;
-    const int max = tr_sessionGetPeerLimit (session);
+  int n = 0;
+  tr_torrent * tor = NULL;
+  const int max = tr_sessionGetPeerLimit (session);
 
-    /* count the total number of peers */
-    while ((tor = tr_torrentNext (session, tor)))
-        n += tr_ptrArraySize (&tor->torrentPeers->peers);
+  /* count the total number of peers */
+  while ((tor = tr_torrentNext (session, tor)))
+    n += tr_ptrArraySize (&tor->swarm->peers);
 
-    /* if there are too many, prune out the worst */
-    if (n > max)
+  /* if there are too many, prune out the worst */
+  if (n > max)
     {
-        tr_peer ** peers = tr_new (tr_peer*, n);
-        Torrent ** torrents = tr_new (Torrent*, n);
+      tr_peer ** peers = tr_new (tr_peer*, n);
+      tr_swarm ** swarms = tr_new (tr_swarm*, n);
 
-        /* populate the peer array */
-        n = 0;
-        tor = NULL;
-        while ((tor = tr_torrentNext (session, tor))) {
-            int i;
-            Torrent * t = tor->torrentPeers;
-            const int tn = tr_ptrArraySize (&t->peers);
-            for (i=0; i<tn; ++i, ++n) {
-                peers[n] = tr_ptrArrayNth (&t->peers, i);
-                torrents[n] = t;
+      /* populate the peer array */
+      n = 0;
+      tor = NULL;
+      while ((tor = tr_torrentNext (session, tor)))
+        {
+          int i;
+          tr_swarm * s = tor->swarm;
+          const int tn = tr_ptrArraySize (&s->peers);
+          for (i=0; i<tn; ++i, ++n)
+            {
+              peers[n] = tr_ptrArrayNth (&s->peers, i);
+              swarms[n] = s;
             }
         }
 
-        /* sort 'em */
-        sortPeersByLiveliness (peers, (void**)torrents, n, now);
+      /* sort 'em */
+      sortPeersByLiveliness (peers, (void**)swarms, n, now);
 
-        /* cull out the crappiest */
-        while (n-- > max)
-            closePeer (torrents[n], peers[n]);
+      /* cull out the crappiest */
+      while (n-- > max)
+        closePeer (swarms[n], peers[n]);
 
-        /* cleanup */
-        tr_free (torrents);
-        tr_free (peers);
+      /* cleanup */
+      tr_free (swarms);
+      tr_free (peers);
     }
 }
 
@@ -3481,34 +3511,34 @@ static void makeNewPeerConnections (tr_peerMgr * mgr, const int max);
 static void
 reconnectPulse (int foo UNUSED, short bar UNUSED, void * vmgr)
 {
-    tr_torrent * tor;
-    tr_peerMgr * mgr = vmgr;
-    const time_t now_sec = tr_time ();
-    const uint64_t now_msec = tr_time_msec ();
+  tr_torrent * tor;
+  tr_peerMgr * mgr = vmgr;
+  const time_t now_sec = tr_time ();
+  const uint64_t now_msec = tr_time_msec ();
 
-    /**
-    ***  enforce the per-session and per-torrent peer limits
-    **/
+  /**
+  ***  enforce the per-session and per-torrent peer limits
+  **/
 
-    /* if we're over the per-torrent peer limits, cull some peers */
-    tor = NULL;
-    while ((tor = tr_torrentNext (mgr->session, tor)))
-        if (tor->isRunning)
-            enforceTorrentPeerLimit (tor->torrentPeers, now_msec);
+  /* if we're over the per-torrent peer limits, cull some peers */
+  tor = NULL;
+  while ((tor = tr_torrentNext (mgr->session, tor)))
+    if (tor->isRunning)
+      enforceTorrentPeerLimit (tor->swarm, now_msec);
 
-    /* if we're over the per-session peer limits, cull some peers */
-    enforceSessionPeerLimit (mgr->session, now_msec);
+  /* if we're over the per-session peer limits, cull some peers */
+  enforceSessionPeerLimit (mgr->session, now_msec);
 
-    /* remove crappy peers */
-    tor = NULL;
-    while ((tor = tr_torrentNext (mgr->session, tor)))
-        if (!tor->torrentPeers->isRunning)
-            removeAllPeers (tor->torrentPeers);
-        else
-            closeBadPeers (tor->torrentPeers, now_sec);
+  /* remove crappy peers */
+  tor = NULL;
+  while ((tor = tr_torrentNext (mgr->session, tor)))
+    if (!tor->swarm->isRunning)
+      removeAllPeers (tor->swarm);
+    else
+      closeBadPeers (tor->swarm, now_sec);
 
-    /* try to make new peer connections */
-    makeNewPeerConnections (mgr, MAX_CONNECTIONS_PER_PULSE);
+  /* try to make new peer connections */
+  makeNewPeerConnections (mgr, MAX_CONNECTIONS_PER_PULSE);
 }
 
 /****
@@ -3520,17 +3550,17 @@ reconnectPulse (int foo UNUSED, short bar UNUSED, void * vmgr)
 static void
 pumpAllPeers (tr_peerMgr * mgr)
 {
-    tr_torrent * tor = NULL;
+  tr_torrent * tor = NULL;
 
-    while ((tor = tr_torrentNext (mgr->session, tor)))
+  while ((tor = tr_torrentNext (mgr->session, tor)))
     {
-        int j;
-        Torrent * t = tor->torrentPeers;
+      int j;
+      tr_swarm * s = tor->swarm;
 
-        for (j=0; j<tr_ptrArraySize (&t->peers); ++j)
+      for (j=0; j<tr_ptrArraySize (&s->peers); ++j)
         {
-            tr_peer * peer = tr_ptrArrayNth (&t->peers, j);
-            tr_peerMsgsPulse (peer->msgs);
+          tr_peer * peer = tr_ptrArrayNth (&s->peers, j);
+          tr_peerMsgsPulse (peer->msgs);
         }
     }
 }
@@ -3571,45 +3601,46 @@ queuePulse (tr_session * session, tr_direction dir)
 static void
 bandwidthPulse (int foo UNUSED, short bar UNUSED, void * vmgr)
 {
-    tr_torrent * tor;
-    tr_peerMgr * mgr = vmgr;
-    tr_session * session = mgr->session;
-    managerLock (mgr);
+  tr_torrent * tor;
+  tr_peerMgr * mgr = vmgr;
+  tr_session * session = mgr->session;
+  managerLock (mgr);
 
-    /* FIXME: this next line probably isn't necessary... */
-    pumpAllPeers (mgr);
+  /* FIXME: this next line probably isn't necessary... */
+  pumpAllPeers (mgr);
 
-    /* allocate bandwidth to the peers */
-    tr_bandwidthAllocate (&session->bandwidth, TR_UP, BANDWIDTH_PERIOD_MSEC);
-    tr_bandwidthAllocate (&session->bandwidth, TR_DOWN, BANDWIDTH_PERIOD_MSEC);
+  /* allocate bandwidth to the peers */
+  tr_bandwidthAllocate (&session->bandwidth, TR_UP, BANDWIDTH_PERIOD_MSEC);
+  tr_bandwidthAllocate (&session->bandwidth, TR_DOWN, BANDWIDTH_PERIOD_MSEC);
 
-    /* torrent upkeep */
-    tor = NULL;
-    while ((tor = tr_torrentNext (session, tor)))
+  /* torrent upkeep */
+  tor = NULL;
+  while ((tor = tr_torrentNext (session, tor)))
     {
-        /* possibly stop torrents that have seeded enough */
-        tr_torrentCheckSeedLimit (tor);
+      /* possibly stop torrents that have seeded enough */
+      tr_torrentCheckSeedLimit (tor);
 
-        /* run the completeness check for any torrents that need it */
-        if (tor->torrentPeers->needsCompletenessCheck) {
-            tor->torrentPeers->needsCompletenessCheck  = false;
-            tr_torrentRecheckCompleteness (tor);
+      /* run the completeness check for any torrents that need it */
+      if (tor->swarm->needsCompletenessCheck)
+        {
+          tor->swarm->needsCompletenessCheck  = false;
+          tr_torrentRecheckCompleteness (tor);
         }
 
-        /* stop torrents that are ready to stop, but couldn't be stopped
-           earlier during the peer-io callback call chain */
-        if (tor->isStopping)
-            tr_torrentStop (tor);
+      /* stop torrents that are ready to stop, but couldn't be stopped
+         earlier during the peer-io callback call chain */
+      if (tor->isStopping)
+        tr_torrentStop (tor);
     }
 
-    /* pump the queues */
-    queuePulse (session, TR_UP);
-    queuePulse (session, TR_DOWN);
+  /* pump the queues */
+  queuePulse (session, TR_UP);
+  queuePulse (session, TR_DOWN);
 
-    reconnectPulse (0, 0, mgr);
+  reconnectPulse (0, 0, mgr);
 
-    tr_timerAddMsec (mgr->bandwidthTimer, BANDWIDTH_PERIOD_MSEC);
-    managerUnlock (mgr);
+  tr_timerAddMsec (mgr->bandwidthTimer, BANDWIDTH_PERIOD_MSEC);
+  managerUnlock (mgr);
 }
 
 /***
@@ -3619,40 +3650,40 @@ bandwidthPulse (int foo UNUSED, short bar UNUSED, void * vmgr)
 static int
 compareAtomPtrsByAddress (const void * va, const void *vb)
 {
-    const struct peer_atom * a = * (const struct peer_atom**) va;
-    const struct peer_atom * b = * (const struct peer_atom**) vb;
+  const struct peer_atom * a = * (const struct peer_atom**) va;
+  const struct peer_atom * b = * (const struct peer_atom**) vb;
 
-    assert (tr_isAtom (a));
-    assert (tr_isAtom (b));
+  assert (tr_isAtom (a));
+  assert (tr_isAtom (b));
 
-    return tr_address_compare (&a->addr, &b->addr);
+  return tr_address_compare (&a->addr, &b->addr);
 }
 
 /* best come first, worst go last */
 static int
 compareAtomPtrsByShelfDate (const void * va, const void *vb)
 {
-    time_t atime;
-    time_t btime;
-    const struct peer_atom * a = * (const struct peer_atom**) va;
-    const struct peer_atom * b = * (const struct peer_atom**) vb;
-    const int data_time_cutoff_secs = 60 * 60;
-    const time_t tr_now = tr_time ();
+  time_t atime;
+  time_t btime;
+  const struct peer_atom * a = * (const struct peer_atom**) va;
+  const struct peer_atom * b = * (const struct peer_atom**) vb;
+  const int data_time_cutoff_secs = 60 * 60;
+  const time_t tr_now = tr_time ();
 
-    assert (tr_isAtom (a));
-    assert (tr_isAtom (b));
+  assert (tr_isAtom (a));
+  assert (tr_isAtom (b));
 
-    /* primary key: the last piece data time *if* it was within the last hour */
-    atime = a->piece_data_time; if (atime + data_time_cutoff_secs < tr_now) atime = 0;
-    btime = b->piece_data_time; if (btime + data_time_cutoff_secs < tr_now) btime = 0;
-    if (atime != btime)
-        return atime > btime ? -1 : 1;
+  /* primary key: the last piece data time *if* it was within the last hour */
+  atime = a->piece_data_time; if (atime + data_time_cutoff_secs < tr_now) atime = 0;
+  btime = b->piece_data_time; if (btime + data_time_cutoff_secs < tr_now) btime = 0;
+  if (atime != btime)
+    return atime > btime ? -1 : 1;
 
-    /* secondary key: shelf date. */
-    if (a->shelf_date != b->shelf_date)
-        return a->shelf_date > b->shelf_date ? -1 : 1;
+  /* secondary key: shelf date. */
+  if (a->shelf_date != b->shelf_date)
+    return a->shelf_date > b->shelf_date ? -1 : 1;
 
-    return 0;
+  return 0;
 }
 
 static int
@@ -3664,63 +3695,65 @@ getMaxAtomCount (const tr_torrent * tor)
 static void
 atomPulse (int foo UNUSED, short bar UNUSED, void * vmgr)
 {
-    tr_torrent * tor = NULL;
-    tr_peerMgr * mgr = vmgr;
-    managerLock (mgr);
+  tr_torrent * tor = NULL;
+  tr_peerMgr * mgr = vmgr;
+  managerLock (mgr);
 
-    while ((tor = tr_torrentNext (mgr->session, tor)))
+  while ((tor = tr_torrentNext (mgr->session, tor)))
     {
-        int atomCount;
-        Torrent * t = tor->torrentPeers;
-        const int maxAtomCount = getMaxAtomCount (tor);
-        struct peer_atom ** atoms = (struct peer_atom**) tr_ptrArrayPeek (&t->pool, &atomCount);
+      int atomCount;
+      tr_swarm * s = tor->swarm;
+      const int maxAtomCount = getMaxAtomCount (tor);
+      struct peer_atom ** atoms = (struct peer_atom**) tr_ptrArrayPeek (&s->pool, &atomCount);
 
-        if (atomCount > maxAtomCount) /* we've got too many atoms... time to prune */
+      if (atomCount > maxAtomCount) /* we've got too many atoms... time to prune */
         {
-            int i;
-            int keepCount = 0;
-            int testCount = 0;
-            struct peer_atom ** keep = tr_new (struct peer_atom*, atomCount);
-            struct peer_atom ** test = tr_new (struct peer_atom*, atomCount);
+          int i;
+          int keepCount = 0;
+          int testCount = 0;
+          struct peer_atom ** keep = tr_new (struct peer_atom*, atomCount);
+          struct peer_atom ** test = tr_new (struct peer_atom*, atomCount);
 
-            /* keep the ones that are in use */
-            for (i=0; i<atomCount; ++i) {
-                struct peer_atom * atom = atoms[i];
-                if (peerIsInUse (t, atom))
-                    keep[keepCount++] = atom;
-                else
-                    test[testCount++] = atom;
+          /* keep the ones that are in use */
+          for (i=0; i<atomCount; ++i)
+            {
+              struct peer_atom * atom = atoms[i];
+              if (peerIsInUse (s, atom))
+                keep[keepCount++] = atom;
+              else
+                test[testCount++] = atom;
             }
 
-            /* if there's room, keep the best of what's left */
-            i = 0;
-            if (keepCount < maxAtomCount) {
-                qsort (test, testCount, sizeof (struct peer_atom *), compareAtomPtrsByShelfDate);
-                while (i<testCount && keepCount<maxAtomCount)
-                    keep[keepCount++] = test[i++];
+          /* if there's room, keep the best of what's left */
+          i = 0;
+          if (keepCount < maxAtomCount)
+            {
+              qsort (test, testCount, sizeof (struct peer_atom *), compareAtomPtrsByShelfDate);
+              while (i<testCount && keepCount<maxAtomCount)
+                keep[keepCount++] = test[i++];
             }
 
-            /* free the culled atoms */
-            while (i<testCount)
-                tr_free (test[i++]);
+          /* free the culled atoms */
+          while (i<testCount)
+            tr_free (test[i++]);
 
-            /* rebuild Torrent.pool with what's left */
-            tr_ptrArrayDestruct (&t->pool, NULL);
-            t->pool = TR_PTR_ARRAY_INIT;
-            qsort (keep, keepCount, sizeof (struct peer_atom *), compareAtomPtrsByAddress);
-            for (i=0; i<keepCount; ++i)
-                tr_ptrArrayAppend (&t->pool, keep[i]);
+          /* rebuild Torrent.pool with what's left */
+          tr_ptrArrayDestruct (&s->pool, NULL);
+          s->pool = TR_PTR_ARRAY_INIT;
+          qsort (keep, keepCount, sizeof (struct peer_atom *), compareAtomPtrsByAddress);
+          for (i=0; i<keepCount; ++i)
+            tr_ptrArrayAppend (&s->pool, keep[i]);
 
-            tordbg (t, "max atom count is %d... pruned from %d to %d\n", maxAtomCount, atomCount, keepCount);
+          tordbg (s, "max atom count is %d... pruned from %d to %d\n", maxAtomCount, atomCount, keepCount);
 
-            /* cleanup */
-            tr_free (test);
-            tr_free (keep);
+          /* cleanup */
+          tr_free (test);
+          tr_free (keep);
         }
     }
 
-    tr_timerAddMsec (mgr->atomTimer, ATOM_PERIOD_MSEC);
-    managerUnlock (mgr);
+  tr_timerAddMsec (mgr->atomTimer, ATOM_PERIOD_MSEC);
+  managerUnlock (mgr);
 }
 
 /***
@@ -3733,101 +3766,102 @@ atomPulse (int foo UNUSED, short bar UNUSED, void * vmgr)
 static bool
 isPeerCandidate (const tr_torrent * tor, struct peer_atom * atom, const time_t now)
 {
-    /* not if we're both seeds */
-    if (tr_torrentIsSeed (tor) && atomIsSeed (atom))
-        return false;
+  /* not if we're both seeds */
+  if (tr_torrentIsSeed (tor) && atomIsSeed (atom))
+    return false;
 
-    /* not if we've already got a connection to them... */
-    if (peerIsInUse (tor->torrentPeers, atom))
-        return false;
+  /* not if we've already got a connection to them... */
+  if (peerIsInUse (tor->swarm, atom))
+    return false;
 
-    /* not if we just tried them already */
-    if ((now - atom->time) < getReconnectIntervalSecs (atom, now))
-        return false;
+  /* not if we just tried them already */
+  if ((now - atom->time) < getReconnectIntervalSecs (atom, now))
+    return false;
 
-    /* not if they're blocklisted */
-    if (isAtomBlocklisted (tor->session, atom))
-        return false;
+  /* not if they're blocklisted */
+  if (isAtomBlocklisted (tor->session, atom))
+    return false;
 
-    /* not if they're banned... */
-    if (atom->flags2 & MYFLAG_BANNED)
-        return false;
+  /* not if they're banned... */
+  if (atom->flags2 & MYFLAG_BANNED)
+    return false;
 
-    return true;
+  return true;
 }
 
 struct peer_candidate
 {
-    uint64_t score;
-    tr_torrent * tor;
-    struct peer_atom * atom;
+  uint64_t score;
+  tr_torrent * tor;
+  struct peer_atom * atom;
 };
 
 static bool
 torrentWasRecentlyStarted (const tr_torrent * tor)
 {
-    return difftime (tr_time (), tor->startDate) < 120;
+  return difftime (tr_time (), tor->startDate) < 120;
 }
 
 static inline uint64_t
 addValToKey (uint64_t value, int width, uint64_t addme)
 {
-    value = (value << (uint64_t)width);
-    value |= addme;
-    return value;
+  value = (value << (uint64_t)width);
+  value |= addme;
+  return value;
 }
 
 /* smaller value is better */
 static uint64_t
 getPeerCandidateScore (const tr_torrent * tor, const struct peer_atom * atom, uint8_t salt)
 {
-    uint64_t i;
-    uint64_t score = 0;
-    const bool failed = atom->lastConnectionAt < atom->lastConnectionAttemptAt;
+  uint64_t i;
+  uint64_t score = 0;
+  const bool failed = atom->lastConnectionAt < atom->lastConnectionAttemptAt;
 
-    /* prefer peers we've connected to, or never tried, over peers we failed to connect to. */
-    i = failed ? 1 : 0;
-    score = addValToKey (score, 1, i);
+  /* prefer peers we've connected to, or never tried, over peers we failed to connect to. */
+  i = failed ? 1 : 0;
+  score = addValToKey (score, 1, i);
 
-    /* prefer the one we attempted least recently (to cycle through all peers) */
-    i = atom->lastConnectionAttemptAt;
-    score = addValToKey (score, 32, i);
+  /* prefer the one we attempted least recently (to cycle through all peers) */
+  i = atom->lastConnectionAttemptAt;
+  score = addValToKey (score, 32, i);
 
-    /* prefer peers belonging to a torrent of a higher priority */
-    switch (tr_torrentGetPriority (tor)) {
-        case TR_PRI_HIGH:    i = 0; break;
-        case TR_PRI_NORMAL:  i = 1; break;
-        case TR_PRI_LOW:     i = 2; break;
+  /* prefer peers belonging to a torrent of a higher priority */
+  switch (tr_torrentGetPriority (tor))
+    {
+      case TR_PRI_HIGH:    i = 0; break;
+      case TR_PRI_NORMAL:  i = 1; break;
+      case TR_PRI_LOW:     i = 2; break;
     }
-    score = addValToKey (score, 4, i);
+  score = addValToKey (score, 4, i);
 
-    /* prefer recently-started torrents */
-    i = torrentWasRecentlyStarted (tor) ? 0 : 1;
-    score = addValToKey (score, 1, i);
+  /* prefer recently-started torrents */
+  i = torrentWasRecentlyStarted (tor) ? 0 : 1;
+  score = addValToKey (score, 1, i);
 
-    /* prefer torrents we're downloading with */
-    i = tr_torrentIsSeed (tor) ? 1 : 0;
-    score = addValToKey (score, 1, i);
+  /* prefer torrents we're downloading with */
+  i = tr_torrentIsSeed (tor) ? 1 : 0;
+  score = addValToKey (score, 1, i);
 
-    /* prefer peers that are known to be connectible */
-    i = (atom->flags & ADDED_F_CONNECTABLE) ? 0 : 1;
-    score = addValToKey (score, 1, i);
+  /* prefer peers that are known to be connectible */
+  i = (atom->flags & ADDED_F_CONNECTABLE) ? 0 : 1;
+  score = addValToKey (score, 1, i);
 
-    /* prefer peers that we might have a chance of uploading to...
-       so lower seed probability is better */
-    if (atom->seedProbability == 100) i = 101;
-    else if (atom->seedProbability == -1) i = 100;
-    else i = atom->seedProbability;
-    score = addValToKey (score, 8, i);
+  /* prefer peers that we might have a chance of uploading to...
+  so lower seed probability is better */
+  if (atom->seedProbability == 100) i = 101;
+  else if (atom->seedProbability == -1) i = 100;
+  else i = atom->seedProbability;
+  score = addValToKey (score, 8, i);
 
-    /* Prefer peers that we got from more trusted sources.
-     * lower `fromBest' values indicate more trusted sources */
-    score = addValToKey (score, 4, atom->fromBest);
+  /* Prefer peers that we got from more trusted sources.
+   * lower `fromBest' values indicate more trusted sources */
+  score = addValToKey (score, 4, atom->fromBest);
 
-    /* salt */
-    score = addValToKey (score, 8, salt);
+  /* salt */
+  score = addValToKey (score, 8, salt);
 
-    return score;
+  return score;
 }
 
 static int
@@ -3863,21 +3897,21 @@ selectPeerCandidates (struct peer_candidate * candidates, int candidate_count, i
 static bool
 checkBestScoresComeFirst (const struct peer_candidate * candidates, int n, int k)
 {
-    int i;
-    uint64_t worstFirstScore = 0;
-    const int x = MIN (n, k) - 1;
+  int i;
+  uint64_t worstFirstScore = 0;
+  const int x = MIN (n, k) - 1;
 
-    for (i=0; i<x; i++)
-        if (worstFirstScore < candidates[i].score)
-            worstFirstScore = candidates[i].score;
+  for (i=0; i<x; i++)
+    if (worstFirstScore < candidates[i].score)
+      worstFirstScore = candidates[i].score;
 
-    for (i=0; i<x; i++)
-        assert (candidates[i].score <= worstFirstScore);
+  for (i=0; i<x; i++)
+    assert (candidates[i].score <= worstFirstScore);
 
-    for (i=x+1; i<n; i++)
-        assert (candidates[i].score >= worstFirstScore);
+  for (i=x+1; i<n; i++)
+    assert (candidates[i].score >= worstFirstScore);
 
-    return true;
+  return true;
 }
 #endif /* NDEBUG */
 
@@ -3885,154 +3919,153 @@ checkBestScoresComeFirst (const struct peer_candidate * candidates, int n, int k
 static struct peer_candidate*
 getPeerCandidates (tr_session * session, int * candidateCount, int max)
 {
-    int atomCount;
-    int peerCount;
-    tr_torrent * tor;
-    struct peer_candidate * candidates;
-    struct peer_candidate * walk;
-    const time_t now = tr_time ();
-    const uint64_t now_msec = tr_time_msec ();
-    /* leave 5% of connection slots for incoming connections -- ticket #2609 */
-    const int maxCandidates = tr_sessionGetPeerLimit (session) * 0.95;
+  int atomCount;
+  int peerCount;
+  tr_torrent * tor;
+  struct peer_candidate * candidates;
+  struct peer_candidate * walk;
+  const time_t now = tr_time ();
+  const uint64_t now_msec = tr_time_msec ();
+  /* leave 5% of connection slots for incoming connections -- ticket #2609 */
+  const int maxCandidates = tr_sessionGetPeerLimit (session) * 0.95;
 
-    /* count how many peers and atoms we've got */
-    tor= NULL;
-    atomCount = 0;
-    peerCount = 0;
-    while ((tor = tr_torrentNext (session, tor))) {
-        atomCount += tr_ptrArraySize (&tor->torrentPeers->pool);
-        peerCount += tr_ptrArraySize (&tor->torrentPeers->peers);
-    }
-
-    /* don't start any new handshakes if we're full up */
-    if (maxCandidates <= peerCount) {
-        *candidateCount = 0;
-        return NULL;
-    }
-
-    /* allocate an array of candidates */
-    walk = candidates = tr_new (struct peer_candidate, atomCount);
-
-    /* populate the candidate array */
-    tor = NULL;
-    while ((tor = tr_torrentNext (session, tor)))
+  /* count how many peers and atoms we've got */
+  tor= NULL;
+  atomCount = 0;
+  peerCount = 0;
+  while ((tor = tr_torrentNext (session, tor)))
     {
-        int i, nAtoms;
-        struct peer_atom ** atoms;
+      atomCount += tr_ptrArraySize (&tor->swarm->pool);
+      peerCount += tr_ptrArraySize (&tor->swarm->peers);
+    }
 
-        if (!tor->torrentPeers->isRunning)
-            continue;
+  /* don't start any new handshakes if we're full up */
+  if (maxCandidates <= peerCount)
+    {
+      *candidateCount = 0;
+      return NULL;
+    }
 
-        /* if we've already got enough peers in this torrent... */
-        if (tr_torrentGetPeerLimit (tor) <= tr_ptrArraySize (&tor->torrentPeers->peers))
-            continue;
+  /* allocate an array of candidates */
+  walk = candidates = tr_new (struct peer_candidate, atomCount);
 
-        /* if we've already got enough speed in this torrent... */
-        if (tr_torrentIsSeed (tor) && isBandwidthMaxedOut (&tor->bandwidth, now_msec, TR_UP))
-            continue;
+  /* populate the candidate array */
+  tor = NULL;
+  while ((tor = tr_torrentNext (session, tor)))
+    {
+      int i, nAtoms;
+      struct peer_atom ** atoms;
 
-        atoms = (struct peer_atom**) tr_ptrArrayPeek (&tor->torrentPeers->pool, &nAtoms);
-        for (i=0; i<nAtoms; ++i)
+      if (!tor->swarm->isRunning)
+        continue;
+
+      /* if we've already got enough peers in this torrent... */
+      if (tr_torrentGetPeerLimit (tor) <= tr_ptrArraySize (&tor->swarm->peers))
+        continue;
+
+      /* if we've already got enough speed in this torrent... */
+      if (tr_torrentIsSeed (tor) && isBandwidthMaxedOut (&tor->bandwidth, now_msec, TR_UP))
+        continue;
+
+      atoms = (struct peer_atom**) tr_ptrArrayPeek (&tor->swarm->pool, &nAtoms);
+      for (i=0; i<nAtoms; ++i)
         {
-            struct peer_atom * atom = atoms[i];
+          struct peer_atom * atom = atoms[i];
 
-            if (isPeerCandidate (tor, atom, now))
+          if (isPeerCandidate (tor, atom, now))
             {
-                const uint8_t salt = tr_cryptoWeakRandInt (1024);
-                walk->tor = tor;
-                walk->atom = atom;
-                walk->score = getPeerCandidateScore (tor, atom, salt);
-                ++walk;
+              const uint8_t salt = tr_cryptoWeakRandInt (1024);
+              walk->tor = tor;
+              walk->atom = atom;
+              walk->score = getPeerCandidateScore (tor, atom, salt);
+              ++walk;
             }
         }
     }
 
-    *candidateCount = walk - candidates;
-    if (walk != candidates)
-        selectPeerCandidates (candidates, walk-candidates, max);
+  *candidateCount = walk - candidates;
+  if (walk != candidates)
+    selectPeerCandidates (candidates, walk-candidates, max);
 
-    assert (checkBestScoresComeFirst (candidates, *candidateCount, max));
-
-    return candidates;
+  assert (checkBestScoresComeFirst (candidates, *candidateCount, max));
+  return candidates;
 }
 
 static void
-initiateConnection (tr_peerMgr * mgr, Torrent * t, struct peer_atom * atom)
+initiateConnection (tr_peerMgr * mgr, tr_swarm * s, struct peer_atom * atom)
 {
-    tr_peerIo * io;
-    const time_t now = tr_time ();
-    bool utp = tr_sessionIsUTPEnabled (mgr->session) && !atom->utp_failed;
+  tr_peerIo * io;
+  const time_t now = tr_time ();
+  bool utp = tr_sessionIsUTPEnabled (mgr->session) && !atom->utp_failed;
 
-    if (atom->fromFirst == TR_PEER_FROM_PEX)
-        /* PEX has explicit signalling for uTP support.  If an atom
-           originally came from PEX and doesn't have the uTP flag, skip the
-           uTP connection attempt.  Are we being optimistic here? */
-        utp = utp && (atom->flags & ADDED_F_UTP_FLAGS);
+  if (atom->fromFirst == TR_PEER_FROM_PEX)
+    /* PEX has explicit signalling for uTP support.  If an atom
+       originally came from PEX and doesn't have the uTP flag, skip the
+       uTP connection attempt.  Are we being optimistic here? */
+    utp = utp && (atom->flags & ADDED_F_UTP_FLAGS);
 
-    tordbg (t, "Starting an OUTGOING%s connection with %s",
-            utp ? " µTP" : "",
-            tr_atomAddrStr (atom));
+  tordbg (s, "Starting an OUTGOING%s connection with %s",
+          utp ? " µTP" : "", tr_atomAddrStr (atom));
 
-    io = tr_peerIoNewOutgoing (mgr->session,
-                               &mgr->session->bandwidth,
-                               &atom->addr,
-                               atom->port,
-                               t->tor->info.hash,
-                               t->tor->completeness == TR_SEED,
-                               utp);
+  io = tr_peerIoNewOutgoing (mgr->session,
+                             &mgr->session->bandwidth,
+                             &atom->addr,
+                             atom->port,
+                             s->tor->info.hash,
+                             s->tor->completeness == TR_SEED,
+                             utp);
 
-    if (io == NULL)
+  if (io == NULL)
     {
-        tordbg (t, "peerIo not created; marking peer %s as unreachable",
-                tr_atomAddrStr (atom));
-        atom->flags2 |= MYFLAG_UNREACHABLE;
-        atom->numFails++;
+      tordbg (s, "peerIo not created; marking peer %s as unreachable", tr_atomAddrStr (atom));
+      atom->flags2 |= MYFLAG_UNREACHABLE;
+      atom->numFails++;
     }
-    else
+  else
     {
-        tr_handshake * handshake = tr_handshakeNew (io,
-                                                    mgr->session->encryptionMode,
-                                                    myHandshakeDoneCB,
-                                                    mgr);
+      tr_handshake * handshake = tr_handshakeNew (io,
+                                                  mgr->session->encryptionMode,
+                                                  myHandshakeDoneCB,
+                                                  mgr);
 
-        assert (tr_peerIoGetTorrentHash (io));
+      assert (tr_peerIoGetTorrentHash (io));
 
-        tr_peerIoUnref (io); /* balanced by the initial ref
-                                 in tr_peerIoNewOutgoing () */
+      tr_peerIoUnref (io); /* balanced by the initial ref
+                              in tr_peerIoNewOutgoing () */
 
-        tr_ptrArrayInsertSorted (&t->outgoingHandshakes, handshake,
-                                 handshakeCompare);
+      tr_ptrArrayInsertSorted (&s->outgoingHandshakes, handshake,
+                               handshakeCompare);
     }
 
-    atom->lastConnectionAttemptAt = now;
-    atom->time = now;
+  atom->lastConnectionAttemptAt = now;
+  atom->time = now;
 }
 
 static void
 initiateCandidateConnection (tr_peerMgr * mgr, struct peer_candidate * c)
 {
 #if 0
-    fprintf (stderr, "Starting an OUTGOING connection with %s - [%s] seedProbability==%d; %s, %s\n",
-             tr_atomAddrStr (c->atom),
-             tr_torrentName (c->tor),
+  fprintf (stderr, "Starting an OUTGOING connection with %s - [%s] seedProbability==%d; %s, %s\n",
+           tr_atomAddrStr (c->atom),
+           tr_torrentName (c->tor),
            (int)c->atom->seedProbability,
-             tr_torrentIsPrivate (c->tor) ? "private" : "public",
-             tr_torrentIsSeed (c->tor) ? "seed" : "downloader");
+           tr_torrentIsPrivate (c->tor) ? "private" : "public",
+           tr_torrentIsSeed (c->tor) ? "seed" : "downloader");
 #endif
 
-    initiateConnection (mgr, c->tor->torrentPeers, c->atom);
+  initiateConnection (mgr, c->tor->swarm, c->atom);
 }
 
 static void
 makeNewPeerConnections (struct tr_peerMgr * mgr, const int max)
 {
-    int i, n;
-    struct peer_candidate * candidates;
+  int i, n;
+  struct peer_candidate * candidates;
 
-    candidates = getPeerCandidates (mgr->session, &n, max);
+  candidates = getPeerCandidates (mgr->session, &n, max);
 
-    for (i=0; i<n && i<max; ++i)
-        initiateCandidateConnection (mgr, &candidates[i]);
+  for (i=0; i<n && i<max; ++i)
+    initiateCandidateConnection (mgr, &candidates[i]);
 
-    tr_free (candidates);
+  tr_free (candidates);
 }
