@@ -2830,14 +2830,14 @@ deleteLocalData (tr_torrent * tor, tr_fileFunc func)
         if (!tr_is_same_file (top, dir) && strcmp (top, dir)) {
             for (;;) {
                 char * parent = tr_dirname (dir);
-                if (tr_is_same_file (top, parent) || !strcmp (top, parent)) {
-                    if (tr_ptrArrayFindSorted (&folders, dir, vstrcmp) == NULL) {
-                        tr_ptrArrayInsertSorted (&folders, tr_strdup (dir), vstrcmp);
-                    }
-                    break;
-                }
-                tr_free (dir);
+                const bool done_walking = tr_is_same_file (top, parent) || !strcmp (top, parent);
+                if (done_walking && tr_ptrArrayFindSorted (&folders, dir, vstrcmp))
+                  tr_ptrArrayInsertSorted (&folders, dir, vstrcmp); /* folders assumes ownership of dir */
+                else
+                  tr_free (dir);
                 dir = parent;
+                if (done_walking)
+                  break;
             }
         }
         tr_free (dir);
