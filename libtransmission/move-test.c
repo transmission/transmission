@@ -32,16 +32,23 @@ zeroes_completeness_func (tr_torrent       * torrent UNUSED,
   *(tr_completeness*)user_data = completeness;
 }
 
+#define check_file_location(tor, i, expected_path) \
+  do { \
+    char * path = tr_torrentFindFile (tor, i); \
+    char * expected = expected_path; \
+    check_streq (expected, path); \
+    tr_free (expected); \
+    tr_free (path); \
+  } while (0)
 
 static int
 test_incomplete_dir_is_subdir_of_download_dir (void)
 {
-  tr_file_index_t i;
-  char * path;
   char * incomplete_dir;
-  char * expected_path;
   tr_torrent * tor;
   tr_completeness completeness;
+  const tr_completeness completeness_unset = -1;
+  const time_t deadline = time(NULL) + 5;
 
   /* init the session */
   libtransmission_test_session_init ();
@@ -49,60 +56,44 @@ test_incomplete_dir_is_subdir_of_download_dir (void)
   tr_sessionSetIncompleteDir (session, incomplete_dir);
   tr_sessionSetIncompleteDirEnabled (session, true);
 
-  /* init an incomplete torrent */
+  /* init an incomplete torrent.
+     the test zero_torrent will be missing its first piece */
   tor = libtransmission_test_zero_torrent_init ();
   libtransmission_test_zero_torrent_populate (tor, false);
   check (tr_torrentStat(tor)->leftUntilDone == tor->info.pieceSize);
-  path = tr_torrentFindFile (tor, 0);
-  expected_path = tr_strdup_printf ("%s/%s.part", incomplete_dir, tor->info.files[0].name);
-  check_streq (expected_path, path);
-  tr_free (expected_path);
-  tr_free (path);
-  path = tr_torrentFindFile (tor, 1);
-  expected_path = tr_buildPath (incomplete_dir, tor->info.files[1].name, NULL);
-  check_streq (expected_path, path);
-  tr_free (expected_path);
-  tr_free (path);
+  check_file_location (tor, 0, tr_strdup_printf("%s/%s.part", incomplete_dir, tor->info.files[0].name));
+  check_file_location (tor, 1, tr_buildPath(incomplete_dir, tor->info.files[1].name, NULL));
   check_int_eq (tor->info.pieceSize, tr_torrentStat(tor)->leftUntilDone);
 
   /* now finish writing it */
   {
-    //char * block;
     uint32_t offset;
-    tr_block_index_t i;
-    tr_block_index_t first;
-    tr_block_index_t last;
-    char * tobuf;
-    struct evbuffer * buf;
+    tr_block_index_t first, last, i;
+    struct evbuffer * buf = evbuffer_new ();
+    char * zero_block = tr_new0 (char, tor->blockSize);
 
-    tobuf = tr_new0 (char, tor->blockSize);
-    buf = evbuffer_new ();
+    completeness = completeness_unset;
+    tr_torrentSetCompletenessCallback (tor, zeroes_completeness_func, &completeness);
 
     tr_torGetPieceBlockRange (tor, 0, &first, &last);
     for (offset=0, i=first; i<=last; ++i, offset+=tor->blockSize)
       {
-        evbuffer_add (buf, tobuf, tor->blockSize);
+        evbuffer_add (buf, zero_block, tor->blockSize);
         tr_cacheWriteBlock (session->cache, tor, 0, offset, tor->blockSize, buf);
         tr_torrentGotBlock (tor, i);
       }
+    sync ();
+
+    tr_torrentVerify (tor);
+    while ((completeness==completeness_unset) && (time(NULL)<=deadline))
+      tr_wait_msec (50);
+    check_int_eq (TR_SEED, completeness);
+    for (i=0; i<tor->info.fileCount; ++i)
+      check_file_location (tor, i, tr_buildPath (downloadDir, tor->info.files[i].name, NULL));
 
     evbuffer_free (buf);
-    tr_free (tobuf);
+    tr_free (zero_block);
   }
-
-  completeness = -1;
-  tr_torrentSetCompletenessCallback (tor, zeroes_completeness_func, &completeness);
-  tr_torrentRecheckCompleteness (tor);
-  check_int_eq (TR_SEED, completeness);
-  sync ();
-  for (i=0; i<tor->info.fileCount; ++i)
-    {
-      path = tr_torrentFindFile (tor, i);
-      expected_path = tr_buildPath (downloadDir, tor->info.files[i].name, NULL);
-      check_streq (expected_path, path);
-      tr_free (expected_path);
-      tr_free (path);
-    }
 
 
   /* cleanup */
