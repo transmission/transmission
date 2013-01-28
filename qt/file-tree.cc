@@ -11,7 +11,6 @@
  */
 
 #include <cassert>
-#include <iostream>
 
 #include <QApplication>
 #include <QHeaderView>
@@ -31,9 +30,13 @@
 enum
 {
   COL_NAME,
+  FIRST_VISIBLE_COLUMN = COL_NAME,
   COL_PROGRESS,
   COL_WANTED,
   COL_PRIORITY,
+  LAST_VISIBLE_COLUMN = COL_PRIORITY,
+
+  COL_FILE_INDEX,
   NUM_COLUMNS
 };
 
@@ -41,7 +44,7 @@ enum
 *****
 ****/
 
-QHash<QString,int>&
+const QHash<QString,int>&
 FileTreeItem :: getMyChildRows ()
 {
   const size_t n = childCount();
@@ -114,7 +117,11 @@ FileTreeItem :: data (int column, int role) const
 {
   QVariant value;
 
-  if (role == Qt::EditRole)
+  if (column == COL_FILE_INDEX)
+    {
+      return myIndex;
+    }
+  else if (role == Qt::EditRole)
     {
       if (column == 0)
         value.setValue (name());
@@ -177,47 +184,48 @@ FileTreeItem :: fileSizeName () const
   return str;
 }
 
+#include <iostream>
+
 bool
-FileTreeItem :: update (int      index,
-                        bool     wanted,
-                        int      priority,
-                        uint64_t totalSize,
-                        uint64_t haveSize,
-                        bool     updateFields)
+FileTreeItem :: update (const QString& name,
+                        bool           wanted,
+                        int            priority,
+                        uint64_t       haveSize,
+                        bool           updateFields)
 {
   bool changed = false;
 
-std::cerr << __FILE__ << ':' << __LINE__ << " index " << index << " wanted " << wanted << " myIndex " << myIndex << " myWanted" << myIsWanted << std::endl;
-
-  if (myIndex != index)
+  if (myName != name)
     {
-      myIndex = index;
+      if (myParent)
+        myParent->myFirstUnhashedRow = row();
+
+      myName = name;
       changed = true;
     }
 
-  if (updateFields && myIsWanted != wanted)
+  if (fileIndex() != -1)
     {
-      myIsWanted = wanted;
-      changed = true;
-std::cerr << __FILE__ << ':' << __LINE__ << " setting myIsWanted to " << myIsWanted << std::endl;
-    }
+      if (myHaveSize != haveSize)
+        {
+          myHaveSize = haveSize;
+          changed = true;
+        }
 
-  if (updateFields && myPriority != priority)
-    {
-      myPriority = priority;
-      changed = true;
-    }
+      if (updateFields)
+        {
+          if (myIsWanted != wanted)
+            {
+              myIsWanted = wanted;
+              changed = true;
+            }
 
-  if (myTotalSize != totalSize)
-    {
-      myTotalSize = totalSize;
-      changed = true;
-    }
-
-  if (myHaveSize != haveSize)
-    {
-      myHaveSize = haveSize;
-      changed = true;
+          if (myPriority != priority)
+            {
+              myPriority = priority;
+              changed = true;
+            }
+        }
     }
 
   return changed;
@@ -288,7 +296,6 @@ FileTreeItem :: twiddlePriority (QSet<int>& ids, int& p)
     p = TR_PRI_HIGH;
   else
     p = TR_PRI_LOW;
-std::cerr << __FILE__ << ':' << __LINE__ << " twiddlePriority, p " << p << std::endl;
 
   setSubtreePriority (p, ids);
 }
@@ -320,7 +327,6 @@ FileTreeItem :: isSubtreeWanted () const
 void
 FileTreeItem :: setSubtreeWanted (bool b, QSet<int>& ids)
 {
-std::cerr << __FILE__ << ':' << __LINE__ << " twiddleWanted, wanted " << b << std::endl;
   if (myIsWanted != b)
     {
       myIsWanted = b;
@@ -336,7 +342,6 @@ std::cerr << __FILE__ << ':' << __LINE__ << " twiddleWanted, wanted " << b << st
 void
 FileTreeItem :: twiddleWanted (QSet<int>& ids, bool& wanted)
 {
-std::cerr << __FILE__ << ':' << __LINE__ << " twiddleWanted" << std::endl;
   wanted = isSubtreeWanted() != Qt::Checked;
   setSubtreeWanted (wanted, ids);
 }
@@ -346,18 +351,18 @@ std::cerr << __FILE__ << ':' << __LINE__ << " twiddleWanted" << std::endl;
 ****
 ***/
 
-FileTreeModel :: FileTreeModel (QObject *parent):
-  QAbstractItemModel(parent)
+FileTreeModel :: FileTreeModel (QObject *parent, bool isEditable):
+  QAbstractItemModel(parent),
+  myRootItem (new FileTreeItem),
+  myIsEditable (isEditable)
 {
-  rootItem = new FileTreeItem(-1);
 }
 
 FileTreeModel :: ~FileTreeModel()
 {
-std::cerr << __FILE__ << ':' << __LINE__ << " dtor " << std::endl;
   clear();
 
-  delete rootItem;
+  delete myRootItem;
 }
 
 QVariant
@@ -379,7 +384,7 @@ FileTreeModel :: flags (const QModelIndex& index) const
 {
   int i(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
 
-  if(index.column() == COL_NAME)
+  if(myIsEditable && (index.column() == COL_NAME))
     i |= Qt::ItemIsEditable;
 
   if(index.column() == COL_WANTED)
@@ -452,14 +457,14 @@ FileTreeModel :: index (int row, int column, const QModelIndex& parent) const
 
   if (!hasIndex (row, column, parent))
     {
-      std::cerr << " I don't have this index " << std::endl;
+      qWarning ("I don't have this index");
     }
   else
     {
       FileTreeItem * parentItem;
 
       if(!parent.isValid())
-        parentItem = rootItem;
+        parentItem = myRootItem;
       else
         parentItem = static_cast<FileTreeItem*>(parent.internalPointer());
 
@@ -495,7 +500,7 @@ FileTreeModel :: rowCount (const QModelIndex& parent) const
   FileTreeItem * parentItem;
 
   if (!parent.isValid())
-    parentItem = rootItem;
+    parentItem = myRootItem;
   else
     parentItem = static_cast<FileTreeItem*>(parent.internalPointer());
 
@@ -507,13 +512,13 @@ FileTreeModel :: columnCount (const QModelIndex &parent) const
 {
   Q_UNUSED(parent);
 
-  return 4;
+  return NUM_COLUMNS;
 }
 
 QModelIndex
 FileTreeModel :: indexOf (FileTreeItem * item, int column) const
 {
-  if (!item || item==rootItem)
+  if (!item || item==myRootItem)
     return QModelIndex();
 
   return createIndex(item->row(), column, item);
@@ -523,7 +528,6 @@ void
 FileTreeModel :: clearSubtree (const QModelIndex& top)
 {
   size_t i = rowCount (top);
-std::cerr << __FILE__ << ':' << __LINE__ << " clearSubtree " << i << std::endl;
 
   while (i > 0)
     clearSubtree(index(--i, 0, top));
@@ -534,47 +538,98 @@ std::cerr << __FILE__ << ':' << __LINE__ << " clearSubtree " << i << std::endl;
 void
 FileTreeModel :: clear ()
 {
-std::cerr << __FILE__ << ':' << __LINE__ << " clear"  << std::endl;
   clearSubtree (QModelIndex());
 
   reset ();
 }
 
+FileTreeItem *
+FileTreeModel :: findItemForFileIndex (int fileIndex) const
+{
+  FileTreeItem * ret = 0;
+
+  QModelIndexList indices = match (index (0,COL_FILE_INDEX),
+                                   Qt::DisplayRole,
+                                   fileIndex,
+                                   1,
+                                   Qt::MatchFlags (Qt::MatchExactly | Qt::MatchRecursive));
+
+  if (!indices.isEmpty ())
+    {
+      QModelIndex& index = indices.front ();
+      if (index.isValid())
+        ret = static_cast<FileTreeItem*>(index.internalPointer());
+    }
+
+  return ret;
+}
+
 void
-FileTreeModel :: addFile (int                   index,
+FileTreeModel :: itemChanged (FileTreeItem * item)
+{
+  dataChanged (indexOf(item, FIRST_VISIBLE_COLUMN), indexOf(item, LAST_VISIBLE_COLUMN));
+}
+
+void
+FileTreeModel :: addFile (int                   fileIndex,
                           const QString       & filename,
                           bool                  wanted,
                           int                   priority,
-                          uint64_t              size,
+                          uint64_t              totalSize,
                           uint64_t              have,
                           QList<QModelIndex>  & rowsAdded,
                           bool                  updateFields)
 {
   bool added = false;
-  FileTreeItem * i (rootItem);
+  FileTreeItem * item;
+  QStringList tokens = filename.split (QChar::fromAscii('/'));
 
-  foreach (QString token, filename.split (QChar::fromAscii('/')))
+  item = findItemForFileIndex (fileIndex);
+
+  if (item) // this file is already in the tree, we've added this 
     {
-      FileTreeItem * child(i->child(token));
-      if (!child)
+      while (!tokens.isEmpty())
         {
-          added = true;
-          QModelIndex parentIndex (indexOf(i, 0));
-          const int n (i->childCount());
-          beginInsertRows (parentIndex, n, n);
-          i->appendChild ((child = new FileTreeItem(-1, token)));
-          endInsertRows ();
-          rowsAdded.append (indexOf(child, 0));
+          const QString token = tokens.takeLast();
+          if (item->update (token, wanted, priority, have, updateFields))
+            itemChanged (item);
+          item = item->parent();
         }
-      i = child;
+      assert (item == myRootItem);
     }
-
-  if (i != rootItem)
+  else // we haven't build the FileTreeItems for these tokens yet
     {
-      if (i->update (index, wanted, priority, size, have, added || updateFields))
+      item = myRootItem;
+      while (!tokens.isEmpty())
         {
-          std::cerr << __FILE__ << ':' << __LINE__ << " emitting dataChanged for row " << i << std::endl;
-          dataChanged (indexOf(i, 0), indexOf(i, NUM_COLUMNS-1));
+          const QString token = tokens.takeFirst();
+          FileTreeItem * child(item->child(token));
+          if (!child)
+            {
+              added = true;
+              QModelIndex parentIndex (indexOf(item, 0));
+              const int n (item->childCount());
+
+              beginInsertRows (parentIndex, n, n);
+              if (tokens.isEmpty())
+                child = new FileTreeItem (token, fileIndex, totalSize);
+              else
+                child = new FileTreeItem (token);
+              item->appendChild (child);
+              endInsertRows ();
+
+              rowsAdded.append (indexOf(child, 0));
+            }
+          item = child;
+        }
+
+      if (item != myRootItem)
+        {
+          assert (item->fileIndex() == fileIndex);
+          assert (item->totalSize() == totalSize);
+
+          if (item->update (item->name(), wanted, priority, have, added || updateFields))
+            itemChanged (item);
         }
     }
 }
@@ -637,7 +692,6 @@ FileTreeModel :: clicked (const QModelIndex& index)
       QSet<int> file_ids;
       FileTreeItem * item;
 
-std::cerr << "clicked in COL_PRIORITY" << std::endl;
       item = static_cast<FileTreeItem*>(index.internalPointer());
       item->twiddlePriority (file_ids, priority);
       emit priorityChanged (file_ids, priority);
@@ -775,9 +829,9 @@ FileTreeDelegate :: paint (QPainter                    * painter,
 *****
 ****/
 
-FileTreeView :: FileTreeView (QWidget * parent):
+FileTreeView :: FileTreeView (QWidget * parent, bool isEditable):
   QTreeView (parent),
-  myModel (this),
+  myModel (this, isEditable),
   myProxy (new QSortFilterProxyModel()),
   myDelegate (this)
 {
@@ -792,7 +846,7 @@ FileTreeView :: FileTreeView (QWidget * parent):
   sortByColumn (COL_NAME, Qt::AscendingOrder);
   installEventFilter (this);
 
-  for (int i=0; i<NUM_COLUMNS; ++i)
+  for (int i=FIRST_VISIBLE_COLUMN; i<=LAST_VISIBLE_COLUMN; ++i)
     header()->setResizeMode(i, QHeaderView::Interactive);
 
   connect (this, SIGNAL(clicked(const QModelIndex&)),
@@ -817,29 +871,24 @@ void
 FileTreeView :: onClicked (const QModelIndex& proxyIndex)
 {
   const QModelIndex modelIndex = myProxy->mapToSource (proxyIndex);
-std::cerr << __FILE__ << ':' << __LINE__ << " calling myModel.clicked()" << std::endl;
   myModel.clicked (modelIndex);
 }
 
 bool
 FileTreeView :: eventFilter (QObject * o, QEvent * event)
 {
-  if (o != this)
-    return false;
-
   // this is kind of a hack to get the last three columns be the
   // right size, and to have the filename column use whatever
   // space is left over...
-  if (event->type() == QEvent::Resize)
+  if ((o == this) && (event->type() == QEvent::Resize))
     {
       QResizeEvent * r = dynamic_cast<QResizeEvent*>(event);
       int left = r->size().width();
       const QFontMetrics fontMetrics(font());
-      for (int column=0; column<NUM_COLUMNS; ++column)
+      for (int column=FIRST_VISIBLE_COLUMN; column<=LAST_VISIBLE_COLUMN; ++column)
         {
           if (column == COL_NAME)
             continue;
-
           if (isColumnHidden (column))
             continue;
 
@@ -850,32 +899,7 @@ FileTreeView :: eventFilter (QObject * o, QEvent * event)
         }
       left -= 20; // not sure why this is necessary.  it works in different themes + font sizes though...
       setColumnWidth(COL_NAME, std::max(left,0));
-      return false;
     }
-
-#if 0
-  // handle using the keyboard to toggle the
-  // wanted/unwanted state or the file priority
-  else if (event->type() == QEvent::KeyPress)
-    {
-std::cerr << __FILE__ << ':' << __LINE__ << " " << qPrintable(dynamic_cast<QKeyEvent*>(event)->text()) << std::endl;
-      switch(dynamic_cast<QKeyEvent*>(event)->key())
-        {
-          case Qt::Key_Space:
-            std::cerr << __FILE__ << ':' << __LINE__ << " calling COL_WANTED.clicked()" << std::endl;
-            foreach (QModelIndex i, selectionModel()->selectedRows(COL_WANTED))
-              clicked (i);
-            return false;
-
-          case Qt::Key_Enter:
-          case Qt::Key_Return:
-            std::cerr << __FILE__ << ':' << __LINE__ << " calling COL_PRIORITY.clicked()" << std::endl;
-            foreach (QModelIndex i, selectionModel()->selectedRows(COL_PRIORITY))
-              clicked (i);
-            return false;
-        }
-    }
-#endif
 
   return false;
 }
@@ -889,11 +913,9 @@ FileTreeView :: update (const FileList& files)
 void
 FileTreeView :: update (const FileList& files, bool updateFields)
 {
-std::cerr << "update updateFields " << updateFields << std::endl;
   foreach (const TrFile file, files)
     {
       QList<QModelIndex> added;
-std::cerr << __FILE__ << ':' << __LINE__ << " add file " << qPrintable(file.filename) << " wanted " << file.wanted << std::endl;
       myModel.addFile (file.index, file.filename, file.wanted, file.priority, file.size, file.have, added, updateFields);
       foreach (QModelIndex i, added)
         expand (myProxy->mapFromSource(i));
@@ -903,6 +925,5 @@ std::cerr << __FILE__ << ':' << __LINE__ << " add file " << qPrintable(file.file
 void
 FileTreeView :: clear ()
 {
-std::cerr << __FILE__ << ':' << __LINE__ << " clear" << std::endl;
   myModel.clear();
 }

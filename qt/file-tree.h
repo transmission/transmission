@@ -43,14 +43,14 @@ class FileTreeItem: public QObject
 
     virtual ~FileTreeItem();
 
-    FileTreeItem (int fileIndex, const QString& name=""):
+    FileTreeItem (const QString& name="", int fileIndex=-1, uint64_t size=0):
       myIndex (fileIndex),
       myParent (0),
       myName (name),
       myPriority (0),
       myIsWanted (0),
       myHaveSize (0),
-      myTotalSize (0),
+      myTotalSize (size),
       myFirstUnhashedRow (0) { }
 
   public:
@@ -63,9 +63,13 @@ class FileTreeItem: public QObject
     int row () const;
     const QString& name () const { return myName; }
     QVariant data (int column, int role) const;
-    bool update (int index, bool want, int priority, uint64_t total, uint64_t have, bool updateFields);
+    bool update (const QString& name, bool want, int priority, uint64_t have, bool updateFields);
     void twiddleWanted (QSet<int>& fileIds, bool&);
     void twiddlePriority (QSet<int>& fileIds, int&);
+    int fileIndex () const { return myIndex; }
+    uint64_t totalSize () const { return myTotalSize; }
+    
+    
 
   private:
     void setSubtreePriority (int priority, QSet<int>& fileIds);
@@ -77,16 +81,16 @@ class FileTreeItem: public QObject
     int priority () const;
     int isSubtreeWanted () const;
 
-    int myIndex;
+    const int myIndex;
     FileTreeItem * myParent;
     QList<FileTreeItem*> myChildren;
     QHash<QString,int> myChildRows;
-    QHash<QString,int>& getMyChildRows();
-    const QString myName;
+    const QHash<QString,int>& getMyChildRows();
+    QString myName;
     int myPriority;
     bool myIsWanted;
     uint64_t myHaveSize;
-    uint64_t myTotalSize;
+    const uint64_t myTotalSize;
     size_t myFirstUnhashedRow;
 };
 
@@ -95,7 +99,7 @@ class FileTreeModel: public QAbstractItemModel
     Q_OBJECT
 
   public:
-    FileTreeModel (QObject *parent = 0);
+    FileTreeModel (QObject *parent = 0, bool isEditable = true);
     ~FileTreeModel ();
 
   public:
@@ -123,13 +127,18 @@ class FileTreeModel: public QAbstractItemModel
                   bool torrentChanged);
 
   private:
+    void itemChanged (FileTreeItem *);
     void clearSubtree (const QModelIndex &);
     QModelIndex indexOf (FileTreeItem *, int column) const;
     void parentsChanged (const QModelIndex &, int column);
     void subtreeChanged (const QModelIndex &, int column);
+    FileTreeItem * findItemForFileIndex (int fileIndex) const;
+
+
 
   private:
-    FileTreeItem * rootItem;
+    FileTreeItem * myRootItem;
+    const bool myIsEditable;
 
   public slots:
     void clicked (const QModelIndex & index);
@@ -153,7 +162,7 @@ class FileTreeView: public QTreeView
     Q_OBJECT
 
   public:
-    FileTreeView (QWidget * parent=0);
+    FileTreeView (QWidget * parent=0, bool editable=true);
     virtual ~FileTreeView ();
     void clear ();
     void update (const FileList& files);

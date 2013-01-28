@@ -202,10 +202,8 @@ Details :: setIds (const QSet<int>& ids)
     // stop listening to the old torrents
     foreach (int id, myIds) {
         const Torrent * tor = myModel.getTorrentFromId (id);
-        if (tor) {
+        if (tor)
             disconnect (tor, SIGNAL (torrentChanged (int)), this, SLOT (onTorrentChanged ()));
-            disconnect (tor, SIGNAL (torrentFileListRebuilt (int)), this, SLOT (onTorrentFileListRebuilt ()));
-        }
     }
 
     myFileTreeView->clear ();
@@ -215,10 +213,8 @@ Details :: setIds (const QSet<int>& ids)
     // listen to the new torrents
     foreach (int id, myIds) {
         const Torrent * tor = myModel.getTorrentFromId (id);
-        if (tor) {
+        if (tor)
             connect (tor, SIGNAL (torrentChanged (int)), this, SLOT (onTorrentChanged ()));
-            connect (tor, SIGNAL (torrentFileListRebuilt (int)), this, SLOT (onTorrentFileListRebuilt ()));
-        }
     }
 
     foreach (QWidget * w, myWidgets)
@@ -297,13 +293,6 @@ Details :: onTorrentChanged ()
         myHavePendingRefresh = true;
         QTimer::singleShot (100, this, SLOT (refresh ()));
     }
-}
-
-void
-Details :: onTorrentFileListRebuilt ()
-{
-  myFilesDirty = true;
-  onTorrentChanged ();
 }
 
 namespace
@@ -840,12 +829,11 @@ Details :: refresh ()
     }
     myPeers = peers2;
 
-    if (!single || myFilesDirty)
+    if (!single)
         myFileTreeView->clear ();
     if (single)
-        myFileTreeView->update (torrents[0]->files () , myFilesDirty || myChangedTorrents);
+        myFileTreeView->update (torrents[0]->files (), myChangedTorrents);
 
-    myFilesDirty = false;
     myChangedTorrents = false;
     myHavePendingRefresh = false;
     foreach (QWidget * w, myWidgets)

@@ -49,7 +49,6 @@ class Details: public QDialog
 
   private slots:
     void onTorrentChanged ();
-    void onTorrentFileListRebuilt ();
     void onTimer ();
 
   public:
@@ -135,8 +134,6 @@ class Details: public QDialog
     QWidgetList myWidgets;
 
     FileTreeView * myFileTreeView;
-
-    bool myFilesDirty;
 
   private slots:
     void refreshPref (int key);

@@ -11,7 +11,6 @@
  */
 
 #include <cstdio>
-#include <iostream>
 
 #include <QApplication>
 #include <QCheckBox>
@@ -139,7 +138,7 @@ Options :: Options( Session& session, const Prefs& prefs, const AddData& addme, 
         l->setBuddy( e );
     }
 
-    myTree = new FileTreeView;
+    myTree = new FileTreeView (0, false);
     layout->addWidget( myTree, ++row, 0, 1, 2 );
     if( !session.isLocal( ) )
         myTree->hideColumn( 1 ); // hide the % done, since we've no way of knowing
@@ -358,7 +357,7 @@ Options :: onAccepted( )
         }
 
         default:
-            std::cerr << "unhandled AddData.type: " << myAdd.type << std::endl;
+            qWarning ("unhandled AddData.type: %d", myAdd.type);
     }
 
     // paused
@@ -403,7 +402,6 @@ Options :: onAccepted( )
     connect( &mySession, SIGNAL(executed(int64_t,const QString&, struct tr_variant*)),
              fileAdded, SLOT(executed(int64_t,const QString&, struct tr_variant*)));
 
-//std::cerr << tr_variantToStr(&top,TR_FMT_JSON,NULL) << std::endl;
     mySession.exec( &top );
 
     tr_variantFree( &top );
@@ -486,7 +484,6 @@ Options :: clearVerify( )
 void
 Options :: onVerify( )
 {
-    //std::cerr << "starting to verify..." << std::endl;
     clearVerify( );
     myVerifyFlags.insert( 0, myInfo.pieceCount, false );
     myVerifyTimer.setSingleShot( false );
@@ -512,7 +509,6 @@ Options :: onTimeout( )
     {
         const QFileInfo fileInfo( myDestination, QString::fromUtf8( file->name ) );
         myVerifyFile.setFileName( fileInfo.absoluteFilePath( ) );
-        //std::cerr << "opening file" << qPrintable(fileInfo.absoluteFilePath()) << std::endl;
         myVerifyFile.open( QIODevice::ReadOnly );
     }
 
@@ -560,7 +556,6 @@ Options :: onTimeout( )
 
     if( leftInFile == 0 )
     {
-        //std::cerr << "closing file" << std::endl;
         myVerifyFile.close( );
         ++myVerifyFileIndex;
         myVerifyFilePos = 0;
