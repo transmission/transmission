@@ -110,7 +110,6 @@ Torrent :: myProperties[] =
   { CREATOR, TR_KEY_creator, QVariant::String, INFO },
   { MANUAL_ANNOUNCE_TIME, TR_KEY_manualAnnounceTime, QVariant::DateTime, STAT_EXTRA },
   { PEERS, TR_KEY_peers, TrTypes::PeerList, STAT_EXTRA },
-  { TORRENT_FILE, TR_KEY_torrentFile, QVariant::String, STAT_EXTRA },
   { BANDWIDTH_PRIORITY, TR_KEY_bandwidthPriority, QVariant::Int, STAT_EXTRA },
   { QUEUE_POSITION, TR_KEY_queuePosition, QVariant::Int, STAT },
 };

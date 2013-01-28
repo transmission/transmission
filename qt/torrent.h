@@ -174,7 +174,6 @@ class Torrent: public QObject
             CREATOR,
             MANUAL_ANNOUNCE_TIME,
             PEERS,
-            TORRENT_FILE,
             BANDWIDTH_PRIORITY,
             QUEUE_POSITION,
 
@@ -250,7 +249,6 @@ class Torrent: public QObject
         QString getPath( ) const { return getString( DOWNLOAD_DIR ); }
         QString getError( ) const;
         QString hashString( ) const { return getString( HASH_STRING ); }
-        QString torrentFile( ) const { return getString( TORRENT_FILE ); }
         bool hasError( ) const { return !getError( ).isEmpty( ); }
         bool isDone( ) const { return getSize( LEFT_UNTIL_DONE ) == 0; }
         bool isSeed( ) const { return haveVerified() >= totalSize(); }
