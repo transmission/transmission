@@ -10,8 +10,8 @@
  * $Id$
  */
 
-#ifndef QTR_TREE_FILE_MODEL
-#define QTR_TREE_FILE_MODEL
+#ifndef QTR_FILE_TREE
+#define QTR_FILE_TREE
 
 #include <QAbstractItemModel>
 #include <QObject>
@@ -44,7 +44,7 @@ class FileTreeItem: public QObject
     virtual ~FileTreeItem();
 
     FileTreeItem (const QString& name="", int fileIndex=-1, uint64_t size=0):
-      myIndex (fileIndex),
+      myFileIndex (fileIndex),
       myParent (0),
       myName (name),
       myPriority (0),
@@ -66,10 +66,8 @@ class FileTreeItem: public QObject
     bool update (const QString& name, bool want, int priority, uint64_t have, bool updateFields);
     void twiddleWanted (QSet<int>& fileIds, bool&);
     void twiddlePriority (QSet<int>& fileIds, int&);
-    int fileIndex () const { return myIndex; }
+    int fileIndex () const { return myFileIndex; }
     uint64_t totalSize () const { return myTotalSize; }
-    
-    
 
   private:
     void setSubtreePriority (int priority, QSet<int>& fileIds);
@@ -81,7 +79,7 @@ class FileTreeItem: public QObject
     int priority () const;
     int isSubtreeWanted () const;
 
-    const int myIndex;
+    const int myFileIndex;
     FileTreeItem * myParent;
     QList<FileTreeItem*> myChildren;
     QHash<QString,int> myChildRows;
@@ -133,8 +131,7 @@ class FileTreeModel: public QAbstractItemModel
     void parentsChanged (const QModelIndex &, int column);
     void subtreeChanged (const QModelIndex &, int column);
     FileTreeItem * findItemForFileIndex (int fileIndex) const;
-
-
+    FileTreeItem * itemFromIndex (const QModelIndex&) const;
 
   private:
     FileTreeItem * myRootItem;
@@ -165,12 +162,11 @@ class FileTreeView: public QTreeView
     FileTreeView (QWidget * parent=0, bool editable=true);
     virtual ~FileTreeView ();
     void clear ();
-    void update (const FileList& files);
-    void update (const FileList& files, bool torrentChanged);
+    void update (const FileList& files, bool updateProperties=true);
 
   signals:
-    void priorityChanged (const QSet<int>& fileIndices, int);
-    void wantedChanged (const QSet<int>& fileIndices, bool);
+    void priorityChanged (const QSet<int>& fileIndices, int priority);
+    void wantedChanged (const QSet<int>& fileIndices, bool wanted);
     void pathEdited (const QString& oldpath, const QString& newname);
 
   protected:
@@ -182,7 +178,7 @@ class FileTreeView: public QTreeView
     FileTreeDelegate myDelegate;
 
   public slots:
-    void onClicked (const QModelIndex & index);
+    void onClicked (const QModelIndex& index);
 };
 
 #endif
