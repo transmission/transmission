@@ -1377,9 +1377,7 @@ tr_strtruncd (char * buf, double x, int precision, size_t buflen)
 char*
 tr_strpercent (char * buf, double x, size_t buflen)
 {
-  if (x < 10.0)
-    tr_strtruncd (buf, x, 2, buflen);
-  else if (x < 100.0)
+  if (x < 100.0)
     tr_strtruncd (buf, x, 1, buflen);
   else
     tr_strtruncd (buf, x, 0, buflen);
