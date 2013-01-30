@@ -1670,16 +1670,23 @@ cancelAllRequestsForBlock (tr_swarm          * s,
 void
 tr_peerMgrPieceCompleted (tr_torrent * tor, tr_piece_index_t p)
 {
-  int i;
-  int peerCount;
-  tr_peer ** peers;
-  tr_swarm * s = tor->swarm;
+  bool pieceCameFromPeers = false;
+  tr_swarm * const s = tor->swarm;
+  const tr_peer ** peer = (const tr_peer **) tr_ptrArrayBase (&s->peers);
+  const tr_peer ** const pend = peer + tr_ptrArraySize (&s->peers);
 
-  /* notify the peers that we now have this piece */
-  peerCount = tr_ptrArraySize (&s->peers);
-  peers = (tr_peer**) tr_ptrArrayBase (&s->peers);
-  for (i=0; i<peerCount; ++i)
-    tr_peerMsgsHave (peers[i]->msgs, p);
+  /* walk through our peers */
+  for ( ; peer!=pend; ++peer)
+    {
+      /* notify the peer that we now have this piece */
+      tr_peerMsgsHave ((*peer)->msgs, p);
+
+      if (!pieceCameFromPeers)
+        pieceCameFromPeers = tr_bitfieldHas (&(*peer)->blame, p);
+    }
+
+  if (pieceCameFromPeers) /* webseed downloads don't belong in announce totals */
+    tr_announcerAddBytes (tor, TR_ANN_DOWN, tr_torPieceCountBytes (tor, p));
 
   /* bookkeeping */
   pieceListRemovePiece (s, p);
@@ -1793,8 +1800,6 @@ peerCallbackFunc (tr_peer * peer, const tr_peer_event * e, void * vs)
           tr_torrent * tor = s->tor;
           const tr_piece_index_t p = e->pieceIndex;
           const tr_block_index_t block = _tr_block (tor, p, e->offset);
-          if (peer->msgs != NULL) /* webseed downloads don't belong in announce totals */
-            tr_announcerAddBytes (tor, TR_ANN_DOWN, tr_torPieceCountBytes (tor, p));
           cancelAllRequestsForBlock (s, block, peer);
           tr_historyAdd (&peer->blocksSentToClient, tr_time(), 1);
           pieceListResortPiece (s, pieceListLookup (s, p));
