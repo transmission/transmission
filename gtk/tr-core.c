@@ -490,7 +490,7 @@ compare_by_activity (GtkTreeModel * m,
     }
 
   if (!ret)
-    ret = compare_by_activity (m, a, b, user_data);
+    ret = compare_by_queue (m, a, b, user_data);
 
   return ret;
 }
