@@ -463,26 +463,22 @@ FileTreeModel :: index (int row, int column, const QModelIndex& parent) const
 {
   QModelIndex i;
 
-  if (!hasIndex (row, column, parent))
-    {
-      qWarning ("I don't have this index");
-    }
-  else
+  if (hasIndex (row, column, parent))
     {
       FileTreeItem * parentItem;
 
-      if(!parent.isValid())
+      if (!parent.isValid ())
         parentItem = myRootItem;
       else
         parentItem = itemFromIndex (parent);
 
-      FileTreeItem * childItem = parentItem->child(row);
+      FileTreeItem * childItem = parentItem->child (row);
 
       if (childItem)
-        i = createIndex(row, column, childItem);
+        i = createIndex (row, column, childItem);
     }
 
-    return i;
+  return i;
 }
 
 QModelIndex
