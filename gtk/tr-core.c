@@ -468,7 +468,6 @@ compare_by_activity (GtkTreeModel * m,
 {
   int ret = 0;
   tr_torrent *ta, *tb;
-  const tr_stat *sa, *sb;
   double aUp, aDown, bUp, bDown;
 
   gtk_tree_model_get (m, a, MC_SPEED_UP, &aUp,
@@ -479,15 +478,19 @@ compare_by_activity (GtkTreeModel * m,
                             MC_SPEED_DOWN, &bDown,
                             MC_TORRENT, &tb,
                             -1);
-  sa = tr_torrentStatCached (ta);
-  sb = tr_torrentStatCached (tb);
+
+  ret = compare_double (aUp+aDown, bUp+bDown);
 
   if (!ret)
-    ret = compare_double (aUp+aDown, bUp+bDown);
+    {
+      const tr_stat * const sa = tr_torrentStatCached (ta);
+      const tr_stat * const sb = tr_torrentStatCached (tb);
+      ret = compare_uint64 (sa->peersSendingToUs + sa->peersGettingFromUs,
+                            sb->peersSendingToUs + sb->peersGettingFromUs);
+    }
+
   if (!ret)
-    ret = compare_uint64 (sa->uploadedEver, sb->uploadedEver);
-  if (!ret)
-    ret = compare_by_queue (m, a, b, user_data);
+    ret = compare_by_activity (m, a, b, user_data);
 
   return ret;
 }

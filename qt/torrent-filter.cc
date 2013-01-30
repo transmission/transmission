@@ -100,12 +100,14 @@ TorrentFilter :: lessThan( const QModelIndex& left, const QModelIndex& right ) c
             break;
         case SortMode :: SORT_BY_ACTIVITY:
             if( !val ) val = compare( a->downloadSpeed() + a->uploadSpeed(), b->downloadSpeed() + b->uploadSpeed() );
-            if( !val ) val = compare( a->uploadedEver(), b->uploadedEver() );
+            if( !val ) val = compare( a->peersWeAreUploadingTo() + a->webseedsWeAreDownloadingFrom(),
+                                      b->peersWeAreUploadingTo() + b->webseedsWeAreDownloadingFrom());
             // fall through
         case SortMode :: SORT_BY_STATE:
-            if( !val ) val = compare( a->hasError(), b->hasError() );
+            if( !val ) val = -compare( a->isPaused(), b->isPaused() );
             if( !val ) val = compare( a->getActivity(), b->getActivity() );
             if( !val ) val = -compare( a->queuePosition(), b->queuePosition() );
+            if( !val ) val = compare( a->hasError(), b->hasError() );
             // fall through
         case SortMode :: SORT_BY_PROGRESS:
             if( !val ) val = compare( a->percentComplete(), b->percentComplete() );
