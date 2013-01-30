@@ -101,7 +101,7 @@ enum
   CANCEL_HISTORY_SEC = 60
 };
 
-const tr_peer_event TR_PEER_EVENT_INIT = { 0, 0, NULL, 0, 0, 0, false, 0 };
+const tr_peer_event TR_PEER_EVENT_INIT = { 0, 0, NULL, 0, 0, 0, 0 };
 
 /**
 ***
@@ -1697,25 +1697,35 @@ peerCallbackFunc (tr_peer * peer, const tr_peer_event * e, void * vs)
 
   switch (e->eventType)
     {
-      case TR_PEER_PEER_GOT_DATA:
+      case TR_PEER_PEER_GOT_PIECE_DATA:
         {
           const time_t now = tr_time ();
           tr_torrent * tor = s->tor;
 
-          if (e->wasPieceData)
-            {
-              tor->uploadedCur += e->length;
-              tr_announcerAddBytes (tor, TR_ANN_UP, e->length);
-              tr_torrentSetActivityDate (tor, now);
-              tr_torrentSetDirty (tor);
-            }
+          tor->uploadedCur += e->length;
+          tr_announcerAddBytes (tor, TR_ANN_UP, e->length);
+          tr_torrentSetActivityDate (tor, now);
+          tr_torrentSetDirty (tor);
+          tr_statsAddUploaded (tor->session, e->length);
 
-          /* update the stats */
-          if (e->wasPieceData)
-            tr_statsAddUploaded (tor->session, e->length);
+          if (peer->atom != NULL)
+            peer->atom->piece_data_time = now;
 
-          /* update our atom */
-          if (peer->atom && e->wasPieceData)
+          break;
+        }
+
+      case TR_PEER_CLIENT_GOT_PIECE_DATA:
+        {
+          const time_t now = tr_time ();
+          tr_torrent * tor = s->tor;
+
+          tor->downloadedCur += e->length;
+          tr_torrentSetActivityDate (tor, now);
+          tr_torrentSetDirty (tor);
+
+          tr_statsAddDownloaded (tor->session, e->length);
+
+          if (peer->atom != NULL)
             peer->atom->piece_data_time = now;
 
           break;
@@ -1778,36 +1788,17 @@ peerCallbackFunc (tr_peer * peer, const tr_peer_event * e, void * vs)
         peerSuggestedPiece (s, peer, e->pieceIndex, true);
         break;
 
-      case TR_PEER_CLIENT_GOT_DATA:
-        {
-          const time_t now = tr_time ();
-          tr_torrent * tor = s->tor;
-
-          if (e->wasPieceData)
-            {
-              tor->downloadedCur += e->length;
-              tr_torrentSetActivityDate (tor, now);
-              tr_torrentSetDirty (tor);
-            }
-
-          /* update the stats */
-          if (e->wasPieceData)
-            tr_statsAddDownloaded (tor->session, e->length);
-
-          /* update our atom */
-          if (peer->atom && e->wasPieceData)
-            peer->atom->piece_data_time = now;
-
-          break;
-        }
-
       case TR_PEER_CLIENT_GOT_BLOCK:
         {
-          const tr_block_index_t block = _tr_block (s->tor, e->pieceIndex, e->offset);
+          tr_torrent * tor = s->tor;
+          const tr_piece_index_t p = e->pieceIndex;
+          const tr_block_index_t block = _tr_block (tor, p, e->offset);
+          if (peer->msgs != NULL) /* webseed downloads don't belong in announce totals */
+            tr_announcerAddBytes (tor, TR_ANN_DOWN, tr_torPieceCountBytes (tor, p));
           cancelAllRequestsForBlock (s, block, peer);
           tr_historyAdd (&peer->blocksSentToClient, tr_time(), 1);
-          pieceListResortPiece (s, pieceListLookup (s, e->pieceIndex));
-          tr_torrentGotBlock (s->tor, block);
+          pieceListResortPiece (s, pieceListLookup (s, p));
+          tr_torrentGotBlock (tor, block);
           break;
         }
 

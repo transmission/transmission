@@ -142,12 +142,11 @@ fire_client_got_blocks (tr_torrent * tor, tr_webseed * w,
 }
 
 static void
-fire_client_got_data (tr_webseed * w, uint32_t length)
+fire_client_got_piece_data (tr_webseed * w, uint32_t length)
 {
     tr_peer_event e = TR_PEER_EVENT_INIT;
-    e.eventType = TR_PEER_CLIENT_GOT_DATA;
+    e.eventType = TR_PEER_CLIENT_GOT_PIECE_DATA;
     e.length = length;
-    e.wasPieceData = true;
     publish (w, &e);
 }
 
@@ -252,7 +251,7 @@ on_content_changed (struct evbuffer                * buf,
     if (!w->is_stopping)
     {
         tr_bandwidthUsed (&w->bandwidth, TR_DOWN, n_added, true, tr_time_msec ());
-        fire_client_got_data (w, n_added);
+        fire_client_got_piece_data (w, n_added);
     }
 
     len = evbuffer_get_length (buf);

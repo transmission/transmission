@@ -496,13 +496,20 @@ fireClientGotHaveNone (tr_peermsgs * msgs)
 }
 
 static void
-fireClientGotData (tr_peermsgs * msgs, uint32_t length, int wasPieceData)
+fireClientGotPieceData (tr_peermsgs * msgs, uint32_t length)
 {
     tr_peer_event e = TR_PEER_EVENT_INIT;
-
     e.length = length;
-    e.eventType = TR_PEER_CLIENT_GOT_DATA;
-    e.wasPieceData = wasPieceData;
+    e.eventType = TR_PEER_CLIENT_GOT_PIECE_DATA;
+    publish (msgs, &e);
+}
+
+static void
+firePeerGotPieceData (tr_peermsgs * msgs, uint32_t length)
+{
+    tr_peer_event e = TR_PEER_EVENT_INIT;
+    e.length = length;
+    e.eventType = TR_PEER_PEER_GOT_PIECE_DATA;
     publish (msgs, &e);
 }
 
@@ -551,17 +558,6 @@ fireClientGotHave (tr_peermsgs * msgs, tr_piece_index_t index)
     publish (msgs, &e);
 }
 
-static void
-firePeerGotData (tr_peermsgs * msgs, uint32_t length, bool wasPieceData)
-{
-    tr_peer_event e = TR_PEER_EVENT_INIT;
-
-    e.length = length;
-    e.eventType = TR_PEER_PEER_GOT_DATA;
-    e.wasPieceData = wasPieceData;
-
-    publish (msgs, &e);
-}
 
 /**
 ***  ALLOWED FAST SET
@@ -1331,7 +1327,7 @@ readBtPiece (tr_peermsgs      * msgs,
 
         tr_peerIoReadBytesToBuf (msgs->peer->io, inbuf, block_buffer, n);
 
-        fireClientGotData (msgs, n, true);
+        fireClientGotPieceData (msgs, n);
         *setme_piece_bytes_read += n;
         dbgmsg (msgs, "got %zu bytes for block %u:%u->%u ... %d remain",
                n, req->index, req->offset, req->length,
@@ -1603,10 +1599,12 @@ clientGotBlock (tr_peermsgs                * msgs,
 static int peerPulse (void * vmsgs);
 
 static void
-didWrite (tr_peerIo * io UNUSED, size_t bytesWritten, int wasPieceData, void * vmsgs)
+didWrite (tr_peerIo * io UNUSED, size_t bytesWritten, bool wasPieceData, void * vmsgs)
 {
     tr_peermsgs * msgs = vmsgs;
-    firePeerGotData (msgs, bytesWritten, wasPieceData);
+
+    if (wasPieceData)
+      firePeerGotPieceData (msgs, bytesWritten);
 
     if (tr_isPeerIo (io) && io->userData)
         peerPulse (msgs);
@@ -1647,10 +1645,6 @@ canRead (tr_peerIo * io, void * vmsgs, size_t * piece)
     }
 
     dbgmsg (msgs, "canRead: ret is %d", (int)ret);
-
-    /* log the raw data that was read */
-    if ((ret != READ_ERR) && (evbuffer_get_length (in) != inlen))
-        fireClientGotData (msgs, inlen - evbuffer_get_length (in), false);
 
     return ret;
 }
