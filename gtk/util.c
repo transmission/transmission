@@ -61,8 +61,8 @@ gtr_get_unicode_string (int i)
 {
   switch (i)
     {
-      case GTR_UNICODE_UP:      return "\xE2\x86\x91";
-      case GTR_UNICODE_DOWN:    return "\xE2\x86\x93";
+      case GTR_UNICODE_UP:      return "\xE2\x96\xB4";
+      case GTR_UNICODE_DOWN:    return "\xE2\x96\xBE";
       case GTR_UNICODE_INF:     return "\xE2\x88\x9E";
       case GTR_UNICODE_BULLET:  return "\xE2\x88\x99";
       default:                  return "err";

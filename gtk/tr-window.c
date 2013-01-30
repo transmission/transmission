@@ -742,22 +742,20 @@ gtr_window_new (GtkApplication * app, GtkUIManager * ui_mgr, TrCore * core)
   gtk_grid_attach_next_to (grid, w, sibling, GTK_POS_RIGHT, 1, 1);
   sibling = w;
 
-  /* ratio */
-  w = gtk_label_new (NULL);
-  p->stats_lb = GTK_LABEL (w);
-  gtk_label_set_single_line_mode (p->stats_lb, TRUE);
+  /* download */
+  w = dl_lb = gtk_label_new (NULL);
+  p->dl_lb = GTK_LABEL (w);
+  gtk_label_set_single_line_mode (p->dl_lb, TRUE);
   gtk_grid_attach_next_to (grid, w, sibling, GTK_POS_RIGHT, 1, 1);
   sibling = w;
-  w = gtk_button_new ();
-  gtk_widget_set_tooltip_text (w, _("Statistics"));
-  gtk_container_add (GTK_CONTAINER (w), gtk_image_new_from_stock ("ratio", -1));
-  gtk_button_set_relief (GTK_BUTTON (w), GTK_RELIEF_NONE);
-  g_signal_connect (w, "clicked", G_CALLBACK (onYinYangReleased), p);
+  w = gtk_image_new_from_stock (GTK_STOCK_GO_DOWN, GTK_ICON_SIZE_MENU);
+  g_object_set (G_OBJECT(w), "margin-left", GUI_PAD, NULL);
   gtk_grid_attach_next_to (grid, w, sibling, GTK_POS_RIGHT, 1, 1);
   sibling = w;
 
   /* upload */
   w = ul_lb = gtk_label_new (NULL);
+  g_object_set (G_OBJECT(w), "margin-left", GUI_PAD, NULL);
   p->ul_lb = GTK_LABEL (w);
   gtk_label_set_single_line_mode (p->ul_lb, TRUE);
   gtk_grid_attach_next_to (grid, w, sibling, GTK_POS_RIGHT, 1, 1);
@@ -767,14 +765,18 @@ gtr_window_new (GtkApplication * app, GtkUIManager * ui_mgr, TrCore * core)
   gtk_grid_attach_next_to (grid, w, sibling, GTK_POS_RIGHT, 1, 1);
   sibling = w;
 
-  /* download */
-  w = dl_lb = gtk_label_new (NULL);
-  p->dl_lb = GTK_LABEL (w);
-  gtk_label_set_single_line_mode (p->dl_lb, TRUE);
+  /* ratio */
+  w = gtk_label_new (NULL);
+  g_object_set (G_OBJECT(w), "margin-left", GUI_PAD_BIG, NULL);
+  p->stats_lb = GTK_LABEL (w);
+  gtk_label_set_single_line_mode (p->stats_lb, TRUE);
   gtk_grid_attach_next_to (grid, w, sibling, GTK_POS_RIGHT, 1, 1);
   sibling = w;
-  w = gtk_image_new_from_stock (GTK_STOCK_GO_DOWN, GTK_ICON_SIZE_MENU);
-  g_object_set (G_OBJECT(w), "margin-left", GUI_PAD, NULL);
+  w = gtk_button_new ();
+  gtk_widget_set_tooltip_text (w, _("Statistics"));
+  gtk_container_add (GTK_CONTAINER (w), gtk_image_new_from_stock ("ratio", -1));
+  gtk_button_set_relief (GTK_BUTTON (w), GTK_RELIEF_NONE);
+  g_signal_connect (w, "clicked", G_CALLBACK (onYinYangReleased), p);
   gtk_grid_attach_next_to (grid, w, sibling, GTK_POS_RIGHT, 1, 1);
   sibling = w;
 

@@ -122,13 +122,9 @@ Formatter :: sizeToString( int64_t bytes )
 QString
 Formatter :: speedToString( const Speed& speed )
 {
-    if( speed.isZero( ) )
-        return tr( "None" );
-    else {
-        char buf[128];
-        tr_formatter_speed_KBps( buf, speed.KBps( ), sizeof( buf ) );
-        return QString::fromUtf8( buf );
-    }
+  char buf[128];
+  tr_formatter_speed_KBps( buf, speed.KBps( ), sizeof( buf ) );
+  return QString::fromUtf8( buf );
 }
 
 QString

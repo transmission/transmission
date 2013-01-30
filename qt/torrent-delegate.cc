@@ -168,38 +168,33 @@ TorrentDelegate :: progressString( const Torrent& tor ) const
 }
 
 QString
-TorrentDelegate :: shortTransferString( const Torrent& tor ) const
+TorrentDelegate :: shortTransferString (const Torrent& tor) const
 {
-    static const QChar upArrow( 0x2191 );
-    static const QChar downArrow( 0x2193 );
-    const bool haveMeta( tor.hasMetadata( ) );
-    const bool haveDown( haveMeta && ((tor.webseedsWeAreDownloadingFrom()>0) || (tor.peersWeAreDownloadingFrom( )>0)) );
-    const bool haveUp( haveMeta && tor.peersWeAreUploadingTo( ) > 0 );
-    QString downStr, upStr, str;
+  QString str;
+  static const QChar uploadSymbol (0x25B4);
+  static const QChar downloadSymbol (0x25BE);
+  const bool haveMeta (tor.hasMetadata());
+  const bool haveDown (haveMeta && ((tor.webseedsWeAreDownloadingFrom()>0) || (tor.peersWeAreDownloadingFrom()>0)));
+  const bool haveUp (haveMeta && tor.peersWeAreUploadingTo()>0);
 
-    if( haveDown )
-        downStr = Formatter::speedToString( tor.downloadSpeed( ) );
-    if( haveUp )
-        upStr = Formatter::speedToString( tor.uploadSpeed( ) );
+  if (haveDown)
+    str = tr( "%1 %2   %3 %4" ).arg(Formatter::speedToString(tor.downloadSpeed()))
+                               .arg(downloadSymbol)
+                               .arg(Formatter::speedToString(tor.uploadSpeed()))
+                               .arg(uploadSymbol);
 
-    if( haveDown && haveUp )
-        str = tr( "%1%2,   %3%4" ).arg(upStr).arg(upArrow).arg(downStr).arg(downArrow);
-    else if( haveDown )
-        str = tr( "%1%2" ).arg(downStr).arg(downArrow);
-    else if( haveUp )
-        str = tr( "%1%2" ).arg(upStr).arg(upArrow);
-    else if( tor.isStalled( ) )
-        str = tr( "Stalled" );
-    else if( tor.hasMetadata( ) )
-        str = tr( "Idle" );
+  else if (haveUp)
+    str = tr( "%1 %2" ).arg(Formatter::speedToString(tor.uploadSpeed()))
+                       .arg(uploadSymbol);
 
-    return str;
+  return str;
 }
 
 QString
 TorrentDelegate :: shortStatusString( const Torrent& tor ) const
 {
     QString str;
+    static const QChar ratioSymbol (0x262F);
 
     switch( tor.getActivity( ) )
     {
@@ -209,9 +204,9 @@ TorrentDelegate :: shortStatusString( const Torrent& tor ) const
 
         case TR_STATUS_DOWNLOAD:
         case TR_STATUS_SEED:
-            if( !tor.isDownloading( ) )
-              str = tr( "Ratio: %1,   " ).arg( Formatter::ratioToString( tor.ratio( ) ) );
-            str += shortTransferString( tor );
+            str = tr("%1    %2 %3").arg(shortTransferString(tor))
+                                   .arg(tr("Ratio:"))
+                                   .arg(Formatter::ratioToString(tor.ratio()));
             break;
 
         default:
