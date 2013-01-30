@@ -920,7 +920,7 @@ announce_request_new (const tr_announcer  * announcer,
     req->corrupt = tier->byteCounts[TR_ANN_CORRUPT];
     req->leftUntilComplete = tr_torrentHasMetadata (tor)
             ? tor->info.totalSize - tr_cpHaveTotal (&tor->completion)
-            : ~ (uint64_t)0;
+            : 0;
     req->event = event;
     req->numwant = event == TR_ANNOUNCE_EVENT_STOPPED ? 0 : NUMWANT;
     req->key = announcer->key;
@@ -1205,6 +1205,24 @@ announce_request_delegate (tr_announcer               * announcer,
                            void                       * callback_data)
 {
     tr_session * session = announcer->session;
+
+#if 0
+    fprintf (stderr, "ANNOUNCE: event %s isPartialSeed %d port %d key %d numwant %d"
+                     " up %"PRIu64" down %"PRIu64" corrupt %"PRIu64" left %"PRIu64
+                     " url [%s] tracker_id_str [%s] peer_id [%8.8s]\n",
+             tr_announce_event_get_string (request->event),
+             (int)request->partial_seed,
+             (int)request->port,
+             request->key,
+             request->numwant,
+             request->up,
+             request->down,
+             request->corrupt,
+             request->leftUntilComplete,
+             request->url,
+             request->tracker_id_str,
+             request->peer_id);
+#endif
 
     if (!memcmp (request->url, "http", 4))
         tr_tracker_http_announce (session, request, callback, callback_data);
