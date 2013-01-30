@@ -215,12 +215,15 @@ test_single_filename_torrent (void)
   check_streq ("hello-world.txt", tr_torrentName(tor));
   check_int_eq (0, torrentRenameAndWait (tor, tor->info.name, "foobar"));
   check (!tr_fileExists (tmpstr, NULL)); /* confirm the old filename can't be found */
+  tr_free (tmpstr);
   check (tor->info.files[0].is_renamed); /* confirm the file's 'renamed' flag is set */
   check_streq ("foobar", tr_torrentName(tor)); /* confirm the torrent's name is now 'foobar' */
-  check_streq ("foobar", tor->info.files[0].name); /* confirm the file's name is now 'foobar' */
+  check_streq ("foobar", tor->info.files[0].name); /* confirm the file's name is now 'foobar' in our struct */
   check (strstr (tor->info.torrent, "foobar") == NULL); /* confirm the name in the .torrent file hasn't changed */
-  check (testFileExistsAndConsistsOfThisString (tor, 0, "hello, world!\n")); /* confirm the contents are right */
+  tmpstr = tr_buildPath (tor->currentDir, "foobar", NULL); 
+  check (tr_fileExists (tmpstr, NULL)); /* confirm the file's name is now 'foobar' on the disk */
   tr_free (tmpstr);
+  check (testFileExistsAndConsistsOfThisString (tor, 0, "hello, world!\n")); /* confirm the contents are right */
 
   /* (while it's renamed: confirm that the .resume file remembers the changes) */
   tr_torrentSaveResume (tor);
