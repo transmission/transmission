@@ -13,6 +13,7 @@
 #include "transmission.h"
 #include "cache.h"
 #include "resume.h"
+#include "trevent.h"
 #include "torrent.h" /* tr_isTorrent() */
 #include "utils.h" /* tr_mkdirp() */
 #include "variant.h"
@@ -22,6 +23,13 @@
 /***
 ****
 ***/
+
+#define verify_and_block_until_done(tor) \
+  do { \
+    do { tr_wait_msec (10); } while (tor->verifyState != TR_VERIFY_NONE); \
+    tr_torrentVerify (tor); \
+    do { tr_wait_msec (10); } while (tor->verifyState != TR_VERIFY_NONE); \
+  } while (0)
 
 static void
 zeroes_completeness_func (tr_torrent       * torrent UNUSED,
@@ -41,9 +49,30 @@ zeroes_completeness_func (tr_torrent       * torrent UNUSED,
     tr_free (path); \
   } while (0)
 
+struct test_incomplete_dir_is_subdir_of_download_dir_data
+{
+  tr_torrent * tor;
+  tr_block_index_t block;
+  tr_piece_index_t pieceIndex;
+  uint32_t offset;
+  struct evbuffer * buf;
+  bool done;
+};
+
+static void
+test_incomplete_dir_is_subdir_of_download_dir_threadfunc (void * vdata)
+{
+  struct test_incomplete_dir_is_subdir_of_download_dir_data * data = vdata;
+  tr_cacheWriteBlock (session->cache, data->tor, 0, data->offset, data->tor->blockSize, data->buf);
+  tr_torrentGotBlock (data->tor, data->block);
+  data->done = true;
+}
+  
+
 static int
 test_incomplete_dir_is_subdir_of_download_dir (void)
 {
+  size_t i;
   char * incomplete_dir;
   tr_torrent * tor;
   tr_completeness completeness;
@@ -65,36 +94,43 @@ test_incomplete_dir_is_subdir_of_download_dir (void)
   check_file_location (tor, 1, tr_buildPath(incomplete_dir, tor->info.files[1].name, NULL));
   check_int_eq (tor->info.pieceSize, tr_torrentStat(tor)->leftUntilDone);
 
+  completeness = completeness_unset;
+  tr_torrentSetCompletenessCallback (tor, zeroes_completeness_func, &completeness);
+
   /* now finish writing it */
   {
-    uint32_t offset;
-    tr_block_index_t first, last, i;
-    struct evbuffer * buf = evbuffer_new ();
+    tr_block_index_t first, last;
     char * zero_block = tr_new0 (char, tor->blockSize);
+    struct test_incomplete_dir_is_subdir_of_download_dir_data data;
 
-    completeness = completeness_unset;
-    tr_torrentSetCompletenessCallback (tor, zeroes_completeness_func, &completeness);
+    data.tor = tor;
+    data.pieceIndex = 0;
+    data.buf = evbuffer_new ();
 
-    tr_torGetPieceBlockRange (tor, 0, &first, &last);
-    for (offset=0, i=first; i<=last; ++i, offset+=tor->blockSize)
+    tr_torGetPieceBlockRange (tor, data.pieceIndex, &first, &last);
+    for (i=first; i<=last; ++i)
       {
-        evbuffer_add (buf, zero_block, tor->blockSize);
-        tr_cacheWriteBlock (session->cache, tor, 0, offset, tor->blockSize, buf);
-        tr_torrentGotBlock (tor, i);
+        evbuffer_add (data.buf, zero_block, tor->blockSize);
+        data.block = i;
+        data.done = false;
+        data.offset = data.block * tor->blockSize;
+        tr_runInEventThread (session, test_incomplete_dir_is_subdir_of_download_dir_threadfunc, &data);
+        do { tr_wait_msec(50); } while (!data.done);
       }
-    sync ();
 
-    tr_torrentVerify (tor);
-    while ((completeness==completeness_unset) && (time(NULL)<=deadline))
-      tr_wait_msec (50);
-    check_int_eq (TR_SEED, completeness);
-    for (i=0; i<tor->info.fileCount; ++i)
-      check_file_location (tor, i, tr_buildPath (downloadDir, tor->info.files[i].name, NULL));
-
-    evbuffer_free (buf);
+    evbuffer_free (data.buf);
     tr_free (zero_block);
   }
 
+  verify_and_block_until_done (tor);
+  check_int_eq (0, tr_torrentStat(tor)->leftUntilDone);
+
+  while ((completeness==completeness_unset) && (time(NULL)<=deadline))
+    tr_wait_msec (50);
+
+  check_int_eq (TR_SEED, completeness);
+  for (i=0; i<tor->info.fileCount; ++i)
+    check_file_location (tor, i, tr_buildPath (downloadDir, tor->info.files[i].name, NULL));
 
   /* cleanup */
   tr_torrentRemove (tor, true, remove);

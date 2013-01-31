@@ -21,6 +21,7 @@
 #include "peer-common.h" /* MAX_BLOCK_SIZE */
 #include "ptrarray.h"
 #include "torrent.h"
+#include "trevent.h"
 #include "utils.h"
 
 #define MY_NAME "Cache"
@@ -332,6 +333,8 @@ tr_cacheWriteBlock (tr_cache         * cache,
                     struct evbuffer  * writeme)
 {
   struct cache_block * cb = findBlock (cache, torrent, piece, offset);
+
+  assert (tr_amInEventThread (torrent->session));
 
   if (cb == NULL)
     {

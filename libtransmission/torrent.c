@@ -2950,7 +2950,7 @@ setLocation (void * vdata)
         {
             /* blow away the leftover subdirectories in the old location */
             if (do_move)
-                tr_torrentDeleteLocalData (tor, remove);
+              tr_torrentDeleteLocalData (tor, remove);
 
             /* set the new location and reverify */
             tr_torrentSetDownloadDir (tor, location);
@@ -3065,6 +3065,9 @@ void
 tr_torrentGotBlock (tr_torrent * tor, tr_block_index_t block)
 {
   const bool block_is_new = !tr_cpBlockIsComplete (&tor->completion, block);
+
+  assert (tr_isTorrent (tor));
+  assert (tr_amInEventThread (tor->session));
 
   if (block_is_new)
     {
