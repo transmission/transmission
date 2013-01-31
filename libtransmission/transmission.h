@@ -1439,7 +1439,7 @@ void tr_torrentClearCompletenessCallback (tr_torrent * torrent);
 
 
 typedef void (tr_torrent_metadata_func)(tr_torrent  * torrent,
-                                           void        * user_data);
+                                        void        * user_data);
 /**
  * Register to be notified whenever a torrent changes from
  * having incomplete metadata to having complete metadata.
@@ -1722,7 +1722,29 @@ void tr_torrentAmountFinished (const tr_torrent  * torrent,
                                float             * tab,
                                int                 size);
 
-void tr_torrentVerify (tr_torrent * torrent);
+/**
+ * Callback function invoked when a torrent finishes being verified.
+ *
+ * @param torrent the torrent that was verified
+ * @param aborted true if the verify ended prematurely for some reason,
+ *                such as tr_torrentStop() or tr_torrentSetLocation()
+ *                being called during verification.
+ * @param callback_data the user-defined pointer from tr_torrentVerify()
+ */
+typedef void (*tr_verify_done_func)(tr_torrent  * torrent,
+                                    bool          aborted,
+                                    void        * user_data);
+
+/**
+ * Queue a torrent for verification.
+ *
+ * If callback_func is non-NULL, it will be called from the libtransmission
+ * thread after the torrent's completness state is updated after the
+ * file verification pass.
+ */
+void tr_torrentVerify (tr_torrent           * torrent,
+                       tr_verify_done_func    callback_func_or_NULL,
+                       void                 * callback_data_or_NULL);
 
 /***********************************************************************
  * tr_info

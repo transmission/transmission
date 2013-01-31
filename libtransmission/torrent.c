@@ -918,7 +918,7 @@ torrentInit (tr_torrent * tor, const tr_ctor * ctor)
     if (isNewTorrent)
     {
         tor->startAfterVerify = doStart;
-        tr_torrentVerify (tor);
+        tr_torrentVerify (tor, NULL, NULL);
     }
     else if (doStart)
     {
@@ -1682,59 +1682,81 @@ tr_torrentStartNow (tr_torrent * tor)
         torrentStart (tor, true);
 }
 
-static void
-torrentRecheckDoneImpl (void * vtor)
+struct verify_data
 {
-    tr_torrent * tor = vtor;
-    assert (tr_isTorrent (tor));
+  bool aborted;
+  tr_torrent * tor;
+  tr_verify_done_func callback_func;
+  void * callback_data;
+};
 
+static void
+onVerifyDoneThreadFunc (void * vdata)
+{
+  struct verify_data * data = vdata;
+  tr_torrent * tor = data->tor;
+
+  if (!data->aborted)
     tr_torrentRecheckCompleteness (tor);
 
-    if (tor->startAfterVerify) {
-        tor->startAfterVerify = false;
-        torrentStart (tor, false);
+  if (data->callback_func != NULL)
+    (*data->callback_func)(tor, data->aborted, data->callback_data);
+
+  if (!data->aborted && tor->startAfterVerify)
+    {
+      tor->startAfterVerify = false;
+      torrentStart (tor, false);
     }
+
+  tr_free (data);
 }
 
 static void
-torrentRecheckDoneCB (tr_torrent * tor)
+onVerifyDone (tr_torrent * tor, bool aborted, void * vdata)
 {
-    assert (tr_isTorrent (tor));
-
-    tr_runInEventThread (tor->session, torrentRecheckDoneImpl, tor);
+  struct verify_data * data = vdata;
+  assert (data->tor == tor);
+  data->aborted = aborted;
+  tr_runInEventThread (tor->session, onVerifyDoneThreadFunc, data);
 }
 
 static void
-verifyTorrent (void * vtor)
+verifyTorrent (void * vdata)
 {
-    bool startAfter;
-    tr_torrent * tor = vtor;
+  bool startAfter;
+  struct verify_data * data = vdata;
+  tr_torrent * tor = data->tor;
+  tr_sessionLock (tor->session);
 
-    tr_sessionLock (tor->session);
+  /* if the torrent's already being verified, stop it */
+  tr_verifyRemove (tor);
 
-    /* if the torrent's already being verified, stop it */
-    tr_verifyRemove (tor);
+  startAfter = (tor->isRunning || tor->startAfterVerify) && !tor->isStopping;
+  if (tor->isRunning)
+    tr_torrentStop (tor);
+  tor->startAfterVerify = startAfter;
 
-    startAfter = (tor->isRunning || tor->startAfterVerify) && !tor->isStopping;
+  if (setLocalErrorIfFilesDisappeared (tor))
+    tor->startAfterVerify = false;
+  else
+    tr_verifyAdd (tor, onVerifyDone, data);
 
-    if (tor->isRunning)
-        tr_torrentStop (tor);
-
-    tor->startAfterVerify = startAfter;
-
-    if (setLocalErrorIfFilesDisappeared (tor))
-        tor->startAfterVerify = false;
-    else
-        tr_verifyAdd (tor, torrentRecheckDoneCB);
-
-    tr_sessionUnlock (tor->session);
+  tr_sessionUnlock (tor->session);
 }
 
 void
-tr_torrentVerify (tr_torrent * tor)
+tr_torrentVerify (tr_torrent           * tor,
+                  tr_verify_done_func    callback_func,
+                  void                 * callback_data)
 {
-  if (tr_isTorrent (tor))
-    tr_runInEventThread (tor->session, verifyTorrent, tor);
+  struct verify_data * data;
+
+  data = tr_new (struct verify_data, 1);
+  data->tor = tor;
+  data->aborted = false;
+  data->callback_func = callback_func;
+  data->callback_data = callback_data;
+  tr_runInEventThread (tor->session, verifyTorrent, data);
 }
 
 void

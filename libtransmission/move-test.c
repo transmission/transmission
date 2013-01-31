@@ -24,13 +24,6 @@
 ****
 ***/
 
-#define verify_and_block_until_done(tor) \
-  do { \
-    do { tr_wait_msec (10); } while (tor->verifyState != TR_VERIFY_NONE); \
-    tr_torrentVerify (tor); \
-    do { tr_wait_msec (10); } while (tor->verifyState != TR_VERIFY_NONE); \
-  } while (0)
-
 static void
 zeroes_completeness_func (tr_torrent       * torrent UNUSED,
                           tr_completeness    completeness,
@@ -122,7 +115,7 @@ test_incomplete_dir_is_subdir_of_download_dir (void)
     tr_free (zero_block);
   }
 
-  verify_and_block_until_done (tor);
+  libttest_blockingTorrentVerify (tor);
   check_int_eq (0, tr_torrentStat(tor)->leftUntilDone);
 
   while ((completeness==completeness_unset) && (time(NULL)<=deadline))

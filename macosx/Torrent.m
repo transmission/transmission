@@ -406,7 +406,7 @@ int trashDataFile(const char * filename)
 
 - (void) resetCache
 {
-    tr_torrentVerify(fHandle);
+    tr_torrentVerify(fHandle, NULL, NULL);
     [self update];
 }
 

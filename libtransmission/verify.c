@@ -173,19 +173,11 @@ verifyTorrent (tr_torrent * tor, bool * stopFlag)
 
 struct verify_node
 {
-  tr_torrent *         torrent;
-  tr_verify_done_cb    verify_done_cb;
-  uint64_t             current_size;
+  tr_torrent          * torrent;
+  tr_verify_done_func   callback_func;
+  void                * callback_data;
+  uint64_t              current_size;
 };
-
-static void
-fireCheckDone (tr_torrent * tor, tr_verify_done_cb verify_done_cb)
-{
-  assert (tr_isTorrent (tor));
-
-  if (verify_done_cb)
-    verify_done_cb (tor);
-}
 
 static struct verify_node currentNode;
 static tr_list * verifyList = NULL;
@@ -233,12 +225,11 @@ verifyThreadFunc (void * unused UNUSED)
       tr_torrentSetVerifyState (tor, TR_VERIFY_NONE);
       assert (tr_isTorrent (tor));
 
-      if (!stopCurrent)
-        {
-          if (changed)
-            tr_torrentSetDirty (tor);
-          fireCheckDone (tor, currentNode.verify_done_cb);
-        }
+      if (!stopCurrent && changed)
+        tr_torrentSetDirty (tor);
+
+      if (currentNode.callback_func)
+        (*currentNode.callback_func)(tor, stopCurrent, currentNode.callback_data);
     }
 
   verifyThread = NULL;
@@ -266,7 +257,9 @@ compareVerifyByPriorityAndSize (const void * va, const void * vb)
 }
 
 void
-tr_verifyAdd (tr_torrent * tor, tr_verify_done_cb verify_done_cb)
+tr_verifyAdd (tr_torrent           * tor,
+              tr_verify_done_func    callback_func,
+              void                 * callback_data)
 {
   struct verify_node * node;
 
@@ -275,7 +268,8 @@ tr_verifyAdd (tr_torrent * tor, tr_verify_done_cb verify_done_cb)
 
   node = tr_new (struct verify_node, 1);
   node->torrent = tor;
-  node->verify_done_cb = verify_done_cb;
+  node->callback_func = callback_func;
+  node->callback_data = callback_data;
   node->current_size = tr_torrentGetCurrentSizeOnDisk (tor);
 
   tr_lockLock (getVerifyLock ());

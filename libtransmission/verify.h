@@ -22,10 +22,9 @@
  * @{
  */
 
-typedef void (*tr_verify_done_cb)(tr_torrent * tor);
-
-void tr_verifyAdd (tr_torrent *      tor,
-                   tr_verify_done_cb recheck_done_cb);
+void tr_verifyAdd (tr_torrent           * tor,
+                   tr_verify_done_func    callback_func,
+                   void                 * callback_user_data);
 
 void tr_verifyRemove (tr_torrent * tor);
 

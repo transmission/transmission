@@ -163,7 +163,7 @@ updateTorrent (struct OpenData * o)
         tr_torrentSetDownloadDir (o->tor, o->downloadDir);
         gtk_widget_set_sensitive (o->file_list, tr_torrentHasMetadata (o->tor));
         gtr_file_list_set_torrent (o->file_list, tr_torrentId (o->tor));
-        tr_torrentVerify (o->tor);
+        tr_torrentVerify (o->tor, NULL, NULL);
     }
 }
 

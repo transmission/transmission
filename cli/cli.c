@@ -328,7 +328,7 @@ main (int argc, char ** argv)
   if (verify)
     {
       verify = false;
-      tr_torrentVerify (tor);
+      tr_torrentVerify (tor, NULL, NULL);
     }
 
   for (;;)

@@ -395,7 +395,7 @@ torrentVerify (tr_session               * session,
     for (i = 0; i < torrentCount; ++i)
     {
         tr_torrent * tor = torrents[i];
-        tr_torrentVerify (tor);
+        tr_torrentVerify (tor, NULL, NULL);
         notify (session, TR_RPC_TORRENT_CHANGED, tor);
     }
 

@@ -20,13 +20,6 @@
 ****
 ***/
 
-#define verify_and_block_until_done(tor) \
-  do { \
-    do { tr_wait_msec (10); } while (tor->verifyState != TR_VERIFY_NONE); \
-    tr_torrentVerify (tor); \
-    do { tr_wait_msec (10); } while (tor->verifyState != TR_VERIFY_NONE); \
-  } while (0)
-
 #define check_have_none(tor, totalSize) \
   do { \
     const tr_stat * st = tr_torrentStat(tor); \
@@ -172,13 +165,13 @@ test_single_filename_torrent (void)
   check (!tor->info.files[0].is_renamed);
 
   /* sanity check the (empty) stats */
-  verify_and_block_until_done (tor);
+  libttest_blockingTorrentVerify (tor);
   check_have_none (tor, totalSize);
 
   create_single_file_torrent_contents (tor->currentDir);
 
   /* sanity check the stats again, now that we've added the file */
-  verify_and_block_until_done (tor);
+  libttest_blockingTorrentVerify (tor);
   st = tr_torrentStat (tor);
   check_int_eq (TR_STATUS_STOPPED, st->activity);
   check_int_eq (TR_STAT_OK, st->error);
@@ -328,14 +321,14 @@ test_multifile_torrent (void)
     check_streq (expected_files[i], files[i].name);
 
   /* sanity check the (empty) stats */
-  verify_and_block_until_done (tor);
+  libttest_blockingTorrentVerify (tor);
   check_have_none (tor, totalSize);
 
   /* build the local data */
   create_multifile_torrent_contents (tor->currentDir);
 
   /* sanity check the (full) stats */
-  verify_and_block_until_done (tor);
+  libttest_blockingTorrentVerify (tor);
   st = tr_torrentStat (tor);
   check_int_eq (TR_STATUS_STOPPED, st->activity);
   check_int_eq (TR_STAT_OK, st->error);
@@ -414,7 +407,7 @@ test_multifile_torrent (void)
   tr_free (tmp);
   tr_free (str);
   sync ();
-  verify_and_block_until_done (tor);
+  libttest_blockingTorrentVerify (tor);
   testFileExistsAndConsistsOfThisString (tor, 0, expected_contents[0]);
   for (i=1; i<=2; ++i)
     {

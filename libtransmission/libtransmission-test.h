@@ -81,6 +81,8 @@ void libtransmission_test_session_close (void);
 void         libtransmission_test_zero_torrent_populate (tr_torrent * tor, bool complete);
 tr_torrent * libtransmission_test_zero_torrent_init (void);
 
+void         libttest_blockingTorrentVerify (tr_torrent * tor);
+
 
 
 #endif /* !LIBTRANSMISSION_TEST_H */

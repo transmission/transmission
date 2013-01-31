@@ -4,6 +4,7 @@
 #include "transmission.h"
 #include "platform.h" /* TR_PATH_DELIMETER */
 #include "torrent.h"
+#include "trevent.h"
 #include "libtransmission-test.h"
 
 bool verbose = false;
@@ -323,14 +324,6 @@ libtransmission_test_zero_torrent_init (void)
   return tor;
 }
 
-#define verify_and_block_until_done(tor) \
-  do { \
-    do { tr_wait_msec (10); } while (tor->verifyState != TR_VERIFY_NONE); \
-    tr_torrentVerify (tor); \
-    do { tr_wait_msec (10); } while (tor->verifyState != TR_VERIFY_NONE); \
-  } while (0)
-
-
 void
 libtransmission_test_zero_torrent_populate (tr_torrent * tor, bool complete)
 {
@@ -368,10 +361,33 @@ libtransmission_test_zero_torrent_populate (tr_torrent * tor, bool complete)
     }
 
   sync ();
-  verify_and_block_until_done (tor);
+  libttest_blockingTorrentVerify (tor);
 
   if (complete)
     assert (tr_torrentStat(tor)->leftUntilDone == 0);
   else
     assert (tr_torrentStat(tor)->leftUntilDone == tor->info.pieceSize);
+}
+
+/***
+****
+***/
+
+static void
+onVerifyDone (tr_torrent * tor UNUSED, bool aborted UNUSED, void * done)
+{
+  *(bool*)done = true;
+}
+
+void
+libttest_blockingTorrentVerify (tr_torrent * tor)
+{
+  bool done = false;
+
+  assert (session != NULL);
+  assert (!tr_amInEventThread (session));
+
+  tr_torrentVerify (tor, onVerifyDone, &done);
+  while (!done)
+    tr_wait_msec (10);
 }
