@@ -607,7 +607,9 @@ tr_fdFileGetCachedMTime (tr_session * s, int torrent_id, tr_file_index_t i, time
 void
 tr_fdTorrentClose (tr_session * session, int torrent_id)
 {
-    fileset_close_torrent (get_fileset (session), torrent_id);
+  assert (tr_sessionIsLocked (session));
+
+  fileset_close_torrent (get_fileset (session), torrent_id);
 }
 
 /* returns an fd on success, or a -1 on failure and sets errno */

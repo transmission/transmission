@@ -1734,10 +1734,7 @@ void
 tr_torrentVerify (tr_torrent * tor)
 {
   if (tr_isTorrent (tor))
-    {
-      tr_verifyRemove (tor);
-      tr_runInEventThread (tor->session, verifyTorrent, tor);
-    }
+    tr_runInEventThread (tor->session, verifyTorrent, tor);
 }
 
 void
@@ -1848,14 +1845,18 @@ static void tr_torrentDeleteLocalData (tr_torrent *, tr_fileFunc);
 static void
 removeTorrent (void * vdata)
 {
-    struct remove_data * data = vdata;
+  struct remove_data * data = vdata;
+  tr_session * session = data->tor->session;
+  tr_sessionLock (session); 
 
-    if (data->deleteFlag)
-        tr_torrentDeleteLocalData (data->tor, data->deleteFunc);
+  if (data->deleteFlag)
+    tr_torrentDeleteLocalData (data->tor, data->deleteFunc);
 
-    tr_torrentClearCompletenessCallback (data->tor);
-    closeTorrent (data->tor);
-    tr_free (data);
+  tr_torrentClearCompletenessCallback (data->tor);
+  closeTorrent (data->tor);
+  tr_free (data);
+
+  tr_sessionUnlock (session); 
 }
 
 void
