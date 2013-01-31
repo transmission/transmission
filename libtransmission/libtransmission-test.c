@@ -2,6 +2,7 @@
 #include <stdio.h>
 
 #include "transmission.h"
+#include "platform.h" /* TR_PATH_DELIMETER */
 #include "torrent.h"
 #include "libtransmission-test.h"
 
