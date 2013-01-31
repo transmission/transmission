@@ -728,8 +728,11 @@ loadFromFile (tr_torrent * tor, uint64_t fieldsToLoad)
       && (tr_variantDictFindStr (&top, TR_KEY_destination, &str, &len))
       && (str && *str))
     {
+        const bool is_current_dir = tor->currentDir == tor->downloadDir;
         tr_free (tor->downloadDir);
         tor->downloadDir = tr_strndup (str, len);
+        if (is_current_dir)
+          tor->currentDir = tor->downloadDir;
         fieldsLoaded |= TR_FR_DOWNLOAD_DIR;
     }
 
@@ -737,8 +740,11 @@ loadFromFile (tr_torrent * tor, uint64_t fieldsToLoad)
       && (tr_variantDictFindStr (&top, TR_KEY_incomplete_dir, &str, &len))
       && (str && *str))
     {
+        const bool is_current_dir = tor->currentDir == tor->incompleteDir;
         tr_free (tor->incompleteDir);
         tor->incompleteDir = tr_strndup (str, len);
+        if (is_current_dir)
+          tor->currentDir = tor->incompleteDir;
         fieldsLoaded |= TR_FR_INCOMPLETE_DIR;
     }
 
