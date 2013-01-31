@@ -409,12 +409,17 @@ test_multifile_torrent (void)
   remove (str);
   tmp = tr_dirname (str);
   remove (tmp);
+  sync ();
   tr_free (tmp);
   tr_free (str);
   verify_and_block_until_done (tor);
   testFileExistsAndConsistsOfThisString (tor, 0, expected_contents[0]);
-  check (tr_torrentFindFile (tor, 1) == NULL);
-  check (tr_torrentFindFile (tor, 2) == NULL);
+  for (i=1; i<=2; ++i)
+    {
+      str = tr_torrentFindFile (tor, i);
+      check_streq (NULL, str);
+      tr_free (str);
+    }
   testFileExistsAndConsistsOfThisString (tor, 3, expected_contents[3]);
 
   /* rename a branch... */
