@@ -22,10 +22,9 @@
 
 #define verify_and_block_until_done(tor) \
   do { \
+    do { tr_wait_msec (10); } while (tor->verifyState != TR_VERIFY_NONE); \
     tr_torrentVerify (tor); \
-    do { \
-      tr_wait_msec (10); \
-    } while (tor->verifyState != TR_VERIFY_NONE); \
+    do { tr_wait_msec (10); } while (tor->verifyState != TR_VERIFY_NONE); \
   } while (0)
 
 #define check_have_none(tor, totalSize) \
