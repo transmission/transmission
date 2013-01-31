@@ -402,16 +402,18 @@ test_multifile_torrent (void)
   ***/
 
   /* remove the directory Felidae/Felinae/Felis/catus */
-  str = tr_buildPath (tor->currentDir, files[1].name, NULL);
+  str = tr_torrentFindFile (tor, 1);
+  check (str != NULL);
   remove (str);
   tr_free (str);
-  str = tr_buildPath (tor->currentDir, files[2].name, NULL);
+  str = tr_torrentFindFile (tor, 2);
+  check (str != NULL);
   remove (str);
   tmp = tr_dirname (str);
   remove (tmp);
-  sync ();
   tr_free (tmp);
   tr_free (str);
+  sync ();
   verify_and_block_until_done (tor);
   testFileExistsAndConsistsOfThisString (tor, 0, expected_contents[0]);
   for (i=1; i<=2; ++i)
