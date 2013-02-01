@@ -841,15 +841,18 @@ updateFreeSpace (PrivateData * p)
 
       if (visible)
         {
-          char * tip;
+          char * str;
           char sizeStr[32];
 
           tr_strlsize (sizeStr, n, sizeof(sizeStr));
-          gtk_label_set_text (p->freespace_lb, sizeStr);
 
-          tip = tr_strdup_printf (_("Download folder \"%1$s\" has %2$s free"), downloadDir, sizeStr);
-          gtk_widget_set_tooltip_text (w, tip);
-          g_free (tip);
+          str = g_strdup_printf (_("%s Free"), sizeStr);
+          gtk_label_set_text (p->freespace_lb, str);
+          g_free (str);
+          
+          str = g_strdup_printf (_("Download folder \"%1$s\" has %2$s free"), downloadDir, sizeStr);
+          gtk_widget_set_tooltip_text (w, str);
+          g_free (str);
         }
     }
 

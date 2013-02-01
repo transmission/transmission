@@ -731,7 +731,7 @@ TrMainWindow :: refreshFreeSpace ()
         .arg (myPrefs.getString (Prefs::DOWNLOAD_DIR))
         .arg (sizeStr);
 
-      myFreeSpaceTextLabel->setText (sizeStr);
+      myFreeSpaceTextLabel->setText (tr("%1 Free").arg(sizeStr));
       myFreeSpaceTextLabel->setToolTip (tip);
       myFreeSpaceIconLabel->setToolTip (tip);
     }
