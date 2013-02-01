@@ -2847,25 +2847,34 @@ deleteLocalData (tr_torrent * tor, tr_fileFunc func)
     /* build a list of 'top's child directories that belong to this torrent */
     for (f=0; f<tor->info.fileCount; ++f)
     {
+        char * dir;
+        char * filename;
+
         /* get the directory that this file goes in... */
-        char * filename = tr_buildPath (top, tor->info.files[f].name, NULL);
-        char * dir = tr_dirname (filename);
+        filename = tr_buildPath (top, tor->info.files[f].name, NULL);
+        dir = tr_dirname (filename);
+        tr_free (filename);
+
+        /* walk up the directory tree until we reach 'top' */
         if (!tr_is_same_file (top, dir) && strcmp (top, dir)) {
-            for (;;) {
-                char * parent = tr_dirname (dir);
-                const bool done_walking = tr_is_same_file (top, parent) || !strcmp (top, parent);
-                if (done_walking && tr_ptrArrayFindSorted (&folders, dir, vstrcmp))
-                  tr_ptrArrayInsertSorted (&folders, dir, vstrcmp); /* folders assumes ownership of dir */
-                else
-                  tr_free (dir);
-                dir = parent;
-                if (done_walking)
+          for (;;) {
+              char * parent = tr_dirname (dir);
+              if (tr_is_same_file (top, parent) || !strcmp (top, parent)) {
+                  if (tr_ptrArrayFindSorted (&folders, dir, vstrcmp) == NULL)
+                    tr_ptrArrayInsertSorted (&folders, tr_strdup(dir), vstrcmp);
+                  tr_free (parent);
                   break;
+                }
+
+              /* walk upwards to parent */
+              tr_free (dir);
+              dir = parent;
             }
         }
-        tr_free (dir);
-        tr_free (filename);
+
+      tr_free (dir);
     }
+
     for (i=0, n=tr_ptrArraySize (&folders); i<n; ++i)
         removeEmptyFoldersAndJunkFiles (tr_ptrArrayNth (&folders, i));
 
