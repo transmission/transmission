@@ -1,3 +1,18 @@
+=== Transmission 2.77 (2013/xx/yy) ===
+[http://trac.transmissionbt.com/query?milestone=2.77&group=component&order=severity All tickets closed by this release]
+==== All Platforms ====
+  * Fix 2.75 regression that broke JSON parsing of real numbers in locales that don't use '.' as a decimal separator
+  * Don't invalidate the OS' file cache when closing files
+==== GTK+ Client ====
+  * Minor pluralization fixes in the UI
+==== Qt Client ====
+  * Fix non Latin-1 symbol issue when showing file transfer speeds
+  * Fix issue when creating new torrents with multiple trackers
+==== Daemon ====
+  * Fix documentation errors in the spec and manpages
+==== CLI ====
+  * Fix transmission-cli failure when the download directory doesn't exist
+
 === Transmission 2.76 (2013/01/08) ===
 [http://trac.transmissionbt.com/query?milestone=2.76&group=component&order=severity All tickets closed by this release]
 ==== All Platforms ====
