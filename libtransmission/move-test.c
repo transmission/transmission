@@ -42,8 +42,9 @@ zeroes_completeness_func (tr_torrent       * torrent UNUSED,
     tr_free (path); \
   } while (0)
 
-struct test_incomplete_dir_is_subdir_of_download_dir_data
+struct test_incomplete_dir_data
 {
+  tr_session * session;
   tr_torrent * tor;
   tr_block_index_t block;
   tr_piece_index_t pieceIndex;
@@ -53,35 +54,39 @@ struct test_incomplete_dir_is_subdir_of_download_dir_data
 };
 
 static void
-test_incomplete_dir_is_subdir_of_download_dir_threadfunc (void * vdata)
+test_incomplete_dir_threadfunc (void * vdata)
 {
-  struct test_incomplete_dir_is_subdir_of_download_dir_data * data = vdata;
-  tr_cacheWriteBlock (session->cache, data->tor, 0, data->offset, data->tor->blockSize, data->buf);
+  struct test_incomplete_dir_data * data = vdata;
+  tr_cacheWriteBlock (data->session->cache, data->tor, 0, data->offset, data->tor->blockSize, data->buf);
   tr_torrentGotBlock (data->tor, data->block);
   data->done = true;
 }
   
-
 static int
-test_incomplete_dir_is_subdir_of_download_dir (void)
+test_incomplete_dir_impl (const char * incomplete_dir, const char * download_dir)
 {
   size_t i;
-  char * incomplete_dir;
+  tr_session * session;
   tr_torrent * tor;
   tr_completeness completeness;
   const tr_completeness completeness_unset = -1;
   const time_t deadline = time(NULL) + 5;
+  tr_variant settings;
 
   /* init the session */
-  libtransmission_test_session_init ();
-  incomplete_dir = tr_buildPath (downloadDir, "incomplete", NULL);
-  tr_sessionSetIncompleteDir (session, incomplete_dir);
-  tr_sessionSetIncompleteDirEnabled (session, true);
+  tr_variantInitDict (&settings, 3);
+  tr_variantDictAddStr (&settings, TR_KEY_download_dir, download_dir);
+  tr_variantDictAddStr (&settings, TR_KEY_incomplete_dir, incomplete_dir);
+  tr_variantDictAddBool (&settings, TR_KEY_incomplete_dir_enabled, true);
+  session = libttest_session_init (&settings);
+  tr_variantFree (&settings);
+  download_dir = tr_sessionGetDownloadDir (session);
+  incomplete_dir = tr_sessionGetIncompleteDir (session);
 
   /* init an incomplete torrent.
      the test zero_torrent will be missing its first piece */
-  tor = libtransmission_test_zero_torrent_init ();
-  libtransmission_test_zero_torrent_populate (tor, false);
+  tor = libttest_zero_torrent_init (session);
+  libttest_zero_torrent_populate (tor, false);
   check (tr_torrentStat(tor)->leftUntilDone == tor->info.pieceSize);
   check_file_location (tor, 0, tr_strdup_printf("%s/%s.part", incomplete_dir, tor->info.files[0].name));
   check_file_location (tor, 1, tr_buildPath(incomplete_dir, tor->info.files[1].name, NULL));
@@ -94,8 +99,9 @@ test_incomplete_dir_is_subdir_of_download_dir (void)
   {
     tr_block_index_t first, last;
     char * zero_block = tr_new0 (char, tor->blockSize);
-    struct test_incomplete_dir_is_subdir_of_download_dir_data data;
+    struct test_incomplete_dir_data data;
 
+    data.session = session;
     data.tor = tor;
     data.pieceIndex = 0;
     data.buf = evbuffer_new ();
@@ -107,7 +113,7 @@ test_incomplete_dir_is_subdir_of_download_dir (void)
         data.block = i;
         data.done = false;
         data.offset = data.block * tor->blockSize;
-        tr_runInEventThread (session, test_incomplete_dir_is_subdir_of_download_dir_threadfunc, &data);
+        tr_runInEventThread (session, test_incomplete_dir_threadfunc, &data);
         do { tr_wait_msec(50); } while (!data.done);
       }
 
@@ -123,15 +129,33 @@ test_incomplete_dir_is_subdir_of_download_dir (void)
 
   check_int_eq (TR_SEED, completeness);
   for (i=0; i<tor->info.fileCount; ++i)
-    check_file_location (tor, i, tr_buildPath (downloadDir, tor->info.files[i].name, NULL));
+    check_file_location (tor, i, tr_buildPath (download_dir, tor->info.files[i].name, NULL));
 
   /* cleanup */
   tr_torrentRemove (tor, true, remove);
-  libtransmission_test_session_close ();
-  tr_free (incomplete_dir);
+  libttest_session_close (session);
   return 0;
 }
 
+static int
+test_incomplete_dir (void)
+{
+  int rv;
+
+  /* test what happens when incompleteDir is a subdir of downloadDir*/
+  if ((rv = test_incomplete_dir_impl ("Downloads/Incomplete", "Downloads")))
+    return rv;
+
+  /* test what happens when downloadDir is a subdir of incompleteDir */
+  if ((rv = test_incomplete_dir_impl ("Downloads", "Downloads/Complete")))
+    return rv;
+
+  /* test what happens when downloadDir and incompleteDir are siblings */
+  if ((rv = test_incomplete_dir_impl ("Incomplete", "Downloads")))
+    return rv;
+
+  return 0;
+}
 
 /***
 ****
@@ -140,7 +164,7 @@ test_incomplete_dir_is_subdir_of_download_dir (void)
 int
 main (void)
 {
-  const testFunc tests[] = { test_incomplete_dir_is_subdir_of_download_dir };
+  const testFunc tests[] = { test_incomplete_dir };
 
   return runTests (tests, NUM_TESTS (tests));
 }

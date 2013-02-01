@@ -191,78 +191,90 @@ rm_rf (const char * killme)
 #define SPEED_G_STR "GB/s"
 #define SPEED_T_STR "TB/s"
 
-void
-libtransmission_test_session_init_formatters (void)
+tr_session *
+libttest_session_init (tr_variant * settings)
 {
-  tr_formatter_mem_init (MEM_K, MEM_K_STR, MEM_M_STR, MEM_G_STR, MEM_T_STR);
-  tr_formatter_size_init (DISK_K,DISK_K_STR, DISK_M_STR, DISK_G_STR, DISK_T_STR);
-  tr_formatter_speed_init (SPEED_K, SPEED_K_STR, SPEED_M_STR, SPEED_G_STR, SPEED_T_STR);
-}
+  size_t len;
+  const char * str;
+  char * sandbox;
+  char * path;
+  tr_quark q;
+  static bool formatters_inited = false;
+  tr_session * session;
+  tr_variant local_settings;
 
-void
-libtransmission_test_session_init_sandbox (void)
-{
-  char * cwd;
+  tr_variantInitDict (&local_settings, 10);
 
-  /* create a sandbox for the test session */
-  cwd = tr_getcwd ();
-  sandbox = tr_buildPath (cwd, "sandbox-XXXXXX", NULL);
+  if (settings == NULL)
+    settings = &local_settings;
+
+  path = tr_getcwd ();
+  sandbox = tr_buildPath (path, "sandbox-XXXXXX", NULL);
   tr_mkdtemp (sandbox);
-  downloadDir = tr_buildPath (sandbox, "Downloads", NULL);
-  tr_mkdirp (downloadDir, 0700);
-  blocklistDir = tr_buildPath (sandbox, "blocklists", NULL);
-  tr_mkdirp (blocklistDir, 0700);
+  tr_free (path);
 
-  /* cleanup locals*/
-  tr_free (cwd);
+  if (!formatters_inited)
+    {
+      formatters_inited = true;
+      tr_formatter_mem_init (MEM_K, MEM_K_STR, MEM_M_STR, MEM_G_STR, MEM_T_STR);
+      tr_formatter_size_init (DISK_K,DISK_K_STR, DISK_M_STR, DISK_G_STR, DISK_T_STR);
+      tr_formatter_speed_init (SPEED_K, SPEED_K_STR, SPEED_M_STR, SPEED_G_STR, SPEED_T_STR);
+    }
+
+  /* download dir */
+  q = TR_KEY_download_dir;
+  if (tr_variantDictFindStr (settings, q, &str, &len))
+    path = tr_strdup_printf ("%s/%*.*s", sandbox, (int)len, (int)len, str);
+  else
+    path = tr_buildPath (sandbox, "Downloads", NULL);
+  tr_mkdirp (path, 0700);
+  tr_variantDictAddStr (settings, q, path);
+  tr_free (path);
+
+  /* incomplete dir */
+  q = TR_KEY_incomplete_dir;
+  if (tr_variantDictFindStr (settings, q, &str, &len))
+    path = tr_strdup_printf ("%s/%*.*s", sandbox, (int)len, (int)len, str);
+  else
+    path = tr_buildPath (sandbox, "Incomplete", NULL);
+  tr_variantDictAddStr (settings, q, path);
+  tr_free (path);
+
+  path = tr_buildPath (sandbox, "blocklists", NULL);
+  tr_mkdirp (path, 0700);
+  tr_free (path);
+
+  q = TR_KEY_port_forwarding_enabled;
+  if (!tr_variantDictFind (settings, q))
+    tr_variantDictAddBool (settings, q, false);
+
+  q = TR_KEY_dht_enabled;
+  if (!tr_variantDictFind (settings, q))
+    tr_variantDictAddBool (settings, q, false);
+
+  q = TR_KEY_message_level;
+  if (!tr_variantDictFind (settings, q))
+    tr_variantDictAddInt (settings, q, verbose ? TR_LOG_DEBUG : TR_LOG_ERROR);
+
+  session = tr_sessionInit ("libtransmission-test", sandbox, !verbose, settings);
+
+  tr_free (sandbox);
+  tr_variantFree (&local_settings);
+  return session;
 }
 
 void
-libtransmission_test_session_init_session (void)
+libttest_session_close (tr_session * session)
 {
-  tr_variant dict;
+  char * path;
 
-  /* libtransmission_test_session_init_sandbox() has to be called first */
-  assert (sandbox != NULL);
-  assert (session == NULL);
-
-  /* init the session */
-  tr_variantInitDict    (&dict, 4);
-  tr_variantDictAddStr  (&dict, TR_KEY_download_dir, downloadDir);
-  tr_variantDictAddBool (&dict, TR_KEY_port_forwarding_enabled, false);
-  tr_variantDictAddBool (&dict, TR_KEY_dht_enabled, false);
-  tr_variantDictAddInt  (&dict, TR_KEY_message_level, verbose ? TR_LOG_DEBUG : TR_LOG_ERROR);
-  session = tr_sessionInit ("libtransmission-test", sandbox, !verbose, &dict);
-
-  /* cleanup locals*/
-  tr_variantFree (&dict);
-}
-
-void
-libtransmission_test_session_init (void)
-{
-  libtransmission_test_session_init_formatters ();
-  libtransmission_test_session_init_sandbox ();
-  libtransmission_test_session_init_session ();
-}
-
-void
-libtransmission_test_session_close (void)
-{
+  path = tr_strdup (tr_sessionGetConfigDir (session));
   tr_sessionClose (session);
   tr_logFreeQueue (tr_logGetQueue ());
   session = NULL;
 
-  rm_rf (sandbox);
-
-  tr_free (blocklistDir);
-  blocklistDir = NULL;
-
-  tr_free (downloadDir);
-  downloadDir = NULL;
-
-  tr_free (sandbox);
-  sandbox = NULL;
+  rm_rf (path);
+  tr_free (path);
 }
 
 /***
@@ -270,7 +282,7 @@ libtransmission_test_session_close (void)
 ***/
 
 tr_torrent *
-libtransmission_test_zero_torrent_init (void)
+libttest_zero_torrent_init (tr_session * session)
 {
   int err;
   int metainfo_len;
@@ -325,7 +337,7 @@ libtransmission_test_zero_torrent_init (void)
 }
 
 void
-libtransmission_test_zero_torrent_populate (tr_torrent * tor, bool complete)
+libttest_zero_torrent_populate (tr_torrent * tor, bool complete)
 {
   tr_file_index_t i;
 
@@ -384,8 +396,8 @@ libttest_blockingTorrentVerify (tr_torrent * tor)
 {
   bool done = false;
 
-  assert (session != NULL);
-  assert (!tr_amInEventThread (session));
+  assert (tor->session != NULL);
+  assert (!tr_amInEventThread (tor->session));
 
   tr_torrentVerify (tor, onVerifyDone, &done);
   while (!done)

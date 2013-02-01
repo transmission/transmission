@@ -66,20 +66,11 @@ int main (void) { \
     return runTests (tests, 1); \
 }
 
-extern tr_session * session;
-extern char * sandbox;
-extern char * downloadDir;
-extern char * blocklistDir;
+tr_session * libttest_session_init (struct tr_variant * settings);
+void         libttest_session_close (tr_session * session);
 
-void libtransmission_test_session_init_formatters (void);
-void libtransmission_test_session_init_sandbox (void);
-void libtransmission_test_session_init_session (void);
-void libtransmission_test_session_init (void); /* utility; calls the other 3 */
-
-void libtransmission_test_session_close (void);
-
-void         libtransmission_test_zero_torrent_populate (tr_torrent * tor, bool complete);
-tr_torrent * libtransmission_test_zero_torrent_init (void);
+void         libttest_zero_torrent_populate (tr_torrent * tor, bool complete);
+tr_torrent * libttest_zero_torrent_init (tr_session * session);
 
 void         libttest_blockingTorrentVerify (tr_torrent * tor);
 

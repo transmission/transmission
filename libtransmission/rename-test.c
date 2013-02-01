@@ -20,6 +20,8 @@
 ****
 ***/
 
+static tr_session * session = NULL;
+
 #define check_have_none(tor, totalSize) \
   do { \
     const tr_stat * st = tr_torrentStat(tor); \
@@ -126,7 +128,6 @@ create_torrent_from_base64_metainfo (tr_ctor * ctor, const char * metainfo_base6
   metainfo = tr_base64_decode (metainfo_base64, -1, &metainfo_len);
   assert (metainfo != NULL);
   assert (metainfo_len > 0);
-  assert (session != NULL);
   tr_ctorSetMetainfo (ctor, (uint8_t*)metainfo, metainfo_len);
   tr_ctorSetPaused (ctor, TR_FORCE, true);
 
@@ -485,7 +486,7 @@ test_partial_file (void)
   ****  create our test torrent with an incomplete .part file 
   ***/
 
-  tor = libtransmission_test_zero_torrent_init ();
+  tor = libttest_zero_torrent_init (session);
   check_int_eq (totalSize, tor->info.totalSize);
   check_int_eq (pieceSize, tor->info.pieceSize);
   check_int_eq (pieceCount, tor->info.pieceCount);
@@ -493,7 +494,7 @@ test_partial_file (void)
   check_streq ("files-filled-with-zeroes/4096",    tor->info.files[1].name);
   check_streq ("files-filled-with-zeroes/512",     tor->info.files[2].name);
 
-  libtransmission_test_zero_torrent_populate (tor, false);
+  libttest_zero_torrent_populate (tor, false);
   fst = tr_torrentFiles (tor, NULL);
   check_int_eq (length[0] - pieceSize, fst[0].bytesCompleted);
   check_int_eq (length[1],             fst[1].bytesCompleted);
@@ -543,9 +544,9 @@ main (void)
                              test_multifile_torrent,
                              test_partial_file };
 
-  libtransmission_test_session_init ();
+  session = libttest_session_init (NULL);
   ret = runTests (tests, NUM_TESTS (tests));
-  libtransmission_test_session_close ();
+  libttest_session_close (session);
 
   return ret;
 }

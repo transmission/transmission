@@ -76,10 +76,14 @@ rpc_response_func (tr_session      * session    UNUSED,
 static int
 test_session_get_and_set (void)
 {
+  tr_session * session;
   const char * json;
   tr_variant response;
   tr_variant * args;
-  tr_torrent * tor = libtransmission_test_zero_torrent_init ();
+  tr_torrent * tor;
+
+  session = libttest_session_init (NULL);
+  tor= libttest_zero_torrent_init (session);
   check (tor != NULL);
 
   json = "{\"method\":\"session-get\"}";
@@ -141,6 +145,7 @@ test_session_get_and_set (void)
 
   /* cleanup */
   tr_torrentRemove (tor, false, NULL);
+  libttest_session_close (session);
   return 0;
 }
 
@@ -151,13 +156,8 @@ test_session_get_and_set (void)
 int
 main (void)
 {
-  int ret;
   const testFunc tests[] = { test_list,
                              test_session_get_and_set };
 
-  libtransmission_test_session_init ();
-  ret = runTests (tests, NUM_TESTS (tests));
-  libtransmission_test_session_close ();
-
-  return ret;
+  return runTests (tests, NUM_TESTS (tests));
 }

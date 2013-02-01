@@ -23,25 +23,26 @@ static const char * contents2 =
   "Fox Speed Channel:216.79.131.192-216.79.131.223\n"
   "Evilcorp:216.88.88.0-216.88.88.255\n";
 
-static char *
-create_blocklist_text_file (const char * basename, const char * contents)
+static void
+create_text_file (const char * path, const char * contents)
 {
   FILE * fp;
-  char * path;
+  char * dir;
 
-  assert (blocklistDir != NULL);
+  dir = tr_dirname (path);
+  tr_mkdirp (dir, 0700);
+  tr_free (dir);
 
-  path = tr_buildPath (blocklistDir, basename, NULL);
   remove (path);
   fp = fopen (path, "w+");
   fprintf (fp, "%s", contents);
   fclose (fp);
+
   sync ();
-  return path;
 }
 
 static bool
-address_is_blocked (const char * address_str)
+address_is_blocked (tr_session * session, const char * address_str)
 {
   struct tr_address addr;
   tr_address_from_string (&addr, address_str);
@@ -51,35 +52,44 @@ address_is_blocked (const char * address_str)
 static int
 test_parsing (void)
 {
-  char * text_file;
+  char * path;
+  tr_session * session;
 
-  libtransmission_test_session_init_sandbox ();
-  text_file = create_blocklist_text_file ("level1", contents1);
-  libtransmission_test_session_init_session ();
+  /* init the session */
+  session = libttest_session_init (NULL);
+  check (!tr_blocklistExists (session));
+  check_int_eq (0, tr_blocklistGetRuleCount (session));
 
+  /* init the blocklist */
+  path = tr_buildPath (tr_sessionGetConfigDir(session), "blocklists", "level1", NULL);
+  create_text_file (path, contents1);
+  tr_free (path);
+  tr_sessionReloadBlocklists (session);
+  check (tr_blocklistExists (session));
+  check_int_eq (4, tr_blocklistGetRuleCount (session));
+
+  /* enable the blocklist */
   check (!tr_blocklistIsEnabled (session));
   tr_blocklistSetEnabled (session, true);
   check (tr_blocklistIsEnabled (session));
 
-  check (tr_blocklistExists (session));
-  check_int_eq (4, tr_blocklistGetRuleCount (session));
+  /* test blocked addresses */
+  check (!address_is_blocked (session, "216.16.1.143"));
+  check ( address_is_blocked (session, "216.16.1.144"));
+  check ( address_is_blocked (session, "216.16.1.145"));
+  check ( address_is_blocked (session, "216.16.1.146"));
+  check ( address_is_blocked (session, "216.16.1.147"));
+  check ( address_is_blocked (session, "216.16.1.148"));
+  check ( address_is_blocked (session, "216.16.1.149"));
+  check ( address_is_blocked (session, "216.16.1.150"));
+  check ( address_is_blocked (session, "216.16.1.151"));
+  check (!address_is_blocked (session, "216.16.1.152"));
+  check (!address_is_blocked (session, "216.16.1.153"));
+  check (!address_is_blocked (session, "217.0.0.1"));
+  check (!address_is_blocked (session, "255.0.0.1"));
 
-  check (!address_is_blocked ("216.16.1.143"));
-  check ( address_is_blocked ("216.16.1.144"));
-  check ( address_is_blocked ("216.16.1.145"));
-  check ( address_is_blocked ("216.16.1.146"));
-  check ( address_is_blocked ("216.16.1.147"));
-  check ( address_is_blocked ("216.16.1.148"));
-  check ( address_is_blocked ("216.16.1.149"));
-  check ( address_is_blocked ("216.16.1.150"));
-  check ( address_is_blocked ("216.16.1.151"));
-  check (!address_is_blocked ("216.16.1.152"));
-  check (!address_is_blocked ("216.16.1.153"));
-  check (!address_is_blocked ("217.0.0.1"));
-  check (!address_is_blocked ("255.0.0.1"));
-
-  libtransmission_test_session_close ();
-  tr_free (text_file);
+  /* cleanup */
+  libttest_session_close (session);
   return 0;
 }
 
@@ -90,33 +100,39 @@ test_parsing (void)
 static int
 test_updating (void)
 {
-  char * text_file;
+  char * path;
+  tr_session * session;
 
-  libtransmission_test_session_init_sandbox ();
-  text_file = create_blocklist_text_file ("level1", contents1);
-  libtransmission_test_session_init_session ();
+  /* init the session */
+  session = libttest_session_init (NULL);
+  path = tr_buildPath (tr_sessionGetConfigDir(session), "blocklists", "level1", NULL);
+
+  /* no blocklist to start with... */
+  check_int_eq (0, tr_blocklistGetRuleCount (session));
+
+  /* test that updated source files will get loaded */
+  create_text_file (path, contents1);
+  tr_sessionReloadBlocklists (session);
   check_int_eq (4, tr_blocklistGetRuleCount (session));
 
   /* test that updated source files will get loaded */
-  tr_free (text_file);
-  text_file = create_blocklist_text_file ("level1", contents2);
+  create_text_file (path, contents2);
   tr_sessionReloadBlocklists (session);
   check_int_eq (5, tr_blocklistGetRuleCount (session));
 
   /* test that updated source files will get loaded */
-  tr_free (text_file);
-  text_file = create_blocklist_text_file ("level1", contents1);
+  create_text_file (path, contents1);
   tr_sessionReloadBlocklists (session);
   check_int_eq (4, tr_blocklistGetRuleCount (session));
 
   /* ensure that new files, if bad, get skipped */
-  tr_free (text_file);
-  text_file = create_blocklist_text_file ("level1", "# nothing useful\n");
+  create_text_file (path,  "# nothing useful\n");
   tr_sessionReloadBlocklists (session);
   check_int_eq (4, tr_blocklistGetRuleCount (session));
 
-  libtransmission_test_session_close ();
-  tr_free (text_file);
+  /* cleanup */
+  libttest_session_close (session);
+  tr_free (path);
   return 0;
 }
 
@@ -129,8 +145,6 @@ main (void)
 {
   const testFunc tests[] = { test_parsing,
                              test_updating };
-
-  libtransmission_test_session_init_formatters ();
 
   return runTests (tests, NUM_TESTS (tests));
 }
