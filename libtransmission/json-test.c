@@ -249,7 +249,9 @@ main (void)
     if (setlocale (LC_NUMERIC, comma_locales[i]) != NULL)
       break;
   if (i==n)
-    fprintf (stderr, "WARNING: unable to run locale-specific json tests.\n");
+    fprintf (stderr, "WARNING: unable to run locale-specific json tests. add a locale like %s or %s\n",
+             comma_locales[0],
+             comma_locales[1]);
   else if ((rv = runTests (tests, NUM_TESTS(tests))))
     return rv;
 
