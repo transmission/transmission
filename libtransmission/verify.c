@@ -309,8 +309,17 @@ tr_verifyRemove (tr_torrent * tor)
     }
   else
     {
-      tr_free (tr_list_remove (&verifyList, tor, compareVerifyByTorrent));
+      struct verify_node * node = tr_list_remove (&verifyList, tor, compareVerifyByTorrent);
+
       tr_torrentSetVerifyState (tor, TR_VERIFY_NONE);
+
+      if (node != NULL)
+        {
+          if (node->callback_func != NULL)
+            (*node->callback_func)(tor, true, node->callback_data);
+
+          tr_free (node);
+        }
     }
 
   tr_lockUnlock (lock);
