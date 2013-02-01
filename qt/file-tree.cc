@@ -850,6 +850,11 @@ FileTreeView :: FileTreeView (QWidget * parent, bool isEditable):
   sortByColumn (COL_NAME, Qt::AscendingOrder);
   installEventFilter (this);
 
+  for (int i=0; i<FIRST_VISIBLE_COLUMN; ++i)
+    hideColumn (i);
+  for (int i=LAST_VISIBLE_COLUMN+1; i<NUM_COLUMNS; ++i)
+    hideColumn (i);
+
   for (int i=FIRST_VISIBLE_COLUMN; i<=LAST_VISIBLE_COLUMN; ++i)
     header()->setResizeMode(i, QHeaderView::Interactive);
 
