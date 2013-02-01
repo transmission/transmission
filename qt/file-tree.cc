@@ -10,6 +10,7 @@
  * $Id$
  */
 
+#include <algorithm>
 #include <cassert>
 
 #include <QApplication>
@@ -187,14 +188,15 @@ FileTreeItem :: fileSizeName () const
 
 #include <iostream>
 
-bool
+std::pair<int,int>
 FileTreeItem :: update (const QString& name,
                         bool           wanted,
                         int            priority,
                         uint64_t       haveSize,
                         bool           updateFields)
 {
-  bool changed = false;
+  int changed_count = 0;
+  int changed_fields[3];
 
   if (myName != name)
     {
@@ -202,33 +204,38 @@ FileTreeItem :: update (const QString& name,
         myParent->myFirstUnhashedRow = row();
 
       myName = name;
-      changed = true;
+      changed_fields[changed_count++] = COL_NAME;
     }
 
   if (fileIndex() != -1)
     {
       if (myHaveSize != haveSize)
-        {
-          myHaveSize = haveSize;
-          changed = true;
-        }
+        myHaveSize = haveSize;
 
       if (updateFields)
         {
           if (myIsWanted != wanted)
             {
               myIsWanted = wanted;
-              changed = true;
+              changed_fields[changed_count++] = COL_WANTED;
             }
 
           if (myPriority != priority)
             {
               myPriority = priority;
-              changed = true;
+              changed_fields[changed_count++] = COL_PRIORITY;
             }
         }
     }
 
+  std::pair<int,int> changed (-1, -1);
+  if (changed_count > 0)
+    {
+      std::sort (changed_fields, changed_fields+changed_count);
+      changed.first = changed_fields[0];
+      changed.second = changed_fields [changed_count-1];
+      std::cerr << "changed.first " << changed.first << " changed.second " << changed.second << std::endl;
+    }
   return changed;
 }
 
@@ -569,12 +576,6 @@ FileTreeModel :: findItemForFileIndex (int fileIndex) const
 }
 
 void
-FileTreeModel :: itemChanged (FileTreeItem * item)
-{
-  dataChanged (indexOf(item, FIRST_VISIBLE_COLUMN), indexOf(item, LAST_VISIBLE_COLUMN));
-}
-
-void
 FileTreeModel :: addFile (int                   fileIndex,
                           const QString       & filename,
                           bool                  wanted,
@@ -595,8 +596,9 @@ FileTreeModel :: addFile (int                   fileIndex,
       while (!tokens.isEmpty())
         {
           const QString token = tokens.takeLast();
-          if (item->update (token, wanted, priority, have, updateFields))
-            itemChanged (item);
+          const std::pair<int,int> changed = item->update (token, wanted, priority, have, updateFields);
+          if (changed.first >= 0)
+            dataChanged (indexOf (item, changed.first), indexOf (item, changed.second));
           item = item->parent();
         }
       assert (item == myRootItem);
@@ -632,8 +634,9 @@ FileTreeModel :: addFile (int                   fileIndex,
           assert (item->fileIndex() == fileIndex);
           assert (item->totalSize() == totalSize);
 
-          if (item->update (item->name(), wanted, priority, have, added || updateFields))
-            itemChanged (item);
+          const std::pair<int,int> changed = item->update (item->name(), wanted, priority, have, added || updateFields);
+          if (changed.first >= 0)
+            dataChanged (indexOf (item, changed.first), indexOf (item, changed.second));
         }
     }
 }
