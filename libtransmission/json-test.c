@@ -212,12 +212,38 @@ test_unescape (void)
 int
 main (void)
 {
-    const testFunc tests[] = { test_elements,
-                               test_utf8,
-                               test1,
-                               test2,
-                               test3,
-                               test_unescape };
+  int i;
+  int n;
+  int rv;
 
-    return runTests (tests, NUM_TESTS (tests));
+  const char * comma_locales[] = { "da_DK.UTF-8",
+                                   "fr_FR.UTF-8",
+                                   "ru_RU.UTF-8"};
+
+  const testFunc tests[] = { test_elements,
+                             test_utf8,
+                             test1,
+                             test2,
+                             test3,
+                             test_unescape };
+
+  /* run the tests in a locale with a decimal point of '.' */
+  setlocale (LC_NUMERIC, "C");
+  if ((rv = runTests (tests, NUM_TESTS (tests))))
+    return rv;
+
+  /* run the tests in a locale with a decimal point of ',' */
+  n = sizeof(comma_locales) / sizeof(comma_locales[0]);
+  for (i=0; i<n; ++i)
+    if (setlocale (LC_NUMERIC, comma_locales[i]) != NULL)
+      break;
+  if (i==n)
+    fprintf (stderr, "WARNING: unable to run locale-specific json tests. add a locale like %s or %s\n",
+             comma_locales[0],
+             comma_locales[1]);
+  else if ((rv = runTests (tests, NUM_TESTS(tests))))
+    return rv;
+
+  /* success */
+  return 0;
 }

@@ -279,6 +279,10 @@ tr_jsonParse (const char     * source,
   int error;
   jsonsl_t jsn;
   struct json_wrapper_data data;
+  char lc_numeric[128];
+
+  tr_strlcpy (lc_numeric, setlocale (LC_NUMERIC, NULL), sizeof (lc_numeric));
+  setlocale (LC_NUMERIC, "C");
 
   jsn = jsonsl_new (MAX_DEPTH);
   jsn->action_callback_PUSH = action_callback_PUSH;
@@ -309,5 +313,6 @@ tr_jsonParse (const char     * source,
   error = data.error;
   tr_ptrArrayDestruct (&data.stack, NULL);
   jsonsl_destroy (jsn);
+  setlocale (LC_NUMERIC, lc_numeric);
   return error;
 }
