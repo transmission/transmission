@@ -791,6 +791,7 @@ struct filter_data
   GtkWidget * activity;
   GtkWidget * tracker;
   GtkWidget * entry;
+  GtkWidget * show_lb;
   GtkTreeModel * filter_model;
   int active_activity_type;
   int active_tracker_type;
@@ -854,6 +855,47 @@ selection_changed_cb (GtkComboBox * combo, gpointer vdata)
   gtk_tree_model_filter_refilter (GTK_TREE_MODEL_FILTER (data->filter_model));
 }
 
+/***
+****
+***/
+
+static void
+update_count_label (struct filter_data * data)
+{
+  char buf[512];
+  GtkTreeModel * tmodel = gtk_tree_model_filter_get_model (GTK_TREE_MODEL_FILTER (data->filter_model));
+  const int torrentCount = gtk_tree_model_iter_n_children (tmodel, NULL);
+  const int visibleCount = gtk_tree_model_iter_n_children (data->filter_model, NULL);
+
+  /* set the text */
+  if (visibleCount == torrentCount)
+    g_snprintf (buf, sizeof(buf), _("_Show:"));
+  else
+    g_snprintf (buf, sizeof(buf), _("_Show %'d:"), visibleCount);
+  gtk_label_set_markup_with_mnemonic (GTK_LABEL (data->show_lb), buf);
+}
+
+static void
+on_filter_model_row_inserted (GtkTreeModel * tree_model UNUSED,
+                              GtkTreePath  * path       UNUSED,
+                              GtkTreeIter  * iter       UNUSED,
+                              gpointer       data)
+{
+  update_count_label (data);
+}
+
+static void
+on_filter_model_row_deleted (GtkTreeModel * tree_model UNUSED,
+                             GtkTreePath  * path       UNUSED,
+                             gpointer       data       UNUSED)
+{
+  update_count_label (data);
+}
+
+/***
+****
+***/
+
 GtkWidget *
 gtr_filter_bar_new (tr_session * session, GtkTreeModel * tmodel, GtkTreeModel ** filter_model)
 {
@@ -864,7 +906,6 @@ gtr_filter_bar_new (tr_session * session, GtkTreeModel * tmodel, GtkTreeModel **
   GtkWidget * activity;
   GtkWidget * tracker;
   GtkBox * h_box;
-  const char * str;
   struct filter_data * data;
 
   g_assert (DIRTY_KEY == 0);
@@ -874,9 +915,12 @@ gtr_filter_bar_new (tr_session * session, GtkTreeModel * tmodel, GtkTreeModel **
   TORRENT_MODEL_KEY = g_quark_from_static_string ("tr-filter-torrent-model-key");
 
   data = g_new0 (struct filter_data, 1);
+  data->show_lb = gtk_label_new (NULL);
   data->activity = activity = activity_combo_box_new (tmodel);
   data->tracker = tracker = tracker_combo_box_new (tmodel);
   data->filter_model = gtk_tree_model_filter_new (tmodel, NULL);
+  g_signal_connect (data->filter_model, "row-deleted", G_CALLBACK(on_filter_model_row_deleted), data);
+  g_signal_connect (data->filter_model, "row-inserted", G_CALLBACK(on_filter_model_row_inserted), data);
 
   g_object_set (G_OBJECT (data->tracker), "width-request", 170, NULL);
   g_object_set_qdata (G_OBJECT (gtk_combo_box_get_model (GTK_COMBO_BOX (data->tracker))), SESSION_KEY, session);
@@ -892,10 +936,8 @@ gtr_filter_bar_new (tr_session * session, GtkTreeModel * tmodel, GtkTreeModel **
   h_box = GTK_BOX (h);
 
   /* add the activity combobox */
-  str = _("_Show:");
   w = activity;
-  l = gtk_label_new (NULL);
-  gtk_label_set_markup_with_mnemonic (GTK_LABEL (l), str);
+  l = data->show_lb;
   gtk_label_set_mnemonic_widget (GTK_LABEL (l), w);
   gtk_box_pack_start (h_box, l, FALSE, FALSE, 0);
   gtk_box_pack_start (h_box, w, TRUE, TRUE, 0);
@@ -924,5 +966,6 @@ gtr_filter_bar_new (tr_session * session, GtkTreeModel * tmodel, GtkTreeModel **
   selection_changed_cb (NULL, data);
 
   *filter_model = data->filter_model;
+  update_count_label (data);
   return h;
 }

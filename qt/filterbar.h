@@ -17,6 +17,7 @@
 #include <QItemDelegate>
 #include <QWidget>
 
+class QLabel;
 class QLineEdit;
 class QPaintEvent;
 class QStandardItemModel;
@@ -79,6 +80,7 @@ class FilterBar: public QWidget
     TorrentFilter& myFilter;
     QComboBox * myActivityCombo;
     QComboBox * myTrackerCombo;
+    QLabel * myCountLabel;
     QStandardItemModel * myTrackerModel;
     QTimer * myRecountTimer;
     bool myIsBootstrapping;
@@ -87,6 +89,7 @@ class FilterBar: public QWidget
   private slots:
     void recount ();
     void refreshPref (int key);
+    void refreshCountLabel ();
     void onActivityIndexChanged (int index);
     void onTrackerIndexChanged (int index);
     void onTorrentModelReset ();

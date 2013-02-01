@@ -104,7 +104,6 @@ class TrMainWindow: public QMainWindow
     void showTotalTransfer ();
     void showSessionRatio ();
     void showSessionTransfer ();
-    void refreshVisibleCount ();
     void refreshFreeSpace ();
     void refreshTitle ();
     void refreshStatusBar ();
@@ -155,7 +154,6 @@ class TrMainWindow: public QMainWindow
     QPushButton * myAltSpeedButton;
     QAction * myAltSpeedAction;
     QPushButton * myOptionsButton;
-    QLabel * myVisibleCountLabel;
     QPushButton * myStatsModeButton;
     QLabel * myStatsLabel;
     QLabel * myDownloadSpeedLabel;

@@ -202,8 +202,6 @@ TrMainWindow :: TrMainWindow (Session& session, Prefs& prefs, TorrentModel& mode
   connect (ui.action_SelectAll, SIGNAL (triggered ()), ui.listView, SLOT (selectAll ()));
   connect (ui.action_DeselectAll, SIGNAL (triggered ()), ui.listView, SLOT (clearSelection ()));
 
-  connect (&myFilterModel, SIGNAL (rowsInserted (const QModelIndex&,int,int)), this, SLOT (refreshVisibleCount ()));
-  connect (&myFilterModel, SIGNAL (rowsRemoved (const QModelIndex&,int,int)), this, SLOT (refreshVisibleCount ()));
   connect (&myFilterModel, SIGNAL (rowsInserted (const QModelIndex&,int,int)), this, SLOT (refreshActionSensitivitySoon ()));
   connect (&myFilterModel, SIGNAL (rowsRemoved (const QModelIndex&,int,int)), this, SLOT (refreshActionSensitivitySoon ()));
 
@@ -307,7 +305,6 @@ TrMainWindow :: TrMainWindow (Session& session, Prefs& prefs, TorrentModel& mode
   refreshStatusBar ();
   refreshFreeSpace ();
   refreshTitle ();
-  refreshVisibleCount ();
 }
 
 TrMainWindow :: ~TrMainWindow ()
@@ -328,7 +325,6 @@ void
 TrMainWindow :: onModelReset ()
 {
   refreshTitle ();
-  refreshVisibleCount ();
   refreshActionSensitivitySoon ();
   refreshStatusBar ();
   refreshTrayIconSoon ();
@@ -395,17 +391,12 @@ TrMainWindow :: createStatusBar ()
 
   h->addStretch (1);
 
-    l = myVisibleCountLabel = new QLabel (this);
+    l = myFreeSpaceIconLabel = new QLabel (this);
+    l->setPixmap (getStockIcon ("drive-harddisk", QStyle::SP_DriveHDIcon).pixmap (smallIconSize));
     h->addWidget (l);
-
-  h->addSpacing (HIG::PAD_BIG);
-
     l = myFreeSpaceTextLabel = new QLabel (this);
     const int minimumFreeSpaceWidth = l->fontMetrics ().width (Formatter::sizeToString (1024 * 1024));
     l->setMinimumWidth (minimumFreeSpaceWidth);
-    h->addWidget (l);
-    l = myFreeSpaceIconLabel = new QLabel (this);
-    l->setPixmap (getStockIcon ("drive-harddisk", QStyle::SP_DriveHDIcon).pixmap (smallIconSize));
     h->addWidget (l);
 
   h->addStretch (1);
@@ -728,33 +719,19 @@ TrMainWindow :: refreshTitle ()
 }
 
 void
-TrMainWindow :: refreshVisibleCount ()
-{
-  const int visibleCount (myFilterModel.rowCount ());
-  const int totalCount (visibleCount + myFilterModel.hiddenRowCount ());
-  QString str;
-  if (visibleCount == totalCount)
-    str = tr ("%Ln Torrent (s)", 0, totalCount);
-  else
-    str = tr ("%L1 of %Ln Torrent (s)", 0, totalCount).arg (visibleCount);
-  myVisibleCountLabel->setText (str);
-  myVisibleCountLabel->setVisible (totalCount > 0);
-}
-
-void
 TrMainWindow :: refreshFreeSpace ()
 {
   const int64_t bytes (mySession.downloadDirFreeSpace ());
 
   if (bytes >= 0)
     {
-      const QString text = Formatter::sizeToString (bytes);
+      const QString sizeStr = Formatter::sizeToString (bytes);
 
       const QString tip = tr ("Download folder \"%1\" has %2 free")
         .arg (myPrefs.getString (Prefs::DOWNLOAD_DIR))
-        .arg (text);
+        .arg (sizeStr);
 
-      myFreeSpaceTextLabel->setText (text);
+      myFreeSpaceTextLabel->setText (sizeStr);
       myFreeSpaceTextLabel->setToolTip (tip);
       myFreeSpaceIconLabel->setToolTip (tip);
     }

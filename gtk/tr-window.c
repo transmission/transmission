@@ -56,7 +56,6 @@ typedef struct
     GtkLabel           * stats_lb;
     GtkLabel           * freespace_lb;
     GtkWidget          * freespace_icon;
-    GtkLabel           * count_lb;
     GtkWidget          * alt_speed_image;
     GtkWidget          * alt_speed_button;
     GtkWidget          * options_menu;
@@ -716,23 +715,16 @@ gtr_window_new (GtkApplication * app, GtkUIManager * ui_mgr, TrCore * core)
   gtk_grid_attach_next_to (grid, w, sibling, GTK_POS_RIGHT, 1, 1);
   sibling = w;
 
-  /* torrent count */
-  w = gtk_label_new ("N Torrents");
-  p->count_lb = GTK_LABEL (w);
-  gtk_label_set_single_line_mode (p->count_lb, TRUE);
+  /* freespace */
+  w = gtk_image_new_from_stock (GTK_STOCK_HARDDISK, GTK_ICON_SIZE_MENU);
+  p->freespace_icon = w;
+  g_object_set (G_OBJECT(w), "margin-left", GUI_PAD, NULL);
   gtk_grid_attach_next_to (grid, w, sibling, GTK_POS_RIGHT, 1, 1);
   sibling = w;
-
-  /* freespace */
   w = gtk_label_new (NULL);
   g_object_set (G_OBJECT(w), "margin-left", GUI_PAD_BIG*2, NULL);
   p->freespace_lb = GTK_LABEL (w);
   gtk_label_set_single_line_mode (p->freespace_lb, TRUE);
-  gtk_grid_attach_next_to (grid, w, sibling, GTK_POS_RIGHT, 1, 1);
-  sibling = w;
-  w = gtk_image_new_from_stock (GTK_STOCK_HARDDISK, GTK_ICON_SIZE_MENU);
-  p->freespace_icon = w;
-  g_object_set (G_OBJECT(w), "margin-left", GUI_PAD, NULL);
   gtk_grid_attach_next_to (grid, w, sibling, GTK_POS_RIGHT, 1, 1);
   sibling = w;
 
@@ -830,42 +822,6 @@ gtr_window_new (GtkApplication * app, GtkUIManager * ui_mgr, TrCore * core)
 }
 
 static void
-updateTorrentCount (PrivateData * p)
-{
-  bool visible = false;
-
-  g_return_if_fail (p != NULL);
-
-  if (p->core != NULL)
-    {
-      const int torrentCount = gtk_tree_model_iter_n_children (gtr_core_model (p->core), NULL);
-      const int visibleCount = gtk_tree_model_iter_n_children (p->filter_model, NULL);
-
-      visible = torrentCount > 0;
-
-      if (visible)
-        {
-          char countStr[512];
-
-          if (torrentCount != visibleCount)
-            g_snprintf (countStr, sizeof (countStr),
-                        ngettext ("%1$'d of %2$'d Torrent",
-                                  "%1$'d of %2$'d Torrents",
-                                  torrentCount),
-                        visibleCount, torrentCount);
-          else
-            g_snprintf (countStr, sizeof (countStr),
-                        ngettext ("%'d Torrent", "%'d Torrents", torrentCount),
-                        torrentCount);
-
-          gtr_label_set_text (p->count_lb, countStr);
-        }
-    }
-
-  gtk_widget_set_visible (GTK_WIDGET(p->count_lb), visible);
-}
-
-static void
 updateFreeSpace (PrivateData * p)
 {
   GtkWidget * w;
@@ -887,8 +843,10 @@ updateFreeSpace (PrivateData * p)
         {
           char * tip;
           char sizeStr[32];
+
           tr_strlsize (sizeStr, n, sizeof(sizeStr));
           gtk_label_set_text (p->freespace_lb, sizeStr);
+
           tip = tr_strdup_printf (_("Download folder \"%1$s\" has %2$s free"), downloadDir, sizeStr);
           gtk_widget_set_tooltip_text (w, tip);
           g_free (tip);
@@ -989,7 +947,6 @@ gtr_window_refresh (GtkWindow * self)
   if (p && p->core && gtr_core_session (p->core))
     {
       updateSpeeds (p);
-      updateTorrentCount (p);
       updateStats (p);
       updateFreeSpace (p);
     }

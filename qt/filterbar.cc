@@ -406,9 +406,10 @@ FilterBar :: FilterBar (Prefs& prefs, TorrentModel& torrents, TorrentFilter& fil
   QHBoxLayout * h = new QHBoxLayout (this);
   const int hmargin = qMax (int (HIG::PAD), style ()->pixelMetric (QStyle::PM_LayoutHorizontalSpacing));
 
+  myCountLabel = new QLabel;
   h->setSpacing (0);
   h->setContentsMargins (2, 2, 2, 2);
-  h->addWidget (new QLabel (tr ("Show:"), this));
+  h->addWidget (myCountLabel);
   h->addSpacing (hmargin);
 
   myActivityCombo = createActivityCombo ();
@@ -437,6 +438,8 @@ FilterBar :: FilterBar (Prefs& prefs, TorrentModel& torrents, TorrentFilter& fil
   connect (&myPrefs, SIGNAL (changed (int)), this, SLOT (refreshPref (int)));
   connect (myActivityCombo, SIGNAL (currentIndexChanged (int)), this, SLOT (onActivityIndexChanged (int)));
   connect (myTrackerCombo, SIGNAL (currentIndexChanged (int)), this, SLOT (onTrackerIndexChanged (int)));
+  connect (&myFilter, SIGNAL (rowsInserted (const QModelIndex&,int,int)), this, SLOT (refreshCountLabel ()));
+  connect (&myFilter, SIGNAL (rowsRemoved (const QModelIndex&,int,int)), this, SLOT (refreshCountLabel ()));
   connect (&myTorrents, SIGNAL (modelReset ()), this, SLOT (onTorrentModelReset ()));
   connect (&myTorrents, SIGNAL (rowsInserted (const QModelIndex&,int,int)), this, SLOT (onTorrentModelRowsInserted (const QModelIndex&,int,int)));
   connect (&myTorrents, SIGNAL (rowsRemoved (const QModelIndex&,int,int)), this, SLOT (onTorrentModelRowsRemoved (const QModelIndex&,int,int)));
@@ -445,6 +448,7 @@ FilterBar :: FilterBar (Prefs& prefs, TorrentModel& torrents, TorrentFilter& fil
 
   recountSoon ();
   refreshTrackers ();
+  refreshCountLabel ();
   myIsBootstrapping = false;
 
   // initialize our state
@@ -577,4 +581,16 @@ QString
 FilterBar :: getCountString (int n) const
 {
   return QString ("%L1").arg (n);
+}
+
+void
+FilterBar :: refreshCountLabel ()
+{
+  const int visibleCount = myFilter.rowCount ();
+  const int torrentCount = visibleCount + myFilter.hiddenRowCount ();
+
+  if (visibleCount == torrentCount)
+    myCountLabel->setText (tr("Show:"));
+  else
+    myCountLabel->setText (tr("Show %Ln:", 0, visibleCount));
 }
