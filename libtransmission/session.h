@@ -223,20 +223,12 @@ struct tr_session
 
     struct tr_bindinfo         * public_ipv4;
     struct tr_bindinfo         * public_ipv6;
-
-    uint8_t peer_id[PEER_ID_LEN+1];
 };
 
 static inline tr_port
 tr_sessionGetPublicPeerPort (const tr_session * session)
 {
     return session->public_peer_port;
-}
-
-static inline const uint8_t*
-tr_getPeerId (tr_session * session)
-{
-    return session->peer_id;
 }
 
 bool         tr_sessionAllowsDHT (const tr_session * session);

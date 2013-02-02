@@ -592,7 +592,6 @@ tr_sessionInit (const char  * tag,
     session->tag = tr_strdup (tag);
     session->magicNumber = SESSION_MAGIC_NUMBER;
     tr_bandwidthConstruct (&session->bandwidth, session, NULL);
-    tr_peerIdInit (session->peer_id);
     tr_variantInitList (&session->removedTorrents, 0);
 
     /* nice to start logging at the very beginning */
