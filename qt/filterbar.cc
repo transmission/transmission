@@ -31,9 +31,10 @@
 
 enum
 {
-    TorrentCountRole = Qt::UserRole + 1,
-    ActivityRole,
-    TrackerRole
+  TorrentCountRole = Qt::UserRole + 1,
+  TorrentCountStringRole,
+  ActivityRole,
+  TrackerRole
 };
 
 namespace
@@ -98,7 +99,7 @@ FilterBarComboBoxDelegate :: paint (QPainter                    * painter,
                                             decorationRect.size (), boundingBox);
       boundingBox.setLeft (decorationRect.right () + hmargin);
 
-      QRect countRect  = rect (option, index, TorrentCountRole);
+      QRect countRect  = rect (option, index, TorrentCountStringRole);
       countRect = QStyle::alignedRect (Qt::LeftToRight,
                                        Qt::AlignRight|Qt::AlignVCenter,
                                        countRect.size (), boundingBox);
@@ -110,7 +111,7 @@ FilterBarComboBoxDelegate :: paint (QPainter                    * painter,
       option2.decorationSize = myCombo->iconSize ();
       drawDecoration (painter, option, decorationRect, decoration (option2,index.data (Qt::DecorationRole)));
       drawDisplay (painter, option, displayRect, index.data (Qt::DisplayRole).toString ());
-      drawDisplay (painter, disabledOption, countRect, index.data (TorrentCountRole).toString ());
+      drawDisplay (painter, disabledOption, countRect, index.data (TorrentCountStringRole).toString ());
       drawFocus (painter, option, displayRect|countRect);
     }
 }
@@ -132,7 +133,7 @@ FilterBarComboBoxDelegate :: sizeHint (const QStyleOptionViewItem & option,
       QSize size = QItemDelegate::sizeHint (option, index);
       size.setHeight (qMax (size.height (), myCombo->iconSize ().height () + 6));
       size.rwidth () += s->pixelMetric (QStyle::PM_FocusFrameHMargin, 0, myCombo);
-      size.rwidth () += rect (option,index,TorrentCountRole).width ();
+      size.rwidth () += rect (option,index,TorrentCountStringRole).width ();
       size.rwidth () += hmargin * 4;
       return size;
     }
@@ -145,6 +146,18 @@ FilterBarComboBoxDelegate :: sizeHint (const QStyleOptionViewItem & option,
 FilterBarComboBox :: FilterBarComboBox (QWidget * parent):
   QComboBox (parent)
 {
+}
+
+int
+FilterBarComboBox :: currentCount () const
+{
+  int count = 0;
+
+  const QModelIndex modelIndex = model ()->index (currentIndex (), 0, rootModelIndex ());
+  if (modelIndex.isValid ())
+    count = modelIndex.data (TorrentCountRole).toInt ();
+
+  return count;
 }
 
 void
@@ -185,7 +198,7 @@ FilterBarComboBox :: paintEvent (QPaintEvent * e)
         }
 
       // draw the count
-      QString text = modelIndex.data (TorrentCountRole).toString ();
+      QString text = modelIndex.data (TorrentCountStringRole).toString ();
       if (!text.isEmpty ())
         {
           const QPen pen = painter.pen ();
@@ -209,10 +222,10 @@ FilterBarComboBox :: paintEvent (QPaintEvent * e)
 *****
 ****/
 
-QComboBox*
+FilterBarComboBox *
 FilterBar :: createActivityCombo ()
 {
-  QComboBox * c = new FilterBarComboBox (this);
+  FilterBarComboBox * c = new FilterBarComboBox (this);
   FilterBarComboBoxDelegate * delegate = new FilterBarComboBoxDelegate (0, c);
   c->setItemDelegate (delegate);
 
@@ -318,14 +331,17 @@ FilterBar :: refreshTrackers ()
     }
 
   // update the "All" row
-  myTrackerModel->setData (myTrackerModel->index (0,0), getCountString (myTorrents.rowCount ()), TorrentCountRole);
+  myTrackerModel->setData (myTrackerModel->index (0,0), myTorrents.rowCount (), TorrentCountRole);
+  myTrackerModel->setData (myTrackerModel->index (0,0), getCountString (myTorrents.rowCount ()), TorrentCountStringRole);
 
   // rows to update
   foreach (QString host, oldHosts & newHosts)
     {
       const QString name = readableHostName (host);
       QStandardItem * row = myTrackerModel->findItems (name).front ();
-      row->setData (getCountString (torrentsPerHost[name]), TorrentCountRole);
+      const int count = torrentsPerHost[name];
+      row->setData (count, TorrentCountRole);
+      row->setData (getCountString (count), TorrentCountStringRole);
       row->setData (favicons.findFromHost (host), Qt::DecorationRole);
     }
 
@@ -358,7 +374,9 @@ FilterBar :: refreshTrackers ()
 
       // add the row
       QStandardItem * row = new QStandardItem (favicons.findFromHost (host), name);
-      row->setData (getCountString (torrentsPerHost[host]), TorrentCountRole);
+      const int count = torrentsPerHost[host];
+      row->setData (count, TorrentCountRole);
+      row->setData (getCountString (count), TorrentCountStringRole);
       row->setData (favicons.findFromHost (host), Qt::DecorationRole);
       row->setData (host, TrackerRole);
       myTrackerModel->insertRow (i, row);
@@ -370,16 +388,18 @@ FilterBar :: refreshTrackers ()
 }
 
 
-QComboBox*
+FilterBarComboBox *
 FilterBar :: createTrackerCombo (QStandardItemModel * model)
 {
-  QComboBox * c = new FilterBarComboBox (this);
+  FilterBarComboBox * c = new FilterBarComboBox (this);
   FilterBarComboBoxDelegate * delegate = new FilterBarComboBoxDelegate (0, c);
   c->setItemDelegate (delegate);
 
   QStandardItem * row = new QStandardItem (tr ("All"));
   row->setData ("", TrackerRole);
-  row->setData (getCountString (myTorrents.rowCount ()), TorrentCountRole);
+  const int count = myTorrents.rowCount ();
+  row->setData (count, TorrentCountRole);
+  row->setData (getCountString (count), TorrentCountStringRole);
   model->appendRow (row);
 
   model->appendRow (new QStandardItem); // separator
@@ -571,10 +591,13 @@ FilterBar :: recount ()
     {
       QModelIndex index = model->index (row, 0);
       const int mode = index.data (ActivityRole).toInt ();
-      model->setData (index, getCountString (torrentsPerMode[mode]), TorrentCountRole);
+      const int count = torrentsPerMode [mode];
+      model->setData (index, count, TorrentCountRole);
+      model->setData (index, getCountString (count), TorrentCountStringRole);
     }
 
   refreshTrackers ();
+  refreshCountLabel ();
 }
 
 QString
@@ -587,10 +610,11 @@ void
 FilterBar :: refreshCountLabel ()
 {
   const int visibleCount = myFilter.rowCount ();
-  const int torrentCount = visibleCount + myFilter.hiddenRowCount ();
+  const int trackerCount = myTrackerCombo->currentCount ();
+  const int activityCount = myActivityCombo->currentCount ();
 
-  if (visibleCount == torrentCount)
+  if ((visibleCount == activityCount) || (visibleCount == trackerCount))
     myCountLabel->setText (tr("Show:"));
   else
-    myCountLabel->setText (tr("Show %Ln:", 0, visibleCount));
+    myCountLabel->setText (tr("Show %Ln of:", 0, visibleCount));
 }

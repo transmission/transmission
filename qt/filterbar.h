@@ -53,6 +53,7 @@ class FilterBarComboBox: public QComboBox
 
   public:
     FilterBarComboBox (QWidget * parent = 0);
+    int currentCount () const;
 
   protected:
     virtual void paintEvent (QPaintEvent * e);
@@ -68,8 +69,8 @@ class FilterBar: public QWidget
     ~FilterBar ();
 
   private:
-    QComboBox * createTrackerCombo (QStandardItemModel * );
-    QComboBox * createActivityCombo ();
+    FilterBarComboBox * createTrackerCombo (QStandardItemModel * );
+    FilterBarComboBox * createActivityCombo ();
     void recountSoon ();
     void refreshTrackers ();
     QString getCountString (int n) const;
@@ -78,8 +79,8 @@ class FilterBar: public QWidget
     Prefs& myPrefs;
     TorrentModel& myTorrents;
     TorrentFilter& myFilter;
-    QComboBox * myActivityCombo;
-    QComboBox * myTrackerCombo;
+    FilterBarComboBox * myActivityCombo;
+    FilterBarComboBox * myTrackerCombo;
     QLabel * myCountLabel;
     QStandardItemModel * myTrackerModel;
     QTimer * myRecountTimer;
