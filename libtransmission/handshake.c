@@ -193,8 +193,8 @@ buildHandshakeMessage (tr_handshake * handshake, uint8_t * buf)
 {
   uint8_t * walk = buf;
   const uint8_t * torrentHash = tr_cryptoGetTorrentHash (handshake->crypto);
-  const tr_torrent * tor = tr_torrentFindFromHash (handshake->session, torrentHash);
-  const uint8_t * peer_id = tor->peer_id;
+  tr_torrent * tor = tr_torrentFindFromHash (handshake->session, torrentHash);
+  const unsigned char * peer_id = tr_torrentGetPeerId (tor);
 
   memcpy (walk, HANDSHAKE_NAME, HANDSHAKE_NAME_LEN);
   walk += HANDSHAKE_NAME_LEN;
@@ -235,8 +235,7 @@ parseHandshake (tr_handshake *    handshake,
   uint8_t name[HANDSHAKE_NAME_LEN];
   uint8_t reserved[HANDSHAKE_FLAGS_LEN];
   uint8_t hash[SHA_DIGEST_LENGTH];
-  const tr_torrent * tor;
-  const uint8_t * tor_peer_id;
+  tr_torrent * tor;
   uint8_t peer_id[PEER_ID_LEN];
 
   dbgmsg (handshake, "payload: need %d, got %zu",
@@ -272,8 +271,7 @@ parseHandshake (tr_handshake *    handshake,
   dbgmsg (handshake, "peer-id is [%*.*s]", PEER_ID_LEN, PEER_ID_LEN, peer_id);
 
   tor = tr_torrentFindFromHash (handshake->session, hash);
-  tor_peer_id = tor->peer_id;
-  if (!memcmp (peer_id, tor_peer_id, PEER_ID_LEN))
+  if (!memcmp (peer_id, tr_torrentGetPeerId(tor), PEER_ID_LEN))
     {
       dbgmsg (handshake, "streuth!  we've connected to ourselves.");
       return HANDSHAKE_PEER_IS_SELF;
@@ -703,7 +701,7 @@ readPeerId (tr_handshake    * handshake,
 
   /* if we've somehow connected to ourselves, don't keep the connection */
   tor = tr_torrentFindFromHash (handshake->session, tr_peerIoGetTorrentHash (handshake->io));
-  connected_to_self = (tor != NULL) && !memcmp (peer_id, tor->peer_id, PEER_ID_LEN);
+  connected_to_self = (tor != NULL) && !memcmp (peer_id, tr_torrentGetPeerId(tor), PEER_ID_LEN);
 
   return tr_handshakeDone (handshake, !connected_to_self);
 }

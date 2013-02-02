@@ -308,7 +308,7 @@ tr_sessionGetDefaultSettings (tr_variant * d)
 {
     assert (tr_variantIsDict (d));
 
-    tr_variantDictReserve (d, 62);
+    tr_variantDictReserve (d, 63);
     tr_variantDictAddBool (d, TR_KEY_blocklist_enabled,               false);
     tr_variantDictAddStr  (d, TR_KEY_blocklist_url,                   "http://www.example.com/blocklist");
     tr_variantDictAddInt  (d, TR_KEY_cache_size_mb,                   DEFAULT_CACHE_SIZE_MB);
@@ -337,6 +337,7 @@ tr_sessionGetDefaultSettings (tr_variant * d)
     tr_variantDictAddBool (d, TR_KEY_port_forwarding_enabled,         true);
     tr_variantDictAddInt  (d, TR_KEY_preallocation,                   TR_PREALLOCATE_SPARSE);
     tr_variantDictAddBool (d, TR_KEY_prefetch_enabled,                DEFAULT_PREFETCH_ENABLED);
+    tr_variantDictAddInt  (d, TR_KEY_peer_id_ttl_hours,               6);
     tr_variantDictAddBool (d, TR_KEY_queue_stalled_enabled,           true);
     tr_variantDictAddInt  (d, TR_KEY_queue_stalled_minutes,           30);
     tr_variantDictAddReal (d, TR_KEY_ratio_limit,                     2.0);
@@ -408,6 +409,7 @@ tr_sessionGetSettings (tr_session * s, tr_variant * d)
   tr_variantDictAddBool (d, TR_KEY_port_forwarding_enabled,      tr_sessionIsPortForwardingEnabled (s));
   tr_variantDictAddInt  (d, TR_KEY_preallocation,                s->preallocationMode);
   tr_variantDictAddInt  (d, TR_KEY_prefetch_enabled,             s->isPrefetchEnabled);
+  tr_variantDictAddInt  (d, TR_KEY_peer_id_ttl_hours,            s->peer_id_ttl_hours);
   tr_variantDictAddBool (d, TR_KEY_queue_stalled_enabled,        tr_sessionGetQueueStalledEnabled (s));
   tr_variantDictAddInt  (d, TR_KEY_queue_stalled_minutes,        tr_sessionGetQueueStalledMinutes (s));
   tr_variantDictAddReal (d, TR_KEY_ratio_limit,                  s->desiredRatio);
@@ -799,6 +801,8 @@ sessionSetImpl (void * vdata)
         tr_sessionSetPaused (session, !boolVal);
     if (tr_variantDictFindBool (settings, TR_KEY_trash_original_torrent_files, &boolVal))
         tr_sessionSetDeleteSource (session, boolVal);
+    if (tr_variantDictFindInt (settings, TR_KEY_peer_id_ttl_hours, &i))
+        session->peer_id_ttl_hours = i;
 
     /* torrent queues */
     if (tr_variantDictFindInt (settings, TR_KEY_queue_stalled_minutes, &i))

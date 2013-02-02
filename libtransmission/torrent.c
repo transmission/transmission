@@ -175,6 +175,51 @@ tr_torrentIsPieceTransferAllowed (const tr_torrent  * tor,
 }
 
 /***
+****
+***/
+
+static void
+tr_torrentUnsetPeerId (tr_torrent * tor)
+{
+  /* triggers a rebuild next time tr_torrentGetPeerId() is called */
+  *tor->peer_id = '\0';
+}
+
+static int
+peerIdTTL (const tr_torrent * tor)
+{
+  int ttl;
+
+  if (!tor->peer_id_creation_time)
+    ttl = 0;
+  else
+    ttl = (int)difftime(tor->peer_id_creation_time+(tor->session->peer_id_ttl_hours*3600), tr_time());
+
+  return ttl;
+}
+
+const unsigned char *
+tr_torrentGetPeerId (tr_torrent * tor)
+{
+  bool needs_new_peer_id = false;
+
+  if (!*tor->peer_id)
+    needs_new_peer_id = true;
+
+  if (!needs_new_peer_id)
+    if (!tr_torrentIsPrivate (tor))
+      if (peerIdTTL (tor) <= 0)
+        needs_new_peer_id = true;
+
+  if (needs_new_peer_id)
+    {
+      tr_peerIdInit (tor->peer_id);
+      tor->peer_id_creation_time = tr_time ();
+    }
+
+  return tor->peer_id;
+}
+/***
 ****  PER-TORRENT UL / DL SPEEDS
 ***/
 
@@ -819,8 +864,6 @@ torrentInit (tr_torrent * tor, const tr_ctor * ctor)
     tor->uniqueId = nextUniqueId++;
     tor->magicNumber = TORRENT_MAGIC_NUMBER;
     tor->queuePosition = session->torrentCount;
-
-    tr_peerIdInit (tor->peer_id);
 
     tr_sha1 (tor->obfuscatedHash, "req2", 4,
              tor->info.hash, SHA_DIGEST_LENGTH,
@@ -1660,8 +1703,8 @@ torrentStart (tr_torrent * tor, bool bypass_queue)
      * closed and opened again without quitting Transmission ...
      * change the peerid. It would help sometimes if a stopped event
      * was missed to ensure that we didn't think someone was cheating. */
-    tr_peerIdInit (tor->peer_id);
-    tor->isRunning = 1;
+    tr_torrentUnsetPeerId (tor);
+    tor->isRunning = true;
     tr_torrentSetDirty (tor);
     tr_runInEventThread (tor->session, torrentStartImpl, tor);
 

@@ -905,7 +905,7 @@ tr_announcerAddBytes (tr_torrent * tor, int type, uint32_t byteCount)
 
 static tr_announce_request *
 announce_request_new (const tr_announcer  * announcer,
-                      const tr_torrent    * tor,
+                      tr_torrent          * tor,
                       const tr_tier       * tier,
                       tr_announce_event     event)
 {
@@ -914,7 +914,7 @@ announce_request_new (const tr_announcer  * announcer,
     req->url = tr_strdup (tier->currentTracker->announce);
     req->tracker_id_str = tr_strdup (tier->currentTracker->tracker_id_str);
     memcpy (req->info_hash, tor->info.hash, SHA_DIGEST_LENGTH);
-    memcpy (req->peer_id, tor->peer_id, PEER_ID_LEN);
+    memcpy (req->peer_id, tr_torrentGetPeerId(tor), PEER_ID_LEN);
     req->up = tier->byteCounts[TR_ANN_UP];
     req->down = tier->byteCounts[TR_ANN_DOWN];
     req->corrupt = tier->byteCounts[TR_ANN_CORRUPT];
@@ -1209,7 +1209,7 @@ announce_request_delegate (tr_announcer               * announcer,
 #if 0
     fprintf (stderr, "ANNOUNCE: event %s isPartialSeed %d port %d key %d numwant %d"
                      " up %"PRIu64" down %"PRIu64" corrupt %"PRIu64" left %"PRIu64
-                     " url [%s] tracker_id_str [%s] peer_id [%8.8s]\n",
+                     " url [%s] tracker_id_str [%s] peer_id [%20.20s]\n",
              tr_announce_event_get_string (request->event),
              (int)request->partial_seed,
              (int)request->port,
@@ -1240,7 +1240,7 @@ tierAnnounce (tr_announcer * announcer, tr_tier * tier)
     tr_announce_event announce_event;
     tr_announce_request * req;
     struct announce_data * data;
-    const tr_torrent * tor = tier->tor;
+    tr_torrent * tor = tier->tor;
     const time_t now = tr_time ();
 
     assert (!tier->isAnnouncing);

@@ -159,7 +159,9 @@ struct tr_torrent
      * peer_id that was registered by the peer. The peer_id from the tracker
      * and in the handshake are expected to match.
      */
-    uint8_t peer_id[PEER_ID_LEN+1];
+    unsigned char peer_id[PEER_ID_LEN+1];
+
+    time_t peer_id_creation_time;
 
     /* Where the files will be when it's complete */
     char * downloadDir;
@@ -434,6 +436,9 @@ time_t tr_torrentGetFileMTime (const tr_torrent * tor, tr_file_index_t i);
 uint64_t tr_torrentGetCurrentSizeOnDisk (const tr_torrent * tor);
 
 bool tr_torrentIsStalled (const tr_torrent * tor);
+
+const unsigned char * tr_torrentGetPeerId (tr_torrent * tor);
+
 
 static inline bool
 tr_torrentIsQueued (const tr_torrent * tor)

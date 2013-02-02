@@ -118,6 +118,8 @@ struct tr_session
     bool                         deleteSourceTorrent;
     bool                         scrapePausedTorrents;
 
+    uint8_t                      peer_id_ttl_hours;
+
     tr_variant                   removedTorrents;
 
     bool                         stalledEnabled;

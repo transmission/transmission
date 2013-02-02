@@ -208,6 +208,7 @@ static const struct tr_key_struct my_static[] =
   { "paused", 6 },
   { "pausedTorrentCount", 18 },
   { "peer-congestion-algorithm", 25 },
+  { "peer-id-ttl-hours", 17 },
   { "peer-limit", 10 },
   { "peer-limit-global", 17 },
   { "peer-limit-per-torrent", 22 },
