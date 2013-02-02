@@ -32,32 +32,35 @@ struct tr_torrent;
 
 typedef struct tr_peermsgs tr_peermsgs;
 
-tr_peermsgs* tr_peerMsgsNew (struct tr_torrent    * torrent,
-                             struct tr_peer       * peer,
-                             tr_peer_callback     * callback,
-                             void                 * callback_data);
+tr_peermsgs* tr_peerMsgsNew              (struct tr_torrent        * torrent,
+                                          struct tr_peer           * peer,
+                                          tr_peer_callback         * callback,
+                                          void                     * callback_data);
 
-void         tr_peerMsgsSetChoke (tr_peermsgs *, bool peerIsChoked);
+void         tr_peerMsgsSetChoke         (tr_peermsgs              * msgs,
+                                          bool                       peerIsChoked);
 
-int          tr_peerMsgsIsReadingBlock (const tr_peermsgs * msgs, tr_block_index_t block);
+int          tr_peerMsgsIsReadingBlock   (const tr_peermsgs        * msgs,
+                                          tr_block_index_t           block);
 
-void         tr_peerMsgsSetInterested (tr_peermsgs *, bool clientIsInterested);
+void         tr_peerMsgsSetInterested    (tr_peermsgs              * msgs,
+                                          bool                       clientIsInterested);
 
-void         tr_peerMsgsHave (tr_peermsgs * msgs,
-                              uint32_t      pieceIndex);
+void         tr_peerMsgsHave             (tr_peermsgs              * msgs,
+                                          uint32_t                   pieceIndex);
 
-void         tr_peerMsgsPulse (tr_peermsgs * msgs);
+void         tr_peerMsgsPulse            (tr_peermsgs              * msgs);
 
-void         tr_peerMsgsCancel (tr_peermsgs * msgs,
-                                tr_block_index_t block);
+void         tr_peerMsgsCancel           (tr_peermsgs              * msgs,
+                                          tr_block_index_t           block);
 
-void         tr_peerMsgsFree (tr_peermsgs*);
+void         tr_peerMsgsFree             (tr_peermsgs              * msgs);
 
-size_t       tr_generateAllowedSet (tr_piece_index_t         * setmePieces,
-                                    size_t                     desiredSetSize,
-                                    size_t                     pieceCount,
-                                    const uint8_t            * infohash,
-                                    const struct tr_address  * addr);
+size_t       tr_generateAllowedSet       (tr_piece_index_t         * setmePieces,
+                                          size_t                     desiredSetSize,
+                                          size_t                     pieceCount,
+                                          const uint8_t            * infohash,
+                                          const struct tr_address  * addr);
 
 
 /* @} */

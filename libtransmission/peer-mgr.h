@@ -42,28 +42,28 @@ typedef struct tr_peerMgr tr_peerMgr;
 /* added_f's bitwise-or'ed flags */
 enum
 {
-    /* true if the peer supports encryption */
-    ADDED_F_ENCRYPTION_FLAG = 1,
+  /* true if the peer supports encryption */
+  ADDED_F_ENCRYPTION_FLAG = 1,
 
-    /* true if the peer is a seed or partial seed */
-    ADDED_F_SEED_FLAG = 2,
+  /* true if the peer is a seed or partial seed */
+  ADDED_F_SEED_FLAG = 2,
 
-    /* true if the peer supports uTP */
-    ADDED_F_UTP_FLAGS = 4,
+  /* true if the peer supports uTP */
+  ADDED_F_UTP_FLAGS = 4,
 
-    /* true if the peer has holepunch support */
-    ADDED_F_HOLEPUNCH = 8,
+  /* true if the peer has holepunch support */
+  ADDED_F_HOLEPUNCH = 8,
 
-    /* true if the peer telling us about this peer
-     * initiated the connection (implying that it is connectible) */
-    ADDED_F_CONNECTABLE = 16
+  /* true if the peer telling us about this peer
+   * initiated the connection (implying that it is connectible) */
+  ADDED_F_CONNECTABLE = 16
 };
 
 typedef struct tr_pex
 {
-    tr_address addr;
-    tr_port    port; /* this field is in network byte order */
-    uint8_t    flags;
+  tr_address addr;
+  tr_port    port; /* this field is in network byte order */
+  uint8_t    flags;
 }
 tr_pex;
 
@@ -73,9 +73,9 @@ struct tr_peermsgs;
 
 enum
 {
-    ENCRYPTION_PREFERENCE_UNKNOWN,
-    ENCRYPTION_PREFERENCE_YES,
-    ENCRYPTION_PREFERENCE_NO
+  ENCRYPTION_PREFERENCE_UNKNOWN,
+  ENCRYPTION_PREFERENCE_YES,
+  ENCRYPTION_PREFERENCE_NO
 };
 
 /* opaque forward declaration */
@@ -89,45 +89,45 @@ struct peer_atom;
  */
 typedef struct tr_peer
 {
-    bool                     peerIsChoked;
-    bool                     peerIsInterested;
-    bool                     clientIsChoked;
-    bool                     clientIsInterested;
-    bool                     doPurge;
+  bool peerIsChoked;
+  bool peerIsInterested;
+  bool clientIsChoked;
+  bool clientIsInterested;
+  bool doPurge;
 
-    /* number of bad pieces they've contributed to */
-    uint8_t                  strikes;
+  /* number of bad pieces they've contributed to */
+  uint8_t strikes;
 
-    uint8_t                  encryption_preference;
-    tr_port                  dht_port;
+  uint8_t encryption_preference;
+  tr_port dht_port;
 
-    /* how many requests the peer has made that we haven't responded to yet */
-    int                      pendingReqsToClient;
+  /* how many requests the peer has made that we haven't responded to yet */
+  int pendingReqsToClient;
 
-    /* how many requests we've made and are currently awaiting a response for */
-    int                      pendingReqsToPeer;
+  /* how many requests we've made and are currently awaiting a response for */
+  int pendingReqsToPeer;
 
-    struct tr_peerIo       * io;
-    struct peer_atom       * atom;
+  struct tr_peerIo * io;
+  struct peer_atom * atom;
 
-    struct tr_bitfield       blame;
-    struct tr_bitfield       have;
+  struct tr_bitfield blame;
+  struct tr_bitfield have;
 
-    /** how complete the peer's copy of the torrent is. [0.0...1.0] */
-    float                    progress;
+  /** how complete the peer's copy of the torrent is. [0.0...1.0] */
+  float progress;
 
-    /* the client name from the `v' string in LTEP's handshake dictionary */
-    tr_quark                 client;
+  /* the client name from the `v' string in LTEP's handshake dictionary */
+  tr_quark client;
 
-    time_t                   chokeChangedAt;
+  time_t chokeChangedAt;
 
-    tr_recentHistory         blocksSentToClient;
-    tr_recentHistory         blocksSentToPeer;
+  tr_recentHistory blocksSentToClient;
+  tr_recentHistory blocksSentToPeer;
 
-    tr_recentHistory         cancelsSentToClient;
-    tr_recentHistory         cancelsSentToPeer;
+  tr_recentHistory cancelsSentToClient;
+  tr_recentHistory cancelsSentToPeer;
 
-    struct tr_peermsgs     * msgs;
+  struct tr_peermsgs * msgs;
 }
 tr_peer;
 
@@ -151,7 +151,7 @@ tr_peerMgr* tr_peerMgrNew (tr_session *);
 void tr_peerMgrFree (tr_peerMgr * manager);
 
 bool tr_peerMgrPeerIsSeed (const tr_torrent * tor,
-                              const tr_address * addr);
+                           const tr_address * addr);
 
 void tr_peerMgrSetUtpSupported (tr_torrent       * tor,
                                 const tr_address * addr);

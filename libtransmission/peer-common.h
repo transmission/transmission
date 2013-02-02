@@ -32,15 +32,15 @@ struct tr_bitfield;
 
 enum
 {
-    /** when we're making requests from another peer,
-        batch them together to send enough requests to
-        meet our bandwidth goals for the next N seconds */
-    REQUEST_BUF_SECS = 10,
+  /* when we're making requests from another peer,
+     batch them together to send enough requests to
+     meet our bandwidth goals for the next N seconds */
+  REQUEST_BUF_SECS = 10,
 
-    /** this is the maximum size of a block request.
-        most bittorrent clients will reject requests
-        larger than this size. */
-    MAX_BLOCK_SIZE = (1024 * 16)
+  /* this is the maximum size of a block request.
+     most bittorrent clients will reject requests
+     larger than this size. */
+  MAX_BLOCK_SIZE = (1024 * 16)
 };
 
 /**
@@ -49,32 +49,32 @@ enum
 
 typedef enum
 {
-    TR_PEER_CLIENT_GOT_BLOCK,
-    TR_PEER_CLIENT_GOT_CHOKE,
-    TR_PEER_CLIENT_GOT_PIECE_DATA,
-    TR_PEER_CLIENT_GOT_ALLOWED_FAST,
-    TR_PEER_CLIENT_GOT_SUGGEST,
-    TR_PEER_CLIENT_GOT_PORT,
-    TR_PEER_CLIENT_GOT_REJ,
-    TR_PEER_CLIENT_GOT_BITFIELD,
-    TR_PEER_CLIENT_GOT_HAVE,
-    TR_PEER_CLIENT_GOT_HAVE_ALL,
-    TR_PEER_CLIENT_GOT_HAVE_NONE,
-    TR_PEER_PEER_GOT_PIECE_DATA,
-    TR_PEER_ERROR
+  TR_PEER_CLIENT_GOT_BLOCK,
+  TR_PEER_CLIENT_GOT_CHOKE,
+  TR_PEER_CLIENT_GOT_PIECE_DATA,
+  TR_PEER_CLIENT_GOT_ALLOWED_FAST,
+  TR_PEER_CLIENT_GOT_SUGGEST,
+  TR_PEER_CLIENT_GOT_PORT,
+  TR_PEER_CLIENT_GOT_REJ,
+  TR_PEER_CLIENT_GOT_BITFIELD,
+  TR_PEER_CLIENT_GOT_HAVE,
+  TR_PEER_CLIENT_GOT_HAVE_ALL,
+  TR_PEER_CLIENT_GOT_HAVE_NONE,
+  TR_PEER_PEER_GOT_PIECE_DATA,
+  TR_PEER_ERROR
 }
 PeerEventType;
 
 typedef struct
 {
-    PeerEventType         eventType;
+  PeerEventType         eventType;
 
-    uint32_t              pieceIndex;   /* for GOT_BLOCK, GOT_HAVE, CANCEL, ALLOWED, SUGGEST */
-    struct tr_bitfield  * bitfield;     /* for GOT_BITFIELD */
-    uint32_t              offset;       /* for GOT_BLOCK */
-    uint32_t              length;       /* for GOT_BLOCK + GOT_PIECE_DATA */
-    int                   err;          /* errno for GOT_ERROR */
-    tr_port               port;         /* for GOT_PORT */
+  uint32_t              pieceIndex;   /* for GOT_BLOCK, GOT_HAVE, CANCEL, ALLOWED, SUGGEST */
+  struct tr_bitfield  * bitfield;     /* for GOT_BITFIELD */
+  uint32_t              offset;       /* for GOT_BLOCK */
+  uint32_t              length;       /* for GOT_BLOCK + GOT_PIECE_DATA */
+  int                   err;          /* errno for GOT_ERROR */
+  tr_port               port;         /* for GOT_PORT */
 }
 tr_peer_event;
 
