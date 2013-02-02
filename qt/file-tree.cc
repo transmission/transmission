@@ -186,8 +186,6 @@ FileTreeItem :: fileSizeName () const
   return str;
 }
 
-#include <iostream>
-
 std::pair<int,int>
 FileTreeItem :: update (const QString& name,
                         bool           wanted,
@@ -196,7 +194,7 @@ FileTreeItem :: update (const QString& name,
                         bool           updateFields)
 {
   int changed_count = 0;
-  int changed_fields[3];
+  int changed_columns[3];
 
   if (myName != name)
     {
@@ -204,7 +202,7 @@ FileTreeItem :: update (const QString& name,
         myParent->myFirstUnhashedRow = row();
 
       myName = name;
-      changed_fields[changed_count++] = COL_NAME;
+      changed_columns[changed_count++] = COL_NAME;
     }
 
   if (fileIndex() != -1)
@@ -217,13 +215,13 @@ FileTreeItem :: update (const QString& name,
           if (myIsWanted != wanted)
             {
               myIsWanted = wanted;
-              changed_fields[changed_count++] = COL_WANTED;
+              changed_columns[changed_count++] = COL_WANTED;
             }
 
           if (myPriority != priority)
             {
               myPriority = priority;
-              changed_fields[changed_count++] = COL_PRIORITY;
+              changed_columns[changed_count++] = COL_PRIORITY;
             }
         }
     }
@@ -231,10 +229,9 @@ FileTreeItem :: update (const QString& name,
   std::pair<int,int> changed (-1, -1);
   if (changed_count > 0)
     {
-      std::sort (changed_fields, changed_fields+changed_count);
-      changed.first = changed_fields[0];
-      changed.second = changed_fields [changed_count-1];
-      std::cerr << "changed.first " << changed.first << " changed.second " << changed.second << std::endl;
+      std::sort (changed_columns, changed_columns+changed_count);
+      changed.first = changed_columns[0];
+      changed.second = changed_columns[changed_count-1];
     }
   return changed;
 }
