@@ -112,17 +112,18 @@ favicon_ready_cb (gpointer pixbuf, gpointer vreference)
 }
 
 static gboolean
-tracker_filter_model_update (GtkTreeStore * store)
+tracker_filter_model_update (gpointer gstore)
 {
   int i, n;
   int all = 0;
   int store_pos;
   GtkTreeIter iter;
-  GtkTreeModel * model = GTK_TREE_MODEL (store);
+  GObject * o = G_OBJECT (gstore);
+  GtkTreeStore * store = GTK_TREE_STORE (gstore);
+  GtkTreeModel * model = GTK_TREE_MODEL (gstore);
   GPtrArray * hosts = g_ptr_array_new ();
   GStringChunk * strings = g_string_chunk_new (4096);
   GHashTable * hosts_hash = g_hash_table_new_full (g_str_hash, g_str_equal, NULL, g_free);
-  GObject * o = G_OBJECT (store);
   GtkTreeModel * tmodel = GTK_TREE_MODEL (g_object_get_qdata (o, TORRENT_MODEL_KEY));
   const int first_tracker_pos = 2; /* offset past the "All" and the separator */
 
@@ -266,7 +267,7 @@ tracker_filter_model_update (GtkTreeStore * store)
   g_ptr_array_free (hosts, TRUE);
   g_hash_table_unref (hosts_hash);
   g_string_chunk_free (strings);
-  return FALSE;
+  return G_SOURCE_REMOVE;
 }
 
 static GtkTreeModel *
@@ -307,7 +308,7 @@ tracker_model_update_idle (gpointer tracker_model)
   const gboolean pending = g_object_get_qdata (o, DIRTY_KEY) != NULL;
   if (!pending)
     {
-      GSourceFunc func = (GSourceFunc) tracker_filter_model_update;
+      GSourceFunc func = tracker_filter_model_update;
       g_object_set_qdata (o, DIRTY_KEY, GINT_TO_POINTER (1));
       gdk_threads_add_idle (func, tracker_model);
     }
@@ -542,12 +543,13 @@ status_model_update_count (GtkListStore * store, GtkTreeIter * iter, int n)
     gtk_list_store_set (store, iter, ACTIVITY_FILTER_COL_COUNT, n, -1);
 }
 
-static void
-activity_filter_model_update (GtkListStore * store)
+static gboolean
+activity_filter_model_update (gpointer gstore)
 {
   GtkTreeIter iter;
+  GObject * o = G_OBJECT (gstore);
+  GtkListStore * store = GTK_LIST_STORE (gstore);
   GtkTreeModel * model = GTK_TREE_MODEL (store);
-  GObject * o = G_OBJECT (store);
   GtkTreeModel * tmodel = GTK_TREE_MODEL (g_object_get_qdata (o, TORRENT_MODEL_KEY));
 
   g_object_steal_qdata (o, DIRTY_KEY);
@@ -571,9 +573,10 @@ activity_filter_model_update (GtkListStore * store)
       while (gtk_tree_model_iter_next (tmodel, &torrent_iter));
 
       status_model_update_count (store, &iter, hits);
-
     }
   while (gtk_tree_model_iter_next (model, &iter));
+
+  return G_SOURCE_REMOVE;
 }
 
 static GtkTreeModel *
@@ -645,7 +648,7 @@ activity_model_update_idle (gpointer activity_model)
   const gboolean pending = g_object_get_qdata (o, DIRTY_KEY) != NULL;
   if (!pending)
     {
-      GSourceFunc func = (GSourceFunc) activity_filter_model_update;
+      GSourceFunc func = activity_filter_model_update;
       g_object_set_qdata (o, DIRTY_KEY, GINT_TO_POINTER (1));
       gdk_threads_add_idle (func, activity_model);
     }
@@ -859,20 +862,58 @@ selection_changed_cb (GtkComboBox * combo, gpointer vdata)
 ****
 ***/
 
-static void
-update_count_label (struct filter_data * data)
+static gboolean
+update_count_label (gpointer gdata)
 {
   char buf[512];
-  GtkTreeModel * tmodel = gtk_tree_model_filter_get_model (GTK_TREE_MODEL_FILTER (data->filter_model));
-  const int torrentCount = gtk_tree_model_iter_n_children (tmodel, NULL);
-  const int visibleCount = gtk_tree_model_iter_n_children (data->filter_model, NULL);
+  int visibleCount;
+  int trackerCount;
+  int activityCount;
+  GtkTreeModel * model;
+  GtkComboBox * combo;
+  GtkTreeIter iter;
+  struct filter_data * data = gdata;
+
+  /* get the visible count */
+  visibleCount = gtk_tree_model_iter_n_children (data->filter_model, NULL);
+
+  /* get the tracker count */
+  combo = GTK_COMBO_BOX (data->tracker);
+  model = gtk_combo_box_get_model (combo);
+  if (gtk_combo_box_get_active_iter (combo, &iter))
+    gtk_tree_model_get (model, &iter, TRACKER_FILTER_COL_COUNT, &trackerCount, -1);
+  else
+    trackerCount = 0;
+
+  /* get the activity count */
+  combo = GTK_COMBO_BOX (data->activity);
+  model = gtk_combo_box_get_model (combo);
+  if (gtk_combo_box_get_active_iter (combo, &iter))
+    gtk_tree_model_get (model, &iter, ACTIVITY_FILTER_COL_COUNT, &activityCount, -1);
+  else
+    activityCount = 0;
 
   /* set the text */
-  if (visibleCount == torrentCount)
+  if (visibleCount == MIN (activityCount, trackerCount))
     g_snprintf (buf, sizeof(buf), _("_Show:"));
   else
-    g_snprintf (buf, sizeof(buf), _("_Show %'d:"), visibleCount);
+    g_snprintf (buf, sizeof(buf), _("_Show %'d of:"), visibleCount);
   gtk_label_set_markup_with_mnemonic (GTK_LABEL (data->show_lb), buf);
+
+  g_object_steal_qdata (G_OBJECT(data->show_lb), DIRTY_KEY);
+  return G_SOURCE_REMOVE;
+}
+
+static void
+update_count_label_idle (struct filter_data * data)
+{
+  GObject * o = G_OBJECT (data->show_lb);
+  const gboolean pending = g_object_get_qdata (o, DIRTY_KEY) != NULL;
+  if (!pending)
+    {
+      g_object_set_qdata (o, DIRTY_KEY, GINT_TO_POINTER (1));
+      gdk_threads_add_idle (update_count_label, data);
+    }
 }
 
 static void
@@ -881,7 +922,7 @@ on_filter_model_row_inserted (GtkTreeModel * tree_model UNUSED,
                               GtkTreeIter  * iter       UNUSED,
                               gpointer       data)
 {
-  update_count_label (data);
+  update_count_label_idle (data);
 }
 
 static void
@@ -889,7 +930,7 @@ on_filter_model_row_deleted (GtkTreeModel * tree_model UNUSED,
                              GtkTreePath  * path       UNUSED,
                              gpointer       data       UNUSED)
 {
-  update_count_label (data);
+  update_count_label_idle (data);
 }
 
 /***
