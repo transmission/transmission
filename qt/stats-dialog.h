@@ -21,34 +21,34 @@ class QTimer;
 
 class StatsDialog: public QDialog
 {
-        Q_OBJECT
+    Q_OBJECT
 
-    signals:
-        void accepted( );
+  signals:
+    void accepted ();
 
-    public slots:
-        void updateStats( );
+  public slots:
+    void updateStats ();
 
-    private slots:
-        void onTimer( );
+  private slots:
+    void onTimer ();
 
-    public:
-        StatsDialog( Session&, QWidget * parent = 0 );
-        ~StatsDialog( );
-        virtual void setVisible( bool visible );
+  public:
+    StatsDialog (Session&, QWidget * parent = 0);
+    ~StatsDialog ();
+    virtual void setVisible (bool visible);
 
-    private:
-        Session & mySession;
-        QTimer * myTimer;
-        QLabel * myCurrentUp;
-        QLabel * myCurrentDown;
-        QLabel * myCurrentRatio;
-        QLabel * myCurrentDuration;
-        QLabel * myStartCount;
-        QLabel * myTotalUp;
-        QLabel * myTotalDown;
-        QLabel * myTotalRatio;
-        QLabel * myTotalDuration;
+  private:
+    Session & mySession;
+    QTimer * myTimer;
+    QLabel * myCurrentUp;
+    QLabel * myCurrentDown;
+    QLabel * myCurrentRatio;
+    QLabel * myCurrentDuration;
+    QLabel * myStartCount;
+    QLabel * myTotalUp;
+    QLabel * myTotalDown;
+    QLabel * myTotalRatio;
+    QLabel * myTotalDuration;
 };
 
 #endif

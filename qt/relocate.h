@@ -25,28 +25,28 @@ class TorrentModel;
 
 class RelocateDialog: public QDialog
 {
-        Q_OBJECT
+    Q_OBJECT
 
-    private:
-        QString myPath;
-        static bool myMoveFlag;
+  private:
+    QString myPath;
+    static bool myMoveFlag;
 
-    private:
-        Session & mySession;
-        TorrentModel& myModel;
-        QSet<int> myIds;
-        QPushButton * myDirButton;
-        QRadioButton * myMoveRadio;
+  private:
+    Session & mySession;
+    TorrentModel& myModel;
+    QSet<int> myIds;
+    QPushButton * myDirButton;
+    QRadioButton * myMoveRadio;
 
-    private slots:
-        void onFileSelected( const QString& path );
-        void onDirButtonClicked( );
-        void onSetLocation( );
-        void onMoveToggled( bool );
+  private slots:
+    void onFileSelected (const QString& path);
+    void onDirButtonClicked ();
+    void onSetLocation ();
+    void onMoveToggled (bool);
 
-    public:
-        RelocateDialog( Session&, TorrentModel&, const QSet<int>& ids, QWidget * parent = 0 );
-        ~RelocateDialog( ) { }
+  public:
+    RelocateDialog (Session&, TorrentModel&, const QSet<int>& ids, QWidget * parent = 0);
+    ~RelocateDialog () { }
 };
 
 #endif
