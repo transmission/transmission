@@ -633,8 +633,10 @@ Details :: refresh( )
             }
         }
     }
-    myCommentBrowser->setText( string );
-    myCommentBrowser->setMaximumHeight( QWIDGETSIZE_MAX );
+    if( myCommentBrowser->toPlainText() != string ) {
+      myCommentBrowser->setText( string );
+      myCommentBrowser->setMaximumHeight( QWIDGETSIZE_MAX );
+    }
 
     // myOriginLabel
     if( torrents.empty( ) )
