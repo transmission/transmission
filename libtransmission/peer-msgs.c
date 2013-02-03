@@ -104,6 +104,16 @@ enum
     AWAITING_BT_PIECE
 };
 
+typedef enum
+{
+  ENCRYPTION_PREFERENCE_UNKNOWN,
+  ENCRYPTION_PREFERENCE_YES,
+  ENCRYPTION_PREFERENCE_NO
+}
+encryption_preference_t;
+
+
+
 /**
 ***
 **/
@@ -179,7 +189,9 @@ struct tr_peermsgs
 
     tr_port         dht_port;
 
-    size_t          metadata_size_hint;
+    encryption_preference_t  encryption_preference;
+
+    size_t                   metadata_size_hint;
 #if 0
     size_t                 fastsetSize;
     tr_piece_index_t       fastset[MAX_FAST_SET_SIZE];
@@ -883,8 +895,8 @@ parseLtepHandshake (tr_peermsgs * msgs, int len, struct evbuffer * inbuf)
 
     /* does the peer prefer encrypted connections? */
     if (tr_variantDictFindInt (&val, TR_KEY_e, &i)) {
-        msgs->peer->encryption_preference = i ? ENCRYPTION_PREFERENCE_YES
-                                              : ENCRYPTION_PREFERENCE_NO;
+        msgs->encryption_preference = i ? ENCRYPTION_PREFERENCE_YES
+                                        : ENCRYPTION_PREFERENCE_NO;
         if (i)
             pex.flags |= ADDED_F_ENCRYPTION_FLAG;
     }

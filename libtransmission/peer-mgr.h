@@ -69,13 +69,6 @@ tr_pex;
 struct tr_peerIo;
 struct tr_peermsgs;
 
-enum
-{
-  ENCRYPTION_PREFERENCE_UNKNOWN,
-  ENCRYPTION_PREFERENCE_YES,
-  ENCRYPTION_PREFERENCE_NO
-};
-
 /* opaque forward declaration */
 struct peer_atom;
 

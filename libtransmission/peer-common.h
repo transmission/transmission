@@ -112,8 +112,6 @@ typedef struct tr_peer
   /* number of bad pieces they've contributed to */
   uint8_t strikes;
 
-  uint8_t encryption_preference;
-
   /* how many requests the peer has made that we haven't responded to yet */
   int pendingReqsToClient;
 
@@ -121,6 +119,8 @@ typedef struct tr_peer
   int pendingReqsToPeer;
 
   struct tr_peerIo * io;
+
+  /* Hook to private peer-mgr information */
   struct peer_atom * atom;
 
   /** how complete the peer's copy of the torrent is. [0.0...1.0] */
