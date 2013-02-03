@@ -399,22 +399,10 @@ compareKeys (const void * va, const void * vb)
   const struct tr_key_struct * a = va;
   const struct tr_key_struct * b = vb;
 
-  if (a->len == b->len)
-    {
-      ret = memcmp (a->str, b->str, a->len);
-    }
-  else if (a->len < b->len)
-    {
-      ret = memcmp (a->str, b->str, a->len);
-      if (!ret)
-        ret = -1;
-    }
-  else /* a->len > b->len */
-    {
-      ret = memcmp (a->str, b->str, b->len);
-      if (!ret)
-        ret = 1;
-    }
+  ret = memcmp (a->str, b->str, a->len);
+
+  if (!ret && (a->len != b->len))
+    ret = a->len < b->len ? -1 : 1;
 
   return ret;
 }
