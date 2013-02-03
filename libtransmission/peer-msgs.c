@@ -90,6 +90,11 @@ enum
     /* how many blocks to keep prefetched per peer */
     PREFETCH_SIZE = 18,
 
+    /* when we're making requests from another peer,
+       batch them together to send enough requests to
+       meet our bandwidth goals for the next N seconds */
+    REQUEST_BUF_SECS = 10,
+
     /* defined in BEP #9 */
     METADATA_MSG_TYPE_REQUEST = 0,
     METADATA_MSG_TYPE_DATA = 1,

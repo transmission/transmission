@@ -17,27 +17,18 @@
 #ifndef TR_PEER_H
 #define TR_PEER_H
 
-/**
- * @addtogroup peers Peers
- * @{
- */
-
-/**
-*** Fields common to webseed and bittorrent peers
-**/
-
 #include "transmission.h"
 #include "bitfield.h"
 #include "history.h"
 #include "quark.h"
 
+/**
+ * @addtogroup peers Peers
+ * @{
+ */
+
 enum
 {
-  /* when we're making requests from another peer,
-     batch them together to send enough requests to
-     meet our bandwidth goals for the next N seconds */
-  REQUEST_BUF_SECS = 10,
-
   /* this is the maximum size of a block request.
      most bittorrent clients will reject requests
      larger than this size. */
