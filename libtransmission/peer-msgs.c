@@ -177,6 +177,8 @@ struct tr_peermsgs
     uint16_t        pexCount;
     uint16_t        pexCount6;
 
+    tr_port         dht_port;
+
     size_t          metadata_size_hint;
 #if 0
     size_t                 fastsetSize;
@@ -1466,11 +1468,11 @@ readBtMessage (tr_peermsgs * msgs, struct evbuffer * inbuf, size_t inlen)
 
         case BT_PORT:
             dbgmsg (msgs, "Got a BT_PORT");
-            tr_peerIoReadUint16 (msgs->peer->io, inbuf, &msgs->peer->dht_port);
-            if (msgs->peer->dht_port > 0)
+            tr_peerIoReadUint16 (msgs->peer->io, inbuf, &msgs->dht_port);
+            if (msgs->dht_port > 0)
                 tr_dhtAddNode (getSession (msgs),
                                tr_peerAddress (msgs->peer),
-                               msgs->peer->dht_port, 0);
+                               msgs->dht_port, 0);
             break;
 
         case BT_FEXT_SUGGEST:

@@ -27,8 +27,9 @@
 **/
 
 #include "transmission.h"
-
-struct tr_bitfield;
+#include "bitfield.h"
+#include "history.h"
+#include "quark.h"
 
 enum
 {
@@ -80,7 +81,69 @@ tr_peer_event;
 
 extern const tr_peer_event TR_PEER_EVENT_INIT;
 
-struct tr_peer;
+/**
+ * State information about a connected peer.
+ *
+ * @see struct peer_atom
+ * @see tr_peermsgs
+ */
+typedef struct tr_peer
+{
+  /* whether or not we should free this peer soon.
+     NOTE: private to peer-mgr.c */
+  bool doPurge;
+
+  /* Whether or not we've choked this peer.
+     Only applies to BitTorrent peers */
+  bool peerIsChoked;
+
+  /* whether or not the peer has indicated it will download from us.
+     Only applies to BitTorrent peers */
+  bool peerIsInterested;
+
+  /* whether or the peer is choking us.
+     Only applies to BitTorrent peers */
+  bool clientIsChoked;
+
+  /* whether or not we've indicated to the peer that we would download from them if unchoked.
+     Only applies to BitTorrent peers */
+  bool clientIsInterested;
+
+  /* number of bad pieces they've contributed to */
+  uint8_t strikes;
+
+  uint8_t encryption_preference;
+
+  /* how many requests the peer has made that we haven't responded to yet */
+  int pendingReqsToClient;
+
+  /* how many requests we've made and are currently awaiting a response for */
+  int pendingReqsToPeer;
+
+  struct tr_peerIo * io;
+  struct peer_atom * atom;
+
+  /** how complete the peer's copy of the torrent is. [0.0...1.0] */
+  float progress;
+
+  struct tr_bitfield blame;
+  struct tr_bitfield have;
+
+  /* the client name.
+     For BitTorrent peers, this is the app name derived from the `v' string in LTEP's handshake dictionary */
+  tr_quark client;
+
+  time_t chokeChangedAt;
+
+  tr_recentHistory blocksSentToClient;
+  tr_recentHistory blocksSentToPeer;
+
+  tr_recentHistory cancelsSentToClient;
+  tr_recentHistory cancelsSentToPeer;
+
+  struct tr_peermsgs * msgs;
+}
+tr_peer;
 
 typedef void tr_peer_callback (struct tr_peer       * peer,
                                const tr_peer_event  * event,

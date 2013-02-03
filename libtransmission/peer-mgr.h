@@ -23,10 +23,8 @@
  #include <winsock2.h> /* struct in_addr */
 #endif
 
-#include "bitfield.h"
-#include "history.h"
 #include "net.h" /* tr_address */
-#include "peer-common.h" /* struct peer_request */
+#include "peer-common.h"
 #include "quark.h"
 
 /**
@@ -80,56 +78,6 @@ enum
 
 /* opaque forward declaration */
 struct peer_atom;
-
-/**
- * State information about a connected peer.
- *
- * @see struct peer_atom
- * @see tr_peermsgs
- */
-typedef struct tr_peer
-{
-  bool peerIsChoked;
-  bool peerIsInterested;
-  bool clientIsChoked;
-  bool clientIsInterested;
-  bool doPurge;
-
-  /* number of bad pieces they've contributed to */
-  uint8_t strikes;
-
-  uint8_t encryption_preference;
-  tr_port dht_port;
-
-  /* how many requests the peer has made that we haven't responded to yet */
-  int pendingReqsToClient;
-
-  /* how many requests we've made and are currently awaiting a response for */
-  int pendingReqsToPeer;
-
-  struct tr_peerIo * io;
-  struct peer_atom * atom;
-
-  struct tr_bitfield blame;
-  struct tr_bitfield have;
-
-  /** how complete the peer's copy of the torrent is. [0.0...1.0] */
-  float progress;
-
-  /* the client name from the `v' string in LTEP's handshake dictionary */
-  tr_quark client;
-
-  time_t chokeChangedAt;
-
-  tr_recentHistory blocksSentToClient;
-  tr_recentHistory blocksSentToPeer;
-
-  tr_recentHistory cancelsSentToClient;
-  tr_recentHistory cancelsSentToPeer;
-
-  struct tr_peermsgs * msgs;
-}
-tr_peer;
 
 void tr_peerConstruct (struct tr_peer * peer);
 
