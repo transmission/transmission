@@ -226,14 +226,14 @@ FilterBarComboBox *
 FilterBar :: createActivityCombo ()
 {
   FilterBarComboBox * c = new FilterBarComboBox (this);
-  FilterBarComboBoxDelegate * delegate = new FilterBarComboBoxDelegate (0, c);
+  FilterBarComboBoxDelegate * delegate = new FilterBarComboBoxDelegate (this, c);
   c->setItemDelegate (delegate);
 
   QPixmap blankPixmap (c->iconSize ());
   blankPixmap.fill (Qt::transparent);
   QIcon blankIcon (blankPixmap);
 
-  QStandardItemModel * model = new QStandardItemModel;
+  QStandardItemModel * model = new QStandardItemModel (this);
 
   QStandardItem * row = new QStandardItem (tr ("All"));
   row->setData (FilterMode::SHOW_ALL, ActivityRole);
@@ -392,7 +392,7 @@ FilterBarComboBox *
 FilterBar :: createTrackerCombo (QStandardItemModel * model)
 {
   FilterBarComboBox * c = new FilterBarComboBox (this);
-  FilterBarComboBoxDelegate * delegate = new FilterBarComboBoxDelegate (0, c);
+  FilterBarComboBoxDelegate * delegate = new FilterBarComboBoxDelegate (this, c);
   c->setItemDelegate (delegate);
 
   QStandardItem * row = new QStandardItem (tr ("All"));
@@ -426,7 +426,7 @@ FilterBar :: FilterBar (Prefs& prefs, TorrentModel& torrents, TorrentFilter& fil
   QHBoxLayout * h = new QHBoxLayout (this);
   const int hmargin = qMax (int (HIG::PAD), style ()->pixelMetric (QStyle::PM_LayoutHorizontalSpacing));
 
-  myCountLabel = new QLabel;
+  myCountLabel = new QLabel (this);
   h->setSpacing (0);
   h->setContentsMargins (2, 2, 2, 2);
   h->addWidget (myCountLabel);
@@ -436,7 +436,7 @@ FilterBar :: FilterBar (Prefs& prefs, TorrentModel& torrents, TorrentFilter& fil
   h->addWidget (myActivityCombo, 1);
   h->addSpacing (hmargin);
 
-  myTrackerModel = new QStandardItemModel;
+  myTrackerModel = new QStandardItemModel (this);
   myTrackerCombo = createTrackerCombo (myTrackerModel);
   h->addWidget (myTrackerCombo, 1);
   h->addSpacing (hmargin*2);
@@ -445,7 +445,7 @@ FilterBar :: FilterBar (Prefs& prefs, TorrentModel& torrents, TorrentFilter& fil
   h->addWidget (myLineEdit);
   connect (myLineEdit, SIGNAL (textChanged (QString)), this, SLOT (onTextChanged (QString)));
 
-  QPushButton * p = new QPushButton;
+  QPushButton * p = new QPushButton (this);
   QIcon icon = QIcon::fromTheme ("edit-clear", style ()->standardIcon (QStyle::SP_DialogCloseButton));
   int iconSize = style ()->pixelMetric (QStyle::PM_SmallIconSize);
   p->setIconSize (QSize (iconSize, iconSize));

@@ -232,7 +232,7 @@ TrMainWindow :: TrMainWindow (Session& session, Prefs& prefs, TorrentModel& mode
   myAltSpeedAction->setIcon (myPrefs.get<bool> (Prefs::ALT_SPEED_LIMIT_ENABLED) ? mySpeedModeOnIcon : mySpeedModeOffIcon);
   connect (myAltSpeedAction, SIGNAL (triggered ()), this, SLOT (toggleSpeedMode ()));
 
-  QMenu * menu = new QMenu ();
+  QMenu * menu = new QMenu (this);
   menu->addAction (ui.action_OpenFile);
   menu->addAction (ui.action_AddURL);
   menu->addSeparator ();
@@ -429,7 +429,7 @@ TrMainWindow :: createStatusBar ()
     a->addAction (ui.action_TotalTransfer);
     a->addAction (ui.action_SessionRatio);
     a->addAction (ui.action_SessionTransfer);
-    m = new QMenu ();
+    m = new QMenu (this);
     m->addAction (ui.action_TotalRatio);
     m->addAction (ui.action_TotalTransfer);
     m->addAction (ui.action_SessionRatio);
@@ -461,7 +461,7 @@ TrMainWindow :: createOptionsMenu ()
   QList<double> stockRatios;
   stockRatios << 0.25 << 0.50 << 0.75 << 1 << 1.5 << 2 << 3;
 
-  menu = new QMenu;
+  menu = new QMenu (this);
   sub = menu->addMenu (tr ("Limit Download Speed"));
 
     int currentVal = myPrefs.get<int> (Prefs::DSPEED);
@@ -1457,7 +1457,7 @@ TrMainWindow :: contextMenuEvent (QContextMenuEvent * event)
   menu->addAction (ui.action_Properties);
   menu->addAction (ui.action_OpenFolder);
 
-  QAction * sep = new QAction (this);
+  QAction * sep = new QAction (menu);
   sep->setSeparator (true);
   menu->addAction (sep);
   menu->addAction (ui.action_Start);
@@ -1470,14 +1470,14 @@ TrMainWindow :: contextMenuEvent (QContextMenuEvent * event)
     queueMenu->addAction (ui.action_QueueMoveBottom);
   menu->addAction (ui.action_Pause);
 
-  sep = new QAction (this);
+  sep = new QAction (menu);
   sep->setSeparator (true);
   menu->addAction (sep);
   menu->addAction (ui.action_Verify);
   menu->addAction (ui.action_SetLocation);
   menu->addAction (ui.action_CopyMagnetToClipboard);
 
-  sep = new QAction (this);
+  sep = new QAction (menu);
   sep->setSeparator (true);
   menu->addAction (sep);
   menu->addAction (ui.action_Remove);
