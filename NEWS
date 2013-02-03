@@ -3,11 +3,13 @@
 ==== All Platforms ====
   * Fix 2.75 regression that broke JSON parsing of real numbers in locales that don't use '.' as a decimal separator
   * Don't invalidate the OS' file cache when closing files
+  * Fix overflow error when setting speed limits above ~8589 kB/s
 ==== GTK+ Client ====
   * Minor pluralization fixes in the UI
 ==== Qt Client ====
   * Fix non Latin-1 symbol issue when showing file transfer speeds
   * Fix issue when creating new torrents with multiple trackers
+  * Fix lost text selection in the properties dialog's 'comment' field
 ==== Daemon ====
   * Fix documentation errors in the spec and manpages
 ==== CLI ====
