@@ -16,6 +16,8 @@
 #include <string.h>
 #include <errno.h> /* EILSEQ, EINVAL */
 
+#include <locale.h> /* setlocale () */
+
 #include <event2/util.h> /* evutil_strtoll () */
 
 #define JSONSL_STATE_USER_FIELDS /* no fields */
