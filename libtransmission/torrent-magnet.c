@@ -398,5 +398,11 @@ tr_torrentInfoGetMagnetLink (const tr_info * inf)
       tr_http_escape (s, inf->trackers[i].announce, -1, true);
     }
 
+  for (i=0; i<inf->webseedCount; i++)
+    {
+      evbuffer_add_printf (s, "%s", "&ws=");
+      tr_http_escape (s, inf->webseeds[i], -1, true);
+    }
+
   return evbuffer_free_to_str (s);
 }
