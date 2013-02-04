@@ -119,7 +119,7 @@ favicon_ready_cb (gpointer pixbuf, gpointer vreference)
 }
 
 static gboolean
-category_filter_model_update (GtkTreeStore * store)
+category_filter_model_update (gpointer gstore)
 {
     int i, n;
     int low = 0;
@@ -131,7 +131,8 @@ category_filter_model_update (GtkTreeStore * store)
     int store_pos;
     GtkTreeIter top;
     GtkTreeIter iter;
-    GtkTreeModel * model = GTK_TREE_MODEL (store);
+    GtkTreeStore * store = GTK_TREE_STORE (gstore);
+    GtkTreeModel * model = GTK_TREE_MODEL (gstore);
     GPtrArray * hosts = g_ptr_array_new ();
     GStringChunk * strings = g_string_chunk_new (4096);
     GHashTable * hosts_hash = g_hash_table_new_full (g_str_hash, g_str_equal, NULL, g_free);
@@ -295,7 +296,7 @@ category_filter_model_update (GtkTreeStore * store)
     g_ptr_array_free (hosts, TRUE);
     g_hash_table_unref (hosts_hash);
     g_string_chunk_free (strings);
-    return FALSE;
+    return G_SOURCE_REMOVE;
 }
 
 static GtkTreeModel *
@@ -376,7 +377,7 @@ category_model_update_idle (gpointer category_model)
     const gboolean pending = g_object_get_qdata (o, DIRTY_KEY) != NULL;
     if (!pending)
     {
-        GSourceFunc func = (GSourceFunc) category_filter_model_update;
+        GSourceFunc func = category_filter_model_update;
         g_object_set_qdata (o, DIRTY_KEY, GINT_TO_POINTER (1));
         gdk_threads_add_idle (func, category_model);
     }
@@ -651,11 +652,12 @@ status_model_update_count (GtkListStore * store, GtkTreeIter * iter, int n)
         gtk_list_store_set (store, iter, ACTIVITY_FILTER_COL_COUNT, n, -1);
 }
 
-static void
-activity_filter_model_update (GtkListStore * store)
+static gboolean
+activity_filter_model_update (gpointer gstore)
 {
     GtkTreeIter iter;
-    GtkTreeModel * model = GTK_TREE_MODEL (store);
+    GtkListStore * store = GTK_LIST_STORE (gstore);
+    GtkTreeModel * model = GTK_TREE_MODEL (gstore);
     GObject * o = G_OBJECT (store);
     GtkTreeModel * tmodel = GTK_TREE_MODEL (g_object_get_qdata (o, TORRENT_MODEL_KEY));
 
@@ -680,6 +682,8 @@ activity_filter_model_update (GtkListStore * store)
         status_model_update_count (store, &iter, hits);
 
     } while (gtk_tree_model_iter_next (model, &iter));
+
+    return G_SOURCE_REMOVE;
 }
 
 static GtkTreeModel *
@@ -751,7 +755,7 @@ activity_model_update_idle (gpointer activity_model)
     const gboolean pending = g_object_get_qdata (o, DIRTY_KEY) != NULL;
     if (!pending)
     {
-        GSourceFunc func = (GSourceFunc) activity_filter_model_update;
+        GSourceFunc func = activity_filter_model_update;
         g_object_set_qdata (o, DIRTY_KEY, GINT_TO_POINTER (1));
         gdk_threads_add_idle (func, activity_model);
     }
