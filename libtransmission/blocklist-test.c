@@ -33,7 +33,7 @@ create_text_file (const char * path, const char * contents)
   tr_mkdirp (dir, 0700);
   tr_free (dir);
 
-  remove (path);
+  tr_remove (path);
   fp = fopen (path, "w+");
   fprintf (fp, "%s", contents);
   fclose (fp);

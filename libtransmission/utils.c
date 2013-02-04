@@ -1437,7 +1437,7 @@ tr_moveFile (const char * oldpath, const char * newpath, bool * renamed)
 
   /* they might be on the same filesystem... */
   {
-    const int i = rename (oldpath, newpath);
+    const int i = tr_rename (oldpath, newpath);
     if (renamed != NULL)
       *renamed = i == 0;
     if (!i)
@@ -1470,6 +1470,22 @@ tr_moveFile (const char * oldpath, const char * newpath, bool * renamed)
 
   unlink (oldpath);
   return 0;
+}
+
+int
+tr_rename (const char * oldpath, const char * newpath)
+{
+  /* FIXME: needs win32 utf-16 support */
+
+  return rename (oldpath, newpath);
+}
+
+int
+tr_remove (const char * pathname)
+{
+  /* FIXME: needs win32 utf-16 support */
+
+  return remove (pathname);
 }
 
 bool

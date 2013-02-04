@@ -27,7 +27,6 @@
 #include <stdarg.h>
 #include <string.h> /* memcmp */
 #include <stdlib.h> /* qsort */
-#include <stdio.h> /* remove () */
 
 #include <event2/util.h> /* evutil_vsnprintf () */
 
@@ -2775,11 +2774,11 @@ removeEmptyFoldersAndJunkFiles (const char * folder)
                 if (!stat (filename, &sb) && S_ISDIR (sb.st_mode))
                     removeEmptyFoldersAndJunkFiles (filename);
                 else if (isJunkFile (d->d_name))
-                    remove (filename);
+                    tr_remove (filename);
                 tr_free (filename);
             }
         }
-        remove (folder);
+        tr_remove (folder);
         closedir (odir);
     }
 }
@@ -3106,7 +3105,7 @@ tr_torrentFileCompleted (tr_torrent * tor, tr_file_index_t fileIndex)
             char * oldpath = tr_buildPath (base, sub, NULL);
             char * newpath = tr_buildPath (base, f->name, NULL);
 
-            if (rename (oldpath, newpath))
+            if (tr_rename (oldpath, newpath))
                 tr_logAddTorErr (tor, "Error moving \"%s\" to \"%s\": %s", oldpath, newpath, tr_strerror (errno));
 
             tr_free (newpath);
@@ -3524,7 +3523,7 @@ renamePath (tr_torrent  * tor,
           int rv;
 
           tmp = errno;
-          rv = rename (src, tgt);
+          rv = tr_rename (src, tgt);
           if (rv != 0)
             error = errno;
           errno = tmp;

@@ -390,6 +390,12 @@ struct tm * tr_localtime_r (const time_t *_clock, struct tm *_result);
 int tr_moveFile (const char * oldpath, const char * newpath,
                  bool * renamed) TR_GNUC_NONNULL (1,2);
 
+/** @brief Portability wrapper for rename () */
+int tr_rename (const char * oldpath_utf8, const char * newpath_utf8);
+
+/** @brief Portability wrapper for remove () */
+int tr_remove (const char * pathname_utf8);
+
 /** @brief Test to see if the two filenames point to the same file. */
 bool tr_is_same_file (const char * filename1, const char * filename2);
 

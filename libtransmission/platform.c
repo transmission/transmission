@@ -371,7 +371,7 @@ moveFiles (const char * oldDir, const char * newDir)
                 {
                   char * o = tr_buildPath (oldDir, name, NULL);
                   char * n = tr_buildPath (newDir, name, NULL);
-                  rename (o, n);
+                  tr_rename (o, n);
                   ++count;
                   tr_free (n);
                   tr_free (o);

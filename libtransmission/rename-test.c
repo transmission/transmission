@@ -1,6 +1,6 @@
 #include <assert.h>
 #include <errno.h>
-#include <stdio.h> /* remove() */
+#include <stdio.h> /* fopen() */
 #include <string.h> /* strcmp() */
 #include <stdio.h>
 
@@ -98,7 +98,7 @@ create_file_with_contents (const char * path, const char * str)
   assert (rv == 0);
   tr_free (dir);
 
-  remove (path);
+  tr_remove (path);
   fp = fopen (path, "wb");
   fprintf (fp, "%s", str);
   fclose (fp);
@@ -398,13 +398,13 @@ test_multifile_torrent (void)
   /* remove the directory Felidae/Felinae/Felis/catus */
   str = tr_torrentFindFile (tor, 1);
   check (str != NULL);
-  remove (str);
+  tr_remove (str);
   tr_free (str);
   str = tr_torrentFindFile (tor, 2);
   check (str != NULL);
-  remove (str);
+  tr_remove (str);
   tmp = tr_dirname (str);
-  remove (tmp);
+  tr_remove (tmp);
   tr_free (tmp);
   tr_free (str);
   sync ();

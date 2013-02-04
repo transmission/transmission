@@ -11,7 +11,6 @@
  */
 
 #include <assert.h>
-#include <stdio.h> /* remove () */
 #include <string.h> /* memcpy (), memset (), memcmp () */
 
 #include <event2/buffer.h>
@@ -263,7 +262,7 @@ tr_torrentSetMetadataPiece (tr_torrent  * tor, int piece, const void  * data, in
                   int infoDictLength;
 
                   /* remove any old .torrent and .resume files */
-                  remove (path);
+                  tr_remove (path);
                   tr_torrentRemoveResume (tor);
 
                   dbgmsg (tor, "Saving completed metadata to \"%s\"", path);

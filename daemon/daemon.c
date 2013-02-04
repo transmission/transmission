@@ -277,13 +277,13 @@ onFileAdded (tr_session * session, const char * dir, const char * file)
             if (!test && trash)
             {
                 tr_logAddInfo ("Deleting input .torrent file \"%s\"", file);
-                if (remove (filename))
+                if (tr_remove (filename))
                     tr_logAddError ("Error deleting .torrent file: %s", tr_strerror (errno));
             }
             else
             {
                 char * new_filename = tr_strdup_printf ("%s.added", filename);
-                rename (filename, new_filename);
+                tr_rename (filename, new_filename);
                 tr_free (new_filename);
             }
         }
@@ -597,7 +597,7 @@ main (int argc, char ** argv)
 
     /* cleanup */
     if (pidfile_created)
-        remove (pid_filename);
+        tr_remove (pid_filename);
     tr_variantFree (&settings);
     return 0;
 }

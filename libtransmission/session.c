@@ -2238,17 +2238,17 @@ loadBlocklists (tr_session * session)
               tr_blocklistFile * b;
 
               old = tr_strdup_printf ("%s.old", binname);
-              remove (old);
-              rename (binname, old);
+              tr_remove (old);
+              tr_rename (binname, old);
               b = tr_blocklistFileNew (binname, isEnabled);
               if (tr_blocklistFileSetContent (b, path) > 0)
                 {
-                  remove (old);
+                  tr_remove (old);
                 }
               else
                 {
-                  remove (binname);
-                  rename (old, binname);
+                  tr_remove (binname);
+                  tr_rename (old, binname);
                 }
 
               tr_blocklistFileFree (b);

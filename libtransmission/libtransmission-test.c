@@ -166,7 +166,7 @@ rm_rf (const char * killme)
       if (verbose)
         fprintf (stderr, "cleanup: removing %s\n", killme);
 
-      remove (killme);
+      tr_remove (killme);
     }
 }
 

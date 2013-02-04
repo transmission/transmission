@@ -1212,11 +1212,7 @@ tr_variantToFile (const tr_variant  * v,
         {
           tr_close_file (fd);
 
-#ifdef WIN32
-          if (MoveFileEx (tmp, filename, MOVEFILE_REPLACE_EXISTING))
-#else
-          if (!rename (tmp, filename))
-#endif
+          if (!tr_rename (tmp, filename))
             {
               tr_logAddInfo (_("Saved \"%s\""), filename);
             }
