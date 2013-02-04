@@ -73,6 +73,7 @@ struct cbdata
   char * config_dir;
   gboolean start_paused;
   gboolean is_iconified;
+  gboolean is_closing;
 
   guint activation_count;
   guint timer;
@@ -275,7 +276,7 @@ refresh_actions_soon (gpointer gdata)
 {
   struct cbdata * data = gdata;
 
-  if (data->refresh_actions_tag == 0)
+  if (!data->is_closing && !data->refresh_actions_tag)
     data->refresh_actions_tag = gdk_threads_add_idle (refresh_actions, data);
 }
 
@@ -926,11 +927,20 @@ on_app_exit (gpointer vdata)
   GtkWidget *r, *p, *b, *w, *c;
   struct cbdata *cbdata = vdata;
 
+  cbdata->is_closing = true;
+
   /* stop the update timer */
   if (cbdata->timer)
     {
       g_source_remove (cbdata->timer);
       cbdata->timer = 0;
+    }
+
+  /* stop the refresh-actions timer */
+  if (cbdata->refresh_actions_tag)
+    {
+      g_source_remove (cbdata->refresh_actions_tag);
+      cbdata->refresh_actions_tag = 0;
     }
 
   c = GTK_WIDGET (cbdata->wind);

@@ -486,7 +486,6 @@ category_combo_box_new (GtkTreeModel * tmodel)
     /* create the category combobox */
     cat_model = category_filter_model_new (tmodel);
     c = gtk_combo_box_new_with_model (cat_model);
-    g_object_unref (cat_model);
     gtk_combo_box_set_row_separator_func (GTK_COMBO_BOX (c),
                                           is_it_a_separator, NULL, NULL);
     gtk_combo_box_set_active (GTK_COMBO_BOX (c), 0);
@@ -791,7 +790,6 @@ activity_combo_box_new (GtkTreeModel * tmodel)
 
     activity_model = activity_filter_model_new (tmodel);
     c = gtk_combo_box_new_with_model (activity_model);
-    g_object_unref (activity_model);
     gtk_combo_box_set_row_separator_func (GTK_COMBO_BOX (c),
                                        activity_is_it_a_separator, NULL, NULL);
     gtk_combo_box_set_active (GTK_COMBO_BOX (c), 0);
