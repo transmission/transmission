@@ -227,7 +227,7 @@ new_path_chooser_button (const char * key, gpointer core)
     g_object_set_data_full (G_OBJECT (w), PREF_KEY, g_strdup (key), g_free);
     g_signal_connect (w, "selection-changed", G_CALLBACK (chosen_cb), core);
     if (path != NULL)
-        gtk_file_chooser_set_current_folder (GTK_FILE_CHOOSER (w), path);
+        gtk_file_chooser_set_filename (GTK_FILE_CHOOSER (w), path);
     return w;
 }
 
