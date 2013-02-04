@@ -13,13 +13,13 @@
 #include <assert.h>
 #include <errno.h>
 #include <stdio.h> /* rename() */
-#include <stdlib.h> /* strtoul(), strtod(), realloc(), qsort(), mkstemp() */
+#include <stdlib.h> /* strtod(), realloc(), qsort(), mkstemp() */
 #include <string.h>
 
 #ifdef WIN32 /* tr_mkstemp() */
  #include <fcntl.h>
- #define _S_IREAD 256
- #define _S_IWRITE 128
+ #include <share.h>
+ #include <sys/stat.h>
 #endif
 
 #include <locale.h> /* setlocale() */
@@ -1133,12 +1133,25 @@ static int
 tr_mkstemp (char * template)
 {
 #ifdef WIN32
+
+  const int n = strlen (template) + 1;
   const int flags = O_RDWR | O_BINARY | O_CREAT | O_EXCL | _O_SHORT_LIVED;
   const mode_t mode = _S_IREAD | _S_IWRITE;
-  mktemp (template);
-  return open (template, flags, mode);
+  wchar_t templateUTF16[n];
+
+  if (MultiByteToWideChar(CP_UTF8, 0, template, -1, templateUTF16, n))
+    {
+      _wmktemp(templateUTF16);
+      WideCharToMultiByte(CP_UTF8, 0, templateUTF16, -1, template, n, NULL, NULL);
+      return _wopen(chkFilename(templateUTF16), flags, mode);
+    }
+  errno = EINVAL;
+  return -1;
+
 #else
+
   return mkstemp (template);
+
 #endif
 }
 

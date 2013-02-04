@@ -13,7 +13,7 @@
 #include <assert.h>
 #include <ctype.h> /* isdigit() */
 #include <errno.h>
-#include <stdlib.h> /* strtoul(), strtod(), realloc(), qsort(), mkstemp() */
+#include <stdlib.h> /* strtoul() */
 #include <string.h> /* strlen(), memchr() */
 
 #include <event2/buffer.h>
