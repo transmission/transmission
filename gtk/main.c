@@ -232,43 +232,46 @@ count_updatable_foreach (GtkTreeModel * model, GtkTreePath * path UNUSED,
 static gboolean
 refresh_actions (gpointer gdata)
 {
-  int canUpdate;
-  struct counts_data sel_counts;
   struct cbdata * data = gdata;
-  const size_t total = gtr_core_get_torrent_count (data->core);
-  const size_t active = gtr_core_get_active_torrent_count (data->core);
-  const int torrent_count = gtk_tree_model_iter_n_children (gtr_core_model (data->core), NULL);
-  bool has_selection;
+  if (!data->is_closing)
+    {
+      int canUpdate;
+      struct counts_data sel_counts;
+      const size_t total = gtr_core_get_torrent_count (data->core);
+      const size_t active = gtr_core_get_active_torrent_count (data->core);
+      const int torrent_count = gtk_tree_model_iter_n_children (gtr_core_model (data->core), NULL);
+      bool has_selection;
 
-  get_selected_torrent_counts (data, &sel_counts);
-  has_selection = sel_counts.total_count > 0;
+      get_selected_torrent_counts (data, &sel_counts);
+      has_selection = sel_counts.total_count > 0;
 
-  gtr_action_set_sensitive ("select-all", torrent_count != 0);
-  gtr_action_set_sensitive ("deselect-all", torrent_count != 0);
-  gtr_action_set_sensitive ("pause-all-torrents", active != 0);
-  gtr_action_set_sensitive ("start-all-torrents", active != total);
+      gtr_action_set_sensitive ("select-all", torrent_count != 0);
+      gtr_action_set_sensitive ("deselect-all", torrent_count != 0);
+      gtr_action_set_sensitive ("pause-all-torrents", active != 0);
+      gtr_action_set_sensitive ("start-all-torrents", active != total);
 
-  gtr_action_set_sensitive ("torrent-stop", (sel_counts.stopped_count < sel_counts.total_count));
-  gtr_action_set_sensitive ("torrent-start", (sel_counts.stopped_count) > 0);
-  gtr_action_set_sensitive ("torrent-start-now", (sel_counts.stopped_count + sel_counts.queued_count) > 0);
-  gtr_action_set_sensitive ("torrent-verify",          has_selection);
-  gtr_action_set_sensitive ("remove-torrent",          has_selection);
-  gtr_action_set_sensitive ("delete-torrent",          has_selection);
-  gtr_action_set_sensitive ("relocate-torrent",        has_selection);
-  gtr_action_set_sensitive ("queue-move-top",          has_selection);
-  gtr_action_set_sensitive ("queue-move-up",           has_selection);
-  gtr_action_set_sensitive ("queue-move-down",         has_selection);
-  gtr_action_set_sensitive ("queue-move-bottom",       has_selection);
-  gtr_action_set_sensitive ("show-torrent-properties", has_selection);
-  gtr_action_set_sensitive ("open-torrent-folder", sel_counts.total_count == 1);
-  gtr_action_set_sensitive ("copy-magnet-link-to-clipboard", sel_counts.total_count == 1);
+      gtr_action_set_sensitive ("torrent-stop", (sel_counts.stopped_count < sel_counts.total_count));
+      gtr_action_set_sensitive ("torrent-start", (sel_counts.stopped_count) > 0);
+      gtr_action_set_sensitive ("torrent-start-now", (sel_counts.stopped_count + sel_counts.queued_count) > 0);
+      gtr_action_set_sensitive ("torrent-verify",          has_selection);
+      gtr_action_set_sensitive ("remove-torrent",          has_selection);
+      gtr_action_set_sensitive ("delete-torrent",          has_selection);
+      gtr_action_set_sensitive ("relocate-torrent",        has_selection);
+      gtr_action_set_sensitive ("queue-move-top",          has_selection);
+      gtr_action_set_sensitive ("queue-move-up",           has_selection);
+      gtr_action_set_sensitive ("queue-move-down",         has_selection);
+      gtr_action_set_sensitive ("queue-move-bottom",       has_selection);
+      gtr_action_set_sensitive ("show-torrent-properties", has_selection);
+      gtr_action_set_sensitive ("open-torrent-folder", sel_counts.total_count == 1);
+      gtr_action_set_sensitive ("copy-magnet-link-to-clipboard", sel_counts.total_count == 1);
 
-  canUpdate = 0;
-  gtk_tree_selection_selected_foreach (data->sel, count_updatable_foreach, &canUpdate);
-  gtr_action_set_sensitive ("torrent-reannounce", canUpdate != 0);
+      canUpdate = 0;
+      gtk_tree_selection_selected_foreach (data->sel, count_updatable_foreach, &canUpdate);
+      gtr_action_set_sensitive ("torrent-reannounce", canUpdate != 0);
+    }
 
   data->refresh_actions_tag = 0;
-  return FALSE;
+  return G_SOURCE_REMOVE;
 }
 
 static void
