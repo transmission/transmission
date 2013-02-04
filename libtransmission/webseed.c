@@ -229,6 +229,7 @@ connection_succeeded (void * vdata)
                                &file_index, &file_offset);
         tr_free (w->file_urls[file_index]);
         w->file_urls[file_index] = data->real_url;
+        data->real_url = NULL;
     }
 
   tr_free (data->real_url);
