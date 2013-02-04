@@ -4,8 +4,12 @@
   * Fix 2.75 regression that broke JSON parsing of real numbers in locales that don't use '.' as a decimal separator
   * Don't invalidate the OS' file cache when closing files
   * Fix overflow error when setting speed limits above ~8589 kB/s
+  * Fix minor memory leaks when using webseeds
+  * "Copy magnet link to clipboard" didn't include webseeds
 ==== GTK+ Client ====
   * Minor pluralization fixes in the UI
+  * Fix folder mis-selection issue in the Preferences Dialog
+  * Fix GTK+ console warnings on shutdown
 ==== Qt Client ====
   * Fix non Latin-1 symbol issue when showing file transfer speeds
   * Fix issue when creating new torrents with multiple trackers
