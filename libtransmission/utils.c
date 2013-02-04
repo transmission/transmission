@@ -1475,12 +1475,39 @@ tr_moveFile (const char * oldpath, const char * newpath, bool * renamed)
 bool
 tr_is_same_file (const char * filename1, const char * filename2)
 {
+#ifdef WIN32
+
+  bool res;
+  HANDLE fh1, fh2;
+  BY_HANDLE_FILE_INFORMATION fi1, fi2;
+  int n = strlen (filename1) + 1;
+  int m = strlen (filename2) + 1;
+  wchar_t f1nameUTF16[n];
+  wchar_t f2nameUTF16[m];
+ 
+  MultiByteToWideChar (CP_UTF8, 0, filename1, -1, f1nameUTF16, n);
+  MultiByteToWideChar (CP_UTF8, 0, filename2, -1, f2nameUTF16, m);
+  fh1 = CreateFileW (chkFilename (f1nameUTF16), 0, 0, NULL, OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, NULL);
+  fh2 = CreateFileW (chkFilename (f2nameUTF16), 0, 0, NULL, OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, NULL);
+  res = GetFileInformationByHandle (fh1, &fi1)
+          && GetFileInformationByHandle (fh2, &fi2)
+          && (fi1.dwVolumeSerialNumber == fi2.dwVolumeSerialNumber)
+          && (fi1.nFileIndexHigh == fi2.nFileIndexHigh)
+          && (fi1.nFileIndexLow  == fi2.nFileIndexLow);
+  CloseHandle (fh1);
+  CloseHandle (fh2);
+  return res;
+
+#else
+
   struct stat sb1, sb2;
 
   return !stat (filename1, &sb1)
       && !stat (filename2, &sb2)
       && (sb1.st_dev == sb2.st_dev)
       && (sb1.st_ino == sb2.st_ino);
+
+#endif
 }
 
 /***
