@@ -32,7 +32,7 @@ static int            myQueueLength = 0;
 #ifndef WIN32
   /* make null versions of these win32 functions */
   static inline int IsDebuggerPresent (void) { return false; }
-  static inline void OutputDebugString (const void * unused UNUSED) { }
+  static inline void OutputDebugStringA (const void * unused UNUSED) { }
 #endif
 
 /***
@@ -206,7 +206,7 @@ tr_logAddDeep (const char  * file,
       evbuffer_add_printf (buf, " (%s:%d)\n", base, line);
       /* FIXME (libevent2) ifdef this out for nonwindows platforms */
       message = evbuffer_free_to_str (buf);
-      OutputDebugString (message);
+      OutputDebugStringA (message);
       if (fp)
         fputs (message, fp);
 
@@ -238,7 +238,7 @@ tr_logAddMessage (const char * file,
   evutil_vsnprintf (buf, sizeof (buf), fmt, ap);
   va_end (ap);
 
-  OutputDebugString (buf);
+  OutputDebugStringA (buf);
 
   if (*buf)
     {
