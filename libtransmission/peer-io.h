@@ -90,7 +90,7 @@ typedef struct tr_peerIo
 
     tr_port               port;
     int                   socket;
-    struct UTPSocket      *utp_socket;
+    struct UTPSocket    * utp_socket;
 
     int                   refCount;
 
@@ -138,13 +138,13 @@ tr_peerIo*  tr_peerIoNewIncoming (tr_session              * session,
                                   int                       socket,
                                   struct UTPSocket *        utp_socket);
 
-void tr_peerIoRefImpl         (const char              * file,
+void tr_peerIoRefImpl            (const char              * file,
                                   int                       line,
                                   tr_peerIo               * io);
 
 #define tr_peerIoRef(io) tr_peerIoRefImpl (__FILE__, __LINE__, (io));
 
-void tr_peerIoUnrefImpl       (const char              * file,
+void tr_peerIoUnrefImpl          (const char              * file,
                                   int                       line,
                                   tr_peerIo               * io);
 

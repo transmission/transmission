@@ -27,6 +27,9 @@
  * @{
  */
 
+struct tr_peer;
+struct tr_swarm;
+
 enum
 {
   /* this is the maximum size of a block request.
@@ -72,33 +75,36 @@ tr_peer_event;
 
 extern const tr_peer_event TR_PEER_EVENT_INIT;
 
+typedef void tr_peer_callback (struct tr_peer       * peer,
+                               const tr_peer_event  * event,
+                               void                 * client_data);
+
+/***
+****
+***/
+
+typedef void (*tr_peer_destruct_func)(struct tr_peer * peer);
+typedef bool (*tr_peer_is_transferring_pieces_func)(const struct tr_peer * peer,
+                                                    uint64_t now,
+                                                    tr_direction direction,
+                                                    unsigned int * Bps);
+struct tr_peer_virtual_funcs
+{
+  tr_peer_destruct_func destruct;
+  tr_peer_is_transferring_pieces_func is_transferring_pieces;
+};
+
 /**
  * State information about a connected peer.
  *
  * @see struct peer_atom
- * @see tr_peermsgs
+ * @see tr_peerMsgs
  */
 typedef struct tr_peer
 {
   /* whether or not we should free this peer soon.
      NOTE: private to peer-mgr.c */
   bool doPurge;
-
-  /* Whether or not we've choked this peer.
-     Only applies to BitTorrent peers */
-  bool peerIsChoked;
-
-  /* whether or not the peer has indicated it will download from us.
-     Only applies to BitTorrent peers */
-  bool peerIsInterested;
-
-  /* whether or the peer is choking us.
-     Only applies to BitTorrent peers */
-  bool clientIsChoked;
-
-  /* whether or not we've indicated to the peer that we would download from them if unchoked.
-     Only applies to BitTorrent peers */
-  bool clientIsInterested;
 
   /* number of bad pieces they've contributed to */
   uint8_t strikes;
@@ -109,10 +115,10 @@ typedef struct tr_peer
   /* how many requests we've made and are currently awaiting a response for */
   int pendingReqsToPeer;
 
-  struct tr_peerIo * io;
-
   /* Hook to private peer-mgr information */
   struct peer_atom * atom;
+
+  struct tr_swarm * swarm;
 
   /** how complete the peer's copy of the torrent is. [0.0...1.0] */
   float progress;
@@ -124,21 +130,21 @@ typedef struct tr_peer
      For BitTorrent peers, this is the app name derived from the `v' string in LTEP's handshake dictionary */
   tr_quark client;
 
-  time_t chokeChangedAt;
-
   tr_recentHistory blocksSentToClient;
   tr_recentHistory blocksSentToPeer;
 
   tr_recentHistory cancelsSentToClient;
   tr_recentHistory cancelsSentToPeer;
 
-  struct tr_peermsgs * msgs;
+  const struct tr_peer_virtual_funcs * funcs;
 }
 tr_peer;
 
-typedef void tr_peer_callback (struct tr_peer       * peer,
-                               const tr_peer_event  * event,
-                               void                 * client_data);
+
+void tr_peerConstruct (struct tr_peer * peer, const tr_torrent * tor);
+
+void tr_peerDestruct  (struct tr_peer * peer);
+
 
 /** Update the tr_peer.progress field based on the 'have' bitset. */
 void tr_peerUpdateProgress (tr_torrent * tor, struct tr_peer *);
