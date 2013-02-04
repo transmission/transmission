@@ -12,6 +12,7 @@
 
 #define __LIBTRANSMISSION_ANNOUNCER_MODULE___
 
+#include <errno.h> /* errno, EAFNOSUPPORT */
 #include <string.h> /* memcpy (), memset () */
 
 #include <event2/buffer.h>
