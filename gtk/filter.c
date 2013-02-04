@@ -402,7 +402,6 @@ tracker_combo_box_new (GtkTreeModel * tmodel)
   c = gtk_combo_box_new_with_model (cat_model);
   c_combo_box = GTK_COMBO_BOX (c);
   c_cell_layout = GTK_CELL_LAYOUT (c);
-  g_object_unref (cat_model);
   gtk_combo_box_set_row_separator_func (c_combo_box,
                                         is_it_a_separator, NULL, NULL);
   gtk_combo_box_set_active (c_combo_box, 0);
@@ -691,7 +690,6 @@ activity_combo_box_new (GtkTreeModel * tmodel)
   c = gtk_combo_box_new_with_model (activity_model);
   c_combo_box = GTK_COMBO_BOX (c);
   c_cell_layout = GTK_CELL_LAYOUT (c);
-  g_object_unref (activity_model);
   gtk_combo_box_set_row_separator_func (c_combo_box,
                                         activity_is_it_a_separator, NULL, NULL);
   gtk_combo_box_set_active (c_combo_box, 0);
