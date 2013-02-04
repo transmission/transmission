@@ -1,4 +1,7 @@
 #include <string.h> /* strlen () */
+
+#include <locale.h> /* setlocale () */
+
 #include "transmission.h"
 #include "bencode.h"
 #include "json.h"
