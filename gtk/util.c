@@ -17,7 +17,6 @@
 
 #include <gtk/gtk.h>
 #include <glib/gi18n.h>
-#include <glib/gstdio.h> /* g_unlink () */
 #include <gio/gio.h> /* g_file_trash () */
 
 #include <libtransmission/transmission.h> /* TR_RATIO_NA, TR_RATIO_INF */

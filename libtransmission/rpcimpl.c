@@ -15,7 +15,6 @@
 #include <errno.h>
 #include <stdlib.h> /* strtol */
 #include <string.h> /* strcmp */
-#include <unistd.h> /* unlink */
 
 #ifdef HAVE_ZLIB
  #include <zlib.h>
@@ -1490,7 +1489,7 @@ gotNewBlocklist (tr_session       * session,
             tr_snprintf (result, sizeof (result), "success");
         }
 
-        unlink (filename);
+        tr_remove (filename);
         tr_free (filename);
         tr_free (buf);
     }

@@ -40,7 +40,7 @@
 #include <sys/time.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <unistd.h> /* stat (), getcwd (), getpagesize (), unlink () */
+#include <unistd.h> /* stat (), getcwd (), getpagesize () */
 
 #include <event2/buffer.h>
 #include <event2/event.h>
@@ -1468,7 +1468,7 @@ tr_moveFile (const char * oldpath, const char * newpath, bool * renamed)
   if (bytesLeft != 0)
     return -1;
 
-  unlink (oldpath);
+  tr_remove (oldpath);
   return 0;
 }
 

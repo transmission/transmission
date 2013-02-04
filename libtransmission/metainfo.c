@@ -16,7 +16,7 @@
 #include <string.h> /* strlen () */
 
 #include <sys/types.h>
-#include <unistd.h> /* unlink, stat */
+#include <unistd.h> /* stat */
 
 #include <event2/buffer.h>
 
@@ -587,7 +587,7 @@ tr_metainfoRemoveSaved (const tr_session * session, const tr_info * inf)
   char * filename;
 
   filename = getTorrentFilename (session, inf);
-  unlink (filename);
+  tr_remove (filename);
   tr_free (filename);
 }
 

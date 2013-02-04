@@ -23,7 +23,7 @@
 #endif
 
 #include <locale.h> /* setlocale() */
-#include <unistd.h> /* write(), unlink() */
+#include <unistd.h> /* write() */
 
 #include <event2/buffer.h>
 
@@ -1206,7 +1206,7 @@ tr_variantToFile (const tr_variant  * v,
         {
           tr_logAddError (_("Couldn't save temporary file \"%1$s\": %2$s"), tmp, tr_strerror (err));
           tr_close_file (fd);
-          unlink (tmp);
+          tr_remove (tmp);
         }
       else
         {
@@ -1220,7 +1220,7 @@ tr_variantToFile (const tr_variant  * v,
             {
               err = errno;
               tr_logAddError (_("Couldn't save file \"%1$s\": %2$s"), filename, tr_strerror (err));
-              unlink (tmp);
+              tr_remove (tmp);
             }
         }
     }

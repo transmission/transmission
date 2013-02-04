@@ -16,7 +16,7 @@
 #include <stdlib.h> /* bsearch (), qsort () */
 #include <string.h>
 
-#include <unistd.h> /* unlink () */
+#include <unistd.h> /* close () */
 
 #ifdef WIN32
  #include <w32api.h>
@@ -139,7 +139,7 @@ static void
 blocklistDelete (tr_blocklistFile * b)
 {
   blocklistClose (b);
-  unlink (b->filename);
+  tr_remove (b->filename);
 }
 
 /***

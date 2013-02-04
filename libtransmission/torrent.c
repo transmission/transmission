@@ -2921,7 +2921,7 @@ deleteLocalData (tr_torrent * tor, tr_fileFunc func)
         removeEmptyFoldersAndJunkFiles (tr_ptrArrayNth (&folders, i));
 
     /* cleanup */
-    rmdir (tmpdir);
+    tr_remove (tmpdir);
     tr_free (tmpdir);
     tr_ptrArrayDestruct (&folders, tr_free);
     tr_ptrArrayDestruct (&files, tr_free);

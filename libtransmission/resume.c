@@ -10,8 +10,6 @@
  * $Id$
  */
 
-#include <unistd.h> /* unlink */
-
 #include <string.h>
 
 #include "transmission.h"
@@ -923,6 +921,6 @@ void
 tr_torrentRemoveResume (const tr_torrent * tor)
 {
     char * filename = getResumeFilename (tor);
-    unlink (filename);
+    tr_remove (filename);
     tr_free (filename);
 }
