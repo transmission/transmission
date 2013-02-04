@@ -230,6 +230,9 @@ connection_succeeded (void * vdata)
         tr_free (w->file_urls[file_index]);
         w->file_urls[file_index] = data->real_url;
     }
+
+  tr_free (data->real_url);
+  tr_free (data);
 }
 
 /***
