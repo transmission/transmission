@@ -1147,10 +1147,10 @@ Transmission.prototype =
 		$('#speed-dn-label').text( fmt.speedBps( d ) );
 
 		if (this.freeSpace > 0)
-			text = fmt.size (this.freeSpace);
+			text = fmt.size (this.freeSpace) + " Free";
 		else
 			text = '';
-		$('#freespace-info').text( text);
+		$('#freespace-info').text( text );
 
 		// visible torrents
 		$('#filter-count').text( fmt.countString('Transfer','Transfers',this._rows.length ) );

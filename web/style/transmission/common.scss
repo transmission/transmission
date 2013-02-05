@@ -246,18 +246,6 @@ $statusbar-height: 26px;
 			display: inline;
 		}
 	}
-
-	#freespace-info
-	{
-		float: right;
-		margin-top: 5px;
-		margin-right: 10px;
-		display: inline;
-
-		* {
-			display: inline-block;
-		}
-	}
 }
 
 /***
@@ -806,6 +794,13 @@ div.torrent_footer
 	#compact-button {
 		@include roundedBox(5px);
 		@include buttonImage('images/compact.png', $idle-color-top, $idle-color-bottom, $active-color-top, $active-color-bottom);
+	}
+
+	#freespace-info	{
+		float: right;
+                text-align: right;
+                border: 0px;
+                width: 100px;
 	}
 }
 

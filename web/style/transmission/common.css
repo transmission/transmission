@@ -143,13 +143,6 @@ div#toolbar {
       background: url("images/arrow-down.png") bottom no-repeat; }
     #statusbar #speed-info #speed-up-container, #statusbar #speed-info #speed-dn-container {
       display: inline; }
-  #statusbar #freespace-info {
-    float: right;
-    margin-top: 5px;
-    margin-right: 10px;
-    display: inline; }
-    #statusbar #freespace-info * {
-      display: inline-block; }
 
 /***
 ****
@@ -957,6 +950,11 @@ div.torrent_footer {
       /* Opera 11.10+ */
       background-position: center;
       background-repeat: no-repeat; }
+  div.torrent_footer #freespace-info {
+    float: right;
+    text-align: right;
+    border: 0px;
+    width: 100px; }
 
 /****
 *****
