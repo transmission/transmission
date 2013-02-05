@@ -14,12 +14,21 @@
  #include <sys/types.h> /* types needed by quota.h */
  #ifdef __FreeBSD__
   #include <ufs/ufs/quota.h> /* quotactl() */
+ #elif defined (__sun)
+  #include <sys/fs/ufs_quota.h> /* quotactl */
  #else
   #include <sys/quota.h> /* quotactl() */
  #endif
  #ifdef HAVE_GETMNTENT
-  #include <mntent.h>
-  #include <paths.h> /* _PATH_MOUNTED */
+  #ifdef __sun
+   #include <stdio.h>
+   #include <sys/mntent.h>
+   #include <sys/mnttab.h>
+   #define _PATH_MOUNTED MNTTAB
+  #else
+   #include <mntent.h>
+   #include <paths.h> /* _PATH_MOUNTED */
+  #endif
  #else /* BSD derived systems */
   #include <sys/param.h>
   #include <sys/ucred.h>
@@ -729,6 +738,19 @@ getdev (const char * path)
 #ifdef HAVE_GETMNTENT
 
   FILE * fp;
+
+#ifdef __sun
+  struct mnttab * mnt;
+  fp = fopen(_PATH_MOUNTED, "r");
+  if (fp == NULL)
+    return NULL;
+
+  while (getmntent(fp, mnt))
+    if (!tr_strcmp0 (path, mnt->mnt_mountp))
+      break;
+  fclose(fp);
+  return mnt ? mnt->mnt_fstype : NULL;
+#else
   struct mntent * mnt;
 
   fp = setmntent(_PATH_MOUNTED, "r");
@@ -741,7 +763,7 @@ getdev (const char * path)
 
   endmntent(fp);
   return mnt ? mnt->mnt_fsname : NULL;
-
+#endif
 #else /* BSD derived systems */
 
   int i;
@@ -768,6 +790,17 @@ getfstype (const char * device)
 #ifdef HAVE_GETMNTENT
 
   FILE * fp;
+#ifdef __sun
+  struct mnttab *mnt;
+  fp = fopen(_PATH_MOUNTED, "r");
+  if (fp == NULL)
+    return NULL;
+  while (getmntent(fp, mnt))
+    if (!tr_strcmp0 (device, mnt->mnt_mountp))
+      break;
+  fclose(fp);
+  return mnt ? mnt->mnt_fstype : NULL;
+#else
   struct mntent *mnt;
 
   fp = setmntent (_PATH_MOUNTED, "r");
@@ -780,7 +813,7 @@ getfstype (const char * device)
 
   endmntent(fp);
   return mnt ? mnt->mnt_type : NULL;
-
+#endif
 #else /* BSD derived systems */
 
   int i;
@@ -836,10 +869,22 @@ getquota (char * device)
 
 #if defined(__FreeBSD__) || defined(SYS_DARWIN)
   if (quotactl(device, QCMD(Q_GETQUOTA, USRQUOTA), getuid(), (caddr_t) &dq) == 0)
+    {
+#elif defined(__sun)
+  struct quotctl  op; 
+  int fd = open(device, O_RDONLY); 
+  if (fd < 0) 
+    return -1; 
+  op.op = Q_GETQUOTA; 
+  op.uid = getuid(); 
+  op.addr = (caddr_t) &dq; 
+  if (ioctl(fd, Q_QUOTACTL, &op) == 0)
+    {
+      close(fd);
 #else
   if (quotactl(QCMD(Q_GETQUOTA, USRQUOTA), device, getuid(), (caddr_t) &dq) == 0)
-#endif
     {
+#endif
       if (dq.dqb_bsoftlimit > 0)
         {
           /* Use soft limit first */
@@ -860,6 +905,8 @@ getquota (char * device)
       spaceused = (int64_t) dq.dqb_curbytes;
 #elif defined(__UCLIBC__)
       spaceused = (int64_t) btodb(dq.dqb_curblocks);
+#elif defined(__sun)
+      spaceused = (int64_t) dq.dqb_curblocks >> 1;
 #else
       spaceused = btodb(dq.dqb_curspace);
 #endif
@@ -870,7 +917,9 @@ getquota (char * device)
       return (freespace < 0) ? 0 : freespace * 1024;
 #endif
     }
-
+#if defined(__sun)
+  close(fd);
+#endif
   /* something went wrong */
   return -1;
 }
