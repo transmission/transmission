@@ -189,3 +189,20 @@ Formatter :: timeToString( int seconds )
 
     return str;
 }
+
+QString
+Formatter :: uploadSpeedToString (const Speed& uploadSpeed)
+{
+  static const QChar uploadSymbol (0x25B4);
+
+  return tr( "%1 %2").arg(speedToString(uploadSpeed)).arg(uploadSymbol);
+}
+
+QString
+Formatter :: downloadSpeedToString (const Speed& downloadSpeed)
+{
+  static const QChar downloadSymbol (0x25BE);
+
+  return tr( "%1 %2").arg(speedToString(downloadSpeed)).arg(downloadSymbol);
+}
+

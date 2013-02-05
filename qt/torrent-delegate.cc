@@ -171,21 +171,16 @@ QString
 TorrentDelegate :: shortTransferString (const Torrent& tor) const
 {
   QString str;
-  static const QChar uploadSymbol (0x25B4);
-  static const QChar downloadSymbol (0x25BE);
   const bool haveMeta (tor.hasMetadata());
   const bool haveDown (haveMeta && ((tor.webseedsWeAreDownloadingFrom()>0) || (tor.peersWeAreDownloadingFrom()>0)));
   const bool haveUp (haveMeta && tor.peersWeAreUploadingTo()>0);
 
   if (haveDown)
-    str = tr( "%1 %2   %3 %4" ).arg(Formatter::speedToString(tor.downloadSpeed()))
-                               .arg(downloadSymbol)
-                               .arg(Formatter::speedToString(tor.uploadSpeed()))
-                               .arg(uploadSymbol);
+    str = tr( "%1   %2" ).arg(Formatter::downloadSpeedToString(tor.downloadSpeed()))
+                         .arg(Formatter::uploadSpeedToString(tor.uploadSpeed()));
 
   else if (haveUp)
-    str = tr( "%1 %2" ).arg(Formatter::speedToString(tor.uploadSpeed()))
-                       .arg(uploadSymbol);
+    str = Formatter::uploadSpeedToString(tor.uploadSpeed());
 
   return str;
 }

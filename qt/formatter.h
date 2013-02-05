@@ -38,6 +38,8 @@ class Formatter: public QObject
         static QString percentToString( double x );
         static QString ratioToString( double ratio );
         static QString timeToString( int seconds );
+        static QString uploadSpeedToString (const Speed& up);
+        static QString downloadSpeedToString (const Speed& down);
 
     public:
 
