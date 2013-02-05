@@ -4,7 +4,6 @@ http://www.transmissionbt.com/
 Lead Developers <dev@transmissionbt.com>
   Jordan Lee <jordan@transmissionbt.com>  (Daemon, Backend, GTK+ client)
   Mitchell Livingston, Digital Ignition LLC <livings124@transmissionbt.com>  (Mac OS X client)
-  Kevin Glowacz <kjg@transmissionbt.com> (Web client)
 
 Project Contributors
   John Clay <john@transmissionbt.com> (Website maintenance and troubleshooting, Mac OS X help documentation)
@@ -15,6 +14,7 @@ Project Contributors
   Diego Jiménez (Patches)
   Kendall Hopkins <SoftwareElves@gmail.com>  (Web client)
   Malcolm Jarvis <mjarvis@transmissionbt.com>  (Web client)
+  Kevin Glowacz <kjg@transmissionbt.com> (Web client)
   Rashid Eissing  (Mac OS X Transfers preferences icon)
   Hugo van Heuven, madebysofa  (Main icon design)
   Andreas Nilsson (GNOME adaptation of main icon)
