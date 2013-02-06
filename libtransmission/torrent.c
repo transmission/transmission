@@ -2964,6 +2964,7 @@ setLocation (void * vdata)
     const bool do_move = data->move_from_old_location;
     const char * location = data->location;
     double bytesHandled = 0;
+    tr_torrentLock (tor);
 
     assert (tr_isTorrent (tor));
 
@@ -3041,6 +3042,7 @@ setLocation (void * vdata)
         *data->setme_state = err ? TR_LOC_ERROR : TR_LOC_DONE;
 
     /* cleanup */
+    tr_torrentUnlock (tor);
     tr_free (data->location);
     tr_free (data);
 }
