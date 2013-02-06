@@ -161,10 +161,59 @@ test_incomplete_dir (void)
 ****
 ***/
 
+static int
+test_set_location (void)
+{
+  size_t i;
+  int state;
+  char * target_dir;
+  tr_torrent * tor;
+  tr_session * session;
+  const time_t deadline = time(NULL) + 5;
+
+  /* init the session */
+  session = libttest_session_init (NULL);
+  target_dir = tr_buildPath (tr_sessionGetConfigDir (session), "target", NULL);
+  tr_mkdirp (target_dir, 0777);
+  
+  /* init a torrent. */
+  tor = libttest_zero_torrent_init (session);
+  libttest_zero_torrent_populate (tor, true);
+  libttest_blockingTorrentVerify (tor);
+  check_int_eq (0, tr_torrentStat(tor)->leftUntilDone);
+
+  /* now move it */
+  state = -1;
+  tr_torrentSetLocation (tor, target_dir, true, NULL, &state);
+  while ((state==TR_LOC_MOVING) && (time(NULL)<=deadline))
+    tr_wait_msec (50);
+  check_int_eq (TR_LOC_DONE, state);
+
+  /* confirm the torrent is still complete after being moved */
+  libttest_blockingTorrentVerify (tor);
+  check_int_eq (0, tr_torrentStat(tor)->leftUntilDone);
+
+  /* confirm the filest really got moved */
+  sync ();
+  for (i=0; i<tor->info.fileCount; ++i)
+    check_file_location (tor, i, tr_buildPath (target_dir, tor->info.files[i].name, NULL));
+
+  /* cleanup */
+  tr_free (target_dir);
+  tr_torrentRemove (tor, true, remove);
+  libttest_session_close (session);
+  return 0;
+}
+
+/***
+****
+***/
+
 int
 main (void)
 {
-  const testFunc tests[] = { test_incomplete_dir };
+  const testFunc tests[] = { test_incomplete_dir,
+                             test_set_location };
 
   return runTests (tests, NUM_TESTS (tests));
 }
