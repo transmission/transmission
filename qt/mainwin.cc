@@ -746,21 +746,40 @@ TrMainWindow :: refreshTrayIconSoon ()
 void
 TrMainWindow :: refreshTrayIcon ()
 {
-  const QString idle = tr ("Idle");
-  const Speed u (myModel.getUploadSpeed ());
-  const Speed d (myModel.getDownloadSpeed ());
+  Speed upSpeed, downSpeed;
+  size_t upCount, downCount;
+  QString tip;
 
-  myTrayIcon.setToolTip (tr ("Transmission\nUp: %1\nDown: %2")
-                         .arg (u.isZero () ? idle : Formatter::speedToString (u))
-                         .arg (d.isZero () ? idle : Formatter::speedToString (d)));
+  myModel.getTransferSpeed (upSpeed, upCount, downSpeed, downCount);
+
+  if (!upCount && !downCount)
+    {
+      tip = tr ("Idle");
+    }
+  else if (downCount)
+    {
+      tip  = tr( "%1   %2" ).arg(Formatter::downloadSpeedToString(downSpeed))
+                            .arg(Formatter::uploadSpeedToString(upSpeed));
+    }
+  else if (upCount)
+    {
+      tip = Formatter::uploadSpeedToString(upSpeed);
+    }
+
+  myTrayIcon.setToolTip (tip);
 }
 
 void
 TrMainWindow :: refreshStatusBar ()
 {
-  myUploadSpeedLabel->setText (Formatter::uploadSpeedToString(myModel.getUploadSpeed()));
+  Speed upSpeed, downSpeed;
+  size_t upCount, downCount;
+  myModel.getTransferSpeed (upSpeed, upCount, downSpeed, downCount);
 
-  myDownloadSpeedLabel->setText (Formatter::downloadSpeedToString(myModel.getDownloadSpeed()));
+  myUploadSpeedLabel->setText (Formatter::uploadSpeedToString(upSpeed));
+  myUploadSpeedLabel->setVisible (downCount || upCount);
+  myDownloadSpeedLabel->setText (Formatter::downloadSpeedToString(downSpeed));
+  myDownloadSpeedLabel->setVisible (downCount);
 
   myNetworkLabel->setVisible (!mySession.isServer ());
 

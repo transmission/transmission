@@ -57,8 +57,10 @@ class TorrentModel: public QAbstractListModel
         QSet<int> getIds( ) const;
 
     public:
-        Speed getUploadSpeed( ) const;
-        Speed getDownloadSpeed( ) const;
+        void getTransferSpeed (Speed   & uploadSpeed,
+                               size_t  & uploadPeerCount,
+                               Speed   & downloadSpeed,
+                               size_t  & downloadPeerCount);
 
     signals:
         void torrentsAdded( QSet<int> );

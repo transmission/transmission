@@ -230,22 +230,28 @@ TorrentModel :: removeTorrent( int id )
     }
 }
 
-Speed
-TorrentModel :: getUploadSpeed( ) const
+void
+TorrentModel :: getTransferSpeed (Speed   & uploadSpeed,
+                                  size_t  & uploadPeerCount,
+                                  Speed   & downloadSpeed,
+                                  size_t  & downloadPeerCount)
 {
-    Speed up;
-    foreach( const Torrent * tor, myTorrents )
-        up += tor->uploadSpeed( );
-    return up;
-}
+  Speed upSpeed, downSpeed;
+  size_t upCount=0, downCount=0;
 
-Speed
-TorrentModel :: getDownloadSpeed( ) const
-{
-    Speed down;
-    foreach( const Torrent * tor, myTorrents )
-        down += tor->downloadSpeed( );
-    return down;
+  foreach (const Torrent * const tor, myTorrents)
+    {
+      upSpeed += tor->uploadSpeed ();
+      upCount += tor->peersWeAreUploadingTo ();
+      downSpeed += tor->downloadSpeed ();
+      downCount += tor->webseedsWeAreDownloadingFrom();
+      downCount += tor->peersWeAreDownloadingFrom();
+    }
+
+  uploadSpeed = upSpeed;
+  uploadPeerCount = upCount;
+  downloadSpeed = downSpeed;
+  downloadPeerCount = downCount;
 }
 
 QSet<int>
