@@ -18,6 +18,8 @@ typedef void (^CompletionBlock)(BOOL);
 @property (nonatomic, retain) FileListNode * node;
 @property (nonatomic, copy) CompletionBlock completionHandler;
 
+@property (nonatomic, copy) NSString * originalName;
+
 @end
 
 @implementation FileRenameSheetController
@@ -26,6 +28,7 @@ typedef void (^CompletionBlock)(BOOL);
 @synthesize torrent = _torrent;
 @synthesize node = _node;
 @synthesize completionHandler = _completionHandler;
+@synthesize originalName = _originalName;
 @synthesize labelField = _labelField;
 @synthesize inputField = _inputField;
 @synthesize renameButton = _renameButton;
@@ -75,6 +78,7 @@ typedef void (^CompletionBlock)(BOOL);
     [_torrent release];
     [_node release];
     [_completionHandler release];
+    [_originalName release];
     [super dealloc];
 }
 
@@ -82,11 +86,11 @@ typedef void (^CompletionBlock)(BOOL);
 {
     [super windowDidLoad];
     
-    NSString * name = [self.node name] ?: [self.torrent name];
-    NSString * label = [NSString stringWithFormat: NSLocalizedString(@"Rename the file \"%@\":", "rename sheet label"), name];
+    self.originalName = [self.node name] ?: [self.torrent name];
+    NSString * label = [NSString stringWithFormat: NSLocalizedString(@"Rename the file \"%@\":", "rename sheet label"), self.originalName];
     [self.labelField setStringValue: label];
     
-    [self.inputField setStringValue: name];
+    [self.inputField setStringValue: self.originalName];
     [self.renameButton setEnabled: NO];
     
     #warning size these
@@ -119,7 +123,7 @@ typedef void (^CompletionBlock)(BOOL);
 
 - (void) controlTextDidChange: (NSNotification *) notification
 {
-    [self.renameButton setEnabled: ![[self.inputField stringValue] isEqualToString: @""] && ![[self.inputField stringValue] isEqualToString: [self.torrent name]]];
+    [self.renameButton setEnabled: ![[self.inputField stringValue] isEqualToString: @""] && ![[self.inputField stringValue] isEqualToString: self.originalName]];
 }
 
 @end
