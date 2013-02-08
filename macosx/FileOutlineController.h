@@ -53,6 +53,6 @@
 
 - (void) revealFile: (id) sender;
 
-- (IBAction) renameSelected: (id) sender;
+- (void) renameSelected: (id) sender;
 
 @end

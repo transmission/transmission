@@ -432,7 +432,7 @@ typedef enum
         [[NSWorkspace sharedWorkspace] activateFileViewerSelectingURLs: paths];
 }
 
-- (IBAction) renameSelected: (id) sender
+- (void) renameSelected: (id) sender
 {
     NSIndexSet * indexes = [fOutline selectedRowIndexes];
     NSAssert([indexes count] == 1, @"1 file needs to be selected to rename, but %ld are selected", [indexes count]);
