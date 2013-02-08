@@ -1385,6 +1385,8 @@
 				A22180970D148A71007D09ED /* GroupsPrefsController.m */,
 				A2FB701A0D95CAEA0001F331 /* GroupsController.h */,
 				A2FB701B0D95CAEA0001F331 /* GroupsController.m */,
+				A2451E6616ACE4EB00586E0E /* FileRenameSheetController.h */,
+				A2451E6716ACE4EB00586E0E /* FileRenameSheetController.m */,
 				A23F526D0F14395900AA02E3 /* PredicateEditorRowTemplateAny.h */,
 				A23F526E0F14395900AA02E3 /* PredicateEditorRowTemplateAny.m */,
 				A2D307A20D9EC6870051FD27 /* BlocklistDownloader.h */,
@@ -1419,9 +1421,6 @@
 		29B97314FDCFA39411CA2CEA /* Transmission */ = {
 			isa = PBXGroup;
 			children = (
-				A2451E6616ACE4EB00586E0E /* FileRenameSheetController.h */,
-				A2451E6716ACE4EB00586E0E /* FileRenameSheetController.m */,
-				A2451E6816ACE4EB00586E0E /* FileRenameSheetController.xib */,
 				4DDBB70A09E16B3200284745 /* GUI */,
 				A2F35BC315C5A0A100EBF632 /* QuickLookPlugin */,
 				4D1838DC09DEC04A0047D688 /* libtransmission */,
@@ -1472,6 +1471,7 @@
 				A209EBD81142F52B002B02D1 /* InfoFileView.xib */,
 				A209EC11114301C6002B02D1 /* InfoOptionsView.xib */,
 				A220AF7913D7CC460035C512 /* GlobalOptionsPopover.xib */,
+				A2451E6816ACE4EB00586E0E /* FileRenameSheetController.xib */,
 				A20B6FAD0C4D9B040034AB1D /* PriorityNormalTemplate.png */,
 				A2DC498915842ECC00758FF1 /* PriorityNormalTemplate@2x.png */,
 				A20B6F6A0C4D842B0034AB1D /* PriorityLowTemplate.png */,
