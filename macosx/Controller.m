@@ -374,7 +374,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         fInfoController = [[InfoWindowController alloc] init];
         
         //needs to be done before init-ing the prefs controller
-        fFileWatcherQueue = [[[VDKQueue alloc] init] autorelease];
+        fFileWatcherQueue = [[VDKQueue alloc] init];
         [fFileWatcherQueue setDelegate: self];
         
         fPrefsController = [[PrefsController alloc] initWithHandle: fLib];
@@ -2956,7 +2956,9 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 
 -(void) VDKQueue: (VDKQueue *) queue receivedNotification: (NSString*) notification forPath: (NSString*) fpath
 {
-    NSParameterAssert([notification isEqualToString:VDKQueueWriteNotification]);NSLog(@"%@",notification);
+    #warning remove log
+    NSLog(@"%@",notification);
+    NSParameterAssert([notification isEqualToString:VDKQueueWriteNotification]);
     
     if (![fDefaults boolForKey: @"AutoImport"] || ![fDefaults stringForKey: @"AutoImportDirectory"])
         return;
