@@ -197,6 +197,8 @@ tr_core_init (TrCore * core)
                     G_TYPE_INT,       /* torrent id */
                     G_TYPE_DOUBLE,    /* tr_stat.pieceUploadSpeed_KBps */
                     G_TYPE_DOUBLE,    /* tr_stat.pieceDownloadSpeed_KBps */
+                    G_TYPE_INT,       /* tr_stat.peersGettingFromUs */
+                    G_TYPE_INT,       /* tr_stat.peersSendingToUs + webseedsSendingToUs */
                     G_TYPE_DOUBLE,    /* tr_stat.recheckProgress */
                     G_TYPE_BOOLEAN,   /* filter.c:ACTIVITY_FILTER_ACTIVE */
                     G_TYPE_INT,       /* tr_stat.activity */
@@ -1078,6 +1080,8 @@ gtr_core_add_torrent (TrCore * core, tr_torrent * tor, gboolean do_notify)
         MC_TORRENT_ID,        tr_torrentId (tor),
         MC_SPEED_UP,          st->pieceUploadSpeed_KBps,
         MC_SPEED_DOWN,        st->pieceDownloadSpeed_KBps,
+        MC_ACTIVE_PEERS_UP,   st->peersGettingFromUs,
+        MC_ACTIVE_PEERS_DOWN, st->peersSendingToUs + st->webseedsSendingToUs,
         MC_RECHECK_PROGRESS,  st->recheckProgress,
         MC_ACTIVE,            is_torrent_active (st),
         MC_ACTIVITY,          st->activity,
@@ -1428,6 +1432,8 @@ update_foreach (GtkTreeModel * model, GtkTreeIter * iter)
   int oldError, newError;
   bool oldFinished, newFinished;
   int oldQueuePosition, newQueuePosition;
+  int oldDownloadPeerCount, newDownloadPeerCount;
+  int oldUploadPeerCount, newUploadPeerCount;
   tr_priority_t oldPriority, newPriority;
   unsigned int oldTrackers, newTrackers;
   double oldUpSpeed, newUpSpeed;
@@ -1442,6 +1448,8 @@ update_foreach (GtkTreeModel * model, GtkTreeIter * iter)
                       MC_TORRENT,  &tor,
                       MC_ACTIVE, &oldActive,
                       MC_ACTIVE_PEER_COUNT, &oldActivePeerCount,
+                      MC_ACTIVE_PEERS_UP, &oldUploadPeerCount,
+                      MC_ACTIVE_PEERS_DOWN, &oldDownloadPeerCount,
                       MC_ERROR, &oldError,
                       MC_ACTIVITY, &oldActivity,
                       MC_FINISHED, &oldFinished,
@@ -1465,6 +1473,8 @@ update_foreach (GtkTreeModel * model, GtkTreeIter * iter)
   newDownSpeed = st->pieceDownloadSpeed_KBps;
   newRecheckProgress = st->recheckProgress;
   newActivePeerCount = st->peersSendingToUs + st->peersGettingFromUs + st->webseedsSendingToUs;
+  newDownloadPeerCount = st->peersSendingToUs;
+  newUploadPeerCount = st->peersGettingFromUs + st->webseedsSendingToUs;
   newError = st->error;
 
   /* updating the model triggers off resort/refresh,
@@ -1476,6 +1486,8 @@ update_foreach (GtkTreeModel * model, GtkTreeIter * iter)
         || (newQueuePosition != oldQueuePosition)
         || (newError != oldError)
         || (newActivePeerCount != oldActivePeerCount)
+        || (newDownloadPeerCount != oldDownloadPeerCount)
+        || (newUploadPeerCount != oldUploadPeerCount)
         || (newTrackers != oldTrackers)
         || gtr_compare_double (newUpSpeed, oldUpSpeed, 2)
         || gtr_compare_double (newDownSpeed, oldDownSpeed, 2)
@@ -1484,6 +1496,8 @@ update_foreach (GtkTreeModel * model, GtkTreeIter * iter)
       gtk_list_store_set (GTK_LIST_STORE (model), iter,
                           MC_ACTIVE, newActive,
                           MC_ACTIVE_PEER_COUNT, newActivePeerCount,
+                          MC_ACTIVE_PEERS_UP, newUploadPeerCount,
+                          MC_ACTIVE_PEERS_DOWN, newDownloadPeerCount,
                           MC_ERROR, newError,
                           MC_ACTIVITY, newActivity,
                           MC_FINISHED, newFinished,

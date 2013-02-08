@@ -740,20 +740,12 @@ gtr_window_new (GtkApplication * app, GtkUIManager * ui_mgr, TrCore * core)
   gtk_label_set_single_line_mode (p->dl_lb, TRUE);
   gtk_grid_attach_next_to (grid, w, sibling, GTK_POS_RIGHT, 1, 1);
   sibling = w;
-  w = gtk_image_new_from_stock (GTK_STOCK_GO_DOWN, GTK_ICON_SIZE_MENU);
-  g_object_set (G_OBJECT(w), "margin-left", GUI_PAD, NULL);
-  gtk_grid_attach_next_to (grid, w, sibling, GTK_POS_RIGHT, 1, 1);
-  sibling = w;
 
   /* upload */
   w = ul_lb = gtk_label_new (NULL);
   g_object_set (G_OBJECT(w), "margin-left", GUI_PAD, NULL);
   p->ul_lb = GTK_LABEL (w);
   gtk_label_set_single_line_mode (p->ul_lb, TRUE);
-  gtk_grid_attach_next_to (grid, w, sibling, GTK_POS_RIGHT, 1, 1);
-  sibling = w;
-  w = gtk_image_new_from_stock (GTK_STOCK_GO_UP, GTK_ICON_SIZE_MENU);
-  g_object_set (G_OBJECT(w), "margin-left", GUI_PAD, NULL);
   gtk_grid_attach_next_to (grid, w, sibling, GTK_POS_RIGHT, 1, 1);
   sibling = w;
 
@@ -818,6 +810,7 @@ gtr_window_new (GtkApplication * app, GtkUIManager * ui_mgr, TrCore * core)
 
   tr_sessionSetAltSpeedFunc (gtr_core_session (core), onAltSpeedToggled, p);
 
+  gtr_window_refresh (GTK_WINDOW(self));
   return self;
 }
 
@@ -918,27 +911,41 @@ updateSpeeds (PrivateData * p)
 
   if (session != NULL)
     {
-      char buf[128];
-      double up=0, down=0;
+      char text_str[256];
+      char speed_str[128];
+      double upSpeed = 0;
+      double downSpeed = 0;
+      int upCount = 0;
+      int downCount = 0;
       GtkTreeIter iter;
       GtkTreeModel * model = gtr_core_model (p->core);
 
+
       if (gtk_tree_model_iter_nth_child (model, &iter, NULL, 0)) do
         {
-          double u, d;
-          gtk_tree_model_get (model, &iter, MC_SPEED_UP, &u,
-                                            MC_SPEED_DOWN, &d,
+          int uc, dc;
+          double us, ds;
+          gtk_tree_model_get (model, &iter, MC_SPEED_UP, &us,
+                                            MC_SPEED_DOWN, &ds,
+                                            MC_ACTIVE_PEERS_UP, &uc,
+                                            MC_ACTIVE_PEERS_DOWN, &dc,
                                             -1);
-          up += u;
-          down += d;
+          upSpeed += us;
+          upCount += uc;
+          downSpeed += ds;
+          downCount += dc;
         }
       while (gtk_tree_model_iter_next (model, &iter));
 
-      tr_formatter_speed_KBps (buf, down, sizeof (buf));
-      gtr_label_set_text (p->dl_lb, buf);
+      tr_formatter_speed_KBps (speed_str, downSpeed, sizeof (speed_str));
+      g_snprintf (text_str, sizeof(text_str), "%s %s", speed_str, gtr_get_unicode_string (GTR_UNICODE_DOWN));
+      gtr_label_set_text (p->dl_lb, text_str);
+      gtk_widget_set_visible (GTK_WIDGET (p->dl_lb), (downCount>0));
 
-      tr_formatter_speed_KBps (buf, up, sizeof (buf));
-      gtr_label_set_text (p->ul_lb, buf);
+      tr_formatter_speed_KBps (speed_str, upSpeed, sizeof (speed_str));
+      g_snprintf (text_str, sizeof(text_str), "%s %s", speed_str, gtr_get_unicode_string (GTR_UNICODE_UP));
+      gtr_label_set_text (p->ul_lb, text_str);
+      gtk_widget_set_visible (GTK_WIDGET (p->ul_lb), ((downCount>0) || (upCount>0)));
     }
 }
 
