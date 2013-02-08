@@ -2956,9 +2956,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 
 -(void) VDKQueue: (VDKQueue *) queue receivedNotification: (NSString*) notification forPath: (NSString*) fpath
 {
-    #warning remove log
-    NSLog(@"%@",notification);
-    NSParameterAssert([notification isEqualToString:VDKQueueWriteNotification]);
+    //don't assume that just because we're watching for write notification, we'll only receive write notifications
     
     if (![fDefaults boolForKey: @"AutoImport"] || ![fDefaults stringForKey: @"AutoImportDirectory"])
         return;
