@@ -154,13 +154,16 @@ FileTreeItem :: data (int column, int role) const
 }
 
 void
-FileTreeItem :: getSubtreeSize (uint64_t& have, uint64_t& total) const
+FileTreeItem :: getSubtreeWantedSize (uint64_t& have, uint64_t& total) const
 {
-  have += myHaveSize;
-  total += myTotalSize;
+  if (myIsWanted)
+    {
+      have += myHaveSize;
+      total += myTotalSize;
+    }
 
   foreach(const FileTreeItem * i, myChildren)
-    i->getSubtreeSize(have, total);
+    i->getSubtreeWantedSize(have, total);
 }
 
 double
@@ -169,7 +172,7 @@ FileTreeItem :: progress () const
   double d(0);
   uint64_t have(0), total(0);
 
-  getSubtreeSize(have, total);
+  getSubtreeWantedSize (have, total);
   if (total)
     d = have / (double)total;
 
@@ -179,11 +182,15 @@ FileTreeItem :: progress () const
 QString
 FileTreeItem :: fileSizeName () const
 {
-  uint64_t have(0), total(0);
-  QString str;
-  getSubtreeSize(have, total);
-  str = QString(name() + " (%1)").arg(Formatter::sizeToString(total));
-  return str;
+  uint64_t have = 0;
+  uint64_t total = 0;
+
+  if (myChildren.isEmpty())
+    total = myTotalSize;
+  else
+    getSubtreeWantedSize (have, total);
+
+  return QString("%1 (%2)").arg(name()).arg(Formatter::sizeToString(total));
 }
 
 std::pair<int,int>
@@ -685,6 +692,11 @@ FileTreeModel :: clicked (const QModelIndex& index)
       item = itemFromIndex (index);
       item->twiddleWanted (file_ids, want);
       emit wantedChanged (file_ids, want);
+
+      // this changes the name column's parenthetical size-wanted string too...
+      QModelIndex nameSibling = index.sibling (index.row(), COL_NAME);
+      dataChanged (nameSibling, nameSibling);
+      parentsChanged (nameSibling, COL_NAME);
 
       dataChanged (index, index);
       parentsChanged (index, column);
