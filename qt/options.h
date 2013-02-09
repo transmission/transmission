@@ -44,85 +44,84 @@ extern "C" { struct tr_variant; };
 
 class FileAdded: public QObject
 {
-        Q_OBJECT
-        const int64_t myTag;
-        QString myName;
-        QString myDelFile;
+    Q_OBJECT
 
-    public:
-        FileAdded( int tag, const QString& name ): myTag(tag), myName(name) { }
-        ~FileAdded( ) { }
-        void setFileToDelete( const QString& file ) { myDelFile = file; }
+  public:
+    FileAdded (int tag, const QString& name): myTag (tag), myName (name) { }
+    ~FileAdded () { }
+    void setFileToDelete (const QString& file) { myDelFile = file; }
 
-    public slots:
-        void executed( int64_t tag, const QString& result, struct tr_variant * arguments );
+  public slots:
+    void executed (int64_t tag, const QString& result, struct tr_variant * arguments);
+
+  private:
+    const int64_t myTag;
+    QString myName;
+    QString myDelFile;
 };
 
 class Options: public QDialog
 {
-        Q_OBJECT
+    Q_OBJECT
 
-    public:
-        Options( Session& session, const Prefs& prefs, const AddData& addme, QWidget * parent = 0 );
-        ~Options( );
+  public:
+    Options (Session& session, const Prefs& prefs, const AddData& addme, QWidget * parent = 0);
+    ~Options ();
 
-    private:
-        void reload( );
-        void clearInfo( );
-        void refreshFileButton( int width=-1 );
-        void refreshDestinationButton( int width=-1 );
-        void refreshButton( QPushButton *, const QString&, int width=-1 );
+  private:
+    void reload ();
+    void clearInfo ();
+    void refreshFileButton (int width=-1);
+    void refreshDestinationButton (int width=-1);
+    void refreshButton (QPushButton *, const QString&, int width=-1);
+    bool eventFilter (QObject *, QEvent *);
 
-    private:
-        Session& mySession;
-        AddData myAdd;
-        QDir myDestination;
-        bool myHaveInfo;
-        tr_info myInfo;
-        FileTreeView * myTree;
-        FreespaceLabel * myFreespaceLabel;
-        QCheckBox * myStartCheck;
-        QCheckBox * myTrashCheck;
-        QComboBox * myPriorityCombo;
-        QPushButton * myFileButton;
-        QPushButton * myDestinationButton;
-        QLineEdit * myDestinationEdit;
-        QPushButton * myVerifyButton;
-        QVector<int> myPriorities;
-        QVector<bool> myWanted;
-        FileList myFiles;
+  private slots:
+    void onAccepted ();
+    void onPriorityChanged (const QSet<int>& fileIndices, int);
+    void onWantedChanged (const QSet<int>& fileIndices, bool);
+    void onVerify ();
+    void onTimeout ();
+    void onFilenameClicked ();
+    void onDestinationClicked ();
+    void onFilesSelected (const QStringList&);
+    void onDestinationsSelected (const QStringList&);
+    void onDestinationEdited (const QString&);
+    void onDestinationEditedIdle ();
 
-    private slots:
-        void onAccepted( );
-        void onPriorityChanged( const QSet<int>& fileIndices, int );
-        void onWantedChanged( const QSet<int>& fileIndices, bool );
-        void onVerify( );
-        void onTimeout( );
-        void onFilenameClicked( );
-        void onDestinationClicked( );
-        void onFilesSelected( const QStringList& );
-        void onDestinationsSelected( const QStringList& );
-        void onDestinationEdited (const QString&);
-        void onDestinationEditedIdle ();
+  private:
+    Session& mySession;
+    AddData myAdd;
+    QDir myDestination;
+    bool myHaveInfo;
+    tr_info myInfo;
+    FileTreeView * myTree;
+    FreespaceLabel * myFreespaceLabel;
+    QCheckBox * myStartCheck;
+    QCheckBox * myTrashCheck;
+    QComboBox * myPriorityCombo;
+    QPushButton * myFileButton;
+    QPushButton * myDestinationButton;
+    QLineEdit * myDestinationEdit;
+    QPushButton * myVerifyButton;
+    QVector<int> myPriorities;
+    QVector<bool> myWanted;
+    FileList myFiles;
 
-    private:
-        bool eventFilter( QObject *, QEvent * );
-
-    private:
-        QTimer myVerifyTimer;
-        char myVerifyBuf[2048*4];
-        QFile myVerifyFile;
-        uint64_t myVerifyFilePos;
-        int myVerifyFileIndex;
-        uint32_t myVerifyPieceIndex;
-        uint32_t myVerifyPiecePos;
-        void clearVerify( );
-        QVector<bool> myVerifyFlags;
-        QCryptographicHash myVerifyHash;
-        typedef QMap<uint32_t,int32_t> mybins_t;
-        mybins_t myVerifyBins;
-        QTimer myEditTimer;
-
+  private:
+    QTimer myVerifyTimer;
+    char myVerifyBuf[2048*4];
+    QFile myVerifyFile;
+    uint64_t myVerifyFilePos;
+    int myVerifyFileIndex;
+    uint32_t myVerifyPieceIndex;
+    uint32_t myVerifyPiecePos;
+    void clearVerify ();
+    QVector<bool> myVerifyFlags;
+    QCryptographicHash myVerifyHash;
+    typedef QMap<uint32_t,int32_t> mybins_t;
+    mybins_t myVerifyBins;
+    QTimer myEditTimer;
 };
 
 #endif
