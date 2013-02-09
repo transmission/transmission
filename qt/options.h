@@ -71,7 +71,7 @@ class Options: public QDialog
   private:
     void reload ();
     void clearInfo ();
-    void refreshFileButton (int width=-1);
+    void refreshSource (int width=-1);
     void refreshDestinationButton (int width=-1);
     void refreshButton (QPushButton *, const QString&, int width=-1);
     bool eventFilter (QObject *, QEvent *);
@@ -85,6 +85,7 @@ class Options: public QDialog
     void onFilenameClicked ();
     void onDestinationClicked ();
     void onFilesSelected (const QStringList&);
+    void onSourceEditingFinished ();
     void onDestinationsSelected (const QStringList&);
     void onDestinationEdited (const QString&);
     void onDestinationEditedIdle ();
@@ -92,7 +93,7 @@ class Options: public QDialog
   private:
     Session& mySession;
     AddData myAdd;
-    QDir myDestination;
+    QDir myLocalDestination;
     bool myHaveInfo;
     tr_info myInfo;
     FileTreeView * myTree;
@@ -100,7 +101,8 @@ class Options: public QDialog
     QCheckBox * myStartCheck;
     QCheckBox * myTrashCheck;
     QComboBox * myPriorityCombo;
-    QPushButton * myFileButton;
+    QPushButton * mySourceButton;
+    QLineEdit * mySourceEdit;
     QPushButton * myDestinationButton;
     QLineEdit * myDestinationEdit;
     QPushButton * myVerifyButton;

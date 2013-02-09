@@ -33,6 +33,7 @@ extern "C" {
 #include "torrent-filter.h"
 #include "ui_mainwin.h"
 
+class AddData;
 class ActionDelegator;
 class Prefs;
 class Details;
@@ -92,9 +93,6 @@ class TrMainWindow: public QMainWindow
     QSet<int> getSelectedTorrents () const;
     void updateNetworkIcon ();
     QWidgetList myHidden;
-
-  public slots:
-    void openURL (QString);
 
   private slots:
     void onPrefsDestroyed ();
@@ -173,7 +171,7 @@ class TrMainWindow: public QMainWindow
     void queueMoveDown ();
     void queueMoveBottom ();
     void reannounceSelected ();
-    void addTorrent (const QString& filename);
+    void addTorrent (const AddData& addMe);
     void onNetworkTimer ();
 
   private:

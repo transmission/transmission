@@ -1189,22 +1189,7 @@ TrMainWindow :: openURL ()
   if (!AddData::isSupported (str))
     str.clear ();
 
-  openURL (str);
-}
-
-void
-TrMainWindow :: openURL (QString url)
-{
-  bool ok;
-  const QString key = QInputDialog::getText (this,
-                                             tr ("Open Link"),
-                                             tr ("Open URL or Magnet Link"),
-                                             QLineEdit::Normal,
-                                             url,
-                                             &ok,
-                                             Qt::WindowStaysOnTopHint);
-  if (ok && !key.isEmpty ())
-    mySession.addTorrent (key);
+  addTorrent (str);
 }
 
 void
@@ -1215,18 +1200,25 @@ TrMainWindow :: addTorrents (const QStringList& filenames)
 }
 
 void
-TrMainWindow :: addTorrent (const QString& filename)
+TrMainWindow :: addTorrent (const AddData& addMe)
 {
-  if (!myFileDialogOptionsCheck->isChecked ())
+  bool show_options_dialog;
+
+  if (myFileDialogOptionsCheck)
+    show_options_dialog = myFileDialogOptionsCheck->isChecked ();
+  else
+    show_options_dialog = myPrefs.getBool (Prefs::OPTIONS_PROMPT);
+
+  if (show_options_dialog)
     {
-      mySession.addTorrent (filename);
-      QApplication :: alert (this);
+      Options * o = new Options (mySession, myPrefs, addMe, this);
+      o->show ();
+      QApplication :: alert (o);
     }
   else
     {
-      Options * o = new Options (mySession, myPrefs, filename, this);
-      o->show ();
-      QApplication :: alert (o);
+      mySession.addTorrent (addMe);
+      QApplication :: alert (this);
     }
 }
 

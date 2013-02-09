@@ -86,16 +86,25 @@ Options :: Options (Session& session, const Prefs& prefs, const AddData& addme, 
   mySession (session),
   myAdd (addme),
   myHaveInfo (false),
+  mySourceButton (0),
+  mySourceEdit (0),
   myDestinationButton (0),
+  myDestinationEdit (0),
   myVerifyButton (0),
   myVerifyFile (0),
   myVerifyHash (QCryptographicHash::Sha1),
   myEditTimer (this)
 {
-  setWindowTitle (tr ("Open Torrent"));
   QFontMetrics fontMetrics (font ());
   QGridLayout * layout = new QGridLayout (this);
   int row = 0;
+
+  QString title;
+  if (myAdd.type == AddData::FILENAME)
+    title = tr ("Open Torrent from File");
+  else
+    title = tr ("Open Torrent from URL or Magnet Link");
+  setWindowTitle (title);
 
   myEditTimer.setInterval (2000);
   myEditTimer.setSingleShot (true);
@@ -105,23 +114,35 @@ Options :: Options (Session& session, const Prefs& prefs, const AddData& addme, 
   QIcon fileIcon = style ()->standardIcon (QStyle::SP_FileIcon);
   const QPixmap filePixmap = fileIcon.pixmap (iconSize);
 
-  QPushButton * p;
-  int width = fontMetrics.size (0, QString::fromAscii ("This is a pretty long torrent filename indeed.torrent")).width ();
-  QLabel * l = new QLabel (tr ("&Torrent file:"));
+  QLabel * l = new QLabel (tr ("&Source:"));
   layout->addWidget (l, row, 0, Qt::AlignLeft);
-  p = myFileButton =  new QPushButton;
-  p->setIcon (filePixmap);
-  p->setMinimumWidth (width);
-  p->setStyleSheet (QString::fromAscii ("text-align: left; padding-left: 5; padding-right: 5"));
-  p->installEventFilter (this);
 
-  layout->addWidget (p, row, 1);
-  l->setBuddy (p);
-  connect (p, SIGNAL (clicked (bool)), this, SLOT (onFilenameClicked ()));
+  QWidget * w;
+  QPushButton * p;
 
-  const QFileIconProvider iconProvider;
-  const QIcon folderIcon = iconProvider.icon (QFileIconProvider::Folder);
-  const QPixmap folderPixmap = folderIcon.pixmap (iconSize);
+  if (myAdd.type == AddData::FILENAME)
+    {
+      p = mySourceButton =  new QPushButton;
+      p->setIcon (filePixmap);
+      p->setStyleSheet (QString::fromAscii ("text-align: left; padding-left: 5; padding-right: 5"));
+      p->installEventFilter (this);
+      w = p;
+      connect (p, SIGNAL (clicked (bool)), this, SLOT (onFilenameClicked ()));
+    }
+  else
+    {
+      QLineEdit * e = mySourceEdit = new QLineEdit;
+      e->setText (myAdd.readableName());
+      e->setCursorPosition (0);
+      e->selectAll ();
+      w = e;
+      connect (e, SIGNAL(editingFinished()), this, SLOT(onSourceEditingFinished()));
+    }
+
+  const int width = fontMetrics.size (0, QString::fromAscii ("This is a pretty long torrent filename indeed.torrent")).width ();
+  w->setMinimumWidth (width);
+  layout->addWidget (w, row, 1);
+  l->setBuddy (w);
 
   l = new QLabel (tr ("&Destination folder:"));
   layout->addWidget (l, ++row, 0, Qt::AlignLeft);
@@ -130,7 +151,11 @@ Options :: Options (Session& session, const Prefs& prefs, const AddData& addme, 
 
   if (session.isLocal ())
     {
-      myDestination.setPath (downloadDir);
+      const QFileIconProvider iconProvider;
+      const QIcon folderIcon = iconProvider.icon (QFileIconProvider::Folder);
+      const QPixmap folderPixmap = folderIcon.pixmap (iconSize);
+
+      myLocalDestination.setPath (downloadDir);
       p = myDestinationButton = new QPushButton;
       p->setIcon (folderPixmap);
       p->setStyleSheet ("text-align: left; padding-left: 5; padding-right: 5");
@@ -163,7 +188,7 @@ Options :: Options (Session& session, const Prefs& prefs, const AddData& addme, 
   m->addItem (tr ("Low"),    TR_PRI_LOW);
   m->setCurrentIndex (1); // Normal
   myPriorityCombo = m;
-  l = new QLabel (tr ("Torrent &priority:"));
+  l = new QLabel (tr ("&Priority:"));
   l->setBuddy (m);
   layout->addWidget (l, ++row, 0, Qt::AlignLeft);
   layout->addWidget (m, row, 1);
@@ -175,7 +200,7 @@ Options :: Options (Session& session, const Prefs& prefs, const AddData& addme, 
     }
 
   QCheckBox * c;
-  c = myStartCheck = new QCheckBox (tr ("&Start when added"));
+  c = myStartCheck = new QCheckBox (tr ("S&tart when added"));
   c->setChecked (prefs.getBool (Prefs :: START));
   layout->addWidget (c, ++row, 0, 1, 2, Qt::AlignLeft);
 
@@ -223,40 +248,35 @@ Options :: refreshButton (QPushButton * p, const QString& text, int width)
 }
 
 void
-Options :: refreshFileButton (int width)
+Options :: refreshSource (int width)
 {
-  QString text;
+  QString text = myAdd.readableName ();
 
-  switch (myAdd.type)
-    {
-      case AddData::FILENAME: text = QFileInfo (myAdd.filename).completeBaseName (); break;
-      case AddData::URL:      text = myAdd.url.toString (); break;
-      case AddData::MAGNET:   text = myAdd.magnet; break;
-      default:                break;
-    }
+  if (mySourceButton)
+    refreshButton (mySourceButton, text, width);
 
-  refreshButton (myFileButton, text, width);
+  if (mySourceEdit)
+    mySourceEdit->setText (text);
 }
 
 void
 Options :: refreshDestinationButton (int width)
 {
   if (myDestinationButton != 0)
-    refreshButton (myDestinationButton, myDestination.absolutePath (), width);
+    refreshButton (myDestinationButton, myLocalDestination.absolutePath (), width);
 }
 
 
 bool
 Options :: eventFilter (QObject * o, QEvent * event)
 {
-  if (o==myFileButton && event->type () == QEvent::Resize)
+  if (event->type() == QEvent::Resize)
     {
-      refreshFileButton (dynamic_cast<QResizeEvent*> (event)->size ().width ());
-    }
+      if (o == mySourceButton)
+        refreshSource (dynamic_cast<QResizeEvent*> (event)->size ().width ());
 
-  if (o==myDestinationButton && event->type () == QEvent::Resize)
-    {
-      refreshDestinationButton (dynamic_cast<QResizeEvent*> (event)->size ().width ());
+      else if (o == myDestinationButton)
+        refreshDestinationButton (dynamic_cast<QResizeEvent*> (event)->size ().width ());
     }
 
   return false;
@@ -307,6 +327,7 @@ Options :: reload ()
   tr_ctorFree (ctor);
 
   myTree->clear ();
+  myTree->setVisible (myHaveInfo && (myInfo.fileCount>0));
   myFiles.clear ();
   myPriorities.clear ();
   myWanted.clear ();
@@ -361,9 +382,10 @@ Options :: onAccepted ()
 
   // "download-dir"
   if (myDestinationButton)
-    downloadDir = myDestination.absolutePath ();
+    downloadDir = myLocalDestination.absolutePath ();
   else
     downloadDir = myDestinationEdit->text ();
+
   tr_variantDictAddStr (args, TR_KEY_download_dir, downloadDir.toUtf8 ().constData ());
 
   // "metainfo"
@@ -461,15 +483,21 @@ Options :: onFilesSelected (const QStringList& files)
   if (files.size () == 1)
     {
       myAdd.set (files.at (0));
-      refreshFileButton ();
+      refreshSource ();
       reload ();
     }
 }
 
 void
+Options :: onSourceEditingFinished ()
+{
+  myAdd.set (mySourceEdit->text());
+}
+
+void
 Options :: onDestinationClicked ()
 {
-  QFileDialog * d = new QFileDialog (this, tr ("Select Destination"), myDestination.absolutePath ());
+  QFileDialog * d = new QFileDialog (this, tr ("Select Destination"), myLocalDestination.absolutePath ());
   d->setFileMode (QFileDialog::Directory);
   d->setAttribute (Qt::WA_DeleteOnClose);
   connect (d, SIGNAL (filesSelected (const QStringList&)), this, SLOT (onDestinationsSelected (const QStringList&)));
@@ -483,7 +511,7 @@ Options :: onDestinationsSelected (const QStringList& destinations)
     {
       const QString& destination (destinations.first ());
       myFreespaceLabel->setPath (destination);
-      myDestination.setPath (destination);
+      myLocalDestination.setPath (destination);
       refreshDestinationButton ();
     }
 }
@@ -499,7 +527,7 @@ Options :: onDestinationEdited (const QString& text)
 void
 Options :: onDestinationEditedIdle ()
 {
-  myFreespaceLabel->setPath (myDestinationEdit->text ());
+  myFreespaceLabel->setPath (myDestinationEdit->text());
 }
 
 /***
@@ -552,7 +580,7 @@ Options :: onTimeout ()
 
   if (!myVerifyFilePos && !myVerifyFile.isOpen ())
     {
-      const QFileInfo fileInfo (myDestination, QString::fromUtf8 (file->name));
+      const QFileInfo fileInfo (myLocalDestination, QString::fromUtf8 (file->name));
       myVerifyFile.setFileName (fileInfo.absoluteFilePath ());
       myVerifyFile.open (QIODevice::ReadOnly);
     }
@@ -620,10 +648,10 @@ Options :: onTimeout ()
         {
           // did the user accidentally specify the child directory instead of the parent?
           const QStringList tokens = QString (file->name).split ('/');
-          if (!tokens.empty () && myDestination.dirName ()==tokens.at (0))
+          if (!tokens.empty () && myLocalDestination.dirName ()==tokens.at (0))
             {
               // move up one directory and try again
-              myDestination.cdUp ();
+              myLocalDestination.cdUp ();
               refreshDestinationButton (-1);
               onVerify ();
               done = false;
