@@ -3,12 +3,12 @@
 	<data>
 		<int key="IBDocument.SystemTarget">1060</int>
 		<string key="IBDocument.SystemVersion">12C60</string>
-		<string key="IBDocument.InterfaceBuilderVersion">2843</string>
+		<string key="IBDocument.InterfaceBuilderVersion">3084</string>
 		<string key="IBDocument.AppKitVersion">1187.34</string>
 		<string key="IBDocument.HIToolboxVersion">625.00</string>
 		<object class="NSMutableDictionary" key="IBDocument.PluginVersions">
 			<string key="NS.key.0">com.apple.InterfaceBuilder.CocoaPlugin</string>
-			<string key="NS.object.0">2843</string>
+			<string key="NS.object.0">3084</string>
 		</object>
 		<array key="IBDocument.IntegratedClassDependencies">
 			<string>NSButton</string>
@@ -75,6 +75,7 @@
 					<int key="NSvFlags">256</int>
 					<string key="NSFrameSize">{542, 107}</string>
 					<reference key="NSSuperview"/>
+					<reference key="NSWindow"/>
 					<reference key="NSNextKeyView"/>
 				</object>
 				<string key="NSScreenRect">{{0, 0}, {1920, 1058}}</string>
@@ -82,7 +83,7 @@
 				<bool key="NSWindowIsRestorable">YES</bool>
 			</object>
 			<object class="NSCustomView" id="249126185">
-				<reference key="NSNextResponder"/>
+				<nil key="NSNextResponder"/>
 				<int key="NSvFlags">256</int>
 				<array class="NSMutableArray" key="NSSubviews">
 					<object class="NSTextField" id="1015958671">
@@ -552,7 +553,6 @@
 					</object>
 				</array>
 				<string key="NSFrameSize">{542, 366}</string>
-				<reference key="NSSuperview"/>
 				<reference key="NSNextKeyView" ref="343626323"/>
 				<string key="NSClassName">NSView</string>
 				<string key="NSExtension">NSResponder</string>
@@ -1164,8 +1164,8 @@
 														<bool key="NS.raise.underflow">YES</bool>
 														<bool key="NS.raise.dividebyzero">YES</bool>
 													</object>
-													<string key="NS.decimal">,</string>
-													<string key="NS.thousand">.</string>
+													<string key="NS.decimal">.</string>
+													<string key="NS.thousand">,</string>
 													<bool key="NS.hasthousands">NO</bool>
 													<bool key="NS.localized">YES</bool>
 													<bool key="NS.allowsfloats">NO</bool>
@@ -1294,8 +1294,8 @@
 														<bool key="NS.raise.underflow">YES</bool>
 														<bool key="NS.raise.dividebyzero">YES</bool>
 													</object>
-													<string key="NS.decimal">,</string>
-													<string key="NS.thousand">.</string>
+													<string key="NS.decimal">.</string>
+													<string key="NS.thousand">,</string>
 													<bool key="NS.hasthousands">NO</bool>
 													<bool key="NS.localized">YES</bool>
 													<bool key="NS.allowsfloats">YES</bool>
@@ -1376,8 +1376,8 @@
 														<bool key="NS.raise.underflow">YES</bool>
 														<bool key="NS.raise.dividebyzero">YES</bool>
 													</object>
-													<string key="NS.decimal">,</string>
-													<string key="NS.thousand">.</string>
+													<string key="NS.decimal">.</string>
+													<string key="NS.thousand">,</string>
 													<bool key="NS.hasthousands">NO</bool>
 													<bool key="NS.localized">YES</bool>
 													<bool key="NS.allowsfloats">YES</bool>
@@ -1503,8 +1503,8 @@
 														<bool key="NS.raise.underflow">YES</bool>
 														<bool key="NS.raise.dividebyzero">YES</bool>
 													</object>
-													<string key="NS.decimal">,</string>
-													<string key="NS.thousand">.</string>
+													<string key="NS.decimal">.</string>
+													<string key="NS.thousand">,</string>
 													<bool key="NS.hasthousands">NO</bool>
 													<bool key="NS.localized">YES</bool>
 													<bool key="NS.allowsfloats">NO</bool>
@@ -1605,8 +1605,8 @@
 														<bool key="NS.raise.underflow">YES</bool>
 														<bool key="NS.raise.dividebyzero">YES</bool>
 													</object>
-													<string key="NS.decimal">,</string>
-													<string key="NS.thousand">.</string>
+													<string key="NS.decimal">.</string>
+													<string key="NS.thousand">,</string>
 													<bool key="NS.hasthousands">NO</bool>
 													<bool key="NS.localized">YES</bool>
 													<bool key="NS.allowsfloats">NO</bool>
@@ -1998,7 +1998,7 @@
 										<object class="NSButton" id="754675227">
 											<reference key="NSNextResponder" ref="159788047"/>
 											<int key="NSvFlags">264</int>
-											<string key="NSFrame">{{101, 235}, {312, 18}}</string>
+											<string key="NSFrame">{{101, 235}, {309, 18}}</string>
 											<reference key="NSSuperview" ref="159788047"/>
 											<reference key="NSWindow"/>
 											<reference key="NSNextKeyView" ref="653956150"/>
@@ -2006,7 +2006,7 @@
 											<object class="NSButtonCell" key="NSCell" id="608056912">
 												<int key="NSCellFlags">67108864</int>
 												<int key="NSCellFlags2">0</int>
-												<string key="NSContents">Verweider van transfer lijst als seeden klaar is</string>
+												<string key="NSContents">Verwijder van transfer lijst als seeden klaar is</string>
 												<reference key="NSSupport" ref="86725571"/>
 												<reference key="NSControlView" ref="754675227"/>
 												<int key="NSButtonFlags">1211912448</int>
@@ -2068,7 +2068,7 @@
 				<string key="NSExtension">NSResponder</string>
 			</object>
 			<object class="NSCustomView" id="284666863">
-				<nil key="NSNextResponder"/>
+				<reference key="NSNextResponder"/>
 				<int key="NSvFlags">256</int>
 				<array class="NSMutableArray" key="NSSubviews">
 					<object class="NSScrollView" id="544077474">
@@ -2084,6 +2084,8 @@
 										<int key="NSvFlags">4352</int>
 										<string key="NSFrameSize">{141, 169}</string>
 										<reference key="NSSuperview" ref="568562479"/>
+										<reference key="NSWindow"/>
+										<reference key="NSNextKeyView" ref="287972127"/>
 										<bool key="NSEnabled">YES</bool>
 										<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
 										<bool key="NSControlAllowsExpansionToolTips">YES</bool>
@@ -2280,6 +2282,7 @@ AAAD2QAAwHFtbW9kAAAAAAAABhAAAKAHAAAAAMknHgAAAAAAAAAAAAAAAAAAAAAAA</bytes>
 								</array>
 								<string key="NSFrame">{{1, 1}, {141, 169}}</string>
 								<reference key="NSSuperview" ref="544077474"/>
+								<reference key="NSWindow"/>
 								<reference key="NSNextKeyView" ref="638525082"/>
 								<reference key="NSDocView" ref="638525082"/>
 								<reference key="NSBGColor" ref="729660797"/>
@@ -2290,6 +2293,8 @@ AAAD2QAAwHFtbW9kAAAAAAAABhAAAKAHAAAAAMknHgAAAAAAAAAAAAAAAAAAAAAAA</bytes>
 								<int key="NSvFlags">-2147483392</int>
 								<string key="NSFrame">{{184, 1}, {15, 188}}</string>
 								<reference key="NSSuperview" ref="544077474"/>
+								<reference key="NSWindow"/>
+								<reference key="NSNextKeyView" ref="1066282417"/>
 								<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
 								<reference key="NSTarget" ref="544077474"/>
 								<string key="NSAction">_doScroller:</string>
@@ -2300,6 +2305,8 @@ AAAD2QAAwHFtbW9kAAAAAAAABhAAAKAHAAAAAMknHgAAAAAAAAAAAAAAAAAAAAAAA</bytes>
 								<int key="NSvFlags">-2147483392</int>
 								<string key="NSFrame">{{-100, -100}, {470, 15}}</string>
 								<reference key="NSSuperview" ref="544077474"/>
+								<reference key="NSWindow"/>
+								<reference key="NSNextKeyView" ref="568562479"/>
 								<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
 								<int key="NSsFlags">1</int>
 								<reference key="NSTarget" ref="544077474"/>
@@ -2310,7 +2317,8 @@ AAAD2QAAwHFtbW9kAAAAAAAABhAAAKAHAAAAAMknHgAAAAAAAAAAAAAAAAAAAAAAA</bytes>
 						</array>
 						<string key="NSFrame">{{20, 49}, {143, 171}}</string>
 						<reference key="NSSuperview" ref="284666863"/>
-						<reference key="NSNextKeyView" ref="568562479"/>
+						<reference key="NSWindow"/>
+						<reference key="NSNextKeyView" ref="781866080"/>
 						<int key="NSsFlags">133650</int>
 						<reference key="NSVScroller" ref="287972127"/>
 						<reference key="NSHScroller" ref="781866080"/>
@@ -2325,6 +2333,8 @@ AAAD2QAAwHFtbW9kAAAAAAAABhAAAKAHAAAAAMknHgAAAAAAAAAAAAAAAAAAAAAAA</bytes>
 						<int key="NSvFlags">292</int>
 						<string key="NSFrame">{{20, 19}, {67, 23}}</string>
 						<reference key="NSSuperview" ref="284666863"/>
+						<reference key="NSWindow"/>
+						<reference key="NSNextKeyView"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSSegmentedCell" key="NSCell" id="116288466">
 							<int key="NSCellFlags">67108864</int>
@@ -2361,6 +2371,8 @@ AAAD2QAAwHFtbW9kAAAAAAAABhAAAKAHAAAAAMknHgAAAAAAAAAAAAAAAAAAAAAAA</bytes>
 						<int key="NSvFlags">268</int>
 						<string key="NSFrame">{{231, 173}, {291, 22}}</string>
 						<reference key="NSSuperview" ref="284666863"/>
+						<reference key="NSWindow"/>
+						<reference key="NSNextKeyView" ref="340964805"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSTextFieldCell" key="NSCell" id="227628947">
 							<int key="NSCellFlags">-1804599231</int>
@@ -2379,6 +2391,8 @@ AAAD2QAAwHFtbW9kAAAAAAAABhAAAKAHAAAAAMknHgAAAAAAAAAAAAAAAAAAAAAAA</bytes>
 						<int key="NSvFlags">268</int>
 						<string key="NSFrame">{{228, 203}, {88, 17}}</string>
 						<reference key="NSSuperview" ref="284666863"/>
+						<reference key="NSWindow"/>
+						<reference key="NSNextKeyView" ref="873906094"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSTextFieldCell" key="NSCell" id="810991095">
 							<int key="NSCellFlags">68157504</int>
@@ -2399,6 +2413,8 @@ AAAD2QAAwHFtbW9kAAAAAAAABhAAAKAHAAAAAMknHgAAAAAAAAAAAAAAAAAAAAAAA</bytes>
 						</set>
 						<string key="NSFrame">{{171, 173}, {52, 47}}</string>
 						<reference key="NSSuperview" ref="284666863"/>
+						<reference key="NSWindow"/>
+						<reference key="NSNextKeyView" ref="415414007"/>
 						<bool key="NSEnabled">YES</bool>
 						<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
 						<bool key="NSIsBordered">YES</bool>
@@ -2412,6 +2428,8 @@ AAAD2QAAwHFtbW9kAAAAAAAABhAAAKAHAAAAAMknHgAAAAAAAAAAAAAAAAAAAAAAA</bytes>
 						<int key="NSvFlags">256</int>
 						<string key="NSFrame">{{316, 136}, {209, 26}}</string>
 						<reference key="NSSuperview" ref="284666863"/>
+						<reference key="NSWindow"/>
+						<reference key="NSNextKeyView" ref="25528693"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSPopUpButtonCell" key="NSCell" id="1012387126">
 							<int key="NSCellFlags">-2076180416</int>
@@ -2484,6 +2502,8 @@ AAAD2QAAwHFtbW9kAAAAAAAABhAAAKAHAAAAAMknHgAAAAAAAAAAAAAAAAAAAAAAA</bytes>
 						<int key="NSvFlags">268</int>
 						<string key="NSFrame">{{169, 141}, {144, 18}}</string>
 						<reference key="NSSuperview" ref="284666863"/>
+						<reference key="NSWindow"/>
+						<reference key="NSNextKeyView" ref="119227485"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSButtonCell" key="NSCell" id="725735591">
 							<int key="NSCellFlags">67108864</int>
@@ -2507,6 +2527,8 @@ AAAD2QAAwHFtbW9kAAAAAAAABhAAAKAHAAAAAMknHgAAAAAAAAAAAAAAAAAAAAAAA</bytes>
 						<int key="NSvFlags">256</int>
 						<string key="NSFrame">{{187, 107}, {338, 28}}</string>
 						<reference key="NSSuperview" ref="284666863"/>
+						<reference key="NSWindow"/>
+						<reference key="NSNextKeyView" ref="31476212"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSTextFieldCell" key="NSCell" id="12341917">
 							<int key="NSCellFlags">67108864</int>
@@ -2524,6 +2546,8 @@ AAAD2QAAwHFtbW9kAAAAAAAABhAAAKAHAAAAAMknHgAAAAAAAAAAAAAAAAAAAAAAA</bytes>
 						<int key="NSvFlags">268</int>
 						<string key="NSFrame">{{169, 83}, {302, 18}}</string>
 						<reference key="NSSuperview" ref="284666863"/>
+						<reference key="NSWindow"/>
+						<reference key="NSNextKeyView" ref="360885126"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSButtonCell" key="NSCell" id="23936638">
 							<int key="NSCellFlags">-2080374784</int>
@@ -2547,6 +2571,8 @@ AAAD2QAAwHFtbW9kAAAAAAAABhAAAKAHAAAAAMknHgAAAAAAAAAAAAAAAAAAAAAAA</bytes>
 						<int key="NSvFlags">268</int>
 						<string key="NSFrame">{{436, 45}, {92, 32}}</string>
 						<reference key="NSSuperview" ref="284666863"/>
+						<reference key="NSWindow"/>
+						<reference key="NSNextKeyView" ref="931871344"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSButtonCell" key="NSCell" id="565625533">
 							<int key="NSCellFlags">67108864</int>
@@ -2568,6 +2594,8 @@ AAAD2QAAwHFtbW9kAAAAAAAABhAAAKAHAAAAAMknHgAAAAAAAAAAAAAAAAAAAAAAA</bytes>
 						<int key="NSvFlags">256</int>
 						<string key="NSFrame">{{187, 49}, {250, 28}}</string>
 						<reference key="NSSuperview" ref="284666863"/>
+						<reference key="NSWindow"/>
+						<reference key="NSNextKeyView" ref="233310108"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSTextFieldCell" key="NSCell" id="660134747">
 							<int key="NSCellFlags">67108864</int>
@@ -2582,6 +2610,9 @@ AAAD2QAAwHFtbW9kAAAAAAAABhAAAKAHAAAAAMknHgAAAAAAAAAAAAAAAAAAAAAAA</bytes>
 					</object>
 				</array>
 				<string key="NSFrameSize">{542, 240}</string>
+				<reference key="NSSuperview"/>
+				<reference key="NSWindow"/>
+				<reference key="NSNextKeyView" ref="544077474"/>
 				<string key="NSClassName">NSView</string>
 			</object>
 			<object class="NSCustomView" id="352903881">
@@ -2626,8 +2657,8 @@ AAAD2QAAwHFtbW9kAAAAAAAABhAAAKAHAAAAAMknHgAAAAAAAAAAAAAAAAAAAAAAA</bytes>
 									<bool key="NS.raise.underflow">YES</bool>
 									<bool key="NS.raise.dividebyzero">YES</bool>
 								</object>
-								<string key="NS.decimal">,</string>
-								<string key="NS.thousand">.</string>
+								<string key="NS.decimal">.</string>
+								<string key="NS.thousand">,</string>
 								<bool key="NS.hasthousands">NO</bool>
 								<bool key="NS.localized">YES</bool>
 								<bool key="NS.allowsfloats">NO</bool>
@@ -2701,8 +2732,8 @@ AAAD2QAAwHFtbW9kAAAAAAAABhAAAKAHAAAAAMknHgAAAAAAAAAAAAAAAAAAAAAAA</bytes>
 									<bool key="NS.raise.underflow">YES</bool>
 									<bool key="NS.raise.dividebyzero">YES</bool>
 								</object>
-								<string key="NS.decimal">,</string>
-								<string key="NS.thousand">.</string>
+								<string key="NS.decimal">.</string>
+								<string key="NS.thousand">,</string>
 								<bool key="NS.hasthousands">NO</bool>
 								<bool key="NS.localized">YES</bool>
 								<bool key="NS.allowsfloats">NO</bool>
@@ -2830,8 +2861,8 @@ AAAD2QAAwHFtbW9kAAAAAAAABhAAAKAHAAAAAMknHgAAAAAAAAAAAAAAAAAAAAAAA</bytes>
 									<bool key="NS.raise.underflow">YES</bool>
 									<bool key="NS.raise.dividebyzero">YES</bool>
 								</object>
-								<string key="NS.decimal">,</string>
-								<string key="NS.thousand">.</string>
+								<string key="NS.decimal">.</string>
+								<string key="NS.thousand">,</string>
 								<bool key="NS.hasthousands">NO</bool>
 								<bool key="NS.localized">YES</bool>
 								<bool key="NS.allowsfloats">NO</bool>
@@ -2881,8 +2912,8 @@ AAAD2QAAwHFtbW9kAAAAAAAABhAAAKAHAAAAAMknHgAAAAAAAAAAAAAAAAAAAAAAA</bytes>
 									<bool key="NS.raise.underflow">YES</bool>
 									<bool key="NS.raise.dividebyzero">YES</bool>
 								</object>
-								<string key="NS.decimal">,</string>
-								<string key="NS.thousand">.</string>
+								<string key="NS.decimal">.</string>
+								<string key="NS.thousand">,</string>
 								<bool key="NS.hasthousands">NO</bool>
 								<bool key="NS.localized">YES</bool>
 								<bool key="NS.allowsfloats">NO</bool>
@@ -3486,8 +3517,8 @@ AAABAAAAAQ</bytes>
 									<bool key="NS.raise.underflow">YES</bool>
 									<bool key="NS.raise.dividebyzero">YES</bool>
 								</object>
-								<string key="NS.decimal">,</string>
-								<string key="NS.thousand">.</string>
+								<string key="NS.decimal">.</string>
+								<string key="NS.thousand">,</string>
 								<bool key="NS.hasthousands">NO</bool>
 								<bool key="NS.localized">YES</bool>
 								<bool key="NS.allowsfloats">NO</bool>
@@ -3574,8 +3605,8 @@ AAABAAAAAQ</bytes>
 									<bool key="NS.raise.underflow">YES</bool>
 									<bool key="NS.raise.dividebyzero">YES</bool>
 								</object>
-								<string key="NS.decimal">,</string>
-								<string key="NS.thousand">.</string>
+								<string key="NS.decimal">.</string>
+								<string key="NS.thousand">,</string>
 								<bool key="NS.hasthousands">NO</bool>
 								<bool key="NS.localized">YES</bool>
 								<bool key="NS.allowsfloats">NO</bool>
@@ -4082,8 +4113,8 @@ AAABAAAAAQ</bytes>
 									<bool key="NS.raise.underflow">YES</bool>
 									<bool key="NS.raise.dividebyzero">YES</bool>
 								</object>
-								<string key="NS.decimal">,</string>
-								<string key="NS.thousand">.</string>
+								<string key="NS.decimal">.</string>
+								<string key="NS.thousand">,</string>
 								<bool key="NS.hasthousands">NO</bool>
 								<bool key="NS.localized">YES</bool>
 								<bool key="NS.allowsfloats">NO</bool>
@@ -4285,8 +4316,8 @@ AAABAAAAAQ</bytes>
 									<bool key="NS.raise.underflow">YES</bool>
 									<bool key="NS.raise.dividebyzero">YES</bool>
 								</object>
-								<string key="NS.decimal">,</string>
-								<string key="NS.thousand">.</string>
+								<string key="NS.decimal">.</string>
+								<string key="NS.thousand">,</string>
 								<bool key="NS.hasthousands">NO</bool>
 								<bool key="NS.localized">YES</bool>
 								<bool key="NS.allowsfloats">NO</bool>
