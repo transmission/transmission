@@ -93,9 +93,31 @@ typedef void (^CompletionBlock)(BOOL);
     [self.inputField setStringValue: self.originalName];
     [self.renameButton setEnabled: NO];
     
-    #warning size these
+    //resize the buttons so that they're long enough and the same width
+    const NSRect oldRenameFrame = [self.renameButton frame];
+    const NSRect oldCancelFrame = [self.cancelButton frame];
+    
+    //get the extra width of the rename button from the English xib - the width from sizeToFit is too squished
+    [self.renameButton sizeToFit];
+    const CGFloat extra = NSWidth(oldRenameFrame) - NSWidth([self.renameButton frame]);
+    
     [self.renameButton setStringValue: NSLocalizedString(@"Rename", "rename sheet button")];
     [self.cancelButton setStringValue: NSLocalizedString(@"Cancel", "rename sheet button")];
+    
+    [self.renameButton sizeToFit];
+    [self.cancelButton sizeToFit];
+    NSRect newRenameFrame = [self.renameButton frame];
+    NSRect newCancelFrame = [self.cancelButton frame];
+    newRenameFrame.size.width = MAX(NSWidth(newRenameFrame), NSWidth(newCancelFrame)) + extra;
+    newCancelFrame.size.width = MAX(NSWidth(newRenameFrame), NSWidth(newCancelFrame)) + extra;
+    
+    const CGFloat renameWidthIncrease = NSWidth(newRenameFrame) - NSWidth(oldRenameFrame);
+    newRenameFrame.origin.x -= renameWidthIncrease;
+    [self.renameButton setFrame:newRenameFrame];
+    
+    const CGFloat cancelWidthIncrease = NSWidth(newCancelFrame) - NSWidth(oldCancelFrame);
+    newCancelFrame.origin.x -= renameWidthIncrease + cancelWidthIncrease;
+    [self.cancelButton setFrame:newCancelFrame];
 }
 
 - (IBAction) rename: (id) sender;
