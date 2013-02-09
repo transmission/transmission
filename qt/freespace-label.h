@@ -27,7 +27,7 @@ class FreespaceLabel: public QLabel
   public:
     FreespaceLabel (Session&, const QString& path, QWidget *parent=0);
     virtual ~FreespaceLabel () {}
-    void setPath (const QString& folder) { myPath=folder; onTimer(); }
+    void setPath (const QString& folder);
 
   private:
     Session& mySession;

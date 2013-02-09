@@ -10,8 +10,6 @@
  * $Id$
  */
 
-#include <cstdio>
-
 #include <QApplication>
 #include <QCheckBox>
 #include <QComboBox>
@@ -87,13 +85,17 @@ Options :: Options( Session& session, const Prefs& prefs, const AddData& addme, 
     myDestinationButton( 0 ),
     myVerifyButton( 0 ),
     myVerifyFile( 0 ),
-    myVerifyHash( QCryptographicHash::Sha1 )
-
+    myVerifyHash( QCryptographicHash::Sha1 ),
+    myEditTimer (this)
 {
     setWindowTitle( tr( "Open Torrent" ) );
     QFontMetrics fontMetrics( font( ) );
     QGridLayout * layout = new QGridLayout( this );
     int row = 0;
+
+    myEditTimer.setInterval (2000);
+    myEditTimer.setSingleShot (true);
+    connect (&myEditTimer, SIGNAL(timeout()), this, SLOT(onDestinationEditedIdle()));
 
     const int iconSize( style( )->pixelMetric( QStyle :: PM_SmallIconSize ) );
     QIcon fileIcon = style( )->standardIcon( QStyle::SP_FileIcon );
@@ -120,6 +122,7 @@ Options :: Options( Session& session, const Prefs& prefs, const AddData& addme, 
     l = new QLabel( tr( "&Destination folder:" ) );
     layout->addWidget( l, ++row, 0, Qt::AlignLeft );
     const QString downloadDir (prefs.getString (Prefs::DOWNLOAD_DIR));
+    myFreespaceLabel = new FreespaceLabel (mySession, downloadDir, this);
 
     if( session.isLocal( ) )
     {
@@ -138,9 +141,10 @@ Options :: Options( Session& session, const Prefs& prefs, const AddData& addme, 
         e->setText (downloadDir);
         layout->addWidget( e, row, 1 );
         l->setBuddy( e );
+        connect (e, SIGNAL(textEdited(const QString&)), this, SLOT(onDestinationEdited(const QString&)));
     }
 
-    l = myFreespaceLabel = new FreespaceLabel (mySession, downloadDir, this);
+    l = myFreespaceLabel;
     layout->addWidget (l, ++row, 0, 1, 2, Qt::Alignment (Qt::AlignRight | Qt::AlignTop));
     layout->setRowMinimumHeight (row, l->height() + HIG::PAD);
 
@@ -463,6 +467,20 @@ Options :: onDestinationsSelected (const QStringList& destinations)
       myDestination.setPath (destination);
       refreshDestinationButton ();
     }
+}
+
+void
+Options :: onDestinationEdited (const QString& text)
+{
+  Q_UNUSED (text);
+
+  myEditTimer.start ();
+}
+
+void
+Options :: onDestinationEditedIdle ()
+{
+  myFreespaceLabel->setPath (myDestinationEdit->text());
 }
 
 /***

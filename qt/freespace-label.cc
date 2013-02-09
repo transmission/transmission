@@ -28,7 +28,6 @@ FreespaceLabel :: FreespaceLabel (Session        & session,
   QLabel (parent),
   mySession (session),
   myTag (-1),
-  myPath (path),
   myTimer (this)
 {
   myTimer.setSingleShot (false);
@@ -40,7 +39,18 @@ FreespaceLabel :: FreespaceLabel (Session        & session,
   connect (&mySession, SIGNAL(executed(int64_t, const QString&, struct tr_variant*)),
            this,       SLOT(onSessionExecuted(int64_t, const QString&, struct tr_variant*)));
 
-  onTimer ();
+  setPath (path);
+}
+
+void
+FreespaceLabel :: setPath (const QString& path)
+{
+  if (myPath != path)
+    {
+      setText (tr("<i>Counting Free Space...</i>"));
+      myPath = path;
+      onTimer ();
+    }
 }
 
 void

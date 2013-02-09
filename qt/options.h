@@ -102,6 +102,8 @@ class Options: public QDialog
         void onDestinationClicked( );
         void onFilesSelected( const QStringList& );
         void onDestinationsSelected( const QStringList& );
+        void onDestinationEdited (const QString&);
+        void onDestinationEditedIdle ();
 
     private:
         bool eventFilter( QObject *, QEvent * );
@@ -119,6 +121,7 @@ class Options: public QDialog
         QCryptographicHash myVerifyHash;
         typedef QMap<uint32_t,int32_t> mybins_t;
         mybins_t myVerifyBins;
+        QTimer myEditTimer;
 
 };
 
