@@ -386,7 +386,7 @@ tr_sessionGetSettings (tr_session * s, tr_variant * d)
   tr_variantDictAddBool (d, TR_KEY_dht_enabled,                  s->isDHTEnabled);
   tr_variantDictAddBool (d, TR_KEY_utp_enabled,                  s->isUTPEnabled);
   tr_variantDictAddBool (d, TR_KEY_lpd_enabled,                  s->isLPDEnabled);
-  tr_variantDictAddStr  (d, TR_KEY_download_dir,                 s->downloadDir);
+  tr_variantDictAddStr  (d, TR_KEY_download_dir,                 tr_sessionGetDownloadDir (s));
   tr_variantDictAddInt  (d, TR_KEY_download_queue_size,          tr_sessionGetQueueSize (s, TR_DOWN));
   tr_variantDictAddBool (d, TR_KEY_download_queue_enabled,       tr_sessionGetQueueEnabled (s, TR_DOWN));
   tr_variantDictAddInt  (d, TR_KEY_speed_limit_down,             tr_sessionGetSpeedLimit_KBps (s, TR_DOWN));
@@ -953,33 +953,40 @@ tr_sessionSet (tr_session * session, tr_variant  * settings)
 void
 tr_sessionSetDownloadDir (tr_session * session, const char * dir)
 {
-    assert (tr_isSession (session));
+  struct tr_device_info * info = NULL;
 
-    if (session->downloadDir != dir)
-    {
-        tr_free (session->downloadDir);
-        session->downloadDir = tr_strdup (dir);
-        memset (session->downloadDirBlkDev, 0, sizeof(session->downloadDirBlkDev));
-        memset (session->downloadDirFsType, 0, sizeof(session->downloadDirFsType));
-    }
+  assert (tr_isSession (session));
+
+  if (dir != NULL)
+    info = tr_device_info_create (dir);
+  tr_device_info_free (session->downloadDir);
+  session->downloadDir = info;
 }
 
 const char *
 tr_sessionGetDownloadDir (const tr_session * session)
 {
-    assert (tr_isSession (session));
+  const char * dir = NULL;
 
-    return session->downloadDir;
+  assert (tr_isSession (session));
+
+  if ((session != NULL) && (session->downloadDir != NULL))
+    dir = session->downloadDir->path;
+
+  return dir;
 }
 
 int64_t
-tr_sessionGetDownloadDirFreeSpace (tr_session * session)
+tr_sessionGetDirFreeSpace (tr_session * session, const char * dir)
 {
-    assert (tr_isSession (session));
+  int64_t free_space;
 
-    return tr_getFreeSpace (session->downloadDir,
-                            session->downloadDirBlkDev,
-                            session->downloadDirFsType);
+  if (!tr_strcmp0 (dir, tr_sessionGetDownloadDir (session)))
+    free_space = tr_device_info_get_free_space (session->downloadDir);
+  else
+    free_space = tr_getDirFreeSpace (dir);
+
+  return free_space;
 }
 
 /***
@@ -1883,12 +1890,12 @@ tr_sessionClose (tr_session * session)
         tr_variantFree (session->metainfoLookup);
         tr_free (session->metainfoLookup);
     }
+    tr_device_info_free (session->downloadDir);
     tr_free (session->torrentDoneScript);
     tr_free (session->tag);
     tr_free (session->configDir);
     tr_free (session->resumeDir);
     tr_free (session->torrentDir);
-    tr_free (session->downloadDir);
     tr_free (session->incompleteDir);
     tr_free (session->blocklist_url);
     tr_free (session->peer_congestion_algorithm);

@@ -54,8 +54,6 @@ typedef struct
     GtkLabel           * ul_lb;
     GtkLabel           * dl_lb;
     GtkLabel           * stats_lb;
-    GtkLabel           * freespace_lb;
-    GtkWidget          * freespace_icon;
     GtkWidget          * alt_speed_image;
     GtkWidget          * alt_speed_button;
     GtkWidget          * options_menu;
@@ -715,25 +713,6 @@ gtr_window_new (GtkApplication * app, GtkUIManager * ui_mgr, TrCore * core)
   gtk_grid_attach_next_to (grid, w, sibling, GTK_POS_RIGHT, 1, 1);
   sibling = w;
 
-  /* freespace */
-  w = gtk_image_new_from_stock (GTK_STOCK_HARDDISK, GTK_ICON_SIZE_MENU);
-  p->freespace_icon = w;
-  g_object_set (G_OBJECT(w), "margin-left", GUI_PAD, NULL);
-  gtk_grid_attach_next_to (grid, w, sibling, GTK_POS_RIGHT, 1, 1);
-  sibling = w;
-  w = gtk_label_new (NULL);
-  g_object_set (G_OBJECT(w), "margin-left", GUI_PAD_BIG*2, NULL);
-  p->freespace_lb = GTK_LABEL (w);
-  gtk_label_set_single_line_mode (p->freespace_lb, TRUE);
-  gtk_grid_attach_next_to (grid, w, sibling, GTK_POS_RIGHT, 1, 1);
-  sibling = w;
-
-  /* spacer */
-  w = gtk_alignment_new (0.0f, 0.0f, 0.0f, 0.0f);
-  gtk_widget_set_hexpand (w, TRUE);
-  gtk_grid_attach_next_to (grid, w, sibling, GTK_POS_RIGHT, 1, 1);
-  sibling = w;
-
   /* download */
   w = dl_lb = gtk_label_new (NULL);
   p->dl_lb = GTK_LABEL (w);
@@ -812,45 +791,6 @@ gtr_window_new (GtkApplication * app, GtkUIManager * ui_mgr, TrCore * core)
 
   gtr_window_refresh (GTK_WINDOW(self));
   return self;
-}
-
-static void
-updateFreeSpace (PrivateData * p)
-{
-  GtkWidget * w;
-  bool visible = false;
-
-  g_return_if_fail (p != NULL);
-
-  w = GTK_WIDGET (p->freespace_lb);
-
-  if (p->core != NULL)
-    {
-      tr_session * session = gtr_core_session (p->core);
-      const int64_t n = tr_sessionGetDownloadDirFreeSpace (session);
-      const char * downloadDir = tr_sessionGetDownloadDir (session);
-
-      visible = n >= 0;
-
-      if (visible)
-        {
-          char * str;
-          char sizeStr[32];
-
-          tr_strlsize (sizeStr, n, sizeof(sizeStr));
-
-          str = g_strdup_printf (_("%s Free"), sizeStr);
-          gtk_label_set_text (p->freespace_lb, str);
-          g_free (str);
-          
-          str = g_strdup_printf (_("Download folder \"%1$s\" has %2$s free"), downloadDir, sizeStr);
-          gtk_widget_set_tooltip_text (w, str);
-          g_free (str);
-        }
-    }
-
-  gtk_widget_set_visible (w, visible);
-  gtk_widget_set_visible (p->freespace_icon, visible);
 }
 
 static void
@@ -958,7 +898,6 @@ gtr_window_refresh (GtkWindow * self)
     {
       updateSpeeds (p);
       updateStats (p);
-      updateFreeSpace (p);
     }
 }
 

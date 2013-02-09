@@ -281,7 +281,6 @@ TrMainWindow :: TrMainWindow (Session& session, Prefs& prefs, TorrentModel& mode
 
   connect (&mySession, SIGNAL (sourceChanged ()), this, SLOT (onSessionSourceChanged ()));
   connect (&mySession, SIGNAL (statsUpdated ()), this, SLOT (refreshStatusBar ()));
-  connect (&mySession, SIGNAL (sessionUpdated ()), this, SLOT (refreshFreeSpace ()));
   connect (&mySession, SIGNAL (dataReadProgress ()), this, SLOT (dataReadProgress ()));
   connect (&mySession, SIGNAL (dataSendProgress ()), this, SLOT (dataSendProgress ()));
   connect (&mySession, SIGNAL (httpAuthenticationRequired ()), this, SLOT (wrongAuthentication ()));
@@ -303,7 +302,6 @@ TrMainWindow :: TrMainWindow (Session& session, Prefs& prefs, TorrentModel& mode
   refreshActionSensitivitySoon ();
   refreshTrayIconSoon ();
   refreshStatusBar ();
-  refreshFreeSpace ();
   refreshTitle ();
 }
 
@@ -387,16 +385,6 @@ TrMainWindow :: createStatusBar ()
     connect (p, SIGNAL (clicked ()), this, SLOT (toggleSpeedMode ()));
 
     l = myNetworkLabel = new QLabel;
-    h->addWidget (l);
-
-  h->addStretch (1);
-
-    l = myFreeSpaceIconLabel = new QLabel (this);
-    l->setPixmap (getStockIcon ("drive-harddisk", QStyle::SP_DriveHDIcon).pixmap (smallIconSize));
-    h->addWidget (l);
-    l = myFreeSpaceTextLabel = new QLabel (this);
-    const int minimumFreeSpaceWidth = l->fontMetrics ().width (Formatter::sizeToString (1024 * 1024));
-    l->setMinimumWidth (minimumFreeSpaceWidth);
     h->addWidget (l);
 
   h->addStretch (1);
@@ -710,28 +698,6 @@ TrMainWindow :: refreshTitle ()
   if (!url.isEmpty ())
     title += tr (" - %1:%2").arg (url.host ()).arg (url.port ());
   setWindowTitle (title);
-}
-
-void
-TrMainWindow :: refreshFreeSpace ()
-{
-  const int64_t bytes (mySession.downloadDirFreeSpace ());
-
-  if (bytes >= 0)
-    {
-      const QString sizeStr = Formatter::sizeToString (bytes);
-
-      const QString tip = tr ("Download folder \"%1\" has %2 free")
-        .arg (myPrefs.getString (Prefs::DOWNLOAD_DIR))
-        .arg (sizeStr);
-
-      myFreeSpaceTextLabel->setText (tr("%1 Free").arg(sizeStr));
-      myFreeSpaceTextLabel->setToolTip (tip);
-      myFreeSpaceIconLabel->setToolTip (tip);
-    }
-
-  myFreeSpaceTextLabel->setVisible (bytes >= 0);
-  myFreeSpaceIconLabel->setVisible (bytes >= 0);
 }
 
 void

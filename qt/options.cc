@@ -36,6 +36,7 @@
 
 #include "add-data.h"
 #include "file-tree.h"
+#include "freespace-label.h"
 #include "hig.h"
 #include "options.h"
 #include "prefs.h"
@@ -118,10 +119,11 @@ Options :: Options( Session& session, const Prefs& prefs, const AddData& addme, 
 
     l = new QLabel( tr( "&Destination folder:" ) );
     layout->addWidget( l, ++row, 0, Qt::AlignLeft );
+    const QString downloadDir (prefs.getString (Prefs::DOWNLOAD_DIR));
 
     if( session.isLocal( ) )
     {
-        myDestination.setPath( prefs.getString( Prefs :: DOWNLOAD_DIR ) );
+        myDestination.setPath (downloadDir);
         p = myDestinationButton = new QPushButton;
         p->setIcon( folderPixmap );
         p->setStyleSheet( "text-align: left; padding-left: 5; padding-right: 5" );
@@ -133,10 +135,14 @@ Options :: Options( Session& session, const Prefs& prefs, const AddData& addme, 
     else
     {
         QLineEdit * e = myDestinationEdit = new QLineEdit;
-        e->setText( prefs.getString( Prefs :: DOWNLOAD_DIR ) );
+        e->setText (downloadDir);
         layout->addWidget( e, row, 1 );
         l->setBuddy( e );
     }
+
+    l = myFreespaceLabel = new FreespaceLabel (mySession, downloadDir, this);
+    layout->addWidget (l, ++row, 0, 1, 2, Qt::Alignment (Qt::AlignRight | Qt::AlignTop));
+    layout->setRowMinimumHeight (row, l->height() + HIG::PAD);
 
     myTree = new FileTreeView (0, false);
     layout->addWidget( myTree, ++row, 0, 1, 2 );
@@ -174,7 +180,7 @@ Options :: Options( Session& session, const Prefs& prefs, const AddData& addme, 
     connect( b, SIGNAL(accepted()), this, SLOT(onAccepted()) );
     layout->addWidget( b, ++row, 0, 1, 2 );
 
-    layout->setRowStretch( 2, 2 );
+    layout->setRowStretch( 3, 2 );
     layout->setColumnStretch( 1, 2 );
     layout->setSpacing( HIG :: PAD );
 
@@ -448,13 +454,14 @@ Options :: onDestinationClicked( )
 }
 
 void
-Options :: onDestinationsSelected( const QStringList& destinations )
+Options :: onDestinationsSelected (const QStringList& destinations)
 {
-    if( destinations.size() == 1 )
+  if (destinations.size() == 1)
     {
-        const QString& destination( destinations.first( ) );
-        myDestination.setPath( destination );
-        refreshDestinationButton( );
+      const QString& destination (destinations.first ());
+      myFreespaceLabel->setPath (destination);
+      myDestination.setPath (destination);
+      refreshDestinationButton ();
     }
 }
 

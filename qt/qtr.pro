@@ -52,6 +52,7 @@ SOURCES += about.cc \
            file-tree.cc \
            filterbar.cc \
            filters.cc \
+           freespace-label.cc \
            formatter.cc \
            hig.cc \
            license.cc \

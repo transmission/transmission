@@ -26,6 +26,7 @@
 
 #include "conf.h"
 #include "hig.h"
+#include "tr-core.h"
 #include "tr-prefs.h"
 #include "util.h"
 
@@ -630,4 +631,123 @@ gtr_label_set_text (GtkLabel * lb, const char * newstr)
 
   if (tr_strcmp0 (oldstr, newstr))
     gtk_label_set_text (lb, newstr);
+}
+
+/***
+****
+***/
+
+struct freespace_label_data
+{
+  guint timer_id;
+  TrCore * core;
+  GtkLabel * label;
+  char * dir;
+};
+
+static void on_freespace_label_core_destroyed (gpointer gdata, GObject * dead_core);
+static void on_freespace_label_destroyed      (gpointer gdata, GObject * dead_label);
+
+static void
+freespace_label_data_free (gpointer gdata)
+{
+  struct freespace_label_data * data = gdata;
+
+  if (data->core != NULL)
+    g_object_weak_unref (G_OBJECT(data->core), on_freespace_label_core_destroyed, data);
+
+  if (data->label != NULL)
+    g_object_weak_ref (G_OBJECT(data->label), on_freespace_label_destroyed, data);
+
+  g_source_remove (data->timer_id);
+  g_free (data->dir);
+  g_free (data);
+}
+
+static GQuark
+freespace_label_data_quark (void)
+{
+  static GQuark q = 0;
+
+  if (G_UNLIKELY(!q))
+    q = g_quark_from_static_string ("data");
+
+  return q;
+}
+
+static void
+on_freespace_label_core_destroyed (gpointer gdata, GObject * dead_core G_GNUC_UNUSED)
+{
+  struct freespace_label_data * data = gdata;
+  data->core = NULL;
+  freespace_label_data_free (data);
+}
+
+static void
+on_freespace_label_destroyed (gpointer gdata, GObject * dead_label G_GNUC_UNUSED)
+{
+  struct freespace_label_data * data = gdata;
+  data->label = NULL;
+  freespace_label_data_free (data);
+}
+
+static gboolean
+on_freespace_timer (gpointer gdata)
+{
+  char text[128];
+  char markup[128];
+  int64_t bytes;
+  tr_session * session;
+  struct freespace_label_data * data = gdata;
+
+  session = gtr_core_session (data->core);
+  bytes = tr_sessionGetDirFreeSpace (session, data->dir);
+
+  if (bytes < 0)
+    {
+      g_snprintf (text, sizeof(text), _("Error"));
+    }
+  else
+    {
+      char size[128];
+      tr_strlsize (size, bytes, sizeof(size));
+      g_snprintf (text, sizeof(text), _("%s free"), size);
+    }
+
+  g_snprintf (markup, sizeof(markup), "<i>%s</i>", text);
+  gtk_label_set_markup (data->label, markup);
+
+  return G_SOURCE_CONTINUE;
+}
+
+GtkWidget *
+gtr_freespace_label_new (struct _TrCore * core, const char * dir)
+{
+  struct freespace_label_data * data;
+
+  data = g_new0 (struct freespace_label_data, 1);
+  data->timer_id = g_timeout_add_seconds (3, on_freespace_timer, data);
+  data->core = core;
+  data->label = GTK_LABEL (gtk_label_new (NULL));
+  data->dir = g_strdup (dir);
+
+  /* when either the core or the label is destroyed, stop updating */
+  g_object_weak_ref (G_OBJECT(core), on_freespace_label_core_destroyed, data);
+  g_object_weak_ref (G_OBJECT(data->label), on_freespace_label_destroyed, data);
+
+  g_object_set_qdata (G_OBJECT(data->label), freespace_label_data_quark (), data);
+  on_freespace_timer (data);
+  return GTK_WIDGET (data->label);
+}
+
+void
+gtr_freespace_label_set_dir (GtkWidget * label, const char * dir)
+{
+  struct freespace_label_data * data;
+
+  data = g_object_get_qdata (G_OBJECT(label), freespace_label_data_quark ());
+
+  tr_free (data->dir);
+  data->dir = g_strdup (dir);
+  on_freespace_timer (data);
 }

@@ -42,9 +42,20 @@ const char * tr_getTorrentDir (const tr_session *);
 /** @brief return the directory where the Web Client's web ui files are kept */
 const char * tr_getWebClientDir (const tr_session *);
 
+struct tr_device_info
+{
+  char * path;
+  char * device;
+  char * fstype;
+};
+
+struct tr_device_info * tr_device_info_create (const char * path);
+
 /** If the disk quota is enabled and readable, this returns how much is available in the quota.
     Otherwise, it returns how much is available on the disk, or -1 on error. */
-int64_t tr_getFreeSpace (const char * path, char * device, char * fstype);
+int64_t tr_device_info_get_free_space (const struct tr_device_info * info);
+
+void tr_device_info_free (struct tr_device_info * info);
 
 
 /** @} */

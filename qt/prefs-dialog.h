@@ -32,6 +32,7 @@ class QPushButton;
 class QMessageBox;
 class QHttp;
 
+class FreespaceLabel;
 class Prefs;
 class Session;
 
@@ -108,6 +109,7 @@ class PrefsDialog: public QDialog
         QWidgetList mySchedWidgets;
         QWidgetList myBlockWidgets;
         QWidgetList myUnsupportedWhenRemote;
+        FreespaceLabel * myFreespaceLabel;
 
         int myBlocklistHttpTag;
         QHttp * myBlocklistHttp;

@@ -29,6 +29,23 @@
 ***
 **/
 
+struct prefs_dialog_data
+{
+  TrCore * core;
+  gulong core_prefs_tag;
+
+  GtkWidget * freespace_label;
+
+  GtkWidget * port_label;
+  GtkWidget * port_button;
+  GtkWidget * port_spin;
+};
+
+
+/**
+***
+**/
+
 #define PREF_KEY "pref-key"
 
 static void
@@ -256,7 +273,7 @@ target_cb (GtkWidget * tb, gpointer target)
 ****/
 
 static GtkWidget*
-downloadingPage (GObject * core)
+downloadingPage (GObject * core, struct prefs_dialog_data * data)
 {
   GtkWidget * t;
   GtkWidget * w;
@@ -288,6 +305,10 @@ downloadingPage (GObject * core)
 
     w = new_path_chooser_button (TR_KEY_download_dir, core);
     hig_workarea_add_row (t, &row, _("Save to _Location:"), w, NULL);
+
+    l = data->freespace_label = gtr_freespace_label_new (TR_CORE(core), NULL);
+    gtk_misc_set_alignment (GTK_MISC (l), 1.0f, 0.5f);
+    hig_workarea_add_wide_control (t, &row, l);
 
   hig_workarea_add_section_divider (t, &row);
   hig_workarea_add_section_title (t, &row, _("Download Queue"));
@@ -1242,11 +1263,49 @@ networkPage (GObject * core)
 *****
 ****/
 
+static void
+on_prefs_dialog_destroyed (gpointer gdata, GObject * dead_dialog G_GNUC_UNUSED)
+{
+  struct prefs_dialog_data * data = gdata;
+
+  if (data->core_prefs_tag > 0)
+    g_signal_handler_disconnect (data->core, data->core_prefs_tag);
+
+  g_free (data);
+}
+
+static void
+on_core_prefs_changed (TrCore * core, const tr_quark key, gpointer gdata)
+{
+  struct prefs_dialog_data * data = gdata;
+
+#if 0
+  if (key == TR_KEY_peer_port)
+    {
+      gtr_label_set_text (GTK_LABEL (data->port_label), _("Status unknown"));
+      gtk_widget_set_sensitive (data->port_button, TRUE);
+      gtk_widget_set_sensitive (data->port_spin, TRUE);
+    }
+#endif
+  if (key == TR_KEY_download_dir)
+    {
+      const char * downloadDir = tr_sessionGetDownloadDir (gtr_core_session (core));
+      gtr_freespace_label_set_dir (data->freespace_label, downloadDir);
+    }
+}
+
 GtkWidget *
 gtr_prefs_dialog_new (GtkWindow * parent, GObject * core)
 {
+  size_t i;
   GtkWidget * d;
   GtkWidget * n;
+  struct prefs_dialog_data * data;
+  const tr_quark prefs_quarks[] = { TR_KEY_peer_port, TR_KEY_download_dir };
+
+  data = g_new0 (struct prefs_dialog_data, 1);
+  data->core = TR_CORE (core);
+  data->core_prefs_tag = g_signal_connect (TR_CORE (core), "prefs-changed", G_CALLBACK (on_core_prefs_changed), data);
 
   d = gtk_dialog_new_with_buttons (_("Transmission Preferences"),
                                    parent,
@@ -1254,6 +1313,7 @@ gtr_prefs_dialog_new (GtkWindow * parent, GObject * core)
                                    GTK_STOCK_HELP, GTK_RESPONSE_HELP,
                                    GTK_STOCK_CLOSE, GTK_RESPONSE_CLOSE,
                                    NULL);
+  g_object_weak_ref (G_OBJECT(d), on_prefs_dialog_destroyed, data);
   gtk_window_set_role (GTK_WINDOW (d), "transmission-preferences-dialog");
   gtk_container_set_border_width (GTK_CONTAINER (d), GUI_PAD);
 
@@ -1262,7 +1322,7 @@ gtr_prefs_dialog_new (GtkWindow * parent, GObject * core)
 
   gtk_notebook_append_page (GTK_NOTEBOOK (n), speedPage (core),
                             gtk_label_new (_("Speed")));
-  gtk_notebook_append_page (GTK_NOTEBOOK (n), downloadingPage (core),
+  gtk_notebook_append_page (GTK_NOTEBOOK (n), downloadingPage (core, data),
                             gtk_label_new (C_("Gerund", "Downloading")));
   gtk_notebook_append_page (GTK_NOTEBOOK (n), seedingPage (core),
                             gtk_label_new (C_("Gerund", "Seeding")));
@@ -1274,6 +1334,10 @@ gtr_prefs_dialog_new (GtkWindow * parent, GObject * core)
                             gtk_label_new (_("Desktop")));
   gtk_notebook_append_page (GTK_NOTEBOOK (n), remotePage (core),
                             gtk_label_new (_("Remote")));
+
+  /* init from prefs keys */
+  for (i=0; i<sizeof(prefs_quarks)/sizeof(prefs_quarks[0]); ++i)
+    on_core_prefs_changed (TR_CORE(core), prefs_quarks[i], data);
 
   g_signal_connect (d, "response", G_CALLBACK (response_cb), core);
   gtr_dialog_set_content (GTK_DIALOG (d), n);

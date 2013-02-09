@@ -140,6 +140,12 @@ char* tr_buildPath (const char * first_element, ...) TR_GNUC_NULL_TERMINATED
 
 bool tr_fileExists (const char * filename, time_t * mtime);
 
+/**
+ * @brief Get available disk space (in bytes) for the specified folder.
+ * @return zero or positive integer on success, -1 in case of error.
+ */
+int64_t tr_getDirFreeSpace (const char * path);
+
 
 struct event;
 

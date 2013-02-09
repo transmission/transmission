@@ -1726,8 +1726,8 @@ torrentAdd (tr_session               * session,
 
 static const char*
 sessionSet (tr_session               * session,
-            tr_variant                  * args_in,
-            tr_variant                  * args_out UNUSED,
+            tr_variant               * args_in,
+            tr_variant               * args_out UNUSED,
             struct tr_rpc_idle_data  * idle_data UNUSED)
 {
     int64_t      i;
@@ -1905,7 +1905,6 @@ sessionGet (tr_session               * s,
     tr_variantDictAddStr  (d, TR_KEY_download_dir, tr_sessionGetDownloadDir (s));
     tr_variantDictAddBool (d, TR_KEY_download_queue_enabled, tr_sessionGetQueueEnabled (s, TR_DOWN));
     tr_variantDictAddInt  (d, TR_KEY_download_queue_size, tr_sessionGetQueueSize (s, TR_DOWN));
-    tr_variantDictAddInt  (d, TR_KEY_download_dir_free_space,  tr_sessionGetDownloadDirFreeSpace (s));
     tr_variantDictAddInt  (d, TR_KEY_peer_limit_global, tr_sessionGetPeerLimit (s));
     tr_variantDictAddInt  (d, TR_KEY_peer_limit_per_torrent, tr_sessionGetPeerLimitPerTorrent (s));
     tr_variantDictAddStr  (d, TR_KEY_incomplete_dir, tr_sessionGetIncompleteDir (s));
@@ -1948,6 +1947,33 @@ sessionGet (tr_session               * s,
     return NULL;
 }
 
+static const char*
+freeSpace (tr_session               * session,
+           tr_variant               * args_in,
+           tr_variant               * args_out,
+           struct tr_rpc_idle_data  * idle_data UNUSED)
+{
+  int tmperr;
+  const char * path = NULL;
+  const char * err = NULL;
+  int64_t free_space = -1;
+
+  /* get the free space */
+  tr_variantDictFindStr (args_in, TR_KEY_path, &path, NULL);
+  tmperr = errno;
+  errno = 0;
+  free_space = tr_sessionGetDirFreeSpace (session, path);
+  if (free_space < 0)
+    err = tr_strerror (errno);
+  errno = tmperr;
+
+  /* response */
+  if (path != NULL)
+    tr_variantDictAddStr (args_out, TR_KEY_path, path);
+  tr_variantDictAddInt (args_out, TR_KEY_size_bytes, free_space);
+  return err;
+}
+
 /***
 ****
 ***/
@@ -1978,6 +2004,7 @@ methods[] =
 {
     { "port-test",             false, portTest            },
     { "blocklist-update",      false, blocklistUpdate     },
+    { "free-space",            true,  freeSpace           },
     { "session-close",         true,  sessionClose        },
     { "session-get",           true,  sessionGet          },
     { "session-set",           true,  sessionSet          },

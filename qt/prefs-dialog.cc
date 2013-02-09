@@ -36,6 +36,7 @@
 #include <QTimer>
 #include <QVBoxLayout>
 
+#include "freespace-label.h"
 #include "formatter.h"
 #include "hig.h"
 #include "prefs.h"
@@ -588,6 +589,13 @@ PrefsDialog :: createDownloadingTab( )
         connect( b, SIGNAL(clicked(bool)), this, SLOT(onDestinationClicked(void)) );
         hig->addRow( tr( "Save to &Location:" ), b );
 
+        const QString downloadDir (myPrefs.getString(Prefs::DOWNLOAD_DIR));
+        l = myFreespaceLabel = new FreespaceLabel (mySession, downloadDir, this);
+        QHBoxLayout * h = new QHBoxLayout ();
+        h->addStretch (1);
+        h->addWidget (l);
+        hig->addWideControl (h);
+
     hig->addSectionDivider( );
     hig->addSectionTitle( tr( "Download Queue" ) );
     
@@ -746,8 +754,9 @@ PrefsDialog :: refreshPref( int key )
             break;
 
         case Prefs :: DOWNLOAD_DIR: {
-            QString path( myPrefs.getString( key ) );
+            const QString path( myPrefs.getString( key ) );
             myDestinationButton->setText( QFileInfo(path).fileName() );
+            myFreespaceLabel->setPath (path);
             break;
         }
 

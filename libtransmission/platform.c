@@ -56,6 +56,7 @@
 #endif
 
 #include <assert.h>
+#include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -80,6 +81,8 @@
  #define HAVE_XQM
  #include <xfs/xqm.h>
 #endif
+
+#include <event2/util.h> /* evutil_ascii_strcasecmp () */
 
 #include "transmission.h"
 #include "session.h"
@@ -732,7 +735,7 @@ tr_getWebClientDir (const tr_session * session UNUSED)
 ***/
 
 #ifndef WIN32
-static char *
+static const char *
 getdev (const char * path)
 {
 #ifdef HAVE_GETMNTENT
@@ -783,7 +786,7 @@ getdev (const char * path)
 #endif
 }
 
-static char *
+static const char *
 getfstype (const char * device)
 {
 
@@ -833,12 +836,12 @@ getfstype (const char * device)
 #endif
 }
 
-static char *
+static const char *
 getblkdev (const char * path)
 {
   char * c;
   char * dir;
-  char * device;
+  const char * device;
 
   dir = tr_strdup(path);
 
@@ -860,7 +863,7 @@ getblkdev (const char * path)
 }
 
 static int64_t
-getquota (char * device)
+getquota (const char * device)
 {
   struct dqblk dq;
   int64_t limit;
@@ -960,41 +963,24 @@ getxfsquota (char * device)
 #endif /* WIN32 */
 
 static int64_t
-tr_getQuotaFreeSpace (const char * path, char * device, char * fstype)
+tr_getQuotaFreeSpace (const struct tr_device_info * info)
 {
-  int64_t ret=-1;
+  int64_t ret = -1;
 
 #ifndef WIN32
 
-  /* save device for future use */
-  if (!*device)
-    {
-      char * d = getblkdev (path);
-      if (d == NULL)
-        return ret;
-      tr_strlcpy (device, d, PATH_MAX + 1);
-    }
-
-  /* save FS type for future use */
-  if (!*fstype)
-    {
-      char * fs = getfstype (device);
-      if (fs != NULL)
-        tr_strlcpy (fstype, fs, PATH_MAX + 1);
-    }
-
-  if (strcasecmp(fstype, "xfs") == 0)
+  if (info->fstype && !evutil_ascii_strcasecmp(info->fstype, "xfs"))
     {
 #ifdef HAVE_XQM
-      ret = getxfsquota(device);
+      ret = getxfsquota (info->device);
 #endif
     }
   else
     {
-      ret = getquota(device);
+      ret = getquota (info->device);
     }
-
 #endif /* WIN32 */
+
   return ret;
 }
 
@@ -1021,15 +1007,50 @@ tr_getDiskFreeSpace (const char * path)
 #endif
 }
 
-int64_t
-tr_getFreeSpace (const char * path, char * device, char * fstype)
+struct tr_device_info *
+tr_device_info_create (const char * path)
 {
-  int64_t i = tr_getQuotaFreeSpace (path, device, fstype);
+  struct tr_device_info * info;
 
-  if (i < 0)
-    i = tr_getDiskFreeSpace (path);
+  info = tr_new0 (struct tr_device_info, 1);
+  info->path = tr_strdup (path);
+  info->device = tr_strdup (getblkdev (path));
+  info->fstype = tr_strdup (getfstype (path));
 
-  return i;
+  return info;
+}
+
+void
+tr_device_info_free (struct tr_device_info * info)
+{
+  if (info != NULL)
+    {
+      tr_free (info->fstype);
+      tr_free (info->device);
+      tr_free (info->path);
+      tr_free (info);
+    }
+}
+
+int64_t
+tr_device_info_get_free_space (const struct tr_device_info * info)
+{
+  int64_t free_space;
+
+  if ((info == NULL) || (info->path == NULL))
+    {
+      errno = EINVAL;
+      free_space = -1;
+    }
+  else
+    {
+      free_space = tr_getQuotaFreeSpace (info);
+
+      if (free_space < 0)
+        free_space = tr_getDiskFreeSpace (info->path);
+    }
+
+  return free_space;
 }
 
 /***

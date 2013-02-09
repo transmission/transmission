@@ -88,7 +88,6 @@ enum
   TR_KEY_done_date,
   TR_KEY_doneDate,
   TR_KEY_download_dir,
-  TR_KEY_download_dir_free_space,
   TR_KEY_download_queue_enabled,
   TR_KEY_download_queue_size,
   TR_KEY_downloadCount,

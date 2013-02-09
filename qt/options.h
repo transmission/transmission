@@ -21,7 +21,6 @@
 #include <QDir>
 #include <QVector>
 #include <QMap>
-#include <QPushButton>
 #include <QString>
 #include <QStringList>
 #include <QCryptographicHash>
@@ -32,10 +31,13 @@
 #include "add-data.h" // AddData
 #include "file-tree.h" // FileList
 
-class FileTreeView;
-class Prefs;
 class QCheckBox;
 class QComboBox;
+class QPushButton;
+
+class FileTreeView;
+class FreespaceLabel;
+class Prefs;
 class Session;
 
 extern "C" { struct tr_variant; };
@@ -78,6 +80,7 @@ class Options: public QDialog
         bool myHaveInfo;
         tr_info myInfo;
         FileTreeView * myTree;
+        FreespaceLabel * myFreespaceLabel;
         QCheckBox * myStartCheck;
         QCheckBox * myTrashCheck;
         QComboBox * myPriorityCombo;

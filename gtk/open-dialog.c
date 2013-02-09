@@ -94,6 +94,7 @@ struct OpenData
     GtkWidget *  run_check;
     GtkWidget *  trash_check;
     GtkWidget *  priority_combo;
+    GtkWidget *  freespace_label;
     char *       filename;
     char *       downloadDir;
     tr_torrent * tor;
@@ -226,6 +227,8 @@ downloadDirChanged (GtkFileChooserButton * b, gpointer gdata)
         g_free (data->downloadDir);
         data->downloadDir = g_strdup (fname);
         updateTorrent (data);
+
+        gtr_freespace_label_set_dir (data->freespace_label, data->downloadDir);
     }
 
     g_free (fname);
@@ -338,6 +341,13 @@ gtr_torrent_options_dialog_new (GtkWindow * parent, TrCore * core, tr_ctor * cto
     gtk_label_set_mnemonic_widget (GTK_LABEL (l), w);
     g_signal_connect (w, "selection-changed",
                       G_CALLBACK (downloadDirChanged), data);
+
+    row++;
+    l = data->freespace_label = gtr_freespace_label_new (core, data->downloadDir);
+    gtk_widget_set_margin_bottom (l, GUI_PAD_BIG);
+    gtk_misc_set_alignment (GTK_MISC (l), 1.0f, 0.5f);
+    gtk_grid_attach (grid, l, 0, row, 2, 1);
+
 
     // file list row
     row++;

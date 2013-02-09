@@ -82,7 +82,7 @@ tr_torrentName (const tr_torrent * tor)
 int
 tr_torrentId (const tr_torrent * tor)
 {
-    return tor->uniqueId;
+    return tor ? tor->uniqueId : -1;
 }
 
 tr_torrent*

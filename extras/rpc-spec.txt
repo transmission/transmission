@@ -457,7 +457,6 @@
    "cache-size-mb"                  | number     | maximum size of the disk cache (MB)
    "config-dir"                     | string     | location of transmission's configuration directory
    "download-dir"                   | string     | default path to download torrents
-   "download-dir-free-space"        | number     | number of free bytes available in download-dir, or -1 if it can't be calculated
    "download-queue-size"            | number     | max number of torrents to download at once (see download-queue-enabled)
    "download-queue-enabled"         | boolean    | if true, limit how many torrents can be downloaded at once
    "dht-enabled"                    | boolean    | true means allow dht in public torrents
@@ -516,8 +515,8 @@
 
    Method name: "session-set"
    Request arguments: one or more of 4.1's arguments, except: "blocklist-size",
-                      "config-dir", "download-dir-free-space", "rpc-version",
-                      "rpc-version-minimum", and "version"
+                      "config-dir", "rpc-version", "rpc-version-minimum", and
+                      "version"
    Response arguments: none
 
 4.1.2.  Accessors
@@ -597,6 +596,27 @@
    "ids"       | array   torrent list, as described in 3.1.
 
    Response arguments: none
+
+4.7.  Free Space
+
+   This method tests how much free space is available in a
+   client-specified folder.
+
+   Method name: "free-space"
+
+   Request arguments:
+
+   string      | value type & description
+   ------------+----------------------------------------------------------
+   "path"      | string  the directory to query
+
+   Response arguments:
+
+   string      | value type & description
+   ------------+----------------------------------------------------------
+   "path"      | string  same as the Request argument
+   "size-bytes"| number  the size, in bytes, of the free space in that directory
+
 
 5.0.  Protocol Versions
 
@@ -738,6 +758,8 @@
          |         | yes       |                      | new method "queue-move-bottom"
          |         | yes       |                      | new method "torrent-start-now"
    ------+---------+-----------+--------------------------+-------------------------------
-   15    | 2.80    | yes       | torrent-get          | new arg "etaIdle"
+   15    | 2.80    |        NO | session-get          | removed arg "download-dir-free-space"
+         |         | yes       | torrent-get          | new arg "etaIdle"
          |         | yes       | torrent-rename-path  | new method
+         |         | yes       | free-space           | new method
 

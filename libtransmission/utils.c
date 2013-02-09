@@ -420,6 +420,27 @@ tr_fileExists (const char * filename, time_t * mtime)
   return ok;
 }
 
+int64_t
+tr_getDirFreeSpace (const char * dir)
+{
+  int64_t free_space;
+
+  if (!dir || !*dir)
+    {
+      errno = EINVAL;
+      free_space = -1;
+    }
+  else
+    {
+      struct tr_device_info * info;
+      info = tr_device_info_create (dir);
+      free_space = tr_device_info_get_free_space (info);
+      tr_device_info_free (info);
+    }
+
+  return free_space;
+}
+
 /****
 *****
 ****/

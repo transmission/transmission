@@ -109,6 +109,16 @@ void        gtr_combo_box_set_active_enum (GtkComboBox *, int value);
 ****
 ***/
 
+struct _TrCore;
+
+GtkWidget * gtr_freespace_label_new (struct _TrCore * core, const char * dir);
+
+void gtr_freespace_label_set_dir (GtkWidget * label, const char * dir);
+
+/***
+****
+***/
+
 void gtr_unrecognized_url_dialog (GtkWidget * parent, const char * url);
 
 void gtr_http_failure_dialog (GtkWidget * parent, const char * url, long response_code);

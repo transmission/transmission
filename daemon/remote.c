@@ -1523,8 +1523,6 @@ printSession (tr_variant * top)
         printf ("  Configuration directory: %s\n", str);
       if (tr_variantDictFindStr (args,  TR_KEY_download_dir, &str, NULL))
         printf ("  Download directory: %s\n", str);
-      if (tr_variantDictFindInt (args,  TR_KEY_download_dir_free_space, &i))
-        printf ("  Download directory free space: %s\n",  strlsize (buf, i, sizeof buf));
       if (tr_variantDictFindInt (args, TR_KEY_peer_port, &i))
         printf ("  Listenport: %" PRId64 "\n", i);
       if (tr_variantDictFindBool (args, TR_KEY_port_forwarding_enabled, &boolVal))
