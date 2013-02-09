@@ -180,8 +180,11 @@ refreshFilesForeach (GtkTreeModel * model,
                                                FC_ENABLED, &child_enabled,
                                                -1);
 
-            sub_size += child_size;
-            have += child_have;
+            if ((child_enabled != FALSE) && (child_enabled != NOT_SET))
+            {
+              sub_size += child_size;
+              have += child_have;
+            }
 
             if (enabled == NOT_SET)
                 enabled = child_enabled;
