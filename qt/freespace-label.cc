@@ -82,10 +82,10 @@ FreespaceLabel :: onSessionExecuted (int64_t tag, const QString& result, struct 
   int64_t bytes = -1;
   tr_variantDictFindInt (arguments, TR_KEY_size_bytes, &bytes);
   if (bytes < 0)
-    str = tr("Error: %1").arg(result);
+    str = tr("<i>Error: %1</i>").arg(result);
   else
     str = tr("%1 free").arg(Formatter::sizeToString (bytes));
-  setText (QString("<i>%1</i>").arg(str));
+  setText (str);
 
   // update the tooltip
   size_t len = 0;

@@ -73,8 +73,8 @@ class FileTreeItem: public QObject
     void setSubtreePriority (int priority, QSet<int>& fileIds);
     void setSubtreeWanted (bool, QSet<int>& fileIds);
     QString priorityString () const;
+    QString sizeString () const;
     void getSubtreeWantedSize (uint64_t& have, uint64_t& total) const;
-    QString fileSizeName () const;
     double progress () const;
     int priority () const;
     int isSubtreeWanted () const;

@@ -146,12 +146,12 @@ Options :: Options( Session& session, const Prefs& prefs, const AddData& addme, 
 
     l = myFreespaceLabel;
     layout->addWidget (l, ++row, 0, 1, 2, Qt::Alignment (Qt::AlignRight | Qt::AlignTop));
-    layout->setRowMinimumHeight (row, l->height() + HIG::PAD);
+    layout->setRowMinimumHeight (row, l->height() + HIG::PAD_SMALL);
 
     myTree = new FileTreeView (0, false);
     layout->addWidget( myTree, ++row, 0, 1, 2 );
     if( !session.isLocal( ) )
-        myTree->hideColumn( 1 ); // hide the % done, since we've no way of knowing
+        myTree->hideColumn( 2 ); // hide the % done, since we've no way of knowing
 
     QComboBox * m = new QComboBox;
     m->addItem( tr( "High" ),   TR_PRI_HIGH );

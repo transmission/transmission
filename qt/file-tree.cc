@@ -32,6 +32,7 @@ enum
 {
   COL_NAME,
   FIRST_VISIBLE_COLUMN = COL_NAME,
+  COL_SIZE,
   COL_PROGRESS,
   COL_WANTED,
   COL_PRIORITY,
@@ -121,19 +122,27 @@ FileTreeItem :: data (int column, int role) const
 
   if (column == COL_FILE_INDEX)
     {
-      return myFileIndex;
+      value.setValue (myFileIndex);
     }
   else if (role == Qt::EditRole)
     {
       if (column == 0)
         value.setValue (name());
     }
+  else if ((role == Qt::TextAlignmentRole) && column == COL_SIZE)
+    {
+      value = Qt::AlignRight + Qt::AlignVCenter;
+    }
   else if (role == Qt::DisplayRole)
     {
       switch(column)
        {
          case COL_NAME:
-           value.setValue (fileSizeName());
+           value.setValue (name());
+           break;
+
+         case COL_SIZE:
+           value.setValue (sizeString() + "  ");
            break;
 
          case COL_PROGRESS:
@@ -180,17 +189,23 @@ FileTreeItem :: progress () const
 }
 
 QString
-FileTreeItem :: fileSizeName () const
+FileTreeItem :: sizeString () const
 {
-  uint64_t have = 0;
-  uint64_t total = 0;
+  QString str; 
 
   if (myChildren.isEmpty())
-    total = myTotalSize;
+    {
+      str = Formatter::sizeToString (myTotalSize);
+    }
   else
-    getSubtreeWantedSize (have, total);
+    {
+      uint64_t have = 0;
+      uint64_t total = 0;
+      getSubtreeWantedSize (have, total);
+      str = Formatter::sizeToString (total);
+    }
 
-  return QString("%1 (%2)").arg(name()).arg(Formatter::sizeToString(total));
+  return str;
 }
 
 std::pair<int,int>
@@ -201,7 +216,7 @@ FileTreeItem :: update (const QString& name,
                         bool           updateFields)
 {
   int changed_count = 0;
-  int changed_columns[3];
+  int changed_columns[4];
 
   if (myName != name)
     {
@@ -212,11 +227,14 @@ FileTreeItem :: update (const QString& name,
       changed_columns[changed_count++] = COL_NAME;
     }
 
+  if (myHaveSize != haveSize)
+    {
+      myHaveSize = haveSize;
+      changed_columns[changed_count++] = COL_PROGRESS;
+    }
+
   if (fileIndex() != -1)
     {
-      if (myHaveSize != haveSize)
-        myHaveSize = haveSize;
-
       if (updateFields)
         {
           if (myIsWanted != wanted)
@@ -447,6 +465,10 @@ FileTreeModel :: headerData (int column, Qt::Orientation orientation, int role) 
         {
           case COL_NAME:
             data.setValue (tr("File"));
+            break;
+
+          case COL_SIZE:
+            data.setValue (tr("Size"));
             break;
 
           case COL_PROGRESS:
@@ -694,9 +716,9 @@ FileTreeModel :: clicked (const QModelIndex& index)
       emit wantedChanged (file_ids, want);
 
       // this changes the name column's parenthetical size-wanted string too...
-      QModelIndex nameSibling = index.sibling (index.row(), COL_NAME);
+      QModelIndex nameSibling = index.sibling (index.row(), COL_SIZE);
       dataChanged (nameSibling, nameSibling);
-      parentsChanged (nameSibling, COL_NAME);
+      parentsChanged (nameSibling, COL_SIZE);
 
       dataChanged (index, index);
       parentsChanged (index, column);
@@ -732,7 +754,6 @@ FileTreeDelegate :: sizeHint(const QStyleOptionViewItem& item, const QModelIndex
       case COL_NAME:
         {
           const QFontMetrics fm(item.font);
-          const QString text = index.data().toString();
           const int iconSize = QApplication::style()->pixelMetric(QStyle::PM_SmallIconSize);
           size.rwidth() = HIG::PAD_SMALL + iconSize;
           size.rheight() = std::max(iconSize, fm.height());
@@ -862,13 +883,11 @@ FileTreeView :: FileTreeView (QWidget * parent, bool isEditable):
   sortByColumn (COL_NAME, Qt::AscendingOrder);
   installEventFilter (this);
 
-  for (int i=0; i<FIRST_VISIBLE_COLUMN; ++i)
-    hideColumn (i);
-  for (int i=LAST_VISIBLE_COLUMN+1; i<NUM_COLUMNS; ++i)
-    hideColumn (i);
-
-  for (int i=FIRST_VISIBLE_COLUMN; i<=LAST_VISIBLE_COLUMN; ++i)
-    header()->setResizeMode(i, QHeaderView::Interactive);
+  for (int i=0; i<NUM_COLUMNS; ++i)
+    {
+      setColumnHidden (i, (i<FIRST_VISIBLE_COLUMN) || (LAST_VISIBLE_COLUMN<i));
+      header()->setResizeMode(i, QHeaderView::Interactive);
+    }
 
   connect (this, SIGNAL(clicked(const QModelIndex&)),
            this, SLOT(onClicked(const QModelIndex&)));
@@ -913,7 +932,12 @@ FileTreeView :: eventFilter (QObject * o, QEvent * event)
           if (isColumnHidden (column))
             continue;
 
-          const QString header = myModel.headerData (column, Qt::Horizontal).toString() + "    ";
+          QString header;
+          if (column == COL_SIZE)
+            header = "999.9 KiB";
+          else
+            header = myModel.headerData (column, Qt::Horizontal).toString();
+          header += "    ";
           const int width = fontMetrics.size (0, header).width();
           setColumnWidth (column, width);
             left -= width;
