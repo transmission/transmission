@@ -758,8 +758,20 @@
          |         | yes       |                      | new method "queue-move-bottom"
          |         | yes       |                      | new method "torrent-start-now"
    ------+---------+-----------+--------------------------+-------------------------------
-   15    | 2.80    |        NO | session-get          | removed arg "download-dir-free-space"
-         |         | yes       | torrent-get          | new arg "etaIdle"
+   15    | 2.80    | yes       | torrent-get          | new arg "etaIdle"
          |         | yes       | torrent-rename-path  | new method
          |         | yes       | free-space           | new method
 
+5.1.  Upcoming Breakage
+
+   These features will be removed three months after 2.80's release:
+
+   1. session-get's 'download-dir-free-space' argument will be removed.
+      Its functionality has been superceded by the 'free-space' method.
+
+   2. HTTP POSTs to http://server:port/transmission/upload will fail.
+      It's been superceded by http://server:port/transmission/upload2.
+      Example in https://trac.transmissionbt.com/changeset/14005/#file8
+      NB: not to be confused with section 3.4's torrent-add method.
+      /upload and /upload2 are undocumented features to help web clients
+      upload .torrent files.

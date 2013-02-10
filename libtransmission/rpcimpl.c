@@ -26,6 +26,7 @@
 #include "completion.h"
 #include "fdlimit.h"
 #include "log.h"
+#include "platform.h" /* tr_device_info_get_free_space() */
 #include "rpcimpl.h"
 #include "session.h"
 #include "torrent.h"
@@ -1882,8 +1883,8 @@ sessionStats (tr_session               * session,
 
 static const char*
 sessionGet (tr_session               * s,
-            tr_variant                  * args_in UNUSED,
-            tr_variant                  * args_out,
+            tr_variant               * args_in UNUSED,
+            tr_variant               * args_out,
             struct tr_rpc_idle_data  * idle_data UNUSED)
 {
     const char * str;
@@ -1903,6 +1904,7 @@ sessionGet (tr_session               * s,
     tr_variantDictAddInt  (d, TR_KEY_blocklist_size, tr_blocklistGetRuleCount (s));
     tr_variantDictAddStr  (d, TR_KEY_config_dir, tr_sessionGetConfigDir (s));
     tr_variantDictAddStr  (d, TR_KEY_download_dir, tr_sessionGetDownloadDir (s));
+    tr_variantDictAddInt  (d, TR_KEY_download_dir_free_space, tr_device_info_get_free_space (s->downloadDir));
     tr_variantDictAddBool (d, TR_KEY_download_queue_enabled, tr_sessionGetQueueEnabled (s, TR_DOWN));
     tr_variantDictAddInt  (d, TR_KEY_download_queue_size, tr_sessionGetQueueSize (s, TR_DOWN));
     tr_variantDictAddInt  (d, TR_KEY_peer_limit_global, tr_sessionGetPeerLimit (s));

@@ -106,6 +106,7 @@ test_session_get_and_set (void)
   check (tr_variantDictFind (args, TR_KEY_config_dir) != NULL);
   check (tr_variantDictFind (args, TR_KEY_dht_enabled) != NULL);
   check (tr_variantDictFind (args, TR_KEY_download_dir) != NULL);
+  check (tr_variantDictFind (args, TR_KEY_download_dir_free_space) != NULL);
   check (tr_variantDictFind (args, TR_KEY_download_queue_enabled) != NULL);
   check (tr_variantDictFind (args, TR_KEY_download_queue_size) != NULL);
   check (tr_variantDictFind (args, TR_KEY_encryption) != NULL);

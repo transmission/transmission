@@ -78,6 +78,7 @@ static const struct tr_key_struct my_static[] =
   { "done-date", 9 },
   { "doneDate", 8 },
   { "download-dir", 12 },
+  { "download-dir-free-space", 23 },
   { "download-queue-enabled", 22 },
   { "download-queue-size", 19 },
   { "downloadCount", 13 },
