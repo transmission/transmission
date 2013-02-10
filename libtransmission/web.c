@@ -129,8 +129,8 @@ sockoptfunction (void * vtask, curl_socket_t fd, curlsocktype purpose UNUSED)
   /* announce and scrape requests have tiny payloads. */
   if (isScrape || isAnnounce)
     {
-      const int sndbuf = 1024;
-      const int rcvbuf = isScrape ? 2048 : 3072;
+      const int sndbuf = isScrape ? 4096 : 1024;
+      const int rcvbuf = isScrape ? 4096 : 3072;
       setsockopt (fd, SOL_SOCKET, SO_SNDBUF, &sndbuf, sizeof (sndbuf));
       setsockopt (fd, SOL_SOCKET, SO_RCVBUF, &rcvbuf, sizeof (rcvbuf));
     }
