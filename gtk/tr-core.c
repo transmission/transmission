@@ -23,7 +23,7 @@
  *****************************************************************************/
 
 #include <math.h> /* pow () */
-#include <string.h> /* strcmp, strlen */
+#include <string.h> /* strlen */
 
 #include <gtk/gtk.h>
 #include <glib/gi18n.h>
@@ -618,21 +618,21 @@ core_set_sort_mode (TrCore * core, const char * mode, gboolean is_reversed)
   GtkSortType type = is_reversed ? GTK_SORT_ASCENDING : GTK_SORT_DESCENDING;
   GtkTreeSortable * sortable = GTK_TREE_SORTABLE (gtr_core_model (core));
 
-  if (!strcmp (mode, "sort-by-activity"))
+  if (!g_strcmp0 (mode, "sort-by-activity"))
     sort_func = compare_by_activity;
-  else if (!strcmp (mode, "sort-by-age"))
+  else if (!g_strcmp0 (mode, "sort-by-age"))
     sort_func = compare_by_age;
-  else if (!strcmp (mode, "sort-by-progress"))
+  else if (!g_strcmp0 (mode, "sort-by-progress"))
     sort_func = compare_by_progress;
-  else if (!strcmp (mode, "sort-by-queue"))
+  else if (!g_strcmp0 (mode, "sort-by-queue"))
     sort_func = compare_by_queue;
-  else if (!strcmp (mode, "sort-by-time-left"))
+  else if (!g_strcmp0 (mode, "sort-by-time-left"))
     sort_func = compare_by_eta;
-  else if (!strcmp (mode, "sort-by-ratio"))
+  else if (!g_strcmp0 (mode, "sort-by-ratio"))
     sort_func = compare_by_ratio;
-  else if (!strcmp (mode, "sort-by-state"))
+  else if (!g_strcmp0 (mode, "sort-by-state"))
     sort_func = compare_by_state;
-  else if (!strcmp (mode, "sort-by-size"))
+  else if (!g_strcmp0 (mode, "sort-by-size"))
     sort_func = compare_by_size;
   else {
     sort_func = compare_by_name;

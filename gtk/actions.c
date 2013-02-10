@@ -216,9 +216,8 @@ gtr_actions_init (GtkUIManager * ui_manager, gpointer callback_user_data)
     gtk_action_group_set_translation_domain (action_group, NULL);
 
     match = gtr_pref_string_get (TR_KEY_sort_mode);
-    for (i = 0, n = G_N_ELEMENTS (sort_radio_entries), active = -1;
-         active == -1 && i < n; ++i)
-        if (!strcmp (sort_radio_entries[i].name, match))
+    for (i = 0, n = G_N_ELEMENTS (sort_radio_entries), active = -1; active == -1 && i < n; ++i)
+        if (!g_strcmp0 (sort_radio_entries[i].name, match))
             active = i;
 
     gtk_action_group_add_radio_actions (action_group,
