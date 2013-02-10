@@ -18,8 +18,7 @@ var RPC = {
 	_TurtleState            : 'alt-speed-enabled',
 	_TurtleUpSpeedLimit     : 'alt-speed-up',
 	_UpSpeedLimit           : 'speed-limit-up',
-	_UpSpeedLimited         : 'speed-limit-up-enabled',
-	_DownloadDirFreeSpace   : 'download-dir-free-space'
+	_UpSpeedLimited         : 'speed-limit-up-enabled'
 };
 
 function TransmissionRemote(controller)

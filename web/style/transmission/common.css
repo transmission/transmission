@@ -950,11 +950,6 @@ div.torrent_footer {
       /* Opera 11.10+ */
       background-position: center;
       background-repeat: no-repeat; }
-  div.torrent_footer #freespace-info {
-    float: right;
-    text-align: right;
-    border: 0px;
-    width: 100px; }
 
 /****
 *****
