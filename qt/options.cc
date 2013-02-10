@@ -332,6 +332,9 @@ Options :: reload ()
   myPriorities.clear ();
   myWanted.clear ();
 
+  if (myVerifyButton)
+    myVerifyButton->setVisible (myHaveInfo && (myInfo.fileCount>0));
+
   if (myHaveInfo)
     {
       myPriorities.insert (0, myInfo.fileCount, TR_PRI_NORMAL);
@@ -576,6 +579,12 @@ namespace
 void
 Options :: onTimeout ()
 {
+  if (myFiles.isEmpty())
+    {
+      myVerifyTimer.stop ();
+      return;
+    }
+
   const tr_file * file = &myInfo.files[myVerifyFileIndex];
 
   if (!myVerifyFilePos && !myVerifyFile.isOpen ())
