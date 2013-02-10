@@ -299,6 +299,78 @@ handle_upload (struct evhttp_request * req,
     }
 }
 
+/***
+****
+***/
+
+static void
+handle_rpc_from_json (struct evhttp_request * req,
+                      struct tr_rpc_server  * server,
+                      const char            * json,
+                      size_t                  json_len);
+
+static void
+handle_upload2 (struct evhttp_request * req,
+                struct tr_rpc_server  * server)
+{
+  if (req->type != EVHTTP_REQ_POST)
+    {
+      send_simple_response (req, 405, NULL);
+    }
+  else
+    {
+      const char * val;
+      tr_variant top;
+      tr_variant * args;
+      char * json;
+      int json_len;
+
+      tr_variantInitDict (&top, 2);
+      tr_variantDictAddStr (&top, TR_KEY_method, "torrent-add");
+      args = tr_variantDictAddDict (&top, TR_KEY_arguments, 3);
+
+      if ((val = evhttp_find_header (req->input_headers, "X-Transmission-Add-Paused")))
+        tr_variantDictAddBool (args, TR_KEY_paused, !tr_strcmp0(val,"true"));
+
+      if ((val = evhttp_find_header (req->input_headers, "X-Transmission-Add-Download-Dir")) && *val)
+        tr_variantDictAddStr (args, TR_KEY_download_dir, val);
+
+      if ((val = evhttp_find_header (req->input_headers, "X-Transmission-Add-URL")) && *val)
+        {
+          tr_variantDictAddStr (args, TR_KEY_filename, val);
+        }
+      else
+        {
+          int i;
+          int n;
+          bool have_source = false;
+          tr_ptrArray parts = TR_PTR_ARRAY_INIT;
+
+          extract_parts_from_multipart (req->input_headers, req->input_buffer, &parts);
+          n = tr_ptrArraySize (&parts);
+          for (i=0; !have_source && i<n; ++i)
+            {
+              tr_variant test;
+              const struct tr_mimepart * p = tr_ptrArrayNth (&parts, i);
+              if (!tr_variantFromBenc (&test, p->body, p->body_len))
+                {
+                  char * b64 = tr_base64_encode (p->body, p->body_len, NULL);
+                  tr_variantDictAddStr (args, TR_KEY_metainfo, b64);
+                  have_source = true;
+                  tr_free (b64);
+                  tr_variantFree (&test);
+                }
+            }
+          tr_ptrArrayDestruct (&parts, (PtrArrayForeachFunc)tr_mimepart_free);
+        }
+
+      json = tr_variantToStr (&top, TR_VARIANT_FMT_JSON, &json_len);
+      handle_rpc_from_json (req, server, json, json_len);
+      tr_free (json);
+      tr_variantFree (&top);
+    }
+}
+
 static const char*
 mimetype_guess (const char * path)
 {
@@ -541,29 +613,43 @@ rpc_response_func (tr_session      * session UNUSED,
   tr_free (data);
 }
 
+static void
+handle_rpc_from_json (struct evhttp_request * req,
+                      struct tr_rpc_server  * server,
+                      const char            * json,
+                      size_t                  json_len)
+{
+  struct rpc_response_data * data;
+
+  data = tr_new0 (struct rpc_response_data, 1);
+  data->req = req;
+  data->server = server;
+
+  tr_rpc_request_exec_json (server->session, json, json_len, rpc_response_func, data);
+}
 
 static void
 handle_rpc (struct evhttp_request * req, struct tr_rpc_server  * server)
 {
-  struct rpc_response_data * data = tr_new0 (struct rpc_response_data, 1);
+  const char * q;
 
-  data->req = req;
-  data->server = server;
-
-  if (req->type == EVHTTP_REQ_GET)
+  if (req->type == EVHTTP_REQ_POST)
     {
-      const char * q;
-      if ((q = strchr (req->uri, '?')))
-        tr_rpc_request_exec_uri (server->session, q+1, -1, rpc_response_func, data);
+      handle_rpc_from_json (req, server,
+                            (const char *) evbuffer_pullup (req->input_buffer, -1),
+                            evbuffer_get_length (req->input_buffer));
     }
-  else if (req->type == EVHTTP_REQ_POST)
+  else if ((req->type == EVHTTP_REQ_GET) && ((q = strchr (req->uri, '?'))))
     {
-      tr_rpc_request_exec_json (server->session,
-                                evbuffer_pullup (req->input_buffer, -1),
-                                evbuffer_get_length (req->input_buffer),
-                                rpc_response_func, data);
+      struct rpc_response_data * data = tr_new0 (struct rpc_response_data, 1);
+      data->req = req;
+      data->server = server;
+      tr_rpc_request_exec_uri (server->session, q+1, -1, rpc_response_func, data);
     }
-
+  else
+    {
+      send_simple_response (req, 405, NULL);
+    }
 }
 
 static bool
@@ -644,7 +730,7 @@ handle_request (struct evhttp_request * req, void * arg)
         {
           handle_web_client (req, server);
         }
-      else if (!strncmp (req->uri + strlen (server->url), "upload", 6))
+      else if (!strcmp (req->uri + strlen (server->url), "upload"))
         {
           handle_upload (req, server);
         }
@@ -669,6 +755,10 @@ handle_request (struct evhttp_request * req, void * arg)
           tr_free (tmp);
         }
 #endif
+      else if (!strcmp (req->uri + strlen (server->url), "upload2"))
+        {
+          handle_upload2 (req, server);
+        }
       else if (!strncmp (req->uri + strlen (server->url), "rpc", 3))
         {
           handle_rpc (req, server);

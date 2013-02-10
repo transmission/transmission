@@ -21,7 +21,6 @@
 		<![endif]-->
 		<script type="text/javascript" src="./javascript/jquery/jquery.transmenu.min.js"></script>
 		<script type="text/javascript" src="./javascript/jquery/jquery.contextmenu.min.js"></script>
-		<script type="text/javascript" src="./javascript/jquery/jquery.form.min.js"></script>
 		<script type="text/javascript" src="./javascript/jquery/json2.min.js"></script>
 		<script type="text/javascript" src="./javascript/common.js"></script>
 		<script type="text/javascript" src="./javascript/inspector.js"></script>
@@ -291,6 +290,8 @@
 							<input type="file" name="torrent_files[]" id="torrent_upload_file" multiple="multiple" />
 						<label for="torrent_upload_url">Or enter a URL:</label>
 							<input type="url" id="torrent_upload_url"/>
+						<label id='add-dialog-folder-label' for="add-dialog-folder-input">Destination folder:</label>
+							<input type="text" id="add-dialog-folder-input"/>
 							<input type="checkbox" id="torrent_auto_start" />
 						<label for="torrent_auto_start" id="auto_start_label">Start when added</label>
 					</div>

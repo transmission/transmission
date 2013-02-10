@@ -224,6 +224,32 @@ Transmission.prototype =
 		$('#unlimited_upload_rate').selectMenuItem();
 	},
 
+	/****
+	*****
+	****/
+
+	updateFreeSpaceInAddDialog: function()
+	{
+		var formdir = $('input#add-dialog-folder-input').val();
+		this.remote.getFreeSpace (formdir, this.onFreeSpaceResponse, this);
+	},
+
+	onFreeSpaceResponse: function(dir, bytes)
+	{
+		var e, str, formdir;
+
+		formdir = $('input#add-dialog-folder-input').val();
+		if (formdir == dir)
+		{
+			e = $('label#add-dialog-folder-label');
+			if (bytes > 0)
+				str = '  <i>(' + Transmission.fmt.size(bytes) + ' Free)</i>';
+			else
+				str = '';
+			e.html ('Destination folder' + str + ':');
+		}
+	},
+
 
 	/****
 	*****
@@ -872,33 +898,49 @@ Transmission.prototype =
 
 	/*
 	 * Select a torrent file to upload
-	 * FIXME
 	 */
 	uploadTorrentFile: function(confirmed)
 	{
-		// Display the upload dialog
-		if (! confirmed) {
-			$('input#torrent_upload_file').attr('value', '');
-			$('input#torrent_upload_url').attr('value', '');
-			$('input#torrent_auto_start').attr('checked', this.shouldAddedTorrentsStart());
-			$('#upload_container').show();
-			$('#torrent_upload_url').focus();
+		var formData,
+		    fileInput   = $('input#torrent_upload_file'),
+		    folderInput = $('input#add-dialog-folder-input'),
+		    startInput  = $('input#torrent_auto_start'),
+		    urlInput    = $('input#torrent_upload_url');
 
-		// Submit the upload form
-		} else {
-			var args = {};
-			var remote = this.remote;
-			var paused = !$('#torrent_auto_start').is(':checked');
-			if ('' != $('#torrent_upload_url').val()) {
-				remote.addTorrentByUrl($('#torrent_upload_url').val(), { paused: paused });
-			} else {
-				args.url = '../upload?paused=' + paused;
-				args.type = 'POST';
-				args.data = { 'X-Transmission-Session-Id' : remote._token };
-				args.dataType = 'xml';
-				args.iframe = true;
-				$('#torrent_upload_form').ajaxSubmit(args);
-			}
+		if (!confirmed)
+		{
+			// update the upload dialog's fields
+			fileInput.attr('value', '');
+			urlInput.attr('value', '');
+			startInput.attr('checked', this.shouldAddedTorrentsStart());
+			folderInput.attr('value', $("#download-dir").val());
+			folderInput.change($.proxy(this.updateFreeSpaceInAddDialog,this));
+			this.updateFreeSpaceInAddDialog();
+
+			// show the dialog
+			$('#upload_container').show();
+			urlInput.focus();
+		}
+		else
+		{
+			formData = new FormData ();
+			jQuery.each(fileInput[0].files, function(i, file) {
+				formData.append ('file-'+i, file);
+			});
+			$.ajax ({
+				url: '../upload2',
+				data: formData,
+				headers : {
+					'X-Transmission-Session-Id':        this.remote._token,
+					'X-Transmission-Add-Paused':        !startInput.is(':checked'),
+					'X-Transmission-Add-Download-Dir':  folderInput.val(),
+					'X-Transmission-Add-URL':           urlInput.val()
+				},
+				cache: false,
+				contentType: false,
+				processData: false,
+				type: 'POST'
+			});
 		}
 	},
 

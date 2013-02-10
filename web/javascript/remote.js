@@ -124,6 +124,18 @@ TransmissionRemote.prototype =
 		});
 	},
 
+	getFreeSpace: function(dir, callback, context) {
+		var remote = this;
+		var o = {
+			method: 'free-space',
+			arguments: { path: dir }
+		};
+		this.sendRequest(o, function(response) {
+			var args = response['arguments'];
+			callback.call (context, args.path, args['size-bytes']);
+		});
+	},
+
 	changeFileCommand: function(torrentId, fileIndices, command) {
 		var remote = this,
 		    args = { ids: [torrentId] };
