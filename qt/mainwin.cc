@@ -102,6 +102,7 @@ TrMainWindow :: TrMainWindow (Session& session, Prefs& prefs, TorrentModel& mode
   myAboutDialog (new AboutDialog (this)),
   myStatsDialog (new StatsDialog (session, this)),
   myDetailsDialog (0),
+  myFileDialogOptionsCheck (0),
   myFilterModel (prefs),
   myTorrentDelegate (new TorrentDelegate (this)),
   myTorrentDelegateMin (new TorrentDelegateMin (this)),
