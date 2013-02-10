@@ -527,7 +527,7 @@ function Inspector(controller) {
         $(row).bind('wantedToggled',onFileWantedToggled);
         $(row).bind('priorityToggled',onFilePriorityToggled);
         $(row).bind('nameClicked',onNameClicked);
-    }
+    },
 
     addSubtreeToView = function (tor, parent, sub, i) {
         var key, div;
