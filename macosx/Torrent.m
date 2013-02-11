@@ -53,6 +53,7 @@
 - (void) ratioLimitHit;
 - (void) idleLimitHit;
 - (void) metadataRetrieved;
+- (void)renameFinished: (BOOL) success withNodes: (NSArray *) nodes completionHandler: (void (^)(BOOL)) completionHandler oldPath: (NSString *) oldPath newName: (NSString *) newName;
 
 - (BOOL) shouldShowEta;
 - (NSString *) etaString;
@@ -95,38 +96,12 @@ void renameCallback(tr_torrent * torrent, const char * oldPathCharString, const 
 {
     @autoreleasepool
     {
-        NSDictionary * contextDict = (NSDictionary *)contextInfo;
-        
         NSString * oldPath = [NSString stringWithUTF8String: oldPathCharString];
-        NSString * path = [oldPath stringByDeletingLastPathComponent];
         NSString * newName = [NSString stringWithUTF8String: newNameCharString];
         
-        if (error == 0)
-        {
-            NSString * oldName = [oldPath lastPathComponent];
-            void (^__block updateNodeAndChildrenForRename)(FileListNode *) = ^(FileListNode * node) {
-                [node updateFromOldName: oldName toNewName: newName inPath: path];
-                
-                if ([node isFolder]) {
-                    [[node children] enumerateObjectsWithOptions: NSEnumerationConcurrent usingBlock: ^(FileListNode * childNode, NSUInteger idx, BOOL * stop) {
-                        updateNodeAndChildrenForRename(childNode);
-                    }];
-                }
-            };
-            
-            NSArray * nodes = [contextDict objectForKey: @"Nodes"];
-            [nodes enumerateObjectsWithOptions: NSEnumerationConcurrent usingBlock: ^(FileListNode * node, NSUInteger idx, BOOL *stop) {
-                updateNodeAndChildrenForRename(node);
-            }];
-        }
-        else
-            NSLog(@"Error renaming %@ to %@", oldPath, [path stringByAppendingPathComponent: newName]);
-        
-        typedef void (^RenameCompletionBlock)(BOOL);
-        RenameCompletionBlock completionHandler = [contextDict objectForKey: @"CompletionHandler"];
-        completionHandler(error == 0);
-        
-        [contextDict release];
+        NSDictionary * contextDict = [(NSDictionary *)contextInfo autorelease];
+        Torrent * torrentObject = [contextDict objectForKey: @"Torrent"];
+        [torrentObject renameFinished: error == 0 withNodes: [contextDict objectForKey: @"Nodes"] completionHandler: [contextDict objectForKey: @"CompletionHandler"] oldPath: oldPath newName: newName];
     }
 }
 
@@ -848,7 +823,7 @@ int trashDataFile(const char * filename)
     NSParameterAssert(newName != nil);
     NSParameterAssert(![newName isEqualToString: @""]);
     
-    NSDictionary * contextInfo = [@{ @"Nodes" : fFileList, @"CompletionHandler" : [[completionHandler copy] autorelease] } retain];
+    NSDictionary * contextInfo = [@{ @"Torrent" : self, @"CompletionHandler" : [[completionHandler copy] autorelease] } retain];
     
     tr_torrentRenamePath(fHandle, fInfo->name, [newName UTF8String], renameCallback, contextInfo);
 }
@@ -859,7 +834,7 @@ int trashDataFile(const char * filename)
     NSParameterAssert(newName != nil);
     NSParameterAssert(![newName isEqualToString: @""]);
     
-    NSDictionary * contextInfo = [@{ @"Nodes" : @[ node ], @"CompletionHandler" : [[completionHandler copy] autorelease] } retain];
+    NSDictionary * contextInfo = [@{ @"Torrent" : self, @"Nodes" : @[ node ], @"CompletionHandler" : [[completionHandler copy] autorelease] } retain];
     
     NSString * oldPath = [[node path] stringByAppendingPathComponent: [node name]];
     tr_torrentRenamePath(fHandle, [oldPath UTF8String], [newName UTF8String], renameCallback, contextInfo);
@@ -1748,7 +1723,7 @@ int trashDataFile(const char * filename)
     if ([self isFolder])
     {
         const NSInteger count = [self fileCount];
-        NSMutableArray * fileList = [NSMutableArray arrayWithCapacity: count],
+        NSMutableArray * fileList = [NSMutableArray array],
                     * flatFileList = [NSMutableArray arrayWithCapacity: count];
         
         for (NSInteger i = 0; i < count; i++)
@@ -1941,6 +1916,50 @@ int trashDataFile(const char * filename)
     }
     
     [[NSNotificationCenter defaultCenter] postNotificationName: @"ResetInspector" object: self userInfo: @{ @"Torrent" : self }];
+}
+
+- (void)renameFinished: (BOOL) success withNodes: (NSArray *) nodes completionHandler: (void (^)(BOOL)) completionHandler oldPath: (NSString *) oldPath newName: (NSString *) newName
+{
+    NSParameterAssert(completionHandler != nil);
+    NSParameterAssert(oldPath != nil);
+    NSParameterAssert(newName != nil);
+    
+    NSString * path = [oldPath stringByDeletingLastPathComponent];
+    
+    if (success)
+    {
+        NSString * oldName = [oldPath lastPathComponent];
+        void (^__block updateNodeAndChildrenForRename)(FileListNode *) = ^(FileListNode * node) {
+            [node updateFromOldName: oldName toNewName: newName inPath: path];
+            
+            if ([node isFolder]) {
+                [[node children] enumerateObjectsWithOptions: NSEnumerationConcurrent usingBlock: ^(FileListNode * childNode, NSUInteger idx, BOOL * stop) {
+                    updateNodeAndChildrenForRename(childNode);
+                }];
+            }
+        };
+        
+        if (!nodes)
+            nodes = fFlatFileList;
+        [nodes enumerateObjectsWithOptions: NSEnumerationConcurrent usingBlock: ^(FileListNode * node, NSUInteger idx, BOOL *stop) {
+            updateNodeAndChildrenForRename(node);
+        }];
+        
+        //resort lists
+        NSMutableArray * fileList = [fFileList mutableCopy];
+        [fFileList release];
+        [self sortFileList: fileList];
+        fFileList = fileList;
+        
+        NSMutableArray * flatFileList = [fFlatFileList mutableCopy];
+        [fFlatFileList release];
+        [self sortFileList: flatFileList];
+        fFlatFileList = flatFileList;
+    }
+    else
+        NSLog(@"Error renaming %@ to %@", oldPath, [path stringByAppendingPathComponent: newName]);
+    
+    completionHandler(success);
 }
 
 - (BOOL) shouldShowEta
