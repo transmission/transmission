@@ -94,14 +94,15 @@ void metadataCallback(tr_torrent * torrent, void * torrentData)
 
 void renameCallback(tr_torrent * torrent, const char * oldPathCharString, const char * newNameCharString, int error, void * contextInfo)
 {
-    @autoreleasepool
-    {
+    @autoreleasepool {
         NSString * oldPath = [NSString stringWithUTF8String: oldPathCharString];
         NSString * newName = [NSString stringWithUTF8String: newNameCharString];
         
-        NSDictionary * contextDict = [(NSDictionary *)contextInfo autorelease];
-        Torrent * torrentObject = [contextDict objectForKey: @"Torrent"];
-        [torrentObject renameFinished: error == 0 withNodes: [contextDict objectForKey: @"Nodes"] completionHandler: [contextDict objectForKey: @"CompletionHandler"] oldPath: oldPath newName: newName];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            NSDictionary * contextDict = [(NSDictionary *)contextInfo autorelease];
+            Torrent * torrentObject = [contextDict objectForKey: @"Torrent"];
+            [torrentObject renameFinished: error == 0 withNodes: [contextDict objectForKey: @"Nodes"] completionHandler: [contextDict objectForKey: @"CompletionHandler"] oldPath: oldPath newName: newName];
+        });
     }
 }
 
