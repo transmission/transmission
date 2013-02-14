@@ -90,19 +90,19 @@ tr_upnpClose (tr_upnp * handle)
 static struct UPNPDev *
 tr_upnpDiscover (int msec)
 {
-    int err = 0;
     struct UPNPDev * ret = NULL;
+    int err = UPNPDISCOVER_SUCCESS;
 
 #if defined (HAVE_MINIUPNP_16)
     ret = upnpDiscover (msec, NULL, NULL, 0, 0, &err);
 #elif defined (HAVE_MINIUPNP_15)
     ret = upnpDiscover (msec, NULL, NULL, 0);
 #else
-    ret = UPNPCOMMAND_UNKNOWN_ERROR;
+    ret = UPNPDISCOVER_UNKNOWN_ERROR;
 #endif
 
-    if (ret != UPNPCOMMAND_SUCCESS)
-        tr_logAddNamedDbg (getKey (), "upnpDiscover failed (errno %d - %s)", err, tr_strerror (err));
+    if (err != UPNPDISCOVER_SUCCESS)
+        tr_logAddNamedDbg (getKey (), "upnpDiscover failed (errno %d - %s)", errno, tr_strerror (errno));
 
     return ret;
 }
