@@ -423,7 +423,7 @@ compare_by_name (GtkTreeModel * m,
   const char *ca, *cb;
   gtk_tree_model_get (m, a, MC_NAME_COLLATED, &ca, -1);
   gtk_tree_model_get (m, b, MC_NAME_COLLATED, &cb, -1);
-  return tr_strcmp0 (ca, cb);
+  return g_strcmp0 (ca, cb);
 }
 
 static int
@@ -1666,7 +1666,7 @@ core_commit_prefs_change (TrCore * core, const tr_quark key)
 void
 gtr_core_set_pref (TrCore * self, const tr_quark key, const char * newval)
 {
-  if (tr_strcmp0 (newval, gtr_pref_string_get (key)))
+  if (g_strcmp0 (newval, gtr_pref_string_get (key)))
     {
       gtr_pref_string_set (key, newval);
       core_commit_prefs_change (self, key);

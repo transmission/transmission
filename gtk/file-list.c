@@ -484,7 +484,7 @@ find_child (GNode* parent, const char * name)
     GNode * child = parent->children;
     while (child) {
         const struct row_struct * child_data = child->data;
-        if ((*child_data->name == *name) && !strcmp (child_data->name, name))
+        if ((*child_data->name == *name) && !g_strcmp0 (child_data->name, name))
             break;
         child = child->next;
     }

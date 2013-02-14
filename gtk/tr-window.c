@@ -22,7 +22,7 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
-#include <string.h>
+#include <string.h> /* strlen() */
 
 #include <gtk/gtk.h>
 #include <glib/gi18n.h>
@@ -673,7 +673,7 @@ gtr_window_new (GtkApplication * app, GtkUIManager * ui_mgr, TrCore * core)
       const char * val = stats_modes[i].val;
       w = gtk_radio_menu_item_new_with_label (l, _ (stats_modes[i].i18n));
       l = gtk_radio_menu_item_get_group (GTK_RADIO_MENU_ITEM (w));
-      gtk_check_menu_item_set_active (GTK_CHECK_MENU_ITEM (w), !strcmp (val, pch));
+      gtk_check_menu_item_set_active (GTK_CHECK_MENU_ITEM (w), !g_strcmp0 (val, pch));
       g_object_set_data (G_OBJECT (w), STATS_MODE, (gpointer)stats_modes[i].val);
       g_signal_connect (w, "toggled", G_CALLBACK (status_menu_toggled_cb), p);
       gtk_menu_shell_append (GTK_MENU_SHELL (menu), w);
@@ -806,13 +806,13 @@ updateStats (PrivateData * p)
 
   /* update the stats */
   pch = gtr_pref_string_get (TR_KEY_statusbar_stats);
-  if (!strcmp (pch, "session-ratio"))
+  if (!g_strcmp0 (pch, "session-ratio"))
     {
       tr_sessionGetStats (session, &stats);
       tr_strlratio (ratio, stats.ratio, sizeof (ratio));
       g_snprintf (buf, sizeof (buf), _("Ratio: %s"), ratio);
     }
-  else if (!strcmp (pch, "session-transfer"))
+  else if (!g_strcmp0 (pch, "session-transfer"))
     {
       tr_sessionGetStats (session, &stats);
       tr_strlsize (up, stats.uploadedBytes, sizeof (up));
@@ -823,7 +823,7 @@ updateStats (PrivateData * p)
       g_snprintf (buf, sizeof (buf),
                   Q_("Down: %1$s, Up: %2$s"), down, up);
     }
-  else if (!strcmp (pch, "total-transfer"))
+  else if (!g_strcmp0 (pch, "total-transfer"))
     {
       tr_sessionGetCumulativeStats (session, &stats);
       tr_strlsize (up, stats.uploadedBytes, sizeof (up));

@@ -55,7 +55,7 @@ enum
 static int
 pstrcmp (const void * a, const void * b)
 {
-  return strcmp (* (const char**)a, * (const char**)b);
+  return g_strcmp0 (* (const char**)a, * (const char**)b);
 }
 
 /* human-readable name; ie, Legaltorrents */
@@ -163,7 +163,7 @@ tracker_filter_model_update (gpointer gstore)
             }
 
           for (k=0; k<keyCount; ++k)
-            if (!strcmp (keys[k], key))
+            if (!g_strcmp0 (keys[k], key))
               break;
 
           if (k==keyCount)
@@ -214,7 +214,7 @@ tracker_filter_model_update (gpointer gstore)
           int cmp;
           char * host;
           gtk_tree_model_get (model, &iter, TRACKER_FILTER_COL_HOST, &host,  -1);
-          cmp = strcmp (host, hosts->pdata[i]);
+          cmp = g_strcmp0 (host, hosts->pdata[i]);
 
           if (cmp < 0)
             remove_row = TRUE;
@@ -447,7 +447,7 @@ test_tracker (tr_torrent * tor, int active_tracker_type, const char * host)
       for (i=0; i<inf->trackerCount; ++i)
         {
           gtr_get_host_from_url (tmp, sizeof (tmp), inf->trackers[i].announce);
-          if (!strcmp (tmp, host))
+          if (!g_strcmp0 (tmp, host))
             break;
         }
 

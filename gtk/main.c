@@ -160,7 +160,7 @@ show_details_dialog_for_selected_torrents (struct cbdata * data)
   char * key = get_details_dialog_key (ids);
 
   for (l=data->details; dialog==NULL && l!=NULL; l=l->next)
-    if (!strcmp (key, g_object_get_data (l->data, "key")))
+    if (!g_strcmp0 (key, g_object_get_data (l->data, "key")))
       dialog = l->data;
 
   if (dialog == NULL)
@@ -393,7 +393,7 @@ on_rpc_changed_idle (gpointer gdata)
               {
                 char * a = tr_variantToStr (oldval, TR_VARIANT_FMT_BENC, NULL);
                 char * b = tr_variantToStr (newval, TR_VARIANT_FMT_BENC, NULL);
-                changed = strcmp (a, b) != 0;
+                changed = g_strcmp0 (a, b) != 0;
                 tr_free (b);
                 tr_free (a);
               }
@@ -1492,35 +1492,35 @@ gtr_actions_handler (const char * action_name, gpointer user_data)
   gboolean changed = FALSE;
   struct cbdata * data = user_data;
 
-  if (!strcmp (action_name, "open-torrent-from-url"))
+  if (!g_strcmp0 (action_name, "open-torrent-from-url"))
     {
       GtkWidget * w = gtr_torrent_open_from_url_dialog_new (data->wind, data->core);
       gtk_widget_show (w);
     }
-  else if (!strcmp (action_name, "open-torrent-menu")
-        || !strcmp (action_name, "open-torrent-toolbar"))
+  else if (!g_strcmp0 (action_name, "open-torrent-menu")
+        || !g_strcmp0 (action_name, "open-torrent-toolbar"))
     {
       GtkWidget * w = gtr_torrent_open_from_file_dialog_new (data->wind, data->core);
       gtk_widget_show (w);
     }
-    else if (!strcmp (action_name, "show-stats"))
+    else if (!g_strcmp0 (action_name, "show-stats"))
     {
         GtkWidget * dialog = gtr_stats_dialog_new (data->wind, data->core);
         gtk_widget_show (dialog);
     }
-  else if (!strcmp (action_name, "donate"))
+  else if (!g_strcmp0 (action_name, "donate"))
     {
       gtr_open_uri ("http://www.transmissionbt.com/donate.php");
     }
-  else if (!strcmp (action_name, "pause-all-torrents"))
+  else if (!g_strcmp0 (action_name, "pause-all-torrents"))
     {
       pause_all_torrents (data);
     }
-  else if (!strcmp (action_name, "start-all-torrents"))
+  else if (!g_strcmp0 (action_name, "start-all-torrents"))
     {
       start_all_torrents (data);
     }
-  else if (!strcmp (action_name, "copy-magnet-link-to-clipboard"))
+  else if (!g_strcmp0 (action_name, "copy-magnet-link-to-clipboard"))
     {
       tr_torrent * tor = get_first_selected_torrent (data);
       if (tor != NULL)
@@ -1528,7 +1528,7 @@ gtr_actions_handler (const char * action_name, gpointer user_data)
           copy_magnet_link_to_clipboard (GTK_WIDGET (data->wind), tor);
         }
     }
-  else if (!strcmp (action_name, "relocate-torrent"))
+  else if (!g_strcmp0 (action_name, "relocate-torrent"))
     {
       GSList * ids = get_selected_torrent_ids (data);
       if (ids != NULL)
@@ -1538,52 +1538,52 @@ gtr_actions_handler (const char * action_name, gpointer user_data)
           gtk_widget_show (w);
         }
     }
-  else if (!strcmp (action_name, "torrent-start")
-        || !strcmp (action_name, "torrent-start-now")
-        || !strcmp (action_name, "torrent-stop")
-        || !strcmp (action_name, "torrent-reannounce")
-        || !strcmp (action_name, "torrent-verify")
-        || !strcmp (action_name, "queue-move-top")
-        || !strcmp (action_name, "queue-move-up")
-        || !strcmp (action_name, "queue-move-down")
-        || !strcmp (action_name, "queue-move-bottom"))
+  else if (!g_strcmp0 (action_name, "torrent-start")
+        || !g_strcmp0 (action_name, "torrent-start-now")
+        || !g_strcmp0 (action_name, "torrent-stop")
+        || !g_strcmp0 (action_name, "torrent-reannounce")
+        || !g_strcmp0 (action_name, "torrent-verify")
+        || !g_strcmp0 (action_name, "queue-move-top")
+        || !g_strcmp0 (action_name, "queue-move-up")
+        || !g_strcmp0 (action_name, "queue-move-down")
+        || !g_strcmp0 (action_name, "queue-move-bottom"))
     {
       changed |= call_rpc_for_selected_torrents (data, action_name);
     }
-  else if (!strcmp (action_name, "open-torrent-folder"))
+  else if (!g_strcmp0 (action_name, "open-torrent-folder"))
     {
       gtk_tree_selection_selected_foreach (data->sel, open_folder_foreach, data->core);
     }
-  else if (!strcmp (action_name, "show-torrent-properties"))
+  else if (!g_strcmp0 (action_name, "show-torrent-properties"))
     {
       show_details_dialog_for_selected_torrents (data);
     }
-  else if (!strcmp (action_name, "new-torrent"))
+  else if (!g_strcmp0 (action_name, "new-torrent"))
     {
       GtkWidget * w = gtr_torrent_creation_dialog_new (data->wind, data->core);
       gtk_widget_show (w);
     }
-  else if (!strcmp (action_name, "remove-torrent"))
+  else if (!g_strcmp0 (action_name, "remove-torrent"))
     {
       remove_selected (data, FALSE);
     }
-  else if (!strcmp (action_name, "delete-torrent"))
+  else if (!g_strcmp0 (action_name, "delete-torrent"))
     {
       remove_selected (data, TRUE);
     }
-  else if (!strcmp (action_name, "quit"))
+  else if (!g_strcmp0 (action_name, "quit"))
     {
       on_app_exit (data);
     }
-  else if (!strcmp (action_name, "select-all"))
+  else if (!g_strcmp0 (action_name, "select-all"))
     {
       gtk_tree_selection_select_all (data->sel);
     }
-  else if (!strcmp (action_name, "deselect-all"))
+  else if (!g_strcmp0 (action_name, "deselect-all"))
     {
       gtk_tree_selection_unselect_all (data->sel);
     }
-  else if (!strcmp (action_name, "edit-preferences"))
+  else if (!g_strcmp0 (action_name, "edit-preferences"))
     {
       if (NULL == data->prefs)
         {
@@ -1593,7 +1593,7 @@ gtr_actions_handler (const char * action_name, gpointer user_data)
         }
         gtr_window_present (GTK_WINDOW (data->prefs));
     }
-  else if (!strcmp (action_name, "toggle-message-log"))
+  else if (!g_strcmp0 (action_name, "toggle-message-log"))
     {
       if (!data->msgwin)
         {
@@ -1608,19 +1608,19 @@ gtr_actions_handler (const char * action_name, gpointer user_data)
           data->msgwin = NULL;
         }
     }
-  else if (!strcmp (action_name, "show-about-dialog"))
+  else if (!g_strcmp0 (action_name, "show-about-dialog"))
     {
       show_about_dialog (data->wind);
     }
-  else if (!strcmp (action_name, "help"))
+  else if (!g_strcmp0 (action_name, "help"))
     {
       gtr_open_uri (gtr_get_help_uri ());
     }
-  else if (!strcmp (action_name, "toggle-main-window"))
+  else if (!g_strcmp0 (action_name, "toggle-main-window"))
     {
       toggleMainWindow (data);
     }
-  else if (!strcmp (action_name, "present-main-window"))
+  else if (!g_strcmp0 (action_name, "present-main-window"))
     {
       presentMainWindow (data);
     }

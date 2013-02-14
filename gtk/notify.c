@@ -10,8 +10,6 @@
  * $Id$
  */
 
-#include <string.h> /* strcmp () */
-
 #include <gio/gio.h>
 
 #include <glib/gi18n.h>
@@ -67,7 +65,7 @@ get_capabilities_callback (GObject      * source,
   g_variant_get (result, "(^a&s)", &caps);
   for (i=0; caps[i]; i++)
     {
-      if (strcmp (caps[i], "actions") == 0)
+      if (g_strcmp0 (caps[i], "actions") == 0)
         {
           server_supports_actions = TRUE;
           break;
@@ -96,12 +94,12 @@ g_signal_callback (GDBusProxy * proxy UNUSED,
   if (n == NULL)
     return;
 
-  if (strcmp (signal_name, "NotificationClosed") == 0)
+  if (g_strcmp0 (signal_name, "NotificationClosed") == 0)
     {
       g_hash_table_remove (active_notifications,
                            GINT_TO_POINTER ((int *) &n->id));
     }
-  else if (strcmp (signal_name, "ActionInvoked") == 0 &&
+  else if (g_strcmp0 (signal_name, "ActionInvoked") == 0 &&
            g_variant_is_of_type (params, G_VARIANT_TYPE ("(us)")))
     {
       char * action;
@@ -112,11 +110,11 @@ g_signal_callback (GDBusProxy * proxy UNUSED,
         return;
 
       g_variant_get (params, "(u&s)", NULL, &action);
-      if (strcmp (action, "folder") == 0)
+      if (g_strcmp0 (action, "folder") == 0)
         {
           gtr_core_open_folder (n->core, n->torrent_id);
         }
-      else if (strcmp (action, "file") == 0)
+      else if (g_strcmp0 (action, "file") == 0)
         {
           const tr_info * inf = tr_torrentInfo (tor);
           const char * dir = tr_torrentGetDownloadDir (tor);

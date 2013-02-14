@@ -59,7 +59,7 @@ save_recent_destination (TrCore * core, const char * dir)
         return;
 
     /* if it was already in the list, remove it */
-    if ((l = g_slist_find_custom (list, dir, (GCompareFunc)strcmp)))
+    if ((l = g_slist_find_custom (list, dir, (GCompareFunc)g_strcmp0)))
         list = g_slist_delete_link (list, l);
 
     /* add it to the front of the list */
