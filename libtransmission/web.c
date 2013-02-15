@@ -247,6 +247,8 @@ tr_webRun (tr_session         * session,
                               NULL);
 }
 
+static void tr_webThreadFunc (void * vsession);
+
 struct tr_web_task *
 tr_webRunWithBuffer (tr_session         * session,
                      const char         * url,
@@ -256,12 +258,20 @@ tr_webRunWithBuffer (tr_session         * session,
                      void               * done_func_user_data,
                      struct evbuffer    * buffer)
 {
-  struct tr_web * web = session->web;
+  struct tr_web_task * task = NULL;
 
-  if (web != NULL)
+  if (!session->isClosing)
     {
-      struct tr_web_task * task = tr_new0 (struct tr_web_task, 1);
+      if (session->web == NULL)
+        {
+          tr_threadNew (tr_webThreadFunc, session);
 
+          while (session->web == NULL)
+            tr_wait_msec (20);
+        }
+      
+      task = tr_new0 (struct tr_web_task, 1);
+      task = tr_new0 (struct tr_web_task, 1);
       task->session = session;
       task->url = tr_strdup (url);
       task->range = tr_strdup (range);
@@ -271,14 +281,13 @@ tr_webRunWithBuffer (tr_session         * session,
       task->response = buffer ? buffer : evbuffer_new ();
       task->freebuf = buffer ? NULL : task->response;
 
-      tr_lockLock (web->taskLock);
-      task->next = web->tasks;
-      web->tasks = task;
-      tr_lockUnlock (web->taskLock);
-      return task;
+      tr_lockLock (session->web->taskLock);
+      task->next = session->web->tasks;
+      session->web->tasks = task;
+      tr_lockUnlock (session->web->taskLock);
     }
 
-  return NULL;
+  return task;
 }
 
 /**
@@ -450,11 +459,6 @@ tr_webThreadFunc (void * vsession)
   session->web = NULL;
 }
 
-void
-tr_webInit (tr_session * session)
-{
-  tr_threadNew (tr_webThreadFunc, session);
-}
 
 void
 tr_webClose (tr_session * session, tr_web_close_mode close_mode)

@@ -30,8 +30,6 @@ typedef enum
 }
 tr_web_task_info;
 
-void tr_webInit (tr_session * session);
-
 typedef enum
 {
     TR_WEB_CLOSE_WHEN_IDLE,

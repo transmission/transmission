@@ -728,10 +728,6 @@ tr_sessionInitImpl (void * vdata)
 
     tr_statsInit (session);
 
-    tr_webInit (session);
-    while (session->web == NULL)
-      tr_wait_msec (50);
-
     tr_sessionSet (session, &settings);
 
     tr_udpInit (session);
@@ -1755,6 +1751,8 @@ sessionCloseImpl (void * vsession)
     tr_torrent ** torrents;
 
     assert (tr_isSession (session));
+
+    session->isClosing = true;
 
     free_incoming_peer_port (session);
 

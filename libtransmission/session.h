@@ -110,6 +110,7 @@ struct tr_session
     bool                         isBlocklistEnabled;
     bool                         isPrefetchEnabled;
     bool                         isTorrentDoneScriptEnabled;
+    bool                         isClosing;
     bool                         isClosed;
     bool                         isIncompleteFileNamingEnabled;
     bool                         isRatioLimited;
