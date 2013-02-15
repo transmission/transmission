@@ -301,33 +301,6 @@ getHomeDir (void)
   return home;
 }
 
-static const char *
-getOldConfigDir (void)
-{
-  static char * path = NULL;
-
-  if (!path)
-    {
-#ifdef SYS_DARWIN
-      path = tr_buildPath (getHomeDir (), "Library",
-                           "Application Support",
-                           "Transmission", NULL);
-#elif defined (WIN32)
-      char appdata[MAX_PATH]; /* SHGetFolderPath () requires MAX_PATH */
-      SHGetFolderPath (NULL, CSIDL_APPDATA, NULL, 0, appdata);
-      path = tr_buildPath (appdata, "Transmission", NULL);
-#elif defined (__HAIKU__)
-      char buf[TR_PATH_MAX];
-      find_directory (B_USER_SETTINGS_DIRECTORY, -1, true, buf, sizeof (buf));
-      path = tr_buildPath (buf, "Transmission", NULL);
-#else
-      path = tr_buildPath (getHomeDir (), ".transmission", NULL);
-#endif
-    }
-
-  return path;
-}
-
 #if defined (SYS_DARWIN) || defined (WIN32)
  #define RESUME_SUBDIR  "Resume"
  #define TORRENT_SUBDIR "Torrents"
@@ -335,96 +308,6 @@ getOldConfigDir (void)
  #define RESUME_SUBDIR  "resume"
  #define TORRENT_SUBDIR "torrents"
 #endif
-
-static const char *
-getOldTorrentsDir (void)
-{
-  static char * path = NULL;
-
-  if (!path)
-    path = tr_buildPath (getOldConfigDir (), TORRENT_SUBDIR, NULL);
-
-  return path;
-}
-
-static const char *
-getOldCacheDir (void)
-{
-  static char * path = NULL;
-
-  if (!path)
-    {
-#if defined (WIN32)
-      path = tr_buildPath (getOldConfigDir (), "Cache", NULL);
-#elif defined (SYS_DARWIN)
-      path = tr_buildPath (getHomeDir (), "Library", "Caches", "Transmission", NULL);
-#else
-      path = tr_buildPath (getOldConfigDir (), "cache", NULL);
-#endif
-    }
-
-  return path;
-}
-
-static void
-moveFiles (const char * oldDir, const char * newDir)
-{
-  if (oldDir && newDir && strcmp (oldDir, newDir))
-    {
-      DIR * dirh = opendir (oldDir);
-      if (dirh)
-        {
-          int count = 0;
-          struct dirent * dirp;
-          while ((dirp = readdir (dirh)))
-            {
-              const char * name = dirp->d_name;
-              if (name && strcmp (name, ".") && strcmp (name, ".."))
-                {
-                  char * o = tr_buildPath (oldDir, name, NULL);
-                  char * n = tr_buildPath (newDir, name, NULL);
-                  tr_rename (o, n);
-                  ++count;
-                  tr_free (n);
-                  tr_free (o);
-                }
-            }
-
-          if (count)
-            tr_logAddInfo (_("Migrated %1$d files from \"%2$s\" to \"%3$s\""), count, oldDir, newDir);
-
-          closedir (dirh);
-        }
-    }
-}
-
-/**
- * This function is for transmission-gtk users to migrate the config files
- * from $HOME/.transmission/ (where they were kept before Transmission 1.30)
- * to $HOME/.config/$appname as per the XDG directory spec.
- */
-static void
-migrateFiles (const tr_session * session)
-{
-  static int migrated = false;
-  const bool should_migrate = strstr (getOldConfigDir (), ".transmission") != NULL;
-
-  if (!migrated && should_migrate)
-    {
-      const char * oldDir;
-      const char * newDir;
-
-      migrated = true;
-
-      oldDir = getOldTorrentsDir ();
-      newDir = tr_getTorrentDir (session);
-      moveFiles (oldDir, newDir);
-
-      oldDir = getOldCacheDir ();
-      newDir = tr_getResumeDir (session);
-      moveFiles (oldDir, newDir);
-    }
-}
 
 void
 tr_setConfigDir (tr_session * session, const char * configDir)
@@ -440,8 +323,6 @@ tr_setConfigDir (tr_session * session, const char * configDir)
   path = tr_buildPath (configDir, TORRENT_SUBDIR, NULL);
   tr_mkdirp (path, 0777);
   session->torrentDir = path;
-
-  migrateFiles (session);
 }
 
 const char *
