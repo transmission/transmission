@@ -271,7 +271,6 @@ tr_webRunWithBuffer (tr_session         * session,
         }
       
       task = tr_new0 (struct tr_web_task, 1);
-      task = tr_new0 (struct tr_web_task, 1);
       task->session = session;
       task->url = tr_strdup (url);
       task->range = tr_strdup (range);
