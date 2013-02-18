@@ -2,13 +2,13 @@
 [http://trac.transmissionbt.com/query?milestone=2.77&group=component&order=severity All tickets closed by this release]
 ==== All Platforms ====
   * Fix 2.75 regression that broke JSON parsing of real numbers in locales that don't use '.' as a decimal separator
-  * Don't invalidate the OS' file cache when closing files
+  * Don't invalidate the OS's file cache when closing files
   * Fix overflow error when setting speed limits above ~8589 kB/s
+  * Generated magnet links didn't include webseeds
   * Fix minor memory leaks when using webseeds
-  * "Copy magnet link to clipboard" didn't include webseeds
 ==== GTK+ Client ====
   * Minor pluralization fixes in the UI
-  * Fix folder mis-selection issue in the Preferences Dialog
+  * Fix folder mis-selection issue in the Preferences dialog
   * Fix GTK+ console warnings on shutdown
 ==== Qt Client ====
   * Fix non Latin-1 symbol issue when showing file transfer speeds
