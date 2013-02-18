@@ -91,17 +91,16 @@ static struct UPNPDev *
 tr_upnpDiscover (int msec)
 {
     struct UPNPDev * ret = NULL;
-    int err = UPNPDISCOVER_SUCCESS;
 
 #if defined (HAVE_MINIUPNP_16)
+    int err = UPNPDISCOVER_SUCCESS;
     ret = upnpDiscover (msec, NULL, NULL, 0, 0, &err);
+    if (err != UPNPDISCOVER_SUCCESS)
 #elif defined (HAVE_MINIUPNP_15)
     ret = upnpDiscover (msec, NULL, NULL, 0);
-#else
-    ret = UPNPDISCOVER_UNKNOWN_ERROR;
+    if (ret == NULL)
 #endif
 
-    if (err != UPNPDISCOVER_SUCCESS)
         tr_logAddNamedDbg (getKey (), "upnpDiscover failed (errno %d - %s)", errno, tr_strerror (errno));
 
     return ret;
