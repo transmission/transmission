@@ -770,8 +770,6 @@
       Its functionality has been superceded by the 'free-space' method.
 
    2. HTTP POSTs to http://server:port/transmission/upload will fail.
-      It's been superceded by http://server:port/transmission/upload2.
-      Example in https://trac.transmissionbt.com/changeset/14005/#file8
-      NB: not to be confused with section 3.4's torrent-add method.
-      /upload and /upload2 are undocumented features to help web clients
-      upload .torrent files.
+      This was an undocumented hack to allow web clients to add files without
+      client-side access to the file. This functionality is superceded by
+      using HTML5's FileReader object + the documented 'torrent-add' method.

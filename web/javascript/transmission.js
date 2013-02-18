@@ -901,7 +901,8 @@ Transmission.prototype =
 	 */
 	uploadTorrentFile: function(confirmed)
 	{
-		var formData,
+		var i, file,
+		    reader,
 		    fileInput   = $('input#torrent_upload_file'),
 		    folderInput = $('input#add-dialog-folder-input'),
 		    startInput  = $('input#torrent_auto_start'),
@@ -923,23 +924,33 @@ Transmission.prototype =
 		}
 		else
 		{
-			formData = new FormData ();
-			jQuery.each(fileInput[0].files, function(i, file) {
-				formData.append ('file-'+i, file);
-			});
-			$.ajax ({
-				url: '../upload2',
-				data: formData,
-				headers : {
-					'X-Transmission-Session-Id':        this.remote._token,
-					'X-Transmission-Add-Paused':        !startInput.is(':checked'),
-					'X-Transmission-Add-Download-Dir':  folderInput.val(),
-					'X-Transmission-Add-URL':           urlInput.val()
-				},
-				cache: false,
-				contentType: false,
-				processData: false,
-				type: 'POST'
+			var paused = !startInput.is(':checked'),
+			    destination = folderInput.val(),
+			    remote = this.remote;
+
+			jQuery.each (fileInput[0].files, function(i,file) {
+				var reader = new FileReader();
+				reader.onload = function(e) { 
+					var contents = e.target.result;
+					var key = "base64,"
+					var index = contents.indexOf (key);
+					if (index > -1) {
+						var metainfo = contents.substring (index + key.length);
+						var o = {
+							'method': 'torrent-add',
+							arguments: {
+								'paused': paused,
+								'download-dir': destination,
+								'metainfo': metainfo
+							}
+						};
+						remote.sendRequest (o, function(response) {
+							if (response.result != 'success')
+								alert ('Error adding "' + file.name + '": ' + response.result);
+						});
+					}
+				}
+				reader.readAsDataURL (file);
 			});
 		}
 	},
