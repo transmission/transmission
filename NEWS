@@ -1,4 +1,4 @@
-=== Transmission 2.77 (2013/xx/yy) ===
+=== Transmission 2.77 (2013/02/18) ===
 [http://trac.transmissionbt.com/query?milestone=2.77&group=component&order=severity All tickets closed by this release]
 ==== All Platforms ====
   * Fix 2.75 regression that broke JSON parsing of real numbers in locales that don't use '.' as a decimal separator
