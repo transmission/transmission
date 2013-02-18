@@ -16,6 +16,8 @@
   * Fix lost text selection in the properties dialog's 'comment' field
 ==== Daemon ====
   * Fix documentation errors in the spec and manpages
+==== Web Client ====
+  * Fix minor DOM leak
 ==== CLI ====
   * Fix transmission-cli failure when the download directory doesn't exist
 
