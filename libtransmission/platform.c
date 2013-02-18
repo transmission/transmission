@@ -895,8 +895,10 @@ tr_device_info_create (const char * path)
 
   info = tr_new0 (struct tr_device_info, 1);
   info->path = tr_strdup (path);
+#ifndef WIN32
   info->device = tr_strdup (getblkdev (path));
   info->fstype = tr_strdup (getfstype (path));
+#endif
 
   return info;
 }
