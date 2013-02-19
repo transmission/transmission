@@ -1823,9 +1823,7 @@ int trashDataFile(const char * filename)
     {
         case TR_SEED:
         case TR_PARTIAL_SEED:
-            //simpler to create a new dictionary than to use statusInfo - avoids retention chicanery
-            [[NSNotificationCenter defaultCenter] postNotificationName: @"TorrentFinishedDownloading" object: self
-                userInfo: [NSDictionary dictionaryWithObject: [statusInfo objectForKey: @"WasRunning"] forKey: @"WasRunning"]];
+            [[NSNotificationCenter defaultCenter] postNotificationName: @"TorrentFinishedDownloading" object: self userInfo: [[statusInfo retain] autorelease]];
             
             //quarantine the finished data
             NSString * dataLocation = [[self currentDirectory] stringByAppendingPathComponent: [self name]];
