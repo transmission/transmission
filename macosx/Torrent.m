@@ -53,7 +53,7 @@
 - (void) ratioLimitHit;
 - (void) idleLimitHit;
 - (void) metadataRetrieved;
-- (void)renameFinished: (BOOL) success withNodes: (NSArray *) nodes completionHandler: (void (^)(BOOL)) completionHandler oldPath: (NSString *) oldPath newName: (NSString *) newName;
+- (void)renameFinished: (BOOL) success nodes: (NSArray *) nodes completionHandler: (void (^)(BOOL)) completionHandler oldPath: (NSString *) oldPath newName: (NSString *) newName;
 
 - (BOOL) shouldShowEta;
 - (NSString *) etaString;
@@ -101,7 +101,7 @@ void renameCallback(tr_torrent * torrent, const char * oldPathCharString, const 
         dispatch_async(dispatch_get_main_queue(), ^{
             NSDictionary * contextDict = [(NSDictionary *)contextInfo autorelease];
             Torrent * torrentObject = [contextDict objectForKey: @"Torrent"];
-            [torrentObject renameFinished: error == 0 withNodes: [contextDict objectForKey: @"Nodes"] completionHandler: [contextDict objectForKey: @"CompletionHandler"] oldPath: oldPath newName: newName];
+            [torrentObject renameFinished: error == 0 nodes: [contextDict objectForKey: @"Nodes"] completionHandler: [contextDict objectForKey: @"CompletionHandler"] oldPath: oldPath newName: newName];
         });
     }
 }
@@ -1724,8 +1724,9 @@ int trashDataFile(const char * filename)
     if ([self isFolder])
     {
         const NSInteger count = [self fileCount];
-        NSMutableArray * fileList = [NSMutableArray array],
-                    * flatFileList = [NSMutableArray arrayWithCapacity: count];
+        NSMutableArray * flatFileList = [NSMutableArray arrayWithCapacity: count];
+        
+        FileListNode * tempNode = [[FileListNode alloc] initWithFolderName:nil path:nil torrent:self];
         
         for (NSInteger i = 0; i < count; i++)
         {
@@ -1733,47 +1734,15 @@ int trashDataFile(const char * filename)
             
             NSString * fullPath = [NSString stringWithUTF8String: file->name];
             NSArray * pathComponents = [fullPath pathComponents];
-            NSAssert1([pathComponents count] >= 2, @"Not enough components in path %@", fullPath);
-            
-            NSString * path = [pathComponents objectAtIndex: 0];
-            NSString * name = [pathComponents objectAtIndex: 1];
-            
-            if ([pathComponents count] > 2)
-            {
-                //determine if folder node already exists
-                __block FileListNode * node = nil;
-                [fileList enumerateObjectsWithOptions: NSEnumerationConcurrent usingBlock: ^(FileListNode * searchNode, NSUInteger idx, BOOL * stop) {
-                    if ([[searchNode name] isEqualToString: name] && [searchNode isFolder])
-                    {
-                        node = searchNode;
-                        *stop = YES;
-                    }
-                }];
-                
-                if (!node)
-                {
-                    node = [[FileListNode alloc] initWithFolderName: name path: path torrent: self];
-                    [fileList addObject: node];
-                    [node release];
-                }
-                
-                [node insertIndex: i withSize: file->length];
-                [self insertPathForComponents: pathComponents withComponentIndex: 2 forParent: node fileSize: file->length index: i flatList: flatFileList];
-            }
-            else
-            {
-                FileListNode * node = [[FileListNode alloc] initWithFileName: name path: path size: file->length index: i torrent: self];
-                [fileList addObject: node];
-                [flatFileList addObject: node];
-                [node release];
-            }
+            [self insertPathForComponents: pathComponents withComponentIndex: 1 forParent: tempNode fileSize: file->length index: i flatList: flatFileList];
         }
         
-        [self sortFileList: fileList];
+        [self sortFileList: [tempNode children]];
         [self sortFileList: flatFileList];
         
-        fFileList = [[NSArray alloc] initWithArray: fileList];
+        fFileList = [[NSArray alloc] initWithArray: [tempNode children]];
         fFlatFileList = [[NSArray alloc] initWithArray: flatFileList];
+        [tempNode release];
     }
     else
     {
@@ -1919,7 +1888,7 @@ int trashDataFile(const char * filename)
     [[NSNotificationCenter defaultCenter] postNotificationName: @"ResetInspector" object: self userInfo: @{ @"Torrent" : self }];
 }
 
-- (void)renameFinished: (BOOL) success withNodes: (NSArray *) nodes completionHandler: (void (^)(BOOL)) completionHandler oldPath: (NSString *) oldPath newName: (NSString *) newName
+- (void)renameFinished: (BOOL) success nodes: (NSArray *) nodes completionHandler: (void (^)(BOOL)) completionHandler oldPath: (NSString *) oldPath newName: (NSString *) newName
 {
     NSParameterAssert(completionHandler != nil);
     NSParameterAssert(oldPath != nil);
