@@ -30,14 +30,13 @@
 {
     NSMutableIndexSet * fIndexes;
     
-    NSMutableArray * fChildren;
-    
     NSString * fName;
     NSString * fPath;
     Torrent * fTorrent;
     uint64_t fSize;
     NSImage * fIcon;
     BOOL fIsFolder;
+    NSMutableArray * fChildren;
 }
 
 @property (nonatomic, copy, readonly) NSString * name;
@@ -48,6 +47,7 @@
 @property (nonatomic, readonly) uint64_t size;
 @property (nonatomic, retain, readonly) NSImage * icon;
 @property (nonatomic, readonly) BOOL isFolder;
+@property (nonatomic, retain, readonly) NSMutableArray * children;
 
 @property (nonatomic, retain, readonly) NSIndexSet * indexes;
 
@@ -58,8 +58,6 @@
 - (void) insertIndex: (NSUInteger) index withSize: (uint64_t) size;
 
 - (NSString *) description;
-
-- (NSMutableArray *) children;
 
 - (BOOL) updateFromOldName: (NSString *) oldName toNewName: (NSString *) newName inPath: (NSString *) path;
 

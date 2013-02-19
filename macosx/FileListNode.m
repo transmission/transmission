@@ -40,6 +40,7 @@
 @synthesize icon = fIcon;
 @synthesize isFolder = fIsFolder;
 @synthesize indexes = fIndexes;
+@synthesize children = fChildren;
 
 - (id) initWithFolderName: (NSString *) name path: (NSString *) path torrent: (Torrent *) torrent
 {
@@ -89,11 +90,8 @@
     [fName release];
     [fPath release];
     [fIndexes release];
-    
     [fIcon release];
-    
     [fChildren release];
-    
     [super dealloc];
 }
 
