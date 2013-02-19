@@ -1726,7 +1726,7 @@ int trashDataFile(const char * filename)
         const NSInteger count = [self fileCount];
         NSMutableArray * flatFileList = [NSMutableArray arrayWithCapacity: count];
         
-        FileListNode * tempNode = [[FileListNode alloc] initWithFolderName:nil path:nil torrent:self];
+        FileListNode * tempNode = nil;
         
         for (NSInteger i = 0; i < count; i++)
         {
@@ -1734,6 +1734,10 @@ int trashDataFile(const char * filename)
             
             NSString * fullPath = [NSString stringWithUTF8String: file->name];
             NSArray * pathComponents = [fullPath pathComponents];
+            
+            if (!tempNode)
+                tempNode = [[FileListNode alloc] initWithFolderName:[pathComponents objectAtIndex: 0] path:@"" torrent:self];
+            
             [self insertPathForComponents: pathComponents withComponentIndex: 1 forParent: tempNode fileSize: file->length index: i flatList: flatFileList];
         }
         
