@@ -107,7 +107,7 @@ Prefs::PrefItem Prefs::myItems[] =
   { DHT_ENABLED, TR_KEY_dht_enabled, QVariant::Bool },
   { UTP_ENABLED, TR_KEY_utp_enabled, QVariant::Bool },
   { LPD_ENABLED, TR_KEY_lpd_enabled, QVariant::Bool },
-  { PORT_FORWARDING, TR_KEY_port, QVariant::Bool },
+  { PORT_FORWARDING, TR_KEY_port_forwarding_enabled, QVariant::Bool },
   { PREALLOCATION, TR_KEY_preallocation, QVariant::Int },
   { RATIO, TR_KEY_ratio_limit, QVariant::Double },
   { RATIO_ENABLED, TR_KEY_ratio_limit_enabled, QVariant::Bool },
