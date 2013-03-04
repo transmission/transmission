@@ -4745,7 +4745,10 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         {
             [fTorrents enumerateObjectsWithOptions: NSEnumerationConcurrent usingBlock: ^(Torrent * checkTorrent, NSUInteger idx, BOOL *stop) {
                 if (torrentStruct == [checkTorrent torrentStruct])
+                {
                     torrent = checkTorrent;
+                    *stop = YES;
+                }
             }];
             
             if (!torrent)
