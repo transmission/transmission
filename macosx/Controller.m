@@ -4740,19 +4740,19 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     @autoreleasepool
     {
         //get the torrent
-        Torrent * torrent = nil;
+        __block Torrent * torrent = nil;
         if (torrentStruct != NULL && (type != TR_RPC_TORRENT_ADDED && type != TR_RPC_SESSION_CHANGED && type != TR_RPC_SESSION_CLOSE))
         {
-            const NSUInteger index = [fTorrents indexOfObjectWithOptions:NSEnumerationConcurrent passingTest: ^BOOL(Torrent * checkTorrent, NSUInteger idx, BOOL * stop) {
-                return torrentStruct == [checkTorrent torrentStruct];
+            [fTorrents enumerateObjectsWithOptions: NSEnumerationConcurrent usingBlock: ^(Torrent * checkTorrent, NSUInteger idx, BOOL *stop) {
+                if (torrentStruct == [checkTorrent torrentStruct])
+                    torrent = checkTorrent;
             }];
             
-            if (index == NSNotFound)
+            if (!torrent)
             {
                 NSLog(@"No torrent found matching the given torrent struct from the RPC callback!");
                 return;
             }
-            torrent = [fTorrents objectAtIndex: index];
         }
         
         dispatch_async(dispatch_get_main_queue(), ^{
