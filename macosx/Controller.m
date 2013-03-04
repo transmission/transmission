@@ -4743,73 +4743,68 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         Torrent * torrent = nil;
         if (torrentStruct != NULL && (type != TR_RPC_TORRENT_ADDED && type != TR_RPC_SESSION_CHANGED && type != TR_RPC_SESSION_CLOSE))
         {
-            for (torrent in fTorrents)
-                if (torrentStruct == [torrent torrentStruct])
-                {
-                    [torrent retain];
-                    break;
-                }
+            const NSUInteger index = [fTorrents indexOfObjectWithOptions:NSEnumerationConcurrent passingTest: ^BOOL(Torrent * checkTorrent, NSUInteger idx, BOOL * stop) {
+                return torrentStruct == [checkTorrent torrentStruct];
+            }];
             
-            if (!torrent)
+            if (index == NSNotFound)
             {
                 NSLog(@"No torrent found matching the given torrent struct from the RPC callback!");
                 return;
             }
+            torrent = [fTorrents objectAtIndex: index];
         }
         
-        switch (type)
-        {
-            case TR_RPC_TORRENT_ADDED:
-                [self performSelectorOnMainThread: @selector(rpcAddTorrentStruct:) withObject:
-                    [[NSValue valueWithPointer: torrentStruct] retain] waitUntilDone: NO];
-                break;
-            
-            case TR_RPC_TORRENT_STARTED:
-            case TR_RPC_TORRENT_STOPPED:
-                [self performSelectorOnMainThread: @selector(rpcStartedStoppedTorrent:) withObject: torrent waitUntilDone: NO];
-                break;
-            
-            case TR_RPC_TORRENT_REMOVING:
-                [self performSelectorOnMainThread: @selector(rpcRemoveTorrent:) withObject: torrent waitUntilDone: NO];
-                break;
-            
-            case TR_RPC_TORRENT_TRASHING:
-                [self performSelectorOnMainThread: @selector(rpcRemoveTorrentDeleteData:) withObject: torrent waitUntilDone: NO];
-                break;
-            
-            case TR_RPC_TORRENT_CHANGED:
-                [self performSelectorOnMainThread: @selector(rpcChangedTorrent:) withObject: torrent waitUntilDone: NO];
-                break;
-            
-            case TR_RPC_TORRENT_MOVED:
-                [self performSelectorOnMainThread: @selector(rpcMovedTorrent:) withObject: torrent waitUntilDone: NO];
-                break;
-            
-            case TR_RPC_SESSION_QUEUE_POSITIONS_CHANGED:
-                [self performSelectorOnMainThread: @selector(rpcUpdateQueue) withObject: nil waitUntilDone: NO];
-                break;
-            
-            case TR_RPC_SESSION_CHANGED:
-                [fPrefsController performSelectorOnMainThread: @selector(rpcUpdatePrefs) withObject: nil waitUntilDone: NO];
-                break;
-            
-            case TR_RPC_SESSION_CLOSE:
-                fQuitRequested = YES;
-                [NSApp performSelectorOnMainThread: @selector(terminate:) withObject: self waitUntilDone: NO];
-                break;
-            
-            default:
-                NSAssert1(NO, @"Unknown RPC command received: %d", type);
-                [torrent release];
-        }
+        dispatch_async(dispatch_get_main_queue(), ^{
+            switch (type)
+            {
+                case TR_RPC_TORRENT_ADDED:
+                    [self rpcAddTorrentStruct: torrentStruct];
+                    break;
+                    
+                case TR_RPC_TORRENT_STARTED:
+                case TR_RPC_TORRENT_STOPPED:
+                    [self rpcStartedStoppedTorrent: torrent];
+                    break;
+                    
+                case TR_RPC_TORRENT_REMOVING:
+                    [self rpcRemoveTorrent: torrent];
+                    break;
+                    
+                case TR_RPC_TORRENT_TRASHING:
+                    [self rpcRemoveTorrentDeleteData: torrent];
+                    break;
+                    
+                case TR_RPC_TORRENT_CHANGED:
+                    [self rpcChangedTorrent: torrent];
+                    break;
+                    
+                case TR_RPC_TORRENT_MOVED:
+                    [self rpcMovedTorrent: torrent];
+                    break;
+                    
+                case TR_RPC_SESSION_QUEUE_POSITIONS_CHANGED:
+                    [self rpcUpdateQueue];
+                    break;
+                    
+                case TR_RPC_SESSION_CHANGED:
+                    [fPrefsController rpcUpdatePrefs];
+                    break;
+                    
+                case TR_RPC_SESSION_CLOSE:
+                    fQuitRequested = YES;
+                    [NSApp terminate: self];
+                    break;
+                    
+                default:
+                    NSAssert1(NO, @"Unknown RPC command received: %d", type);
+            }
+        });
     }
 }
 
-- (void) rpcAddTorrentStruct: (NSValue *) torrentStructPtr
+- (void) rpcAddTorrentStruct: (struct tr_torrent *) torrentStruct
 {
-    tr_torrent * torrentStruct = (tr_torrent *)[torrentStructPtr pointerValue];
-    [torrentStructPtr release];
-    
     NSString * location = nil;
     if (tr_torrentGetDownloadDir(torrentStruct) != NULL)
         location = [NSString stringWithUTF8String: tr_torrentGetDownloadDir(torrentStruct)];
@@ -4837,19 +4832,16 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 - (void) rpcRemoveTorrent: (Torrent *) torrent
 {
     [self confirmRemoveTorrents: @[ torrent ] deleteData: NO];
-    [torrent release];
 }
 
 - (void) rpcRemoveTorrentDeleteData: (Torrent *) torrent
 {
     [self confirmRemoveTorrents: @[ torrent ] deleteData: YES];
-    [torrent release];
 }
 
 - (void) rpcStartedStoppedTorrent: (Torrent *) torrent
 {
     [torrent update];
-    [torrent release];
     
     [self updateUI];
     [self applyFilter];
@@ -4865,8 +4857,6 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         [fInfoController updateInfoStats]; //this will reload the file table
         [fInfoController updateOptions];
     }
-    
-    [torrent release];
 }
 
 - (void) rpcMovedTorrent: (Torrent *) torrent
@@ -4876,8 +4866,6 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     
     if ([[fTableView selectedTorrents] containsObject: torrent])
         [fInfoController updateInfoStats];
-    
-    [torrent release];
 }
 
 - (void) rpcUpdateQueue
@@ -4885,16 +4873,11 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     for (Torrent * torrent in fTorrents)
         [torrent update];
     
-    NSArray * selectedValues = [fTableView selectedValues];
-    
     NSSortDescriptor * descriptor = [NSSortDescriptor sortDescriptorWithKey: @"queuePosition" ascending: YES];
     NSArray * descriptors = [NSArray arrayWithObject: descriptor];
-    
     [fTorrents sortUsingDescriptors: descriptors];
     
-    [self fullUpdateUI];
-    
-    [fTableView selectValues: selectedValues];
+    [self sortTorrents: YES];
 }
 
 @end
