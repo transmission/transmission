@@ -4771,11 +4771,11 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
                     break;
                     
                 case TR_RPC_TORRENT_REMOVING:
-                    [self rpcRemoveTorrent: torrent];
+                    [self rpcRemoveTorrent: torrent deleteData: NO];
                     break;
                     
                 case TR_RPC_TORRENT_TRASHING:
-                    [self rpcRemoveTorrentDeleteData: torrent];
+                    [self rpcRemoveTorrent: torrent deleteData: YES];
                     break;
                     
                 case TR_RPC_TORRENT_CHANGED:
@@ -4832,14 +4832,9 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     [self fullUpdateUI];
 }
 
-- (void) rpcRemoveTorrent: (Torrent *) torrent
+- (void) rpcRemoveTorrent: (Torrent *) torrent deleteData: (BOOL) deleteData
 {
-    [self confirmRemoveTorrents: @[ torrent ] deleteData: NO];
-}
-
-- (void) rpcRemoveTorrentDeleteData: (Torrent *) torrent
-{
-    [self confirmRemoveTorrents: @[ torrent ] deleteData: YES];
+    [self confirmRemoveTorrents: @[ torrent ] deleteData: deleteData];
 }
 
 - (void) rpcStartedStoppedTorrent: (Torrent *) torrent
