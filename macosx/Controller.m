@@ -25,6 +25,7 @@
 #import <IOKit/IOMessage.h>
 #import <IOKit/pwr_mgt/IOPMLib.h>
 #import <Carbon/Carbon.h>
+#import <libkern/OSAtomic.h>
 
 #import "Controller.h"
 #import "Torrent.h"
@@ -2352,7 +2353,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     if (!onLion)
         selectedValuesSL = [fTableView selectedValues];
     
-    __block NSUInteger active = 0, downloading = 0, seeding = 0, paused = 0;
+    __block int32_t active = 0, downloading = 0, seeding = 0, paused = 0;
     NSString * filterType = [fDefaults stringForKey: @"Filter"];
     BOOL filterActive = NO, filterDownload = NO, filterSeed = NO, filterPause = NO, filterStatus = YES;
     if ([filterType isEqualToString: FILTER_ACTIVE])
@@ -2381,24 +2382,24 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         {
             const BOOL isActive = ![torrent isStalled];
             if (isActive)
-                ++active;
+                OSAtomicAdd32(1, &active);
             
             if ([torrent isSeeding])
             {
-                ++seeding;
+                OSAtomicAdd32(1, &seeding);
                 if (filterStatus && !((filterActive && isActive) || filterSeed))
                     return NO;
             }
             else
             {
-                ++downloading;
+                OSAtomicAdd32(1, &downloading);
                 if (filterStatus && !((filterActive && isActive) || filterDownload))
                     return NO;
             }
         }
         else
         {
-            ++paused;
+            OSAtomicAdd32(1, &paused);
             if (filterStatus && !filterPause)
                 return NO;
         }
