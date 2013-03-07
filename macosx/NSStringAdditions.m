@@ -209,30 +209,31 @@
     return [self compare: string options: comparisonOptions range: NSMakeRange(0, [self length]) locale: [NSLocale currentLocale]];
 }
 
-- (NSArray *) betterComponentsSeparatedByCharactersInSet: (NSCharacterSet *) separator
+- (NSArray *) betterComponentsSeparatedByCharactersInSet: (NSCharacterSet *) separators
 {
     NSMutableArray * components = [NSMutableArray array];
     
-    NSUInteger i = 0;
-    while (i < [self length])
+    NSCharacterSet * includededCharSet = [separators invertedSet];
+    NSUInteger index = 0;
+    const NSUInteger fullLength = [self length];
+    do
     {
-        const NSRange range = [self rangeOfCharacterFromSet: separator options: 0 range: NSMakeRange(i, [self length]-i)];
+        const NSUInteger start = [self rangeOfCharacterFromSet: includededCharSet options: 0 range: NSMakeRange(index, fullLength - index)].location;
+        if (start == NSNotFound)
+            break;
         
-        if (range.location == NSNotFound)
+        const NSRange endRange = [self rangeOfCharacterFromSet: separators options: 0 range: NSMakeRange(start, fullLength - start)];
+        if (endRange.location == NSNotFound)
         {
-            [components addObject: [self substringFromIndex: i]];
+            [components addObject: [self substringFromIndex: start]];
             break;
         }
-        else if (range.location != i)
-        {
-            const NSUInteger length = range.location - i;
-            [components addObject: [self substringWithRange: NSMakeRange(i, length)]];
-            
-            i += length;
-        }
         
-        i += range.length;
+        [components addObject: [self substringWithRange: NSMakeRange(start, endRange.location - start)]];
+        
+        index = NSMaxRange(endRange);
     }
+    while (YES);
     
     return components;
 }
