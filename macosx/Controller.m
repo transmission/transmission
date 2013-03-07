@@ -2382,24 +2382,24 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         {
             const BOOL isActive = ![torrent isStalled];
             if (isActive)
-                OSAtomicAdd32(1, &active);
+                OSAtomicIncrement32(&active);
             
             if ([torrent isSeeding])
             {
-                OSAtomicAdd32(1, &seeding);
+                OSAtomicIncrement32(&seeding);
                 if (filterStatus && !((filterActive && isActive) || filterSeed))
                     return NO;
             }
             else
             {
-                OSAtomicAdd32(1, &downloading);
+                OSAtomicIncrement32(&downloading);
                 if (filterStatus && !((filterActive && isActive) || filterDownload))
                     return NO;
             }
         }
         else
         {
-            OSAtomicAdd32(1, &paused);
+            OSAtomicIncrement32(&paused);
             if (filterStatus && !filterPause)
                 return NO;
         }
