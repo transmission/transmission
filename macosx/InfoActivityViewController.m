@@ -201,7 +201,7 @@
 {
     const BOOL availability = [sender selectedSegment] == PIECES_CONTROL_AVAILABLE;
     [[NSUserDefaults standardUserDefaults] setBool: availability forKey: @"PiecesViewShowAvailability"];
-    [self updatePiecesView];
+    [self updatePiecesView:nil];
 }
 
 
