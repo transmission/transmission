@@ -56,7 +56,8 @@
 - (void) setInfoForTorrents: (NSArray *) torrents;
 - (void) updateInfo;
 
-- (void) setPiecesView: (id) sender;
+- (IBAction) setPiecesView: (id) sender;
+- (IBAction) updatePiecesView: (id) sender;
 - (void) clearView;
 
 @end

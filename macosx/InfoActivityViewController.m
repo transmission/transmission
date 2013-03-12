@@ -37,8 +37,6 @@
 
 - (void) setupInfo;
 
-- (void) updatePiecesView;
-
 @end
 
 @implementation InfoActivityViewController
@@ -95,7 +93,8 @@
     }
     
     //set the click action of the pieces view
-    [fPiecesView setAction:@selector(updatePiecesView)];
+    #warning after 2.8 just hook this up in the xib
+    [fPiecesView setAction:@selector(updatePiecesView:)];
     [fPiecesView setTarget:self];
 }
 
@@ -205,6 +204,17 @@
     [self updatePiecesView];
 }
 
+
+- (void) updatePiecesView: (id) sender
+{
+    const BOOL piecesAvailableSegment = [[NSUserDefaults standardUserDefaults] boolForKey: @"PiecesViewShowAvailability"];
+    
+    [fPiecesControl setSelected: piecesAvailableSegment forSegment: PIECES_CONTROL_AVAILABLE];
+    [fPiecesControl setSelected: !piecesAvailableSegment forSegment: PIECES_CONTROL_PROGRESS];
+    
+    [fPiecesView updateView];
+}
+
 - (void) clearView
 {
     [fPiecesView clearView];
@@ -259,16 +269,6 @@
     }
     
     fSet = YES;
-}
-
-- (void) updatePiecesView
-{
-    const BOOL piecesAvailableSegment = [[NSUserDefaults standardUserDefaults] boolForKey: @"PiecesViewShowAvailability"];
-    
-    [fPiecesControl setSelected: piecesAvailableSegment forSegment: PIECES_CONTROL_AVAILABLE];
-    [fPiecesControl setSelected: !piecesAvailableSegment forSegment: PIECES_CONTROL_PROGRESS];
-    
-    [fPiecesView updateView];
 }
 
 @end
