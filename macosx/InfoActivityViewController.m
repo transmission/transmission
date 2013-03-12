@@ -55,8 +55,6 @@
 
 - (void) awakeFromNib
 {
-    [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(updatePiecesView) name: @"UpdatePiecesView" object: nil];
-    
     [fTransferSectionLabel sizeToFit];
     [fDatesSectionLabel sizeToFit];
     [fTimeSectionLabel sizeToFit];
@@ -95,6 +93,10 @@
         frame.size.width -= widthIncrease;
         [field setFrame: frame];
     }
+    
+    //set the click action of the pieces view
+    [fPiecesView setAction:@selector(updatePiecesView)];
+    [fPiecesView setTarget:self];
 }
 
 - (void) dealloc

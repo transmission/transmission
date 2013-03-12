@@ -216,7 +216,7 @@ enum
         const BOOL availability = ![[NSUserDefaults standardUserDefaults] boolForKey: @"PiecesViewShowAvailability"];
         [[NSUserDefaults standardUserDefaults] setBool: availability forKey: @"PiecesViewShowAvailability"];
         
-        [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdatePiecesView" object: self];
+        [self sendAction:[self action] to:[self target]];
     }
     
     [super mouseDown: event];
