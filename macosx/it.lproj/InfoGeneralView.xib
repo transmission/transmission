@@ -2,13 +2,13 @@
 <archive type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="8.00">
 	<data>
 		<int key="IBDocument.SystemTarget">1060</int>
-		<string key="IBDocument.SystemVersion">12B19</string>
-		<string key="IBDocument.InterfaceBuilderVersion">2549</string>
-		<string key="IBDocument.AppKitVersion">1187</string>
-		<string key="IBDocument.HIToolboxVersion">624.00</string>
+		<string key="IBDocument.SystemVersion">12C60</string>
+		<string key="IBDocument.InterfaceBuilderVersion">3084</string>
+		<string key="IBDocument.AppKitVersion">1187.34</string>
+		<string key="IBDocument.HIToolboxVersion">625.00</string>
 		<object class="NSMutableDictionary" key="IBDocument.PluginVersions">
 			<string key="NS.key.0">com.apple.InterfaceBuilder.CocoaPlugin</string>
-			<string key="NS.object.0">2549</string>
+			<string key="NS.object.0">3084</string>
 		</object>
 		<array key="IBDocument.IntegratedClassDependencies">
 			<string>NSBox</string>
@@ -142,7 +142,7 @@
 					<object class="NSTextField" id="438336412">
 						<reference key="NSNextResponder" ref="923140800"/>
 						<int key="NSvFlags">268</int>
-						<string key="NSFrame">{{9, 189}, {149, 17}}</string>
+						<string key="NSFrame">{{9, 189}, {156, 17}}</string>
 						<reference key="NSSuperview" ref="923140800"/>
 						<reference key="NSWindow"/>
 						<reference key="NSNextKeyView" ref="986371149"/>
@@ -165,7 +165,7 @@
 					<object class="NSTextField" id="895565412">
 						<reference key="NSNextResponder" ref="923140800"/>
 						<int key="NSvFlags">268</int>
-						<string key="NSFrame">{{12, 144}, {66, 14}}</string>
+						<string key="NSFrame">{{-2, 144}, {80, 14}}</string>
 						<reference key="NSSuperview" ref="923140800"/>
 						<reference key="NSWindow"/>
 						<reference key="NSNextKeyView" ref="30608565"/>
@@ -243,7 +243,7 @@
 					<object class="NSTextField" id="837220447">
 						<reference key="NSNextResponder" ref="923140800"/>
 						<int key="NSvFlags">268</int>
-						<string key="NSFrame">{{9, 23}, {89, 17}}</string>
+						<string key="NSFrame">{{9, 23}, {85, 17}}</string>
 						<reference key="NSSuperview" ref="923140800"/>
 						<reference key="NSWindow"/>
 						<reference key="NSNextKeyView" ref="1011159268"/>
@@ -297,7 +297,7 @@
 					<object class="NSTextField" id="258860752">
 						<reference key="NSNextResponder" ref="923140800"/>
 						<int key="NSvFlags">268</int>
-						<string key="NSFrame">{{12, 128}, {66, 14}}</string>
+						<string key="NSFrame">{{7, 128}, {71, 14}}</string>
 						<reference key="NSSuperview" ref="923140800"/>
 						<reference key="NSWindow"/>
 						<reference key="NSNextKeyView" ref="118425947"/>
@@ -672,6 +672,86 @@ AAEAAQAAAT0AAwAAAAEAAgAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 					</object>
 					<int key="connectionID">51</int>
 				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">fInfoSectionLabel</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="438336412"/>
+					</object>
+					<int key="connectionID">52</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">fWhereSectionLabel</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="837220447"/>
+					</object>
+					<int key="connectionID">53</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">fPiecesLabel</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="986371149"/>
+					</object>
+					<int key="connectionID">54</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">fHashLabel</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="93257596"/>
+					</object>
+					<int key="connectionID">55</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">fSecureLabel</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="895565412"/>
+					</object>
+					<int key="connectionID">56</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">fCreatorLabel</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="258860752"/>
+					</object>
+					<int key="connectionID">57</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">fDateCreatedLabel</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="945225777"/>
+					</object>
+					<int key="connectionID">58</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">fCommentLabel</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="700837161"/>
+					</object>
+					<int key="connectionID">59</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">fDataLocationLabel</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="1011159268"/>
+					</object>
+					<int key="connectionID">60</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">fCommentScrollView</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="971532614"/>
+					</object>
+					<int key="connectionID">61</int>
+				</object>
 			</array>
 			<object class="IBMutableOrderedSet" key="objectRecords">
 				<array key="orderedObjects">
@@ -1031,7 +1111,7 @@ AAEAAQAAAT0AAwAAAAEAAgAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 			<nil key="activeLocalization"/>
 			<dictionary class="NSMutableDictionary" key="localizations"/>
 			<nil key="sourceID"/>
-			<int key="maxID">51</int>
+			<int key="maxID">61</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<array class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -1039,16 +1119,34 @@ AAEAAQAAAT0AAwAAAAEAAgAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 					<string key="className">InfoGeneralViewController</string>
 					<string key="superclassName">NSViewController</string>
 					<dictionary class="NSMutableDictionary" key="outlets">
+						<string key="fCommentLabel">NSTextField</string>
+						<string key="fCommentScrollView">NSScrollView</string>
 						<string key="fCommentView">NSTextView</string>
 						<string key="fCreatorField">NSTextField</string>
+						<string key="fCreatorLabel">NSTextField</string>
 						<string key="fDataLocationField">NSTextField</string>
+						<string key="fDataLocationLabel">NSTextField</string>
 						<string key="fDateCreatedField">NSTextField</string>
+						<string key="fDateCreatedLabel">NSTextField</string>
 						<string key="fHashField">NSTextField</string>
+						<string key="fHashLabel">NSTextField</string>
+						<string key="fInfoSectionLabel">NSTextField</string>
 						<string key="fPiecesField">NSTextField</string>
+						<string key="fPiecesLabel">NSTextField</string>
 						<string key="fRevealDataButton">NSButton</string>
 						<string key="fSecureField">NSTextField</string>
+						<string key="fSecureLabel">NSTextField</string>
+						<string key="fWhereSectionLabel">NSTextField</string>
 					</dictionary>
 					<dictionary class="NSMutableDictionary" key="toOneOutletInfosByName">
+						<object class="IBToOneOutletInfo" key="fCommentLabel">
+							<string key="name">fCommentLabel</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="fCommentScrollView">
+							<string key="name">fCommentScrollView</string>
+							<string key="candidateClassName">NSScrollView</string>
+						</object>
 						<object class="IBToOneOutletInfo" key="fCommentView">
 							<string key="name">fCommentView</string>
 							<string key="candidateClassName">NSTextView</string>
@@ -1057,20 +1155,44 @@ AAEAAQAAAT0AAwAAAAEAAgAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 							<string key="name">fCreatorField</string>
 							<string key="candidateClassName">NSTextField</string>
 						</object>
+						<object class="IBToOneOutletInfo" key="fCreatorLabel">
+							<string key="name">fCreatorLabel</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
 						<object class="IBToOneOutletInfo" key="fDataLocationField">
 							<string key="name">fDataLocationField</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="fDataLocationLabel">
+							<string key="name">fDataLocationLabel</string>
 							<string key="candidateClassName">NSTextField</string>
 						</object>
 						<object class="IBToOneOutletInfo" key="fDateCreatedField">
 							<string key="name">fDateCreatedField</string>
 							<string key="candidateClassName">NSTextField</string>
 						</object>
+						<object class="IBToOneOutletInfo" key="fDateCreatedLabel">
+							<string key="name">fDateCreatedLabel</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
 						<object class="IBToOneOutletInfo" key="fHashField">
 							<string key="name">fHashField</string>
 							<string key="candidateClassName">NSTextField</string>
 						</object>
+						<object class="IBToOneOutletInfo" key="fHashLabel">
+							<string key="name">fHashLabel</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="fInfoSectionLabel">
+							<string key="name">fInfoSectionLabel</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
 						<object class="IBToOneOutletInfo" key="fPiecesField">
 							<string key="name">fPiecesField</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="fPiecesLabel">
+							<string key="name">fPiecesLabel</string>
 							<string key="candidateClassName">NSTextField</string>
 						</object>
 						<object class="IBToOneOutletInfo" key="fRevealDataButton">
@@ -1079,6 +1201,14 @@ AAEAAQAAAT0AAwAAAAEAAgAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 						</object>
 						<object class="IBToOneOutletInfo" key="fSecureField">
 							<string key="name">fSecureField</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="fSecureLabel">
+							<string key="name">fSecureLabel</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="fWhereSectionLabel">
+							<string key="name">fWhereSectionLabel</string>
 							<string key="candidateClassName">NSTextField</string>
 						</object>
 					</dictionary>

@@ -2,13 +2,13 @@
 <archive type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="8.00">
 	<data>
 		<int key="IBDocument.SystemTarget">1060</int>
-		<string key="IBDocument.SystemVersion">12B19</string>
-		<string key="IBDocument.InterfaceBuilderVersion">2549</string>
-		<string key="IBDocument.AppKitVersion">1187</string>
-		<string key="IBDocument.HIToolboxVersion">624.00</string>
+		<string key="IBDocument.SystemVersion">12C60</string>
+		<string key="IBDocument.InterfaceBuilderVersion">3084</string>
+		<string key="IBDocument.AppKitVersion">1187.34</string>
+		<string key="IBDocument.HIToolboxVersion">625.00</string>
 		<object class="NSMutableDictionary" key="IBDocument.PluginVersions">
 			<string key="NS.key.0">com.apple.InterfaceBuilder.CocoaPlugin</string>
-			<string key="NS.object.0">2549</string>
+			<string key="NS.object.0">3084</string>
 		</object>
 		<array key="IBDocument.IntegratedClassDependencies">
 			<string>NSButton</string>
@@ -154,11 +154,11 @@
 								<int key="NSKeyEquivModMask">1048576</int>
 								<int key="NSMnemonicLoc">2147483647</int>
 								<int key="NSState">1</int>
-								<object class="NSCustomResource" key="NSOnImage" id="864547586">
+								<object class="NSCustomResource" key="NSOnImage" id="662512792">
 									<string key="NSClassName">NSImage</string>
 									<string key="NSResourceName">NSMenuCheckmark</string>
 								</object>
-								<object class="NSCustomResource" key="NSMixedImage" id="488625821">
+								<object class="NSCustomResource" key="NSMixedImage" id="999867276">
 									<string key="NSClassName">NSImage</string>
 									<string key="NSResourceName">NSMenuMixedState</string>
 								</object>
@@ -177,8 +177,8 @@
 										<string key="NSKeyEquiv"/>
 										<int key="NSKeyEquivModMask">1048576</int>
 										<int key="NSMnemonicLoc">2147483647</int>
-										<reference key="NSOnImage" ref="864547586"/>
-										<reference key="NSMixedImage" ref="488625821"/>
+										<reference key="NSOnImage" ref="662512792"/>
+										<reference key="NSMixedImage" ref="999867276"/>
 										<string key="NSAction">_popUpItemAction:</string>
 										<reference key="NSTarget" ref="669284794"/>
 									</object>
@@ -188,8 +188,8 @@
 										<string key="NSKeyEquiv"/>
 										<int key="NSKeyEquivModMask">1048576</int>
 										<int key="NSMnemonicLoc">2147483647</int>
-										<reference key="NSOnImage" ref="864547586"/>
-										<reference key="NSMixedImage" ref="488625821"/>
+										<reference key="NSOnImage" ref="662512792"/>
+										<reference key="NSMixedImage" ref="999867276"/>
 										<string key="NSAction">_popUpItemAction:</string>
 										<reference key="NSTarget" ref="669284794"/>
 									</object>
@@ -214,7 +214,7 @@
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSTextFieldCell" key="NSCell" id="563562657">
 							<int key="NSCellFlags">67108864</int>
-							<int key="NSCellFlags2">272629760</int>
+							<int key="NSCellFlags2">71303168</int>
 							<string key="NSContents">Inattività:</string>
 							<reference key="NSSupport" ref="26"/>
 							<reference key="NSControlView" ref="919278636"/>
@@ -319,7 +319,7 @@
 					<object class="NSTextField" id="1004759797">
 						<reference key="NSNextResponder" ref="617828785"/>
 						<int key="NSvFlags">268</int>
-						<string key="NSFrame">{{9, 198}, {117, 14}}</string>
+						<string key="NSFrame">{{9, 198}, {158, 14}}</string>
 						<reference key="NSSuperview" ref="617828785"/>
 						<reference key="NSWindow"/>
 						<reference key="NSNextKeyView" ref="614569420"/>
@@ -588,8 +588,8 @@
 								<int key="NSKeyEquivModMask">1048576</int>
 								<int key="NSMnemonicLoc">2147483647</int>
 								<int key="NSState">1</int>
-								<reference key="NSOnImage" ref="864547586"/>
-								<reference key="NSMixedImage" ref="488625821"/>
+								<reference key="NSOnImage" ref="662512792"/>
+								<reference key="NSMixedImage" ref="999867276"/>
 								<string key="NSAction">_popUpItemAction:</string>
 								<reference key="NSTarget" ref="931579513"/>
 							</object>
@@ -606,8 +606,8 @@
 										<string key="NSKeyEquiv"/>
 										<int key="NSKeyEquivModMask">1048576</int>
 										<int key="NSMnemonicLoc">2147483647</int>
-										<reference key="NSOnImage" ref="864547586"/>
-										<reference key="NSMixedImage" ref="488625821"/>
+										<reference key="NSOnImage" ref="662512792"/>
+										<reference key="NSMixedImage" ref="999867276"/>
 										<string key="NSAction">_popUpItemAction:</string>
 										<reference key="NSTarget" ref="931579513"/>
 									</object>
@@ -617,8 +617,8 @@
 										<string key="NSKeyEquiv"/>
 										<int key="NSKeyEquivModMask">1048576</int>
 										<int key="NSMnemonicLoc">2147483647</int>
-										<reference key="NSOnImage" ref="864547586"/>
-										<reference key="NSMixedImage" ref="488625821"/>
+										<reference key="NSOnImage" ref="662512792"/>
+										<reference key="NSMixedImage" ref="999867276"/>
 										<string key="NSAction">_popUpItemAction:</string>
 										<reference key="NSTarget" ref="931579513"/>
 									</object>
@@ -641,7 +641,7 @@
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSTextFieldCell" key="NSCell" id="1061208496">
 							<int key="NSCellFlags">67108864</int>
-							<int key="NSCellFlags2">272629760</int>
+							<int key="NSCellFlags2">71303168</int>
 							<string key="NSContents">Ferma a:</string>
 							<reference key="NSSupport" ref="26"/>
 							<reference key="NSControlView" ref="457156870"/>
@@ -653,14 +653,14 @@
 					<object class="NSTextField" id="340525598">
 						<reference key="NSNextResponder" ref="617828785"/>
 						<int key="NSvFlags">268</int>
-						<string key="NSFrame">{{10, 221}, {99, 14}}</string>
+						<string key="NSFrame">{{4, 221}, {100, 14}}</string>
 						<reference key="NSSuperview" ref="617828785"/>
 						<reference key="NSWindow"/>
 						<reference key="NSNextKeyView" ref="529271757"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSTextFieldCell" key="NSCell" id="780052505">
 							<int key="NSCellFlags">67108864</int>
-							<int key="NSCellFlags2">272629760</int>
+							<int key="NSCellFlags2">71303168</int>
 							<string key="NSContents">Priorità generale:</string>
 							<reference key="NSSupport" ref="26"/>
 							<reference key="NSControlView" ref="340525598"/>
@@ -913,8 +913,8 @@
 									<string key="NSClassName">NSImage</string>
 									<string key="NSResourceName">PriorityHighTemplate</string>
 								</object>
-								<reference key="NSOnImage" ref="864547586"/>
-								<reference key="NSMixedImage" ref="488625821"/>
+								<reference key="NSOnImage" ref="662512792"/>
+								<reference key="NSMixedImage" ref="999867276"/>
 								<string key="NSAction">_popUpItemAction:</string>
 								<reference key="NSTarget" ref="545585394"/>
 							</object>
@@ -933,8 +933,8 @@
 											<string key="NSClassName">NSImage</string>
 											<string key="NSResourceName">PriorityNormalTemplate</string>
 										</object>
-										<reference key="NSOnImage" ref="864547586"/>
-										<reference key="NSMixedImage" ref="488625821"/>
+										<reference key="NSOnImage" ref="662512792"/>
+										<reference key="NSMixedImage" ref="999867276"/>
 										<string key="NSAction">_popUpItemAction:</string>
 										<int key="NSTag">1</int>
 										<reference key="NSTarget" ref="545585394"/>
@@ -949,8 +949,8 @@
 											<string key="NSClassName">NSImage</string>
 											<string key="NSResourceName">PriorityLowTemplate</string>
 										</object>
-										<reference key="NSOnImage" ref="864547586"/>
-										<reference key="NSMixedImage" ref="488625821"/>
+										<reference key="NSOnImage" ref="662512792"/>
+										<reference key="NSMixedImage" ref="999867276"/>
 										<string key="NSAction">_popUpItemAction:</string>
 										<int key="NSTag">2</int>
 										<reference key="NSTarget" ref="545585394"/>
@@ -1212,14 +1212,6 @@
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
-						<string key="label">fRemovesSeedingCompleteCheck</string>
-						<reference key="source" ref="1001"/>
-						<reference key="destination" ref="733590464"/>
-					</object>
-					<int key="connectionID">117</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
 						<string key="label">fRemoveSeedingCompleteCheck</string>
 						<reference key="source" ref="1001"/>
 						<reference key="destination" ref="733590464"/>
@@ -1233,6 +1225,70 @@
 						<reference key="destination" ref="733590464"/>
 					</object>
 					<int key="connectionID">119</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">fPrioritySectionLabel</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="234468111"/>
+					</object>
+					<int key="connectionID">120</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">fPriorityLabel</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="340525598"/>
+					</object>
+					<int key="connectionID">121</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">fSeedingLimitsSectionLabel</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="275413408"/>
+					</object>
+					<int key="connectionID">122</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">fRatioLabel</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="457156870"/>
+					</object>
+					<int key="connectionID">123</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">fInactivityLabel</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="919278636"/>
+					</object>
+					<int key="connectionID">124</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">fTransferBandwidthSectionLabel</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="1004759797"/>
+					</object>
+					<int key="connectionID">125</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">fAdvancedSectionLabel</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="249386201"/>
+					</object>
+					<int key="connectionID">126</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">fMaxConnectionsLabel</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="955673008"/>
+					</object>
+					<int key="connectionID">127</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
@@ -1887,7 +1943,7 @@
 			<nil key="activeLocalization"/>
 			<dictionary class="NSMutableDictionary" key="localizations"/>
 			<nil key="sourceID"/>
-			<int key="maxID">119</int>
+			<int key="maxID">127</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<array class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -1957,6 +2013,7 @@
 						</object>
 					</dictionary>
 					<dictionary class="NSMutableDictionary" key="outlets">
+						<string key="fAdvancedSectionLabel">NSTextField</string>
 						<string key="fDownloadLimitCheck">NSButton</string>
 						<string key="fDownloadLimitField">NSTextField</string>
 						<string key="fDownloadLimitLabel">NSTextField</string>
@@ -1965,18 +2022,29 @@
 						<string key="fIdleLimitGlobalLabel">NSTextField</string>
 						<string key="fIdleLimitLabel">NSTextField</string>
 						<string key="fIdlePopUp">NSPopUpButton</string>
+						<string key="fInactivityLabel">NSTextField</string>
+						<string key="fMaxConnectionsLabel">NSTextField</string>
 						<string key="fPeersConnectField">NSTextField</string>
 						<string key="fPeersConnectLabel">NSTextField</string>
+						<string key="fPriorityLabel">NSTextField</string>
 						<string key="fPriorityPopUp">NSPopUpButton</string>
+						<string key="fPrioritySectionLabel">NSTextField</string>
+						<string key="fRatioLabel">NSTextField</string>
 						<string key="fRatioLimitField">NSTextField</string>
 						<string key="fRatioLimitGlobalLabel">NSTextField</string>
 						<string key="fRatioPopUp">NSPopUpButton</string>
 						<string key="fRemoveSeedingCompleteCheck">NSButton</string>
+						<string key="fSeedingLimitsSectionLabel">NSTextField</string>
+						<string key="fTransferBandwidthSectionLabel">NSTextField</string>
 						<string key="fUploadLimitCheck">NSButton</string>
 						<string key="fUploadLimitField">NSTextField</string>
 						<string key="fUploadLimitLabel">NSTextField</string>
 					</dictionary>
 					<dictionary class="NSMutableDictionary" key="toOneOutletInfosByName">
+						<object class="IBToOneOutletInfo" key="fAdvancedSectionLabel">
+							<string key="name">fAdvancedSectionLabel</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
 						<object class="IBToOneOutletInfo" key="fDownloadLimitCheck">
 							<string key="name">fDownloadLimitCheck</string>
 							<string key="candidateClassName">NSButton</string>
@@ -2009,6 +2077,14 @@
 							<string key="name">fIdlePopUp</string>
 							<string key="candidateClassName">NSPopUpButton</string>
 						</object>
+						<object class="IBToOneOutletInfo" key="fInactivityLabel">
+							<string key="name">fInactivityLabel</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="fMaxConnectionsLabel">
+							<string key="name">fMaxConnectionsLabel</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
 						<object class="IBToOneOutletInfo" key="fPeersConnectField">
 							<string key="name">fPeersConnectField</string>
 							<string key="candidateClassName">NSTextField</string>
@@ -2017,9 +2093,21 @@
 							<string key="name">fPeersConnectLabel</string>
 							<string key="candidateClassName">NSTextField</string>
 						</object>
+						<object class="IBToOneOutletInfo" key="fPriorityLabel">
+							<string key="name">fPriorityLabel</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
 						<object class="IBToOneOutletInfo" key="fPriorityPopUp">
 							<string key="name">fPriorityPopUp</string>
 							<string key="candidateClassName">NSPopUpButton</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="fPrioritySectionLabel">
+							<string key="name">fPrioritySectionLabel</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="fRatioLabel">
+							<string key="name">fRatioLabel</string>
+							<string key="candidateClassName">NSTextField</string>
 						</object>
 						<object class="IBToOneOutletInfo" key="fRatioLimitField">
 							<string key="name">fRatioLimitField</string>
@@ -2036,6 +2124,14 @@
 						<object class="IBToOneOutletInfo" key="fRemoveSeedingCompleteCheck">
 							<string key="name">fRemoveSeedingCompleteCheck</string>
 							<string key="candidateClassName">NSButton</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="fSeedingLimitsSectionLabel">
+							<string key="name">fSeedingLimitsSectionLabel</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="fTransferBandwidthSectionLabel">
+							<string key="name">fTransferBandwidthSectionLabel</string>
+							<string key="candidateClassName">NSTextField</string>
 						</object>
 						<object class="IBToOneOutletInfo" key="fUploadLimitCheck">
 							<string key="name">fUploadLimitCheck</string>

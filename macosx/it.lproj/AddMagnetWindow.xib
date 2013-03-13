@@ -2,13 +2,13 @@
 <archive type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="8.00">
 	<data>
 		<int key="IBDocument.SystemTarget">1060</int>
-		<string key="IBDocument.SystemVersion">12B19</string>
-		<string key="IBDocument.InterfaceBuilderVersion">2549</string>
-		<string key="IBDocument.AppKitVersion">1187</string>
-		<string key="IBDocument.HIToolboxVersion">624.00</string>
+		<string key="IBDocument.SystemVersion">12C60</string>
+		<string key="IBDocument.InterfaceBuilderVersion">3084</string>
+		<string key="IBDocument.AppKitVersion">1187.34</string>
+		<string key="IBDocument.HIToolboxVersion">625.00</string>
 		<object class="NSMutableDictionary" key="IBDocument.PluginVersions">
 			<string key="NS.key.0">com.apple.InterfaceBuilder.CocoaPlugin</string>
-			<string key="NS.object.0">2549</string>
+			<string key="NS.object.0">3084</string>
 		</object>
 		<array key="IBDocument.IntegratedClassDependencies">
 			<string>NSBox</string>
@@ -131,7 +131,7 @@
 						<object class="NSButton" id="999003967">
 							<reference key="NSNextResponder" ref="1006"/>
 							<int key="NSvFlags">292</int>
-							<string key="NSFrame">{{18, 21}, {163, 18}}</string>
+							<string key="NSFrame">{{18, 21}, {171, 18}}</string>
 							<reference key="NSSuperview" ref="1006"/>
 							<reference key="NSWindow"/>
 							<reference key="NSNextKeyView" ref="533609783"/>
@@ -165,7 +165,7 @@
 						<object class="NSButton" id="636183414">
 							<reference key="NSNextResponder" ref="1006"/>
 							<int key="NSvFlags">289</int>
-							<string key="NSFrame">{{306, 12}, {80, 32}}</string>
+							<string key="NSFrame">{{304, 12}, {82, 32}}</string>
 							<reference key="NSSuperview" ref="1006"/>
 							<reference key="NSWindow"/>
 							<reference key="NSNextKeyView"/>
@@ -193,7 +193,7 @@
 						<object class="NSButton" id="533609783">
 							<reference key="NSNextResponder" ref="1006"/>
 							<int key="NSvFlags">289</int>
-							<string key="NSFrame">{{224, 12}, {82, 32}}</string>
+							<string key="NSFrame">{{222, 12}, {82, 32}}</string>
 							<reference key="NSSuperview" ref="1006"/>
 							<reference key="NSWindow"/>
 							<reference key="NSNextKeyView" ref="636183414"/>
@@ -217,7 +217,7 @@
 						<object class="NSTextField" id="368126870">
 							<reference key="NSNextResponder" ref="1006"/>
 							<int key="NSvFlags">268</int>
-							<string key="NSFrame">{{41, 211}, {186, 17}}</string>
+							<string key="NSFrame">{{41, 211}, {179, 17}}</string>
 							<reference key="NSSuperview" ref="1006"/>
 							<reference key="NSWindow"/>
 							<reference key="NSNextKeyView" ref="471778487"/>
@@ -334,7 +334,7 @@
 										<object class="NSTextField" id="485847244">
 											<reference key="NSNextResponder" ref="638974187"/>
 											<int key="NSvFlags">268</int>
-											<string key="NSFrame">{{15, 25}, {54, 17}}</string>
+											<string key="NSFrame">{{8, 25}, {61, 17}}</string>
 											<reference key="NSSuperview" ref="638974187"/>
 											<reference key="NSWindow"/>
 											<reference key="NSNextKeyView" ref="1049508202"/>
@@ -438,7 +438,7 @@
 										<object class="NSTextField" id="224369214">
 											<reference key="NSNextResponder" ref="638974187"/>
 											<int key="NSvFlags">268</int>
-											<string key="NSFrame">{{3, 53}, {66, 17}}</string>
+											<string key="NSFrame">{{8, 53}, {61, 17}}</string>
 											<reference key="NSSuperview" ref="638974187"/>
 											<reference key="NSWindow"/>
 											<reference key="NSNextKeyView" ref="711151157"/>
@@ -584,7 +584,7 @@
 					<reference key="NSWindow"/>
 					<reference key="NSNextKeyView" ref="887781818"/>
 				</object>
-				<string key="NSScreenRect">{{0, 0}, {1680, 1028}}</string>
+				<string key="NSScreenRect">{{0, 0}, {2560, 1440}}</string>
 				<string key="NSMinSize">{400, 260}</string>
 				<string key="NSMaxSize">{9999, 260}</string>
 				<string key="NSFrameAutosaveName">AddMagnetWindow</string>
@@ -680,6 +680,70 @@
 						<reference key="destination" ref="1049508202"/>
 					</object>
 					<int key="connectionID">99</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">fChangeDestinationButton</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="1065995789"/>
+					</object>
+					<int key="connectionID">104</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">fDownloadToBox</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="406479853"/>
+					</object>
+					<int key="connectionID">105</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">fDownloadToLabel</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="1059202456"/>
+					</object>
+					<int key="connectionID">106</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">fGroupLabel</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="224369214"/>
+					</object>
+					<int key="connectionID">107</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">fMagnetLinkLabel</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="368126870"/>
+					</object>
+					<int key="connectionID">108</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">fPriorityLabel</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="485847244"/>
+					</object>
+					<int key="connectionID">109</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">fCancelButton</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="533609783"/>
+					</object>
+					<int key="connectionID">110</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">fAddButton</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="636183414"/>
+					</object>
+					<int key="connectionID">111</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
@@ -1030,7 +1094,7 @@
 			<nil key="activeLocalization"/>
 			<dictionary class="NSMutableDictionary" key="localizations"/>
 			<nil key="sourceID"/>
-			<int key="maxID">103</int>
+			<int key="maxID">111</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<array class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -1038,14 +1102,46 @@
 					<string key="className">AddMagnetWindowController</string>
 					<string key="superclassName">NSWindowController</string>
 					<dictionary class="NSMutableDictionary" key="outlets">
+						<string key="fAddButton">NSButton</string>
+						<string key="fCancelButton">NSButton</string>
+						<string key="fChangeDestinationButton">NSButton</string>
+						<string key="fDownloadToBox">NSBox</string>
+						<string key="fDownloadToLabel">NSTextField</string>
+						<string key="fGroupLabel">NSTextField</string>
 						<string key="fGroupPopUp">NSPopUpButton</string>
 						<string key="fLocationField">NSTextField</string>
 						<string key="fLocationImageView">NSImageView</string>
+						<string key="fMagnetLinkLabel">NSTextField</string>
 						<string key="fNameField">NSTextField</string>
+						<string key="fPriorityLabel">NSTextField</string>
 						<string key="fPriorityPopUp">NSPopUpButton</string>
 						<string key="fStartCheck">NSButton</string>
 					</dictionary>
 					<dictionary class="NSMutableDictionary" key="toOneOutletInfosByName">
+						<object class="IBToOneOutletInfo" key="fAddButton">
+							<string key="name">fAddButton</string>
+							<string key="candidateClassName">NSButton</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="fCancelButton">
+							<string key="name">fCancelButton</string>
+							<string key="candidateClassName">NSButton</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="fChangeDestinationButton">
+							<string key="name">fChangeDestinationButton</string>
+							<string key="candidateClassName">NSButton</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="fDownloadToBox">
+							<string key="name">fDownloadToBox</string>
+							<string key="candidateClassName">NSBox</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="fDownloadToLabel">
+							<string key="name">fDownloadToLabel</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="fGroupLabel">
+							<string key="name">fGroupLabel</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
 						<object class="IBToOneOutletInfo" key="fGroupPopUp">
 							<string key="name">fGroupPopUp</string>
 							<string key="candidateClassName">NSPopUpButton</string>
@@ -1058,8 +1154,16 @@
 							<string key="name">fLocationImageView</string>
 							<string key="candidateClassName">NSImageView</string>
 						</object>
+						<object class="IBToOneOutletInfo" key="fMagnetLinkLabel">
+							<string key="name">fMagnetLinkLabel</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
 						<object class="IBToOneOutletInfo" key="fNameField">
 							<string key="name">fNameField</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="fPriorityLabel">
+							<string key="name">fPriorityLabel</string>
 							<string key="candidateClassName">NSTextField</string>
 						</object>
 						<object class="IBToOneOutletInfo" key="fPriorityPopUp">

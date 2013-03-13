@@ -280,8 +280,10 @@
    Removal confirm panel -> button
    Remove completed confirm panel -> button
    Remove trackers alert -> button
+   rename sheet button
    Stats reset -> button
    URL sheet button */
+
 
 
 
@@ -483,7 +485,7 @@
 "From: tracker" = "Da: server traccia";
 
 /* File size - gigabytes
-   Memory size - gigabytes */
+   file/memory size - gigabytes */
 
 "GB" = "GB";
 
@@ -564,7 +566,7 @@
 "It appears that the file \"%@\" from %@ is not a torrent file." = "Sembra che il file \"%1$@\" da %2$@ non sia un file torrent.";
 
 /* File size - kilobytes
-   Memory size - kilobytes */
+   file/memory size - kilobytes */
 
 "KB" = "KB";
 
@@ -609,7 +611,7 @@
 "Magnetized transfer" = "Trasferimento magnetico";
 
 /* File size - megabytes
-   Memory size - megabytes */
+   file/memory size - megabytes */
 
 "MB" = "MB";
 
@@ -909,6 +911,15 @@
 /* Remove toolbar item -> tooltip */
 "Remove selected transfers" = "Rimuovi trasferimenti selezionati";
 
+/* rename sheet button */
+"Rename" = "Rinomina";
+
+/* File Outline -> Menu */
+"Rename File" = "Rinomina file";
+
+/* rename sheet label */
+"Rename the file \"%@\":" = "Rinomina il file \"%@\":";
+
 /* Stats reset -> button
    Stats window -> reset button */
 
@@ -1054,7 +1065,7 @@
 "Support open-source indie software" = "Supporta il software open-source indipendente";
 
 /* File size - terabytes
-   Memory size - terabytes */
+   file/memory size - terabytes */
 
 "TB" = "TB";
 

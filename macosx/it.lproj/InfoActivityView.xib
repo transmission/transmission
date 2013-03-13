@@ -2,13 +2,13 @@
 <archive type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="8.00">
 	<data>
 		<int key="IBDocument.SystemTarget">1060</int>
-		<string key="IBDocument.SystemVersion">12B19</string>
-		<string key="IBDocument.InterfaceBuilderVersion">2549</string>
-		<string key="IBDocument.AppKitVersion">1187</string>
-		<string key="IBDocument.HIToolboxVersion">624.00</string>
+		<string key="IBDocument.SystemVersion">12C60</string>
+		<string key="IBDocument.InterfaceBuilderVersion">3084</string>
+		<string key="IBDocument.AppKitVersion">1187.34</string>
+		<string key="IBDocument.HIToolboxVersion">625.00</string>
 		<object class="NSMutableDictionary" key="IBDocument.PluginVersions">
 			<string key="NS.key.0">com.apple.InterfaceBuilder.CocoaPlugin</string>
-			<string key="NS.object.0">2549</string>
+			<string key="NS.object.0">3084</string>
 		</object>
 		<array key="IBDocument.IntegratedClassDependencies">
 			<string>NSBox</string>
@@ -147,7 +147,7 @@
 					<object class="NSTextField" id="635463300">
 						<reference key="NSNextResponder" ref="570476534"/>
 						<int key="NSvFlags">268</int>
-						<string key="NSFrame">{{28, 204}, {60, 14}}</string>
+						<string key="NSFrame">{{17, 204}, {71, 14}}</string>
 						<reference key="NSSuperview" ref="570476534"/>
 						<reference key="NSWindow"/>
 						<reference key="NSNextKeyView" ref="655961577"/>
@@ -186,7 +186,7 @@
 					<object class="NSTextField" id="206962076">
 						<reference key="NSNextResponder" ref="570476534"/>
 						<int key="NSvFlags">268</int>
-						<string key="NSFrame">{{22, 268}, {66, 14}}</string>
+						<string key="NSFrame">{{26, 268}, {62, 14}}</string>
 						<reference key="NSSuperview" ref="570476534"/>
 						<reference key="NSWindow"/>
 						<reference key="NSNextKeyView" ref="581792195"/>
@@ -225,7 +225,7 @@
 					<object class="NSTextField" id="553434559">
 						<reference key="NSNextResponder" ref="570476534"/>
 						<int key="NSvFlags">268</int>
-						<string key="NSFrame">{{42, 300}, {46, 14}}</string>
+						<string key="NSFrame">{{41, 300}, {47, 14}}</string>
 						<reference key="NSSuperview" ref="570476534"/>
 						<reference key="NSWindow"/>
 						<reference key="NSNextKeyView" ref="255262911"/>
@@ -357,11 +357,10 @@
 										</object>
 										<int key="NSTVFlags">6</int>
 										<string key="NSMaxSize">{517, 10000000}</string>
-										<string key="NSMinize">{248, 56}</string>
 										<nil key="NSDelegate"/>
 									</object>
 								</array>
-								<string key="NSFrame">{{1, 1}, {248, 56}}</string>
+								<string key="NSFrame">{{1, 1}, {259, 56}}</string>
 								<reference key="NSSuperview" ref="1015114756"/>
 								<reference key="NSWindow"/>
 								<reference key="NSNextKeyView" ref="745634418"/>
@@ -396,7 +395,7 @@ AAEAAQAAAT0AAwAAAAEAAgAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 							<object class="NSScroller" id="975841179">
 								<reference key="NSNextResponder" ref="1015114756"/>
 								<int key="NSvFlags">256</int>
-								<string key="NSFrame">{{249, 1}, {11, 56}}</string>
+								<string key="NSFrame">{{246, 1}, {14, 56}}</string>
 								<reference key="NSSuperview" ref="1015114756"/>
 								<reference key="NSWindow"/>
 								<reference key="NSNextKeyView" ref="428643281"/>
@@ -436,7 +435,7 @@ AAEAAQAAAT0AAwAAAAEAAgAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 					<object class="NSTextField" id="615655994">
 						<reference key="NSNextResponder" ref="570476534"/>
 						<int key="NSvFlags">268</int>
-						<string key="NSFrame">{{26, 188}, {62, 14}}</string>
+						<string key="NSFrame">{{17, 188}, {71, 14}}</string>
 						<reference key="NSSuperview" ref="570476534"/>
 						<reference key="NSWindow"/>
 						<reference key="NSNextKeyView" ref="1015114756"/>
@@ -455,7 +454,7 @@ AAEAAQAAAT0AAwAAAAEAAgAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 					<object class="NSTextField" id="1017199380">
 						<reference key="NSNextResponder" ref="570476534"/>
 						<int key="NSvFlags">268</int>
-						<string key="NSFrame">{{9, 39}, {115, 17}}</string>
+						<string key="NSFrame">{{9, 39}, {107, 17}}</string>
 						<reference key="NSSuperview" ref="570476534"/>
 						<reference key="NSWindow"/>
 						<reference key="NSNextKeyView" ref="835637422"/>
@@ -516,7 +515,7 @@ AAEAAQAAAT0AAwAAAAEAAgAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 					<object class="NSTextField" id="393335924">
 						<reference key="NSNextResponder" ref="570476534"/>
 						<int key="NSvFlags">268</int>
-						<string key="NSFrame">{{2, 10}, {86, 14}}</string>
+						<string key="NSFrame">{{7, 10}, {81, 14}}</string>
 						<reference key="NSSuperview" ref="570476534"/>
 						<reference key="NSWindow"/>
 						<reference key="NSNextKeyView" ref="961311417"/>
@@ -606,7 +605,7 @@ AAEAAQAAAT0AAwAAAAEAAgAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 					<object class="NSTextField" id="895817577">
 						<reference key="NSNextResponder" ref="570476534"/>
 						<int key="NSvFlags">268</int>
-						<string key="NSFrame">{{17, 102}, {71, 14}}</string>
+						<string key="NSFrame">{{26, 102}, {62, 14}}</string>
 						<reference key="NSSuperview" ref="570476534"/>
 						<reference key="NSWindow"/>
 						<reference key="NSNextKeyView" ref="819483856"/>
@@ -641,7 +640,7 @@ AAEAAQAAAT0AAwAAAAEAAgAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 									<integer value="1040" key="formatterBehavior"/>
 									<integer value="1" key="timeStyle"/>
 								</dictionary>
-								<string key="NS.format">dd MMMM y HH:mm</string>
+								<string key="NS.format">MMMM d, y h:mm a</string>
 								<bool key="NS.natural">NO</bool>
 							</object>
 							<string key="NSPlaceholderString">N/D</string>
@@ -689,7 +688,7 @@ AAEAAQAAAT0AAwAAAAEAAgAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 									<integer value="1040" key="formatterBehavior"/>
 									<integer value="1" key="timeStyle"/>
 								</dictionary>
-								<string key="NS.format">dd MMMM y HH:mm</string>
+								<string key="NS.format">MMMM d, y h:mm a</string>
 								<bool key="NS.natural">NO</bool>
 							</object>
 							<string key="NSPlaceholderString">N/D</string>
@@ -745,7 +744,7 @@ AAEAAQAAAT0AAwAAAAEAAgAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 					<object class="NSTextField" id="253816666">
 						<reference key="NSNextResponder" ref="570476534"/>
 						<int key="NSvFlags">268</int>
-						<string key="NSFrame">{{16, 70}, {72, 14}}</string>
+						<string key="NSFrame">{{9, 70}, {79, 14}}</string>
 						<reference key="NSSuperview" ref="570476534"/>
 						<reference key="NSWindow"/>
 						<reference key="NSNextKeyView" ref="988657593"/>
@@ -780,7 +779,7 @@ AAEAAQAAAT0AAwAAAAEAAgAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 									<integer value="1040" key="formatterBehavior"/>
 									<integer value="1" key="timeStyle"/>
 								</dictionary>
-								<string key="NS.format">dd MMMM y HH:mm</string>
+								<string key="NS.format">MMMM d, y h:mm a</string>
 								<bool key="NS.natural">NO</bool>
 							</object>
 							<string key="NSPlaceholderString">N/D</string>
@@ -1051,6 +1050,142 @@ AAEAAQAAAT0AAwAAAAEAAgAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 						<reference key="destination" ref="178079550"/>
 					</object>
 					<int key="connectionID">99</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">fStateLabel</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="553434559"/>
+					</object>
+					<int key="connectionID">100</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">fProgressLabel</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="630952996"/>
+					</object>
+					<int key="connectionID">101</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">fHaveLabel</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="206962076"/>
+					</object>
+					<int key="connectionID">102</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">fDownloadedLabel</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="377137329"/>
+					</object>
+					<int key="connectionID">103</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">fUploadedLabel</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="1068112942"/>
+					</object>
+					<int key="connectionID">104</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">fFailedDLLabel</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="882091406"/>
+					</object>
+					<int key="connectionID">105</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">fRatioLabel</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="635463300"/>
+					</object>
+					<int key="connectionID">106</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">fErrorLabel</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="615655994"/>
+					</object>
+					<int key="connectionID">107</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">fDateAddedLabel</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="895817577"/>
+					</object>
+					<int key="connectionID">108</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">fDateCompletedLabel</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="267672181"/>
+					</object>
+					<int key="connectionID">109</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">fDateActivityLabel</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="253816666"/>
+					</object>
+					<int key="connectionID">110</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">fSeedTimeLabel</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="393335924"/>
+					</object>
+					<int key="connectionID">111</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">fDownloadTimeLabel</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="835637422"/>
+					</object>
+					<int key="connectionID">112</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">fTransferSectionLabel</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="381599958"/>
+					</object>
+					<int key="connectionID">113</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">fDatesSectionLabel</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="293727443"/>
+					</object>
+					<int key="connectionID">114</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">fTimeSectionLabel</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="1017199380"/>
+					</object>
+					<int key="connectionID">116</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">fErrorScrollView</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="1015114756"/>
+					</object>
+					<int key="connectionID">118</int>
 				</object>
 			</array>
 			<object class="IBMutableOrderedSet" key="objectRecords">
@@ -1638,7 +1773,7 @@ AAEAAQAAAT0AAwAAAAEAAgAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 				<string key="52.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<integer value="1" key="53.IBDateFormatterBehaviorMetadataKey"/>
 				<string key="53.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="0" key="54.IBNSSegmentedControlInspectorSelectedSegmentMetadataKey"/>
+				<integer value="1" key="54.IBNSSegmentedControlInspectorSelectedSegmentMetadataKey"/>
 				<string key="54.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="55.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="56.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -1673,28 +1808,59 @@ AAEAAQAAAT0AAwAAAAEAAgAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 			<nil key="activeLocalization"/>
 			<dictionary class="NSMutableDictionary" key="localizations"/>
 			<nil key="sourceID"/>
-			<int key="maxID">99</int>
+			<int key="maxID">118</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<array class="NSMutableArray" key="referencedPartialClassDescriptions">
 				<object class="IBPartialClassDescription">
 					<string key="className">InfoActivityViewController</string>
 					<string key="superclassName">NSViewController</string>
+					<dictionary class="NSMutableDictionary" key="actions">
+						<string key="setPiecesView:">id</string>
+						<string key="updatePiecesView:">id</string>
+					</dictionary>
+					<dictionary class="NSMutableDictionary" key="actionInfosByName">
+						<object class="IBActionInfo" key="setPiecesView:">
+							<string key="name">setPiecesView:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="updatePiecesView:">
+							<string key="name">updatePiecesView:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+					</dictionary>
 					<dictionary class="NSMutableDictionary" key="outlets">
 						<string key="fDateActivityField">NSTextField</string>
+						<string key="fDateActivityLabel">NSTextField</string>
 						<string key="fDateAddedField">NSTextField</string>
+						<string key="fDateAddedLabel">NSTextField</string>
 						<string key="fDateCompletedField">NSTextField</string>
+						<string key="fDateCompletedLabel">NSTextField</string>
+						<string key="fDatesSectionLabel">NSTextField</string>
 						<string key="fDownloadTimeField">NSTextField</string>
+						<string key="fDownloadTimeLabel">NSTextField</string>
+						<string key="fDownloadedLabel">NSTextField</string>
 						<string key="fDownloadedTotalField">NSTextField</string>
+						<string key="fErrorLabel">NSTextField</string>
 						<string key="fErrorMessageView">NSTextView</string>
+						<string key="fErrorScrollView">NSScrollView</string>
+						<string key="fFailedDLLabel">NSTextField</string>
 						<string key="fFailedHashField">NSTextField</string>
 						<string key="fHaveField">NSTextField</string>
+						<string key="fHaveLabel">NSTextField</string>
 						<string key="fPiecesControl">NSSegmentedControl</string>
 						<string key="fPiecesView">PiecesView</string>
 						<string key="fProgressField">NSTextField</string>
+						<string key="fProgressLabel">NSTextField</string>
 						<string key="fRatioField">NSTextField</string>
+						<string key="fRatioLabel">NSTextField</string>
 						<string key="fSeedTimeField">NSTextField</string>
+						<string key="fSeedTimeLabel">NSTextField</string>
 						<string key="fStateField">NSTextField</string>
+						<string key="fStateLabel">NSTextField</string>
+						<string key="fTimeSectionLabel">NSTextField</string>
+						<string key="fTransferSectionLabel">NSTextField</string>
+						<string key="fUploadedLabel">NSTextField</string>
 						<string key="fUploadedTotalField">NSTextField</string>
 					</dictionary>
 					<dictionary class="NSMutableDictionary" key="toOneOutletInfosByName">
@@ -1702,25 +1868,61 @@ AAEAAQAAAT0AAwAAAAEAAgAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 							<string key="name">fDateActivityField</string>
 							<string key="candidateClassName">NSTextField</string>
 						</object>
+						<object class="IBToOneOutletInfo" key="fDateActivityLabel">
+							<string key="name">fDateActivityLabel</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
 						<object class="IBToOneOutletInfo" key="fDateAddedField">
 							<string key="name">fDateAddedField</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="fDateAddedLabel">
+							<string key="name">fDateAddedLabel</string>
 							<string key="candidateClassName">NSTextField</string>
 						</object>
 						<object class="IBToOneOutletInfo" key="fDateCompletedField">
 							<string key="name">fDateCompletedField</string>
 							<string key="candidateClassName">NSTextField</string>
 						</object>
+						<object class="IBToOneOutletInfo" key="fDateCompletedLabel">
+							<string key="name">fDateCompletedLabel</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="fDatesSectionLabel">
+							<string key="name">fDatesSectionLabel</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
 						<object class="IBToOneOutletInfo" key="fDownloadTimeField">
 							<string key="name">fDownloadTimeField</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="fDownloadTimeLabel">
+							<string key="name">fDownloadTimeLabel</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="fDownloadedLabel">
+							<string key="name">fDownloadedLabel</string>
 							<string key="candidateClassName">NSTextField</string>
 						</object>
 						<object class="IBToOneOutletInfo" key="fDownloadedTotalField">
 							<string key="name">fDownloadedTotalField</string>
 							<string key="candidateClassName">NSTextField</string>
 						</object>
+						<object class="IBToOneOutletInfo" key="fErrorLabel">
+							<string key="name">fErrorLabel</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
 						<object class="IBToOneOutletInfo" key="fErrorMessageView">
 							<string key="name">fErrorMessageView</string>
 							<string key="candidateClassName">NSTextView</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="fErrorScrollView">
+							<string key="name">fErrorScrollView</string>
+							<string key="candidateClassName">NSScrollView</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="fFailedDLLabel">
+							<string key="name">fFailedDLLabel</string>
+							<string key="candidateClassName">NSTextField</string>
 						</object>
 						<object class="IBToOneOutletInfo" key="fFailedHashField">
 							<string key="name">fFailedHashField</string>
@@ -1728,6 +1930,10 @@ AAEAAQAAAT0AAwAAAAEAAgAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 						</object>
 						<object class="IBToOneOutletInfo" key="fHaveField">
 							<string key="name">fHaveField</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="fHaveLabel">
+							<string key="name">fHaveLabel</string>
 							<string key="candidateClassName">NSTextField</string>
 						</object>
 						<object class="IBToOneOutletInfo" key="fPiecesControl">
@@ -1742,16 +1948,44 @@ AAEAAQAAAT0AAwAAAAEAAgAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 							<string key="name">fProgressField</string>
 							<string key="candidateClassName">NSTextField</string>
 						</object>
+						<object class="IBToOneOutletInfo" key="fProgressLabel">
+							<string key="name">fProgressLabel</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
 						<object class="IBToOneOutletInfo" key="fRatioField">
 							<string key="name">fRatioField</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="fRatioLabel">
+							<string key="name">fRatioLabel</string>
 							<string key="candidateClassName">NSTextField</string>
 						</object>
 						<object class="IBToOneOutletInfo" key="fSeedTimeField">
 							<string key="name">fSeedTimeField</string>
 							<string key="candidateClassName">NSTextField</string>
 						</object>
+						<object class="IBToOneOutletInfo" key="fSeedTimeLabel">
+							<string key="name">fSeedTimeLabel</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
 						<object class="IBToOneOutletInfo" key="fStateField">
 							<string key="name">fStateField</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="fStateLabel">
+							<string key="name">fStateLabel</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="fTimeSectionLabel">
+							<string key="name">fTimeSectionLabel</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="fTransferSectionLabel">
+							<string key="name">fTransferSectionLabel</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="fUploadedLabel">
+							<string key="name">fUploadedLabel</string>
 							<string key="candidateClassName">NSTextField</string>
 						</object>
 						<object class="IBToOneOutletInfo" key="fUploadedTotalField">
