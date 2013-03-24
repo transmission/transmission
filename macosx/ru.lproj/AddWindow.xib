@@ -2,13 +2,13 @@
 <archive type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="8.00">
 	<data>
 		<int key="IBDocument.SystemTarget">1060</int>
-		<string key="IBDocument.SystemVersion">12A239</string>
-		<string key="IBDocument.InterfaceBuilderVersion">2541</string>
-		<string key="IBDocument.AppKitVersion">1179.1</string>
-		<string key="IBDocument.HIToolboxVersion">620.00</string>
+		<string key="IBDocument.SystemVersion">12D78</string>
+		<string key="IBDocument.InterfaceBuilderVersion">3084</string>
+		<string key="IBDocument.AppKitVersion">1187.37</string>
+		<string key="IBDocument.HIToolboxVersion">626.00</string>
 		<object class="NSMutableDictionary" key="IBDocument.PluginVersions">
 			<string key="NS.key.0">com.apple.InterfaceBuilder.CocoaPlugin</string>
-			<string key="NS.object.0">2541</string>
+			<string key="NS.object.0">3084</string>
 		</object>
 		<array key="IBDocument.IntegratedClassDependencies">
 			<string>NSBox</string>
@@ -173,7 +173,7 @@
 								<reference key="NSControlView" ref="999003967"/>
 								<int key="NSButtonFlags">1211912448</int>
 								<int key="NSButtonFlags2">2</int>
-								<object class="NSCustomResource" key="NSNormalImage" id="441289568">
+								<object class="NSCustomResource" key="NSNormalImage" id="1018047055">
 									<string key="NSClassName">NSImage</string>
 									<string key="NSResourceName">NSSwitch</string>
 								</object>
@@ -190,7 +190,7 @@
 						<object class="NSButton" id="636183414">
 							<reference key="NSNextResponder" ref="1006"/>
 							<int key="NSvFlags">289</int>
-							<string key="NSFrame">{{318, 13}, {101, 32}}</string>
+							<string key="NSFrame">{{318, 12}, {101, 32}}</string>
 							<reference key="NSSuperview" ref="1006"/>
 							<reference key="NSWindow"/>
 							<reference key="NSNextKeyView"/>
@@ -218,7 +218,7 @@
 						<object class="NSButton" id="533609783">
 							<reference key="NSNextResponder" ref="1006"/>
 							<int key="NSvFlags">289</int>
-							<string key="NSFrame">{{215, 13}, {103, 32}}</string>
+							<string key="NSFrame">{{215, 12}, {103, 32}}</string>
 							<reference key="NSSuperview" ref="1006"/>
 							<reference key="NSWindow"/>
 							<reference key="NSNextKeyView" ref="636183414"/>
@@ -265,7 +265,7 @@
 											<array class="NSMutableArray" key="NSTableColumns">
 												<object class="NSTableColumn" id="161502441">
 													<string key="NSIdentifier">Name</string>
-													<double key="NSWidth">329.59910000000002</double>
+													<double key="NSWidth">317</double>
 													<double key="NSMinWidth">38.599119999999999</double>
 													<double key="NSMaxWidth">1000</double>
 													<object class="NSTableHeaderCell" key="NSHeaderCell">
@@ -306,15 +306,15 @@
 													<bool key="NSIsResizeable">YES</bool>
 													<reference key="NSTableView" ref="591175582"/>
 												</object>
-												<object class="NSTableColumn" id="189961006">
-													<string key="NSIdentifier">Check</string>
-													<double key="NSWidth">18</double>
+												<object class="NSTableColumn" id="1036951889">
+													<string key="NSIdentifier">Priority</string>
+													<double key="NSWidth">34</double>
 													<double key="NSMinWidth">10</double>
 													<double key="NSMaxWidth">1000</double>
 													<object class="NSTableHeaderCell" key="NSHeaderCell">
 														<int key="NSCellFlags">75497536</int>
 														<int key="NSCellFlags2">2048</int>
-														<string key="NSContents">Скач.</string>
+														<string key="NSContents">Важн.</string>
 														<reference key="NSSupport" ref="26"/>
 														<object class="NSColor" key="NSBackgroundColor" id="211491450">
 															<int key="NSColorSpace">6</int>
@@ -325,6 +325,30 @@
 																<bytes key="NSWhite">MQA</bytes>
 															</object>
 														</object>
+														<reference key="NSTextColor" ref="362182954"/>
+													</object>
+													<object class="NSTextFieldCell" key="NSDataCell" id="422188465">
+														<int key="NSCellFlags">337641536</int>
+														<int key="NSCellFlags2">134219776</int>
+														<string key="NSContents">Text Cell</string>
+														<reference key="NSSupport" ref="728563564"/>
+														<reference key="NSControlView" ref="591175582"/>
+														<reference key="NSBackgroundColor" ref="925881442"/>
+														<reference key="NSTextColor" ref="932603584"/>
+													</object>
+													<reference key="NSTableView" ref="591175582"/>
+												</object>
+												<object class="NSTableColumn" id="189961006">
+													<string key="NSIdentifier">Check</string>
+													<double key="NSWidth">31</double>
+													<double key="NSMinWidth">10</double>
+													<double key="NSMaxWidth">1000</double>
+													<object class="NSTableHeaderCell" key="NSHeaderCell">
+														<int key="NSCellFlags">75497536</int>
+														<int key="NSCellFlags2">2048</int>
+														<string key="NSContents">Скач.</string>
+														<reference key="NSSupport" ref="26"/>
+														<reference key="NSBackgroundColor" ref="211491450"/>
 														<reference key="NSTextColor" ref="362182954"/>
 													</object>
 													<object class="NSButtonCell" key="NSDataCell" id="1016752986">
@@ -344,30 +368,6 @@
 														<string key="NSKeyEquivalent"/>
 														<int key="NSPeriodicDelay">400</int>
 														<int key="NSPeriodicInterval">75</int>
-													</object>
-													<reference key="NSTableView" ref="591175582"/>
-												</object>
-												<object class="NSTableColumn" id="1036951889">
-													<string key="NSIdentifier">Priority</string>
-													<double key="NSWidth">34</double>
-													<double key="NSMinWidth">10</double>
-													<double key="NSMaxWidth">1000</double>
-													<object class="NSTableHeaderCell" key="NSHeaderCell">
-														<int key="NSCellFlags">75497536</int>
-														<int key="NSCellFlags2">2048</int>
-														<string key="NSContents">Важн.</string>
-														<reference key="NSSupport" ref="26"/>
-														<reference key="NSBackgroundColor" ref="211491450"/>
-														<reference key="NSTextColor" ref="362182954"/>
-													</object>
-													<object class="NSTextFieldCell" key="NSDataCell" id="422188465">
-														<int key="NSCellFlags">337641536</int>
-														<int key="NSCellFlags2">134219776</int>
-														<string key="NSContents">Text Cell</string>
-														<reference key="NSSupport" ref="728563564"/>
-														<reference key="NSControlView" ref="591175582"/>
-														<reference key="NSBackgroundColor" ref="925881442"/>
-														<reference key="NSTextColor" ref="932603584"/>
 													</object>
 													<reference key="NSTableView" ref="591175582"/>
 												</object>
@@ -443,12 +443,12 @@
 							<bytes key="NSScrollAmts">QSAAAEEgAABCEAAAQhAAAA</bytes>
 							<double key="NSMinMagnification">0.25</double>
 							<double key="NSMaxMagnification">4</double>
-							<double key="NMagnification">1</double>
+							<double key="NSMagnification">1</double>
 						</object>
 						<object class="NSButton" id="152228799">
 							<reference key="NSNextResponder" ref="1006"/>
 							<int key="NSvFlags">289</int>
-							<string key="NSFrame">{{352, 190}, {61, 17}}</string>
+							<string key="NSFrame">{{371, 190}, {42, 17}}</string>
 							<reference key="NSSuperview" ref="1006"/>
 							<reference key="NSWindow"/>
 							<reference key="NSNextKeyView" ref="501735897"/>
@@ -471,7 +471,7 @@
 						<object class="NSButton" id="407928630">
 							<reference key="NSNextResponder" ref="1006"/>
 							<int key="NSvFlags">289</int>
-							<string key="NSFrame">{{302, 190}, {42, 17}}</string>
+							<string key="NSFrame">{{321, 190}, {42, 17}}</string>
 							<reference key="NSSuperview" ref="1006"/>
 							<reference key="NSWindow"/>
 							<reference key="NSNextKeyView" ref="152228799"/>
@@ -507,7 +507,7 @@
 								<reference key="NSControlView" ref="46983627"/>
 								<int key="NSButtonFlags">1211912448</int>
 								<int key="NSButtonFlags2">2</int>
-								<reference key="NSNormalImage" ref="441289568"/>
+								<reference key="NSNormalImage" ref="1018047055"/>
 								<reference key="NSAlternateImage" ref="240636852"/>
 								<string key="NSAlternateContents"/>
 								<string key="NSKeyEquivalent"/>
@@ -612,14 +612,14 @@
 										<object class="NSTextField" id="224369214">
 											<reference key="NSNextResponder" ref="946207297"/>
 											<int key="NSvFlags">265</int>
-											<string key="NSFrame">{{201, 53}, {54, 17}}</string>
+											<string key="NSFrame">{{198, 53}, {57, 17}}</string>
 											<reference key="NSSuperview" ref="946207297"/>
 											<reference key="NSWindow"/>
 											<reference key="NSNextKeyView" ref="711151157"/>
 											<bool key="NSEnabled">YES</bool>
 											<object class="NSTextFieldCell" key="NSCell" id="580409040">
 												<int key="NSCellFlags">67108864</int>
-												<int key="NSCellFlags2">272629760</int>
+												<int key="NSCellFlags2">71303168</int>
 												<string key="NSContents">Группа:</string>
 												<reference key="NSSupport" ref="728563564"/>
 												<reference key="NSControlView" ref="224369214"/>
@@ -664,7 +664,7 @@
 										<object class="NSProgressIndicator" id="744550600">
 											<reference key="NSNextResponder" ref="946207297"/>
 											<int key="NSvFlags">268</int>
-											<string key="NSFrame">{{17, 31}, {152, 12}}</string>
+											<string key="NSFrame">{{18, 31}, {150, 12}}</string>
 											<reference key="NSSuperview" ref="946207297"/>
 											<reference key="NSWindow"/>
 											<reference key="NSNextKeyView" ref="485847244"/>
@@ -1224,11 +1224,11 @@
 							<reference ref="399642967"/>
 							<reference ref="46983627"/>
 							<reference ref="501735897"/>
-							<reference ref="636183414"/>
-							<reference ref="533609783"/>
-							<reference ref="290897607"/>
 							<reference ref="152228799"/>
 							<reference ref="407928630"/>
+							<reference ref="290897607"/>
+							<reference ref="636183414"/>
+							<reference ref="533609783"/>
 						</array>
 						<reference key="parent" ref="1005"/>
 					</object>
@@ -1334,8 +1334,8 @@
 						<int key="objectID">46</int>
 						<reference key="object" ref="591175582"/>
 						<array class="NSMutableArray" key="children">
-							<reference ref="1036951889"/>
 							<reference ref="189961006"/>
+							<reference ref="1036951889"/>
 							<reference ref="161502441"/>
 						</array>
 						<reference key="parent" ref="399642967"/>
@@ -1406,10 +1406,10 @@
 							<reference ref="224369214"/>
 							<reference ref="711151157"/>
 							<reference ref="485847244"/>
-							<reference ref="38073450"/>
 							<reference ref="1065995789"/>
 							<reference ref="1059202456"/>
 							<reference ref="928839683"/>
+							<reference ref="38073450"/>
 							<reference ref="744550600"/>
 						</array>
 						<reference key="parent" ref="1006"/>
@@ -1697,145 +1697,9 @@
 			<nil key="activeLocalization"/>
 			<dictionary class="NSMutableDictionary" key="localizations"/>
 			<nil key="sourceID"/>
-			<int key="maxID">185</int>
+			<int key="maxID">116</int>
 		</object>
-		<object class="IBClassDescriber" key="IBDocument.Classes">
-			<array class="NSMutableArray" key="referencedPartialClassDescriptions">
-				<object class="IBPartialClassDescription">
-					<string key="className">AddWindowController</string>
-					<string key="superclassName">NSWindowController</string>
-					<dictionary class="NSMutableDictionary" key="actions">
-						<string key="checkAll:">id</string>
-						<string key="setFileFilterText:">id</string>
-						<string key="uncheckAll:">id</string>
-					</dictionary>
-					<dictionary class="NSMutableDictionary" key="actionInfosByName">
-						<object class="IBActionInfo" key="checkAll:">
-							<string key="name">checkAll:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="setFileFilterText:">
-							<string key="name">setFileFilterText:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="uncheckAll:">
-							<string key="name">uncheckAll:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-					</dictionary>
-					<dictionary class="NSMutableDictionary" key="outlets">
-						<string key="fCheckAllButton">NSButton</string>
-						<string key="fDeleteCheck">NSButton</string>
-						<string key="fFileController">FileOutlineController</string>
-						<string key="fFileFilterField">NSTextField</string>
-						<string key="fFileScrollView">NSScrollView</string>
-						<string key="fGroupPopUp">NSPopUpButton</string>
-						<string key="fIconView">NSImageView</string>
-						<string key="fLocationField">NSTextField</string>
-						<string key="fLocationImageView">NSImageView</string>
-						<string key="fNameField">NSTextField</string>
-						<string key="fPriorityPopUp">NSPopUpButton</string>
-						<string key="fStartCheck">NSButton</string>
-						<string key="fStatusField">NSTextField</string>
-						<string key="fUncheckAllButton">NSButton</string>
-						<string key="fVerifyIndicator">NSProgressIndicator</string>
-					</dictionary>
-					<dictionary class="NSMutableDictionary" key="toOneOutletInfosByName">
-						<object class="IBToOneOutletInfo" key="fCheckAllButton">
-							<string key="name">fCheckAllButton</string>
-							<string key="candidateClassName">NSButton</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="fDeleteCheck">
-							<string key="name">fDeleteCheck</string>
-							<string key="candidateClassName">NSButton</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="fFileController">
-							<string key="name">fFileController</string>
-							<string key="candidateClassName">FileOutlineController</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="fFileFilterField">
-							<string key="name">fFileFilterField</string>
-							<string key="candidateClassName">NSTextField</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="fFileScrollView">
-							<string key="name">fFileScrollView</string>
-							<string key="candidateClassName">NSScrollView</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="fGroupPopUp">
-							<string key="name">fGroupPopUp</string>
-							<string key="candidateClassName">NSPopUpButton</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="fIconView">
-							<string key="name">fIconView</string>
-							<string key="candidateClassName">NSImageView</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="fLocationField">
-							<string key="name">fLocationField</string>
-							<string key="candidateClassName">NSTextField</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="fLocationImageView">
-							<string key="name">fLocationImageView</string>
-							<string key="candidateClassName">NSImageView</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="fNameField">
-							<string key="name">fNameField</string>
-							<string key="candidateClassName">NSTextField</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="fPriorityPopUp">
-							<string key="name">fPriorityPopUp</string>
-							<string key="candidateClassName">NSPopUpButton</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="fStartCheck">
-							<string key="name">fStartCheck</string>
-							<string key="candidateClassName">NSButton</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="fStatusField">
-							<string key="name">fStatusField</string>
-							<string key="candidateClassName">NSTextField</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="fUncheckAllButton">
-							<string key="name">fUncheckAllButton</string>
-							<string key="candidateClassName">NSButton</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="fVerifyIndicator">
-							<string key="name">fVerifyIndicator</string>
-							<string key="candidateClassName">NSProgressIndicator</string>
-						</object>
-					</dictionary>
-					<object class="IBClassDescriptionSource" key="sourceIdentifier">
-						<string key="majorKey">IBProjectSource</string>
-						<string key="minorKey">./Classes/AddWindowController.h</string>
-					</object>
-				</object>
-				<object class="IBPartialClassDescription">
-					<string key="className">FileOutlineController</string>
-					<string key="superclassName">NSObject</string>
-					<object class="NSMutableDictionary" key="outlets">
-						<string key="NS.key.0">fOutline</string>
-						<string key="NS.object.0">FileOutlineView</string>
-					</object>
-					<object class="NSMutableDictionary" key="toOneOutletInfosByName">
-						<string key="NS.key.0">fOutline</string>
-						<object class="IBToOneOutletInfo" key="NS.object.0">
-							<string key="name">fOutline</string>
-							<string key="candidateClassName">FileOutlineView</string>
-						</object>
-					</object>
-					<object class="IBClassDescriptionSource" key="sourceIdentifier">
-						<string key="majorKey">IBProjectSource</string>
-						<string key="minorKey">./Classes/FileOutlineController.h</string>
-					</object>
-				</object>
-				<object class="IBPartialClassDescription">
-					<string key="className">FileOutlineView</string>
-					<string key="superclassName">NSOutlineView</string>
-					<object class="IBClassDescriptionSource" key="sourceIdentifier">
-						<string key="majorKey">IBProjectSource</string>
-						<string key="minorKey">./Classes/FileOutlineView.h</string>
-					</object>
-				</object>
-			</array>
-		</object>
+		<object class="IBClassDescriber" key="IBDocument.Classes"/>
 		<int key="IBDocument.localizationMode">0</int>
 		<string key="IBDocument.TargetRuntimeIdentifier">IBCocoaFramework</string>
 		<object class="NSMutableDictionary" key="IBDocument.PluginDeclaredDependencies">
