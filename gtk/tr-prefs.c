@@ -239,11 +239,9 @@ new_path_chooser_button (const tr_quark key, gpointer core)
   GtkWidget *  w = gtk_file_chooser_button_new (NULL, GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER);
   const char * path = gtr_pref_string_get (key);
   g_object_set_data (G_OBJECT (w), PREF_KEY, GINT_TO_POINTER(key));
-  g_signal_connect (w, "selection-changed", G_CALLBACK (chosen_cb), core);
-
   if (path != NULL)
     gtk_file_chooser_set_filename (GTK_FILE_CHOOSER (w), path);
-
+  g_signal_connect (w, "selection-changed", G_CALLBACK (chosen_cb), core);
   return w;
 }
 
