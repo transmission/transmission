@@ -952,6 +952,24 @@ Transmission.prototype =
 				}
 				reader.readAsDataURL (file);
 			});
+
+			var url = $('#torrent_upload_url').val();
+			if (url != '') {
+				if (url.match(/^[0-9a-f]{40}$/i)) 
+					url = 'magnet:?xt=urn:btih:'+url;
+				var o = {
+					'method': 'torrent-add',
+					arguments: {
+						'paused': paused,
+						'download-dir': destination,
+						'filename': url
+					}
+				};
+				remote.sendRequest (o, function(response) {
+					if (response.result != 'success')
+						alert ('Error adding "' + file.name + '": ' + response.result);
+				});
+			}
 		}
 	},
 
