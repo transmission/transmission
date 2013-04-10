@@ -19,7 +19,7 @@
 
 namespace
 {
-  static const int INTERVAL_MSEC = 5000;
+  static const int INTERVAL_MSEC = 15000;
 }
 
 FreespaceLabel :: FreespaceLabel (Session        & session,
