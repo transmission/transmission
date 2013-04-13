@@ -399,7 +399,7 @@ compareKeys (const void * va, const void * vb)
   const struct tr_key_struct * a = va;
   const struct tr_key_struct * b = vb;
 
-  ret = memcmp (a->str, b->str, a->len);
+  ret = memcmp (a->str, b->str, MIN (a->len, b->len));
 
   if (!ret && (a->len != b->len))
     ret = a->len < b->len ? -1 : 1;
