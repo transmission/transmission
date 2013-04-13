@@ -268,6 +268,7 @@ tr_netOpenPeerSocket (tr_session        * session,
     {
         tr_logAddError (_("Couldn't set source address %s on %d: %s"),
                 tr_address_to_string (source_addr), s, tr_strerror (errno));
+        tr_netClose (session, s);
         return -errno;
     }
 
