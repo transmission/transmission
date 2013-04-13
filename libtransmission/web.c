@@ -26,6 +26,7 @@
 #include "transmission.h"
 #include "log.h"
 #include "net.h" /* tr_address */
+#include "torrent.h"
 #include "platform.h" /* mutex */
 #include "session.h"
 #include "trevent.h" /* tr_runInEventThread () */
@@ -62,6 +63,7 @@ enum
 
 struct tr_web_task
 {
+  int torrentId;
   long code;
   long timeout_secs;
   bool did_connect;
@@ -234,29 +236,17 @@ task_finish_func (void * vtask)
 *****
 ****/
 
-struct tr_web_task *
-tr_webRun (tr_session         * session,
-           const char         * url,
-           const char         * range,
-           const char         * cookies,
-           tr_web_done_func     done_func,
-           void               * done_func_user_data)
-{
-  return tr_webRunWithBuffer (session, url, range, cookies,
-                              done_func, done_func_user_data,
-                              NULL);
-}
-
 static void tr_webThreadFunc (void * vsession);
 
-struct tr_web_task *
-tr_webRunWithBuffer (tr_session         * session,
-                     const char         * url,
-                     const char         * range,
-                     const char         * cookies,
-                     tr_web_done_func     done_func,
-                     void               * done_func_user_data,
-                     struct evbuffer    * buffer)
+static struct tr_web_task *
+tr_webRunImpl (tr_session         * session,
+               int                  torrentId,
+               const char         * url,
+               const char         * range,
+               const char         * cookies,
+               tr_web_done_func     done_func,
+               void               * done_func_user_data,
+               struct evbuffer    * buffer)
 {
   struct tr_web_task * task = NULL;
 
@@ -272,6 +262,7 @@ tr_webRunWithBuffer (tr_session         * session,
       
       task = tr_new0 (struct tr_web_task, 1);
       task->session = session;
+      task->torrentId = torrentId;
       task->url = tr_strdup (url);
       task->range = tr_strdup (range);
       task->cookies = tr_strdup (cookies);
@@ -287,6 +278,44 @@ tr_webRunWithBuffer (tr_session         * session,
     }
 
   return task;
+}
+
+struct tr_web_task *
+tr_webRunWithCookies (tr_session        * session,
+                      const char        * url,
+                      const char        * cookies,
+                      tr_web_done_func    done_func,
+                      void              * done_func_user_data)
+{
+  return tr_webRunImpl (session, -1, url,
+                        NULL, cookies,
+                        done_func, done_func_user_data,
+                        NULL);
+}
+
+struct tr_web_task *
+tr_webRun (tr_session         * session,
+           const char         * url,
+           tr_web_done_func     done_func,
+           void               * done_func_user_data)
+{
+  return tr_webRunWithCookies (session, url, NULL,
+                               done_func, done_func_user_data);
+}
+
+
+struct tr_web_task *
+tr_webRunWebseed (tr_torrent        * tor,
+                  const char        * url,
+                  const char        * range,
+                  tr_web_done_func    done_func,
+                  void              * done_func_user_data,
+                  struct evbuffer   * buffer)
+{
+  return tr_webRunImpl (tor->session, tr_torrentId (tor), url,
+                        range, NULL,
+                        done_func, done_func_user_data,
+                        buffer);
 }
 
 /**

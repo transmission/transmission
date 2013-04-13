@@ -1400,7 +1400,7 @@ portTest (tr_session               * session,
 {
     const int port = tr_sessionGetPeerPort (session);
     char * url = tr_strdup_printf ("http://portcheck.transmissionbt.com/%d", port);
-    tr_webRun (session, url, NULL, NULL, portTested, idle_data);
+    tr_webRun (session, url, portTested, idle_data);
     tr_free (url);
     return NULL;
 }
@@ -1500,11 +1500,11 @@ gotNewBlocklist (tr_session       * session,
 
 static const char*
 blocklistUpdate (tr_session               * session,
-                 tr_variant                  * args_in UNUSED,
-                 tr_variant                  * args_out UNUSED,
+                 tr_variant               * args_in UNUSED,
+                 tr_variant               * args_out UNUSED,
                  struct tr_rpc_idle_data  * idle_data)
 {
-    tr_webRun (session, session->blocklist_url, NULL, NULL, gotNewBlocklist, idle_data);
+    tr_webRun (session, session->blocklist_url, gotNewBlocklist, idle_data);
     return NULL;
 }
 
@@ -1689,7 +1689,7 @@ torrentAdd (tr_session               * session,
             struct add_torrent_idle_data * d = tr_new0 (struct add_torrent_idle_data, 1);
             d->data = idle_data;
             d->ctor = ctor;
-            tr_webRun (session, filename, NULL, cookies, gotMetadataFromURL, d);
+            tr_webRunWithCookies (session, filename, cookies, gotMetadataFromURL, d);
         }
         else
         {

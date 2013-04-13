@@ -51,20 +51,23 @@ const char * tr_webGetResponseStr (long response_code);
 
 struct tr_web_task * tr_webRun (tr_session        * session,
                                 const char        * url,
-                                const char        * range,
-                                const char        * cookies,
                                 tr_web_done_func    done_func,
                                 void              * done_func_user_data);
 
+struct tr_web_task * tr_webRunWithCookies (tr_session        * session,
+                                           const char        * url,
+                                           const char        * cookies,
+                                           tr_web_done_func    done_func,
+                                           void              * done_func_user_data);
+
 struct evbuffer;
 
-struct tr_web_task * tr_webRunWithBuffer (tr_session         * session,
-                                          const char         * url,
-                                          const char         * range,
-                                          const char         * cookies,
-                                          tr_web_done_func     done_func,
-                                          void               * done_func_user_data,
-                                          struct evbuffer    * buffer);
+struct tr_web_task * tr_webRunWebseed (tr_torrent        * tor,
+                                       const char        * url,
+                                       const char        * range,
+                                       tr_web_done_func    done_func,
+                                       void              * done_func_user_data,
+                                       struct evbuffer   * buffer);
 
 void tr_webGetTaskInfo (struct tr_web_task * task, tr_web_task_info info, void * dst);
 

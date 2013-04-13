@@ -294,7 +294,7 @@ main (int argc, char ** argv)
     }
   else if (!memcmp (torrentPath, "http", 4))
     {
-      tr_webRun (h, torrentPath, NULL, NULL, onTorrentFileDownloaded, ctor);
+      tr_webRun (h, torrentPath, onTorrentFileDownloaded, ctor);
       waitingOnWeb = true;
       while (waitingOnWeb)
         tr_wait_msec (1000);

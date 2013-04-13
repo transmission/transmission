@@ -498,8 +498,9 @@ task_request_next_chunk (struct tr_webseed_task * t)
 
       tr_snprintf (range, sizeof range, "%"PRIu64"-%"PRIu64,
                    file_offset, file_offset + this_pass - 1);
-      t->web_task = tr_webRunWithBuffer (w->session, urls[file_index],
-                                         range, NULL, web_response_func, t, t->content);
+
+      t->web_task = tr_webRunWebseed (tor, urls[file_index], range,
+                                      web_response_func, t, t->content);
     }
 }
 
