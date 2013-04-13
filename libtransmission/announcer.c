@@ -920,7 +920,7 @@ announce_request_new (const tr_announcer  * announcer,
     req->corrupt = tier->byteCounts[TR_ANN_CORRUPT];
     req->leftUntilComplete = tr_torrentHasMetadata (tor)
             ? tor->info.totalSize - tr_cpHaveTotal (&tor->completion)
-            : 0;
+            : ~ (uint64_t)0;
     req->event = event;
     req->numwant = event == TR_ANNOUNCE_EVENT_STOPPED ? 0 : NUMWANT;
     req->key = announcer->key;
