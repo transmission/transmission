@@ -24,6 +24,7 @@
 #include <event2/buffer.h>
 
 #include "transmission.h"
+#include "list.h"
 #include "log.h"
 #include "net.h" /* tr_address */
 #include "torrent.h"
@@ -40,7 +41,7 @@
 
 enum
 {
-  THREADFUNC_MAX_SLEEP_MSEC = 1000,
+  THREADFUNC_MAX_SLEEP_MSEC = 200,
 };
 
 #if 0
@@ -95,6 +96,8 @@ task_free (struct tr_web_task * task)
 ****
 ***/
 
+static tr_list  * paused_easy_handles = NULL;
+
 struct tr_web
 {
   bool curl_verbose;
@@ -115,6 +118,19 @@ writeFunc (void * ptr, size_t size, size_t nmemb, void * vtask)
 {
   const size_t byteCount = size * nmemb;
   struct tr_web_task * task = vtask;
+
+  /* webseed downloads should be speed limited */
+  if (task->torrentId != -1)
+    {
+      tr_torrent * tor = tr_torrentFindFromId (task->session, task->torrentId);
+
+      if (tor && !tr_bandwidthClamp (&tor->bandwidth, TR_DOWN, nmemb))
+        {
+          tr_list_append (&paused_easy_handles, task->curl_easy);
+          return CURL_WRITEFUNC_PAUSE;
+        }
+    }
+
   evbuffer_add (task->response, ptr, byteCount);
   dbgmsg ("wrote %zu bytes to task %p's buffer", byteCount, task);
   return byteCount;
@@ -411,6 +427,14 @@ tr_webThreadFunc (void * vsession)
           ++taskCount;
         }
       tr_lockUnlock (web->taskLock);
+
+      /* unpause any paused curl handles */
+      if (paused_easy_handles != NULL)
+        {
+          CURL * handle;
+          while ((handle = tr_list_pop_front (&paused_easy_handles)))
+            curl_easy_pause (handle, CURLPAUSE_CONT);
+        }
 
       /* maybe wait a little while before calling curl_multi_perform () */
       msec = 0;
