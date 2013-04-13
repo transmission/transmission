@@ -140,6 +140,7 @@ TESTS = \
   rename-test \
   rpc-test \
   test-peer-id \
+  tr-getopt-test \
   utils-test \
   variant-test
 
@@ -210,6 +211,10 @@ rpc_test_LDFLAGS = ${apps_ldflags}
 test_peer_id_SOURCES = test-peer-id.c $(TEST_SOURCES)
 test_peer_id_LDADD = ${apps_ldadd}
 test_peer_id_LDFLAGS = ${apps_ldflags}
+
+tr_getopt_test_SOURCES = tr-getopt-test.c $(TEST_SOURCES)
+tr_getopt_test_LDADD = ${apps_ldadd}
+tr_getopt_test_LDFLAGS = ${apps_ldflags}
 
 utils_test_SOURCES = utils-test.c $(TEST_SOURCES)
 utils_test_LDADD = ${apps_ldadd}
