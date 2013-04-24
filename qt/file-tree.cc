@@ -813,7 +813,7 @@ FileTreeDelegate :: paint (QPainter                    * painter,
       else
         {
           QString name = index.data().toString();
-          icon = Utils :: guessMimeIcon (name.left(name.lastIndexOf(" (")));
+          icon = Utils :: guessMimeIcon (name);
         }
       icon.paint (painter, iconArea, Qt::AlignCenter, QIcon::Normal, QIcon::On);
 
