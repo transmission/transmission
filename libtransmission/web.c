@@ -432,7 +432,14 @@ tr_webThreadFunc (void * vsession)
       if (paused_easy_handles != NULL)
         {
           CURL * handle;
-          while ((handle = tr_list_pop_front (&paused_easy_handles)))
+          tr_list * tmp;
+
+          /* swap paused_easy_handles to prevent oscillation
+             between writeFunc this while loop */
+          tmp = paused_easy_handles;
+          paused_easy_handles = NULL;
+
+          while ((handle = tr_list_pop_front (&tmp)))
             curl_easy_pause (handle, CURLPAUSE_CONT);
         }
 
