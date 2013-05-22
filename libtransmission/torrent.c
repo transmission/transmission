@@ -74,9 +74,7 @@
 const char *
 tr_torrentName (const tr_torrent * tor)
 {
-    assert (tr_isTorrent (tor));
-
-    return tor->info.name;
+    return tor ? tor->info.name : "";
 }
 
 int
