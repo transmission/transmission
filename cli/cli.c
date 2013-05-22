@@ -222,7 +222,6 @@ getConfigDir (int argc, const char ** argv)
 int
 main (int argc, char ** argv)
 {
-  int           error;
   tr_session  * h;
   tr_ctor     * ctor;
   tr_torrent  * tor = NULL;
@@ -310,7 +309,7 @@ main (int argc, char ** argv)
 
   tr_free (fileContents);
 
-  tor = tr_torrentNew (ctor, &error);
+  tor = tr_torrentNew (ctor, NULL, NULL);
   tr_ctorFree (ctor);
   if (!tor)
     {

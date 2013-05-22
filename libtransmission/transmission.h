@@ -1061,12 +1061,21 @@ tr_parse_result  tr_torrentParse (const tr_ctor  * ctor,
 void tr_metainfoFree (tr_info * inf);
 
 
-/** Instantiate a single torrent.
-    @return 0 on success,
-            TR_EINVALID if the torrent couldn't be parsed, or
-            TR_EDUPLICATE if there's already a matching torrent object. */
+/**
+ * Instantiate a single torrent.
+ *
+ * Returns a pointer to the torrent on success, or NULL on failure.
+ *
+ * @param setme_error: TR_PARSE_ERR if the parsing failed;
+ *                     TR_PARSE_OK if parsing succeeded and it's not a duplicate;
+ *                     TR_PARSE_DUPLICATE if parsing succeeded but it's a duplicate.
+ *
+ * @param setme_duplicate_id: when setmeError is TR_PARSE_DUPLICATE,
+ *                            this field is set to the duplicate torrent's id.
+ */
 tr_torrent * tr_torrentNew (const tr_ctor   * ctor,
-                            int             * setmeError);
+                            int             * setme_error,
+                            int             * setme_duplicate_id);
 
 /** @} */
 

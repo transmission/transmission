@@ -971,15 +971,18 @@ torrentInit (tr_torrent * tor, const tr_ctor * ctor)
 }
 
 static tr_parse_result
-torrentParseImpl (const tr_ctor * ctor, tr_info * setmeInfo,
-                  bool * setmeHasInfo, int * dictLength)
+torrentParseImpl (const tr_ctor  * ctor,
+                  tr_info        * setmeInfo,
+                  bool           * setmeHasInfo,
+                  int            * dictLength,
+                  int            * setme_duplicate_id)
 {
-    int             doFree;
-    bool            didParse;
-    bool            hasInfo = false;
-    tr_info         tmp;
+    bool doFree;
+    bool didParse;
+    bool hasInfo = false;
+    tr_info tmp;
     const tr_variant * metainfo;
-    tr_session    * session = tr_ctorGetSession (ctor);
+    tr_session * session = tr_ctorGetSession (ctor);
     tr_parse_result result = TR_PARSE_OK;
 
     if (setmeInfo == NULL)
@@ -999,8 +1002,18 @@ torrentParseImpl (const tr_ctor * ctor, tr_info * setmeInfo,
     if (didParse && hasInfo && !tr_getBlockSize (setmeInfo->pieceSize))
         result = TR_PARSE_ERR;
 
-    if (didParse && session && tr_torrentExists (session, setmeInfo->hash))
-        result = TR_PARSE_DUPLICATE;
+    if (didParse && session && (result == TR_PARSE_OK))
+      {
+        const tr_torrent * const tor = tr_torrentFindFromHash (session, setmeInfo->hash);
+
+        if (tor != NULL)
+          {
+            result = TR_PARSE_DUPLICATE;
+
+            if (setme_duplicate_id != NULL)
+              *setme_duplicate_id = tr_torrentId (tor);
+          }
+      }
 
     if (doFree)
         tr_metainfoFree (setmeInfo);
@@ -1014,40 +1027,42 @@ torrentParseImpl (const tr_ctor * ctor, tr_info * setmeInfo,
 tr_parse_result
 tr_torrentParse (const tr_ctor * ctor, tr_info * setmeInfo)
 {
-    return torrentParseImpl (ctor, setmeInfo, NULL, NULL);
+    return torrentParseImpl (ctor, setmeInfo, NULL, NULL, NULL);
 }
 
 tr_torrent *
-tr_torrentNew (const tr_ctor * ctor, int * setmeError)
+tr_torrentNew (const tr_ctor * ctor, int * setme_error, int * setme_duplicate_id)
 {
-    int len;
-    bool hasInfo;
-    tr_info tmpInfo;
-    tr_parse_result r;
-    tr_torrent * tor = NULL;
+  int len;
+  bool hasInfo;
+  tr_info tmpInfo;
+  tr_parse_result r;
+  tr_torrent * tor = NULL;
 
-    assert (ctor != NULL);
-    assert (tr_isSession (tr_ctorGetSession (ctor)));
+  assert (ctor != NULL);
+  assert (tr_isSession (tr_ctorGetSession (ctor)));
 
-    r = torrentParseImpl (ctor, &tmpInfo, &hasInfo, &len);
-    if (r == TR_PARSE_OK)
+  r = torrentParseImpl (ctor, &tmpInfo, &hasInfo, &len, setme_duplicate_id);
+  if (r == TR_PARSE_OK)
     {
-        tor = tr_new0 (tr_torrent, 1);
-        tor->info = tmpInfo;
-        if (hasInfo)
-            tor->infoDictLength = len;
-        torrentInit (tor, ctor);
+      tor = tr_new0 (tr_torrent, 1);
+      tor->info = tmpInfo;
+
+      if (hasInfo)
+        tor->infoDictLength = len;
+
+      torrentInit (tor, ctor);
     }
     else
     {
-        if (r == TR_PARSE_DUPLICATE)
-            tr_metainfoFree (&tmpInfo);
+      if (r == TR_PARSE_DUPLICATE)
+        tr_metainfoFree (&tmpInfo);
 
-        if (setmeError)
-            *setmeError = r;
+      if (setme_error != NULL)
+        *setme_error = r;
     }
 
-    return tor;
+  return tor;
 }
 
 /**

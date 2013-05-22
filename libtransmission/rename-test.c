@@ -133,7 +133,7 @@ create_torrent_from_base64_metainfo (tr_ctor * ctor, const char * metainfo_base6
 
   /* create the torrent */
   err = 0;
-  tor = tr_torrentNew (ctor, &err);
+  tor = tr_torrentNew (ctor, &err, NULL);
   assert (!err);
 
   /* cleanup */

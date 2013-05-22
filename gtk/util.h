@@ -125,6 +125,7 @@ void gtr_http_failure_dialog (GtkWidget * parent, const char * url, long respons
 
 void gtr_add_torrent_error_dialog (GtkWidget  * window_or_child,
                                    int          err,
+                                   tr_torrent * duplicate_torrent,
                                    const char * filename);
 
 /* pop up the context menu if a user right-clicks.

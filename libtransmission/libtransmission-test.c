@@ -327,7 +327,7 @@ libttest_zero_torrent_init (tr_session * session)
 
   /* create the torrent */
   err = 0;
-  tor = tr_torrentNew (ctor, &err);
+  tor = tr_torrentNew (ctor, &err, NULL);
   assert (!err);
 
   /* cleanup */

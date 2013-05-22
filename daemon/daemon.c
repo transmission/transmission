@@ -263,7 +263,7 @@ onFileAdded (tr_session * session, const char * dir, const char * file)
 
     if (!err)
     {
-        tr_torrentNew (ctor, &err);
+        tr_torrentNew (ctor, &err, NULL);
 
         if (err == TR_PARSE_ERR)
             tr_logAddError ("Error parsing .torrent file \"%s\"", file);

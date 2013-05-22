@@ -217,21 +217,21 @@ getWindow (GtkWidget * w)
 }
 
 void
-gtr_add_torrent_error_dialog (GtkWidget * child, int err, const char * file)
+gtr_add_torrent_error_dialog (GtkWidget   * child,
+                              int           err,
+                              tr_torrent  * duplicate_torrent,
+                              const char  * filename)
 {
   char * secondary;
-  const char * fmt;
   GtkWidget * w;
   GtkWindow * win = getWindow (child);
 
-  switch (err)
-    {
-      case TR_PARSE_ERR: fmt = _("The torrent file \"%s\" contains invalid data."); break;
-      case TR_PARSE_DUPLICATE: fmt = _("The torrent file \"%s\" is already in use."); break;
-      default: fmt = _("The torrent file \"%s\" encountered an unknown error."); break;
-    }
-
-  secondary = g_strdup_printf (fmt, file);
+  if (err == TR_PARSE_ERR)
+    secondary = g_strdup_printf (_("The torrent file \"%s\" contains invalid data."), filename);
+  else if (err == TR_PARSE_DUPLICATE)
+    secondary = g_strdup_printf (_("The torrent file \"%s\" is already in use by \"%s.\""), filename, tr_torrentName (duplicate_torrent));
+  else
+    secondary = g_strdup_printf (_("The torrent file \"%s\" encountered an unknown error."), filename);
 
   w = gtk_message_dialog_new (win,
                               GTK_DIALOG_DESTROY_WITH_PARENT,

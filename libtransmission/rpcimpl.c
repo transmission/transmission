@@ -1515,33 +1515,46 @@ blocklistUpdate (tr_session               * session,
 static void
 addTorrentImpl (struct tr_rpc_idle_data * data, tr_ctor * ctor)
 {
-    int err = 0;
-    const char * result = NULL;
-    tr_torrent * tor = tr_torrentNew (ctor, &err);
+  int err;
+  int duplicate_id;
+  const char * result;
+  tr_torrent * tor;
+  tr_quark key;
 
-    tr_ctorFree (ctor);
+  err = 0;
+  duplicate_id = 0;
+  tor = tr_torrentNew (ctor, &err, &duplicate_id);
+  tr_ctorFree (ctor);
 
-    if (tor)
+  if (!err)
     {
-        tr_variant fields;
-        tr_variantInitList (&fields, 3);
-        tr_variantListAddStr (&fields, "id");
-        tr_variantListAddStr (&fields, "name");
-        tr_variantListAddStr (&fields, "hashString");
-        addInfo (tor, tr_variantDictAdd (data->args_out, TR_KEY_torrent_added), &fields);
-        notify (data->session, TR_RPC_TORRENT_ADDED, tor);
-        tr_variantFree (&fields);
+      key = TR_KEY_torrent_added;
+      result = NULL;
     }
-    else if (err == TR_PARSE_DUPLICATE)
+  else if (err == TR_PARSE_ERR)
     {
-        result = "duplicate torrent";
+      result = "invalid or corrupt torrent file";
     }
-    else if (err == TR_PARSE_ERR)
+  else if (err == TR_PARSE_DUPLICATE)
     {
-        result = "invalid or corrupt torrent file";
+      tor = tr_torrentFindFromId (data->session, duplicate_id);
+      key = TR_KEY_torrent_duplicate;
+      result = "duplicate torrent";
     }
 
-    tr_idle_function_done (data, result);
+  if (tor != NULL)
+    {
+      tr_variant fields;
+      tr_variantInitList (&fields, 3);
+      tr_variantListAddStr (&fields, "id");
+      tr_variantListAddStr (&fields, "name");
+      tr_variantListAddStr (&fields, "hashString");
+      addInfo (tor, tr_variantDictAdd (data->args_out, key), &fields);
+      notify (data->session, TR_RPC_TORRENT_ADDED, tor);
+      tr_variantFree (&fields);
+    }
+
+  tr_idle_function_done (data, result);
 }
 
 

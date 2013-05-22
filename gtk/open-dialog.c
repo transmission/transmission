@@ -186,6 +186,7 @@ sourceChanged (GtkFileChooserButton * b, gpointer gdata)
     {
         int err = 0;
         int new_file = 0;
+        int duplicate_id = 0;
         tr_torrent * torrent;
 
         if (filename && (!o->filename || !tr_is_same_file (filename, o->filename)))
@@ -200,14 +201,21 @@ sourceChanged (GtkFileChooserButton * b, gpointer gdata)
         tr_ctorSetPaused (o->ctor, TR_FORCE, TRUE);
         tr_ctorSetDeleteSource (o->ctor, FALSE);
 
-        if ((torrent = tr_torrentNew (o->ctor, &err)))
+        if ((torrent = tr_torrentNew (o->ctor, &err, &duplicate_id)))
         {
             removeOldTorrent (o);
             o->tor = torrent;
         }
         else if (new_file)
         {
-            gtr_add_torrent_error_dialog (GTK_WIDGET (b), err, o->filename);
+            tr_torrent * tor;
+
+            if (duplicate_id)
+              tor = gtr_core_find_torrent (o->core, duplicate_id);
+            else
+              tor = NULL;
+
+            gtr_add_torrent_error_dialog (GTK_WIDGET (b), err, tor, o->filename);
         }
 
         updateTorrent (o);

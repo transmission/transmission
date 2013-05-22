@@ -1666,7 +1666,7 @@ int trashDataFile(const char * filename)
             result = tr_ctorSetMetainfoFromHash(ctor, [hashString UTF8String]);
         
         if (result == TR_PARSE_OK)
-            fHandle = tr_torrentNew(ctor, NULL);
+            fHandle = tr_torrentNew(ctor, NULL, NULL);
         
         tr_ctorFree(ctor);
         

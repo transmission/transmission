@@ -382,9 +382,12 @@
    Set multiple cookies like this: "name1=content1; name2=content2;" etc. 
    <http://curl.haxx.se/libcurl/c/curl_easy_setopt.html#CURLOPTCOOKIE>
 
-   Response arguments: on success, a "torrent-added" object in the
+   Response arguments: On success, a "torrent-added" object in the
                        form of one of 3.3's tr_info objects with the
                        fields for id, name, and hashString.
+
+                       On failure due to a duplicate torrent existing,
+                       a "torrent-duplicate" object in the same form.
 
 3.5.  Removing a Torrent
 
@@ -761,6 +764,7 @@
    15    | 2.80    | yes       | torrent-get          | new arg "etaIdle"
          |         | yes       | torrent-rename-path  | new method
          |         | yes       | free-space           | new method
+         |         | yes       | torrent-add          | new return return arg "torrent-duplicate"
 
 5.1.  Upcoming Breakage
 

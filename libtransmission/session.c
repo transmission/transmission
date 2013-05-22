@@ -1937,7 +1937,7 @@ sessionLoadTorrents (void * vdata)
                 tr_torrent * tor;
                 char * path = tr_buildPath (dirname, d->d_name, NULL);
                 tr_ctorSetMetainfoFromFile (data->ctor, path);
-                if ((tor = tr_torrentNew (data->ctor, NULL)))
+                if ((tor = tr_torrentNew (data->ctor, NULL, NULL)))
                 {
                     tr_list_prepend (&list, tor);
                     ++n;

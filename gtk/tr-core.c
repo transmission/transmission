@@ -1102,7 +1102,6 @@ gtr_core_add_torrent (TrCore * core, tr_torrent * tor, gboolean do_notify)
 static tr_torrent *
 core_create_new_torrent (TrCore * core, tr_ctor * ctor)
 {
-  int errcode = 0;
   tr_torrent * tor;
   bool do_trash = false;
   tr_session * session = gtr_core_session (core);
@@ -1111,7 +1110,7 @@ core_create_new_torrent (TrCore * core, tr_ctor * ctor)
    * doesn't have any concept of the glib trash API */
   tr_ctorGetDeleteSource (ctor, &do_trash);
   tr_ctorSetDeleteSource (ctor, FALSE);
-  tor = tr_torrentNew (ctor, &errcode);
+  tor = tr_torrentNew (ctor, NULL, NULL);
 
   if (tor && do_trash)
     {
@@ -1127,7 +1126,7 @@ core_create_new_torrent (TrCore * core, tr_ctor * ctor)
         }
     }
 
-    return tor;
+  return tor;
 }
 
 static int
