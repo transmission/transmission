@@ -182,7 +182,6 @@ createEasy (tr_session * s, struct tr_web * web, struct tr_web_task * task)
   task->timeout_secs = getTimeoutFromURL (task);
 
   curl_easy_setopt (e, CURLOPT_AUTOREFERER, 1L);
-  curl_easy_setopt (e, CURLOPT_COOKIEFILE, web->cookie_filename);
   curl_easy_setopt (e, CURLOPT_ENCODING, "gzip;q=1.0, deflate, identity");
   curl_easy_setopt (e, CURLOPT_FOLLOWLOCATION, 1L);
   curl_easy_setopt (e, CURLOPT_MAXREDIRS, -1L);
@@ -215,6 +214,9 @@ createEasy (tr_session * s, struct tr_web * web, struct tr_web_task * task)
 
   if (task->cookies != NULL)
     curl_easy_setopt (e, CURLOPT_COOKIE, task->cookies);
+
+  if (web->cookie_filename != NULL)
+    curl_easy_setopt (e, CURLOPT_COOKIEFILE, web->cookie_filename);
 
   if (task->range != NULL)
     {
@@ -370,6 +372,7 @@ tr_select (int nfds,
 static void
 tr_webThreadFunc (void * vsession)
 {
+  char * str;
   CURLM * multi;
   struct tr_web * web;
   int taskCount = 0;
@@ -395,7 +398,11 @@ tr_webThreadFunc (void * vsession)
       tr_logAddNamedInfo ("web", "NB: this only works if you built against libcurl with openssl or gnutls, NOT nss");
       tr_logAddNamedInfo ("web", "NB: invalid certs will show up as 'Could not connect to tracker' like many other errors");
     }
-  web->cookie_filename = tr_buildPath (session->configDir, "cookies.txt", NULL);
+
+  str = tr_buildPath (session->configDir, "cookies.txt", NULL);
+  if (tr_fileExists (str, NULL))
+    web->cookie_filename = tr_strdup (str);
+  tr_free (str);
 
   multi = curl_multi_init ();
   session->web = web;

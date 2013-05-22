@@ -2449,6 +2449,14 @@ tr_peerMsgsIsPeerInterested (const tr_peerMsgs * msgs)
 }
 
 bool
+tr_peerMsgsIsPeerDownloading (const tr_peerMsgs * msgs)
+{
+  assert (tr_isPeerMsgs (msgs));
+
+  return msgs->peer_is_interested && !msgs->peer_is_choked;
+}
+
+bool
 tr_peerMsgsIsClientChoked (const tr_peerMsgs * msgs)
 {
   assert (tr_isPeerMsgs (msgs));
@@ -2462,6 +2470,16 @@ tr_peerMsgsIsClientInterested (const tr_peerMsgs * msgs)
   assert (tr_isPeerMsgs (msgs));
 
   return msgs->client_is_interested;
+}
+
+bool
+tr_peerMsgsIsClientDownloading (const tr_peerMsgs * msgs)
+{
+  assert (tr_isPeerMsgs (msgs));
+
+  return msgs->client_is_interested
+     && !msgs->client_is_choked
+     && tr_torrentHasMetadata (msgs->torrent);
 }
 
 bool

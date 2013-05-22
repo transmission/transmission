@@ -48,9 +48,13 @@ bool         tr_peerMsgsIsPeerChoked         (const tr_peerMsgs        * msgs);
 
 bool         tr_peerMsgsIsPeerInterested     (const tr_peerMsgs        * msgs);
 
+bool         tr_peerMsgsIsPeerDownloading    (const tr_peerMsgs        * msgs);
+
 bool         tr_peerMsgsIsClientChoked       (const tr_peerMsgs        * msgs);
 
 bool         tr_peerMsgsIsClientInterested   (const tr_peerMsgs        * msgs);
+
+bool         tr_peerMsgsIsClientDownloading  (const tr_peerMsgs        * msgs);
 
 time_t       tr_peerMsgsGetConnectionAge     (const tr_peerMsgs        * msgs);
 

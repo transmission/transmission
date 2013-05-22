@@ -595,21 +595,6 @@ tr_peerMgrFree (tr_peerMgr * manager)
   tr_free (manager);
 }
 
-static int
-clientIsDownloadingFrom (const tr_torrent * tor, const tr_peerMsgs * p)
-{
-  if (!tr_torrentHasMetadata (tor))
-    return true;
-
-  return tr_peerMsgsIsClientInterested (p) && !tr_peerMsgsIsClientChoked (p);
-}
-
-static int
-clientIsUploadingTo (const tr_peerMsgs * p)
-{
-  return tr_peerMsgsIsPeerInterested (p) && !tr_peerMsgsIsPeerChoked (p);
-}
-
 /***
 ****
 ***/
@@ -2654,10 +2639,10 @@ tr_peerMgrTorrentStats (tr_torrent  * tor,
 
       ++setmePeersFrom[atom->fromFirst];
 
-      if (clientIsDownloadingFrom (tor, msgs))
+      if (tr_peerMsgsIsClientDownloading (msgs))
         ++*setmePeersSendingToUs;
 
-      if (clientIsUploadingTo (msgs))
+      if (tr_peerMsgsIsPeerDownloading (msgs))
         ++*setmePeersGettingFromUs;
     }
 
@@ -2735,8 +2720,8 @@ tr_peerMgrPeerStats (const tr_torrent * tor, int * setmeCount)
       stat->clientIsChoked      = tr_peerMsgsIsClientChoked (msgs);
       stat->clientIsInterested  = tr_peerMsgsIsClientInterested (msgs);
       stat->isIncoming          = tr_peerMsgsIsIncomingConnection (msgs);
-      stat->isDownloadingFrom   = clientIsDownloadingFrom (tor, msgs);
-      stat->isUploadingTo       = clientIsUploadingTo (msgs);
+      stat->isDownloadingFrom   = tr_peerMsgsIsClientDownloading (msgs);
+      stat->isUploadingTo       = tr_peerMsgsIsPeerDownloading (msgs);
       stat->isSeed              = peerIsSeed (peer);
 
       stat->blocksToPeer        = tr_historyGet (&peer->blocksSentToPeer,    now, CANCEL_HISTORY_SEC);
