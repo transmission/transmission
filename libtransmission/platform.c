@@ -357,7 +357,7 @@ tr_getDefaultConfigDir (const char * appname)
         {
           s = tr_strdup (s);
         }
-        else
+      else
         {
 #ifdef SYS_DARWIN
           s = tr_buildPath (getHomeDir (), "Library", "Application Support", appname, NULL);
