@@ -486,6 +486,19 @@ replicationNew (tr_swarm * s)
 }
 
 static void
+resetTorrentStats (tr_torrent * tor)
+{
+  int i;
+
+  tor->peerCount = 0;
+  tor->activePeerCount[TR_UP] = 0;
+  tor->activePeerCount[TR_DOWN] = 0;
+  tor->activeWebseedCount = 0;
+  for (i=0; i<TR_PEER_FROM__MAX; i++)
+    tor->peerFromCount[i] = 0;
+}
+
+static void
 swarmFree (void * vs)
 {
   tr_swarm * s = vs;
@@ -500,6 +513,7 @@ swarmFree (void * vs)
   tr_ptrArrayDestruct (&s->pool, (PtrArrayForeachFunc)tr_free);
   tr_ptrArrayDestruct (&s->outgoingHandshakes, NULL);
   tr_ptrArrayDestruct (&s->peers, NULL);
+  resetTorrentStats (s->tor);
 
   replicationFree (s);
 
@@ -519,6 +533,7 @@ rebuildWebseedArray (tr_swarm * s, tr_torrent * tor)
   /* clear the array */
   tr_ptrArrayDestruct (&s->webseeds, (PtrArrayForeachFunc)tr_peerFree);
   s->webseeds = TR_PTR_ARRAY_INIT;
+  s->tor->activeWebseedCount = 0;
 
   /* repopulate it */
   for (i=0; i<inf->webseedCount; ++i)
@@ -593,21 +608,6 @@ tr_peerMgrFree (tr_peerMgr * manager)
 
   managerUnlock (manager);
   tr_free (manager);
-}
-
-static int
-clientIsDownloadingFrom (const tr_torrent * tor, const tr_peerMsgs * p)
-{
-  if (!tr_torrentHasMetadata (tor))
-    return true;
-
-  return tr_peerMsgsIsClientInterested (p) && !tr_peerMsgsIsClientChoked (p);
-}
-
-static int
-clientIsUploadingTo (const tr_peerMsgs * p)
-{
-  return tr_peerMsgsIsPeerInterested (p) && !tr_peerMsgsIsPeerChoked (p);
 }
 
 /***
@@ -868,14 +868,22 @@ requestListRemove (tr_swarm * s, tr_block_index_t block, const tr_peer * peer)
 static int
 countActiveWebseeds (tr_swarm * s)
 {
-  int i;
-  int activeCount = 0;
-  const int n = tr_ptrArraySize (&s->webseeds);
-  const uint64_t now = tr_time_msec ();
+  int activeCount;
 
-  for (i=0; i<n; ++i)
-    if (tr_peerIsTransferringPieces (tr_ptrArrayNth(&s->webseeds,i), now, TR_DOWN, NULL))
-      ++activeCount;
+  if (s->tor->isRunning && !tr_torrentIsSeed (s->tor))
+    {
+      int i;
+      const int n = tr_ptrArraySize (&s->webseeds);
+      const uint64_t now = tr_time_msec ();
+
+      for (i=0; i<n; ++i)
+        if (tr_peerIsTransferringPieces (tr_ptrArrayNth(&s->webseeds,i), now, TR_DOWN, NULL))
+          ++activeCount;
+    }
+  else
+    {
+      activeCount = 0;
+    }
 
   return activeCount;
 }
@@ -1931,6 +1939,11 @@ createBitTorrentPeer (tr_torrent       * tor,
   atom->peer = peer;
 
   tr_ptrArrayInsertSorted (&swarm->peers, peer, peerCompare);
+  ++tor->peerCount;
+  ++tor->peerFromCount[atom->fromFirst];
+
+  assert (tor->peerCount == tr_ptrArraySize (&swarm->peers));
+  assert (tor->peerFromCount[atom->fromFirst] <= tor->peerCount);
 }
 
 
@@ -2419,19 +2432,17 @@ tr_peerMgrStartTorrent (tr_torrent * tor)
   rechokePulse (0, 0, s->manager);
 }
 
+static void removeAllPeers (tr_swarm *);
+
 static void
 stopSwarm (tr_swarm * swarm)
 {
-  tr_peer * peer;
-
   swarm->isRunning = false;
 
   replicationFree (swarm);
   invalidatePieceSorting (swarm);
 
-  /* disconnect the peers. */
-  while ((peer = tr_ptrArrayPop (&swarm->peers)))
-    tr_peerFree (peer);
+  removeAllPeers (swarm);
 
   /* disconnect the handshakes. handshakeAbort calls handshakeDoneCB (),
    * which removes the handshake from t->outgoingHandshakes... */
@@ -2521,6 +2532,13 @@ tr_peerMgrOnTorrentGotMetainfo (tr_torrent * tor)
   peers = (tr_peer**) tr_ptrArrayBase (&tor->swarm->peers);
   for (i=0; i<peerCount; ++i)
     tr_peerUpdateProgress (tor, peers[i]);
+
+  /* update the bittorrent peers' willingnes... */
+  for (i=0; i<peerCount; ++i)
+    {
+      tr_peerMsgsUpdateActive (tr_peerMsgsCast(peers[i]), TR_UP);
+      tr_peerMsgsUpdateActive (tr_peerMsgsCast(peers[i]), TR_DOWN);
+    }
 }
 
 void
@@ -2617,53 +2635,6 @@ tr_peerMgrGetDesiredAvailable (const tr_torrent * tor)
   return desiredAvailable;
 }
 
-void
-tr_peerMgrTorrentStats (tr_torrent  * tor,
-                        int         * setmePeersConnected,
-                        int         * setmeWebseedsSendingToUs,
-                        int         * setmePeersSendingToUs,
-                        int         * setmePeersGettingFromUs,
-                        int         * setmePeersFrom)
-{
-  int i;
-  int n;
-  tr_swarm * s;
-
-  assert (tr_isTorrent (tor));
-
-  *setmePeersConnected       = 0;
-  *setmePeersGettingFromUs   = 0;
-  *setmePeersSendingToUs     = 0;
-  *setmeWebseedsSendingToUs  = 0;
-
-  s = tor->swarm;
-  n = tr_ptrArraySize (&s->peers);
-
-  for (i=0; i<TR_PEER_FROM__MAX; ++i)
-    setmePeersFrom[i] = 0;
-
-  for (i=0; i<n; ++i)
-    {
-      tr_peer * peer = tr_ptrArrayNth (&s->peers, i);
-      tr_peerMsgs * msgs = PEER_MSGS (peer);
-      const struct peer_atom * atom = peer->atom;
-
-      assert (msgs != NULL);
-
-      ++*setmePeersConnected;
-
-      ++setmePeersFrom[atom->fromFirst];
-
-      if (clientIsDownloadingFrom (tor, msgs))
-        ++*setmePeersSendingToUs;
-
-      if (clientIsUploadingTo (msgs))
-        ++*setmePeersGettingFromUs;
-    }
-
-  *setmeWebseedsSendingToUs = countActiveWebseeds (s);
-}
-
 double*
 tr_peerMgrWebSpeeds_KBps (const tr_torrent * tor)
 {
@@ -2735,8 +2706,8 @@ tr_peerMgrPeerStats (const tr_torrent * tor, int * setmeCount)
       stat->clientIsChoked      = tr_peerMsgsIsClientChoked (msgs);
       stat->clientIsInterested  = tr_peerMsgsIsClientInterested (msgs);
       stat->isIncoming          = tr_peerMsgsIsIncomingConnection (msgs);
-      stat->isDownloadingFrom   = clientIsDownloadingFrom (tor, msgs);
-      stat->isUploadingTo       = clientIsUploadingTo (msgs);
+      stat->isDownloadingFrom   = tr_peerMsgsIsActive (msgs, TR_PEER_TO_CLIENT);
+      stat->isUploadingTo       = tr_peerMsgsIsActive (msgs, TR_CLIENT_TO_PEER);
       stat->isSeed              = peerIsSeed (peer);
 
       stat->blocksToPeer        = tr_historyGet (&peer->blocksSentToPeer,    now, CANCEL_HISTORY_SEC);
@@ -3181,14 +3152,11 @@ rechokePulse (int foo UNUSED, short bar UNUSED, void * vmgr)
 
   while ((tor = tr_torrentNext (mgr->session, tor)))
     {
-      if (tor->isRunning)
+      if (tor->isRunning && tor->peerCount)
         {
           tr_swarm * s = tor->swarm;
-          if (!tr_ptrArrayEmpty (&s->peers))
-            {
-              rechokeUploads (s, now);
-              rechokeDownloads (s);
-            }
+          rechokeUploads (s, now);
+          rechokeDownloads (s);
         }
     }
 
@@ -3321,11 +3289,16 @@ removePeer (tr_swarm * s, tr_peer * peer)
   atom->time = tr_time ();
 
   removed = tr_ptrArrayRemoveSorted (&s->peers, peer, peerCompare);
+  --s->tor->peerCount;
+  --s->tor->peerFromCount[atom->fromFirst];
 
   if (replicationExists (s))
     tr_decrReplicationFromBitfield (s, &peer->have);
 
   assert (removed == peer);
+  assert (s->tor->peerCount == tr_ptrArraySize (&s->peers));
+  assert (s->tor->peerFromCount[atom->fromFirst] >= 0);
+
   tr_peerFree (removed);
 }
 
@@ -3362,6 +3335,8 @@ removeAllPeers (tr_swarm * s)
 {
   while (!tr_ptrArrayEmpty (&s->peers))
     removePeer (s, tr_ptrArrayNth (&s->peers, 0));
+
+  assert (!s->tor->peerCount);
 }
 
 static void
@@ -3645,6 +3620,9 @@ bandwidthPulse (int foo UNUSED, short bar UNUSED, void * vmgr)
          earlier during the peer-io callback call chain */
       if (tor->isStopping)
         tr_torrentStop (tor);
+
+      /* update the torrent's stats */
+      tor->activeWebseedCount = countActiveWebseeds (tor->swarm);
     }
 
   /* pump the queues */

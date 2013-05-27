@@ -226,6 +226,11 @@ struct tr_torrent
     int                        secondsDownloading;
     int                        secondsSeeding;
 
+    int                        peerCount;
+    int                        peerFromCount[TR_PEER_FROM__MAX];
+    int                        activePeerCount[2];
+    int                        activeWebseedCount;
+
     int                        queuePosition;
 
     tr_torrent_metadata_func  * metadata_func;

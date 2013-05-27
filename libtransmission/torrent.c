@@ -1255,6 +1255,7 @@ tr_torrentStat (tr_torrent * tor)
   const uint64_t now = tr_time_msec ();
   unsigned int pieceUploadSpeed_Bps;
   unsigned int pieceDownloadSpeed_Bps;
+  int i;
 
   assert (tr_isTorrent (tor));
 
@@ -1270,12 +1271,12 @@ tr_torrentStat (tr_torrent * tor)
 
   s->manualAnnounceTime = tr_announcerNextManualAnnounce (tor);
 
-  tr_peerMgrTorrentStats (tor,
-                          &s->peersConnected,
-                          &s->webseedsSendingToUs,
-                          &s->peersSendingToUs,
-                          &s->peersGettingFromUs,
-                          s->peersFrom);
+  s->peersConnected      = tor->peerCount;
+  s->peersSendingToUs    = tor->activePeerCount[TR_DOWN];
+  s->peersGettingFromUs  = tor->activePeerCount[TR_UP];
+  s->webseedsSendingToUs = tor->activeWebseedCount;
+  for (i=0; i<TR_PEER_FROM__MAX; i++)
+    s->peersFrom[i] = tor->peerFromCount[i];
 
   s->rawUploadSpeed_KBps     = toSpeedKBps (tr_bandwidthGetRawSpeed_Bps (&tor->bandwidth, now, TR_UP));
   s->rawDownloadSpeed_KBps   = toSpeedKBps (tr_bandwidthGetRawSpeed_Bps (&tor->bandwidth, now, TR_DOWN));

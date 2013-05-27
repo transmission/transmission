@@ -170,13 +170,6 @@ void         tr_peerMgrOnTorrentGotMetainfo (tr_torrent         * tor);
 
 void         tr_peerMgrOnBlocklistChanged   (tr_peerMgr         * manager);
 
-void         tr_peerMgrTorrentStats         (tr_torrent         * tor,
-                                             int                * setmePeersConnected,
-                                             int                * setmeWebseedsSendingToUs,
-                                             int                * setmePeersSendingToUs,
-                                             int                * setmePeersGettingFromUs,
-                                             int                * setmePeersFrom); /* TR_PEER_FROM__MAX */
-
 struct tr_peer_stat * tr_peerMgrPeerStats   (const tr_torrent   * tor,
                                              int                * setmeCount);
 

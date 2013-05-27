@@ -198,6 +198,8 @@ struct tr_peerMsgs
 
   int prefetchCount;
 
+  int is_active[2];
+
   /* how long the outMessages batch should be allowed to grow before
    * it's flushed -- some messages (like requests >:) should be sent
    * very quickly; others aren't as urgent. */
@@ -267,6 +269,11 @@ getSession (struct tr_peerMsgs * msgs)
 /**
 ***
 **/
+
+static void
+myDebug (const char * file, int line,
+         const struct tr_peerMsgs * msgs,
+         const char * fmt, ...) TR_GNUC_PRINTF(4, 5);
 
 static void
 myDebug (const char * file, int line,
@@ -678,6 +685,66 @@ updateFastSet (tr_peerMsgs * msgs UNUSED)
 }
 #endif
 
+/***
+****  ACTIVE
+***/
+
+bool
+tr_peerMsgsIsActive (const tr_peerMsgs  * msgs, tr_direction direction)
+{
+  assert (tr_isPeerMsgs (msgs));
+  assert (tr_isDirection (direction));
+
+  return msgs->is_active[direction];
+}
+
+static void
+tr_peerMsgsSetActive (tr_peerMsgs  * msgs,
+                      tr_direction   direction,
+                      bool           is_active)
+{
+  if (msgs->is_active[direction] != is_active)
+    {
+      int n = msgs->torrent->activePeerCount[direction];
+
+      msgs->is_active[direction] = is_active;
+
+      if (is_active)
+        ++n;
+      else
+        --n;
+      assert (0 <= n);
+      assert (n <= msgs->torrent->peerCount);
+
+      msgs->torrent->activePeerCount[direction] = n;
+    }
+}
+
+void
+tr_peerMsgsUpdateActive (tr_peerMsgs * msgs, tr_direction direction)
+{
+  bool active;
+
+  assert (tr_isPeerMsgs (msgs));
+  assert (tr_isDirection (direction));
+
+  if (direction == TR_CLIENT_TO_PEER)
+    {
+      active = tr_peerMsgsIsPeerInterested (msgs)
+           && !tr_peerMsgsIsPeerChoked (msgs);
+    }
+  else /* TR_PEER_TO_CLIENT */
+    {
+      if (!tr_torrentHasMetadata (msgs->torrent))
+        active = true;
+      else
+        active = tr_peerMsgsIsClientInterested (msgs)
+             && !tr_peerMsgsIsClientChoked (msgs);
+    }
+
+  tr_peerMsgsSetActive (msgs, direction, active);
+}
+
 /**
 ***  INTEREST
 **/
@@ -711,7 +778,11 @@ tr_peerMsgsSetInterested (tr_peerMsgs * msgs, bool b)
   assert (tr_isBool (b));
 
   if (msgs->client_is_interested != b)
-    sendInterest (msgs, b);
+    {
+      sendInterest (msgs, b);
+
+      tr_peerMsgsUpdateActive (msgs, TR_PEER_TO_CLIENT);
+    }
 }
 
 static bool
@@ -1416,22 +1487,26 @@ readBtMessage (tr_peerMsgs * msgs, struct evbuffer * inbuf, size_t inlen)
             msgs->client_is_choked = true;
             if (!fext)
                 fireGotChoke (msgs);
+            tr_peerMsgsUpdateActive (msgs, TR_PEER_TO_CLIENT);
             break;
 
         case BT_UNCHOKE:
             dbgmsg (msgs, "got Unchoke");
             msgs->client_is_choked = false;
+            tr_peerMsgsUpdateActive (msgs, TR_PEER_TO_CLIENT);
             updateDesiredRequestCount (msgs);
             break;
 
         case BT_INTERESTED:
             dbgmsg (msgs, "got Interested");
             msgs->peer_is_interested = true;
+            tr_peerMsgsUpdateActive (msgs, TR_CLIENT_TO_PEER);
             break;
 
         case BT_NOT_INTERESTED:
             dbgmsg (msgs, "got Not Interested");
             msgs->peer_is_interested = false;
+            tr_peerMsgsUpdateActive (msgs, TR_CLIENT_TO_PEER);
             break;
 
         case BT_HAVE:
@@ -2393,6 +2468,9 @@ peermsgs_destruct (tr_peer * peer)
 
   assert (msgs != NULL);
 
+  tr_peerMsgsSetActive (msgs, TR_UP, false);
+  tr_peerMsgsSetActive (msgs, TR_DOWN, false);
+
   if (msgs->pexTimer != NULL)
     event_free (msgs->pexTimer);
 
@@ -2417,7 +2495,7 @@ peermsgs_destruct (tr_peer * peer)
 static const struct tr_peer_virtual_funcs my_funcs =
 {
   .destruct = peermsgs_destruct,
-  .is_transferring_pieces = peermsgs_is_transferring_pieces
+  .is_transferring_pieces = peermsgs_is_transferring_pieces,
 };
 
 /***
@@ -2526,6 +2604,8 @@ tr_peerMsgsNew (struct tr_torrent    * torrent,
   m->peer_is_choked = true;
   m->client_is_interested = false;
   m->peer_is_interested = false;
+  m->is_active[TR_UP] = false;
+  m->is_active[TR_DOWN] = false;
   m->callback = callback;
   m->callbackData = callbackData;
   m->io = io;
