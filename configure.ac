@@ -178,6 +178,25 @@ AC_CHECK_HEADERS([sys/statvfs.h \
 
 dnl ----------------------------------------------------------------------------
 dnl
+dnl file monitoring for the daemon
+
+# Check whether to enable systemd startup notification.
+# This requires libsystemd-daemon.
+AC_ARG_WITH([systemd-daemon], AS_HELP_STRING([--with-systemd-daemon],
+            [Add support for systemd startup notification (default is autodetected)])
+            [USE_SYSTEMD_DAEMON=$withval], [USE_SYSTEMD_DAEMON=auto])
+AS_IF([test "x$USE_SYSTEMD_DAEMON" != "xno"], [
+    PKG_CHECK_MODULES([SYSTEMD_DAEMON], [libsystemd-daemon],
+        [AC_DEFINE(USE_SYSTEMD_DAEMON,1,[Use systemd startup notification])],
+        [AS_IF([test "x$USE_SYSTEMD_DAEMON" = "xyes"],
+            [AC_MSG_ERROR([systemd startup notification support requested, but libsystemd-daemon not found.])]
+        )]
+    )
+])
+
+
+dnl ----------------------------------------------------------------------------
+dnl
 dnl  dht
 
 DHT_CFLAGS="-I\$(top_srcdir)/third-party/dht"

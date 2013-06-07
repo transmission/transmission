@@ -30,6 +30,13 @@
 #include <libtransmission/variant.h>
 #include <libtransmission/version.h>
 
+#ifdef USE_SYSTEMD_DAEMON
+ #include <systemd/sd-daemon.h>
+#else
+ static void sd_notify (int status UNUSED, const char * str UNUSED) { }
+ static void sd_notifyf (int status UNUSED, const char * fmt UNUSED, ...) { }
+#endif
+
 #include "watch.h"
 
 #define MY_NAME "transmission-daemon"
@@ -508,6 +515,8 @@ main (int argc, char ** argv)
         exit (1);
     }
 
+    sd_notifyf (0, "MAINPID=%d\n", (int)getpid()); 
+
     /* start the session */
     tr_formatter_mem_init (MEM_K, MEM_K_STR, MEM_M_STR, MEM_G_STR, MEM_T_STR);
     tr_formatter_size_init (DISK_K, DISK_K_STR, DISK_M_STR, DISK_G_STR, DISK_T_STR);
@@ -573,12 +582,27 @@ main (int argc, char ** argv)
         openlog (MY_NAME, LOG_CONS|LOG_PID, LOG_DAEMON);
 #endif
 
-    while (!closing) {
-        tr_wait_msec (1000); /* sleep one second */
-        dtr_watchdir_update (watchdir);
-        pumpLogMessages (logfile);
-    }
+  sd_notify( 0, "READY=1\n" ); 
 
+  while (!closing)
+    { 
+      double up;
+      double dn;
+
+      tr_wait_msec (1000); /* sleep one second */ 
+
+      dtr_watchdir_update (watchdir); 
+      pumpLogMessages (logfile); 
+
+      up = tr_sessionGetRawSpeed_KBps (mySession, TR_UP);
+      dn = tr_sessionGetRawSpeed_KBps (mySession, TR_DOWN);
+      if (up>0 || dn>0)
+        sd_notifyf (0, "STATUS=Uploading %.2f KBps, Downloading %.2f KBps.\n", up, dn); 
+      else
+        sd_notify (0, "STATUS=Idle.\n"); 
+    } 
+
+    sd_notify( 0, "STATUS=Closing transmission session...\n" );
     printf ("Closing transmission session...");
     tr_sessionSaveSettings (mySession, configDir, &settings);
     dtr_watchdir_free (watchdir);
@@ -599,5 +623,6 @@ main (int argc, char ** argv)
     if (pidfile_created)
         tr_remove (pid_filename);
     tr_variantFree (&settings);
+    sd_notify (0, "STATUS=\n");
     return 0;
 }
