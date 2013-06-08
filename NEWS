@@ -2,7 +2,7 @@
 [http://trac.transmissionbt.com/query?milestone=2.80&group=component&order=severity All tickets closed by this release]
 ==== All Platforms ====
   * Support renaming a transfer's files and folders
-  * Better use of the OS' filesystem cache
+  * Better use of the OS's filesystem cache
   * Lengthen the prefetch cache for data sent to peers
   * Faster parsing of JSON data and bencoded data
   * Fewer public API calls in libtransmission need thread locks (ie, fewer beachballs)
@@ -13,10 +13,10 @@
   * Improved unit tests in libtransmission
   * Tarballs are now released only in .xz format
 ==== Mac Client ====
-  * VDKQueue
+  * Use VDKQueue for watching for torrent files
 ==== GTK+ Client ====
-  * Simplify the tracker filter pulldown's interface; now matches the Qt client
-  * Synced preferences text & shortcuts in the GTK+ and Qt clients
+  * Simplify the tracker filter pulldown's interface (now matches the Qt client)
+  * Synced preferences text & shortcuts
   * Remove deprecated calls to gdk_threads_enter()
   * Silence a handful of console warnings
 ==== Qt Client ====
@@ -26,7 +26,7 @@
   * Fix an issue with the tray icon preventing hibernation/logout
   * Other CPU speedups
   * Open the correct folder when clicking on single-file torrents
-  * Synced preferences text & shortcuts in the GTK+ and Qt clients
+  * Synced preferences text & shortcuts
   * Fix non Latin-1 unit strings
 ==== Daemon ====
   * Add support for specifying recently-active torrents in transmission-remote
