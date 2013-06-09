@@ -4,7 +4,7 @@ Description=Transmission BitTorrent Daemon
 [Service]
 User=transmission
 Type=notify
-ExecStart=/usr/bin/transmission-daemon -f --config-dir /var/lib/transmission/.config/transmission --log-error
+ExecStart=/usr/bin/transmission-daemon -f --log-error
 
 [Install]
 WantedBy=multi-user.target
