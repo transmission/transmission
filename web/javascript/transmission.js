@@ -41,7 +41,6 @@ Transmission.prototype =
 		Prefs.getClutchPrefs(this);
 
 		// Set up user events
-		$(".numberinput").forceNumeric();
 		$('#toolbar-pause').click($.proxy(this.stopSelectedClicked,this));
 		$('#toolbar-start').click($.proxy(this.startSelectedClicked,this));
 		$('#toolbar-pause-all').click($.proxy(this.stopAllClicked,this));
