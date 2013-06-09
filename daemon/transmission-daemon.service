@@ -1,12 +1,9 @@
 [Unit]
 Description=Transmission BitTorrent Daemon
 
-# This assumes that a user 'transmission' exists, with a writeable homedirectory,
-# and that /run/transmission exists and is writeable by the transmission user.
-
 [Service]
 User=transmission
-Type=simple
+Type=notify
 ExecStart=/usr/bin/transmission-daemon -f --config-dir /var/lib/transmission/.config/transmission --log-error
 
 [Install]
