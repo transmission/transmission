@@ -1669,7 +1669,7 @@ cancelAllRequestsForBlock (tr_swarm          * s,
     {
       tr_peer * p = peers[i];
 
-      if ((p != no_notify) && (p != NULL))
+      if ((p != no_notify) && tr_isPeerMsgs (p))
         {
           tr_historyAdd (&p->cancelsSentToPeer, tr_time (), 1);
           tr_peerMsgsCancel (PEER_MSGS(p), block);
