@@ -1407,13 +1407,24 @@ TrMainWindow :: dragEnterEvent (QDragEnterEvent * event)
 void
 TrMainWindow :: dropEvent (QDropEvent * event)
 {
-  QString key = event->mimeData ()->text ().trimmed ();
+  const QStringList list = event->mimeData()->text().trimmed().split('\n');
 
-  const QUrl url (key);
-  if (url.scheme () == "file")
-    key = QUrl::fromPercentEncoding (url.path ().toUtf8 ());
+  foreach (QString entry, list)
+    {
+      QString key = entry.trimmed();
 
-  dynamic_cast<MyApp*> (QApplication::instance ())->addTorrent (key);
+      if (!key.isEmpty())
+        {
+          const QUrl url (key);
+
+          if (url.scheme () == "file")
+            key = QUrl::fromPercentEncoding (url.path().toUtf8());
+
+          dynamic_cast<MyApp*> (QApplication::instance ())->addTorrent (key);
+        }
+    }
+
+  qDebug() << "Added " << list.size() << " entries.";
 }
 
 /***
