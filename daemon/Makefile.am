@@ -11,6 +11,9 @@ AM_CFLAGS = \
 AM_LDFLAGS = \
     @ZLIB_LDFLAGS@
 
+EXTRA_DIST = \
+    transmission-daemon.service
+
 dist_man_MANS = \
     transmission-daemon.1 \
     transmission-remote.1
