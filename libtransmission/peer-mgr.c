@@ -868,7 +868,7 @@ requestListRemove (tr_swarm * s, tr_block_index_t block, const tr_peer * peer)
 static int
 countActiveWebseeds (tr_swarm * s)
 {
-  int activeCount;
+  int activeCount = 0;
 
   if (s->tor->isRunning && !tr_torrentIsSeed (s->tor))
     {
@@ -879,10 +879,6 @@ countActiveWebseeds (tr_swarm * s)
       for (i=0; i<n; ++i)
         if (tr_peerIsTransferringPieces (tr_ptrArrayNth(&s->webseeds,i), now, TR_DOWN, NULL))
           ++activeCount;
-    }
-  else
-    {
-      activeCount = 0;
     }
 
   return activeCount;
