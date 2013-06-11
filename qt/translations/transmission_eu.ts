@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS><TS version="1.1" language="eu">
+<!DOCTYPE TS><TS version="1.1" language="en">
 <context>
     <name>AboutDialog</name>
     <message>
@@ -33,7 +33,7 @@
         <translation>&amp;Baimena</translation>
     </message>
     <message>
-        <location filename="" line="13"/>
+        <location filename="" line="15"/>
         <source>Credits</source>
         <translation>Kreditoak</translation>
     </message>
@@ -41,7 +41,7 @@
 <context>
     <name>Details</name>
     <message>
-        <location filename="../details.cc" line="158"/>
+        <location filename="../details.cc" line="169"/>
         <source>Torrent Properties</source>
         <translation>Torrent Ezaugarriak</translation>
     </message>
@@ -71,21 +71,22 @@
         <translation>Aukerak</translation>
     </message>
     <message>
-        <location filename="" line="179"/>
+        <location filename="" line="187"/>
         <source>None</source>
         <translation>Ezer ez</translation>
     </message>
     <message>
         <location filename="" line="1"/>
         <source>Mixed</source>
-        <translation>Nahastuta</translation>
+        <translation>Nahastua</translation>
     </message>
     <message>
-        <location filename="" line="177"/>
+        <location filename="" line="206"/>
         <source>Unknown</source>
         <translation>Ezezaguna</translation>
     </message>
     <message>
+        <location filename="" line="206"/>
         <source>Finished</source>
         <translation>Amaituta</translation>
     </message>
@@ -95,7 +96,7 @@
         <translation>Pausatuta</translation>
     </message>
     <message>
-        <location filename="" line="164"/>
+        <location filename="" line="192"/>
         <source>Active now</source>
         <translation>Jardunean orain</translation>
     </message>
@@ -105,7 +106,7 @@
         <translation>Duela %1</translation>
     </message>
     <message numerus="yes">
-        <location filename="" line="41"/>
+        <location filename="" line="51"/>
         <source>%1 (%Ln pieces @ %2)</source>
         <translation>
             <numerusform>%1 (%Ln atal @ %2)</numerusform>
@@ -121,17 +122,17 @@
         </translation>
     </message>
     <message>
-        <location filename="" line="24"/>
+        <location filename="" line="26"/>
         <source>Private to this tracker -- DHT and PEX disabled</source>
         <translation>Aztarnari honen pribatua -- DHT eta PEX ezgaituta</translation>
     </message>
     <message>
         <location filename="" line="1"/>
         <source>Public torrent</source>
-        <translation>Torrent pubilkoa</translation>
+        <translation>Torrent publikoa</translation>
     </message>
     <message>
-        <location filename="" line="39"/>
+        <location filename="" line="48"/>
         <source>Created by %1</source>
         <translation>Sortzailea: %1</translation>
     </message>
@@ -146,13 +147,14 @@
         <translation>Sortua: %1 %2-an</translation>
     </message>
     <message>
-        <location filename="" line="21"/>
+        <location filename="" line="23"/>
         <source>Encrypted connection</source>
         <translation>Elkarkaketa enkriptatua</translation>
     </message>
     <message>
+        <location filename="" line="23"/>
         <source>Optimistic unchoke</source>
-        <translation> Igogabetasun baikorra</translation>
+        <translation> Itogabetasun baikorra</translation>
     </message>
     <message>
         <location filename="" line="1"/>
@@ -172,12 +174,12 @@
     <message>
         <location filename="" line="1"/>
         <source>We would upload to this peer if they asked</source>
-        <translation>Hartzaile hontara igoko genuek bereiek galdetuz gero</translation>
+        <translation>Hartzaile honetara igoko genuke beraiek galdetuz gero</translation>
     </message>
     <message>
         <location filename="" line="1"/>
         <source>Peer has unchoked us, but we&apos;re not interested</source>
-        <translation>Hartzaileak itogabetu  gaitu, baina ez gaude interesaturik</translation>
+        <translation>Hartzaileak itogabetu gaitu, baina ez gaude interesaturik</translation>
     </message>
     <message>
         <location filename="" line="1"/>
@@ -200,7 +202,7 @@
         <translation>Hartzailea barrurako elkarketa bat da</translation>
     </message>
     <message>
-        <location filename="" line="57"/>
+        <location filename="" line="61"/>
         <source>Activity</source>
         <translation>Jarduera</translation>
     </message>
@@ -285,10 +287,12 @@
         <translation>Akatsa</translation>
     </message>
     <message>
+        <location filename="" line="34"/>
         <source>Tracker already exists.</source>
         <translation>Aztarnaria jadanik badago.</translation>
     </message>
     <message>
+        <location filename="" line="34"/>
         <source>%1 (100%)</source>
         <translation>%1 (100%)</translation>
     </message>
@@ -300,30 +304,30 @@
     <message>
         <location filename="" line="7"/>
         <source>%1 of %2 (%3%), %4 Unverified</source>
-        <translation>%1 --&gt; %2 (%3%), %4 Egiaztatugabe</translation>
+        <translation>%1 --&gt; %2 (%3%), %4 Egiaztatu gabe</translation>
     </message>
     <message>
-        <location filename="" line="34"/>
+        <location filename="" line="35"/>
         <source>%1 (%2 corrupt)</source>
         <translation>%1 (%2 hondatuta)</translation>
     </message>
     <message>
-        <location filename="" line="15"/>
+        <location filename="" line="20"/>
         <source>%1 (Ratio: %2)</source>
         <translation>%1 (Maila: %2)</translation>
     </message>
     <message>
-        <location filename="" line="181"/>
+        <location filename="" line="219"/>
         <source>N/A</source>
         <translation>E/G</translation>
     </message>
     <message>
-        <location filename="" line="148"/>
+        <location filename="" line="153"/>
         <source>Peer is connected over uTP</source>
         <translation>Hartzailea uTP bidez elkarketaturik dago</translation>
     </message>
     <message>
-        <location filename="" line="70"/>
+        <location filename="" line="74"/>
         <source>Size:</source>
         <translation>Neurria:</translation>
     </message>
@@ -343,13 +347,14 @@
         <translation>URL baliogabea &quot;%1&quot;</translation>
     </message>
     <message>
+        <location filename="" line="46"/>
         <source>Edit URL </source>
         <translation>Editatu URL-a </translation>
     </message>
     <message>
         <location filename="" line="1"/>
         <source>Edit tracker announce URL:</source>
-        <translation>Editatu aztarnari iragerpen URL-a:</translation>
+        <translation>Editatu aztarnari iragarpen URL-a:</translation>
     </message>
     <message>
         <location filename="" line="60"/>
@@ -364,12 +369,12 @@
     <message>
         <location filename="" line="5"/>
         <source>Limit &amp;download speed (%1):</source>
-        <translation>Mugatu &amp;jeisketa abiadura (%1):</translation>
+        <translation>&amp;Mugatu jeisketa abiadura (%1):</translation>
     </message>
     <message>
         <location filename="" line="12"/>
         <source>Limit &amp;upload speed (%1):</source>
-        <translation>&amp;Mugatu igoera abiadura (%1):</translation>
+        <translation>M&amp;ugatu igoera abiadura (%1):</translation>
     </message>
     <message>
         <location filename="" line="13"/>
@@ -389,7 +394,7 @@
     <message>
         <location filename="" line="2"/>
         <source>Torrent &amp;priority:</source>
-        <translation>Torrent &amp;lehentasuna:</translation>
+        <translation>&amp;Torrent lehentasuna:</translation>
     </message>
     <message>
         <location filename="" line="4"/>
@@ -402,6 +407,7 @@
         <translation>Erabili Ezarpen Orokorrak</translation>
     </message>
     <message>
+        <location filename="" line="15"/>
         <source>Seed regardless of ratio</source>
         <translation>Emaritu maila kontuan izan gabe</translation>
     </message>
@@ -413,7 +419,7 @@
     <message>
         <location filename="" line="8"/>
         <source>&amp;Ratio:</source>
-        <translation>&amp;Maila:</translation>
+        <translation>M&amp;aila:</translation>
     </message>
     <message>
         <location filename="" line="6"/>
@@ -441,7 +447,22 @@
         <translation>&amp;Gehienezko hartzaile:</translation>
     </message>
     <message>
-        <location filename="" line="75"/>
+        <location filename="" line="46"/>
+        <source>Add Tracker</source>
+        <translation>Gehitu Aztarnaria</translation>
+    </message>
+    <message>
+        <location filename="" line="7"/>
+        <source>Edit Tracker</source>
+        <translation>Editatu Aztarnaria</translation>
+    </message>
+    <message>
+        <location filename="" line="9"/>
+        <source>Remove Trackers</source>
+        <translation>Kendu Aztarnariak</translation>
+    </message>
+    <message>
+        <location filename="" line="13"/>
         <source>Show &amp;more details</source>
         <translation>Erakutsi &amp;xehetasun gehiago</translation>
     </message>
@@ -484,7 +505,7 @@
 <context>
     <name>FileAdded</name>
     <message>
-        <location filename="../options.cc" line="75"/>
+        <location filename="../options.cc" line="76"/>
         <source>Error Adding Torrent</source>
         <translation>Akatsa Torrenta Gehitzerakoan</translation>
     </message>
@@ -492,7 +513,7 @@
 <context>
     <name>FileTreeItem</name>
     <message>
-        <location filename="../file-tree.cc" line="169"/>
+        <location filename="../file-tree.cc" line="271"/>
         <source>Low</source>
         <translation>Apala</translation>
     </message>
@@ -509,28 +530,33 @@
     <message>
         <location filename="" line="1"/>
         <source>Mixed</source>
-        <translation>Nahastuta</translation>
+        <translation>Nahastua</translation>
     </message>
 </context>
 <context>
     <name>FileTreeModel</name>
     <message>
-        <location filename="" line="135"/>
+        <location filename="" line="192"/>
         <source>File</source>
         <translation>Agiria</translation>
     </message>
     <message>
-        <location filename="" line="1"/>
+        <location filename="" line="4"/>
+        <source>Size</source>
+        <translation>Neurria</translation>
+    </message>
+    <message>
+        <location filename="" line="4"/>
         <source>Progress</source>
         <translation>Garapena</translation>
     </message>
     <message>
-        <location filename="" line="1"/>
+        <location filename="" line="4"/>
         <source>Download</source>
         <translation>Jeitsi</translation>
     </message>
     <message>
-        <location filename="" line="1"/>
+        <location filename="" line="4"/>
         <source>Priority</source>
         <translation>Lehentasuna</translation>
     </message>
@@ -538,11 +564,12 @@
 <context>
     <name>FilterBar</name>
     <message>
-        <location filename="" line="157"/>
+        <location filename="" line="160"/>
         <source>All</source>
         <translation>Denak</translation>
     </message>
     <message>
+        <location filename="" line="160"/>
         <source>Active</source>
         <translation>Jardunean</translation>
     </message>
@@ -574,12 +601,20 @@
     <message>
         <location filename="" line="4"/>
         <source>Error</source>
-        <translation>Akastunak</translation>
+        <translation>Akatsa</translation>
     </message>
     <message>
-        <location filename="" line="157"/>
+        <location filename="" line="348"/>
         <source>Show:</source>
         <translation>Erakutsi:</translation>
+    </message>
+    <message numerus="yes">
+        <location filename="" line="2"/>
+        <source>Show %Ln of:</source>
+        <translation>
+            <numerusform>Erakutsi %Ln -&gt;:</numerusform>
+            <numerusform>Erakutsi %Ln -&gt;:</numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -595,6 +630,7 @@
         <translation>B</translation>
     </message>
     <message>
+        <location filename="" line="13"/>
         <source>KiB/s</source>
         <translation>KiB/s</translation>
     </message>
@@ -654,6 +690,7 @@
         <translation>TiB</translation>
     </message>
     <message>
+        <location filename="" line="21"/>
         <source>kB</source>
         <translation>kB</translation>
     </message>
@@ -678,13 +715,18 @@
         <translation>Ezezaguna</translation>
     </message>
     <message>
-        <location filename="" line="12"/>
+        <location filename="" line="14"/>
         <source>None</source>
         <translation>Ezer ez</translation>
     </message>
+    <message>
+        <location filename="" line="8"/>
+        <source>%1 %2</source>
+        <translation>%1 %2</translation>
+    </message>
     <message numerus="yes">
-        <location filename="" line="37"/>
-        <source>%Ln day(s)</source>
+        <location filename="" line="32"/>
+        <source>%Ln day (s)</source>
         <translation>
             <numerusform>%Ln egun</numerusform>
             <numerusform>%Ln egun</numerusform>
@@ -692,7 +734,7 @@
     </message>
     <message numerus="yes">
         <location filename="" line="1"/>
-        <source>%Ln hour(s)</source>
+        <source>%Ln hour (s)</source>
         <translation>
             <numerusform>%Ln ordu</numerusform>
             <numerusform>%Ln ordu</numerusform>
@@ -700,7 +742,7 @@
     </message>
     <message numerus="yes">
         <location filename="" line="1"/>
-        <source>%Ln minute(s)</source>
+        <source>%Ln minute (s)</source>
         <translation>
             <numerusform>%Ln minutu</numerusform>
             <numerusform>%Ln minutu</numerusform>
@@ -708,7 +750,7 @@
     </message>
     <message numerus="yes">
         <location filename="" line="1"/>
-        <source>%Ln second(s)</source>
+        <source>%Ln second (s)</source>
         <translation>
             <numerusform>%Ln segundu</numerusform>
             <numerusform>%Ln segundu</numerusform>
@@ -721,11 +763,24 @@
     </message>
 </context>
 <context>
+    <name>FreespaceLabel</name>
+    <message>
+        <location filename="../freespace-label.cc" line="50"/>
+        <source>&lt;i&gt;Calculating Free Space...&lt;/i&gt;</source>
+        <translation>&lt;i&gt;Toki Askea Kalkulatzen...&lt;/i&gt;</translation>
+    </message>
+    <message>
+        <location filename="" line="38"/>
+        <source>%1 free</source>
+        <translation>%1 aske</translation>
+    </message>
+</context>
+<context>
     <name>LicenseDialog</name>
     <message>
         <location filename="../license.cc" line="22"/>
         <source>License</source>
-        <translation></translation>
+        <translation>Baimena</translation>
     </message>
 </context>
 <context>
@@ -741,7 +796,7 @@
         <translation>&amp;Torrenta</translation>
     </message>
     <message>
-        <location filename="" line="30"/>
+        <location filename="" line="29"/>
         <source>&amp;Edit</source>
         <translation>&amp;Editatu</translation>
     </message>
@@ -801,15 +856,17 @@
         <translation>Ireki torrentaren agiritegia</translation>
     </message>
     <message>
+        <location filename="" line="8"/>
         <source>Ctrl+O</source>
         <translation>Ktrl+O</translation>
     </message>
     <message>
+        <location filename="" line="8"/>
         <source>Queue</source>
         <translation>Lerrokatu</translation>
     </message>
     <message>
-        <location filename="" line="126"/>
+        <location filename="" line="125"/>
         <source>&amp;Open...</source>
         <translation>&amp;Ireki...</translation>
     </message>
@@ -951,7 +1008,7 @@
     <message>
         <location filename="" line="5"/>
         <source>&amp;Deselect All</source>
-        <translation>&amp;Ezhautatu  Denak</translation>
+        <translation>&amp;Ezhautatu Denak</translation>
     </message>
     <message>
         <location filename="" line="3"/>
@@ -1036,12 +1093,12 @@
     <message>
         <location filename="" line="8"/>
         <source>Sort by T&amp;racker</source>
-        <translation>Antolatu &amp;Aztarnariz</translation>
+        <translation>Antolatu Az&amp;tarnariz</translation>
     </message>
     <message>
         <location filename="" line="8"/>
         <source>Message &amp;Log</source>
-        <translation>Mezu &amp;Oharra</translation>
+        <translation>Mez&amp;u Oharra</translation>
     </message>
     <message>
         <location filename="" line="8"/>
@@ -1061,7 +1118,7 @@
     <message>
         <location filename="" line="5"/>
         <source>&amp;About</source>
-        <translation>&amp;Honi buruz</translation>
+        <translation>Honi &amp;Buruz</translation>
     </message>
     <message>
         <location filename="" line="8"/>
@@ -1096,7 +1153,7 @@
     <message>
         <location filename="" line="8"/>
         <source>Total Transfer</source>
-        <translation>Eskualdatuta Guztira</translation>
+        <translation>Eskualdaketa Guztira</translation>
     </message>
     <message>
         <location filename="" line="8"/>
@@ -1106,7 +1163,7 @@
     <message>
         <location filename="" line="8"/>
         <source>&amp;Main Window</source>
-        <translation>&amp;Leiho Nagusia</translation>
+        <translation>Leiho &amp;Nagusia</translation>
     </message>
     <message>
         <location filename="" line="8"/>
@@ -1192,7 +1249,7 @@
 <context>
     <name>MakeDialog</name>
     <message>
-        <location filename="../make-dialog.cc" line="85"/>
+        <location filename="../make-dialog.cc" line="89"/>
         <source>Creating &quot;%1&quot;</source>
         <translation>&quot;%1&quot; sortzen</translation>
     </message>
@@ -1222,21 +1279,22 @@
         <translation>Akatsa idazten &quot;%1&quot;: %2</translation>
     </message>
     <message>
-        <location filename="" line="195"/>
+        <location filename="" line="229"/>
         <source>New Torrent</source>
         <translation>Torrent Berria</translation>
     </message>
     <message>
+        <location filename="" line="9"/>
         <source>Select File</source>
         <translation>Hautatu Agiria</translation>
     </message>
     <message>
-        <location filename="" line="23"/>
+        <location filename="" line="10"/>
         <source>Select Folder</source>
         <translation>Hautatu Agiritegia</translation>
     </message>
     <message>
-        <location filename="" line="72"/>
+        <location filename="" line="71"/>
         <source>&lt;i&gt;No source selected&lt;i&gt;</source>
         <translation>&lt;i&gt;Ez dago iturbururik hautatuta&lt;i&gt;</translation>
     </message>
@@ -1262,7 +1320,7 @@
         <translation>%1 -&gt; %2; %3 @ %4</translation>
     </message>
     <message>
-        <location filename="" line="35"/>
+        <location filename="" line="36"/>
         <source>Files</source>
         <translation>Agiriak</translation>
     </message>
@@ -1282,6 +1340,7 @@
         <translation>(Ezer ez)</translation>
     </message>
     <message>
+        <location filename="" line="14"/>
         <source>Source &amp;File:</source>
         <translation>I&amp;turburu Agiria:</translation>
     </message>
@@ -1316,12 +1375,12 @@ Beste lehen URL bat gehitzeko, gehitu hura lerro huts baten ondoren.</translatio
 <context>
     <name>MessageLogDialog</name>
     <message>
-        <location filename="../messagelog-dialog.cc" line="38"/>
+        <location filename="../messagelog-dialog.cc" line="35"/>
         <source>Message Log</source>
         <translation>Mezu Oharra</translation>
     </message>
     <message>
-        <location filename="" line="19"/>
+        <location filename="" line="22"/>
         <source>Error</source>
         <translation>Akatsa</translation>
     </message>
@@ -1346,9 +1405,9 @@ Beste lehen URL bat gehitzeko, gehitu hura lerro huts baten ondoren.</translatio
         <translation>Garbitu</translation>
     </message>
     <message>
-        <location filename="" line="47"/>
+        <location filename="" line="53"/>
         <source>Save</source>
-        <translation>Garbitu</translation>
+        <translation>Gorde</translation>
     </message>
     <message>
         <location filename="" line="8"/>
@@ -1366,7 +1425,7 @@ Beste lehen URL bat gehitzeko, gehitu hura lerro huts baten ondoren.</translatio
 <context>
     <name>MessageLogModel</name>
     <message>
-        <location filename="../messagelog-model.cc" line="87"/>
+        <location filename="../messagelog-model.cc" line="101"/>
         <source>Date</source>
         <translation>Eguna</translation>
     </message>
@@ -1384,9 +1443,9 @@ Beste lehen URL bat gehitzeko, gehitu hura lerro huts baten ondoren.</translatio
 <context>
     <name>MyApp</name>
     <message>
-        <location filename="../app.cc" line="238"/>
-        <source>Transmission is a file-sharing program.  When you run a torrent, its data will be made available to others by means of upload.  You and you alone are fully responsible for exercising proper judgement and abiding by your local laws.</source>
-        <translation>Transmission agiri-elkarbanatze programa da.  Torrent bat ekinten duzunean, datu hauek besteentzat igotzeko eskuragarri egingo dira. Zu eta zu bakarrik zara zuzen jokatzearen eta zure herrialdeko legeak betetzearen erantzulea.</translation>
+        <location filename="../app.cc" line="255"/>
+        <source>Transmission is a file sharing program. When you run a torrent, its data will be made available to others by means of upload. Any content you share is your sole responsibility.</source>
+        <translation>Transmission agiri elkarbanatze programa bat da. Torrent bati ekiten diozunean, bere datuak eskuragarri daude besteentzat igoera bidez. Elkarbanatzen duzun edozein eduki zeure erantzukizunezkoa besterik ez da.</translation>
     </message>
     <message>
         <location filename="" line="4"/>
@@ -1399,12 +1458,12 @@ Beste lehen URL bat gehitzeko, gehitu hura lerro huts baten ondoren.</translatio
         <translation>&amp;Onartzen dut</translation>
     </message>
     <message>
-        <location filename="" line="53"/>
+        <location filename="" line="58"/>
         <source>Torrent Completed</source>
         <translation>Torrenta Osatuta</translation>
     </message>
     <message>
-        <location filename="" line="15"/>
+        <location filename="" line="24"/>
         <source>Torrent Added</source>
         <translation>Torrenta Gehituta</translation>
     </message>
@@ -1412,21 +1471,32 @@ Beste lehen URL bat gehitzeko, gehitu hura lerro huts baten ondoren.</translatio
 <context>
     <name>Options</name>
     <message>
-        <location filename="" line="357"/>
+        <location filename="" line="10"/>
         <source>Open Torrent</source>
         <translation>Ireki Torrenta</translation>
     </message>
     <message>
-        <source>&amp;Torrent file:</source>
-        <translation>&amp;Torrent agiria:</translation>
+        <location filename="" line="10"/>
+        <source>Open Torrent from File</source>
+        <translation>Ireki Torrenta Agiritik</translation>
     </message>
     <message>
-        <location filename="" line="16"/>
+        <location filename="" line="2"/>
+        <source>Open Torrent from URL or Magnet Link</source>
+        <translation>Ireki Torrenta URL edo Magnet Loturatik</translation>
+    </message>
+    <message>
+        <location filename="" line="11"/>
+        <source>&amp;Source:</source>
+        <translation>&amp;Iturburua:</translation>
+    </message>
+    <message>
+        <location filename="" line="32"/>
         <source>&amp;Destination folder:</source>
         <translation>&amp;Helmuga agiritegia:</translation>
     </message>
     <message>
-        <location filename="" line="46"/>
+        <location filename="" line="54"/>
         <source>High</source>
         <translation>Handia</translation>
     </message>
@@ -1442,31 +1512,31 @@ Beste lehen URL bat gehitzeko, gehitu hura lerro huts baten ondoren.</translatio
     </message>
     <message>
         <location filename="" line="3"/>
-        <source>Torrent &amp;priority:</source>
-        <translation>Torrent &amp;lehentasuna:</translation>
+        <source>&amp;Priority:</source>
+        <translation>&amp;Lehentasuna:</translation>
     </message>
     <message>
-        <location filename="" line="7"/>
+        <location filename="" line="13"/>
+        <source>S&amp;tart when added</source>
+        <translation>H&amp;asi gehitutakoan</translation>
+    </message>
+    <message>
+        <location filename="" line="13"/>
         <source>&amp;Verify Local Data</source>
         <translation>&amp;Egiaztatu Tokiko Datuak</translation>
     </message>
     <message>
-        <location filename="" line="5"/>
-        <source>&amp;Start when added</source>
-        <translation>&amp;Hasi gehitutakoan</translation>
-    </message>
-    <message>
-        <location filename="" line="4"/>
+        <location filename="" line="10"/>
         <source>Mo&amp;ve .torrent file to the trash</source>
         <translation>&amp;Mugitu .torrent agiria zakarrontzira</translation>
     </message>
     <message>
-        <location filename="" line="264"/>
+        <location filename="" line="10"/>
         <source>Torrent Files (*.torrent);;All Files (*.*)</source>
         <translation>Torrent Agiriak (*.torrent);;Agiri Denak (*.*)</translation>
     </message>
     <message>
-        <location filename="" line="22"/>
+        <location filename="" line="9"/>
         <source>Select Destination</source>
         <translation>Hautatu Helmuga</translation>
     </message>
@@ -1474,7 +1544,7 @@ Beste lehen URL bat gehitzeko, gehitu hura lerro huts baten ondoren.</translatio
 <context>
     <name>PrefsDialog</name>
     <message>
-        <location filename="../prefs-dialog.cc" line="186"/>
+        <location filename="../prefs-dialog.cc" line="189"/>
         <source>Use &amp;authentication</source>
         <translation>E&amp;rabili egiaztapena</translation>
     </message>
@@ -1489,31 +1559,12 @@ Beste lehen URL bat gehitzeko, gehitu hura lerro huts baten ondoren.</translatio
         <translation>&amp;Sarhitza:</translation>
     </message>
     <message>
-        <source>Web Client</source>
-        <translation>Web Bezeroa</translation>
-    </message>
-    <message>
-        <location filename="" line="3"/>
+        <location filename="" line="2"/>
         <source>&amp;Open web client</source>
         <translation>&amp;Ireki web bezeroa</translation>
     </message>
     <message>
-        <location filename="" line="3"/>
-        <source>&amp;Enable web client</source>
-        <translation>&amp;Gaitu web bezeroa</translation>
-    </message>
-    <message>
-        <location filename="" line="3"/>
-        <source>Listening &amp;port:</source>
-        <translation>&amp;Aditze ataka:</translation>
-    </message>
-    <message>
-        <location filename="" line="8"/>
-        <source>Only allow these IP a&amp;ddresses to connect:</source>
-        <translation>Ahalbidetu bakarrik IP &amp;helbide hauek elkarketatzea:</translation>
-    </message>
-    <message>
-        <location filename="" line="2"/>
+        <location filename="" line="16"/>
         <source>Addresses:</source>
         <translation>Helbideak:</translation>
     </message>
@@ -1523,17 +1574,17 @@ Beste lehen URL bat gehitzeko, gehitu hura lerro huts baten ondoren.</translatio
         <translation>Abiadura Mugak</translation>
     </message>
     <message>
-        <location filename="" line="18"/>
-        <source>Limit &amp;download speed (%1):</source>
-        <translation>&amp;Jeisketa abiadura muga (%1):</translation>
+        <location filename="" line="16"/>
+        <source>Speed and Size Units</source>
+        <translation>Abiadura eta Neurri Unitateak</translation>
     </message>
     <message>
-        <location filename="" line="23"/>
-        <source>Limit &amp;upload speed (%1):</source>
-        <translation>Mugatu &amp;igoera abiadura (%1):</translation>
+        <location filename="" line="8"/>
+        <source>Standard:</source>
+        <translation>Estandarra:</translation>
     </message>
     <message>
-        <location filename="" line="24"/>
+        <location filename="" line="9"/>
         <source>Temporary Speed Limits</source>
         <translation>Aldibaterako Abiadura Mugak</translation>
     </message>
@@ -1543,19 +1594,24 @@ Beste lehen URL bat gehitzeko, gehitu hura lerro huts baten ondoren.</translatio
         <translation>&lt;small&gt;Ezeztatu abiadura muga arruntak eskuz edo denborak egitarautuz&lt;/small&gt;</translation>
     </message>
     <message>
-        <location filename="" line="57"/>
-        <source>Limit u&amp;pload speed (%1):</source>
-        <translation>Mugatu &amp;igoera abiadura (%1):</translation>
+        <location filename="" line="6"/>
+        <source>IEC (multiples of 1024)</source>
+        <translation>IEC (1024-ren biderkariak)</translation>
     </message>
     <message>
-        <location filename="" line="5"/>
+        <location filename="" line="1"/>
+        <source>SI  (multiples of 1000)</source>
+        <translation>SI  (1000-ren biderkariak)</translation>
+    </message>
+    <message>
+        <location filename="" line="33"/>
         <source>&amp;Scheduled times:</source>
         <translation>Egitarautu &amp;denborak:</translation>
     </message>
     <message>
         <location filename="" line="15"/>
         <source>&amp;On days:</source>
-        <translation>&amp;Egunak:</translation>
+        <translation>Eg&amp;unak:</translation>
     </message>
     <message>
         <location filename="" line="3"/>
@@ -1600,7 +1656,7 @@ Beste lehen URL bat gehitzeko, gehitu hura lerro huts baten ondoren.</translatio
     <message>
         <location filename="" line="1"/>
         <source>Friday</source>
-        <translation>Ostirala</translation>
+        <translation>Ostirla</translation>
     </message>
     <message>
         <location filename="" line="1"/>
@@ -1608,14 +1664,39 @@ Beste lehen URL bat gehitzeko, gehitu hura lerro huts baten ondoren.</translatio
         <translation>Larunbata</translation>
     </message>
     <message>
-        <location filename="" line="37"/>
+        <location filename="" line="21"/>
+        <source>Start &amp;minimized in notification area</source>
+        <translation>&amp;Hasi jakinarazpen eremuan ikurtuta</translation>
+    </message>
+    <message>
+        <location filename="" line="5"/>
+        <source>Notification</source>
+        <translation>Jakinarazpena</translation>
+    </message>
+    <message>
+        <location filename="" line="2"/>
+        <source>Show a notification when torrents are a&amp;dded</source>
+        <translation>&amp;Erakutsi jakinarazpen bat torreta gehitzen denean</translation>
+    </message>
+    <message>
+        <location filename="" line="1"/>
+        <source>Show a notification when torrents &amp;finish</source>
+        <translation>E&amp;rakutsi jakinarazpen bat torrentak amaitzean</translation>
+    </message>
+    <message>
+        <location filename="" line="1"/>
+        <source>Play a &amp;sound when torrents finish</source>
+        <translation>&amp;Jo soinu bat torrentek amaitutakoan</translation>
+    </message>
+    <message>
+        <location filename="" line="15"/>
         <source>Port is &lt;b&gt;open&lt;/b&gt;</source>
-        <translation>Ataka dago &lt;b&gt;irekita&lt;/b&gt;</translation>
+        <translation>Ataka &lt;b&gt;irekita&lt;/b&gt; dago</translation>
     </message>
     <message>
         <location filename="" line="1"/>
         <source>Port is &lt;b&gt;closed&lt;/b&gt;</source>
-        <translation>Ataka dago &lt;b&gt;itxita&lt;/b&gt;</translation>
+        <translation>Ataka &lt;b&gt;itxita&lt;/b&gt; dago</translation>
     </message>
     <message>
         <location filename="" line="16"/>
@@ -1623,11 +1704,12 @@ Beste lehen URL bat gehitzeko, gehitu hura lerro huts baten ondoren.</translatio
         <translation>Barrurako Hartzaileak</translation>
     </message>
     <message>
-        <location filename="" line="400"/>
+        <location filename="" line="407"/>
         <source>Status unknown</source>
         <translation>Egoera ezezaguna</translation>
     </message>
     <message>
+        <location filename="" line="407"/>
         <source>&amp;Port for incoming connections:</source>
         <translation>&amp;Barrurako elkarketentzako ataka:</translation>
     </message>
@@ -1637,7 +1719,12 @@ Beste lehen URL bat gehitzeko, gehitu hura lerro huts baten ondoren.</translatio
         <translation>&amp;Erabili UPnP edo NAT-PMP ataka bidalketa nire bideratzailetik</translation>
     </message>
     <message>
-        <location filename="" line="8"/>
+        <location filename="" line="3"/>
+        <source>Peer Limits</source>
+        <translation>Hartzaile Mugak</translation>
+    </message>
+    <message>
+        <location filename="" line="5"/>
         <source>Options</source>
         <translation>Aukerak</translation>
     </message>
@@ -1651,8 +1738,68 @@ Beste lehen URL bat gehitzeko, gehitu hura lerro huts baten ondoren.</translatio
         <source>uTP is a tool for reducing network congestion.</source>
         <translation>uTP sare betekada murrizteko tresna bat da.</translation>
     </message>
+    <message>
+        <location filename="" line="65"/>
+        <source>Encryption</source>
+        <translation>Enkriptaketa</translation>
+    </message>
+    <message>
+        <location filename="" line="136"/>
+        <source>Automatically add .torrent files &amp;from:</source>
+        <translation>&amp;Berezgaitasunez gehitu .torrent agiriak hemendik:</translation>
+    </message>
+    <message>
+        <location filename="" line="8"/>
+        <source>Show the Torrent Options &amp;dialog</source>
+        <translation>Erakutsi &amp;Torrentaren Aukera elkarrizketa</translation>
+    </message>
+    <message>
+        <location filename="" line="2"/>
+        <source>&amp;Start added torrents</source>
+        <translation>&amp;Hasi gehitutako torrentak</translation>
+    </message>
+    <message>
+        <location filename="" line="2"/>
+        <source>Mo&amp;ve the .torrent file to the trash</source>
+        <translation>&amp;Mugitu .torrent agiriak zakarrontzira</translation>
+    </message>
+    <message>
+        <location filename="" line="15"/>
+        <source>Download to &amp;previous location</source>
+        <translation>Jeitsi a&amp;urreko kokalekura</translation>
+    </message>
+    <message>
+        <location filename="" line="3"/>
+        <source>Download Queue</source>
+        <translation>Jeisketa Lerroa</translation>
+    </message>
+    <message>
+        <location filename="" line="2"/>
+        <source>Ma&amp;ximum active downloads:</source>
+        <translation>&amp;Gehienezko jeisketa eraginda:</translation>
+    </message>
+    <message>
+        <location filename="" line="1"/>
+        <source>Downloads sharing data in the last &amp;N minutes are active:</source>
+        <translation>Azken &amp;N minututan datuak elkarbanatu dituzten jeisketak ekinean daude:</translation>
+    </message>
+    <message>
+        <location filename="" line="43"/>
+        <source>Downloading</source>
+        <translation>Jeisten</translation>
+    </message>
+    <message>
+        <location filename="" line="1"/>
+        <source>Seeding</source>
+        <translation>Emaritzan</translation>
+    </message>
+    <message>
+        <location filename="" line="4"/>
+        <source>Remote</source>
+        <translation>Hurrunekoa</translation>
+    </message>
     <message numerus="yes">
-        <location filename="" line="334"/>
+        <location filename="" line="59"/>
         <source>&lt;i&gt;Blocklist contains %Ln rules&lt;/i&gt;</source>
         <translation>
             <numerusform>&lt;i&gt;Blokeo-zerrendak ditu %Ln arau&lt;/i&gt;</numerusform>
@@ -1660,16 +1807,17 @@ Beste lehen URL bat gehitzeko, gehitu hura lerro huts baten ondoren.</translatio
         </translation>
     </message>
     <message>
+        <location filename="" line="59"/>
         <source>Pick a &amp;random port every time Transmission is started</source>
-        <translation>&amp;Hautatu zorizko ataka bat Transmission abiarazten den bakoitzena</translation>
+        <translation>&amp;Hautatu zorizko ataka bat Transmission abiarazten den bakoitzean</translation>
     </message>
     <message>
-        <location filename="" line="4"/>
+        <location filename="" line="183"/>
         <source>Limits</source>
         <translation>Mugak</translation>
     </message>
     <message>
-        <location filename="" line="1"/>
+        <location filename="" line="183"/>
         <source>Maximum peers per &amp;torrent:</source>
         <translation>Gehinezko hartzaile &amp;torrenteko:</translation>
     </message>
@@ -1679,11 +1827,11 @@ Beste lehen URL bat gehitzeko, gehitu hura lerro huts baten ondoren.</translatio
         <translation>Gehinezko hartzaile &amp;orotara:</translation>
     </message>
     <message numerus="yes">
-        <location filename="" line="35"/>
+        <location filename="" line="41"/>
         <source>&lt;b&gt;Update succeeded!&lt;/b&gt;&lt;p&gt;Blocklist now has %Ln rules.</source>
         <translation>
-            <numerusform>&lt;b&gt;Eguneratuta!&lt;/b&gt;&lt;p&gt;Blokeo-zerrendak orain %Ln arau ditu.</numerusform>
-            <numerusform>&lt;b&gt;Eguneratuta!&lt;/b&gt;&lt;p&gt;Blokeo-zerrendak orain %Ln arau ditu.</numerusform>
+            <numerusform>&lt;b&gt;Eguneraketa eginda!&lt;/b&gt;&lt;p&gt;Blokeo-zerrendak orain %Ln arau ditu.</numerusform>
+            <numerusform>&lt;b&gt;Eguneraketa eginda!&lt;/b&gt;&lt;p&gt;Blokeo-zerrendak orain %Ln arau ditu.</numerusform>
         </translation>
     </message>
     <message>
@@ -1692,7 +1840,7 @@ Beste lehen URL bat gehitzeko, gehitu hura lerro huts baten ondoren.</translatio
         <translation>&lt;b&gt;Eguneratu Blokeo-zerrenda&lt;/b&gt;&lt;p&gt;Blokeo-zerrenda berria lortzen...</translation>
     </message>
     <message>
-        <location filename="" line="22"/>
+        <location filename="" line="34"/>
         <source>Blocklist</source>
         <translation>Blokeo-zerrenda</translation>
     </message>
@@ -1702,7 +1850,7 @@ Beste lehen URL bat gehitzeko, gehitu hura lerro huts baten ondoren.</translatio
         <translation>Gaitu &amp;berezgaitasunezko eguneraketak</translation>
     </message>
     <message>
-        <location filename="" line="8"/>
+        <location filename="" line="18"/>
         <source>Allow encryption</source>
         <translation>Ahalbidetu enkriptaketa</translation>
     </message>
@@ -1717,62 +1865,39 @@ Beste lehen URL bat gehitzeko, gehitu hura lerro huts baten ondoren.</translatio
         <translation>Beharrezkoa enkriptaketa</translation>
     </message>
     <message>
-        <location filename="" line="190"/>
+        <location filename="" line="209"/>
         <source>Privacy</source>
         <translation>Pribatutasuna</translation>
     </message>
     <message>
-        <location filename="" line="53"/>
-        <source>Limit do&amp;wnload speed (%1):</source>
-        <translation>Mugatu jeis&amp;keta abiadura (%1):</translation>
-    </message>
-    <message>
-        <source>Speed and Size Units</source>
-        <translation>Abiadura eta Neurri Batekoak</translation>
-    </message>
-    <message>
-        <location filename="" line="2"/>
-        <source>IEC (multiples of 1024)</source>
-        <translation>IEC (1024-ren biderkariak)</translation>
-    </message>
-    <message>
-        <location filename="" line="1"/>
-        <source>SI  (multiples of 1000)</source>
-        <translation>SI  (1000-ren biderkariak)</translation>
-    </message>
-    <message>
-        <location filename="" line="5"/>
-        <source>Standard:</source>
-        <translation>Estandarra:</translation>
-    </message>
-    <message>
-        <location filename="" line="34"/>
+        <location filename="" line="209"/>
         <source>&amp;to</source>
         <translation>&amp;hona</translation>
     </message>
     <message>
-        <location filename="" line="338"/>
+        <location filename="" line="353"/>
         <source>Desktop</source>
-        <translation>Mahigaina</translation>
+        <translation>Mahaigaina</translation>
     </message>
     <message>
+        <location filename="" line="353"/>
         <source>Show Transmission icon in the &amp;notification area</source>
         <translation>Erakutsi &amp;Transmission ikurra jakinarazpen eremuan</translation>
     </message>
     <message>
-        <location filename="" line="1"/>
-        <source>Show &amp;popup notifications</source>
-        <translation>Erakutsi &amp;oharleiho jakinarazpenak</translation>
-    </message>
-    <message>
-        <location filename="" line="1"/>
+        <location filename="" line="2"/>
         <source>Use &amp;Recycle Bin when deleting files
-Warning: This will remove all files under the torrent top directory.</source>
+Warning: This will remove all files under the torrent&apos;s top directory.</source>
         <translation>Erabili &amp;Birziklapen Bin agiriak ezabatzerakoan
 Kontuz: Honek torrentaren zuzenbideko agiri guztiak ezabatuko ditu.</translation>
     </message>
     <message>
-        <location filename="" line="22"/>
+        <location filename="" line="1"/>
+        <source>Use native file dialog</source>
+        <translation>Erabili jatorrizko agiri elkarrizketa</translation>
+    </message>
+    <message>
+        <location filename="" line="29"/>
         <source>Testing TCP Port...</source>
         <translation>TCP Ataka aztertzen...</translation>
     </message>
@@ -1782,7 +1907,7 @@ Kontuz: Honek torrentaren zuzenbideko agiri guztiak ezabatuko ditu.</translation
         <translation>&amp;Ataka Azterketa</translation>
     </message>
     <message>
-        <location filename="" line="85"/>
+        <location filename="" line="103"/>
         <source>Enable &amp;blocklist:</source>
         <translation>Gaitu blokeo-&amp;zerrenda:</translation>
     </message>
@@ -1792,12 +1917,52 @@ Kontuz: Honek torrentaren zuzenbideko agiri guztiak ezabatuko ditu.</translation
         <translation>&amp;Eguneraketa</translation>
     </message>
     <message>
-        <location filename="" line="23"/>
+        <location filename="" line="7"/>
         <source>&amp;Encryption mode:</source>
         <translation>Enkriptaketa &amp;modua:</translation>
     </message>
     <message>
-        <location filename="" line="1"/>
+        <location filename="" line="7"/>
+        <source>Remote Control</source>
+        <translation>Hurruneko Agintea</translation>
+    </message>
+    <message>
+        <location filename="" line="6"/>
+        <source>Allow &amp;remote access</source>
+        <translation>Ahalbidetu h&amp;urruneko sarbidea</translation>
+    </message>
+    <message>
+        <location filename="" line="3"/>
+        <source>HTTP &amp;port:</source>
+        <translation>HTTP &amp;ataka:</translation>
+    </message>
+    <message>
+        <location filename="" line="8"/>
+        <source>Only allow these IP a&amp;ddresses:</source>
+        <translation>A&amp;halbidetu IP helbide hauek bakarrik:</translation>
+    </message>
+    <message>
+        <location filename="" line="24"/>
+        <source>&amp;Download (%1):</source>
+        <translation>&amp;Jeitsera (%1):</translation>
+    </message>
+    <message>
+        <location filename="" line="17"/>
+        <source>&amp;Upload (%1):</source>
+        <translation>&amp;Igoera (%1):</translation>
+    </message>
+    <message>
+        <location filename="" line="58"/>
+        <source>Do&amp;wnload (%1):</source>
+        <translation>J&amp;eitsiera (%1):</translation>
+    </message>
+    <message>
+        <location filename="" line="52"/>
+        <source>U&amp;pload (%1):</source>
+        <translation>I&amp;goera (%1):</translation>
+    </message>
+    <message>
+        <location filename="" line="128"/>
         <source>Use PE&amp;X to find more peers</source>
         <translation>Erabili PE&amp;X hartzaile gehiago bilatzeko</translation>
     </message>
@@ -1819,7 +1984,7 @@ Kontuz: Honek torrentaren zuzenbideko agiri guztiak ezabatuko ditu.</translation
     <message>
         <location filename="" line="1"/>
         <source>Use &amp;Local Peer Discovery to find more peers</source>
-        <translation>Erabili &amp;Tokiko Hartzaile Aurkikuntza hartzaile gehiago bilatzeko</translation>
+        <translation>Erabili To&amp;kiko Hartzaile Aurkikuntza hartzaile gehiago bilatzeko</translation>
     </message>
     <message>
         <location filename="" line="1"/>
@@ -1827,7 +1992,7 @@ Kontuz: Honek torrentaren zuzenbideko agiri guztiak ezabatuko ditu.</translation
         <translation>LPD zure tokiko zarean hartzaile gehiago bilatzeko tresna bat da.</translation>
     </message>
     <message>
-        <location filename="" line="14"/>
+        <location filename="" line="105"/>
         <source>Select &quot;Torrent Done&quot; Script</source>
         <translation>Hautatu &quot;Torrenta Eginda&quot; Eskripta</translation>
     </message>
@@ -1847,31 +2012,12 @@ Kontuz: Honek torrentaren zuzenbideko agiri guztiak ezabatuko ditu.</translation
         <translation>Hautatu Helmuga</translation>
     </message>
     <message>
-        <location filename="" line="26"/>
+        <location filename="" line="55"/>
         <source>Adding</source>
         <translation>Gehiketa</translation>
     </message>
     <message>
-        <location filename="" line="6"/>
-        <source>Automatically &amp;add torrents from:</source>
-        <translation>&amp;Berezgaitasunez gehitu torrentak hemendik:</translation>
-    </message>
-    <message>
-        <source>Show &amp;options dialog</source>
-        <translation>&amp;Erakutsi aukera elkarrizketa</translation>
-    </message>
-    <message>
-        <location filename="" line="1"/>
-        <source>&amp;Start when added</source>
-        <translation>&amp;Hasi gehitutakoan</translation>
-    </message>
-    <message>
-        <location filename="" line="1"/>
-        <source>Mo&amp;ve .torrent file to the trash</source>
-        <translation>&amp;Mugitu .torrent agiria zakarrontzira</translation>
-    </message>
-    <message>
-        <location filename="" line="58"/>
+        <location filename="" line="40"/>
         <source>Append &quot;.&amp;part&quot; to incomplete files&apos; names</source>
         <translation>&amp;Erantsi &quot;.part&quot; osatugabeko agiri izenei</translation>
     </message>
@@ -1881,20 +2027,17 @@ Kontuz: Honek torrentaren zuzenbideko agiri guztiak ezabatuko ditu.</translation
         <translation>&amp;Gorde osatugabeko agiriak hemen:</translation>
     </message>
     <message>
+        <location filename="" line="2"/>
         <source>Save to &amp;Location:</source>
         <translation>Gorde &amp;Kokaleku honetan:</translation>
     </message>
     <message>
-        <location filename="" line="23"/>
+        <location filename="" line="30"/>
         <source>Call scrip&amp;t when torrent is completed:</source>
         <translation>&amp;Deitu eskripta torrenta osatutakoan:</translation>
     </message>
     <message>
-        <source>Seeding Limits</source>
-        <translation>Emaritza Mugak</translation>
-    </message>
-    <message>
-        <location filename="" line="2"/>
+        <location filename="" line="30"/>
         <source>Stop seeding at &amp;ratio:</source>
         <translation>&amp;Gelditu emaritza maila honetan:</translation>
     </message>
@@ -1904,32 +2047,7 @@ Kontuz: Honek torrentaren zuzenbideko agiri guztiak ezabatuko ditu.</translation
         <translation>Gelditu emaritza jardungabe badago &amp;N minutuz:</translation>
     </message>
     <message>
-        <location filename="" line="21"/>
-        <source>Location</source>
-        <translation>Kokalekua</translation>
-    </message>
-    <message>
-        <location filename="" line="8"/>
-        <source>Download to &amp;previous location</source>
-        <translation>Jeitsi a&amp;urreko kokalekura</translation>
-    </message>
-    <message>
-        <location filename="" line="3"/>
-        <source>Queue</source>
-        <translation>Lerroa</translation>
-    </message>
-    <message>
-        <location filename="" line="2"/>
-        <source>Maximum active &amp;downloads:</source>
-        <translation>Gehinezko &amp;jeisketa eraginda:</translation>
-    </message>
-    <message>
-        <location filename="" line="1"/>
-        <source>Downloads sharing data in the last N minutes are &amp;active:</source>
-        <translation>&amp;Azken N min. datuak elkarb. dituzten jeisketak eranginda:</translation>
-    </message>
-    <message>
-        <location filename="" line="3"/>
+        <location filename="" line="60"/>
         <source>Incomplete</source>
         <translation>Osatugabe</translation>
     </message>
@@ -1940,31 +2058,16 @@ Kontuz: Honek torrentaren zuzenbideko agiri guztiak ezabatuko ditu.</translation
     </message>
     <message>
         <location filename="" line="4"/>
-        <source>Torrents</source>
-        <translation>Torrent</translation>
-    </message>
-    <message>
-        <location filename="" line="1"/>
-        <source>Download</source>
-        <translation>Jeisketa</translation>
-    </message>
-    <message>
-        <location filename="" line="1"/>
         <source>Speed</source>
         <translation>Abiadura</translation>
     </message>
     <message>
-        <location filename="" line="2"/>
+        <location filename="" line="4"/>
         <source>Network</source>
         <translation>Sarea</translation>
     </message>
     <message>
-        <location filename="" line="2"/>
-        <source>Web</source>
-        <translation>Webgunea</translation>
-    </message>
-    <message>
-        <location filename="" line="28"/>
+        <location filename="" line="30"/>
         <source>Not supported by remote sessions</source>
         <translation>Ez dago sostengaturik hurruneko saioentzat</translation>
     </message>
@@ -1972,6 +2075,7 @@ Kontuz: Honek torrentaren zuzenbideko agiri guztiak ezabatuko ditu.</translation
 <context>
     <name>QObject</name>
     <message>
+        <location filename="" line="30"/>
         <source>Invalid option</source>
         <translation>Aukera baliogabea</translation>
     </message>
@@ -1979,17 +2083,17 @@ Kontuz: Honek torrentaren zuzenbideko agiri guztiak ezabatuko ditu.</translation
 <context>
     <name>RelocateDialog</name>
     <message>
-        <location filename="../relocate.cc" line="51"/>
+        <location filename="../relocate.cc" line="52"/>
         <source>Select Location</source>
         <translation>Hautatu Kokalekua</translation>
     </message>
     <message>
-        <location filename="" line="25"/>
+        <location filename="" line="30"/>
         <source>Set Torrent Location</source>
         <translation>Ezarri Torrentaren Kokalekua</translation>
     </message>
     <message>
-        <location filename="" line="16"/>
+        <location filename="" line="20"/>
         <source>Set Location</source>
         <translation>Ezarri Kokalekua</translation>
     </message>
@@ -2006,13 +2110,23 @@ Kontuz: Honek torrentaren zuzenbideko agiri guztiak ezabatuko ditu.</translation
     <message>
         <location filename="" line="1"/>
         <source>Local data is &amp;already there</source>
-        <translation>Tokiko datuak &amp;jadanik hor daude</translation>
+        <translation>&amp;Tokiko datuak jadanik hor daude</translation>
     </message>
 </context>
 <context>
     <name>Session</name>
     <message>
-        <location filename="../session.cc" line="820"/>
+        <location filename="../session.cc" line="848"/>
+        <source>Error Renaming Path</source>
+        <translation>Akatsa Helburua Berrizendatzerakoan</translation>
+    </message>
+    <message>
+        <location filename="" line="1"/>
+        <source>&lt;p&gt;&lt;b&gt;Unable to rename &quot;%1&quot; as &quot;%2&quot;: %3.&lt;/b&gt;&lt;/p&gt; &lt;p&gt;Please correct the errors and try again.&lt;/p&gt;</source>
+        <translation>&lt;p&gt;&lt;b&gt;Ezinezkoa berreizendatzea &quot;%1&quot; -&gt; &quot;%2&quot;: %3.&lt;/b&gt;&lt;/p&gt; &lt;p&gt;Mesedez zuzendu akatsak eta saiatu berriro.&lt;/p&gt;</translation>
+    </message>
+    <message>
+        <location filename="" line="45"/>
         <source>Add Torrent</source>
         <translation>Gehitu Torrenta</translation>
     </message>
@@ -2037,7 +2151,7 @@ Kontuz: Honek torrentaren zuzenbideko agiri guztiak ezabatuko ditu.</translation
     <message>
         <location filename="" line="4"/>
         <source>Connect to &amp;Remote Session</source>
-        <translation>Elkarketatu &amp;Hurruneko Saiora</translation>
+        <translation>Elkarketatu H&amp;urruneko Saiora</translation>
     </message>
     <message>
         <location filename="" line="6"/>
@@ -2075,7 +2189,7 @@ Kontuz: Honek torrentaren zuzenbideko agiri guztiak ezabatuko ditu.</translation
     <message>
         <location filename="" line="3"/>
         <source>Current Session</source>
-        <translation>Uneko Saioa</translation>
+        <translation>Oraingo Saioa</translation>
     </message>
     <message>
         <location filename="" line="7"/>
@@ -2098,22 +2212,23 @@ Kontuz: Honek torrentaren zuzenbideko agiri guztiak ezabatuko ditu.</translation
         <translation>Iraupena:</translation>
     </message>
     <message>
+        <location filename="" line="7"/>
         <source>Total</source>
         <translation>Guztira</translation>
     </message>
     <message numerus="yes">
         <location filename="" line="53"/>
-        <source>Started %n time(s)</source>
+        <source>Started %n time (s)</source>
         <translation>
-            <numerusform>Behin hasita</numerusform>
-            <numerusform>%n aldiz hasita</numerusform>
+            <numerusform>Hasita %n aldiz</numerusform>
+            <numerusform>Hasita %n aldiz</numerusform>
         </translation>
     </message>
 </context>
 <context>
     <name>Torrent</name>
     <message>
-        <location filename="../torrent.cc" line="709"/>
+        <location filename="../torrent.cc" line="778"/>
         <source>Verifying local data</source>
         <translation>Tokiko datuak egiaztatzen</translation>
     </message>
@@ -2128,6 +2243,7 @@ Kontuz: Honek torrentaren zuzenbideko agiri guztiak ezabatuko ditu.</translation
         <translation>Emaritzan</translation>
     </message>
     <message>
+        <location filename="" line="2"/>
         <source>Finished</source>
         <translation>Amaituta</translation>
     </message>
@@ -2170,7 +2286,7 @@ Kontuz: Honek torrentaren zuzenbideko agiri guztiak ezabatuko ditu.</translation
 <context>
     <name>TorrentDelegate</name>
     <message>
-        <location filename="../torrent-delegate.cc" line="86"/>
+        <location filename="../torrent-delegate.cc" line="91"/>
         <source>Magnetized transfer - retrieving metadata (%1%)</source>
         <translation>Magneturiko eskualdaketa - metadatu berreskurapena (%1%)</translation>
     </message>
@@ -2200,11 +2316,12 @@ Kontuz: Honek torrentaren zuzenbideko agiri guztiak ezabatuko ditu.</translation
         <translation>%1, igota %2 (Maila: %3)</translation>
     </message>
     <message>
-        <location filename="" line="106"/>
+        <location filename="" line="100"/>
         <source> - </source>
         <translation> - </translation>
     </message>
     <message>
+        <location filename="" line="100"/>
         <source>%1 left</source>
         <translation>%1 gelditzen da</translation>
     </message>
@@ -2214,37 +2331,12 @@ Kontuz: Honek torrentaren zuzenbideko agiri guztiak ezabatuko ditu.</translation
         <translation>Gelditzen den denbora ezezaguna</translation>
     </message>
     <message>
-        <location filename="" line="22"/>
-        <source>%1 %2, %3 %4</source>
-        <translation>%1 %2, %3 %4</translation>
-    </message>
-    <message>
-        <location filename="" line="2"/>
-        <source>%1 %2</source>
-        <translation>%1 %2</translation>
-    </message>
-    <message>
-        <location filename="" line="2"/>
-        <source>Stalled</source>
-        <translation>Geldituta</translation>
-    </message>
-    <message>
-        <location filename="" line="2"/>
-        <source>Idle</source>
-        <translation>Jardungabe</translation>
-    </message>
-    <message>
-        <location filename="" line="13"/>
+        <location filename="" line="33"/>
         <source>Verifying local data (%1% tested)</source>
         <translation>Tokiko datuak egiaztatzen (%1% aztertuta)</translation>
     </message>
-    <message>
-        <location filename="" line="6"/>
-        <source>Ratio: %1, </source>
-        <translation>Maila: %1, </translation>
-    </message>
     <message numerus="yes">
-        <location filename="" line="33"/>
+        <location filename="" line="43"/>
         <source>Downloading from %1 of %n connected peer(s)</source>
         <translation>
             <numerusform>Jeisten %1 --&gt; %n elkarketaturiko hartzailetik</numerusform>
@@ -2252,19 +2344,42 @@ Kontuz: Honek torrentaren zuzenbideko agiri guztiak ezabatuko ditu.</translation
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="" line="3"/>
+        <location filename="" line="43"/>
         <source>Downloading metadata from %n peer(s) (%1% done)</source>
         <translation>
             <numerusform>Metadatuak jeisten %n hartzailetik (%1% eginda)</numerusform>
             <numerusform>Metadatuak jeisten %n hartzailetik (%1% eginda)</numerusform>
         </translation>
     </message>
+    <message>
+        <location filename="" line="43"/>
+        <source>%1   %2</source>
+        <translation>%1   %2</translation>
+    </message>
+    <message>
+        <location filename="" line="23"/>
+        <source>%1    %2 %3</source>
+        <translation>%1    %2 %3</translation>
+    </message>
+    <message>
+        <location filename="" line="1"/>
+        <source>Ratio:</source>
+        <translation>Maila:</translation>
+    </message>
+    <message numerus="yes">
+        <location filename="" line="40"/>
+        <source> and %n web seed(s)</source>
+        <translation>
+            <numerusform> eta %n web emaritza</numerusform>
+            <numerusform> eta %n web emaritza</numerusform>
+        </translation>
+    </message>
     <message numerus="yes">
         <location filename="" line="5"/>
         <source>Seeding to %1 of %n connected peer(s)</source>
         <translation>
-            <numerusform>Emaritzen %1-ri elkarketaturiko %n hartzailetik</numerusform>
-            <numerusform>Emaritzen %1-ri elkarketaturiko %n hartzailetik</numerusform>
+            <numerusform>%1 hartzailera emaritzen</numerusform>
+            <numerusform>%1 -&gt; %n elkarturiko hartzailera emaritzen</numerusform>
         </translation>
     </message>
     <message>
@@ -2276,12 +2391,12 @@ Kontuz: Honek torrentaren zuzenbideko agiri guztiak ezabatuko ditu.</translation
 <context>
     <name>TrMainWindow</name>
     <message>
-        <location filename="../mainwin.cc" line="477"/>
+        <location filename="../mainwin.cc" line="479"/>
         <source>Limit Download Speed</source>
         <translation>Mugatu Jeisketa Abiadura</translation>
     </message>
     <message>
-        <location filename="" line="20"/>
+        <location filename="" line="22"/>
         <source>Unlimited</source>
         <translation>Mugagabea</translation>
     </message>
@@ -2291,11 +2406,12 @@ Kontuz: Honek torrentaren zuzenbideko agiri guztiak ezabatuko ditu.</translation
         <translation>Muga: %1</translation>
     </message>
     <message>
+        <location filename="" line="8"/>
         <source>Limit Upload Speed</source>
         <translation>Mugatu Igoera Abiadura</translation>
     </message>
     <message>
-        <location filename="" line="21"/>
+        <location filename="" line="23"/>
         <source>Stop Seeding at Ratio</source>
         <translation>Gelditu Emaritza Maila honetan</translation>
     </message>
@@ -2305,35 +2421,19 @@ Kontuz: Honek torrentaren zuzenbideko agiri guztiak ezabatuko ditu.</translation
         <translation>Emaritu Etengabe</translation>
     </message>
     <message>
-        <location filename="" line="540"/>
+        <location filename="" line="596"/>
         <source>Stop at Ratio (%1)</source>
         <translation>Gelditu Maila honetan (%1)</translation>
     </message>
     <message>
+        <location filename="" line="596"/>
         <source> - %1:%2</source>
         <translation> - %1:%2</translation>
     </message>
-    <message numerus="yes">
-        <location filename="" line="11"/>
-        <source>%Ln Torrent(s)</source>
-        <translation>
-            <numerusform>%Ln Torrent</numerusform>
-            <numerusform>%Ln Torrents</numerusform>
-        </translation>
-    </message>
     <message>
-        <location filename="" line="20"/>
+        <location filename="" line="24"/>
         <source>Idle</source>
         <translation>Jardungabe</translation>
-    </message>
-    <message>
-        <location filename="" line="8"/>
-        <source>Transmission
-Up: %1
-Down: %2</source>
-        <translation>Transmission
-Igoera: %1
-Jeisketa: %2</translation>
     </message>
     <message>
         <location filename="" line="16"/>
@@ -2346,44 +2446,46 @@ Jeisketa: %2</translation>
         <translation>Jeisketa: %1, Igoera: %2</translation>
     </message>
     <message>
-        <location filename="" line="371"/>
-        <source>Click to disable Temporary Speed Limits
-(%1 down, %2 up)</source>
-        <translation>Klikatu ezgaitzeko Aldibaterako Abiadura Mugak
-(%1 jeitsiera, %2 igoera)</translation>
-    </message>
-    <message>
-        <location filename="" line="1"/>
-        <source>Click to enable Temporary Speed Limits
-(%1 down, %2 up)</source>
-        <translation>Klikatu gaitzeko Aldibaterako Abiadura Mugak(%1 jeitsiera, %2 igoera)</translation>
-    </message>
-    <message>
-        <location filename="" line="31"/>
+        <location filename="" line="21"/>
         <source>Torrent Files (*.torrent);;All Files (*.*)</source>
         <translation>Torrent Agiriak (*.torrent);;Agiri Guzitak (*.*)</translation>
     </message>
     <message>
-        <location filename="" line="3"/>
+        <location filename="" line="21"/>
         <source>Show &amp;options dialog</source>
         <translation>Erakutsi a&amp;ukera elkarrizketa</translation>
     </message>
     <message>
+        <location filename="" line="21"/>
         <source>Open Torrent</source>
         <translation>Ireki Torrenta</translation>
     </message>
     <message>
-        <location filename="" line="36"/>
-        <source>Open Link</source>
-        <translation>Ireki Lotura</translation>
+        <location filename="" line="21"/>
+        <source>Speed Limits</source>
+        <translation>Abiadura Mugak</translation>
+    </message>
+    <message>
+        <location filename="" line="507"/>
+        <source>%1   %2</source>
+        <translation>%1   %2</translation>
+    </message>
+    <message>
+        <location filename="" line="420"/>
+        <source>Click to disable Temporary Speed Limits
+ (%1 down, %2 up)</source>
+        <translation>Klikatu Aldibaterako Abiadura Mugaka ezgaitzeko
+ (%1 jeitsiera, %2 igoera)</translation>
     </message>
     <message>
         <location filename="" line="1"/>
-        <source>Open URL or Magnet Link</source>
-        <translation>Ireki URL-a edo Magnet Lotura</translation>
+        <source>Click to enable Temporary Speed Limits
+ (%1 down, %2 up)</source>
+        <translation>Klikatu Aldibaterako Abiadura Mugak gaitzeko
+ (%1 jeitsiera, %2 igoera)</translation>
     </message>
     <message>
-        <location filename="" line="56"/>
+        <location filename="" line="134"/>
         <source>Remove torrent?</source>
         <translation>Kendu torrenta?</translation>
     </message>
@@ -2453,26 +2555,29 @@ Jeisketa: %2</translation>
         <translation>Torrent hauetako batzuk ez dute jeisketa amaitu.</translation>
     </message>
     <message>
-        <location filename="" line="54"/>
-        <source>Transmission server is responding</source>
-        <translation>Transmission zerbitzaria erantzuten ari da</translation>
+        <location filename="" line="58"/>
+        <source>%1 has not responded yet</source>
+        <translation>%1 ez du oraindik erantzun</translation>
     </message>
     <message>
-        <location filename="" line="1"/>
-        <source>Last response from server was %1 ago</source>
-        <translation>Zerbitzariaren azken erantzuna izan da duela %1</translation>
+        <location filename="" line="2"/>
+        <source>%1 is responding</source>
+        <translation>%1 erantzuten ari da</translation>
     </message>
     <message>
-        <location filename="" line="75"/>
+        <location filename="" line="2"/>
+        <source>%1 last responded %2 ago</source>
+        <translation>%1 azken erantzuna duela %2</translation>
+    </message>
+    <message>
+        <location filename="" line="2"/>
+        <source>%1 is not responding</source>
+        <translation>%1 ez du erantzuten</translation>
+    </message>
+    <message>
+        <location filename="" line="78"/>
         <source>Queue</source>
         <translation>Lerroa</translation>
-    </message>
-    <message numerus="yes">
-        <source>%L1 of %Ln Torrent(s)</source>
-        <translation>
-            <numerusform>%L1 of %Ln Torrent</numerusform>
-            <numerusform>%L1 of %Ln Torrents</numerusform>
-        </translation>
     </message>
 </context>
 <context>
@@ -2541,7 +2646,7 @@ Jeisketa: %2</translation>
 <context>
     <name>Utils</name>
     <message>
-        <location filename="../utils.cc" line="52"/>
+        <location filename="../utils.cc" line="58"/>
         <source>Enter a location:</source>
         <translation>Sartu kokaleku bat:</translation>
     </message>
