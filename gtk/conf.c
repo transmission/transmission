@@ -64,17 +64,16 @@ gtr_pref_init (const char * config_dir)
 static void
 tr_prefs_init_defaults (tr_variant * d)
 {
-  const char * str;
-  const char * special_dl_dir = g_get_user_special_dir (G_USER_DIRECTORY_DOWNLOAD);
+  const char * dir;
 
-  str = g_get_user_special_dir (G_USER_DIRECTORY_DOWNLOAD);
-  if (!str)
-    str = g_get_user_special_dir (G_USER_DIRECTORY_DESKTOP);
-  if (!str)
-    str = tr_getDefaultDownloadDir ();
+  dir = g_get_user_special_dir (G_USER_DIRECTORY_DOWNLOAD);
+  if (dir == NULL)
+    dir = g_get_user_special_dir (G_USER_DIRECTORY_DESKTOP);
+  if (dir == NULL)
+    dir = tr_getDefaultDownloadDir ();
 
   tr_variantDictReserve (d, 29);
-  tr_variantDictAddStr  (d, TR_KEY_watch_dir, str);
+  tr_variantDictAddStr  (d, TR_KEY_watch_dir, dir);
   tr_variantDictAddBool (d, TR_KEY_watch_dir_enabled, FALSE);
   tr_variantDictAddBool (d, TR_KEY_user_has_given_informed_consent, FALSE);
   tr_variantDictAddBool (d, TR_KEY_inhibit_desktop_hibernation, FALSE);
@@ -99,7 +98,7 @@ tr_prefs_init_defaults (tr_variant * d)
   tr_variantDictAddInt  (d, TR_KEY_main_window_width, 300);
   tr_variantDictAddInt  (d, TR_KEY_main_window_x, 50);
   tr_variantDictAddInt  (d, TR_KEY_main_window_y, 50);
-  tr_variantDictAddStr  (d, TR_KEY_download_dir, special_dl_dir ? special_dl_dir : str);
+  tr_variantDictAddStr  (d, TR_KEY_download_dir, dir);
   tr_variantDictAddStr  (d, TR_KEY_sort_mode, "sort-by-name");
   tr_variantDictAddBool (d, TR_KEY_sort_reversed, FALSE);
   tr_variantDictAddBool (d, TR_KEY_compact_view, FALSE);
