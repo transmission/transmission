@@ -2,9 +2,9 @@
 <archive type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="8.00">
 	<data>
 		<int key="IBDocument.SystemTarget">1060</int>
-		<string key="IBDocument.SystemVersion">12D78</string>
+		<string key="IBDocument.SystemVersion">12E55</string>
 		<string key="IBDocument.InterfaceBuilderVersion">3084</string>
-		<string key="IBDocument.AppKitVersion">1187.37</string>
+		<string key="IBDocument.AppKitVersion">1187.39</string>
 		<string key="IBDocument.HIToolboxVersion">626.00</string>
 		<object class="NSMutableDictionary" key="IBDocument.PluginVersions">
 			<string key="NS.key.0">com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -401,7 +401,7 @@ ptzUTw49zt214F4AgIAADwEAAAMAAAABAD4AAAEBAAMAAAABAD4AAAECAAMAAAAEAAAkpAEDAAMAAAAB
 AAUAAAEGAAMAAAABAAIAAAERAAQAAAABAAAACAESAAMAAAABAAEAAAEVAAMAAAABAAQAAAEWAAMAAAAB
 AD4AAAEXAAQAAAABAAAj4gEcAAMAAAABAAEAAAE9AAMAAAABAAIAAAFSAAMAAAABAAEAAAFTAAMAAAAE
 AAAkrIdzAAcAABq0AAAktAAAAAAACAAIAAgACAABAAEAAQABAAAatGFwcGwCEAAAbW50clJHQiBYWVog
-B90AAwASAA8AGwAlYWNzcEFQUEwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPbWAAEAAAAA0y1hcHBs
+B90ABgANAAEACQA2YWNzcEFQUEwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPbWAAEAAAAA0y1hcHBs
 AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAARZGVzYwAAAVAAAABi
 ZHNjbQAAAbQAAAO4Y3BydAAABWwAAAAkd3RwdAAABZAAAAAUclhZWgAABaQAAAAUZ1hZWgAABbgAAAAU
 YlhZWgAABcwAAAAUclRSQwAABeAAAAgMYWFyZwAADewAAAAgdmNndAAADgwAAAYSbmRpbgAAFCAAAAY+
@@ -786,7 +786,7 @@ AAAGEAAAnM0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA</bytes>
 								</object>
 								<object class="NSMenuItem" id="701116531">
 									<reference key="NSMenu" ref="152009435"/>
-									<string key="NSTitle">Søg efter opdateringer…</string>
+									<string key="NSTitle">Søg efter opdateringer...</string>
 									<string key="NSKeyEquiv"/>
 									<int key="NSMnemonicLoc">2147483647</int>
 									<reference key="NSOnImage" ref="246127200"/>
@@ -925,7 +925,7 @@ AAAGEAAAnM0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA</bytes>
 							<array class="NSMutableArray" key="NSMenuItems">
 								<object class="NSMenuItem" id="690856088">
 									<reference key="NSMenu" ref="455126894"/>
-									<string key="NSTitle">Ny torrent...</string>
+									<string key="NSTitle">Opret torrent fil...</string>
 									<string key="NSKeyEquiv">n</string>
 									<int key="NSKeyEquivModMask">1048576</int>
 									<int key="NSMnemonicLoc">2147483647</int>
@@ -934,7 +934,7 @@ AAAGEAAAnM0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA</bytes>
 								</object>
 								<object class="NSMenuItem" id="785760832">
 									<reference key="NSMenu" ref="455126894"/>
-									<string key="NSTitle">Åbn torrent...</string>
+									<string key="NSTitle">Åbn torrent fil...</string>
 									<string key="NSKeyEquiv">o</string>
 									<int key="NSKeyEquivModMask">1048576</int>
 									<int key="NSMnemonicLoc">2147483647</int>
@@ -944,7 +944,7 @@ AAAGEAAAnM0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA</bytes>
 								<object class="NSMenuItem" id="711840500">
 									<reference key="NSMenu" ref="455126894"/>
 									<bool key="NSIsAlternate">YES</bool>
-									<string key="NSTitle">Avanceret åbn...</string>
+									<string key="NSTitle">Åbn med valg</string>
 									<string key="NSKeyEquiv">o</string>
 									<int key="NSKeyEquivModMask">1572864</int>
 									<int key="NSMnemonicLoc">2147483647</int>
@@ -1014,7 +1014,7 @@ AAAGEAAAnM0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA</bytes>
 								</object>
 								<object class="NSMenuItem" id="500522949">
 									<reference key="NSMenu" ref="455126894"/>
-									<string key="NSTitle">Flyt data fil til...</string>
+									<string key="NSTitle">Flyt data til...</string>
 									<string key="NSKeyEquiv"/>
 									<int key="NSKeyEquivModMask">1048576</int>
 									<int key="NSMnemonicLoc">2147483647</int>
@@ -1023,7 +1023,7 @@ AAAGEAAAnM0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA</bytes>
 								</object>
 								<object class="NSMenuItem" id="1019122142">
 									<reference key="NSMenu" ref="455126894"/>
-									<string key="NSTitle">Omdøb fil...</string>
+									<string key="NSTitle">Omdøb...</string>
 									<string key="NSKeyEquiv"/>
 									<int key="NSKeyEquivModMask">1048576</int>
 									<int key="NSMnemonicLoc">2147483647</int>
@@ -1043,7 +1043,7 @@ AAAGEAAAnM0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA</bytes>
 								</object>
 								<object class="NSMenuItem" id="521960375">
 									<reference key="NSMenu" ref="455126894"/>
-									<string key="NSTitle">Arkiver torrent som...</string>
+									<string key="NSTitle">Arkiver torrent fil som...</string>
 									<string key="NSKeyEquiv">s</string>
 									<int key="NSKeyEquivModMask">1048576</int>
 									<int key="NSMnemonicLoc">2147483647</int>
@@ -1219,7 +1219,7 @@ AAAGEAAAnM0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA</bytes>
 								</object>
 								<object class="NSMenuItem" id="869366887">
 									<reference key="NSMenu" ref="284921107"/>
-									<string key="NSTitle">Sorter overførsler efter...</string>
+									<string key="NSTitle">Sorter overførsler efter</string>
 									<string key="NSKeyEquiv"/>
 									<int key="NSKeyEquivModMask">1048576</int>
 									<int key="NSMnemonicLoc">2147483647</int>
@@ -1227,7 +1227,7 @@ AAAGEAAAnM0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA</bytes>
 									<reference key="NSMixedImage" ref="330170270"/>
 									<string key="NSAction">submenuAction:</string>
 									<object class="NSMenu" key="NSSubmenu" id="188604546">
-										<string key="NSTitle">Sorter overførsler efter...</string>
+										<string key="NSTitle">Sorter overførsler efter</string>
 										<array class="NSMutableArray" key="NSMenuItems">
 											<object class="NSMenuItem" id="245235570">
 												<reference key="NSMenu" ref="188604546"/>
@@ -1250,7 +1250,7 @@ AAAGEAAAnM0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA</bytes>
 											</object>
 											<object class="NSMenuItem" id="138424002">
 												<reference key="NSMenu" ref="188604546"/>
-												<string key="NSTitle">Oprettelsesdato</string>
+												<string key="NSTitle">Tilføjelsesdato</string>
 												<string key="NSKeyEquiv"/>
 												<int key="NSKeyEquivModMask">1048576</int>
 												<int key="NSMnemonicLoc">2147483647</int>
@@ -1456,7 +1456,7 @@ AAAGEAAAnM0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA</bytes>
 								</object>
 								<object class="NSMenuItem" id="896632939">
 									<reference key="NSMenu" ref="335948734"/>
-									<string key="NSTitle">Sæt valgte på pause</string>
+									<string key="NSTitle">Pause valgte</string>
 									<string key="NSKeyEquiv">.</string>
 									<int key="NSKeyEquivModMask">1048576</int>
 									<int key="NSMnemonicLoc">2147483647</int>
@@ -1465,7 +1465,7 @@ AAAGEAAAnM0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA</bytes>
 								</object>
 								<object class="NSMenuItem" id="416556752">
 									<reference key="NSMenu" ref="335948734"/>
-									<string key="NSTitle">Fjern valgte</string>
+									<string key="NSTitle">Genoptag valgte</string>
 									<string key="NSKeyEquiv">/</string>
 									<int key="NSKeyEquivModMask">1048576</int>
 									<int key="NSMnemonicLoc">2147483647</int>
@@ -1485,7 +1485,7 @@ AAAGEAAAnM0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA</bytes>
 								</object>
 								<object class="NSMenuItem" id="961934972">
 									<reference key="NSMenu" ref="335948734"/>
-									<string key="NSTitle">Fjern...</string>
+									<string key="NSTitle">Fjern</string>
 									<string type="base64-UTF8" key="NSKeyEquiv">CA</string>
 									<int key="NSKeyEquivModMask">1048576</int>
 									<int key="NSMnemonicLoc">2147483647</int>
@@ -1495,7 +1495,7 @@ AAAGEAAAnM0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA</bytes>
 								</object>
 								<object class="NSMenuItem" id="977787692">
 									<reference key="NSMenu" ref="335948734"/>
-									<string key="NSTitle">Fjern data...</string>
+									<string key="NSTitle">Fjern data</string>
 									<string type="base64-UTF8" key="NSKeyEquiv">CA</string>
 									<int key="NSKeyEquivModMask">1572864</int>
 									<int key="NSMnemonicLoc">2147483647</int>
@@ -1505,7 +1505,7 @@ AAAGEAAAnM0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA</bytes>
 								</object>
 								<object class="NSMenuItem" id="96633809">
 									<reference key="NSMenu" ref="335948734"/>
-									<string key="NSTitle">Fjern fuldførte overførsler...</string>
+									<string key="NSTitle">Fjern færdige overførsler</string>
 									<string key="NSKeyEquiv"/>
 									<int key="NSMnemonicLoc">2147483647</int>
 									<reference key="NSOnImage" ref="246127200"/>
@@ -1544,7 +1544,7 @@ AAAGEAAAnM0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA</bytes>
 								</object>
 								<object class="NSMenuItem" id="1068114287">
 									<reference key="NSMenu" ref="335948734"/>
-									<string key="NSTitle">Sæt alle på pause</string>
+									<string key="NSTitle">Pause alle</string>
 									<string key="NSKeyEquiv">.</string>
 									<int key="NSKeyEquivModMask">1572864</int>
 									<int key="NSMnemonicLoc">2147483647</int>
@@ -1582,7 +1582,7 @@ AAAGEAAAnM0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA</bytes>
 								</object>
 								<object class="NSMenuItem" id="765645684">
 									<reference key="NSMenu" ref="335948734"/>
-									<string key="NSTitle">Genoptag ventende overførsler</string>
+									<string key="NSTitle">Genoptag alle ventende</string>
 									<string key="NSKeyEquiv"/>
 									<int key="NSKeyEquivModMask">1048576</int>
 									<int key="NSMnemonicLoc">2147483647</int>
@@ -1756,7 +1756,7 @@ AAAGEAAAnM0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA</bytes>
 								</object>
 								<object class="NSMenuItem" id="970316938">
 									<reference key="NSMenu" ref="986610193"/>
-									<string key="NSTitle">Statestik</string>
+									<string key="NSTitle">Statistik</string>
 									<string key="NSKeyEquiv">2</string>
 									<int key="NSKeyEquivModMask">1048576</int>
 									<int key="NSMnemonicLoc">2147483647</int>
@@ -1765,7 +1765,7 @@ AAAGEAAAnM0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA</bytes>
 								</object>
 								<object class="NSMenuItem" id="120684917">
 									<reference key="NSMenu" ref="986610193"/>
-									<string key="NSTitle">Beskeder</string>
+									<string key="NSTitle">Log</string>
 									<string key="NSKeyEquiv">3</string>
 									<int key="NSKeyEquivModMask">1048576</int>
 									<int key="NSMnemonicLoc">2147483647</int>
@@ -1830,7 +1830,7 @@ AAAGEAAAnM0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA</bytes>
 								</object>
 								<object class="NSMenuItem" id="422984009">
 									<reference key="NSMenu" ref="393698794"/>
-									<string key="NSTitle">Hjemmeside</string>
+									<string key="NSTitle">Gå til hjemmesiden</string>
 									<string key="NSKeyEquiv"/>
 									<int key="NSKeyEquivModMask">1048576</int>
 									<int key="NSMnemonicLoc">2147483647</int>
@@ -1870,7 +1870,7 @@ AAAGEAAAnM0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA</bytes>
 				<array class="NSMutableArray" key="NSMenuItems">
 					<object class="NSMenuItem" id="765094731">
 						<reference key="NSMenu" ref="434296936"/>
-						<string key="NSTitle">Sæt valgte på pause</string>
+						<string key="NSTitle">Pause valgte</string>
 						<string key="NSKeyEquiv"/>
 						<int key="NSKeyEquivModMask">1048576</int>
 						<int key="NSMnemonicLoc">2147483647</int>
@@ -1911,7 +1911,7 @@ AAAGEAAAnM0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA</bytes>
 					</object>
 					<object class="NSMenuItem" id="767449940">
 						<reference key="NSMenu" ref="434296936"/>
-						<string key="NSTitle">Fjern...</string>
+						<string key="NSTitle">Fjern</string>
 						<string key="NSKeyEquiv"/>
 						<int key="NSKeyEquivModMask">1048576</int>
 						<int key="NSMnemonicLoc">2147483647</int>
@@ -1921,7 +1921,7 @@ AAAGEAAAnM0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA</bytes>
 					</object>
 					<object class="NSMenuItem" id="46144164">
 						<reference key="NSMenu" ref="434296936"/>
-						<string key="NSTitle">Fjern data...</string>
+						<string key="NSTitle">Fjern data</string>
 						<string key="NSKeyEquiv"/>
 						<int key="NSKeyEquivModMask">1572864</int>
 						<int key="NSMnemonicLoc">2147483647</int>
@@ -2044,7 +2044,7 @@ AAAGEAAAnM0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA</bytes>
 					</object>
 					<object class="NSMenuItem" id="897097834">
 						<reference key="NSMenu" ref="434296936"/>
-						<string key="NSTitle">Opdater trackere</string>
+						<string key="NSTitle">Opdater tracker</string>
 						<string key="NSKeyEquiv"/>
 						<int key="NSKeyEquivModMask">1048576</int>
 						<int key="NSMnemonicLoc">2147483647</int>
@@ -2168,7 +2168,7 @@ AAAGEAAAnM0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA</bytes>
 					</object>
 					<object class="NSMenuItem" id="129280366">
 						<reference key="NSMenu" ref="354817592"/>
-						<string key="NSTitle">Sorter overførsler efter...</string>
+						<string key="NSTitle">Sorter overførsler efter</string>
 						<string key="NSKeyEquiv"/>
 						<int key="NSKeyEquivModMask">1048576</int>
 						<int key="NSMnemonicLoc">2147483647</int>
@@ -2176,7 +2176,7 @@ AAAGEAAAnM0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA</bytes>
 						<reference key="NSMixedImage" ref="330170270"/>
 						<string key="NSAction">submenuAction:</string>
 						<object class="NSMenu" key="NSSubmenu" id="995409894">
-							<string key="NSTitle">Sorter overførsler efter...</string>
+							<string key="NSTitle">Sorter overførsler efter</string>
 							<array class="NSMutableArray" key="NSMenuItems">
 								<object class="NSMenuItem" id="711642878">
 									<reference key="NSMenu" ref="995409894"/>
@@ -2199,7 +2199,7 @@ AAAGEAAAnM0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA</bytes>
 								</object>
 								<object class="NSMenuItem" id="253017453">
 									<reference key="NSMenu" ref="995409894"/>
-									<string key="NSTitle">Oprettelsesdato</string>
+									<string key="NSTitle">Tilføjelsesdato</string>
 									<string key="NSKeyEquiv"/>
 									<int key="NSKeyEquivModMask">1048576</int>
 									<int key="NSMnemonicLoc">2147483647</int>
@@ -2303,7 +2303,7 @@ AAAGEAAAnM0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA</bytes>
 					</object>
 					<object class="NSMenuItem" id="689898645">
 						<reference key="NSMenu" ref="354817592"/>
-						<string key="NSTitle">Begræns download</string>
+						<string key="NSTitle">Begræns download hastighed</string>
 						<string key="NSKeyEquiv"/>
 						<int key="NSKeyEquivModMask">1048576</int>
 						<int key="NSMnemonicLoc">2147483647</int>
@@ -2311,11 +2311,11 @@ AAAGEAAAnM0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA</bytes>
 						<reference key="NSMixedImage" ref="330170270"/>
 						<string key="NSAction">submenuAction:</string>
 						<object class="NSMenu" key="NSSubmenu" id="30727689">
-							<string key="NSTitle">Begræns download</string>
+							<string key="NSTitle">Begræns download hastighed</string>
 							<array class="NSMutableArray" key="NSMenuItems">
 								<object class="NSMenuItem" id="450135695">
 									<reference key="NSMenu" ref="30727689"/>
-									<string key="NSTitle">Unlimited</string>
+									<string key="NSTitle">Ubegrænset</string>
 									<string key="NSKeyEquiv"/>
 									<int key="NSKeyEquivModMask">1048576</int>
 									<int key="NSMnemonicLoc">2147483647</int>
@@ -2347,7 +2347,7 @@ AAAGEAAAnM0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA</bytes>
 					</object>
 					<object class="NSMenuItem" id="637529483">
 						<reference key="NSMenu" ref="354817592"/>
-						<string key="NSTitle">Begræns upload</string>
+						<string key="NSTitle">Begræns upload hastighed</string>
 						<string key="NSKeyEquiv"/>
 						<int key="NSKeyEquivModMask">1048576</int>
 						<int key="NSMnemonicLoc">2147483647</int>
@@ -2355,7 +2355,7 @@ AAAGEAAAnM0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA</bytes>
 						<reference key="NSMixedImage" ref="330170270"/>
 						<string key="NSAction">submenuAction:</string>
 						<object class="NSMenu" key="NSSubmenu" id="501349102">
-							<string key="NSTitle">Begræns upload</string>
+							<string key="NSTitle">Begræns upload hastighed</string>
 							<array class="NSMutableArray" key="NSMenuItems">
 								<object class="NSMenuItem" id="215540247">
 									<reference key="NSMenu" ref="501349102"/>
@@ -2402,16 +2402,15 @@ AAAGEAAAnM0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA</bytes>
 					</object>
 					<object class="NSMenuItem" id="500844726">
 						<reference key="NSMenu" ref="354817592"/>
-						<string key="NSTitle">Stop med at seede ved Ratio</string>
+						<string key="NSTitle">Stop seeding ved delingsforhold</string>
 						<string key="NSKeyEquiv"/>
 						<int key="NSKeyEquivModMask">1048576</int>
 						<int key="NSMnemonicLoc">2147483647</int>
-						<int key="NSState">1</int>
 						<reference key="NSOnImage" ref="246127200"/>
 						<reference key="NSMixedImage" ref="330170270"/>
 						<string key="NSAction">submenuAction:</string>
 						<object class="NSMenu" key="NSSubmenu" id="911765337">
-							<string key="NSTitle">Stop med at seede ved Ratio</string>
+							<string key="NSTitle">Stop seeding ved delingsforhold</string>
 							<array class="NSMutableArray" key="NSMenuItems">
 								<object class="NSMenuItem" id="1016774026">
 									<reference key="NSMenu" ref="911765337"/>
@@ -2517,7 +2516,7 @@ AAAGEAAAnM0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA</bytes>
 					</object>
 					<object class="NSMenuItem" id="665673233">
 						<reference key="NSMenu" ref="588646173"/>
-						<string key="NSTitle">Begræns download</string>
+						<string key="NSTitle">Begræns download hastighed</string>
 						<string key="NSKeyEquiv"/>
 						<int key="NSKeyEquivModMask">1048576</int>
 						<int key="NSMnemonicLoc">2147483647</int>
@@ -2525,7 +2524,7 @@ AAAGEAAAnM0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA</bytes>
 						<reference key="NSMixedImage" ref="330170270"/>
 						<string key="NSAction">submenuAction:</string>
 						<object class="NSMenu" key="NSSubmenu" id="137637493">
-							<string key="NSTitle">Begræns download</string>
+							<string key="NSTitle">Begræns download hastighed</string>
 							<array class="NSMutableArray" key="NSMenuItems">
 								<object class="NSMenuItem" id="701056891">
 									<reference key="NSMenu" ref="137637493"/>
@@ -2563,7 +2562,7 @@ AAAGEAAAnM0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA</bytes>
 					</object>
 					<object class="NSMenuItem" id="624203829">
 						<reference key="NSMenu" ref="588646173"/>
-						<string key="NSTitle">Begræns upload</string>
+						<string key="NSTitle">Begræns upload hastighed</string>
 						<string key="NSKeyEquiv"/>
 						<int key="NSKeyEquivModMask">1048576</int>
 						<int key="NSMnemonicLoc">2147483647</int>
@@ -2571,7 +2570,7 @@ AAAGEAAAnM0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA</bytes>
 						<reference key="NSMixedImage" ref="330170270"/>
 						<string key="NSAction">submenuAction:</string>
 						<object class="NSMenu" key="NSSubmenu" id="192501462">
-							<string key="NSTitle">Begræns upload</string>
+							<string key="NSTitle">Begræns upload hastighed</string>
 							<array class="NSMutableArray" key="NSMenuItems">
 								<object class="NSMenuItem" id="67180675">
 									<reference key="NSMenu" ref="192501462"/>
@@ -2609,7 +2608,7 @@ AAAGEAAAnM0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA</bytes>
 					</object>
 					<object class="NSMenuItem" id="1039703472">
 						<reference key="NSMenu" ref="588646173"/>
-						<string key="NSTitle">Hold indenfor genrelle begrænsninger</string>
+						<string key="NSTitle">Hold indenfor generelle indstillinger</string>
 						<string key="NSKeyEquiv"/>
 						<int key="NSKeyEquivModMask">1048576</int>
 						<int key="NSMnemonicLoc">2147483647</int>
@@ -2629,7 +2628,7 @@ AAAGEAAAnM0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA</bytes>
 					</object>
 					<object class="NSMenuItem" id="585779654">
 						<reference key="NSMenu" ref="588646173"/>
-						<string key="NSTitle">Stop Seeding at Ratio</string>
+						<string key="NSTitle">Stop seeding ved delingsforhold</string>
 						<string key="NSKeyEquiv"/>
 						<int key="NSKeyEquivModMask">1048576</int>
 						<int key="NSMnemonicLoc">2147483647</int>
@@ -2637,7 +2636,7 @@ AAAGEAAAnM0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA</bytes>
 						<reference key="NSMixedImage" ref="330170270"/>
 						<string key="NSAction">submenuAction:</string>
 						<object class="NSMenu" key="NSSubmenu" id="729841321">
-							<string key="NSTitle">Stop Seeding at Ratio</string>
+							<string key="NSTitle">Stop seeding ved delingsforhold</string>
 							<array class="NSMutableArray" key="NSMenuItems">
 								<object class="NSMenuItem" id="139528350">
 									<reference key="NSMenu" ref="729841321"/>
@@ -2651,7 +2650,7 @@ AAAGEAAAnM0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA</bytes>
 								</object>
 								<object class="NSMenuItem" id="947610053">
 									<reference key="NSMenu" ref="729841321"/>
-									<string key="NSTitle">Seed Forever</string>
+									<string key="NSTitle">Seed altid</string>
 									<string key="NSKeyEquiv"/>
 									<int key="NSKeyEquivModMask">1048576</int>
 									<int key="NSMnemonicLoc">2147483647</int>
@@ -4067,10 +4066,10 @@ AAAGEAAAnM0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA</bytes>
 						<reference key="object" ref="303120456"/>
 						<array class="NSMutableArray" key="children">
 							<reference ref="673219624"/>
+							<reference ref="87647552"/>
 							<reference ref="403739499"/>
 							<reference ref="52857407"/>
 							<reference ref="306218447"/>
-							<reference ref="87647552"/>
 						</array>
 						<reference key="parent" ref="405103408"/>
 					</object>

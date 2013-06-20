@@ -2,9 +2,9 @@
 <archive type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="8.00">
 	<data>
 		<int key="IBDocument.SystemTarget">1060</int>
-		<string key="IBDocument.SystemVersion">12D78</string>
+		<string key="IBDocument.SystemVersion">12E55</string>
 		<string key="IBDocument.InterfaceBuilderVersion">3084</string>
-		<string key="IBDocument.AppKitVersion">1187.37</string>
+		<string key="IBDocument.AppKitVersion">1187.39</string>
 		<string key="IBDocument.HIToolboxVersion">626.00</string>
 		<object class="NSMutableDictionary" key="IBDocument.PluginVersions">
 			<string key="NS.key.0">com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -150,7 +150,7 @@
 						<object class="NSTextFieldCell" key="NSCell" id="868205360">
 							<int key="NSCellFlags">67108864</int>
 							<int key="NSCellFlags2">272629760</int>
-							<string key="NSContents">Om denne torrent</string>
+							<string key="NSContents">Torrent information</string>
 							<object class="NSFont" key="NSSupport" id="27">
 								<string key="NSName">LucidaGrande-Bold</string>
 								<double key="NSSize">11</double>
@@ -165,7 +165,7 @@
 					<object class="NSTextField" id="895565412">
 						<reference key="NSNextResponder" ref="923140800"/>
 						<int key="NSvFlags">268</int>
-						<string key="NSFrame">{{17, 144}, {61, 14}}</string>
+						<string key="NSFrame">{{30, 144}, {48, 14}}</string>
 						<reference key="NSSuperview" ref="923140800"/>
 						<reference key="NSWindow"/>
 						<reference key="NSNextKeyView" ref="30608565"/>
@@ -173,7 +173,7 @@
 						<object class="NSTextFieldCell" key="NSCell" id="344393505">
 							<int key="NSCellFlags">67108864</int>
 							<int key="NSCellFlags2">71303168</int>
-							<string key="NSContents">Sikkerhed:</string>
+							<string key="NSContents">Sikker:</string>
 							<reference key="NSSupport" ref="26"/>
 							<reference key="NSControlView" ref="895565412"/>
 							<reference key="NSBackgroundColor" ref="983143484"/>
@@ -297,7 +297,7 @@
 					<object class="NSTextField" id="258860752">
 						<reference key="NSNextResponder" ref="923140800"/>
 						<int key="NSvFlags">268</int>
-						<string key="NSFrame">{{29, 128}, {49, 14}}</string>
+						<string key="NSFrame">{{25, 128}, {53, 14}}</string>
 						<reference key="NSSuperview" ref="923140800"/>
 						<reference key="NSWindow"/>
 						<reference key="NSNextKeyView" ref="118425947"/>

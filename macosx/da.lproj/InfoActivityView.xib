@@ -2,9 +2,9 @@
 <archive type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="8.00">
 	<data>
 		<int key="IBDocument.SystemTarget">1060</int>
-		<string key="IBDocument.SystemVersion">12D78</string>
+		<string key="IBDocument.SystemVersion">12E55</string>
 		<string key="IBDocument.InterfaceBuilderVersion">3084</string>
-		<string key="IBDocument.AppKitVersion">1187.37</string>
+		<string key="IBDocument.AppKitVersion">1187.39</string>
 		<string key="IBDocument.HIToolboxVersion">626.00</string>
 		<object class="NSMutableDictionary" key="IBDocument.PluginVersions">
 			<string key="NS.key.0">com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -108,7 +108,7 @@
 					<object class="NSTextField" id="1068112942">
 						<reference key="NSNextResponder" ref="570476534"/>
 						<int key="NSvFlags">268</int>
-						<string key="NSFrame">{{32, 236}, {56, 14}}</string>
+						<string key="NSFrame">{{36, 236}, {52, 14}}</string>
 						<reference key="NSSuperview" ref="570476534"/>
 						<reference key="NSWindow"/>
 						<reference key="NSNextKeyView" ref="375557524"/>
@@ -116,7 +116,7 @@
 						<object class="NSTextFieldCell" key="NSCell" id="506564662">
 							<int key="NSCellFlags">67108864</int>
 							<int key="NSCellFlags2">71303168</int>
-							<string key="NSContents">Uploadet:</string>
+							<string key="NSContents">Overført:</string>
 							<reference key="NSSupport" ref="26"/>
 							<reference key="NSControlView" ref="1068112942"/>
 							<reference key="NSBackgroundColor" ref="1003757738"/>
@@ -147,7 +147,7 @@
 					<object class="NSTextField" id="635463300">
 						<reference key="NSNextResponder" ref="570476534"/>
 						<int key="NSvFlags">268</int>
-						<string key="NSFrame">{{53, 204}, {35, 14}}</string>
+						<string key="NSFrame">{{22, 204}, {66, 14}}</string>
 						<reference key="NSSuperview" ref="570476534"/>
 						<reference key="NSWindow"/>
 						<reference key="NSNextKeyView" ref="655961577"/>
@@ -155,7 +155,7 @@
 						<object class="NSTextFieldCell" key="NSCell" id="754768633">
 							<int key="NSCellFlags">67108864</int>
 							<int key="NSCellFlags2">71303168</int>
-							<string key="NSContents">Ratio:</string>
+							<string key="NSContents">Deling:</string>
 							<reference key="NSSupport" ref="26"/>
 							<reference key="NSControlView" ref="635463300"/>
 							<reference key="NSBackgroundColor" ref="1003757738"/>
@@ -272,7 +272,7 @@
 							<string>NeXT Encapsulated PostScript v1.2 pasteboard type</string>
 							<string>NeXT TIFF v4.0 pasteboard type</string>
 						</set>
-						<string key="NSFrame">{{242, 223}, {91, 91}}</string>
+						<string key="NSFrame">{{255, 223}, {91, 91}}</string>
 						<reference key="NSSuperview" ref="570476534"/>
 						<reference key="NSWindow"/>
 						<reference key="NSNextKeyView" ref="635463300"/>
@@ -463,7 +463,7 @@ AAEAAQAAAT0AAwAAAAEAAgAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 						<object class="NSTextFieldCell" key="NSCell" id="414540253">
 							<int key="NSCellFlags">67108864</int>
 							<int key="NSCellFlags2">272629760</int>
-							<string key="NSContents">Brugt tid</string>
+							<string key="NSContents">Forløbet tid</string>
 							<object class="NSFont" key="NSSupport" id="27">
 								<string key="NSName">LucidaGrande-Bold</string>
 								<double key="NSSize">11</double>
@@ -587,7 +587,7 @@ AAEAAQAAAT0AAwAAAAEAAgAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 					<object class="NSTextField" id="293727443">
 						<reference key="NSNextResponder" ref="570476534"/>
 						<int key="NSvFlags">268</int>
-						<string key="NSFrame">{{9, 115}, {37, 17}}</string>
+						<string key="NSFrame">{{9, 115}, {48, 17}}</string>
 						<reference key="NSSuperview" ref="570476534"/>
 						<reference key="NSWindow"/>
 						<reference key="NSNextKeyView" ref="895817577"/>
@@ -595,7 +595,7 @@ AAEAAQAAAT0AAwAAAAEAAgAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 						<object class="NSTextFieldCell" key="NSCell" id="719007168">
 							<int key="NSCellFlags">67108864</int>
 							<int key="NSCellFlags2">272629760</int>
-							<string key="NSContents">Dato</string>
+							<string key="NSContents">Datoer</string>
 							<reference key="NSSupport" ref="27"/>
 							<reference key="NSControlView" ref="293727443"/>
 							<reference key="NSBackgroundColor" ref="1003757738"/>
@@ -606,7 +606,7 @@ AAEAAQAAAT0AAwAAAAEAAgAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 					<object class="NSTextField" id="895817577">
 						<reference key="NSNextResponder" ref="570476534"/>
 						<int key="NSvFlags">268</int>
-						<string key="NSFrame">{{41, 102}, {47, 14}}</string>
+						<string key="NSFrame">{{38, 102}, {50, 14}}</string>
 						<reference key="NSSuperview" ref="570476534"/>
 						<reference key="NSWindow"/>
 						<reference key="NSNextKeyView" ref="819483856"/>
@@ -654,7 +654,7 @@ AAEAAQAAAT0AAwAAAAEAAgAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 					<object class="NSTextField" id="267672181">
 						<reference key="NSNextResponder" ref="570476534"/>
 						<int key="NSvFlags">268</int>
-						<string key="NSFrame">{{38, 86}, {50, 14}}</string>
+						<string key="NSFrame">{{43, 86}, {45, 14}}</string>
 						<reference key="NSSuperview" ref="570476534"/>
 						<reference key="NSWindow"/>
 						<reference key="NSNextKeyView" ref="72642357"/>
@@ -662,7 +662,7 @@ AAEAAQAAAT0AAwAAAAEAAgAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 						<object class="NSTextFieldCell" key="NSCell" id="816909811">
 							<int key="NSCellFlags">67108864</int>
 							<int key="NSCellFlags2">71303168</int>
-							<string key="NSContents">Fuldført:</string>
+							<string key="NSContents">Færdig:</string>
 							<reference key="NSSupport" ref="26"/>
 							<reference key="NSControlView" ref="267672181"/>
 							<reference key="NSBackgroundColor" ref="1003757738"/>
@@ -726,7 +726,7 @@ AAEAAQAAAT0AAwAAAAEAAgAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 					<object class="NSTextField" id="381599958">
 						<reference key="NSNextResponder" ref="570476534"/>
 						<int key="NSvFlags">268</int>
-						<string key="NSFrame">{{9, 316}, {69, 14}}</string>
+						<string key="NSFrame">{{9, 313}, {80, 17}}</string>
 						<reference key="NSSuperview" ref="570476534"/>
 						<reference key="NSWindow"/>
 						<reference key="NSNextKeyView" ref="553434559"/>
@@ -793,7 +793,7 @@ AAEAAQAAAT0AAwAAAAEAAgAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 					<object class="NSSegmentedControl" id="952075492">
 						<reference key="NSNextResponder" ref="570476534"/>
 						<int key="NSvFlags">265</int>
-						<string key="NSFrame">{{224, 205}, {126, 17}}</string>
+						<string key="NSFrame">{{251, 205}, {99, 17}}</string>
 						<reference key="NSSuperview" ref="570476534"/>
 						<reference key="NSWindow"/>
 						<reference key="NSNextKeyView" ref="615655994"/>
@@ -809,11 +809,13 @@ AAEAAQAAAT0AAwAAAAEAAgAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 							<reference key="NSControlView" ref="952075492"/>
 							<array class="NSMutableArray" key="NSSegmentImages">
 								<object class="NSSegmentItem">
-									<string key="NSSegmentItemLabel">Fremskridt</string>
+									<double key="NSSegmentItemWidth">46</double>
+									<string key="NSSegmentItemLabel">Progress</string>
 									<int key="NSSegmentItemImageScaling">2</int>
 								</object>
 								<object class="NSSegmentItem">
-									<string key="NSSegmentItemLabel">Tilgængelig</string>
+									<double key="NSSegmentItemWidth">46</double>
+									<string key="NSSegmentItemLabel">Available</string>
 									<int key="NSSegmentItemTag">1</int>
 									<int key="NSSegmentItemImageScaling">2</int>
 								</object>
@@ -873,7 +875,7 @@ AAEAAQAAAT0AAwAAAAEAAgAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 						<object class="NSTextFieldCell" key="NSCell" id="390866183">
 							<int key="NSCellFlags">67108864</int>
 							<int key="NSCellFlags2">71303168</int>
-							<string key="NSContents">Tabt:</string>
+							<string key="NSContents">Er fejlet:</string>
 							<reference key="NSSupport" ref="26"/>
 							<reference key="NSControlView" ref="882091406"/>
 							<reference key="NSBackgroundColor" ref="1003757738"/>

@@ -2,9 +2,9 @@
 <archive type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="8.00">
 	<data>
 		<int key="IBDocument.SystemTarget">1060</int>
-		<string key="IBDocument.SystemVersion">12D78</string>
+		<string key="IBDocument.SystemVersion">12E55</string>
 		<string key="IBDocument.InterfaceBuilderVersion">3084</string>
-		<string key="IBDocument.AppKitVersion">1187.37</string>
+		<string key="IBDocument.AppKitVersion">1187.39</string>
 		<string key="IBDocument.HIToolboxVersion">626.00</string>
 		<object class="NSMutableDictionary" key="IBDocument.PluginVersions">
 			<string key="NS.key.0">com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -160,7 +160,7 @@
 						<object class="NSButton" id="999003967">
 							<reference key="NSNextResponder" ref="1006"/>
 							<int key="NSvFlags">292</int>
-							<string key="NSFrame">{{18, 18}, {147, 18}}</string>
+							<string key="NSFrame">{{18, 18}, {153, 18}}</string>
 							<reference key="NSSuperview" ref="1006"/>
 							<reference key="NSWindow"/>
 							<reference key="NSNextKeyView" ref="533609783"/>
@@ -444,7 +444,7 @@
 						<object class="NSButton" id="152228799">
 							<reference key="NSNextResponder" ref="1006"/>
 							<int key="NSvFlags">289</int>
-							<string key="NSFrame">{{344, 190}, {69, 17}}</string>
+							<string key="NSFrame">{{371, 190}, {42, 17}}</string>
 							<reference key="NSSuperview" ref="1006"/>
 							<reference key="NSWindow"/>
 							<reference key="NSNextKeyView" ref="501735897"/>
@@ -453,7 +453,7 @@
 							<object class="NSButtonCell" key="NSCell" id="773611009">
 								<int key="NSCellFlags">-1543503872</int>
 								<int key="NSCellFlags2">134348800</int>
-								<string key="NSContents">Vælg intet</string>
+								<string key="NSContents">Intet</string>
 								<reference key="NSSupport" ref="26"/>
 								<string key="NSCellIdentifier">_NS:9</string>
 								<reference key="NSControlView" ref="152228799"/>
@@ -469,7 +469,7 @@
 						<object class="NSButton" id="407928630">
 							<reference key="NSNextResponder" ref="1006"/>
 							<int key="NSvFlags">289</int>
-							<string key="NSFrame">{{281, 190}, {58, 17}}</string>
+							<string key="NSFrame">{{321, 190}, {42, 17}}</string>
 							<reference key="NSSuperview" ref="1006"/>
 							<reference key="NSWindow"/>
 							<reference key="NSNextKeyView" ref="152228799"/>
@@ -478,7 +478,7 @@
 							<object class="NSButtonCell" key="NSCell" id="635637831">
 								<int key="NSCellFlags">-1543503872</int>
 								<int key="NSCellFlags2">134348800</int>
-								<string key="NSContents">Vælg alt</string>
+								<string key="NSContents">Alt</string>
 								<reference key="NSSupport" ref="26"/>
 								<string key="NSCellIdentifier">_NS:9</string>
 								<reference key="NSControlView" ref="407928630"/>
@@ -494,7 +494,7 @@
 						<object class="NSButton" id="46983627">
 							<reference key="NSNextResponder" ref="1006"/>
 							<int key="NSvFlags">292</int>
-							<string key="NSFrame">{{18, 40}, {205, 18}}</string>
+							<string key="NSFrame">{{18, 40}, {210, 18}}</string>
 							<reference key="NSSuperview" ref="1006"/>
 							<reference key="NSWindow"/>
 							<reference key="NSNextKeyView" ref="999003967"/>
@@ -615,7 +615,7 @@
 										<object class="NSTextField" id="224369214">
 											<reference key="NSNextResponder" ref="946207297"/>
 											<int key="NSvFlags">265</int>
-											<string key="NSFrame">{{199, 50}, {60, 20}}</string>
+											<string key="NSFrame">{{199, 53}, {55, 17}}</string>
 											<reference key="NSSuperview" ref="946207297"/>
 											<reference key="NSWindow"/>
 											<reference key="NSNextKeyView" ref="711151157"/>
@@ -677,7 +677,7 @@
 										<object class="NSTextField" id="485847244">
 											<reference key="NSNextResponder" ref="946207297"/>
 											<int key="NSvFlags">265</int>
-											<string key="NSFrame">{{204, 25}, {50, 17}}</string>
+											<string key="NSFrame">{{204, 25}, {53, 17}}</string>
 											<reference key="NSSuperview" ref="946207297"/>
 											<reference key="NSWindow"/>
 											<reference key="NSNextKeyView" ref="1049508202"/>
@@ -719,7 +719,7 @@
 										<object class="NSButton" id="1065995789">
 											<reference key="NSNextResponder" ref="946207297"/>
 											<int key="NSvFlags">265</int>
-											<string key="NSFrame">{{311, 76}, {73, 28}}</string>
+											<string key="NSFrame">{{306, 76}, {78, 28}}</string>
 											<reference key="NSSuperview" ref="946207297"/>
 											<reference key="NSWindow"/>
 											<reference key="NSNextKeyView" ref="38073450"/>
@@ -749,7 +749,7 @@
 										<object class="NSTextField" id="1059202456">
 											<reference key="NSNextResponder" ref="946207297"/>
 											<int key="NSvFlags">268</int>
-											<string key="NSFrame">{{16, 83}, {73, 17}}</string>
+											<string key="NSFrame">{{15, 83}, {88, 17}}</string>
 											<reference key="NSSuperview" ref="946207297"/>
 											<reference key="NSWindow"/>
 											<reference key="NSNextKeyView" ref="928839683"/>
@@ -757,7 +757,7 @@
 											<object class="NSTextFieldCell" key="NSCell" id="974538373">
 												<int key="NSCellFlags">67108864</int>
 												<int key="NSCellFlags2">272629760</int>
-												<string key="NSContents">Overfør til:</string>
+												<string key="NSContents">Download til:</string>
 												<reference key="NSSupport" ref="728563564"/>
 												<reference key="NSControlView" ref="1059202456"/>
 												<reference key="NSBackgroundColor" ref="729622418"/>

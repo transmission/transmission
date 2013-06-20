@@ -2,9 +2,9 @@
 <archive type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="8.00">
 	<data>
 		<int key="IBDocument.SystemTarget">1060</int>
-		<string key="IBDocument.SystemVersion">12D78</string>
+		<string key="IBDocument.SystemVersion">12E55</string>
 		<string key="IBDocument.InterfaceBuilderVersion">3084</string>
-		<string key="IBDocument.AppKitVersion">1187.37</string>
+		<string key="IBDocument.AppKitVersion">1187.39</string>
 		<string key="IBDocument.HIToolboxVersion">626.00</string>
 		<object class="NSMutableDictionary" key="IBDocument.PluginVersions">
 			<string key="NS.key.0">com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -389,7 +389,7 @@ AAEAAQAAAT0AAwAAAAEAAgAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 						<object class="NSButton" id="833650385">
 							<reference key="NSNextResponder" ref="755547124"/>
 							<int key="NSvFlags">289</int>
-							<string key="NSFrame">{{618, 53}, {71, 28}}</string>
+							<string key="NSFrame">{{618, 53}, {75, 28}}</string>
 							<reference key="NSSuperview" ref="755547124"/>
 							<reference key="NSWindow"/>
 							<reference key="NSNextKeyView" ref="631380462"/>
@@ -423,7 +423,7 @@ AAEAAQAAAT0AAwAAAAEAAgAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 						<object class="NSTextField" id="631224046">
 							<reference key="NSNextResponder" ref="755547124"/>
 							<int key="NSvFlags">292</int>
-							<string key="NSFrame">{{24, 60}, {72, 17}}</string>
+							<string key="NSFrame">{{26, 60}, {72, 17}}</string>
 							<reference key="NSSuperview" ref="755547124"/>
 							<reference key="NSWindow"/>
 							<reference key="NSNextKeyView" ref="795084797"/>
@@ -492,7 +492,7 @@ AAEAAQAAAT0AAwAAAAEAAgAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 						<object class="NSButton" id="22400418">
 							<reference key="NSNextResponder" ref="755547124"/>
 							<int key="NSvFlags">292</int>
-							<string key="NSFrame">{{101, 97}, {167, 18}}</string>
+							<string key="NSFrame">{{101, 97}, {186, 18}}</string>
 							<reference key="NSSuperview" ref="755547124"/>
 							<reference key="NSWindow"/>
 							<reference key="NSNextKeyView" ref="644564296"/>
@@ -500,7 +500,7 @@ AAEAAQAAAT0AAwAAAAEAAgAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 							<object class="NSButtonCell" key="NSCell" id="240082396">
 								<int key="NSCellFlags">67108864</int>
 								<int key="NSCellFlags2">0</int>
-								<string key="NSContents">Denne torrent er privat</string>
+								<string key="NSContents">Dette er en privat torrent</string>
 								<reference key="NSSupport" ref="364179855"/>
 								<reference key="NSControlView" ref="22400418"/>
 								<int key="NSButtonFlags">1211912448</int>
@@ -522,7 +522,7 @@ AAEAAQAAAT0AAwAAAAEAAgAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 						<object class="NSButton" id="697506694">
 							<reference key="NSNextResponder" ref="755547124"/>
 							<int key="NSvFlags">289</int>
-							<string key="NSFrame">{{617, 12}, {73, 32}}</string>
+							<string key="NSFrame">{{611, 12}, {83, 32}}</string>
 							<reference key="NSSuperview" ref="755547124"/>
 							<reference key="NSWindow"/>
 							<reference key="NSNextKeyView"/>
@@ -530,7 +530,7 @@ AAEAAQAAAT0AAwAAAAEAAgAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 							<object class="NSButtonCell" key="NSCell" id="671503663">
 								<int key="NSCellFlags">67108864</int>
 								<int key="NSCellFlags2">134217728</int>
-								<string key="NSContents">Tilføj</string>
+								<string key="NSContents">Opret</string>
 								<reference key="NSSupport" ref="364179855"/>
 								<reference key="NSControlView" ref="697506694"/>
 								<int key="NSButtonFlags">-2038284288</int>
@@ -546,7 +546,7 @@ AAEAAQAAAT0AAwAAAAEAAgAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 						<object class="NSButton" id="142097578">
 							<reference key="NSNextResponder" ref="755547124"/>
 							<int key="NSvFlags">289</int>
-							<string key="NSFrame">{{524, 12}, {94, 32}}</string>
+							<string key="NSFrame">{{517, 12}, {94, 32}}</string>
 							<reference key="NSSuperview" ref="755547124"/>
 							<reference key="NSWindow"/>
 							<reference key="NSNextKeyView" ref="697506694"/>
@@ -570,7 +570,7 @@ AAEAAQAAAT0AAwAAAAEAAgAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 						<object class="NSTextField" id="644564296">
 							<reference key="NSNextResponder" ref="755547124"/>
 							<int key="NSvFlags">290</int>
-							<string key="NSFrame">{{169, 98}, {522, 17}}</string>
+							<string key="NSFrame">{{290, 98}, {401, 17}}</string>
 							<reference key="NSSuperview" ref="755547124"/>
 							<reference key="NSWindow"/>
 							<reference key="NSNextKeyView" ref="490783512"/>
@@ -589,7 +589,7 @@ AAEAAQAAAT0AAwAAAAEAAgAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 						<object class="NSButton" id="631380462">
 							<reference key="NSNextResponder" ref="755547124"/>
 							<int key="NSvFlags">292</int>
-							<string key="NSFrame">{{101, 21}, {230, 18}}</string>
+							<string key="NSFrame">{{101, 21}, {196, 18}}</string>
 							<reference key="NSSuperview" ref="755547124"/>
 							<reference key="NSWindow"/>
 							<reference key="NSNextKeyView" ref="142097578"/>
@@ -597,7 +597,7 @@ AAEAAQAAAT0AAwAAAAEAAgAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 							<object class="NSButtonCell" key="NSCell" id="813600242">
 								<int key="NSCellFlags">-2080374784</int>
 								<int key="NSCellFlags2">0</int>
-								<string key="NSContents">Åbn denne torrent efter tilføjelse</string>
+								<string key="NSContents">Åbn torrent efter oprettelse</string>
 								<reference key="NSSupport" ref="364179855"/>
 								<reference key="NSControlView" ref="631380462"/>
 								<int key="NSButtonFlags">1211912448</int>
@@ -796,7 +796,7 @@ AAEAAQAAAT0AAwAAAAEAAgAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 							<object class="NSTextFieldCell" key="NSCell" id="35173837">
 								<int key="NSCellFlags">67108928</int>
 								<int key="NSCellFlags2">4327424</int>
-								<string key="NSContents">Trackere bliver placeret i hver deres liste</string>
+								<string key="NSContents">Hver tracker vil blive placeret i egen liste</string>
 								<reference key="NSSupport" ref="26"/>
 								<reference key="NSControlView" ref="415165203"/>
 								<reference key="NSBackgroundColor" ref="119700158"/>
