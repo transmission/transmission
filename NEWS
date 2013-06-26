@@ -31,7 +31,7 @@
 ==== Daemon ====
   * Add support for specifying recently-active torrents in transmission-remote
 ==== Web Client ====
-  * Exend the cookie lifespan so that settings like sort order don't get lost
+  * Extend the cookie lifespan so that settings like sort order don't get lost
 ==== Utils ====
   * Support user-defined piece sizes in transmission-create
 
@@ -423,7 +423,7 @@
 === Transmission 2.21 (2011/02/08) ===
 [http://trac.transmissionbt.com/query?milestone=2.21&group=component&order=severity All tickets closed by this release]
 ==== All Platforms ====
-  * Fix compile error in the the 2.20 tarball
+  * Fix compile error in the 2.20 tarball
 ==== GTK+ ====
   * Several updated translations
 ==== Qt ====
