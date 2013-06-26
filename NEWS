@@ -1,15 +1,15 @@
-=== Transmission 2.80 (2013/xx/yy) ===
+=== Transmission 2.80 (2013/06/25) ===
 [http://trac.transmissionbt.com/query?milestone=2.80&group=component&order=severity All tickets closed by this release]
 ==== All Platforms ====
   * Support renaming a transfer's files and folders
+  * Remove the most frequent thread locks in libtransmission (ie, fewer beachballs)
+  * Show the free disk space available when adding torrent
+  * Faster reading and parsing of local data files
   * Better use of the OS's filesystem cache
   * Lengthen the prefetch cache for data sent to peers
-  * Faster parsing of JSON data and bencoded data
-  * Fewer public API calls in libtransmission need thread locks (ie, fewer beachballs)
-  * Other CPU speedups
-  * Replace the previous JSON parser with jsonsl to resolve DFSG license issue
-  * Fix FTBFS when compiling with -Werror=format-security
-  * Add 'freespace' argument to session-get in the Remote API
+  * Other small speedups
+  * Replace the previous JSON parser with jsonsl to resolve DFSG licensing issue
+  * Fix fails-to-build when compiling with -Werror=format-security
   * Improved unit tests in libtransmission
   * Tarballs are now released only in .xz format
 ==== Mac Client ====
