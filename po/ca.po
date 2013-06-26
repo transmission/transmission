@@ -22,8 +22,8 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2012-09-26 02:29+0000\n"
-"X-Generator: Launchpad (build 16022)\n"
+"X-Launchpad-Export-Date: 2013-06-26 02:13+0000\n"
+"X-Generator: Launchpad (build 16681)\n"
 
 #: ../gtk/actions.c:45
 msgid "Sort by _Activity"
@@ -258,7 +258,7 @@ msgstr "Mou a la part in_ferior"
 msgid "Present Main Window"
 msgstr "Finestra present principal"
 
-#: ../gtk/conf.c:317 ../gtk/conf.c:322
+#: ../gtk/conf.c:331 ../gtk/conf.c:336
 #, c-format
 msgid "Importing \"%s\""
 msgstr "S'està important «%s»"
@@ -283,7 +283,7 @@ msgstr "Comparteix independentment de l'activitat"
 msgid "Stop seeding if idle for N minutes:"
 msgstr "Atura la compartició si està inactiu N minuts:"
 
-#: ../gtk/details.c:478 ../gtk/tr-prefs.c:1280
+#: ../gtk/details.c:478 ../gtk/tr-prefs.c:1282
 msgid "Speed"
 msgstr "Velocitat"
 
@@ -326,7 +326,7 @@ msgid "_Maximum peers:"
 msgstr "Nombre _màxim de clients connectats:"
 
 #: ../gtk/details.c:559 ../gtk/torrent-cell-renderer.c:201
-#: ../libtransmission/verify.c:260
+#: ../libtransmission/verify.c:273
 msgid "Queued for verification"
 msgstr "S'està encuant per a verificar-lo"
 
@@ -338,7 +338,7 @@ msgstr "S'estan verificant les dades locals"
 msgid "Queued for download"
 msgstr "S'ha encuat per baixar"
 
-#: ../gtk/details.c:562 ../gtk/filter.c:699
+#: ../gtk/details.c:562 ../gtk/filter.c:702
 msgctxt "Verb"
 msgid "Downloading"
 msgstr "S'està baixant"
@@ -347,16 +347,16 @@ msgstr "S'està baixant"
 msgid "Queued for seeding"
 msgstr "S'ha encuat per sembrar"
 
-#: ../gtk/details.c:564 ../gtk/filter.c:700
+#: ../gtk/details.c:564 ../gtk/filter.c:703
 msgctxt "Verb"
 msgid "Seeding"
 msgstr "S'està sembrant"
 
-#: ../gtk/details.c:565 ../gtk/filter.c:702 ../gtk/torrent-cell-renderer.c:198
+#: ../gtk/details.c:565 ../gtk/filter.c:705 ../gtk/torrent-cell-renderer.c:198
 msgid "Finished"
 msgstr "Finalitzat"
 
-#: ../gtk/details.c:565 ../gtk/filter.c:701 ../gtk/torrent-cell-renderer.c:198
+#: ../gtk/details.c:565 ../gtk/filter.c:704 ../gtk/torrent-cell-renderer.c:198
 msgid "Paused"
 msgstr "En pausa"
 
@@ -723,7 +723,7 @@ msgstr "Rastrejador"
 msgid "_Announce URL:"
 msgstr "_Anunci URL:"
 
-#: ../gtk/details.c:2397 ../gtk/details.c:2541 ../gtk/filter.c:322
+#: ../gtk/details.c:2397 ../gtk/details.c:2541 ../gtk/filter.c:323
 msgid "Trackers"
 msgstr "Rastrejadors"
 
@@ -739,7 +739,7 @@ msgstr "_Suprimeix"
 msgid "Show _backup trackers"
 msgstr "Mostra els rastrejadors de _seguretat"
 
-#: ../gtk/details.c:2533 ../gtk/msgwin.c:429
+#: ../gtk/details.c:2533 ../gtk/msgwin.c:440
 msgid "Information"
 msgstr "Informació"
 
@@ -757,7 +757,7 @@ msgstr ""
 msgid "Files"
 msgstr "Fitxers"
 
-#: ../gtk/details.c:2554 ../gtk/tr-prefs.c:1236 ../gtk/tr-window.c:658
+#: ../gtk/details.c:2554 ../gtk/tr-prefs.c:1239 ../gtk/tr-window.c:658
 msgid "Options"
 msgstr "Opcions"
 
@@ -823,19 +823,19 @@ msgid_plural "Some of these torrents have not finished downloading."
 msgstr[0] "Un d'aquests torrents no ha finalitzat la baixada."
 msgstr[1] "Alguns d'aquests torrents no han finalitzat la baixada."
 
-#: ../gtk/file-list.c:607 ../gtk/filter.c:347 ../gtk/util.c:465
+#: ../gtk/file-list.c:607 ../gtk/filter.c:348 ../gtk/util.c:471
 msgid "High"
 msgstr "Alta"
 
-#: ../gtk/file-list.c:608 ../gtk/filter.c:351 ../gtk/util.c:466
+#: ../gtk/file-list.c:608 ../gtk/filter.c:352 ../gtk/util.c:472
 msgid "Normal"
 msgstr "Normal"
 
-#: ../gtk/file-list.c:609 ../gtk/filter.c:355 ../gtk/util.c:467
+#: ../gtk/file-list.c:609 ../gtk/filter.c:356 ../gtk/util.c:473
 msgid "Low"
 msgstr "Baixa"
 
-#: ../gtk/file-list.c:827 ../gtk/msgwin.c:295
+#: ../gtk/file-list.c:827 ../gtk/msgwin.c:305
 msgid "Name"
 msgstr "Nom"
 
@@ -855,52 +855,52 @@ msgid "Download"
 msgstr "Baixada"
 
 #. add priority column
-#: ../gtk/file-list.c:886 ../gtk/filter.c:342
+#: ../gtk/file-list.c:886 ../gtk/filter.c:343
 msgid "Priority"
 msgstr "Prioritat"
 
-#: ../gtk/filter.c:314 ../gtk/filter.c:696
+#: ../gtk/filter.c:315 ../gtk/filter.c:699
 msgid "All"
 msgstr "Tot"
 
-#: ../gtk/filter.c:328 ../gtk/tr-prefs.c:567 ../gtk/tr-prefs.c:1283
+#: ../gtk/filter.c:329 ../gtk/tr-prefs.c:567 ../gtk/tr-prefs.c:1285
 msgid "Privacy"
 msgstr "Privacitat"
 
-#: ../gtk/filter.c:333
+#: ../gtk/filter.c:334
 msgid "Public"
 msgstr "Públic"
 
-#: ../gtk/filter.c:337
+#: ../gtk/filter.c:338
 msgid "Private"
 msgstr "Privat"
 
-#: ../gtk/filter.c:698
+#: ../gtk/filter.c:701
 msgid "Active"
 msgstr "Actiu"
 
-#: ../gtk/filter.c:703
+#: ../gtk/filter.c:706
 msgctxt "Verb"
 msgid "Verifying"
 msgstr "S'està verificant"
 
-#: ../gtk/filter.c:704 ../gtk/msgwin.c:428
+#: ../gtk/filter.c:707 ../gtk/msgwin.c:439
 msgid "Error"
 msgstr "Errors"
 
 #. add the activity combobox
-#: ../gtk/filter.c:994
+#: ../gtk/filter.c:996
 msgid "_Show:"
 msgstr "_Mostra:"
 
-#: ../gtk/main.c:303
+#: ../gtk/main.c:308
 #, c-format
 msgid "Error registering Transmission as x-scheme-handler/magnet handler: %s"
 msgstr ""
 "S'ha produït un error en registrar el Transmission com a gestor de x-scheme-"
 "handler/magnet: %s"
 
-#: ../gtk/main.c:469
+#: ../gtk/main.c:477
 #, c-format
 msgid ""
 "Got signal %d; trying to shut down cleanly. Do it again if it gets stuck."
@@ -908,32 +908,32 @@ msgstr ""
 "S'ha obtingut la senyal %d i s'està intentant aturar netament. Torneu-ho a "
 "fer si es bloqueja."
 
-#: ../gtk/main.c:597
+#: ../gtk/main.c:610
 msgid "Where to look for configuration files"
 msgstr "On cercar els fitxers de configuració"
 
-#: ../gtk/main.c:598
+#: ../gtk/main.c:611
 msgid "Start with all torrents paused"
 msgstr "Inicia amb tots els torrents en pausa"
 
-#: ../gtk/main.c:599
+#: ../gtk/main.c:612
 msgid "Start minimized in notification area"
 msgstr "Inicia minimitzat a l'àrea de notificació"
 
-#: ../gtk/main.c:600
+#: ../gtk/main.c:613
 msgid "Show version number and exit"
 msgstr "Mostra el número de versió i surt"
 
-#: ../gtk/main.c:617 ../gtk/transmission-gtk.desktop.in.h:1
+#: ../gtk/main.c:630 ../gtk/transmission-gtk.desktop.in.h:1
 msgid "Transmission"
 msgstr "Transmission"
 
 #. parse the command line
-#: ../gtk/main.c:621
+#: ../gtk/main.c:634
 msgid "[torrent files or urls]"
 msgstr "[fitxers torrent o URL]"
 
-#: ../gtk/main.c:625
+#: ../gtk/main.c:639
 #, c-format
 msgid ""
 "%s\n"
@@ -943,7 +943,7 @@ msgstr ""
 "Executeu «%s --help» per veure una llista completa de les opcions "
 "disponibles de la línia d'ordres.\n"
 
-#: ../gtk/main.c:722
+#: ../gtk/main.c:739
 msgid ""
 "Transmission is a file-sharing program. When you run a torrent, its data "
 "will be made available to others by means of upload. You and you alone are "
@@ -955,46 +955,46 @@ msgstr ""
 "les. Vós i només vós sou totalment responsable d'exercir un criteri correcte "
 "i complir les lleis locals."
 
-#: ../gtk/main.c:724
+#: ../gtk/main.c:741
 msgid "I _Accept"
 msgstr "_Accepto"
 
-#: ../gtk/main.c:933
+#: ../gtk/main.c:963
 msgid "<b>Closing Connections</b>"
 msgstr "<b>S'estan tancant les connexions</b>"
 
-#: ../gtk/main.c:937
+#: ../gtk/main.c:967
 msgid "Sending upload/download totals to tracker…"
 msgstr "Enviant els totals de pujada i baixada cap al rastrejador..."
 
-#: ../gtk/main.c:942
+#: ../gtk/main.c:972
 msgid "_Quit Now"
 msgstr "_Surt ara"
 
-#: ../gtk/main.c:1000
+#: ../gtk/main.c:1030
 msgid "Couldn't add corrupt torrent"
 msgid_plural "Couldn't add corrupt torrents"
 msgstr[0] "No s'ha pogut afegir un torrent malmès"
 msgstr[1] "No s'han pogut afegir torrents malmesos"
 
-#: ../gtk/main.c:1007
+#: ../gtk/main.c:1037
 msgid "Couldn't add duplicate torrent"
 msgid_plural "Couldn't add duplicate torrents"
 msgstr[0] "No s'ha pogut afegir un torrent duplicat"
 msgstr[1] "No s'han pogut afegir torrents duplicats"
 
-#: ../gtk/main.c:1308
+#: ../gtk/main.c:1336
 msgid "A fast and easy BitTorrent client"
 msgstr "Un client de BitTorrent ràpid i senzill"
 
-#: ../gtk/main.c:1309
+#: ../gtk/main.c:1337
 msgid "Copyright (c) The Transmission Project"
 msgstr "Copyright (c) El projecte del Transmission"
 
 #. Translators: translate "translator-credits" as your name
 #. to have it appear in the credits in the "About"
 #. dialog
-#: ../gtk/main.c:1315
+#: ../gtk/main.c:1343
 msgid "translator-credits"
 msgstr ""
 "Joan Duran <jodufi@gmail.com>, 2008\n"
@@ -1112,43 +1112,43 @@ msgstr "Torrent _particular"
 msgid "Couldn't save \"%s\""
 msgstr "No s'ha pogut desar «%s»"
 
-#: ../gtk/msgwin.c:195
+#: ../gtk/msgwin.c:205
 msgid "Save Log"
 msgstr "Desa el registre"
 
-#: ../gtk/msgwin.c:291
+#: ../gtk/msgwin.c:300
 msgid "Time"
 msgstr "Hora"
 
-#: ../gtk/msgwin.c:299
+#: ../gtk/msgwin.c:310
 msgid "Message"
 msgstr "Missatge"
 
-#: ../gtk/msgwin.c:430
+#: ../gtk/msgwin.c:441
 msgid "Debug"
 msgstr "Depuració"
 
-#: ../gtk/msgwin.c:456
+#: ../gtk/msgwin.c:467
 msgid "Message Log"
 msgstr "Registre de missatges"
 
-#: ../gtk/msgwin.c:491
+#: ../gtk/msgwin.c:502
 msgid "Level"
 msgstr "Nivell"
 
-#: ../gtk/notify.c:215
+#: ../gtk/notify.c:219
 msgid "Open File"
 msgstr "Obre un fitxer"
 
-#: ../gtk/notify.c:220
+#: ../gtk/notify.c:224
 msgid "Open Folder"
 msgstr "Obre la carpeta"
 
-#: ../gtk/notify.c:228
+#: ../gtk/notify.c:232
 msgid "Torrent Complete"
 msgstr "S'ha completat el torrent"
 
-#: ../gtk/notify.c:250
+#: ../gtk/notify.c:254
 msgid "Torrent Added"
 msgstr "S'ha afegit el torrent"
 
@@ -1198,15 +1198,15 @@ msgstr "Obre un torrent"
 msgid "Show _options dialog"
 msgstr "Mostra el diàleg de les _opcions"
 
-#: ../gtk/open-dialog.c:492
+#: ../gtk/open-dialog.c:491
 msgid "Open URL"
 msgstr "Obre un URL"
 
-#: ../gtk/open-dialog.c:505
+#: ../gtk/open-dialog.c:504
 msgid "Open torrent from URL"
 msgstr "Obre un torrent des d'un URL"
 
-#: ../gtk/open-dialog.c:510
+#: ../gtk/open-dialog.c:509
 msgid "_URL"
 msgstr "_URL"
 
@@ -1402,7 +1402,7 @@ msgid_plural "Downloading metadata from %1$'d peers (%2$d%% done)"
 msgstr[0] "S'estan baixant les metadades del client %1$'d (%2$d%% fet)"
 msgstr[1] "S'estan baixant les metadades dels clients %1$'d  (%2$d%% fet)"
 
-#: ../gtk/torrent-cell-renderer.c:286
+#: ../gtk/torrent-cell-renderer.c:301
 #, c-format
 msgid "Seeding to %1$'d of %2$'d connected peer"
 msgid_plural "Seeding to %1$'d of %2$'d connected peers"
@@ -1421,26 +1421,26 @@ msgstr "Client de BitTorrent Transmission"
 msgid "Download and share files over BitTorrent"
 msgstr "Baixeu i compartiu fitxers mitjançant el BitTorrent"
 
-#: ../gtk/tr-core.c:1083
+#: ../gtk/tr-core.c:1181
 #, c-format
 msgid "Couldn't read \"%s\": %s"
 msgstr "No s'ha pogut llegir \"%s\": %s"
 
-#: ../gtk/tr-core.c:1175
+#: ../gtk/tr-core.c:1277
 #, c-format
 msgid "Skipping unknown torrent \"%s\""
 msgstr "S'està ometent el torrent desconegut «%s»"
 
-#: ../gtk/tr-core.c:1411
+#: ../gtk/tr-core.c:1521
 msgid "Inhibiting desktop hibernation"
 msgstr "S'està inhibint la hibernació de l'escriptori"
 
-#: ../gtk/tr-core.c:1413
+#: ../gtk/tr-core.c:1525
 #, c-format
 msgid "Couldn't inhibit desktop hibernation: %s"
 msgstr "No s'ha pogut inhibir la hibernació de l'escriptori: %s"
 
-#: ../gtk/tr-core.c:1446
+#: ../gtk/tr-core.c:1559
 msgid "Allowing desktop hibernation"
 msgstr "Permet la hibernació de l'escriptori"
 
@@ -1480,7 +1480,7 @@ msgstr "Màxim nombre de _baixades actives"
 msgid "Downloads sharing data in the last N minutes are _active:"
 msgstr "Baixades _actives els últims N minuts que estan compartint dades:"
 
-#: ../gtk/tr-prefs.c:286 ../libtransmission/torrent.c:1909
+#: ../gtk/tr-prefs.c:286 ../libtransmission/torrent.c:1919
 msgid "Incomplete"
 msgstr "No s'ha completat"
 
@@ -1518,7 +1518,7 @@ msgstr "Atura la compartició a la _relació:"
 msgid "Stop seeding if idle for _N minutes:"
 msgstr "Atura la compartició si està inactiu _N minuts:"
 
-#: ../gtk/tr-prefs.c:378 ../gtk/tr-prefs.c:1289
+#: ../gtk/tr-prefs.c:378 ../gtk/tr-prefs.c:1291
 msgid "Desktop"
 msgstr "Escriptori"
 
@@ -1768,81 +1768,81 @@ msgstr " _a "
 msgid "_On days:"
 msgstr "_Als dies:"
 
-#: ../gtk/tr-prefs.c:1143 ../gtk/tr-prefs.c:1209
+#: ../gtk/tr-prefs.c:1143 ../gtk/tr-prefs.c:1212
 msgid "Status unknown"
 msgstr "Estat desconegut"
 
-#: ../gtk/tr-prefs.c:1165
+#: ../gtk/tr-prefs.c:1167
 msgid "Port is <b>open</b>"
 msgstr "El port està <b>obert</b>"
 
-#: ../gtk/tr-prefs.c:1165
+#: ../gtk/tr-prefs.c:1167
 msgid "Port is <b>closed</b>"
 msgstr "El port està <b>tancat</b>"
 
-#: ../gtk/tr-prefs.c:1179
+#: ../gtk/tr-prefs.c:1182
 msgid "<i>Testing TCP port…</i>"
 msgstr "<i>Provant el port TCP...</i>"
 
-#: ../gtk/tr-prefs.c:1202
+#: ../gtk/tr-prefs.c:1205
 msgid "Listening Port"
 msgstr "Port a escoltar"
 
-#: ../gtk/tr-prefs.c:1204
+#: ../gtk/tr-prefs.c:1207
 msgid "_Port used for incoming connections:"
 msgstr "_Port utilitzat per a les connexions d'entrada:"
 
-#: ../gtk/tr-prefs.c:1212
+#: ../gtk/tr-prefs.c:1215
 msgid "Te_st Port"
 msgstr "_Comprova el port"
 
-#: ../gtk/tr-prefs.c:1219
+#: ../gtk/tr-prefs.c:1222
 msgid "Pick a _random port every time Transmission is started"
 msgstr "_Tria un port aleatori cada cop que s'inicia el Transmission"
 
-#: ../gtk/tr-prefs.c:1223
+#: ../gtk/tr-prefs.c:1226
 msgid "Use UPnP or NAT-PMP port _forwarding from my router"
 msgstr ""
 "Utilitza el _redireccionament de ports UPnP o NAT-PMP de l'encaminador"
 
-#: ../gtk/tr-prefs.c:1228
+#: ../gtk/tr-prefs.c:1231
 msgid "Peer Limits"
 msgstr "Límit de clients"
 
-#: ../gtk/tr-prefs.c:1231
+#: ../gtk/tr-prefs.c:1234
 msgid "Maximum peers per _torrent:"
 msgstr "Nombre màxim de clients per t_orrent:"
 
-#: ../gtk/tr-prefs.c:1233
+#: ../gtk/tr-prefs.c:1236
 msgid "Maximum peers _overall:"
 msgstr "Nombre _màxim de clients:"
 
-#: ../gtk/tr-prefs.c:1239
+#: ../gtk/tr-prefs.c:1242
 msgid "Enable _uTP for peer communication"
 msgstr "Habilita el _uTP per a la comunicacó dels clients"
 
-#: ../gtk/tr-prefs.c:1241
+#: ../gtk/tr-prefs.c:1244
 msgid "uTP is a tool for reducing network congestion."
 msgstr "El uTP és una eina per reduir la congestió de xarxa."
 
-#: ../gtk/tr-prefs.c:1260
+#: ../gtk/tr-prefs.c:1262
 msgid "Transmission Preferences"
 msgstr "Preferències del Transmission"
 
-#: ../gtk/tr-prefs.c:1274
+#: ../gtk/tr-prefs.c:1276
 msgid "Torrents"
 msgstr "Torrents"
 
-#: ../gtk/tr-prefs.c:1277
+#: ../gtk/tr-prefs.c:1279
 msgctxt "Gerund"
 msgid "Downloading"
 msgstr "Baixades"
 
-#: ../gtk/tr-prefs.c:1286
+#: ../gtk/tr-prefs.c:1288
 msgid "Network"
 msgstr "Xarxa"
 
-#: ../gtk/tr-prefs.c:1292
+#: ../gtk/tr-prefs.c:1294
 msgid "Web"
 msgstr "Web"
 
@@ -1991,7 +1991,7 @@ msgstr "GB/s"
 msgid "TB/s"
 msgstr "TB/s"
 
-#: ../gtk/util.c:87 ../libtransmission/utils.c:1505
+#: ../cli/cli.c:115 ../gtk/util.c:87 ../libtransmission/utils.c:1509
 msgid "None"
 msgstr "Res"
 
@@ -2023,45 +2023,45 @@ msgid_plural "%'d seconds"
 msgstr[0] "%'d segon"
 msgstr[1] "%'d segons"
 
-#: ../gtk/util.c:221
+#: ../gtk/util.c:223
 #, c-format
 msgid "The torrent file \"%s\" contains invalid data."
 msgstr "El fitxer torrent «%s» conté dades invàlides."
 
-#: ../gtk/util.c:222
+#: ../gtk/util.c:224
 #, c-format
 msgid "The torrent file \"%s\" is already in use."
 msgstr "El fitxer torrent «%s» ja s'està utilitzant."
 
-#: ../gtk/util.c:223
+#: ../gtk/util.c:225
 #, c-format
 msgid "The torrent file \"%s\" encountered an unknown error."
 msgstr "S'ha produït un error desconegut en el fitxer torrent «%s»."
 
-#: ../gtk/util.c:231
+#: ../gtk/util.c:233
 msgid "Error opening torrent"
 msgstr "S'ha produït un error en obrir el fitxer torrent"
 
-#: ../gtk/util.c:534
+#: ../gtk/util.c:540
 #, c-format
 msgid "Error opening \"%s\""
 msgstr "S'ha produït un error en obrir «%s»"
 
-#: ../gtk/util.c:537
+#: ../gtk/util.c:543
 #, c-format
 msgid "Server returned \"%1$ld %2$s\""
 msgstr "El servidor ha retornat «%1$ld %2$s»"
 
-#: ../gtk/util.c:557
+#: ../gtk/util.c:563
 msgid "Unrecognized URL"
 msgstr "URL no reconegut"
 
-#: ../gtk/util.c:559
+#: ../gtk/util.c:565
 #, c-format
 msgid "Transmission doesn't know how to use \"%s\""
 msgstr "El Transmission no sap com utilitzar «%s»"
 
-#: ../gtk/util.c:564
+#: ../gtk/util.c:570
 #, c-format
 msgid ""
 "This magnet link appears to be intended for something other than BitTorrent. "
@@ -2076,17 +2076,19 @@ msgstr ""
 msgid "Invalid metadata"
 msgstr "Metadades invàlides"
 
-#: ../libtransmission/bencode.c:1716 ../libtransmission/bencode.c:1744
+#: ../libtransmission/bencode.c:1723 ../libtransmission/bencode.c:1751
 #, c-format
 msgid "Couldn't save temporary file \"%1$s\": %2$s"
 msgstr "No s'ha pogut desat el fitxer temporal «%1$s»: %2$s"
 
-#: ../libtransmission/bencode.c:1731
+#: ../libtransmission/bencode.c:1738
 #, c-format
 msgid "Saved \"%s\""
 msgstr "S'ha desat «%s»"
 
-#: ../libtransmission/bencode.c:1736 ../libtransmission/blocklist.c:417
+#: ../libtransmission/bencode.c:1743 ../libtransmission/blocklist.c:417
+#: ../libtransmission/rpcimpl.c:1260 ../libtransmission/rpcimpl.c:1271
+#: ../libtransmission/rpcimpl.c:1287
 #, c-format
 msgid "Couldn't save file \"%1$s\": %2$s"
 msgstr "No s'ha pogut desar el fitxer «%1$s»: %2$s"
@@ -2113,23 +2115,23 @@ msgstr "la llista de bloquejats ha omès l'adreça no vàlida a la línia %d"
 msgid "Blocklist \"%s\" updated with %zu entries"
 msgstr "La llista de bloquejats «%s» s'ha actualitzat amb %zu entrades"
 
-#: ../libtransmission/fdlimit.c:360 ../libtransmission/metainfo.c:112
-#: ../libtransmission/utils.c:570 ../libtransmission/utils.c:581
+#: ../libtransmission/fdlimit.c:348 ../libtransmission/utils.c:574
+#: ../libtransmission/utils.c:585
 #, c-format
 msgid "Couldn't create \"%1$s\": %2$s"
 msgstr "No s'ha pogut crear «%1$s»: %2$s"
 
-#: ../libtransmission/fdlimit.c:381
+#: ../libtransmission/fdlimit.c:369
 #, c-format
 msgid "Couldn't open \"%1$s\": %2$s"
 msgstr "No s'ha pogut obrir «%1$s»: %2$s"
 
-#: ../libtransmission/fdlimit.c:396
+#: ../libtransmission/fdlimit.c:384
 #, c-format
 msgid "Couldn't truncate \"%1$s\": %2$s"
 msgstr "No s'ha pogut truncar «%1$s»: %2$s"
 
-#: ../libtransmission/fdlimit.c:682
+#: ../libtransmission/fdlimit.c:670
 #, c-format
 msgid "Couldn't create socket: %s"
 msgstr "No s'ha pogut crear el sòcol: %s"
@@ -2139,7 +2141,7 @@ msgstr "No s'ha pogut crear el sòcol: %s"
 msgid "Torrent Creator is skipping file \"%s\": %s"
 msgstr "El creador de fitxers torrent està ometent el fitxer «%s»: %s"
 
-#: ../libtransmission/metainfo.c:592
+#: ../libtransmission/metainfo.c:533
 #, c-format
 msgid "Invalid metadata entry \"%s\""
 msgstr "Entrada de metadades «%s» invàlida"
@@ -2178,21 +2180,21 @@ msgstr "No s'ha pogut establir l'adreça font %s a %d: %s"
 msgid "Couldn't connect socket %d to %s, port %d (errno %d - %s)"
 msgstr "No s'ha pogut connectar el sòcol %d a %s, port %d (error %d -%s)"
 
-#: ../libtransmission/net.c:356
+#: ../libtransmission/net.c:360
 msgid "Is another copy of Transmission already running?"
 msgstr "Pot ser que s'estigui executant una altra còpia del Transmission?"
 
-#: ../libtransmission/net.c:361
+#: ../libtransmission/net.c:365
 #, c-format
 msgid "Couldn't bind port %d on %s: %s"
 msgstr "No s'ha pogut vincular el port %d a %s: %s"
 
-#: ../libtransmission/net.c:363
+#: ../libtransmission/net.c:367
 #, c-format
 msgid "Couldn't bind port %d on %s: %s (%s)"
 msgstr "No s'ha pogut vincular el port %d a %s: %s (%s)"
 
-#: ../libtransmission/peer-msgs.c:1896
+#: ../libtransmission/peer-msgs.c:1898
 #, c-format
 msgid "Please Verify Local Data! Piece #%zu is corrupt."
 msgstr "Verifiqueu les dades locals. La peça número %zu està malmesa."
@@ -2217,7 +2219,7 @@ msgstr "S'està aturant"
 msgid "Not forwarded"
 msgstr "No redireccionat"
 
-#: ../libtransmission/port-forwarding.c:91 ../libtransmission/torrent.c:2046
+#: ../libtransmission/port-forwarding.c:91 ../libtransmission/torrent.c:2060
 #, c-format
 msgid "State changed from \"%1$s\" to \"%2$s\""
 msgstr "L'estat ha canviat de «%1$s» a «%2$s»"
@@ -2228,27 +2230,27 @@ msgstr "Aturat"
 
 #. first %s is the application name
 #. second %s is the version number
-#: ../libtransmission/session.c:720
+#: ../libtransmission/session.c:722
 #, c-format
 msgid "%s %s started"
 msgstr "%s %s iniciat"
 
-#: ../libtransmission/session.c:1937
+#: ../libtransmission/session.c:1943
 #, c-format
 msgid "Loaded %d torrents"
 msgstr "S'han carregat %d torrents"
 
-#: ../libtransmission/torrent.c:523
+#: ../libtransmission/torrent.c:525
 #, c-format
 msgid "Tracker warning: \"%s\""
 msgstr "Avís del rastrejador: «%s»"
 
-#: ../libtransmission/torrent.c:530
+#: ../libtransmission/torrent.c:532
 #, c-format
 msgid "Tracker error: \"%s\""
 msgstr "Error del rastrejador: «%s»"
 
-#: ../libtransmission/torrent.c:777
+#: ../libtransmission/torrent.c:787
 msgid ""
 "No data found! Ensure your drives are connected or use \"Set Location\". To "
 "re-download, remove the torrent and re-add it."
@@ -2257,21 +2259,21 @@ msgstr ""
 "utilitzeu «Estableix la ubicació». Per tornar a baixar-lo, suprimiu el "
 "torrent i torneu a afegir-lo."
 
-#: ../libtransmission/torrent.c:1667
+#: ../libtransmission/torrent.c:1677
 msgid "Restarted manually -- disabling its seed ratio"
 msgstr ""
 "S'ha reiniciat manualment-- s'està inhabilitant la seva relació de "
 "compartició"
 
-#: ../libtransmission/torrent.c:1819
+#: ../libtransmission/torrent.c:1829
 msgid "Removing torrent"
 msgstr "S'està suprimint el torrent"
 
-#: ../libtransmission/torrent.c:1903
+#: ../libtransmission/torrent.c:1913
 msgid "Done"
 msgstr "Fet"
 
-#: ../libtransmission/torrent.c:1906
+#: ../libtransmission/torrent.c:1916
 msgid "Complete"
 msgstr "Completat"
 
@@ -2279,27 +2281,27 @@ msgstr "Completat"
 msgid "Port Forwarding (UPnP)"
 msgstr "Redireccionament de ports (UPnP)"
 
-#: ../libtransmission/upnp.c:201
+#: ../libtransmission/upnp.c:199
 #, c-format
 msgid "Found Internet Gateway Device \"%s\""
 msgstr "S'ha trobat un dispositiu de porta d'enllaç a Internet «%s»"
 
-#: ../libtransmission/upnp.c:204
+#: ../libtransmission/upnp.c:202
 #, c-format
 msgid "Local Address is \"%s\""
 msgstr "L'adreça local és «%s»"
 
-#: ../libtransmission/upnp.c:233
+#: ../libtransmission/upnp.c:231
 #, c-format
 msgid "Port %d isn't forwarded"
 msgstr "El port %d no s'ha redireccionat"
 
-#: ../libtransmission/upnp.c:244
+#: ../libtransmission/upnp.c:242
 #, c-format
 msgid "Stopping port forwarding through \"%s\", service \"%s\""
 msgstr "S'està aturant el redireccionament del port «%s», servei «%s»"
 
-#: ../libtransmission/upnp.c:277
+#: ../libtransmission/upnp.c:275
 #, c-format
 msgid ""
 "Port forwarding through \"%s\", service \"%s\". (local address: %s:%d)"
@@ -2307,7 +2309,7 @@ msgstr ""
 "Redireccionament del port a través de «%s», servei «%s». (adreça local: "
 "%s:%d)"
 
-#: ../libtransmission/upnp.c:282
+#: ../libtransmission/upnp.c:280
 msgid "Port forwarding successful!"
 msgstr "Redireccionament del port completat"
 
@@ -2320,12 +2322,12 @@ msgid "Memory allocation failed"
 msgstr "Ha fallat l'assignació de memòria"
 
 #. Node exists but isn't a folder
-#: ../libtransmission/utils.c:580
+#: ../libtransmission/utils.c:584
 #, c-format
 msgid "File \"%s\" is in the way"
 msgstr "El fitxer «%s» està en camí"
 
-#: ../libtransmission/verify.c:218
+#: ../libtransmission/verify.c:229
 msgid "Verifying torrent"
 msgstr "S'està verificant el torrent"
 

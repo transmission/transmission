@@ -8,15 +8,15 @@ msgstr ""
 "Project-Id-Version: transmission\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2012-02-03 15:22-0600\n"
-"PO-Revision-Date: 2012-02-06 21:31+0000\n"
+"PO-Revision-Date: 2012-10-27 20:13+0000\n"
 "Last-Translator: Asier Sarasua Garmendia <Unknown>\n"
 "Language-Team: Basque <eu@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2012-09-26 02:29+0000\n"
-"X-Generator: Launchpad (build 16022)\n"
+"X-Launchpad-Export-Date: 2013-06-26 02:14+0000\n"
+"X-Generator: Launchpad (build 16681)\n"
 
 #: ../gtk/actions.c:45
 msgid "Sort by _Activity"
@@ -250,7 +250,7 @@ msgstr "Mugitu _beheraino"
 msgid "Present Main Window"
 msgstr "Erakutsi leiho nagusia"
 
-#: ../gtk/conf.c:317 ../gtk/conf.c:322
+#: ../gtk/conf.c:331 ../gtk/conf.c:336
 #, c-format
 msgid "Importing \"%s\""
 msgstr "\"%s\" inportatzen"
@@ -275,7 +275,7 @@ msgstr "Aletu jarduera kontuan hartu gabe"
 msgid "Stop seeding if idle for N minutes:"
 msgstr "Gelditu aletzea N minutuz inaktibo egon ondoren:"
 
-#: ../gtk/details.c:478 ../gtk/tr-prefs.c:1280
+#: ../gtk/details.c:478 ../gtk/tr-prefs.c:1282
 msgid "Speed"
 msgstr "Abiadura"
 
@@ -318,7 +318,7 @@ msgid "_Maximum peers:"
 msgstr "Pare-kopuru _maximoa:"
 
 #: ../gtk/details.c:559 ../gtk/torrent-cell-renderer.c:201
-#: ../libtransmission/verify.c:260
+#: ../libtransmission/verify.c:273
 msgid "Queued for verification"
 msgstr "Egiaztatzeko ilaran"
 
@@ -330,7 +330,7 @@ msgstr "Datu lokalak egiaztatzen"
 msgid "Queued for download"
 msgstr "Deskargatzeko ilaran gehitua"
 
-#: ../gtk/details.c:562 ../gtk/filter.c:699
+#: ../gtk/details.c:562 ../gtk/filter.c:702
 msgctxt "Verb"
 msgid "Downloading"
 msgstr "Deskargatzen"
@@ -339,16 +339,16 @@ msgstr "Deskargatzen"
 msgid "Queued for seeding"
 msgstr "Aletzeko ilaran gehitua"
 
-#: ../gtk/details.c:564 ../gtk/filter.c:700
+#: ../gtk/details.c:564 ../gtk/filter.c:703
 msgctxt "Verb"
 msgid "Seeding"
 msgstr "Aletzen"
 
-#: ../gtk/details.c:565 ../gtk/filter.c:702 ../gtk/torrent-cell-renderer.c:198
+#: ../gtk/details.c:565 ../gtk/filter.c:705 ../gtk/torrent-cell-renderer.c:198
 msgid "Finished"
 msgstr "Amaitua"
 
-#: ../gtk/details.c:565 ../gtk/filter.c:701 ../gtk/torrent-cell-renderer.c:198
+#: ../gtk/details.c:565 ../gtk/filter.c:704 ../gtk/torrent-cell-renderer.c:198
 msgid "Paused"
 msgstr "Pausatua"
 
@@ -712,7 +712,7 @@ msgstr "Aztarnaria"
 msgid "_Announce URL:"
 msgstr "_Iragarpen URLa:"
 
-#: ../gtk/details.c:2397 ../gtk/details.c:2541 ../gtk/filter.c:322
+#: ../gtk/details.c:2397 ../gtk/details.c:2541 ../gtk/filter.c:323
 msgid "Trackers"
 msgstr "Aztarnariak"
 
@@ -728,7 +728,7 @@ msgstr "_Kendu"
 msgid "Show _backup trackers"
 msgstr "Erakutsi _babeskopiako aztarnariak"
 
-#: ../gtk/details.c:2533 ../gtk/msgwin.c:429
+#: ../gtk/details.c:2533 ../gtk/msgwin.c:440
 msgid "Information"
 msgstr "Informazioa"
 
@@ -745,7 +745,7 @@ msgstr ""
 msgid "Files"
 msgstr "Fitxategiak"
 
-#: ../gtk/details.c:2554 ../gtk/tr-prefs.c:1236 ../gtk/tr-window.c:658
+#: ../gtk/details.c:2554 ../gtk/tr-prefs.c:1239 ../gtk/tr-window.c:658
 msgid "Options"
 msgstr "Aukerak"
 
@@ -782,10 +782,10 @@ msgid_plural ""
 "magnet links."
 msgstr[0] ""
 "Kendu ondoren, transferentziarekin jarraitu nahi bada torrent fitxategia edo "
-"magnet esteka beherko da."
+"magnet esteka beharko da."
 msgstr[1] ""
 "Kendu ondoren, transferentziekin jarraitu nahi bada torrent fitxategiak edo "
-"magnet estekak beherko dira."
+"magnet estekak beharko dira."
 
 #: ../gtk/dialogs.c:117
 msgid "This torrent has not finished downloading."
@@ -811,19 +811,19 @@ msgid_plural "Some of these torrents have not finished downloading."
 msgstr[0] "Torrent hauetako batek ez du deskarga amaitu."
 msgstr[1] "Torrent hauetako batzuk ez dute deskarga amaitu."
 
-#: ../gtk/file-list.c:607 ../gtk/filter.c:347 ../gtk/util.c:465
+#: ../gtk/file-list.c:607 ../gtk/filter.c:348 ../gtk/util.c:471
 msgid "High"
 msgstr "Altua"
 
-#: ../gtk/file-list.c:608 ../gtk/filter.c:351 ../gtk/util.c:466
+#: ../gtk/file-list.c:608 ../gtk/filter.c:352 ../gtk/util.c:472
 msgid "Normal"
 msgstr "Normala"
 
-#: ../gtk/file-list.c:609 ../gtk/filter.c:355 ../gtk/util.c:467
+#: ../gtk/file-list.c:609 ../gtk/filter.c:356 ../gtk/util.c:473
 msgid "Low"
 msgstr "Baxua"
 
-#: ../gtk/file-list.c:827 ../gtk/msgwin.c:295
+#: ../gtk/file-list.c:827 ../gtk/msgwin.c:305
 msgid "Name"
 msgstr "Izena"
 
@@ -843,52 +843,52 @@ msgid "Download"
 msgstr "Deskarga"
 
 #. add priority column
-#: ../gtk/file-list.c:886 ../gtk/filter.c:342
+#: ../gtk/file-list.c:886 ../gtk/filter.c:343
 msgid "Priority"
 msgstr "Lehentasuna"
 
-#: ../gtk/filter.c:314 ../gtk/filter.c:696
+#: ../gtk/filter.c:315 ../gtk/filter.c:699
 msgid "All"
 msgstr "Dena"
 
-#: ../gtk/filter.c:328 ../gtk/tr-prefs.c:567 ../gtk/tr-prefs.c:1283
+#: ../gtk/filter.c:329 ../gtk/tr-prefs.c:567 ../gtk/tr-prefs.c:1285
 msgid "Privacy"
 msgstr "Pribatutasuna"
 
-#: ../gtk/filter.c:333
+#: ../gtk/filter.c:334
 msgid "Public"
 msgstr "Publikoa"
 
-#: ../gtk/filter.c:337
+#: ../gtk/filter.c:338
 msgid "Private"
 msgstr "Pribatua"
 
-#: ../gtk/filter.c:698
+#: ../gtk/filter.c:701
 msgid "Active"
 msgstr "Aktiboa"
 
-#: ../gtk/filter.c:703
+#: ../gtk/filter.c:706
 msgctxt "Verb"
 msgid "Verifying"
 msgstr "Egiaztatzen"
 
-#: ../gtk/filter.c:704 ../gtk/msgwin.c:428
+#: ../gtk/filter.c:707 ../gtk/msgwin.c:439
 msgid "Error"
 msgstr "Errorea"
 
 #. add the activity combobox
-#: ../gtk/filter.c:994
+#: ../gtk/filter.c:996
 msgid "_Show:"
 msgstr "_Erakutsi:"
 
-#: ../gtk/main.c:303
+#: ../gtk/main.c:308
 #, c-format
 msgid "Error registering Transmission as x-scheme-handler/magnet handler: %s"
 msgstr ""
 "Errorea Transmission x-scheme-handler/magnet maneiatzaile modura "
 "erregistratzean: %s"
 
-#: ../gtk/main.c:469
+#: ../gtk/main.c:477
 #, c-format
 msgid ""
 "Got signal %d; trying to shut down cleanly. Do it again if it gets stuck."
@@ -896,32 +896,32 @@ msgstr ""
 "%d seinalea jaso da; modu garbian ixten saiatzen. Egin berriro trabatzen "
 "bada."
 
-#: ../gtk/main.c:597
+#: ../gtk/main.c:610
 msgid "Where to look for configuration files"
 msgstr "Non bilatu konfigurazio-fitxategiak"
 
-#: ../gtk/main.c:598
+#: ../gtk/main.c:611
 msgid "Start with all torrents paused"
 msgstr "Abiarazi torrent guztiak pausatuta"
 
-#: ../gtk/main.c:599
+#: ../gtk/main.c:612
 msgid "Start minimized in notification area"
 msgstr "Abiarazi jakinarazpen-arean ikonotuta"
 
-#: ../gtk/main.c:600
+#: ../gtk/main.c:613
 msgid "Show version number and exit"
 msgstr "Erakutsi bertsio-zenbakia eta irten"
 
-#: ../gtk/main.c:617 ../gtk/transmission-gtk.desktop.in.h:1
+#: ../gtk/main.c:630 ../gtk/transmission-gtk.desktop.in.h:1
 msgid "Transmission"
 msgstr "Transmission"
 
 #. parse the command line
-#: ../gtk/main.c:621
+#: ../gtk/main.c:634
 msgid "[torrent files or urls]"
 msgstr "[torrent fitxategiak edo URLak]"
 
-#: ../gtk/main.c:625
+#: ../gtk/main.c:639
 #, c-format
 msgid ""
 "%s\n"
@@ -930,7 +930,7 @@ msgstr ""
 "%s\n"
 "Exekutatu '%s --help' agindu-lerroko aukera guztiak zerrendatzeko.\n"
 
-#: ../gtk/main.c:722
+#: ../gtk/main.c:739
 msgid ""
 "Transmission is a file-sharing program. When you run a torrent, its data "
 "will be made available to others by means of upload. You and you alone are "
@@ -942,58 +942,58 @@ msgstr ""
 "inguruan behar den bezalako erabakiak hartu eta legeak betetzeko "
 "erantzukizuna zurea eta soilik zurea da."
 
-#: ../gtk/main.c:724
+#: ../gtk/main.c:741
 msgid "I _Accept"
 msgstr "_Onartzen dut"
 
-#: ../gtk/main.c:933
+#: ../gtk/main.c:963
 msgid "<b>Closing Connections</b>"
 msgstr "<b>Konexioak ixten</b>"
 
-#: ../gtk/main.c:937
+#: ../gtk/main.c:967
 msgid "Sending upload/download totals to tracker…"
 msgstr "Karga/deskargen totalak aztarnarira bidaltzen..."
 
-#: ../gtk/main.c:942
+#: ../gtk/main.c:972
 msgid "_Quit Now"
 msgstr "_Irten orain"
 
-#: ../gtk/main.c:1000
+#: ../gtk/main.c:1030
 msgid "Couldn't add corrupt torrent"
 msgid_plural "Couldn't add corrupt torrents"
 msgstr[0] "Ezin izan da torrent hondatua gehitu"
 msgstr[1] "Ezin izan dira torrent hondatuak gehitu"
 
-#: ../gtk/main.c:1007
+#: ../gtk/main.c:1037
 msgid "Couldn't add duplicate torrent"
 msgid_plural "Couldn't add duplicate torrents"
 msgstr[0] "Ezin izan da torrent bikoiztua gehitu"
 msgstr[1] "Ezin izan dira torrent bikoiztuak gehitu"
 
-#: ../gtk/main.c:1308
+#: ../gtk/main.c:1336
 msgid "A fast and easy BitTorrent client"
 msgstr "BitTorrent bezero azkar eta erraza"
 
-#: ../gtk/main.c:1309
+#: ../gtk/main.c:1337
 msgid "Copyright (c) The Transmission Project"
 msgstr "Copyright (c) The Transmission Project"
 
 #. Translators: translate "translator-credits" as your name
 #. to have it appear in the credits in the "About"
 #. dialog
-#: ../gtk/main.c:1315
+#: ../gtk/main.c:1343
 msgid "translator-credits"
 msgstr ""
 "Launchpad Contributions:\n"
+"  Ander Martínez https://launchpad.net/~ander-basaundi\n"
 "  Asier Sarasua Garmendia https://launchpad.net/~asarasuagarmendia\n"
 "  BlouBlou https://launchpad.net/~bloublou\n"
-"  Ibai Oihanguren https://launchpad.net/~ibai-oihanguren\n"
+"  Ibai Oihanguren Sala https://launchpad.net/~ibai-oihanguren\n"
 "  Iñaki Calvo https://launchpad.net/~inaki-naiz\n"
 "  Josu Lazkano https://launchpad.net/~josu-lazkano\n"
 "  Krzysztof Klimonda https://launchpad.net/~kklimonda\n"
 "  Mikel Alzibar https://launchpad.net/~mikelalzibar\n"
-"  Oier Mees https://launchpad.net/~oier\n"
-"  OrE https://launchpad.net/~dwarfnauko"
+"  Oier Mees https://launchpad.net/~oier"
 
 #: ../gtk/makemeta-ui.c:75
 #, c-format
@@ -1094,43 +1094,43 @@ msgstr "Torrent _pribatua"
 msgid "Couldn't save \"%s\""
 msgstr "Ezin izan da \"%s\" gorde"
 
-#: ../gtk/msgwin.c:195
+#: ../gtk/msgwin.c:205
 msgid "Save Log"
 msgstr "Gorde egunkaria"
 
-#: ../gtk/msgwin.c:291
+#: ../gtk/msgwin.c:300
 msgid "Time"
 msgstr "Ordua"
 
-#: ../gtk/msgwin.c:299
+#: ../gtk/msgwin.c:310
 msgid "Message"
 msgstr "Mezua"
 
-#: ../gtk/msgwin.c:430
+#: ../gtk/msgwin.c:441
 msgid "Debug"
 msgstr "Araztu"
 
-#: ../gtk/msgwin.c:456
+#: ../gtk/msgwin.c:467
 msgid "Message Log"
 msgstr "Mezuen egunkaria"
 
-#: ../gtk/msgwin.c:491
+#: ../gtk/msgwin.c:502
 msgid "Level"
 msgstr "Maila"
 
-#: ../gtk/notify.c:215
+#: ../gtk/notify.c:219
 msgid "Open File"
 msgstr "Ireki fitxategia"
 
-#: ../gtk/notify.c:220
+#: ../gtk/notify.c:224
 msgid "Open Folder"
 msgstr "Ireki karpeta"
 
-#: ../gtk/notify.c:228
+#: ../gtk/notify.c:232
 msgid "Torrent Complete"
 msgstr "Torrent-a osatu da"
 
-#: ../gtk/notify.c:250
+#: ../gtk/notify.c:254
 msgid "Torrent Added"
 msgstr "Torrent-a gehitu da"
 
@@ -1180,15 +1180,15 @@ msgstr "Ireki torrent-a"
 msgid "Show _options dialog"
 msgstr "Erakutsi au_keren koadroa"
 
-#: ../gtk/open-dialog.c:492
+#: ../gtk/open-dialog.c:491
 msgid "Open URL"
 msgstr "Ireki URLa"
 
-#: ../gtk/open-dialog.c:505
+#: ../gtk/open-dialog.c:504
 msgid "Open torrent from URL"
 msgstr "Ireki torrent-a URL batetik"
 
-#: ../gtk/open-dialog.c:510
+#: ../gtk/open-dialog.c:509
 msgid "_URL"
 msgstr "_URLa"
 
@@ -1383,7 +1383,7 @@ msgid_plural "Downloading metadata from %1$'d peers (%2$d%% done)"
 msgstr[0] "Metadatuak deskargatzen pare %1$'d-etik (%2$d%% egina)"
 msgstr[1] "Metadatuak deskargatzen %1$'d paretik (%2$d%% egina)"
 
-#: ../gtk/torrent-cell-renderer.c:286
+#: ../gtk/torrent-cell-renderer.c:301
 #, c-format
 msgid "Seeding to %1$'d of %2$'d connected peer"
 msgid_plural "Seeding to %1$'d of %2$'d connected peers"
@@ -1402,26 +1402,26 @@ msgstr "Transmission BitTorrent bezeroa"
 msgid "Download and share files over BitTorrent"
 msgstr "Deskargatu eta partekatu fitxategiak BitTorrent bidez"
 
-#: ../gtk/tr-core.c:1083
+#: ../gtk/tr-core.c:1181
 #, c-format
 msgid "Couldn't read \"%s\": %s"
 msgstr "Ezin izan da \"%s\" irakurri: %s"
 
-#: ../gtk/tr-core.c:1175
+#: ../gtk/tr-core.c:1277
 #, c-format
 msgid "Skipping unknown torrent \"%s\""
 msgstr "\"%s\" torrent ezezaguna saltatzen"
 
-#: ../gtk/tr-core.c:1411
+#: ../gtk/tr-core.c:1521
 msgid "Inhibiting desktop hibernation"
 msgstr "Mahagainaren hibernazioa galarazten"
 
-#: ../gtk/tr-core.c:1413
+#: ../gtk/tr-core.c:1525
 #, c-format
 msgid "Couldn't inhibit desktop hibernation: %s"
 msgstr "Ezin izan da mahaigainaren hibernazioa galarazi: %s"
 
-#: ../gtk/tr-core.c:1446
+#: ../gtk/tr-core.c:1559
 msgid "Allowing desktop hibernation"
 msgstr "Mahaigainaren hibernatzea onartzen"
 
@@ -1461,7 +1461,7 @@ msgstr "Gehienezko _deskarga aktiboak:"
 msgid "Downloads sharing data in the last N minutes are _active:"
 msgstr "Azken N minutuetan _aktibo dauden deskargen partekatze-datuak:"
 
-#: ../gtk/tr-prefs.c:286 ../libtransmission/torrent.c:1909
+#: ../gtk/tr-prefs.c:286 ../libtransmission/torrent.c:1919
 msgid "Incomplete"
 msgstr "Osatu gabea"
 
@@ -1499,7 +1499,7 @@ msgstr "Gelditu aletzea hurrengo tasan:"
 msgid "Stop seeding if idle for _N minutes:"
 msgstr "Gelditu aletzea _N minutuz inaktibo egonez gero:"
 
-#: ../gtk/tr-prefs.c:378 ../gtk/tr-prefs.c:1289
+#: ../gtk/tr-prefs.c:378 ../gtk/tr-prefs.c:1291
 msgid "Desktop"
 msgstr "Mahaigaina"
 
@@ -1745,80 +1745,80 @@ msgstr " _hona "
 msgid "_On days:"
 msgstr "E_gun hauetan:"
 
-#: ../gtk/tr-prefs.c:1143 ../gtk/tr-prefs.c:1209
+#: ../gtk/tr-prefs.c:1143 ../gtk/tr-prefs.c:1212
 msgid "Status unknown"
 msgstr "Egoera ezezaguna"
 
-#: ../gtk/tr-prefs.c:1165
+#: ../gtk/tr-prefs.c:1167
 msgid "Port is <b>open</b>"
 msgstr "Ataka <b>irekita</b> dago"
 
-#: ../gtk/tr-prefs.c:1165
+#: ../gtk/tr-prefs.c:1167
 msgid "Port is <b>closed</b>"
 msgstr "Ataka <b>itxita</b> dago"
 
-#: ../gtk/tr-prefs.c:1179
+#: ../gtk/tr-prefs.c:1182
 msgid "<i>Testing TCP port…</i>"
 msgstr "<i>TCP ataka probatzen…</i>"
 
-#: ../gtk/tr-prefs.c:1202
+#: ../gtk/tr-prefs.c:1205
 msgid "Listening Port"
 msgstr "Entzuteko ataka"
 
-#: ../gtk/tr-prefs.c:1204
+#: ../gtk/tr-prefs.c:1207
 msgid "_Port used for incoming connections:"
 msgstr "_Sarrerako konexioetarako erabilitako ataka:"
 
-#: ../gtk/tr-prefs.c:1212
+#: ../gtk/tr-prefs.c:1215
 msgid "Te_st Port"
 msgstr "_Probatu ataka"
 
-#: ../gtk/tr-prefs.c:1219
+#: ../gtk/tr-prefs.c:1222
 msgid "Pick a _random port every time Transmission is started"
 msgstr "Hautatu _ausazko ataka bat Transmission abiarazten den bakoitzean"
 
-#: ../gtk/tr-prefs.c:1223
+#: ../gtk/tr-prefs.c:1226
 msgid "Use UPnP or NAT-PMP port _forwarding from my router"
 msgstr "Erabili UPnP edo NAT-PMP ataka-birbidalketa nire bideratzailetik"
 
-#: ../gtk/tr-prefs.c:1228
+#: ../gtk/tr-prefs.c:1231
 msgid "Peer Limits"
 msgstr "Pareen mugak"
 
-#: ../gtk/tr-prefs.c:1231
+#: ../gtk/tr-prefs.c:1234
 msgid "Maximum peers per _torrent:"
 msgstr "Pare-kopuru maximoa _torrent bakoitzeko:"
 
-#: ../gtk/tr-prefs.c:1233
+#: ../gtk/tr-prefs.c:1236
 msgid "Maximum peers _overall:"
 msgstr "Pare-kopuru maximoa _guztira:"
 
-#: ../gtk/tr-prefs.c:1239
+#: ../gtk/tr-prefs.c:1242
 msgid "Enable _uTP for peer communication"
 msgstr "Gaitu _uTP pareen komunikaziorako"
 
-#: ../gtk/tr-prefs.c:1241
+#: ../gtk/tr-prefs.c:1244
 msgid "uTP is a tool for reducing network congestion."
 msgstr "uTP sarearen buxadura murrizteko tresna bat da."
 
-#: ../gtk/tr-prefs.c:1260
+#: ../gtk/tr-prefs.c:1262
 msgid "Transmission Preferences"
 msgstr "Transmission-en hobespenak"
 
-#: ../gtk/tr-prefs.c:1274
+#: ../gtk/tr-prefs.c:1276
 msgid "Torrents"
 msgstr "Torrent-ak"
 
-#: ../gtk/tr-prefs.c:1277
+#: ../gtk/tr-prefs.c:1279
 msgctxt "Gerund"
 msgid "Downloading"
 msgstr "Deskargatzen"
 
-#: ../gtk/tr-prefs.c:1286
+#: ../gtk/tr-prefs.c:1288
 msgid "Network"
 msgstr "Sarea"
 
-#: ../gtk/tr-prefs.c:1292
+#: ../gtk/tr-prefs.c:1294
 msgid "Web"
 msgstr "Web-a"
 
@@ -1967,7 +1967,7 @@ msgstr "GB/s"
 msgid "TB/s"
 msgstr "TB/s"
 
-#: ../gtk/util.c:87 ../libtransmission/utils.c:1505
+#: ../cli/cli.c:115 ../gtk/util.c:87 ../libtransmission/utils.c:1509
 msgid "None"
 msgstr "Bat ere ez"
 
@@ -1999,45 +1999,45 @@ msgid_plural "%'d seconds"
 msgstr[0] "Segundo %'d"
 msgstr[1] "%'d segundo"
 
-#: ../gtk/util.c:221
+#: ../gtk/util.c:223
 #, c-format
 msgid "The torrent file \"%s\" contains invalid data."
 msgstr "\"%s\" torrent-fitxategiak baliogabeko datuak ditu."
 
-#: ../gtk/util.c:222
+#: ../gtk/util.c:224
 #, c-format
 msgid "The torrent file \"%s\" is already in use."
 msgstr "\"%s\" torrent-fitxategia jadanik erabilia izaten ari da."
 
-#: ../gtk/util.c:223
+#: ../gtk/util.c:225
 #, c-format
 msgid "The torrent file \"%s\" encountered an unknown error."
 msgstr "\"%s\" torrent-fitxategiak errore ezezaguna aurkitu du."
 
-#: ../gtk/util.c:231
+#: ../gtk/util.c:233
 msgid "Error opening torrent"
 msgstr "Errorea torrent-a irekitzean"
 
-#: ../gtk/util.c:534
+#: ../gtk/util.c:540
 #, c-format
 msgid "Error opening \"%s\""
 msgstr "Errorea \"%s\" irekitzean"
 
-#: ../gtk/util.c:537
+#: ../gtk/util.c:543
 #, c-format
 msgid "Server returned \"%1$ld %2$s\""
 msgstr "Zerbitzariak \"%1$ld %2$s\" itzuli du"
 
-#: ../gtk/util.c:557
+#: ../gtk/util.c:563
 msgid "Unrecognized URL"
 msgstr "URL ezezaguna"
 
-#: ../gtk/util.c:559
+#: ../gtk/util.c:565
 #, c-format
 msgid "Transmission doesn't know how to use \"%s\""
 msgstr "Transmission-ek ez daki \"%s\" nola erabili"
 
-#: ../gtk/util.c:564
+#: ../gtk/util.c:570
 #, c-format
 msgid ""
 "This magnet link appears to be intended for something other than BitTorrent. "
@@ -2051,17 +2051,19 @@ msgstr ""
 msgid "Invalid metadata"
 msgstr "Baliogabeko metadatuak"
 
-#: ../libtransmission/bencode.c:1716 ../libtransmission/bencode.c:1744
+#: ../libtransmission/bencode.c:1723 ../libtransmission/bencode.c:1751
 #, c-format
 msgid "Couldn't save temporary file \"%1$s\": %2$s"
 msgstr "Ezin izan da behin-behineko \"%1$s\" fitxategia gorde: %2$s"
 
-#: ../libtransmission/bencode.c:1731
+#: ../libtransmission/bencode.c:1738
 #, c-format
 msgid "Saved \"%s\""
 msgstr "\"%s\" gorde da"
 
-#: ../libtransmission/bencode.c:1736 ../libtransmission/blocklist.c:417
+#: ../libtransmission/bencode.c:1743 ../libtransmission/blocklist.c:417
+#: ../libtransmission/rpcimpl.c:1260 ../libtransmission/rpcimpl.c:1271
+#: ../libtransmission/rpcimpl.c:1287
 #, c-format
 msgid "Couldn't save file \"%1$s\": %2$s"
 msgstr "Ezin izan da \"%1$s\" fitxategia gorde: %2$s"
@@ -2088,23 +2090,23 @@ msgstr "blokeatze-zerrendak helbide baliogabea saltatu du %d lerroan"
 msgid "Blocklist \"%s\" updated with %zu entries"
 msgstr "\"%s\" blokeatze-zerrenda %zu sarrerekin eguneratu da"
 
-#: ../libtransmission/fdlimit.c:360 ../libtransmission/metainfo.c:112
-#: ../libtransmission/utils.c:570 ../libtransmission/utils.c:581
+#: ../libtransmission/fdlimit.c:348 ../libtransmission/utils.c:574
+#: ../libtransmission/utils.c:585
 #, c-format
 msgid "Couldn't create \"%1$s\": %2$s"
 msgstr "Ezin izan da \"%1$s\" sortu: %2$s"
 
-#: ../libtransmission/fdlimit.c:381
+#: ../libtransmission/fdlimit.c:369
 #, c-format
 msgid "Couldn't open \"%1$s\": %2$s"
 msgstr "Ezin izan da \"%1$s\" ireki: %2$s"
 
-#: ../libtransmission/fdlimit.c:396
+#: ../libtransmission/fdlimit.c:384
 #, c-format
 msgid "Couldn't truncate \"%1$s\": %2$s"
 msgstr "Ezin izan da \"%1$s\" moztu: %2$s"
 
-#: ../libtransmission/fdlimit.c:682
+#: ../libtransmission/fdlimit.c:670
 #, c-format
 msgid "Couldn't create socket: %s"
 msgstr "Ezin izan da socket-a sortu: %s"
@@ -2114,7 +2116,7 @@ msgstr "Ezin izan da socket-a sortu: %s"
 msgid "Torrent Creator is skipping file \"%s\": %s"
 msgstr "Torrent Creator-ek \"%s\" fitxategia saltatu egin du: %s"
 
-#: ../libtransmission/metainfo.c:592
+#: ../libtransmission/metainfo.c:533
 #, c-format
 msgid "Invalid metadata entry \"%s\""
 msgstr "Baliogabeko metadatu-sarrera \"%s\""
@@ -2154,21 +2156,21 @@ msgid "Couldn't connect socket %d to %s, port %d (errno %d - %s)"
 msgstr ""
 "Ezin izan da %d socket-a %s-(e)ra, %d atakara konektatu (errno %d - %s)"
 
-#: ../libtransmission/net.c:356
+#: ../libtransmission/net.c:360
 msgid "Is another copy of Transmission already running?"
 msgstr "Abian al dago Transmission-en beste kopiaren bat?"
 
-#: ../libtransmission/net.c:361
+#: ../libtransmission/net.c:365
 #, c-format
 msgid "Couldn't bind port %d on %s: %s"
 msgstr "Ezin izan da %d ataka %s-(e)ra lotu: %s"
 
-#: ../libtransmission/net.c:363
+#: ../libtransmission/net.c:367
 #, c-format
 msgid "Couldn't bind port %d on %s: %s (%s)"
 msgstr "Ezin izan da %d ataka %s-(e)ra lotu: %s (%s)"
 
-#: ../libtransmission/peer-msgs.c:1896
+#: ../libtransmission/peer-msgs.c:1898
 #, c-format
 msgid "Please Verify Local Data! Piece #%zu is corrupt."
 msgstr "Egiaztatu datu lokalak! #%zu zatia hondatuta dago."
@@ -2193,7 +2195,7 @@ msgstr "Gelditzen"
 msgid "Not forwarded"
 msgstr "Birbidali gabea"
 
-#: ../libtransmission/port-forwarding.c:91 ../libtransmission/torrent.c:2046
+#: ../libtransmission/port-forwarding.c:91 ../libtransmission/torrent.c:2060
 #, c-format
 msgid "State changed from \"%1$s\" to \"%2$s\""
 msgstr "Egoera aldatu egin da \"%1$s\"-(e)tik \"%2$s\"-(e)ra"
@@ -2204,27 +2206,27 @@ msgstr "Gelditua"
 
 #. first %s is the application name
 #. second %s is the version number
-#: ../libtransmission/session.c:720
+#: ../libtransmission/session.c:722
 #, c-format
 msgid "%s %s started"
 msgstr "%s %s abiarazi da"
 
-#: ../libtransmission/session.c:1937
+#: ../libtransmission/session.c:1943
 #, c-format
 msgid "Loaded %d torrents"
 msgstr "%d torrent kargatu dira"
 
-#: ../libtransmission/torrent.c:523
+#: ../libtransmission/torrent.c:525
 #, c-format
 msgid "Tracker warning: \"%s\""
 msgstr "Aztarnariaren abisua: \"%s\""
 
-#: ../libtransmission/torrent.c:530
+#: ../libtransmission/torrent.c:532
 #, c-format
 msgid "Tracker error: \"%s\""
 msgstr "Aztarnariaren errorea: \"%s\""
 
-#: ../libtransmission/torrent.c:777
+#: ../libtransmission/torrent.c:787
 msgid ""
 "No data found! Ensure your drives are connected or use \"Set Location\". To "
 "re-download, remove the torrent and re-add it."
@@ -2233,19 +2235,19 @@ msgstr ""
 "erabili \"Ezarri kokapena\". Berriro kargatzeko, kendu torrent-a eta berriro "
 "gehitu programara."
 
-#: ../libtransmission/torrent.c:1667
+#: ../libtransmission/torrent.c:1677
 msgid "Restarted manually -- disabling its seed ratio"
 msgstr "Eskuz berrabiarazi da -- bere aletze-tasa desgaitzen"
 
-#: ../libtransmission/torrent.c:1819
+#: ../libtransmission/torrent.c:1829
 msgid "Removing torrent"
 msgstr "Torrent-a kentzen"
 
-#: ../libtransmission/torrent.c:1903
+#: ../libtransmission/torrent.c:1913
 msgid "Done"
 msgstr "Egina"
 
-#: ../libtransmission/torrent.c:1906
+#: ../libtransmission/torrent.c:1916
 msgid "Complete"
 msgstr "Osatua"
 
@@ -2253,34 +2255,34 @@ msgstr "Osatua"
 msgid "Port Forwarding (UPnP)"
 msgstr "Ataka-birbidalketa (UPnP)"
 
-#: ../libtransmission/upnp.c:201
+#: ../libtransmission/upnp.c:199
 #, c-format
 msgid "Found Internet Gateway Device \"%s\""
 msgstr "\"%s\" Interneteko atebide-gailua aurkitu da"
 
-#: ../libtransmission/upnp.c:204
+#: ../libtransmission/upnp.c:202
 #, c-format
 msgid "Local Address is \"%s\""
 msgstr "Helbide lokala \"%s\" da"
 
-#: ../libtransmission/upnp.c:233
+#: ../libtransmission/upnp.c:231
 #, c-format
 msgid "Port %d isn't forwarded"
 msgstr "%d ataka ez dago birbidalita"
 
-#: ../libtransmission/upnp.c:244
+#: ../libtransmission/upnp.c:242
 #, c-format
 msgid "Stopping port forwarding through \"%s\", service \"%s\""
 msgstr "Ataka-birbidalketa gelditu da \"%s\", \"%s\" zerbitzuaren bidez"
 
-#: ../libtransmission/upnp.c:277
+#: ../libtransmission/upnp.c:275
 #, c-format
 msgid ""
 "Port forwarding through \"%s\", service \"%s\". (local address: %s:%d)"
 msgstr ""
 "Ataka-birbidalketa \"%s\" bidez, \"%s\" zerbitzua (tokiko helbidea: %s:%d)"
 
-#: ../libtransmission/upnp.c:282
+#: ../libtransmission/upnp.c:280
 msgid "Port forwarding successful!"
 msgstr "Ataka-birbidalketa ongi gauzatu da!"
 
@@ -2293,12 +2295,12 @@ msgid "Memory allocation failed"
 msgstr "Memoria-esleipenak huts egin du"
 
 #. Node exists but isn't a folder
-#: ../libtransmission/utils.c:580
+#: ../libtransmission/utils.c:584
 #, c-format
 msgid "File \"%s\" is in the way"
 msgstr "\"%s\" fitxategia bidean dago"
 
-#: ../libtransmission/verify.c:218
+#: ../libtransmission/verify.c:229
 msgid "Verifying torrent"
 msgstr "Torrent-a egiaztatzen"
 

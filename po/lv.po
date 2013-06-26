@@ -3,7 +3,7 @@
 # This file is distributed under the same license as the transmission package.
 #
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2008.
-# Rūdolfs Mazurs <rudolfs.mazurs@gmail.com>, 2009, 2010, 2011.
+# Rūdolfs Mazurs <rudolfs.mazurs@gmail.com>, 2009, 2010, 2011, 2012.
 msgid ""
 msgstr ""
 "Project-Id-Version: transmission\n"
@@ -16,8 +16,9 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n != 0 ? 1 : 2;\n"
-"X-Launchpad-Export-Date: 2012-09-26 02:29+0000\n"
-"X-Generator: Launchpad (build 16022)\n"
+"X-Launchpad-Export-Date: 2013-06-26 02:14+0000\n"
+"X-Generator: Launchpad (build 16681)\n"
+"Language: lv\n"
 
 #: ../gtk/actions.c:45
 msgid "Sort by _Activity"
@@ -89,11 +90,11 @@ msgstr "_Rīkjosla"
 
 #: ../gtk/actions.c:96
 msgid "_File"
-msgstr "_Fails"
+msgstr "_Datne"
 
 #: ../gtk/actions.c:97
 msgid "_Torrent"
-msgstr "_Torrents"
+msgstr "_Torents"
 
 #: ../gtk/actions.c:98
 msgid "_View"
@@ -101,7 +102,7 @@ msgstr "_Skats"
 
 #: ../gtk/actions.c:99
 msgid "_Sort Torrents By"
-msgstr "_Kārtot torrentus pēc"
+msgstr "_Kārtot torentus pēc"
 
 #: ../gtk/actions.c:100
 msgid "_Queue"
@@ -129,7 +130,7 @@ msgstr "Atvērt URL…"
 
 #: ../gtk/actions.c:105 ../gtk/actions.c:106
 msgid "Open a torrent"
-msgstr "Atvērt torrentu"
+msgstr "Atvērt torentu"
 
 #: ../gtk/actions.c:107
 msgid "_Start"
@@ -137,7 +138,7 @@ msgstr "_Sākt"
 
 #: ../gtk/actions.c:107
 msgid "Start torrent"
-msgstr "Sākt torrentu"
+msgstr "Sākt torentu"
 
 #: ../gtk/actions.c:108
 msgid "Start _Now"
@@ -149,7 +150,7 @@ msgstr "Sākt torentu tagad"
 
 #: ../gtk/actions.c:109
 msgid "_Statistics"
-msgstr "S_tatistika"
+msgstr "_Statistika"
 
 #: ../gtk/actions.c:110
 msgid "_Donate"
@@ -165,7 +166,7 @@ msgstr "_Pauzēt"
 
 #: ../gtk/actions.c:112
 msgid "Pause torrent"
-msgstr "Pauzēt torrentu"
+msgstr "Pauzēt torentu"
 
 #: ../gtk/actions.c:113
 msgid "_Pause All"
@@ -173,7 +174,7 @@ msgstr "_Pauzēt visus"
 
 #: ../gtk/actions.c:113
 msgid "Pause all torrents"
-msgstr "Pauzēt visus torrentus"
+msgstr "Pauzēt visus torentus"
 
 #: ../gtk/actions.c:114
 msgid "_Start All"
@@ -181,7 +182,7 @@ msgstr "_Sākt visus"
 
 #: ../gtk/actions.c:114
 msgid "Start all torrents"
-msgstr "Sākt visus torrentus"
+msgstr "Sākt visus torentus"
 
 #: ../gtk/actions.c:115
 msgid "Set _Location…"
@@ -189,19 +190,19 @@ msgstr "Iestatīt _vietu..."
 
 #: ../gtk/actions.c:116
 msgid "Remove torrent"
-msgstr "Izņemt torrentu"
+msgstr "Izņemt torentu"
 
 #: ../gtk/actions.c:117
 msgid "_Delete Files and Remove"
-msgstr "Iz_dzēst failus un izņemt"
+msgstr "Iz_dzēst datnes un izņemt"
 
 #: ../gtk/actions.c:118
 msgid "_New…"
-msgstr "Jau_ns"
+msgstr "Jau_ns…"
 
 #: ../gtk/actions.c:118
 msgid "Create a torrent"
-msgstr "Izveidot torrentu"
+msgstr "Izveidot torentu"
 
 #: ../gtk/actions.c:119
 msgid "_Quit"
@@ -213,11 +214,11 @@ msgstr "Izvēlēties _visus"
 
 #: ../gtk/actions.c:121
 msgid "Dese_lect All"
-msgstr "Izvē_lēties neko"
+msgstr "Neizvē_lēties neko"
 
 #: ../gtk/actions.c:123
 msgid "Torrent properties"
-msgstr "Torrena īpašības"
+msgstr "Torena īpašības"
 
 #: ../gtk/actions.c:124
 msgid "Open Fold_er"
@@ -229,7 +230,7 @@ msgstr "_Saturs"
 
 #: ../gtk/actions.c:127
 msgid "Ask Tracker for _More Peers"
-msgstr "_Jautāt sekotājam papildus devējus"
+msgstr "_Jautāt sekotājam papildu devējus"
 
 #: ../gtk/actions.c:128
 msgid "Move to _Top"
@@ -251,10 +252,10 @@ msgstr "Pārvietot uz a_pakšu"
 msgid "Present Main Window"
 msgstr "Rādīt galveno logu"
 
-#: ../gtk/conf.c:317 ../gtk/conf.c:322
+#: ../gtk/conf.c:331 ../gtk/conf.c:336
 #, c-format
 msgid "Importing \"%s\""
-msgstr "Importē \"%s\""
+msgstr "Importē “%s”"
 
 #: ../gtk/details.c:448 ../gtk/details.c:460
 msgid "Use global settings"
@@ -276,7 +277,7 @@ msgstr "Dot, neskatoties uz aktivitāti"
 msgid "Stop seeding if idle for N minutes:"
 msgstr "Apturēt došanu, ja dīkstāvē N minūtes:"
 
-#: ../gtk/details.c:478 ../gtk/tr-prefs.c:1280
+#: ../gtk/details.c:478 ../gtk/tr-prefs.c:1282
 msgid "Speed"
 msgstr "Ātrums"
 
@@ -296,7 +297,7 @@ msgstr "Ierobežot augš_upielādes ātrumu (%s):"
 
 #: ../gtk/details.c:511 ../gtk/open-dialog.c:351
 msgid "Torrent _priority:"
-msgstr "Torrenta _prioritāte:"
+msgstr "Torenta _prioritāte:"
 
 #: ../gtk/details.c:515
 msgid "Seeding Limits"
@@ -319,7 +320,7 @@ msgid "_Maximum peers:"
 msgstr "_Maksimālais dalībnieku skaits:"
 
 #: ../gtk/details.c:559 ../gtk/torrent-cell-renderer.c:201
-#: ../libtransmission/verify.c:260
+#: ../libtransmission/verify.c:273
 msgid "Queued for verification"
 msgstr "Rindā uz pārbaudīšanu"
 
@@ -331,7 +332,7 @@ msgstr "Pārbauda lokālos datus"
 msgid "Queued for download"
 msgstr "Ielikts rindā uz lejupielādēšanu"
 
-#: ../gtk/details.c:562 ../gtk/filter.c:699
+#: ../gtk/details.c:562 ../gtk/filter.c:702
 msgctxt "Verb"
 msgid "Downloading"
 msgstr "Lejupielādē"
@@ -340,16 +341,16 @@ msgstr "Lejupielādē"
 msgid "Queued for seeding"
 msgstr "Ielikts rindā uz došanu"
 
-#: ../gtk/details.c:564 ../gtk/filter.c:700
+#: ../gtk/details.c:564 ../gtk/filter.c:703
 msgctxt "Verb"
 msgid "Seeding"
 msgstr "Dod"
 
-#: ../gtk/details.c:565 ../gtk/filter.c:702 ../gtk/torrent-cell-renderer.c:198
+#: ../gtk/details.c:565 ../gtk/filter.c:705 ../gtk/torrent-cell-renderer.c:198
 msgid "Finished"
 msgstr "Pabeigts"
 
-#: ../gtk/details.c:565 ../gtk/filter.c:701 ../gtk/torrent-cell-renderer.c:198
+#: ../gtk/details.c:565 ../gtk/filter.c:704 ../gtk/torrent-cell-renderer.c:198
 msgid "Paused"
 msgstr "Pauzēts"
 
@@ -363,7 +364,7 @@ msgstr "Jaukts"
 
 #: ../gtk/details.c:611
 msgid "No Torrents Selected"
-msgstr "Neviens torrents nav izvēlēts"
+msgstr "Neviens torents nav izvēlēts"
 
 #: ../gtk/details.c:633
 msgid "Private to this tracker -- DHT and PEX disabled"
@@ -371,7 +372,7 @@ msgstr "Privāts šim sekotājam -- izslēgts DHT un PEX"
 
 #: ../gtk/details.c:635
 msgid "Public torrent"
-msgstr "Publiskais torrents"
+msgstr "Publiskais torents"
 
 #: ../gtk/details.c:658
 #, c-format
@@ -398,7 +399,7 @@ msgid "%1$s (%2$'d piece @ %3$s)"
 msgid_plural "%1$s (%2$'d pieces @ %3$s)"
 msgstr[0] "%1$s (%2$'d daļa @ %3$s)"
 msgstr[1] "%1$s (%2$'d daļas @ %3$s)"
-msgstr[2] "%1$s (%2$'d daļas @ %3$s)"
+msgstr[2] "%1$s (%2$'d daļu @ %3$s)"
 
 #: ../gtk/details.c:782
 #, c-format
@@ -406,7 +407,7 @@ msgid "%1$s (%2$'d piece)"
 msgid_plural "%1$s (%2$'d pieces)"
 msgstr[0] "%1$s (%2$'d daļa)"
 msgstr[1] "%1$s (%2$'d daļas)"
-msgstr[2] "%1$s (%2$'d daļas)"
+msgstr[2] "%1$s (%2$'d daļu)"
 
 #: ../gtk/details.c:816
 #, c-format
@@ -431,7 +432,7 @@ msgstr "%1$s (+%2$s bojāti)"
 #: ../gtk/details.c:861
 #, c-format
 msgid "%s (Ratio: %s)"
-msgstr "%s (Samērs: %s)"
+msgstr "%s (samērs: %s)"
 
 #: ../gtk/details.c:889
 msgid "No errors"
@@ -456,7 +457,7 @@ msgstr "Aktivitāte"
 
 #: ../gtk/details.c:934
 msgid "Torrent size:"
-msgstr "Torrenta izmērs:"
+msgstr "Torenta izmērs:"
 
 #: ../gtk/details.c:939
 msgid "Have:"
@@ -492,7 +493,7 @@ msgstr "Kļūda:"
 
 #: ../gtk/details.c:980
 msgid "Details"
-msgstr "Detaļas"
+msgstr "Sīkāka informācija"
 
 #: ../gtk/details.c:986
 msgid "Location:"
@@ -500,7 +501,7 @@ msgstr "Atrašanās vieta:"
 
 #: ../gtk/details.c:993
 msgid "Hash:"
-msgstr "Juceklis:"
+msgstr "Jaucējsumma:"
 
 #: ../gtk/details.c:999
 msgid "Privacy:"
@@ -572,7 +573,7 @@ msgstr "Optimistiskā atsvabināšana"
 
 #: ../gtk/details.c:1479
 msgid "Downloading from this peer"
-msgstr "Ņemu no šī dalībnieka"
+msgstr "Ņem no šī dalībnieka"
 
 #: ../gtk/details.c:1480
 msgid "We would download from this peer if they would let us"
@@ -580,7 +581,7 @@ msgstr "Mēs ņemtu no šī dalībnieka, ja viņš ļautu"
 
 #: ../gtk/details.c:1481
 msgid "Uploading to peer"
-msgstr "Dodam dalībniekam"
+msgstr "Dod dalībniekam"
 
 #: ../gtk/details.c:1482
 msgid "We would upload to this peer if they asked"
@@ -621,7 +622,7 @@ msgstr "Rādīt vairāk infor_mācijas"
 #: ../gtk/details.c:1805
 #, c-format
 msgid "Got a list of %1$s%2$'d peers%3$s %4$s ago"
-msgstr "Saņēmu sarakstu ar %1$s%2$'d dalībniekiem pirms %3$s %4$s"
+msgstr "Saņēma sarakstu ar %1$s%2$'d dalībniekiem pirms %3$s %4$s"
 
 #: ../gtk/details.c:1809
 #, c-format
@@ -642,7 +643,7 @@ msgstr "Nav ieplānoti atjauninājumi"
 #: ../gtk/details.c:1825
 #, c-format
 msgid "Asking for more peers in %s"
-msgstr "Vaicāt pēc papildus dalībniekiem pēc %s"
+msgstr "Vaicāt papildu dalībniekus pēc %s"
 
 #: ../gtk/details.c:1829
 msgid "Queued to ask for more peers"
@@ -661,7 +662,7 @@ msgstr "Sekotājam bija %s%'d devēji un %'d ņēmēji pirms %s %s"
 #: ../gtk/details.c:1848
 #, c-format
 msgid "Got a scrape error \"%s%s%s\" %s ago"
-msgstr "Saņemu pieprasījuma kļūdu pirms \"%s%s%s\" %s"
+msgstr "Saņemu pieprasījuma kļūdu pirms “%s%s%s” %s"
 
 #: ../gtk/details.c:1858
 #, c-format
@@ -688,7 +689,7 @@ msgstr "Lūdzu, izlabojiet kļūdas un mēģiniet vēlreiz."
 #: ../gtk/details.c:2192
 #, c-format
 msgid "%s - Edit Trackers"
-msgstr "%s - rediģēt sekotājus"
+msgstr "%s — rediģēt sekotājus"
 
 #: ../gtk/details.c:2202
 msgid "Tracker Announce URLs"
@@ -706,7 +707,7 @@ msgstr ""
 #: ../gtk/details.c:2302
 #, c-format
 msgid "%s - Add Tracker"
-msgstr "%s - pievienot sekotāju"
+msgstr "%s — pievienot sekotāju"
 
 #: ../gtk/details.c:2316
 msgid "Tracker"
@@ -716,7 +717,7 @@ msgstr "Sekotājs"
 msgid "_Announce URL:"
 msgstr "_Announce URL:"
 
-#: ../gtk/details.c:2397 ../gtk/details.c:2541 ../gtk/filter.c:322
+#: ../gtk/details.c:2397 ../gtk/details.c:2541 ../gtk/filter.c:323
 msgid "Trackers"
 msgstr "Sekotāji"
 
@@ -732,7 +733,7 @@ msgstr "_Noņemt"
 msgid "Show _backup trackers"
 msgstr "Rādīt _rezerves sekotājus"
 
-#: ../gtk/details.c:2533 ../gtk/msgwin.c:429
+#: ../gtk/details.c:2533 ../gtk/msgwin.c:440
 msgid "Information"
 msgstr "Informācija"
 
@@ -742,13 +743,13 @@ msgstr "Dalībnieki"
 
 #: ../gtk/details.c:2546
 msgid "File listing not available for combined torrent properties"
-msgstr "Failu saraksts nav pieejams kombinētām torrentu īpašībām"
+msgstr "Datņu saraksts nav pieejams kombinētām torentu īpašībām"
 
 #: ../gtk/details.c:2550 ../gtk/makemeta-ui.c:437
 msgid "Files"
-msgstr "Faili"
+msgstr "Datnes"
 
-#: ../gtk/details.c:2554 ../gtk/tr-prefs.c:1236 ../gtk/tr-window.c:658
+#: ../gtk/details.c:2554 ../gtk/tr-prefs.c:1239 ../gtk/tr-window.c:658
 msgid "Options"
 msgstr "Opcijas"
 
@@ -760,23 +761,23 @@ msgstr "%s īpašības"
 #: ../gtk/details.c:2589
 #, c-format
 msgid "%'d Torrent Properties"
-msgstr "%'d torrenta īpašības"
+msgstr "%'d torenta īpašības"
 
 #: ../gtk/dialogs.c:95
 #, c-format
 msgid "Remove torrent?"
 msgid_plural "Remove %d torrents?"
-msgstr[0] "Izņemt %d torrentu?"
-msgstr[1] "Izņemt %d torrentus?"
-msgstr[2] "Izņemt %d torrentu?"
+msgstr[0] "Izņemt %d torentu?"
+msgstr[1] "Izņemt %d torentus?"
+msgstr[2] "Izņemt %d torentu?"
 
 #: ../gtk/dialogs.c:101
 #, c-format
 msgid "Delete this torrent's downloaded files?"
 msgid_plural "Delete these %d torrents' downloaded files?"
-msgstr[0] "Dzēst šī %d torrenta lejupielādētos failus?"
-msgstr[1] "Dzēst šo %d torrentu lejupielādētos failus?"
-msgstr[2] "Dzēst šo %d torrentu lejupielādētos failus?"
+msgstr[0] "Dzēst šī %d torenta lejupielādētās datnes?"
+msgstr[1] "Dzēst šo %d torentu lejupielādētās datnes?"
+msgstr[2] "Dzēst šo %d torentu lejupielādētās datnes?"
 
 #: ../gtk/dialogs.c:111
 msgid ""
@@ -786,56 +787,56 @@ msgid_plural ""
 "Once removed, continuing the transfers will require the torrent files or "
 "magnet links."
 msgstr[0] ""
-"Kad izņemts, sūtīšanas turpināšanai būs nepieciešams torrenta fails vai "
+"Kad izņemts, sūtīšanas turpināšanai būs nepieciešama torenta datne vai "
 "magnēta saite."
 msgstr[1] ""
-"Kad izņemti, sūtīšanas turpināšanai būs nepieciešami torrenta faili vai "
+"Kad izņemti, sūtīšanas turpināšanai būs nepieciešamas torentu datnes vai "
 "magnēta saites."
 msgstr[2] ""
-"Kad izņemts, sūtīšanas turpināšanai būs nepieciešams torrenta faili vai "
+"Kad izņemts, sūtīšanas turpināšanai būs nepieciešamas torentu datnes vai "
 "magnēta saites."
 
 #: ../gtk/dialogs.c:117
 msgid "This torrent has not finished downloading."
 msgid_plural "These torrents have not finished downloading."
-msgstr[0] "Šis torrents nav beidzis lejupielādi."
-msgstr[1] "Šie torrenti nav beiguši lejupielādi."
-msgstr[2] "Šie torrenti nav beiguši lejupielādi."
+msgstr[0] "Šis torents nav beidzis lejupielādi."
+msgstr[1] "Šie torenti nav beiguši lejupielādi."
+msgstr[2] "Šie torenti nav beiguši lejupielādi."
 
 #: ../gtk/dialogs.c:123
 msgid "This torrent is connected to peers."
 msgid_plural "These torrents are connected to peers."
-msgstr[0] "Šis torrents ir savienots ar dalībniekiem."
-msgstr[1] "Šie torrenti ir pieslēgušies dalībniekiem."
-msgstr[2] "Šie torrenti ir pieslēgušies dalībniekiem."
+msgstr[0] "Šis torents ir savienots ar dalībniekiem."
+msgstr[1] "Šie torenti ir savienoti ar dalībniekiem."
+msgstr[2] "Šie torenti ir savienoti ar dalībniekiem."
 
 #: ../gtk/dialogs.c:130
 msgid "One of these torrents is connected to peers."
 msgid_plural "Some of these torrents are connected to peers."
-msgstr[0] "Viens no šiem torrentiem ir savienots ar dalībniekiem."
-msgstr[1] "Daži no šiem torrentiem ir pieslēgušies dalībniekiem."
-msgstr[2] "Daži no šiem torrentiem ir pieslēgušies dalībniekiem."
+msgstr[0] "Viens no šiem torentiem ir savienots ar dalībniekiem."
+msgstr[1] "Daži no šiem torentiem ir savienoti ar dalībniekiem."
+msgstr[2] "Daži no šiem torentiem ir savienoti ar dalībniekiem."
 
 #: ../gtk/dialogs.c:137
 msgid "One of these torrents has not finished downloading."
 msgid_plural "Some of these torrents have not finished downloading."
-msgstr[0] "Viens no šiem torrentiem nav beidzis lejupielādi."
-msgstr[1] "Daži no šiem torrentiem nav beiguši lejupielādi."
-msgstr[2] "Daži no šiem torrentiem nav beiguši lejupielādi."
+msgstr[0] "Viens no šiem torentiem nav beidzis lejupielādi."
+msgstr[1] "Daži no šiem torentiem nav beiguši lejupielādi."
+msgstr[2] "Daži no šiem torentiem nav beiguši lejupielādi."
 
-#: ../gtk/file-list.c:607 ../gtk/filter.c:347 ../gtk/util.c:465
+#: ../gtk/file-list.c:607 ../gtk/filter.c:348 ../gtk/util.c:471
 msgid "High"
 msgstr "Augsta"
 
-#: ../gtk/file-list.c:608 ../gtk/filter.c:351 ../gtk/util.c:466
+#: ../gtk/file-list.c:608 ../gtk/filter.c:352 ../gtk/util.c:472
 msgid "Normal"
 msgstr "Normāla"
 
-#: ../gtk/file-list.c:609 ../gtk/filter.c:355 ../gtk/util.c:467
+#: ../gtk/file-list.c:609 ../gtk/filter.c:356 ../gtk/util.c:473
 msgid "Low"
 msgstr "Zema"
 
-#: ../gtk/file-list.c:827 ../gtk/msgwin.c:295
+#: ../gtk/file-list.c:827 ../gtk/msgwin.c:305
 msgid "Name"
 msgstr "Nosaukums"
 
@@ -855,51 +856,51 @@ msgid "Download"
 msgstr "Lejupielādēt"
 
 #. add priority column
-#: ../gtk/file-list.c:886 ../gtk/filter.c:342
+#: ../gtk/file-list.c:886 ../gtk/filter.c:343
 msgid "Priority"
 msgstr "Prioritāte"
 
-#: ../gtk/filter.c:314 ../gtk/filter.c:696
+#: ../gtk/filter.c:315 ../gtk/filter.c:699
 msgid "All"
 msgstr "Visi"
 
-#: ../gtk/filter.c:328 ../gtk/tr-prefs.c:567 ../gtk/tr-prefs.c:1283
+#: ../gtk/filter.c:329 ../gtk/tr-prefs.c:567 ../gtk/tr-prefs.c:1285
 msgid "Privacy"
 msgstr "Privātums"
 
-#: ../gtk/filter.c:333
+#: ../gtk/filter.c:334
 msgid "Public"
 msgstr "Publisks"
 
-#: ../gtk/filter.c:337
+#: ../gtk/filter.c:338
 msgid "Private"
 msgstr "Privāts"
 
-#: ../gtk/filter.c:698
+#: ../gtk/filter.c:701
 msgid "Active"
 msgstr "Aktīvs"
 
-#: ../gtk/filter.c:703
+#: ../gtk/filter.c:706
 msgctxt "Verb"
 msgid "Verifying"
 msgstr "Pārbauda"
 
-#: ../gtk/filter.c:704 ../gtk/msgwin.c:428
+#: ../gtk/filter.c:707 ../gtk/msgwin.c:439
 msgid "Error"
 msgstr "Kļūda"
 
 #. add the activity combobox
-#: ../gtk/filter.c:994
+#: ../gtk/filter.c:996
 msgid "_Show:"
 msgstr "_Rādīt:"
 
-#: ../gtk/main.c:303
+#: ../gtk/main.c:308
 #, c-format
 msgid "Error registering Transmission as x-scheme-handler/magnet handler: %s"
 msgstr ""
-"Kļūda, reģistrējot Transmission kā x-scheme-handler/magnet handler: %s"
+"Kļūda, reģistrējot Transmission kā x-scheme-handler/magnet apstrādātāju — %s"
 
-#: ../gtk/main.c:469
+#: ../gtk/main.c:477
 #, c-format
 msgid ""
 "Got signal %d; trying to shut down cleanly. Do it again if it gets stuck."
@@ -907,93 +908,94 @@ msgstr ""
 "Saņēma signālu %d; mēģina izslēgties korekti. Ja iestrēgst, izdariet to "
 "atkal."
 
-#: ../gtk/main.c:597
+#: ../gtk/main.c:610
 msgid "Where to look for configuration files"
-msgstr "Kur meklēt konfigurācijas failus"
+msgstr "Kur meklēt konfigurācijas datnes"
 
-#: ../gtk/main.c:598
+#: ../gtk/main.c:611
 msgid "Start with all torrents paused"
-msgstr "Palaižot apturēt visus torrentus"
+msgstr "Palaižot apturēt visus torentus"
 
-#: ../gtk/main.c:599
+#: ../gtk/main.c:612
 msgid "Start minimized in notification area"
 msgstr "Palaist minimizētu paziņojumu laukā"
 
-#: ../gtk/main.c:600
+#: ../gtk/main.c:613
 msgid "Show version number and exit"
 msgstr "Rādīt versijas numuru un iziet"
 
-#: ../gtk/main.c:617 ../gtk/transmission-gtk.desktop.in.h:1
+#: ../gtk/main.c:630 ../gtk/transmission-gtk.desktop.in.h:1
 msgid "Transmission"
 msgstr "Transmission"
 
 #. parse the command line
-#: ../gtk/main.c:621
+#: ../gtk/main.c:634
 msgid "[torrent files or urls]"
-msgstr "[torrentu faili vai url]"
+msgstr "[torentu datnes vai url]"
 
-#: ../gtk/main.c:625
+#: ../gtk/main.c:639
 #, c-format
 msgid ""
 "%s\n"
 "Run '%s --help' to see a full list of available command line options.\n"
 msgstr ""
 "%s\n"
-"Izpildiet '%s --help', lai redzētu pieejamo komandrindas opciju sarakstu.\n"
+"Palaidiet “%s --help”, lai redzētu pilnu sarakstu ar pieejamajām "
+"komandrindas opcijām.\n"
 
-#: ../gtk/main.c:722
+#: ../gtk/main.c:739
 msgid ""
 "Transmission is a file-sharing program. When you run a torrent, its data "
 "will be made available to others by means of upload. You and you alone are "
 "fully responsible for exercising proper judgement and abiding by your local "
 "laws."
 msgstr ""
-"Transmission ir failu koplietošanas programma. Kad jūs palaižat torrentu, "
+"Transmission ir datņu koplietošanas programma. Kad jūs palaižat torentu, "
 "augšupielādējot tā dati būs pieejami cietiem. Jūs un tikai jūs esat "
 "atbildīgi par sekām likuma priekšā."
 
-#: ../gtk/main.c:724
+#: ../gtk/main.c:741
 msgid "I _Accept"
 msgstr "Es _piekrītu"
 
-#: ../gtk/main.c:933
+#: ../gtk/main.c:963
 msgid "<b>Closing Connections</b>"
 msgstr "<b>Aizver savienojumus</b>"
 
-#: ../gtk/main.c:937
+#: ../gtk/main.c:967
 msgid "Sending upload/download totals to tracker…"
-msgstr "Sūta augšupielādes/lejupielādes summas sekotājam..."
+msgstr "Sūta augšupielādes/lejupielādes summas sekotājam…"
 
-#: ../gtk/main.c:942
+#: ../gtk/main.c:972
 msgid "_Quit Now"
-msgstr "_Aizvērt uzreiz"
+msgstr "I_ziet tagad"
 
-#: ../gtk/main.c:1000
+#: ../gtk/main.c:1030
 msgid "Couldn't add corrupt torrent"
 msgid_plural "Couldn't add corrupt torrents"
-msgstr[0] "Nevar pievienot bojātu torrentu"
-msgstr[1] "Nevar pievienot bojātus torrentus"
-msgstr[2] "Nevar pievienot bojātus torrentus"
+msgstr[0] "Nevar pievienot bojātu torentu"
+msgstr[1] "Nevar pievienot bojātus torentus"
+msgstr[2] "Nevar pievienot bojātus torentus"
 
-#: ../gtk/main.c:1007
+#: ../gtk/main.c:1037
 msgid "Couldn't add duplicate torrent"
 msgid_plural "Couldn't add duplicate torrents"
-msgstr[0] "Nevar pievienot torrenta dublikātu"
-msgstr[1] "Nevar pievienot torrentu dublikātus"
-msgstr[2] "Nevar pievienot torrentu dublikātus"
+msgstr[0] "Nevar pievienot torenta dublikātu"
+msgstr[1] "Nevar pievienot torentu dublikātus"
+msgstr[2] "Nevar pievienot torentu dublikātus"
 
-#: ../gtk/main.c:1308
+#: ../gtk/main.c:1336
 msgid "A fast and easy BitTorrent client"
 msgstr "Ātrs un vienkāršs BitTorrent klients"
 
-#: ../gtk/main.c:1309
+#: ../gtk/main.c:1337
 msgid "Copyright (c) The Transmission Project"
 msgstr "Autortiesības (c) The Transmission Project"
 
 #. Translators: translate "translator-credits" as your name
 #. to have it appear in the credits in the "About"
 #. dialog
-#: ../gtk/main.c:1315
+#: ../gtk/main.c:1343
 msgid "translator-credits"
 msgstr ""
 "Launchpad Contributions:\n"
@@ -1012,17 +1014,17 @@ msgstr ""
 #: ../gtk/makemeta-ui.c:75
 #, c-format
 msgid "Creating \"%s\""
-msgstr "Veido \"%s\""
+msgstr "Izveido “%s”"
 
 #: ../gtk/makemeta-ui.c:77
 #, c-format
 msgid "Created \"%s\"!"
-msgstr "Izveidots \"%s\"!"
+msgstr "Izveidots “%s”!"
 
 #: ../gtk/makemeta-ui.c:79
 #, c-format
 msgid "Error: invalid announce URL \"%s\""
-msgstr "Kļūda: nederīgs announce URL \"%s\""
+msgstr "Kļūda — nederīgs announce URL “%s”"
 
 #: ../gtk/makemeta-ui.c:81
 #, c-format
@@ -1032,12 +1034,12 @@ msgstr "Atcelts"
 #: ../gtk/makemeta-ui.c:83
 #, c-format
 msgid "Error reading \"%s\": %s"
-msgstr "Kļūda, lasot \"%s\": %s"
+msgstr "Kļūda, lasot “%s” — %s"
 
 #: ../gtk/makemeta-ui.c:85
 #, c-format
 msgid "Error writing \"%s\": %s"
-msgstr "Kļūda, rakstot \"%s\": %s"
+msgstr "Kļūda, rakstot “%s” — %s"
 
 #. how much data we've scanned through to generate checksums
 #: ../gtk/makemeta-ui.c:102
@@ -1047,11 +1049,11 @@ msgstr "Skenēts %s"
 
 #: ../gtk/makemeta-ui.c:167 ../gtk/makemeta-ui.c:425
 msgid "New Torrent"
-msgstr "Jauns torrents"
+msgstr "Jauns torents"
 
 #: ../gtk/makemeta-ui.c:183
 msgid "Creating torrent…"
-msgstr "Izveido torentu..."
+msgstr "Izveido torentu…"
 
 #: ../gtk/makemeta-ui.c:292
 msgid "No source selected"
@@ -1061,9 +1063,9 @@ msgstr "Nav izvēlēts avots"
 #, c-format
 msgid "%1$s; %2$'d File"
 msgid_plural "%1$s; %2$'d Files"
-msgstr[0] "%1$s; %2$'d fails"
-msgstr[1] "%1$s; %2$'d faili"
-msgstr[2] "%1$s; %2$'d faili"
+msgstr[0] "%1$s; %2$'d datne"
+msgstr[1] "%1$s; %2$'d datnes"
+msgstr[2] "%1$s; %2$'d datņu"
 
 #: ../gtk/makemeta-ui.c:305
 #, c-format
@@ -1071,7 +1073,7 @@ msgid "%1$'d Piece @ %2$s"
 msgid_plural "%1$'d Pieces @ %2$s"
 msgstr[0] "%1$'d gabals @ %2$s"
 msgstr[1] "%1$'d gabali @ %2$s"
-msgstr[2] "%1$'d gabali @ %2$s"
+msgstr[2] "%1$'d gabalu @ %2$s"
 
 #: ../gtk/makemeta-ui.c:439
 msgid "Sa_ve to:"
@@ -1083,7 +1085,7 @@ msgstr "Av_ota mape:"
 
 #: ../gtk/makemeta-ui.c:457
 msgid "Source _File:"
-msgstr "Avota _fails:"
+msgstr "Avota _datne:"
 
 #: ../gtk/makemeta-ui.c:469
 msgid "<i>No source selected</i>"
@@ -1103,69 +1105,69 @@ msgstr "Ko_mentārs:"
 
 #: ../gtk/makemeta-ui.c:506
 msgid "_Private torrent"
-msgstr "_Privāts torrents"
+msgstr "_Privāts torents"
 
 #: ../gtk/msgwin.c:144
 #, c-format
 msgid "Couldn't save \"%s\""
-msgstr "Nevarēja saglabāt \"%s\""
+msgstr "Nevarēja saglabāt “%s”"
 
-#: ../gtk/msgwin.c:195
+#: ../gtk/msgwin.c:205
 msgid "Save Log"
 msgstr "Saglabāt žurnālu"
 
-#: ../gtk/msgwin.c:291
+#: ../gtk/msgwin.c:300
 msgid "Time"
 msgstr "Laiks"
 
-#: ../gtk/msgwin.c:299
+#: ../gtk/msgwin.c:310
 msgid "Message"
 msgstr "Ziņojums"
 
-#: ../gtk/msgwin.c:430
+#: ../gtk/msgwin.c:441
 msgid "Debug"
-msgstr "Atkļūdošana"
+msgstr "Atkļūdot"
 
-#: ../gtk/msgwin.c:456
+#: ../gtk/msgwin.c:467
 msgid "Message Log"
 msgstr "Ziņojumu žurnāls"
 
-#: ../gtk/msgwin.c:491
+#: ../gtk/msgwin.c:502
 msgid "Level"
 msgstr "Līmenis"
 
-#: ../gtk/notify.c:215
+#: ../gtk/notify.c:219
 msgid "Open File"
-msgstr "Atvērt failu"
+msgstr "Atvērt datni"
 
-#: ../gtk/notify.c:220
+#: ../gtk/notify.c:224
 msgid "Open Folder"
 msgstr "Atvērt mapi"
 
-#: ../gtk/notify.c:228
+#: ../gtk/notify.c:232
 msgid "Torrent Complete"
-msgstr "Torrents pabeigts"
+msgstr "Torents pabeigts"
 
-#: ../gtk/notify.c:250
+#: ../gtk/notify.c:254
 msgid "Torrent Added"
-msgstr "Torrents pievienots"
+msgstr "Torents pievienots"
 
 #: ../gtk/open-dialog.c:240
 msgid "Torrent files"
-msgstr "Torrentu faili"
+msgstr "Torentu datnes"
 
 #: ../gtk/open-dialog.c:245
 msgid "All files"
-msgstr "Visi faili"
+msgstr "Visas datnes"
 
 #. make the dialog
 #: ../gtk/open-dialog.c:270
 msgid "Torrent Options"
-msgstr "Torrentu opcijas"
+msgstr "Torentu opcijas"
 
 #: ../gtk/open-dialog.c:292 ../gtk/tr-prefs.c:334
 msgid "Mo_ve .torrent file to the trash"
-msgstr "Pār_vietot .torrent failu uz miskasti"
+msgstr "Pār_vietot .torrent datni uz miskasti"
 
 #: ../gtk/open-dialog.c:294 ../gtk/tr-prefs.c:326
 msgid "_Start when added"
@@ -1174,11 +1176,11 @@ msgstr "_Sākt pēc pievienošanas"
 #. "torrent file" row
 #: ../gtk/open-dialog.c:310
 msgid "_Torrent file:"
-msgstr "_Torrenta fails:"
+msgstr "_Torenta datne:"
 
 #: ../gtk/open-dialog.c:313
 msgid "Select Source File"
-msgstr "Izvēlēties avota failu"
+msgstr "Izvēlieties avota datni"
 
 #: ../gtk/open-dialog.c:325
 msgid "_Destination folder:"
@@ -1190,40 +1192,40 @@ msgstr "Izvēlieties mapi, kurā saglabāt"
 
 #: ../gtk/open-dialog.c:427
 msgid "Open a Torrent"
-msgstr "Atvērt torrentu"
+msgstr "Atvērt torentu"
 
 #: ../gtk/open-dialog.c:443 ../gtk/tr-prefs.c:330
 msgid "Show _options dialog"
-msgstr "Rādīt _opciju dialogu"
+msgstr "Rādīt _opciju dialoglodziņu"
 
-#: ../gtk/open-dialog.c:492
+#: ../gtk/open-dialog.c:491
 msgid "Open URL"
 msgstr "Atvērt URL"
 
-#: ../gtk/open-dialog.c:505
+#: ../gtk/open-dialog.c:504
 msgid "Open torrent from URL"
-msgstr "Atvērt torrentu no URL"
+msgstr "Atvērt torentu no URL"
 
-#: ../gtk/open-dialog.c:510
+#: ../gtk/open-dialog.c:509
 msgid "_URL"
 msgstr "_URL"
 
 #: ../gtk/relocate.c:62
 #, c-format
 msgid "Moving \"%s\""
-msgstr "Pārvieto \"%s\""
+msgstr "Pārvieto “%s”"
 
 #: ../gtk/relocate.c:84
 msgid "Couldn't move torrent"
-msgstr "Neizdevās pārvietot torrentu"
+msgstr "Neizdevās pārvietot torentu"
 
 #: ../gtk/relocate.c:125
 msgid "This may take a moment…"
-msgstr "Tas var aizņemt kādu laiciņu..."
+msgstr "Tas var aizņemt kādu laiciņu…"
 
 #: ../gtk/relocate.c:156 ../gtk/relocate.c:176
 msgid "Set Torrent Location"
-msgstr "Norādiet torrenta atrašanās vietu"
+msgstr "Iestatiet torenta atrašanās vietu"
 
 #: ../gtk/relocate.c:172 ../gtk/tr-prefs.c:269
 msgid "Location"
@@ -1231,7 +1233,7 @@ msgstr "Atrašanās vieta"
 
 #: ../gtk/relocate.c:179
 msgid "Torrent _location:"
-msgstr "Torrenta atrašanās _vieta:"
+msgstr "Torenta atrašanās _vieta:"
 
 #: ../gtk/relocate.c:180
 msgid "_Move from the current folder"
@@ -1247,7 +1249,7 @@ msgid "Started %'d time"
 msgid_plural "Started %'d times"
 msgstr[0] "Palaists %'d reizi"
 msgstr[1] "Palaists %'d reizes"
-msgstr[2] "Palaists %'d reizes"
+msgstr[2] "Palaists %'d reižu"
 
 #: ../gtk/stats.c:97
 msgid "Reset your statistics?"
@@ -1340,7 +1342,7 @@ msgstr "Atlikušais laiks nav zināms"
 #: ../gtk/torrent-cell-renderer.c:142
 #, c-format
 msgid "%s remaining"
-msgstr "Atlikušais laiks: %s"
+msgstr "Atlikušais laiks — %s"
 
 #. 1==down arrow, 2==down speed, 3==up arrow, 4==down speed
 #: ../gtk/torrent-cell-renderer.c:167
@@ -1375,25 +1377,25 @@ msgstr "Samērs %s"
 #: ../gtk/torrent-cell-renderer.c:244
 #, c-format
 msgid "Tracker gave a warning: \"%s\""
-msgstr "Sekotājs deva brīdinājumu: \"%s\""
+msgstr "Sekotājs deva brīdinājumu — “%s”"
 
 #: ../gtk/torrent-cell-renderer.c:245
 #, c-format
 msgid "Tracker gave an error: \"%s\""
-msgstr "Sekotājs deva kļūdu: \"%s\""
+msgstr "Sekotājs deva kļūdu — “%s”"
 
 #: ../gtk/torrent-cell-renderer.c:246
 #, c-format
 msgid "Error: %s"
-msgstr "Kļūda: %s"
+msgstr "Kļūda — %s"
 
 #: ../gtk/torrent-cell-renderer.c:266
 #, c-format
 msgid "Downloading from %1$'d of %2$'d connected peer"
 msgid_plural "Downloading from %1$'d of %2$'d connected peers"
-msgstr[0] "Lejupielādē no %1$'d no %2$'d savienotā dalībnieka"
-msgstr[1] "Lejupielādē no %1$'d no %2$'d savienotajiem dalībniekiem"
-msgstr[2] "Lejupielādē no %1$'d no %2$'d savienotajiem dalībniekiem"
+msgstr[0] "Lejupielādē no %1$'d no %2$'d savienota dalībnieka"
+msgstr[1] "Lejupielādē no %1$'d no %2$'d savienotiem dalībniekiem"
+msgstr[2] "Lejupielādē no %1$'d no %2$'d savienotiem dalībniekiem"
 
 #: ../gtk/torrent-cell-renderer.c:275
 #, c-format
@@ -1403,13 +1405,13 @@ msgstr[0] "Lejupielādē metadatus no %1$'d dalībnieka (%2$d%% pabeigti)"
 msgstr[1] "Lejupielādē metadatus no %1$'d dalībniekiem (%2$d%% pabeigti)"
 msgstr[2] "Lejupielādē metadatus no %1$'d dalībniekiem (%2$d%% pabeigti)"
 
-#: ../gtk/torrent-cell-renderer.c:286
+#: ../gtk/torrent-cell-renderer.c:301
 #, c-format
 msgid "Seeding to %1$'d of %2$'d connected peer"
 msgid_plural "Seeding to %1$'d of %2$'d connected peers"
-msgstr[0] "Augšupielādē %1$'d no %2$'d savienotajam dalībniekam"
-msgstr[1] "Augšupielādē %1$'d no %2$'d savienotajiem dalībniekiem"
-msgstr[2] "Augšupielādē %1$'d no %2$'d savienotajiem dalībniekiem"
+msgstr[0] "Augšupielādē %1$'d no %2$'d savienota dalībnieka"
+msgstr[1] "Augšupielādē %1$'d no %2$'d savienotiem dalībniekiem"
+msgstr[2] "Augšupielādē %1$'d no %2$'d savienotiem dalībniekiem"
 
 #: ../gtk/transmission-gtk.desktop.in.h:2
 msgid "BitTorrent Client"
@@ -1421,30 +1423,30 @@ msgstr "Transmission BitTorrent klients"
 
 #: ../gtk/transmission-gtk.desktop.in.h:4
 msgid "Download and share files over BitTorrent"
-msgstr "Lejupielādēt un dalīties ar failiem caur BitTorrent"
+msgstr "Lejupielādēt un dalīties ar datnēm caur BitTorrent"
 
-#: ../gtk/tr-core.c:1083
+#: ../gtk/tr-core.c:1181
 #, c-format
 msgid "Couldn't read \"%s\": %s"
-msgstr "Neizdevās nolasīt \"%s\": %s"
+msgstr "Neizdevās nolasīt “%s” — %s"
 
-#: ../gtk/tr-core.c:1175
+#: ../gtk/tr-core.c:1277
 #, c-format
 msgid "Skipping unknown torrent \"%s\""
-msgstr "Izlaiž nezināmu torentu \"%s\""
+msgstr "Izlaiž nezināmu torentu “%s”"
 
-#: ../gtk/tr-core.c:1411
+#: ../gtk/tr-core.c:1521
 msgid "Inhibiting desktop hibernation"
 msgstr "Nomāc darbvirsmas iemidzināšanu"
 
-#: ../gtk/tr-core.c:1413
+#: ../gtk/tr-core.c:1525
 #, c-format
 msgid "Couldn't inhibit desktop hibernation: %s"
-msgstr "Neizdevās nomākt darbvirsmas iemidzināšanu: %s"
+msgstr "Neizdevās nomākt darbvirsmas iemidzināšanu — %s"
 
-#: ../gtk/tr-core.c:1446
+#: ../gtk/tr-core.c:1559
 msgid "Allowing desktop hibernation"
-msgstr "Atļauju darbvirsmas iemigšanu"
+msgstr "Atļauju darbvirsmas iemidzināšanu"
 
 #: ../gtk/tr-icon.c:86 ../gtk/tr-icon.c:102
 #, c-format
@@ -1482,17 +1484,17 @@ msgstr "Maksimums aktīvo _lejupielāžu:"
 msgid "Downloads sharing data in the last N minutes are _active:"
 msgstr "Lejupielādes, kas koplieto datus pēdējās N minūtes, ir _aktīvas:"
 
-#: ../gtk/tr-prefs.c:286 ../libtransmission/torrent.c:1909
+#: ../gtk/tr-prefs.c:286 ../libtransmission/torrent.c:1919
 msgid "Incomplete"
 msgstr "Nepabeigts"
 
 #: ../gtk/tr-prefs.c:288
 msgid "Append \"._part\" to incomplete files' names"
-msgstr "Pielikt \".part\" pie nepabeigtu failu nosaukumiem"
+msgstr "Pielikt “.part” pie nepabeigtu datņu nosaukumiem"
 
 #: ../gtk/tr-prefs.c:292
 msgid "Keep _incomplete torrents in:"
-msgstr "Turēt nepabe_igtos torrentus mapē:"
+msgstr "Turēt nepabe_igtos torentus mapē:"
 
 #: ../gtk/tr-prefs.c:299
 msgid "Call _script when torrent is completed:"
@@ -1505,7 +1507,7 @@ msgstr "Pievienošana"
 
 #: ../gtk/tr-prefs.c:338
 msgid "Automatically _add torrents from:"
-msgstr "Automātiski _pievienot torrentus no"
+msgstr "Automātiski _pievienot torentus no"
 
 #: ../gtk/tr-prefs.c:346
 msgctxt "Gerund"
@@ -1520,7 +1522,7 @@ msgstr "Apturēt došanu pie samē_ra:"
 msgid "Stop seeding if idle for _N minutes:"
 msgstr "Apturēt došanu, ja dīkstāvē _N minūtes:"
 
-#: ../gtk/tr-prefs.c:378 ../gtk/tr-prefs.c:1289
+#: ../gtk/tr-prefs.c:378 ../gtk/tr-prefs.c:1291
 msgid "Desktop"
 msgstr "Darbvirsma"
 
@@ -1542,11 +1544,11 @@ msgstr "Rā_dīt paziņojumu, kad torenti tiek pievienoti"
 
 #: ../gtk/tr-prefs.c:395
 msgid "Show a notification when torrents _finish"
-msgstr "Rādīt paziņojumu, kad torenti pa_beidzas"
+msgstr "Rādīt paziņojumu, kad torenti pa_beidz"
 
 #: ../gtk/tr-prefs.c:399
 msgid "Play a _sound when torrents finish"
-msgstr "Atskaņot _skaņu, kad torenti pabeidzas"
+msgstr "Atskaņot _skaņu, kad torenti beidzās"
 
 #: ../gtk/tr-prefs.c:427
 #, c-format
@@ -1574,11 +1576,11 @@ msgstr "<b>Nevar atjaunināt.</b>"
 
 #: ../gtk/tr-prefs.c:479
 msgid "Update Blocklist"
-msgstr "Atjaunot bloķēšanas sarakstu"
+msgstr "Atjaunināt bloķēšanas sarakstu"
 
 #: ../gtk/tr-prefs.c:481
 msgid "Getting new blocklist…"
-msgstr "Saņem jaunu bloķēšanas sarakstu..."
+msgstr "Saņem jaunu bloķēšanas sarakstu…"
 
 #: ../gtk/tr-prefs.c:509
 msgid "Allow encryption"
@@ -1634,7 +1636,7 @@ msgstr "DHT ir rīks, lai atrastu dalībniekus bez sekotāja."
 #: ../gtk/tr-prefs.c:585
 msgid "Use _Local Peer Discovery to find more peers"
 msgstr ""
-"Izmantot \"_lokālo dalībnieku atklāšanu\", lai atrastu vairāk dalībnieku"
+"Izmantot “_lokālo dalībnieku atklāšanu”, lai atrastu vairāk dalībnieku"
 
 #: ../gtk/tr-prefs.c:587
 msgid "LPD is a tool for finding peers on your local network."
@@ -1675,7 +1677,7 @@ msgstr "_Parole:"
 #. require authentication
 #: ../gtk/tr-prefs.c:848
 msgid "Only allow these IP a_ddresses to connect:"
-msgstr "Atļaut savienoties tikai no šīm IP _adresēm:"
+msgstr "Atļaut savienoties tikai no šīm IP a_dresēm:"
 
 #: ../gtk/tr-prefs.c:873
 msgid "IP addresses may use wildcards, such as 192.168.*.*"
@@ -1769,86 +1771,86 @@ msgstr " _līdz "
 msgid "_On days:"
 msgstr "_Dienās:"
 
-#: ../gtk/tr-prefs.c:1143 ../gtk/tr-prefs.c:1209
+#: ../gtk/tr-prefs.c:1143 ../gtk/tr-prefs.c:1212
 msgid "Status unknown"
 msgstr "Statuss nav zināms"
 
-#: ../gtk/tr-prefs.c:1165
+#: ../gtk/tr-prefs.c:1167
 msgid "Port is <b>open</b>"
 msgstr "Ports ir <b>atvērts</b>"
 
-#: ../gtk/tr-prefs.c:1165
+#: ../gtk/tr-prefs.c:1167
 msgid "Port is <b>closed</b>"
 msgstr "Ports ir <b>bloķēts</b>"
 
-#: ../gtk/tr-prefs.c:1179
+#: ../gtk/tr-prefs.c:1182
 msgid "<i>Testing TCP port…</i>"
 msgstr "<i>Testē TCP portu…</i>"
 
-#: ../gtk/tr-prefs.c:1202
+#: ../gtk/tr-prefs.c:1205
 msgid "Listening Port"
 msgstr "Klausīšanās ports"
 
-#: ../gtk/tr-prefs.c:1204
+#: ../gtk/tr-prefs.c:1207
 msgid "_Port used for incoming connections:"
 msgstr "_Ports, ko izmantot ienākošajiem savienojumiem:"
 
-#: ../gtk/tr-prefs.c:1212
+#: ../gtk/tr-prefs.c:1215
 msgid "Te_st Port"
-msgstr "_Pārbaudīt portu:"
+msgstr "_Pārbaudīt portu"
 
-#: ../gtk/tr-prefs.c:1219
+#: ../gtk/tr-prefs.c:1222
 msgid "Pick a _random port every time Transmission is started"
 msgstr "Izvēlēties _patvaļīgu portu katrā Transmission palaišanas reizē"
 
-#: ../gtk/tr-prefs.c:1223
+#: ../gtk/tr-prefs.c:1226
 msgid "Use UPnP or NAT-PMP port _forwarding from my router"
 msgstr "Izmantot UPnP vai NAT-PMP porta _pārsūtīšanu no maršrutētāja"
 
-#: ../gtk/tr-prefs.c:1228
+#: ../gtk/tr-prefs.c:1231
 msgid "Peer Limits"
 msgstr "Dalībnieku ierobežojumi"
 
-#: ../gtk/tr-prefs.c:1231
+#: ../gtk/tr-prefs.c:1234
 msgid "Maximum peers per _torrent:"
-msgstr "Lielākais dalībnieku skaits uz _torrentu:"
+msgstr "Lielākais dalībnieku skaits uz _torentu:"
 
-#: ../gtk/tr-prefs.c:1233
+#: ../gtk/tr-prefs.c:1236
 msgid "Maximum peers _overall:"
 msgstr "Lielākais _kopīgais dalībnieku skaits:"
 
-#: ../gtk/tr-prefs.c:1239
+#: ../gtk/tr-prefs.c:1242
 msgid "Enable _uTP for peer communication"
 msgstr "Aktivēt _uTP dalībnieku saziņai"
 
-#: ../gtk/tr-prefs.c:1241
+#: ../gtk/tr-prefs.c:1244
 msgid "uTP is a tool for reducing network congestion."
 msgstr "uTP ir rīks tīkla pārslogojuma mazināšanai."
 
-#: ../gtk/tr-prefs.c:1260
+#: ../gtk/tr-prefs.c:1262
 msgid "Transmission Preferences"
 msgstr "Transmission iestatījumi"
 
-#: ../gtk/tr-prefs.c:1274
+#: ../gtk/tr-prefs.c:1276
 msgid "Torrents"
-msgstr "Torrenti"
+msgstr "Torenti"
 
-#: ../gtk/tr-prefs.c:1277
+#: ../gtk/tr-prefs.c:1279
 msgctxt "Gerund"
 msgid "Downloading"
 msgstr "Lejupielāde"
 
-#: ../gtk/tr-prefs.c:1286
+#: ../gtk/tr-prefs.c:1288
 msgid "Network"
 msgstr "Tīkls"
 
-#: ../gtk/tr-prefs.c:1292
+#: ../gtk/tr-prefs.c:1294
 msgid "Web"
 msgstr "Tīmeklis"
 
 #: ../gtk/tr-window.c:148
 msgid "Torrent"
-msgstr "Torrents"
+msgstr "Torents"
 
 #: ../gtk/tr-window.c:252
 msgid "Total Ratio"
@@ -1918,17 +1920,17 @@ msgstr "Apturēt pie samēra (%s)"
 #, c-format
 msgid "%1$'d of %2$'d Torrent"
 msgid_plural "%1$'d of %2$'d Torrents"
-msgstr[0] "%1$'d no %2$'d torrenta"
-msgstr[1] "%1$'d no %2$'d torrentiem"
-msgstr[2] "%1$'d no %2$'d torrentiem"
+msgstr[0] "%1$'d no %2$'d torenta"
+msgstr[1] "%1$'d no %2$'d torentiem"
+msgstr[2] "%1$'d no %2$'d torentiem"
 
 #: ../gtk/tr-window.c:777
 #, c-format
 msgid "%'d Torrent"
 msgid_plural "%'d Torrents"
-msgstr[0] "%'d torrents"
-msgstr[1] "%'d torrenti"
-msgstr[2] "%'d torrenti"
+msgstr[0] "%'d torents"
+msgstr[1] "%'d torenti"
+msgstr[2] "%'d torenti"
 
 #: ../gtk/tr-window.c:797 ../gtk/tr-window.c:825
 #, c-format
@@ -1938,12 +1940,12 @@ msgstr "Samērs: %s"
 #: ../gtk/tr-window.c:808
 #, c-format
 msgid "Down: %1$s, Up: %2$s"
-msgstr "Lejup: %1$s, Augšup: %2$s"
+msgstr "Lejup: %1$s, augšup: %2$s"
 
 #: ../gtk/tr-window.c:819
 #, c-format
 msgid "size|Down: %1$s, Up: %2$s"
-msgstr "Lejup: %1$s, Augšup: %2$s"
+msgstr "Lejup: %1$s, augšup: %2$s"
 
 #: ../gtk/util.c:38
 msgid "KiB"
@@ -1993,7 +1995,7 @@ msgstr "GB/s"
 msgid "TB/s"
 msgstr "TB/s"
 
-#: ../gtk/util.c:87 ../libtransmission/utils.c:1505
+#: ../cli/cli.c:115 ../gtk/util.c:87 ../libtransmission/utils.c:1509
 msgid "None"
 msgstr "Nekas"
 
@@ -2003,7 +2005,7 @@ msgid "%'d day"
 msgid_plural "%'d days"
 msgstr[0] "%'d diena"
 msgstr[1] "%'d dienas"
-msgstr[2] "%'d dienas"
+msgstr[2] "%'d dienu"
 
 #: ../gtk/util.c:109
 #, c-format
@@ -2011,7 +2013,7 @@ msgid "%'d hour"
 msgid_plural "%'d hours"
 msgstr[0] "%'d stunda"
 msgstr[1] "%'d stundas"
-msgstr[2] "%'d stundas"
+msgstr[2] "%'d stundu"
 
 #: ../gtk/util.c:110
 #, c-format
@@ -2019,7 +2021,7 @@ msgid "%'d minute"
 msgid_plural "%'d minutes"
 msgstr[0] "%'d minūte"
 msgstr[1] "%'d minūtes"
-msgstr[2] "%'d minūtes"
+msgstr[2] "%'d minūšu"
 
 #: ../gtk/util.c:111
 #, c-format
@@ -2027,85 +2029,87 @@ msgid "%'d second"
 msgid_plural "%'d seconds"
 msgstr[0] "%'d sekunde"
 msgstr[1] "%'d sekundes"
-msgstr[2] "%'d sekundes"
-
-#: ../gtk/util.c:221
-#, c-format
-msgid "The torrent file \"%s\" contains invalid data."
-msgstr "Torrenta fails \"%s\" satur nederīgus datus."
-
-#: ../gtk/util.c:222
-#, c-format
-msgid "The torrent file \"%s\" is already in use."
-msgstr "Torrenta fails \"%s\" jau tiek lietots."
+msgstr[2] "%'d sekunžu"
 
 #: ../gtk/util.c:223
 #, c-format
+msgid "The torrent file \"%s\" contains invalid data."
+msgstr "Torenta datne “%s” satur nederīgus datus."
+
+#: ../gtk/util.c:224
+#, c-format
+msgid "The torrent file \"%s\" is already in use."
+msgstr "Torenta datne “%s” jau tiek lietota."
+
+#: ../gtk/util.c:225
+#, c-format
 msgid "The torrent file \"%s\" encountered an unknown error."
-msgstr "Torrenta fails \"%s\" saskārās ar nezināmu kļūdu."
+msgstr "Torenta datne “%s” saskārās ar nezināmu kļūdu."
 
-#: ../gtk/util.c:231
+#: ../gtk/util.c:233
 msgid "Error opening torrent"
-msgstr "Kļūda, atverot torrentu"
+msgstr "Kļūda, atverot torentu"
 
-#: ../gtk/util.c:534
+#: ../gtk/util.c:540
 #, c-format
 msgid "Error opening \"%s\""
-msgstr "Kļūda, atverot \"%s\""
+msgstr "Kļūda, atverot “%s”"
 
-#: ../gtk/util.c:537
+#: ../gtk/util.c:543
 #, c-format
 msgid "Server returned \"%1$ld %2$s\""
-msgstr "Serveris atgrieza \"%1$ld %2$s\""
+msgstr "Serveris atgrieza “%1$ld %2$s”"
 
-#: ../gtk/util.c:557
+#: ../gtk/util.c:563
 msgid "Unrecognized URL"
 msgstr "Neatpazīts URL"
 
-#: ../gtk/util.c:559
+#: ../gtk/util.c:565
 #, c-format
 msgid "Transmission doesn't know how to use \"%s\""
-msgstr "Transmission nezina, kā izmantot \"%s\""
+msgstr "Transmission nezina, kā izmantot “%s”"
 
-#: ../gtk/util.c:564
+#: ../gtk/util.c:570
 #, c-format
 msgid ""
 "This magnet link appears to be intended for something other than BitTorrent. "
 "BitTorrent magnet links have a section containing \"%s\"."
 msgstr ""
 "Izskatās, ka šī magnet saite ir paredzēta kaut kam citam, ne BitTorrent. "
-"BitTorrent magnet saitēm ir sadaļa, kas satur \"%s\"."
+"BitTorrent magnet saitēm ir sadaļa, kas satur “%s”."
 
 #. did caller give us an uninitialized val?
 #: ../libtransmission/bencode.c:1117
 msgid "Invalid metadata"
 msgstr "Nederīgi metadati"
 
-#: ../libtransmission/bencode.c:1716 ../libtransmission/bencode.c:1744
+#: ../libtransmission/bencode.c:1723 ../libtransmission/bencode.c:1751
 #, c-format
 msgid "Couldn't save temporary file \"%1$s\": %2$s"
-msgstr "Nevarēja saglabāt pagaidu failu \"%1$s\": %2$s"
+msgstr "Nevarēja saglabāt pagaidu datni “%1$s” — %2$s"
 
-#: ../libtransmission/bencode.c:1731
+#: ../libtransmission/bencode.c:1738
 #, c-format
 msgid "Saved \"%s\""
-msgstr "Saglabāts \"%s\""
+msgstr "Saglabāts “%s”"
 
-#: ../libtransmission/bencode.c:1736 ../libtransmission/blocklist.c:417
+#: ../libtransmission/bencode.c:1743 ../libtransmission/blocklist.c:417
+#: ../libtransmission/rpcimpl.c:1260 ../libtransmission/rpcimpl.c:1271
+#: ../libtransmission/rpcimpl.c:1287
 #, c-format
 msgid "Couldn't save file \"%1$s\": %2$s"
-msgstr "Nevarēja saglabāt failu \"%1$s\": %2$s"
+msgstr "Nevarēja saglabāt datni “%1$s” — %2$s"
 
 #: ../libtransmission/blocklist.c:86 ../libtransmission/blocklist.c:325
 #: ../libtransmission/utils.c:438
 #, c-format
 msgid "Couldn't read \"%1$s\": %2$s"
-msgstr "Nevar nolasīt \"%1$s\": %2$s"
+msgstr "Nevarēja nolasīt “%1$s” — %2$s"
 
 #: ../libtransmission/blocklist.c:115
 #, c-format
 msgid "Blocklist \"%s\" contains %zu entries"
-msgstr "Bloķēšanas saraksts \"%s\" satur %zu ierakstus"
+msgstr "Bloķēšanas saraksts “%s” satur %zu ierakstus"
 
 #. don't try to display the actual lines - it causes issues
 #: ../libtransmission/blocklist.c:368
@@ -2116,38 +2120,38 @@ msgstr "nobloķēto saraksts izlaida nederīgu adresi rindā %d"
 #: ../libtransmission/blocklist.c:420
 #, c-format
 msgid "Blocklist \"%s\" updated with %zu entries"
-msgstr "Bloķēšanas saraksts \"%s\" ir atjaunināts ar %zu ierakstiem"
+msgstr "Bloķēšanas saraksts “%s” ir atjaunināts ar %zu ierakstiem"
 
-#: ../libtransmission/fdlimit.c:360 ../libtransmission/metainfo.c:112
-#: ../libtransmission/utils.c:570 ../libtransmission/utils.c:581
+#: ../libtransmission/fdlimit.c:348 ../libtransmission/utils.c:574
+#: ../libtransmission/utils.c:585
 #, c-format
 msgid "Couldn't create \"%1$s\": %2$s"
-msgstr "Nevar izveidot \"%1$s\": %2$s"
+msgstr "Nevarēja izveidot “%1$s” — %2$s"
 
-#: ../libtransmission/fdlimit.c:381
+#: ../libtransmission/fdlimit.c:369
 #, c-format
 msgid "Couldn't open \"%1$s\": %2$s"
-msgstr "Nevar atvērt \"%1$s\": %2$s"
+msgstr "Nevarēja atvērt “%1$s” — %2$s"
 
-#: ../libtransmission/fdlimit.c:396
+#: ../libtransmission/fdlimit.c:384
 #, c-format
 msgid "Couldn't truncate \"%1$s\": %2$s"
-msgstr "Nevarēja saīsināt \"%1$s\": %2$s"
+msgstr "Nevarēja saīsināt “%1$s” — %2$s"
 
-#: ../libtransmission/fdlimit.c:682
+#: ../libtransmission/fdlimit.c:670
 #, c-format
 msgid "Couldn't create socket: %s"
-msgstr "Nevar izveidot ligzdu: %s"
+msgstr "Nevarēja izveidot ligzdu — %s"
 
 #: ../libtransmission/makemeta.c:63
 #, c-format
 msgid "Torrent Creator is skipping file \"%s\": %s"
-msgstr "Torrenta veidotājs izlaiž failu \"%s\": %s"
+msgstr "Torenta veidotājs izlaiž datni “%s” — %s"
 
-#: ../libtransmission/metainfo.c:592
+#: ../libtransmission/metainfo.c:533
 #, c-format
 msgid "Invalid metadata entry \"%s\""
-msgstr "Nederīgs metadatu ieraksts \"%s\""
+msgstr "Nederīgs metadatu ieraksts “%s”"
 
 #: ../libtransmission/natpmp.c:32
 msgid "Port Forwarding (NAT-PMP)"
@@ -2161,7 +2165,7 @@ msgstr "%s izdevās (%d)"
 #: ../libtransmission/natpmp.c:141
 #, c-format
 msgid "Found public address \"%s\""
-msgstr "Atrasta publiskā adrese \"%s\""
+msgstr "Atrasta publiskā adrese “%s”"
 
 #: ../libtransmission/natpmp.c:176
 #, c-format
@@ -2176,28 +2180,28 @@ msgstr "Ports %d veiksmīgi pārsūtīts"
 #: ../libtransmission/net.c:268
 #, c-format
 msgid "Couldn't set source address %s on %d: %s"
-msgstr "Nevar iestatīt avota adresi %s uz %d: %s"
+msgstr "Nevar iestatīt avota adresi %s uz %d — %s"
 
 #: ../libtransmission/net.c:284
 #, c-format
 msgid "Couldn't connect socket %d to %s, port %d (errno %d - %s)"
-msgstr "Nevar savienot ligzdu %d ar %s, ports %d (kļūmes numurs %d - %s)"
+msgstr "Nevar savienot ligzdu %d ar %s, ports %d (kļūdas numurs %d — %s)"
 
-#: ../libtransmission/net.c:356
+#: ../libtransmission/net.c:360
 msgid "Is another copy of Transmission already running?"
-msgstr "Vai ir palaista cita Transmission kopija?"
+msgstr "Vai ir palaista cita Transmission instance?"
 
-#: ../libtransmission/net.c:361
+#: ../libtransmission/net.c:365
 #, c-format
 msgid "Couldn't bind port %d on %s: %s"
-msgstr "Nevar piesaistīt portu %d uz %s: %s"
+msgstr "Nevar piesaistīt portu %d uz %s — %s"
 
-#: ../libtransmission/net.c:363
+#: ../libtransmission/net.c:367
 #, c-format
 msgid "Couldn't bind port %d on %s: %s (%s)"
-msgstr "Nevar piesaistīt portu %d uz %s: %s (%s)"
+msgstr "Nevar piesaistīt portu %d uz %s — %s (%s)"
 
-#: ../libtransmission/peer-msgs.c:1896
+#: ../libtransmission/peer-msgs.c:1898
 #, c-format
 msgid "Please Verify Local Data! Piece #%zu is corrupt."
 msgstr "Lūdzu, pārbaudiet lokālos datus. Daļa #%zu ir bojāta."
@@ -2222,10 +2226,10 @@ msgstr "Beidz"
 msgid "Not forwarded"
 msgstr "Nav pārsūtīts"
 
-#: ../libtransmission/port-forwarding.c:91 ../libtransmission/torrent.c:2046
+#: ../libtransmission/port-forwarding.c:91 ../libtransmission/torrent.c:2060
 #, c-format
 msgid "State changed from \"%1$s\" to \"%2$s\""
-msgstr "Stāvoklis mainīts no \"%1$s\" uz \"%2$s\""
+msgstr "Stāvoklis mainīts no “%1$s” uz “%2$s”"
 
 #: ../libtransmission/port-forwarding.c:181
 msgid "Stopped"
@@ -2233,48 +2237,48 @@ msgstr "Apturēts"
 
 #. first %s is the application name
 #. second %s is the version number
-#: ../libtransmission/session.c:720
+#: ../libtransmission/session.c:722
 #, c-format
 msgid "%s %s started"
 msgstr "%s %s palaists"
 
-#: ../libtransmission/session.c:1937
+#: ../libtransmission/session.c:1943
 #, c-format
 msgid "Loaded %d torrents"
-msgstr "Ielādēti %d torrenti"
+msgstr "Ielādēti %d torenti"
 
-#: ../libtransmission/torrent.c:523
+#: ../libtransmission/torrent.c:525
 #, c-format
 msgid "Tracker warning: \"%s\""
-msgstr "Sekotāja brīdinājums: \"%s\""
+msgstr "Sekotāja brīdinājums — “%s”"
 
-#: ../libtransmission/torrent.c:530
+#: ../libtransmission/torrent.c:532
 #, c-format
 msgid "Tracker error: \"%s\""
-msgstr "Sekotāja kļūda: \"%s\""
+msgstr "Sekotāja kļūda — “%s”"
 
-#: ../libtransmission/torrent.c:777
+#: ../libtransmission/torrent.c:787
 msgid ""
 "No data found! Ensure your drives are connected or use \"Set Location\". To "
 "re-download, remove the torrent and re-add it."
 msgstr ""
 "Dati nav atrasti! Pārliecinieties, ka diski ir pievienoti, vai izmantojiet "
-"\"Iestatīt atrašanās vietu\". Lai atkal lejupielādētu, izņemiet torrentu un "
+"“Iestatīt atrašanās vietu”. Lai atkal lejupielādētu, izņemiet torentu un "
 "atkal pievienojiet."
 
-#: ../libtransmission/torrent.c:1667
+#: ../libtransmission/torrent.c:1677
 msgid "Restarted manually -- disabling its seed ratio"
-msgstr "Pārstartēts manuāli -- atstata došanas samēru"
+msgstr "Pārstartēts manuāli — atstata došanas samēru"
 
-#: ../libtransmission/torrent.c:1819
+#: ../libtransmission/torrent.c:1829
 msgid "Removing torrent"
-msgstr "Noņem torrentu"
+msgstr "Izņem torentu"
 
-#: ../libtransmission/torrent.c:1903
+#: ../libtransmission/torrent.c:1913
 msgid "Done"
 msgstr "Izdarīts"
 
-#: ../libtransmission/torrent.c:1906
+#: ../libtransmission/torrent.c:1916
 msgid "Complete"
 msgstr "Pabeigts"
 
@@ -2282,54 +2286,53 @@ msgstr "Pabeigts"
 msgid "Port Forwarding (UPnP)"
 msgstr "Portu pārsūtīšana (UPnP)"
 
-#: ../libtransmission/upnp.c:201
+#: ../libtransmission/upnp.c:199
 #, c-format
 msgid "Found Internet Gateway Device \"%s\""
-msgstr "Atrasta interneta vārtejas ierīce \"%s\""
+msgstr "Atrasta interneta vārtejas ierīce “%s”"
 
-#: ../libtransmission/upnp.c:204
+#: ../libtransmission/upnp.c:202
 #, c-format
 msgid "Local Address is \"%s\""
-msgstr "Lokālā adrese ir \"%s\""
+msgstr "Lokālā adrese ir “%s”"
 
-#: ../libtransmission/upnp.c:233
+#: ../libtransmission/upnp.c:231
 #, c-format
 msgid "Port %d isn't forwarded"
 msgstr "Ports %d nav pārsūtīts"
 
-#: ../libtransmission/upnp.c:244
+#: ../libtransmission/upnp.c:242
 #, c-format
 msgid "Stopping port forwarding through \"%s\", service \"%s\""
-msgstr "Aptur portu pārsūtīšanu caur \"%s\", pakalpojums \"%s\""
+msgstr "Aptur portu pārsūtīšanu caur “%s”, pakalpojums “%s”"
 
-#: ../libtransmission/upnp.c:277
+#: ../libtransmission/upnp.c:275
 #, c-format
 msgid ""
 "Port forwarding through \"%s\", service \"%s\". (local address: %s:%d)"
-msgstr ""
-"Portu pārsūtīšana caur \"%s\", serviss \"%s\". (lokālā adrese: %s:%d)"
+msgstr "Portu pārsūtīšana caur “%s”, serviss “%s”. (lokālā adrese — %s:%d)"
 
-#: ../libtransmission/upnp.c:282
+#: ../libtransmission/upnp.c:280
 msgid "Port forwarding successful!"
 msgstr "Portu pārsūtīšana veiksmīga!"
 
 #: ../libtransmission/utils.c:452
 msgid "Not a regular file"
-msgstr "Neparasts fails"
+msgstr "Nav parasta datne"
 
 #: ../libtransmission/utils.c:470
 msgid "Memory allocation failed"
 msgstr "Neizdevās rezervēt atmiņu"
 
 #. Node exists but isn't a folder
-#: ../libtransmission/utils.c:580
+#: ../libtransmission/utils.c:584
 #, c-format
 msgid "File \"%s\" is in the way"
-msgstr "Fails \"%s\" ir ceļā"
+msgstr "Datne “%s” ir ceļā"
 
-#: ../libtransmission/verify.c:218
+#: ../libtransmission/verify.c:229
 msgid "Verifying torrent"
-msgstr "Pārbauda torrentu"
+msgstr "Pārbauda torentu"
 
 #~ msgid "Sort by _Ratio"
 #~ msgstr "Šķirot pēc _ratio"
