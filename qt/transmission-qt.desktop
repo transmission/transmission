@@ -14,5 +14,4 @@ Actions=Minimize;
 [Desktop Action Minimize]
 Name=Start Transmission Minimized
 Exec=transmission-qt --minimized
-OnlyShowIn=Unity;
 
