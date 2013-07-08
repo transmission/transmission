@@ -142,7 +142,11 @@ get_themed_icon_pixbuf (GThemedIcon   * icon,
         g_clear_error (&error);
     }
 
+#if GTK_CHECK_VERSION(3,8,0)
+    g_object_unref (icon_info);
+#else
     gtk_icon_info_free (icon_info);
+#endif
     g_strfreev (icon_names);
 
     return pixbuf;
