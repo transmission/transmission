@@ -2509,7 +2509,7 @@ peermsgs_destruct (tr_peer * peer)
 static const struct tr_peer_virtual_funcs my_funcs =
 {
   .destruct = peermsgs_destruct,
-  .is_transferring_pieces = peermsgs_is_transferring_pieces,
+  .is_transferring_pieces = peermsgs_is_transferring_pieces
 };
 
 /***
