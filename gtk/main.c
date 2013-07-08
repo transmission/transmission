@@ -293,22 +293,43 @@ on_selection_changed (GtkTreeSelection * s UNUSED, gpointer gdata)
 ****
 ***/
 
+static gboolean
+has_magnet_link_handler (void)
+{
+  GAppInfo * app_info = g_app_info_get_default_for_uri_scheme ("magnet");
+  const gboolean has_handler = app_info != NULL;
+  g_clear_object (&app_info);
+  return has_handler;
+}
+
 static void
 register_magnet_link_handler (void)
 {
-  GAppInfo * app_info = g_app_info_get_default_for_uri_scheme ("magnet");
-  if (app_info == NULL)
+  GError * error;
+  GAppInfo * app;
+  const char * const content_type = "x-scheme-handler/magnet";
+
+  error = NULL;
+  app = g_app_info_create_from_commandline ("transmission-gtk",
+                                            "transmission-gtk",
+                                            G_APP_INFO_CREATE_SUPPORTS_URIS,
+                                            &error);
+  g_app_info_set_as_default_for_type (app, content_type, &error);
+  if (error != NULL)
     {
-      /* there's no default magnet handler, so register ourselves for the job... */
-      GError * error = NULL;
-      app_info = g_app_info_create_from_commandline ("transmission-gtk", "transmission-gtk", G_APP_INFO_CREATE_SUPPORTS_URIS, NULL);
-      g_app_info_set_as_default_for_type (app_info, "x-scheme-handler/magnet", &error);
-      if (error != NULL)
-        {
-          g_warning (_("Error registering Transmission as x-scheme-handler/magnet handler: %s"), error->message);
-          g_clear_error (&error);
-        }
+      g_warning (_("Error registering Transmission as a %s handler: %s"),
+                 content_type,
+                 error->message);
+      g_error_free (error);
     }
+
+  g_clear_object (&app);
+}
+static void
+ensure_magnet_handler_exists (void)
+{
+  if (!has_magnet_link_handler ())
+    register_magnet_link_handler ();
 }
 
 static void
@@ -529,7 +550,7 @@ on_startup (GApplication * application, gpointer user_data)
     }
 
   /* if there's no magnet link handler registered, register us */
-  register_magnet_link_handler ();
+  ensure_magnet_handler_exists ();
 }
 
 static void
