@@ -689,13 +689,50 @@ updateFastSet (tr_peerMsgs * msgs UNUSED)
 ****  ACTIVE
 ***/
 
-bool
-tr_peerMsgsIsActive (const tr_peerMsgs  * msgs, tr_direction direction)
+static bool 
+tr_peerMsgsCalculateActive (const tr_peerMsgs * msgs, tr_direction direction)
 {
+  bool is_active;
+
   assert (tr_isPeerMsgs (msgs));
   assert (tr_isDirection (direction));
 
-  return msgs->is_active[direction];
+  if (direction == TR_CLIENT_TO_PEER)
+    {
+      is_active = tr_peerMsgsIsPeerInterested (msgs)
+              && !tr_peerMsgsIsPeerChoked (msgs);
+
+      if (is_active)
+        assert (!tr_peerIsSeed (&msgs->peer));
+    }
+  else /* TR_PEER_TO_CLIENT */
+    {
+      if (!tr_torrentHasMetadata (msgs->torrent))
+        is_active = true;
+      else
+        is_active = tr_peerMsgsIsClientInterested (msgs)
+                && !tr_peerMsgsIsClientChoked (msgs);
+
+      if (is_active)
+        assert (!tr_torrentIsSeed (msgs->torrent));
+    }
+
+  return is_active;
+}
+
+bool
+tr_peerMsgsIsActive (const tr_peerMsgs  * msgs, tr_direction direction)
+{
+  bool is_active;
+
+  assert (tr_isPeerMsgs (msgs));
+  assert (tr_isDirection (direction));
+
+  is_active = msgs->is_active[direction];
+
+  assert (is_active == tr_peerMsgsCalculateActive (msgs, direction));
+
+  return is_active;
 }
 
 static void
@@ -703,46 +740,22 @@ tr_peerMsgsSetActive (tr_peerMsgs  * msgs,
                       tr_direction   direction,
                       bool           is_active)
 {
+  dbgmsg (msgs, "direction [%d] is_active [%d]", (int)direction, (int)is_active);
+
   if (msgs->is_active[direction] != is_active)
     {
-      int n = msgs->torrent->activePeerCount[direction];
-
       msgs->is_active[direction] = is_active;
 
-      if (is_active)
-        ++n;
-      else
-        --n;
-      assert (0 <= n);
-      assert (n <= msgs->torrent->peerCount);
-
-      msgs->torrent->activePeerCount[direction] = n;
+      tr_swarmIncrementActivePeers (msgs->torrent->swarm, direction, is_active);
     }
 }
 
 void
 tr_peerMsgsUpdateActive (tr_peerMsgs * msgs, tr_direction direction)
 {
-  bool active;
+  const bool is_active = tr_peerMsgsCalculateActive (msgs, direction);
 
-  assert (tr_isPeerMsgs (msgs));
-  assert (tr_isDirection (direction));
-
-  if (direction == TR_CLIENT_TO_PEER)
-    {
-      active = tr_peerMsgsIsPeerInterested (msgs)
-           && !tr_peerMsgsIsPeerChoked (msgs);
-    }
-  else /* TR_PEER_TO_CLIENT */
-    {
-      if (!tr_torrentHasMetadata (msgs->torrent))
-        active = true;
-      else
-        active = tr_peerMsgsIsClientInterested (msgs)
-             && !tr_peerMsgsIsClientChoked (msgs);
-    }
-
-  tr_peerMsgsSetActive (msgs, direction, active);
+  tr_peerMsgsSetActive (msgs, direction, is_active);
 }
 
 /**
@@ -846,6 +859,7 @@ tr_peerMsgsSetChoke (tr_peerMsgs * msgs, bool peer_is_choked)
         cancelAllRequestsToClient (msgs);
       protocolSendChoke (msgs, peer_is_choked);
       msgs->chokeChangedAt = now;
+      tr_peerMsgsUpdateActive (msgs, TR_CLIENT_TO_PEER);
     }
 }
 

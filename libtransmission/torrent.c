@@ -1255,11 +1255,17 @@ tr_torrentStat (tr_torrent * tor)
   const uint64_t now = tr_time_msec ();
   unsigned int pieceUploadSpeed_Bps;
   unsigned int pieceDownloadSpeed_Bps;
+  struct tr_swarm_stats swarm_stats;
   int i;
 
   assert (tr_isTorrent (tor));
 
   tor->lastStatTime = tr_time ();
+
+  if (tor->swarm != NULL)
+    tr_swarmGetStats (tor->swarm, &swarm_stats);
+  else
+    swarm_stats = TR_SWARM_STATS_INIT;
 
   s = &tor->stats;
   s->id = tor->uniqueId;
@@ -1270,13 +1276,12 @@ tr_torrentStat (tr_torrent * tor)
   tr_strlcpy (s->errorString, tor->errorString, sizeof (s->errorString));
 
   s->manualAnnounceTime = tr_announcerNextManualAnnounce (tor);
-
-  s->peersConnected      = tor->peerCount;
-  s->peersSendingToUs    = tor->activePeerCount[TR_DOWN];
-  s->peersGettingFromUs  = tor->activePeerCount[TR_UP];
-  s->webseedsSendingToUs = tor->activeWebseedCount;
+  s->peersConnected      = swarm_stats.peerCount;
+  s->peersSendingToUs    = swarm_stats.activePeerCount[TR_DOWN];
+  s->peersGettingFromUs  = swarm_stats.activePeerCount[TR_UP];
+  s->webseedsSendingToUs = swarm_stats.activeWebseedCount;
   for (i=0; i<TR_PEER_FROM__MAX; i++)
-    s->peersFrom[i] = tor->peerFromCount[i];
+    s->peersFrom[i] = swarm_stats.peerFromCount[i];
 
   s->rawUploadSpeed_KBps     = toSpeedKBps (tr_bandwidthGetRawSpeed_Bps (&tor->bandwidth, now, TR_UP));
   s->rawDownloadSpeed_KBps   = toSpeedKBps (tr_bandwidthGetRawSpeed_Bps (&tor->bandwidth, now, TR_DOWN));

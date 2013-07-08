@@ -149,6 +149,32 @@ void tr_peerDestruct  (struct tr_peer * peer);
 /** Update the tr_peer.progress field based on the 'have' bitset. */
 void tr_peerUpdateProgress (tr_torrent * tor, struct tr_peer *);
 
+bool tr_peerIsSeed (const struct tr_peer * peer);
+
+/***
+****
+***/
+
+typedef struct tr_swarm_stats
+{
+  int activePeerCount[2];
+  int activeWebseedCount;
+  int peerCount;
+  int peerFromCount[TR_PEER_FROM__MAX];
+}
+tr_swarm_stats;
+
+extern const tr_swarm_stats TR_SWARM_STATS_INIT;
+
+void tr_swarmGetStats (const struct tr_swarm * swarm, tr_swarm_stats * setme);
+
+void tr_swarmIncrementActivePeers (struct tr_swarm * swarm, tr_direction direction, bool is_active);
+
+
+/***
+****
+***/
+
 
 #ifdef WIN32
  #define EMSGSIZE WSAEMSGSIZE
