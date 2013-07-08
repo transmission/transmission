@@ -59,6 +59,7 @@
 #include "log.h"
 #include "utils.h"
 #include "platform.h" /* tr_lockLock (), TR_PATH_MAX */
+#include "platform-quota.h" /* tr_device_info_create(), tr_device_info_get_free_space(), tr_device_info_free() */
 #include "variant.h"
 #include "version.h"
 

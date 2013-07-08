@@ -39,7 +39,8 @@
 #include "net.h"
 #include "peer-io.h"
 #include "peer-mgr.h"
-#include "platform.h" /* tr_lock, tr_getTorrentDir (), tr_getFreeSpace () */
+#include "platform.h" /* tr_lock, tr_getTorrentDir () */
+#include "platform-quota.h" /* tr_device_info_free() */
 #include "port-forwarding.h"
 #include "rpc-server.h"
 #include "session.h"

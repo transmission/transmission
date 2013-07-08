@@ -26,7 +26,7 @@
 #include "completion.h"
 #include "fdlimit.h"
 #include "log.h"
-#include "platform.h" /* tr_device_info_get_free_space() */
+#include "platform-quota.h" /* tr_device_info_get_free_space() */
 #include "rpcimpl.h"
 #include "session.h"
 #include "torrent.h"

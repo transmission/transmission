@@ -43,6 +43,7 @@ libtransmission_a_SOURCES = \
   peer-mgr.c \
   peer-msgs.c \
   platform.c \
+  platform-quota.c \
   port-forwarding.c \
   ptrarray.c \
   quark.c \
@@ -100,6 +101,7 @@ noinst_HEADERS = \
   peer-mgr.h \
   peer-msgs.h \
   platform.h \
+  platform-quota.h \
   port-forwarding.h \
   ptrarray.h \
   quark.h \
