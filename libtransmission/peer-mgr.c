@@ -2610,14 +2610,20 @@ tr_peerMgrGetDesiredAvailable (const tr_torrent * tor)
   size_t i;
   size_t n;
   uint64_t desiredAvailable;
-  const tr_swarm * s = tor->swarm;
+  const tr_swarm * s;
+
+  assert (tr_isTorrent (tor));
 
   /* common shortcuts... */
 
-  if (tr_torrentIsSeed (s->tor))
+  if (tr_torrentIsSeed (tor))
     return 0;
 
   if (!tr_torrentHasMetadata (tor))
+    return 0;
+
+  s = tor->swarm;
+  if (s == NULL)
     return 0;
 
   n = tr_ptrArraySize (&s->peers);
@@ -2641,7 +2647,7 @@ tr_peerMgrGetDesiredAvailable (const tr_torrent * tor)
   desiredAvailable = 0;
   for (i=0, n=MIN (tor->info.pieceCount, s->pieceReplicationSize); i<n; ++i)
     if (!tor->info.pieces[i].dnd && (s->pieceReplication[i] > 0))
-      desiredAvailable += tr_cpMissingBytesInPiece (&s->tor->completion, i);
+      desiredAvailable += tr_cpMissingBytesInPiece (&tor->completion, i);
 
   assert (desiredAvailable <= tor->info.totalSize);
   return desiredAvailable;
@@ -3377,7 +3383,7 @@ struct peer_liveliness
   void * clientData;
   time_t pieceDataTime;
   time_t time;
-  int speed;
+  unsigned int speed;
   bool doPurge;
 };
 
