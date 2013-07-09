@@ -664,16 +664,7 @@ freespace_label_data_free (gpointer gdata)
   g_free (data);
 }
 
-static GQuark
-freespace_label_data_quark (void)
-{
-  static GQuark q = 0;
-
-  if (G_UNLIKELY(!q))
-    q = g_quark_from_static_string ("data");
-
-  return q;
-}
+static G_DEFINE_QUARK (freespace-label-data, freespace_label_data)
 
 static void
 on_freespace_label_core_destroyed (gpointer gdata, GObject * dead_core G_GNUC_UNUSED)
