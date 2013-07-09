@@ -165,6 +165,8 @@
 		A23F4FF20D1D98AD002FCB97 /* PrefsWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = A23F4FF00D1D98AD002FCB97 /* PrefsWindow.xib */; };
 		A23F50020D1D99D7002FCB97 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = A23F50000D1D99D7002FCB97 /* MainMenu.xib */; };
 		A23F526F0F14395900AA02E3 /* PredicateEditorRowTemplateAny.m in Sources */ = {isa = PBXBuildFile; fileRef = A23F526E0F14395900AA02E3 /* PredicateEditorRowTemplateAny.m */; };
+		A23FAE54178BC2950053DC5B /* platform-quota.c in Sources */ = {isa = PBXBuildFile; fileRef = A23FAE52178BC2950053DC5B /* platform-quota.c */; };
+		A23FAE55178BC2950053DC5B /* platform-quota.h in Headers */ = {isa = PBXBuildFile; fileRef = A23FAE53178BC2950053DC5B /* platform-quota.h */; };
 		A241528B0C0261B8007DD3B4 /* Globe.png in Resources */ = {isa = PBXBuildFile; fileRef = A2FB06950BFF484A0095564D /* Globe.png */; };
 		A242AD9315F05D23002B3A6C /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = A242AD9115F05D23002B3A6C /* Localizable.strings */; };
 		A245030C0D6A1FB000B49D00 /* UpArrowGroupTemplate.png in Resources */ = {isa = PBXBuildFile; fileRef = A245030B0D6A1FB000B49D00 /* UpArrowGroupTemplate.png */; };
@@ -783,6 +785,8 @@
 		A23F29A0132A447400E9A83B /* announcer-http.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "announcer-http.c"; path = "libtransmission/announcer-http.c"; sourceTree = "<group>"; };
 		A23F526D0F14395900AA02E3 /* PredicateEditorRowTemplateAny.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PredicateEditorRowTemplateAny.h; path = macosx/PredicateEditorRowTemplateAny.h; sourceTree = "<group>"; };
 		A23F526E0F14395900AA02E3 /* PredicateEditorRowTemplateAny.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = PredicateEditorRowTemplateAny.m; path = macosx/PredicateEditorRowTemplateAny.m; sourceTree = "<group>"; };
+		A23FAE52178BC2950053DC5B /* platform-quota.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "platform-quota.c"; path = "libtransmission/platform-quota.c"; sourceTree = "<group>"; };
+		A23FAE53178BC2950053DC5B /* platform-quota.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "platform-quota.h"; path = "libtransmission/platform-quota.h"; sourceTree = "<group>"; };
 		A242AD9215F05D23002B3A6C /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = macosx/QuickLookPlugin/en.lproj/Localizable.strings; sourceTree = SOURCE_ROOT; };
 		A245030B0D6A1FB000B49D00 /* UpArrowGroupTemplate.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = UpArrowGroupTemplate.png; path = macosx/Images/UpArrowGroupTemplate.png; sourceTree = "<group>"; };
 		A245030D0D6A1FBC00B49D00 /* DownArrowGroupTemplate.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = DownArrowGroupTemplate.png; path = macosx/Images/DownArrowGroupTemplate.png; sourceTree = "<group>"; };
@@ -1699,6 +1703,8 @@
 				A23547E111CD0B090046EAE6 /* cache.h */,
 				BEFC1E020C07861A00B0BB3C /* platform.h */,
 				BEFC1E030C07861A00B0BB3C /* platform.c */,
+				A23FAE53178BC2950053DC5B /* platform-quota.h */,
+				A23FAE52178BC2950053DC5B /* platform-quota.c */,
 				BEFC1E0C0C07861A00B0BB3C /* net.h */,
 				BEFC1E0D0C07861A00B0BB3C /* net.c */,
 				A2EE726E14DCCC950093C99A /* natpmp_local.h */,
@@ -2076,6 +2082,7 @@
 				A25BFD6E167BED3B0039D1AA /* variant.h in Headers */,
 				A2EA52321686AC0D00180493 /* quark.h in Headers */,
 				A2AF23C916B44FA0003BC59E /* log.h in Headers */,
+				A23FAE55178BC2950053DC5B /* platform-quota.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2684,6 +2691,7 @@
 				A25BFD6D167BED3B0039D1AA /* variant.c in Sources */,
 				A2EA52311686AC0D00180493 /* quark.c in Sources */,
 				A2AF23C816B44FA0003BC59E /* log.c in Sources */,
+				A23FAE54178BC2950053DC5B /* platform-quota.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
