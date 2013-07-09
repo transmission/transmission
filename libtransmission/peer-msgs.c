@@ -708,13 +708,17 @@ tr_peerMsgsCalculateActive (const tr_peerMsgs * msgs, tr_direction direction)
   else /* TR_PEER_TO_CLIENT */
     {
       if (!tr_torrentHasMetadata (msgs->torrent))
-        is_active = true;
+        {
+          is_active = true;
+        }
       else
-        is_active = tr_peerMsgsIsClientInterested (msgs)
-                && !tr_peerMsgsIsClientChoked (msgs);
+        {
+          is_active = tr_peerMsgsIsClientInterested (msgs)
+                  && !tr_peerMsgsIsClientChoked (msgs);
 
-      if (is_active)
-        assert (!tr_torrentIsSeed (msgs->torrent));
+          if (is_active)
+            assert (!tr_torrentIsSeed (msgs->torrent));
+        }
     }
 
   return is_active;

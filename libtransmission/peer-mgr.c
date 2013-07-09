@@ -1912,6 +1912,7 @@ createBitTorrentPeer (tr_torrent       * tor,
                       tr_quark           client)
 {
   tr_peer * peer;
+  tr_peerMsgs * msgs;
   tr_swarm * swarm;
 
   assert (atom != NULL);
@@ -1931,6 +1932,10 @@ createBitTorrentPeer (tr_torrent       * tor,
 
   assert (swarm->stats.peerCount == tr_ptrArraySize (&swarm->peers));
   assert (swarm->stats.peerFromCount[atom->fromFirst] <= swarm->stats.peerCount);
+
+  msgs = PEER_MSGS (peer);
+  tr_peerMsgsUpdateActive (msgs, TR_UP);
+  tr_peerMsgsUpdateActive (msgs, TR_DOWN);
 }
 
 

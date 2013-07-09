@@ -941,7 +941,7 @@ sessionSetImpl (void * vdata)
 }
 
 void
-tr_sessionSet (tr_session * session, tr_variant  * settings)
+tr_sessionSet (tr_session * session, tr_variant * settings)
 {
   struct init_data data;
   data.done = false;
