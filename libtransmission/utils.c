@@ -306,7 +306,15 @@ tr_mkdirp (const char * path_in,
   int tmperr;
   int rv;
   struct stat sb;
-  char * path = tr_strdup (path_in);
+  char * path;
+
+  /* make a temporary copy of path */
+  path = tr_strdup (path_in);
+  if (path == NULL)
+    {
+      errno = ENOMEM;
+      return -1;
+    }
 
   /* walk past the root */
   p = path;
@@ -379,6 +387,8 @@ tr_buildPath (const char *first_element, ...)
     }
   pch = buf = tr_new (char, bufLen);
   va_end (vl);
+  if (buf == NULL)
+    return NULL;
 
   /* pass 2: build the string piece by piece */
   va_start (vl, first_element);
@@ -475,8 +485,12 @@ tr_strndup (const void * in, int len)
   else if (in)
     {
       out = tr_malloc (len + 1);
-      memcpy (out, in, len);
-      out[len] = '\0';
+
+      if (out != NULL)
+        {
+          memcpy (out, in, len);
+          out[len] = '\0';
+        }
     }
 
   return out;
@@ -1344,23 +1358,38 @@ tr_parseNumberRange (const char * str_in, int len, int * setmeCount)
           n += r->high + 1 - r->low;
         }
       sorted = tr_new (int, n);
-      for (l=ranges; l!=NULL; l=l->next)
+      if (sorted == NULL)
         {
-          int i;
-          const struct number_range * r = l->data;
-          for (i=r->low; i<=r->high; ++i)
-            sorted[n2++] = i;
+          n = 0;
+          uniq = NULL;
         }
-      qsort (sorted, n, sizeof (int), compareInt);
-      assert (n == n2);
+      else
+        {
+          for (l=ranges; l!=NULL; l=l->next)
+            {
+              int i;
+              const struct number_range * r = l->data;
+              for (i=r->low; i<=r->high; ++i)
+                sorted[n2++] = i;
+            }
+          qsort (sorted, n, sizeof (int), compareInt);
+          assert (n == n2);
 
-      /* remove duplicates */
-      uniq = tr_new (int, n);
-      for (i=n=0; i<n2; ++i)
-        if (!n || uniq[n-1] != sorted[i])
-          uniq[n++] = sorted[i];
+          /* remove duplicates */
+          uniq = tr_new (int, n);
+          if (uniq == NULL)
+            {
+              n = 0;
+            }
+          else
+            {
+              for (i=n=0; i<n2; ++i)
+                if (!n || uniq[n-1] != sorted[i])
+                  uniq[n++] = sorted[i];
+            }
 
-      tr_free (sorted);
+          tr_free (sorted);
+        }
     }
 
   /* cleanup */

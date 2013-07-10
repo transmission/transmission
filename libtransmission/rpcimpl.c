@@ -1593,6 +1593,7 @@ addTorrentImpl (struct tr_rpc_idle_data * data, tr_ctor * ctor)
     }
   else if (err == TR_PARSE_ERR)
     {
+      key = 0;
       result = "invalid or corrupt torrent file";
     }
   else if (err == TR_PARSE_DUPLICATE)
@@ -1602,7 +1603,7 @@ addTorrentImpl (struct tr_rpc_idle_data * data, tr_ctor * ctor)
       result = "duplicate torrent";
     }
 
-  if (tor != NULL)
+  if (tor && key)
     {
       tr_variant fields;
       tr_variantInitList (&fields, 3);
@@ -1612,6 +1613,7 @@ addTorrentImpl (struct tr_rpc_idle_data * data, tr_ctor * ctor)
       addInfo (tor, tr_variantDictAdd (data->args_out, key), &fields);
       notify (data->session, TR_RPC_TORRENT_ADDED, tor);
       tr_variantFree (&fields);
+      result = NULL;
     }
 
   tr_idle_function_done (data, result);
