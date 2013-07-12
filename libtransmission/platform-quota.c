@@ -238,7 +238,7 @@ getquota (const char * device)
       spaceused = (int64_t) dq.dqb_curbytes;
 #elif defined(__UCLIBC__)
       spaceused = (int64_t) btodb(dq.dqb_curblocks);
-#elif defined(__sun)
+#elif defined(__sun) || (_LINUX_QUOTA_VERSION < 2)
       spaceused = (int64_t) dq.dqb_curblocks >> 1;
 #else
       spaceused = btodb(dq.dqb_curspace);
