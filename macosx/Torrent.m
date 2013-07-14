@@ -64,32 +64,39 @@
 
 void startQueueCallback(tr_torrent * torrent, void * torrentData)
 {
-    [(Torrent *)torrentData performSelectorOnMainThread: @selector(startQueue) withObject: nil waitUntilDone: NO];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [(Torrent *)torrentData startQueue];
+    });
 }
 
 void completenessChangeCallback(tr_torrent * torrent, tr_completeness status, bool wasRunning, void * torrentData)
 {
-    @autoreleasepool
-    {
+    dispatch_async(dispatch_get_main_queue(), ^{
         NSDictionary * dict = [[NSDictionary alloc] initWithObjectsAndKeys: [NSNumber numberWithInt: status], @"Status",
                                [NSNumber numberWithBool: wasRunning], @"WasRunning", nil];
-        [(Torrent *)torrentData performSelectorOnMainThread: @selector(completenessChange:) withObject: dict waitUntilDone: NO];
-    }
+        [(Torrent *)torrentData completenessChange: dict];
+    });
 }
 
 void ratioLimitHitCallback(tr_torrent * torrent, void * torrentData)
 {
-    [(Torrent *)torrentData performSelectorOnMainThread: @selector(ratioLimitHit) withObject: nil waitUntilDone: NO];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [(Torrent *)torrentData ratioLimitHit];
+    });
 }
 
 void idleLimitHitCallback(tr_torrent * torrent, void * torrentData)
 {
-    [(Torrent *)torrentData performSelectorOnMainThread: @selector(idleLimitHit) withObject: nil waitUntilDone: NO];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [(Torrent *)torrentData idleLimitHit];
+    });
 }
 
 void metadataCallback(tr_torrent * torrent, void * torrentData)
 {
-    [(Torrent *)torrentData performSelectorOnMainThread: @selector(metadataRetrieved) withObject: nil waitUntilDone: NO];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [(Torrent *)torrentData metadataRetrieved];
+    });
 }
 
 void renameCallback(tr_torrent * torrent, const char * oldPathCharString, const char * newNameCharString, int error, void * contextInfo)
