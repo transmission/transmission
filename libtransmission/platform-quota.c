@@ -27,6 +27,9 @@
  #endif
  #ifdef HAVE_GETMNTENT
   #ifdef __sun
+   #include <sys/types.h>
+   #include <sys/stat.h>
+   #include <fcntl.h>
    #include <stdio.h>
    #include <sys/mntent.h>
    #include <sys/mnttab.h>
@@ -73,16 +76,16 @@ getdev (const char * path)
   FILE * fp;
 
 #ifdef __sun
-  struct mnttab * mnt;
+  struct mnttab mnt;
   fp = fopen(_PATH_MOUNTED, "r");
   if (fp == NULL)
     return NULL;
 
-  while (getmntent(fp, mnt))
-    if (!tr_strcmp0 (path, mnt->mnt_mountp))
+  while (getmntent(fp, &mnt))
+    if (!tr_strcmp0 (path, mnt.mnt_mountp))
       break;
   fclose(fp);
-  return mnt ? mnt->mnt_fstype : NULL;
+  return mnt.mnt_special;
 #else
   struct mntent * mnt;
 
@@ -124,15 +127,15 @@ getfstype (const char * device)
 
   FILE * fp;
 #ifdef __sun
-  struct mnttab *mnt;
+  struct mnttab mnt;
   fp = fopen(_PATH_MOUNTED, "r");
   if (fp == NULL)
     return NULL;
-  while (getmntent(fp, mnt))
-    if (!tr_strcmp0 (device, mnt->mnt_mountp))
+  while (getmntent(fp, &mnt))
+    if (!tr_strcmp0 (device, mnt.mnt_mountp))
       break;
   fclose(fp);
-  return mnt ? mnt->mnt_fstype : NULL;
+  return mnt.mnt_fstype;
 #else
   struct mntent *mnt;
 
