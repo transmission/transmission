@@ -49,7 +49,7 @@
 - (void) sortFileList: (NSMutableArray *) fileNodes;
 
 - (void) startQueue;
-- (void) completenessChange: (NSDictionary *) statusInfo;
+- (void) completenessChange: (tr_completeness) status wasRunning: (BOOL) wasRunning;
 - (void) ratioLimitHit;
 - (void) idleLimitHit;
 - (void) metadataRetrieved;
@@ -72,9 +72,7 @@ void startQueueCallback(tr_torrent * torrent, void * torrentData)
 void completenessChangeCallback(tr_torrent * torrent, tr_completeness status, bool wasRunning, void * torrentData)
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        NSDictionary * dict = [[NSDictionary alloc] initWithObjectsAndKeys: [NSNumber numberWithInt: status], @"Status",
-                               [NSNumber numberWithBool: wasRunning], @"WasRunning", nil];
-        [(Torrent *)torrentData completenessChange: dict];
+        [(Torrent *)torrentData completenessChange: status wasRunning: wasRunning];
     });
 }
 
@@ -1826,15 +1824,17 @@ int trashDataFile(const char * filename)
 }
 
 //status has been retained
-- (void) completenessChange: (NSDictionary *) statusInfo
+- (void) completenessChange: (tr_completeness) status wasRunning: (BOOL) wasRunning
 {
     fStat = tr_torrentStat(fHandle); //don't call update yet to avoid auto-stop
     
-    switch ([[statusInfo objectForKey: @"Status"] intValue])
+    switch (status)
     {
         case TR_SEED:
         case TR_PARTIAL_SEED:
-            [[NSNotificationCenter defaultCenter] postNotificationName: @"TorrentFinishedDownloading" object: self userInfo: [[statusInfo retain] autorelease]];
+        {
+            NSDictionary * statusInfo = @{ @"Status" : @(status), @"WasRunning" : @(wasRunning) };
+            [[NSNotificationCenter defaultCenter] postNotificationName: @"TorrentFinishedDownloading" object: self userInfo: statusInfo];
             
             //quarantine the finished data
             NSString * dataLocation = [[self currentDirectory] stringByAppendingPathComponent: [self name]];
@@ -1849,12 +1849,11 @@ int trashDataFile(const char * filename)
                 NSLog(@"Could not find file to quarantine: %@", dataLocation);
             
             break;
-        
+        }
         case TR_LEECH:
             [[NSNotificationCenter defaultCenter] postNotificationName: @"TorrentRestartedDownloading" object: self];
             break;
     }
-    [statusInfo release];
     
     [self update];
     [self updateTimeMachineExclude];
