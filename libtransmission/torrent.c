@@ -2164,13 +2164,15 @@ tr_torrentRecheckCompleteness (tr_torrent * tor)
 
           if (tor->currentDir == tor->incompleteDir)
             tr_torrentSetLocation (tor, tor->downloadDir, true, NULL, NULL);
+       }
 
+      fireCompletenessChange (tor, completeness, wasRunning);
+
+      if (tr_torrentIsSeed (tor))
+        {
           if (tr_sessionIsTorrentDoneScriptEnabled (tor->session))
             torrentCallScript (tor, tr_sessionGetTorrentDoneScript (tor->session));
         }
-
-
-      fireCompletenessChange (tor, completeness, wasRunning);
 
       tr_torrentSetDirty (tor);
     }
