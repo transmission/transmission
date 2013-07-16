@@ -2157,19 +2157,22 @@ tr_torrentRecheckCompleteness (tr_torrent * tor)
             {
               /* clear interested flag on all peers */
               tr_peerMgrClearInterest (tor);
-
-              /* if completeness was TR_LEECH then the seed limit check will have been skipped in bandwidthPulse */
-              tr_torrentCheckSeedLimit (tor);
             }
 
           if (tor->currentDir == tor->incompleteDir)
             tr_torrentSetLocation (tor, tor->downloadDir, true, NULL, NULL);
-       }
+        }
 
       fireCompletenessChange (tor, completeness, wasRunning);
 
       if (tr_torrentIsSeed (tor))
         {
+          if (wasLeeching && wasRunning)
+            {
+              /* if completeness was TR_LEECH then the seed limit check will have been skipped in bandwidthPulse */
+              tr_torrentCheckSeedLimit (tor);
+            }
+
           if (tr_sessionIsTorrentDoneScriptEnabled (tor->session))
             torrentCallScript (tor, tr_sessionGetTorrentDoneScript (tor->session));
         }
