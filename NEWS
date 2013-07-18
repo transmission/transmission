@@ -1,3 +1,23 @@
+=== Transmission 2.81 (2013/07/17) ===
+[http://trac.transmissionbt.com/query?milestone=2.81&group=component&order=severity All tickets closed by this release]
+==== All Platforms ====
+  * Fix 2.80 bug that showed the status for some peers
+  * Better handling of announce errors returned by some trackers
+  * Fix compilation error on Solaris
+==== Mac Client ====
+  * Fix 2.80 crash when removing a torrent when its seed ratio is reached
+  * Fix crash on some torrents when pressing the 'torrent pause' button
+  * Fix 2.80 bug rendering some icon buttons on Mavericks
+==== GTK+ Client ====
+  * Fix minor memory leaks
+  * Remove OnlyShowIn= from the .desktop file
+==== Qt Client ====
+  * Remove OnlyShowIn= from the .desktop file
+==== Daemon ====
+  * Change the systemd script to start Transmission after the network's initialized
+==== Web Client ====
+  * Slightly better compression of png files
+
 === Transmission 2.80 (2013/06/25) ===
 [http://trac.transmissionbt.com/query?milestone=2.80&group=component&order=severity All tickets closed by this release]
 ==== All Platforms ====
