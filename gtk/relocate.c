@@ -28,6 +28,7 @@ struct relocate_dialog_data
 {
   int done;
   bool do_move;
+  guint timer;
   TrCore * core;
   GSList * torrent_ids;
   GtkWidget * message_dialog;
@@ -38,6 +39,7 @@ static void
 data_free (gpointer gdata)
 {
   struct relocate_dialog_data * data = gdata;
+  g_source_remove (data->timer);
   g_slist_free (data->torrent_ids);
   g_free (data);
 }
@@ -127,8 +129,8 @@ onResponse (GtkDialog * dialog, int response, gpointer unused UNUSED)
       /* start the move and periodically check its status */
       data->message_dialog = w;
       data->done = TR_LOC_DONE;
+      data->timer = gdk_threads_add_timeout_seconds (1, onTimer, data);
       onTimer (data);
-      gdk_threads_add_timeout_seconds (1, onTimer, data);
     }
   else
     {
