@@ -680,7 +680,6 @@ tau_tracker_upkeep (struct tau_tracker * tracker)
         struct evutil_addrinfo hints;
         memset (&hints, 0, sizeof (hints));
         hints.ai_family = AF_UNSPEC;
-        hints.ai_flags = EVUTIL_AI_CANONNAME;
         hints.ai_socktype = SOCK_DGRAM;
         hints.ai_protocol = IPPROTO_UDP;
         tracker->is_asking_dns = true;
