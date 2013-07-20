@@ -3390,20 +3390,15 @@ compareTorrentByQueuePosition (const void * va, const void * vb)
 static bool
 queueIsSequenced (tr_session * session)
 {
-  int i ;
-  int n ;
-  bool is_sequenced = true;
+  int i;
+  int n;
+  bool is_sequenced;
   tr_torrent * tor;
-  tr_torrent ** tmp = tr_new (tr_torrent *, session->torrentCount);
+  tr_torrent ** torrents;
 
-  /* get all the torrents */
   n = 0;
-  tor = NULL;
-  while ((tor = tr_torrentNext (session, tor)))
-    tmp[n++] = tor;
-
-  /* sort them by position */
-  qsort (tmp, n, sizeof (tr_torrent *), compareTorrentByQueuePosition);
+  torrents = tr_sessionGetTorrents (session, &n);
+  qsort (torrents, n, sizeof (tr_torrent *), compareTorrentByQueuePosition);
 
 #if 0
   fprintf (stderr, "%s", "queue: ");
@@ -3413,11 +3408,12 @@ queueIsSequenced (tr_session * session)
 #endif
 
   /* test them */
+  is_sequenced = true;
   for (i=0; is_sequenced && i<n; ++i)
-    if (tmp[i]->queuePosition != i)
+    if (torrents[i]->queuePosition != i)
       is_sequenced = false;
 
-  tr_free (tmp);
+  tr_free (torrents);
   return is_sequenced;
 }
 #endif

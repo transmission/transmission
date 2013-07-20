@@ -1740,6 +1740,28 @@ tr_sessionCountTorrents (const tr_session * session)
   return tr_isSession (session) ? session->torrentCount : 0;
 }
 
+tr_torrent **
+tr_sessionGetTorrents (tr_session * session, int * setme_n)
+{
+  int i;
+  int n;
+  tr_torrent ** torrents;
+  tr_torrent * tor;
+
+  assert (tr_isSession (session));
+  assert (setme_n != NULL);
+
+  n = tr_sessionCountTorrents (session);
+  *setme_n = n;
+
+  torrents = tr_new (tr_torrent *, n);
+  tor = NULL;
+  for (i=0; i<n; ++i)
+    torrents[i] = tor = tr_torrentNext (session, tor);
+
+  return torrents;
+} 
+
 static int
 compareTorrentByCur (const void * va, const void * vb)
 {
@@ -1789,11 +1811,7 @@ sessionCloseImpl (void * vsession)
   /* Close the torrents. Get the most active ones first so that
    * if we can't get them all closed in a reasonable amount of time,
    * at least we get the most important ones first. */
-  tor = NULL;
-  n = session->torrentCount;
-  torrents = tr_new (tr_torrent *, session->torrentCount);
-  for (i=0; i<n; ++i)
-    torrents[i] = tor = tr_torrentNext (session, tor);
+  torrents = tr_sessionGetTorrents (session, &n);
   qsort (torrents, n, sizeof (tr_torrent*), compareTorrentByCur);
   for (i=0; i<n; ++i)
     tr_torrentFree (torrents[i]);
@@ -2805,6 +2823,7 @@ tr_sessionGetNextQueuedTorrents (tr_session   * session,
                                  tr_ptrArray  * setme)
 {
   size_t i;
+  size_t n;
   tr_torrent * tor;
   struct TorrentAndPosition * candidates;
 
@@ -2812,7 +2831,8 @@ tr_sessionGetNextQueuedTorrents (tr_session   * session,
   assert (tr_isDirection (direction));
 
   /* build an array of the candidates */
-  candidates = tr_new (struct TorrentAndPosition, session->torrentCount);
+  n = tr_sessionCountTorrents (session);
+  candidates = tr_new (struct TorrentAndPosition, n);
   i = 0;
   tor = NULL;
   while ((tor = tr_torrentNext (session, tor)))

@@ -263,6 +263,8 @@ struct tr_bindsockets * tr_sessionGetBindSockets (tr_session *);
 
 int tr_sessionCountTorrents (const tr_session * session);
 
+tr_torrent ** tr_sessionGetTorrents (tr_session * session, int * setme_n);
+
 enum
 {
     SESSION_MAGIC_NUMBER = 3845,
