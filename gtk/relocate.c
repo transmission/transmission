@@ -87,7 +87,7 @@ onTimer (gpointer gdata)
       gtk_dialog_run (GTK_DIALOG (w));
       gtk_widget_destroy (GTK_WIDGET (data->message_dialog));
     }
-    else if (done == TR_LOC_DONE)
+  else if (done == TR_LOC_DONE)
     {
       if (data->torrent_ids != NULL)
         startMovingNextTorrent (data);
