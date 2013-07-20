@@ -324,7 +324,7 @@ on_idle (tr_webseed * w)
       w->retry_challenge = running_tasks + w->idle_connections + 1;
     }
 
-  if (tor && tor->isRunning && !tr_torrentIsSeed (tor) && want)
+  if (tor && tor->isRunning && !tr_torrentIsSeed (tor) && (want > 0))
     {
       int i;
       int got = 0;
