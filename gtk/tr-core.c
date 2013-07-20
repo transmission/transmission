@@ -933,7 +933,7 @@ on_torrent_completeness_changed_idle (gpointer gdata)
   gtr_notify_torrent_completed (data->core, data->torrent_id);
   g_object_unref (G_OBJECT (data->core));
   g_free (data);
-  return FALSE;
+  return G_SOURCE_REMOVE;
 }
 
 /* this is called in the libtransmission thread, *NOT* the GTK+ thread,
@@ -1019,7 +1019,7 @@ on_torrent_metadata_changed_idle (gpointer gdata)
   /* cleanup */
   g_object_unref (G_OBJECT (data->core));
   g_free (data);
-  return FALSE;
+  return G_SOURCE_REMOVE;
 }
 
 /* this is called in the libtransmission thread, *NOT* the GTK+ thread,
@@ -1746,7 +1746,7 @@ core_read_rpc_response_idle (void * vresponse)
 
   tr_variantFree (&top);
   evbuffer_free (response);
-  return FALSE;
+  return G_SOURCE_REMOVE;
 }
 
 static void

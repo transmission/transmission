@@ -361,7 +361,7 @@ onAltSpeedToggledIdle (gpointer vp)
   gboolean b = tr_sessionUsesAltSpeed (gtr_core_session (p->core));
   gtr_core_set_pref_bool (p->core, TR_KEY_alt_speed_enabled, b);
 
-  return FALSE;
+  return G_SOURCE_REMOVE;
 }
 
 static void

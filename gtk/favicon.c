@@ -124,7 +124,7 @@ favicon_web_done_idle_cb (gpointer vfav)
         g_free (fav);
     }
 
-    return FALSE;
+    return G_SOURCE_REMOVE;
 }
 
 static void
