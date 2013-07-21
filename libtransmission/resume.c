@@ -778,7 +778,7 @@ loadFromFile (tr_torrent * tor, uint64_t fieldsToLoad)
   if ((fieldsToLoad & TR_FR_RUN)
       && tr_variantDictFindBool (&top, TR_KEY_paused, &boolVal))
     {
-      tor->isRunning = !boolVal;
+      tor->isRunning = !boolVal && !tor->isQueued; 
       fieldsLoaded |= TR_FR_RUN;
     }
 
