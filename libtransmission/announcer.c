@@ -962,8 +962,6 @@ tr_announcerRemoveTorrent (tr_announcer * announcer, tr_torrent * tor)
 static int
 getRetryInterval (const tr_tracker * t)
 {
-  assert (t->consecutiveFailures >= 1);
-
   switch (t->consecutiveFailures)
     {
       case 0:  return 0;
