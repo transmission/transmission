@@ -66,7 +66,7 @@ typedef struct
 }
 PrivateData;
 
-static G_DEFINE_QUARK (private-data, private_data)
+static G_DEFINE_QUARK (private_data, private_data)
 
 static PrivateData*
 get_private_data (GtkWindow * w)
