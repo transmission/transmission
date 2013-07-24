@@ -10,6 +10,7 @@
  * $Id$
  */
 
+#include <assert.h>
 #include <string.h> /* strlen (), strstr () */
 #include <stdlib.h> /* getenv () */
 
@@ -494,12 +495,14 @@ tr_webThreadFunc (void * vsession)
               long req_bytes_sent;
               CURL * e = msg->easy_handle;
               curl_easy_getinfo (e, CURLINFO_PRIVATE, (void*)&task);
+              assert (e == task->curl_easy);
               curl_easy_getinfo (e, CURLINFO_RESPONSE_CODE, &task->code);
               curl_easy_getinfo (e, CURLINFO_REQUEST_SIZE, &req_bytes_sent);
               curl_easy_getinfo (e, CURLINFO_TOTAL_TIME, &total_time);
               task->did_connect = task->code>0 || req_bytes_sent>0;
               task->did_timeout = !task->code && (total_time >= task->timeout_secs);
               curl_multi_remove_handle (multi, e);
+              tr_list_remove_data (&paused_easy_handles, e);
               curl_easy_cleanup (e);
               tr_runInEventThread (task->session, task_finish_func, task);
               --taskCount;
@@ -518,6 +521,7 @@ tr_webThreadFunc (void * vsession)
     }
 
   /* cleanup */
+  tr_list_free (&paused_easy_handles, NULL);
   curl_multi_cleanup (multi);
   tr_lockFree (web->taskLock);
   tr_free (web->cookie_filename);
