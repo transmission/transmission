@@ -361,21 +361,11 @@ gtr_get_help_uri (void)
 void
 gtr_open_file (const char * path)
 {
-  char * uri;
-
-  if (g_path_is_absolute (path))
-    {
-      uri = g_strdup_printf ("file://%s", path);
-    }
-  else
-    {
-      char * cwd = g_get_current_dir ();
-      uri = g_strdup_printf ("file://%s/%s", cwd, path);
-      g_free (cwd);
-    }
-
+  GFile * file = g_file_new_for_path (path);
+  gchar * uri = g_file_get_uri (file);
   gtr_open_uri (uri);
   g_free (uri);
+  g_object_unref (file);
 }
 
 void
