@@ -18,7 +18,7 @@
 
 #ifndef WIN32
  #include <sys/types.h> /* types needed by quota.h */
- #ifdef __FreeBSD__
+ #if defined(__FreeBSD__) || defined(__OpenBSD__)
   #include <ufs/ufs/quota.h> /* quotactl() */
  #elif defined (__sun)
   #include <sys/fs/ufs_quota.h> /* quotactl */
@@ -203,7 +203,7 @@ getquota (const char * device)
   int64_t freespace;
   int64_t spaceused;
 
-#if defined(__FreeBSD__) || defined(SYS_DARWIN)
+#if defined(__FreeBSD__) || defined(__OpenBSD__) || defined(SYS_DARWIN)
   if (quotactl(device, QCMD(Q_GETQUOTA, USRQUOTA), getuid(), (caddr_t) &dq) == 0)
     {
 #elif defined(__sun)
@@ -235,7 +235,7 @@ getquota (const char * device)
           /* No quota enabled for this user */
           return -1;
         }
-#if defined(__FreeBSD__)
+#if defined(__FreeBSD__) || defined(__OpenBSD__)
       spaceused = (int64_t) dq.dqb_curblocks >> 1;
 #elif defined(SYS_DARWIN)
       spaceused = (int64_t) dq.dqb_curbytes;
