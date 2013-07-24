@@ -664,7 +664,7 @@ freespace_label_data_free (gpointer gdata)
   g_free (data);
 }
 
-static G_DEFINE_QUARK (freespace_label_data, freespace_label_data)
+static TR_DEFINE_QUARK (freespace_label_data, freespace_label_data)
 
 static void
 on_freespace_label_core_destroyed (gpointer gdata, GObject * dead_core G_GNUC_UNUSED)
