@@ -335,7 +335,8 @@ cached_file_open (struct tr_cached_file  * o,
 {
   int flags;
   struct stat sb;
-  bool alreadyExisted;
+  bool already_existed;
+  bool resize_needed;
 
   /* create subfolders, if any */
   if (writable)
@@ -351,11 +352,15 @@ cached_file_open (struct tr_cached_file  * o,
       tr_free (dir);
     }
 
-  alreadyExisted = !stat (filename, &sb) && S_ISREG (sb.st_mode);
+  already_existed = !stat (filename, &sb) && S_ISREG (sb.st_mode);
 
-  if (writable && !alreadyExisted && (allocation == TR_PREALLOCATE_FULL))
+  if (writable && !already_existed && (allocation == TR_PREALLOCATE_FULL))
     if (preallocate_file_full (filename, file_size))
       tr_logAddDebug ("Preallocated file \"%s\"", filename);
+
+  /* we can't resize the file w/o write permissions */
+  resize_needed = already_existed && (file_size < (uint64_t)sb.st_size);
+  writable |= resize_needed;
 
   /* open the file */
   flags = writable ? (O_RDWR | O_CREAT) : O_RDONLY;
@@ -375,17 +380,14 @@ cached_file_open (struct tr_cached_file  * o,
    * http://trac.transmissionbt.com/ticket/2228
    * https://bugs.launchpad.net/ubuntu/+source/transmission/+bug/318249
    */
-  if (alreadyExisted && (file_size < (uint64_t)sb.st_size))
+  if (resize_needed && (ftruncate (o->fd, file_size) == -1))
     {
-      if (ftruncate (o->fd, file_size) == -1)
-        {
-          const int err = errno;
-          tr_logAddError (_("Couldn't truncate \"%1$s\": %2$s"), filename, tr_strerror (err));
-          return err;
-        }
+      const int err = errno;
+      tr_logAddError (_("Couldn't truncate \"%1$s\": %2$s"), filename, tr_strerror (err));
+      return err;
     }
 
-  if (writable && !alreadyExisted && (allocation == TR_PREALLOCATE_SPARSE))
+  if (writable && !already_existed && (allocation == TR_PREALLOCATE_SPARSE))
     preallocate_file_sparse (o->fd, file_size);
 
   /* Many (most?) clients request blocks in ascending order,
