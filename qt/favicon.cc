@@ -10,11 +10,11 @@
  * $Id$
  */
 
-#include <QDesktopServices>
 #include <QDir>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 #include <QNetworkRequest>
+#include <QStandardPaths>
 
 #include "favicon.h"
 
@@ -40,7 +40,7 @@ Favicons :: ~Favicons( )
 QString
 Favicons :: getCacheDir( )
 {
-    const QString base = QDesktopServices::storageLocation( QDesktopServices::CacheLocation );
+    const QString base = QStandardPaths::writableLocation (QStandardPaths::CacheLocation);
     return QDir( base ).absoluteFilePath( "favicons" );
 }
 

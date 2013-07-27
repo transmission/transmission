@@ -22,11 +22,14 @@
 void
 TorrentModel :: clear( )
 {
+    beginResetModel ();
+
     myIdToRow.clear( );
     myIdToTorrent.clear( );
     foreach( Torrent * tor, myTorrents ) delete tor;
     myTorrents.clear( );
-    reset( );
+
+    endResetModel ();
 }
 
 int

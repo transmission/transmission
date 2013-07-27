@@ -867,7 +867,7 @@ Details :: refresh ()
           foreach (QChar ch, code)
             {
               QString txt;
-              switch (ch.toAscii ())
+              switch (ch.unicode ())
                 {
                   case 'O': txt = tr ("Optimistic unchoke"); break;
                   case 'D': txt = tr ("Downloading from this peer"); break;

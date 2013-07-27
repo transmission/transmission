@@ -45,9 +45,9 @@
 
 namespace
 {
-  const QString DBUS_SERVICE     = QString::fromAscii ("com.transmissionbt.Transmission" );
-  const QString DBUS_OBJECT_PATH = QString::fromAscii ("/com/transmissionbt/Transmission");
-  const QString DBUS_INTERFACE   = QString::fromAscii ("com.transmissionbt.Transmission" );
+  const QString DBUS_SERVICE     = QString::fromUtf8 ("com.transmissionbt.Transmission" );
+  const QString DBUS_OBJECT_PATH = QString::fromUtf8 ("/com/transmissionbt/Transmission");
+  const QString DBUS_INTERFACE   = QString::fromUtf8 ("com.transmissionbt.Transmission" );
 
   const char * MY_READABLE_NAME ("transmission-qt");
 
@@ -89,7 +89,7 @@ MyApp :: MyApp (int& argc, char ** argv):
   QApplication (argc, argv),
   myLastFullUpdateTime (0)
 {
-  const QString MY_CONFIG_NAME = QString::fromAscii ("transmission");
+  const QString MY_CONFIG_NAME = QString::fromUtf8 ("transmission");
 
   setApplicationName (MY_CONFIG_NAME);
 
@@ -108,7 +108,7 @@ MyApp :: MyApp (int& argc, char ** argv):
   QList<int> sizes;
   sizes << 16 << 22 << 24 << 32 << 48 << 64 << 72 << 96 << 128 << 192 << 256;
   foreach (int size, sizes)
-    icon.addPixmap (QPixmap (QString::fromAscii (":/icons/transmission-%1.png").arg (size)));
+    icon.addPixmap (QPixmap (QString::fromUtf8 (":/icons/transmission-%1.png").arg (size)));
   setWindowIcon (icon);
 
   // parse the command-line arguments
@@ -464,15 +464,15 @@ MyApp :: raise ()
 bool
 MyApp :: notify (const QString& title, const QString& body) const
 {
-  const QString dbusServiceName   = QString::fromAscii ("org.freedesktop.Notifications");
-  const QString dbusInterfaceName = QString::fromAscii ("org.freedesktop.Notifications");
-  const QString dbusPath          = QString::fromAscii ("/org/freedesktop/Notifications");
+  const QString dbusServiceName   = QString::fromUtf8 ("org.freedesktop.Notifications");
+  const QString dbusInterfaceName = QString::fromUtf8 ("org.freedesktop.Notifications");
+  const QString dbusPath          = QString::fromUtf8 ("/org/freedesktop/Notifications");
 
-  QDBusMessage m = QDBusMessage::createMethodCall (dbusServiceName, dbusPath, dbusInterfaceName, QString::fromAscii ("Notify"));
+  QDBusMessage m = QDBusMessage::createMethodCall (dbusServiceName, dbusPath, dbusInterfaceName, QString::fromUtf8 ("Notify"));
   QList<QVariant> args;
-  args.append (QString::fromAscii ("Transmission")); // app_name
+  args.append (QString::fromUtf8 ("Transmission")); // app_name
   args.append (0U);                                   // replaces_id
-  args.append (QString::fromAscii ("transmission")); // icon
+  args.append (QString::fromUtf8 ("transmission")); // icon
   args.append (title);                                // summary
   args.append (body);                                 // body
   args.append (QStringList ());                       // actions - unused for plain passive popups
@@ -510,7 +510,7 @@ main (int argc, char * argv[])
       QDBusMessage request = QDBusMessage::createMethodCall (DBUS_SERVICE,
                                                              DBUS_OBJECT_PATH,
                                                              DBUS_INTERFACE,
-                                                             QString::fromAscii ("AddMetainfo"));
+                                                             QString::fromUtf8 ("AddMetainfo"));
       QList<QVariant> arguments;
       AddData a (addme[i]);
       switch (a.type)

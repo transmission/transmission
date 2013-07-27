@@ -52,7 +52,7 @@ WatchDir :: metainfoTest( const QString& filename ) const
     const int err = tr_torrentParse( ctor, &inf );
     if( err )
         ret = ERROR;
-    else if( myModel.hasTorrent( QString::fromAscii( inf.hashString ) ) )
+    else if( myModel.hasTorrent( QString::fromUtf8( inf.hashString ) ) )
         ret = DUPLICATE;
     else
         ret = OK;
@@ -106,7 +106,7 @@ WatchDir :: watcherActivated( const QString& path )
 
     // try to add any new files which end in .torrent
     const QSet<QString> newFiles( files - myWatchDirFiles );
-    const QString torrentSuffix = QString::fromAscii( ".torrent" );
+    const QString torrentSuffix = QString::fromUtf8( ".torrent" );
     foreach( QString name, newFiles ) {
         if( name.endsWith( torrentSuffix, Qt::CaseInsensitive ) ) {
             const QString filename = dir.absoluteFilePath( name );

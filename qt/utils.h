@@ -42,20 +42,20 @@ class Utils: public QObject
         /// URLs
         ///
 
-        static bool isMagnetLink( const QString& s ) { return s.startsWith( QString::fromAscii( "magnet:?" ) ); }
+        static bool isMagnetLink( const QString& s ) { return s.startsWith( QString::fromUtf8( "magnet:?" ) ); }
 
         static bool isHexHashcode( const QString& s )
         {
             if( s.length() != 40 ) return false;
-            foreach( QChar ch, s ) if( !isxdigit( ch.toAscii() ) ) return false;
+            foreach( QChar ch, s ) if( !isxdigit( ch.unicode() ) ) return false;
             return true;
         }
 
         static bool isUriWithSupportedScheme( const QString& s )
         {
-            static const QString ftp = QString::fromAscii( "ftp://" );
-            static const QString http = QString::fromAscii( "http://" );
-            static const QString https = QString::fromAscii( "https://" );
+            static const QString ftp = QString::fromUtf8( "ftp://" );
+            static const QString http = QString::fromUtf8( "http://" );
+            static const QString https = QString::fromUtf8( "https://" );
             return s.startsWith(http) || s.startsWith(https) || s.startsWith(ftp);
         }
 

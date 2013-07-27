@@ -124,7 +124,7 @@ Options :: Options (Session& session, const Prefs& prefs, const AddData& addme, 
     {
       p = mySourceButton =  new QPushButton;
       p->setIcon (filePixmap);
-      p->setStyleSheet (QString::fromAscii ("text-align: left; padding-left: 5; padding-right: 5"));
+      p->setStyleSheet (QString::fromUtf8 ("text-align: left; padding-left: 5; padding-right: 5"));
       p->installEventFilter (this);
       w = p;
       connect (p, SIGNAL (clicked (bool)), this, SLOT (onFilenameClicked ()));
@@ -139,7 +139,7 @@ Options :: Options (Session& session, const Prefs& prefs, const AddData& addme, 
       connect (e, SIGNAL(editingFinished()), this, SLOT(onSourceEditingFinished()));
     }
 
-  const int width = fontMetrics.size (0, QString::fromAscii ("This is a pretty long torrent filename indeed.torrent")).width ();
+  const int width = fontMetrics.size (0, QString::fromUtf8 ("This is a pretty long torrent filename indeed.torrent")).width ();
   w->setMinimumWidth (width);
   layout->addWidget (w, row, 1);
   l->setBuddy (w);

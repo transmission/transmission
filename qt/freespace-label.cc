@@ -73,6 +73,8 @@ FreespaceLabel :: onTimer ()
 void
 FreespaceLabel :: onSessionExecuted (int64_t tag, const QString& result, struct tr_variant * arguments)
 {
+  Q_UNUSED (result);
+
   if (tag != myTag)
     return;
 

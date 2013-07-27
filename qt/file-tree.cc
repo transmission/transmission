@@ -436,7 +436,6 @@ FileTreeModel :: setData (const QModelIndex& index, const QVariant& newname, int
   if (role == Qt::EditRole)
     {
       QString oldpath;
-      QModelIndex walk = index;
       FileTreeItem * item = itemFromIndex (index);
 
       while (item && !item->name().isEmpty())
@@ -575,9 +574,9 @@ FileTreeModel :: clearSubtree (const QModelIndex& top)
 void
 FileTreeModel :: clear ()
 {
+  beginResetModel ();
   clearSubtree (QModelIndex());
-
-  reset ();
+  endResetModel ();
 }
 
 FileTreeItem *
@@ -613,7 +612,7 @@ FileTreeModel :: addFile (int                   fileIndex,
 {
   bool added = false;
   FileTreeItem * item;
-  QStringList tokens = filename.split (QChar::fromAscii('/'));
+  QStringList tokens = filename.split (QChar::fromLatin1('/'));
 
   item = findItemForFileIndex (fileIndex);
 
@@ -886,7 +885,7 @@ FileTreeView :: FileTreeView (QWidget * parent, bool isEditable):
   for (int i=0; i<NUM_COLUMNS; ++i)
     {
       setColumnHidden (i, (i<FIRST_VISIBLE_COLUMN) || (LAST_VISIBLE_COLUMN<i));
-      header()->setResizeMode(i, QHeaderView::Interactive);
+      header()->setSectionResizeMode(i, QHeaderView::Interactive);
     }
 
   connect (this, SIGNAL(clicked(const QModelIndex&)),

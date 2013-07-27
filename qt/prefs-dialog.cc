@@ -21,7 +21,6 @@
 #include <QFileIconProvider>
 #include <QFileInfo>
 #include <QHBoxLayout>
-#include <QHttp>
 #include <QIcon>
 #include <QLabel>
 #include <QLineEdit>
@@ -135,7 +134,7 @@ PrefsDialog :: timeEditNew( int key )
 {
     const int minutes( myPrefs.getInt( key ) );
     QTimeEdit * e = new QTimeEdit( );
-    e->setDisplayFormat( QString::fromAscii( "hh:mm" ) );
+    e->setDisplayFormat( QString::fromUtf8( "hh:mm" ) );
     e->setProperty( PREF_KEY, key );
     e->setTime( QTime().addSecs( minutes * 60 ) );
     myWidgets.insert( key, e );
@@ -233,11 +232,11 @@ PrefsDialog :: createSpeedTab( )
     QHBoxLayout * h = new QHBoxLayout;
     h->setSpacing( HIG :: PAD );
     QLabel * label = new QLabel;
-    label->setPixmap( QPixmap( QString::fromAscii( ":/icons/alt-limit-off.png" ) ) );
+    label->setPixmap( QPixmap( QString::fromUtf8( ":/icons/alt-limit-off.png" ) ) );
     label->setAlignment( Qt::AlignLeft|Qt::AlignVCenter );
     h->addWidget( label );
     label = new QLabel( tr( "Alternative Speed Limits" ) );
-    label->setStyleSheet( QString::fromAscii( "font: bold" ) );
+    label->setStyleSheet( QString::fromUtf8( "font: bold" ) );
     label->setAlignment( Qt::AlignLeft|Qt::AlignVCenter );
     h->addWidget( label );
     hig->addSectionTitle( h );
@@ -572,7 +571,7 @@ PrefsDialog :: createDownloadingTab( )
         l = checkBoxNew( tr( "Automatically add .torrent files &from:" ), Prefs::DIR_WATCH_ENABLED );
         b = myWatchButton = new QPushButton;
         b->setIcon( folderPixmap );
-        b->setStyleSheet( QString::fromAscii( "text-align: left; padding-left: 5; padding-right: 5" ) );
+        b->setStyleSheet( QString::fromUtf8( "text-align: left; padding-left: 5; padding-right: 5" ) );
         connect( b, SIGNAL(clicked(bool)), this, SLOT(onWatchClicked(void)) );
         hig->addRow( l, b );
         enableBuddyWhenChecked( qobject_cast<QCheckBox*>(l), b );
@@ -585,7 +584,7 @@ PrefsDialog :: createDownloadingTab( )
 
         b = myDestinationButton = new QPushButton;
         b->setIcon( folderPixmap );
-        b->setStyleSheet( QString::fromAscii( "text-align: left; padding-left: 5; padding-right: 5" ) );
+        b->setStyleSheet( QString::fromUtf8( "text-align: left; padding-left: 5; padding-right: 5" ) );
         connect( b, SIGNAL(clicked(bool)), this, SLOT(onDestinationClicked(void)) );
         hig->addRow( tr( "Save to &Location:" ), b );
 
@@ -610,7 +609,7 @@ PrefsDialog :: createDownloadingTab( )
         l = myIncompleteCheckbox = checkBoxNew( tr( "Keep &incomplete files in:" ), Prefs::INCOMPLETE_DIR_ENABLED );
         b = myIncompleteButton = new QPushButton;
         b->setIcon( folderPixmap );
-        b->setStyleSheet( QString::fromAscii( "text-align: left; padding-left: 5; padding-right: 5" ) );
+        b->setStyleSheet( QString::fromUtf8( "text-align: left; padding-left: 5; padding-right: 5" ) );
         connect( b, SIGNAL(clicked(bool)), this, SLOT(onIncompleteClicked(void)) );
         hig->addRow( myIncompleteCheckbox, b );
         enableBuddyWhenChecked( qobject_cast<QCheckBox*>(l), b );
@@ -618,7 +617,7 @@ PrefsDialog :: createDownloadingTab( )
         l = myTorrentDoneScriptCheckbox = checkBoxNew( tr( "Call scrip&t when torrent is completed:" ), Prefs::SCRIPT_TORRENT_DONE_ENABLED );
         b = myTorrentDoneScriptButton = new QPushButton;
         b->setIcon( filePixmap );
-        b->setStyleSheet( QString::fromAscii( "text-align: left; padding-left: 5; padding-right: 5" ) );
+        b->setStyleSheet( QString::fromUtf8( "text-align: left; padding-left: 5; padding-right: 5" ) );
         connect( b, SIGNAL(clicked(bool)), this, SLOT(onScriptClicked(void)) );
         hig->addRow( myTorrentDoneScriptCheckbox, b );
         enableBuddyWhenChecked( qobject_cast<QCheckBox*>(l), b );

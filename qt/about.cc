@@ -37,21 +37,21 @@ AboutDialog :: AboutDialog (QWidget * parent):
   QVBoxLayout * v = new QVBoxLayout (this);
 
   l = new QLabel;
-  l->setPixmap (QPixmap (QString::fromAscii (":/icons/transmission-48.png")));
+  l->setPixmap (QPixmap (QString::fromUtf8 (":/icons/transmission-48.png")));
   l->setAlignment (Qt::AlignCenter);
   v->addWidget (l);
 
   QFont f (font ());
   f.setWeight (QFont::Bold);
   f.setPointSize (int (f.pointSize () * 1.2));
-  l = new QLabel (tr ("<big>Transmission %1</big>").arg (QString::fromAscii (LONG_VERSION_STRING)));
+  l = new QLabel (tr ("<big>Transmission %1</big>").arg (QString::fromUtf8 (LONG_VERSION_STRING)));
   l->setAlignment (Qt::AlignCenter);
   l->setFont (f);
   l->setMargin (8);
   v->addWidget (l);
 
   l = new QLabel (tr ("A fast and easy BitTorrent client"));
-  l->setStyleSheet (QString::fromAscii ("text-align: center"));
+  l->setStyleSheet (QString::fromUtf8 ("text-align: center"));
   l->setAlignment (Qt::AlignCenter);
   v->addWidget (l);
 
@@ -59,7 +59,7 @@ AboutDialog :: AboutDialog (QWidget * parent):
   l->setAlignment (Qt::AlignCenter);
   v->addWidget (l);
 
-  l = new QLabel (QString::fromAscii ("<a href=\"http://www.transmissionbt.com/\">http://www.transmissionbt.com/</a>"));
+  l = new QLabel (QString::fromUtf8 ("<a href=\"http://www.transmissionbt.com/\">http://www.transmissionbt.com/</a>"));
   l->setOpenExternalLinks (true);
   l->setAlignment (Qt::AlignCenter);
   v->addWidget (l);
@@ -89,7 +89,7 @@ AboutDialog :: showCredits ()
   QMessageBox::about (
     this,
     tr ("Credits"),
-    QString::fromAscii ("Jordan Lee (Backend; Daemon; GTK+; Qt)\n"
+    QString::fromUtf8 ("Jordan Lee (Backend; Daemon; GTK+; Qt)\n"
                         "Michell Livingston (OS X)\n"));
 }
 

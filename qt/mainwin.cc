@@ -14,6 +14,10 @@
 #include <iostream>
 
 #include <QtGui>
+#include <QProxyStyle>
+#include <QLabel>
+#include <QFileDialog>
+#include <QMessageBox>
 
 #include <libtransmission/transmission.h>
 #include <libtransmission/utils.h>

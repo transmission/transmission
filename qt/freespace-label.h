@@ -16,7 +16,7 @@
 #include <QString>
 #include <QTimer>
 
-#include <QtGui/QLabel>
+#include <QLabel>
 
 class Session;
 

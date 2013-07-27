@@ -690,11 +690,11 @@ Session :: exec (const char * json)
     {
       QNetworkRequest request;
       request.setUrl (myUrl);
-      request.setRawHeader ("User-Agent", QString (QCoreApplication::instance ()->applicationName () + "/" + LONG_VERSION_STRING).toAscii ());
+      request.setRawHeader ("User-Agent", QString (QCoreApplication::instance ()->applicationName () + "/" + LONG_VERSION_STRING).toUtf8 ());
       request.setRawHeader ("Content-Type", "application/json; charset=UTF-8");
 
       if (!mySessionId.isEmpty ())
-        request.setRawHeader (TR_RPC_SESSION_ID_HEADER, mySessionId.toAscii ());
+        request.setRawHeader (TR_RPC_SESSION_ID_HEADER, mySessionId.toUtf8 ());
 
       const QByteArray requestData (json);
       QNetworkReply * reply = networkAccessManager ()->post (request, requestData);

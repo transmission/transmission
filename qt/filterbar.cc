@@ -10,6 +10,12 @@
  * $Id$
  */
 
+#include <QAbstractItemView>
+#include <QPushButton>
+#include <QLabel>
+#include <QHBoxLayout>
+#include <QLineEdit>
+#include <QStylePainter>
 #include <QString>
 #include <QtGui>
 

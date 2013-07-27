@@ -21,6 +21,7 @@
 #include <QLabel>
 #include <QLineEdit>
 #include <QList>
+#include <QMimeData>
 #include <QPlainTextEdit>
 #include <QProgressBar>
 #include <QPushButton>
@@ -342,7 +343,7 @@ MakeDialog :: MakeDialog( Session & session, QWidget * parent ):
         const QPixmap folderPixmap = folderIcon.pixmap( iconSize );
         QPushButton * b = new QPushButton;
         b->setIcon( folderPixmap );
-        b->setStyleSheet( QString::fromAscii( "text-align: left; padding-left: 5; padding-right: 5" ) );
+        b->setStyleSheet( QString::fromUtf8( "text-align: left; padding-left: 5; padding-right: 5" ) );
         myDestination = QDir::homePath();
         b->setText( myDestination );
         connect( b, SIGNAL(clicked(bool)),
@@ -356,7 +357,7 @@ MakeDialog :: MakeDialog( Session & session, QWidget * parent ):
         myFolderButton = new QPushButton;
         myFolderButton->setIcon( folderPixmap );
         myFolderButton->setText( tr( "(None)" ) );
-        myFolderButton->setStyleSheet( QString::fromAscii( "text-align: left; padding-left: 5; padding-right: 5" ) );
+        myFolderButton->setStyleSheet( QString::fromUtf8( "text-align: left; padding-left: 5; padding-right: 5" ) );
         connect( myFolderButton, SIGNAL(clicked(bool)),
                  this, SLOT(onFolderClicked(void)) );
         hig->addRow( myFolderRadio, myFolderButton );
@@ -371,7 +372,7 @@ MakeDialog :: MakeDialog( Session & session, QWidget * parent ):
         myFileButton = new QPushButton;
         myFileButton->setText( tr( "(None)" ) );
         myFileButton->setIcon( filePixmap );
-        myFileButton->setStyleSheet( QString::fromAscii( "text-align: left; padding-left: 5; padding-right: 5" ) );
+        myFileButton->setStyleSheet( QString::fromUtf8( "text-align: left; padding-left: 5; padding-right: 5" ) );
         connect( myFileButton, SIGNAL(clicked(bool)),
                  this, SLOT(onFileClicked(void)) );
         hig->addRow( myFileRadio, myFileButton );
@@ -384,7 +385,7 @@ MakeDialog :: MakeDialog( Session & session, QWidget * parent ):
     hig->addSectionTitle( tr( "Properties" ) );
 
         hig->addWideControl( myTrackerEdit = new ShortPlainTextEdit );
-        const int height = fontMetrics().size( 0, QString::fromAscii("\n\n\n\n") ).height( );
+        const int height = fontMetrics().size( 0, QString::fromUtf8("\n\n\n\n") ).height( );
         myTrackerEdit->setMinimumHeight( height );
         hig->addTallRow( tr( "&Trackers:" ), myTrackerEdit );
         QLabel * l = new QLabel( tr( "To add a backup URL, add it on the line after the primary URL.\nTo add another primary URL, add it after a blank line." ) );
