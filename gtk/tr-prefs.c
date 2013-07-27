@@ -462,7 +462,7 @@ onBlocklistUpdateResponse (GtkDialog * dialog, gint response UNUSED, gpointer gd
     gtk_widget_set_sensitive (data->updateBlocklistButton, TRUE);
     data->updateBlocklistDialog = NULL;
     g_signal_handler_disconnect (data->core, data->updateBlocklistTag);
-    data->updateBlocklistTag = 0
+    data->updateBlocklistTag = 0;
 }
 
 /* core says the blocklist was updated */
