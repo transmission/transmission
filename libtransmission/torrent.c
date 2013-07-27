@@ -3393,7 +3393,6 @@ queueIsSequenced (tr_session * session)
   int i;
   int n;
   bool is_sequenced;
-  tr_torrent * tor;
   tr_torrent ** torrents;
 
   n = 0;

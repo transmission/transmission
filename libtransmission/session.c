@@ -1782,7 +1782,6 @@ static void
 sessionCloseImpl (void * vsession)
 {
   int i, n;
-  tr_torrent * tor;
   tr_torrent ** torrents;
   tr_session * session = vsession;
 
