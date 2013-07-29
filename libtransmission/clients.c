@@ -415,8 +415,13 @@ tr_clientForId (char * buf, size_t buflen, const void * id_in)
     {
         four_digits (buf, buflen, "BT Next Evolution", id+3);
     }
+    else if (!memcmp (id, "TIX", 3))
+    {
+        two_major_two_minor (buf, buflen, "Tixati", id+3);
+    }
 
     /* Shad0w-style */
+    if (!*buf)
     {
         int a, b, c;
         if (strchr ("AOQRSTU", id[0])

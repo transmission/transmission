@@ -18,6 +18,7 @@ main (void)
     TEST_CLIENT ("-TR0072-", "Transmission 0.72");
     TEST_CLIENT ("-TR111Z-", "Transmission 1.11+");
     TEST_CLIENT ("O1008132", "Osprey 1.0.0");
+    TEST_CLIENT ("TIX0193-", "Tixati 1.93");
 
     /* gobbledygook */
     TEST_CLIENT ("-IIO\x10\x2D\x04-", "-IIO%10-%04-");
