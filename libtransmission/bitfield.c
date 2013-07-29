@@ -179,9 +179,12 @@ set_all_true (uint8_t * array, size_t bit_count)
   const uint8_t val = 0xFF;
   const size_t n = get_bytes_needed (bit_count);
 
-  memset (array, val, n-1);
+  if (n > 0)
+    {
+      memset (array, val, n-1);
 
-  array[n-1] = val << (n*8 - bit_count);
+      array[n-1] = val << (n*8 - bit_count);
+    }
 }
 
 void*
