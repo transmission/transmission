@@ -255,7 +255,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
                                                                             [fDefaults objectForKey: @"SpeedLimitAutoOffDate"]]);
         tr_variantDictAddInt(&settings, TR_KEY_alt_speed_time_day, [fDefaults integerForKey: @"SpeedLimitAutoDay"]);
         
-        tr_variantDictAddInt(&settings, TR_KEY_downloadSpeed, [fDefaults integerForKey: @"DownloadLimit"]);
+        tr_variantDictAddInt(&settings, TR_KEY_speed_limit_down, [fDefaults integerForKey: @"DownloadLimit"]);
         tr_variantDictAddBool(&settings, TR_KEY_speed_limit_down_enabled, [fDefaults boolForKey: @"CheckDownload"]);
         tr_variantDictAddInt(&settings, TR_KEY_speed_limit_up, [fDefaults integerForKey: @"UploadLimit"]);
         tr_variantDictAddBool(&settings, TR_KEY_speed_limit_up_enabled, [fDefaults boolForKey: @"CheckUpload"]);
