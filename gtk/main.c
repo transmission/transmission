@@ -944,6 +944,9 @@ on_app_exit (gpointer vdata)
   struct cbdata * cbdata = vdata;
   struct session_close_struct * session_close_data;
 
+  if (cbdata->is_closing)
+    return;
+
   cbdata->is_closing = true;
 
   /* stop the update timer */
