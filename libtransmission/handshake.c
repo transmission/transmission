@@ -188,33 +188,49 @@ setReadState (tr_handshake * handshake, handshake_state_t state)
   setState (handshake, state);
 }
 
-static void
+static bool
 buildHandshakeMessage (tr_handshake * handshake, uint8_t * buf)
 {
-  uint8_t * walk = buf;
-  const uint8_t * torrentHash = tr_cryptoGetTorrentHash (handshake->crypto);
-  tr_torrent * tor = tr_torrentFindFromHash (handshake->session, torrentHash);
-  const unsigned char * peer_id = tr_torrentGetPeerId (tor);
+  const unsigned char * peer_id = NULL;
+  const uint8_t * torrentHash;
+  tr_torrent * tor;
+  bool success;
 
-  memcpy (walk, HANDSHAKE_NAME, HANDSHAKE_NAME_LEN);
-  walk += HANDSHAKE_NAME_LEN;
-  memset (walk, 0, HANDSHAKE_FLAGS_LEN);
-  HANDSHAKE_SET_LTEP (walk);
-  HANDSHAKE_SET_FASTEXT (walk);
+  if ((torrentHash = tr_cryptoGetTorrentHash (handshake->crypto)))
+    if ((tor = tr_torrentFindFromHash (handshake->session, torrentHash)))
+      peer_id = tr_torrentGetPeerId (tor);
 
-  /* Note that this doesn't depend on whether the torrent is private.
-   * We don't accept DHT peers for a private torrent,
-   * but we participate in the DHT regardless. */
-  if (tr_dhtEnabled (handshake->session))
-    HANDSHAKE_SET_DHT (walk);
+  if (peer_id == NULL)
+    {
+      success = false;
+    }
+  else
+    {
+      uint8_t * walk = buf;
 
-  walk += HANDSHAKE_FLAGS_LEN;
-  memcpy (walk, torrentHash, SHA_DIGEST_LENGTH);
-  walk += SHA_DIGEST_LENGTH;
-  memcpy (walk, peer_id, PEER_ID_LEN);
-  walk += PEER_ID_LEN;
+      memcpy (walk, HANDSHAKE_NAME, HANDSHAKE_NAME_LEN);
+      walk += HANDSHAKE_NAME_LEN;
+      memset (walk, 0, HANDSHAKE_FLAGS_LEN);
+      HANDSHAKE_SET_LTEP (walk);
+      HANDSHAKE_SET_FASTEXT (walk);
 
-  assert (walk - buf == HANDSHAKE_SIZE);
+      /* Note that this doesn't depend on whether the torrent is private.
+       * We don't accept DHT peers for a private torrent,
+       * but we participate in the DHT regardless. */
+      if (tr_dhtEnabled (handshake->session))
+        HANDSHAKE_SET_DHT (walk);
+
+      walk += HANDSHAKE_FLAGS_LEN;
+      memcpy (walk, torrentHash, SHA_DIGEST_LENGTH);
+      walk += SHA_DIGEST_LENGTH;
+      memcpy (walk, peer_id, PEER_ID_LEN);
+      walk += PEER_ID_LEN;
+
+      assert (walk - buf == HANDSHAKE_SIZE);
+      success = true;
+    }
+
+  return success;
 }
 
 static int tr_handshakeDone (tr_handshake * handshake,
@@ -455,7 +471,8 @@ readYb (tr_handshake * handshake, struct evbuffer * inbuf)
   /* ENCRYPT len (IA)), ENCRYPT (IA) */
   {
     uint8_t msg[HANDSHAKE_SIZE];
-    buildHandshakeMessage (handshake, msg);
+    if (!buildHandshakeMessage (handshake, msg))
+      return tr_handshakeDone (handshake, false);
 
     evbuffer_add_uint16 (outbuf, sizeof (msg));
     evbuffer_add        (outbuf, msg, sizeof (msg));
@@ -670,7 +687,8 @@ readHandshake (tr_handshake    * handshake,
   if (!handshake->haveSentBitTorrentHandshake)
     {
       uint8_t msg[HANDSHAKE_SIZE];
-      buildHandshakeMessage (handshake, msg);
+      if (!buildHandshakeMessage (handshake, msg))
+        return tr_handshakeDone (handshake, false);
       tr_peerIoWriteBytes (handshake->io, msg, sizeof (msg), false);
       handshake->haveSentBitTorrentHandshake = 1;
     }
@@ -920,7 +938,8 @@ readIA (tr_handshake    * handshake,
   /* send our handshake */
   {
     uint8_t msg[HANDSHAKE_SIZE];
-    buildHandshakeMessage (handshake, msg);
+    if (!buildHandshakeMessage (handshake, msg))
+      return tr_handshakeDone (handshake, false);
 
     evbuffer_add (outbuf, msg, sizeof (msg));
     handshake->haveSentBitTorrentHandshake = 1;
