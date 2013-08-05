@@ -17,7 +17,6 @@
  #include <sys/wait.h> /* wait () */
 #else
  #include <process.h>
- #define waitpid(pid, status, options)	_cwait (status, pid, WAIT_CHILD)
 #endif
 #include <unistd.h> /* stat */
 #include <dirent.h>
@@ -2073,7 +2072,18 @@ tr_torrentClearIdleLimitHitCallback (tr_torrent * torrent)
 static void
 onSigCHLD (int i UNUSED)
 {
-  waitpid (-1, NULL, WNOHANG);
+#ifdef WIN32
+
+  _cwait (NULL, -1, WAIT_CHILD);
+
+#else
+
+  int rc;
+  do
+    rc = waitpid (-1, NULL, WNOHANG);
+  while (rc>0 || (rc==-1 && errno==EINTR));
+
+#endif
 }
 
 static void
