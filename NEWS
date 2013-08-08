@@ -8,14 +8,13 @@
   * Add safeguard to prevent zombie processes after running a script when a torrent finishes downloading
   * Fix "bad file descriptor" error
   * Queued torrents no longer show up as paused after exiting & restarting
-  * Fix 2.81 compliation error on OpenBSD
+  * Fix 2.81 compilation error on OpenBSD
   * Don't misidentify Tixati as BitTornado
-  * Silence a couple of 'unused variable' compiler warnings
 ==== Mac Client ====
-  * Fix bug that had slow download speeds in 2.80 and 2.81 until editing preferences
+  * Fix bug that had slow download speeds until editing preferences
 ==== GTK+ Client ====
   * Fix crash that occurred in some cases after using Torrent > Set Location
-  * Fix crash when on_app_exit() got called twice in a row.
+  * Fix crash where on_app_exit() got called twice in a row
   * Fix 2.81 compilation error on older versions of glib
   * Can now open folders that have a '#' in their names
   * Silence gobject warning when updating a blocklist from URL
