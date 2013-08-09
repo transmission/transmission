@@ -1,4 +1,4 @@
-=== Transmission 2.82 (2013/xx/yy) ===
+=== Transmission 2.82 (2013/08/08) ===
 [http://trac.transmissionbt.com/query?milestone=2.82&group=component&order=severity All tickets closed by this release]
 ==== All Platforms ====
   * Fix webseed crash
