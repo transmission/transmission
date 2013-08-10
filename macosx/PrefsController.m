@@ -110,6 +110,9 @@
         if ([fDefaults boolForKey: @"AutoImport"] && (autoPath = [fDefaults stringForKey: @"AutoImportDirectory"]))
             [[(Controller *)[NSApp delegate] fileWatcherQueue] addPath: [autoPath stringByExpandingTildeInPath] notifyingAbout: VDKQueueNotifyAboutWrite];
         
+        //set special-handling of magnet link add window checkbox
+        [self updateShowAddMagnetWindowField];
+        
         //set blocklist scheduler
         [[BlocklistScheduler scheduler] updateSchedule];
         
@@ -820,6 +823,7 @@
 - (void) setDownloadLocation: (id) sender
 {
     [fDefaults setBool: [fFolderPopUp indexOfSelectedItem] == DOWNLOAD_FOLDER forKey: @"DownloadLocationConstant"];
+    [self updateShowAddMagnetWindowField];
 }
 
 - (void) folderSheetShow: (id) sender
@@ -839,7 +843,8 @@
             
             NSString * folder = [[[panel URLs] objectAtIndex: 0] path];
             [fDefaults setObject: folder forKey: @"DownloadFolder"];
-            [fDefaults setObject: @"Constant" forKey: @"DownloadChoice"];
+            [fDefaults setBool: YES forKey: @"DownloadLocationConstant"];
+            [self updateShowAddMagnetWindowField];
             
             tr_sessionSetDownloadDir(fHandle, [folder UTF8String]);
         }
@@ -906,6 +911,26 @@
 - (void) setRenamePartialFiles: (id) sender
 {
     tr_sessionSetIncompleteFileNamingEnabled(fHandle, [fDefaults boolForKey: @"RenamePartialFiles"]);
+}
+
+- (void) setShowAddMagnetWindow: (id) sender
+{
+    [fDefaults setBool: ([fShowMagnetAddWindowCheck state] == NSOnState) forKey: @"MagnetOpenAsk"];
+}
+
+- (void) updateShowAddMagnetWindowField
+{
+    if (![fDefaults boolForKey: @"DownloadLocationConstant"])
+    {
+        //always show the add window for magnet links when the download location is the same as the torrent file
+        [fShowMagnetAddWindowCheck setState: NSOnState];
+        [fShowMagnetAddWindowCheck setEnabled: NO];
+    }
+    else
+    {
+        [fShowMagnetAddWindowCheck setState: [fDefaults boolForKey: @"MagnetOpenAsk"]];
+        [fShowMagnetAddWindowCheck setEnabled: YES];
+    }
 }
 
 - (void) setDoneScriptEnabled: (id) sender

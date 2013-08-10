@@ -42,6 +42,7 @@
     IBOutlet NSButton * fCheckForUpdatesButton, * fCheckForUpdatesBetaButton;
     
     IBOutlet NSPopUpButton * fFolderPopUp, * fIncompleteFolderPopUp, * fImportFolderPopUp, * fDoneScriptPopUp;
+    IBOutlet NSButton * fShowMagnetAddWindowCheck;
     IBOutlet NSTextField * fRatioStopField, * fIdleStopField, * fQueueDownloadField, * fQueueSeedField, * fStalledField;
 
     IBOutlet NSTextField * fUploadField, * fDownloadField,
@@ -123,6 +124,9 @@
 - (void) setUseIncompleteFolder: (id) sender;
 
 - (void) setRenamePartialFiles: (id) sender;
+
+- (IBAction) setShowAddMagnetWindow: (id) sender;
+- (void) updateShowAddMagnetWindowField;
 
 - (void) setDoneScriptEnabled: (id) sender;
 - (void) doneScriptSheetShow: (id) sender;
