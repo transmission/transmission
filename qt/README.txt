@@ -36,9 +36,9 @@ BUILDING ON OS X
 
 BUILDING ON UNIX
 
-   1. Prerequisites: Qt >= 5 and its development packages
+   1. Prerequisites: Qt >= 4.6 and its development packages
    2. Build Transmission as normal
-   3. In the qt/ directory, type "qmake qtr.pro" or "qmake-qt5 qtr.pro"
+   3. In the qt/ directory, type "qmake qtr.pro" (or "qmake-qt4 qtr.pro", or "qmake-qt5 qtr.pro")
    4. In the qt/ directory, type "make"
    5. In the qt/ directory, as root, type "INSTALL_ROOT=/usr make install"
       (Feel free to replace /usr with /usr/local or /opt or whatever)

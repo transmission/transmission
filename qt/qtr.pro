@@ -12,8 +12,12 @@ man.path = /share/man/man1/
 man.files = transmission-qt.1
 
 CONFIG += qt thread debug link_pkgconfig
-QT += network dbus widgets
+QT += network dbus
 PKGCONFIG = fontconfig libcurl openssl libevent
+
+greaterThan(QT_MAJOR_VERSION, 4) {
+    QT += widgets
+}
 
 TRANSMISSION_TOP = ..
 

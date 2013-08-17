@@ -885,7 +885,12 @@ FileTreeView :: FileTreeView (QWidget * parent, bool isEditable):
   for (int i=0; i<NUM_COLUMNS; ++i)
     {
       setColumnHidden (i, (i<FIRST_VISIBLE_COLUMN) || (LAST_VISIBLE_COLUMN<i));
+
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
+      header()->setResizeMode(i, QHeaderView::Interactive);
+#else
       header()->setSectionResizeMode(i, QHeaderView::Interactive);
+#endif
     }
 
   connect (this, SIGNAL(clicked(const QModelIndex&)),

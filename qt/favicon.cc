@@ -14,7 +14,12 @@
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 #include <QNetworkRequest>
-#include <QStandardPaths>
+
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
+ #include <QDesktopServices>
+#else
+ #include <QStandardPaths>
+#endif
 
 #include "favicon.h"
 
@@ -40,7 +45,13 @@ Favicons :: ~Favicons( )
 QString
 Favicons :: getCacheDir( )
 {
-    const QString base = QStandardPaths::writableLocation (QStandardPaths::CacheLocation);
+    const QString base =
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
+        QDesktopServices::storageLocation( QDesktopServices::CacheLocation );
+#else
+        QStandardPaths::writableLocation( QStandardPaths::CacheLocation );
+#endif
+
     return QDir( base ).absoluteFilePath( "favicons" );
 }
 
