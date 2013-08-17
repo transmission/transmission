@@ -343,7 +343,7 @@ libttest_zero_torrent_populate (tr_torrent * tor, bool complete)
 
   for (i=0; i<tor->info.fileCount; ++i)
     {
-      int rv;
+      int err;
       uint64_t j;
       FILE * fp;
       char * path;
@@ -367,8 +367,11 @@ libttest_zero_torrent_populate (tr_torrent * tor, bool complete)
 
       path = tr_torrentFindFile (tor, i);
       assert (path != NULL);
-      rv = stat (path, &sb);
-      assert (rv == 0);
+      err = errno;
+      errno = 0;
+      stat (path, &sb);
+      assert (errno == 0);
+      errno = err; 
       tr_free (path);
     }
 

@@ -265,7 +265,8 @@ tr_eventInit (tr_session * session)
 
     eh = tr_new0 (tr_event_handle, 1);
     eh->lock = tr_lockNew ();
-    pipe (eh->fds);
+    if (pipe (eh->fds) == -1)
+      tr_logAddError ("Unable to write to pipe() in libtransmission: %s", tr_strerror(errno));
     eh->session = session;
     eh->thread = tr_threadNew (libeventThreadFunc, eh);
 

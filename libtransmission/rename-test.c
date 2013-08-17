@@ -86,7 +86,6 @@ torrentRenameAndWait (tr_torrent * tor,
 static void
 create_file_with_contents (const char * path, const char * str)
 {
-  int rv;
   FILE * fp;
   char * dir;
   const int tmperr = errno;
