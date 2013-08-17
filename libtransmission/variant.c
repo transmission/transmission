@@ -1283,7 +1283,7 @@ tr_variantFromBuf (tr_variant      * setme,
         err = tr_jsonParse (optional_source, buf, buflen, setme, setme_end);
         break;
 
-      case TR_VARIANT_FMT_BENC:
+      default /* TR_VARIANT_FMT_BENC */:
         err = tr_variantParseBenc (buf, ((const char*)buf)+buflen, setme, setme_end);
         break;
     }

@@ -305,25 +305,35 @@ void
 tr_runInEventThread (tr_session * session,
                      void func (void*), void * user_data)
 {
-    assert (tr_isSession (session));
-    assert (session->events != NULL);
+  assert (tr_isSession (session));
+  assert (session->events != NULL);
 
-    if (tr_amInThread (session->events->thread))
+  if (tr_amInThread (session->events->thread))
     {
       (func)(user_data);
     }
-    else
+  else
     {
-        const char         ch = 'r';
-        int                fd = session->events->fds[1];
-        tr_lock *          lock = session->events->lock;
-        struct tr_run_data data;
+      int fd;
+      char ch;
+      ssize_t res_1;
+      ssize_t res_2;
+      tr_event_handle * e = session->events;
+      struct tr_run_data data;
 
-        tr_lockLock (lock);
-        pipewrite (fd, &ch, 1);
-        data.func = func;
-        data.user_data = user_data;
-        pipewrite (fd, &data, sizeof (data));
-        tr_lockUnlock (lock);
+      tr_lockLock (e->lock);
+
+      fd = e->fds[1];
+      ch = 'r';
+      res_1 = pipewrite (fd, &ch, 1);
+
+      data.func = func;
+      data.user_data = user_data;
+      res_2 = pipewrite (fd, &data, sizeof (data));
+
+      tr_lockUnlock (e->lock);
+
+      if ((res_1 == -1) || (res_2 == -1))
+        tr_logAddError ("Unable to write to libtransmisison event queue: %s", tr_strerror(errno));
     }
 }

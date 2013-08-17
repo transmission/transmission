@@ -1587,16 +1587,16 @@ addTorrentImpl (struct tr_rpc_idle_data * data, tr_ctor * ctor)
       key = TR_KEY_torrent_added;
       result = NULL;
     }
-  else if (err == TR_PARSE_ERR)
-    {
-      key = 0;
-      result = "invalid or corrupt torrent file";
-    }
   else if (err == TR_PARSE_DUPLICATE)
     {
       tor = tr_torrentFindFromId (data->session, duplicate_id);
       key = TR_KEY_torrent_duplicate;
       result = "duplicate torrent";
+    }
+  else /* err == TR_PARSE_ERR */
+    {
+      key = 0;
+      result = "invalid or corrupt torrent file";
     }
 
   if (tor && key)

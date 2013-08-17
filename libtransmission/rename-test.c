@@ -93,9 +93,8 @@ create_file_with_contents (const char * path, const char * str)
 
   dir = tr_dirname (path);
   errno = 0;
-  rv = tr_mkdirp (dir, 0700);
+  tr_mkdirp (dir, 0700);
   assert (errno == 0);
-  assert (rv == 0);
   tr_free (dir);
 
   tr_remove (path);
