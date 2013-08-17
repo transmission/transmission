@@ -141,14 +141,8 @@ tr_bandwidthSetParent (tr_bandwidth  * b,
 
   if (b->parent)
     {
-      void * removed;
-
       assert (tr_isBandwidth (b->parent));
-
-      removed = tr_ptrArrayRemoveSorted (&b->parent->children, b, compareBandwidth);
-      assert (removed == b);
-      assert (tr_ptrArrayFindSorted (&b->parent->children, b, compareBandwidth) == NULL);
-
+      tr_ptrArrayRemoveSortedPointer (&b->parent->children, b, compareBandwidth);
       b->parent = NULL;
     }
 

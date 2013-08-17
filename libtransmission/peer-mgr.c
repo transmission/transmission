@@ -1954,7 +1954,6 @@ myHandshakeDoneCB (tr_handshake  * handshake,
   const tr_address * addr;
   tr_peerMgr * manager = vmanager;
   tr_swarm  * s;
-  tr_handshake * ours;
 
   assert (io);
   assert (tr_isBool (ok));
@@ -1964,16 +1963,11 @@ myHandshakeDoneCB (tr_handshake  * handshake,
     : NULL;
 
   if (tr_peerIoIsIncoming (io))
-    ours = tr_ptrArrayRemoveSorted (&manager->incomingHandshakes,
+    tr_ptrArrayRemoveSortedPointer (&manager->incomingHandshakes,
                                     handshake, handshakeCompare);
   else if (s)
-    ours = tr_ptrArrayRemoveSorted (&s->outgoingHandshakes,
+    tr_ptrArrayRemoveSortedPointer (&s->outgoingHandshakes,
                                     handshake, handshakeCompare);
-  else
-    ours = handshake;
-
-  assert (ours);
-  assert (ours == handshake);
 
   if (s)
     swarmLock (s);
@@ -3307,7 +3301,6 @@ getReconnectIntervalSecs (const struct peer_atom * atom, const time_t now)
 static void
 removePeer (tr_swarm * s, tr_peer * peer)
 {
-  tr_peer * removed;
   struct peer_atom * atom = peer->atom;
 
   assert (swarmIsLocked (s));
@@ -3315,18 +3308,17 @@ removePeer (tr_swarm * s, tr_peer * peer)
 
   atom->time = tr_time ();
 
-  removed = tr_ptrArrayRemoveSorted (&s->peers, peer, peerCompare);
+  tr_ptrArrayRemoveSortedPointer (&s->peers, peer, peerCompare);
   --s->stats.peerCount;
   --s->stats.peerFromCount[atom->fromFirst];
 
   if (replicationExists (s))
     tr_decrReplicationFromBitfield (s, &peer->have);
 
-  assert (removed == peer);
   assert (s->stats.peerCount == tr_ptrArraySize (&s->peers));
   assert (s->stats.peerFromCount[atom->fromFirst] >= 0);
 
-  tr_peerFree (removed);
+  tr_peerFree (peer);
 }
 
 static void

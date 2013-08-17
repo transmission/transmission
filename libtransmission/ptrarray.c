@@ -215,10 +215,10 @@ tr_ptrArrayFindSorted (tr_ptrArray * t,
   return match ? t->items[pos] : NULL;
 }
 
-void*
-tr_ptrArrayRemoveSorted (tr_ptrArray * t,
-                         const void  * ptr,
-                         int           compare (const void*, const void*))
+static void*
+tr_ptrArrayRemoveSortedValue (tr_ptrArray * t,
+                              const void  * ptr,
+                              int           compare (const void*, const void*))
 {
   int pos;
   bool match;
@@ -237,4 +237,19 @@ tr_ptrArrayRemoveSorted (tr_ptrArray * t,
 
   assert ((ret == NULL) || (compare (ret, ptr) == 0));
   return ret;
+}
+
+void
+tr_ptrArrayRemoveSortedPointer (tr_ptrArray * t,
+                                const void  * ptr,
+                                int           compare (const void*, const void*))
+{
+#ifdef NDEBUG
+  tr_ptrArrayRemoveSortedValue (t, ptr, compare);
+#else
+  void * removed = tr_ptrArrayRemoveSortedValue (t, ptr, compare);
+  assert (removed != NULL);
+  assert (removed == ptr);
+  assert (tr_ptrArrayFindSorted (t, ptr, compare) == NULL);
+#endif
 }
