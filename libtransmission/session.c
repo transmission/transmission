@@ -2796,7 +2796,6 @@ struct TorrentAndPosition
   int position;
 };
 
-/* higher positions come first */
 static int
 compareTorrentAndPositions (const void * va, const void * vb)
 {
@@ -2805,9 +2804,9 @@ compareTorrentAndPositions (const void * va, const void * vb)
   const struct TorrentAndPosition * b = vb;
 
   if (a->position > b->position)
-    ret = -1;
-  else if (a->position < b->position)
     ret = 1;
+  else if (a->position < b->position)
+    ret = -1;
   else
     ret = 0;
 
