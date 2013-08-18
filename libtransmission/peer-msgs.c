@@ -1339,7 +1339,7 @@ peerMadeRequest (tr_peerMsgs * msgs, const struct peer_request * req)
 {
     const bool fext = tr_peerIoSupportsFEXT (msgs->io);
     const int reqIsValid = requestIsValid (msgs, req);
-    const int clientHasPiece = reqIsValid && tr_cpPieceIsComplete (&msgs->torrent->completion, req->index);
+    const int clientHasPiece = reqIsValid && tr_torrentPieceIsComplete (msgs->torrent, req->index);
     const int peerIsChoked = msgs->peer_is_choked;
 
     int allow = false;
@@ -1708,7 +1708,7 @@ clientGotBlock (tr_peerMsgs                * msgs,
         dbgmsg (msgs, "we didn't ask for this message...");
         return 0;
     }
-    if (tr_cpPieceIsComplete (&msgs->torrent->completion, req->index)) {
+    if (tr_torrentPieceIsComplete (msgs->torrent, req->index)) {
         dbgmsg (msgs, "we did ask for this message, but the piece is already complete...");
         return 0;
     }
@@ -2006,7 +2006,7 @@ fillOutputBuffer (tr_peerMsgs * msgs, time_t now)
         --msgs->prefetchCount;
 
         if (requestIsValid (msgs, &req)
-            && tr_cpPieceIsComplete (&msgs->torrent->completion, req.index))
+            && tr_torrentPieceIsComplete (msgs->torrent, req.index))
         {
             int err;
             const uint32_t msglen = 4 + 1 + 4 + 4 + req.length;
@@ -2126,7 +2126,7 @@ sendBitfield (tr_peerMsgs * msgs)
 
     assert (tr_torrentHasMetadata (msgs->torrent));
 
-    bytes = tr_cpCreatePieceBitfield (&msgs->torrent->completion, &byte_count);
+    bytes = tr_torrentCreatePieceBitfield (msgs->torrent, &byte_count);
     evbuffer_add_uint32 (out, sizeof (uint8_t) + byte_count);
     evbuffer_add_uint8 (out, BT_BITFIELD);
     evbuffer_add     (out, bytes, byte_count);
@@ -2141,15 +2141,15 @@ tellPeerWhatWeHave (tr_peerMsgs * msgs)
 {
     const bool fext = tr_peerIoSupportsFEXT (msgs->io);
 
-    if (fext && tr_cpHasAll (&msgs->torrent->completion))
+    if (fext && tr_torrentHasAll (msgs->torrent))
     {
         protocolSendHaveAll (msgs);
     }
-    else if (fext && tr_cpHasNone (&msgs->torrent->completion))
+    else if (fext && tr_torrentHasNone (msgs->torrent))
     {
         protocolSendHaveNone (msgs);
     }
-    else if (!tr_cpHasNone (&msgs->torrent->completion))
+    else if (!tr_torrentHasNone (msgs->torrent))
     {
         sendBitfield (msgs);
     }

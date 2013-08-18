@@ -919,12 +919,12 @@ announce_request_new (const tr_announcer  * announcer,
     req->down = tier->byteCounts[TR_ANN_DOWN];
     req->corrupt = tier->byteCounts[TR_ANN_CORRUPT];
     req->leftUntilComplete = tr_torrentHasMetadata (tor)
-            ? tor->info.totalSize - tr_cpHaveTotal (&tor->completion)
+            ? tor->info.totalSize - tr_torrentHaveTotal (tor)
             : ~ (uint64_t)0;
     req->event = event;
     req->numwant = event == TR_ANNOUNCE_EVENT_STOPPED ? 0 : NUMWANT;
     req->key = announcer->key;
-    req->partial_seed = tr_cpGetStatus (&tor->completion) == TR_PARTIAL_SEED;
+    req->partial_seed = tr_torrentGetCompleteness (tor) == TR_PARTIAL_SEED;
     tier_build_log_name (tier, req->log_name, sizeof (req->log_name));
     return req;
 }

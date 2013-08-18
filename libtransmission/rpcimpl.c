@@ -746,7 +746,7 @@ addField (tr_torrent       * const tor,
         if (tr_torrentHasMetadata (tor))
           {
             size_t byte_count = 0;
-            void * bytes = tr_cpCreatePieceBitfield (&tor->completion, &byte_count);
+            void * bytes = tr_torrentCreatePieceBitfield (tor, &byte_count);
             char * str = tr_base64_encode (bytes, byte_count, NULL);
             tr_variantDictAddStr (d, key, str!=NULL ? str : "");
             tr_free (str);

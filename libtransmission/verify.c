@@ -70,7 +70,7 @@ verifyTorrent (tr_torrent * tor, bool * stopFlag)
 
       /* if we're starting a new piece... */
       if (piecePos == 0)
-        hadPiece = tr_cpPieceIsComplete (&tor->completion, pieceIndex);
+        hadPiece = tr_torrentPieceIsComplete (tor, pieceIndex);
 
       /* if we're starting a new file... */
       if (!filePos && (fd<0) && (fileIndex!=prevFileIndex))

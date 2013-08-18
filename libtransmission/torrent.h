@@ -323,10 +323,16 @@ tr_torrentExists (const tr_session * session, const uint8_t *   torrentHash)
     return tr_torrentFindFromHash ((tr_session*)session, torrentHash) != NULL;
 }
 
+static inline tr_completeness
+tr_torrentGetCompleteness (const tr_torrent * tor)
+{
+    return tor->completeness;
+}
+
 static inline bool
 tr_torrentIsSeed (const tr_torrent * tor)
 {
-    return tor->completeness != TR_LEECH;
+    return tr_torrentGetCompleteness(tor) != TR_LEECH;
 }
 
 static inline bool tr_torrentIsPrivate (const tr_torrent * tor)
@@ -439,17 +445,71 @@ bool tr_torrentIsStalled (const tr_torrent * tor);
 
 const unsigned char * tr_torrentGetPeerId (tr_torrent * tor);
 
+static inline uint64_t
+tr_torrentGetLeftUntilDone (const tr_torrent * tor)
+{
+  return tr_cpLeftUntilDone (&tor->completion);
+}
+
+static inline bool
+tr_torrentHasAll (const tr_torrent * tor)
+{
+  return tr_cpHasAll (&tor->completion);
+}
+
+static inline bool
+tr_torrentHasNone (const tr_torrent * tor)
+{
+  return tr_cpHasNone (&tor->completion);
+}
+
+static inline bool
+tr_torrentPieceIsComplete (const tr_torrent * tor, tr_piece_index_t i)
+{
+  return tr_cpPieceIsComplete (&tor->completion, i);
+}
+
+static inline bool
+tr_torrentBlockIsComplete (const tr_torrent * tor, tr_block_index_t i)
+{
+  return tr_cpBlockIsComplete (&tor->completion, i);
+}
+
+static inline size_t
+tr_torrentMissingBlocksInPiece (const tr_torrent * tor, tr_piece_index_t i)
+{
+  return tr_cpMissingBlocksInPiece (&tor->completion, i);
+}
+
+static inline size_t
+tr_torrentMissingBytesInPiece (const tr_torrent * tor, tr_piece_index_t i)
+{
+  return tr_cpMissingBytesInPiece (&tor->completion, i);
+}
+
+static inline void *
+tr_torrentCreatePieceBitfield (const tr_torrent * tor, size_t * byte_count)
+{
+  return tr_cpCreatePieceBitfield (&tor->completion, byte_count);
+}
+
+static inline uint64_t
+tr_torrentHaveTotal (const tr_torrent * tor)
+{
+  return tr_cpHaveTotal (&tor->completion);
+}
+
 
 static inline bool
 tr_torrentIsQueued (const tr_torrent * tor)
 {
-    return tor->isQueued;
+  return tor->isQueued;
 }
 
 static inline tr_direction
 tr_torrentGetQueueDirection (const tr_torrent * tor)
 {
-    return tr_torrentIsSeed (tor) ? TR_UP : TR_DOWN;
+  return tr_torrentIsSeed (tor) ? TR_UP : TR_DOWN;
 }
 
 #endif

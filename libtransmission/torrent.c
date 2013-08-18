@@ -838,7 +838,7 @@ hasAnyLocalData (const tr_torrent * tor)
 static bool
 setLocalErrorIfFilesDisappeared (tr_torrent * tor)
 {
-  const bool disappeared = (tr_cpHaveTotal (&tor->completion) > 0) && !hasAnyLocalData (tor);
+  const bool disappeared = (tr_torrentHaveTotal (tor) > 0) && !hasAnyLocalData (tor);
 
   if (disappeared)
     {
@@ -1293,7 +1293,7 @@ tr_torrentStat (tr_torrent * tor)
   s->metadataPercentComplete = tr_torrentGetMetadataPercent (tor);
 
   s->percentDone         = tr_cpPercentDone (&tor->completion);
-  s->leftUntilDone       = tr_cpLeftUntilDone (&tor->completion);
+  s->leftUntilDone       = tr_torrentGetLeftUntilDone (tor);
   s->sizeWhenDone        = tr_cpSizeWhenDone (&tor->completion);
   s->recheckProgress     = s->activity == TR_STATUS_CHECK ? getVerifyProgress (tor) : 0;
   s->activityDate        = tor->activityDate;
@@ -1308,7 +1308,7 @@ tr_torrentStat (tr_torrent * tor)
   s->downloadedEver   = tor->downloadedCur + tor->downloadedPrev;
   s->uploadedEver     = tor->uploadedCur   + tor->uploadedPrev;
   s->haveValid        = tr_cpHaveValid (&tor->completion);
-  s->haveUnchecked    = tr_cpHaveTotal (&tor->completion) - s->haveValid;
+  s->haveUnchecked    = tr_torrentHaveTotal (tor) - s->haveValid;
   s->desiredAvailable = tr_peerMgrGetDesiredAvailable (tor);
 
   s->ratio = tr_getRatio (s->uploadedEver,
@@ -1412,13 +1412,13 @@ countFileBytesCompleted (const tr_torrent * tor, tr_file_index_t index)
 
       if (first == last)
         {
-          if (tr_cpBlockIsComplete (&tor->completion, first))
+          if (tr_torrentBlockIsComplete (tor, first))
             total = f->length;
         }
       else
         {
           /* the first block */
-          if (tr_cpBlockIsComplete (&tor->completion, first))
+          if (tr_torrentBlockIsComplete (tor, first))
             total += tor->blockSize - (f->offset % tor->blockSize);
 
           /* the middle blocks */
@@ -1430,7 +1430,7 @@ countFileBytesCompleted (const tr_torrent * tor, tr_file_index_t index)
             }
 
           /* the last block */
-          if (tr_cpBlockIsComplete (&tor->completion, last))
+          if (tr_torrentBlockIsComplete (tor, last))
             total += (f->offset + f->length) - ((uint64_t)tor->blockSize * last);
         }
     }
@@ -3224,7 +3224,7 @@ tr_torrentPieceCompleted (tr_torrent * tor, tr_piece_index_t pieceIndex)
 void
 tr_torrentGotBlock (tr_torrent * tor, tr_block_index_t block)
 {
-  const bool block_is_new = !tr_cpBlockIsComplete (&tor->completion, block);
+  const bool block_is_new = !tr_torrentBlockIsComplete (tor, block);
 
   assert (tr_isTorrent (tor));
   assert (tr_amInEventThread (tor->session));
@@ -3237,7 +3237,7 @@ tr_torrentGotBlock (tr_torrent * tor, tr_block_index_t block)
       tr_torrentSetDirty (tor);
 
       p = tr_torBlockPiece (tor, block);
-      if (tr_cpPieceIsComplete (&tor->completion, p))
+      if (tr_torrentPieceIsComplete (tor, p))
         {
           tr_logAddTorDbg (tor, "[LAZY] checking just-completed piece %zu", (size_t)p);
 
