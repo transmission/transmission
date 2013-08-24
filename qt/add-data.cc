@@ -11,6 +11,7 @@
  */
 
 #include <QFile>
+#include <QDir>
 
 #include <libtransmission/transmission.h>
 #include <libtransmission/utils.h> // tr_base64_encode()
@@ -33,7 +34,7 @@ AddData :: set( const QString& key )
     }
     else if( QFile(key).exists( ) )
     {
-        filename = key;
+        filename = QDir::fromNativeSeparators( key );
         type = FILENAME;
 
         QFile file( key );
