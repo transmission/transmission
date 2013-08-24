@@ -12,6 +12,7 @@
 
 #include <ctype.h> /* isxdigit () */
 #include <errno.h>
+#include <limits.h> /* INT_MAX */
 #include <stdarg.h>
 #include <string.h> /* strchr (), strrchr (), strlen (), strstr () */
 

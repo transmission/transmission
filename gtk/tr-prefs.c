@@ -11,7 +11,7 @@
  */
 
 #include <ctype.h> /* isspace */
-#include <limits.h> /* USHRT_MAX */
+#include <limits.h> /* USHRT_MAX, INT_MAX */
 #include <unistd.h>
 #include <glib/gi18n.h>
 #include <gtk/gtk.h>

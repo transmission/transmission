@@ -11,6 +11,7 @@
  */
 
 #include <cassert>
+#include <climits> /* INT_MAX */
 #include <iostream>
 
 #include <QCheckBox>

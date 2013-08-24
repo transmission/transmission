@@ -26,6 +26,7 @@
 #include <stdarg.h>
 #include <string.h> /* memcmp */
 #include <stdlib.h> /* qsort */
+#include <limits.h> /* INT_MAX */
 
 #include <event2/util.h> /* evutil_vsnprintf () */
 

@@ -12,6 +12,7 @@
 
 #include <assert.h>
 #include <errno.h> /* ENOENT */
+#include <limits.h> /* INT_MAX */
 #include <stdlib.h>
 #include <string.h> /* memcpy */
 

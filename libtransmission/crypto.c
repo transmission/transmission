@@ -12,7 +12,6 @@
 
 #include <assert.h>
 #include <inttypes.h> /* uint8_t */
-#include <limits.h> /* INT_MAX */
 #include <stdarg.h>
 #include <stdlib.h> /* abs () */
 #include <string.h> /* memcpy (), memset (), strcmp () */

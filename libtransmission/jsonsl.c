@@ -26,7 +26,6 @@
 
 #include "jsonsl.h"
 #include <assert.h>
-#include <limits.h>
 #include <ctype.h>
 
 #ifdef JSONSL_USE_METRICS

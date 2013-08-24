@@ -1,3 +1,4 @@
+#include <limits.h> /* INT_MAX */
 #include <math.h> /* sqrt () */
 #include <string.h> /* strlen () */
 

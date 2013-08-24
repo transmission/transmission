@@ -10,6 +10,7 @@
  * $Id$
  */
 
+#include <limits.h> /* INT_MAX */
 #include <gtk/gtk.h>
 #include <glib/gi18n.h>
 #include <libtransmission/transmission.h>

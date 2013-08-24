@@ -10,6 +10,7 @@
  * $Id$
  */
 
+#include <limits.h> /* INT_MAX */
 #include <stddef.h>
 #include <stdio.h> /* sscanf () */
 #include <stdlib.h> /* abort () */

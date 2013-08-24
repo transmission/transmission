@@ -13,7 +13,6 @@
 #include <assert.h>
 #include <errno.h>
 #include <string.h> /* memcpy */
-#include <limits.h> /* INT_MAX */
 
 #include <unistd.h>    /* close */
 
