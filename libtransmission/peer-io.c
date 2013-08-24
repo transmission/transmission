@@ -624,7 +624,7 @@ tr_peerIoNew (tr_session       * session,
     io->port = port;
     io->socket = socket;
     io->utp_socket = utp_socket;
-    io->isIncoming = isIncoming != 0;
+    io->isIncoming = isIncoming;
     io->timeCreated = tr_time ();
     io->inbuf = evbuffer_new ();
     io->outbuf = evbuffer_new ();
@@ -1051,7 +1051,7 @@ addDatatype (tr_peerIo * io, size_t byteCount, bool isPieceData)
 {
     struct tr_datatype * d;
     d = datatype_new ();
-    d->isPieceData = isPieceData != 0;
+    d->isPieceData = isPieceData;
     d->length = byteCount;
     peer_io_push_datatype (io, d);
 }

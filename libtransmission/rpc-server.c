@@ -843,7 +843,9 @@ void
 tr_rpcSetWhitelistEnabled (tr_rpc_server  * server,
                            bool             isEnabled)
 {
-  server->isWhitelistEnabled = isEnabled != 0;
+  assert (tr_isBool (isEnabled));
+
+  server->isWhitelistEnabled = isEnabled;
 }
 
 bool
