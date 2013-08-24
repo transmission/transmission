@@ -449,7 +449,7 @@ tr_realMakeMetaInfo (tr_metainfo_builder * builder)
   tr_variantFree (&top);
   if (builder->abortFlag)
     builder->result = TR_MAKEMETA_CANCELLED;
-  builder->isDone = 1;
+  builder->isDone = true;
 }
 
 /***
@@ -506,10 +506,12 @@ tr_makeMetaInfo (tr_metainfo_builder   * builder,
                  const tr_tracker_info * trackers,
                  int                     trackerCount,
                  const char            * comment,
-                 int                     isPrivate)
+                 bool                    isPrivate)
 {
   int i;
   tr_lock * lock;
+
+  assert (tr_isBool (isPrivate));
 
   /* free any variables from a previous run */
   for (i=0; i<builder->trackerCount; ++i)
@@ -519,9 +521,9 @@ tr_makeMetaInfo (tr_metainfo_builder   * builder,
   tr_free (builder->outputFile);
 
   /* initialize the builder variables */
-  builder->abortFlag = 0;
+  builder->abortFlag = false;
   builder->result = 0;
-  builder->isDone = 0;
+  builder->isDone = false;
   builder->pieceIndex = 0;
   builder->trackerCount = trackerCount;
   builder->trackers = tr_new0 (tr_tracker_info, builder->trackerCount);

@@ -853,7 +853,7 @@ setLocalErrorIfFilesDisappeared (tr_torrent * tor)
 static void
 torrentInit (tr_torrent * tor, const tr_ctor * ctor)
 {
-  int doStart;
+  bool doStart;
   uint64_t loaded;
   const char * dir;
   bool isNewTorrent;
@@ -910,7 +910,7 @@ torrentInit (tr_torrent * tor, const tr_ctor * ctor)
   refreshCurrentDir (tor);
 
   doStart = tor->isRunning;
-  tor->isRunning = 0;
+  tor->isRunning = false;
 
   if (!(loaded & TR_FR_SPEEDLIMIT))
     {
@@ -1886,8 +1886,8 @@ tr_torrentStop (tr_torrent * tor)
     {
       tr_sessionLock (tor->session);
 
-      tor->isRunning = 0;
-      tor->isStopping = 0;
+      tor->isRunning = false;
+      tor->isStopping = false;
       tr_torrentSetDirty (tor);
       tr_runInEventThread (tor->session, stopTorrent, tor);
 
@@ -1917,7 +1917,7 @@ closeTorrent (void * vtor)
       tr_torrentRemoveResume (tor);
     }
 
-  tor->isRunning = 0;
+  tor->isRunning = false;
   freeTorrent (tor);
 }
 

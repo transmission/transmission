@@ -198,7 +198,10 @@ tr_blocklistFileIsEnabled (tr_blocklistFile * b)
 void
 tr_blocklistFileSetEnabled (tr_blocklistFile * b, bool isEnabled)
 {
-  b->isEnabled = isEnabled ? 1 : 0;
+  assert (b != NULL);
+  assert (tr_isBool (isEnabled));
+
+  b->isEnabled = isEnabled;
 }
 
 int

@@ -106,7 +106,7 @@ getBlockRun (const tr_cache * cache, int pos, struct run_info * info)
       const struct cache_block * b = blocks[i-1];
       info->last_block_time = b->time;
       info->is_piece_done = tr_torrentPieceIsComplete (b->tor, b->piece);
-      info->is_multi_piece = b->piece != blocks[pos]->piece ? true : false;
+      info->is_multi_piece = b->piece != blocks[pos]->piece;
       info->len = i - pos;
       info->pos = pos;
     }

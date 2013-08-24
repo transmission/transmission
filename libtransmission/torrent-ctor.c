@@ -40,7 +40,7 @@ struct tr_ctor
     tr_priority_t           bandwidthPriority;
     bool                    isSet_metainfo;
     bool                    isSet_delete;
-    tr_variant                 metainfo;
+    tr_variant              metainfo;
     char *                  sourceFile;
 
     struct optional_args    optionalArgs[2];
@@ -77,7 +77,7 @@ clearMetainfo (tr_ctor * ctor)
 {
     if (ctor->isSet_metainfo)
     {
-        ctor->isSet_metainfo = 0;
+        ctor->isSet_metainfo = false;
         tr_variantFree (&ctor->metainfo);
     }
 

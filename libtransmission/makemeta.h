@@ -60,7 +60,7 @@ typedef struct tr_metainfo_builder
     int                trackerCount;
     char *             comment;
     char *             outputFile;
-    int                isPrivate;
+    bool               isPrivate;
 
     /**
     ***  These are set inside tr_makeMetaInfo () so the client
@@ -70,8 +70,8 @@ typedef struct tr_metainfo_builder
     **/
 
     uint32_t                   pieceIndex;
-    int                        abortFlag;
-    int                        isDone;
+    bool                       abortFlag;
+    bool                       isDone;
     tr_metainfo_builder_err    result;
 
     /* file in use when result was set to _IO_READ or _IO_WRITE,
@@ -124,7 +124,7 @@ void tr_makeMetaInfo (tr_metainfo_builder *   builder,
                       const tr_tracker_info * trackers,
                       int                     trackerCount,
                       const char *            comment,
-                      int                     isPrivate);
+                      bool                    isPrivate);
 
 
 #ifdef __cplusplus
