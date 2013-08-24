@@ -55,13 +55,27 @@ extern "C" {
 #endif
 
 #ifndef PRId64
- #define PRId64 "lld"
+ #ifdef WIN32
+  #define PRId64 "I64"
+ #else
+  #define PRId64 "lld"
+ #endif
 #endif
+
 #ifndef PRIu64
- #define PRIu64 "llu"
+ #ifdef WIN32
+  #define PRIu64 "uI64"
+ #else
+  #define PRIu64 "llu"
+ #endif
 #endif
+
 #ifndef PRIu32
- #define PRIu32 "lu"
+ #ifdef WIN32
+  #define PRIu32 "uI32"
+ #else
+  #define PRIu32 "lu"
+ #endif
 #endif
 
 #if defined (WIN32) && defined (_MSC_VER)
