@@ -55,6 +55,7 @@ class Details: public QDialog
     Details (Session&, Prefs&, TorrentModel&, QWidget * parent = 0);
     ~Details ();
     void setIds (const QSet<int>& ids);
+    virtual QSize sizeHint () const { return QSize (440, 460); }
 
   private:
     QWidget * createPeersTab ();
