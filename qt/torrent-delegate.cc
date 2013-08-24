@@ -80,7 +80,7 @@ TorrentDelegate :: progressString( const Torrent& tor ) const
     const bool isMagnet( !tor.hasMetadata( ) );
     const bool isDone( tor.isDone( ) );
     const bool isSeed( tor.isSeed( ) );
-    const uint64_t haveTotal( tor.haveTotal( ) );
+    const quint64 haveTotal( tor.haveTotal( ) );
     QString str;
     double seedRatio;
     const bool hasSeedRatio( tor.getSeedRatio( seedRatio ) );

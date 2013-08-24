@@ -31,12 +31,12 @@ class FreespaceLabel: public QLabel
 
   private:
     Session& mySession;
-    int64_t myTag;
+    qint64 myTag;
     QString myPath;
     QTimer myTimer;
 
   private slots:
-    void onSessionExecuted (int64_t tag, const QString& result, struct tr_variant * arguments);
+    void onSessionExecuted (qint64 tag, const QString& result, struct tr_variant * arguments);
     void onTimer ();
 };
 

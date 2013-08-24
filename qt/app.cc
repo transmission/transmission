@@ -477,7 +477,7 @@ MyApp :: notify (const QString& title, const QString& body) const
   args.append (body);                                 // body
   args.append (QStringList ());                       // actions - unused for plain passive popups
   args.append (QVariantMap ());                       // hints - unused atm
-  args.append (int32_t (-1));                          // use the default timeout period
+  args.append (qint32 (-1));                          // use the default timeout period
   m.setArguments (args);
   QDBusMessage replyMsg = QDBusConnection::sessionBus ().call (m);
   //std::cerr << qPrintable (replyMsg.errorName ()) << std::endl;

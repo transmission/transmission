@@ -163,7 +163,7 @@ FileTreeItem :: data (int column, int role) const
 }
 
 void
-FileTreeItem :: getSubtreeWantedSize (uint64_t& have, uint64_t& total) const
+FileTreeItem :: getSubtreeWantedSize (quint64& have, quint64& total) const
 {
   if (myIsWanted)
     {
@@ -179,7 +179,7 @@ double
 FileTreeItem :: progress () const
 {
   double d(0);
-  uint64_t have(0), total(0);
+  quint64 have(0), total(0);
 
   getSubtreeWantedSize (have, total);
   if (total)
@@ -199,8 +199,8 @@ FileTreeItem :: sizeString () const
     }
   else
     {
-      uint64_t have = 0;
-      uint64_t total = 0;
+      quint64 have = 0;
+      quint64 total = 0;
       getSubtreeWantedSize (have, total);
       str = Formatter::sizeToString (total);
     }
@@ -212,7 +212,7 @@ std::pair<int,int>
 FileTreeItem :: update (const QString& name,
                         bool           wanted,
                         int            priority,
-                        uint64_t       haveSize,
+                        quint64       haveSize,
                         bool           updateFields)
 {
   int changed_count = 0;
@@ -605,8 +605,8 @@ FileTreeModel :: addFile (int                   fileIndex,
                           const QString       & filename,
                           bool                  wanted,
                           int                   priority,
-                          uint64_t              totalSize,
-                          uint64_t              have,
+                          quint64              totalSize,
+                          quint64              have,
                           QList<QModelIndex>  & rowsAdded,
                           bool                  updateFields)
 {

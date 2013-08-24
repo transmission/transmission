@@ -36,8 +36,8 @@ FreespaceLabel :: FreespaceLabel (Session        & session,
 
   connect (&myTimer, SIGNAL(timeout()), this, SLOT(onTimer()));
 
-  connect (&mySession, SIGNAL(executed(int64_t, const QString&, struct tr_variant*)),
-           this,       SLOT(onSessionExecuted(int64_t, const QString&, struct tr_variant*)));
+  connect (&mySession, SIGNAL(executed(qint64, const QString&, struct tr_variant*)),
+           this,       SLOT(onSessionExecuted(qint64, const QString&, struct tr_variant*)));
 
   setPath (path);
 }
@@ -56,7 +56,7 @@ FreespaceLabel :: setPath (const QString& path)
 void
 FreespaceLabel :: onTimer ()
 {
-  const int64_t tag = mySession.getUniqueTag ();
+  const qint64 tag = mySession.getUniqueTag ();
   const QByteArray myPathUtf8 = myPath.toUtf8 ();
 
   myTag = tag;
@@ -71,7 +71,7 @@ FreespaceLabel :: onTimer ()
 }
 
 void
-FreespaceLabel :: onSessionExecuted (int64_t tag, const QString& result, struct tr_variant * arguments)
+FreespaceLabel :: onSessionExecuted (qint64 tag, const QString& result, struct tr_variant * arguments)
 {
   Q_UNUSED (result);
 
@@ -81,7 +81,7 @@ FreespaceLabel :: onSessionExecuted (int64_t tag, const QString& result, struct 
   QString str;
 
   // update the label
-  int64_t bytes = -1;
+  qint64 bytes = -1;
   tr_variantDictFindInt (arguments, TR_KEY_size_bytes, &bytes);
   if (bytes >= 0)
     setText (tr("%1 free").arg(Formatter::sizeToString (bytes)));

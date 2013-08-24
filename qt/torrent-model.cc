@@ -131,7 +131,7 @@ TorrentModel :: removeTorrents( tr_variant * torrents )
     int i = 0;
     tr_variant * child;
     while(( child = tr_variantListChild( torrents, i++ ))) {
-        int64_t intVal;
+        qint64 intVal;
         if( tr_variantGetInt( child, &intVal ) )
             removeTorrent( intVal );
     }
@@ -155,7 +155,7 @@ TorrentModel :: updateTorrents( tr_variant * torrents, bool isCompleteList )
         tr_variant * child;
         while(( child = tr_variantListChild( torrents, i++ )))
         {
-            int64_t id;
+            qint64 id;
             if( tr_variantDictFindInt( child, TR_KEY_id, &id ) )
             {
                 newIds.insert( id );

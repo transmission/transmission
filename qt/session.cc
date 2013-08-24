@@ -764,7 +764,7 @@ Session :: parseResponse (const char * json, size_t jsonLength)
     const int err (tr_variantFromJson (&top, json, jsonLength));
     if (!err)
     {
-        int64_t tag = -1;
+        qint64 tag = -1;
         const char * result = NULL;
         tr_variant * args = NULL;
 
@@ -802,7 +802,7 @@ Session :: parseResponse (const char * json, size_t jsonLength)
                     break;
 
                 case TAG_BLOCKLIST_UPDATE: {
-                    int64_t intVal = 0;
+                    qint64 intVal = 0;
                     if (tr_variantDictFindDict (&top, TR_KEY_arguments, &args))
                         if (tr_variantDictFindInt (args, TR_KEY_blocklist_size, &intVal))
                             setBlocklistSize (intVal);
@@ -811,7 +811,7 @@ Session :: parseResponse (const char * json, size_t jsonLength)
 
                 case TAG_RENAME_PATH:
                   {
-                    int64_t id = 0;
+                    qint64 id = 0;
                     const char * result = 0;
                     if (tr_variantDictFindStr (&top, TR_KEY_result, &result, 0) && strcmp (result, "success"))
                       {
@@ -885,7 +885,7 @@ Session :: parseResponse (const char * json, size_t jsonLength)
 void
 Session :: updateStats (tr_variant * d, struct tr_session_stats * stats)
 {
-  int64_t i;
+  qint64 i;
 
   if (tr_variantDictFindInt (d, TR_KEY_uploadedBytes, &i))
     stats->uploadedBytes = i;
@@ -918,7 +918,7 @@ Session :: updateStats (tr_variant * d)
 void
 Session :: updateInfo (tr_variant * d)
 {
-  int64_t i;
+  qint64 i;
   const char * str;
 
   disconnect (&myPrefs, SIGNAL (changed (int)), this, SLOT (updatePref (int)));
@@ -949,7 +949,7 @@ Session :: updateInfo (tr_variant * d)
         {
           case QVariant :: Int:
             {
-              int64_t val;
+              qint64 val;
               if (tr_variantGetInt (b, &val))
                 myPrefs.set (i, (int)val);
               break;
@@ -1014,7 +1014,7 @@ Session :: updateInfo (tr_variant * d)
 }
 
 void
-Session :: setBlocklistSize (int64_t i)
+Session :: setBlocklistSize (qint64 i)
 {
   myBlocklistSize = i;
 
