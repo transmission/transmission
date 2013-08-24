@@ -29,7 +29,7 @@ struct QDialogButtonBox;
 
 extern "C"
 {
-    struct tr_metainfo_builder;
+  struct tr_metainfo_builder;
 }
 
 class MakeDialog: public QDialog

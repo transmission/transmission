@@ -25,9 +25,10 @@
 #include <QTimer>
 #include <QWidgetList>
 
-extern "C" {
-    struct tr_variant;
-};
+extern "C"
+{
+  struct tr_variant;
+}
 
 #include "filters.h"
 #include "torrent-filter.h"

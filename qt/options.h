@@ -40,7 +40,10 @@ class FreespaceLabel;
 class Prefs;
 class Session;
 
-extern "C" { struct tr_variant; };
+extern "C"
+{
+  struct tr_variant;
+}
 
 class FileAdded: public QObject
 {
