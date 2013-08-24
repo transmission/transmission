@@ -126,7 +126,6 @@ PrefsDialog :: timeEditingFinished( )
         const int key( e->property( PREF_KEY ).toInt( ) );
         const QTime time( e->time( ) );
         const int seconds( QTime().secsTo( time ) );
-std::cerr << "setPref to " << (seconds/60) << " minutes" << std::endl;
         setPref( key, seconds / 60 );
     }
 }
