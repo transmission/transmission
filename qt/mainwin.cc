@@ -1009,7 +1009,8 @@ TrMainWindow :: toggleWindows (bool doShow)
 void
 TrMainWindow :: trayActivated (QSystemTrayIcon::ActivationReason reason)
 {
-  if (reason == QSystemTrayIcon::Trigger)
+  if ((reason == QSystemTrayIcon::Trigger) ||
+      (reason == QSystemTrayIcon::DoubleClick)
     {
       if (isMinimized ())
         toggleWindows (true);
