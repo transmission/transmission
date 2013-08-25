@@ -12,11 +12,23 @@
 
 #include "transmission.h"
 #include "list.h"
+#include "platform.h"
 #include "utils.h"
 
 static const tr_list TR_LIST_CLEAR = { NULL, NULL, NULL };
 
 static tr_list * recycled_nodes = NULL;
+
+static tr_lock*
+getRecycledNodesLock (void)
+{
+  static tr_lock * l = NULL;
+
+  if (!l)
+    l = tr_lockNew ();
+
+  return l;
+}
 
 static tr_list*
 node_alloc (void)
@@ -29,8 +41,10 @@ node_alloc (void)
     }
   else
     {
+      tr_lockLock (getRecycledNodesLock ());
       ret = recycled_nodes;
       recycled_nodes = recycled_nodes->next;
+      tr_lockUnlock (getRecycledNodesLock ());
     }
 
   *ret = TR_LIST_CLEAR;
@@ -43,8 +57,10 @@ node_free (tr_list* node)
   if (node != NULL)
     {
       *node = TR_LIST_CLEAR;
+      tr_lockLock (getRecycledNodesLock ());
       node->next = recycled_nodes;
       recycled_nodes = node;
+      tr_lockUnlock (getRecycledNodesLock ());
     }
 }
 
