@@ -64,7 +64,7 @@ extern "C" {
 
 #ifndef PRIu64
  #ifdef WIN32
-  #define PRIu64 "uI64"
+  #define PRIu64 "I64u"
  #else
   #define PRIu64 "llu"
  #endif
@@ -72,7 +72,7 @@ extern "C" {
 
 #ifndef PRIu32
  #ifdef WIN32
-  #define PRIu32 "uI32"
+  #define PRIu32 "u"
  #else
   #define PRIu32 "lu"
  #endif
