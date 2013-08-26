@@ -44,6 +44,11 @@ extern "C" {
 #include <inttypes.h> /* uintN_t */
 #include <time.h> /* time_t */
 
+#ifdef WIN32
+ #define __USE_MINGW_ANSI_STDIO 1
+ #define __STDC_FORMAT_MACROS 1
+#endif
+
 #if !defined (__cplusplus)
  #ifdef HAVE_STDBOOL_H
   #include <stdbool.h>
