@@ -92,7 +92,7 @@ Speed :: fromKBps (double KBps)
 ***/
 
 QString
-Formatter :: memToString (qint64 bytes)
+Formatter :: memToString (int64_t bytes)
 {
   if (bytes < 0)
     return tr ("Unknown");
@@ -106,7 +106,7 @@ Formatter :: memToString (qint64 bytes)
 }
 
 QString
-Formatter :: sizeToString (qint64 bytes)
+Formatter :: sizeToString (int64_t bytes)
 {
   if (bytes < 0)
     return tr ("Unknown");

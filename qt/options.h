@@ -55,10 +55,10 @@ class FileAdded: public QObject
     void setFileToDelete (const QString& file) { myDelFile = file; }
 
   public slots:
-    void executed (qint64 tag, const QString& result, struct tr_variant * arguments);
+    void executed (int64_t tag, const QString& result, struct tr_variant * arguments);
 
   private:
-    const qint64 myTag;
+    const int64_t myTag;
     QString myName;
     QString myDelFile;
 };
@@ -117,14 +117,14 @@ class Options: public QDialog
     QTimer myVerifyTimer;
     char myVerifyBuf[2048*4];
     QFile myVerifyFile;
-    quint64 myVerifyFilePos;
+    uint64_t myVerifyFilePos;
     int myVerifyFileIndex;
-    quint32 myVerifyPieceIndex;
-    quint32 myVerifyPiecePos;
+    uint32_t myVerifyPieceIndex;
+    uint32_t myVerifyPiecePos;
     void clearVerify ();
     QVector<bool> myVerifyFlags;
     QCryptographicHash myVerifyHash;
-    typedef QMap<quint32,qint32> mybins_t;
+    typedef QMap<uint32_t,int32_t> mybins_t;
     mybins_t myVerifyBins;
     QTimer myEditTimer;
 };

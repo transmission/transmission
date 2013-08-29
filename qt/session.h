@@ -59,8 +59,8 @@ class Session: public QObject
     const QString& sessionVersion () const { return mySessionVersion; }
 
   public:
-    qint64 blocklistSize () const { return myBlocklistSize; }
-    void setBlocklistSize (qint64 i);
+    int64_t blocklistSize () const { return myBlocklistSize; }
+    void setBlocklistSize (int64_t i);
     void updateBlocklist ();
     void portTest ();
     void copyMagnetLinkToClipboard (int torrentId);
@@ -84,7 +84,7 @@ class Session: public QObject
     void exec (const struct tr_variant * request);
 
   public:
-    qint64 getUniqueTag () { return nextUniqueTag++; }
+    int64_t getUniqueTag () { return nextUniqueTag++; }
 
   private:
     void sessionSet (const tr_quark key, const QVariant& variant);
@@ -134,7 +134,7 @@ class Session: public QObject
 
   signals:
     void responseReceived (const QByteArray& json);
-    void executed (qint64 tag, const QString& result, struct tr_variant * arguments);
+    void executed (int64_t tag, const QString& result, struct tr_variant * arguments);
     void sourceChanged ();
     void portTested (bool isOpen);
     void statsUpdated ();
@@ -147,8 +147,8 @@ class Session: public QObject
     void httpAuthenticationRequired ();
 
   private:
-    qint64 nextUniqueTag;
-    qint64 myBlocklistSize;
+    int64_t nextUniqueTag;
+    int64_t myBlocklistSize;
     Prefs& myPrefs;
     tr_session * mySession;
     QString myConfigDir;

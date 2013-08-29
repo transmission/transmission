@@ -43,7 +43,7 @@ class FileTreeItem: public QObject
 
     virtual ~FileTreeItem();
 
-    FileTreeItem (const QString& name="", int fileIndex=-1, quint64 size=0):
+    FileTreeItem (const QString& name="", int fileIndex=-1, uint64_t size=0):
       myFileIndex (fileIndex),
       myParent (0),
       myName (name),
@@ -63,18 +63,18 @@ class FileTreeItem: public QObject
     int row () const;
     const QString& name () const { return myName; }
     QVariant data (int column, int role) const;
-    std::pair<int,int> update (const QString& name, bool want, int priority, quint64 have, bool updateFields);
+    std::pair<int,int> update (const QString& name, bool want, int priority, uint64_t have, bool updateFields);
     void twiddleWanted (QSet<int>& fileIds, bool&);
     void twiddlePriority (QSet<int>& fileIds, int&);
     int fileIndex () const { return myFileIndex; }
-    quint64 totalSize () const { return myTotalSize; }
+    uint64_t totalSize () const { return myTotalSize; }
 
   private:
     void setSubtreePriority (int priority, QSet<int>& fileIds);
     void setSubtreeWanted (bool, QSet<int>& fileIds);
     QString priorityString () const;
     QString sizeString () const;
-    void getSubtreeWantedSize (quint64& have, quint64& total) const;
+    void getSubtreeWantedSize (uint64_t& have, uint64_t& total) const;
     double progress () const;
     int priority () const;
     int isSubtreeWanted () const;
@@ -87,8 +87,8 @@ class FileTreeItem: public QObject
     QString myName;
     int myPriority;
     bool myIsWanted;
-    quint64 myHaveSize;
-    const quint64 myTotalSize;
+    uint64_t myHaveSize;
+    const uint64_t myTotalSize;
     size_t myFirstUnhashedRow;
 };
 
@@ -120,7 +120,7 @@ class FileTreeModel: public QAbstractItemModel
     void clear ();
     void addFile (int index, const QString& filename,
                   bool wanted, int priority,
-                  quint64 size, quint64 have,
+                  uint64_t size, uint64_t have,
                   QList<QModelIndex>& rowsAdded,
                   bool torrentChanged);
 

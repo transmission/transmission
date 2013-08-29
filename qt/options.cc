@@ -47,7 +47,7 @@
 ***/
 
 void
-FileAdded :: executed (qint64 tag, const QString& result, struct tr_variant * arguments)
+FileAdded :: executed (int64_t tag, const QString& result, struct tr_variant * arguments)
 {
   Q_UNUSED (arguments);
 
@@ -375,7 +375,7 @@ Options :: onAccepted ()
 {
   // rpc spec section 3.4 "adding a torrent"
 
-  const qint64 tag = mySession.getUniqueTag ();
+  const int64_t tag = mySession.getUniqueTag ();
   tr_variant top;
   tr_variantInitDict (&top, 3);
   tr_variantDictAddStr (&top, TR_KEY_method, "torrent-add");
@@ -455,8 +455,8 @@ Options :: onAccepted ()
   FileAdded * fileAdded = new FileAdded (tag, myAdd.readableName ());
   if (myTrashCheck->isChecked () && (myAdd.type==AddData::FILENAME))
     fileAdded->setFileToDelete (myAdd.filename);
-  connect (&mySession, SIGNAL (executed (qint64,const QString&, struct tr_variant*)),
-           fileAdded, SLOT (executed (qint64,const QString&, struct tr_variant*)));
+  connect (&mySession, SIGNAL (executed (int64_t,const QString&, struct tr_variant*)),
+           fileAdded, SLOT (executed (int64_t,const QString&, struct tr_variant*)));
 
   mySession.exec (&top);
 
@@ -568,7 +568,7 @@ Options :: onVerify ()
 
 namespace
 {
-  quint64 getPieceSize (const tr_info * info, tr_piece_index_t pieceIndex)
+  uint64_t getPieceSize (const tr_info * info, tr_piece_index_t pieceIndex)
   {
     if (pieceIndex != info->pieceCount - 1)
       return info->pieceSize;
@@ -594,14 +594,14 @@ Options :: onTimeout ()
       myVerifyFile.open (QIODevice::ReadOnly);
     }
 
-  qint64 leftInPiece = getPieceSize (&myInfo, myVerifyPieceIndex) - myVerifyPiecePos;
-  qint64 leftInFile = file->length - myVerifyFilePos;
-  qint64 bytesThisPass = std::min (leftInFile, leftInPiece);
-  bytesThisPass = std::min (bytesThisPass, (qint64)sizeof (myVerifyBuf));
+  int64_t leftInPiece = getPieceSize (&myInfo, myVerifyPieceIndex) - myVerifyPiecePos;
+  int64_t leftInFile = file->length - myVerifyFilePos;
+  int64_t bytesThisPass = std::min (leftInFile, leftInPiece);
+  bytesThisPass = std::min (bytesThisPass, (int64_t)sizeof (myVerifyBuf));
 
   if (myVerifyFile.isOpen () && myVerifyFile.seek (myVerifyFilePos))
     {
-      qint64 numRead = myVerifyFile.read (myVerifyBuf, bytesThisPass);
+      int64_t numRead = myVerifyFile.read (myVerifyBuf, bytesThisPass);
       if (numRead == bytesThisPass)
         myVerifyHash.addData (myVerifyBuf, numRead);
     }
@@ -649,7 +649,7 @@ Options :: onTimeout ()
   bool done = myVerifyPieceIndex >= myInfo.pieceCount;
   if (done)
     {
-      quint64 have = 0;
+      uint64_t have = 0;
       foreach (const TrFile& f, myFiles)
         have += f.have;
 

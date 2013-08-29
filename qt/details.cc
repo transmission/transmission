@@ -412,10 +412,10 @@ Details :: refresh ()
   double sizeWhenDone = 0;
   double leftUntilDone = 0;
   double available = 0;
-  qint64 haveTotal = 0;
-  qint64 haveVerified = 0;
-  qint64 haveUnverified = 0;
-  qint64 verifiedPieces = 0;
+  int64_t haveTotal = 0;
+  int64_t haveVerified = 0;
+  int64_t haveUnverified = 0;
+  int64_t verifiedPieces = 0;
   if (torrents.empty ())
     {
       string = none;
@@ -428,7 +428,7 @@ Details :: refresh ()
             {
               haveTotal += t->haveTotal ();
               haveUnverified += t->haveUnverified ();
-              const quint64 v = t->haveVerified ();
+              const uint64_t v = t->haveVerified ();
               haveVerified += v;
               if (t->pieceSize ())
                 verifiedPieces += v / t->pieceSize ();
@@ -480,8 +480,8 @@ Details :: refresh ()
     }
   else
     {
-      quint64 d = 0;
-      quint64 f = 0;
+      uint64_t d = 0;
+      uint64_t f = 0;
       foreach (const Torrent * t, torrents)
         {
           d += t->downloadedEver ();
@@ -503,8 +503,8 @@ Details :: refresh ()
     }
   else
     {
-      quint64 u = 0;
-      quint64 d = 0;
+      uint64_t u = 0;
+      uint64_t d = 0;
       foreach (const Torrent * t, torrents)
         {
           u += t->uploadedEver ();
@@ -633,8 +633,8 @@ Details :: refresh ()
   else
     {
       int pieces = 0;
-      quint64 size = 0;
-      quint32 pieceSize = torrents[0]->pieceSize ();
+      uint64_t size = 0;
+      uint32_t pieceSize = torrents[0]->pieceSize ();
       foreach (const Torrent * t, torrents)
         {
           pieces += t->pieceCount ();

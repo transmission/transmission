@@ -103,8 +103,8 @@ struct TrFile
   int index;
   int priority;
   QString filename;
-  quint64 size;
-  quint64 have;
+  uint64_t size;
+  uint64_t have;
 };
 
 typedef QList<TrFile> FileList;
@@ -253,14 +253,14 @@ class Torrent: public QObject
         bool isSeed( ) const { return haveVerified() >= totalSize(); }
         bool isPrivate( ) const { return getBool( IS_PRIVATE ); }
         bool getSeedRatio( double& setme ) const;
-        quint64 haveVerified( ) const { return getSize( HAVE_VERIFIED ); }
-        quint64 haveUnverified( ) const { return getSize( HAVE_UNCHECKED ); }
-        quint64 desiredAvailable( ) const { return getSize( DESIRED_AVAILABLE ); }
-        quint64 haveTotal( ) const { return haveVerified( ) + haveUnverified(); }
-        quint64 totalSize( ) const { return getSize( TOTAL_SIZE ); }
-        quint64 sizeWhenDone( ) const { return getSize( SIZE_WHEN_DONE ); }
-        quint64 leftUntilDone( ) const { return getSize( LEFT_UNTIL_DONE ); }
-        quint64 pieceSize( ) const { return getSize( PIECE_SIZE ); }
+        uint64_t haveVerified( ) const { return getSize( HAVE_VERIFIED ); }
+        uint64_t haveUnverified( ) const { return getSize( HAVE_UNCHECKED ); }
+        uint64_t desiredAvailable( ) const { return getSize( DESIRED_AVAILABLE ); }
+        uint64_t haveTotal( ) const { return haveVerified( ) + haveUnverified(); }
+        uint64_t totalSize( ) const { return getSize( TOTAL_SIZE ); }
+        uint64_t sizeWhenDone( ) const { return getSize( SIZE_WHEN_DONE ); }
+        uint64_t leftUntilDone( ) const { return getSize( LEFT_UNTIL_DONE ); }
+        uint64_t pieceSize( ) const { return getSize( PIECE_SIZE ); }
         bool hasMetadata( ) const { return getDouble( METADATA_PERCENT_DONE ) >= 1.0; }
         bool isMagnet( ) const { return magnetTorrent; }
         int  pieceCount( ) const { return getInt( PIECE_COUNT ); }
@@ -268,9 +268,9 @@ class Torrent: public QObject
         double percentComplete( ) const { return haveTotal() / (double)totalSize(); }
         double percentDone( ) const { return getDouble( PERCENT_DONE ); }
         double metadataPercentDone( ) const { return getDouble( METADATA_PERCENT_DONE ); }
-        quint64 downloadedEver( ) const { return getSize( DOWNLOADED_EVER ); }
-        quint64 uploadedEver( ) const { return getSize( UPLOADED_EVER ); }
-        quint64 failedEver( ) const { return getSize( FAILED_EVER ); }
+        uint64_t downloadedEver( ) const { return getSize( DOWNLOADED_EVER ); }
+        uint64_t uploadedEver( ) const { return getSize( UPLOADED_EVER ); }
+        uint64_t failedEver( ) const { return getSize( FAILED_EVER ); }
         int compareTracker( const Torrent& ) const;
         int compareSeedRatio( const Torrent& ) const;
         int compareRatio( const Torrent& ) const;

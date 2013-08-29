@@ -466,7 +466,7 @@ Torrent :: update (tr_variant * d)
   static int key_to_property_index[TR_N_KEYS];
   bool changed = false;
   const bool was_seed = isSeed ();
-  const quint64 old_verified_size = haveVerified ();
+  const uint64_t old_verified_size = haveVerified ();
 
   if (!lookup_initialized)
     {
@@ -492,7 +492,7 @@ Torrent :: update (tr_variant * d)
         {
           case QVariant :: Int:
             {
-              qint64 val;
+              int64_t val;
               if (tr_variantGetInt (child, &val))
                 changed |= setInt (property_index, val);
               break;
@@ -513,7 +513,7 @@ Torrent :: update (tr_variant * d)
             }
           case QVariant :: ULongLong:
             {
-              qint64 val;
+              int64_t val;
               if (tr_variantGetInt (child, &val))
                 changed |= setSize (property_index, val);
               break;
@@ -527,7 +527,7 @@ Torrent :: update (tr_variant * d)
             }
           case QVariant :: DateTime:
             {
-              qint64 val;
+              int64_t val;
               if (tr_variantGetInt (child, &val) && val)
                 changed |= setDateTime (property_index, QDateTime :: fromTime_t(val));
               break;
@@ -549,7 +549,7 @@ Torrent :: update (tr_variant * d)
   if (tr_variantDictFindList (d, TR_KEY_files, &files))
     {
       const char * str;
-      qint64 intVal;
+      int64_t intVal;
       int i = 0;
       tr_variant * child;
 
@@ -580,7 +580,7 @@ Torrent :: update (tr_variant * d)
 
       for (int i=0; i<n && i<myFiles.size(); ++i)
         {
-          qint64 intVal;
+          int64_t intVal;
           bool boolVal;
           tr_variant * child = tr_variantListChild (files, i);
           TrFile& file (myFiles[i]);
@@ -640,7 +640,7 @@ Torrent :: update (tr_variant * d)
       while ((child = tr_variantListChild (trackerStats, childNum++)))
         {
           bool b;
-          qint64 i;
+          int64_t i;
           size_t len;
           const char * str;
           TrackerStat trackerStat;
@@ -717,7 +717,7 @@ Torrent :: update (tr_variant * d)
         {
           double d;
           bool b;
-          qint64 i;
+          int64_t i;
           size_t len;
           const char * str;
           Peer peer;

@@ -151,7 +151,7 @@ Prefs :: Prefs (const char * configDir):
     {
       double d;
       bool boolVal;
-      qint64 intVal;
+      int64_t intVal;
       const char * str;
       size_t strLen;
       tr_variant * b (tr_variantDictFind (&top, myItems[i].key));
