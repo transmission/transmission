@@ -699,8 +699,8 @@ Session :: exec (const char * json)
       const QByteArray requestData (json);
       QNetworkReply * reply = networkAccessManager ()->post (request, requestData);
       reply->setProperty (REQUEST_DATA_PROPERTY_KEY, requestData);
-      connect (reply, SIGNAL (downloadProgress (int64_t,int64_t)), this, SIGNAL (dataReadProgress ()));
-      connect (reply, SIGNAL (uploadProgress (int64_t,int64_t)), this, SIGNAL (dataSendProgress ()));
+      connect (reply, SIGNAL (downloadProgress (qint64,qint64)), this, SIGNAL (dataReadProgress ()));
+      connect (reply, SIGNAL (uploadProgress (qint64,qint64)), this, SIGNAL (dataSendProgress ()));
 
 #ifdef DEBUG_HTTP
       std::cerr << "sending " << "POST " << qPrintable (myUrl.path ()) << std::endl;
