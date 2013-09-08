@@ -2445,7 +2445,7 @@ sendPex (tr_peerMsgs * msgs)
 }
 
 static void
-pexPulse (int foo UNUSED, short bar UNUSED, void * vmsgs)
+pexPulse (evutil_socket_t foo UNUSED, short bar UNUSED, void * vmsgs)
 {
     struct tr_peerMsgs * msgs = vmsgs;
 

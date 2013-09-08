@@ -160,9 +160,9 @@ struct tr_run_data
     } while (0)
 
 static void
-readFromPipe (int    fd,
-              short  eventType,
-              void * veh)
+readFromPipe (evutil_socket_t   fd,
+              short             eventType,
+              void            * veh)
 {
     char              ch;
     int               ret;

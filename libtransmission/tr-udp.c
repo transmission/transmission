@@ -188,7 +188,7 @@ rebind_ipv6 (tr_session *ss, bool force)
 }
 
 static void
-event_callback (int s, short type UNUSED, void *sv)
+event_callback (evutil_socket_t s, short type UNUSED, void *sv)
 {
     int rc;
     socklen_t fromlen;

@@ -246,7 +246,7 @@ canReadWrapper (tr_peerIo * io)
 }
 
 static void
-event_read_cb (int fd, short event UNUSED, void * vio)
+event_read_cb (evutil_socket_t fd, short event UNUSED, void * vio)
 {
     int res;
     int e;
@@ -325,7 +325,7 @@ tr_evbuffer_write (tr_peerIo * io, int fd, size_t howmuch)
 }
 
 static void
-event_write_cb (int fd, short event UNUSED, void * vio)
+event_write_cb (evutil_socket_t fd, short event UNUSED, void * vio)
 {
     int res = 0;
     int e;

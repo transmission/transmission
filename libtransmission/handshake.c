@@ -1176,7 +1176,7 @@ gotError (tr_peerIo  * io,
 **/
 
 static void
-handshakeTimeout (int foo UNUSED, short bar UNUSED, void * handshake)
+handshakeTimeout (evutil_socket_t foo UNUSED, short bar UNUSED, void * handshake)
 {
   tr_handshakeAbort (handshake);
 }

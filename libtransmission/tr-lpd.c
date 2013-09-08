@@ -67,7 +67,7 @@ THE SOFTWARE.
 * $Id$
 */
 
-static void event_callback (int, short, void*);
+static void event_callback (evutil_socket_t, short, void*);
 
 enum {
    UPKEEP_INTERVAL_SECS = 5
@@ -255,7 +255,7 @@ static int lpd_extractParam (const char* const str, const char* const name, int 
 /**
 * @} */
 
-static void on_upkeep_timer (int, short, void *);
+static void on_upkeep_timer (evutil_socket_t, short, void *);
 
 /**
 * @brief Initializes Local Peer Discovery for this node
@@ -619,7 +619,7 @@ tr_lpdAnnounceMore (const time_t now, const int interval)
 }
 
 static void
-on_upkeep_timer (int foo UNUSED, short bar UNUSED, void * vsession UNUSED)
+on_upkeep_timer (evutil_socket_t foo UNUSED, short bar UNUSED, void * vsession UNUSED)
 {
     const time_t now = tr_time ();
     tr_lpdAnnounceMore (now, UPKEEP_INTERVAL_SECS);
@@ -630,7 +630,7 @@ on_upkeep_timer (int foo UNUSED, short bar UNUSED, void * vsession UNUSED)
 * @brief Processing of timeout notifications and incoming data on the socket
 * @note maximum rate of read events is limited according to @a lpd_maxAnnounceCap
 * @see DoS */
-static void event_callback (int s UNUSED, short type, void* ignore UNUSED)
+static void event_callback (evutil_socket_t s UNUSED, short type, void* ignore UNUSED)
 {
     assert (tr_isSession (session));
 

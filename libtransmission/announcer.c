@@ -159,7 +159,7 @@ tr_announcerHasBacklog (const struct tr_announcer * announcer)
 }
 
 static void
-onUpkeepTimer (int foo UNUSED, short bar UNUSED, void * vannouncer);
+onUpkeepTimer (evutil_socket_t foo UNUSED, short bar UNUSED, void * vannouncer);
 
 void
 tr_announcerInit (tr_session * session)
@@ -1566,7 +1566,7 @@ announceMore (tr_announcer * announcer)
 }
 
 static void
-onUpkeepTimer (int foo UNUSED, short bar UNUSED, void * vannouncer)
+onUpkeepTimer (evutil_socket_t foo UNUSED, short bar UNUSED, void * vannouncer)
 {
     tr_announcer * announcer = vannouncer;
     tr_session * session = announcer->session;

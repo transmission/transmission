@@ -66,7 +66,7 @@ static struct event *dht_timer = NULL;
 static unsigned char myid[20];
 static tr_session *session = NULL;
 
-static void timer_callback (int s, short type, void *ignore);
+static void timer_callback (evutil_socket_t s, short type, void *ignore);
 
 struct bootstrap_closure {
     tr_session *session;
@@ -657,7 +657,7 @@ tr_dhtCallback (unsigned char *buf, int buflen,
 }
 
 static void
-timer_callback (int s UNUSED, short type UNUSED, void *session)
+timer_callback (evutil_socket_t s UNUSED, short type UNUSED, void *session)
 {
     tr_dhtCallback (NULL, 0, NULL, 0, session);
 }

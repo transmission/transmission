@@ -180,7 +180,7 @@ free_incoming_peer_port (tr_session * session)
 }
 
 static void
-accept_incoming_peer (int fd, short what UNUSED, void * vsession)
+accept_incoming_peer (evutil_socket_t fd, short what UNUSED, void * vsession)
 {
   int clientSocket;
   tr_port clientPort;
@@ -548,7 +548,7 @@ tr_sessionSaveSettings (tr_session       * session,
  * in the case of a crash, unclean shutdown, clumsy user, etc.
  */
 static void
-onSaveTimer (int foo UNUSED, short bar UNUSED, void * vsession)
+onSaveTimer (evutil_socket_t foo UNUSED, short bar UNUSED, void * vsession)
 {
   tr_torrent * tor = NULL;
   tr_session * session = vsession;
@@ -629,7 +629,7 @@ tr_sessionInit (const char  * tag,
 static void turtleCheckClock (tr_session * s, struct tr_turtle_info * t);
 
 static void
-onNowTimer (int foo UNUSED, short bar UNUSED, void * vsession)
+onNowTimer (evutil_socket_t foo UNUSED, short bar UNUSED, void * vsession)
 {
   int usec;
   const int min = 100;
