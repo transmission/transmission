@@ -900,8 +900,8 @@ addInfo (tr_torrent * tor, tr_variant * d, tr_variant * fields)
   if (n > 0)
     {
       int i;
-      const tr_info const * inf = tr_torrentInfo (tor);
-      const tr_stat const * st = tr_torrentStat ((tr_torrent*)tor);
+      const tr_info * const inf = tr_torrentInfo (tor);
+      const tr_stat * const st = tr_torrentStat ((tr_torrent*)tor);
 
       for (i=0; i<n; ++i)
         {

@@ -216,7 +216,7 @@ static int lpd_extractParam (const char* const str, const char* const name, int 
 {
     /* configure maximum length of search string here */
     enum { maxLength = 30 };
-    char sstr[maxLength] = { };
+    char sstr[maxLength] = { 0 };
     const char* pos;
 
     assert (str != NULL && name != NULL);
@@ -445,7 +445,7 @@ tr_lpdSendAnnounce (const tr_torrent* t)
         CRLF;
 
     char hashString[lengthof (t->info.hashString)];
-    char query[lpd_maxDatagramLength + 1] = { };
+    char query[lpd_maxDatagramLength + 1] = { 0 };
 
     if (t == NULL)
         return false;
@@ -499,8 +499,8 @@ static int tr_lpdConsiderAnnounce (tr_pex* peer, const char* const msg)
     };
 
     struct lpd_protocolVersion ver = { -1, -1 };
-    char value[maxValueLen] = { };
-    char hashString[maxHashLen] = { };
+    char value[maxValueLen] = { 0 };
+    char hashString[maxHashLen] = { 0 };
     int res = 0, peerPort = 0;
 
     if (peer != NULL && msg != NULL)
@@ -644,7 +644,7 @@ static void event_callback (evutil_socket_t s UNUSED, short type, void* ignore U
         int addrLen = sizeof foreignAddr;
 
         /* be paranoid enough about zero terminating the foreign string */
-        char foreignMsg[lpd_maxDatagramLength + 1] = { };
+        char foreignMsg[lpd_maxDatagramLength + 1] = { 0 };
 
         /* process local announcement from foreign peer */
         int res = recvfrom (lpd_socket, foreignMsg, lpd_maxDatagramLength,
