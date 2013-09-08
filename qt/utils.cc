@@ -206,3 +206,11 @@ Utils :: isValidUtf8 ( const char *s )
     } 
     return true;
 }
+
+QString
+Utils :: removeTrailingDirSeparator (const QString& path)
+{
+  return path.endsWith (QDir::separator ())
+    ? path.left (path.length()-1)
+    : path;
+}

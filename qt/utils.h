@@ -35,6 +35,8 @@ class Utils: public QObject
         // Test if string is UTF-8 or not
         static bool isValidUtf8 ( const char *s );
 
+        static QString removeTrailingDirSeparator (const QString& path);
+
         // meh
         static void toStderr( const QString& qstr );
 

@@ -514,7 +514,7 @@ Options :: onDestinationsSelected (const QStringList& destinations)
 {
   if (destinations.size () == 1)
     {
-      const QString& destination (destinations.first ());
+      QString destination = Utils::removeTrailingDirSeparator (destinations.first ());
       myFreespaceLabel->setPath (destination);
       myLocalDestination.setPath (destination);
       refreshDestinationButton ();
