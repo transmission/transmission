@@ -254,7 +254,7 @@ parseHandshake (tr_handshake *    handshake,
   tr_torrent * tor;
   uint8_t peer_id[PEER_ID_LEN];
 
-  dbgmsg (handshake, "payload: need %d, got %zu",
+  dbgmsg (handshake, "payload: need %d, got %"TR_PRIuSIZE,
           HANDSHAKE_SIZE, evbuffer_get_length (inbuf));
 
   if (evbuffer_get_length (inbuf) < HANDSHAKE_SIZE)
@@ -565,7 +565,7 @@ readPadD (tr_handshake    * handshake,
 {
   const size_t needlen = handshake->pad_d_len;
 
-  dbgmsg (handshake, "pad d: need %zu, got %zu",
+  dbgmsg (handshake, "pad d: need %"TR_PRIuSIZE", got %"TR_PRIuSIZE,
           needlen, evbuffer_get_length (inbuf));
   if (evbuffer_get_length (inbuf) < needlen)
     return READ_LATER;
@@ -593,7 +593,7 @@ readHandshake (tr_handshake    * handshake,
   uint8_t reserved[HANDSHAKE_FLAGS_LEN];
   uint8_t hash[SHA_DIGEST_LENGTH];
 
-  dbgmsg (handshake, "payload: need %d, got %zu",
+  dbgmsg (handshake, "payload: need %d, got %"TR_PRIuSIZE,
           INCOMING_HANDSHAKE_LEN, evbuffer_get_length (inbuf));
 
   if (evbuffer_get_length (inbuf) < INCOMING_HANDSHAKE_LEN)
@@ -734,7 +734,7 @@ readYa (tr_handshake    * handshake,
   const uint8_t * secret;
   int len;
 
-  dbgmsg (handshake, "in readYa... need %d, have %zu",
+  dbgmsg (handshake, "in readYa... need %d, have %"TR_PRIuSIZE,
           KEY_LEN, evbuffer_get_length (inbuf));
   if (evbuffer_get_length (inbuf) < KEY_LEN)
     return READ_LATER;
@@ -884,7 +884,7 @@ readIA (tr_handshake    * handshake,
   struct evbuffer * outbuf;
   uint32_t crypto_select;
 
-  dbgmsg (handshake, "reading IA... have %zu, need %zu",
+  dbgmsg (handshake, "reading IA... have %"TR_PRIuSIZE", need %"TR_PRIuSIZE,
           evbuffer_get_length (inbuf), needlen);
   if (evbuffer_get_length (inbuf) < needlen)
     return READ_LATER;
@@ -961,7 +961,7 @@ readPayloadStream (tr_handshake    * handshake,
   int i;
   const size_t needlen = HANDSHAKE_SIZE;
 
-  dbgmsg (handshake, "reading payload stream... have %zu, need %zu",
+  dbgmsg (handshake, "reading payload stream... have %"TR_PRIuSIZE", need %"TR_PRIuSIZE,
           evbuffer_get_length (inbuf), needlen);
   if (evbuffer_get_length (inbuf) < needlen)
     return READ_LATER;

@@ -690,7 +690,7 @@ tau_tracker_upkeep (struct tau_tracker * tracker)
         return;
     }
 
-    dbgmsg (tracker->key, "addr %p -- connected %d (%zu %zu) -- connecting_at %zu",
+    dbgmsg (tracker->key, "addr %p -- connected %d (%"TR_PRIuSIZE" %"TR_PRIuSIZE") -- connecting_at %"TR_PRIuSIZE,
             tracker->addr,
           (int)(tracker->connection_expiration_time > now), (size_t)tracker->connection_expiration_time, (size_t)now,
           (size_t)tracker->connecting_at);
@@ -871,7 +871,7 @@ tau_handle_message (tr_session * session, const uint8_t * msg, size_t msglen)
     tau_transaction_t transaction_id;
     struct evbuffer * buf;
 
-    /*fprintf (stderr, "got an incoming udp message w/len %zu\n", msglen);*/
+    /*fprintf (stderr, "got an incoming udp message w/len %"TR_PRIuSIZE"\n", msglen);*/
 
     if (!session || !session->announcer_udp)
         return false;

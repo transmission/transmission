@@ -83,6 +83,14 @@ extern "C" {
  #endif
 #endif
 
+#ifndef TR_PRIuSIZE
+ #ifdef _MSC_VER
+  #define TR_PRIuSIZE "Iu"
+ #else
+  #define TR_PRIuSIZE "zu"
+ #endif
+#endif
+
 #if defined (WIN32) && defined (_MSC_VER)
  #define inline __inline
 #endif

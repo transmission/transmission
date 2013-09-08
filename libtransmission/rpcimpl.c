@@ -1633,7 +1633,7 @@ gotMetadataFromURL (tr_session       * session UNUSED,
 {
   struct add_torrent_idle_data * data = user_data;
 
-  dbgmsg ("torrentAdd: HTTP response code was %ld (%s); response length was %zu bytes",
+  dbgmsg ("torrentAdd: HTTP response code was %ld (%s); response length was %"TR_PRIuSIZE" bytes",
           response_code, tr_webGetResponseStr (response_code), response_byte_count);
 
   if (response_code==200 || response_code==221) /* http or ftp success.. */
