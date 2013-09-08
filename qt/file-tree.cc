@@ -1003,6 +1003,25 @@ FileTreeView :: eventFilter (QObject * o, QEvent * event)
       setColumnWidth(COL_NAME, std::max(left,0));
     }
 
+  // handle using the keyboard to toggle the
+  // wanted/unwanted state or the file priority
+  else if (event->type () == QEvent::KeyPress && state () != EditingState)
+    {
+      switch (static_cast<QKeyEvent*> (event)->key ())
+        {
+        case Qt::Key_Space:
+          foreach (const QModelIndex& i, selectionModel ()->selectedRows (COL_WANTED))
+            clicked (i);
+          break;
+
+        case Qt::Key_Enter:
+        case Qt::Key_Return:
+          foreach (const QModelIndex& i, selectionModel ()->selectedRows (COL_PRIORITY))
+            clicked (i);
+          break;
+        }
+    }
+
   return false;
 }
 
