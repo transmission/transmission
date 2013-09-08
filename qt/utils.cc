@@ -12,6 +12,11 @@
 
 #include <iostream>
 
+#ifdef WIN32
+ #include <windows.h>
+ #include <shellapi.h>
+#endif
+
 #include <QApplication>
 #include <QDataStream>
 #include <QFile>
@@ -19,6 +24,7 @@
 #include <QFileInfo>
 #include <QInputDialog>
 #include <QObject>
+#include <QPixmapCache>
 #include <QSet>
 #include <QStyle>
 
@@ -30,6 +36,11 @@
 /***
 ****
 ***/
+
+#if defined(WIN32) && QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
+// Should be in QtWinExtras soon, but for now let's import it manually
+extern QPixmap qt_pixmapFromWinHICON(HICON icon);
+#endif
 
 QString
 Utils :: remoteFileChooser( QWidget * parent, const QString& title, const QString& myPath, bool dir, bool local )
@@ -55,9 +66,64 @@ Utils :: toStderr( const QString& str )
     std::cerr << qPrintable(str) << std::endl;
 }
 
-const QIcon&
+#ifdef WIN32
+namespace
+{
+  void
+  addAssociatedFileIcon (const QFileInfo& fileInfo, UINT iconSize, QIcon& icon)
+  {
+    QString const pixmapCacheKey = QLatin1String ("tr_file_ext_") +
+      QString::number (iconSize) + "_" + fileInfo.suffix ();
+    QPixmap pixmap;
+    if (!QPixmapCache::find (pixmapCacheKey, &pixmap))
+      {
+        const QString filename = fileInfo.fileName ();
+
+        SHFILEINFO shellFileInfo;
+        if (::SHGetFileInfoW ((const wchar_t*) filename.utf16 (), FILE_ATTRIBUTE_NORMAL,
+                              &shellFileInfo, sizeof(shellFileInfo),
+                              SHGFI_ICON | iconSize | SHGFI_USEFILEATTRIBUTES) != 0)
+          {
+            if (shellFileInfo.hIcon != NULL)
+              {
+#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
+                pixmap = qt_pixmapFromWinHICON (shellFileInfo.hIcon);
+#else
+                pixmap = QPixmap::fromWinHICON (shellFileInfo.hIcon);
+#endif
+                ::DestroyIcon (shellFileInfo.hIcon);
+              }
+          }
+
+        QPixmapCache::insert (pixmapCacheKey, pixmap);
+      }
+
+    if (!pixmap.isNull ())
+      icon.addPixmap (pixmap);
+  }
+} // namespace
+#endif
+
+QIcon
 Utils :: guessMimeIcon( const QString& filename )
 {
+#ifdef WIN32
+  QIcon icon;
+
+  if (!filename.isEmpty ())
+    {
+      const QFileInfo fileInfo (filename);
+
+      addAssociatedFileIcon (fileInfo, SHGFI_SMALLICON, icon);
+      addAssociatedFileIcon (fileInfo, 0, icon);
+      addAssociatedFileIcon (fileInfo, SHGFI_LARGEICON, icon);
+    }
+
+  if (icon.isNull ())
+    icon = QApplication::style ()->standardIcon (QStyle::SP_FileIcon);
+
+  return icon;
+#else
     enum { DISK, DOCUMENT, PICTURE, VIDEO, ARCHIVE, AUDIO, APP, TYPE_COUNT };
     static QIcon fallback;
     static QIcon fileIcons[TYPE_COUNT];
@@ -116,6 +182,7 @@ Utils :: guessMimeIcon( const QString& filename )
             return fileIcons[i];
 
     return fallback;
+#endif
 }
 
 bool
