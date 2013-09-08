@@ -113,7 +113,7 @@ blocklistLoad (tr_blocklistFile * b)
   b->ruleCount = byteCount / sizeof (struct tr_ipv4_range);
 
   base = tr_basename (b->filename);
-  tr_logAddInfo (_("Blocklist \"%s\" contains %zu entries"), base, b->ruleCount);
+  tr_logAddInfo (_("Blocklist \"%s\" contains %"TR_PRIuSIZE" entries"), base, b->ruleCount);
   tr_free (base);
 }
 
@@ -422,7 +422,7 @@ tr_blocklistFileSetContent (tr_blocklistFile * b, const char * filename)
   else
     {
       char * base = tr_basename (b->filename);
-      tr_logAddInfo (_("Blocklist \"%s\" updated with %zu entries"), base, ranges_count);
+      tr_logAddInfo (_("Blocklist \"%s\" updated with %"TR_PRIuSIZE" entries"), base, ranges_count);
       tr_free (base);
     }
 
