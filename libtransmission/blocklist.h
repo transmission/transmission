@@ -24,7 +24,7 @@ typedef struct tr_blocklistFile tr_blocklistFile;
 tr_blocklistFile * tr_blocklistFileNew          (const char              * filename,
                                                  bool                      isEnabled);
 
-int                tr_blocklistFileExists       (const tr_blocklistFile  * b);
+bool               tr_blocklistFileExists       (const tr_blocklistFile  * b);
 
 const char *       tr_blocklistFileGetFilename  (const tr_blocklistFile  * b);
 
@@ -32,12 +32,12 @@ int                tr_blocklistFileGetRuleCount (const tr_blocklistFile  * b);
 
 void               tr_blocklistFileFree         (tr_blocklistFile        * b);
 
-int                tr_blocklistFileIsEnabled    (tr_blocklistFile        * b);
+bool               tr_blocklistFileIsEnabled    (tr_blocklistFile        * b);
 
 void               tr_blocklistFileSetEnabled   (tr_blocklistFile        * b,
                                                  bool                      isEnabled);
 
-int                tr_blocklistFileHasAddress   (tr_blocklistFile        * b,
+bool               tr_blocklistFileHasAddress   (tr_blocklistFile        * b,
                                                  const struct tr_address * addr);
 
 int                tr_blocklistFileSetContent   (tr_blocklistFile        * b,

@@ -173,12 +173,10 @@ tr_blocklistFileFree (tr_blocklistFile * b)
   tr_free (b);
 }
 
-int
+bool
 tr_blocklistFileExists (const tr_blocklistFile * b)
 {
-  struct stat st;
-
-  return !stat (b->filename, &st);
+  return tr_fileExists (b->filename, NULL);
 }
 
 int
@@ -189,7 +187,7 @@ tr_blocklistFileGetRuleCount (const tr_blocklistFile * b)
   return b->ruleCount;
 }
 
-int
+bool
 tr_blocklistFileIsEnabled (tr_blocklistFile * b)
 {
   return b->isEnabled;
@@ -204,7 +202,7 @@ tr_blocklistFileSetEnabled (tr_blocklistFile * b, bool isEnabled)
   b->isEnabled = isEnabled;
 }
 
-int
+bool
 tr_blocklistFileHasAddress (tr_blocklistFile * b, const tr_address * addr)
 {
   uint32_t needle;
@@ -213,12 +211,12 @@ tr_blocklistFileHasAddress (tr_blocklistFile * b, const tr_address * addr)
   assert (tr_address_is_valid (addr));
 
   if (!b->isEnabled || addr->type == TR_AF_INET6)
-    return 0;
+    return false;
 
   blocklistEnsureLoaded (b);
 
   if (!b->rules || !b->ruleCount)
-    return 0;
+    return false;
 
   needle = ntohl (addr->addr.addr4.s_addr);
 
@@ -300,7 +298,7 @@ parseLine2 (const char * line, struct tr_ipv4_range * range)
   return true;
 }
 
-static int
+static bool
 parseLine (const char * line, struct tr_ipv4_range * range)
 {
   return parseLine1 (line, range)
