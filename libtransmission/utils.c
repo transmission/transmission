@@ -49,7 +49,7 @@
  #include <w32api.h>
  #define WINVER WindowsXP /* freeaddrinfo (), getaddrinfo (), getnameinfo () */
  #include <direct.h> /* _getcwd () */
- #include <windows.h> /* Sleep () */
+ #include <windows.h> /* Sleep (), GetSystemTimeAsFileTime () */
 #endif
 
 #include "transmission.h"
@@ -80,6 +80,41 @@ tr_localtime_r (const time_t *_clock, struct tm *_result)
   if (p)
     * (_result) = *p;
   return p;
+#endif
+}
+
+int
+tr_gettimeofday (struct timeval * tv)
+{
+#ifdef _MSC_VER
+#define DELTA_EPOCH_IN_MICROSECS 11644473600000000Ui64
+
+  FILETIME ft;
+  uint64_t tmp = 0;
+
+  if (tv == NULL)
+    {
+      errno = EINVAL;
+      return -1;
+    }
+
+  GetSystemTimeAsFileTime(&ft);
+  tmp |= ft.dwHighDateTime;
+  tmp <<= 32;
+  tmp |= ft.dwLowDateTime;
+  tmp /= 10; /* to microseconds */
+  tmp -= DELTA_EPOCH_IN_MICROSECS;
+
+  tv->tv_sec = tmp / 1000000UL;
+  tv->tv_usec = tmp % 1000000UL;
+
+  return 0;
+
+#undef DELTA_EPOCH_IN_MICROSECS
+#else
+
+  return gettimeofday (tv, NULL);
+
 #endif
 }
 
@@ -248,19 +283,69 @@ tr_loadFile (const char * path,
 char*
 tr_basename (const char * path)
 {
+#ifdef _MSC_VER
+
+  char fname[_MAX_FNAME], ext[_MAX_EXT];
+  if (_splitpath_s (path, NULL, 0, NULL, 0, fname, sizeof (fname), ext, sizeof (ext)) == 0)
+    {
+      const size_t tmpLen = strlen(fname) + strlen(ext) + 2;
+      char * const tmp = tr_malloc (tmpLen);
+      if (tmp != NULL)
+        {
+          if (_makepath_s (tmp, tmpLen, NULL, NULL, fname, ext) == 0)
+            return tmp;
+
+          tr_free (tmp);
+        }
+    }
+
+  return tr_strdup (".");
+
+#else
+
   char * tmp = tr_strdup (path);
   char * ret = tr_strdup (basename (tmp));
   tr_free (tmp);
   return ret;
+
+#endif
 }
 
 char*
 tr_dirname (const char * path)
 {
+#ifdef _MSC_VER
+
+  char drive[_MAX_DRIVE], dir[_MAX_DIR];
+  if (_splitpath_s (path, drive, sizeof (drive), dir, sizeof (dir), NULL, 0, NULL, 0) == 0)
+    {
+      const size_t tmpLen = strlen(drive) + strlen(dir) + 2;
+      char * const tmp = tr_malloc (tmpLen);
+      if (tmp != NULL)
+        {
+          if (_makepath_s (tmp, tmpLen, drive, dir, NULL, NULL) == 0)
+            {
+              size_t len = strlen(tmp);
+              while (len > 0 && (tmp[len - 1] == '/' || tmp[len - 1] == '\\'))
+                tmp[--len] = '\0';
+
+              return tmp;
+            }
+
+          tr_free (tmp);
+        }
+    }
+
+  return tr_strdup (".");
+
+#else
+
   char * tmp = tr_strdup (path);
   char * ret = tr_strdup (dirname (tmp));
   tr_free (tmp);
   return ret;
+
+#endif
 }
 
 char*
@@ -647,7 +732,7 @@ tr_time_msec (void)
 {
   struct timeval tv;
 
-  gettimeofday (&tv, NULL);
+  tr_gettimeofday (&tv);
   return (uint64_t) tv.tv_sec * 1000 + (tv.tv_usec / 1000);
 }
 

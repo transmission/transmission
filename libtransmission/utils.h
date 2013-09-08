@@ -17,6 +17,7 @@
 #include <stddef.h> /* size_t */
 #include <time.h> /* time_t */
 
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -387,6 +388,11 @@ char* tr_strratio (char * buf, size_t buflen, double ratio, const char * infinit
 
 /** @brief Portability wrapper for localtime_r () that uses the system implementation if available */
 struct tm * tr_localtime_r (const time_t *_clock, struct tm *_result);
+
+struct timeval;
+
+/** @brief Portability wrapper for gettimeofday (), with tz argument dropped */
+int tr_gettimeofday (struct timeval * tv);
 
 
 /**

@@ -158,7 +158,7 @@ tr_logGetTimeStr (char * buf, int buflen)
   time_t seconds;
   int milliseconds;
 
-  gettimeofday (&tv, NULL);
+  tr_gettimeofday (&tv);
 
   seconds = tv.tv_sec;
   tr_localtime_r (&seconds, &now_tm);

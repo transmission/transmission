@@ -669,7 +669,7 @@ onNowTimer (evutil_socket_t foo UNUSED, short bar UNUSED, void * vsession)
   **/
 
   /* schedule the next timer for right after the next second begins */
-  gettimeofday (&tv, NULL);
+  tr_gettimeofday (&tv);
   usec = 1000000 - tv.tv_usec;
   if (usec > max)
     usec = max;
