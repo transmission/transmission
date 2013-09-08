@@ -223,7 +223,7 @@ struct tr_peerMsgs
 
   tr_torrent *           torrent;
 
-  tr_peer_callback      * callback;
+  tr_peer_callback        callback;
   void                  * callbackData;
 
   struct evbuffer *      outMessages; /* all the non-piece messages */
@@ -479,7 +479,7 @@ static void
 publish (tr_peerMsgs * msgs, tr_peer_event * e)
 {
   if (msgs->callback != NULL)
-    msgs->callback (&msgs->peer, e, msgs->callbackData);
+    (*msgs->callback) (&msgs->peer, e, msgs->callbackData);
 }
 
 static void
@@ -2605,7 +2605,7 @@ tr_peerMsgsCast (void * vm)
 tr_peerMsgs *
 tr_peerMsgsNew (struct tr_torrent    * torrent,
                 struct tr_peerIo     * io,
-                tr_peer_callback     * callback,
+                tr_peer_callback       callback,
                 void                 * callbackData)
 {
   tr_peerMsgs * m;

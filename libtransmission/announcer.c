@@ -407,7 +407,7 @@ typedef struct tr_torrent_tiers
     tr_tracker * trackers;
     int tracker_count;
 
-    tr_tracker_callback * callback;
+    tr_tracker_callback callback;
     void * callbackData;
 }
 tr_torrent_tiers;
@@ -481,7 +481,7 @@ publishMessage (tr_tier * tier, const char * msg, int type)
         if (tier->currentTracker)
             event.tracker = tier->currentTracker->announce;
 
-        tiers->callback (tier->tor, &event, tiers->callbackData);
+        (*tiers->callback) (tier->tor, &event, tiers->callbackData);
     }
 }
 
@@ -533,7 +533,7 @@ publishPeersPex (tr_tier * tier, int seeds, int leechers,
         e.pexCount = n;
         dbgmsg (tier, "got %d peers; seed prob %d", n, (int)e.seedProbability);
 
-        tier->tor->tiers->callback (tier->tor, &e, NULL);
+        (*tier->tor->tiers->callback) (tier->tor, &e, NULL);
     }
 }
 
@@ -691,7 +691,7 @@ addTorrentToTier (tr_torrent_tiers * tt, tr_torrent * tor)
 
 tr_torrent_tiers *
 tr_announcerAddTorrent (tr_torrent           * tor,
-                        tr_tracker_callback  * callback,
+                        tr_tracker_callback    callback,
                         void                 * callbackData)
 {
     tr_torrent_tiers * tiers;
@@ -1200,7 +1200,7 @@ announce_request_free (tr_announce_request * req)
 static void
 announce_request_delegate (tr_announcer               * announcer,
                            tr_announce_request        * request,
-                           tr_announce_response_func  * callback,
+                           tr_announce_response_func    callback,
                            void                       * callback_data)
 {
     tr_session * session = announcer->session;
@@ -1397,7 +1397,7 @@ on_scrape_done (const tr_scrape_response * response, void * vsession)
 static void
 scrape_request_delegate (tr_announcer             * announcer,
                          const tr_scrape_request  * request,
-                         tr_scrape_response_func  * callback,
+                         tr_scrape_response_func    callback,
                          void                     * callback_data)
 {
     tr_session * session = announcer->session;
