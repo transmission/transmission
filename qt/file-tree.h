@@ -68,6 +68,8 @@ class FileTreeItem: public QObject
     void twiddlePriority (QSet<int>& fileIds, int&);
     int fileIndex () const { return myFileIndex; }
     uint64_t totalSize () const { return myTotalSize; }
+    QString path () const;
+    bool isComplete () const;
 
   private:
     void setSubtreePriority (int priority, QSet<int>& fileIds);
@@ -115,6 +117,7 @@ class FileTreeModel: public QAbstractItemModel
     void priorityChanged (const QSet<int>& fileIndices, int);
     void wantedChanged (const QSet<int>& fileIndices, bool);
     void pathEdited (const QString& oldpath, const QString& newname);
+    void openRequested (const QString& path);
 
   public:
     void clear ();
@@ -138,6 +141,7 @@ class FileTreeModel: public QAbstractItemModel
 
   public slots:
     void clicked (const QModelIndex & index);
+    void doubleClicked (const QModelIndex & index);
 };
 
 class FileTreeDelegate: public QItemDelegate
@@ -167,6 +171,7 @@ class FileTreeView: public QTreeView
     void priorityChanged (const QSet<int>& fileIndices, int priority);
     void wantedChanged (const QSet<int>& fileIndices, bool wanted);
     void pathEdited (const QString& oldpath, const QString& newname);
+    void openRequested (const QString& path);
 
   protected:
     bool eventFilter (QObject *, QEvent *);
@@ -178,6 +183,8 @@ class FileTreeView: public QTreeView
 
   public slots:
     void onClicked (const QModelIndex& index);
+    void onDoubleClicked (const QModelIndex& index);
+    void onOpenRequested (const QString& path);
 };
 
 #endif
