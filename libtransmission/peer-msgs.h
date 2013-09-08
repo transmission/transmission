@@ -41,7 +41,7 @@ tr_peerMsgs* tr_peerMsgsCast                 (void                     * msgs);
 
 tr_peerMsgs* tr_peerMsgsNew                  (struct tr_torrent        * torrent,
                                               struct tr_peerIo         * io,
-                                              tr_peer_callback         * callback,
+                                              tr_peer_callback           callback,
                                               void                     * callback_data);
 
 bool         tr_peerMsgsIsPeerChoked         (const tr_peerMsgs        * msgs);

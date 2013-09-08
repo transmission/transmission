@@ -58,8 +58,6 @@ struct tr_cache;
 struct tr_fdInfo;
 struct tr_device_info;
 
-typedef void (tr_web_config_func)(tr_session * session, void * curl_pointer, const char * url, void * user_data);
-
 struct tr_turtle_info
 {
     /* TR_UP and TR_DOWN speed limits */
@@ -81,7 +79,7 @@ struct tr_turtle_info
     tr_sched_day days;
 
     /* called when isEnabled changes */
-    tr_altSpeedFunc * callback;
+    tr_altSpeedFunc callback;
 
     /* the callback's user_data argument */
     void * callbackUserData;

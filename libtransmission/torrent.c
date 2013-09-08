@@ -1939,9 +1939,9 @@ tr_torrentFree (tr_torrent * tor)
 
 struct remove_data
 {
-    tr_torrent   * tor;
-    bool           deleteFlag;
-    tr_fileFunc  * deleteFunc;
+    tr_torrent  * tor;
+    bool          deleteFlag;
+    tr_fileFunc   deleteFunc;
 };
 
 static void tr_torrentDeleteLocalData (tr_torrent *, tr_fileFunc);
@@ -3696,7 +3696,7 @@ struct rename_data
   tr_torrent * tor;
   char * oldpath;
   char * newname;
-  tr_torrent_rename_done_func * callback;
+  tr_torrent_rename_done_func callback;
   void * callback_user_data;
 };
 

@@ -881,7 +881,7 @@ cell_edited_callback (GtkCellRendererText * cell G_GNUC_UNUSED,
   rename_data->newname = g_strdup (newname);
   rename_data->file_data = data;
   rename_data->path_string = g_strdup (path_string);
-  tr_torrentRenamePath (tor, oldpath->str, newname, (tr_torrent_rename_done_func*)on_rename_done, rename_data);
+  tr_torrentRenamePath (tor, oldpath->str, newname, (tr_torrent_rename_done_func)on_rename_done, rename_data);
 
   /* cleanup */
   g_string_free (oldpath, TRUE);

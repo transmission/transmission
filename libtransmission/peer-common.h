@@ -75,9 +75,9 @@ tr_peer_event;
 
 extern const tr_peer_event TR_PEER_EVENT_INIT;
 
-typedef void tr_peer_callback (struct tr_peer       * peer,
-                               const tr_peer_event  * event,
-                               void                 * client_data);
+typedef void (*tr_peer_callback) (struct tr_peer       * peer,
+                                  const tr_peer_event  * event,
+                                  void                 * client_data);
 
 /***
 ****

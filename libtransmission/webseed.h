@@ -23,7 +23,7 @@ typedef struct tr_webseed tr_webseed;
 
 tr_webseed* tr_webseedNew (struct tr_torrent * torrent,
                            const char        * url,
-                           tr_peer_callback  * callback,
+                           tr_peer_callback    callback,
                            void              * callback_data);
 
 #endif

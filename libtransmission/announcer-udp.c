@@ -156,7 +156,7 @@ struct tau_scrape_request
     tau_transaction_t transaction_id;
 
     tr_scrape_response response;
-    tr_scrape_response_func * callback;
+    tr_scrape_response_func callback;
     void * user_data;
 };
 
@@ -286,7 +286,7 @@ struct tau_announce_request
     tau_transaction_t transaction_id;
 
     tr_announce_response response;
-    tr_announce_response_func * callback;
+    tr_announce_response_func callback;
     void * user_data;
 };
 

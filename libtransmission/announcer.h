@@ -56,9 +56,9 @@ typedef struct
 }
 tr_tracker_event;
 
-typedef void tr_tracker_callback (tr_torrent              * tor,
-                                   const tr_tracker_event  * event,
-                                   void                    * client_data);
+typedef void (*tr_tracker_callback) (tr_torrent              * tor,
+                                     const tr_tracker_event  * event,
+                                     void                    * client_data);
 
 /**
 ***  Session ctor/dtor
@@ -73,7 +73,7 @@ void tr_announcerClose (tr_session *);
 **/
 
 struct tr_torrent_tiers * tr_announcerAddTorrent (tr_torrent          * torrent,
-                                                  tr_tracker_callback * cb,
+                                                  tr_tracker_callback   cb,
                                                   void                * cbdata);
 
 bool tr_announcerHasBacklog (const struct tr_announcer *);

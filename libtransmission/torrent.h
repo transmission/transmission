@@ -228,16 +228,16 @@ struct tr_torrent
 
     int                        queuePosition;
 
-    tr_torrent_metadata_func  * metadata_func;
+    tr_torrent_metadata_func    metadata_func;
     void                      * metadata_func_user_data;
 
-    tr_torrent_completeness_func  * completeness_func;
-    void                          *  completeness_func_user_data;
+    tr_torrent_completeness_func    completeness_func;
+    void                          * completeness_func_user_data;
 
-    tr_torrent_ratio_limit_hit_func  * ratio_limit_hit_func;
+    tr_torrent_ratio_limit_hit_func    ratio_limit_hit_func;
     void                             * ratio_limit_hit_func_user_data;
 
-    tr_torrent_idle_limit_hit_func  * idle_limit_hit_func;
+    tr_torrent_idle_limit_hit_func    idle_limit_hit_func;
     void                            * idle_limit_hit_func_user_data;
 
     void * queue_started_user_data;

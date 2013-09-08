@@ -164,7 +164,7 @@ listToPex (tr_variant * peerList, size_t * setme_len)
 struct announce_data
 {
     tr_announce_response response;
-    tr_announce_response_func * response_func;
+    tr_announce_response_func response_func;
     void * response_func_user_data;
     char log_name[128];
 };
@@ -318,7 +318,7 @@ tr_tracker_http_announce (tr_session                 * session,
 struct scrape_data
 {
     tr_scrape_response response;
-    tr_scrape_response_func * response_func;
+    tr_scrape_response_func response_func;
     void * response_func_user_data;
     char log_name[128];
 };

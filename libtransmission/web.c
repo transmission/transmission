@@ -76,7 +76,7 @@ struct tr_web_task
   char * range;
   char * cookies;
   tr_session * session;
-  tr_web_done_func * done_func;
+  tr_web_done_func done_func;
   void * done_func_user_data;
   CURL * curl_easy;
   struct tr_web_task * next;
