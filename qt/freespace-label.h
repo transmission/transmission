@@ -13,9 +13,10 @@
 #ifndef QTR_FREESPACE_LABEL_H
 #define QTR_FREESPACE_LABEL_H
 
+#include <stdint.h>
+
 #include <QString>
 #include <QTimer>
-
 #include <QLabel>
 
 class Session;

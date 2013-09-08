@@ -10,6 +10,8 @@
  * $Id$
  */
 
+#include <algorithm> // std::min()
+
 #include <QApplication>
 #include <QCheckBox>
 #include <QComboBox>

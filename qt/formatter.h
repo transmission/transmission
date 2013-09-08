@@ -17,6 +17,8 @@
 #include <QObject>
 #include <QIcon>
 
+#include <stdint.h> // int64_t
+
 class Speed;
 
 class Formatter: public QObject

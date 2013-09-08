@@ -16,16 +16,16 @@
 #include <QDialog>
 #include <QTimer>
 
-struct QAbstractButton;
-struct QPlainTextEdit;
-struct QLineEdit;
-struct QCheckBox;
-struct QLabel;
-struct QPushButton;
-struct QRadioButton;
-struct Session;
-struct QProgressBar;
-struct QDialogButtonBox;
+class QAbstractButton;
+class QPlainTextEdit;
+class QLineEdit;
+class QCheckBox;
+class QLabel;
+class QPushButton;
+class QRadioButton;
+class Session;
+class QProgressBar;
+class QDialogButtonBox;
 
 extern "C"
 {

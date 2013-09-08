@@ -10,8 +10,8 @@
  * $Id$
  */
 
-#ifndef QTR_TORRENT_DELEGATE_H
-#define QTR_TORRENT_DELEGATE_H
+#ifndef QTR_TRACKER_DELEGATE_H
+#define QTR_TRACKER_DELEGATE_H
 
 #include <QItemDelegate>
 #include <QSize>
@@ -20,7 +20,7 @@ class QPainter;
 class QStyleOptionViewItem;
 class QStyle;
 class Session;
-class TrackerInfo;
+struct TrackerInfo;
 
 class TrackerDelegate: public QItemDelegate
 {

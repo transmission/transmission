@@ -29,6 +29,10 @@
 #include "speed.h"
 #include "types.h"
 
+#ifdef ERROR
+ #undef ERROR
+#endif
+
 extern "C"
 {
   struct tr_variant;

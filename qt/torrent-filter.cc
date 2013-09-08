@@ -211,7 +211,7 @@ TorrentFilter :: hiddenRowCount( ) const
 void
 TorrentFilter :: countTorrentsPerMode (int * setmeCounts) const
 {
-  std::fill_n (setmeCounts, FilterMode::NUM_MODES, 0);
+  std::fill_n (setmeCounts, static_cast<std::size_t>(FilterMode::NUM_MODES), 0);
 
   for (int row(0); ; ++row)
     { 
