@@ -44,6 +44,21 @@
 ****
 ***/
 
+namespace
+{
+  QString removeTrailingSlash (const QString& path)
+  {
+    // QFileDialog may return path ending with slash if that path refers to
+    // directory. QFileInfo::fileName() applied to such path would then return
+    // an empty string which is not what we want, so we strip the slash here.
+
+    if (!path.endsWith (QDir::separator ()))
+      return path;
+
+    return path.left (path.length () - 1);
+  }
+}
+
 void
 MakeDialog :: onNewDialogDestroyed( QObject * o )
 {
@@ -186,7 +201,7 @@ MakeDialog :: onFileSelected( const QStringList& list )
 void
 MakeDialog :: onFileSelected( const QString& filename )
 {
-    myFile = filename;
+    myFile = removeTrailingSlash (filename);
     myFileButton->setText( QFileInfo(myFile).fileName() );
     onSourceChanged( );
 }
@@ -211,7 +226,7 @@ MakeDialog :: onFolderSelected( const QStringList& list )
 void
 MakeDialog :: onFolderSelected( const QString& filename )
 {
-    myFolder = filename;
+    myFolder = removeTrailingSlash (filename);
     myFolderButton->setText( QFileInfo(myFolder).fileName() );
     onSourceChanged( );
 }
@@ -236,7 +251,7 @@ MakeDialog :: onDestinationSelected( const QStringList& list )
 void
 MakeDialog :: onDestinationSelected( const QString& filename )
 {
-    myDestination = filename;
+    myDestination = removeTrailingSlash (filename);
     myDestinationButton->setText( QFileInfo(myDestination).fileName() );
 }
 
