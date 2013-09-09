@@ -50,8 +50,8 @@ test_no_options (void)
   int argc = 1;
   const char * argv[] = { "/some/path/tr-getopt-test" };
   int expected_n = 0;
-  int expected_c[] = { };
-  const char * expected_optarg[] = { };
+  int expected_c[] = { 0 };
+  const char * expected_optarg[] = { NULL };
   return run_test (argc, argv, expected_n, expected_c, expected_optarg);
 }
 
