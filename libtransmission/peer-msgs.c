@@ -1922,7 +1922,7 @@ fillOutputBuffer (tr_peerMsgs * msgs, time_t now)
     {
         const size_t len = evbuffer_get_length (msgs->outMessages);
         /* flush the protocol messages */
-        dbgmsg (msgs, "flushing outMessages... to %p (length is %"TR_PRIuSIZE")", msgs->io, len);
+        dbgmsg (msgs, "flushing outMessages... to %p (length is %"TR_PRIuSIZE")", (void*)msgs->io, len);
         tr_peerIoWriteBuf (msgs->io, msgs->outMessages, false);
         msgs->clientSentAnythingAt = now;
         msgs->outMessagesBatchedAt = 0;

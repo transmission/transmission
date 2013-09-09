@@ -2877,7 +2877,7 @@ deleteLocalData (tr_torrent * tor, tr_fileFunc func)
   char * tmpdir = NULL;
   tr_ptrArray files = TR_PTR_ARRAY_INIT;
   tr_ptrArray folders = TR_PTR_ARRAY_INIT;
-  const void * const vstrcmp = strcmp;
+  PtrArrayCompareFunc vstrcmp = (PtrArrayCompareFunc)strcmp;
   const char * const top = tor->currentDir;
 
   /* if it's a magnet link, there's nothing to move... */

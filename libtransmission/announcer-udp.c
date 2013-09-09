@@ -547,7 +547,7 @@ tau_tracker_send_reqs (struct tau_tracker * tracker)
     for (i=0, n=tr_ptrArraySize (reqs); i<n; ++i) {
         struct tau_announce_request * req = tr_ptrArrayNth (reqs, i);
         if (!req->sent_at) {
-            dbgmsg (tracker->key, "sending announce req %p", req);
+            dbgmsg (tracker->key, "sending announce req %p", (void*)req);
             req->sent_at = now;
             tau_tracker_send_request (tracker, req->payload, req->payload_len);
             if (req->callback == NULL) {
@@ -563,7 +563,7 @@ tau_tracker_send_reqs (struct tau_tracker * tracker)
     for (i=0, n=tr_ptrArraySize (reqs); i<n; ++i) {
         struct tau_scrape_request * req = tr_ptrArrayNth (reqs, i);
         if (!req->sent_at) {
-            dbgmsg (tracker->key, "sending scrape req %p", req);
+            dbgmsg (tracker->key, "sending scrape req %p", (void*)req);
             req->sent_at = now;
             tau_tracker_send_request (tracker, req->payload, req->payload_len);
             if (req->callback == NULL) {
@@ -628,7 +628,7 @@ tau_tracker_timeout_reqs (struct tau_tracker * tracker)
     for (i=0, n=tr_ptrArraySize (reqs); i<n; ++i) {
         struct tau_announce_request * req = tr_ptrArrayNth (reqs, i);
         if (cancel_all || (req->created_at + TAU_REQUEST_TTL < now)) {
-            dbgmsg (tracker->key, "timeout announce req %p", req);
+            dbgmsg (tracker->key, "timeout announce req %p", (void*)req);
             tau_announce_request_fail (req, false, true, NULL);
             tau_announce_request_free (req);
             tr_ptrArrayRemove (reqs, i);
@@ -641,7 +641,7 @@ tau_tracker_timeout_reqs (struct tau_tracker * tracker)
     for (i=0, n=tr_ptrArraySize (reqs); i<n; ++i) {
         struct tau_scrape_request * req = tr_ptrArrayNth (reqs, i);
         if (cancel_all || (req->created_at + TAU_REQUEST_TTL < now)) {
-            dbgmsg (tracker->key, "timeout scrape req %p", req);
+            dbgmsg (tracker->key, "timeout scrape req %p", (void*)req);
             tau_scrape_request_fail (req, false, true, NULL);
             tau_scrape_request_free (req);
             tr_ptrArrayRemove (reqs, i);
@@ -691,9 +691,11 @@ tau_tracker_upkeep (struct tau_tracker * tracker)
     }
 
     dbgmsg (tracker->key, "addr %p -- connected %d (%"TR_PRIuSIZE" %"TR_PRIuSIZE") -- connecting_at %"TR_PRIuSIZE,
-            tracker->addr,
-          (int)(tracker->connection_expiration_time > now), (size_t)tracker->connection_expiration_time, (size_t)now,
-          (size_t)tracker->connecting_at);
+            (void*)tracker->addr,
+            (int)(tracker->connection_expiration_time > now),
+            (size_t)tracker->connection_expiration_time,
+            (size_t)now,
+            (size_t)tracker->connecting_at);
 
     /* also need a valid connection ID... */
     if (tracker->addr

@@ -630,8 +630,8 @@ tr_peerIoNew (tr_session       * session,
     io->outbuf = evbuffer_new ();
     tr_bandwidthConstruct (&io->bandwidth, session, parent);
     tr_bandwidthSetPeer (&io->bandwidth, io);
-    dbgmsg (io, "bandwidth is %p; its parent is %p", &io->bandwidth, parent);
-    dbgmsg (io, "socket is %d, utp_socket is %p", socket, utp_socket);
+    dbgmsg (io, "bandwidth is %p; its parent is %p", (void*)&io->bandwidth, (void*)parent);
+    dbgmsg (io, "socket is %d, utp_socket is %p", socket, (void*)utp_socket);
 
     if (io->socket >= 0) {
         io->event_read = event_new (session->event_base,

@@ -133,7 +133,7 @@ writeFunc (void * ptr, size_t size, size_t nmemb, void * vtask)
     }
 
   evbuffer_add (task->response, ptr, byteCount);
-  dbgmsg ("wrote %"TR_PRIuSIZE" bytes to task %p's buffer", byteCount, task);
+  dbgmsg ("wrote %"TR_PRIuSIZE" bytes to task %p's buffer", byteCount, (void*)task);
   return byteCount;
 }
 
@@ -237,7 +237,7 @@ static void
 task_finish_func (void * vtask)
 {
   struct tr_web_task * task = vtask;
-  dbgmsg ("finished web task %p; got %ld", task, task->code);
+  dbgmsg ("finished web task %p; got %ld", (void*)task, task->code);
 
   if (task->done_func != NULL)
     task->done_func (task->session,

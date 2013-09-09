@@ -693,7 +693,7 @@ tr_sessionInitImpl (void * vdata)
   assert (tr_variantIsDict (clientSettings));
 
   dbgmsg ("tr_sessionInit: the session's top-level bandwidth object is %p",
-          &session->bandwidth);
+          (void*)&session->bandwidth);
 
   tr_variantInitDict (&settings, 0);
   tr_sessionGetDefaultSettings (&settings);
@@ -1868,7 +1868,7 @@ tr_sessionClose (tr_session * session)
 
   assert (tr_isSession (session));
 
-  dbgmsg ("shutting down transmission session %p... now is %"TR_PRIuSIZE", deadline is %"TR_PRIuSIZE, session, (size_t)time (NULL), (size_t)deadline);
+  dbgmsg ("shutting down transmission session %p... now is %"TR_PRIuSIZE", deadline is %"TR_PRIuSIZE, (void*)session, (size_t)time (NULL), (size_t)deadline);
 
   /* close the session */
   tr_runInEventThread (session, sessionCloseImpl, session);
@@ -1886,7 +1886,7 @@ tr_sessionClose (tr_session * session)
            && !deadlineReached (deadline))
     {
       dbgmsg ("waiting on port unmap (%p) or announcer (%p)... now %"TR_PRIuSIZE" deadline %"TR_PRIuSIZE,
-              session->shared, session->announcer, (size_t)time (NULL), (size_t)deadline);
+              (void*)session->shared, (void*)session->announcer, (size_t)time (NULL), (size_t)deadline);
       tr_wait_msec (50);
     }
 
