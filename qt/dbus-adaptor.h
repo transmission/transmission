@@ -27,7 +27,7 @@ class TrDBusAdaptor: public QDBusAbstractAdaptor
 
   public:
     TrDBusAdaptor( MyApp* );
-    virtual ~TrDBusAdaptor() { }
+    virtual ~TrDBusAdaptor() {}
 
   public slots:
     bool PresentWindow();

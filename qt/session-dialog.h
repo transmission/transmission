@@ -25,30 +25,30 @@ class QSpinBox;
 
 class SessionDialog: public QDialog
 {
-        Q_OBJECT
+    Q_OBJECT
 
-    public:
-        SessionDialog( Session& session, Prefs& prefs, QWidget * parent = 0 );
-        ~SessionDialog( ) { }
+  public:
+    SessionDialog (Session& session, Prefs& prefs, QWidget * parent = 0);
+    ~SessionDialog () {}
 
-    private slots:
-        void onAccepted( );
-        void resensitize( );
+  private slots:
+    void onAccepted ();
+    void resensitize ();
 
-    private:
-        QCheckBox * myAuthCheckBox;
-        QRadioButton * myRemoteRadioButton;
-        QLineEdit * myHostLineEdit;
-        QSpinBox * myPortSpinBox;
-        QLineEdit * myUsernameLineEdit;
-        QLineEdit * myPasswordLineEdit;
-        QCheckBox * myAutomaticCheckBox;
+  private:
+    QCheckBox * myAuthCheckBox;
+    QRadioButton * myRemoteRadioButton;
+    QLineEdit * myHostLineEdit;
+    QSpinBox * myPortSpinBox;
+    QLineEdit * myUsernameLineEdit;
+    QLineEdit * myPasswordLineEdit;
+    QCheckBox * myAutomaticCheckBox;
 
-    private:
-        Session& mySession;
-        Prefs& myPrefs;
-        QWidgetList myRemoteWidgets;
-        QWidgetList myAuthWidgets;
+  private:
+    Session& mySession;
+    Prefs& myPrefs;
+    QWidgetList myRemoteWidgets;
+    QWidgetList myAuthWidgets;
 };
 
 #endif

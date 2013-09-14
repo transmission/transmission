@@ -26,32 +26,32 @@ class Torrent;
 
 class TorrentFilter: public QSortFilterProxyModel
 {
-        Q_OBJECT
+    Q_OBJECT
 
-    public:
-        TorrentFilter( Prefs& prefs );
-        virtual ~TorrentFilter( );
+  public:
+    TorrentFilter (Prefs& prefs);
+    virtual ~TorrentFilter ();
 
-    public:
-        enum TextMode { FILTER_BY_NAME, FILTER_BY_FILES, FILTER_BY_TRACKER };
-        int hiddenRowCount( ) const;
+  public:
+    enum TextMode { FILTER_BY_NAME, FILTER_BY_FILES, FILTER_BY_TRACKER };
+    int hiddenRowCount () const;
 
-    private slots:
-        void refreshPref( int key );
+  private slots:
+    void refreshPref (int key);
 
-    protected:
-        virtual bool filterAcceptsRow( int, const QModelIndex& ) const;
-        virtual bool lessThan( const QModelIndex&, const QModelIndex& ) const;
+  protected:
+    virtual bool filterAcceptsRow (int, const QModelIndex&) const;
+    virtual bool lessThan (const QModelIndex&, const QModelIndex&) const;
 
-    private:
-        bool activityFilterAcceptsTorrent( const Torrent * tor, const FilterMode& mode ) const;
-        bool trackerFilterAcceptsTorrent( const Torrent * tor, const QString& tracker ) const;
+  private:
+    bool activityFilterAcceptsTorrent (const Torrent * tor, const FilterMode& mode) const;
+    bool trackerFilterAcceptsTorrent (const Torrent * tor, const QString& tracker) const;
 
-    public:
-        void countTorrentsPerMode (int * setmeCounts) const;
+  public:
+    void countTorrentsPerMode (int * setmeCounts) const;
 
-    private:
-        Prefs& myPrefs;
+  private:
+    Prefs& myPrefs;
 };
 
 #endif

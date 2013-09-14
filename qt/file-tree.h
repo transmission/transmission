@@ -51,7 +51,7 @@ class FileTreeItem: public QObject
       myIsWanted (0),
       myHaveSize (0),
       myTotalSize (size),
-      myFirstUnhashedRow (0) { }
+      myFirstUnhashedRow (0) {}
 
   public:
     void appendChild (FileTreeItem *child);
@@ -149,8 +149,8 @@ class FileTreeDelegate: public QItemDelegate
     Q_OBJECT
 
   public:
-    FileTreeDelegate (QObject * parent=0): QItemDelegate(parent) { }
-    virtual ~FileTreeDelegate() { }
+    FileTreeDelegate (QObject * parent=0): QItemDelegate(parent) {}
+    virtual ~FileTreeDelegate() {}
 
   public:
     virtual QSize sizeHint (const QStyleOptionViewItem&, const QModelIndex&) const;

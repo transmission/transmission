@@ -56,7 +56,7 @@ FileAdded :: executed (int64_t tag, const QString& result, struct tr_variant * a
   if (tag != myTag)
     return;
 
-  if ( (result == "success") && !myDelFile.isEmpty ())
+  if ((result == "success") && !myDelFile.isEmpty ())
     {
       QFile file (myDelFile);
       file.setPermissions (QFile::ReadOwner | QFile::WriteOwner);

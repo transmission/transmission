@@ -29,23 +29,23 @@ Q_DECLARE_METATYPE(TrackerInfo)
 
 class TrackerModel: public QAbstractListModel
 {
-        Q_OBJECT
+    Q_OBJECT
 
-        typedef QVector<TrackerInfo> rows_t;
-        rows_t myRows;
+    typedef QVector<TrackerInfo> rows_t;
+    rows_t myRows;
 
-    public:
-        void refresh( const TorrentModel&, const QSet<int>& ids );
-        int find( int torrentId, const QString& url ) const;
+  public:
+    void refresh (const TorrentModel&, const QSet<int>& ids);
+    int find (int torrentId, const QString& url) const;
 
-    public:
-        virtual int rowCount( const QModelIndex& parent = QModelIndex() ) const;
-        virtual QVariant data( const QModelIndex& index, int role = Qt::DisplayRole ) const;
-        enum Role { TrackerRole = Qt::UserRole };
+  public:
+    virtual int rowCount (const QModelIndex& parent = QModelIndex()) const;
+    virtual QVariant data (const QModelIndex& index, int role = Qt::DisplayRole) const;
+    enum Role { TrackerRole = Qt::UserRole };
 
-    public:
-        TrackerModel( ) { }
-        virtual ~TrackerModel( ) { }
+  public:
+    TrackerModel () {}
+    virtual ~TrackerModel () {}
 };
 
 #endif

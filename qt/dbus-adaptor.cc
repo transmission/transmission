@@ -14,26 +14,26 @@
 #include "app.h"
 #include "dbus-adaptor.h"
 
-TrDBusAdaptor :: TrDBusAdaptor( MyApp* app ):
-    QDBusAbstractAdaptor( app ),
-    myApp( app )
+TrDBusAdaptor :: TrDBusAdaptor (MyApp* app):
+  QDBusAbstractAdaptor (app),
+  myApp (app)
 {
 }
 
 bool
-TrDBusAdaptor :: PresentWindow( )
+TrDBusAdaptor :: PresentWindow ()
 {
-    myApp->raise( );
-    return true;
+  myApp->raise ();
+  return true;
 }
 
 bool
-TrDBusAdaptor :: AddMetainfo( const QString& key )
+TrDBusAdaptor :: AddMetainfo (const QString& key)
 {
-    AddData addme( key );
+  AddData addme (key);
 
-    if( addme.type != addme.NONE )
-        myApp->addTorrent( addme );
+  if (addme.type != addme.NONE)
+    myApp->addTorrent (addme);
 
-    return true;
+  return true;
 }

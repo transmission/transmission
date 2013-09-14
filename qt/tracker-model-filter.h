@@ -17,20 +17,20 @@
 
 class TrackerModelFilter : public QSortFilterProxyModel
 {
-        Q_OBJECT
+    Q_OBJECT
 
-    public:
-        TrackerModelFilter( QObject *parent = 0 );
+  public:
+    TrackerModelFilter (QObject *parent = 0);
 
-    public:
-        void setShowBackupTrackers( bool );
-        bool showBackupTrackers( ) const { return myShowBackups; }
+  public:
+    void setShowBackupTrackers (bool);
+    bool showBackupTrackers () const { return myShowBackups; }
 
-    protected:
-        bool filterAcceptsRow( int sourceRow, const QModelIndex&sourceParent ) const;
+  protected:
+    bool filterAcceptsRow (int sourceRow, const QModelIndex&sourceParent) const;
 
-    private:
-        bool myShowBackups;
+  private:
+    bool myShowBackups;
 };
 
 #endif

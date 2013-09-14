@@ -22,7 +22,7 @@ class Speed
     Speed (int Bps): _Bps (Bps) {}
 
   public:
-    Speed (): _Bps (0) { }
+    Speed (): _Bps (0) {}
     double KBps () const;
     int Bps () const { return _Bps; }
     bool isZero () const { return _Bps == 0; }

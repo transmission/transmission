@@ -22,31 +22,30 @@ class QFileSystemWatcher;
 
 class WatchDir: public QObject
 {
-        Q_OBJECT
+    Q_OBJECT
 
-    public:
-        WatchDir( const TorrentModel& );
-        ~WatchDir( );
+  public:
+    WatchDir (const TorrentModel&);
+    ~WatchDir ();
 
-    public:
-        void setPath( const QString& path, bool isEnabled );
+  public:
+    void setPath (const QString& path, bool isEnabled);
 
-    private:
-        enum { OK, DUPLICATE, ERROR };
-        int metainfoTest( const QString& filename ) const;
+  private:
+    enum { OK, DUPLICATE, ERROR };
+    int metainfoTest (const QString& filename) const;
 
+  signals:
+    void torrentFileAdded (QString filename);
 
-    signals:
-        void torrentFileAdded( QString filename );
+  private slots:
+    void watcherActivated (const QString& path);
+    void onTimeout ();
 
-    private slots:
-        void watcherActivated( const QString& path );
-        void onTimeout( );
-
-    private:
-        const TorrentModel& myModel;
-        QSet<QString> myWatchDirFiles;
-        QFileSystemWatcher * myWatcher;
+  private:
+    const TorrentModel& myModel;
+    QSet<QString> myWatchDirFiles;
+    QFileSystemWatcher * myWatcher;
 };
 
 #endif

@@ -27,15 +27,15 @@
 ****
 ***/
 
-Favicons :: Favicons( )
+Favicons :: Favicons ()
 {
-    myNAM = new QNetworkAccessManager( );
-    connect( myNAM, SIGNAL(finished(QNetworkReply*)), this, SLOT(onRequestFinished(QNetworkReply*)) );
+  myNAM = new QNetworkAccessManager ();
+  connect (myNAM, SIGNAL(finished(QNetworkReply*)), this, SLOT(onRequestFinished(QNetworkReply*)));
 }
 
-Favicons :: ~Favicons( )
+Favicons :: ~Favicons ()
 {
-    delete myNAM;
+  delete myNAM;
 }
 
 /***
@@ -43,121 +43,122 @@ Favicons :: ~Favicons( )
 ***/
 
 QString
-Favicons :: getCacheDir( )
+Favicons :: getCacheDir ()
 {
-    const QString base =
+  const QString base =
 #if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
-        QDesktopServices::storageLocation( QDesktopServices::CacheLocation );
+    QDesktopServices::storageLocation (QDesktopServices::CacheLocation);
 #else
-        QStandardPaths::writableLocation( QStandardPaths::CacheLocation );
+    QStandardPaths::writableLocation (QStandardPaths::CacheLocation);
 #endif
 
-    return QDir( base ).absoluteFilePath( "favicons" );
+  return QDir(base).absoluteFilePath ("favicons");
 }
 
 void
-Favicons :: ensureCacheDirHasBeenScanned( )
+Favicons :: ensureCacheDirHasBeenScanned ()
 {
-    static bool hasBeenScanned = false;
+  static bool hasBeenScanned = false;
 
-    if( !hasBeenScanned )
+  if (!hasBeenScanned)
     {
-        hasBeenScanned = true;
+      hasBeenScanned = true;
 
-        QDir cacheDir( getCacheDir( ) );
-        cacheDir.mkpath( cacheDir.absolutePath( ) );
+      QDir cacheDir (getCacheDir ());
+      cacheDir.mkpath (cacheDir.absolutePath ());
 
-        QStringList files = cacheDir.entryList( QDir::Files|QDir::Readable );
-        foreach( QString file, files ) {
-            QPixmap pixmap;
-            pixmap.load( cacheDir.absoluteFilePath( file ) );
-            if( !pixmap.isNull( ) )
-                myPixmaps.insert( file, pixmap );
+      QStringList files = cacheDir.entryList (QDir::Files|QDir::Readable);
+      foreach (QString file, files)
+        {
+          QPixmap pixmap;
+          pixmap.load (cacheDir.absoluteFilePath (file));
+          if (!pixmap.isNull ())
+            myPixmaps.insert (file, pixmap);
         }
     }
 }
 
 QString
-Favicons :: getHost( const QUrl& url )
+Favicons :: getHost (const QUrl& url)
 {
-    QString host = url.host( );
-    const int first_dot = host.indexOf( '.' );
-    const int last_dot = host.lastIndexOf( '.' );
+  QString host = url.host ();
+  const int first_dot = host.indexOf ('.');
+  const int last_dot = host.lastIndexOf ('.');
 
-    if( ( first_dot != -1 ) && ( last_dot != -1 ) && ( first_dot != last_dot ) )
-        host.remove( 0, first_dot + 1 );
+  if ((first_dot != -1) && (last_dot != -1) &&  (first_dot != last_dot))
+    host.remove (0, first_dot + 1);
 
-    return host;
+  return host;
 }
 
 QPixmap
-Favicons :: find( const QUrl& url )
+Favicons :: find (const QUrl& url)
 {
-    return findFromHost( getHost( url ) );
+  return findFromHost (getHost (url));
 }
 
 namespace
 {
-    const QSize rightSize( 16, 16 );
+  const QSize rightSize (16, 16);
 };
 
 QPixmap
-Favicons :: findFromHost( const QString& host )
+Favicons :: findFromHost (const QString& host)
 {
-    ensureCacheDirHasBeenScanned( );
+  ensureCacheDirHasBeenScanned ();
 
-    const QPixmap pixmap = myPixmaps[ host ];
-    return pixmap.size()==rightSize ? pixmap : pixmap.scaled(rightSize);
+  const QPixmap pixmap = myPixmaps[ host ];
+  return pixmap.size()==rightSize ? pixmap : pixmap.scaled(rightSize);
 }
 
 void
-Favicons :: add( const QUrl& url )
+Favicons :: add (const QUrl& url)
 {
-    ensureCacheDirHasBeenScanned( );
+  ensureCacheDirHasBeenScanned ();
 
-    const QString host = getHost( url );
+  const QString host = getHost (url);
 
-    if( !myPixmaps.contains( host ) )
+  if (!myPixmaps.contains (host))
     {
-        // add a placholder s.t. we only ping the server once per session
-        QPixmap tmp( rightSize );
-        tmp.fill( Qt::transparent );
-        myPixmaps.insert( host, tmp );
+      // add a placholder s.t. we only ping the server once per session
+      QPixmap tmp (rightSize);
+      tmp.fill (Qt::transparent);
+      myPixmaps.insert (host, tmp);
 
-        // try to download the favicon
-        const QString path = "http://" + host + "/favicon.";
-        QStringList suffixes;
-        suffixes << "ico" << "png" << "gif" << "jpg";
-        foreach( QString suffix, suffixes )
-            myNAM->get( QNetworkRequest( path + suffix ) );
+      // try to download the favicon
+      const QString path = "http://" + host + "/favicon.";
+      QStringList suffixes;
+      suffixes << "ico" << "png" << "gif" << "jpg";
+      foreach (QString suffix, suffixes)
+        myNAM->get (QNetworkRequest (path + suffix));
     }
 }
 
 void
-Favicons :: onRequestFinished( QNetworkReply * reply )
+Favicons :: onRequestFinished (QNetworkReply * reply)
 {
-    const QString host = reply->url().host();
+  const QString host = reply->url().host();
 
-    QPixmap pixmap;
+  QPixmap pixmap;
 
-    const QByteArray content = reply->readAll( );
-    if( !reply->error( ) )
-        pixmap.loadFromData( content );
+  const QByteArray content = reply->readAll ();
+  if (!reply->error ())
+    pixmap.loadFromData (content);
 
-    if( !pixmap.isNull( ) )
+  if (!pixmap.isNull ())
     {
-        // save it in memory...
-        myPixmaps.insert( host, pixmap );
+      // save it in memory...
+      myPixmaps.insert (host, pixmap);
 
-        // save it on disk...
-        QDir cacheDir( getCacheDir( ) );
-        cacheDir.mkpath( cacheDir.absolutePath( ) );
-        QFile file( cacheDir.absoluteFilePath( host ) );
-        file.open( QIODevice::WriteOnly );
-        file.write( content );
-        file.close( );
+      // save it on disk...
+      QDir cacheDir (getCacheDir ());
+      cacheDir.mkpath (cacheDir.absolutePath ());
+      QFile file (cacheDir.absoluteFilePath (host));
+      file.open (QIODevice::WriteOnly);
+      file.write (content);
+      file.close ();
 
-        // notify listeners
-        emit pixmapReady( host );
+      // notify listeners
+      emit pixmapReady (host);
     }
 }

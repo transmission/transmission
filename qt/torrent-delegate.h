@@ -24,34 +24,33 @@ class Torrent;
 
 class TorrentDelegate: public QStyledItemDelegate
 {
-        Q_OBJECT
+    Q_OBJECT
 
-    public:
-      static QColor blueBrush, greenBrush, silverBrush;
-      static QColor blueBack,  greenBack, silverBack;
+  public:
+    static QColor blueBrush, greenBrush, silverBrush;
+    static QColor blueBack,  greenBack, silverBack;
 
-    protected:
-        QStyleOptionProgressBar * myProgressBarStyle;
+  protected:
+    QStyleOptionProgressBar * myProgressBarStyle;
 
-    protected:
-        QString statusString( const Torrent& tor ) const;
-        QString progressString( const Torrent& tor ) const;
-        QString shortStatusString( const Torrent& tor ) const;
-        QString shortTransferString( const Torrent& tor ) const;
+  protected:
+    QString statusString (const Torrent& tor) const;
+    QString progressString (const Torrent& tor) const;
+    QString shortStatusString (const Torrent& tor) const;
+    QString shortTransferString (const Torrent& tor) const;
 
-    protected:
-        QSize margin( const QStyle& style ) const;
-        virtual QSize sizeHint( const QStyleOptionViewItem&, const Torrent& ) const;
-        virtual void setProgressBarPercentDone( const QStyleOptionViewItem& option, const Torrent& ) const;
-        virtual void drawTorrent( QPainter* painter, const QStyleOptionViewItem& option, const Torrent& ) const;
+  protected:
+    QSize margin (const QStyle& style) const;
+    virtual QSize sizeHint (const QStyleOptionViewItem&, const Torrent&) const;
+    virtual void setProgressBarPercentDone (const QStyleOptionViewItem& option, const Torrent&) const;
+    virtual void drawTorrent (QPainter* painter, const QStyleOptionViewItem& option, const Torrent&) const;
 
-    public:
-        explicit TorrentDelegate( QObject * parent=0 );
-        virtual ~TorrentDelegate( );
+  public:
+    explicit TorrentDelegate (QObject * parent=0);
+    virtual ~TorrentDelegate ();
 
-        QSize sizeHint(const QStyleOptionViewItem& option, const QModelIndex& index) const;
-        void paint(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const;
-
+    QSize sizeHint(const QStyleOptionViewItem& option, const QModelIndex& index) const;
+    void paint(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const;
 };
 
 #endif

@@ -20,24 +20,24 @@
 #include "torrent-model.h"
 
 void
-TorrentModel :: clear( )
+TorrentModel :: clear ()
 {
-    beginResetModel ();
+  beginResetModel ();
 
-    myIdToRow.clear( );
-    myIdToTorrent.clear( );
-    foreach( Torrent * tor, myTorrents ) delete tor;
-    myTorrents.clear( );
+  myIdToRow.clear ();
+  myIdToTorrent.clear ();
+  foreach (Torrent * tor, myTorrents) delete tor;
+  myTorrents.clear ();
 
-    endResetModel ();
+  endResetModel ();
 }
 
 int
-TorrentModel :: rowCount( const QModelIndex& parent ) const
+TorrentModel :: rowCount (const QModelIndex& parent) const
 {
-    Q_UNUSED( parent );
+  Q_UNUSED (parent);
 
-    return myTorrents.size( );
+  return myTorrents.size ();
 }
 
 QVariant
@@ -76,21 +76,21 @@ TorrentModel :: data (const QModelIndex& index, int role) const
 ***/
 
 void
-TorrentModel :: addTorrent( Torrent * t )
+TorrentModel :: addTorrent (Torrent * t)
 {
-    myIdToTorrent.insert( t->id( ), t );
-    myIdToRow.insert( t->id( ), myTorrents.size( ) );
-    myTorrents.append( t );
+  myIdToTorrent.insert (t->id (), t);
+  myIdToRow.insert (t->id (), myTorrents.size ());
+  myTorrents.append (t);
 }
 
-TorrentModel :: TorrentModel( Prefs& prefs ):
-    myPrefs( prefs )
+TorrentModel :: TorrentModel (Prefs& prefs):
+  myPrefs (prefs)
 {
 }
 
-TorrentModel :: ~TorrentModel( )
+TorrentModel :: ~TorrentModel ()
 {
-    clear( );
+  clear ();
 }
 
 /***
@@ -98,17 +98,17 @@ TorrentModel :: ~TorrentModel( )
 ***/
 
 Torrent*
-TorrentModel :: getTorrentFromId( int id )
+TorrentModel :: getTorrentFromId (int id)
 {
-    id_to_torrent_t::iterator it( myIdToTorrent.find( id ) );
-    return it == myIdToTorrent.end() ? 0 : it.value( );
+  id_to_torrent_t::iterator it (myIdToTorrent.find (id));
+  return it == myIdToTorrent.end() ? 0 : it.value ();
 }
 
 const Torrent*
-TorrentModel :: getTorrentFromId( int id ) const
+TorrentModel :: getTorrentFromId (int id) const
 {
-    id_to_torrent_t::const_iterator it( myIdToTorrent.find( id ) );
-    return it == myIdToTorrent.end() ? 0 : it.value( );
+  id_to_torrent_t::const_iterator it (myIdToTorrent.find (id));
+  return it == myIdToTorrent.end() ? 0 : it.value ();
 }
 
 /***
@@ -116,120 +116,124 @@ TorrentModel :: getTorrentFromId( int id ) const
 ***/
 
 void
-TorrentModel :: onTorrentChanged( int torrentId )
+TorrentModel :: onTorrentChanged (int torrentId)
 {
-    const int row( myIdToRow.value( torrentId, -1 ) );
-    if( row >= 0 ) {
-        QModelIndex qmi( index( row, 0 ) );
-        emit dataChanged( qmi, qmi );
-    }
-}
-
-void
-TorrentModel :: removeTorrents( tr_variant * torrents )
-{
-    int i = 0;
-    tr_variant * child;
-    while(( child = tr_variantListChild( torrents, i++ ))) {
-        int64_t intVal;
-        if( tr_variantGetInt( child, &intVal ) )
-            removeTorrent( intVal );
-    }
-}
-
-void
-TorrentModel :: updateTorrents( tr_variant * torrents, bool isCompleteList )
-{
-    QList<Torrent*> newTorrents;
-    QSet<int> oldIds;
-    QSet<int> addIds;
-    QSet<int> newIds;
-    int updatedCount = 0;
-
-    if ( isCompleteList )
-      oldIds = getIds( );
-
-    if( tr_variantIsList( torrents ) )
+  const int row (myIdToRow.value (torrentId, -1));
+  if (row >= 0)
     {
-        size_t i( 0 );
-        tr_variant * child;
-        while(( child = tr_variantListChild( torrents, i++ )))
-        {
-            int64_t id;
-            if( tr_variantDictFindInt( child, TR_KEY_id, &id ) )
-            {
-                newIds.insert( id );
+      QModelIndex qmi (index (row, 0));
+      emit dataChanged (qmi, qmi);
+    }
+}
 
-                Torrent * tor = getTorrentFromId( id );
-                if( tor == 0 )
+void
+TorrentModel :: removeTorrents (tr_variant * torrents)
+{
+  int i = 0;
+  tr_variant * child;
+  while( (child = tr_variantListChild (torrents, i++)))
+    {
+      int64_t intVal;
+      if (tr_variantGetInt (child, &intVal))
+        removeTorrent (intVal);
+    }
+}
+
+void
+TorrentModel :: updateTorrents (tr_variant * torrents, bool isCompleteList)
+{
+  QList<Torrent*> newTorrents;
+  QSet<int> oldIds;
+  QSet<int> addIds;
+  QSet<int> newIds;
+  int updatedCount = 0;
+
+  if  (isCompleteList)
+    oldIds = getIds ();
+
+  if (tr_variantIsList (torrents))
+    {
+      size_t i (0);
+      tr_variant * child;
+      while( (child = tr_variantListChild (torrents, i++)))
+        {
+          int64_t id;
+          if (tr_variantDictFindInt (child, TR_KEY_id, &id))
+            {
+              newIds.insert (id);
+
+              Torrent * tor = getTorrentFromId (id);
+              if (tor == 0)
                 {
-                    tor = new Torrent( myPrefs, id );
-                    tor->update( child );
-                    if( !tor->hasMetadata() )
-                        tor->setMagnet( true );
-                    newTorrents.append( tor );
-                    connect( tor, SIGNAL(torrentChanged(int)), this, SLOT(onTorrentChanged(int)));
+                  tor = new Torrent (myPrefs, id);
+                  tor->update (child);
+                  if (!tor->hasMetadata())
+                    tor->setMagnet (true);
+                  newTorrents.append (tor);
+                  connect (tor, SIGNAL(torrentChanged(int)), this, SLOT(onTorrentChanged(int)));
                 }
-                else
+              else
                 {
-                    tor->update( child );
-                    ++updatedCount;
-                    if( tor->isMagnet() && tor->hasMetadata() )
+                  tor->update (child);
+                  ++updatedCount;
+                  if (tor->isMagnet() && tor->hasMetadata())
                     {
-                        addIds.insert( tor->id() );
-                        tor->setMagnet( false );
+                      addIds.insert (tor->id());
+                      tor->setMagnet (false);
                     }
                 }
             }
         }
     }
 
-    if( !newTorrents.isEmpty( ) )
+  if (!newTorrents.isEmpty ())
     {
-        const int oldCount( rowCount( ) );
-        const int newCount( oldCount + newTorrents.size( ) );
-        QSet<int> ids;
+      const int oldCount (rowCount ());
+      const int newCount (oldCount + newTorrents.size ());
+      QSet<int> ids;
 
-        beginInsertRows( QModelIndex(), oldCount, newCount - 1 );
+      beginInsertRows (QModelIndex(), oldCount, newCount - 1);
 
-        foreach( Torrent * tor, newTorrents ) {
-            addTorrent( tor );
-            addIds.insert( tor->id( ) );
+      foreach (Torrent * tor, newTorrents)
+        {
+          addTorrent (tor);
+          addIds.insert (tor->id ());
         }
-        endInsertRows( );
+
+      endInsertRows ();
     }
 
-    if( !addIds.isEmpty() )
-        emit torrentsAdded( addIds );
+  if (!addIds.isEmpty())
+    emit torrentsAdded (addIds);
 
-    if( isCompleteList )
+  if (isCompleteList)
     {
-        QSet<int> removedIds( oldIds );
-        removedIds -= newIds;
-        foreach( int id, removedIds )
-            removeTorrent( id );
+      QSet<int> removedIds (oldIds);
+      removedIds -= newIds;
+      foreach (int id, removedIds)
+        removeTorrent (id);
     }
 }
 
 void
-TorrentModel :: removeTorrent( int id )
+TorrentModel :: removeTorrent (int id)
 {
-    const int row = myIdToRow.value( id, -1 );
-    if( row >= 0 )
+  const int row = myIdToRow.value (id, -1);
+  if (row >= 0)
     {
-        Torrent * tor = myIdToTorrent.value( id, 0 );
+      Torrent * tor = myIdToTorrent.value (id, 0);
 
-        beginRemoveRows( QModelIndex(), row, row );
-        // make the myIdToRow map consistent with list view/model
-        for( QMap<int,int>::iterator i = myIdToRow.begin(); i != myIdToRow.end(); ++i )
-            if( i.value() > row )
-                --i.value();
-        myIdToRow.remove( id );
-        myIdToTorrent.remove( id );
-        myTorrents.remove( myTorrents.indexOf( tor ) );
-        endRemoveRows( );
+      beginRemoveRows (QModelIndex(), row, row);
+      // make the myIdToRow map consistent with list view/model
+      for (QMap<int,int>::iterator i = myIdToRow.begin(); i != myIdToRow.end(); ++i)
+        if (i.value() > row)
+          --i.value();
+      myIdToRow.remove (id);
+      myIdToTorrent.remove (id);
+      myTorrents.remove (myTorrents.indexOf (tor));
+      endRemoveRows ();
 
-        delete tor;
+      delete tor;
     }
 }
 
@@ -270,10 +274,11 @@ TorrentModel :: getIds () const
 }
 
 bool
-TorrentModel :: hasTorrent( const QString& hashString ) const
+TorrentModel :: hasTorrent (const QString& hashString) const
 {
-    foreach( const Torrent * tor, myTorrents )
-        if( tor->hashString( ) == hashString )
-            return true;
-    return false;
+  foreach (const Torrent * tor, myTorrents)
+    if (tor->hashString () == hashString)
+      return true;
+
+  return false;
 }

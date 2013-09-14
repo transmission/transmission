@@ -23,48 +23,52 @@ class QLayout;
 
 class HIG: public QWidget
 {
-        Q_OBJECT
+    Q_OBJECT
 
-    public:
-        enum {
-            PAD_SMALL = 3,
-            PAD = 6,
-            PAD_BIG = 12,
-            PAD_LARGE = PAD_BIG
-        };
+  public:
 
-    public:
-        HIG( QWidget * parent = 0 );
-        virtual ~HIG( );
+    enum
+    {
+      PAD_SMALL = 3,
+      PAD = 6,
+      PAD_BIG = 12,
+      PAD_LARGE = PAD_BIG
+    };
 
-    public:
-        void addSectionDivider( );
-        void addSectionTitle( const QString& );
-        void addSectionTitle( QWidget* );
-        void addSectionTitle( QLayout* );
-        void addWideControl( QLayout * );
-        void addWideControl( QWidget * );
-        QCheckBox* addWideCheckBox( const QString&, bool isChecked );
-        QLabel* addLabel( const QString& );
-        QLabel* addTallLabel( const QString& );
-        void addLabel( QWidget * );
-        void addTallLabel( QWidget * );
-        void addControl( QWidget * );
-        void addControl( QLayout * );
-        QLabel* addRow( const QString & label, QWidget * control, QWidget * buddy=0 );
-        QLabel* addRow( const QString & label, QLayout * control, QWidget * buddy );
-        void addRow( QWidget * label, QWidget * control, QWidget * buddy=0 );
-        void addRow( QWidget * label, QLayout * control, QWidget * buddy );
-        QLabel* addTallRow( const QString & label, QWidget * control, QWidget * buddy=0 );
-        void finish( );
+  public:
 
-    private:
-        QLayout* addRow( QWidget* w );
+    HIG (QWidget * parent = 0);
+    virtual ~HIG ();
 
-    private:
-        int myRow;
-        bool myHasTall;
-        QGridLayout * myGrid;
+  public:
+
+    void addSectionDivider ();
+    void addSectionTitle (const QString&);
+    void addSectionTitle (QWidget*);
+    void addSectionTitle (QLayout*);
+    void addWideControl (QLayout *);
+    void addWideControl (QWidget *);
+    QCheckBox* addWideCheckBox (const QString&, bool isChecked);
+    QLabel* addLabel (const QString&);
+    QLabel* addTallLabel (const QString&);
+    void addLabel (QWidget *);
+    void addTallLabel (QWidget *);
+    void addControl (QWidget *);
+    void addControl (QLayout *);
+    QLabel* addRow (const QString & label, QWidget * control, QWidget * buddy=0);
+    QLabel* addRow (const QString & label, QLayout * control, QWidget * buddy);
+    void addRow (QWidget * label, QWidget * control, QWidget * buddy=0);
+    void addRow (QWidget * label, QLayout * control, QWidget * buddy);
+    QLabel* addTallRow (const QString & label, QWidget * control, QWidget * buddy=0);
+    void finish ();
+
+  private:
+    QLayout* addRow (QWidget* w);
+
+  private:
+    int myRow;
+    bool myHasTall;
+    QGridLayout * myGrid;
 };
 
 #endif // QTR_HIG_H

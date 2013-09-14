@@ -23,44 +23,47 @@
 
 class Utils: public QObject
 {
-        Q_OBJECT
+    Q_OBJECT
 
-    public:
-        Utils( ) { }
-        virtual ~Utils( ) { }
+  public:
+    Utils () {}
+    virtual ~Utils () {}
 
-    public:
-        static QString remoteFileChooser( QWidget * parent, const QString& title, const QString& myPath, bool dir, bool local );
-        static QIcon guessMimeIcon( const QString& filename );
-        // Test if string is UTF-8 or not
-        static bool isValidUtf8 ( const char *s );
+  public:
+    static QString remoteFileChooser (QWidget * parent, const QString& title, const QString& myPath, bool dir, bool local);
+    static QIcon guessMimeIcon (const QString& filename);
+    // Test if string is UTF-8 or not
+    static bool isValidUtf8  (const char *s);
 
-        static QString removeTrailingDirSeparator (const QString& path);
+    static QString removeTrailingDirSeparator (const QString& path);
 
-        // meh
-        static void toStderr( const QString& qstr );
+    // meh
+    static void toStderr (const QString& qstr);
 
-        ///
-        /// URLs
-        ///
+    ///
+    /// URLs
+    ///
 
-        static bool isMagnetLink( const QString& s ) { return s.startsWith( QString::fromUtf8( "magnet:?" ) ); }
+    static bool isMagnetLink (const QString& s)
+    {
+      return s.startsWith (QString::fromUtf8 ("magnet:?"));
+    }
 
-        static bool isHexHashcode( const QString& s )
-        {
-            if( s.length() != 40 ) return false;
-            foreach( QChar ch, s ) if( !isxdigit( ch.unicode() ) ) return false;
-            return true;
-        }
+    static bool isHexHashcode (const QString& s)
+    {
+      if (s.length() != 40)
+        return false;
+      foreach (QChar ch, s) if (!isxdigit (ch.unicode())) return false;
+      return true;
+    }
 
-        static bool isUriWithSupportedScheme( const QString& s )
-        {
-            static const QString ftp = QString::fromUtf8( "ftp://" );
-            static const QString http = QString::fromUtf8( "http://" );
-            static const QString https = QString::fromUtf8( "https://" );
-            return s.startsWith(http) || s.startsWith(https) || s.startsWith(ftp);
-        }
-
+    static bool isUriWithSupportedScheme (const QString& s)
+    {
+      static const QString ftp = QString::fromUtf8 ("ftp://");
+      static const QString http = QString::fromUtf8 ("http://");
+      static const QString https = QString::fromUtf8 ("https://");
+      return s.startsWith(http) || s.startsWith(https) || s.startsWith(ftp);
+    }
 };
 
 #endif

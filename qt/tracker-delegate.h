@@ -24,27 +24,27 @@ struct TrackerInfo;
 
 class TrackerDelegate: public QItemDelegate
 {
-        Q_OBJECT
+    Q_OBJECT
 
-    public:
-        TrackerDelegate( QObject * parent=0 ): QItemDelegate(parent), myShowMore(false) { }
-        virtual ~TrackerDelegate( ) { }
+  public:
+    TrackerDelegate (QObject * parent=0): QItemDelegate(parent), myShowMore(false) {}
+    virtual ~TrackerDelegate () {}
 
-    public:
-        QSize sizeHint(const QStyleOptionViewItem& option, const QModelIndex& index) const;
-        void paint(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const;
+  public:
+    QSize sizeHint(const QStyleOptionViewItem& option, const QModelIndex& index) const;
+    void paint(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const;
 
-    public:
-        void setShowMore( bool b );
+  public:
+    void setShowMore (bool b);
 
-    protected:
-        QString getText( const TrackerInfo& ) const;
-        QSize margin( const QStyle& style ) const;
-        virtual QSize sizeHint( const QStyleOptionViewItem&, const TrackerInfo& ) const;
-        void drawTracker( QPainter*, const QStyleOptionViewItem&, const TrackerInfo& ) const;
+  protected:
+    QString getText (const TrackerInfo&) const;
+    QSize margin (const QStyle& style) const;
+    virtual QSize sizeHint (const QStyleOptionViewItem&, const TrackerInfo&) const;
+    void drawTracker (QPainter*, const QStyleOptionViewItem&, const TrackerInfo&) const;
 
-    private:
-        bool myShowMore;
+  private:
+    bool myShowMore;
 };
 
 #endif

@@ -46,7 +46,7 @@ class RelocateDialog: public QDialog
 
   public:
     RelocateDialog (Session&, TorrentModel&, const QSet<int>& ids, QWidget * parent = 0);
-    ~RelocateDialog () { }
+    ~RelocateDialog () {}
 };
 
 #endif

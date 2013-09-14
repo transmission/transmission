@@ -48,13 +48,13 @@ class SqueezeLabel : public QLabel
 {
     Q_OBJECT
 
-public:
-    SqueezeLabel(QWidget *parent = 0);
-    SqueezeLabel(const QString& text, QWidget *parent = 0);
+  public:
+    SqueezeLabel (QWidget *parent=0);
+    SqueezeLabel (const QString& text, QWidget *parent=0);
 
-protected:
-    void init();
-    void paintEvent(QPaintEvent* paintEvent);
+  protected:
+    void init ();
+    void paintEvent (QPaintEvent* paintEvent);
 };
 
 #endif // SQUEEZELABEL_H

@@ -19,35 +19,37 @@
 
 class FilterMode
 {
-    private:
-        int myMode;
-    public:
-        FilterMode( int mode=SHOW_ALL ): myMode(mode) { }
-        FilterMode( const QString& name ): myMode(modeFromName(name)) { }
-        static const QString names[];
-        enum { SHOW_ALL, SHOW_ACTIVE, SHOW_DOWNLOADING, SHOW_SEEDING, SHOW_PAUSED,
-               SHOW_FINISHED, SHOW_VERIFYING, SHOW_ERROR, NUM_MODES };
-        static int modeFromName( const QString& name );
-        static const QString& nameFromMode( int mode ) { return names[mode]; }
-        int mode() const { return myMode; }
-        const QString& name() const { return names[myMode]; }
+  private:
+    int myMode;
+
+  public:
+    FilterMode( int mode=SHOW_ALL ): myMode(mode) {}
+    FilterMode( const QString& name ): myMode(modeFromName(name)) {}
+    static const QString names[];
+    enum { SHOW_ALL, SHOW_ACTIVE, SHOW_DOWNLOADING, SHOW_SEEDING, SHOW_PAUSED,
+           SHOW_FINISHED, SHOW_VERIFYING, SHOW_ERROR, NUM_MODES };
+    static int modeFromName( const QString& name );
+    static const QString& nameFromMode( int mode ) { return names[mode]; }
+    int mode() const { return myMode; }
+    const QString& name() const { return names[myMode]; }
 };
 
 class SortMode
 {
-    private:
-        int myMode;
-    public:
-        SortMode( int mode=SORT_BY_ID ): myMode(mode) { }
-        SortMode( const QString& name ): myMode(modeFromName(name)) { }
-        static const QString names[];
-        enum { SORT_BY_ACTIVITY, SORT_BY_AGE, SORT_BY_ETA, SORT_BY_NAME,
-               SORT_BY_PROGRESS, SORT_BY_QUEUE, SORT_BY_RATIO, SORT_BY_SIZE,
-               SORT_BY_STATE, SORT_BY_ID, NUM_MODES };
-        static int modeFromName( const QString& name );
-        static const QString& nameFromMode( int mode );
-        int mode() const { return myMode; }
-        const QString& name() const { return names[myMode]; }
+  private:
+    int myMode;
+
+  public:
+    SortMode( int mode=SORT_BY_ID ): myMode(mode) {}
+    SortMode( const QString& name ): myMode(modeFromName(name)) {}
+    static const QString names[];
+    enum { SORT_BY_ACTIVITY, SORT_BY_AGE, SORT_BY_ETA, SORT_BY_NAME,
+           SORT_BY_PROGRESS, SORT_BY_QUEUE, SORT_BY_RATIO, SORT_BY_SIZE,
+           SORT_BY_STATE, SORT_BY_ID, NUM_MODES };
+    static int modeFromName( const QString& name );
+    static const QString& nameFromMode( int mode );
+    int mode() const { return myMode; }
+    const QString& name() const { return names[myMode]; }
 };
 
 Q_DECLARE_METATYPE(FilterMode)
