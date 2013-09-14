@@ -14,7 +14,6 @@
 #define MAIN_WINDOW_H
 
 #include <ctime>
-#include <QCheckBox>
 #include <QLineEdit>
 #include <QIcon>
 #include <QMainWindow>
@@ -64,7 +63,6 @@ class TrMainWindow: public QMainWindow
     QDialog * myAboutDialog;
     QDialog * myStatsDialog;
     Details * myDetailsDialog;
-    QCheckBox * myFileDialogOptionsCheck;
     QSystemTrayIcon myTrayIcon;
     TorrentFilter myFilterModel;
     TorrentDelegate * myTorrentDelegate;
@@ -172,11 +170,11 @@ class TrMainWindow: public QMainWindow
     void queueMoveDown ();
     void queueMoveBottom ();
     void reannounceSelected ();
-    void addTorrent (const AddData& addMe);
     void onNetworkTimer ();
 
   private:
     void clearSelection ();
+    void addTorrent (const AddData& addMe, bool showOptions);
 
   public slots:
     void setToolbarVisible (bool);

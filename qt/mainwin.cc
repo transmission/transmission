@@ -14,6 +14,7 @@
 #include <iostream>
 
 #include <QtGui>
+#include <QCheckBox>
 #include <QProxyStyle>
 #include <QLabel>
 #include <QFileDialog>
@@ -106,7 +107,6 @@ TrMainWindow :: TrMainWindow (Session& session, Prefs& prefs, TorrentModel& mode
   myAboutDialog (new AboutDialog (this)),
   myStatsDialog (new StatsDialog (session, this)),
   myDetailsDialog (0),
-  myFileDialogOptionsCheck (0),
   myFilterModel (prefs),
   myTorrentDelegate (new TorrentDelegate (this)),
   myTorrentDelegateMin (new TorrentDelegateMin (this)),
@@ -1154,6 +1154,8 @@ TrMainWindow :: refreshPref (int key)
 ****
 ***/
 
+#define SHOW_OPTIONS_CHECKBOX_NAME "show-options-checkbox"
+
 void
 TrMainWindow :: newTorrent ()
 {
@@ -1164,24 +1166,24 @@ TrMainWindow :: newTorrent ()
 void
 TrMainWindow :: openTorrent ()
 {
-  QFileDialog * myFileDialog;
-  myFileDialog = new QFileDialog (this,
-                                  tr ("Open Torrent"),
-                                  myPrefs.getString (Prefs::OPEN_DIALOG_FOLDER),
-                                  tr ("Torrent Files (*.torrent);;All Files (*.*)"));
-  myFileDialog->setFileMode (QFileDialog::ExistingFiles);
-  myFileDialog->setAttribute (Qt::WA_DeleteOnClose);
+  QFileDialog * d;
+  d = new QFileDialog (this,
+                       tr ("Open Torrent"),
+                       myPrefs.getString (Prefs::OPEN_DIALOG_FOLDER),
+                       tr ("Torrent Files (*.torrent);;All Files (*.*)"));
+  d->setFileMode (QFileDialog::ExistingFiles);
+  d->setAttribute (Qt::WA_DeleteOnClose);
 
-  QCheckBox * button = new QCheckBox (tr ("Show &options dialog"));
-  button->setChecked (myPrefs.getBool (Prefs::OPTIONS_PROMPT));
-  QGridLayout * layout = dynamic_cast<QGridLayout*> (myFileDialog->layout ());
-  layout->addWidget (button, layout->rowCount (), 0, 1, -1, Qt::AlignLeft);
-  myFileDialogOptionsCheck = button;
+  QCheckBox * b = new QCheckBox (tr ("Show &options dialog"));
+  b->setChecked (myPrefs.getBool (Prefs::OPTIONS_PROMPT));
+  b->setObjectName (SHOW_OPTIONS_CHECKBOX_NAME);
+  QGridLayout * l = dynamic_cast<QGridLayout*> (d->layout ());
+  l->addWidget (b, l->rowCount (), 0, 1, -1, Qt::AlignLeft);
 
-  connect (myFileDialog, SIGNAL (filesSelected (const QStringList&)),
+  connect (d, SIGNAL (filesSelected (const QStringList&)),
            this, SLOT (addTorrents (const QStringList&)));
 
-  myFileDialog->show ();
+  d->show ();
 }
 
 void
@@ -1195,27 +1197,30 @@ TrMainWindow :: openURL ()
   if (!AddData::isSupported (str))
     str.clear ();
 
-  addTorrent (str);
+  addTorrent (str, true);
 }
 
 void
 TrMainWindow :: addTorrents (const QStringList& filenames)
 {
+  bool showOptions = myPrefs.getBool (Prefs::OPTIONS_PROMPT);
+
+  const QFileDialog * const fileDialog = qobject_cast<const QFileDialog*> (sender ());
+  if (fileDialog != NULL)
+    {
+      const QCheckBox * const b = fileDialog->findChild<const QCheckBox*> (SHOW_OPTIONS_CHECKBOX_NAME);
+      if (b != NULL)
+        showOptions = b->isChecked ();
+    }
+
   foreach (const QString& filename, filenames)
-    addTorrent (filename);
+    addTorrent (filename, showOptions);
 }
 
 void
-TrMainWindow :: addTorrent (const AddData& addMe)
+TrMainWindow :: addTorrent (const AddData& addMe, bool showOptions)
 {
-  bool show_options_dialog;
-
-  if (myFileDialogOptionsCheck)
-    show_options_dialog = myFileDialogOptionsCheck->isChecked ();
-  else
-    show_options_dialog = myPrefs.getBool (Prefs::OPTIONS_PROMPT);
-
-  if (show_options_dialog)
+  if (showOptions)
     {
       Options * o = new Options (mySession, myPrefs, addMe, this);
       o->show ();
