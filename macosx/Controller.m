@@ -3620,13 +3620,13 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 {
     const BOOL show = fFilterBar == nil;
     
+    //disable filtering when hiding (have to do before showFilterBar:animate:)
+    if (!show)
+        [fFilterBar reset: NO];
+    
     [self showFilterBar: show animate: YES];
     [fDefaults setBool: show forKey: @"FilterBar"];
     [[fWindow toolbar] validateVisibleItems];
-    
-    //disable filtering when hiding
-    if (!show)
-        [fFilterBar reset: NO];
     
     [self applyFilter]; //do even if showing to ensure tooltips are updated
 }
