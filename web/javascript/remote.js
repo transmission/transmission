@@ -69,7 +69,9 @@ TransmissionRemote.prototype =
 	},
 
 	appendSessionId: function(XHR) {
-		XHR.setRequestHeader('X-Transmission-Session-Id', this._token);
+		if (this._token) {
+			XHR.setRequestHeader('X-Transmission-Session-Id', this._token);
+		}
 	},
 
 	sendRequest: function(data, callback, context, async) {
