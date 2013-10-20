@@ -105,7 +105,16 @@ TransmissionRemote.prototype =
 		var o = { method: 'port-test' };
 		this.sendRequest(o, callback, context, async);
 	},
-	
+
+	renameTorrent: function(torrentIds, oldpath, newname, callback, context) {
+		var o = { method: 'torrent-rename-path',
+                          arguments: { 'ids': torrentIds,
+                                       'path': oldpath,
+                                       'name': newname }
+		};
+		this.sendRequest(o, callback, context);
+	},
+
 	loadDaemonStats: function(callback, context, async) {
 		var o = { method: 'session-stats' };
 		this.sendRequest(o, callback, context, async);
