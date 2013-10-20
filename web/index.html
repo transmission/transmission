@@ -301,6 +301,20 @@
 			</div>
 		</div>
 
+        <div class="dialog_container" id="rename_container" style="display:none;">
+            <div class="dialog_top_bar"></div>
+            <div class="dialog_window">
+                <div class="dialog_logo"></div>
+                <h2 class="dialog_heading">Rename torrent</h2>
+                <div class="dialog_message">
+                    <label for="torrent_rename_name">Enter new name:</label>
+                    <input type="text" id="torrent_rename_name"/>
+                </div>
+                <a href="#rename" id="rename_confirm_button">Rename</a>
+                <a href="#cancel" id="rename_cancel_button">Cancel</a>
+            </div>
+        </div>
+
 		<div class="dialog_container" id="move_container" style="display:none;">
 			<div class="dialog_top_bar"></div>
 			<div class="dialog_window">
@@ -388,7 +402,7 @@
 					</ul>
 				</li>
 			</ul>
-			<div id="prefs-button" title="Edit Preferences...">&nbsp;</div>
+			<div id="prefs-button" title="Edit Preferences…">&nbsp;</div>
 			<div id="turtle-button" title="Alternative Speed Limits">&nbsp;</div>
 			<div id="compact-button" title="Compact View">&nbsp;</div>
 		</div>
@@ -404,11 +418,12 @@
 				<li id="context_move_down">Move Down</li>
 				<li id="context_move_bottom">Move to Bottom</li>
 				<li class="separator"></li>
-				<li id="context_remove">Remove From List...</li>
-				<li id="context_removedata">Trash Data & Remove From List...</li>
+				<li id="context_remove">Remove From List…</li>
+				<li id="context_removedata">Trash Data and Remove From List…</li>
 				<li class="separator"></li>
 				<li id="context_verify">Verify Local Data</li>
-				<li id="context_move">Set Location...</li>
+				<li id="context_move">Set Location…</li>
+				<li id="context_rename">Rename…</li>
 				<li class="separator"></li>
 				<li id="context_reannounce">Ask tracker for more peers</li>
 				<li class="separator"></li>
