@@ -21,6 +21,7 @@
 #include <QString>
 #include <QStringList>
 #include <QUrl>
+#include <QNetworkReply>
 
 class QStringList;
 
@@ -144,6 +145,8 @@ class Session: public QObject
     void torrentsRemoved (struct tr_variant * torrentList);
     void dataReadProgress ();
     void dataSendProgress ();
+    void error (QNetworkReply::NetworkError);
+    void errorMessage (const QString);
     void httpAuthenticationRequired ();
 
   private:

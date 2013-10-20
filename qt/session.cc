@@ -701,6 +701,7 @@ Session :: exec (const char * json)
       reply->setProperty (REQUEST_DATA_PROPERTY_KEY, requestData);
       connect (reply, SIGNAL (downloadProgress (qint64,qint64)), this, SIGNAL (dataReadProgress ()));
       connect (reply, SIGNAL (uploadProgress (qint64,qint64)), this, SIGNAL (dataSendProgress ()));
+      connect (reply, SIGNAL(error(QNetworkReply::NetworkError)), this, SIGNAL(error(QNetworkReply::NetworkError)));
 
 #ifdef DEBUG_HTTP
       std::cerr << "sending " << "POST " << qPrintable (myUrl.path ()) << std::endl;
@@ -737,7 +738,7 @@ Session :: onFinished (QNetworkReply * reply)
     }
     else if (reply->error () != QNetworkReply::NoError)
     {
-        std::cerr << "http error: " << qPrintable (reply->errorString ()) << std::endl;
+        emit (errorMessage(reply->errorString ()));
     }
     else
     {
@@ -746,6 +747,7 @@ Session :: onFinished (QNetworkReply * reply)
         int jsonLength (response.size ());
         if (jsonLength>0 && json[jsonLength-1] == '\n') --jsonLength;
         parseResponse (json, jsonLength);
+        emit (error(QNetworkReply::NoError));
     }
 
     reply->deleteLater ();

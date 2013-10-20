@@ -23,6 +23,7 @@
 #include <QSystemTrayIcon>
 #include <QTimer>
 #include <QWidgetList>
+#include <QNetworkReply>
 
 extern "C"
 {
@@ -76,6 +77,7 @@ class TrMainWindow: public QMainWindow
     time_t myLastSendTime;
     time_t myLastReadTime;
     QTimer myNetworkTimer;
+    bool myNetworkError;
     QTimer myRefreshTrayIconTimer;
     QTimer myRefreshActionSensitivityTimer;
     QAction * myDlimitOffAction;
@@ -121,6 +123,8 @@ class TrMainWindow: public QMainWindow
     void toggleSpeedMode ();
     void dataReadProgress ();
     void dataSendProgress ();
+    void onError (QNetworkReply::NetworkError);
+    void errorMessage (const QString);
     void toggleWindows (bool doShow);
     void onSetPrefs ();
     void onSetPrefs (bool);
@@ -155,6 +159,7 @@ class TrMainWindow: public QMainWindow
     QLabel * myDownloadSpeedLabel;
     QLabel * myUploadSpeedLabel;
     QLabel * myNetworkLabel;
+    QString myErrorMessage;
 
   public slots:
     void startAll ();

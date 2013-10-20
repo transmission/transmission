@@ -118,6 +118,7 @@ TrMainWindow :: TrMainWindow (Session& session, Prefs& prefs, TorrentModel& mode
   myLastSendTime (0),
   myLastReadTime (0),
   myNetworkTimer (this),
+  myNetworkError (false),
   myRefreshTrayIconTimer (this),
   myRefreshActionSensitivityTimer (this)
 {
@@ -289,6 +290,8 @@ TrMainWindow :: TrMainWindow (Session& session, Prefs& prefs, TorrentModel& mode
   connect (&mySession, SIGNAL (dataReadProgress ()), this, SLOT (dataReadProgress ()));
   connect (&mySession, SIGNAL (dataSendProgress ()), this, SLOT (dataSendProgress ()));
   connect (&mySession, SIGNAL (httpAuthenticationRequired ()), this, SLOT (wrongAuthentication ()));
+  connect (&mySession, SIGNAL (error (QNetworkReply::NetworkError)), this, SLOT (onError (QNetworkReply::NetworkError)));
+  connect (&mySession, SIGNAL (errorMessage (const QString)), this, SLOT (errorMessage(const QString)));
 
   if (mySession.isServer ())
     {
@@ -1346,7 +1349,9 @@ TrMainWindow :: updateNetworkIcon ()
   const bool isReading = secondsSinceLastRead <= period;
   const char * key;
 
-  if (isSending && isReading)
+  if (myNetworkError)
+    key = "network-error";
+  else if (isSending && isReading)
     key = "network-transmit-receive";
   else if (isSending)
     key = "network-transmit";
@@ -1361,9 +1366,11 @@ TrMainWindow :: updateNetworkIcon ()
   const QString url = mySession.getRemoteUrl ().host ();
   if (!myLastReadTime)
     tip = tr ("%1 has not responded yet").arg (url);
-  else if (secondsSinceLastRead < 60)
+  else if (myNetworkError)
+    tip = tr (myErrorMessage.toLatin1 ().constData ());
+  else if (secondsSinceLastRead < 30)
     tip = tr ("%1 is responding").arg (url);
-  else if (secondsSinceLastRead < (60*10))
+  else if (secondsSinceLastRead < (60*2))
     tip = tr ("%1 last responded %2 ago").arg (url).arg (Formatter::timeToString (secondsSinceLastRead));
   else
     tip = tr ("%1 is not responding").arg (url);
@@ -1381,15 +1388,29 @@ TrMainWindow :: onNetworkTimer ()
 void
 TrMainWindow :: dataReadProgress ()
 {
+  if (!myNetworkError)
   myLastReadTime = time (NULL);
-  updateNetworkIcon ();
 }
 
 void
 TrMainWindow :: dataSendProgress ()
 {
   myLastSendTime = time (NULL);
-  updateNetworkIcon ();
+}
+
+void
+TrMainWindow :: onError (QNetworkReply::NetworkError code)
+{
+    if (code != QNetworkReply::NoError)
+        myNetworkError = true;
+    else
+        myNetworkError = false;
+}
+
+void
+TrMainWindow :: errorMessage (const QString msg)
+{
+    myErrorMessage = msg;
 }
 
 void
