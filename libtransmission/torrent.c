@@ -1864,7 +1864,6 @@ stopTorrent (void * vtor)
   tr_torrentLock (tor);
 
   tr_verifyRemove (tor);
-  torrentSetQueued (tor, false);
   tr_peerMgrStopTorrent (tor);
   tr_announcerTorrentStopped (tor);
   tr_cacheFlushTorrent (tor->session->cache, tor);
@@ -1873,6 +1872,8 @@ stopTorrent (void * vtor)
 
   if (!tor->isDeleting)
     tr_torrentSave (tor);
+
+  torrentSetQueued (tor, false);
 
   tr_torrentUnlock (tor);
 }
@@ -3543,6 +3544,7 @@ torrentSetQueued (tr_torrent * tor, bool queued)
     {
       tor->isQueued = queued;
       tor->anyDate = tr_time ();
+      tr_torrentSetDirty (tor);
     }
 }
 

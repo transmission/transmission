@@ -675,7 +675,7 @@ tr_torrentSaveResume (tr_torrent * tor)
   tr_variantDictAddInt (&top, TR_KEY_uploaded, tor->uploadedPrev + tor->uploadedCur);
   tr_variantDictAddInt (&top, TR_KEY_max_peers, tor->maxConnectedPeers);
   tr_variantDictAddInt (&top, TR_KEY_bandwidth_priority, tr_torrentGetPriority (tor));
-  tr_variantDictAddBool (&top, TR_KEY_paused, !tor->isRunning);
+  tr_variantDictAddBool (&top, TR_KEY_paused, !tor->isRunning && !tor->isQueued);
   savePeers (&top, tor);
   if (tr_torrentHasMetadata (tor))
     {
@@ -778,7 +778,7 @@ loadFromFile (tr_torrent * tor, uint64_t fieldsToLoad)
   if ((fieldsToLoad & TR_FR_RUN)
       && tr_variantDictFindBool (&top, TR_KEY_paused, &boolVal))
     {
-      tor->isRunning = !boolVal && !tor->isQueued; 
+      tor->isRunning = !boolVal;
       fieldsLoaded |= TR_FR_RUN;
     }
 
