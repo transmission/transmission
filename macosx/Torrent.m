@@ -1407,6 +1407,11 @@ int trashDataFile(const char * filename)
     if (!fFileStat)
         [self updateFileStat];
     
+    // #5501
+    if ([node size] == 0) {
+        return 1.0;
+    }
+    
     NSIndexSet * indexSet = [node indexes];
     
     if ([indexSet count] == 1)
@@ -1416,7 +1421,6 @@ int trashDataFile(const char * filename)
     for (NSInteger index = [indexSet firstIndex]; index != NSNotFound; index = [indexSet indexGreaterThanIndex: index])
         have += fFileStat[index].bytesCompleted;
     
-    NSAssert([node size], @"directory in torrent file has size 0");
     return (CGFloat)have / [node size];
 }
 
