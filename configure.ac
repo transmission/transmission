@@ -474,6 +474,7 @@ AM_CONDITIONAL([BUILD_DAEMON],[test "x$build_daemon" = "xyes"])
 
 
 if test "x$build_mac" = "xyes" ; then
+   AC_DEFINE([BUILD_MAC_CLIENT], 1)
     # Make sure the proper Mac SDK is installed
     if test ! -d /Developer/SDKs/MacOSX10.5.sdk; then
       cat << EOF

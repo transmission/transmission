@@ -14,7 +14,7 @@
  #define _GNU_SOURCE /* glibc's string.h needs this to pick up memmem */
 #endif
 
-#if defined (SYS_DARWIN)
+#if defined (XCODE_BUILD)
  #define HAVE_GETPAGESIZE
  #define HAVE_ICONV_OPEN
  #define HAVE_MKDTEMP

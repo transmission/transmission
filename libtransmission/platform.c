@@ -28,7 +28,7 @@
  #include <windows.h>
  #include <shlobj.h> /* for CSIDL_APPDATA, CSIDL_MYDOCUMENTS */
 #else
- #ifdef SYS_DARWIN
+ #ifdef BUILD_MAC_CLIENT
   #include <CoreFoundation/CoreFoundation.h>
  #endif
  #ifdef __HAIKU__
@@ -429,7 +429,7 @@ tr_getWebClientDir (const tr_session * session UNUSED)
       else
         {
 
-#ifdef SYS_DARWIN /* on Mac, look in the Application Support folder first, then in the app bundle. */
+#ifdef BUILD_MAC_CLIENT /* on Mac, look in the Application Support folder first, then in the app bundle. */
 
           /* Look in the Application Support folder */
           s = tr_buildPath (tr_sessionGetConfigDir (session), "web", NULL);
