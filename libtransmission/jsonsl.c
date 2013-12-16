@@ -869,7 +869,7 @@ void jsonsl_jpr_match_state_init(jsonsl_t jsn,
     }
     jsn->jprs = malloc(sizeof(jsonsl_jpr_t) * njprs);
     jsn->jpr_count = njprs;
-    jsn->jpr_root = calloc(1, sizeof(int) * njprs * jsn->levels_max);
+    jsn->jpr_root = calloc(1, sizeof(size_t) * njprs * jsn->levels_max);
     memcpy(jsn->jprs, jprs, sizeof(jsonsl_jpr_t) * njprs);
     /* Set the initial jump table values */
 
