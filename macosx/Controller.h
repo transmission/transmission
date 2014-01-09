@@ -50,7 +50,7 @@ typedef enum
     ADD_CREATED
 } addType;
 
-@interface Controller : NSObject <GrowlApplicationBridgeDelegate, NSURLDownloadDelegate, NSUserNotificationCenterDelegate, NSPopoverDelegate, NSSoundDelegate, NSToolbarDelegate, NSWindowDelegate, QLPreviewPanelDataSource, QLPreviewPanelDelegate, VDKQueueDelegate>
+@interface Controller : NSObject <GrowlApplicationBridgeDelegate, NSURLDownloadDelegate, NSUserNotificationCenterDelegate, NSPopoverDelegate, NSSharingServiceDelegate, NSSharingServicePickerDelegate, NSSoundDelegate, NSToolbarDelegate, NSWindowDelegate, QLPreviewPanelDataSource, QLPreviewPanelDelegate, VDKQueueDelegate>
 {
     tr_session                      * fLib;
     
@@ -179,6 +179,8 @@ typedef enum
 
 - (void) verifySelectedTorrents: (id) sender;
 - (void) verifyTorrents: (NSArray *) torrents;
+
+- (NSArray *)selectedTorrents;
 
 @property (retain, readonly) PrefsController * prefsController;
 - (void) showPreferenceWindow: (id) sender;

@@ -126,6 +126,7 @@
 		A221DCC8104B3660008A642D /* Quartz.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A221DCC7104B3660008A642D /* Quartz.framework */; };
 		A222E9870E6B21D9009FB003 /* BlocklistDownloaderViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A222E9860E6B21D9009FB003 /* BlocklistDownloaderViewController.m */; };
 		A222EA7B0E6C32C4009FB003 /* BlocklistScheduler.m in Sources */ = {isa = PBXBuildFile; fileRef = A222EA7A0E6C32C4009FB003 /* BlocklistScheduler.m */; };
+		A225A4C0187E369C00CDE823 /* ShareToolbarItem.m in Sources */ = {isa = PBXBuildFile; fileRef = A225A4BF187E369C00CDE823 /* ShareToolbarItem.m */; };
 		A2265F420B5EF5F40093DDA5 /* FileNameCell.m in Sources */ = {isa = PBXBuildFile; fileRef = A2265F400B5EF5F40093DDA5 /* FileNameCell.m */; };
 		A226FDAC0D0CDF20005A7F71 /* libnatpmp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3C7A118D0D0B2EB800B5701F /* libnatpmp.a */; };
 		A2290D1E14421CC100B95A09 /* libcrypto.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A27653A714369C5C009D3CCF /* libcrypto.dylib */; };
@@ -744,6 +745,8 @@
 		A223AA800D220CEB00840069 /* nl */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = nl; path = macosx/nl.lproj/Localizable.strings; sourceTree = "<group>"; };
 		A223AA810D220CEB00840069 /* nl */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = nl; path = macosx/nl.lproj/MainMenu.xib; sourceTree = "<group>"; };
 		A223AA830D220CEB00840069 /* nl */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = nl; path = macosx/nl.lproj/PrefsWindow.xib; sourceTree = "<group>"; };
+		A225A4BE187E369C00CDE823 /* ShareToolbarItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ShareToolbarItem.h; path = macosx/ShareToolbarItem.h; sourceTree = "<group>"; };
+		A225A4BF187E369C00CDE823 /* ShareToolbarItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ShareToolbarItem.m; path = macosx/ShareToolbarItem.m; sourceTree = "<group>"; };
 		A2265F3F0B5EF5F40093DDA5 /* FileNameCell.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = FileNameCell.h; path = macosx/FileNameCell.h; sourceTree = "<group>"; };
 		A2265F400B5EF5F40093DDA5 /* FileNameCell.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = FileNameCell.m; path = macosx/FileNameCell.m; sourceTree = "<group>"; };
 		A2290D2D1442B23200B95A09 /* libcurl.4.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libcurl.4.dylib; path = "third-party/curl/lib/libcurl.4.dylib"; sourceTree = "<group>"; };
@@ -1393,6 +1396,8 @@
 				A2ED7D8E0CEF431B00970975 /* FilterButton.m */,
 				A2C89D5F0CFCBF57004CC2BC /* ButtonToolbarItem.m */,
 				A28E1DDF0CFFD8EC00E16385 /* ButtonToolbarItem.h */,
+				A225A4BE187E369C00CDE823 /* ShareToolbarItem.h */,
+				A225A4BF187E369C00CDE823 /* ShareToolbarItem.m */,
 				A21979890D07B78400438EA7 /* GroupToolbarItem.h */,
 				A219798A0D07B78400438EA7 /* GroupToolbarItem.m */,
 				A20BFFB50D091CC700CE5D2B /* ToolbarSegmentedCell.h */,
@@ -2719,6 +2724,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A225A4C0187E369C00CDE823 /* ShareToolbarItem.m in Sources */,
 				A2D77453154CC72B00A62B93 /* WebSeedTableView.m in Sources */,
 				8D11072D0486CEB800E47090 /* main.m in Sources */,
 				4DF0C5AB0899190500DD8943 /* Controller.m in Sources */,
