@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="4511" systemVersion="13B42" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+    <dependencies>
+        <deployment version="1060" defaultVersion="1060" identifier="macosx"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="4511"/>
+    </dependencies>
+    <objects>
+        <customObject id="-2" userLabel="File's Owner" customClass="GroupsPrefsController">
+            <connections>
+                <outlet property="fGroupRulesSheetWindow" destination="1" id="17"/>
+                <outlet property="fRuleEditor" destination="34" id="56"/>
+            </connections>
+        </customObject>
+        <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
+        <customObject id="-3" userLabel="Application"/>
+        <window title="Window" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" restorable="NO" oneShot="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" animationBehavior="default" id="1" userLabel="Group Rules">
+            <windowStyleMask key="styleMask" titled="YES"/>
+            <windowPositionMask key="initialPositionMask" leftStrut="YES" bottomStrut="YES"/>
+            <rect key="contentRect" x="196" y="283" width="471" height="248"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1280" height="778"/>
+            <value key="minSize" type="size" width="471" height="128"/>
+            <view key="contentView" id="2">
+                <rect key="frame" x="0.0" y="0.0" width="471" height="248"/>
+                <autoresizingMask key="autoresizingMask"/>
+                <subviews>
+                    <button verticalHuggingPriority="750" id="4">
+                        <rect key="frame" x="361" y="12" width="96" height="32"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
+                        <buttonCell key="cell" type="push" title="Tamam" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="11">
+                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                            <font key="font" metaFont="system"/>
+                            <string key="keyEquivalent" base64-UTF8="YES">
+DQ
+</string>
+                        </buttonCell>
+                        <connections>
+                            <action selector="saveRules:" target="-2" id="13"/>
+                        </connections>
+                    </button>
+                    <button verticalHuggingPriority="750" id="3">
+                        <rect key="frame" x="265" y="12" width="96" height="32"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
+                        <buttonCell key="cell" type="push" title="Vazgeç" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="12">
+                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                            <font key="font" metaFont="system"/>
+                            <string key="keyEquivalent" base64-UTF8="YES">
+Gw
+</string>
+                        </buttonCell>
+                        <connections>
+                            <action selector="cancelRules:" target="-2" id="14"/>
+                        </connections>
+                    </button>
+                    <scrollView autohidesScrollers="YES" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" hasVerticalScroller="NO" usesPredominantAxisScrolling="NO" id="31">
+                        <rect key="frame" x="20" y="60" width="431" height="168"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <clipView key="contentView" id="IOE-SD-MI9">
+                            <rect key="frame" x="1" y="1" width="429" height="166"/>
+                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                            <subviews>
+                                <predicateEditor verticalHuggingPriority="750" nestingMode="compound" rowHeight="25" id="34">
+                                    <rect key="frame" x="0.0" y="0.0" width="429" height="166"/>
+                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                    <rowTemplates>
+                                        <predicateEditorRowTemplate rowType="compound" id="35">
+                                            <popUpMenus>
+                                                <menu id="47">
+                                                    <items>
+                                                        <menuItem title="Herhangi biri" id="50">
+                                                            <modifierMask key="keyEquivalentModifierMask" shift="YES"/>
+                                                            <integer key="representedObject" value="2"/>
+                                                        </menuItem>
+                                                        <menuItem title="Hepsi" state="on" id="51">
+                                                            <integer key="representedObject" value="1"/>
+                                                        </menuItem>
+                                                        <menuItem title="Hiçbiri" id="166">
+                                                            <modifierMask key="keyEquivalentModifierMask" shift="YES"/>
+                                                            <integer key="representedObject" value="0"/>
+                                                        </menuItem>
+                                                    </items>
+                                                </menu>
+                                                <menu id="48">
+                                                    <items>
+                                                        <menuItem title="aşağıdakilerden biri doğru ise" state="on" id="49"/>
+                                                    </items>
+                                                </menu>
+                                            </popUpMenus>
+                                        </predicateEditorRowTemplate>
+                                        <predicateEditorRowTemplate rowType="simple" id="36">
+                                            <array key="leftExpressionObject">
+                                                <expression type="keyPath">
+                                                    <string key="keyPath">name</string>
+                                                </expression>
+                                                <expression type="keyPath">
+                                                    <string key="keyPath">comment</string>
+                                                </expression>
+                                            </array>
+                                            <integer key="rightExpressionObject" value="700"/>
+                                            <comparisonPredicateOptions key="options" caseInsensitive="YES" diacriticInsensitive="YES"/>
+                                            <popUpMenus>
+                                                <menu id="37">
+                                                    <items>
+                                                        <menuItem title="Ad" state="on" id="100">
+                                                            <expression key="representedObject" type="keyPath">
+                                                                <string key="keyPath">name</string>
+                                                            </expression>
+                                                        </menuItem>
+                                                        <menuItem title="Yorum" id="102">
+                                                            <expression key="representedObject" type="keyPath">
+                                                                <string key="keyPath">comment</string>
+                                                            </expression>
+                                                        </menuItem>
+                                                    </items>
+                                                </menu>
+                                                <menu id="38">
+                                                    <items>
+                                                        <menuItem title="içeren" state="on" id="165">
+                                                            <integer key="representedObject" value="99"/>
+                                                        </menuItem>
+                                                        <menuItem title="başlayan" id="40">
+                                                            <integer key="representedObject" value="8"/>
+                                                        </menuItem>
+                                                        <menuItem title="biten" id="163">
+                                                            <integer key="representedObject" value="9"/>
+                                                        </menuItem>
+                                                        <menuItem title="eşit" id="42">
+                                                            <integer key="representedObject" value="4"/>
+                                                        </menuItem>
+                                                        <menuItem title="eşit değil" id="164">
+                                                            <integer key="representedObject" value="5"/>
+                                                        </menuItem>
+                                                        <menuItem title="eşleşen" id="118">
+                                                            <integer key="representedObject" value="6"/>
+                                                        </menuItem>
+                                                    </items>
+                                                </menu>
+                                            </popUpMenus>
+                                        </predicateEditorRowTemplate>
+                                        <predicateEditorRowTemplate rowType="simple" id="147" customClass="PredicateEditorRowTemplateAny">
+                                            <array key="leftExpressionObject">
+                                                <expression type="keyPath">
+                                                    <string key="keyPath">fFlatFileList.name</string>
+                                                </expression>
+                                                <expression type="keyPath">
+                                                    <string key="keyPath">allTrackersFlat</string>
+                                                </expression>
+                                            </array>
+                                            <integer key="rightExpressionObject" value="700"/>
+                                            <comparisonPredicateOptions key="options" caseInsensitive="YES"/>
+                                            <popUpMenus>
+                                                <menu id="148">
+                                                    <items>
+                                                        <menuItem title="Dosya" state="on" id="161">
+                                                            <expression key="representedObject" type="keyPath">
+                                                                <string key="keyPath">fFlatFileList.name</string>
+                                                            </expression>
+                                                        </menuItem>
+                                                        <menuItem title="İzleyici" id="162">
+                                                            <expression key="representedObject" type="keyPath">
+                                                                <string key="keyPath">allTrackersFlat</string>
+                                                            </expression>
+                                                        </menuItem>
+                                                    </items>
+                                                </menu>
+                                                <menu id="152">
+                                                    <items>
+                                                        <menuItem title="içeren" state="on" id="153">
+                                                            <integer key="representedObject" value="99"/>
+                                                        </menuItem>
+                                                        <menuItem title="başlayan" id="154">
+                                                            <integer key="representedObject" value="8"/>
+                                                        </menuItem>
+                                                        <menuItem title="biten" id="155">
+                                                            <integer key="representedObject" value="9"/>
+                                                        </menuItem>
+                                                        <menuItem title="eşit" id="156">
+                                                            <integer key="representedObject" value="4"/>
+                                                        </menuItem>
+                                                        <menuItem title="eşleşen" id="167">
+                                                            <integer key="representedObject" value="6"/>
+                                                        </menuItem>
+                                                    </items>
+                                                </menu>
+                                            </popUpMenus>
+                                        </predicateEditorRowTemplate>
+                                    </rowTemplates>
+                                    <connections>
+                                        <outlet property="delegate" destination="-2" id="57"/>
+                                    </connections>
+                                </predicateEditor>
+                            </subviews>
+                            <color key="backgroundColor" white="0.91000002999999996" alpha="1" colorSpace="calibratedWhite"/>
+                        </clipView>
+                        <scroller key="horizontalScroller" hidden="YES" verticalHuggingPriority="750" id="33">
+                            <rect key="frame" x="-100" y="-100" width="360" height="15"/>
+                            <autoresizingMask key="autoresizingMask"/>
+                        </scroller>
+                        <scroller key="verticalScroller" hidden="YES" verticalHuggingPriority="750" id="32">
+                            <rect key="frame" x="-100" y="-100" width="15" height="50"/>
+                            <autoresizingMask key="autoresizingMask"/>
+                        </scroller>
+                    </scrollView>
+                </subviews>
+            </view>
+        </window>
+    </objects>
+</document>

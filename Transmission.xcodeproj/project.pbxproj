@@ -967,6 +967,18 @@
 		A2A7B328164F87D400B98C65 /* jsonsl.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = jsonsl.c; path = libtransmission/jsonsl.c; sourceTree = "<group>"; };
 		A2A7B329164F87D400B98C65 /* jsonsl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = jsonsl.h; path = libtransmission/jsonsl.h; sourceTree = "<group>"; };
 		A2A90DC115F3C3D900FB7115 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = macosx/QuickLookPlugin/de.lproj/Localizable.strings; sourceTree = SOURCE_ROOT; };
+		A2A9D119187DD75100C52A1F /* tr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = tr; path = macosx/tr.lproj/Localizable.strings; sourceTree = "<group>"; };
+		A2A9D11A187DD75200C52A1F /* tr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = tr; path = macosx/tr.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		A2A9D11B187DD75300C52A1F /* tr */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = tr; path = macosx/tr.lproj/MainMenu.xib; sourceTree = "<group>"; };
+		A2A9D11C187DD75400C52A1F /* tr */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = tr; path = macosx/tr.lproj/PrefsWindow.xib; sourceTree = "<group>"; };
+		A2A9D11D187DD75500C52A1F /* tr */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = tr; path = macosx/tr.lproj/Creator.xib; sourceTree = "<group>"; };
+		A2A9D11E187DD75600C52A1F /* tr */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = tr; path = macosx/tr.lproj/AddWindow.xib; sourceTree = "<group>"; };
+		A2A9D11F187DD75700C52A1F /* tr */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = tr; path = macosx/tr.lproj/AddMagnetWindow.xib; sourceTree = "<group>"; };
+		A2A9D120187DD75800C52A1F /* tr */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = tr; path = macosx/tr.lproj/GroupRules.xib; sourceTree = "<group>"; };
+		A2A9D121187DD75900C52A1F /* tr */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = tr; path = macosx/tr.lproj/InfoGeneralView.xib; sourceTree = "<group>"; };
+		A2A9D122187DD75A00C52A1F /* tr */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = tr; path = macosx/tr.lproj/InfoActivityView.xib; sourceTree = "<group>"; };
+		A2A9D123187DD75B00C52A1F /* tr */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = tr; path = macosx/tr.lproj/InfoOptionsView.xib; sourceTree = "<group>"; };
+		A2A9D124187DD75C00C52A1F /* tr */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = tr; path = macosx/tr.lproj/GlobalOptionsPopover.xib; sourceTree = "<group>"; };
 		A2AA579A0ADFCAB400CA59F6 /* PiecesView.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = PiecesView.h; path = macosx/PiecesView.h; sourceTree = "<group>"; };
 		A2AA579B0ADFCAB400CA59F6 /* PiecesView.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = PiecesView.m; path = macosx/PiecesView.m; sourceTree = "<group>"; };
 		A2AA9BE0132CAC8D00FA131E /* announcer-udp.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "announcer-udp.c"; path = "libtransmission/announcer-udp.c"; sourceTree = "<group>"; };
@@ -2943,6 +2955,7 @@
 				A28393FD10D54A79005C0240 /* de */,
 				A2613F9811B3383200472893 /* pt_PT */,
 				A263C5671560A4210082A3D1 /* da */,
+				A2A9D11A187DD75200C52A1F /* tr */,
 			);
 			name = InfoPlist.strings;
 			sourceTree = "<group>";
@@ -2960,6 +2973,7 @@
 				A2B9F90411BD10BE003FC8CA /* fr */,
 				A279E3D111C3BDC300D48B1F /* nl */,
 				A263C56E1560A4470082A3D1 /* da */,
+				A2A9D122187DD75A00C52A1F /* tr */,
 			);
 			name = InfoActivityView.xib;
 			sourceTree = "<group>";
@@ -2977,6 +2991,7 @@
 				A2B9F90511BD10BE003FC8CA /* fr */,
 				A279E3D211C3BDC300D48B1F /* nl */,
 				A263C56D1560A4420082A3D1 /* da */,
+				A2A9D121187DD75900C52A1F /* tr */,
 			);
 			name = InfoGeneralView.xib;
 			sourceTree = "<group>";
@@ -2994,6 +3009,7 @@
 				A2B9F90611BD10BE003FC8CA /* fr */,
 				A279E3D311C3BDC300D48B1F /* nl */,
 				A263C56F1560A44B0082A3D1 /* da */,
+				A2A9D123187DD75B00C52A1F /* tr */,
 			);
 			name = InfoOptionsView.xib;
 			sourceTree = "<group>";
@@ -3011,6 +3027,7 @@
 				A28393FC10D54A66005C0240 /* de */,
 				A2613F9411B3383200472893 /* pt_PT */,
 				A263C56C1560A43E0082A3D1 /* da */,
+				A2A9D120187DD75800C52A1F /* tr */,
 			);
 			name = GroupRules.xib;
 			sourceTree = "<group>";
@@ -3028,6 +3045,7 @@
 				A2B9F90311BD10BE003FC8CA /* fr */,
 				A279E3D011C3BDC300D48B1F /* nl */,
 				A263C56B1560A43A0082A3D1 /* da */,
+				A2A9D11F187DD75700C52A1F /* tr */,
 			);
 			name = AddMagnetWindow.xib;
 			sourceTree = "<group>";
@@ -3045,6 +3063,7 @@
 				A2963CFD1423F2BB00C497B5 /* fr */,
 				A2A1C81D142EC032008C17BF /* nl */,
 				A263C5701560A44F0082A3D1 /* da */,
+				A2A9D124187DD75C00C52A1F /* tr */,
 			);
 			name = GlobalOptionsPopover.xib;
 			sourceTree = "<group>";
@@ -3062,6 +3081,7 @@
 				A28393FF10D54A96005C0240 /* de */,
 				A2613F9911B3383200472893 /* pt_PT */,
 				A263C5661560A3CF0082A3D1 /* da */,
+				A2A9D119187DD75100C52A1F /* tr */,
 			);
 			name = Localizable.strings;
 			sourceTree = "<group>";
@@ -3079,6 +3099,7 @@
 				A283940110D54AA7005C0240 /* de */,
 				A2613F9B11B3383200472893 /* pt_PT */,
 				A263C5681560A4290082A3D1 /* da */,
+				A2A9D11C187DD75400C52A1F /* tr */,
 			);
 			name = PrefsWindow.xib;
 			sourceTree = "<group>";
@@ -3096,6 +3117,7 @@
 				A283940010D54A9D005C0240 /* de */,
 				A2613F9A11B3383200472893 /* pt_PT */,
 				A263C5651560A35B0082A3D1 /* da */,
+				A2A9D11B187DD75300C52A1F /* tr */,
 			);
 			name = MainMenu.xib;
 			sourceTree = "<group>";
@@ -3130,6 +3152,7 @@
 				A28393F910D54A35005C0240 /* de */,
 				A2613F9211B3383200472893 /* pt_PT */,
 				A263C56A1560A4370082A3D1 /* da */,
+				A2A9D11E187DD75600C52A1F /* tr */,
 			);
 			name = AddWindow.xib;
 			sourceTree = "<group>";
@@ -3147,6 +3170,7 @@
 				A28393FA10D54A4B005C0240 /* de */,
 				A2613F9311B3383200472893 /* pt_PT */,
 				A263C5691560A4310082A3D1 /* da */,
+				A2A9D11D187DD75500C52A1F /* tr */,
 			);
 			name = Creator.xib;
 			sourceTree = "<group>";

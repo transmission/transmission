@@ -1,0 +1,1205 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="4511" systemVersion="13B42" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+    <dependencies>
+        <deployment version="1060" defaultVersion="1060" identifier="macosx"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="4511"/>
+    </dependencies>
+    <objects>
+        <customObject id="-2" userLabel="File's Owner" customClass="NSApplication">
+            <connections>
+                <outlet property="delegate" destination="206" id="207"/>
+            </connections>
+        </customObject>
+        <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
+        <customObject id="-3" userLabel="Application"/>
+        <window title="Transmission" allowsToolTipsWhenApplicationIsInactive="NO" restorable="NO" releasedWhenClosed="NO" wantsToBeColor="NO" visibleAtLaunch="NO" frameAutosaveName="TransmissionWindow" animationBehavior="default" id="21" userLabel="Transmission">
+            <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES" unifiedTitleAndToolbar="YES"/>
+            <windowPositionMask key="initialPositionMask" leftStrut="YES" topStrut="YES"/>
+            <rect key="contentRect" x="71" y="712" width="515" height="248"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1280" height="778"/>
+            <value key="minSize" type="size" width="350" height="5"/>
+            <view key="contentView" id="2">
+                <rect key="frame" x="0.0" y="0.0" width="515" height="248"/>
+                <autoresizingMask key="autoresizingMask"/>
+                <subviews>
+                    <button id="2690">
+                        <rect key="frame" x="36" y="3" width="36" height="18"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                        <buttonCell key="cell" type="squareTextured" bezelStyle="texturedSquare" image="TurtleTemplate" imagePosition="only" alignment="center" state="on" imageScaling="proportionallyDown" inset="2" id="3048">
+                            <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
+                            <font key="font" metaFont="system"/>
+                        </buttonCell>
+                        <connections>
+                            <action selector="speedLimitChanged:" target="206" id="3180"/>
+                            <binding destination="1815" name="value" keyPath="values.SpeedLimit" id="3179"/>
+                        </connections>
+                    </button>
+                    <button id="3420">
+                        <rect key="frame" x="72" y="3" width="36" height="18"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                        <buttonCell key="cell" type="squareTextured" bezelStyle="texturedSquare" image="CleanupTemplate" imagePosition="only" alignment="center" state="on" imageScaling="proportionallyDown" inset="2" id="3421">
+                            <behavior key="behavior" lightByContents="YES"/>
+                            <font key="font" metaFont="system"/>
+                        </buttonCell>
+                        <connections>
+                            <action selector="clearCompleted:" target="206" id="3424"/>
+                        </connections>
+                    </button>
+                    <button id="3435">
+                        <rect key="frame" x="0.0" y="3" width="36" height="18"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                        <buttonCell key="cell" type="squareTextured" bezelStyle="texturedSquare" image="NSActionTemplate" imagePosition="only" alignment="center" state="on" imageScaling="proportionallyDown" inset="2" id="3436">
+                            <behavior key="behavior" lightByContents="YES"/>
+                            <font key="font" metaFont="system"/>
+                        </buttonCell>
+                        <connections>
+                            <action selector="showGlobalPopover:" target="206" id="3439"/>
+                        </connections>
+                    </button>
+                    <textField verticalHuggingPriority="750" id="2700">
+                        <rect key="frame" x="118" y="5" width="279" height="14"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES"/>
+                        <textFieldCell key="cell" controlSize="small" lineBreakMode="truncatingTail" allowsUndo="NO" sendsActionOnEndEditing="YES" alignment="center" title="999 aktarımdan 999 tanesi" usesSingleLineMode="YES" id="3049">
+                            <font key="font" metaFont="smallSystem"/>
+                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                        </textFieldCell>
+                    </textField>
+                    <scrollView borderType="none" autohidesScrollers="YES" horizontalLineScroll="65" horizontalPageScroll="0.0" verticalLineScroll="65" verticalPageScroll="0.0" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" id="3088">
+                        <rect key="frame" x="0.0" y="24" width="515" height="224"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <clipView key="contentView" copiesOnScroll="NO" id="7X8-VC-azR">
+                            <rect key="frame" x="0.0" y="0.0" width="515" height="224"/>
+                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                            <subviews>
+                                <outlineView verticalHuggingPriority="750" allowsExpansionToolTips="YES" alternatingRowBackgroundColors="YES" columnReordering="NO" columnResizing="NO" autosaveColumns="NO" rowHeight="62" indentationPerLevel="16" indentationMarkerFollowsCell="NO" outlineTableColumn="3093" id="3091" customClass="TorrentTableView">
+                                    <rect key="frame" x="0.0" y="0.0" width="515" height="224"/>
+                                    <autoresizingMask key="autoresizingMask"/>
+                                    <size key="intercellSpacing" width="2" height="3"/>
+                                    <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                    <color key="gridColor" white="0.80241936000000003" alpha="1" colorSpace="calibratedWhite"/>
+                                    <tableColumns>
+                                        <tableColumn identifier="Color" editable="NO" width="29" minWidth="16" maxWidth="3000" id="3093">
+                                            <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Color">
+                                                <font key="font" metaFont="smallSystem"/>
+                                                <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
+                                                <color key="backgroundColor" white="0.33333299" alpha="1" colorSpace="calibratedWhite"/>
+                                            </tableHeaderCell>
+                                            <imageCell key="dataCell" controlSize="small" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="6F86AAE5-CFD0-4E2D-B9B7-3737FC5C72B3" id="3146">
+                                                <font key="font" metaFont="system"/>
+                                            </imageCell>
+                                        </tableColumn>
+                                        <tableColumn identifier="Group" editable="NO" width="326" minWidth="48" maxWidth="3.4028229999999999e+38" id="3140">
+                                            <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Group">
+                                                <font key="font" metaFont="smallSystem"/>
+                                                <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
+                                                <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
+                                            </tableHeaderCell>
+                                            <textFieldCell key="dataCell" lineBreakMode="truncatingTail" selectable="YES" sendsActionOnEndEditing="YES" alignment="left" title="Text Cell" id="3145">
+                                                <font key="font" metaFont="system"/>
+                                                <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                            </textFieldCell>
+                                            <tableColumnResizingMask key="resizingMask" resizeWithTable="YES"/>
+                                        </tableColumn>
+                                        <tableColumn identifier="DL Image" editable="NO" width="10" minWidth="10" maxWidth="10" id="3124">
+                                            <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left">
+                                                <font key="font" metaFont="smallSystem"/>
+                                                <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
+                                                <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
+                                            </tableHeaderCell>
+                                            <imageCell key="dataCell" controlSize="small" refusesFirstResponder="YES" alignment="left" imageAlignment="right" imageScaling="proportionallyDown" image="6F86AAE5-CFD0-4E2D-B9B7-3737FC5C72B3" id="3138">
+                                                <font key="font" metaFont="system"/>
+                                            </imageCell>
+                                        </tableColumn>
+                                        <tableColumn identifier="DL" editable="NO" width="64" minWidth="64" maxWidth="64" id="3126">
+                                            <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="DL Speed">
+                                                <font key="font" metaFont="smallSystem"/>
+                                                <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
+                                                <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
+                                            </tableHeaderCell>
+                                            <textFieldCell key="dataCell" lineBreakMode="truncatingTail" selectable="YES" alignment="left" title="Text Cell" id="3127">
+                                                <font key="font" metaFont="system"/>
+                                                <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                            </textFieldCell>
+                                        </tableColumn>
+                                        <tableColumn identifier="UL Image" editable="NO" width="10" minWidth="10" maxWidth="10" id="3133">
+                                            <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left">
+                                                <font key="font" metaFont="smallSystem"/>
+                                                <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
+                                                <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
+                                            </tableHeaderCell>
+                                            <imageCell key="dataCell" controlSize="small" refusesFirstResponder="YES" alignment="left" imageAlignment="right" imageScaling="proportionallyDown" image="6F86AAE5-CFD0-4E2D-B9B7-3737FC5C72B3" id="3139">
+                                                <font key="font" metaFont="system"/>
+                                            </imageCell>
+                                        </tableColumn>
+                                        <tableColumn identifier="UL" editable="NO" width="64" minWidth="64" maxWidth="64" id="3135">
+                                            <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="UL Speed">
+                                                <font key="font" metaFont="smallSystem"/>
+                                                <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
+                                                <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
+                                            </tableHeaderCell>
+                                            <textFieldCell key="dataCell" lineBreakMode="truncatingTail" selectable="YES" alignment="left" title="Text Cell" id="3136">
+                                                <font key="font" metaFont="system"/>
+                                                <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                            </textFieldCell>
+                                        </tableColumn>
+                                    </tableColumns>
+                                    <connections>
+                                        <outlet property="dataSource" destination="206" id="3097"/>
+                                        <outlet property="fActionMenu" destination="1936" id="3098"/>
+                                        <outlet property="fContextNoRow" destination="589" id="3101"/>
+                                        <outlet property="fContextRow" destination="456" id="3100"/>
+                                        <outlet property="fController" destination="206" id="3102"/>
+                                        <outlet property="fDownloadMenu" destination="1945" id="3103"/>
+                                        <outlet property="fGlobalLimitItem" destination="3190" id="3193"/>
+                                        <outlet property="fPriorityMenu" destination="3197" id="3201"/>
+                                        <outlet property="fRatioMenu" destination="2018" id="3105"/>
+                                        <outlet property="fUploadMenu" destination="1951" id="3104"/>
+                                    </connections>
+                                </outlineView>
+                            </subviews>
+                            <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
+                        </clipView>
+                        <scroller key="horizontalScroller" hidden="YES" verticalHuggingPriority="750" id="3090">
+                            <rect key="frame" x="-100" y="-100" width="451" height="15"/>
+                            <autoresizingMask key="autoresizingMask"/>
+                        </scroller>
+                        <scroller key="verticalScroller" hidden="YES" verticalHuggingPriority="750" id="3089">
+                            <rect key="frame" x="453" y="0.0" width="15" height="173"/>
+                            <autoresizingMask key="autoresizingMask"/>
+                        </scroller>
+                    </scrollView>
+                </subviews>
+            </view>
+            <connections>
+                <outlet property="menu" destination="29" id="2687"/>
+            </connections>
+        </window>
+        <menu title="MainMenu" systemMenu="main" id="29" userLabel="MainMenu">
+            <items>
+                <menuItem title="Transmission" id="56">
+                    <menu key="submenu" title="Transmission" systemMenu="apple" id="57">
+                        <items>
+                            <menuItem title="Transmission Hakkında" id="58">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="showAboutWindow:" target="206" id="1927"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Güncellemeleri Denetle" tag="1234" id="975">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="checkForUpdates:" target="1812" id="1814"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Bağış Yap" tag="5678" id="3212">
+                                <connections>
+                                    <action selector="linkDonate:" target="206" id="3213"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem isSeparatorItem="YES" id="196">
+                                <modifierMask key="keyEquivalentModifierMask" command="YES"/>
+                            </menuItem>
+                            <menuItem title="Tercihler..." keyEquivalent="," id="129">
+                                <connections>
+                                    <action selector="showPreferenceWindow:" target="206" id="1395"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem isSeparatorItem="YES" id="3211">
+                                <modifierMask key="keyEquivalentModifierMask" command="YES"/>
+                            </menuItem>
+                            <menuItem title="Servisler..." id="131">
+                                <menu key="submenu" title="Servisler..." systemMenu="services" id="130"/>
+                            </menuItem>
+                            <menuItem isSeparatorItem="YES" id="144">
+                                <modifierMask key="keyEquivalentModifierMask" command="YES"/>
+                            </menuItem>
+                            <menuItem title="Transmission'u Gizle" keyEquivalent="h" id="134">
+                                <connections>
+                                    <action selector="hide:" target="-2" id="152"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Diğerlerini Gizle" keyEquivalent="h" id="145">
+                                <modifierMask key="keyEquivalentModifierMask" option="YES" command="YES"/>
+                                <connections>
+                                    <action selector="hideOtherApplications:" target="-2" id="146"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Tümünü Göster" id="150">
+                                <connections>
+                                    <action selector="unhideAllApplications:" target="-2" id="153"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem isSeparatorItem="YES" id="149">
+                                <modifierMask key="keyEquivalentModifierMask" command="YES"/>
+                            </menuItem>
+                            <menuItem title="Transmission'dan Çık" keyEquivalent="q" id="136">
+                                <connections>
+                                    <action selector="terminate:" target="-2" id="614"/>
+                                </connections>
+                            </menuItem>
+                        </items>
+                    </menu>
+                </menuItem>
+                <menuItem title="Dosya" id="83">
+                    <menu key="submenu" title="Dosya" id="81">
+                        <items>
+                            <menuItem title="Torrent Dosyası Oluştur..." keyEquivalent="n" id="1921">
+                                <connections>
+                                    <action selector="createFile:" target="206" id="1922"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Torrent Dosyası Aç..." keyEquivalent="o" id="72">
+                                <connections>
+                                    <action selector="openShowSheet:" target="206" id="300"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Seçenekler Penceresi ile Aç..." tag="501" alternate="YES" keyEquivalent="o" id="1680">
+                                <modifierMask key="keyEquivalentModifierMask" option="YES" command="YES"/>
+                                <connections>
+                                    <action selector="openShowSheet:" target="206" id="1681"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Torrent Adresi Aç..." keyEquivalent="c" id="1846">
+                                <connections>
+                                    <action selector="openURLShowSheet:" target="206" id="1847"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem isSeparatorItem="YES" id="1926">
+                                <modifierMask key="keyEquivalentModifierMask" command="YES"/>
+                            </menuItem>
+                            <menuItem title="Pencereyi Kapat" keyEquivalent="w" id="73">
+                                <connections>
+                                    <action selector="performClose:" target="-1" id="193"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem isSeparatorItem="YES" id="79">
+                                <modifierMask key="keyEquivalentModifierMask" command="YES"/>
+                            </menuItem>
+                            <menuItem title="Göz At" keyEquivalent="y" id="3166">
+                                <connections>
+                                    <action selector="toggleQuickLook:" target="206" id="3168"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem isSeparatorItem="YES" id="3167">
+                                <modifierMask key="keyEquivalentModifierMask" command="YES"/>
+                            </menuItem>
+                            <menuItem title="Veri Dosyasını Taşı..." id="1891">
+                                <connections>
+                                    <action selector="moveDataFilesSelected:" target="206" id="3153"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Yeniden Adlandır..." id="3448">
+                                <connections>
+                                    <action selector="renameSelected:" target="206" id="3449"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem isSeparatorItem="YES" id="3215">
+                                <modifierMask key="keyEquivalentModifierMask" command="YES"/>
+                            </menuItem>
+                            <menuItem title="Torrent'i Farklı Kaydet..." tag="4" keyEquivalent="s" id="1533">
+                                <connections>
+                                    <action selector="copyTorrentFiles:" target="206" id="1893"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Mıknatıslı Bağı Panoya Kopyala..." id="3216">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="copyMagnetLinks:" target="206" id="3217"/>
+                                </connections>
+                            </menuItem>
+                        </items>
+                    </menu>
+                </menuItem>
+                <menuItem title="Düzen" id="163">
+                    <menu key="submenu" title="Düzen" id="169">
+                        <items>
+                            <menuItem title="Geri Al" keyEquivalent="z" id="3321">
+                                <connections>
+                                    <action selector="undo:" target="-1" id="3323"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Yinele" keyEquivalent="Z" id="3400">
+                                <connections>
+                                    <action selector="redo:" target="-1" id="3402"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem isSeparatorItem="YES" id="3322"/>
+                            <menuItem title="Kes" keyEquivalent="x" id="160">
+                                <connections>
+                                    <action selector="cut:" target="-1" id="175"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Kopyala" keyEquivalent="c" id="157">
+                                <connections>
+                                    <action selector="copy:" target="-1" id="181"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Yapıştır" keyEquivalent="v" id="171">
+                                <connections>
+                                    <action selector="paste:" target="-1" id="176"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Sil" id="1766">
+                                <connections>
+                                    <action selector="delete:" target="-1" id="1767"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Tümünü Seç" keyEquivalent="a" id="172">
+                                <connections>
+                                    <action selector="selectAll:" target="-1" id="179"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Seçimleri Kaldır" keyEquivalent="A" id="1675">
+                                <connections>
+                                    <action selector="deselectAll:" target="-1" id="1677"/>
+                                </connections>
+                            </menuItem>
+                        </items>
+                    </menu>
+                </menuItem>
+                <menuItem title="Görünüm" id="301">
+                    <menu key="submenu" title="Görünüm" id="302">
+                        <items>
+                            <menuItem title="Küçük Görünüm" keyEquivalent="t" id="1578">
+                                <connections>
+                                    <action selector="toggleSmallView:" target="206" id="1579"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Parçalar Çubuğu" keyEquivalent="t" id="2185">
+                                <modifierMask key="keyEquivalentModifierMask" option="YES" command="YES"/>
+                                <connections>
+                                    <action selector="togglePiecesBar:" target="206" id="2186"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Uygunluk" id="2279">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="toggleAvailabilityBar:" target="206" id="2280"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem isSeparatorItem="YES" id="1282">
+                                <modifierMask key="keyEquivalentModifierMask" command="YES"/>
+                            </menuItem>
+                            <menuItem title="Öbekleri Kullan" keyEquivalent="g" id="3078">
+                                <connections>
+                                    <action selector="setSortByGroup:" target="206" id="3079"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Aktarımları Sırala" id="1894">
+                                <menu key="submenu" title="Aktarımları Sırala" id="1895">
+                                    <items>
+                                        <menuItem title="Sıraya Göre" id="1901">
+                                            <connections>
+                                                <action selector="setSort:" target="206" id="1903"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Etkinlik" tag="6" id="2324">
+                                            <connections>
+                                                <action selector="setSort:" target="206" id="2325"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Ekleme Tarihi" tag="1" id="1900">
+                                            <connections>
+                                                <action selector="setSort:" target="206" id="1904"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Ad" tag="2" id="1902">
+                                            <connections>
+                                                <action selector="setSort:" target="206" id="1905"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="İndirme Durumu" tag="3" id="1896">
+                                            <connections>
+                                                <action selector="setSort:" target="206" id="1906"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Boyut" tag="7" id="3430">
+                                            <connections>
+                                                <action selector="setSort:" target="206" id="3431"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Durum" tag="4" id="1897">
+                                            <connections>
+                                                <action selector="setSort:" target="206" id="1907"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="İzleyici" tag="5" id="1933">
+                                            <connections>
+                                                <action selector="setSort:" target="206" id="1934"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem isSeparatorItem="YES" id="2881">
+                                            <modifierMask key="keyEquivalentModifierMask" command="YES"/>
+                                        </menuItem>
+                                        <menuItem title="Artan" id="1899">
+                                            <connections>
+                                                <action selector="setSortReverse:" target="206" id="1908"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Azalan" tag="1" id="3405">
+                                            <connections>
+                                                <action selector="setSortReverse:" target="206" id="3406"/>
+                                            </connections>
+                                        </menuItem>
+                                    </items>
+                                </menu>
+                            </menuItem>
+                            <menuItem isSeparatorItem="YES" id="1591">
+                                <modifierMask key="keyEquivalentModifierMask" command="YES"/>
+                            </menuItem>
+                            <menuItem title="Denetçiyi Göster" keyEquivalent="i" id="1536">
+                                <connections>
+                                    <action selector="showInfo:" target="206" id="1538"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem isSeparatorItem="YES" id="1537">
+                                <modifierMask key="keyEquivalentModifierMask" command="YES"/>
+                            </menuItem>
+                            <menuItem title="Durum Çubuğunu Gizle" keyEquivalent="b" id="547">
+                                <connections>
+                                    <action selector="toggleStatusBar:" target="206" id="1224"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Süzgeç Çubuğunu Gizle" keyEquivalent="f" id="1620">
+                                <connections>
+                                    <action selector="toggleFilterBar:" target="206" id="1621"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem isSeparatorItem="YES" id="1293">
+                                <modifierMask key="keyEquivalentModifierMask" command="YES"/>
+                            </menuItem>
+                            <menuItem title="Araç Çubuğunu Gizle" id="1222">
+                                <connections>
+                                    <action selector="toggleToolbarShown:" target="-1" id="1251"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Araç Çubuğunu Özelleştir..." id="545">
+                                <connections>
+                                    <action selector="runToolbarCustomizationPalette:" target="-1" id="1252"/>
+                                </connections>
+                            </menuItem>
+                        </items>
+                    </menu>
+                </menuItem>
+                <menuItem title="Aktarımlar" id="1399">
+                    <menu key="submenu" title="Aktarımlar" id="1400">
+                        <items>
+                            <menuItem title="Hız Limiti" keyEquivalent="l" id="1566">
+                                <connections>
+                                    <action selector="toggleSpeedLimit:" target="206" id="2144"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem isSeparatorItem="YES" id="1567">
+                                <modifierMask key="keyEquivalentModifierMask" command="YES"/>
+                            </menuItem>
+                            <menuItem title="Seçiliyi Beklet" keyEquivalent="." id="1403">
+                                <connections>
+                                    <action selector="stopSelectedTorrents:" target="206" id="1581"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Seçiliyi Sürdür" keyEquivalent="/" id="1404">
+                                <connections>
+                                    <action selector="resumeSelectedTorrents:" target="206" id="1582"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem isSeparatorItem="YES" id="1412">
+                                <modifierMask key="keyEquivalentModifierMask" command="YES"/>
+                            </menuItem>
+                            <menuItem title="Dizelgeden Kaldır" tag="2" id="1516">
+                                <string key="keyEquivalent" base64-UTF8="YES">
+CA
+</string>
+                                <connections>
+                                    <action selector="removeNoDelete:" target="206" id="1546"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Veri Dosyasını Kaldır" tag="4" id="1514">
+                                <string key="keyEquivalent" base64-UTF8="YES">
+CA
+</string>
+                                <modifierMask key="keyEquivalentModifierMask" option="YES" command="YES"/>
+                                <connections>
+                                    <action selector="removeDeleteData:" target="206" id="1547"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Tüm Bitenleri Dizelgeden Kaldır" id="3407">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="clearCompleted:" target="206" id="3409"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem isSeparatorItem="YES" id="1526">
+                                <modifierMask key="keyEquivalentModifierMask" command="YES"/>
+                            </menuItem>
+                            <menuItem title="Finder'da Göster" keyEquivalent="r" id="1539">
+                                <connections>
+                                    <action selector="revealFile:" target="-1" id="1543"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem isSeparatorItem="YES" id="1541">
+                                <modifierMask key="keyEquivalentModifierMask" command="YES"/>
+                            </menuItem>
+                            <menuItem title="Tümünü Beklet" keyEquivalent="." id="1413">
+                                <modifierMask key="keyEquivalentModifierMask" option="YES" command="YES"/>
+                                <connections>
+                                    <action selector="stopAllTorrents:" target="206" id="1417"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Tümünü Sürdür" keyEquivalent="/" id="1414">
+                                <modifierMask key="keyEquivalentModifierMask" option="YES" command="YES"/>
+                                <connections>
+                                    <action selector="resumeAllTorrents:" target="206" id="1418"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem isSeparatorItem="YES" id="1805">
+                                <modifierMask key="keyEquivalentModifierMask" command="YES"/>
+                            </menuItem>
+                            <menuItem title="Seçiliyi Anında Sürdür" id="1678">
+                                <connections>
+                                    <action selector="resumeSelectedTorrentsNoWait:" target="206" id="1806"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Tüm Bekleyenleri Sürdür" id="1804">
+                                <connections>
+                                    <action selector="resumeWaitingTorrents:" target="206" id="1807"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem isSeparatorItem="YES" id="1861">
+                                <modifierMask key="keyEquivalentModifierMask" command="YES"/>
+                            </menuItem>
+                            <menuItem title="Öbek" id="2839">
+                                <menu key="submenu" title="Öbek" id="2840">
+                                    <connections>
+                                        <outlet property="delegate" destination="206" id="2842"/>
+                                    </connections>
+                                </menu>
+                            </menuItem>
+                            <menuItem isSeparatorItem="YES" id="3408">
+                                <modifierMask key="keyEquivalentModifierMask" command="YES"/>
+                            </menuItem>
+                            <menuItem title="İzleyiciyi Güncelle" id="1860">
+                                <connections>
+                                    <action selector="announceSelectedTorrents:" target="206" id="1862"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Yerel Veriyi Doğrula" id="1877">
+                                <connections>
+                                    <action selector="verifySelectedTorrents:" target="206" id="3147"/>
+                                </connections>
+                            </menuItem>
+                        </items>
+                    </menu>
+                </menuItem>
+                <menuItem title="Pencere" id="1683">
+                    <menu key="submenu" title="Pencere" systemMenu="window" id="1684">
+                        <items>
+                            <menuItem title="Simge Durumuna Küçült" keyEquivalent="m" id="1685">
+                                <connections>
+                                    <action selector="performMiniaturize:" target="-1" id="1691"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Büyült/Küçült" id="1688">
+                                <connections>
+                                    <action selector="performZoom:" target="-1" id="1690"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem isSeparatorItem="YES" id="1692">
+                                <modifierMask key="keyEquivalentModifierMask" command="YES"/>
+                            </menuItem>
+                            <menuItem title="Sonraki Denetçi Sekmesi" keyEquivalent="" id="1693">
+                                <connections>
+                                    <action selector="setInfoTab:" target="206" id="1700"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Önceki Denetçi Sekmesi" keyEquivalent="" id="1694">
+                                <connections>
+                                    <action selector="setInfoTab:" target="206" id="1701"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem isSeparatorItem="YES" id="1695">
+                                <modifierMask key="keyEquivalentModifierMask" command="YES"/>
+                            </menuItem>
+                            <menuItem title="Sonraki Süzgeç Düğmesi" keyEquivalent="" id="1797">
+                                <modifierMask key="keyEquivalentModifierMask" option="YES" command="YES"/>
+                                <connections>
+                                    <action selector="switchFilter:" target="206" id="1802"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Önceki Süzgeç Düğmesi" keyEquivalent="" id="1798">
+                                <modifierMask key="keyEquivalentModifierMask" option="YES" command="YES"/>
+                                <connections>
+                                    <action selector="switchFilter:" target="206" id="1803"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem isSeparatorItem="YES" id="1799">
+                                <modifierMask key="keyEquivalentModifierMask" command="YES"/>
+                            </menuItem>
+                            <menuItem title="Transmission" keyEquivalent="1" id="1696">
+                                <connections>
+                                    <action selector="showMainWindow:" target="206" id="1702"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="İstatistikler" keyEquivalent="2" id="2301">
+                                <connections>
+                                    <action selector="showStatsWindow:" target="206" id="2302"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="İleti Günlüğü" keyEquivalent="3" id="1795">
+                                <connections>
+                                    <action selector="showMessageWindow:" target="206" id="1796"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem isSeparatorItem="YES" id="1697">
+                                <modifierMask key="keyEquivalentModifierMask" command="YES"/>
+                            </menuItem>
+                            <menuItem title="Tümünü Öne Getir" id="1687">
+                                <connections>
+                                    <action selector="arrangeInFront:" target="-1" id="1689"/>
+                                </connections>
+                            </menuItem>
+                        </items>
+                    </menu>
+                </menuItem>
+                <menuItem title="Yardım" id="103">
+                    <menu key="submenu" title="Yardım" autoenablesItems="NO" id="106">
+                        <items>
+                            <menuItem title="Transmission Yardımı" keyEquivalent="?" id="1561">
+                                <connections>
+                                    <action selector="showHelp:" target="-1" id="1562"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem isSeparatorItem="YES" id="1559">
+                                <modifierMask key="keyEquivalentModifierMask" command="YES"/>
+                            </menuItem>
+                            <menuItem title="Transmission Anasayfası" id="1558">
+                                <connections>
+                                    <action selector="linkHomepage:" target="206" id="1560"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Yazışmalıklar" id="418">
+                                <connections>
+                                    <action selector="linkForums:" target="206" id="421"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Destek &amp; Geliştirme" id="3170">
+                                <connections>
+                                    <action selector="linkTrac:" target="206" id="3171"/>
+                                </connections>
+                            </menuItem>
+                        </items>
+                    </menu>
+                </menuItem>
+            </items>
+        </menu>
+        <customObject id="206" userLabel="Controller" customClass="Controller">
+            <connections>
+                <outlet property="fActionButton" destination="3435" id="3438"/>
+                <outlet property="fActionMenu" destination="1041" id="3434"/>
+                <outlet property="fCheckRatioItem" destination="1317" id="3043"/>
+                <outlet property="fClearCompletedButton" destination="3420" id="3425"/>
+                <outlet property="fDownloadLimitItem" destination="1068" id="1464"/>
+                <outlet property="fDownloadMenu" destination="1060" id="1456"/>
+                <outlet property="fDownloadNoLimitItem" destination="1070" id="1463"/>
+                <outlet property="fGroupsSetContextMenu" destination="2850" id="2855"/>
+                <outlet property="fGroupsSetMenu" destination="2840" id="2843"/>
+                <outlet property="fNextFilterItem" destination="1797" id="1801"/>
+                <outlet property="fNextInfoTabItem" destination="1693" id="1703"/>
+                <outlet property="fNoCheckRatioItem" destination="1316" id="3044"/>
+                <outlet property="fOpenIgnoreDownloadFolder" destination="1680" id="1682"/>
+                <outlet property="fPrevInfoTabItem" destination="1694" id="1704"/>
+                <outlet property="fRatioStopMenu" destination="1310" id="3076"/>
+                <outlet property="fSortMenu" destination="1895" id="3440"/>
+                <outlet property="fSpeedLimitButton" destination="2690" id="2703"/>
+                <outlet property="fTableView" destination="3091" id="3118"/>
+                <outlet property="fTotalTorrentsField" destination="2700" id="2702"/>
+                <outlet property="fUploadLimitItem" destination="1046" id="1466"/>
+                <outlet property="fUploadMenu" destination="1045" id="1455"/>
+                <outlet property="fUploadNoLimitItem" destination="1058" id="1465"/>
+                <outlet property="fWindow" destination="21" id="246"/>
+            </connections>
+        </customObject>
+        <menu title="Menu" id="456" userLabel="ContextRowMenu">
+            <items>
+                <menuItem title="Seçiliyi Beklet" tag="1" id="457">
+                    <connections>
+                        <action selector="stopSelectedTorrents:" target="206" id="1583"/>
+                    </connections>
+                </menuItem>
+                <menuItem title="Seçiliyi Sürdür" tag="1" id="1028">
+                    <connections>
+                        <action selector="resumeSelectedTorrents:" target="206" id="1584"/>
+                    </connections>
+                </menuItem>
+                <menuItem title="Seçiliyi Anında Sürdür" tag="1" id="1808">
+                    <connections>
+                        <action selector="resumeSelectedTorrentsNoWait:" target="206" id="1809"/>
+                    </connections>
+                </menuItem>
+                <menuItem isSeparatorItem="YES" id="613">
+                    <modifierMask key="keyEquivalentModifierMask" command="YES"/>
+                </menuItem>
+                <menuItem title="Dizelgeden Kaldır" tag="2" id="1550">
+                    <connections>
+                        <action selector="removeNoDelete:" target="206" id="1554"/>
+                    </connections>
+                </menuItem>
+                <menuItem title="Veri Dosyasını Kaldır" tag="4" id="1551">
+                    <modifierMask key="keyEquivalentModifierMask" option="YES" command="YES"/>
+                    <connections>
+                        <action selector="removeDeleteData:" target="206" id="1555"/>
+                    </connections>
+                </menuItem>
+                <menuItem isSeparatorItem="YES" id="3172">
+                    <modifierMask key="keyEquivalentModifierMask" command="YES"/>
+                </menuItem>
+                <menuItem title="Finder'da Göster" id="516">
+                    <connections>
+                        <action selector="revealFile:" target="206" id="1467"/>
+                    </connections>
+                </menuItem>
+                <menuItem isSeparatorItem="YES" id="1522">
+                    <modifierMask key="keyEquivalentModifierMask" command="YES"/>
+                </menuItem>
+                <menuItem title="Öbek" id="2849">
+                    <menu key="submenu" title="Öbek" id="2850">
+                        <connections>
+                            <outlet property="delegate" destination="206" id="2854"/>
+                        </connections>
+                    </menu>
+                </menuItem>
+                <menuItem isSeparatorItem="YES" id="3206">
+                    <modifierMask key="keyEquivalentModifierMask" command="YES"/>
+                </menuItem>
+                <menuItem title="Veri Dosyasını Taşı..." id="3209">
+                    <connections>
+                        <action selector="moveDataFilesSelected:" target="206" id="3210"/>
+                    </connections>
+                </menuItem>
+                <menuItem title="Yeniden Adlandır..." tag="4" id="3445">
+                    <modifierMask key="keyEquivalentModifierMask"/>
+                    <connections>
+                        <action selector="renameSelected:" target="206" id="3447"/>
+                    </connections>
+                </menuItem>
+                <menuItem isSeparatorItem="YES" id="3220">
+                    <modifierMask key="keyEquivalentModifierMask" command="YES"/>
+                </menuItem>
+                <menuItem title="Torrent'i Farklı Kaydet..." tag="4" id="3207">
+                    <modifierMask key="keyEquivalentModifierMask"/>
+                    <connections>
+                        <action selector="copyTorrentFiles:" target="206" id="3208"/>
+                    </connections>
+                </menuItem>
+                <menuItem title="Mıknatıslı Bağı Panoya Kopyala..." id="3218">
+                    <modifierMask key="keyEquivalentModifierMask"/>
+                    <connections>
+                        <action selector="copyMagnetLinks:" target="206" id="3219"/>
+                    </connections>
+                </menuItem>
+                <menuItem isSeparatorItem="YES" id="2848">
+                    <modifierMask key="keyEquivalentModifierMask" command="YES"/>
+                </menuItem>
+                <menuItem title="İzleyiciyi Güncelle" id="2122">
+                    <connections>
+                        <action selector="announceSelectedTorrents:" target="206" id="2124"/>
+                    </connections>
+                </menuItem>
+                <menuItem isSeparatorItem="YES" id="3450">
+                    <modifierMask key="keyEquivalentModifierMask" command="YES"/>
+                </menuItem>
+                <menuItem title="Denetçiyi Göster" tag="6" id="459">
+                    <connections>
+                        <action selector="showInfo:" target="206" id="477"/>
+                    </connections>
+                </menuItem>
+            </items>
+        </menu>
+        <menu title="Menu" id="589" userLabel="ContextNoRowMenu">
+            <items>
+                <menuItem title="Torrent Dosyası Oluştur..." id="1923">
+                    <connections>
+                        <action selector="createFile:" target="206" id="1924"/>
+                    </connections>
+                </menuItem>
+                <menuItem title="Torrent Dosyası Aç..." id="611">
+                    <connections>
+                        <action selector="openShowSheet:" target="206" id="612"/>
+                    </connections>
+                </menuItem>
+                <menuItem title="Torrent Dosyası Aç..." id="1858">
+                    <connections>
+                        <action selector="openURLShowSheet:" target="206" id="1859"/>
+                    </connections>
+                </menuItem>
+                <menuItem isSeparatorItem="YES" id="3077">
+                    <modifierMask key="keyEquivalentModifierMask" command="YES"/>
+                </menuItem>
+                <menuItem title="Denetçiyi Göster" tag="6" id="598">
+                    <connections>
+                        <action selector="showInfo:" target="206" id="605"/>
+                    </connections>
+                </menuItem>
+            </items>
+        </menu>
+        <customObject id="1812" userLabel="SUUpdater" customClass="SUUpdater"/>
+        <userDefaultsController representsSharedInstance="YES" id="1815" userLabel="Shared Defaults"/>
+        <menu title="ActionMenu" id="1041" userLabel="ActionMenu">
+            <items>
+                <menuItem title="Seçili Dosyaların Durumu" id="3163">
+                    <connections>
+                        <action selector="toggleStatusString:" target="206" id="3165"/>
+                    </connections>
+                </menuItem>
+                <menuItem isSeparatorItem="YES" id="3164">
+                    <modifierMask key="keyEquivalentModifierMask" command="YES"/>
+                </menuItem>
+                <menuItem title="Öbekleri Kullan" id="3080">
+                    <connections>
+                        <action selector="setSortByGroup:" target="206" id="3081"/>
+                    </connections>
+                </menuItem>
+                <menuItem title="Aktarımları Sırala:" id="1638">
+                    <menu key="submenu" title="Aktarımları Sırala:" id="1639">
+                        <items>
+                            <menuItem title="Sıraya Göre" id="1646">
+                                <connections>
+                                    <action selector="setSort:" target="206" id="1657"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Etkinlik" tag="6" id="2326">
+                                <connections>
+                                    <action selector="setSort:" target="206" id="2327"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Ekleme Tarihi" tag="1" id="1642">
+                                <connections>
+                                    <action selector="setSort:" target="206" id="1653"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Ad" tag="2" id="1643">
+                                <connections>
+                                    <action selector="setSort:" target="206" id="1654"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="İndirme Durumu" tag="3" id="1644">
+                                <connections>
+                                    <action selector="setSort:" target="206" id="1655"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Boyut" tag="7" id="1645">
+                                <connections>
+                                    <action selector="setSort:" target="206" id="1656"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Durum" tag="4" id="3432">
+                                <connections>
+                                    <action selector="setSort:" target="206" id="3433"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="İzleyici" tag="5" id="1930">
+                                <connections>
+                                    <action selector="setSort:" target="206" id="1931"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem isSeparatorItem="YES" id="2883">
+                                <modifierMask key="keyEquivalentModifierMask" command="YES"/>
+                            </menuItem>
+                            <menuItem title="Artan" id="1884">
+                                <connections>
+                                    <action selector="setSortReverse:" target="206" id="1887"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Azalan" tag="1" id="3403">
+                                <connections>
+                                    <action selector="setSortReverse:" target="206" id="3404"/>
+                                </connections>
+                            </menuItem>
+                        </items>
+                    </menu>
+                </menuItem>
+                <menuItem isSeparatorItem="YES" id="1641">
+                    <modifierMask key="keyEquivalentModifierMask" command="YES"/>
+                </menuItem>
+                <menuItem title="İndirme Bant Genişliği Limiti" id="1059">
+                    <menu key="submenu" title="İndirme Bant Genişliği Limiti" id="1060">
+                        <items>
+                            <menuItem title="Limitsiz" id="1070">
+                                <connections>
+                                    <action selector="setLimitGlobalEnabled:" target="206" id="1426"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="limit" id="1068">
+                                <connections>
+                                    <action selector="setLimitGlobalEnabled:" target="206" id="1427"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem isSeparatorItem="YES" id="1064">
+                                <modifierMask key="keyEquivalentModifierMask" command="YES"/>
+                            </menuItem>
+                        </items>
+                        <connections>
+                            <outlet property="delegate" destination="206" id="3074"/>
+                        </connections>
+                    </menu>
+                </menuItem>
+                <menuItem title="Gönderme Bant Genişliği Limiti" id="1044">
+                    <menu key="submenu" title="Gönderme Bant Genişliği Limiti" id="1045">
+                        <items>
+                            <menuItem title="Limitsiz" id="1058">
+                                <connections>
+                                    <action selector="setLimitGlobalEnabled:" target="206" id="1424"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="limit" id="1046">
+                                <connections>
+                                    <action selector="setLimitGlobalEnabled:" target="206" id="1425"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem isSeparatorItem="YES" id="1048">
+                                <modifierMask key="keyEquivalentModifierMask" command="YES"/>
+                            </menuItem>
+                        </items>
+                        <connections>
+                            <outlet property="delegate" destination="206" id="3073"/>
+                        </connections>
+                    </menu>
+                </menuItem>
+                <menuItem isSeparatorItem="YES" id="1341">
+                    <modifierMask key="keyEquivalentModifierMask" command="YES"/>
+                </menuItem>
+                <menuItem title="Şu Orana Varınca Durdur:" id="1309">
+                    <menu key="submenu" title="Şu Orana Varınca Durdur:" id="1310">
+                        <items>
+                            <menuItem title="Sonsuza dek Besle" id="1316">
+                                <connections>
+                                    <action selector="setRatioGlobalEnabled:" target="206" id="3042"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="durma oranı" id="1317">
+                                <connections>
+                                    <action selector="setRatioGlobalEnabled:" target="206" id="3041"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem isSeparatorItem="YES" id="1318">
+                                <modifierMask key="keyEquivalentModifierMask" command="YES"/>
+                            </menuItem>
+                        </items>
+                        <connections>
+                            <outlet property="delegate" destination="206" id="3075"/>
+                        </connections>
+                    </menu>
+                </menuItem>
+            </items>
+        </menu>
+        <menu title="Menu" autoenablesItems="NO" id="1936" userLabel="TorrentActionMenu">
+            <items>
+                <menuItem title="Öncelik" id="3196">
+                    <modifierMask key="keyEquivalentModifierMask"/>
+                    <menu key="submenu" title="Öncelik" id="3197">
+                        <items>
+                            <menuItem title="Yüksek" image="PriorityHighTemplate" tag="101" id="3198">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="setPriority:" target="3091" id="3202"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Olağan" image="PriorityNormalTemplate" tag="102" id="3199">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="setPriority:" target="3091" id="3203"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Düşük" image="PriorityLowTemplate" tag="103" id="3200">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="setPriority:" target="3091" id="3204"/>
+                                </connections>
+                            </menuItem>
+                        </items>
+                        <connections>
+                            <outlet property="delegate" destination="3091" id="3205"/>
+                        </connections>
+                    </menu>
+                </menuItem>
+                <menuItem isSeparatorItem="YES" id="3195">
+                    <modifierMask key="keyEquivalentModifierMask" command="YES"/>
+                </menuItem>
+                <menuItem title="İndirme Bant Genişliği Limiti" id="1944">
+                    <menu key="submenu" title="İndirme Bant Genişliği Limiti" id="1945">
+                        <items>
+                            <menuItem title="Limitsiz" tag="102" id="1946">
+                                <connections>
+                                    <action selector="setQuickLimitMode:" target="3091" id="3110"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="limit" tag="103" id="1960">
+                                <connections>
+                                    <action selector="setQuickLimitMode:" target="3091" id="3111"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem isSeparatorItem="YES" id="1971">
+                                <modifierMask key="keyEquivalentModifierMask" command="YES"/>
+                            </menuItem>
+                        </items>
+                        <connections>
+                            <outlet property="delegate" destination="3091" id="3121"/>
+                        </connections>
+                    </menu>
+                </menuItem>
+                <menuItem title="Gönderme Bant Genişliği Limiti" id="1950">
+                    <menu key="submenu" title="Gönderme Bant Genişliği Limiti" id="1951">
+                        <items>
+                            <menuItem title="Limitsiz" tag="102" id="1963">
+                                <modifierMask key="keyEquivalentModifierMask" shift="YES"/>
+                                <connections>
+                                    <action selector="setQuickLimitMode:" target="3091" id="3113"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="limit" tag="103" id="1964">
+                                <connections>
+                                    <action selector="setQuickLimitMode:" target="3091" id="3114"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem isSeparatorItem="YES" id="2005">
+                                <modifierMask key="keyEquivalentModifierMask" command="YES"/>
+                            </menuItem>
+                        </items>
+                        <connections>
+                            <outlet property="delegate" destination="3091" id="3122"/>
+                        </connections>
+                    </menu>
+                </menuItem>
+                <menuItem title="Genel Bant Genişliği Limiti İçinde Kal" id="3190">
+                    <connections>
+                        <action selector="setGlobalLimit:" target="3091" id="3191"/>
+                    </connections>
+                </menuItem>
+                <menuItem isSeparatorItem="YES" id="2029">
+                    <modifierMask key="keyEquivalentModifierMask" command="YES"/>
+                </menuItem>
+                <menuItem title="Şu Orana Varınca Durdur:" id="2017">
+                    <menu key="submenu" title="Şu Orana Varınca Durdur:" id="2018">
+                        <items>
+                            <menuItem title="Genel" tag="101" id="2031">
+                                <connections>
+                                    <action selector="setQuickRatioMode:" target="3091" id="3115"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Sonsuza dek Besle" tag="102" id="2024">
+                                <connections>
+                                    <action selector="setQuickRatioMode:" target="3091" id="3116"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="durma oranı" tag="103" id="2025">
+                                <connections>
+                                    <action selector="setQuickRatioMode:" target="3091" id="3117"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem isSeparatorItem="YES" id="2026">
+                                <modifierMask key="keyEquivalentModifierMask" command="YES"/>
+                            </menuItem>
+                        </items>
+                        <connections>
+                            <outlet property="delegate" destination="3091" id="3123"/>
+                        </connections>
+                    </menu>
+                </menuItem>
+            </items>
+            <connections>
+                <outlet property="delegate" destination="3091" id="3120"/>
+            </connections>
+        </menu>
+    </objects>
+    <resources>
+        <image name="6F86AAE5-CFD0-4E2D-B9B7-3737FC5C72B3" width="62" height="62">
+            <mutableData key="keyedArchiveRepresentation">
+YnBsaXN0MDDUAQIDBAUGRkdYJHZlcnNpb25YJG9iamVjdHNZJGFyY2hpdmVyVCR0b3ASAAGGoK8QDwcI
+ExQZHh8qKyw0NzpAQ1UkbnVsbNUJCgsMDQ4PEBESVk5TU2l6ZVYkY2xhc3NcTlNJbWFnZUZsYWdzVk5T
+UmVwc1dOU0NvbG9ygAKADhIgwAAAgAOADFh7NjIsIDYyfdIVChYYWk5TLm9iamVjdHOhF4AEgAvSFQoa
+HaIbHIAFgAaAChAA1iAhCiIjJCUmJygpHl8QEE5TQ2FjaGVXaW5kb3dCUFNfEBdOU0NhY2hlV2luZG93
+Q29sb3JTcGFjZV8QFE5TVElGRlJlcHJlc2VudGF0aW9uXxAQTlNDYWNoZVdpbmRvd0JQUF8QFU5TQ2Fj
+aGVXaW5kb3dJc1BsYW5hchAIgAiACYAHEBhPEQ7QTU0AKgAAAUqAOyBP8AQWDQeEQmFQuGQ2HQ+IRGJR
+OKRWLReMRCBOyCRmPR+QSGRSOSSWGRuOyaVSuWS2XS+DyiYTOaTWbTcATKcTueT2fRqBz+hUOiTadUWk
+UmlR+j0unU+oQqm1GqVWkVOrVmtTisVuvV+WV2wWOyUyg2W0WmMWK1W23Qi2W+5Wq43O7WO63e9Vq83u
+/VG+3/BUrA4PDUPC4fFTzE4vHTXG4/JS7I5PLSbK5fNSHM5vPRh16GU5/SSzQuvR6XVSTT6nV6+P63Yb
+OQbLabeL7bcbuJbreb+G77gcOEcLicfjcfh8nlb/mc3d8/obfpdPZ9Xra/sdnVdvuaTvd/PeHxZryeXL
+ef0ZL1evHe33Yr4fHDfP6YL7fe/fn9Xr+P6uz/wAuUBQGt0CwMtUEQStEFwYskHQesEIwkr0KQqrSAgA
+AA8BAAADAAAAAQA+AAABAQADAAAAAQA+AAABAgADAAAABAAAAgQBAwADAAAAAQAFAAABBgADAAAAAQAC
+AAABEQAEAAAAAQAAAAgBEgADAAAAAQABAAABFQADAAAAAQAEAAABFgADAAAAAQA+AAABFwAEAAAAAQAA
+AUEBHAADAAAAAQABAAABPQADAAAAAQACAAABUgADAAAAAQABAAABUwADAAAABAAAAgyHcwAHAAAMvAAA
+AhQAAAAAAAgACAAIAAgAAQABAAEAAQAADLxhcHBsAhAAAG1udHJSR0IgWFlaIAfeAAEACAAJADUAF2Fj
+c3BBUFBMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD21gABAAAAANMtYXBwbAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEWRlc2MAAAFQAAAAYmRzY20AAAG0AAABpGNw
+cnQAAANYAAAAI3d0cHQAAAN8AAAAFHJYWVoAAAOQAAAAFGdYWVoAAAOkAAAAFGJYWVoAAAO4AAAAFHJU
+UkMAAAPMAAAIDGFhcmcAAAvYAAAAIHZjZ3QAAAv4AAAAMG5kaW4AAAwoAAAAPmNoYWQAAAxoAAAALG1t
+b2QAAAyUAAAAKGJUUkMAAAPMAAAIDGdUUkMAAAPMAAAIDGFhYmcAAAvYAAAAIGFhZ2cAAAvYAAAAIGRl
+c2MAAAAAAAAACERpc3BsYXkAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABtbHVjAAAAAAAAACEAAAAMaHJIUgAA
+AAgAAAGca29LUgAAAAgAAAGcbmJOTwAAAAgAAAGcaWQAAAAAAAgAAAGcaHVIVQAAAAgAAAGcY3NDWgAA
+AAgAAAGcZGFESwAAAAgAAAGcdWtVQQAAAAgAAAGcYXIAAAAAAAgAAAGcaXRJVAAAAAgAAAGccm9STwAA
+AAgAAAGcbmxOTAAAAAgAAAGcaGVJTAAAAAgAAAGcZXNFUwAAAAgAAAGcZmlGSQAAAAgAAAGcemhUVwAA
+AAgAAAGcdmlWTgAAAAgAAAGcc2tTSwAAAAgAAAGcemhDTgAAAAgAAAGccnVSVQAAAAgAAAGcZnJGUgAA
+AAgAAAGcbXMAAAAAAAgAAAGcY2FFUwAAAAgAAAGcdGhUSAAAAAgAAAGcZGVERQAAAAgAAAGcZW5VUwAA
+AAgAAAGccHRCUgAAAAgAAAGccGxQTAAAAAgAAAGcZWxHUgAAAAgAAAGcc3ZTRQAAAAgAAAGcdHJUUgAA
+AAgAAAGcamFKUAAAAAgAAAGccHRQVAAAAAgAAAGcAGkATQBhAGN0ZXh0AAAAAENvcHlyaWdodCBBcHBs
+ZSBJbmMuLCAyMDE0AABYWVogAAAAAAAA8xYAAQAAAAEWylhZWiAAAAAAAABxwAAAOYoAAAFnWFlaIAAA
+AAAAAGEjAAC55gAAE/ZYWVogAAAAAAAAI/IAAAyQAAC90GN1cnYAAAAAAAAEAAAAAAUACgAPABQAGQAe
+ACMAKAAtADIANgA7AEAARQBKAE8AVABZAF4AYwBoAG0AcgB3AHwAgQCGAIsAkACVAJoAnwCjAKgArQCy
+ALcAvADBAMYAywDQANUA2wDgAOUA6wDwAPYA+wEBAQcBDQETARkBHwElASsBMgE4AT4BRQFMAVIBWQFg
+AWcBbgF1AXwBgwGLAZIBmgGhAakBsQG5AcEByQHRAdkB4QHpAfIB+gIDAgwCFAIdAiYCLwI4AkECSwJU
+Al0CZwJxAnoChAKOApgCogKsArYCwQLLAtUC4ALrAvUDAAMLAxYDIQMtAzgDQwNPA1oDZgNyA34DigOW
+A6IDrgO6A8cD0wPgA+wD+QQGBBMEIAQtBDsESARVBGMEcQR+BIwEmgSoBLYExATTBOEE8AT+BQ0FHAUr
+BToFSQVYBWcFdwWGBZYFpgW1BcUF1QXlBfYGBgYWBicGNwZIBlkGagZ7BowGnQavBsAG0QbjBvUHBwcZ
+BysHPQdPB2EHdAeGB5kHrAe/B9IH5Qf4CAsIHwgyCEYIWghuCIIIlgiqCL4I0gjnCPsJEAklCToJTwlk
+CXkJjwmkCboJzwnlCfsKEQonCj0KVApqCoEKmAquCsUK3ArzCwsLIgs5C1ELaQuAC5gLsAvIC+EL+QwS
+DCoMQwxcDHUMjgynDMAM2QzzDQ0NJg1ADVoNdA2ODakNww3eDfgOEw4uDkkOZA5/DpsOtg7SDu4PCQ8l
+D0EPXg96D5YPsw/PD+wQCRAmEEMQYRB+EJsQuRDXEPURExExEU8RbRGMEaoRyRHoEgcSJhJFEmQShBKj
+EsMS4xMDEyMTQxNjE4MTpBPFE+UUBhQnFEkUahSLFK0UzhTwFRIVNBVWFXgVmxW9FeAWAxYmFkkWbBaP
+FrIW1hb6Fx0XQRdlF4kXrhfSF/cYGxhAGGUYihivGNUY+hkgGUUZaxmRGbcZ3RoEGioaURp3Gp4axRrs
+GxQbOxtjG4obshvaHAIcKhxSHHscoxzMHPUdHh1HHXAdmR3DHeweFh5AHmoelB6+HukfEx8+H2kflB+/
+H+ogFSBBIGwgmCDEIPAhHCFIIXUhoSHOIfsiJyJVIoIiryLdIwojOCNmI5QjwiPwJB8kTSR8JKsk2iUJ
+JTglaCWXJccl9yYnJlcmhya3JugnGCdJJ3onqyfcKA0oPyhxKKIo1CkGKTgpaymdKdAqAio1KmgqmyrP
+KwIrNitpK50r0SwFLDksbiyiLNctDC1BLXYtqy3hLhYuTC6CLrcu7i8kL1ovkS/HL/4wNTBsMKQw2zES
+MUoxgjG6MfIyKjJjMpsy1DMNM0YzfzO4M/E0KzRlNJ402DUTNU01hzXCNf02NzZyNq426TckN2A3nDfX
+OBQ4UDiMOMg5BTlCOX85vDn5OjY6dDqyOu87LTtrO6o76DwnPGU8pDzjPSI9YT2hPeA+ID5gPqA+4D8h
+P2E/oj/iQCNAZECmQOdBKUFqQaxB7kIwQnJCtUL3QzpDfUPARANER0SKRM5FEkVVRZpF3kYiRmdGq0bw
+RzVHe0fASAVIS0iRSNdJHUljSalJ8Eo3Sn1KxEsMS1NLmkviTCpMcky6TQJNSk2TTdxOJU5uTrdPAE9J
+T5NP3VAnUHFQu1EGUVBRm1HmUjFSfFLHUxNTX1OqU/ZUQlSPVNtVKFV1VcJWD1ZcVqlW91dEV5JX4Fgv
+WH1Yy1kaWWlZuFoHWlZaplr1W0VblVvlXDVchlzWXSddeF3JXhpebF69Xw9fYV+zYAVgV2CqYPxhT2Gi
+YfViSWKcYvBjQ2OXY+tkQGSUZOllPWWSZedmPWaSZuhnPWeTZ+loP2iWaOxpQ2maafFqSGqfavdrT2un
+a/9sV2yvbQhtYG25bhJua27Ebx5veG/RcCtwhnDgcTpxlXHwcktypnMBc11zuHQUdHB0zHUodYV14XY+
+dpt2+HdWd7N4EXhueMx5KnmJeed6RnqlewR7Y3vCfCF8gXzhfUF9oX4BfmJ+wn8jf4R/5YBHgKiBCoFr
+gc2CMIKSgvSDV4O6hB2EgITjhUeFq4YOhnKG14c7h5+IBIhpiM6JM4mZif6KZIrKizCLlov8jGOMyo0x
+jZiN/45mjs6PNo+ekAaQbpDWkT+RqJIRknqS45NNk7aUIJSKlPSVX5XJljSWn5cKl3WX4JhMmLiZJJmQ
+mfyaaJrVm0Kbr5wcnImc951kndKeQJ6unx2fi5/6oGmg2KFHobaiJqKWowajdqPmpFakx6U4pammGqaL
+pv2nbqfgqFKoxKk3qamqHKqPqwKrdavprFys0K1ErbiuLa6hrxavi7AAsHWw6rFgsdayS7LCszizrrQl
+tJy1E7WKtgG2ebbwt2i34LhZuNG5SrnCuju6tbsuu6e8IbybvRW9j74KvoS+/796v/XAcMDswWfB48Jf
+wtvDWMPUxFHEzsVLxcjGRsbDx0HHv8g9yLzJOsm5yjjKt8s2y7bMNcy1zTXNtc42zrbPN8+40DnQutE8
+0b7SP9LB00TTxtRJ1MvVTtXR1lXW2Ndc1+DYZNjo2WzZ8dp22vvbgNwF3IrdEN2W3hzeot8p36/gNuC9
+4UThzOJT4tvjY+Pr5HPk/OWE5g3mlucf56noMui86Ubp0Opb6uXrcOv77IbtEe2c7ijutO9A78zwWPDl
+8XLx//KM8xnzp/Q09ML1UPXe9m32+/eK+Bn4qPk4+cf6V/rn+3f8B/yY/Sn9uv5L/tz/bf//cGFyYQAA
+AAAAAwAAAAJmZgAA8qcAAA1ZAAAT0AAACg52Y2d0AAAAAAAAAAEAAQAAAAAAAAABAAAAAQAAAAAAAAAB
+AAAAAQAAAAAAAAABAABuZGluAAAAAAAAADYAAKdAAABVgAAATMAAAJ7AAAAlgAAADMAAAFAAAABUQAAC
+MzMAAjMzAAIzMwAAAAAAAAAAc2YzMgAAAAAAAQxyAAAF+P//8x0AAAe6AAD9cv//+53///2kAAAD2QAA
+wHFtbW9kAAAAAAAABhAAAKAHAAAAAMknHgAAAAAAAAAAAAAAAAAAAAAAXxAZTlNDYWxpYnJhdGVkUkdC
+Q29sb3JTcGFjZdItLi8wWiRjbGFzc25hbWVYJGNsYXNzZXNfEBBOU0NhY2hlZEltYWdlUmVwozEyM18Q
+EE5TQ2FjaGVkSW1hZ2VSZXBaTlNJbWFnZVJlcFhOU09iamVjdNItLjU2V05TQXJyYXmiNTPSLS44OV5O
+U011dGFibGVBcnJheaM4NTPTOzwKPT4/V05TV2hpdGVcTlNDb2xvclNwYWNlRDAgMAAQA4AN0i0uQUJX
+TlNDb2xvcqJBM9ItLkRFV05TSW1hZ2WiRDNfEA9OU0tleWVkQXJjaGl2ZXLRSElUcm9vdIABAAgAEQAa
+ACMALQAyADcASQBPAFoAYQBoAHUAfACEAIYAiACNAI8AkQCaAJ8AqgCsAK4AsAC1ALgAugC8AL4AwADN
+AOAA+gERASQBPAE+AUABQgFEAUYQGhA2EDsQRhBPEGIQZhB5EIQQjRCSEJoQnRCiELEQtRC8EMQQ0RDW
+ENgQ2hDfEOcQ6hDvEPcQ+hEMEQ8RFAAAAAAAAAIBAAAAAAAAAEoAAAAAAAAAAAAAAAAAABEWA
+</mutableData>
+        </image>
+        <image name="CleanupTemplate" width="18" height="18"/>
+        <image name="NSActionTemplate" width="14" height="14"/>
+        <image name="PriorityHighTemplate" width="12" height="12"/>
+        <image name="PriorityLowTemplate" width="12" height="12"/>
+        <image name="PriorityNormalTemplate" width="12" height="12"/>
+        <image name="TurtleTemplate" width="18" height="18"/>
+    </resources>
+</document>
