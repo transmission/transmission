@@ -1010,6 +1010,7 @@
 		A2BE9C4F0C1E4ADA002D16E6 /* makemeta.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = makemeta.h; path = libtransmission/makemeta.h; sourceTree = "<group>"; };
 		A2C0C5020E02CB6100D95339 /* Remote.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Remote.png; path = macosx/Images/Remote.png; sourceTree = "<group>"; };
 		A2C89D5F0CFCBF57004CC2BC /* ButtonToolbarItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ButtonToolbarItem.m; path = macosx/ButtonToolbarItem.m; sourceTree = "<group>"; };
+		A2CA772B187F063A00154956 /* tr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = tr; path = macosx/QuickLookPlugin/tr.lproj/Localizable.strings; sourceTree = SOURCE_ROOT; };
 		A2CB38AE0E1E6896002B514C /* COPYING */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = COPYING; sourceTree = "<group>"; };
 		A2CBDED80D993E4500BB22BC /* fr */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = fr; path = macosx/fr.lproj/AddWindow.xib; sourceTree = "<group>"; };
 		A2CBDF9E0D9AD08100BB22BC /* ru */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = ru; path = macosx/ru.lproj/AddWindow.xib; sourceTree = "<group>"; };
@@ -3141,6 +3142,7 @@
 				A23E75D015FC1A2500E91223 /* pt */,
 				A27F4483160B4AF50048CD4C /* fr */,
 				A28B3A2D160E1BC900D4A2BC /* pt_PT */,
+				A2CA772B187F063A00154956 /* tr */,
 			);
 			name = Localizable.strings;
 			sourceTree = "<group>";
