@@ -2930,11 +2930,14 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     [fStatusBar updateSpeedFieldsToolTips];
     
     if (![[dict objectForKey: @"ByUser"] boolValue])
-        [GrowlApplicationBridge notifyWithTitle: isLimited
-                ? NSLocalizedString(@"Speed Limit Auto Enabled", "Growl notification title")
-                : NSLocalizedString(@"Speed Limit Auto Disabled", "Growl notification title")
-            description: NSLocalizedString(@"Bandwidth settings changed", "Growl notification description")
-            notificationName: GROWL_AUTO_SPEED_LIMIT iconData: nil priority: 0 isSticky: NO clickContext: nil];
+        [GrowlApplicationBridge notifyWithTitle: isLimited ? NSLocalizedString(@"Speed Limit Auto Enabled", "Growl notification title") : NSLocalizedString(@"Speed Limit Auto Disabled", "Growl notification title")
+                                    description: NSLocalizedString(@"Bandwidth settings changed", "Growl notification description")
+                               notificationName: GROWL_AUTO_SPEED_LIMIT
+                                       iconData: nil
+                                       priority: 0
+                                       isSticky: NO
+                                   clickContext: nil
+                                     identifier: GROWL_AUTO_SPEED_LIMIT];
     
     [dict release];
 }
