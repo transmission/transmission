@@ -36,7 +36,7 @@
     return fileURLs;
 }
 
-- (NSArray *)menuItems
+- (NSArray *) menuItems
 {
     NSArray * services = [NSSharingService sharingServicesForItems: [self shareTorrentURLs]];
     NSMutableArray * items = [NSMutableArray arrayWithCapacity: [services count]];
@@ -56,8 +56,7 @@
     return items;
 }
 
-
-- (void)performShareAction:(NSMenuItem *)item
+- (void) performShareAction: (NSMenuItem *) item
 {
     NSSharingService * service = item.representedObject;
     [service performWithItems: [self shareTorrentURLs]]; // on 10.9, use attachmentFileURLs?
