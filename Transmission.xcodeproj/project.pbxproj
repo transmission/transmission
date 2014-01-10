@@ -277,6 +277,7 @@
 		A2B3FB460E5901E700FF78FB /* cli.c in Sources */ = {isa = PBXBuildFile; fileRef = A2B3FB450E5901E700FF78FB /* cli.c */; };
 		A2B3FB4C0E59023000FF78FB /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */; };
 		A2B3FB530E59027100FF78FB /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */; };
+		A2B5B4E91880665E0071A66A /* ShareTorrentFileHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = A2B5B4E81880665E0071A66A /* ShareTorrentFileHelper.m */; };
 		A2B6141C1395ADE9000E0975 /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A2B6141B1395ADE9000E0975 /* libz.dylib */; };
 		A2B6141D1395B0E3000E0975 /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A2B6141B1395ADE9000E0975 /* libz.dylib */; };
 		A2B6141E1395B0EC000E0975 /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A2B6141B1395ADE9000E0975 /* libz.dylib */; };
@@ -998,6 +999,8 @@
 		A2AF23C616B44FA0003BC59E /* log.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = log.c; path = libtransmission/log.c; sourceTree = "<group>"; };
 		A2AF23C716B44FA0003BC59E /* log.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = log.h; path = libtransmission/log.h; sourceTree = "<group>"; };
 		A2B3FB450E5901E700FF78FB /* cli.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = cli.c; path = cli/cli.c; sourceTree = "<group>"; };
+		A2B5B4E71880665E0071A66A /* ShareTorrentFileHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ShareTorrentFileHelper.h; path = macosx/ShareTorrentFileHelper.h; sourceTree = "<group>"; };
+		A2B5B4E81880665E0071A66A /* ShareTorrentFileHelper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ShareTorrentFileHelper.m; path = macosx/ShareTorrentFileHelper.m; sourceTree = "<group>"; };
 		A2B5BB7A0D9C7C2300FCB650 /* es */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = es; path = macosx/es.lproj/AddWindow.xib; sourceTree = "<group>"; };
 		A2B6141B1395ADE9000E0975 /* libz.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.dylib; path = usr/lib/libz.dylib; sourceTree = SDKROOT; };
 		A2B9F90311BD10BE003FC8CA /* fr */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = fr; path = macosx/fr.lproj/AddMagnetWindow.xib; sourceTree = "<group>"; };
@@ -1399,6 +1402,8 @@
 				A28E1DDF0CFFD8EC00E16385 /* ButtonToolbarItem.h */,
 				A225A4BE187E369C00CDE823 /* ShareToolbarItem.h */,
 				A225A4BF187E369C00CDE823 /* ShareToolbarItem.m */,
+				A2B5B4E71880665E0071A66A /* ShareTorrentFileHelper.h */,
+				A2B5B4E81880665E0071A66A /* ShareTorrentFileHelper.m */,
 				A21979890D07B78400438EA7 /* GroupToolbarItem.h */,
 				A219798A0D07B78400438EA7 /* GroupToolbarItem.m */,
 				A20BFFB50D091CC700CE5D2B /* ToolbarSegmentedCell.h */,
@@ -2789,6 +2794,7 @@
 				A2F7CF5F13035FFD0016FF10 /* URLSheetWindowController.m in Sources */,
 				A2E57ABB1310822C00A7DAB1 /* StatusBarController.m in Sources */,
 				A2E57BA713109E6B00A7DAB1 /* FilterBarController.m in Sources */,
+				A2B5B4E91880665E0071A66A /* ShareTorrentFileHelper.m in Sources */,
 				A22BAE281388040500FB022F /* NSMutableArrayAdditions.m in Sources */,
 				A2966E8713DAF74C007B52DF /* GlobalOptionsPopoverViewController.m in Sources */,
 				A234EA541453563B000F3E97 /* NSImageAdditions.m in Sources */,

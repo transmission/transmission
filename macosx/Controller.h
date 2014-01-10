@@ -97,6 +97,9 @@ typedef enum
     
     IBOutlet NSMenu                 * fGroupsSetMenu, * fGroupsSetContextMenu;
     
+    IBOutlet NSMenu                 * fShareMenu, * fShareContextMenu;
+    IBOutlet NSMenuItem             * fShareMenuItem, * fShareContextMenuItem; // remove when dropping 10.6
+    
     QLPreviewPanel                  * fPreviewPanel;
     BOOL                            fQuitting;
     BOOL                            fQuitRequested;

@@ -10,6 +10,4 @@
 
 @interface ShareToolbarItem : ButtonToolbarItem
 
-+ (NSArray *)shareTorrentURLs;
-
 @end

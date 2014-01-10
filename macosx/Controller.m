@@ -45,6 +45,7 @@
 #import "ButtonToolbarItem.h"
 #import "GroupToolbarItem.h"
 #import "ShareToolbarItem.h"
+#import "ShareTorrentFileHelper.h"
 #import "ToolbarSegmentedCell.h"
 #import "BlocklistDownloader.h"
 #import "StatusBarController.h"
@@ -523,6 +524,12 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     
     if ([NSApp isOnMountainLionOrBetter])
         [[NSUserNotificationCenterMtLion defaultUserNotificationCenter] setDelegate: self];
+    
+    // remove Share menu items
+    if (![NSApp isOnMountainLionOrBetter]) {
+        [[fShareMenuItem menu] removeItem:fShareMenuItem];
+        [[fShareContextMenuItem menu] removeItem:fShareContextMenuItem];
+    }
     
     //observe notifications
     NSNotificationCenter * nc = [NSNotificationCenter defaultCenter];
@@ -2877,6 +2884,14 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
             [item release];
         }
     }
+    else if (menu == fShareMenu || menu == fShareContextMenu) {
+        [menu removeAllItems];
+        
+        for (NSMenuItem * item in [[ShareTorrentFileHelper sharedHelper] menuItems])
+        {
+            [menu addItem:item];
+        }
+    }
     else;
 }
 
@@ -3815,7 +3830,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 {
     NSParameterAssert([sender isKindOfClass:[NSButton class]]);
     
-    NSSharingServicePicker * picker = [[NSSharingServicePicker alloc] initWithItems: [ShareToolbarItem shareTorrentURLs]];
+    NSSharingServicePicker * picker = [[NSSharingServicePicker alloc] initWithItems: [[ShareTorrentFileHelper sharedHelper] shareTorrentURLs]];
     picker.delegate = self;
     
     [picker showRelativeToRect:[sender bounds] ofView:sender preferredEdge:NSMinYEdge];

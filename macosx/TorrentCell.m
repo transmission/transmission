@@ -157,7 +157,7 @@
     
     NSPoint point = [controlView convertPoint: [event locationInWindow] fromView: nil];
     
-    const NSRect controlRect= [self controlButtonRectForBounds: cellFrame];
+    const NSRect controlRect = [self controlButtonRectForBounds: cellFrame];
     const BOOL checkControl = NSMouseInRect(point, controlRect, [controlView isFlipped]);
     
     const NSRect revealRect = [self revealButtonRectForBounds: cellFrame];
