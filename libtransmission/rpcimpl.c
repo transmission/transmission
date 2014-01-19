@@ -1542,6 +1542,8 @@ gotNewBlocklist (tr_session       * session,
         if (write (fd, response, response_byte_count) < 0)
           tr_snprintf (result, sizeof (result), _("Couldn't save file \"%1$s\": %2$s"), filename, tr_strerror (errno));
 
+      tr_close_file(fd);
+
       if (*result)
         {
           tr_logAddError ("%s", result);
