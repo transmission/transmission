@@ -86,14 +86,14 @@ loadPeers (tr_variant * dict, tr_torrent * tor)
   size_t len;
   uint64_t ret = 0;
 
-  if (tr_variantDictFindRaw (dict, TR_KEY_peers, &str, &len))
+  if (tr_variantDictFindRaw (dict, TR_KEY_peers2, &str, &len))
     {
       const int numAdded = addPeers (tor, str, len);
       tr_logAddTorDbg (tor, "Loaded %d IPv4 peers from resume file", numAdded);
       ret = TR_FR_PEERS;
     }
 
-  if (tr_variantDictFindRaw (dict, TR_KEY_peers6, &str, &len))
+  if (tr_variantDictFindRaw (dict, TR_KEY_peers2_6, &str, &len))
     {
       const int numAdded = addPeers (tor, str, len);
       tr_logAddTorDbg (tor, "Loaded %d IPv6 peers from resume file", numAdded);
