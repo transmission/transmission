@@ -1873,6 +1873,14 @@ stopTorrent (void * vtor)
   torrentSetQueued (tor, false);
 
   tr_torrentUnlock (tor);
+
+  if (tor->magnetVerify)
+    {
+      tor->magnetVerify = false;
+      tr_logAddTorInfo (tor, "%s", "Magnet Verify");
+      refreshCurrentDir (tor);
+      tr_torrentVerify (tor, NULL, NULL);
+    }
 }
 
 void
@@ -1907,6 +1915,7 @@ closeTorrent (void * vtor)
 
   tr_logAddTorInfo (tor, "%s", _("Removing torrent"));
 
+  tor->magnetVerify = false;
   stopTorrent (tor);
 
   if (tor->isDeleting)

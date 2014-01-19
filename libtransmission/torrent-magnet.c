@@ -299,6 +299,9 @@ tr_torrentSetMetadataPiece (tr_torrent  * tor, int piece, const void  * data, in
         {
           incompleteMetadataFree (tor->incompleteMetadata);
           tor->incompleteMetadata = NULL;
+          tor->isStopping = true;
+          tor->magnetVerify = true;
+          tor->startAfterVerify = true;
         }
         else /* drat. */
         {

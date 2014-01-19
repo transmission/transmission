@@ -247,6 +247,8 @@ struct tr_torrent
     bool                       isDirty;
     bool                       isQueued;
 
+    bool                       magnetVerify;
+
     bool                       infoDictOffsetIsCached;
 
     uint16_t                   maxConnectedPeers;
