@@ -326,10 +326,11 @@ debugf(const char *format, ...)
 {
     va_list args;
     va_start(args, format);
-    if(dht_debug)
+    if(dht_debug) {
         vfprintf(dht_debug, format, args);
+        fflush(dht_debug);
+    }
     va_end(args);
-    fflush(dht_debug);
 }
 
 static void
