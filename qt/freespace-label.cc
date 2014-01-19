@@ -4,7 +4,7 @@
  * It may be used under the GNU Public License v2 or v3 licenses,
  * or any future license endorsed by Mnemosyne LLC.
  *
- * $Id:$
+ * $Id$
  */
 
 #include <libtransmission/transmission.h>
