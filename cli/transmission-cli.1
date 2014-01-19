@@ -32,7 +32,7 @@
 .Op Fl h
 .Op Fl m | M
 .Op Fl p Ar port
-.Op Fl t
+.Op Fl t Ar tos
 .Op Fl u Ar number | Fl U
 .Op Fl v
 .Op Fl w Ar directory
@@ -76,8 +76,17 @@ Disable portmapping
 Create torrent from the specified file or directory
 .It Fl p, -port Ar port
 Set the port to listen for incoming peers. (Default: 51413)
-.It Fl t, -tos
+.It Fl t, -tos Ar tos
 Set the peer socket TOS for local router-based traffic shaping.
+Valid values are
+.Pp
+.Dq default ,
+.Dq lowcost ,
+.Dq throughput ,
+.Dq reliability ,
+.Dq lowdelay ,
+.Pp
+a decimal value 0-255 or a hexidecimal value 0x00-0xff)
 .It Fl u, -uplimit Ar number
 Set the maximum upload speed in KB/s
 .It Fl U, -no-uplimit
