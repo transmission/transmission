@@ -132,6 +132,7 @@ TESTS = \
   bitfield-test \
   blocklist-test \
   clients-test \
+  crypto-test \
   history-test \
   json-test \
   magnet-test \
@@ -177,6 +178,10 @@ blocklist_test_LDFLAGS = ${apps_ldflags}
 clients_test_SOURCES = clients-test.c $(TEST_SOURCES)
 clients_test_LDADD = ${apps_ldadd}
 clients_test_LDFLAGS = ${apps_ldflags}
+
+crypto_test_SOURCES = crypto-test.c $(TEST_SOURCES)
+crypto_test_LDADD = ${apps_ldadd}
+crypto_test_LDFLAGS = ${apps_ldflags}
 
 history_test_SOURCES = history-test.c $(TEST_SOURCES)
 history_test_LDADD = ${apps_ldadd}
