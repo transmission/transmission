@@ -1,3 +1,12 @@
+/*
+ * This file Copyright (C) 2010-2014 Mnemosyne LLC
+ *
+ * It may be used under the GNU Public License v2 or v3 licenses,
+ * or any future license endorsed by Mnemosyne LLC.
+ *
+ * $Id:$
+ */
+
 /* Note VERBOSE needs to be (un)defined before including this file */
 
 #ifndef LIBTRANSMISSION_TEST_H

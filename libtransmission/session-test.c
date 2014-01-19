@@ -1,3 +1,12 @@
+/*
+ * This file Copyright (C) 2013-2014 Mnemosyne LLC
+ *
+ * It may be used under the GNU Public License v2 or v3 licenses,
+ * or any future license endorsed by Mnemosyne LLC.
+ *
+ * $Id$
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

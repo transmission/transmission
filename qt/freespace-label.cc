@@ -1,11 +1,8 @@
 /*
- * This file Copyright (C) 2010-2014 Mnemosyne LLC
+ * This file Copyright (C) 2013-2014 Mnemosyne LLC
  *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2
- * as published by the Free Software Foundation.
- *
- * http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+ * It may be used under the GNU Public License v2 or v3 licenses,
+ * or any future license endorsed by Mnemosyne LLC.
  *
  * $Id:$
  */
