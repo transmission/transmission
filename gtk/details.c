@@ -1051,15 +1051,15 @@ info_page_new (struct DetailsImpl * di)
     gtk_label_set_single_line_mode (GTK_LABEL (l), TRUE);
     hig_workarea_add_row (t, &row, _("Have:"), l, NULL);
 
-    /* downloaded */
-    l = di->dl_lb = gtk_label_new (NULL);
-    gtk_label_set_single_line_mode (GTK_LABEL (l), TRUE);
-    hig_workarea_add_row (t, &row, _("Downloaded:"), l, NULL);
-
     /* uploaded */
     l = di->ul_lb = gtk_label_new (NULL);
     gtk_label_set_single_line_mode (GTK_LABEL (l), TRUE);
     hig_workarea_add_row (t, &row, _("Uploaded:"), l, NULL);
+
+    /* downloaded */
+    l = di->dl_lb = gtk_label_new (NULL);
+    gtk_label_set_single_line_mode (GTK_LABEL (l), TRUE);
+    hig_workarea_add_row (t, &row, _("Downloaded:"), l, NULL);
 
     /* state */
     l = di->state_lb = gtk_label_new (NULL);

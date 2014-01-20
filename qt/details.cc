@@ -942,8 +942,8 @@ Details :: createInfoTab ()
   hig->addSectionTitle (tr ("Activity"));
   hig->addRow (tr ("Have:"), myHaveLabel = new SqueezeLabel);
   hig->addRow (tr ("Availability:"), myAvailabilityLabel = new SqueezeLabel);
-  hig->addRow (tr ("Downloaded:"), myDownloadedLabel = new SqueezeLabel);
   hig->addRow (tr ("Uploaded:"), myUploadedLabel = new SqueezeLabel);
+  hig->addRow (tr ("Downloaded:"), myDownloadedLabel = new SqueezeLabel);
   hig->addRow (tr ("State:"), myStateLabel = new SqueezeLabel);
   hig->addRow (tr ("Running time:"), myRunTimeLabel = new SqueezeLabel);
   hig->addRow (tr ("Remaining time:"), myETALabel = new SqueezeLabel);
