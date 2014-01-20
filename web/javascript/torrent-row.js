@@ -215,8 +215,11 @@ TorrentRendererFull.prototype =
 	getProgressDetails: function(controller, t)
 	{
 		if (t.needsMetaData()) {
+			var MetaDataStatus = "retrieving";
+			if (t.isStopped())
+				MetaDataStatus = "needs";
 			var percent = 100 * t.getMetadataPercentComplete();
-			return [ "Magnetized transfer - retrieving metadata (",
+			return [ "Magnetized transfer - " + MetaDataStatus + " metadata (",
 			         Transmission.fmt.percentString(percent),
 			         "%)" ].join('');
 		}
