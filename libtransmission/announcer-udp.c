@@ -431,7 +431,7 @@ struct tau_tracker
     char * host;
     int port;
 
-    bool is_asking_dns;
+    struct evdns_getaddrinfo_request * dns_request;
     struct evutil_addrinfo * addr;
     time_t addr_expiration_time;
 
@@ -453,6 +453,8 @@ tau_tracker_free (struct tau_tracker * t)
 {
     if (t->addr)
         evutil_freeaddrinfo (t->addr);
+    if (t->dns_request != NULL)
+        evdns_getaddrinfo_cancel (t->dns_request);
     tr_ptrArrayDestruct (&t->announces, (PtrArrayForeachFunc)tau_announce_request_free);
     tr_ptrArrayDestruct (&t->scrapes, (PtrArrayForeachFunc)tau_scrape_request_free);
     tr_free (t->host);
@@ -493,7 +495,7 @@ tau_tracker_on_dns (int errcode, struct evutil_addrinfo *addr, void * vtracker)
 {
     struct tau_tracker * tracker = vtracker;
 
-    tracker->is_asking_dns = false;
+    tracker->dns_request = NULL;
 
     if (errcode)
     {
@@ -535,7 +537,7 @@ tau_tracker_send_reqs (struct tau_tracker * tracker)
     tr_ptrArray * reqs;
     const time_t now = tr_time ();
 
-    assert (tracker->is_asking_dns == false);
+    assert (tracker->dns_request == NULL);
     assert (tracker->connecting_at == 0);
     assert (tracker->addr != NULL);
     assert (tracker->connection_expiration_time > now);
@@ -672,18 +674,17 @@ tau_tracker_upkeep (struct tau_tracker * tracker)
         return;
 
     /* if we don't have an address yet, try & get one now. */
-    if (!tracker->addr && !tracker->is_asking_dns)
+    if (!tracker->addr && (tracker->dns_request == NULL))
     {
         struct evutil_addrinfo hints;
         memset (&hints, 0, sizeof (hints));
         hints.ai_family = AF_UNSPEC;
         hints.ai_socktype = SOCK_DGRAM;
         hints.ai_protocol = IPPROTO_UDP;
-        tracker->is_asking_dns = true;
         dbgmsg (tracker->host, "Trying a new DNS lookup");
-        evdns_getaddrinfo (tracker->session->evdns_base,
-                           tracker->host, NULL, &hints,
-                           tau_tracker_on_dns, tracker);
+        tracker->dns_request = evdns_getaddrinfo (tracker->session->evdns_base,
+                                                  tracker->host, NULL, &hints,
+                                                  tau_tracker_on_dns, tracker);
         return;
     }
 
