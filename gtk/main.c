@@ -65,16 +65,16 @@
 static const char * LICENSE =
   "Copyright 2005-2014. All code is copyrighted by the respective authors.\n"
   "\n"           
-  "Transmission can be redistributed and/or modified under the terms of the"
+  "Transmission can be redistributed and/or modified under the terms of the "
   "GNU GPL versions 2 or 3 or by any future license endorsed by Mnemosyne LLC.\n"
   "\n"
   "In addition, linking to and/or using OpenSSL is allowed.\n"
   "\n"
-  "This program is distributed in the hope that it will be useful,"
-  "but WITHOUT ANY WARRANTY; without even the implied warranty of"
+  "This program is distributed in the hope that it will be useful, "
+  "but WITHOUT ANY WARRANTY; without even the implied warranty of "
   "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n"
   "\n"
-  "Some of Transmission's source files have more permissive licenses."
+  "Some of Transmission's source files have more permissive licenses. "
   "Those files may, of course, be used on their own under their own terms.\n";
 
 struct cbdata
