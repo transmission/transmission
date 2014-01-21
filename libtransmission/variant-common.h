@@ -1,7 +1,7 @@
 /*
  * This file Copyright (C) 2008-2014 Mnemosyne LLC
  *
- * It may be used under the GNU Public License v2 or v3 licenses,
+ * It may be used under the GNU GPL versions 2 or 3
  * or any future license endorsed by Mnemosyne LLC.
  *
  * $Id: announcer-common.h 13625 2012-12-05 17:29:46Z jordan $

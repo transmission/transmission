@@ -1,7 +1,7 @@
 /*
  * This file Copyright (C) 2010-2014 Mnemosyne LLC
  *
- * It may be used under the GNU Public License v2 or v3 licenses,
+ * It may be used under the GNU GPL versions 2 or 3
  * or any future license endorsed by Mnemosyne LLC.
  *
  * $Id: utils.c 13863 2013-01-24 23:59:52Z jordan $

@@ -63,8 +63,19 @@
 
 #define SHOW_LICENSE
 static const char * LICENSE =
-"Transmission may be used under the GNU Public License v2 or v3 licenses, or any future license endorsed by Mnemosyne LLC.\n\n"
-"Permission is granted to link the code in this release with the OpenSSL project's 'OpenSSL' library and to distribute the linked executables. Works derived from Transmission may, at their authors' discretion, keep or delete this exception.";
+  "Copyright 2005-2014. All code is copyrighted by the respective authors.\n"
+  "\n"           
+  "Transmission can be redistributed and/or modified under the terms of the"
+  "GNU GPL versions 2 or 3 or by any future license endorsed by Mnemosyne LLC.\n"
+  "\n"
+  "In addition, linking to and/or using OpenSSL is allowed.\n"
+  "\n"
+  "This program is distributed in the hope that it will be useful,"
+  "but WITHOUT ANY WARRANTY; without even the implied warranty of"
+  "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n"
+  "\n"
+  "Some of Transmission's source files have more permissive licenses."
+  "Those files may, of course, be used on their own under their own terms.\n";
 
 struct cbdata
 {
