@@ -2239,6 +2239,12 @@ loadBlocklists (tr_session * session)
   /* walk the blocklist directory... */
   dirname = tr_buildPath (session->configDir, "blocklists", NULL);
   odir = opendir (dirname);
+  if (odir == NULL)
+    {
+      tr_free (dirname);
+      return;
+    }
+
   while ((d = readdir (odir)))
     {
       char * path;
