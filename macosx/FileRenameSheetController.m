@@ -101,8 +101,8 @@ typedef void (^CompletionBlock)(BOOL);
     [self.renameButton sizeToFit];
     const CGFloat extra = NSWidth(oldRenameFrame) - NSWidth([self.renameButton frame]);
     
-    [self.renameButton setStringValue: NSLocalizedString(@"Rename", "rename sheet button")];
-    [self.cancelButton setStringValue: NSLocalizedString(@"Cancel", "rename sheet button")];
+    [self.renameButton setTitle: NSLocalizedString(@"Rename", "rename sheet button")];
+    [self.cancelButton setTitle: NSLocalizedString(@"Cancel", "rename sheet button")];
     
     [self.renameButton sizeToFit];
     [self.cancelButton sizeToFit];
