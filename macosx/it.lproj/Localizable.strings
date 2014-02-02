@@ -1009,6 +1009,14 @@
 /* Status Bar -> status menu */
 "Session Transfer" = "Trasferimento sessione";
 
+/* Share toolbar item -> label
+   Share toolbar item -> palette label */
+
+"Share" = "Condividi";
+
+/* Share toolbar item -> tooltip */
+"Share torrent file" = "Condividi il file torrent";
+
 /* Main window -> 1st bottom left button (action) tooltip */
 "Shortcuts for changing global settings." = "Scorciatoie per cambiare le impostazioni generali.";
 
