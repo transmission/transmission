@@ -183,7 +183,7 @@ dnl file monitoring for the daemon
 # Check whether to enable systemd startup notification.
 # This requires libsystemd-daemon.
 AC_ARG_WITH([systemd-daemon], AS_HELP_STRING([--with-systemd-daemon],
-            [Add support for systemd startup notification (default is autodetected)])
+            [Add support for systemd startup notification (default is autodetected)]),
             [USE_SYSTEMD_DAEMON=$withval], [USE_SYSTEMD_DAEMON=auto])
 AS_IF([test "x$USE_SYSTEMD_DAEMON" != "xno"], [
     PKG_CHECK_MODULES([SYSTEMD_DAEMON], [libsystemd-daemon],
