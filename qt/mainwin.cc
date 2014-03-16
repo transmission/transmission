@@ -1177,8 +1177,13 @@ TrMainWindow :: openTorrent ()
   QCheckBox * b = new QCheckBox (tr ("Show &options dialog"));
   b->setChecked (myPrefs.getBool (Prefs::OPTIONS_PROMPT));
   b->setObjectName (SHOW_OPTIONS_CHECKBOX_NAME);
-  QGridLayout * l = dynamic_cast<QGridLayout*> (d->layout ());
-  l->addWidget (b, l->rowCount (), 0, 1, -1, Qt::AlignLeft);
+  auto l = dynamic_cast<QGridLayout*> (d->layout ());
+  if (l == nullptr)
+    {
+      l = new QGridLayout;
+      d->setLayout (l);
+    }
+  l->addWidget (b, l->rowCount(), 0, 1, -1, Qt::AlignLeft);
 
   connect (d, SIGNAL (filesSelected (const QStringList&)),
            this, SLOT (addTorrents (const QStringList&)));
@@ -1319,8 +1324,13 @@ TrMainWindow :: removeTorrents (const bool deleteFiles)
   msgBox.setStandardButtons (QMessageBox::Ok | QMessageBox::Cancel);
   msgBox.setDefaultButton (QMessageBox::Cancel);
   msgBox.setIcon (QMessageBox::Question);
-  /* hack needed to keep the dialog from being too narrow */
-  QGridLayout* layout = (QGridLayout*)msgBox.layout ();
+  // hack needed to keep the dialog from being too narrow
+  auto layout = dynamic_cast<QGridLayout*>(msgBox.layout());
+  if (layout == nullptr)
+    {
+      layout = new QGridLayout;
+      msgBox.setLayout (layout);
+    }
   QSpacerItem* spacer = new QSpacerItem (450, 0, QSizePolicy::Minimum, QSizePolicy::Expanding);
   layout->addItem (spacer, layout->rowCount (), 0, 1, layout->columnCount ());
 
