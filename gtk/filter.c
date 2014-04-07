@@ -761,6 +761,7 @@ struct filter_data
     GtkWidget* tracker;
     GtkWidget* entry;
     GtkWidget* show_lb;
+    GtkWidget* header_bar;
     GtkTreeModel* filter_model;
     int active_activity_type;
     int active_tracker_type;
@@ -786,13 +787,32 @@ static void selection_changed_cb(GtkComboBox* combo, gpointer vdata)
 {
     int type;
     char* host;
+    char* name;
     GtkTreeIter iter;
     GtkTreeModel* model;
     struct filter_data* data = vdata;
+    guchar* bar_title;
 
     /* set data->active_activity_type from the activity combobox */
     combo = GTK_COMBO_BOX(data->activity);
     model = gtk_combo_box_get_model(combo);
+
+    if (gtk_combo_box_get_active_iter(combo, &iter))
+    {
+        gtk_tree_model_get(model, &iter,
+            ACTIVITY_FILTER_COL_TYPE, &type,
+            ACTIVITY_FILTER_COL_NAME, &name,
+            -1);
+        // TODO: Fix up this shitty thing
+        bar_title = g_strdup_vprintf(_("Showing %s Torrents"), name);
+        gtk_header_bar_set_subtitle(GTK_HEADER_BAR(data->header_bar), bar_title);
+    }
+    else
+    {
+        type = ACTIVITY_FILTER_ALL;
+    }
+
+    data->active_activity_type = type;
 
     if (gtk_combo_box_get_active_iter(combo, &iter))
     {
@@ -917,15 +937,17 @@ static void on_filter_model_row_deleted(GtkTreeModel* tree_model UNUSED, GtkTree
 ****
 ***/
 
-GtkWidget* gtr_filter_bar_new(tr_session* session, GtkTreeModel* tmodel, GtkTreeModel** filter_model)
+GtkWidget* gtr_filter_bar_new(tr_session* session, GtkTreeModel* tmodel, GtkTreeModel** filter_model, GtkHeaderBar* header_bar)
 {
     GtkWidget* l;
     GtkWidget* w;
-    GtkWidget* h;
     GtkWidget* s;
+    GtkWidget* ti;
+    GtkWidget* b;
+    GtkWidget* reveal;
+    GtkWidget* toolbar;
     GtkWidget* activity;
     GtkWidget* tracker;
-    GtkBox* h_box;
     struct filter_data* data;
 
     g_assert(DIRTY_KEY == 0);
@@ -939,6 +961,7 @@ GtkWidget* gtr_filter_bar_new(tr_session* session, GtkTreeModel* tmodel, GtkTree
     data->activity = activity = activity_combo_box_new(tmodel);
     data->tracker = tracker = tracker_combo_box_new(tmodel);
     data->filter_model = gtk_tree_model_filter_new(tmodel, NULL);
+    data->header_bar = header_bar;
     g_signal_connect(data->filter_model, "row-deleted", G_CALLBACK(on_filter_model_row_deleted), data);
     g_signal_connect(data->filter_model, "row-inserted", G_CALLBACK(on_filter_model_row_inserted), data);
 
@@ -950,40 +973,58 @@ GtkWidget* gtr_filter_bar_new(tr_session* session, GtkTreeModel* tmodel, GtkTree
     g_signal_connect(data->tracker, "changed", G_CALLBACK(selection_changed_cb), data);
     g_signal_connect(data->activity, "changed", G_CALLBACK(selection_changed_cb), data);
 
-    h = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, GUI_PAD_SMALL);
-    h_box = GTK_BOX(h);
+    toolbar = gtk_toolbar_new();
+    gtk_style_context_add_class(gtk_widget_get_style_context(toolbar), GTK_STYLE_CLASS_PRIMARY_TOOLBAR);
 
     /* add the activity combobox */
     w = activity;
     l = data->show_lb;
     gtk_label_set_mnemonic_widget(GTK_LABEL(l), w);
-    gtk_box_pack_start(h_box, l, FALSE, FALSE, 0);
-    gtk_box_pack_start(h_box, w, TRUE, TRUE, 0);
+
+    b = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
+
+    gtk_box_pack_start(GTK_CONTAINER(b), l, FALSE, FALSE, 0);
+    gtk_box_pack_end(GTK_CONTAINER(b), w, FALSE, FALSE, 0);
+
+    /* create a tool item for activity and label. */
+    ti = gtk_tool_item_new();
+    gtk_container_add(GTK_CONTAINER(ti), b);
+
+    gtk_toolbar_insert(GTK_CONTAINER(toolbar), GTK_WIDGET(ti), 0);
 
     /* add a spacer */
-    w = gtk_alignment_new(0.0f, 0.0f, 0.0f, 0.0f);
-    gtk_widget_set_size_request(w, 0u, GUI_PAD_BIG);
-    gtk_box_pack_start(h_box, w, FALSE, FALSE, 0);
+    // w = gtk_alignment_new(0.0f, 0.0f, 0.0f, 0.0f);
+    // gtk_widget_set_size_request(w, 0u, GUI_PAD_BIG);
+    // gtk_box_pack_start(h_box, w, FALSE, FALSE, 0);
 
     /* add the tracker combobox */
     w = tracker;
-    gtk_box_pack_start(h_box, w, TRUE, TRUE, 0);
+    ti = gtk_tool_item_new();
+    gtk_container_add(GTK_CONTAINER(ti), w);
+    gtk_toolbar_insert(GTK_TOOLBAR(toolbar), GTK_WIDGET(ti), 1);
 
     /* add a spacer */
-    w = gtk_alignment_new(0.0f, 0.0f, 0.0f, 0.0f);
-    gtk_widget_set_size_request(w, 0u, GUI_PAD_BIG);
-    gtk_box_pack_start(h_box, w, FALSE, FALSE, 0);
+    // w = gtk_alignment_new(0.0f, 0.0f, 0.0f, 0.0f);
+    // gtk_widget_set_size_request(w, 0u, GUI_PAD_BIG);
+    // gtk_box_pack_start(h_box, w, FALSE, FALSE, 0);
 
     /* add the entry field */
     s = gtk_entry_new();
     gtk_entry_set_icon_from_stock(GTK_ENTRY(s), GTK_ENTRY_ICON_SECONDARY, GTK_STOCK_CLEAR);
     g_signal_connect(s, "icon-release", G_CALLBACK(entry_clear), NULL);
-    gtk_box_pack_start(h_box, s, TRUE, TRUE, 0);
+
+    ti = gtk_tool_item_new();
+    gtk_tool_item_set_expand(GTK_TOOL_ITEM(ti), TRUE);
+    gtk_container_add(GTK_CONTAINER(ti), s);
+    gtk_toolbar_insert(GTK_TOOLBAR(toolbar), GTK_WIDGET(ti), 2);
 
     g_signal_connect(s, "changed", G_CALLBACK(filter_entry_changed), data->filter_model);
     selection_changed_cb(NULL, data);
 
     *filter_model = data->filter_model;
     update_count_label(data);
-    return h;
+
+    reveal = gtk_revealer_new();
+    gtk_container_add(GTK_CONTAINER(reveal), toolbar);
+    return reveal;
 }

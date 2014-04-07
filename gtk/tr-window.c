@@ -268,6 +268,15 @@ static void alt_speed_toggled_cb(GtkToggleButton* button, gpointer vprivate)
 ****  FILTER
 ***/
 
+static void onFilterChanged(GtkToggleButton* button, gpointer vp)
+{
+    PrivateData* p = vp;
+    GtkWidget* w = p->filter;
+    gboolean const b = gtk_toggle_button_get_active(button);
+
+    gtk_revealer_set_reveal_child(w, b);
+}
+
 static void findMaxAnnounceTime(GtkTreeModel* model, GtkTreePath* path UNUSED, GtkTreeIter* iter, gpointer gmaxTime)
 {
     tr_torrent* tor;
@@ -552,6 +561,9 @@ GtkWidget* gtr_window_new(GtkApplication* app, GtkUIManager* ui_mgr, TrCore* cor
     GtkWidget* w;
     GtkWidget* self;
     GtkWidget* menu;
+    GtkWidget* button;
+    GtkWidget* toggle_button;
+    GtkImage* image;
     GtkWidget* grid_w;
     GtkWindow* win;
     GtkCssProvider* css_provider;
@@ -564,8 +576,8 @@ GtkWidget* gtr_window_new(GtkApplication* app, GtkUIManager* ui_mgr, TrCore* cor
     self = gtk_application_window_new(app);
     g_object_set_qdata_full(G_OBJECT(self), private_data_quark(), p, privateFree);
     win = GTK_WINDOW(self);
-    gtk_window_set_title(win, g_get_application_name());
     gtk_window_set_role(win, "tr-main");
+    gtk_window_set_title(win, g_get_application_name());
     gtk_window_set_default_size(win, gtr_pref_int_get(TR_KEY_main_window_width), gtr_pref_int_get(TR_KEY_main_window_height));
     gtk_window_move(win, gtr_pref_int_get(TR_KEY_main_window_x), gtr_pref_int_get(TR_KEY_main_window_y));
 
@@ -588,18 +600,51 @@ GtkWidget* gtr_window_new(GtkApplication* app, GtkUIManager* ui_mgr, TrCore* cor
     gtk_container_add(GTK_CONTAINER(self), vbox);
 
     /* main menu */
-    mainmenu = gtr_action_get_widget("/main-window-menu");
-    w = gtr_action_get_widget("/main-window-menu/torrent-menu/torrent-reannounce");
-    g_signal_connect(w, "query-tooltip", G_CALLBACK(onAskTrackerQueryTooltip), p);
+    // mainmenu = gtr_action_get_widget("/main-window-menu");
+    // w = gtr_action_get_widget("/main-window-menu/torrent-menu/torrent-reannounce");
+    // g_signal_connect(w, "query-tooltip", G_CALLBACK(onAskTrackerQueryTooltip), p);
 
     /* toolbar */
-    toolbar = p->toolbar = gtr_action_get_widget("/main-window-toolbar");
-    gtk_style_context_add_class(gtk_widget_get_style_context(toolbar), GTK_STYLE_CLASS_PRIMARY_TOOLBAR);
-    gtr_action_set_important("open-torrent-toolbar", TRUE);
-    gtr_action_set_important("show-torrent-properties", TRUE);
+    toolbar = gtk_header_bar_new();
+    gtk_header_bar_set_show_close_button(GTK_HEADER_BAR(toolbar), TRUE);
+    gtk_header_bar_set_title(toolbar, g_get_application_name());
+    gtk_header_bar_set_subtitle(toolbar, "All Torrents");
+    gtk_window_set_titlebar(GTK_WINDOW(win), toolbar);
+
+    button = (GtkButton*)gtk_button_new();
+    image = (GtkImage*)gtk_image_new_from_icon_name("emblem-document-symbolic", GTK_ICON_SIZE_MENU);
+    gtk_container_add(button, GTK_WIDGET(image));
+    gtk_header_bar_pack_start(GTK_CONTAINER(toolbar), (GtkWidget*)button);
+
+    button = (GtkButton*)gtk_button_new();
+    image = (GtkImage*)gtk_image_new_from_icon_name("document-open-symbolic", GTK_ICON_SIZE_MENU);
+    gtk_container_add(button, GTK_WIDGET(image));
+    gtk_header_bar_pack_start(GTK_CONTAINER(toolbar), (GtkWidget*)button);
+
+    button = (GtkButton*)gtk_button_new();
+    image = (GtkImage*)gtk_image_new_from_icon_name("user-trash-symbolic", GTK_ICON_SIZE_MENU);
+    gtk_container_add(button, GTK_WIDGET(image));
+    gtk_header_bar_pack_start(GTK_CONTAINER(toolbar), (GtkWidget*)button);
+
+    button = (GtkButton*)gtk_button_new();
+    image = (GtkImage*)gtk_image_new_from_icon_name("document-properties-symbolic", GTK_ICON_SIZE_MENU);
+    gtk_container_add(button, GTK_WIDGET(image));
+    gtk_header_bar_pack_start(GTK_CONTAINER(toolbar), (GtkWidget*)button);
+
+    button = (GtkButton*)gtk_button_new();
+    image = (GtkImage*)gtk_image_new_from_icon_name("emblem-system-symbolic", GTK_ICON_SIZE_MENU);
+    gtk_container_add(button, GTK_WIDGET(image));
+    gtk_header_bar_pack_end(GTK_CONTAINER(toolbar), (GtkWidget*)button);
+
+    toggle_button = (GtkToggleButton*)gtk_toggle_button_new();
+    image = (GtkImage*)gtk_image_new_from_icon_name("edit-find-symbolic", GTK_ICON_SIZE_MENU);
+    gtk_container_add(toggle_button, GTK_WIDGET(image));
+    gtk_header_bar_pack_end(GTK_CONTAINER(toolbar), (GtkWidget*)toggle_button);
+    g_signal_connect(toggle_button, "toggled", G_CALLBACK(onFilterChanged), p);
 
     /* filter */
-    w = filter = p->filter = gtr_filter_bar_new(gtr_core_session(core), gtr_core_model(core), &p->filter_model);
+    w = filter = p->filter = gtr_filter_bar_new(gtr_core_session(core), gtr_core_model(core), &p->filter_model, toolbar);
+    // gtk_revealer_set_reveal_child(GTK_REVEALER(filter), TRUE);
     gtk_container_set_border_width(GTK_CONTAINER(w), GUI_PAD_SMALL);
 
     /* status menu */
@@ -691,8 +736,8 @@ GtkWidget* gtr_window_new(GtkApplication* app, GtkUIManager* ui_mgr, TrCore* cor
     gtk_container_add(GTK_CONTAINER(w), p->view);
 
     /* lay out the widgets */
-    gtk_box_pack_start(GTK_BOX(vbox), mainmenu, FALSE, FALSE, 0);
-    gtk_box_pack_start(GTK_BOX(vbox), toolbar, FALSE, FALSE, 0);
+    // gtk_box_pack_start(GTK_BOX(vbox), mainmenu, FALSE, FALSE, 0);
+    // gtk_box_pack_start(GTK_BOX(vbox), toolbar, FALSE, FALSE, 0);
     gtk_box_pack_start(GTK_BOX(vbox), filter, FALSE, FALSE, 0);
     gtk_box_pack_start(GTK_BOX(vbox), list, TRUE, TRUE, 0);
     gtk_box_pack_start(GTK_BOX(vbox), status, FALSE, FALSE, 0);
@@ -711,8 +756,8 @@ GtkWidget* gtr_window_new(GtkApplication* app, GtkUIManager* ui_mgr, TrCore* cor
         g_object_unref(G_OBJECT(pango_layout));
     }
 
-    /* show all but the window */
-    gtk_widget_show_all(vbox);
+    /* show the window */
+    gtk_widget_show_all(win);
 
     /* listen for prefs changes that affect the window */
     p->core = core;
