@@ -791,7 +791,7 @@ static void selection_changed_cb(GtkComboBox* combo, gpointer vdata)
     GtkTreeIter iter;
     GtkTreeModel* model;
     struct filter_data* data = vdata;
-    guchar* bar_title;
+    guchar bar_title[255];
 
     /* set data->active_activity_type from the activity combobox */
     combo = GTK_COMBO_BOX(data->activity);
@@ -803,8 +803,7 @@ static void selection_changed_cb(GtkComboBox* combo, gpointer vdata)
             ACTIVITY_FILTER_COL_TYPE, &type,
             ACTIVITY_FILTER_COL_NAME, &name,
             -1);
-        // TODO: Fix up this shitty thing
-        bar_title = g_strdup_vprintf(_("Showing %s Torrents"), name);
+        g_snprintf(bar_title, sizeof(bar_title), _("%s torrents"), name);
         gtk_header_bar_set_subtitle(GTK_HEADER_BAR(data->header_bar), bar_title);
     }
     else
