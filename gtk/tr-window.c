@@ -631,10 +631,12 @@ GtkWidget* gtr_window_new(GtkApplication* app, GtkUIManager* ui_mgr, TrCore* cor
     gtk_container_add(button, GTK_WIDGET(image));
     gtk_header_bar_pack_start(GTK_CONTAINER(toolbar), (GtkWidget*)button);
 
-    button = (GtkButton*)gtk_button_new();
+    button = (GtkMenuButton*)gtk_menu_button_new();
     image = (GtkImage*)gtk_image_new_from_icon_name("emblem-system-symbolic", GTK_ICON_SIZE_MENU);
     gtk_container_add(button, GTK_WIDGET(image));
     gtk_header_bar_pack_end(GTK_CONTAINER(toolbar), (GtkWidget*)button);
+    menu = gtr_action_get_widget("/main-window-popup");
+    gtk_menu_button_set_popup(GTK_MENU_BUTTON(button), menu);
 
     toggle_button = (GtkToggleButton*)gtk_toggle_button_new();
     image = (GtkImage*)gtk_image_new_from_icon_name("edit-find-symbolic", GTK_ICON_SIZE_MENU);
