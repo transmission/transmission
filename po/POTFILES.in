@@ -17,6 +17,7 @@ gtk/stats.c
 gtk/torrent-cell-renderer.c
 gtk/transmission-gtk.appdata.xml.in
 gtk/transmission-gtk.desktop.in
+gtk/transmission-menus.ui
 gtk/tr-core.c
 gtk/tr-icon.c
 gtk/tr-prefs.c

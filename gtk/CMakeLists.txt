@@ -43,7 +43,7 @@ add_custom_command(
         icons/turtle-grey.png
         icons/utilities.png
         transmission.gresource.xml
-        transmission-ui.xml
+        transmission-menus.ui
     WORKING_DIRECTORY
         ${CMAKE_CURRENT_SOURCE_DIR}
 )

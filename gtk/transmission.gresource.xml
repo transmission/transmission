@@ -8,6 +8,6 @@
     <file>icons/turtle-blue.png</file> 
     <file>icons/turtle-grey.png</file> 
     <file>icons/utilities.png</file> 
-    <file>transmission-ui.xml</file> 
+    <file>transmission-menus.ui</file> 
   </gresource> 
 </gresources> 

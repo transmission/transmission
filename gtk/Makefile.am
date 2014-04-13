@@ -110,7 +110,8 @@ appdata_DATA = $(APPDATA_FILES)
 icon_DATA = transmission.png
 icondir = $(datadir)/pixmaps
 
-UI_FILES = transmission-ui.xml
+UI_FILES = \
+	transmission-menus.ui
 
 transmission-resources.c: transmission.gresource.xml $(UI_FILES)
 	$(AM_V_GEN)glib-compile-resources --target=$@ --sourcedir=$(srcdir) \

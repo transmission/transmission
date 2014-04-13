@@ -491,9 +491,9 @@ static void app_setup(GtkWindow* wind, struct cbdata* cbdata);
 static void on_startup(GApplication* application, gpointer user_data)
 {
     GError* error;
+    GtkApplication* gtk_app = GTK_APPLICATION(application);
     char const* str;
     GtkWindow* win;
-    GtkUIManager* ui_manager;
     tr_session* session;
     struct cbdata* cbdata = user_data;
 
@@ -520,19 +520,12 @@ static void on_startup(GApplication* application, gpointer user_data)
     gtr_pref_int_set(TR_KEY_peer_port, tr_sessionGetPeerPort(session));
     cbdata->core = gtr_core_new(session);
 
-    /* init the ui manager */
-    error = NULL;
-    ui_manager = gtk_ui_manager_new();
-    gtr_actions_init(ui_manager, cbdata);
-    gtk_ui_manager_add_ui_from_resource(ui_manager, TR_RESOURCE_PATH "transmission-ui.xml", &error);
-    g_assert_no_error(error);
-    gtk_ui_manager_ensure_update(ui_manager);
+    /* initialize menu actions */
+    gtr_actions_init(gtk_app, cbdata);
 
     /* create main window now to be a parent to any error dialogs */
-    win = GTK_WINDOW(gtr_window_new(GTK_APPLICATION(application), ui_manager, cbdata->core));
+    win = GTK_WINDOW(gtr_window_new(gtk_app, cbdata->core));
     g_signal_connect(win, "size-allocate", G_CALLBACK(on_main_window_size_allocated), cbdata);
-    g_application_hold(application);
-    g_object_weak_ref(G_OBJECT(win), (GWeakNotify)g_application_release, application);
     app_setup(win, cbdata);
     tr_sessionSetRPCCallback(session, on_rpc_changed, cbdata);
 
@@ -706,6 +699,7 @@ static void app_setup(GtkWindow* wind, struct cbdata* cbdata)
     }
 
     gtr_actions_set_core(cbdata->core);
+    gtr_actions_add_to_map(G_ACTION_MAP(wind), cbdata);
 
     /* set up core handlers */
     g_signal_connect(cbdata->core, "busy", G_CALLBACK(on_core_busy), cbdata);
@@ -1523,7 +1517,7 @@ void gtr_actions_handler(char const* action_name, gpointer user_data)
         GtkWidget* w = gtr_torrent_open_from_url_dialog_new(data->wind, data->core);
         gtk_widget_show(w);
     }
-    else if (g_strcmp0(action_name, "open-torrent-menu") == 0 || g_strcmp0(action_name, "open-torrent-toolbar") == 0)
+    else if (g_strcmp0(action_name, "open-torrent") == 0)
     {
         GtkWidget* w = gtr_torrent_open_from_file_dialog_new(data->wind, data->core);
         gtk_widget_show(w);
@@ -1606,7 +1600,7 @@ void gtr_actions_handler(char const* action_name, gpointer user_data)
     {
         gtk_tree_selection_unselect_all(data->sel);
     }
-    else if (g_strcmp0(action_name, "edit-preferences") == 0)
+    else if (g_strcmp0(action_name, "preferences") == 0)
     {
         if (data->prefs == NULL)
         {

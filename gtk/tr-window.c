@@ -77,7 +77,16 @@ static PrivateData* get_private_data(GtkWindow * w)
 
 static void on_popup_menu(GtkWidget* self UNUSED, GdkEventButton* event)
 {
-    GtkWidget* menu = gtr_action_get_widget("/main-window-popup");
+    static GtkWidget* menu = NULL;
+
+    if (menu == NULL)
+    {
+        GMenuModel* model = gtr_action_get_menu_model("main-window-popup");
+        menu = gtk_menu_new_from_model(model);
+        gtk_menu_attach_to_widget(GTK_MENU(menu), self, NULL);
+
+        g_object_unref(model);
+    }
 
     gtk_menu_popup(GTK_MENU(menu), NULL, NULL, NULL, NULL, event != NULL ? event->button : 0, event != NULL ? event->time : 0);
 }
@@ -277,6 +286,7 @@ static void onFilterChanged(GtkToggleButton* button, gpointer vp)
     gtk_revealer_set_reveal_child(w, b);
 }
 
+/*
 static void findMaxAnnounceTime(GtkTreeModel* model, GtkTreePath* path UNUSED, GtkTreeIter* iter, gpointer gmaxTime)
 {
     tr_torrent* tor;
@@ -316,6 +326,7 @@ static gboolean onAskTrackerQueryTooltip(GtkWidget* widget UNUSED, gint x UNUSED
 
     return handled;
 }
+*/
 
 static gboolean onAltSpeedToggledIdle(gpointer vp)
 {
@@ -544,7 +555,7 @@ static void onOptionsClicked(GtkButton* button UNUSED, gpointer vp)
 ****  PUBLIC
 ***/
 
-GtkWidget* gtr_window_new(GtkApplication* app, GtkUIManager* ui_mgr, TrCore* core)
+GtkWidget* gtr_window_new(GtkApplication* app, TrCore* core)
 {
     char const* pch;
     char const* style;
@@ -552,7 +563,6 @@ GtkWidget* gtr_window_new(GtkApplication* app, GtkUIManager* ui_mgr, TrCore* cor
     GtkWidget* sibling = NULL;
     GtkWidget* ul_lb;
     GtkWidget* dl_lb;
-    GtkWidget* mainmenu;
     GtkWidget* toolbar;
     GtkWidget* filter;
     GtkWidget* list;
@@ -569,6 +579,7 @@ GtkWidget* gtr_window_new(GtkApplication* app, GtkUIManager* ui_mgr, TrCore* cor
     GtkCssProvider* css_provider;
     GSList* l;
     GtkGrid* grid;
+    GMenuModel* model;
 
     p = g_new0(PrivateData, 1);
 
@@ -586,7 +597,6 @@ GtkWidget* gtr_window_new(GtkApplication* app, GtkUIManager* ui_mgr, TrCore* cor
         gtk_window_maximize(win);
     }
 
-    gtk_window_add_accel_group(win, gtk_ui_manager_get_accel_group(ui_mgr));
     /* Add style provider to the window. */
     /* Please move it to separate .css file if you’re adding more styles here. */
     style = ".tr-workarea.frame {border-left-width: 0; border-right-width: 0; border-radius: 0;}";
@@ -598,11 +608,6 @@ GtkWidget* gtr_window_new(GtkApplication* app, GtkUIManager* ui_mgr, TrCore* cor
     /* window's main container */
     vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
     gtk_container_add(GTK_CONTAINER(self), vbox);
-
-    /* main menu */
-    // mainmenu = gtr_action_get_widget("/main-window-menu");
-    // w = gtr_action_get_widget("/main-window-menu/torrent-menu/torrent-reannounce");
-    // g_signal_connect(w, "query-tooltip", G_CALLBACK(onAskTrackerQueryTooltip), p);
 
     /* toolbar */
     toolbar = gtk_header_bar_new();
@@ -635,8 +640,8 @@ GtkWidget* gtr_window_new(GtkApplication* app, GtkUIManager* ui_mgr, TrCore* cor
     image = (GtkImage*)gtk_image_new_from_icon_name("emblem-system-symbolic", GTK_ICON_SIZE_MENU);
     gtk_container_add(button, GTK_WIDGET(image));
     gtk_header_bar_pack_end(GTK_CONTAINER(toolbar), (GtkWidget*)button);
-    menu = gtr_action_get_widget("/main-window-popup");
-    gtk_menu_button_set_popup(GTK_MENU_BUTTON(button), menu);
+    model = gtr_action_get_menu_model("main-window-popup");
+    gtk_menu_button_set_menu_model(GTK_MENU_BUTTON(button), model);
 
     toggle_button = (GtkToggleButton*)gtk_toggle_button_new();
     image = (GtkImage*)gtk_image_new_from_icon_name("edit-find-symbolic", GTK_ICON_SIZE_MENU);
@@ -738,8 +743,6 @@ GtkWidget* gtr_window_new(GtkApplication* app, GtkUIManager* ui_mgr, TrCore* cor
     gtk_container_add(GTK_CONTAINER(w), p->view);
 
     /* lay out the widgets */
-    // gtk_box_pack_start(GTK_BOX(vbox), mainmenu, FALSE, FALSE, 0);
-    // gtk_box_pack_start(GTK_BOX(vbox), toolbar, FALSE, FALSE, 0);
     gtk_box_pack_start(GTK_BOX(vbox), filter, FALSE, FALSE, 0);
     gtk_box_pack_start(GTK_BOX(vbox), list, TRUE, TRUE, 0);
     gtk_box_pack_start(GTK_BOX(vbox), status, FALSE, FALSE, 0);
