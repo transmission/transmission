@@ -106,6 +106,7 @@ function Inspector(controller) {
             creator, mixed_creator,
             date, mixed_date,
             v, u, f, d, pct,
+            uri,
             now = Date.now();
 
         //
@@ -396,7 +397,13 @@ function Inspector(controller) {
         }
         if(!str)
             str = none;  
-        setTextContent(e.comment_lb, str);
+        uri = parseUri(str);
+        if (uri.protocol == 'http' || uri.parseUri == 'https') {
+            str = encodeURI(str);
+            setInnerHTML(e.comment_lb, '<a href="' + str + '" target="_blank" >' + str + '</a>');
+        }
+        else
+            setTextContent(e.comment_lb, str);
 
         //
         //  origin
