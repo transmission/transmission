@@ -982,7 +982,7 @@ Transmission.prototype =
 				};
 				remote.sendRequest (o, function(response) {
 					if (response.result != 'success')
-						alert ('Error adding "' + file.name + '": ' + response.result);
+						alert ('Error adding "' + url + '": ' + response.result);
 				});
 			}
 		}
