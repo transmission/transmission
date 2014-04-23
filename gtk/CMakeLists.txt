@@ -42,6 +42,7 @@ add_custom_command(
         icons/turtle-blue.png
         icons/turtle-grey.png
         icons/utilities.png
+        tr-status-menu-button.ui
         transmission.gresource.xml
         transmission-menus.ui
     WORKING_DIRECTORY
@@ -89,6 +90,7 @@ set(${PROJECT_NAME}_SOURCES
     tr-core.c
     tr-icon.c
     tr-prefs.c
+    tr-status-menu-button.c
     tr-window.c
     util.c
     ${CMAKE_CURRENT_BINARY_DIR}/transmission-resources.c
@@ -114,6 +116,7 @@ set(${PROJECT_NAME}_HEADERS
     tr-core.h
     tr-icon.h
     tr-prefs.h
+    tr-status-menu-button.h
     tr-window.h
     util.h
     ${CMAKE_CURRENT_BINARY_DIR}/transmission-resources.h

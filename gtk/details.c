@@ -2840,7 +2840,7 @@ static GtkWidget* tracker_page_new(struct DetailsImpl* di)
     gtk_box_pack_start(GTK_BOX(v), w, FALSE, FALSE, 0);
 
     w = gtk_button_new_with_mnemonic(_("_Edit"));
-    gtk_button_set_image(GTK_BUTTON(w), gtk_image_new_from_stock(GTK_STOCK_EDIT, GTK_ICON_SIZE_BUTTON));
+    gtk_button_set_image(GTK_BUTTON(w), gtk_image_new_from_icon_name("gtk-edit", GTK_ICON_SIZE_BUTTON));
     g_signal_connect(w, "clicked", G_CALLBACK(on_edit_trackers), di);
     di->edit_trackers_button = w;
     gtk_box_pack_start(GTK_BOX(v), w, FALSE, FALSE, 0);

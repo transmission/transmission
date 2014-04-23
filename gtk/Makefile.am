@@ -45,6 +45,7 @@ noinst_HEADERS = \
     tr-core.h \
     tr-icon.h \
     tr-prefs.h \
+    tr-status-menu-button.h \
     tr-window.h \
     util.h
 
@@ -72,6 +73,7 @@ transmission_gtk_SOURCES = \
     tr-core.c \
     tr-icon.c \
     tr-prefs.c \
+    tr-status-menu-button.c \
     tr-window.c \
     util.c
 
@@ -111,6 +113,7 @@ icon_DATA = transmission.png
 icondir = $(datadir)/pixmaps
 
 UI_FILES = \
+	tr-status-menu-button.ui \
 	transmission-menus.ui
 
 transmission-resources.c: transmission.gresource.xml $(UI_FILES)

@@ -80,6 +80,7 @@ static GActionEntry win_entries[] =
     { "show-statusbar", toggle_action_cb, NULL, "true", change_pref_cb, {} },
     { "show-toolbar", toggle_action_cb, NULL, "true", change_pref_cb, {} },
     /* plain actions */
+    { "seed-until", action_cb, NULL, NULL, NULL, {} },
     { "copy-magnet-link-to-clipboard", action_cb, NULL, NULL, NULL, {} },
     { "open-torrent-from-url", action_cb, NULL, NULL, NULL, {} },
     { "open-torrent", action_cb, NULL, NULL, NULL, {} },

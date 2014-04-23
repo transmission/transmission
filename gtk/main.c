@@ -970,7 +970,7 @@ static void on_app_exit(gpointer vdata)
     gtk_grid_set_column_spacing(GTK_GRID(p), GUI_PAD_BIG);
     gtk_container_add(GTK_CONTAINER(r), p);
 
-    w = gtk_image_new_from_stock(GTK_STOCK_NETWORK, GTK_ICON_SIZE_DIALOG);
+    w = gtk_image_new_from_icon_name("network-workgroup", GTK_ICON_SIZE_DIALOG);
     gtk_grid_attach(GTK_GRID(p), w, 0, 0, 1, 2);
 
     w = gtk_label_new(NULL);

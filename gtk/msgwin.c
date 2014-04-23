@@ -206,8 +206,8 @@ static void onSaveDialogResponse(GtkWidget* d, int response, gpointer data)
 static void onSaveRequest(GtkWidget* w, gpointer data)
 {
     GtkWindow* window = GTK_WINDOW(gtk_widget_get_toplevel(w));
-    GtkWidget* d = gtk_file_chooser_dialog_new(_("Save Log"), window, GTK_FILE_CHOOSER_ACTION_SAVE, GTK_STOCK_CANCEL,
-        GTK_RESPONSE_CANCEL, GTK_STOCK_SAVE, GTK_RESPONSE_ACCEPT, NULL);
+    GtkWidget* d = gtk_file_chooser_dialog_new("Open File", window, GTK_FILE_CHOOSER_ACTION_SAVE, _("_Cancel"),
+        GTK_RESPONSE_CANCEL, _("_Open"), GTK_RESPONSE_ACCEPT, NULL);
 
     gtk_dialog_set_alternative_button_order(GTK_DIALOG(d), GTK_RESPONSE_ACCEPT, GTK_RESPONSE_CANCEL, -1);
     g_signal_connect(d, "response", G_CALLBACK(onSaveDialogResponse), data);
@@ -464,44 +464,39 @@ GtkWidget* gtr_message_log_window_new(GtkWindow* parent, TrCore* core)
     ***  toolbar
     **/
 
-    toolbar = gtk_toolbar_new();
-    gtk_toolbar_set_style(GTK_TOOLBAR(toolbar), GTK_TOOLBAR_BOTH_HORIZ);
-    gtk_style_context_add_class(gtk_widget_get_style_context(toolbar), GTK_STYLE_CLASS_PRIMARY_TOOLBAR);
+    toolbar = gtk_header_bar_new();
+    gtk_header_bar_set_show_close_button(GTK_HEADER_BAR(toolbar), TRUE);
+    gtk_header_bar_set_title(GTK_HEADER_BAR(toolbar), "Message Log");
 
-    item = gtk_tool_button_new_from_stock(GTK_STOCK_SAVE_AS);
+    gtk_window_set_titlebar(GTK_WINDOW(win), toolbar);
+
+    // gtk_toolbar_set_style(GTK_TOOLBAR(toolbar), GTK_TOOLBAR_BOTH_HORIZ);
+    // gtk_style_context_add_class(gtk_widget_get_style_context(toolbar), GTK_STYLE_CLASS_PRIMARY_TOOLBAR);
+
+    item = gtk_tool_button_new(gtk_image_new_from_icon_name("document-save-as-symbolic", GTK_ICON_SIZE_MENU), _("Save As"));
     g_object_set(G_OBJECT(item), "is-important", TRUE, NULL);
     g_signal_connect(item, "clicked", G_CALLBACK(onSaveRequest), data);
-    gtk_toolbar_insert(GTK_TOOLBAR(toolbar), item, -1);
+    gtk_header_bar_pack_start(GTK_HEADER_BAR(toolbar), GTK_WIDGET(item));
 
-    item = gtk_tool_button_new_from_stock(GTK_STOCK_CLEAR);
+    item = gtk_tool_button_new(gtk_image_new_from_icon_name("edit-clear-symbolic", GTK_ICON_SIZE_MENU), _("Clear"));
     g_object_set(G_OBJECT(item), "is-important", TRUE, NULL);
     g_signal_connect(item, "clicked", G_CALLBACK(onClearRequest), data);
-    gtk_toolbar_insert(GTK_TOOLBAR(toolbar), item, -1);
+    gtk_header_bar_pack_start(GTK_HEADER_BAR(toolbar), GTK_WIDGET(item));
 
-    item = gtk_separator_tool_item_new();
-    gtk_toolbar_insert(GTK_TOOLBAR(toolbar), item, -1);
-
-    item = gtk_toggle_tool_button_new_from_stock(GTK_STOCK_MEDIA_PAUSE);
+    item = gtk_toggle_tool_button_new();
+    gtk_tool_button_set_icon_name(GTK_TOOL_BUTTON(item), "media-playback-pause-symbolic");
     g_object_set(G_OBJECT(item), "is-important", TRUE, NULL);
     g_signal_connect(item, "toggled", G_CALLBACK(onPauseToggled), data);
-    gtk_toolbar_insert(GTK_TOOLBAR(toolbar), item, -1);
+    gtk_header_bar_pack_start(GTK_HEADER_BAR(toolbar), GTK_WIDGET(item));
 
     item = gtk_separator_tool_item_new();
-    gtk_toolbar_insert(GTK_TOOLBAR(toolbar), item, -1);
-
-    w = gtk_label_new(_("Level"));
-    gtk_misc_set_padding(GTK_MISC(w), GUI_PAD, 0);
-    item = gtk_tool_item_new();
-    gtk_container_add(GTK_CONTAINER(item), w);
-    gtk_toolbar_insert(GTK_TOOLBAR(toolbar), item, -1);
+    gtk_header_bar_pack_start(GTK_HEADER_BAR(toolbar), GTK_WIDGET(item));
 
     w = debug_level_combo_new();
     g_signal_connect(w, "changed", G_CALLBACK(level_combo_changed_cb), data);
     item = gtk_tool_item_new();
     gtk_container_add(GTK_CONTAINER(item), w);
-    gtk_toolbar_insert(GTK_TOOLBAR(toolbar), item, -1);
-
-    gtk_box_pack_start(GTK_BOX(vbox), toolbar, FALSE, FALSE, 0);
+    gtk_header_bar_pack_end(GTK_HEADER_BAR(toolbar), GTK_WIDGET(item));
 
     /**
     ***  messages

@@ -1009,7 +1009,7 @@ GtkWidget* gtr_filter_bar_new(tr_session* session, GtkTreeModel* tmodel, GtkTree
 
     /* add the entry field */
     s = gtk_entry_new();
-    gtk_entry_set_icon_from_stock(GTK_ENTRY(s), GTK_ENTRY_ICON_SECONDARY, GTK_STOCK_CLEAR);
+    gtk_entry_set_icon_from_icon_name(GTK_ENTRY(s), GTK_ENTRY_ICON_SECONDARY, "edit-clear-symbolic");
     g_signal_connect(s, "icon-release", G_CALLBACK(entry_clear), NULL);
 
     ti = gtk_tool_item_new();

@@ -9,5 +9,6 @@
     <file>icons/turtle-grey.png</file> 
     <file>icons/utilities.png</file> 
     <file>transmission-menus.ui</file> 
+    <file>tr-status-menu-button.ui</file> 
   </gresource> 
 </gresources> 

@@ -34,13 +34,14 @@
 #include "hig.h"
 #include "torrent-cell-renderer.h"
 #include "tr-prefs.h"
+#include "tr-status-menu-button.h"
 #include "tr-window.h"
 #include "util.h"
 
 typedef struct
 {
-    GtkWidget* speedlimit_on_item[2];
-    GtkWidget* speedlimit_off_item[2];
+    GAction* speedlimit_on_item[2];
+    GAction* speedlimit_off_item[2];
     GtkWidget* ratio_on_item;
     GtkWidget* ratio_off_item;
     GtkWidget* scroll;
@@ -379,15 +380,44 @@ static void onSpeedSet(GtkCheckMenuItem* check, gpointer vp)
     gtr_core_set_pref_bool(p->core, key, TRUE);
 }
 
-static GtkWidget* createSpeedMenu(PrivateData* p, tr_direction dir)
+static GMenuModel* get_speed_menu_model(tr_direction dir)
 {
     GObject* o;
-    GtkWidget* w;
-    GtkWidget* m;
-    GtkMenuShell* menu_shell;
+    GMenuItem* mi;
+    GMenuItem* sec;
+    GMenu* m;
+    GMenu* sm;
     int const speeds_KBps[] = { 5, 10, 20, 30, 40, 50, 75, 100, 150, 200, 250, 500, 750 };
 
-    m = gtk_menu_new();
+    m = g_menu_new();
+
+    mi = g_menu_item_new(_("Unlimited"), "win.set-speed::unlimited");
+    g_menu_append_item(m, mi);
+
+    sm = g_menu_new();
+    mi = g_menu_item_new_section(NULL , sm);
+
+    g_menu_append_item(m, mi);
+
+    for (size_t i = 0; i < G_N_ELEMENTS(speeds_KBps); ++i)
+    {
+        char title[128];
+        char target_value[256];
+
+        tr_formatter_speed_KBps(title, speeds_KBps[i], sizeof(title));
+
+        g_snprintf(target_value, sizeof(target_value), "win.speed::limit-%d", speeds_KBps[i]);
+
+        mi = g_menu_item_new(title, target_value);
+
+        o = G_OBJECT(mi);
+        g_object_set_data(o, DIRECTION_KEY, GINT_TO_POINTER(dir));
+        g_object_set_data(o, SPEED_KEY, GINT_TO_POINTER(speeds_KBps[i]));
+
+        g_menu_append_item(sm, mi);
+    }
+
+    /*
     menu_shell = GTK_MENU_SHELL(m);
 
     w = gtk_radio_menu_item_new_with_label(NULL, _("Unlimited"));
@@ -420,6 +450,7 @@ static GtkWidget* createSpeedMenu(PrivateData* p, tr_direction dir)
         g_signal_connect(w, "activate", G_CALLBACK(onSpeedSet), p);
         gtk_menu_shell_append(menu_shell, w);
     }
+    */
 
     return m;
 }
@@ -449,6 +480,43 @@ static void onRatioSet(GtkCheckMenuItem* check, gpointer vp)
     double const ratio = stockRatios[i];
     gtr_core_set_pref_double(p->core, TR_KEY_ratio_limit, ratio);
     gtr_core_set_pref_bool(p->core, TR_KEY_ratio_limit_enabled, TRUE);
+}
+
+static GMenuModel* get_ratio_menu_model()
+{
+    GObject* o;
+    GMenuItem* mi;
+    GMenuItem* sec;
+    GMenu* m;
+    GMenu* sm;
+
+    m = g_menu_new();
+
+    mi = g_menu_item_new(_("Seed Forever"), "win.seed-until::ratio-forever");
+    g_menu_append_item(m, mi);
+
+    sm = g_menu_new();
+    mi = g_menu_item_new_section(NULL, sm);
+
+    g_menu_append_item(m, mi);
+
+    for (size_t i = 0; i < G_N_ELEMENTS(stockRatios); ++i)
+    {
+        char ratio[128];
+        char title[128];
+        char target_value[256];
+
+        tr_strlratio(ratio, stockRatios[i], sizeof(ratio));
+
+        g_snprintf(title, sizeof(title), "Stop at %s ratio", ratio);
+        g_snprintf(target_value, sizeof(target_value), "win.seed-until::ratio-%d", i);
+
+        mi = g_menu_item_new(title, target_value);
+
+        g_menu_append_item(sm, mi);
+    }
+
+    return m;
 }
 
 static GtkWidget* createRatioMenu(PrivateData* p)
@@ -499,11 +567,11 @@ static GtkWidget* createOptionsMenu(PrivateData* p)
     GtkMenuShell* menu_shell = GTK_MENU_SHELL(top);
 
     m = gtk_menu_item_new_with_label(_("Limit Download Speed"));
-    gtk_menu_item_set_submenu(GTK_MENU_ITEM(m), createSpeedMenu(p, TR_DOWN));
+    gtk_menu_item_set_submenu(GTK_MENU_ITEM(m), get_speed_menu_model(TR_DOWN));
     gtk_menu_shell_append(menu_shell, m);
 
     m = gtk_menu_item_new_with_label(_("Limit Upload Speed"));
-    gtk_menu_item_set_submenu(GTK_MENU_ITEM(m), createSpeedMenu(p, TR_UP));
+    gtk_menu_item_set_submenu(GTK_MENU_ITEM(m), get_speed_menu_model(TR_UP));
     gtk_menu_shell_append(menu_shell, m);
 
     m = gtk_separator_menu_item_new();
@@ -568,7 +636,9 @@ GtkWidget* gtr_window_new(GtkApplication* app, TrCore* core)
     GtkWidget* list;
     GtkWidget* status;
     GtkWidget* vbox;
+    GtkWidget* tbox;
     GtkWidget* w;
+    GtkWidget* pop;
     GtkWidget* self;
     GtkWidget* menu;
     GtkWidget* button;
@@ -599,7 +669,7 @@ GtkWidget* gtr_window_new(GtkApplication* app, TrCore* core)
 
     /* Add style provider to the window. */
     /* Please move it to separate .css file if you’re adding more styles here. */
-    style = ".tr-workarea.frame {border-left-width: 0; border-right-width: 0; border-radius: 0;}";
+    style = ".tr-workarea {border-width: 0px 0px 1px 0px; border-style: solid; border-radius: 0;}";
     css_provider = gtk_css_provider_new();
     gtk_css_provider_load_from_data(css_provider, style, strlen(style), NULL);
     gtk_style_context_add_provider_for_screen(gdk_screen_get_default(), GTK_STYLE_PROVIDER(css_provider),
@@ -616,25 +686,34 @@ GtkWidget* gtr_window_new(GtkApplication* app, TrCore* core)
     gtk_header_bar_set_subtitle(toolbar, "All Torrents");
     gtk_window_set_titlebar(GTK_WINDOW(win), toolbar);
 
+    /* action icons group */
+
+    tbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
+
     button = (GtkButton*)gtk_button_new();
-    image = (GtkImage*)gtk_image_new_from_icon_name("emblem-document-symbolic", GTK_ICON_SIZE_MENU);
+    image = (GtkImage*)gtk_image_new_from_icon_name("document-send-symbolic", GTK_ICON_SIZE_MENU);
     gtk_container_add(button, GTK_WIDGET(image));
-    gtk_header_bar_pack_start(GTK_CONTAINER(toolbar), (GtkWidget*)button);
+    gtk_container_add(GTK_CONTAINER(tbox), (GtkWidget*)button);
 
     button = (GtkButton*)gtk_button_new();
     image = (GtkImage*)gtk_image_new_from_icon_name("document-open-symbolic", GTK_ICON_SIZE_MENU);
     gtk_container_add(button, GTK_WIDGET(image));
-    gtk_header_bar_pack_start(GTK_CONTAINER(toolbar), (GtkWidget*)button);
+    gtk_container_add(GTK_CONTAINER(tbox), (GtkWidget*)button);
 
     button = (GtkButton*)gtk_button_new();
     image = (GtkImage*)gtk_image_new_from_icon_name("user-trash-symbolic", GTK_ICON_SIZE_MENU);
     gtk_container_add(button, GTK_WIDGET(image));
-    gtk_header_bar_pack_start(GTK_CONTAINER(toolbar), (GtkWidget*)button);
+    gtk_container_add(GTK_CONTAINER(tbox), (GtkWidget*)button);
 
     button = (GtkButton*)gtk_button_new();
     image = (GtkImage*)gtk_image_new_from_icon_name("document-properties-symbolic", GTK_ICON_SIZE_MENU);
     gtk_container_add(button, GTK_WIDGET(image));
-    gtk_header_bar_pack_start(GTK_CONTAINER(toolbar), (GtkWidget*)button);
+    gtk_container_add(GTK_CONTAINER(tbox), (GtkWidget*)button);
+
+    gtk_style_context_add_class(gtk_widget_get_style_context(tbox), GTK_STYLE_CLASS_RAISED);
+    gtk_style_context_add_class(gtk_widget_get_style_context(tbox), GTK_STYLE_CLASS_LINKED);
+
+    gtk_header_bar_pack_start(GTK_HEADER_BAR(toolbar), tbox);
 
     button = (GtkMenuButton*)gtk_menu_button_new();
     image = (GtkImage*)gtk_image_new_from_icon_name("emblem-system-symbolic", GTK_ICON_SIZE_MENU);
@@ -677,17 +756,50 @@ GtkWidget* gtr_window_new(GtkApplication* app, TrCore* core)
 
     grid_w = status = p->status = gtk_grid_new();
     grid = GTK_GRID(grid_w);
-    gtk_container_set_border_width(GTK_CONTAINER(grid), GUI_PAD_SMALL);
+    // gtk_container_set_border_width(GTK_CONTAINER(grid), GUI_PAD_SMALL);
+
+    /* download */
+    w = tr_status_menu_button_new();
+    tr_status_menu_button_set_label(TR_STATUS_MENU_BUTTON(w), _("Download: Unlimited"));
+    pop = gtk_popover_new_from_model(GTK_WIDGET(w), get_speed_menu_model(TR_DOWN));
+    gtk_popover_set_position(GTK_POPOVER(pop), GTK_POS_BOTTOM);
+    gtk_menu_button_set_popover(GTK_MENU_BUTTON(w), GTK_POPOVER(pop));
+    gtk_grid_attach_next_to(grid, w, sibling, GTK_POS_RIGHT, 1, 1);
+    sibling = w;
+
+    /* upload */
+    w = tr_status_menu_button_new();
+    tr_status_menu_button_set_label(TR_STATUS_MENU_BUTTON(w), _("Upload: Unlimited"));
+    pop = gtk_popover_new_from_model(GTK_WIDGET(w), get_speed_menu_model(TR_UP));
+    gtk_popover_set_position(GTK_POPOVER(pop), GTK_POS_BOTTOM);
+    gtk_menu_button_set_popover(GTK_MENU_BUTTON(w), GTK_POPOVER(pop));
+    gtk_grid_attach_next_to(grid, w, sibling, GTK_POS_RIGHT, 1, 1);
+    // p->options_menu = createOptionsMenu(p);
+    // g_signal_connect(w, "clicked", G_CALLBACK(onOptionsClicked), p);
+    sibling = w;
+
+    /* ratio */
+    w = tr_status_menu_button_new();
+    tr_status_menu_button_set_label(TR_STATUS_MENU_BUTTON(w), _("Seed Forever"));
+    pop = gtk_popover_new_from_model(GTK_WIDGET(w), get_ratio_menu_model());
+    gtk_menu_button_set_popover(GTK_MENU_BUTTON(w), GTK_POPOVER(pop));
+    gtk_grid_attach_next_to(grid, w, sibling, GTK_POS_RIGHT, 1, 1);
+    // p->options_menu = createOptionsMenu(p);
+    // g_signal_connect(w, "clicked", G_CALLBACK(onOptionsClicked), p);
+    sibling = w;
 
     /* gear */
+    /*
     w = gtk_button_new();
-    gtk_container_add(GTK_CONTAINER(w), gtk_image_new_from_stock("utilities", -1));
+    image = gtk_image_new_from_icon_name("preferences-system-symbolic", GTK_ICON_SIZE_MENU);
+    gtk_container_add(GTK_CONTAINER(w), image);
     gtk_widget_set_tooltip_text(w, _("Options"));
     gtk_grid_attach_next_to(grid, w, sibling, GTK_POS_RIGHT, 1, 1);
     gtk_button_set_relief(GTK_BUTTON(w), GTK_RELIEF_NONE);
     p->options_menu = createOptionsMenu(p);
     g_signal_connect(w, "clicked", G_CALLBACK(onOptionsClicked), p);
     sibling = w;
+    */
 
     /* turtle */
     p->alt_speed_image = gtk_image_new();
