@@ -260,7 +260,7 @@ static void syncAltSpeedButton(PrivateData* p)
     str = g_strdup_printf(fmt, d, u);
 
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(w), b);
-    gtk_image_set_from_stock(GTK_IMAGE(p->alt_speed_image), stock, -1);
+    gtk_image_set_from_icon_name(GTK_IMAGE(p->alt_speed_image), stock, GTK_ICON_SIZE_SMALL_TOOLBAR);
     gtk_button_set_alignment(GTK_BUTTON(w), 0.5, 0.5);
     gtk_widget_set_tooltip_text(w, str);
 
@@ -840,7 +840,7 @@ GtkWidget* gtr_window_new(GtkApplication* app, TrCore* core)
     sibling = w;
     w = gtk_button_new();
     gtk_widget_set_tooltip_text(w, _("Statistics"));
-    gtk_container_add(GTK_CONTAINER(w), gtk_image_new_from_stock("ratio", -1));
+    gtk_container_add(GTK_CONTAINER(w), gtk_image_new_from_icon_name("ratio", GTK_ICON_SIZE_SMALL_TOOLBAR));
     gtk_button_set_relief(GTK_BUTTON(w), GTK_RELIEF_NONE);
     g_signal_connect(w, "clicked", G_CALLBACK(onYinYangReleased), p);
     gtk_grid_attach_next_to(grid, w, sibling, GTK_POS_RIGHT, 1, 1);

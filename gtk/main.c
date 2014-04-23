@@ -738,7 +738,7 @@ static void app_setup(GtkWindow* wind, struct cbdata* cbdata)
         GtkWidget* w = gtk_message_dialog_new(GTK_WINDOW(wind), GTK_DIALOG_DESTROY_WITH_PARENT, GTK_MESSAGE_OTHER,
             GTK_BUTTONS_NONE, "%s", _("Transmission is a file sharing program. When you run a torrent, its data will be "
             "made available to others by means of upload. Any content you share is your sole responsibility."));
-        gtk_dialog_add_button(GTK_DIALOG(w), GTK_STOCK_CANCEL, GTK_RESPONSE_REJECT);
+        gtk_dialog_add_button(GTK_DIALOG(w), _("_Cancel"), GTK_RESPONSE_REJECT);
         gtk_dialog_add_button(GTK_DIALOG(w), _("I _Agree"), GTK_RESPONSE_ACCEPT);
         gtk_dialog_set_default_response(GTK_DIALOG(w), GTK_RESPONSE_ACCEPT);
 

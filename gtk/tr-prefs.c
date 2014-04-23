@@ -839,12 +839,12 @@ static GtkWidget* remotePage(GObject* core)
         page->whitelist_widgets = g_slist_prepend(page->whitelist_widgets, w);
 
         h = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, GUI_PAD);
-        w = gtk_button_new_from_stock(GTK_STOCK_REMOVE);
+        w = gtk_button_new_from_stock(_("_Remove"));
         g_signal_connect(w, "clicked", G_CALLBACK(onRemoveWhitelistClicked), page);
         page->remove_button = w;
         onWhitelistSelectionChanged(sel, page);
         gtk_box_pack_start(GTK_BOX(h), w, TRUE, TRUE, 0);
-        w = gtk_button_new_from_stock(GTK_STOCK_ADD);
+        w = gtk_button_new_from_stock(_("_Add"));
         page->whitelist_widgets = g_slist_prepend(page->whitelist_widgets, w);
         g_signal_connect(w, "clicked", G_CALLBACK(onAddWhitelistClicked), page);
         gtk_box_pack_start(GTK_BOX(h), w, TRUE, TRUE, 0);
@@ -997,7 +997,7 @@ static GtkWidget* speedPage(GObject* core)
     gtk_misc_set_alignment(GTK_MISC(w), 0.0f, 0.5f);
     gtk_label_set_use_markup(GTK_LABEL(w), TRUE);
     gtk_box_pack_start(GTK_BOX(h), w, FALSE, FALSE, 0);
-    w = gtk_image_new_from_stock("alt-speed-on", -1);
+    w = gtk_image_new_from_icon_name("alt-speed-on", GTK_ICON_SIZE_SMALL_TOOLBAR);
     gtk_box_pack_start(GTK_BOX(h), w, FALSE, FALSE, 0);
     hig_workarea_add_section_title_widget(t, &row, h);
 
@@ -1243,8 +1243,8 @@ GtkWidget* gtr_prefs_dialog_new(GtkWindow* parent, GObject* core)
     data->core = TR_CORE(core);
     data->core_prefs_tag = g_signal_connect(TR_CORE(core), "prefs-changed", G_CALLBACK(on_core_prefs_changed), data);
 
-    d = gtk_dialog_new_with_buttons(_("Transmission Preferences"), parent, GTK_DIALOG_DESTROY_WITH_PARENT, GTK_STOCK_HELP,
-        GTK_RESPONSE_HELP, GTK_STOCK_CLOSE, GTK_RESPONSE_CLOSE, NULL);
+    d = gtk_dialog_new_with_buttons(_("Transmission Preferences"), parent, GTK_DIALOG_DESTROY_WITH_PARENT, _("_Help"),
+        GTK_RESPONSE_HELP, _("_Close"), GTK_RESPONSE_CLOSE, NULL);
     g_object_weak_ref(G_OBJECT(d), on_prefs_dialog_destroyed, data);
     gtk_window_set_role(GTK_WINDOW(d), "transmission-preferences-dialog");
     gtk_container_set_border_width(GTK_CONTAINER(d), GUI_PAD);

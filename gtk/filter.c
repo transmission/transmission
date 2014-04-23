@@ -582,13 +582,13 @@ static GtkTreeModel* activity_filter_model_new(GtkTreeModel* tmodel)
     {
         { ACTIVITY_FILTER_ALL, NULL, N_("All"), NULL },
         { ACTIVITY_FILTER_SEPARATOR, NULL, NULL, NULL },
-        { ACTIVITY_FILTER_ACTIVE, NULL, N_("Active"), GTK_STOCK_EXECUTE },
-        { ACTIVITY_FILTER_DOWNLOADING, "Verb", NC_("Verb", "Downloading"), GTK_STOCK_GO_DOWN },
-        { ACTIVITY_FILTER_SEEDING, "Verb", NC_("Verb", "Seeding"), GTK_STOCK_GO_UP },
-        { ACTIVITY_FILTER_PAUSED, NULL, N_("Paused"), GTK_STOCK_MEDIA_PAUSE },
+        { ACTIVITY_FILTER_ACTIVE, NULL, N_("Active"), NULL },
+        { ACTIVITY_FILTER_DOWNLOADING, "Verb", NC_("Verb", "Downloading"), NULL },
+        { ACTIVITY_FILTER_SEEDING, "Verb", NC_("Verb", "Seeding"), NULL },
+        { ACTIVITY_FILTER_PAUSED, NULL, N_("Paused"), NULL },
         { ACTIVITY_FILTER_FINISHED, NULL, N_("Finished"), NULL },
-        { ACTIVITY_FILTER_VERIFYING, "Verb", NC_("Verb", "Verifying"), GTK_STOCK_REFRESH },
-        { ACTIVITY_FILTER_ERROR, NULL, N_("Error"), GTK_STOCK_DIALOG_ERROR }
+        { ACTIVITY_FILTER_VERIFYING, "Verb", NC_("Verb", "Verifying"), NULL },
+        { ACTIVITY_FILTER_ERROR, NULL, N_("Error"), NULL }
     };
 
     GtkListStore* store = gtk_list_store_new(ACTIVITY_FILTER_N_COLS,
