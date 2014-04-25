@@ -157,9 +157,6 @@ static BuiltinIconInfo const my_fallback_icons[] =
 static void register_my_icons(void)
 {
     GtkIconTheme* theme = gtk_icon_theme_get_default();
-    GtkIconFactory* factory = gtk_icon_factory_new();
-
-    gtk_icon_factory_add_default(factory);
 
     for (size_t i = 0; i < G_N_ELEMENTS(my_fallback_icons); ++i)
     {
@@ -177,21 +174,15 @@ static void register_my_icons(void)
             if (p != NULL)
             {
                 int width;
-                GtkIconSet* icon_set;
 
                 width = gdk_pixbuf_get_width(p);
-                icon_set = gtk_icon_set_new_from_pixbuf(p);
 
                 gtk_icon_theme_add_builtin_icon(name, width, p);
-                gtk_icon_factory_add(factory, name, icon_set);
 
                 g_object_unref(p);
-                gtk_icon_set_unref(icon_set);
             }
         }
     }
-
-    g_object_unref(G_OBJECT(factory));
 }
 
 void gtr_actions_set_core(TrCore* core)
@@ -202,6 +193,7 @@ void gtr_actions_set_core(TrCore* core)
 void gtr_actions_init(GtkApplication* app, gpointer callback_user_data UNUSED)
 {
     gtk_application_set_app_menu(app, gtr_action_get_menu_model("menubar"));
+    register_my_icons();
 }
 
 void gtr_actions_add_to_map(GActionMap* map, gpointer callback_user_data)
