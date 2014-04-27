@@ -1,4 +1,4 @@
-/* $Id: portlistingparse.c,v 1.5 2012/03/05 19:42:47 nanard Exp $ */
+/* $Id: portlistingparse.c,v 1.6 2012/05/29 10:26:51 nanard Exp $ */
 /* MiniUPnP project
  * http://miniupnp.free.fr/ or http://miniupnp.tuxfamily.org/
  * (c) 2011 Thomas Bernard
@@ -71,6 +71,8 @@ static void
 endelt(void * d, const char * name, int l)
 {
 	struct PortMappingParserData * pdata = (struct PortMappingParserData *)d;
+	(void)name;
+	(void)l;
 	pdata->curelt = PortMappingEltNone;
 }
 

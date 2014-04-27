@@ -1,5 +1,88 @@
-$Id: Changelog.txt,v 1.169 2012/05/24 18:08:49 nanard Exp $
+$Id: Changelog.txt,v 1.193 2014/02/05 17:26:45 nanard Exp $
 miniUPnP client Changelog.
+
+2014/02/05:
+  handle EINPROGRESS after connect()
+
+2014/02/03:
+  minixml now handle XML comments
+
+VERSION 1.9 : released 2014/01/31
+
+2014/01/31:
+  added argument remoteHost to UPNP_GetSpecificPortMappingEntry()
+  increment API_VERSION to 10
+
+2013/12/09:
+  --help and -h arguments in upnpc.c
+
+2013/10/07:
+  fixed potential buffer overrun in miniwget.c
+  Modified UPNP_GetValidIGD() to check for ExternalIpAddress
+
+2013/08/01:
+  define MAXHOSTNAMELEN if not already done
+
+2013/06/06:
+  update upnpreplyparse to allow larger values (128 chars instead of 64)
+
+2013/05/14:
+  Update upnpreplyparse to take into account "empty" elements
+  validate upnpreplyparse.c code with "make check"
+
+2013/05/03:
+  Fix Solaris build thanks to Maciej Małecki
+
+2013/04/27:
+  Fix testminiwget.sh for BSD
+
+2013/03/23:
+  Fixed Makefile for *BSD
+
+2013/03/11:
+  Update Makefile to use JNAerator version 0.11
+
+2013/02/11:
+  Fix testminiwget.sh for use with dash
+  Use $(DESTDIR) in Makefile
+
+VERSION 1.8 : released 2013/02/06
+
+2012/10/16:
+  fix testminiwget with no IPv6 support
+
+2012/09/27:
+  Rename all include guards to not clash with C99
+  (7.1.3 Reserved identifiers).
+
+2012/08/30:
+  Added -e option to upnpc program (set description for port mappings)
+
+2012/08/29:
+  Python 3 support (thanks to Christopher Foo)
+
+2012/08/11:
+  Fix a memory link in UPNP_GetValidIGD()
+  Try to handle scope id in link local IPv6 URL under MS Windows
+
+2012/07/20:
+  Disable HAS_IP_MREQN on DragonFly BSD
+
+2012/06/28:
+  GetUPNPUrls() now inserts scope into link-local IPv6 addresses
+
+2012/06/23:
+  More error return checks in upnpc.c
+  #define MINIUPNPC_GET_SRC_ADDR enables receivedata() to get scope_id
+  parseURL() now parses IPv6 addresses scope
+  new parameter for miniwget() : IPv6 address scope
+  increment API_VERSION to 9
+
+2012/06/20:
+  fixed CMakeLists.txt
+
+2012/05/29
+  Improvements in testminiwget.sh
 
 VERSION 1.7 : released 2012/05/24
 

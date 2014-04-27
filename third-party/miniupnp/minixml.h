@@ -1,4 +1,4 @@
-/* $Id: minixml.h,v 1.6 2006/11/30 11:47:21 nanard Exp $ */
+/* $Id: minixml.h,v 1.7 2012/09/27 15:42:10 nanard Exp $ */
 /* minimal xml parser
  *
  * Project : miniupnp
@@ -8,8 +8,8 @@
  * This software is subject to the conditions detailed in the
  * LICENCE file provided in this distribution.
  * */
-#ifndef __MINIXML_H__
-#define __MINIXML_H__
+#ifndef MINIXML_H_INCLUDED
+#define MINIXML_H_INCLUDED
 #define IS_WHITE_SPACE(c) ((c==' ') || (c=='\t') || (c=='\r') || (c=='\n'))
 
 /* if a callback function pointer is set to NULL,

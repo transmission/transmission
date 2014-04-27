@@ -1,10 +1,10 @@
-/* $Id: minixml.c,v 1.10 2012/03/05 19:42:47 nanard Exp $ */
+/* $Id: minixml.c,v 1.11 2014/02/03 15:54:12 nanard Exp $ */
 /* minixml.c : the minimum size a xml parser can be ! */
 /* Project : miniupnp
  * webpage: http://miniupnp.free.fr/ or http://miniupnp.tuxfamily.org/
  * Author : Thomas Bernard
 
-Copyright (c) 2005-2011, Thomas BERNARD
+Copyright (c) 2005-2014, Thomas BERNARD
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -113,7 +113,20 @@ static void parseelt(struct xmlparser * p)
 	const char * elementname;
 	while(p->xml < (p->xmlend - 1))
 	{
-		if((p->xml)[0]=='<' && (p->xml)[1]!='?')
+		if((p->xml + 4) <= p->xmlend && (0 == memcmp(p->xml, "<!--", 4)))
+		{
+			p->xml += 3;
+			/* ignore comments */
+			do
+			{
+				p->xml++;
+				if ((p->xml + 3) >= p->xmlend)
+					return;
+			}
+			while(memcmp(p->xml, "-->", 3) != 0);
+			p->xml += 3;
+		}
+		else if((p->xml)[0]=='<' && (p->xml)[1]!='?')
 		{
 			i = 0; elementname = ++p->xml;
 			while( !IS_WHITE_SPACE(*p->xml)

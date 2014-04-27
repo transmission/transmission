@@ -1,4 +1,4 @@
-/* $Id: receivedata.c,v 1.3 2012/03/05 19:42:47 nanard Exp $ */
+/* $Id: receivedata.c,v 1.5 2013/10/07 09:48:36 nanard Exp $ */
 /* Project : miniupnp
  * Website : http://miniupnp.free.fr/
  * Author : Thomas Bernard
@@ -18,6 +18,7 @@
 #include <sys/select.h>
 #endif /* #else defined(__amigaos__) && !defined(__amigaos4__) */
 #include <sys/socket.h>
+#include <netinet/in.h>
 #if !defined(__amigaos__) && !defined(__amigaos4__)
 #include <poll.h>
 #endif
@@ -34,8 +35,19 @@
 #include "receivedata.h"
 
 int
-receivedata(int socket, char * data, int length, int timeout)
+receivedata(int socket,
+            char * data, int length,
+            int timeout, unsigned int * scope_id)
 {
+#ifdef MINIUPNPC_GET_SRC_ADDR
+#ifdef DEBUG
+	/* to shut up valgrind about uninit value */
+	struct sockaddr_storage src_addr = {0};
+#else
+	struct sockaddr_storage src_addr;
+#endif
+	socklen_t src_addr_len = sizeof(src_addr);
+#endif
     int n;
 #if !defined(_WIN32) && !defined(__amigaos__) && !defined(__amigaos4__)
 	/* using poll */
@@ -72,10 +84,25 @@ receivedata(int socket, char * data, int length, int timeout)
         return 0;
     }
 #endif
+#ifdef MINIUPNPC_GET_SRC_ADDR
+	n = recvfrom(socket, data, length, 0,
+	             (struct sockaddr *)&src_addr, &src_addr_len);
+#else
 	n = recv(socket, data, length, 0);
+#endif
 	if(n<0) {
 		PRINT_SOCKET_ERROR("recv");
 	}
+#ifdef MINIUPNPC_GET_SRC_ADDR
+	if (src_addr.ss_family == AF_INET6) {
+		const struct sockaddr_in6 * src_addr6 = (struct sockaddr_in6 *)&src_addr;
+#ifdef DEBUG
+		printf("scope_id=%u\n", src_addr6->sin6_scope_id);
+#endif
+		if(scope_id)
+			*scope_id = src_addr6->sin6_scope_id;
+	}
+#endif
 	return n;
 }
 

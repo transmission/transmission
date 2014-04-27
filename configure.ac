@@ -243,41 +243,47 @@ dnl
 dnl  look for preinstalled miniupnpc...
 dnl
 
-AC_MSG_CHECKING([supported miniupnp library])
-upnp_version="none"
 ac_save_LIBS="$LIBS"
 LIBS="-lminiupnpc"
-# See if the OS has its miniupnp 1.5 installed
-AC_LINK_IFELSE([AC_LANG_PROGRAM([[
-    #include <stdlib.h>
-    #include <miniupnpc/miniupnpc.h>
-    #include <miniupnpc/upnpcommands.h>
-]], [[
-    struct UPNPDev * devlist;
-    struct UPNPUrls    urls;
-    struct IGDdatas    data;
-    char lanaddr[16];
-    char portStr[8];
-    char intPort[8];
-    char intClient[16];
-    upnpDiscover( 2000, NULL, NULL, 0 );
-    UPNP_GetValidIGD( devlist, &urls, &data, lanaddr, sizeof( lanaddr ) ); 
-    UPNP_GetSpecificPortMappingEntry( urls.controlURL, data.first.servicetype,
-                        portStr, "TCP", intClient, intPort );
-]])],[
-AC_DEFINE(HAVE_MINIUPNP_15, 1, [Define to 1 if you have miniupnpc version 1.5])
-upnp_version="1.5"],[])
+AC_MSG_CHECKING([system miniupnpc library])
 
-# See if the OS has its miniupnp 1.6 installed
-AC_LINK_IFELSE([AC_LANG_PROGRAM([[
+dnl See if ANY version of miniupnpc is installed
+AC_LINK_IFELSE(
+  [AC_LANG_PROGRAM([#include <miniupnpc/miniupnpc.h>],
+                   [struct UPNPDev dev;])],
+  [upnp_version="unknown"],
+  [upnp_version="none"]
+)
+
+dnl Let's hope it's 1.7 or higher, since it provides
+dnl MINIUPNPC_API_VERSION and we won't have to figure
+dnl it out on our own
+if test "x$upnp_version" = "xunknown" ; then
+  AC_RUN_IFELSE(
+    [AC_LANG_PROGRAM(
+      [#include <stdlib.h>
+       #include <miniupnpc/miniupnpc.h>],
+      [#ifdef MINIUPNPC_API_VERSION
+       return EXIT_SUCCESS;
+       #else
+       return EXIT_FAILURE;
+       #endif]
+    )],
+    [upnp_version=">= 1.7"]
+  )
+fi
+
+dnl Or maybe it's miniupnp 1.6
+if test "x$upnp_version" = "xunknown" ; then
+  AC_LINK_IFELSE([AC_LANG_PROGRAM([[
     #include <stdlib.h>
     #include <errno.h>
     #include <miniupnpc/miniupnpc.h>
     #include <miniupnpc/upnpcommands.h>
-]], [[
+  ]], [[
     struct UPNPDev * devlist;
-    struct UPNPUrls    urls;
-    struct IGDdatas    data;
+    struct UPNPUrls urls;
+    struct IGDdatas data;
     char lanaddr[16];
     char portStr[8];
     char intPort[8];
@@ -286,9 +292,33 @@ AC_LINK_IFELSE([AC_LANG_PROGRAM([[
     UPNP_GetValidIGD( devlist, &urls, &data, lanaddr, sizeof( lanaddr ) ); 
     UPNP_GetSpecificPortMappingEntry( urls.controlURL, data.first.servicetype,
                         portStr, "TCP", intClient, intPort, NULL, NULL, NULL );
-]])],[
-AC_DEFINE(HAVE_MINIUPNP_16, 1, [Define to 1 if you have miniupnpc version 1.6])
-upnp_version="1.6"],[])
+  ]])],[
+  AC_DEFINE(MINIUPNPC_API_VERSION, 8, [miniupnpc 1.6's API version is 8])
+  upnp_version="1.6"])
+fi
+
+dnl Or maybe it's miniupnp 1.5
+if test "x$upnp_version" = "xunknown" ; then
+  AC_LINK_IFELSE([AC_LANG_PROGRAM([[
+    #include <stdlib.h>
+    #include <miniupnpc/miniupnpc.h>
+    #include <miniupnpc/upnpcommands.h>
+  ]], [[
+    struct UPNPDev * devlist;
+    struct UPNPUrls urls;
+    struct IGDdatas data;
+    char lanaddr[16];
+    char portStr[8];
+    char intPort[8];
+    char intClient[16];
+    upnpDiscover( 2000, NULL, NULL, 0 );
+    UPNP_GetValidIGD( devlist, &urls, &data, lanaddr, sizeof( lanaddr ) ); 
+    UPNP_GetSpecificPortMappingEntry( urls.controlURL, data.first.servicetype,
+                        portStr, "TCP", intClient, intPort );
+  ]])],[
+  AC_DEFINE(MINIUPNPC_API_VERSION, 5, [miniupnpc 1.5's API version is 5])
+  upnp_version="1.5"])
+fi
 
 # ... and the results of our tests
 LIBS="$ac_save_LIBS"
@@ -298,8 +328,6 @@ if test "x$upnp_version" = "xnone" ; then
     LIBUPNP_CFLAGS="-I\$(top_srcdir)/third-party/"
     LIBUPNP_LIBS="\$(top_builddir)/third-party/miniupnp/libminiupnp.a"
     LIBUPNP_LIBS_QT="\$\${TRANSMISSION_TOP}/third-party/miniupnp/libminiupnp.a"
-    dnl because this is the version that we bundle...
-    AC_DEFINE(HAVE_MINIUPNP_16, 1, [Define to 1 if you have miniupnpc version 1.6])
 else
     AC_DEFINE([SYSTEM_MINIUPNP])
     LIBUPNP_CFLAGS="" 

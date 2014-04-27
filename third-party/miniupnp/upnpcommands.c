@@ -1,7 +1,7 @@
-/* $Id: upnpcommands.c,v 1.39 2012/04/09 12:49:27 nanard Exp $ */
+/* $Id: upnpcommands.c,v 1.42 2014/01/31 13:18:25 nanard Exp $ */
 /* Project : miniupnp
  * Author : Thomas Bernard
- * Copyright (c) 2005-2011 Thomas Bernard
+ * Copyright (c) 2005-2012 Thomas Bernard
  * This software is subject to the conditions detailed in the
  * LICENCE file provided in this distribution.
  * */
@@ -578,7 +578,8 @@ LIBSPEC int
 UPNP_GetSpecificPortMappingEntry(const char * controlURL,
                                  const char * servicetype,
                                  const char * extPort,
-							     const char * proto,
+                                 const char * proto,
+                                 const char * remoteHost,
                                  char * intClient,
                                  char * intPort,
                                  char * desc,
@@ -597,7 +598,7 @@ UPNP_GetSpecificPortMappingEntry(const char * controlURL,
 
 	GetPortMappingArgs = calloc(4, sizeof(struct UPNParg));
 	GetPortMappingArgs[0].elt = "NewRemoteHost";
-	/* TODO : add remote host ? */
+	GetPortMappingArgs[0].val = remoteHost;
 	GetPortMappingArgs[1].elt = "NewExternalPort";
 	GetPortMappingArgs[1].val = extPort;
 	GetPortMappingArgs[2].elt = "NewProtocol";
@@ -759,7 +760,7 @@ UPNP_GetFirewallStatus(const char * controlURL,
 	char * fe, *ipa, *p;
 	int ret = UPNPCOMMAND_UNKNOWN_ERROR;
 
-	if(!firewallEnabled && !inboundPinholeAllowed)
+	if(!firewallEnabled || !inboundPinholeAllowed)
 		return UPNPCOMMAND_INVALID_ARGS;
 
 	buffer = simpleUPnPcommand(-1, controlURL, servicetype,

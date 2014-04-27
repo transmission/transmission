@@ -1,4 +1,4 @@
-/* $Id: igd_desc_parse.h,v 1.10 2011/04/11 09:19:24 nanard Exp $ */
+/* $Id: igd_desc_parse.h,v 1.11 2012/10/16 16:49:02 nanard Exp $ */
 /* Project : miniupnp
  * http://miniupnp.free.fr/
  * Author : Thomas Bernard
@@ -6,8 +6,8 @@
  * This software is subject to the conditions detailed in the
  * LICENCE file provided in this distribution.
  * */
-#ifndef __IGD_DESC_PARSE_H__
-#define __IGD_DESC_PARSE_H__
+#ifndef IGD_DESC_PARSE_H_INCLUDED
+#define IGD_DESC_PARSE_H_INCLUDED
 
 /* Structure to store the result of the parsing of UPnP
  * descriptions of Internet Gateway Devices */

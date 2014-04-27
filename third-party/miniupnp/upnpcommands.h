@@ -1,11 +1,11 @@
-/* $Id: upnpcommands.h,v 1.24 2012/03/05 19:42:47 nanard Exp $ */
+/* $Id: upnpcommands.h,v 1.27 2014/02/17 15:38:26 nanard Exp $ */
 /* Miniupnp project : http://miniupnp.free.fr/
  * Author : Thomas Bernard
- * Copyright (c) 2005-2011 Thomas Bernard
+ * Copyright (c) 2005-2014 Thomas Bernard
  * This software is subject to the conditions detailed in the
  * LICENCE file provided within this distribution */
-#ifndef __UPNPCOMMANDS_H__
-#define __UPNPCOMMANDS_H__
+#ifndef UPNPCOMMANDS_H_INCLUDED
+#define UPNPCOMMANDS_H_INCLUDED
 
 #include "upnpreplyparse.h"
 #include "portlistingparse.h"
@@ -100,6 +100,8 @@ UPNP_GetLinkLayerMaxBitRates(const char* controlURL,
  * errorCode errorDescription (short) - Description (long)
  * 402 Invalid Args - See UPnP Device Architecture section on Control.
  * 501 Action Failed - See UPnP Device Architecture section on Control.
+ * 606 Action not authorized - The action requested REQUIRES authorization and
+ *                             the sender was not authorized.
  * 715 WildCardNotPermittedInSrcIP - The source IP address cannot be
  *                                   wild-carded
  * 716 WildCardNotPermittedInExtPort - The external port cannot be wild-carded
@@ -112,7 +114,13 @@ UPNP_GetLinkLayerMaxBitRates(const char* controlURL,
  * 726 RemoteHostOnlySupportsWildcard - RemoteHost must be a wildcard
  *                             and cannot be a specific IP address or DNS name
  * 727 ExternalPortOnlySupportsWildcard - ExternalPort must be a wildcard and
- *                                        cannot be a specific port value */
+ *                                        cannot be a specific port value
+ * 728 NoPortMapsAvailable - There are not enough free ports available to
+ *                           complete port mapping.
+ * 729 ConflictWithOtherMechanisms - Attempted port mapping is not allowed
+ *                                   due to conflict with other mechanisms.
+ * 732 WildCardNotPermittedInIntPort - The internal port cannot be wild-carded
+ */
 LIBSPEC int
 UPNP_AddPortMapping(const char * controlURL, const char * servicetype,
                     const char * extPort,
@@ -132,6 +140,8 @@ UPNP_AddPortMapping(const char * controlURL, const char * servicetype,
  *
  * List of possible UPnP errors for DeletePortMapping :
  * 402 Invalid Args - See UPnP Device Architecture section on Control.
+ * 606 Action not authorized - The action requested REQUIRES authorization
+ *                             and the sender was not authorized.
  * 714 NoSuchEntryInArray - The specified value does not exist in the array */
 LIBSPEC int
 UPNP_DeletePortMapping(const char * controlURL, const char * servicetype,
@@ -150,6 +160,7 @@ UPNP_GetPortMappingNumberOfEntries(const char* controlURL,
  * params :
  *  in   extPort
  *  in   proto
+ *  in   remoteHost
  *  out  intClient (16 bytes)
  *  out  intPort (6 bytes)
  *  out  desc (80 bytes)
@@ -158,12 +169,21 @@ UPNP_GetPortMappingNumberOfEntries(const char* controlURL,
  *
  * return value :
  * UPNPCOMMAND_SUCCESS, UPNPCOMMAND_INVALID_ARGS, UPNPCOMMAND_UNKNOWN_ERROR
- * or a UPnP Error Code. */
+ * or a UPnP Error Code.
+ *
+ * List of possible UPnP errors for _GetSpecificPortMappingEntry :
+ * 402 Invalid Args - See UPnP Device Architecture section on Control.
+ * 501 Action Failed - See UPnP Device Architecture section on Control.
+ * 606 Action not authorized - The action requested REQUIRES authorization
+ *                             and the sender was not authorized.
+ * 714 NoSuchEntryInArray - The specified value does not exist in the array.
+ */
 LIBSPEC int
 UPNP_GetSpecificPortMappingEntry(const char * controlURL,
                                  const char * servicetype,
                                  const char * extPort,
                                  const char * proto,
+                                 const char * remoteHost,
                                  char * intClient,
                                  char * intPort,
                                  char * desc,
@@ -188,6 +208,8 @@ UPNP_GetSpecificPortMappingEntry(const char * controlURL,
  *
  * Possible UPNP Error codes :
  * 402 Invalid Args - See UPnP Device Architecture section on Control.
+ * 606 Action not authorized - The action requested REQUIRES authorization
+ *                             and the sender was not authorized.
  * 713 SpecifiedArrayIndexInvalid - The specified array index is out of bounds
  */
 LIBSPEC int

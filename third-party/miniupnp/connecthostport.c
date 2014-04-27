@@ -1,7 +1,7 @@
-/* $Id: connecthostport.c,v 1.7 2012/03/05 19:42:46 nanard Exp $ */
+/* $Id: connecthostport.c,v 1.13 2014/03/31 12:36:36 nanard Exp $ */
 /* Project : miniupnp
  * Author : Thomas Bernard
- * Copyright (c) 2010-2012 Thomas Bernard
+ * Copyright (c) 2010-2014 Thomas Bernard
  * This software is subject to the conditions detailed in the
  * LICENCE file provided in this distribution. */
 
@@ -24,15 +24,18 @@
 #else /* #ifdef _WIN32 */
 #include <unistd.h>
 #include <sys/param.h>
+#include <sys/select.h>
 #include <errno.h>
 #define closesocket close
 #include <netdb.h>
+#include <netinet/in.h>
 /* defining MINIUPNPC_IGNORE_EINTR enable the ignore of interruptions
  * during the connect() call */
 #define MINIUPNPC_IGNORE_EINTR
 #ifndef USE_GETHOSTBYNAME
 #include <sys/types.h>
 #include <sys/socket.h>
+#include <sys/select.h>
 #endif /* #ifndef USE_GETHOSTBYNAME */
 #endif /* #else _WIN32 */
 
@@ -49,10 +52,15 @@
 
 #include "connecthostport.h"
 
+#ifndef MAXHOSTNAMELEN
+#define MAXHOSTNAMELEN 64
+#endif
+
 /* connecthostport()
  * return a socket connected (TCP) to the host and port
  * or -1 in case of error */
-int connecthostport(const char * host, unsigned short port)
+int connecthostport(const char * host, unsigned short port,
+                    unsigned int scope_id)
 {
 	int s, n;
 #ifdef USE_GETHOSTBYNAME
@@ -102,7 +110,10 @@ int connecthostport(const char * host, unsigned short port)
 	dest.sin_port = htons(port);
 	n = connect(s, (struct sockaddr *)&dest, sizeof(struct sockaddr_in));
 #ifdef MINIUPNPC_IGNORE_EINTR
-	while(n < 0 && errno == EINTR)
+	/* EINTR The system call was interrupted by a signal that was caught
+	 * EINPROGRESS The socket is nonblocking and the connection cannot
+	 *             be completed immediately. */
+	while(n < 0 && (errno == EINTR || errno = EINPROGRESS))
 	{
 		socklen_t len;
 		fd_set wset;
@@ -145,10 +156,12 @@ int connecthostport(const char * host, unsigned short port)
 	if(host[0] == '[')
 	{
 		/* literal ip v6 address */
-		int i;
-		for(i = 0; host[i+1] && (host[i+1] != ']') && i < MAXHOSTNAMELEN; i++)
+		int i, j;
+		for(i = 0, j = 1; host[j] && (host[j] != ']') && i < MAXHOSTNAMELEN; i++, j++)
 		{
-			tmp_host[i] = host[i+1];
+			tmp_host[i] = host[j];
+			if(0 == memcmp(host+j, "%25", 3))	/* %25 is just url encoding for '%' */
+				j+=2;							/* skip "25" */
 		}
 		tmp_host[i] = '\0';
 	}
@@ -173,6 +186,10 @@ int connecthostport(const char * host, unsigned short port)
 		s = socket(p->ai_family, p->ai_socktype, p->ai_protocol);
 		if(s < 0)
 			continue;
+		if(p->ai_addr->sa_family == AF_INET6 && scope_id > 0) {
+			struct sockaddr_in6 * addr6 = (struct sockaddr_in6 *)p->ai_addr;
+			addr6->sin6_scope_id = scope_id;
+		}
 #ifdef MINIUPNPC_SET_SOCKET_TIMEOUT
 		/* setting a 3 seconds timeout for the connect() call */
 		timeout.tv_sec = 3;
@@ -190,7 +207,10 @@ int connecthostport(const char * host, unsigned short port)
 #endif /* #ifdef MINIUPNPC_SET_SOCKET_TIMEOUT */
 		n = connect(s, p->ai_addr, p->ai_addrlen);
 #ifdef MINIUPNPC_IGNORE_EINTR
-		while(n < 0 && errno == EINTR)
+		/* EINTR The system call was interrupted by a signal that was caught
+		 * EINPROGRESS The socket is nonblocking and the connection cannot
+		 *             be completed immediately. */
+		while(n < 0 && (errno == EINTR || errno == EINPROGRESS))
 		{
 			socklen_t len;
 			fd_set wset;
