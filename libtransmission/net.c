@@ -59,7 +59,7 @@ const tr_address tr_inaddr_any = { TR_AF_INET, { { { { INADDR_ANY, 0x00, 0x00, 0
 void
 tr_netInit (void)
 {
-    static int initialized = false;
+    static bool initialized = false;
 
     if (!initialized)
     {

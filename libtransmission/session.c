@@ -1243,7 +1243,7 @@ tr_sessionGetIdleLimit (const tr_session * session)
 bool
 tr_sessionGetActiveSpeedLimit_Bps (const tr_session * session, tr_direction dir, unsigned int * setme_Bps)
 {
-  int isLimited = true;
+  bool isLimited = true;
 
   if (!tr_isSession (session))
     return false;

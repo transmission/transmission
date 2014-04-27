@@ -204,7 +204,7 @@ test_lowerbound (void)
   int i;
   const int A[] = { 1, 2, 3, 3, 3, 5, 8 };
   const int expected_pos[] = { 0, 1, 2, 5, 5, 6, 6, 6, 7, 7 };
-  const int expected_exact[] = { true, true, true, false, true, false, false, true, false, false };
+  const bool expected_exact[] = { true, true, true, false, true, false, false, true, false, false };
   const int N = sizeof (A) / sizeof (A[0]);
 
   for (i=1; i<=10; i++)

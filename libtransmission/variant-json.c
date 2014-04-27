@@ -604,7 +604,7 @@ jsonContainerEndFunc (const tr_variant * val,
                       void             * vdata)
 {
   struct jsonWalk * data = vdata;
-  int emptyContainer = false;
+  bool emptyContainer = false;
 
   jsonPopParent (data);
 

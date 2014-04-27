@@ -1339,7 +1339,7 @@ peerMadeRequest (tr_peerMsgs * msgs, const struct peer_request * req)
     const int clientHasPiece = reqIsValid && tr_torrentPieceIsComplete (msgs->torrent, req->index);
     const int peerIsChoked = msgs->peer_is_choked;
 
-    int allow = false;
+    bool allow = false;
 
     if (!reqIsValid)
         dbgmsg (msgs, "rejecting an invalid request.");
