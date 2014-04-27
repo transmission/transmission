@@ -723,7 +723,11 @@ TrMainWindow :: refreshTrayIcon ()
 
   myModel.getTransferSpeed (upSpeed, upCount, downSpeed, downCount);
 
-  if (!upCount && !downCount)
+  if (myNetworkError)
+    {
+      tip  = tr ("Network Error");
+    }
+  else if (!upCount && !downCount)
     {
       tip = tr ("Idle");
     }
@@ -1408,10 +1412,17 @@ TrMainWindow :: dataSendProgress ()
 void
 TrMainWindow :: onError (QNetworkReply::NetworkError code)
 {
-    if (code != QNetworkReply::NoError)
-        myNetworkError = true;
-    else
-        myNetworkError = false;
+  const bool hadError = myNetworkError;
+  const bool haveError = code != QNetworkReply::NoError;
+
+  myNetworkError = haveError;
+  refreshTrayIconSoon();
+  updateNetworkIcon();
+
+  // Refresh our model if we've just gotten a clean connection to the session.
+  // That way we can rebuild after a restart of transmission-daemon
+  if (hadError && !haveError)
+    myModel.clear();
 }
 
 void
