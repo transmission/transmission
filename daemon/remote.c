@@ -1057,7 +1057,7 @@ printDetails (tr_variant * top)
                         break;
                     case TR_RATIOLIMIT_SINGLE:
                         if (tr_variantDictFindReal (t, TR_KEY_seedRatioLimit, &d))
-                            printf ("  Ratio Limit: %.2f\n", d);
+                            printf ("  Ratio Limit: %s\n", strlratio2 (buf, d, sizeof(buf)));
                         break;
                     case TR_RATIOLIMIT_UNLIMITED:
                         printf ("  Ratio Limit: Unlimited\n");
@@ -1566,7 +1566,7 @@ printSession (tr_variant * top)
                 printf ("  Peer limit: %" PRId64 "\n", peerLimit);
 
                 if (seedRatioLimited)
-                    tr_snprintf (buf, sizeof (buf), "%.2f", seedRatioLimit);
+                    strlratio2 (buf, seedRatioLimit, sizeof(buf));
                 else
                     tr_strlcpy (buf, "Unlimited", sizeof (buf));
                 printf ("  Default seed ratio limit: %s\n", buf);
