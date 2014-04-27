@@ -18,7 +18,9 @@
 #endif
 #include <unistd.h> /* daemon */
 
+#include <event.h>
 #include <event2/buffer.h>
+#include <event2/event.h>
 
 #include <libtransmission/transmission.h>
 #include <libtransmission/tr-getopt.h>
@@ -61,12 +63,12 @@
 #define LOGFILE_MODE_STR "a+"
 
 static bool paused = false;
-static bool closing = false;
 static bool seenHUP = false;
 static const char *logfileName = NULL;
 static FILE *logfile = NULL;
 static tr_session * mySession = NULL;
 static tr_quark key_pidfile = 0;
+static struct event_base *ev_base = NULL;
 
 /***
 ****  Config File
@@ -183,7 +185,7 @@ gotsig (int sig)
 
         case SIGINT:
         case SIGTERM:
-            closing = true;
+            event_base_loopexit(ev_base, NULL);
             break;
     }
 }
@@ -344,6 +346,28 @@ pumpLogMessages (FILE * logfile)
     tr_logFreeQueue (list);
 }
 
+static void
+reportStatus (void)
+{
+    const double up = tr_sessionGetRawSpeed_KBps (mySession, TR_UP);
+    const double dn = tr_sessionGetRawSpeed_KBps (mySession, TR_DOWN);
+
+    if (up>0 || dn>0)
+	sd_notifyf (0, "STATUS=Uploading %.2f KBps, Downloading %.2f KBps.\n", up, dn);
+    else
+	sd_notify (0, "STATUS=Idle.\n");
+}
+
+static void
+periodicUpdate (evutil_socket_t fd UNUSED, short what UNUSED, void *watchdir)
+{
+    dtr_watchdir_update (watchdir);
+
+    pumpLogMessages (logfile);
+
+    reportStatus ();
+}
+
 static tr_rpc_callback_status
 on_rpc_callback (tr_session            * session UNUSED,
                  tr_rpc_callback_type    type,
@@ -351,7 +375,7 @@ on_rpc_callback (tr_session            * session UNUSED,
                  void                  * user_data UNUSED)
 {
     if (type == TR_RPC_SESSION_CLOSE)
-        closing = true;
+        event_base_loopexit(ev_base, NULL);
     return TR_RPC_OK;
 }
 
@@ -370,6 +394,7 @@ main (int argc, char ** argv)
     dtr_watchdir * watchdir = NULL;
     bool pidfile_created = false;
     tr_session * session = NULL;
+    struct event *status_ev;
 
     key_pidfile = tr_quark_new ("pidfile",  7);
 
@@ -514,6 +539,16 @@ main (int argc, char ** argv)
 
     sd_notifyf (0, "MAINPID=%d\n", (int)getpid()); 
 
+    /* setup event state */
+    ev_base = event_base_new();
+    if (ev_base == NULL)
+    {
+        char buf[256];
+        tr_snprintf(buf, sizeof(buf), "Failed to init daemon event state: %s", tr_strerror(errno));
+        printMessage (logfile, TR_LOG_ERROR, MY_NAME, buf, __FILE__, __LINE__);
+        exit (1);
+    }
+
     /* start the session */
     tr_formatter_mem_init (MEM_K, MEM_K_STR, MEM_M_STR, MEM_G_STR, MEM_T_STR);
     tr_formatter_size_init (DISK_K, DISK_K_STR, DISK_M_STR, DISK_G_STR, DISK_T_STR);
@@ -579,28 +614,42 @@ main (int argc, char ** argv)
         openlog (MY_NAME, LOG_CONS|LOG_PID, LOG_DAEMON);
 #endif
 
-  sd_notify( 0, "READY=1\n" ); 
+    /* Create new timer event to report daemon status */
+    {
+        struct timeval one_sec = { 1, 0 };
+        status_ev = event_new(ev_base, -1, EV_PERSIST, &periodicUpdate, watchdir);
+        if (status_ev == NULL)
+        {
+            tr_logAddError("Failed to create status event %s", tr_strerror(errno));
+            goto cleanup;
+        }
+        if (event_add(status_ev, &one_sec) == -1)
+        {
+            tr_logAddError("Failed to add status event %s", tr_strerror(errno));
+            goto cleanup;
+        }
+    }
 
-  while (!closing)
-    { 
-      double up;
-      double dn;
+    sd_notify( 0, "READY=1\n" );
 
-      tr_wait_msec (1000); /* sleep one second */ 
+    /* Run daemon event loop */
+    if (event_base_dispatch(ev_base) == -1)
+    {
+        tr_logAddError("Failed to launch daemon event loop: %s", tr_strerror(errno));
+	goto cleanup;
+    }
 
-      dtr_watchdir_update (watchdir); 
-      pumpLogMessages (logfile); 
-
-      up = tr_sessionGetRawSpeed_KBps (mySession, TR_UP);
-      dn = tr_sessionGetRawSpeed_KBps (mySession, TR_DOWN);
-      if (up>0 || dn>0)
-        sd_notifyf (0, "STATUS=Uploading %.2f KBps, Downloading %.2f KBps.\n", up, dn); 
-      else
-        sd_notify (0, "STATUS=Idle.\n"); 
-    } 
-
+cleanup:
     sd_notify( 0, "STATUS=Closing transmission session...\n" );
     printf ("Closing transmission session...");
+
+    if (status_ev)
+    {
+        event_del(status_ev);
+        event_free(status_ev);
+    }
+    event_base_free(ev_base);
+
     tr_sessionSaveSettings (mySession, configDir, &settings);
     dtr_watchdir_free (watchdir);
     tr_sessionClose (mySession);
