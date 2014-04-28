@@ -791,7 +791,7 @@ static void selection_changed_cb(GtkComboBox* combo, gpointer vdata)
     GtkTreeIter iter;
     GtkTreeModel* model;
     struct filter_data* data = vdata;
-    guchar bar_title[255];
+    gchar bar_title[255];
 
     /* set data->active_activity_type from the activity combobox */
     combo = GTK_COMBO_BOX(data->activity);
@@ -941,12 +941,12 @@ GtkWidget* gtr_filter_bar_new(tr_session* session, GtkTreeModel* tmodel, GtkTree
     GtkWidget* l;
     GtkWidget* w;
     GtkWidget* s;
-    GtkWidget* ti;
     GtkWidget* b;
     GtkWidget* reveal;
     GtkWidget* toolbar;
     GtkWidget* activity;
     GtkWidget* tracker;
+    GtkToolItem* ti;
     struct filter_data* data;
 
     g_assert(DIRTY_KEY == 0);
@@ -960,7 +960,7 @@ GtkWidget* gtr_filter_bar_new(tr_session* session, GtkTreeModel* tmodel, GtkTree
     data->activity = activity = activity_combo_box_new(tmodel);
     data->tracker = tracker = tracker_combo_box_new(tmodel);
     data->filter_model = gtk_tree_model_filter_new(tmodel, NULL);
-    data->header_bar = header_bar;
+    data->header_bar = GTK_WIDGET(header_bar);
     g_signal_connect(data->filter_model, "row-deleted", G_CALLBACK(on_filter_model_row_deleted), data);
     g_signal_connect(data->filter_model, "row-inserted", G_CALLBACK(on_filter_model_row_inserted), data);
 
@@ -982,14 +982,14 @@ GtkWidget* gtr_filter_bar_new(tr_session* session, GtkTreeModel* tmodel, GtkTree
 
     b = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
 
-    gtk_box_pack_start(GTK_CONTAINER(b), l, FALSE, FALSE, 0);
-    gtk_box_pack_end(GTK_CONTAINER(b), w, FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(b), l, FALSE, FALSE, 0);
+    gtk_box_pack_end(GTK_BOX(b), w, FALSE, FALSE, 0);
 
     /* create a tool item for activity and label. */
     ti = gtk_tool_item_new();
     gtk_container_add(GTK_CONTAINER(ti), b);
 
-    gtk_toolbar_insert(GTK_CONTAINER(toolbar), GTK_WIDGET(ti), 0);
+    gtk_toolbar_insert(GTK_TOOLBAR(toolbar), GTK_TOOL_ITEM(ti), 0);
 
     /* add a spacer */
     // w = gtk_alignment_new(0.0f, 0.0f, 0.0f, 0.0f);
@@ -1000,7 +1000,7 @@ GtkWidget* gtr_filter_bar_new(tr_session* session, GtkTreeModel* tmodel, GtkTree
     w = tracker;
     ti = gtk_tool_item_new();
     gtk_container_add(GTK_CONTAINER(ti), w);
-    gtk_toolbar_insert(GTK_TOOLBAR(toolbar), GTK_WIDGET(ti), 1);
+    gtk_toolbar_insert(GTK_TOOLBAR(toolbar), GTK_TOOL_ITEM(ti), 1);
 
     /* add a spacer */
     // w = gtk_alignment_new(0.0f, 0.0f, 0.0f, 0.0f);
@@ -1015,7 +1015,7 @@ GtkWidget* gtr_filter_bar_new(tr_session* session, GtkTreeModel* tmodel, GtkTree
     ti = gtk_tool_item_new();
     gtk_tool_item_set_expand(GTK_TOOL_ITEM(ti), TRUE);
     gtk_container_add(GTK_CONTAINER(ti), s);
-    gtk_toolbar_insert(GTK_TOOLBAR(toolbar), GTK_WIDGET(ti), 2);
+    gtk_toolbar_insert(GTK_TOOLBAR(toolbar), GTK_TOOL_ITEM(ti), 2);
 
     g_signal_connect(s, "changed", G_CALLBACK(filter_entry_changed), data->filter_model);
     selection_changed_cb(NULL, data);
