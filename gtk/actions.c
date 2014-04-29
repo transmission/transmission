@@ -36,7 +36,7 @@ static void change_sort_cb(GSimpleAction* action, GVariant* state, gpointer user
 {
     char const* val = g_variant_get_string(state, NULL);
 
-    gtr_core_set_pref(myCore, PREF_KEY_SORT_MODE, val);
+    gtr_core_set_pref(myCore, TR_KEY_sort_mode, val);
     g_simple_action_set_state(action, state);
 }
 
@@ -52,11 +52,25 @@ static void toggle_action_cb(GSimpleAction* action, GVariant* parameter UNUSED, 
 static void change_pref_cb(GSimpleAction* action, GVariant* state, gpointer user_data UNUSED)
 {
     char const* key = g_action_get_name(G_ACTION(action));
- 
+    size_t len = 0;
+    tr_quark entry_name = TR_KEY_NONE;
+
     g_return_if_fail(g_variant_is_of_type(state, G_VARIANT_TYPE_BOOLEAN));
 
-    gtr_core_set_pref_bool(myCore, key, g_variant_get_boolean(state));
-    g_simple_action_set_state(action, state);
+    if (key == NULL)
+    {
+        len = 0;
+    }
+    else if (len == TR_BAD_SIZE)
+    {
+        len = strlen(key);
+    }
+
+    if (tr_quark_lookup(key, len, &entry_name))
+    {
+        gtr_core_set_pref_bool(myCore, entry_name, g_variant_get_boolean(state));
+        g_simple_action_set_state(action, state);
+    }
 }
 
 static void change_toggle_cb(GSimpleAction* action, GVariant* state, gpointer user_data UNUSED)
@@ -122,15 +136,31 @@ static void update_entry_states(GActionEntry* entries, int n_entries)
 
         if (strcmp(entry->name, "sort-mode") == 0)
         {
-            char const* value = gtr_pref_string_get("sort-mode");
+            char const* value = gtr_pref_string_get(TR_KEY_sort_mode);
             entry->state = g_strdup_printf("\"%s\"", value); /* FIXME: leak */
         }
         else if (strcmp(entry->name, "alt-speed-enabled") == 0 || strcmp(entry->name, "compact-view") == 0 ||
             strcmp(entry->name, "sort-reversed") == 0 || strcmp(entry->name, "show-filterbar") == 0 ||
             strcmp(entry->name, "show-statusbar") == 0 || strcmp(entry->name, "show-toolbar") == 0)
         {
-            gboolean value = gtr_pref_flag_get(entry->name);
-            entry->state = value ? "true" : "false";
+            tr_quark entry_name = TR_KEY_NONE;
+            gboolean value;
+            size_t len = 0;
+
+            if (entry->name == NULL)
+            {
+                len = 0;
+            }
+            else if (len == TR_BAD_SIZE)
+            {
+                len = strlen(entry->name);
+            }
+
+            if (tr_quark_lookup(entry->name, len, &entry_name))
+            {
+                value = gtr_pref_flag_get(entry_name);
+                entry->state = value ? "true" : "false";
+            }
         }
     }
 }
