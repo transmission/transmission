@@ -490,7 +490,6 @@ static void app_setup(GtkWindow* wind, struct cbdata* cbdata);
 
 static void on_startup(GApplication* application, gpointer user_data)
 {
-    GError* error;
     GtkApplication* gtk_app = GTK_APPLICATION(application);
     char const* str;
     GtkWindow* win;
