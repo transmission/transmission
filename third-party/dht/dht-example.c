@@ -79,8 +79,8 @@ const unsigned char hash[20] = {
 static void
 callback(void *closure,
          int event,
-         unsigned char *info_hash,
-         void *data, size_t data_len)
+         const unsigned char *info_hash,
+         const void *data, size_t data_len)
 {
     if(event == DHT_EVENT_SEARCH_DONE)
         printf("Search done.\n");

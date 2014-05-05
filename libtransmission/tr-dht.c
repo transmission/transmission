@@ -514,7 +514,7 @@ tr_dhtPrintableStatus (int status)
 
 static void
 callback (void *ignore UNUSED, int event,
-          unsigned char *info_hash, void *data, size_t data_len)
+          const unsigned char *info_hash, const void *data, size_t data_len)
 {
     if (event == DHT_EVENT_VALUES || event == DHT_EVENT_VALUES6) {
         tr_torrent *tor;

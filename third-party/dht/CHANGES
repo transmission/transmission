@@ -1,3 +1,13 @@
+3 May 2014: dht-0.22
+
+  * INCOMPATIBLE CHANGE: the callback now takes const arguments.
+  * Consult the local storage when performing a search, which should
+    make bootstrapping of tiny DHTs easier.  Note that we're still not
+    performing local stores, since that would require knowing our IP
+    address.
+  * Don't attempt to flush the debug stream if debugging is disabled.
+    This appears to work around a bug in Transmission.
+
 25 July 2011: dht-0.21
 
   * Blacklisting support.

@@ -212,6 +212,7 @@ struct storage {
     struct storage *next;
 };
 
+static struct storage * find_storage(const unsigned char *id);
 static void flush_search_node(struct search_node *n, struct search *sr);
 
 static int send_ping(const struct sockaddr *sa, int salen,
@@ -326,11 +327,11 @@ debugf(const char *format, ...)
 {
     va_list args;
     va_start(args, format);
-    if(dht_debug) {
+    if(dht_debug)
         vfprintf(dht_debug, format, args);
-        fflush(dht_debug);
-    }
     va_end(args);
+    if(dht_debug)
+        fflush(dht_debug);
 }
 
 static void
@@ -1193,11 +1194,42 @@ dht_search(const unsigned char *id, int port, int af,
            dht_callback *callback, void *closure)
 {
     struct search *sr;
+    struct storage *st;
     struct bucket *b = find_bucket(id, af);
 
     if(b == NULL) {
         errno = EAFNOSUPPORT;
         return -1;
+    }
+
+    /* Try to answer this search locally.  In a fully grown DHT this
+       is very unlikely, but people are running modified versions of
+       this code in private DHTs with very few nodes.  What's wrong
+       with flooding? */
+    if(callback) {
+        st = find_storage(id);
+        if(st) {
+            unsigned short swapped;
+            unsigned char buf[18];
+            int i;
+
+            debugf("Found local data (%d peers).\n", st->numpeers);
+
+            for(i = 0; i < st->numpeers; i++) {
+                swapped = htons(st->peers[i].port);
+                if(st->peers[i].len == 4) {
+                    memcpy(buf, st->peers[i].ip, 4);
+                    memcpy(buf + 4, &swapped, 2);
+                    (*callback)(closure, DHT_EVENT_VALUES, id,
+                                (void*)buf, 6);
+                } else if(st->peers[i].len == 16) {
+                    memcpy(buf, st->peers[i].ip, 16);
+                    memcpy(buf + 16, &swapped, 2);
+                    (*callback)(closure, DHT_EVENT_VALUES6, id,
+                                (void*)buf, 18);
+                }
+            }
+        }
     }
 
     sr = searches;
