@@ -3,9 +3,10 @@
 # project miniupnp : http://miniupnp.free.fr/
 # (c) 2009 Thomas Bernard
 
-FILE=miniupnpcstrings.h
-TMPFILE=miniupnpcstrings.h.tmp
-TEMPLATE_FILE=${FILE}.in
+VERSION_FILE=$1
+TEMPLATE_FILE=$2
+FILE=$3
+TMPFILE=$3.tmp
 
 # detecting the OS name and version
 OS_NAME=`uname -s`
