@@ -18,7 +18,6 @@
 #endif
 #include <unistd.h> /* daemon */
 
-#include <event.h>
 #include <event2/buffer.h>
 #include <event2/event.h>
 
