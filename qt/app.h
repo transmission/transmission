@@ -34,7 +34,7 @@ class MyApp: public QApplication
 
   public:
     void raise ();
-    bool notify (const QString& title, const QString& body) const;
+    bool notifyApp (const QString& title, const QString& body) const;
 
   public:
     Favicons favicons;

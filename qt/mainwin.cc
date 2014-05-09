@@ -81,22 +81,6 @@ TrMainWindow :: getStockIcon (const QString& name, int fallback)
   return icon;
 }
 
-namespace
-{
-  QSize calculateTextButtonSizeHint (QPushButton * button)
-  {
-    QStyleOptionButton opt;
-    opt.initFrom (button);
-    QString s (button->text ());
-    if (s.isEmpty ())
-      s = QString::fromLatin1 ("XXXX");
-    QFontMetrics fm = button->fontMetrics ();
-    QSize sz = fm.size (Qt::TextShowMnemonic, s);
-    return button->style ()->sizeFromContents (QStyle::CT_PushButton, &opt, sz, button).expandedTo (QApplication::globalStrut ());
-  }
-}
-
-
 TrMainWindow :: TrMainWindow (Session& session, Prefs& prefs, TorrentModel& model, bool minimized):
   myLastFullUpdateTime (0),
   mySessionDialog (new SessionDialog (session, prefs, this)),
@@ -1170,6 +1154,7 @@ TrMainWindow :: newTorrent ()
 void
 TrMainWindow :: openTorrent ()
 {
+std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
   QFileDialog * d;
   d = new QFileDialog (this,
                        tr ("Open Torrent"),

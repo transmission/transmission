@@ -11,7 +11,7 @@ unix: INSTALLS += man
 man.path = /share/man/man1/
 man.files = transmission-qt.1
 
-CONFIG += qt thread debug link_pkgconfig c++11
+CONFIG += qt thread debug link_pkgconfig c++11 warn_on
 QT += network dbus
 PKGCONFIG = fontconfig libcurl openssl libevent
 

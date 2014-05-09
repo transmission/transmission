@@ -291,7 +291,7 @@ MyApp :: onTorrentCompleted (int id)
   if (tor)
     {
       if (myPrefs->getBool (Prefs::SHOW_NOTIFICATION_ON_COMPLETE))
-        notify (tr ("Torrent Completed"), tor->name ());
+        notifyApp (tr ("Torrent Completed"), tor->name ());
 
       if (myPrefs->getBool (Prefs::COMPLETE_SOUND_ENABLED))
         {
@@ -315,7 +315,7 @@ MyApp :: onNewTorrentChanged (int id)
     {
       const int age_secs = tor->dateAdded ().secsTo (QDateTime::currentDateTime ());
       if (age_secs < 30)
-        notify (tr ("Torrent Added"), tor->name ());
+        notifyApp (tr ("Torrent Added"), tor->name ());
 
       disconnect (tor, SIGNAL (torrentChanged (int)), this, SLOT (onNewTorrentChanged (int)));
 
@@ -459,7 +459,7 @@ MyApp :: raise ()
 }
 
 bool
-MyApp :: notify (const QString& title, const QString& body) const
+MyApp :: notifyApp (const QString& title, const QString& body) const
 {
   const QString dbusServiceName   = QString::fromUtf8 ("org.freedesktop.Notifications");
   const QString dbusInterfaceName = QString::fromUtf8 ("org.freedesktop.Notifications");
