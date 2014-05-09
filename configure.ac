@@ -293,7 +293,7 @@ if test "x$upnp_version" = "xunknown" ; then
     UPNP_GetSpecificPortMappingEntry( urls.controlURL, data.first.servicetype,
                         portStr, "TCP", intClient, intPort, NULL, NULL, NULL );
   ]])],[
-  AC_DEFINE(MINIUPNPC_API_VERSION, 8, [miniupnpc 1.6's API version is 8])
+  AC_DEFINE(MINIUPNPC_API_VERSION, 8, [miniupnpc 1.6 has API version 8])
   upnp_version="1.6"])
 fi
 
@@ -316,7 +316,7 @@ if test "x$upnp_version" = "xunknown" ; then
     UPNP_GetSpecificPortMappingEntry( urls.controlURL, data.first.servicetype,
                         portStr, "TCP", intClient, intPort );
   ]])],[
-  AC_DEFINE(MINIUPNPC_API_VERSION, 5, [miniupnpc 1.5's API version is 5])
+  AC_DEFINE(MINIUPNPC_API_VERSION, 5, [miniupnpc 1.5 has API version 5])
   upnp_version="1.5"])
 fi
 
