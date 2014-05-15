@@ -1398,7 +1398,8 @@ void
 TrMainWindow :: onError (QNetworkReply::NetworkError code)
 {
   const bool hadError = myNetworkError;
-  const bool haveError = code != QNetworkReply::NoError;
+  const bool haveError = (code != QNetworkReply::NoError)
+                      && (code != QNetworkReply::UnknownContentError);
 
   myNetworkError = haveError;
   refreshTrayIconSoon();
