@@ -1154,7 +1154,6 @@ TrMainWindow :: newTorrent ()
 void
 TrMainWindow :: openTorrent ()
 {
-std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
   QFileDialog * d;
   d = new QFileDialog (this,
                        tr ("Open Torrent"),
