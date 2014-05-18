@@ -29,9 +29,7 @@ test_torrent_hash (void)
   tr_cryptoConstruct (&a, NULL, true);
 
   check (!tr_cryptoHasTorrentHash (&a));
-#ifdef NDEBUG
   check (tr_cryptoGetTorrentHash (&a) == NULL);
-#endif
 
   tr_cryptoSetTorrentHash (&a, hash);
   check (tr_cryptoHasTorrentHash (&a));
@@ -51,9 +49,7 @@ test_torrent_hash (void)
 
   tr_cryptoSetTorrentHash (&a, NULL);
   check (!tr_cryptoHasTorrentHash (&a));
-#ifdef NDEBUG
   check (tr_cryptoGetTorrentHash (&a) == NULL);
-#endif
 
   tr_cryptoDestruct (&a);
 

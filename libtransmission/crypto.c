@@ -282,9 +282,8 @@ const uint8_t*
 tr_cryptoGetTorrentHash (const tr_crypto * crypto)
 {
   assert (crypto);
-  assert (crypto->torrentHashIsSet);
 
-  return crypto->torrentHash;
+  return crypto->torrentHashIsSet ? crypto->torrentHash : NULL;
 }
 
 int
