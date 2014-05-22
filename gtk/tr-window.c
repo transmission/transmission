@@ -684,33 +684,21 @@ GtkWidget* gtr_window_new(GtkApplication* app, TrCore* core)
 
     /* new document actions */
 
-    tbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
-
     button = gtk_button_new_from_icon_name("document-send-symbolic", GTK_ICON_SIZE_MENU);
-    gtk_container_add(GTK_CONTAINER(tbox), button);
+    gtk_header_bar_pack_start(GTK_HEADER_BAR(toolbar), button);
 
     button = gtk_button_new_from_icon_name("document-open-symbolic", GTK_ICON_SIZE_MENU);
-    gtk_container_add(GTK_CONTAINER(tbox), button);
-
-    gtk_style_context_add_class(gtk_widget_get_style_context(tbox), GTK_STYLE_CLASS_RAISED);
-    gtk_style_context_add_class(gtk_widget_get_style_context(tbox), GTK_STYLE_CLASS_LINKED);
-
-    gtk_header_bar_pack_start(GTK_HEADER_BAR(toolbar), tbox);
-
-    /* selection actions */
-
-    tbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
+    gtk_header_bar_pack_start(GTK_HEADER_BAR(toolbar), button);
 
     button = gtk_button_new_from_icon_name("user-trash-symbolic", GTK_ICON_SIZE_MENU);
-    gtk_container_add(GTK_CONTAINER(tbox), button);
+    gtk_header_bar_pack_start(GTK_HEADER_BAR(toolbar), button);
 
-    button = gtk_button_new_from_icon_name("document-properties-symbolic", GTK_ICON_SIZE_MENU);
-    gtk_container_add(GTK_CONTAINER(tbox), button);
-
+    /*
     gtk_style_context_add_class(gtk_widget_get_style_context(tbox), GTK_STYLE_CLASS_RAISED);
     gtk_style_context_add_class(gtk_widget_get_style_context(tbox), GTK_STYLE_CLASS_LINKED);
 
     gtk_header_bar_pack_start(GTK_HEADER_BAR(toolbar), tbox);
+    */
 
     /* gear */
 
@@ -726,6 +714,11 @@ GtkWidget* gtr_window_new(GtkApplication* app, TrCore* core)
     gtk_container_add(GTK_CONTAINER(toggle_button), image);
     gtk_header_bar_pack_end(GTK_HEADER_BAR(toolbar), toggle_button);
     g_signal_connect(toggle_button, "toggled", G_CALLBACK(onFilterChanged), p);
+
+    /* selection actions */
+
+    button = gtk_button_new_from_icon_name("media-playback-pause-symbolic", GTK_ICON_SIZE_MENU);
+    gtk_header_bar_pack_end(GTK_HEADER_BAR(toolbar), button);
 
     /* filter */
     w = filter = p->filter = gtr_filter_bar_new(gtr_core_session(core), gtr_core_model(core), &p->filter_model,
