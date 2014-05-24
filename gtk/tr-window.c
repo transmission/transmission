@@ -392,11 +392,26 @@ static GMenuModel* get_speed_menu_model(tr_direction dir)
     GMenuItem* mi;
     GMenu* m;
     GMenu* sm;
+    char* action;
+    char title[128];
+    char detailed_action[256];
     int const speeds_KBps[] = { 5, 10, 20, 30, 40, 50, 75, 100, 150, 200, 250, 500, 750 };
 
     m = g_menu_new();
 
-    mi = g_menu_item_new(_("Unlimited"), "win.set-speed::unlimited");
+    if (dir == TR_UP)
+    {
+        action = tr_quark_get_string(TR_KEY_speed_limit_up_enabled, NULL);
+    }
+    else
+    {
+        action = tr_quark_get_string(TR_KEY_speed_limit_down_enabled, NULL);
+    }
+
+    g_snprintf(detailed_action, sizeof(detailed_action), "win.%s", action);
+    printf("%s\n", detailed_action);
+
+    mi = g_menu_item_new(_("Unlimited"), detailed_action);
     g_menu_append_item(m, mi);
 
     sm = g_menu_new();
@@ -406,25 +421,22 @@ static GMenuModel* get_speed_menu_model(tr_direction dir)
 
     for (size_t i = 0; i < G_N_ELEMENTS(speeds_KBps); ++i)
     {
-        char title[128];
-        char target_value[256];
-
         tr_formatter_speed_KBps(title, speeds_KBps[i], sizeof(title));
 
         if (dir == TR_UP)
         {
-            g_snprintf(target_value, sizeof(target_value), "win.speed::limit-%d", speeds_KBps[i]);
+            action = tr_quark_get_string(TR_KEY_speed_limit_up, NULL);
         }
-        else if (dir == TR_DOWN)
+        else
         {
-            g_snprintf(target_value, sizeof(target_value), "win.speed::limit-%d", speeds_KBps[i]);
+            action = tr_quark_get_string(TR_KEY_speed_limit_down, NULL);
         }
 
-        mi = g_menu_item_new(title, target_value);
+        g_snprintf(detailed_action, sizeof(detailed_action), "win.%s(%d)", action, speeds_KBps[i]);
 
-        o = G_OBJECT(mi);
-        g_object_set_data(o, DIRECTION_KEY, GINT_TO_POINTER(dir));
-        g_object_set_data(o, SPEED_KEY, GINT_TO_POINTER(speeds_KBps[i]));
+        printf("%s\n", detailed_action);
+
+        mi = g_menu_item_new(title, detailed_action);
 
         g_menu_append_item(sm, mi);
     }
@@ -485,6 +497,7 @@ static void onRatioToggled(GtkCheckMenuItem* check, gpointer vp)
         gtr_core_set_pref_bool(p->core, TR_KEY_ratio_limit_enabled, f);
     }
 }
+
 static void onRatioSet(GtkCheckMenuItem* check, gpointer vp)
 {
     PrivateData* p = vp;
