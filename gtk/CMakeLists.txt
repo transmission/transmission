@@ -89,6 +89,7 @@ set(${PROJECT_NAME}_SOURCES
     torrent-cell-renderer.c
     tr-core.c
     tr-icon.c
+    tr-limit-popover.c
     tr-prefs.c
     tr-status-menu-button.c
     tr-window.c
@@ -115,6 +116,7 @@ set(${PROJECT_NAME}_HEADERS
     torrent-cell-renderer.h
     tr-core.h
     tr-icon.h
+    tr-limit-popover.h
     tr-prefs.h
     tr-status-menu-button.h
     tr-window.h
