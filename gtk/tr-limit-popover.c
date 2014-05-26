@@ -74,7 +74,6 @@ static void tr_limit_popover_init(TrLimitPopover* popover)
     gtk_grid_attach(GTK_GRID(popover), gtk_label_new("KB/s"), 3, 1, 1, 1);
 
     w = gtk_check_button_new_with_label("Limit Upload");
-    gtk_label_set_justify(GTK_LABEL(w), GTK_JUSTIFY_RIGHT);
     gtk_grid_attach(GTK_GRID(popover), w, 1, 2, 1, 1);
 
     priv->upload_limit_entry = gtk_entry_new();
@@ -83,7 +82,6 @@ static void tr_limit_popover_init(TrLimitPopover* popover)
     gtk_grid_attach(GTK_GRID(popover), gtk_label_new("KB/s"), 3, 2, 1, 1);
 
     w = gtk_check_button_new_with_label("Stop seeding at ratio");
-    gtk_label_set_justify(GTK_LABEL(w), GTK_JUSTIFY_RIGHT);
     gtk_grid_attach(GTK_GRID(popover), w, 1, 3, 1, 1);
 
     priv->seed_limit_entry = gtk_entry_new();
@@ -91,7 +89,6 @@ static void tr_limit_popover_init(TrLimitPopover* popover)
     gtk_grid_attach(GTK_GRID(popover), priv->seed_limit_entry, 2, 3, 1, 1);
 
     w = gtk_button_new_with_label("Apply Limits");
-    gtk_label_set_justify(GTK_LABEL(w), GTK_JUSTIFY_RIGHT);
     context = gtk_widget_get_style_context(w);
 
     gtk_style_context_add_class(context, GTK_STYLE_CLASS_SUGGESTED_ACTION);
