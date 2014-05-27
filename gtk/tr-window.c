@@ -430,9 +430,21 @@ GtkWidget* gtr_status_bar_new(PrivateData *p)
             "padding: 0 3px 0 3px;\n"
         "}\n"
         "GtkBox.status-bar GtkButton {\n"
-            "border: 0;\n"
+            "border-image: 0;\n"
+            "border-style: outset;\n"
+            "border-width: 0px 1px;\n"
+            "border-color: rgba(80,80,80,1.0);\n"
             "border-radius: 0px;\n"
             "padding: 0px;\n"
+        "}\n"
+        "GtkBox.status-bar GtkButton:first-child {\n"
+            "border-width: 0px 1px 0px 0px;\n"
+        "}\n"
+        "GtkBox.status-bar GtkButton:last-child {\n"
+            "border-width: 0px 0px 0px 1px;\n"
+        "}\n"
+        "GtkBox.status-bar GtkLabel {"
+            "font-size: 9px;\n"
         "}";
 
     box_wrapper = GTK_BOX(gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0));
