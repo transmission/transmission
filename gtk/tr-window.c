@@ -294,48 +294,6 @@ static void onFilterChanged(GtkToggleButton* button, gpointer vp)
     gtk_revealer_set_reveal_child(GTK_REVEALER(w), b);
 }
 
-/*
-static void findMaxAnnounceTime(GtkTreeModel* model, GtkTreePath* path UNUSED, GtkTreeIter* iter, gpointer gmaxTime)
-{
-    tr_torrent* tor;
-    tr_stat const* torStat;
-    time_t* maxTime = gmaxTime;
-
-    gtk_tree_model_get(model, iter, MC_TORRENT, &tor, -1);
-    torStat = tr_torrentStatCached(tor);
-    *maxTime = MAX(*maxTime, torStat->manualAnnounceTime);
-}
-
-static gboolean onAskTrackerQueryTooltip(GtkWidget* widget UNUSED, gint x UNUSED, gint y UNUSED, gboolean keyboard_tip UNUSED,
-    GtkTooltip* tooltip, gpointer gdata)
-{
-    gboolean handled;
-    time_t maxTime = 0;
-    PrivateData* p = gdata;
-    time_t const now = time(NULL);
-
-    gtk_tree_selection_selected_foreach(p->selection, findMaxAnnounceTime, &maxTime);
-
-    if (maxTime <= now)
-    {
-        handled = FALSE;
-    }
-    else
-    {
-        char buf[512];
-        char timebuf[64];
-        int const seconds = maxTime - now;
-
-        tr_strltime(timebuf, seconds, sizeof(timebuf));
-        g_snprintf(buf, sizeof(buf), _("Tracker will allow requests in %s"), timebuf);
-        gtk_tooltip_set_text(tooltip, buf);
-        handled = TRUE;
-    }
-
-    return handled;
-}
-*/
-
 static gboolean onAltSpeedToggledIdle(gpointer vp)
 {
     PrivateData* p = vp;
@@ -415,89 +373,6 @@ static void onRatioSet(GtkCheckMenuItem* check, gpointer vp)
     gtr_core_set_pref_bool(p->core, TR_KEY_ratio_limit_enabled, TRUE);
 }
 
-static GMenuModel* get_ratio_menu_model()
-{
-    GObject* o;
-    GMenuItem* mi;
-    GMenu* m;
-    GMenu* sm;
-
-    char* action_key;
-    char detailed_action[256];
-
-    action_key = tr_quark_get_string(TR_KEY_ratio_limit_enabled, NULL);
-
-    g_snprintf(detailed_action, sizeof(detailed_action), "win.%s", action_key);
-
-    m = g_menu_new();
-
-    mi = g_menu_item_new(_("Seed Forever"), detailed_action);
-    g_menu_append_item(m, mi);
-
-    sm = g_menu_new();
-    mi = g_menu_item_new_section(NULL, G_MENU_MODEL(sm));
-
-    g_menu_append_item(m, mi);
-
-    for (size_t i = 0; i < G_N_ELEMENTS(stockRatios); ++i)
-    {
-        char ratio[128];
-        char title[128];
-
-        action_key = tr_quark_get_string(TR_KEY_ratio_limit, NULL);
-
-        tr_strlratio(ratio, stockRatios[i], sizeof(ratio));
-
-        g_snprintf(title, sizeof(title), "Stop at %s ratio", ratio);
-        g_snprintf(detailed_action, sizeof(detailed_action), "win.%s(%.02f)", action_key, stockRatios[i]);
-
-        printf("%s\n", detailed_action);
-
-        mi = g_menu_item_new(title, detailed_action);
-
-        g_menu_append_item(sm, mi);
-    }
-
-    return G_MENU_MODEL(m);
-}
-
-static GtkWidget* createRatioMenu(PrivateData* p)
-{
-    GtkWidget* m;
-    GtkWidget* w;
-    GtkMenuShell* menu_shell;
-
-    m = gtk_menu_new();
-    menu_shell = GTK_MENU_SHELL(m);
-
-    w = gtk_radio_menu_item_new_with_label(NULL, _("Seed Forever"));
-    p->ratio_off_item = w;
-    g_object_set_data(G_OBJECT(w), ENABLED_KEY, GINT_TO_POINTER(FALSE));
-    g_signal_connect(w, "toggled", G_CALLBACK(onRatioToggled), p);
-    gtk_menu_shell_append(menu_shell, w);
-
-    w = gtk_radio_menu_item_new_with_label_from_widget(GTK_RADIO_MENU_ITEM(w), "");
-    p->ratio_on_item = w;
-    g_object_set_data(G_OBJECT(w), ENABLED_KEY, GINT_TO_POINTER(TRUE));
-    g_signal_connect(w, "toggled", G_CALLBACK(onRatioToggled), p);
-    gtk_menu_shell_append(menu_shell, w);
-
-    w = gtk_separator_menu_item_new();
-    gtk_menu_shell_append(menu_shell, w);
-
-    for (size_t i = 0; i < G_N_ELEMENTS(stockRatios); ++i)
-    {
-        char buf[128];
-        tr_strlratio(buf, stockRatios[i], sizeof(buf));
-        w = gtk_menu_item_new_with_label(buf);
-        g_object_set_data(G_OBJECT(w), RATIO_KEY, GINT_TO_POINTER(i));
-        g_signal_connect(w, "activate", G_CALLBACK(onRatioSet), p);
-        gtk_menu_shell_append(menu_shell, w);
-    }
-
-    return m;
-}
-
 /***
 ****  Option menu
 ***/
@@ -548,39 +423,26 @@ GtkWidget* gtr_status_bar_new(PrivateData *p)
     GtkWidget* w;
     GtkWidget* box;
     GtkWidget* pop;
-    GtkWidget* grid;
+    GtkWidget* box_wrapper;
+    GtkCssProvider* css_provider;
+    char* style =
+        "GtkBox.status-bar {\n"
+            "padding: 0 3px 0 3px;\n"
+        "}\n"
+        "GtkBox.status-bar GtkButton {\n"
+            "border: 0;\n"
+            "border-radius: 0px;\n"
+            "padding: 0px;\n"
+        "}";
 
-    grid = GTK_GRID(gtk_grid_new());
+    box_wrapper = GTK_BOX(gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0));
 
-#if 0
+    gtk_style_context_add_class(gtk_widget_get_style_context(box_wrapper), "status-bar");
 
-    /* download */
-    w = tr_status_menu_button_new();
-    tr_status_menu_button_set_label(TR_STATUS_MENU_BUTTON(w), _("Download: Unlimited"));
-    pop = gtk_popover_new_from_model(GTK_WIDGET(w), get_speed_menu_model(TR_DOWN));
-    gtk_popover_set_position(GTK_POPOVER(pop), GTK_POS_BOTTOM);
-    gtk_menu_button_set_popover(GTK_MENU_BUTTON(w), GTK_WIDGET(pop));
-    gtk_grid_attach_next_to(grid, w, sibling, GTK_POS_RIGHT, 1, 1);
-    sibling = w;
-
-    /* upload */
-    w = tr_status_menu_button_new();
-    tr_status_menu_button_set_label(TR_STATUS_MENU_BUTTON(w), _("Upload: Unlimited"));
-    pop = gtk_popover_new_from_model(GTK_WIDGET(w), get_speed_menu_model(TR_UP));
-    gtk_popover_set_position(GTK_POPOVER(pop), GTK_POS_BOTTOM);
-    gtk_menu_button_set_popover(GTK_MENU_BUTTON(w), GTK_WIDGET(pop));
-    gtk_grid_attach_next_to(grid, w, sibling, GTK_POS_RIGHT, 1, 1);
-    sibling = w;
-
-    /* ratio */
-    w = tr_status_menu_button_new();
-    tr_status_menu_button_set_label(TR_STATUS_MENU_BUTTON(w), _("Seed Forever"));
-    pop = gtk_popover_new_from_model(GTK_WIDGET(w), get_ratio_menu_model());
-    gtk_menu_button_set_popover(GTK_MENU_BUTTON(w), GTK_WIDGET(pop));
-    gtk_grid_attach_next_to(grid, w, sibling, GTK_POS_RIGHT, 1, 1);
-    sibling = w;
-
-#endif
+    css_provider = gtk_css_provider_new();
+    gtk_css_provider_load_from_data(css_provider, style, strlen(style), NULL);
+    gtk_style_context_add_provider_for_screen(gdk_screen_get_default(), GTK_STYLE_PROVIDER(css_provider),
+        GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
 
     w = gtk_menu_button_new();
     gtk_button_set_image(GTK_BUTTON(w), gtk_image_new_from_icon_name("emblem-system-symbolic", GTK_ICON_SIZE_SMALL_TOOLBAR));
@@ -589,14 +451,13 @@ GtkWidget* gtr_status_bar_new(PrivateData *p)
     pop = gtk_popover_new(w);
 
     box = tr_limit_popover_new();
-    gtk_widget_show_all(box);
 
     gtk_container_add(GTK_CONTAINER(pop), GTK_WIDGET(box));
+    gtk_widget_show_all(box);
 
     gtk_menu_button_set_popover(GTK_MENU_BUTTON(w), GTK_WIDGET(pop));
 
-    gtk_grid_attach_next_to(GTK_GRID(grid), w, sibling, GTK_POS_RIGHT, 1, 1);
-    sibling = w;
+    gtk_box_pack_start(GTK_GRID(box_wrapper), w, FALSE, FALSE, 0);
 
     /* turtle */
     p->alt_speed_image = gtk_image_new();
@@ -604,43 +465,32 @@ GtkWidget* gtr_status_bar_new(PrivateData *p)
     gtk_button_set_image(GTK_BUTTON(w), p->alt_speed_image);
     gtk_button_set_relief(GTK_BUTTON(w), GTK_RELIEF_NONE);
     g_signal_connect(w, "toggled", G_CALLBACK(alt_speed_toggled_cb), p);
-    gtk_grid_attach_next_to(grid, w, sibling, GTK_POS_RIGHT, 1, 1);
-    sibling = w;
-
-    /* spacer */
-    w = gtk_alignment_new(0.0f, 0.0f, 0.0f, 0.0f);
-    gtk_widget_set_hexpand(w, TRUE);
-    gtk_grid_attach_next_to(grid, w, sibling, GTK_POS_RIGHT, 1, 1);
-    sibling = w;
+    gtk_box_pack_start(box_wrapper, w, FALSE, FALSE, 0);
 
     /* download */
     w = dl_lb = gtk_label_new(NULL);
     p->dl_lb = GTK_LABEL(w);
     gtk_label_set_single_line_mode(p->dl_lb, TRUE);
-    gtk_grid_attach_next_to(grid, w, sibling, GTK_POS_RIGHT, 1, 1);
-    sibling = w;
+    gtk_box_pack_start(box_wrapper, w, TRUE, FALSE, 0);
 
     /* upload */
     w = ul_lb = gtk_label_new(NULL);
-    g_object_set(G_OBJECT(w), "margin-left", GUI_PAD, NULL);
     p->ul_lb = GTK_LABEL(w);
     gtk_label_set_single_line_mode(p->ul_lb, TRUE);
-    gtk_grid_attach_next_to(grid, w, sibling, GTK_POS_RIGHT, 1, 1);
-    sibling = w;
+    gtk_box_pack_start(box_wrapper, w, TRUE, FALSE, 0);
 
     /* ratio */
     w = gtk_label_new(NULL);
     g_object_set(G_OBJECT(w), "margin-left", GUI_PAD_BIG, NULL);
     p->stats_lb = GTK_LABEL(w);
     gtk_label_set_single_line_mode(p->stats_lb, TRUE);
-    gtk_grid_attach_next_to(grid, w, sibling, GTK_POS_RIGHT, 1, 1);
-    sibling = w;
+    gtk_box_pack_start(box_wrapper, w, TRUE, FALSE, 0);
+
     w = gtk_button_new_from_icon_name("ratio", GTK_ICON_SIZE_SMALL_TOOLBAR);
     gtk_widget_set_tooltip_text(w, _("Statistics"));
     gtk_button_set_relief(GTK_BUTTON(w), GTK_RELIEF_NONE);
     g_signal_connect(w, "clicked", G_CALLBACK(onYinYangReleased), p);
-    gtk_grid_attach_next_to(grid, w, sibling, GTK_POS_RIGHT, 1, 1);
-    sibling = w;
+    gtk_box_pack_end(box_wrapper, w, FALSE, FALSE, 0);
 
     {
         /* this is to determine the maximum width/height for the label */
@@ -656,7 +506,7 @@ GtkWidget* gtr_status_bar_new(PrivateData *p)
         g_object_unref(G_OBJECT(pango_layout));
     }
 
-    return grid;
+    return box_wrapper;
 }
 
 GtkWidget* gtr_window_new(GtkApplication* app, TrCore* core)
@@ -693,6 +543,7 @@ GtkWidget* gtr_window_new(GtkApplication* app, TrCore* core)
     win = GTK_WINDOW(self);
     gtk_window_set_role(win, "tr-main");
     gtk_window_set_title(win, g_get_application_name());
+    gtk_widget_set_size_request(win, 620, 220);
     gtk_window_set_default_size(win, gtr_pref_int_get(TR_KEY_main_window_width), gtr_pref_int_get(TR_KEY_main_window_height));
     gtk_window_move(win, gtr_pref_int_get(TR_KEY_main_window_x), gtr_pref_int_get(TR_KEY_main_window_y));
 
