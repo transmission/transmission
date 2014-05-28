@@ -91,13 +91,18 @@ static void change_value_cb(GSimpleAction* action, GVariant* value, gpointer use
             gtr_core_set_pref_bool(myCore, entry_name, boolean);
         }
 
+        if (g_variant_is_of_type(value, G_VARIANT_TYPE_STRING))
+        {
+            char const* string = g_variant_get_string(value, NULL);
+            gtr_core_set_pref(myCore, entry_name, string);
+        }
+
         if (entry_name == TR_KEY_ratio_limit || entry_name == TR_KEY_ratio_limit_enabled)
         {
-            gdouble val;
-
             g_return_if_fail(g_variant_is_of_type(value, G_VARIANT_TYPE_DOUBLE));
 
-            val = g_variant_get_double(value);
+            double val = g_variant_get_double(value);
+
             gtr_core_set_pref_double(myCore, TR_KEY_ratio_limit, val);
             gtr_core_set_pref_bool(myCore, TR_KEY_ratio_limit_enabled, TRUE);
         }
@@ -145,6 +150,7 @@ static GActionEntry win_entries[] =
     { "toggle-main-window", toggle_action_cb, NULL, "true", change_toggle_cb, {} },
     { "toggle-message-log", toggle_action_cb, NULL, "false", change_toggle_cb, {} },
     /* pref toggle actions */
+    { "statusbar-stats", radio_action_cb, "s", "\"total-transfer\"", change_value_cb, {} },
     { "alt-speed-enabled", toggle_action_cb, NULL, "false", change_pref_cb, {} },
     { "speed-limit-up-enabled", toggle_action_cb, NULL, "false", change_pref_cb, {} },
     { "speed-limit-down-enabled", toggle_action_cb, NULL, "false", change_pref_cb, {} },

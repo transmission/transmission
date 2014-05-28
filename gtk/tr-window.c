@@ -218,37 +218,7 @@ static void privateFree(gpointer vprivate)
     g_free(p);
 }
 
-static void onYinYangReleased(GtkWidget* w UNUSED, gpointer vprivate)
-{
-    PrivateData* p = vprivate;
-
-    gtk_menu_popup(GTK_MENU(p->status_menu), NULL, NULL, NULL, NULL, 0, gtk_get_current_event_time());
-}
-
 #define STATS_MODE "stats-mode"
-
-static struct
-{
-    char const* val;
-    char const* i18n;
-}
-stats_modes[] =
-{
-    { "total-ratio", N_("Total Ratio") },
-    { "session-ratio", N_("Session Ratio") },
-    { "total-transfer", N_("Total Transfer") },
-    { "session-transfer", N_("Session Transfer") }
-};
-
-static void status_menu_toggled_cb(GtkCheckMenuItem* menu_item, gpointer vprivate)
-{
-    if (gtk_check_menu_item_get_active(menu_item))
-    {
-        PrivateData* p = vprivate;
-        char const* val = g_object_get_data(G_OBJECT(menu_item), STATS_MODE);
-        gtr_core_set_pref(p->core, TR_KEY_statusbar_stats, val);
-    }
-}
 
 static void syncAltSpeedButton(PrivateData* p)
 {
@@ -411,6 +381,42 @@ static void onOptionsClicked(GtkButton* button UNUSED, gpointer vp)
     gtk_menu_popup(GTK_MENU(p->options_menu), NULL, NULL, NULL, NULL, 0, gtk_get_current_event_time());
 }
 
+static GMenuModel* get_statistics_menu_model(void)
+{
+    static struct
+    {
+        char const* val;
+        char const* i18n;
+    }
+    const stats_modes[] =
+    {
+        { "total-ratio", N_("Total Ratio") },
+        { "session-ratio", N_("Session Ratio") },
+        { "total-transfer", N_("Total Transfer") },
+        { "session-transfer", N_("Session Transfer") }
+    };
+
+    GMenuItem* mi;
+    GMenu* m;
+    GMenu* sm;
+    char* action_key;
+    char detailed_action[256];
+
+    action_key = tr_quark_get_string(TR_KEY_statusbar_stats, NULL);
+
+    m = g_menu_new();
+
+    for (size_t i = 0; i < G_N_ELEMENTS(stats_modes); i++)
+    {
+        g_snprintf(detailed_action, sizeof(detailed_action), "win.%s('%s')", action_key, stats_modes[i].val);
+
+        mi = g_menu_item_new(stats_modes[i].i18n, detailed_action);
+        g_menu_append_item(m, mi);
+    }
+
+    return G_MENU_MODEL(m);
+}
+
 /***
 ****  PUBLIC
 ***/
@@ -469,7 +475,7 @@ GtkWidget* gtr_status_bar_new(PrivateData *p)
 
     gtk_menu_button_set_popover(GTK_MENU_BUTTON(w), GTK_WIDGET(pop));
 
-    gtk_box_pack_start(GTK_GRID(box_wrapper), w, FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(box_wrapper), w, FALSE, FALSE, 0);
 
     /* turtle */
     p->alt_speed_image = gtk_image_new();
@@ -498,32 +504,19 @@ GtkWidget* gtr_status_bar_new(PrivateData *p)
     gtk_label_set_single_line_mode(p->stats_lb, TRUE);
     gtk_box_pack_start(box_wrapper, w, TRUE, FALSE, 0);
 
-    w = gtk_button_new_from_icon_name("ratio", GTK_ICON_SIZE_SMALL_TOOLBAR);
+    /* statistics button */
+    w = gtk_menu_button_new();
+    gtk_menu_button_set_use_popover(GTK_MENU_BUTTON(w), TRUE);
+    gtk_button_set_image(GTK_BUTTON(w), gtk_image_new_from_icon_name("ratio", GTK_ICON_SIZE_SMALL_TOOLBAR));
+    gtk_menu_button_set_menu_model(GTK_MENU_BUTTON(w), get_statistics_menu_model());
     gtk_widget_set_tooltip_text(w, _("Statistics"));
-    gtk_button_set_relief(GTK_BUTTON(w), GTK_RELIEF_NONE);
-    g_signal_connect(w, "clicked", G_CALLBACK(onYinYangReleased), p);
     gtk_box_pack_end(box_wrapper, w, FALSE, FALSE, 0);
-
-    {
-        /* this is to determine the maximum width/height for the label */
-        int w = 0;
-        int h = 0;
-        PangoLayout* pango_layout;
-        pango_layout = gtk_widget_create_pango_layout(ul_lb, "999.99 kB/s");
-        pango_layout_get_pixel_size(pango_layout, &w, &h);
-        gtk_widget_set_size_request(ul_lb, w, h);
-        gtk_widget_set_size_request(dl_lb, w, h);
-        gtk_misc_set_alignment(GTK_MISC(ul_lb), 1.0, 0.5);
-        gtk_misc_set_alignment(GTK_MISC(dl_lb), 1.0, 0.5);
-        g_object_unref(G_OBJECT(pango_layout));
-    }
 
     return box_wrapper;
 }
 
 GtkWidget* gtr_window_new(GtkApplication* app, TrCore* core)
 {
-    char const* pch;
     char const* style;
     PrivateData* p;
     GtkWidget* sibling = NULL;
@@ -536,14 +529,12 @@ GtkWidget* gtr_window_new(GtkApplication* app, TrCore* core)
     GtkWidget* w;
     GtkWidget* pop;
     GtkWidget* self;
-    GtkWidget* menu;
     GtkWidget* button;
     GtkWidget* toggle_button;
     GtkWidget* image;
     GtkWidget* grid_w;
     GtkWindow* win;
     GtkCssProvider* css_provider;
-    GSList* l;
     GtkGrid* grid;
     GMenuModel* model;
 
@@ -626,23 +617,6 @@ GtkWidget* gtr_window_new(GtkApplication* app, TrCore* core)
         GTK_HEADER_BAR(toolbar));
     // gtk_revealer_set_reveal_child(GTK_REVEALER(filter), TRUE);
     gtk_container_set_border_width(GTK_CONTAINER(w), GUI_PAD_SMALL);
-
-    /* status menu */
-    menu = p->status_menu = gtk_menu_new();
-    l = NULL;
-    pch = gtr_pref_string_get(TR_KEY_statusbar_stats);
-
-    for (size_t i = 0; i < G_N_ELEMENTS(stats_modes); ++i)
-    {
-        char const* val = stats_modes[i].val;
-        w = gtk_radio_menu_item_new_with_label(l, _(stats_modes[i].i18n));
-        l = gtk_radio_menu_item_get_group(GTK_RADIO_MENU_ITEM(w));
-        gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(w), g_strcmp0(val, pch) == 0);
-        g_object_set_data(G_OBJECT(w), STATS_MODE, (gpointer)stats_modes[i].val);
-        g_signal_connect(w, "toggled", G_CALLBACK(status_menu_toggled_cb), p);
-        gtk_menu_shell_append(GTK_MENU_SHELL(menu), w);
-        gtk_widget_show(w);
-    }
 
     /**
     *** Statusbar
