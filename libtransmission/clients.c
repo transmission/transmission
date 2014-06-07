@@ -163,10 +163,14 @@ tr_clientForId (char * buf, size_t buflen, const void * id_in)
                 tr_snprintf (buf, buflen, "Transmission %d.%02d%s", strint (id+3,1), strint (id+4,2),
                           id[6]=='Z' || id[6]=='X' ? "+" : "");
         }
-
         else if (!memcmp (id+1, "UT", 2))
         {
             tr_snprintf (buf, buflen, "\xc2\xb5Torrent %d.%d.%d%s",
+                         strint (id+3,1), strint (id+4,1), strint (id+5,1), getMnemonicEnd (id[6]));
+        }
+        else if (!memcmp (id+1, "BT", 2))
+        {
+            tr_snprintf (buf, buflen, "BitTorrent %d.%d.%d%s",
                          strint (id+3,1), strint (id+4,1), strint (id+5,1), getMnemonicEnd (id[6]));
         }
         else if (!memcmp (id+1, "UM", 2))
