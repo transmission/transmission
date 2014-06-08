@@ -146,7 +146,7 @@ parseFiles (tr_info * inf, tr_variant * files, const tr_variant * length)
       buf = evbuffer_new ();
       result = NULL;
 
-      inf->isMultifile = 1;
+      inf->isFolder = true;
       inf->fileCount = tr_variantListSize (files);
       inf->files = tr_new0 (tr_file, inf->fileCount);
 
@@ -193,7 +193,7 @@ parseFiles (tr_info * inf, tr_variant * files, const tr_variant * length)
       if (path_component_is_suspicious (inf->name))
         return "path";
 
-      inf->isMultifile      = 0;
+      inf->isFolder         = false;
       inf->fileCount        = 1;
       inf->files            = tr_new0 (tr_file, 1);
       inf->files[0].name    = tr_strdup (inf->name);

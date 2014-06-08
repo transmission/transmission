@@ -489,7 +489,7 @@ libtest_create_tmpfile_with_contents (char* tmpl, const void* payload, size_t n)
       const ssize_t n = write (fd, payload, n_left);
       if (n == -1)
         {
-          fprintf (stderr, "Error writing '%s': %s", tmpl, tr_strerror(errno));
+          fprintf (stderr, "Error writing '%s': %s\n", tmpl, tr_strerror(errno));
           break;
         }
       n_left -= n;
