@@ -96,7 +96,7 @@ static void
 create_single_file_torrent_contents (const char * top)
 {
   char * path = tr_buildPath (top, "hello-world.txt", NULL);
-  libtest_create_file_with_contents (path, "hello, world!\n");
+  libtest_create_file_with_string_contents (path, "hello, world!\n");
   tr_free (path);
 }
 
@@ -241,19 +241,19 @@ create_multifile_torrent_contents (const char * top)
   char * path;
 
   path = tr_buildPath (top, "Felidae", "Felinae", "Acinonyx", "Cheetah", "Chester", NULL);
-  libtest_create_file_with_contents (path, "It ain't easy bein' cheesy.\n");
+  libtest_create_file_with_string_contents (path, "It ain't easy bein' cheesy.\n");
   tr_free (path);
 
   path = tr_buildPath (top, "Felidae", "Pantherinae", "Panthera", "Tiger", "Tony", NULL);
-  libtest_create_file_with_contents (path, "They’re Grrrrreat!\n");
+  libtest_create_file_with_string_contents (path, "They’re Grrrrreat!\n");
   tr_free (path);
 
   path = tr_buildPath (top, "Felidae", "Felinae", "Felis", "catus", "Kyphi", NULL);
-  libtest_create_file_with_contents (path, "Inquisitive\n");
+  libtest_create_file_with_string_contents (path, "Inquisitive\n");
   tr_free (path);
 
   path = tr_buildPath (top, "Felidae", "Felinae", "Felis", "catus", "Saffron", NULL);
-  libtest_create_file_with_contents (path, "Tough\n");
+  libtest_create_file_with_string_contents (path, "Tough\n");
   tr_free (path);
 
   sync ();

@@ -136,6 +136,7 @@ TESTS = \
   history-test \
   json-test \
   magnet-test \
+  makemeta-test \
   metainfo-test \
   move-test \
   peer-msgs-test \
@@ -202,6 +203,10 @@ magnet_test_LDFLAGS = ${apps_ldflags}
 metainfo_test_SOURCES = metainfo-test.c $(TEST_SOURCES)
 metainfo_test_LDADD = ${apps_ldadd}
 metainfo_test_LDFLAGS = ${apps_ldflags}
+
+makemeta_test_SOURCES = makemeta-test.c $(TEST_SOURCES)
+makemeta_test_LDADD = ${apps_ldadd}
+makemeta_test_LDFLAGS = ${apps_ldflags}
 
 move_test_SOURCES = move-test.c $(TEST_SOURCES)
 move_test_LDADD = ${apps_ldadd}

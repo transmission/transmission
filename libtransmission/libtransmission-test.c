@@ -9,6 +9,9 @@
 
 #include <assert.h>
 #include <stdio.h>
+#include <stdlib.h> /* mkstemp() */
+
+#include <unistd.h>
 
 #include "transmission.h"
 #include "platform.h" /* TR_PATH_DELIMETER */
@@ -150,8 +153,9 @@ tr_getcwd (void)
 char *
 libtest_sandbox_create (void)
 {
-  const char * path = tr_getcwd ();
+  char * path = tr_getcwd ();
   char * sandbox = tr_buildPath (path, "sandbox-XXXXXX", NULL);
+  tr_free (path);
   tr_mkdtemp (sandbox);
   return sandbox;
 }
@@ -431,10 +435,9 @@ libttest_blockingTorrentVerify (tr_torrent * tor)
     tr_wait_msec (10);
 }
 
-void
-libtest_create_file_with_contents (const char * path, const char * str)
+static void
+build_parent_dir (const char* path)
 {
-  FILE * fp;
   char * dir;
   const int tmperr = errno;
 
@@ -444,9 +447,20 @@ libtest_create_file_with_contents (const char * path, const char * str)
   assert (errno == 0);
   tr_free (dir);
 
+  errno = tmperr;
+}
+
+void
+libtest_create_file_with_contents (const char* path, const void* payload, size_t n)
+{
+  FILE * fp;
+  const int tmperr = errno;
+
+  build_parent_dir (path);
+
   tr_remove (path);
   fp = fopen (path, "wb");
-  fprintf (fp, "%s", str);
+  fwrite (payload, 1, n, fp);
   fclose (fp);
 
   sync ();
@@ -454,3 +468,35 @@ libtest_create_file_with_contents (const char * path, const char * str)
   errno = tmperr;
 }
 
+void
+libtest_create_file_with_string_contents (const char * path, const char* str)
+{
+  libtest_create_file_with_contents (path, str, strlen(str));
+}
+
+void
+libtest_create_tmpfile_with_contents (char* tmpl, const void* payload, size_t n)
+{
+  int fd;
+  const int tmperr = errno;
+  size_t n_left = n;
+
+  build_parent_dir (tmpl);
+
+  fd = mkstemp (tmpl);
+  while (n_left > 0)
+    {
+      const ssize_t n = write (fd, payload, n_left);
+      if (n == -1)
+        {
+          fprintf (stderr, "Error writing '%s': %s", tmpl, tr_strerror(errno));
+          break;
+        }
+      n_left -= n;
+    }
+  close (fd);
+
+  sync ();
+
+  errno = tmperr;
+}
