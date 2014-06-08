@@ -93,33 +93,10 @@ torrentRenameAndWait (tr_torrent * tor,
 ***/
 
 static void
-create_file_with_contents (const char * path, const char * str)
-{
-  FILE * fp;
-  char * dir;
-  const int tmperr = errno;
-
-  dir = tr_dirname (path);
-  errno = 0;
-  tr_mkdirp (dir, 0700);
-  assert (errno == 0);
-  tr_free (dir);
-
-  tr_remove (path);
-  fp = fopen (path, "wb");
-  fprintf (fp, "%s", str);
-  fclose (fp);
-
-  sync ();
-
-  errno = tmperr;
-}
-
-static void
 create_single_file_torrent_contents (const char * top)
 {
   char * path = tr_buildPath (top, "hello-world.txt", NULL);
-  create_file_with_contents (path, "hello, world!\n");
+  libtest_create_file_with_contents (path, "hello, world!\n");
   tr_free (path);
 }
 
@@ -264,19 +241,19 @@ create_multifile_torrent_contents (const char * top)
   char * path;
 
   path = tr_buildPath (top, "Felidae", "Felinae", "Acinonyx", "Cheetah", "Chester", NULL);
-  create_file_with_contents (path, "It ain't easy bein' cheesy.\n");
+  libtest_create_file_with_contents (path, "It ain't easy bein' cheesy.\n");
   tr_free (path);
 
   path = tr_buildPath (top, "Felidae", "Pantherinae", "Panthera", "Tiger", "Tony", NULL);
-  create_file_with_contents (path, "They’re Grrrrreat!\n");
+  libtest_create_file_with_contents (path, "They’re Grrrrreat!\n");
   tr_free (path);
 
   path = tr_buildPath (top, "Felidae", "Felinae", "Felis", "catus", "Kyphi", NULL);
-  create_file_with_contents (path, "Inquisitive\n");
+  libtest_create_file_with_contents (path, "Inquisitive\n");
   tr_free (path);
 
   path = tr_buildPath (top, "Felidae", "Felinae", "Felis", "catus", "Saffron", NULL);
-  create_file_with_contents (path, "Tough\n");
+  libtest_create_file_with_contents (path, "Tough\n");
   tr_free (path);
 
   sync ();

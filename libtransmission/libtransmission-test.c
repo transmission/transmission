@@ -122,10 +122,9 @@ runTests (const testFunc * const tests, int numTests)
 
 #include "variant.h"
 
-tr_session * session = NULL;
-char * sandbox = NULL;
-char * downloadDir = NULL;
-char * blocklistDir = NULL;
+/***
+****
+***/
 
 static char*
 tr_getcwd (void)
@@ -146,6 +145,15 @@ tr_getcwd (void)
     }
 
   return tr_strdup (buf);
+}
+
+char *
+libtest_sandbox_create (void)
+{
+  const char * path = tr_getcwd ();
+  char * sandbox = tr_buildPath (path, "sandbox-XXXXXX", NULL);
+  tr_mkdtemp (sandbox);
+  return sandbox;
 }
 
 static void
@@ -178,6 +186,16 @@ rm_rf (const char * killme)
       tr_remove (killme);
     }
 }
+
+void
+libtest_sandbox_destroy (const char * sandbox)
+{
+  rm_rf (sandbox);
+}
+
+/***
+****
+***/
 
 #define MEM_K 1024
 #define MEM_B_STR   "B"
@@ -217,10 +235,7 @@ libttest_session_init (tr_variant * settings)
   if (settings == NULL)
     settings = &local_settings;
 
-  path = tr_getcwd ();
-  sandbox = tr_buildPath (path, "sandbox-XXXXXX", NULL);
-  tr_mkdtemp (sandbox);
-  tr_free (path);
+  sandbox = libtest_sandbox_create ();
 
   if (!formatters_inited)
     {
@@ -275,15 +290,15 @@ libttest_session_init (tr_variant * settings)
 void
 libttest_session_close (tr_session * session)
 {
-  char * path;
+  char * sandbox;
 
-  path = tr_strdup (tr_sessionGetConfigDir (session));
+  sandbox = tr_strdup (tr_sessionGetConfigDir (session));
   tr_sessionClose (session);
   tr_logFreeQueue (tr_logGetQueue ());
   session = NULL;
 
-  rm_rf (path);
-  tr_free (path);
+  libtest_sandbox_destroy (sandbox);
+  tr_free (sandbox);
 }
 
 /***
@@ -415,3 +430,27 @@ libttest_blockingTorrentVerify (tr_torrent * tor)
   while (!done)
     tr_wait_msec (10);
 }
+
+void
+libtest_create_file_with_contents (const char * path, const char * str)
+{
+  FILE * fp;
+  char * dir;
+  const int tmperr = errno;
+
+  dir = tr_dirname (path);
+  errno = 0;
+  tr_mkdirp (dir, 0700);
+  assert (errno == 0);
+  tr_free (dir);
+
+  tr_remove (path);
+  fp = fopen (path, "wb");
+  fprintf (fp, "%s", str);
+  fclose (fp);
+
+  sync ();
+
+  errno = tmperr;
+}
+
