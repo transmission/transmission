@@ -45,7 +45,7 @@ typedef struct tr_metainfo_builder
     uint32_t                    fileCount;
     uint32_t                    pieceSize;
     uint32_t                    pieceCount;
-    int                         isSingleFile;
+    bool                        isSingleFile;
 
     /**
     ***  These are set inside tr_makeMetaInfo ()
