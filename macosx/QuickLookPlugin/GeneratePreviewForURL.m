@@ -60,13 +60,13 @@ OSStatus GeneratePreviewForURL(void *thisInterface, QLPreviewRequestRef preview,
     NSMutableDictionary * allImgProps = [NSMutableDictionary dictionary];
     
     NSString * name = [NSString stringWithUTF8String: inf.name];
-    NSString * fileTypeString = inf.isMultifile ? NSFileTypeForHFSTypeCode(kGenericFolderIcon) : [name pathExtension];
+    NSString * fileTypeString = inf.isFolder ? NSFileTypeForHFSTypeCode(kGenericFolderIcon) : [name pathExtension];
     
     const NSUInteger width = 32;
     [htmlString appendFormat: @"<h2><img class=\"icon\" src=\"%@\" width=\"%ld\" height=\"%ld\" />%@</h2>", generateIconData(fileTypeString, width, allImgProps), width, width, name];
     
     NSString * fileSizeString = [NSString stringForFileSize: inf.totalSize];
-    if (inf.isMultifile)
+    if (inf.isFolder)
     {
         NSString * fileCountString;
         if (inf.fileCount == 1)
@@ -132,7 +132,7 @@ OSStatus GeneratePreviewForURL(void *thisInterface, QLPreviewRequestRef preview,
         [lists addObject: listSection];
     }
     
-    if (inf.isMultifile)
+    if (inf.isFolder)
     {
         NSMutableString * listSection = [NSMutableString string];
         [listSection appendString: @"<table>"];

@@ -110,7 +110,7 @@
                 if (count == 1)
                 {
                     name = [NSString stringWithUTF8String: info.name];
-                    folder = info.isMultifile;
+                    folder = info.isFolder;
                 }
             }
             tr_metainfoFree(&info);

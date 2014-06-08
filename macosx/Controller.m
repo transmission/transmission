@@ -953,7 +953,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         
         //determine to show the options window
         const BOOL showWindow = type == ADD_SHOW_OPTIONS || ([fDefaults boolForKey: @"DownloadAsk"]
-                                    && (info.isMultifile || ![fDefaults boolForKey: @"DownloadAskMulti"])
+                                    && (info.isFolder || ![fDefaults boolForKey: @"DownloadAskMulti"])
                                     && (type != ADD_AUTO || ![fDefaults boolForKey: @"DownloadAskManual"]));
         tr_metainfoFree(&info);
         

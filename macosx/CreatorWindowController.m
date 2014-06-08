@@ -150,7 +150,7 @@
     [fNameField setStringValue: name];
     [fNameField setToolTip: [fPath path]];
     
-    const BOOL multifile = !fInfo->isSingleFile;
+    const BOOL multifile = fInfo->isFolder;
     
     NSImage * icon = [[NSWorkspace sharedWorkspace] iconForFileType: multifile
                         ? NSFileTypeForHFSTypeCode(kGenericFolderIcon) : [fPath pathExtension]];

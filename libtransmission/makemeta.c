@@ -126,7 +126,7 @@ tr_metaInfoBuilderCreate (const char * topFileArg)
   {
     struct stat sb;
     stat (topFile, &sb);
-    ret->isSingleFile = !S_ISDIR (sb.st_mode);
+    ret->isFolder = S_ISDIR (sb.st_mode);
   }
 
   /* build a list of files containing topFile and,
@@ -334,11 +334,7 @@ makeInfoDict (tr_variant          * dict,
 
   tr_variantDictReserve (dict, 5);
 
-  if (builder->isSingleFile)
-    {
-      tr_variantDictAddInt (dict, TR_KEY_length, builder->files[0].size);
-    }
-  else /* root node is a directory */
+  if (builder->isFolder) /* root node is a directory */
     {
       uint32_t  i;
       tr_variant * list = tr_variantDictAddList (dict, TR_KEY_files,
@@ -350,6 +346,10 @@ makeInfoDict (tr_variant          * dict,
           tr_variant * pathVal = tr_variantDictAdd (d, TR_KEY_path);
           getFileInfo (builder->top, &builder->files[i], length, pathVal);
         }
+    }
+  else
+    {
+      tr_variantDictAddInt (dict, TR_KEY_length, builder->files[0].size);
     }
 
   base = tr_basename (builder->top);
