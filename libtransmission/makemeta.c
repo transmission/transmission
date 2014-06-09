@@ -320,7 +320,8 @@ getFileInfo (const char                      * topFile,
       char * walk = filename;
       const char * token;
       while ((token = tr_strsep (&walk, TR_PATH_DELIMITER_STR)))
-        tr_variantListAddStr (uninitialized_path, token);
+        if (*token)
+          tr_variantListAddStr (uninitialized_path, token);
       tr_free (filename);
     }
 }
