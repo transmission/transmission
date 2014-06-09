@@ -248,8 +248,8 @@ tr_variantParseBenc (const void    * buf_in,
         break;
     }
 
-  if (!err)
-    err = !top->type || !tr_ptrArrayEmpty(&stack);
+  if (!err && (!top->type || !tr_ptrArrayEmpty(&stack)))
+    err = EILSEQ;
 
   if (!err && setme_end)
     *setme_end = (const char*) buf;

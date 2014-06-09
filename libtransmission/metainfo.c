@@ -76,7 +76,6 @@ static bool
 path_component_is_suspicious (const char * component)
 {
   return (component == NULL)
-      || (*component == '\0')
       || (strpbrk (component, PATH_DELIMITER_CHARS) != NULL)
       || (strcmp (component, ".") == 0)
       || (strcmp (component, "..") == 0);
@@ -86,6 +85,7 @@ static bool
 getfile (char ** setme, const char * root, tr_variant * path, struct evbuffer * buf)
 {
   bool success = false;
+  size_t root_len = 0;
 
   *setme = NULL;
 
@@ -99,7 +99,8 @@ getfile (char ** setme, const char * root, tr_variant * path, struct evbuffer * 
 
       success = true;
       evbuffer_drain (buf, evbuffer_get_length (buf));
-      evbuffer_add (buf, root, strlen (root));
+      root_len = strlen (root);
+      evbuffer_add (buf, root, root_len);
 
       for (i=0; i<n; i++)
         {
@@ -113,9 +114,17 @@ getfile (char ** setme, const char * root, tr_variant * path, struct evbuffer * 
               break;
             }
 
+          if (!*str)
+            continue;
+
           evbuffer_add (buf, TR_PATH_DELIMITER_STR, 1);
           evbuffer_add (buf, str, len);
         }
+    }
+
+  if (success && (evbuffer_get_length (buf) <= root_len))
+    {
+      success = false;
     }
 
   if (success)
