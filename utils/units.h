@@ -7,8 +7,8 @@
  * $Id:$
  */
 
-#ifndef SHOW_H
-#define SHOW_H
+#ifndef UNITS_H
+#define UNITS_H
 
 #define MEM_K 1024
 #define MEM_K_STR "KiB"
