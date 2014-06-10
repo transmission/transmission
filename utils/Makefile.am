@@ -19,6 +19,9 @@ transmission_create_SOURCES = create.c
 transmission_edit_SOURCES = edit.c
 transmission_show_SOURCES = show.c
 
+noinst_HEADERS = \
+    units.h \
+
 dist_man_MANS = \
     transmission-create.1 \
     transmission-edit.1 \
