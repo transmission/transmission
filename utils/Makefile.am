@@ -20,7 +20,7 @@ transmission_edit_SOURCES = edit.c
 transmission_show_SOURCES = show.c
 
 noinst_HEADERS = \
-    units.h \
+    units.h
 
 dist_man_MANS = \
     transmission-create.1 \
