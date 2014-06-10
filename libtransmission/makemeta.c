@@ -165,15 +165,37 @@ tr_metaInfoBuilderCreate (const char * topFileArg)
   return ret;
 }
 
-void
+static bool
+isValidPieceSize (uint32_t n)
+{
+  const bool isPowerOfTwo = !(n == 0) && !(n & (n - 1));
+
+  return isPowerOfTwo;
+}
+
+bool
 tr_metaInfoBuilderSetPieceSize (tr_metainfo_builder * b,
                                 uint32_t              bytes)
 {
+  if (!isValidPieceSize (bytes))
+    {
+      char wanted[32];
+      char gotten[32];
+      tr_formatter_mem_B (wanted, bytes, sizeof(wanted));
+      tr_formatter_mem_B (gotten, b->pieceSize, sizeof(gotten));
+      tr_logAddError (_("Failed to set piece size to %s, leaving it at %s"),
+                      wanted,
+                      gotten);
+      return false;
+    }
+
   b->pieceSize = bytes;
 
   b->pieceCount = (int)(b->totalSize / b->pieceSize);
   if (b->totalSize % b->pieceSize)
     ++b->pieceCount;
+
+  return true;
 }
 
 

@@ -18,6 +18,8 @@
 #include <libtransmission/utils.h>
 #include <libtransmission/version.h>
 
+#include "units.h"
+
 #define MY_NAME "transmission-create"
 
 #define MAX_TRACKERS 128
@@ -133,6 +135,9 @@ main (int argc, char * argv[])
   tr_metainfo_builder * b = NULL;
 
   tr_logSetLevel (TR_LOG_ERROR);
+  tr_formatter_mem_init (MEM_K, MEM_K_STR, MEM_M_STR, MEM_G_STR, MEM_T_STR);
+  tr_formatter_size_init (DISK_K, DISK_K_STR, DISK_M_STR, DISK_G_STR, DISK_T_STR);
+  tr_formatter_speed_init (SPEED_K, SPEED_K_STR, SPEED_M_STR, SPEED_G_STR, SPEED_T_STR);
 
   if (parseCommandLine (argc, (const char**)argv))
     return EXIT_FAILURE;

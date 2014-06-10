@@ -93,8 +93,10 @@ tr_metainfo_builder * tr_metaInfoBuilderCreate (const char * topFile);
 /**
  * Call this before tr_makeMetaInfo() to override the builder.pieceSize
  * and builder.pieceCount values that were set by tr_metainfoBuilderCreate()
+ *
+ * @return false if the piece size isn't valid; eg, isn't a power of two.
  */
-void tr_metaInfoBuilderSetPieceSize (tr_metainfo_builder * builder,
+bool tr_metaInfoBuilderSetPieceSize (tr_metainfo_builder * builder,
                                      uint32_t              bytes);
 
 void tr_metaInfoBuilderFree (tr_metainfo_builder*);
