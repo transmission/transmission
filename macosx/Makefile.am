@@ -140,6 +140,10 @@ EXTRA_DIST = \
     PrefsWindow.m \
     ProgressGradients.h \
     ProgressGradients.m \
+    ShareToolbarItem.h \
+    ShareToolbarItem.m \
+    ShareTorrentFileHelper.h \
+    ShareTorrentFileHelper.m \
     StatsWindowController.h \
     StatsWindowController.m \
     StatusBarController.h \
