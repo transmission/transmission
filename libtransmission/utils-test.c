@@ -421,6 +421,63 @@ test_cryptoRand (void)
   return 0;
 }
 
+static char *
+test_strdup_printf_valist (const char * fmt, ...)
+{
+  va_list args;
+  char * ret;
+
+  va_start (args, fmt);
+  ret = tr_strdup_vprintf (fmt, args);
+  va_end (args);
+
+  return ret;
+}
+
+static int
+test_strdup_printf (void)
+{
+  char * s, * s2, * s3;
+
+  s = tr_strdup_printf ("%s", "test");
+  check_streq ("test", s);
+  tr_free (s);
+
+  s = tr_strdup_printf ("%d %s %c %u", -1, "0", '1', 2);
+  check_streq ("-1 0 1 2", s);
+  tr_free (s);
+
+  s3 = tr_malloc0 (4098);
+  memset (s3, '-', 4097);
+  s3[2047] = 't';
+  s3[2048] = 'e';
+  s3[2049] = 's';
+  s3[2050] = 't';
+
+  s2 = tr_malloc0 (4096);
+  memset (s2, '-', 4095);
+  s2[2047] = '%';
+  s2[2048] = 's';
+
+  s = tr_strdup_printf (s2, "test");
+  check_streq (s3, s);
+  tr_free (s);
+
+  tr_free (s2);
+
+  s = tr_strdup_printf ("%s", s3);
+  check_streq (s3, s);
+  tr_free (s);
+
+  tr_free (s3);
+
+  s = test_strdup_printf_valist ("\n-%s-%s-%s-\n", "\r", "\t", "\b");
+  check_streq ("\n-\r-\t-\b-\n", s);
+  tr_free (s);
+
+  return 0;
+}
+
 int
 main (void)
 {
@@ -434,6 +491,7 @@ main (void)
                              test_memmem,
                              test_numbers,
                              test_strip_positional_args,
+                             test_strdup_printf,
                              test_strstrip,
                              test_truncd,
                              test_url,

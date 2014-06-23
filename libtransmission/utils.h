@@ -11,6 +11,7 @@
 #define TR_UTILS_H 1
 
 #include <inttypes.h>
+#include <stdarg.h>
 #include <stddef.h> /* size_t */
 #include <time.h> /* time_t */
 
@@ -267,6 +268,8 @@ void tr_quickfindFirstK (void * base, size_t nmemb, size_t size,
  */
 char* tr_strdup_printf (const char * fmt, ...) TR_GNUC_PRINTF (1, 2)
                                                 TR_GNUC_MALLOC;
+char * tr_strdup_vprintf (const char * fmt,
+                          va_list      args) TR_GNUC_MALLOC;
 
 /**
  * @brief Translate a block of bytes into base64

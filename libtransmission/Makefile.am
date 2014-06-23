@@ -28,6 +28,7 @@ libtransmission_a_SOURCES = \
   completion.c \
   ConvertUTF.c \
   crypto.c \
+  error.c \
   fdlimit.c \
   handshake.c \
   history.c \
@@ -82,6 +83,7 @@ noinst_HEADERS = \
   ConvertUTF.h \
   crypto.h \
   completion.h \
+  error.h \
   fdlimit.h \
   handshake.h \
   history.h \
@@ -133,6 +135,7 @@ TESTS = \
   blocklist-test \
   clients-test \
   crypto-test \
+  error-test \
   history-test \
   json-test \
   magnet-test \
@@ -183,6 +186,10 @@ clients_test_LDFLAGS = ${apps_ldflags}
 crypto_test_SOURCES = crypto-test.c $(TEST_SOURCES)
 crypto_test_LDADD = ${apps_ldadd}
 crypto_test_LDFLAGS = ${apps_ldflags}
+
+error_test_SOURCES = error-test.c $(TEST_SOURCES)
+error_test_LDADD = ${apps_ldadd}
+error_test_LDFLAGS = ${apps_ldflags}
 
 history_test_SOURCES = history-test.c $(TEST_SOURCES)
 history_test_LDADD = ${apps_ldadd}

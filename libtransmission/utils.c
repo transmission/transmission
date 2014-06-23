@@ -24,7 +24,6 @@
 #include <float.h> /* DBL_EPSILON */
 #include <locale.h> /* localeconv () */
 #include <math.h> /* pow (), fabs (), floor () */
-#include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h> /* strerror (), memset (), memmem () */
@@ -602,26 +601,21 @@ tr_strdup_printf (const char * fmt, ...)
 {
   va_list ap;
   char * ret;
-  size_t len;
-  char statbuf[2048];
 
   va_start (ap, fmt);
-  len = evutil_vsnprintf (statbuf, sizeof (statbuf), fmt, ap);
+  ret = tr_strdup_vprintf (fmt, ap);
   va_end (ap);
 
-  if (len < sizeof (statbuf))
-    {
-      ret = tr_strndup (statbuf, len);
-    }
-  else
-    {
-      ret = tr_new (char, len + 1);
-      va_start (ap, fmt);
-      evutil_vsnprintf (ret, len + 1, fmt, ap);
-      va_end (ap);
-    }
-
   return ret;
+}
+
+char *
+tr_strdup_vprintf (const char * fmt,
+                   va_list      args)
+{
+  struct evbuffer * buf = evbuffer_new ();
+  evbuffer_add_vprintf (buf, fmt, args);
+  return evbuffer_free_to_str (buf);
 }
 
 const char*
