@@ -1,3 +1,8 @@
+=== Transmission 2.83 (2014/xx/yy) ===
+[http://trac.transmissionbt.com/query?milestone=2.84&group=component&order=severity All tickets closed by this release]
+==== All Platforms ====
+  * Fix peer communication vulnerability (no known exploits) reported by Ben Hawkes
+
 === Transmission 2.83 (2014/05/18) ===
 [http://trac.transmissionbt.com/query?milestone=2.83&group=component&order=severity All tickets closed by this release]
 ==== All Platforms ====
