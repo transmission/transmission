@@ -33,6 +33,10 @@
 #include "variant.h"
 #include "version.h"
 
+#ifndef EBADMSG
+ #define EBADMSG EINVAL
+#endif
+
 /**
 ***
 **/
@@ -1692,6 +1696,12 @@ clientGotBlock (tr_peerMsgs                * msgs,
 
     assert (msgs);
     assert (req);
+
+    if (!requestIsValid (msgs, req)) {
+        dbgmsg (msgs, "dropping invalid block %u:%u->%u",
+                req->index, req->offset, req->length);
+        return EBADMSG;
+    }
 
     if (req->length != tr_torBlockCountBytes (msgs->torrent, block)) {
         dbgmsg (msgs, "wrong block size -- expected %u, got %d",
