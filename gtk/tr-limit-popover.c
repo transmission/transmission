@@ -66,35 +66,31 @@ static void tr_limit_popover_init(TrLimitPopover* popover)
     gtk_grid_set_column_homogeneous(GTK_GRID(popover), FALSE);
 
     w = gtk_check_button_new_with_label("Limit Download");
+    gtk_actionable_set_action_name(GTK_ACTIONABLE(w), "win.speed-limit-down-enabled");
     gtk_grid_attach(GTK_GRID(popover), w, 1, 1, 1, 1);
 
-    priv->download_limit_entry = gtk_entry_new();
-    gtk_entry_set_width_chars(GTK_ENTRY(priv->download_limit_entry), 1);
-    gtk_grid_attach(GTK_GRID(popover), priv->download_limit_entry, 2, 1, 1, 1);
+    w = priv->download_limit_entry = gtk_entry_new();
+    gtk_entry_set_width_chars(GTK_ENTRY(w), 1);
+    gtk_grid_attach(GTK_GRID(popover), w, 2, 1, 1, 1);
     gtk_grid_attach(GTK_GRID(popover), gtk_label_new("KB/s"), 3, 1, 1, 1);
 
     w = gtk_check_button_new_with_label("Limit Upload");
+    gtk_actionable_set_action_name(GTK_ACTIONABLE(w), "win.speed-limit-up-enabled");
     gtk_grid_attach(GTK_GRID(popover), w, 1, 2, 1, 1);
 
-    priv->upload_limit_entry = gtk_entry_new();
-    gtk_entry_set_width_chars(GTK_ENTRY(priv->upload_limit_entry), 1);
-    gtk_grid_attach(GTK_GRID(popover), priv->upload_limit_entry, 2, 2, 1, 1);
+    w = priv->upload_limit_entry = gtk_entry_new();
+    gtk_entry_set_width_chars(GTK_ENTRY(w), 1);
+    gtk_actionable_set_action_name(GTK_ACTIONABLE(w), "win.ratio-limit");
+    gtk_grid_attach(GTK_GRID(popover), w, 2, 2, 1, 1);
     gtk_grid_attach(GTK_GRID(popover), gtk_label_new("KB/s"), 3, 2, 1, 1);
 
     w = gtk_check_button_new_with_label("Stop seeding at ratio");
+    gtk_actionable_set_action_name(GTK_ACTIONABLE(w), "win.ratio-limit-enabled");
     gtk_grid_attach(GTK_GRID(popover), w, 1, 3, 1, 1);
 
     priv->seed_limit_entry = gtk_entry_new();
     gtk_entry_set_width_chars(GTK_ENTRY(priv->seed_limit_entry), 1);
     gtk_grid_attach(GTK_GRID(popover), priv->seed_limit_entry, 2, 3, 1, 1);
-
-    w = gtk_button_new_with_label("Apply Limits");
-    context = gtk_widget_get_style_context(w);
-
-    gtk_style_context_add_class(context, GTK_STYLE_CLASS_SUGGESTED_ACTION);
-    gtk_style_context_add_class(context, GTK_STYLE_CLASS_DEFAULT);
-
-    gtk_grid_attach(GTK_GRID(popover), w, 1, 4, 3, 1);
 }
 
 TrLimitPopover* tr_limit_popover_new()
