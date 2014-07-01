@@ -1,4 +1,4 @@
-=== Transmission 2.83 (2014/xx/yy) ===
+=== Transmission 2.84 (2014/07/01) ===
 [http://trac.transmissionbt.com/query?milestone=2.84&group=component&order=severity All tickets closed by this release]
 ==== All Platforms ====
   * Fix peer communication vulnerability (no known exploits) reported by Ben Hawkes
