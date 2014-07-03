@@ -47,7 +47,7 @@
  #endif
 #endif
 
-#ifdef SYS_DARWIN
+#ifdef __APPLE__
  #define HAVE_SYS_STATVFS_H
  #define HAVE_STATVFS
 #endif
@@ -246,7 +246,7 @@ getquota (const char * device)
   int64_t freespace;
   int64_t spaceused;
 
-#if defined(__FreeBSD__) || defined(__OpenBSD__) || defined(SYS_DARWIN)
+#if defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__APPLE__)
   if (quotactl(device, QCMD(Q_GETQUOTA, USRQUOTA), getuid(), (caddr_t) &dq) == 0)
     {
 #elif defined(__sun)
@@ -280,7 +280,7 @@ getquota (const char * device)
         }
 #if defined(__FreeBSD__) || defined(__OpenBSD__)
       spaceused = (int64_t) dq.dqb_curblocks >> 1;
-#elif defined(SYS_DARWIN)
+#elif defined(__APPLE__)
       spaceused = (int64_t) dq.dqb_curbytes;
 #elif defined(__UCLIBC__)
       spaceused = (int64_t) btodb(dq.dqb_curblocks);
@@ -290,7 +290,7 @@ getquota (const char * device)
       spaceused = btodb(dq.dqb_curspace);
 #endif
       freespace = limit - spaceused;
-#ifdef SYS_DARWIN
+#ifdef __APPLE__
       return (freespace < 0) ? 0 : freespace;
 #else
       return (freespace < 0) ? 0 : freespace * 1024;

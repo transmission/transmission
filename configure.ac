@@ -461,7 +461,6 @@ case $host_os in
 
   *darwin*)
     have_darwin="yes"
-    CFLAGS="-DMACOSX $CFLAGS"
     ;;
 
 esac
@@ -508,10 +507,6 @@ with --enable-mac:
 EOF
       exit 1
     fi
-fi
-if test "x$have_darwin" = "xyes"; then
-    AC_DEFINE([HAVE_DARWIN], 1)
-    AC_DEFINE([SYS_DARWIN], 1)
 fi
 if test "x$have_msw" = "xyes"; then
     AC_DEFINE([HAVE_MSW], 1)

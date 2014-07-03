@@ -254,7 +254,7 @@ getHomeDir (void)
   return home;
 }
 
-#if defined (SYS_DARWIN) || defined (WIN32)
+#if defined (__APPLE__) || defined (WIN32)
  #define RESUME_SUBDIR  "Resume"
  #define TORRENT_SUBDIR "Torrents"
 #else
@@ -312,7 +312,7 @@ tr_getDefaultConfigDir (const char * appname)
         }
       else
         {
-#ifdef SYS_DARWIN
+#ifdef __APPLE__
           s = tr_buildPath (getHomeDir (), "Library", "Application Support", appname, NULL);
 #elif defined (WIN32)
           char appdata[TR_PATH_MAX]; /* SHGetFolderPath () requires MAX_PATH */

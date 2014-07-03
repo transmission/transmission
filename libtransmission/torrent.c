@@ -2827,7 +2827,7 @@ isJunkFile (const char * base)
     if (!strcmp (base, files[i]))
       return true;
 
-#ifdef SYS_DARWIN
+#ifdef __APPLE__
   /* check for resource forks. <http://support.apple.com/kb/TA20578> */
   if (!memcmp (base, "._", 2))
     return true;

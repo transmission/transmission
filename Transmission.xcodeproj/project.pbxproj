@@ -3207,7 +3207,6 @@
 				);
 				OTHER_CFLAGS = (
 					"$(inherited)",
-					"-DSYS_DARWIN",
 					"-DWITH_UTP",
 					"-DHAVE_OPENSSL",
 					"-D__TRANSMISSION__",
@@ -3231,10 +3230,6 @@
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)/third-party/curl/lib\"",
-				);
-				OTHER_CFLAGS = (
-					"$(inherited)",
-					"-DSYS_DARWIN",
 				);
 				PRODUCT_NAME = Transmission;
 				WRAPPER_EXTENSION = app;
@@ -3295,7 +3290,6 @@
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREPROCESSOR_DEFINITIONS = (
-					MACOSX,
 					BUILD_MAC_CLIENT,
 					XCODE_BUILD,
 				);
@@ -3359,7 +3353,6 @@
 				);
 				OTHER_CFLAGS = (
 					"$(inherited)",
-					"-DSYS_DARWIN",
 					"-DWITH_UTP",
 					"-DHAVE_OPENSSL",
 					"-D__TRANSMISSION__",
@@ -3394,10 +3387,6 @@
 					"$(inherited)",
 					"\"$(SRCROOT)/third-party/curl/lib\"",
 				);
-				OTHER_CFLAGS = (
-					"$(inherited)",
-					"-DSYS_DARWIN",
-				);
 				PRODUCT_NAME = Transmission;
 				WRAPPER_EXTENSION = app;
 			};
@@ -3417,7 +3406,6 @@
 				GCC_INCREASE_PRECOMPILED_HEADER_SHARING = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREPROCESSOR_DEFINITIONS = (
-					MACOSX,
 					NS_BLOCK_ASSERTIONS,
 					BUILD_MAC_CLIENT,
 					XCODE_BUILD,
@@ -3478,7 +3466,6 @@
 				GCC_INCREASE_PRECOMPILED_HEADER_SHARING = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREPROCESSOR_DEFINITIONS = (
-					MACOSX,
 					BUILD_MAC_CLIENT,
 					XCODE_BUILD,
 				);
@@ -3511,10 +3498,6 @@
 					"$(inherited)",
 					"\"$(SRCROOT)/third-party/curl/lib\"",
 				);
-				OTHER_CFLAGS = (
-					"$(inherited)",
-					"-DSYS_DARWIN",
-				);
 				PRODUCT_NAME = Transmission;
 				WRAPPER_EXTENSION = app;
 			};
@@ -3546,7 +3529,6 @@
 				);
 				OTHER_CFLAGS = (
 					"$(inherited)",
-					"-DSYS_DARWIN",
 					"-DWITH_UTP",
 					"-DHAVE_OPENSSL",
 					"-D__TRANSMISSION__",
@@ -3603,7 +3585,6 @@
 			buildSettings = {
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					POSIX,
-					MACOSX,
 				);
 				PRODUCT_NAME = utp;
 			};
@@ -3614,7 +3595,6 @@
 			buildSettings = {
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					POSIX,
-					MACOSX,
 				);
 				PRODUCT_NAME = utp;
 			};
@@ -3625,7 +3605,6 @@
 			buildSettings = {
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					POSIX,
-					MACOSX,
 					NS_BLOCK_ASSERTIONS,
 				);
 				PRODUCT_NAME = utp;

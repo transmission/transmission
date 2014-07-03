@@ -77,7 +77,7 @@ extern "C" {
 const char * tr_strip_positional_args (const char * fmt);
 
 #if !defined (_)
- #if defined (HAVE_LIBINTL_H) && !defined (SYS_DARWIN)
+ #if defined (HAVE_LIBINTL_H) && !defined (__APPLE__)
   #include <libintl.h>
   #define _(a) gettext (a)
  #else

@@ -494,7 +494,7 @@ tr_buildPath (const char *first_element, ...)
   return buf;
 }
 
-#ifdef SYS_DARWIN
+#ifdef __APPLE__
  #define TR_STAT_MTIME(sb)((sb).st_mtimespec.tv_sec)
 #else
  #define TR_STAT_MTIME(sb)((sb).st_mtime)
