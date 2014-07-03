@@ -1316,6 +1316,98 @@ tr_utf8clean (const char * str, int max_len)
   return ret;
 }
 
+#ifdef WIN32
+
+char *
+tr_win32_native_to_utf8 (const wchar_t * text,
+                         int             text_size)
+{
+  char * ret = NULL;
+  int size;
+
+  size = WideCharToMultiByte (CP_UTF8, 0, text, text_size, NULL, 0, NULL, NULL);
+  if (size == 0)
+    goto fail;
+
+  ret = tr_new (char, size + 1);
+  size = WideCharToMultiByte (CP_UTF8, 0, text, text_size, ret, size, NULL, NULL);
+  if (size == 0)
+    goto fail;
+
+  ret[size] = '\0';
+
+  return ret;
+
+fail:
+  tr_free (ret);
+
+  return NULL;
+}
+
+wchar_t *
+tr_win32_utf8_to_native (const char * text,
+                         int          text_size)
+{
+  return tr_win32_utf8_to_native_ex (text, text_size, 0);
+}
+
+wchar_t *
+tr_win32_utf8_to_native_ex (const char * text,
+                            int          text_size,
+                            int          extra_chars)
+{
+  wchar_t * ret = NULL;
+  int size;
+
+  size = MultiByteToWideChar (CP_UTF8, 0, text, text_size, NULL, 0);
+  if (size == 0)
+    goto fail;
+
+  ret = tr_new (wchar_t, size + extra_chars + 1);
+  size = MultiByteToWideChar (CP_UTF8, 0, text, text_size, ret, size);
+  if (size == 0)
+    goto fail;
+
+  ret[size] = L'\0';
+
+  return ret;
+
+fail:
+  tr_free (ret);
+
+  return NULL;
+}
+
+char *
+tr_win32_format_message (uint32_t code)
+{
+  wchar_t * wide_text = NULL;
+  DWORD wide_size;
+  char * text = NULL;
+  size_t text_size;
+
+  wide_size = FormatMessageW (FORMAT_MESSAGE_ALLOCATE_BUFFER |
+                              FORMAT_MESSAGE_FROM_SYSTEM |
+                              FORMAT_MESSAGE_IGNORE_INSERTS,
+                              NULL, code, 0, (LPWSTR)&wide_text, 0, NULL);
+
+  if (wide_size != 0 && wide_text != NULL)
+    text = tr_win32_native_to_utf8 (wide_text, wide_size);
+
+  LocalFree (wide_text);
+
+  /* Most (all?) messages contain "\r\n" in the end, chop it */
+  text_size = strlen (text);
+  while (text_size > 0 &&
+         text[text_size - 1] >= '\0' &&
+         text[text_size - 1] <= ' ')
+    text[--text_size] = '\0';
+
+  return text;
+}
+
+#endif
+
 /***
 ****
 ***/

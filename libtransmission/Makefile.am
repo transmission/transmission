@@ -72,6 +72,12 @@ libtransmission_a_SOURCES = \
   webseed.c \
   wildmat.c
 
+if WIN32
+libtransmission_a_SOURCES += file-win32.c
+else
+libtransmission_a_SOURCES += file-posix.c
+endif
+
 noinst_HEADERS = \
   announcer.h \
   announcer-common.h \
@@ -85,6 +91,7 @@ noinst_HEADERS = \
   completion.h \
   error.h \
   fdlimit.h \
+  file.h \
   handshake.h \
   history.h \
   inout.h \
@@ -136,6 +143,7 @@ TESTS = \
   clients-test \
   crypto-test \
   error-test \
+  file-test \
   history-test \
   json-test \
   magnet-test \
@@ -190,6 +198,10 @@ crypto_test_LDFLAGS = ${apps_ldflags}
 error_test_SOURCES = error-test.c $(TEST_SOURCES)
 error_test_LDADD = ${apps_ldadd}
 error_test_LDFLAGS = ${apps_ldflags}
+
+file_test_SOURCES = file-test.c $(TEST_SOURCES)
+file_test_LDADD = ${apps_ldadd}
+file_test_LDFLAGS = ${apps_ldflags}
 
 history_test_SOURCES = history-test.c $(TEST_SOURCES)
 history_test_LDADD = ${apps_ldadd}

@@ -460,6 +460,8 @@
 		BEFC1E580C07861A00B0BB3C /* clients.c in Sources */ = {isa = PBXBuildFile; fileRef = BEFC1E1F0C07861A00B0BB3C /* clients.c */; };
 		C1077A4E183EB29600634C22 /* error.c in Sources */ = {isa = PBXBuildFile; fileRef = C1077A4A183EB29600634C22 /* error.c */; };
 		C1077A4F183EB29600634C22 /* error.h in Headers */ = {isa = PBXBuildFile; fileRef = C1077A4B183EB29600634C22 /* error.h */; };
+		C1077A50183EB29600634C22 /* file-posix.c in Sources */ = {isa = PBXBuildFile; fileRef = C1077A4C183EB29600634C22 /* file-posix.c */; };
+		C1077A51183EB29600634C22 /* file.h in Headers */ = {isa = PBXBuildFile; fileRef = C1077A4D183EB29600634C22 /* file.h */; };
 		D4AF3B2F0C41F7A500D46B6B /* list.c in Sources */ = {isa = PBXBuildFile; fileRef = D4AF3B2D0C41F7A500D46B6B /* list.c */; };
 		D4AF3B300C41F7A600D46B6B /* list.h in Headers */ = {isa = PBXBuildFile; fileRef = D4AF3B2E0C41F7A500D46B6B /* list.h */; };
 		E138A9780C04D88F00C5426C /* ProgressGradients.m in Sources */ = {isa = PBXBuildFile; fileRef = E138A9760C04D88F00C5426C /* ProgressGradients.m */; };
@@ -1196,6 +1198,8 @@
 		BEFC1E1F0C07861A00B0BB3C /* clients.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = clients.c; path = libtransmission/clients.c; sourceTree = "<group>"; };
 		C1077A4A183EB29600634C22 /* error.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = error.c; path = libtransmission/error.c; sourceTree = "<group>"; };
 		C1077A4B183EB29600634C22 /* error.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = error.h; path = libtransmission/error.h; sourceTree = "<group>"; };
+		C1077A4C183EB29600634C22 /* file-posix.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "file-posix.c"; path = "libtransmission/file-posix.c"; sourceTree = "<group>"; };
+		C1077A4D183EB29600634C22 /* file.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = file.h; path = libtransmission/file.h; sourceTree = "<group>"; };
 		D4AF3B2D0C41F7A500D46B6B /* list.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = list.c; path = libtransmission/list.c; sourceTree = "<group>"; };
 		D4AF3B2E0C41F7A500D46B6B /* list.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = list.h; path = libtransmission/list.h; sourceTree = "<group>"; };
 		E138A9750C04D88F00C5426C /* ProgressGradients.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ProgressGradients.h; path = macosx/ProgressGradients.h; sourceTree = "<group>"; };
@@ -1652,6 +1656,8 @@
 			children = (
 				C1077A4A183EB29600634C22 /* error.c */,
 				C1077A4B183EB29600634C22 /* error.h */,
+				C1077A4C183EB29600634C22 /* file-posix.c */,
+				C1077A4D183EB29600634C22 /* file.h */,
 				4D80185710BBC0B0008A4AF2 /* magnet.c */,
 				4D80185810BBC0B0008A4AF2 /* magnet.h */,
 				4D8017E810BBC073008A4AF2 /* torrent-magnet.c */,
@@ -2047,6 +2053,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C1077A51183EB29600634C22 /* file.h in Headers */,
 				BEFC1E290C07861A00B0BB3C /* version.h in Headers */,
 				BEFC1E2A0C07861A00B0BB3C /* utils.h in Headers */,
 				BEFC1E2C0C07861A00B0BB3C /* upnp.h in Headers */,
@@ -2678,6 +2685,7 @@
 				4D36BA720CA2F00800A63CA5 /* handshake.c in Sources */,
 				4D36BA740CA2F00800A63CA5 /* peer-io.c in Sources */,
 				4D36BA770CA2F00800A63CA5 /* peer-mgr.c in Sources */,
+				C1077A50183EB29600634C22 /* file-posix.c in Sources */,
 				4D36BA790CA2F00800A63CA5 /* peer-msgs.c in Sources */,
 				A25D2CBD0CF4C73E0096A262 /* stats.c in Sources */,
 				A201527E0D1C270F0081714F /* torrent-ctor.c in Sources */,
