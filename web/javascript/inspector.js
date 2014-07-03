@@ -424,6 +424,8 @@ function Inspector(controller) {
             }
             if(mixed_creator && mixed_date)
                 str = mixed;
+            else if(!creator.length && !date)
+                str = unknown;
             else if(mixed_date && creator.length)
                 str = 'Created by ' + creator;
             else if(mixed_creator && date)
