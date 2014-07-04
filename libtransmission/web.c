@@ -11,7 +11,7 @@
 #include <string.h> /* strlen (), strstr () */
 #include <stdlib.h> /* getenv () */
 
-#ifdef WIN32
+#ifdef _WIN32
   #include <ws2tcpip.h>
 #else
   #include <sys/select.h>
@@ -347,7 +347,7 @@ tr_select (int nfds,
            fd_set * r_fd_set, fd_set * w_fd_set, fd_set * c_fd_set,
            struct timeval  * t)
 {
-#ifdef WIN32
+#ifdef _WIN32
   if (!r_fd_set->fd_count && !w_fd_set->fd_count && !c_fd_set->fd_count)
     {
       const long int msec = t->tv_sec*1000 + t->tv_usec/1000;

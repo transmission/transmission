@@ -98,7 +98,7 @@ preallocate_file_full (const char * filename, uint64_t length)
 {
   bool success = 0;
 
-#ifdef WIN32
+#ifdef _WIN32
 
   HANDLE hFile = CreateFile (filename, GENERIC_WRITE, 0, 0, CREATE_NEW, FILE_FLAG_RANDOM_ACCESS, 0);
   if (hFile != INVALID_HANDLE_VALUE)
@@ -172,7 +172,7 @@ preallocate_file_full (const char * filename, uint64_t length)
 int
 tr_fsync (int fd)
 {
-#ifdef WIN32
+#ifdef _WIN32
   return _commit (fd);
 #else
   return fsync (fd);

@@ -448,7 +448,7 @@ case $host_os in
    *mingw32*)
      have_msw="yes"
      CXXFLAGS="$CXXFLAGS -mms-bitfields -mwin32 -mwindows"
-     CPPFLAGS="$CPPFLAGS -DWIN32 -D_WIN32 -DWIN32_LEAN_AND_MEAN"
+     CPPFLAGS="$CPPFLAGS -DWIN32_LEAN_AND_MEAN"
      LIBS="$LIBS -liphlpapi -lshell32 -lws2_32"
      transmissionlocaledir="locale"
      if test -z "$host_alias"; then
@@ -507,9 +507,6 @@ with --enable-mac:
 EOF
       exit 1
     fi
-fi
-if test "x$have_msw" = "xyes"; then
-    AC_DEFINE([HAVE_MSW], 1)
 fi
 AM_CONDITIONAL(WIN32, test "x$have_msw" = "xyes")
 

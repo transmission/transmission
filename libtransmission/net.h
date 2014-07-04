@@ -29,7 +29,7 @@
 #ifndef _TR_NET_H_
 #define _TR_NET_H_
 
-#ifdef WIN32
+#ifdef _WIN32
  #include <inttypes.h>
  #include <ws2tcpip.h>
 #else
@@ -37,7 +37,7 @@
  #include <netinet/in.h>
 #endif
 
-#ifdef WIN32
+#ifdef _WIN32
  #define EADDRINUSE              WSAEADDRINUSE
  #define ECONNREFUSED            WSAECONNREFUSED
  #define ECONNRESET              WSAECONNRESET
@@ -154,7 +154,7 @@ char* tr_net_strerror (char * buf, size_t buflen, int err);
 
 const unsigned char *tr_globalIPv6 (void);
 
-#if defined (WIN32) && !defined (QT_DLL)
+#if defined (_WIN32) && !defined (QT_DLL)
 /* The QT exclusion is because something clashes whith the next include */
 #include <ws2tcpip.h>		/* socklen_t */
 

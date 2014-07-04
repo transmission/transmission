@@ -700,7 +700,7 @@ tr_sessionInitImpl (void * vdata)
   session->nowTimer = evtimer_new (session->event_base, onNowTimer, session);
   onNowTimer (0, 0, session);
 
-#ifndef WIN32
+#ifndef _WIN32
   /* Don't exit when writing on a broken socket */
   signal (SIGPIPE, SIG_IGN);
 #endif

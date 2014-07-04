@@ -26,7 +26,7 @@ static tr_log_message *  myQueue = NULL;
 static tr_log_message ** myQueueTail = &myQueue;
 static int            myQueueLength = 0;
 
-#ifndef WIN32
+#ifndef _WIN32
   /* make null versions of these win32 functions */
   static inline int IsDebuggerPresent (void) { return false; }
   static inline void OutputDebugStringA (const void * unused UNUSED) { }

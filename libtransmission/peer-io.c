@@ -30,7 +30,7 @@
 #include "utils.h"
 
 
-#ifdef WIN32
+#ifdef _WIN32
  #define EAGAIN       WSAEWOULDBLOCK
  #define EINTR        WSAEINTR
  #define EINPROGRESS  WSAEINPROGRESS

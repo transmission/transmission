@@ -189,7 +189,7 @@ gotsig (int sig)
     }
 }
 
-#if defined (WIN32)
+#if defined (_WIN32)
  #define USE_NO_DAEMON
 #elif !defined (HAVE_DAEMON) || defined (__UCLIBC__)
  #define USE_TR_DAEMON
@@ -399,7 +399,7 @@ main (int argc, char ** argv)
 
     signal (SIGINT, gotsig);
     signal (SIGTERM, gotsig);
-#ifndef WIN32
+#ifndef _WIN32
     signal (SIGHUP, gotsig);
 #endif
 

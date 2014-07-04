@@ -173,7 +173,7 @@ void tr_swarmIncrementActivePeers (struct tr_swarm * swarm, tr_direction directi
 ***/
 
 
-#ifdef WIN32
+#ifdef _WIN32
  #define EMSGSIZE WSAEMSGSIZE
 #endif
 

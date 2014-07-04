@@ -15,7 +15,7 @@
 #include <stdlib.h>
 #include <string.h> /* strcmp */
 
-#ifdef WIN32
+#ifdef _WIN32
  #include <direct.h> /* getcwd */
 #else
  #include <unistd.h> /* getcwd */
@@ -500,7 +500,7 @@ tr_getcwd (void)
   char * result;
   char buf[2048];
 
-#ifdef WIN32
+#ifdef _WIN32
   result = _getcwd (buf, sizeof (buf));
 #else
   result = getcwd (buf, sizeof (buf));

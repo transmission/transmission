@@ -87,7 +87,7 @@ const char * tr_strip_positional_args (const char * fmt);
 
 /* #define DISABLE_GETTEXT */
 #ifndef DISABLE_GETTEXT
- #if defined (WIN32) || defined (TR_LIGHTWEIGHT)
+ #if defined (_WIN32) || defined (TR_LIGHTWEIGHT)
    #define DISABLE_GETTEXT
  #endif
 #endif
@@ -451,7 +451,7 @@ static inline time_t tr_time (void) { return __tr_current_time; }
 /** @brief Private libtransmission function to update tr_time ()'s counter */
 static inline void tr_timeUpdate (time_t now) { __tr_current_time = now; }
 
-#ifdef WIN32
+#ifdef _WIN32
  #include <windef.h> /* MAX_PATH */
  #define TR_PATH_MAX (MAX_PATH + 1)
 #else

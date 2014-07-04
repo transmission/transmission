@@ -21,7 +21,7 @@
 
 #include "libtransmission-test.h"
 
-#ifndef WIN32
+#ifndef _WIN32
 #define STACK_SMASH_DEPTH (1 * 1000 * 1000)
 #else
 #define STACK_SMASH_DEPTH ( 100 * 1000)

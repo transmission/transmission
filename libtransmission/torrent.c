@@ -10,7 +10,7 @@
 #include <signal.h> /* signal () */
 #include <sys/types.h> /* stat */
 #include <sys/stat.h> /* stat */
-#ifndef WIN32
+#ifndef _WIN32
  #include <sys/wait.h> /* wait () */
 #else
  #include <process.h>
@@ -2080,7 +2080,7 @@ tr_torrentClearIdleLimitHitCallback (tr_torrent * torrent)
 static void
 onSigCHLD (int i UNUSED)
 {
-#ifdef WIN32
+#ifdef _WIN32
 
   _cwait (NULL, -1, WAIT_CHILD);
 
@@ -2118,7 +2118,7 @@ torrentCallScript (const tr_torrent * tor, const char * script)
 
       tr_logAddTorInfo (tor, "Calling script \"%s\"", script);
 
-#ifdef WIN32
+#ifdef _WIN32
       if (_spawnvpe (_P_NOWAIT, script, (const char*)cmd, env) == -1)
         tr_logAddTorErr (tor, "error executing script \"%s\": %s", cmd[0], tr_strerror (errno));
 #else

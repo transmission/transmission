@@ -16,7 +16,7 @@
 
 #include <inttypes.h> /* uint16_t */
 
-#ifdef WIN32
+#ifdef _WIN32
  #include <winsock2.h> /* struct in_addr */
 #endif
 

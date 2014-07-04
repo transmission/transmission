@@ -319,7 +319,7 @@ main (int argc, char ** argv)
     }
 
   signal (SIGINT, sigHandler);
-#ifndef WIN32
+#ifndef _WIN32
   signal (SIGHUP, sigHandler);
 #endif
   tr_torrentStart (tor);
@@ -489,7 +489,7 @@ sigHandler (int signal)
         gotsig = true;
         break;
 
-#ifndef WIN32
+#ifndef _WIN32
       case SIGHUP:
         manualUpdate = true;
         break;

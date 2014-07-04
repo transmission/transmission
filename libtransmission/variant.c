@@ -13,7 +13,7 @@
 #include <stdlib.h> /* strtod(), realloc(), qsort(), mkstemp() */
 #include <string.h>
 
-#ifdef WIN32 /* tr_mkstemp() */
+#ifdef _WIN32 /* tr_mkstemp() */
  #include <fcntl.h>
  #include <share.h>
  #include <sys/stat.h>
@@ -1129,7 +1129,7 @@ tr_variantToStr (const tr_variant * v, tr_variant_fmt fmt, int * len)
 static int
 tr_mkstemp (char * template)
 {
-#ifdef WIN32
+#ifdef _WIN32
 
   const int n = strlen (template) + 1;
   const int flags = O_RDWR | O_BINARY | O_CREAT | O_EXCL | _O_SHORT_LIVED;

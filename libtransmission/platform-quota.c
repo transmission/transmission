@@ -13,7 +13,7 @@
 #include <unistd.h> /* getuid() */
 #include <event2/util.h> /* evutil_ascii_strcasecmp () */
 
-#ifndef WIN32
+#ifndef _WIN32
  #include <sys/types.h> /* types needed by quota.h */
  #if defined(__FreeBSD__) || defined(__OpenBSD__)
   #include <ufs/ufs/quota.h> /* quotactl() */
@@ -69,7 +69,7 @@
 ****
 ***/
 
-#ifndef WIN32
+#ifndef _WIN32
 static const char *
 getdev (const char * path)
 {
@@ -337,14 +337,14 @@ getxfsquota (char * device)
   return -1;
 }
 #endif /* HAVE_XQM */
-#endif /* WIN32 */
+#endif /* _WIN32 */
 
 static int64_t
 tr_getQuotaFreeSpace (const struct tr_device_info * info)
 {
   int64_t ret = -1;
 
-#ifndef WIN32
+#ifndef _WIN32
 
   if (info->fstype && !evutil_ascii_strcasecmp(info->fstype, "xfs"))
     {
@@ -356,7 +356,7 @@ tr_getQuotaFreeSpace (const struct tr_device_info * info)
     {
       ret = getquota (info->device);
     }
-#endif /* WIN32 */
+#endif /* _WIN32 */
 
   return ret;
 }
@@ -364,7 +364,7 @@ tr_getQuotaFreeSpace (const struct tr_device_info * info)
 static int64_t
 tr_getDiskFreeSpace (const char * path)
 {
-#ifdef WIN32
+#ifdef _WIN32
 
   uint64_t freeBytesAvailable = 0;
   return GetDiskFreeSpaceEx (path, &freeBytesAvailable, NULL, NULL)
@@ -391,7 +391,7 @@ tr_device_info_create (const char * path)
 
   info = tr_new0 (struct tr_device_info, 1);
   info->path = tr_strdup (path);
-#ifndef WIN32
+#ifndef _WIN32
   info->device = tr_strdup (getblkdev (path));
   info->fstype = tr_strdup (getfstype (path));
 #endif

@@ -9,7 +9,7 @@
 
 #include <iostream>
 
-#ifdef WIN32
+#ifdef _WIN32
  #include <windows.h>
  #include <shellapi.h>
 #endif
@@ -34,7 +34,7 @@
 ****
 ***/
 
-#if defined(WIN32) && QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
+#if defined(_WIN32) && QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
 // Should be in QtWinExtras soon, but for now let's import it manually
 extern QPixmap qt_pixmapFromWinHICON(HICON icon);
 #endif
@@ -65,7 +65,7 @@ Utils :: toStderr (const QString& str)
   std::cerr << qPrintable(str) << std::endl;
 }
 
-#ifdef WIN32
+#ifdef _WIN32
 namespace
 {
   void
@@ -109,7 +109,7 @@ namespace
 QIcon
 Utils :: guessMimeIcon (const QString& filename)
 {
-#ifdef WIN32
+#ifdef _WIN32
   QIcon icon;
 
   if (!filename.isEmpty ())

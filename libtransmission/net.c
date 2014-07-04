@@ -29,7 +29,7 @@
 
 #include <sys/types.h>
 
-#ifdef WIN32
+#ifdef _WIN32
  #define _WIN32_WINNT   0x0501
  #include <ws2tcpip.h>
 #else
@@ -63,7 +63,7 @@ tr_netInit (void)
 
     if (!initialized)
     {
-#ifdef WIN32
+#ifdef _WIN32
         WSADATA wsaData;
         WSAStartup (MAKEWORD (2, 2), &wsaData);
 #endif
@@ -75,7 +75,7 @@ char *
 tr_net_strerror (char * buf, size_t buflen, int err)
 {
     *buf = '\0';
-#ifdef WIN32
+#ifdef _WIN32
     FormatMessage (FORMAT_MESSAGE_FROM_SYSTEM, NULL, err, 0, buf, buflen, NULL);
 #else
     tr_strlcpy (buf, tr_strerror (err), buflen);
@@ -274,7 +274,7 @@ tr_netOpenPeerSocket (tr_session        * session,
 
     if ((connect (s, (struct sockaddr *) &sock,
                   addrlen) < 0)
-#ifdef WIN32
+#ifdef _WIN32
       && (sockerrno != WSAEWOULDBLOCK)
 #endif
       && (sockerrno != EINPROGRESS))

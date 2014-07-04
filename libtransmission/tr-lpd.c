@@ -30,7 +30,7 @@ THE SOFTWARE.
 #include <sys/time.h>
 #include <unistd.h> /* close () */
 #include <ctype.h> /* toupper () */
-#ifdef WIN32
+#ifdef _WIN32
   #include <w32api.h>
   #define WINDOWS  WindowsXP  /* freeaddrinfo (),getaddrinfo (),getnameinfo () */
   #include <inttypes.h>

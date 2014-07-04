@@ -41,7 +41,7 @@
 #include <event2/buffer.h>
 #include <event2/event.h>
 
-#ifdef WIN32
+#ifdef _WIN32
  #include <w32api.h>
  #define WINVER WindowsXP /* freeaddrinfo (), getaddrinfo (), getnameinfo () */
  #include <direct.h> /* _getcwd () */
@@ -368,7 +368,7 @@ tr_mkdtemp (char * template)
 static int
 tr_mkdir (const char * path, int permissions UNUSED)
 {
-#ifdef WIN32
+#ifdef _WIN32
   if (path && isalpha (path[0]) && path[1] == ':' && !path[2])
     return 0;
   return mkdir (path);
@@ -730,7 +730,7 @@ tr_time_msec (void)
 void
 tr_wait_msec (long int msec)
 {
-#ifdef WIN32
+#ifdef _WIN32
   Sleep ((DWORD)msec);
 #else
   struct timespec ts;
@@ -1710,7 +1710,7 @@ tr_remove (const char * pathname)
 bool
 tr_is_same_file (const char * filename1, const char * filename2)
 {
-#ifdef WIN32
+#ifdef _WIN32
 
   bool res;
   HANDLE fh1, fh2;
@@ -1787,7 +1787,7 @@ tr_valloc (size_t bufLen)
 char *
 tr_realpath (const char * path, char * resolved_path)
 {
-#ifdef WIN32
+#ifdef _WIN32
   /* From a message to the Mingw-msys list, Jun 2, 2005 by Mark Junker. */
   if (GetFullPathNameA (path, TR_PATH_MAX, resolved_path, NULL) == 0)
     return NULL;

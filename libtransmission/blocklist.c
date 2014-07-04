@@ -15,7 +15,7 @@
 
 #include <unistd.h> /* close () */
 
-#ifdef WIN32
+#ifdef _WIN32
  #include <w32api.h>
  #define WINVER  WindowsXP
  #include <windows.h>
@@ -23,7 +23,7 @@
  #define MAP_PRIVATE    FILE_MAP_COPY
 #endif
 
-#ifndef WIN32
+#ifndef _WIN32
  #include <sys/mman.h>
 #endif
 #include <sys/types.h>

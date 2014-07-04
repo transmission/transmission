@@ -31,7 +31,7 @@
 ***/
 
 
-#ifdef WIN32
+#ifdef _WIN32
   #define PATH_DELIMITER_CHARS "/\\"
 #else
   #define PATH_DELIMITER_CHARS "/"

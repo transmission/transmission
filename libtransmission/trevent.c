@@ -21,7 +21,7 @@
 #include "net.h"
 #include "session.h"
 
-#ifdef WIN32
+#ifdef _WIN32
 
 #include "utils.h"
 #include <winsock2.h>
@@ -222,7 +222,7 @@ libeventThreadFunc (void * veh)
     struct event_base * base;
     tr_event_handle * eh = veh;
 
-#ifndef WIN32
+#ifndef _WIN32
     /* Don't exit when writing on a broken socket */
     signal (SIGPIPE, SIG_IGN);
 #endif
