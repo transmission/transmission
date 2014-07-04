@@ -3592,7 +3592,8 @@ renameFindAffectedFiles (tr_torrent * tor, const char * oldpath, size_t * setme_
     {
       const char * name = tor->info.files[i].name;
       const size_t len = strlen (name);
-      if ((len >= oldpath_len) && !memcmp (oldpath, name, oldpath_len))
+      if ((len == oldpath_len || (len > oldpath_len && name[oldpath_len] == '/')) &&
+          !memcmp (oldpath, name, oldpath_len))
         indices[n++] = i;
     }
 
@@ -3735,7 +3736,7 @@ torrentRenamePath (void * vdata)
       file_indices = renameFindAffectedFiles (tor, oldpath, &n);
       if (n == 0)
         {
-          errno = EINVAL;
+          error = EINVAL;
         }
       else
         {

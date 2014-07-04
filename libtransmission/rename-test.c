@@ -368,7 +368,7 @@ test_multifile_torrent (void)
   for (i=0; i<4; ++i)
     {
       check_streq (expected_files[i], files[i].name);
-      check (testFileExistsAndConsistsOfThisString (tor, 1, expected_contents[1]));
+      check (testFileExistsAndConsistsOfThisString (tor, i, expected_contents[i]));
     }
   check (files[0].is_renamed == false);
   check (files[1].is_renamed == true);
@@ -438,6 +438,43 @@ test_multifile_torrent (void)
       check_streq (strings[i], files[i].name);
       testFileExistsAndConsistsOfThisString (tor, i, expected_contents[i]);
     }
+
+  /**
+  ***  Test renaming prefixes (shouldn't work)
+  **/
+
+  tr_torrentRemove (tor, false, NULL);
+  do {
+    tr_wait_msec (10);
+  } while (0);
+  ctor = tr_ctorNew (session);
+  tor = create_torrent_from_base64_metainfo (ctor,
+    "ZDEwOmNyZWF0ZWQgYnkyNTpUcmFuc21pc3Npb24vMi42MSAoMTM0MDcpMTM6Y3JlYXRpb24gZGF0"
+    "ZWkxMzU4NTU1NDIwZTg6ZW5jb2Rpbmc1OlVURi04NDppbmZvZDU6ZmlsZXNsZDY6bGVuZ3RoaTI4"
+    "ZTQ6cGF0aGw3OkZlbGluYWU4OkFjaW5vbnl4NzpDaGVldGFoNzpDaGVzdGVyZWVkNjpsZW5ndGhp"
+    "MTJlNDpwYXRobDc6RmVsaW5hZTU6RmVsaXM1OmNhdHVzNTpLeXBoaWVlZDY6bGVuZ3RoaTZlNDpw"
+    "YXRobDc6RmVsaW5hZTU6RmVsaXM1OmNhdHVzNzpTYWZmcm9uZWVkNjpsZW5ndGhpMjFlNDpwYXRo"
+    "bDExOlBhbnRoZXJpbmFlODpQYW50aGVyYTU6VGlnZXI0OlRvbnllZWU0Om5hbWU3OkZlbGlkYWUx"
+    "MjpwaWVjZSBsZW5ndGhpMzI3NjhlNjpwaWVjZXMyMDp27buFkmy8ICfNX4nsJmt0Ckm2Ljc6cHJp"
+    "dmF0ZWkwZWVl");
+  check (tr_isTorrent (tor));
+  files = tor->info.files;
+
+  /* rename prefix of top */
+  check_int_eq (EINVAL, torrentRenameAndWait (tor, "Feli", "FelidaeX"));
+  check_streq (tor->info.name, "Felidae");
+  check (files[0].is_renamed == false);
+  check (files[1].is_renamed == false);
+  check (files[2].is_renamed == false);
+  check (files[3].is_renamed == false);
+
+  /* rename false path */
+  check_int_eq (EINVAL, torrentRenameAndWait (tor, "Felidae/FelinaeX", "Genus Felinae"));
+  check_streq (tor->info.name, "Felidae");
+  check (files[0].is_renamed == false);
+  check (files[1].is_renamed == false);
+  check (files[2].is_renamed == false);
+  check (files[3].is_renamed == false);
 
   /***
   ****
