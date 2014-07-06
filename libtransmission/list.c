@@ -30,18 +30,22 @@ getRecycledNodesLock (void)
 static tr_list*
 node_alloc (void)
 {
-  tr_list * ret;
+  tr_list * ret = NULL;
+  tr_lock * lock = getRecycledNodesLock ();
 
-  if (recycled_nodes == NULL)
+  tr_lockLock (lock);
+
+  if (recycled_nodes != NULL)
     {
-      ret = tr_new (tr_list, 1);
-    }
-  else
-    {
-      tr_lockLock (getRecycledNodesLock ());
       ret = recycled_nodes;
       recycled_nodes = recycled_nodes->next;
-      tr_lockUnlock (getRecycledNodesLock ());
+    }
+
+  tr_lockUnlock (lock);
+
+  if (ret == NULL)
+    {
+      ret = tr_new (tr_list, 1);
     }
 
   *ret = TR_LIST_CLEAR;
@@ -51,13 +55,15 @@ node_alloc (void)
 static void
 node_free (tr_list* node)
 {
+  tr_lock * lock = getRecycledNodesLock ();
+
   if (node != NULL)
     {
       *node = TR_LIST_CLEAR;
-      tr_lockLock (getRecycledNodesLock ());
+      tr_lockLock (lock);
       node->next = recycled_nodes;
       recycled_nodes = node;
-      tr_lockUnlock (getRecycledNodesLock ());
+      tr_lockUnlock (lock);
     }
 }
 
