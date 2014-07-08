@@ -28,11 +28,55 @@ extern "C" {
  * @{
  */
 
+#ifndef _WIN32
+ /** @brief Platform-specific file descriptor type. */
+ typedef int tr_sys_file_t;
+ /** @brief Platform-specific invalid file descriptor constant. */
+ #define TR_BAD_SYS_FILE (-1)
+#else
+ typedef HANDLE tr_sys_file_t;
+ #define TR_BAD_SYS_FILE INVALID_HANDLE_VALUE
+#endif
+
+typedef enum
+{
+  TR_STD_SYS_FILE_IN,
+  TR_STD_SYS_FILE_OUT,
+  TR_STD_SYS_FILE_ERR
+}
+tr_std_sys_file_t;
+
+typedef enum
+{
+  TR_SYS_FILE_READ       = 1 << 0,
+  TR_SYS_FILE_WRITE      = 1 << 1,
+  TR_SYS_FILE_CREATE     = 1 << 2,
+  TR_SYS_FILE_CREATE_NEW = 1 << 3,
+  TR_SYS_FILE_APPEND     = 1 << 4,
+  TR_SYS_FILE_TRUNCATE   = 1 << 5,
+  TR_SYS_FILE_SEQUENTIAL = 1 << 6
+}
+tr_sys_file_open_flags_t;
+
+typedef enum
+{
+  TR_SEEK_SET,
+  TR_SEEK_CUR,
+  TR_SEEK_END
+}
+tr_seek_origin_t;
+
 typedef enum
 {
     TR_SYS_PATH_NO_FOLLOW = 1 << 0
 }
 tr_sys_path_get_info_flags_t;
+
+typedef enum
+{
+    TR_SYS_FILE_PREALLOC_SPARSE = 1 << 0
+}
+tr_sys_file_preallocate_flags_t;
 
 typedef enum
 {
@@ -55,6 +99,9 @@ tr_sys_path_info;
  *
  * Following functions accept paths in UTF-8 encoding and convert them to native
  * encoding internally if needed.
+ * Descriptors returned (@ref tr_sys_file_t) may have different type depending
+ * on platform and should generally not be passed to native functions, but to
+ * wrapper functions instead.
  *
  * @{
  */
@@ -181,6 +228,273 @@ bool            tr_sys_path_rename          (const char         * src_path,
  *         files and directories).
  */
 bool            tr_sys_path_remove          (const char         * path,
+                                             tr_error          ** error);
+
+/* File-related wrappers */
+
+/**
+ * @brief Get handle to one of standard I/O files.
+ *
+ * @param[in]  std_file Standard file identifier.
+ * @param[out] error    Pointer to error object. Optional, pass `NULL` if you
+ *                      are not interested in error details.
+ *
+ * @return Opened file descriptor on success, `TR_BAD_SYS_FILE` otherwise (with
+ *         `error` set accordingly). DO NOT pass this descriptor to
+ *         @ref tr_sys_file_close (unless you know what you are doing).
+ */
+tr_sys_file_t   tr_sys_file_get_std         (tr_std_sys_file_t    std_file,
+                                             tr_error          ** error);
+
+/**
+ * @brief Portability wrapper for `open ()`.
+ *
+ * @param[in]  path        Path to file.
+ * @param[in]  flags       Combination of @ref tr_sys_file_open_flags_t values.
+ * @param[in]  permissions Permissions to create file with (in case
+                           @ref TR_SYS_FILE_CREATE is used). Not used on Windows.
+ * @param[out] error       Pointer to error object. Optional, pass `NULL` if you
+ *                         are not interested in error details.
+ *
+ * @return Opened file descriptor on success, `TR_BAD_SYS_FILE` otherwise (with
+ *         `error` set accordingly).
+ */
+tr_sys_file_t   tr_sys_file_open            (const char         * path,
+                                             int                  flags,
+                                             int                  permissions,
+                                             tr_error          ** error);
+
+/**
+ * @brief Portability wrapper for `mkstemp ()`.
+ *
+ * @param[in,out] path_template Template path to file. Should end with at least
+ *                              six 'X' characters. Upon success, trailing 'X'
+ *                              characters are replaced with actual random
+ *                              characters used to form a unique path to
+ *                              temporary file.
+ * @param[out]    error         Pointer to error object. Optional, pass `NULL`
+ *                              if you are not interested in error details.
+ *
+ * @return Opened file descriptor on success, `TR_BAD_SYS_FILE` otherwise (with
+ *         `error` set accordingly).
+ */
+tr_sys_file_t   tr_sys_file_open_temp       (char               * path_template,
+                                             tr_error          ** error);
+
+/**
+ * @brief Portability wrapper for `close ()`.
+ *
+ * @param[in]  handle Valid file descriptor.
+ * @param[out] error  Pointer to error object. Optional, pass `NULL` if you are
+ *                    not interested in error details.
+ *
+ * @return `True` on success, `false` otherwise (with `error` set accordingly).
+ */
+bool            tr_sys_file_close           (tr_sys_file_t        handle,
+                                             tr_error          ** error);
+
+/**
+ * @brief Portability wrapper for `fstat ()`.
+ *
+ * @param[in]  handle Valid file descriptor.
+ * @param[out] info   Result buffer.
+ * @param[out] error  Pointer to error object. Optional, pass `NULL` if you are
+ *                    not interested in error details.
+ *
+ * @return `True` on success, `false` otherwise (with `error` set accordingly).
+ */
+bool            tr_sys_file_get_info        (tr_sys_file_t        handle,
+                                             tr_sys_path_info   * info,
+                                             tr_error          ** error);
+
+/**
+ * @brief Portability wrapper for `lseek ()`.
+ *
+ * @param[in]  handle     Valid file descriptor.
+ * @param[in]  offset     Relative file offset in bytes to seek to.
+ * @param[in]  origin     Offset origin.
+ * @param[out] new_offset New offset in bytes from beginning of file. Optional,
+ *                        pass `NULL` if you are not interested.
+ * @param[out] error      Pointer to error object. Optional, pass `NULL` if you
+ *                        are not interested in error details.
+ *
+ * @return `True` on success, `false` otherwise (with `error` set accordingly).
+ */
+bool            tr_sys_file_seek            (tr_sys_file_t        handle,
+                                             int64_t              offset,
+                                             tr_seek_origin_t     origin,
+                                             uint64_t           * new_offset,
+                                             tr_error          ** error);
+
+/**
+ * @brief Portability wrapper for `read ()`.
+ *
+ * @param[in]  handle     Valid file descriptor.
+ * @param[out] buffer     Buffer to store read data to.
+ * @param[in]  size       Number of bytes to read.
+ * @param[out] bytes_read Number of bytes actually read. Optional, pass `NULL`
+ *                        if you are not interested.
+ * @param[out] error      Pointer to error object. Optional, pass `NULL` if you
+ *                        are not interested in error details.
+ *
+ * @return `True` on success, `false` otherwise (with `error` set accordingly).
+ */
+bool            tr_sys_file_read            (tr_sys_file_t        handle,
+                                             void               * buffer,
+                                             uint64_t             size,
+                                             uint64_t           * bytes_read,
+                                             tr_error          ** error);
+
+/**
+ * @brief Like `pread ()`, except that the position is undefined afterwards.
+ *        Not thread-safe.
+ *
+ * @param[in]  handle     Valid file descriptor.
+ * @param[out] buffer     Buffer to store read data to.
+ * @param[in]  size       Number of bytes to read.
+ * @param[in]  offset     File offset in bytes to start reading from.
+ * @param[out] bytes_read Number of bytes actually read. Optional, pass `NULL`
+ *                        if you are not interested.
+ * @param[out] error      Pointer to error object. Optional, pass `NULL` if you
+ *                        are not interested in error details.
+ *
+ * @return `True` on success, `false` otherwise (with `error` set accordingly).
+ */
+bool            tr_sys_file_read_at         (tr_sys_file_t        handle,
+                                             void               * buffer,
+                                             uint64_t             size,
+                                             uint64_t             offset,
+                                             uint64_t           * bytes_read,
+                                             tr_error          ** error);
+
+/**
+ * @brief Portability wrapper for `write ()`.
+ *
+ * @param[in]  handle        Valid file descriptor.
+ * @param[in]  buffer        Buffer to get data being written from.
+ * @param[in]  size          Number of bytes to write.
+ * @param[out] bytes_written Number of bytes actually written. Optional, pass
+ *                           `NULL` if you are not interested.
+ * @param[out] error         Pointer to error object. Optional, pass `NULL` if
+ *                           you are not interested in error details.
+ *
+ * @return `True` on success, `false` otherwise (with `error` set accordingly).
+ */
+bool            tr_sys_file_write           (tr_sys_file_t        handle,
+                                             const void         * buffer,
+                                             uint64_t             size,
+                                             uint64_t           * bytes_written,
+                                             tr_error          ** error);
+
+/**
+ * @brief Like `pwrite ()`, except that the position is undefined afterwards.
+ *        Not thread-safe.
+ *
+ * @param[in]  handle        Valid file descriptor.
+ * @param[in]  buffer        Buffer to get data being written from.
+ * @param[in]  size          Number of bytes to write.
+ * @param[in]  offset        File offset in bytes to start writing from.
+ * @param[out] bytes_written Number of bytes actually written. Optional, pass
+ *                           `NULL` if you are not interested.
+ * @param[out] error         Pointer to error object. Optional, pass `NULL` if you
+ *                           are not interested in error details.
+ *
+ * @return `True` on success, `false` otherwise (with `error` set accordingly).
+ */
+bool            tr_sys_file_write_at        (tr_sys_file_t        handle,
+                                             const void         * buffer,
+                                             uint64_t             size,
+                                             uint64_t             offset,
+                                             uint64_t           * bytes_written,
+                                             tr_error          ** error);
+
+/**
+ * @brief Portability wrapper for `fsync ()`.
+ *
+ * @param[in]  handle Valid file descriptor.
+ * @param[out] error  Pointer to error object. Optional, pass `NULL` if you are
+ *                    not interested in error details.
+ *
+ * @return `True` on success, `false` otherwise (with `error` set accordingly).
+ */
+bool            tr_sys_file_flush           (tr_sys_file_t        handle,
+                                             tr_error          ** error);
+
+/**
+ * @brief Portability wrapper for `ftruncate ()`.
+ *
+ * @param[in]  handle Valid file descriptor.
+ * @param[in]  size   Number of bytes to truncate (or extend) file to.
+ * @param[out] error  Pointer to error object. Optional, pass `NULL` if you are
+ *                    not interested in error details.
+ *
+ * @return `True` on success, `false` otherwise (with `error` set accordingly).
+ */
+bool            tr_sys_file_truncate        (tr_sys_file_t        handle,
+                                             uint64_t             size,
+                                             tr_error          ** error);
+
+/**
+ * @brief Tell system to prefetch some part of file which is to be read soon.
+ *
+ * @param[in]  handle Valid file descriptor.
+ * @param[in]  offset Offset in file to prefetch from.
+ * @param[in]  size   Number of bytes to prefetch.
+ * @param[out] error  Pointer to error object. Optional, pass `NULL` if you are
+ *                    not interested in error details.
+ *
+ * @return `True` on success, `false` otherwise (with `error` set accordingly).
+ */
+bool            tr_sys_file_prefetch        (tr_sys_file_t        handle,
+                                             uint64_t             offset,
+                                             uint64_t             size,
+                                             tr_error          ** error);
+
+/**
+ * @brief Preallocate file to specified size in full or sparse mode.
+ *
+ * @param[in]  handle Valid file descriptor.
+ * @param[in]  size   Number of bytes to preallocate file to.
+ * @param[in]  flags  Combination of @ref tr_sys_file_preallocate_flags_t values.
+ * @param[out] error  Pointer to error object. Optional, pass `NULL` if you are
+ *                    not interested in error details.
+ *
+ * @return `True` on success, `false` otherwise (with `error` set accordingly).
+ */
+bool            tr_sys_file_preallocate     (tr_sys_file_t        handle,
+                                             uint64_t             size,
+                                             int                  flags,
+                                             tr_error          ** error);
+
+/**
+ * @brief Portability wrapper for `mmap ()` for files.
+ *
+ * @param[in]  handle Valid file descriptor.
+ * @param[in]  offset Offset in file to map from.
+ * @param[in]  size   Number of bytes to map.
+ * @param[out] error  Pointer to error object. Optional, pass `NULL` if you are
+ *                    not interested in error details.
+ *
+ * @return Pointer to mapped file data on success, `NULL` otherwise (with
+ *         `error` set accordingly).
+ */
+void          * tr_sys_file_map_for_reading (tr_sys_file_t        handle,
+                                             uint64_t             offset,
+                                             uint64_t             size,
+                                             tr_error          ** error);
+
+/**
+ * @brief Portability wrapper for `munmap ()` for files.
+ *
+ * @param[in]  address Pointer to mapped file data.
+ * @param[in]  size    Size of mapped data in bytes.
+ * @param[out] error   Pointer to error object. Optional, pass `NULL` if you are
+ *                     not interested in error details.
+ *
+ * @return `True` on success, `false` otherwise (with `error` set accordingly).
+ */
+bool            tr_sys_file_unmap           (const void         * address,
+                                             uint64_t             size,
                                              tr_error          ** error);
 
 /** @} */

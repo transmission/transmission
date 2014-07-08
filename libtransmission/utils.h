@@ -70,6 +70,26 @@ extern "C" {
 #endif
 
 
+#ifndef __has_feature
+ #define __has_feature(x) 0
+#endif
+#ifndef __has_extension
+ #define __has_extension __has_feature
+#endif
+
+/**
+ * @def TR_STATIC_ASSERT
+ * @brief This helper allows to perform static checks at compile time
+ */
+#if defined (static_assert)
+ #define TR_STATIC_ASSERT static_assert
+#elif __has_feature (c_static_assert) || __has_extension (c_static_assert)
+ #define TR_STATIC_ASSERT _Static_assert
+#else
+ #define TR_STATIC_ASSERT(x, msg) { const char static_check[((x) ? 1 : -1)] UNUSED; }
+#endif
+
+
 /***
 ****
 ***/

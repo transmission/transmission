@@ -46,11 +46,6 @@ bool tr_lpdSendAnnounce (const tr_torrent*);
 #define lengthof(arr)(sizeof (* (arr)) > 0 ? sizeof (arr) / sizeof (* (arr)) : 0)
 
 /**
-* @def STATIC_ASSERT
-* @brief This helper allows to perform static checks at compile time */
-#define STATIC_ASSERT(x) { const char static_check[ ((x) ? 1 : -1)] UNUSED; }
-
-/**
 * @} */
 
 #endif /* _TR_LPD_H */

@@ -411,7 +411,7 @@ static inline void lpd_consistencyCheck (void)
      * without our knowledge; revise string handling in functions tr_lpdSendAnnounce
      * and tr_lpdConsiderAnnounce. However, the code is designed to function as long
      * as interfaces to the rest of the lib remain compatible with char* strings. */
-    STATIC_ASSERT (sizeof (lpd_torStaticType->info.hashString[0]) == sizeof (char));
+    TR_STATIC_ASSERT (sizeof (lpd_torStaticType->info.hashString[0]) == sizeof (char), "");
 }
 /**
 * @endcond */

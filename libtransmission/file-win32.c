@@ -10,9 +10,16 @@
 #include <assert.h>
 #include <stdlib.h> /* _splitpath_s (), _makepath_s () */
 
+#include <winioctl.h> /* FSCTL_SET_SPARSE */
+
 #include "transmission.h"
+#include "crypto.h" /* tr_cryptoRandInt () */
 #include "file.h"
 #include "utils.h"
+
+#ifndef MAXSIZE_T
+ #define MAXSIZE_T ((SIZE_T)~((SIZE_T)0))
+#endif
 
 /* MSDN (http://msdn.microsoft.com/en-us/library/2k2xf226.aspx) only mentions
    "i64" suffix for C code, but no warning is issued */
@@ -90,10 +97,85 @@ stat_to_sys_path_info (DWORD              attributes,
   info->last_modified_at = filetime_to_unix_time (mtime);
 }
 
-static bool
-get_file_info (HANDLE              handle,
-               tr_sys_path_info  * info,
-               tr_error         ** error);
+static tr_sys_file_t
+open_file (const char  * path,
+           DWORD         access,
+           DWORD         disposition,
+           DWORD         flags,
+           tr_error   ** error)
+{
+  tr_sys_file_t ret = TR_BAD_SYS_FILE;
+  wchar_t * wide_path;
+
+  assert (path != NULL);
+
+  wide_path = tr_win32_utf8_to_native (path, -1);
+
+  if (wide_path != NULL)
+    ret = CreateFileW (wide_path, access, FILE_SHARE_READ | FILE_SHARE_WRITE,
+                       NULL, disposition, flags, NULL);
+
+  if (ret == TR_BAD_SYS_FILE)
+    set_system_error (error, GetLastError ());
+
+  tr_free (wide_path);
+
+  return ret;
+}
+
+static void
+create_temp_path (char      * path_template,
+                  void     (* callback) (const char * path, void * param, tr_error ** error),
+                  void      * callback_param,
+                  tr_error ** error)
+{
+  char * path;
+  size_t path_size;
+  int attempt;
+  tr_error * my_error = NULL;
+
+  assert (path_template != NULL);
+  assert (callback != NULL);
+
+  path = tr_strdup (path_template);
+  path_size = strlen (path);
+
+  assert (path_size > 0);
+
+  for (attempt = 0; attempt < 100; ++attempt)
+    {
+      size_t i = path_size;
+
+      while (i > 0 && path_template[i - 1] == 'X')
+        {
+          const int c = tr_cryptoRandInt (26 + 26 + 10);
+          path[i - 1] = c < 26 ? c + 'A' : (c < 26 + 26 ? (c - 26) + 'a' : (c - 26 - 26) + '0');
+          --i;
+        }
+
+      assert (path_size >= i + 6);
+
+      tr_error_clear (&my_error);
+
+      (*callback) (path, callback_param, &my_error);
+
+      if (my_error == NULL)
+        break;
+    }
+
+  if (my_error != NULL)
+    tr_error_propagate(error, &my_error);
+  else
+    memcpy (path_template, path, path_size);
+
+  goto cleanup;
+
+fail:
+  set_system_error (error, GetLastError ());
+
+cleanup:
+  tr_free (path);
+}
 
 bool
 tr_sys_path_exists (const char  * path,
@@ -161,7 +243,7 @@ tr_sys_path_get_info (const char        * path,
       if (handle != INVALID_HANDLE_VALUE)
         {
           tr_error * my_error = NULL;
-          ret = get_file_info (handle, info, &my_error);
+          ret = tr_sys_file_get_info (handle, info, &my_error);
           if (!ret)
             tr_error_propagate (error, &my_error);
           CloseHandle (handle);
@@ -428,15 +510,140 @@ tr_sys_path_remove (const char  * path,
   return ret;
 }
 
-static bool
-get_file_info (HANDLE              handle,
-               tr_sys_path_info  * info,
-               tr_error         ** error)
+tr_sys_file_t
+tr_sys_file_get_std (tr_std_sys_file_t    std_file,
+                     tr_error          ** error)
+{
+  tr_sys_file_t ret = TR_BAD_SYS_FILE;
+
+  switch (std_file)
+    {
+    case TR_STD_SYS_FILE_IN:
+      ret = GetStdHandle (STD_INPUT_HANDLE);
+      break;
+    case TR_STD_SYS_FILE_OUT:
+      ret = GetStdHandle (STD_OUTPUT_HANDLE);
+      break;
+    case TR_STD_SYS_FILE_ERR:
+      ret = GetStdHandle (STD_ERROR_HANDLE);
+      break;
+    default:
+      assert (0 && "Unknown standard file");
+      set_system_error (error, ERROR_INVALID_PARAMETER);
+      return TR_BAD_SYS_FILE;
+    }
+
+  if (ret == TR_BAD_SYS_FILE)
+    set_system_error (error, GetLastError ());
+  else if (ret == NULL)
+    ret = TR_BAD_SYS_FILE;
+
+  return ret;
+}
+
+tr_sys_file_t
+tr_sys_file_open (const char  * path,
+                  int           flags,
+                  int           permissions,
+                  tr_error   ** error)
+{
+  tr_sys_file_t ret;
+  DWORD native_access = 0;
+  DWORD native_disposition = OPEN_EXISTING;
+  DWORD native_flags = FILE_ATTRIBUTE_NORMAL;
+  bool success;
+
+  assert (path != NULL);
+  assert ((flags & (TR_SYS_FILE_READ | TR_SYS_FILE_WRITE)) != 0);
+
+  if (flags & TR_SYS_FILE_READ)
+    native_access |= GENERIC_READ;
+  if (flags & TR_SYS_FILE_WRITE)
+    native_access |= GENERIC_WRITE;
+
+  if (flags & TR_SYS_FILE_CREATE_NEW)
+    native_disposition = CREATE_NEW;
+  else if (flags & TR_SYS_FILE_CREATE)
+    native_disposition = flags & TR_SYS_FILE_TRUNCATE ? CREATE_ALWAYS : OPEN_ALWAYS;
+  else if (flags & TR_SYS_FILE_TRUNCATE)
+    native_disposition = TRUNCATE_EXISTING;
+
+  if (flags & TR_SYS_FILE_SEQUENTIAL)
+    native_flags |= FILE_FLAG_SEQUENTIAL_SCAN;
+
+  ret = open_file (path, native_access, native_disposition, native_flags, error);
+
+  success = ret != TR_BAD_SYS_FILE;
+
+  if (success && (flags & TR_SYS_FILE_APPEND))
+    success = SetFilePointer (ret, 0, NULL, FILE_END) != INVALID_SET_FILE_POINTER;
+
+  if (!success)
+    {
+      if (error == NULL)
+        set_system_error (error, GetLastError ());
+
+      CloseHandle (ret);
+      ret = TR_BAD_SYS_FILE;
+    }
+
+  return ret;
+}
+
+static void
+file_open_temp_callback (const char  * path,
+                         void        * param,
+                         tr_error   ** error)
+{
+  tr_sys_file_t * result = (tr_sys_file_t *) param;
+
+  assert (result != NULL);
+
+  *result = open_file (path,
+                       GENERIC_READ | GENERIC_WRITE,
+                       CREATE_NEW,
+                       FILE_ATTRIBUTE_TEMPORARY,
+                       error);
+}
+
+tr_sys_file_t
+tr_sys_file_open_temp (char      * path_template,
+                       tr_error ** error)
+{
+  tr_sys_file_t ret = TR_BAD_SYS_FILE;
+
+  assert (path_template != NULL);
+
+  create_temp_path (path_template, file_open_temp_callback, &ret, error);
+
+  return ret;
+}
+
+bool
+tr_sys_file_close (tr_sys_file_t    handle,
+                   tr_error      ** error)
+{
+  bool ret;
+
+  assert (handle != TR_BAD_SYS_FILE);
+
+  ret = CloseHandle (handle);
+
+  if (!ret)
+    set_system_error (error, GetLastError ());
+
+  return ret;
+}
+
+bool
+tr_sys_file_get_info (tr_sys_file_t       handle,
+                      tr_sys_path_info  * info,
+                      tr_error         ** error)
 {
   bool ret;
   BY_HANDLE_FILE_INFORMATION attributes;
 
-  assert (handle != INVALID_HANDLE_VALUE);
+  assert (handle != TR_BAD_SYS_FILE);
   assert (info != NULL);
 
   ret = GetFileInformationByHandle (handle, &attributes);
@@ -446,6 +653,314 @@ get_file_info (HANDLE              handle,
                            attributes.nFileSizeHigh, &attributes.ftLastWriteTime,
                            info);
   else
+    set_system_error (error, GetLastError ());
+
+  return ret;
+}
+
+bool
+tr_sys_file_seek (tr_sys_file_t       handle,
+                  int64_t             offset,
+                  tr_seek_origin_t    origin,
+                  uint64_t          * new_offset,
+                  tr_error         ** error)
+{
+  bool ret = false;
+  LARGE_INTEGER native_offset, new_native_pointer;
+
+  TR_STATIC_ASSERT (TR_SEEK_SET == FILE_BEGIN,   "values should match");
+  TR_STATIC_ASSERT (TR_SEEK_CUR == FILE_CURRENT, "values should match");
+  TR_STATIC_ASSERT (TR_SEEK_END == FILE_END,     "values should match");
+
+  assert (handle != TR_BAD_SYS_FILE);
+  assert (origin == TR_SEEK_SET || origin == TR_SEEK_CUR || origin == TR_SEEK_END);
+
+  native_offset.QuadPart = offset;
+
+  if (SetFilePointerEx (handle, native_offset, &new_native_pointer, origin))
+    {
+      if (new_offset != NULL)
+        *new_offset = new_native_pointer.QuadPart;
+      ret = true;
+    }
+  else
+    {
+      set_system_error (error, GetLastError ());
+    }
+
+  return ret;
+}
+
+bool
+tr_sys_file_read (tr_sys_file_t    handle,
+                  void           * buffer,
+                  uint64_t         size,
+                  uint64_t       * bytes_read,
+                  tr_error      ** error)
+{
+  bool ret = false;
+  DWORD my_bytes_read;
+
+  assert (handle != TR_BAD_SYS_FILE);
+  assert (buffer != NULL || size == 0);
+
+  if (size > MAXDWORD)
+    {
+      set_system_error (error, ERROR_INVALID_PARAMETER);
+      return false;
+    }
+
+  if (ReadFile (handle, buffer, (DWORD)size, &my_bytes_read, NULL))
+    {
+      if (bytes_read != NULL)
+        *bytes_read = my_bytes_read;
+      ret = true;
+    }
+  else
+    {
+      set_system_error (error, GetLastError ());
+    }
+
+  return ret;
+}
+
+bool
+tr_sys_file_read_at (tr_sys_file_t    handle,
+                     void           * buffer,
+                     uint64_t         size,
+                     uint64_t         offset,
+                     uint64_t       * bytes_read,
+                     tr_error      ** error)
+{
+  bool ret = false;
+  OVERLAPPED overlapped;
+  DWORD my_bytes_read;
+
+  assert (handle != TR_BAD_SYS_FILE);
+  assert (buffer != NULL || size == 0);
+
+  if (size > MAXDWORD)
+    {
+      set_system_error (error, ERROR_INVALID_PARAMETER);
+      return false;
+    }
+
+  overlapped.Offset = (DWORD)offset;
+  offset >>= 32;
+  overlapped.OffsetHigh = (DWORD)offset;
+  overlapped.hEvent = NULL;
+
+  if (ReadFile (handle, buffer, (DWORD)size, &my_bytes_read, &overlapped))
+    {
+      if (bytes_read != NULL)
+        *bytes_read = my_bytes_read;
+      ret = true;
+    }
+  else
+    {
+      set_system_error (error, GetLastError ());
+    }
+
+  return ret;
+}
+
+bool
+tr_sys_file_write (tr_sys_file_t    handle,
+                   const void     * buffer,
+                   uint64_t         size,
+                   uint64_t       * bytes_written,
+                   tr_error      ** error)
+{
+  bool ret = false;
+  DWORD my_bytes_written;
+
+  assert (handle != TR_BAD_SYS_FILE);
+  assert (buffer != NULL || size == 0);
+
+  if (size > MAXDWORD)
+    {
+      set_system_error (error, ERROR_INVALID_PARAMETER);
+      return false;
+    }
+
+  if (WriteFile (handle, buffer, (DWORD)size, &my_bytes_written, NULL))
+    {
+      if (bytes_written != NULL)
+        *bytes_written = my_bytes_written;
+      ret = true;
+    }
+  else
+    {
+      set_system_error (error, GetLastError ());
+    }
+
+  return ret;
+}
+
+bool
+tr_sys_file_write_at (tr_sys_file_t    handle,
+                      const void     * buffer,
+                      uint64_t         size,
+                      uint64_t         offset,
+                      uint64_t       * bytes_written,
+                      tr_error      ** error)
+{
+  bool ret = false;
+  OVERLAPPED overlapped;
+  DWORD my_bytes_written;
+
+  assert (handle != TR_BAD_SYS_FILE);
+  assert (buffer != NULL || size == 0);
+
+  if (size > MAXDWORD)
+    {
+      set_system_error (error, ERROR_INVALID_PARAMETER);
+      return false;
+    }
+
+  overlapped.Offset = (DWORD)offset;
+  offset >>= 32;
+  overlapped.OffsetHigh = (DWORD)offset;
+  overlapped.hEvent = NULL;
+
+  if (WriteFile (handle, buffer, (DWORD)size, &my_bytes_written, &overlapped))
+    {
+      if (bytes_written != NULL)
+        *bytes_written = my_bytes_written;
+      ret = true;
+    }
+  else
+    {
+      set_system_error (error, GetLastError ());
+    }
+
+  return ret;
+}
+
+bool
+tr_sys_file_flush (tr_sys_file_t    handle,
+                   tr_error      ** error)
+{
+  bool ret;
+
+  assert (handle != TR_BAD_SYS_FILE);
+
+  ret = FlushFileBuffers (handle);
+
+  if (!ret)
+    set_system_error (error, GetLastError ());
+
+  return ret;
+}
+
+bool
+tr_sys_file_truncate (tr_sys_file_t    handle,
+                      uint64_t         size,
+                      tr_error      ** error)
+{
+  bool ret = false;
+  FILE_END_OF_FILE_INFO info;
+
+  assert (handle != TR_BAD_SYS_FILE);
+
+  info.EndOfFile.QuadPart = size;
+
+  ret = SetFileInformationByHandle (handle, FileEndOfFileInfo, &info, sizeof (info));
+
+  if (!ret)
+    set_system_error (error, GetLastError ());
+
+  return ret;
+}
+
+bool
+tr_sys_file_prefetch (tr_sys_file_t    handle,
+                      uint64_t         offset,
+                      uint64_t         size,
+                      tr_error      ** error)
+{
+  bool ret = false;
+
+  assert (handle != TR_BAD_SYS_FILE);
+  assert (size > 0);
+
+  /* ??? */
+
+  return ret;
+}
+
+bool
+tr_sys_file_preallocate (tr_sys_file_t    handle,
+                         uint64_t         size,
+                         int              flags,
+                         tr_error      ** error)
+{
+  assert (handle != TR_BAD_SYS_FILE);
+
+  if ((flags & TR_SYS_FILE_PREALLOC_SPARSE) != 0)
+    {
+      DWORD tmp;
+      if (!DeviceIoControl (handle, FSCTL_SET_SPARSE, NULL, 0, NULL, 0, &tmp, NULL))
+        {
+          set_system_error (error, GetLastError ());
+          return false;
+        }
+    }
+
+  return tr_sys_file_truncate (handle, size, error);
+}
+
+void *
+tr_sys_file_map_for_reading (tr_sys_file_t    handle,
+                             uint64_t         offset,
+                             uint64_t         size,
+                             tr_error      ** error)
+{
+  void * ret = NULL;
+  HANDLE mappingHandle;
+
+  assert (handle != TR_BAD_SYS_FILE);
+  assert (size > 0);
+
+  if (size > MAXSIZE_T)
+    {
+      set_system_error (error, ERROR_INVALID_PARAMETER);
+      return false;
+    }
+
+  mappingHandle = CreateFileMappingW (handle, NULL, PAGE_READONLY, 0, 0, NULL);
+
+  if (mappingHandle != NULL)
+    {
+      ULARGE_INTEGER native_offset;
+
+      native_offset.QuadPart = offset;
+
+      ret = MapViewOfFile (mappingHandle, FILE_MAP_READ, native_offset.u.HighPart,
+                           native_offset.u.LowPart, (SIZE_T)size);
+    }
+
+  if (ret == NULL)
+    set_system_error (error, GetLastError ());
+
+  CloseHandle (mappingHandle);
+
+  return ret;
+}
+
+bool
+tr_sys_file_unmap (const void  * address,
+                   uint64_t      size,
+                   tr_error   ** error)
+{
+  bool ret;
+
+  assert (address != NULL);
+  assert (size > 0);
+
+  ret = UnmapViewOfFile (address);
+
+  if (!ret)
     set_system_error (error, GetLastError ());
 
   return ret;

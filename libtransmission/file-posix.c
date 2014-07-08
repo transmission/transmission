@@ -7,26 +7,84 @@
  * $Id$
  */
 
-#if defined (HAVE_CANONICALIZE_FILE_NAME) && !defined (_GNU_SOURCE)
+#if (defined (HAVE_POSIX_FADVISE) || defined (HAVE_POSIX_FALLOCATE)) && (!defined (_XOPEN_SOURCE) || _XOPEN_SOURCE < 600)
+ #ifdef _XOPEN_SOURCE
+  #undef _XOPEN_SOURCE
+ #endif
+ #define _XOPEN_SOURCE 600
+#endif
+
+#if (defined (HAVE_FALLOCATE64) || defined (HAVE_CANONICALIZE_FILE_NAME)) && !defined (_GNU_SOURCE)
  #define _GNU_SOURCE
+#endif
+
+#if defined (__APPLE__) && !defined (_DARWIN_C_SOURCE)
+ #define _DARWIN_C_SOURCE
 #endif
 
 #include <assert.h>
 #include <errno.h>
+#include <fcntl.h> /* O_LARGEFILE, posix_fadvise (), [posix_]fallocate () */
 #include <libgen.h> /* basename (), dirname () */
 #include <limits.h> /* PATH_MAX */
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include <sys/mman.h> /* mmap (), munmap () */
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <unistd.h>
+#include <unistd.h> /* lseek (), write (), ftruncate (), pread (), pwrite (), pathconf (), etc */
+
+#ifdef HAVE_XFS_XFS_H
+ #include <xfs/xfs.h>
+#endif
 
 #include "transmission.h"
 #include "file.h"
+#include "platform.h"
 #include "utils.h"
+
+#ifndef O_LARGEFILE
+ #define O_LARGEFILE 0
+#endif
+#ifndef O_BINARY
+ #define O_BINARY 0
+#endif
+#ifndef O_SEQUENTIAL
+ #define O_SEQUENTIAL 0
+#endif
+#ifndef O_CLOEXEC
+ #define O_CLOEXEC 0
+#endif
 
 #ifndef PATH_MAX
  #define PATH_MAX 4096
+#endif
+
+/* don't use pread/pwrite on old versions of uClibc because they're buggy.
+ * https://trac.transmissionbt.com/ticket/3826 */
+#ifdef __UCLIBC__
+#define TR_UCLIBC_CHECK_VERSION(major,minor,micro) \
+  (__UCLIBC_MAJOR__ > (major) || \
+   (__UCLIBC_MAJOR__ == (major) && __UCLIBC_MINOR__ > (minor)) || \
+   (__UCLIBC_MAJOR__ == (major) && __UCLIBC_MINOR__ == (minor) && \
+      __UCLIBC_SUBLEVEL__ >= (micro)))
+#if !TR_UCLIBC_CHECK_VERSION (0,9,28)
+ #undef HAVE_PREAD
+ #undef HAVE_PWRITE
+#endif
+#endif
+
+#ifdef __APPLE__
+ #ifndef HAVE_PREAD
+  #define HAVE_PREAD
+ #endif
+ #ifndef HAVE_PWRITE
+  #define HAVE_PWRITE
+ #endif
+ #ifndef HAVE_MKDTEMP
+  #define HAVE_MKDTEMP
+ #endif
 #endif
 
 static void
@@ -60,6 +118,33 @@ stat_to_sys_path_info (const struct stat * sb,
 
   info->size = (uint64_t) sb->st_size;
   info->last_modified_at = sb->st_mtime;
+}
+
+static void
+set_file_for_single_pass (tr_sys_file_t handle)
+{
+  /* Set hints about the lookahead buffer and caching. It's okay
+     for these to fail silently, so don't let them affect errno */
+
+  const int err = errno;
+
+  if (handle == TR_BAD_SYS_FILE)
+    return;
+
+#ifdef HAVE_POSIX_FADVISE
+
+  posix_fadvise (handle, 0, 0, POSIX_FADV_SEQUENTIAL);
+
+#endif
+
+#ifdef __APPLE__
+
+  fcntl (handle, F_RDAHEAD, 1);
+  fcntl (handle, F_NOCACHE, 1);
+
+#endif
+
+  errno = err;
 }
 
 bool
@@ -232,6 +317,507 @@ tr_sys_path_remove (const char  * path,
   assert (path != NULL);
 
   ret = remove (path) != -1;
+
+  if (!ret)
+    set_system_error (error, errno);
+
+  return ret;
+}
+
+tr_sys_file_t
+tr_sys_file_get_std (tr_std_sys_file_t    std_file,
+                     tr_error          ** error)
+{
+  tr_sys_file_t ret = TR_BAD_SYS_FILE;
+
+  switch (std_file)
+    {
+    case TR_STD_SYS_FILE_IN:
+      ret = STDIN_FILENO;
+      break;
+    case TR_STD_SYS_FILE_OUT:
+      ret = STDOUT_FILENO;
+      break;
+    case TR_STD_SYS_FILE_ERR:
+      ret = STDERR_FILENO;
+      break;
+    default:
+      assert (0 && "Unknown standard file");
+      set_system_error (error, EINVAL);
+    }
+
+  return ret;
+}
+
+tr_sys_file_t
+tr_sys_file_open (const char  * path,
+                  int           flags,
+                  int           permissions,
+                  tr_error   ** error)
+{
+  tr_sys_file_t ret;
+  int native_flags = 0;
+
+  assert (path != NULL);
+  assert ((flags & (TR_SYS_FILE_READ | TR_SYS_FILE_WRITE)) != 0);
+
+  if ((flags & (TR_SYS_FILE_READ | TR_SYS_FILE_WRITE)) == (TR_SYS_FILE_READ | TR_SYS_FILE_WRITE))
+    native_flags |= O_RDWR;
+  else if (flags & TR_SYS_FILE_READ)
+    native_flags |= O_RDONLY;
+  else if (flags & TR_SYS_FILE_WRITE)
+    native_flags |= O_WRONLY;
+
+  native_flags |=
+    (flags & TR_SYS_FILE_CREATE ? O_CREAT : 0) |
+    (flags & TR_SYS_FILE_CREATE_NEW ? O_CREAT | O_EXCL : 0) |
+    (flags & TR_SYS_FILE_APPEND ? O_APPEND : 0) |
+    (flags & TR_SYS_FILE_TRUNCATE ? O_TRUNC : 0) |
+    (flags & TR_SYS_FILE_SEQUENTIAL ? O_SEQUENTIAL : 0) |
+    O_BINARY | O_LARGEFILE | O_CLOEXEC;
+
+  ret = open (path, native_flags, permissions);
+
+  if (ret != TR_BAD_SYS_FILE)
+    {
+      if (flags & TR_SYS_FILE_SEQUENTIAL)
+        set_file_for_single_pass (ret);
+    }
+  else
+    {
+      set_system_error (error, errno);
+    }
+
+  return ret;
+}
+
+tr_sys_file_t
+tr_sys_file_open_temp (char      * path_template,
+                       tr_error ** error)
+{
+  tr_sys_file_t ret;
+
+  assert (path_template != NULL);
+
+  ret = mkstemp (path_template);
+
+  if (ret == TR_BAD_SYS_FILE)
+    set_system_error (error, errno);
+
+  set_file_for_single_pass (ret);
+
+  return ret;
+}
+
+bool
+tr_sys_file_close (tr_sys_file_t    handle,
+                   tr_error      ** error)
+{
+  bool ret;
+
+  assert (handle != TR_BAD_SYS_FILE);
+
+  ret = close (handle) != -1;
+
+  if (!ret)
+    set_system_error (error, errno);
+
+  return ret;
+}
+
+bool
+tr_sys_file_get_info (tr_sys_file_t       handle,
+                      tr_sys_path_info  * info,
+                      tr_error         ** error)
+{
+  bool ret;
+  struct stat sb;
+
+  assert (handle != TR_BAD_SYS_FILE);
+  assert (info != NULL);
+
+  ret = fstat (handle, &sb) != -1;
+
+  if (ret)
+    stat_to_sys_path_info (&sb, info);
+  else
+    set_system_error (error, errno);
+
+  return ret;
+}
+
+bool
+tr_sys_file_seek (tr_sys_file_t       handle,
+                  int64_t             offset,
+                  tr_seek_origin_t    origin,
+                  uint64_t          * new_offset,
+                  tr_error         ** error)
+{
+  bool ret = false;
+  off_t my_new_offset;
+
+  TR_STATIC_ASSERT (TR_SEEK_SET == SEEK_SET, "values should match");
+  TR_STATIC_ASSERT (TR_SEEK_CUR == SEEK_CUR, "values should match");
+  TR_STATIC_ASSERT (TR_SEEK_END == SEEK_END, "values should match");
+
+  TR_STATIC_ASSERT (sizeof (*new_offset) >= sizeof (my_new_offset), "");
+
+  assert (handle != TR_BAD_SYS_FILE);
+  assert (origin == TR_SEEK_SET || origin == TR_SEEK_CUR || origin == TR_SEEK_END);
+
+  my_new_offset = lseek (handle, offset, origin);
+
+  if (my_new_offset != (off_t)-1)
+    {
+      if (new_offset != NULL)
+        *new_offset = my_new_offset;
+      ret = true;
+    }
+  else
+    {
+      set_system_error (error, errno);
+    }
+
+  return ret;
+}
+
+bool
+tr_sys_file_read (tr_sys_file_t    handle,
+                  void           * buffer,
+                  uint64_t         size,
+                  uint64_t       * bytes_read,
+                  tr_error      ** error)
+{
+  bool ret = false;
+  ssize_t my_bytes_read;
+
+  TR_STATIC_ASSERT (sizeof (*bytes_read) >= sizeof (my_bytes_read), "");
+
+  assert (handle != TR_BAD_SYS_FILE);
+  assert (buffer != NULL || size == 0);
+
+  my_bytes_read = read (handle, buffer, size);
+
+  if (my_bytes_read != -1)
+    {
+      if (bytes_read != NULL)
+        *bytes_read = my_bytes_read;
+      ret = true;
+    }
+  else
+    {
+      set_system_error (error, errno);
+    }
+
+  return ret;
+}
+
+bool
+tr_sys_file_read_at (tr_sys_file_t    handle,
+                     void           * buffer,
+                     uint64_t         size,
+                     uint64_t         offset,
+                     uint64_t       * bytes_read,
+                     tr_error      ** error)
+{
+  bool ret = false;
+  ssize_t my_bytes_read;
+
+  TR_STATIC_ASSERT (sizeof (*bytes_read) >= sizeof (my_bytes_read), "");
+
+  assert (handle != TR_BAD_SYS_FILE);
+  assert (buffer != NULL || size == 0);
+
+#ifdef HAVE_PREAD
+
+  my_bytes_read = pread (handle, buffer, size, offset);
+
+#else
+
+  if (lseek (handle, offset, SEEK_SET) != -1)
+    my_bytes_read = read (handle, buffer, size);
+  else
+    my_bytes_read = -1;
+
+#endif
+
+  if (my_bytes_read != -1)
+    {
+      if (bytes_read != NULL)
+        *bytes_read = my_bytes_read;
+      ret = true;
+    }
+  else
+    {
+      set_system_error (error, errno);
+    }
+
+  return ret;
+}
+
+bool
+tr_sys_file_write (tr_sys_file_t    handle,
+                   const void     * buffer,
+                   uint64_t         size,
+                   uint64_t       * bytes_written,
+                   tr_error      ** error)
+{
+  bool ret = false;
+  ssize_t my_bytes_written;
+
+  TR_STATIC_ASSERT (sizeof (*bytes_written) >= sizeof (my_bytes_written), "");
+
+  assert (handle != TR_BAD_SYS_FILE);
+  assert (buffer != NULL || size == 0);
+
+  my_bytes_written = write (handle, buffer, size);
+
+  if (my_bytes_written != -1)
+    {
+      if (bytes_written != NULL)
+        *bytes_written = my_bytes_written;
+      ret = true;
+    }
+  else
+    {
+      set_system_error (error, errno);
+    }
+
+  return ret;
+}
+
+bool
+tr_sys_file_write_at (tr_sys_file_t    handle,
+                      const void     * buffer,
+                      uint64_t         size,
+                      uint64_t         offset,
+                      uint64_t       * bytes_written,
+                      tr_error      ** error)
+{
+  bool ret = false;
+  ssize_t my_bytes_written;
+
+  TR_STATIC_ASSERT (sizeof (*bytes_written) >= sizeof (my_bytes_written), "");
+
+  assert (handle != TR_BAD_SYS_FILE);
+  assert (buffer != NULL || size == 0);
+
+#ifdef HAVE_PWRITE
+
+  my_bytes_written = pwrite (handle, buffer, size, offset);
+
+#else
+
+  if (lseek (handle, offset, SEEK_SET) != -1)
+    my_bytes_written = write (handle, buffer, size);
+  else
+    my_bytes_written = -1;
+
+#endif
+
+  if (my_bytes_written != -1)
+    {
+      if (bytes_written != NULL)
+        *bytes_written = my_bytes_written;
+      ret = true;
+    }
+  else
+    {
+      set_system_error (error, errno);
+    }
+
+  return ret;
+}
+
+bool
+tr_sys_file_flush (tr_sys_file_t    handle,
+                   tr_error      ** error)
+{
+  bool ret;
+
+  assert (handle != TR_BAD_SYS_FILE);
+
+  ret = fsync (handle) != -1;
+
+  if (!ret)
+    set_system_error (error, errno);
+
+  return ret;
+}
+
+bool
+tr_sys_file_truncate (tr_sys_file_t    handle,
+                      uint64_t         size,
+                      tr_error      ** error)
+{
+  bool ret;
+
+  assert (handle != TR_BAD_SYS_FILE);
+
+  ret = ftruncate (handle, size) != -1;
+
+  if (!ret)
+    set_system_error (error, errno);
+
+  return ret;
+}
+
+bool
+tr_sys_file_prefetch (tr_sys_file_t    handle,
+                      uint64_t         offset,
+                      uint64_t         size,
+                      tr_error      ** error)
+{
+  bool ret = false;
+
+#if defined (HAVE_POSIX_FADVISE)
+
+  int code;
+
+  assert (handle != TR_BAD_SYS_FILE);
+  assert (size > 0);
+
+  code = posix_fadvise (handle, offset, size, POSIX_FADV_WILLNEED);
+
+  if (code == 0)
+    ret = true;
+  else
+    set_system_error (error, code);
+
+#elif defined (__APPLE__)
+
+  struct radvisory radv;
+
+  assert (handle != TR_BAD_SYS_FILE);
+  assert (size > 0);
+
+  radv.ra_offset = offset;
+  radv.ra_count = size;
+
+  ret = fcntl (handle, F_RDADVISE, &radv) != -1;
+
+  if (!ret)
+    set_system_error (error, errno);
+
+#endif
+
+  return ret;
+}
+
+bool
+tr_sys_file_preallocate (tr_sys_file_t    handle,
+                         uint64_t         size,
+                         int              flags,
+                         tr_error      ** error)
+{
+  bool ret = false;
+
+  assert (handle != TR_BAD_SYS_FILE);
+
+  errno = 0;
+
+#ifdef HAVE_FALLOCATE64
+
+  /* fallocate64 is always preferred, so try it first */
+  ret = fallocate64 (handle, 0, 0, size) != -1;
+
+#endif
+
+  if (!ret && (flags & TR_SYS_FILE_PREALLOC_SPARSE) == 0)
+    {
+      int code = errno;
+
+#ifdef HAVE_XFS_XFS_H
+
+      if (!ret && platform_test_xfs_fd (handle))
+        {
+          xfs_flock64_t fl;
+
+          fl.l_whence = 0;
+          fl.l_start = 0;
+          fl.l_len = size;
+
+          ret = xfsctl (NULL, handle, XFS_IOC_RESVSP64, &fl) != -1;
+
+          code = errno;
+        }
+
+#endif
+
+#ifdef __APPLE__
+
+      if (!ret)
+        {
+          fstore_t fst;
+
+          fst.fst_flags = F_ALLOCATECONTIG;
+          fst.fst_posmode = F_PEOFPOSMODE;
+          fst.fst_offset = 0;
+          fst.fst_length = size;
+          fst.fst_bytesalloc = 0;
+
+          ret = fcntl (handle, F_PREALLOCATE, &fst) != -1;
+
+          if (ret)
+            ret = ftruncate (handle, size) != -1;
+
+          code = errno;
+        }
+
+#endif
+
+#ifdef HAVE_POSIX_FALLOCATE
+
+      if (!ret)
+        {
+          code = posix_fallocate (handle, 0, size);
+          ret = code == 0;
+        }
+
+#endif
+
+      errno = code;
+    }
+
+  if (!ret)
+    set_system_error (error, errno);
+
+  return ret;
+}
+
+void *
+tr_sys_file_map_for_reading (tr_sys_file_t    handle,
+                             uint64_t         offset,
+                             uint64_t         size,
+                             tr_error      ** error)
+{
+  void * ret;
+
+  assert (handle != TR_BAD_SYS_FILE);
+  assert (size > 0);
+
+  ret = mmap (NULL, size, PROT_READ, MAP_SHARED, handle, offset);
+
+  if (ret == MAP_FAILED)
+    {
+      set_system_error (error, errno);
+      ret = NULL;
+    }
+
+  return ret;
+}
+
+bool
+tr_sys_file_unmap (const void  * address,
+                   uint64_t      size,
+                   tr_error   ** error)
+{
+  bool ret;
+
+  assert (address != NULL);
+  assert (size > 0);
+
+  ret = munmap ((void *) address, size) != -1;
 
   if (!ret)
     set_system_error (error, errno);
