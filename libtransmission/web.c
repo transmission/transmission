@@ -22,6 +22,7 @@
 #include <event2/buffer.h>
 
 #include "transmission.h"
+#include "file.h"
 #include "list.h"
 #include "log.h"
 #include "net.h" /* tr_address */
@@ -398,7 +399,7 @@ tr_webThreadFunc (void * vsession)
     }
 
   str = tr_buildPath (session->configDir, "cookies.txt", NULL);
-  if (tr_fileExists (str, NULL))
+  if (tr_sys_path_exists (str, NULL))
     web->cookie_filename = tr_strdup (str);
   tr_free (str);
 

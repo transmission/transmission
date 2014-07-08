@@ -32,11 +32,10 @@
 #ifdef HAVE_ICONV_OPEN
  #include <iconv.h>
 #endif
-#include <libgen.h> /* basename () */
 #include <sys/time.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <unistd.h> /* stat (), getcwd (), getpagesize () */
+#include <unistd.h> /* stat (), getpagesize () */
 
 #include <event2/buffer.h>
 #include <event2/event.h>
@@ -44,17 +43,19 @@
 #ifdef _WIN32
  #include <w32api.h>
  #define WINVER WindowsXP /* freeaddrinfo (), getaddrinfo (), getnameinfo () */
- #include <direct.h> /* _getcwd () */
  #include <windows.h> /* Sleep (), GetSystemTimeAsFileTime () */
 #endif
 
 #include "transmission.h"
+#include "error.h"
 #include "fdlimit.h"
+#include "file.h"
 #include "ConvertUTF.h"
 #include "list.h"
 #include "log.h"
+#include "net.h"
 #include "utils.h"
-#include "platform.h" /* tr_lockLock (), TR_PATH_MAX */
+#include "platform.h" /* tr_lockLock () */
 #include "platform-quota.h" /* tr_device_info_create(), tr_device_info_get_free_space(), tr_device_info_free() */
 #include "variant.h"
 #include "version.h"
@@ -219,27 +220,32 @@ tr_loadFile (const char * path,
              size_t     * size)
 {
   uint8_t * buf;
-  struct stat  sb;
+  tr_sys_path_info info;
   int fd;
   ssize_t n;
+  tr_error * error = NULL;
   const char * const err_fmt = _("Couldn't read \"%1$s\": %2$s");
 
   /* try to stat the file */
-  errno = 0;
-  if (stat (path, &sb))
+  if (!tr_sys_path_get_info (path, 0, &info, &error))
     {
-      const int err = errno;
-      tr_logAddDebug (err_fmt, path, tr_strerror (errno));
+      const int err = error->code;
+      tr_logAddDebug (err_fmt, path, error->message);
+      tr_error_free (error);
       errno = err;
       return NULL;
     }
 
-  if ((sb.st_mode & S_IFMT) != S_IFREG)
+  if (info.type != TR_SYS_PATH_IS_FILE)
     {
       tr_logAddError (err_fmt, path, _("Not a regular file"));
       errno = EISDIR;
       return NULL;
     }
+
+  /* file size should be able to fit into size_t */
+  if (sizeof(info.size) > sizeof(*size))
+    assert (info.size <= SIZE_MAX);
 
   /* Load the torrent file into our buffer */
   fd = tr_open_file_for_scanning (path);
@@ -250,7 +256,7 @@ tr_loadFile (const char * path,
       errno = err;
       return NULL;
     }
-  buf = tr_malloc (sb.st_size + 1);
+  buf = tr_malloc (info.size + 1);
   if (!buf)
     {
       const int err = errno;
@@ -259,7 +265,7 @@ tr_loadFile (const char * path,
       errno = err;
       return NULL;
     }
-  n = read (fd, buf, (size_t)sb.st_size);
+  n = read (fd, buf, (size_t)info.size);
   if (n == -1)
     {
       const int err = errno;
@@ -271,77 +277,9 @@ tr_loadFile (const char * path,
     }
 
   tr_close_file (fd);
-  buf[ sb.st_size ] = '\0';
-  *size = sb.st_size;
+  buf[info.size] = '\0';
+  *size = info.size;
   return buf;
-}
-
-char*
-tr_basename (const char * path)
-{
-#ifdef _MSC_VER
-
-  char fname[_MAX_FNAME], ext[_MAX_EXT];
-  if (_splitpath_s (path, NULL, 0, NULL, 0, fname, sizeof (fname), ext, sizeof (ext)) == 0)
-    {
-      const size_t tmpLen = strlen(fname) + strlen(ext) + 2;
-      char * const tmp = tr_malloc (tmpLen);
-      if (tmp != NULL)
-        {
-          if (_makepath_s (tmp, tmpLen, NULL, NULL, fname, ext) == 0)
-            return tmp;
-
-          tr_free (tmp);
-        }
-    }
-
-  return tr_strdup (".");
-
-#else
-
-  char * tmp = tr_strdup (path);
-  char * ret = tr_strdup (basename (tmp));
-  tr_free (tmp);
-  return ret;
-
-#endif
-}
-
-char*
-tr_dirname (const char * path)
-{
-#ifdef _MSC_VER
-
-  char drive[_MAX_DRIVE], dir[_MAX_DIR];
-  if (_splitpath_s (path, drive, sizeof (drive), dir, sizeof (dir), NULL, 0, NULL, 0) == 0)
-    {
-      const size_t tmpLen = strlen(drive) + strlen(dir) + 2;
-      char * const tmp = tr_malloc (tmpLen);
-      if (tmp != NULL)
-        {
-          if (_makepath_s (tmp, tmpLen, drive, dir, NULL, NULL) == 0)
-            {
-              size_t len = strlen(tmp);
-              while (len > 0 && (tmp[len - 1] == '/' || tmp[len - 1] == '\\'))
-                tmp[--len] = '\0';
-
-              return tmp;
-            }
-
-          tr_free (tmp);
-        }
-    }
-
-  return tr_strdup (".");
-
-#else
-
-  char * tmp = tr_strdup (path);
-  char * ret = tr_strdup (dirname (tmp));
-  tr_free (tmp);
-  return ret;
-
-#endif
 }
 
 char*
@@ -492,24 +430,6 @@ tr_buildPath (const char *first_element, ...)
   /* sanity checks & return */
   assert (pch - buf == (off_t)bufLen);
   return buf;
-}
-
-#ifdef __APPLE__
- #define TR_STAT_MTIME(sb)((sb).st_mtimespec.tv_sec)
-#else
- #define TR_STAT_MTIME(sb)((sb).st_mtime)
-#endif
-
-bool
-tr_fileExists (const char * filename, time_t * mtime)
-{
-  struct stat sb;
-  const bool ok = !stat (filename, &sb);
-
-  if (ok && (mtime != NULL))
-    *mtime = TR_STAT_MTIME (sb);
-
-  return ok;
 }
 
 int64_t
@@ -1627,27 +1547,29 @@ tr_moveFile (const char * oldpath, const char * newpath, bool * renamed)
   int in;
   int out;
   char * buf;
-  struct stat st;
+  tr_sys_path_info info;
   off_t bytesLeft;
   const size_t buflen = 1024 * 128; /* 128 KiB buffer */
+  tr_error * error = NULL;
 
   /* make sure the old file exists */
-  if (stat (oldpath, &st))
+  if (!tr_sys_path_get_info (oldpath, 0, &info, &error))
     {
-      const int err = errno;
+      const int err = error->code;
+      tr_error_free (error);
       errno = err;
       return -1;
     }
-  if (!S_ISREG (st.st_mode))
+  if (info.type != TR_SYS_PATH_IS_FILE)
     {
       errno = ENOENT;
       return -1;
     }
-  bytesLeft = st.st_size;
+  bytesLeft = info.size;
 
   /* make sure the target directory exists */
   {
-    char * newdir = tr_dirname (newpath);
+    char * newdir = tr_sys_path_dirname (newpath, NULL);
     int i = tr_mkdirp (newdir, 0777);
     tr_free (newdir);
     if (i)
@@ -1656,10 +1578,10 @@ tr_moveFile (const char * oldpath, const char * newpath, bool * renamed)
 
   /* they might be on the same filesystem... */
   {
-    const int i = tr_rename (oldpath, newpath);
+    const bool i = tr_sys_path_rename (oldpath, newpath, NULL);
     if (renamed != NULL)
-      *renamed = i == 0;
-    if (!i)
+      *renamed = i;
+    if (i)
       return 0;
   }
 
@@ -1687,62 +1609,8 @@ tr_moveFile (const char * oldpath, const char * newpath, bool * renamed)
   if (bytesLeft != 0)
     return -1;
 
-  tr_remove (oldpath);
+  tr_sys_path_remove (oldpath, NULL);
   return 0;
-}
-
-int
-tr_rename (const char * oldpath, const char * newpath)
-{
-  /* FIXME: needs win32 utf-16 support */
-
-  return rename (oldpath, newpath);
-}
-
-int
-tr_remove (const char * pathname)
-{
-  /* FIXME: needs win32 utf-16 support */
-
-  return remove (pathname);
-}
-
-bool
-tr_is_same_file (const char * filename1, const char * filename2)
-{
-#ifdef _WIN32
-
-  bool res;
-  HANDLE fh1, fh2;
-  BY_HANDLE_FILE_INFORMATION fi1, fi2;
-  int n = strlen (filename1) + 1;
-  int m = strlen (filename2) + 1;
-  wchar_t f1nameUTF16[n];
-  wchar_t f2nameUTF16[m];
- 
-  MultiByteToWideChar (CP_UTF8, 0, filename1, -1, f1nameUTF16, n);
-  MultiByteToWideChar (CP_UTF8, 0, filename2, -1, f2nameUTF16, m);
-  fh1 = CreateFileW (chkFilename (f1nameUTF16), 0, 0, NULL, OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, NULL);
-  fh2 = CreateFileW (chkFilename (f2nameUTF16), 0, 0, NULL, OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, NULL);
-  res = GetFileInformationByHandle (fh1, &fi1)
-          && GetFileInformationByHandle (fh2, &fi2)
-          && (fi1.dwVolumeSerialNumber == fi2.dwVolumeSerialNumber)
-          && (fi1.nFileIndexHigh == fi2.nFileIndexHigh)
-          && (fi1.nFileIndexLow  == fi2.nFileIndexLow);
-  CloseHandle (fh1);
-  CloseHandle (fh2);
-  return res;
-
-#else
-
-  struct stat sb1, sb2;
-
-  return !stat (filename1, &sb1)
-      && !stat (filename2, &sb2)
-      && (sb1.st_dev == sb2.st_dev)
-      && (sb1.st_ino == sb2.st_ino);
-
-#endif
 }
 
 /***
@@ -1782,19 +1650,6 @@ tr_valloc (size_t bufLen)
     buf = tr_malloc (allocLen);
 
   return buf;
-}
-
-char *
-tr_realpath (const char * path, char * resolved_path)
-{
-#ifdef _WIN32
-  /* From a message to the Mingw-msys list, Jun 2, 2005 by Mark Junker. */
-  if (GetFullPathNameA (path, TR_PATH_MAX, resolved_path, NULL) == 0)
-    return NULL;
-  return resolved_path;
-#else
-  return realpath (path, resolved_path);
-#endif
 }
 
 /***

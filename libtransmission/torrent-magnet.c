@@ -14,6 +14,7 @@
 
 #include "transmission.h"
 #include "crypto.h" /* tr_sha1 () */
+#include "file.h"
 #include "log.h"
 #include "magnet.h"
 #include "metainfo.h"
@@ -259,7 +260,7 @@ tr_torrentSetMetadataPiece (tr_torrent  * tor, int piece, const void  * data, in
                   int infoDictLength;
 
                   /* remove any old .torrent and .resume files */
-                  tr_remove (path);
+                  tr_sys_path_remove (path, NULL);
                   tr_torrentRemoveResume (tor);
 
                   dbgmsg (tor, "Saving completed metadata to \"%s\"", path);

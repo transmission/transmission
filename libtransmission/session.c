@@ -14,9 +14,8 @@
 #include <string.h> /* memcpy */
 
 #include <signal.h>
-#include <sys/types.h> /* stat (), umask () */
-#include <sys/stat.h> /* stat (), umask () */
-#include <unistd.h> /* stat */
+#include <sys/types.h> /* umask () */
+#include <sys/stat.h> /* umask () */
 #include <dirent.h> /* opendir */
 
 #include <event2/dns.h> /* evdns_base_free () */
@@ -32,6 +31,7 @@
 #include "cache.h"
 #include "crypto.h"
 #include "fdlimit.h"
+#include "file.h"
 #include "list.h"
 #include "log.h"
 #include "net.h"
@@ -1947,7 +1947,7 @@ sessionLoadTorrents (void * vdata)
 {
   int i;
   int n = 0;
-  struct stat sb;
+  tr_sys_path_info info;
   DIR * odir = NULL;
   tr_list * l = NULL;
   tr_list * list = NULL;
@@ -1958,8 +1958,8 @@ sessionLoadTorrents (void * vdata)
 
   tr_ctorSetSave (data->ctor, false); /* since we already have them */
 
-  if (!stat (dirname, &sb)
-      && S_ISDIR (sb.st_mode)
+  if (tr_sys_path_get_info (dirname, 0, &info, NULL)
+      && info.type == TR_SYS_PATH_IS_DIRECTORY
       && ((odir = opendir (dirname))))
     {
       struct dirent *d;
@@ -2263,13 +2263,13 @@ loadBlocklists (tr_session * session)
         {
           char * binname;
           char * basename;
-          time_t path_mtime = 0;
-          time_t binname_mtime = 0;
+          tr_sys_path_info path_info;
+          tr_sys_path_info binname_info;
 
-          basename = tr_basename (d->d_name);
+          basename = tr_sys_path_basename (d->d_name, NULL);
           binname = tr_strdup_printf ("%s" TR_PATH_DELIMITER_STR "%s.bin", dirname, basename);
 
-          if (!tr_fileExists (binname, &binname_mtime)) /* create it */
+          if (!tr_sys_path_get_info (binname, 0, &binname_info, NULL)) /* create it */
             {
               tr_blocklistFile * b = tr_blocklistFileNew (binname, isEnabled);
               const int n = tr_blocklistFileSetContent (b, path);
@@ -2278,23 +2278,24 @@ loadBlocklists (tr_session * session)
 
               tr_blocklistFileFree (b);
             }
-          else if (tr_fileExists(path,&path_mtime) && (path_mtime>=binname_mtime)) /* update it */
+          else if (tr_sys_path_get_info (path, 0, &path_info, NULL) &&
+                   path_info.last_modified_at >= binname_info.last_modified_at) /* update it */
             {
               char * old;
               tr_blocklistFile * b;
 
               old = tr_strdup_printf ("%s.old", binname);
-              tr_remove (old);
-              tr_rename (binname, old);
+              tr_sys_path_remove (old, NULL);
+              tr_sys_path_rename (binname, old, NULL);
               b = tr_blocklistFileNew (binname, isEnabled);
               if (tr_blocklistFileSetContent (b, path) > 0)
                 {
-                  tr_remove (old);
+                  tr_sys_path_remove (old, NULL);
                 }
               else
                 {
-                  tr_remove (binname);
-                  tr_rename (old, binname);
+                  tr_sys_path_remove (binname, NULL);
+                  tr_sys_path_rename (old, binname, NULL);
                 }
 
               tr_blocklistFileFree (b);
@@ -2457,7 +2458,7 @@ tr_blocklistGetURL (const tr_session * session)
 static void
 metainfoLookupInit (tr_session * session)
 {
-  struct stat sb;
+  tr_sys_path_info info;
   const char * dirname = tr_getTorrentDir (session);
   DIR * odir = NULL;
   tr_ctor * ctor = NULL;
@@ -2471,7 +2472,9 @@ metainfoLookupInit (tr_session * session)
   tr_variantInitDict (lookup, 0);
   ctor = tr_ctorNew (session);
   tr_ctorSetSave (ctor, false); /* since we already have them */
-  if (!stat (dirname, &sb) && S_ISDIR (sb.st_mode) && ((odir = opendir (dirname))))
+  if (tr_sys_path_get_info (dirname, 0, &info, NULL)
+      && info.type == TR_SYS_PATH_IS_DIRECTORY
+      && ((odir = opendir (dirname))))
     {
       struct dirent *d;
       while ((d = readdir (odir)))

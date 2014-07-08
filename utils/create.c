@@ -13,6 +13,7 @@
 #include <unistd.h> /* getcwd() */
 
 #include <libtransmission/transmission.h>
+#include <libtransmission/file.h>
 #include <libtransmission/makemeta.h>
 #include <libtransmission/tr-getopt.h>
 #include <libtransmission/utils.h>
@@ -158,7 +159,7 @@ main (int argc, char * argv[])
 
   if (outfile == NULL)
     {
-      char * base = tr_basename (infile);
+      char * base = tr_sys_path_basename (infile, NULL);
       char * end = tr_strdup_printf ("%s.torrent", base);
       char * cwd = tr_getcwd ();
       outfile = out2 = tr_buildPath (cwd, end, NULL);

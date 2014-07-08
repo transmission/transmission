@@ -8,21 +8,17 @@
  */
 
 #include <assert.h>
-#include <errno.h>
-#include <stdio.h> /* fopen (), fwrite (), fclose () */
 #include <string.h> /* strlen () */
-
-#include <sys/types.h>
-#include <unistd.h> /* stat */
 
 #include <event2/buffer.h>
 
 #include "transmission.h"
-#include "session.h"
 #include "crypto.h" /* tr_sha1 */
+#include "file.h"
 #include "log.h"
 #include "metainfo.h"
 #include "platform.h" /* tr_getTorrentDir () */
+#include "session.h"
 #include "utils.h"
 #include "variant.h"
 
@@ -635,7 +631,7 @@ tr_metainfoRemoveSaved (const tr_session * session, const tr_info * inf)
   char * filename;
 
   filename = getTorrentFilename (session, inf);
-  tr_remove (filename);
+  tr_sys_path_remove (filename, NULL);
   tr_free (filename);
 }
 

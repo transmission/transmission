@@ -11,6 +11,7 @@
 
 #include "transmission.h"
 #include "crypto.h"
+#include "file.h"
 #include "makemeta.h"
 
 #include <unistd.h> /* sync() */
@@ -69,7 +70,7 @@ test_single_file_impl (const tr_tracker_info * trackers,
 
   /* quick check of some of the parsed metainfo */
   check_int_eq (payloadSize, inf.totalSize);
-  tmpstr = tr_basename(input_file);
+  tmpstr = tr_sys_path_basename (input_file, NULL);
   check_streq (tmpstr, inf.name);
   tr_free (tmpstr);
   check_streq (comment, inf.comment);
@@ -190,7 +191,7 @@ test_single_directory_impl (const tr_tracker_info * trackers,
 
   /* quick check of some of the parsed metainfo */
   check_int_eq (totalSize, inf.totalSize);
-  tmpstr = tr_basename(top);
+  tmpstr = tr_sys_path_basename (top, NULL);
   check_streq (tmpstr, inf.name);
   tr_free (tmpstr);
   check_streq (comment, inf.comment);

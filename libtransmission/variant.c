@@ -9,7 +9,6 @@
 
 #include <assert.h>
 #include <errno.h>
-#include <stdio.h> /* rename() */
 #include <stdlib.h> /* strtod(), realloc(), qsort(), mkstemp() */
 #include <string.h>
 
@@ -28,8 +27,9 @@
 #include "transmission.h"
 #include "ConvertUTF.h"  
 #include "fdlimit.h" /* tr_close_file() */
+#include "error.h"
+#include "file.h"
 #include "log.h"
-#include "platform.h" /* TR_PATH_MAX */
 #include "utils.h" /* tr_new(), tr_free() */
 #include "variant.h"
 #include "variant-common.h"
@@ -1160,12 +1160,12 @@ tr_variantToFile (const tr_variant  * v,
   char * tmp;
   int fd;
   int err = 0;
-  char buf[TR_PATH_MAX];
+  char * real_filename;
 
   /* follow symlinks to find the "real" file, to make sure the temporary
    * we build with tr_mkstemp() is created on the right partition */
-  if (tr_realpath (filename, buf) != NULL)
-    filename = buf;
+  if ((real_filename = tr_sys_path_resolve (filename, NULL)) != NULL)
+    filename = real_filename;
 
   /* if the file already exists, try to move it out of the way & keep it as a backup */
   tmp = tr_strdup_printf ("%s.tmp.XXXXXX", filename);
@@ -1203,21 +1203,24 @@ tr_variantToFile (const tr_variant  * v,
         {
           tr_logAddError (_("Couldn't save temporary file \"%1$s\": %2$s"), tmp, tr_strerror (err));
           tr_close_file (fd);
-          tr_remove (tmp);
+          tr_sys_path_remove (tmp, NULL);
         }
       else
         {
+          tr_error * error = NULL;
+
           tr_close_file (fd);
 
-          if (!tr_rename (tmp, filename))
+          if (tr_sys_path_rename (tmp, filename, &error))
             {
               tr_logAddInfo (_("Saved \"%s\""), filename);
             }
           else
             {
-              err = errno;
-              tr_logAddError (_("Couldn't save file \"%1$s\": %2$s"), filename, tr_strerror (err));
-              tr_remove (tmp);
+              err = error->code;
+              tr_logAddError (_("Couldn't save file \"%1$s\": %2$s"), filename, error->message);
+              tr_sys_path_remove (tmp, NULL);
+              tr_error_free (error);
             }
         }
     }
@@ -1228,6 +1231,7 @@ tr_variantToFile (const tr_variant  * v,
     }
 
   tr_free (tmp);
+  tr_free (real_filename);
   return err;
 }
 

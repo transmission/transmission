@@ -12,8 +12,6 @@
   #include <sys/select.h>
   #include <unistd.h> /* close */
 #else
-  #include <sys/types.h> /* stat */
-  #include <sys/stat.h> /* stat */
   #include <event2/buffer.h> /* evbuffer */
 #endif
 
@@ -24,6 +22,7 @@
 #include <dirent.h> /* readdir */
 
 #include <libtransmission/transmission.h>
+#include <libtransmission/file.h>
 #include <libtransmission/log.h>
 #include <libtransmission/utils.h> /* tr_buildPath (), tr_logAddInfo () */
 #include "watch.h"
@@ -196,15 +195,15 @@ is_file_in_list (struct evbuffer * buf, const char * filename, size_t len)
 static void
 watchdir_update_impl (dtr_watchdir * w)
 {
-    struct stat sb;
+    tr_sys_path_info info;
     DIR * odir;
     const time_t oldTime = w->lastTimeChecked;
     const char * dirname = w->dir;
     struct evbuffer * curFiles = evbuffer_new ();
 
     if ((oldTime + WATCHDIR_POLL_INTERVAL_SECS < time (NULL))
-         && !stat (dirname, &sb)
-         && S_ISDIR (sb.st_mode)
+         && tr_sys_path_get_info (dirname, 0, &info, NULL)
+         && info.type == TR_SYS_PATH_IS_DIRECTORY
          && ((odir = opendir (dirname))))
     {
         struct dirent * d;

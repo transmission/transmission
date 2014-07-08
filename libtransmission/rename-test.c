@@ -11,16 +11,13 @@
 #include <errno.h>
 #include <stdio.h> /* fopen() */
 #include <string.h> /* strcmp() */
-#include <stdio.h>
 
-#include <sys/types.h> /* stat() */
-#include <sys/stat.h> /* stat() */
-#include <unistd.h> /* stat(), sync() */
+#include <unistd.h> /* sync() */
 
 #include "transmission.h"
+#include "file.h"
 #include "resume.h"
 #include "torrent.h" /* tr_isTorrent() */
-#include "utils.h" /* tr_mkdirp() */
 #include "variant.h"
 
 #include "libtransmission-test.h"
@@ -55,7 +52,7 @@ testFileExistsAndConsistsOfThisString (const tr_torrent * tor, tr_file_index_t f
       uint8_t * contents;
       size_t contents_len;
 
-      assert (tr_fileExists (path, NULL));
+      assert (tr_sys_path_exists (path, NULL));
 
       contents = tr_loadFile (path, &contents_len);
 
@@ -188,17 +185,17 @@ test_single_filename_torrent (void)
   ***/
 
   tmpstr = tr_buildPath (tor->currentDir, "hello-world.txt", NULL); 
-  check (tr_fileExists (tmpstr, NULL));
+  check (tr_sys_path_exists (tmpstr, NULL));
   check_streq ("hello-world.txt", tr_torrentName(tor));
   check_int_eq (0, torrentRenameAndWait (tor, tor->info.name, "foobar"));
-  check (!tr_fileExists (tmpstr, NULL)); /* confirm the old filename can't be found */
+  check (!tr_sys_path_exists (tmpstr, NULL)); /* confirm the old filename can't be found */
   tr_free (tmpstr);
   check (tor->info.files[0].is_renamed); /* confirm the file's 'renamed' flag is set */
   check_streq ("foobar", tr_torrentName(tor)); /* confirm the torrent's name is now 'foobar' */
   check_streq ("foobar", tor->info.files[0].name); /* confirm the file's name is now 'foobar' in our struct */
   check (strstr (tor->info.torrent, "foobar") == NULL); /* confirm the name in the .torrent file hasn't changed */
   tmpstr = tr_buildPath (tor->currentDir, "foobar", NULL); 
-  check (tr_fileExists (tmpstr, NULL)); /* confirm the file's name is now 'foobar' on the disk */
+  check (tr_sys_path_exists (tmpstr, NULL)); /* confirm the file's name is now 'foobar' on the disk */
   tr_free (tmpstr);
   check (testFileExistsAndConsistsOfThisString (tor, 0, "hello, world!\n")); /* confirm the contents are right */
 
@@ -214,9 +211,9 @@ test_single_filename_torrent (void)
   ***/
 
   tmpstr = tr_buildPath (tor->currentDir, "foobar", NULL); 
-  check (tr_fileExists (tmpstr, NULL));
+  check (tr_sys_path_exists (tmpstr, NULL));
   check_int_eq (0, torrentRenameAndWait (tor, "foobar", "hello-world.txt"));
-  check (!tr_fileExists (tmpstr, NULL));
+  check (!tr_sys_path_exists (tmpstr, NULL));
   check (tor->info.files[0].is_renamed);
   check_streq ("hello-world.txt", tor->info.files[0].name);
   check_streq ("hello-world.txt", tr_torrentName(tor));
@@ -382,13 +379,13 @@ test_multifile_torrent (void)
   /* remove the directory Felidae/Felinae/Felis/catus */
   str = tr_torrentFindFile (tor, 1);
   check (str != NULL);
-  tr_remove (str);
+  tr_sys_path_remove (str, NULL);
   tr_free (str);
   str = tr_torrentFindFile (tor, 2);
   check (str != NULL);
-  tr_remove (str);
-  tmp = tr_dirname (str);
-  tr_remove (tmp);
+  tr_sys_path_remove (str, NULL);
+  tmp = tr_sys_path_dirname (str, NULL);
+  tr_sys_path_remove (tmp, NULL);
   tr_free (tmp);
   tr_free (str);
   sync ();

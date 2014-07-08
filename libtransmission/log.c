@@ -15,6 +15,7 @@
 #include <event2/buffer.h>
 
 #include "transmission.h"
+#include "file.h"
 #include "log.h"
 #include "platform.h" /* tr_lock */
 #include "utils.h"
@@ -191,7 +192,7 @@ tr_logAddDeep (const char  * file,
       char timestr[64];
       char * message;
       struct evbuffer * buf = evbuffer_new ();
-      char * base = tr_basename (file);
+      char * base = tr_sys_path_basename (file, NULL);
 
       evbuffer_add_printf (buf, "[%s] ",
                            tr_logGetTimeStr (timestr, sizeof (timestr)));

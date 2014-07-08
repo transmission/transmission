@@ -40,6 +40,7 @@
 
 #include "transmission.h"
 #include "fdlimit.h"
+#include "file.h"
 #include "log.h"
 #include "session.h"
 #include "torrent.h" /* tr_isTorrent () */
@@ -331,14 +332,14 @@ cached_file_open (struct tr_cached_file  * o,
                   uint64_t                 file_size)
 {
   int flags;
-  struct stat sb;
+  tr_sys_path_info info;
   bool already_existed;
   bool resize_needed;
 
   /* create subfolders, if any */
   if (writable)
     {
-      char * dir = tr_dirname (filename);
+      char * dir = tr_sys_path_dirname (filename, NULL);
       const int err = tr_mkdirp (dir, 0777) ? errno : 0;
       if (err)
         {
@@ -349,14 +350,14 @@ cached_file_open (struct tr_cached_file  * o,
       tr_free (dir);
     }
 
-  already_existed = !stat (filename, &sb) && S_ISREG (sb.st_mode);
+  already_existed = tr_sys_path_get_info (filename, 0, &info, NULL) && info.type == TR_SYS_PATH_IS_FILE;
 
   if (writable && !already_existed && (allocation == TR_PREALLOCATE_FULL))
     if (preallocate_file_full (filename, file_size))
       tr_logAddDebug ("Preallocated file \"%s\"", filename);
 
   /* we can't resize the file w/o write permissions */
-  resize_needed = already_existed && (file_size < (uint64_t)sb.st_size);
+  resize_needed = already_existed && (file_size < info.size);
   writable |= resize_needed;
 
   /* open the file */

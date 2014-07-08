@@ -21,6 +21,7 @@
 #include "cache.h"
 #include "completion.h"
 #include "crypto.h" /* tr_sha1 () */
+#include "file.h"
 #include "log.h"
 #include "peer-io.h"
 #include "peer-mgr.h"
@@ -288,7 +289,7 @@ myDebug (const char * file, int line,
       va_list           args;
       char              timestr[64];
       struct evbuffer * buf = evbuffer_new ();
-      char *            base = tr_basename (file);
+      char *            base = tr_sys_path_basename (file, NULL);
       char *            message;
 
       evbuffer_add_printf (buf, "[%s] %s - %s [%s]: ",

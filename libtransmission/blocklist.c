@@ -26,12 +26,11 @@
 #ifndef _WIN32
  #include <sys/mman.h>
 #endif
-#include <sys/types.h>
-#include <sys/stat.h>
 #include <fcntl.h>
 
 #include "transmission.h"
 #include "blocklist.h"
+#include "file.h"
 #include "log.h"
 #include "net.h"
 #include "utils.h"
@@ -80,13 +79,17 @@ blocklistLoad (tr_blocklistFile * b)
 {
   int fd;
   size_t byteCount;
-  struct stat st;
+  tr_sys_path_info info;
   char * base;
   const char * err_fmt = _("Couldn't read \"%1$s\": %2$s");
 
   blocklistClose (b);
 
-  if (stat (b->filename, &st) == -1)
+  if (!tr_sys_path_get_info (b->filename, 0, &info, NULL))
+    return;
+
+  byteCount = (size_t) info.size;
+  if (byteCount == 0)
     return;
 
   fd = open (b->filename, O_RDONLY | O_BINARY);
@@ -96,7 +99,6 @@ blocklistLoad (tr_blocklistFile * b)
       return;
     }
 
-  byteCount = (size_t) st.st_size;
   b->rules = mmap (NULL, byteCount, PROT_READ, MAP_PRIVATE, fd, 0);
   if (!b->rules)
     {
@@ -109,7 +111,7 @@ blocklistLoad (tr_blocklistFile * b)
   b->byteCount = byteCount;
   b->ruleCount = byteCount / sizeof (struct tr_ipv4_range);
 
-  base = tr_basename (b->filename);
+  base = tr_sys_path_basename (b->filename, NULL);
   tr_logAddInfo (_("Blocklist \"%s\" contains %"TR_PRIuSIZE" entries"), base, b->ruleCount);
   tr_free (base);
 }
@@ -136,7 +138,7 @@ static void
 blocklistDelete (tr_blocklistFile * b)
 {
   blocklistClose (b);
-  tr_remove (b->filename);
+  tr_sys_path_remove (b->filename, NULL);
 }
 
 /***
@@ -173,7 +175,7 @@ tr_blocklistFileFree (tr_blocklistFile * b)
 bool
 tr_blocklistFileExists (const tr_blocklistFile * b)
 {
-  return tr_fileExists (b->filename, NULL);
+  return tr_sys_path_exists (b->filename, NULL);
 }
 
 int
@@ -416,7 +418,7 @@ tr_blocklistFileSetContent (tr_blocklistFile * b, const char * filename)
     }
   else
     {
-      char * base = tr_basename (b->filename);
+      char * base = tr_sys_path_basename (b->filename, NULL);
       tr_logAddInfo (_("Blocklist \"%s\" updated with %"TR_PRIuSIZE" entries"), base, ranges_count);
       tr_free (base);
     }

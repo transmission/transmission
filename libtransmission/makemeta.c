@@ -13,8 +13,6 @@
 #include <stdlib.h> /* qsort */
 #include <string.h> /* strcmp, strlen */
 
-#include <sys/types.h>
-#include <sys/stat.h>
 #include <unistd.h> /* read () */
 #include <dirent.h>
 
@@ -22,7 +20,9 @@
 
 #include "transmission.h"
 #include "crypto.h" /* tr_sha1 */
+#include "error.h"
 #include "fdlimit.h" /* tr_open_file_for_scanning () */
+#include "file.h"
 #include "log.h"
 #include "session.h"
 #include "makemeta.h"
@@ -47,24 +47,22 @@ getFiles (const char      * dir,
           const char      * base,
           struct FileList * list)
 {
-  int i;
   DIR * odir;
   char * buf;
-  struct stat sb;
-
-  sb.st_size = 0;
+  tr_sys_path_info info;
+  tr_error * error = NULL;
 
   buf = tr_buildPath (dir, base, NULL);
-  i = stat (buf, &sb);
-  if (i)
+  if (!tr_sys_path_get_info (buf, 0, &info, &error))
     {
       tr_logAddError (_("Torrent Creator is skipping file \"%s\": %s"),
-                buf, tr_strerror (errno));
+                      buf, error->message);
       tr_free (buf);
+      tr_error_free (error);
       return list;
     }
 
-  if (S_ISDIR (sb.st_mode) && ((odir = opendir (buf))))
+  if (info.type == TR_SYS_PATH_IS_DIRECTORY && ((odir = opendir (buf))))
     {
       struct dirent *d;
       for (d = readdir (odir); d != NULL; d = readdir (odir))
@@ -72,10 +70,10 @@ getFiles (const char      * dir,
           list = getFiles (buf, d->d_name, list);
       closedir (odir);
     }
-  else if (S_ISREG (sb.st_mode) && (sb.st_size > 0))
+  else if (info.type == TR_SYS_PATH_IS_FILE && info.size > 0)
     {
       struct FileList * node = tr_new (struct FileList, 1);
-      node->size = sb.st_size;
+      node->size = info.size;
       node->filename = tr_strdup (buf);
       node->next = list;
       list = node;
@@ -116,24 +114,21 @@ tr_metaInfoBuilderCreate (const char * topFileArg)
   int i;
   struct FileList * files;
   struct FileList * walk;
-  char topFile[TR_PATH_MAX];
   tr_metainfo_builder * ret = tr_new0 (tr_metainfo_builder, 1);
 
-  tr_realpath (topFileArg, topFile);
-
-  ret->top = tr_strdup (topFile);
+  ret->top = tr_sys_path_resolve (topFileArg, NULL);
 
   {
-    struct stat sb;
-    stat (topFile, &sb);
-    ret->isFolder = S_ISDIR (sb.st_mode);
+    tr_sys_path_info info;
+    ret->isFolder = tr_sys_path_get_info (ret->top, 0, &info, NULL) &&
+                    info.type == TR_SYS_PATH_IS_DIRECTORY;
   }
 
-  /* build a list of files containing topFile and,
+  /* build a list of files containing top file and,
      if it's a directory, all of its children */
   {
-    char * dir = tr_dirname (topFile);
-    char * base = tr_basename (topFile);
+    char * dir = tr_sys_path_dirname (ret->top, NULL);
+    char * base = tr_sys_path_basename (ret->top, NULL);
     files = getFiles (dir, base, NULL);
     tr_free (base);
     tr_free (dir);
@@ -375,7 +370,7 @@ makeInfoDict (tr_variant          * dict,
       tr_variantDictAddInt (dict, TR_KEY_length, builder->files[0].size);
     }
 
-  base = tr_basename (builder->top);
+  base = tr_sys_path_basename (builder->top, NULL);
   tr_variantDictAddStr (dict, TR_KEY_name, base);
   tr_free (base);
 

@@ -28,6 +28,7 @@
 #include <signal.h>
 
 #include <libtransmission/transmission.h>
+#include <libtransmission/file.h>
 #include <libtransmission/tr-getopt.h>
 #include <libtransmission/utils.h> /* tr_wait_msec */
 #include <libtransmission/variant.h>
@@ -265,11 +266,11 @@ main (int argc, char ** argv)
 
   if (tr_variantDictFindStr (&settings, TR_KEY_download_dir, &str, NULL))
     {
-      if (!tr_fileExists (str, NULL))
+      if (!tr_sys_path_exists (str, NULL))
         {
           tr_mkdirp (str, 0700);
 
-          if (!tr_fileExists (str, NULL))
+          if (!tr_sys_path_exists (str, NULL))
             {
               fprintf (stderr, "Unable to create download directory \"%s\"!\n", str);
               return EXIT_FAILURE;

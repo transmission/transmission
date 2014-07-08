@@ -106,11 +106,6 @@ const char * tr_strip_positional_args (const char * fmt);
  */
 bool tr_wildmat (const char * text, const char * pattern) TR_GNUC_NONNULL (1,2);
 
-/** @brief Portability wrapper for basename () that uses the system implementation if available */
-char* tr_basename (const char * path) TR_GNUC_MALLOC;
-
-/** @brief Portability wrapper for dirname () that uses the system implementation if available */
-char* tr_dirname (const char * path) TR_GNUC_MALLOC;
 
 /**
  * Like mkdir, but makes parent directories as needed.
@@ -136,8 +131,6 @@ uint8_t* tr_loadFile (const char * filename, size_t * size) TR_GNUC_MALLOC
            platform's correct directory separator. */
 char* tr_buildPath (const char * first_element, ...) TR_GNUC_NULL_TERMINATED
                                                       TR_GNUC_MALLOC;
-
-bool tr_fileExists (const char * filename, time_t * mtime);
 
 /**
  * @brief Get available disk space (in bytes) for the specified folder.
@@ -414,15 +407,6 @@ int tr_gettimeofday (struct timeval * tv);
 int tr_moveFile (const char * oldpath, const char * newpath,
                  bool * renamed) TR_GNUC_NONNULL (1,2);
 
-/** @brief Portability wrapper for rename () */
-int tr_rename (const char * oldpath_utf8, const char * newpath_utf8);
-
-/** @brief Portability wrapper for remove () */
-int tr_remove (const char * pathname_utf8);
-
-/** @brief Test to see if the two filenames point to the same file. */
-bool tr_is_same_file (const char * filename1, const char * filename2);
-
 /** @brief convenience function to remove an item from an array */
 void tr_removeElementFromArray (void         * array,
                                 unsigned int   index_to_remove,
@@ -450,22 +434,6 @@ static inline time_t tr_time (void) { return __tr_current_time; }
 
 /** @brief Private libtransmission function to update tr_time ()'s counter */
 static inline void tr_timeUpdate (time_t now) { __tr_current_time = now; }
-
-#ifdef _WIN32
- #include <windef.h> /* MAX_PATH */
- #define TR_PATH_MAX (MAX_PATH + 1)
-#else
- #include <limits.h> /* PATH_MAX */
- #ifdef PATH_MAX
-  #define TR_PATH_MAX PATH_MAX
- #else
-  #define TR_PATH_MAX 4096
- #endif
-#endif
-
-/** @brief Portability wrapper for realpath () that uses the system implementation if available.
-    @param resolved_path should be TR_PATH_MAX or larger */
-char* tr_realpath (const char *path, char * resolved_path);
 
 /** @brief Portability wrapper for htonll () that uses the system implementation if available */
 uint64_t tr_htonll (uint64_t);

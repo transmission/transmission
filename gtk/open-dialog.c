@@ -13,7 +13,7 @@
 #include <string.h>
 
 #include <libtransmission/transmission.h>
-#include <libtransmission/utils.h> /* tr_is_same_file () */
+#include <libtransmission/file.h> /* tr_sys_path_is_same () */
 
 #include "conf.h"
 #include "file-list.h"
@@ -188,7 +188,7 @@ sourceChanged (GtkFileChooserButton * b, gpointer gdata)
       int duplicate_id = 0;
       tr_torrent * torrent;
 
-      if (filename && (!o->filename || !tr_is_same_file (filename, o->filename)))
+      if (filename && (!o->filename || !tr_sys_path_is_same (filename, o->filename, NULL)))
         {
           g_free (o->filename);
           o->filename = g_strdup (filename);
@@ -229,7 +229,7 @@ downloadDirChanged (GtkFileChooserButton * b, gpointer gdata)
   struct OpenData * data = gdata;
   char * fname = gtk_file_chooser_get_filename (GTK_FILE_CHOOSER (b));
 
-  if (fname && (!data->downloadDir || !tr_is_same_file (fname, data->downloadDir)))
+  if (fname && (!data->downloadDir || !tr_sys_path_is_same (fname, data->downloadDir, NULL)))
     {
       g_free (data->downloadDir);
       data->downloadDir = g_strdup (fname);

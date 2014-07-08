@@ -13,6 +13,7 @@
 
 #include "transmission.h"
 #include "blocklist.h"
+#include "file.h"
 #include "net.h"
 #include "session.h" /* tr_sessionIsAddressBlocked() */
 #include "utils.h"
@@ -38,11 +39,11 @@ create_text_file (const char * path, const char * contents)
   FILE * fp;
   char * dir;
 
-  dir = tr_dirname (path);
+  dir = tr_sys_path_dirname (path, NULL);
   tr_mkdirp (dir, 0700);
   tr_free (dir);
 
-  tr_remove (path);
+  tr_sys_path_remove (path, NULL);
   fp = fopen (path, "w+");
   fprintf (fp, "%s", contents);
   fclose (fp);

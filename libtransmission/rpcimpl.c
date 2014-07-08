@@ -22,6 +22,7 @@
 #include "transmission.h"
 #include "completion.h"
 #include "fdlimit.h"
+#include "file.h"
 #include "log.h"
 #include "platform-quota.h" /* tr_device_info_get_free_space() */
 #include "rpcimpl.h"
@@ -1556,7 +1557,7 @@ gotNewBlocklist (tr_session       * session,
           tr_snprintf (result, sizeof (result), "success");
         }
 
-      tr_remove (filename);
+      tr_sys_path_remove (filename, NULL);
       tr_free (filename);
       tr_free (buf);
     }

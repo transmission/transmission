@@ -22,6 +22,8 @@
 #include <event2/event.h>
 
 #include <libtransmission/transmission.h>
+#include <libtransmission/error.h>
+#include <libtransmission/file.h>
 #include <libtransmission/tr-getopt.h>
 #include <libtransmission/log.h>
 #include <libtransmission/utils.h>
@@ -281,14 +283,19 @@ onFileAdded (tr_session * session, const char * dir, const char * file)
 
             if (!test && trash)
             {
+                tr_error * error = NULL;
+
                 tr_logAddInfo ("Deleting input .torrent file \"%s\"", file);
-                if (tr_remove (filename))
-                    tr_logAddError ("Error deleting .torrent file: %s", tr_strerror (errno));
+                if (!tr_sys_path_remove (filename, &error))
+                {
+                    tr_logAddError ("Error deleting .torrent file: %s", error->message);
+                    tr_error_free (error);
+                }
             }
             else
             {
                 char * new_filename = tr_strdup_printf ("%s.added", filename);
-                tr_rename (filename, new_filename);
+                tr_sys_path_rename (filename, new_filename, NULL);
                 tr_free (new_filename);
             }
         }
@@ -666,7 +673,7 @@ cleanup:
 
     /* cleanup */
     if (pidfile_created)
-        tr_remove (pid_filename);
+        tr_sys_path_remove (pid_filename, NULL);
     tr_variantFree (&settings);
     sd_notify (0, "STATUS=\n");
     return 0;

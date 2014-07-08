@@ -8,7 +8,9 @@
  */
 
 #include <errno.h> /* EINVAL */
+
 #include "transmission.h"
+#include "file.h"
 #include "magnet.h"
 #include "session.h" /* tr_sessionFindTorrentFile () */
 #include "torrent.h" /* tr_ctorGetSave () */
@@ -156,7 +158,7 @@ tr_ctorSetMetainfoFromFile (tr_ctor *    ctor,
                     name = NULL;
             if (!name || !*name)
             {
-                char * base = tr_basename (filename);
+                char * base = tr_sys_path_basename (filename, NULL);
                 tr_variantDictAddStr (info, TR_KEY_name, base);
                 tr_free (base);
             }

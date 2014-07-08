@@ -11,6 +11,7 @@
 
 #include "transmission.h"
 #include "completion.h"
+#include "file.h"
 #include "log.h"
 #include "metainfo.h" /* tr_metainfoGetBasename () */
 #include "peer-mgr.h" /* pex */
@@ -928,6 +929,6 @@ void
 tr_torrentRemoveResume (const tr_torrent * tor)
 {
   char * filename = getResumeFilename (tor);
-  tr_remove (filename);
+  tr_sys_path_remove (filename, NULL);
   tr_free (filename);
 }

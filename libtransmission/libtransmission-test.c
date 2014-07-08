@@ -14,6 +14,7 @@
 #include <unistd.h>
 
 #include "transmission.h"
+#include "file.h"
 #include "platform.h" /* TR_PATH_DELIMETER */
 #include "torrent.h"
 #include "trevent.h"
@@ -115,8 +116,7 @@ runTests (const testFunc * const tests, int numTests)
 ****
 ***/
 
-#include <sys/types.h> /* stat(), opendir() */
-#include <sys/stat.h> /* stat() */
+#include <sys/types.h> /* opendir() */
 #include <dirent.h> /* opendir() */
 #include <unistd.h> /* getcwd() */
 
@@ -163,13 +163,13 @@ libtest_sandbox_create (void)
 static void
 rm_rf (const char * killme)
 {
-  struct stat sb;
+  tr_sys_path_info info;
 
-  if (!stat (killme, &sb))
+  if (tr_sys_path_get_info (killme, 0, &info, NULL))
     {
       DIR * odir;
 
-      if (S_ISDIR (sb.st_mode) && ((odir = opendir (killme))))
+      if (info.type == TR_SYS_PATH_IS_DIRECTORY && ((odir = opendir (killme))))
         {
           struct dirent *d;
           for (d = readdir(odir); d != NULL; d=readdir(odir))
@@ -187,7 +187,7 @@ rm_rf (const char * killme)
       if (verbose)
         fprintf (stderr, "cleanup: removing %s\n", killme);
 
-      tr_remove (killme);
+      tr_sys_path_remove (killme, NULL);
     }
 }
 
@@ -377,13 +377,12 @@ libttest_zero_torrent_populate (tr_torrent * tor, bool complete)
       char * path;
       char * dirname;
       const tr_file * file = &tor->info.files[i];
-      struct stat sb;
 
       if (!complete && (i==0))
         path = tr_strdup_printf ("%s%c%s.part", tor->currentDir, TR_PATH_DELIMITER, file->name);
       else
         path = tr_strdup_printf ("%s%c%s", tor->currentDir, TR_PATH_DELIMITER, file->name);
-      dirname = tr_dirname (path);
+      dirname = tr_sys_path_dirname (path, NULL);
       tr_mkdirp (dirname, 0700);
       fp = fopen (path, "wb+");
       for (j=0; j<file->length; ++j)
@@ -396,9 +395,7 @@ libttest_zero_torrent_populate (tr_torrent * tor, bool complete)
       path = tr_torrentFindFile (tor, i);
       assert (path != NULL);
       err = errno;
-      errno = 0;
-      stat (path, &sb);
-      assert (errno == 0);
+      assert (tr_sys_path_exists (path, NULL));
       errno = err; 
       tr_free (path);
     }
@@ -441,7 +438,7 @@ build_parent_dir (const char* path)
   char * dir;
   const int tmperr = errno;
 
-  dir = tr_dirname (path);
+  dir = tr_sys_path_dirname (path, NULL);
   errno = 0;
   tr_mkdirp (dir, 0700);
   assert (errno == 0);
@@ -458,7 +455,7 @@ libtest_create_file_with_contents (const char* path, const void* payload, size_t
 
   build_parent_dir (path);
 
-  tr_remove (path);
+  tr_sys_path_remove (path, NULL);
   fp = fopen (path, "wb");
   fwrite (payload, 1, n, fp);
   fclose (fp);

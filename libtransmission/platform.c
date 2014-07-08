@@ -17,7 +17,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h> /* getuid(), close() */
-#include <sys/stat.h>
 
 #ifdef _WIN32
  #include <w32api.h>
@@ -39,10 +38,11 @@
 #endif
 
 #include "transmission.h"
-#include "session.h"
+#include "file.h"
 #include "list.h"
 #include "log.h"
 #include "platform.h"
+#include "session.h"
 
 /***
 ****  THREADS
@@ -399,9 +399,8 @@ tr_getDefaultDownloadDir (void)
 static int
 isWebClientDir (const char * path)
 {
-  struct stat sb;
   char * tmp = tr_buildPath (path, "index.html", NULL);
-  const int ret = !stat (tmp, &sb);
+  const bool ret = tr_sys_path_exists (tmp, NULL);
   tr_logAddInfo (_("Searching for web interface file \"%s\""), tmp);
   tr_free (tmp);
 
@@ -490,8 +489,11 @@ tr_getWebClientDir (const tr_session * session UNUSED)
 
             if (s == NULL) /* check calling module place */
               {
+                char * tmp;
                 GetModuleFileName (GetModuleHandle (NULL), dir, sizeof (dir));
-                s = tr_buildPath (dirname (dir), "Web", NULL);
+                tmp = tr_sys_path_dirname (dir, NULL);
+                s = tr_buildPath (tmp, "Web", NULL);
+                tr_free (tmp);
                 if (!isWebClientDir (s))
                   {
                     tr_free (s);
