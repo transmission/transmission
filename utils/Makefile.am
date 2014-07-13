@@ -7,9 +7,6 @@ AM_CFLAGS = \
     @ZLIB_CFLAGS@ \
     @PTHREAD_CFLAGS@
 
-AM_LDFLAGS = \
-    @ZLIB_LDFLAGS@
-
 bin_PROGRAMS = \
     transmission-create \
     transmission-edit \

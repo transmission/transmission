@@ -161,9 +161,6 @@ TESTS = \
 
 noinst_PROGRAMS = $(TESTS)
 
-apps_ldflags = \
-  @ZLIB_LDFLAGS@
-
 apps_ldadd = \
   ./libtransmission.a  \
   @LIBUPNP_LIBS@ \

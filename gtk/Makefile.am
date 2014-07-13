@@ -25,9 +25,6 @@ AM_CFLAGS = \
     @ZLIB_CFLAGS@ \
     @PTHREAD_CFLAGS@
 
-AM_LDFLAGS = \
-    @ZLIB_LDFLAGS@
-
 noinst_HEADERS = \
     actions.h \
     conf.h \

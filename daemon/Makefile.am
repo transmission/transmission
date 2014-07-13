@@ -8,9 +8,6 @@ AM_CFLAGS = \
     @ZLIB_CFLAGS@ \
     @PTHREAD_CFLAGS@
 
-AM_LDFLAGS = \
-    @ZLIB_LDFLAGS@
-
 EXTRA_DIST = \
     transmission-daemon.service
 
