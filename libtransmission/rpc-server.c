@@ -13,9 +13,7 @@
 
 #include <unistd.h>    /* close */
 
-#ifdef HAVE_ZLIB
- #include <zlib.h>
-#endif
+#include <zlib.h>
 
 #include <event2/buffer.h>
 #include <event2/event.h>
@@ -67,10 +65,8 @@ struct tr_rpc_server
     char             * sessionId;
     time_t             sessionIdExpiresAt;
 
-#ifdef HAVE_ZLIB
     bool               isStreamInitialized;
     z_stream           stream;
-#endif
 };
 
 #define dbgmsg(...) \
@@ -331,9 +327,6 @@ add_response (struct evhttp_request * req,
               struct evbuffer       * out,
               struct evbuffer       * content)
 {
-#ifndef HAVE_ZLIB
-  evbuffer_add_buffer (out, content);
-#else
   const char * key = "Accept-Encoding";
   const char * encoding = evhttp_find_header (req->input_headers, key);
   const int do_compress = encoding && strstr (encoding, "gzip");
@@ -400,7 +393,6 @@ add_response (struct evhttp_request * req,
       evbuffer_commit_space (out, iovec, 1);
       deflateReset (&server->stream);
     }
-#endif
 }
 
 static void
@@ -923,10 +915,8 @@ closeServer (void * vserver)
   stopServer (s);
   while ((tmp = tr_list_pop_front (&s->whitelist)))
     tr_free (tmp);
-#ifdef HAVE_ZLIB
   if (s->isStreamInitialized)
     deflateEnd (&s->stream);
-#endif
   tr_free (s->url);
   tr_free (s->sessionId);
   tr_free (s->whitelistStr);

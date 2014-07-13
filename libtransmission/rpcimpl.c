@@ -13,9 +13,7 @@
 #include <stdlib.h> /* strtol */
 #include <string.h> /* strcmp */
 
-#ifdef HAVE_ZLIB
- #include <zlib.h>
-#endif
+#include <zlib.h>
 
 #include <event2/buffer.h>
 
