@@ -278,7 +278,7 @@ static tr_option opts[] =
     { 600, "reannounce",             "Reannounce the current torrent(s)", NULL,  0, NULL },
     { 'r', "remove",                 "Remove the current torrent(s)", "r",  0, NULL },
     { 930, "peers",                  "Set the maximum number of peers for the current torrent(s) or globally", "pr", 1, "<max>" },
-    { 'R', "remove-and-delete",      "Remove the current torrent(s) and delete local data", "R", 0, NULL },
+    { 'R', "remove-and-delete",      "Remove the current torrent(s) and delete local data", NULL, 0, NULL },
     { 800, "torrent-done-script",    "Specify a script to run when a torrent finishes", NULL, 1, "<file>" },
     { 801, "no-torrent-done-script", "Don't run a script when torrents finish", NULL, 0, NULL },
     { 950, "seedratio",              "Let the current torrent(s) seed until a specific ratio", "sr", 1, "ratio" },
