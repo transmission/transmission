@@ -77,12 +77,6 @@ void tr_lockUnlock (tr_lock *);
 /** @brief return nonzero if the specified lock is locked */
 int tr_lockHave (const tr_lock *);
 
-#ifdef _WIN32
-void * mmap (void *ptr, long  size, long  prot, long  type, long  handle, long  arg);
-
-long munmap (void *ptr, long  size);
-#endif
-
 /* @} */
 
 #endif

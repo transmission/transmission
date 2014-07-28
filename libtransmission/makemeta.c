@@ -9,11 +9,9 @@
 
 #include <assert.h>
 #include <errno.h>
-#include <stdio.h> /* FILE, stderr */
 #include <stdlib.h> /* qsort */
 #include <string.h> /* strcmp, strlen */
 
-#include <unistd.h> /* read () */
 #include <dirent.h>
 
 #include <event2/util.h> /* evutil_ascii_strcasecmp () */
@@ -21,7 +19,6 @@
 #include "transmission.h"
 #include "crypto.h" /* tr_sha1 */
 #include "error.h"
-#include "fdlimit.h" /* tr_open_file_for_scanning () */
 #include "file.h"
 #include "log.h"
 #include "session.h"
@@ -228,7 +225,8 @@ getHashInfo (tr_metainfo_builder * b)
   uint8_t *buf;
   uint64_t totalRemain;
   uint64_t off = 0;
-  int fd;
+  tr_sys_file_t fd;
+  tr_error * error = NULL;
 
   if (!b->totalSize)
     return ret;
@@ -236,16 +234,18 @@ getHashInfo (tr_metainfo_builder * b)
   buf = tr_valloc (b->pieceSize);
   b->pieceIndex = 0;
   totalRemain = b->totalSize;
-  fd = tr_open_file_for_scanning (b->files[fileIndex].filename);
-  if (fd < 0)
+  fd = tr_sys_file_open (b->files[fileIndex].filename, TR_SYS_FILE_READ |
+                         TR_SYS_FILE_SEQUENTIAL, 0, &error);
+  if (fd == TR_BAD_SYS_FILE)
     {
-      b->my_errno = errno;
+      b->my_errno = error->code;
       tr_strlcpy (b->errfile,
                   b->files[fileIndex].filename,
                   sizeof (b->errfile));
       b->result = TR_MAKEMETA_IO_READ;
       tr_free (buf);
       tr_free (ret);
+      tr_error_free (error);
       return NULL;
     }
 
@@ -253,34 +253,37 @@ getHashInfo (tr_metainfo_builder * b)
     {
       uint8_t * bufptr = buf;
       const uint32_t thisPieceSize = (uint32_t) MIN (b->pieceSize, totalRemain);
-      uint32_t leftInPiece = thisPieceSize;
+      uint64_t leftInPiece = thisPieceSize;
 
       assert (b->pieceIndex < b->pieceCount);
 
       while (leftInPiece)
         {
-          const size_t n_this_pass = (size_t) MIN ((b->files[fileIndex].size - off), leftInPiece);
-          const ssize_t n_read = read (fd, bufptr, n_this_pass);
+          const uint64_t n_this_pass = MIN (b->files[fileIndex].size - off, leftInPiece);
+          uint64_t n_read = 0;
+          tr_sys_file_read (fd, bufptr, n_this_pass, &n_read, NULL);
           bufptr += n_read;
           off += n_read;
           leftInPiece -= n_read;
           if (off == b->files[fileIndex].size)
             {
               off = 0;
-              tr_close_file (fd);
-              fd = -1;
+              tr_sys_file_close (fd, NULL);
+              fd = TR_BAD_SYS_FILE;
               if (++fileIndex < b->fileCount)
                 {
-                  fd = tr_open_file_for_scanning (b->files[fileIndex].filename);
-                  if (fd < 0)
+                  fd = tr_sys_file_open (b->files[fileIndex].filename, TR_SYS_FILE_READ |
+                                         TR_SYS_FILE_SEQUENTIAL, 0, &error);
+                  if (fd == TR_BAD_SYS_FILE)
                     {
-                      b->my_errno = errno;
+                      b->my_errno = error->code;
                       tr_strlcpy (b->errfile,
                                   b->files[fileIndex].filename,
                                   sizeof (b->errfile));
                       b->result = TR_MAKEMETA_IO_READ;
                       tr_free (buf);
                       tr_free (ret);
+                      tr_error_free (error);
                       return NULL;
                     }
                 }
@@ -306,8 +309,8 @@ getHashInfo (tr_metainfo_builder * b)
         || (walk - ret == (int)(SHA_DIGEST_LENGTH * b->pieceCount)));
   assert (b->abortFlag || !totalRemain);
 
-  if (fd >= 0)
-    tr_close_file (fd);
+  if (fd != TR_BAD_SYS_FILE)
+    tr_sys_file_close (fd, NULL);
 
   tr_free (buf);
   return ret;

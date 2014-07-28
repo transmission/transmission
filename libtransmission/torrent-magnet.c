@@ -155,19 +155,19 @@ tr_torrentGetMetadataPiece (tr_torrent * tor, int piece, int * len)
 
   if (tr_torrentHasMetadata (tor))
     {
-      FILE * fp;
+      tr_sys_file_t fd;
 
       ensureInfoDictOffsetIsCached (tor);
 
       assert (tor->infoDictLength > 0);
       assert (tor->infoDictOffset >= 0);
 
-      fp = fopen (tor->info.torrent, "rb");
-      if (fp != NULL)
+      fd = tr_sys_file_open (tor->info.torrent, TR_SYS_FILE_READ, 0, NULL);
+      if (fd != TR_BAD_SYS_FILE)
         {
           const int o = piece  * METADATA_PIECE_SIZE;
 
-          if (!fseek (fp, tor->infoDictOffset + o, SEEK_SET))
+          if (tr_sys_file_seek (fd, tor->infoDictOffset + o, TR_SEEK_SET, NULL, NULL))
             {
               const int l = o + METADATA_PIECE_SIZE <= tor->infoDictLength
                           ? METADATA_PIECE_SIZE
@@ -176,8 +176,8 @@ tr_torrentGetMetadataPiece (tr_torrent * tor, int piece, int * len)
               if (0<l && l<=METADATA_PIECE_SIZE)
                 {
                   char * buf = tr_new (char, l);
-                  const int n = fread (buf, 1, l, fp);
-                  if (n == l)
+                  uint64_t n;
+                  if (tr_sys_file_read (fd, buf, l, &n, NULL) && n == (unsigned int) l)
                     {
                       *len = l;
                       ret = buf;
@@ -188,7 +188,7 @@ tr_torrentGetMetadataPiece (tr_torrent * tor, int piece, int * len)
                 }
             }
 
-          fclose (fp);
+          tr_sys_file_close (fd, NULL);
         }
     }
 

@@ -12,6 +12,7 @@
 #endif
 
 #include "transmission.h"
+#include "file.h"
 #include "net.h"
 
 /**
@@ -22,21 +23,6 @@
 /***
 ****
 ***/
-
-void tr_set_file_for_single_pass (int fd);
-
-int tr_open_file_for_scanning (const char * filename);
-
-int tr_open_file_for_writing (const char * filename);
-
-void tr_close_file (int fd);
-
-int tr_fsync (int fd);
-
-ssize_t tr_pread (int fd, void *buf, size_t count, off_t offset);
-ssize_t tr_pwrite (int fd, const void *buf, size_t count, off_t offset);
-int tr_prefetch (int fd, off_t offset, size_t count);
-
 
 /**
  * Returns an fd to the specified filename.
@@ -49,22 +35,22 @@ int tr_prefetch (int fd, off_t offset, size_t count);
  * - if do_write is true, the target file is created if necessary.
  *
  * on success, a file descriptor >= 0 is returned.
- * on failure, a -1 is returned and errno is set.
+ * on failure, a TR_BAD_SYS_FILE is returned and errno is set.
  *
  * @see tr_fdFileClose
  */
-int  tr_fdFileCheckout (tr_session             * session,
-                        int                      torrent_id,
-                        tr_file_index_t          file_num,
-                        const char             * filename,
-                        bool                     do_write,
-                        tr_preallocation_mode    preallocation_mode,
-                        uint64_t                 preallocation_file_size);
+tr_sys_file_t  tr_fdFileCheckout (tr_session             * session,
+                                  int                      torrent_id,
+                                  tr_file_index_t          file_num,
+                                  const char             * filename,
+                                  bool                     do_write,
+                                  tr_preallocation_mode    preallocation_mode,
+                                  uint64_t                 preallocation_file_size);
 
-int tr_fdFileGetCached (tr_session             * session,
-                        int                      torrent_id,
-                        tr_file_index_t          file_num,
-                        bool                  doWrite);
+tr_sys_file_t tr_fdFileGetCached (tr_session             * session,
+                                  int                      torrent_id,
+                                  tr_file_index_t          file_num,
+                                  bool                     doWrite);
 
 bool tr_fdFileGetCachedMTime (tr_session       * session,
                               int                torrent_id,

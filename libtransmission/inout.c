@@ -16,7 +16,9 @@
 
 #include "transmission.h"
 #include "cache.h" /* tr_cacheReadBlock () */
+#include "error.h"
 #include "fdlimit.h"
+#include "file.h"
 #include "inout.h"
 #include "log.h"
 #include "peer-common.h" /* MAX_BLOCK_SIZE */
@@ -46,7 +48,7 @@ readOrWriteBytes (tr_session       * session,
                   void             * buf,
                   size_t             buflen)
 {
-  int fd;
+  tr_sys_file_t fd;
   int err = 0;
   const bool doWrite = ioMode >= TR_IO_WRITE;
   const tr_info * const info = &tor->info;
@@ -64,7 +66,7 @@ readOrWriteBytes (tr_session       * session,
   ***/
 
   fd = tr_fdFileGetCached (session, tr_torrentId (tor), fileIndex, doWrite);
-  if (fd < 0)
+  if (fd == TR_BAD_SYS_FILE)
     {
       /* it's not cached, so open/create it now */
       char * subpath;
@@ -94,7 +96,7 @@ readOrWriteBytes (tr_session       * session,
                              : tor->session->preallocationMode;
           if (((fd = tr_fdFileCheckout (session, tor->uniqueId, fileIndex,
                                         filename, doWrite,
-                                        prealloc, file->length))) < 0)
+                                        prealloc, file->length))) == TR_BAD_SYS_FILE)
             {
               err = errno;
               tr_logAddTorErr (tor, "tr_fdFileCheckout failed for \"%s\": %s",
@@ -118,27 +120,29 @@ readOrWriteBytes (tr_session       * session,
 
   if (!err)
     {
+      tr_error * error = NULL;
+
       if (ioMode == TR_IO_READ)
         {
-          const int rc = tr_pread (fd, buf, buflen, fileOffset);
-          if (rc < 0)
+          if (!tr_sys_file_read_at (fd, buf, buflen, fileOffset, NULL, &error))
             {
-              err = errno;
-              tr_logAddTorErr (tor, "read failed for \"%s\": %s", file->name, tr_strerror (err));
+              err = error->code;
+              tr_logAddTorErr (tor, "read failed for \"%s\": %s", file->name, error->message);
+              tr_error_free (error);
             }
         }
       else if (ioMode == TR_IO_WRITE)
         {
-          const int rc = tr_pwrite (fd, buf, buflen, fileOffset);
-          if (rc < 0)
+          if (!tr_sys_file_write_at (fd, buf, buflen, fileOffset, NULL, &error))
             {
-              err = errno;
-              tr_logAddTorErr (tor, "write failed for \"%s\": %s", file->name, tr_strerror (err));
+              err = error->code;
+              tr_logAddTorErr (tor, "write failed for \"%s\": %s", file->name, error->message);
+              tr_error_free (error);
             }
         }
       else if (ioMode == TR_IO_PREFETCH)
         {
-          tr_prefetch (fd, fileOffset, buflen);
+          tr_sys_file_prefetch (fd, fileOffset, buflen, NULL);
         }
       else
         {

@@ -11,8 +11,6 @@
 #include <errno.h>
 #include <string.h> /* memcpy */
 
-#include <unistd.h>    /* close */
-
 #include <zlib.h>
 
 #include <event2/buffer.h>

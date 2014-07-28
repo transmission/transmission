@@ -14,6 +14,7 @@
 #include <unistd.h>
 
 #include "transmission.h"
+#include "error.h"
 #include "file.h"
 #include "platform.h" /* TR_PATH_DELIMETER */
 #include "torrent.h"
@@ -373,7 +374,7 @@ libttest_zero_torrent_populate (tr_torrent * tor, bool complete)
     {
       int err;
       uint64_t j;
-      FILE * fp;
+      tr_sys_file_t fd;
       char * path;
       char * dirname;
       const tr_file * file = &tor->info.files[i];
@@ -384,10 +385,10 @@ libttest_zero_torrent_populate (tr_torrent * tor, bool complete)
         path = tr_strdup_printf ("%s%c%s", tor->currentDir, TR_PATH_DELIMITER, file->name);
       dirname = tr_sys_path_dirname (path, NULL);
       tr_mkdirp (dirname, 0700);
-      fp = fopen (path, "wb+");
+      fd = tr_sys_file_open (path, TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE | TR_SYS_FILE_TRUNCATE, 0600, NULL);
       for (j=0; j<file->length; ++j)
-        fputc (((!complete) && (i==0) && (j<tor->info.pieceSize)) ? '\1' : '\0', fp);
-      fclose (fp);
+        tr_sys_file_write (fd, ((!complete) && (i==0) && (j<tor->info.pieceSize)) ? "\1" : "\0", 1, NULL, NULL);
+      tr_sys_file_close (fd, NULL);
 
       tr_free (dirname);
       tr_free (path);
@@ -450,15 +451,14 @@ build_parent_dir (const char* path)
 void
 libtest_create_file_with_contents (const char* path, const void* payload, size_t n)
 {
-  FILE * fp;
+  tr_sys_file_t fd;
   const int tmperr = errno;
 
   build_parent_dir (path);
 
-  tr_sys_path_remove (path, NULL);
-  fp = fopen (path, "wb");
-  fwrite (payload, 1, n, fp);
-  fclose (fp);
+  fd = tr_sys_file_open (path, TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE | TR_SYS_FILE_TRUNCATE, 0600, NULL);
+  tr_sys_file_write (fd, payload, n, NULL, NULL);
+  tr_sys_file_close (fd, NULL);
 
   sync ();
 
@@ -474,24 +474,26 @@ libtest_create_file_with_string_contents (const char * path, const char* str)
 void
 libtest_create_tmpfile_with_contents (char* tmpl, const void* payload, size_t n)
 {
-  int fd;
+  tr_sys_file_t fd;
   const int tmperr = errno;
-  size_t n_left = n;
+  uint64_t n_left = n;
+  tr_error * error = NULL;
 
   build_parent_dir (tmpl);
 
-  fd = mkstemp (tmpl);
+  fd = tr_sys_file_open_temp (tmpl, NULL);
   while (n_left > 0)
     {
-      const ssize_t n = write (fd, payload, n_left);
-      if (n == -1)
+      uint64_t n;
+      if (!tr_sys_file_write (fd, payload, n_left, &n, &error))
         {
-          fprintf (stderr, "Error writing '%s': %s\n", tmpl, tr_strerror(errno));
+          fprintf (stderr, "Error writing '%s': %s\n", tmpl, error->message);
+          tr_error_free (error);
           break;
         }
       n_left -= n;
     }
-  close (fd);
+  tr_sys_file_close (fd, NULL);
 
   sync ();
 

@@ -7,38 +7,16 @@
  * $Id$
  */
 
-#ifdef HAVE_POSIX_FADVISE
- #ifdef _XOPEN_SOURCE
-  #undef _XOPEN_SOURCE
- #endif
- #define _XOPEN_SOURCE 600
-#endif
-
 #include <assert.h>
 #include <errno.h>
 #include <inttypes.h>
 #include <string.h>
-#ifdef __APPLE__
- #include <fcntl.h>
-#endif
 
-#ifdef HAVE_FALLOCATE64
-  /* FIXME can't find the right #include voodoo to pick up the declaration.. */
-  extern int fallocate64 (int fd, int mode, uint64_t offset, uint64_t len);
-#endif
-
-#ifdef HAVE_XFS_XFS_H
- #include <xfs/xfs.h>
-#endif
-
-#include <sys/types.h>
-#include <sys/stat.h>
 #include <sys/time.h> /* getrlimit */
 #include <sys/resource.h> /* getrlimit */
-#include <fcntl.h> /* O_LARGEFILE posix_fadvise */
-#include <unistd.h> /* lseek (), write (), ftruncate (), pread (), pwrite (), etc */
 
 #include "transmission.h"
+#include "error.h"
 #include "fdlimit.h"
 #include "file.h"
 #include "log.h"
@@ -59,21 +37,8 @@
 ****
 ***/
 
-#ifndef O_LARGEFILE
- #define O_LARGEFILE 0
-#endif
-
-#ifndef O_BINARY
- #define O_BINARY 0
-#endif
-
-#ifndef O_SEQUENTIAL
- #define O_SEQUENTIAL 0
-#endif
-
-
 static bool
-preallocate_file_sparse (int fd, uint64_t length)
+preallocate_file_sparse (tr_sys_file_t fd, uint64_t length)
 {
   const char zero = '\0';
   bool success = 0;
@@ -81,15 +46,18 @@ preallocate_file_sparse (int fd, uint64_t length)
   if (!length)
     success = true;
 
-#ifdef HAVE_FALLOCATE64
-  if (!success) /* fallocate64 is always preferred, so try it first */
-    success = !fallocate64 (fd, 0, 0, length);
-#endif
+  if (!success)
+    success = tr_sys_file_preallocate (fd, length, TR_SYS_FILE_PREALLOC_SPARSE, NULL);
 
   if (!success) /* fallback: the old-style seek-and-write */
-    success = (lseek (fd, length-1, SEEK_SET) != -1)
-           && (write (fd, &zero, 1) != -1)
-           && (ftruncate (fd, length) != -1);
+    {
+      /* seek requires signed offset, so length should be in mod range */
+      assert (length < 0x7FFFFFFFFFFFFFFFULL);
+
+      success = tr_sys_file_seek (fd, length - 1, TR_SEEK_SET, NULL, NULL) &&
+                tr_sys_file_write (fd, &zero, 1, NULL, NULL) &&
+                tr_sys_file_truncate (fd, length, NULL);
+    }
 
   return success;
 }
@@ -99,53 +67,10 @@ preallocate_file_full (const char * filename, uint64_t length)
 {
   bool success = 0;
 
-#ifdef _WIN32
-
-  HANDLE hFile = CreateFile (filename, GENERIC_WRITE, 0, 0, CREATE_NEW, FILE_FLAG_RANDOM_ACCESS, 0);
-  if (hFile != INVALID_HANDLE_VALUE)
+  tr_sys_file_t fd = tr_sys_file_open (filename, TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE, 0666, NULL);
+  if (fd != TR_BAD_SYS_FILE)
     {
-      LARGE_INTEGER li;
-      li.QuadPart = length;
-      success = SetFilePointerEx (hFile, li, NULL, FILE_BEGIN) && SetEndOfFile (hFile);
-      CloseHandle (hFile);
-    }
-
-#else
-
-  int flags = O_RDWR | O_CREAT | O_LARGEFILE;
-  int fd = open (filename, flags, 0666);
-  if (fd >= 0)
-    {
-# ifdef HAVE_FALLOCATE64
-      if (!success)
-        success = !fallocate64 (fd, 0, 0, length);
-# endif
-# ifdef HAVE_XFS_XFS_H
-      if (!success && platform_test_xfs_fd (fd))
-        {
-          xfs_flock64_t fl;
-          fl.l_whence = 0;
-          fl.l_start = 0;
-          fl.l_len = length;
-          success = !xfsctl (NULL, fd, XFS_IOC_RESVSP64, &fl);
-        }
-# endif
-# ifdef __APPLE__
-      if (!success)
-        {
-          fstore_t fst;
-          fst.fst_flags = F_ALLOCATECONTIG;
-          fst.fst_posmode = F_PEOFPOSMODE;
-          fst.fst_offset = 0;
-          fst.fst_length = length;
-          fst.fst_bytesalloc = 0;
-          success = !fcntl (fd, F_PREALLOCATE, &fst);
-        }
-# endif
-# ifdef HAVE_POSIX_FALLOCATE
-      if (!success)
-        success = !posix_fallocate (fd, 0, length);
-# endif
+      success = tr_sys_file_preallocate (fd, length, 0, NULL);
 
       if (!success) /* if nothing else works, do it the old-fashioned way */
         {
@@ -154,137 +79,17 @@ preallocate_file_full (const char * filename, uint64_t length)
           success = true;
           while (success && (length > 0))
             {
-              const int thisPass = MIN (length, sizeof (buf));
-              success = write (fd, buf, thisPass) == thisPass;
+              const uint64_t thisPass = MIN (length, sizeof (buf));
+              uint64_t bytes_written;
+              success = tr_sys_file_write (fd, buf, thisPass, &bytes_written, NULL) && bytes_written == thisPass;
               length -= thisPass;
             }
         }
 
-      close (fd);
+      tr_sys_file_close (fd, NULL);
     }
-
-#endif
 
   return success;
-}
-
-
-/* portability wrapper for fsync (). */
-int
-tr_fsync (int fd)
-{
-#ifdef _WIN32
-  return _commit (fd);
-#else
-  return fsync (fd);
-#endif
-}
-
-
-/* Like pread and pwrite, except that the position is undefined afterwards.
-   And of course they are not thread-safe. */
-
-/* don't use pread/pwrite on old versions of uClibc because they're buggy.
- * https://trac.transmissionbt.com/ticket/3826 */
-#ifdef __UCLIBC__
-#define TR_UCLIBC_CHECK_VERSION(major,minor,micro) \
-  (__UCLIBC_MAJOR__ > (major) || \
-   (__UCLIBC_MAJOR__ == (major) && __UCLIBC_MINOR__ > (minor)) || \
-   (__UCLIBC_MAJOR__ == (major) && __UCLIBC_MINOR__ == (minor) && \
-      __UCLIBC_SUBLEVEL__ >= (micro)))
-#if !TR_UCLIBC_CHECK_VERSION (0,9,28)
- #undef HAVE_PREAD
- #undef HAVE_PWRITE
-#endif
-#endif
-
-#ifdef __APPLE__
- #define HAVE_PREAD
- #define HAVE_PWRITE
-#endif
-
-ssize_t
-tr_pread (int fd, void *buf, size_t count, off_t offset)
-{
-#ifdef HAVE_PREAD
-  return pread (fd, buf, count, offset);
-#else
-  const off_t lrc = lseek (fd, offset, SEEK_SET);
-  if (lrc < 0)
-    return -1;
-  return read (fd, buf, count);
-#endif
-}
-
-ssize_t
-tr_pwrite (int fd, const void *buf, size_t count, off_t offset)
-{
-#ifdef HAVE_PWRITE
-  return pwrite (fd, buf, count, offset);
-#else
-  const off_t lrc = lseek (fd, offset, SEEK_SET);
-  if (lrc < 0)
-    return -1;
-  return write (fd, buf, count);
-#endif
-}
-
-int
-tr_prefetch (int fd UNUSED, off_t offset UNUSED, size_t count UNUSED)
-{
-#ifdef HAVE_POSIX_FADVISE
-  return posix_fadvise (fd, offset, count, POSIX_FADV_WILLNEED);
-#elif defined (__APPLE__)
-  struct radvisory radv;
-  radv.ra_offset = offset;
-  radv.ra_count = count;
-  return fcntl (fd, F_RDADVISE, &radv);
-#else
-  return 0;
-#endif
-}
-
-void
-tr_set_file_for_single_pass (int fd)
-{
-  if (fd >= 0)
-    {
-      /* Set hints about the lookahead buffer and caching. It's okay
-         for these to fail silently, so don't let them affect errno */
-      const int err = errno;
-#ifdef HAVE_POSIX_FADVISE
-      posix_fadvise (fd, 0, 0, POSIX_FADV_SEQUENTIAL);
-#endif
-#ifdef __APPLE__
-      fcntl (fd, F_RDAHEAD, 1);
-      fcntl (fd, F_NOCACHE, 1);
-#endif
-      errno = err;
-    }
-}
-
-static int
-open_local_file (const char * filename, int flags)
-{
-  const int fd = open (filename, flags, 0666);
-  tr_set_file_for_single_pass (fd);
-  return fd;
-}
-int
-tr_open_file_for_writing (const char * filename)
-{
-  return open_local_file (filename, O_LARGEFILE|O_BINARY|O_CREAT|O_WRONLY);
-}
-int
-tr_open_file_for_scanning (const char * filename)
-{
-  return open_local_file (filename, O_LARGEFILE|O_BINARY|O_SEQUENTIAL|O_RDONLY);
-}
-
-void
-tr_close_file (int fd)
-{
-  close (fd);
 }
 
 /*****
@@ -296,7 +101,7 @@ tr_close_file (int fd)
 struct tr_cached_file
 {
   bool is_writable;
-  int fd;
+  tr_sys_file_t fd;
   int torrent_id;
   tr_file_index_t file_index;
   time_t used_at;
@@ -307,7 +112,7 @@ cached_file_is_open (const struct tr_cached_file * o)
 {
   assert (o != NULL);
 
-  return o->fd >= 0;
+  return o->fd != TR_BAD_SYS_FILE;
 }
 
 static void
@@ -315,14 +120,14 @@ cached_file_close (struct tr_cached_file * o)
 {
   assert (cached_file_is_open (o));
 
-  tr_close_file (o->fd);
-  o->fd = -1;
+  tr_sys_file_close (o->fd, NULL);
+  o->fd = TR_BAD_SYS_FILE;
 }
 
 /**
  * returns 0 on success, or an errno value on failure.
  * errno values include ENOENT if the parent folder doesn't exist,
- * plus the errno values set by tr_mkdirp () and open ().
+ * plus the errno values set by tr_mkdirp () and tr_sys_file_open ().
  */
 static int
 cached_file_open (struct tr_cached_file  * o,
@@ -335,6 +140,7 @@ cached_file_open (struct tr_cached_file  * o,
   tr_sys_path_info info;
   bool already_existed;
   bool resize_needed;
+  tr_error * error = NULL;
 
   /* create subfolders, if any */
   if (writable)
@@ -361,14 +167,15 @@ cached_file_open (struct tr_cached_file  * o,
   writable |= resize_needed;
 
   /* open the file */
-  flags = writable ? (O_RDWR | O_CREAT) : O_RDONLY;
-  flags |= O_LARGEFILE | O_BINARY | O_SEQUENTIAL;
-  o->fd = open (filename, flags, 0666);
+  flags = writable ? (TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE) : 0;
+  flags |= TR_SYS_FILE_READ | TR_SYS_FILE_SEQUENTIAL;
+  o->fd = tr_sys_file_open (filename, flags, 0666, &error);
 
-  if (o->fd == -1)
+  if (o->fd == TR_BAD_SYS_FILE)
     {
-      const int err = errno;
-      tr_logAddError (_("Couldn't open \"%1$s\": %2$s"), filename, tr_strerror (err));
+      const int err = error->code;
+      tr_logAddError (_("Couldn't open \"%1$s\": %2$s"), filename, error->message);
+      tr_error_free (error);
       return err;
     }
 
@@ -378,20 +185,16 @@ cached_file_open (struct tr_cached_file  * o,
    * http://trac.transmissionbt.com/ticket/2228
    * https://bugs.launchpad.net/ubuntu/+source/transmission/+bug/318249
    */
-  if (resize_needed && (ftruncate (o->fd, file_size) == -1))
+  if (resize_needed && !tr_sys_file_truncate (o->fd, file_size, &error))
     {
-      const int err = errno;
-      tr_logAddError (_("Couldn't truncate \"%1$s\": %2$s"), filename, tr_strerror (err));
+      const int err = error->code;
+      tr_logAddError (_("Couldn't truncate \"%1$s\": %2$s"), filename, error->message);
+      tr_error_free (error);
       return err;
     }
 
   if (writable && !already_existed && (allocation == TR_PREALLOCATE_SPARSE))
     preallocate_file_sparse (o->fd, file_size);
-
-  /* Many (most?) clients request blocks in ascending order,
-   * so increase the readahead buffer.
-   * Also, disable OS-level caching because "inactive memory" angers users. */
-  tr_set_file_for_single_pass (o->fd);
 
   return 0;
 }
@@ -410,7 +213,7 @@ static void
 fileset_construct (struct tr_fileset * set, int n)
 {
   struct tr_cached_file * o;
-  const struct tr_cached_file TR_CACHED_FILE_INIT = { 0, -1, 0, 0, 0 };
+  const struct tr_cached_file TR_CACHED_FILE_INIT = { false, TR_BAD_SYS_FILE, 0, 0, 0 };
 
   set->begin = tr_new (struct tr_cached_file, n);
   set->end = set->begin + n;
@@ -567,39 +370,33 @@ tr_fdFileClose (tr_session * s, const tr_torrent * tor, tr_file_index_t i)
       /* flush writable files so that their mtimes will be
        * up-to-date when this function returns to the caller... */
       if (o->is_writable)
-        tr_fsync (o->fd);
+        tr_sys_file_flush (o->fd, NULL);
 
       cached_file_close (o);
     }
 }
 
-int
+tr_sys_file_t
 tr_fdFileGetCached (tr_session * s, int torrent_id, tr_file_index_t i, bool writable)
 {
   struct tr_cached_file * o = fileset_lookup (get_fileset (s), torrent_id, i);
 
   if (!o || (writable && !o->is_writable))
-    return -1;
+    return TR_BAD_SYS_FILE;
 
   o->used_at = tr_time ();
   return o->fd;
 }
 
-#ifdef __APPLE__
- #define TR_STAT_MTIME(sb)((sb).st_mtimespec.tv_sec)
-#else
- #define TR_STAT_MTIME(sb)((sb).st_mtime)
-#endif
-
 bool
 tr_fdFileGetCachedMTime (tr_session * s, int torrent_id, tr_file_index_t i, time_t * mtime)
 {
   bool success;
-  struct stat sb;
+  tr_sys_path_info info;
   struct tr_cached_file * o = fileset_lookup (get_fileset (s), torrent_id, i);
 
-  if ((success = (o != NULL) && !fstat (o->fd, &sb)))
-    *mtime = TR_STAT_MTIME (sb);
+  if ((success = (o != NULL) && tr_sys_file_get_info (o->fd, &info, NULL)))
+    *mtime = info.last_modified_at;
 
   return success;
 }
@@ -612,8 +409,8 @@ tr_fdTorrentClose (tr_session * session, int torrent_id)
   fileset_close_torrent (get_fileset (session), torrent_id);
 }
 
-/* returns an fd on success, or a -1 on failure and sets errno */
-int
+/* returns an fd on success, or a TR_BAD_SYS_FILE on failure and sets errno */
+tr_sys_file_t
 tr_fdFileCheckout (tr_session             * session,
                    int                      torrent_id,
                    tr_file_index_t          i,
@@ -636,7 +433,7 @@ tr_fdFileCheckout (tr_session             * session,
       if (err)
         {
           errno = err;
-          return -1;
+          return TR_BAD_SYS_FILE;
         }
 
       dbgmsg ("opened '%s' writable %c", filename, writable?'y':'n');

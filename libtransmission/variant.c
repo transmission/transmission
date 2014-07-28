@@ -9,24 +9,20 @@
 
 #include <assert.h>
 #include <errno.h>
-#include <stdlib.h> /* strtod(), realloc(), qsort(), mkstemp() */
+#include <stdlib.h> /* strtod(), realloc(), qsort() */
 #include <string.h>
 
-#ifdef _WIN32 /* tr_mkstemp() */
- #include <fcntl.h>
+#ifdef _WIN32
  #include <share.h>
- #include <sys/stat.h>
 #endif
 
 #include <locale.h> /* setlocale() */
-#include <unistd.h> /* write() */
 
 #include <event2/buffer.h>
 
 #define __LIBTRANSMISSION_VARIANT_MODULE___
 #include "transmission.h"
 #include "ConvertUTF.h"  
-#include "fdlimit.h" /* tr_close_file() */
 #include "error.h"
 #include "file.h"
 #include "log.h"
@@ -1125,55 +1121,28 @@ tr_variantToStr (const tr_variant * v, tr_variant_fmt fmt, int * len)
   return ret;
 }
 
-/* portability wrapper for mkstemp(). */
-static int
-tr_mkstemp (char * template)
-{
-#ifdef _WIN32
-
-  const int n = strlen (template) + 1;
-  const int flags = O_RDWR | O_BINARY | O_CREAT | O_EXCL | _O_SHORT_LIVED;
-  const mode_t mode = _S_IREAD | _S_IWRITE;
-  wchar_t templateUTF16[n];
-
-  if (MultiByteToWideChar(CP_UTF8, 0, template, -1, templateUTF16, n))
-    {
-      _wmktemp(templateUTF16);
-      WideCharToMultiByte(CP_UTF8, 0, templateUTF16, -1, template, n, NULL, NULL);
-      return _wopen(chkFilename(templateUTF16), flags, mode);
-    }
-  errno = EINVAL;
-  return -1;
-
-#else
-
-  return mkstemp (template);
-
-#endif
-}
-
 int
 tr_variantToFile (const tr_variant  * v,
                   tr_variant_fmt      fmt,
                   const char        * filename)
 {
   char * tmp;
-  int fd;
+  tr_sys_file_t fd;
   int err = 0;
   char * real_filename;
+  tr_error * error = NULL;
 
   /* follow symlinks to find the "real" file, to make sure the temporary
-   * we build with tr_mkstemp() is created on the right partition */
+   * we build with tr_sys_file_open_temp() is created on the right partition */
   if ((real_filename = tr_sys_path_resolve (filename, NULL)) != NULL)
     filename = real_filename;
 
   /* if the file already exists, try to move it out of the way & keep it as a backup */
   tmp = tr_strdup_printf ("%s.tmp.XXXXXX", filename);
-  fd = tr_mkstemp (tmp);
-  tr_set_file_for_single_pass (fd);
-  if (fd >= 0)
+  fd = tr_sys_file_open_temp (tmp, &error);
+  if (fd != TR_BAD_SYS_FILE)
     {
-      int nleft;
+      uint64_t nleft;
 
       /* save the variant to a temporary file */
       {
@@ -1183,34 +1152,31 @@ tr_variantToFile (const tr_variant  * v,
 
         while (nleft > 0)
           {
-            const int n = write (fd, walk, nleft);
-            if (n >= 0)
+            uint64_t n;
+            if (!tr_sys_file_write (fd, walk, nleft, &n, &error))
               {
-                nleft -= n;
-                walk += n;
-              }
-            else if (errno != EAGAIN)
-              {
-                err = errno;
+                err = error->code;
                 break;
               }
+
+            nleft -= n;
+            walk += n;
           }
 
         evbuffer_free (buf);
       }
 
+      tr_sys_file_close (fd, NULL);
+
       if (nleft > 0)
         {
-          tr_logAddError (_("Couldn't save temporary file \"%1$s\": %2$s"), tmp, tr_strerror (err));
-          tr_close_file (fd);
+          tr_logAddError (_("Couldn't save temporary file \"%1$s\": %2$s"), tmp, error->message);
           tr_sys_path_remove (tmp, NULL);
+          tr_error_free (error);
         }
       else
         {
-          tr_error * error = NULL;
-
-          tr_close_file (fd);
-
+          tr_error_clear (&error);
           if (tr_sys_path_rename (tmp, filename, &error))
             {
               tr_logAddInfo (_("Saved \"%s\""), filename);
@@ -1226,8 +1192,9 @@ tr_variantToFile (const tr_variant  * v,
     }
   else
     {
-      err = errno;
-      tr_logAddError (_("Couldn't save temporary file \"%1$s\": %2$s"), tmp, tr_strerror (err));
+      err = error->code;
+      tr_logAddError (_("Couldn't save temporary file \"%1$s\": %2$s"), tmp, error->message);
+      tr_error_free (error);
     }
 
   tr_free (tmp);

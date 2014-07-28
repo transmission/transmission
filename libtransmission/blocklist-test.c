@@ -9,6 +9,7 @@
 
 #include <assert.h>
 #include <stdio.h>
+#include <string.h> /* strlen () */
 #include <unistd.h> /* sync() */
 
 #include "transmission.h"
@@ -36,17 +37,16 @@ static const char * contents2 =
 static void
 create_text_file (const char * path, const char * contents)
 {
-  FILE * fp;
+  tr_sys_file_t fd;
   char * dir;
 
   dir = tr_sys_path_dirname (path, NULL);
   tr_mkdirp (dir, 0700);
   tr_free (dir);
 
-  tr_sys_path_remove (path, NULL);
-  fp = fopen (path, "w+");
-  fprintf (fp, "%s", contents);
-  fclose (fp);
+  fd = tr_sys_file_open (path, TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE | TR_SYS_FILE_TRUNCATE, 0600, NULL);
+  tr_sys_file_write (fd, contents, strlen (contents), NULL, NULL);
+  tr_sys_file_close (fd, NULL);
 
   sync ();
 }

@@ -28,14 +28,14 @@
 #include <stdlib.h>
 #include <string.h> /* strerror (), memset (), memmem () */
 #include <time.h> /* nanosleep () */
+#include <sys/types.h>
+#include <sys/stat.h>
 
 #ifdef HAVE_ICONV_OPEN
  #include <iconv.h>
 #endif
 #include <sys/time.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <unistd.h> /* stat (), getpagesize () */
+#include <unistd.h> /* getpagesize () */
 
 #include <event2/buffer.h>
 #include <event2/event.h>
@@ -48,7 +48,6 @@
 
 #include "transmission.h"
 #include "error.h"
-#include "fdlimit.h"
 #include "file.h"
 #include "ConvertUTF.h"
 #include "list.h"
@@ -221,8 +220,7 @@ tr_loadFile (const char * path,
 {
   uint8_t * buf;
   tr_sys_path_info info;
-  int fd;
-  ssize_t n;
+  tr_sys_file_t fd;
   tr_error * error = NULL;
   const char * const err_fmt = _("Couldn't read \"%1$s\": %2$s");
 
@@ -248,11 +246,12 @@ tr_loadFile (const char * path,
     assert (info.size <= SIZE_MAX);
 
   /* Load the torrent file into our buffer */
-  fd = tr_open_file_for_scanning (path);
-  if (fd < 0)
+  fd = tr_sys_file_open (path, TR_SYS_FILE_READ | TR_SYS_FILE_SEQUENTIAL, 0, &error);
+  if (fd == TR_BAD_SYS_FILE)
     {
-      const int err = errno;
-      tr_logAddError (err_fmt, path, tr_strerror (errno));
+      const int err = error->code;
+      tr_logAddError (err_fmt, path, error->message);
+      tr_error_free (error);
       errno = err;
       return NULL;
     }
@@ -261,22 +260,22 @@ tr_loadFile (const char * path,
     {
       const int err = errno;
       tr_logAddError (err_fmt, path, _("Memory allocation failed"));
-      tr_close_file (fd);
+      tr_sys_file_close (fd, NULL);
       errno = err;
       return NULL;
     }
-  n = read (fd, buf, (size_t)info.size);
-  if (n == -1)
+  if (!tr_sys_file_read (fd, buf, info.size, NULL, &error))
     {
-      const int err = errno;
-      tr_logAddError (err_fmt, path, tr_strerror (errno));
-      tr_close_file (fd);
+      const int err = error->code;
+      tr_logAddError (err_fmt, path, error->message);
+      tr_sys_file_close (fd, NULL);
       free (buf);
+      tr_error_free (error);
       errno = err;
       return NULL;
     }
 
-  tr_close_file (fd);
+  tr_sys_file_close (fd, NULL);
   buf[info.size] = '\0';
   *size = info.size;
   return buf;
@@ -1544,11 +1543,11 @@ tr_strratio (char * buf, size_t buflen, double ratio, const char * infinity)
 int
 tr_moveFile (const char * oldpath, const char * newpath, bool * renamed)
 {
-  int in;
-  int out;
+  tr_sys_file_t in;
+  tr_sys_file_t out;
   char * buf;
   tr_sys_path_info info;
-  off_t bytesLeft;
+  uint64_t bytesLeft;
   const size_t buflen = 1024 * 128; /* 128 KiB buffer */
   tr_error * error = NULL;
 
@@ -1586,26 +1585,24 @@ tr_moveFile (const char * oldpath, const char * newpath, bool * renamed)
   }
 
   /* copy the file */
-  in = tr_open_file_for_scanning (oldpath);
-  out = tr_open_file_for_writing (newpath);
+  in = tr_sys_file_open (oldpath, TR_SYS_FILE_READ | TR_SYS_FILE_SEQUENTIAL, 0, NULL);
+  out = tr_sys_file_open (newpath, TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE | TR_SYS_FILE_TRUNCATE, 0666, NULL);
   buf = tr_valloc (buflen);
   while (bytesLeft > 0)
     {
-      ssize_t bytesWritten;
-      const off_t bytesThisPass = MIN (bytesLeft, (off_t)buflen);
-      const int numRead = read (in, buf, bytesThisPass);
-      if (numRead < 0)
+      const uint64_t bytesThisPass = MIN (bytesLeft, buflen);
+      uint64_t numRead, bytesWritten;
+      if (!tr_sys_file_read (in, buf, bytesThisPass, &numRead, NULL))
         break;
-      bytesWritten = write (out, buf, numRead);
-      if (bytesWritten < 0)
+      if (!tr_sys_file_write (out, buf, numRead, &bytesWritten, NULL))
         break;
       bytesLeft -= bytesWritten;
     }
 
   /* cleanup */
   tr_free (buf);
-  tr_close_file (out);
-  tr_close_file (in);
+  tr_sys_file_close (out, NULL);
+  tr_sys_file_close (in, NULL);
   if (bytesLeft != 0)
     return -1;
 

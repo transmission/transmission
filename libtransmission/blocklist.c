@@ -13,31 +13,13 @@
 #include <stdlib.h> /* bsearch (), qsort () */
 #include <string.h>
 
-#include <unistd.h> /* close () */
-
-#ifdef _WIN32
- #include <w32api.h>
- #define WINVER  WindowsXP
- #include <windows.h>
- #define PROT_READ      PAGE_READONLY
- #define MAP_PRIVATE    FILE_MAP_COPY
-#endif
-
-#ifndef _WIN32
- #include <sys/mman.h>
-#endif
-#include <fcntl.h>
-
 #include "transmission.h"
 #include "blocklist.h"
+#include "error.h"
 #include "file.h"
 #include "log.h"
 #include "net.h"
 #include "utils.h"
-
-#ifndef O_BINARY
- #define O_BINARY 0
-#endif
 
 
 /***
@@ -53,9 +35,9 @@ struct tr_ipv4_range
 struct tr_blocklistFile
 {
   bool                   isEnabled;
-  int                    fd;
+  tr_sys_file_t          fd;
   size_t                 ruleCount;
-  size_t                 byteCount;
+  uint64_t               byteCount;
   char *                 filename;
   struct tr_ipv4_range * rules;
 };
@@ -65,22 +47,23 @@ blocklistClose (tr_blocklistFile * b)
 {
   if (b->rules != NULL)
     {
-      munmap (b->rules, b->byteCount);
-      close (b->fd);
+      tr_sys_file_unmap (b->rules, b->byteCount, NULL);
+      tr_sys_file_close (b->fd, NULL);
       b->rules = NULL;
       b->ruleCount = 0;
       b->byteCount = 0;
-      b->fd = -1;
+      b->fd = TR_BAD_SYS_FILE;
     }
 }
 
 static void
 blocklistLoad (tr_blocklistFile * b)
 {
-  int fd;
-  size_t byteCount;
+  tr_sys_file_t fd;
+  uint64_t byteCount;
   tr_sys_path_info info;
   char * base;
+  tr_error * error = NULL;
   const char * err_fmt = _("Couldn't read \"%1$s\": %2$s");
 
   blocklistClose (b);
@@ -88,22 +71,24 @@ blocklistLoad (tr_blocklistFile * b)
   if (!tr_sys_path_get_info (b->filename, 0, &info, NULL))
     return;
 
-  byteCount = (size_t) info.size;
+  byteCount = info.size;
   if (byteCount == 0)
     return;
 
-  fd = open (b->filename, O_RDONLY | O_BINARY);
-  if (fd == -1)
+  fd = tr_sys_file_open (b->filename, TR_SYS_FILE_READ, 0, &error);
+  if (fd == TR_BAD_SYS_FILE)
     {
-      tr_logAddError (err_fmt, b->filename, tr_strerror (errno));
+      tr_logAddError (err_fmt, b->filename, error->message);
+      tr_error_free (error);
       return;
     }
 
-  b->rules = mmap (NULL, byteCount, PROT_READ, MAP_PRIVATE, fd, 0);
+  b->rules = tr_sys_file_map_for_reading (fd, 0, byteCount, &error);
   if (!b->rules)
     {
-      tr_logAddError (err_fmt, b->filename, tr_strerror (errno));
-      close (fd);
+      tr_logAddError (err_fmt, b->filename, error->message);
+      tr_sys_file_close (fd, NULL);
+      tr_error_free (error);
       return;
     }
 
@@ -151,7 +136,7 @@ tr_blocklistFileNew (const char * filename, bool isEnabled)
   tr_blocklistFile * b;
 
   b = tr_new0 (tr_blocklistFile, 1);
-  b->fd = -1;
+  b->fd = TR_BAD_SYS_FILE;
   b->filename = tr_strdup (filename);
   b->isEnabled = isEnabled;
 

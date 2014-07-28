@@ -19,6 +19,7 @@
 
 #include "transmission.h"
 #include "completion.h"
+#include "error.h"
 #include "fdlimit.h"
 #include "file.h"
 #include "log.h"
@@ -1487,13 +1488,14 @@ gotNewBlocklist (tr_session       * session,
     }
   else /* successfully fetched the blocklist... */
     {
-      int fd;
+      tr_sys_file_t fd;
       int err;
       char * filename;
       z_stream stream;
       const char * configDir = tr_sessionGetConfigDir (session);
       const size_t buflen = 1024 * 128; /* 128 KiB buffer */
       uint8_t * buf = tr_valloc (buflen);
+      tr_error * error = NULL;
 
       /* this is an odd Magic Number required by zlib to enable gz support.
          See zlib's inflateInit2 () documentation for a full description */
@@ -1506,10 +1508,13 @@ gotNewBlocklist (tr_session       * session,
       stream.avail_in = response_byte_count;
       inflateInit2 (&stream, windowBits);
 
-      filename = tr_buildPath (configDir, "blocklist.tmp", NULL);
-      fd = tr_open_file_for_writing (filename);
-      if (fd < 0)
-        tr_snprintf (result, sizeof (result), _("Couldn't save file \"%1$s\": %2$s"), filename, tr_strerror (errno));
+      filename = tr_buildPath (configDir, "blocklist.tmp.XXXXXX", NULL);
+      fd = tr_sys_file_open_temp (filename, &error);
+      if (fd == TR_BAD_SYS_FILE)
+        {
+          tr_snprintf (result, sizeof (result), _("Couldn't save file \"%1$s\": %2$s"), filename, error->message);
+          tr_error_clear (&error);
+        }
 
       for (;;)
         {
@@ -1519,10 +1524,10 @@ gotNewBlocklist (tr_session       * session,
 
           if (stream.avail_out < buflen)
             {
-              const int e = write (fd, buf, buflen - stream.avail_out);
-              if (e < 0)
+              if (!tr_sys_file_write (fd, buf, buflen - stream.avail_out, NULL, &error))
                 {
-                  tr_snprintf (result, sizeof (result), _("Couldn't save file \"%1$s\": %2$s"), filename, tr_strerror (errno));
+                  tr_snprintf (result, sizeof (result), _("Couldn't save file \"%1$s\": %2$s"), filename, error->message);
+                  tr_error_clear (&error);
                   break;
                 }
             }
@@ -1538,10 +1543,13 @@ gotNewBlocklist (tr_session       * session,
       inflateEnd (&stream);
 
       if (err == Z_DATA_ERROR) /* couldn't inflate it... it's probably already uncompressed */
-        if (write (fd, response, response_byte_count) < 0)
-          tr_snprintf (result, sizeof (result), _("Couldn't save file \"%1$s\": %2$s"), filename, tr_strerror (errno));
+        if (!tr_sys_file_write (fd, response, response_byte_count, NULL, &error))
+          {
+            tr_snprintf (result, sizeof (result), _("Couldn't save file \"%1$s\": %2$s"), filename, error->message);
+            tr_error_clear (&error);
+          }
 
-      tr_close_file(fd);
+      tr_sys_file_close (fd, NULL);
 
       if (*result)
         {
