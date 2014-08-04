@@ -48,6 +48,7 @@ typedef struct
     GtkWidget* scroll;
     GtkWidget* view;
     GtkWidget* toolbar;
+    GtkWidget* limit_popover;
     GtkWidget* filter;
     GtkWidget* status;
     GtkWidget* status_menu;
@@ -162,7 +163,13 @@ static void syncAltSpeedButton(PrivateData* p);
 
 static void prefsChanged(TrCore* core UNUSED, tr_quark const key, gpointer wind)
 {
+    GAction* action;
+    char const* action_name;
+
     gboolean isEnabled;
+    int limit;
+    size_t len;
+    double ratio;
     PrivateData* p = get_private_data(GTK_WINDOW(wind));
 
     printf("prefsChanges(%d)\n", key);
@@ -198,6 +205,36 @@ static void prefsChanged(TrCore* core UNUSED, tr_quark const key, gpointer wind)
 
     case TR_KEY_statusbar_stats:
         gtr_window_refresh(wind);
+        break;
+
+    case TR_KEY_speed_limit_down:
+        limit = gtr_pref_int_get(key);
+        tr_limit_popover_set_speed_limit_down(TR_LIMIT_POPOVER(p->limit_popover), limit);
+        break;
+
+    case TR_KEY_speed_limit_up:
+        limit = gtr_pref_int_get(key);
+        tr_limit_popover_set_speed_limit_up(TR_LIMIT_POPOVER(p->limit_popover), limit);
+        break;
+
+    case TR_KEY_ratio_limit:
+        ratio = gtr_pref_double_get(key);
+        tr_limit_popover_set_ratio_limit(TR_LIMIT_POPOVER(p->limit_popover), ratio);
+        break;
+
+    case TR_KEY_speed_limit_up_enabled:
+        isEnabled = gtr_pref_flag_get(key);
+        tr_limit_popover_set_speed_limit_up_enabled(TR_LIMIT_POPOVER(p->limit_popover), isEnabled);
+        break;
+
+    case TR_KEY_speed_limit_down_enabled:
+        isEnabled = gtr_pref_flag_get(key);
+        tr_limit_popover_set_speed_limit_down_enabled(TR_LIMIT_POPOVER(p->limit_popover), isEnabled);
+        break;
+
+    case TR_KEY_ratio_limit_enabled:
+        isEnabled = gtr_pref_flag_get(key);
+        tr_limit_popover_set_ratio_limit_enabled(TR_LIMIT_POPOVER(p->limit_popover), isEnabled);
         break;
 
     case TR_KEY_alt_speed_enabled:
@@ -279,71 +316,6 @@ static void onAltSpeedToggled(tr_session* s UNUSED, bool isEnabled UNUSED, bool 
 }
 
 /***
-****  Speed limit menu
-***/
-
-#define DIRECTION_KEY "direction-key"
-#define ENABLED_KEY "enabled-key"
-#define SPEED_KEY "speed-key"
-
-static void onSpeedToggled(GtkCheckMenuItem* check, gpointer vp)
-{
-    PrivateData* p = vp;
-    GObject* o = G_OBJECT(check);
-    gboolean isEnabled = g_object_get_data(o, ENABLED_KEY) != 0;
-    tr_direction dir = GPOINTER_TO_INT(g_object_get_data(o, DIRECTION_KEY));
-    tr_quark const key = dir == TR_UP ? TR_KEY_speed_limit_up_enabled : TR_KEY_speed_limit_down_enabled;
-
-    if (gtk_check_menu_item_get_active(check))
-    {
-        gtr_core_set_pref_bool(p->core, key, isEnabled);
-    }
-}
-
-static void onSpeedSet(GtkCheckMenuItem* check, gpointer vp)
-{
-    tr_quark key;
-    PrivateData* p = vp;
-    GObject* o = G_OBJECT(check);
-    int const KBps = GPOINTER_TO_INT(g_object_get_data(o, SPEED_KEY));
-    tr_direction dir = GPOINTER_TO_INT(g_object_get_data(o, DIRECTION_KEY));
-
-    key = dir == TR_UP ? TR_KEY_speed_limit_up : TR_KEY_speed_limit_down;
-    gtr_core_set_pref_int(p->core, key, KBps);
-
-    key = dir == TR_UP ? TR_KEY_speed_limit_up_enabled : TR_KEY_speed_limit_down_enabled;
-    gtr_core_set_pref_bool(p->core, key, TRUE);
-}
-
-/***
-****  Speed limit menu
-***/
-
-#define RATIO_KEY "stock-ratio-index"
-
-static double const stockRatios[] = { 0.25, 0.5, 0.75, 1, 1.5, 2, 3 };
-
-static void onRatioToggled(GtkCheckMenuItem* check, gpointer vp)
-{
-    PrivateData* p = vp;
-
-    if (gtk_check_menu_item_get_active(check))
-    {
-        gboolean f = g_object_get_data(G_OBJECT(check), ENABLED_KEY) != 0;
-        gtr_core_set_pref_bool(p->core, TR_KEY_ratio_limit_enabled, f);
-    }
-}
-
-static void onRatioSet(GtkCheckMenuItem* check, gpointer vp)
-{
-    PrivateData* p = vp;
-    int i = GPOINTER_TO_INT(g_object_get_data(G_OBJECT(check), RATIO_KEY));
-    double const ratio = stockRatios[i];
-    gtr_core_set_pref_double(p->core, TR_KEY_ratio_limit, ratio);
-    gtr_core_set_pref_bool(p->core, TR_KEY_ratio_limit_enabled, TRUE);
-}
-
-/***
 ****  Option menu
 ***/
 
@@ -418,6 +390,40 @@ static GMenuModel* get_statistics_menu_model(void)
 }
 
 /***
+****  Speed limit popover
+***/
+
+void on_ratio_limit(TrLimitPopover* popover, double ratio, gpointer vp)
+{
+    PrivateData* p = vp;
+
+    printf("on_ratio_limit %.02f\n", ratio);
+
+    gtr_core_set_pref_double(p->core, TR_KEY_ratio_limit, ratio);
+    gtr_core_set_pref_bool(p->core, TR_KEY_ratio_limit_enabled, TRUE);
+}
+
+void on_speed_limit_up(TrLimitPopover* popover, int limit, gpointer vp)
+{
+    PrivateData* p = vp;
+
+    printf("on_speed_limit_up %d\n", limit);
+
+    gtr_core_set_pref_int(p->core, TR_KEY_speed_limit_up, limit);
+    gtr_core_set_pref_bool(p->core, TR_KEY_speed_limit_up_enabled, TRUE);
+}
+
+void on_speed_limit_down(TrLimitPopover* popover, int limit, gpointer vp)
+{
+    PrivateData* p = vp;
+
+    printf("on_speed_limit_down %d\n", limit);
+
+    gtr_core_set_pref_int(p->core, TR_KEY_speed_limit_down, limit);
+    gtr_core_set_pref_bool(p->core, TR_KEY_speed_limit_down_enabled, TRUE);
+}
+
+/***
 ****  PUBLIC
 ***/
 
@@ -468,10 +474,13 @@ GtkWidget* gtr_status_bar_new(PrivateData *p)
 
     pop = gtk_popover_new(w);
 
-    box = tr_limit_popover_new();
-
+    p->limit_popover = box = tr_limit_popover_new();
     gtk_container_add(GTK_CONTAINER(pop), GTK_WIDGET(box));
     gtk_widget_show_all(box);
+
+    g_signal_connect(box, "speed-limit-up", G_CALLBACK(on_speed_limit_up), p);
+    g_signal_connect(box, "speed-limit-down", G_CALLBACK(on_speed_limit_down), p);
+    g_signal_connect(box, "ratio-limit", G_CALLBACK(on_ratio_limit), p);
 
     gtk_menu_button_set_popover(GTK_MENU_BUTTON(w), GTK_WIDGET(pop));
 
@@ -649,6 +658,16 @@ GtkWidget* gtr_window_new(GtkApplication* app, TrCore* core)
     prefsChanged(core, TR_KEY_statusbar_stats, self);
     prefsChanged(core, TR_KEY_show_toolbar, self);
     prefsChanged(core, TR_KEY_alt_speed_enabled, self);
+
+    prefsChanged(core, TR_KEY_speed_limit_down, self);
+    prefsChanged(core, TR_KEY_speed_limit_down_enabled, self);
+
+    prefsChanged(core, TR_KEY_speed_limit_up, self);
+    prefsChanged(core, TR_KEY_speed_limit_up_enabled, self);
+
+    prefsChanged(core, TR_KEY_ratio_limit, self);
+    prefsChanged(core, TR_KEY_ratio_limit_enabled, self);
+
     p->pref_handler_id = g_signal_connect(core, "prefs-changed", G_CALLBACK(prefsChanged), self);
 
     tr_sessionSetAltSpeedFunc(gtr_core_session(core), onAltSpeedToggled, p);

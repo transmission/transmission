@@ -48,12 +48,26 @@ struct _TrLimitPopoverClass
 {
     GtkGridClass parent_class;
 
-    void (* limits_changed)(TrLimitPopover* widget);
+    void (* speed_limit_up)(TrLimitPopover* widget);
+    void (* speed_limit_down)(TrLimitPopover* widget);
+    void (* ratio_limit)(TrLimitPopover* widget);
 };
 
 GType tr_limit_popover_get_type(void) G_GNUC_CONST;
 
 TrLimitPopover* tr_limit_popover_new(void);
+
+int tr_limit_popover_get_speed_limit_up(TrLimitPopover* popover);
+int tr_limit_popover_get_speed_limit_down(TrLimitPopover* popover);
+double tr_limit_popover_get_ratio_limit(TrLimitPopover* popover);
+
+void tr_limit_popover_set_speed_limit_up(TrLimitPopover* popover, int value);
+void tr_limit_popover_set_speed_limit_down(TrLimitPopover* popover, int value);
+void tr_limit_popover_set_ratio_limit(TrLimitPopover* popover, double value);
+
+void tr_limit_popover_set_speed_limit_up_enabled(TrLimitPopover* popover, gboolean enabled);
+void tr_limit_popover_set_speed_limit_down_enabled(TrLimitPopover* popover, gboolean enabled);
+void tr_limit_popover_set_ratio_limit_enabled(TrLimitPopover* popover, gboolean enabled);
 
 G_END_DECLS
 
