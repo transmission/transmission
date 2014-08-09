@@ -47,22 +47,6 @@
       </item>
     </section>
 
-    <submenu>
-      <attribute name="label" translatable="yes">_Edit</attribute>
-      <section>
-        <item>
-          <attribute name="label" translatable="yes">Select _All</attribute>
-          <attribute name="action">win.select-all</attribute>
-          <attribute name="accel">&lt;Primary&gt;a</attribute>
-        </item>
-        <item>
-          <attribute name="label" translatable="yes">Dese_lect All</attribute>
-          <attribute name="action">win.deselect-all</attribute>
-          <attribute name="accel">&lt;Shift&gt;&lt;Primary&gt;a</attribute>
-        </item>
-      </section>
-    </submenu>
-
     <section>
       <item>
         <attribute name="label" translatable="yes">Message _Log</attribute>
@@ -158,6 +142,19 @@
   </menu>
 
   <menu id="main-window-popup">
+
+    <section>
+      <item>
+        <attribute name="label" translatable="yes">Select _All</attribute>
+        <attribute name="action">win.select-all</attribute>
+        <attribute name="accel">&lt;Primary&gt;a</attribute>
+        </item>
+      <item>
+        <attribute name="label" translatable="yes">Dese_lect All</attribute>
+        <attribute name="action">win.deselect-all</attribute>
+        <attribute name="accel">&lt;Shift&gt;&lt;Primary&gt;a</attribute>
+      </item>
+    </section>
 
     <section>
       <item>
