@@ -44,7 +44,6 @@ static void toggle_action_cb(GSimpleAction* action, GVariant* parameter UNUSED, 
 {
     GVariant* state = g_action_get_state(G_ACTION(action));
     gboolean const val = g_variant_get_boolean(state);
-    printf("toggle_action_cb(%s, %d)\n", g_action_get_name(G_ACTION(action)), val);
 
     g_action_change_state(G_ACTION(action), g_variant_new_boolean(!val));
     g_variant_unref(state);
@@ -63,12 +62,8 @@ static void change_pref_cb(GSimpleAction* action, GVariant* state, gpointer user
         len = strlen(action_name);
     }
 
-    printf("action_name = %s\n", action_name);
-    printf("len = %d\n", len);
-
     if (tr_quark_lookup(action_name, len, &entry_name))
     {
-        printf("set_pref_bool %s, %d, %d\n", action_name, entry_name, g_variant_get_boolean(state));
         gtr_core_set_pref_bool(myCore, entry_name, g_variant_get_boolean(state));
         g_simple_action_set_state(action, state);
     }
@@ -109,8 +104,6 @@ static void change_value_cb(GSimpleAction* action, GVariant* value, gpointer use
         if (entry_name == TR_KEY_speed_limit_up || entry_name == TR_KEY_speed_limit_down)
         {
             gint val;
-
-            printf("reached here");
 
             g_return_if_fail(g_variant_is_of_type(value, G_VARIANT_TYPE_INT32));
 

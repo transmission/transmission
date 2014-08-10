@@ -123,7 +123,6 @@ static void tr_limit_popover_init(TrLimitPopover* popover)
     w = priv->upload_limit_entry = gtk_spin_button_new_with_range(0, INT_MAX, 5);
     gtk_entry_set_width_chars(GTK_ENTRY(w), 1);
     g_signal_connect(GTK_ENTRY(w), "activate", G_CALLBACK(on_entry_activate), popover);
-    gtk_actionable_set_action_name(GTK_ACTIONABLE(w), "win.ratio-limit");
     gtk_grid_attach(GTK_GRID(popover), w, 2, 2, 1, 1);
     gtk_grid_attach(GTK_GRID(popover), gtk_label_new("KB/s"), 3, 2, 1, 1);
 

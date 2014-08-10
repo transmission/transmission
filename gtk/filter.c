@@ -223,7 +223,8 @@ static void selection_changed_cb(GtkButton* button, gpointer vdata)
 ****
 ***/
 
-GtkWidget* gtr_filter_bar_new(tr_session* session, GtkTreeModel* tmodel, GtkTreeModel** filter_model, GtkHeaderBar* header_bar)
+GtkWidget* gtr_filter_bar_new(tr_session* session UNUSED, GtkTreeModel* tmodel, GtkTreeModel** filter_model,
+    GtkHeaderBar* header_bar)
 {
     GtkWidget* w;
     GtkWidget* b;
@@ -266,8 +267,6 @@ GtkWidget* gtr_filter_bar_new(tr_session* session, GtkTreeModel* tmodel, GtkTree
 
     for (int i = 0; i < MAX_FILTERS_ON_TOOLBAR; i++)
     {
-        printf("Adding type %d, name %s\n", filters[i].type, filters[i].name);
-
         if (sibling != NULL)
         {
             w = gtk_radio_button_new_with_label_from_widget(GTK_RADIO_BUTTON(sibling), filters[i].name);
