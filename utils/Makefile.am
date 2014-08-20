@@ -5,7 +5,8 @@ AM_CFLAGS = \
     @LIBCURL_CFLAGS@ \
     @OPENSSL_CFLAGS@ \
     @ZLIB_CFLAGS@ \
-    @PTHREAD_CFLAGS@
+    @PTHREAD_CFLAGS@ \
+    ${LIBM}
 
 bin_PROGRAMS = \
     transmission-create \
@@ -35,6 +36,7 @@ transmission_create_LDADD = \
     @LIBCURL_LIBS@ \
     @OPENSSL_LIBS@ \
     @ZLIB_LIBS@ \
-    @PTHREAD_LIBS@
+    @PTHREAD_LIBS@ \
+    ${LIBM}
 transmission_edit_LDADD = $(transmission_create_LDADD)
 transmission_show_LDADD = $(transmission_create_LDADD)

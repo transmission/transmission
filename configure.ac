@@ -18,6 +18,7 @@ dnl AM_CONFIG_HEADER(config.h)
 AC_CONFIG_SRCDIR(libtransmission/transmission.h)
 AM_INIT_AUTOMAKE([1.9 tar-pax no-dist-gzip dist-xz])
 LT_INIT
+LT_LIB_M
 
 if test m4_substr(peer_id_prefix,6,1) = "0"; then
   supported_build=yes
