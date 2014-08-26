@@ -116,28 +116,28 @@ PrefsDialog :: doubleSpinBoxNew (int key, double low, double high, double step, 
 }
 
 void
-PrefsDialog :: timeEditingFinished ()
+PrefsDialog::timeEditingFinished()
 {
-  QTimeEdit * e = qobject_cast<QTimeEdit*>(sender());
-  if (e)
+  auto e = qobject_cast<QTimeEdit*>(sender());
+  if (e != nullptr)
     {
-      const int key (e->property (PREF_KEY).toInt ());
-      const QTime time (e->time ());
-      const int seconds (QTime().secsTo (time));
-      setPref (key, seconds / 60);
+      const int key {e->property(PREF_KEY).toInt()};
+      const QTime t {e->time()};
+      const int minutes_after_midnight {t.hour()*60 + t.minute()};
+      setPref(key, minutes_after_midnight);
     }
 }
 
 QTimeEdit*
-PrefsDialog :: timeEditNew (int key)
+PrefsDialog::timeEditNew (int key)
 {
-  const int minutes (myPrefs.getInt (key));
-  QTimeEdit * e = new QTimeEdit ();
-  e->setDisplayFormat (QString::fromUtf8 ("hh:mm"));
-  e->setProperty (PREF_KEY, key);
-  e->setTime (QTime().addSecs (minutes * 60));
-  myWidgets.insert (key, e);
-  connect (e, SIGNAL(editingFinished()), this, SLOT(timeEditingFinished()));
+  const int minutes {myPrefs.getInt(key)};
+  auto e = new QTimeEdit{};
+  e->setDisplayFormat(QString::fromUtf8("hh:mm"));
+  e->setProperty(PREF_KEY, key);
+  e->setTime(QTime{minutes/60, minutes%60});
+  myWidgets.insert(key, e);
+  connect(e, SIGNAL(editingFinished()), this, SLOT(timeEditingFinished()));
   return e;
 }
 
