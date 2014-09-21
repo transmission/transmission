@@ -2406,6 +2406,10 @@ main (int argc, char ** argv)
     char * rpcurl = NULL;
     int exit_status = EXIT_SUCCESS;
 
+#ifdef _WIN32
+    tr_win32_make_args_utf8 (&argc, &argv);
+#endif
+
     if (argc < 2) {
         showUsage ();
         return EXIT_FAILURE;

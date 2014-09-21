@@ -233,6 +233,10 @@ main (int argc, char ** argv)
   size_t        fileLength;
   const char  * str;
 
+#ifdef _WIN32
+  tr_win32_make_args_utf8 (&argc, &argv);
+#endif
+
   tr_formatter_mem_init (MEM_K, MEM_K_STR, MEM_M_STR, MEM_G_STR, MEM_T_STR);
   tr_formatter_size_init (DISK_K,DISK_K_STR, DISK_M_STR, DISK_G_STR, DISK_T_STR);
   tr_formatter_speed_init (SPEED_K, SPEED_K_STR, SPEED_M_STR, SPEED_G_STR, SPEED_T_STR);

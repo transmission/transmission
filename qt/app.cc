@@ -493,7 +493,13 @@ main (int argc, char * argv[])
   int c;
   QStringList addme;
   const char * optarg;
-  char ** argvv = argv;
+  char ** argvv;
+
+#ifdef _WIN32
+  tr_win32_make_args_utf8 (&argc, &argv);
+#endif
+
+  argvv = argv;
   while ( (c = tr_getopt (getUsage (), argc, (const char **)argvv, opts, &optarg)))
     if (c == TR_OPT_UNK)
       addme.append (optarg);

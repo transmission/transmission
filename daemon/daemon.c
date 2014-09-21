@@ -425,6 +425,10 @@ main (int argc, char ** argv)
     tr_session * session = NULL;
     struct event *status_ev;
 
+#ifdef _WIN32
+    tr_win32_make_args_utf8 (&argc, &argv);
+#endif
+
     key_pidfile = tr_quark_new ("pidfile",  7);
 
     signal (SIGINT, gotsig);

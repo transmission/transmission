@@ -290,6 +290,10 @@ main (int argc, char * argv[])
   int i;
   int changedCount = 0;
 
+#ifdef _WIN32
+  tr_win32_make_args_utf8 (&argc, &argv);
+#endif
+
   files = tr_new0 (const char*, argc);
 
   tr_logSetLevel (TR_LOG_ERROR);

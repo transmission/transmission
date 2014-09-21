@@ -41,6 +41,7 @@
  #include <w32api.h>
  #define WINVER WindowsXP /* freeaddrinfo (), getaddrinfo (), getnameinfo () */
  #include <windows.h> /* Sleep (), GetSystemTimeAsFileTime (), GetEnvironmentVariable () */
+ #include <shellapi.h> /* CommandLineToArgv () */
 #endif
 
 #include "transmission.h"
@@ -1215,6 +1216,53 @@ tr_win32_format_message (uint32_t code)
     text[--text_size] = '\0';
 
   return text;
+}
+
+void
+tr_win32_make_args_utf8 (int    * argc,
+                         char *** argv)
+{
+  int my_argc, i;
+  char ** my_argv;
+  wchar_t ** my_wide_argv;
+
+  my_wide_argv = CommandLineToArgvW (GetCommandLineW (), &my_argc);
+  if (my_wide_argv == NULL)
+    return;
+
+  assert (*argc == my_argc);
+
+  my_argv = tr_new (char *, my_argc + 1);
+
+  for (i = 0; i < my_argc; ++i)
+    {
+      my_argv[i] = tr_win32_native_to_utf8 (my_wide_argv[i], -1);
+      if (my_argv[i] == NULL)
+        break;
+    }
+
+  if (i < my_argc)
+    {
+      int j;
+
+      for (j = 0; j < i; ++j)
+        {
+          tr_free (my_argv[j]);
+        }
+
+      tr_free (my_argv);
+    }
+  else
+    {
+      my_argv[my_argc] = NULL;
+
+      *argc = my_argc;
+      *argv = my_argv;
+
+      /* TODO: Add atexit handler to cleanup? */
+    }
+
+  LocalFree (my_wide_argv);
 }
 
 #endif

@@ -289,6 +289,10 @@ main (int argc, char * argv[])
   tr_info inf;
   tr_ctor * ctor;
 
+#ifdef _WIN32
+  tr_win32_make_args_utf8 (&argc, &argv);
+#endif
+
   tr_logSetLevel (TR_LOG_ERROR);
   tr_formatter_mem_init (MEM_K, MEM_K_STR, MEM_M_STR, MEM_G_STR, MEM_T_STR);
   tr_formatter_size_init (DISK_K, DISK_K_STR, DISK_M_STR, DISK_G_STR, DISK_T_STR);
