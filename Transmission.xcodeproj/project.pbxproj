@@ -462,6 +462,7 @@
 		C1077A4F183EB29600634C22 /* error.h in Headers */ = {isa = PBXBuildFile; fileRef = C1077A4B183EB29600634C22 /* error.h */; };
 		C1077A50183EB29600634C22 /* file-posix.c in Sources */ = {isa = PBXBuildFile; fileRef = C1077A4C183EB29600634C22 /* file-posix.c */; };
 		C1077A51183EB29600634C22 /* file.h in Headers */ = {isa = PBXBuildFile; fileRef = C1077A4D183EB29600634C22 /* file.h */; };
+		C1305EBE186A13B100F03351 /* file.c in Sources */ = {isa = PBXBuildFile; fileRef = C1305EB8186A134000F03351 /* file.c */; };
 		D4AF3B2F0C41F7A500D46B6B /* list.c in Sources */ = {isa = PBXBuildFile; fileRef = D4AF3B2D0C41F7A500D46B6B /* list.c */; };
 		D4AF3B300C41F7A600D46B6B /* list.h in Headers */ = {isa = PBXBuildFile; fileRef = D4AF3B2E0C41F7A500D46B6B /* list.h */; };
 		E138A9780C04D88F00C5426C /* ProgressGradients.m in Sources */ = {isa = PBXBuildFile; fileRef = E138A9760C04D88F00C5426C /* ProgressGradients.m */; };
@@ -1200,6 +1201,7 @@
 		C1077A4B183EB29600634C22 /* error.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = error.h; path = libtransmission/error.h; sourceTree = "<group>"; };
 		C1077A4C183EB29600634C22 /* file-posix.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "file-posix.c"; path = "libtransmission/file-posix.c"; sourceTree = "<group>"; };
 		C1077A4D183EB29600634C22 /* file.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = file.h; path = libtransmission/file.h; sourceTree = "<group>"; };
+		C1305EB8186A134000F03351 /* file.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = file.c; path = libtransmission/file.c; sourceTree = "<group>"; };
 		D4AF3B2D0C41F7A500D46B6B /* list.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = list.c; path = libtransmission/list.c; sourceTree = "<group>"; };
 		D4AF3B2E0C41F7A500D46B6B /* list.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = list.h; path = libtransmission/list.h; sourceTree = "<group>"; };
 		E138A9750C04D88F00C5426C /* ProgressGradients.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ProgressGradients.h; path = macosx/ProgressGradients.h; sourceTree = "<group>"; };
@@ -1657,6 +1659,7 @@
 				C1077A4A183EB29600634C22 /* error.c */,
 				C1077A4B183EB29600634C22 /* error.h */,
 				C1077A4C183EB29600634C22 /* file-posix.c */,
+				C1305EB8186A134000F03351 /* file.c */,
 				C1077A4D183EB29600634C22 /* file.h */,
 				4D80185710BBC0B0008A4AF2 /* magnet.c */,
 				4D80185810BBC0B0008A4AF2 /* magnet.h */,
@@ -2696,6 +2699,7 @@
 				A2A4EA0E0DE106EB000CE197 /* ConvertUTF.c in Sources */,
 				A292A6E80DFB45FC004B9C0A /* webseed.c in Sources */,
 				A25E03E30E4015380086C225 /* tr-getopt.c in Sources */,
+				C1305EBE186A13B100F03351 /* file.c in Sources */,
 				4DB74F080E8CD75100AEB1A8 /* wildmat.c in Sources */,
 				A21FBBAC0EDA78C300BC3C51 /* bandwidth.c in Sources */,
 				A22CFCA80FC24ED80009BD3E /* tr-dht.c in Sources */,
