@@ -9,7 +9,7 @@
 
 #include <stdio.h> /* fprintf () */
 #include <string.h> /* strcmp (), strchr (), memcmp () */
-#include <stdlib.h> /* getenv (), qsort () */
+#include <stdlib.h> /* qsort () */
 #include <time.h>
 
 #define CURL_DISABLE_TYPECHECK /* otherwise -Wunreachable-code goes insane */
@@ -188,7 +188,7 @@ tr_curl_easy_init (struct evbuffer * writebuf)
   curl_easy_setopt (curl, CURLOPT_WRITEFUNCTION, writeFunc);
   curl_easy_setopt (curl, CURLOPT_WRITEDATA, writebuf);
   curl_easy_setopt (curl, CURLOPT_HTTPAUTH, CURLAUTH_ANY);
-  curl_easy_setopt (curl, CURLOPT_VERBOSE, getenv ("TR_CURL_VERBOSE") != NULL);
+  curl_easy_setopt (curl, CURLOPT_VERBOSE, tr_env_key_exists ("TR_CURL_VERBOSE"));
   curl_easy_setopt (curl, CURLOPT_ENCODING, "");
   return curl;
 }

@@ -10,7 +10,6 @@
 #include <assert.h>
 #include <errno.h>
 #include <stdio.h>
-#include <stdlib.h> /* getenv() */
 
 #include <event2/buffer.h>
 
@@ -66,11 +65,7 @@ tr_logGetFile (void)
 
   if (!initialized)
     {
-      int fd = 0;
-      const char * str = getenv ("TR_DEBUG_FD");
-
-      if (str && *str)
-        fd = atoi (str);
+      const int fd = tr_env_get_int ("TR_DEBUG_FD", 0);
 
       switch (fd)
         {

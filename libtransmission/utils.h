@@ -486,6 +486,21 @@ void tr_formatter_get_units (void * dict);
 ****
 ***/
 
+/** @brief Check if environment variable exists. */
+bool   tr_env_key_exists (const char * key);
+
+/** @brief Get environment variable value as int. */
+int    tr_env_get_int    (const char * key,
+                          int          default_value);
+
+/** @brief Get environment variable value as string (should be freed afterwards). */
+char * tr_env_get_string (const char * key,
+                          const char * default_value);
+
+/***
+****
+***/
+
 #ifdef __cplusplus
 }
 #endif

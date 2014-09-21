@@ -10,6 +10,13 @@
 #include <limits.h> /* INT_MAX */
 #include <math.h> /* sqrt () */
 #include <string.h> /* strlen () */
+#include <stdlib.h> /* setenv (), unsetenv () */
+
+#ifdef _WIN32
+ #include <windows.h>
+ #define setenv(key, value, unused) SetEnvironmentVariableA (key, value)
+ #define unsetenv(key) SetEnvironmentVariableA (key, NULL)
+#endif
 
 #include "transmission.h"
 #include "ConvertUTF.h" /* tr_utf8_validate*/
@@ -478,6 +485,51 @@ test_strdup_printf (void)
   return 0;
 }
 
+static int
+test_env (void)
+{
+  const char * test_key = "TR_TEST_ENV";
+  int x;
+  char * s;
+
+  unsetenv (test_key);
+
+  check (!tr_env_key_exists (test_key));
+  x = tr_env_get_int (test_key, 123);
+  check_int_eq (123, x);
+  s = tr_env_get_string (test_key, NULL);
+  check (s == NULL);
+  s = tr_env_get_string (test_key, "a");
+  check_streq ("a", s);
+  tr_free (s);
+
+  setenv (test_key, "", 1);
+
+  check (tr_env_key_exists (test_key));
+  x = tr_env_get_int (test_key, 456);
+  check_int_eq (456, x);
+  s = tr_env_get_string (test_key, NULL);
+  check_streq ("", s);
+  tr_free (s);
+  s = tr_env_get_string (test_key, "b");
+  check_streq ("", s);
+  tr_free (s);
+
+  setenv (test_key, "135", 1);
+
+  check (tr_env_key_exists (test_key));
+  x = tr_env_get_int (test_key, 789);
+  check_int_eq (135, x);
+  s = tr_env_get_string (test_key, NULL);
+  check_streq ("135", s);
+  tr_free (s);
+  s = tr_env_get_string (test_key, "c");
+  check_streq ("135", s);
+  tr_free (s);
+
+  return 0;
+}
+
 int
 main (void)
 {
@@ -495,7 +547,8 @@ main (void)
                              test_strstrip,
                              test_truncd,
                              test_url,
-                             test_utf8 };
+                             test_utf8,
+                             test_env };
 
   return runTests (tests, NUM_TESTS (tests));
 }

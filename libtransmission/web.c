@@ -9,7 +9,6 @@
 
 #include <assert.h>
 #include <string.h> /* strlen (), strstr () */
-#include <stdlib.h> /* getenv () */
 
 #ifdef _WIN32
   #include <ws2tcpip.h>
@@ -101,7 +100,7 @@ struct tr_web
 {
   bool curl_verbose;
   bool curl_ssl_verify;
-  const char * curl_ca_bundle;
+  char * curl_ca_bundle;
   int close_mode;
   struct tr_web_task * tasks;
   tr_lock * taskLock;
@@ -387,9 +386,9 @@ tr_webThreadFunc (void * vsession)
   web->close_mode = ~0;
   web->taskLock = tr_lockNew ();
   web->tasks = NULL;
-  web->curl_verbose = getenv ("TR_CURL_VERBOSE") != NULL;
-  web->curl_ssl_verify = getenv ("TR_CURL_SSL_VERIFY") != NULL;
-  web->curl_ca_bundle = getenv ("CURL_CA_BUNDLE");
+  web->curl_verbose = tr_env_key_exists ("TR_CURL_VERBOSE");
+  web->curl_ssl_verify = tr_env_key_exists ("TR_CURL_SSL_VERIFY");
+  web->curl_ca_bundle = tr_env_get_string ("CURL_CA_BUNDLE", NULL);
   if (web->curl_ssl_verify)
     {
       tr_logAddNamedInfo ("web", "will verify tracker certs using envvar CURL_CA_BUNDLE: %s",
@@ -522,6 +521,7 @@ tr_webThreadFunc (void * vsession)
   tr_list_free (&paused_easy_handles, NULL);
   curl_multi_cleanup (multi);
   tr_lockFree (web->taskLock);
+  tr_free (web->curl_ca_bundle);
   tr_free (web->cookie_filename);
   tr_free (web);
   session->web = NULL;

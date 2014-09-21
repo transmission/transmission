@@ -247,7 +247,7 @@ getHomeDir (void)
 
   if (!home)
     {
-      home = tr_strdup (getenv ("HOME"));
+      home = tr_env_get_string ("HOME", NULL);
 
       if (!home)
         {
@@ -320,11 +320,9 @@ tr_getDefaultConfigDir (const char * appname)
 
   if (!s)
     {
-      if ((s = getenv ("TRANSMISSION_HOME")))
-        {
-          s = tr_strdup (s);
-        }
-      else
+      s = tr_env_get_string ("TRANSMISSION_HOME", NULL);
+
+      if (s == NULL)
         {
 #ifdef __APPLE__
           s = tr_buildPath (getHomeDir (), "Library", "Application Support", appname, NULL);
@@ -337,10 +335,15 @@ tr_getDefaultConfigDir (const char * appname)
           find_directory (B_USER_SETTINGS_DIRECTORY, -1, true, buf, sizeof (buf));
           s = tr_buildPath (buf, appname, NULL);
 #else
-          if ((s = getenv ("XDG_CONFIG_HOME")))
-            s = tr_buildPath (s, appname, NULL);
+          if ((s = tr_env_get_string ("XDG_CONFIG_HOME", NULL)))
+            {
+              s = tr_buildPath (s, appname, NULL);
+              tr_free (s);
+            }
           else
-            s = tr_buildPath (getHomeDir (), ".config", appname, NULL);
+            {
+              s = tr_buildPath (getHomeDir (), ".config", appname, NULL);
+            }
 #endif
         }
     }
@@ -355,17 +358,18 @@ tr_getDefaultDownloadDir (void)
 
   if (user_dir == NULL)
     {
-      const char * config_home;
+      char * config_home;
       char * config_file;
       char * content;
       size_t content_len;
 
       /* figure out where to look for user-dirs.dirs */
-      config_home = getenv ("XDG_CONFIG_HOME");
+      config_home = tr_env_get_string ("XDG_CONFIG_HOME", NULL);
       if (config_home && *config_home)
         config_file = tr_buildPath (config_home, "user-dirs.dirs", NULL);
       else
         config_file = tr_buildPath (getHomeDir (), ".config", "user-dirs.dirs", NULL);
+      tr_free (config_home);
 
       /* read in user-dirs.dirs and look for the download dir entry */
       content = (char *) tr_loadFile (config_file, &content_len);
@@ -428,15 +432,10 @@ tr_getWebClientDir (const tr_session * session UNUSED)
 
   if (!s)
     {
-      if ((s = getenv ("CLUTCH_HOME")))
-        {
-          s = tr_strdup (s);
-        }
-      else if ((s = getenv ("TRANSMISSION_WEB_HOME")))
-        {
-          s = tr_strdup (s);
-        }
-      else
+      s = tr_env_get_string ("CLUTCH_HOME", NULL);
+      if (s == NULL)
+        s = tr_env_get_string ("TRANSMISSION_WEB_HOME", NULL);
+      if (s == NULL)
         {
 
 #ifdef BUILD_MAC_CLIENT /* on Mac, look in the Application Support folder first, then in the app bundle. */
@@ -522,26 +521,28 @@ tr_getWebClientDir (const tr_session * session UNUSED)
 #else /* everyone else, follow the XDG spec */
 
           tr_list *candidates = NULL, *l;
-          const char * tmp;
+          char * tmp;
 
           /* XDG_DATA_HOME should be the first in the list of candidates */
-          tmp = getenv ("XDG_DATA_HOME");
+          tmp = tr_env_get_string ("XDG_DATA_HOME", NULL);
           if (tmp && *tmp)
             {
-              tr_list_append (&candidates, tr_strdup (tmp));
+              tr_list_append (&candidates, tmp);
             }
           else
             {
               char * dhome = tr_buildPath (getHomeDir (), ".local", "share", NULL);
               tr_list_append (&candidates, dhome);
+              tr_free (tmp);
             }
 
           /* XDG_DATA_DIRS are the backup directories */
           {
             const char * pkg = PACKAGE_DATA_DIR;
-            const char * xdg = getenv ("XDG_DATA_DIRS");
+            char * xdg = tr_env_get_string ("XDG_DATA_DIRS", NULL);
             const char * fallback = "/usr/local/share:/usr/share";
             char * buf = tr_strdup_printf ("%s:%s:%s", (pkg?pkg:""), (xdg?xdg:""), fallback);
+            tr_free (xdg);
             tmp = buf;
             while (tmp && *tmp)
               {
@@ -550,7 +551,7 @@ tr_getWebClientDir (const tr_session * session UNUSED)
                   {
                     if ((end - tmp) > 1)
                       tr_list_append (&candidates, tr_strndup (tmp, end - tmp));
-                    tmp = end + 1;
+                    tmp = (char *) end + 1;
                   }
                 else if (tmp && *tmp)
                   {

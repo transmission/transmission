@@ -24,7 +24,7 @@
 #include <locale.h> /* localeconv () */
 #include <math.h> /* pow (), fabs (), floor () */
 #include <stdio.h>
-#include <stdlib.h>
+#include <stdlib.h> /* getenv () */
 #include <string.h> /* strerror (), memset (), memmem () */
 #include <time.h> /* nanosleep () */
 
@@ -40,7 +40,7 @@
 #ifdef _WIN32
  #include <w32api.h>
  #define WINVER WindowsXP /* freeaddrinfo (), getaddrinfo (), getnameinfo () */
- #include <windows.h> /* Sleep (), GetSystemTimeAsFileTime () */
+ #include <windows.h> /* Sleep (), GetSystemTimeAsFileTime (), GetEnvironmentVariable () */
 #endif
 
 #include "transmission.h"
@@ -1749,3 +1749,98 @@ tr_formatter_get_units (void * vdict)
     tr_variantListAddStr (l, speed_units.units[i].name);
 }
 
+/***
+****  ENVIRONMENT
+***/
+
+bool
+tr_env_key_exists (const char * key)
+{
+  assert (key != NULL);
+
+#ifdef _WIN32
+
+  return GetEnvironmentVariableA (key, NULL, 0) != 0;
+
+#else
+
+  return getenv (key) != NULL;
+
+#endif
+}
+
+int
+tr_env_get_int (const char * key,
+                int          default_value)
+{
+#ifdef _WIN32
+
+  char value[16];
+
+  assert (key != NULL);
+
+  if (GetEnvironmentVariableA (key, value, ARRAYSIZE (value)) > 1)
+    return atoi (value);
+
+#else
+
+  const char * value;
+
+  assert (key != NULL);
+
+  value = getenv (key);
+
+  if (value != NULL && *value != '\0')
+    return atoi (value);
+
+#endif
+
+  return default_value;
+}
+
+char * tr_env_get_string (const char * key,
+                          const char * default_value)
+{
+#ifdef _WIN32
+
+  wchar_t * wide_key;
+  char * value = NULL;
+
+  wide_key = tr_win32_utf8_to_native (key, -1);
+  if (wide_key != NULL)
+    {
+      const DWORD size = GetEnvironmentVariableW (wide_key, NULL, 0);
+      if (size != 0)
+        {
+          wchar_t * const wide_value = tr_new (wchar_t, size);
+          if (GetEnvironmentVariableW (wide_key, wide_value, size) == size - 1)
+            value = tr_win32_native_to_utf8 (wide_value, size);
+
+          tr_free (wide_value);
+        }
+
+      tr_free (wide_key);
+    }
+
+  if (value == NULL && default_value != NULL)
+    value = tr_strdup (default_value);
+
+  return value;
+
+#else
+
+  char * value;
+
+  assert (key != NULL);
+
+  value = getenv (key);
+  if (value == NULL)
+    value = (char *) default_value;
+
+  if (value != NULL)
+    value = tr_strdup (value);
+
+  return value;
+
+#endif
+}

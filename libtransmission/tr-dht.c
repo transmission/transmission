@@ -275,7 +275,7 @@ tr_dhtInit (tr_session *ss)
 
     tr_logAddNamedDbg ("DHT", "Initializing DHT");
 
-    if (getenv ("TR_DHT_VERBOSE") != NULL)
+    if (tr_env_key_exists ("TR_DHT_VERBOSE"))
         dht_debug = stderr;
 
     dat_file = tr_buildPath (ss->configDir, "dht.dat", NULL);

@@ -1908,13 +1908,11 @@ processArgs (const char * rpcurl, int argc, const char ** argv)
                     break;
 
                 case 810: /* authenv */
+                    auth = tr_env_get_string ("TR_AUTH", NULL);
+                    if (auth == NULL)
                     {
-                        char *authenv = getenv ("TR_AUTH");
-                        if (!authenv) {
-                            fprintf (stderr, "The TR_AUTH environment variable is not set\n");
-                            exit (0);
-                        }
-                        auth = tr_strdup (authenv);
+                        fprintf (stderr, "The TR_AUTH environment variable is not set\n");
+                        exit (0);
                     }
                     break;
 
