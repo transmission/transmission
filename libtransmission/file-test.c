@@ -35,7 +35,7 @@ static char *
 create_test_dir (const char * name)
 {
   char * const test_dir = tr_buildPath (tr_sessionGetConfigDir (session), name, NULL);
-  tr_mkdirp (test_dir, 0777);
+  tr_sys_dir_create (test_dir, 0, 0777, NULL);
   return test_dir;
 }
 
@@ -194,7 +194,7 @@ test_get_info (void)
   tr_sys_path_remove (path1, NULL);
 
   /* Good directory info */
-  tr_mkdirp (path1, 0777);
+  tr_sys_dir_create (path1, 0, 0777, NULL);
   clear_path_info (&info);
   check (tr_sys_path_get_info (path1, 0, &info, &err));
   check (err == NULL);
@@ -233,7 +233,7 @@ test_get_info (void)
       tr_sys_path_remove (path2, NULL);
 
       /* Good directory info */
-      tr_mkdirp (path2, 0777);
+      tr_sys_dir_create (path2, 0, 0777, NULL);
       clear_path_info (&info);
       check (tr_sys_path_get_info (path1, 0, &info, &err));
       check (err == NULL);
@@ -278,7 +278,7 @@ test_path_exists (void)
   tr_sys_path_remove (path1, NULL);
 
   /* Create directory and see that it exists */
-  tr_mkdirp (path1, 0777);
+  tr_sys_dir_create (path1, 0, 0777, NULL);
   check (tr_sys_path_exists (path1, &err));
   check (err == NULL);
 
@@ -298,7 +298,7 @@ test_path_exists (void)
       tr_sys_path_remove (path2, NULL);
 
       /* Create directory and see that it exists (via symlink) */
-      tr_mkdirp (path2, 0777);
+      tr_sys_dir_create (path2, 0, 0777, NULL);
       check (tr_sys_path_exists (path1, &err));
       check (err == NULL);
 
@@ -353,7 +353,7 @@ test_path_is_same (void)
   tr_sys_path_remove (path1, NULL);
 
   /* Two same directories are the same */
-  tr_mkdirp (path1, 0777);
+  tr_sys_dir_create (path1, 0, 0777, NULL);
   check (tr_sys_path_is_same (path1, path1, &err));
   check (err == NULL);
 
@@ -366,7 +366,7 @@ test_path_is_same (void)
   tr_sys_path_remove (path2, NULL);
 
   /* Two separate directories are not the same */
-  tr_mkdirp (path2, 0777);
+  tr_sys_dir_create (path2, 0, 0777, NULL);
   check (!tr_sys_path_is_same (path1, path2, &err));
   check (err == NULL);
 
@@ -404,7 +404,7 @@ test_path_is_same (void)
       tr_sys_path_remove (path2, NULL);
 
       /* Directory and symlink pointing to another directory are not the same */
-      tr_mkdirp (path2, 0777);
+      tr_sys_dir_create (path2, 0, 0777, NULL);
       check (!tr_sys_path_is_same (path1, path2, &err));
       check (err == NULL);
       check (!tr_sys_path_is_same (path2, path1, &err));
@@ -552,7 +552,7 @@ test_path_resolve (void)
       tr_free (tmp);
 
       tr_sys_path_remove (path1, NULL);
-      tr_mkdirp (path1, 0755);
+      tr_sys_dir_create (path1, 0, 0755, NULL);
 
       tmp = tr_sys_path_resolve (path2, &err);
       check (tmp != NULL);
@@ -692,7 +692,7 @@ test_path_rename (void)
   check (tr_sys_path_rename (path2, path1, &err));
   check (err == NULL);
 
-  tr_mkdirp (path2, 0777);
+  tr_sys_dir_create (path2, 0, 0777, NULL);
 
   /* Renaming file does not overwrite existing directory, and vice versa */
   check (!tr_sys_path_rename (path1, path2, &err));
@@ -785,14 +785,14 @@ test_path_remove (void)
   check (!tr_sys_path_exists (path1, NULL));
 
   /* Removing empty directory works */
-  tr_mkdirp (path1, 0777);
+  tr_sys_dir_create (path1, 0, 0777, NULL);
   check (tr_sys_path_exists (path1, NULL));
   check (tr_sys_path_remove (path1, &err));
   check (err == NULL);
   check (!tr_sys_path_exists (path1, NULL));
 
   /* Removing non-empty directory fails */
-  tr_mkdirp (path2, 0777);
+  tr_sys_dir_create (path2, 0, 0777, NULL);
   libtest_create_file_with_string_contents (path3, "test");
   check (tr_sys_path_exists (path2, NULL));
   check (tr_sys_path_exists (path3, NULL));
@@ -837,7 +837,7 @@ test_file_open (void)
   tr_error_clear (&err);
 
   /* Can't open directory */
-  tr_mkdirp (path1, 0777);
+  tr_sys_dir_create (path1, 0, 0777, NULL);
 #ifdef _WIN32
   /* This works on *NIX */
   check (tr_sys_file_open (path1, TR_SYS_FILE_READ, 0600, &err) == TR_BAD_SYS_FILE);
@@ -1152,6 +1152,146 @@ test_file_map (void)
   return 0;
 }
 
+static int
+test_dir_create (void)
+{
+  char * const test_dir = create_test_dir (__FUNCTION__);
+  tr_error * err = NULL;
+  char * path1, * path2;
+
+  path1 = tr_buildPath (test_dir, "a", NULL);
+  path2 = tr_buildPath (path1, "b", NULL);
+
+  /* Can create directory which has parent */
+  check (tr_sys_dir_create (path1, 0, 0700, &err));
+  check (err == NULL);
+  check (tr_sys_path_exists (path1, NULL));
+  check (validate_permissions (path1, 0700));
+
+  tr_sys_path_remove (path1, NULL);
+  libtest_create_file_with_string_contents (path1, "test");
+
+  /* Can't create directory where file already exists */
+  check (!tr_sys_dir_create (path1, 0, 0700, &err));
+  check (err != NULL);
+  tr_error_clear (&err);
+  check (!tr_sys_dir_create (path1, TR_SYS_DIR_CREATE_PARENTS, 0700, &err));
+  check (err != NULL);
+  tr_error_clear (&err);
+
+  tr_sys_path_remove (path1, NULL);
+
+  /* Can't create directory which has no parent */
+  check (!tr_sys_dir_create (path2, 0, 0700, &err));
+  check (err != NULL);
+  check (!tr_sys_path_exists (path2, NULL));
+  tr_error_clear (&err);
+
+  /* Can create directory with parent directories */
+  check (tr_sys_dir_create (path2, TR_SYS_DIR_CREATE_PARENTS, 0751, &err));
+  check (err == NULL);
+  check (tr_sys_path_exists (path1, NULL));
+  check (tr_sys_path_exists (path2, NULL));
+  check (validate_permissions (path1, 0751));
+  check (validate_permissions (path2, 0751));
+
+  /* Can create existing directory (no-op) */
+  check (tr_sys_dir_create (path1, 0, 0700, &err));
+  check (err == NULL);
+  check (tr_sys_dir_create (path1, TR_SYS_DIR_CREATE_PARENTS, 0700, &err));
+  check (err == NULL);
+
+  tr_sys_path_remove (path2, NULL);
+  tr_sys_path_remove (path1, NULL);
+
+  tr_free (path2);
+  tr_free (path1);
+
+  tr_free (test_dir);
+  return 0;
+}
+
+static int
+test_dir_read_impl (const char * path,
+                      bool       * have1,
+                      bool       * have2)
+{
+  tr_error * err = NULL;
+  tr_sys_dir_t dd;
+  const char * name;
+
+  *have1 = *have2 = false;
+
+  dd = tr_sys_dir_open (path, &err);
+  check (dd != TR_BAD_SYS_DIR);
+  check (err == NULL);
+
+  while ((name = tr_sys_dir_read_name (dd, &err)) != NULL)
+    {
+      check (err == NULL);
+
+      if (strcmp (name, ".") == 0 || strcmp (name, "..") == 0)
+        continue;
+
+      if (strcmp (name, "a") == 0)
+        *have1 = true;
+      else if (strcmp (name, "b") == 0)
+        *have2 = true;
+      else
+        check (false);
+    }
+
+  check (err == NULL);
+
+  check (tr_sys_dir_close (dd, &err));
+  check (err == NULL);
+
+  return 0;
+}
+
+static int
+test_dir_read (void)
+{
+  char * const test_dir = create_test_dir (__FUNCTION__);
+  char * path1, * path2;
+  bool have1, have2;
+
+  path1 = tr_buildPath (test_dir, "a", NULL);
+  path2 = tr_buildPath (test_dir, "b", NULL);
+
+  if (test_dir_read_impl (test_dir, &have1, &have2) != 0)
+    return 1;
+  check (!have1);
+  check (!have2);
+
+  libtest_create_file_with_string_contents (path1, "test");
+
+  if (test_dir_read_impl (test_dir, &have1, &have2) != 0)
+    return 1;
+  check (have1);
+  check (!have2);
+
+  libtest_create_file_with_string_contents (path2, "test");
+
+  if (test_dir_read_impl (test_dir, &have1, &have2) != 0)
+    return 1;
+  check (have1);
+  check (have2);
+
+  tr_sys_path_remove (path1, NULL);
+
+  if (test_dir_read_impl (test_dir, &have1, &have2) != 0)
+    return 1;
+  check (!have1);
+  check (have2);
+
+  tr_free (path2);
+  tr_free (path1);
+
+  tr_free (test_dir);
+  return 0;
+}
+
 int
 main (void)
 {
@@ -1168,7 +1308,9 @@ main (void)
       test_file_read_write_seek,
       test_file_truncate,
       test_file_preallocate,
-      test_file_map
+      test_file_map,
+      test_dir_create,
+      test_dir_read
     };
   int ret;
 

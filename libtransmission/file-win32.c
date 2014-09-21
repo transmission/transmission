@@ -10,6 +10,7 @@
 #include <assert.h>
 #include <stdlib.h> /* _splitpath_s (), _makepath_s () */
 
+#include <shlobj.h> /* SHCreateDirectoryEx () */
 #include <winioctl.h> /* FSCTL_SET_SPARSE */
 
 #include "transmission.h"
@@ -24,6 +25,14 @@
 /* MSDN (http://msdn.microsoft.com/en-us/library/2k2xf226.aspx) only mentions
    "i64" suffix for C code, but no warning is issued */
 #define DELTA_EPOCH_IN_MICROSECS 11644473600000000ULL
+
+struct tr_sys_dir_win32
+{
+  wchar_t * pattern;
+  HANDLE find_handle;
+  WIN32_FIND_DATAW find_data;
+  char * utf8_name;
+};
 
 static void
 set_system_error (tr_error ** error,
@@ -117,6 +126,54 @@ open_file (const char  * path,
 
   if (ret == TR_BAD_SYS_FILE)
     set_system_error (error, GetLastError ());
+
+  tr_free (wide_path);
+
+  return ret;
+}
+
+static bool
+create_dir (const char  * path,
+            int           flags,
+            int           permissions,
+            bool          okay_if_exists,
+            tr_error   ** error)
+{
+  bool ret;
+  wchar_t * wide_path;
+  DWORD error_code = ERROR_SUCCESS;
+
+  assert (path != NULL);
+
+  wide_path = tr_win32_utf8_to_native (path, -1);
+
+  if ((flags & TR_SYS_DIR_CREATE_PARENTS) != 0)
+    {
+      /* For some reason SHCreateDirectoryEx has issues with forward slashes */
+      wchar_t * p = wide_path;
+      while ((p = wcschr (p, L'/')) != NULL)
+        *p++ = L'\\';
+
+      error_code = SHCreateDirectoryExW (NULL, wide_path, NULL);
+      ret = error_code == ERROR_SUCCESS;
+    }
+  else
+    {
+      ret = CreateDirectoryW (wide_path, NULL);
+      if (!ret)
+        error_code = GetLastError ();
+    }
+
+  if (!ret && error_code == ERROR_ALREADY_EXISTS && okay_if_exists)
+    {
+      const DWORD attributes = GetFileAttributesW (wide_path);
+      if (attributes != INVALID_FILE_ATTRIBUTES &&
+          (attributes & FILE_ATTRIBUTE_DIRECTORY) != 0)
+        ret = true;
+    }
+
+  if (!ret)
+    set_system_error (error, error_code);
 
   tr_free (wide_path);
 
@@ -962,6 +1019,165 @@ tr_sys_file_unmap (const void  * address,
 
   if (!ret)
     set_system_error (error, GetLastError ());
+
+  return ret;
+}
+
+char *
+tr_sys_dir_get_current (tr_error ** error)
+{
+  char * ret = NULL;
+  wchar_t * wide_ret = NULL;
+  DWORD size;
+
+  size = GetCurrentDirectoryW (0, NULL);
+
+  if (size != 0)
+    {
+      wide_ret = tr_new (wchar_t, size);
+      if (GetCurrentDirectoryW (size, wide_ret) != 0)
+        ret = tr_win32_native_to_utf8 (wide_ret, size);
+    }
+
+  if (ret == NULL)
+    set_system_error (error, GetLastError ());
+
+  tr_free (wide_ret);
+
+  return ret;
+}
+
+bool
+tr_sys_dir_create (const char  * path,
+                   int           flags,
+                   int           permissions,
+                   tr_error   ** error)
+{
+  return create_dir (path, flags, permissions, true, error);
+}
+
+static void
+dir_create_temp_callback (const char  * path,
+                          void        * param,
+                          tr_error   ** error)
+{
+  bool * result = (bool *) param;
+
+  assert (result != NULL);
+
+  *result = create_dir (path, 0, 0, false, error);
+}
+
+bool
+tr_sys_dir_create_temp (char      * path_template,
+                        tr_error ** error)
+{
+  bool ret = false;
+
+  assert (path_template != NULL);
+
+  create_temp_path (path_template, dir_create_temp_callback, &ret, error);
+
+  return ret;
+}
+
+tr_sys_dir_t
+tr_sys_dir_open (const char  * path,
+                 tr_error   ** error)
+{
+  tr_sys_dir_t ret;
+
+#ifndef __clang__
+  /* Clang gives "static_assert expression is not an integral constant expression" error */
+  TR_STATIC_ASSERT (TR_BAD_SYS_DIR == NULL, "values should match");
+#endif
+
+  assert (path != NULL);
+
+  ret = tr_new (struct tr_sys_dir_win32, 1);
+  ret->pattern = tr_win32_utf8_to_native_ex (path, -1, 2);
+
+  if (ret->pattern != NULL)
+    {
+      const size_t pattern_size = wcslen (ret->pattern);
+      ret->pattern[pattern_size + 0] = L'\\';
+      ret->pattern[pattern_size + 1] = L'*';
+      ret->pattern[pattern_size + 2] = L'\0';
+
+      ret->find_handle = INVALID_HANDLE_VALUE;
+      ret->utf8_name = NULL;
+    }
+  else
+    {
+      set_system_error (error, GetLastError ());
+
+      tr_free (ret->pattern);
+      tr_free (ret);
+
+      ret = NULL;
+    }
+
+  return ret;
+}
+
+const char *
+tr_sys_dir_read_name (tr_sys_dir_t    handle,
+                      tr_error     ** error)
+{
+  char * ret;
+  DWORD error_code = ERROR_SUCCESS;
+
+  assert (handle != TR_BAD_SYS_DIR);
+
+  if (handle->find_handle == INVALID_HANDLE_VALUE)
+    {
+      handle->find_handle = FindFirstFileW (handle->pattern, &handle->find_data);
+      if (handle->find_handle == INVALID_HANDLE_VALUE)
+        error_code = GetLastError ();
+    }
+  else
+    {
+      if (!FindNextFileW (handle->find_handle, &handle->find_data))
+        error_code = GetLastError ();
+    }
+
+  if (error_code != ERROR_SUCCESS)
+    {
+      set_system_error_if_file_found (error, error_code);
+      return NULL;
+    }
+
+  ret = tr_win32_native_to_utf8 (handle->find_data.cFileName, -1);
+
+  if (ret != NULL)
+    {
+      tr_free (handle->utf8_name);
+      handle->utf8_name = ret;
+    }
+  else
+    {
+      set_system_error (error, GetLastError ());
+    }
+
+  return ret;
+}
+
+bool
+tr_sys_dir_close (tr_sys_dir_t    handle,
+                  tr_error     ** error)
+{
+  bool ret;
+
+  assert (handle != TR_BAD_SYS_DIR);
+
+  ret = FindClose (handle->find_handle);
+
+  if (!ret)
+    set_system_error (error, GetLastError ());
+
+  tr_free (handle->utf8_name);
+  tr_free (handle->pattern);
+  tr_free (handle);
 
   return ret;
 }

@@ -33,10 +33,16 @@ extern "C" {
  typedef int tr_sys_file_t;
  /** @brief Platform-specific invalid file descriptor constant. */
  #define TR_BAD_SYS_FILE (-1)
+ /** @brief Platform-specific directory descriptor type. */
+ typedef void * tr_sys_dir_t;
 #else
  typedef HANDLE tr_sys_file_t;
  #define TR_BAD_SYS_FILE INVALID_HANDLE_VALUE
+ typedef struct tr_sys_dir_win32 * tr_sys_dir_t;
 #endif
+
+/** @brief Platform-specific invalid directory descriptor constant. */
+#define TR_BAD_SYS_DIR ((tr_sys_dir_t)NULL)
 
 typedef enum
 {
@@ -80,6 +86,12 @@ tr_sys_file_preallocate_flags_t;
 
 typedef enum
 {
+    TR_SYS_DIR_CREATE_PARENTS = 1 << 0
+}
+tr_sys_dir_create_flags_t;
+
+typedef enum
+{
   TR_SYS_PATH_IS_FILE,
   TR_SYS_PATH_IS_DIRECTORY,
   TR_SYS_PATH_IS_OTHER
@@ -99,9 +111,9 @@ tr_sys_path_info;
  *
  * Following functions accept paths in UTF-8 encoding and convert them to native
  * encoding internally if needed.
- * Descriptors returned (@ref tr_sys_file_t) may have different type depending
- * on platform and should generally not be passed to native functions, but to
- * wrapper functions instead.
+ * Descriptors returned (@ref tr_sys_file_t and @ref tr_sys_dir_t) may have
+ * different type depending on platform and should generally not be passed to
+ * native functions, but to wrapper functions instead.
  *
  * @{
  */
@@ -495,6 +507,94 @@ void          * tr_sys_file_map_for_reading (tr_sys_file_t        handle,
  */
 bool            tr_sys_file_unmap           (const void         * address,
                                              uint64_t             size,
+                                             tr_error          ** error);
+
+/* Directory-related wrappers */
+
+/**
+ * @brief Portability wrapper for `getcwd ()`.
+ *
+ * @param[out] error Pointer to error object. Optional, pass `NULL` if you are
+ *                   not interested in error details.
+ *
+ * @return Pointer to newly allocated buffer containing path to current
+ *         directory (use @ref tr_free to free it when no longer needed) on
+ *         success, `NULL` otherwise (with `error` set accordingly).
+ */
+char          * tr_sys_dir_get_current      (tr_error          ** error);
+
+/**
+ * @brief Like `mkdir ()`, but makes parent directories if needed.
+ *
+ * @param[in]  path        Path to directory.
+ * @param[in]  flags       Combination of @ref tr_sys_dir_create_flags_t values.
+ * @param[in]  permissions Permissions to create directory with. Not used on
+                           Windows.
+ * @param[out] error       Pointer to error object. Optional, pass `NULL` if you
+ *                         are not interested in error details.
+ *
+ * @return `True` on success, `false` otherwise (with `error` set accordingly).
+ */
+bool            tr_sys_dir_create           (const char         * path,
+                                             int                  flags,
+                                             int                  permissions,
+                                             tr_error          ** error);
+
+/**
+ * @brief Portability wrapper for `mkdtemp ()`.
+ *
+ * @param[in,out] path_template Template path to directory. Should end with at
+ *                              least six 'X' characters. Upon success, trailing
+ *                              'X' characters are replaced with actual random
+ *                              characters used to form a unique path to
+ *                              temporary directory.
+ * @param[out]    error         Pointer to error object. Optional, pass `NULL`
+ *                              if you are not interested in error details.
+ *
+ * @return `True` on success, `false` otherwise (with `error` set accordingly).
+ */
+bool            tr_sys_dir_create_temp      (char               * path_template,
+                                             tr_error          ** error);
+
+/**
+ * @brief Portability wrapper for `opendir ()`.
+ *
+ * @param[in]  path  Path to directory.
+ * @param[out] error Pointer to error object. Optional, pass `NULL` if you are
+ *                   not interested in error details.
+ *
+ * @return Opened directory descriptor on success, `TR_BAD_SYS_DIR` otherwise
+ *         (with `error` set accordingly).
+ */
+tr_sys_dir_t    tr_sys_dir_open             (const char         * path,
+                                             tr_error          ** error);
+
+/**
+ * @brief Portability wrapper for `readdir ()`.
+ *
+ * @param[in]  handle Valid directory descriptor.
+ * @param[out] error  Pointer to error object. Optional, pass `NULL` if you are
+ *                    not interested in error details.
+ *
+ * @return Pointer to next directory entry name (stored internally, DO NOT pass
+ *         it to @ref tr_free) on success, `NULL` otherwise (with `error` set
+ *         accordingly). Note that `NULL` will also be returned in case of end
+ *         of directory; if you need to distinguish the two, check if `error`
+ *         is `NULL` afterwards.
+ */
+const char    * tr_sys_dir_read_name        (tr_sys_dir_t         handle,
+                                             tr_error          ** error);
+
+/**
+ * @brief Portability wrapper for `closedir ()`.
+ *
+ * @param[in]  handle Valid directory descriptor.
+ * @param[out] error  Pointer to error object. Optional, pass `NULL` if you are
+ *                    not interested in error details.
+ *
+ * @return `True` on success, `false` otherwise (with `error` set accordingly).
+ */
+bool            tr_sys_dir_close            (tr_sys_dir_t         handle,
                                              tr_error          ** error);
 
 /** @} */

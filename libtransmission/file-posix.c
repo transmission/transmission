@@ -7,7 +7,12 @@
  * $Id$
  */
 
-#if (defined (HAVE_POSIX_FADVISE) || defined (HAVE_POSIX_FALLOCATE)) && (!defined (_XOPEN_SOURCE) || _XOPEN_SOURCE < 600)
+#if defined (HAVE_MKDTEMP) && (!defined (_XOPEN_SOURCE) || _XOPEN_SOURCE < 700)
+ #ifdef _XOPEN_SOURCE
+  #undef _XOPEN_SOURCE
+ #endif
+ #define _XOPEN_SOURCE 700
+#elif (defined (HAVE_POSIX_FADVISE) || defined (HAVE_POSIX_FALLOCATE)) && (!defined (_XOPEN_SOURCE) || _XOPEN_SOURCE < 600)
  #ifdef _XOPEN_SOURCE
   #undef _XOPEN_SOURCE
  #endif
@@ -23,6 +28,7 @@
 #endif
 
 #include <assert.h>
+#include <dirent.h>
 #include <errno.h>
 #include <fcntl.h> /* O_LARGEFILE, posix_fadvise (), [posix_]fallocate () */
 #include <libgen.h> /* basename (), dirname () */
@@ -41,6 +47,7 @@
 
 #include "transmission.h"
 #include "file.h"
+#include "log.h"
 #include "platform.h"
 #include "utils.h"
 
@@ -146,6 +153,79 @@ set_file_for_single_pass (tr_sys_file_t handle)
 
   errno = err;
 }
+
+#ifndef HAVE_MKDIRP
+
+static bool
+create_path (const char  * path_in,
+             int           permissions,
+             tr_error   ** error)
+{
+  char * p;
+  char * pp;
+  bool done;
+  int tmperr;
+  int rv;
+  struct stat sb;
+  char * path;
+
+  /* make a temporary copy of path */
+  path = tr_strdup (path_in);
+
+  /* walk past the root */
+  p = path;
+  while (*p == TR_PATH_DELIMITER)
+    ++p;
+
+  pp = p;
+  done = false;
+  while ((p = strchr (pp, TR_PATH_DELIMITER)) || (p = strchr (pp, '\0')))
+    {
+      if (!*p)
+        done = true;
+      else
+        *p = '\0';
+
+      tmperr = errno;
+      rv = stat (path, &sb);
+      errno = tmperr;
+      if (rv)
+        {
+          tr_error * my_error = NULL;
+
+          /* Folder doesn't exist yet */
+          if (!tr_sys_dir_create (path, 0, permissions, &my_error))
+            {
+              tr_logAddError (_ ("Couldn't create \"%1$s\": %2$s"), path, my_error->message);
+              tr_free (path);
+              tr_error_propagate (error, &my_error);
+              return false;
+            }
+        }
+      else if ((sb.st_mode & S_IFMT) != S_IFDIR)
+        {
+          /* Node exists but isn't a folder */
+          char * const buf = tr_strdup_printf (_ ("File \"%s\" is in the way"), path);
+          tr_logAddError (_ ("Couldn't create \"%1$s\": %2$s"), path_in, buf);
+          tr_free (buf);
+          tr_free (path);
+          set_system_error (error, ENOTDIR);
+          return false;
+        }
+
+      if (done)
+        break;
+
+      *p = TR_PATH_DELIMITER;
+      p++;
+      pp = p;
+    }
+
+  tr_free (path);
+  return true;
+}
+
+#endif
 
 bool
 tr_sys_path_exists (const char  * path,
@@ -818,6 +898,169 @@ tr_sys_file_unmap (const void  * address,
   assert (size > 0);
 
   ret = munmap ((void *) address, size) != -1;
+
+  if (!ret)
+    set_system_error (error, errno);
+
+  return ret;
+}
+
+char *
+tr_sys_dir_get_current (tr_error ** error)
+{
+  char * ret;
+
+  ret = getcwd (NULL, 0);
+
+  if (ret == NULL && (errno == EINVAL || errno == ERANGE))
+    {
+      size_t size = PATH_MAX;
+      char * tmp = NULL;
+
+      do
+        {
+          tmp = tr_renew (char, tmp, size);
+          if (tmp == NULL)
+            break;
+          ret = getcwd (tmp, size);
+          size += 2048;
+        }
+      while (ret == NULL && errno == ERANGE);
+
+      if (ret == NULL)
+        {
+          const int err = errno;
+          tr_free (tmp);
+          errno = err;
+        }
+    }
+
+  if (ret == NULL)
+    set_system_error (error, errno);
+
+  return ret;
+}
+
+bool
+tr_sys_dir_create (const char  * path,
+                   int           flags,
+                   int           permissions,
+                   tr_error   ** error)
+{
+  bool ret;
+  tr_error * my_error = NULL;
+
+  assert (path != NULL);
+
+  if ((flags & TR_SYS_DIR_CREATE_PARENTS) != 0)
+#ifdef HAVE_MKDIRP
+    ret = mkdirp (path, permissions) != -1;
+#else
+    ret = create_path (path, permissions, &my_error);
+#endif
+  else
+    ret = mkdir (path, permissions) != -1;
+
+  if (!ret && errno == EEXIST)
+    {
+      struct stat sb;
+
+      if (stat (path, &sb) != -1 && S_ISDIR (sb.st_mode))
+        {
+          tr_error_clear (&my_error);
+          ret = true;
+        }
+      else
+        {
+          errno = EEXIST;
+        }
+    }
+
+  if (!ret)
+    {
+      if (my_error != NULL)
+        tr_error_propagate (error, &my_error);
+      else
+        set_system_error (error, errno);
+    }
+
+  return ret;
+}
+
+bool
+tr_sys_dir_create_temp (char      * path_template,
+                        tr_error ** error)
+{
+  bool ret;
+
+  assert (path_template != NULL);
+
+#ifdef HAVE_MKDTEMP
+
+  ret = mkdtemp (path_template) != NULL;
+
+#else
+
+  ret = mktemp (path_template) != NULL && mkdir (path_template, 0700) != -1;
+
+#endif
+
+  if (!ret)
+    set_system_error (error, errno);
+
+  return ret;
+}
+
+tr_sys_dir_t
+tr_sys_dir_open (const char  * path,
+                 tr_error   ** error)
+{
+  tr_sys_dir_t ret;
+
+#ifndef __clang__
+  /* Clang gives "static_assert expression is not an integral constant expression" error */
+  TR_STATIC_ASSERT (TR_BAD_SYS_DIR == NULL, "values should match");
+#endif
+
+  assert (path != NULL);
+
+  ret = opendir (path);
+
+  if (ret == TR_BAD_SYS_DIR)
+    set_system_error (error, errno);
+
+  return ret;
+}
+
+const char *
+tr_sys_dir_read_name (tr_sys_dir_t    handle,
+                      tr_error     ** error)
+{
+  const char * ret = NULL;
+  struct dirent * entry;
+
+  assert (handle != TR_BAD_SYS_DIR);
+
+  errno = 0;
+  entry = readdir (handle);
+
+  if (entry != NULL)
+    ret = entry->d_name;
+  else if (errno != 0)
+    set_system_error (error, errno);
+
+  return ret;
+}
+
+bool
+tr_sys_dir_close (tr_sys_dir_t    handle,
+                  tr_error     ** error)
+{
+  bool ret;
+
+  assert (handle != TR_BAD_SYS_DIR);
+
+  ret = closedir (handle) != -1;
 
   if (!ret)
     set_system_error (error, errno);
