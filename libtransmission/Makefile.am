@@ -30,6 +30,7 @@ libtransmission_a_SOURCES = \
   crypto.c \
   error.c \
   fdlimit.c \
+  file.c \
   handshake.c \
   history.c \
   inout.c \

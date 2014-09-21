@@ -1153,6 +1153,105 @@ test_file_map (void)
 }
 
 static int
+test_file_utilities (void)
+{
+  char * const test_dir = create_test_dir (__FUNCTION__);
+  tr_error * err = NULL;
+  char * path1;
+  tr_sys_file_t fd;
+  char buffer[16];
+
+  path1 = tr_buildPath (test_dir, "a", NULL);
+
+  libtest_create_file_with_string_contents (path1, "a\nbc\r\ndef\nghij\r\n\n\nklmno\r");
+
+  fd = tr_sys_file_open (path1, TR_SYS_FILE_READ, 0, NULL);
+
+  check (tr_sys_file_read_line (fd, buffer, sizeof (buffer) / sizeof (*buffer), &err));
+  check (err == NULL);
+  check_streq ("a", buffer);
+  check (tr_sys_file_read_line (fd, buffer, sizeof (buffer) / sizeof (*buffer), &err));
+  check (err == NULL);
+  check_streq ("bc", buffer);
+  check (tr_sys_file_read_line (fd, buffer, sizeof (buffer) / sizeof (*buffer), &err));
+  check (err == NULL);
+  check_streq ("def", buffer);
+  check (tr_sys_file_read_line (fd, buffer, sizeof (buffer) / sizeof (*buffer), &err));
+  check (err == NULL);
+  check_streq ("ghij", buffer);
+  check (tr_sys_file_read_line (fd, buffer, sizeof (buffer) / sizeof (*buffer), &err));
+  check (err == NULL);
+  check_streq ("", buffer);
+  check (tr_sys_file_read_line (fd, buffer, sizeof (buffer) / sizeof (*buffer), &err));
+  check (err == NULL);
+  check_streq ("", buffer);
+  check (tr_sys_file_read_line (fd, buffer, 4, &err));
+  check (err == NULL);
+  check_streq ("klmn", buffer);
+  check (tr_sys_file_read_line (fd, buffer, sizeof (buffer) / sizeof (*buffer), &err));
+  check (err == NULL);
+  check_streq ("o", buffer);
+  check (!tr_sys_file_read_line (fd, buffer, sizeof (buffer) / sizeof (*buffer), &err));
+  check (err == NULL);
+  check_streq ("o", buffer); /* on EOF, buffer stays unchanged */
+
+  tr_sys_file_close (fd, NULL);
+
+  fd = tr_sys_file_open (path1, TR_SYS_FILE_READ | TR_SYS_FILE_WRITE | TR_SYS_FILE_TRUNCATE, 0, NULL);
+
+  check (tr_sys_file_write_line (fd, "p", &err));
+  check (err == NULL);
+  check (tr_sys_file_write_line (fd, "", &err));
+  check (err == NULL);
+  check (tr_sys_file_write_line (fd, "qr", &err));
+  check (err == NULL);
+  check (tr_sys_file_write_fmt (fd, "s%cu\r\n", &err, 't'));
+  check (err == NULL);
+  check (tr_sys_file_write_line (fd, "", &err));
+  check (err == NULL);
+  check (tr_sys_file_write_line (fd, "", &err));
+  check (err == NULL);
+  check (tr_sys_file_write_fmt (fd, "v%sy%d", &err, "wx", 2));
+  check (err == NULL);
+
+  tr_sys_file_seek (fd, 0, TR_SEEK_SET, NULL, NULL);
+
+  check (tr_sys_file_read_line (fd, buffer, sizeof (buffer) / sizeof (*buffer), &err));
+  check (err == NULL);
+  check_streq ("p", buffer);
+  check (tr_sys_file_read_line (fd, buffer, sizeof (buffer) / sizeof (*buffer), &err));
+  check (err == NULL);
+  check_streq ("", buffer);
+  check (tr_sys_file_read_line (fd, buffer, sizeof (buffer) / sizeof (*buffer), &err));
+  check (err == NULL);
+  check_streq ("qr", buffer);
+  check (tr_sys_file_read_line (fd, buffer, sizeof (buffer) / sizeof (*buffer), &err));
+  check (err == NULL);
+  check_streq ("stu", buffer);
+  check (tr_sys_file_read_line (fd, buffer, sizeof (buffer) / sizeof (*buffer), &err));
+  check (err == NULL);
+  check_streq ("", buffer);
+  check (tr_sys_file_read_line (fd, buffer, sizeof (buffer) / sizeof (*buffer), &err));
+  check (err == NULL);
+  check_streq ("", buffer);
+  check (tr_sys_file_read_line (fd, buffer, sizeof (buffer) / sizeof (*buffer), &err));
+  check (err == NULL);
+  check_streq ("vwxy2", buffer);
+  check (!tr_sys_file_read_line (fd, buffer, sizeof (buffer) / sizeof (*buffer), &err));
+  check (err == NULL);
+  check_streq ("vwxy2", buffer); /* on EOF, buffer stays unchanged */
+
+  tr_sys_file_close (fd, NULL);
+
+  tr_sys_path_remove (path1, NULL);
+
+  tr_free (path1);
+
+  tr_free (test_dir);
+  return 0;
+}
+
+static int
 test_dir_create (void)
 {
   char * const test_dir = create_test_dir (__FUNCTION__);
@@ -1309,6 +1408,7 @@ main (void)
       test_file_truncate,
       test_file_preallocate,
       test_file_map,
+      test_file_utilities,
       test_dir_create,
       test_dir_read
     };
