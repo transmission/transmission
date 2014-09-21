@@ -282,9 +282,9 @@ myDebug (const char * file, int line,
          const struct tr_peerMsgs * msgs,
          const char * fmt, ...)
 {
-  FILE * fp = tr_logGetFile ();
+  const tr_sys_file_t fp = tr_logGetFile ();
 
-  if (fp)
+  if (fp != TR_BAD_SYS_FILE)
     {
       va_list           args;
       char              timestr[64];
@@ -300,10 +300,10 @@ myDebug (const char * file, int line,
       va_start (args, fmt);
       evbuffer_add_vprintf (buf, fmt, args);
       va_end (args);
-      evbuffer_add_printf (buf, " (%s:%d)\n", base, line);
+      evbuffer_add_printf (buf, " (%s:%d)", base, line);
 
       message = evbuffer_free_to_str (buf);
-      fputs (message, fp);
+      tr_sys_file_write_line (fp, message, NULL);
 
       tr_free (base);
       tr_free (message);

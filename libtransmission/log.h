@@ -11,6 +11,8 @@
 #define TR_LOG_H 1
 
 #include <stddef.h> /* size_t */
+
+#include "file.h" /* tr_sys_file_t */
 #include "utils.h" /* TR_GNUC_PRINTF, TR_GNUC_NONNULL */
 
 #ifdef __cplusplus
@@ -107,7 +109,7 @@ void tr_logAddMessage (const char   * file,
 
 
 
-void* tr_logGetFile (void);
+tr_sys_file_t tr_logGetFile (void);
 
 /** @brief return true if deep logging has been enabled by the user; false otherwise */
 bool tr_logGetDeepEnabled (void);

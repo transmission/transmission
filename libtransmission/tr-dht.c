@@ -32,7 +32,6 @@
 /* posix */
 #include <signal.h> /* sig_atomic_t */
 #include <sys/time.h>
-#include <unistd.h> /* close () */
 #ifdef _WIN32
   #include <inttypes.h>
   #define _WIN32_WINNT  0x0501	/* freeaddrinfo (),getaddrinfo (),getnameinfo () */
@@ -51,6 +50,7 @@
 /* libT */
 #include "transmission.h"
 #include "crypto.h"
+#include "file.h"
 #include "log.h"
 #include "net.h"
 #include "peer-mgr.h" /* tr_peerMgrCompactToPex () */
@@ -195,22 +195,21 @@ dht_bootstrap (void *closure)
 
     if (!bootstrap_done (cl->session, 0)) {
         char *bootstrap_file;
-        FILE *f = NULL;
+        tr_sys_file_t f = TR_BAD_SYS_FILE;
 
         bootstrap_file =
             tr_buildPath (cl->session->configDir, "dht.bootstrap", NULL);
 
         if (bootstrap_file)
-            f = fopen (bootstrap_file, "rb");
-        if (f != NULL) {
+            f = tr_sys_file_open (bootstrap_file, TR_SYS_FILE_READ, 0, NULL);
+        if (f != TR_BAD_SYS_FILE) {
             tr_logAddNamedInfo ("DHT", "Attempting manual bootstrap");
             for (;;) {
                 char buf[201];
                 char *p;
                 int port = 0;
 
-                p = fgets (buf, 200, f);
-                if (p == NULL)
+                if (!tr_sys_file_read_line (f, buf, 200, NULL))
                     break;
 
                 p = memchr (buf, ' ', strlen (buf));
@@ -228,7 +227,7 @@ dht_bootstrap (void *closure)
                 if (bootstrap_done (cl->session, 0))
                     break;
             }
-            fclose (f);
+            tr_sys_file_close (f, NULL);
         }
 
         tr_free (bootstrap_file);
