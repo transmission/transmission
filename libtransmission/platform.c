@@ -13,10 +13,13 @@
 #endif
 
 #include <assert.h>
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <unistd.h> /* getuid(), close() */
+#include <unistd.h> /* getuid() */
+
+#ifdef __HAIKU__
+ #include <limits.h> /* PATH_MAX */
+#endif
 
 #ifdef _WIN32
  #include <w32api.h>
@@ -43,6 +46,7 @@
 #include "log.h"
 #include "platform.h"
 #include "session.h"
+#include "utils.h"
 
 /***
 ****  THREADS
@@ -223,6 +227,19 @@ tr_lockUnlock (tr_lock * l)
  #include <pwd.h>
 #endif
 
+#ifdef _WIN32
+
+char *
+win32_get_special_folder (int folder_id)
+{
+  wchar_t path[MAX_PATH]; /* SHGetFolderPath () requires MAX_PATH */
+  *path = L'\0';
+  SHGetFolderPathW (NULL, folder_id, NULL, 0, path);
+  return tr_win32_native_to_utf8 (path, -1);
+}
+
+#endif
+
 static const char *
 getHomeDir (void)
 {
@@ -235,10 +252,7 @@ getHomeDir (void)
       if (!home)
         {
 #ifdef _WIN32
-          char appdata[MAX_PATH]; /* SHGetFolderPath () requires MAX_PATH */
-          *appdata = '\0';
-          SHGetFolderPath (NULL, CSIDL_PERSONAL, NULL, 0, appdata);
-          home = tr_strdup (appdata);
+          home = win32_get_special_folder (CSIDL_PERSONAL);
 #else
           struct passwd * pw = getpwuid (getuid ());
           if (pw)
@@ -315,11 +329,11 @@ tr_getDefaultConfigDir (const char * appname)
 #ifdef __APPLE__
           s = tr_buildPath (getHomeDir (), "Library", "Application Support", appname, NULL);
 #elif defined (_WIN32)
-          char appdata[TR_PATH_MAX]; /* SHGetFolderPath () requires MAX_PATH */
-          SHGetFolderPath (NULL, CSIDL_APPDATA, NULL, 0, appdata);
+          char * appdata = win32_get_special_folder (CSIDL_APPDATA);
           s = tr_buildPath (appdata, appname, NULL);
+          tr_free (appdata);
 #elif defined (__HAIKU__)
-          char buf[TR_PATH_MAX];
+          char buf[PATH_MAX];
           find_directory (B_USER_SETTINGS_DIRECTORY, -1, true, buf, sizeof (buf));
           s = tr_buildPath (buf, appname, NULL);
 #else
@@ -396,7 +410,7 @@ tr_getDefaultDownloadDir (void)
 ****
 ***/
 
-static int
+static bool
 isWebClientDir (const char * path)
 {
   char * tmp = tr_buildPath (path, "index.html", NULL);
@@ -459,16 +473,14 @@ tr_getWebClientDir (const tr_session * session UNUSED)
 
 #elif defined (_WIN32)
 
-          /* SHGetFolderPath explicitly requires MAX_PATH length */
-          char dir[MAX_PATH];
-
           /* Generally, Web interface should be stored in a Web subdir of
            * calling executable dir. */
 
           if (s == NULL) /* check personal AppData/Transmission/Web */
             {
-              SHGetFolderPath (NULL, CSIDL_COMMON_APPDATA, NULL, 0, dir);
+              char * dir = win32_get_special_folder (CSIDL_COMMON_APPDATA);
               s = tr_buildPath (dir, "Transmission", "Web", NULL);
+              tr_free (dir);
               if (!isWebClientDir (s))
                 {
                   tr_free (s);
@@ -478,8 +490,9 @@ tr_getWebClientDir (const tr_session * session UNUSED)
 
           if (s == NULL) /* check personal AppData */
             {
-              SHGetFolderPath (NULL, CSIDL_APPDATA, NULL, 0, dir);
+              char * dir = win32_get_special_folder (CSIDL_APPDATA);
               s = tr_buildPath (dir, "Transmission", "Web", NULL);
+              tr_free (dir);
               if (!isWebClientDir (s))
                 {
                   tr_free (s);
@@ -489,11 +502,16 @@ tr_getWebClientDir (const tr_session * session UNUSED)
 
             if (s == NULL) /* check calling module place */
               {
-                char * tmp;
-                GetModuleFileName (GetModuleHandle (NULL), dir, sizeof (dir));
-                tmp = tr_sys_path_dirname (dir, NULL);
-                s = tr_buildPath (tmp, "Web", NULL);
-                tr_free (tmp);
+                wchar_t wide_module_path[MAX_PATH];
+                char * module_path;
+                char * dir;
+                GetModuleFileNameW (NULL, wide_module_path,
+                                    sizeof (wide_module_path) / sizeof (*wide_module_path));
+                module_path = tr_win32_native_to_utf8 (wide_module_path, -1);
+                dir = tr_sys_path_dirname (module_path, NULL);
+                tr_free (module_path);
+                s = tr_buildPath (dir, "Web", NULL);
+                tr_free (dir);
                 if (!isWebClientDir (s))
                   {
                     tr_free (s);

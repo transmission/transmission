@@ -29,8 +29,6 @@
  #endif
  #ifdef HAVE_GETMNTENT
   #ifdef __sun
-   #include <sys/types.h>
-   #include <sys/stat.h>
    #include <fcntl.h>
    #include <stdio.h>
    #include <sys/mntent.h>
@@ -366,10 +364,21 @@ tr_getDiskFreeSpace (const char * path)
 {
 #ifdef _WIN32
 
-  uint64_t freeBytesAvailable = 0;
-  return GetDiskFreeSpaceEx (path, &freeBytesAvailable, NULL, NULL)
-    ? (int64_t)freeBytesAvailable
-    : -1;
+  int64_t ret = -1;
+  wchar_t * wide_path;
+
+  wide_path = tr_win32_utf8_to_native (path, -1);
+
+  if (wide_path != NULL)
+    {
+      ULARGE_INTEGER freeBytesAvailable;
+      if (GetDiskFreeSpaceExW (wide_path, &freeBytesAvailable, NULL, NULL))
+        ret = freeBytesAvailable.QuadPart;
+
+      tr_free (wide_path);
+    }
+
+  return ret;
 
 #elif defined(HAVE_STATVFS)
 

@@ -61,12 +61,10 @@
 #define SPEED_G_STR "GB/s"
 #define SPEED_T_STR "TB/s"
 
-#define LOGFILE_MODE_STR "a+"
-
 static bool paused = false;
 static bool seenHUP = false;
 static const char *logfileName = NULL;
-static FILE *logfile = NULL;
+static tr_sys_file_t logfile = TR_BAD_SYS_FILE;
 static tr_session * mySession = NULL;
 static tr_quark key_pidfile = 0;
 static struct event_base *ev_base = NULL;
@@ -144,6 +142,30 @@ showUsage (void)
     exit (0);
 }
 
+static bool
+reopen_log_file (const char *filename)
+{
+    tr_error * error = NULL;
+    const tr_sys_file_t old_log_file = logfile;
+    const tr_sys_file_t new_log_file = tr_sys_file_open (filename,
+                                                         TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE | TR_SYS_FILE_APPEND,
+                                                         0666, &error);
+
+    if (new_log_file == TR_BAD_SYS_FILE)
+    {
+        fprintf (stderr, "Couldn't (re)open log file \"%s\": %s\n", filename, error->message);
+        tr_error_free (error);
+        return false;
+    }
+
+    logfile = new_log_file;
+
+    if (old_log_file != TR_BAD_SYS_FILE)
+        tr_sys_file_close (old_log_file, NULL);
+
+    return true;
+}
+
 static void
 gotsig (int sig)
 {
@@ -162,10 +184,9 @@ gotsig (int sig)
                 const char * configDir;
 
                 /* reopen the logfile to allow for log rotation */
-                if (logfileName) {
-                    logfile = freopen (logfileName, LOGFILE_MODE_STR, logfile);
-                    if (!logfile)
-                        fprintf (stderr, "Couldn't reopen \"%s\": %s\n", logfileName, tr_strerror (errno));
+                if (logfileName != NULL)
+                {
+                    reopen_log_file (logfileName);
                 }
 
                 configDir = tr_sessionGetConfigDir (mySession);
@@ -306,16 +327,18 @@ onFileAdded (tr_session * session, const char * dir, const char * file)
 }
 
 static void
-printMessage (FILE * logfile, int level, const char * name, const char * message, const char * file, int line)
+printMessage (tr_sys_file_t logfile, int level, const char * name, const char * message, const char * file, int line)
 {
-    if (logfile != NULL)
+    if (logfile != TR_BAD_SYS_FILE)
     {
         char timestr[64];
         tr_logGetTimeStr (timestr, sizeof (timestr));
         if (name)
-            fprintf (logfile, "[%s] %s %s (%s:%d)\n", timestr, name, message, file, line);
+            tr_sys_file_write_fmt (logfile, "[%s] %s %s (%s:%d)" TR_NATIVE_EOL_STR,
+                                   NULL, timestr, name, message, file, line);
         else
-            fprintf (logfile, "[%s] %s (%s:%d)\n", timestr, message, file, line);
+            tr_sys_file_write_fmt (logfile, "[%s] %s (%s:%d)" TR_NATIVE_EOL_STR,
+                                   NULL, timestr, message, file, line);
     }
 #ifdef HAVE_SYSLOG
     else /* daemon... write to syslog */
@@ -338,7 +361,7 @@ printMessage (FILE * logfile, int level, const char * name, const char * message
 }
 
 static void
-pumpLogMessages (FILE * logfile)
+pumpLogMessages (tr_sys_file_t logfile)
 {
     const tr_log_message * l;
     tr_log_message * list = tr_logGetQueue ();
@@ -346,8 +369,8 @@ pumpLogMessages (FILE * logfile)
     for (l=list; l!=NULL; l=l->next)
         printMessage (logfile, l->level, l->name, l->message, l->file, l->line);
 
-    if (logfile != NULL)
-        fflush (logfile);
+    if (logfile != TR_BAD_SYS_FILE)
+        tr_sys_file_flush (logfile, NULL);
 
     tr_logFreeQueue (list);
 }
@@ -439,11 +462,8 @@ main (int argc, char ** argv)
                       break;
             case 'd': dumpSettings = true;
                       break;
-            case 'e': logfile = fopen (optarg, LOGFILE_MODE_STR);
-                      if (logfile)
+            case 'e': if (reopen_log_file (optarg))
                           logfileName = optarg;
-                      else
-                          fprintf (stderr, "Couldn't open \"%s\": %s\n", optarg, tr_strerror (errno));
                       break;
             case 'f': foreground = true;
                       break;
@@ -518,8 +538,8 @@ main (int argc, char ** argv)
         }
     }
 
-    if (foreground && !logfile)
-        logfile = stderr;
+    if (foreground && logfile == TR_BAD_SYS_FILE)
+        logfile = tr_sys_file_get_std (TR_STD_SYS_FILE_ERR, NULL);
 
     if (!loaded)
     {
@@ -568,16 +588,22 @@ main (int argc, char ** argv)
     tr_variantDictFindStr (&settings, key_pidfile, &pid_filename, NULL);
     if (pid_filename && *pid_filename)
     {
-        FILE * fp = fopen (pid_filename, "w+");
-        if (fp != NULL)
+        tr_error * error = NULL;
+        tr_sys_file_t fp = tr_sys_file_open (pid_filename,
+                                             TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE | TR_SYS_FILE_TRUNCATE,
+                                             0666, &error);
+        if (fp != TR_BAD_SYS_FILE)
         {
-            fprintf (fp, "%d", (int)getpid ());
-            fclose (fp);
+            tr_sys_file_write_fmt (fp, "%d", NULL, (int)getpid ());
+            tr_sys_file_close (fp, NULL);
             tr_logAddInfo ("Saved pidfile \"%s\"", pid_filename);
             pidfile_created = true;
         }
         else
-            tr_logAddError ("Unable to save pidfile \"%s\": %s", pid_filename, tr_strerror (errno));
+        {
+            tr_logAddError ("Unable to save pidfile \"%s\": %s", pid_filename, error->message);
+            tr_error_free (error);
+        }
     }
 
     if (tr_variantDictFindBool (&settings, TR_KEY_rpc_authentication_required, &boolVal) && boolVal)
