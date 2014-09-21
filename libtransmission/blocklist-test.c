@@ -41,7 +41,7 @@ create_text_file (const char * path, const char * contents)
   char * dir;
 
   dir = tr_sys_path_dirname (path, NULL);
-  tr_mkdirp (dir, 0700);
+  tr_sys_dir_create (dir, TR_SYS_DIR_CREATE_PARENTS, 0700, NULL);
   tr_free (dir);
 
   fd = tr_sys_file_open (path, TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE | TR_SYS_FILE_TRUNCATE, 0600, NULL);

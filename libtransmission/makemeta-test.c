@@ -144,7 +144,7 @@ test_single_directory_impl (const tr_tracker_info * trackers,
 
   /* create the top temp directory */
   top = tr_buildPath (sandbox, "folder.XXXXXX", NULL);
-  tr_mkdtemp (top);
+  tr_sys_dir_create_temp (top, NULL);
 
   /* build the payload files that go into the top temp directory */
   files = tr_new (char*, payloadCount);

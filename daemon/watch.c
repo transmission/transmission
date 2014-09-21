@@ -19,8 +19,6 @@
 #include <string.h> /* strlen () */
 #include <stdio.h> /* perror () */
 
-#include <dirent.h> /* readdir */
-
 #include <libtransmission/transmission.h>
 #include <libtransmission/file.h>
 #include <libtransmission/log.h>
@@ -59,7 +57,7 @@ static void
 watchdir_new_impl (dtr_watchdir * w)
 {
     int i;
-    DIR * odir;
+    tr_sys_dir_t odir;
     w->inotify_fd = inotify_init ();
 
     if (w->inotify_fd < 0)
@@ -76,14 +74,11 @@ watchdir_new_impl (dtr_watchdir * w)
     {
         tr_logAddError ("Unable to watch \"%s\": %s", w->dir, tr_strerror (errno));
     }
-    else if ((odir = opendir (w->dir)))
+    else if ((odir = tr_sys_dir_open (w->dir, NULL)) != TR_BAD_SYS_DIR)
     {
-        struct dirent * d;
-
-        while ((d = readdir (odir)))
+        const char * name;
+        while ((name = tr_sys_dir_read_name (odir, NULL)) != NULL)
         {
-            const char * name = d->d_name;
-
             if (!tr_str_has_suffix (name, ".torrent")) /* skip non-torrents */
                 continue;
 
@@ -91,7 +86,7 @@ watchdir_new_impl (dtr_watchdir * w)
             w->callback (w->session, w->dir, name);
         }
 
-        closedir (odir);
+        tr_sys_dir_close (odir, NULL);
     }
 
 }
@@ -196,24 +191,22 @@ static void
 watchdir_update_impl (dtr_watchdir * w)
 {
     tr_sys_path_info info;
-    DIR * odir;
+    tr_sys_dir_t odir;
     const time_t oldTime = w->lastTimeChecked;
     const char * dirname = w->dir;
     struct evbuffer * curFiles = evbuffer_new ();
 
-    if ((oldTime + WATCHDIR_POLL_INTERVAL_SECS < time (NULL))
-         && tr_sys_path_get_info (dirname, 0, &info, NULL)
-         && info.type == TR_SYS_PATH_IS_DIRECTORY
-         && ((odir = opendir (dirname))))
+    if (oldTime + WATCHDIR_POLL_INTERVAL_SECS < time (NULL) &&
+        tr_sys_path_get_info (dirname, 0, &info, NULL) &&
+        info.type == TR_SYS_PATH_IS_DIRECTORY &&
+        (odir = tr_sys_dir_open (dirname, NULL)) != TR_BAD_SYS_DIR)
     {
-        struct dirent * d;
-
-        for (d = readdir (odir); d != NULL; d = readdir (odir))
+        const char * name;
+        while ((name = tr_sys_dir_read_name (odir, NULL)) != NULL)
         {
             size_t len;
-            const char * name = d->d_name;
 
-            if (!name || *name=='.') /* skip dotfiles */
+            if (*name == '.') /* skip dotfiles */
                 continue;
             if (!tr_str_has_suffix (name, ".torrent")) /* skip non-torrents */
                 continue;
@@ -228,7 +221,7 @@ watchdir_update_impl (dtr_watchdir * w)
             }
         }
 
-        closedir (odir);
+        tr_sys_dir_close (odir, NULL);
         w->lastTimeChecked = time (NULL);
         evbuffer_free (w->lastFiles);
         w->lastFiles = curFiles;

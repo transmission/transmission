@@ -7,12 +7,11 @@
  * $Id$
  */
 
-#include <errno.h>
 #include <stdio.h> /* fprintf() */
 #include <stdlib.h> /* strtoul(), EXIT_FAILURE */
-#include <unistd.h> /* getcwd() */
 
 #include <libtransmission/transmission.h>
+#include <libtransmission/error.h>
 #include <libtransmission/file.h>
 #include <libtransmission/makemeta.h>
 #include <libtransmission/tr-getopt.h>
@@ -112,21 +111,18 @@ static char*
 tr_getcwd (void)
 {
   char * result;
-  char buf[2048];
+  tr_error * error = NULL;
 
-#ifdef _WIN32
-  result = _getcwd (buf, sizeof (buf));
-#else
-  result = getcwd (buf, sizeof (buf));
-#endif
+  result = tr_sys_dir_get_current (&error);
 
   if (result == NULL)
     {
-      fprintf (stderr, "getcwd error: \"%s\"", tr_strerror (errno));
-      *buf = '\0';
+      fprintf (stderr, "getcwd error: \"%s\"", error->message);
+      tr_error_free (error);
+      result = tr_strdup ("");
     }
 
-  return tr_strdup (buf);
+  return result;
 }
 
 int

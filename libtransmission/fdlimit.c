@@ -127,7 +127,7 @@ cached_file_close (struct tr_cached_file * o)
 /**
  * returns 0 on success, or an errno value on failure.
  * errno values include ENOENT if the parent folder doesn't exist,
- * plus the errno values set by tr_mkdirp () and tr_sys_file_open ().
+ * plus the errno values set by tr_sys_dir_create () and tr_sys_file_open ().
  */
 static int
 cached_file_open (struct tr_cached_file  * o,
@@ -146,10 +146,11 @@ cached_file_open (struct tr_cached_file  * o,
   if (writable)
     {
       char * dir = tr_sys_path_dirname (filename, NULL);
-      const int err = tr_mkdirp (dir, 0777) ? errno : 0;
-      if (err)
+      if (!tr_sys_dir_create (dir, TR_SYS_DIR_CREATE_PARENTS, 0777, &error))
         {
-          tr_logAddError (_("Couldn't create \"%1$s\": %2$s"), dir, tr_strerror (err));
+          const int err = error->code;
+          tr_logAddError (_("Couldn't create \"%1$s\": %2$s"), dir, error->message);
+          tr_error_free (error);
           tr_free (dir);
           return err;
         }

@@ -117,9 +117,7 @@ runTests (const testFunc * const tests, int numTests)
 ****
 ***/
 
-#include <sys/types.h> /* opendir() */
-#include <dirent.h> /* opendir() */
-#include <unistd.h> /* getcwd() */
+#include <unistd.h> /* sync() */
 
 #include <errno.h>
 #include <string.h> /* strcmp() */
@@ -134,21 +132,18 @@ static char*
 tr_getcwd (void)
 {
   char * result;
-  char buf[2048];
+  tr_error * error = NULL;
 
-#ifdef _WIN32
-  result = _getcwd (buf, sizeof (buf));
-#else
-  result = getcwd (buf, sizeof (buf));
-#endif
+  result = tr_sys_dir_get_current (&error);
 
   if (result == NULL)
     {
-      fprintf (stderr, "getcwd error: \"%s\"", tr_strerror (errno));
-      *buf = '\0';
+      fprintf (stderr, "getcwd error: \"%s\"", error->message);
+      tr_error_free (error);
+      result = tr_strdup ("");
     }
 
-  return tr_strdup (buf);
+  return result;
 }
 
 char *
@@ -157,7 +152,7 @@ libtest_sandbox_create (void)
   char * path = tr_getcwd ();
   char * sandbox = tr_buildPath (path, "sandbox-XXXXXX", NULL);
   tr_free (path);
-  tr_mkdtemp (sandbox);
+  tr_sys_dir_create_temp (sandbox, NULL);
   return sandbox;
 }
 
@@ -168,21 +163,22 @@ rm_rf (const char * killme)
 
   if (tr_sys_path_get_info (killme, 0, &info, NULL))
     {
-      DIR * odir;
+      tr_sys_dir_t odir;
 
-      if (info.type == TR_SYS_PATH_IS_DIRECTORY && ((odir = opendir (killme))))
+      if (info.type == TR_SYS_PATH_IS_DIRECTORY &&
+          (odir = tr_sys_dir_open (killme, NULL)) != TR_BAD_SYS_DIR)
         {
-          struct dirent *d;
-          for (d = readdir(odir); d != NULL; d=readdir(odir))
+          const char * name;
+          while ((name = tr_sys_dir_read_name (odir, NULL)) != NULL)
             {
-              if (d->d_name && strcmp(d->d_name,".") && strcmp(d->d_name,".."))
+              if (strcmp (name, ".") != 0 && strcmp (name, "..") != 0)
                 {
-                  char * tmp = tr_buildPath (killme, d->d_name, NULL);
+                  char * tmp = tr_buildPath (killme, name, NULL);
                   rm_rf (tmp);
                   tr_free (tmp);
                 }
             }
-          closedir (odir);
+          tr_sys_dir_close (odir, NULL);
         }
 
       if (verbose)
@@ -256,7 +252,7 @@ libttest_session_init (tr_variant * settings)
     path = tr_strdup_printf ("%s/%*.*s", sandbox, (int)len, (int)len, str);
   else
     path = tr_buildPath (sandbox, "Downloads", NULL);
-  tr_mkdirp (path, 0700);
+  tr_sys_dir_create (path, TR_SYS_DIR_CREATE_PARENTS, 0700, NULL);
   tr_variantDictAddStr (settings, q, path);
   tr_free (path);
 
@@ -270,7 +266,7 @@ libttest_session_init (tr_variant * settings)
   tr_free (path);
 
   path = tr_buildPath (sandbox, "blocklists", NULL);
-  tr_mkdirp (path, 0700);
+  tr_sys_dir_create (path, TR_SYS_DIR_CREATE_PARENTS, 0700, NULL);
   tr_free (path);
 
   q = TR_KEY_port_forwarding_enabled;
@@ -384,7 +380,7 @@ libttest_zero_torrent_populate (tr_torrent * tor, bool complete)
       else
         path = tr_strdup_printf ("%s%c%s", tor->currentDir, TR_PATH_DELIMITER, file->name);
       dirname = tr_sys_path_dirname (path, NULL);
-      tr_mkdirp (dirname, 0700);
+      tr_sys_dir_create (dirname, TR_SYS_DIR_CREATE_PARENTS, 0700, NULL);
       fd = tr_sys_file_open (path, TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE | TR_SYS_FILE_TRUNCATE, 0600, NULL);
       for (j=0; j<file->length; ++j)
         tr_sys_file_write (fd, ((!complete) && (i==0) && (j<tor->info.pieceSize)) ? "\1" : "\0", 1, NULL, NULL);
@@ -437,12 +433,12 @@ static void
 build_parent_dir (const char* path)
 {
   char * dir;
+  tr_error * error = NULL;
   const int tmperr = errno;
 
   dir = tr_sys_path_dirname (path, NULL);
-  errno = 0;
-  tr_mkdirp (dir, 0700);
-  assert (errno == 0);
+  tr_sys_dir_create (dir, TR_SYS_DIR_CREATE_PARENTS, 0700, &error);
+  assert (error == NULL);
   tr_free (dir);
 
   errno = tmperr;

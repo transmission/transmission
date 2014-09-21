@@ -15,7 +15,6 @@
  #include <process.h>
 #endif
 #include <unistd.h> /* fork (), execvp (), _exit () */
-#include <dirent.h>
 
 #include <assert.h>
 #include <math.h>
@@ -2839,22 +2838,22 @@ isJunkFile (const char * base)
 static void
 removeEmptyFoldersAndJunkFiles (const char * folder)
 {
-  DIR * odir;
+  tr_sys_dir_t odir;
 
-  if ((odir = opendir (folder)))
+  if ((odir = tr_sys_dir_open (folder, NULL)) != TR_BAD_SYS_DIR)
     {
-      struct dirent * d;
-      while ((d = readdir (odir)))
+      const char * name;
+      while ((name = tr_sys_dir_read_name (odir, NULL)) != NULL)
         {
-          if (strcmp (d->d_name, ".") && strcmp (d->d_name, ".."))
+          if (strcmp (name, ".") != 0 && strcmp (name, "..") != 0)
             {
               tr_sys_path_info info;
-              char * filename = tr_buildPath (folder, d->d_name, NULL);
+              char * filename = tr_buildPath (folder, name, NULL);
 
               if (tr_sys_path_get_info (filename, 0, &info, NULL) &&
                   info.type == TR_SYS_PATH_IS_DIRECTORY)
                 removeEmptyFoldersAndJunkFiles (filename);
-              else if (isJunkFile (d->d_name))
+              else if (isJunkFile (name))
                 tr_sys_path_remove (filename, NULL);
 
               tr_free (filename);
@@ -2862,7 +2861,7 @@ removeEmptyFoldersAndJunkFiles (const char * folder)
         }
 
       tr_sys_path_remove (folder, NULL);
-      closedir (odir);
+      tr_sys_dir_close (odir, NULL);
     }
 }
 
@@ -2881,7 +2880,7 @@ deleteLocalData (tr_torrent * tor, tr_fileFunc func)
   int i, n;
   tr_file_index_t f;
   char * base;
-  DIR * odir;
+  tr_sys_dir_t odir;
   char * tmpdir = NULL;
   tr_ptrArray files = TR_PTR_ARRAY_INIT;
   tr_ptrArray folders = TR_PTR_ARRAY_INIT;
@@ -2898,7 +2897,7 @@ deleteLocalData (tr_torrent * tor, tr_fileFunc func)
 
   base = tr_strdup_printf ("%s__XXXXXX", tr_torrentName (tor));
   tmpdir = tr_buildPath (top, base, NULL);
-  tr_mkdtemp (tmpdir);
+  tr_sys_dir_create_temp (tmpdir, NULL);
   tr_free (base);
 
   for (f=0; f<tor->info.fileCount; ++f)
@@ -2940,19 +2939,19 @@ deleteLocalData (tr_torrent * tor, tr_fileFunc func)
   ***/
 
   /* try deleting the local data's top-level files & folders */
-  if ((odir = opendir (tmpdir)))
+  if ((odir = tr_sys_dir_open (tmpdir, NULL)) != TR_BAD_SYS_DIR)
     {
-      struct dirent * d;
-      while ((d = readdir (odir)))
+      const char * name;
+      while ((name = tr_sys_dir_read_name (odir, NULL)) != NULL)
         {
-          if (strcmp (d->d_name, ".") && strcmp (d->d_name, ".."))
+          if (strcmp (name, ".") != 0 && strcmp (name, "..") != 0)
             {
-              char * file = tr_buildPath (tmpdir, d->d_name, NULL);
+              char * file = tr_buildPath (tmpdir, name, NULL);
               func (file);
               tr_free (file);
             }
         }
-      closedir (odir);
+      tr_sys_dir_close (odir, NULL);
     }
 
   /* go from the bottom up */
@@ -3063,7 +3062,7 @@ setLocation (void * vdata)
   tr_logAddDebug ("Moving \"%s\" location from currentDir \"%s\" to \"%s\"",
                   tr_torrentName (tor), tor->currentDir, location);
 
-  tr_mkdirp (location, 0777);
+  tr_sys_dir_create (location, TR_SYS_DIR_CREATE_PARENTS, 0777, NULL);
 
   if (!tr_sys_path_is_same (location, tor->currentDir, NULL))
     {

@@ -270,11 +270,11 @@ tr_setConfigDir (tr_session * session, const char * configDir)
   session->configDir = tr_strdup (configDir);
 
   path = tr_buildPath (configDir, RESUME_SUBDIR, NULL);
-  tr_mkdirp (path, 0777);
+  tr_sys_dir_create (path, TR_SYS_DIR_CREATE_PARENTS, 0777, NULL);
   session->resumeDir = path;
 
   path = tr_buildPath (configDir, TORRENT_SUBDIR, NULL);
-  tr_mkdirp (path, 0777);
+  tr_sys_dir_create (path, TR_SYS_DIR_CREATE_PARENTS, 0777, NULL);
   session->torrentDir = path;
 }
 

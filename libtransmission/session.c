@@ -16,7 +16,6 @@
 #include <signal.h>
 #include <sys/types.h> /* umask () */
 #include <sys/stat.h> /* umask () */
-#include <dirent.h> /* opendir */
 
 #include <event2/dns.h> /* evdns_base_free () */
 #include <event2/event.h>
@@ -719,7 +718,7 @@ tr_sessionInitImpl (void * vdata)
 
   {
     char * filename = tr_buildPath (session->configDir, "blocklists", NULL);
-    tr_mkdirp (filename, 0777);
+    tr_sys_dir_create (filename, TR_SYS_DIR_CREATE_PARENTS, 0777, NULL);
     tr_free (filename);
     loadBlocklists (session);
   }
@@ -1948,7 +1947,7 @@ sessionLoadTorrents (void * vdata)
   int i;
   int n = 0;
   tr_sys_path_info info;
-  DIR * odir = NULL;
+  tr_sys_dir_t odir = NULL;
   tr_list * l = NULL;
   tr_list * list = NULL;
   struct sessionLoadTorrentsData * data = vdata;
@@ -1958,17 +1957,17 @@ sessionLoadTorrents (void * vdata)
 
   tr_ctorSetSave (data->ctor, false); /* since we already have them */
 
-  if (tr_sys_path_get_info (dirname, 0, &info, NULL)
-      && info.type == TR_SYS_PATH_IS_DIRECTORY
-      && ((odir = opendir (dirname))))
+  if (tr_sys_path_get_info (dirname, 0, &info, NULL) &&
+      info.type == TR_SYS_PATH_IS_DIRECTORY &&
+      (odir = tr_sys_dir_open (dirname, NULL)) != TR_BAD_SYS_DIR)
     {
-      struct dirent *d;
-      for (d = readdir (odir); d != NULL; d = readdir (odir))
+      const char * name;
+      while ((name = tr_sys_dir_read_name (odir, NULL)) != NULL)
         {
-          if (tr_str_has_suffix (d->d_name, ".torrent"))
+          if (tr_str_has_suffix (name, ".torrent"))
             {
               tr_torrent * tor;
-              char * path = tr_buildPath (dirname, d->d_name, NULL);
+              char * path = tr_buildPath (dirname, name, NULL);
               tr_ctorSetMetainfoFromFile (data->ctor, path);
               if ((tor = tr_torrentNew (data->ctor, NULL, NULL)))
                 {
@@ -1978,7 +1977,7 @@ sessionLoadTorrents (void * vdata)
               tr_free (path);
             }
         }
-      closedir (odir);
+      tr_sys_dir_close (odir, NULL);
     }
 
   data->torrents = tr_new (tr_torrent *, n);
@@ -2229,31 +2228,31 @@ tr_stringEndsWith (const char * str, const char * end)
 static void
 loadBlocklists (tr_session * session)
 {
-  DIR * odir;
+  tr_sys_dir_t odir;
   char * dirname;
-  struct dirent * d;
+  const char * name;
   tr_list * blocklists = NULL;
   tr_ptrArray loadme = TR_PTR_ARRAY_INIT;
   const bool isEnabled = session->isBlocklistEnabled;
 
   /* walk the blocklist directory... */
   dirname = tr_buildPath (session->configDir, "blocklists", NULL);
-  odir = opendir (dirname);
-  if (odir == NULL)
+  odir = tr_sys_dir_open (dirname, NULL);
+  if (odir == TR_BAD_SYS_DIR)
     {
       tr_free (dirname);
       return;
     }
 
-  while ((d = readdir (odir)))
+  while ((name = tr_sys_dir_read_name (odir, NULL)) != NULL)
     {
       char * path;
       char * load = NULL;
  
-      if (!d->d_name || (d->d_name[0]=='.')) /* ignore dotfiles */
+      if (name[0] == '.') /* ignore dotfiles */
         continue;
 
-      path = tr_buildPath (dirname, d->d_name, NULL);
+      path = tr_buildPath (dirname, name, NULL);
 
       if (tr_stringEndsWith (path, ".bin"))
         {
@@ -2266,7 +2265,7 @@ loadBlocklists (tr_session * session)
           tr_sys_path_info path_info;
           tr_sys_path_info binname_info;
 
-          basename = tr_sys_path_basename (d->d_name, NULL);
+          basename = tr_sys_path_basename (name, NULL);
           binname = tr_strdup_printf ("%s" TR_PATH_DELIMITER_STR "%s.bin", dirname, basename);
 
           if (!tr_sys_path_get_info (binname, 0, &binname_info, NULL)) /* create it */
@@ -2328,7 +2327,7 @@ loadBlocklists (tr_session * session)
     }
 
   /* cleanup */
-  closedir (odir);
+  tr_sys_dir_close (odir, NULL);
   tr_free (dirname);
   tr_ptrArrayDestruct (&loadme, (PtrArrayForeachFunc)tr_free);
   session->blocklists = blocklists;
@@ -2460,7 +2459,7 @@ metainfoLookupInit (tr_session * session)
 {
   tr_sys_path_info info;
   const char * dirname = tr_getTorrentDir (session);
-  DIR * odir = NULL;
+  tr_sys_dir_t odir;
   tr_ctor * ctor = NULL;
   tr_variant * lookup;
   int n = 0;
@@ -2472,17 +2471,17 @@ metainfoLookupInit (tr_session * session)
   tr_variantInitDict (lookup, 0);
   ctor = tr_ctorNew (session);
   tr_ctorSetSave (ctor, false); /* since we already have them */
-  if (tr_sys_path_get_info (dirname, 0, &info, NULL)
-      && info.type == TR_SYS_PATH_IS_DIRECTORY
-      && ((odir = opendir (dirname))))
+  if (tr_sys_path_get_info (dirname, 0, &info, NULL) &&
+      info.type == TR_SYS_PATH_IS_DIRECTORY &&
+      (odir = tr_sys_dir_open (dirname, NULL)) != TR_BAD_SYS_DIR)
     {
-      struct dirent *d;
-      while ((d = readdir (odir)))
+      const char * name;
+      while ((name = tr_sys_dir_read_name (odir, NULL)) != NULL)
         {
-          if (tr_str_has_suffix (d->d_name, ".torrent"))
+          if (tr_str_has_suffix (name, ".torrent"))
             {
               tr_info inf;
-              char * path = tr_buildPath (dirname, d->d_name, NULL);
+              char * path = tr_buildPath (dirname, name, NULL);
               tr_ctorSetMetainfoFromFile (ctor, path);
               if (!tr_torrentParse (ctor, &inf))
                 {
@@ -2492,7 +2491,7 @@ metainfoLookupInit (tr_session * session)
               tr_free (path);
             }
         }
-      closedir (odir);
+      tr_sys_dir_close (odir, NULL);
     }
   tr_ctorFree (ctor);
 

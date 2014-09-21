@@ -14,7 +14,6 @@
 #if defined (XCODE_BUILD)
  #define HAVE_GETPAGESIZE
  #define HAVE_ICONV_OPEN
- #define HAVE_MKDTEMP
  #define HAVE_VALLOC
 #endif
 
@@ -28,8 +27,6 @@
 #include <stdlib.h>
 #include <string.h> /* strerror (), memset (), memmem () */
 #include <time.h> /* nanosleep () */
-#include <sys/types.h>
-#include <sys/stat.h>
 
 #ifdef HAVE_ICONV_OPEN
  #include <iconv.h>
@@ -279,111 +276,6 @@ tr_loadFile (const char * path,
   buf[info.size] = '\0';
   *size = info.size;
   return buf;
-}
-
-char*
-tr_mkdtemp (char * template)
-{
-#ifdef HAVE_MKDTEMP
-  return mkdtemp (template);
-#else
-  if (!mktemp (template) || mkdir (template, 0700))
-    return NULL;
-  return template;
-#endif
-}
-
-/**
- * @brief Portability wrapper for mkdir ()
- *
- * A portability wrapper around mkdir ().
- * On WIN32, the `permissions' argument is unused.
- *
- * @return zero on success, or -1 if an error occurred
- * (in which case errno is set appropriately).
- */
-static int
-tr_mkdir (const char * path, int permissions UNUSED)
-{
-#ifdef _WIN32
-  if (path && isalpha (path[0]) && path[1] == ':' && !path[2])
-    return 0;
-  return mkdir (path);
-#else
-  return mkdir (path, permissions);
-#endif
-}
-
-int
-tr_mkdirp (const char * path_in,
-           int          permissions)
-{
-  char * p;
-  char * pp;
-  bool done;
-  int tmperr;
-  int rv;
-  struct stat sb;
-  char * path;
-
-  /* make a temporary copy of path */
-  path = tr_strdup (path_in);
-  if (path == NULL)
-    {
-      errno = ENOMEM;
-      return -1;
-    }
-
-  /* walk past the root */
-  p = path;
-  while (*p == TR_PATH_DELIMITER)
-    ++p;
-
-  pp = p;
-  done = false;
-  while ((p = strchr (pp, TR_PATH_DELIMITER)) || (p = strchr (pp, '\0')))
-    {
-      if (!*p)
-        done = true;
-      else
-        *p = '\0';
-
-      tmperr = errno;
-      rv = stat (path, &sb);
-      errno = tmperr;
-      if (rv)
-        {
-          /* Folder doesn't exist yet */
-          if (tr_mkdir (path, permissions))
-            {
-              tmperr = errno;
-              tr_logAddError (_("Couldn't create \"%1$s\": %2$s"), path, tr_strerror (tmperr));
-              tr_free (path);
-              errno = tmperr;
-              return -1;
-            }
-        }
-      else if ((sb.st_mode & S_IFMT) != S_IFDIR)
-        {
-          /* Node exists but isn't a folder */
-          char * buf = tr_strdup_printf (_("File \"%s\" is in the way"), path);
-          tr_logAddError (_("Couldn't create \"%1$s\": %2$s"), path_in, buf);
-          tr_free (buf);
-          tr_free (path);
-          errno = ENOTDIR;
-          return -1;
-        }
-
-      if (done)
-        break;
-
-      *p = TR_PATH_DELIMITER;
-      p++;
-      pp = p;
-    }
-
-  tr_free (path);
-  return 0;
 }
 
 char*
@@ -1569,10 +1461,15 @@ tr_moveFile (const char * oldpath, const char * newpath, bool * renamed)
   /* make sure the target directory exists */
   {
     char * newdir = tr_sys_path_dirname (newpath, NULL);
-    int i = tr_mkdirp (newdir, 0777);
+    const bool i = tr_sys_dir_create (newdir, TR_SYS_DIR_CREATE_PARENTS, 0777, &error);
     tr_free (newdir);
-    if (i)
-      return i;
+    if (!i)
+      {
+        const int err = error->code;
+        tr_error_free (error);
+        errno = err;
+        return -1;
+      }
   }
 
   /* they might be on the same filesystem... */

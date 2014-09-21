@@ -28,6 +28,7 @@
 #include <signal.h>
 
 #include <libtransmission/transmission.h>
+#include <libtransmission/error.h>
 #include <libtransmission/file.h>
 #include <libtransmission/tr-getopt.h>
 #include <libtransmission/utils.h> /* tr_wait_msec */
@@ -268,11 +269,11 @@ main (int argc, char ** argv)
     {
       if (!tr_sys_path_exists (str, NULL))
         {
-          tr_mkdirp (str, 0700);
-
-          if (!tr_sys_path_exists (str, NULL))
+          tr_error * error = NULL;
+          if (!tr_sys_dir_create (str, TR_SYS_DIR_CREATE_PARENTS, 0700, &error))
             {
-              fprintf (stderr, "Unable to create download directory \"%s\"!\n", str);
+              fprintf (stderr, "Unable to create download directory \"%s\": %s\n", str, error->message);
+              tr_error_free (error);
               return EXIT_FAILURE;
             }
         }

@@ -8,23 +8,20 @@
  */
 
 #include <assert.h>
-#include <errno.h>
 #include <stdio.h> /* remove() */
 #include <string.h> /* strcmp() */
 #include <stdio.h>
 
-#include <sys/types.h> /* stat() */
-#include <sys/stat.h> /* stat() */
-#include <unistd.h> /* stat(), sync() */
+#include <unistd.h> /* sync() */
 
 #include <event2/buffer.h>
 
 #include "transmission.h"
 #include "cache.h"
+#include "file.h"
 #include "resume.h"
 #include "trevent.h"
 #include "torrent.h" /* tr_isTorrent() */
-#include "utils.h" /* tr_mkdirp() */
 #include "variant.h"
 
 #include "libtransmission-test.h"
@@ -183,7 +180,7 @@ test_set_location (void)
   /* init the session */
   session = libttest_session_init (NULL);
   target_dir = tr_buildPath (tr_sessionGetConfigDir (session), "target", NULL);
-  tr_mkdirp (target_dir, 0777);
+  tr_sys_dir_create (target_dir, TR_SYS_DIR_CREATE_PARENTS, 0777, NULL);
   
   /* init a torrent. */
   tor = libttest_zero_torrent_init (session);

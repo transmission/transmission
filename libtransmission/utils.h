@@ -128,18 +128,6 @@ bool tr_wildmat (const char * text, const char * pattern) TR_GNUC_NONNULL (1,2);
 
 
 /**
- * Like mkdir, but makes parent directories as needed.
- *
- * @return zero on success, or -1 if an error occurred
- * (in which case errno is set appropriately).
- */
-int tr_mkdirp (const char * path, int permissions) TR_GNUC_NONNULL (1);
-
-/** @brief Portability wrapper for mkdtemp () that uses the system implementation if available */
-char* tr_mkdtemp (char * _template);
-
-
-/**
  * @brief Loads a file and returns its contents.
  * On failure, NULL is returned and errno is set.
  */

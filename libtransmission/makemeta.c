@@ -12,8 +12,6 @@
 #include <stdlib.h> /* qsort */
 #include <string.h> /* strcmp, strlen */
 
-#include <dirent.h>
-
 #include <event2/util.h> /* evutil_ascii_strcasecmp () */
 
 #include "transmission.h"
@@ -44,7 +42,7 @@ getFiles (const char      * dir,
           const char      * base,
           struct FileList * list)
 {
-  DIR * odir;
+  tr_sys_dir_t odir;
   char * buf;
   tr_sys_path_info info;
   tr_error * error = NULL;
@@ -59,13 +57,14 @@ getFiles (const char      * dir,
       return list;
     }
 
-  if (info.type == TR_SYS_PATH_IS_DIRECTORY && ((odir = opendir (buf))))
+  if (info.type == TR_SYS_PATH_IS_DIRECTORY &&
+      (odir = tr_sys_dir_open (buf, NULL)) != TR_BAD_SYS_DIR)
     {
-      struct dirent *d;
-      for (d = readdir (odir); d != NULL; d = readdir (odir))
-        if (d->d_name && d->d_name[0] != '.') /* skip dotfiles */
-          list = getFiles (buf, d->d_name, list);
-      closedir (odir);
+      const char * name;
+      while ((name = tr_sys_dir_read_name (odir, NULL)) != NULL)
+        if (name[0] != '.') /* skip dotfiles */
+          list = getFiles (buf, name, list);
+      tr_sys_dir_close (odir, NULL);
     }
   else if (info.type == TR_SYS_PATH_IS_FILE && info.size > 0)
     {
