@@ -26,6 +26,7 @@ libtransmission/announcer-http.c
 libtransmission/announcer-udp.c
 libtransmission/blocklist.c
 libtransmission/fdlimit.c
+libtransmission/file-posix.c
 libtransmission/makemeta.c
 libtransmission/metainfo.c
 libtransmission/natpmp.c
