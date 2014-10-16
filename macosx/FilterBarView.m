@@ -23,6 +23,7 @@
  *****************************************************************************/
 
 #import "FilterBarView.h"
+#import "NSApplicationAdditions.h"
 
 @implementation FilterBarView
 
@@ -30,9 +31,11 @@
 {
     if ((self = [super initWithFrame: rect]))
     {
-        NSColor * lightColor = [NSColor colorWithCalibratedRed: 235.0/255.0 green: 235.0/255.0 blue: 235.0/255.0 alpha: 1.0];
-        NSColor * darkColor = [NSColor colorWithCalibratedRed: 205.0/255.0 green: 205.0/255.0 blue: 205.0/255.0 alpha: 1.0];
-        fGradient = [[NSGradient alloc] initWithStartingColor: lightColor endingColor: darkColor];
+        if (![NSApp isOnYosemiteOrBetter]) {
+            NSColor * lightColor = [NSColor colorWithCalibratedRed: 235.0/255.0 green: 235.0/255.0 blue: 235.0/255.0 alpha: 1.0];
+            NSColor * darkColor = [NSColor colorWithCalibratedRed: 205.0/255.0 green: 205.0/255.0 blue: 205.0/255.0 alpha: 1.0];
+            fGradient = [[NSGradient alloc] initWithStartingColor: lightColor endingColor: darkColor];
+        }
     }
     return self;
 }
@@ -55,38 +58,51 @@
 
 - (void) drawRect: (NSRect) rect
 {
-    NSInteger count = 0;
-    NSRect gridRects[2];
-    NSColor * colorRects[2];
-    
-    NSRect lineBorderRect = NSMakeRect(NSMinX(rect), NSHeight([self bounds]) - 1.0, NSWidth(rect), 1.0);
-    if (NSIntersectsRect(lineBorderRect, rect))
-    {
-        gridRects[count] = lineBorderRect;
-        colorRects[count] = [NSColor whiteColor];
-        ++count;
+    if ([NSApp isOnYosemiteOrBetter]) {
+        [[NSColor windowBackgroundColor] setFill];
+        NSRectFill(rect);
         
-        rect.size.height -= 1.0;
+        const NSRect lineBorderRect = NSMakeRect(NSMinX(rect), 0.0, NSWidth(rect), 1.0);
+        if (NSIntersectsRect(lineBorderRect, rect))
+        {
+            [[NSColor lightGrayColor] setFill];
+            NSRectFill(lineBorderRect);
+        }
     }
-    
-    lineBorderRect.origin.y = 0.0;
-    if (NSIntersectsRect(lineBorderRect, rect))
-    {
-        gridRects[count] = lineBorderRect;
-        colorRects[count] = [NSColor colorWithCalibratedWhite: 0.65 alpha: 1.0];
-        ++count;
+    else {
+        NSInteger count = 0;
+        NSRect gridRects[2];
+        NSColor * colorRects[2];
         
-        rect.origin.y += 1.0;
-        rect.size.height -= 1.0;
+        NSRect lineBorderRect = NSMakeRect(NSMinX(rect), NSHeight([self bounds]) - 1.0, NSWidth(rect), 1.0);
+        if (NSIntersectsRect(lineBorderRect, rect))
+        {
+            gridRects[count] = lineBorderRect;
+            colorRects[count] = [NSColor whiteColor];
+            ++count;
+            
+            rect.size.height -= 1.0;
+        }
+        
+        lineBorderRect.origin.y = 0.0;
+        if (NSIntersectsRect(lineBorderRect, rect))
+        {
+            gridRects[count] = lineBorderRect;
+            colorRects[count] = [NSColor colorWithCalibratedWhite: 0.65 alpha: 1.0];
+            ++count;
+            
+            rect.origin.y += 1.0;
+            rect.size.height -= 1.0;
+        }
+        
+        if (!NSIsEmptyRect(rect))
+        {
+            const NSRect gradientRect = NSMakeRect(NSMinX(rect), 1.0, NSWidth(rect), NSHeight([self bounds]) - 1.0 - 1.0); //proper gradient requires the full height of the bar
+            [fGradient drawInRect: gradientRect angle: 270.0];
+        }
+        
+        NSRectFillListWithColors(gridRects, colorRects, count);
     }
-    
-    if (!NSIsEmptyRect(rect))
-    {
-        const NSRect gradientRect = NSMakeRect(NSMinX(rect), 1.0, NSWidth(rect), NSHeight([self bounds]) - 1.0 - 1.0); //proper gradient requires the full height of the bar
-        [fGradient drawInRect: gradientRect angle: 270.0];
-    }
-    
-    NSRectFillListWithColors(gridRects, colorRects, count);
 }
 
 @end

@@ -32,5 +32,6 @@
 
 - (BOOL) isOnLionOrBetter;
 - (BOOL) isOnMountainLionOrBetter;
+- (BOOL) isOnYosemiteOrBetter;
 
 @end

@@ -3321,7 +3321,7 @@
 				LIBRARY_SEARCH_PATHS = "third-party/curl/lib";
 				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				ONLY_ACTIVE_ARCH = YES;
-				SDKROOT = macosx10.8;
+				SDKROOT = macosx10.10;
 				STRIP_INSTALLED_PRODUCT = NO;
 			};
 			name = Debug;
@@ -3438,7 +3438,7 @@
 				LIBRARY_SEARCH_PATHS = "third-party/curl/lib";
 				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				OTHER_CFLAGS = "-DNDEBUG";
-				SDKROOT = macosx10.8;
+				SDKROOT = macosx10.10;
 			};
 			name = Release;
 		};
@@ -3496,7 +3496,7 @@
 				INFOPLIST_PREPROCESS = YES;
 				LIBRARY_SEARCH_PATHS = "third-party/curl/lib";
 				MACOSX_DEPLOYMENT_TARGET = 10.6;
-				SDKROOT = macosx10.8;
+				SDKROOT = macosx10.10;
 				STRIP_INSTALLED_PRODUCT = NO;
 			};
 			name = "Release - Debug";
@@ -3595,9 +3595,7 @@
 		A2E384CF130DFB1D001F501B /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					POSIX,
-				);
+				GCC_PREPROCESSOR_DEFINITIONS = POSIX;
 				PRODUCT_NAME = utp;
 			};
 			name = Debug;
@@ -3605,9 +3603,7 @@
 		A2E384D0130DFB1D001F501B /* Release - Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					POSIX,
-				);
+				GCC_PREPROCESSOR_DEFINITIONS = POSIX;
 				PRODUCT_NAME = utp;
 			};
 			name = "Release - Debug";

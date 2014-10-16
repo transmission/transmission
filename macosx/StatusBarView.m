@@ -42,7 +42,7 @@
         NSColor * darkColor = [NSColor colorWithCalibratedRed: 155.0/255.0 green: 155.0/255.0 blue: 155.0/255.0 alpha: 1.0];
         fGradient = [[NSGradient alloc] initWithStartingColor: lightColor endingColor: darkColor];
         
-        if([NSApp isOnLionOrBetter])
+        if([NSApp isOnLionOrBetter] && ![NSApp isOnYosemiteOrBetter])
         {
             CIFilter * randomFilter = [CIFilter filterWithName: @"CIRandomGenerator"];
             [randomFilter setDefaults];
@@ -85,65 +85,78 @@
 
 - (void) drawRect: (NSRect) rect
 {
-    const BOOL active = [[self window] isMainWindow];
-    
-    NSInteger count = 0;
-    NSRect gridRects[active ? 2 : 3];
-    NSColor * colorRects[active ? 2 : 3];
-    
-    //bottom line
-    NSRect lineBorderRect = NSMakeRect(NSMinX(rect), 0.0, NSWidth(rect), 1.0);
-    NSRect intersectLineBorderRect = NSIntersectionRect(lineBorderRect, rect);
-    if (!NSIsEmptyRect(intersectLineBorderRect))
-    {
-        gridRects[count] = intersectLineBorderRect;
-        colorRects[count] = active ? [NSColor colorWithCalibratedWhite: 0.25 alpha: 1.0]
-        : [NSColor colorWithCalibratedWhite: 0.5 alpha: 1.0];
-        ++count;
+    if ([NSApp isOnYosemiteOrBetter]) {
+        [[NSColor windowBackgroundColor] setFill];
+        NSRectFill(rect);
         
-        rect.origin.y += intersectLineBorderRect.size.height;
-        rect.size.height -= intersectLineBorderRect.size.height;
+        const NSRect lineBorderRect = NSMakeRect(NSMinX(rect), 0.0, NSWidth(rect), 1.0);
+        if (NSIntersectsRect(lineBorderRect, rect))
+        {
+            [[NSColor lightGrayColor] setFill];
+            NSRectFill(lineBorderRect);
+        }
     }
-    
-    
-    //top line
-    if (active)
-    {
-        lineBorderRect.origin.y = NSHeight([self bounds]) - 1.0;
-        intersectLineBorderRect = NSIntersectionRect(lineBorderRect, rect);
+    else {
+        const BOOL active = [[self window] isMainWindow];
+        
+        NSInteger count = 0;
+        NSRect gridRects[active ? 2 : 3];
+        NSColor * colorRects[active ? 2 : 3];
+        
+        //bottom line
+        NSRect lineBorderRect = NSMakeRect(NSMinX(rect), 0.0, NSWidth(rect), 1.0);
+        NSRect intersectLineBorderRect = NSIntersectionRect(lineBorderRect, rect);
         if (!NSIsEmptyRect(intersectLineBorderRect))
         {
             gridRects[count] = intersectLineBorderRect;
-            colorRects[count] = [NSColor colorWithCalibratedWhite: 0.75 alpha: 1.0];
+            colorRects[count] = active ? [NSColor colorWithCalibratedWhite: 0.25 alpha: 1.0]
+            : [NSColor colorWithCalibratedWhite: 0.5 alpha: 1.0];
             ++count;
             
+            rect.origin.y += intersectLineBorderRect.size.height;
             rect.size.height -= intersectLineBorderRect.size.height;
         }
-    }
-    
-    if (!NSIsEmptyRect(rect))
-    {
+        
+        
+        //top line
         if (active)
         {
-            const NSRect gradientRect = NSMakeRect(NSMinX(rect), 1.0, NSWidth(rect), NSHeight([self bounds]) - 1.0 - 1.0); //proper gradient requires the full height of the bar
-            [fGradient drawInRect: gradientRect angle: 270.0];
+            lineBorderRect.origin.y = NSHeight([self bounds]) - 1.0;
+            intersectLineBorderRect = NSIntersectionRect(lineBorderRect, rect);
+            if (!NSIsEmptyRect(intersectLineBorderRect))
+            {
+                gridRects[count] = intersectLineBorderRect;
+                colorRects[count] = [NSColor colorWithCalibratedWhite: 0.75 alpha: 1.0];
+                ++count;
+                
+                rect.size.height -= intersectLineBorderRect.size.height;
+            }
         }
-        else
+        
+        if (!NSIsEmptyRect(rect))
         {
-            gridRects[count] = rect;
-            colorRects[count] = [NSColor colorWithCalibratedWhite: 0.85 alpha: 1.0];
-            ++count;
+            if (active)
+            {
+                const NSRect gradientRect = NSMakeRect(NSMinX(rect), 1.0, NSWidth(rect), NSHeight([self bounds]) - 1.0 - 1.0); //proper gradient requires the full height of the bar
+                [fGradient drawInRect: gradientRect angle: 270.0];
+            }
+            else
+            {
+                gridRects[count] = rect;
+                colorRects[count] = [NSColor colorWithCalibratedWhite: 0.85 alpha: 1.0];
+                ++count;
+            }
         }
-    }
-    
-    NSRectFillListWithColors(gridRects, colorRects, count);
-    
-    if (fNoiseImage) {
-        NSAssert([NSApp isOnLionOrBetter], @"we have a noise image, but we're on 10.6"); //https://trac.transmissionbt.com/ticket/5053
-        [fNoiseImage drawInRect: rect
-                       fromRect: [self convertRectToBacking: rect]
-                      operation: NSCompositeSourceOver
-                       fraction: 0.12];
+        
+        NSRectFillListWithColors(gridRects, colorRects, count);
+        
+        if (fNoiseImage) {
+            NSAssert([NSApp isOnLionOrBetter], @"we have a noise image, but we're on 10.6"); //https://trac.transmissionbt.com/ticket/5053
+            [fNoiseImage drawInRect: rect
+                           fromRect: [self convertRectToBacking: rect]
+                          operation: NSCompositeSourceOver
+                           fraction: 0.12];
+        }
     }
 }
 
