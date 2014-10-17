@@ -196,8 +196,24 @@ tr_session * fLib = NULL;
         : NSLocalizedString(@"Total N/A", "stats total");
     [fRatioAllField setStringValue: totalRatioString];
     
-    [fTimeField setStringValue: [NSString timeString: statsSession.secondsActive showSeconds: NO]];
-    [fTimeAllField setStringValue: [NSString stringWithFormat: NSLocalizedString(@"%@ total", "stats total"), [NSString timeString: statsAll.secondsActive showSeconds: NO]]];
+    if ([NSApp isOnYosemiteOrBetter]) {
+        static NSDateComponentsFormatter *timeFormatter;
+        static dispatch_once_t onceToken;
+        dispatch_once(&onceToken, ^{
+            timeFormatter = [NSDateComponentsFormatter new];
+            timeFormatter.unitsStyle = NSDateComponentsFormatterUnitsStyleFull;
+            timeFormatter.maximumUnitCount = 3;
+            timeFormatter.allowedUnits = NSCalendarUnitYear | NSCalendarUnitMonth | NSCalendarUnitWeekOfMonth | NSCalendarUnitDay | NSCalendarUnitHour | NSCalendarUnitMinute;
+            timeFormatter.zeroFormattingBehavior = NSDateComponentsFormatterZeroFormattingBehaviorDropLeading;
+        });
+        
+        [fTimeField setStringValue: [timeFormatter stringFromTimeInterval:statsSession.secondsActive]];
+        [fTimeAllField setStringValue: [NSString stringWithFormat: NSLocalizedString(@"%@ total", "stats total"), [timeFormatter stringFromTimeInterval:statsAll.secondsActive]]];
+    }
+    else {
+        [fTimeField setStringValue: [NSString timeString: statsSession.secondsActive includesTimeRemainingPhrase:NO showSeconds: NO]];
+        [fTimeAllField setStringValue: [NSString stringWithFormat: NSLocalizedString(@"%@ total", "stats total"), [NSString timeString: statsAll.secondsActive includesTimeRemainingPhrase:NO showSeconds: NO]]];
+    }
     
     if (statsAll.sessionCount == 1)
         [fNumOpenedField setStringValue: NSLocalizedString(@"1 time", "stats window -> times opened")];

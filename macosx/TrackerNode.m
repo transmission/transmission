@@ -23,6 +23,7 @@
  *****************************************************************************/
 
 #import "TrackerNode.h"
+#import "NSApplicationAdditions.h"
 #import "NSStringAdditions.h"
 
 @implementation TrackerNode
@@ -156,9 +157,28 @@
             return [NSLocalizedString(@"Announce in progress", "Tracker next announce") stringByAppendingEllipsis];
         
         case TR_TRACKER_WAITING:
+        {
+            const NSTimeInterval nextAnnounceTimeLeft = fStat.nextAnnounceTime - [[NSDate date] timeIntervalSince1970];
+            
+            NSString *timeString;
+            if ([NSApp isOnYosemiteOrBetter]) {
+                static NSDateComponentsFormatter *formatter;
+                static dispatch_once_t onceToken;
+                dispatch_once(&onceToken, ^{
+                    formatter = [NSDateComponentsFormatter new];
+                    formatter.unitsStyle = NSDateComponentsFormatterUnitsStyleAbbreviated;
+                    formatter.zeroFormattingBehavior = NSDateComponentsFormatterZeroFormattingBehaviorDropLeading;
+                    formatter.collapsesLargestUnit = YES;
+                });
+                
+                timeString = [formatter stringFromTimeInterval: nextAnnounceTimeLeft];
+            }
+            else {
+                timeString = [NSString timeString: nextAnnounceTimeLeft includesTimeRemainingPhrase: NO showSeconds: YES];
+            }
             return [NSString stringWithFormat: NSLocalizedString(@"Next announce in %@", "Tracker next announce"),
-                    [NSString timeString: fStat.nextAnnounceTime - [[NSDate date] timeIntervalSince1970] showSeconds: YES]];
-        
+                    timeString];
+        }
         case TR_TRACKER_QUEUED:
             return [NSLocalizedString(@"Announce is queued", "Tracker next announce") stringByAppendingEllipsis];
         

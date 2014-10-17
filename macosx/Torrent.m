@@ -25,6 +25,7 @@
 #import "Torrent.h"
 #import "GroupsController.h"
 #import "FileListNode.h"
+#import "NSApplicationAdditions.h"
 #import "NSStringAdditions.h"
 #import "TrackerNode.h"
 
@@ -1980,10 +1981,28 @@ int trashDataFile(const char * filename)
     else
         return NSLocalizedString(@"remaining time unknown", "Torrent -> eta string");
     
-    NSString * idleString = [NSString stringWithFormat: NSLocalizedString(@"%@ remaining", "Torrent -> eta string"),
-                                [NSString timeString: eta showSeconds: YES maxFields: 2]];
-    if (fromIdle)
+    NSString * idleString;
+    
+    if ([NSApp isOnYosemiteOrBetter]) {
+        static NSDateComponentsFormatter *formatter;
+        static dispatch_once_t onceToken;
+        dispatch_once(&onceToken, ^{
+            formatter = [NSDateComponentsFormatter new];
+            formatter.unitsStyle = NSDateComponentsFormatterUnitsStyleShort;
+            formatter.maximumUnitCount = 2;
+            formatter.collapsesLargestUnit = YES;
+            formatter.includesTimeRemainingPhrase = YES;
+        });
+        
+        idleString = [formatter stringFromTimeInterval: eta];
+    }
+    else {
+        idleString = [NSString timeString: eta includesTimeRemainingPhrase: YES showSeconds: YES maxFields: 2];
+    }
+    
+    if (fromIdle) {
         idleString = [idleString stringByAppendingFormat: @" (%@)", NSLocalizedString(@"inactive", "Torrent -> eta string")];
+    }
     
     return idleString;
 }
