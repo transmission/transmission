@@ -204,7 +204,6 @@ tr_session * fLib = NULL;
             timeFormatter.unitsStyle = NSDateComponentsFormatterUnitsStyleFull;
             timeFormatter.maximumUnitCount = 3;
             timeFormatter.allowedUnits = NSCalendarUnitYear | NSCalendarUnitMonth | NSCalendarUnitWeekOfMonth | NSCalendarUnitDay | NSCalendarUnitHour | NSCalendarUnitMinute;
-            timeFormatter.zeroFormattingBehavior = NSDateComponentsFormatterZeroFormattingBehaviorDropLeading;
         });
         
         [fTimeField setStringValue: [timeFormatter stringFromTimeInterval:statsSession.secondsActive]];
