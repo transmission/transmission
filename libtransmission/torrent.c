@@ -2887,6 +2887,10 @@ deleteLocalData (tr_torrent * tor, tr_fileFunc func)
   PtrArrayCompareFunc vstrcmp = (PtrArrayCompareFunc)strcmp;
   const char * const top = tor->currentDir;
 
+  /* don't try to delete local data if the directory's gone missing */
+  if (!tr_sys_path_exists (top, NULL))
+    return;
+
   /* if it's a magnet link, there's nothing to move... */
   if (!tr_torrentHasMetadata (tor))
     return;
