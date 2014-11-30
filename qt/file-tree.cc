@@ -231,14 +231,14 @@ FileTreeItem :: update (const QString& name,
       changed_columns[changed_count++] = COL_NAME;
     }
 
-  if (myHaveSize != haveSize)
+  if (fileIndex () != -1)
     {
-      myHaveSize = haveSize;
-      changed_columns[changed_count++] = COL_PROGRESS;
-    }
+      if (myHaveSize != haveSize)
+        {
+          myHaveSize = haveSize;
+          changed_columns[changed_count++] = COL_PROGRESS;
+        }
 
-  if (fileIndex() != -1)
-    {
       if (updateFields)
         {
           if (myIsWanted != wanted)
@@ -416,6 +416,7 @@ FileTreeItem :: isComplete () const
 FileTreeModel :: FileTreeModel (QObject *parent, bool isEditable):
   QAbstractItemModel(parent),
   myRootItem (new FileTreeItem),
+  myIndexCache (),
   myIsEditable (isEditable)
 {
 }
@@ -586,7 +587,14 @@ FileTreeModel :: clearSubtree (const QModelIndex& top)
   while (i > 0)
     clearSubtree(index(--i, 0, top));
 
-  delete static_cast<FileTreeItem*>(itemFromIndex(top));
+  FileTreeItem * const item = itemFromIndex (top);
+  if (item == 0)
+    return;
+
+  if (item->fileIndex () != -1)
+    myIndexCache.remove (item->fileIndex ());
+
+  delete item;
 }
 
 void
@@ -595,27 +603,14 @@ FileTreeModel :: clear ()
   beginResetModel ();
   clearSubtree (QModelIndex());
   endResetModel ();
+
+  assert (myIndexCache.isEmpty ());
 }
 
 FileTreeItem *
 FileTreeModel :: findItemForFileIndex (int fileIndex) const
 {
-  FileTreeItem * ret = 0;
-
-  QModelIndexList indices = match (index (0,COL_FILE_INDEX),
-                                   Qt::DisplayRole,
-                                   fileIndex,
-                                   1,
-                                   Qt::MatchFlags (Qt::MatchExactly | Qt::MatchRecursive));
-
-  if (!indices.isEmpty ())
-    {
-      QModelIndex& index = indices.front ();
-      if (index.isValid())
-        ret = itemFromIndex (index);
-    }
-
-  return ret;
+  return myIndexCache.value (fileIndex, 0);
 }
 
 void
@@ -636,15 +631,23 @@ FileTreeModel :: addFile (int                   fileIndex,
 
   if (item) // this file is already in the tree, we've added this 
     {
+      QModelIndex indexWithChangedParents;
       while (!tokens.isEmpty())
         {
           const QString token = tokens.takeLast();
           const std::pair<int,int> changed = item->update (token, wanted, priority, have, updateFields);
           if (changed.first >= 0)
-            dataChanged (indexOf (item, changed.first), indexOf (item, changed.second));
+            {
+              dataChanged (indexOf (item, changed.first), indexOf (item, changed.second));
+              if (!indexWithChangedParents.isValid () &&
+                  changed.first <= COL_PRIORITY && changed.second >= COL_SIZE)
+                indexWithChangedParents = indexOf (item, 0);
+            }
           item = item->parent();
         }
       assert (item == myRootItem);
+      if (indexWithChangedParents.isValid ())
+        parentsChanged (indexWithChangedParents, COL_SIZE, COL_PRIORITY);
     }
   else // we haven't build the FileTreeItems for these tokens yet
     {
@@ -677,6 +680,8 @@ FileTreeModel :: addFile (int                   fileIndex,
           assert (item->fileIndex() == fileIndex);
           assert (item->totalSize() == totalSize);
 
+          myIndexCache[fileIndex] = item;
+
           const std::pair<int,int> changed = item->update (item->name(), wanted, priority, have, added || updateFields);
           if (changed.first >= 0)
             dataChanged (indexOf (item, changed.first), indexOf (item, changed.second));
@@ -685,33 +690,37 @@ FileTreeModel :: addFile (int                   fileIndex,
 }
 
 void
-FileTreeModel :: parentsChanged (const QModelIndex& index, int column)
+FileTreeModel :: parentsChanged (const QModelIndex& index, int firstColumn, int lastColumn)
 {
+  assert (firstColumn <= lastColumn);
+
   QModelIndex walk = index;
 
   for (;;)
     {
-      walk = parent(walk, column);
-      if(!walk.isValid())
+      walk = parent (walk, firstColumn);
+      if (!walk.isValid ())
         break;
 
-      dataChanged(walk, walk);
+      dataChanged (walk, walk.sibling (walk.row (), lastColumn));
     }
 }
 
 void
-FileTreeModel :: subtreeChanged (const QModelIndex& index, int column)
+FileTreeModel :: subtreeChanged (const QModelIndex& index, int firstColumn, int lastColumn)
 {
+  assert (firstColumn <= lastColumn);
+
   const int childCount = rowCount (index);
   if (!childCount)
     return;
 
   // tell everyone that this tier changed
-  dataChanged (index.child(0,column), index.child(childCount-1,column));
+  dataChanged (index.child (0, firstColumn), index.child (childCount - 1, lastColumn));
 
   // walk the subtiers
   for (int i=0; i<childCount; ++i)
-    subtreeChanged (index.child(i,column), column);
+    subtreeChanged (index.child (i, 0), firstColumn, lastColumn);
 }
 
 void
@@ -732,14 +741,9 @@ FileTreeModel :: clicked (const QModelIndex& index)
       item->twiddleWanted (file_ids, want);
       emit wantedChanged (file_ids, want);
 
-      // this changes the name column's parenthetical size-wanted string too...
-      QModelIndex nameSibling = index.sibling (index.row(), COL_SIZE);
-      dataChanged (nameSibling, nameSibling);
-      parentsChanged (nameSibling, COL_SIZE);
-
       dataChanged (index, index);
-      parentsChanged (index, column);
-      subtreeChanged (index, column);
+      parentsChanged (index, COL_SIZE, COL_WANTED);
+      subtreeChanged (index, COL_WANTED, COL_WANTED);
     }
   else if (column == COL_PRIORITY)
     {
@@ -751,9 +755,9 @@ FileTreeModel :: clicked (const QModelIndex& index)
       item->twiddlePriority (file_ids, priority);
       emit priorityChanged (file_ids, priority);
 
-      dataChanged(index, index);
-      parentsChanged(index, column);
-      subtreeChanged(index, column);
+      dataChanged (index, index);
+      parentsChanged (index, column, column);
+      subtreeChanged (index, column, column);
     }
 }
 

@@ -15,6 +15,7 @@
 #include <QItemDelegate>
 #include <QList>
 #include <QHash>
+#include <QMap>
 #include <QSet>
 #include <QSize>
 #include <QString>
@@ -127,13 +128,14 @@ class FileTreeModel: public QAbstractItemModel
   private:
     void clearSubtree (const QModelIndex &);
     QModelIndex indexOf (FileTreeItem *, int column) const;
-    void parentsChanged (const QModelIndex &, int column);
-    void subtreeChanged (const QModelIndex &, int column);
+    void parentsChanged (const QModelIndex &, int firstColumn, int lastColumn);
+    void subtreeChanged (const QModelIndex &, int firstColumn, int lastColumn);
     FileTreeItem * findItemForFileIndex (int fileIndex) const;
     FileTreeItem * itemFromIndex (const QModelIndex&) const;
 
   private:
     FileTreeItem * myRootItem;
+    QMap<int, FileTreeItem *> myIndexCache;
     const bool myIsEditable;
 
   public slots:
