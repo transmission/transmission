@@ -57,7 +57,7 @@ void tr_cryptoSetTorrentHash (tr_crypto * crypto, const uint8_t * torrentHash);
 
 const uint8_t* tr_cryptoGetTorrentHash (const tr_crypto * crypto);
 
-int            tr_cryptoHasTorrentHash (const tr_crypto * crypto);
+bool           tr_cryptoHasTorrentHash (const tr_crypto * crypto);
 
 const uint8_t* tr_cryptoComputeSecret (tr_crypto *     crypto,
                                        const uint8_t * peerPublicKey);

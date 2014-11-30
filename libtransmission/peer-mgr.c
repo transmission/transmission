@@ -1556,7 +1556,7 @@ addStrike (tr_swarm * s, tr_peer * peer)
     {
       struct peer_atom * atom = peer->atom;
       atom->flags2 |= MYFLAG_BANNED;
-      peer->doPurge = 1;
+      peer->doPurge = true;
       tordbg (s, "banning peer %s", tr_atomAddrStr (atom));
     }
 }
@@ -1811,7 +1811,7 @@ peerCallbackFunc (tr_peer * peer, const tr_peer_event * e, void * vs)
         if ((e->err == ERANGE) || (e->err == EMSGSIZE) || (e->err == ENOTCONN))
           {
             /* some protocol error from the peer */
-            peer->doPurge = 1;
+            peer->doPurge = true;
             tordbg (s, "setting %s doPurge flag because we got an ERANGE, EMSGSIZE, or ENOTCONN error",
                     tr_atomAddrStr (peer->atom));
           }

@@ -43,8 +43,8 @@ verifyTorrent (tr_torrent * tor, bool * stopFlag)
   SHA_CTX sha;
   tr_sys_file_t fd = TR_BAD_SYS_FILE;
   uint64_t filePos = 0;
-  bool changed = 0;
-  bool hadPiece = 0;
+  bool changed = false;
+  bool hadPiece = false;
   time_t lastSleptAt = 0;
   uint32_t piecePos = 0;
   tr_file_index_t fileIndex = 0;

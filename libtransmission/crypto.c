@@ -175,7 +175,7 @@ tr_cryptoComputeSecret (tr_crypto *     crypto,
       offset = KEY_LEN - len;
       memset (crypto->mySecret, 0, offset);
       memcpy (crypto->mySecret + offset, secret, len);
-      crypto->mySecretIsSet = 1;
+      crypto->mySecretIsSet = true;
     }
 
   BN_free (bn);
@@ -270,7 +270,7 @@ void
 tr_cryptoSetTorrentHash (tr_crypto     * crypto,
                          const uint8_t * hash)
 {
-  crypto->torrentHashIsSet = hash ? 1 : 0;
+  crypto->torrentHashIsSet = hash != NULL;
 
   if (hash)
     memcpy (crypto->torrentHash, hash, SHA_DIGEST_LENGTH);
@@ -286,12 +286,12 @@ tr_cryptoGetTorrentHash (const tr_crypto * crypto)
   return crypto->torrentHashIsSet ? crypto->torrentHash : NULL;
 }
 
-int
+bool
 tr_cryptoHasTorrentHash (const tr_crypto * crypto)
 {
   assert (crypto);
 
-  return crypto->torrentHashIsSet ? 1 : 0;
+  return crypto->torrentHashIsSet;
 }
 
 int

@@ -41,7 +41,7 @@ static bool
 preallocate_file_sparse (tr_sys_file_t fd, uint64_t length)
 {
   const char zero = '\0';
-  bool success = 0;
+  bool success = false;
 
   if (!length)
     success = true;
@@ -65,7 +65,7 @@ preallocate_file_sparse (tr_sys_file_t fd, uint64_t length)
 static bool
 preallocate_file_full (const char * filename, uint64_t length)
 {
-  bool success = 0;
+  bool success = false;
 
   tr_sys_file_t fd = tr_sys_file_open (filename, TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE, 0666, NULL);
   if (fd != TR_BAD_SYS_FILE)

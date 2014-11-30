@@ -474,7 +474,7 @@ readYb (tr_handshake * handshake, struct evbuffer * inbuf)
     evbuffer_add_uint16 (outbuf, sizeof (msg));
     evbuffer_add        (outbuf, msg, sizeof (msg));
 
-    handshake->haveSentBitTorrentHandshake = 1;
+    handshake->haveSentBitTorrentHandshake = true;
   }
 
   /* send it */
@@ -687,7 +687,7 @@ readHandshake (tr_handshake    * handshake,
       if (!buildHandshakeMessage (handshake, msg))
         return tr_handshakeDone (handshake, false);
       tr_peerIoWriteBytes (handshake->io, msg, sizeof (msg), false);
-      handshake->haveSentBitTorrentHandshake = 1;
+      handshake->haveSentBitTorrentHandshake = true;
     }
 
   setReadState (handshake, AWAITING_PEER_ID);
@@ -939,7 +939,7 @@ readIA (tr_handshake    * handshake,
       return tr_handshakeDone (handshake, false);
 
     evbuffer_add (outbuf, msg, sizeof (msg));
-    handshake->haveSentBitTorrentHandshake = 1;
+    handshake->haveSentBitTorrentHandshake = true;
   }
 
   /* send it out */
@@ -1139,7 +1139,7 @@ gotError (tr_peerIo  * io,
         {
           uint8_t msg[HANDSHAKE_SIZE];
           buildHandshakeMessage (handshake, msg);
-          handshake->haveSentBitTorrentHandshake = 1;
+          handshake->haveSentBitTorrentHandshake = true;
           setReadState (handshake, AWAITING_HANDSHAKE);
           tr_peerIoWriteBytes (handshake->io, msg, sizeof (msg), false);
         }
@@ -1156,7 +1156,7 @@ gotError (tr_peerIo  * io,
 
       dbgmsg (handshake, "handshake failed, trying plaintext...");
       buildHandshakeMessage (handshake, msg);
-      handshake->haveSentBitTorrentHandshake = 1;
+      handshake->haveSentBitTorrentHandshake = true;
       setReadState (handshake, AWAITING_HANDSHAKE);
       tr_peerIoWriteBytes (handshake->io, msg, sizeof (msg), false);
     }
@@ -1214,7 +1214,7 @@ tr_handshakeNew (tr_peerIo           * io,
       uint8_t msg[HANDSHAKE_SIZE];
       buildHandshakeMessage (handshake, msg);
 
-      handshake->haveSentBitTorrentHandshake = 1;
+      handshake->haveSentBitTorrentHandshake = true;
       setReadState (handshake, AWAITING_HANDSHAKE);
       tr_peerIoWriteBytes (handshake->io, msg, sizeof (msg), false);
     }

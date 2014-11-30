@@ -678,7 +678,7 @@ updateFastSet (tr_peerMsgs * msgs UNUSED)
 
         /* build the fast set */
         msgs->fastsetSize = tr_generateAllowedSet (msgs->fastset, numwant, inf->pieceCount, inf->hash, addr);
-        msgs->haveFastSet = 1;
+        msgs->haveFastSet = true;
 
         /* send it to the peer */
         for (i=0; i<msgs->fastsetSize; ++i)
@@ -932,21 +932,21 @@ sendLtepHandshake (tr_peerMsgs * msgs)
       version_quark = tr_quark_new (TR_NAME " " USERAGENT_PREFIX, -1);
 
     dbgmsg (msgs, "sending an ltep handshake");
-    msgs->clientSentLtepHandshake = 1;
+    msgs->clientSentLtepHandshake = true;
 
     /* decide if we want to advertise metadata xfer support (BEP 9) */
     if (tr_torrentIsPrivate (msgs->torrent))
-        allow_metadata_xfer = 0;
+        allow_metadata_xfer = false;
     else
-        allow_metadata_xfer = 1;
+        allow_metadata_xfer = true;
 
     /* decide if we want to advertise pex support */
     if (!tr_torrentAllowsPex (msgs->torrent))
-        allow_pex = 0;
+        allow_pex = false;
     else if (msgs->peerSentLtepHandshake)
-        allow_pex = msgs->peerSupportsPex ? 1 : 0;
+        allow_pex = msgs->peerSupportsPex;
     else
-        allow_pex = 1;
+        allow_pex = true;
 
     tr_variantInitDict (&val, 8);
     tr_variantDictAddInt (&val, TR_KEY_e, getSession (msgs)->encryptionMode != TR_CLEAR_PREFERRED);
@@ -995,7 +995,7 @@ parseLtepHandshake (tr_peerMsgs * msgs, int len, struct evbuffer * inbuf)
     memset (&pex, 0, sizeof (tr_pex));
 
     tr_peerIoReadBytes (msgs->io, inbuf, tmp, len);
-    msgs->peerSentLtepHandshake = 1;
+    msgs->peerSentLtepHandshake = true;
 
     if (tr_variantFromBenc (&val, tmp, len) || !tr_variantIsDict (&val))
     {
@@ -1015,8 +1015,8 @@ parseLtepHandshake (tr_peerMsgs * msgs, int len, struct evbuffer * inbuf)
     }
 
     /* check supported messages for utorrent pex */
-    msgs->peerSupportsPex = 0;
-    msgs->peerSupportsMetadataXfer = 0;
+    msgs->peerSupportsPex = false;
+    msgs->peerSupportsMetadataXfer = false;
 
     if (tr_variantDictFindDict (&val, TR_KEY_m, &sub)) {
         if (tr_variantDictFindInt (sub, TR_KEY_ut_pex, &i)) {
@@ -1244,13 +1244,13 @@ parseLtep (tr_peerMsgs * msgs, int msglen, struct evbuffer  * inbuf)
     else if (ltep_msgid == UT_PEX_ID)
     {
         dbgmsg (msgs, "got ut pex");
-        msgs->peerSupportsPex = 1;
+        msgs->peerSupportsPex = true;
         parseUtPex (msgs, msglen, inbuf);
     }
     else if (ltep_msgid == UT_METADATA_ID)
     {
         dbgmsg (msgs, "got ut metadata");
-        msgs->peerSupportsMetadataXfer = 1;
+        msgs->peerSupportsMetadataXfer = true;
         parseUtMetadata (msgs, msglen, inbuf);
     }
     else

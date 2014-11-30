@@ -1976,7 +1976,7 @@ tr_torrentRemove (tr_torrent   * tor,
   struct remove_data * data;
 
   assert (tr_isTorrent (tor));
-  tor->isDeleting = 1;
+  tor->isDeleting = true;
 
   data = tr_new0 (struct remove_data, 1);
   data->tor = tor;

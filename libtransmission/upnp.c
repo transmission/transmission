@@ -224,7 +224,7 @@ tr_upnpPulse (tr_upnp * handle,
             tr_logAddNamedInfo (getKey (), _(
                          "Local Address is \"%s\""), handle->lanaddr);
             handle->state = TR_UPNP_IDLE;
-            handle->hasDiscovered = 1;
+            handle->hasDiscovered = true;
         }
         else
         {

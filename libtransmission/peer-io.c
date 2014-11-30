@@ -179,8 +179,8 @@ didWriteWrapper (tr_peerIo * io, unsigned int bytes_transferred)
 static void
 canReadWrapper (tr_peerIo * io)
 {
-    bool err = 0;
-    bool done = 0;
+    bool err = false;
+    bool done = false;
     tr_session * session;
 
     dbgmsg (io, "canRead");
@@ -221,15 +221,15 @@ canReadWrapper (tr_peerIo * io)
                 case READ_NOW:
                     if (evbuffer_get_length (io->inbuf))
                         continue;
-                    done = 1;
+                    done = true;
                     break;
 
                 case READ_LATER:
-                    done = 1;
+                    done = true;
                     break;
 
                 case READ_ERR:
-                    err = 1;
+                    err = true;
                     break;
             }
 
@@ -971,7 +971,7 @@ tr_peerIoGetTorrentHash (tr_peerIo * io)
     return tr_cryptoGetTorrentHash (&io->crypto);
 }
 
-int
+bool
 tr_peerIoHasTorrentHash (const tr_peerIo * io)
 {
     assert (tr_isPeerIo (io));
