@@ -179,7 +179,7 @@ void tr_wait_msec (long int delay_milliseconds);
  */
 char* tr_utf8clean (const char * str, int len) TR_GNUC_MALLOC;
 
-#ifdef WIN32
+#ifdef _WIN32
 
 char    * tr_win32_native_to_utf8    (const wchar_t * text,
                                       int             text_size);

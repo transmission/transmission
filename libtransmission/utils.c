@@ -1128,7 +1128,7 @@ tr_utf8clean (const char * str, int max_len)
   return ret;
 }
 
-#ifdef WIN32
+#ifdef _WIN32
 
 char *
 tr_win32_native_to_utf8 (const wchar_t * text,

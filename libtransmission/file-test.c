@@ -9,7 +9,7 @@
 
 #include <string.h>
 
-#ifndef WIN32
+#ifndef _WIN32
  #include <sys/types.h>
  #include <sys/stat.h>
  #include <unistd.h>
@@ -23,7 +23,7 @@
 
 #include "libtransmission-test.h"
 
-#ifndef WIN32
+#ifndef _WIN32
  #define NATIVE_PATH_SEP "/"
 #else
  #define NATIVE_PATH_SEP "\\"
@@ -42,7 +42,7 @@ create_test_dir (const char * name)
 static bool
 create_symlink (const char * dst_path, const char * src_path, bool dst_is_dir)
 {
-#ifndef WIN32
+#ifndef _WIN32
 
   (void) dst_is_dir;
 
@@ -71,7 +71,7 @@ create_symlink (const char * dst_path, const char * src_path, bool dst_is_dir)
 static bool
 create_hardlink (const char * dst_path, const char * src_path)
 {
-#ifndef WIN32
+#ifndef _WIN32
 
   return link (src_path, dst_path) != -1;
 
@@ -109,7 +109,7 @@ path_contains_no_symlinks (const char * path)
       char * pathPart;
       const char * slashPos = strchr (p, '/');
 
-#ifdef WIN32
+#ifdef _WIN32
 
       const char * backslashPos = strchr (p, '\\');
       if (slashPos == NULL || (backslashPos != NULL && backslashPos < slashPos))
@@ -617,7 +617,7 @@ test_path_basename_dirname (void)
   check_streq (".", name);
   tr_free (name);
 
-#ifdef WIN32
+#ifdef _WIN32
 
   name = tr_sys_path_basename ("c:\\a\\b\\c", &err);
   check (name != NULL);

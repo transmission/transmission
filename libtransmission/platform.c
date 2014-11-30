@@ -268,7 +268,7 @@ getHomeDir (void)
   return home;
 }
 
-#if defined (__APPLE__) || defined (WIN32)
+#if defined (__APPLE__) || defined (_WIN32)
  #define RESUME_SUBDIR  "Resume"
  #define TORRENT_SUBDIR "Torrents"
 #else
