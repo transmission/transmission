@@ -39,11 +39,12 @@ TRANSLATIONS += translations/transmission_en.ts \
                 translations/transmission_es.ts \
                 translations/transmission_eu.ts \
                 translations/transmission_fr.ts \
+                translations/transmission_hu.ts \
                 translations/transmission_kk.ts \
                 translations/transmission_lt.ts \
                 translations/transmission_pt_BR.ts \
                 translations/transmission_ru.ts \
-                translations/transmission_hu.ts
+                translations/transmission_uk.ts
 
 FORMS += mainwin.ui
 RESOURCES += application.qrc
