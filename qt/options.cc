@@ -9,7 +9,6 @@
 
 #include <algorithm> // std::min()
 
-#include <QApplication>
 #include <QCheckBox>
 #include <QComboBox>
 #include <QDialogButtonBox>
@@ -19,7 +18,6 @@
 #include <QFileInfo>
 #include <QGridLayout>
 #include <QLabel>
-#include <QMessageBox>
 #include <QPushButton>
 #include <QResizeEvent>
 #include <QSet>
@@ -40,41 +38,6 @@
 #include "session.h"
 #include "torrent.h"
 #include "utils.h"
-
-/***
-****
-***/
-
-void
-FileAdded :: executed (int64_t tag, const QString& result, struct tr_variant * arguments)
-{
-  Q_UNUSED (arguments);
-
-  if (tag != myTag)
-    return;
-
-  if ((result == "success") && !myDelFile.isEmpty ())
-    {
-      QFile file (myDelFile);
-      file.setPermissions (QFile::ReadOwner | QFile::WriteOwner);
-      file.remove ();
-    }
-
-  if (result != "success")
-    {
-      QString text = result;
-
-      for (int i=0, n=text.size (); i<n; ++i)
-        if (!i || text[i-1].isSpace ())
-          text[i] = text[i].toUpper ();
-
-      QMessageBox::warning (QApplication::activeWindow (),
-                            tr ("Error Adding Torrent"),
-                            QString ("<p><b>%1</b></p><p>%2</p>").arg (text).arg (myName));
-    }
-
-  deleteLater ();
-}
 
 /***
 ****
@@ -374,11 +337,8 @@ Options :: onAccepted ()
 {
   // rpc spec section 3.4 "adding a torrent"
 
-  const int64_t tag = mySession.getUniqueTag ();
   tr_variant top;
   tr_variantInitDict (&top, 3);
-  tr_variantDictAddStr (&top, TR_KEY_method, "torrent-add");
-  tr_variantDictAddInt (&top, TR_KEY_tag, tag);
   tr_variant * args (tr_variantDictAddDict (&top, TR_KEY_arguments, 10));
   QString downloadDir;
 
@@ -389,28 +349,6 @@ Options :: onAccepted ()
     downloadDir = myDestinationEdit->text ();
 
   tr_variantDictAddStr (args, TR_KEY_download_dir, downloadDir.toUtf8 ().constData ());
-
-  // "metainfo"
-  switch (myAdd.type)
-    {
-      case AddData::MAGNET:
-        tr_variantDictAddStr (args, TR_KEY_filename, myAdd.magnet.toUtf8 ().constData ());
-        break;
-
-      case AddData::URL:
-        tr_variantDictAddStr (args, TR_KEY_filename, myAdd.url.toString ().toUtf8 ().constData ());
-        break;
-
-      case AddData::FILENAME:
-      case AddData::METAINFO: {
-        const QByteArray b64 = myAdd.toBase64 ();
-        tr_variantDictAddRaw (args, TR_KEY_metainfo, b64.constData (), b64.size ());
-        break;
-      }
-
-      default:
-        qWarning ("unhandled AddData.type: %d", myAdd.type);
-    }
 
   // paused
   tr_variantDictAddBool (args, TR_KEY_paused, !myStartCheck->isChecked ());
@@ -450,14 +388,7 @@ Options :: onAccepted ()
           tr_variantListAddInt (l, i);
     }
 
-  // maybe delete the source .torrent
-  FileAdded * fileAdded = new FileAdded (tag, myAdd.readableName ());
-  if (myTrashCheck->isChecked () && (myAdd.type==AddData::FILENAME))
-    fileAdded->setFileToDelete (myAdd.filename);
-  connect (&mySession, SIGNAL (executed (int64_t,const QString&, struct tr_variant*)),
-           fileAdded, SLOT (executed (int64_t,const QString&, struct tr_variant*)));
-
-  mySession.exec (&top);
+  mySession.addTorrent (myAdd, top, myTrashCheck->isChecked ());
 
   tr_variantFree (&top);
   deleteLater ();

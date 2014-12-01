@@ -35,6 +35,24 @@ extern "C"
 
 class Prefs;
 
+class FileAdded: public QObject
+{
+    Q_OBJECT
+
+  public:
+    FileAdded (int tag, const QString& name): myTag (tag), myName (name) {}
+    ~FileAdded () {}
+    void setFileToDelete (const QString& file) { myDelFile = file; }
+
+  public slots:
+    void executed (int64_t tag, const QString& result, struct tr_variant * arguments);
+
+  private:
+    const int64_t myTag;
+    const QString myName;
+    QString myDelFile;
+};
+
 class Session: public QObject
 {
     Q_OBJECT
@@ -101,6 +119,7 @@ class Session: public QObject
     void torrentSet (const QSet<int>& ids, const tr_quark key, const QPair<int,QString>& val);
     void torrentSetLocation (const QSet<int>& ids, const QString& path, bool doMove);
     void torrentRenamePath (const QSet<int>& ids, const QString& oldpath, const QString& newname);
+    void addTorrent (const AddData& addme, tr_variant& top, bool trashOriginal);
 
   public slots:
     void pauseTorrents (const QSet<int>& torrentIds = QSet<int> ());

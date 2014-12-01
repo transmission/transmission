@@ -10,8 +10,6 @@
 #ifndef OPTIONS_DIALOG_H
 #define OPTIONS_DIALOG_H
 
-#include <iostream>
-
 #include <QDialog>
 #include <QEvent>
 #include <QString>
@@ -41,24 +39,6 @@ extern "C"
 {
   struct tr_variant;
 }
-
-class FileAdded: public QObject
-{
-    Q_OBJECT
-
-  public:
-    FileAdded (int tag, const QString& name): myTag (tag), myName (name) {}
-    ~FileAdded () {}
-    void setFileToDelete (const QString& file) { myDelFile = file; }
-
-  public slots:
-    void executed (int64_t tag, const QString& result, struct tr_variant * arguments);
-
-  private:
-    const int64_t myTag;
-    QString myName;
-    QString myDelFile;
-};
 
 class Options: public QDialog
 {

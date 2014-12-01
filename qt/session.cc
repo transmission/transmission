@@ -15,6 +15,7 @@
 #include <QClipboard>
 #include <QCoreApplication>
 #include <QDesktopServices>
+#include <QFile>
 #include <QMessageBox>
 #include <QNetworkProxy>
 #include <QNetworkProxyFactory>
@@ -81,6 +82,43 @@ namespace
     foreach (tr_quark key, keys)
       tr_variantListAddQuark (list, key);
   }
+}
+
+/***
+****
+***/
+
+void
+FileAdded :: executed (int64_t tag, const QString& result, struct tr_variant * arguments)
+{
+  Q_UNUSED (arguments);
+
+  if (tag != myTag)
+    return;
+
+  if (result == "success")
+    {
+      if (!myDelFile.isEmpty ())
+        {
+          QFile file (myDelFile);
+          file.setPermissions (QFile::ReadOwner | QFile::WriteOwner);
+          file.remove ();
+        }
+    }
+  else
+    {
+      QString text = result;
+
+      for (int i=0, n=text.size (); i<n; ++i)
+        if (!i || text[i-1].isSpace ())
+          text[i] = text[i].toUpper ();
+
+      QMessageBox::warning (QApplication::activeWindow (),
+                            tr ("Error Adding Torrent"),
+                            QString ("<p><b>%1</b></p><p>%2</p>").arg (text).arg (myName));
+    }
+
+  deleteLater ();
 }
 
 /***
@@ -1021,15 +1059,25 @@ Session :: setBlocklistSize (int64_t i)
 }
 
 void
-Session :: addTorrent (const AddData& addMe)
+Session :: addTorrent (const AddData& addMe, tr_variant& top, bool trashOriginal)
 {
-  const QByteArray b64 = addMe.toBase64 ();
+  assert (tr_variantDictFind (&top, TR_KEY_method) == nullptr);
+  assert (tr_variantDictFind (&top, TR_KEY_tag) == nullptr);
 
-  tr_variant top, *args;
-  tr_variantInitDict (&top, 2);
   tr_variantDictAddStr (&top, TR_KEY_method, "torrent-add");
-  args = tr_variantDictAddDict (&top, TR_KEY_arguments, 2);
-  tr_variantDictAddBool (args, TR_KEY_paused, !myPrefs.getBool (Prefs::START));
+
+  const int64_t tag = getUniqueTag ();
+  tr_variantDictAddInt (&top, TR_KEY_tag, tag);
+
+  tr_variant * args;
+  if (!tr_variantDictFindDict (&top, TR_KEY_arguments, &args))
+    args = tr_variantDictAddDict (&top, TR_KEY_arguments, 2);
+
+  assert (tr_variantDictFind (args, TR_KEY_filename) == nullptr);
+  assert (tr_variantDictFind (args, TR_KEY_metainfo) == nullptr);
+
+  if (tr_variantDictFind (args, TR_KEY_paused) == nullptr)
+    tr_variantDictAddBool (args, TR_KEY_paused, !myPrefs.getBool (Prefs::START));
 
   switch (addMe.type)
     {
@@ -1043,15 +1091,35 @@ Session :: addTorrent (const AddData& addMe)
 
       case AddData::FILENAME: /* fall-through */
       case AddData::METAINFO:
-        tr_variantDictAddRaw (args, TR_KEY_metainfo, b64.constData (), b64.size ());
-        break;
+        {
+          const QByteArray b64 = addMe.toBase64 ();
+          tr_variantDictAddRaw (args, TR_KEY_metainfo, b64.constData (), b64.size ());
+          break;
+        }
 
       default:
-        std::cerr << "Unhandled AddData type: " << addMe.type << std::endl;
+        qWarning() << "Unhandled AddData type: " << addMe.type;
         break;
     }
 
+  // maybe delete the source .torrent
+  FileAdded * fileAdded = new FileAdded (tag, addMe.readableName ());
+  if (trashOriginal && addMe.type == AddData::FILENAME)
+    fileAdded->setFileToDelete (addMe.filename);
+  connect (this, SIGNAL (executed (int64_t, QString, struct tr_variant *)),
+           fileAdded, SLOT (executed (int64_t, QString, struct tr_variant *)));
+
   exec (&top);
+}
+
+void
+Session :: addTorrent (const AddData& addMe)
+{
+  tr_variant top;
+  tr_variantInitDict (&top, 3);
+
+  addTorrent (addMe, top, myPrefs.getBool (Prefs::TRASH_ORIGINAL));
+
   tr_variantFree (&top);
 }
 
