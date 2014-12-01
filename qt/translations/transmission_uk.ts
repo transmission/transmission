@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
 <TS version="2.0" language="uk_UA">
+<defaultcodec>UTF-8</defaultcodec>
 <context>
     <name>AboutDialog</name>
     <message>
@@ -514,7 +515,7 @@
 <context>
     <name>FileAdded</name>
     <message>
-        <location filename="../options.cc" line="+72"/>
+        <location filename="../session.cc" line="+117"/>
         <source>Error Adding Torrent</source>
         <translation>Помилка під час додавання торенту</translation>
     </message>
@@ -545,7 +546,7 @@
 <context>
     <name>FileTreeModel</name>
     <message>
-        <location line="+206"/>
+        <location line="+207"/>
         <source>File</source>
         <translation>Файл</translation>
     </message>
@@ -613,10 +614,6 @@
         </translation>
     </message>
     <message>
-        <source>Queued</source>
-        <translation type="obsolete">В черзі</translation>
-    </message>
-    <message>
         <location line="-354"/>
         <source>Verifying</source>
         <translation>Перевірка</translation>
@@ -664,22 +661,6 @@
         <location line="+12"/>
         <source>B</source>
         <translation>Б</translation>
-    </message>
-    <message>
-        <source>KiB/s</source>
-        <translation type="obsolete">КіБ/с</translation>
-    </message>
-    <message>
-        <source>MiB/s</source>
-        <translation type="obsolete">МіБ/с</translation>
-    </message>
-    <message>
-        <source>GiB/s</source>
-        <translation type="obsolete">ГіБ/с</translation>
-    </message>
-    <message>
-        <source>TiB/s</source>
-        <translation type="obsolete">ТіБ/с</translation>
     </message>
     <message>
         <location line="-11"/>
@@ -1404,10 +1385,6 @@ To add another primary URL, add it after a blank line.</source>
 <context>
     <name>MyApp</name>
     <message>
-        <source>Transmission is a file-sharing program.  When you run a torrent, its data will be made available to others by means of upload.  You and you alone are fully responsible for exercising proper judgement and abiding by your local laws.</source>
-        <translation type="obsolete">Transmission — програма для поширення файлів. Дані завантаженого вами торента будуть доступні іншим користувачам, які зможуть завантажити ці дані на свої комп’ютери. Повна відповідальність за ваші рішення та виконання законодавства вашої країни покладається на вас і лише на вас.</translation>
-    </message>
-    <message>
         <location filename="../app.cc" line="+231"/>
         <source>Transmission is a file sharing program. When you run a torrent, its data will be made available to others by means of upload. Any content you share is your sole responsibility.</source>
         <translation>Transmission — програма для поширення файлів. Дані завантаженого вами торента будуть доступні іншим користувачам, які зможуть завантажити ці дані на свої комп&apos;ютери. Повна відповідальність за ваші рішення та виконання законодавства вашої країни покладається на вас і лише на вас.</translation>
@@ -1436,16 +1413,12 @@ To add another primary URL, add it after a blank line.</source>
 <context>
     <name>Options</name>
     <message>
-        <location filename="../options.cc" line="+400"/>
+        <location filename="../options.cc" line="+403"/>
         <source>Open Torrent</source>
         <translation>Відкрити торент</translation>
     </message>
     <message>
-        <source>&amp;Torrent file:</source>
-        <translation type="obsolete">&amp;Торент-файл:</translation>
-    </message>
-    <message>
-        <location line="-369"/>
+        <location line="-337"/>
         <source>Open Torrent from File</source>
         <translation>Відкрити торент з файлу</translation>
     </message>
@@ -1490,17 +1463,9 @@ To add another primary URL, add it after a blank line.</source>
         <translation>&amp;Розпочинати безпосередньо після додавання</translation>
     </message>
     <message>
-        <source>Torrent &amp;priority:</source>
-        <translation type="obsolete">Прі&amp;оритетність торента:</translation>
-    </message>
-    <message>
         <location line="-5"/>
         <source>&amp;Verify Local Data</source>
         <translation>&amp;Перевірити локальні дані</translation>
-    </message>
-    <message>
-        <source>&amp;Start when added</source>
-        <translation type="obsolete">&amp;Розпочинати безпосередньо після додавання</translation>
     </message>
     <message>
         <location line="+9"/>
@@ -1508,7 +1473,7 @@ To add another primary URL, add it after a blank line.</source>
         <translation>Вилу&amp;чати файли .torrent до смітника</translation>
     </message>
     <message>
-        <location line="+268"/>
+        <location line="+236"/>
         <source>Torrent Files (*.torrent);;All Files (*.*)</source>
         <translation>Торент файли (*.torrent);;Всі файли (*.*)</translation>
     </message>
@@ -1536,25 +1501,9 @@ To add another primary URL, add it after a blank line.</source>
         <translation>&amp;Пароль:</translation>
     </message>
     <message>
-        <source>Web Client</source>
-        <translation type="obsolete">Веб-інтерфейс</translation>
-    </message>
-    <message>
         <location line="-12"/>
         <source>&amp;Open web client</source>
         <translation>Переглянути через веб</translation>
-    </message>
-    <message>
-        <source>&amp;Enable web client</source>
-        <translation type="obsolete">&amp;Увімкнути веб-інтерфейс</translation>
-    </message>
-    <message>
-        <source>Listening &amp;port:</source>
-        <translation type="obsolete">Використовувати &amp;порт:</translation>
-    </message>
-    <message>
-        <source>Only allow these IP a&amp;ddresses to connect:</source>
-        <translation type="obsolete">Дозволити підключення лише таким IP-&amp;адресам:</translation>
     </message>
     <message>
         <location line="+16"/>
@@ -1567,25 +1516,9 @@ To add another primary URL, add it after a blank line.</source>
         <translation>Обмеження швидкості</translation>
     </message>
     <message>
-        <source>Limit &amp;download speed (%1):</source>
-        <translation type="obsolete">Обмеження &amp;швидкості завантаження (%1):</translation>
-    </message>
-    <message>
-        <source>Limit &amp;upload speed (%1):</source>
-        <translation type="obsolete">Обмеження &amp;швидкості відвантаження (%1):</translation>
-    </message>
-    <message>
-        <source>Temporary Speed Limits</source>
-        <translation type="obsolete">Тичасові обмеження швидкості</translation>
-    </message>
-    <message>
         <location line="+26"/>
         <source>&lt;small&gt;Override normal speed limits manually or at scheduled times&lt;/small&gt;</source>
         <translation>&lt;small&gt;Не дотримуватись обмежень швидкості при встановленні обмежень вручну або за розкладом&lt;/small&gt;</translation>
-    </message>
-    <message>
-        <source>Limit u&amp;pload speed (%1):</source>
-        <translation type="obsolete">Обмежити шв&amp;идкість відвантаження (%1):</translation>
     </message>
     <message>
         <location line="+11"/>
@@ -1656,10 +1589,6 @@ To add another primary URL, add it after a blank line.</source>
         <location line="+1"/>
         <source>Port is &lt;b&gt;closed&lt;/b&gt;</source>
         <translation>Порт &lt;b&gt;закритий&lt;/b&gt;</translation>
-    </message>
-    <message>
-        <source>Testing...</source>
-        <translation type="obsolete">Перевірка…</translation>
     </message>
     <message>
         <location line="+16"/>
@@ -1821,10 +1750,6 @@ To add another primary URL, add it after a blank line.</source>
         <translation>Конфіденційність</translation>
     </message>
     <message>
-        <source>Limit do&amp;wnload speed (%1):</source>
-        <translation type="obsolete">Обмеження &amp;швидкості завантаження (%1):</translation>
-    </message>
-    <message>
         <location line="-385"/>
         <source>&amp;to</source>
         <translation>&amp;до</translation>
@@ -1839,10 +1764,6 @@ To add another primary URL, add it after a blank line.</source>
         <location line="-346"/>
         <source>Show Transmission icon in the &amp;notification area</source>
         <translation>Показувати &amp;значок Transmission в зоні сповіщення</translation>
-    </message>
-    <message>
-        <source>Show &amp;popup notifications</source>
-        <translation type="obsolete">Показувати &amp;спливаючі повідомлення</translation>
     </message>
     <message>
         <location line="+44"/>
@@ -2005,22 +1926,6 @@ To add another primary URL, add it after a blank line.</source>
         <translation>Додавання</translation>
     </message>
     <message>
-        <source>Automatically &amp;add torrents from:</source>
-        <translation type="obsolete">Автоматично &amp;додавати торенти з:</translation>
-    </message>
-    <message>
-        <source>Show &amp;options dialog</source>
-        <translation type="obsolete">Показати &amp;діалог налаштування</translation>
-    </message>
-    <message>
-        <source>&amp;Start when added</source>
-        <translation type="obsolete">&amp;Розпочинати безпосередньо після додавання</translation>
-    </message>
-    <message>
-        <source>Mo&amp;ve .torrent file to the trash</source>
-        <translation type="obsolete">Вилу&amp;чати файли .torrent до смітника</translation>
-    </message>
-    <message>
         <location line="+75"/>
         <source>Downloading</source>
         <translation>Завантаження</translation>
@@ -2046,11 +1951,6 @@ To add another primary URL, add it after a blank line.</source>
         <translation>Виконати с&amp;ценарій, після завершення завантаження:</translation>
     </message>
     <message>
-        <source>Seeding Limits</source>
-        <oldsource>Seeding</oldsource>
-        <translation type="obsolete">Обмеження поширення</translation>
-    </message>
-    <message>
         <location line="-75"/>
         <source>Stop seeding at &amp;ratio:</source>
         <translation>Припинити поширення при співвідношенні:</translation>
@@ -2066,10 +1966,6 @@ To add another primary URL, add it after a blank line.</source>
         <translation>Налаштування Transmission</translation>
     </message>
     <message>
-        <source>Torrents</source>
-        <translation type="obsolete">Торенти</translation>
-    </message>
-    <message>
         <location line="+3"/>
         <source>Speed</source>
         <translation>Швидкість</translation>
@@ -2078,10 +1974,6 @@ To add another primary URL, add it after a blank line.</source>
         <location line="+4"/>
         <source>Network</source>
         <translation>Мережа</translation>
-    </message>
-    <message>
-        <source>Web</source>
-        <translation type="obsolete">Веб-інтерфейс</translation>
     </message>
     <message>
         <location line="+32"/>
@@ -2133,7 +2025,7 @@ To add another primary URL, add it after a blank line.</source>
 <context>
     <name>Session</name>
     <message>
-        <location filename="../session.cc" line="+821"/>
+        <location filename="../session.cc" line="+742"/>
         <source>Error Renaming Path</source>
         <translation>Помилка під час перейменування шляху</translation>
     </message>
@@ -2247,21 +2139,9 @@ To add another primary URL, add it after a blank line.</source>
             <numerusform>Запущено %n разів</numerusform>
         </translation>
     </message>
-    <message numerus="yes">
-        <source>Started %n time(s)</source>
-        <translation type="obsolete">
-            <numerusform>Запущено %n раз</numerusform>
-            <numerusform>Запущено %n рази</numerusform>
-            <numerusform>Запущено %n разів</numerusform>
-        </translation>
-    </message>
 </context>
 <context>
     <name>Torrent</name>
-    <message>
-        <source>Waiting to verify local data</source>
-        <translation type="obsolete">Очікування перевірки локальних даних</translation>
-    </message>
     <message>
         <location filename="../torrent.cc" line="+775"/>
         <source>Verifying local data</source>
@@ -2372,26 +2252,9 @@ To add another primary URL, add it after a blank line.</source>
         <translation>Помилка</translation>
     </message>
     <message>
-        <source>%1 %2, %3 %4</source>
-        <translation type="obsolete">%1 %2, %3 %4</translation>
-    </message>
-    <message>
-        <source>%1 %2</source>
-        <oldsource>Up: %1</oldsource>
-        <translation type="obsolete">%1 %2</translation>
-    </message>
-    <message>
-        <source>Idle</source>
-        <translation type="obsolete">Неактивний</translation>
-    </message>
-    <message>
         <location line="-61"/>
         <source>Verifying local data (%1% tested)</source>
         <translation>Очікування перевірки локальних даних (%1% перевірено)</translation>
-    </message>
-    <message>
-        <source>Ratio: %1, </source>
-        <translation type="obsolete">Рейтинг: %1, </translation>
     </message>
     <message numerus="yes">
         <location line="+47"/>
@@ -2492,26 +2355,10 @@ To add another primary URL, add it after a blank line.</source>
         <source> - %1:%2</source>
         <translation> - %1:%2</translation>
     </message>
-    <message numerus="yes">
-        <source>%Ln Torrent(s)</source>
-        <translation type="obsolete">
-            <numerusform>%Ln торент</numerusform>
-            <numerusform>%Ln торента</numerusform>
-            <numerusform>%Ln торентів</numerusform>
-        </translation>
-    </message>
     <message>
         <location line="+28"/>
         <source>Idle</source>
         <translation>Неактивний</translation>
-    </message>
-    <message>
-        <source>Transmission
-Up: %1
-Down: %2</source>
-        <translation type="obsolete">Transmission
-Завантажено: %1
-Відвантажено: %2</translation>
     </message>
     <message>
         <location line="+34"/>
@@ -2524,18 +2371,6 @@ Down: %2</source>
         <location line="+6"/>
         <source>Down: %1, Up: %2</source>
         <translation>Завн: %1, Пошир: %2</translation>
-    </message>
-    <message>
-        <source>Click to disable Temporary Speed Limits
-(%1 down, %2 up)</source>
-        <translation type="obsolete">Натисніть для зняття тимчасових обмежень швидкості
-(%1 down, %2 up)</translation>
-    </message>
-    <message>
-        <source>Click to enable Temporary Speed Limits
-(%1 down, %2 up)</source>
-        <translation type="obsolete">Натисніть для встановлення тимчасового обмеження швидкості
-(%1 down, %2 up)</translation>
     </message>
     <message>
         <location line="+400"/>
@@ -2551,10 +2386,6 @@ Down: %2</source>
         <location line="-6"/>
         <source>Open Torrent</source>
         <translation>Відкрити торент</translation>
-    </message>
-    <message>
-        <source>Open URL or Magnet Link</source>
-        <translation type="obsolete">Відкрити посилання чи Маґнет</translation>
     </message>
     <message>
         <location line="-941"/>
@@ -2679,22 +2510,6 @@ Down: %2</source>
         <location line="+120"/>
         <source>Queue</source>
         <translation>Черга</translation>
-    </message>
-    <message>
-        <source>Transmission server is responding</source>
-        <translation type="obsolete">Сервер Transmission відповідає</translation>
-    </message>
-    <message>
-        <source>Last response from server was %1 ago</source>
-        <translation type="obsolete">Остання відповідь від серверу була %1 тому</translation>
-    </message>
-    <message numerus="yes">
-        <source>%L1 of %Ln Torrent(s)</source>
-        <translation type="obsolete">
-            <numerusform>%L1 з %Ln Торента</numerusform>
-            <numerusform>%L1 з %Ln Торенти</numerusform>
-            <numerusform>%L1 з %Ln Торентів</numerusform>
-        </translation>
     </message>
 </context>
 <context>

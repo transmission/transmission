@@ -1,40 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
 <TS version="2.0" language="hu_HU">
+<defaultcodec>UTF-8</defaultcodec>
 <context>
     <name>AboutDialog</name>
     <message>
-        <location filename="../about.cc" line="35"/>
+        <location filename="../about.cc" line="+32"/>
         <source>About Transmission</source>
         <translation>A Transmission-ről</translation>
     </message>
     <message>
-        <location filename="../about.cc" line="47"/>
+        <location line="+12"/>
         <source>&lt;big&gt;Transmission %1&lt;/big&gt;</source>
         <translation>&lt;big&gt;Transmission %1&lt;/big&gt;</translation>
     </message>
     <message>
-        <location filename="../about.cc" line="53"/>
+        <location line="+6"/>
         <source>A fast and easy BitTorrent client</source>
         <translation>Egy gyors és egyszerű BitTorrent kliens</translation>
     </message>
     <message>
-        <location filename="../about.cc" line="58"/>
+        <location line="+5"/>
         <source>Copyright (c) The Transmission Project</source>
         <translation>Copyright (c) a Transmission Projekt</translation>
     </message>
     <message>
-        <location filename="../about.cc" line="72"/>
+        <location line="+14"/>
         <source>C&amp;redits</source>
         <translation>K&amp;észítették</translation>
     </message>
     <message>
-        <location filename="../about.cc" line="76"/>
+        <location line="+4"/>
         <source>&amp;License</source>
         <translation>&amp;Licensz</translation>
     </message>
     <message>
-        <location filename="../about.cc" line="89"/>
+        <location line="+15"/>
         <source>Credits</source>
         <translation>Készítették</translation>
     </message>
@@ -42,452 +43,467 @@
 <context>
     <name>Details</name>
     <message>
-        <location filename="../details.cc" line="153"/>
+        <location filename="../details.cc" line="+163"/>
         <source>Torrent Properties</source>
         <translation>Torrent tulajdonságai</translation>
     </message>
     <message>
-        <location filename="../details.cc" line="157"/>
+        <location line="+4"/>
         <source>Information</source>
         <translation>Információ</translation>
     </message>
     <message>
-        <location filename="../details.cc" line="159"/>
+        <location line="+2"/>
         <source>Peers</source>
         <translation>Partnerek</translation>
     </message>
     <message>
-        <location filename="../details.cc" line="161"/>
+        <location line="+2"/>
         <source>Tracker</source>
         <translation>Tracker</translation>
     </message>
     <message>
-        <location filename="../details.cc" line="163"/>
+        <location line="+2"/>
         <source>Files</source>
         <translation>Fájlok</translation>
     </message>
     <message>
-        <location filename="../details.cc" line="165"/>
+        <location line="+2"/>
         <source>Options</source>
         <translation>Beállítások</translation>
     </message>
     <message>
-        <location filename="../details.cc" line="341"/>
+        <location line="+184"/>
         <source>None</source>
         <translation>Nincs</translation>
     </message>
     <message>
-        <location filename="../details.cc" line="342"/>
+        <location line="+1"/>
         <source>Mixed</source>
         <translation>Vegyes</translation>
     </message>
     <message>
-        <location filename="../details.cc" line="343"/>
-        <location filename="../details.cc" line="520"/>
+        <location line="+1"/>
+        <location line="+206"/>
         <source>Unknown</source>
         <translation>Ismeretlen</translation>
     </message>
     <message>
-        <location filename="../details.cc" line="376"/>
+        <location line="-167"/>
         <source>Finished</source>
         <translation>Befejezve</translation>
     </message>
     <message>
-        <location filename="../details.cc" line="378"/>
+        <location line="+2"/>
         <source>Paused</source>
         <translation>Szünetelteve</translation>
     </message>
     <message>
-        <location filename="../details.cc" line="415"/>
+        <location line="+42"/>
         <source>%1 (100%)</source>
         <translation>%1 (100%)</translation>
     </message>
     <message>
-        <location filename="../details.cc" line="420"/>
+        <location line="+5"/>
         <source>%1 of %2 (%3%)</source>
         <translation>%1 of %2 (%3%)</translation>
     </message>
     <message>
-        <location filename="../details.cc" line="427"/>
+        <location line="+7"/>
         <source>%1 of %2 (%3%), %4 Unverified</source>
         <translation>%1 of %2 (%3%), %4 Ellenőrízetlen</translation>
     </message>
     <message>
-        <location filename="../details.cc" line="461"/>
+        <location line="+35"/>
         <source>%1 (%2 corrupt)</source>
         <translation>%1 (%2 hibás)</translation>
     </message>
     <message>
-        <location filename="../details.cc" line="476"/>
+        <location line="+20"/>
         <source>%1 (Ratio: %2)</source>
         <translation>%1 (Arány: %2)</translation>
     </message>
     <message>
-        <location filename="../details.cc" line="542"/>
+        <location line="+83"/>
         <source>Active now</source>
         <translation>Jelenleg aktív</translation>
     </message>
     <message>
-        <location filename="../details.cc" line="544"/>
+        <location line="+2"/>
         <source>%1 ago</source>
         <translation>%1 óta</translation>
     </message>
     <message numerus="yes">
-        <location filename="../details.cc" line="585"/>
+        <location line="+51"/>
         <source>%1 (%Ln pieces @ %2)</source>
         <translation>
             <numerusform>%1 (%Ln rész @ %2)</numerusform>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../details.cc" line="589"/>
+        <location line="+4"/>
         <source>%1 (%Ln pieces)</source>
         <translation>
             <numerusform>%1 (%Ln rész)</numerusform>
         </translation>
     </message>
     <message>
-        <location filename="../details.cc" line="613"/>
+        <location line="+26"/>
         <source>Private to this tracker -- DHT and PEX disabled</source>
         <translation>Privát tracker --DHT és PEX letiltva </translation>
     </message>
     <message>
-        <location filename="../details.cc" line="614"/>
+        <location line="+1"/>
         <source>Public torrent</source>
         <translation>Publikus torrent</translation>
     </message>
     <message>
-        <location filename="../details.cc" line="653"/>
+        <location line="+48"/>
         <source>Created by %1</source>
         <translation>Készítette: %1</translation>
     </message>
     <message>
-        <location filename="../details.cc" line="655"/>
+        <location line="+2"/>
         <source>Created on %1</source>
         <translation>Készült: %1</translation>
     </message>
     <message>
-        <location filename="../details.cc" line="657"/>
+        <location line="+2"/>
         <source>N/A</source>
         <translation>N/A</translation>
     </message>
     <message>
-        <location filename="../details.cc" line="659"/>
+        <location line="+2"/>
         <source>Created by %1 on %2</source>
         <translation>Készítette: %1 ekkor: %2</translation>
     </message>
     <message>
-        <location filename="../details.cc" line="780"/>
-        <location filename="../details.cc" line="801"/>
+        <location line="+123"/>
+        <location line="+23"/>
         <source>Encrypted connection</source>
         <translation>Titkosított kapcsolat</translation>
     </message>
     <message>
-        <location filename="../details.cc" line="794"/>
+        <location line="-7"/>
         <source>Optimistic unchoke</source>
         <translation>Optimista unchoke</translation>
     </message>
     <message>
-        <location filename="../details.cc" line="795"/>
+        <location line="+1"/>
         <source>Downloading from this peer</source>
         <translation>Letöltés ettől a partnertől</translation>
     </message>
     <message>
-        <location filename="../details.cc" line="796"/>
+        <location line="+1"/>
         <source>We would download from this peer if they would let us</source>
         <translation>Töltenénk ettől a partnertől ha az megengedné</translation>
     </message>
     <message>
-        <location filename="../details.cc" line="797"/>
+        <location line="+1"/>
         <source>Uploading to peer</source>
         <translation>Feltöltés a partnernek</translation>
     </message>
     <message>
-        <location filename="../details.cc" line="798"/>
+        <location line="+1"/>
         <source>We would upload to this peer if they asked</source>
         <translation>Feltöltenénk ennek apartnernek ha az kérné </translation>
     </message>
     <message>
-        <location filename="../details.cc" line="799"/>
+        <location line="+1"/>
         <source>Peer has unchoked us, but we&apos;re not interested</source>
         <translation>A partner unchoke-olt minket, de nem vagyunk ebben érdekeltek</translation>
     </message>
     <message>
-        <location filename="../details.cc" line="800"/>
+        <location line="+1"/>
         <source>We unchoked this peer, but they&apos;re not interested</source>
         <translation>Unchoke-oltuk a partnert, de ő nem érdeklődik</translation>
     </message>
     <message>
-        <location filename="../details.cc" line="802"/>
+        <location line="+2"/>
         <source>Peer was discovered through DHT</source>
         <translation>A partner DHT-n keresztül lett felderítva</translation>
     </message>
     <message>
-        <location filename="../details.cc" line="803"/>
+        <location line="+1"/>
         <source>Peer was discovered through Peer Exchange (PEX)</source>
         <translation>A partner PEX-en keresztül lett felfedezve</translation>
     </message>
     <message>
-        <location filename="../details.cc" line="804"/>
+        <location line="+1"/>
         <source>Peer is an incoming connection</source>
         <translation>Bejövő kapcsolatú partner</translation>
     </message>
     <message>
-        <location filename="../details.cc" line="805"/>
+        <location line="+1"/>
         <source>Peer is connected over uTP</source>
         <translation>A partner uTP-n keresztül kapcsolódik</translation>
     </message>
     <message>
-        <location filename="../details.cc" line="861"/>
+        <location line="+60"/>
         <source>Activity</source>
         <translation>Aktivitás</translation>
     </message>
     <message>
-        <location filename="../details.cc" line="862"/>
+        <location line="+1"/>
         <source>Have:</source>
         <translation>Van:</translation>
     </message>
     <message>
-        <location filename="../details.cc" line="863"/>
+        <location line="+1"/>
         <source>Availability:</source>
         <translation>Elérhetőség:</translation>
     </message>
     <message>
-        <location filename="../details.cc" line="864"/>
+        <location line="+2"/>
         <source>Downloaded:</source>
         <translation>Letöltve:</translation>
     </message>
     <message>
-        <location filename="../details.cc" line="865"/>
+        <location line="-1"/>
         <source>Uploaded:</source>
         <translation>Feltöltve:</translation>
     </message>
     <message>
-        <location filename="../details.cc" line="866"/>
+        <location line="+2"/>
         <source>State:</source>
         <translation>Állapot:</translation>
     </message>
     <message>
-        <location filename="../details.cc" line="867"/>
+        <location line="+1"/>
         <source>Running time:</source>
         <translation>Futásidő:</translation>
     </message>
     <message>
-        <location filename="../details.cc" line="868"/>
+        <location line="+1"/>
         <source>Remaining time:</source>
         <translation>Hátralevő idő:</translation>
     </message>
     <message>
-        <location filename="../details.cc" line="869"/>
+        <location line="+1"/>
         <source>Last activity:</source>
         <translation>Utolsó aktivitás:</translation>
     </message>
     <message>
-        <location filename="../details.cc" line="870"/>
+        <location line="+1"/>
         <source>Error:</source>
         <translation>Hiba:</translation>
     </message>
     <message>
-        <location filename="../details.cc" line="874"/>
+        <location line="+4"/>
         <source>Details</source>
         <translation>Részletek</translation>
     </message>
     <message>
-        <location filename="../details.cc" line="875"/>
+        <location line="+1"/>
         <source>Size:</source>
         <translation>Méret:</translation>
     </message>
     <message>
-        <location filename="../details.cc" line="876"/>
+        <location line="+1"/>
         <source>Location:</source>
         <translation>Hely:</translation>
     </message>
     <message>
-        <location filename="../details.cc" line="877"/>
+        <location line="+1"/>
         <source>Hash:</source>
         <translation>Hash:</translation>
     </message>
     <message>
-        <location filename="../details.cc" line="878"/>
+        <location line="+1"/>
         <source>Privacy:</source>
         <translation>Titkosítás:</translation>
     </message>
     <message>
-        <location filename="../details.cc" line="879"/>
+        <location line="+1"/>
         <source>Origin:</source>
         <translation>Eredet:</translation>
     </message>
     <message>
-        <location filename="../details.cc" line="881"/>
+        <location line="+2"/>
         <source>Comment:</source>
         <translation>Megjegyzés:</translation>
     </message>
     <message>
-        <location filename="../details.cc" line="977"/>
+        <location line="+96"/>
         <source>Add URL </source>
         <translation>URL hozzáadása</translation>
     </message>
     <message>
-        <location filename="../details.cc" line="978"/>
+        <location line="+1"/>
         <source>Add tracker announce URL:</source>
         <translation>Tracker URL hozzáadása:</translation>
     </message>
     <message>
-        <location filename="../details.cc" line="986"/>
-        <location filename="../details.cc" line="998"/>
-        <location filename="../details.cc" line="1032"/>
+        <location line="+8"/>
+        <location line="+12"/>
+        <location line="+34"/>
         <source>Error</source>
         <translation>Hiba</translation>
     </message>
     <message>
-        <location filename="../details.cc" line="986"/>
-        <location filename="../details.cc" line="1032"/>
+        <location line="-46"/>
+        <location line="+46"/>
         <source>Invalid URL &quot;%1&quot;</source>
         <translation>Érvénytelen URL: &quot;%1&quot;</translation>
     </message>
     <message>
-        <location filename="../details.cc" line="998"/>
+        <location line="-34"/>
         <source>Tracker already exists.</source>
         <translation>A tracker már létezik.</translation>
     </message>
     <message>
-        <location filename="../details.cc" line="1021"/>
+        <location line="+23"/>
         <source>Edit URL </source>
         <translation>URL szerkesztése </translation>
     </message>
     <message>
-        <location filename="../details.cc" line="1022"/>
+        <location line="+1"/>
         <source>Edit tracker announce URL:</source>
         <translation>Tracker bejelentési URL szerkesztése:</translation>
     </message>
     <message>
-        <location filename="../details.cc" line="1082"/>
+        <location line="+60"/>
         <source>Speed</source>
         <translation>Sebesség</translation>
     </message>
     <message>
-        <location filename="../details.cc" line="1084"/>
+        <location line="+2"/>
         <source>Honor global &amp;limits</source>
         <translation>&amp;Globális limitek betartása</translation>
     </message>
     <message>
-        <location filename="../details.cc" line="1089"/>
+        <location line="+5"/>
         <source>Limit &amp;download speed (%1):</source>
         <translation>&amp;Letöltési sebességkorlát (%1):</translation>
     </message>
     <message>
-        <location filename="../details.cc" line="1101"/>
+        <location line="+12"/>
         <source>Limit &amp;upload speed (%1):</source>
         <translation>&amp;Feltöltési sebességkorlát (%1):</translation>
     </message>
     <message>
-        <location filename="../details.cc" line="1114"/>
+        <location line="+13"/>
         <source>High</source>
         <translation>Magas</translation>
     </message>
     <message>
-        <location filename="../details.cc" line="1115"/>
+        <location line="+1"/>
         <source>Normal</source>
         <translation>Normál</translation>
     </message>
     <message>
-        <location filename="../details.cc" line="1116"/>
+        <location line="+1"/>
         <source>Low</source>
         <translation>Alacsony</translation>
     </message>
     <message>
-        <location filename="../details.cc" line="1118"/>
+        <location line="+2"/>
         <source>Torrent &amp;priority:</source>
         <translation>Torrent &amp;prioritása:</translation>
     </message>
     <message>
-        <location filename="../details.cc" line="1122"/>
+        <location line="+4"/>
         <source>Seeding Limits</source>
         <translation>Sebesség korlátok</translation>
     </message>
     <message>
-        <location filename="../details.cc" line="1127"/>
-        <location filename="../details.cc" line="1142"/>
+        <location line="+5"/>
+        <location line="+15"/>
         <source>Use Global Settings</source>
         <translation>Globális sebességkorlátok használata</translation>
     </message>
     <message>
-        <location filename="../details.cc" line="1128"/>
+        <location line="-14"/>
         <source>Seed regardless of ratio</source>
         <translation>Aránytól függetlenül seedeljen</translation>
     </message>
     <message>
-        <location filename="../details.cc" line="1129"/>
+        <location line="+1"/>
         <source>Stop seeding at ratio:</source>
         <translation>Seedelés befejezése ha elérte az arányt:</translation>
     </message>
     <message>
-        <location filename="../details.cc" line="1137"/>
+        <location line="+8"/>
         <source>&amp;Ratio:</source>
         <translation>&amp;Arány:</translation>
     </message>
     <message>
-        <location filename="../details.cc" line="1143"/>
+        <location line="+6"/>
         <source>Seed regardless of activity</source>
         <translation>Aktivitástól független seedelés</translation>
     </message>
     <message>
-        <location filename="../details.cc" line="1144"/>
+        <location line="+1"/>
         <source>Stop seeding if idle for N minutes:</source>
         <translation>Seedelés befejezése ha inaktív a torrent N percig:</translation>
     </message>
     <message>
-        <location filename="../details.cc" line="1153"/>
+        <location line="+9"/>
         <source>&amp;Idle:</source>
         <translation>&amp;Inaktív:</translation>
     </message>
     <message>
-        <location filename="../details.cc" line="1157"/>
+        <location line="+4"/>
         <source>Peer Connections</source>
         <translation>Csatlakozott partnerek</translation>
     </message>
     <message>
-        <location filename="../details.cc" line="1165"/>
+        <location line="+8"/>
         <source>&amp;Maximum peers:</source>
         <translation>Partnerek &amp;maximális száma:</translation>
     </message>
     <message>
-        <location filename="../details.cc" line="1240"/>
+        <location line="+46"/>
+        <source>Add Tracker</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>Edit Tracker</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+9"/>
+        <source>Remove Trackers</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+13"/>
         <source>Show &amp;more details</source>
         <translation>&amp;Részletek mutatása</translation>
     </message>
     <message>
-        <location filename="../details.cc" line="1246"/>
+        <location line="+6"/>
         <source>Show &amp;backup trackers</source>
         <translation>Mutassa a &amp;backup trackereket</translation>
     </message>
     <message>
-        <location filename="../details.cc" line="1268"/>
+        <location line="+22"/>
         <source>Up</source>
         <translation>Fel</translation>
     </message>
     <message>
-        <location filename="../details.cc" line="1268"/>
+        <location line="+0"/>
         <source>Down</source>
         <translation>Le</translation>
     </message>
     <message>
-        <location filename="../details.cc" line="1268"/>
+        <location line="+0"/>
         <source>%</source>
         <translation>%</translation>
     </message>
     <message>
-        <location filename="../details.cc" line="1268"/>
+        <location line="+0"/>
         <source>Status</source>
         <translation>Állapot</translation>
     </message>
     <message>
-        <location filename="../details.cc" line="1268"/>
+        <location line="+0"/>
         <source>Address</source>
         <translation>Cím</translation>
     </message>
     <message>
-        <location filename="../details.cc" line="1268"/>
+        <location line="+0"/>
         <source>Client</source>
         <translation>Kliens</translation>
     </message>
@@ -495,7 +511,7 @@
 <context>
     <name>FileAdded</name>
     <message>
-        <location filename="../options.cc" line="71"/>
+        <location filename="../session.cc" line="+117"/>
         <source>Error Adding Torrent</source>
         <translation>Hiba a torrent hozzáadásakor</translation>
     </message>
@@ -503,22 +519,22 @@
 <context>
     <name>FileTreeItem</name>
     <message>
-        <location filename="../file-tree.cc" line="196"/>
+        <location filename="../file-tree.cc" line="+275"/>
         <source>Low</source>
         <translation>Alacsony</translation>
     </message>
     <message>
-        <location filename="../file-tree.cc" line="197"/>
+        <location line="+1"/>
         <source>High</source>
         <translation>Magas</translation>
     </message>
     <message>
-        <location filename="../file-tree.cc" line="198"/>
+        <location line="+1"/>
         <source>Normal</source>
         <translation>Normál</translation>
     </message>
     <message>
-        <location filename="../file-tree.cc" line="199"/>
+        <location line="+1"/>
         <source>Mixed</source>
         <translation>Vegyes</translation>
     </message>
@@ -526,22 +542,27 @@
 <context>
     <name>FileTreeModel</name>
     <message>
-        <location filename="../file-tree.cc" line="334"/>
+        <location line="+207"/>
         <source>File</source>
         <translation>Fájl</translation>
     </message>
     <message>
-        <location filename="../file-tree.cc" line="335"/>
+        <location line="+4"/>
+        <source>Size</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+4"/>
         <source>Progress</source>
         <translation>Folyamat</translation>
     </message>
     <message>
-        <location filename="../file-tree.cc" line="336"/>
+        <location line="+4"/>
         <source>Download</source>
         <translation>Letöltés</translation>
     </message>
     <message>
-        <location filename="../file-tree.cc" line="337"/>
+        <location line="+4"/>
         <source>Priority</source>
         <translation>Prioritás</translation>
     </message>
@@ -549,178 +570,203 @@
 <context>
     <name>FilterBar</name>
     <message>
-        <location filename="../filterbar.cc" line="223"/>
-        <location filename="../filterbar.cc" line="380"/>
+        <location filename="../filterbar.cc" line="+241"/>
+        <location line="+160"/>
         <source>All</source>
         <translation>Mind</translation>
     </message>
     <message>
-        <location filename="../filterbar.cc" line="230"/>
+        <location line="-153"/>
         <source>Active</source>
         <translation>Aktív</translation>
     </message>
     <message>
-        <location filename="../filterbar.cc" line="234"/>
+        <location line="+4"/>
         <source>Downloading</source>
         <translation>Letöltés alatt</translation>
     </message>
     <message>
-        <location filename="../filterbar.cc" line="238"/>
+        <location line="+4"/>
         <source>Seeding</source>
         <translation>Feltöltés alatt</translation>
     </message>
     <message>
-        <location filename="../filterbar.cc" line="242"/>
+        <location line="+4"/>
         <source>Paused</source>
         <translation>Szüneteltetve</translation>
     </message>
     <message>
-        <location filename="../filterbar.cc" line="246"/>
+        <location line="+4"/>
         <source>Finished</source>
         <translation>Befejezve</translation>
     </message>
     <message>
-        <location filename="../filterbar.cc" line="250"/>
+        <location line="+4"/>
         <source>Verifying</source>
         <translation>Ellenőrzés</translation>
     </message>
     <message>
-        <location filename="../filterbar.cc" line="254"/>
+        <location line="+4"/>
         <source>Error</source>
         <translation>Hiba</translation>
     </message>
     <message>
-        <location filename="../filterbar.cc" line="411"/>
+        <location line="+348"/>
         <source>Show:</source>
         <translation>Mutat:</translation>
+    </message>
+    <message numerus="yes">
+        <location line="+2"/>
+        <source>Show %Ln of:</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
     <name>Formatter</name>
     <message>
-        <location filename="../formatter.cc" line="38"/>
+        <location filename="../formatter.cc" line="+35"/>
         <source>B/s</source>
         <translation>B/s</translation>
     </message>
     <message>
-        <location filename="../formatter.cc" line="39"/>
+        <location line="+1"/>
         <source>kB/s</source>
         <translation>kB/s</translation>
     </message>
     <message>
-        <location filename="../formatter.cc" line="40"/>
+        <location line="+1"/>
         <source>MB/s</source>
         <translation>MB/s</translation>
     </message>
     <message>
-        <location filename="../formatter.cc" line="41"/>
+        <location line="+1"/>
         <source>GB/s</source>
         <translation>GB/s</translation>
     </message>
     <message>
-        <location filename="../formatter.cc" line="42"/>
+        <location line="+1"/>
         <source>TB/s</source>
         <translation>TB/s</translation>
     </message>
     <message>
-        <location filename="../formatter.cc" line="50"/>
-        <location filename="../formatter.cc" line="62"/>
+        <location line="+8"/>
+        <location line="+12"/>
         <source>B</source>
         <translation>B</translation>
     </message>
     <message>
-        <location filename="../formatter.cc" line="51"/>
+        <location line="-11"/>
         <source>kB</source>
         <translation>kB</translation>
     </message>
     <message>
-        <location filename="../formatter.cc" line="52"/>
+        <location line="+1"/>
         <source>MB</source>
         <translation>MB</translation>
     </message>
     <message>
-        <location filename="../formatter.cc" line="53"/>
+        <location line="+1"/>
         <source>GB</source>
         <translation>GB</translation>
     </message>
     <message>
-        <location filename="../formatter.cc" line="54"/>
+        <location line="+1"/>
         <source>TB</source>
         <translation>TB</translation>
     </message>
     <message>
-        <location filename="../formatter.cc" line="63"/>
+        <location line="+9"/>
         <source>KiB</source>
         <translation>KiB</translation>
     </message>
     <message>
-        <location filename="../formatter.cc" line="64"/>
+        <location line="+1"/>
         <source>MiB</source>
         <translation>MiB</translation>
     </message>
     <message>
-        <location filename="../formatter.cc" line="65"/>
+        <location line="+1"/>
         <source>GiB</source>
         <translation>GiB</translation>
     </message>
     <message>
-        <location filename="../formatter.cc" line="66"/>
+        <location line="+1"/>
         <source>TiB</source>
         <translation>TiB</translation>
     </message>
     <message>
-        <location filename="../formatter.cc" line="98"/>
-        <location filename="../formatter.cc" line="112"/>
+        <location line="+32"/>
+        <location line="+14"/>
         <source>Unknown</source>
         <translation>Ismeretlen</translation>
     </message>
     <message>
-        <location filename="../formatter.cc" line="100"/>
-        <location filename="../formatter.cc" line="114"/>
-        <location filename="../formatter.cc" line="126"/>
+        <location line="-11"/>
+        <location line="+14"/>
         <source>None</source>
         <translation>Nincs</translation>
     </message>
+    <message>
+        <location line="+20"/>
+        <location line="+8"/>
+        <source>%1 %2</source>
+        <translation type="unfinished">%1 %2</translation>
+    </message>
     <message numerus="yes">
-        <location filename="../formatter.cc" line="163"/>
+        <location line="+32"/>
         <source>%Ln day(s)</source>
         <translation>
             <numerusform>%Ln nap</numerusform>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../formatter.cc" line="164"/>
+        <location line="+1"/>
         <source>%Ln hour(s)</source>
         <translation>
             <numerusform>%Ln óra</numerusform>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../formatter.cc" line="165"/>
+        <location line="+1"/>
         <source>%Ln minute(s)</source>
         <translation>
             <numerusform>%Ln perc</numerusform>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../formatter.cc" line="166"/>
+        <location line="+1"/>
         <source>%Ln second(s)</source>
         <translation>
             <numerusform>%Ln másodperc</numerusform>
         </translation>
     </message>
     <message>
-        <location filename="../formatter.cc" line="173"/>
-        <location filename="../formatter.cc" line="180"/>
-        <location filename="../formatter.cc" line="187"/>
+        <location line="+7"/>
+        <location line="+7"/>
+        <location line="+7"/>
         <source>%1, %2</source>
         <translation>%1, %2</translation>
     </message>
 </context>
 <context>
+    <name>FreespaceLabel</name>
+    <message>
+        <location filename="../freespace-label.cc" line="+47"/>
+        <source>&lt;i&gt;Calculating Free Space...&lt;/i&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+37"/>
+        <source>%1 free</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>LicenseDialog</name>
     <message>
-        <location filename="../license.cc" line="22"/>
+        <location filename="../license.cc" line="+19"/>
         <source>License</source>
         <translation>Licensz</translation>
     </message>
@@ -728,464 +774,464 @@
 <context>
     <name>MainWindow</name>
     <message>
-        <location filename="../mainwin.ui" line="14"/>
+        <location filename="../mainwin.ui" line="+14"/>
         <source>Transmission</source>
         <translation>Transmission</translation>
     </message>
     <message>
-        <location filename="../mainwin.ui" line="65"/>
+        <location line="+51"/>
         <source>&amp;Torrent</source>
         <translation>&amp;Torrent</translation>
     </message>
     <message>
-        <location filename="../mainwin.ui" line="69"/>
+        <location line="+4"/>
         <source>Queue</source>
         <translation>Sorrend</translation>
     </message>
     <message>
-        <location filename="../mainwin.ui" line="95"/>
+        <location line="+26"/>
         <source>&amp;Edit</source>
         <translation>&amp;Szerkesztés</translation>
     </message>
     <message>
-        <location filename="../mainwin.ui" line="106"/>
+        <location line="+11"/>
         <source>&amp;Help</source>
         <translation>&amp;Súgó</translation>
     </message>
     <message>
-        <location filename="../mainwin.ui" line="117"/>
+        <location line="+11"/>
         <source>&amp;View</source>
         <translation>&amp;Nézet</translation>
     </message>
     <message>
-        <location filename="../mainwin.ui" line="139"/>
+        <location line="+22"/>
         <source>&amp;File</source>
         <translation>&amp;Fájl</translation>
     </message>
     <message>
-        <location filename="../mainwin.ui" line="158"/>
+        <location line="+19"/>
         <source>toolBar</source>
         <translation>toolBar</translation>
     </message>
     <message>
-        <location filename="../mainwin.ui" line="194"/>
+        <location line="+36"/>
         <source>&amp;Open...</source>
         <translation>&amp;Megnyitás...</translation>
     </message>
     <message>
-        <location filename="../mainwin.ui" line="197"/>
+        <location line="+3"/>
         <source>Open</source>
         <translation>Megnyitás</translation>
     </message>
     <message>
-        <location filename="../mainwin.ui" line="200"/>
+        <location line="+3"/>
         <source>Open a torrent</source>
         <translation>Torrent megnyitása</translation>
     </message>
     <message>
-        <location filename="../mainwin.ui" line="203"/>
+        <location line="+3"/>
         <source>Ctrl+O</source>
         <translation>Ctrl+O</translation>
     </message>
     <message>
-        <location filename="../mainwin.ui" line="208"/>
+        <location line="+5"/>
         <source>&amp;New...</source>
         <translation>&amp;Új...</translation>
     </message>
     <message>
-        <location filename="../mainwin.ui" line="211"/>
+        <location line="+3"/>
         <source>Create a new torrent</source>
         <translation>Új torrent létrehozása</translation>
     </message>
     <message>
-        <location filename="../mainwin.ui" line="214"/>
+        <location line="+3"/>
         <source>Ctrl+N</source>
         <translation>Ctrl+N</translation>
     </message>
     <message>
-        <location filename="../mainwin.ui" line="219"/>
+        <location line="+5"/>
         <source>&amp;Properties</source>
         <translation>&amp;Tulajdonságok</translation>
     </message>
     <message>
-        <location filename="../mainwin.ui" line="222"/>
+        <location line="+3"/>
         <source>Show torrent properties</source>
         <translation>Torrent tulajdonságainak megjelenítése</translation>
     </message>
     <message>
-        <location filename="../mainwin.ui" line="225"/>
+        <location line="+3"/>
         <source>Alt+Enter</source>
         <translation>Alt+Enter</translation>
     </message>
     <message>
-        <location filename="../mainwin.ui" line="230"/>
+        <location line="+5"/>
         <source>Open Fold&amp;er</source>
         <translation>&amp;Mappa megniytása</translation>
     </message>
     <message>
-        <location filename="../mainwin.ui" line="233"/>
+        <location line="+3"/>
         <source>Open the torrent&apos;s folder</source>
         <translation>Torrent mappájának megnyitása</translation>
     </message>
     <message>
-        <location filename="../mainwin.ui" line="236"/>
+        <location line="+3"/>
         <source>Ctrl+E</source>
         <translation>Ctrl+E</translation>
     </message>
     <message>
-        <location filename="../mainwin.ui" line="241"/>
+        <location line="+5"/>
         <source>&amp;Start</source>
         <translation>&amp;Indítás</translation>
     </message>
     <message>
-        <location filename="../mainwin.ui" line="244"/>
+        <location line="+3"/>
         <source>Start torrent</source>
         <translation>Torrent indítása</translation>
     </message>
     <message>
-        <location filename="../mainwin.ui" line="247"/>
+        <location line="+3"/>
         <source>Ctrl+S</source>
         <translation>Ctrl+S</translation>
     </message>
     <message>
-        <location filename="../mainwin.ui" line="255"/>
+        <location line="+8"/>
         <source>Ask Tracker for &amp;More Peers</source>
         <translation>Több &amp;partner igénylése a trackertől</translation>
     </message>
     <message>
-        <location filename="../mainwin.ui" line="258"/>
+        <location line="+3"/>
         <source>Ask tracker for more peers</source>
         <translation>Több partner igénylése a trackertől</translation>
     </message>
     <message>
-        <location filename="../mainwin.ui" line="263"/>
+        <location line="+5"/>
         <source>&amp;Pause</source>
         <translation>&amp;Szünet</translation>
     </message>
     <message>
-        <location filename="../mainwin.ui" line="266"/>
+        <location line="+3"/>
         <source>Pause torrent</source>
         <translation>Torrent szüneteltetése</translation>
     </message>
     <message>
-        <location filename="../mainwin.ui" line="269"/>
+        <location line="+3"/>
         <source>Ctrl+P</source>
         <translation>Ctrl+P</translation>
     </message>
     <message>
-        <location filename="../mainwin.ui" line="277"/>
+        <location line="+8"/>
         <source>&amp;Verify Local Data</source>
         <translation>&amp;Helyi adat ellenőrzése</translation>
     </message>
     <message>
-        <location filename="../mainwin.ui" line="280"/>
+        <location line="+3"/>
         <source>Verify local data</source>
         <translation>Helyi adat ellenőrzése</translation>
     </message>
     <message>
-        <location filename="../mainwin.ui" line="283"/>
+        <location line="+3"/>
         <source>Ctrl+V</source>
         <translation>Ctrl+V</translation>
     </message>
     <message>
-        <location filename="../mainwin.ui" line="288"/>
+        <location line="+5"/>
         <source>&amp;Remove</source>
         <translation>&amp;Törlés</translation>
     </message>
     <message>
-        <location filename="../mainwin.ui" line="291"/>
+        <location line="+3"/>
         <source>Remove torrent</source>
         <translation>Torrent törlése</translation>
     </message>
     <message>
-        <location filename="../mainwin.ui" line="294"/>
+        <location line="+3"/>
         <source>Del</source>
         <translation>Del</translation>
     </message>
     <message>
-        <location filename="../mainwin.ui" line="302"/>
+        <location line="+8"/>
         <source>&amp;Delete Files and Remove</source>
         <translation>Törlés az &amp;adatokkal együtt</translation>
     </message>
     <message>
-        <location filename="../mainwin.ui" line="305"/>
+        <location line="+3"/>
         <source>Remove torrent and delete its files</source>
         <translation>Törlés az adatokkal együtt</translation>
     </message>
     <message>
-        <location filename="../mainwin.ui" line="308"/>
+        <location line="+3"/>
         <source>Shift+Del</source>
         <translation>Shift+Del</translation>
     </message>
     <message>
-        <location filename="../mainwin.ui" line="313"/>
+        <location line="+5"/>
         <source>&amp;Start All</source>
         <translation>Összes &amp;indítása</translation>
     </message>
     <message>
-        <location filename="../mainwin.ui" line="318"/>
+        <location line="+5"/>
         <source>&amp;Pause All</source>
         <translation>Összes &amp;szüneteltetése</translation>
     </message>
     <message>
-        <location filename="../mainwin.ui" line="323"/>
+        <location line="+5"/>
         <source>&amp;Quit</source>
         <translation>&amp;Kilépés</translation>
     </message>
     <message>
-        <location filename="../mainwin.ui" line="326"/>
+        <location line="+3"/>
         <source>Ctrl+Q</source>
         <translation>Ctrl+Q</translation>
     </message>
     <message>
-        <location filename="../mainwin.ui" line="331"/>
+        <location line="+5"/>
         <source>&amp;Select All</source>
         <translation>Összes &amp;kijelölése</translation>
     </message>
     <message>
-        <location filename="../mainwin.ui" line="334"/>
+        <location line="+3"/>
         <source>Ctrl+A</source>
         <translation>Ctrl+A</translation>
     </message>
     <message>
-        <location filename="../mainwin.ui" line="339"/>
+        <location line="+5"/>
         <source>&amp;Deselect All</source>
         <translation>Kijelölés &amp;megszüntetése</translation>
     </message>
     <message>
-        <location filename="../mainwin.ui" line="342"/>
+        <location line="+3"/>
         <source>Ctrl+Shift+A</source>
         <translation>Ctrl+Shift+A</translation>
     </message>
     <message>
-        <location filename="../mainwin.ui" line="347"/>
+        <location line="+5"/>
         <source>&amp;Preferences</source>
         <translation>&amp;Beállítások</translation>
     </message>
     <message>
-        <location filename="../mainwin.ui" line="355"/>
+        <location line="+8"/>
         <source>&amp;Compact View</source>
         <translation>&amp;Kompakt nézet</translation>
     </message>
     <message>
-        <location filename="../mainwin.ui" line="358"/>
-        <location filename="../mainwin.ui" line="361"/>
+        <location line="+3"/>
+        <location line="+3"/>
         <source>Compact View</source>
         <translation>Kompakt nézet</translation>
     </message>
     <message>
-        <location filename="../mainwin.ui" line="364"/>
+        <location line="+3"/>
         <source>Alt+C</source>
         <translation>Alt+C</translation>
     </message>
     <message>
-        <location filename="../mainwin.ui" line="372"/>
+        <location line="+8"/>
         <source>&amp;Toolbar</source>
         <translation>&amp;Eszköztár</translation>
     </message>
     <message>
-        <location filename="../mainwin.ui" line="380"/>
+        <location line="+8"/>
         <source>&amp;Filterbar</source>
         <translation>&amp;Szűrőmenü</translation>
     </message>
     <message>
-        <location filename="../mainwin.ui" line="388"/>
+        <location line="+8"/>
         <source>&amp;Statusbar</source>
         <translation>&amp;Lábléc</translation>
     </message>
     <message>
-        <location filename="../mainwin.ui" line="396"/>
+        <location line="+8"/>
         <source>Sort by &amp;Activity</source>
         <translation>Rendezés &amp;aktivitás szerint</translation>
     </message>
     <message>
-        <location filename="../mainwin.ui" line="404"/>
+        <location line="+8"/>
         <source>Sort by A&amp;ge</source>
         <translation>Rendezés &amp;kor szerint</translation>
     </message>
     <message>
-        <location filename="../mainwin.ui" line="412"/>
+        <location line="+8"/>
         <source>Sort by Time &amp;Left</source>
         <translation>Rendezés &amp;hátralévő idő szerint</translation>
     </message>
     <message>
-        <location filename="../mainwin.ui" line="420"/>
+        <location line="+8"/>
         <source>Sort by &amp;Name</source>
         <translation>Rendezés &amp;név szerint</translation>
     </message>
     <message>
-        <location filename="../mainwin.ui" line="428"/>
+        <location line="+8"/>
         <source>Sort by &amp;Progress</source>
         <translation>Rendezés &amp;elkészültség szerint</translation>
     </message>
     <message>
-        <location filename="../mainwin.ui" line="436"/>
+        <location line="+8"/>
         <source>Sort by Rati&amp;o</source>
         <translation>Rendezés a&amp;rány szerint</translation>
     </message>
     <message>
-        <location filename="../mainwin.ui" line="444"/>
+        <location line="+8"/>
         <source>Sort by Si&amp;ze</source>
         <translation>Rendezés &amp;méret szerint</translation>
     </message>
     <message>
-        <location filename="../mainwin.ui" line="452"/>
+        <location line="+8"/>
         <source>Sort by Stat&amp;e</source>
         <translation>Rendezés á&amp;llapot szerint</translation>
     </message>
     <message>
-        <location filename="../mainwin.ui" line="460"/>
+        <location line="+8"/>
         <source>Sort by T&amp;racker</source>
         <translation>Rendezés &amp;tracker szerint</translation>
     </message>
     <message>
-        <location filename="../mainwin.ui" line="468"/>
+        <location line="+8"/>
         <source>Message &amp;Log</source>
         <translation>Ü&amp;zenetnapló</translation>
     </message>
     <message>
-        <location filename="../mainwin.ui" line="476"/>
+        <location line="+8"/>
         <source>&amp;Statistics</source>
         <translation>&amp;Statisztika</translation>
     </message>
     <message>
-        <location filename="../mainwin.ui" line="481"/>
+        <location line="+5"/>
         <source>&amp;Contents</source>
         <translation>&amp;Tartalom</translation>
     </message>
     <message>
-        <location filename="../mainwin.ui" line="484"/>
+        <location line="+3"/>
         <source>F1</source>
         <translation>F1</translation>
     </message>
     <message>
-        <location filename="../mainwin.ui" line="489"/>
+        <location line="+5"/>
         <source>&amp;About</source>
         <translation>A Transmission-&amp;ről</translation>
     </message>
     <message>
-        <location filename="../mainwin.ui" line="497"/>
+        <location line="+8"/>
         <source>Re&amp;verse Sort Order</source>
         <translation>Rendezés &amp;fordítva</translation>
     </message>
     <message>
-        <location filename="../mainwin.ui" line="505"/>
+        <location line="+8"/>
         <source>&amp;Name</source>
         <translation>&amp;Név</translation>
     </message>
     <message>
-        <location filename="../mainwin.ui" line="513"/>
+        <location line="+8"/>
         <source>&amp;Files</source>
         <translation>&amp;Fájlok</translation>
     </message>
     <message>
-        <location filename="../mainwin.ui" line="521"/>
+        <location line="+8"/>
         <source>&amp;Tracker</source>
         <translation>&amp;Tracker</translation>
     </message>
     <message>
-        <location filename="../mainwin.ui" line="529"/>
+        <location line="+8"/>
         <source>Total Ratio</source>
         <translation>Összarány</translation>
     </message>
     <message>
-        <location filename="../mainwin.ui" line="537"/>
+        <location line="+8"/>
         <source>Session Ratio</source>
         <translation>Munkamenet aránya</translation>
     </message>
     <message>
-        <location filename="../mainwin.ui" line="545"/>
+        <location line="+8"/>
         <source>Total Transfer</source>
         <translation>Összes forgalom</translation>
     </message>
     <message>
-        <location filename="../mainwin.ui" line="553"/>
+        <location line="+8"/>
         <source>Session Transfer</source>
         <translation>Munkamenet forgalma</translation>
     </message>
     <message>
-        <location filename="../mainwin.ui" line="561"/>
+        <location line="+8"/>
         <source>&amp;Main Window</source>
         <translation>&amp;Főablak</translation>
     </message>
     <message>
-        <location filename="../mainwin.ui" line="569"/>
+        <location line="+8"/>
         <source>Tray &amp;Icon</source>
         <translation>Tálca&amp;ikon</translation>
     </message>
     <message>
-        <location filename="../mainwin.ui" line="574"/>
+        <location line="+5"/>
         <source>&amp;Change Session...</source>
         <translation>Munkamenet &amp;váltás...</translation>
     </message>
     <message>
-        <location filename="../mainwin.ui" line="577"/>
+        <location line="+3"/>
         <source>Choose Session</source>
         <extracomment>Start a local session or connect to a running session</extracomment>
         <translation>Munkamenet kiválasztása</translation>
     </message>
     <message>
-        <location filename="../mainwin.ui" line="582"/>
+        <location line="+5"/>
         <source>Set &amp;Location...</source>
         <translation>Adatok &amp;helye...</translation>
     </message>
     <message>
-        <location filename="../mainwin.ui" line="587"/>
+        <location line="+5"/>
         <source>&amp;Copy Magnet Link to Clipboard</source>
         <translation>Magnet Link másolása a &amp;vágólapra</translation>
     </message>
     <message>
-        <location filename="../mainwin.ui" line="592"/>
+        <location line="+5"/>
         <source>Open &amp;URL...</source>
         <translation>&amp;URL megnyitása...</translation>
     </message>
     <message>
-        <location filename="../mainwin.ui" line="595"/>
+        <location line="+3"/>
         <source>Ctrl+U</source>
         <translation>Ctrl+U</translation>
     </message>
     <message>
-        <location filename="../mainwin.ui" line="600"/>
+        <location line="+5"/>
         <source>&amp;Donate</source>
         <translation>&amp;Adakozás</translation>
     </message>
     <message>
-        <location filename="../mainwin.ui" line="605"/>
+        <location line="+5"/>
         <source>Start &amp;Now</source>
         <translation>Indítás a&amp;zonnal</translation>
     </message>
     <message>
-        <location filename="../mainwin.ui" line="608"/>
+        <location line="+3"/>
         <source>Bypass the queue and start now</source>
         <translation>A sor figyelmen kívül hagyása és azonnali indítás</translation>
     </message>
     <message>
-        <location filename="../mainwin.ui" line="611"/>
+        <location line="+3"/>
         <source>Ctrl+Shift+S</source>
         <translation>Ctrl+Shift+S</translation>
     </message>
     <message>
-        <location filename="../mainwin.ui" line="619"/>
+        <location line="+8"/>
         <source>Move to &amp;Top</source>
         <translation>Mozgatás &amp;legfelülre</translation>
     </message>
     <message>
-        <location filename="../mainwin.ui" line="624"/>
+        <location line="+5"/>
         <source>Move &amp;Up</source>
         <translation>Mozgatás &amp;fel</translation>
     </message>
     <message>
-        <location filename="../mainwin.ui" line="629"/>
+        <location line="+5"/>
         <source>Move &amp;Down</source>
         <translation>Mozgatás &amp;le</translation>
     </message>
     <message>
-        <location filename="../mainwin.ui" line="634"/>
+        <location line="+5"/>
         <source>Move to &amp;Bottom</source>
         <translation>Mozgatás leg&amp;alulra</translation>
     </message>
     <message>
-        <location filename="../mainwin.ui" line="642"/>
+        <location line="+8"/>
         <source>Sort by &amp;Queue</source>
         <translation>&amp;Sorrend szerint rendezés</translation>
     </message>
@@ -1193,126 +1239,126 @@
 <context>
     <name>MakeDialog</name>
     <message>
-        <location filename="../make-dialog.cc" line="88"/>
+        <location filename="../make-dialog.cc" line="+86"/>
         <source>Creating &quot;%1&quot;</source>
         <translation>&quot;%1&quot; létrehozás alatt</translation>
     </message>
     <message>
-        <location filename="../make-dialog.cc" line="90"/>
+        <location line="+2"/>
         <source>Created &quot;%1&quot;!</source>
         <translation>&quot;%1&quot; létrehozva!</translation>
     </message>
     <message>
-        <location filename="../make-dialog.cc" line="92"/>
+        <location line="+2"/>
         <source>Error: invalid announce URL &quot;%1&quot;</source>
         <translation>Hibás announce URL: &quot;%1&quot;</translation>
     </message>
     <message>
-        <location filename="../make-dialog.cc" line="94"/>
+        <location line="+2"/>
         <source>Cancelled</source>
         <translation>Megszakítva</translation>
     </message>
     <message>
-        <location filename="../make-dialog.cc" line="96"/>
+        <location line="+2"/>
         <source>Error reading &quot;%1&quot;: %2</source>
         <translation>&quot;%2&quot; hiba történt a(z) &quot;%1&quot; olvasásakor</translation>
     </message>
     <message>
-        <location filename="../make-dialog.cc" line="98"/>
+        <location line="+2"/>
         <source>Error writing &quot;%1&quot;: %2</source>
         <translation>&quot;%2&quot; hiba történt a(z) &quot;%1&quot; írásakor</translation>
     </message>
     <message>
-        <location filename="../make-dialog.cc" line="131"/>
-        <location filename="../make-dialog.cc" line="327"/>
+        <location line="+37"/>
+        <location line="+206"/>
         <source>New Torrent</source>
         <translation>Új Torrent</translation>
     </message>
     <message>
-        <location filename="../make-dialog.cc" line="176"/>
+        <location line="-162"/>
         <source>Select File</source>
         <translation>Fájl kiválasztása</translation>
     </message>
     <message>
-        <location filename="../make-dialog.cc" line="199"/>
-        <location filename="../make-dialog.cc" line="222"/>
+        <location line="+24"/>
+        <location line="+27"/>
         <source>Select Folder</source>
         <translation>Mapp kiválasztása</translation>
     </message>
     <message>
-        <location filename="../make-dialog.cc" line="294"/>
+        <location line="+75"/>
         <source>&lt;i&gt;No source selected&lt;i&gt;</source>
         <translation>&lt;i&gt;Nincs forrás kiválasztva&lt;i&gt;</translation>
     </message>
     <message numerus="yes">
-        <location filename="../make-dialog.cc" line="296"/>
+        <location line="+4"/>
         <source>%Ln File(s)</source>
         <translation>
             <numerusform>%Ln fájl</numerusform>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../make-dialog.cc" line="297"/>
+        <location line="+1"/>
         <source>%Ln Piece(s)</source>
         <translation>
             <numerusform>%1 (%Ln darab)</numerusform>
         </translation>
     </message>
     <message>
-        <location filename="../make-dialog.cc" line="298"/>
+        <location line="+1"/>
         <source>%1 in %2; %3 @ %4</source>
         <translation>%1 in %2; %3 @ %4</translation>
     </message>
     <message>
-        <location filename="../make-dialog.cc" line="333"/>
+        <location line="+36"/>
         <source>Files</source>
         <translation>Fájlok</translation>
     </message>
     <message>
-        <location filename="../make-dialog.cc" line="347"/>
+        <location line="+14"/>
         <source>Sa&amp;ve to:</source>
         <translation>Mentés &amp;ide:</translation>
     </message>
     <message>
-        <location filename="../make-dialog.cc" line="349"/>
+        <location line="+2"/>
         <source>Source F&amp;older:</source>
         <translation>Forrás&amp;mappa:</translation>
     </message>
     <message>
-        <location filename="../make-dialog.cc" line="354"/>
-        <location filename="../make-dialog.cc" line="368"/>
+        <location line="+5"/>
+        <location line="+14"/>
         <source>(None)</source>
         <translation>(Nincs)</translation>
     </message>
     <message>
-        <location filename="../make-dialog.cc" line="363"/>
+        <location line="-5"/>
         <source>Source &amp;File:</source>
         <translation>&amp;Forrásfájl:</translation>
     </message>
     <message>
-        <location filename="../make-dialog.cc" line="380"/>
+        <location line="+17"/>
         <source>Properties</source>
         <translation>Tulajdonságok</translation>
     </message>
     <message>
-        <location filename="../make-dialog.cc" line="385"/>
+        <location line="+5"/>
         <source>&amp;Trackers:</source>
         <translation>&amp;Trackerek:</translation>
     </message>
     <message>
-        <location filename="../make-dialog.cc" line="386"/>
+        <location line="+1"/>
         <source>To add a backup URL, add it on the line after the primary URL.
 To add another primary URL, add it after a blank line.</source>
         <translation>Ha tartalék URL-t kívánsz hozzáadni írd azt az elsődleges után vele egy sorba.
 Másik elsődleges URL-t új sorba írva adhatsz hozzá.</translation>
     </message>
     <message>
-        <location filename="../make-dialog.cc" line="391"/>
+        <location line="+5"/>
         <source>Co&amp;mment</source>
         <translation>Megje&amp;gyzés</translation>
     </message>
     <message>
-        <location filename="../make-dialog.cc" line="396"/>
+        <location line="+5"/>
         <source>&amp;Private torrent</source>
         <translation>&amp;Privát torrent</translation>
     </message>
@@ -1320,27 +1366,27 @@ Másik elsődleges URL-t új sorba írva adhatsz hozzá.</translation>
 <context>
     <name>MyApp</name>
     <message>
-        <location filename="../app.cc" line="222"/>
-        <source>Transmission is a file-sharing program.  When you run a torrent, its data will be made available to others by means of upload.  You and you alone are fully responsible for exercising proper judgement and abiding by your local laws.</source>
-        <translation>A Transmission egy fájlcserélő program. Ha torrenteket futtatsz azok adatai elérhetők lesznek mások számára. Te, csak és kizárólag Te vagy a felelős az általad megosztott tartalmakért.   </translation>
+        <location filename="../app.cc" line="+231"/>
+        <source>Transmission is a file sharing program. When you run a torrent, its data will be made available to others by means of upload. Any content you share is your sole responsibility.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../app.cc" line="226"/>
+        <location line="+4"/>
         <source>&amp;Cancel</source>
         <translation>&amp;Mégsem</translation>
     </message>
     <message>
-        <location filename="../app.cc" line="227"/>
+        <location line="+1"/>
         <source>I &amp;Agree</source>
         <translation>&amp;Elfogadom</translation>
     </message>
     <message>
-        <location filename="../app.cc" line="280"/>
+        <location line="+58"/>
         <source>Torrent Completed</source>
         <translation>Torrent befejezve</translation>
     </message>
     <message>
-        <location filename="../app.cc" line="295"/>
+        <location line="+24"/>
         <source>Torrent Added</source>
         <translation>Torrent hozzáadva</translation>
     </message>
@@ -1348,63 +1394,72 @@ Másik elsődleges URL-t új sorba írva adhatsz hozzá.</translation>
 <context>
     <name>Options</name>
     <message>
-        <location filename="../options.cc" line="93"/>
-        <location filename="../options.cc" line="419"/>
+        <location filename="../options.cc" line="+403"/>
         <source>Open Torrent</source>
         <translation>Torrent megnyitása</translation>
     </message>
     <message>
-        <location filename="../options.cc" line="104"/>
-        <source>&amp;Torrent file:</source>
-        <translation>Torrent &amp;fájl:</translation>
+        <location line="-337"/>
+        <source>Open Torrent from File</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../options.cc" line="120"/>
+        <location line="+2"/>
+        <source>Open Torrent from URL or Magnet Link</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+11"/>
+        <source>&amp;Source:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+30"/>
         <source>&amp;Destination folder:</source>
         <translation>&amp;Célmappa:</translation>
     </message>
     <message>
-        <location filename="../options.cc" line="148"/>
+        <location line="+39"/>
         <source>High</source>
         <translation>Magas</translation>
     </message>
     <message>
-        <location filename="../options.cc" line="149"/>
+        <location line="+1"/>
         <source>Normal</source>
         <translation>Normál</translation>
     </message>
     <message>
-        <location filename="../options.cc" line="150"/>
+        <location line="+1"/>
         <source>Low</source>
         <translation>Alacsony</translation>
     </message>
     <message>
-        <location filename="../options.cc" line="153"/>
-        <source>Torrent &amp;priority:</source>
-        <translation>Torrent &amp;prioritása:</translation>
+        <location line="+3"/>
+        <source>&amp;Priority:</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../options.cc" line="160"/>
+        <location line="+12"/>
+        <source>S&amp;tart when added</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-5"/>
         <source>&amp;Verify Local Data</source>
         <translation>Hely adat &amp;ellenőrzése</translation>
     </message>
     <message>
-        <location filename="../options.cc" line="165"/>
-        <source>&amp;Start when added</source>
-        <translation>Indítás &amp;hozzáadáskor</translation>
-    </message>
-    <message>
-        <location filename="../options.cc" line="169"/>
+        <location line="+9"/>
         <source>Mo&amp;ve .torrent file to the trash</source>
         <translation>Torrent fájl &amp;lomtárba helyezése</translation>
     </message>
     <message>
-        <location filename="../options.cc" line="421"/>
+        <location line="+236"/>
         <source>Torrent Files (*.torrent);;All Files (*.*)</source>
         <translation>Torrent fájlok (*.torrent);;Minden fájl (*.*)</translation>
     </message>
     <message>
-        <location filename="../options.cc" line="443"/>
+        <location line="+28"/>
         <source>Select Destination</source>
         <translation>Célmappa kiválasztása</translation>
     </message>
@@ -1412,472 +1467,491 @@ Másik elsődleges URL-t új sorba írva adhatsz hozzá.</translation>
 <context>
     <name>PrefsDialog</name>
     <message>
-        <location filename="../prefs-dialog.cc" line="175"/>
-        <source>Web Client</source>
-        <translation>Webes kliens</translation>
-    </message>
-    <message>
-        <location filename="../prefs-dialog.cc" line="178"/>
+        <location filename="../prefs-dialog.cc" line="+178"/>
         <source>&amp;Open web client</source>
         <translation>&amp;Webes kliens megnyitása</translation>
     </message>
     <message>
-        <location filename="../prefs-dialog.cc" line="181"/>
-        <source>&amp;Enable web client</source>
-        <translation>Webes kliens &amp;engedélyezése</translation>
-    </message>
-    <message>
-        <location filename="../prefs-dialog.cc" line="184"/>
-        <source>Listening &amp;port:</source>
-        <translation>&amp;Port:</translation>
-    </message>
-    <message>
-        <location filename="../prefs-dialog.cc" line="186"/>
+        <location line="+8"/>
         <source>Use &amp;authentication</source>
         <translation>&amp;Authentikáció használata</translation>
     </message>
     <message>
-        <location filename="../prefs-dialog.cc" line="188"/>
+        <location line="+2"/>
         <source>&amp;Username:</source>
         <translation>&amp;Felhasználónév:</translation>
     </message>
     <message>
-        <location filename="../prefs-dialog.cc" line="190"/>
+        <location line="+2"/>
         <source>Pass&amp;word:</source>
         <translation>&amp;Jelszó:</translation>
     </message>
     <message>
-        <location filename="../prefs-dialog.cc" line="192"/>
-        <source>Only allow these IP a&amp;ddresses to connect:</source>
-        <translation>Csak a következő IP címek &amp;csatlakozhatnak:</translation>
-    </message>
-    <message>
-        <location filename="../prefs-dialog.cc" line="194"/>
+        <location line="+4"/>
         <source>Addresses:</source>
         <translation>Címek:</translation>
     </message>
     <message>
-        <location filename="../prefs-dialog.cc" line="218"/>
+        <location line="+24"/>
         <source>Speed Limits</source>
         <translation>Sebesség korlátok</translation>
     </message>
     <message>
-        <location filename="../prefs-dialog.cc" line="221"/>
-        <source>Limit &amp;download speed (%1):</source>
-        <translation>&amp;Letöltési sebességkorlát (%1):</translation>
-    </message>
-    <message>
-        <location filename="../prefs-dialog.cc" line="226"/>
-        <source>Limit &amp;upload speed (%1):</source>
-        <translation>&amp;Feltöltési sebességkorlát (%1):</translation>
-    </message>
-    <message>
-        <location filename="../prefs-dialog.cc" line="238"/>
+        <location line="+20"/>
         <source>Alternative Speed Limits</source>
         <translation>Alternatív sebességkorlátok</translation>
     </message>
     <message>
-        <location filename="../prefs-dialog.cc" line="244"/>
+        <location line="+6"/>
         <source>&lt;small&gt;Override normal speed limits manually or at scheduled times&lt;/small&gt;</source>
         <translation>&lt;small&gt;Normál sebességlimitek felülbírálása kézzel vagy ütemezve a következő időszakokban&lt;/small&gt;</translation>
     </message>
     <message>
-        <location filename="../prefs-dialog.cc" line="247"/>
-        <source>Limit do&amp;wnload speed (%1):</source>
-        <translation>&amp;Letöltési sebességkorlát (%1):</translation>
-    </message>
-    <message>
-        <location filename="../prefs-dialog.cc" line="251"/>
-        <source>Limit u&amp;pload speed (%1):</source>
-        <translation>&amp;Feltöltési sebességkorlát (%1):</translation>
-    </message>
-    <message>
-        <location filename="../prefs-dialog.cc" line="255"/>
+        <location line="+11"/>
         <source>&amp;Scheduled times:</source>
         <translation>Ü&amp;temezett időszakok:</translation>
     </message>
     <message>
-        <location filename="../prefs-dialog.cc" line="261"/>
+        <location line="+6"/>
         <source>&amp;to</source>
         <translation>&amp;ide</translation>
     </message>
     <message>
-        <location filename="../prefs-dialog.cc" line="270"/>
+        <location line="+9"/>
         <source>&amp;On days:</source>
         <translation>Megadott &amp;napokon:</translation>
     </message>
     <message>
-        <location filename="../prefs-dialog.cc" line="273"/>
+        <location line="+3"/>
         <source>Every Day</source>
         <translation>Minden nap</translation>
     </message>
     <message>
-        <location filename="../prefs-dialog.cc" line="274"/>
+        <location line="+1"/>
         <source>Weekdays</source>
         <translation>Hétköznap</translation>
     </message>
     <message>
-        <location filename="../prefs-dialog.cc" line="275"/>
+        <location line="+1"/>
         <source>Weekends</source>
         <translation>Hétvégén</translation>
     </message>
     <message>
-        <location filename="../prefs-dialog.cc" line="276"/>
+        <location line="+1"/>
         <source>Sunday</source>
         <translation>Vasárnap</translation>
     </message>
     <message>
-        <location filename="../prefs-dialog.cc" line="277"/>
+        <location line="+1"/>
         <source>Monday</source>
         <translation>Hétfő</translation>
     </message>
     <message>
-        <location filename="../prefs-dialog.cc" line="278"/>
+        <location line="+1"/>
         <source>Tuesday</source>
         <translation>Kedd</translation>
     </message>
     <message>
-        <location filename="../prefs-dialog.cc" line="279"/>
+        <location line="+1"/>
         <source>Wednesday</source>
         <translation>Szerda</translation>
     </message>
     <message>
-        <location filename="../prefs-dialog.cc" line="280"/>
+        <location line="+1"/>
         <source>Thursday</source>
         <translation>Csütörtök</translation>
     </message>
     <message>
-        <location filename="../prefs-dialog.cc" line="281"/>
+        <location line="+1"/>
         <source>Friday</source>
         <translation>Péntek</translation>
     </message>
     <message>
-        <location filename="../prefs-dialog.cc" line="282"/>
+        <location line="+1"/>
         <source>Saturday</source>
         <translation>Szombat</translation>
     </message>
     <message>
-        <location filename="../prefs-dialog.cc" line="300"/>
-        <location filename="../prefs-dialog.cc" line="634"/>
+        <location line="+18"/>
+        <location line="+348"/>
         <source>Desktop</source>
         <translation>Asztal</translation>
     </message>
     <message>
-        <location filename="../prefs-dialog.cc" line="302"/>
+        <location line="-346"/>
         <source>Show Transmission icon in the &amp;notification area</source>
         <translation>Ikon mutatása a &amp;tálcán</translation>
     </message>
     <message>
-        <location filename="../prefs-dialog.cc" line="303"/>
-        <source>Show &amp;popup notifications</source>
-        <translation>&amp;Popup üzenetek engedélyezése</translation>
-    </message>
-    <message>
-        <location filename="../prefs-dialog.cc" line="318"/>
+        <location line="+23"/>
         <source>Port is &lt;b&gt;open&lt;/b&gt;</source>
         <translation>A port &lt;b&gt;nyitva&lt;/b&gt;</translation>
     </message>
     <message>
-        <location filename="../prefs-dialog.cc" line="319"/>
+        <location line="+1"/>
         <source>Port is &lt;b&gt;closed&lt;/b&gt;</source>
         <translation>A port &lt;b&gt;zárva&lt;/b&gt;</translation>
     </message>
     <message>
-        <location filename="../prefs-dialog.cc" line="325"/>
+        <location line="+6"/>
         <source>Testing TCP Port...</source>
         <translation>TCP port tesztelése...</translation>
     </message>
     <message>
-        <location filename="../prefs-dialog.cc" line="335"/>
+        <location line="+10"/>
         <source>Incoming Peers</source>
         <translation>Bejövő partnerek</translation>
     </message>
     <message>
-        <location filename="../prefs-dialog.cc" line="339"/>
+        <location line="+4"/>
         <source>Te&amp;st Port</source>
         <translation>Tesz&amp;t port</translation>
     </message>
     <message>
-        <location filename="../prefs-dialog.cc" line="340"/>
-        <location filename="../prefs-dialog.cc" line="737"/>
+        <location line="+1"/>
+        <location line="+410"/>
         <source>Status unknown</source>
         <translation>Státusz nem ismert</translation>
     </message>
     <message>
-        <location filename="../prefs-dialog.cc" line="348"/>
+        <location line="-402"/>
         <source>&amp;Port for incoming connections:</source>
         <translation>&amp;Bejövő kapcsolatok portja:</translation>
     </message>
     <message>
-        <location filename="../prefs-dialog.cc" line="350"/>
+        <location line="+2"/>
         <source>Pick a &amp;random port every time Transmission is started</source>
         <translation>&amp;Véletlen port választása minden indításnál</translation>
     </message>
     <message>
-        <location filename="../prefs-dialog.cc" line="351"/>
+        <location line="+1"/>
         <source>Use UPnP or NAT-PMP port &amp;forwarding from my router</source>
         <translation>UPnP vagy NAT-PMP port &amp;forward a routerhez</translation>
     </message>
     <message>
-        <location filename="../prefs-dialog.cc" line="354"/>
+        <location line="+182"/>
         <source>Limits</source>
         <translation>Korlátok</translation>
     </message>
     <message>
-        <location filename="../prefs-dialog.cc" line="355"/>
+        <location line="-178"/>
         <source>Maximum peers per &amp;torrent:</source>
         <translation>Partnerek maximális száma &amp;torrentenként::</translation>
     </message>
     <message>
-        <location filename="../prefs-dialog.cc" line="356"/>
+        <location line="-187"/>
+        <source>Remote Control</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <source>Allow &amp;remote access</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>HTTP &amp;port:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+8"/>
+        <source>Only allow these IP a&amp;ddresses:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+29"/>
+        <source>&amp;Upload (%1):</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>&amp;Download (%1):</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+21"/>
+        <source>U&amp;pload (%1):</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Do&amp;wnload (%1):</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+52"/>
+        <source>Start &amp;minimized in notification area</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Notification</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Show a notification when torrents are a&amp;dded</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Show a notification when torrents &amp;finish</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Play a &amp;sound when torrents finish</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+51"/>
+        <source>Peer Limits</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
         <source>Maximum peers &amp;overall:</source>
         <translation>&amp;Partnerek maximális száma:</translation>
     </message>
     <message>
-        <location filename="../prefs-dialog.cc" line="359"/>
+        <location line="+3"/>
         <source>Options</source>
         <translation>Opciók</translation>
     </message>
     <message>
-        <location filename="../prefs-dialog.cc" line="362"/>
+        <location line="+3"/>
         <source>Enable &amp;uTP for peer connections</source>
         <translation>&amp;uTP engedélyezése</translation>
     </message>
     <message>
-        <location filename="../prefs-dialog.cc" line="363"/>
+        <location line="+1"/>
         <source>uTP is a tool for reducing network congestion.</source>
         <translation>A uTP egy eszköz ami a hálózat túlterhelése ellen véd. </translation>
     </message>
     <message numerus="yes">
-        <location filename="../prefs-dialog.cc" line="391"/>
+        <location line="+34"/>
         <source>&lt;b&gt;Update succeeded!&lt;/b&gt;&lt;p&gt;Blocklist now has %Ln rules.</source>
         <translation>
             <numerusform>&lt;b&gt;Frissítés sikeres!&lt;/b&gt;&lt;p&gt;A tiltólistában most %Ln elemet tartalmaz.</numerusform>
         </translation>
     </message>
     <message>
-        <location filename="../prefs-dialog.cc" line="400"/>
+        <location line="+9"/>
         <source>&lt;b&gt;Update Blocklist&lt;/b&gt;&lt;p&gt;Getting new blocklist...</source>
         <translation>&lt;b&gt;Tiltólista frissítése&lt;/b&gt;&lt;p&gt;Új tiltólista letöltése...</translation>
     </message>
     <message>
-        <location filename="../prefs-dialog.cc" line="422"/>
+        <location line="+22"/>
+        <source>Encryption</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+12"/>
         <source>Blocklist</source>
         <translation>Tiltólista</translation>
     </message>
     <message>
-        <location filename="../prefs-dialog.cc" line="424"/>
+        <location line="+2"/>
         <source>Enable &amp;blocklist:</source>
         <translation>&amp;Tiltólista engedélyezése:</translation>
     </message>
     <message>
-        <location filename="../prefs-dialog.cc" line="431"/>
+        <location line="+7"/>
         <source>&amp;Update</source>
         <translation>&amp;Frissítés</translation>
     </message>
     <message>
-        <location filename="../prefs-dialog.cc" line="440"/>
+        <location line="+9"/>
         <source>Enable &amp;automatic updates</source>
         <translation>&amp;Automata frissítések engedélyezése</translation>
     </message>
     <message>
-        <location filename="../prefs-dialog.cc" line="445"/>
-        <location filename="../prefs-dialog.cc" line="632"/>
+        <location line="+106"/>
+        <source>Automatically add .torrent files &amp;from:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+8"/>
+        <source>Show the Torrent Options &amp;dialog</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>&amp;Start added torrents</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Mo&amp;ve the .torrent file to the trash</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+16"/>
+        <source>Download Queue</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Ma&amp;ximum active downloads:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Downloads sharing data in the last &amp;N minutes are active:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+42"/>
+        <source>Downloading</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Seeding</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
         <source>Privacy</source>
         <translation>Biztonság</translation>
     </message>
     <message>
-        <location filename="../prefs-dialog.cc" line="448"/>
+        <location line="+3"/>
+        <source>Remote</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-211"/>
         <source>Allow encryption</source>
         <translation>Titkosítás engedélyezése</translation>
     </message>
     <message>
-        <location filename="../prefs-dialog.cc" line="449"/>
+        <location line="+1"/>
         <source>Prefer encryption</source>
         <translation>Titkosítás előnyben részesítése</translation>
     </message>
     <message>
-        <location filename="../prefs-dialog.cc" line="450"/>
+        <location line="+1"/>
         <source>Require encryption</source>
         <translation>Titkosítás megkövetelése</translation>
     </message>
     <message>
-        <location filename="../prefs-dialog.cc" line="454"/>
+        <location line="+4"/>
         <source>&amp;Encryption mode:</source>
         <translation>&amp;Titkosítási mód:</translation>
     </message>
     <message>
-        <location filename="../prefs-dialog.cc" line="455"/>
+        <location line="-73"/>
         <source>Use PE&amp;X to find more peers</source>
         <translation>&amp;PEX használata több partnerek kereséséhez</translation>
     </message>
     <message>
-        <location filename="../prefs-dialog.cc" line="456"/>
+        <location line="+1"/>
         <source>PEX is a tool for exchanging peer lists with the peers you&apos;re connected to.</source>
         <translation>A PEX elósegíti a partnerlista cseréjét a csatlakozott partnerekkel.</translation>
     </message>
     <message>
-        <location filename="../prefs-dialog.cc" line="457"/>
+        <location line="+1"/>
         <source>Use &amp;DHT to find more peers</source>
         <translation>&amp;DHT használata több partnerek kereséséhez</translation>
     </message>
     <message>
-        <location filename="../prefs-dialog.cc" line="458"/>
+        <location line="+1"/>
         <source>DHT is a tool for finding peers without a tracker.</source>
         <translation>A DHT segítségével tracker nélkül találhatod meg a partnereket.</translation>
     </message>
     <message>
-        <location filename="../prefs-dialog.cc" line="459"/>
+        <location line="+1"/>
         <source>Use &amp;Local Peer Discovery to find more peers</source>
         <translation>&amp;LPD használata több partnerek kereséséhez</translation>
     </message>
     <message>
-        <location filename="../prefs-dialog.cc" line="460"/>
+        <location line="+1"/>
         <source>LPD is a tool for finding peers on your local network.</source>
         <translation>A LDP segít partnereket találni a helyi hálózaton.</translation>
     </message>
     <message>
-        <location filename="../prefs-dialog.cc" line="474"/>
+        <location line="+105"/>
         <source>Select &quot;Torrent Done&quot; Script</source>
         <translation>Válaszd ki a torrent befejezésekor lefuttatni kívánt szkriptet</translation>
     </message>
     <message>
-        <location filename="../prefs-dialog.cc" line="485"/>
+        <location line="+11"/>
         <source>Select Incomplete Directory</source>
         <translation>Válaszd ki az átmeneti könyvtárat</translation>
     </message>
     <message>
-        <location filename="../prefs-dialog.cc" line="496"/>
+        <location line="+11"/>
         <source>Select Watch Directory</source>
         <translation>Válaszd ki a megfigyelni kívánt könyvtárat</translation>
     </message>
     <message>
-        <location filename="../prefs-dialog.cc" line="507"/>
+        <location line="+11"/>
         <source>Select Destination</source>
         <translation>Válaszd ki a cél könyvtárat</translation>
     </message>
     <message>
-        <location filename="../prefs-dialog.cc" line="533"/>
+        <location line="+55"/>
         <source>Adding</source>
         <translation>Hozzáadá</translation>
     </message>
     <message>
-        <location filename="../prefs-dialog.cc" line="535"/>
-        <source>Show &amp;options dialog</source>
-        <translation>Mutasd az &amp;opciók ablakot</translation>
-    </message>
-    <message>
-        <location filename="../prefs-dialog.cc" line="536"/>
-        <source>&amp;Start when added</source>
-        <translation>&amp;Indítás hozzáadáskor</translation>
-    </message>
-    <message>
-        <location filename="../prefs-dialog.cc" line="537"/>
-        <source>Mo&amp;ve .torrent file to the trash</source>
-        <translation>Torrent fájl &amp;lomtárba helyezése</translation>
-    </message>
-    <message>
-        <location filename="../prefs-dialog.cc" line="539"/>
-        <source>Automatically &amp;add torrents from:</source>
-        <translation>&amp;Torrentek automatikus hozzáadása a következő mappából:</translation>
-    </message>
-    <message>
-        <location filename="../prefs-dialog.cc" line="548"/>
-        <source>Seeding Limits</source>
-        <translation>Visszaosztási limitek</translation>
-    </message>
-    <message>
-        <location filename="../prefs-dialog.cc" line="550"/>
+        <location line="-27"/>
         <source>Stop seeding at &amp;ratio:</source>
         <translation>Seedelés befejezése ha elérte az &amp;arányt:</translation>
     </message>
     <message>
-        <location filename="../prefs-dialog.cc" line="555"/>
+        <location line="+5"/>
         <source>Stop seeding if idle for &amp;N minutes:</source>
         <translation>Seedelés befejezése ha inaktív a torrent &amp;N percig:</translation>
     </message>
     <message>
-        <location filename="../prefs-dialog.cc" line="576"/>
-        <source>Location</source>
-        <translation>Hely</translation>
-    </message>
-    <message>
-        <location filename="../prefs-dialog.cc" line="582"/>
+        <location line="+42"/>
         <source>Save to &amp;Location:</source>
         <translation>Mentés &amp;ide:</translation>
     </message>
     <message>
-        <location filename="../prefs-dialog.cc" line="585"/>
-        <source>Queue</source>
-        <translation>Letöltési sor</translation>
-    </message>
-    <message>
-        <location filename="../prefs-dialog.cc" line="587"/>
-        <source>Maximum active &amp;downloads:</source>
-        <translation>&amp;Letöltések maximális száma:</translation>
-    </message>
-    <message>
-        <location filename="../prefs-dialog.cc" line="588"/>
-        <source>Downloads sharing data in the last N minutes are &amp;active:</source>
-        <translation>A következő kész megosztott adatok voltak az utóbbi N percben &amp;aktívak: </translation>
-    </message>
-    <message>
-        <location filename="../prefs-dialog.cc" line="591"/>
+        <location line="+16"/>
         <source>Incomplete</source>
         <translation>Félkész</translation>
     </message>
     <message>
-        <location filename="../prefs-dialog.cc" line="593"/>
+        <location line="+2"/>
         <source>Append &quot;.&amp;part&quot; to incomplete files&apos; names</source>
         <translation>Félkész fájlok nevéhez &quot;.&amp;part&quot; hozzáfűzése</translation>
     </message>
     <message>
-        <location filename="../prefs-dialog.cc" line="595"/>
+        <location line="+2"/>
         <source>Keep &amp;incomplete files in:</source>
         <translation>&amp;Az átmeneti fájlok tárolása ebben a mappában:</translation>
     </message>
     <message>
-        <location filename="../prefs-dialog.cc" line="603"/>
+        <location line="+8"/>
         <source>Call scrip&amp;t when torrent is completed:</source>
         <translation>&amp;Program futtatása amikor a torrent befejeződik:</translation>
     </message>
     <message>
-        <location filename="../prefs-dialog.cc" line="626"/>
+        <location line="+23"/>
         <source>Transmission Preferences</source>
         <translation>Transmission beállításai</translation>
     </message>
     <message>
-        <location filename="../prefs-dialog.cc" line="629"/>
-        <source>Torrents</source>
-        <translation>Torrentek</translation>
-    </message>
-    <message>
-        <location filename="../prefs-dialog.cc" line="630"/>
-        <source>Download</source>
-        <translation>Letöltés</translation>
-    </message>
-    <message>
-        <location filename="../prefs-dialog.cc" line="631"/>
+        <location line="+3"/>
         <source>Speed</source>
         <translation>Sebesség</translation>
     </message>
     <message>
-        <location filename="../prefs-dialog.cc" line="633"/>
+        <location line="+4"/>
         <source>Network</source>
         <translation>Hálózat</translation>
     </message>
     <message>
-        <location filename="../prefs-dialog.cc" line="635"/>
-        <source>Web</source>
-        <translation>Web</translation>
-    </message>
-    <message>
-        <location filename="../prefs-dialog.cc" line="663"/>
+        <location line="+32"/>
         <source>Not supported by remote sessions</source>
         <translation>Távoli munkamenet esetén nem támogatott</translation>
     </message>
     <message numerus="yes">
-        <location filename="../prefs-dialog.cc" line="694"/>
+        <location line="+31"/>
         <source>&lt;i&gt;Blocklist contains %Ln rules&lt;/i&gt;</source>
         <translation>
             <numerusform>&lt;i&gt;A blokkolási lista %Ln szabályt tartalmaz&lt;/i&gt;</numerusform>
@@ -1887,7 +1961,7 @@ Másik elsődleges URL-t új sorba írva adhatsz hozzá.</translation>
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../app.cc" line="132"/>
+        <location filename="../app.cc" line="-186"/>
         <source>Invalid option</source>
         <translation>érvénytelen opció</translation>
     </message>
@@ -1895,32 +1969,32 @@ Másik elsődleges URL-t új sorba írva adhatsz hozzá.</translation>
 <context>
     <name>RelocateDialog</name>
     <message>
-        <location filename="../relocate.cc" line="51"/>
+        <location filename="../relocate.cc" line="+48"/>
         <source>Select Location</source>
         <translation>Válaszd ki a mappát</translation>
     </message>
     <message>
-        <location filename="../relocate.cc" line="76"/>
+        <location line="+28"/>
         <source>Set Torrent Location</source>
         <translation>Válaszd ki a torrentet</translation>
     </message>
     <message>
-        <location filename="../relocate.cc" line="92"/>
+        <location line="+20"/>
         <source>Set Location</source>
         <translation>Válaszd ki a mappát</translation>
     </message>
     <message>
-        <location filename="../relocate.cc" line="93"/>
+        <location line="+1"/>
         <source>New &amp;location:</source>
         <translation>Új &amp;hely:</translation>
     </message>
     <message>
-        <location filename="../relocate.cc" line="94"/>
+        <location line="+1"/>
         <source>&amp;Move from the current folder</source>
         <translation>Áthelyezés a &amp;jelenlegi mappából</translation>
     </message>
     <message>
-        <location filename="../relocate.cc" line="95"/>
+        <location line="+1"/>
         <source>Local data is &amp;already there</source>
         <translation>A letöltött adat &amp;már itt van</translation>
     </message>
@@ -1928,7 +2002,17 @@ Másik elsődleges URL-t új sorba írva adhatsz hozzá.</translation>
 <context>
     <name>Session</name>
     <message>
-        <location filename="../session.cc" line="792"/>
+        <location filename="../session.cc" line="+742"/>
+        <source>Error Renaming Path</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>&lt;p&gt;&lt;b&gt;Unable to rename &quot;%1&quot; as &quot;%2&quot;: %3.&lt;/b&gt;&lt;/p&gt; &lt;p&gt;Please correct the errors and try again.&lt;/p&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+45"/>
         <source>Add Torrent</source>
         <translation>Torrent hozzáadása</translation>
     </message>
@@ -1936,47 +2020,47 @@ Másik elsődleges URL-t új sorba írva adhatsz hozzá.</translation>
 <context>
     <name>SessionDialog</name>
     <message>
-        <location filename="../session-dialog.cc" line="71"/>
+        <location filename="../session-dialog.cc" line="+68"/>
         <source>Change Session</source>
         <translation>Munkamenet váltás</translation>
     </message>
     <message>
-        <location filename="../session-dialog.cc" line="77"/>
+        <location line="+6"/>
         <source>Source</source>
         <translation>Forrás</translation>
     </message>
     <message>
-        <location filename="../session-dialog.cc" line="78"/>
+        <location line="+1"/>
         <source>Start &amp;Local Session</source>
         <translation>&amp;Helyi munkamenet indítása</translation>
     </message>
     <message>
-        <location filename="../session-dialog.cc" line="82"/>
+        <location line="+4"/>
         <source>Connect to &amp;Remote Session</source>
         <translation>Csatalkozás &amp;távoli munkamenethez</translation>
     </message>
     <message>
-        <location filename="../session-dialog.cc" line="88"/>
+        <location line="+6"/>
         <source>&amp;Host:</source>
         <translation>&amp;Hoszt:</translation>
     </message>
     <message>
-        <location filename="../session-dialog.cc" line="93"/>
+        <location line="+5"/>
         <source>&amp;Port:</source>
         <translation>&amp;Port:</translation>
     </message>
     <message>
-        <location filename="../session-dialog.cc" line="95"/>
+        <location line="+2"/>
         <source>&amp;Authentication required</source>
         <translation>&amp;Authentikáció kötelező</translation>
     </message>
     <message>
-        <location filename="../session-dialog.cc" line="102"/>
+        <location line="+7"/>
         <source>&amp;Username:</source>
         <translation>&amp;Felhasználónév:</translation>
     </message>
     <message>
-        <location filename="../session-dialog.cc" line="107"/>
+        <location line="+5"/>
         <source>Pass&amp;word:</source>
         <translation>&amp;Jelszó:</translation>
     </message>
@@ -1984,107 +2068,107 @@ Másik elsődleges URL-t új sorba írva adhatsz hozzá.</translation>
 <context>
     <name>StatsDialog</name>
     <message>
-        <location filename="../stats-dialog.cc" line="35"/>
+        <location filename="../stats-dialog.cc" line="+32"/>
         <source>Statistics</source>
         <translation>Statisztika</translation>
     </message>
     <message>
-        <location filename="../stats-dialog.cc" line="38"/>
+        <location line="+3"/>
         <source>Current Session</source>
         <translation>Jelenlegi munkamenet</translation>
     </message>
     <message>
-        <location filename="../stats-dialog.cc" line="39"/>
-        <location filename="../stats-dialog.cc" line="46"/>
+        <location line="+1"/>
+        <location line="+7"/>
         <source>Uploaded:</source>
         <translation>Feltöltve:</translation>
     </message>
     <message>
-        <location filename="../stats-dialog.cc" line="40"/>
-        <location filename="../stats-dialog.cc" line="47"/>
+        <location line="-6"/>
+        <location line="+7"/>
         <source>Downloaded:</source>
         <translation>Letöltve:</translation>
     </message>
     <message>
-        <location filename="../stats-dialog.cc" line="41"/>
-        <location filename="../stats-dialog.cc" line="48"/>
+        <location line="-6"/>
+        <location line="+7"/>
         <source>Ratio:</source>
         <translation>Arány:</translation>
     </message>
     <message>
-        <location filename="../stats-dialog.cc" line="42"/>
-        <location filename="../stats-dialog.cc" line="49"/>
+        <location line="-6"/>
+        <location line="+7"/>
         <source>Duration:</source>
         <translation>Időtartam:</translation>
     </message>
     <message>
-        <location filename="../stats-dialog.cc" line="44"/>
+        <location line="-5"/>
         <source>Total</source>
         <translation>Összesen</translation>
     </message>
     <message numerus="yes">
-        <location filename="../stats-dialog.cc" line="45"/>
-        <location filename="../stats-dialog.cc" line="98"/>
-        <source>Started %n time(s)</source>
-        <translation>
-            <numerusform>%n-szer elindítva</numerusform>
+        <location line="+1"/>
+        <location line="+53"/>
+        <source>Started %n time (s)</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
         </translation>
     </message>
 </context>
 <context>
     <name>Torrent</name>
     <message>
-        <location filename="../torrent.cc" line="706"/>
+        <location filename="../torrent.cc" line="+773"/>
         <source>Finished</source>
         <translation>Befejezve</translation>
     </message>
     <message>
-        <location filename="../torrent.cc" line="706"/>
+        <location line="+0"/>
         <source>Paused</source>
         <translation>Szünetelteve</translation>
     </message>
     <message>
-        <location filename="../torrent.cc" line="707"/>
+        <location line="+1"/>
         <source>Queued for verification</source>
         <translation>Sorbaállítva ellenőrzésre</translation>
     </message>
     <message>
-        <location filename="../torrent.cc" line="708"/>
+        <location line="+1"/>
         <source>Verifying local data</source>
         <translation>Helyi adat ellenőrzése</translation>
     </message>
     <message>
-        <location filename="../torrent.cc" line="709"/>
+        <location line="+1"/>
         <source>Queued for download</source>
         <translation>Sorbaállítva letöltésre</translation>
     </message>
     <message>
-        <location filename="../torrent.cc" line="710"/>
+        <location line="+1"/>
         <source>Downloading</source>
         <translation>Letöltés</translation>
     </message>
     <message>
-        <location filename="../torrent.cc" line="711"/>
+        <location line="+1"/>
         <source>Queued for seeding</source>
         <translation>Sorbaállítva feltöltésre</translation>
     </message>
     <message>
-        <location filename="../torrent.cc" line="712"/>
+        <location line="+1"/>
         <source>Seeding</source>
         <translation>Feltöltés</translation>
     </message>
     <message>
-        <location filename="../torrent.cc" line="725"/>
+        <location line="+13"/>
         <source>Tracker gave a warning: %1</source>
         <translation>A tracker figyelmeztetést dobott: %1</translation>
     </message>
     <message>
-        <location filename="../torrent.cc" line="726"/>
+        <location line="+1"/>
         <source>Tracker gave an error: %1</source>
         <translation>A tracker hibát dobott: %1</translation>
     </message>
     <message>
-        <location filename="../torrent.cc" line="727"/>
+        <location line="+1"/>
         <source>Error: %1</source>
         <translation>Hiba: %1</translation>
     </message>
@@ -2092,105 +2176,101 @@ Másik elsődleges URL-t új sorba írva adhatsz hozzá.</translation>
 <context>
     <name>TorrentDelegate</name>
     <message>
-        <location filename="../torrent-delegate.cc" line="86"/>
+        <location filename="../torrent-delegate.cc" line="+89"/>
         <source>Magnetized transfer - retrieving metadata (%1%)</source>
         <translation>Mágneses átvitel - metadat letöltése (%1 %)</translation>
     </message>
     <message>
-        <location filename="../torrent-delegate.cc" line="94"/>
+        <location line="+8"/>
         <source>%1 of %2 (%3%)</source>
         <translation>%1 a %2 (%3%) -ból</translation>
     </message>
     <message>
-        <location filename="../torrent-delegate.cc" line="108"/>
+        <location line="+15"/>
         <source>%1 of %2 (%3%), uploaded %4 (Ratio: %5 Goal: %6)</source>
         <translation>%1 a %2 (%3%)-ból, feltöltve: %4 (Arány: %5 Cél: %6)</translation>
     </message>
     <message>
-        <location filename="../torrent-delegate.cc" line="123"/>
+        <location line="+15"/>
         <source>%1 of %2 (%3%), uploaded %4 (Ratio: %5)</source>
         <translation>%1 a %2 (%3%)-ból, feltöltve: %4 (Arány: %5)</translation>
     </message>
     <message>
-        <location filename="../torrent-delegate.cc" line="139"/>
+        <location line="+16"/>
         <source>%1, uploaded %2 (Ratio: %3 Goal: %4)</source>
         <translation>%1, feltöltve %2 (Arány: %3 Cél: %4)</translation>
     </message>
     <message>
-        <location filename="../torrent-delegate.cc" line="150"/>
+        <location line="+11"/>
         <source>%1, uploaded %2 (Ratio: %3)</source>
         <translation>%1, feltöltve %2 (Arány: %3)</translation>
     </message>
     <message>
-        <location filename="../torrent-delegate.cc" line="160"/>
-        <location filename="../torrent-delegate.cc" line="266"/>
+        <location line="+10"/>
+        <location line="+107"/>
         <source> - </source>
         <translation> - </translation>
     </message>
     <message>
-        <location filename="../torrent-delegate.cc" line="162"/>
+        <location line="-105"/>
         <source>%1 left</source>
         <translation>%1 van hátra</translation>
     </message>
     <message>
-        <location filename="../torrent-delegate.cc" line="164"/>
+        <location line="+2"/>
         <source>Remaining time unknown</source>
         <translation>Hátralévő idő ismeretlen</translation>
     </message>
     <message>
-        <location filename="../torrent-delegate.cc" line="186"/>
-        <source>%1 %2, %3 %4</source>
-        <translation>%1 %2, %3 %4</translation>
-    </message>
-    <message>
-        <location filename="../torrent-delegate.cc" line="188"/>
-        <location filename="../torrent-delegate.cc" line="190"/>
-        <source>%1 %2</source>
-        <translation>%1 %2</translation>
-    </message>
-    <message>
-        <location filename="../torrent-delegate.cc" line="192"/>
-        <source>Stalled</source>
-        <translation>Elakadt</translation>
-    </message>
-    <message>
-        <location filename="../torrent-delegate.cc" line="194"/>
-        <source>Idle</source>
-        <translation>Inaktív</translation>
-    </message>
-    <message>
-        <location filename="../torrent-delegate.cc" line="207"/>
+        <location line="+34"/>
         <source>Verifying local data (%1% tested)</source>
         <translation>Helyi adatok ellenőrzése (%1 %1)</translation>
     </message>
-    <message>
-        <location filename="../torrent-delegate.cc" line="213"/>
-        <source>Ratio: %1, </source>
-        <translation>Arány: %1, </translation>
-    </message>
     <message numerus="yes">
-        <location filename="../torrent-delegate.cc" line="246"/>
+        <location line="+47"/>
         <source>Downloading from %1 of %n connected peer(s)</source>
         <translation>
             <numerusform>Letöltés %1 (a %2-ből) partnertől</numerusform>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../torrent-delegate.cc" line="249"/>
+        <location line="-6"/>
         <source>Downloading metadata from %n peer(s) (%1% done)</source>
         <translation>
             <numerusform>Metaadat letöltése %n partnertől (%1 % kész)</numerusform>
         </translation>
     </message>
+    <message>
+        <location line="-60"/>
+        <source>%1   %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+24"/>
+        <source>%1    %2 %3</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Ratio:</source>
+        <translation type="unfinished">Arány:</translation>
+    </message>
     <message numerus="yes">
-        <location filename="../torrent-delegate.cc" line="254"/>
+        <location line="+44"/>
+        <source> and %n web seed(s)</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <location line="+5"/>
         <source>Seeding to %1 of %n connected peer(s)</source>
         <translation>
             <numerusform>Seedelés a %1 partnernek (%n elérhető)</numerusform>
         </translation>
     </message>
     <message>
-        <location filename="../torrent-delegate.cc" line="259"/>
+        <location line="+5"/>
         <source>Error</source>
         <translation>Hiba</translation>
     </message>
@@ -2198,216 +2278,201 @@ Másik elsődleges URL-t új sorba írva adhatsz hozzá.</translation>
 <context>
     <name>TrMainWindow</name>
     <message>
-        <location filename="../mainwin.cc" line="232"/>
+        <location filename="../mainwin.cc" line="+218"/>
         <source>Speed Limits</source>
         <translation>Ideiglenes sebesség korlátok</translation>
     </message>
     <message>
-        <location filename="../mainwin.cc" line="475"/>
+        <location line="+218"/>
         <source>Limit Download Speed</source>
         <translation>Letöltési sebességkorlát</translation>
     </message>
     <message>
-        <location filename="../mainwin.cc" line="478"/>
-        <location filename="../mainwin.cc" line="498"/>
+        <location line="+4"/>
+        <location line="+22"/>
         <source>Unlimited</source>
         <translation>Korlátlan</translation>
     </message>
     <message>
-        <location filename="../mainwin.cc" line="483"/>
-        <location filename="../mainwin.cc" line="503"/>
-        <location filename="../mainwin.cc" line="1041"/>
-        <location filename="../mainwin.cc" line="1049"/>
+        <location line="-17"/>
+        <location line="+22"/>
+        <location line="+584"/>
+        <location line="+8"/>
         <source>Limited at %1</source>
         <translation>Koráltozva %1-re</translation>
     </message>
     <message>
-        <location filename="../mainwin.cc" line="495"/>
+        <location line="-601"/>
         <source>Limit Upload Speed</source>
         <translation>Feltöltési sebességkorlát</translation>
     </message>
     <message>
-        <location filename="../mainwin.cc" line="516"/>
+        <location line="+23"/>
         <source>Stop Seeding at Ratio</source>
         <translation>Seedelés befejezése ha elérte az arányt</translation>
     </message>
     <message>
-        <location filename="../mainwin.cc" line="520"/>
+        <location line="+4"/>
         <source>Seed Forever</source>
         <translation>Seedelés örökké</translation>
     </message>
     <message>
-        <location filename="../mainwin.cc" line="525"/>
-        <location filename="../mainwin.cc" line="1057"/>
+        <location line="+5"/>
+        <location line="+577"/>
         <source>Stop at Ratio (%1)</source>
         <translation>Seedelés befejezése ha elérte a %1 arányt</translation>
     </message>
     <message>
-        <location filename="../mainwin.cc" line="682"/>
+        <location line="-379"/>
         <source> - %1:%2</source>
         <translation>b</translation>
     </message>
-    <message numerus="yes">
-        <location filename="../mainwin.cc" line="693"/>
-        <source>%Ln Torrent(s)</source>
-        <translation>
-            <numerusform>%Ln Torrent</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <location filename="../mainwin.cc" line="695"/>
-        <source>%L1 of %Ln Torrent(s)</source>
-        <translation>
-            <numerusform>%L1 a %Ln Torrentből</numerusform>
-        </translation>
-    </message>
     <message>
-        <location filename="../mainwin.cc" line="713"/>
+        <location line="+28"/>
         <source>Idle</source>
         <translation>Inaktív</translation>
     </message>
     <message>
-        <location filename="../mainwin.cc" line="721"/>
-        <source>Transmission
-Up: %1
-Down: %2</source>
-        <translation>Transmission
-Fel: %1
-Le: %2</translation>
-    </message>
-    <message>
-        <location filename="../mainwin.cc" line="741"/>
-        <location filename="../mainwin.cc" line="757"/>
+        <location line="+34"/>
+        <location line="+16"/>
         <source>Ratio: %1</source>
         <translation>Arány: %1</translation>
     </message>
     <message>
-        <location filename="../mainwin.cc" line="746"/>
-        <location filename="../mainwin.cc" line="752"/>
+        <location line="-11"/>
+        <location line="+6"/>
         <source>Down: %1, Up: %2</source>
         <translation>Le: %1, Fel: %2</translation>
     </message>
     <message>
-        <location filename="../mainwin.cc" line="1115"/>
-        <source>Click to disable Temporary Speed Limits
-(%1 down, %2 up)</source>
-        <translation>Ide kattintva kikapcsolhatod az ideiglenes sebességkorlátokat
-(%1 le, %2 fel)</translation>
-    </message>
-    <message>
-        <location filename="../mainwin.cc" line="1116"/>
-        <source>Click to enable Temporary Speed Limits
-(%1 down, %2 up)</source>
-        <translation>Ide kattintva bekapcsolhatod az ideiglenes sebességkorlátokat
-(%1 le, %2 fel)</translation>
-    </message>
-    <message>
-        <location filename="../mainwin.cc" line="1145"/>
+        <location line="+398"/>
         <source>Open Torrent</source>
         <translation>Torrent megnyitása</translation>
     </message>
     <message>
-        <location filename="../mainwin.cc" line="1147"/>
+        <location line="+2"/>
         <source>Torrent Files (*.torrent);;All Files (*.*)</source>
         <translation>Torrent fájlok (*.torrent);;Minden fájl (*.*)</translation>
     </message>
     <message>
-        <location filename="../mainwin.cc" line="1150"/>
+        <location line="+4"/>
         <source>Show &amp;options dialog</source>
         <translation>&amp;Opciók ablak megjelenítése</translation>
     </message>
     <message>
-        <location filename="../mainwin.cc" line="1181"/>
-        <source>Open Link</source>
-        <translation>Link megnyitása</translation>
+        <location line="-453"/>
+        <source>Network Error</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mainwin.cc" line="1182"/>
-        <source>Open URL or Magnet Link</source>
-        <translation>URL vagy magnet link megnyitása</translation>
+        <location line="+8"/>
+        <source>%1   %2</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mainwin.cc" line="1238"/>
+        <location line="+407"/>
+        <source>Click to disable Temporary Speed Limits
+ (%1 down, %2 up)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Click to enable Temporary Speed Limits
+ (%1 down, %2 up)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+131"/>
         <source>Remove torrent?</source>
         <translation>Valóban törölni kívánod a torrentet?</translation>
     </message>
     <message>
-        <location filename="../mainwin.cc" line="1239"/>
+        <location line="+1"/>
         <source>Remove %1 torrents?</source>
         <translation>Valóban törölni kívánod mind a %1 torrentet?</translation>
     </message>
     <message>
-        <location filename="../mainwin.cc" line="1244"/>
+        <location line="+5"/>
         <source>Delete this torrent&apos;s downloaded files?</source>
         <translation>Valóban le kívánod törölni a torrent letöltött fájlait?</translation>
     </message>
     <message>
-        <location filename="../mainwin.cc" line="1245"/>
+        <location line="+1"/>
         <source>Delete these %1 torrents&apos; downloaded files?</source>
         <translation>Valóban le kívánod törölni a %1 torrent letöltött fájlait?</translation>
     </message>
     <message>
-        <location filename="../mainwin.cc" line="1251"/>
+        <location line="+6"/>
         <source>Once removed, continuing the transfer will require the torrent file or magnet link.</source>
         <translation>Ha egyzser eltávolítod a folytatáshoz szükséged lesz a torrent fájlra, vagy egy magnet linkre.</translation>
     </message>
     <message>
-        <location filename="../mainwin.cc" line="1252"/>
+        <location line="+1"/>
         <source>Once removed, continuing the transfers will require the torrent files or magnet links.</source>
         <translation>Ha egyzser eltávolítod a folytatáshoz szükséged lesz a torrent fájlokra, vagy egy magnet linkekre.</translation>
     </message>
     <message>
-        <location filename="../mainwin.cc" line="1257"/>
+        <location line="+5"/>
         <source>This torrent has not finished downloading.</source>
         <translation>Ez a torrent még nincsenek letöltve.</translation>
     </message>
     <message>
-        <location filename="../mainwin.cc" line="1258"/>
+        <location line="+1"/>
         <source>These torrents have not finished downloading.</source>
         <translation>Ezek a torrentek még nincsenek letöltve.</translation>
     </message>
     <message>
-        <location filename="../mainwin.cc" line="1263"/>
+        <location line="+5"/>
         <source>This torrent is connected to peers.</source>
         <translation>Ennél a torrentnél még vannak partnerek csatlakoztatva.</translation>
     </message>
     <message>
-        <location filename="../mainwin.cc" line="1264"/>
+        <location line="+1"/>
         <source>These torrents are connected to peers.</source>
         <translation>E torrenteknél még vannak partnerek csatlakoztatva.</translation>
     </message>
     <message>
-        <location filename="../mainwin.cc" line="1271"/>
+        <location line="+7"/>
         <source>One of these torrents is connected to peers.</source>
         <translation>A torrentek közül valamelyikhez még vannak partnerek csatlakoztatva.</translation>
     </message>
     <message>
-        <location filename="../mainwin.cc" line="1272"/>
+        <location line="+1"/>
         <source>Some of these torrents are connected to peers.</source>
         <translation>A torrentek közül valamelyikhez még vannak partnerek csatlakoztatva.</translation>
     </message>
     <message>
-        <location filename="../mainwin.cc" line="1283"/>
+        <location line="+11"/>
         <source>One of these torrents has not finished downloading.</source>
         <translation>A torrentek egyike még nincs letöltve.</translation>
     </message>
     <message>
-        <location filename="../mainwin.cc" line="1284"/>
+        <location line="+1"/>
         <source>Some of these torrents have not finished downloading.</source>
         <translation>E torrentek egyike még nincs letöltve.</translation>
     </message>
     <message>
-        <location filename="../mainwin.cc" line="1332"/>
-        <source>Transmission server is responding</source>
-        <translation>A Transmission szerver nem reagál</translation>
+        <location line="+58"/>
+        <source>%1 has not responded yet</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mainwin.cc" line="1333"/>
-        <source>Last response from server was %1 ago</source>
-        <translation>A szerver utoljára %1-kor válaszolt</translation>
+        <location line="+4"/>
+        <source>%1 is responding</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mainwin.cc" line="1408"/>
+        <location line="+2"/>
+        <source>%1 last responded %2 ago</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>%1 is not responding</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+120"/>
         <source>Queue</source>
         <translation>Sor</translation>
     </message>
@@ -2415,62 +2480,62 @@ Le: %2</translation>
 <context>
     <name>TrackerDelegate</name>
     <message>
-        <location filename="../tracker-delegate.cc" line="161"/>
+        <location filename="../tracker-delegate.cc" line="+161"/>
         <source>Got a list of %1%2 peers%3 %4 ago</source>
         <translation>%1 %2 partner listája lekérve %3 %4 ezelőtt </translation>
     </message>
     <message>
-        <location filename="../tracker-delegate.cc" line="169"/>
+        <location line="+8"/>
         <source>Peer list request %1timed out%2 %3 ago; will retry</source>
         <translation>A %1 partnerlista lekérés időtúllépés re futott %2 %3 ezelőtt; újrapróbálom </translation>
     </message>
     <message>
-        <location filename="../tracker-delegate.cc" line="176"/>
+        <location line="+7"/>
         <source>Got an error %1&quot;%2&quot;%3 %4 ago</source>
         <translation>Hiba történt %1&quot;%2&quot;%3 %4 ezelőtt</translation>
     </message>
     <message>
-        <location filename="../tracker-delegate.cc" line="188"/>
+        <location line="+12"/>
         <source>No updates scheduled</source>
         <translation>Nincs frissítés beütemezve</translation>
     </message>
     <message>
-        <location filename="../tracker-delegate.cc" line="194"/>
+        <location line="+7"/>
         <source>Asking for more peers in %1</source>
         <translation>Több partner kérése %1 múlva</translation>
     </message>
     <message>
-        <location filename="../tracker-delegate.cc" line="200"/>
+        <location line="+6"/>
         <source>Queued to ask for more peers</source>
         <translation>Partnerek kérése beütemezve</translation>
     </message>
     <message>
-        <location filename="../tracker-delegate.cc" line="206"/>
+        <location line="+6"/>
         <source>Asking for more peers now... &lt;small&gt;%1&lt;/small&gt;</source>
         <translation>Új partnerek kérése... &lt;small&gt;%1&lt;/small&gt;</translation>
     </message>
     <message>
-        <location filename="../tracker-delegate.cc" line="219"/>
+        <location line="+13"/>
         <source>Tracker had %1%2 seeders%3 and %4%5 leechers%6 %7 ago</source>
         <translation>%6 %7 -el ezelőtt a trackeren %1%2 feltöltő %3 és %4%5 letöltő volt</translation>
     </message>
     <message>
-        <location filename="../tracker-delegate.cc" line="230"/>
+        <location line="+11"/>
         <source>Got a scrape error %1&quot;%2&quot;%3 %4 ago</source>
         <translation>Kínos hiba történt %1&quot;%2&quot;%3 %4 ezelőtt</translation>
     </message>
     <message>
-        <location filename="../tracker-delegate.cc" line="246"/>
+        <location line="+17"/>
         <source>Asking for peer counts in %1</source>
         <translation>Partnerszám lekérése %1 múlva</translation>
     </message>
     <message>
-        <location filename="../tracker-delegate.cc" line="252"/>
+        <location line="+7"/>
         <source>Queued to ask for peer counts</source>
         <translation>Partnerszám lekérése beütemezve</translation>
     </message>
     <message>
-        <location filename="../tracker-delegate.cc" line="259"/>
+        <location line="+8"/>
         <source>Asking for peer counts now... &lt;small&gt;%1&lt;/small&gt;</source>
         <translation>Partnerszám lekérése most... &lt;small&gt;%1&lt;/small&gt;</translation>
     </message>
@@ -2478,7 +2543,7 @@ Le: %2</translation>
 <context>
     <name>Utils</name>
     <message>
-        <location filename="../utils.cc" line="47"/>
+        <location filename="../utils.cc" line="+56"/>
         <source>Enter a location:</source>
         <translation>Add meg az elérési utat:</translation>
     </message>
