@@ -1,0 +1,34 @@
+if(UTP_PREFER_STATIC_LIB)
+    set(UTP_ORIG_CMAKE_FIND_LIBRARY_SUFFIXES ${CMAKE_FIND_LIBRARY_SUFFIXES})
+    if(WIN32)
+        set(CMAKE_FIND_LIBRARY_SUFFIXES .a .lib ${CMAKE_FIND_LIBRARY_SUFFIXES})
+    else()
+        set(CMAKE_FIND_LIBRARY_SUFFIXES .a ${CMAKE_FIND_LIBRARY_SUFFIXES})
+    endif()
+endif()
+
+if(UNIX)
+  find_package(PkgConfig QUIET)
+  pkg_check_modules(_UTP QUIET libutp)
+endif()
+
+find_path(UTP_INCLUDE_DIR NAMES libutp/utp.h HINTS ${_UTP_INCLUDEDIR})
+find_library(UTP_LIBRARY NAMES utp HINTS ${_UTP_LIBDIR})
+
+set(UTP_INCLUDE_DIRS ${UTP_INCLUDE_DIR})
+set(UTP_LIBRARIES ${UTP_LIBRARY})
+
+include(FindPackageHandleStandardArgs)
+
+find_package_handle_standard_args(UTP
+    REQUIRED_VARS
+        UTP_LIBRARY
+        UTP_INCLUDE_DIR
+)
+
+mark_as_advanced(UTP_INCLUDE_DIR UTP_LIBRARY)
+
+if(UTP_PREFER_STATIC_LIB)
+    set(CMAKE_FIND_LIBRARY_SUFFIXES ${UTP_ORIG_CMAKE_FIND_LIBRARY_SUFFIXES})
+    unset(UTP_ORIG_CMAKE_FIND_LIBRARY_SUFFIXES)
+endif()
