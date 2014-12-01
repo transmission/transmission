@@ -84,7 +84,12 @@ namespace
 
 MyApp :: MyApp (int& argc, char ** argv):
   QApplication (argc, argv),
-  myLastFullUpdateTime (0)
+  myLastFullUpdateTime (0),
+  myPrefs(nullptr),
+  mySession(nullptr),
+  myModel(nullptr),
+  myWindow(nullptr),
+  myWatchDir(nullptr)
 {
   const QString MY_CONFIG_NAME = QString::fromUtf8 ("transmission");
 
@@ -133,6 +138,44 @@ MyApp :: MyApp (int& argc, char ** argv):
           default:         filenames.append (optarg); break;
         }
     }
+
+  // try to delegate the work to an existing copy of Transmission
+  // before starting ourselves...
+  QDBusConnection bus = QDBusConnection::sessionBus ();
+  if (bus.isConnected ())
+  {
+    bool delegated = false;
+    for (int i=0, n=filenames.size (); i<n; ++i)
+      {
+        QDBusMessage request = QDBusMessage::createMethodCall (DBUS_SERVICE,
+                                                               DBUS_OBJECT_PATH,
+                                                               DBUS_INTERFACE,
+                                                               QString::fromUtf8 ("AddMetainfo"));
+        QList<QVariant> arguments;
+        AddData a (filenames[i]);
+        switch (a.type)
+          {
+            case AddData::URL:      arguments.push_back (a.url.toString ()); break;
+            case AddData::MAGNET:   arguments.push_back (a.magnet); break;
+            case AddData::FILENAME: arguments.push_back (a.toBase64 ().constData ()); break;
+            case AddData::METAINFO: arguments.push_back (a.toBase64 ().constData ()); break;
+            default:                break;
+          }
+        request.setArguments (arguments);
+
+        QDBusMessage response = bus.call (request);
+        //std::cerr << qPrintable (response.errorName ()) << std::endl;
+        //std::cerr << qPrintable (response.errorMessage ()) << std::endl;
+        arguments = response.arguments ();
+        delegated |= (arguments.size ()==1) && arguments[0].toBool ();
+      }
+
+    if (delegated)
+      {
+        QTimer::singleShot (0, this, SLOT (quit ()));
+        return;
+      }
+  }
 
   // set the fallback config dir
   if (configDir == 0)
@@ -249,12 +292,14 @@ MyApp :: MyApp (int& argc, char ** argv):
     addTorrent (*it);
 
   // register as the dbus handler for Transmission
-  new TrDBusAdaptor (this);
-  QDBusConnection bus = QDBusConnection::sessionBus ();
-  if (!bus.registerService (DBUS_SERVICE))
-    std::cerr << "couldn't register " << qPrintable (DBUS_SERVICE) << std::endl;
-  if (!bus.registerObject (DBUS_OBJECT_PATH, this))
-    std::cerr << "couldn't register " << qPrintable (DBUS_OBJECT_PATH) << std::endl;
+  if (bus.isConnected ())
+    {
+      new TrDBusAdaptor (this);
+      if (!bus.registerService (DBUS_SERVICE))
+        std::cerr << "couldn't register " << qPrintable (DBUS_SERVICE) << std::endl;
+      if (!bus.registerObject (DBUS_OBJECT_PATH, this))
+        std::cerr << "couldn't register " << qPrintable (DBUS_OBJECT_PATH) << std::endl;
+    }
 }
 
 /* these functions are for popping up desktop notifications */
@@ -336,16 +381,19 @@ MyApp :: consentGiven ()
 
 MyApp :: ~MyApp ()
 {
-  const QRect mainwinRect (myWindow->geometry ());
+  if (myPrefs != nullptr && myWindow != nullptr)
+    {
+      const QRect mainwinRect (myWindow->geometry ());
+      myPrefs->set (Prefs :: MAIN_WINDOW_HEIGHT, std::max (100, mainwinRect.height ()));
+      myPrefs->set (Prefs :: MAIN_WINDOW_WIDTH, std::max (100, mainwinRect.width ()));
+      myPrefs->set (Prefs :: MAIN_WINDOW_X, mainwinRect.x ());
+      myPrefs->set (Prefs :: MAIN_WINDOW_Y, mainwinRect.y ());
+    }
+
   delete myWatchDir;
   delete myWindow;
   delete myModel;
   delete mySession;
-
-  myPrefs->set (Prefs :: MAIN_WINDOW_HEIGHT, std::max (100, mainwinRect.height ()));
-  myPrefs->set (Prefs :: MAIN_WINDOW_WIDTH, std::max (100, mainwinRect.width ()));
-  myPrefs->set (Prefs :: MAIN_WINDOW_X, mainwinRect.x ());
-  myPrefs->set (Prefs :: MAIN_WINDOW_Y, mainwinRect.y ());
   delete myPrefs;
 }
 
@@ -489,54 +537,10 @@ MyApp :: notifyApp (const QString& title, const QString& body) const
 int
 main (int argc, char * argv[])
 {
-  // find .torrents, URLs, magnet links, etc in the command-line args
-  int c;
-  QStringList addme;
-  const char * optarg;
-  char ** argvv;
-
 #ifdef _WIN32
   tr_win32_make_args_utf8 (&argc, &argv);
 #endif
 
-  argvv = argv;
-  while ( (c = tr_getopt (getUsage (), argc, (const char **)argvv, opts, &optarg)))
-    if (c == TR_OPT_UNK)
-      addme.append (optarg);
-
-  // try to delegate the work to an existing copy of Transmission
-  // before starting ourselves...
-  bool delegated = false;
-  QDBusConnection bus = QDBusConnection::sessionBus ();
-  for (int i=0, n=addme.size (); i<n; ++i)
-    {
-      QDBusMessage request = QDBusMessage::createMethodCall (DBUS_SERVICE,
-                                                             DBUS_OBJECT_PATH,
-                                                             DBUS_INTERFACE,
-                                                             QString::fromUtf8 ("AddMetainfo"));
-      QList<QVariant> arguments;
-      AddData a (addme[i]);
-      switch (a.type)
-        {
-          case AddData::URL:      arguments.push_back (a.url.toString ()); break;
-          case AddData::MAGNET:   arguments.push_back (a.magnet); break;
-          case AddData::FILENAME: arguments.push_back (a.toBase64 ().constData ()); break;
-          case AddData::METAINFO: arguments.push_back (a.toBase64 ().constData ()); break;
-          default:                break;
-        }
-      request.setArguments (arguments);
-
-      QDBusMessage response = bus.call (request);
-      //std::cerr << qPrintable (response.errorName ()) << std::endl;
-      //std::cerr << qPrintable (response.errorMessage ()) << std::endl;
-      arguments = response.arguments ();
-      delegated |= (arguments.size ()==1) && arguments[0].toBool ();
-    }
-
-  if (delegated)
-    return 0;
-
-  tr_optind = 1;
   MyApp app (argc, argv);
   return app.exec ();
 }
