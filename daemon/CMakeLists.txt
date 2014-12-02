@@ -14,6 +14,7 @@ endif()
 
 include_directories(
     ${CMAKE_SOURCE_DIR}
+    ${CURL_INCLUDE_DIRS}
     ${EVENT2_INCLUDE_DIRS}
 )
 
@@ -34,10 +35,6 @@ target_link_libraries(${TR_NAME}-daemon
 )
 
 add_executable(${TR_NAME}-remote remote.c)
-
-target_include_directories(${TR_NAME}-remote PRIVATE
-    ${CURL_INCLUDE_DIRS}
-)
 
 target_link_libraries(${TR_NAME}-remote
     ${TR_NAME}
