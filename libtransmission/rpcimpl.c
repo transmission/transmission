@@ -19,6 +19,7 @@
 
 #include "transmission.h"
 #include "completion.h"
+#include "crypto-utils.h"
 #include "error.h"
 #include "fdlimit.h"
 #include "file.h"
@@ -1796,8 +1797,8 @@ torrentAdd (tr_session               * session,
 
           if (fname == NULL)
             {
-              int len;
-              char * metainfo = tr_base64_decode (metainfo_base64, -1, &len);
+              size_t len;
+              char * metainfo = tr_base64_decode_str (metainfo_base64, &len);
               tr_ctorSetMetainfo (ctor, (uint8_t*)metainfo, len);
               tr_free (metainfo);
             }

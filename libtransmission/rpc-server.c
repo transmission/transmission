@@ -611,8 +611,8 @@ handle_request (struct evhttp_request * req, void * arg)
       auth = evhttp_find_header (req->input_headers, "Authorization");
       if (auth && !evutil_ascii_strncasecmp (auth, "basic ", 6))
         {
-          int plen;
-          char * p = tr_base64_decode (auth + 6, 0, &plen);
+          size_t plen;
+          char * p = tr_base64_decode_str (auth + 6, &plen);
           if (p && plen && ((pass = strchr (p, ':'))))
             {
               user = p;

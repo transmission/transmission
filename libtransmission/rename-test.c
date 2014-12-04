@@ -15,6 +15,7 @@
 #include <unistd.h> /* sync() */
 
 #include "transmission.h"
+#include "crypto-utils.h"
 #include "file.h"
 #include "resume.h"
 #include "torrent.h" /* tr_isTorrent() */
@@ -101,12 +102,12 @@ static tr_torrent *
 create_torrent_from_base64_metainfo (tr_ctor * ctor, const char * metainfo_base64)
 {
   int err;
-  int metainfo_len;
+  size_t metainfo_len;
   char * metainfo;
   tr_torrent * tor;
 
   /* create the torrent ctor */
-  metainfo = tr_base64_decode (metainfo_base64, -1, &metainfo_len);
+  metainfo = tr_base64_decode_str (metainfo_base64, &metainfo_len);
   assert (metainfo != NULL);
   assert (metainfo_len > 0);
   tr_ctorSetMetainfo (ctor, (uint8_t*)metainfo, metainfo_len);

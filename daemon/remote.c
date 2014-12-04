@@ -20,6 +20,7 @@
 #include <curl/curl.h>
 
 #include <libtransmission/transmission.h>
+#include <libtransmission/crypto-utils.h>
 #include <libtransmission/error.h>
 #include <libtransmission/file.h>
 #include <libtransmission/log.h>
@@ -1191,9 +1192,9 @@ printPeers (tr_variant * top)
 }
 
 static void
-printPiecesImpl (const uint8_t * raw, size_t rawlen, int64_t j)
+printPiecesImpl (const uint8_t * raw, size_t rawlen, size_t j)
 {
-    int i, k, len;
+    size_t i, k, len;
     char * str = tr_base64_decode (raw, rawlen, &len);
     printf ("  ");
     for (i=k=0; k<len; ++k) {
@@ -1225,7 +1226,8 @@ printPieces (tr_variant * top)
             tr_variant * torrent = tr_variantListChild (torrents, i);
             if (tr_variantDictFindRaw (torrent, TR_KEY_pieces, &raw, &rawlen) &&
                 tr_variantDictFindInt (torrent, TR_KEY_pieceCount, &j)) {
-                printPiecesImpl (raw, rawlen, j);
+                assert (j >= 0);
+                printPiecesImpl (raw, rawlen, (size_t) j);
                 if (i+1<n)
                     printf ("\n");
             }

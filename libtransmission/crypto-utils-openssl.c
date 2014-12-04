@@ -9,7 +9,9 @@
 
 #include <assert.h>
 
+#include <openssl/bio.h>
 #include <openssl/bn.h>
+#include <openssl/buffer.h>
 #include <openssl/dh.h>
 #include <openssl/err.h>
 #include <openssl/evp.h>
@@ -300,4 +302,93 @@ tr_rand_buffer (void   * buffer,
   assert (buffer != NULL);
 
   return check_result (RAND_bytes (buffer, (int) length));
+}
+
+/***
+****
+***/
+
+void *
+tr_base64_encode_impl (const void * input,
+                       size_t       input_length,
+                       size_t     * output_length)
+{
+  char * ret = NULL;
+  int ret_length = 0;
+  BIO * bmem;
+  BIO * b64;
+
+  assert (input != NULL);
+  assert (input_length > 0);
+
+  bmem = BIO_new (BIO_s_mem ());
+  b64 = BIO_new (BIO_f_base64 ());
+
+  BIO_set_flags (b64, BIO_FLAGS_BASE64_NO_NL);
+  b64 = BIO_push (b64, bmem);
+
+  if (check_result_eq (BIO_write (b64, input, input_length), (int) input_length) &&
+      check_result (BIO_flush (b64)))
+    {
+      BUF_MEM * bptr;
+
+      BIO_get_mem_ptr (b64, &bptr);
+      ret = tr_strndup (bptr->data, bptr->length);
+      ret_length = bptr->length;
+    }
+
+  BIO_free_all (b64);
+
+  if (output_length != NULL)
+    *output_length = (size_t) ret_length;
+
+  return ret;
+}
+
+void *
+tr_base64_decode_impl (const void * input,
+                       size_t       input_length,
+                       size_t     * output_length)
+{
+  char * ret;
+  int ret_length;
+  int i;
+
+  assert (input != NULL);
+  assert (input_length > 0);
+
+  ret = tr_new (char, input_length + 1);
+
+  /* try two times, without and with BIO_FLAGS_BASE64_NO_NL flag */
+  for (i = 0; i < 2; ++i)
+    {
+      BIO * bmem = BIO_new_mem_buf ((void *) input, (int) input_length);
+      BIO * b64 = BIO_new (BIO_f_base64 ());
+
+      BIO_set_flags (b64, i == 1 ? BIO_FLAGS_BASE64_NO_NL : 0);
+      bmem = BIO_push (b64, bmem);
+
+      ret_length = BIO_read (bmem, ret, (int) input_length);
+      if (ret_length < 0 && i == 1)
+        log_error ();
+
+      BIO_free_all (bmem);
+
+      /* < 0 - fatal error, > 0 - success*/
+      if (ret_length != 0)
+        break;
+    }
+
+  if (ret_length < 0)
+    {
+      tr_free (ret);
+      return NULL;
+    }
+
+  ret[ret_length] = '\0';
+
+  if (output_length != NULL)
+    *output_length = (size_t) ret_length;
+
+  return ret;
 }

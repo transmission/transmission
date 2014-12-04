@@ -11,7 +11,7 @@
 #include <QDir>
 
 #include <libtransmission/transmission.h>
-#include <libtransmission/utils.h> // tr_base64_encode()
+#include <libtransmission/crypto-utils.h> // tr_base64_encode()
 
 #include "add-data.h"
 #include "utils.h"
@@ -46,11 +46,11 @@ AddData :: set (const QString& key)
     }
   else
     {
-      int len;
-      char * raw = tr_base64_decode (key.toUtf8().constData(), key.toUtf8().size(), &len);
+      size_t len;
+      void * raw = tr_base64_decode (key.toUtf8().constData(), key.toUtf8().size(), &len);
       if (raw)
         {
-          metainfo.append (raw, len);
+          metainfo.append (static_cast<const char*> (raw), (int) len);
           tr_free (raw);
           type = METAINFO;
         }
@@ -70,9 +70,9 @@ AddData :: toBase64 () const
 
   if (!metainfo.isEmpty ())
     {
-      int len = 0;
-      char * b64 = tr_base64_encode (metainfo.constData(), metainfo.size(), &len);
-      ret = QByteArray (b64, len);
+      size_t len;
+      void * b64 = tr_base64_encode (metainfo.constData(), metainfo.size(), &len);
+      ret = QByteArray (static_cast<const char*> (b64), (int) len);
       tr_free (b64);
     }
 

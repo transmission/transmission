@@ -14,6 +14,7 @@
 #include <unistd.h>
 
 #include "transmission.h"
+#include "crypto-utils.h"
 #include "error.h"
 #include "file.h"
 #include "platform.h" /* TR_PATH_DELIMETER */
@@ -310,7 +311,7 @@ tr_torrent *
 libttest_zero_torrent_init (tr_session * session)
 {
   int err;
-  int metainfo_len;
+  size_t metainfo_len;
   char * metainfo;
   const char * metainfo_base64;
   tr_torrent * tor;
@@ -342,7 +343,7 @@ libttest_zero_torrent_init (tr_session * session)
     "OnByaXZhdGVpMGVlZQ==";
 
   /* create the torrent ctor */
-  metainfo = tr_base64_decode (metainfo_base64, -1, &metainfo_len);
+  metainfo = tr_base64_decode_str (metainfo_base64, &metainfo_len);
   assert (metainfo != NULL);
   assert (metainfo_len > 0);
   assert (session != NULL);

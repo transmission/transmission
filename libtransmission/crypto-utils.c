@@ -10,7 +10,7 @@
 #include <assert.h>
 #include <stdarg.h>
 #include <stdlib.h> /* abs (), srand (), rand () */
-#include <string.h> /* memmove (), memset () */
+#include <string.h> /* memmove (), memset (), strlen () */
 
 #include "transmission.h"
 #include "crypto-utils.h"
@@ -114,4 +114,78 @@ tr_rand_int_weak (int upper_bound)
     }
 
   return rand () % upper_bound;
+}
+
+/***
+****
+***/
+
+void *
+tr_base64_encode (const void * input,
+                  size_t       input_length,
+                  size_t     * output_length)
+{
+  char * ret;
+
+  if (input != NULL)
+    {
+      if (input_length != 0)
+        {
+          if ((ret = tr_base64_encode_impl (input, input_length, output_length)) != NULL)
+            return ret;
+        }
+      else
+        ret = tr_strdup ("");
+    }
+  else
+    {
+      ret = NULL;
+    }
+
+  if (output_length != NULL)
+    *output_length = 0;
+
+  return ret;
+}
+
+void *
+tr_base64_encode_str (const char * input,
+                      size_t     * output_length)
+{
+  return tr_base64_encode (input, input == NULL ? 0 : strlen (input), output_length);
+}
+
+void *
+tr_base64_decode (const void * input,
+                  size_t       input_length,
+                  size_t     * output_length)
+{
+  char * ret;
+
+  if (input != NULL)
+    {
+      if (input_length != 0)
+        {
+          if ((ret = tr_base64_decode_impl (input, input_length, output_length)) != NULL)
+            return ret;
+        }
+      else
+        ret = tr_strdup ("");
+    }
+  else
+    {
+      ret = NULL;
+    }
+
+  if (output_length != NULL)
+    *output_length = 0;
+
+  return ret;
+}
+
+void *
+tr_base64_decode_str (const char * input,
+                      size_t     * output_length)
+{
+  return tr_base64_decode (input, input == NULL ? 0 : strlen (input), output_length);
 }

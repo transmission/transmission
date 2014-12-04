@@ -183,6 +183,72 @@ test_random (void)
   return 0;
 }
 
+static int
+test_base64 (void)
+{
+  size_t len;
+  char * in, * out;
+  int i;
+
+  out = tr_base64_encode_str ("YOYO!", &len);
+  check_int_eq (8, len);
+  check_streq ("WU9ZTyE=", out);
+  in = tr_base64_decode_str (out, &len);
+  check_int_eq (5, len);
+  check_streq ("YOYO!", in);
+  tr_free (in);
+  tr_free (out);
+
+  out = tr_base64_encode ("", 0, &len);
+  check_int_eq (0, len);
+  check_streq ("", out);
+  out = tr_base64_decode ("", 0, &len);
+  check_int_eq (0, len);
+  check_streq ("", out);
+
+  out = tr_base64_encode (NULL, 0, &len);
+  check_int_eq (0, len);
+  check (out == NULL);
+  out = tr_base64_decode (NULL, 0, &len);
+  check_int_eq (0, len);
+  check (out == NULL);
+
+#define MAX_BUF_SIZE 1024
+
+  for (i = 1; i <= MAX_BUF_SIZE; ++i)
+    {
+      int j;
+      char buf[MAX_BUF_SIZE + 1];
+
+      for (j = 0; j < i; ++j)
+        buf[j] = tr_rand_int_weak (256);
+
+      out = tr_base64_encode (buf, j, &len);
+      check_int_eq ((j + 2) / 3 * 4, len);
+      in = tr_base64_decode (out, len, &len);
+      check_int_eq (j, len);
+      check (memcmp (in, buf, len) == 0);
+      tr_free (in);
+      tr_free (out);
+
+      for (j = 0; j < i; ++j)
+        buf[j] = 1 + tr_rand_int_weak (255);
+      buf[j] = '\0';
+
+      out = tr_base64_encode_str (buf, &len);
+      check_int_eq ((j + 2) / 3 * 4, len);
+      in = tr_base64_decode_str (out, &len);
+      check_int_eq (j, len);
+      check_streq (in, buf);
+      tr_free (in);
+      tr_free (out);
+    }
+
+#undef MAX_BUF_SIZE
+
+  return 0;
+}
+
 int
 main (void)
 {
@@ -190,7 +256,8 @@ main (void)
                              test_encrypt_decrypt,
                              test_sha1,
                              test_ssha1,
-                             test_random };
+                             test_random,
+                             test_base64 };
 
   return runTests (tests, NUM_TESTS (tests));
 }

@@ -287,22 +287,6 @@ char* tr_strdup_printf (const char * fmt, ...) TR_GNUC_PRINTF (1, 2)
 char * tr_strdup_vprintf (const char * fmt,
                           va_list      args) TR_GNUC_MALLOC;
 
-/**
- * @brief Translate a block of bytes into base64
- * @return a newly-allocated string that can be freed with tr_free ()
- */
-char* tr_base64_encode (const void * input,
-                        int          inlen,
-                        int        * outlen) TR_GNUC_MALLOC;
-
-/**
- * @brief Translate a block of bytes from base64 into raw form
- * @return a newly-allocated string that can be freed with tr_free ()
- */
-char* tr_base64_decode (const void * input,
-                        int          inlen,
-                        int        * outlen) TR_GNUC_MALLOC;
-
 /** @brief Portability wrapper for strlcpy () that uses the system implementation if available */
 size_t tr_strlcpy (char * dst, const void * src, size_t siz);
 

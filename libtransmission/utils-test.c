@@ -37,28 +37,6 @@
 #include "libtransmission-test.h"
 
 static int
-test_base64 (void)
-{
-  int len;
-  char *in, *out;
-
-  /* base64 */
-  out = tr_base64_encode ("YOYO!", -1, &len);
-  check_streq ("WU9ZTyE=", out);
-  check_int_eq (8, len);
-  in = tr_base64_decode (out, -1, &len);
-  check_streq ("YOYO!", in);
-  check_int_eq (5, len);
-  tr_free (in);
-  tr_free (out);
-  out = tr_base64_encode (NULL, 0, &len);
-  check (out == NULL);
-  check_int_eq (0, len);
-
-  return 0;
-}
-
-static int
 test_strip_positional_args (void)
 {
   const char * in;
@@ -518,7 +496,6 @@ int
 main (void)
 {
   const testFunc tests[] = { test_array,
-                             test_base64,
                              test_buildpath,
                              test_hex,
                              test_lowerbound,
