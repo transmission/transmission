@@ -8,7 +8,7 @@
  */
 
 #include <assert.h>
-#include <string.h> /* memcpy (), memmove (), memset (), strcmp () */
+#include <string.h> /* memcpy (), memmove (), memset () */
 
 #include "transmission.h"
 #include "crypto.h"
@@ -218,69 +218,4 @@ tr_cryptoHasTorrentHash (const tr_crypto * crypto)
   assert (crypto);
 
   return crypto->torrentHashIsSet;
-}
-
-/***
-****
-***/
-
-char*
-tr_ssha1 (const void * plaintext)
-{
-  enum { saltval_len = 8,
-         salter_len  = 64 };
-  static const char * salter = "0123456789"
-                               "abcdefghijklmnopqrstuvwxyz"
-                               "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-                               "./";
-
-  size_t i;
-  unsigned char salt[saltval_len];
-  uint8_t sha[SHA_DIGEST_LENGTH];
-  char buf[2*SHA_DIGEST_LENGTH + saltval_len + 2];
-
-  tr_rand_buffer (salt, saltval_len);
-  for (i=0; i<saltval_len; ++i)
-    salt[i] = salter[ salt[i] % salter_len ];
-
-  tr_sha1 (sha, plaintext, strlen (plaintext), salt, saltval_len, NULL);
-  tr_sha1_to_hex (&buf[1], sha);
-  memcpy (&buf[1+2*SHA_DIGEST_LENGTH], &salt, saltval_len);
-  buf[1+2*SHA_DIGEST_LENGTH + saltval_len] = '\0';
-  buf[0] = '{'; /* signal that this is a hash. this makes saving/restoring easier */
-
-  return tr_strdup (&buf);
-}
-
-bool
-tr_ssha1_matches (const char * source, const char * pass)
-{
-  char * salt;
-  size_t saltlen;
-  char * hashed;
-  uint8_t buf[SHA_DIGEST_LENGTH];
-  bool result;
-  const size_t sourcelen = strlen (source);
-
-  /* extract the salt */
-  if (sourcelen < 2*SHA_DIGEST_LENGTH-1)
-    return false;
-  saltlen = sourcelen - 2*SHA_DIGEST_LENGTH-1;
-  salt = tr_malloc (saltlen);
-  memcpy (salt, source + 2*SHA_DIGEST_LENGTH+1, saltlen);
-
-  /* hash pass + salt */
-  hashed = tr_malloc (2*SHA_DIGEST_LENGTH + saltlen + 2);
-  tr_sha1 (buf, pass, strlen (pass), salt, saltlen, NULL);
-  tr_sha1_to_hex (&hashed[1], buf);
-  memcpy (hashed + 1+2*SHA_DIGEST_LENGTH, salt, saltlen);
-  hashed[1+2*SHA_DIGEST_LENGTH + saltlen] = '\0';
-  hashed[0] = '{';
-
-  result = strcmp (source, hashed) == 0 ? true : false;
-
-  tr_free (hashed);
-  tr_free (salt);
-
-  return result;
 }

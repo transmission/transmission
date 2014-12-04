@@ -85,17 +85,4 @@ bool           tr_cryptoSecretKeySha1 (const tr_crypto * crypto,
 
 /* @} */
 
-/**
-*** @addtogroup utils Utilities
-*** @{
-**/
-
-/** @brief generate a SSHA password from its plaintext source */
-char*  tr_ssha1 (const void * plaintext);
-
-/** @brief Validate a test password against the a ssha1 password */
-bool tr_ssha1_matches (const char * ssha1, const char * pass);
-
-/* @} */
-
 #endif

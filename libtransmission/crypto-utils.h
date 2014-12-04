@@ -155,6 +155,17 @@ bool             tr_rand_buffer        (void           * buffer,
                                         size_t           length);
 
 /**
+ * @brief Generate a SSHA password from its plaintext source.
+ */
+char           * tr_ssha1              (const char     * plain_text) TR_GNUC_MALLOC;
+
+/**
+ * @brief Validate a test password against the a ssha1 password.
+ */
+bool             tr_ssha1_matches      (const char     * ssha1,
+                                        const char     * plain_text);
+
+/**
  * @brief Translate a block of bytes into base64.
  * @return a newly-allocated null-terminated string that can be freed with tr_free ()
  */

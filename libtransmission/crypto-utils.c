@@ -10,7 +10,7 @@
 #include <assert.h>
 #include <stdarg.h>
 #include <stdlib.h> /* abs (), srand (), rand () */
-#include <string.h> /* memmove (), memset (), strlen () */
+#include <string.h> /* memcpy (), memmove (), memset (), strcmp (), strlen () */
 
 #include "transmission.h"
 #include "crypto-utils.h"
@@ -114,6 +114,72 @@ tr_rand_int_weak (int upper_bound)
     }
 
   return rand () % upper_bound;
+}
+
+/***
+****
+***/
+
+char *
+tr_ssha1 (const char * plain_text)
+{
+  enum { saltval_len = 8,
+         salter_len  = 64 };
+  static const char * salter = "0123456789"
+                               "abcdefghijklmnopqrstuvwxyz"
+                               "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+                               "./";
+
+  size_t i;
+  unsigned char salt[saltval_len];
+  uint8_t sha[SHA_DIGEST_LENGTH];
+  char buf[2 * SHA_DIGEST_LENGTH + saltval_len + 2];
+
+  tr_rand_buffer (salt, saltval_len);
+  for (i = 0; i < saltval_len; ++i)
+    salt[i] = salter[salt[i] % salter_len];
+
+  tr_sha1 (sha, plain_text, strlen (plain_text), salt, (size_t) saltval_len, NULL);
+  tr_sha1_to_hex (&buf[1], sha);
+  memcpy (&buf[1 + 2 * SHA_DIGEST_LENGTH], &salt, saltval_len);
+  buf[1 + 2 * SHA_DIGEST_LENGTH + saltval_len] = '\0';
+  buf[0] = '{'; /* signal that this is a hash. this makes saving/restoring easier */
+
+  return tr_strdup (buf);
+}
+
+bool
+tr_ssha1_matches (const char * ssha1,
+                  const char * plain_text)
+{
+  char * salt;
+  size_t saltlen;
+  char * my_ssha1;
+  uint8_t buf[SHA_DIGEST_LENGTH];
+  bool result;
+  const size_t sourcelen = strlen (ssha1);
+
+  /* extract the salt */
+  if (sourcelen < 2 * SHA_DIGEST_LENGTH - 1)
+    return false;
+  saltlen = sourcelen - 2 * SHA_DIGEST_LENGTH - 1;
+  salt = tr_malloc (saltlen);
+  memcpy (salt, ssha1 + 2 * SHA_DIGEST_LENGTH + 1, saltlen);
+
+  /* hash pass + salt */
+  my_ssha1 = tr_malloc (2 * SHA_DIGEST_LENGTH + saltlen + 2);
+  tr_sha1 (buf, plain_text, strlen (plain_text), salt, saltlen, NULL);
+  tr_sha1_to_hex (&my_ssha1[1], buf);
+  memcpy (my_ssha1 + 1 + 2 * SHA_DIGEST_LENGTH, salt, saltlen);
+  my_ssha1[1 + 2 * SHA_DIGEST_LENGTH + saltlen] = '\0';
+  my_ssha1[0] = '{';
+
+  result = strcmp (ssha1, my_ssha1) == 0;
+
+  tr_free (my_ssha1);
+  tr_free (salt);
+
+  return result;
 }
 
 /***
