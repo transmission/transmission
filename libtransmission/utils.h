@@ -319,9 +319,8 @@ char* tr_strsep (char ** str, const char * delim);
 
 int compareInt (const void * va, const void * vb);
 
-void tr_sha1_to_hex (char * out, const uint8_t * sha1) TR_GNUC_NONNULL (1,2);
-
-void tr_hex_to_sha1 (uint8_t * out, const char * hex) TR_GNUC_NONNULL (1,2);
+void tr_binary_to_hex (const void * input, char * output, size_t byte_length) TR_GNUC_NONNULL (1,2);
+void tr_hex_to_binary (const char * input, void * output, size_t byte_length) TR_GNUC_NONNULL (1,2);
 
 /** @brief convenience function to determine if an address is an IP address (IPv4 or IPv6) */
 bool tr_addressIsIP (const char * address);

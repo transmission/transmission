@@ -18,7 +18,7 @@
 #endif
 
 #include <assert.h>
-#include <ctype.h> /* isdigit (), isalpha (), tolower () */
+#include <ctype.h> /* isdigit (), tolower () */
 #include <errno.h>
 #include <float.h> /* DBL_EPSILON */
 #include <locale.h> /* localeconv () */
@@ -629,32 +629,38 @@ tr_getRatio (uint64_t numerator, uint64_t denominator)
 }
 
 void
-tr_sha1_to_hex (char * out, const uint8_t * sha1)
+tr_binary_to_hex (const void * input,
+                  char       * output,
+                  size_t       byte_length)
 {
-  int i;
   static const char hex[] = "0123456789abcdef";
+  const uint8_t * input_octets = input;
+  size_t i;
 
-  for (i=0; i<20; ++i)
+  for (i = 0; i < byte_length; ++i)
     {
-      const unsigned int val = *sha1++;
-      *out++ = hex[val >> 4];
-      *out++ = hex[val & 0xf];
+      const unsigned int val = *input_octets++;
+      *output++ = hex[val >> 4];
+      *output++ = hex[val & 0xf];
     }
 
-  *out = '\0';
+  *output = '\0';
 }
 
 void
-tr_hex_to_sha1 (uint8_t * out, const char * in)
+tr_hex_to_binary (const char * input,
+                  void       * output,
+                  size_t       byte_length)
 {
-  int i;
   static const char hex[] = "0123456789abcdef";
+  uint8_t * output_octets = output;
+  size_t i;
 
-  for (i=0; i<20; ++i)
+  for (i = 0; i < byte_length; ++i)
     {
-      const int hi = strchr (hex, tolower (*in++)) - hex;
-      const int lo = strchr (hex, tolower (*in++)) - hex;
-      *out++ = (uint8_t)((hi<<4) | lo);
+      const int hi = strchr (hex, tolower (*input++)) - hex;
+      const int lo = strchr (hex, tolower (*input++)) - hex;
+      *output_octets++ = (uint8_t) ((hi << 4) | lo);
     }
 }
 

@@ -13,6 +13,7 @@
 #include <inttypes.h>
 #include <stddef.h>
 
+#include "transmission.h" /* SHA_DIGEST_LENGTH */
 #include "utils.h" /* TR_GNUC_MALLOC, TR_GNUC_NULL_TERMINATED */
 
 #ifdef __cplusplus
@@ -210,6 +211,26 @@ void           * tr_base64_decode_str  (const char     * input,
 void           * tr_base64_decode_impl (const void     * input,
                                         size_t           input_length,
                                         size_t         * output_length) TR_GNUC_MALLOC;
+
+/**
+ * @brief Wrapper around tr_binary_to_hex () for SHA_DIGEST_LENGTH.
+ */
+static inline void
+tr_sha1_to_hex (char          * hex,
+                const uint8_t * sha1)
+{
+  tr_binary_to_hex (sha1, hex, SHA_DIGEST_LENGTH);
+}
+
+/**
+ * @brief Wrapper around tr_hex_to_binary () for SHA_DIGEST_LENGTH.
+ */
+static inline void
+tr_hex_to_sha1 (uint8_t    * sha1,
+                const char * hex)
+{
+  tr_hex_to_binary (hex, sha1, SHA_DIGEST_LENGTH);
+}
 
 /** @} */
 

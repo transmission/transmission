@@ -12,8 +12,8 @@
 #include <stdio.h> /* sscanf () */
 
 #include "transmission.h"
+#include "crypto-utils.h" /* tr_hex_to_sha1 () */
 #include "magnet.h"
-#include "utils.h"
 #include "variant.h"
 #include "web.h"
 

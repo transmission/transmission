@@ -277,11 +277,11 @@ test_hex (void)
 {
   char hex1[41];
   char hex2[41];
-  uint8_t sha1[20];
+  uint8_t binary[20];
 
   memcpy (hex1, "fb5ef5507427b17e04b69cef31fa3379b456735a", 41);
-  tr_hex_to_sha1 (sha1, hex1);
-  tr_sha1_to_hex (hex2, sha1);
+  tr_hex_to_binary (hex1, binary, 20);
+  tr_binary_to_hex (binary, hex2, 20);
   check_streq (hex1, hex2);
 
   return 0;
