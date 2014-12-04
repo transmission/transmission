@@ -16,6 +16,7 @@
 
 #include <inttypes.h>
 
+#include "crypto-utils.h"
 #include "utils.h" /* TR_GNUC_NULL_TERMINATED */
 
 /**
@@ -23,8 +24,7 @@
 *** @{
 **/
 
-#include <openssl/dh.h> /* RC4_KEY */
-#include <openssl/rc4.h> /* DH */
+#include <openssl/dh.h> /* DH */
 
 enum
 {
@@ -34,8 +34,8 @@ enum
 /** @brief Holds state information for encrypted peer communications */
 typedef struct
 {
-    RC4_KEY         dec_key;
-    RC4_KEY         enc_key;
+    tr_rc4_ctx_t    dec_key;
+    tr_rc4_ctx_t    enc_key;
     DH *            dh;
     uint8_t         myPublicKey[KEY_LEN];
     uint8_t         mySecret[KEY_LEN];

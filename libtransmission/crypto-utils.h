@@ -22,6 +22,8 @@
 
  /** @brief Opaque SHA1 context type. */
 typedef void * tr_sha1_ctx_t;
+ /** @brief Opaque RC4 context type. */
+typedef void * tr_rc4_ctx_t;
 
 /**
  * @brief Generate a SHA1 hash from one or more chunks of memory.
@@ -48,6 +50,32 @@ bool             tr_sha1_update        (tr_sha1_ctx_t    handle,
  */
 bool             tr_sha1_final         (tr_sha1_ctx_t    handle,
                                         uint8_t        * hash);
+
+/**
+ * @brief Allocate and initialize new RC4 cipher context.
+ */
+tr_rc4_ctx_t     tr_rc4_new            (void);
+
+/**
+ * @brief Free RC4 cipher context.
+ */
+void             tr_rc4_free           (tr_rc4_ctx_t     handle);
+
+/**
+ * @brief Set RC4 cipher key.
+ */
+void             tr_rc4_set_key        (tr_rc4_ctx_t     handle,
+                                        const uint8_t  * key,
+                                        size_t           key_length);
+
+/**
+ * @brief Process memory block with RC4 cipher.
+ */
+void             tr_rc4_process        (tr_rc4_ctx_t     handle,
+                                        const void     * input,
+                                        void           * output,
+                                        size_t           length);
+
 /**
  * @brief Returns a random number in the range of [0...upper_bound).
  */

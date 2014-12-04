@@ -16,6 +16,7 @@
 #include "transmission.h"
 #include "crypto-utils.h"
 #include "log.h"
+#include "utils.h"
 
 /***
 ****
@@ -125,6 +126,59 @@ tr_sha1_final (tr_sha1_ctx_t   handle,
 
   EVP_MD_CTX_destroy (handle);
   return ret;
+}
+
+/***
+****
+***/
+
+tr_rc4_ctx_t
+tr_rc4_new (void)
+{
+  EVP_CIPHER_CTX * handle = EVP_CIPHER_CTX_new ();
+
+  if (check_result (EVP_CipherInit_ex (handle, EVP_rc4 (), NULL, NULL, NULL, -1)))
+    return handle;
+
+  EVP_CIPHER_CTX_free (handle);
+  return NULL;
+}
+
+void
+tr_rc4_free (tr_rc4_ctx_t handle)
+{
+  if (handle == NULL)
+    return;
+
+  EVP_CIPHER_CTX_free (handle);
+}
+
+void
+tr_rc4_set_key (tr_rc4_ctx_t    handle,
+                const uint8_t * key,
+                size_t          key_length)
+{
+  assert (handle != NULL);
+  assert (key != NULL);
+
+  if (!check_result (EVP_CIPHER_CTX_set_key_length (handle, key_length)))
+    return;
+  check_result (EVP_CipherInit_ex (handle, NULL, NULL, key, NULL, -1));
+}
+
+void
+tr_rc4_process (tr_rc4_ctx_t   handle,
+                const void   * input,
+                void         * output,
+                size_t         length)
+{
+  int output_length;
+
+  assert (handle != NULL);
+  assert (input != NULL);
+  assert (output != NULL);
+
+  check_result (EVP_CipherUpdate (handle, output, &output_length, input, length));
 }
 
 /***

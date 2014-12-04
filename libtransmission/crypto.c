@@ -9,12 +9,11 @@
 
 #include <assert.h>
 #include <stdarg.h>
-#include <string.h> /* memcpy (), memset (), strcmp () */
+#include <string.h> /* memcpy (), memmove (), memset (), strcmp () */
 
 #include <openssl/bn.h>
 #include <openssl/dh.h>
 #include <openssl/err.h>
-#include <openssl/rc4.h>
 
 #include "transmission.h"
 #include "crypto.h"
@@ -118,6 +117,8 @@ tr_cryptoDestruct (tr_crypto * crypto)
 {
   if (crypto->dh != NULL)
     DH_free (crypto->dh);
+  tr_rc4_free (crypto->enc_key);
+  tr_rc4_free (crypto->dec_key);
 }
 
 /**
@@ -171,21 +172,24 @@ tr_cryptoGetMyPublicKey (const tr_crypto * crypto,
 **/
 
 static void
-initRC4 (tr_crypto  * crypto,
-         RC4_KEY    * setme,
-         const char * key)
+initRC4 (tr_crypto    * crypto,
+         tr_rc4_ctx_t * setme,
+         const char   * key)
 {
   uint8_t buf[SHA_DIGEST_LENGTH];
 
   assert (crypto->torrentHashIsSet);
   assert (crypto->mySecretIsSet);
 
+  if (*setme == NULL)
+    *setme = tr_rc4_new ();
+
   if (tr_sha1 (buf,
                key, 4,
                crypto->mySecret, KEY_LEN,
                crypto->torrentHash, SHA_DIGEST_LENGTH,
                NULL))
-    RC4_set_key (setme, SHA_DIGEST_LENGTH, buf);
+    tr_rc4_set_key (*setme, buf, SHA_DIGEST_LENGTH);
 }
 
 void
@@ -195,7 +199,7 @@ tr_cryptoDecryptInit (tr_crypto * crypto)
   const char * txt = crypto->isIncoming ? "keyA" : "keyB";
 
   initRC4 (crypto, &crypto->dec_key, txt);
-  RC4 (&crypto->dec_key, sizeof (discard), discard, discard);
+  tr_rc4_process (crypto->dec_key, discard, discard, sizeof (discard));
 }
 
 void
@@ -204,9 +208,15 @@ tr_cryptoDecrypt (tr_crypto  * crypto,
                   const void * buf_in,
                   void       * buf_out)
 {
-  RC4 (&crypto->dec_key, buf_len,
-       (const unsigned char*)buf_in,
-       (unsigned char*)buf_out);
+  /* FIXME: someone calls this function with uninitialized key */
+  if (crypto->dec_key == NULL)
+    {
+      if (buf_in != buf_out)
+        memmove (buf_out, buf_in, buf_len);
+      return;
+    }
+
+  tr_rc4_process (crypto->dec_key, buf_in, buf_out, buf_len);
 }
 
 void
@@ -216,7 +226,7 @@ tr_cryptoEncryptInit (tr_crypto * crypto)
   const char * txt = crypto->isIncoming ? "keyB" : "keyA";
 
   initRC4 (crypto, &crypto->enc_key, txt);
-  RC4 (&crypto->enc_key, sizeof (discard), discard, discard);
+  tr_rc4_process (crypto->enc_key, discard, discard, sizeof (discard));
 }
 
 void
@@ -225,9 +235,15 @@ tr_cryptoEncrypt (tr_crypto  * crypto,
                   const void * buf_in,
                   void       * buf_out)
 {
-  RC4 (&crypto->enc_key, buf_len,
-       (const unsigned char*)buf_in,
-       (unsigned char*)buf_out);
+  /* FIXME: someone calls this function with uninitialized key */
+  if (crypto->enc_key == NULL)
+    {
+      if (buf_in != buf_out)
+        memmove (buf_out, buf_in, buf_len);
+      return;
+    }
+
+  tr_rc4_process (crypto->enc_key, buf_in, buf_out, buf_len);
 }
 
 /**
