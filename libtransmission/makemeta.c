@@ -15,7 +15,7 @@
 #include <event2/util.h> /* evutil_ascii_strcasecmp () */
 
 #include "transmission.h"
-#include "crypto.h" /* tr_sha1 */
+#include "crypto-utils.h" /* tr_sha1 */
 #include "error.h"
 #include "file.h"
 #include "log.h"

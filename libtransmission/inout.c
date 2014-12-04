@@ -12,10 +12,9 @@
 #include <stdlib.h> /* bsearch () */
 #include <string.h> /* memcmp () */
 
-#include <openssl/sha.h>
-
 #include "transmission.h"
 #include "cache.h" /* tr_cacheReadBlock () */
+#include "crypto-utils.h"
 #include "error.h"
 #include "fdlimit.h"
 #include "file.h"
@@ -278,7 +277,7 @@ recalculateHash (tr_torrent * tor, tr_piece_index_t pieceIndex, uint8_t * setme)
   bool  success = true;
   const size_t buflen = tor->blockSize;
   void * buffer = tr_valloc (buflen);
-  SHA_CTX  sha;
+  tr_sha1_ctx_t sha;
 
   assert (tor != NULL);
   assert (pieceIndex < tor->info.pieceCount);
@@ -286,7 +285,7 @@ recalculateHash (tr_torrent * tor, tr_piece_index_t pieceIndex, uint8_t * setme)
   assert (buflen > 0);
   assert (setme != NULL);
 
-  SHA1_Init (&sha);
+  sha = tr_sha1_init ();
   bytesLeft = tr_torPieceCountBytes (tor, pieceIndex);
 
   tr_ioPrefetch (tor, pieceIndex, offset, bytesLeft);
@@ -297,13 +296,12 @@ recalculateHash (tr_torrent * tor, tr_piece_index_t pieceIndex, uint8_t * setme)
       success = !tr_cacheReadBlock (tor->session->cache, tor, pieceIndex, offset, len, buffer);
       if (!success)
         break;
-      SHA1_Update (&sha, buffer, len);
+      tr_sha1_update (sha, buffer, len);
       offset += len;
       bytesLeft -= len;
     }
 
-  if (success)
-    SHA1_Final (setme, &sha);
+  tr_sha1_final (sha, success ? setme : NULL);
 
   tr_free (buffer);
   return success;

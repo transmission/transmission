@@ -99,10 +99,10 @@ test_sha1 (void)
 {
   uint8_t hash[SHA_DIGEST_LENGTH];
 
-  tr_sha1 (hash, "test", 4, NULL);
+  check (tr_sha1 (hash, "test", 4, NULL));
   check (memcmp (hash, "\xa9\x4a\x8f\xe5\xcc\xb1\x9b\xa6\x1c\x4c\x08\x73\xd3\x91\xe9\x87\x98\x2f\xbb\xd3", SHA_DIGEST_LENGTH) == 0);
 
-  tr_sha1 (hash, "1", 1, "22", 2, "333", 3, NULL);
+  check (tr_sha1 (hash, "1", 1, "22", 2, "333", 3, NULL));
   check (memcmp (hash, "\x1f\x74\x64\x8e\x50\xa6\xa6\x70\x8e\xc5\x4a\xb3\x27\xa1\x63\xd5\x53\x6b\x7c\xed", SHA_DIGEST_LENGTH) == 0);
 
   return 0;

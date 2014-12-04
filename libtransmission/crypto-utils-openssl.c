@@ -10,6 +10,7 @@
 #include <assert.h>
 
 #include <openssl/err.h>
+#include <openssl/evp.h>
 #include <openssl/rand.h>
 
 #include "transmission.h"
@@ -77,6 +78,54 @@ check_openssl_pointer (void       * pointer,
 }
 
 #define check_pointer(pointer) check_openssl_pointer ((pointer), __FILE__, __LINE__)
+
+/***
+****
+***/
+
+tr_sha1_ctx_t
+tr_sha1_init (void)
+{
+  EVP_MD_CTX * handle = EVP_MD_CTX_create ();
+
+  if (check_result (EVP_DigestInit_ex (handle, EVP_sha1 (), NULL)))
+    return handle;
+
+  EVP_MD_CTX_destroy (handle);
+  return NULL;
+}
+
+bool
+tr_sha1_update (tr_sha1_ctx_t   handle,
+                const void    * data,
+                size_t          data_length)
+{
+  assert (handle != NULL);
+  assert (data != NULL);
+
+  return check_result (EVP_DigestUpdate (handle, data, data_length));
+}
+
+bool
+tr_sha1_final (tr_sha1_ctx_t   handle,
+               uint8_t       * hash)
+{
+  bool ret = true;
+
+  if (hash != NULL)
+    {
+      unsigned int hash_length;
+
+      assert (handle != NULL);
+
+      ret = check_result (EVP_DigestFinal_ex (handle, hash, &hash_length));
+
+      assert (!ret || hash_length == SHA_DIGEST_LENGTH);
+    }
+
+  EVP_MD_CTX_destroy (handle);
+  return ret;
+}
 
 /***
 ****

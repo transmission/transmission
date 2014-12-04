@@ -14,6 +14,8 @@ set(${PROJECT_NAME}_SOURCES
     completion.c
     ConvertUTF.c
     crypto.c
+    crypto-utils.c
+    crypto-utils-openssl.c
     error.c
     fdlimit.c
     file.c
@@ -91,6 +93,7 @@ set(${PROJECT_NAME}_PRIVATE_HEADERS
     completion.h
     ConvertUTF.h
     crypto.h
+    crypto-utils.h
     fdlimit.h
     handshake.h
     history.h

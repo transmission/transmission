@@ -86,14 +86,6 @@ void           tr_cryptoEncrypt (tr_crypto *  crypto,
 *** @{
 **/
 
-
-/** @brief generate a SHA1 hash from one or more chunks of memory */
-void tr_sha1 (uint8_t    * setme,
-              const void * content1,
-              int          content1_len,
-              ...) TR_GNUC_NULL_TERMINATED;
-
-
 /** @brief generate a SSHA password from its plaintext source */
 char*  tr_ssha1 (const void * plaintext);
 

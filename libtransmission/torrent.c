@@ -19,6 +19,7 @@
 #include <assert.h>
 #include <math.h>
 #include <stdarg.h>
+#include <stdio.h> /* remove () */
 #include <string.h> /* memcmp */
 #include <stdlib.h> /* qsort */
 #include <limits.h> /* INT_MAX */
@@ -30,8 +31,7 @@
 #include "bandwidth.h"
 #include "cache.h"
 #include "completion.h"
-#include "crypto.h" /* for tr_sha1 */
-#include "crypto-utils.h"
+#include "crypto-utils.h" /* for tr_sha1 */
 #include "error.h"
 #include "fdlimit.h" /* tr_fdTorrentClose */
 #include "file.h"

@@ -13,7 +13,7 @@
 #include <event2/buffer.h>
 
 #include "transmission.h"
-#include "crypto.h" /* tr_sha1 */
+#include "crypto-utils.h" /* tr_sha1 */
 #include "file.h"
 #include "log.h"
 #include "metainfo.h"

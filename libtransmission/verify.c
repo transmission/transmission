@@ -15,10 +15,9 @@
  #include <fcntl.h> /* posix_fadvise () */
 #endif
 
-#include <openssl/sha.h>
-
 #include "transmission.h"
 #include "completion.h"
+#include "crypto-utils.h"
 #include "file.h"
 #include "list.h"
 #include "log.h"
@@ -40,7 +39,7 @@ static bool
 verifyTorrent (tr_torrent * tor, bool * stopFlag)
 {
   time_t end;
-  SHA_CTX sha;
+  tr_sha1_ctx_t sha;
   tr_sys_file_t fd = TR_BAD_SYS_FILE;
   uint64_t filePos = 0;
   bool changed = false;
@@ -54,7 +53,7 @@ verifyTorrent (tr_torrent * tor, bool * stopFlag)
   const size_t buflen = 1024 * 128; /* 128 KiB buffer */
   uint8_t * buffer = tr_valloc (buflen);
 
-  SHA1_Init (&sha);
+  sha = tr_sha1_init ();
 
   tr_logAddTorDbg (tor, "%s", "verifying torrent...");
   tr_torrentSetChecked (tor, 0);
@@ -92,7 +91,7 @@ verifyTorrent (tr_torrent * tor, bool * stopFlag)
           if (tr_sys_file_read_at (fd, buffer, bytesThisPass, filePos, &numRead, NULL) && numRead > 0)
             {
               bytesThisPass = numRead;
-              SHA1_Update (&sha, buffer, bytesThisPass);
+              tr_sha1_update (sha, buffer, bytesThisPass);
 #if defined HAVE_POSIX_FADVISE && defined POSIX_FADV_DONTNEED
               posix_fadvise (fd, filePos, bytesThisPass, POSIX_FADV_DONTNEED);
 #endif
@@ -112,7 +111,7 @@ verifyTorrent (tr_torrent * tor, bool * stopFlag)
           bool hasPiece;
           uint8_t hash[SHA_DIGEST_LENGTH];
 
-          SHA1_Final (hash, &sha);
+          tr_sha1_final (sha, hash);
           hasPiece = !memcmp (hash, tor->info.pieces[pieceIndex].hash, SHA_DIGEST_LENGTH);
 
           if (hasPiece || hadPiece)
@@ -133,7 +132,7 @@ verifyTorrent (tr_torrent * tor, bool * stopFlag)
               tr_wait_msec (MSEC_TO_SLEEP_PER_SECOND_DURING_VERIFY);
             }
 
-          SHA1_Init (&sha);
+          sha = tr_sha1_init ();
           pieceIndex++;
           piecePos = 0;
         }
@@ -154,6 +153,7 @@ verifyTorrent (tr_torrent * tor, bool * stopFlag)
   /* cleanup */
   if (fd != TR_BAD_SYS_FILE)
     tr_sys_file_close (fd, NULL);
+  tr_sha1_final (sha, NULL);
   free (buffer);
 
   /* stopwatch */

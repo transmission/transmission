@@ -15,7 +15,6 @@
 #include <openssl/dh.h>
 #include <openssl/err.h>
 #include <openssl/rc4.h>
-#include <openssl/sha.h>
 
 #include "transmission.h"
 #include "crypto.h"
@@ -24,28 +23,6 @@
 #include "utils.h"
 
 #define MY_NAME "tr_crypto"
-
-/**
-***
-**/
-
-void
-tr_sha1 (uint8_t * setme, const void * content1, int content1_len, ...)
-{
-  va_list vl;
-  SHA_CTX sha;
-  const void * content;
-
-  SHA1_Init (&sha);
-  SHA1_Update (&sha, content1, content1_len);
-
-  va_start (vl, content1_len);
-  while ((content = va_arg (vl, const void*)))
-    SHA1_Update (&sha, content, va_arg (vl, int));
-  va_end (vl);
-
-  SHA1_Final (setme, &sha);
-}
 
 /**
 ***
@@ -198,24 +175,17 @@ initRC4 (tr_crypto  * crypto,
          RC4_KEY    * setme,
          const char * key)
 {
-  SHA_CTX sha;
   uint8_t buf[SHA_DIGEST_LENGTH];
 
   assert (crypto->torrentHashIsSet);
   assert (crypto->mySecretIsSet);
 
-  if (SHA1_Init (&sha)
-      && SHA1_Update (&sha, key, 4)
-      && SHA1_Update (&sha, crypto->mySecret, KEY_LEN)
-      && SHA1_Update (&sha, crypto->torrentHash, SHA_DIGEST_LENGTH)
-      && SHA1_Final (buf, &sha))
-    {
-      RC4_set_key (setme, SHA_DIGEST_LENGTH, buf);
-    }
-  else
-    {
-      logErrorFromSSL ();
-    }
+  if (tr_sha1 (buf,
+               key, 4,
+               crypto->mySecret, KEY_LEN,
+               crypto->torrentHash, SHA_DIGEST_LENGTH,
+               NULL))
+    RC4_set_key (setme, SHA_DIGEST_LENGTH, buf);
 }
 
 void

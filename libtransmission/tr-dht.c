@@ -49,7 +49,6 @@
 
 /* libT */
 #include "transmission.h"
-#include "crypto.h"
 #include "crypto-utils.h"
 #include "file.h"
 #include "log.h"
