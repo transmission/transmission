@@ -50,6 +50,7 @@
 /* libT */
 #include "transmission.h"
 #include "crypto.h"
+#include "crypto-utils.h"
 #include "file.h"
 #include "log.h"
 #include "net.h"
@@ -93,7 +94,7 @@ static void
 nap (int roughly_sec)
 {
     const int roughly_msec = roughly_sec * 1000;
-    const int msec = roughly_msec/2 + tr_cryptoWeakRandInt (roughly_msec);
+    const int msec = roughly_msec/2 + tr_rand_int_weak (roughly_msec);
     tr_wait_msec (msec);
 }
 
@@ -307,7 +308,7 @@ tr_dhtInit (tr_session *ss)
         /* Note that DHT ids need to be distributed uniformly,
          * so it should be something truly random. */
         tr_logAddNamedInfo ("DHT", "Generating new id");
-        tr_cryptoRandBuf (myid, 20);
+        tr_rand_buffer (myid, 20);
     }
 
     rc = dht_init (ss->udp_socket, ss->udp6_socket, myid, NULL);
@@ -325,7 +326,7 @@ tr_dhtInit (tr_session *ss)
     tr_threadNew (dht_bootstrap, cl);
 
     dht_timer = evtimer_new (session->event_base, timer_callback, session);
-    tr_timerAdd (dht_timer, 0, tr_cryptoWeakRandInt (1000000));
+    tr_timerAdd (dht_timer, 0, tr_rand_int_weak (1000000));
 
     tr_logAddNamedDbg ("DHT", "DHT initialized");
 
@@ -609,8 +610,8 @@ tr_dhtUpkeep (tr_session * session)
             const int rc = tr_dhtAnnounce (tor, AF_INET, 1);
 
             tor->dhtAnnounceAt = now + ((rc == 0)
-                                     ? 5 + tr_cryptoWeakRandInt (5)
-                                     : 25 * 60 + tr_cryptoWeakRandInt (3*60));
+                                     ? 5 + tr_rand_int_weak (5)
+                                     : 25 * 60 + tr_rand_int_weak (3*60));
         }
 
         if (tor->dhtAnnounce6At <= now)
@@ -618,8 +619,8 @@ tr_dhtUpkeep (tr_session * session)
             const int rc = tr_dhtAnnounce (tor, AF_INET6, 1);
 
             tor->dhtAnnounce6At = now + ((rc == 0)
-                                      ? 5 + tr_cryptoWeakRandInt (5)
-                                      : 25 * 60 + tr_cryptoWeakRandInt (3*60));
+                                      ? 5 + tr_rand_int_weak (5)
+                                      : 25 * 60 + tr_rand_int_weak (3*60));
         }
     }
 }
@@ -652,7 +653,7 @@ tr_dhtCallback (unsigned char *buf, int buflen,
 
     /* Being slightly late is fine,
        and has the added benefit of adding some jitter. */
-    tr_timerAdd (dht_timer, tosleep, tr_cryptoWeakRandInt (1000000));
+    tr_timerAdd (dht_timer, tosleep, tr_rand_int_weak (1000000));
 }
 
 static void
@@ -688,6 +689,6 @@ dht_hash (void *hash_return, int hash_size,
 int
 dht_random_bytes (void * buf, size_t size)
 {
-    tr_cryptoRandBuf (buf, size);
+    tr_rand_buffer (buf, size);
     return size;
 }

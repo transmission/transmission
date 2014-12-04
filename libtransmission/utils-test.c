@@ -21,7 +21,7 @@
 #include "transmission.h"
 #include "ConvertUTF.h" /* tr_utf8_validate*/
 #include "platform.h"
-#include "crypto.h"
+#include "crypto-utils.h" /* tr_rand_int_weak */
 #include "utils.h"
 #include "web.h"
 
@@ -243,7 +243,7 @@ test_quickFindFirst_Iteration (const size_t k, const size_t n, int * buf, int ra
 
   /* populate buf with random ints */
   for (i=0; i<n; ++i)
-    buf[i] = tr_cryptoWeakRandInt (range);
+    buf[i] = tr_rand_int_weak (range);
 
   /* find the best k */
   tr_quickfindFirstK (buf, n, sizeof(int), compareInts, k);
@@ -412,22 +412,6 @@ test_truncd (void)
   return 0;
 }
 
-static int
-test_cryptoRand (void)
-{
-  int i;
-
-  /* test that tr_cryptoRandInt () stays in-bounds */
-  for (i = 0; i < 100000; ++i)
-    {
-      const int val = tr_cryptoRandInt (100);
-       check (val >= 0);
-       check (val < 100);
-    }
-
-  return 0;
-}
-
 static char *
 test_strdup_printf_valist (const char * fmt, ...)
 {
@@ -536,7 +520,6 @@ main (void)
   const testFunc tests[] = { test_array,
                              test_base64,
                              test_buildpath,
-                             test_cryptoRand,
                              test_hex,
                              test_lowerbound,
                              test_quickfindFirst,

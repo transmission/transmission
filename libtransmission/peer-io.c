@@ -20,7 +20,6 @@
 #include "transmission.h"
 #include "session.h"
 #include "bandwidth.h"
-#include "crypto.h"
 #include "log.h"
 #include "net.h"
 #include "peer-common.h" /* MAX_BLOCK_SIZE */

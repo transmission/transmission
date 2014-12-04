@@ -24,7 +24,7 @@
 #include "cache.h"
 #include "clients.h"
 #include "completion.h"
-#include "crypto.h"
+#include "crypto-utils.h"
 #include "handshake.h"
 #include "log.h"
 #include "net.h"
@@ -1097,7 +1097,7 @@ pieceListRebuild (tr_swarm * s)
           struct weighted_piece * piece = pieces + i;
           piece->index = pool[i];
           piece->requestCount = 0;
-          piece->salt = tr_cryptoWeakRandInt (4096);
+          piece->salt = tr_rand_int_weak (4096);
         }
 
       /* if we already had a list of pieces, merge it into
@@ -1863,7 +1863,7 @@ ensureAtomExists (tr_swarm          * s,
 
   if (a == NULL)
     {
-      const int jitter = tr_cryptoWeakRandInt (60*10);
+      const int jitter = tr_rand_int_weak (60*10);
       a = tr_new0 (struct peer_atom, 1);
       a->addr = *addr;
       a->port = port;
@@ -2948,7 +2948,7 @@ rechokeDownloads (tr_swarm * s)
 
               rechoke[rechoke_count].peer = peer;
               rechoke[rechoke_count].rechoke_state = rechoke_state;
-              rechoke[rechoke_count].salt = tr_cryptoWeakRandInt (INT_MAX);
+              rechoke[rechoke_count].salt = tr_rand_int_weak (INT_MAX);
               rechoke_count++;
             }
 
@@ -3088,7 +3088,7 @@ rechokeUploads (tr_swarm * s, const uint64_t now)
           n->isInterested = tr_peerMsgsIsPeerInterested (msgs);
           n->wasChoked    = tr_peerMsgsIsPeerChoked (msgs);
           n->rate         = getRate (s->tor, atom, now);
-          n->salt         = tr_cryptoWeakRandInt (INT_MAX);
+          n->salt         = tr_rand_int_weak (INT_MAX);
           n->isChoked     = true;
         }
     }
@@ -3139,7 +3139,7 @@ rechokeUploads (tr_swarm * s, const uint64_t now)
 
       if ((n = tr_ptrArraySize (&randPool)))
         {
-          c = tr_ptrArrayNth (&randPool, tr_cryptoWeakRandInt (n));
+          c = tr_ptrArrayNth (&randPool, tr_rand_int_weak (n));
           c->isChoked = false;
           s->optimistic = c->msgs;
           s->optimisticUnchokeTimeScaler = OPTIMISTIC_UNCHOKE_MULTIPLIER;
@@ -3982,7 +3982,7 @@ getPeerCandidates (tr_session * session, int * candidateCount, int max)
 
           if (isPeerCandidate (tor, atom, now))
             {
-              const uint8_t salt = tr_cryptoWeakRandInt (1024);
+              const uint8_t salt = tr_rand_int_weak (1024);
               walk->tor = tor;
               walk->atom = atom;
               walk->score = getPeerCandidateScore (tor, atom, salt);

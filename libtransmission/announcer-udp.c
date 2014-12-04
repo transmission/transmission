@@ -19,7 +19,7 @@
 #include "transmission.h"
 #include "announcer.h"
 #include "announcer-common.h"
-#include "crypto.h" /* tr_cryptoRandBuf () */
+#include "crypto-utils.h" /* tr_rand_buffer () */
 #include "log.h"
 #include "peer-io.h"
 #include "peer-mgr.h" /* tr_peerMgrCompactToPex () */
@@ -108,7 +108,7 @@ static tau_transaction_t
 tau_transaction_new (void)
 {
     tau_transaction_t tmp;
-    tr_cryptoRandBuf (&tmp, sizeof (tau_transaction_t));
+    tr_rand_buffer (&tmp, sizeof (tau_transaction_t));
     return tmp;
 }
 

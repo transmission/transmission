@@ -12,7 +12,7 @@
 
 #include "transmission.h"
 #include "bandwidth.h"
-#include "crypto.h" /* tr_cryptoWeakRandInt () */
+#include "crypto-utils.h" /* tr_rand_int_weak () */
 #include "log.h"
 #include "peer-io.h"
 #include "utils.h"
@@ -210,7 +210,7 @@ phaseOne (tr_ptrArray * peerArray, tr_direction dir)
   dbgmsg ("%d peers to go round-robin for %s", n, (dir==TR_UP?"upload":"download"));
   while (n > 0)
     {
-      const int i = tr_cryptoWeakRandInt (n); /* pick a peer at random */
+      const int i = tr_rand_int_weak (n); /* pick a peer at random */
 
       /* value of 3000 bytes chosen so that when using uTP we'll send a full-size
        * frame right away and leave enough buffered data for the next frame to go

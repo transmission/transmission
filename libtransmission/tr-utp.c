@@ -31,7 +31,7 @@ THE SOFTWARE.
 #include "log.h"
 #include "net.h"
 #include "session.h"
-#include "crypto.h" /* tr_cryptoWeakRandInt () */
+#include "crypto-utils.h" /* tr_rand_int_weak () */
 #include "peer-mgr.h"
 #include "tr-utp.h"
 #include "utils.h"
@@ -143,7 +143,7 @@ reset_timer (tr_session *ss)
     int usec;
     if (tr_sessionIsUTPEnabled (ss)) {
         sec = 0;
-        usec = UTP_INTERVAL_US / 2 + tr_cryptoWeakRandInt (UTP_INTERVAL_US);
+        usec = UTP_INTERVAL_US / 2 + tr_rand_int_weak (UTP_INTERVAL_US);
     } else {
         /* If somebody has disabled uTP, then we still want to run
            UTP_CheckTimeouts, in order to let closed sockets finish
@@ -151,7 +151,7 @@ reset_timer (tr_session *ss)
            interested in that happening in a timely manner, we might as
            well use a large timeout. */
         sec = 2;
-        usec = tr_cryptoWeakRandInt (1000000);
+        usec = tr_rand_int_weak (1000000);
     }
     tr_timerAdd (utp_timer, sec, usec);
 }

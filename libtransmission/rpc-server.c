@@ -19,7 +19,8 @@
 #include <event2/http_struct.h> /* TODO: eventually remove this */
 
 #include "transmission.h"
-#include "crypto.h" /* tr_cryptoRandBuf (), tr_ssha1_matches () */
+#include "crypto.h" /* tr_ssha1_matches () */
+#include "crypto-utils.h" /* tr_rand_buffer () */
 #include "fdlimit.h"
 #include "list.h"
 #include "log.h"
@@ -91,7 +92,7 @@ get_current_session_id (struct tr_rpc_server * server)
       const size_t pool_size = strlen (pool);
       unsigned char * buf = tr_new (unsigned char, n+1);
 
-      tr_cryptoRandBuf (buf, n);
+      tr_rand_buffer (buf, n);
       for (i=0; i<n; ++i)
         buf[i] = pool[ buf[i] % pool_size ];
       buf[n] = '\0';

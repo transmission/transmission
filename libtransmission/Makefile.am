@@ -28,6 +28,8 @@ libtransmission_a_SOURCES = \
   completion.c \
   ConvertUTF.c \
   crypto.c \
+  crypto-utils.c \
+  crypto-utils-openssl.c \
   error.c \
   fdlimit.c \
   file.c \
@@ -89,6 +91,7 @@ noinst_HEADERS = \
   clients.h \
   ConvertUTF.h \
   crypto.h \
+  crypto-utils.h \
   completion.h \
   error.h \
   fdlimit.h \

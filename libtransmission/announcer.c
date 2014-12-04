@@ -21,7 +21,7 @@
 #include "transmission.h"
 #include "announcer.h"
 #include "announcer-common.h"
-#include "crypto.h" /* tr_cryptoRandInt (), tr_cryptoWeakRandInt () */
+#include "crypto-utils.h" /* tr_rand_int (), tr_rand_int_weak () */
 #include "log.h"
 #include "peer-mgr.h" /* tr_peerMgrCompactToPex () */
 #include "ptrarray.h"
@@ -167,7 +167,7 @@ tr_announcerInit (tr_session * session)
 
     a = tr_new0 (tr_announcer, 1);
     a->stops = TR_PTR_ARRAY_INIT;
-    a->key = tr_cryptoRandInt (INT_MAX);
+    a->key = tr_rand_int (INT_MAX);
     a->session = session;
     a->slotsAvailable = MAX_CONCURRENT_TASKS;
     a->upkeepTimer = evtimer_new (session->event_base, onUpkeepTimer, a);
@@ -349,7 +349,7 @@ tierConstruct (tr_tier * tier, tr_torrent * tor)
     tier->scrapeIntervalSec = DEFAULT_SCRAPE_INTERVAL_SEC;
     tier->announceIntervalSec = DEFAULT_ANNOUNCE_INTERVAL_SEC;
     tier->announceMinIntervalSec = DEFAULT_ANNOUNCE_MIN_INTERVAL_SEC;
-    tier->scrapeAt = get_next_scrape_time (tor->session, tier, tr_cryptoWeakRandInt (180));
+    tier->scrapeAt = get_next_scrape_time (tor->session, tier, tr_rand_int_weak (180));
     tier->tor = tor;
 }
 
@@ -963,11 +963,11 @@ getRetryInterval (const tr_tracker * t)
     {
       case 0:  return 0;
       case 1:  return 20;
-      case 2:  return tr_cryptoWeakRandInt (60) + (60 * 5);
-      case 3:  return tr_cryptoWeakRandInt (60) + (60 * 15);
-      case 4:  return tr_cryptoWeakRandInt (60) + (60 * 30);
-      case 5:  return tr_cryptoWeakRandInt (60) + (60 * 60);
-      default: return tr_cryptoWeakRandInt (60) + (60 * 120);
+      case 2:  return tr_rand_int_weak (60) + (60 * 5);
+      case 3:  return tr_rand_int_weak (60) + (60 * 15);
+      case 4:  return tr_rand_int_weak (60) + (60 * 30);
+      case 5:  return tr_rand_int_weak (60) + (60 * 60);
+      default: return tr_rand_int_weak (60) + (60 * 120);
     }
 }
 

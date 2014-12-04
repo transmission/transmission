@@ -28,7 +28,7 @@
 #include "bandwidth.h"
 #include "blocklist.h"
 #include "cache.h"
-#include "crypto.h"
+#include "crypto-utils.h"
 #include "fdlimit.h"
 #include "file.h"
 #include "list.h"
@@ -78,7 +78,7 @@ enum
 static tr_port
 getRandomPort (tr_session * s)
 {
-  return tr_cryptoWeakRandInt (s->randomPortHigh - s->randomPortLow + 1) + s->randomPortLow;
+  return tr_rand_int_weak (s->randomPortHigh - s->randomPortLow + 1) + s->randomPortLow;
 }
 
 /* Generate a peer id : "-TRxyzb-" + 12 random alphanumeric
@@ -96,7 +96,7 @@ tr_peerIdInit (uint8_t * buf)
 
   memcpy (buf, PEERID_PREFIX, 8);
 
-  tr_cryptoRandBuf (buf+8, 11);
+  tr_rand_buffer (buf+8, 11);
   for (i=8; i<19; ++i)
     {
       val = buf[i] % base;

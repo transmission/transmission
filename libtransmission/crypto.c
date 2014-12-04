@@ -8,9 +8,7 @@
  */
 
 #include <assert.h>
-#include <inttypes.h> /* uint8_t */
 #include <stdarg.h>
-#include <stdlib.h> /* abs () */
 #include <string.h> /* memcpy (), memset (), strcmp () */
 
 #include <openssl/bn.h>
@@ -18,10 +16,10 @@
 #include <openssl/err.h>
 #include <openssl/rc4.h>
 #include <openssl/sha.h>
-#include <openssl/rand.h>
 
 #include "transmission.h"
 #include "crypto.h"
+#include "crypto-utils.h"
 #include "log.h"
 #include "utils.h"
 
@@ -294,49 +292,6 @@ tr_cryptoHasTorrentHash (const tr_crypto * crypto)
   return crypto->torrentHashIsSet;
 }
 
-int
-tr_cryptoRandInt (int upperBound)
-{
-  int noise;
-  int val;
-
-  assert (upperBound > 0);
-
-  if (RAND_pseudo_bytes ((unsigned char *) &noise, sizeof noise) >= 0)
-    {
-      val = abs (noise) % upperBound;
-    }
-  else /* fall back to a weaker implementation... */
-    {
-      val = tr_cryptoWeakRandInt (upperBound);
-    }
-
-  return val;
-}
-
-int
-tr_cryptoWeakRandInt (int upperBound)
-{
-  static bool init = false;
-
-  assert (upperBound > 0);
-
-  if (!init)
-    {
-      srand (tr_time_msec ());
-      init = true;
-    }
-
-  return rand () % upperBound;
-}
-
-void
-tr_cryptoRandBuf (void * buf, size_t len)
-{
-  if (RAND_pseudo_bytes ((unsigned char*)buf, len) != 1)
-    logErrorFromSSL ();
-}
-
 /***
 ****
 ***/
@@ -356,7 +311,7 @@ tr_ssha1 (const void * plaintext)
   uint8_t sha[SHA_DIGEST_LENGTH];
   char buf[2*SHA_DIGEST_LENGTH + saltval_len + 2];
 
-  tr_cryptoRandBuf (salt, saltval_len);
+  tr_rand_buffer (salt, saltval_len);
   for (i=0; i<saltval_len; ++i)
     salt[i] = salter[ salt[i] % salter_len ];
 

@@ -10,7 +10,7 @@
 #include "libtransmission-test.h"
 
 #include "transmission.h"
-#include "crypto.h"
+#include "crypto-utils.h"
 #include "file.h"
 #include "makemeta.h"
 
@@ -229,14 +229,14 @@ test_single_directory_random_payload_impl (const tr_tracker_info * trackers,
   size_t payloadCount;
 
   /* build random payloads */
-  payloadCount = 1 + tr_cryptoWeakRandInt (maxFileCount);
+  payloadCount = 1 + tr_rand_int_weak (maxFileCount);
   payloads = tr_new0 (void*, payloadCount);
   payloadSizes = tr_new0 (size_t, payloadCount);
   for (i=0; i<payloadCount; i++)
     {
-      const size_t n = 1 + tr_cryptoWeakRandInt (maxFileSize);
+      const size_t n = 1 + tr_rand_int_weak (maxFileSize);
       payloads[i] = tr_new (char, n);
-      tr_cryptoRandBuf (payloads[i], n);
+      tr_rand_buffer (payloads[i], n);
       payloadSizes[i] = n;
     }
 

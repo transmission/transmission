@@ -20,7 +20,6 @@
 #include "transmission.h"
 #include "cache.h"
 #include "completion.h"
-#include "crypto.h" /* tr_sha1 () */
 #include "file.h"
 #include "log.h"
 #include "peer-io.h"

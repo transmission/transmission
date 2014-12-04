@@ -14,7 +14,7 @@
 #include <winioctl.h> /* FSCTL_SET_SPARSE */
 
 #include "transmission.h"
-#include "crypto.h" /* tr_cryptoRandInt () */
+#include "crypto-utils.h" /* tr_rand_int () */
 #include "file.h"
 #include "utils.h"
 
@@ -205,7 +205,7 @@ create_temp_path (char      * path_template,
 
       while (i > 0 && path_template[i - 1] == 'X')
         {
-          const int c = tr_cryptoRandInt (26 + 26 + 10);
+          const int c = tr_rand_int (26 + 26 + 10);
           path[i - 1] = c < 26 ? c + 'A' : (c < 26 + 26 ? (c - 26) + 'a' : (c - 26 - 26) + '0');
           --i;
         }

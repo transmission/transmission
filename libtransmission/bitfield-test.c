@@ -9,7 +9,7 @@
 
 #include <string.h> /* strlen () */
 #include "transmission.h"
-#include "crypto.h"
+#include "crypto-utils.h"
 #include "bitfield.h"
 #include "utils.h" /* tr_free */
 
@@ -24,16 +24,16 @@ test_bitfield_count_range (void)
   int end;
   int count1;
   int count2;
-  const int bitCount = 100 + tr_cryptoWeakRandInt (1000);
+  const int bitCount = 100 + tr_rand_int_weak (1000);
   tr_bitfield bf;
 
   /* generate a random bitfield */
   tr_bitfieldConstruct (&bf, bitCount);
-  for (i=0, n=tr_cryptoWeakRandInt (bitCount); i<n; ++i)
-    tr_bitfieldAdd (&bf, tr_cryptoWeakRandInt (bitCount));
-  begin = tr_cryptoWeakRandInt (bitCount);
+  for (i=0, n=tr_rand_int_weak (bitCount); i<n; ++i)
+    tr_bitfieldAdd (&bf, tr_rand_int_weak (bitCount));
+  begin = tr_rand_int_weak (bitCount);
   do
-    end = tr_cryptoWeakRandInt (bitCount);
+    end = tr_rand_int_weak (bitCount);
   while (end == begin);
 
   /* ensure end <= begin */

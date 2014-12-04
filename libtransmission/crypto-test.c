@@ -11,6 +11,7 @@
 
 #include "transmission.h"
 #include "crypto.h"
+#include "crypto-utils.h"
 
 #include "libtransmission-test.h"
 
@@ -166,13 +167,30 @@ test_ssha1 (void)
   return 0;
 }
 
+static int
+test_random (void)
+{
+  int i;
+
+  /* test that tr_rand_int () stays in-bounds */
+  for (i = 0; i < 100000; ++i)
+    {
+      const int val = tr_rand_int (100);
+      check (val >= 0);
+      check (val < 100);
+    }
+
+  return 0;
+}
+
 int
 main (void)
 {
   const testFunc tests[] = { test_torrent_hash,
                              test_encrypt_decrypt,
                              test_sha1,
-                             test_ssha1 };
+                             test_ssha1,
+                             test_random };
 
   return runTests (tests, NUM_TESTS (tests));
 }

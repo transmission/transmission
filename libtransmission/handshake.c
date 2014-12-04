@@ -16,7 +16,7 @@
 
 #include "transmission.h"
 #include "clients.h"
-#include "crypto.h"
+#include "crypto-utils.h"
 #include "handshake.h"
 #include "log.h"
 #include "peer-io.h"
@@ -324,8 +324,8 @@ sendYa (tr_handshake * handshake)
   walk += len;
 
   /* add some bullshit padding */
-  len = tr_cryptoRandInt (PadA_MAXLEN);
-  tr_cryptoRandBuf (walk, len);
+  len = tr_rand_int (PadA_MAXLEN);
+  tr_rand_buffer (walk, len);
   walk += len;
 
   /* send it */
@@ -748,8 +748,8 @@ readYa (tr_handshake    * handshake,
   myKey = tr_cryptoGetMyPublicKey (handshake->crypto, &len);
   memcpy (walk, myKey, len);
   walk += len;
-  len = tr_cryptoRandInt (PadB_MAXLEN);
-  tr_cryptoRandBuf (walk, len);
+  len = tr_rand_int (PadB_MAXLEN);
+  tr_rand_buffer (walk, len);
   walk += len;
 
   setReadState (handshake, AWAITING_PAD_A);
