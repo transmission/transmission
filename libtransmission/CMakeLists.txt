@@ -15,6 +15,7 @@ set(${PROJECT_NAME}_SOURCES
     ConvertUTF.c
     crypto.c
     crypto-utils.c
+    crypto-utils-fallback.c
     crypto-utils-openssl.c
     error.c
     fdlimit.c

@@ -10,10 +10,33 @@
 #include <assert.h>
 #include <stdarg.h>
 #include <stdlib.h> /* abs (), srand (), rand () */
+#include <string.h> /* memmove (), memset () */
 
 #include "transmission.h"
 #include "crypto-utils.h"
 #include "utils.h"
+
+/***
+****
+***/
+
+void
+tr_dh_align_key (uint8_t * key_buffer,
+                 size_t    key_size,
+                 size_t    buffer_size)
+{
+  assert (key_size <= buffer_size);
+
+  /* DH can generate key sizes that are smaller than the size of
+     key buffer with exponentially decreasing probability, in which case
+     the msb's of key buffer need to be zeroed appropriately. */
+  if (key_size < buffer_size)
+    {
+      const size_t offset = buffer_size - key_size;
+      memmove (key_buffer + offset, key_buffer, key_size);
+      memset (key_buffer, 0, offset);
+    }
+}
 
 /***
 ****

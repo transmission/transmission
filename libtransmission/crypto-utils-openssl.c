@@ -9,6 +9,8 @@
 
 #include <assert.h>
 
+#include <openssl/bn.h>
+#include <openssl/dh.h>
 #include <openssl/err.h>
 #include <openssl/evp.h>
 #include <openssl/rand.h>
@@ -17,6 +19,9 @@
 #include "crypto-utils.h"
 #include "log.h"
 #include "utils.h"
+
+#define TR_CRYPTO_DH_SECRET_FALLBACK
+#include "crypto-utils-fallback.c"
 
 /***
 ****
@@ -187,6 +192,101 @@ tr_rc4_process (tr_rc4_ctx_t   handle,
   assert (output != NULL);
 
   check_result (EVP_CipherUpdate (handle, output, &output_length, input, length));
+}
+
+/***
+****
+***/
+
+tr_dh_ctx_t
+tr_dh_new (const uint8_t * prime_num,
+           size_t          prime_num_length,
+           const uint8_t * generator_num,
+           size_t          generator_num_length)
+{
+  DH * handle = DH_new ();
+
+  assert (prime_num != NULL);
+  assert (generator_num != NULL);
+
+  if (!check_pointer (handle->p = BN_bin2bn (prime_num, prime_num_length, NULL)) ||
+      !check_pointer (handle->g = BN_bin2bn (generator_num, generator_num_length, NULL)))
+    {
+      DH_free (handle);
+      handle = NULL;
+    }
+
+  return handle;
+}
+
+void
+tr_dh_free (tr_dh_ctx_t handle)
+{
+  if (handle == NULL)
+    return;
+
+  DH_free (handle);
+}
+
+bool
+tr_dh_make_key (tr_dh_ctx_t   raw_handle,
+                size_t        private_key_length,
+                uint8_t     * public_key,
+                size_t      * public_key_length)
+{
+  DH * handle = raw_handle;
+  int dh_size, my_public_key_length;
+
+  assert (handle != NULL);
+  assert (public_key != NULL);
+
+  handle->length = private_key_length * 8;
+
+  if (!check_result (DH_generate_key (handle)))
+    return false;
+
+  my_public_key_length = BN_bn2bin (handle->pub_key, public_key);
+  dh_size = DH_size (handle);
+
+  tr_dh_align_key (public_key, my_public_key_length, dh_size);
+
+  if (public_key_length != NULL)
+    *public_key_length = dh_size;
+
+  return true;
+}
+
+tr_dh_secret_t
+tr_dh_agree (tr_dh_ctx_t     handle,
+             const uint8_t * other_public_key,
+             size_t          other_public_key_length)
+{
+  struct tr_dh_secret * ret;
+  int dh_size, secret_key_length;
+  BIGNUM * other_key;
+
+  assert (handle != NULL);
+  assert (other_public_key != NULL);
+
+  if (!check_pointer (other_key = BN_bin2bn (other_public_key, other_public_key_length, NULL)))
+    return NULL;
+
+  dh_size = DH_size (handle);
+  ret = tr_dh_secret_new (dh_size);
+
+  secret_key_length = DH_compute_key (ret->key, other_key, handle);
+  if (check_result_neq (secret_key_length, -1))
+    {
+      tr_dh_secret_align (ret, secret_key_length);
+    }
+  else
+    {
+      tr_dh_secret_free (ret);
+      ret = NULL;
+    }
+
+  BN_free (other_key);
+  return ret;
 }
 
 /***

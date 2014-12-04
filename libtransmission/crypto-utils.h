@@ -24,6 +24,10 @@
 typedef void * tr_sha1_ctx_t;
  /** @brief Opaque RC4 context type. */
 typedef void * tr_rc4_ctx_t;
+ /** @brief Opaque DH context type. */
+typedef void * tr_dh_ctx_t;
+ /** @brief Opaque DH secret key type. */
+typedef void * tr_dh_secret_t;
 
 /**
  * @brief Generate a SHA1 hash from one or more chunks of memory.
@@ -75,6 +79,57 @@ void             tr_rc4_process        (tr_rc4_ctx_t     handle,
                                         const void     * input,
                                         void           * output,
                                         size_t           length);
+
+/**
+ * @brief Allocate and initialize new Diffie-Hellman (DH) key exchange context.
+ */
+tr_dh_ctx_t      tr_dh_new             (const uint8_t  * prime_num,
+                                        size_t           prime_num_length,
+                                        const uint8_t  * generator_num,
+                                        size_t           generator_num_length);
+
+/**
+ * @brief Free DH key exchange context.
+ */
+void             tr_dh_free            (tr_dh_ctx_t      handle);
+
+/**
+ * @brief Generate private and public DH keys, export public key.
+ */
+bool             tr_dh_make_key        (tr_dh_ctx_t      handle,
+                                        size_t           private_key_length,
+                                        uint8_t        * public_key,
+                                        size_t         * public_key_length);
+
+/**
+ * @brief Perform DH key exchange, generate secret key.
+ */
+tr_dh_secret_t   tr_dh_agree           (tr_dh_ctx_t      handle,
+                                        const uint8_t  * other_public_key,
+                                        size_t           other_public_key_length);
+
+/**
+ * @brief Calculate SHA1 hash of DH secret key, prepending and/or appending
+ *        given data to the key during calculation.
+ */
+bool             tr_dh_secret_derive   (tr_dh_secret_t   handle,
+                                        const void     * prepend_data,
+                                        size_t           prepend_data_size,
+                                        const void     * append_data,
+                                        size_t           append_data_size,
+                                        uint8_t        * hash);
+
+/**
+ * @brief Free DH secret key returned by @ref tr_dh_agree.
+ */
+void             tr_dh_secret_free     (tr_dh_secret_t   handle);
+
+/**
+ * @brief Align DH key (big-endian number) to required length (internal, do not use).
+ */
+void             tr_dh_align_key       (uint8_t        * key_buffer,
+                                        size_t           key_size,
+                                        size_t           buffer_size);
 
 /**
  * @brief Returns a random number in the range of [0...upper_bound).

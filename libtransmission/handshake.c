@@ -101,7 +101,6 @@ struct tr_handshake
   tr_peerIo *           io;
   tr_crypto *           crypto;
   tr_session *          session;
-  uint8_t               mySecret[KEY_LEN];
   handshake_state_t     state;
   tr_encryption_mode    encryptionMode;
   uint16_t              pad_c_len;
@@ -385,11 +384,18 @@ getCryptoSelect (const tr_handshake * handshake,
   return 0;
 }
 
+static void
+computeRequestHash (const tr_handshake * handshake,
+                    const char         * name,
+                    uint8_t            * hash)
+{
+  tr_cryptoSecretKeySha1 (handshake->crypto, name, 4, NULL, 0, hash);
+}
+
 static int
 readYb (tr_handshake * handshake, struct evbuffer * inbuf)
 {
   int isEncrypted;
-  const uint8_t * secret;
   uint8_t yb[KEY_LEN];
   struct evbuffer * outbuf;
   size_t needlen = HANDSHAKE_NAME_LEN;
@@ -420,8 +426,7 @@ readYb (tr_handshake * handshake, struct evbuffer * inbuf)
 
   /* compute the secret */
   evbuffer_remove (inbuf, yb, KEY_LEN);
-  secret = tr_cryptoComputeSecret (handshake->crypto, yb);
-  memcpy (handshake->mySecret, secret, KEY_LEN);
+  tr_cryptoComputeSecret (handshake->crypto, yb);
 
   /* now send these: HASH ('req1', S), HASH ('req2', SKEY) xor HASH ('req3', S),
    * ENCRYPT (VC, crypto_provide, len (PadC), PadC, len (IA)), ENCRYPT (IA) */
@@ -430,7 +435,7 @@ readYb (tr_handshake * handshake, struct evbuffer * inbuf)
   /* HASH ('req1', S) */
   {
     uint8_t req1[SHA_DIGEST_LENGTH];
-    tr_sha1 (req1, "req1", 4, secret, KEY_LEN, NULL);
+    computeRequestHash (handshake, "req1", req1);
     evbuffer_add (outbuf, req1, SHA_DIGEST_LENGTH);
   }
 
@@ -442,7 +447,7 @@ readYb (tr_handshake * handshake, struct evbuffer * inbuf)
     uint8_t buf[SHA_DIGEST_LENGTH];
 
     tr_sha1 (req2, "req2", 4, tr_cryptoGetTorrentHash (handshake->crypto), SHA_DIGEST_LENGTH, NULL);
-    tr_sha1 (req3, "req3", 4, secret, KEY_LEN, NULL);
+    computeRequestHash (handshake, "req3", req3);
 
     for (i=0; i<SHA_DIGEST_LENGTH; ++i)
       buf[i] = req2[i] ^ req3[i];
@@ -728,7 +733,6 @@ readYa (tr_handshake    * handshake,
   uint8_t ya[KEY_LEN];
   uint8_t * walk, outbuf[KEY_LEN + PadB_MAXLEN];
   const uint8_t * myKey;
-  const uint8_t * secret;
   int len;
 
   dbgmsg (handshake, "in readYa... need %d, have %"TR_PRIuSIZE,
@@ -738,9 +742,8 @@ readYa (tr_handshake    * handshake,
 
   /* read the incoming peer's public key */
   evbuffer_remove (inbuf, ya, KEY_LEN);
-  secret = tr_cryptoComputeSecret (handshake->crypto, ya);
-  memcpy (handshake->mySecret, secret, KEY_LEN);
-  tr_sha1 (handshake->myReq1, "req1", 4, secret, KEY_LEN, NULL);
+  tr_cryptoComputeSecret (handshake->crypto, ya);
+  computeRequestHash (handshake, "req1", handshake->myReq1);
 
   /* send our public key to the peer */
   dbgmsg (handshake, "sending B->A: Diffie Hellman Yb, PadB");
@@ -810,7 +813,7 @@ readCryptoProvide (tr_handshake    * handshake,
    * by building the latter and xor'ing it with what the peer sent us */
   dbgmsg (handshake, "reading obfuscated torrent hash...");
   evbuffer_remove (inbuf, req2, SHA_DIGEST_LENGTH);
-  tr_sha1 (req3, "req3", 4, handshake->mySecret, KEY_LEN, NULL);
+  computeRequestHash (handshake, "req3", req3);
   for (i=0; i<SHA_DIGEST_LENGTH; ++i)
     obfuscatedTorrentHash[i] = req2[i] ^ req3[i];
   if ((tor = tr_torrentFindFromObfuscatedHash (handshake->session, obfuscatedTorrentHash)))

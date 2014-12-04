@@ -8,30 +8,18 @@
  */
 
 #include <assert.h>
-#include <stdarg.h>
 #include <string.h> /* memcpy (), memmove (), memset (), strcmp () */
-
-#include <openssl/bn.h>
-#include <openssl/dh.h>
-#include <openssl/err.h>
 
 #include "transmission.h"
 #include "crypto.h"
 #include "crypto-utils.h"
-#include "log.h"
 #include "utils.h"
-
-#define MY_NAME "tr_crypto"
 
 /**
 ***
 **/
 
-#define KEY_LEN 96
-
 #define PRIME_LEN 96
-
-#define DH_PRIVKEY_LEN_MIN 16
 #define DH_PRIVKEY_LEN 20
 
 static const uint8_t dh_P[PRIME_LEN] =
@@ -52,53 +40,17 @@ static const uint8_t dh_G[] = { 2 };
 ***
 **/
 
-#define logErrorFromSSL(...) \
-  do { \
-    if (tr_logLevelIsActive (TR_LOG_ERROR)) { \
-      char buf[512]; \
-      ERR_error_string_n (ERR_get_error (), buf, sizeof (buf)); \
-      tr_logAddMessage (__FILE__, __LINE__, TR_LOG_ERROR, MY_NAME, "%s", buf); \
-    } \
-  } while (0)
-
 static void
 ensureKeyExists (tr_crypto * crypto)
 {
   if (crypto->dh == NULL)
     {
-      int len, offset;
-      DH * dh = DH_new ();
+      size_t public_key_length;
 
-      dh->p = BN_bin2bn (dh_P, sizeof (dh_P), NULL);
-      if (dh->p == NULL)
-        logErrorFromSSL ();
+      crypto->dh = tr_dh_new (dh_P, sizeof (dh_P), dh_G, sizeof (dh_G));
+      tr_dh_make_key (crypto->dh, DH_PRIVKEY_LEN, crypto->myPublicKey, &public_key_length);
 
-      dh->g = BN_bin2bn (dh_G, sizeof (dh_G), NULL);
-      if (dh->g == NULL)
-        logErrorFromSSL ();
-
-      /* private DH value: strong random BN of DH_PRIVKEY_LEN*8 bits */
-      dh->priv_key = BN_new ();
-      do
-        {
-          if (BN_rand (dh->priv_key, DH_PRIVKEY_LEN * 8, -1, 0) != 1)
-            logErrorFromSSL ();
-        }
-      while (BN_num_bits (dh->priv_key) < DH_PRIVKEY_LEN_MIN * 8);
-
-      if (!DH_generate_key (dh))
-        logErrorFromSSL ();
-
-      /* DH can generate key sizes that are smaller than the size of
-         P with exponentially decreasing probability, in which case
-         the msb's of myPublicKey need to be zeroed appropriately. */
-      len = BN_num_bytes (dh->pub_key);
-      offset = KEY_LEN - len;
-      assert (len <= KEY_LEN);
-      memset (crypto->myPublicKey, 0, offset);
-      BN_bn2bin (dh->pub_key, crypto->myPublicKey + offset);
-
-      crypto->dh = dh;
+      assert (public_key_length == KEY_LEN);
     }
 }
 
@@ -107,7 +59,6 @@ tr_cryptoConstruct (tr_crypto * crypto, const uint8_t * torrentHash, bool isInco
 {
   memset (crypto, 0, sizeof (tr_crypto));
 
-  crypto->dh = NULL;
   crypto->isIncoming = isIncoming;
   tr_cryptoSetTorrentHash (crypto, torrentHash);
 }
@@ -115,8 +66,8 @@ tr_cryptoConstruct (tr_crypto * crypto, const uint8_t * torrentHash, bool isInco
 void
 tr_cryptoDestruct (tr_crypto * crypto)
 {
-  if (crypto->dh != NULL)
-    DH_free (crypto->dh);
+  tr_dh_secret_free (crypto->mySecret);
+  tr_dh_free (crypto->dh);
   tr_rc4_free (crypto->enc_key);
   tr_rc4_free (crypto->dec_key);
 }
@@ -125,37 +76,13 @@ tr_cryptoDestruct (tr_crypto * crypto)
 ***
 **/
 
-const uint8_t*
+bool
 tr_cryptoComputeSecret (tr_crypto *     crypto,
                         const uint8_t * peerPublicKey)
 {
-  DH * dh;
-  int len;
-  uint8_t secret[KEY_LEN];
-  BIGNUM * bn = BN_bin2bn (peerPublicKey, KEY_LEN, NULL);
-
   ensureKeyExists (crypto);
-  dh = crypto->dh;
-
-  assert (DH_size (dh) == KEY_LEN);
-
-  len = DH_compute_key (secret, bn, dh);
-  if (len == -1)
-    {
-      logErrorFromSSL ();
-    }
-  else
-    {
-      int offset;
-      assert (len <= KEY_LEN);
-      offset = KEY_LEN - len;
-      memset (crypto->mySecret, 0, offset);
-      memcpy (crypto->mySecret + offset, secret, len);
-      crypto->mySecretIsSet = true;
-    }
-
-  BN_free (bn);
-  return crypto->mySecret;
+  crypto->mySecret = tr_dh_agree (crypto->dh, peerPublicKey, KEY_LEN);
+  return crypto->mySecret != NULL;
 }
 
 const uint8_t*
@@ -179,16 +106,14 @@ initRC4 (tr_crypto    * crypto,
   uint8_t buf[SHA_DIGEST_LENGTH];
 
   assert (crypto->torrentHashIsSet);
-  assert (crypto->mySecretIsSet);
 
   if (*setme == NULL)
     *setme = tr_rc4_new ();
 
-  if (tr_sha1 (buf,
-               key, 4,
-               crypto->mySecret, KEY_LEN,
-               crypto->torrentHash, SHA_DIGEST_LENGTH,
-               NULL))
+  if (tr_cryptoSecretKeySha1 (crypto,
+                              key, 4,
+                              crypto->torrentHash, SHA_DIGEST_LENGTH,
+                              buf))
     tr_rc4_set_key (*setme, buf, SHA_DIGEST_LENGTH);
 }
 
@@ -244,6 +169,23 @@ tr_cryptoEncrypt (tr_crypto  * crypto,
     }
 
   tr_rc4_process (crypto->enc_key, buf_in, buf_out, buf_len);
+}
+
+bool
+tr_cryptoSecretKeySha1 (const tr_crypto * crypto,
+                        const void      * prepend_data,
+                        size_t            prepend_data_size,
+                        const void      * append_data,
+                        size_t            append_data_size,
+                        uint8_t         * hash)
+{
+  assert (crypto != NULL);
+  assert (crypto->mySecret != NULL);
+
+  return tr_dh_secret_derive (crypto->mySecret,
+                              prepend_data, prepend_data_size,
+                              append_data, append_data_size,
+                              hash);
 }
 
 /**

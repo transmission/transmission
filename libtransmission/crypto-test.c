@@ -73,8 +73,8 @@ test_encrypt_decrypt (void)
 
   tr_cryptoConstruct (&a, hash, false);
   tr_cryptoConstruct (&b, hash, true);
-  tr_cryptoComputeSecret (&a, tr_cryptoGetMyPublicKey (&b, &i));
-  tr_cryptoComputeSecret (&b, tr_cryptoGetMyPublicKey (&a, &i));
+  check (tr_cryptoComputeSecret (&a, tr_cryptoGetMyPublicKey (&b, &i)));
+  check (tr_cryptoComputeSecret (&b, tr_cryptoGetMyPublicKey (&a, &i)));
 
   tr_cryptoEncryptInit (&a);
   tr_cryptoEncrypt (&a, sizeof (test1), test1, buf11);

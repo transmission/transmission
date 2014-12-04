@@ -24,11 +24,9 @@
 *** @{
 **/
 
-#include <openssl/dh.h> /* DH */
-
 enum
 {
-    KEY_LEN = 96
+  KEY_LEN = 96
 };
 
 /** @brief Holds state information for encrypted peer communications */
@@ -36,13 +34,12 @@ typedef struct
 {
     tr_rc4_ctx_t    dec_key;
     tr_rc4_ctx_t    enc_key;
-    DH *            dh;
+    tr_dh_ctx_t     dh;
     uint8_t         myPublicKey[KEY_LEN];
-    uint8_t         mySecret[KEY_LEN];
+    tr_dh_secret_t  mySecret;
     uint8_t         torrentHash[SHA_DIGEST_LENGTH];
     bool            isIncoming;
     bool            torrentHashIsSet;
-    bool            mySecretIsSet;
 }
 tr_crypto;
 
@@ -59,7 +56,7 @@ const uint8_t* tr_cryptoGetTorrentHash (const tr_crypto * crypto);
 
 bool           tr_cryptoHasTorrentHash (const tr_crypto * crypto);
 
-const uint8_t* tr_cryptoComputeSecret (tr_crypto *     crypto,
+bool           tr_cryptoComputeSecret (tr_crypto *     crypto,
                                        const uint8_t * peerPublicKey);
 
 const uint8_t* tr_cryptoGetMyPublicKey (const tr_crypto * crypto,
@@ -78,6 +75,13 @@ void           tr_cryptoEncrypt (tr_crypto *  crypto,
                                  size_t       buflen,
                                  const void * buf_in,
                                  void *       buf_out);
+
+bool           tr_cryptoSecretKeySha1 (const tr_crypto * crypto,
+                                       const void      * prepend_data,
+                                       size_t            prepend_data_size,
+                                       const void      * append_data,
+                                       size_t            append_data_size,
+                                       uint8_t         * hash);
 
 /* @} */
 
