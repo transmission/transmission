@@ -102,6 +102,10 @@ tr_sha1_update (tr_sha1_ctx_t   handle,
                 size_t          data_length)
 {
   assert (handle != NULL);
+
+  if (data_length == 0)
+    return true;
+
   assert (data != NULL);
 
   return check_result (EVP_DigestUpdate (handle, data, data_length));
@@ -175,6 +179,10 @@ tr_rc4_process (tr_rc4_ctx_t   handle,
   int output_length;
 
   assert (handle != NULL);
+
+  if (length == 0)
+    return;
+
   assert (input != NULL);
   assert (output != NULL);
 
