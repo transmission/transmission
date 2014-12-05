@@ -458,6 +458,10 @@
 		BEFC1E560C07861A00B0BB3C /* completion.c in Sources */ = {isa = PBXBuildFile; fileRef = BEFC1E1D0C07861A00B0BB3C /* completion.c */; };
 		BEFC1E570C07861A00B0BB3C /* clients.h in Headers */ = {isa = PBXBuildFile; fileRef = BEFC1E1E0C07861A00B0BB3C /* clients.h */; };
 		BEFC1E580C07861A00B0BB3C /* clients.c in Sources */ = {isa = PBXBuildFile; fileRef = BEFC1E1F0C07861A00B0BB3C /* clients.c */; };
+		C1033E071A3279B800EF44D8 /* crypto-utils-fallback.c in Sources */ = {isa = PBXBuildFile; fileRef = C1033E031A3279B800EF44D8 /* crypto-utils-fallback.c */; };
+		C1033E081A3279B800EF44D8 /* crypto-utils-openssl.c in Sources */ = {isa = PBXBuildFile; fileRef = C1033E041A3279B800EF44D8 /* crypto-utils-openssl.c */; };
+		C1033E091A3279B800EF44D8 /* crypto-utils.c in Sources */ = {isa = PBXBuildFile; fileRef = C1033E051A3279B800EF44D8 /* crypto-utils.c */; };
+		C1033E0A1A3279B800EF44D8 /* crypto-utils.h in Headers */ = {isa = PBXBuildFile; fileRef = C1033E061A3279B800EF44D8 /* crypto-utils.h */; };
 		C1077A4E183EB29600634C22 /* error.c in Sources */ = {isa = PBXBuildFile; fileRef = C1077A4A183EB29600634C22 /* error.c */; };
 		C1077A4F183EB29600634C22 /* error.h in Headers */ = {isa = PBXBuildFile; fileRef = C1077A4B183EB29600634C22 /* error.h */; };
 		C1077A50183EB29600634C22 /* file-posix.c in Sources */ = {isa = PBXBuildFile; fileRef = C1077A4C183EB29600634C22 /* file-posix.c */; };
@@ -1197,6 +1201,10 @@
 		BEFC1E1D0C07861A00B0BB3C /* completion.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = completion.c; path = libtransmission/completion.c; sourceTree = "<group>"; };
 		BEFC1E1E0C07861A00B0BB3C /* clients.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = clients.h; path = libtransmission/clients.h; sourceTree = "<group>"; };
 		BEFC1E1F0C07861A00B0BB3C /* clients.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = clients.c; path = libtransmission/clients.c; sourceTree = "<group>"; };
+		C1033E031A3279B800EF44D8 /* crypto-utils-fallback.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "crypto-utils-fallback.c"; path = "libtransmission/crypto-utils-fallback.c"; sourceTree = "<group>"; };
+		C1033E041A3279B800EF44D8 /* crypto-utils-openssl.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "crypto-utils-openssl.c"; path = "libtransmission/crypto-utils-openssl.c"; sourceTree = "<group>"; };
+		C1033E051A3279B800EF44D8 /* crypto-utils.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "crypto-utils.c"; path = "libtransmission/crypto-utils.c"; sourceTree = "<group>"; };
+		C1033E061A3279B800EF44D8 /* crypto-utils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "crypto-utils.h"; path = "libtransmission/crypto-utils.h"; sourceTree = "<group>"; };
 		C1077A4A183EB29600634C22 /* error.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = error.c; path = libtransmission/error.c; sourceTree = "<group>"; };
 		C1077A4B183EB29600634C22 /* error.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = error.h; path = libtransmission/error.h; sourceTree = "<group>"; };
 		C1077A4C183EB29600634C22 /* file-posix.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "file-posix.c"; path = "libtransmission/file-posix.c"; sourceTree = "<group>"; };
@@ -1682,6 +1690,10 @@
 				A29DF8B60DB2544C00D04E5A /* resume.c */,
 				A29DF8B70DB2544C00D04E5A /* resume.h */,
 				A29DF8B80DB2544C00D04E5A /* torrent.h */,
+				C1033E031A3279B800EF44D8 /* crypto-utils-fallback.c */,
+				C1033E041A3279B800EF44D8 /* crypto-utils-openssl.c */,
+				C1033E051A3279B800EF44D8 /* crypto-utils.c */,
+				C1033E061A3279B800EF44D8 /* crypto-utils.h */,
 				4D36BA600CA2F00800A63CA5 /* crypto.c */,
 				4D36BA610CA2F00800A63CA5 /* crypto.h */,
 				4D36BA630CA2F00800A63CA5 /* handshake.c */,
@@ -2081,6 +2093,7 @@
 				4D36BA7A0CA2F00800A63CA5 /* peer-msgs.h in Headers */,
 				4D36BA7B0CA2F00800A63CA5 /* ptrarray.h in Headers */,
 				A25D2CBE0CF4C73E0096A262 /* stats.h in Headers */,
+				C1033E0A1A3279B800EF44D8 /* crypto-utils.h in Headers */,
 				A29DF8BA0DB2544C00D04E5A /* resume.h in Headers */,
 				A29DF8BB0DB2544C00D04E5A /* torrent.h in Headers */,
 				A29DF8BE0DB2545F00D04E5A /* verify.h in Headers */,
@@ -2673,6 +2686,7 @@
 				BEFC1E360C07861A00B0BB3C /* port-forwarding.c in Sources */,
 				BEFC1E3C0C07861A00B0BB3C /* platform.c in Sources */,
 				BEFC1E460C07861A00B0BB3C /* net.c in Sources */,
+				C1033E091A3279B800EF44D8 /* crypto-utils.c in Sources */,
 				BEFC1E480C07861A00B0BB3C /* natpmp.c in Sources */,
 				C1077A4E183EB29600634C22 /* error.c in Sources */,
 				BEFC1E4A0C07861A00B0BB3C /* metainfo.c in Sources */,
@@ -2687,6 +2701,7 @@
 				4D36BA6F0CA2F00800A63CA5 /* crypto.c in Sources */,
 				4D36BA720CA2F00800A63CA5 /* handshake.c in Sources */,
 				4D36BA740CA2F00800A63CA5 /* peer-io.c in Sources */,
+				C1033E071A3279B800EF44D8 /* crypto-utils-fallback.c in Sources */,
 				4D36BA770CA2F00800A63CA5 /* peer-mgr.c in Sources */,
 				C1077A50183EB29600634C22 /* file-posix.c in Sources */,
 				4D36BA790CA2F00800A63CA5 /* peer-msgs.c in Sources */,
@@ -2702,6 +2717,7 @@
 				C1305EBE186A13B100F03351 /* file.c in Sources */,
 				4DB74F080E8CD75100AEB1A8 /* wildmat.c in Sources */,
 				A21FBBAC0EDA78C300BC3C51 /* bandwidth.c in Sources */,
+				C1033E081A3279B800EF44D8 /* crypto-utils-openssl.c in Sources */,
 				A22CFCA80FC24ED80009BD3E /* tr-dht.c in Sources */,
 				0A6169A70FE5C9A200C66CE6 /* bitfield.c in Sources */,
 				A25964A6106D73A800453B31 /* announcer.c in Sources */,
