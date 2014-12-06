@@ -271,28 +271,27 @@ if(CMAKE_C_COMPILER_ID STREQUAL "GNU" OR CMAKE_C_COMPILER_ID STREQUAL "Clang")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++11")
 
     set(NEEDED_COMPILER_FLAGS
-        -Wpointer-arith
+        -Wcast-align
+        -Wextra
+        -Wfloat-equal
         -Wformat
         -Wformat-security
-        -Wcast-align
-        -Wundef
-        -Wcast-align
+        -Winit-self
+        -Winline
         -Wmissing-declarations
         -Wmissing-format-attribute
+        -Wpointer-arith
         -Wredundant-decls
+        -Wundef
         -Wunused-parameter
-        -Wwrite-strings
-        -Winline
-        -Wfloat-equal
-        -Wextra
-        -Winit-self
-        -Wvariadic-macros)
+        -Wvariadic-macros
+        -Wwrite-strings)
 
     set(NEEDED_C_COMPILER_FLAGS
         ${NEEDED_COMPILER_FLAGS}
-        -Wstrict-prototypes
+        -Wdeclaration-after-statement
         -Wnested-externs
-        -Wdeclaration-after-statement)
+        -Wstrict-prototypes)
     string(REPLACE ";" " " NEEDED_C_COMPILER_FLAGS_STRING "${NEEDED_C_COMPILER_FLAGS}")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${NEEDED_C_COMPILER_FLAGS_STRING}")
 
@@ -317,6 +316,7 @@ foreach(H ${NEEDED_HEADERS})
 endforeach()
 
 set(NEEDED_FUNCTIONS
+    canonicalize_file_name
     daemon
     fallocate64
     getmntent

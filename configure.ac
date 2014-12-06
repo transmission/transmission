@@ -75,7 +75,7 @@ AC_PROG_CXX
 AC_C_INLINE
 if test "x$GCC" = "xyes" ; then
 
-    CFLAGS="$CFLAGS -std=gnu99 -ggdb3 -Wall -W -Wpointer-arith -Wformat-security -Wcast-align -Wundef -Wcast-align -Wstrict-prototypes -Wmissing-declarations -Wmissing-format-attribute -Wredundant-decls -Wnested-externs -Wunused-parameter -Wwrite-strings -Winline -Wfloat-equal"
+    CFLAGS="$CFLAGS -std=gnu99 -ggdb3 -Wall -W -Wpointer-arith -Wformat-security -Wundef -Wcast-align -Wstrict-prototypes -Wmissing-declarations -Wmissing-format-attribute -Wredundant-decls -Wnested-externs -Wunused-parameter -Wwrite-strings -Winline -Wfloat-equal"
 
     dnl figure out gcc version
     AC_MSG_CHECKING([gcc version])
@@ -99,7 +99,7 @@ AC_HEADER_STDC
 AC_HEADER_TIME
 
 AC_CHECK_HEADERS([stdbool.h])
-AC_CHECK_FUNCS([iconv_open pread pwrite lrintf strlcpy daemon dirname basename strcasecmp localtime_r fallocate64 posix_fallocate memmem strsep strtold syslog valloc getpagesize posix_memalign statvfs htonll ntohll mkdtemp])
+AC_CHECK_FUNCS([iconv_open pread pwrite lrintf strlcpy daemon dirname basename canonicalize_file_name strcasecmp localtime_r fallocate64 posix_fallocate memmem strsep strtold syslog valloc getpagesize posix_memalign statvfs htonll ntohll mkdtemp])
 AC_PROG_INSTALL
 AC_PROG_MAKE_SET
 ACX_PTHREAD
