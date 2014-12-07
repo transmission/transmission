@@ -441,6 +441,7 @@ test_multifile_torrent (void)
   ***  Test renaming prefixes (shouldn't work)
   **/
 
+  tr_ctorFree (ctor);
   tr_torrentRemove (tor, false, NULL);
   do {
     tr_wait_msec (10);

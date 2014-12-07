@@ -202,16 +202,20 @@ test_base64 (void)
   out = tr_base64_encode ("", 0, &len);
   check_int_eq (0, len);
   check_streq ("", out);
+  tr_free (out);
   out = tr_base64_decode ("", 0, &len);
   check_int_eq (0, len);
   check_streq ("", out);
+  tr_free (out);
 
   out = tr_base64_encode (NULL, 0, &len);
   check_int_eq (0, len);
   check (out == NULL);
+  tr_free (out);
   out = tr_base64_decode (NULL, 0, &len);
   check_int_eq (0, len);
   check (out == NULL);
+  tr_free (out);
 
 #define MAX_BUF_SIZE 1024
 
