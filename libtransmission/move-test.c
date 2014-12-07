@@ -76,7 +76,7 @@ test_incomplete_dir_impl (const char * incomplete_dir, const char * download_dir
   tr_torrent * tor;
   tr_completeness completeness;
   const tr_completeness completeness_unset = -1;
-  const time_t deadline = time(NULL) + 5;
+  const time_t deadline = time(NULL) + 300;
   tr_variant settings;
 
   /* init the session */
@@ -175,7 +175,7 @@ test_set_location (void)
   char * target_dir;
   tr_torrent * tor;
   tr_session * session;
-  const time_t deadline = time(NULL) + 5;
+  const time_t deadline = time(NULL) + 300;
 
   /* init the session */
   session = libttest_session_init (NULL);
