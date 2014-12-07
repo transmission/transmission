@@ -360,6 +360,7 @@ endif()
 
 if(ENABLE_TESTS)
     enable_testing()
+    include(CTest)
 endif()
 
 add_subdirectory(libtransmission)
