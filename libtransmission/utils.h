@@ -15,6 +15,7 @@
 #include <stddef.h> /* size_t */
 #include <time.h> /* time_t */
 
+#include "error.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -396,10 +397,10 @@ int tr_gettimeofday (struct timeval * tv);
 
 /**
  * @brief move a file
- * @return 0 on success; otherwise, return -1 and set errno
+ * @return `True` on success, `false` otherwise (with `error` set accordingly).
  */
-int tr_moveFile (const char * oldpath, const char * newpath,
-                 bool * renamed) TR_GNUC_NONNULL (1,2);
+bool tr_moveFile (const char * oldpath, const char * newpath,
+                  tr_error ** error) TR_GNUC_NONNULL (1,2);
 
 /** @brief convenience function to remove an item from an array */
 void tr_removeElementFromArray (void         * array,

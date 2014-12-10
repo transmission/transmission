@@ -16,11 +16,15 @@
 
 #define TR_ERROR_IS_ENOSPC(code) ((code) == ERROR_DISK_FULL)
 
+#define TR_ERROR_EINVAL ERROR_INVALID_PARAMETER
+
 #else /* _WIN32 */
 
 #include <errno.h>
 
 #define TR_ERROR_IS_ENOSPC(code) ((code) == ENOSPC)
+
+#define TR_ERROR_EINVAL EINVAL
 
 #endif /* _WIN32 */
 

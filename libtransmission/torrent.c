@@ -3094,14 +3094,15 @@ setLocation (void * vdata)
 
               if (do_move && !tr_sys_path_is_same (oldpath, newpath, NULL))
                 {
-                  bool renamed = false;
-                  errno = 0;
+                  tr_error * error = NULL;
+
                   tr_logAddTorInfo (tor, "moving \"%s\" to \"%s\"", oldpath, newpath);
-                  if (tr_moveFile (oldpath, newpath, &renamed))
+                  if (!tr_moveFile (oldpath, newpath, &error))
                     {
                       err = true;
                       tr_logAddTorErr (tor, "error moving \"%s\" to \"%s\": %s",
-                                       oldpath, newpath, tr_strerror (errno));
+                                       oldpath, newpath, error->message);
+                      tr_error_free (error);
                     }
                 }
 

@@ -135,8 +135,6 @@ tr_error_clear (tr_error ** error)
   *error = NULL;
 }
 
-#if 0
-
 static void
 error_prefix_valist (tr_error   ** error,
                      const char  * prefix_format,
@@ -194,5 +192,3 @@ tr_error_propagate_prefixed (tr_error   ** new_error,
   error_prefix_valist (new_error, prefix_format, args);
   va_end (args);
 }
-
-#endif /* 0 */

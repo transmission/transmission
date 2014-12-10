@@ -46,6 +46,7 @@
 
 #include "transmission.h"
 #include "error.h"
+#include "error-types.h"
 #include "file.h"
 #include "ConvertUTF.h"
 #include "list.h"
@@ -1410,67 +1411,72 @@ tr_strratio (char * buf, size_t buflen, double ratio, const char * infinity)
 ****
 ***/
 
-int
-tr_moveFile (const char * oldpath, const char * newpath, bool * renamed)
+bool
+tr_moveFile (const char * oldpath, const char * newpath, tr_error ** error)
 {
   tr_sys_file_t in;
   tr_sys_file_t out;
-  char * buf;
+  char * buf = NULL;
   tr_sys_path_info info;
   uint64_t bytesLeft;
   const size_t buflen = 1024 * 128; /* 128 KiB buffer */
-  tr_error * error = NULL;
 
   /* make sure the old file exists */
-  if (!tr_sys_path_get_info (oldpath, 0, &info, &error))
+  if (!tr_sys_path_get_info (oldpath, 0, &info, error))
     {
-      const int err = error->code;
-      tr_error_free (error);
-      errno = err;
-      return -1;
+      tr_error_prefix (error, "Unable to get information on old file: ");
+      return false;
     }
   if (info.type != TR_SYS_PATH_IS_FILE)
     {
-      errno = ENOENT;
-      return -1;
+      tr_error_set_literal (error, TR_ERROR_EINVAL, "Old path does not point to a file.");
+      return false;
     }
-  bytesLeft = info.size;
 
   /* make sure the target directory exists */
   {
     char * newdir = tr_sys_path_dirname (newpath, NULL);
-    const bool i = tr_sys_dir_create (newdir, TR_SYS_DIR_CREATE_PARENTS, 0777, &error);
+    const bool i = tr_sys_dir_create (newdir, TR_SYS_DIR_CREATE_PARENTS, 0777, error);
     tr_free (newdir);
     if (!i)
       {
-        const int err = error->code;
-        tr_error_free (error);
-        errno = err;
-        return -1;
+        tr_error_prefix (error, "Unable to create directory for new file: ");
+        return false;
       }
   }
 
   /* they might be on the same filesystem... */
-  {
-    const bool i = tr_sys_path_rename (oldpath, newpath, NULL);
-    if (renamed != NULL)
-      *renamed = i;
-    if (i)
-      return 0;
-  }
+  if (tr_sys_path_rename (oldpath, newpath, NULL))
+    return true;
 
   /* copy the file */
-  in = tr_sys_file_open (oldpath, TR_SYS_FILE_READ | TR_SYS_FILE_SEQUENTIAL, 0, NULL);
-  out = tr_sys_file_open (newpath, TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE | TR_SYS_FILE_TRUNCATE, 0666, NULL);
+  in = tr_sys_file_open (oldpath, TR_SYS_FILE_READ | TR_SYS_FILE_SEQUENTIAL, 0, error);
+  if (in == TR_BAD_SYS_FILE)
+    {
+      tr_error_prefix (error, "Unable to open old file: ");
+      return false;
+    }
+
+  out = tr_sys_file_open (newpath, TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE | TR_SYS_FILE_TRUNCATE, 0666, error);
+  if (out == TR_BAD_SYS_FILE)
+    {
+      tr_error_prefix (error, "Unable to open new file: ");
+      tr_sys_file_close (in, NULL);
+      return false;
+    }
+
   buf = tr_valloc (buflen);
+  bytesLeft = info.size;
   while (bytesLeft > 0)
     {
       const uint64_t bytesThisPass = MIN (bytesLeft, buflen);
       uint64_t numRead, bytesWritten;
-      if (!tr_sys_file_read (in, buf, bytesThisPass, &numRead, NULL))
+      if (!tr_sys_file_read (in, buf, bytesThisPass, &numRead, error))
         break;
-      if (!tr_sys_file_write (out, buf, numRead, &bytesWritten, NULL))
+      if (!tr_sys_file_write (out, buf, numRead, &bytesWritten, error))
         break;
+      assert (numRead == bytesWritten);
+      assert (bytesWritten <= bytesLeft);
       bytesLeft -= bytesWritten;
     }
 
@@ -1478,11 +1484,23 @@ tr_moveFile (const char * oldpath, const char * newpath, bool * renamed)
   tr_free (buf);
   tr_sys_file_close (out, NULL);
   tr_sys_file_close (in, NULL);
-  if (bytesLeft != 0)
-    return -1;
 
-  tr_sys_path_remove (oldpath, NULL);
-  return 0;
+  if (bytesLeft != 0)
+    {
+      tr_error_prefix (error, "Unable to read/write: ");
+      return false;
+    }
+
+  {
+    tr_error * my_error = NULL;
+    if (!tr_sys_path_remove (oldpath, &my_error))
+      {
+        tr_logAddError ("Unable to remove file at old path: %s", my_error->message);
+        tr_error_free (my_error);
+      }
+  }
+
+  return true;
 }
 
 /***

@@ -134,8 +134,6 @@ void       tr_error_propagate          (tr_error   ** new_error,
  */
 void       tr_error_clear              (tr_error   ** error);
 
-#if 0
-
 /**
  * @brief Prefix message of exising error object.
  *
@@ -166,8 +164,6 @@ void       tr_error_propagate_prefixed (tr_error   ** new_error,
                                         tr_error   ** old_error,
                                         const char  * prefix_format,
                                                       ...) TR_GNUC_PRINTF (3, 4);
-
-#endif /* 0 */
 
 /** @} */
 
