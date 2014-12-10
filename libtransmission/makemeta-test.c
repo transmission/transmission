@@ -4,7 +4,7 @@
  * It may be used under the GNU GPL versions 2 or 3
  * or any future license endorsed by Mnemosyne LLC.
  *
- * $Id: utils-test.c 14266 2014-04-27 23:10:01Z jordan $
+ * $Id$
  */
 
 #include "libtransmission-test.h"

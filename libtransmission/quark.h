@@ -4,7 +4,7 @@
  * It may be used under the GNU GPL versions 2 or 3
  * or any future license endorsed by Mnemosyne LLC.
  *
- * $Id: utils.h 13667 2012-12-14 04:34:42Z jordan $
+ * $Id$
  */
 
 #ifndef TR_QUARK_H

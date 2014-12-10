@@ -4,7 +4,7 @@
  * It may be used under the GNU GPL versions 2 or 3
  * or any future license endorsed by Mnemosyne LLC.
  *
- * $Id: list.c 14224 2014-01-18 20:56:57Z jordan $
+ * $Id$
  */
 
 #ifndef TR_LOG_H
