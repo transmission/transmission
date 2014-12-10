@@ -607,6 +607,8 @@ tr_sys_file_read_at (tr_sys_file_t    handle,
 
   assert (handle != TR_BAD_SYS_FILE);
   assert (buffer != NULL || size == 0);
+  /* seek requires signed offset, so it should be in mod range */
+  assert (offset < UINT64_MAX / 2);
 
 #ifdef HAVE_PREAD
 
@@ -681,6 +683,8 @@ tr_sys_file_write_at (tr_sys_file_t    handle,
 
   assert (handle != TR_BAD_SYS_FILE);
   assert (buffer != NULL || size == 0);
+  /* seek requires signed offset, so it should be in mod range */
+  assert (offset < UINT64_MAX / 2);
 
 #ifdef HAVE_PWRITE
 
@@ -801,15 +805,18 @@ tr_sys_file_preallocate (tr_sys_file_t    handle,
   /* fallocate64 is always preferred, so try it first */
   ret = fallocate64 (handle, 0, 0, size) != -1;
 
+  if (ret || errno == ENOSPC)
+    goto out;
+
 #endif
 
-  if (!ret && (flags & TR_SYS_FILE_PREALLOC_SPARSE) == 0)
+  if ((flags & TR_SYS_FILE_PREALLOC_SPARSE) == 0)
     {
       int code = errno;
 
 #ifdef HAVE_XFS_XFS_H
 
-      if (!ret && platform_test_xfs_fd (handle))
+      if (platform_test_xfs_fd (handle))
         {
           xfs_flock64_t fl;
 
@@ -819,46 +826,53 @@ tr_sys_file_preallocate (tr_sys_file_t    handle,
 
           ret = xfsctl (NULL, handle, XFS_IOC_RESVSP64, &fl) != -1;
 
+          if (ret)
+            ret = ftruncate (handle, size) != -1;
+
           code = errno;
+
+          if (ret || code == ENOSPC)
+            goto non_sparse_out;
         }
 
 #endif
 
 #ifdef __APPLE__
 
-      if (!ret)
-        {
-          fstore_t fst;
+      {
+        fstore_t fst;
 
-          fst.fst_flags = F_ALLOCATECONTIG;
-          fst.fst_posmode = F_PEOFPOSMODE;
-          fst.fst_offset = 0;
-          fst.fst_length = size;
-          fst.fst_bytesalloc = 0;
+        fst.fst_flags = F_ALLOCATEALL;
+        fst.fst_posmode = F_PEOFPOSMODE;
+        fst.fst_offset = 0;
+        fst.fst_length = size;
+        fst.fst_bytesalloc = 0;
 
-          ret = fcntl (handle, F_PREALLOCATE, &fst) != -1;
+        ret = fcntl (handle, F_PREALLOCATE, &fst) != -1;
 
-          if (ret)
-            ret = ftruncate (handle, size) != -1;
+        if (ret)
+          ret = ftruncate (handle, size) != -1;
 
-          code = errno;
-        }
+        code = errno;
+
+        if (ret || code == ENOSPC)
+          goto non_sparse_out;
+      }
 
 #endif
 
 #ifdef HAVE_POSIX_FALLOCATE
 
-      if (!ret)
-        {
-          code = posix_fallocate (handle, 0, size);
-          ret = code == 0;
-        }
+      code = posix_fallocate (handle, 0, size);
+      ret = code == 0;
 
 #endif
 
+non_sparse_out:
       errno = code;
     }
 
+out:
   if (!ret)
     set_system_error (error, errno);
 

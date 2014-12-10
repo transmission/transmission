@@ -95,6 +95,7 @@ noinst_HEADERS = \
   crypto-utils.h \
   completion.h \
   error.h \
+  error-types.h \
   fdlimit.h \
   file.h \
   handshake.h \

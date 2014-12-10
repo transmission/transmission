@@ -70,6 +70,7 @@ endif()
 
 set(${PROJECT_NAME}_PUBLIC_HEADERS
     error.h
+    error-types.h
     file.h
     log.h
     makemeta.h

@@ -17,6 +17,7 @@
 
 #include "transmission.h"
 #include "error.h"
+#include "error-types.h"
 #include "fdlimit.h"
 #include "file.h"
 #include "log.h"
@@ -38,58 +39,74 @@
 ***/
 
 static bool
-preallocate_file_sparse (tr_sys_file_t fd, uint64_t length)
+preallocate_file_sparse (tr_sys_file_t fd, uint64_t length, tr_error ** error)
 {
-  const char zero = '\0';
-  bool success = false;
+  tr_error * my_error = NULL;
 
-  if (!length)
-    success = true;
+  if (length == 0)
+    return true;
 
-  if (!success)
-    success = tr_sys_file_preallocate (fd, length, TR_SYS_FILE_PREALLOC_SPARSE, NULL);
+  if (tr_sys_file_preallocate (fd, length, TR_SYS_FILE_PREALLOC_SPARSE, &my_error))
+    return true;
 
-  if (!success) /* fallback: the old-style seek-and-write */
+  dbgmsg ("Preallocating (sparse, normal) failed (%d): %s", my_error->code, my_error->message);
+
+  if (!TR_ERROR_IS_ENOSPC (my_error->code))
     {
-      /* seek requires signed offset, so length should be in mod range */
-      assert (length < 0x7FFFFFFFFFFFFFFFULL);
+      const char zero = '\0';
 
-      success = tr_sys_file_seek (fd, length - 1, TR_SEEK_SET, NULL, NULL) &&
-                tr_sys_file_write (fd, &zero, 1, NULL, NULL) &&
-                tr_sys_file_truncate (fd, length, NULL);
+      tr_error_clear (&my_error);
+
+      /* fallback: the old-style seek-and-write */
+      if (tr_sys_file_write_at (fd, &zero, 1, length - 1, NULL, &my_error) &&
+          tr_sys_file_truncate (fd, length, &my_error))
+        return true;
+
+      dbgmsg ("Preallocating (sparse, fallback) failed (%d): %s", my_error->code, my_error->message);
     }
 
-  return success;
+  tr_error_propagate (error, &my_error);
+  return false;
 }
 
 static bool
-preallocate_file_full (const char * filename, uint64_t length)
+preallocate_file_full (tr_sys_file_t fd, uint64_t length, tr_error ** error)
 {
-  bool success = false;
+  tr_error * my_error = NULL;
 
-  tr_sys_file_t fd = tr_sys_file_open (filename, TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE, 0666, NULL);
-  if (fd != TR_BAD_SYS_FILE)
+  if (length == 0)
+    return true;
+
+  if (tr_sys_file_preallocate (fd, length, 0, &my_error))
+    return true;
+
+  dbgmsg ("Preallocating (full, normal) failed (%d): %s", my_error->code, my_error->message);
+
+  if (!TR_ERROR_IS_ENOSPC (my_error->code))
     {
-      success = tr_sys_file_preallocate (fd, length, 0, NULL);
+      uint8_t buf[4096];
+      bool success = true;
 
-      if (!success) /* if nothing else works, do it the old-fashioned way */
+      memset (buf, 0, sizeof (buf));
+      tr_error_clear (&my_error);
+
+      /* fallback: the old-fashioned way */
+      while (success && length > 0)
         {
-          uint8_t buf[ 4096 ];
-          memset (buf, 0, sizeof (buf));
-          success = true;
-          while (success && (length > 0))
-            {
-              const uint64_t thisPass = MIN (length, sizeof (buf));
-              uint64_t bytes_written;
-              success = tr_sys_file_write (fd, buf, thisPass, &bytes_written, NULL) && bytes_written == thisPass;
-              length -= thisPass;
-            }
+          const uint64_t thisPass = MIN (length, sizeof (buf));
+          uint64_t bytes_written;
+          success = tr_sys_file_write (fd, buf, thisPass, &bytes_written, &my_error);
+          length -= bytes_written;
         }
 
-      tr_sys_file_close (fd, NULL);
+      if (success)
+        return true;
+
+      dbgmsg ("Preallocating (full, fallback) failed (%d): %s", my_error->code, my_error->message);
     }
 
-  return success;
+  tr_error_propagate (error, &my_error);
+  return false;
 }
 
 /*****
@@ -140,6 +157,7 @@ cached_file_open (struct tr_cached_file  * o,
   tr_sys_path_info info;
   bool already_existed;
   bool resize_needed;
+  tr_sys_file_t fd = TR_BAD_SYS_FILE;
   tr_error * error = NULL;
 
   /* create subfolders, if any */
@@ -148,20 +166,14 @@ cached_file_open (struct tr_cached_file  * o,
       char * dir = tr_sys_path_dirname (filename, NULL);
       if (!tr_sys_dir_create (dir, TR_SYS_DIR_CREATE_PARENTS, 0777, &error))
         {
-          const int err = error->code;
           tr_logAddError (_("Couldn't create \"%1$s\": %2$s"), dir, error->message);
-          tr_error_free (error);
           tr_free (dir);
-          return err;
+          goto fail;
         }
       tr_free (dir);
     }
 
   already_existed = tr_sys_path_get_info (filename, 0, &info, NULL) && info.type == TR_SYS_PATH_IS_FILE;
-
-  if (writable && !already_existed && (allocation == TR_PREALLOCATE_FULL))
-    if (preallocate_file_full (filename, file_size))
-      tr_logAddDebug ("Preallocated file \"%s\"", filename);
 
   /* we can't resize the file w/o write permissions */
   resize_needed = already_existed && (file_size < info.size);
@@ -170,14 +182,40 @@ cached_file_open (struct tr_cached_file  * o,
   /* open the file */
   flags = writable ? (TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE) : 0;
   flags |= TR_SYS_FILE_READ | TR_SYS_FILE_SEQUENTIAL;
-  o->fd = tr_sys_file_open (filename, flags, 0666, &error);
+  fd = tr_sys_file_open (filename, flags, 0666, &error);
 
-  if (o->fd == TR_BAD_SYS_FILE)
+  if (fd == TR_BAD_SYS_FILE)
     {
-      const int err = error->code;
       tr_logAddError (_("Couldn't open \"%1$s\": %2$s"), filename, error->message);
-      tr_error_free (error);
-      return err;
+      goto fail;
+    }
+
+  if (writable && !already_existed && allocation != TR_PREALLOCATE_NONE)
+    {
+      bool success = false;
+      const char * type = NULL;
+
+      if (allocation == TR_PREALLOCATE_FULL)
+        {
+          success = preallocate_file_full (fd, file_size, &error);
+          type = _("full");
+        }
+      else if (allocation == TR_PREALLOCATE_SPARSE)
+        {
+          success = preallocate_file_sparse (fd, file_size, &error);
+          type = _("sparse");
+        }
+
+      assert (type != NULL);
+
+      if (!success)
+        {
+          tr_logAddError (_("Couldn't preallocate file \"%1$s\" (%2$s, size: %3$"PRIu64"): %4$s"),
+            filename, type, file_size, error->message);
+          goto fail;
+        }
+
+      tr_logAddDebug (_("Preallocated file \"%1$s\" (%2$s, size: %3$"PRIu64")"), filename, type, file_size);
     }
 
   /* If the file already exists and it's too large, truncate it.
@@ -186,18 +224,25 @@ cached_file_open (struct tr_cached_file  * o,
    * http://trac.transmissionbt.com/ticket/2228
    * https://bugs.launchpad.net/ubuntu/+source/transmission/+bug/318249
    */
-  if (resize_needed && !tr_sys_file_truncate (o->fd, file_size, &error))
+  if (resize_needed && !tr_sys_file_truncate (fd, file_size, &error))
     {
-      const int err = error->code;
       tr_logAddError (_("Couldn't truncate \"%1$s\": %2$s"), filename, error->message);
-      tr_error_free (error);
-      return err;
+      goto fail;
     }
 
-  if (writable && !already_existed && (allocation == TR_PREALLOCATE_SPARSE))
-    preallocate_file_sparse (o->fd, file_size);
-
+  o->fd = fd;
   return 0;
+
+fail:
+  {
+    const int err = error->code;
+    tr_error_free (error);
+
+    if (fd != TR_BAD_SYS_FILE)
+      tr_sys_file_close (fd, NULL);
+
+    return err;
+  }
 }
 
 /***
