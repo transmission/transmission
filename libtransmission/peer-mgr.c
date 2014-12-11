@@ -2612,6 +2612,9 @@ tr_peerMgrGetDesiredAvailable (const tr_torrent * tor)
 
   /* common shortcuts... */
 
+  if (!tor->isRunning)
+    return 0;
+
   if (tr_torrentIsSeed (tor))
     return 0;
 
