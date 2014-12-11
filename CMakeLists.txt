@@ -276,7 +276,6 @@ if(CMAKE_C_COMPILER_ID STREQUAL "GNU" OR CMAKE_C_COMPILER_ID STREQUAL "Clang")
         -Wcast-align
         -Wfloat-equal
         -Wformat-security
-        -Winline
         -Wmissing-format-attribute
         -Wpointer-arith
         -Wredundant-decls
@@ -292,6 +291,7 @@ if(CMAKE_C_COMPILER_ID STREQUAL "GNU" OR CMAKE_C_COMPILER_ID STREQUAL "Clang")
 
     set(NEEDED_C_COMPILER_FLAGS
         ${NEEDED_COMPILER_FLAGS}
+        -Winline
         -Wmissing-declarations
         -Wnested-externs
         -Wstrict-prototypes)

@@ -121,7 +121,7 @@ test_utf8 (void)
   in = "\x92\xE0\xE3\xA4\xAD\xAE \xA1\xEB\xE2\xEC \x81\xAE\xA3\xAE\xAC";
   out = tr_utf8clean (in, 17);
   check (out != NULL);
-  check ((strlen (out) == 17) || (strlen (out) == 32));
+  check ((strlen (out) == 17) || (strlen (out) == 33));
   check (tr_utf8_validate (out, -1, NULL));
   tr_free (out);
 
