@@ -115,7 +115,7 @@ Q_DECLARE_METATYPE(FileList)
 
 class Torrent: public QObject
 {
-    Q_OBJECT;
+    Q_OBJECT
 
   public:
 

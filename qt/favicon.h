@@ -21,7 +21,7 @@ class QUrl;
 
 class Favicons: public QObject
 {
-    Q_OBJECT;
+    Q_OBJECT
 
   public:
 

@@ -46,8 +46,12 @@
 #endif
 
 #ifdef __APPLE__
- #define HAVE_SYS_STATVFS_H
- #define HAVE_STATVFS
+ #ifndef HAVE_SYS_STATVFS_H
+  #define HAVE_SYS_STATVFS_H
+ #endif
+ #ifndef HAVE_STATVFS
+  #define HAVE_STATVFS
+ #endif
 #endif
 
 #ifdef HAVE_SYS_STATVFS_H

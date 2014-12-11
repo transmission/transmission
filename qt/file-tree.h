@@ -33,7 +33,7 @@ class QStyle;
 
 class FileTreeItem: public QObject
 {
-    Q_OBJECT;
+    Q_OBJECT
 
     enum { LOW=(1<<0), NORMAL=(1<<1), HIGH=(1<<2) };
 

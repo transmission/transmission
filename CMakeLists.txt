@@ -271,25 +271,28 @@ if(CMAKE_C_COMPILER_ID STREQUAL "GNU" OR CMAKE_C_COMPILER_ID STREQUAL "Clang")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++11")
 
     set(NEEDED_COMPILER_FLAGS
+        -Wall
+        -W
         -Wcast-align
-        -Wextra
         -Wfloat-equal
-        -Wformat
         -Wformat-security
-        -Winit-self
         -Winline
-        -Wmissing-declarations
         -Wmissing-format-attribute
         -Wpointer-arith
         -Wredundant-decls
         -Wundef
         -Wunused-parameter
-        -Wvariadic-macros
         -Wwrite-strings)
+
+    if(NOT CMAKE_C_COMPILER_ID STREQUAL "GNU" OR CMAKE_C_COMPILER_VERSION VERSION_GREATER "3.3")
+        list(APPEND NEEDED_COMPILER_FLAGS
+            -Wextra
+            -Winit-self)
+    endif()
 
     set(NEEDED_C_COMPILER_FLAGS
         ${NEEDED_COMPILER_FLAGS}
-        -Wdeclaration-after-statement
+        -Wmissing-declarations
         -Wnested-externs
         -Wstrict-prototypes)
     string(REPLACE ";" " " NEEDED_C_COMPILER_FLAGS_STRING "${NEEDED_C_COMPILER_FLAGS}")

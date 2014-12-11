@@ -117,8 +117,8 @@ test_utf8 (void)
   check_streq ("hello", out);
   tr_free (out);
 
-  /* this version is not utf-8 */
-  in = "������ ���� �����";
+  /* this version is not utf-8 (but cp866) */
+  in = "\x92\xE0\xE3\xA4\xAD\xAE \xA1\xEB\xE2\xEC \x81\xAE\xA3\xAE\xAC";
   out = tr_utf8clean (in, 17);
   check (out != NULL);
   check ((strlen (out) == 17) || (strlen (out) == 32));
@@ -126,7 +126,7 @@ test_utf8 (void)
   tr_free (out);
 
   /* same string, but utf-8 clean */
-  in = "Òðóäíî áûòü Áîãîì";
+  in = "Трудно быть Богом";
   out = tr_utf8clean (in, -1);
   check (out != NULL);
   check (tr_utf8_validate (out, -1, NULL));

@@ -84,12 +84,12 @@ namespace
 
 MyApp :: MyApp (int& argc, char ** argv):
   QApplication (argc, argv),
-  myLastFullUpdateTime (0),
   myPrefs(nullptr),
   mySession(nullptr),
   myModel(nullptr),
   myWindow(nullptr),
-  myWatchDir(nullptr)
+  myWatchDir(nullptr),
+  myLastFullUpdateTime (0)
 {
   const QString MY_CONFIG_NAME = QString::fromUtf8 ("transmission");
 
