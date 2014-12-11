@@ -92,7 +92,7 @@ WatchDir :: setPath (const QString& path, bool isEnabled)
       connect (myWatcher, SIGNAL(directoryChanged(const QString&)),
                this, SLOT(watcherActivated(const QString&)));
       //std::cerr << "watching " << qPrintable(path) << " for new .torrent files" << std::endl;
-      watcherActivated (path); // trigger the watchdir for .torrent files in there already
+      QTimer::singleShot (0, this, SLOT (rescanAllWatchedDirectories ())); // trigger the watchdir for .torrent files in there already
     }
 }
 
@@ -139,4 +139,14 @@ WatchDir :: watcherActivated (const QString& path)
   // update our file list so that we can use it
   // for comparison the next time around
   myWatchDirFiles = files;
+}
+
+void
+WatchDir :: rescanAllWatchedDirectories ()
+{
+  if (myWatcher == nullptr)
+    return;
+
+  foreach (const QString& path, myWatcher->directories ())
+    watcherActivated (path);
 }

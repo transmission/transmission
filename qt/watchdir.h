@@ -39,6 +39,9 @@ class WatchDir: public QObject
     void watcherActivated (const QString& path);
     void onTimeout ();
 
+  private slots:
+    void rescanAllWatchedDirectories ();
+
   private:
     const TorrentModel& myModel;
     QSet<QString> myWatchDirFiles;
