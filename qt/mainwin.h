@@ -121,7 +121,7 @@ class TrMainWindow: public QMainWindow
     void dataReadProgress ();
     void dataSendProgress ();
     void onError (QNetworkReply::NetworkError);
-    void errorMessage (const QString);
+    void errorMessage (const QString&);
     void toggleWindows (bool doShow);
     void onSetPrefs ();
     void onSetPrefs (bool);

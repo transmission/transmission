@@ -1412,7 +1412,7 @@ TrMainWindow::onError (QNetworkReply::NetworkError code)
 }
 
 void
-TrMainWindow::errorMessage (const QString msg)
+TrMainWindow::errorMessage (const QString& msg)
 {
     myErrorMessage = msg;
 }

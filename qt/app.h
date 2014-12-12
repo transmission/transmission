@@ -57,7 +57,7 @@ class MyApp: public QApplication
     void onSessionSourceChanged ();
     void refreshPref (int key);
     void refreshTorrents ();
-    void onTorrentsAdded (QSet<int>);
+    void onTorrentsAdded (const QSet<int>& torrents);
     void onTorrentCompleted (int);
     void onNewTorrentChanged (int);
 

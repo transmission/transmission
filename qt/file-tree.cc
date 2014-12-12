@@ -623,7 +623,6 @@ FileTreeModel::addFile (int                   fileIndex,
                         QList<QModelIndex>  & rowsAdded,
                         bool                  updateFields)
 {
-  bool added = false;
   FileTreeItem * item;
   QStringList tokens = filename.split (QChar::fromLatin1('/'));
 
@@ -651,6 +650,8 @@ FileTreeModel::addFile (int                   fileIndex,
     }
   else // we haven't build the FileTreeItems for these tokens yet
     {
+      bool added = false;
+
       item = myRootItem;
       while (!tokens.isEmpty())
         {

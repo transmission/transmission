@@ -308,7 +308,7 @@ MyApp::MyApp (int& argc, char ** argv):
 /* these functions are for popping up desktop notifications */
 
 void
-MyApp::onTorrentsAdded (QSet<int> torrents)
+MyApp::onTorrentsAdded (const QSet<int>& torrents)
 {
   if (!myPrefs->getBool (Prefs::SHOW_NOTIFICATION_ON_ADD))
     return;

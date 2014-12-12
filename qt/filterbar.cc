@@ -285,7 +285,7 @@ FilterBar::createActivityCombo ()
 
 namespace
 {
-  QString readableHostName (const QString host)
+  QString readableHostName (const QString& host)
   {
     // get the readable name...
     QString name = host;

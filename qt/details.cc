@@ -98,9 +98,9 @@ class PeerItem: public QTreeWidgetItem
 
     virtual ~PeerItem () {}
 
-    PeerItem (const Peer& p)
+    PeerItem (const Peer& p):
+      peer(p)
     {
-      peer = p;
       int q[4];
       if (sscanf (p.address.toUtf8 ().constData (), "%d.%d.%d.%d", q+0, q+1, q+2, q+3) == 4)
         collatedAddress.sprintf ("%03d.%03d.%03d.%03d", q[0], q[1], q[2], q[3]);
@@ -408,18 +408,19 @@ Details::refresh ()
 
   // myHaveLabel
   double sizeWhenDone = 0;
-  double leftUntilDone = 0;
   double available = 0;
-  int64_t haveTotal = 0;
-  int64_t haveVerified = 0;
-  int64_t haveUnverified = 0;
-  int64_t verifiedPieces = 0;
   if (torrents.empty ())
     {
       string = none;
     }
   else
     {
+      double leftUntilDone = 0;
+      int64_t haveTotal = 0;
+      int64_t haveVerified = 0;
+      int64_t haveUnverified = 0;
+      int64_t verifiedPieces = 0;
+
       foreach (const Torrent * t, torrents)
         {
           if (t->hasMetadata ())
@@ -841,7 +842,7 @@ Details::refresh ()
       foreach (const Peer& peer, peers)
         {
           const QString key = idStr + ":" + peer.address;
-          PeerItem * item = (PeerItem*) myPeers.value (key, 0);
+          PeerItem * item = static_cast<PeerItem*> (myPeers.value (key, 0));
 
           if (item == 0) // new peer has connected
             {

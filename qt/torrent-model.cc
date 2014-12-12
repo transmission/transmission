@@ -143,7 +143,6 @@ TorrentModel::updateTorrents (tr_variant * torrents, bool isCompleteList)
   QSet<int> oldIds;
   QSet<int> addIds;
   QSet<int> newIds;
-  int updatedCount = 0;
 
   if  (isCompleteList)
     oldIds = getIds ();
@@ -172,7 +171,6 @@ TorrentModel::updateTorrents (tr_variant * torrents, bool isCompleteList)
               else
                 {
                   tor->update (child);
-                  ++updatedCount;
                   if (tor->isMagnet() && tor->hasMetadata())
                     {
                       addIds.insert (tor->id());
