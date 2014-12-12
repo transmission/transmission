@@ -44,11 +44,11 @@ enum
 ***/
 
 QSize
-TorrentDelegateMin :: sizeHint (const QStyleOptionViewItem & option,
-                                const Torrent              & tor) const
+TorrentDelegateMin::sizeHint (const QStyleOptionViewItem & option,
+                              const Torrent              & tor) const
 {
   const QStyle* style (QApplication::style());
-  static const int iconSize (style->pixelMetric (QStyle :: PM_SmallIconSize));
+  static const int iconSize (style->pixelMetric (QStyle::PM_SmallIconSize));
 
   QFont nameFont (option.font);
   const QFontMetrics nameFM (nameFont);
@@ -71,13 +71,13 @@ TorrentDelegateMin :: sizeHint (const QStyleOptionViewItem & option,
 }
 
 void
-TorrentDelegateMin :: drawTorrent (QPainter                   * painter,
-                                   const QStyleOptionViewItem & option,
-                                   const Torrent              & tor) const
+TorrentDelegateMin::drawTorrent (QPainter                   * painter,
+                                 const QStyleOptionViewItem & option,
+                                 const Torrent              & tor) const
 {
   const bool isPaused (tor.isPaused());
   const QStyle * style (QApplication::style());
-  static const int iconSize (style->pixelMetric (QStyle :: PM_SmallIconSize));
+  static const int iconSize (style->pixelMetric (QStyle::PM_SmallIconSize));
 
   QFont nameFont (option.font);
   const QFontMetrics nameFM (nameFont);

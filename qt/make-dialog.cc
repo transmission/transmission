@@ -43,7 +43,7 @@
 ***/
 
 void
-MakeDialog :: onNewDialogDestroyed (QObject * o)
+MakeDialog::onNewDialogDestroyed (QObject * o)
 {
   Q_UNUSED (o);
 
@@ -51,7 +51,7 @@ MakeDialog :: onNewDialogDestroyed (QObject * o)
 }
 
 void
-MakeDialog :: onNewButtonBoxClicked (QAbstractButton * button)
+MakeDialog::onNewButtonBoxClicked (QAbstractButton * button)
 {
   switch (myNewButtonBox->standardButton (button))
     {
@@ -71,7 +71,7 @@ MakeDialog :: onNewButtonBoxClicked (QAbstractButton * button)
 }
 
 void
-MakeDialog :: onProgress ()
+MakeDialog::onProgress ()
 {
   // progress bar
   const tr_metainfo_builder * b = myBuilder;
@@ -104,7 +104,7 @@ MakeDialog :: onProgress ()
 
 
 void
-MakeDialog :: makeTorrent ()
+MakeDialog::makeTorrent ()
 {
   if (!myBuilder)
     return;
@@ -172,7 +172,7 @@ MakeDialog :: makeTorrent ()
 ***/
 
 void
-MakeDialog :: onFileClicked ()
+MakeDialog::onFileClicked ()
 {
   QFileDialog * d = new QFileDialog (this, tr ("Select File"));
   d->setFileMode (QFileDialog::ExistingFile);
@@ -182,13 +182,13 @@ MakeDialog :: onFileClicked ()
   d->show ();
 }
 void
-MakeDialog :: onFileSelected (const QStringList& list)
+MakeDialog::onFileSelected (const QStringList& list)
 {
   if (!list.empty ())
     onFileSelected (list.front ());
 }
 void
-MakeDialog :: onFileSelected (const QString& filename)
+MakeDialog::onFileSelected (const QString& filename)
 {
   myFile = Utils::removeTrailingDirSeparator (filename);
   myFileButton->setText (QFileInfo(myFile).fileName());
@@ -196,7 +196,7 @@ MakeDialog :: onFileSelected (const QString& filename)
 }
 
 void
-MakeDialog :: onFolderClicked ()
+MakeDialog::onFolderClicked ()
 {
   QFileDialog * d = new QFileDialog (this, tr ("Select Folder"));
   d->setFileMode (QFileDialog::Directory);
@@ -208,14 +208,14 @@ MakeDialog :: onFolderClicked ()
 }
 
 void
-MakeDialog :: onFolderSelected (const QStringList& list)
+MakeDialog::onFolderSelected (const QStringList& list)
 {
   if (!list.empty ())
     onFolderSelected (list.front ());
 }
 
 void
-MakeDialog :: onFolderSelected (const QString& filename)
+MakeDialog::onFolderSelected (const QString& filename)
 {
   myFolder = Utils::removeTrailingDirSeparator (filename);
   myFolderButton->setText (QFileInfo(myFolder).fileName());
@@ -223,7 +223,7 @@ MakeDialog :: onFolderSelected (const QString& filename)
 }
 
 void
-MakeDialog :: onDestinationClicked ()
+MakeDialog::onDestinationClicked ()
 {
   QFileDialog * d = new QFileDialog (this, tr ("Select Folder"));
   d->setFileMode (QFileDialog::Directory);
@@ -234,39 +234,39 @@ MakeDialog :: onDestinationClicked ()
   d->show ();
 }
 void
-MakeDialog :: onDestinationSelected (const QStringList& list)
+MakeDialog::onDestinationSelected (const QStringList& list)
 {
   if (!list.empty ())
     onDestinationSelected (list.front());
 }
 void
-MakeDialog :: onDestinationSelected (const QString& filename)
+MakeDialog::onDestinationSelected (const QString& filename)
 {
   myDestination = Utils::removeTrailingDirSeparator (filename);
   myDestinationButton->setText (QFileInfo(myDestination).fileName());
 }
 
 void
-MakeDialog :: enableBuddyWhenChecked (QRadioButton * box, QWidget * buddy)
+MakeDialog::enableBuddyWhenChecked (QRadioButton * box, QWidget * buddy)
 {
   connect (box, SIGNAL(toggled(bool)), buddy, SLOT(setEnabled(bool)));
   buddy->setEnabled (box->isChecked ());
 }
 void
-MakeDialog :: enableBuddyWhenChecked (QCheckBox * box, QWidget * buddy)
+MakeDialog::enableBuddyWhenChecked (QCheckBox * box, QWidget * buddy)
 {
   connect (box, SIGNAL(toggled(bool)), buddy, SLOT(setEnabled(bool)));
   buddy->setEnabled (box->isChecked ());
 }
 
 QString
-MakeDialog :: getSource () const
+MakeDialog::getSource () const
 {
   return myFileRadio->isChecked () ? myFile : myFolder;
 }
 
 void
-MakeDialog :: onButtonBoxClicked (QAbstractButton * button)
+MakeDialog::onButtonBoxClicked (QAbstractButton * button)
 {
   switch (myButtonBox->standardButton (button))
     {
@@ -285,7 +285,7 @@ MakeDialog :: onButtonBoxClicked (QAbstractButton * button)
 ***/
 
 void
-MakeDialog :: onSourceChanged ()
+MakeDialog::onSourceChanged ()
 {
   if (myBuilder)
     {
@@ -327,7 +327,7 @@ class ShortPlainTextEdit: public QPlainTextEdit
     virtual QSize sizeHint  () const { return QSize (256, 50); }
 };
 
-MakeDialog :: MakeDialog (Session & session, QWidget * parent):
+MakeDialog::MakeDialog (Session& session, QWidget * parent):
   QDialog (parent, Qt::Dialog),
   mySession (session),
   myBuilder (0)
@@ -338,7 +338,7 @@ MakeDialog :: MakeDialog (Session & session, QWidget * parent):
 
   setWindowTitle (tr ("New Torrent"));
   QVBoxLayout * top = new QVBoxLayout (this);
-  top->setSpacing (HIG :: PAD);
+  top->setSpacing (HIG::PAD);
 
   HIG * hig = new HIG;
   hig->setContentsMargins (0, 0, 0, 0);
@@ -419,7 +419,7 @@ MakeDialog :: MakeDialog (Session & session, QWidget * parent):
   onSourceChanged ();
 }
 
-MakeDialog :: ~MakeDialog ()
+MakeDialog::~MakeDialog ()
 {
   if (myBuilder)
     tr_metaInfoBuilderFree (myBuilder);
@@ -430,7 +430,7 @@ MakeDialog :: ~MakeDialog ()
 ***/
 
 void
-MakeDialog :: dragEnterEvent (QDragEnterEvent * event)
+MakeDialog::dragEnterEvent (QDragEnterEvent * event)
 {
   const QMimeData * mime = event->mimeData ();
 
@@ -439,7 +439,7 @@ MakeDialog :: dragEnterEvent (QDragEnterEvent * event)
 }
 
 void
-MakeDialog :: dropEvent (QDropEvent * event)
+MakeDialog::dropEvent (QDropEvent * event)
 {
   const QString filename = event->mimeData()->urls().front().path();
   const QFileInfo fileInfo (filename);

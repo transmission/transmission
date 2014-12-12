@@ -33,7 +33,7 @@ namespace
 }
 
 QSize
-TrackerDelegate :: margin (const QStyle& style) const
+TrackerDelegate::margin (const QStyle& style) const
 {
   Q_UNUSED (style);
 
@@ -45,14 +45,14 @@ TrackerDelegate :: margin (const QStyle& style) const
 ***/
 
 QSize
-TrackerDelegate :: sizeHint (const QStyleOptionViewItem & option,
-                             const TrackerInfo          & info) const
+TrackerDelegate::sizeHint (const QStyleOptionViewItem & option,
+                           const TrackerInfo          & info) const
 {
   Q_UNUSED (option);
 
   QPixmap favicon = info.st.getFavicon ();
 
-  const QString text = TrackerDelegate :: getText(info);
+  const QString text = TrackerDelegate::getText(info);
   QTextDocument textDoc;
   textDoc.setHtml (text);
   const QSize textSize = textDoc.size().toSize();
@@ -62,17 +62,17 @@ TrackerDelegate :: sizeHint (const QStyleOptionViewItem & option,
 }
 
 QSize
-TrackerDelegate :: sizeHint (const QStyleOptionViewItem  & option,
-                             const QModelIndex           & index) const
+TrackerDelegate::sizeHint (const QStyleOptionViewItem  & option,
+                           const QModelIndex           & index) const
 {
   const TrackerInfo trackerInfo = index.data (TrackerModel::TrackerRole).value<TrackerInfo>();
   return sizeHint (option, trackerInfo);
 }
 
 void
-TrackerDelegate :: paint (QPainter                    * painter,
-                          const QStyleOptionViewItem  & option,
-                          const QModelIndex           & index) const
+TrackerDelegate::paint (QPainter                    * painter,
+                        const QStyleOptionViewItem  & option,
+                        const QModelIndex           & index) const
 {
   const TrackerInfo trackerInfo = index.data (TrackerModel::TrackerRole).value<TrackerInfo>();
   painter->save();
@@ -84,9 +84,9 @@ TrackerDelegate :: paint (QPainter                    * painter,
 }
 
 void
-TrackerDelegate :: drawTracker (QPainter                    * painter,
-                                const QStyleOptionViewItem  & option,
-                                const TrackerInfo           & inf) const
+TrackerDelegate::drawTracker (QPainter                    * painter,
+                              const QStyleOptionViewItem  & option,
+                              const TrackerInfo           & inf) const
 {
   painter->save();
 
@@ -110,7 +110,7 @@ TrackerDelegate :: drawTracker (QPainter                    * painter,
 }
 
 void
-TrackerDelegate :: setShowMore (bool b)
+TrackerDelegate::setShowMore (bool b)
 {
   myShowMore = b;
 }
@@ -127,7 +127,7 @@ namespace
 }
 
 QString
-TrackerDelegate :: getText (const TrackerInfo& inf) const
+TrackerDelegate::getText (const TrackerInfo& inf) const
 {
   QString key;
   QString str;

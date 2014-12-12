@@ -51,14 +51,14 @@ namespace
 };
 
 void
-PrefsDialog :: checkBoxToggled (bool checked)
+PrefsDialog::checkBoxToggled (bool checked)
 {
   const int key (sender ()->property (PREF_KEY).toInt ());
   setPref (key, checked);
 }
 
 QCheckBox *
-PrefsDialog :: checkBoxNew (const QString& text, int key)
+PrefsDialog::checkBoxNew (const QString& text, int key)
 {
   QCheckBox * box = new QCheckBox (text);
   box->setChecked (myPrefs.getBool (key));
@@ -69,14 +69,14 @@ PrefsDialog :: checkBoxNew (const QString& text, int key)
 }
 
 void
-PrefsDialog :: enableBuddyWhenChecked (QCheckBox * box, QWidget * buddy)
+PrefsDialog::enableBuddyWhenChecked (QCheckBox * box, QWidget * buddy)
 {
   connect (box, SIGNAL(toggled(bool)), buddy, SLOT(setEnabled(bool)));
   buddy->setEnabled (box->isChecked ());
 }
 
 void
-PrefsDialog :: spinBoxEditingFinished()
+PrefsDialog::spinBoxEditingFinished ()
 {
   const QObject * spin = sender();
   const int key = spin->property (PREF_KEY).toInt ();
@@ -89,7 +89,7 @@ PrefsDialog :: spinBoxEditingFinished()
 }
 
 QSpinBox *
-PrefsDialog :: spinBoxNew (int key, int low, int high, int step)
+PrefsDialog::spinBoxNew (int key, int low, int high, int step)
 {
   QSpinBox * spin = new QSpinBox ();
   spin->setRange (low, high);
@@ -102,7 +102,7 @@ PrefsDialog :: spinBoxNew (int key, int low, int high, int step)
 }
 
 QDoubleSpinBox *
-PrefsDialog :: doubleSpinBoxNew (int key, double low, double high, double step, int decimals)
+PrefsDialog::doubleSpinBoxNew (int key, double low, double high, double step, int decimals)
 {
   QDoubleSpinBox * spin = new QDoubleSpinBox ();
   spin->setRange (low, high);
@@ -142,7 +142,7 @@ PrefsDialog::timeEditNew (int key)
 }
 
 void
-PrefsDialog :: lineEditingFinished ()
+PrefsDialog::lineEditingFinished ()
 {
   QLineEdit * e = qobject_cast<QLineEdit*>(sender());
   if (e && e->isModified ())
@@ -154,7 +154,7 @@ PrefsDialog :: lineEditingFinished ()
 }
 
 QLineEdit*
-PrefsDialog :: lineEditNew (int key, int echoMode)
+PrefsDialog::lineEditNew (int key, int echoMode)
 {
   QLineEdit * e = new QLineEdit (myPrefs.getString (key));
   e->setProperty (PREF_KEY, key);
@@ -169,7 +169,7 @@ PrefsDialog :: lineEditNew (int key, int echoMode)
 ***/
 
 QWidget *
-PrefsDialog :: createRemoteTab (Session& session)
+PrefsDialog::createRemoteTab (Session& session)
 {
   HIG * hig = new HIG (this);
   hig->addSectionTitle (tr ("Remote Control"));
@@ -203,7 +203,7 @@ PrefsDialog :: createRemoteTab (Session& session)
 ***/
 
 void
-PrefsDialog :: altSpeedDaysEdited (int i)
+PrefsDialog::altSpeedDaysEdited (int i)
 {
   const int value = qobject_cast<QComboBox*>(sender())->itemData(i).toInt();
   setPref (Prefs::ALT_SPEED_LIMIT_TIME_DAY, value);
@@ -211,7 +211,7 @@ PrefsDialog :: altSpeedDaysEdited (int i)
 
 
 QWidget *
-PrefsDialog :: createSpeedTab ()
+PrefsDialog::createSpeedTab ()
 {
   QWidget *l, *r;
   HIG * hig = new HIG (this);
@@ -230,7 +230,7 @@ PrefsDialog :: createSpeedTab ()
 
   hig->addSectionDivider ();
   QHBoxLayout * h = new QHBoxLayout;
-  h->setSpacing (HIG :: PAD);
+  h->setSpacing (HIG::PAD);
   QLabel * label = new QLabel;
   label->setPixmap (QPixmap (QString::fromUtf8 (":/icons/alt-limit-off.png")));
   label->setAlignment (Qt::AlignLeft|Qt::AlignVCenter);
@@ -245,23 +245,23 @@ PrefsDialog :: createSpeedTab ()
     hig->addWideControl (new QLabel (s));
 
     s = tr ("U&pload (%1):").arg (speed_K_str);
-    r = spinBoxNew (Prefs :: ALT_SPEED_LIMIT_UP, 0, INT_MAX, 5);
+    r = spinBoxNew (Prefs::ALT_SPEED_LIMIT_UP, 0, INT_MAX, 5);
     hig->addRow (s, r);
 
     s = tr ("Do&wnload (%1):").arg (speed_K_str);
-    r = spinBoxNew (Prefs :: ALT_SPEED_LIMIT_DOWN, 0, INT_MAX, 5);
+    r = spinBoxNew (Prefs::ALT_SPEED_LIMIT_DOWN, 0, INT_MAX, 5);
     hig->addRow (s, r);
 
     QCheckBox * c = checkBoxNew (tr ("&Scheduled times:"), Prefs::ALT_SPEED_LIMIT_TIME_ENABLED);
     h = new QHBoxLayout ();
     h->setSpacing (HIG::PAD);
-    QWidget * w = timeEditNew (Prefs :: ALT_SPEED_LIMIT_TIME_BEGIN);
+    QWidget * w = timeEditNew (Prefs::ALT_SPEED_LIMIT_TIME_BEGIN);
     h->addWidget (w, 1);
     mySchedWidgets << w;
     QLabel * nd = new QLabel (tr("&to"));
     h->addWidget (nd);
     mySchedWidgets << nd;
-    w = timeEditNew (Prefs :: ALT_SPEED_LIMIT_TIME_END);
+    w = timeEditNew (Prefs::ALT_SPEED_LIMIT_TIME_END);
     nd->setBuddy (w);
     h->addWidget (w, 1);
     mySchedWidgets << w;
@@ -280,7 +280,7 @@ PrefsDialog :: createSpeedTab ()
     box->addItem (noIcon, tr ("Thursday"),  QVariant (TR_SCHED_THURS));
     box->addItem (noIcon, tr ("Friday"),    QVariant (TR_SCHED_FRI));
     box->addItem (noIcon, tr ("Saturday"),  QVariant (TR_SCHED_SAT));
-    box->setCurrentIndex (box->findData (myPrefs.getInt (Prefs :: ALT_SPEED_LIMIT_TIME_DAY)));
+    box->setCurrentIndex (box->findData (myPrefs.getInt (Prefs::ALT_SPEED_LIMIT_TIME_DAY)));
     connect (box, SIGNAL(activated(int)), this, SLOT(altSpeedDaysEdited(int)));
     w = hig->addRow (s, box);
     mySchedWidgets << w << box;
@@ -294,7 +294,7 @@ PrefsDialog :: createSpeedTab ()
 ***/
 
 QWidget *
-PrefsDialog :: createDesktopTab ()
+PrefsDialog::createDesktopTab ()
 {
   HIG * hig = new HIG (this);
   hig->addSectionTitle (tr ("Desktop"));
@@ -318,7 +318,7 @@ PrefsDialog :: createDesktopTab ()
 ***/
 
 void
-PrefsDialog :: onPortTested (bool isOpen)
+PrefsDialog::onPortTested (bool isOpen)
 {
   myPortButton->setEnabled (true);
   myWidgets[Prefs::PEER_PORT]->setEnabled (true);
@@ -327,7 +327,7 @@ PrefsDialog :: onPortTested (bool isOpen)
 }
 
 void
-PrefsDialog :: onPortTest ()
+PrefsDialog::onPortTest ()
 {
   myPortLabel->setText (tr ("Testing TCP Port..."));
   myPortButton->setEnabled (false);
@@ -336,7 +336,7 @@ PrefsDialog :: onPortTest ()
 }
 
 QWidget *
-PrefsDialog :: createNetworkTab ()
+PrefsDialog::createNetworkTab ()
 {
   HIG * hig = new HIG (this);
   hig->addSectionTitle (tr ("Incoming Peers"));
@@ -346,7 +346,7 @@ PrefsDialog :: createNetworkTab ()
   QPushButton * b = myPortButton = new QPushButton (tr ("Te&st Port"));
   QLabel * l = myPortLabel = new QLabel (tr ("Status unknown"));
   h->addWidget (l);
-  h->addSpacing (HIG :: PAD_BIG);
+  h->addSpacing (HIG::PAD_BIG);
   h->addWidget (b);
   h->setStretchFactor (l, 1);
   connect (b, SIGNAL(clicked(bool)), this, SLOT(onPortTest()));
@@ -354,7 +354,7 @@ PrefsDialog :: createNetworkTab ()
 
   hig->addRow (tr ("&Port for incoming connections:"), s);
   hig->addRow (QString(), h, 0);
-  hig->addWideControl (checkBoxNew (tr ("Pick a &random port every time Transmission is started"), Prefs :: PEER_PORT_RANDOM_ON_START));
+  hig->addWideControl (checkBoxNew (tr ("Pick a &random port every time Transmission is started"), Prefs::PEER_PORT_RANDOM_ON_START));
   hig->addWideControl (checkBoxNew (tr ("Use UPnP or NAT-PMP port &forwarding from my router"), Prefs::PORT_FORWARDING));
 
   hig->addSectionDivider ();
@@ -384,7 +384,7 @@ PrefsDialog :: createNetworkTab ()
 ***/
 
 void
-PrefsDialog :: onBlocklistDialogDestroyed (QObject * o)
+PrefsDialog::onBlocklistDialogDestroyed (QObject * o)
 {
   Q_UNUSED (o);
 
@@ -392,21 +392,21 @@ PrefsDialog :: onBlocklistDialogDestroyed (QObject * o)
 }
 
 void
-PrefsDialog :: onUpdateBlocklistCancelled ()
+PrefsDialog::onUpdateBlocklistCancelled ()
 {
   disconnect (&mySession, SIGNAL(blocklistUpdated(int)), this, SLOT(onBlocklistUpdated(int)));
   myBlocklistDialog->deleteLater ();
 }
 
 void
-PrefsDialog :: onBlocklistUpdated (int n)
+PrefsDialog::onBlocklistUpdated (int n)
 {
   myBlocklistDialog->setText (tr ("<b>Update succeeded!</b><p>Blocklist now has %Ln rules.", 0, n));
   myBlocklistDialog->setTextFormat (Qt::RichText);
 }
 
 void
-PrefsDialog :: onUpdateBlocklistClicked ()
+PrefsDialog::onUpdateBlocklistClicked ()
 {
   myBlocklistDialog = new QMessageBox (QMessageBox::Information,
                                        QString(),
@@ -420,14 +420,14 @@ PrefsDialog :: onUpdateBlocklistClicked ()
 }
 
 void
-PrefsDialog :: encryptionEdited (int i)
+PrefsDialog::encryptionEdited (int i)
 {
   const int value (qobject_cast<QComboBox*>(sender())->itemData(i).toInt ());
   setPref (Prefs::ENCRYPTION, value);
 }
 
 QWidget *
-PrefsDialog :: createPrivacyTab ()
+PrefsDialog::createPrivacyTab ()
 {
   QWidget * w;
   HIG * hig = new HIG (this);
@@ -438,7 +438,7 @@ PrefsDialog :: createPrivacyTab ()
   box->addItem (tr ("Allow encryption"), 0);
   box->addItem (tr ("Prefer encryption"), 1);
   box->addItem (tr ("Require encryption"), 2);
-  myWidgets.insert (Prefs :: ENCRYPTION, box);
+  myWidgets.insert (Prefs::ENCRYPTION, box);
   connect (box, SIGNAL(activated(int)), this, SLOT(encryptionEdited(int)));
 
   hig->addRow (tr ("&Encryption mode:"), box);
@@ -476,7 +476,7 @@ PrefsDialog :: createPrivacyTab ()
 ***/
 
 void
-PrefsDialog :: onScriptClicked (void)
+PrefsDialog::onScriptClicked (void)
 {
   const QString title = tr ("Select \"Torrent Done\" Script");
   const QString myPath = myPrefs.getString (Prefs::SCRIPT_TORRENT_DONE_FILENAME);
@@ -487,7 +487,7 @@ PrefsDialog :: onScriptClicked (void)
 }
 
 void
-PrefsDialog :: onIncompleteClicked (void)
+PrefsDialog::onIncompleteClicked (void)
 {
   const QString title = tr ("Select Incomplete Directory");
   const QString myPath = myPrefs.getString (Prefs::INCOMPLETE_DIR);
@@ -498,7 +498,7 @@ PrefsDialog :: onIncompleteClicked (void)
 }
 
 void
-PrefsDialog :: onWatchClicked (void)
+PrefsDialog::onWatchClicked (void)
 {
   const QString title = tr ("Select Watch Directory");
   const QString myPath = myPrefs.getString (Prefs::DIR_WATCH);
@@ -509,7 +509,7 @@ PrefsDialog :: onWatchClicked (void)
 }
 
 void
-PrefsDialog :: onDestinationClicked (void)
+PrefsDialog::onDestinationClicked (void)
 {
   const QString title = tr ("Select Destination");
   const QString myPath = myPrefs.getString (Prefs::DOWNLOAD_DIR);
@@ -520,15 +520,15 @@ PrefsDialog :: onDestinationClicked (void)
 }
 
 void
-PrefsDialog :: onLocationSelected (const QString& path, int key)
+PrefsDialog::onLocationSelected (const QString& path, int key)
 {
   setPref (key, path);
 }
 
 QWidget *
-PrefsDialog :: createSeedingTab ()
+PrefsDialog::createSeedingTab ()
 {
-  const int iconSize (style ()->pixelMetric (QStyle :: PM_SmallIconSize));
+  const int iconSize (style ()->pixelMetric (QStyle::PM_SmallIconSize));
   const QFileIconProvider iconProvider;
   const QIcon folderIcon = iconProvider.icon (QFileIconProvider::Folder);
   const QPixmap folderPixmap = folderIcon.pixmap (iconSize);
@@ -554,9 +554,9 @@ PrefsDialog :: createSeedingTab ()
 }
 
 QWidget *
-PrefsDialog :: createDownloadingTab ()
+PrefsDialog::createDownloadingTab ()
 {
-  const int iconSize (style ()->pixelMetric (QStyle :: PM_SmallIconSize));
+  const int iconSize (style ()->pixelMetric (QStyle::PM_SmallIconSize));
   const QFileIconProvider iconProvider;
   const QIcon folderIcon = iconProvider.icon (QFileIconProvider::Folder);
   const QPixmap folderPixmap = folderIcon.pixmap (iconSize);
@@ -630,7 +630,7 @@ PrefsDialog :: createDownloadingTab ()
 ****
 ***/
 
-PrefsDialog :: PrefsDialog (Session& session, Prefs& prefs, QWidget * parent):
+PrefsDialog::PrefsDialog (Session& session, Prefs& prefs, QWidget * parent):
   QDialog (parent),
   myIsServer (session.isServer ()),
   mySession (session),
@@ -657,16 +657,16 @@ PrefsDialog :: PrefsDialog (Session& session, Prefs& prefs, QWidget * parent):
   connect (&mySession, SIGNAL(sessionUpdated()), this, SLOT(sessionUpdated()));
 
   QList<int> keys;
-  keys << Prefs :: RPC_ENABLED
-       << Prefs :: ALT_SPEED_LIMIT_ENABLED
-       << Prefs :: ALT_SPEED_LIMIT_TIME_ENABLED
-       << Prefs :: ENCRYPTION
-       << Prefs :: BLOCKLIST_ENABLED
-       << Prefs :: DIR_WATCH
-       << Prefs :: DOWNLOAD_DIR
-       << Prefs :: INCOMPLETE_DIR
-       << Prefs :: INCOMPLETE_DIR_ENABLED
-       << Prefs :: SCRIPT_TORRENT_DONE_FILENAME;
+  keys << Prefs::RPC_ENABLED
+       << Prefs::ALT_SPEED_LIMIT_ENABLED
+       << Prefs::ALT_SPEED_LIMIT_TIME_ENABLED
+       << Prefs::ENCRYPTION
+       << Prefs::BLOCKLIST_ENABLED
+       << Prefs::DIR_WATCH
+       << Prefs::DOWNLOAD_DIR
+       << Prefs::INCOMPLETE_DIR
+       << Prefs::INCOMPLETE_DIR_ENABLED
+       << Prefs::SCRIPT_TORRENT_DONE_FILENAME;
   foreach (int key, keys)
     refreshPref (key);
 
@@ -682,12 +682,12 @@ PrefsDialog :: PrefsDialog (Session& session, Prefs& prefs, QWidget * parent):
     }
 }
 
-PrefsDialog :: ~PrefsDialog ()
+PrefsDialog::~PrefsDialog ()
 {
 }
 
 void
-PrefsDialog :: setPref (int key, const QVariant& v)
+PrefsDialog::setPref (int key, const QVariant& v)
 {
   myPrefs.set (key, v);
   refreshPref (key);
@@ -698,26 +698,26 @@ PrefsDialog :: setPref (int key, const QVariant& v)
 ***/
 
 void
-PrefsDialog :: sessionUpdated ()
+PrefsDialog::sessionUpdated ()
 {
   updateBlocklistLabel ();
 }
 
 void
-PrefsDialog :: updateBlocklistLabel ()
+PrefsDialog::updateBlocklistLabel ()
 {
   const int n = mySession.blocklistSize ();
   myBlocklistLabel->setText (tr ("<i>Blocklist contains %Ln rules</i>", 0, n));
 }
 
 void
-PrefsDialog :: refreshPref (int key)
+PrefsDialog::refreshPref (int key)
 {
   switch (key)
     {
-      case Prefs :: RPC_ENABLED:
-      case Prefs :: RPC_WHITELIST_ENABLED:
-      case Prefs :: RPC_AUTH_REQUIRED:
+      case Prefs::RPC_ENABLED:
+      case Prefs::RPC_WHITELIST_ENABLED:
+      case Prefs::RPC_AUTH_REQUIRED:
         {
           const bool enabled (myPrefs.getBool (Prefs::RPC_ENABLED));
           const bool whitelist (myPrefs.getBool (Prefs::RPC_WHITELIST_ENABLED));
@@ -728,37 +728,37 @@ PrefsDialog :: refreshPref (int key)
           break;
         }
 
-      case Prefs :: ALT_SPEED_LIMIT_TIME_ENABLED:
+      case Prefs::ALT_SPEED_LIMIT_TIME_ENABLED:
         {
           const bool enabled = myPrefs.getBool (key);
           foreach (QWidget * w, mySchedWidgets)w->setEnabled (enabled);
           break;
         }
 
-      case Prefs :: BLOCKLIST_ENABLED:
+      case Prefs::BLOCKLIST_ENABLED:
         {
           const bool enabled = myPrefs.getBool (key);
           foreach (QWidget * w, myBlockWidgets)w->setEnabled (enabled);
           break;
         }
 
-      case Prefs :: DIR_WATCH:
+      case Prefs::DIR_WATCH:
         myWatchButton->setText (QFileInfo(myPrefs.getString(Prefs::DIR_WATCH)).fileName());
         break;
 
-      case Prefs :: SCRIPT_TORRENT_DONE_FILENAME:
+      case Prefs::SCRIPT_TORRENT_DONE_FILENAME:
         {
           const QString path (myPrefs.getString (key));
           myTorrentDoneScriptButton->setText (QFileInfo(path).fileName());
           break;
         }
 
-      case Prefs :: PEER_PORT:
+      case Prefs::PEER_PORT:
         myPortLabel->setText (tr ("Status unknown"));
         myPortButton->setEnabled (true);
         break;
 
-      case Prefs :: DOWNLOAD_DIR:
+      case Prefs::DOWNLOAD_DIR:
         {
           const QString path (myPrefs.getString (key));
           myDestinationButton->setText (QFileInfo(path).fileName());
@@ -766,14 +766,14 @@ PrefsDialog :: refreshPref (int key)
           break;
         }
 
-      case Prefs :: INCOMPLETE_DIR:
+      case Prefs::INCOMPLETE_DIR:
         {
           QString path (myPrefs.getString (key));
           myIncompleteButton->setText (QFileInfo(path).fileName());
           break;
         }
 
-      case Prefs :: INCOMPLETE_DIR_ENABLED:
+      case Prefs::INCOMPLETE_DIR_ENABLED:
         {
           const bool enabled = myPrefs.getBool (key);
           myIncompleteButton->setEnabled (enabled);
@@ -825,7 +825,7 @@ PrefsDialog :: refreshPref (int key)
 }
 
 bool
-PrefsDialog :: isAllowed (int key) const
+PrefsDialog::isAllowed (int key) const
 {
   Q_UNUSED (key);
 

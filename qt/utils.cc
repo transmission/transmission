@@ -40,7 +40,7 @@ extern QPixmap qt_pixmapFromWinHICON(HICON icon);
 #endif
 
 QString
-Utils :: remoteFileChooser (QWidget * parent, const QString& title, const QString& myPath, bool dir, bool local)
+Utils::remoteFileChooser (QWidget * parent, const QString& title, const QString& myPath, bool dir, bool local)
 {
   QString path;
 
@@ -60,7 +60,7 @@ Utils :: remoteFileChooser (QWidget * parent, const QString& title, const QStrin
 }
 
 void
-Utils :: toStderr (const QString& str)
+Utils::toStderr (const QString& str)
 {
   std::cerr << qPrintable(str) << std::endl;
 }
@@ -107,7 +107,7 @@ namespace
 #endif
 
 QIcon
-Utils :: guessMimeIcon (const QString& filename)
+Utils::guessMimeIcon (const QString& filename)
 {
 #ifdef _WIN32
   QIcon icon;
@@ -133,7 +133,7 @@ Utils :: guessMimeIcon (const QString& filename)
 
   if (fileIcons[0].isNull ())
     {
-      fallback = QApplication::style()->standardIcon (QStyle :: SP_FileIcon);
+      fallback = QApplication::style()->standardIcon (QStyle::SP_FileIcon);
 
       suffixes[DISK] << QString::fromLatin1("iso");
       fileIcons[DISK]= QIcon::fromTheme (QString::fromLatin1("media-optical"), fallback);
@@ -188,7 +188,7 @@ Utils :: guessMimeIcon (const QString& filename)
 }
 
 bool
-Utils :: isValidUtf8  (const char *s)
+Utils::isValidUtf8 (const char * s)
 {
   int n;  // number of bytes in a UTF-8 sequence
 
@@ -211,7 +211,7 @@ Utils :: isValidUtf8  (const char *s)
 }
 
 QString
-Utils :: removeTrailingDirSeparator (const QString& path)
+Utils::removeTrailingDirSeparator (const QString& path)
 {
   return path.endsWith (QDir::separator ())
     ? path.left (path.length()-1)

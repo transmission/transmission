@@ -18,7 +18,7 @@
 #include "torrent-model.h"
 #include "utils.h"
 
-TorrentFilter :: TorrentFilter (Prefs& prefs):
+TorrentFilter::TorrentFilter (Prefs& prefs):
   myPrefs (prefs)
 {
   // listen for changes to the preferences to know when to refilter / resort
@@ -28,32 +28,32 @@ TorrentFilter :: TorrentFilter (Prefs& prefs):
 
   // initialize our state from the current prefs
   QList<int> initKeys;
-  initKeys << Prefs :: SORT_MODE
-           << Prefs :: FILTER_MODE
-           << Prefs :: FILTER_TRACKERS
-           << Prefs :: FILTER_TEXT;
+  initKeys << Prefs::SORT_MODE
+           << Prefs::FILTER_MODE
+           << Prefs::FILTER_TRACKERS
+           << Prefs::FILTER_TEXT;
   foreach (int key, initKeys)
     refreshPref (key);
 }
 
-TorrentFilter :: ~TorrentFilter ()
+TorrentFilter::~TorrentFilter ()
 {
 }
 
 void
-TorrentFilter :: refreshPref (int key)
+TorrentFilter::refreshPref (int key)
 {
   switch (key)
     {
-      case Prefs :: FILTER_TEXT:
-      case Prefs :: FILTER_MODE:
-      case Prefs :: FILTER_TRACKERS:
+      case Prefs::FILTER_TEXT:
+      case Prefs::FILTER_MODE:
+      case Prefs::FILTER_TRACKERS:
         invalidateFilter ();
         /* force a re-sort */
         sort (0, !myPrefs.getBool(Prefs::SORT_REVERSED) ? Qt::AscendingOrder : Qt::DescendingOrder);
 
-      case Prefs :: SORT_MODE:
-      case Prefs :: SORT_REVERSED:
+      case Prefs::SORT_MODE:
+      case Prefs::SORT_REVERSED:
         sort (0, myPrefs.getBool(Prefs::SORT_REVERSED) ? Qt::AscendingOrder : Qt::DescendingOrder);
         invalidate ();
         break;
@@ -79,7 +79,7 @@ namespace
 }
 
 bool
-TorrentFilter :: lessThan (const QModelIndex& left, const QModelIndex& right) const
+TorrentFilter::lessThan (const QModelIndex& left, const QModelIndex& right) const
 {
   int val = 0;
   const Torrent * a = sourceModel()->data (left, TorrentModel::TorrentRole).value<const Torrent*>();
@@ -87,26 +87,26 @@ TorrentFilter :: lessThan (const QModelIndex& left, const QModelIndex& right) co
 
   switch (myPrefs.get<SortMode>(Prefs::SORT_MODE).mode())
     {
-      case SortMode :: SORT_BY_QUEUE:
+      case SortMode::SORT_BY_QUEUE:
         if (!val)
           val = -compare (a->queuePosition(), b->queuePosition());
         break;
 
-      case SortMode :: SORT_BY_SIZE:
+      case SortMode::SORT_BY_SIZE:
         if (!val)
           val = compare (a->sizeWhenDone(), b->sizeWhenDone());
         break;
 
-      case SortMode :: SORT_BY_AGE:
+      case SortMode::SORT_BY_AGE:
         val = compare (a->dateAdded().toTime_t(), b->dateAdded().toTime_t());
         break;
 
-      case SortMode :: SORT_BY_ID:
+      case SortMode::SORT_BY_ID:
         if (!val)
           val = compare (a->id(), b->id());
         break;
 
-      case SortMode :: SORT_BY_ACTIVITY:
+      case SortMode::SORT_BY_ACTIVITY:
         if (!val)
           val = compare (a->downloadSpeed() + a->uploadSpeed(), b->downloadSpeed() + b->uploadSpeed());
         if (!val)
@@ -114,7 +114,7 @@ TorrentFilter :: lessThan (const QModelIndex& left, const QModelIndex& right) co
                          b->peersWeAreUploadingTo() + b->webseedsWeAreDownloadingFrom());
         // fall through
 
-      case SortMode :: SORT_BY_STATE:
+      case SortMode::SORT_BY_STATE:
         if (!val)
           val = -compare (a->isPaused(), b->isPaused());
         if (!val)
@@ -125,7 +125,7 @@ TorrentFilter :: lessThan (const QModelIndex& left, const QModelIndex& right) co
           val = compare (a->hasError(), b->hasError());
         // fall through
 
-      case SortMode :: SORT_BY_PROGRESS:
+      case SortMode::SORT_BY_PROGRESS:
         if (!val)
           val = compare (a->percentComplete(), b->percentComplete());
         if (!val)
@@ -133,12 +133,12 @@ TorrentFilter :: lessThan (const QModelIndex& left, const QModelIndex& right) co
         if (!val)
           val = -compare (a->queuePosition(), b->queuePosition());
 
-      case SortMode :: SORT_BY_RATIO:
+      case SortMode::SORT_BY_RATIO:
         if (!val)
           val = a->compareRatio (*b);
         break;
 
-      case SortMode :: SORT_BY_ETA:
+      case SortMode::SORT_BY_ETA:
         if (!val)
           val = a->compareETA (*b);
         break;
@@ -162,13 +162,13 @@ TorrentFilter :: lessThan (const QModelIndex& left, const QModelIndex& right) co
 ***/
 
 bool
-TorrentFilter :: trackerFilterAcceptsTorrent (const Torrent * tor, const QString& tracker) const
+TorrentFilter::trackerFilterAcceptsTorrent (const Torrent * tor, const QString& tracker) const
 {
   return tracker.isEmpty() || tor->hasTrackerSubstring (tracker);
 }
 
 bool
-TorrentFilter :: activityFilterAcceptsTorrent (const Torrent * tor, const FilterMode& m) const
+TorrentFilter::activityFilterAcceptsTorrent (const Torrent * tor, const FilterMode& m) const
 {
   bool accepts;
 
@@ -211,7 +211,7 @@ TorrentFilter :: activityFilterAcceptsTorrent (const Torrent * tor, const Filter
 }
 
 bool
-TorrentFilter :: filterAcceptsRow (int sourceRow, const QModelIndex& sourceParent) const
+TorrentFilter::filterAcceptsRow (int sourceRow, const QModelIndex& sourceParent) const
 {
   QModelIndex childIndex = sourceModel()->index (sourceRow, 0, sourceParent);
   const Torrent * tor = childIndex.model()->data (childIndex, TorrentModel::TorrentRole).value<const Torrent*>();
@@ -240,13 +240,13 @@ TorrentFilter :: filterAcceptsRow (int sourceRow, const QModelIndex& sourceParen
 }
 
 int
-TorrentFilter :: hiddenRowCount () const
+TorrentFilter::hiddenRowCount () const
 {
   return sourceModel()->rowCount () - rowCount ();
 }
 
 void
-TorrentFilter :: countTorrentsPerMode (int * setmeCounts) const
+TorrentFilter::countTorrentsPerMode (int * setmeCounts) const
 {
   std::fill_n (setmeCounts, static_cast<std::size_t>(FilterMode::NUM_MODES), 0);
 

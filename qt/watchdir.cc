@@ -23,13 +23,13 @@
 ****
 ***/
 
-WatchDir :: WatchDir (const TorrentModel& model):
+WatchDir::WatchDir (const TorrentModel& model):
   myModel (model),
   myWatcher (0)
 {
 }
 
-WatchDir :: ~WatchDir ()
+WatchDir::~WatchDir ()
 {
 }
 
@@ -38,7 +38,7 @@ WatchDir :: ~WatchDir ()
 ***/
 
 int
-WatchDir :: metainfoTest (const QString& filename) const
+WatchDir::metainfoTest (const QString& filename) const
 {
   int ret;
   tr_info inf;
@@ -62,7 +62,7 @@ WatchDir :: metainfoTest (const QString& filename) const
 }
 
 void
-WatchDir :: onTimeout ()
+WatchDir::onTimeout ()
 {
   QTimer * t = qobject_cast<QTimer*>(sender());
   const QString filename = t->objectName ();
@@ -74,7 +74,7 @@ WatchDir :: onTimeout ()
 }
 
 void
-WatchDir :: setPath (const QString& path, bool isEnabled)
+WatchDir::setPath (const QString& path, bool isEnabled)
 {
   // clear out any remnants of the previous watcher, if any
   myWatchDirFiles.clear ();
@@ -97,7 +97,7 @@ WatchDir :: setPath (const QString& path, bool isEnabled)
 }
 
 void
-WatchDir :: watcherActivated (const QString& path)
+WatchDir::watcherActivated (const QString& path)
 {
   const QDir dir(path);
 
@@ -142,7 +142,7 @@ WatchDir :: watcherActivated (const QString& path)
 }
 
 void
-WatchDir :: rescanAllWatchedDirectories ()
+WatchDir::rescanAllWatchedDirectories ()
 {
   if (myWatcher == nullptr)
     return;

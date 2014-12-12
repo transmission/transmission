@@ -22,7 +22,7 @@ enum
   REFRESH_INTERVAL_MSEC = (15*1000)
 };
 
-StatsDialog :: StatsDialog (Session & session, QWidget * parent):
+StatsDialog::StatsDialog (Session& session, QWidget * parent):
   QDialog (parent, Qt::Dialog),
   mySession (session),
   myTimer (new QTimer (this))
@@ -57,12 +57,12 @@ StatsDialog :: StatsDialog (Session & session, QWidget * parent):
   mySession.refreshSessionStats ();
 }
 
-StatsDialog :: ~StatsDialog ()
+StatsDialog::~StatsDialog ()
 {
 }
 
 void
-StatsDialog :: setVisible (bool visible)
+StatsDialog::setVisible (bool visible)
 {
   myTimer->stop ();
   if (visible)
@@ -71,13 +71,13 @@ StatsDialog :: setVisible (bool visible)
 }
 
 void
-StatsDialog :: onTimer ()
+StatsDialog::onTimer ()
 {
   mySession.refreshSessionStats ();
 }
 
 void
-StatsDialog :: updateStats ()
+StatsDialog::updateStats ()
 {
   const struct tr_session_stats& current (mySession.getStats ());
   const struct tr_session_stats& total (mySession.getCumulativeStats ());

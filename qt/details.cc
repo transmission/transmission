@@ -137,7 +137,7 @@ class PeerItem: public QTreeWidgetItem
 ***/
 
 QIcon
-Details :: getStockIcon (const QString& freedesktop_name, int fallback)
+Details::getStockIcon (const QString& freedesktop_name, int fallback)
 {
   QIcon icon = QIcon::fromTheme (freedesktop_name);
 
@@ -147,10 +147,10 @@ Details :: getStockIcon (const QString& freedesktop_name, int fallback)
   return icon;
 }
 
-Details :: Details (Session       & session,
-                    Prefs         & prefs,
-                    TorrentModel  & model,
-                    QWidget       * parent):
+Details::Details (Session       & session,
+                  Prefs         & prefs,
+                  TorrentModel  & model,
+                  QWidget       * parent):
   QDialog (parent, Qt::Dialog),
   mySession (session),
   myPrefs (prefs),
@@ -182,8 +182,8 @@ Details :: Details (Session       & session,
   QWidget::setAttribute (Qt::WA_DeleteOnClose, true);
 
   QList<int> initKeys;
-  initKeys << Prefs :: SHOW_TRACKER_SCRAPES
-           << Prefs :: SHOW_BACKUP_TRACKERS;
+  initKeys << Prefs::SHOW_TRACKER_SCRAPES
+           << Prefs::SHOW_BACKUP_TRACKERS;
   foreach (int key, initKeys)
     refreshPref (key);
 
@@ -195,7 +195,7 @@ Details :: Details (Session       & session,
   myTimer.start (REFRESH_INTERVAL_MSEC);
 }
 
-Details :: ~Details ()
+Details::~Details ()
 {
   myTrackerDelegate->deleteLater ();
   myTrackerFilter->deleteLater ();
@@ -203,7 +203,7 @@ Details :: ~Details ()
 }
 
 void
-Details :: setIds (const QSet<int>& ids)
+Details::setIds (const QSet<int>& ids)
 {
   if (ids == myIds)
     return;
@@ -237,13 +237,13 @@ Details :: setIds (const QSet<int>& ids)
 }
 
 void
-Details :: refreshPref (int key)
+Details::refreshPref (int key)
 {
   QString str;
 
   switch (key)
     {
-      case Prefs :: SHOW_TRACKER_SCRAPES:
+      case Prefs::SHOW_TRACKER_SCRAPES:
         {
           QItemSelectionModel * selectionModel (myTrackerView->selectionModel ());
           const QItemSelection selection (selectionModel->selection ());
@@ -256,7 +256,7 @@ Details :: refreshPref (int key)
           break;
         }
 
-      case Prefs :: SHOW_BACKUP_TRACKERS:
+      case Prefs::SHOW_BACKUP_TRACKERS:
         myTrackerFilter->setShowBackupTrackers (myPrefs.getBool (key));
         break;
 
@@ -271,7 +271,7 @@ Details :: refreshPref (int key)
 ***/
 
 QString
-Details :: timeToStringRounded (int seconds)
+Details::timeToStringRounded (int seconds)
 {
   if (seconds > 60)
     seconds -= (seconds % 60);
@@ -280,13 +280,13 @@ Details :: timeToStringRounded (int seconds)
 }
 
 void
-Details :: onTimer ()
+Details::onTimer ()
 {
   getNewData ();
 }
 
 void
-Details :: getNewData ()
+Details::getNewData ()
 {
   if (!myIds.empty ())
     {
@@ -305,7 +305,7 @@ Details :: getNewData ()
 }
 
 void
-Details :: onTorrentChanged ()
+Details::onTorrentChanged ()
 {
   if (!myHavePendingRefresh)
     {
@@ -348,7 +348,7 @@ namespace
 }
 
 void
-Details :: refresh ()
+Details::refresh ()
 {
   const int n = myIds.size ();
   const bool single = n == 1;
@@ -923,7 +923,7 @@ Details :: refresh ()
 }
 
 void
-Details :: enableWhenChecked (QCheckBox * box, QWidget * w)
+Details::enableWhenChecked (QCheckBox * box, QWidget * w)
 {
   connect (box, SIGNAL (toggled (bool)), w, SLOT (setEnabled (bool)));
   w->setEnabled (box->isChecked ());
@@ -935,7 +935,7 @@ Details :: enableWhenChecked (QCheckBox * box, QWidget * w)
 ***/
 
 QWidget *
-Details :: createInfoTab ()
+Details::createInfoTab ()
 {
   HIG * hig = new HIG (this);
 
@@ -973,31 +973,31 @@ Details :: createInfoTab ()
 ***/
 
 void
-Details :: onShowTrackerScrapesToggled (bool val)
+Details::onShowTrackerScrapesToggled (bool val)
 {
   myPrefs.set (Prefs::SHOW_TRACKER_SCRAPES, val);
 }
 
 void
-Details :: onShowBackupTrackersToggled (bool val)
+Details::onShowBackupTrackersToggled (bool val)
 {
   myPrefs.set (Prefs::SHOW_BACKUP_TRACKERS, val);
 }
 
 void
-Details :: onHonorsSessionLimitsToggled (bool val)
+Details::onHonorsSessionLimitsToggled (bool val)
 {
   mySession.torrentSet (myIds, TR_KEY_honorsSessionLimits, val);
   getNewData ();
 }
 void
-Details :: onDownloadLimitedToggled (bool val)
+Details::onDownloadLimitedToggled (bool val)
 {
   mySession.torrentSet (myIds, TR_KEY_downloadLimited, val);
   getNewData ();
 }
 void
-Details :: onSpinBoxEditingFinished ()
+Details::onSpinBoxEditingFinished ()
 {
   const QObject * spin = sender ();
   const tr_quark key = spin->property (PREF_KEY).toInt ();
@@ -1010,14 +1010,14 @@ Details :: onSpinBoxEditingFinished ()
 }
 
 void
-Details :: onUploadLimitedToggled (bool val)
+Details::onUploadLimitedToggled (bool val)
 {
   mySession.torrentSet (myIds, TR_KEY_uploadLimited, val);
   getNewData ();
 }
 
 void
-Details :: onIdleModeChanged (int index)
+Details::onIdleModeChanged (int index)
 {
   const int val = myIdleCombo->itemData (index).toInt ();
   mySession.torrentSet (myIds, TR_KEY_seedIdleMode, val);
@@ -1025,14 +1025,14 @@ Details :: onIdleModeChanged (int index)
 }
 
 void
-Details :: onRatioModeChanged (int index)
+Details::onRatioModeChanged (int index)
 {
   const int val = myRatioCombo->itemData (index).toInt ();
   mySession.torrentSet (myIds, TR_KEY_seedRatioMode, val);
 }
 
 void
-Details :: onBandwidthPriorityChanged (int index)
+Details::onBandwidthPriorityChanged (int index)
 {
   if (index != -1)
     {
@@ -1043,7 +1043,7 @@ Details :: onBandwidthPriorityChanged (int index)
 }
 
 void
-Details :: onTrackerSelectionChanged ()
+Details::onTrackerSelectionChanged ()
 {
   const int selectionCount = myTrackerView->selectionModel ()->selectedRows ().size ();
   myEditTrackerButton->setEnabled (selectionCount == 1);
@@ -1051,7 +1051,7 @@ Details :: onTrackerSelectionChanged ()
 }
 
 void
-Details :: onAddTrackerClicked ()
+Details::onAddTrackerClicked ()
 {
   bool ok = false;
   const QString url = QInputDialog::getText (this,
@@ -1089,7 +1089,7 @@ Details :: onAddTrackerClicked ()
 }
 
 void
-Details :: onEditTrackerClicked ()
+Details::onEditTrackerClicked ()
 {
   QItemSelectionModel * selectionModel = myTrackerView->selectionModel ();
   QModelIndexList selectedRows = selectionModel->selectedRows ();
@@ -1125,7 +1125,7 @@ Details :: onEditTrackerClicked ()
 }
 
 void
-Details :: onRemoveTrackerClicked ()
+Details::onRemoveTrackerClicked ()
 {
   // make a map of torrentIds to announce URLs to remove
   QItemSelectionModel * selectionModel = myTrackerView->selectionModel ();
@@ -1150,7 +1150,7 @@ Details :: onRemoveTrackerClicked ()
 }
 
 QWidget *
-Details :: createOptionsTab ()
+Details::createOptionsTab ()
 {
   QSpinBox * s;
   QCheckBox * c;
@@ -1203,7 +1203,7 @@ Details :: createOptionsTab ()
   hig->addSectionTitle (tr ("Seeding Limits"));
 
   h = new QHBoxLayout ();
-  h->setSpacing (HIG :: PAD);
+  h->setSpacing (HIG::PAD);
   m = new QComboBox;
   m->addItem (tr ("Use Global Settings"),      TR_RATIOLIMIT_GLOBAL);
   m->addItem (tr ("Seed regardless of ratio"), TR_RATIOLIMIT_UNLIMITED);
@@ -1218,7 +1218,7 @@ Details :: createOptionsTab ()
   hig->addRow (tr ("&Ratio:"), h, m);
 
   h = new QHBoxLayout ();
-  h->setSpacing (HIG :: PAD);
+  h->setSpacing (HIG::PAD);
   m = new QComboBox;
   m->addItem (tr ("Use Global Settings"),                 TR_IDLELIMIT_GLOBAL);
   m->addItem (tr ("Seed regardless of activity"),         TR_IDLELIMIT_UNLIMITED);
@@ -1255,7 +1255,7 @@ Details :: createOptionsTab ()
 ***/
 
 QWidget *
-Details :: createTrackerTab ()
+Details::createTrackerTab ()
 {
   QCheckBox * c;
   QPushButton * p;
@@ -1338,11 +1338,11 @@ Details :: createTrackerTab ()
 ***/
 
 QWidget *
-Details :: createPeersTab ()
+Details::createPeersTab ()
 {
   QWidget * top = new QWidget;
   QVBoxLayout * v = new QVBoxLayout (top);
-  v->setSpacing (HIG :: PAD_BIG);
+  v->setSpacing (HIG::PAD_BIG);
   v->setContentsMargins (HIG::PAD_BIG, HIG::PAD_BIG, HIG::PAD_BIG, HIG::PAD_BIG);
 
   QStringList headers;
@@ -1379,7 +1379,7 @@ Details :: createPeersTab ()
 ***/
 
 QWidget *
-Details :: createFilesTab ()
+Details::createFilesTab ()
 {
   myFileTreeView = new FileTreeView ();
 
@@ -1399,7 +1399,7 @@ Details :: createFilesTab ()
 }
 
 void
-Details :: onFilePriorityChanged (const QSet<int>& indices, int priority)
+Details::onFilePriorityChanged (const QSet<int>& indices, int priority)
 {
   tr_quark key;
 
@@ -1423,7 +1423,7 @@ Details :: onFilePriorityChanged (const QSet<int>& indices, int priority)
 }
 
 void
-Details :: onFileWantedChanged (const QSet<int>& indices, bool wanted)
+Details::onFileWantedChanged (const QSet<int>& indices, bool wanted)
 {
   const tr_quark key = wanted ? TR_KEY_files_wanted : TR_KEY_files_unwanted;
   mySession.torrentSet (myIds, key, indices.toList ());
@@ -1431,13 +1431,13 @@ Details :: onFileWantedChanged (const QSet<int>& indices, bool wanted)
 }
 
 void
-Details :: onPathEdited (const QString& oldpath, const QString& newname)
+Details::onPathEdited (const QString& oldpath, const QString& newname)
 {
   mySession.torrentRenamePath (myIds, oldpath, newname);
 }
 
 void
-Details :: onOpenRequested (const QString& path)
+Details::onOpenRequested (const QString& path)
 {
   if (!mySession.isLocal ())
     return;

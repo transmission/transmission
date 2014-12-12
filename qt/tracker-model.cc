@@ -15,7 +15,7 @@
 #include "tracker-model.h"
 
 int
-TrackerModel :: rowCount (const QModelIndex& parent) const
+TrackerModel::rowCount (const QModelIndex& parent) const
 {
   Q_UNUSED (parent);
 
@@ -23,7 +23,7 @@ TrackerModel :: rowCount (const QModelIndex& parent) const
 }
 
 QVariant
-TrackerModel :: data (const QModelIndex& index, int role) const
+TrackerModel::data (const QModelIndex& index, int role) const
 {
   QVariant var;
 
@@ -77,7 +77,7 @@ struct CompareTrackers
 };
 
 void
-TrackerModel :: refresh (const TorrentModel& torrentModel, const QSet<int>& ids)
+TrackerModel::refresh (const TorrentModel& torrentModel, const QSet<int>& ids)
 {
   // build a list of the TrackerInfos
   QVector<TrackerInfo> trackers;
@@ -152,7 +152,7 @@ TrackerModel :: refresh (const TorrentModel& torrentModel, const QSet<int>& ids)
 }
 
 int
-TrackerModel :: find (int torrentId, const QString& url) const
+TrackerModel::find (int torrentId, const QString& url) const
 {
   for (int i=0, n=myRows.size(); i<n; ++i)
     {

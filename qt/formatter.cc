@@ -29,7 +29,7 @@ namespace
 QString Formatter::unitStrings[3][5];
 
 void
-Formatter :: initUnits ()
+Formatter::initUnits ()
 {
  speed_K = 1000;
  unitStrings[SPEED][B]  = tr ( "B/s");
@@ -73,13 +73,13 @@ Formatter :: initUnits ()
 ***/
 
 double
-Speed :: KBps () const
+Speed::KBps () const
 {
   return _Bps / (double)speed_K;
 }
 
 Speed
-Speed :: fromKBps (double KBps)
+Speed::fromKBps (double KBps)
 {
   return int (KBps * speed_K);
 }
@@ -89,7 +89,7 @@ Speed :: fromKBps (double KBps)
 ***/
 
 QString
-Formatter :: memToString (int64_t bytes)
+Formatter::memToString (int64_t bytes)
 {
   if (bytes < 0)
     return tr ("Unknown");
@@ -103,7 +103,7 @@ Formatter :: memToString (int64_t bytes)
 }
 
 QString
-Formatter :: sizeToString (int64_t bytes)
+Formatter::sizeToString (int64_t bytes)
 {
   if (bytes < 0)
     return tr ("Unknown");
@@ -117,7 +117,7 @@ Formatter :: sizeToString (int64_t bytes)
 }
 
 QString
-Formatter :: speedToString (const Speed& speed)
+Formatter::speedToString (const Speed& speed)
 {
   char buf[128];
   tr_formatter_speed_KBps (buf, speed.KBps (), sizeof (buf));
@@ -125,7 +125,7 @@ Formatter :: speedToString (const Speed& speed)
 }
 
 QString
-Formatter :: uploadSpeedToString (const Speed& uploadSpeed)
+Formatter::uploadSpeedToString (const Speed& uploadSpeed)
 {
   static const QChar uploadSymbol (0x25B4);
 
@@ -133,7 +133,7 @@ Formatter :: uploadSpeedToString (const Speed& uploadSpeed)
 }
 
 QString
-Formatter :: downloadSpeedToString (const Speed& downloadSpeed)
+Formatter::downloadSpeedToString (const Speed& downloadSpeed)
 {
   static const QChar downloadSymbol (0x25BE);
 
@@ -141,21 +141,21 @@ Formatter :: downloadSpeedToString (const Speed& downloadSpeed)
 }
 
 QString
-Formatter :: percentToString (double x)
+Formatter::percentToString (double x)
 {
   char buf[128];
   return QString (tr_strpercent (buf, x, sizeof (buf)));
 }
 
 QString
-Formatter :: ratioToString (double ratio)
+Formatter::ratioToString (double ratio)
 {
   char buf[128];
   return QString::fromUtf8 (tr_strratio (buf, sizeof (buf), ratio, "\xE2\x88\x9E"));
 }
 
 QString
-Formatter :: timeToString (int seconds)
+Formatter::timeToString (int seconds)
 {
   int days, hours, minutes;
   QString d, h, m, s;

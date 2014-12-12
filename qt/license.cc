@@ -13,7 +13,7 @@
 
 #include "license.h"
 
-LicenseDialog :: LicenseDialog (QWidget * parent):
+LicenseDialog::LicenseDialog (QWidget * parent):
   QDialog (parent, Qt::Dialog)
 {
   setWindowTitle (tr ("License"));

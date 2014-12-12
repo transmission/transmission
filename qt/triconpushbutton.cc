@@ -16,19 +16,19 @@
 #include "hig.h"
 #include "triconpushbutton.h"
 
-TrIconPushButton :: TrIconPushButton (QWidget * parent):
+TrIconPushButton::TrIconPushButton (QWidget * parent):
   QPushButton (parent)
 {
 }
 
-TrIconPushButton :: TrIconPushButton (const QIcon& icon, QWidget * parent):
+TrIconPushButton::TrIconPushButton (const QIcon& icon, QWidget * parent):
   QPushButton (parent)
 {
   setIcon (icon);
 }
 
 QSize
-TrIconPushButton :: sizeHint () const
+TrIconPushButton::sizeHint () const
 {
   QSize s = iconSize ();
   s.rwidth() += HIG::PAD_SMALL*2;
@@ -36,7 +36,7 @@ TrIconPushButton :: sizeHint () const
 }
 
 void
-TrIconPushButton :: paintEvent (QPaintEvent *)
+TrIconPushButton::paintEvent (QPaintEvent *)
 {
   QStylePainter p (this);
   QStyleOptionButton opt;

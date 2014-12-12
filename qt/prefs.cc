@@ -125,7 +125,7 @@ Prefs::PrefItem Prefs::myItems[] =
 ****
 ***/
 
-Prefs :: Prefs (const char * configDir):
+Prefs::Prefs (const char * configDir):
   myConfigDir (QString::fromUtf8 (configDir))
 {
   assert (sizeof(myItems) / sizeof(myItems[0]) == PREFS_COUNT);
@@ -187,7 +187,7 @@ Prefs :: Prefs (const char * configDir):
 
           case QVariant::DateTime:
             if (tr_variantGetInt (b, &intVal))
-                myValues[i].setValue (QDateTime :: fromTime_t (intVal));
+                myValues[i].setValue (QDateTime::fromTime_t (intVal));
             break;
 
           default:
@@ -199,7 +199,7 @@ Prefs :: Prefs (const char * configDir):
     tr_variantFree (&top);
 }
 
-Prefs :: ~Prefs ()
+Prefs::~Prefs ()
 {
   // make a dict from settings.json
   tr_variant current_settings;
@@ -273,7 +273,7 @@ Prefs :: ~Prefs ()
  * If you add a new preferences key, you /must/ add a default value here.
  */
 void
-Prefs :: initDefaults (tr_variant * d)
+Prefs::initDefaults (tr_variant * d)
 {
   tr_variantDictReserve (d, 38);
   tr_variantDictAddBool (d, TR_KEY_blocklist_updates_enabled, true);
@@ -321,14 +321,14 @@ Prefs :: initDefaults (tr_variant * d)
 ***/
 
 bool
-Prefs :: getBool (int key) const
+Prefs::getBool (int key) const
 {
   assert (myItems[key].type == QVariant::Bool);
   return myValues[key].toBool();
 }
 
 QString
-Prefs :: getString (int key) const
+Prefs::getString (int key) const
 {
   assert (myItems[key].type == QVariant::String);
   const QByteArray b = myValues[key].toByteArray();
@@ -338,21 +338,21 @@ Prefs :: getString (int key) const
 }
 
 int
-Prefs :: getInt (int key) const
+Prefs::getInt (int key) const
 {
   assert (myItems[key].type == QVariant::Int);
   return myValues[key].toInt();
 }
 
 double
-Prefs :: getDouble (int key) const
+Prefs::getDouble (int key) const
 {
   assert (myItems[key].type == QVariant::Double);
   return myValues[key].toDouble();
 }
 
 QDateTime
-Prefs :: getDateTime (int key) const
+Prefs::getDateTime (int key) const
 {
   assert (myItems[key].type == QVariant::DateTime);
   return myValues[key].toDateTime();
@@ -363,7 +363,7 @@ Prefs :: getDateTime (int key) const
 ***/
 
 void
-Prefs :: toggleBool (int key)
+Prefs::toggleBool (int key)
 {
   set (key, !getBool(key));
 }

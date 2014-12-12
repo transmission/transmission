@@ -48,19 +48,19 @@ namespace
   }
 }
 
-FilterBarComboBoxDelegate :: FilterBarComboBoxDelegate (QObject * parent, QComboBox * combo):
+FilterBarComboBoxDelegate::FilterBarComboBoxDelegate (QObject * parent, QComboBox * combo):
   QItemDelegate (parent),
   myCombo (combo)
 {
 }
 
 bool
-FilterBarComboBoxDelegate :: isSeparator (const QModelIndex &index)
+FilterBarComboBoxDelegate::isSeparator (const QModelIndex& index)
 {
   return index.data (Qt::AccessibleDescriptionRole).toString () == QLatin1String ("separator");
 }
 void
-FilterBarComboBoxDelegate :: setSeparator (QAbstractItemModel * model, const QModelIndex& index)
+FilterBarComboBoxDelegate::setSeparator (QAbstractItemModel * model, const QModelIndex& index)
 {
   model->setData (index, QString::fromLatin1 ("separator"), Qt::AccessibleDescriptionRole);
 
@@ -70,9 +70,9 @@ FilterBarComboBoxDelegate :: setSeparator (QAbstractItemModel * model, const QMo
 }
 
 void
-FilterBarComboBoxDelegate :: paint (QPainter                    * painter,
-                                    const QStyleOptionViewItem  & option,
-                                    const QModelIndex           & index) const
+FilterBarComboBoxDelegate::paint (QPainter                    * painter,
+                                  const QStyleOptionViewItem  & option,
+                                  const QModelIndex           & index) const
 {
   if (isSeparator (index))
     {
@@ -120,8 +120,8 @@ FilterBarComboBoxDelegate :: paint (QPainter                    * painter,
 }
 
 QSize
-FilterBarComboBoxDelegate :: sizeHint (const QStyleOptionViewItem & option,
-                                       const QModelIndex          & index) const
+FilterBarComboBoxDelegate::sizeHint (const QStyleOptionViewItem & option,
+                                     const QModelIndex          & index) const
 {
   if (isSeparator (index))
     {
@@ -146,13 +146,13 @@ FilterBarComboBoxDelegate :: sizeHint (const QStyleOptionViewItem & option,
 ***
 **/
 
-FilterBarComboBox :: FilterBarComboBox (QWidget * parent):
+FilterBarComboBox::FilterBarComboBox (QWidget * parent):
   QComboBox (parent)
 {
 }
 
 int
-FilterBarComboBox :: currentCount () const
+FilterBarComboBox::currentCount () const
 {
   int count = 0;
 
@@ -164,7 +164,7 @@ FilterBarComboBox :: currentCount () const
 }
 
 void
-FilterBarComboBox :: paintEvent (QPaintEvent * e)
+FilterBarComboBox::paintEvent (QPaintEvent * e)
 {
   Q_UNUSED (e);
 
@@ -226,7 +226,7 @@ FilterBarComboBox :: paintEvent (QPaintEvent * e)
 ****/
 
 FilterBarComboBox *
-FilterBar :: createActivityCombo ()
+FilterBar::createActivityCombo ()
 {
   FilterBarComboBox * c = new FilterBarComboBox (this);
   FilterBarComboBoxDelegate * delegate = new FilterBarComboBoxDelegate (this, c);
@@ -299,7 +299,7 @@ namespace
 }
 
 void
-FilterBar :: refreshTrackers ()
+FilterBar::refreshTrackers ()
 {
   Favicons& favicons = dynamic_cast<MyApp*> (QApplication::instance ())->favicons;
   const int firstTrackerRow = 2; // skip over the "All" and separator...
@@ -392,7 +392,7 @@ FilterBar :: refreshTrackers ()
 
 
 FilterBarComboBox *
-FilterBar :: createTrackerCombo (QStandardItemModel * model)
+FilterBar::createTrackerCombo (QStandardItemModel * model)
 {
   FilterBarComboBox * c = new FilterBarComboBox (this);
   FilterBarComboBoxDelegate * delegate = new FilterBarComboBoxDelegate (this, c);
@@ -418,7 +418,7 @@ FilterBar :: createTrackerCombo (QStandardItemModel * model)
 *****
 ****/
 
-FilterBar :: FilterBar (Prefs& prefs, TorrentModel& torrents, TorrentFilter& filter, QWidget * parent):
+FilterBar::FilterBar (Prefs& prefs, TorrentModel& torrents, TorrentFilter& filter, QWidget * parent):
   QWidget (parent),
   myPrefs (prefs),
   myTorrents (torrents),
@@ -476,13 +476,13 @@ FilterBar :: FilterBar (Prefs& prefs, TorrentModel& torrents, TorrentFilter& fil
 
   // initialize our state
   QList<int> initKeys;
-  initKeys << Prefs :: FILTER_MODE
-           << Prefs :: FILTER_TRACKERS;
+  initKeys << Prefs::FILTER_MODE
+           << Prefs::FILTER_TRACKERS;
   foreach (int key, initKeys)
       refreshPref (key);
 }
 
-FilterBar :: ~FilterBar ()
+FilterBar::~FilterBar ()
 {
   delete myRecountTimer;
 }
@@ -492,11 +492,11 @@ FilterBar :: ~FilterBar ()
 ***/
 
 void
-FilterBar :: refreshPref (int key)
+FilterBar::refreshPref (int key)
 {
   switch (key)
     {
-      case Prefs :: FILTER_MODE:
+      case Prefs::FILTER_MODE:
         {
           const FilterMode m = myPrefs.get<FilterMode> (key);
           QAbstractItemModel * model = myActivityCombo->model ();
@@ -505,7 +505,7 @@ FilterBar :: refreshPref (int key)
           break;
         }
 
-      case Prefs :: FILTER_TRACKERS:
+      case Prefs::FILTER_TRACKERS:
         {
           const QString tracker = myPrefs.getString (key);
           const QString name = readableHostName (tracker);
@@ -526,14 +526,14 @@ FilterBar :: refreshPref (int key)
 }
 
 void
-FilterBar :: onTextChanged (const QString& str)
+FilterBar::onTextChanged (const QString& str)
 {
   if (!myIsBootstrapping)
     myPrefs.set (Prefs::FILTER_TEXT, str.trimmed ());
 }
 
 void
-FilterBar :: onTrackerIndexChanged (int i)
+FilterBar::onTrackerIndexChanged (int i)
 {
   if (!myIsBootstrapping)
     {
@@ -555,7 +555,7 @@ FilterBar :: onTrackerIndexChanged (int i)
 }
 
 void
-FilterBar :: onActivityIndexChanged (int i)
+FilterBar::onActivityIndexChanged (int i)
 {
   if (!myIsBootstrapping)
     {
@@ -568,13 +568,13 @@ FilterBar :: onActivityIndexChanged (int i)
 ****
 ***/
 
-void FilterBar :: onTorrentModelReset () { recountSoon (); }
-void FilterBar :: onTorrentModelRowsInserted (const QModelIndex&, int, int) { recountSoon (); }
-void FilterBar :: onTorrentModelRowsRemoved (const QModelIndex&, int, int) { recountSoon (); }
-void FilterBar :: onTorrentModelDataChanged (const QModelIndex&, const QModelIndex&) { recountSoon (); }
+void FilterBar::onTorrentModelReset () { recountSoon (); }
+void FilterBar::onTorrentModelRowsInserted (const QModelIndex&, int, int) { recountSoon (); }
+void FilterBar::onTorrentModelRowsRemoved (const QModelIndex&, int, int) { recountSoon (); }
+void FilterBar::onTorrentModelDataChanged (const QModelIndex&, const QModelIndex&) { recountSoon (); }
 
 void
-FilterBar :: recountSoon ()
+FilterBar::recountSoon ()
 {
   if (!myRecountTimer->isActive ())
     {
@@ -583,7 +583,7 @@ FilterBar :: recountSoon ()
     }
 }
 void
-FilterBar :: recount ()
+FilterBar::recount ()
 {
   QAbstractItemModel * model = myActivityCombo->model ();
 
@@ -604,13 +604,13 @@ FilterBar :: recount ()
 }
 
 QString
-FilterBar :: getCountString (int n) const
+FilterBar::getCountString (int n) const
 {
   return QString ("%L1").arg (n);
 }
 
 void
-FilterBar :: refreshCountLabel ()
+FilterBar::refreshCountLabel ()
 {
   const int visibleCount = myFilter.rowCount ();
   const int trackerCount = myTrackerCombo->currentCount ();

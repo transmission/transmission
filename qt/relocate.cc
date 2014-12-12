@@ -26,24 +26,24 @@
 #include "torrent-model.h"
 #include "utils.h"
 
-bool RelocateDialog :: myMoveFlag = true;
+bool RelocateDialog::myMoveFlag = true;
 
 void
-RelocateDialog :: onSetLocation ()
+RelocateDialog::onSetLocation ()
 {
   mySession.torrentSetLocation (myIds, myPath, myMoveFlag);
   deleteLater ();
 }
 
 void
-RelocateDialog :: onFileSelected (const QString& path)
+RelocateDialog::onFileSelected (const QString& path)
 {
   myPath = path;
   myDirButton->setText (myPath);
 }
 
 void
-RelocateDialog :: onDirButtonClicked ()
+RelocateDialog::onDirButtonClicked ()
 {
   const QString title = tr ("Select Location");
   const QString path = Utils::remoteFileChooser (this, title, myPath, true, mySession.isServer ());
@@ -53,21 +53,21 @@ RelocateDialog :: onDirButtonClicked ()
 }
 
 void
-RelocateDialog :: onMoveToggled (bool b)
+RelocateDialog::onMoveToggled (bool b)
 {
   myMoveFlag = b;
 }
 
-RelocateDialog :: RelocateDialog (Session          & session,
-                                  TorrentModel     & model,
-                                  const QSet<int>  & ids,
-                                  QWidget          * parent):
+RelocateDialog::RelocateDialog (Session          & session,
+                                TorrentModel     & model,
+                                const QSet<int>  & ids,
+                                QWidget          * parent):
   QDialog (parent),
   mySession (session),
   myModel (model),
   myIds (ids)
 {
-  const int iconSize (style ()->pixelMetric (QStyle :: PM_SmallIconSize));
+  const int iconSize (style ()->pixelMetric (QStyle::PM_SmallIconSize));
   const QFileIconProvider iconProvider;
   const QIcon folderIcon = iconProvider.icon (QFileIconProvider::Folder);
   const QPixmap folderPixmap = folderIcon.pixmap (iconSize);

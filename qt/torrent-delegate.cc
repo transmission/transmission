@@ -31,14 +31,14 @@ enum
   BAR_HEIGHT = 12
 };
 
-QColor TorrentDelegate :: greenBrush;
-QColor TorrentDelegate :: blueBrush;
-QColor TorrentDelegate :: silverBrush;
-QColor TorrentDelegate :: greenBack;
-QColor TorrentDelegate :: blueBack;
-QColor TorrentDelegate :: silverBack;
+QColor TorrentDelegate::greenBrush;
+QColor TorrentDelegate::blueBrush;
+QColor TorrentDelegate::silverBrush;
+QColor TorrentDelegate::greenBack;
+QColor TorrentDelegate::blueBack;
+QColor TorrentDelegate::silverBack;
 
-TorrentDelegate :: TorrentDelegate (QObject * parent):
+TorrentDelegate::TorrentDelegate (QObject * parent):
   QStyledItemDelegate (parent),
   myProgressBarStyle (new QStyleOptionProgressBar)
 {
@@ -55,7 +55,7 @@ TorrentDelegate :: TorrentDelegate (QObject * parent):
   silverBack = QColor ("grey");
 }
 
-TorrentDelegate :: ~TorrentDelegate ()
+TorrentDelegate::~TorrentDelegate ()
 {
   delete myProgressBarStyle;
 }
@@ -65,7 +65,7 @@ TorrentDelegate :: ~TorrentDelegate ()
 ***/
 
 QSize
-TorrentDelegate :: margin (const QStyle& style) const
+TorrentDelegate::margin (const QStyle& style) const
 {
   Q_UNUSED (style);
 
@@ -73,7 +73,7 @@ TorrentDelegate :: margin (const QStyle& style) const
 }
 
 QString
-TorrentDelegate :: progressString (const Torrent& tor) const
+TorrentDelegate::progressString (const Torrent& tor) const
 {
   const bool isMagnet (!tor.hasMetadata());
   const bool isDone (tor.isDone ());
@@ -172,7 +172,7 @@ TorrentDelegate :: progressString (const Torrent& tor) const
 }
 
 QString
-TorrentDelegate :: shortTransferString (const Torrent& tor) const
+TorrentDelegate::shortTransferString (const Torrent& tor) const
 {
   QString str;
   const bool haveMeta (tor.hasMetadata());
@@ -191,7 +191,7 @@ TorrentDelegate :: shortTransferString (const Torrent& tor) const
 }
 
 QString
-TorrentDelegate :: shortStatusString (const Torrent& tor) const
+TorrentDelegate::shortStatusString (const Torrent& tor) const
 {
   QString str;
   static const QChar ratioSymbol (0x262F);
@@ -219,7 +219,7 @@ TorrentDelegate :: shortStatusString (const Torrent& tor) const
 }
 
 QString
-TorrentDelegate :: statusString (const Torrent& tor) const
+TorrentDelegate::statusString (const Torrent& tor) const
 {
   QString str;
 
@@ -288,7 +288,7 @@ namespace
 }
 
 QSize
-TorrentDelegate :: sizeHint (const QStyleOptionViewItem& option, const Torrent& tor) const
+TorrentDelegate::sizeHint (const QStyleOptionViewItem& option, const Torrent& tor) const
 {
   const QStyle* style (QApplication::style ());
   static const int iconSize (style->pixelMetric (QStyle::PM_MessageBoxIconSize));
@@ -314,17 +314,17 @@ TorrentDelegate :: sizeHint (const QStyleOptionViewItem& option, const Torrent& 
 }
 
 QSize
-TorrentDelegate :: sizeHint (const QStyleOptionViewItem  & option,
-                             const QModelIndex           & index) const
+TorrentDelegate::sizeHint (const QStyleOptionViewItem  & option,
+                           const QModelIndex           & index) const
 {
   const Torrent * tor (index.data (TorrentModel::TorrentRole).value<const Torrent*>());
   return sizeHint (option, *tor);
 }
 
 void
-TorrentDelegate :: paint (QPainter                    * painter,
-                          const QStyleOptionViewItem  & option,
-                          const QModelIndex           & index) const
+TorrentDelegate::paint (QPainter                    * painter,
+                        const QStyleOptionViewItem  & option,
+                        const QModelIndex           & index) const
 {
   const Torrent * tor (index.data (TorrentModel::TorrentRole).value<const Torrent*>());
   painter->save ();
@@ -334,8 +334,8 @@ TorrentDelegate :: paint (QPainter                    * painter,
 }
 
 void
-TorrentDelegate :: setProgressBarPercentDone (const QStyleOptionViewItem & option,
-                                              const Torrent              & tor) const
+TorrentDelegate::setProgressBarPercentDone (const QStyleOptionViewItem & option,
+                                            const Torrent              & tor) const
 {
   double seedRatioLimit;
   if (tor.isSeeding() && tor.getSeedRatio(seedRatioLimit))
@@ -353,9 +353,9 @@ TorrentDelegate :: setProgressBarPercentDone (const QStyleOptionViewItem & optio
 }
 
 void
-TorrentDelegate :: drawTorrent (QPainter                   * painter,
-                                const QStyleOptionViewItem & option,
-                                const Torrent              & tor) const
+TorrentDelegate::drawTorrent (QPainter                   * painter,
+                              const QStyleOptionViewItem & option,
+                              const Torrent              & tor) const
 {
   const QStyle * style (QApplication::style ());
   static const int iconSize (style->pixelMetric (QStyle::PM_LargeIconSize));

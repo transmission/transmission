@@ -29,7 +29,7 @@
 #include "utils.h"
 
 
-Torrent :: Torrent (Prefs& prefs, int id):
+Torrent::Torrent (Prefs& prefs, int id):
   magnetTorrent (false),
   myPrefs (prefs)
 {
@@ -42,7 +42,7 @@ Torrent :: Torrent (Prefs& prefs, int id):
   setIcon (MIME_ICON, QApplication::style()->standardIcon (QStyle::SP_FileIcon));
 }
 
-Torrent :: ~Torrent ()
+Torrent::~Torrent ()
 {
 }
 
@@ -50,8 +50,8 @@ Torrent :: ~Torrent ()
 ****
 ***/
 
-Torrent :: Property
-Torrent :: myProperties[] =
+Torrent::Property
+Torrent::myProperties[] =
 {
   { ID, TR_KEY_id, QVariant::Int, INFO, },
   { UPLOAD_SPEED, TR_KEY_rateUpload, QVariant::ULongLong, STAT } /* Bps */,
@@ -111,8 +111,8 @@ Torrent :: myProperties[] =
   { QUEUE_POSITION, TR_KEY_queuePosition, QVariant::Int, STAT },
 };
 
-Torrent :: KeyList
-Torrent :: buildKeyList (Group group)
+Torrent::KeyList
+Torrent::buildKeyList (Group group)
 {
   KeyList keys;
 
@@ -124,8 +124,8 @@ Torrent :: buildKeyList (Group group)
   return keys;
 }
 
-const Torrent :: KeyList&
-Torrent :: getInfoKeys ()
+const Torrent::KeyList&
+Torrent::getInfoKeys ()
 {
   static KeyList keys;
 
@@ -135,15 +135,15 @@ Torrent :: getInfoKeys ()
   return keys;
 }
 
-const Torrent :: KeyList&
-Torrent :: getStatKeys ()
+const Torrent::KeyList&
+Torrent::getStatKeys ()
 {
   static KeyList keys (buildKeyList(STAT));
   return keys;
 }
 
-const Torrent :: KeyList&
-Torrent :: getExtraStatKeys()
+const Torrent::KeyList&
+Torrent::getExtraStatKeys()
 {
   static KeyList keys;
 
@@ -154,7 +154,7 @@ Torrent :: getExtraStatKeys()
 }
 
 bool
-Torrent :: setInt (int i, int value)
+Torrent::setInt (int i, int value)
 {
   bool changed = false;
 
@@ -171,7 +171,7 @@ Torrent :: setInt (int i, int value)
 }
 
 bool
-Torrent :: setBool (int i, bool value)
+Torrent::setBool (int i, bool value)
 {
   bool changed = false;
 
@@ -188,7 +188,7 @@ Torrent :: setBool (int i, bool value)
 }
 
 bool
-Torrent :: setDouble (int i, double value)
+Torrent::setDouble (int i, double value)
 {
   bool changed = false;
 
@@ -205,7 +205,7 @@ Torrent :: setDouble (int i, double value)
 }
 
 bool
-Torrent :: setDateTime (int i, const QDateTime& value)
+Torrent::setDateTime (int i, const QDateTime& value)
 {
   bool changed = false;
 
@@ -222,7 +222,7 @@ Torrent :: setDateTime (int i, const QDateTime& value)
 }
 
 bool
-Torrent :: setSize (int i, qulonglong value)
+Torrent::setSize (int i, qulonglong value)
 {
   bool changed = false;
 
@@ -239,7 +239,7 @@ Torrent :: setSize (int i, qulonglong value)
 }
 
 bool
-Torrent :: setString (int i, const char * value)
+Torrent::setString (int i, const char * value)
 {
   bool changed = false;
 
@@ -256,7 +256,7 @@ Torrent :: setString (int i, const char * value)
 }
 
 bool
-Torrent :: setIcon (int i, const QIcon& value)
+Torrent::setIcon (int i, const QIcon& value)
 {
   assert (0<=i && i<PROPERTY_COUNT);
   assert (myProperties[i].type == QVariant::Icon);
@@ -266,7 +266,7 @@ Torrent :: setIcon (int i, const QIcon& value)
 }
 
 int
-Torrent :: getInt (int i) const
+Torrent::getInt (int i) const
 {
   assert (0<=i && i<PROPERTY_COUNT);
   assert (myProperties[i].type == QVariant::Int);
@@ -275,7 +275,7 @@ Torrent :: getInt (int i) const
 }
 
 QDateTime
-Torrent :: getDateTime (int i) const
+Torrent::getDateTime (int i) const
 {
   assert (0<=i && i<PROPERTY_COUNT);
   assert (myProperties[i].type == QVariant::DateTime);
@@ -284,7 +284,7 @@ Torrent :: getDateTime (int i) const
 }
 
 bool
-Torrent :: getBool (int i) const
+Torrent::getBool (int i) const
 {
   assert (0<=i && i<PROPERTY_COUNT);
   assert (myProperties[i].type == QVariant::Bool);
@@ -293,7 +293,7 @@ Torrent :: getBool (int i) const
 }
 
 qulonglong
-Torrent :: getSize (int i) const
+Torrent::getSize (int i) const
 {
     assert (0<=i && i<PROPERTY_COUNT);
     assert (myProperties[i].type == QVariant::ULongLong);
@@ -301,7 +301,7 @@ Torrent :: getSize (int i) const
     return myValues[i].toULongLong ();
 }
 double
-Torrent :: getDouble (int i) const
+Torrent::getDouble (int i) const
 {
   assert (0<=i && i<PROPERTY_COUNT);
   assert (myProperties[i].type == QVariant::Double);
@@ -309,7 +309,7 @@ Torrent :: getDouble (int i) const
   return myValues[i].toDouble ();
 }
 QString
-Torrent :: getString (int i) const
+Torrent::getString (int i) const
 {
   assert (0<=i && i<PROPERTY_COUNT);
   assert (myProperties[i].type == QVariant::String);
@@ -317,7 +317,7 @@ Torrent :: getString (int i) const
   return myValues[i].toString ();
 }
 QIcon
-Torrent :: getIcon (int i) const
+Torrent::getIcon (int i) const
 {
   assert (0<=i && i<PROPERTY_COUNT);
   assert (myProperties[i].type == QVariant::Icon);
@@ -330,7 +330,7 @@ Torrent :: getIcon (int i) const
 ***/
 
 bool
-Torrent :: getSeedRatio (double& ratio) const
+Torrent::getSeedRatio (double& ratio) const
 {
   bool isLimited;
 
@@ -342,8 +342,8 @@ Torrent :: getSeedRatio (double& ratio) const
         break;
 
       case TR_RATIOLIMIT_GLOBAL:
-        if ((isLimited = myPrefs.getBool (Prefs :: RATIO_ENABLED)))
-          ratio = myPrefs.getDouble (Prefs :: RATIO);
+        if ((isLimited = myPrefs.getBool (Prefs::RATIO_ENABLED)))
+          ratio = myPrefs.getDouble (Prefs::RATIO);
         break;
 
       default: // TR_RATIOLIMIT_UNLIMITED:
@@ -355,7 +355,7 @@ Torrent :: getSeedRatio (double& ratio) const
 }
 
 bool
-Torrent :: hasFileSubstring (const QString& substr) const
+Torrent::hasFileSubstring (const QString& substr) const
 {
   foreach (const TrFile file, myFiles)
     if (file.filename.contains (substr, Qt::CaseInsensitive))
@@ -365,7 +365,7 @@ Torrent :: hasFileSubstring (const QString& substr) const
 }
 
 bool
-Torrent :: hasTrackerSubstring (const QString& substr) const
+Torrent::hasTrackerSubstring (const QString& substr) const
 {
   foreach (QString s, myValues[TRACKERS].toStringList())
     if (s.contains (substr, Qt::CaseInsensitive))
@@ -375,7 +375,7 @@ Torrent :: hasTrackerSubstring (const QString& substr) const
 }
 
 int
-Torrent :: compareSeedRatio (const Torrent& that) const
+Torrent::compareSeedRatio (const Torrent& that) const
 {
   double a;
   double b;
@@ -389,7 +389,7 @@ Torrent :: compareSeedRatio (const Torrent& that) const
 }
 
 int
-Torrent :: compareRatio (const Torrent& that) const
+Torrent::compareRatio (const Torrent& that) const
 {
   const double a = ratio ();
   const double b = that.ratio ();
@@ -402,7 +402,7 @@ Torrent :: compareRatio (const Torrent& that) const
 }
 
 int
-Torrent :: compareETA (const Torrent& that) const
+Torrent::compareETA (const Torrent& that) const
 {
   const bool haveA (hasETA ());
   const bool haveB (that.hasETA ());
@@ -413,7 +413,7 @@ Torrent :: compareETA (const Torrent& that) const
 }
 
 int
-Torrent :: compareTracker (const Torrent& that) const
+Torrent::compareTracker (const Torrent& that) const
 {
   Q_UNUSED (that);
 
@@ -426,7 +426,7 @@ Torrent :: compareTracker (const Torrent& that) const
 ***/
 
 void
-Torrent :: updateMimeIcon ()
+Torrent::updateMimeIcon ()
 {
   const FileList& files (myFiles);
 
@@ -435,7 +435,7 @@ Torrent :: updateMimeIcon ()
   if (files.size () > 1)
     icon = QFileIconProvider().icon (QFileIconProvider::Folder);
   else if (files.size () == 1)
-    icon = Utils :: guessMimeIcon (files.at(0).filename);
+    icon = Utils::guessMimeIcon (files.at(0).filename);
   else
     icon = QIcon ();
 
@@ -447,7 +447,7 @@ Torrent :: updateMimeIcon ()
 ***/
 
 void
-Torrent :: notifyComplete () const
+Torrent::notifyComplete () const
 {
     // if someone wants to implement notification, here's the hook.
 }
@@ -457,7 +457,7 @@ Torrent :: notifyComplete () const
 ***/
 
 void
-Torrent :: update (tr_variant * d)
+Torrent::update (tr_variant * d)
 {
   static bool lookup_initialized = false;
   static int key_to_property_index[TR_N_KEYS];
@@ -487,51 +487,51 @@ Torrent :: update (tr_variant * d)
 
       switch (myProperties[property_index].type)
         {
-          case QVariant :: Int:
+          case QVariant::Int:
             {
               int64_t val;
               if (tr_variantGetInt (child, &val))
                 changed |= setInt (property_index, val);
               break;
             }
-          case QVariant :: Bool:
+          case QVariant::Bool:
             {
               bool val;
               if (tr_variantGetBool (child, &val))
                 changed |= setBool (property_index, val);
               break;
             }
-          case QVariant :: String:
+          case QVariant::String:
             {
               const char * val;
               if (tr_variantGetStr(child, &val, NULL))
                 changed |= setString (property_index, val);
               break;
             }
-          case QVariant :: ULongLong:
+          case QVariant::ULongLong:
             {
               int64_t val;
               if (tr_variantGetInt (child, &val))
                 changed |= setSize (property_index, val);
               break;
             }
-          case QVariant :: Double:
+          case QVariant::Double:
             {
               double val;
               if (tr_variantGetReal (child, &val))
                 changed |= setDouble (property_index, val);
               break;
             }
-          case QVariant :: DateTime:
+          case QVariant::DateTime:
             {
               int64_t val;
               if (tr_variantGetInt (child, &val) && val)
-                changed |= setDateTime (property_index, QDateTime :: fromTime_t(val));
+                changed |= setDateTime (property_index, QDateTime::fromTime_t(val));
               break;
             }
 
-          case QVariant :: StringList:
-          case TrTypes :: PeerList:
+          case QVariant::StringList:
+          case TrTypes::PeerList:
             // handled below
             break;
 
@@ -764,7 +764,7 @@ Torrent :: update (tr_variant * d)
 }
 
 QString
-Torrent :: activityString () const
+Torrent::activityString () const
 {
   QString str;
 
@@ -783,7 +783,7 @@ Torrent :: activityString () const
 }
 
 QString
-Torrent :: getError () const
+Torrent::getError () const
 {
   QString s = getString (ERROR_STRING);
 
@@ -799,7 +799,7 @@ Torrent :: getError () const
 }
 
 QPixmap
-TrackerStat :: getFavicon () const
+TrackerStat::getFavicon () const
 {
   MyApp * myApp = dynamic_cast<MyApp*>(QApplication::instance());
   return myApp->favicons.find (QUrl (announce));

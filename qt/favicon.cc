@@ -24,13 +24,13 @@
 ****
 ***/
 
-Favicons :: Favicons ()
+Favicons::Favicons ()
 {
   myNAM = new QNetworkAccessManager ();
   connect (myNAM, SIGNAL(finished(QNetworkReply*)), this, SLOT(onRequestFinished(QNetworkReply*)));
 }
 
-Favicons :: ~Favicons ()
+Favicons::~Favicons ()
 {
   delete myNAM;
 }
@@ -40,7 +40,7 @@ Favicons :: ~Favicons ()
 ***/
 
 QString
-Favicons :: getCacheDir ()
+Favicons::getCacheDir ()
 {
   const QString base =
 #if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
@@ -53,7 +53,7 @@ Favicons :: getCacheDir ()
 }
 
 void
-Favicons :: ensureCacheDirHasBeenScanned ()
+Favicons::ensureCacheDirHasBeenScanned ()
 {
   static bool hasBeenScanned = false;
 
@@ -76,7 +76,7 @@ Favicons :: ensureCacheDirHasBeenScanned ()
 }
 
 QString
-Favicons :: getHost (const QUrl& url)
+Favicons::getHost (const QUrl& url)
 {
   QString host = url.host ();
   const int first_dot = host.indexOf ('.');
@@ -89,7 +89,7 @@ Favicons :: getHost (const QUrl& url)
 }
 
 QPixmap
-Favicons :: find (const QUrl& url)
+Favicons::find (const QUrl& url)
 {
   return findFromHost (getHost (url));
 }
@@ -100,7 +100,7 @@ namespace
 };
 
 QPixmap
-Favicons :: findFromHost (const QString& host)
+Favicons::findFromHost (const QString& host)
 {
   ensureCacheDirHasBeenScanned ();
 
@@ -109,7 +109,7 @@ Favicons :: findFromHost (const QString& host)
 }
 
 void
-Favicons :: add (const QUrl& url)
+Favicons::add (const QUrl& url)
 {
   ensureCacheDirHasBeenScanned ();
 
@@ -132,7 +132,7 @@ Favicons :: add (const QUrl& url)
 }
 
 void
-Favicons :: onRequestFinished (QNetworkReply * reply)
+Favicons::onRequestFinished (QNetworkReply * reply)
 {
   const QString host = reply->url().host();
 

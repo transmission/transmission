@@ -43,7 +43,7 @@
 ****
 ***/
 
-Options :: Options (Session& session, const Prefs& prefs, const AddData& addme, QWidget * parent):
+Options::Options (Session& session, const Prefs& prefs, const AddData& addme, QWidget * parent):
   QDialog (parent, Qt::Dialog),
   mySession (session),
   myAdd (addme),
@@ -72,7 +72,7 @@ Options :: Options (Session& session, const Prefs& prefs, const AddData& addme, 
   myEditTimer.setSingleShot (true);
   connect (&myEditTimer, SIGNAL (timeout ()), this, SLOT (onDestinationEditedIdle ()));
 
-  const int iconSize (style ()->pixelMetric (QStyle :: PM_SmallIconSize));
+  const int iconSize (style ()->pixelMetric (QStyle::PM_SmallIconSize));
   QIcon fileIcon = style ()->standardIcon (QStyle::SP_FileIcon);
   const QPixmap filePixmap = fileIcon.pixmap (iconSize);
 
@@ -163,11 +163,11 @@ Options :: Options (Session& session, const Prefs& prefs, const AddData& addme, 
 
   QCheckBox * c;
   c = myStartCheck = new QCheckBox (tr ("S&tart when added"));
-  c->setChecked (prefs.getBool (Prefs :: START));
+  c->setChecked (prefs.getBool (Prefs::START));
   layout->addWidget (c, ++row, 0, 1, 2, Qt::AlignLeft);
 
   c = myTrashCheck = new QCheckBox (tr ("Mo&ve .torrent file to the trash"));
-  c->setChecked (prefs.getBool (Prefs :: TRASH_ORIGINAL));
+  c->setChecked (prefs.getBool (Prefs::TRASH_ORIGINAL));
   layout->addWidget (c, ++row, 0, 1, 2, Qt::AlignLeft);
 
   QDialogButtonBox * b = new QDialogButtonBox (QDialogButtonBox::Open|QDialogButtonBox::Cancel, Qt::Horizontal, this);
@@ -177,7 +177,7 @@ Options :: Options (Session& session, const Prefs& prefs, const AddData& addme, 
 
   layout->setRowStretch (3, 2);
   layout->setColumnStretch (1, 2);
-  layout->setSpacing (HIG :: PAD);
+  layout->setSpacing (HIG::PAD);
 
   connect (myTree, SIGNAL (priorityChanged (const QSet<int>&,int)), this, SLOT (onPriorityChanged (const QSet<int>&,int)));
   connect (myTree, SIGNAL (wantedChanged (const QSet<int>&,bool)), this, SLOT (onWantedChanged (const QSet<int>&,bool)));
@@ -189,7 +189,7 @@ Options :: Options (Session& session, const Prefs& prefs, const AddData& addme, 
   reload ();
 }
 
-Options :: ~Options ()
+Options::~Options ()
 {
   clearInfo ();
 }
@@ -199,7 +199,7 @@ Options :: ~Options ()
 ***/
 
 void
-Options :: refreshButton (QPushButton * p, const QString& text, int width)
+Options::refreshButton (QPushButton * p, const QString& text, int width)
 {
   if (width <= 0)
     width = p->width ();
@@ -210,7 +210,7 @@ Options :: refreshButton (QPushButton * p, const QString& text, int width)
 }
 
 void
-Options :: refreshSource (int width)
+Options::refreshSource (int width)
 {
   QString text = myAdd.readableName ();
 
@@ -222,7 +222,7 @@ Options :: refreshSource (int width)
 }
 
 void
-Options :: refreshDestinationButton (int width)
+Options::refreshDestinationButton (int width)
 {
   if (myDestinationButton != 0)
     refreshButton (myDestinationButton, myLocalDestination.absolutePath (), width);
@@ -230,7 +230,7 @@ Options :: refreshDestinationButton (int width)
 
 
 bool
-Options :: eventFilter (QObject * o, QEvent * event)
+Options::eventFilter (QObject * o, QEvent * event)
 {
   if (event->type() == QEvent::Resize)
     {
@@ -249,7 +249,7 @@ Options :: eventFilter (QObject * o, QEvent * event)
 ***/
 
 void
-Options :: clearInfo ()
+Options::clearInfo ()
 {
   if (myHaveInfo)
     tr_metainfoFree (&myInfo);
@@ -259,7 +259,7 @@ Options :: clearInfo ()
 }
 
 void
-Options :: reload ()
+Options::reload ()
 {
   clearInfo ();
   clearVerify ();
@@ -319,21 +319,21 @@ Options :: reload ()
 }
 
 void
-Options :: onPriorityChanged (const QSet<int>& fileIndices, int priority)
+Options::onPriorityChanged (const QSet<int>& fileIndices, int priority)
 {
   foreach (int i, fileIndices)
     myPriorities[i] = priority;
 }
 
 void
-Options :: onWantedChanged (const QSet<int>& fileIndices, bool isWanted)
+Options::onWantedChanged (const QSet<int>& fileIndices, bool isWanted)
 {
   foreach (int i, fileIndices)
     myWanted[i] = isWanted;
 }
 
 void
-Options :: onAccepted ()
+Options::onAccepted ()
 {
   // rpc spec section 3.4 "adding a torrent"
 
@@ -395,7 +395,7 @@ Options :: onAccepted ()
 }
 
 void
-Options :: onFilenameClicked ()
+Options::onFilenameClicked ()
 {
   if (myAdd.type == AddData::FILENAME)
     {
@@ -411,7 +411,7 @@ Options :: onFilenameClicked ()
 }
 
 void
-Options :: onFilesSelected (const QStringList& files)
+Options::onFilesSelected (const QStringList& files)
 {
   if (files.size () == 1)
     {
@@ -422,13 +422,13 @@ Options :: onFilesSelected (const QStringList& files)
 }
 
 void
-Options :: onSourceEditingFinished ()
+Options::onSourceEditingFinished ()
 {
   myAdd.set (mySourceEdit->text());
 }
 
 void
-Options :: onDestinationClicked ()
+Options::onDestinationClicked ()
 {
   QFileDialog * d = new QFileDialog (this, tr ("Select Destination"), myLocalDestination.absolutePath ());
   d->setFileMode (QFileDialog::Directory);
@@ -438,7 +438,7 @@ Options :: onDestinationClicked ()
 }
 
 void
-Options :: onDestinationsSelected (const QStringList& destinations)
+Options::onDestinationsSelected (const QStringList& destinations)
 {
   if (destinations.size () == 1)
     {
@@ -450,7 +450,7 @@ Options :: onDestinationsSelected (const QStringList& destinations)
 }
 
 void
-Options :: onDestinationEdited (const QString& text)
+Options::onDestinationEdited (const QString& text)
 {
   Q_UNUSED (text);
 
@@ -458,7 +458,7 @@ Options :: onDestinationEdited (const QString& text)
 }
 
 void
-Options :: onDestinationEditedIdle ()
+Options::onDestinationEditedIdle ()
 {
   myFreespaceLabel->setPath (myDestinationEdit->text());
 }
@@ -470,7 +470,7 @@ Options :: onDestinationEditedIdle ()
 ***/
 
 void
-Options :: clearVerify ()
+Options::clearVerify ()
 {
   myVerifyHash.reset ();
   myVerifyFile.close ();
@@ -488,7 +488,7 @@ Options :: clearVerify ()
 }
 
 void
-Options :: onVerify ()
+Options::onVerify ()
 {
   clearVerify ();
   myVerifyFlags.insert (0, myInfo.pieceCount, false);
@@ -507,7 +507,7 @@ namespace
 }
 
 void
-Options :: onTimeout ()
+Options::onTimeout ()
 {
   if (myFiles.isEmpty())
     {

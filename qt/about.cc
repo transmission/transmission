@@ -27,7 +27,7 @@
 #include "hig.h"
 #include "license.h"
 
-AboutDialog :: AboutDialog (QWidget * parent):
+AboutDialog::AboutDialog (QWidget * parent):
   QDialog (parent, Qt::Dialog),
   myLicenseDialog (new LicenseDialog (this))
 {
@@ -83,7 +83,7 @@ AboutDialog :: AboutDialog (QWidget * parent):
 }
 
 void
-AboutDialog :: showCredits ()
+AboutDialog::showCredits ()
 {
   QMessageBox::about (
     this,

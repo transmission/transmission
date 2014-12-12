@@ -82,7 +82,7 @@ namespace
   };
 }
 
-MyApp :: MyApp (int& argc, char ** argv):
+MyApp::MyApp (int& argc, char ** argv):
   QApplication (argc, argv),
   myPrefs(nullptr),
   mySession(nullptr),
@@ -308,7 +308,7 @@ MyApp :: MyApp (int& argc, char ** argv):
 /* these functions are for popping up desktop notifications */
 
 void
-MyApp :: onTorrentsAdded (QSet<int> torrents)
+MyApp::onTorrentsAdded (QSet<int> torrents)
 {
   if (!myPrefs->getBool (Prefs::SHOW_NOTIFICATION_ON_ADD))
     return;
@@ -332,7 +332,7 @@ MyApp :: onTorrentsAdded (QSet<int> torrents)
 }
 
 void
-MyApp :: onTorrentCompleted (int id)
+MyApp::onTorrentCompleted (int id)
 {
   Torrent * tor = myModel->getTorrentFromId (id);
 
@@ -355,7 +355,7 @@ MyApp :: onTorrentCompleted (int id)
 }
 
 void
-MyApp :: onNewTorrentChanged (int id)
+MyApp::onNewTorrentChanged (int id)
 {
   Torrent * tor = myModel->getTorrentFromId (id);
 
@@ -377,20 +377,20 @@ MyApp :: onNewTorrentChanged (int id)
 ***/
 
 void
-MyApp :: consentGiven ()
+MyApp::consentGiven ()
 {
   myPrefs->set<bool> (Prefs::USER_HAS_GIVEN_INFORMED_CONSENT, true);
 }
 
-MyApp :: ~MyApp ()
+MyApp::~MyApp ()
 {
   if (myPrefs != nullptr && myWindow != nullptr)
     {
       const QRect mainwinRect (myWindow->geometry ());
-      myPrefs->set (Prefs :: MAIN_WINDOW_HEIGHT, std::max (100, mainwinRect.height ()));
-      myPrefs->set (Prefs :: MAIN_WINDOW_WIDTH, std::max (100, mainwinRect.width ()));
-      myPrefs->set (Prefs :: MAIN_WINDOW_X, mainwinRect.x ());
-      myPrefs->set (Prefs :: MAIN_WINDOW_Y, mainwinRect.y ());
+      myPrefs->set (Prefs::MAIN_WINDOW_HEIGHT, std::max (100, mainwinRect.height ()));
+      myPrefs->set (Prefs::MAIN_WINDOW_WIDTH, std::max (100, mainwinRect.width ()));
+      myPrefs->set (Prefs::MAIN_WINDOW_X, mainwinRect.x ());
+      myPrefs->set (Prefs::MAIN_WINDOW_Y, mainwinRect.y ());
     }
 
   delete myWatchDir;
@@ -405,16 +405,16 @@ MyApp :: ~MyApp ()
 ***/
 
 void
-MyApp :: refreshPref (int key)
+MyApp::refreshPref (int key)
 {
   switch (key)
     {
-      case Prefs :: BLOCKLIST_UPDATES_ENABLED:
+      case Prefs::BLOCKLIST_UPDATES_ENABLED:
         maybeUpdateBlocklist ();
         break;
 
-      case Prefs :: DIR_WATCH:
-      case Prefs :: DIR_WATCH_ENABLED:
+      case Prefs::DIR_WATCH:
+      case Prefs::DIR_WATCH_ENABLED:
         {
           const QString path (myPrefs->getString (Prefs::DIR_WATCH));
           const bool isEnabled (myPrefs->getBool (Prefs::DIR_WATCH_ENABLED));
@@ -428,24 +428,24 @@ MyApp :: refreshPref (int key)
 }
 
 void
-MyApp :: maybeUpdateBlocklist ()
+MyApp::maybeUpdateBlocklist ()
 {
-  if (!myPrefs->getBool (Prefs :: BLOCKLIST_UPDATES_ENABLED))
+  if (!myPrefs->getBool (Prefs::BLOCKLIST_UPDATES_ENABLED))
     return;
 
-  const QDateTime lastUpdatedAt = myPrefs->getDateTime (Prefs :: BLOCKLIST_DATE);
+  const QDateTime lastUpdatedAt = myPrefs->getDateTime (Prefs::BLOCKLIST_DATE);
   const QDateTime nextUpdateAt = lastUpdatedAt.addDays (7);
   const QDateTime now = QDateTime::currentDateTime ();
 
   if (now < nextUpdateAt)
     {
       mySession->updateBlocklist ();
-      myPrefs->set (Prefs :: BLOCKLIST_DATE, now);
+      myPrefs->set (Prefs::BLOCKLIST_DATE, now);
     }
 }
 
 void
-MyApp :: onSessionSourceChanged ()
+MyApp::onSessionSourceChanged ()
 {
   mySession->initTorrents ();
   mySession->refreshSessionStats ();
@@ -453,7 +453,7 @@ MyApp :: onSessionSourceChanged ()
 }
 
 void
-MyApp :: refreshTorrents ()
+MyApp::refreshTorrents ()
 {
   // usually we just poll the torrents that have shown recent activity,
   // but we also periodically ask for updates on the others to ensure
@@ -475,7 +475,7 @@ MyApp :: refreshTorrents ()
 ***/
 
 void
-MyApp :: addTorrent (const QString& key)
+MyApp::addTorrent (const QString& key)
 {
   const AddData addme (key);
 
@@ -484,9 +484,9 @@ MyApp :: addTorrent (const QString& key)
 }
 
 void
-MyApp :: addTorrent (const AddData& addme)
+MyApp::addTorrent (const AddData& addme)
 {
-  if (!myPrefs->getBool (Prefs :: OPTIONS_PROMPT))
+  if (!myPrefs->getBool (Prefs::OPTIONS_PROMPT))
     {
       mySession->addTorrent (addme);
     }
@@ -504,13 +504,13 @@ MyApp :: addTorrent (const AddData& addme)
 ***/
 
 void
-MyApp :: raise ()
+MyApp::raise ()
 {
-  QApplication :: alert (myWindow);
+  QApplication::alert (myWindow);
 }
 
 bool
-MyApp :: notifyApp (const QString& title, const QString& body) const
+MyApp::notifyApp (const QString& title, const QString& body) const
 {
   const QString dbusServiceName   = QString::fromUtf8 ("org.freedesktop.Notifications");
   const QString dbusInterfaceName = QString::fromUtf8 ("org.freedesktop.Notifications");

@@ -17,7 +17,7 @@
 #include "utils.h"
 
 int
-AddData :: set (const QString& key)
+AddData::set (const QString& key)
 {
   if (Utils::isMagnetLink (key))
     {
@@ -64,7 +64,7 @@ AddData :: set (const QString& key)
 }
 
 QByteArray
-AddData :: toBase64 () const
+AddData::toBase64 () const
 {
   QByteArray ret;
 
@@ -80,7 +80,7 @@ AddData :: toBase64 () const
 }
 
 QString
-AddData :: readableName () const
+AddData::readableName () const
 {
   QString ret;
 

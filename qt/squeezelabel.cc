@@ -47,25 +47,25 @@
 #include "squeezelabel.h"
 
 void
-SqueezeLabel :: init ()
+SqueezeLabel::init ()
 {
   setTextInteractionFlags(Qt::TextSelectableByMouse);
 }
 
-SqueezeLabel :: SqueezeLabel (const QString& text, QWidget *parent):
+SqueezeLabel::SqueezeLabel (const QString& text, QWidget * parent):
   QLabel (text, parent)
 {
   init();
 }
 
-SqueezeLabel :: SqueezeLabel (QWidget * parent):
+SqueezeLabel::SqueezeLabel (QWidget * parent):
   QLabel (parent)
 {
   init();
 }
 
 void
-SqueezeLabel :: paintEvent (QPaintEvent * paintEvent)
+SqueezeLabel::paintEvent (QPaintEvent * paintEvent)
 {
   Q_UNUSED (paintEvent);
 

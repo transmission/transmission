@@ -89,7 +89,7 @@ namespace
 ***/
 
 void
-FileAdded :: executed (int64_t tag, const QString& result, struct tr_variant * arguments)
+FileAdded::executed (int64_t tag, const QString& result, struct tr_variant * arguments)
 {
   Q_UNUSED (arguments);
 
@@ -126,7 +126,7 @@ FileAdded :: executed (int64_t tag, const QString& result, struct tr_variant * a
 ***/
 
 void
-Session :: sessionSet (const tr_quark key, const QVariant& value)
+Session::sessionSet (const tr_quark key, const QVariant& value)
 {
   tr_variant top;
   tr_variantInitDict (&top, 2);
@@ -145,7 +145,7 @@ Session :: sessionSet (const tr_quark key, const QVariant& value)
 }
 
 void
-Session :: portTest ()
+Session::portTest ()
 {
   tr_variant top;
   tr_variantInitDict (&top, 2);
@@ -156,7 +156,7 @@ Session :: portTest ()
 }
 
 void
-Session :: copyMagnetLinkToClipboard (int torrentId)
+Session::copyMagnetLinkToClipboard (int torrentId)
 {
   tr_variant top;
   tr_variantInitDict (&top, 3);
@@ -170,62 +170,62 @@ Session :: copyMagnetLinkToClipboard (int torrentId)
 }
 
 void
-Session :: updatePref (int key)
+Session::updatePref (int key)
 {
   if (myPrefs.isCore (key)) switch (key)
     {
-      case Prefs :: ALT_SPEED_LIMIT_DOWN:
-      case Prefs :: ALT_SPEED_LIMIT_ENABLED:
-      case Prefs :: ALT_SPEED_LIMIT_TIME_BEGIN:
-      case Prefs :: ALT_SPEED_LIMIT_TIME_DAY:
-      case Prefs :: ALT_SPEED_LIMIT_TIME_ENABLED:
-      case Prefs :: ALT_SPEED_LIMIT_TIME_END:
-      case Prefs :: ALT_SPEED_LIMIT_UP:
-      case Prefs :: BLOCKLIST_DATE:
-      case Prefs :: BLOCKLIST_ENABLED:
-      case Prefs :: BLOCKLIST_URL:
-      case Prefs :: DHT_ENABLED:
-      case Prefs :: DOWNLOAD_QUEUE_ENABLED:
-      case Prefs :: DOWNLOAD_QUEUE_SIZE:
-      case Prefs :: DSPEED:
-      case Prefs :: DSPEED_ENABLED:
-      case Prefs :: IDLE_LIMIT:
-      case Prefs :: IDLE_LIMIT_ENABLED:
-      case Prefs :: INCOMPLETE_DIR:
-      case Prefs :: INCOMPLETE_DIR_ENABLED:
-      case Prefs :: LPD_ENABLED:
-      case Prefs :: PEER_LIMIT_GLOBAL:
-      case Prefs :: PEER_LIMIT_TORRENT:
-      case Prefs :: PEER_PORT:
-      case Prefs :: PEER_PORT_RANDOM_ON_START:
-      case Prefs :: QUEUE_STALLED_MINUTES:
-      case Prefs :: PEX_ENABLED:
-      case Prefs :: PORT_FORWARDING:
-      case Prefs :: RENAME_PARTIAL_FILES:
-      case Prefs :: SCRIPT_TORRENT_DONE_ENABLED:
-      case Prefs :: SCRIPT_TORRENT_DONE_FILENAME:
-      case Prefs :: START:
-      case Prefs :: TRASH_ORIGINAL:
-      case Prefs :: USPEED:
-      case Prefs :: USPEED_ENABLED:
-      case Prefs :: UTP_ENABLED:
+      case Prefs::ALT_SPEED_LIMIT_DOWN:
+      case Prefs::ALT_SPEED_LIMIT_ENABLED:
+      case Prefs::ALT_SPEED_LIMIT_TIME_BEGIN:
+      case Prefs::ALT_SPEED_LIMIT_TIME_DAY:
+      case Prefs::ALT_SPEED_LIMIT_TIME_ENABLED:
+      case Prefs::ALT_SPEED_LIMIT_TIME_END:
+      case Prefs::ALT_SPEED_LIMIT_UP:
+      case Prefs::BLOCKLIST_DATE:
+      case Prefs::BLOCKLIST_ENABLED:
+      case Prefs::BLOCKLIST_URL:
+      case Prefs::DHT_ENABLED:
+      case Prefs::DOWNLOAD_QUEUE_ENABLED:
+      case Prefs::DOWNLOAD_QUEUE_SIZE:
+      case Prefs::DSPEED:
+      case Prefs::DSPEED_ENABLED:
+      case Prefs::IDLE_LIMIT:
+      case Prefs::IDLE_LIMIT_ENABLED:
+      case Prefs::INCOMPLETE_DIR:
+      case Prefs::INCOMPLETE_DIR_ENABLED:
+      case Prefs::LPD_ENABLED:
+      case Prefs::PEER_LIMIT_GLOBAL:
+      case Prefs::PEER_LIMIT_TORRENT:
+      case Prefs::PEER_PORT:
+      case Prefs::PEER_PORT_RANDOM_ON_START:
+      case Prefs::QUEUE_STALLED_MINUTES:
+      case Prefs::PEX_ENABLED:
+      case Prefs::PORT_FORWARDING:
+      case Prefs::RENAME_PARTIAL_FILES:
+      case Prefs::SCRIPT_TORRENT_DONE_ENABLED:
+      case Prefs::SCRIPT_TORRENT_DONE_FILENAME:
+      case Prefs::START:
+      case Prefs::TRASH_ORIGINAL:
+      case Prefs::USPEED:
+      case Prefs::USPEED_ENABLED:
+      case Prefs::UTP_ENABLED:
         sessionSet (myPrefs.getKey (key), myPrefs.variant (key));
         break;
 
-      case Prefs :: DOWNLOAD_DIR:
+      case Prefs::DOWNLOAD_DIR:
         sessionSet (myPrefs.getKey (key), myPrefs.variant (key));
         /* this will change the 'freespace' argument, so refresh */
         refreshSessionInfo ();
         break;
 
-      case Prefs :: RATIO:
+      case Prefs::RATIO:
         sessionSet (TR_KEY_seedRatioLimit, myPrefs.variant (key));
         break;
-      case Prefs :: RATIO_ENABLED:
+      case Prefs::RATIO_ENABLED:
         sessionSet (TR_KEY_seedRatioLimited, myPrefs.variant (key));
         break;
 
-      case Prefs :: ENCRYPTION:
+      case Prefs::ENCRYPTION:
         {
           const int i = myPrefs.variant (key).toInt ();
           switch (i)
@@ -243,37 +243,37 @@ Session :: updatePref (int key)
           break;
         }
 
-      case Prefs :: RPC_AUTH_REQUIRED:
+      case Prefs::RPC_AUTH_REQUIRED:
         if (mySession)
           tr_sessionSetRPCPasswordEnabled (mySession, myPrefs.getBool (key));
         break;
 
-      case Prefs :: RPC_ENABLED:
+      case Prefs::RPC_ENABLED:
         if (mySession)
           tr_sessionSetRPCEnabled (mySession, myPrefs.getBool (key));
         break;
 
-      case Prefs :: RPC_PASSWORD:
+      case Prefs::RPC_PASSWORD:
         if (mySession)
           tr_sessionSetRPCPassword (mySession, myPrefs.getString (key).toUtf8 ().constData ());
         break;
 
-      case Prefs :: RPC_PORT:
+      case Prefs::RPC_PORT:
         if (mySession)
           tr_sessionSetRPCPort (mySession, myPrefs.getInt (key));
         break;
 
-      case Prefs :: RPC_USERNAME:
+      case Prefs::RPC_USERNAME:
         if (mySession)
           tr_sessionSetRPCUsername (mySession, myPrefs.getString (key).toUtf8 ().constData ());
         break;
 
-      case Prefs :: RPC_WHITELIST_ENABLED:
+      case Prefs::RPC_WHITELIST_ENABLED:
         if (mySession)
           tr_sessionSetRPCWhitelistEnabled (mySession, myPrefs.getBool (key));
         break;
 
-      case Prefs :: RPC_WHITELIST:
+      case Prefs::RPC_WHITELIST:
         if (mySession)
           tr_sessionSetRPCWhitelist (mySession, myPrefs.getString (key).toUtf8 ().constData ());
         break;
@@ -287,7 +287,7 @@ Session :: updatePref (int key)
 ****
 ***/
 
-Session :: Session (const char * configDir, Prefs& prefs):
+Session::Session (const char * configDir, Prefs& prefs):
   nextUniqueTag (FIRST_UNIQUE_TAG),
   myBlocklistSize (-1),
   myPrefs (prefs),
@@ -309,13 +309,13 @@ Session :: Session (const char * configDir, Prefs& prefs):
            this, SLOT (onResponseReceived (const QByteArray&)));
 }
 
-Session :: ~Session ()
+Session::~Session ()
 {
     stop ();
 }
 
 QNetworkAccessManager *
-Session :: networkAccessManager ()
+Session::networkAccessManager ()
 {
   if (myNAM == 0)
     {
@@ -336,7 +336,7 @@ Session :: networkAccessManager ()
 ***/
 
 void
-Session :: stop ()
+Session::stop ()
 {
   if (myNAM != 0)
     {
@@ -354,14 +354,14 @@ Session :: stop ()
 }
 
 void
-Session :: restart ()
+Session::restart ()
 {
   stop ();
   start ();
 }
 
 void
-Session :: start ()
+Session::start ()
 {
   if (myPrefs.get<bool> (Prefs::SESSION_IS_REMOTE))
     {
@@ -396,13 +396,13 @@ Session :: start ()
 }
 
 bool
-Session :: isServer () const
+Session::isServer () const
 {
   return mySession != 0;
 }
 
 bool
-Session :: isLocal () const
+Session::isLocal () const
 {
   if (mySession != 0)
     return true;
@@ -447,7 +447,7 @@ namespace
 }
 
 void
-Session :: torrentSet (const QSet<int>& ids, const tr_quark key, double value)
+Session::torrentSet (const QSet<int>& ids, const tr_quark key, double value)
 {
   tr_variant top;
   tr_variantInitDict (&top, 2);
@@ -460,7 +460,7 @@ Session :: torrentSet (const QSet<int>& ids, const tr_quark key, double value)
 }
 
 void
-Session :: torrentSet (const QSet<int>& ids, const tr_quark key, int value)
+Session::torrentSet (const QSet<int>& ids, const tr_quark key, int value)
 {
   tr_variant top;
   tr_variantInitDict (&top, 2);
@@ -473,7 +473,7 @@ Session :: torrentSet (const QSet<int>& ids, const tr_quark key, int value)
 }
 
 void
-Session :: torrentSet (const QSet<int>& ids, const tr_quark key, bool value)
+Session::torrentSet (const QSet<int>& ids, const tr_quark key, bool value)
 {
   tr_variant top;
   tr_variantInitDict (&top, 2);
@@ -486,7 +486,7 @@ Session :: torrentSet (const QSet<int>& ids, const tr_quark key, bool value)
 }
 
 void
-Session :: torrentSet (const QSet<int>& ids, const tr_quark key, const QStringList& value)
+Session::torrentSet (const QSet<int>& ids, const tr_quark key, const QStringList& value)
 {
   tr_variant top;
   tr_variantInitDict (&top, 2);
@@ -501,7 +501,7 @@ Session :: torrentSet (const QSet<int>& ids, const tr_quark key, const QStringLi
 }
 
 void
-Session :: torrentSet (const QSet<int>& ids, const tr_quark key, const QList<int>& value)
+Session::torrentSet (const QSet<int>& ids, const tr_quark key, const QList<int>& value)
 {
   tr_variant top;
   tr_variantInitDict (&top, 2);
@@ -516,7 +516,7 @@ Session :: torrentSet (const QSet<int>& ids, const tr_quark key, const QList<int
 }
 
 void
-Session :: torrentSet (const QSet<int>& ids, const tr_quark key, const QPair<int,QString>& value)
+Session::torrentSet (const QSet<int>& ids, const tr_quark key, const QPair<int,QString>& value)
 {
   tr_variant top;
   tr_variantInitDict (&top, 2);
@@ -531,7 +531,7 @@ Session :: torrentSet (const QSet<int>& ids, const tr_quark key, const QPair<int
 }
 
 void
-Session :: torrentSetLocation (const QSet<int>& ids, const QString& location, bool doMove)
+Session::torrentSetLocation (const QSet<int>& ids, const QString& location, bool doMove)
 {
   tr_variant top;
   tr_variantInitDict (&top, 2);
@@ -545,7 +545,7 @@ Session :: torrentSetLocation (const QSet<int>& ids, const QString& location, bo
 }
 
 void
-Session :: torrentRenamePath (const QSet<int>& ids, const QString& oldpath, const QString& newname)
+Session::torrentRenamePath (const QSet<int>& ids, const QString& oldpath, const QString& newname)
 {
   tr_variant top;
   tr_variantInitDict (&top, 2);
@@ -560,7 +560,7 @@ Session :: torrentRenamePath (const QSet<int>& ids, const QString& oldpath, cons
 }
 
 void
-Session :: refreshTorrents (const QSet<int>& ids)
+Session::refreshTorrents (const QSet<int>& ids)
 {
   if (ids.empty ())
     {
@@ -581,7 +581,7 @@ Session :: refreshTorrents (const QSet<int>& ids)
 }
 
 void
-Session :: refreshExtraStats (const QSet<int>& ids)
+Session::refreshExtraStats (const QSet<int>& ids)
 {
   tr_variant top;
   tr_variantInitDict (&top, 3);
@@ -595,7 +595,7 @@ Session :: refreshExtraStats (const QSet<int>& ids)
 }
 
 void
-Session :: sendTorrentRequest (const char * request, const QSet<int>& ids)
+Session::sendTorrentRequest (const char * request, const QSet<int>& ids)
 {
   tr_variant top;
 
@@ -607,16 +607,16 @@ Session :: sendTorrentRequest (const char * request, const QSet<int>& ids)
   refreshTorrents (ids);
 }
 
-void Session :: pauseTorrents    (const QSet<int>& ids) { sendTorrentRequest ("torrent-stop",      ids); }
-void Session :: startTorrents    (const QSet<int>& ids) { sendTorrentRequest ("torrent-start",     ids); } 
-void Session :: startTorrentsNow (const QSet<int>& ids) { sendTorrentRequest ("torrent-start-now", ids); }
-void Session :: queueMoveTop     (const QSet<int>& ids) { sendTorrentRequest ("queue-move-top",    ids); } 
-void Session :: queueMoveUp      (const QSet<int>& ids) { sendTorrentRequest ("queue-move-up",     ids); } 
-void Session :: queueMoveDown    (const QSet<int>& ids) { sendTorrentRequest ("queue-move-down",   ids); } 
-void Session :: queueMoveBottom  (const QSet<int>& ids) { sendTorrentRequest ("queue-move-bottom", ids); } 
+void Session::pauseTorrents    (const QSet<int>& ids) { sendTorrentRequest ("torrent-stop",      ids); }
+void Session::startTorrents    (const QSet<int>& ids) { sendTorrentRequest ("torrent-start",     ids); } 
+void Session::startTorrentsNow (const QSet<int>& ids) { sendTorrentRequest ("torrent-start-now", ids); }
+void Session::queueMoveTop     (const QSet<int>& ids) { sendTorrentRequest ("queue-move-top",    ids); } 
+void Session::queueMoveUp      (const QSet<int>& ids) { sendTorrentRequest ("queue-move-up",     ids); } 
+void Session::queueMoveDown    (const QSet<int>& ids) { sendTorrentRequest ("queue-move-down",   ids); } 
+void Session::queueMoveBottom  (const QSet<int>& ids) { sendTorrentRequest ("queue-move-bottom", ids); } 
 
 void
-Session :: refreshActiveTorrents ()
+Session::refreshActiveTorrents ()
 {
   tr_variant top;
   tr_variantInitDict (&top, 3);
@@ -630,7 +630,7 @@ Session :: refreshActiveTorrents ()
 }
 
 void
-Session :: refreshAllTorrents ()
+Session::refreshAllTorrents ()
 {
   tr_variant top;
   tr_variantInitDict (&top, 3);
@@ -643,7 +643,7 @@ Session :: refreshAllTorrents ()
 }
 
 void
-Session :: initTorrents (const QSet<int>& ids)
+Session::initTorrents (const QSet<int>& ids)
 {
   tr_variant top;
   const int tag (ids.isEmpty () ? TAG_ALL_TORRENTS : TAG_SOME_TORRENTS);
@@ -655,7 +655,7 @@ Session :: initTorrents (const QSet<int>& ids)
 }
 
 void
-Session :: refreshSessionStats ()
+Session::refreshSessionStats ()
 {
   tr_variant top;
   tr_variantInitDict (&top, 2);
@@ -666,7 +666,7 @@ Session :: refreshSessionStats ()
 }
 
 void
-Session :: refreshSessionInfo ()
+Session::refreshSessionInfo ()
 {
   tr_variant top;
   tr_variantInitDict (&top, 2);
@@ -677,7 +677,7 @@ Session :: refreshSessionInfo ()
 }
 
 void
-Session :: updateBlocklist ()
+Session::updateBlocklist ()
 {
   tr_variant top;
   tr_variantInitDict (&top, 2);
@@ -692,7 +692,7 @@ Session :: updateBlocklist ()
 ***/
 
 void
-Session :: exec (const tr_variant * request)
+Session::exec (const tr_variant * request)
 {
   char * str = tr_variantToStr (request, TR_VARIANT_FMT_JSON_LEAN, NULL);
   exec (str);
@@ -700,7 +700,7 @@ Session :: exec (const tr_variant * request)
 }
 
 void
-Session :: localSessionCallback (tr_session * s, struct evbuffer * json, void * vself)
+Session::localSessionCallback (tr_session * s, struct evbuffer * json, void * vself)
 {
   Q_UNUSED (s);
 
@@ -715,7 +715,7 @@ Session :: localSessionCallback (tr_session * s, struct evbuffer * json, void * 
 #define REQUEST_DATA_PROPERTY_KEY "requestData"
 
 void
-Session :: exec (const char * json)
+Session::exec (const char * json)
 {
   if (mySession )
     {
@@ -751,7 +751,7 @@ Session :: exec (const char * json)
 }
 
 void
-Session :: onFinished (QNetworkReply * reply)
+Session::onFinished (QNetworkReply * reply)
 {
 #ifdef DEBUG_HTTP
     std::cerr << "http response header: " << std::endl;
@@ -789,13 +789,13 @@ Session :: onFinished (QNetworkReply * reply)
 }
 
 void
-Session :: onResponseReceived (const QByteArray& utf8)
+Session::onResponseReceived (const QByteArray& utf8)
 {
   parseResponse (utf8.constData (), utf8.length ());
 }
 
 void
-Session :: parseResponse (const char * json, size_t jsonLength)
+Session::parseResponse (const char * json, size_t jsonLength)
 {
     tr_variant top;
     const int err (tr_variantFromJson (&top, json, jsonLength));
@@ -920,7 +920,7 @@ Session :: parseResponse (const char * json, size_t jsonLength)
 }
 
 void
-Session :: updateStats (tr_variant * d, struct tr_session_stats * stats)
+Session::updateStats (tr_variant * d, struct tr_session_stats * stats)
 {
   int64_t i;
 
@@ -939,7 +939,7 @@ Session :: updateStats (tr_variant * d, struct tr_session_stats * stats)
 }
 
 void
-Session :: updateStats (tr_variant * d)
+Session::updateStats (tr_variant * d)
 {
   tr_variant * c;
 
@@ -953,7 +953,7 @@ Session :: updateStats (tr_variant * d)
 }
 
 void
-Session :: updateInfo (tr_variant * d)
+Session::updateInfo (tr_variant * d)
 {
   int64_t i;
   const char * str;
@@ -967,7 +967,7 @@ Session :: updateInfo (tr_variant * d)
       if (!b)
         continue;
 
-      if (i == Prefs :: ENCRYPTION)
+      if (i == Prefs::ENCRYPTION)
         {
           const char * val;
           if (tr_variantGetStr (b, &val, NULL))
@@ -984,30 +984,30 @@ Session :: updateInfo (tr_variant * d)
 
       switch (myPrefs.type (i))
         {
-          case QVariant :: Int:
+          case QVariant::Int:
             {
               int64_t val;
               if (tr_variantGetInt (b, &val))
                 myPrefs.set (i, (int)val);
               break;
             }
-          case QVariant :: Double:
+          case QVariant::Double:
             {
               double val;
               if (tr_variantGetReal (b, &val))
                 myPrefs.set (i, val);
               break;
             }
-          case QVariant :: Bool:
+          case QVariant::Bool:
             {
               bool val;
               if (tr_variantGetBool (b, &val))
                 myPrefs.set (i, (bool)val);
               break;
             }
-          case TrTypes :: FilterModeType:
-          case TrTypes :: SortModeType:
-          case QVariant :: String:
+          case TrTypes::FilterModeType:
+          case TrTypes::SortModeType:
+          case QVariant::String:
             {
               const char * val;
               if (tr_variantGetStr (b, &val, NULL))
@@ -1044,14 +1044,14 @@ Session :: updateInfo (tr_variant * d)
   if (tr_variantDictFindStr (d, TR_KEY_version, &str, NULL) && (mySessionVersion != str))
     mySessionVersion = str;
 
-  //std::cerr << "Session :: updateInfo end" << std::endl;
+  //std::cerr << "Session::updateInfo end" << std::endl;
   connect (&myPrefs, SIGNAL (changed (int)), this, SLOT (updatePref (int)));
 
   emit sessionUpdated ();
 }
 
 void
-Session :: setBlocklistSize (int64_t i)
+Session::setBlocklistSize (int64_t i)
 {
   myBlocklistSize = i;
 
@@ -1059,7 +1059,7 @@ Session :: setBlocklistSize (int64_t i)
 }
 
 void
-Session :: addTorrent (const AddData& addMe, tr_variant& top, bool trashOriginal)
+Session::addTorrent (const AddData& addMe, tr_variant& top, bool trashOriginal)
 {
   assert (tr_variantDictFind (&top, TR_KEY_method) == nullptr);
   assert (tr_variantDictFind (&top, TR_KEY_tag) == nullptr);
@@ -1113,7 +1113,7 @@ Session :: addTorrent (const AddData& addMe, tr_variant& top, bool trashOriginal
 }
 
 void
-Session :: addTorrent (const AddData& addMe)
+Session::addTorrent (const AddData& addMe)
 {
   tr_variant top;
   tr_variantInitDict (&top, 3);
@@ -1124,7 +1124,7 @@ Session :: addTorrent (const AddData& addMe)
 }
 
 void
-Session :: addNewlyCreatedTorrent (const QString& filename, const QString& localPath)
+Session::addNewlyCreatedTorrent (const QString& filename, const QString& localPath)
 {
   const QByteArray b64 = AddData (filename).toBase64 ();
   const QByteArray localPathUtf8 = localPath.toUtf8 ();
@@ -1141,7 +1141,7 @@ Session :: addNewlyCreatedTorrent (const QString& filename, const QString& local
 }
 
 void
-Session :: removeTorrents (const QSet<int>& ids, bool deleteFiles)
+Session::removeTorrents (const QSet<int>& ids, bool deleteFiles)
 {
   if (!ids.isEmpty ())
     {
@@ -1157,7 +1157,7 @@ Session :: removeTorrents (const QSet<int>& ids, bool deleteFiles)
 }
 
 void
-Session :: verifyTorrents (const QSet<int>& ids)
+Session::verifyTorrents (const QSet<int>& ids)
 {
   if (!ids.isEmpty ())
     {
@@ -1172,7 +1172,7 @@ Session :: verifyTorrents (const QSet<int>& ids)
 }
 
 void
-Session :: reannounceTorrents (const QSet<int>& ids)
+Session::reannounceTorrents (const QSet<int>& ids)
 {
   if (!ids.isEmpty ())
     {
@@ -1191,7 +1191,7 @@ Session :: reannounceTorrents (const QSet<int>& ids)
 ***/
 
 void
-Session :: launchWebInterface ()
+Session::launchWebInterface ()
 {
   QUrl url;
 
@@ -1207,5 +1207,5 @@ Session :: launchWebInterface ()
       url.setPort (myPrefs.getInt (Prefs::RPC_PORT));
     }
 
-  QDesktopServices :: openUrl (url);
+  QDesktopServices::openUrl (url);
 }

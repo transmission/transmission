@@ -19,9 +19,9 @@ namespace
   static const int INTERVAL_MSEC = 15000;
 }
 
-FreespaceLabel :: FreespaceLabel (Session        & session,
-                                  const QString  & path,
-                                  QWidget        * parent):
+FreespaceLabel::FreespaceLabel (Session        & session,
+                                const QString  & path,
+                                QWidget        * parent):
   QLabel (parent),
   mySession (session),
   myTag (-1),
@@ -40,7 +40,7 @@ FreespaceLabel :: FreespaceLabel (Session        & session,
 }
 
 void
-FreespaceLabel :: setPath (const QString& path)
+FreespaceLabel::setPath (const QString& path)
 {
   if (myPath != path)
     {
@@ -51,7 +51,7 @@ FreespaceLabel :: setPath (const QString& path)
 }
 
 void
-FreespaceLabel :: onTimer ()
+FreespaceLabel::onTimer ()
 {
   const int64_t tag = mySession.getUniqueTag ();
   const QByteArray myPathUtf8 = myPath.toUtf8 ();
@@ -68,7 +68,7 @@ FreespaceLabel :: onTimer ()
 }
 
 void
-FreespaceLabel :: onSessionExecuted (int64_t tag, const QString& result, struct tr_variant * arguments)
+FreespaceLabel::onSessionExecuted (int64_t tag, const QString& result, struct tr_variant * arguments)
 {
   Q_UNUSED (result);
 

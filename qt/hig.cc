@@ -17,7 +17,7 @@
 #include "hig.h"
 
 
-HIG :: HIG (QWidget * parent):
+HIG::HIG (QWidget * parent):
   QWidget (parent),
   myRow (0),
   myHasTall (false),
@@ -29,7 +29,7 @@ HIG :: HIG (QWidget * parent):
   myGrid->setColumnStretch  (1, 1);
 }
 
-HIG :: ~HIG ()
+HIG::~HIG ()
 {
   delete myGrid;
 }
@@ -39,7 +39,7 @@ HIG :: ~HIG ()
 ***/
 
 void
-HIG :: addSectionDivider ()
+HIG::addSectionDivider ()
 {
   QWidget * w = new QWidget (this);
   myGrid->addWidget (w, myRow, 0, 1, 2);
@@ -47,7 +47,7 @@ HIG :: addSectionDivider ()
 }
 
 void
-HIG :: addSectionTitle (const QString& title)
+HIG::addSectionTitle (const QString& title)
 {
   QLabel * label = new QLabel (this);
   label->setText (title);
@@ -57,14 +57,14 @@ HIG :: addSectionTitle (const QString& title)
 }
 
 void
-HIG :: addSectionTitle (QWidget * w)
+HIG::addSectionTitle (QWidget * w)
 {
   myGrid->addWidget (w, myRow, 0, 1, 2, Qt::AlignLeft|Qt::AlignVCenter);
   ++myRow;
 }
 
 void
-HIG :: addSectionTitle (QLayout * l)
+HIG::addSectionTitle (QLayout * l)
 {
   myGrid->addLayout (l, myRow, 0, 1, 2, Qt::AlignLeft|Qt::AlignVCenter);
   ++myRow;
@@ -72,7 +72,7 @@ HIG :: addSectionTitle (QLayout * l)
 
 
 QLayout *
-HIG :: addRow (QWidget * w)
+HIG::addRow (QWidget * w)
 {
   QHBoxLayout * h = new QHBoxLayout ();
   h->addSpacing (18);
@@ -86,7 +86,7 @@ HIG :: addRow (QWidget * w)
 }
 
 void
-HIG :: addWideControl (QLayout * l)
+HIG::addWideControl (QLayout * l)
 {
   QHBoxLayout * h = new QHBoxLayout ();
   h->addSpacing (18);
@@ -96,7 +96,7 @@ HIG :: addWideControl (QLayout * l)
 }
 
 void
-HIG :: addWideControl (QWidget * w)
+HIG::addWideControl (QWidget * w)
 {
   QHBoxLayout * h = new QHBoxLayout ();
   h->addSpacing (18);
@@ -106,7 +106,7 @@ HIG :: addWideControl (QWidget * w)
 }
 
 QCheckBox*
-HIG :: addWideCheckBox (const QString& text, bool isChecked)
+HIG::addWideCheckBox (const QString& text, bool isChecked)
 {
   QCheckBox * check = new QCheckBox (text, this);
   check->setChecked (isChecked);
@@ -115,7 +115,7 @@ HIG :: addWideCheckBox (const QString& text, bool isChecked)
 }
 
 void
-HIG :: addLabel (QWidget * w)
+HIG::addLabel (QWidget * w)
 {
   QHBoxLayout * h = new QHBoxLayout ();
   h->addSpacing (18);
@@ -124,7 +124,7 @@ HIG :: addLabel (QWidget * w)
 }
 
 QLabel*
-HIG :: addLabel (const QString& text)
+HIG::addLabel (const QString& text)
 {
   QLabel * label = new QLabel (text, this);
   addLabel (label);
@@ -132,7 +132,7 @@ HIG :: addLabel (const QString& text)
 }
 
 void
-HIG :: addTallLabel (QWidget * w)
+HIG::addTallLabel (QWidget * w)
 {
   QHBoxLayout * h = new QHBoxLayout ();
   h->addSpacing (18);
@@ -141,7 +141,7 @@ HIG :: addTallLabel (QWidget * w)
 }
 
 QLabel*
-HIG :: addTallLabel (const QString& text)
+HIG::addTallLabel (const QString& text)
 {
   QLabel * label = new QLabel (text, this);
   addTallLabel (label);
@@ -149,19 +149,19 @@ HIG :: addTallLabel (const QString& text)
 }
 
 void
-HIG :: addControl (QWidget * w)
+HIG::addControl (QWidget * w)
 {
   myGrid->addWidget (w, myRow, 1, 1, 1);
 }
 
 void
-HIG :: addControl (QLayout * l)
+HIG::addControl (QLayout * l)
 {
   myGrid->addLayout (l, myRow, 1, 1, 1);
 }
 
 QLabel *
-HIG :: addRow (const QString& text, QWidget * control, QWidget * buddy)
+HIG::addRow (const QString& text, QWidget * control, QWidget * buddy)
 {
   QLabel * label = addLabel (text);
   addControl (control);
@@ -171,7 +171,7 @@ HIG :: addRow (const QString& text, QWidget * control, QWidget * buddy)
 }
 
 QLabel *
-HIG :: addTallRow (const QString& text, QWidget * control, QWidget * buddy)
+HIG::addTallRow (const QString& text, QWidget * control, QWidget * buddy)
 {
   QLabel* label = addTallLabel (text);
   label->setBuddy (buddy ? buddy : control);
@@ -183,7 +183,7 @@ HIG :: addTallRow (const QString& text, QWidget * control, QWidget * buddy)
 }
 
 QLabel *
-HIG :: addRow (const QString& text, QLayout * control, QWidget * buddy)
+HIG::addRow (const QString& text, QLayout * control, QWidget * buddy)
 {
   QLabel * label = addLabel (text);
   addControl (control);
@@ -194,7 +194,7 @@ HIG :: addRow (const QString& text, QLayout * control, QWidget * buddy)
 }
 
 void
-HIG :: addRow (QWidget * label, QWidget * control, QWidget * buddy)
+HIG::addRow (QWidget * label, QWidget * control, QWidget * buddy)
 {
   addLabel (label);
 
@@ -211,7 +211,7 @@ HIG :: addRow (QWidget * label, QWidget * control, QWidget * buddy)
 }
 
 void
-HIG :: addRow (QWidget * label, QLayout * control, QWidget * buddy)
+HIG::addRow (QWidget * label, QLayout * control, QWidget * buddy)
 {
   addLabel (label);
 
@@ -228,7 +228,7 @@ HIG :: addRow (QWidget * label, QLayout * control, QWidget * buddy)
 }
 
 void
-HIG :: finish ()
+HIG::finish ()
 {
   if (!myHasTall)
     {

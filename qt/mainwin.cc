@@ -72,7 +72,7 @@ class ListViewProxyStyle: public QProxyStyle
 
 
 QIcon
-TrMainWindow :: getStockIcon (const QString& name, int fallback)
+TrMainWindow::getStockIcon (const QString& name, int fallback)
 {
   QIcon icon = QIcon::fromTheme (name);
 
@@ -82,7 +82,7 @@ TrMainWindow :: getStockIcon (const QString& name, int fallback)
   return icon;
 }
 
-TrMainWindow :: TrMainWindow (Session& session, Prefs& prefs, TorrentModel& model, bool minimized):
+TrMainWindow::TrMainWindow (Session& session, Prefs& prefs, TorrentModel& model, bool minimized):
   myLastFullUpdateTime (0),
   mySessionDialog (new SessionDialog (session, prefs, this)),
   myPrefsDialog (0),
@@ -248,22 +248,22 @@ TrMainWindow :: TrMainWindow (Session& session, Prefs& prefs, TorrentModel& mode
   ui.verticalLayout->insertWidget (0, myFilterBar = new FilterBar (myPrefs, myModel, myFilterModel));
 
   QList<int> initKeys;
-  initKeys << Prefs :: MAIN_WINDOW_X
-           << Prefs :: SHOW_TRAY_ICON
-           << Prefs :: SORT_REVERSED
-           << Prefs :: SORT_MODE
-           << Prefs :: FILTERBAR
-           << Prefs :: STATUSBAR
-           << Prefs :: STATUSBAR_STATS
-           << Prefs :: TOOLBAR
-           << Prefs :: ALT_SPEED_LIMIT_ENABLED
-           << Prefs :: COMPACT_VIEW
-           << Prefs :: DSPEED
-           << Prefs :: DSPEED_ENABLED
-           << Prefs :: USPEED
-           << Prefs :: USPEED_ENABLED
-           << Prefs :: RATIO
-           << Prefs :: RATIO_ENABLED;
+  initKeys << Prefs::MAIN_WINDOW_X
+           << Prefs::SHOW_TRAY_ICON
+           << Prefs::SORT_REVERSED
+           << Prefs::SORT_MODE
+           << Prefs::FILTERBAR
+           << Prefs::STATUSBAR
+           << Prefs::STATUSBAR_STATS
+           << Prefs::TOOLBAR
+           << Prefs::ALT_SPEED_LIMIT_ENABLED
+           << Prefs::COMPACT_VIEW
+           << Prefs::DSPEED
+           << Prefs::DSPEED_ENABLED
+           << Prefs::USPEED
+           << Prefs::USPEED_ENABLED
+           << Prefs::RATIO
+           << Prefs::RATIO_ENABLED;
   foreach (int key, initKeys)
     refreshPref (key);
 
@@ -295,7 +295,7 @@ TrMainWindow :: TrMainWindow (Session& session, Prefs& prefs, TorrentModel& mode
   refreshTitle ();
 }
 
-TrMainWindow :: ~TrMainWindow ()
+TrMainWindow::~TrMainWindow ()
 {
 }
 
@@ -304,13 +304,13 @@ TrMainWindow :: ~TrMainWindow ()
 ****/
 
 void
-TrMainWindow :: onSessionSourceChanged ()
+TrMainWindow::onSessionSourceChanged ()
 {
   myModel.clear ();
 }
 
 void
-TrMainWindow :: onModelReset ()
+TrMainWindow::onModelReset ()
 {
   refreshTitle ();
   refreshActionSensitivitySoon ();
@@ -325,7 +325,7 @@ TrMainWindow :: onModelReset ()
 #define PREF_VARIANTS_KEY "pref-variants-list"
 
 void
-TrMainWindow :: onSetPrefs ()
+TrMainWindow::onSetPrefs ()
 {
   const QVariantList p = sender ()->property (PREF_VARIANTS_KEY).toList ();
   assert ( (p.size () % 2) == 0);
@@ -334,7 +334,7 @@ TrMainWindow :: onSetPrefs ()
 }
 
 void
-TrMainWindow :: onSetPrefs (bool isChecked)
+TrMainWindow::onSetPrefs (bool isChecked)
 {
   if (isChecked)
     onSetPrefs ();
@@ -343,7 +343,7 @@ TrMainWindow :: onSetPrefs (bool isChecked)
 #define SHOW_KEY "show-mode"
 
 QWidget *
-TrMainWindow :: createStatusBar ()
+TrMainWindow::createStatusBar ()
 {
   QMenu * m;
   QLabel * l;
@@ -421,7 +421,7 @@ TrMainWindow :: createStatusBar ()
 }
 
 QMenu *
-TrMainWindow :: createOptionsMenu ()
+TrMainWindow::createOptionsMenu ()
 {
   QMenu * menu;
   QMenu * sub;
@@ -509,22 +509,22 @@ TrMainWindow :: createOptionsMenu ()
 ****/
 
 void
-TrMainWindow :: setSortPref (int i)
+TrMainWindow::setSortPref (int i)
 {
   myPrefs.set (Prefs::SORT_MODE, SortMode (i));
 }
-void TrMainWindow :: onSortByActivityToggled (bool b) { if (b) setSortPref (SortMode::SORT_BY_ACTIVITY); }
-void TrMainWindow :: onSortByAgeToggled (bool b) { if (b) setSortPref (SortMode::SORT_BY_AGE); }
-void TrMainWindow :: onSortByETAToggled (bool b) { if (b) setSortPref (SortMode::SORT_BY_ETA); }
-void TrMainWindow :: onSortByNameToggled (bool b) { if (b) setSortPref (SortMode::SORT_BY_NAME); }
-void TrMainWindow :: onSortByProgressToggled (bool b) { if (b) setSortPref (SortMode::SORT_BY_PROGRESS); }
-void TrMainWindow :: onSortByQueueToggled (bool b) { if (b) setSortPref (SortMode::SORT_BY_QUEUE); }
-void TrMainWindow :: onSortByRatioToggled (bool b) { if (b) setSortPref (SortMode::SORT_BY_RATIO); }
-void TrMainWindow :: onSortBySizeToggled (bool b) { if (b) setSortPref (SortMode::SORT_BY_SIZE); }
-void TrMainWindow :: onSortByStateToggled (bool b) { if (b) setSortPref (SortMode::SORT_BY_STATE); }
+void TrMainWindow::onSortByActivityToggled (bool b) { if (b) setSortPref (SortMode::SORT_BY_ACTIVITY); }
+void TrMainWindow::onSortByAgeToggled (bool b) { if (b) setSortPref (SortMode::SORT_BY_AGE); }
+void TrMainWindow::onSortByETAToggled (bool b) { if (b) setSortPref (SortMode::SORT_BY_ETA); }
+void TrMainWindow::onSortByNameToggled (bool b) { if (b) setSortPref (SortMode::SORT_BY_NAME); }
+void TrMainWindow::onSortByProgressToggled (bool b) { if (b) setSortPref (SortMode::SORT_BY_PROGRESS); }
+void TrMainWindow::onSortByQueueToggled (bool b) { if (b) setSortPref (SortMode::SORT_BY_QUEUE); }
+void TrMainWindow::onSortByRatioToggled (bool b) { if (b) setSortPref (SortMode::SORT_BY_RATIO); }
+void TrMainWindow::onSortBySizeToggled (bool b) { if (b) setSortPref (SortMode::SORT_BY_SIZE); }
+void TrMainWindow::onSortByStateToggled (bool b) { if (b) setSortPref (SortMode::SORT_BY_STATE); }
 
 void
-TrMainWindow :: setSortAscendingPref (bool b)
+TrMainWindow::setSortAscendingPref (bool b)
 {
   myPrefs.set (Prefs::SORT_REVERSED, b);
 }
@@ -534,7 +534,7 @@ TrMainWindow :: setSortAscendingPref (bool b)
 ****/
 
 void
-TrMainWindow :: showEvent (QShowEvent * event)
+TrMainWindow::showEvent (QShowEvent * event)
 {
   Q_UNUSED (event);
 
@@ -546,7 +546,7 @@ TrMainWindow :: showEvent (QShowEvent * event)
 ****/
 
 void
-TrMainWindow :: hideEvent (QHideEvent * event)
+TrMainWindow::hideEvent (QHideEvent * event)
 {
   Q_UNUSED (event);
 
@@ -559,13 +559,13 @@ TrMainWindow :: hideEvent (QHideEvent * event)
 ****/
 
 void
-TrMainWindow :: onPrefsDestroyed ()
+TrMainWindow::onPrefsDestroyed ()
 {
   myPrefsDialog = 0;
 }
 
 void
-TrMainWindow :: openPreferences ()
+TrMainWindow::openPreferences ()
 {
   if (myPrefsDialog == 0)
     {
@@ -577,13 +577,13 @@ TrMainWindow :: openPreferences ()
 }
 
 void
-TrMainWindow :: onDetailsDestroyed ()
+TrMainWindow::onDetailsDestroyed ()
 {
   myDetailsDialog = 0;
 }
 
 void
-TrMainWindow :: openProperties ()
+TrMainWindow::openProperties ()
 {
   if (myDetailsDialog == 0)
     {
@@ -596,7 +596,7 @@ TrMainWindow :: openProperties ()
 }
 
 void
-TrMainWindow :: setLocation ()
+TrMainWindow::setLocation ()
 {
   QDialog * d = new RelocateDialog (mySession, myModel, getSelectedTorrents (), this);
   d->show ();
@@ -634,7 +634,7 @@ void openSelect (const QString& path)
 #endif
 
 void
-TrMainWindow :: openFolder ()
+TrMainWindow::openFolder ()
 {
   const int torrentId (*getSelectedTorrents ().begin ());
   const Torrent * tor (myModel.getTorrentFromId (torrentId));
@@ -653,35 +653,35 @@ TrMainWindow :: openFolder ()
       return;
     }
 #endif
-  QDesktopServices :: openUrl (QUrl::fromLocalFile (path));
+  QDesktopServices::openUrl (QUrl::fromLocalFile (path));
 }
 
 void
-TrMainWindow :: copyMagnetLinkToClipboard ()
+TrMainWindow::copyMagnetLinkToClipboard ()
 {
   const int id (*getSelectedTorrents ().begin ());
   mySession.copyMagnetLinkToClipboard (id);
 }
 
 void
-TrMainWindow :: openDonate ()
+TrMainWindow::openDonate ()
 {
-  QDesktopServices :: openUrl (QUrl ("http://www.transmissionbt.com/donate.php"));
+  QDesktopServices::openUrl (QUrl ("http://www.transmissionbt.com/donate.php"));
 }
 
 void
-TrMainWindow :: openHelp ()
+TrMainWindow::openHelp ()
 {
   const char * fmt = "http://www.transmissionbt.com/help/gtk/%d.%dx";
   int major, minor;
   sscanf (SHORT_VERSION_STRING, "%d.%d", &major, &minor);
   char url[128];
   tr_snprintf (url, sizeof (url), fmt, major, minor/10);
-  QDesktopServices :: openUrl (QUrl (url));
+  QDesktopServices::openUrl (QUrl (url));
 }
 
 void
-TrMainWindow :: refreshTitle ()
+TrMainWindow::refreshTitle ()
 {
   QString title ("Transmission");
   const QUrl url (mySession.getRemoteUrl ());
@@ -691,7 +691,7 @@ TrMainWindow :: refreshTitle ()
 }
 
 void
-TrMainWindow :: refreshTrayIconSoon ()
+TrMainWindow::refreshTrayIconSoon ()
 {
   if (!myRefreshTrayIconTimer.isActive ())
     {
@@ -700,7 +700,7 @@ TrMainWindow :: refreshTrayIconSoon ()
     }
 }
 void
-TrMainWindow :: refreshTrayIcon ()
+TrMainWindow::refreshTrayIcon ()
 {
   Speed upSpeed, downSpeed;
   size_t upCount, downCount;
@@ -730,7 +730,7 @@ TrMainWindow :: refreshTrayIcon ()
 }
 
 void
-TrMainWindow :: refreshStatusBar ()
+TrMainWindow::refreshStatusBar ()
 {
   Speed upSpeed, downSpeed;
   size_t upCount, downCount;
@@ -773,7 +773,7 @@ TrMainWindow :: refreshStatusBar ()
 
 
 void
-TrMainWindow :: refreshActionSensitivitySoon ()
+TrMainWindow::refreshActionSensitivitySoon ()
 {
   if (!myRefreshActionSensitivityTimer.isActive ())
     {
@@ -782,7 +782,7 @@ TrMainWindow :: refreshActionSensitivitySoon ()
     }
 }
 void
-TrMainWindow :: refreshActionSensitivity ()
+TrMainWindow::refreshActionSensitivity ()
 {
   int selected (0);
   int paused (0);
@@ -848,13 +848,13 @@ TrMainWindow :: refreshActionSensitivity ()
 **/
 
 void
-TrMainWindow :: clearSelection ()
+TrMainWindow::clearSelection ()
 {
   ui.action_DeselectAll->trigger ();
 }
 
 QSet<int>
-TrMainWindow :: getSelectedTorrents () const
+TrMainWindow::getSelectedTorrents () const
 {
   QSet<int> ids;
 
@@ -868,67 +868,67 @@ TrMainWindow :: getSelectedTorrents () const
 }
 
 void
-TrMainWindow :: startSelected ()
+TrMainWindow::startSelected ()
 {
   mySession.startTorrents (getSelectedTorrents ());
 }
 void
-TrMainWindow :: startSelectedNow ()
+TrMainWindow::startSelectedNow ()
 {
   mySession.startTorrentsNow (getSelectedTorrents ());
 }
 void
-TrMainWindow :: pauseSelected ()
+TrMainWindow::pauseSelected ()
 {
   mySession.pauseTorrents (getSelectedTorrents ());
 }
 void
-TrMainWindow :: queueMoveTop ()
+TrMainWindow::queueMoveTop ()
 {
   mySession.queueMoveTop (getSelectedTorrents ());
 }
 void
-TrMainWindow :: queueMoveUp ()
+TrMainWindow::queueMoveUp ()
 {
   mySession.queueMoveUp (getSelectedTorrents ());
 }
 void
-TrMainWindow :: queueMoveDown ()
+TrMainWindow::queueMoveDown ()
 {
   mySession.queueMoveDown (getSelectedTorrents ());
 }
 void
-TrMainWindow :: queueMoveBottom ()
+TrMainWindow::queueMoveBottom ()
 {
   mySession.queueMoveBottom (getSelectedTorrents ());
 }
 void
-TrMainWindow :: startAll ()
+TrMainWindow::startAll ()
 {
   mySession.startTorrents ();
 }
 void
-TrMainWindow :: pauseAll ()
+TrMainWindow::pauseAll ()
 {
   mySession.pauseTorrents ();
 }
 void
-TrMainWindow :: removeSelected ()
+TrMainWindow::removeSelected ()
 {
   removeTorrents (false);
 }
 void
-TrMainWindow :: deleteSelected ()
+TrMainWindow::deleteSelected ()
 {
   removeTorrents (true);
 }
 void
-TrMainWindow :: verifySelected ()
+TrMainWindow::verifySelected ()
 {
   mySession.verifyTorrents (getSelectedTorrents ());
 }
 void
-TrMainWindow :: reannounceSelected ()
+TrMainWindow::reannounceSelected ()
 {
   mySession.reannounceTorrents (getSelectedTorrents ());
 }
@@ -937,39 +937,39 @@ TrMainWindow :: reannounceSelected ()
 ***
 **/
 
-void TrMainWindow :: showTotalRatio () { myPrefs.set (Prefs::STATUSBAR_STATS, "total-ratio"); }
-void TrMainWindow :: showTotalTransfer () { myPrefs.set (Prefs::STATUSBAR_STATS, "total-transfer"); }
-void TrMainWindow :: showSessionRatio () { myPrefs.set (Prefs::STATUSBAR_STATS, "session-ratio"); }
-void TrMainWindow :: showSessionTransfer () { myPrefs.set (Prefs::STATUSBAR_STATS, "session-transfer"); }
+void TrMainWindow::showTotalRatio () { myPrefs.set (Prefs::STATUSBAR_STATS, "total-ratio"); }
+void TrMainWindow::showTotalTransfer () { myPrefs.set (Prefs::STATUSBAR_STATS, "total-transfer"); }
+void TrMainWindow::showSessionRatio () { myPrefs.set (Prefs::STATUSBAR_STATS, "session-ratio"); }
+void TrMainWindow::showSessionTransfer () { myPrefs.set (Prefs::STATUSBAR_STATS, "session-transfer"); }
 
 /**
 ***
 **/
 
 void
-TrMainWindow :: setCompactView (bool visible)
+TrMainWindow::setCompactView (bool visible)
 {
-  myPrefs.set (Prefs :: COMPACT_VIEW, visible);
+  myPrefs.set (Prefs::COMPACT_VIEW, visible);
 }
 void
-TrMainWindow :: toggleSpeedMode ()
+TrMainWindow::toggleSpeedMode ()
 {
-  myPrefs.toggleBool (Prefs :: ALT_SPEED_LIMIT_ENABLED);
+  myPrefs.toggleBool (Prefs::ALT_SPEED_LIMIT_ENABLED);
   const bool mode = myPrefs.get<bool> (Prefs::ALT_SPEED_LIMIT_ENABLED);
   myAltSpeedAction->setIcon (mode ? mySpeedModeOnIcon : mySpeedModeOffIcon);
 }
 void
-TrMainWindow :: setToolbarVisible (bool visible)
+TrMainWindow::setToolbarVisible (bool visible)
 {
   myPrefs.set (Prefs::TOOLBAR, visible);
 }
 void
-TrMainWindow :: setFilterbarVisible (bool visible)
+TrMainWindow::setFilterbarVisible (bool visible)
 {
   myPrefs.set (Prefs::FILTERBAR, visible);
 }
 void
-TrMainWindow :: setStatusbarVisible (bool visible)
+TrMainWindow::setStatusbarVisible (bool visible)
 {
   myPrefs.set (Prefs::STATUSBAR, visible);
 }
@@ -979,7 +979,7 @@ TrMainWindow :: setStatusbarVisible (bool visible)
 **/
 
 void
-TrMainWindow :: toggleWindows (bool doShow)
+TrMainWindow::toggleWindows (bool doShow)
 {
   if (!doShow)
     {
@@ -996,7 +996,7 @@ TrMainWindow :: toggleWindows (bool doShow)
 }
 
 void
-TrMainWindow :: trayActivated (QSystemTrayIcon::ActivationReason reason)
+TrMainWindow::trayActivated (QSystemTrayIcon::ActivationReason reason)
 {
   if ((reason == QSystemTrayIcon::Trigger) ||
       (reason == QSystemTrayIcon::DoubleClick))
@@ -1010,7 +1010,7 @@ TrMainWindow :: trayActivated (QSystemTrayIcon::ActivationReason reason)
 
 
 void
-TrMainWindow :: refreshPref (int key)
+TrMainWindow::refreshPref (int key)
 {
   bool b;
   int i;
@@ -1118,11 +1118,11 @@ TrMainWindow :: refreshPref (int key)
                      myPrefs.getInt (Prefs::MAIN_WINDOW_HEIGHT));
         break;
 
-      case Prefs :: ALT_SPEED_LIMIT_ENABLED:
-      case Prefs :: ALT_SPEED_LIMIT_UP:
-      case Prefs :: ALT_SPEED_LIMIT_DOWN:
+      case Prefs::ALT_SPEED_LIMIT_ENABLED:
+      case Prefs::ALT_SPEED_LIMIT_UP:
+      case Prefs::ALT_SPEED_LIMIT_DOWN:
         {
-          b = myPrefs.getBool (Prefs :: ALT_SPEED_LIMIT_ENABLED);
+          b = myPrefs.getBool (Prefs::ALT_SPEED_LIMIT_ENABLED);
           myAltSpeedButton->setChecked (b);
           myAltSpeedButton->setIcon (b ? mySpeedModeOnIcon : mySpeedModeOffIcon);
           const QString fmt = b ? tr ("Click to disable Temporary Speed Limits\n (%1 down, %2 up)")
@@ -1146,14 +1146,14 @@ TrMainWindow :: refreshPref (int key)
 #define SHOW_OPTIONS_CHECKBOX_NAME "show-options-checkbox"
 
 void
-TrMainWindow :: newTorrent ()
+TrMainWindow::newTorrent ()
 {
   MakeDialog * dialog = new MakeDialog (mySession, this);
   dialog->show ();
 }
 
 void
-TrMainWindow :: openTorrent ()
+TrMainWindow::openTorrent ()
 {
   QFileDialog * d;
   d = new QFileDialog (this,
@@ -1181,7 +1181,7 @@ TrMainWindow :: openTorrent ()
 }
 
 void
-TrMainWindow :: openURL ()
+TrMainWindow::openURL ()
 {
   QString str = QApplication::clipboard ()->text (QClipboard::Selection);
 
@@ -1195,7 +1195,7 @@ TrMainWindow :: openURL ()
 }
 
 void
-TrMainWindow :: addTorrents (const QStringList& filenames)
+TrMainWindow::addTorrents (const QStringList& filenames)
 {
   bool showOptions = myPrefs.getBool (Prefs::OPTIONS_PROMPT);
 
@@ -1212,23 +1212,23 @@ TrMainWindow :: addTorrents (const QStringList& filenames)
 }
 
 void
-TrMainWindow :: addTorrent (const AddData& addMe, bool showOptions)
+TrMainWindow::addTorrent (const AddData& addMe, bool showOptions)
 {
   if (showOptions)
     {
       Options * o = new Options (mySession, myPrefs, addMe, this);
       o->show ();
-      QApplication :: alert (o);
+      QApplication::alert (o);
     }
   else
     {
       mySession.addTorrent (addMe);
-      QApplication :: alert (this);
+      QApplication::alert (this);
     }
 }
 
 void
-TrMainWindow :: removeTorrents (const bool deleteFiles)
+TrMainWindow::removeTorrents (const bool deleteFiles)
 {
   QSet<int> ids;
   QMessageBox msgBox (this);
@@ -1335,7 +1335,7 @@ TrMainWindow :: removeTorrents (const bool deleteFiles)
 ***/
 
 void
-TrMainWindow :: updateNetworkIcon ()
+TrMainWindow::updateNetworkIcon ()
 {
   const time_t now = time (NULL);
   const int period = 3;
@@ -1376,26 +1376,26 @@ TrMainWindow :: updateNetworkIcon ()
 }
 
 void
-TrMainWindow :: onNetworkTimer ()
+TrMainWindow::onNetworkTimer ()
 {
   updateNetworkIcon ();
 }
 
 void
-TrMainWindow :: dataReadProgress ()
+TrMainWindow::dataReadProgress ()
 {
   if (!myNetworkError)
   myLastReadTime = time (NULL);
 }
 
 void
-TrMainWindow :: dataSendProgress ()
+TrMainWindow::dataSendProgress ()
 {
   myLastSendTime = time (NULL);
 }
 
 void
-TrMainWindow :: onError (QNetworkReply::NetworkError code)
+TrMainWindow::onError (QNetworkReply::NetworkError code)
 {
   const bool hadError = myNetworkError;
   const bool haveError = (code != QNetworkReply::NoError)
@@ -1412,13 +1412,13 @@ TrMainWindow :: onError (QNetworkReply::NetworkError code)
 }
 
 void
-TrMainWindow :: errorMessage (const QString msg)
+TrMainWindow::errorMessage (const QString msg)
 {
     myErrorMessage = msg;
 }
 
 void
-TrMainWindow :: wrongAuthentication ()
+TrMainWindow::wrongAuthentication ()
 {
   mySession.stop ();
   mySessionDialog->show ();
@@ -1429,7 +1429,7 @@ TrMainWindow :: wrongAuthentication ()
 ***/
 
 void
-TrMainWindow :: dragEnterEvent (QDragEnterEvent * event)
+TrMainWindow::dragEnterEvent (QDragEnterEvent * event)
 {
   const QMimeData * mime = event->mimeData ();
 
@@ -1441,7 +1441,7 @@ TrMainWindow :: dragEnterEvent (QDragEnterEvent * event)
 }
 
 void
-TrMainWindow :: dropEvent (QDropEvent * event)
+TrMainWindow::dropEvent (QDropEvent * event)
 {
   QStringList list;
 
@@ -1476,7 +1476,7 @@ TrMainWindow :: dropEvent (QDropEvent * event)
 ***/
 
 void
-TrMainWindow :: contextMenuEvent (QContextMenuEvent * event)
+TrMainWindow::contextMenuEvent (QContextMenuEvent * event)
 {
   QMenu * menu = new QMenu (this);
 

@@ -25,7 +25,7 @@
 ***/
 
 void
-SessionDialog :: onAccepted ()
+SessionDialog::onAccepted ()
 {
   myPrefs.set (Prefs::SESSION_IS_REMOTE, myRemoteRadioButton->isChecked ());
   myPrefs.set (Prefs::SESSION_REMOTE_HOST, myHostLineEdit->text ());
@@ -38,7 +38,7 @@ SessionDialog :: onAccepted ()
 }
 
 void
-SessionDialog :: resensitize ()
+SessionDialog::resensitize ()
 {
   const bool isRemote = myRemoteRadioButton->isChecked();
   const bool useAuth = myAuthCheckBox->isChecked();
@@ -54,7 +54,7 @@ SessionDialog :: resensitize ()
 ****
 ***/
 
-SessionDialog :: SessionDialog (Session& session, Prefs& prefs, QWidget * parent):
+SessionDialog::SessionDialog (Session& session, Prefs& prefs, QWidget * parent):
   QDialog (parent),
   mySession (session),
   myPrefs (prefs)
@@ -67,7 +67,7 @@ SessionDialog :: SessionDialog (Session& session, Prefs& prefs, QWidget * parent
 
   setWindowTitle (tr ("Change Session"));
   QVBoxLayout * top = new QVBoxLayout (this);
-  top->setSpacing (HIG :: PAD);
+  top->setSpacing (HIG::PAD);
 
   HIG * hig = new HIG;
   hig->setContentsMargins (0, 0, 0, 0);
