@@ -12,6 +12,7 @@
 
 #include <QtGui>
 #include <QCheckBox>
+#include <QIcon>
 #include <QProxyStyle>
 #include <QLabel>
 #include <QFileDialog>
@@ -233,7 +234,7 @@ TrMainWindow :: TrMainWindow (Session& session, Prefs& prefs, TorrentModel& mode
   menu->addSeparator ();
   menu->addAction (ui.action_Quit);
   myTrayIcon.setContextMenu (menu);
-  myTrayIcon.setIcon (QApplication::windowIcon ());
+  myTrayIcon.setIcon (QIcon::fromTheme ("transmission-tray-icon", QApplication::windowIcon ()));
 
   connect (&myPrefs, SIGNAL (changed (int)), this, SLOT (refreshPref (int)));
   connect (ui.action_ShowMainWindow, SIGNAL (triggered (bool)), this, SLOT (toggleWindows (bool)));

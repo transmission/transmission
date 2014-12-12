@@ -7,8 +7,10 @@
  * $Id$
  */
 
+#include <QApplication>
 #include <QDialogButtonBox>
 #include <QFont>
+#include <QIcon>
 #include <QLabel>
 #include <QMessageBox>
 #include <QPixmap>
@@ -34,7 +36,7 @@ AboutDialog :: AboutDialog (QWidget * parent):
   QVBoxLayout * v = new QVBoxLayout (this);
 
   l = new QLabel;
-  l->setPixmap (QPixmap (QString::fromUtf8 (":/icons/transmission-48.png")));
+  l->setPixmap (QApplication::windowIcon ().pixmap (48));
   l->setAlignment (Qt::AlignCenter);
   v->addWidget (l);
 
