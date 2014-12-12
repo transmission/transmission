@@ -79,8 +79,8 @@ StatsDialog::onTimer ()
 void
 StatsDialog::updateStats ()
 {
-  const struct tr_session_stats& current (mySession.getStats ());
-  const struct tr_session_stats& total (mySession.getCumulativeStats ());
+  const tr_session_stats& current (mySession.getStats ());
+  const tr_session_stats& total (mySession.getCumulativeStats ());
 
   myCurrentUp->setText (Formatter::sizeToString (current.uploadedBytes));
   myCurrentDown->setText (Formatter::sizeToString (current.downloadedBytes));

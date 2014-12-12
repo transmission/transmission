@@ -146,7 +146,7 @@ class Prefs: public QObject
     QSet<int> myTemporaryPrefs;
     QString myConfigDir;
     mutable QVariant myValues[PREFS_COUNT];
-    void initDefaults (struct tr_variant*);
+    void initDefaults (tr_variant *);
 
   public:
     bool isCore (int key) const { return FIRST_CORE_PREF<=key && key<=LAST_CORE_PREF; }

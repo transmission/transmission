@@ -89,7 +89,7 @@ namespace
 ***/
 
 void
-FileAdded::executed (int64_t tag, const QString& result, struct tr_variant * arguments)
+FileAdded::executed (int64_t tag, const QString& result, tr_variant * arguments)
 {
   Q_UNUSED (arguments);
 
@@ -700,7 +700,7 @@ Session::exec (const tr_variant * request)
 }
 
 void
-Session::localSessionCallback (tr_session * s, struct evbuffer * json, void * vself)
+Session::localSessionCallback (tr_session * s, evbuffer * json, void * vself)
 {
   Q_UNUSED (s);
 
@@ -920,7 +920,7 @@ Session::parseResponse (const char * json, size_t jsonLength)
 }
 
 void
-Session::updateStats (tr_variant * d, struct tr_session_stats * stats)
+Session::updateStats (tr_variant * d, tr_session_stats * stats)
 {
   int64_t i;
 
@@ -1106,8 +1106,8 @@ Session::addTorrent (const AddData& addMe, tr_variant& top, bool trashOriginal)
   FileAdded * fileAdded = new FileAdded (tag, addMe.readableName ());
   if (trashOriginal && addMe.type == AddData::FILENAME)
     fileAdded->setFileToDelete (addMe.filename);
-  connect (this, SIGNAL (executed (int64_t, QString, struct tr_variant *)),
-           fileAdded, SLOT (executed (int64_t, QString, struct tr_variant *)));
+  connect (this, SIGNAL (executed (int64_t, QString, tr_variant *)),
+           fileAdded, SLOT (executed (int64_t, QString, tr_variant *)));
 
   exec (&top);
 }

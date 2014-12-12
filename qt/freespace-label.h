@@ -18,6 +18,11 @@
 
 class Session;
 
+extern "C"
+{
+  struct tr_variant;
+}
+
 class FreespaceLabel: public QLabel
 {
     Q_OBJECT
@@ -34,7 +39,7 @@ class FreespaceLabel: public QLabel
     QTimer myTimer;
 
   private slots:
-    void onSessionExecuted (int64_t tag, const QString& result, struct tr_variant * arguments);
+    void onSessionExecuted (int64_t tag, const QString& result, tr_variant * arguments);
     void onTimer ();
 };
 

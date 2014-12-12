@@ -45,7 +45,7 @@ class FileAdded: public QObject
     void setFileToDelete (const QString& file) { myDelFile = file; }
 
   public slots:
-    void executed (int64_t tag, const QString& result, struct tr_variant * arguments);
+    void executed (int64_t tag, const QString& result, tr_variant * arguments);
 
   private:
     const int64_t myTag;
@@ -70,8 +70,8 @@ class Session: public QObject
 
   public:
     const QUrl& getRemoteUrl () const { return myUrl; }
-    const struct tr_session_stats& getStats () const { return myStats; }
-    const struct tr_session_stats& getCumulativeStats () const { return myCumulativeStats; }
+    const tr_session_stats& getStats () const { return myStats; }
+    const tr_session_stats& getCumulativeStats () const { return myCumulativeStats; }
     const QString& sessionVersion () const { return mySessionVersion; }
 
   public:
@@ -90,14 +90,14 @@ class Session: public QObject
     bool isLocal () const;
 
   private:
-    void updateStats (struct tr_variant * args);
-    void updateInfo (struct tr_variant * args);
+    void updateStats (tr_variant * args);
+    void updateInfo (tr_variant * args);
     void parseResponse (const char * json, size_t len);
-    static void localSessionCallback (tr_session *, struct evbuffer *, void *);
+    static void localSessionCallback (tr_session *, evbuffer *, void *);
 
   public:
     void exec (const char * json);
-    void exec (const struct tr_variant * request);
+    void exec (const tr_variant * request);
 
   public:
     int64_t getUniqueTag () { return nextUniqueTag++; }
@@ -106,7 +106,7 @@ class Session: public QObject
     void sessionSet (const tr_quark key, const QVariant& variant);
     void pumpRequests ();
     void sendTorrentRequest (const char * request, const QSet<int>& torrentIds);
-    static void updateStats (struct tr_variant * d, struct tr_session_stats * stats);
+    static void updateStats (tr_variant * d, tr_session_stats * stats);
     void refreshTorrents (const QSet<int>& torrentIds);
     QNetworkAccessManager * networkAccessManager ();
 
@@ -151,14 +151,14 @@ class Session: public QObject
 
   signals:
     void responseReceived (const QByteArray& json);
-    void executed (int64_t tag, const QString& result, struct tr_variant * arguments);
+    void executed (int64_t tag, const QString& result, tr_variant * arguments);
     void sourceChanged ();
     void portTested (bool isOpen);
     void statsUpdated ();
     void sessionUpdated ();
     void blocklistUpdated (int);
-    void torrentsUpdated (struct tr_variant * torrentList, bool completeList);
-    void torrentsRemoved (struct tr_variant * torrentList);
+    void torrentsUpdated (tr_variant * torrentList, bool completeList);
+    void torrentsRemoved (tr_variant * torrentList);
     void dataReadProgress ();
     void dataSendProgress ();
     void error (QNetworkReply::NetworkError);
@@ -175,8 +175,8 @@ class Session: public QObject
     QStringList myIdleJSON;
     QUrl myUrl;
     QNetworkAccessManager * myNAM;
-    struct tr_session_stats myStats;
-    struct tr_session_stats myCumulativeStats;
+    tr_session_stats myStats;
+    tr_session_stats myCumulativeStats;
     QString mySessionVersion;
 };
 

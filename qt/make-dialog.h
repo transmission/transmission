@@ -80,7 +80,7 @@ class MakeDialog: public QDialog
     QLabel * myNewLabel;
     QDialogButtonBox * myNewButtonBox;
     QDialog * myNewDialog;
-    struct tr_metainfo_builder * myBuilder;
+    tr_metainfo_builder * myBuilder;
 
   protected:
     virtual void dragEnterEvent (QDragEnterEvent *);
