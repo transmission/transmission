@@ -11,12 +11,17 @@
 #include <stdio.h> /* printf */
 #include <stdlib.h> /* exit, atoi */
 
-#include <fcntl.h> /* open */
 #include <signal.h>
 #ifdef HAVE_SYSLOG
 #include <syslog.h>
 #endif
-#include <unistd.h> /* daemon */
+
+#ifdef _WIN32
+ #include <process.h> /* getpid */
+#else
+ #include <fcntl.h> /* open */
+ #include <unistd.h> /* daemon */
+#endif
 
 #include <event2/buffer.h>
 #include <event2/event.h>
@@ -171,6 +176,7 @@ gotsig (int sig)
 {
     switch (sig)
     {
+#ifdef SIGHUP
         case SIGHUP:
         {
             if (!mySession)
@@ -200,6 +206,7 @@ gotsig (int sig)
             }
             break;
         }
+#endif
 
         default:
             tr_logAddError ("Unexpected signal (%d) in daemon, closing.", sig);
@@ -433,7 +440,7 @@ main (int argc, char ** argv)
 
     signal (SIGINT, gotsig);
     signal (SIGTERM, gotsig);
-#ifndef _WIN32
+#ifdef SIGHUP
     signal (SIGHUP, gotsig);
 #endif
 
@@ -615,9 +622,11 @@ main (int argc, char ** argv)
 
     mySession = session;
 
+#ifdef SIGHUP
     /* If we got a SIGHUP during startup, process that now. */
     if (seenHUP)
         gotsig (SIGHUP);
+#endif
 
     /* maybe add a watchdir */
     {
@@ -693,7 +702,7 @@ cleanup:
     printf (" done.\n");
 
     /* shutdown */
-#if HAVE_SYSLOG
+#ifdef HAVE_SYSLOG
     if (!foreground)
     {
         syslog (LOG_INFO, "%s", "Closing session");

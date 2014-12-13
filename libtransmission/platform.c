@@ -15,18 +15,17 @@
 #include <assert.h>
 #include <stdlib.h>
 #include <string.h>
-#include <unistd.h> /* getuid() */
 
 #ifdef __HAIKU__
  #include <limits.h> /* PATH_MAX */
 #endif
 
 #ifdef _WIN32
- #include <w32api.h>
- #define WINVER  WindowsXP
+ #include <process.h> /* _beginthreadex (), _endthreadex () */
  #include <windows.h>
  #include <shlobj.h> /* for CSIDL_APPDATA, CSIDL_MYDOCUMENTS */
 #else
+#include <unistd.h> /* getuid() */
  #ifdef BUILD_MAC_CLIENT
   #include <CoreFoundation/CoreFoundation.h>
  #endif
@@ -34,10 +33,6 @@
   #include <FindDirectory.h>
  #endif
  #include <pthread.h>
-#endif
-
-#ifdef _WIN32
-#include <libgen.h> /* dirname() */
 #endif
 
 #include "transmission.h"
@@ -229,7 +224,7 @@ tr_lockUnlock (tr_lock * l)
 
 #ifdef _WIN32
 
-char *
+static char *
 win32_get_special_folder (int folder_id)
 {
   wchar_t path[MAX_PATH]; /* SHGetFolderPath () requires MAX_PATH */

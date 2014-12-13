@@ -31,12 +31,12 @@
 
 /* posix */
 #include <signal.h> /* sig_atomic_t */
-#include <sys/time.h>
+
 #ifdef _WIN32
   #include <inttypes.h>
-  #define _WIN32_WINNT  0x0501	/* freeaddrinfo (),getaddrinfo (),getnameinfo () */
   #include <ws2tcpip.h>
 #else
+  #include <sys/time.h>
   #include <sys/types.h>
   #include <sys/socket.h> /* socket (), bind () */
   #include <netdb.h>

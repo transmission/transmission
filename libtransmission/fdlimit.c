@@ -12,8 +12,10 @@
 #include <inttypes.h>
 #include <string.h>
 
-#include <sys/time.h> /* getrlimit */
-#include <sys/resource.h> /* getrlimit */
+#ifndef _WIN32
+ #include <sys/time.h> /* getrlimit */
+ #include <sys/resource.h> /* getrlimit */
+#endif
 
 #include "transmission.h"
 #include "error.h"
@@ -355,7 +357,6 @@ ensureSessionFdInfoExists (tr_session * session)
 
   if (session->fdInfo == NULL)
     {
-      struct rlimit limit;
       struct tr_fdInfo * i;
       const int FILE_CACHE_SIZE = 32;
 
@@ -364,7 +365,9 @@ ensureSessionFdInfoExists (tr_session * session)
       fileset_construct (&i->fileset, FILE_CACHE_SIZE);
       session->fdInfo = i;
 
+#ifndef _WIN32
       /* set the open-file limit to the largest safe size wrt FD_SETSIZE */
+      struct rlimit limit;
       if (!getrlimit (RLIMIT_NOFILE, &limit))
         {
           const int old_limit = (int) limit.rlim_cur;
@@ -377,6 +380,7 @@ ensureSessionFdInfoExists (tr_session * session)
               tr_logAddInfo ("Changed open file limit from %d to %d", old_limit, (int)limit.rlim_cur);
             }
         }
+#endif
     }
 }
 
@@ -541,7 +545,7 @@ int
 tr_fdSocketAccept (tr_session * s, int sockfd, tr_address * addr, tr_port * port)
 {
   int fd;
-  unsigned int len;
+  socklen_t len;
   struct tr_fdInfo * gFd;
   struct sockaddr_storage sock;
 

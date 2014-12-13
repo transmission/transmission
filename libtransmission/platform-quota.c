@@ -10,10 +10,11 @@
 #include <errno.h>
 #include <stdlib.h>
 #include <string.h>
-#include <unistd.h> /* getuid() */
+
 #include <event2/util.h> /* evutil_ascii_strcasecmp () */
 
 #ifndef _WIN32
+ #include <unistd.h> /* getuid() */
  #include <sys/types.h> /* types needed by quota.h */
  #if defined(__FreeBSD__) || defined(__OpenBSD__)
   #include <ufs/ufs/quota.h> /* quotactl() */

@@ -8,10 +8,14 @@
  */
 
 #include <assert.h>
+#include <errno.h>
 #include <stdio.h>
 #include <stdlib.h> /* mkstemp() */
+#include <string.h> /* strcmp() */
 
-#include <unistd.h>
+#ifndef _WIN32
+ #include <unistd.h> /* sync() */
+#endif
 
 #include "transmission.h"
 #include "crypto-utils.h"
@@ -20,6 +24,7 @@
 #include "platform.h" /* TR_PATH_DELIMETER */
 #include "torrent.h"
 #include "trevent.h"
+#include "variant.h"
 #include "libtransmission-test.h"
 
 bool verbose = false;
@@ -113,17 +118,6 @@ runTests (const testFunc * const tests, int numTests)
 
   return 0; /* All tests passed */
 }
-
-/***
-****
-***/
-
-#include <unistd.h> /* sync() */
-
-#include <errno.h>
-#include <string.h> /* strcmp() */
-
-#include "variant.h"
 
 /***
 ****
@@ -398,7 +392,7 @@ libttest_zero_torrent_populate (tr_torrent * tor, bool complete)
       tr_free (path);
     }
 
-  sync ();
+  libttest_sync ();
   libttest_blockingTorrentVerify (tor);
 
   if (complete)
@@ -457,7 +451,7 @@ libtest_create_file_with_contents (const char* path, const void* payload, size_t
   tr_sys_file_write (fd, payload, n, NULL, NULL);
   tr_sys_file_close (fd, NULL);
 
-  sync ();
+  libttest_sync ();
 
   errno = tmperr;
 }
@@ -492,7 +486,15 @@ libtest_create_tmpfile_with_contents (char* tmpl, const void* payload, size_t n)
     }
   tr_sys_file_close (fd, NULL);
 
-  sync ();
+  libttest_sync ();
 
   errno = tmperr;
+}
+
+void
+libttest_sync (void)
+{
+#ifndef _WIN32
+  sync ();
+#endif
 }

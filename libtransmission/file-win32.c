@@ -392,7 +392,7 @@ tr_sys_path_resolve (const char  * path,
   char * ret = NULL;
   wchar_t * wide_path;
   wchar_t * wide_ret = NULL;
-  HANDLE handle;
+  HANDLE handle = INVALID_HANDLE_VALUE;
   DWORD wide_ret_size;
 
   assert (path != NULL);

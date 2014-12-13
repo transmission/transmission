@@ -38,14 +38,23 @@
 #endif
 
 #ifdef _WIN32
+ #undef  EADDRINUSE
  #define EADDRINUSE              WSAEADDRINUSE
+ #undef  ECONNREFUSED
  #define ECONNREFUSED            WSAECONNREFUSED
+ #undef  ECONNRESET
  #define ECONNRESET              WSAECONNRESET
+ #undef  EHOSTUNREACH
  #define EHOSTUNREACH            WSAEHOSTUNREACH
+ #undef  EINPROGRESS
  #define EINPROGRESS             WSAEINPROGRESS
+ #undef  ENOTCONN
  #define ENOTCONN                WSAENOTCONN
+ #undef  EWOULDBLOCK
  #define EWOULDBLOCK             WSAEWOULDBLOCK
+ #undef  EAFNOSUPPORT
  #define EAFNOSUPPORT            WSAEAFNOSUPPORT
+ #undef  ENETUNREACH
  #define ENETUNREACH             WSAENETUNREACH
  #define sockerrno               WSAGetLastError ()
 #else

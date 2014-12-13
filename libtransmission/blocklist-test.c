@@ -10,7 +10,6 @@
 #include <assert.h>
 #include <stdio.h>
 #include <string.h> /* strlen () */
-#include <unistd.h> /* sync() */
 
 #include "transmission.h"
 #include "blocklist.h"
@@ -48,7 +47,7 @@ create_text_file (const char * path, const char * contents)
   tr_sys_file_write (fd, contents, strlen (contents), NULL, NULL);
   tr_sys_file_close (fd, NULL);
 
-  sync ();
+  libttest_sync ();
 }
 
 static bool

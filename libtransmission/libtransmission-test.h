@@ -91,5 +91,6 @@ void         libtest_create_file_with_string_contents (const char * path, const 
 char*        libtest_sandbox_create (void);
 void         libtest_sandbox_destroy (const char * sandbox);
 
+void         libttest_sync (void);
 
 #endif /* !LIBTRANSMISSION_TEST_H */

@@ -9,12 +9,13 @@
 
 #include <errno.h> /* EINVAL */
 #include <signal.h> /* signal () */
+
 #ifndef _WIN32
  #include <sys/wait.h> /* wait () */
+ #include <unistd.h> /* fork (), execvp (), _exit () */
 #else
- #include <process.h>
+ #include <process.h> /* _spawnvpe () */
 #endif
-#include <unistd.h> /* fork (), execvp (), _exit () */
 
 #include <assert.h>
 #include <math.h>
@@ -2076,22 +2077,18 @@ tr_torrentClearIdleLimitHitCallback (tr_torrent * torrent)
   tr_torrentSetIdleLimitHitCallback (torrent, NULL, NULL);
 }
 
+#ifndef _WIN32
+
 static void
 onSigCHLD (int i UNUSED)
 {
-#ifdef _WIN32
-
-  _cwait (NULL, -1, WAIT_CHILD);
-
-#else
-
   int rc;
   do
     rc = waitpid (-1, NULL, WNOHANG);
   while (rc>0 || (rc==-1 && errno==EINTR));
+}
 
 #endif
-}
 
 static void
 torrentCallScript (const tr_torrent * tor, const char * script)

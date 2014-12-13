@@ -14,8 +14,11 @@
 #include <string.h> /* memcpy */
 
 #include <signal.h>
-#include <sys/types.h> /* umask () */
-#include <sys/stat.h> /* umask () */
+
+#ifndef _WIN32
+ #include <sys/types.h> /* umask () */
+ #include <sys/stat.h> /* umask () */
+#endif
 
 #include <event2/dns.h> /* evdns_base_free () */
 #include <event2/event.h>
@@ -771,11 +774,13 @@ sessionSetImpl (void * vdata)
   if (tr_variantDictFindInt (settings, TR_KEY_message_level, &i))
     tr_logSetLevel (i);
 
+#ifndef _WIN32
   if (tr_variantDictFindInt (settings, TR_KEY_umask, &i))
     {
       session->umask = (mode_t)i;
       umask (session->umask);
     }
+#endif
 
   /* misc features */
   if (tr_variantDictFindInt (settings, TR_KEY_cache_size_mb, &i))

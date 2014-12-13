@@ -12,8 +12,6 @@
 #include <string.h> /* strcmp() */
 #include <stdio.h>
 
-#include <unistd.h> /* sync() */
-
 #include <event2/buffer.h>
 
 #include "transmission.h"
@@ -200,7 +198,7 @@ test_set_location (void)
   check_int_eq (0, tr_torrentStat(tor)->leftUntilDone);
 
   /* confirm the filest really got moved */
-  sync ();
+  libttest_sync ();
   for (i=0; i<tor->info.fileCount; ++i)
     check_file_location (tor, i, tr_buildPath (target_dir, tor->info.files[i].name, NULL));
 

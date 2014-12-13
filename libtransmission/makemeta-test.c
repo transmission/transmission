@@ -14,8 +14,6 @@
 #include "file.h"
 #include "makemeta.h"
 
-#include <unistd.h> /* sync() */
-
 #include <stdlib.h> /* mktemp() */
 #include <string.h> /* strlen() */
 
@@ -63,7 +61,7 @@ test_single_file_impl (const tr_tracker_info * trackers,
 
   /* now let's check our work: parse the  .torrent file */
   ctor = tr_ctorNew (NULL);
-  sync ();
+  libttest_sync ();
   tr_ctorSetMetainfoFromFile (ctor, torrent_file);
   parse_result = tr_torrentParse (ctor, &inf);
   check_int_eq (TR_PARSE_OK, parse_result);
@@ -157,7 +155,7 @@ test_single_directory_impl (const tr_tracker_info * trackers,
       libtest_create_tmpfile_with_contents (files[i], payloads[i], payloadSizes[i]);
       totalSize += payloadSizes[i];
     }
-  sync ();
+  libttest_sync ();
 
   /* init the builder */
   builder = tr_metaInfoBuilderCreate (top);
@@ -184,7 +182,7 @@ test_single_directory_impl (const tr_tracker_info * trackers,
 
   /* now let's check our work: parse the  .torrent file */
   ctor = tr_ctorNew (NULL);
-  sync ();
+  libttest_sync ();
   tr_ctorSetMetainfoFromFile (ctor, torrent_file);
   parse_result = tr_torrentParse (ctor, &inf);
   check_int_eq (TR_PARSE_OK, parse_result);

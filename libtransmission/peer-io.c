@@ -30,9 +30,13 @@
 
 
 #ifdef _WIN32
+ #undef  EAGAIN
  #define EAGAIN       WSAEWOULDBLOCK
+ #undef  EINTR
  #define EINTR        WSAEINTR
+ #undef  EINPROGRESS
  #define EINPROGRESS  WSAEINPROGRESS
+ #undef  EPIPE
  #define EPIPE        WSAECONNRESET
 #endif
 

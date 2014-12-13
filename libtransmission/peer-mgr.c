@@ -2895,7 +2895,7 @@ rechokeDownloads (tr_swarm * s)
         const double mult = MIN (timeSinceCancel, maxHistory) / (double) maxHistory;
         const int inc = maxIncrease * mult;
         maxPeers = s->maxPeers + inc;
-        tordbg (s, "time since last cancel is %lli -- increasing the "
+        tordbg (s, "time since last cancel is %"PRId64" -- increasing the "
                    "number of peers we're interested in by %d",
                    (long long)timeSinceCancel, inc);
       }

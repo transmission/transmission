@@ -13,6 +13,12 @@
 
 #include <signal.h>
 
+#ifdef _WIN32
+ #include <winsock2.h>
+#else
+ #include <unistd.h> /* read (), write (), pipe () */
+#endif
+
 #include <event2/dns.h>
 #include <event2/event.h>
 
@@ -21,10 +27,13 @@
 #include "net.h"
 #include "session.h"
 
-#ifdef _WIN32
-
+#include "transmission.h"
+#include "platform.h" /* tr_lockLock () */
+#include "trevent.h"
 #include "utils.h"
-#include <winsock2.h>
+
+
+#ifdef _WIN32
 
 static int
 pgpipe (int handles[2])
@@ -120,13 +129,6 @@ piperead (int s, char *buf, int len)
 #define piperead(a,b,c) read (a,b,c)
 #define pipewrite(a,b,c) write (a,b,c)
 #endif
-
-#include <unistd.h> /* read (), write (), pipe () */
-
-#include "transmission.h"
-#include "platform.h" /* tr_lockLock () */
-#include "trevent.h"
-#include "utils.h"
 
 /***
 ****

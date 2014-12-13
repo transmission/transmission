@@ -28,21 +28,20 @@
 #include <string.h> /* strerror (), memset (), memmem () */
 #include <time.h> /* nanosleep () */
 
+#ifdef _WIN32
+ #include <windows.h> /* Sleep (), GetSystemTimeAsFileTime (), GetEnvironmentVariable () */
+ #include <shellapi.h> /* CommandLineToArgv () */
+#else
+ #include <sys/time.h>
+ #include <unistd.h> /* getpagesize () */
+#endif
+
 #ifdef HAVE_ICONV_OPEN
  #include <iconv.h>
 #endif
-#include <sys/time.h>
-#include <unistd.h> /* getpagesize () */
 
 #include <event2/buffer.h>
 #include <event2/event.h>
-
-#ifdef _WIN32
- #include <w32api.h>
- #define WINVER WindowsXP /* freeaddrinfo (), getaddrinfo (), getnameinfo () */
- #include <windows.h> /* Sleep (), GetSystemTimeAsFileTime (), GetEnvironmentVariable () */
- #include <shellapi.h> /* CommandLineToArgv () */
-#endif
 
 #include "transmission.h"
 #include "error.h"
@@ -81,8 +80,8 @@ tr_localtime_r (const time_t *_clock, struct tm *_result)
 int
 tr_gettimeofday (struct timeval * tv)
 {
-#ifdef _MSC_VER
-#define DELTA_EPOCH_IN_MICROSECS 11644473600000000Ui64
+#ifdef _WIN32
+#define DELTA_EPOCH_IN_MICROSECS 11644473600000000ULL
 
   FILETIME ft;
   uint64_t tmp = 0;
@@ -1516,7 +1515,7 @@ tr_valloc (size_t bufLen)
 
   if (!pageSize)
     {
-#ifdef HAVE_GETPAGESIZE
+#if defined (HAVE_GETPAGESIZE) && !defined (_WIN32)
       pageSize = (size_t) getpagesize ();
 #else /* guess */
       pageSize = 4096;

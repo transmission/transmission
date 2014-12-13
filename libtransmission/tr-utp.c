@@ -157,7 +157,7 @@ reset_timer (tr_session *ss)
 }
 
 static void
-timer_callback (int s UNUSED, short type UNUSED, void *closure)
+timer_callback (evutil_socket_t s UNUSED, short type UNUSED, void *closure)
 {
     tr_session *ss = closure;
     UTP_CheckTimeouts ();

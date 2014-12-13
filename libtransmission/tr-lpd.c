@@ -27,16 +27,15 @@ THE SOFTWARE.
 
 /* posix */
 #include <signal.h> /* sig_atomic_t */
-#include <sys/time.h>
-#include <unistd.h> /* close () */
 #include <ctype.h> /* toupper () */
+
 #ifdef _WIN32
-  #include <w32api.h>
-  #define WINDOWS  WindowsXP  /* freeaddrinfo (),getaddrinfo (),getnameinfo () */
   #include <inttypes.h>
   #include <ws2tcpip.h>
   typedef uint16_t in_port_t;			/* all missing */
 #else
+  #include <sys/time.h>
+  #include <unistd.h> /* close () */
   #include <sys/types.h>
   #include <sys/socket.h> /* socket (), bind () */
   #include <netinet/in.h> /* sockaddr_in */
@@ -359,8 +358,8 @@ int tr_lpdInit (tr_session* ss, tr_address* tr_addr UNUSED)
     fail:
     {
         const int save = errno;
-        close (lpd_socket);
-        close (lpd_socket2);
+        evutil_closesocket (lpd_socket);
+        evutil_closesocket (lpd_socket2);
         lpd_socket = lpd_socket2 = -1;
         session = NULL;
         tr_logAddNamedDbg ("LPD", "LPD initialisation failed (errno = %d)", save);

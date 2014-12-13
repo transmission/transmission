@@ -12,8 +12,6 @@
 #include <stdio.h> /* fopen() */
 #include <string.h> /* strcmp() */
 
-#include <unistd.h> /* sync() */
-
 #include "transmission.h"
 #include "crypto-utils.h"
 #include "file.h"
@@ -202,7 +200,7 @@ test_single_filename_torrent (void)
 
   /* (while it's renamed: confirm that the .resume file remembers the changes) */
   tr_torrentSaveResume (tor);
-  sync ();
+  libttest_sync ();
   loaded = tr_torrentLoadResume (tor, ~0, ctor);
   check_streq ("foobar", tr_torrentName(tor));
   check ((loaded & TR_FR_NAME) != 0);
@@ -254,7 +252,7 @@ create_multifile_torrent_contents (const char * top)
   libtest_create_file_with_string_contents (path, "Tough\n");
   tr_free (path);
 
-  sync ();
+  libttest_sync ();
 }
 
 static int
@@ -389,7 +387,7 @@ test_multifile_torrent (void)
   tr_sys_path_remove (tmp, NULL);
   tr_free (tmp);
   tr_free (str);
-  sync ();
+  libttest_sync ();
   libttest_blockingTorrentVerify (tor);
   testFileExistsAndConsistsOfThisString (tor, 0, expected_contents[0]);
   for (i=1; i<=2; ++i)

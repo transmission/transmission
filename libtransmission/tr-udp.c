@@ -25,7 +25,11 @@ THE SOFTWARE.
 #include <string.h> /* memcmp (), memcpy (), memset () */
 #include <stdlib.h> /* malloc (), free () */
 
-#include <unistd.h> /* close () */
+#ifdef _WIN32
+ #include <io.h> /* dup2 () */
+#else
+ #include <unistd.h> /* dup2 () */
+#endif
 
 #include <event2/event.h>
 
@@ -162,10 +166,11 @@ rebind_ipv6 (tr_session *ss, bool force)
     if (ss->udp6_socket < 0) {
         ss->udp6_socket = s;
     } else {
+        /* FIXME: dup2 doesn't work for sockets on Windows */
         rc = dup2 (s, ss->udp6_socket);
         if (rc < 0)
             goto fail;
-        close (s);
+        tr_netCloseSocket (s);
     }
 
     if (ss->udp6_bound == NULL)
@@ -180,7 +185,7 @@ rebind_ipv6 (tr_session *ss, bool force)
        set things up so that we try again next time. */
     tr_logAddNamedError ("UDP", "Couldn't rebind IPv6 socket");
     if (s >= 0)
-        close (s);
+        tr_netCloseSocket (s);
     if (ss->udp6_bound) {
         free (ss->udp6_bound);
         ss->udp6_bound = NULL;
@@ -261,7 +266,7 @@ tr_udpInit (tr_session *ss)
     rc = bind (ss->udp_socket, (struct sockaddr*)&sin, sizeof (sin));
     if (rc < 0) {
         tr_logAddNamedError ("UDP", "Couldn't bind IPv4 socket");
-        close (ss->udp_socket);
+        tr_netCloseSocket (ss->udp_socket);
         ss->udp_socket = -1;
         goto ipv6;
     }

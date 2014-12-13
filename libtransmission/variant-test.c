@@ -100,7 +100,7 @@ testStr (void)
   size_t len;
 
   /* string len is designed to overflow */
-  n = tr_snprintf ((char*)buf, sizeof (buf), "%zu:boat", (size_t)(SIZE_MAX-2));
+  n = tr_snprintf ((char*)buf, sizeof (buf), "%"TR_PRIuSIZE":boat", (size_t)(SIZE_MAX-2));
   err = tr_bencParseStr (buf, buf+n, &end, &str, &len);
   check_int_eq (EILSEQ, err);
   check_int_eq (0, len);
