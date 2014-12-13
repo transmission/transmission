@@ -44,7 +44,7 @@ extern "C" {
 #endif
 
 #ifndef PRId64
- #if defined (_MSC_VER) || (defined (__MINGW32__) && !defined (__USE_MINGW_ANSI_STDIO))
+ #ifdef _WIN32
   #define PRId64 "I64"
  #else
   #define PRId64 "lld"
@@ -52,7 +52,7 @@ extern "C" {
 #endif
 
 #ifndef PRIu64
- #if defined (_MSC_VER) || (defined (__MINGW32__) && !defined (__USE_MINGW_ANSI_STDIO))
+ #ifdef _WIN32
   #define PRIu64 "I64u"
  #else
   #define PRIu64 "llu"
@@ -60,7 +60,7 @@ extern "C" {
 #endif
 
 #ifndef PRIu32
- #if defined (_MSC_VER) || (defined (__MINGW32__) && !defined (__USE_MINGW_ANSI_STDIO))
+ #ifdef _WIN32
   #define PRIu32 "u"
  #else
   #define PRIu32 "lu"
@@ -68,7 +68,7 @@ extern "C" {
 #endif
 
 #ifndef TR_PRIuSIZE
- #if defined (_MSC_VER) || (defined (__MINGW32__) && !defined (__USE_MINGW_ANSI_STDIO))
+ #ifdef _WIN32
   #define TR_PRIuSIZE "Iu"
  #else
   #define TR_PRIuSIZE "zu"
