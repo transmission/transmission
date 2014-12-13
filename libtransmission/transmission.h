@@ -67,6 +67,14 @@ extern "C" {
  #endif
 #endif
 
+#ifndef PRIdMAX
+ #ifdef _WIN32
+  #define PRIdMAX "I64"
+ #else
+  #define PRIdMAX "jd"
+ #endif
+#endif
+
 #ifndef TR_PRIuSIZE
  #ifdef _WIN32
   #define TR_PRIuSIZE "Iu"
