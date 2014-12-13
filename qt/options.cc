@@ -132,7 +132,7 @@ Options::Options (Session& session, const Prefs& prefs, const AddData& addme, QW
       e->setText (downloadDir);
       layout->addWidget (e, row, 1);
       l->setBuddy (e);
-      connect (e, SIGNAL (textEdited (const QString&)), this, SLOT (onDestinationEdited (const QString&)));
+      connect (e, SIGNAL (textEdited (QString)), this, SLOT (onDestinationEdited (QString)));
     }
 
   l = myFreespaceLabel;
@@ -179,8 +179,8 @@ Options::Options (Session& session, const Prefs& prefs, const AddData& addme, QW
   layout->setColumnStretch (1, 2);
   layout->setSpacing (HIG::PAD);
 
-  connect (myTree, SIGNAL (priorityChanged (const QSet<int>&,int)), this, SLOT (onPriorityChanged (const QSet<int>&,int)));
-  connect (myTree, SIGNAL (wantedChanged (const QSet<int>&,bool)), this, SLOT (onWantedChanged (const QSet<int>&,bool)));
+  connect (myTree, SIGNAL (priorityChanged (QSet<int>, int)), this, SLOT (onPriorityChanged (QSet<int>, int)));
+  connect (myTree, SIGNAL (wantedChanged (QSet<int>, bool)), this, SLOT (onWantedChanged (QSet<int>, bool)));
   if (session.isLocal ())
     connect (myVerifyButton, SIGNAL (clicked (bool)), this, SLOT (onVerify ()));
 
@@ -405,7 +405,7 @@ Options::onFilenameClicked ()
                                          tr ("Torrent Files (*.torrent);;All Files (*.*)"));
       d->setFileMode (QFileDialog::ExistingFile);
       d->setAttribute (Qt::WA_DeleteOnClose);
-      connect (d, SIGNAL (filesSelected (const QStringList&)), this, SLOT (onFilesSelected (const QStringList&)));
+      connect (d, SIGNAL (filesSelected (QStringList)), this, SLOT (onFilesSelected (QStringList)));
       d->show ();
     }
 }
@@ -433,7 +433,7 @@ Options::onDestinationClicked ()
   QFileDialog * d = new QFileDialog (this, tr ("Select Destination"), myLocalDestination.absolutePath ());
   d->setFileMode (QFileDialog::Directory);
   d->setAttribute (Qt::WA_DeleteOnClose);
-  connect (d, SIGNAL (filesSelected (const QStringList&)), this, SLOT (onDestinationsSelected (const QStringList&)));
+  connect (d, SIGNAL (filesSelected (QStringList)), this, SLOT (onDestinationsSelected (QStringList)));
   d->show ();
 }
 

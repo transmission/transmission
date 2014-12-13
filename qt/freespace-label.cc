@@ -33,8 +33,8 @@ FreespaceLabel::FreespaceLabel (Session        & session,
 
   connect (&myTimer, SIGNAL(timeout()), this, SLOT(onTimer()));
 
-  connect (&mySession, SIGNAL(executed(int64_t, const QString&, tr_variant *)),
-           this,       SLOT(onSessionExecuted(int64_t, const QString&, tr_variant *)));
+  connect (&mySession, SIGNAL(executed(int64_t, QString, tr_variant *)),
+           this,       SLOT(onSessionExecuted(int64_t, QString, tr_variant *)));
 
   setPath (path);
 }

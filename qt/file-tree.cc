@@ -892,23 +892,23 @@ FileTreeView::FileTreeView (QWidget * parent, bool isEditable):
 #endif
     }
 
-  connect (this, SIGNAL(clicked(const QModelIndex&)),
-           this, SLOT(onClicked(const QModelIndex&)));
+  connect (this, SIGNAL(clicked(QModelIndex)),
+           this, SLOT(onClicked(QModelIndex)));
 
-  connect (this, SIGNAL(doubleClicked(const QModelIndex&)),
-           this, SLOT(onDoubleClicked(const QModelIndex&)));
+  connect (this, SIGNAL(doubleClicked(QModelIndex)),
+           this, SLOT(onDoubleClicked(QModelIndex)));
 
-  connect (&myModel, SIGNAL(priorityChanged(const QSet<int>&, int)),
-           this,     SIGNAL(priorityChanged(const QSet<int>&, int)));
+  connect (&myModel, SIGNAL(priorityChanged(QSet<int>, int)),
+           this,     SIGNAL(priorityChanged(QSet<int>, int)));
 
-  connect (&myModel, SIGNAL(wantedChanged(const QSet<int>&, bool)),
-           this,     SIGNAL(wantedChanged(const QSet<int>&, bool)));
+  connect (&myModel, SIGNAL(wantedChanged(QSet<int>, bool)),
+           this,     SIGNAL(wantedChanged(QSet<int>, bool)));
 
-  connect (&myModel, SIGNAL(pathEdited(const QString&, const QString&)),
-           this,     SIGNAL(pathEdited(const QString&, const QString&)));
+  connect (&myModel, SIGNAL(pathEdited(QString, QString)),
+           this,     SIGNAL(pathEdited(QString, QString)));
 
-  connect (&myModel, SIGNAL (openRequested (const QString&)),
-           this,     SLOT (onOpenRequested (const QString&)),
+  connect (&myModel, SIGNAL (openRequested (QString)),
+           this,     SLOT (onOpenRequested (QString)),
            Qt::QueuedConnection);
 }
 

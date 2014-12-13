@@ -461,12 +461,12 @@ FilterBar::FilterBar (Prefs& prefs, TorrentModel& torrents, TorrentFilter& filte
   connect (&myPrefs, SIGNAL (changed (int)), this, SLOT (refreshPref (int)));
   connect (myActivityCombo, SIGNAL (currentIndexChanged (int)), this, SLOT (onActivityIndexChanged (int)));
   connect (myTrackerCombo, SIGNAL (currentIndexChanged (int)), this, SLOT (onTrackerIndexChanged (int)));
-  connect (&myFilter, SIGNAL (rowsInserted (const QModelIndex&,int,int)), this, SLOT (refreshCountLabel ()));
-  connect (&myFilter, SIGNAL (rowsRemoved (const QModelIndex&,int,int)), this, SLOT (refreshCountLabel ()));
+  connect (&myFilter, SIGNAL (rowsInserted (QModelIndex, int, int)), this, SLOT (refreshCountLabel ()));
+  connect (&myFilter, SIGNAL (rowsRemoved (QModelIndex, int, int)), this, SLOT (refreshCountLabel ()));
   connect (&myTorrents, SIGNAL (modelReset ()), this, SLOT (onTorrentModelReset ()));
-  connect (&myTorrents, SIGNAL (rowsInserted (const QModelIndex&,int,int)), this, SLOT (onTorrentModelRowsInserted (const QModelIndex&,int,int)));
-  connect (&myTorrents, SIGNAL (rowsRemoved (const QModelIndex&,int,int)), this, SLOT (onTorrentModelRowsRemoved (const QModelIndex&,int,int)));
-  connect (&myTorrents, SIGNAL (dataChanged (const QModelIndex&,const QModelIndex&)), this, SLOT (onTorrentModelDataChanged (const QModelIndex&,const QModelIndex&)));
+  connect (&myTorrents, SIGNAL (rowsInserted (QModelIndex, int, int)), this, SLOT (onTorrentModelRowsInserted (QModelIndex, int, int)));
+  connect (&myTorrents, SIGNAL (rowsRemoved (QModelIndex, int, int)), this, SLOT (onTorrentModelRowsRemoved (QModelIndex, int, int)));
+  connect (&myTorrents, SIGNAL (dataChanged (QModelIndex, QModelIndex)), this, SLOT (onTorrentModelDataChanged (QModelIndex, QModelIndex)));
   connect (myRecountTimer, SIGNAL (timeout ()), this, SLOT (recount ()));
 
   recountSoon ();

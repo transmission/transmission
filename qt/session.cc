@@ -305,8 +305,8 @@ Session::Session (const char * configDir, Prefs& prefs):
 
   connect (&myPrefs, SIGNAL (changed (int)), this, SLOT (updatePref (int)));
 
-  connect (this, SIGNAL (responseReceived (const QByteArray&)),
-           this, SLOT (onResponseReceived (const QByteArray&)));
+  connect (this, SIGNAL (responseReceived (QByteArray)),
+           this, SLOT (onResponseReceived (QByteArray)));
 }
 
 Session::~Session ()

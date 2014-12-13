@@ -1285,7 +1285,7 @@ Details::createTrackerTab ()
   myTrackerView->setItemsExpandable (false);
   myTrackerView->setAlternatingRowColors (true);
   myTrackerView->setItemDelegate (myTrackerDelegate = new TrackerDelegate ());
-  connect (myTrackerView->selectionModel (), SIGNAL (selectionChanged (const QItemSelection&, const QItemSelection&)), this, SLOT (onTrackerSelectionChanged ()));
+  connect (myTrackerView->selectionModel (), SIGNAL (selectionChanged (QItemSelection, QItemSelection)), this, SLOT (onTrackerSelectionChanged ()));
   h->addWidget (myTrackerView, 1);
 
   p = new QPushButton ();
@@ -1384,17 +1384,17 @@ Details::createFilesTab ()
 {
   myFileTreeView = new FileTreeView ();
 
-  connect (myFileTreeView, SIGNAL (     priorityChanged (const QSet<int>&, int)),
-           this,           SLOT ( onFilePriorityChanged (const QSet<int>&, int)));
+  connect (myFileTreeView, SIGNAL (     priorityChanged (QSet<int>, int)),
+           this,           SLOT ( onFilePriorityChanged (QSet<int>, int)));
 
-  connect (myFileTreeView, SIGNAL (     wantedChanged (const QSet<int>&, bool)),
-           this,           SLOT ( onFileWantedChanged (const QSet<int>&, bool)));
+  connect (myFileTreeView, SIGNAL (     wantedChanged (QSet<int>, bool)),
+           this,           SLOT ( onFileWantedChanged (QSet<int>, bool)));
 
-  connect (myFileTreeView, SIGNAL (pathEdited (const QString&, const QString&)),
-           this,           SLOT (onPathEdited (const QString&, const QString&)));
+  connect (myFileTreeView, SIGNAL (pathEdited (QString, QString)),
+           this,           SLOT (onPathEdited (QString, QString)));
 
-  connect (myFileTreeView, SIGNAL (openRequested (const QString&)),
-           this,           SLOT (onOpenRequested (const QString&)));
+  connect (myFileTreeView, SIGNAL (openRequested (QString)),
+           this,           SLOT (onOpenRequested (QString)));
 
   return myFileTreeView;
 }

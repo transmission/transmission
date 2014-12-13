@@ -184,26 +184,26 @@ TrMainWindow::TrMainWindow (Session& session, Prefs& prefs, TorrentModel& model,
   connect (ui.action_Properties, SIGNAL (triggered ()), this, SLOT (openProperties ()));
   connect (ui.action_SessionDialog, SIGNAL (triggered ()), mySessionDialog, SLOT (show ()));
 
-  connect (ui.listView, SIGNAL (activated (const QModelIndex&)), ui.action_Properties, SLOT (trigger ()));
+  connect (ui.listView, SIGNAL (activated (QModelIndex)), ui.action_Properties, SLOT (trigger ()));
 
   // signals
   connect (ui.action_SelectAll, SIGNAL (triggered ()), ui.listView, SLOT (selectAll ()));
   connect (ui.action_DeselectAll, SIGNAL (triggered ()), ui.listView, SLOT (clearSelection ()));
 
-  connect (&myFilterModel, SIGNAL (rowsInserted (const QModelIndex&,int,int)), this, SLOT (refreshActionSensitivitySoon ()));
-  connect (&myFilterModel, SIGNAL (rowsRemoved (const QModelIndex&,int,int)), this, SLOT (refreshActionSensitivitySoon ()));
+  connect (&myFilterModel, SIGNAL (rowsInserted (QModelIndex, int, int)), this, SLOT (refreshActionSensitivitySoon ()));
+  connect (&myFilterModel, SIGNAL (rowsRemoved (QModelIndex, int, int)), this, SLOT (refreshActionSensitivitySoon ()));
 
   connect (ui.action_Quit, SIGNAL (triggered ()), QCoreApplication::instance (), SLOT (quit ()));
 
   // torrent view
   myFilterModel.setSourceModel (&myModel);
   connect (&myModel, SIGNAL (modelReset ()), this, SLOT (onModelReset ()));
-  connect (&myModel, SIGNAL (rowsRemoved (const QModelIndex&,int,int)), this, SLOT (onModelReset ()));
-  connect (&myModel, SIGNAL (rowsInserted (const QModelIndex&,int,int)), this, SLOT (onModelReset ()));
-  connect (&myModel, SIGNAL (dataChanged (const QModelIndex&,const QModelIndex&)), this, SLOT (refreshTrayIconSoon ()));
+  connect (&myModel, SIGNAL (rowsRemoved (QModelIndex, int, int)), this, SLOT (onModelReset ()));
+  connect (&myModel, SIGNAL (rowsInserted (QModelIndex, int, int)), this, SLOT (onModelReset ()));
+  connect (&myModel, SIGNAL (dataChanged (QModelIndex, QModelIndex)), this, SLOT (refreshTrayIconSoon ()));
 
   ui.listView->setModel (&myFilterModel);
-  connect (ui.listView->selectionModel (), SIGNAL (selectionChanged (const QItemSelection&,const QItemSelection&)), this, SLOT (refreshActionSensitivitySoon ()));
+  connect (ui.listView->selectionModel (), SIGNAL (selectionChanged (QItemSelection, QItemSelection)), this, SLOT (refreshActionSensitivitySoon ()));
 
   QActionGroup * actionGroup = new QActionGroup (this);
   actionGroup->addAction (ui.action_SortByActivity);
@@ -273,7 +273,7 @@ TrMainWindow::TrMainWindow (Session& session, Prefs& prefs, TorrentModel& model,
   connect (&mySession, SIGNAL (dataSendProgress ()), this, SLOT (dataSendProgress ()));
   connect (&mySession, SIGNAL (httpAuthenticationRequired ()), this, SLOT (wrongAuthentication ()));
   connect (&mySession, SIGNAL (error (QNetworkReply::NetworkError)), this, SLOT (onError (QNetworkReply::NetworkError)));
-  connect (&mySession, SIGNAL (errorMessage (const QString)), this, SLOT (errorMessage(const QString)));
+  connect (&mySession, SIGNAL (errorMessage (QString)), this, SLOT (errorMessage(QString)));
 
   if (mySession.isServer ())
     {
@@ -1174,8 +1174,8 @@ TrMainWindow::openTorrent ()
     }
   l->addWidget (b, l->rowCount(), 0, 1, -1, Qt::AlignLeft);
 
-  connect (d, SIGNAL (filesSelected (const QStringList&)),
-           this, SLOT (addTorrents (const QStringList&)));
+  connect (d, SIGNAL (filesSelected (QStringList)),
+           this, SLOT (addTorrents (QStringList)));
 
   d->show ();
 }

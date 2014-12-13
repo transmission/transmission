@@ -177,8 +177,8 @@ MakeDialog::onFileClicked ()
   QFileDialog * d = new QFileDialog (this, tr ("Select File"));
   d->setFileMode (QFileDialog::ExistingFile);
   d->setAttribute (Qt::WA_DeleteOnClose);
-  connect (d, SIGNAL(filesSelected(const QStringList&)),
-           this, SLOT(onFileSelected(const QStringList&)));
+  connect (d, SIGNAL(filesSelected(QStringList)),
+           this, SLOT(onFileSelected(QStringList)));
   d->show ();
 }
 void
@@ -202,8 +202,8 @@ MakeDialog::onFolderClicked ()
   d->setFileMode (QFileDialog::Directory);
   d->setOption (QFileDialog::ShowDirsOnly);
   d->setAttribute (Qt::WA_DeleteOnClose);
-  connect (d, SIGNAL(filesSelected(const QStringList&)),
-           this, SLOT(onFolderSelected(const QStringList&)));
+  connect (d, SIGNAL(filesSelected(QStringList)),
+           this, SLOT(onFolderSelected(QStringList)));
   d->show ();
 }
 
@@ -229,8 +229,8 @@ MakeDialog::onDestinationClicked ()
   d->setFileMode (QFileDialog::Directory);
   d->setOption (QFileDialog::ShowDirsOnly);
   d->setAttribute (Qt::WA_DeleteOnClose);
-  connect (d, SIGNAL(filesSelected(const QStringList&)),
-           this, SLOT(onDestinationSelected(const QStringList&)));
+  connect (d, SIGNAL(filesSelected(QStringList)),
+           this, SLOT(onDestinationSelected(QStringList)));
   d->show ();
 }
 void
