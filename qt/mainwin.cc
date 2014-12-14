@@ -19,7 +19,6 @@
 #include <QMessageBox>
 
 #include <libtransmission/transmission.h>
-#include <libtransmission/utils.h>
 #include <libtransmission/version.h>
 
 #include "about.h"
@@ -672,12 +671,8 @@ TrMainWindow::openDonate ()
 void
 TrMainWindow::openHelp ()
 {
-  const char * fmt = "http://www.transmissionbt.com/help/gtk/%d.%dx";
-  int major, minor;
-  sscanf (SHORT_VERSION_STRING, "%d.%d", &major, &minor);
-  char url[128];
-  tr_snprintf (url, sizeof (url), fmt, major, minor/10);
-  QDesktopServices::openUrl (QUrl (url));
+  QDesktopServices::openUrl (QUrl (QString::fromLatin1 ("http://www.transmissionbt.com/help/gtk/%1.%2x").
+    arg (MAJOR_VERSION).arg (MINOR_VERSION / 10)));
 }
 
 void

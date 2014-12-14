@@ -184,9 +184,7 @@ TorrentDelegateMin::drawTorrent (QPainter                   * painter,
       myProgressBarStyle->palette.setColor (QPalette::Window, silverBack);
     }
   myProgressBarStyle->state = progressBarState;
-  char buf[32];
-  tr_snprintf (buf, sizeof (buf), "%d%%", (int)tr_truncd (100.0 * tor.percentDone(), 0));
-  myProgressBarStyle->text = buf;
+  myProgressBarStyle->text = QString::fromLatin1 ("%1%").arg (static_cast<int> (tr_truncd (100.0 * tor.percentDone (), 0)));
   myProgressBarStyle->textVisible = true;
   myProgressBarStyle->textAlignment = Qt::AlignCenter;
   setProgressBarPercentDone (option, tor);

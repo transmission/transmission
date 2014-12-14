@@ -23,6 +23,7 @@
 #include <QHBoxLayout>
 #include <QHBoxLayout>
 #include <QHeaderView>
+#include <QHostAddress>
 #include <QInputDialog>
 #include <QItemSelectionModel>
 #include <QLabel>
@@ -91,26 +92,20 @@ namespace
 class PeerItem: public QTreeWidgetItem
 {
     Peer peer;
-    QString collatedAddress;
+    mutable QString collatedAddress;
     QString status;
 
   public:
-
+    PeerItem (const Peer& p): peer(p) {}
     virtual ~PeerItem () {}
 
-    PeerItem (const Peer& p):
-      peer(p)
-    {
-      int q[4];
-      if (sscanf (p.address.toUtf8 ().constData (), "%d.%d.%d.%d", q+0, q+1, q+2, q+3) == 4)
-        collatedAddress.sprintf ("%03d.%03d.%03d.%03d", q[0], q[1], q[2], q[3]);
-      else
-        collatedAddress = p.address;
-    }
-
   public:
-
-    void refresh (const Peer& p) { peer = p; }
+    void refresh (const Peer& p)
+    {
+      if (p.address != peer.address)
+        collatedAddress.clear ();
+      peer = p;
+    }
 
     void setStatus (const QString& s) { status = s; }
 
@@ -127,8 +122,39 @@ class PeerItem: public QTreeWidgetItem
           case COL_STATUS: return status < i->status;
           case COL_CLIENT: return peer.clientName < i->peer.clientName;
           case COL_LOCK: return peer.isEncrypted && !i->peer.isEncrypted;
-          default: return collatedAddress < i->collatedAddress;
+          default: return address () < i->address ();
         }
+    }
+
+  private:
+    const QString& address () const
+    {
+      if (collatedAddress.isEmpty ())
+        {
+          QHostAddress ipAddress;
+          if (ipAddress.setAddress (peer.address))
+            {
+              if (ipAddress.protocol () == QAbstractSocket::IPv4Protocol)
+                {
+                  const quint32 ipv4Address = ipAddress.toIPv4Address ();
+                  collatedAddress = QLatin1String ("1-") +
+                    QString::fromLatin1 (QByteArray::number (ipv4Address, 16).rightJustified (8, '0'));
+                }
+              else if (ipAddress.protocol () == QAbstractSocket::IPv6Protocol)
+                {
+                  const Q_IPV6ADDR ipv6Address = ipAddress.toIPv6Address ();
+                  QByteArray tmp (16, '\0');
+                  for (int i = 0; i < 16; ++i)
+                    tmp[i] = ipv6Address[i];
+                  collatedAddress = QLatin1String ("2-") + QString::fromLatin1 (tmp.toHex ());
+                }
+            }
+
+          if (collatedAddress.isEmpty ())
+            collatedAddress = QLatin1String ("3-") + peer.address.toLower ();
+        }
+
+      return collatedAddress;
     }
 };
 
