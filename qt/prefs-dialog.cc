@@ -476,7 +476,7 @@ PrefsDialog::createPrivacyTab ()
 ***/
 
 void
-PrefsDialog::onScriptClicked (void)
+PrefsDialog::onScriptClicked ()
 {
   const QString title = tr ("Select \"Torrent Done\" Script");
   const QString myPath = myPrefs.getString (Prefs::SCRIPT_TORRENT_DONE_FILENAME);
@@ -487,7 +487,7 @@ PrefsDialog::onScriptClicked (void)
 }
 
 void
-PrefsDialog::onIncompleteClicked (void)
+PrefsDialog::onIncompleteClicked ()
 {
   const QString title = tr ("Select Incomplete Directory");
   const QString myPath = myPrefs.getString (Prefs::INCOMPLETE_DIR);
@@ -498,7 +498,7 @@ PrefsDialog::onIncompleteClicked (void)
 }
 
 void
-PrefsDialog::onWatchClicked (void)
+PrefsDialog::onWatchClicked ()
 {
   const QString title = tr ("Select Watch Directory");
   const QString myPath = myPrefs.getString (Prefs::DIR_WATCH);
@@ -509,7 +509,7 @@ PrefsDialog::onWatchClicked (void)
 }
 
 void
-PrefsDialog::onDestinationClicked (void)
+PrefsDialog::onDestinationClicked ()
 {
   const QString title = tr ("Select Destination");
   const QString myPath = myPrefs.getString (Prefs::DOWNLOAD_DIR);
@@ -572,7 +572,7 @@ PrefsDialog::createDownloadingTab ()
     b = myWatchButton = new QPushButton;
     b->setIcon (folderPixmap);
     b->setStyleSheet (QString::fromUtf8 ("text-align: left; padding-left: 5; padding-right: 5"));
-    connect (b, SIGNAL(clicked(bool)), this, SLOT(onWatchClicked(void)));
+    connect (b, SIGNAL(clicked(bool)), this, SLOT(onWatchClicked()));
     hig->addRow (l, b);
     enableBuddyWhenChecked (qobject_cast<QCheckBox*>(l), b);
 
@@ -585,7 +585,7 @@ PrefsDialog::createDownloadingTab ()
     b = myDestinationButton = new QPushButton;
     b->setIcon (folderPixmap);
     b->setStyleSheet (QString::fromUtf8 ("text-align: left; padding-left: 5; padding-right: 5"));
-    connect (b, SIGNAL(clicked(bool)), this, SLOT(onDestinationClicked(void)));
+    connect (b, SIGNAL(clicked(bool)), this, SLOT(onDestinationClicked()));
     hig->addRow (tr ("Save to &Location:"), b);
 
     const QString downloadDir (myPrefs.getString(Prefs::DOWNLOAD_DIR));
@@ -610,7 +610,7 @@ PrefsDialog::createDownloadingTab ()
     b = myIncompleteButton = new QPushButton;
     b->setIcon (folderPixmap);
     b->setStyleSheet (QString::fromUtf8 ("text-align: left; padding-left: 5; padding-right: 5"));
-    connect (b, SIGNAL(clicked(bool)), this, SLOT(onIncompleteClicked(void)));
+    connect (b, SIGNAL(clicked(bool)), this, SLOT(onIncompleteClicked()));
     hig->addRow (myIncompleteCheckbox, b);
     enableBuddyWhenChecked (qobject_cast<QCheckBox*>(l), b);
 
@@ -618,7 +618,7 @@ PrefsDialog::createDownloadingTab ()
     b = myTorrentDoneScriptButton = new QPushButton;
     b->setIcon (filePixmap);
     b->setStyleSheet (QString::fromUtf8 ("text-align: left; padding-left: 5; padding-right: 5"));
-    connect (b, SIGNAL(clicked(bool)), this, SLOT(onScriptClicked(void)));
+    connect (b, SIGNAL(clicked(bool)), this, SLOT(onScriptClicked()));
     hig->addRow (myTorrentDoneScriptCheckbox, b);
     enableBuddyWhenChecked (qobject_cast<QCheckBox*>(l), b);
 

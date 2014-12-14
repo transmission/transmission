@@ -61,14 +61,14 @@ namespace
   };
 
   const char*
-  getUsage (void)
+  getUsage ()
   {
     return "Usage:\n"
            "  transmission [OPTIONS...] [torrent files]";
   }
 
   void
-  showUsage (void)
+  showUsage ()
   {
     tr_getopt_usage (MY_READABLE_NAME, getUsage (), opts);
     exit (0);

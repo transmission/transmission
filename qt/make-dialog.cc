@@ -354,7 +354,7 @@ MakeDialog::MakeDialog (Session& session, QWidget * parent):
     myDestination = QDir::homePath();
     b->setText (myDestination);
     connect (b, SIGNAL(clicked(bool)),
-             this, SLOT(onDestinationClicked(void)));
+             this, SLOT(onDestinationClicked()));
     myDestinationButton = b;
     hig->addRow (tr ("Sa&ve to:"), b);
 
@@ -366,7 +366,7 @@ MakeDialog::MakeDialog (Session& session, QWidget * parent):
     myFolderButton->setText (tr ("(None)"));
     myFolderButton->setStyleSheet (QString::fromUtf8 ("text-align: left; padding-left: 5; padding-right: 5"));
     connect (myFolderButton, SIGNAL(clicked(bool)),
-             this, SLOT(onFolderClicked(void)));
+             this, SLOT(onFolderClicked()));
     hig->addRow (myFolderRadio, myFolderButton);
     enableBuddyWhenChecked (myFolderRadio, myFolderButton);
 
@@ -381,7 +381,7 @@ MakeDialog::MakeDialog (Session& session, QWidget * parent):
     myFileButton->setIcon (filePixmap);
     myFileButton->setStyleSheet (QString::fromUtf8 ("text-align: left; padding-left: 5; padding-right: 5"));
     connect (myFileButton, SIGNAL(clicked(bool)),
-             this, SLOT(onFileClicked(void)));
+             this, SLOT(onFileClicked()));
     hig->addRow (myFileRadio, myFileButton);
     enableBuddyWhenChecked (myFileRadio, myFileButton);
 

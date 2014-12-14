@@ -145,8 +145,8 @@ class TrMainWindow: public QMainWindow
     QWidget * myFilterBar;
 
   private:
-    QMenu * createOptionsMenu (void);
-    QWidget * createStatusBar (void);
+    QMenu * createOptionsMenu ();
+    QWidget * createStatusBar ();
     QWidget * myStatusBar;
     QPushButton * myAltSpeedButton;
     QAction * myAltSpeedAction;
