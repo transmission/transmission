@@ -5,7 +5,7 @@
 <context>
     <name>AboutDialog</name>
     <message>
-        <location filename="../about.cc" line="+32"/>
+        <location filename="../about.cc" line="+34"/>
         <source>About Transmission</source>
         <translation type="unfinished"></translation>
     </message>
@@ -43,37 +43,7 @@
 <context>
     <name>Details</name>
     <message>
-        <location filename="../details.cc" line="+163"/>
-        <source>Torrent Properties</source>
-        <translation>Торрент қасиеттері</translation>
-    </message>
-    <message>
-        <location line="+4"/>
-        <source>Information</source>
-        <translation>Ақпараты</translation>
-    </message>
-    <message>
-        <location line="+2"/>
-        <source>Peers</source>
-        <translation>Қатысушылар</translation>
-    </message>
-    <message>
-        <location line="+2"/>
-        <source>Tracker</source>
-        <translation>Трекер</translation>
-    </message>
-    <message>
-        <location line="+2"/>
-        <source>Files</source>
-        <translation>Файлдар</translation>
-    </message>
-    <message>
-        <location line="+2"/>
-        <source>Options</source>
-        <translation>Баптаулары</translation>
-    </message>
-    <message>
-        <location line="+184"/>
+        <location filename="../details.cc" line="+372"/>
         <source>None</source>
         <translation>Ешнәрсе</translation>
     </message>
@@ -84,12 +54,12 @@
     </message>
     <message>
         <location line="+1"/>
-        <location line="+206"/>
+        <location line="+207"/>
         <source>Unknown</source>
         <translation>Белгісіз</translation>
     </message>
     <message>
-        <location line="-167"/>
+        <location line="-168"/>
         <source>Finished</source>
         <translation>Аяқталған</translation>
     </message>
@@ -99,7 +69,7 @@
         <translation>Аялдатылған</translation>
     </message>
     <message>
-        <location line="+192"/>
+        <location line="+193"/>
         <source>Active now</source>
         <translation>Қазір белсенді</translation>
     </message>
@@ -135,7 +105,7 @@
         <translation>Публикалық торрент</translation>
     </message>
     <message>
-        <location line="+48"/>
+        <location line="+50"/>
         <source>Created by %1</source>
         <translation>%1 жасаған</translation>
     </message>
@@ -206,87 +176,7 @@
         <translation>Торап қабылдау режимінде жұмыс істеп тұр</translation>
     </message>
     <message>
-        <location line="+61"/>
-        <source>Activity</source>
-        <translation>Белсенділігі</translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Have:</source>
-        <translation>Бар:</translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Availability:</source>
-        <translation>Қол жетерлігі:</translation>
-    </message>
-    <message>
-        <location line="+2"/>
-        <source>Downloaded:</source>
-        <translation>Жүктелген:</translation>
-    </message>
-    <message>
-        <location line="-1"/>
-        <source>Uploaded:</source>
-        <translation>Таратылған:</translation>
-    </message>
-    <message>
-        <location line="+2"/>
-        <source>State:</source>
-        <translation>Күйі:</translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Running time:</source>
-        <translation>Жұмыс уақыты:</translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Remaining time:</source>
-        <translation>Қалған уақыт:</translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Last activity:</source>
-        <translation>Соңғы белсенділігі:</translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Error:</source>
-        <translation>Қате:</translation>
-    </message>
-    <message>
-        <location line="+4"/>
-        <source>Details</source>
-        <translation>Көбірек білу</translation>
-    </message>
-    <message>
-        <location line="+2"/>
-        <source>Location:</source>
-        <translation>Орналасуы:</translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Hash:</source>
-        <translation>Хеші:</translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Privacy:</source>
-        <translation>Жекелігі:</translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Origin:</source>
-        <translation>Тегі:</translation>
-    </message>
-    <message>
-        <location line="+2"/>
-        <source>Comment:</source>
-        <translation>Түсініктемесі:</translation>
-    </message>
-    <message>
-        <location line="+105"/>
+        <location line="+151"/>
         <location line="+12"/>
         <location line="+34"/>
         <source>Error</source>
@@ -298,7 +188,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-635"/>
+        <location line="-602"/>
         <source>%1 (100%)</source>
         <translation>%1 (100%)</translation>
     </message>
@@ -323,7 +213,7 @@
         <translation>%1 (Рейтингі: %2)</translation>
     </message>
     <message>
-        <location line="+219"/>
+        <location line="+221"/>
         <source>N/A</source>
         <translation>Анықталмаған</translation>
     </message>
@@ -333,12 +223,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+74"/>
-        <source>Size:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+102"/>
+        <location line="+141"/>
         <source>Add URL </source>
         <translation>URL қосу</translation>
     </message>
@@ -364,27 +249,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+60"/>
-        <source>Speed</source>
-        <translation>Жылдамдығы</translation>
-    </message>
-    <message>
-        <location line="+2"/>
-        <source>Honor global &amp;limits</source>
-        <translation>Глобалды шектеу&amp;лерді елемеу</translation>
-    </message>
-    <message>
-        <location line="+5"/>
-        <source>Limit &amp;download speed (%1):</source>
-        <translation>Қаб&amp;ылдау жылдамдығын шектеу (%1):</translation>
-    </message>
-    <message>
-        <location line="+12"/>
-        <source>Limit &amp;upload speed (%1):</source>
-        <translation>Тар&amp;ату жылдамдығын шектеу (%1):</translation>
-    </message>
-    <message>
-        <location line="+13"/>
+        <location line="+63"/>
         <source>High</source>
         <translation>Жоғары</translation>
     </message>
@@ -400,22 +265,12 @@
     </message>
     <message>
         <location line="+2"/>
-        <source>Torrent &amp;priority:</source>
-        <translation>Торрент п&amp;риоритеті:</translation>
-    </message>
-    <message>
         <location line="+4"/>
-        <source>Seeding Limits</source>
-        <translation>Тарату шектеулері</translation>
-    </message>
-    <message>
-        <location line="+5"/>
-        <location line="+15"/>
         <source>Use Global Settings</source>
         <translation>Жалпы баптауларды қолдану</translation>
     </message>
     <message>
-        <location line="-14"/>
+        <location line="-3"/>
         <source>Seed regardless of ratio</source>
         <translation>Рейтингті елемей, тарату</translation>
     </message>
@@ -425,12 +280,7 @@
         <translation>Рейтинг мәні келесіге жеткенде, таратуды тоқтату:</translation>
     </message>
     <message>
-        <location line="+8"/>
-        <source>&amp;Ratio:</source>
-        <translation>&amp;Рейтингі:</translation>
-    </message>
-    <message>
-        <location line="+6"/>
+        <location line="+3"/>
         <source>Seed regardless of activity</source>
         <translation>Белсенділікті елемей, тарату</translation>
     </message>
@@ -440,47 +290,7 @@
         <translation>N мин белсенді емес болса, таратуды тоқтату:</translation>
     </message>
     <message>
-        <location line="+9"/>
-        <source>&amp;Idle:</source>
-        <translation>Кү&amp;ту:</translation>
-    </message>
-    <message>
-        <location line="+4"/>
-        <source>Peer Connections</source>
-        <translation>Тораптармен байланыстар</translation>
-    </message>
-    <message>
-        <location line="+8"/>
-        <source>&amp;Maximum peers:</source>
-        <translation>Тораптардың ма&amp;ксимал саны:</translation>
-    </message>
-    <message>
-        <location line="+46"/>
-        <source>Add Tracker</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+7"/>
-        <source>Edit Tracker</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+9"/>
-        <source>Remove Trackers</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+13"/>
-        <source>Show &amp;more details</source>
-        <translation>&amp;Көбірек ақпарат шығару</translation>
-    </message>
-    <message>
-        <location line="+6"/>
-        <source>Show &amp;backup trackers</source>
-        <translation>Қ&amp;ор трекерлерін көрсету</translation>
-    </message>
-    <message>
-        <location line="+22"/>
+        <location line="+56"/>
         <source>Up</source>
         <translation>Тарату</translation>
     </message>
@@ -508,6 +318,199 @@
         <location line="+0"/>
         <source>Client</source>
         <translation>Клиент</translation>
+    </message>
+</context>
+<context>
+    <name>DetailsDialog</name>
+    <message>
+        <location filename="../details.ui" line="+14"/>
+        <source>Torrent Properties</source>
+        <translation type="unfinished">Торрент қасиеттері</translation>
+    </message>
+    <message>
+        <location line="+26"/>
+        <source>Information</source>
+        <translation type="unfinished">Ақпараты</translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <source>Activity</source>
+        <translation type="unfinished">Белсенділігі</translation>
+    </message>
+    <message>
+        <location line="+10"/>
+        <source>Have:</source>
+        <translation type="unfinished">Бар:</translation>
+    </message>
+    <message>
+        <location line="+29"/>
+        <source>Availability:</source>
+        <translation type="unfinished">Қол жетерлігі:</translation>
+    </message>
+    <message>
+        <location line="+29"/>
+        <source>Uploaded:</source>
+        <translation type="unfinished">Таратылған:</translation>
+    </message>
+    <message>
+        <location line="+29"/>
+        <source>Downloaded:</source>
+        <translation type="unfinished">Жүктелген:</translation>
+    </message>
+    <message>
+        <location line="+29"/>
+        <source>State:</source>
+        <translation type="unfinished">Күйі:</translation>
+    </message>
+    <message>
+        <location line="+29"/>
+        <source>Running time:</source>
+        <translation type="unfinished">Жұмыс уақыты:</translation>
+    </message>
+    <message>
+        <location line="+29"/>
+        <source>Remaining time:</source>
+        <translation type="unfinished">Қалған уақыт:</translation>
+    </message>
+    <message>
+        <location line="+29"/>
+        <source>Last activity:</source>
+        <translation type="unfinished">Соңғы белсенділігі:</translation>
+    </message>
+    <message>
+        <location line="+29"/>
+        <source>Error:</source>
+        <translation type="unfinished">Қате:</translation>
+    </message>
+    <message>
+        <location line="+29"/>
+        <source>Details</source>
+        <translation type="unfinished">Көбірек білу</translation>
+    </message>
+    <message>
+        <location line="+10"/>
+        <source>Size:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+29"/>
+        <source>Location:</source>
+        <translation type="unfinished">Орналасуы:</translation>
+    </message>
+    <message>
+        <location line="+29"/>
+        <source>Hash:</source>
+        <translation type="unfinished">Хеші:</translation>
+    </message>
+    <message>
+        <location line="+29"/>
+        <source>Privacy:</source>
+        <translation type="unfinished">Жекелігі:</translation>
+    </message>
+    <message>
+        <location line="+29"/>
+        <source>Origin:</source>
+        <translation type="unfinished">Тегі:</translation>
+    </message>
+    <message>
+        <location line="+29"/>
+        <source>Comment:</source>
+        <translation type="unfinished">Түсініктемесі:</translation>
+    </message>
+    <message>
+        <location line="+21"/>
+        <source>Peers</source>
+        <translation type="unfinished">Қатысушылар</translation>
+    </message>
+    <message>
+        <location line="+29"/>
+        <source>Tracker</source>
+        <translation type="unfinished">Трекер</translation>
+    </message>
+    <message>
+        <location line="+16"/>
+        <source>Add Tracker</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+10"/>
+        <source>Edit Tracker</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+10"/>
+        <source>Remove Trackers</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+23"/>
+        <source>Show &amp;more details</source>
+        <translation type="unfinished">&amp;Көбірек ақпарат шығару</translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>Show &amp;backup trackers</source>
+        <translation type="unfinished">Қ&amp;ор трекерлерін көрсету</translation>
+    </message>
+    <message>
+        <location line="+8"/>
+        <source>Files</source>
+        <translation type="unfinished">Файлдар</translation>
+    </message>
+    <message>
+        <location line="+10"/>
+        <source>Options</source>
+        <translation type="unfinished">Баптаулары</translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <source>Speed</source>
+        <translation type="unfinished">Жылдамдығы</translation>
+    </message>
+    <message>
+        <location line="+10"/>
+        <source>Honor global &amp;limits</source>
+        <translation type="unfinished">Глобалды шектеу&amp;лерді елемеу</translation>
+    </message>
+    <message>
+        <location line="+10"/>
+        <source>Limit &amp;download speed (%1):</source>
+        <translation type="unfinished">Қаб&amp;ылдау жылдамдығын шектеу (%1):</translation>
+    </message>
+    <message>
+        <location line="+23"/>
+        <source>Limit &amp;upload speed (%1):</source>
+        <translation type="unfinished">Тар&amp;ату жылдамдығын шектеу (%1):</translation>
+    </message>
+    <message>
+        <location line="+23"/>
+        <source>Torrent &amp;priority:</source>
+        <translation type="unfinished">Торрент п&amp;риоритеті:</translation>
+    </message>
+    <message>
+        <location line="+16"/>
+        <source>Seeding Limits</source>
+        <translation type="unfinished">Тарату шектеулері</translation>
+    </message>
+    <message>
+        <location line="+10"/>
+        <source>&amp;Ratio:</source>
+        <translation type="unfinished">&amp;Рейтингі:</translation>
+    </message>
+    <message>
+        <location line="+30"/>
+        <source>&amp;Idle:</source>
+        <translation type="unfinished">Кү&amp;ту:</translation>
+    </message>
+    <message>
+        <location line="+33"/>
+        <source>Peer Connections</source>
+        <translation type="unfinished">Тораптармен байланыстар</translation>
+    </message>
+    <message>
+        <location line="+10"/>
+        <source>&amp;Maximum peers:</source>
+        <translation type="unfinished">Тораптардың ма&amp;ксимал саны:</translation>
     </message>
 </context>
 <context>
@@ -1376,7 +1379,7 @@ To add another primary URL, add it after a blank line.</source>
 <context>
     <name>MyApp</name>
     <message>
-        <location filename="../app.cc" line="+231"/>
+        <location filename="../app.cc" line="+277"/>
         <source>Transmission is a file sharing program. When you run a torrent, its data will be made available to others by means of upload. Any content you share is your sole responsibility.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1391,7 +1394,7 @@ To add another primary URL, add it after a blank line.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+58"/>
+        <location line="+60"/>
         <source>Torrent Completed</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1973,7 +1976,7 @@ To add another primary URL, add it after a blank line.</source>
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../app.cc" line="-186"/>
+        <location filename="../app.cc" line="-226"/>
         <source>Invalid option</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2308,13 +2311,13 @@ To add another primary URL, add it after a blank line.</source>
     <message>
         <location line="-17"/>
         <location line="+22"/>
-        <location line="+584"/>
+        <location line="+580"/>
         <location line="+8"/>
         <source>Limited at %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-601"/>
+        <location line="-597"/>
         <source>Limit Upload Speed</source>
         <translation>Тарату жылдамдығын шектеу</translation>
     </message>
@@ -2330,7 +2333,7 @@ To add another primary URL, add it after a blank line.</source>
     </message>
     <message>
         <location line="+5"/>
-        <location line="+577"/>
+        <location line="+573"/>
         <source>Stop at Ratio (%1)</source>
         <translation>Рейтингте тоқтату (%1)</translation>
     </message>
@@ -2372,12 +2375,12 @@ To add another primary URL, add it after a blank line.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-941"/>
+        <location line="-937"/>
         <source>Speed Limits</source>
         <translation type="unfinished">Жылдамдықты шектеу</translation>
     </message>
     <message>
-        <location line="+494"/>
+        <location line="+490"/>
         <source>Network Error</source>
         <translation type="unfinished"></translation>
     </message>
