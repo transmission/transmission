@@ -40,40 +40,33 @@
 ****************************************************************************/
 
 #include <QPainter>
-#include <QResizeEvent>
 #include <QStyle>
 #include <QStyleOption>
 
 #include "squeezelabel.h"
 
-void
-SqueezeLabel::init ()
-{
-  setTextInteractionFlags(Qt::TextSelectableByMouse);
-}
-
 SqueezeLabel::SqueezeLabel (const QString& text, QWidget * parent):
   QLabel (text, parent)
 {
-  init();
 }
 
 SqueezeLabel::SqueezeLabel (QWidget * parent):
   QLabel (parent)
 {
-  init();
 }
 
 void
 SqueezeLabel::paintEvent (QPaintEvent * paintEvent)
 {
-  Q_UNUSED (paintEvent);
+  if (hasFocus () && (textInteractionFlags () & (Qt::TextSelectableByKeyboard | Qt::TextSelectableByMouse)))
+    return QLabel::paintEvent (paintEvent);
 
   QPainter painter (this);
   QFontMetrics fm = fontMetrics ();
   QStyleOption opt;
   opt.initFrom (this);
-  const QString elidedText = fm.elidedText (text(), Qt::ElideMiddle, width());
+  const QString fullText = text ();
+  const QString elidedText = fm.elidedText (fullText, Qt::ElideRight, width());
   style()->drawItemText (&painter,
                          contentsRect(),
                          alignment(),
@@ -81,4 +74,8 @@ SqueezeLabel::paintEvent (QPaintEvent * paintEvent)
                          isEnabled(),
                          elidedText,
                          foregroundRole());
+
+#ifndef QT_NO_TOOLTIP
+  setToolTip (fullText != elidedText ? fullText : QString ());
+#endif
 }

@@ -46,7 +46,8 @@ TRANSLATIONS += translations/transmission_en.ts \
                 translations/transmission_ru.ts \
                 translations/transmission_uk.ts
 
-FORMS += mainwin.ui
+FORMS += details.ui \
+         mainwin.ui
 RESOURCES += application.qrc
 SOURCES += about.cc \
            add-data.cc \

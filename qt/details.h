@@ -15,20 +15,11 @@
 #include <QMap>
 #include <QSet>
 #include <QTimer>
-#include <QWidgetList>
 
 #include "prefs.h"
 
-class FileTreeView;
-class QTreeView;
-class QComboBox;
-class QCheckBox;
-class QDoubleSpinBox;
-class QLabel;
-class QRadioButton;
-class QSpinBox;
-class QTextBrowser;
-class QTreeWidget;
+#include "ui_details.h"
+
 class QTreeWidgetItem;
 class Session;
 class Torrent;
@@ -55,17 +46,16 @@ class Details: public QDialog
     virtual QSize sizeHint () const { return QSize (440, 460); }
 
   private:
-    QWidget * createPeersTab ();
-    QWidget * createTrackerTab ();
-    QWidget * createInfoTab ();
-    QWidget * createFilesTab ();
-    QWidget * createOptionsTab ();
+    void initPeersTab ();
+    void initTrackerTab ();
+    void initInfoTab ();
+    void initFilesTab ();
+    void initOptionsTab ();
 
   private:
     QIcon getStockIcon (const QString& freedesktop_name, int fallback);
     QString timeToStringRounded (int seconds);
     QString trimToDesiredWidth (const QString& str);
-    void enableWhenChecked (QCheckBox *, QWidget *);
 
   private:
     Session& mySession;
@@ -76,62 +66,13 @@ class Details: public QDialog
     bool myChangedTorrents;
     bool myHavePendingRefresh;
 
-    QLabel * myStateLabel;
-    QLabel * myHaveLabel;
-    QLabel * myAvailabilityLabel;
-    QLabel * myDownloadedLabel;
-    QLabel * myUploadedLabel;
-    QLabel * myErrorLabel;
-    QLabel * myRunTimeLabel;
-    QLabel * myETALabel;
-    QLabel * myLastActivityLabel;
-
-    QCheckBox * mySessionLimitCheck;
-    QCheckBox * mySingleDownCheck;
-    QCheckBox * mySingleUpCheck;
-    QCheckBox * myShowTrackerScrapesCheck;
-    QCheckBox * myShowBackupTrackersCheck;
-    QPushButton * myAddTrackerButton;
-    QPushButton * myEditTrackerButton;
-    QPushButton * myRemoveTrackerButton;
-    QSpinBox * mySingleDownSpin;
-    QSpinBox * mySingleUpSpin;
-    QComboBox * myRatioCombo;
-    QDoubleSpinBox * myRatioSpin;
-    QComboBox * myIdleCombo;
-    QSpinBox * myIdleSpin;
-    QSpinBox * myPeerLimitSpin;
-    QComboBox * myBandwidthPriorityCombo;
-
-    QLabel * mySizeLabel;
-    QLabel * myHashLabel;
-    QLabel * myPrivacyLabel;
-    QLabel * myOriginLabel;
-    QLabel * myLocationLabel;
-    QTextBrowser * myCommentBrowser;
-
-    QLabel * myTrackerLabel;
-    QLabel * myScrapeTimePrevLabel;
-    QLabel * myScrapeTimeNextLabel;
-    QLabel * myScrapeResponseLabel;
-    QLabel * myAnnounceTimePrevLabel;
-    QLabel * myAnnounceTimeNextLabel;
-    QLabel * myAnnounceResponseLabel;
-    QLabel * myAnnounceManualLabel;
+    Ui::DetailsDialog ui;
 
     TrackerModel * myTrackerModel;
     TrackerModelFilter * myTrackerFilter;
     TrackerDelegate * myTrackerDelegate;
-    QTreeView * myTrackerView;
-    //QMap<QString,QTreeWidgetItem*> myTrackerTiers;
-    //QMap<QString,QTreeWidgetItem*> myTrackerItems;
 
-    QTreeWidget * myPeerTree;
     QMap<QString,QTreeWidgetItem*> myPeers;
-
-    QWidgetList myWidgets;
-
-    FileTreeView * myFileTreeView;
 
   private slots:
     void refreshPref (int key);
