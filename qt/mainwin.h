@@ -69,8 +69,6 @@ class TrMainWindow: public QMainWindow
     Prefs& myPrefs;
     TorrentModel& myModel;
     Ui_MainWindow ui;
-    QIcon mySpeedModeOffIcon;
-    QIcon mySpeedModeOnIcon;
     time_t myLastSendTime;
     time_t myLastReadTime;
     QTimer myNetworkTimer;
@@ -146,16 +144,10 @@ class TrMainWindow: public QMainWindow
 
   private:
     QMenu * createOptionsMenu ();
-    QWidget * createStatusBar ();
-    QWidget * myStatusBar;
-    QPushButton * myAltSpeedButton;
+    QMenu * createStatsModeMenu ();
+    void initStatusBar ();
+
     QAction * myAltSpeedAction;
-    QPushButton * myOptionsButton;
-    QPushButton * myStatsModeButton;
-    QLabel * myStatsLabel;
-    QLabel * myDownloadSpeedLabel;
-    QLabel * myUploadSpeedLabel;
-    QLabel * myNetworkLabel;
     QString myErrorMessage;
 
   public slots:

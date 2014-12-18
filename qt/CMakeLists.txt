@@ -56,7 +56,7 @@ set(${PROJECT_NAME}_SOURCES
     tracker-delegate.cc
     tracker-model-filter.cc
     tracker-model.cc
-    triconpushbutton.cc
+    tricontoolbutton.cc
     utils.cc
     watchdir.cc
 )
@@ -94,7 +94,7 @@ set(${PROJECT_NAME}_HEADERS
     tracker-delegate.h
     tracker-model-filter.h
     tracker-model.h
-    triconpushbutton.h
+    tricontoolbutton.h
     types.h
     utils.h
     watchdir.h

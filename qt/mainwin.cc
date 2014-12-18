@@ -43,8 +43,6 @@
 #include "torrent-delegate-min.h"
 #include "torrent-filter.h"
 #include "torrent-model.h"
-#include "triconpushbutton.h"
-#include "ui_mainwin.h"
 
 #define PREFS_KEY "prefs-key";
 
@@ -94,8 +92,6 @@ TrMainWindow::TrMainWindow (Session& session, Prefs& prefs, TorrentModel& model,
   mySession (session),
   myPrefs (prefs),
   myModel (model),
-  mySpeedModeOffIcon (":/icons/alt-limit-off.png"),
-  mySpeedModeOnIcon (":/icons/alt-limit-on.png"),
   myLastSendTime (0),
   myLastReadTime (0),
   myNetworkTimer (this),
@@ -216,7 +212,8 @@ TrMainWindow::TrMainWindow (Session& session, Prefs& prefs, TorrentModel& model,
   actionGroup->addAction (ui.action_SortByState);
 
   myAltSpeedAction = new QAction (tr ("Speed Limits"), this);
-  myAltSpeedAction->setIcon (myPrefs.get<bool> (Prefs::ALT_SPEED_LIMIT_ENABLED) ? mySpeedModeOnIcon : mySpeedModeOffIcon);
+  myAltSpeedAction->setIcon (ui.altSpeedButton->icon ());
+  myAltSpeedAction->setCheckable (true);
   connect (myAltSpeedAction, SIGNAL (triggered ()), this, SLOT (toggleSpeedMode ()));
 
   QMenu * menu = new QMenu (this);
@@ -243,7 +240,7 @@ TrMainWindow::TrMainWindow (Session& session, Prefs& prefs, TorrentModel& model,
   toggleWindows (!minimized);
   ui.action_TrayIcon->setChecked (minimized || prefs.getBool (Prefs::SHOW_TRAY_ICON));
 
-  ui.verticalLayout->addWidget (createStatusBar ());
+  initStatusBar ();
   ui.verticalLayout->insertWidget (0, myFilterBar = new FilterBar (myPrefs, myModel, myFilterModel));
 
   QList<int> initKeys;
@@ -276,7 +273,7 @@ TrMainWindow::TrMainWindow (Session& session, Prefs& prefs, TorrentModel& model,
 
   if (mySession.isServer ())
     {
-      myNetworkLabel->hide ();
+      ui.networkLabel->hide ();
     }
   else
     {
@@ -341,82 +338,18 @@ TrMainWindow::onSetPrefs (bool isChecked)
 
 #define SHOW_KEY "show-mode"
 
-QWidget *
-TrMainWindow::createStatusBar ()
+void
+TrMainWindow::initStatusBar ()
 {
-  QMenu * m;
-  QLabel * l;
-  QHBoxLayout * h;
-  QPushButton * p;
-  QActionGroup * a;
-  const int i = style ()->pixelMetric (QStyle::PM_SmallIconSize, 0, this);
-  const QSize smallIconSize (i, i);
+  ui.optionsButton->setMenu (createOptionsMenu ());
 
-  QWidget * top = myStatusBar = new QWidget;
-  h = new QHBoxLayout (top);
-  h->setContentsMargins (HIG::PAD_SMALL, HIG::PAD_SMALL, HIG::PAD_SMALL, HIG::PAD_SMALL);
-  h->setSpacing (HIG::PAD_SMALL);
+  const int minimumSpeedWidth = ui.downloadSpeedLabel->fontMetrics ().width (Formatter::uploadSpeedToString (Speed::fromKBps (999.99)));
+  ui.downloadSpeedLabel->setMinimumWidth (minimumSpeedWidth);
+  ui.uploadSpeedLabel->setMinimumWidth (minimumSpeedWidth);
 
-    p = myOptionsButton = new TrIconPushButton (this);
-    p->setIcon (QIcon (":/icons/utilities.png"));
-    p->setIconSize (QPixmap (":/icons/utilities.png").size ());
-    p->setFlat (true);
-    p->setMenu (createOptionsMenu ());
-    h->addWidget (p);
+  ui.statsModeButton->setMenu (createStatsModeMenu ());
 
-    p = myAltSpeedButton = new QPushButton (this);
-    p->setIcon (myPrefs.get<bool> (Prefs::ALT_SPEED_LIMIT_ENABLED) ? mySpeedModeOnIcon : mySpeedModeOffIcon);
-    p->setIconSize (QPixmap (":/icons/alt-limit-on.png").size ());
-    p->setCheckable (true);
-    p->setFixedWidth (p->height ());
-    p->setFlat (true);
-    h->addWidget (p);
-    connect (p, SIGNAL (clicked ()), this, SLOT (toggleSpeedMode ()));
-
-    l = myNetworkLabel = new QLabel;
-    h->addWidget (l);
-
-  h->addStretch (1);
-
-    l = myDownloadSpeedLabel = new QLabel (this);
-    const int minimumSpeedWidth = l->fontMetrics ().width (Formatter::uploadSpeedToString (Speed::fromKBps (999.99)));
-    l->setMinimumWidth (minimumSpeedWidth);
-    l->setAlignment (Qt::AlignRight|Qt::AlignVCenter);
-    h->addWidget (l);
-
-  h->addSpacing (HIG::PAD);
-
-    l = myUploadSpeedLabel = new QLabel;
-    l->setMinimumWidth (minimumSpeedWidth);
-    l->setAlignment (Qt::AlignRight|Qt::AlignVCenter);
-    h->addWidget (l);
-
-  h->addSpacing (HIG::PAD);
-
-    l = myStatsLabel = new QLabel (this);
-    h->addWidget (l);
-    a = new QActionGroup (this);
-    a->addAction (ui.action_TotalRatio);
-    a->addAction (ui.action_TotalTransfer);
-    a->addAction (ui.action_SessionRatio);
-    a->addAction (ui.action_SessionTransfer);
-    m = new QMenu (this);
-    m->addAction (ui.action_TotalRatio);
-    m->addAction (ui.action_TotalTransfer);
-    m->addAction (ui.action_SessionRatio);
-    m->addAction (ui.action_SessionTransfer);
-    connect (ui.action_TotalRatio, SIGNAL (triggered ()), this, SLOT (showTotalRatio ()));
-    connect (ui.action_TotalTransfer, SIGNAL (triggered ()), this, SLOT (showTotalTransfer ()));
-    connect (ui.action_SessionRatio, SIGNAL (triggered ()), this, SLOT (showSessionRatio ()));
-    connect (ui.action_SessionTransfer, SIGNAL (triggered ()), this, SLOT (showSessionTransfer ()));
-    p = myStatsModeButton = new TrIconPushButton (this);
-    p->setIcon (QIcon (":/icons/ratio.png"));
-    p->setIconSize (QPixmap (":/icons/ratio.png").size ());
-    p->setFlat (true);
-    p->setMenu (m);
-    h->addWidget (p);
-
-  return top;
+  connect (ui.altSpeedButton, SIGNAL (clicked ()), this, SLOT (toggleSpeedMode ()));
 }
 
 QMenu *
@@ -501,6 +434,29 @@ TrMainWindow::createOptionsMenu ()
       }
 
   return menu;
+}
+
+QMenu *
+TrMainWindow::createStatsModeMenu ()
+{
+  QActionGroup * a = new QActionGroup (this);
+  a->addAction (ui.action_TotalRatio);
+  a->addAction (ui.action_TotalTransfer);
+  a->addAction (ui.action_SessionRatio);
+  a->addAction (ui.action_SessionTransfer);
+
+  QMenu * m = new QMenu (this);
+  m->addAction (ui.action_TotalRatio);
+  m->addAction (ui.action_TotalTransfer);
+  m->addAction (ui.action_SessionRatio);
+  m->addAction (ui.action_SessionTransfer);
+
+  connect (ui.action_TotalRatio, SIGNAL (triggered ()), this, SLOT (showTotalRatio ()));
+  connect (ui.action_TotalTransfer, SIGNAL (triggered ()), this, SLOT (showTotalTransfer ()));
+  connect (ui.action_SessionRatio, SIGNAL (triggered ()), this, SLOT (showSessionRatio ()));
+  connect (ui.action_SessionTransfer, SIGNAL (triggered ()), this, SLOT (showSessionTransfer ()));
+
+  return m;
 }
 
 /****
@@ -731,12 +687,12 @@ TrMainWindow::refreshStatusBar ()
   size_t upCount, downCount;
   myModel.getTransferSpeed (upSpeed, upCount, downSpeed, downCount);
 
-  myUploadSpeedLabel->setText (Formatter::uploadSpeedToString(upSpeed));
-  myUploadSpeedLabel->setVisible (downCount || upCount);
-  myDownloadSpeedLabel->setText (Formatter::downloadSpeedToString(downSpeed));
-  myDownloadSpeedLabel->setVisible (downCount);
+  ui.uploadSpeedLabel->setText (Formatter::uploadSpeedToString (upSpeed));
+  ui.uploadSpeedLabel->setVisible (downCount || upCount);
+  ui.downloadSpeedLabel->setText (Formatter::downloadSpeedToString (downSpeed));
+  ui.downloadSpeedLabel->setVisible (downCount);
 
-  myNetworkLabel->setVisible (!mySession.isServer ());
+  ui.networkLabel->setVisible (!mySession.isServer ());
 
   const QString mode (myPrefs.getString (Prefs::STATUSBAR_STATS));
   QString str;
@@ -762,7 +718,7 @@ TrMainWindow::refreshStatusBar ()
       str = tr ("Ratio: %1").arg (Formatter:: ratioToString (mySession.getCumulativeStats ().ratio));
     }
 
-  myStatsLabel->setText (str);
+  ui.statsLabel->setText (str);
 }
 
 
@@ -951,7 +907,7 @@ TrMainWindow::toggleSpeedMode ()
 {
   myPrefs.toggleBool (Prefs::ALT_SPEED_LIMIT_ENABLED);
   const bool mode = myPrefs.get<bool> (Prefs::ALT_SPEED_LIMIT_ENABLED);
-  myAltSpeedAction->setIcon (mode ? mySpeedModeOnIcon : mySpeedModeOffIcon);
+  myAltSpeedAction->setChecked (mode);
 }
 void
 TrMainWindow::setToolbarVisible (bool visible)
@@ -1071,7 +1027,7 @@ TrMainWindow::refreshPref (int key)
 
       case Prefs::STATUSBAR:
         b = myPrefs.getBool (key);
-        myStatusBar->setVisible (b);
+        ui.statusBar->setVisible (b);
         ui.action_Statusbar->setChecked (b);
         break;
 
@@ -1118,14 +1074,14 @@ TrMainWindow::refreshPref (int key)
       case Prefs::ALT_SPEED_LIMIT_DOWN:
         {
           b = myPrefs.getBool (Prefs::ALT_SPEED_LIMIT_ENABLED);
-          myAltSpeedButton->setChecked (b);
-          myAltSpeedButton->setIcon (b ? mySpeedModeOnIcon : mySpeedModeOffIcon);
+          myAltSpeedAction->setChecked (b);
+          ui.altSpeedButton->setChecked (b);
           const QString fmt = b ? tr ("Click to disable Temporary Speed Limits\n (%1 down, %2 up)")
                                 : tr ("Click to enable Temporary Speed Limits\n (%1 down, %2 up)");
           const Speed d = Speed::fromKBps (myPrefs.getInt (Prefs::ALT_SPEED_LIMIT_DOWN));
           const Speed u = Speed::fromKBps (myPrefs.getInt (Prefs::ALT_SPEED_LIMIT_UP));
-          myAltSpeedButton->setToolTip (fmt.arg (Formatter::speedToString (d))
-                                           .arg (Formatter::speedToString (u)));
+          ui.altSpeedButton->setToolTip (fmt.arg (Formatter::speedToString (d))
+                                            .arg (Formatter::speedToString (u)));
           break;
         }
 
@@ -1366,8 +1322,8 @@ TrMainWindow::updateNetworkIcon ()
   else
     tip = tr ("%1 is not responding").arg (url);
 
-  myNetworkLabel->setPixmap (pixmap);
-  myNetworkLabel->setToolTip (tip);
+  ui.networkLabel->setPixmap (pixmap);
+  ui.networkLabel->setToolTip (tip);
 }
 
 void

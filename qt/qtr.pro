@@ -79,7 +79,7 @@ SOURCES += about.cc \
            tracker-delegate.cc \
            tracker-model.cc \
            tracker-model-filter.cc \
-           triconpushbutton.cc \
+           tricontoolbutton.cc \
            utils.cc \
            watchdir.cc
 HEADERS += $$replace(SOURCES, .cc, .h)
