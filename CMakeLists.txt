@@ -305,10 +305,13 @@ if(CMAKE_C_COMPILER_ID STREQUAL "GNU" OR CMAKE_C_COMPILER_ID STREQUAL "Clang")
 endif()
 
 set(NEEDED_HEADERS
-    libintl.h
     stdbool.h
     sys/statvfs.h
     xfs/xfs.h)
+
+if(ENABLE_NLS)
+    list(APPEND NEEDED_HEADERS libintl.h)
+endif()
 
 foreach(H ${NEEDED_HEADERS})
     tr_make_id("${H}" H_ID)
@@ -355,6 +358,13 @@ endforeach()
 #         add_definitions(-D__USE_MINGW_ANSI_STDIO=1 -D__STDC_FORMAT_MACROS=1)
 #     endif()
 # endif()
+
+if(ENABLE_NLS)
+    check_library_exists(intl libintl_gettext "" HAVE_LIBINTL)
+    if(HAVE_LIBINTL)
+        set(LIBINTL_LIBRARY intl)
+    endif()
+endif()
 
 check_library_exists(m sqrt "" HAVE_LIBM)
 if(HAVE_LIBM)

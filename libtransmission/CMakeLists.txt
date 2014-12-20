@@ -202,6 +202,7 @@ target_link_libraries(${TR_NAME}
     ${MINIUPNPC_LIBRARIES}
     ${DHT_LIBRARIES}
     ${UTP_LIBRARIES}
+    ${LIBINTL_LIBRARY}
     ${LIBM_LIBRARY}
 )
 

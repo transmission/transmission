@@ -62,6 +62,7 @@ macro(tr_add_external_auto_library ID LIBNAME)
             ${ARGN}
             PREFIX "${${ID}_PREFIX}"
             CMAKE_ARGS
+                "-DCMAKE_TOOLCHAIN_FILE:PATH=${CMAKE_TOOLCHAIN_FILE}"
                 "-DCMAKE_C_FLAGS:STRING=${CMAKE_C_FLAGS}"
                 "-DCMAKE_CXX_FLAGS:STRING=${CMAKE_CXX_FLAGS}"
                 "-DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}"
