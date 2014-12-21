@@ -12,6 +12,7 @@
 
 #include <QComboBox>
 #include <QItemDelegate>
+#include <QLineEdit>
 #include <QWidget>
 
 class QLabel;
@@ -56,6 +57,22 @@ class FilterBarComboBox: public QComboBox
     virtual void paintEvent (QPaintEvent * e);
 };
 
+class FilterBarLineEdit: public QLineEdit
+{
+    Q_OBJECT
+
+  public:
+    FilterBarLineEdit (QWidget * parent = 0);
+
+  protected:
+    virtual void resizeEvent (QResizeEvent * event);
+
+  private slots:
+    void updateClearButtonVisibility ();
+
+  private:
+    QToolButton * myClearButton;
+};
 
 class FilterBar: public QWidget
 {
@@ -82,7 +99,7 @@ class FilterBar: public QWidget
     QStandardItemModel * myTrackerModel;
     QTimer * myRecountTimer;
     bool myIsBootstrapping;
-    QLineEdit * myLineEdit;
+    FilterBarLineEdit * myLineEdit;
 
   private slots:
     void recount ();

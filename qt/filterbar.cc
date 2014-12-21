@@ -8,12 +8,11 @@
  */
 
 #include <QAbstractItemView>
-#include <QPushButton>
 #include <QLabel>
 #include <QHBoxLayout>
-#include <QLineEdit>
 #include <QStylePainter>
 #include <QString>
+#include <QToolButton>
 #include <QtGui>
 
 #include "app.h"
@@ -217,6 +216,63 @@ FilterBarComboBox::paintEvent (QPaintEvent * e)
       text = painter.fontMetrics ().elidedText (text, Qt::ElideRight, rect.width ());
       s->drawItemText (&painter, rect, Qt::AlignLeft|Qt::AlignVCenter, opt.palette, true, text);
     }
+}
+
+/****
+*****
+****/
+
+FilterBarLineEdit::FilterBarLineEdit (QWidget * parent):
+  QLineEdit (parent),
+  myClearButton (nullptr)
+{
+#if QT_VERSION < QT_VERSION_CHECK(5, 2, 0)
+  const QIcon icon = QIcon::fromTheme ("edit-clear", style ()->standardIcon (QStyle::SP_DialogCloseButton));
+  const int iconSize = style ()->pixelMetric (QStyle::PM_SmallIconSize);
+
+  myClearButton = new QToolButton (this);
+  myClearButton->setStyleSheet (QLatin1String ("QToolButton{border:0;padding:0;margin:0}"));
+  myClearButton->setToolButtonStyle (Qt::ToolButtonIconOnly);
+  myClearButton->setFocusPolicy (Qt::NoFocus);
+  myClearButton->setCursor (Qt::ArrowCursor);
+  myClearButton->setIconSize (QSize (iconSize, iconSize));
+  myClearButton->setIcon (icon);
+  myClearButton->hide ();
+
+  const int frameWidth = style ()->pixelMetric (QStyle::PM_DefaultFrameWidth);
+  const QSize minSizeHint = minimumSizeHint ();
+  const QSize buttonSizeHint = myClearButton->sizeHint ();
+
+  setStyleSheet (QString::fromLatin1 ("QLineEdit{padding-right:%1px}").arg (buttonSizeHint.width () + frameWidth + 1));
+  setMinimumSize (qMax (minSizeHint.width (), buttonSizeHint.width () + frameWidth * 2 + 2),
+                  qMax (minSizeHint.height (), buttonSizeHint.height () + frameWidth * 2 + 2));
+
+  connect (this, SIGNAL (textChanged (QString)), this, SLOT (updateClearButtonVisibility ()));
+  connect (myClearButton, SIGNAL (clicked ()), this, SLOT (clear ()));
+#else
+  setClearButtonEnabled (true);
+#endif
+}
+
+void FilterBarLineEdit::resizeEvent (QResizeEvent * event)
+{
+  QLineEdit::resizeEvent (event);
+
+#if QT_VERSION < QT_VERSION_CHECK(5, 2, 0)
+  const int frameWidth = style ()->pixelMetric (QStyle::PM_DefaultFrameWidth);
+  const QRect editRect = rect();
+  const QSize buttonSizeHint = myClearButton->sizeHint ();
+
+  myClearButton->move (editRect.right () - frameWidth - buttonSizeHint.width (),
+                       editRect.top () + (editRect.height () - buttonSizeHint.height ()) / 2);
+#endif
+}
+
+void FilterBarLineEdit::updateClearButtonVisibility ()
+{
+#if QT_VERSION < QT_VERSION_CHECK(5, 2, 0)
+  myClearButton->setVisible (!text ().isEmpty ());
+#endif
 }
 
 /****
@@ -444,18 +500,9 @@ FilterBar::FilterBar (Prefs& prefs, TorrentModel& torrents, TorrentFilter& filte
   h->addWidget (myTrackerCombo, 1);
   h->addSpacing (hmargin*2);
 
-  myLineEdit = new QLineEdit (this);
+  myLineEdit = new FilterBarLineEdit (this);
   h->addWidget (myLineEdit);
   connect (myLineEdit, SIGNAL (textChanged (QString)), this, SLOT (onTextChanged (QString)));
-
-  QPushButton * p = new QPushButton (this);
-  QIcon icon = QIcon::fromTheme ("edit-clear", style ()->standardIcon (QStyle::SP_DialogCloseButton));
-  int iconSize = style ()->pixelMetric (QStyle::PM_SmallIconSize);
-  p->setIconSize (QSize (iconSize, iconSize));
-  p->setIcon (icon);
-  p->setFlat (true);
-  h->addWidget (p);
-  connect (p, SIGNAL (clicked (bool)), myLineEdit, SLOT (clear ()));
 
   // listen for changes from the other players
   connect (&myPrefs, SIGNAL (changed (int)), this, SLOT (refreshPref (int)));
