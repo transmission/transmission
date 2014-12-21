@@ -47,7 +47,8 @@ TRANSLATIONS += translations/transmission_en.ts \
                 translations/transmission_uk.ts
 
 FORMS += details.ui \
-         mainwin.ui
+         mainwin.ui \
+         stats-dialog.ui
 RESOURCES += application.qrc
 SOURCES += about.cc \
            add-data.cc \

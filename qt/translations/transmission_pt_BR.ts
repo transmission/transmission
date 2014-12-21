@@ -789,7 +789,7 @@
         <translation>Transmission</translation>
     </message>
     <message>
-        <location line="+51"/>
+        <location line="+151"/>
         <source>&amp;Torrent</source>
         <translation>Torrent</translation>
     </message>
@@ -2083,48 +2083,47 @@ Adicione outra URL primária depois de uma linha em branco.</translation>
 <context>
     <name>StatsDialog</name>
     <message>
-        <location filename="../stats-dialog.cc" line="+32"/>
+        <location filename="../stats-dialog.ui" line="+14"/>
         <source>Statistics</source>
         <translation>Estatísticas</translation>
     </message>
     <message>
-        <location line="+3"/>
+        <location line="+25"/>
         <source>Current Session</source>
         <translation>Sessão Atual</translation>
     </message>
     <message>
-        <location line="+1"/>
-        <location line="+7"/>
+        <location line="+10"/>
+        <location line="+69"/>
         <source>Uploaded:</source>
         <translation>Enviado:</translation>
     </message>
     <message>
-        <location line="-6"/>
-        <location line="+7"/>
+        <location line="-56"/>
+        <location line="+69"/>
         <source>Downloaded:</source>
         <translation>Baixado:</translation>
     </message>
     <message>
-        <location line="-6"/>
-        <location line="+7"/>
+        <location line="-56"/>
+        <location line="+69"/>
         <source>Ratio:</source>
         <translation>Proporção:</translation>
     </message>
     <message>
-        <location line="-6"/>
-        <location line="+7"/>
+        <location line="-56"/>
+        <location line="+69"/>
         <source>Duration:</source>
         <translation>Duração:</translation>
     </message>
     <message>
-        <location line="-5"/>
+        <location line="-56"/>
         <source>Total</source>
         <translation>Total</translation>
     </message>
     <message numerus="yes">
-        <location line="+1"/>
-        <location line="+53"/>
-        <source>Started %n time (s)</source>
+        <location filename="../stats-dialog.cc" line="+66"/>
+        <source>Started %n time(s)</source>
         <translation type="unfinished">
             <numerusform></numerusform>
             <numerusform></numerusform>
@@ -2298,7 +2297,7 @@ Adicione outra URL primária depois de uma linha em branco.</translation>
 <context>
     <name>TrMainWindow</name>
     <message>
-        <location filename="../mainwin.cc" line="+436"/>
+        <location filename="../mainwin.cc" line="+369"/>
         <source>Limit Download Speed</source>
         <translation>Limitar Download</translation>
     </message>
@@ -2311,13 +2310,13 @@ Adicione outra URL primária depois de uma linha em branco.</translation>
     <message>
         <location line="-17"/>
         <location line="+22"/>
-        <location line="+580"/>
+        <location line="+603"/>
         <location line="+8"/>
         <source>Limited at %1</source>
         <translation>Limitar em %1</translation>
     </message>
     <message>
-        <location line="-597"/>
+        <location line="-620"/>
         <source>Limit Upload Speed</source>
         <translation>Limitar Upload</translation>
     </message>
@@ -2333,7 +2332,7 @@ Adicione outra URL primária depois de uma linha em branco.</translation>
     </message>
     <message>
         <location line="+5"/>
-        <location line="+573"/>
+        <location line="+596"/>
         <source>Stop at Ratio (%1)</source>
         <translation>Parar na Proporção (%1)</translation>
     </message>
@@ -2375,12 +2374,12 @@ Adicione outra URL primária depois de uma linha em branco.</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-937"/>
+        <location line="-897"/>
         <source>Speed Limits</source>
         <translation type="unfinished">Limites de Velocidade</translation>
     </message>
     <message>
-        <location line="+490"/>
+        <location line="+450"/>
         <source>Network Error</source>
         <translation type="unfinished"></translation>
     </message>

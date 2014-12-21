@@ -789,7 +789,7 @@
         <translation>Transmission</translation>
     </message>
     <message>
-        <location line="+51"/>
+        <location line="+151"/>
         <source>&amp;Torrent</source>
         <translation>&amp;Torrent</translation>
     </message>
@@ -2083,48 +2083,47 @@ Pour ajouter une autre URL primaire, placez-la après une ligne vide.</translati
 <context>
     <name>StatsDialog</name>
     <message>
-        <location filename="../stats-dialog.cc" line="+32"/>
+        <location filename="../stats-dialog.ui" line="+14"/>
         <source>Statistics</source>
         <translation>Statistiques</translation>
     </message>
     <message>
-        <location line="+3"/>
+        <location line="+25"/>
         <source>Current Session</source>
         <translation>Session courante</translation>
     </message>
     <message>
-        <location line="+1"/>
-        <location line="+7"/>
+        <location line="+10"/>
+        <location line="+69"/>
         <source>Uploaded:</source>
         <translation>Envoyé:</translation>
     </message>
     <message>
-        <location line="-6"/>
-        <location line="+7"/>
+        <location line="-56"/>
+        <location line="+69"/>
         <source>Downloaded:</source>
         <translation>Téléchargé:</translation>
     </message>
     <message>
-        <location line="-6"/>
-        <location line="+7"/>
+        <location line="-56"/>
+        <location line="+69"/>
         <source>Ratio:</source>
         <translation>Ratio:</translation>
     </message>
     <message>
-        <location line="-6"/>
-        <location line="+7"/>
+        <location line="-56"/>
+        <location line="+69"/>
         <source>Duration:</source>
         <translation>Durée:</translation>
     </message>
     <message>
-        <location line="-5"/>
+        <location line="-56"/>
         <source>Total</source>
         <translation>Total</translation>
     </message>
     <message numerus="yes">
-        <location line="+1"/>
-        <location line="+53"/>
-        <source>Started %n time (s)</source>
+        <location filename="../stats-dialog.cc" line="+66"/>
+        <source>Started %n time(s)</source>
         <translation type="unfinished">
             <numerusform></numerusform>
             <numerusform></numerusform>
@@ -2299,12 +2298,12 @@ Pour ajouter une autre URL primaire, placez-la après une ligne vide.</translati
 <context>
     <name>TrMainWindow</name>
     <message>
-        <location filename="../mainwin.cc" line="+218"/>
+        <location filename="../mainwin.cc" line="+214"/>
         <source>Speed Limits</source>
         <translation>Limites de vitesse</translation>
     </message>
     <message>
-        <location line="+218"/>
+        <location line="+155"/>
         <source>Limit Download Speed</source>
         <translation>Limite de réception</translation>
     </message>
@@ -2317,13 +2316,13 @@ Pour ajouter une autre URL primaire, placez-la après une ligne vide.</translati
     <message>
         <location line="-17"/>
         <location line="+22"/>
-        <location line="+580"/>
+        <location line="+603"/>
         <location line="+8"/>
         <source>Limited at %1</source>
         <translation>Limité à: %1</translation>
     </message>
     <message>
-        <location line="-597"/>
+        <location line="-620"/>
         <source>Limit Upload Speed</source>
         <translation>Limite d&apos;émission</translation>
     </message>
@@ -2339,7 +2338,7 @@ Pour ajouter une autre URL primaire, placez-la après une ligne vide.</translati
     </message>
     <message>
         <location line="+5"/>
-        <location line="+573"/>
+        <location line="+596"/>
         <source>Stop at Ratio (%1)</source>
         <translation>Arrêter au ratio (%1)</translation>
     </message>

@@ -789,7 +789,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+51"/>
+        <location line="+151"/>
         <source>&amp;Torrent</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2082,51 +2082,50 @@ To add another primary URL, add it after a blank line.</source>
 <context>
     <name>StatsDialog</name>
     <message>
-        <location filename="../stats-dialog.cc" line="+32"/>
+        <location filename="../stats-dialog.ui" line="+14"/>
         <source>Statistics</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+3"/>
+        <location line="+25"/>
         <source>Current Session</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+1"/>
-        <location line="+7"/>
+        <location line="+10"/>
+        <location line="+69"/>
         <source>Uploaded:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-6"/>
-        <location line="+7"/>
+        <location line="-56"/>
+        <location line="+69"/>
         <source>Downloaded:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-6"/>
-        <location line="+7"/>
+        <location line="-56"/>
+        <location line="+69"/>
         <source>Ratio:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-6"/>
-        <location line="+7"/>
+        <location line="-56"/>
+        <location line="+69"/>
         <source>Duration:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-5"/>
+        <location line="-56"/>
         <source>Total</source>
         <translation type="unfinished"></translation>
     </message>
     <message numerus="yes">
-        <location line="+1"/>
-        <location line="+53"/>
-        <source>Started %n time (s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <location filename="../stats-dialog.cc" line="+66"/>
+        <source>Started %n time(s)</source>
+        <translation>
+            <numerusform>Started %n time</numerusform>
+            <numerusform>Started %n times</numerusform>
         </translation>
     </message>
 </context>
@@ -2297,7 +2296,7 @@ To add another primary URL, add it after a blank line.</source>
 <context>
     <name>TrMainWindow</name>
     <message>
-        <location filename="../mainwin.cc" line="+436"/>
+        <location filename="../mainwin.cc" line="+369"/>
         <source>Limit Download Speed</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2310,13 +2309,13 @@ To add another primary URL, add it after a blank line.</source>
     <message>
         <location line="-17"/>
         <location line="+22"/>
-        <location line="+580"/>
+        <location line="+603"/>
         <location line="+8"/>
         <source>Limited at %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-597"/>
+        <location line="-620"/>
         <source>Limit Upload Speed</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2332,7 +2331,7 @@ To add another primary URL, add it after a blank line.</source>
     </message>
     <message>
         <location line="+5"/>
-        <location line="+573"/>
+        <location line="+596"/>
         <source>Stop at Ratio (%1)</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2374,12 +2373,12 @@ To add another primary URL, add it after a blank line.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-937"/>
+        <location line="-897"/>
         <source>Speed Limits</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+490"/>
+        <location line="+450"/>
         <source>Network Error</source>
         <translation type="unfinished"></translation>
     </message>

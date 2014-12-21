@@ -12,22 +12,17 @@
 
 #include <QDialog>
 
+#include "ui_stats-dialog.h"
+
 class Session;
-class QLabel;
 class QTimer;
 
 class StatsDialog: public QDialog
 {
     Q_OBJECT
 
-  signals:
-    void accepted ();
-
-  public slots:
-    void updateStats ();
-
   private slots:
-    void onTimer ();
+    void updateStats ();
 
   public:
     StatsDialog (Session&, QWidget * parent = 0);
@@ -37,15 +32,7 @@ class StatsDialog: public QDialog
   private:
     Session & mySession;
     QTimer * myTimer;
-    QLabel * myCurrentUp;
-    QLabel * myCurrentDown;
-    QLabel * myCurrentRatio;
-    QLabel * myCurrentDuration;
-    QLabel * myStartCount;
-    QLabel * myTotalUp;
-    QLabel * myTotalDown;
-    QLabel * myTotalRatio;
-    QLabel * myTotalDuration;
+    Ui::StatsDialog ui;
 };
 
 #endif

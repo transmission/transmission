@@ -791,7 +791,7 @@
 <context>
     <name>MainWindow</name>
     <message>
-        <location filename="../mainwin.ui" line="+489"/>
+        <location filename="../mainwin.ui" line="+589"/>
         <source>&amp;About</source>
         <translation>&amp;Apie</translation>
     </message>
@@ -1188,12 +1188,12 @@
         <translation>Visas siuntimas</translation>
     </message>
     <message>
-        <location line="-531"/>
+        <location line="-631"/>
         <source>Transmission</source>
         <translation>Transmission</translation>
     </message>
     <message>
-        <location line="+555"/>
+        <location line="+655"/>
         <source>Tray &amp;Icon</source>
         <translation>&amp;Piktograma pranešimų srityje</translation>
     </message>
@@ -2093,26 +2093,25 @@ Papildomą pirminį URL adresą galite įvesti, palikę prieš jį tuščią eil
 <context>
     <name>StatsDialog</name>
     <message>
-        <location filename="../stats-dialog.cc" line="+35"/>
+        <location filename="../stats-dialog.ui" line="+39"/>
         <source>Current Session</source>
         <translation>Šis seansas</translation>
     </message>
     <message>
-        <location line="+2"/>
-        <location line="+7"/>
+        <location line="+23"/>
+        <location line="+69"/>
         <source>Downloaded:</source>
         <translation>Atsiųsta:</translation>
     </message>
     <message>
-        <location line="-5"/>
-        <location line="+7"/>
+        <location line="-43"/>
+        <location line="+69"/>
         <source>Duration:</source>
         <translation>Naudojimosi trukmė:</translation>
     </message>
     <message numerus="yes">
-        <location line="-4"/>
-        <location line="+53"/>
-        <source>Started %n time (s)</source>
+        <location filename="../stats-dialog.cc" line="+66"/>
+        <source>Started %n time(s)</source>
         <translation type="unfinished">
             <numerusform></numerusform>
             <numerusform></numerusform>
@@ -2120,24 +2119,24 @@ Papildomą pirminį URL adresą galite įvesti, palikę prieš jį tuščią eil
         </translation>
     </message>
     <message>
-        <location line="-57"/>
-        <location line="+7"/>
+        <location filename="../stats-dialog.ui" line="-82"/>
+        <location line="+69"/>
         <source>Ratio:</source>
         <translation>Santykis:</translation>
     </message>
     <message>
-        <location line="-13"/>
+        <location line="-130"/>
         <source>Statistics</source>
         <translation>Statistika</translation>
     </message>
     <message>
-        <location line="+9"/>
+        <location line="+87"/>
         <source>Total</source>
         <translation>Bendra</translation>
     </message>
     <message>
-        <location line="-5"/>
-        <location line="+7"/>
+        <location line="-52"/>
+        <location line="+69"/>
         <source>Uploaded:</source>
         <translation>Išsiųsta:</translation>
     </message>
@@ -2313,12 +2312,12 @@ Papildomą pirminį URL adresą galite įvesti, palikę prieš jį tuščią eil
 <context>
     <name>TrMainWindow</name>
     <message>
-        <location filename="../mainwin.cc" line="+712"/>
+        <location filename="../mainwin.cc" line="+668"/>
         <source>Idle</source>
         <translation>Pasyvus</translation>
     </message>
     <message>
-        <location line="-276"/>
+        <location line="-299"/>
         <source>Limit Download Speed</source>
         <translation>Apriboti atsiuntimo greitį</translation>
     </message>
@@ -2330,7 +2329,7 @@ Papildomą pirminį URL adresą galite įvesti, palikę prieš jį tuščią eil
     <message>
         <location line="-13"/>
         <location line="+22"/>
-        <location line="+580"/>
+        <location line="+603"/>
         <location line="+8"/>
         <source>Limited at %1</source>
         <translation>Ribojama iki %1</translation>
@@ -2392,12 +2391,12 @@ Papildomą pirminį URL adresą galite įvesti, palikę prieš jį tuščią eil
         <translation>Šie torentai prisijungę prie siuntėjų.</translation>
     </message>
     <message>
-        <location line="-796"/>
+        <location line="-819"/>
         <source>Seed Forever</source>
         <translation>Skleisti visada</translation>
     </message>
     <message>
-        <location line="+676"/>
+        <location line="+699"/>
         <source>Show &amp;options dialog</source>
         <translation>Rodyti &amp;parinkčių langą</translation>
     </message>
@@ -2417,12 +2416,12 @@ Papildomą pirminį URL adresą galite įvesti, palikę prieš jį tuščią eil
         <translation>Pašalinti šio torento atsiųstus failus?</translation>
     </message>
     <message>
-        <location line="-1043"/>
+        <location line="-1003"/>
         <source>Speed Limits</source>
         <translation type="unfinished">Greičio ribojimai</translation>
     </message>
     <message>
-        <location line="+490"/>
+        <location line="+450"/>
         <source>Network Error</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2460,13 +2459,13 @@ Papildomą pirminį URL adresą galite įvesti, palikę prieš jį tuščią eil
         <translation>Vienas šių torentų dar neatsiųstas.</translation>
     </message>
     <message>
-        <location line="-819"/>
+        <location line="-842"/>
         <source>Stop Seeding at Ratio</source>
         <translation>Nebeskleisti esant santykiui</translation>
     </message>
     <message>
         <location line="+9"/>
-        <location line="+573"/>
+        <location line="+596"/>
         <source>Stop at Ratio (%1)</source>
         <translation>Nebeskleisti esant santykiui (%1)</translation>
     </message>
@@ -2481,13 +2480,13 @@ Papildomą pirminį URL adresą galite įvesti, palikę prieš jį tuščią eil
         <translation>Šis torentas dar neatsiųstas.</translation>
     </message>
     <message>
-        <location line="-834"/>
+        <location line="-857"/>
         <location line="+22"/>
         <source>Unlimited</source>
         <translation>Be ribojimų</translation>
     </message>
     <message>
-        <location line="+897"/>
+        <location line="+920"/>
         <source>%1 has not responded yet</source>
         <translation type="unfinished"></translation>
     </message>

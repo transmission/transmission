@@ -796,7 +796,7 @@
         <translation>Transmission</translation>
     </message>
     <message>
-        <location line="+51"/>
+        <location line="+151"/>
         <source>&amp;Torrent</source>
         <translation>&amp;Торент</translation>
     </message>
@@ -2094,48 +2094,47 @@ To add another primary URL, add it after a blank line.</source>
 <context>
     <name>StatsDialog</name>
     <message>
-        <location filename="../stats-dialog.cc" line="+32"/>
+        <location filename="../stats-dialog.ui" line="+14"/>
         <source>Statistics</source>
         <translation>Статистика</translation>
     </message>
     <message>
-        <location line="+3"/>
+        <location line="+25"/>
         <source>Current Session</source>
         <translation>Поточна сесія</translation>
     </message>
     <message>
-        <location line="+1"/>
-        <location line="+7"/>
+        <location line="+10"/>
+        <location line="+69"/>
         <source>Uploaded:</source>
         <translation>Вивантажено:</translation>
     </message>
     <message>
-        <location line="-6"/>
-        <location line="+7"/>
+        <location line="-56"/>
+        <location line="+69"/>
         <source>Downloaded:</source>
         <translation>Завантажено:</translation>
     </message>
     <message>
-        <location line="-6"/>
-        <location line="+7"/>
+        <location line="-56"/>
+        <location line="+69"/>
         <source>Ratio:</source>
         <translation>Рейтинг:</translation>
     </message>
     <message>
-        <location line="-6"/>
-        <location line="+7"/>
+        <location line="-56"/>
+        <location line="+69"/>
         <source>Duration:</source>
         <translation>Тривалість:</translation>
     </message>
     <message>
-        <location line="-5"/>
+        <location line="-56"/>
         <source>Total</source>
         <translation>Загалом</translation>
     </message>
     <message numerus="yes">
-        <location line="+1"/>
-        <location line="+53"/>
-        <source>Started %n time (s)</source>
+        <location filename="../stats-dialog.cc" line="+66"/>
+        <source>Started %n time(s)</source>
         <translation>
             <numerusform>Запущено %n раз</numerusform>
             <numerusform>Запущено %n рази</numerusform>
@@ -2314,7 +2313,7 @@ To add another primary URL, add it after a blank line.</source>
 <context>
     <name>TrMainWindow</name>
     <message>
-        <location filename="../mainwin.cc" line="+436"/>
+        <location filename="../mainwin.cc" line="+369"/>
         <source>Limit Download Speed</source>
         <translation>Обмежити швидкість завантаження</translation>
     </message>
@@ -2327,13 +2326,13 @@ To add another primary URL, add it after a blank line.</source>
     <message>
         <location line="-17"/>
         <location line="+22"/>
-        <location line="+580"/>
+        <location line="+603"/>
         <location line="+8"/>
         <source>Limited at %1</source>
         <translation>Обмежено до %1</translation>
     </message>
     <message>
-        <location line="-597"/>
+        <location line="-620"/>
         <source>Limit Upload Speed</source>
         <translation>Обмежити швидкість поширення</translation>
     </message>
@@ -2349,7 +2348,7 @@ To add another primary URL, add it after a blank line.</source>
     </message>
     <message>
         <location line="+5"/>
-        <location line="+573"/>
+        <location line="+596"/>
         <source>Stop at Ratio (%1)</source>
         <translation>Зупинити за співвідношення (%1)</translation>
     </message>
@@ -2391,12 +2390,12 @@ To add another primary URL, add it after a blank line.</source>
         <translation>Відкрити торент</translation>
     </message>
     <message>
-        <location line="-937"/>
+        <location line="-897"/>
         <source>Speed Limits</source>
         <translation>Обмеження швидкості</translation>
     </message>
     <message>
-        <location line="+490"/>
+        <location line="+450"/>
         <source>Network Error</source>
         <translation>Помилка мережі</translation>
     </message>
