@@ -48,6 +48,7 @@ TRANSLATIONS += translations/transmission_en.ts \
 
 FORMS += details.ui \
          mainwin.ui \
+         session-dialog.ui \
          stats-dialog.ui
 RESOURCES += application.qrc
 SOURCES += about.cc \

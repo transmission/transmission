@@ -10,7 +10,6 @@
 #include <QTimer>
 
 #include "formatter.h"
-#include "hig.h"
 #include "session.h"
 #include "stats-dialog.h"
 

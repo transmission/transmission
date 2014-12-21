@@ -13,12 +13,10 @@
 #include <QDialog>
 #include <QWidgetList>
 
+#include "ui_session-dialog.h"
+
 class Prefs;
 class Session;
-class QCheckBox;
-class QLineEdit;
-class QRadioButton;
-class QSpinBox;
 
 class SessionDialog: public QDialog
 {
@@ -33,17 +31,9 @@ class SessionDialog: public QDialog
     void resensitize ();
 
   private:
-    QCheckBox * myAuthCheckBox;
-    QRadioButton * myRemoteRadioButton;
-    QLineEdit * myHostLineEdit;
-    QSpinBox * myPortSpinBox;
-    QLineEdit * myUsernameLineEdit;
-    QLineEdit * myPasswordLineEdit;
-    QCheckBox * myAutomaticCheckBox;
-
-  private:
     Session& mySession;
     Prefs& myPrefs;
+    Ui::SessionDialog ui;
     QWidgetList myRemoteWidgets;
     QWidgetList myAuthWidgets;
 };
