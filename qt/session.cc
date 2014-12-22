@@ -16,6 +16,7 @@
 #include <QCoreApplication>
 #include <QDesktopServices>
 #include <QFile>
+#include <QFileInfo>
 #include <QMessageBox>
 #include <QNetworkProxy>
 #include <QNetworkProxyFactory>
@@ -91,13 +92,23 @@ namespace
 void
 FileAdded::executed (int64_t tag, const QString& result, tr_variant * arguments)
 {
-  Q_UNUSED (arguments);
-
   if (tag != myTag)
     return;
 
   if (result == "success")
     {
+      tr_variant * dup;
+      const char * str;
+      if (tr_variantDictFindDict (arguments, TR_KEY_torrent_duplicate, &dup) &&
+          tr_variantDictFindStr (dup, TR_KEY_name, &str, NULL))
+        {
+          const QString myFilename = QFileInfo (myName).fileName ();
+          const QString name = QString::fromUtf8 (str);
+          QMessageBox::warning (QApplication::activeWindow (),
+                                tr ("Add Torrent"),
+                                tr ("<p><b>Unable to add \"%1\".</b></p><p>It is a duplicate of \"%2\" which is already added.</p>").arg (myFilename).arg (name));
+        }
+
       if (!myDelFile.isEmpty ())
         {
           QFile file (myDelFile);
