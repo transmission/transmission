@@ -80,6 +80,20 @@ namespace
     SESSION_REFRESH_INTERVAL_MSEC = 3000,
     MODEL_REFRESH_INTERVAL_MSEC   = 3000
   };
+
+  bool
+  loadTranslation (QTranslator& translator, const QString& name, const QString& localeName,
+                   const QStringList& searchDirectories)
+  {
+    const QString filename = name + QLatin1Char ('_') + localeName;
+    foreach (const QString& directory, searchDirectories)
+    {
+      if (translator.load (filename, directory))
+        return true;
+    }
+
+    return false;
+  }
 }
 
 MyApp::MyApp (int& argc, char ** argv):
@@ -95,13 +109,26 @@ MyApp::MyApp (int& argc, char ** argv):
 
   setApplicationName (MY_CONFIG_NAME);
 
+  const QString localeName = QLocale ().name ();
+
   // install the qt translator
-  qtTranslator.load ("qt_" + QLocale::system ().name (), QLibraryInfo::location (QLibraryInfo::TranslationsPath));
-  installTranslator (&qtTranslator);
+  if (loadTranslation (qtTranslator, QLatin1String ("qt"), localeName, QStringList ()
+        << QLibraryInfo::location (QLibraryInfo::TranslationsPath)
+#ifdef TRANSLATIONS_DIR
+        << TRANSLATIONS_DIR
+#endif
+        << (applicationDirPath () + "/translations")
+      ))
+    installTranslator (&qtTranslator);
 
   // install the transmission translator
-  appTranslator.load (QString (MY_CONFIG_NAME) + "_" + QLocale::system ().name (), QCoreApplication::applicationDirPath () + "/translations");
-  installTranslator (&appTranslator);
+  if (loadTranslation (appTranslator, MY_CONFIG_NAME, localeName, QStringList ()
+#ifdef TRANSLATIONS_DIR
+        << TRANSLATIONS_DIR
+#endif
+        << (applicationDirPath () + "/translations")
+      ))
+    installTranslator (&appTranslator);
 
   Formatter::initUnits ();
 

@@ -147,6 +147,10 @@ include_directories(
     ${EVENT2_INCLUDE_DIRS}
 )
 
+add_definitions(
+    "-DTRANSLATIONS_DIR=\"${CMAKE_INSTALL_FULL_DATADIR}/${TR_NAME}/translations\""
+)
+
 add_executable(${TR_NAME}-qt
     ${${PROJECT_NAME}_SOURCES}
     ${${PROJECT_NAME}_UI_SOURCES}
@@ -175,3 +179,7 @@ if(INSTALL_DOC)
 endif()
 
 install(FILES transmission-qt.desktop DESTINATION ${CMAKE_INSTALL_DATADIR}/applications)
+
+if(ENABLE_NLS)
+    install(FILES ${${PROJECT_NAME}_QM_FILES} DESTINATION ${CMAKE_INSTALL_DATADIR}/${TR_NAME}/translations)
+endif()
