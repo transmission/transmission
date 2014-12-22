@@ -629,7 +629,7 @@
        <item row="2" column="0">
         <widget class="QCheckBox" name="singleDownCheck">
          <property name="text">
-          <string>Limit &amp;download speed (%1):</string>
+          <string>Limit &amp;download speed:</string>
          </property>
          <property name="tr-style" stdset="0">
           <string notr="true">form-label</string>
@@ -652,7 +652,7 @@
        <item row="3" column="0">
         <widget class="QCheckBox" name="singleUpCheck">
          <property name="text">
-          <string>Limit &amp;upload speed (%1):</string>
+          <string>Limit &amp;upload speed:</string>
          </property>
          <property name="tr-style" stdset="0">
           <string notr="true">form-label</string>
@@ -748,6 +748,9 @@
          </item>
          <item>
           <widget class="QSpinBox" name="idleSpin">
+           <property name="suffix">
+            <string notr="true"> minute(s)</string>
+           </property>
            <property name="minimum">
             <number>1</number>
            </property>

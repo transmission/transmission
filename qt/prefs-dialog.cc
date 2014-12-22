@@ -213,18 +213,21 @@ PrefsDialog::altSpeedDaysEdited (int i)
 QWidget *
 PrefsDialog::createSpeedTab ()
 {
-  QWidget *l, *r;
+  QWidget * l;
+  QSpinBox * r;
   HIG * hig = new HIG (this);
   hig->addSectionTitle (tr ("Speed Limits"));
   const QString speed_K_str = Formatter::unitStr (Formatter::SPEED, Formatter::KB);
 
-    l = checkBoxNew (tr ("&Upload (%1):").arg (speed_K_str), Prefs::USPEED_ENABLED);
+    l = checkBoxNew (tr ("&Upload:"), Prefs::USPEED_ENABLED);
     r = spinBoxNew (Prefs::USPEED, 0, INT_MAX, 5);
+    r->setSuffix (QString::fromLatin1 (" %1").arg (speed_K_str));
     hig->addRow (l, r);
     enableBuddyWhenChecked (qobject_cast<QCheckBox*>(l), r);
 
-    l = checkBoxNew (tr ("&Download (%1):").arg (speed_K_str), Prefs::DSPEED_ENABLED);
+    l = checkBoxNew (tr ("&Download:"), Prefs::DSPEED_ENABLED);
     r = spinBoxNew (Prefs::DSPEED, 0, INT_MAX, 5);
+    r->setSuffix (QString::fromLatin1 (" %1").arg (speed_K_str));
     hig->addRow (l, r);
     enableBuddyWhenChecked (qobject_cast<QCheckBox*>(l), r);
 
@@ -244,12 +247,14 @@ PrefsDialog::createSpeedTab ()
     QString s = tr ("<small>Override normal speed limits manually or at scheduled times</small>");
     hig->addWideControl (new QLabel (s));
 
-    s = tr ("U&pload (%1):").arg (speed_K_str);
+    s = tr ("U&pload:");
     r = spinBoxNew (Prefs::ALT_SPEED_LIMIT_UP, 0, INT_MAX, 5);
+    r->setSuffix (QString::fromLatin1 (" %1").arg (speed_K_str));
     hig->addRow (s, r);
 
-    s = tr ("Do&wnload (%1):").arg (speed_K_str);
+    s = tr ("Do&wnload:");
     r = spinBoxNew (Prefs::ALT_SPEED_LIMIT_DOWN, 0, INT_MAX, 5);
+    r->setSuffix (QString::fromLatin1 (" %1").arg (speed_K_str));
     hig->addRow (s, r);
 
     QCheckBox * c = checkBoxNew (tr ("&Scheduled times:"), Prefs::ALT_SPEED_LIMIT_TIME_ENABLED);
@@ -525,6 +530,14 @@ PrefsDialog::onLocationSelected (const QString& path, int key)
   setPref (key, path);
 }
 
+void
+PrefsDialog::onIdleLimitChanged ()
+{
+  const QString unitsSuffix = tr (" minute(s)", 0, myIdleLimitSpin->value ());
+  if (myIdleLimitSpin->suffix () != unitsSuffix)
+    myIdleLimitSpin->setSuffix (unitsSuffix);
+}
+
 QWidget *
 PrefsDialog::createSeedingTab ()
 {
@@ -544,10 +557,12 @@ PrefsDialog::createSeedingTab ()
     hig->addRow (l, r);
     enableBuddyWhenChecked (qobject_cast<QCheckBox*>(l), r);
 
-    l = checkBoxNew (tr ("Stop seeding if idle for &N minutes:"), Prefs::IDLE_LIMIT_ENABLED);
-    r = spinBoxNew (Prefs::IDLE_LIMIT, 1, INT_MAX, 5);
+    l = checkBoxNew (tr ("Stop seedi&ng if idle for:"), Prefs::IDLE_LIMIT_ENABLED);
+    r = myIdleLimitSpin = spinBoxNew (Prefs::IDLE_LIMIT, 1, INT_MAX, 5);
+    connect (r, SIGNAL (valueChanged (int)), this, SLOT (onIdleLimitChanged ()));
     hig->addRow (l, r);
     enableBuddyWhenChecked (qobject_cast<QCheckBox*>(l), r);
+    onIdleLimitChanged ();
 
   hig->finish ();
   return hig;

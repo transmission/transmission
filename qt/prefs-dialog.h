@@ -53,6 +53,7 @@ class PrefsDialog: public QDialog
     void onLocationSelected (const QString&, int key);
     void onPortTested (bool);
     void onPortTest ();
+    void onIdleLimitChanged ();
 
     void onUpdateBlocklistClicked ();
     void onUpdateBlocklistCancelled ();
@@ -107,6 +108,7 @@ class PrefsDialog: public QDialog
     QWidgetList myBlockWidgets;
     QWidgetList myUnsupportedWhenRemote;
     FreespaceLabel * myFreespaceLabel;
+    QSpinBox * myIdleLimitSpin;
 
     int myBlocklistHttpTag;
     QHttp * myBlocklistHttp;

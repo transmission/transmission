@@ -43,17 +43,26 @@
 <context>
     <name>Details</name>
     <message>
-        <location filename="../details.cc" line="+1213"/>
+        <location filename="../details.cc" line="+1223"/>
         <source>%</source>
         <translation>%</translation>
     </message>
     <message>
-        <location line="-605"/>
+        <location line="-615"/>
         <source>Active now</source>
         <translation>aktyvus dabar</translation>
     </message>
+    <message numerus="yes">
+        <location line="+404"/>
+        <source> minute(s)</source>
+        <translation>
+            <numerusform> minutė</numerusform>
+            <numerusform> minutės</numerusform>
+            <numerusform> minučių</numerusform>
+        </translation>
+    </message>
     <message>
-        <location line="+431"/>
+        <location line="+36"/>
         <source>Add URL </source>
         <translation>URL pridėjimas</translation>
     </message>
@@ -63,7 +72,7 @@
         <translation>Įveskite pridedamo sekiklio skelbimo URL:</translation>
     </message>
     <message>
-        <location line="+173"/>
+        <location line="+174"/>
         <source>Address</source>
         <translation>Adresas</translation>
     </message>
@@ -73,7 +82,7 @@
         <translation>Programa</translation>
     </message>
     <message>
-        <location line="-471"/>
+        <location line="-481"/>
         <source>Created by %1</source>
         <translation>sukurtas naudojant „%1“</translation>
     </message>
@@ -88,17 +97,17 @@
         <translation>sukurtas %1</translation>
     </message>
     <message>
-        <location line="+469"/>
+        <location line="+479"/>
         <source>Down</source>
         <translation>Atsiųsta</translation>
     </message>
     <message>
-        <location line="-325"/>
+        <location line="-334"/>
         <source>Downloading from this peer</source>
         <translation>Atsiunčiama iš šio siuntėjo</translation>
     </message>
     <message>
-        <location line="+195"/>
+        <location line="+203"/>
         <source>Edit URL </source>
         <translation>URL taisymas</translation>
     </message>
@@ -108,25 +117,25 @@
         <translation>Pataisykite sekiklio skelbimo URL:</translation>
     </message>
     <message>
-        <location line="-213"/>
+        <location line="-221"/>
         <location line="+23"/>
         <source>Encrypted connection</source>
         <translation>Šifruota jungtis</translation>
     </message>
     <message>
-        <location line="+154"/>
+        <location line="+162"/>
         <location line="+12"/>
         <location line="+34"/>
         <source>Error</source>
         <translation>Klaida</translation>
     </message>
     <message>
-        <location line="-681"/>
+        <location line="-690"/>
         <source>Finished</source>
         <translation>baigtas</translation>
     </message>
     <message>
-        <location line="+734"/>
+        <location line="+743"/>
         <source>High</source>
         <translation>aukštas</translation>
     </message>
@@ -142,7 +151,7 @@
         <translation>žemas</translation>
     </message>
     <message>
-        <location line="-776"/>
+        <location line="-785"/>
         <source>Mixed</source>
         <translation>įvairuoja</translation>
     </message>
@@ -157,22 +166,22 @@
         <translation>nėra</translation>
     </message>
     <message>
-        <location line="+776"/>
+        <location line="+785"/>
         <source>Normal</source>
         <translation>normalus</translation>
     </message>
     <message>
-        <location line="-261"/>
+        <location line="-269"/>
         <source>Optimistic unchoke</source>
         <translation>Optimistinis atlaisvinimas</translation>
     </message>
     <message>
-        <location line="-472"/>
+        <location line="-473"/>
         <source>Paused</source>
         <translation>pristabdytas</translation>
     </message>
     <message>
-        <location line="+477"/>
+        <location line="+478"/>
         <source>Peer has unchoked us, but we&apos;re not interested</source>
         <translation>Siuntėjas mus atlaisvino, tačiau tai mūsų nedomina</translation>
     </message>
@@ -197,7 +206,7 @@
         <translation>Siuntėjas aptiktas naudojant „Peer Exchange“ (PEX)</translation>
     </message>
     <message>
-        <location line="-205"/>
+        <location line="-206"/>
         <source>Private to this tracker -- DHT and PEX disabled</source>
         <translation>privatus šiam sekikliui – DHT ir PEX funkcijos išjungtos</translation>
     </message>
@@ -207,7 +216,7 @@
         <translation>viešas torentas</translation>
     </message>
     <message>
-        <location line="+464"/>
+        <location line="+473"/>
         <source>Seed regardless of activity</source>
         <translation>skleisti nepaisant aktyvumo</translation>
     </message>
@@ -217,19 +226,19 @@
         <translation>skleisti nepaisant santykio</translation>
     </message>
     <message>
-        <location line="+61"/>
+        <location line="+62"/>
         <source>Status</source>
         <translation>Būsena</translation>
     </message>
     <message>
-        <location line="-60"/>
+        <location line="-61"/>
         <source>Stop seeding at ratio:</source>
         <translation>nebeskleisti esant santykiui:</translation>
     </message>
     <message>
         <location line="+4"/>
-        <source>Stop seeding if idle for N minutes:</source>
-        <translation>nebeskleisti, jei pasyvus N minučių:</translation>
+        <source>Stop seeding if idle for:</source>
+        <translation type="unfinished">nebeskleisti, jei pasyvus:</translation>
     </message>
     <message>
         <location line="-97"/>
@@ -237,29 +246,29 @@
         <translation>Šis sekiklis jau naudojamas.</translation>
     </message>
     <message>
-        <location line="-686"/>
+        <location line="-695"/>
         <location line="+207"/>
         <source>Unknown</source>
         <translation>nežinomas</translation>
     </message>
     <message>
-        <location line="+632"/>
+        <location line="+642"/>
         <source>Up</source>
         <translation>Išsiųsta</translation>
     </message>
     <message>
-        <location line="-323"/>
+        <location line="-332"/>
         <source>Uploading to peer</source>
         <translation>Išsiunčiama šiam siuntėjui</translation>
     </message>
     <message>
-        <location line="+261"/>
+        <location line="+269"/>
         <location line="+4"/>
         <source>Use Global Settings</source>
         <translation>naudoti visuotinius parametrus</translation>
     </message>
     <message>
-        <location line="-262"/>
+        <location line="-270"/>
         <source>We unchoked this peer, but they&apos;re not interested</source>
         <translation>Mes atlaisvinome šį siuntėją, tačiau tai jo nedomina</translation>
     </message>
@@ -274,7 +283,7 @@
         <translation>Siųstume šiam siuntėjui, jei jis paprašytų</translation>
     </message>
     <message>
-        <location line="-386"/>
+        <location line="-387"/>
         <source>%1 (%2 corrupt)</source>
         <translation>%1 (%2 sugadinta)</translation>
     </message>
@@ -476,13 +485,13 @@
     </message>
     <message>
         <location line="+10"/>
-        <source>Limit &amp;download speed (%1):</source>
-        <translation type="unfinished">Riboti &amp;atsiuntimo greitį (%1):</translation>
+        <source>Limit &amp;download speed:</source>
+        <translation type="unfinished">Riboti &amp;atsiuntimo greitį:</translation>
     </message>
     <message>
         <location line="+23"/>
-        <source>Limit &amp;upload speed (%1):</source>
-        <translation type="unfinished">Riboti i&amp;šsiuntimo greitį (%1):</translation>
+        <source>Limit &amp;upload speed:</source>
+        <translation type="unfinished">Riboti i&amp;šsiuntimo greitį:</translation>
     </message>
     <message>
         <location line="+23"/>
@@ -505,7 +514,7 @@
         <translation type="unfinished">&amp;Pasyvumas:</translation>
     </message>
     <message>
-        <location line="+33"/>
+        <location line="+36"/>
         <source>Peer Connections</source>
         <translation type="unfinished">Siuntėjų ryšiai</translation>
     </message>
@@ -518,7 +527,17 @@
 <context>
     <name>FileAdded</name>
     <message>
-        <location filename="../session.cc" line="+117"/>
+        <location filename="../session.cc" line="+108"/>
+        <source>Add Torrent</source>
+        <translation type="unfinished">Torento pridėjimas</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>&lt;p&gt;&lt;b&gt;Unable to add &quot;%1&quot;.&lt;/b&gt;&lt;/p&gt;&lt;p&gt;It is a duplicate of &quot;%2&quot; which is already added.&lt;/p&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+19"/>
         <source>Error Adding Torrent</source>
         <translation>Klaida pridedant torentą</translation>
     </message>
@@ -577,7 +596,7 @@
 <context>
     <name>FilterBar</name>
     <message>
-        <location filename="../filterbar.cc" line="+248"/>
+        <location filename="../filterbar.cc" line="+304"/>
         <source>Active</source>
         <translation>aktyvius</translation>
     </message>
@@ -598,7 +617,7 @@
         <translation>klaidas</translation>
     </message>
     <message numerus="yes">
-        <location line="+350"/>
+        <location line="+341"/>
         <source>Show %Ln of:</source>
         <translation type="unfinished">
             <numerusform></numerusform>
@@ -607,7 +626,7 @@
         </translation>
     </message>
     <message>
-        <location line="-358"/>
+        <location line="-349"/>
         <source>Finished</source>
         <translation>užbaigtus</translation>
     </message>
@@ -622,12 +641,12 @@
         <translation>skleidžiamus</translation>
     </message>
     <message>
-        <location line="+364"/>
+        <location line="+355"/>
         <source>Show:</source>
         <translation>Rodyti:</translation>
     </message>
     <message>
-        <location line="-352"/>
+        <location line="-343"/>
         <source>Verifying</source>
         <translation>tikrinamus</translation>
     </message>
@@ -1387,7 +1406,7 @@ Papildomą pirminį URL adresą galite įvesti, palikę prieš jį tuščią eil
 <context>
     <name>MyApp</name>
     <message>
-        <location filename="../app.cc" line="+277"/>
+        <location filename="../app.cc" line="+304"/>
         <source>Transmission is a file sharing program. When you run a torrent, its data will be made available to others by means of upload. Any content you share is your sole responsibility.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1488,7 +1507,7 @@ Papildomą pirminį URL adresą galite įvesti, palikę prieš jį tuščią eil
 <context>
     <name>PrefsDialog</name>
     <message>
-        <location filename="../prefs-dialog.cc" line="+444"/>
+        <location filename="../prefs-dialog.cc" line="+449"/>
         <source>&amp;Encryption mode:</source>
         <translation>Pozicija dėl &amp;šifravimo:</translation>
     </message>
@@ -1498,12 +1517,12 @@ Papildomą pirminį URL adresą galite įvesti, palikę prieš jį tuščią eil
         <translation>Šiomis &amp;dienomis:</translation>
     </message>
     <message>
-        <location line="-92"/>
+        <location line="-97"/>
         <source>&amp;Open web client</source>
         <translation>&amp;Atverti saityno sąsają</translation>
     </message>
     <message>
-        <location line="+177"/>
+        <location line="+182"/>
         <source>&amp;Port for incoming connections:</source>
         <translation>Įeinantiems ryšiams naudotinas &amp;prievadas:</translation>
     </message>
@@ -1518,12 +1537,12 @@ Papildomą pirminį URL adresą galite įvesti, palikę prieš jį tuščią eil
         <translation>At&amp;naujinti</translation>
     </message>
     <message>
-        <location line="-268"/>
+        <location line="-273"/>
         <source>&amp;Username:</source>
         <translation>Naudotojo &amp;vardas:</translation>
     </message>
     <message>
-        <location line="+73"/>
+        <location line="+78"/>
         <source>&amp;to</source>
         <translation>i&amp;ki</translation>
     </message>
@@ -1542,7 +1561,7 @@ Papildomą pirminį URL adresą galite įvesti, palikę prieš jį tuščią eil
         </translation>
     </message>
     <message numerus="yes">
-        <location line="+306"/>
+        <location line="+316"/>
         <source>&lt;i&gt;Blocklist contains %Ln rules&lt;/i&gt;</source>
         <translation>
             <numerusform>&lt;i&gt;Blokavimo sąraše yra %Ln taisyklė&lt;/i&gt;</numerusform>
@@ -1551,53 +1570,53 @@ Papildomą pirminį URL adresą galite įvesti, palikę prieš jį tuščią eil
         </translation>
     </message>
     <message>
-        <location line="-466"/>
+        <location line="-478"/>
         <source>&lt;small&gt;Override normal speed limits manually or at scheduled times&lt;/small&gt;</source>
         <translation>&lt;small&gt;Taikomi vietoje įprastų greičio ribojimų rankiniu būdu arba numatytuoju laiku&lt;/small&gt;</translation>
     </message>
     <message>
-        <location line="+325"/>
+        <location line="+337"/>
         <source>Adding</source>
         <translation>Pridėjimas</translation>
     </message>
     <message>
-        <location line="-375"/>
+        <location line="-390"/>
         <source>Addresses:</source>
         <translation>Ad&amp;resai:</translation>
     </message>
     <message>
-        <location line="+244"/>
+        <location line="+249"/>
         <source>Allow encryption</source>
         <translation>leisti šifravimą</translation>
     </message>
     <message>
-        <location line="+169"/>
+        <location line="+179"/>
         <source>Append &quot;.&amp;part&quot; to incomplete files&apos; names</source>
         <translation>Nebaigtų failų varduose naudoti „.part“ &amp;prievardį</translation>
     </message>
     <message>
-        <location line="-160"/>
+        <location line="-170"/>
         <source>Blocklist</source>
         <translation>Blokavimo sąrašas</translation>
     </message>
     <message>
-        <location line="+170"/>
+        <location line="+180"/>
         <source>Call scrip&amp;t when torrent is completed:</source>
         <translation>Baigus siųsti torentą, vykdyti s&amp;cenarijų:</translation>
     </message>
     <message>
-        <location line="-243"/>
+        <location line="-253"/>
         <source>DHT is a tool for finding peers without a tracker.</source>
         <translation>DHT – tai priemonė, skirta siuntėjams be sekiklio rasti.</translation>
     </message>
     <message>
         <location line="-74"/>
-        <location line="+348"/>
+        <location line="+358"/>
         <source>Desktop</source>
         <translation>Aplinka</translation>
     </message>
     <message>
-        <location line="-183"/>
+        <location line="-193"/>
         <source>Enable &amp;automatic updates</source>
         <translation>Įjungti &amp;automatinius naujinimus</translation>
     </message>
@@ -1617,7 +1636,7 @@ Papildomą pirminį URL adresą galite įvesti, palikę prieš jį tuščią eil
         <translation>kasdien</translation>
     </message>
     <message>
-        <location line="-98"/>
+        <location line="-103"/>
         <source>Remote Control</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1637,32 +1656,32 @@ Papildomą pirminį URL adresą galite įvesti, palikę prieš jį tuščią eil
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+29"/>
-        <source>&amp;Upload (%1):</source>
+        <location line="+30"/>
+        <source>&amp;Upload:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+5"/>
-        <source>&amp;Download (%1):</source>
+        <location line="+6"/>
+        <source>&amp;Download:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+12"/>
+        <location line="+13"/>
         <source>Alternative Speed Limits</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+9"/>
-        <source>U&amp;pload (%1):</source>
+        <source>U&amp;pload:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+4"/>
-        <source>Do&amp;wnload (%1):</source>
+        <location line="+5"/>
+        <source>Do&amp;wnload:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+30"/>
+        <location line="+31"/>
         <source>Friday</source>
         <translation>penktadieniais</translation>
     </message>
@@ -1706,8 +1725,17 @@ Papildomą pirminį URL adresą galite įvesti, palikę prieš jį tuščią eil
         <source>Encryption</source>
         <translation type="unfinished"></translation>
     </message>
+    <message numerus="yes">
+        <location line="+96"/>
+        <source> minute(s)</source>
+        <translation>
+            <numerusform> minutė</numerusform>
+            <numerusform> minutės</numerusform>
+            <numerusform> minučių</numerusform>
+        </translation>
+    </message>
     <message>
-        <location line="+136"/>
+        <location line="+50"/>
         <source>Automatically add .torrent files &amp;from:</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1747,17 +1775,17 @@ Papildomą pirminį URL adresą galite įvesti, palikę prieš jį tuščią eil
         <translation>Įrašyti &amp;nebaigtus torentus į:</translation>
     </message>
     <message>
-        <location line="-233"/>
+        <location line="-243"/>
         <source>LPD is a tool for finding peers on your local network.</source>
         <translation>VSA – tai priemonė, skirta siuntėjams Jūsų vietiniame tinkle rasti.</translation>
     </message>
     <message>
-        <location line="+164"/>
+        <location line="+172"/>
         <source>Limits</source>
         <translation>Ribojimai</translation>
     </message>
     <message>
-        <location line="-177"/>
+        <location line="-185"/>
         <source>Maximum peers &amp;overall:</source>
         <translation>&amp;Daugiausiai galimų siuntėjų iš viso:</translation>
     </message>
@@ -1772,7 +1800,7 @@ Papildomą pirminį URL adresą galite įvesti, palikę prieš jį tuščią eil
         <translation>pirmadieniais</translation>
     </message>
     <message>
-        <location line="+370"/>
+        <location line="+380"/>
         <source>Network</source>
         <translation>Tinklas</translation>
     </message>
@@ -1787,7 +1815,7 @@ Papildomą pirminį URL adresą galite įvesti, palikę prieš jį tuščią eil
         <translation>Nepalaikoma nuotolinių seansų</translation>
     </message>
     <message>
-        <location line="-313"/>
+        <location line="-323"/>
         <source>Options</source>
         <translation>Nuostatos</translation>
     </message>
@@ -1797,12 +1825,12 @@ Papildomą pirminį URL adresą galite įvesti, palikę prieš jį tuščią eil
         <translation>PEX – tai priemonė, skirta apsikeisti siuntėjų sąrašais su siuntėjais, prie kurių esate prisijungę.</translation>
     </message>
     <message>
-        <location line="-182"/>
+        <location line="-187"/>
         <source>Pass&amp;word:</source>
         <translation>&amp;Slaptažodis:</translation>
     </message>
     <message>
-        <location line="+167"/>
+        <location line="+172"/>
         <source>Pick a &amp;random port every time Transmission is started</source>
         <translation>Pasirinkti &amp;atsitiktinį prievadą kaskart paleidus „Transmission“</translation>
     </message>
@@ -1822,7 +1850,7 @@ Papildomą pirminį URL adresą galite įvesti, palikę prieš jį tuščią eil
         <translation>teikti pirmenybę šifravimui</translation>
     </message>
     <message>
-        <location line="+205"/>
+        <location line="+215"/>
         <source>Downloading</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1837,7 +1865,7 @@ Papildomą pirminį URL adresą galite įvesti, palikę prieš jį tuščią eil
         <translation>Privatumas</translation>
     </message>
     <message>
-        <location line="-206"/>
+        <location line="-216"/>
         <source>Require encryption</source>
         <translation>reikalauti šifravimo</translation>
     </message>
@@ -1847,12 +1875,12 @@ Papildomą pirminį URL adresą galite įvesti, palikę prieš jį tuščią eil
         <translation>šeštadieniais</translation>
     </message>
     <message>
-        <location line="+307"/>
+        <location line="+317"/>
         <source>Save to &amp;Location:</source>
         <translation>Įrašyti &amp;vietoje:</translation>
     </message>
     <message>
-        <location line="-108"/>
+        <location line="-118"/>
         <source>Select &quot;Torrent Done&quot; Script</source>
         <translation>Parinkite „torentas baigtas“ scenarijų</translation>
     </message>
@@ -1877,33 +1905,33 @@ Papildomą pirminį URL adresą galite įvesti, palikę prieš jį tuščią eil
         <translation>Rodyti „Transmission“ piktogramą pranešimų &amp;srityje</translation>
     </message>
     <message>
-        <location line="+341"/>
+        <location line="+351"/>
         <source>Speed</source>
         <translation>Greitis</translation>
     </message>
     <message>
-        <location line="-425"/>
+        <location line="-439"/>
         <source>Speed Limits</source>
         <translation>Greičio ribojimai</translation>
     </message>
     <message>
-        <location line="+129"/>
-        <location line="+410"/>
+        <location line="+133"/>
+        <location line="+420"/>
         <source>Status unknown</source>
         <translation>Būsena nežinoma</translation>
     </message>
     <message>
-        <location line="-215"/>
+        <location line="-217"/>
         <source>Stop seeding at &amp;ratio:</source>
         <translation>Nebeskleisti esant &amp;santykiui:</translation>
     </message>
     <message>
         <location line="+5"/>
-        <source>Stop seeding if idle for &amp;N minutes:</source>
-        <translation>Nebeskleisti jei pasyvus N &amp;minučių:</translation>
+        <source>Stop seedi&amp;ng if idle for:</source>
+        <translation type="unfinished">Nebeskleisti jei &amp;pasyvus:</translation>
     </message>
     <message>
-        <location line="-271"/>
+        <location line="-279"/>
         <source>Sunday</source>
         <translation>sekmadieniais</translation>
     </message>
@@ -1918,12 +1946,12 @@ Papildomą pirminį URL adresą galite įvesti, palikę prieš jį tuščią eil
         <translation>ketvirtadieniais</translation>
     </message>
     <message>
-        <location line="+360"/>
+        <location line="+370"/>
         <source>Transmission Preferences</source>
         <translation>„Transmission“ nuostatos</translation>
     </message>
     <message>
-        <location line="-362"/>
+        <location line="-372"/>
         <source>Tuesday</source>
         <translation>antradieniais</translation>
     </message>
@@ -1938,12 +1966,12 @@ Papildomą pirminį URL adresą galite įvesti, palikę prieš jį tuščią eil
         <translation>Naudoti &amp;vietinių siuntėjų aptikimo metodą papildomiems siuntėjams rasti</translation>
     </message>
     <message>
-        <location line="-189"/>
+        <location line="-194"/>
         <source>Use &amp;authentication</source>
         <translation>Reikalauti &amp;tapatybės nustatymo</translation>
     </message>
     <message>
-        <location line="+185"/>
+        <location line="+190"/>
         <source>Use PE&amp;X to find more peers</source>
         <translation>Naudoti PE&amp;X papildomiems siuntėjams rasti</translation>
     </message>
@@ -1978,7 +2006,7 @@ Papildomą pirminį URL adresą galite įvesti, palikę prieš jį tuščią eil
         <translation>Tikrinamas TCP prievadas…</translation>
     </message>
     <message>
-        <location line="+273"/>
+        <location line="+283"/>
         <source>Incomplete</source>
         <translation>Nebaigtas</translation>
     </message>
@@ -2045,47 +2073,47 @@ Papildomą pirminį URL adresą galite įvesti, palikę prieš jį tuščią eil
 <context>
     <name>SessionDialog</name>
     <message>
-        <location filename="../session-dialog.cc" line="+92"/>
+        <location filename="../session-dialog.ui" line="+108"/>
         <source>&amp;Authentication required</source>
         <translation>Reikia patvirtinti &amp;tapatybę</translation>
     </message>
     <message>
-        <location line="-7"/>
+        <location line="-39"/>
         <source>&amp;Host:</source>
         <translation>&amp;Mazgas:</translation>
     </message>
     <message>
-        <location line="+5"/>
+        <location line="+16"/>
         <source>&amp;Port:</source>
         <translation>&amp;Prievadas:</translation>
     </message>
     <message>
-        <location line="+9"/>
+        <location line="+33"/>
         <source>&amp;Username:</source>
         <translation>&amp;Naudotojo vardas:</translation>
     </message>
     <message>
-        <location line="-31"/>
+        <location line="-104"/>
         <source>Change Session</source>
         <translation>Seanso keitimas</translation>
     </message>
     <message>
-        <location line="+11"/>
+        <location line="+45"/>
         <source>Connect to &amp;Remote Session</source>
         <translation>&amp;Jungtis prie nuotolinio seanso</translation>
     </message>
     <message>
-        <location line="+25"/>
+        <location line="+75"/>
         <source>Pass&amp;word:</source>
         <translation>&amp;Slaptažodis:</translation>
     </message>
     <message>
-        <location line="-30"/>
+        <location line="-95"/>
         <source>Source</source>
         <translation>Seanso kilmė</translation>
     </message>
     <message>
-        <location line="+1"/>
+        <location line="+10"/>
         <source>Start &amp;Local Session</source>
         <translation>Pradėti &amp;vietinį seansą</translation>
     </message>
@@ -2110,7 +2138,7 @@ Papildomą pirminį URL adresą galite įvesti, palikę prieš jį tuščią eil
         <translation>Naudojimosi trukmė:</translation>
     </message>
     <message numerus="yes">
-        <location filename="../stats-dialog.cc" line="+66"/>
+        <location filename="../stats-dialog.cc" line="+65"/>
         <source>Started %n time(s)</source>
         <translation type="unfinished">
             <numerusform></numerusform>

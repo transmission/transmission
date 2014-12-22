@@ -87,6 +87,7 @@ class Details: public QDialog
     void onUploadLimitedToggled (bool);
     void onRatioModeChanged (int);
     void onIdleModeChanged (int);
+    void onIdleLimitChanged ();
     void onShowTrackerScrapesToggled (bool);
     void onShowBackupTrackersToggled (bool);
     void onTrackerSelectionChanged ();

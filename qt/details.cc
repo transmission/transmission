@@ -835,6 +835,7 @@ Details::refresh ()
       ui.idleSpin->setVisible (uniform && (baselineInt == TR_RATIOLIMIT_SINGLE));
 
       setIfIdle (ui.idleSpin, tor->seedIdleLimit ());
+      onIdleLimitChanged ();
     }
 
   ///
@@ -1006,6 +1007,14 @@ Details::onIdleModeChanged (int index)
 }
 
 void
+Details::onIdleLimitChanged ()
+{
+  const QString unitsSuffix = tr (" minute(s)", 0, ui.idleSpin->value ());
+  if (ui.idleSpin->suffix () != unitsSuffix)
+    ui.idleSpin->setSuffix (unitsSuffix);
+}
+
+void
 Details::onRatioModeChanged (int index)
 {
   const int val = ui.ratioCombo->itemData (index).toInt ();
@@ -1135,8 +1144,8 @@ Details::initOptionsTab ()
 {
   const QString speed_K_str = Formatter::unitStr (Formatter::SPEED, Formatter::KB);
 
-  ui.singleDownCheck->setText (ui.singleDownCheck->text ().arg(speed_K_str));
-  ui.singleUpCheck->setText (ui.singleUpCheck->text ().arg(speed_K_str));
+  ui.singleDownSpin->setSuffix (QString::fromLatin1 (" %1").arg (speed_K_str));
+  ui.singleUpSpin->setSuffix (QString::fromLatin1 (" %1").arg (speed_K_str));
 
   ui.singleDownSpin->setProperty (PREF_KEY, TR_KEY_downloadLimit);
   ui.singleUpSpin->setProperty (PREF_KEY, TR_KEY_uploadLimit);
@@ -1152,9 +1161,9 @@ Details::initOptionsTab ()
   ui.ratioCombo->addItem (tr ("Seed regardless of ratio"), TR_RATIOLIMIT_UNLIMITED);
   ui.ratioCombo->addItem (tr ("Stop seeding at ratio:"),   TR_RATIOLIMIT_SINGLE);
 
-  ui.idleCombo->addItem (tr ("Use Global Settings"),                 TR_IDLELIMIT_GLOBAL);
-  ui.idleCombo->addItem (tr ("Seed regardless of activity"),         TR_IDLELIMIT_UNLIMITED);
-  ui.idleCombo->addItem (tr ("Stop seeding if idle for N minutes:"), TR_IDLELIMIT_SINGLE);
+  ui.idleCombo->addItem (tr ("Use Global Settings"),         TR_IDLELIMIT_GLOBAL);
+  ui.idleCombo->addItem (tr ("Seed regardless of activity"), TR_IDLELIMIT_UNLIMITED);
+  ui.idleCombo->addItem (tr ("Stop seeding if idle for:"),   TR_IDLELIMIT_SINGLE);
 
   connect (ui.sessionLimitCheck, SIGNAL (clicked (bool)), SLOT (onHonorsSessionLimitsToggled (bool)));
   connect (ui.singleDownCheck, SIGNAL (clicked (bool)), SLOT (onDownloadLimitedToggled (bool)));
@@ -1166,6 +1175,7 @@ Details::initOptionsTab ()
   connect (ui.ratioSpin, SIGNAL (editingFinished ()), SLOT (onSpinBoxEditingFinished ()));
   connect (ui.idleCombo, SIGNAL (currentIndexChanged (int)), SLOT (onIdleModeChanged (int)));
   connect (ui.idleSpin, SIGNAL (editingFinished ()), SLOT (onSpinBoxEditingFinished ()));
+  connect (ui.idleSpin, SIGNAL (valueChanged (int)), SLOT (onIdleLimitChanged ()));
   connect (ui.peerLimitSpin, SIGNAL (editingFinished ()), SLOT (onSpinBoxEditingFinished ()));
 }
 

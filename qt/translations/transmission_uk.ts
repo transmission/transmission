@@ -122,7 +122,7 @@
         <translation>Створено автором %1 у %2</translation>
     </message>
     <message>
-        <location line="+123"/>
+        <location line="+124"/>
         <location line="+23"/>
         <source>Encrypted connection</source>
         <translation>Шифроване з&apos;єднання</translation>
@@ -177,8 +177,17 @@
         <source>Peer is an incoming connection</source>
         <translation>Вузол є вхідним з’єднанням</translation>
     </message>
+    <message numerus="yes">
+        <location line="+114"/>
+        <source> minute(s)</source>
+        <translation>
+            <numerusform> хвилина</numerusform>
+            <numerusform> хвилини</numerusform>
+            <numerusform> хвилин</numerusform>
+        </translation>
+    </message>
     <message>
-        <location line="+151"/>
+        <location line="+45"/>
         <location line="+12"/>
         <location line="+34"/>
         <source>Error</source>
@@ -190,7 +199,7 @@
         <translation>Трекер вже існує.</translation>
     </message>
     <message>
-        <location line="-602"/>
+        <location line="-611"/>
         <source>%1 (100%)</source>
         <translation>%1 (100%)</translation>
     </message>
@@ -220,12 +229,12 @@
         <translation>н/д</translation>
     </message>
     <message>
-        <location line="+152"/>
+        <location line="+153"/>
         <source>Peer is connected over uTP</source>
         <translation>Вузол з&apos;єднано за протоколом µTP</translation>
     </message>
     <message>
-        <location line="+141"/>
+        <location line="+149"/>
         <source>Add URL </source>
         <translation>Додати посилання </translation>
     </message>
@@ -288,11 +297,11 @@
     </message>
     <message>
         <location line="+1"/>
-        <source>Stop seeding if idle for N minutes:</source>
-        <translation>Припинити поширення, якщо не буде активності (у хвилинах):</translation>
+        <source>Stop seeding if idle for:</source>
+        <translation type="unfinished">Припинити поширення, якщо не буде активності:</translation>
     </message>
     <message>
-        <location line="+56"/>
+        <location line="+57"/>
         <source>Up</source>
         <translation>Вивант</translation>
     </message>
@@ -476,13 +485,13 @@
     </message>
     <message>
         <location line="+10"/>
-        <source>Limit &amp;download speed (%1):</source>
-        <translation type="unfinished">Обмежити &amp;швидкість завантаження (%1):</translation>
+        <source>Limit &amp;download speed:</source>
+        <translation type="unfinished">Обмежити &amp;швидкість завантаження:</translation>
     </message>
     <message>
         <location line="+23"/>
-        <source>Limit &amp;upload speed (%1):</source>
-        <translation type="unfinished">Обмежити шв&amp;идкість відвантаження (%1):</translation>
+        <source>Limit &amp;upload speed:</source>
+        <translation type="unfinished">Обмежити шв&amp;идкість відвантаження:</translation>
     </message>
     <message>
         <location line="+23"/>
@@ -505,7 +514,7 @@
         <translation type="unfinished">&amp;Неактивність:</translation>
     </message>
     <message>
-        <location line="+33"/>
+        <location line="+36"/>
         <source>Peer Connections</source>
         <translation type="unfinished">Підключення вузлів</translation>
     </message>
@@ -518,7 +527,17 @@
 <context>
     <name>FileAdded</name>
     <message>
-        <location filename="../session.cc" line="+117"/>
+        <location filename="../session.cc" line="+108"/>
+        <source>Add Torrent</source>
+        <translation type="unfinished">Додати торент</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>&lt;p&gt;&lt;b&gt;Unable to add &quot;%1&quot;.&lt;/b&gt;&lt;/p&gt;&lt;p&gt;It is a duplicate of &quot;%2&quot; which is already added.&lt;/p&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+19"/>
         <source>Error Adding Torrent</source>
         <translation>Помилка під час додавання торенту</translation>
     </message>
@@ -577,7 +596,7 @@
 <context>
     <name>FilterBar</name>
     <message>
-        <location filename="../filterbar.cc" line="+241"/>
+        <location filename="../filterbar.cc" line="+297"/>
         <location line="+160"/>
         <source>All</source>
         <translation>Всі</translation>
@@ -608,7 +627,7 @@
         <translation>Завершено</translation>
     </message>
     <message numerus="yes">
-        <location line="+358"/>
+        <location line="+349"/>
         <source>Show %Ln of:</source>
         <translation>
             <numerusform>Показувати %Ln з:</numerusform>
@@ -617,7 +636,7 @@
         </translation>
     </message>
     <message>
-        <location line="-354"/>
+        <location line="-345"/>
         <source>Verifying</source>
         <translation>Перевірка</translation>
     </message>
@@ -627,7 +646,7 @@
         <translation>Помилка</translation>
     </message>
     <message>
-        <location line="+348"/>
+        <location line="+339"/>
         <source>Show:</source>
         <translation>Показувати:</translation>
     </message>
@@ -1388,7 +1407,7 @@ To add another primary URL, add it after a blank line.</source>
 <context>
     <name>MyApp</name>
     <message>
-        <location filename="../app.cc" line="+277"/>
+        <location filename="../app.cc" line="+304"/>
         <source>Transmission is a file sharing program. When you run a torrent, its data will be made available to others by means of upload. Any content you share is your sole responsibility.</source>
         <translation>Transmission — програма для поширення файлів. Дані завантаженого вами торента будуть доступні іншим користувачам, які зможуть завантажити ці дані на свої комп&apos;ютери. Повна відповідальність за ваші рішення та виконання законодавства вашої країни покладається на вас і лише на вас.</translation>
     </message>
@@ -1514,17 +1533,17 @@ To add another primary URL, add it after a blank line.</source>
         <translation>Адреси:</translation>
     </message>
     <message>
-        <location line="+24"/>
+        <location line="+25"/>
         <source>Speed Limits</source>
         <translation>Обмеження швидкості</translation>
     </message>
     <message>
-        <location line="+26"/>
+        <location line="+28"/>
         <source>&lt;small&gt;Override normal speed limits manually or at scheduled times&lt;/small&gt;</source>
         <translation>&lt;small&gt;Не дотримуватись обмежень швидкості при встановленні обмежень вручну або за розкладом&lt;/small&gt;</translation>
     </message>
     <message>
-        <location line="+11"/>
+        <location line="+13"/>
         <source>&amp;Scheduled times:</source>
         <translation>З&amp;гідно розкладу:</translation>
     </message>
@@ -1600,12 +1619,12 @@ To add another primary URL, add it after a blank line.</source>
     </message>
     <message>
         <location line="+5"/>
-        <location line="+410"/>
+        <location line="+420"/>
         <source>Status unknown</source>
         <translation>Невідомий статус</translation>
     </message>
     <message>
-        <location line="-402"/>
+        <location line="-412"/>
         <source>&amp;Port for incoming connections:</source>
         <translation>&amp;Порт для вхідних з’єднань:</translation>
     </message>
@@ -1629,8 +1648,17 @@ To add another primary URL, add it after a blank line.</source>
         <source>uTP is a tool for reducing network congestion.</source>
         <translation>µTP — інструмент для запобігання перевантаженню мережі.</translation>
     </message>
+    <message numerus="yes">
+        <location line="+161"/>
+        <source> minute(s)</source>
+        <translation>
+            <numerusform> хвилина</numerusform>
+            <numerusform> хвилини</numerusform>
+            <numerusform> хвилин</numerusform>
+        </translation>
+    </message>
     <message>
-        <location line="+201"/>
+        <location line="+50"/>
         <source>Automatically add .torrent files &amp;from:</source>
         <translation>Автоматично &amp;додавати торенти з:</translation>
     </message>
@@ -1689,17 +1717,17 @@ To add another primary URL, add it after a blank line.</source>
         </translation>
     </message>
     <message>
-        <location line="-353"/>
+        <location line="-363"/>
         <source>Pick a &amp;random port every time Transmission is started</source>
         <translation>Вибирати випадковий порт при кожному запу&amp;ску Transmission</translation>
     </message>
     <message>
-        <location line="+183"/>
+        <location line="+191"/>
         <source>Limits</source>
         <translation>Обмеження</translation>
     </message>
     <message>
-        <location line="-178"/>
+        <location line="-186"/>
         <source>Maximum peers per &amp;torrent:</source>
         <translation>Макс. кількість вузлів на &amp;торент:</translation>
     </message>
@@ -1748,23 +1776,23 @@ To add another primary URL, add it after a blank line.</source>
         <translation>Вимагати шифрування</translation>
     </message>
     <message>
-        <location line="+206"/>
+        <location line="+216"/>
         <source>Privacy</source>
         <translation>Конфіденційність</translation>
     </message>
     <message>
-        <location line="-385"/>
+        <location line="-395"/>
         <source>&amp;to</source>
         <translation>&amp;до</translation>
     </message>
     <message>
         <location line="+39"/>
-        <location line="+348"/>
+        <location line="+358"/>
         <source>Desktop</source>
         <translation>Робочий стіл</translation>
     </message>
     <message>
-        <location line="-346"/>
+        <location line="-356"/>
         <source>Show Transmission icon in the &amp;notification area</source>
         <translation>Показувати &amp;значок Transmission в зоні сповіщення</translation>
     </message>
@@ -1789,7 +1817,7 @@ To add another primary URL, add it after a blank line.</source>
         <translation>Режим &amp;шифрування:</translation>
     </message>
     <message>
-        <location line="-269"/>
+        <location line="-274"/>
         <source>Remote Control</source>
         <translation>Віддалене керування</translation>
     </message>
@@ -1809,32 +1837,32 @@ To add another primary URL, add it after a blank line.</source>
         <translation>Дозволити лише таким IP-&amp;адресам:</translation>
     </message>
     <message>
-        <location line="+29"/>
-        <source>&amp;Upload (%1):</source>
-        <translation>Ві&amp;двантаження (%1):</translation>
+        <location line="+30"/>
+        <source>&amp;Upload:</source>
+        <translation>Ві&amp;двантаження:</translation>
     </message>
     <message>
-        <location line="+5"/>
-        <source>&amp;Download (%1):</source>
-        <translation>З&amp;авантаження (%1):</translation>
+        <location line="+6"/>
+        <source>&amp;Download:</source>
+        <translation>З&amp;авантаження:</translation>
     </message>
     <message>
-        <location line="+12"/>
+        <location line="+13"/>
         <source>Alternative Speed Limits</source>
         <translation>Альтернативні обмеження швидкості</translation>
     </message>
     <message>
         <location line="+9"/>
-        <source>U&amp;pload (%1):</source>
-        <translation>Ві&amp;двантаження (%1):</translation>
+        <source>U&amp;pload:</source>
+        <translation>Ві&amp;двантаження:</translation>
     </message>
     <message>
-        <location line="+4"/>
-        <source>Do&amp;wnload (%1):</source>
-        <translation>З&amp;авантаження (%1):</translation>
+        <location line="+5"/>
+        <source>Do&amp;wnload:</source>
+        <translation>З&amp;авантаження:</translation>
     </message>
     <message>
-        <location line="+52"/>
+        <location line="+53"/>
         <source>Start &amp;minimized in notification area</source>
         <translation>Запускати зверненим у системний лоток</translation>
     </message>
@@ -1924,7 +1952,7 @@ To add another primary URL, add it after a blank line.</source>
         <translation>Виберіть призначення</translation>
     </message>
     <message>
-        <location line="+55"/>
+        <location line="+65"/>
         <source>Adding</source>
         <translation>Додавання</translation>
     </message>
@@ -1954,17 +1982,17 @@ To add another primary URL, add it after a blank line.</source>
         <translation>Виконати с&amp;ценарій, після завершення завантаження:</translation>
     </message>
     <message>
-        <location line="-75"/>
+        <location line="-77"/>
         <source>Stop seeding at &amp;ratio:</source>
         <translation>Припинити поширення при співвідношенні:</translation>
     </message>
     <message>
         <location line="+5"/>
-        <source>Stop seeding if idle for &amp;N minutes:</source>
-        <translation>Припинити поширення, якщо не буде активності (у хвилинах):</translation>
+        <source>Stop seedi&amp;ng if idle for:</source>
+        <translation type="unfinished">Припинити поширення, якщо не буде активності:</translation>
     </message>
     <message>
-        <location line="+93"/>
+        <location line="+95"/>
         <source>Transmission Preferences</source>
         <translation>Налаштування Transmission</translation>
     </message>
@@ -2046,47 +2074,47 @@ To add another primary URL, add it after a blank line.</source>
 <context>
     <name>SessionDialog</name>
     <message>
-        <location filename="../session-dialog.cc" line="+68"/>
+        <location filename="../session-dialog.ui" line="+14"/>
         <source>Change Session</source>
         <translation>Змінити сеанс</translation>
     </message>
     <message>
-        <location line="+6"/>
+        <location line="+25"/>
         <source>Source</source>
         <translation>Джерело</translation>
     </message>
     <message>
-        <location line="+1"/>
+        <location line="+10"/>
         <source>Start &amp;Local Session</source>
         <translation>Ро&amp;зпочати локальний сеанс</translation>
     </message>
     <message>
-        <location line="+4"/>
+        <location line="+10"/>
         <source>Connect to &amp;Remote Session</source>
         <translation>Під&amp;ключитись до віддаленого сеансу</translation>
     </message>
     <message>
-        <location line="+6"/>
+        <location line="+10"/>
         <source>&amp;Host:</source>
         <translation>&amp;Хост:</translation>
     </message>
     <message>
-        <location line="+5"/>
+        <location line="+16"/>
         <source>&amp;Port:</source>
         <translation>&amp;Порт:</translation>
     </message>
     <message>
-        <location line="+2"/>
+        <location line="+23"/>
         <source>&amp;Authentication required</source>
         <translation>Необхідна ав&amp;торизація</translation>
     </message>
     <message>
-        <location line="+7"/>
+        <location line="+10"/>
         <source>&amp;Username:</source>
         <translation>&amp;Користувач:</translation>
     </message>
     <message>
-        <location line="+5"/>
+        <location line="+16"/>
         <source>Pass&amp;word:</source>
         <translation>&amp;Пароль:</translation>
     </message>
@@ -2133,7 +2161,7 @@ To add another primary URL, add it after a blank line.</source>
         <translation>Загалом</translation>
     </message>
     <message numerus="yes">
-        <location filename="../stats-dialog.cc" line="+66"/>
+        <location filename="../stats-dialog.cc" line="+65"/>
         <source>Started %n time(s)</source>
         <translation>
             <numerusform>Запущено %n раз</numerusform>

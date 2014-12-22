@@ -120,7 +120,7 @@
         <translation>Criado pelo %1 em %2</translation>
     </message>
     <message>
-        <location line="+123"/>
+        <location line="+124"/>
         <location line="+23"/>
         <source>Encrypted connection</source>
         <translation>Conexão criptografada</translation>
@@ -180,8 +180,16 @@
         <source>Peer is connected over uTP</source>
         <translation type="unfinished"></translation>
     </message>
+    <message numerus="yes">
+        <location line="+113"/>
+        <source> minute(s)</source>
+        <translation>
+            <numerusform> minuto</numerusform>
+            <numerusform> minutos</numerusform>
+        </translation>
+    </message>
     <message>
-        <location line="+150"/>
+        <location line="+45"/>
         <location line="+12"/>
         <location line="+34"/>
         <source>Error</source>
@@ -193,7 +201,7 @@
         <translation>O rastreador já existe</translation>
     </message>
     <message>
-        <location line="-602"/>
+        <location line="-611"/>
         <source>%1 (100%)</source>
         <translation type="unfinished"></translation>
     </message>
@@ -223,7 +231,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+293"/>
+        <location line="+302"/>
         <source>Add URL </source>
         <translation type="unfinished"></translation>
     </message>
@@ -286,11 +294,11 @@
     </message>
     <message>
         <location line="+1"/>
-        <source>Stop seeding if idle for N minutes:</source>
-        <translation>Parar de semear se ocioso por N minutos:</translation>
+        <source>Stop seeding if idle for:</source>
+        <translation type="unfinished">Parar de semear se ocioso por:</translation>
     </message>
     <message>
-        <location line="+56"/>
+        <location line="+57"/>
         <source>Up</source>
         <translation>Enviando</translation>
     </message>
@@ -474,13 +482,13 @@
     </message>
     <message>
         <location line="+10"/>
-        <source>Limit &amp;download speed (%1):</source>
-        <translation type="unfinished">Limitar velocidade de download (%1):</translation>
+        <source>Limit &amp;download speed:</source>
+        <translation type="unfinished">Limitar velocidade de download:</translation>
     </message>
     <message>
         <location line="+23"/>
-        <source>Limit &amp;upload speed (%1):</source>
-        <translation type="unfinished">Limitar velocidade de upload (%1):</translation>
+        <source>Limit &amp;upload speed:</source>
+        <translation type="unfinished">Limitar velocidade de upload:</translation>
     </message>
     <message>
         <location line="+23"/>
@@ -503,7 +511,7 @@
         <translation type="unfinished">Ocioso:</translation>
     </message>
     <message>
-        <location line="+33"/>
+        <location line="+36"/>
         <source>Peer Connections</source>
         <translation type="unfinished">Conexões da Fonte</translation>
     </message>
@@ -516,7 +524,17 @@
 <context>
     <name>FileAdded</name>
     <message>
-        <location filename="../session.cc" line="+117"/>
+        <location filename="../session.cc" line="+108"/>
+        <source>Add Torrent</source>
+        <translation type="unfinished">Adicionar Torrent</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>&lt;p&gt;&lt;b&gt;Unable to add &quot;%1&quot;.&lt;/b&gt;&lt;/p&gt;&lt;p&gt;It is a duplicate of &quot;%2&quot; which is already added.&lt;/p&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+19"/>
         <source>Error Adding Torrent</source>
         <translation type="unfinished"></translation>
     </message>
@@ -575,7 +593,7 @@
 <context>
     <name>FilterBar</name>
     <message>
-        <location filename="../filterbar.cc" line="+241"/>
+        <location filename="../filterbar.cc" line="+297"/>
         <location line="+160"/>
         <source>All</source>
         <translation type="unfinished"></translation>
@@ -606,7 +624,7 @@
         <translation type="unfinished">Concluído</translation>
     </message>
     <message numerus="yes">
-        <location line="+358"/>
+        <location line="+349"/>
         <source>Show %Ln of:</source>
         <translation type="unfinished">
             <numerusform></numerusform>
@@ -614,7 +632,7 @@
         </translation>
     </message>
     <message>
-        <location line="-354"/>
+        <location line="-345"/>
         <source>Verifying</source>
         <translation type="unfinished"></translation>
     </message>
@@ -624,7 +642,7 @@
         <translation type="unfinished">Erro</translation>
     </message>
     <message>
-        <location line="+348"/>
+        <location line="+339"/>
         <source>Show:</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1379,7 +1397,7 @@ Adicione outra URL primária depois de uma linha em branco.</translation>
 <context>
     <name>MyApp</name>
     <message>
-        <location filename="../app.cc" line="+277"/>
+        <location filename="../app.cc" line="+304"/>
         <source>Transmission is a file sharing program. When you run a torrent, its data will be made available to others by means of upload. Any content you share is your sole responsibility.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1505,17 +1523,17 @@ Adicione outra URL primária depois de uma linha em branco.</translation>
         <translation>Endereços:</translation>
     </message>
     <message>
-        <location line="+24"/>
+        <location line="+25"/>
         <source>Speed Limits</source>
         <translation>Limites de Velocidade</translation>
     </message>
     <message>
-        <location line="+26"/>
+        <location line="+28"/>
         <source>&lt;small&gt;Override normal speed limits manually or at scheduled times&lt;/small&gt;</source>
         <translation>&lt;small&gt;Sobrepõe os limites normais manualmente ou em tempos programados&lt;/small&gt;</translation>
     </message>
     <message>
-        <location line="+11"/>
+        <location line="+13"/>
         <source>&amp;Scheduled times:</source>
         <translation>Agendar:</translation>
     </message>
@@ -1591,12 +1609,12 @@ Adicione outra URL primária depois de uma linha em branco.</translation>
     </message>
     <message>
         <location line="+5"/>
-        <location line="+410"/>
+        <location line="+420"/>
         <source>Status unknown</source>
         <translation>Estado desconhecido</translation>
     </message>
     <message>
-        <location line="-402"/>
+        <location line="-412"/>
         <source>&amp;Port for incoming connections:</source>
         <translation>Porta para conexões de entrada:</translation>
     </message>
@@ -1620,8 +1638,16 @@ Adicione outra URL primária depois de uma linha em branco.</translation>
         <source>uTP is a tool for reducing network congestion.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message numerus="yes">
+        <location line="+161"/>
+        <source> minute(s)</source>
+        <translation>
+            <numerusform> minuto</numerusform>
+            <numerusform> minutos</numerusform>
+        </translation>
+    </message>
     <message>
-        <location line="+201"/>
+        <location line="+50"/>
         <source>Automatically add .torrent files &amp;from:</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1679,17 +1705,17 @@ Adicione outra URL primária depois de uma linha em branco.</translation>
         </translation>
     </message>
     <message>
-        <location line="-353"/>
+        <location line="-363"/>
         <source>Pick a &amp;random port every time Transmission is started</source>
         <translation>Usar uma porta aleatória quando iniciar</translation>
     </message>
     <message>
-        <location line="+183"/>
+        <location line="+191"/>
         <source>Limits</source>
         <translation>Limites</translation>
     </message>
     <message>
-        <location line="-178"/>
+        <location line="-186"/>
         <source>Maximum peers per &amp;torrent:</source>
         <translation>Máximo de fontes por torrent:</translation>
     </message>
@@ -1737,23 +1763,23 @@ Adicione outra URL primária depois de uma linha em branco.</translation>
         <translation>Exigir</translation>
     </message>
     <message>
-        <location line="+206"/>
+        <location line="+216"/>
         <source>Privacy</source>
         <translation>Privacidade</translation>
     </message>
     <message>
-        <location line="-385"/>
+        <location line="-395"/>
         <source>&amp;to</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+39"/>
-        <location line="+348"/>
+        <location line="+358"/>
         <source>Desktop</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-346"/>
+        <location line="-356"/>
         <source>Show Transmission icon in the &amp;notification area</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1778,7 +1804,7 @@ Adicione outra URL primária depois de uma linha em branco.</translation>
         <translation>Criptografia:</translation>
     </message>
     <message>
-        <location line="-269"/>
+        <location line="-274"/>
         <source>Remote Control</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1798,32 +1824,32 @@ Adicione outra URL primária depois de uma linha em branco.</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+29"/>
-        <source>&amp;Upload (%1):</source>
+        <location line="+30"/>
+        <source>&amp;Upload:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+5"/>
-        <source>&amp;Download (%1):</source>
+        <location line="+6"/>
+        <source>&amp;Download:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+12"/>
+        <location line="+13"/>
         <source>Alternative Speed Limits</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+9"/>
-        <source>U&amp;pload (%1):</source>
+        <source>U&amp;pload:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+4"/>
-        <source>Do&amp;wnload (%1):</source>
+        <location line="+5"/>
+        <source>Do&amp;wnload:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+52"/>
+        <location line="+53"/>
         <source>Start &amp;minimized in notification area</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1913,7 +1939,7 @@ Adicione outra URL primária depois de uma linha em branco.</translation>
         <translation>Seleciona o Destino</translation>
     </message>
     <message>
-        <location line="+55"/>
+        <location line="+65"/>
         <source>Adding</source>
         <translation>Adicionando</translation>
     </message>
@@ -1943,17 +1969,17 @@ Adicione outra URL primária depois de uma linha em branco.</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-75"/>
+        <location line="-77"/>
         <source>Stop seeding at &amp;ratio:</source>
         <translation>Parar de semear na proporção:</translation>
     </message>
     <message>
         <location line="+5"/>
-        <source>Stop seeding if idle for &amp;N minutes:</source>
-        <translation>Parar de semear se ocioso por N minutos:</translation>
+        <source>Stop seedi&amp;ng if idle for:</source>
+        <translation type="unfinished">Parar de semear se ocioso por:</translation>
     </message>
     <message>
-        <location line="+93"/>
+        <location line="+95"/>
         <source>Transmission Preferences</source>
         <translation>Preferências do Transmission</translation>
     </message>
@@ -2035,47 +2061,47 @@ Adicione outra URL primária depois de uma linha em branco.</translation>
 <context>
     <name>SessionDialog</name>
     <message>
-        <location filename="../session-dialog.cc" line="+68"/>
+        <location filename="../session-dialog.ui" line="+14"/>
         <source>Change Session</source>
         <translation>Alterar Sessão</translation>
     </message>
     <message>
-        <location line="+6"/>
+        <location line="+25"/>
         <source>Source</source>
         <translation>Fonte</translation>
     </message>
     <message>
-        <location line="+1"/>
+        <location line="+10"/>
         <source>Start &amp;Local Session</source>
         <translation>Iniciar Sessão Local</translation>
     </message>
     <message>
-        <location line="+4"/>
+        <location line="+10"/>
         <source>Connect to &amp;Remote Session</source>
         <translation>Conectar numa Sessão Remota</translation>
     </message>
     <message>
-        <location line="+6"/>
+        <location line="+10"/>
         <source>&amp;Host:</source>
         <translation>Servidor:</translation>
     </message>
     <message>
-        <location line="+5"/>
+        <location line="+16"/>
         <source>&amp;Port:</source>
         <translation>Porta:</translation>
     </message>
     <message>
-        <location line="+2"/>
+        <location line="+23"/>
         <source>&amp;Authentication required</source>
         <translation>Requer autenticação</translation>
     </message>
     <message>
-        <location line="+7"/>
+        <location line="+10"/>
         <source>&amp;Username:</source>
         <translation>Usuário:</translation>
     </message>
     <message>
-        <location line="+5"/>
+        <location line="+16"/>
         <source>Pass&amp;word:</source>
         <translation>Senha:</translation>
     </message>
@@ -2122,7 +2148,7 @@ Adicione outra URL primária depois de uma linha em branco.</translation>
         <translation>Total</translation>
     </message>
     <message numerus="yes">
-        <location filename="../stats-dialog.cc" line="+66"/>
+        <location filename="../stats-dialog.cc" line="+65"/>
         <source>Started %n time(s)</source>
         <translation type="unfinished">
             <numerusform></numerusform>
