@@ -12,23 +12,22 @@
 
 #include <QDialog>
 
+#include "ui_about.h"
+
 class AboutDialog: public QDialog
 {
     Q_OBJECT
 
-  private:
-    QDialog * myLicenseDialog;
-
   public:
     AboutDialog (QWidget * parent = 0);
     ~AboutDialog () {}
-    QWidget * createAboutTab ();
-    QWidget * createAuthorsTab ();
-    QWidget * createLicenseTab ();
 
   public slots:
     void showCredits ();
 
+  private:
+    QDialog * myLicenseDialog;
+    Ui::AboutDialog ui;
 };
 
 #endif

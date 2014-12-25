@@ -46,7 +46,8 @@ TRANSLATIONS += translations/transmission_en.ts \
                 translations/transmission_ru.ts \
                 translations/transmission_uk.ts
 
-FORMS += details.ui \
+FORMS += about.ui \
+         details.ui \
          mainwin.ui \
          session-dialog.ui \
          stats-dialog.ui
