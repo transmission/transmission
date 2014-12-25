@@ -5,27 +5,27 @@
 <context>
     <name>AboutDialog</name>
     <message>
-        <location filename="../about.cc" line="+34"/>
+        <location filename="../about.ui" line="+14"/>
         <source>About Transmission</source>
         <translation>Acerca de Transmission</translation>
     </message>
     <message>
-        <location line="+12"/>
-        <source>&lt;big&gt;Transmission %1&lt;/big&gt;</source>
-        <translation>&lt;big&gt;Transmission %1&lt;/big&gt;</translation>
+        <location filename="../about.cc" line="+27"/>
+        <source>&lt;big&gt;&lt;b&gt;Transmission %1&lt;/b&gt;&lt;/big&gt;</source>
+        <translation>&lt;big&gt;&lt;b&gt;Transmission %1&lt;/b&gt;&lt;/big&gt;</translation>
     </message>
     <message>
-        <location line="+6"/>
+        <location filename="../about.ui" line="+26"/>
         <source>A fast and easy BitTorrent client</source>
         <translation>Un cliente de bittorrent rápido y fácil</translation>
     </message>
     <message>
-        <location line="+5"/>
+        <location line="+10"/>
         <source>Copyright (c) The Transmission Project</source>
         <translation>Derechos de Autor (c) The Transmission Project</translation>
     </message>
     <message>
-        <location line="+14"/>
+        <location filename="../about.cc" line="+4"/>
         <source>C&amp;redits</source>
         <translation>C&amp;réditos</translation>
     </message>
@@ -35,7 +35,7 @@
         <translation>&amp;Licencia</translation>
     </message>
     <message>
-        <location line="+15"/>
+        <location line="+12"/>
         <source>Credits</source>
         <translation>Créditos</translation>
     </message>
@@ -1014,7 +1014,7 @@
         <translation>Ctrl+Q</translation>
     </message>
     <message>
-        <location line="+5"/>
+        <location line="+8"/>
         <source>&amp;Select All</source>
         <translation>&amp;Seleccionar todos</translation>
     </message>
@@ -1039,7 +1039,7 @@
         <translation>&amp;Preferencias</translation>
     </message>
     <message>
-        <location line="+8"/>
+        <location line="+11"/>
         <source>&amp;Compact View</source>
         <translation>Vista &amp;Compacta</translation>
     </message>
@@ -1140,7 +1140,7 @@
         <translation>&amp;Acerca</translation>
     </message>
     <message>
-        <location line="+8"/>
+        <location line="+11"/>
         <source>Re&amp;verse Sort Order</source>
         <translation>&amp;Invertir órden</translation>
     </message>

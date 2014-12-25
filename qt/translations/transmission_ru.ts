@@ -5,28 +5,28 @@
 <context>
     <name>AboutDialog</name>
     <message>
-        <location filename="../about.cc" line="+34"/>
+        <location filename="../about.ui" line="+14"/>
         <source>About Transmission</source>
         <translation>О программе &quot;Transmission&quot;</translation>
     </message>
     <message>
-        <location line="+12"/>
-        <source>&lt;big&gt;Transmission %1&lt;/big&gt;</source>
+        <location filename="../about.cc" line="+27"/>
+        <source>&lt;big&gt;&lt;b&gt;Transmission %1&lt;/b&gt;&lt;/big&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+6"/>
+        <location filename="../about.ui" line="+26"/>
         <source>A fast and easy BitTorrent client</source>
         <translation>Простой и быстрый BitTorrent клиент</translation>
     </message>
     <message>
-        <location line="+5"/>
+        <location line="+10"/>
         <source>Copyright (c) The Transmission Project</source>
         <translatorcomment>Transmission-QT Win v2.21 (11855) Russian Localization Beta 0.2 by Igor Bootwin (bootwin@gmail.com)</translatorcomment>
         <translation>© Transmission Project, 2005-2011</translation>
     </message>
     <message>
-        <location line="+14"/>
+        <location filename="../about.cc" line="+4"/>
         <source>C&amp;redits</source>
         <translation>А&amp;вторы</translation>
     </message>
@@ -36,7 +36,7 @@
         <translation>&amp;Лицензия</translation>
     </message>
     <message>
-        <location line="+15"/>
+        <location line="+12"/>
         <source>Credits</source>
         <translation>Сведения об авторах</translation>
     </message>
@@ -1021,7 +1021,7 @@
         <translation>Ctrl+Q</translation>
     </message>
     <message>
-        <location line="+5"/>
+        <location line="+8"/>
         <source>&amp;Select All</source>
         <translation>Вы&amp;брать все</translation>
     </message>
@@ -1046,7 +1046,7 @@
         <translation>Н&amp;астройки</translation>
     </message>
     <message>
-        <location line="+8"/>
+        <location line="+11"/>
         <source>&amp;Compact View</source>
         <translation>&amp;Компактный вид</translation>
     </message>
@@ -1147,7 +1147,7 @@
         <translation>О програ&amp;мме</translation>
     </message>
     <message>
-        <location line="+8"/>
+        <location line="+11"/>
         <source>Re&amp;verse Sort Order</source>
         <translation>Обра&amp;тный порядок сортировки</translation>
     </message>

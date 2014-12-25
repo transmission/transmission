@@ -5,39 +5,39 @@
 <context>
     <name>AboutDialog</name>
     <message>
-        <location filename="../about.cc" line="+75"/>
+        <location filename="../about.cc" line="+35"/>
         <source>&amp;License</source>
         <translation>&amp;Licencija</translation>
     </message>
     <message>
-        <location line="-41"/>
+        <location filename="../about.ui" line="+14"/>
         <source>About Transmission</source>
         <translation>Apie „Transmission“</translation>
     </message>
     <message>
-        <location line="+37"/>
+        <location filename="../about.cc" line="-4"/>
         <source>C&amp;redits</source>
         <translation>&amp;Padėkos</translation>
     </message>
     <message>
-        <location line="-14"/>
+        <location filename="../about.ui" line="+36"/>
         <source>Copyright (c) The Transmission Project</source>
         <translation>© „Transmission“ projektas</translation>
     </message>
     <message>
-        <location line="+33"/>
+        <location filename="../about.cc" line="+16"/>
         <source>Credits</source>
         <translation>Padėkos</translation>
     </message>
     <message>
-        <location line="-38"/>
+        <location filename="../about.ui" line="-10"/>
         <source>A fast and easy BitTorrent client</source>
         <translation>Sparti ir paprasta „BitTorrent“ klientinė programa</translation>
     </message>
     <message>
-        <location line="-6"/>
-        <source>&lt;big&gt;Transmission %1&lt;/big&gt;</source>
-        <translation>&lt;big&gt;Transmission %1&lt;/big&gt;</translation>
+        <location filename="../about.cc" line="-20"/>
+        <source>&lt;big&gt;&lt;b&gt;Transmission %1&lt;/b&gt;&lt;/big&gt;</source>
+        <translation>&lt;big&gt;&lt;b&gt;Transmission %1&lt;/b&gt;&lt;/big&gt;</translation>
     </message>
 </context>
 <context>
@@ -810,17 +810,17 @@
 <context>
     <name>MainWindow</name>
     <message>
-        <location filename="../mainwin.ui" line="+589"/>
+        <location filename="../mainwin.ui" line="+595"/>
         <source>&amp;About</source>
         <translation>&amp;Apie</translation>
     </message>
     <message>
-        <location line="+85"/>
+        <location line="+88"/>
         <source>&amp;Change Session...</source>
         <translation>&amp;Keisti seansą…</translation>
     </message>
     <message>
-        <location line="-219"/>
+        <location line="-222"/>
         <source>&amp;Compact View</source>
         <translation>&amp;Glaustasis rodinys</translation>
     </message>
@@ -830,27 +830,27 @@
         <translation>&amp;Žinynas</translation>
     </message>
     <message>
-        <location line="+106"/>
+        <location line="+109"/>
         <source>&amp;Copy Magnet Link to Clipboard</source>
         <translation>Kopijuoti &amp;magnet nuorodą į iškarpinę</translation>
     </message>
     <message>
-        <location line="-285"/>
+        <location line="-294"/>
         <source>&amp;Delete Files and Remove</source>
         <translation>Ištrinti &amp;failus ir pašalinti</translation>
     </message>
     <message>
-        <location line="+37"/>
+        <location line="+40"/>
         <source>&amp;Deselect All</source>
         <translation>&amp;Panaikinti žymėjimą</translation>
     </message>
     <message>
-        <location line="+261"/>
+        <location line="+267"/>
         <source>&amp;Donate</source>
         <translation>&amp;Paaukoti</translation>
     </message>
     <message>
-        <location line="-505"/>
+        <location line="-514"/>
         <source>&amp;Edit</source>
         <translation>&amp;Taisa</translation>
     </message>
@@ -860,22 +860,22 @@
         <translation>&amp;Failas</translation>
     </message>
     <message>
-        <location line="+374"/>
+        <location line="+383"/>
         <source>&amp;Files</source>
         <translation>&amp;Failai</translation>
     </message>
     <message>
-        <location line="-133"/>
+        <location line="-136"/>
         <source>&amp;Filterbar</source>
         <translation>&amp;Filtro juosta</translation>
     </message>
     <message>
-        <location line="-274"/>
+        <location line="-280"/>
         <source>&amp;Help</source>
         <translation>&amp;Pagalba</translation>
     </message>
     <message>
-        <location line="+455"/>
+        <location line="+464"/>
         <source>&amp;Main Window</source>
         <translation>&amp;Pagrindinis langas</translation>
     </message>
@@ -885,7 +885,7 @@
         <translation>Pa&amp;vadinimas</translation>
     </message>
     <message>
-        <location line="-297"/>
+        <location line="-306"/>
         <source>&amp;New...</source>
         <translation>&amp;Naujas…</translation>
     </message>
@@ -905,12 +905,12 @@
         <translation>Pri&amp;stabdyti visus</translation>
     </message>
     <message>
-        <location line="+29"/>
+        <location line="+32"/>
         <source>&amp;Preferences</source>
         <translation>&amp;Nuostatos</translation>
     </message>
     <message>
-        <location line="-128"/>
+        <location line="-131"/>
         <source>&amp;Properties</source>
         <translation>&amp;Savybės</translation>
     </message>
@@ -925,12 +925,12 @@
         <translation>Pa&amp;šalinti</translation>
     </message>
     <message>
-        <location line="+43"/>
+        <location line="+46"/>
         <source>&amp;Select All</source>
         <translation>Pažymėti &amp;viską</translation>
     </message>
     <message>
-        <location line="-90"/>
+        <location line="-93"/>
         <source>&amp;Start</source>
         <translation>&amp;Paleisti</translation>
     </message>
@@ -940,7 +940,7 @@
         <translation>Pa&amp;leisti visus</translation>
     </message>
     <message>
-        <location line="+163"/>
+        <location line="+169"/>
         <source>&amp;Statistics</source>
         <translation>&amp;Statistika</translation>
     </message>
@@ -955,17 +955,17 @@
         <translation>Į&amp;rankinė</translation>
     </message>
     <message>
-        <location line="-307"/>
+        <location line="-313"/>
         <source>&amp;Torrent</source>
         <translation>T&amp;orentas</translation>
     </message>
     <message>
-        <location line="+456"/>
+        <location line="+465"/>
         <source>&amp;Tracker</source>
         <translation>&amp;Sekiklis</translation>
     </message>
     <message>
-        <location line="-244"/>
+        <location line="-253"/>
         <source>&amp;Verify Local Data</source>
         <translation>Pa&amp;tikrinti turimus duomenis</translation>
     </message>
@@ -975,12 +975,12 @@
         <translation>&amp;Rodymas</translation>
     </message>
     <message>
-        <location line="+247"/>
+        <location line="+253"/>
         <source>Alt+C</source>
         <translation>Alt+C</translation>
     </message>
     <message>
-        <location line="-139"/>
+        <location line="-145"/>
         <source>Alt+Enter</source>
         <translation>Alt+Enter</translation>
     </message>
@@ -995,29 +995,29 @@
         <translation>Paprašyti sekiklio daugiau siuntėjų</translation>
     </message>
     <message>
-        <location line="+319"/>
+        <location line="+328"/>
         <source>Choose Session</source>
         <extracomment>Start a local session or connect to a running session</extracomment>
         <translation>Pasirinkite seansą</translation>
     </message>
     <message>
-        <location line="-219"/>
+        <location line="-222"/>
         <location line="+3"/>
         <source>Compact View</source>
         <translation>Glaustasis rodinys</translation>
     </message>
     <message>
-        <location line="-150"/>
+        <location line="-156"/>
         <source>Create a new torrent</source>
         <translation>Sukurti naują torentą</translation>
     </message>
     <message>
-        <location line="+123"/>
+        <location line="+126"/>
         <source>Ctrl+A</source>
         <translation>Ctrl+A</translation>
     </message>
     <message>
-        <location line="-98"/>
+        <location line="-101"/>
         <source>Ctrl+E</source>
         <translation>Ctrl+E</translation>
     </message>
@@ -1047,17 +1047,17 @@
         <translation>Ctrl+S</translation>
     </message>
     <message>
-        <location line="+95"/>
+        <location line="+98"/>
         <source>Ctrl+Shift+A</source>
         <translation>Ctrl+Shift+A</translation>
     </message>
     <message>
-        <location line="+253"/>
+        <location line="+259"/>
         <source>Ctrl+U</source>
         <translation>Ctrl+U</translation>
     </message>
     <message>
-        <location line="-312"/>
+        <location line="-321"/>
         <source>Ctrl+V</source>
         <translation>Ctrl+V</translation>
     </message>
@@ -1067,7 +1067,7 @@
         <translation>Del</translation>
     </message>
     <message>
-        <location line="+190"/>
+        <location line="+196"/>
         <source>F1</source>
         <translation>F1</translation>
     </message>
@@ -1077,17 +1077,17 @@
         <translation>Pranešimų &amp;žurnalas</translation>
     </message>
     <message>
-        <location line="-271"/>
+        <location line="-277"/>
         <source>Open</source>
         <translation>Atverti</translation>
     </message>
     <message>
-        <location line="+395"/>
+        <location line="+404"/>
         <source>Open &amp;URL...</source>
         <translation>Atverti &amp;URL…</translation>
     </message>
     <message>
-        <location line="-362"/>
+        <location line="-371"/>
         <source>Open Fold&amp;er</source>
         <translation>&amp;Atverti aplanką</translation>
     </message>
@@ -1107,12 +1107,12 @@
         <translation>Pristabdyti torentą</translation>
     </message>
     <message>
-        <location line="+231"/>
+        <location line="+240"/>
         <source>Re&amp;verse Sort Order</source>
         <translation>A&amp;tvirkštinė rikiavimo tvarka</translation>
     </message>
     <message>
-        <location line="-206"/>
+        <location line="-215"/>
         <source>Remove torrent</source>
         <translation>Pašalinti torentą</translation>
     </message>
@@ -1122,7 +1122,7 @@
         <translation>Pašalinti torentą ir jo failus</translation>
     </message>
     <message>
-        <location line="+232"/>
+        <location line="+241"/>
         <source>Session Ratio</source>
         <translation>Seanso santykis</translation>
     </message>
@@ -1137,7 +1137,7 @@
         <translation>Nurodyti &amp;vietą…</translation>
     </message>
     <message>
-        <location line="-274"/>
+        <location line="-283"/>
         <source>Shift+Del</source>
         <translation>Shift+Del</translation>
     </message>
@@ -1147,7 +1147,7 @@
         <translation>Rodyti torento savybes</translation>
     </message>
     <message>
-        <location line="+174"/>
+        <location line="+180"/>
         <source>Sort by &amp;Activity</source>
         <translation>Rikiuoti pagal &amp;aktyvumą</translation>
     </message>
@@ -1192,12 +1192,12 @@
         <translation>Rikiuoti pagal likusį &amp;laiką</translation>
     </message>
     <message>
-        <location line="-168"/>
+        <location line="-174"/>
         <source>Start torrent</source>
         <translation>Paleisti torentą</translation>
     </message>
     <message>
-        <location line="+285"/>
+        <location line="+294"/>
         <source>Total Ratio</source>
         <translation>Bendras santykis</translation>
     </message>
@@ -1207,17 +1207,17 @@
         <translation>Visas siuntimas</translation>
     </message>
     <message>
-        <location line="-631"/>
+        <location line="-640"/>
         <source>Transmission</source>
         <translation>Transmission</translation>
     </message>
     <message>
-        <location line="+655"/>
+        <location line="+664"/>
         <source>Tray &amp;Icon</source>
         <translation>&amp;Piktograma pranešimų srityje</translation>
     </message>
     <message>
-        <location line="-289"/>
+        <location line="-298"/>
         <source>Verify local data</source>
         <translation>Patikrinti turimus duomenis</translation>
     </message>
@@ -1232,7 +1232,7 @@
         <translation>&amp;Eilė</translation>
     </message>
     <message>
-        <location line="+536"/>
+        <location line="+545"/>
         <source>Start &amp;Now</source>
         <translation>Paleisti da&amp;bar</translation>
     </message>

@@ -5,27 +5,27 @@
 <context>
     <name>AboutDialog</name>
     <message>
-        <location filename="../about.cc" line="+34"/>
+        <location filename="../about.ui" line="+14"/>
         <source>About Transmission</source>
         <translation>Про Transmission</translation>
     </message>
     <message>
-        <location line="+12"/>
-        <source>&lt;big&gt;Transmission %1&lt;/big&gt;</source>
-        <translation>&lt;big&gt;Transmission %1&lt;/big&gt;</translation>
+        <location filename="../about.cc" line="+27"/>
+        <source>&lt;big&gt;&lt;b&gt;Transmission %1&lt;/b&gt;&lt;/big&gt;</source>
+        <translation>&lt;big&gt;&lt;b&gt;Transmission %1&lt;/b&gt;&lt;/big&gt;</translation>
     </message>
     <message>
-        <location line="+6"/>
+        <location filename="../about.ui" line="+26"/>
         <source>A fast and easy BitTorrent client</source>
         <translation>Швидкий і простий у використанні клієнт BitTorrent</translation>
     </message>
     <message>
-        <location line="+5"/>
+        <location line="+10"/>
         <source>Copyright (c) The Transmission Project</source>
         <translation>© The Transmission Project</translation>
     </message>
     <message>
-        <location line="+14"/>
+        <location filename="../about.cc" line="+4"/>
         <source>C&amp;redits</source>
         <translation>А&amp;втори</translation>
     </message>
@@ -35,7 +35,7 @@
         <translation>&amp;Ліцензія</translation>
     </message>
     <message>
-        <location line="+15"/>
+        <location line="+12"/>
         <source>Credits</source>
         <translation>Автори</translation>
     </message>
@@ -1020,7 +1020,7 @@
         <translation>Ctrl+Q</translation>
     </message>
     <message>
-        <location line="+5"/>
+        <location line="+8"/>
         <source>&amp;Select All</source>
         <translation>Поз&amp;начити всі</translation>
     </message>
@@ -1045,7 +1045,7 @@
         <translation>&amp;Налаштування</translation>
     </message>
     <message>
-        <location line="+8"/>
+        <location line="+11"/>
         <source>&amp;Compact View</source>
         <translation>&amp;Стислий перегляд</translation>
     </message>
@@ -1147,7 +1147,7 @@
         <translation>&amp;Про програму</translation>
     </message>
     <message>
-        <location line="+8"/>
+        <location line="+11"/>
         <source>Re&amp;verse Sort Order</source>
         <translation>&amp;Змінити порядок сортування</translation>
     </message>

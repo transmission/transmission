@@ -8,23 +8,14 @@
  */
 
 #include <QApplication>
-#include <QDialogButtonBox>
-#include <QFont>
 #include <QIcon>
-#include <QLabel>
 #include <QMessageBox>
-#include <QPixmap>
 #include <QPushButton>
-#include <QString>
-#include <QTextEdit>
-#include <QVBoxLayout>
-#include <QWidget>
 
 #include <libtransmission/transmission.h>
 #include <libtransmission/version.h>
 
 #include "about.h"
-#include "hig.h"
 #include "license.h"
 
 AboutDialog::AboutDialog (QWidget * parent):
@@ -58,4 +49,3 @@ AboutDialog::showCredits ()
     QString::fromUtf8 ("Jordan Lee (Backend; Daemon; GTK+; Qt)\n"
                         "Michell Livingston (OS X)\n"));
 }
-

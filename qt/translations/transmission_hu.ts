@@ -5,27 +5,27 @@
 <context>
     <name>AboutDialog</name>
     <message>
-        <location filename="../about.cc" line="+34"/>
+        <location filename="../about.ui" line="+14"/>
         <source>About Transmission</source>
         <translation>A Transmission-ről</translation>
     </message>
     <message>
-        <location line="+12"/>
-        <source>&lt;big&gt;Transmission %1&lt;/big&gt;</source>
-        <translation>&lt;big&gt;Transmission %1&lt;/big&gt;</translation>
+        <location filename="../about.cc" line="+27"/>
+        <source>&lt;big&gt;&lt;b&gt;Transmission %1&lt;/b&gt;&lt;/big&gt;</source>
+        <translation>&lt;big&gt;&lt;b&gt;Transmission %1&lt;/b&gt;&lt;/big&gt;</translation>
     </message>
     <message>
-        <location line="+6"/>
+        <location filename="../about.ui" line="+26"/>
         <source>A fast and easy BitTorrent client</source>
         <translation>Egy gyors és egyszerű BitTorrent kliens</translation>
     </message>
     <message>
-        <location line="+5"/>
+        <location line="+10"/>
         <source>Copyright (c) The Transmission Project</source>
         <translation>Copyright (c) a Transmission Projekt</translation>
     </message>
     <message>
-        <location line="+14"/>
+        <location filename="../about.cc" line="+4"/>
         <source>C&amp;redits</source>
         <translation>K&amp;észítették</translation>
     </message>
@@ -35,7 +35,7 @@
         <translation>&amp;Licensz</translation>
     </message>
     <message>
-        <location line="+15"/>
+        <location line="+12"/>
         <source>Credits</source>
         <translation>Készítették</translation>
     </message>
@@ -1004,7 +1004,7 @@
         <translation>Ctrl+Q</translation>
     </message>
     <message>
-        <location line="+5"/>
+        <location line="+8"/>
         <source>&amp;Select All</source>
         <translation>Összes &amp;kijelölése</translation>
     </message>
@@ -1029,7 +1029,7 @@
         <translation>&amp;Beállítások</translation>
     </message>
     <message>
-        <location line="+8"/>
+        <location line="+11"/>
         <source>&amp;Compact View</source>
         <translation>&amp;Kompakt nézet</translation>
     </message>
@@ -1130,7 +1130,7 @@
         <translation>A Transmission-&amp;ről</translation>
     </message>
     <message>
-        <location line="+8"/>
+        <location line="+11"/>
         <source>Re&amp;verse Sort Order</source>
         <translation>Rendezés &amp;fordítva</translation>
     </message>
