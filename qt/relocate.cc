@@ -32,13 +32,14 @@ RelocateDialog::onFileSelected (const QString& path)
   myPath = path;
 
   const QFileInfo pathInfo (path);
+  const QString absolutePath = pathInfo.absoluteFilePath ();
   const QFileIconProvider iconProvider;
 
   ui.newLocationButton->setIcon (mySession.isLocal () ?
                                  iconProvider.icon (pathInfo) :
                                  iconProvider.icon (QFileIconProvider::Folder));
-  ui.newLocationButton->setText (pathInfo.baseName ());
-  ui.newLocationButton->setToolTip (path);
+  ui.newLocationButton->setText (pathInfo.fileName ().isEmpty () ? absolutePath : pathInfo.fileName ());
+  ui.newLocationButton->setToolTip (absolutePath);
 }
 
 void
