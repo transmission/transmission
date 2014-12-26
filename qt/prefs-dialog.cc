@@ -604,7 +604,9 @@ PrefsDialog::createDownloadingTab ()
     hig->addRow (tr ("Save to &Location:"), b);
 
     const QString downloadDir (myPrefs.getString(Prefs::DOWNLOAD_DIR));
-    l = myFreespaceLabel = new FreespaceLabel (mySession, downloadDir, this);
+    l = myFreespaceLabel = new FreespaceLabel (this);
+    myFreespaceLabel->setSession (mySession);
+    myFreespaceLabel->setPath (downloadDir);
     QHBoxLayout * h = new QHBoxLayout ();
     h->addStretch (1);
     h->addWidget (l);

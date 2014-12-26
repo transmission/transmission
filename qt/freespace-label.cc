@@ -19,24 +19,33 @@ namespace
   static const int INTERVAL_MSEC = 15000;
 }
 
-FreespaceLabel::FreespaceLabel (Session        & session,
-                                const QString  & path,
-                                QWidget        * parent):
+FreespaceLabel::FreespaceLabel (QWidget * parent):
   QLabel (parent),
-  mySession (session),
+  mySession (nullptr),
   myTag (-1),
   myTimer (this)
 {
-  myTimer.setSingleShot (false);
+  myTimer.setSingleShot (true);
   myTimer.setInterval (INTERVAL_MSEC);
-  myTimer.start ();
 
-  connect (&myTimer, SIGNAL(timeout()), this, SLOT(onTimer()));
+  connect (&myTimer, SIGNAL (timeout ()), this, SLOT (onTimer ()));
+}
 
-  connect (&mySession, SIGNAL(executed(int64_t, QString, tr_variant *)),
-           this,       SLOT(onSessionExecuted(int64_t, QString, tr_variant *)));
+void
+FreespaceLabel::setSession (Session& session)
+{
+  if (mySession == &session)
+    return;
 
-  setPath (path);
+  if (mySession != nullptr)
+    disconnect (mySession, nullptr, this, nullptr);
+
+  mySession = &session;
+
+  connect (mySession, SIGNAL (executed (int64_t, QString, tr_variant *)),
+           this,      SLOT (onSessionExecuted (int64_t, QString, tr_variant *)));
+
+  onTimer ();
 }
 
 void
@@ -53,7 +62,12 @@ FreespaceLabel::setPath (const QString& path)
 void
 FreespaceLabel::onTimer ()
 {
-  const int64_t tag = mySession.getUniqueTag ();
+  myTimer.stop ();
+
+  if (mySession == nullptr || myPath.isEmpty ())
+    return;
+
+  const int64_t tag = mySession->getUniqueTag ();
   const QByteArray myPathUtf8 = myPath.toUtf8 ();
 
   myTag = tag;
@@ -63,7 +77,7 @@ FreespaceLabel::onTimer ()
   tr_variantDictAddInt (&top, TR_KEY_tag, tag);
   tr_variant * args = tr_variantDictAddDict (&top, TR_KEY_arguments, 1);
   tr_variantDictAddStr (args, TR_KEY_path, myPathUtf8.constData());
-  mySession.exec (&top);
+  mySession->exec (&top);
   tr_variantFree (&top);
 }
 
@@ -91,4 +105,6 @@ FreespaceLabel::onSessionExecuted (int64_t tag, const QString& result, tr_varian
   tr_variantDictFindStr (arguments, TR_KEY_path, &path, &len);
   str = QString::fromUtf8 (path, len);
   setToolTip (str);
+
+  myTimer.start ();
 }

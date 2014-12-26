@@ -28,12 +28,14 @@ class FreespaceLabel: public QLabel
     Q_OBJECT
 
   public:
-    FreespaceLabel (Session&, const QString& path, QWidget *parent=0);
+    FreespaceLabel (QWidget * parent = 0);
     virtual ~FreespaceLabel () {}
+
+    void setSession (Session& session);
     void setPath (const QString& folder);
 
   private:
-    Session& mySession;
+    Session * mySession;
     int64_t myTag;
     QString myPath;
     QTimer myTimer;

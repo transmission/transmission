@@ -109,7 +109,9 @@ Options::Options (Session& session, const Prefs& prefs, const AddData& addme, QW
   l = new QLabel (tr ("&Destination folder:"));
   layout->addWidget (l, ++row, 0, Qt::AlignLeft);
   const QString downloadDir (prefs.getString (Prefs::DOWNLOAD_DIR));
-  myFreespaceLabel = new FreespaceLabel (mySession, downloadDir, this);
+  myFreespaceLabel = new FreespaceLabel (this);
+  myFreespaceLabel->setSession (mySession);
+  myFreespaceLabel->setPath (downloadDir);
 
   if (session.isLocal ())
     {
