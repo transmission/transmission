@@ -14,26 +14,18 @@
 #include <QSet>
 #include <QString>
 
-class QPushButton;
-class QRadioButton;
+#include "ui_relocate.h"
+
 class Session;
-class Torrent;
 class TorrentModel;
 
 class RelocateDialog: public QDialog
 {
     Q_OBJECT
 
-  private:
-    QString myPath;
-    static bool myMoveFlag;
-
-  private:
-    Session & mySession;
-    TorrentModel& myModel;
-    QSet<int> myIds;
-    QPushButton * myDirButton;
-    QRadioButton * myMoveRadio;
+  public:
+    RelocateDialog (Session&, const TorrentModel&, const QSet<int>& ids, QWidget * parent = 0);
+    ~RelocateDialog () {}
 
   private slots:
     void onFileSelected (const QString& path);
@@ -41,9 +33,13 @@ class RelocateDialog: public QDialog
     void onSetLocation ();
     void onMoveToggled (bool);
 
-  public:
-    RelocateDialog (Session&, TorrentModel&, const QSet<int>& ids, QWidget * parent = 0);
-    ~RelocateDialog () {}
+  private:
+    Session& mySession;
+    const QSet<int> myIds;
+    Ui::RelocateDialog ui;
+    QString myPath;
+
+    static bool myMoveFlag;
 };
 
 #endif

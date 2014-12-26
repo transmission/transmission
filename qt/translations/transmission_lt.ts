@@ -5,7 +5,7 @@
 <context>
     <name>AboutDialog</name>
     <message>
-        <location filename="../about.cc" line="+35"/>
+        <location filename="../about.cc" line="+36"/>
         <source>&amp;License</source>
         <translation>&amp;Licencija</translation>
     </message>
@@ -2022,32 +2022,32 @@ Papildomą pirminį URL adresą galite įvesti, palikę prieš jį tuščią eil
 <context>
     <name>RelocateDialog</name>
     <message>
-        <location filename="../relocate.cc" line="+98"/>
+        <location filename="../relocate.ui" line="+72"/>
         <source>&amp;Move from the current folder</source>
         <translation>&amp;Perkelti iš dabartinio aplanko</translation>
     </message>
     <message>
-        <location line="+1"/>
+        <location line="+10"/>
         <source>Local data is &amp;already there</source>
         <translation>Vietiniai duomenys jau yra &amp;ten</translation>
     </message>
     <message>
-        <location line="-2"/>
+        <location line="-33"/>
         <source>New &amp;location:</source>
         <translation>Nauja &amp;vieta:</translation>
     </message>
     <message>
-        <location line="-49"/>
+        <location filename="../relocate.cc" line="+47"/>
         <source>Select Location</source>
         <translation>Parinkite vietą</translation>
     </message>
     <message>
-        <location line="+48"/>
+        <location filename="../relocate.ui" line="-10"/>
         <source>Set Location</source>
         <translation>Nustatyti vietą</translation>
     </message>
     <message>
-        <location line="-20"/>
+        <location line="-25"/>
         <source>Set Torrent Location</source>
         <translation>Torento vietos nustatymas</translation>
     </message>

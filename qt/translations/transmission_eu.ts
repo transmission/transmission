@@ -10,7 +10,7 @@
         <translation>Transmissioni buruz</translation>
     </message>
     <message>
-        <location filename="../about.cc" line="+27"/>
+        <location filename="../about.cc" line="+28"/>
         <source>&lt;big&gt;&lt;b&gt;Transmission %1&lt;/b&gt;&lt;/big&gt;</source>
         <translation>&lt;big&gt;&lt;b&gt;Transmission %1&lt;/b&gt;&lt;/big&gt;</translation>
     </message>
@@ -2009,32 +2009,32 @@ Beste lehen URL bat gehitzeko, gehitu hura lerro huts baten ondoren.</translatio
 <context>
     <name>RelocateDialog</name>
     <message>
-        <location filename="../relocate.cc" line="+48"/>
+        <location filename="../relocate.cc" line="+47"/>
         <source>Select Location</source>
         <translation>Hautatu Kokalekua</translation>
     </message>
     <message>
-        <location line="+28"/>
+        <location filename="../relocate.ui" line="+14"/>
         <source>Set Torrent Location</source>
         <translation>Ezarri Torrentaren Kokalekua</translation>
     </message>
     <message>
-        <location line="+20"/>
+        <location line="+25"/>
         <source>Set Location</source>
         <translation>Ezarri Kokalekua</translation>
     </message>
     <message>
-        <location line="+1"/>
+        <location line="+10"/>
         <source>New &amp;location:</source>
         <translation>&amp;Kokaleku berria:</translation>
     </message>
     <message>
-        <location line="+1"/>
+        <location line="+23"/>
         <source>&amp;Move from the current folder</source>
         <translation>&amp;Mugitu oraingo agiritegitik</translation>
     </message>
     <message>
-        <location line="+1"/>
+        <location line="+10"/>
         <source>Local data is &amp;already there</source>
         <translation>&amp;Tokiko datuak jadanik hor daude</translation>
     </message>

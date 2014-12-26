@@ -10,7 +10,7 @@
         <translation>A Transmission-ről</translation>
     </message>
     <message>
-        <location filename="../about.cc" line="+27"/>
+        <location filename="../about.cc" line="+28"/>
         <source>&lt;big&gt;&lt;b&gt;Transmission %1&lt;/b&gt;&lt;/big&gt;</source>
         <translation>&lt;big&gt;&lt;b&gt;Transmission %1&lt;/b&gt;&lt;/big&gt;</translation>
     </message>
@@ -1996,32 +1996,32 @@ Másik elsődleges URL-t új sorba írva adhatsz hozzá.</translation>
 <context>
     <name>RelocateDialog</name>
     <message>
-        <location filename="../relocate.cc" line="+48"/>
+        <location filename="../relocate.cc" line="+47"/>
         <source>Select Location</source>
         <translation>Válaszd ki a mappát</translation>
     </message>
     <message>
-        <location line="+28"/>
+        <location filename="../relocate.ui" line="+14"/>
         <source>Set Torrent Location</source>
         <translation>Válaszd ki a torrentet</translation>
     </message>
     <message>
-        <location line="+20"/>
+        <location line="+25"/>
         <source>Set Location</source>
         <translation>Válaszd ki a mappát</translation>
     </message>
     <message>
-        <location line="+1"/>
+        <location line="+10"/>
         <source>New &amp;location:</source>
         <translation>Új &amp;hely:</translation>
     </message>
     <message>
-        <location line="+1"/>
+        <location line="+23"/>
         <source>&amp;Move from the current folder</source>
         <translation>Áthelyezés a &amp;jelenlegi mappából</translation>
     </message>
     <message>
-        <location line="+1"/>
+        <location line="+10"/>
         <source>Local data is &amp;already there</source>
         <translation>A letöltött adat &amp;már itt van</translation>
     </message>

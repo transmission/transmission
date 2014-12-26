@@ -104,6 +104,7 @@ tr_qt_wrap_ui(${PROJECT_NAME}_UI_SOURCES
     about.ui
     details.ui
     mainwin.ui
+    relocate.ui
     session-dialog.ui
     stats-dialog.ui
 )

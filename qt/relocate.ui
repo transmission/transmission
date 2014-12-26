@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>RelocateDialog</class>
+ <widget class="QDialog" name="RelocateDialog">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>225</width>
+    <height>155</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Set Torrent Location</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">[tr-style~=&quot;form-section&quot;]
+{
+  font-weight: bold;
+  margin-top: 12px;
+  margin-bottom: 1px;
+}
+[tr-style~=&quot;form-section&quot;][tr-style~=&quot;first&quot;]
+{
+  margin-top: 0;
+}
+[tr-style~=&quot;form-label&quot;]
+{
+  margin-left: 18px;
+}</string>
+  </property>
+  <layout class="QGridLayout" name="dialogLayout">
+   <property name="sizeConstraint">
+    <enum>QLayout::SetFixedSize</enum>
+   </property>
+   <item row="0" column="0" colspan="2">
+    <widget class="QLabel" name="setLocationSectionLabel">
+     <property name="text">
+      <string>Set Location</string>
+     </property>
+     <property name="tr-style" stdset="0">
+      <string notr="true">form-section first</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="0">
+    <widget class="QLabel" name="newLocationLabel">
+     <property name="text">
+      <string>New &amp;location:</string>
+     </property>
+     <property name="buddy">
+      <cstring>newLocationButton</cstring>
+     </property>
+     <property name="tr-style" stdset="0">
+      <string notr="true">form-label</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="1">
+    <widget class="QPushButton" name="newLocationButton">
+     <property name="styleSheet">
+      <string notr="true">text-align:left</string>
+     </property>
+     <property name="autoDefault">
+      <bool>false</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="0" colspan="2">
+    <widget class="QRadioButton" name="moveDataRadio">
+     <property name="text">
+      <string>&amp;Move from the current folder</string>
+     </property>
+     <property name="tr-style" stdset="0">
+      <string notr="true">form-label</string>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="0" colspan="2">
+    <widget class="QRadioButton" name="findDataRadio">
+     <property name="text">
+      <string>Local data is &amp;already there</string>
+     </property>
+     <property name="tr-style" stdset="0">
+      <string notr="true">form-label</string>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="0" colspan="2">
+    <widget class="QDialogButtonBox" name="dialogButtons">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="standardButtons">
+      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

@@ -10,7 +10,7 @@
         <translation>Transmission</translation>
     </message>
     <message>
-        <location filename="../about.cc" line="+27"/>
+        <location filename="../about.cc" line="+28"/>
         <source>&lt;big&gt;&lt;b&gt;Transmission %1&lt;/b&gt;&lt;/big&gt;</source>
         <translation>&lt;big&gt;&lt;b&gt;Transmission %1&lt;/b&gt;&lt;/big&gt;</translation>
     </message>
@@ -2009,32 +2009,32 @@ Pour ajouter une autre URL primaire, placez-la après une ligne vide.</translati
 <context>
     <name>RelocateDialog</name>
     <message>
-        <location filename="../relocate.cc" line="+48"/>
+        <location filename="../relocate.cc" line="+47"/>
         <source>Select Location</source>
         <translation>Séléctionner l&apos;emplacement</translation>
     </message>
     <message>
-        <location line="+28"/>
+        <location filename="../relocate.ui" line="+14"/>
         <source>Set Torrent Location</source>
         <translation>Définir l&apos;emplacement du torrent</translation>
     </message>
     <message>
-        <location line="+20"/>
+        <location line="+25"/>
         <source>Set Location</source>
         <translation>Définir l&apos;emplacement</translation>
     </message>
     <message>
-        <location line="+1"/>
+        <location line="+10"/>
         <source>New &amp;location:</source>
         <translation>Nouvel emp&amp;lacement:</translation>
     </message>
     <message>
-        <location line="+1"/>
+        <location line="+23"/>
         <source>&amp;Move from the current folder</source>
         <translation>&amp;Déplacer depuis le dossier courant</translation>
     </message>
     <message>
-        <location line="+1"/>
+        <location line="+10"/>
         <source>Local data is &amp;already there</source>
         <translation>Les données locales sont &amp;déjà là</translation>
     </message>

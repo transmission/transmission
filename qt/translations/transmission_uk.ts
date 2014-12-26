@@ -10,7 +10,7 @@
         <translation>Про Transmission</translation>
     </message>
     <message>
-        <location filename="../about.cc" line="+27"/>
+        <location filename="../about.cc" line="+28"/>
         <source>&lt;big&gt;&lt;b&gt;Transmission %1&lt;/b&gt;&lt;/big&gt;</source>
         <translation>&lt;big&gt;&lt;b&gt;Transmission %1&lt;/b&gt;&lt;/big&gt;</translation>
     </message>
@@ -2023,32 +2023,32 @@ To add another primary URL, add it after a blank line.</source>
 <context>
     <name>RelocateDialog</name>
     <message>
-        <location filename="../relocate.cc" line="+48"/>
+        <location filename="../relocate.cc" line="+47"/>
         <source>Select Location</source>
         <translation>Обрати розташування</translation>
     </message>
     <message>
-        <location line="+28"/>
+        <location filename="../relocate.ui" line="+14"/>
         <source>Set Torrent Location</source>
         <translation>Встановити розташування торенту</translation>
     </message>
     <message>
-        <location line="+20"/>
+        <location line="+25"/>
         <source>Set Location</source>
         <translation>Встановити розташування</translation>
     </message>
     <message>
-        <location line="+1"/>
+        <location line="+10"/>
         <source>New &amp;location:</source>
         <translation>Но&amp;ве розташування:</translation>
     </message>
     <message>
-        <location line="+1"/>
+        <location line="+23"/>
         <source>&amp;Move from the current folder</source>
         <translation>&amp;Перенести зі старої теки у вказану</translation>
     </message>
     <message>
-        <location line="+1"/>
+        <location line="+10"/>
         <source>Local data is &amp;already there</source>
         <translation>&amp;Локальні дані вже перенесено</translation>
     </message>

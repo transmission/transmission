@@ -10,7 +10,7 @@
         <translation>Sobre o Transmission</translation>
     </message>
     <message>
-        <location filename="../about.cc" line="+27"/>
+        <location filename="../about.cc" line="+28"/>
         <source>&lt;big&gt;&lt;b&gt;Transmission %1&lt;/b&gt;&lt;/big&gt;</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2010,32 +2010,32 @@ Adicione outra URL primária depois de uma linha em branco.</translation>
 <context>
     <name>RelocateDialog</name>
     <message>
-        <location filename="../relocate.cc" line="+48"/>
+        <location filename="../relocate.cc" line="+47"/>
         <source>Select Location</source>
         <translation>Selecionar local</translation>
     </message>
     <message>
-        <location line="+28"/>
+        <location filename="../relocate.ui" line="+14"/>
         <source>Set Torrent Location</source>
         <translation>Definir Local do Torrent</translation>
     </message>
     <message>
-        <location line="+20"/>
+        <location line="+25"/>
         <source>Set Location</source>
         <translation>Definir Local</translation>
     </message>
     <message>
-        <location line="+1"/>
+        <location line="+10"/>
         <source>New &amp;location:</source>
         <translation>Novo local:</translation>
     </message>
     <message>
-        <location line="+1"/>
+        <location line="+23"/>
         <source>&amp;Move from the current folder</source>
         <translation>Mover da pasta atual</translation>
     </message>
     <message>
-        <location line="+1"/>
+        <location line="+10"/>
         <source>Local data is &amp;already there</source>
         <translation>Os dados locais já estão lá</translation>
     </message>
