@@ -699,23 +699,23 @@ TrMainWindow::refreshStatusBar ()
 
   if (mode == "session-ratio")
     {
-      str = tr ("Ratio: %1").arg (Formatter:: ratioToString (mySession.getStats ().ratio));
+      str = tr ("Ratio: %1").arg (Formatter::ratioToString (mySession.getStats ().ratio));
     }
   else if (mode == "session-transfer")
     {
       const tr_session_stats& stats (mySession.getStats ());
-      str = tr ("Down: %1, Up: %2").arg (Formatter:: sizeToString (stats.downloadedBytes))
-                                      .arg (Formatter:: sizeToString (stats.uploadedBytes));
+      str = tr ("Down: %1, Up: %2").arg (Formatter::sizeToString (stats.downloadedBytes))
+                                      .arg (Formatter::sizeToString (stats.uploadedBytes));
     }
   else if (mode == "total-transfer")
     {
       const tr_session_stats& stats (mySession.getCumulativeStats ());
-      str = tr ("Down: %1, Up: %2").arg (Formatter:: sizeToString (stats.downloadedBytes))
-                                   .arg (Formatter:: sizeToString (stats.uploadedBytes));
+      str = tr ("Down: %1, Up: %2").arg (Formatter::sizeToString (stats.downloadedBytes))
+                                   .arg (Formatter::sizeToString (stats.uploadedBytes));
     }
   else // default is "total-ratio"
     {
-      str = tr ("Ratio: %1").arg (Formatter:: ratioToString (mySession.getCumulativeStats ().ratio));
+      str = tr ("Ratio: %1").arg (Formatter::ratioToString (mySession.getCumulativeStats ().ratio));
     }
 
   ui.statsLabel->setText (str);
