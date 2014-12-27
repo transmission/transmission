@@ -339,9 +339,8 @@ Options::onAccepted ()
 {
   // rpc spec section 3.4 "adding a torrent"
 
-  tr_variant top;
-  tr_variantInitDict (&top, 3);
-  tr_variant * args (tr_variantDictAddDict (&top, TR_KEY_arguments, 10));
+  tr_variant args;
+  tr_variantInitDict (&args, 10);
   QString downloadDir;
 
   // "download-dir"
@@ -350,21 +349,21 @@ Options::onAccepted ()
   else
     downloadDir = myDestinationEdit->text ();
 
-  tr_variantDictAddStr (args, TR_KEY_download_dir, downloadDir.toUtf8 ().constData ());
+  tr_variantDictAddStr (&args, TR_KEY_download_dir, downloadDir.toUtf8 ().constData ());
 
   // paused
-  tr_variantDictAddBool (args, TR_KEY_paused, !myStartCheck->isChecked ());
+  tr_variantDictAddBool (&args, TR_KEY_paused, !myStartCheck->isChecked ());
 
   // priority
   const int index = myPriorityCombo->currentIndex ();
   const int priority = myPriorityCombo->itemData (index).toInt ();
-  tr_variantDictAddInt (args, TR_KEY_bandwidthPriority, priority);
+  tr_variantDictAddInt (&args, TR_KEY_bandwidthPriority, priority);
 
   // files-unwanted
   int count = myWanted.count (false);
   if (count > 0)
     {
-      tr_variant * l = tr_variantDictAddList (args, TR_KEY_files_unwanted, count);
+      tr_variant * l = tr_variantDictAddList (&args, TR_KEY_files_unwanted, count);
       for (int i=0, n=myWanted.size (); i<n; ++i)
         if (myWanted.at (i) == false)
           tr_variantListAddInt (l, i);
@@ -374,7 +373,7 @@ Options::onAccepted ()
   count = myPriorities.count (TR_PRI_LOW);
   if (count > 0)
     {
-      tr_variant * l = tr_variantDictAddList (args, TR_KEY_priority_low, count);
+      tr_variant * l = tr_variantDictAddList (&args, TR_KEY_priority_low, count);
       for (int i=0, n=myPriorities.size (); i<n; ++i)
         if (myPriorities.at (i) == TR_PRI_LOW)
           tr_variantListAddInt (l, i);
@@ -384,15 +383,14 @@ Options::onAccepted ()
   count = myPriorities.count (TR_PRI_HIGH);
   if (count > 0)
     {
-      tr_variant * l = tr_variantDictAddList (args, TR_KEY_priority_high, count);
+      tr_variant * l = tr_variantDictAddList (&args, TR_KEY_priority_high, count);
       for (int i=0, n=myPriorities.size (); i<n; ++i)
         if (myPriorities.at (i) == TR_PRI_HIGH)
           tr_variantListAddInt (l, i);
     }
 
-  mySession.addTorrent (myAdd, top, myTrashCheck->isChecked ());
+  mySession.addTorrent (myAdd, &args, myTrashCheck->isChecked ());
 
-  tr_variantFree (&top);
   deleteLater ();
 }
 

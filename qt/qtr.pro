@@ -72,6 +72,7 @@ SOURCES += about.cc \
            prefs.cc \
            prefs-dialog.cc \
            relocate.cc \
+           rpc-client.cc \
            session.cc \
            session-dialog.cc \
            squeezelabel.cc \

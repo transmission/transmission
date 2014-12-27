@@ -366,6 +366,10 @@ tr_variant * tr_variantDictAddDict     (tr_variant       * dict,
                                         const tr_quark     key,
                                         size_t             reserve_count);
 
+tr_variant * tr_variantDictSteal       (tr_variant       * dict,
+                                        const tr_quark     key,
+                                        tr_variant       * value);
+
 tr_variant * tr_variantDictAddRaw      (tr_variant       * dict,
                                         const tr_quark     key,
                                         const void       * value,

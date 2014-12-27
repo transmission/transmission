@@ -67,18 +67,12 @@ FreespaceLabel::onTimer ()
   if (mySession == nullptr || myPath.isEmpty ())
     return;
 
-  const int64_t tag = mySession->getUniqueTag ();
-  const QByteArray myPathUtf8 = myPath.toUtf8 ();
+  tr_variant args;
+  tr_variantInitDict (&args, 1);
+  tr_variantDictAddStr (&args, TR_KEY_path, myPath.toUtf8 ().constData());
 
-  myTag = tag;
-  tr_variant top;
-  tr_variantInitDict (&top, 3);
-  tr_variantDictAddStr (&top, TR_KEY_method, "free-space");
-  tr_variantDictAddInt (&top, TR_KEY_tag, tag);
-  tr_variant * args = tr_variantDictAddDict (&top, TR_KEY_arguments, 1);
-  tr_variantDictAddStr (args, TR_KEY_path, myPathUtf8.constData());
-  mySession->exec (&top);
-  tr_variantFree (&top);
+  myTag = mySession->getUniqueTag ();
+  mySession->exec ("free-space", &args, myTag);
 }
 
 void

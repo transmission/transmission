@@ -685,6 +685,18 @@ tr_variantDictAddDict (tr_variant     * dict,
   return child;
 }
 
+tr_variant *
+tr_variantDictSteal (tr_variant       * dict,
+                     const tr_quark     key,
+                     tr_variant       * value)
+{
+  tr_variant * child = tr_variantDictAdd (dict, key);
+  *child = *value;
+  child->key = key;
+  tr_variantInit (value, value->type);
+  return child;
+}
+
 bool
 tr_variantDictRemove (tr_variant     * dict,
                       const tr_quark   key)

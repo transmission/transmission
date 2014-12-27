@@ -44,6 +44,7 @@ set(${PROJECT_NAME}_SOURCES
     prefs-dialog.cc
     prefs.cc
     relocate.cc
+    rpc-client.cc
     session-dialog.cc
     session.cc
     squeezelabel.cc
@@ -81,6 +82,7 @@ set(${PROJECT_NAME}_HEADERS
     prefs-dialog.h
     prefs.h
     relocate.h
+    rpc-client.h
     session-dialog.h
     session.h
     speed.h
