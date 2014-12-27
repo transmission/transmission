@@ -14,6 +14,7 @@
 #include <QByteArray>
 #include <QClipboard>
 #include <QCoreApplication>
+#include <QDebug>
 #include <QDesktopServices>
 #include <QFile>
 #include <QFileInfo>
