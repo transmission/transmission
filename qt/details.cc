@@ -482,7 +482,7 @@ Details::refresh ()
   else if (sizeWhenDone == 0)
     string = none;
   else
-    string = QString ("%1%").arg (Formatter::percentToString ( (100.0 * available) / sizeWhenDone));
+    string = QString::fromLatin1 ("%1%").arg (Formatter::percentToString ( (100.0 * available) / sizeWhenDone));
   ui.availabilityValueLabel->setText (string);
 
   // myDownloadedLabel
@@ -900,7 +900,7 @@ Details::refresh ()
                 }
 
               if (!txt.isEmpty ())
-                codeTip += QString ("%1: %2\n").arg (ch).arg (txt);
+                codeTip += QString::fromLatin1 ("%1: %2\n").arg (ch).arg (txt);
             }
 
           if (!codeTip.isEmpty ())
@@ -908,7 +908,7 @@ Details::refresh ()
 
           item->setText (COL_UP, peer.rateToPeer.isZero () ? "" : Formatter::speedToString (peer.rateToPeer));
           item->setText (COL_DOWN, peer.rateToClient.isZero () ? "" : Formatter::speedToString (peer.rateToClient));
-          item->setText (COL_PERCENT, peer.progress > 0 ? QString ("%1%").arg ( (int) (peer.progress * 100.0)) : "");
+          item->setText (COL_PERCENT, peer.progress > 0 ? QString::fromLatin1 ("%1%").arg ( (int) (peer.progress * 100.0)) : "");
           item->setText (COL_STATUS, code);
           item->setToolTip (COL_STATUS, codeTip);
 

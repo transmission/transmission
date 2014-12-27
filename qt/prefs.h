@@ -167,7 +167,6 @@ class Prefs: public QObject
 
     template<typename T> T get (int key) const { return myValues[key].value<T>(); }
 
-    void set (int key, char * value) { set (key, QString::fromUtf8 (value)); }
     void set (int key, const char * value) { set (key, QString::fromUtf8 (value)); }
 
     template<typename T> void set (int key, const T& value)

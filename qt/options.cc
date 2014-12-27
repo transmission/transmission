@@ -237,10 +237,10 @@ Options::eventFilter (QObject * o, QEvent * event)
   if (event->type() == QEvent::Resize)
     {
       if (o == mySourceButton)
-        refreshSource (dynamic_cast<QResizeEvent*> (event)->size ().width ());
+        refreshSource (static_cast<QResizeEvent*> (event)->size ().width ());
 
       else if (o == myDestinationButton)
-        refreshDestinationButton (dynamic_cast<QResizeEvent*> (event)->size ().width ());
+        refreshDestinationButton (static_cast<QResizeEvent*> (event)->size ().width ());
     }
 
   return false;
@@ -529,7 +529,7 @@ Options::onTimeout ()
   int64_t leftInPiece = getPieceSize (&myInfo, myVerifyPieceIndex) - myVerifyPiecePos;
   int64_t leftInFile = file->length - myVerifyFilePos;
   int64_t bytesThisPass = std::min (leftInFile, leftInPiece);
-  bytesThisPass = std::min (bytesThisPass, (int64_t)sizeof (myVerifyBuf));
+  bytesThisPass = std::min (bytesThisPass, static_cast<int64_t> (sizeof (myVerifyBuf)));
 
   if (myVerifyFile.isOpen () && myVerifyFile.seek (myVerifyFilePos))
     {
@@ -588,7 +588,7 @@ Options::onTimeout ()
       if (!have) // everything failed
         {
           // did the user accidentally specify the child directory instead of the parent?
-          const QStringList tokens = QString (file->name).split ('/');
+          const QStringList tokens = QString::fromUtf8 (file->name).split ('/');
           if (!tokens.empty () && myLocalDestination.dirName ()==tokens.at (0))
             {
               // move up one directory and try again

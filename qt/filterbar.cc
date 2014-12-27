@@ -357,7 +357,7 @@ namespace
 void
 FilterBar::refreshTrackers ()
 {
-  Favicons& favicons = dynamic_cast<MyApp*> (QApplication::instance ())->favicons;
+  Favicons& favicons = qApp->favicons;
   const int firstTrackerRow = 2; // skip over the "All" and separator...
 
   // pull info from the tracker model...
@@ -483,7 +483,7 @@ FilterBar::FilterBar (Prefs& prefs, TorrentModel& torrents, TorrentFilter& filte
   myIsBootstrapping (true)
 {
   QHBoxLayout * h = new QHBoxLayout (this);
-  const int hmargin = qMax (int (HIG::PAD), style ()->pixelMetric (QStyle::PM_LayoutHorizontalSpacing));
+  const int hmargin = qMax (static_cast<int> (HIG::PAD), style ()->pixelMetric (QStyle::PM_LayoutHorizontalSpacing));
 
   myCountLabel = new QLabel (this);
   h->setSpacing (0);
@@ -653,7 +653,7 @@ FilterBar::recount ()
 QString
 FilterBar::getCountString (int n) const
 {
-  return QString ("%L1").arg (n);
+  return QString::fromLatin1 ("%L1").arg (n);
 }
 
 void

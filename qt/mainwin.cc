@@ -188,7 +188,7 @@ TrMainWindow::TrMainWindow (Session& session, Prefs& prefs, TorrentModel& model,
   connect (&myFilterModel, SIGNAL (rowsInserted (QModelIndex, int, int)), this, SLOT (refreshActionSensitivitySoon ()));
   connect (&myFilterModel, SIGNAL (rowsRemoved (QModelIndex, int, int)), this, SLOT (refreshActionSensitivitySoon ()));
 
-  connect (ui.action_Quit, SIGNAL (triggered ()), QCoreApplication::instance (), SLOT (quit ()));
+  connect (ui.action_Quit, SIGNAL (triggered ()), qApp, SLOT (quit ()));
 
   // torrent view
   myFilterModel.setSourceModel (&myModel);
@@ -230,7 +230,7 @@ TrMainWindow::TrMainWindow (Session& session, Prefs& prefs, TorrentModel& model,
   menu->addSeparator ();
   menu->addAction (ui.action_Quit);
   myTrayIcon.setContextMenu (menu);
-  myTrayIcon.setIcon (QIcon::fromTheme ("transmission-tray-icon", QApplication::windowIcon ()));
+  myTrayIcon.setIcon (QIcon::fromTheme ("transmission-tray-icon", qApp->windowIcon ()));
 
   connect (&myPrefs, SIGNAL (changed (int)), this, SLOT (refreshPref (int)));
   connect (ui.action_ShowMainWindow, SIGNAL (triggered (bool)), this, SLOT (toggleWindows (bool)));
@@ -942,7 +942,7 @@ TrMainWindow::toggleWindows (bool doShow)
       if (isMinimized ()) showNormal ();
       //activateWindow ();
       raise ();
-      QApplication::setActiveWindow (this);
+      qApp->setActiveWindow (this);
     }
 }
 
@@ -1041,7 +1041,7 @@ TrMainWindow::refreshPref (int key)
         b = myPrefs.getBool (key);
         ui.action_TrayIcon->setChecked (b);
         myTrayIcon.setVisible (b);
-        dynamic_cast<MyApp*> (QCoreApplication::instance ())->setQuitOnLastWindowClosed (!b);
+        qApp->setQuitOnLastWindowClosed (!b);
         refreshTrayIconSoon ();
         break;
 
@@ -1117,7 +1117,7 @@ TrMainWindow::openTorrent ()
   QCheckBox * b = new QCheckBox (tr ("Show &options dialog"));
   b->setChecked (myPrefs.getBool (Prefs::OPTIONS_PROMPT));
   b->setObjectName (SHOW_OPTIONS_CHECKBOX_NAME);
-  auto l = dynamic_cast<QGridLayout*> (d->layout ());
+  auto l = qobject_cast<QGridLayout*> (d->layout ());
   if (l == nullptr)
     {
       l = new QGridLayout;
@@ -1134,10 +1134,10 @@ TrMainWindow::openTorrent ()
 void
 TrMainWindow::openURL ()
 {
-  QString str = QApplication::clipboard ()->text (QClipboard::Selection);
+  QString str = qApp->clipboard ()->text (QClipboard::Selection);
 
   if (!AddData::isSupported (str))
-    str = QApplication::clipboard ()->text (QClipboard::Clipboard);
+    str = qApp->clipboard ()->text (QClipboard::Clipboard);
 
   if (!AddData::isSupported (str))
     str.clear ();
@@ -1169,12 +1169,12 @@ TrMainWindow::addTorrent (const AddData& addMe, bool showOptions)
     {
       Options * o = new Options (mySession, myPrefs, addMe, this);
       o->show ();
-      QApplication::alert (o);
+      qApp->alert (o);
     }
   else
     {
       mySession.addTorrent (addMe);
-      QApplication::alert (this);
+      qApp->alert (this);
     }
 }
 
@@ -1258,14 +1258,14 @@ TrMainWindow::removeTorrents (const bool deleteFiles)
         }
     }
 
-  msgBox.setWindowTitle (QString (" "));
-  msgBox.setText (QString ("<big><b>%1</big></b>").arg (primary_text));
+  msgBox.setWindowTitle (QLatin1String (" "));
+  msgBox.setText (QString::fromLatin1 ("<big><b>%1</big></b>").arg (primary_text));
   msgBox.setInformativeText (secondary_text);
   msgBox.setStandardButtons (QMessageBox::Ok | QMessageBox::Cancel);
   msgBox.setDefaultButton (QMessageBox::Cancel);
   msgBox.setIcon (QMessageBox::Question);
   // hack needed to keep the dialog from being too narrow
-  auto layout = dynamic_cast<QGridLayout*>(msgBox.layout());
+  auto layout = qobject_cast<QGridLayout*> (msgBox.layout ());
   if (layout == nullptr)
     {
       layout = new QGridLayout;
@@ -1417,7 +1417,7 @@ TrMainWindow::dropEvent (QDropEvent * event)
           if (url.scheme () == "file")
             key = QUrl::fromPercentEncoding (url.path().toUtf8());
 
-          dynamic_cast<MyApp*> (QApplication::instance ())->addTorrent (key);
+          qApp->addTorrent (key);
         }
     }
 }

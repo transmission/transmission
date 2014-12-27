@@ -36,7 +36,7 @@ TrackerModel::data (const QModelIndex& index, int role) const
       switch (role)
         {
           case Qt::DisplayRole:
-            var = QString (trackerInfo.st.announce);
+            var = trackerInfo.st.announce;
             break;
 
           case Qt::DecorationRole:

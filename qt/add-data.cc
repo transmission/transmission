@@ -102,7 +102,7 @@ AddData::readableName () const
         {
           tr_info inf;
           tr_ctor * ctor = tr_ctorNew (NULL);
-          tr_ctorSetMetainfo (ctor, (const quint8*)metainfo.constData(), metainfo.size());
+          tr_ctorSetMetainfo (ctor, reinterpret_cast<const quint8*> (metainfo.constData()), metainfo.size());
           if (tr_torrentParse (ctor, &inf) == TR_PARSE_OK )
             {
               ret = QString::fromUtf8 (inf.name); // metainfo is required to be UTF-8

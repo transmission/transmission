@@ -290,7 +290,7 @@ namespace
 QSize
 TorrentDelegate::sizeHint (const QStyleOptionViewItem& option, const Torrent& tor) const
 {
-  const QStyle* style (QApplication::style ());
+  const QStyle* style (qApp->style ());
   static const int iconSize (style->pixelMetric (QStyle::PM_MessageBoxIconSize));
 
   QFont nameFont (option.font);
@@ -299,7 +299,7 @@ TorrentDelegate::sizeHint (const QStyleOptionViewItem& option, const Torrent& to
   const QString nameStr (tor.name ());
   const int nameWidth = nameFM.width (nameStr);
   QFont statusFont (option.font);
-  statusFont.setPointSize (int (option.font.pointSize () * 0.9));
+  statusFont.setPointSize (static_cast<int> (option.font.pointSize () * 0.9));
   const QFontMetrics statusFM (statusFont);
   const QString statusStr (statusString (tor));
   const int statusWidth = statusFM.width (statusStr);
@@ -348,7 +348,7 @@ TorrentDelegate::setProgressBarPercentDone (const QStyleOptionViewItem & option,
     {
       const bool isMagnet (!tor.hasMetadata ());
       myProgressBarStyle->direction = option.direction;
-      myProgressBarStyle->progress = int(myProgressBarStyle->minimum + (((isMagnet ? tor.metadataPercentDone() : tor.percentDone()) * (myProgressBarStyle->maximum - myProgressBarStyle->minimum))));
+      myProgressBarStyle->progress = static_cast<int> (myProgressBarStyle->minimum + (((isMagnet ? tor.metadataPercentDone() : tor.percentDone()) * (myProgressBarStyle->maximum - myProgressBarStyle->minimum))));
     }
 }
 
@@ -357,7 +357,7 @@ TorrentDelegate::drawTorrent (QPainter                   * painter,
                               const QStyleOptionViewItem & option,
                               const Torrent              & tor) const
 {
-  const QStyle * style (QApplication::style ());
+  const QStyle * style (qApp->style ());
   static const int iconSize (style->pixelMetric (QStyle::PM_LargeIconSize));
   QFont nameFont (option.font);
   nameFont.setWeight (QFont::Bold);
@@ -365,7 +365,7 @@ TorrentDelegate::drawTorrent (QPainter                   * painter,
   const QString nameStr (tor.name ());
   const QSize nameSize (nameFM.size (0, nameStr));
   QFont statusFont (option.font);
-  statusFont.setPointSize (int (option.font.pointSize () * 0.9));
+  statusFont.setPointSize (static_cast<int> (option.font.pointSize () * 0.9));
   const QFontMetrics statusFM (statusFont);
   const QString statusStr (progressString (tor));
   QFont progressFont (statusFont);

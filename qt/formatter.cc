@@ -75,13 +75,13 @@ Formatter::initUnits ()
 double
 Speed::KBps () const
 {
-  return _Bps / (double)speed_K;
+  return _Bps / static_cast<double> (speed_K);
 }
 
 Speed
 Speed::fromKBps (double KBps)
 {
-  return int (KBps * speed_K);
+  return static_cast<int> (KBps * speed_K);
 }
 
 /***
@@ -144,7 +144,7 @@ QString
 Formatter::percentToString (double x)
 {
   char buf[128];
-  return QString (tr_strpercent (buf, x, sizeof (buf)));
+  return QString::fromUtf8 (tr_strpercent (buf, x, sizeof (buf)));
 }
 
 QString

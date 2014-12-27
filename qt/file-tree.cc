@@ -158,7 +158,7 @@ FileTreeItem::data (int column, int role) const
   else if (role == Qt::DecorationRole && column == COL_NAME)
     {
       if (childCount () > 0)
-        value = QApplication::style ()->standardIcon (QStyle::SP_DirOpenIcon);
+        value = qApp->style ()->standardIcon (QStyle::SP_DirOpenIcon);
       else
         value = Utils::guessMimeIcon (name ());
     }
@@ -815,7 +815,7 @@ FileTreeDelegate::paint (QPainter                    * painter,
       return;
     }
 
-  QStyle * style (QApplication::style ());
+  QStyle * style (qApp->style ());
 
   painter->save();
   QItemDelegate::drawBackground (painter, option, index);
@@ -824,11 +824,11 @@ FileTreeDelegate::paint (QPainter                    * painter,
     {
       QStyleOptionProgressBar p;
       p.state = option.state | QStyle::State_Small;
-      p.direction = QApplication::layoutDirection();
+      p.direction = qApp->layoutDirection();
       p.rect = option.rect;
       p.rect.setSize (QSize(option.rect.width()-2, option.rect.height()-8));
       p.rect.moveCenter (option.rect.center());
-      p.fontMetrics = QApplication::fontMetrics();
+      p.fontMetrics = qApp->fontMetrics();
       p.minimum = 0;
       p.maximum = 100;
       p.textAlignment = Qt::AlignCenter;
@@ -841,10 +841,10 @@ FileTreeDelegate::paint (QPainter                    * painter,
     {
       QStyleOptionButton o;
       o.state = option.state;
-      o.direction = QApplication::layoutDirection();
+      o.direction = qApp->layoutDirection();
       o.rect.setSize (QSize(20, option.rect.height()));
       o.rect.moveCenter (option.rect.center());
-      o.fontMetrics = QApplication::fontMetrics();
+      o.fontMetrics = qApp->fontMetrics();
       switch (index.data().toInt())
         {
           case Qt::Unchecked: o.state |= QStyle::State_Off; break;
@@ -948,7 +948,7 @@ FileTreeView::eventFilter (QObject * o, QEvent * event)
   // space is left over...
   if ((o == this) && (event->type() == QEvent::Resize))
     {
-      QResizeEvent * r = dynamic_cast<QResizeEvent*>(event);
+      QResizeEvent * r = static_cast<QResizeEvent*> (event);
       int left = r->size().width();
       const QFontMetrics fontMetrics(font());
       for (int column=FIRST_VISIBLE_COLUMN; column<=LAST_VISIBLE_COLUMN; ++column)

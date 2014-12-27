@@ -39,7 +39,7 @@ Torrent::Torrent (Prefs& prefs, int id):
 #endif
 
   setInt (ID, id);
-  setIcon (MIME_ICON, QApplication::style()->standardIcon (QStyle::SP_FileIcon));
+  setIcon (MIME_ICON, qApp->style()->standardIcon (QStyle::SP_FileIcon));
 }
 
 Torrent::~Torrent ()
@@ -393,9 +393,9 @@ Torrent::compareRatio (const Torrent& that) const
 {
   const double a = ratio ();
   const double b = that.ratio ();
-  if ((int)a == TR_RATIO_INF && (int)b == TR_RATIO_INF) return 0;
-  if ((int)a == TR_RATIO_INF) return 1;
-  if ((int)b == TR_RATIO_INF) return -1;
+  if (static_cast<int> (a) == TR_RATIO_INF && static_cast<int> (b) == TR_RATIO_INF) return 0;
+  if (static_cast<int> (a) == TR_RATIO_INF) return 1;
+  if (static_cast<int> (b) == TR_RATIO_INF) return -1;
   if (a < b) return -1;
   if (a > b) return 1;
   return 0;
@@ -605,7 +605,7 @@ Torrent::update (tr_variant * d)
         {
           if (tr_variantDictFindStr(child, TR_KEY_announce, &str, &len))
             {
-              dynamic_cast<MyApp*>(QApplication::instance())->favicons.add (QUrl(QString::fromUtf8(str)));
+              qApp->favicons.add (QUrl(QString::fromUtf8(str)));
               list.append (QString::fromUtf8 (str, len));
             }
         }
@@ -645,7 +645,7 @@ Torrent::update (tr_variant * d)
           if (tr_variantDictFindStr(child, TR_KEY_announce, &str, &len))
             {
               trackerStat.announce = QString::fromUtf8 (str, len);
-              dynamic_cast<MyApp*>(QApplication::instance())->favicons.add (QUrl (trackerStat.announce));
+              qApp->favicons.add (QUrl (trackerStat.announce));
             }
 
           if (tr_variantDictFindInt (child, TR_KEY_announceState, &i))
@@ -801,7 +801,6 @@ Torrent::getError () const
 QPixmap
 TrackerStat::getFavicon () const
 {
-  MyApp * myApp = dynamic_cast<MyApp*>(QApplication::instance());
-  return myApp->favicons.find (QUrl (announce));
+  return qApp->favicons.find (QUrl (announce));
 }
 

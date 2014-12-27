@@ -76,7 +76,7 @@ MakeDialog::onProgress ()
   // progress bar
   const tr_metainfo_builder * b = myBuilder;
   const double denom = b->pieceCount ? b->pieceCount : 1;
-  myNewProgress->setValue ((int) ((100.0 * b->pieceIndex) / denom));
+  myNewProgress->setValue (static_cast<int> ((100.0 * b->pieceIndex) / denom));
 
   // progress label
   const QString top = QString::fromLocal8Bit (myBuilder->top);

@@ -82,7 +82,7 @@ namespace
         const QString filename = fileInfo.fileName ();
 
         SHFILEINFO shellFileInfo;
-        if (::SHGetFileInfoW ((const wchar_t*) filename.utf16 (), FILE_ATTRIBUTE_NORMAL,
+        if (::SHGetFileInfoW (reinterpret_cast<const wchar_t*> (filename.utf16 ()), FILE_ATTRIBUTE_NORMAL,
                               &shellFileInfo, sizeof(shellFileInfo),
                               SHGFI_ICON | iconSize | SHGFI_USEFILEATTRIBUTES) != 0)
           {
@@ -122,7 +122,7 @@ Utils::guessMimeIcon (const QString& filename)
     }
 
   if (icon.isNull ())
-    icon = QApplication::style ()->standardIcon (QStyle::SP_FileIcon);
+    icon = qApp->style ()->standardIcon (QStyle::SP_FileIcon);
 
   return icon;
 #else
@@ -133,7 +133,7 @@ Utils::guessMimeIcon (const QString& filename)
 
   if (fileIcons[0].isNull ())
     {
-      fallback = QApplication::style()->standardIcon (QStyle::SP_FileIcon);
+      fallback = qApp->style()->standardIcon (QStyle::SP_FileIcon);
 
       suffixes[DISK] << QString::fromLatin1("iso");
       fileIcons[DISK]= QIcon::fromTheme (QString::fromLatin1("media-optical"), fallback);

@@ -157,7 +157,7 @@ Prefs::Prefs (const char * configDir):
         {
           case QVariant::Int:
             if (tr_variantGetInt (b, &intVal))
-              myValues[i].setValue (qlonglong(intVal));
+              myValues[i].setValue (static_cast<qlonglong> (intVal));
             break;
 
           case TrTypes::SortModeType:
@@ -177,7 +177,7 @@ Prefs::Prefs (const char * configDir):
 
           case QVariant::Bool:
             if (tr_variantGetBool (b, &boolVal))
-              myValues[i].setValue (bool(boolVal));
+              myValues[i].setValue (static_cast<bool> (boolVal));
             break;
 
           case QVariant::Double:

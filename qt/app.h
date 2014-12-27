@@ -69,4 +69,7 @@ class MyApp: public QApplication
     void maybeUpdateBlocklist ();
 };
 
+#undef qApp
+#define qApp static_cast<MyApp*> (MyApp::instance ())
+
 #endif

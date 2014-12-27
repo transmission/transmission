@@ -153,7 +153,7 @@ MyApp::MyApp (int& argc, char ** argv):
   const char * password = 0;
   const char * configDir = 0;
   QStringList filenames;
-  while ((c = tr_getopt (getUsage(), argc, (const char**)argv, opts, &optarg)))
+  while ((c = tr_getopt (getUsage(), argc, const_cast<const char**> (argv), opts, &optarg)))
     {
       switch (c)
         {
@@ -371,7 +371,7 @@ MyApp::onTorrentCompleted (int id)
       if (myPrefs->getBool (Prefs::COMPLETE_SOUND_ENABLED))
         {
 #if defined (Q_OS_WIN) || defined (Q_OS_MAC)
-          QApplication::beep ();
+          beep ();
 #else
           QProcess::execute (myPrefs->getString (Prefs::COMPLETE_SOUND_COMMAND));
 #endif
@@ -533,7 +533,7 @@ MyApp::addTorrent (const AddData& addme)
 void
 MyApp::raise ()
 {
-  QApplication::alert (myWindow);
+  alert (myWindow);
 }
 
 bool
@@ -552,7 +552,7 @@ MyApp::notifyApp (const QString& title, const QString& body) const
   args.append (body);                                 // body
   args.append (QStringList ());                       // actions - unused for plain passive popups
   args.append (QVariantMap ());                       // hints - unused atm
-  args.append (int32_t (-1));                          // use the default timeout period
+  args.append (static_cast<int32_t> (-1));            // use the default timeout period
   m.setArguments (args);
   QDBusMessage replyMsg = QDBusConnection::sessionBus ().call (m);
   //std::cerr << qPrintable (replyMsg.errorName ()) << std::endl;

@@ -47,7 +47,7 @@ QSize
 TorrentDelegateMin::sizeHint (const QStyleOptionViewItem & option,
                               const Torrent              & tor) const
 {
-  const QStyle* style (QApplication::style());
+  const QStyle* style (qApp->style());
   static const int iconSize (style->pixelMetric (QStyle::PM_SmallIconSize));
 
   QFont nameFont (option.font);
@@ -57,7 +57,7 @@ TorrentDelegateMin::sizeHint (const QStyleOptionViewItem & option,
   const int nameWidth = nameFM.width (nameStr);
 
   QFont statusFont (option.font);
-  statusFont.setPointSize (int (option.font.pointSize() * 0.85));
+  statusFont.setPointSize (static_cast<int> (option.font.pointSize() * 0.85));
   const QFontMetrics statusFM (statusFont);
   const QString statusStr (shortStatusString (tor));
   const int statusWidth = statusFM.width (statusStr);
@@ -76,7 +76,7 @@ TorrentDelegateMin::drawTorrent (QPainter                   * painter,
                                  const Torrent              & tor) const
 {
   const bool isPaused (tor.isPaused());
-  const QStyle * style (QApplication::style());
+  const QStyle * style (qApp->style());
   static const int iconSize (style->pixelMetric (QStyle::PM_SmallIconSize));
 
   QFont nameFont (option.font);
@@ -85,7 +85,7 @@ TorrentDelegateMin::drawTorrent (QPainter                   * painter,
   const QString nameStr = (isMagnet ? progressString (tor) : tor.name());
 
   QFont statusFont (option.font);
-  statusFont.setPointSize (int (option.font.pointSize() * 0.85));
+  statusFont.setPointSize (static_cast<int> (option.font.pointSize() * 0.85));
   const QFontMetrics statusFM (statusFont);
   const QString statusStr (shortStatusString (tor));
   const QSize statusSize (statusFM.size (0, statusStr));

@@ -104,7 +104,7 @@ FileAdded::executed (int64_t tag, const QString& result, tr_variant * arguments)
         {
           const QString myFilename = QFileInfo (myName).fileName ();
           const QString name = QString::fromUtf8 (str);
-          QMessageBox::warning (QApplication::activeWindow (),
+          QMessageBox::warning (qApp->activeWindow (),
                                 tr ("Add Torrent"),
                                 tr ("<p><b>Unable to add \"%1\".</b></p><p>It is a duplicate of \"%2\" which is already added.</p>").arg (myFilename).arg (name));
         }
@@ -124,9 +124,9 @@ FileAdded::executed (int64_t tag, const QString& result, tr_variant * arguments)
         if (!i || text[i-1].isSpace ())
           text[i] = text[i].toUpper ();
 
-      QMessageBox::warning (QApplication::activeWindow (),
+      QMessageBox::warning (qApp->activeWindow (),
                             tr ("Error Adding Torrent"),
-                            QString ("<p><b>%1</b></p><p>%2</p>").arg (text).arg (myName));
+                            QString::fromLatin1 ("<p><b>%1</b></p><p>%2</p>").arg (text).arg (myName));
     }
 
   deleteLater ();
@@ -719,8 +719,8 @@ Session::localSessionCallback (tr_session * s, evbuffer * json, void * vself)
 
   /* this callback is invoked in the libtransmission thread, so we don't want
      to process the response here... let's push it over to the Qt thread. */
-  self->responseReceived (QByteArray ( (const char *)evbuffer_pullup (json, -1),
-                                     (int)evbuffer_get_length (json)));
+  self->responseReceived (QByteArray (reinterpret_cast<const char *> (evbuffer_pullup (json, -1)),
+                                      static_cast<int> (evbuffer_get_length (json))));
 }
 
 #define REQUEST_DATA_PROPERTY_KEY "requestData"
@@ -736,7 +736,7 @@ Session::exec (const char * json)
     {
       QNetworkRequest request;
       request.setUrl (myUrl);
-      request.setRawHeader ("User-Agent", QString (QCoreApplication::instance ()->applicationName () + "/" + LONG_VERSION_STRING).toUtf8 ());
+      request.setRawHeader ("User-Agent", (qApp->applicationName () + "/" + LONG_VERSION_STRING).toUtf8 ());
       request.setRawHeader ("Content-Type", "application/json; charset=UTF-8");
 
       if (!mySessionId.isEmpty ())
@@ -779,7 +779,7 @@ Session::onFinished (QNetworkReply * reply)
     {
         // we got a 409 telling us our session id has expired.
         // update it and resubmit the request.
-        mySessionId = QString (reply->rawHeader (TR_RPC_SESSION_ID_HEADER));
+        mySessionId = QString::fromUtf8 (reply->rawHeader (TR_RPC_SESSION_ID_HEADER));
         exec (reply->property (REQUEST_DATA_PROPERTY_KEY).toByteArray ().constData ());
     }
     else if (reply->error () != QNetworkReply::NoError)
@@ -871,7 +871,7 @@ Session::parseResponse (const char * json, size_t jsonLength)
                         const QString text = tr ("<p><b>Unable to rename \"%1\" as \"%2\": %3.</b></p> <p>Please correct the errors and try again.</p>").arg (path).arg (name).arg (result);
                         QMessageBox * d = new QMessageBox (QMessageBox::Information, title, text,
                                                            QMessageBox::Close,
-                                                           QApplication::activeWindow ());
+                                                           qApp->activeWindow ());
                         connect (d, SIGNAL (rejected ()), d, SLOT (deleteLater ()));
                         d->show ();
                       }
@@ -879,8 +879,8 @@ Session::parseResponse (const char * json, size_t jsonLength)
                       {
                         // let's get the updated file list
                         char * req = tr_strdup_printf ("{ \"arguments\": { \"fields\": [ \"fileStats\", \"files\", \"id\", \"name\" ], \"ids\": %d }, \"method\": \"torrent-get\", \"tag\": %d }",
-                                                       int (id),
-                                                       int (TAG_SOME_TORRENTS));
+                                                       static_cast<int> (id),
+                                                       static_cast<int> (TAG_SOME_TORRENTS));
                         exec (req);
                         tr_free (req);
                       }
@@ -889,10 +889,10 @@ Session::parseResponse (const char * json, size_t jsonLength)
                 }
 
                 case TAG_PORT_TEST: {
-                    bool isOpen = 0;
+                    bool isOpen = false;
                     if (tr_variantDictFindDict (&top, TR_KEY_arguments, &args))
                         tr_variantDictFindBool (args, TR_KEY_port_is_open, &isOpen);
-                    emit portTested ( (bool)isOpen);
+                    emit portTested (isOpen);
                     break;
                 }
 
@@ -905,7 +905,7 @@ Session::parseResponse (const char * json, size_t jsonLength)
                         && tr_variantDictFindList (args, TR_KEY_torrents, &torrents)
                         && ( (child = tr_variantListChild (torrents, 0)))
                         && tr_variantDictFindStr (child, TR_KEY_magnetLink, &str, NULL))
-                            QApplication::clipboard ()->setText (str);
+                            qApp->clipboard ()->setText (str);
                     break;
                 }
 
@@ -916,7 +916,7 @@ Session::parseResponse (const char * json, size_t jsonLength)
                                                            tr ("Add Torrent"),
                                                            QString::fromUtf8 (str),
                                                            QMessageBox::Close,
-                                                           QApplication::activeWindow ());
+                                                           qApp->activeWindow ());
                         connect (d, SIGNAL (rejected ()), d, SLOT (deleteLater ()));
                         d->show ();
                     }
@@ -999,7 +999,7 @@ Session::updateInfo (tr_variant * d)
             {
               int64_t val;
               if (tr_variantGetInt (b, &val))
-                myPrefs.set (i, (int)val);
+                myPrefs.set (i, static_cast<int>(val));
               break;
             }
           case QVariant::Double:
@@ -1013,7 +1013,7 @@ Session::updateInfo (tr_variant * d)
             {
               bool val;
               if (tr_variantGetBool (b, &val))
-                myPrefs.set (i, (bool)val);
+                myPrefs.set (i, val);
               break;
             }
           case TrTypes::FilterModeType:
@@ -1022,7 +1022,7 @@ Session::updateInfo (tr_variant * d)
             {
               const char * val;
               if (tr_variantGetStr (b, &val, NULL))
-                myPrefs.set (i, QString (val));
+                myPrefs.set (i, QString::fromUtf8 (val));
               break;
             }
           default:
@@ -1033,7 +1033,7 @@ Session::updateInfo (tr_variant * d)
   bool b;
   double x;
   if (tr_variantDictFindBool (d, TR_KEY_seedRatioLimited, &b))
-    myPrefs.set (Prefs::RATIO_ENABLED, b ? true : false);
+    myPrefs.set (Prefs::RATIO_ENABLED, b);
   if (tr_variantDictFindReal (d, TR_KEY_seedRatioLimit, &x))
     myPrefs.set (Prefs::RATIO, x);
 
