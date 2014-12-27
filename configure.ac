@@ -211,17 +211,30 @@ AC_CHECK_LIB([rt],
 
 AC_MSG_CHECKING([µTP])
 build_utp="no"
-if test "x$CXX" != "x" ; then
-    have_utp="yes"
-else
-    have_utp="no"
-fi
+
+ac_save_LIBS="$LIBS"
+LIBS="-lutp"
+AC_LINK_IFELSE(
+  [AC_LANG_PROGRAM([#include <libutp/utp.h>],
+                   [struct UTPFunctionTable func;])],
+  [have_utp="yes"],
+  [have_utp="no"]
+)
+LIBS=$ac_save_LIBS
+
 AC_ARG_ENABLE([utp],
               AS_HELP_STRING([--enable-utp],[build µTP support]),
               [want_utp=${enableval}],
               [want_utp=${have_utp}])
-if test "x$want_utp" = "xyes" ; then
+if test "x$want_utp" = "xyes"; then
     if test "x$have_utp" = "xyes"; then
+        dnl Would be lovely if it had pkgconfig
+        LIBUTP_CFLAGS=""
+        LIBUTP_LIBS="-lutp $libutp_extra_libs"
+        LIBUTP_LIBS_QT="-lutp $libutp_extra_libs"
+        AC_DEFINE([WITH_UTP],[1])
+        build_utp="system"
+    elif test "x$CXX" != "x"; then
         LIBUTP_CFLAGS="-I\$(top_srcdir)/third-party/"
         LIBUTP_LIBS="\$(top_builddir)/third-party/libutp/libutp.a"
         LIBUTP_LIBS_QT="\$\${TRANSMISSION_TOP}/third-party/libutp/libutp.a"
