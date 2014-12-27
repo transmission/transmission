@@ -220,12 +220,18 @@ AC_LINK_IFELSE(
   [have_utp="yes"],
   [have_utp="no"]
 )
-LIBS=$ac_save_LIBS
+LIBS="$ac_save_LIBS"
+
+if test "x$have_utp" = "xyes" -o "x$CXX" != "x"; then
+    want_utp_default="yes"
+else
+    want_utp_default="no"
+fi
 
 AC_ARG_ENABLE([utp],
               AS_HELP_STRING([--enable-utp],[build µTP support]),
               [want_utp=${enableval}],
-              [want_utp=${have_utp}])
+              [want_utp=${want_utp_default}])
 if test "x$want_utp" = "xyes"; then
     if test "x$have_utp" = "xyes"; then
         dnl Would be lovely if it had pkgconfig
