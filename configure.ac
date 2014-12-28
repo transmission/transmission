@@ -196,8 +196,10 @@ dnl  dht
 
 DHT_CFLAGS="-I\$(top_srcdir)/third-party/dht"
 DHT_LIBS="\$(top_builddir)/third-party/dht/libdht.a"
+DHT_LIBS_QT="\$\${TRANSMISSION_TOP}/third-party/dht/libdht.a"
 AC_SUBST(DHT_CFLAGS)
 AC_SUBST(DHT_LIBS)
+AC_SUBST(DHT_LIBS_QT)
 
 
 dnl ----------------------------------------------------------------------------
