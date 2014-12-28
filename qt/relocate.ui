@@ -57,12 +57,18 @@
     </widget>
    </item>
    <item row="1" column="1">
-    <widget class="QPushButton" name="newLocationButton">
+    <widget class="QToolButton" name="newLocationButton">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
      <property name="styleSheet">
       <string notr="true">text-align:left</string>
      </property>
-     <property name="autoDefault">
-      <bool>false</bool>
+     <property name="toolButtonStyle">
+      <enum>Qt::ToolButtonTextBesideIcon</enum>
      </property>
     </widget>
    </item>
