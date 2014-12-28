@@ -20,6 +20,7 @@ class QLineEdit;
 class QPaintEvent;
 class QStandardItemModel;
 class QTimer;
+class QToolButton;
 
 class Prefs;
 class TorrentFilter;
