@@ -197,6 +197,20 @@ dnl  dht
 DHT_CFLAGS="-I\$(top_srcdir)/third-party/dht"
 DHT_LIBS="\$(top_builddir)/third-party/dht/libdht.a"
 DHT_LIBS_QT="\$\${TRANSMISSION_TOP}/third-party/dht/libdht.a"
+build_bundled_dht="yes"
+AC_ARG_ENABLE([external-dht],
+              AS_HELP_STRING([--enable-external-dht],[Use system external-dht]),
+              [want_external_dht=${enableval}],
+              [want_external_dht=no])
+if test "x$want_external_dht" != "xno" ; then
+       dnl Would be lovely if it had pkgconfig
+       DHT_CFLAGS=""
+       DHT_LIBS="-ldht"
+       DHT_LIBS_QT="-ldht"
+       build_bundled_dht="no"
+fi
+
+AM_CONDITIONAL([BUILD_DHT],[test "x$build_bundled_dht" = "xyes"])
 AC_SUBST(DHT_CFLAGS)
 AC_SUBST(DHT_LIBS)
 AC_SUBST(DHT_LIBS_QT)

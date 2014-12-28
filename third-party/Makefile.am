@@ -1,3 +1,6 @@
+if BUILD_DHT
+  DHT_DIR = dht
+endif
 if BUILD_UTP
   UTP_DIR = libutp
 endif
@@ -9,7 +12,7 @@ if BUILD_NATPMP
 endif 
 
 SUBDIRS = \
-  dht \
+  $(DHT_DIR) \
   $(NATPMP_DIR) \
   $(MINIUPNP_DIR) \
   $(UTP_DIR)
