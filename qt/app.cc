@@ -519,7 +519,7 @@ MyApp::addTorrent (const AddData& addme)
     }
   else
     {
-      Options * o = new Options (*mySession, *myPrefs, addme, myWindow);
+      OptionsDialog * o = new OptionsDialog (*mySession, *myPrefs, addme, myWindow);
       o->show ();
     }
 

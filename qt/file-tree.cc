@@ -428,6 +428,12 @@ FileTreeModel::~FileTreeModel()
   delete myRootItem;
 }
 
+void
+FileTreeModel::setEditable (bool editable)
+{
+  myIsEditable = editable;
+}
+
 FileTreeItem *
 FileTreeModel::itemFromIndex (const QModelIndex& index) const
 {
@@ -1010,4 +1016,10 @@ void
 FileTreeView::clear ()
 {
   myModel.clear();
+}
+
+void
+FileTreeView::setEditable (bool editable)
+{
+  myModel.setEditable (editable);
 }

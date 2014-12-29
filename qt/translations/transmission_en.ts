@@ -1422,7 +1422,7 @@ To add another primary URL, add it after a blank line.</source>
     </message>
 </context>
 <context>
-    <name>Options</name>
+    <name>OptionsDialog</name>
     <message>
         <location filename="../options.cc" line="+403"/>
         <source>Open Torrent</source>

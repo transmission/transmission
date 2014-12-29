@@ -1432,7 +1432,7 @@ Papildomą pirminį URL adresą galite įvesti, palikę prieš jį tuščią eil
     </message>
 </context>
 <context>
-    <name>Options</name>
+    <name>OptionsDialog</name>
     <message>
         <location filename="../options.cc" line="+109"/>
         <source>&amp;Destination folder:</source>

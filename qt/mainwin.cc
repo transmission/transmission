@@ -1167,7 +1167,7 @@ TrMainWindow::addTorrent (const AddData& addMe, bool showOptions)
 {
   if (showOptions)
     {
-      Options * o = new Options (mySession, myPrefs, addMe, this);
+      OptionsDialog * o = new OptionsDialog (mySession, myPrefs, addMe, this);
       o->show ();
       qApp->alert (o);
     }

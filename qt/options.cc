@@ -7,23 +7,10 @@
  * $Id$
  */
 
-#include <algorithm> // std::min()
-
-#include <QCheckBox>
-#include <QComboBox>
-#include <QDialogButtonBox>
-#include <QEvent>
 #include <QFileDialog>
 #include <QFileIconProvider>
 #include <QFileInfo>
-#include <QGridLayout>
-#include <QLabel>
 #include <QPushButton>
-#include <QResizeEvent>
-#include <QSet>
-#include <QVBoxLayout>
-#include <QWidget>
-#include <QLineEdit>
 
 #include <libtransmission/transmission.h>
 #include <libtransmission/utils.h> /* mime64 */
@@ -32,7 +19,6 @@
 #include "add-data.h"
 #include "file-tree.h"
 #include "freespace-label.h"
-#include "hig.h"
 #include "options.h"
 #include "prefs.h"
 #include "session.h"
@@ -43,23 +29,17 @@
 ****
 ***/
 
-Options::Options (Session& session, const Prefs& prefs, const AddData& addme, QWidget * parent):
+OptionsDialog::OptionsDialog (Session& session, const Prefs& prefs, const AddData& addme, QWidget * parent):
   QDialog (parent, Qt::Dialog),
   mySession (session),
   myAdd (addme),
   myHaveInfo (false),
-  mySourceButton (0),
-  mySourceEdit (0),
-  myDestinationButton (0),
-  myDestinationEdit (0),
-  myVerifyButton (0),
-  myVerifyFile (0),
+  myVerifyButton (nullptr),
+  myVerifyFile (nullptr),
   myVerifyHash (QCryptographicHash::Sha1),
   myEditTimer (this)
 {
-  QFontMetrics fontMetrics (font ());
-  QGridLayout * layout = new QGridLayout (this);
-  int row = 0;
+  ui.setupUi (this);
 
   QString title;
   if (myAdd.type == AddData::FILENAME)
@@ -70,128 +50,81 @@ Options::Options (Session& session, const Prefs& prefs, const AddData& addme, QW
 
   myEditTimer.setInterval (2000);
   myEditTimer.setSingleShot (true);
-  connect (&myEditTimer, SIGNAL (timeout ()), this, SLOT (onDestinationEditedIdle ()));
-
-  const int iconSize (style ()->pixelMetric (QStyle::PM_SmallIconSize));
-  QIcon fileIcon = style ()->standardIcon (QStyle::SP_FileIcon);
-  const QPixmap filePixmap = fileIcon.pixmap (iconSize);
-
-  QLabel * l = new QLabel (tr ("&Source:"));
-  layout->addWidget (l, row, 0, Qt::AlignLeft);
-
-  QWidget * w;
-  QPushButton * p;
+  connect (&myEditTimer, SIGNAL (timeout ()), this, SLOT (onDestinationEdited ()));
 
   if (myAdd.type == AddData::FILENAME)
     {
-      p = mySourceButton =  new QPushButton;
-      p->setIcon (filePixmap);
-      p->setStyleSheet (QString::fromUtf8 ("text-align: left; padding-left: 5; padding-right: 5"));
-      p->installEventFilter (this);
-      w = p;
-      connect (p, SIGNAL (clicked (bool)), this, SLOT (onFilenameClicked ()));
+      ui.sourceStack->setCurrentWidget (ui.sourceButton);
+      onSourceSelected (myAdd.filename);
+      connect (ui.sourceButton, SIGNAL (clicked ()), this, SLOT (onSourceClicked ()));
     }
   else
     {
-      QLineEdit * e = mySourceEdit = new QLineEdit;
-      e->setText (myAdd.readableName());
-      e->setCursorPosition (0);
-      e->selectAll ();
-      w = e;
-      connect (e, SIGNAL(editingFinished()), this, SLOT(onSourceEditingFinished()));
+      ui.sourceStack->setCurrentWidget (ui.sourceEdit);
+      ui.sourceEdit->setText (myAdd.readableName ());
+      ui.sourceEdit->selectAll ();
+      connect (ui.sourceEdit, SIGNAL (editingFinished ()), this, SLOT (onSourceEdited ()));
     }
 
+  ui.sourceStack->setFixedHeight (ui.sourceStack->currentWidget ()->sizeHint ().height ());
+  ui.sourceLabel->setBuddy (ui.sourceStack->currentWidget ());
+
+  const QFontMetrics fontMetrics (font ());
   const int width = fontMetrics.size (0, QString::fromUtf8 ("This is a pretty long torrent filename indeed.torrent")).width ();
-  w->setMinimumWidth (width);
-  layout->addWidget (w, row, 1);
-  l->setBuddy (w);
+  ui.sourceStack->setMinimumWidth (width);
 
-  l = new QLabel (tr ("&Destination folder:"));
-  layout->addWidget (l, ++row, 0, Qt::AlignLeft);
   const QString downloadDir (prefs.getString (Prefs::DOWNLOAD_DIR));
-  myFreespaceLabel = new FreespaceLabel (this);
-  myFreespaceLabel->setSession (mySession);
-  myFreespaceLabel->setPath (downloadDir);
+  ui.freeSpaceLabel->setSession (mySession);
 
   if (session.isLocal ())
     {
-      const QFileIconProvider iconProvider;
-      const QIcon folderIcon = iconProvider.icon (QFileIconProvider::Folder);
-      const QPixmap folderPixmap = folderIcon.pixmap (iconSize);
-
-      myLocalDestination.setPath (downloadDir);
-      p = myDestinationButton = new QPushButton;
-      p->setIcon (folderPixmap);
-      p->setStyleSheet ("text-align: left; padding-left: 5; padding-right: 5");
-      p->installEventFilter (this);
-      layout->addWidget (p, row, 1);
-      l->setBuddy (p);
-      connect (p, SIGNAL (clicked (bool)), this, SLOT (onDestinationClicked ()));
+      ui.destinationStack->setCurrentWidget (ui.destinationButton);
+      onDestinationSelected (downloadDir);
+      connect (ui.destinationButton, SIGNAL (clicked ()), this, SLOT (onDestinationClicked ()));
     }
   else
     {
-      QLineEdit * e = myDestinationEdit = new QLineEdit;
-      e->setText (downloadDir);
-      layout->addWidget (e, row, 1);
-      l->setBuddy (e);
-      connect (e, SIGNAL (textEdited (QString)), this, SLOT (onDestinationEdited (QString)));
+      ui.destinationStack->setCurrentWidget (ui.destinationEdit);
+      ui.destinationEdit->setText (downloadDir);
+      ui.freeSpaceLabel->setPath (downloadDir);
+      connect (ui.destinationEdit, SIGNAL (textEdited (QString)), &myEditTimer, SLOT (start ()));
+      connect (ui.destinationEdit, SIGNAL (editingFinished ()), this, SLOT (onDestinationEdited ()));
     }
 
-  l = myFreespaceLabel;
-  layout->addWidget (l, ++row, 0, 1, 2, Qt::Alignment (Qt::AlignRight | Qt::AlignTop));
-  layout->setRowMinimumHeight (row, l->height () + HIG::PAD_SMALL);
+  ui.destinationStack->setFixedHeight (ui.destinationStack->currentWidget ()->sizeHint ().height ());
+  ui.destinationLabel->setBuddy (ui.destinationStack->currentWidget ());
 
-  myTree = new FileTreeView (0, false);
-  layout->addWidget (myTree, ++row, 0, 1, 2);
+  ui.filesView->setEditable (false);
   if (!session.isLocal ())
-    myTree->hideColumn (2); // hide the % done, since we've no way of knowing
+    ui.filesView->hideColumn (2); // hide the % done, since we've no way of knowing
 
-  QComboBox * m = new QComboBox;
-  m->addItem (tr ("High"),   TR_PRI_HIGH);
-  m->addItem (tr ("Normal"), TR_PRI_NORMAL);
-  m->addItem (tr ("Low"),    TR_PRI_LOW);
-  m->setCurrentIndex (1); // Normal
-  myPriorityCombo = m;
-  l = new QLabel (tr ("&Priority:"));
-  l->setBuddy (m);
-  layout->addWidget (l, ++row, 0, Qt::AlignLeft);
-  layout->addWidget (m, row, 1);
+  ui.priorityCombo->addItem (tr ("High"),   TR_PRI_HIGH);
+  ui.priorityCombo->addItem (tr ("Normal"), TR_PRI_NORMAL);
+  ui.priorityCombo->addItem (tr ("Low"),    TR_PRI_LOW);
+  ui.priorityCombo->setCurrentIndex (1); // Normal
 
   if (session.isLocal ())
     {
-      p = myVerifyButton = new QPushButton (tr ("&Verify Local Data"));
-      layout->addWidget (p, ++row, 0, Qt::AlignLeft);
+      myVerifyButton = new QPushButton (tr ("&Verify Local Data"), this);
+      ui.dialogButtons->addButton (myVerifyButton, QDialogButtonBox::ActionRole);
+      connect (myVerifyButton, SIGNAL (clicked (bool)), this, SLOT (onVerify ()));
     }
 
-  QCheckBox * c;
-  c = myStartCheck = new QCheckBox (tr ("S&tart when added"));
-  c->setChecked (prefs.getBool (Prefs::START));
-  layout->addWidget (c, ++row, 0, 1, 2, Qt::AlignLeft);
+  ui.startCheck->setChecked (prefs.getBool (Prefs::START));
+  ui.trashCheck->setChecked (prefs.getBool (Prefs::TRASH_ORIGINAL));
 
-  c = myTrashCheck = new QCheckBox (tr ("Mo&ve .torrent file to the trash"));
-  c->setChecked (prefs.getBool (Prefs::TRASH_ORIGINAL));
-  layout->addWidget (c, ++row, 0, 1, 2, Qt::AlignLeft);
+  connect (ui.dialogButtons, SIGNAL (rejected ()), this, SLOT (deleteLater ()));
+  connect (ui.dialogButtons, SIGNAL (accepted ()), this, SLOT (onAccepted ()));
 
-  QDialogButtonBox * b = new QDialogButtonBox (QDialogButtonBox::Open|QDialogButtonBox::Cancel, Qt::Horizontal, this);
-  connect (b, SIGNAL (rejected ()), this, SLOT (deleteLater ()));
-  connect (b, SIGNAL (accepted ()), this, SLOT (onAccepted ()));
-  layout->addWidget (b, ++row, 0, 1, 2);
-
-  layout->setRowStretch (3, 2);
-  layout->setColumnStretch (1, 2);
-  layout->setSpacing (HIG::PAD);
-
-  connect (myTree, SIGNAL (priorityChanged (QSet<int>, int)), this, SLOT (onPriorityChanged (QSet<int>, int)));
-  connect (myTree, SIGNAL (wantedChanged (QSet<int>, bool)), this, SLOT (onWantedChanged (QSet<int>, bool)));
-  if (session.isLocal ())
-    connect (myVerifyButton, SIGNAL (clicked (bool)), this, SLOT (onVerify ()));
+  connect (ui.filesView, SIGNAL (priorityChanged (QSet<int>, int)), this, SLOT (onPriorityChanged (QSet<int>, int)));
+  connect (ui.filesView, SIGNAL (wantedChanged (QSet<int>, bool)), this, SLOT (onWantedChanged (QSet<int>, bool)));
 
   connect (&myVerifyTimer, SIGNAL (timeout ()), this, SLOT (onTimeout ()));
 
   reload ();
 }
 
-Options::~Options ()
+OptionsDialog::~OptionsDialog ()
 {
   clearInfo ();
 }
@@ -201,57 +134,7 @@ Options::~Options ()
 ***/
 
 void
-Options::refreshButton (QPushButton * p, const QString& text, int width)
-{
-  if (width <= 0)
-    width = p->width ();
-  width -= 15;
-  QFontMetrics fontMetrics (font ());
-  QString str = fontMetrics.elidedText (text, Qt::ElideRight, width);
-  p->setText (str);
-}
-
-void
-Options::refreshSource (int width)
-{
-  QString text = myAdd.readableName ();
-
-  if (mySourceButton)
-    refreshButton (mySourceButton, text, width);
-
-  if (mySourceEdit)
-    mySourceEdit->setText (text);
-}
-
-void
-Options::refreshDestinationButton (int width)
-{
-  if (myDestinationButton != 0)
-    refreshButton (myDestinationButton, myLocalDestination.absolutePath (), width);
-}
-
-
-bool
-Options::eventFilter (QObject * o, QEvent * event)
-{
-  if (event->type() == QEvent::Resize)
-    {
-      if (o == mySourceButton)
-        refreshSource (static_cast<QResizeEvent*> (event)->size ().width ());
-
-      else if (o == myDestinationButton)
-        refreshDestinationButton (static_cast<QResizeEvent*> (event)->size ().width ());
-    }
-
-  return false;
-}
-
-/***
-****
-***/
-
-void
-Options::clearInfo ()
+OptionsDialog::clearInfo ()
 {
   if (myHaveInfo)
     tr_metainfoFree (&myInfo);
@@ -261,7 +144,7 @@ Options::clearInfo ()
 }
 
 void
-Options::reload ()
+OptionsDialog::reload ()
 {
   clearInfo ();
   clearVerify ();
@@ -279,7 +162,7 @@ Options::reload ()
         break;
 
       case AddData::METAINFO:
-        tr_ctorSetMetainfo (ctor, (const quint8*)myAdd.metainfo.constData (), myAdd.metainfo.size ());
+        tr_ctorSetMetainfo (ctor, reinterpret_cast<const quint8*> (myAdd.metainfo.constData ()), myAdd.metainfo.size ());
         break;
 
       default:
@@ -290,21 +173,24 @@ Options::reload ()
   myHaveInfo = !err;
   tr_ctorFree (ctor);
 
-  myTree->clear ();
-  myTree->setVisible (myHaveInfo && (myInfo.fileCount>0));
+  ui.filesView->clear ();
   myFiles.clear ();
   myPriorities.clear ();
   myWanted.clear ();
 
-  if (myVerifyButton)
-    myVerifyButton->setVisible (myHaveInfo && (myInfo.fileCount>0));
+  const bool haveFilesToShow = myHaveInfo && myInfo.fileCount > 0;
+
+  ui.filesView->setVisible (haveFilesToShow);
+  if (myVerifyButton != nullptr)
+    myVerifyButton->setVisible (haveFilesToShow);
+  layout ()->setSizeConstraint (haveFilesToShow ? QLayout::SetDefaultConstraint : QLayout::SetFixedSize);
 
   if (myHaveInfo)
     {
       myPriorities.insert (0, myInfo.fileCount, TR_PRI_NORMAL);
       myWanted.insert (0, myInfo.fileCount, true);
 
-      for (tr_file_index_t i=0; i<myInfo.fileCount; ++i)
+      for (tr_file_index_t i = 0; i < myInfo.fileCount; ++i)
         {
           TrFile file;
           file.index = i;
@@ -317,25 +203,25 @@ Options::reload ()
         }
     }
 
-  myTree->update (myFiles);
+  ui.filesView->update (myFiles);
 }
 
 void
-Options::onPriorityChanged (const QSet<int>& fileIndices, int priority)
+OptionsDialog::onPriorityChanged (const QSet<int>& fileIndices, int priority)
 {
   foreach (int i, fileIndices)
     myPriorities[i] = priority;
 }
 
 void
-Options::onWantedChanged (const QSet<int>& fileIndices, bool isWanted)
+OptionsDialog::onWantedChanged (const QSet<int>& fileIndices, bool isWanted)
 {
   foreach (int i, fileIndices)
     myWanted[i] = isWanted;
 }
 
 void
-Options::onAccepted ()
+OptionsDialog::onAccepted ()
 {
   // rpc spec section 3.4 "adding a torrent"
 
@@ -344,19 +230,19 @@ Options::onAccepted ()
   QString downloadDir;
 
   // "download-dir"
-  if (myDestinationButton)
+  if (ui.destinationStack->currentWidget () == ui.destinationButton)
     downloadDir = myLocalDestination.absolutePath ();
   else
-    downloadDir = myDestinationEdit->text ();
+    downloadDir = ui.destinationEdit->text ();
 
   tr_variantDictAddStr (&args, TR_KEY_download_dir, downloadDir.toUtf8 ().constData ());
 
   // paused
-  tr_variantDictAddBool (&args, TR_KEY_paused, !myStartCheck->isChecked ());
+  tr_variantDictAddBool (&args, TR_KEY_paused, !ui.startCheck->isChecked ());
 
   // priority
-  const int index = myPriorityCombo->currentIndex ();
-  const int priority = myPriorityCombo->itemData (index).toInt ();
+  const int index = ui.priorityCombo->currentIndex ();
+  const int priority = ui.priorityCombo->itemData (index).toInt ();
   tr_variantDictAddInt (&args, TR_KEY_bandwidthPriority, priority);
 
   // files-unwanted
@@ -364,9 +250,11 @@ Options::onAccepted ()
   if (count > 0)
     {
       tr_variant * l = tr_variantDictAddList (&args, TR_KEY_files_unwanted, count);
-      for (int i=0, n=myWanted.size (); i<n; ++i)
-        if (myWanted.at (i) == false)
-          tr_variantListAddInt (l, i);
+      for (int i = 0, n = myWanted.size (); i < n; ++i)
+        {
+          if (myWanted.at (i) == false)
+            tr_variantListAddInt (l, i);
+        }
     }
 
   // priority-low
@@ -374,9 +262,11 @@ Options::onAccepted ()
   if (count > 0)
     {
       tr_variant * l = tr_variantDictAddList (&args, TR_KEY_priority_low, count);
-      for (int i=0, n=myPriorities.size (); i<n; ++i)
-        if (myPriorities.at (i) == TR_PRI_LOW)
-          tr_variantListAddInt (l, i);
+      for (int i = 0, n = myPriorities.size (); i < n; ++i)
+        {
+          if (myPriorities.at (i) == TR_PRI_LOW)
+            tr_variantListAddInt (l, i);
+        }
     }
 
   // priority-high
@@ -384,18 +274,20 @@ Options::onAccepted ()
   if (count > 0)
     {
       tr_variant * l = tr_variantDictAddList (&args, TR_KEY_priority_high, count);
-      for (int i=0, n=myPriorities.size (); i<n; ++i)
-        if (myPriorities.at (i) == TR_PRI_HIGH)
-          tr_variantListAddInt (l, i);
+      for (int i = 0, n = myPriorities.size (); i < n; ++i)
+        {
+          if (myPriorities.at (i) == TR_PRI_HIGH)
+            tr_variantListAddInt (l, i);
+        }
     }
 
-  mySession.addTorrent (myAdd, &args, myTrashCheck->isChecked ());
+  mySession.addTorrent (myAdd, &args, ui.trashCheck->isChecked ());
 
   deleteLater ();
 }
 
 void
-Options::onFilenameClicked ()
+OptionsDialog::onSourceClicked ()
 {
   if (myAdd.type == AddData::FILENAME)
     {
@@ -405,62 +297,71 @@ Options::onFilenameClicked ()
                                          tr ("Torrent Files (*.torrent);;All Files (*.*)"));
       d->setFileMode (QFileDialog::ExistingFile);
       d->setAttribute (Qt::WA_DeleteOnClose);
-      connect (d, SIGNAL (filesSelected (QStringList)), this, SLOT (onFilesSelected (QStringList)));
+      connect (d, SIGNAL (fileSelected (QString)), this, SLOT (onSourceSelected (QString)));
       d->show ();
     }
 }
 
 void
-Options::onFilesSelected (const QStringList& files)
+OptionsDialog::onSourceSelected (const QString& path)
 {
-  if (files.size () == 1)
-    {
-      myAdd.set (files.at (0));
-      refreshSource ();
-      reload ();
-    }
+  if (path.isEmpty ())
+    return;
+
+  myAdd.set (path);
+
+  const QFileInfo pathInfo (path);
+
+  const int iconSize (style ()->pixelMetric (QStyle::PM_SmallIconSize));
+  const QFileIconProvider iconProvider;
+
+  ui.sourceButton->setIconSize (QSize (iconSize, iconSize));
+  ui.sourceButton->setIcon (iconProvider.icon (path));
+  ui.sourceButton->setText (pathInfo.fileName ().isEmpty () ? path : pathInfo.fileName ());
+  ui.sourceButton->setToolTip (path);
+
+  reload ();
 }
 
 void
-Options::onSourceEditingFinished ()
+OptionsDialog::onSourceEdited ()
 {
-  myAdd.set (mySourceEdit->text());
+  myAdd.set (ui.sourceEdit->text ());
 }
 
 void
-Options::onDestinationClicked ()
+OptionsDialog::onDestinationClicked ()
 {
   QFileDialog * d = new QFileDialog (this, tr ("Select Destination"), myLocalDestination.absolutePath ());
   d->setFileMode (QFileDialog::Directory);
   d->setAttribute (Qt::WA_DeleteOnClose);
-  connect (d, SIGNAL (filesSelected (QStringList)), this, SLOT (onDestinationsSelected (QStringList)));
+  connect (d, SIGNAL (fileSelected (QString)), this, SLOT (onDestinationSelected (QString)));
   d->show ();
 }
 
 void
-Options::onDestinationsSelected (const QStringList& destinations)
+OptionsDialog::onDestinationSelected (const QString& path)
 {
-  if (destinations.size () == 1)
-    {
-      QString destination = Utils::removeTrailingDirSeparator (destinations.first ());
-      myFreespaceLabel->setPath (destination);
-      myLocalDestination.setPath (destination);
-      refreshDestinationButton ();
-    }
+  if (path.isEmpty ())
+    return;
+
+  myLocalDestination.setPath (Utils::removeTrailingDirSeparator (path));
+
+  const int iconSize (style ()->pixelMetric (QStyle::PM_SmallIconSize));
+  const QFileIconProvider iconProvider;
+
+  ui.destinationButton->setIconSize (QSize (iconSize, iconSize));
+  ui.destinationButton->setIcon (iconProvider.icon (path));
+  ui.destinationButton->setText (myLocalDestination.dirName ().isEmpty () ? path : myLocalDestination.dirName ());
+  ui.destinationButton->setToolTip (path);
+
+  ui.freeSpaceLabel->setPath (path);
 }
 
 void
-Options::onDestinationEdited (const QString& text)
+OptionsDialog::onDestinationEdited ()
 {
-  Q_UNUSED (text);
-
-  myEditTimer.start ();
-}
-
-void
-Options::onDestinationEditedIdle ()
-{
-  myFreespaceLabel->setPath (myDestinationEdit->text());
+  ui.freeSpaceLabel->setPath (ui.destinationEdit->text ());
 }
 
 /***
@@ -470,7 +371,7 @@ Options::onDestinationEditedIdle ()
 ***/
 
 void
-Options::clearVerify ()
+OptionsDialog::clearVerify ()
 {
   myVerifyHash.reset ();
   myVerifyFile.close ();
@@ -481,14 +382,14 @@ Options::clearVerify ()
   myVerifyPiecePos = 0;
   myVerifyTimer.stop ();
 
-  for (int i=0, n=myFiles.size (); i<n; ++i)
+  for (int i = 0, n = myFiles.size (); i < n; ++i)
     myFiles[i].have = 0;
 
-  myTree->update (myFiles);
+  ui.filesView->update (myFiles);
 }
 
 void
-Options::onVerify ()
+OptionsDialog::onVerify ()
 {
   clearVerify ();
   myVerifyFlags.insert (0, myInfo.pieceCount, false);
@@ -507,9 +408,9 @@ namespace
 }
 
 void
-Options::onTimeout ()
+OptionsDialog::onTimeout ()
 {
-  if (myFiles.isEmpty())
+  if (myFiles.isEmpty ())
     {
       myVerifyTimer.stop ();
       return;
@@ -526,8 +427,8 @@ Options::onTimeout ()
 
   int64_t leftInPiece = getPieceSize (&myInfo, myVerifyPieceIndex) - myVerifyPiecePos;
   int64_t leftInFile = file->length - myVerifyFilePos;
-  int64_t bytesThisPass = std::min (leftInFile, leftInPiece);
-  bytesThisPass = std::min (bytesThisPass, static_cast<int64_t> (sizeof (myVerifyBuf)));
+  int64_t bytesThisPass = qMin (leftInFile, leftInPiece);
+  bytesThisPass = qMin (bytesThisPass, static_cast<int64_t> (sizeof (myVerifyBuf)));
 
   if (myVerifyFile.isOpen () && myVerifyFile.seek (myVerifyFilePos))
     {
@@ -557,15 +458,14 @@ Options::onTimeout ()
       FileList changedFiles;
       if (matches)
         {
-          mybins_t::const_iterator i;
-          for (i=myVerifyBins.begin (); i!=myVerifyBins.end (); ++i)
+          for (auto i = myVerifyBins.begin (), end = myVerifyBins.end (); i != end; ++i)
             {
               TrFile& f (myFiles[i.key ()]);
               f.have += i.value ();
               changedFiles.append (f);
             }
         }
-      myTree->update (changedFiles);
+      ui.filesView->update (changedFiles);
       myVerifyBins.clear ();
     }
 
@@ -587,11 +487,10 @@ Options::onTimeout ()
         {
           // did the user accidentally specify the child directory instead of the parent?
           const QStringList tokens = QString::fromUtf8 (file->name).split ('/');
-          if (!tokens.empty () && myLocalDestination.dirName ()==tokens.at (0))
+          if (!tokens.empty () && myLocalDestination.dirName () == tokens.at (0))
             {
               // move up one directory and try again
               myLocalDestination.cdUp ();
-              refreshDestinationButton (-1);
               onVerify ();
               done = false;
             }

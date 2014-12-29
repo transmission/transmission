@@ -10,28 +10,21 @@
 #ifndef OPTIONS_DIALOG_H
 #define OPTIONS_DIALOG_H
 
+#include <QCryptographicHash>
 #include <QDialog>
-#include <QEvent>
-#include <QString>
 #include <QDir>
-#include <QVector>
+#include <QFile>
 #include <QMap>
 #include <QString>
-#include <QStringList>
-#include <QCryptographicHash>
-#include <QFile>
+#include <QString>
 #include <QTimer>
-#include <QLineEdit>
+#include <QVector>
 
 #include "add-data.h" // AddData
 #include "file-tree.h" // FileList
 
-class QCheckBox;
-class QComboBox;
-class QPushButton;
+#include "ui_options.h"
 
-class FileTreeView;
-class FreespaceLabel;
 class Prefs;
 class Session;
 
@@ -40,21 +33,18 @@ extern "C"
   struct tr_variant;
 }
 
-class Options: public QDialog
+class OptionsDialog: public QDialog
 {
     Q_OBJECT
 
   public:
-    Options (Session& session, const Prefs& prefs, const AddData& addme, QWidget * parent = 0);
-    ~Options ();
+    OptionsDialog (Session& session, const Prefs& prefs, const AddData& addme, QWidget * parent = 0);
+    ~OptionsDialog ();
 
   private:
     void reload ();
     void clearInfo ();
-    void refreshSource (int width=-1);
-    void refreshDestinationButton (int width=-1);
-    void refreshButton (QPushButton *, const QString&, int width=-1);
-    bool eventFilter (QObject *, QEvent *);
+    void clearVerify ();
 
   private slots:
     void onAccepted ();
@@ -62,13 +52,14 @@ class Options: public QDialog
     void onWantedChanged (const QSet<int>& fileIndices, bool);
     void onVerify ();
     void onTimeout ();
-    void onFilenameClicked ();
+
+    void onSourceClicked ();
+    void onSourceSelected (const QString&);
+    void onSourceEdited ();
+
     void onDestinationClicked ();
-    void onFilesSelected (const QStringList&);
-    void onSourceEditingFinished ();
-    void onDestinationsSelected (const QStringList&);
-    void onDestinationEdited (const QString&);
-    void onDestinationEditedIdle ();
+    void onDestinationSelected (const QString&);
+    void onDestinationEdited ();
 
   private:
     Session& mySession;
@@ -76,15 +67,7 @@ class Options: public QDialog
     QDir myLocalDestination;
     bool myHaveInfo;
     tr_info myInfo;
-    FileTreeView * myTree;
-    FreespaceLabel * myFreespaceLabel;
-    QCheckBox * myStartCheck;
-    QCheckBox * myTrashCheck;
-    QComboBox * myPriorityCombo;
-    QPushButton * mySourceButton;
-    QLineEdit * mySourceEdit;
-    QPushButton * myDestinationButton;
-    QLineEdit * myDestinationEdit;
+    Ui::OptionsDialog ui;
     QPushButton * myVerifyButton;
     QVector<int> myPriorities;
     QVector<bool> myWanted;
@@ -92,16 +75,15 @@ class Options: public QDialog
 
   private:
     QTimer myVerifyTimer;
-    char myVerifyBuf[2048*4];
+    char myVerifyBuf[2048 * 4];
     QFile myVerifyFile;
     uint64_t myVerifyFilePos;
     int myVerifyFileIndex;
     uint32_t myVerifyPieceIndex;
     uint32_t myVerifyPiecePos;
-    void clearVerify ();
     QVector<bool> myVerifyFlags;
     QCryptographicHash myVerifyHash;
-    typedef QMap<uint32_t,int32_t> mybins_t;
+    typedef QMap<uint32_t, int32_t> mybins_t;
     mybins_t myVerifyBins;
     QTimer myEditTimer;
 };

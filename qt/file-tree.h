@@ -100,6 +100,8 @@ class FileTreeModel: public QAbstractItemModel
     FileTreeModel (QObject *parent = 0, bool isEditable = true);
     ~FileTreeModel ();
 
+    void setEditable (bool editable);
+
   public:
     QVariant data (const QModelIndex &index, int role = Qt::DisplayRole) const;
     Qt::ItemFlags flags (const QModelIndex& index) const;
@@ -136,7 +138,7 @@ class FileTreeModel: public QAbstractItemModel
   private:
     FileTreeItem * myRootItem;
     QMap<int, FileTreeItem *> myIndexCache;
-    const bool myIsEditable;
+    bool myIsEditable;
 
   public slots:
     void clicked (const QModelIndex & index);
@@ -165,6 +167,8 @@ class FileTreeView: public QTreeView
     virtual ~FileTreeView ();
     void clear ();
     void update (const FileList& files, bool updateProperties=true);
+
+    void setEditable (bool editable);
 
   signals:
     void priorityChanged (const QSet<int>& fileIndices, int priority);

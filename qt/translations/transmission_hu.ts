@@ -1412,7 +1412,7 @@ Másik elsődleges URL-t új sorba írva adhatsz hozzá.</translation>
     </message>
 </context>
 <context>
-    <name>Options</name>
+    <name>OptionsDialog</name>
     <message>
         <location filename="../options.cc" line="+403"/>
         <source>Open Torrent</source>
