@@ -22,6 +22,8 @@ TrPathButton::TrPathButton (QWidget * parent):
   myNameFilter (),
   myPath ()
 {
+  setSizePolicy(QSizePolicy (QSizePolicy::Preferred, QSizePolicy::Fixed));
+
   updateAppearance ();
 
   connect (this, SIGNAL (clicked ()), this, SLOT (onClicked ()));

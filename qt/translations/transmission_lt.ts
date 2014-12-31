@@ -1275,7 +1275,7 @@
 <context>
     <name>MakeDialog</name>
     <message>
-        <location filename="../make-dialog.cc" line="+309"/>
+        <location filename="../make-dialog.cc" line="+206"/>
         <source>%1 in %2; %3 @ %4</source>
         <translation>%1, %2; %3 po %4</translation>
     </message>
@@ -1298,109 +1298,99 @@
         </translation>
     </message>
     <message>
-        <location line="+100"/>
+        <location filename="../make-dialog.ui" line="+177"/>
         <source>&amp;Private torrent</source>
         <translation>&amp;Privatus torentas</translation>
     </message>
     <message>
-        <location line="-11"/>
+        <location line="-51"/>
         <source>&amp;Trackers:</source>
         <translation>&amp;Sekikliai:</translation>
     </message>
     <message>
-        <location line="-31"/>
-        <location line="+14"/>
-        <source>(None)</source>
-        <translation>(Joks)</translation>
-    </message>
-    <message>
-        <location line="-77"/>
+        <location filename="../make-dialog.cc" line="-5"/>
         <source>&lt;i&gt;No source selected&lt;i&gt;</source>
         <translation>&lt;i&gt;Nepasirinktas šaltinis&lt;/i&gt;</translation>
     </message>
     <message>
-        <location line="-211"/>
-        <source>Cancelled</source>
-        <translation>Atsisakyta</translation>
+        <location filename="../make-dialog.ui" line="+34"/>
+        <source>Co&amp;mment:</source>
+        <translation>&amp;Komentaras:</translation>
     </message>
     <message>
-        <location line="+311"/>
-        <source>Co&amp;mment</source>
-        <translation>&amp;Komentaras</translation>
-    </message>
-    <message>
-        <location line="-315"/>
-        <source>Created &quot;%1&quot;!</source>
-        <translation>Sukurtas „%1“!</translation>
-    </message>
-    <message>
-        <location line="-2"/>
-        <source>Creating &quot;%1&quot;</source>
-        <translation>Kuriamas „%1“</translation>
-    </message>
-    <message>
-        <location line="+8"/>
-        <source>Error reading &quot;%1&quot;: %2</source>
-        <translation>Klaida skaitant „%1“: %2</translation>
-    </message>
-    <message>
-        <location line="+2"/>
-        <source>Error writing &quot;%1&quot;: %2</source>
-        <translation>Klaida rašant „%1“: %2</translation>
-    </message>
-    <message>
-        <location line="-6"/>
-        <source>Error: invalid announce URL &quot;%1&quot;</source>
-        <translation>Klaida: netinkamas pranešimo URL „%1“</translation>
-    </message>
-    <message>
-        <location line="+255"/>
+        <location line="-121"/>
         <source>Files</source>
         <translation>Failai</translation>
     </message>
     <message>
-        <location line="-212"/>
-        <location line="+206"/>
+        <location line="-22"/>
         <source>New Torrent</source>
         <translation>Naujas torentas</translation>
     </message>
     <message>
-        <location line="+53"/>
+        <location line="+99"/>
         <source>Properties</source>
         <translation>Savybės</translation>
     </message>
     <message>
-        <location line="-33"/>
+        <location line="-67"/>
         <source>Sa&amp;ve to:</source>
         <translation>Į&amp;rašyti į:</translation>
     </message>
     <message>
-        <location line="-182"/>
-        <source>Select File</source>
-        <translation>Parinkite failą</translation>
-    </message>
-    <message>
-        <location line="+24"/>
-        <location line="+27"/>
-        <source>Select Folder</source>
-        <translation>Parinkite aplanką</translation>
-    </message>
-    <message>
-        <location line="+147"/>
-        <source>Source &amp;File:</source>
+        <location line="+40"/>
+        <source>Source &amp;file:</source>
         <translation>Šaltinio &amp;failas:</translation>
     </message>
     <message>
-        <location line="-14"/>
-        <source>Source F&amp;older:</source>
+        <location line="-20"/>
+        <source>Source f&amp;older:</source>
         <translation>Šaltinio &amp;aplankas:</translation>
     </message>
     <message>
-        <location line="+37"/>
+        <location line="+83"/>
         <source>To add a backup URL, add it on the line after the primary URL.
 To add another primary URL, add it after a blank line.</source>
         <translation>Atsarginį URL adresą veskite atskiroje eilutėje po pirminiu URL adresu.
 Papildomą pirminį URL adresą galite įvesti, palikę prieš jį tuščią eilutę.</translation>
+    </message>
+</context>
+<context>
+    <name>MakeProgressDialog</name>
+    <message>
+        <location filename="../make-progress-dialog.ui" line="+14"/>
+        <source>New Torrent</source>
+        <translation type="unfinished">Naujas torentas</translation>
+    </message>
+    <message>
+        <location filename="../make-dialog.cc" line="-102"/>
+        <source>Creating &quot;%1&quot;</source>
+        <translation type="unfinished">Kuriamas „%1“</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Created &quot;%1&quot;!</source>
+        <translation type="unfinished">Sukurtas „%1“!</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Error: invalid announce URL &quot;%1&quot;</source>
+        <translation type="unfinished">Klaida: netinkamas pranešimo URL „%1“</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Cancelled</source>
+        <translation type="unfinished">Atsisakyta</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Error reading &quot;%1&quot;: %2</source>
+        <translation type="unfinished">Klaida skaitant „%1“: %2</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Error writing &quot;%1&quot;: %2</source>
+        <translation type="unfinished">Klaida rašant „%1“: %2</translation>
     </message>
 </context>
 <context>
@@ -1439,7 +1429,7 @@ Papildomą pirminį URL adresą galite įvesti, palikę prieš jį tuščią eil
         <translation>Paskirties &amp;aplankas:</translation>
     </message>
     <message>
-        <location filename="../options.cc" line="+115"/>
+        <location filename="../options.cc" line="+113"/>
         <source>&amp;Verify Local Data</source>
         <translation>Pa&amp;tikrinti turimus duomenis</translation>
     </message>
@@ -2363,7 +2353,7 @@ Papildomą pirminį URL adresą galite įvesti, palikę prieš jį tuščią eil
         <translation>Ribojama iki %1</translation>
     </message>
     <message>
-        <location line="+214"/>
+        <location line="+215"/>
         <source>Once removed, continuing the transfers will require the torrent files or magnet links.</source>
         <translation>Jeigu pašalinsite, norint tęsti siuntimus, jums prireiks atitinkamų torentų failų arba magnet nuorodų.</translation>
     </message>
@@ -2378,13 +2368,13 @@ Papildomą pirminį URL adresą galite įvesti, palikę prieš jį tuščią eil
         <translation>Atverti torentą</translation>
     </message>
     <message>
-        <location line="-409"/>
+        <location line="-410"/>
         <location line="+16"/>
         <source>Ratio: %1</source>
         <translation>Santykis: %1</translation>
     </message>
     <message>
-        <location line="+494"/>
+        <location line="+495"/>
         <source>Remove %1 torrents?</source>
         <translation>Pašalinti %1 torentus(-ų)?</translation>
     </message>
@@ -2419,22 +2409,22 @@ Papildomą pirminį URL adresą galite įvesti, palikę prieš jį tuščią eil
         <translation>Šie torentai prisijungę prie siuntėjų.</translation>
     </message>
     <message>
-        <location line="-819"/>
+        <location line="-820"/>
         <source>Seed Forever</source>
         <translation>Skleisti visada</translation>
     </message>
     <message>
-        <location line="+699"/>
+        <location line="+700"/>
         <source>Show &amp;options dialog</source>
         <translation>Rodyti &amp;parinkčių langą</translation>
     </message>
     <message>
-        <location line="-477"/>
+        <location line="-478"/>
         <source> - %1:%2</source>
         <translation> - %1:%2</translation>
     </message>
     <message>
-        <location line="+578"/>
+        <location line="+579"/>
         <source>Delete these %1 torrents&apos; downloaded files?</source>
         <translation>Pašalinti šių %1 torentų atsiųstus failus?</translation>
     </message>
@@ -2444,7 +2434,7 @@ Papildomą pirminį URL adresą galite įvesti, palikę prieš jį tuščią eil
         <translation>Pašalinti šio torento atsiųstus failus?</translation>
     </message>
     <message>
-        <location line="-1003"/>
+        <location line="-1004"/>
         <source>Speed Limits</source>
         <translation type="unfinished">Greičio ribojimai</translation>
     </message>
@@ -2477,7 +2467,7 @@ Papildomą pirminį URL adresą galite įvesti, palikę prieš jį tuščią eil
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+144"/>
+        <location line="+145"/>
         <source>Once removed, continuing the transfer will require the torrent file or magnet link.</source>
         <translation>Jeigu pašalinsite, norint tęsti siuntimą, jums prireiks torento failo arba magnet nuorodos.</translation>
     </message>
@@ -2487,7 +2477,7 @@ Papildomą pirminį URL adresą galite įvesti, palikę prieš jį tuščią eil
         <translation>Vienas šių torentų dar neatsiųstas.</translation>
     </message>
     <message>
-        <location line="-842"/>
+        <location line="-843"/>
         <source>Stop Seeding at Ratio</source>
         <translation>Nebeskleisti esant santykiui</translation>
     </message>
@@ -2498,7 +2488,7 @@ Papildomą pirminį URL adresą galite įvesti, palikę prieš jį tuščią eil
         <translation>Nebeskleisti esant santykiui (%1)</translation>
     </message>
     <message>
-        <location line="+212"/>
+        <location line="+213"/>
         <source>These torrents have not finished downloading.</source>
         <translation>Šie torentai dar neatsiųsti.</translation>
     </message>
@@ -2508,13 +2498,13 @@ Papildomą pirminį URL adresą galite įvesti, palikę prieš jį tuščią eil
         <translation>Šis torentas dar neatsiųstas.</translation>
     </message>
     <message>
-        <location line="-857"/>
+        <location line="-858"/>
         <location line="+22"/>
         <source>Unlimited</source>
         <translation>Be ribojimų</translation>
     </message>
     <message>
-        <location line="+920"/>
+        <location line="+921"/>
         <source>%1 has not responded yet</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2542,7 +2532,7 @@ Papildomą pirminį URL adresą galite įvesti, palikę prieš jį tuščią eil
 <context>
     <name>TrPathButton</name>
     <message>
-        <location filename="../path-button.cc" line="+111"/>
+        <location filename="../path-button.cc" line="+113"/>
         <source>(None)</source>
         <translation type="unfinished">(Joks)</translation>
     </message>

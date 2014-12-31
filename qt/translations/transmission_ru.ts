@@ -1276,54 +1276,12 @@
 <context>
     <name>MakeDialog</name>
     <message>
-        <location filename="../make-dialog.cc" line="+86"/>
-        <source>Creating &quot;%1&quot;</source>
-        <translation>Создание &quot;%1&quot;</translation>
-    </message>
-    <message>
-        <location line="+2"/>
-        <source>Created &quot;%1&quot;!</source>
-        <translation>Создан &quot;%1&quot;!</translation>
-    </message>
-    <message>
-        <location line="+2"/>
-        <source>Error: invalid announce URL &quot;%1&quot;</source>
-        <translation>Ошибка: неверный URL-адрес объявлений &quot;%1&quot;</translation>
-    </message>
-    <message>
-        <location line="+2"/>
-        <source>Cancelled</source>
-        <translation>Отменено</translation>
-    </message>
-    <message>
-        <location line="+2"/>
-        <source>Error reading &quot;%1&quot;: %2</source>
-        <translation>Ошибка чтения &quot;%1&quot;: %2</translation>
-    </message>
-    <message>
-        <location line="+2"/>
-        <source>Error writing &quot;%1&quot;: %2</source>
-        <translation>Ошибка записи &quot;%1&quot;: %2</translation>
-    </message>
-    <message>
-        <location line="+37"/>
-        <location line="+206"/>
+        <location filename="../make-dialog.ui" line="+17"/>
         <source>New Torrent</source>
         <translation>Создание нового торрента</translation>
     </message>
     <message>
-        <location line="-162"/>
-        <source>Select File</source>
-        <translation>Выбор файла</translation>
-    </message>
-    <message>
-        <location line="+24"/>
-        <location line="+27"/>
-        <source>Select Folder</source>
-        <translation>Выбор папки</translation>
-    </message>
-    <message>
-        <location line="+75"/>
+        <location filename="../make-dialog.cc" line="+200"/>
         <source>&lt;i&gt;No source selected&lt;i&gt;</source>
         <translation>&lt;i&gt;Не выбраны исходные данные&lt;i&gt;</translation>
     </message>
@@ -1351,57 +1309,89 @@
         <translation>%1 в %2; %3 @ %4</translation>
     </message>
     <message>
-        <location line="+36"/>
+        <location filename="../make-dialog.ui" line="+22"/>
         <source>Files</source>
         <translation>Файлы</translation>
     </message>
     <message>
-        <location line="+14"/>
+        <location line="+10"/>
         <source>Sa&amp;ve to:</source>
         <translation>&amp;Сохранить в папку:</translation>
     </message>
     <message>
-        <location line="+2"/>
-        <source>Source F&amp;older:</source>
+        <location line="+20"/>
+        <source>Source f&amp;older:</source>
         <translation>Исходный к&amp;аталог:</translation>
     </message>
     <message>
-        <location line="+5"/>
-        <location line="+14"/>
-        <source>(None)</source>
-        <translation>(Не выбран)</translation>
-    </message>
-    <message>
-        <location line="-5"/>
-        <source>Source &amp;File:</source>
+        <location line="+20"/>
+        <source>Source &amp;file:</source>
         <translation>&amp;Исходный файл:</translation>
     </message>
     <message>
-        <location line="+17"/>
+        <location line="+27"/>
         <source>Properties</source>
         <translation>Свойства</translation>
     </message>
     <message>
-        <location line="+5"/>
+        <location line="+10"/>
         <source>&amp;Trackers:</source>
         <translation>&amp;Трекеры:</translation>
     </message>
     <message>
-        <location line="+1"/>
+        <location line="+26"/>
         <source>To add a backup URL, add it on the line after the primary URL.
 To add another primary URL, add it after a blank line.</source>
         <translation>Чтобы добавить резервный URL, добавьте его после основного URL в той же строке.
 Чтобы добавить ещё один основной URL, добавьте его в новой строке.</translation>
     </message>
     <message>
-        <location line="+5"/>
-        <source>Co&amp;mment</source>
-        <translation>&amp;Комментарий</translation>
+        <location line="+8"/>
+        <source>Co&amp;mment:</source>
+        <translation>&amp;Комментарий:</translation>
     </message>
     <message>
-        <location line="+5"/>
+        <location line="+17"/>
         <source>&amp;Private torrent</source>
         <translation>&amp;Закрытый торрент</translation>
+    </message>
+</context>
+<context>
+    <name>MakeProgressDialog</name>
+    <message>
+        <location filename="../make-progress-dialog.ui" line="+14"/>
+        <source>New Torrent</source>
+        <translation type="unfinished">Создание нового торрента</translation>
+    </message>
+    <message>
+        <location filename="../make-dialog.cc" line="-108"/>
+        <source>Creating &quot;%1&quot;</source>
+        <translation type="unfinished">Создание &quot;%1&quot;</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Created &quot;%1&quot;!</source>
+        <translation type="unfinished">Создан &quot;%1&quot;!</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Error: invalid announce URL &quot;%1&quot;</source>
+        <translation type="unfinished">Ошибка: неверный URL-адрес объявлений &quot;%1&quot;</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Cancelled</source>
+        <translation type="unfinished">Отменено</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Error reading &quot;%1&quot;: %2</source>
+        <translation type="unfinished">Ошибка чтения &quot;%1&quot;: %2</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Error writing &quot;%1&quot;: %2</source>
+        <translation type="unfinished">Ошибка записи &quot;%1&quot;: %2</translation>
     </message>
 </context>
 <context>
@@ -1435,7 +1425,7 @@ To add another primary URL, add it after a blank line.</source>
 <context>
     <name>OptionsDialog</name>
     <message>
-        <location filename="../options.cc" line="+59"/>
+        <location filename="../options.cc" line="+57"/>
         <source>Open Torrent</source>
         <translation>Открытие файла</translation>
     </message>
@@ -2403,12 +2393,12 @@ To add another primary URL, add it after a blank line.</source>
         <translation>Принято: %1, Роздано: %2</translation>
     </message>
     <message>
-        <location line="+398"/>
+        <location line="+399"/>
         <source>Open Torrent</source>
         <translation>Открытие файла</translation>
     </message>
     <message>
-        <location line="-897"/>
+        <location line="-898"/>
         <source>Speed Limits</source>
         <translation type="unfinished">Ограничения скорости</translation>
     </message>
@@ -2435,7 +2425,7 @@ To add another primary URL, add it after a blank line.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+33"/>
+        <location line="+34"/>
         <source>Torrent Files (*.torrent);;All Files (*.*)</source>
         <translation>Торрент-файлы (*.torrent);;Все файлы (*.*)</translation>
     </message>
@@ -2543,7 +2533,7 @@ To add another primary URL, add it after a blank line.</source>
 <context>
     <name>TrPathButton</name>
     <message>
-        <location filename="../path-button.cc" line="+111"/>
+        <location filename="../path-button.cc" line="+113"/>
         <source>(None)</source>
         <translation type="unfinished">(Не выбран)</translation>
     </message>

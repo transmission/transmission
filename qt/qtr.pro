@@ -49,6 +49,8 @@ TRANSLATIONS += translations/transmission_en.ts \
 FORMS += about.ui \
          details.ui \
          mainwin.ui \
+         make-dialog.ui \
+         make-progress-dialog.ui \
          options.ui \
          relocate.ui \
          session-dialog.ui \

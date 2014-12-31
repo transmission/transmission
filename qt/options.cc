@@ -7,8 +7,6 @@
  * $Id$
  */
 
-#include <QFileDialog>
-#include <QFileIconProvider>
 #include <QFileInfo>
 #include <QPushButton>
 

@@ -1100,6 +1100,7 @@ void
 TrMainWindow::newTorrent ()
 {
   MakeDialog * dialog = new MakeDialog (mySession, this);
+  dialog->setAttribute (Qt::WA_DeleteOnClose);
   dialog->show ();
 }
 

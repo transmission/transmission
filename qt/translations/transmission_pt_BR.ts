@@ -1268,54 +1268,12 @@
 <context>
     <name>MakeDialog</name>
     <message>
-        <location filename="../make-dialog.cc" line="+86"/>
-        <source>Creating &quot;%1&quot;</source>
-        <translation>Criando &quot;%1&quot;</translation>
-    </message>
-    <message>
-        <location line="+2"/>
-        <source>Created &quot;%1&quot;!</source>
-        <translation>&quot;%1&quot; Criado!</translation>
-    </message>
-    <message>
-        <location line="+2"/>
-        <source>Error: invalid announce URL &quot;%1&quot;</source>
-        <translation>Erro: URL de anúncio inválida &quot;%1&quot;</translation>
-    </message>
-    <message>
-        <location line="+2"/>
-        <source>Cancelled</source>
-        <translation>Cancelado</translation>
-    </message>
-    <message>
-        <location line="+2"/>
-        <source>Error reading &quot;%1&quot;: %2</source>
-        <translation>Erro na leitura de &quot;%1&quot;: %2</translation>
-    </message>
-    <message>
-        <location line="+2"/>
-        <source>Error writing &quot;%1&quot;: %2</source>
-        <translation>Erro na gravação de &quot;%1&quot;: %2</translation>
-    </message>
-    <message>
-        <location line="+37"/>
-        <location line="+206"/>
+        <location filename="../make-dialog.ui" line="+17"/>
         <source>New Torrent</source>
         <translation>Novo Torrent</translation>
     </message>
     <message>
-        <location line="-162"/>
-        <source>Select File</source>
-        <translation>Selecionar Arquivo</translation>
-    </message>
-    <message>
-        <location line="+24"/>
-        <location line="+27"/>
-        <source>Select Folder</source>
-        <translation>Selecionar Pasta</translation>
-    </message>
-    <message>
-        <location line="+75"/>
+        <location filename="../make-dialog.cc" line="+200"/>
         <source>&lt;i&gt;No source selected&lt;i&gt;</source>
         <translation>&lt;i&gt;Nenhuma fonte selecionada&lt;i&gt;</translation>
     </message>
@@ -1341,57 +1299,89 @@
         <translation>%1 em %2; %3 @ %4</translation>
     </message>
     <message>
-        <location line="+36"/>
+        <location filename="../make-dialog.ui" line="+22"/>
         <source>Files</source>
         <translation>Arquivos</translation>
     </message>
     <message>
-        <location line="+14"/>
+        <location line="+10"/>
         <source>Sa&amp;ve to:</source>
         <translation>Salvar em:</translation>
     </message>
     <message>
-        <location line="+2"/>
-        <source>Source F&amp;older:</source>
-        <translation>Pasta Fonte:</translation>
+        <location line="+20"/>
+        <source>Source f&amp;older:</source>
+        <translation>Pasta fonte:</translation>
     </message>
     <message>
-        <location line="+5"/>
-        <location line="+14"/>
-        <source>(None)</source>
-        <translation>(Nenhuma)</translation>
-    </message>
-    <message>
-        <location line="-5"/>
-        <source>Source &amp;File:</source>
+        <location line="+20"/>
+        <source>Source &amp;file:</source>
         <translation>Arquivo Fonte:</translation>
     </message>
     <message>
-        <location line="+17"/>
+        <location line="+27"/>
         <source>Properties</source>
         <translation>Propriedades</translation>
     </message>
     <message>
-        <location line="+5"/>
+        <location line="+10"/>
         <source>&amp;Trackers:</source>
         <translation>Rastreadores:</translation>
     </message>
     <message>
-        <location line="+1"/>
+        <location line="+26"/>
         <source>To add a backup URL, add it on the line after the primary URL.
 To add another primary URL, add it after a blank line.</source>
         <translation>Adicione uma URL reserva na linha após a primária.
 Adicione outra URL primária depois de uma linha em branco.</translation>
     </message>
     <message>
-        <location line="+5"/>
-        <source>Co&amp;mment</source>
-        <translation>Comentário</translation>
+        <location line="+8"/>
+        <source>Co&amp;mment:</source>
+        <translation>Comentário:</translation>
     </message>
     <message>
-        <location line="+5"/>
+        <location line="+17"/>
         <source>&amp;Private torrent</source>
         <translation>Torrent Privado</translation>
+    </message>
+</context>
+<context>
+    <name>MakeProgressDialog</name>
+    <message>
+        <location filename="../make-progress-dialog.ui" line="+14"/>
+        <source>New Torrent</source>
+        <translation type="unfinished">Novo Torrent</translation>
+    </message>
+    <message>
+        <location filename="../make-dialog.cc" line="-108"/>
+        <source>Creating &quot;%1&quot;</source>
+        <translation type="unfinished">Criando &quot;%1&quot;</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Created &quot;%1&quot;!</source>
+        <translation type="unfinished">&quot;%1&quot; Criado!</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Error: invalid announce URL &quot;%1&quot;</source>
+        <translation type="unfinished">Erro: URL de anúncio inválida &quot;%1&quot;</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Cancelled</source>
+        <translation type="unfinished">Cancelado</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Error reading &quot;%1&quot;: %2</source>
+        <translation type="unfinished">Erro na leitura de &quot;%1&quot;: %2</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Error writing &quot;%1&quot;: %2</source>
+        <translation type="unfinished">Erro na gravação de &quot;%1&quot;: %2</translation>
     </message>
 </context>
 <context>
@@ -1425,7 +1415,7 @@ Adicione outra URL primária depois de uma linha em branco.</translation>
 <context>
     <name>OptionsDialog</name>
     <message>
-        <location filename="../options.cc" line="+59"/>
+        <location filename="../options.cc" line="+57"/>
         <source>Open Torrent</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2385,7 +2375,7 @@ Adicione outra URL primária depois de uma linha em branco.</translation>
         <translation>Baixado: %1 - Enviado: %2</translation>
     </message>
     <message>
-        <location line="+400"/>
+        <location line="+401"/>
         <source>Torrent Files (*.torrent);;All Files (*.*)</source>
         <translation>Arquivos Torrent (*.torrent);;Todos os Arquivos (*.*)</translation>
     </message>
@@ -2400,7 +2390,7 @@ Adicione outra URL primária depois de uma linha em branco.</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-897"/>
+        <location line="-898"/>
         <source>Speed Limits</source>
         <translation type="unfinished">Limites de Velocidade</translation>
     </message>
@@ -2427,7 +2417,7 @@ Adicione outra URL primária depois de uma linha em branco.</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+131"/>
+        <location line="+132"/>
         <source>Remove torrent?</source>
         <translation>Remover torrent?</translation>
     </message>
@@ -2525,7 +2515,7 @@ Adicione outra URL primária depois de uma linha em branco.</translation>
 <context>
     <name>TrPathButton</name>
     <message>
-        <location filename="../path-button.cc" line="+111"/>
+        <location filename="../path-button.cc" line="+113"/>
         <source>(None)</source>
         <translation type="unfinished">(Nenhuma)</translation>
     </message>
