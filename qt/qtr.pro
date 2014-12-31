@@ -70,6 +70,7 @@ SOURCES += about.cc \
            mainwin.cc \
            make-dialog.cc \
            options.cc \
+           path-button.cc \
            prefs.cc \
            prefs-dialog.cc \
            relocate.cc \

@@ -29,7 +29,7 @@
        <verstretch>0</verstretch>
       </sizepolicy>
      </property>
-     <widget class="QToolButton" name="sourceButton">
+     <widget class="TrPathButton" name="sourceButton">
       <property name="toolButtonStyle">
        <enum>Qt::ToolButtonTextBesideIcon</enum>
       </property>
@@ -55,7 +55,7 @@
        <verstretch>0</verstretch>
       </sizepolicy>
      </property>
-     <widget class="QToolButton" name="destinationButton">
+     <widget class="TrPathButton" name="destinationButton">
       <property name="toolButtonStyle">
        <enum>Qt::ToolButtonTextBesideIcon</enum>
       </property>
@@ -125,6 +125,11 @@
    <class>FreespaceLabel</class>
    <extends>QLabel</extends>
    <header>freespace-label.h</header>
+  </customwidget>
+  <customwidget>
+   <class>TrPathButton</class>
+   <extends>QToolButton</extends>
+   <header>path-button.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

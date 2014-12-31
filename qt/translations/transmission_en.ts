@@ -524,7 +524,7 @@
 <context>
     <name>FileAdded</name>
     <message>
-        <location filename="../session.cc" line="+108"/>
+        <location filename="../session.cc" line="+94"/>
         <source>Add Torrent</source>
         <translation type="unfinished"></translation>
     </message>
@@ -565,7 +565,7 @@
 <context>
     <name>FileTreeModel</name>
     <message>
-        <location line="+207"/>
+        <location line="+213"/>
         <source>File</source>
         <translation type="unfinished"></translation>
     </message>
@@ -781,12 +781,12 @@
 <context>
     <name>FreespaceLabel</name>
     <message>
-        <location filename="../freespace-label.cc" line="+47"/>
+        <location filename="../freespace-label.cc" line="+56"/>
         <source>&lt;i&gt;Calculating Free Space...&lt;/i&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+37"/>
+        <location line="+36"/>
         <source>%1 free</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1424,12 +1424,12 @@ To add another primary URL, add it after a blank line.</source>
 <context>
     <name>OptionsDialog</name>
     <message>
-        <location filename="../options.cc" line="+403"/>
+        <location filename="../options.cc" line="+59"/>
         <source>Open Torrent</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-337"/>
+        <location line="-13"/>
         <source>Open Torrent from File</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1439,17 +1439,17 @@ To add another primary URL, add it after a blank line.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+11"/>
+        <location filename="../options.ui" line="+17"/>
         <source>&amp;Source:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+30"/>
+        <location line="+26"/>
         <source>&amp;Destination folder:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+39"/>
+        <location filename="../options.cc" line="+60"/>
         <source>High</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1464,32 +1464,32 @@ To add another primary URL, add it after a blank line.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+3"/>
+        <location filename="../options.ui" line="+39"/>
         <source>&amp;Priority:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+12"/>
+        <location line="+13"/>
         <source>S&amp;tart when added</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-5"/>
+        <location filename="../options.cc" line="+5"/>
         <source>&amp;Verify Local Data</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+9"/>
+        <location filename="../options.ui" line="+7"/>
         <source>Mo&amp;ve .torrent file to the trash</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+236"/>
+        <location filename="../options.cc" line="-55"/>
         <source>Torrent Files (*.torrent);;All Files (*.*)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+28"/>
+        <location line="+27"/>
         <source>Select Destination</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1608,12 +1608,12 @@ To add another primary URL, add it after a blank line.</source>
     </message>
     <message>
         <location line="+5"/>
-        <location line="+420"/>
+        <location line="+422"/>
         <source>Status unknown</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-412"/>
+        <location line="-414"/>
         <source>&amp;Port for incoming connections:</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1666,7 +1666,7 @@ To add another primary URL, add it after a blank line.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+16"/>
+        <location line="+18"/>
         <source>Download Queue</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1704,7 +1704,7 @@ To add another primary URL, add it after a blank line.</source>
         </translation>
     </message>
     <message>
-        <location line="-363"/>
+        <location line="-365"/>
         <source>Pick a &amp;random port every time Transmission is started</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1762,23 +1762,23 @@ To add another primary URL, add it after a blank line.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+216"/>
+        <location line="+218"/>
         <source>Privacy</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-395"/>
+        <location line="-397"/>
         <source>&amp;to</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+39"/>
-        <location line="+358"/>
+        <location line="+360"/>
         <source>Desktop</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-356"/>
+        <location line="-358"/>
         <source>Show Transmission icon in the &amp;notification area</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1943,7 +1943,7 @@ To add another primary URL, add it after a blank line.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+75"/>
+        <location line="+77"/>
         <source>Downloading</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1958,17 +1958,17 @@ To add another primary URL, add it after a blank line.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-20"/>
+        <location line="-22"/>
         <source>Save to &amp;Location:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+28"/>
+        <location line="+30"/>
         <source>Call scrip&amp;t when torrent is completed:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-77"/>
+        <location line="-79"/>
         <source>Stop seeding at &amp;ratio:</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1978,7 +1978,7 @@ To add another primary URL, add it after a blank line.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+95"/>
+        <location line="+97"/>
         <source>Transmission Preferences</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2009,7 +2009,7 @@ To add another primary URL, add it after a blank line.</source>
 <context>
     <name>RelocateDialog</name>
     <message>
-        <location filename="../relocate.cc" line="+47"/>
+        <location filename="../relocate.cc" line="+51"/>
         <source>Select Location</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2029,7 +2029,7 @@ To add another primary URL, add it after a blank line.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+23"/>
+        <location line="+29"/>
         <source>&amp;Move from the current folder</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2042,7 +2042,7 @@ To add another primary URL, add it after a blank line.</source>
 <context>
     <name>Session</name>
     <message>
-        <location filename="../session.cc" line="+742"/>
+        <location filename="../session.cc" line="+548"/>
         <source>Error Renaming Path</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2052,7 +2052,7 @@ To add another primary URL, add it after a blank line.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+45"/>
+        <location line="+48"/>
         <source>Add Torrent</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2518,6 +2518,24 @@ To add another primary URL, add it after a blank line.</source>
     <message>
         <location line="+120"/>
         <source>Queue</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>TrPathButton</name>
+    <message>
+        <location filename="../path-button.cc" line="+111"/>
+        <source>(None)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+16"/>
+        <source>Select Folder</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Select File</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

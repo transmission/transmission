@@ -41,6 +41,7 @@ set(${PROJECT_NAME}_SOURCES
     mainwin.cc
     make-dialog.cc
     options.cc
+    path-button.cc
     prefs-dialog.cc
     prefs.cc
     relocate.cc
@@ -79,6 +80,7 @@ set(${PROJECT_NAME}_HEADERS
     mainwin.h
     make-dialog.h
     options.h
+    path-button.h
     prefs-dialog.h
     prefs.h
     relocate.h

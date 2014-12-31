@@ -521,7 +521,7 @@
 <context>
     <name>FileAdded</name>
     <message>
-        <location filename="../session.cc" line="+108"/>
+        <location filename="../session.cc" line="+94"/>
         <source>Add Torrent</source>
         <translation type="unfinished">Torrent hozzáadása</translation>
     </message>
@@ -562,7 +562,7 @@
 <context>
     <name>FileTreeModel</name>
     <message>
-        <location line="+207"/>
+        <location line="+213"/>
         <source>File</source>
         <translation>Fájl</translation>
     </message>
@@ -773,12 +773,12 @@
 <context>
     <name>FreespaceLabel</name>
     <message>
-        <location filename="../freespace-label.cc" line="+47"/>
+        <location filename="../freespace-label.cc" line="+56"/>
         <source>&lt;i&gt;Calculating Free Space...&lt;/i&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+37"/>
+        <location line="+36"/>
         <source>%1 free</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1414,12 +1414,12 @@ Másik elsődleges URL-t új sorba írva adhatsz hozzá.</translation>
 <context>
     <name>OptionsDialog</name>
     <message>
-        <location filename="../options.cc" line="+403"/>
+        <location filename="../options.cc" line="+59"/>
         <source>Open Torrent</source>
         <translation>Torrent megnyitása</translation>
     </message>
     <message>
-        <location line="-337"/>
+        <location line="-13"/>
         <source>Open Torrent from File</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1429,17 +1429,17 @@ Másik elsődleges URL-t új sorba írva adhatsz hozzá.</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+11"/>
+        <location filename="../options.ui" line="+17"/>
         <source>&amp;Source:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+30"/>
+        <location line="+26"/>
         <source>&amp;Destination folder:</source>
         <translation>&amp;Célmappa:</translation>
     </message>
     <message>
-        <location line="+39"/>
+        <location filename="../options.cc" line="+60"/>
         <source>High</source>
         <translation>Magas</translation>
     </message>
@@ -1454,32 +1454,32 @@ Másik elsődleges URL-t új sorba írva adhatsz hozzá.</translation>
         <translation>Alacsony</translation>
     </message>
     <message>
-        <location line="+3"/>
+        <location filename="../options.ui" line="+39"/>
         <source>&amp;Priority:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+12"/>
+        <location line="+13"/>
         <source>S&amp;tart when added</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-5"/>
+        <location filename="../options.cc" line="+5"/>
         <source>&amp;Verify Local Data</source>
         <translation>Hely adat &amp;ellenőrzése</translation>
     </message>
     <message>
-        <location line="+9"/>
+        <location filename="../options.ui" line="+7"/>
         <source>Mo&amp;ve .torrent file to the trash</source>
         <translation>Torrent fájl &amp;lomtárba helyezése</translation>
     </message>
     <message>
-        <location line="+236"/>
+        <location filename="../options.cc" line="-55"/>
         <source>Torrent Files (*.torrent);;All Files (*.*)</source>
         <translation>Torrent fájlok (*.torrent);;Minden fájl (*.*)</translation>
     </message>
     <message>
-        <location line="+28"/>
+        <location line="+27"/>
         <source>Select Destination</source>
         <translation>Célmappa kiválasztása</translation>
     </message>
@@ -1593,12 +1593,12 @@ Másik elsődleges URL-t új sorba írva adhatsz hozzá.</translation>
     </message>
     <message>
         <location line="+18"/>
-        <location line="+358"/>
+        <location line="+360"/>
         <source>Desktop</source>
         <translation>Asztal</translation>
     </message>
     <message>
-        <location line="-356"/>
+        <location line="-358"/>
         <source>Show Transmission icon in the &amp;notification area</source>
         <translation>Ikon mutatása a &amp;tálcán</translation>
     </message>
@@ -1629,12 +1629,12 @@ Másik elsődleges URL-t új sorba írva adhatsz hozzá.</translation>
     </message>
     <message>
         <location line="+1"/>
-        <location line="+420"/>
+        <location line="+422"/>
         <source>Status unknown</source>
         <translation>Státusz nem ismert</translation>
     </message>
     <message>
-        <location line="-412"/>
+        <location line="-414"/>
         <source>&amp;Port for incoming connections:</source>
         <translation>&amp;Bejövő kapcsolatok portja:</translation>
     </message>
@@ -1813,7 +1813,7 @@ Másik elsődleges URL-t új sorba írva adhatsz hozzá.</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+16"/>
+        <location line="+18"/>
         <source>Download Queue</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1848,7 +1848,7 @@ Másik elsődleges URL-t új sorba írva adhatsz hozzá.</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-221"/>
+        <location line="-223"/>
         <source>Allow encryption</source>
         <translation>Titkosítás engedélyezése</translation>
     </message>
@@ -1938,7 +1938,7 @@ Másik elsődleges URL-t új sorba írva adhatsz hozzá.</translation>
         <translation>Mentés &amp;ide:</translation>
     </message>
     <message>
-        <location line="+16"/>
+        <location line="+18"/>
         <source>Incomplete</source>
         <translation>Félkész</translation>
     </message>
@@ -1996,7 +1996,7 @@ Másik elsődleges URL-t új sorba írva adhatsz hozzá.</translation>
 <context>
     <name>RelocateDialog</name>
     <message>
-        <location filename="../relocate.cc" line="+47"/>
+        <location filename="../relocate.cc" line="+51"/>
         <source>Select Location</source>
         <translation>Válaszd ki a mappát</translation>
     </message>
@@ -2016,7 +2016,7 @@ Másik elsődleges URL-t új sorba írva adhatsz hozzá.</translation>
         <translation>Új &amp;hely:</translation>
     </message>
     <message>
-        <location line="+23"/>
+        <location line="+29"/>
         <source>&amp;Move from the current folder</source>
         <translation>Áthelyezés a &amp;jelenlegi mappából</translation>
     </message>
@@ -2029,7 +2029,7 @@ Másik elsődleges URL-t új sorba írva adhatsz hozzá.</translation>
 <context>
     <name>Session</name>
     <message>
-        <location filename="../session.cc" line="+742"/>
+        <location filename="../session.cc" line="+548"/>
         <source>Error Renaming Path</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2039,7 +2039,7 @@ Másik elsődleges URL-t új sorba írva adhatsz hozzá.</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+45"/>
+        <location line="+48"/>
         <source>Add Torrent</source>
         <translation>Torrent hozzáadása</translation>
     </message>
@@ -2501,6 +2501,24 @@ Másik elsődleges URL-t új sorba írva adhatsz hozzá.</translation>
         <location line="+120"/>
         <source>Queue</source>
         <translation>Sor</translation>
+    </message>
+</context>
+<context>
+    <name>TrPathButton</name>
+    <message>
+        <location filename="../path-button.cc" line="+111"/>
+        <source>(None)</source>
+        <translation type="unfinished">(Nincs)</translation>
+    </message>
+    <message>
+        <location line="+16"/>
+        <source>Select Folder</source>
+        <translation type="unfinished">Mapp kiválasztása</translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Select File</source>
+        <translation type="unfinished">Fájl kiválasztása</translation>
     </message>
 </context>
 <context>

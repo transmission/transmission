@@ -213,7 +213,6 @@ Utils::isValidUtf8 (const char * s)
 QString
 Utils::removeTrailingDirSeparator (const QString& path)
 {
-  return path.endsWith (QDir::separator ())
-    ? path.left (path.length()-1)
-    : path;
+  const QFileInfo pathInfo (path);
+  return pathInfo.fileName ().isEmpty () ? pathInfo.absolutePath () : pathInfo.absoluteFilePath ();
 }

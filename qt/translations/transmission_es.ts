@@ -526,7 +526,7 @@
 <context>
     <name>FileAdded</name>
     <message>
-        <location filename="../session.cc" line="+108"/>
+        <location filename="../session.cc" line="+94"/>
         <source>Add Torrent</source>
         <translation type="unfinished">Agregar torrent</translation>
     </message>
@@ -567,7 +567,7 @@
 <context>
     <name>FileTreeModel</name>
     <message>
-        <location line="+207"/>
+        <location line="+213"/>
         <source>File</source>
         <translation>Archivo</translation>
     </message>
@@ -783,12 +783,12 @@
 <context>
     <name>FreespaceLabel</name>
     <message>
-        <location filename="../freespace-label.cc" line="+47"/>
+        <location filename="../freespace-label.cc" line="+56"/>
         <source>&lt;i&gt;Calculating Free Space...&lt;/i&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+37"/>
+        <location line="+36"/>
         <source>%1 free</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1426,12 +1426,12 @@ Para agregar otro URL primario, agrueguelo después de una línea en blanco.</tr
 <context>
     <name>OptionsDialog</name>
     <message>
-        <location filename="../options.cc" line="+403"/>
+        <location filename="../options.cc" line="+59"/>
         <source>Open Torrent</source>
         <translation>Abrir Torrent</translation>
     </message>
     <message>
-        <location line="-337"/>
+        <location line="-13"/>
         <source>Open Torrent from File</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1441,17 +1441,17 @@ Para agregar otro URL primario, agrueguelo después de una línea en blanco.</tr
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+11"/>
+        <location filename="../options.ui" line="+17"/>
         <source>&amp;Source:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+30"/>
+        <location line="+26"/>
         <source>&amp;Destination folder:</source>
         <translation>Folder de &amp;destino:</translation>
     </message>
     <message>
-        <location line="+39"/>
+        <location filename="../options.cc" line="+60"/>
         <source>High</source>
         <translation>Alta</translation>
     </message>
@@ -1466,32 +1466,32 @@ Para agregar otro URL primario, agrueguelo después de una línea en blanco.</tr
         <translation>Baja</translation>
     </message>
     <message>
-        <location line="+3"/>
+        <location filename="../options.ui" line="+39"/>
         <source>&amp;Priority:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+12"/>
+        <location line="+13"/>
         <source>S&amp;tart when added</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-5"/>
+        <location filename="../options.cc" line="+5"/>
         <source>&amp;Verify Local Data</source>
         <translation>&amp;Verificar datos locales</translation>
     </message>
     <message>
-        <location line="+9"/>
+        <location filename="../options.ui" line="+7"/>
         <source>Mo&amp;ve .torrent file to the trash</source>
         <translation>M&amp;over archivo .torrent al basurero</translation>
     </message>
     <message>
-        <location line="+236"/>
+        <location filename="../options.cc" line="-55"/>
         <source>Torrent Files (*.torrent);;All Files (*.*)</source>
         <translation>Archivos torrent (*.torrent);;Todos los archivos (*.*)</translation>
     </message>
     <message>
-        <location line="+28"/>
+        <location line="+27"/>
         <source>Select Destination</source>
         <translation>Seleccione destino</translation>
     </message>
@@ -1600,12 +1600,12 @@ Para agregar otro URL primario, agrueguelo después de una línea en blanco.</tr
     </message>
     <message>
         <location line="+18"/>
-        <location line="+358"/>
+        <location line="+360"/>
         <source>Desktop</source>
         <translation>Escritorio</translation>
     </message>
     <message>
-        <location line="-356"/>
+        <location line="-358"/>
         <source>Show Transmission icon in the &amp;notification area</source>
         <translation>Mostrar ícono de Transmission en el área de &amp;notificaciones</translation>
     </message>
@@ -1642,12 +1642,12 @@ Para agregar otro URL primario, agrueguelo después de una línea en blanco.</tr
     </message>
     <message>
         <location line="+1"/>
-        <location line="+420"/>
+        <location line="+422"/>
         <source>Status unknown</source>
         <translation>Estado desconocido</translation>
     </message>
     <message>
-        <location line="-412"/>
+        <location line="-414"/>
         <source>&amp;Port for incoming connections:</source>
         <translation>&amp;Puerto para recibir conexiones:</translation>
     </message>
@@ -1828,7 +1828,7 @@ Para agregar otro URL primario, agrueguelo después de una línea en blanco.</tr
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+16"/>
+        <location line="+18"/>
         <source>Download Queue</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1863,7 +1863,7 @@ Para agregar otro URL primario, agrueguelo después de una línea en blanco.</tr
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-221"/>
+        <location line="-223"/>
         <source>Allow encryption</source>
         <translation>Permitir cifrado</translation>
     </message>
@@ -1938,17 +1938,17 @@ Para agregar otro URL primario, agrueguelo después de una línea en blanco.</tr
         <translation>Al agregar</translation>
     </message>
     <message>
-        <location line="+38"/>
+        <location line="+40"/>
         <source>Append &quot;.&amp;part&quot; to incomplete files&apos; names</source>
         <translation>Agregar .&amp;part al nombre de archivos incompletos</translation>
     </message>
     <message>
-        <location line="-18"/>
+        <location line="-20"/>
         <source>Save to &amp;Location:</source>
         <translation>Guardar en &amp;locación:</translation>
     </message>
     <message>
-        <location line="+20"/>
+        <location line="+22"/>
         <source>Keep &amp;incomplete files in:</source>
         <translation>Mantener archivos &amp;incompletos en:</translation>
     </message>
@@ -1958,7 +1958,7 @@ Para agregar otro URL primario, agrueguelo después de una línea en blanco.</tr
         <translation>Ejecutar scrip&amp;t cuando el torrent esté completo:</translation>
     </message>
     <message>
-        <location line="-77"/>
+        <location line="-79"/>
         <source>Stop seeding at &amp;ratio:</source>
         <translation>Dejar de compartir llegando a &amp;proporción:</translation>
     </message>
@@ -1968,7 +1968,7 @@ Para agregar otro URL primario, agrueguelo después de una línea en blanco.</tr
         <translation type="unfinished">Dejar de compartir si está i&amp;nactivo:</translation>
     </message>
     <message>
-        <location line="+60"/>
+        <location line="+62"/>
         <source>Incomplete</source>
         <translation>Incompleto</translation>
     </message>
@@ -2012,7 +2012,7 @@ Para agregar otro URL primario, agrueguelo después de una línea en blanco.</tr
 <context>
     <name>RelocateDialog</name>
     <message>
-        <location filename="../relocate.cc" line="+47"/>
+        <location filename="../relocate.cc" line="+51"/>
         <source>Select Location</source>
         <translation>Seleccione localización</translation>
     </message>
@@ -2032,7 +2032,7 @@ Para agregar otro URL primario, agrueguelo después de una línea en blanco.</tr
         <translation>Nueva &amp;localización:</translation>
     </message>
     <message>
-        <location line="+23"/>
+        <location line="+29"/>
         <source>&amp;Move from the current folder</source>
         <translation>&amp;Mover del directorio actual</translation>
     </message>
@@ -2045,7 +2045,7 @@ Para agregar otro URL primario, agrueguelo después de una línea en blanco.</tr
 <context>
     <name>Session</name>
     <message>
-        <location filename="../session.cc" line="+742"/>
+        <location filename="../session.cc" line="+548"/>
         <source>Error Renaming Path</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2055,7 +2055,7 @@ Para agregar otro URL primario, agrueguelo después de una línea en blanco.</tr
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+45"/>
+        <location line="+48"/>
         <source>Add Torrent</source>
         <translation>Agregar torrent</translation>
     </message>
@@ -2525,6 +2525,24 @@ Para agregar otro URL primario, agrueguelo después de una línea en blanco.</tr
         <location line="+1"/>
         <source>Some of these torrents have not finished downloading.</source>
         <translation>Algunos de estos torrents no han terminado su descarga.</translation>
+    </message>
+</context>
+<context>
+    <name>TrPathButton</name>
+    <message>
+        <location filename="../path-button.cc" line="+111"/>
+        <source>(None)</source>
+        <translation type="unfinished">(Ninguno)</translation>
+    </message>
+    <message>
+        <location line="+16"/>
+        <source>Select Folder</source>
+        <translation type="unfinished">Seleccione folder</translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Select File</source>
+        <translation type="unfinished">Seleccione archivo</translation>
     </message>
 </context>
 <context>

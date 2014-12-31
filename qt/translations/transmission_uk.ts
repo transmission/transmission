@@ -527,7 +527,7 @@
 <context>
     <name>FileAdded</name>
     <message>
-        <location filename="../session.cc" line="+108"/>
+        <location filename="../session.cc" line="+94"/>
         <source>Add Torrent</source>
         <translation type="unfinished">Додати торент</translation>
     </message>
@@ -568,7 +568,7 @@
 <context>
     <name>FileTreeModel</name>
     <message>
-        <location line="+207"/>
+        <location line="+213"/>
         <source>File</source>
         <translation>Файл</translation>
     </message>
@@ -789,12 +789,12 @@
 <context>
     <name>FreespaceLabel</name>
     <message>
-        <location filename="../freespace-label.cc" line="+47"/>
+        <location filename="../freespace-label.cc" line="+56"/>
         <source>&lt;i&gt;Calculating Free Space...&lt;/i&gt;</source>
         <translation>&lt;i&gt;Обчислення вільного простору...&lt;/i&gt;</translation>
     </message>
     <message>
-        <location line="+37"/>
+        <location line="+36"/>
         <source>%1 free</source>
         <translation>%1 вільно</translation>
     </message>
@@ -1435,12 +1435,12 @@ To add another primary URL, add it after a blank line.</source>
 <context>
     <name>OptionsDialog</name>
     <message>
-        <location filename="../options.cc" line="+403"/>
+        <location filename="../options.cc" line="+59"/>
         <source>Open Torrent</source>
         <translation>Відкрити торент</translation>
     </message>
     <message>
-        <location line="-337"/>
+        <location line="-13"/>
         <source>Open Torrent from File</source>
         <translation>Відкрити торент з файлу</translation>
     </message>
@@ -1450,17 +1450,17 @@ To add another primary URL, add it after a blank line.</source>
         <translation>Відкрити торент з посилання чи Маґнет</translation>
     </message>
     <message>
-        <location line="+11"/>
+        <location filename="../options.ui" line="+17"/>
         <source>&amp;Source:</source>
         <translation>&amp;Джерело:</translation>
     </message>
     <message>
-        <location line="+30"/>
+        <location line="+26"/>
         <source>&amp;Destination folder:</source>
         <translation>&amp;Тека призначення:</translation>
     </message>
     <message>
-        <location line="+39"/>
+        <location filename="../options.cc" line="+60"/>
         <source>High</source>
         <translation>Високий</translation>
     </message>
@@ -1475,32 +1475,32 @@ To add another primary URL, add it after a blank line.</source>
         <translation>Низький</translation>
     </message>
     <message>
-        <location line="+3"/>
+        <location filename="../options.ui" line="+39"/>
         <source>&amp;Priority:</source>
         <translation>&amp;Пріоритет:</translation>
     </message>
     <message>
-        <location line="+12"/>
+        <location line="+13"/>
         <source>S&amp;tart when added</source>
         <translation>&amp;Розпочинати безпосередньо після додавання</translation>
     </message>
     <message>
-        <location line="-5"/>
+        <location filename="../options.cc" line="+5"/>
         <source>&amp;Verify Local Data</source>
         <translation>&amp;Перевірити локальні дані</translation>
     </message>
     <message>
-        <location line="+9"/>
+        <location filename="../options.ui" line="+7"/>
         <source>Mo&amp;ve .torrent file to the trash</source>
         <translation>Вилу&amp;чати файли .torrent до смітника</translation>
     </message>
     <message>
-        <location line="+236"/>
+        <location filename="../options.cc" line="-55"/>
         <source>Torrent Files (*.torrent);;All Files (*.*)</source>
         <translation>Торент файли (*.torrent);;Всі файли (*.*)</translation>
     </message>
     <message>
-        <location line="+28"/>
+        <location line="+27"/>
         <source>Select Destination</source>
         <translation>Обрати призначення</translation>
     </message>
@@ -1619,12 +1619,12 @@ To add another primary URL, add it after a blank line.</source>
     </message>
     <message>
         <location line="+5"/>
-        <location line="+420"/>
+        <location line="+422"/>
         <source>Status unknown</source>
         <translation>Невідомий статус</translation>
     </message>
     <message>
-        <location line="-412"/>
+        <location line="-414"/>
         <source>&amp;Port for incoming connections:</source>
         <translation>&amp;Порт для вхідних з’єднань:</translation>
     </message>
@@ -1678,7 +1678,7 @@ To add another primary URL, add it after a blank line.</source>
         <translation>Вилу&amp;чати файли .torrent до смітника</translation>
     </message>
     <message>
-        <location line="+16"/>
+        <location line="+18"/>
         <source>Download Queue</source>
         <translation>Черга завантажень</translation>
     </message>
@@ -1717,7 +1717,7 @@ To add another primary URL, add it after a blank line.</source>
         </translation>
     </message>
     <message>
-        <location line="-363"/>
+        <location line="-365"/>
         <source>Pick a &amp;random port every time Transmission is started</source>
         <translation>Вибирати випадковий порт при кожному запу&amp;ску Transmission</translation>
     </message>
@@ -1776,23 +1776,23 @@ To add another primary URL, add it after a blank line.</source>
         <translation>Вимагати шифрування</translation>
     </message>
     <message>
-        <location line="+216"/>
+        <location line="+218"/>
         <source>Privacy</source>
         <translation>Конфіденційність</translation>
     </message>
     <message>
-        <location line="-395"/>
+        <location line="-397"/>
         <source>&amp;to</source>
         <translation>&amp;до</translation>
     </message>
     <message>
         <location line="+39"/>
-        <location line="+358"/>
+        <location line="+360"/>
         <source>Desktop</source>
         <translation>Робочий стіл</translation>
     </message>
     <message>
-        <location line="-356"/>
+        <location line="-358"/>
         <source>Show Transmission icon in the &amp;notification area</source>
         <translation>Показувати &amp;значок Transmission в зоні сповіщення</translation>
     </message>
@@ -1957,7 +1957,7 @@ To add another primary URL, add it after a blank line.</source>
         <translation>Додавання</translation>
     </message>
     <message>
-        <location line="+75"/>
+        <location line="+77"/>
         <source>Downloading</source>
         <translation>Завантаження</translation>
     </message>
@@ -1972,17 +1972,17 @@ To add another primary URL, add it after a blank line.</source>
         <translation>Зберігати &amp;незавершені файли у:</translation>
     </message>
     <message>
-        <location line="-20"/>
+        <location line="-22"/>
         <source>Save to &amp;Location:</source>
         <translation>Зберігати до:</translation>
     </message>
     <message>
-        <location line="+28"/>
+        <location line="+30"/>
         <source>Call scrip&amp;t when torrent is completed:</source>
         <translation>Виконати с&amp;ценарій, після завершення завантаження:</translation>
     </message>
     <message>
-        <location line="-77"/>
+        <location line="-79"/>
         <source>Stop seeding at &amp;ratio:</source>
         <translation>Припинити поширення при співвідношенні:</translation>
     </message>
@@ -1992,7 +1992,7 @@ To add another primary URL, add it after a blank line.</source>
         <translation type="unfinished">Припинити поширення, якщо не буде активності:</translation>
     </message>
     <message>
-        <location line="+95"/>
+        <location line="+97"/>
         <source>Transmission Preferences</source>
         <translation>Налаштування Transmission</translation>
     </message>
@@ -2023,7 +2023,7 @@ To add another primary URL, add it after a blank line.</source>
 <context>
     <name>RelocateDialog</name>
     <message>
-        <location filename="../relocate.cc" line="+47"/>
+        <location filename="../relocate.cc" line="+51"/>
         <source>Select Location</source>
         <translation>Обрати розташування</translation>
     </message>
@@ -2043,7 +2043,7 @@ To add another primary URL, add it after a blank line.</source>
         <translation>Но&amp;ве розташування:</translation>
     </message>
     <message>
-        <location line="+23"/>
+        <location line="+29"/>
         <source>&amp;Move from the current folder</source>
         <translation>&amp;Перенести зі старої теки у вказану</translation>
     </message>
@@ -2056,7 +2056,7 @@ To add another primary URL, add it after a blank line.</source>
 <context>
     <name>Session</name>
     <message>
-        <location filename="../session.cc" line="+742"/>
+        <location filename="../session.cc" line="+548"/>
         <source>Error Renaming Path</source>
         <translation>Помилка під час перейменування шляху</translation>
     </message>
@@ -2066,7 +2066,7 @@ To add another primary URL, add it after a blank line.</source>
         <translation>&lt;p&gt;&lt;b&gt;Не вдалося перейменувати «%1» на «%2»: %3.&lt;/b&gt;&lt;/p&gt; &lt;p&gt;Виправте помилку і спробуйте ще раз.&lt;/p&gt;</translation>
     </message>
     <message>
-        <location line="+45"/>
+        <location line="+48"/>
         <source>Add Torrent</source>
         <translation>Додати торент</translation>
     </message>
@@ -2540,6 +2540,24 @@ To add another primary URL, add it after a blank line.</source>
         <location line="+120"/>
         <source>Queue</source>
         <translation>Черга</translation>
+    </message>
+</context>
+<context>
+    <name>TrPathButton</name>
+    <message>
+        <location filename="../path-button.cc" line="+111"/>
+        <source>(None)</source>
+        <translation type="unfinished">(Нічого)</translation>
+    </message>
+    <message>
+        <location line="+16"/>
+        <source>Select Folder</source>
+        <translation type="unfinished">Обрати теку</translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Select File</source>
+        <translation type="unfinished">Обрати файл</translation>
     </message>
 </context>
 <context>

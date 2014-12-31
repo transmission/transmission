@@ -53,13 +53,8 @@ class OptionsDialog: public QDialog
     void onVerify ();
     void onTimeout ();
 
-    void onSourceClicked ();
-    void onSourceSelected (const QString&);
-    void onSourceEdited ();
-
-    void onDestinationClicked ();
-    void onDestinationSelected (const QString&);
-    void onDestinationEdited ();
+    void onSourceChanged ();
+    void onDestinationChanged ();
 
   private:
     Session& mySession;

@@ -50,20 +50,23 @@ OptionsDialog::OptionsDialog (Session& session, const Prefs& prefs, const AddDat
 
   myEditTimer.setInterval (2000);
   myEditTimer.setSingleShot (true);
-  connect (&myEditTimer, SIGNAL (timeout ()), this, SLOT (onDestinationEdited ()));
+  connect (&myEditTimer, SIGNAL (timeout ()), this, SLOT (onDestinationChanged ()));
 
   if (myAdd.type == AddData::FILENAME)
     {
       ui.sourceStack->setCurrentWidget (ui.sourceButton);
-      onSourceSelected (myAdd.filename);
-      connect (ui.sourceButton, SIGNAL (clicked ()), this, SLOT (onSourceClicked ()));
+      ui.sourceButton->setMode (TrPathButton::FileMode);
+      ui.sourceButton->setTitle (tr ("Open Torrent"));
+      ui.sourceButton->setNameFilter (tr ("Torrent Files (*.torrent);;All Files (*.*)"));
+      ui.sourceButton->setPath (myAdd.filename);
+      connect (ui.sourceButton, SIGNAL (pathChanged (QString)), this, SLOT (onSourceChanged ()));
     }
   else
     {
       ui.sourceStack->setCurrentWidget (ui.sourceEdit);
       ui.sourceEdit->setText (myAdd.readableName ());
       ui.sourceEdit->selectAll ();
-      connect (ui.sourceEdit, SIGNAL (editingFinished ()), this, SLOT (onSourceEdited ()));
+      connect (ui.sourceEdit, SIGNAL (editingFinished ()), this, SLOT (onSourceChanged ()));
     }
 
   ui.sourceStack->setFixedHeight (ui.sourceStack->currentWidget ()->sizeHint ().height ());
@@ -73,14 +76,18 @@ OptionsDialog::OptionsDialog (Session& session, const Prefs& prefs, const AddDat
   const int width = fontMetrics.size (0, QString::fromUtf8 ("This is a pretty long torrent filename indeed.torrent")).width ();
   ui.sourceStack->setMinimumWidth (width);
 
-  const QString downloadDir (prefs.getString (Prefs::DOWNLOAD_DIR));
+  const QString downloadDir (Utils::removeTrailingDirSeparator (prefs.getString (Prefs::DOWNLOAD_DIR)));
   ui.freeSpaceLabel->setSession (mySession);
+  ui.freeSpaceLabel->setPath (downloadDir);
 
   if (session.isLocal ())
     {
       ui.destinationStack->setCurrentWidget (ui.destinationButton);
-      onDestinationSelected (downloadDir);
-      connect (ui.destinationButton, SIGNAL (clicked ()), this, SLOT (onDestinationClicked ()));
+      ui.destinationButton->setMode (TrPathButton::DirectoryMode);
+      ui.destinationButton->setTitle (tr ("Select Destination"));
+      ui.destinationButton->setPath (downloadDir);
+      myLocalDestination = downloadDir;
+      connect (ui.destinationButton, SIGNAL (pathChanged (QString)), this, SLOT (onDestinationChanged ()));
     }
   else
     {
@@ -88,7 +95,7 @@ OptionsDialog::OptionsDialog (Session& session, const Prefs& prefs, const AddDat
       ui.destinationEdit->setText (downloadDir);
       ui.freeSpaceLabel->setPath (downloadDir);
       connect (ui.destinationEdit, SIGNAL (textEdited (QString)), &myEditTimer, SLOT (start ()));
-      connect (ui.destinationEdit, SIGNAL (editingFinished ()), this, SLOT (onDestinationEdited ()));
+      connect (ui.destinationEdit, SIGNAL (editingFinished ()), this, SLOT (onDestinationChanged ()));
     }
 
   ui.destinationStack->setFixedHeight (ui.destinationStack->currentWidget ()->sizeHint ().height ());
@@ -287,81 +294,28 @@ OptionsDialog::onAccepted ()
 }
 
 void
-OptionsDialog::onSourceClicked ()
+OptionsDialog::onSourceChanged ()
 {
-  if (myAdd.type == AddData::FILENAME)
-    {
-      QFileDialog * d = new QFileDialog (this,
-                                         tr ("Open Torrent"),
-                                         QFileInfo (myAdd.filename).absolutePath (),
-                                         tr ("Torrent Files (*.torrent);;All Files (*.*)"));
-      d->setFileMode (QFileDialog::ExistingFile);
-      d->setAttribute (Qt::WA_DeleteOnClose);
-      connect (d, SIGNAL (fileSelected (QString)), this, SLOT (onSourceSelected (QString)));
-      d->show ();
-    }
-}
-
-void
-OptionsDialog::onSourceSelected (const QString& path)
-{
-  if (path.isEmpty ())
-    return;
-
-  myAdd.set (path);
-
-  const QFileInfo pathInfo (path);
-
-  const int iconSize (style ()->pixelMetric (QStyle::PM_SmallIconSize));
-  const QFileIconProvider iconProvider;
-
-  ui.sourceButton->setIconSize (QSize (iconSize, iconSize));
-  ui.sourceButton->setIcon (iconProvider.icon (path));
-  ui.sourceButton->setText (pathInfo.fileName ().isEmpty () ? path : pathInfo.fileName ());
-  ui.sourceButton->setToolTip (path);
+  if (ui.sourceStack->currentWidget () == ui.sourceButton)
+    myAdd.set (ui.sourceButton->path ());
+  else
+    myAdd.set (ui.sourceEdit->text ());
 
   reload ();
 }
 
 void
-OptionsDialog::onSourceEdited ()
+OptionsDialog::onDestinationChanged ()
 {
-  myAdd.set (ui.sourceEdit->text ());
-}
-
-void
-OptionsDialog::onDestinationClicked ()
-{
-  QFileDialog * d = new QFileDialog (this, tr ("Select Destination"), myLocalDestination.absolutePath ());
-  d->setFileMode (QFileDialog::Directory);
-  d->setAttribute (Qt::WA_DeleteOnClose);
-  connect (d, SIGNAL (fileSelected (QString)), this, SLOT (onDestinationSelected (QString)));
-  d->show ();
-}
-
-void
-OptionsDialog::onDestinationSelected (const QString& path)
-{
-  if (path.isEmpty ())
-    return;
-
-  myLocalDestination.setPath (Utils::removeTrailingDirSeparator (path));
-
-  const int iconSize (style ()->pixelMetric (QStyle::PM_SmallIconSize));
-  const QFileIconProvider iconProvider;
-
-  ui.destinationButton->setIconSize (QSize (iconSize, iconSize));
-  ui.destinationButton->setIcon (iconProvider.icon (path));
-  ui.destinationButton->setText (myLocalDestination.dirName ().isEmpty () ? path : myLocalDestination.dirName ());
-  ui.destinationButton->setToolTip (path);
-
-  ui.freeSpaceLabel->setPath (path);
-}
-
-void
-OptionsDialog::onDestinationEdited ()
-{
-  ui.freeSpaceLabel->setPath (ui.destinationEdit->text ());
+  if (ui.destinationStack->currentWidget () == ui.destinationButton)
+    {
+      myLocalDestination = ui.destinationButton->path ();
+      ui.freeSpaceLabel->setPath (myLocalDestination.absolutePath ());
+    }
+  else
+    {
+      ui.freeSpaceLabel->setPath (ui.destinationEdit->text ());
+    }
 }
 
 /***
