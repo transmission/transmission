@@ -7,10 +7,13 @@
  * $Id$
  */
 
+#include <QApplication>
 #include <QFileDialog>
 #include <QFileIconProvider>
 #include <QFileInfo>
 #include <QStyle>
+#include <QStyleOptionToolButton>
+#include <QStylePainter>
 
 #include "path-button.h"
 #include "utils.h"
@@ -23,6 +26,7 @@ TrPathButton::TrPathButton (QWidget * parent):
   myPath ()
 {
   setSizePolicy(QSizePolicy (QSizePolicy::Preferred, QSizePolicy::Fixed));
+  setText (tr ("(None)")); // for minimum width
 
   updateAppearance ();
 
@@ -72,6 +76,28 @@ TrPathButton::path () const
 }
 
 void
+TrPathButton::paintEvent (QPaintEvent * /*event*/)
+{
+  QStylePainter painter(this);
+  QStyleOptionToolButton option;
+  initStyleOption (&option);
+
+  const QSize fakeContentSize (qMax (100, qApp->globalStrut ().width ()),
+                        qMax (100, qApp->globalStrut ().height ()));
+  const QSize fakeSizeHint = style ()->sizeFromContents (QStyle::CT_ToolButton, &option, fakeContentSize, this);
+
+  int textWidth = width () - (fakeSizeHint.width () - fakeContentSize.width ()) - iconSize ().width () - 6;
+  if (popupMode () == MenuButtonPopup)
+    textWidth -= style ()->pixelMetric (QStyle::PM_MenuButtonIndicator, &option, this);
+
+  const QFileInfo pathInfo (myPath);
+  option.text = myPath.isEmpty () ? tr ("(None)") : (pathInfo.fileName ().isEmpty () ? myPath : pathInfo.fileName ());
+  option.text = fontMetrics ().elidedText (option.text, Qt::ElideMiddle, textWidth);
+
+  painter.drawComplexControl(QStyle::CC_ToolButton, option);
+}
+
+void
 TrPathButton::onClicked ()
 {
   QFileDialog * dialog = new QFileDialog (window (), effectiveTitle ());
@@ -110,8 +136,9 @@ TrPathButton::updateAppearance ()
 
   setIconSize (QSize (iconSize, iconSize));
   setIcon (icon);
-  setText (myPath.isEmpty () ? tr ("(None)") : (pathInfo.fileName ().isEmpty () ? myPath : pathInfo.fileName ()));
   setToolTip (myPath == text () ? QString () : myPath);
+
+  update ();
 }
 
 bool

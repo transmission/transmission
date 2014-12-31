@@ -36,6 +36,9 @@ class TrPathButton: public QToolButton
   signals:
     void pathChanged (const QString& path);
 
+  protected:
+    virtual void paintEvent (QPaintEvent * event);
+
   private slots:
     void onClicked ();
     void onFileSelected (const QString& path);

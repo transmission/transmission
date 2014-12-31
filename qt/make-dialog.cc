@@ -220,6 +220,8 @@ MakeDialog::MakeDialog (Session& session, QWidget * parent):
 {
   ui.setupUi (this);
 
+  resize (minimumSizeHint ());
+
   ui.destinationButton->setMode (TrPathButton::DirectoryMode);
   ui.destinationButton->setPath (QDir::homePath ());
 
