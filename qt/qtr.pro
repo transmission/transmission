@@ -36,6 +36,8 @@ win32:DEFINES += QT_DBUS
 win32:LIBS += -levent-2.0 -lws2_32 -lintl
 win32:LIBS += -lidn -liconv -lwldap32 -liphlpapi
 
+lessThan(QT_MAJOR_VERSION, 5):*-g++*:QMAKE_CXXFLAGS += -std=gnu++11
+
 TRANSLATIONS += translations/transmission_en.ts \
                 translations/transmission_es.ts \
                 translations/transmission_eu.ts \
