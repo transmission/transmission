@@ -196,6 +196,7 @@ clients_test_LDADD = ${apps_ldadd}
 clients_test_LDFLAGS = ${apps_ldflags}
 
 crypto_test_SOURCES = crypto-test.c $(TEST_SOURCES)
+crypto_test_HEADERS = crypto-test-ref.h
 crypto_test_LDADD = ${apps_ldadd}
 crypto_test_LDFLAGS = ${apps_ldflags}
 

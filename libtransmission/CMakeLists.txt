@@ -218,9 +218,11 @@ if(ENABLE_TESTS)
 
     target_link_libraries(${TR_NAME}-test ${TR_NAME})
 
+    set(crypto-test_ADD_SOURCES crypto-test-ref.h)
+
     foreach(T bitfield blocklist clients crypto error file history json magnet metainfo move peer-msgs quark rename rpc session tr-getopt utils variant)
         set(TP ${TR_NAME}-test-${T})
-        add_executable(${TP} ${T}-test.c)
+        add_executable(${TP} ${T}-test.c ${${T}-test_ADD_SOURCES})
         target_link_libraries(${TP} ${TR_NAME} ${TR_NAME}-test)
         add_test(${T} ${TP})
     endforeach()

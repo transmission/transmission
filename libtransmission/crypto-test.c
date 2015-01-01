@@ -15,7 +15,7 @@
 
 #include "libtransmission-test.h"
 
-#define SHA_DIGEST_LENGTH 20
+#include "crypto-test-ref.h"
 
 static int
 test_torrent_hash (void)
@@ -60,7 +60,8 @@ test_torrent_hash (void)
 static int
 test_encrypt_decrypt (void)
 {
-  tr_crypto a, b;
+  tr_crypto a;
+  tr_crypto_ b;
   uint8_t hash[SHA_DIGEST_LENGTH];
   const char test1[] = { "test1" };
   char buf11[sizeof (test1)], buf12[sizeof (test1)];
@@ -72,23 +73,23 @@ test_encrypt_decrypt (void)
     hash[i] = i;
 
   tr_cryptoConstruct (&a, hash, false);
-  tr_cryptoConstruct (&b, hash, true);
-  check (tr_cryptoComputeSecret (&a, tr_cryptoGetMyPublicKey (&b, &i)));
-  check (tr_cryptoComputeSecret (&b, tr_cryptoGetMyPublicKey (&a, &i)));
+  tr_cryptoConstruct_ (&b, hash, true);
+  check (tr_cryptoComputeSecret (&a, tr_cryptoGetMyPublicKey_ (&b, &i)));
+  check (tr_cryptoComputeSecret_ (&b, tr_cryptoGetMyPublicKey (&a, &i)));
 
   tr_cryptoEncryptInit (&a);
   tr_cryptoEncrypt (&a, sizeof (test1), test1, buf11);
-  tr_cryptoDecryptInit (&b);
-  tr_cryptoDecrypt (&b, sizeof (test1), buf11, buf12);
+  tr_cryptoDecryptInit_ (&b);
+  tr_cryptoDecrypt_ (&b, sizeof (test1), buf11, buf12);
   check_streq (test1, buf12);
 
-  tr_cryptoEncryptInit (&b);
-  tr_cryptoEncrypt (&b, sizeof (test2), test2, buf21);
+  tr_cryptoEncryptInit_ (&b);
+  tr_cryptoEncrypt_ (&b, sizeof (test2), test2, buf21);
   tr_cryptoDecryptInit (&a);
   tr_cryptoDecrypt (&a, sizeof (test2), buf21, buf22);
   check_streq (test2, buf22);
 
-  tr_cryptoDestruct (&b);
+  tr_cryptoDestruct_ (&b);
   tr_cryptoDestruct (&a);
 
   return 0;
@@ -98,12 +99,17 @@ static int
 test_sha1 (void)
 {
   uint8_t hash[SHA_DIGEST_LENGTH];
+  uint8_t hash_[SHA_DIGEST_LENGTH];
 
   check (tr_sha1 (hash, "test", 4, NULL));
+  check (tr_sha1_ (hash_, "test", 4, NULL));
   check (memcmp (hash, "\xa9\x4a\x8f\xe5\xcc\xb1\x9b\xa6\x1c\x4c\x08\x73\xd3\x91\xe9\x87\x98\x2f\xbb\xd3", SHA_DIGEST_LENGTH) == 0);
+  check (memcmp (hash, hash_, SHA_DIGEST_LENGTH) == 0);
 
   check (tr_sha1 (hash, "1", 1, "22", 2, "333", 3, NULL));
+  check (tr_sha1_ (hash_, "1", 1, "22", 2, "333", 3, NULL));
   check (memcmp (hash, "\x1f\x74\x64\x8e\x50\xa6\xa6\x70\x8e\xc5\x4a\xb3\x27\xa1\x63\xd5\x53\x6b\x7c\xed", SHA_DIGEST_LENGTH) == 0);
+  check (memcmp (hash, hash_, SHA_DIGEST_LENGTH) == 0);
 
   return 0;
 }
@@ -129,12 +135,13 @@ test_ssha1 (void)
 
       for (j = 0; j < HASH_COUNT; ++j)
         {
-          hashes[j] = tr_ssha1 (phrase);
+          hashes[j] = j % 2 == 0 ? tr_ssha1 (phrase) : tr_ssha1_ (phrase);
 
           check (hashes[j] != NULL);
 
           /* phrase matches each of generated hashes */
           check (tr_ssha1_matches (hashes[j], phrase));
+          check (tr_ssha1_matches_ (hashes[j], phrase));
         }
 
       for (j = 0; j < HASH_COUNT; ++j)
@@ -152,8 +159,11 @@ test_ssha1 (void)
       phrase[0] ^= phrase[1];
 
       for (j = 0; j < HASH_COUNT; ++j)
-        /* changed phrase doesn't match the hashes */
-        check (!tr_ssha1_matches (hashes[j], phrase));
+        {
+          /* changed phrase doesn't match the hashes */
+          check (!tr_ssha1_matches (hashes[j], phrase));
+          check (!tr_ssha1_matches_ (hashes[j], phrase));
+        }
 
       for (j = 0; j < HASH_COUNT; ++j)
         tr_free (hashes[j]);
@@ -193,6 +203,15 @@ test_base64 (void)
   out = tr_base64_encode_str ("YOYO!", &len);
   check_int_eq (8, len);
   check_streq ("WU9ZTyE=", out);
+  in = tr_base64_decode_str_ (out, &len);
+  check_int_eq (5, len);
+  check_streq ("YOYO!", in);
+  tr_free (in);
+  tr_free (out);
+
+  out = tr_base64_encode_str_ ("YOYO!", &len);
+  check_int_eq (8, len);
+  check_streq ("WU9ZTyE=", out);
   in = tr_base64_decode_str (out, &len);
   check_int_eq (5, len);
   check_streq ("YOYO!", in);
@@ -203,12 +222,30 @@ test_base64 (void)
   check_int_eq (0, len);
   check_streq ("", out);
   tr_free (out);
+  out = tr_base64_decode_ ("", 0, &len);
+  check_int_eq (0, len);
+  check_streq ("", out);
+  tr_free (out);
+
+  out = tr_base64_encode_ ("", 0, &len);
+  check_int_eq (0, len);
+  check_streq ("", out);
+  tr_free (out);
   out = tr_base64_decode ("", 0, &len);
   check_int_eq (0, len);
   check_streq ("", out);
   tr_free (out);
 
   out = tr_base64_encode (NULL, 0, &len);
+  check_int_eq (0, len);
+  check (out == NULL);
+  tr_free (out);
+  out = tr_base64_decode_ (NULL, 0, &len);
+  check_int_eq (0, len);
+  check (out == NULL);
+  tr_free (out);
+
+  out = tr_base64_encode_ (NULL, 0, &len);
   check_int_eq (0, len);
   check (out == NULL);
   tr_free (out);
@@ -229,6 +266,14 @@ test_base64 (void)
 
       out = tr_base64_encode (buf, j, &len);
       check_int_eq ((j + 2) / 3 * 4, len);
+      in = tr_base64_decode_ (out, len, &len);
+      check_int_eq (j, len);
+      check (memcmp (in, buf, len) == 0);
+      tr_free (in);
+      tr_free (out);
+
+      out = tr_base64_encode_ (buf, j, &len);
+      check_int_eq ((j + 2) / 3 * 4, len);
       in = tr_base64_decode (out, len, &len);
       check_int_eq (j, len);
       check (memcmp (in, buf, len) == 0);
@@ -240,6 +285,14 @@ test_base64 (void)
       buf[j] = '\0';
 
       out = tr_base64_encode_str (buf, &len);
+      check_int_eq ((j + 2) / 3 * 4, len);
+      in = tr_base64_decode_str_ (out, &len);
+      check_int_eq (j, len);
+      check_streq (in, buf);
+      tr_free (in);
+      tr_free (out);
+
+      out = tr_base64_encode_str_ (buf, &len);
       check_int_eq ((j + 2) / 3 * 4, len);
       in = tr_base64_decode_str (out, &len);
       check_int_eq (j, len);
