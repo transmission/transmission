@@ -25,6 +25,11 @@
 #include <QSet>
 #include <QStyle>
 
+#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
+#include <QMimeDatabase>
+#include <QMimeType>
+#endif
+
 #include <libtransmission/transmission.h>
 #include <libtransmission/utils.h> // tr_formatter
 
@@ -106,10 +111,14 @@ namespace
 } // namespace
 #endif
 
+#include <QDebug>
 QIcon
 Utils::guessMimeIcon (const QString& filename)
 {
+  static const QIcon fallback = qApp->style ()->standardIcon (QStyle::SP_FileIcon);
+
 #ifdef _WIN32
+
   QIcon icon;
 
   if (!filename.isEmpty ())
@@ -121,20 +130,24 @@ Utils::guessMimeIcon (const QString& filename)
       addAssociatedFileIcon (fileInfo, SHGFI_LARGEICON, icon);
     }
 
-  if (icon.isNull ())
-    icon = qApp->style ()->standardIcon (QStyle::SP_FileIcon);
+  if (!icon.isNull ())
+    return icon;
 
-  return icon;
+#elif QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
+
+  QMimeDatabase mimeDb;
+  QMimeType mimeType = mimeDb.mimeTypeForFile (filename, QMimeDatabase::MatchExtension);
+  if (mimeType.isValid ())
+    return QIcon::fromTheme (mimeType.iconName (), QIcon::fromTheme (mimeType.genericIconName (), fallback));
+
 #else
+
   enum { DISK, DOCUMENT, PICTURE, VIDEO, ARCHIVE, AUDIO, APP, TYPE_COUNT };
-  static QIcon fallback;
   static QIcon fileIcons[TYPE_COUNT];
   static QSet<QString> suffixes[TYPE_COUNT];
 
   if (fileIcons[0].isNull ())
     {
-      fallback = qApp->style()->standardIcon (QStyle::SP_FileIcon);
-
       suffixes[DISK] << QString::fromLatin1("iso");
       fileIcons[DISK]= QIcon::fromTheme (QString::fromLatin1("media-optical"), fallback);
 
@@ -183,8 +196,9 @@ Utils::guessMimeIcon (const QString& filename)
     if (suffixes[i].contains (suffix))
       return fileIcons[i];
 
-  return fallback;
 #endif
+
+  return fallback;
 }
 
 bool
