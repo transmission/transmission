@@ -29,11 +29,7 @@
        <verstretch>0</verstretch>
       </sizepolicy>
      </property>
-     <widget class="TrPathButton" name="sourceButton">
-      <property name="toolButtonStyle">
-       <enum>Qt::ToolButtonTextBesideIcon</enum>
-      </property>
-     </widget>
+     <widget class="TrPathButton" name="sourceButton"/>
      <widget class="QLineEdit" name="sourceEdit"/>
     </widget>
    </item>
@@ -55,11 +51,7 @@
        <verstretch>0</verstretch>
       </sizepolicy>
      </property>
-     <widget class="TrPathButton" name="destinationButton">
-      <property name="toolButtonStyle">
-       <enum>Qt::ToolButtonTextBesideIcon</enum>
-      </property>
-     </widget>
+     <widget class="TrPathButton" name="destinationButton"/>
      <widget class="QLineEdit" name="destinationEdit"/>
     </widget>
    </item>

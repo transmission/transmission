@@ -554,6 +554,7 @@ void
 TrMainWindow::setLocation ()
 {
   QDialog * d = new RelocateDialog (mySession, myModel, getSelectedTorrents (), this);
+  d->setAttribute (Qt::WA_DeleteOnClose, true);
   d->show ();
 }
 

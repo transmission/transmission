@@ -26,6 +26,7 @@ TrPathButton::TrPathButton (QWidget * parent):
   myPath ()
 {
   setSizePolicy(QSizePolicy (QSizePolicy::Preferred, QSizePolicy::Fixed));
+  setToolButtonStyle (Qt::ToolButtonTextBesideIcon);
   setText (tr ("(None)")); // for minimum width
 
   updateAppearance ();
@@ -104,7 +105,8 @@ TrPathButton::onClicked ()
   dialog->setFileMode (isDirMode () ? QFileDialog::Directory : QFileDialog::ExistingFile);
   if (isDirMode ())
     dialog->setOption (QFileDialog::ShowDirsOnly);
-  dialog->setNameFilter (myNameFilter);
+  if (!myNameFilter.isEmpty ())
+    dialog->setNameFilter (myNameFilter);
   dialog->selectFile (myPath);
 
   connect (dialog, SIGNAL (fileSelected (QString)), this, SLOT (onFileSelected (QString)));

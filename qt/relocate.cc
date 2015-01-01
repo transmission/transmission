@@ -8,51 +8,19 @@
  */
 
 #include <QDir>
-#include <QFileIconProvider>
-#include <QFileInfo>
 
 #include "relocate.h"
 #include "session.h"
 #include "torrent.h"
 #include "torrent-model.h"
-#include "utils.h"
 
 bool RelocateDialog::myMoveFlag = true;
 
 void
 RelocateDialog::onSetLocation ()
 {
-  mySession.torrentSetLocation (myIds, myPath, myMoveFlag);
+  mySession.torrentSetLocation (myIds, newLocation (), myMoveFlag);
   close ();
-}
-
-void
-RelocateDialog::onFileSelected (const QString& path)
-{
-  myPath = path;
-
-  const int iconSize = style ()->pixelMetric (QStyle::PM_SmallIconSize);
-
-  const QFileInfo pathInfo (path);
-  const QString absolutePath = pathInfo.absoluteFilePath ();
-  const QFileIconProvider iconProvider;
-
-  ui.newLocationButton->setIcon (mySession.isLocal () ?
-                                 iconProvider.icon (pathInfo) :
-                                 iconProvider.icon (QFileIconProvider::Folder));
-  ui.newLocationButton->setIconSize (QSize (iconSize, iconSize));
-  ui.newLocationButton->setText (pathInfo.fileName ().isEmpty () ? absolutePath : pathInfo.fileName ());
-  ui.newLocationButton->setToolTip (absolutePath);
-}
-
-void
-RelocateDialog::onDirButtonClicked ()
-{
-  const QString title = tr ("Select Location");
-  const QString path = Utils::remoteFileChooser (this, title, myPath, true, mySession.isServer ());
-
-  if (!path.isEmpty ())
-    onFileSelected (path);
 }
 
 void
@@ -71,25 +39,41 @@ RelocateDialog::RelocateDialog (Session            & session,
 {
   ui.setupUi (this);
 
+  QString path;
   foreach (int id, myIds)
     {
       const Torrent * tor = model.getTorrentFromId (id);
 
-      if (myPath.isEmpty ())
+      if (path.isEmpty ())
         {
-          myPath = tor->getPath ();
+          path = tor->getPath ();
         }
-      else if (myPath != tor->getPath ())
+      else if (path != tor->getPath ())
         {
           if (mySession.isServer ())
-            myPath = QDir::homePath ();
+            path = QDir::homePath ();
           else
-            myPath = QDir::rootPath ();
+            path = QDir::rootPath ();
           break;
         }
     }
 
-  onFileSelected (myPath);
+  if (mySession.isServer ())
+    {
+      ui.newLocationStack->setCurrentWidget (ui.newLocationButton);
+      ui.newLocationButton->setMode (TrPathButton::DirectoryMode);
+      ui.newLocationButton->setTitle (tr ("Select Location"));
+      ui.newLocationButton->setPath (path);
+    }
+  else
+    {
+      ui.newLocationStack->setCurrentWidget (ui.newLocationEdit);
+      ui.newLocationEdit->setText (path);
+      ui.newLocationEdit->selectAll ();
+    }
+
+  ui.newLocationStack->setFixedHeight (ui.newLocationStack->currentWidget ()->sizeHint ().height ());
+  ui.newLocationLabel->setBuddy (ui.newLocationStack->currentWidget ());
 
   if (myMoveFlag)
     ui.moveDataRadio->setChecked (true);
@@ -97,9 +81,13 @@ RelocateDialog::RelocateDialog (Session            & session,
     ui.findDataRadio->setChecked (true);
 
   connect (ui.moveDataRadio, SIGNAL (toggled (bool)), this, SLOT (onMoveToggled (bool)));
-  connect (ui.newLocationButton, SIGNAL (clicked ()), this, SLOT (onDirButtonClicked ()));
   connect (ui.dialogButtons, SIGNAL (rejected ()), this, SLOT (close ()));
   connect (ui.dialogButtons, SIGNAL (accepted ()), this, SLOT (onSetLocation ()));
+}
 
-  setAttribute (Qt::WA_DeleteOnClose, true);
+QString
+RelocateDialog::newLocation () const
+{
+  return ui.newLocationStack->currentWidget () == ui.newLocationButton ?
+         ui.newLocationButton->path () : ui.newLocationEdit->text ();
 }

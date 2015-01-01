@@ -12,7 +12,6 @@
 
 #include <QDialog>
 #include <QSet>
-#include <QString>
 
 #include "ui_relocate.h"
 
@@ -28,16 +27,16 @@ class RelocateDialog: public QDialog
     ~RelocateDialog () {}
 
   private slots:
-    void onFileSelected (const QString& path);
-    void onDirButtonClicked ();
     void onSetLocation ();
     void onMoveToggled (bool);
+
+  private:
+    QString newLocation () const;
 
   private:
     Session& mySession;
     const QSet<int> myIds;
     Ui::RelocateDialog ui;
-    QString myPath;
 
     static bool myMoveFlag;
 };

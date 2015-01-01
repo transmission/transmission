@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>225</width>
-    <height>155</height>
+    <width>339</width>
+    <height>151</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -27,6 +27,10 @@
 [tr-style~=&quot;form-label&quot;]
 {
   margin-left: 18px;
+}
+#newLocationStack
+{
+  min-width: 15em;
 }</string>
   </property>
   <layout class="QGridLayout" name="dialogLayout">
@@ -48,28 +52,15 @@
      <property name="text">
       <string>New &amp;location:</string>
      </property>
-     <property name="buddy">
-      <cstring>newLocationButton</cstring>
-     </property>
      <property name="tr-style" stdset="0">
       <string notr="true">form-label</string>
      </property>
     </widget>
    </item>
    <item row="1" column="1">
-    <widget class="QToolButton" name="newLocationButton">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="styleSheet">
-      <string notr="true">text-align:left</string>
-     </property>
-     <property name="toolButtonStyle">
-      <enum>Qt::ToolButtonTextBesideIcon</enum>
-     </property>
+    <widget class="QStackedWidget" name="newLocationStack">
+     <widget class="TrPathButton" name="newLocationButton"/>
+     <widget class="QLineEdit" name="newLocationEdit"/>
     </widget>
    </item>
    <item row="2" column="0" colspan="2">
@@ -104,6 +95,13 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>TrPathButton</class>
+   <extends>QToolButton</extends>
+   <header>path-button.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

@@ -57,11 +57,7 @@
     </widget>
    </item>
    <item row="1" column="1">
-    <widget class="TrPathButton" name="destinationButton">
-     <property name="toolButtonStyle">
-      <enum>Qt::ToolButtonTextBesideIcon</enum>
-     </property>
-    </widget>
+    <widget class="TrPathButton" name="destinationButton"/>
    </item>
    <item row="2" column="0">
     <widget class="QRadioButton" name="sourceFolderRadio">
@@ -77,9 +73,6 @@
     <widget class="TrPathButton" name="sourceFolderButton">
      <property name="enabled">
       <bool>false</bool>
-     </property>
-     <property name="toolButtonStyle">
-      <enum>Qt::ToolButtonTextBesideIcon</enum>
      </property>
     </widget>
    </item>
@@ -97,11 +90,7 @@
     </widget>
    </item>
    <item row="3" column="1">
-    <widget class="TrPathButton" name="sourceFileButton">
-     <property name="toolButtonStyle">
-      <enum>Qt::ToolButtonTextBesideIcon</enum>
-     </property>
-    </widget>
+    <widget class="TrPathButton" name="sourceFileButton"/>
    </item>
    <item row="4" column="1">
     <widget class="QLabel" name="sourceSizeLabel">
