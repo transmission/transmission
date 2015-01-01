@@ -555,6 +555,13 @@
 			remoteGlobalIDString = 4D18389609DEC0030047D688;
 			remoteInfo = libtransmission;
 		};
+		C165AB8C1A55FAA900D37711 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = C1639A6E1A55F4D600E42033;
+			remoteInfo = b64;
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -2254,6 +2261,7 @@
 				BE75C34F0C729ED300DBEFE0 /* PBXTargetDependency */,
 				A22CFCC70FC24F990009BD3E /* PBXTargetDependency */,
 				A2E384E4130DFB51001F501B /* PBXTargetDependency */,
+				C165AB8D1A55FAA900D37711 /* PBXTargetDependency */,
 			);
 			name = libtransmission;
 			productName = transmission;
@@ -3046,6 +3054,11 @@
 			isa = PBXTargetDependency;
 			target = 4D18389609DEC0030047D688 /* libtransmission */;
 			targetProxy = BEFC1CEC0C07822400B0BB3C /* PBXContainerItemProxy */;
+		};
+		C165AB8D1A55FAA900D37711 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = C1639A6E1A55F4D600E42033 /* b64 */;
+			targetProxy = C165AB8C1A55FAA900D37711 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -3965,6 +3978,7 @@
 				C1639A721A55F4D600E42033 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
 		};
 /* End XCConfigurationList section */
 	};
