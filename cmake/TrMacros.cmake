@@ -40,7 +40,10 @@ endfunction()
 
 macro(tr_github_upstream ID REPOID RELID RELMD5)
     set(${ID}_RELEASE "${RELID}")
-    set(${ID}_UPSTREAM URL "https://github.com/${REPOID}/archive/${RELID}.tar.gz" URL_MD5 "${RELMD5}")
+    set(${ID}_UPSTREAM URL "https://github.com/${REPOID}/archive/${RELID}.tar.gz")
+    if(NOT SKIP_UPSTREAM_CHECKSUM)
+        list(APPEND ${ID}_UPSTREAM URL_MD5 "${RELMD5}")
+    endif()
 endmacro()
 
 macro(tr_add_external_auto_library ID LIBNAME)
@@ -62,6 +65,7 @@ macro(tr_add_external_auto_library ID LIBNAME)
             ${ARGN}
             PREFIX "${${ID}_PREFIX}"
             CMAKE_ARGS
+                -Wno-dev # We don't want to be warned over unused variables
                 "-DCMAKE_TOOLCHAIN_FILE:PATH=${CMAKE_TOOLCHAIN_FILE}"
                 "-DCMAKE_C_FLAGS:STRING=${CMAKE_C_FLAGS}"
                 "-DCMAKE_CXX_FLAGS:STRING=${CMAKE_CXX_FLAGS}"
