@@ -31,6 +31,7 @@ transmission_create_LDADD = \
     @LIBNATPMP_LIBS@ \
     @INTLLIBS@ \
     @DHT_LIBS@ \
+    @LIBB64_LIBS@ \
     @LIBUTP_LIBS@ \
     @LIBEVENT_LIBS@ \
     @LIBCURL_LIBS@ \

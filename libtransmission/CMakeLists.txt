@@ -171,6 +171,7 @@ include_directories(
     ${MINIUPNPC_INCLUDE_DIRS}
     ${DHT_INCLUDE_DIRS}
     ${UTP_INCLUDE_DIRS}
+    ${B64_INCLUDE_DIRS}
 )
 
 if(ENABLE_UTP)
@@ -187,7 +188,8 @@ foreach(UT ${EVENT2_UPSTREAM_TARGET}
            ${NATPMP_UPSTREAM_TARGET}
            ${MINIUPNPC_UPSTREAM_TARGET}
            ${DHT_UPSTREAM_TARGET}
-           ${UTP_UPSTREAM_TARGET})
+           ${UTP_UPSTREAM_TARGET}
+           ${B64_UPSTREAM_TARGET})
     add_dependencies(${TR_NAME} ${UT})
 endforeach()
 
@@ -202,6 +204,7 @@ target_link_libraries(${TR_NAME}
     ${MINIUPNPC_LIBRARIES}
     ${DHT_LIBRARIES}
     ${UTP_LIBRARIES}
+    ${B64_LIBRARIES}
     ${LIBINTL_LIBRARY}
     ${LIBM_LIBRARY}
 )

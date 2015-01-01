@@ -89,6 +89,7 @@ transmission_gtk_LDADD = \
     @LIBUPNP_LIBS@ \
     @LIBNATPMP_LIBS@ \
     @DHT_LIBS@ \
+    @LIBB64_LIBS@ \
     @LIBUTP_LIBS@ \
     @GTK_LIBS@ \
     @LIBAPPINDICATOR_LIBS@ \

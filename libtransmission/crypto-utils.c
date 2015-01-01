@@ -12,6 +12,9 @@
 #include <stdlib.h> /* abs (), srand (), rand () */
 #include <string.h> /* memcpy (), memmove (), memset (), strcmp (), strlen () */
 
+#include <b64/cdecode.h>
+#include <b64/cencode.h>
+
 #include "transmission.h"
 #include "crypto-utils.h"
 #include "utils.h"
@@ -197,8 +200,21 @@ tr_base64_encode (const void * input,
     {
       if (input_length != 0)
         {
-          if ((ret = tr_base64_encode_impl (input, input_length, output_length)) != NULL)
-            return ret;
+          size_t ret_length;
+          base64_encodestate state;
+
+          ret = tr_new (char, 4 * ((input_length + 2) / 3) + 1);
+
+          base64_init_encodestate (&state);
+          ret_length = base64_encode_block (input, input_length, ret, &state);
+          ret_length += base64_encode_blockend (ret + ret_length, &state);
+
+          if (output_length != NULL)
+            *output_length = ret_length;
+
+          ret[ret_length] = '\0';
+
+          return ret;
         }
       else
         ret = tr_strdup ("");
@@ -232,8 +248,20 @@ tr_base64_decode (const void * input,
     {
       if (input_length != 0)
         {
-          if ((ret = tr_base64_decode_impl (input, input_length, output_length)) != NULL)
-            return ret;
+          size_t ret_length;
+          base64_decodestate state;
+
+          ret = tr_new (char, input_length / 4 * 3 + 1);
+
+          base64_init_decodestate (&state);
+          ret_length = base64_decode_block (input, input_length, ret, &state);
+
+          if (output_length != NULL)
+            *output_length = ret_length;
+
+          ret[ret_length] = '\0';
+
+          return ret;
         }
       else
         ret = tr_strdup ("");

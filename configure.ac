@@ -218,6 +218,31 @@ AC_SUBST(DHT_LIBS_QT)
 
 dnl ----------------------------------------------------------------------------
 dnl
+dnl  libb64
+
+LIBB64_CFLAGS="-I\$(top_srcdir)/third-party/libb64"
+LIBB64_LIBS="\$(top_builddir)/third-party/libb64/libb64.a"
+LIBB64_LIBS_QT="\$\${TRANSMISSION_TOP}/third-party/libb64/libb64.a"
+build_bundled_b64="yes"
+AC_ARG_ENABLE([external-b64],
+              AS_HELP_STRING([--enable-external-b64],[Use system libb64]),
+              [want_external_b64=${enableval}],
+              [want_external_b64=no])
+if test "x$want_external_b64" != "xno" ; then
+    LIBB64_CFLAGS=""
+    LIBB64_LIBS="-lb64"
+    LIBB64_LIBS_QT="-lb64"
+    build_bundled_b64="no"
+fi
+
+AM_CONDITIONAL([BUILD_B64],[test "x$build_bundled_b64" = "xyes"])
+AC_SUBST(LIBB64_CFLAGS)
+AC_SUBST(LIBB64_LIBS)
+AC_SUBST(LIBB64_LIBS_QT)
+
+
+dnl ----------------------------------------------------------------------------
+dnl
 dnl  utp
 
 AC_CHECK_LIB([rt],
@@ -562,6 +587,7 @@ AC_CONFIG_FILES([Makefile
                  utils/Makefile
                  third-party/Makefile
                  third-party/dht/Makefile
+                 third-party/libb64/Makefile
                  third-party/libutp/Makefile
                  third-party/libnatpmp/Makefile
                  third-party/miniupnp/Makefile

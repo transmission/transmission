@@ -18,6 +18,7 @@ transmission_cli_LDADD = \
     @LIBNATPMP_LIBS@ \
     @LIBUPNP_LIBS@ \
     @DHT_LIBS@ \
+    @LIBB64_LIBS@ \
     @LIBUTP_LIBS@ \
     @LIBEVENT_LIBS@ \
     @LIBCURL_LIBS@ \
