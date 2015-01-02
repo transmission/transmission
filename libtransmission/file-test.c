@@ -148,6 +148,9 @@ validate_permissions (const char   * path,
 
 #else
 
+  (void) path;
+  (void) permissions;
+
   /* No UNIX permissions on Windows */
   return true;
 

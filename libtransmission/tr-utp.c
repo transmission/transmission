@@ -131,9 +131,9 @@ tr_utpSendTo (void *closure, const unsigned char *buf, size_t buflen,
     tr_session *ss = closure;
 
     if (to->sa_family == AF_INET && ss->udp_socket)
-        sendto (ss->udp_socket, buf, buflen, 0, to, tolen);
+        sendto (ss->udp_socket, (const void *) buf, buflen, 0, to, tolen);
     else if (to->sa_family == AF_INET6 && ss->udp_socket)
-        sendto (ss->udp6_socket, buf, buflen, 0, to, tolen);
+        sendto (ss->udp6_socket, (const void *) buf, buflen, 0, to, tolen);
 }
 
 static void

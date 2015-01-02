@@ -147,8 +147,8 @@ sockoptfunction (void * vtask, curl_socket_t fd, curlsocktype purpose UNUSED)
     {
       const int sndbuf = isScrape ? 4096 : 1024;
       const int rcvbuf = isScrape ? 4096 : 3072;
-      setsockopt (fd, SOL_SOCKET, SO_SNDBUF, &sndbuf, sizeof (sndbuf));
-      setsockopt (fd, SOL_SOCKET, SO_RCVBUF, &rcvbuf, sizeof (rcvbuf));
+      setsockopt (fd, SOL_SOCKET, SO_SNDBUF, (const void *) &sndbuf, sizeof (sndbuf));
+      setsockopt (fd, SOL_SOCKET, SO_RCVBUF, (const void *) &rcvbuf, sizeof (rcvbuf));
     }
 
   /* return nonzero if this function encountered an error */

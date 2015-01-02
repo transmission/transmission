@@ -57,23 +57,23 @@ set_socket_buffers (int fd, int large)
     socklen_t rbuf_len = sizeof (rbuf), sbuf_len = sizeof (sbuf);
 
     size = large ? RECV_BUFFER_SIZE : SMALL_BUFFER_SIZE;
-    rc = setsockopt (fd, SOL_SOCKET, SO_RCVBUF, &size, sizeof (size));
+    rc = setsockopt (fd, SOL_SOCKET, SO_RCVBUF, (const void *) &size, sizeof (size));
     if (rc < 0)
         tr_logAddNamedError ("UDP", "Failed to set receive buffer: %s",
                 tr_strerror (errno));
 
     size = large ? SEND_BUFFER_SIZE : SMALL_BUFFER_SIZE;
-    rc = setsockopt (fd, SOL_SOCKET, SO_SNDBUF, &size, sizeof (size));
+    rc = setsockopt (fd, SOL_SOCKET, SO_SNDBUF, (const void *) &size, sizeof (size));
     if (rc < 0)
         tr_logAddNamedError ("UDP", "Failed to set send buffer: %s",
                 tr_strerror (errno));
 
     if (large) {
-        rc = getsockopt (fd, SOL_SOCKET, SO_RCVBUF, &rbuf, &rbuf_len);
+        rc = getsockopt (fd, SOL_SOCKET, SO_RCVBUF, (void *) &rbuf, &rbuf_len);
         if (rc < 0)
             rbuf = 0;
 
-        rc = getsockopt (fd, SOL_SOCKET, SO_SNDBUF, &sbuf, &sbuf_len);
+        rc = getsockopt (fd, SOL_SOCKET, SO_SNDBUF, (void *) &sbuf, &sbuf_len);
         if (rc < 0)
             sbuf = 0;
 
@@ -147,7 +147,7 @@ rebind_ipv6 (tr_session *ss, bool force)
 #ifdef IPV6_V6ONLY
         /* Since we always open an IPv4 socket on the same port, this
            shouldn't matter.  But I'm superstitious. */
-        setsockopt (s, IPPROTO_IPV6, IPV6_V6ONLY, &one, sizeof (one));
+        setsockopt (s, IPPROTO_IPV6, IPV6_V6ONLY, (const void *) &one, sizeof (one));
 #endif
 
     memset (&sin6, 0, sizeof (sin6));
@@ -205,7 +205,7 @@ event_callback (evutil_socket_t s, short type UNUSED, void *sv)
     assert (type == EV_READ);
 
     fromlen = sizeof (from);
-    rc = recvfrom (s, buf, 4096 - 1, 0,
+    rc = recvfrom (s, (void *) buf, 4096 - 1, 0,
                 (struct sockaddr*)&from, &fromlen);
 
     /* Since most packets we receive here are ÂµTP, make quick inline

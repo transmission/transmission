@@ -75,7 +75,7 @@ tr_net_strerror (char * buf, size_t buflen, int err)
 {
     *buf = '\0';
 #ifdef _WIN32
-    FormatMessage (FORMAT_MESSAGE_FROM_SYSTEM, NULL, err, 0, buf, buflen, NULL);
+    FormatMessageA (FORMAT_MESSAGE_FROM_SYSTEM, NULL, err, 0, buf, buflen, NULL);
 #else
     tr_strlcpy (buf, tr_strerror (err), buflen);
 #endif
@@ -148,7 +148,7 @@ int
 tr_netSetTOS (int s, int tos)
 {
 #ifdef IP_TOS
-    return setsockopt (s, IPPROTO_IP, IP_TOS, (char*)&tos, sizeof (tos));
+    return setsockopt (s, IPPROTO_IP, IP_TOS, (const void *) &tos, sizeof (tos));
 #else
     return 0;
 #endif
@@ -159,7 +159,7 @@ tr_netSetCongestionControl (int s UNUSED, const char *algorithm UNUSED)
 {
 #ifdef TCP_CONGESTION
     return setsockopt (s, IPPROTO_TCP, TCP_CONGESTION,
-                       algorithm, strlen (algorithm) + 1);
+                       (const void *) algorithm, strlen (algorithm) + 1);
 #else
     errno = ENOSYS;
     return -1;
@@ -248,7 +248,7 @@ tr_netOpenPeerSocket (tr_session        * session,
     /* seeds don't need much of a read buffer... */
     if (clientIsSeed) {
         int n = 8192;
-        if (setsockopt (s, SOL_SOCKET, SO_RCVBUF, &n, sizeof (n)))
+        if (setsockopt (s, SOL_SOCKET, SO_RCVBUF, (const void *) &n, sizeof (n)))
             tr_logAddInfo ("Unable to set SO_RCVBUF on socket %d: %s", s, tr_strerror (sockerrno));
     }
 
@@ -337,12 +337,12 @@ tr_netBindTCPImpl (const tr_address * addr, tr_port port, bool suppressMsgs, int
     }
 
     optval = 1;
-    setsockopt (fd, SOL_SOCKET, SO_KEEPALIVE, &optval, sizeof (optval));
-    setsockopt (fd, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof (optval));
+    setsockopt (fd, SOL_SOCKET, SO_KEEPALIVE, (const void *) &optval, sizeof (optval));
+    setsockopt (fd, SOL_SOCKET, SO_REUSEADDR, (const void *) &optval, sizeof (optval));
 
 #ifdef IPV6_V6ONLY
     if (addr->type == TR_AF_INET6)
-        if (setsockopt (fd, IPPROTO_IPV6, IPV6_V6ONLY, &optval, sizeof (optval)) == -1)
+        if (setsockopt (fd, IPPROTO_IPV6, IPV6_V6ONLY, (const void *) &optval, sizeof (optval)) == -1)
             if (sockerrno != ENOPROTOOPT) { /* if the kernel doesn't support it, ignore it */
                 *errOut = sockerrno;
                 return -1;

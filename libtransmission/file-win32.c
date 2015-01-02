@@ -145,6 +145,8 @@ create_dir (const char  * path,
 
   assert (path != NULL);
 
+  (void) permissions;
+
   wide_path = tr_win32_utf8_to_native (path, -1);
 
   if ((flags & TR_SYS_DIR_CREATE_PARENTS) != 0)
@@ -225,12 +227,6 @@ create_temp_path (char      * path_template,
   else
     memcpy (path_template, path, path_size);
 
-  goto cleanup;
-
-fail:
-  set_system_error (error, GetLastError ());
-
-cleanup:
   tr_free (path);
 }
 
@@ -444,6 +440,8 @@ tr_sys_path_basename (const char  * path,
 
   assert (path != NULL);
 
+  (void) error;
+
   /* TODO: Error handling */
 
   if (_splitpath_s (path, NULL, 0, NULL, 0, fname, sizeof (fname), ext, sizeof (ext)) == 0 &&
@@ -466,6 +464,8 @@ tr_sys_path_dirname (const char  * path,
   char drive[_MAX_DRIVE], dir[_MAX_DIR];
 
   assert (path != NULL);
+
+  (void) error;
 
   /* TODO: Error handling */
 
@@ -612,6 +612,8 @@ tr_sys_file_open (const char  * path,
 
   assert (path != NULL);
   assert ((flags & (TR_SYS_FILE_READ | TR_SYS_FILE_WRITE)) != 0);
+
+  (void) permissions;
 
   if (flags & TR_SYS_FILE_READ)
     native_access |= GENERIC_READ;
@@ -941,6 +943,11 @@ tr_sys_file_prefetch (tr_sys_file_t    handle,
   assert (handle != TR_BAD_SYS_FILE);
   assert (size > 0);
 
+  (void) handle;
+  (void) offset;
+  (void) size;
+  (void) error;
+
   /* ??? */
 
   return ret;
@@ -1014,6 +1021,8 @@ tr_sys_file_unmap (const void  * address,
 
   assert (address != NULL);
   assert (size > 0);
+
+  (void) size;
 
   ret = UnmapViewOfFile (address);
 

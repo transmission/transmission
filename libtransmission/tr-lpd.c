@@ -292,7 +292,7 @@ int tr_lpdInit (tr_session* ss, tr_address* tr_addr UNUSED)
             goto fail;
 
         if (setsockopt (lpd_socket, SOL_SOCKET, SO_REUSEADDR,
-                &opt_on, sizeof opt_on) < 0)
+                (const void *) &opt_on, sizeof opt_on) < 0)
             goto fail;
 
         memset (&lpd_mcastAddr, 0, sizeof lpd_mcastAddr);
@@ -311,11 +311,11 @@ int tr_lpdInit (tr_session* ss, tr_address* tr_addr UNUSED)
         mcastReq.imr_multiaddr = lpd_mcastAddr.sin_addr;
         mcastReq.imr_interface.s_addr = htonl (INADDR_ANY);
         if (setsockopt (lpd_socket, IPPROTO_IP, IP_ADD_MEMBERSHIP,
-                &mcastReq, sizeof mcastReq) < 0)
+                (const void *) &mcastReq, sizeof mcastReq) < 0)
             goto fail;
 
         if (setsockopt (lpd_socket, IPPROTO_IP, IP_MULTICAST_LOOP,
-                &opt_off, sizeof opt_off) < 0)
+                (const void *) &opt_off, sizeof opt_off) < 0)
             goto fail;
     }
 
@@ -332,11 +332,11 @@ int tr_lpdInit (tr_session* ss, tr_address* tr_addr UNUSED)
 
         /* configure outbound multicast TTL */
         if (setsockopt (lpd_socket2, IPPROTO_IP, IP_MULTICAST_TTL,
-                &scope, sizeof scope) < 0)
+                (const void *) &scope, sizeof scope) < 0)
             goto fail;
 
         if (setsockopt (lpd_socket2, IPPROTO_IP, IP_MULTICAST_LOOP,
-                &opt_off, sizeof opt_off) < 0)
+                (const void *) &opt_off, sizeof opt_off) < 0)
             goto fail;
     }
 
@@ -463,7 +463,7 @@ tr_lpdSendAnnounce (const tr_torrent* t)
 
         /* destination address info has already been set up in tr_lpdInit (),
          * so we refrain from preparing another sockaddr_in here */
-        int res = sendto (lpd_socket2, query, len, 0,
+        int res = sendto (lpd_socket2, (const void *) query, len, 0,
           (const struct sockaddr*) &lpd_mcastAddr, sizeof lpd_mcastAddr);
 
         if (res != len)
@@ -646,7 +646,7 @@ static void event_callback (evutil_socket_t s UNUSED, short type, void* ignore U
         char foreignMsg[lpd_maxDatagramLength + 1] = { 0 };
 
         /* process local announcement from foreign peer */
-        int res = recvfrom (lpd_socket, foreignMsg, lpd_maxDatagramLength,
+        int res = recvfrom (lpd_socket, (void *) foreignMsg, lpd_maxDatagramLength,
             0, (struct sockaddr*) &foreignAddr, (socklen_t*) &addrLen);
 
         /* besides, do we get flooded? then bail out! */
