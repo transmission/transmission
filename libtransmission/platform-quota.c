@@ -253,13 +253,13 @@ getquota (const char * device)
   if (quotactl(device, QCMD(Q_GETQUOTA, USRQUOTA), getuid(), (caddr_t) &dq) == 0)
     {
 #elif defined(__sun)
-  struct quotctl  op; 
-  int fd = open(device, O_RDONLY); 
-  if (fd < 0) 
-    return -1; 
-  op.op = Q_GETQUOTA; 
-  op.uid = getuid(); 
-  op.addr = (caddr_t) &dq; 
+  struct quotctl  op;
+  int fd = open(device, O_RDONLY);
+  if (fd < 0)
+    return -1;
+  op.op = Q_GETQUOTA;
+  op.uid = getuid();
+  op.addr = (caddr_t) &dq;
   if (ioctl(fd, Q_QUOTACTL, &op) == 0)
     {
       close(fd);

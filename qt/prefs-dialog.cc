@@ -614,7 +614,7 @@ PrefsDialog::createDownloadingTab ()
 
   hig->addSectionDivider ();
   hig->addSectionTitle (tr ("Download Queue"));
-    
+
     hig->addRow (tr ("Ma&ximum active downloads:"), spinBoxNew (Prefs::DOWNLOAD_QUEUE_SIZE, 1, INT_MAX, 1));
     hig->addRow (tr ("Downloads sharing data in the last &N minutes are active:"), spinBoxNew (Prefs::QUEUE_STALLED_MINUTES, 1, INT_MAX, 10));
 

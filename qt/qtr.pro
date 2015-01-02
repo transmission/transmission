@@ -21,7 +21,7 @@ greaterThan(QT_MAJOR_VERSION, 4) {
 
 TRANSMISSION_TOP = ..
 
-include(config.pri) 
+include(config.pri)
 
 INCLUDEPATH = $${EVENT_TOP}/include $${INCLUDEPATH}
 INCLUDEPATH += $${TRANSMISSION_TOP}

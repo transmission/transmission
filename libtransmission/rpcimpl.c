@@ -251,14 +251,14 @@ queueMoveBottom (tr_session               * session,
   return NULL;
 }
 
-static int 
-compareTorrentByQueuePosition (const void * va, const void * vb) 
-{ 
-  const tr_torrent * a = * (const tr_torrent **) va; 
-  const tr_torrent * b = * (const tr_torrent **) vb; 
+static int
+compareTorrentByQueuePosition (const void * va, const void * vb)
+{
+  const tr_torrent * a = * (const tr_torrent **) va;
+  const tr_torrent * b = * (const tr_torrent **) vb;
 
-  return a->queuePosition - b->queuePosition; 
-} 
+  return a->queuePosition - b->queuePosition;
+}
 
 static const char*
 torrentStart (tr_session               * session,
@@ -273,7 +273,7 @@ torrentStart (tr_session               * session,
   assert (idle_data == NULL);
 
   torrents = getTorrents (session, args_in, &torrentCount);
-  qsort (torrents, torrentCount, sizeof (tr_torrent *), compareTorrentByQueuePosition); 
+  qsort (torrents, torrentCount, sizeof (tr_torrent *), compareTorrentByQueuePosition);
   for (i=0; i<torrentCount; ++i)
     {
       tr_torrent * tor = torrents[i];
@@ -301,7 +301,7 @@ torrentStartNow (tr_session               * session,
   assert (idle_data == NULL);
 
   torrents = getTorrents (session, args_in, &torrentCount);
-  qsort (torrents, torrentCount, sizeof (tr_torrent *), compareTorrentByQueuePosition); 
+  qsort (torrents, torrentCount, sizeof (tr_torrent *), compareTorrentByQueuePosition);
   for (i=0; i<torrentCount; ++i)
     {
       tr_torrent * tor = torrents[i];

@@ -690,7 +690,7 @@ updateFastSet (tr_peerMsgs * msgs UNUSED)
 ****  ACTIVE
 ***/
 
-static bool 
+static bool
 tr_peerMsgsCalculateActive (const tr_peerMsgs * msgs, tr_direction direction)
 {
   bool is_active;
@@ -1829,7 +1829,7 @@ updateDesiredRequestCount (tr_peerMsgs * msgs)
 
         /* honor the session limits, if enabled */
         if (tr_torrentUsesSessionLimits (torrent) &&
-	    tr_sessionGetActiveSpeedLimit_Bps (torrent->session, TR_PEER_TO_CLIENT, &irate_Bps))
+            tr_sessionGetActiveSpeedLimit_Bps (torrent->session, TR_PEER_TO_CLIENT, &irate_Bps))
                 rate_Bps = MIN (rate_Bps, irate_Bps);
 
         /* use this desired rate to figure out how
@@ -2469,7 +2469,7 @@ pexPulse (evutil_socket_t foo UNUSED, short bar UNUSED, void * vmsgs)
 static bool
 peermsgs_is_transferring_pieces (const struct tr_peer * peer,
                                  uint64_t               now,
-                                 tr_direction           direction, 
+                                 tr_direction           direction,
                                  unsigned int         * setme_Bps)
 {
   unsigned int Bps = 0;

@@ -3281,7 +3281,7 @@ getReconnectIntervalSecs (const struct peer_atom * atom, const time_t now)
       /* penalize peers that were unreachable the last time we tried */
       if (unreachable)
         step += 2;
- 
+
       switch (step)
         {
           case 0: sec = 0; break;

@@ -219,7 +219,7 @@ Utils::isValidUtf8 (const char * s)
       for  (int m = 1; m < n; m++)
         if  ((c[m] & 0xc0) != 0x80)
           return false;
-    } 
+    }
 
   return true;
 }

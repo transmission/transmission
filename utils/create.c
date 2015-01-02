@@ -86,12 +86,12 @@ parseCommandLine (int argc, const char ** argv)
             break;
 
           case 's':
-            if (optarg) 
-              { 
+            if (optarg)
+              {
                 char * endptr = NULL;
                 piecesize_kib = strtoul (optarg, &endptr, 10);
                 if (endptr && *endptr=='M')
-                  piecesize_kib *= KiB; 
+                  piecesize_kib *= KiB;
               }
             break;
 

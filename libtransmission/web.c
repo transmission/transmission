@@ -275,7 +275,7 @@ tr_webRunImpl (tr_session         * session,
           while (session->web == NULL)
             tr_wait_msec (20);
         }
-      
+
       task = tr_new0 (struct tr_web_task, 1);
       task->session = session;
       task->torrentId = torrentId;

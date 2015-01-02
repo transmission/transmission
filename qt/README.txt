@@ -2,7 +2,7 @@ VOLUNTEERS WANTED
 
    - Qt developers and translators are needed
    - If you find a bug, please report it at http://trac.transmissionbt.com/
-    
+
 ABOUT TRANSMISSION-QT
 
    Transmission-qt is a GUI for Transmission loosely based on the GTK+ client.
@@ -42,4 +42,4 @@ BUILDING ON UNIX
    4. In the qt/ directory, type "make"
    5. In the qt/ directory, as root, type "INSTALL_ROOT=/usr make install"
       (Feel free to replace /usr with /usr/local or /opt or whatever)
- 
+

@@ -251,7 +251,7 @@ TorrentFilter::countTorrentsPerMode (int * setmeCounts) const
   std::fill_n (setmeCounts, static_cast<std::size_t>(FilterMode::NUM_MODES), 0);
 
   for (int row(0); ; ++row)
-    { 
+    {
       QModelIndex index (sourceModel()->index(row, 0));
       if (!index.isValid())
         break;

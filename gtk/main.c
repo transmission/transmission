@@ -64,7 +64,7 @@
 #define SHOW_LICENSE
 static const char * LICENSE =
   "Copyright 2005-2014. All code is copyrighted by the respective authors.\n"
-  "\n"           
+  "\n"
   "Transmission can be redistributed and/or modified under the terms of the "
   "GNU GPL versions 2 or 3 or by any future license endorsed by Mnemosyne LLC.\n"
   "\n"
@@ -468,7 +468,7 @@ on_rpc_changed (tr_session            * session G_GNUC_UNUSED,
   data->type = type;
   data->torrent_id = tr_torrentId (tor);
   gdk_threads_add_idle (on_rpc_changed_idle, data);
-  
+
   return TR_RPC_NOREMOVE;
 }
 

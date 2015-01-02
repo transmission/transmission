@@ -110,15 +110,15 @@ Productivity_DATA = $(DESKTOP_FILES)
 icon_DATA = transmission.png
 icondir = $(datadir)/pixmaps
 
-UI_FILES = transmission-ui.xml 
+UI_FILES = transmission-ui.xml
 
-transmission-resources.c: transmission.gresource.xml $(UI_FILES) 
+transmission-resources.c: transmission.gresource.xml $(UI_FILES)
 	$(AM_V_GEN)glib-compile-resources --target=$@ --sourcedir=$(srcdir) \
-	  --generate-source --c-name transmission $< 
+	  --generate-source --c-name transmission $<
 
-transmission-resources.h: transmission.gresource.xml $(UI_FILES) 
+transmission-resources.h: transmission.gresource.xml $(UI_FILES)
 	$(AM_V_GEN)glib-compile-resources --target=$@ --sourcedir=$(srcdir) \
-	  --generate-header --c-name transmission $< 
+	  --generate-header --c-name transmission $<
 
 CLEANFILES += \
 	transmission-resources.c \

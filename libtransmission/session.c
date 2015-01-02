@@ -1762,7 +1762,7 @@ tr_sessionGetTorrents (tr_session * session, int * setme_n)
     torrents[i] = tor = tr_torrentNext (session, tor);
 
   return torrents;
-} 
+}
 
 static int
 compareTorrentByCur (const void * va, const void * vb)
@@ -2253,7 +2253,7 @@ loadBlocklists (tr_session * session)
     {
       char * path;
       char * load = NULL;
- 
+
       if (name[0] == '.') /* ignore dotfiles */
         continue;
 

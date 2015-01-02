@@ -285,7 +285,7 @@ on_content_changed (struct evbuffer                * buf,
              that will be needed when writing the block in a different thread */
           evbuffer_remove_buffer (task->content, data->content,
                                   block_size * completed);
-  
+
           tr_runInEventThread (w->session, write_block_func, data);
           task->blocks_done += completed;
         }

@@ -12,7 +12,7 @@ StartupNotify=true
 MimeType=application/x-bittorrent;x-scheme-handler/magnet;
 Categories=Network;FileTransfer;P2P;GTK;
 X-Ubuntu-Gettext-Domain=transmission
-X-AppInstall-Keywords=torrent 
+X-AppInstall-Keywords=torrent
 Actions=Pause;Minimize;
 
 [Desktop Action Pause]

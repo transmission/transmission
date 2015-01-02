@@ -353,7 +353,7 @@ MyApp::onTorrentsAdded (const QSet<int>& torrents)
           onNewTorrentChanged (id);
 
           if (!tor->isSeed ())
-	    connect (tor, SIGNAL (torrentCompleted (int)), this, SLOT (onTorrentCompleted (int)));
+            connect (tor, SIGNAL (torrentCompleted (int)), this, SLOT (onTorrentCompleted (int)));
         }
     }
 }

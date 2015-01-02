@@ -1929,19 +1929,19 @@ closeTorrent (void * vtor)
 }
 
 void
-tr_torrentFree (tr_torrent * tor) 
+tr_torrentFree (tr_torrent * tor)
 {
-  if (tr_isTorrent (tor)) 
-    { 
-      tr_session * session = tor->session; 
-      assert (tr_isSession (session)); 
-      tr_sessionLock (session); 
+  if (tr_isTorrent (tor))
+    {
+      tr_session * session = tor->session;
+      assert (tr_isSession (session));
+      tr_sessionLock (session);
 
-      tr_torrentClearCompletenessCallback (tor); 
-      tr_runInEventThread (session, closeTorrent, tor); 
+      tr_torrentClearCompletenessCallback (tor);
+      tr_runInEventThread (session, closeTorrent, tor);
 
-      tr_sessionUnlock (session); 
-    } 
+      tr_sessionUnlock (session);
+    }
 }
 
 struct remove_data
@@ -1958,7 +1958,7 @@ removeTorrent (void * vdata)
 {
   struct remove_data * data = vdata;
   tr_session * session = data->tor->session;
-  tr_sessionLock (session); 
+  tr_sessionLock (session);
 
   if (data->deleteFlag)
     tr_torrentDeleteLocalData (data->tor, data->deleteFunc);
@@ -1967,7 +1967,7 @@ removeTorrent (void * vdata)
   closeTorrent (data->tor);
   tr_free (data);
 
-  tr_sessionUnlock (session); 
+  tr_sessionUnlock (session);
 }
 
 void
@@ -3700,13 +3700,13 @@ renameTorrentFileString (tr_torrent       * tor,
 
       tr_free (tmp);
     }
-     
+
   if (!strcmp (file->name, name))
     {
       tr_free (name);
     }
   else
-    { 
+    {
       tr_free (file->name);
       file->name = name;
       file->is_renamed = true;

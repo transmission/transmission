@@ -49,7 +49,7 @@ struct tr_variant_string
   size_t len;
   union { char buf[16]; const char * str; } str;
 };
-  
+
 
 /* these are PRIVATE IMPLEMENTATION details that should not be touched.
  * I'll probably change them just to break your code! HA HA HA!
@@ -200,7 +200,7 @@ tr_variantIsString (const tr_variant * b)
 bool         tr_variantGetStr          (const tr_variant * variant,
                                         const char      ** setme_str,
                                         size_t           * setme_len);
-                                                                 
+
 void         tr_variantInitStr         (tr_variant       * initme,
                                         const void       * str,
                                         int                str_len);

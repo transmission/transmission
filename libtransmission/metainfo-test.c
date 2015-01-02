@@ -96,7 +96,7 @@ test_metainfo (void)
 
   return 0;
 }
-    
+
 int
 main (void)
 {

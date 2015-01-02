@@ -1351,7 +1351,7 @@ on_scrape_done (const tr_scrape_response * response, void * vsession)
                 if (!response->did_connect)
                 {
                     on_scrape_error (session, tier, _("Could not connect to tracker"));
-		}
+                }
                 else if (response->did_timeout)
                 {
                     on_scrape_error (session, tier, _("Tracker did not respond"));

@@ -48,7 +48,7 @@ extern const char * speed_T_str;
                                                                          \
   return q;                                                             \
  }
-#endif 
+#endif
 
 
 /* macro to shut up "unused parameter" warnings */

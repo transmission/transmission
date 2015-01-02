@@ -65,7 +65,7 @@ test_incomplete_dir_threadfunc (void * vdata)
   tr_torrentGotBlock (data->tor, data->block);
   data->done = true;
 }
-  
+
 static int
 test_incomplete_dir_impl (const char * incomplete_dir, const char * download_dir)
 {
@@ -179,7 +179,7 @@ test_set_location (void)
   session = libttest_session_init (NULL);
   target_dir = tr_buildPath (tr_sessionGetConfigDir (session), "target", NULL);
   tr_sys_dir_create (target_dir, TR_SYS_DIR_CREATE_PARENTS, 0777, NULL);
-  
+
   /* init a torrent. */
   tor = libttest_zero_torrent_init (session);
   libttest_zero_torrent_populate (tor, true);

@@ -183,7 +183,7 @@ void         tr_peerMgrGotBadPiece          (tr_torrent         * tor,
 
 void         tr_peerMgrPieceCompleted       (tr_torrent         * tor,
                                              tr_piece_index_t     pieceIndex);
- 
+
 
 
 /* @} */

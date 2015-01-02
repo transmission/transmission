@@ -135,7 +135,7 @@ test_single_directory_impl (const tr_tracker_info * trackers,
   size_t totalSize;
   size_t i;
   char* tmpstr;
-  
+
 
   /* set up our local test sandbox */
   sandbox = libtest_sandbox_create();
@@ -212,7 +212,7 @@ test_single_directory_impl (const tr_tracker_info * trackers,
 
   return 0;
 }
-  
+
 static int
 test_single_directory_random_payload_impl (const tr_tracker_info * trackers,
                                            const size_t            trackerCount,

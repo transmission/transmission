@@ -116,14 +116,14 @@ tr_upnpGetSpecificPortMappingEntry (tr_upnp * handle, const char * proto)
 
 #if (MINIUPNPC_API_VERSION >= 10) /* adds remoteHost arg */
 
-    err = UPNP_GetSpecificPortMappingEntry (handle->urls.controlURL, 
-                                            handle->data.first.servicetype, 
+    err = UPNP_GetSpecificPortMappingEntry (handle->urls.controlURL,
+                                            handle->data.first.servicetype,
                                             portStr,
                                             proto,
-                                            NULL /*remoteHost*/, 
+                                            NULL /*remoteHost*/,
                                             intClient,
                                             intPort,
-                                            NULL /*desc*/, 
+                                            NULL /*desc*/,
                                             NULL /*enabled*/,
                                             NULL /*duration*/);
 

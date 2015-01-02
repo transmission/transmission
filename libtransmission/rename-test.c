@@ -117,7 +117,7 @@ create_torrent_from_base64_metainfo (tr_ctor * ctor, const char * metainfo_base6
   assert (!err);
 
   /* cleanup */
-  tr_free (metainfo); 
+  tr_free (metainfo);
   return tor;
 }
 
@@ -183,7 +183,7 @@ test_single_filename_torrent (void)
   ****  Now try a rename that should succeed
   ***/
 
-  tmpstr = tr_buildPath (tor->currentDir, "hello-world.txt", NULL); 
+  tmpstr = tr_buildPath (tor->currentDir, "hello-world.txt", NULL);
   check (tr_sys_path_exists (tmpstr, NULL));
   check_streq ("hello-world.txt", tr_torrentName(tor));
   check_int_eq (0, torrentRenameAndWait (tor, tor->info.name, "foobar"));
@@ -193,7 +193,7 @@ test_single_filename_torrent (void)
   check_streq ("foobar", tr_torrentName(tor)); /* confirm the torrent's name is now 'foobar' */
   check_streq ("foobar", tor->info.files[0].name); /* confirm the file's name is now 'foobar' in our struct */
   check (strstr (tor->info.torrent, "foobar") == NULL); /* confirm the name in the .torrent file hasn't changed */
-  tmpstr = tr_buildPath (tor->currentDir, "foobar", NULL); 
+  tmpstr = tr_buildPath (tor->currentDir, "foobar", NULL);
   check (tr_sys_path_exists (tmpstr, NULL)); /* confirm the file's name is now 'foobar' on the disk */
   tr_free (tmpstr);
   check (testFileExistsAndConsistsOfThisString (tor, 0, "hello, world!\n")); /* confirm the contents are right */
@@ -209,7 +209,7 @@ test_single_filename_torrent (void)
   ****  ...and rename it back again
   ***/
 
-  tmpstr = tr_buildPath (tor->currentDir, "foobar", NULL); 
+  tmpstr = tr_buildPath (tor->currentDir, "foobar", NULL);
   check (tr_sys_path_exists (tmpstr, NULL));
   check_int_eq (0, torrentRenameAndWait (tor, "foobar", "hello-world.txt"));
   check (!tr_sys_path_exists (tmpstr, NULL));
@@ -501,7 +501,7 @@ test_partial_file (void)
   const char * strings[3];
 
   /***
-  ****  create our test torrent with an incomplete .part file 
+  ****  create our test torrent with an incomplete .part file
   ***/
 
   tor = libttest_zero_torrent_init (session);

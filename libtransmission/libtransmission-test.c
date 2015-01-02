@@ -311,7 +311,7 @@ libttest_zero_torrent_init (tr_session * session)
   tr_torrent * tor;
   tr_ctor * ctor;
 
-  /* 
+  /*
      1048576 files-filled-with-zeroes/1048576
         4096 files-filled-with-zeroes/4096
          512 files-filled-with-zeroes/512
@@ -388,7 +388,7 @@ libttest_zero_torrent_populate (tr_torrent * tor, bool complete)
       assert (path != NULL);
       err = errno;
       assert (tr_sys_path_exists (path, NULL));
-      errno = err; 
+      errno = err;
       tr_free (path);
     }
 

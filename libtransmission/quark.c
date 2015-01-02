@@ -488,7 +488,7 @@ tr_quark_new (const void * str, size_t len)
 
   return ret;
 }
-  
+
 const char *
 tr_quark_get_string (tr_quark q, size_t * len)
 {

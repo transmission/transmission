@@ -22,7 +22,7 @@
 
 #define __LIBTRANSMISSION_VARIANT_MODULE___
 #include "transmission.h"
-#include "ConvertUTF.h"  
+#include "ConvertUTF.h"
 #include "error.h"
 #include "file.h"
 #include "log.h"

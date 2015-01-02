@@ -195,7 +195,7 @@ FileTreeItem::progress () const
 QString
 FileTreeItem::sizeString () const
 {
-  QString str; 
+  QString str;
 
   if (myChildren.isEmpty())
     {
@@ -437,7 +437,7 @@ FileTreeModel::setEditable (bool editable)
 FileTreeItem *
 FileTreeModel::itemFromIndex (const QModelIndex& index) const
 {
-  return static_cast<FileTreeItem*>(index.internalPointer()); 
+  return static_cast<FileTreeItem*>(index.internalPointer());
 }
 
 QVariant
@@ -504,7 +504,7 @@ FileTreeModel::headerData (int column, Qt::Orientation orientation, int role) co
             break;
 
           case COL_PRIORITY:
-            data.setValue (tr("Priority")); 
+            data.setValue (tr("Priority"));
             break;
 
           default:
@@ -634,7 +634,7 @@ FileTreeModel::addFile (int                   fileIndex,
 
   item = findItemForFileIndex (fileIndex);
 
-  if (item) // this file is already in the tree, we've added this 
+  if (item) // this file is already in the tree, we've added this
     {
       QModelIndex indexWithChangedParents;
       while (!tokens.isEmpty())

@@ -303,10 +303,10 @@ tr_torBlockCountBytes (const tr_torrent * tor, const tr_block_index_t block)
                                         : tor->blockSize;
 }
 
-static inline void tr_torrentLock (const tr_torrent * tor) 
-{ 
-  tr_sessionLock (tor->session); 
-} 
+static inline void tr_torrentLock (const tr_torrent * tor)
+{
+  tr_sessionLock (tor->session);
+}
 static inline bool tr_torrentIsLocked (const tr_torrent * tor)
 {
   return tr_sessionIsLocked (tor->session);

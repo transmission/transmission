@@ -109,10 +109,10 @@ piperead (int s, char *buf, int len)
             case WSAEWOULDBLOCK:
                 errno = EAGAIN;
                 break;
-	    case WSAECONNRESET:
-	        /* EOF on the pipe! (win32 socket based implementation) */
-	        ret = 0;
-	        /* fall through */
+            case WSAECONNRESET:
+                /* EOF on the pipe! (win32 socket based implementation) */
+                ret = 0;
+                /* fall through */
             default:
                 errno = werror;
                 break;

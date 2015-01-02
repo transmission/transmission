@@ -216,14 +216,14 @@ extract_escaped_string (const char       * in,
                           UTF8 str8_buf[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
                           UTF8 * str8_walk = str8_buf;
                           UTF8 * str8_end = str8_buf + 8;
-    
+
                           if (ConvertUTF32toUTF8 (&str32_walk, str32_end, &str8_walk, str8_end, 0) == 0)
                             {
                               const size_t len = str8_walk - str8_buf;
                               evbuffer_add (buf, str8_buf, len);
                               unescaped = true;
                             }
-    
+
                           in += 6;
                           break;
                         }

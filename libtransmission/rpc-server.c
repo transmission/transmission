@@ -936,7 +936,7 @@ missing_settings_key (const tr_quark q)
 {
   const char * str = tr_quark_get_string (q, NULL);
   tr_logAddNamedError (MY_NAME, _("Couldn't find settings key \"%s\""), str);
-} 
+}
 
 tr_rpc_server *
 tr_rpcInit (tr_session  * session, tr_variant * settings)

@@ -389,9 +389,9 @@ reportStatus (void)
     const double dn = tr_sessionGetRawSpeed_KBps (mySession, TR_DOWN);
 
     if (up>0 || dn>0)
-	sd_notifyf (0, "STATUS=Uploading %.2f KBps, Downloading %.2f KBps.\n", up, dn);
+        sd_notifyf (0, "STATUS=Uploading %.2f KBps, Downloading %.2f KBps.\n", up, dn);
     else
-	sd_notify (0, "STATUS=Idle.\n");
+        sd_notify (0, "STATUS=Idle.\n");
 }
 
 static void
@@ -574,7 +574,7 @@ main (int argc, char ** argv)
         exit (1);
     }
 
-    sd_notifyf (0, "MAINPID=%d\n", (int)getpid()); 
+    sd_notifyf (0, "MAINPID=%d\n", (int)getpid());
 
     /* setup event state */
     ev_base = event_base_new();
@@ -681,7 +681,7 @@ main (int argc, char ** argv)
     if (event_base_dispatch(ev_base) == -1)
     {
         tr_logAddError("Failed to launch daemon event loop: %s", tr_strerror(errno));
-	goto cleanup;
+        goto cleanup;
     }
 
 cleanup:
