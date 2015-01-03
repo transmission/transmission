@@ -159,6 +159,10 @@ if(MINIUPNPC_VERSION VERSION_LESS 1.7)
     add_definitions(-DMINIUPNPC_API_VERSION=${MINIUPNPC_API_VERSION})
 endif()
 
+if(USE_SYSTEM_B64)
+    add_definitions(-DUSE_SYSTEM_B64)
+endif()
+
 include_directories(
     ${PROJECT_SOURCE_DIR}
     ${PROJECT_BINARY_DIR}

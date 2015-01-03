@@ -200,10 +200,15 @@ tr_base64_encode (const void * input,
     {
       if (input_length != 0)
         {
-          size_t ret_length;
+          size_t ret_length = 4 * ((input_length + 2) / 3);
           base64_encodestate state;
 
-          ret = tr_new (char, 4 * ((input_length + 2) / 3) + 1);
+#ifdef USE_SYSTEM_B64
+          /* Additional space is needed for newlines if we're using unpatched libb64 */
+          ret_length += ret_length / 72 + 1;
+#endif
+
+          ret = tr_new (char, ret_length + 1);
 
           base64_init_encodestate (&state);
           ret_length = base64_encode_block (input, input_length, ret, &state);
@@ -248,10 +253,10 @@ tr_base64_decode (const void * input,
     {
       if (input_length != 0)
         {
-          size_t ret_length;
+          size_t ret_length = input_length / 4 * 3;
           base64_decodestate state;
 
-          ret = tr_new (char, input_length / 4 * 3 + 1);
+          ret = tr_new (char, ret_length + 1);
 
           base64_init_decodestate (&state);
           ret_length = base64_decode_block (input, input_length, ret, &state);

@@ -229,7 +229,7 @@ AC_ARG_ENABLE([external-b64],
               [want_external_b64=${enableval}],
               [want_external_b64=no])
 if test "x$want_external_b64" != "xno" ; then
-    LIBB64_CFLAGS=""
+    LIBB64_CFLAGS="-DUSE_SYSTEM_B64"
     LIBB64_LIBS="-lb64"
     LIBB64_LIBS_QT="-lb64"
     build_bundled_b64="no"

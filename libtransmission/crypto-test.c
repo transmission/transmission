@@ -193,6 +193,23 @@ test_random (void)
   return 0;
 }
 
+static bool
+base64_eq (const char * a,
+           const char * b)
+{
+  for (; ; ++a, ++b)
+    {
+      while (*a == '\r' || *a == '\n')
+        ++a;
+      while (*b == '\r' || *b == '\n')
+        ++b;
+      if (*a == '\0' || *b == '\0' || *a != *b)
+        break;
+    }
+
+  return *a == *b;
+}
+
 static int
 test_base64 (void)
 {
@@ -201,17 +218,8 @@ test_base64 (void)
   int i;
 
   out = tr_base64_encode_str ("YOYO!", &len);
-  check_int_eq (8, len);
-  check_streq ("WU9ZTyE=", out);
-  in = tr_base64_decode_str_ (out, &len);
-  check_int_eq (5, len);
-  check_streq ("YOYO!", in);
-  tr_free (in);
-  tr_free (out);
-
-  out = tr_base64_encode_str_ ("YOYO!", &len);
-  check_int_eq (8, len);
-  check_streq ("WU9ZTyE=", out);
+  check_int_eq (strlen (out), len);
+  check (base64_eq ("WU9ZTyE=", out));
   in = tr_base64_decode_str (out, &len);
   check_int_eq (5, len);
   check_streq ("YOYO!", in);
@@ -219,15 +227,6 @@ test_base64 (void)
   tr_free (out);
 
   out = tr_base64_encode ("", 0, &len);
-  check_int_eq (0, len);
-  check_streq ("", out);
-  tr_free (out);
-  out = tr_base64_decode_ ("", 0, &len);
-  check_int_eq (0, len);
-  check_streq ("", out);
-  tr_free (out);
-
-  out = tr_base64_encode_ ("", 0, &len);
   check_int_eq (0, len);
   check_streq ("", out);
   tr_free (out);
@@ -239,20 +238,9 @@ test_base64 (void)
   out = tr_base64_encode (NULL, 0, &len);
   check_int_eq (0, len);
   check (out == NULL);
-  tr_free (out);
-  out = tr_base64_decode_ (NULL, 0, &len);
-  check_int_eq (0, len);
-  check (out == NULL);
-  tr_free (out);
-
-  out = tr_base64_encode_ (NULL, 0, &len);
-  check_int_eq (0, len);
-  check (out == NULL);
-  tr_free (out);
   out = tr_base64_decode (NULL, 0, &len);
   check_int_eq (0, len);
   check (out == NULL);
-  tr_free (out);
 
 #define MAX_BUF_SIZE 1024
 
@@ -265,15 +253,7 @@ test_base64 (void)
         buf[j] = tr_rand_int_weak (256);
 
       out = tr_base64_encode (buf, j, &len);
-      check_int_eq ((j + 2) / 3 * 4, len);
-      in = tr_base64_decode_ (out, len, &len);
-      check_int_eq (j, len);
-      check (memcmp (in, buf, len) == 0);
-      tr_free (in);
-      tr_free (out);
-
-      out = tr_base64_encode_ (buf, j, &len);
-      check_int_eq ((j + 2) / 3 * 4, len);
+      check_int_eq (strlen (out), len);
       in = tr_base64_decode (out, len, &len);
       check_int_eq (j, len);
       check (memcmp (in, buf, len) == 0);
@@ -285,15 +265,7 @@ test_base64 (void)
       buf[j] = '\0';
 
       out = tr_base64_encode_str (buf, &len);
-      check_int_eq ((j + 2) / 3 * 4, len);
-      in = tr_base64_decode_str_ (out, &len);
-      check_int_eq (j, len);
-      check_streq (in, buf);
-      tr_free (in);
-      tr_free (out);
-
-      out = tr_base64_encode_str_ (buf, &len);
-      check_int_eq ((j + 2) / 3 * 4, len);
+      check_int_eq (strlen (out), len);
       in = tr_base64_decode_str (out, &len);
       check_int_eq (j, len);
       check_streq (in, buf);
