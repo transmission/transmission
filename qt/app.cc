@@ -132,6 +132,11 @@ MyApp::MyApp (int& argc, char ** argv):
 
   Formatter::initUnits ();
 
+#if defined (_WIN32) || defined (__APPLE__)
+  if (QIcon::themeName ().isEmpty ())
+    QIcon::setThemeName ("Faenza");
+#endif
+
   // set the default icon
   QIcon icon = QIcon::fromTheme ("transmission");
   if (icon.isNull ())

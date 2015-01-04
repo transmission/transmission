@@ -59,6 +59,7 @@ FORMS += about.ui \
          session-dialog.ui \
          stats-dialog.ui
 RESOURCES += application.qrc
+win32|macx:RESOURCES += icons/Faenza/Faenza.qrc
 SOURCES += about.cc \
            add-data.cc \
            app.cc \

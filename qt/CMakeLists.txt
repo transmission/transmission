@@ -116,9 +116,12 @@ tr_qt_wrap_ui(${PROJECT_NAME}_UI_SOURCES
     stats-dialog.ui
 )
 
-tr_qt_add_resources(${PROJECT_NAME}_QRC_SOURCES
-    application.qrc
-)
+set(${PROJECT_NAME}_QRC_FILES application.qrc)
+if(WIN32 OR APPLE)
+    list(APPEND ${PROJECT_NAME}_QRC_FILES icons/Faenza/Faenza.qrc)
+endif()
+
+tr_qt_add_resources(${PROJECT_NAME}_QRC_SOURCES ${${PROJECT_NAME}_QRC_FILES})
 
 set(${PROJECT_NAME}_LINGUAS
     en
