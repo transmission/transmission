@@ -11,8 +11,8 @@
     </message>
     <message>
         <location filename="../about.cc" line="+28"/>
-        <source>&lt;big&gt;&lt;b&gt;Transmission %1&lt;/b&gt;&lt;/big&gt;</source>
-        <translation>&lt;big&gt;&lt;b&gt;Transmission %1&lt;/b&gt;&lt;/big&gt;</translation>
+        <source>&lt;b style=&apos;font-size:x-large&apos;&gt;Transmission %1&lt;/b&gt;</source>
+        <translation>&lt;b style=&apos;font-size:x-large&apos;&gt;Transmission %1&lt;/b&gt;</translation>
     </message>
     <message>
         <location filename="../about.ui" line="+26"/>
