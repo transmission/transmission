@@ -45,10 +45,10 @@ static size_t
 countArray (const tr_bitfield * b)
 {
   size_t ret = 0;
-  ssize_t i = b->alloc_count;
+  size_t i = b->alloc_count;
 
-  while (--i >= 0)
-    ret += trueBitCount[b->bits[i]];
+  while (i > 0)
+    ret += trueBitCount[b->bits[--i]];
 
   return ret;
 }
