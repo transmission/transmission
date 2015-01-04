@@ -163,7 +163,7 @@ add_definitions(
     "-DTRANSLATIONS_DIR=\"${CMAKE_INSTALL_FULL_DATADIR}/${TR_NAME}/translations\""
 )
 
-add_executable(${TR_NAME}-qt
+add_executable(${TR_NAME}-qt WIN32
     ${${PROJECT_NAME}_SOURCES}
     ${${PROJECT_NAME}_UI_SOURCES}
     ${${PROJECT_NAME}_QRC_SOURCES}
@@ -177,6 +177,10 @@ target_link_libraries(${TR_NAME}-qt
     ${CURL_LIBRARIES}
     ${EVENT2_LIBRARIES}
 )
+
+if(MSVC)
+    tr_append_target_property(${TR_NAME}-qt LINK_FLAGS "/ENTRY:mainCRTStartup")
+endif()
 
 if(USE_QT5)
     qt5_use_modules(${TR_NAME}-qt ${TR_QT5_MODULES})

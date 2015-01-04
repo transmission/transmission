@@ -135,7 +135,7 @@ add_definitions(
     ${GTK_CFLAGS_OTHER}
 )
 
-add_executable(${TR_NAME}-gtk
+add_executable(${TR_NAME}-gtk WIN32
     ${${PROJECT_NAME}_SOURCES}
     ${${PROJECT_NAME}_HEADERS}
     ${${PROJECT_NAME}_DESKTOP_FILE}
@@ -147,6 +147,10 @@ target_link_libraries(${TR_NAME}-gtk
     ${CURL_LIBRARIES}
     ${EVENT2_LIBRARIES}
 )
+
+if(MSVC)
+    tr_append_target_property(${TR_NAME}-gtk LINK_FLAGS "/ENTRY:mainCRTStartup")
+endif()
 
 install(TARGETS ${TR_NAME}-gtk DESTINATION ${CMAKE_INSTALL_BINDIR})
 
