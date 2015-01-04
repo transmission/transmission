@@ -1308,17 +1308,17 @@
         <translation>S&amp;auvegarder vers:</translation>
     </message>
     <message>
-        <location line="+20"/>
+        <location line="+16"/>
         <source>Source f&amp;older:</source>
         <translation>Répert&amp;oire source:</translation>
     </message>
     <message>
-        <location line="+20"/>
+        <location line="+17"/>
         <source>Source &amp;file:</source>
         <translation>&amp;Fichier source:</translation>
     </message>
     <message>
-        <location line="+27"/>
+        <location line="+23"/>
         <source>Properties</source>
         <translation>Propriétés</translation>
     </message>
@@ -1386,22 +1386,22 @@ Pour ajouter une autre URL primaire, placez-la après une ligne vide.</translati
 <context>
     <name>MyApp</name>
     <message>
-        <location filename="../app.cc" line="+304"/>
-        <source>Transmission is a file sharing program. When you run a torrent, its data will be made available to others by means of upload. Any content you share is your sole responsibility.</source>
-        <translation>Transmission est un programme de partage de fichiers. Lorsque vous exécutez un torrent, ses données sont mises à disposition des autres par envoi de données. Le partage de tout contenu est votre entière responsabilité.</translation>
+        <location filename="../app.cc" line="+306"/>
+        <source>&lt;b&gt;Transmission is a file sharing program.&lt;/b&gt;</source>
+        <translation>&lt;b&gt;Transmission est un programme de partage de fichiers.&lt;/b&gt;</translation>
     </message>
     <message>
-        <location line="+4"/>
-        <source>&amp;Cancel</source>
-        <translation>&amp;Annuler</translation>
+        <location line="+2"/>
+        <source>When you run a torrent, its data will be made available to others by means of upload. Any content you share is your sole responsibility.</source>
+        <translation>Lorsque vous exécutez un torrent, ses données sont mises à disposition des autres par envoi de données. Le partage de tout contenu est votre entière responsabilité.</translation>
     </message>
     <message>
-        <location line="+1"/>
+        <location line="+2"/>
         <source>I &amp;Agree</source>
         <translation>Je suis d&apos;&amp;accord</translation>
     </message>
     <message>
-        <location line="+60"/>
+        <location line="+58"/>
         <source>Torrent Completed</source>
         <translation>Torrent complété</translation>
     </message>
@@ -1434,7 +1434,7 @@ Pour ajouter une autre URL primaire, placez-la après une ligne vide.</translati
         <translation>&amp;Source:</translation>
     </message>
     <message>
-        <location line="+26"/>
+        <location line="+22"/>
         <source>&amp;Destination folder:</source>
         <translation>Dossier de &amp;destination:</translation>
     </message>
@@ -1454,7 +1454,7 @@ Pour ajouter une autre URL primaire, placez-la après une ligne vide.</translati
         <translation>Basse</translation>
     </message>
     <message>
-        <location filename="../options.ui" line="+39"/>
+        <location filename="../options.ui" line="+35"/>
         <source>&amp;Priority:</source>
         <translation>&amp;Priorité:</translation>
     </message>
@@ -1991,7 +1991,7 @@ Pour ajouter une autre URL primaire, placez-la après une ligne vide.</translati
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../app.cc" line="-226"/>
+        <location filename="../app.cc" line="-221"/>
         <source>Invalid option</source>
         <translation>Option invalide</translation>
     </message>
@@ -1999,7 +1999,7 @@ Pour ajouter une autre URL primaire, placez-la après une ligne vide.</translati
 <context>
     <name>RelocateDialog</name>
     <message>
-        <location filename="../relocate.cc" line="+51"/>
+        <location filename="../relocate.cc" line="+65"/>
         <source>Select Location</source>
         <translation>Séléctionner l&apos;emplacement</translation>
     </message>
@@ -2009,7 +2009,7 @@ Pour ajouter une autre URL primaire, placez-la après une ligne vide.</translati
         <translation>Définir l&apos;emplacement du torrent</translation>
     </message>
     <message>
-        <location line="+25"/>
+        <location line="+29"/>
         <source>Set Location</source>
         <translation>Définir l&apos;emplacement</translation>
     </message>
@@ -2019,7 +2019,7 @@ Pour ajouter une autre URL primaire, placez-la après une ligne vide.</translati
         <translation>Nouvel emp&amp;lacement:</translation>
     </message>
     <message>
-        <location line="+29"/>
+        <location line="+16"/>
         <source>&amp;Move from the current folder</source>
         <translation>&amp;Déplacer depuis le dossier courant</translation>
     </message>
@@ -2332,13 +2332,13 @@ Pour ajouter une autre URL primaire, placez-la après une ligne vide.</translati
     <message>
         <location line="-17"/>
         <location line="+22"/>
-        <location line="+603"/>
+        <location line="+604"/>
         <location line="+8"/>
         <source>Limited at %1</source>
         <translation>Limité à: %1</translation>
     </message>
     <message>
-        <location line="-620"/>
+        <location line="-621"/>
         <source>Limit Upload Speed</source>
         <translation>Limite d&apos;émission</translation>
     </message>
@@ -2354,7 +2354,7 @@ Pour ajouter une autre URL primaire, placez-la après une ligne vide.</translati
     </message>
     <message>
         <location line="+5"/>
-        <location line="+596"/>
+        <location line="+597"/>
         <source>Stop at Ratio (%1)</source>
         <translation>Arrêter au ratio (%1)</translation>
     </message>
@@ -2518,12 +2518,13 @@ Pour ajouter une autre URL primaire, placez-la après une ligne vide.</translati
 <context>
     <name>TrPathButton</name>
     <message>
-        <location filename="../path-button.cc" line="+113"/>
+        <location filename="../path-button.cc" line="+30"/>
+        <location line="+65"/>
         <source>(None)</source>
         <translation type="unfinished">(Aucun)</translation>
     </message>
     <message>
-        <location line="+16"/>
+        <location line="+63"/>
         <source>Select Folder</source>
         <translation type="unfinished">Sélectionner le dossier</translation>
     </message>
@@ -2600,7 +2601,7 @@ Pour ajouter une autre URL primaire, placez-la après une ligne vide.</translati
 <context>
     <name>Utils</name>
     <message>
-        <location filename="../utils.cc" line="+56"/>
+        <location filename="../utils.cc" line="+61"/>
         <source>Enter a location:</source>
         <translation>Entrer un emplacement:</translation>
     </message>

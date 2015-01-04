@@ -1309,17 +1309,17 @@
         <translation>Қа&amp;йда сақтау:</translation>
     </message>
     <message>
-        <location line="+20"/>
+        <location line="+16"/>
         <source>Source f&amp;older:</source>
         <translation>Бу&amp;мадан жасау:</translation>
     </message>
     <message>
-        <location line="+20"/>
+        <location line="+17"/>
         <source>Source &amp;file:</source>
         <translation>Фай&amp;лдан жасау:</translation>
     </message>
     <message>
-        <location line="+27"/>
+        <location line="+23"/>
         <source>Properties</source>
         <translation>Қасиеттері</translation>
     </message>
@@ -1387,22 +1387,22 @@ To add another primary URL, add it after a blank line.</source>
 <context>
     <name>MyApp</name>
     <message>
-        <location filename="../app.cc" line="+304"/>
-        <source>Transmission is a file sharing program. When you run a torrent, its data will be made available to others by means of upload. Any content you share is your sole responsibility.</source>
+        <location filename="../app.cc" line="+306"/>
+        <source>&lt;b&gt;Transmission is a file sharing program.&lt;/b&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+4"/>
-        <source>&amp;Cancel</source>
+        <location line="+2"/>
+        <source>When you run a torrent, its data will be made available to others by means of upload. Any content you share is your sole responsibility.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+1"/>
+        <location line="+2"/>
         <source>I &amp;Agree</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+60"/>
+        <location line="+58"/>
         <source>Torrent Completed</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1435,7 +1435,7 @@ To add another primary URL, add it after a blank line.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+26"/>
+        <location line="+22"/>
         <source>&amp;Destination folder:</source>
         <translation>&amp;Мақсат бумасы:</translation>
     </message>
@@ -1455,7 +1455,7 @@ To add another primary URL, add it after a blank line.</source>
         <translation>Төмен</translation>
     </message>
     <message>
-        <location filename="../options.ui" line="+39"/>
+        <location filename="../options.ui" line="+35"/>
         <source>&amp;Priority:</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1992,7 +1992,7 @@ To add another primary URL, add it after a blank line.</source>
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../app.cc" line="-226"/>
+        <location filename="../app.cc" line="-221"/>
         <source>Invalid option</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2000,7 +2000,7 @@ To add another primary URL, add it after a blank line.</source>
 <context>
     <name>RelocateDialog</name>
     <message>
-        <location filename="../relocate.cc" line="+51"/>
+        <location filename="../relocate.cc" line="+65"/>
         <source>Select Location</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2010,7 +2010,7 @@ To add another primary URL, add it after a blank line.</source>
         <translation>Торрент орналасуын көрсетіңіз</translation>
     </message>
     <message>
-        <location line="+25"/>
+        <location line="+29"/>
         <source>Set Location</source>
         <translation>Орналасуын көрсету</translation>
     </message>
@@ -2020,7 +2020,7 @@ To add another primary URL, add it after a blank line.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+29"/>
+        <location line="+16"/>
         <source>&amp;Move from the current folder</source>
         <translation>&amp;Ағымдағы бумадан жылжыту</translation>
     </message>
@@ -2326,13 +2326,13 @@ To add another primary URL, add it after a blank line.</source>
     <message>
         <location line="-17"/>
         <location line="+22"/>
-        <location line="+603"/>
+        <location line="+604"/>
         <location line="+8"/>
         <source>Limited at %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-620"/>
+        <location line="-621"/>
         <source>Limit Upload Speed</source>
         <translation>Тарату жылдамдығын шектеу</translation>
     </message>
@@ -2348,7 +2348,7 @@ To add another primary URL, add it after a blank line.</source>
     </message>
     <message>
         <location line="+5"/>
-        <location line="+596"/>
+        <location line="+597"/>
         <source>Stop at Ratio (%1)</source>
         <translation>Рейтингте тоқтату (%1)</translation>
     </message>
@@ -2390,12 +2390,12 @@ To add another primary URL, add it after a blank line.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-898"/>
+        <location line="-899"/>
         <source>Speed Limits</source>
         <translation type="unfinished">Жылдамдықты шектеу</translation>
     </message>
     <message>
-        <location line="+450"/>
+        <location line="+451"/>
         <source>Network Error</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2515,12 +2515,13 @@ To add another primary URL, add it after a blank line.</source>
 <context>
     <name>TrPathButton</name>
     <message>
-        <location filename="../path-button.cc" line="+113"/>
+        <location filename="../path-button.cc" line="+30"/>
+        <location line="+65"/>
         <source>(None)</source>
         <translation type="unfinished">(Ешнәрсе)</translation>
     </message>
     <message>
-        <location line="+16"/>
+        <location line="+63"/>
         <source>Select Folder</source>
         <translation type="unfinished">Бумадан жасау</translation>
     </message>
@@ -2596,7 +2597,7 @@ To add another primary URL, add it after a blank line.</source>
 <context>
     <name>Utils</name>
     <message>
-        <location filename="../utils.cc" line="+56"/>
+        <location filename="../utils.cc" line="+61"/>
         <source>Enter a location:</source>
         <translation type="unfinished"></translation>
     </message>

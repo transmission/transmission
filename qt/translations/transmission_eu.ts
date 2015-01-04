@@ -1308,17 +1308,17 @@
         <translation>&amp;Gorde hemen:</translation>
     </message>
     <message>
-        <location line="+20"/>
+        <location line="+16"/>
         <source>Source f&amp;older:</source>
         <translation>&amp;Iturburu agiritegia:</translation>
     </message>
     <message>
-        <location line="+20"/>
+        <location line="+17"/>
         <source>Source &amp;file:</source>
         <translation>I&amp;turburu Agiria:</translation>
     </message>
     <message>
-        <location line="+27"/>
+        <location line="+23"/>
         <source>Properties</source>
         <translation>Ezaugarriak</translation>
     </message>
@@ -1386,22 +1386,22 @@ Beste lehen URL bat gehitzeko, gehitu hura lerro huts baten ondoren.</translatio
 <context>
     <name>MyApp</name>
     <message>
-        <location filename="../app.cc" line="+304"/>
-        <source>Transmission is a file sharing program. When you run a torrent, its data will be made available to others by means of upload. Any content you share is your sole responsibility.</source>
-        <translation>Transmission agiri elkarbanatze programa bat da. Torrent bati ekiten diozunean, bere datuak eskuragarri daude besteentzat igoera bidez. Elkarbanatzen duzun edozein eduki zeure erantzukizunezkoa besterik ez da.</translation>
+        <location filename="../app.cc" line="+306"/>
+        <source>&lt;b&gt;Transmission is a file sharing program.&lt;/b&gt;</source>
+        <translation>&lt;b&gt;Transmission agiri elkarbanatze programa bat da.&lt;/b&gt;</translation>
     </message>
     <message>
-        <location line="+4"/>
-        <source>&amp;Cancel</source>
-        <translation>E&amp;zeztatu</translation>
+        <location line="+2"/>
+        <source>When you run a torrent, its data will be made available to others by means of upload. Any content you share is your sole responsibility.</source>
+        <translation>Torrent bati ekiten diozunean, bere datuak eskuragarri daude besteentzat igoera bidez. Elkarbanatzen duzun edozein eduki zeure erantzukizunezkoa besterik ez da.</translation>
     </message>
     <message>
-        <location line="+1"/>
+        <location line="+2"/>
         <source>I &amp;Agree</source>
         <translation>&amp;Onartzen dut</translation>
     </message>
     <message>
-        <location line="+60"/>
+        <location line="+58"/>
         <source>Torrent Completed</source>
         <translation>Torrenta Osatuta</translation>
     </message>
@@ -1434,7 +1434,7 @@ Beste lehen URL bat gehitzeko, gehitu hura lerro huts baten ondoren.</translatio
         <translation>&amp;Iturburua:</translation>
     </message>
     <message>
-        <location line="+26"/>
+        <location line="+22"/>
         <source>&amp;Destination folder:</source>
         <translation>&amp;Helmuga agiritegia:</translation>
     </message>
@@ -1454,7 +1454,7 @@ Beste lehen URL bat gehitzeko, gehitu hura lerro huts baten ondoren.</translatio
         <translation>Apala</translation>
     </message>
     <message>
-        <location filename="../options.ui" line="+39"/>
+        <location filename="../options.ui" line="+35"/>
         <source>&amp;Priority:</source>
         <translation>&amp;Lehentasuna:</translation>
     </message>
@@ -1991,7 +1991,7 @@ Beste lehen URL bat gehitzeko, gehitu hura lerro huts baten ondoren.</translatio
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../app.cc" line="-226"/>
+        <location filename="../app.cc" line="-221"/>
         <source>Invalid option</source>
         <translation>Aukera baliogabea</translation>
     </message>
@@ -1999,7 +1999,7 @@ Beste lehen URL bat gehitzeko, gehitu hura lerro huts baten ondoren.</translatio
 <context>
     <name>RelocateDialog</name>
     <message>
-        <location filename="../relocate.cc" line="+51"/>
+        <location filename="../relocate.cc" line="+65"/>
         <source>Select Location</source>
         <translation>Hautatu Kokalekua</translation>
     </message>
@@ -2009,7 +2009,7 @@ Beste lehen URL bat gehitzeko, gehitu hura lerro huts baten ondoren.</translatio
         <translation>Ezarri Torrentaren Kokalekua</translation>
     </message>
     <message>
-        <location line="+25"/>
+        <location line="+29"/>
         <source>Set Location</source>
         <translation>Ezarri Kokalekua</translation>
     </message>
@@ -2019,7 +2019,7 @@ Beste lehen URL bat gehitzeko, gehitu hura lerro huts baten ondoren.</translatio
         <translation>&amp;Kokaleku berria:</translation>
     </message>
     <message>
-        <location line="+29"/>
+        <location line="+16"/>
         <source>&amp;Move from the current folder</source>
         <translation>&amp;Mugitu oraingo agiritegitik</translation>
     </message>
@@ -2325,13 +2325,13 @@ Beste lehen URL bat gehitzeko, gehitu hura lerro huts baten ondoren.</translatio
     <message>
         <location line="-17"/>
         <location line="+22"/>
-        <location line="+603"/>
+        <location line="+604"/>
         <location line="+8"/>
         <source>Limited at %1</source>
         <translation>Muga: %1</translation>
     </message>
     <message>
-        <location line="-620"/>
+        <location line="-621"/>
         <source>Limit Upload Speed</source>
         <translation>Mugatu Igoera Abiadura</translation>
     </message>
@@ -2347,7 +2347,7 @@ Beste lehen URL bat gehitzeko, gehitu hura lerro huts baten ondoren.</translatio
     </message>
     <message>
         <location line="+5"/>
-        <location line="+596"/>
+        <location line="+597"/>
         <source>Stop at Ratio (%1)</source>
         <translation>Gelditu Maila honetan (%1)</translation>
     </message>
@@ -2389,12 +2389,12 @@ Beste lehen URL bat gehitzeko, gehitu hura lerro huts baten ondoren.</translatio
         <translation>Ireki Torrenta</translation>
     </message>
     <message>
-        <location line="-898"/>
+        <location line="-899"/>
         <source>Speed Limits</source>
         <translation>Abiadura Mugak</translation>
     </message>
     <message>
-        <location line="+450"/>
+        <location line="+451"/>
         <source>Network Error</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2516,12 +2516,13 @@ Beste lehen URL bat gehitzeko, gehitu hura lerro huts baten ondoren.</translatio
 <context>
     <name>TrPathButton</name>
     <message>
-        <location filename="../path-button.cc" line="+113"/>
+        <location filename="../path-button.cc" line="+30"/>
+        <location line="+65"/>
         <source>(None)</source>
         <translation type="unfinished">(Ezer ez)</translation>
     </message>
     <message>
-        <location line="+16"/>
+        <location line="+63"/>
         <source>Select Folder</source>
         <translation type="unfinished">Hautatu Agiritegia</translation>
     </message>
@@ -2597,7 +2598,7 @@ Beste lehen URL bat gehitzeko, gehitu hura lerro huts baten ondoren.</translatio
 <context>
     <name>Utils</name>
     <message>
-        <location filename="../utils.cc" line="+56"/>
+        <location filename="../utils.cc" line="+61"/>
         <source>Enter a location:</source>
         <translation>Sartu kokaleku bat:</translation>
     </message>

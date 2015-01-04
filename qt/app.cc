@@ -15,10 +15,9 @@
 #include <QDBusConnectionInterface>
 #include <QDBusError>
 #include <QDBusMessage>
-#include <QDialogButtonBox>
 #include <QIcon>
-#include <QLabel>
 #include <QLibraryInfo>
+#include <QMessageBox>
 #include <QProcess>
 #include <QRect>
 
@@ -303,23 +302,18 @@ MyApp::MyApp (int& argc, char ** argv):
 
   if (!myPrefs->getBool (Prefs::USER_HAS_GIVEN_INFORMED_CONSENT))
     {
-      QDialog * dialog = new QDialog (myWindow);
+      QMessageBox * dialog = new QMessageBox (QMessageBox::Information, QString (),
+                                              tr ("<b>Transmission is a file sharing program.</b>"),
+                                              QMessageBox::Ok | QMessageBox::Cancel, myWindow);
+      dialog->setInformativeText (tr ("When you run a torrent, its data will be made available to others by means of upload. "
+                                      "Any content you share is your sole responsibility."));
+      dialog->button (QMessageBox::Ok)->setText (tr ("I &Agree"));
+      dialog->setDefaultButton (QMessageBox::Ok);
       dialog->setModal (true);
-      QVBoxLayout * v = new QVBoxLayout (dialog);
-      QLabel * l = new QLabel (tr ("Transmission is a file sharing program. When you run a torrent, its data will be made available to others by means of upload. Any content you share is your sole responsibility."));
-      l->setWordWrap (true);
-      v->addWidget (l);
-      QDialogButtonBox * box = new QDialogButtonBox;
-      box->addButton (new QPushButton (tr ("&Cancel")), QDialogButtonBox::RejectRole);
-      QPushButton * agree = new QPushButton (tr ("I &Agree"));
-      agree->setDefault (true);
-      box->addButton (agree, QDialogButtonBox::AcceptRole);
-      box->setSizePolicy (QSizePolicy::Expanding, QSizePolicy::Fixed);
-      box->setOrientation (Qt::Horizontal);
-      v->addWidget (box);
-      connect (box, SIGNAL (rejected ()), this, SLOT (quit ()));
-      connect (box, SIGNAL (accepted ()), dialog, SLOT (deleteLater ()));
-      connect (box, SIGNAL (accepted ()), this, SLOT (consentGiven ()));
+
+      connect (dialog, SIGNAL (finished (int)), this, SLOT (consentGiven (int)));
+
+      dialog->setAttribute (Qt::WA_DeleteOnClose);
       dialog->show ();
     }
 
@@ -409,9 +403,12 @@ MyApp::onNewTorrentChanged (int id)
 ***/
 
 void
-MyApp::consentGiven ()
+MyApp::consentGiven (int result)
 {
-  myPrefs->set<bool> (Prefs::USER_HAS_GIVEN_INFORMED_CONSENT, true);
+  if (result == QMessageBox::Ok)
+    myPrefs->set<bool> (Prefs::USER_HAS_GIVEN_INFORMED_CONSENT, true);
+  else
+    quit ();
 }
 
 MyApp::~MyApp ()

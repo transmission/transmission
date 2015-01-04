@@ -53,7 +53,7 @@ class MyApp: public QApplication
     QTranslator appTranslator;
 
   private slots:
-    void consentGiven ();
+    void consentGiven (int result);
     void onSessionSourceChanged ();
     void refreshPref (int key);
     void refreshTorrents ();

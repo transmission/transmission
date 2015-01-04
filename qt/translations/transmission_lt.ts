@@ -1298,7 +1298,7 @@
         </translation>
     </message>
     <message>
-        <location filename="../make-dialog.ui" line="+177"/>
+        <location filename="../make-dialog.ui" line="+166"/>
         <source>&amp;Private torrent</source>
         <translation>&amp;Privatus torentas</translation>
     </message>
@@ -1318,7 +1318,7 @@
         <translation>&amp;Komentaras:</translation>
     </message>
     <message>
-        <location line="-121"/>
+        <location line="-110"/>
         <source>Files</source>
         <translation>Failai</translation>
     </message>
@@ -1328,27 +1328,27 @@
         <translation>Naujas torentas</translation>
     </message>
     <message>
-        <location line="+99"/>
+        <location line="+88"/>
         <source>Properties</source>
         <translation>Savybės</translation>
     </message>
     <message>
-        <location line="-67"/>
+        <location line="-56"/>
         <source>Sa&amp;ve to:</source>
         <translation>Į&amp;rašyti į:</translation>
     </message>
     <message>
-        <location line="+40"/>
+        <location line="+33"/>
         <source>Source &amp;file:</source>
         <translation>Šaltinio &amp;failas:</translation>
     </message>
     <message>
-        <location line="-20"/>
+        <location line="-17"/>
         <source>Source f&amp;older:</source>
         <translation>Šaltinio &amp;aplankas:</translation>
     </message>
     <message>
-        <location line="+83"/>
+        <location line="+76"/>
         <source>To add a backup URL, add it on the line after the primary URL.
 To add another primary URL, add it after a blank line.</source>
         <translation>Atsarginį URL adresą veskite atskiroje eilutėje po pirminiu URL adresu.
@@ -1396,22 +1396,22 @@ Papildomą pirminį URL adresą galite įvesti, palikę prieš jį tuščią eil
 <context>
     <name>MyApp</name>
     <message>
-        <location filename="../app.cc" line="+304"/>
-        <source>Transmission is a file sharing program. When you run a torrent, its data will be made available to others by means of upload. Any content you share is your sole responsibility.</source>
+        <location filename="../app.cc" line="+306"/>
+        <source>&lt;b&gt;Transmission is a file sharing program.&lt;/b&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+4"/>
-        <source>&amp;Cancel</source>
-        <translation>&amp;Atsisakyti</translation>
+        <location line="+2"/>
+        <source>When you run a torrent, its data will be made available to others by means of upload. Any content you share is your sole responsibility.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+1"/>
+        <location line="+2"/>
         <source>I &amp;Agree</source>
         <translation>Aš &amp;sutinku</translation>
     </message>
     <message>
-        <location line="+84"/>
+        <location line="+82"/>
         <source>Torrent Added</source>
         <translation>Torentas pridėtas</translation>
     </message>
@@ -1424,7 +1424,7 @@ Papildomą pirminį URL adresą galite įvesti, palikę prieš jį tuščią eil
 <context>
     <name>OptionsDialog</name>
     <message>
-        <location filename="../options.ui" line="+43"/>
+        <location filename="../options.ui" line="+39"/>
         <source>&amp;Destination folder:</source>
         <translation>Paskirties &amp;aplankas:</translation>
     </message>
@@ -1449,7 +1449,7 @@ Papildomą pirminį URL adresą galite įvesti, palikę prieš jį tuščią eil
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../options.ui" line="-26"/>
+        <location filename="../options.ui" line="-22"/>
         <source>&amp;Source:</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1459,7 +1459,7 @@ Papildomą pirminį URL adresą galite įvesti, palikę prieš jį tuščią eil
         <translation>žemas</translation>
     </message>
     <message>
-        <location filename="../options.ui" line="+65"/>
+        <location filename="../options.ui" line="+57"/>
         <source>&amp;Priority:</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2004,7 +2004,7 @@ Papildomą pirminį URL adresą galite įvesti, palikę prieš jį tuščią eil
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../app.cc" line="-202"/>
+        <location filename="../app.cc" line="-197"/>
         <source>Invalid option</source>
         <translation>Netinkamas parametras</translation>
     </message>
@@ -2012,7 +2012,7 @@ Papildomą pirminį URL adresą galite įvesti, palikę prieš jį tuščią eil
 <context>
     <name>RelocateDialog</name>
     <message>
-        <location filename="../relocate.ui" line="+78"/>
+        <location filename="../relocate.ui" line="+69"/>
         <source>&amp;Move from the current folder</source>
         <translation>&amp;Perkelti iš dabartinio aplanko</translation>
     </message>
@@ -2022,12 +2022,12 @@ Papildomą pirminį URL adresą galite įvesti, palikę prieš jį tuščią eil
         <translation>Vietiniai duomenys jau yra &amp;ten</translation>
     </message>
     <message>
-        <location line="-39"/>
+        <location line="-26"/>
         <source>New &amp;location:</source>
         <translation>Nauja &amp;vieta:</translation>
     </message>
     <message>
-        <location filename="../relocate.cc" line="+51"/>
+        <location filename="../relocate.cc" line="+65"/>
         <source>Select Location</source>
         <translation>Parinkite vietą</translation>
     </message>
@@ -2037,7 +2037,7 @@ Papildomą pirminį URL adresą galite įvesti, palikę prieš jį tuščią eil
         <translation>Nustatyti vietą</translation>
     </message>
     <message>
-        <location line="-25"/>
+        <location line="-29"/>
         <source>Set Torrent Location</source>
         <translation>Torento vietos nustatymas</translation>
     </message>
@@ -2330,12 +2330,12 @@ Papildomą pirminį URL adresą galite įvesti, palikę prieš jį tuščią eil
 <context>
     <name>TrMainWindow</name>
     <message>
-        <location filename="../mainwin.cc" line="+668"/>
+        <location filename="../mainwin.cc" line="+669"/>
         <source>Idle</source>
         <translation>Pasyvus</translation>
     </message>
     <message>
-        <location line="-299"/>
+        <location line="-300"/>
         <source>Limit Download Speed</source>
         <translation>Apriboti atsiuntimo greitį</translation>
     </message>
@@ -2347,7 +2347,7 @@ Papildomą pirminį URL adresą galite įvesti, palikę prieš jį tuščią eil
     <message>
         <location line="-13"/>
         <location line="+22"/>
-        <location line="+603"/>
+        <location line="+604"/>
         <location line="+8"/>
         <source>Limited at %1</source>
         <translation>Ribojama iki %1</translation>
@@ -2409,12 +2409,12 @@ Papildomą pirminį URL adresą galite įvesti, palikę prieš jį tuščią eil
         <translation>Šie torentai prisijungę prie siuntėjų.</translation>
     </message>
     <message>
-        <location line="-820"/>
+        <location line="-821"/>
         <source>Seed Forever</source>
         <translation>Skleisti visada</translation>
     </message>
     <message>
-        <location line="+700"/>
+        <location line="+701"/>
         <source>Show &amp;options dialog</source>
         <translation>Rodyti &amp;parinkčių langą</translation>
     </message>
@@ -2434,12 +2434,12 @@ Papildomą pirminį URL adresą galite įvesti, palikę prieš jį tuščią eil
         <translation>Pašalinti šio torento atsiųstus failus?</translation>
     </message>
     <message>
-        <location line="-1004"/>
+        <location line="-1005"/>
         <source>Speed Limits</source>
         <translation type="unfinished">Greičio ribojimai</translation>
     </message>
     <message>
-        <location line="+450"/>
+        <location line="+451"/>
         <source>Network Error</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2477,13 +2477,13 @@ Papildomą pirminį URL adresą galite įvesti, palikę prieš jį tuščią eil
         <translation>Vienas šių torentų dar neatsiųstas.</translation>
     </message>
     <message>
-        <location line="-843"/>
+        <location line="-844"/>
         <source>Stop Seeding at Ratio</source>
         <translation>Nebeskleisti esant santykiui</translation>
     </message>
     <message>
         <location line="+9"/>
-        <location line="+596"/>
+        <location line="+597"/>
         <source>Stop at Ratio (%1)</source>
         <translation>Nebeskleisti esant santykiui (%1)</translation>
     </message>
@@ -2498,13 +2498,13 @@ Papildomą pirminį URL adresą galite įvesti, palikę prieš jį tuščią eil
         <translation>Šis torentas dar neatsiųstas.</translation>
     </message>
     <message>
-        <location line="-858"/>
+        <location line="-859"/>
         <location line="+22"/>
         <source>Unlimited</source>
         <translation>Be ribojimų</translation>
     </message>
     <message>
-        <location line="+921"/>
+        <location line="+922"/>
         <source>%1 has not responded yet</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2532,12 +2532,13 @@ Papildomą pirminį URL adresą galite įvesti, palikę prieš jį tuščią eil
 <context>
     <name>TrPathButton</name>
     <message>
-        <location filename="../path-button.cc" line="+113"/>
+        <location filename="../path-button.cc" line="+30"/>
+        <location line="+65"/>
         <source>(None)</source>
         <translation type="unfinished">(Joks)</translation>
     </message>
     <message>
-        <location line="+16"/>
+        <location line="+63"/>
         <source>Select Folder</source>
         <translation type="unfinished">Parinkite aplanką</translation>
     </message>
@@ -2613,7 +2614,7 @@ Papildomą pirminį URL adresą galite įvesti, palikę prieš jį tuščią eil
 <context>
     <name>Utils</name>
     <message>
-        <location filename="../utils.cc" line="+56"/>
+        <location filename="../utils.cc" line="+61"/>
         <source>Enter a location:</source>
         <translation>Įveskite vietą:</translation>
     </message>
