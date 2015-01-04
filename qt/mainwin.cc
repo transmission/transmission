@@ -114,7 +114,7 @@ TrMainWindow::TrMainWindow (Session& session, Prefs& prefs, TorrentModel& model,
   ui.listView->setStyle (new ListViewProxyStyle);
 
   // icons
-  ui.action_OpenFile->setIcon (getStockIcon ("folder-open", QStyle::SP_DialogOpenButton));
+  ui.action_OpenFile->setIcon (getStockIcon ("document-open", QStyle::SP_DialogOpenButton));
   ui.action_New->setIcon (getStockIcon ("document-new", QStyle::SP_DesktopIcon));
   ui.action_Properties->setIcon (getStockIcon ("document-properties", QStyle::SP_DesktopIcon));
   ui.action_OpenFolder->setIcon (getStockIcon ("folder-open", QStyle::SP_DirOpenIcon));

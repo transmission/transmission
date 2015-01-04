@@ -317,7 +317,7 @@ FilterBar::createActivityCombo ()
   row->setData (FilterMode::SHOW_PAUSED, ActivityRole);
   model->appendRow (row);
 
-  row = new QStandardItem (blankIcon, tr ("Finished"));
+  row = new QStandardItem (QIcon::fromTheme ("dialog-ok", blankIcon), tr ("Finished"));
   row->setData (FilterMode::SHOW_FINISHED, ActivityRole);
   model->appendRow (row);
 
@@ -325,7 +325,7 @@ FilterBar::createActivityCombo ()
   row->setData (FilterMode::SHOW_VERIFYING, ActivityRole);
   model->appendRow (row);
 
-  row = new QStandardItem (QIcon::fromTheme ("dialog-error", blankIcon), tr ("Error"));
+  row = new QStandardItem (QIcon::fromTheme ("process-stop", blankIcon), tr ("Error"));
   row->setData (FilterMode::SHOW_ERROR, ActivityRole);
   model->appendRow (row);
 
