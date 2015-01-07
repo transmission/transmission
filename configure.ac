@@ -37,14 +37,19 @@ AM_CONDITIONAL(TR_UNSTABLE, test "x$supported_build" = "xno")
 ##   MANDATORY for everything
 ##
 ##
+
 CURL_MINIMUM=7.15.4
 AC_SUBST(CURL_MINIMUM)
 LIBEVENT_MINIMUM=2.0.10
 AC_SUBST(LIBEVENT_MINIMUM)
-OPENSSL_MINIMUM=0.9.4
-AC_SUBST(OPENSSL_MINIMUM)
 ZLIB_MINIMUM=1.2.3
 AC_SUBST(ZLIB_MINIMUM)
+
+# crypto backends
+OPENSSL_MINIMUM=0.9.4
+AC_SUBST(OPENSSL_MINIMUM)
+CYASSL_MINIMUM=3.0
+AC_SUBST(CYASSL_MINIMUM)
 
 ##
 ##
@@ -112,10 +117,43 @@ AC_SEARCH_LIBS(cos, [m])
 AC_SEARCH_LIBS([socket], [socket net])
 AC_SEARCH_LIBS([gethostbyname], [nsl bind])
 AC_SEARCH_LIBS([quotacursor_skipidtype], [quota])
-PKG_CHECK_MODULES(OPENSSL, [openssl >= $OPENSSL_MINIMUM], , [CHECK_SSL()])
 PKG_CHECK_MODULES(LIBCURL, [libcurl >= $CURL_MINIMUM])
 PKG_CHECK_MODULES(LIBEVENT, [libevent >= $LIBEVENT_MINIMUM])
 PKG_CHECK_MODULES(ZLIB, [zlib >= $ZLIB_MINIMUM])
+
+
+AC_ARG_WITH([crypto], AS_HELP_STRING([--with-crypto=PKG],
+            [Use specified crypto library: auto (default), openssl, cyassl]),
+            [want_crypto=$withval], [want_crypto=auto])
+
+AS_IF([test "x$want_crypto" = "xauto" -o "x$want_crypto" = "xopenssl"], [
+    PKG_CHECK_MODULES(OPENSSL, [openssl >= $OPENSSL_MINIMUM],
+        [want_crypto="openssl"; CRYPTO_PKG="openssl"; CRYPTO_CFLAGS="$OPENSSL_CFLAGS"; CRYPTO_LIBS="$OPENSSL_LIBS"],
+        [AS_IF([test "x$want_crypto" = "xopenssl"],
+            [AC_MSG_ERROR([OpenSSL support requested, but library not found.])]
+        )]
+    )
+])
+AS_IF([test "x$want_crypto" = "xauto" -o "x$want_crypto" = "xcyassl"], [
+    PKG_CHECK_MODULES(CYASSL, [cyassl >= $CYASSL_MINIMUM],
+        [want_crypto="cyassl"; CRYPTO_PKG="cyassl"; CRYPTO_CFLAGS="$CYASSL_CFLAGS"; CRYPTO_LIBS="$CYASSL_LIBS"],
+        [AS_IF([test "x$want_crypto" = "xcyassl"],
+            [AC_MSG_ERROR([CyaSSL support requested, but library not found.])]
+        )]
+    )
+])
+# we should have found the library by now
+AS_IF([test "x$CRYPTO_PKG" = "x"], [
+    AS_IF([test "x$want_crypto" = "xauto"],
+        [AC_MSG_ERROR([Unable to find any supported crypto library.])],
+        [AC_MSG_ERROR([Requested crypto library "$want_crypto" is not supported.])],
+    )
+])
+
+AC_SUBST(CRYPTO_PKG)
+AC_SUBST(CRYPTO_CFLAGS)
+AC_SUBST(CRYPTO_LIBS)
+
 
 AC_SYS_LARGEFILE
 AC_CHECK_FUNCS([lseek64])
@@ -619,6 +657,7 @@ Configuration:
    Build libtransmission:                             yes
       * optimized for low-resource systems:           ${enable_lightweight}
       * µTP enabled:                                  ${build_utp}
+      * crypto library:                               ${CRYPTO_PKG}
 
    Build Command-Line client:                         ${build_cli}
 

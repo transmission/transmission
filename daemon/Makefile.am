@@ -2,7 +2,6 @@ AM_CPPFLAGS = -I@top_srcdir@ -DEMBEDDED
 
 AM_CFLAGS = \
     @LIBEVENT_CFLAGS@ \
-    @OPENSSL_CFLAGS@ \
     @LIBCURL_CFLAGS@ \
     @SYSTEMD_DAEMON_CFLAGS@ \
     @ZLIB_CFLAGS@ \
@@ -28,7 +27,7 @@ LDADD = \
     @LIBUTP_LIBS@ \
     @LIBEVENT_LIBS@ \
     @LIBCURL_LIBS@ \
-    @OPENSSL_LIBS@ \
+    @CRYPTO_LIBS@ \
     @INTLLIBS@ \
     @SYSTEMD_DAEMON_LIBS@ \
     @ZLIB_LIBS@ \

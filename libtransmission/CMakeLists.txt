@@ -16,7 +16,7 @@ set(${PROJECT_NAME}_SOURCES
     crypto.c
     crypto-utils.c
     crypto-utils-fallback.c
-    crypto-utils-openssl.c
+    crypto-utils-${CRYPTO_PKG}.c
     error.c
     fdlimit.c
     file.c
@@ -167,7 +167,7 @@ include_directories(
     ${PROJECT_SOURCE_DIR}
     ${PROJECT_BINARY_DIR}
     ${ZLIB_INCLUDE_DIRS}
-    ${OPENSSL_INCLUDE_DIRS}
+    ${CRYPTO_INCLUDE_DIRS}
     ${CURL_INCLUDE_DIRS}
     ${ICONV_INCLUDE_DIRS}
     ${EVENT2_INCLUDE_DIRS}
@@ -200,7 +200,7 @@ endforeach()
 target_link_libraries(${TR_NAME}
     ${CMAKE_THREAD_LIBS_INIT}
     ${ZLIB_LIBRARIES}
-    ${OPENSSL_LIBRARIES}
+    ${CRYPTO_LIBRARIES}
     ${CURL_LIBRARIES}
     ${ICONV_LIBRARIES}
     ${EVENT2_LIBRARIES}
