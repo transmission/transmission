@@ -31,7 +31,7 @@ libtransmission_a_SOURCES = \
   crypto.c \
   crypto-utils.c \
   crypto-utils-fallback.c \
-  crypto-utils-openssl.c \
+  crypto-utils-@CRYPTO_PKG@.c \
   error.c \
   fdlimit.c \
   file.c \
