@@ -50,6 +50,8 @@ OPENSSL_MINIMUM=0.9.4
 AC_SUBST(OPENSSL_MINIMUM)
 CYASSL_MINIMUM=3.0
 AC_SUBST(CYASSL_MINIMUM)
+POLARSSL_MINIMUM=0x01030000 # 1.3
+AC_SUBST(POLARSSL_MINIMUM)
 
 ##
 ##
@@ -123,7 +125,7 @@ PKG_CHECK_MODULES(ZLIB, [zlib >= $ZLIB_MINIMUM])
 
 
 AC_ARG_WITH([crypto], AS_HELP_STRING([--with-crypto=PKG],
-            [Use specified crypto library: auto (default), openssl, cyassl]),
+            [Use specified crypto library: auto (default), openssl, cyassl, polarssl]),
             [want_crypto=$withval], [want_crypto=auto])
 
 AS_IF([test "x$want_crypto" = "xauto" -o "x$want_crypto" = "xopenssl"], [
@@ -139,6 +141,27 @@ AS_IF([test "x$want_crypto" = "xauto" -o "x$want_crypto" = "xcyassl"], [
         [want_crypto="cyassl"; CRYPTO_PKG="cyassl"; CRYPTO_CFLAGS="$CYASSL_CFLAGS"; CRYPTO_LIBS="$CYASSL_LIBS"],
         [AS_IF([test "x$want_crypto" = "xcyassl"],
             [AC_MSG_ERROR([CyaSSL support requested, but library not found.])]
+        )]
+    )
+])
+AS_IF([test "x$want_crypto" = "xauto" -o "x$want_crypto" = "xpolarssl"], [
+    AC_CHECK_HEADER([polarssl/version.h],
+        [AC_EGREP_CPP([version_ok], [#include <polarssl/version.h>
+                                     #if defined (POLARSSL_VERSION_NUMBER) && POLARSSL_VERSION_NUMBER >= $POLARSSL_MINIMUM
+                                     version_ok
+                                     #endif],
+            [AC_CHECK_LIB([polarssl], [dhm_init],
+                [want_crypto="polarssl"; CRYPTO_PKG="polarssl"; CRYPTO_CFLAGS=""; CRYPTO_LIBS="-lpolarssl"],
+                [AS_IF([test "x$want_crypto" = "xpolarssl"],
+                    [AC_MSG_ERROR([PolarSSL support requested, but library not found.])]
+                )]
+            )],
+            [AS_IF([test "x$want_crypto" = "xpolarssl"],
+                [AC_MSG_ERROR([PolarSSL support requested, but version not suitable.])]
+            )]
+        )],
+        [AS_IF([test "x$want_crypto" = "xpolarssl"],
+            [AC_MSG_ERROR([PolarSSL support requested, but headers not found.])]
         )]
     )
 ])

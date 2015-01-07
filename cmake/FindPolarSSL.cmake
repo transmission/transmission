@@ -1,0 +1,47 @@
+if(POLARSSL_PREFER_STATIC_LIB)
+    set(POLARSSL_ORIG_CMAKE_FIND_LIBRARY_SUFFIXES ${CMAKE_FIND_LIBRARY_SUFFIXES})
+    if(WIN32)
+        set(CMAKE_FIND_LIBRARY_SUFFIXES .a .lib ${CMAKE_FIND_LIBRARY_SUFFIXES})
+    else()
+        set(CMAKE_FIND_LIBRARY_SUFFIXES .a ${CMAKE_FIND_LIBRARY_SUFFIXES})
+    endif()
+endif()
+
+if(UNIX)
+  find_package(PkgConfig QUIET)
+  pkg_check_modules(_POLARSSL QUIET polarssl)
+endif()
+
+find_path(POLARSSL_INCLUDE_DIR NAMES polarssl/version.h HINTS ${_POLARSSL_INCLUDEDIR})
+find_library(POLARSSL_LIBRARY NAMES polarssl HINTS ${_POLARSSL_LIBDIR})
+
+if(POLARSSL_INCLUDE_DIR)
+    if(_POLARSSL_VERSION)
+        set(POLARSSL_VERSION ${_POLARSSL_VERSION})
+    else()
+        file(STRINGS "${POLARSSL_INCLUDE_DIR}/polarssl/version.h" POLARSSL_VERSION_STR REGEX "^#define[\t ]+POLARSSL_VERSION_STRING[\t ]+\"[^\"]+\"")
+        if(POLARSSL_VERSION_STR MATCHES "\"([^\"]+)\"")
+            set(POLARSSL_VERSION "${CMAKE_MATCH_1}")
+        endif()
+    endif()
+endif()
+
+set(POLARSSL_INCLUDE_DIRS ${POLARSSL_INCLUDE_DIR})
+set(POLARSSL_LIBRARIES ${POLARSSL_LIBRARY})
+
+include(FindPackageHandleStandardArgs)
+
+find_package_handle_standard_args(PolarSSL
+    REQUIRED_VARS
+        POLARSSL_LIBRARY
+        POLARSSL_INCLUDE_DIR
+    VERSION_VAR
+        POLARSSL_VERSION
+)
+
+mark_as_advanced(POLARSSL_INCLUDE_DIR POLARSSL_LIBRARY)
+
+if(POLARSSL_PREFER_STATIC_LIB)
+    set(CMAKE_FIND_LIBRARY_SUFFIXES ${POLARSSL_ORIG_CMAKE_FIND_LIBRARY_SUFFIXES})
+    unset(POLARSSL_ORIG_CMAKE_FIND_LIBRARY_SUFFIXES)
+endif()
