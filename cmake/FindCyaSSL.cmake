@@ -21,7 +21,7 @@ if(CYASSL_INCLUDE_DIR)
     else()
         file(STRINGS "${CYASSL_INCLUDE_DIR}/cyassl/version.h" CYASSL_VERSION_STR REGEX "^#define[\t ]+LIBCYASSL_VERSION_STRING[\t ]+\"[^\"]+\"")
         if(CYASSL_VERSION_STR MATCHES "\"([^\"]+)\"")
-            set(CYASSL_VERSION_STR "${CMAKE_MATCH_1}")
+            set(CYASSL_VERSION "${CMAKE_MATCH_1}")
         endif()
     endif()
 endif()
@@ -31,7 +31,7 @@ set(CYASSL_LIBRARIES ${CYASSL_LIBRARY})
 
 include(FindPackageHandleStandardArgs)
 
-find_package_handle_standard_args(CYASSL
+find_package_handle_standard_args(CyaSSL
     REQUIRED_VARS
         CYASSL_LIBRARY
         CYASSL_INCLUDE_DIR
