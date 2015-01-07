@@ -131,7 +131,6 @@ endif()
 find_package(Threads)
 find_package(PkgConfig QUIET)
 
-find_package(OpenSSL ${OPENSSL_MINIMUM} REQUIRED)
 find_package(CURL ${CURL_MINIMUM} REQUIRED)
 
 if(UNIX)
