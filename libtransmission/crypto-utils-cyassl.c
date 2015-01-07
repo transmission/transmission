@@ -19,6 +19,7 @@
 #include "transmission.h"
 #include "crypto-utils.h"
 #include "log.h"
+#include "platform.h"
 #include "utils.h"
 
 #define TR_CRYPTO_DH_SECRET_FALLBACK
@@ -87,6 +88,17 @@ get_rng (void)
     }
 
   return &rng;
+}
+
+static tr_lock *
+get_rng_lock (void)
+{
+  static tr_lock * lock = NULL;
+
+  if (lock == NULL)
+    lock = tr_lockNew ();
+
+  return lock;
 }
 
 /***
@@ -231,6 +243,7 @@ tr_dh_make_key (tr_dh_ctx_t   raw_handle,
 {
   struct tr_dh_ctx * handle = raw_handle;
   word32 my_private_key_length, my_public_key_length;
+  tr_lock * rng_lock = get_rng_lock ();
 
   assert (handle != NULL);
   assert (public_key != NULL);
@@ -238,10 +251,17 @@ tr_dh_make_key (tr_dh_ctx_t   raw_handle,
   if (handle->private_key == NULL)
     handle->private_key = tr_malloc (handle->key_length);
 
+  tr_lockLock (rng_lock);
+
   if (!check_result (DhGenerateKeyPair (&handle->dh, get_rng (),
                                         handle->private_key, &my_private_key_length,
                                         public_key, &my_public_key_length)))
-    return false;
+    {
+      tr_lockUnlock (rng_lock);
+      return false;
+    }
+
+  tr_lockUnlock (rng_lock);
 
   tr_dh_align_key (public_key, my_public_key_length, handle->key_length);
 
@@ -291,7 +311,14 @@ bool
 tr_rand_buffer (void   * buffer,
                 size_t   length)
 {
+  bool ret;
+  tr_lock * rng_lock = get_rng_lock ();
+
   assert (buffer != NULL);
 
-  return check_result (RNG_GenerateBlock (get_rng (), buffer, length));
+  tr_lockLock (rng_lock);
+  ret = check_result (RNG_GenerateBlock (get_rng (), buffer, length));
+  tr_lockUnlock (rng_lock);
+
+  return ret;
 }
