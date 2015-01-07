@@ -15,6 +15,7 @@
 #include <polarssl/dhm.h>
 #include <polarssl/error.h>
 #include <polarssl/sha1.h>
+#include <polarssl/version.h>
 
 #include "transmission.h"
 #include "crypto-utils.h"
@@ -110,7 +111,12 @@ get_rng_lock (void)
 tr_sha1_ctx_t
 tr_sha1_init (void)
 {
-  sha1_context * handle = tr_new (sha1_context, 1);
+  sha1_context * handle = tr_new0 (sha1_context, 1);
+
+#if POLARSSL_VERSION_NUMBER >= 0x01030800
+  sha1_init (handle);
+#endif
+
   sha1_starts (handle);
   return handle;
 }
@@ -142,6 +148,10 @@ tr_sha1_final (tr_sha1_ctx_t   handle,
       sha1_finish (handle, hash);
     }
 
+#if POLARSSL_VERSION_NUMBER >= 0x01030800
+  sha1_free (handle);
+#endif
+
   tr_free (handle);
   return true;
 }
@@ -153,12 +163,22 @@ tr_sha1_final (tr_sha1_ctx_t   handle,
 tr_rc4_ctx_t
 tr_rc4_new (void)
 {
-  return tr_new0 (arc4_context, 1);
+  arc4_context * handle = tr_new0 (arc4_context, 1);
+
+#if POLARSSL_VERSION_NUMBER >= 0x01030800
+  arc4_init (handle);
+#endif
+
+  return handle;
 }
 
 void
 tr_rc4_free (tr_rc4_ctx_t handle)
 {
+#if POLARSSL_VERSION_NUMBER >= 0x01030800
+  arc4_free (handle);
+#endif
+
   tr_free (handle);
 }
 
@@ -205,7 +225,9 @@ tr_dh_new (const uint8_t * prime_num,
   assert (prime_num != NULL);
   assert (generator_num != NULL);
 
+#if POLARSSL_VERSION_NUMBER >= 0x01030800
   dhm_init (handle);
+#endif
 
   if (!check_result (mpi_read_binary (&handle->P, prime_num, prime_num_length)) ||
       !check_result (mpi_read_binary (&handle->G, generator_num, generator_num_length)))
