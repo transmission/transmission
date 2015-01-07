@@ -150,7 +150,7 @@ AS_IF([test "x$want_crypto" = "xauto" -o "x$want_crypto" = "xpolarssl"], [
                                      #if defined (POLARSSL_VERSION_NUMBER) && POLARSSL_VERSION_NUMBER >= $POLARSSL_MINIMUM
                                      version_ok
                                      #endif],
-            [AC_CHECK_LIB([polarssl], [dhm_init],
+            [AC_CHECK_LIB([polarssl], [dhm_calc_secret],
                 [want_crypto="polarssl"; CRYPTO_PKG="polarssl"; CRYPTO_CFLAGS=""; CRYPTO_LIBS="-lpolarssl"],
                 [AS_IF([test "x$want_crypto" = "xpolarssl"],
                     [AC_MSG_ERROR([PolarSSL support requested, but library not found.])]

@@ -40,7 +40,13 @@ log_polarssl_error (int          error_code,
   if (tr_logLevelIsActive (TR_LOG_ERROR))
     {
       char error_message[256];
+
+#if POLARSSL_VERSION_NUMBER >= 0x01030000
       polarssl_strerror (error_code, error_message, sizeof (error_message));
+#else
+      error_strerror (error_code, error_message, sizeof (error_message));
+#endif
+
       tr_logAddMessage (file, line, TR_LOG_ERROR, MY_NAME, "PolarSSL error: %s", error_message);
     }
 }
@@ -288,8 +294,12 @@ tr_dh_agree (tr_dh_ctx_t     raw_handle,
 
   secret_key_length = handle->len;
 
+#if POLARSSL_VERSION_NUMBER >= 0x01030000
   if (!check_result (dhm_calc_secret (handle, ret->key,
                                       &secret_key_length, my_rand, NULL)))
+#else
+  if (!check_result (dhm_calc_secret (handle, ret->key, &secret_key_length)))
+#endif
     {
       tr_dh_secret_free (ret);
       return NULL;
