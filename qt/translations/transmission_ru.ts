@@ -214,8 +214,9 @@
         <translation type="unfinished"></translation>
     </message>
     <message numerus="yes">
-        <location line="+113"/>
+        <location line="+114"/>
         <source> minute(s)</source>
+        <extracomment>Spin box suffix, &quot;Stop seeding if idle for: [ 5 minutes ]&quot;</extracomment>
         <translation>
             <numerusform> минута</numerusform>
             <numerusform> минуты</numerusform>
@@ -1607,12 +1608,12 @@ To add another primary URL, add it after a blank line.</source>
     </message>
     <message>
         <location line="+18"/>
-        <location line="+360"/>
+        <location line="+373"/>
         <source>Desktop</source>
         <translation>Рабочий стол</translation>
     </message>
     <message>
-        <location line="-358"/>
+        <location line="-371"/>
         <source>Show Transmission icon in the &amp;notification area</source>
         <translation>Показать значок Transmission в о&amp;бласти уведомлений</translation>
     </message>
@@ -1638,12 +1639,12 @@ To add another primary URL, add it after a blank line.</source>
     </message>
     <message>
         <location line="+1"/>
-        <location line="+422"/>
+        <location line="+435"/>
         <source>Status unknown</source>
         <translation>Статус неизвестен</translation>
     </message>
     <message>
-        <location line="-414"/>
+        <location line="-427"/>
         <source>&amp;Port for incoming connections:</source>
         <translation>&amp;Порт для входящих подключений:</translation>
     </message>
@@ -1658,12 +1659,12 @@ To add another primary URL, add it after a blank line.</source>
         <translation>Использовать пере&amp;направление портов UPnP или NAT-PMP</translation>
     </message>
     <message>
-        <location line="+190"/>
+        <location line="+191"/>
         <source>Limits</source>
         <translation>Ограничения</translation>
     </message>
     <message>
-        <location line="-186"/>
+        <location line="-187"/>
         <source>Maximum peers per &amp;torrent:</source>
         <translation>&amp;Максимальное количество узлов на торрент:</translation>
     </message>
@@ -1707,7 +1708,7 @@ To add another primary URL, add it after a blank line.</source>
         <translation>Разрешить &amp;автоматическое обновление</translation>
     </message>
     <message>
-        <location line="+116"/>
+        <location line="+126"/>
         <source>Automatically add .torrent files &amp;from:</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1737,12 +1738,7 @@ To add another primary URL, add it after a blank line.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+1"/>
-        <source>Downloads sharing data in the last &amp;N minutes are active:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+3"/>
+        <location line="+7"/>
         <source>Incomplete</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1757,7 +1753,7 @@ To add another primary URL, add it after a blank line.</source>
         <translation>Безопасность</translation>
     </message>
     <message>
-        <location line="-220"/>
+        <location line="-233"/>
         <source>Allow encryption</source>
         <translation>Разрешить шифрование</translation>
     </message>
@@ -1927,21 +1923,37 @@ To add another primary URL, add it after a blank line.</source>
         <translation>Выбор папки назначения</translation>
     </message>
     <message numerus="yes">
-        <location line="+17"/>
+        <location line="+18"/>
         <source> minute(s)</source>
+        <extracomment>Spin box suffix, &quot;Stop seeding if idle for: [ 5 minutes ]&quot;</extracomment>
         <translation>
             <numerusform> минута</numerusform>
             <numerusform> минуты</numerusform>
             <numerusform> минут</numerusform>
         </translation>
     </message>
+    <message numerus="yes">
+        <location line="+39"/>
+        <source> minute(s) ago</source>
+        <extracomment>Spin box suffix, &quot;Download is inactive if data sharing stopped: [ 5 minutes ago ]&quot;</extracomment>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
     <message>
-        <location line="+48"/>
+        <location line="+18"/>
         <source>Adding</source>
         <translation>Добавление</translation>
     </message>
     <message>
-        <location line="+82"/>
+        <location line="+37"/>
+        <source>Download is i&amp;nactive if data sharing stopped:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+48"/>
         <source>Remote</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1956,12 +1968,12 @@ To add another primary URL, add it after a blank line.</source>
         <translation>Добавлят&amp;ь &quot;.part&quot; к именам не завершенных файлов</translation>
     </message>
     <message>
-        <location line="-20"/>
+        <location line="-23"/>
         <source>Save to &amp;Location:</source>
         <translation>Сохранять в &amp;этом местоположении:</translation>
     </message>
     <message>
-        <location line="+22"/>
+        <location line="+25"/>
         <source>Keep &amp;incomplete files in:</source>
         <translation>Сохранять &amp;не завершенные файлы в:</translation>
     </message>
@@ -1971,7 +1983,7 @@ To add another primary URL, add it after a blank line.</source>
         <translation>Выполнить с&amp;ценарий, после завершения загрузки:</translation>
     </message>
     <message>
-        <location line="-79"/>
+        <location line="-91"/>
         <source>Stop seeding at &amp;ratio:</source>
         <translation>Прекратить &amp;раздачу при рейтинге:</translation>
     </message>
@@ -1981,7 +1993,7 @@ To add another primary URL, add it after a blank line.</source>
         <translation type="unfinished">Прекратить раздачу при &amp;простое:</translation>
     </message>
     <message>
-        <location line="+97"/>
+        <location line="+109"/>
         <source>Transmission Preferences</source>
         <translation>Настройки Transmission</translation>
     </message>

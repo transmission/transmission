@@ -176,8 +176,9 @@
         <translation>Торап қабылдау режимінде жұмыс істеп тұр</translation>
     </message>
     <message numerus="yes">
-        <location line="+114"/>
+        <location line="+115"/>
         <source> minute(s)</source>
+        <extracomment>Spin box suffix, &quot;Stop seeding if idle for: [ 5 minutes ]&quot;</extracomment>
         <translation>
             <numerusform> минут</numerusform>
             <numerusform> минут</numerusform>
@@ -196,7 +197,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-611"/>
+        <location line="-612"/>
         <source>%1 (100%)</source>
         <translation>%1 (100%)</translation>
     </message>
@@ -231,7 +232,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+149"/>
+        <location line="+150"/>
         <source>Add URL </source>
         <translation>URL қосу</translation>
     </message>
@@ -1607,12 +1608,12 @@ To add another primary URL, add it after a blank line.</source>
     </message>
     <message>
         <location line="+5"/>
-        <location line="+422"/>
+        <location line="+435"/>
         <source>Status unknown</source>
         <translation>Қалып-күйі белгісіз</translation>
     </message>
     <message>
-        <location line="-414"/>
+        <location line="-427"/>
         <source>&amp;Port for incoming connections:</source>
         <translation>Кіріс байланыстар &amp;порты:</translation>
     </message>
@@ -1637,15 +1638,25 @@ To add another primary URL, add it after a blank line.</source>
         <translation type="unfinished"></translation>
     </message>
     <message numerus="yes">
-        <location line="+161"/>
+        <location line="+162"/>
         <source> minute(s)</source>
+        <extracomment>Spin box suffix, &quot;Stop seeding if idle for: [ 5 minutes ]&quot;</extracomment>
         <translation>
             <numerusform> минут</numerusform>
             <numerusform> минут</numerusform>
         </translation>
     </message>
+    <message numerus="yes">
+        <location line="+39"/>
+        <source> minute(s) ago</source>
+        <extracomment>Spin box suffix, &quot;Download is inactive if data sharing stopped: [ 5 minutes ago ]&quot;</extracomment>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
     <message>
-        <location line="+50"/>
+        <location line="+20"/>
         <source>Automatically add .torrent files &amp;from:</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1675,12 +1686,7 @@ To add another primary URL, add it after a blank line.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+1"/>
-        <source>Downloads sharing data in the last &amp;N minutes are active:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+3"/>
+        <location line="+7"/>
         <source>Incomplete</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1703,17 +1709,17 @@ To add another primary URL, add it after a blank line.</source>
         </translation>
     </message>
     <message>
-        <location line="-365"/>
+        <location line="-378"/>
         <source>Pick a &amp;random port every time Transmission is started</source>
         <translation>Әр р&amp;ет Transmission қосылғанда, кездейсоқ портты таңдау</translation>
     </message>
     <message>
-        <location line="+191"/>
+        <location line="+192"/>
         <source>Limits</source>
         <translation>Шектеулер</translation>
     </message>
     <message>
-        <location line="-186"/>
+        <location line="-187"/>
         <source>Maximum peers per &amp;torrent:</source>
         <translation>Торрент үшін макси&amp;малды тораптар саны:</translation>
     </message>
@@ -1761,23 +1767,23 @@ To add another primary URL, add it after a blank line.</source>
         <translation>Шифрлеуді талап ету</translation>
     </message>
     <message>
-        <location line="+218"/>
+        <location line="+231"/>
         <source>Privacy</source>
         <translation>Жекелігі</translation>
     </message>
     <message>
-        <location line="-397"/>
+        <location line="-410"/>
         <source>&amp;to</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+39"/>
-        <location line="+360"/>
+        <location line="+373"/>
         <source>Desktop</source>
         <translation>Жұмыс үстелі</translation>
     </message>
     <message>
-        <location line="-358"/>
+        <location line="-371"/>
         <source>Show Transmission icon in the &amp;notification area</source>
         <translation>Transmission таңбашас&amp;ын трейде көрсету</translation>
     </message>
@@ -1937,12 +1943,17 @@ To add another primary URL, add it after a blank line.</source>
         <translation>Мақсат бумасын таңдаңыз</translation>
     </message>
     <message>
-        <location line="+65"/>
+        <location line="+75"/>
         <source>Adding</source>
         <translation>Қосу</translation>
     </message>
     <message>
-        <location line="+77"/>
+        <location line="+37"/>
+        <source>Download is i&amp;nactive if data sharing stopped:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+43"/>
         <source>Downloading</source>
         <translation>Жүктелуде</translation>
     </message>
@@ -1957,17 +1968,17 @@ To add another primary URL, add it after a blank line.</source>
         <translation>Аяқтал&amp;маған торренттерді сақтау орны:</translation>
     </message>
     <message>
-        <location line="-22"/>
+        <location line="-25"/>
         <source>Save to &amp;Location:</source>
         <translation>Қай&amp;да сақтау:</translation>
     </message>
     <message>
-        <location line="+30"/>
+        <location line="+33"/>
         <source>Call scrip&amp;t when torrent is completed:</source>
         <translation>Торрент аяқталған кезде скрипт&amp;ті орындау:</translation>
     </message>
     <message>
-        <location line="-79"/>
+        <location line="-91"/>
         <source>Stop seeding at &amp;ratio:</source>
         <translation>Рейтинг &amp;мәні келесідей болғанда, таратуды тоқтату:</translation>
     </message>
@@ -1977,7 +1988,7 @@ To add another primary URL, add it after a blank line.</source>
         <translation type="unfinished">Белсенді е&amp;мес болса, таратуды тоқтату:</translation>
     </message>
     <message>
-        <location line="+97"/>
+        <location line="+109"/>
         <source>Transmission Preferences</source>
         <translation>Transmission баптаулары</translation>
     </message>

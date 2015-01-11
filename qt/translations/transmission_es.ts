@@ -213,8 +213,9 @@
         <translation>%1 (%2 corrupto)</translation>
     </message>
     <message numerus="yes">
-        <location line="+507"/>
+        <location line="+508"/>
         <source> minute(s)</source>
+        <extracomment>Spin box suffix, &quot;Stop seeding if idle for: [ 5 minutes ]&quot;</extracomment>
         <translation>
             <numerusform> minuto</numerusform>
             <numerusform> minutos</numerusform>
@@ -1598,12 +1599,12 @@ Para agregar otro URL primario, agrueguelo después de una línea en blanco.</tr
     </message>
     <message>
         <location line="+18"/>
-        <location line="+360"/>
+        <location line="+373"/>
         <source>Desktop</source>
         <translation>Escritorio</translation>
     </message>
     <message>
-        <location line="-358"/>
+        <location line="-371"/>
         <source>Show Transmission icon in the &amp;notification area</source>
         <translation>Mostrar ícono de Transmission en el área de &amp;notificaciones</translation>
     </message>
@@ -1640,12 +1641,12 @@ Para agregar otro URL primario, agrueguelo después de una línea en blanco.</tr
     </message>
     <message>
         <location line="+1"/>
-        <location line="+422"/>
+        <location line="+435"/>
         <source>Status unknown</source>
         <translation>Estado desconocido</translation>
     </message>
     <message>
-        <location line="-414"/>
+        <location line="-427"/>
         <source>&amp;Port for incoming connections:</source>
         <translation>&amp;Puerto para recibir conexiones:</translation>
     </message>
@@ -1660,12 +1661,12 @@ Para agregar otro URL primario, agrueguelo después de una línea en blanco.</tr
         <translation>Usar UPnP o NAT-PMP para obtener un puerto y su mapeo de mi ruteador</translation>
     </message>
     <message>
-        <location line="+190"/>
+        <location line="+191"/>
         <source>Limits</source>
         <translation>Límites</translation>
     </message>
     <message>
-        <location line="-186"/>
+        <location line="-187"/>
         <source>Maximum peers per &amp;torrent:</source>
         <translation>Máximo número de compañeros por &amp;torrent:</translation>
     </message>
@@ -1798,15 +1799,25 @@ Para agregar otro URL primario, agrueguelo después de una línea en blanco.</tr
         <translation>Habilitar actualización &amp;automática</translation>
     </message>
     <message numerus="yes">
-        <location line="+66"/>
+        <location line="+67"/>
         <source> minute(s)</source>
+        <extracomment>Spin box suffix, &quot;Stop seeding if idle for: [ 5 minutes ]&quot;</extracomment>
         <translation>
             <numerusform> minuto</numerusform>
             <numerusform> minutos</numerusform>
         </translation>
     </message>
+    <message numerus="yes">
+        <location line="+39"/>
+        <source> minute(s) ago</source>
+        <extracomment>Spin box suffix, &quot;Download is inactive if data sharing stopped: [ 5 minutes ago ]&quot;</extracomment>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
     <message>
-        <location line="+50"/>
+        <location line="+20"/>
         <source>Automatically add .torrent files &amp;from:</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1836,12 +1847,7 @@ Para agregar otro URL primario, agrueguelo después de una línea en blanco.</tr
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+1"/>
-        <source>Downloads sharing data in the last &amp;N minutes are active:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+42"/>
+        <location line="+46"/>
         <source>Downloading</source>
         <translation type="unfinished">Descargando</translation>
     </message>
@@ -1861,7 +1867,7 @@ Para agregar otro URL primario, agrueguelo después de una línea en blanco.</tr
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-223"/>
+        <location line="-236"/>
         <source>Allow encryption</source>
         <translation>Permitir cifrado</translation>
     </message>
@@ -1931,22 +1937,27 @@ Para agregar otro URL primario, agrueguelo después de una línea en blanco.</tr
         <translation>Seleccionar destino</translation>
     </message>
     <message>
-        <location line="+65"/>
+        <location line="+75"/>
         <source>Adding</source>
         <translation>Al agregar</translation>
     </message>
     <message>
-        <location line="+40"/>
+        <location line="+37"/>
+        <source>Download is i&amp;nactive if data sharing stopped:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+6"/>
         <source>Append &quot;.&amp;part&quot; to incomplete files&apos; names</source>
         <translation>Agregar .&amp;part al nombre de archivos incompletos</translation>
     </message>
     <message>
-        <location line="-20"/>
+        <location line="-23"/>
         <source>Save to &amp;Location:</source>
         <translation>Guardar en &amp;locación:</translation>
     </message>
     <message>
-        <location line="+22"/>
+        <location line="+25"/>
         <source>Keep &amp;incomplete files in:</source>
         <translation>Mantener archivos &amp;incompletos en:</translation>
     </message>
@@ -1956,7 +1967,7 @@ Para agregar otro URL primario, agrueguelo después de una línea en blanco.</tr
         <translation>Ejecutar scrip&amp;t cuando el torrent esté completo:</translation>
     </message>
     <message>
-        <location line="-79"/>
+        <location line="-91"/>
         <source>Stop seeding at &amp;ratio:</source>
         <translation>Dejar de compartir llegando a &amp;proporción:</translation>
     </message>
@@ -1966,7 +1977,7 @@ Para agregar otro URL primario, agrueguelo después de una línea en blanco.</tr
         <translation type="unfinished">Dejar de compartir si está i&amp;nactivo:</translation>
     </message>
     <message>
-        <location line="+62"/>
+        <location line="+74"/>
         <source>Incomplete</source>
         <translation>Incompleto</translation>
     </message>

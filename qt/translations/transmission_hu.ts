@@ -209,8 +209,9 @@
         <translation>A partner uTP-n keresztül kapcsolódik</translation>
     </message>
     <message numerus="yes">
-        <location line="+113"/>
+        <location line="+114"/>
         <source> minute(s)</source>
+        <extracomment>Spin box suffix, &quot;Stop seeding if idle for: [ 5 minutes ]&quot;</extracomment>
         <translation>
             <numerusform> perc</numerusform>
         </translation>
@@ -1591,12 +1592,12 @@ Másik elsődleges URL-t új sorba írva adhatsz hozzá.</translation>
     </message>
     <message>
         <location line="+18"/>
-        <location line="+360"/>
+        <location line="+373"/>
         <source>Desktop</source>
         <translation>Asztal</translation>
     </message>
     <message>
-        <location line="-358"/>
+        <location line="-371"/>
         <source>Show Transmission icon in the &amp;notification area</source>
         <translation>Ikon mutatása a &amp;tálcán</translation>
     </message>
@@ -1627,12 +1628,12 @@ Másik elsődleges URL-t új sorba írva adhatsz hozzá.</translation>
     </message>
     <message>
         <location line="+1"/>
-        <location line="+422"/>
+        <location line="+435"/>
         <source>Status unknown</source>
         <translation>Státusz nem ismert</translation>
     </message>
     <message>
-        <location line="-414"/>
+        <location line="-427"/>
         <source>&amp;Port for incoming connections:</source>
         <translation>&amp;Bejövő kapcsolatok portja:</translation>
     </message>
@@ -1647,12 +1648,12 @@ Másik elsődleges URL-t új sorba írva adhatsz hozzá.</translation>
         <translation>UPnP vagy NAT-PMP port &amp;forward a routerhez</translation>
     </message>
     <message>
-        <location line="+190"/>
+        <location line="+191"/>
         <source>Limits</source>
         <translation>Korlátok</translation>
     </message>
     <message>
-        <location line="-186"/>
+        <location line="-187"/>
         <source>Maximum peers per &amp;torrent:</source>
         <translation>Partnerek maximális száma &amp;torrentenként::</translation>
     </message>
@@ -1784,14 +1785,23 @@ Másik elsődleges URL-t új sorba írva adhatsz hozzá.</translation>
         <translation>&amp;Automata frissítések engedélyezése</translation>
     </message>
     <message numerus="yes">
-        <location line="+66"/>
+        <location line="+67"/>
         <source> minute(s)</source>
+        <extracomment>Spin box suffix, &quot;Stop seeding if idle for: [ 5 minutes ]&quot;</extracomment>
         <translation>
             <numerusform> perc</numerusform>
         </translation>
     </message>
+    <message numerus="yes">
+        <location line="+39"/>
+        <source> minute(s) ago</source>
+        <extracomment>Spin box suffix, &quot;Download is inactive if data sharing stopped: [ 5 minutes ago ]&quot;</extracomment>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
     <message>
-        <location line="+50"/>
+        <location line="+20"/>
         <source>Automatically add .torrent files &amp;from:</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1821,12 +1831,7 @@ Másik elsődleges URL-t új sorba írva adhatsz hozzá.</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+1"/>
-        <source>Downloads sharing data in the last &amp;N minutes are active:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+42"/>
+        <location line="+46"/>
         <source>Downloading</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1846,7 +1851,7 @@ Másik elsődleges URL-t új sorba írva adhatsz hozzá.</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-223"/>
+        <location line="-236"/>
         <source>Allow encryption</source>
         <translation>Titkosítás engedélyezése</translation>
     </message>
@@ -1916,12 +1921,12 @@ Másik elsődleges URL-t új sorba írva adhatsz hozzá.</translation>
         <translation>Válaszd ki a cél könyvtárat</translation>
     </message>
     <message>
-        <location line="+65"/>
+        <location line="+75"/>
         <source>Adding</source>
         <translation>Hozzáadá</translation>
     </message>
     <message>
-        <location line="-29"/>
+        <location line="-38"/>
         <source>Stop seeding at &amp;ratio:</source>
         <translation>Seedelés befejezése ha elérte az &amp;arányt:</translation>
     </message>
@@ -1931,12 +1936,17 @@ Másik elsődleges URL-t új sorba írva adhatsz hozzá.</translation>
         <translation type="unfinished">Seedelés befejezése ha i&amp;naktív a torrent:</translation>
     </message>
     <message>
-        <location line="+44"/>
+        <location line="+53"/>
         <source>Save to &amp;Location:</source>
         <translation>Mentés &amp;ide:</translation>
     </message>
     <message>
-        <location line="+18"/>
+        <location line="+17"/>
+        <source>Download is i&amp;nactive if data sharing stopped:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+4"/>
         <source>Incomplete</source>
         <translation>Félkész</translation>
     </message>

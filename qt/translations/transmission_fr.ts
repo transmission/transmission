@@ -176,8 +176,9 @@
         <translation>Le pair est une connexion entrante</translation>
     </message>
     <message numerus="yes">
-        <location line="+114"/>
+        <location line="+115"/>
         <source> minute(s)</source>
+        <extracomment>Spin box suffix, &quot;Stop seeding if idle for: [ 5 minutes ]&quot;</extracomment>
         <translation>
             <numerusform> minute</numerusform>
             <numerusform> minutes</numerusform>
@@ -196,7 +197,7 @@
         <translation>Le traqueur existe déjà.</translation>
     </message>
     <message>
-        <location line="-611"/>
+        <location line="-612"/>
         <source>%1 (100%)</source>
         <translation>%1 (100%)</translation>
     </message>
@@ -231,7 +232,7 @@
         <translation>Pair connecté via uTP</translation>
     </message>
     <message>
-        <location line="+149"/>
+        <location line="+150"/>
         <source>Add URL </source>
         <translation>Ajouter une URL </translation>
     </message>
@@ -1631,12 +1632,12 @@ Pour ajouter une autre URL primaire, placez-la après une ligne vide.</translati
     </message>
     <message>
         <location line="+5"/>
-        <location line="+422"/>
+        <location line="+435"/>
         <source>Status unknown</source>
         <translation type="unfinished">État inconnu</translation>
     </message>
     <message>
-        <location line="-414"/>
+        <location line="-427"/>
         <source>&amp;Port for incoming connections:</source>
         <translation>&amp;Port pour les connexions entrantes:</translation>
     </message>
@@ -1671,15 +1672,25 @@ Pour ajouter une autre URL primaire, placez-la après une ligne vide.</translati
         <translation>Chiffrement</translation>
     </message>
     <message numerus="yes">
-        <location line="+96"/>
+        <location line="+97"/>
         <source> minute(s)</source>
+        <extracomment>Spin box suffix, &quot;Stop seeding if idle for: [ 5 minutes ]&quot;</extracomment>
         <translation>
             <numerusform> minute</numerusform>
             <numerusform> minutes</numerusform>
         </translation>
     </message>
+    <message numerus="yes">
+        <location line="+39"/>
+        <source> minute(s) ago</source>
+        <extracomment>Spin box suffix, &quot;Download is inactive if data sharing stopped: [ 5 minutes ago ]&quot;</extracomment>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
     <message>
-        <location line="+50"/>
+        <location line="+20"/>
         <source>Automatically add .torrent files &amp;from:</source>
         <translation>Ajouter automatiquement les fichiers .torrent dans:</translation>
     </message>
@@ -1709,12 +1720,7 @@ Pour ajouter une autre URL primaire, placez-la après une ligne vide.</translati
         <translation>Nombre maximal de téléchargements actifs:</translation>
     </message>
     <message>
-        <location line="+1"/>
-        <source>Downloads sharing data in the last &amp;N minutes are active:</source>
-        <translation>Les téléchargements ayant partagé dans les N dernières minutes sont actifs:</translation>
-    </message>
-    <message>
-        <location line="+42"/>
+        <location line="+46"/>
         <source>Downloading</source>
         <translation>Téléchargement</translation>
     </message>
@@ -1737,17 +1743,17 @@ Pour ajouter une autre URL primaire, placez-la après une ligne vide.</translati
         </translation>
     </message>
     <message>
-        <location line="-365"/>
+        <location line="-378"/>
         <source>Pick a &amp;random port every time Transmission is started</source>
         <translation>Choisir un port au hasa&amp;rd à chaque lancement de Transmission</translation>
     </message>
     <message>
-        <location line="+191"/>
+        <location line="+192"/>
         <source>Limits</source>
         <translation>Limites</translation>
     </message>
     <message>
-        <location line="-186"/>
+        <location line="-187"/>
         <source>Maximum peers per &amp;torrent:</source>
         <translation>Nombre maximum de pairs par torrent:</translation>
     </message>
@@ -1795,23 +1801,23 @@ Pour ajouter une autre URL primaire, placez-la après une ligne vide.</translati
         <translation>Exiger le chiffrement</translation>
     </message>
     <message>
-        <location line="+218"/>
+        <location line="+231"/>
         <source>Privacy</source>
         <translation>Confidentialité</translation>
     </message>
     <message>
-        <location line="-397"/>
+        <location line="-410"/>
         <source>&amp;to</source>
         <translation>&amp;à</translation>
     </message>
     <message>
         <location line="+39"/>
-        <location line="+360"/>
+        <location line="+373"/>
         <source>Desktop</source>
         <translation>Bureau</translation>
     </message>
     <message>
-        <location line="-358"/>
+        <location line="-371"/>
         <source>Show Transmission icon in the &amp;notification area</source>
         <translation>Afficher l&apos;icône de Transmission dans la zone de &amp;notification</translation>
     </message>
@@ -1936,12 +1942,17 @@ Pour ajouter une autre URL primaire, placez-la après une ligne vide.</translati
         <translation>Selectionner la destination</translation>
     </message>
     <message>
-        <location line="+65"/>
+        <location line="+75"/>
         <source>Adding</source>
         <translation>Ajout</translation>
     </message>
     <message>
-        <location line="+40"/>
+        <location line="+37"/>
+        <source>Download is i&amp;nactive if data sharing stopped:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+6"/>
         <source>Append &quot;.&amp;part&quot; to incomplete files&apos; names</source>
         <translation>&amp;Ajouter &quot;.part&quot; aux fichiers incomplets</translation>
     </message>
@@ -1951,17 +1962,17 @@ Pour ajouter une autre URL primaire, placez-la après une ligne vide.</translati
         <translation>Garder les fichiers &amp;incomplets dans:</translation>
     </message>
     <message>
-        <location line="-22"/>
+        <location line="-25"/>
         <source>Save to &amp;Location:</source>
         <translation>Sauvegarder dans l&apos;emp&amp;lacement:</translation>
     </message>
     <message>
-        <location line="+30"/>
+        <location line="+33"/>
         <source>Call scrip&amp;t when torrent is completed:</source>
         <translation>Appeler ce scrip&amp;t quand un torrent est terminé:</translation>
     </message>
     <message>
-        <location line="-79"/>
+        <location line="-91"/>
         <source>Stop seeding at &amp;ratio:</source>
         <translation>Partager jusqu’à un &amp;ratio de:</translation>
     </message>
@@ -1971,7 +1982,7 @@ Pour ajouter une autre URL primaire, placez-la après une ligne vide.</translati
         <translation type="unfinished">Arrêter de partager si i&amp;nactif depuis:</translation>
     </message>
     <message>
-        <location line="+62"/>
+        <location line="+74"/>
         <source>Incomplete</source>
         <translation>Incomplet</translation>
     </message>

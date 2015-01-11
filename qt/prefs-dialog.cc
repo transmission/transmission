@@ -533,6 +533,7 @@ PrefsDialog::onLocationSelected (const QString& path, int key)
 void
 PrefsDialog::onIdleLimitChanged ()
 {
+  //: Spin box suffix, "Stop seeding if idle for: [ 5 minutes ]"
   const QString unitsSuffix = tr (" minute(s)", 0, myIdleLimitSpin->value ());
   if (myIdleLimitSpin->suffix () != unitsSuffix)
     myIdleLimitSpin->setSuffix (unitsSuffix);
@@ -566,6 +567,15 @@ PrefsDialog::createSeedingTab ()
 
   hig->finish ();
   return hig;
+}
+
+void
+PrefsDialog::onQueueStalledMinutesChanged ()
+{
+  //: Spin box suffix, "Download is inactive if data sharing stopped: [ 5 minutes ago ]"
+  const QString unitsSuffix = tr (" minute(s) ago", 0, myQueueStalledMinutesSpin->value ());
+  if (myQueueStalledMinutesSpin->suffix () != unitsSuffix)
+    myQueueStalledMinutesSpin->setSuffix (unitsSuffix);
 }
 
 QWidget *
@@ -616,7 +626,10 @@ PrefsDialog::createDownloadingTab ()
   hig->addSectionTitle (tr ("Download Queue"));
 
     hig->addRow (tr ("Ma&ximum active downloads:"), spinBoxNew (Prefs::DOWNLOAD_QUEUE_SIZE, 1, INT_MAX, 1));
-    hig->addRow (tr ("Downloads sharing data in the last &N minutes are active:"), spinBoxNew (Prefs::QUEUE_STALLED_MINUTES, 1, INT_MAX, 10));
+    QSpinBox * sb = myQueueStalledMinutesSpin = spinBoxNew (Prefs::QUEUE_STALLED_MINUTES, 1, INT_MAX, 10);
+    connect (sb, SIGNAL (valueChanged (int)), this, SLOT (onQueueStalledMinutesChanged ()));
+    hig->addRow (tr ("Download is i&nactive if data sharing stopped:"), sb);
+    onQueueStalledMinutesChanged ();
 
   hig->addSectionDivider ();
   hig->addSectionTitle (tr ("Incomplete"));

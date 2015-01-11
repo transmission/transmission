@@ -176,8 +176,9 @@
         <translation>Hartzailea barrurako elkarketa bat da</translation>
     </message>
     <message numerus="yes">
-        <location line="+114"/>
+        <location line="+115"/>
         <source> minute(s)</source>
+        <extracomment>Spin box suffix, &quot;Stop seeding if idle for: [ 5 minutes ]&quot;</extracomment>
         <translation>
             <numerusform> minutu</numerusform>
             <numerusform> minutu</numerusform>
@@ -196,7 +197,7 @@
         <translation>Aztarnaria jadanik badago.</translation>
     </message>
     <message>
-        <location line="-611"/>
+        <location line="-612"/>
         <source>%1 (100%)</source>
         <translation>%1 (100%)</translation>
     </message>
@@ -231,7 +232,7 @@
         <translation>Hartzailea uTP bidez elkarketaturik dago</translation>
     </message>
     <message>
-        <location line="+149"/>
+        <location line="+150"/>
         <source>Add URL </source>
         <translation>Gehitu URL-a </translation>
     </message>
@@ -1636,12 +1637,12 @@ Beste lehen URL bat gehitzeko, gehitu hura lerro huts baten ondoren.</translatio
     </message>
     <message>
         <location line="+5"/>
-        <location line="+422"/>
+        <location line="+435"/>
         <source>Status unknown</source>
         <translation>Egoera ezezaguna</translation>
     </message>
     <message>
-        <location line="-414"/>
+        <location line="-427"/>
         <source>&amp;Port for incoming connections:</source>
         <translation>&amp;Barrurako elkarketentzako ataka:</translation>
     </message>
@@ -1676,15 +1677,25 @@ Beste lehen URL bat gehitzeko, gehitu hura lerro huts baten ondoren.</translatio
         <translation>Enkriptaketa</translation>
     </message>
     <message numerus="yes">
-        <location line="+96"/>
+        <location line="+97"/>
         <source> minute(s)</source>
+        <extracomment>Spin box suffix, &quot;Stop seeding if idle for: [ 5 minutes ]&quot;</extracomment>
         <translation>
             <numerusform> minutu</numerusform>
             <numerusform> minutu</numerusform>
         </translation>
     </message>
+    <message numerus="yes">
+        <location line="+39"/>
+        <source> minute(s) ago</source>
+        <extracomment>Spin box suffix, &quot;Download is inactive if data sharing stopped: [ 5 minutes ago ]&quot;</extracomment>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
     <message>
-        <location line="+50"/>
+        <location line="+20"/>
         <source>Automatically add .torrent files &amp;from:</source>
         <translation>&amp;Berezgaitasunez gehitu .torrent agiriak hemendik:</translation>
     </message>
@@ -1714,12 +1725,7 @@ Beste lehen URL bat gehitzeko, gehitu hura lerro huts baten ondoren.</translatio
         <translation>Gehienezko &amp;jeisketa eraginda:</translation>
     </message>
     <message>
-        <location line="+1"/>
-        <source>Downloads sharing data in the last &amp;N minutes are active:</source>
-        <translation>Azken &amp;Z minututan datuak elkarbanatu dituzten jeisketak ekinean daude:</translation>
-    </message>
-    <message>
-        <location line="+42"/>
+        <location line="+46"/>
         <source>Downloading</source>
         <translation>Jeisten</translation>
     </message>
@@ -1742,17 +1748,17 @@ Beste lehen URL bat gehitzeko, gehitu hura lerro huts baten ondoren.</translatio
         </translation>
     </message>
     <message>
-        <location line="-365"/>
+        <location line="-378"/>
         <source>Pick a &amp;random port every time Transmission is started</source>
         <translation>&amp;Hautatu zorizko ataka bat Transmission abiarazten den bakoitzean</translation>
     </message>
     <message>
-        <location line="+191"/>
+        <location line="+192"/>
         <source>Limits</source>
         <translation>Mugak</translation>
     </message>
     <message>
-        <location line="-186"/>
+        <location line="-187"/>
         <source>Maximum peers per &amp;torrent:</source>
         <translation>Gehinezko hartzaile &amp;torrenteko:</translation>
     </message>
@@ -1800,23 +1806,23 @@ Beste lehen URL bat gehitzeko, gehitu hura lerro huts baten ondoren.</translatio
         <translation>Beharrezkoa enkriptaketa</translation>
     </message>
     <message>
-        <location line="+218"/>
+        <location line="+231"/>
         <source>Privacy</source>
         <translation>Pribatutasuna</translation>
     </message>
     <message>
-        <location line="-397"/>
+        <location line="-410"/>
         <source>&amp;to</source>
         <translation>&amp;hona</translation>
     </message>
     <message>
         <location line="+39"/>
-        <location line="+360"/>
+        <location line="+373"/>
         <source>Desktop</source>
         <translation>Mahaigaina</translation>
     </message>
     <message>
-        <location line="-358"/>
+        <location line="-371"/>
         <source>Show Transmission icon in the &amp;notification area</source>
         <translation>Erakutsi &amp;Transmission ikurra jakinarazpen eremuan</translation>
     </message>
@@ -1936,12 +1942,17 @@ Beste lehen URL bat gehitzeko, gehitu hura lerro huts baten ondoren.</translatio
         <translation>Hautatu Helmuga</translation>
     </message>
     <message>
-        <location line="+65"/>
+        <location line="+75"/>
         <source>Adding</source>
         <translation>Gehiketa</translation>
     </message>
     <message>
-        <location line="+40"/>
+        <location line="+37"/>
+        <source>Download is i&amp;nactive if data sharing stopped:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+6"/>
         <source>Append &quot;.&amp;part&quot; to incomplete files&apos; names</source>
         <translation>&amp;Erantsi &quot;.part&quot; osatugabeko agiri izenei</translation>
     </message>
@@ -1951,17 +1962,17 @@ Beste lehen URL bat gehitzeko, gehitu hura lerro huts baten ondoren.</translatio
         <translation>&amp;Gorde osatugabeko agiriak hemen:</translation>
     </message>
     <message>
-        <location line="-22"/>
+        <location line="-25"/>
         <source>Save to &amp;Location:</source>
         <translation>Gorde &amp;Kokaleku honetan:</translation>
     </message>
     <message>
-        <location line="+30"/>
+        <location line="+33"/>
         <source>Call scrip&amp;t when torrent is completed:</source>
         <translation>&amp;Deitu eskripta torrenta osatutakoan:</translation>
     </message>
     <message>
-        <location line="-79"/>
+        <location line="-91"/>
         <source>Stop seeding at &amp;ratio:</source>
         <translation>&amp;Gelditu emaritza maila honetan:</translation>
     </message>
@@ -1971,7 +1982,7 @@ Beste lehen URL bat gehitzeko, gehitu hura lerro huts baten ondoren.</translatio
         <translation type="unfinished">Gelditu emarit&amp;za jardungabe badago:</translation>
     </message>
     <message>
-        <location line="+62"/>
+        <location line="+74"/>
         <source>Incomplete</source>
         <translation>Osatugabe</translation>
     </message>
