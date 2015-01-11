@@ -590,7 +590,7 @@
 <context>
     <name>FilterBar</name>
     <message>
-        <location filename="../filterbar.cc" line="+297"/>
+        <location filename="../filterbar.cc" line="+368"/>
         <location line="+160"/>
         <source>All</source>
         <translation>Mind</translation>
@@ -631,7 +631,7 @@
         <translation>Hiba</translation>
     </message>
     <message>
-        <location line="+339"/>
+        <location line="+335"/>
         <source>Show:</source>
         <translation>Mutat:</translation>
     </message>
@@ -641,6 +641,14 @@
         <translation type="unfinished">
             <numerusform></numerusform>
         </translation>
+    </message>
+</context>
+<context>
+    <name>FilterBarLineEdit</name>
+    <message>
+        <location line="-410"/>
+        <source>Search...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -799,7 +807,7 @@
         <translation>Transmission</translation>
     </message>
     <message>
-        <location line="+151"/>
+        <location line="+154"/>
         <source>&amp;Torrent</source>
         <translation>&amp;Torrent</translation>
     </message>

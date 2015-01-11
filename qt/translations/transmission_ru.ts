@@ -597,7 +597,7 @@
 <context>
     <name>FilterBar</name>
     <message>
-        <location filename="../filterbar.cc" line="+297"/>
+        <location filename="../filterbar.cc" line="+368"/>
         <location line="+160"/>
         <source>All</source>
         <translation>Все</translation>
@@ -628,7 +628,7 @@
         <translation>Завершенные</translation>
     </message>
     <message numerus="yes">
-        <location line="+349"/>
+        <location line="+345"/>
         <source>Show %Ln of:</source>
         <translation type="unfinished">
             <numerusform></numerusform>
@@ -637,7 +637,7 @@
         </translation>
     </message>
     <message>
-        <location line="-345"/>
+        <location line="-341"/>
         <source>Verifying</source>
         <translation>Проверки</translation>
     </message>
@@ -647,9 +647,17 @@
         <translation>Ошибки</translation>
     </message>
     <message>
-        <location line="+339"/>
+        <location line="+335"/>
         <source>Show:</source>
         <translation>  Показать:</translation>
+    </message>
+</context>
+<context>
+    <name>FilterBarLineEdit</name>
+    <message>
+        <location line="-408"/>
+        <source>Search...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -816,7 +824,7 @@
         <translation>Transmission</translation>
     </message>
     <message>
-        <location line="+151"/>
+        <location line="+154"/>
         <source>&amp;Torrent</source>
         <translation>&amp;Торрент</translation>
     </message>

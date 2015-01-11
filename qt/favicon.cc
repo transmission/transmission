@@ -104,8 +104,8 @@ Favicons::findFromHost (const QString& host)
 {
   ensureCacheDirHasBeenScanned ();
 
-  const QPixmap pixmap = myPixmaps[ host ];
-  return pixmap.size()==rightSize ? pixmap : pixmap.scaled(rightSize);
+  const QPixmap pixmap = myPixmaps[host];
+  return pixmap.isNull () || pixmap.size () == rightSize ? pixmap : pixmap.scaled (rightSize);
 }
 
 void
@@ -118,9 +118,7 @@ Favicons::add (const QUrl& url)
   if (!myPixmaps.contains (host))
     {
       // add a placholder s.t. we only ping the server once per session
-      QPixmap tmp (rightSize);
-      tmp.fill (Qt::transparent);
-      myPixmaps.insert (host, tmp);
+      myPixmaps.insert (host, QPixmap ());
 
       // try to download the favicon
       const QString path = "http://" + host + "/favicon.";

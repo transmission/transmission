@@ -596,7 +596,7 @@
 <context>
     <name>FilterBar</name>
     <message>
-        <location filename="../filterbar.cc" line="+304"/>
+        <location filename="../filterbar.cc" line="+375"/>
         <source>Active</source>
         <translation>aktyvius</translation>
     </message>
@@ -617,7 +617,7 @@
         <translation>klaidas</translation>
     </message>
     <message numerus="yes">
-        <location line="+341"/>
+        <location line="+337"/>
         <source>Show %Ln of:</source>
         <translation type="unfinished">
             <numerusform></numerusform>
@@ -626,7 +626,7 @@
         </translation>
     </message>
     <message>
-        <location line="-349"/>
+        <location line="-345"/>
         <source>Finished</source>
         <translation>užbaigtus</translation>
     </message>
@@ -641,14 +641,22 @@
         <translation>skleidžiamus</translation>
     </message>
     <message>
-        <location line="+355"/>
+        <location line="+351"/>
         <source>Show:</source>
         <translation>Rodyti:</translation>
     </message>
     <message>
-        <location line="-343"/>
+        <location line="-339"/>
         <source>Verifying</source>
         <translation>tikrinamus</translation>
+    </message>
+</context>
+<context>
+    <name>FilterBarLineEdit</name>
+    <message>
+        <location line="-69"/>
+        <source>Search...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -810,7 +818,7 @@
 <context>
     <name>MainWindow</name>
     <message>
-        <location filename="../mainwin.ui" line="+595"/>
+        <location filename="../mainwin.ui" line="+598"/>
         <source>&amp;About</source>
         <translation>&amp;Apie</translation>
     </message>
@@ -1207,12 +1215,12 @@
         <translation>Visas siuntimas</translation>
     </message>
     <message>
-        <location line="-640"/>
+        <location line="-643"/>
         <source>Transmission</source>
         <translation>Transmission</translation>
     </message>
     <message>
-        <location line="+664"/>
+        <location line="+667"/>
         <source>Tray &amp;Icon</source>
         <translation>&amp;Piktograma pranešimų srityje</translation>
     </message>

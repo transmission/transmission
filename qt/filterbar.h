@@ -54,8 +54,14 @@ class FilterBarComboBox: public QComboBox
     FilterBarComboBox (QWidget * parent = 0);
     int currentCount () const;
 
+    virtual QSize minimumSizeHint () const;
+    virtual QSize sizeHint () const;
+
   protected:
     virtual void paintEvent (QPaintEvent * e);
+
+  private:
+    QSize calculateSize (const QSize& textSize, const QSize& countSize) const;
 };
 
 class FilterBarLineEdit: public QLineEdit
