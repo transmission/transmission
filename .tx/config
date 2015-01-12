@@ -1,0 +1,7 @@
+[main]
+host = https://www.transifex.com
+
+[transmissionbt.transmission-qt]
+file_filter = qt/translations/transmission_<lang>.ts
+source_lang = en
+type = QT
