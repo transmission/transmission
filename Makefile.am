@@ -36,6 +36,25 @@ EXTRA_DIST = \
   update-version-h.sh \
   Transmission.xcodeproj/project.pbxproj
 
+EXTRA_DIST += \
+  CMakeLists.txt \
+  cmake \
+  cli/CMakeLists.txt \
+  daemon/CMakeLists.txt \
+  gtk/CMakeLists.txt \
+  libtransmission/CMakeLists.txt \
+  libtransmission/version.h.in \
+  po/CMakeLists.txt \
+  qt/CMakeLists.txt \
+  third-party/b64-01-newline.patch \
+  third-party/b64.cmake \
+  third-party/dht.cmake \
+  third-party/event2.cmake \
+  third-party/natpmp.cmake \
+  third-party/utp.cmake \
+  third-party/utp_config.h \
+  utils/CMakeLists.txt
+
 dist-hook:
 	rm -rf `find $(distdir)/qt -name .svn`
 
