@@ -1009,7 +1009,7 @@ Details::onIdleModeChanged (int index)
 void
 Details::onIdleLimitChanged ()
 {
-  //: Spin box suffix, "Stop seeding if idle for: [ 5 minutes ]"
+  //: Spin box suffix, "Stop seeding if idle for: [ 5 minutes ]" (includes leading space after the number, if needed)
   const QString unitsSuffix = tr (" minute(s)", 0, ui.idleSpin->value ());
   if (ui.idleSpin->suffix () != unitsSuffix)
     ui.idleSpin->setSuffix (unitsSuffix);

@@ -533,7 +533,7 @@ PrefsDialog::onLocationSelected (const QString& path, int key)
 void
 PrefsDialog::onIdleLimitChanged ()
 {
-  //: Spin box suffix, "Stop seeding if idle for: [ 5 minutes ]"
+  //: Spin box suffix, "Stop seeding if idle for: [ 5 minutes ]" (includes leading space after the number, if needed)
   const QString unitsSuffix = tr (" minute(s)", 0, myIdleLimitSpin->value ());
   if (myIdleLimitSpin->suffix () != unitsSuffix)
     myIdleLimitSpin->setSuffix (unitsSuffix);
@@ -572,7 +572,7 @@ PrefsDialog::createSeedingTab ()
 void
 PrefsDialog::onQueueStalledMinutesChanged ()
 {
-  //: Spin box suffix, "Download is inactive if data sharing stopped: [ 5 minutes ago ]"
+  //: Spin box suffix, "Download is inactive if data sharing stopped: [ 5 minutes ago ]" (includes leading space after the number, if needed)
   const QString unitsSuffix = tr (" minute(s) ago", 0, myQueueStalledMinutesSpin->value ());
   if (myQueueStalledMinutesSpin->suffix () != unitsSuffix)
     myQueueStalledMinutesSpin->setSuffix (unitsSuffix);
