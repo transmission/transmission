@@ -151,7 +151,7 @@ tr_logGetTimeStr (char * buf, int buflen)
 
   seconds = tv.tv_sec;
   tr_localtime_r (&seconds, &now_tm);
-  strftime (tmp, sizeof (tmp), "%Y-%m-%d %H:%M:%S.%%03d %Z", &now_tm);
+  strftime (tmp, sizeof (tmp), "%Y-%m-%d %H:%M:%S.%%03d", &now_tm);
   milliseconds = tv.tv_usec / 1000;
   tr_snprintf (buf, buflen, tmp, milliseconds);
 
