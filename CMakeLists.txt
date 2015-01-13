@@ -103,7 +103,7 @@ set(GLIB_MINIMUM            2.32.0)
 set(GIO_MINIMUM             2.26.0)
 set(LIBAPPINDICATOR_MINIMUM 0.4.90)
 
-tr_github_upstream(EVENT2    libevent/libevent  be1aeff21a b9135e43c925b1f86ec43ea71a8c367a)
+tr_github_upstream(EVENT2    libevent/libevent  c51b159cff 7be95856a39714dfd2218cb56415c990)
 tr_github_upstream(NATPMP    miniupnp/libnatpmp 31ebda6226 7e8deb00a98220622a6f2aeb98b8921b)
 tr_github_upstream(MINIUPNPC miniupnp/miniupnp  c490b42547 f9b7a4715bcd5034abae866e31102888)
 tr_github_upstream(DHT       jech/dht           bf62643a95 0a2a2abe447d8a73f0084c1bc837e566)
