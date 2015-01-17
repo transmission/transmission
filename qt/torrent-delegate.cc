@@ -420,7 +420,7 @@ TorrentDelegate::drawTorrent (QPainter                   * painter,
   progressBarState |= QStyle::State_Small;
 
   const QIcon::Mode emblemIm = isItemSelected ? QIcon::Selected : QIcon::Normal;
-  const QIcon emblemIcon = tor.hasError () ? QIcon::fromTheme ("emblem-important") : QIcon ();
+  const QIcon emblemIcon = tor.hasError () ? QIcon::fromTheme ("emblem-important", style->standardIcon (QStyle::SP_MessageBoxWarning)) : QIcon ();
 
   // layout
   const QSize m (margin (*style));
