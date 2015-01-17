@@ -90,22 +90,25 @@ TorrentDelegateMin::drawTorrent (QPainter                   * painter,
   const QString statusStr (shortStatusString (tor));
   const QSize statusSize (statusFM.size (0, statusStr));
 
+  const bool isItemSelected ((option.state & QStyle::State_Selected) != 0);
+  const bool isItemEnabled ((option.state & QStyle::State_Enabled) != 0);
+  const bool isItemActive ((option.state & QStyle::State_Active) != 0);
+
   painter->save();
 
-  if (option.state & QStyle::State_Selected)
+  if (isItemSelected)
     {
-      QPalette::ColorGroup cg = option.state & QStyle::State_Enabled
-                              ? QPalette::Normal : QPalette::Disabled;
-      if (cg == QPalette::Normal && !(option.state & QStyle::State_Active))
+      QPalette::ColorGroup cg = isItemEnabled ? QPalette::Normal : QPalette::Disabled;
+      if (cg == QPalette::Normal && !isItemActive)
         cg = QPalette::Inactive;
 
       painter->fillRect(option.rect, option.palette.brush(cg, QPalette::Highlight));
     }
 
   QIcon::Mode im;
-  if (isPaused || !(option.state & QStyle::State_Enabled))
+  if (isPaused || !isItemEnabled)
     im = QIcon::Disabled;
-  else if (option.state & QStyle::State_Selected)
+  else if (isItemSelected)
     im = QIcon::Selected;
   else
     im = QIcon::Normal;
@@ -117,13 +120,13 @@ TorrentDelegateMin::drawTorrent (QPainter                   * painter,
     qs = QIcon::On;
 
   QPalette::ColorGroup cg = QPalette::Normal;
-  if (isPaused || !(option.state & QStyle::State_Enabled))
+  if (isPaused || !isItemEnabled)
     cg = QPalette::Disabled;
-  if (cg == QPalette::Normal && !(option.state & QStyle::State_Active))
+  if (cg == QPalette::Normal && !isItemActive)
     cg = QPalette::Inactive;
 
   QPalette::ColorRole cr;
-  if (option.state & QStyle::State_Selected)
+  if (isItemSelected)
     cr = QPalette::HighlightedText;
   else
     cr = QPalette::Text;
@@ -133,6 +136,9 @@ TorrentDelegateMin::drawTorrent (QPainter                   * painter,
     progressBarState = QStyle::State_None;
   progressBarState |= QStyle::State_Small;
 
+  const QIcon::Mode emblemIm = isItemSelected ? QIcon::Selected : QIcon::Normal;
+  const QIcon emblemIcon = tor.hasError () ? QIcon::fromTheme ("emblem-important") : QIcon ();
+
   // layout
   const QSize m (margin (*style));
   QRect fillArea (option.rect);
@@ -141,6 +147,9 @@ TorrentDelegateMin::drawTorrent (QPainter                   * painter,
                         fillArea.y() +  (fillArea.height() - iconSize) / 2,
                         iconSize,
                         iconSize);
+  const QRect emblemRect (style->alignedRect (option.direction, Qt::AlignRight | Qt::AlignBottom,
+                                              emblemIcon.actualSize (QSize (iconSize / 2, iconSize / 2), emblemIm, qs),
+                                              iconArea));
   const QRect barArea (fillArea.x() + fillArea.width() - BAR_WIDTH,
                        fillArea.y() +  (fillArea.height() - BAR_HEIGHT) / 2,
                        BAR_WIDTH,
@@ -155,11 +164,13 @@ TorrentDelegateMin::drawTorrent (QPainter                   * painter,
                         fillArea.height());
 
   // render
-  if (tor.hasError())
+  if (tor.hasError() && !isItemSelected)
     painter->setPen (QColor ("red"));
   else
     painter->setPen (option.palette.color (cg, cr));
   tor.getMimeTypeIcon().paint (painter, iconArea, Qt::AlignCenter, im, qs);
+  if (!emblemIcon.isNull ())
+    emblemIcon.paint (painter, emblemRect, Qt::AlignCenter, emblemIm, qs);
   painter->setFont (nameFont);
   painter->drawText (nameArea, 0, nameFM.elidedText (nameStr, Qt::ElideRight, nameArea.width()));
   painter->setFont (statusFont);
