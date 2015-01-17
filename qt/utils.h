@@ -10,9 +10,10 @@
 #ifndef QTR_UTILS
 #define QTR_UTILS
 
-#include <QString>
-#include <QObject>
 #include <QIcon>
+#include <QObject>
+#include <QRect>
+#include <QString>
 
 #include <cctype> // isxdigit()
 
@@ -33,6 +34,13 @@ class Utils: public QObject
     static bool isValidUtf8  (const char *s);
 
     static QString removeTrailingDirSeparator (const QString& path);
+
+    static void narrowRect (QRect& rect, int dx1, int dx2, Qt::LayoutDirection direction)
+    {
+      if (direction == Qt::RightToLeft)
+        qSwap (dx1, dx2);
+      rect.adjust (dx1, 0, -dx2, 0);
+    }
 
     // meh
     static void toStderr (const QString& qstr);

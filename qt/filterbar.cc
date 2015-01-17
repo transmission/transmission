@@ -53,15 +53,6 @@ namespace
     fadedColor.setAlpha (128);
     return fadedColor;
   }
-
-  void
-  narrowRect (QRect& rect, int dx1, int dx2, Qt::LayoutDirection direction)
-  {
-    if (direction == Qt::LeftToRight)
-      rect.adjust (dx1, 0, -dx2, 0);
-    else
-      rect.adjust (dx2, 0, -dx1, 0);
-  }
 }
 
 FilterBarComboBoxDelegate::FilterBarComboBoxDelegate (QObject * parent, QComboBox * combo):
@@ -117,13 +108,13 @@ FilterBarComboBoxDelegate::paint (QPainter                    * painter,
       decorationRect = QStyle::alignedRect (option.direction,
                                             Qt::AlignLeft|Qt::AlignVCenter,
                                             decorationRect.size (), boundingBox);
-      narrowRect (boundingBox, decorationRect.width () + hmargin, 0, option.direction);
+      Utils::narrowRect (boundingBox, decorationRect.width () + hmargin, 0, option.direction);
 
       QRect countRect  = rect (option, index, TorrentCountStringRole);
       countRect = QStyle::alignedRect (option.direction,
                                        Qt::AlignRight|Qt::AlignVCenter,
                                        countRect.size (), boundingBox);
-      narrowRect (boundingBox, 0, countRect.width () + hmargin, option.direction);
+      Utils::narrowRect (boundingBox, 0, countRect.width () + hmargin, option.direction);
       const QRect displayRect = boundingBox;
 
       drawBackground (painter, option, index);
@@ -263,7 +254,7 @@ FilterBarComboBox::paintEvent (QPaintEvent * e)
           const QRect iconRect = QStyle::alignedRect(opt.direction, Qt::AlignLeft | Qt::AlignVCenter,
                                                      opt.iconSize, rect);
           painter.drawPixmap (iconRect.topLeft (), pixmap);
-          narrowRect (rect, iconRect.width () + hmargin, 0, opt.direction);
+          Utils::narrowRect (rect, iconRect.width () + hmargin, 0, opt.direction);
         }
 
       // draw the count
@@ -275,7 +266,7 @@ FilterBarComboBox::paintEvent (QPaintEvent * e)
           const QRect textRect = QStyle::alignedRect(opt.direction, Qt::AlignRight | Qt::AlignVCenter,
                                                      QSize (opt.fontMetrics.width (text), rect.height ()), rect);
           painter.drawText (textRect, Qt::AlignRight | Qt::AlignVCenter, text);
-          narrowRect (rect, 0, textRect.width () + hmargin, opt.direction);
+          Utils::narrowRect (rect, 0, textRect.width () + hmargin, opt.direction);
           painter.setPen (pen);
         }
 

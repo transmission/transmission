@@ -24,6 +24,7 @@
 #include "torrent.h"
 #include "torrent-delegate.h"
 #include "torrent-model.h"
+#include "utils.h"
 
 enum
 {
@@ -37,6 +38,89 @@ QColor TorrentDelegate::silverBrush;
 QColor TorrentDelegate::greenBack;
 QColor TorrentDelegate::blueBack;
 QColor TorrentDelegate::silverBack;
+
+namespace
+{
+  class ItemLayout
+  {
+    private:
+      QString myNameText;
+      QString myStatusText;
+      QString myProgressText;
+
+    public:
+      QFont nameFont;
+      QFont statusFont;
+      QFont progressFont;
+
+      QRect iconRect;
+      QRect emblemRect;
+      QRect nameRect;
+      QRect statusRect;
+      QRect barRect;
+      QRect progressRect;
+
+    public:
+      ItemLayout(const QString& nameText, const QString& statusText, const QString& progressText,
+                 const QIcon& emblemIcon, const QFont& baseFont, Qt::LayoutDirection direction,
+                 const QPoint& topLeft, int width);
+
+      QSize size () const
+      {
+        return (iconRect | nameRect | statusRect | barRect | progressRect).size ();
+      }
+
+      QString nameText () const { return elidedText (nameFont, myNameText, nameRect.width ()); }
+      QString statusText () const { return elidedText (statusFont, myStatusText, statusRect.width ()); }
+      QString progressText () const  { return elidedText (progressFont, myProgressText, progressRect.width ()); }
+
+    private:
+      QString elidedText (const QFont& font, const QString& text, int width) const
+      {
+        return QFontMetrics (font).elidedText (text, Qt::ElideRight, width);
+      }
+  };
+
+  ItemLayout::ItemLayout(const QString& nameText, const QString& statusText, const QString& progressText,
+                         const QIcon& emblemIcon, const QFont& baseFont, Qt::LayoutDirection direction,
+                         const QPoint& topLeft, int width):
+    myNameText (nameText),
+    myStatusText (statusText),
+    myProgressText (progressText),
+    nameFont (baseFont),
+    statusFont (baseFont),
+    progressFont (baseFont)
+  {
+    const QStyle * style (qApp->style ());
+    const int iconSize (style->pixelMetric (QStyle::PM_LargeIconSize));
+
+    nameFont.setWeight (QFont::Bold);
+    const QFontMetrics nameFM (nameFont);
+    const QSize nameSize (nameFM.size (0, myNameText));
+
+    statusFont.setPointSize (static_cast<int> (statusFont.pointSize () * 0.9));
+    const QFontMetrics statusFM (statusFont);
+    const QSize statusSize (statusFM.size (0, myStatusText));
+
+    progressFont.setPointSize (static_cast<int> (progressFont.pointSize () * 0.9));
+    const QFontMetrics progressFM (progressFont);
+    const QSize progressSize (progressFM.size (0, myProgressText));
+
+    QRect baseRect (topLeft, QSize (width, 0));
+    Utils::narrowRect (baseRect, iconSize + GUI_PAD, 0, direction);
+
+    nameRect = baseRect.adjusted(0, 0, 0, nameSize.height ());
+    statusRect = nameRect.adjusted(0, nameRect.height () + 1, 0, statusSize.height () + 1);
+    barRect = statusRect.adjusted(0, statusRect.height () + 1, 0, BAR_HEIGHT + 1);
+    progressRect = barRect.adjusted (0, barRect.height () + 1, 0, progressSize.height () + 1);
+    iconRect = style->alignedRect (direction, Qt::AlignLeft | Qt::AlignVCenter,
+                                   QSize (iconSize, iconSize),
+                                   QRect (topLeft, QSize (width, progressRect.bottom () - nameRect.top ())));
+    emblemRect = style->alignedRect (direction, Qt::AlignRight | Qt::AlignBottom,
+                                     emblemIcon.actualSize (iconRect.size () / 2, QIcon::Normal, QIcon::On),
+                                     iconRect);
+  }
+}
 
 TorrentDelegate::TorrentDelegate (QObject * parent):
   QStyledItemDelegate (parent),
@@ -168,7 +252,7 @@ TorrentDelegate::progressString (const Torrent& tor) const
         str += tr ("Remaining time unknown");
     }
 
-    return str;
+    return str.trimmed ();
 }
 
 QString
@@ -187,7 +271,7 @@ TorrentDelegate::shortTransferString (const Torrent& tor) const
   else if (haveUp)
     str = Formatter::uploadSpeedToString(tor.uploadSpeed());
 
-  return str;
+  return str.trimmed ();
 }
 
 QString
@@ -215,7 +299,7 @@ TorrentDelegate::shortStatusString (const Torrent& tor) const
         break;
     }
 
-  return str;
+  return str.trimmed ();
 }
 
 QString
@@ -271,46 +355,20 @@ TorrentDelegate::statusString (const Torrent& tor) const
         str += tr (" - ") + s;
     }
 
-  return str;
+  return str.trimmed ();
 }
 
 /***
 ****
 ***/
 
-namespace
-{
-  int MAX3 (int a, int b, int c)
-    {
-      const int ab (a > b ? a : b);
-      return ab > c ? ab : c;
-    }
-}
-
 QSize
 TorrentDelegate::sizeHint (const QStyleOptionViewItem& option, const Torrent& tor) const
 {
-  const QStyle* style (qApp->style ());
-  static const int iconSize (style->pixelMetric (QStyle::PM_MessageBoxIconSize));
-
-  QFont nameFont (option.font);
-  nameFont.setWeight (QFont::Bold);
-  const QFontMetrics nameFM (nameFont);
-  const QString nameStr (tor.name ());
-  const int nameWidth = nameFM.width (nameStr);
-  QFont statusFont (option.font);
-  statusFont.setPointSize (static_cast<int> (option.font.pointSize () * 0.9));
-  const QFontMetrics statusFM (statusFont);
-  const QString statusStr (statusString (tor));
-  const int statusWidth = statusFM.width (statusStr);
-  QFont progressFont (statusFont);
-  const QFontMetrics progressFM (progressFont);
-  const QString progressStr (progressString (tor));
-  const int progressWidth = progressFM.width (progressStr);
-  const QSize m (margin (*style));
-  return QSize (m.width()*2 + iconSize + GUI_PAD + MAX3 (nameWidth, statusWidth, progressWidth),
-                //m.height()*3 + nameFM.lineSpacing() + statusFM.lineSpacing()*2 + progressFM.lineSpacing());
-                m.height()*3 + nameFM.lineSpacing() + statusFM.lineSpacing() + BAR_HEIGHT + progressFM.lineSpacing());
+  const QSize m (margin (*qApp->style ()));
+  const ItemLayout layout (tor.name (), progressString (tor), statusString (tor), QIcon (),
+                           option.font, option.direction, QPoint (0, 0), option.rect.width () - m.width () * 2);
+  return layout.size () + m * 2;
 }
 
 QSize
@@ -358,19 +416,7 @@ TorrentDelegate::drawTorrent (QPainter                   * painter,
                               const Torrent              & tor) const
 {
   const QStyle * style (qApp->style ());
-  static const int iconSize (style->pixelMetric (QStyle::PM_LargeIconSize));
-  QFont nameFont (option.font);
-  nameFont.setWeight (QFont::Bold);
-  const QFontMetrics nameFM (nameFont);
-  const QString nameStr (tor.name ());
-  const QSize nameSize (nameFM.size (0, nameStr));
-  QFont statusFont (option.font);
-  statusFont.setPointSize (static_cast<int> (option.font.pointSize () * 0.9));
-  const QFontMetrics statusFM (statusFont);
-  const QString statusStr (progressString (tor));
-  QFont progressFont (statusFont);
-  const QFontMetrics progressFM (progressFont);
-  const QString progressStr (statusString (tor));
+
   const bool isPaused (tor.isPaused ());
 
   const bool isItemSelected ((option.state & QStyle::State_Selected) != 0);
@@ -424,37 +470,25 @@ TorrentDelegate::drawTorrent (QPainter                   * painter,
 
   // layout
   const QSize m (margin (*style));
-  QRect fillArea (option.rect);
-  fillArea.adjust (m.width(), m.height(), -m.width(), -m.height());
-  QRect iconArea (fillArea.x (), fillArea.y () +  (fillArea.height () - iconSize) / 2, iconSize, iconSize);
-  QRect emblemRect (style->alignedRect (option.direction, Qt::AlignRight | Qt::AlignBottom,
-                                        emblemIcon.actualSize (QSize (iconSize / 2, iconSize / 2), emblemIm, qs), iconArea));
-  QRect nameArea (iconArea.x () + iconArea.width () + GUI_PAD, fillArea.y (),
-                  fillArea.width () - GUI_PAD - iconArea.width (), nameSize.height ());
-  QRect statusArea (nameArea);
-  statusArea.moveTop (nameArea.y () + nameFM.lineSpacing ());
-  statusArea.setHeight (nameSize.height ());
-  QRect barArea (statusArea);
-  barArea.setHeight (BAR_HEIGHT);
-  barArea.moveTop (statusArea.y () + statusFM.lineSpacing ());
-  QRect progArea (statusArea);
-  progArea.moveTop (barArea.y () + barArea.height ());
+  const QRect contentRect (option.rect.adjusted (m.width(), m.height(), -m.width(), -m.height()));
+  const ItemLayout layout (tor.name (), progressString (tor), statusString (tor), emblemIcon,
+                           option.font, option.direction, contentRect.topLeft (), contentRect.width ());
 
   // render
   if (tor.hasError () && !isItemSelected)
     painter->setPen (QColor ("red"));
   else
     painter->setPen (option.palette.color (cg, cr));
-  tor.getMimeTypeIcon().paint (painter, iconArea, Qt::AlignCenter, im, qs);
+  tor.getMimeTypeIcon().paint (painter, layout.iconRect, Qt::AlignCenter, im, qs);
   if (!emblemIcon.isNull ())
-    emblemIcon.paint (painter, emblemRect, Qt::AlignCenter, emblemIm, qs);
-  painter->setFont (nameFont);
-  painter->drawText (nameArea, 0, nameFM.elidedText (nameStr, Qt::ElideRight, nameArea.width ()));
-  painter->setFont (statusFont);
-  painter->drawText (statusArea, 0, statusFM.elidedText (statusStr, Qt::ElideRight, statusArea.width ()));
-  painter->setFont (progressFont);
-  painter->drawText (progArea, 0, progressFM.elidedText (progressStr, Qt::ElideRight, progArea.width ()));
-  myProgressBarStyle->rect = barArea;
+    emblemIcon.paint (painter, layout.emblemRect, Qt::AlignCenter, emblemIm, qs);
+  painter->setFont (layout.nameFont);
+  painter->drawText (layout.nameRect, Qt::AlignLeft | Qt::AlignVCenter, layout.nameText ());
+  painter->setFont (layout.statusFont);
+  painter->drawText (layout.statusRect, Qt::AlignLeft | Qt::AlignVCenter, layout.statusText ());
+  painter->setFont (layout.progressFont);
+  painter->drawText (layout.progressRect, Qt::AlignLeft | Qt::AlignVCenter, layout.progressText ());
+  myProgressBarStyle->rect = layout.barRect;
   if (tor.isDownloading())
     {
       myProgressBarStyle->palette.setBrush (QPalette::Highlight, blueBrush);
