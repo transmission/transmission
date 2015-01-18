@@ -257,9 +257,6 @@
    <addaction name="menu_Help"/>
   </widget>
   <widget class="QToolBar" name="toolBar">
-   <property name="windowTitle">
-    <string>toolBar</string>
-   </property>
    <property name="movable">
     <bool>false</bool>
    </property>
@@ -303,7 +300,7 @@
     <string>Open a torrent</string>
    </property>
    <property name="shortcut">
-    <string>Ctrl+O</string>
+    <string notr="true">Ctrl+O</string>
    </property>
   </action>
   <action name="action_New">
@@ -314,7 +311,7 @@
     <string>Create a new torrent</string>
    </property>
    <property name="shortcut">
-    <string>Ctrl+N</string>
+    <string notr="true">Ctrl+N</string>
    </property>
   </action>
   <action name="action_Properties">
@@ -325,7 +322,7 @@
     <string>Show torrent properties</string>
    </property>
    <property name="shortcut">
-    <string>Alt+Enter</string>
+    <string notr="true">Alt+Enter</string>
    </property>
   </action>
   <action name="action_OpenFolder">
@@ -336,7 +333,7 @@
     <string>Open the torrent's folder</string>
    </property>
    <property name="shortcut">
-    <string>Ctrl+E</string>
+    <string notr="true">Ctrl+E</string>
    </property>
   </action>
   <action name="action_Start">
@@ -347,7 +344,7 @@
     <string>Start torrent</string>
    </property>
    <property name="shortcut">
-    <string>Ctrl+S</string>
+    <string notr="true">Ctrl+S</string>
    </property>
    <property name="priority">
     <enum>QAction::LowPriority</enum>
@@ -369,7 +366,7 @@
     <string>Pause torrent</string>
    </property>
    <property name="shortcut">
-    <string>Ctrl+P</string>
+    <string notr="true">Ctrl+P</string>
    </property>
    <property name="priority">
     <enum>QAction::LowPriority</enum>
@@ -383,7 +380,7 @@
     <string>Verify local data</string>
    </property>
    <property name="shortcut">
-    <string>Ctrl+V</string>
+    <string notr="true">Ctrl+V</string>
    </property>
   </action>
   <action name="action_Remove">
@@ -394,7 +391,7 @@
     <string>Remove torrent</string>
    </property>
    <property name="shortcut">
-    <string>Del</string>
+    <string notr="true">Del</string>
    </property>
    <property name="priority">
     <enum>QAction::LowPriority</enum>
@@ -408,7 +405,7 @@
     <string>Remove torrent and delete its files</string>
    </property>
    <property name="shortcut">
-    <string>Shift+Del</string>
+    <string notr="true">Shift+Del</string>
    </property>
   </action>
   <action name="action_StartAll">
@@ -426,7 +423,7 @@
     <string>&amp;Quit</string>
    </property>
    <property name="shortcut">
-    <string>Ctrl+Q</string>
+    <string notr="true">Ctrl+Q</string>
    </property>
    <property name="menuRole">
     <enum>QAction::QuitRole</enum>
@@ -437,7 +434,7 @@
     <string>&amp;Select All</string>
    </property>
    <property name="shortcut">
-    <string>Ctrl+A</string>
+    <string notr="true">Ctrl+A</string>
    </property>
   </action>
   <action name="action_DeselectAll">
@@ -445,7 +442,7 @@
     <string>&amp;Deselect All</string>
    </property>
    <property name="shortcut">
-    <string>Ctrl+Shift+A</string>
+    <string notr="true">Ctrl+Shift+A</string>
    </property>
   </action>
   <action name="action_Preferences">
@@ -470,7 +467,7 @@
     <string>Compact View</string>
    </property>
    <property name="shortcut">
-    <string>Alt+C</string>
+    <string notr="true">Alt+C</string>
    </property>
   </action>
   <action name="action_Toolbar">
@@ -590,7 +587,7 @@
     <string>&amp;Contents</string>
    </property>
    <property name="shortcut">
-    <string>F1</string>
+    <string notr="true">F1</string>
    </property>
   </action>
   <action name="action_About">
@@ -704,7 +701,7 @@
     <string>Open &amp;URL...</string>
    </property>
    <property name="shortcut">
-    <string>Ctrl+U</string>
+    <string notr="true">Ctrl+U</string>
    </property>
   </action>
   <action name="action_Donate">
@@ -720,7 +717,7 @@
     <string>Bypass the queue and start now</string>
    </property>
    <property name="shortcut">
-    <string>Ctrl+Shift+S</string>
+    <string notr="true">Ctrl+Shift+S</string>
    </property>
    <property name="priority">
     <enum>QAction::LowPriority</enum>

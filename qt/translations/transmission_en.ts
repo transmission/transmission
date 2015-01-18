@@ -54,12 +54,12 @@
     </message>
     <message>
         <location line="+1"/>
-        <location line="+207"/>
+        <location line="+218"/>
         <source>Unknown</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-168"/>
+        <location line="-179"/>
         <source>Finished</source>
         <translation type="unfinished"></translation>
     </message>
@@ -69,7 +69,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+193"/>
+        <location line="+204"/>
         <source>Active now</source>
         <translation type="unfinished"></translation>
     </message>
@@ -197,18 +197,21 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-612"/>
+        <location line="-621"/>
         <source>%1 (100%)</source>
+        <extracomment>Text following the &quot;Have:&quot; label in torrent properties dialog; %1 is amount of downloaded and verified data</extracomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+5"/>
+        <location line="+9"/>
         <source>%1 of %2 (%3%)</source>
+        <extracomment>Text following the &quot;Have:&quot; label in torrent properties dialog; %1 is amount of downloaded and verified data, %2 is overall size of torrent data, %3 is percentage (%1/%2*100)</extracomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+7"/>
+        <location line="+12"/>
         <source>%1 of %2 (%3%), %4 Unverified</source>
+        <extracomment>Text following the &quot;Have:&quot; label in torrent properties dialog; %1 is amount of downloaded data (both verified and unverified), %2 is overall size of torrent data, %3 is percentage (%1/%2*100), %4 is amount of downloaded but not yet verified data</extracomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -594,7 +597,7 @@
 <context>
     <name>FilterBar</name>
     <message>
-        <location filename="../filterbar.cc" line="+368"/>
+        <location filename="../filterbar.cc" line="+359"/>
         <location line="+160"/>
         <source>All</source>
         <translation type="unfinished"></translation>
@@ -841,12 +844,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+19"/>
-        <source>toolBar</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+50"/>
+        <location line="+66"/>
         <source>&amp;New...</source>
         <translation type="unfinished"></translation>
     </message>
@@ -856,12 +854,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+3"/>
-        <source>Ctrl+N</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+5"/>
+        <location line="+8"/>
         <source>&amp;Properties</source>
         <translation type="unfinished"></translation>
     </message>
@@ -871,27 +864,17 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+3"/>
-        <source>Alt+Enter</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+8"/>
+        <location line="+11"/>
         <source>Open the torrent&apos;s folder</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-30"/>
-        <source>Ctrl+O</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="-134"/>
+        <location line="-161"/>
         <source>Queue</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+125"/>
+        <location line="+122"/>
         <source>&amp;Open...</source>
         <translation type="unfinished"></translation>
     </message>
@@ -911,12 +894,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+6"/>
-        <source>Ctrl+E</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+5"/>
+        <location line="+11"/>
         <source>&amp;Start</source>
         <translation type="unfinished"></translation>
     </message>
@@ -926,12 +904,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+3"/>
-        <source>Ctrl+S</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+8"/>
+        <location line="+11"/>
         <source>Ask Tracker for &amp;More Peers</source>
         <translation type="unfinished"></translation>
     </message>
@@ -951,12 +924,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+3"/>
-        <source>Ctrl+P</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+8"/>
+        <location line="+11"/>
         <source>&amp;Verify Local Data</source>
         <translation type="unfinished"></translation>
     </message>
@@ -966,12 +934,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+3"/>
-        <source>Ctrl+V</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+5"/>
+        <location line="+8"/>
         <source>&amp;Remove</source>
         <translation type="unfinished"></translation>
     </message>
@@ -981,12 +944,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+3"/>
-        <source>Del</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+8"/>
+        <location line="+11"/>
         <source>&amp;Delete Files and Remove</source>
         <translation type="unfinished"></translation>
     </message>
@@ -996,12 +954,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+3"/>
-        <source>Shift+Del</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+5"/>
+        <location line="+8"/>
         <source>&amp;Start All</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1016,32 +969,17 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+3"/>
-        <source>Ctrl+Q</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+8"/>
+        <location line="+11"/>
         <source>&amp;Select All</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+3"/>
-        <source>Ctrl+A</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+5"/>
+        <location line="+8"/>
         <source>&amp;Deselect All</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+3"/>
-        <source>Ctrl+Shift+A</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+5"/>
+        <location line="+8"/>
         <source>&amp;Preferences</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1057,13 +995,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+3"/>
-        <source>Alt+C</source>
-        <oldsource>Alt+M</oldsource>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+8"/>
+        <location line="+11"/>
         <source>&amp;Toolbar</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1138,12 +1070,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+3"/>
-        <source>F1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+5"/>
+        <location line="+8"/>
         <source>&amp;About</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1224,12 +1151,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+3"/>
-        <source>Ctrl+U</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+5"/>
+        <location line="+8"/>
         <source>&amp;Donate</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1244,12 +1166,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+3"/>
-        <source>Ctrl+Shift+S</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+8"/>
+        <location line="+11"/>
         <source>Move to &amp;Top</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1607,12 +1524,12 @@ To add another primary URL, add it after a blank line.</source>
     </message>
     <message>
         <location line="+5"/>
-        <location line="+435"/>
+        <location line="+436"/>
         <source>Status unknown</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-427"/>
+        <location line="-428"/>
         <source>&amp;Port for incoming connections:</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1649,9 +1566,9 @@ To add another primary URL, add it after a blank line.</source>
         <location line="+39"/>
         <source> minute(s) ago</source>
         <extracomment>Spin box suffix, &quot;Download is inactive if data sharing stopped: [ 5 minutes ago ]&quot; (includes leading space after the number, if needed)</extracomment>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform> minute ago</numerusform>
+            <numerusform> minutes ago</numerusform>
         </translation>
     </message>
     <message>
@@ -1685,7 +1602,7 @@ To add another primary URL, add it after a blank line.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+7"/>
+        <location line="+8"/>
         <source>Incomplete</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1701,14 +1618,14 @@ To add another primary URL, add it after a blank line.</source>
     </message>
     <message numerus="yes">
         <location line="+61"/>
-        <source>&lt;i&gt;Blocklist contains %Ln rules&lt;/i&gt;</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <source>&lt;i&gt;Blocklist contains %Ln rule(s)&lt;/i&gt;</source>
+        <translation>
+            <numerusform>&lt;i&gt;Blocklist contains %Ln rule&lt;/i&gt;</numerusform>
+            <numerusform>&lt;i&gt;Blocklist contains %Ln rules&lt;/i&gt;</numerusform>
         </translation>
     </message>
     <message>
-        <location line="-378"/>
+        <location line="-379"/>
         <source>Pick a &amp;random port every time Transmission is started</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1729,10 +1646,10 @@ To add another primary URL, add it after a blank line.</source>
     </message>
     <message numerus="yes">
         <location line="+41"/>
-        <source>&lt;b&gt;Update succeeded!&lt;/b&gt;&lt;p&gt;Blocklist now has %Ln rules.</source>
+        <source>&lt;b&gt;Update succeeded!&lt;/b&gt;&lt;p&gt;Blocklist now has %Ln rule(s).</source>
         <translation>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+            <numerusform>&lt;b&gt;Update succeeded!&lt;/b&gt;&lt;p&gt;Blocklist now has %Ln rule.</numerusform>
+            <numerusform>&lt;b&gt;Update succeeded!&lt;/b&gt;&lt;p&gt;Blocklist now has %Ln rules.</numerusform>
         </translation>
     </message>
     <message>
@@ -1766,23 +1683,23 @@ To add another primary URL, add it after a blank line.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+231"/>
+        <location line="+232"/>
         <source>Privacy</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-410"/>
+        <location line="-411"/>
         <source>&amp;to</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+39"/>
-        <location line="+373"/>
+        <location line="+374"/>
         <source>Desktop</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-371"/>
+        <location line="-372"/>
         <source>Show Transmission icon in the &amp;notification area</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1947,8 +1864,9 @@ To add another primary URL, add it after a blank line.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+37"/>
+        <location line="+38"/>
         <source>Download is i&amp;nactive if data sharing stopped:</source>
+        <extracomment>Please keep this phrase as short as possible, it&apos;s curently the longest and influences dialog width</extracomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1967,17 +1885,17 @@ To add another primary URL, add it after a blank line.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-25"/>
+        <location line="-26"/>
         <source>Save to &amp;Location:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+33"/>
+        <location line="+34"/>
         <source>Call scrip&amp;t when torrent is completed:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-91"/>
+        <location line="-92"/>
         <source>Stop seeding at &amp;ratio:</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1987,7 +1905,7 @@ To add another primary URL, add it after a blank line.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+109"/>
+        <location line="+110"/>
         <source>Transmission Preferences</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2157,10 +2075,10 @@ To add another primary URL, add it after a blank line.</source>
     </message>
     <message numerus="yes">
         <location filename="../stats-dialog.cc" line="+65"/>
-        <source>Started %n time(s)</source>
+        <source>Started %Ln time(s)</source>
         <translation>
-            <numerusform>Started %n time</numerusform>
-            <numerusform>Started %n times</numerusform>
+            <numerusform>Started %Ln time</numerusform>
+            <numerusform>Started %Ln times</numerusform>
         </translation>
     </message>
 </context>
@@ -2225,107 +2143,123 @@ To add another primary URL, add it after a blank line.</source>
 <context>
     <name>TorrentDelegate</name>
     <message>
-        <location filename="../torrent-delegate.cc" line="+89"/>
+        <location filename="../torrent-delegate.cc" line="+174"/>
         <source>Magnetized transfer - retrieving metadata (%1%)</source>
+        <extracomment>First part of torrent progress string; %1 is the percentage of torrent metadata downloaded</extracomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+8"/>
+        <location line="+9"/>
         <source>%1 of %2 (%3%)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+15"/>
-        <source>%1 of %2 (%3%), uploaded %4 (Ratio: %5 Goal: %6)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+15"/>
-        <source>%1 of %2 (%3%), uploaded %4 (Ratio: %5)</source>
+        <extracomment>First part of torrent progress string; %1 is how much we&apos;ve got, %2 is how much we&apos;ll have when done, %3 is a percentage of the two</extracomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+16"/>
+        <source>%1 of %2 (%3%), uploaded %4 (Ratio: %5 Goal: %6)</source>
+        <extracomment>First part of torrent progress string; %1 is how much we&apos;ve got, %2 is the torrent&apos;s total size, %3 is a percentage of the two, %4 is how much we&apos;ve uploaded, %5 is our upload-to-download ratio, %6 is the ratio we want to reach before we stop uploading</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+16"/>
+        <source>%1 of %2 (%3%), uploaded %4 (Ratio: %5)</source>
+        <extracomment>First part of torrent progress string; %1 is how much we&apos;ve got, %2 is the torrent&apos;s total size, %3 is a percentage of the two, %4 is how much we&apos;ve uploaded, %5 is our upload-to-download ratio</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+17"/>
         <source>%1, uploaded %2 (Ratio: %3 Goal: %4)</source>
+        <extracomment>First part of torrent progress string; %1 is the torrent&apos;s total size, %2 is how much we&apos;ve uploaded, %3 is our upload-to-download ratio, %4 is the ratio we want to reach before we stop uploading</extracomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+11"/>
+        <location line="+12"/>
         <source>%1, uploaded %2 (Ratio: %3)</source>
+        <extracomment>First part of torrent progress string; %1 is the torrent&apos;s total size, %2 is how much we&apos;ve uploaded, %3 is our upload-to-download ratio</extracomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+10"/>
-        <location line="+107"/>
+        <location line="+14"/>
+        <source> - %1 left</source>
+        <extracomment>Second (optional) part of torrent progress string; %1 is duration; notice that leading space (before the dash) is included here</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source> - Remaining time unknown</source>
+        <extracomment>Second (optional) part of torrent progress string; notice that leading space (before the dash) is included here</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+41"/>
+        <source>Ratio: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <location line="+41"/>
+        <source>Downloading from %Ln peer(s)</source>
+        <extracomment>First part of phrase &quot;Downloading from ... peer(s) and ... web seed(s)&quot;</extracomment>
+        <translation>
+            <numerusform>Downloading from %Ln peer</numerusform>
+            <numerusform>Downloading from %Ln peers</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <location line="+15"/>
+        <source>Seeding to %Ln peer(s)</source>
+        <translation>
+            <numerusform>Seeding to %Ln peer</numerusform>
+            <numerusform>Seeding to %Ln peers</numerusform>
+        </translation>
+    </message>
+    <message>
+        <location line="+15"/>
         <source> - </source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
-        <location line="-105"/>
-        <source>%1 left</source>
-        <translation type="unfinished"></translation>
+    <message numerus="yes">
+        <location line="-38"/>
+        <source>Downloading metadata from %Ln peer(s) (%1% done)</source>
+        <translation>
+            <numerusform>Downloading metadata from %Ln peer (%1% done)</numerusform>
+            <numerusform>Downloading metadata from %Ln peers (%1% done)</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <location line="+11"/>
+        <source>Downloading from %1 of %Ln connected peer(s)</source>
+        <extracomment>First part of phrase &quot;Downloading from ... of ... connected peer(s) and ... web seed(s)&quot;</extracomment>
+        <translation>
+            <numerusform>Downloading from %1 of %Ln connected peer</numerusform>
+            <numerusform>Downloading from %1 of %Ln connected peers</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <location line="+6"/>
+        <source> and %Ln web seed(s)</source>
+        <extracomment>Second (optional) part of phrase &quot;Downloading from ... of ... connected peer(s) and ... web seed(s)&quot;; notice that leading space (before &quot;and&quot;) is included here</extracomment>
+        <translation>
+            <numerusform> and %Ln web seed</numerusform>
+            <numerusform> and %Ln web seeds</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <location line="+8"/>
+        <source>Seeding to %1 of %Ln connected peer(s)</source>
+        <translation>
+            <numerusform>Seeding to %1 of %Ln connected peer</numerusform>
+            <numerusform>Seeding to %1 of %Ln connected peers</numerusform>
+        </translation>
     </message>
     <message>
-        <location line="+2"/>
-        <source>Remaining time unknown</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+95"/>
+        <location line="+5"/>
         <source>Error</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-61"/>
+        <location line="-70"/>
         <source>Verifying local data (%1% tested)</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message numerus="yes">
-        <location line="+47"/>
-        <source>Downloading from %1 of %n connected peer(s)</source>
-        <translation>
-            <numerusform>Downloading from %1 peer</numerusform>
-            <numerusform>Downloading from %1 of %n connected peers</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <location line="-6"/>
-        <source>Downloading metadata from %n peer(s) (%1% done)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-        </translation>
-    </message>
-    <message>
-        <location line="-60"/>
-        <source>%1   %2</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+24"/>
-        <source>%1    %2 %3</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+2"/>
-        <source>Ratio:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message numerus="yes">
-        <location line="+44"/>
-        <source> and %n web seed(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <location line="+5"/>
-        <source>Seeding to %1 of %n connected peer(s)</source>
-        <translation>
-            <numerusform>Seeding to %1 peer</numerusform>
-            <numerusform>Seeding to %1 of %n connected peers</numerusform>
-        </translation>
     </message>
 </context>
 <context>
@@ -2344,13 +2278,13 @@ To add another primary URL, add it after a blank line.</source>
     <message>
         <location line="-17"/>
         <location line="+22"/>
-        <location line="+604"/>
+        <location line="+607"/>
         <location line="+8"/>
         <source>Limited at %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-621"/>
+        <location line="-624"/>
         <source>Limit Upload Speed</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2366,13 +2300,14 @@ To add another primary URL, add it after a blank line.</source>
     </message>
     <message>
         <location line="+5"/>
-        <location line="+597"/>
+        <location line="+600"/>
         <source>Stop at Ratio (%1)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-379"/>
+        <location line="-380"/>
         <source> - %1:%2</source>
+        <extracomment>Second (optional) part of main window title &quot;Transmission - host:port&quot; (added when connected to remote session); notice that leading space (before the dash) is included here</extracomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2381,7 +2316,7 @@ To add another primary URL, add it after a blank line.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+34"/>
+        <location line="+35"/>
         <location line="+16"/>
         <source>Ratio: %1</source>
         <translation type="unfinished"></translation>
@@ -2408,22 +2343,17 @@ To add another primary URL, add it after a blank line.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-899"/>
+        <location line="-902"/>
         <source>Speed Limits</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+451"/>
+        <location line="+453"/>
         <source>Network Error</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+8"/>
-        <source>%1   %2</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+407"/>
+        <location line="+416"/>
         <source>Click to disable Temporary Speed Limits
  (%1 down, %2 up)</source>
         <translation type="unfinished"></translation>
@@ -2440,19 +2370,25 @@ To add another primary URL, add it after a blank line.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+1"/>
-        <source>Remove %1 torrents?</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+5"/>
+        <location line="+6"/>
         <source>Delete this torrent&apos;s downloaded files?</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
-        <location line="+1"/>
-        <source>Delete these %1 torrents&apos; downloaded files?</source>
-        <translation type="unfinished"></translation>
+    <message numerus="yes">
+        <location line="-5"/>
+        <source>Remove %Ln torrent(s)?</source>
+        <translation>
+            <numerusform>Remove %Ln torrent?</numerusform>
+            <numerusform>Remove %Ln torrents?</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <location line="+6"/>
+        <source>Delete these %Ln torrent(s)&apos; downloaded files?</source>
+        <translation>
+            <numerusform>Delete this %Ln torrent&apos; downloaded files?</numerusform>
+            <numerusform>Delete these %Ln torrents&apos; downloaded files?</numerusform>
+        </translation>
     </message>
     <message>
         <location line="+6"/>
@@ -2551,19 +2487,25 @@ To add another primary URL, add it after a blank line.</source>
 </context>
 <context>
     <name>TrackerDelegate</name>
-    <message>
-        <location filename="../tracker-delegate.cc" line="+161"/>
-        <source>Got a list of %1%2 peers%3 %4 ago</source>
-        <translation type="unfinished"></translation>
+    <message numerus="yes">
+        <location filename="../tracker-delegate.cc" line="+162"/>
+        <source>Got a list of%1 %Ln peer(s)%2 %3 ago</source>
+        <extracomment>%1 and %2 are replaced with HTML markup, %3 is duration</extracomment>
+        <translation>
+            <numerusform>Got a list of%1 %Ln peer%2 %3 ago</numerusform>
+            <numerusform>Got a list of%1 %Ln peers%2 %3 ago</numerusform>
+        </translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Peer list request %1timed out%2 %3 ago; will retry</source>
+        <extracomment>%1 and %2 are replaced with HTML markup, %3 is duration</extracomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+7"/>
+        <location line="+8"/>
         <source>Got an error %1&quot;%2&quot;%3 %4 ago</source>
+        <extracomment>%1 and %3 are replaced with HTML markup, %2 is error message, %4 is duration</extracomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2572,8 +2514,9 @@ To add another primary URL, add it after a blank line.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+7"/>
+        <location line="+8"/>
         <source>Asking for more peers in %1</source>
+        <extracomment>%1 is duration</extracomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2582,23 +2525,39 @@ To add another primary URL, add it after a blank line.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+6"/>
+        <location line="+7"/>
         <source>Asking for more peers now... &lt;small&gt;%1&lt;/small&gt;</source>
+        <extracomment>%1 is duration</extracomment>
         <translation type="unfinished"></translation>
     </message>
-    <message>
-        <location line="+13"/>
-        <source>Tracker had %1%2 seeders%3 and %4%5 leechers%6 %7 ago</source>
-        <translation type="unfinished"></translation>
+    <message numerus="yes">
+        <location line="+15"/>
+        <source>Tracker had%1 %Ln seeder(s)%2</source>
+        <extracomment>First part of phrase &quot;Tracker had ... seeder(s) and ... leecher(s) ... ago&quot;; %1 and %2 are replaced with HTML markup</extracomment>
+        <translation>
+            <numerusform>Tracker had%1 %Ln seeder%2</numerusform>
+            <numerusform>Tracker had%1 %Ln seeders%2</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <location line="+6"/>
+        <source> and%1 %Ln leecher(s)%2 %3 ago</source>
+        <extracomment>Second part of phrase &quot;Tracker had ... seeder(s) and ... leecher(s) ... ago&quot;; %1 and %2 are replaced with HTML markup, %3 is duration; notice that leading space (before &quot;and&quot;) is included here</extracomment>
+        <translation>
+            <numerusform> and%1 %Ln leecher%2 %3 ago</numerusform>
+            <numerusform> and%1 %Ln leechers%2 %3 ago</numerusform>
+        </translation>
     </message>
     <message>
-        <location line="+11"/>
+        <location line="+8"/>
         <source>Got a scrape error %1&quot;%2&quot;%3 %4 ago</source>
+        <extracomment>%1 and %3 are replaced with HTML markup, %2 is error message, %4 is duration</extracomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+17"/>
+        <location line="+18"/>
         <source>Asking for peer counts in %1</source>
+        <extracomment>%1 is duration</extracomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2607,8 +2566,9 @@ To add another primary URL, add it after a blank line.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+8"/>
+        <location line="+9"/>
         <source>Asking for peer counts now... &lt;small&gt;%1&lt;/small&gt;</source>
+        <extracomment>%1 is duration</extracomment>
         <translation type="unfinished"></translation>
     </message>
 </context>

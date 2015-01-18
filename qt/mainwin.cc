@@ -638,6 +638,8 @@ TrMainWindow::refreshTitle ()
   QString title ("Transmission");
   const QUrl url (mySession.getRemoteUrl ());
   if (!url.isEmpty ())
+    //: Second (optional) part of main window title "Transmission - host:port" (added when connected to remote session);
+    //: notice that leading space (before the dash) is included here
     title += tr (" - %1:%2").arg (url.host ()).arg (url.port ());
   setWindowTitle (title);
 }
@@ -670,8 +672,9 @@ TrMainWindow::refreshTrayIcon ()
     }
   else if (downCount)
     {
-      tip  = tr( "%1   %2" ).arg(Formatter::downloadSpeedToString(downSpeed))
-                            .arg(Formatter::uploadSpeedToString(upSpeed));
+      tip = Formatter::downloadSpeedToString(downSpeed) +
+            QLatin1String ("   ") +
+            Formatter::uploadSpeedToString(upSpeed);
     }
   else if (upCount)
     {
@@ -1211,13 +1214,13 @@ TrMainWindow::removeTorrents (const bool deleteFiles)
     {
       primary_text = (count == 1)
         ? tr ("Remove torrent?")
-        : tr ("Remove %1 torrents?").arg (count);
+        : tr ("Remove %Ln torrent(s)?", 0, count);
     }
   else
     {
       primary_text = (count == 1)
         ? tr ("Delete this torrent's downloaded files?")
-        : tr ("Delete these %1 torrents' downloaded files?").arg (count);
+        : tr ("Delete these %Ln torrent(s)' downloaded files?", 0, count);
     }
 
   if (!incomplete && !connected)

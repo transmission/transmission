@@ -406,7 +406,7 @@ PrefsDialog::onUpdateBlocklistCancelled ()
 void
 PrefsDialog::onBlocklistUpdated (int n)
 {
-  myBlocklistDialog->setText (tr ("<b>Update succeeded!</b><p>Blocklist now has %Ln rules.", 0, n));
+  myBlocklistDialog->setText (tr ("<b>Update succeeded!</b><p>Blocklist now has %Ln rule(s).", 0, n));
   myBlocklistDialog->setTextFormat (Qt::RichText);
 }
 
@@ -628,6 +628,7 @@ PrefsDialog::createDownloadingTab ()
     hig->addRow (tr ("Ma&ximum active downloads:"), spinBoxNew (Prefs::DOWNLOAD_QUEUE_SIZE, 1, INT_MAX, 1));
     QSpinBox * sb = myQueueStalledMinutesSpin = spinBoxNew (Prefs::QUEUE_STALLED_MINUTES, 1, INT_MAX, 10);
     connect (sb, SIGNAL (valueChanged (int)), this, SLOT (onQueueStalledMinutesChanged ()));
+    //: Please keep this phrase as short as possible, it's curently the longest and influences dialog width
     hig->addRow (tr ("Download is i&nactive if data sharing stopped:"), sb);
     onQueueStalledMinutesChanged ();
 
@@ -737,7 +738,7 @@ void
 PrefsDialog::updateBlocklistLabel ()
 {
   const int n = mySession.blocklistSize ();
-  myBlocklistLabel->setText (tr ("<i>Blocklist contains %Ln rules</i>", 0, n));
+  myBlocklistLabel->setText (tr ("<i>Blocklist contains %Ln rule(s)</i>", 0, n));
 }
 
 void

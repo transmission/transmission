@@ -158,14 +158,15 @@ TrackerDelegate::getText (const TrackerInfo& inf) const
           str += "<br/>\n";
           if (inf.st.lastAnnounceSucceeded)
             {
-              str += tr ("Got a list of %1%2 peers%3 %4 ago")
+              //: %1 and %2 are replaced with HTML markup, %3 is duration
+              str += tr ("Got a list of%1 %Ln peer(s)%2 %3 ago", 0, inf.st.lastAnnouncePeerCount)
                      .arg (success_markup_begin)
-                     .arg (inf.st.lastAnnouncePeerCount)
                      .arg (success_markup_end)
                      .arg (tstr);
             }
           else if (inf.st.lastAnnounceTimedOut)
             {
+              //: %1 and %2 are replaced with HTML markup, %3 is duration
               str += tr ("Peer list request %1timed out%2 %3 ago; will retry")
                      .arg (timeout_markup_begin)
                      .arg (timeout_markup_end)
@@ -173,6 +174,7 @@ TrackerDelegate::getText (const TrackerInfo& inf) const
             }
           else
             {
+              //: %1 and %3 are replaced with HTML markup, %2 is error message, %4 is duration
               str += tr ("Got an error %1\"%2\"%3 %4 ago")
                      .arg (err_markup_begin)
                      .arg (inf.st.lastAnnounceResult)
@@ -192,6 +194,7 @@ TrackerDelegate::getText (const TrackerInfo& inf) const
               {
                 const QString tstr (timeToStringRounded (inf.st.nextAnnounceTime - now));
                 str += "<br/>\n";
+                //: %1 is duration
                 str += tr ("Asking for more peers in %1").arg (tstr);
                 break;
               }
@@ -204,6 +207,7 @@ TrackerDelegate::getText (const TrackerInfo& inf) const
             case TR_TRACKER_ACTIVE: {
               const QString tstr (timeToStringRounded (now - inf.st.lastAnnounceStartTime));
               str += "<br/>\n";
+              //: %1 is duration
               str += tr ("Asking for more peers now... <small>%1</small>").arg (tstr);
               break;
             }
@@ -217,17 +221,22 @@ TrackerDelegate::getText (const TrackerInfo& inf) const
               const QString tstr (timeToStringRounded (now - inf.st.lastScrapeTime));
               if (inf.st.lastScrapeSucceeded)
                 {
-                  str += tr ("Tracker had %1%2 seeders%3 and %4%5 leechers%6 %7 ago")
+                  //: First part of phrase "Tracker had ... seeder(s) and ... leecher(s) ... ago";
+                  //: %1 and %2 are replaced with HTML markup
+                  str += tr ("Tracker had%1 %Ln seeder(s)%2", 0, inf.st.seederCount)
                          .arg (success_markup_begin)
-                         .arg (inf.st.seederCount)
-                         .arg (success_markup_end)
+                         .arg (success_markup_end);
+                  //: Second part of phrase "Tracker had ... seeder(s) and ... leecher(s) ... ago";
+                  //: %1 and %2 are replaced with HTML markup, %3 is duration;
+                  //: notice that leading space (before "and") is included here
+                  str += tr (" and%1 %Ln leecher(s)%2 %3 ago", 0, inf.st.leecherCount)
                          .arg (success_markup_begin)
-                         .arg (inf.st.leecherCount)
                          .arg (success_markup_end)
                          .arg (tstr);
                 }
               else
                 {
+                  //: %1 and %3 are replaced with HTML markup, %2 is error message, %4 is duration
                   str += tr ("Got a scrape error %1\"%2\"%3 %4 ago")
                          .arg (err_markup_begin)
                          .arg (inf.st.lastScrapeResult)
@@ -245,6 +254,7 @@ TrackerDelegate::getText (const TrackerInfo& inf) const
                 {
                   str += "<br/>\n";
                   const QString tstr (timeToStringRounded (inf.st.nextScrapeTime - now));
+                  //: %1 is duration
                   str += tr ("Asking for peer counts in %1").arg (tstr);
                   break;
                 }
@@ -260,6 +270,7 @@ TrackerDelegate::getText (const TrackerInfo& inf) const
                 {
                   str += "<br/>\n";
                   const QString tstr (timeToStringRounded (now - inf.st.lastScrapeStartTime));
+                  //: %1 is duration
                   str += tr ("Asking for peer counts now... <small>%1</small>").arg (tstr);
                   break;
                 }

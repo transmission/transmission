@@ -455,11 +455,17 @@ Details::refresh ()
 
       if (!haveUnverified && !leftUntilDone)
         {
+          //: Text following the "Have:" label in torrent properties dialog;
+          //: %1 is amount of downloaded and verified data
           string = tr ("%1 (100%)")
                      .arg (Formatter::sizeToString (haveVerified));
         }
       else if (!haveUnverified)
         {
+          //: Text following the "Have:" label in torrent properties dialog;
+          //: %1 is amount of downloaded and verified data,
+          //: %2 is overall size of torrent data,
+          //: %3 is percentage (%1/%2*100)
           string = tr ("%1 of %2 (%3%)")
                      .arg (Formatter::sizeToString (haveVerified))
                      .arg (Formatter::sizeToString (sizeWhenDone))
@@ -467,6 +473,11 @@ Details::refresh ()
         }
       else
         {
+          //: Text following the "Have:" label in torrent properties dialog;
+          //: %1 is amount of downloaded data (both verified and unverified),
+          //: %2 is overall size of torrent data,
+          //: %3 is percentage (%1/%2*100),
+          //: %4 is amount of downloaded but not yet verified data
           string = tr ("%1 of %2 (%3%), %4 Unverified")
                      .arg (Formatter::sizeToString (haveVerified + haveUnverified))
                      .arg (Formatter::sizeToString (sizeWhenDone))
