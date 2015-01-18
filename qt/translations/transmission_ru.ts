@@ -1565,16 +1565,7 @@ To add another primary URL, add it after a blank line.</source>
         <translation>uTP — технология снижения нагрузки на сеть</translation>
     </message>
     <message numerus="yes">
-        <location line="+34"/>
-        <source>&lt;b&gt;Update succeeded!&lt;/b&gt;&lt;p&gt;Blocklist now has %Ln rule(s).</source>
-        <translation type="unfinished">
-            <numerusform>&lt;b&gt;Обновление успешно завершено!&lt;/b&gt;&lt;p&gt;В &quot;черном списке&quot; %Ln правило.</numerusform>
-            <numerusform>&lt;b&gt;Обновление успешно завершено!&lt;/b&gt;&lt;p&gt;В &quot;черном списке&quot; %Ln правила.</numerusform>
-            <numerusform>&lt;b&gt;Обновление успешно завершено!&lt;/b&gt;&lt;p&gt;В &quot;черном списке&quot; %Ln правил.</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <location line="+128"/>
+        <location line="+162"/>
         <source> minute(s)</source>
         <extracomment>Spin box suffix, &quot;Stop seeding if idle for: [ 5 minutes ]&quot; (includes leading space after the number, if needed)</extracomment>
         <translation>
@@ -1641,7 +1632,7 @@ To add another primary URL, add it after a blank line.</source>
     <message numerus="yes">
         <location line="+61"/>
         <source>&lt;i&gt;Blocklist contains %Ln rule(s)&lt;/i&gt;</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>&lt;i&gt;&quot;Черный список&quot; содержит %Ln правило&lt;/i&gt;</numerusform>
             <numerusform>&lt;i&gt;&quot;Черный список&quot; содержит %Ln правила&lt;/i&gt;</numerusform>
             <numerusform>&lt;i&gt;&quot;Черный список&quot; содержит %Ln правил&lt;/i&gt;</numerusform>
@@ -1667,8 +1658,17 @@ To add another primary URL, add it after a blank line.</source>
         <source>Maximum peers &amp;overall:</source>
         <translation>&amp;Общее максимальное количество узлов:</translation>
     </message>
+    <message numerus="yes">
+        <location line="+41"/>
+        <source>&lt;b&gt;Update succeeded!&lt;/b&gt;&lt;p&gt;Blocklist now has %Ln rule(s).</source>
+        <translation>
+            <numerusform>&lt;b&gt;Обновление успешно завершено!&lt;/b&gt;&lt;p&gt;В &quot;черном списке&quot; %Ln правило.</numerusform>
+            <numerusform>&lt;b&gt;Обновление успешно завершено!&lt;/b&gt;&lt;p&gt;В &quot;черном списке&quot; %Ln правила.</numerusform>
+            <numerusform>&lt;b&gt;Обновление успешно завершено!&lt;/b&gt;&lt;p&gt;В &quot;черном списке&quot; %Ln правил.</numerusform>
+        </translation>
+    </message>
     <message>
-        <location line="+50"/>
+        <location line="+9"/>
         <source>&lt;b&gt;Update Blocklist&lt;/b&gt;&lt;p&gt;Getting new blocklist...</source>
         <translation>&lt;b&gt;Обновление «черного списка»&lt;/b&gt;&lt;p&gt;Получение нового «черного списка»...</translation>
     </message>
@@ -2091,10 +2091,10 @@ To add another primary URL, add it after a blank line.</source>
     <message numerus="yes">
         <location filename="../stats-dialog.cc" line="+65"/>
         <source>Started %Ln time(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Запущено %Ln раз</numerusform>
+            <numerusform>Запущено %Ln раза</numerusform>
+            <numerusform>Запущено %Ln раз</numerusform>
         </translation>
     </message>
 </context>
@@ -2198,13 +2198,13 @@ To add another primary URL, add it after a blank line.</source>
         <location line="+14"/>
         <source> - %1 left</source>
         <extracomment>Second (optional) part of torrent progress string; %1 is duration; notice that leading space (before the dash) is included here</extracomment>
-        <translation type="unfinished"> - осталось %1</translation>
+        <translation> - осталось %1</translation>
     </message>
     <message>
         <location line="+4"/>
         <source> - Remaining time unknown</source>
         <extracomment>Second (optional) part of torrent progress string; notice that leading space (before the dash) is included here</extracomment>
-        <translation type="unfinished"> - Оставшееся время неизвестно</translation>
+        <translation> - Оставшееся время неизвестно</translation>
     </message>
     <message>
         <location line="+41"/>
@@ -2212,29 +2212,43 @@ To add another primary URL, add it after a blank line.</source>
         <translation>Рейтинг: %1</translation>
     </message>
     <message numerus="yes">
-        <location line="+33"/>
-        <source>Downloading metadata from %Ln peer(s) (%1% done)</source>
-        <translation type="unfinished">
-            <numerusform>Загрузка метаданных от %Ln участника (%1% завершено)</numerusform>
-            <numerusform>Загрузка метаданных от %Ln участников (%1% завершено)</numerusform>
-            <numerusform>Загрузка метаданных от %Ln участников (%1% завершено)</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <location line="+8"/>
+        <location line="+41"/>
         <source>Downloading from %Ln peer(s)</source>
         <extracomment>First part of phrase &quot;Downloading from ... peer(s) and ... web seed(s)&quot;</extracomment>
-        <translation type="unfinished">
+        <translation>
             <numerusform>Приём от %Ln узла</numerusform>
             <numerusform>Приём от %Ln узлов</numerusform>
             <numerusform>Приём от %Ln узлов</numerusform>
         </translation>
     </message>
     <message numerus="yes">
-        <location line="+3"/>
+        <location line="+15"/>
+        <source>Seeding to %Ln peer(s)</source>
+        <translation>
+            <numerusform>Раздача к %Ln узлу</numerusform>
+            <numerusform>Раздача к %Ln узлам</numerusform>
+            <numerusform>Раздача к %Ln узлам</numerusform>
+        </translation>
+    </message>
+    <message>
+        <location line="+15"/>
+        <source> - </source>
+        <translation> - </translation>
+    </message>
+    <message numerus="yes">
+        <location line="-38"/>
+        <source>Downloading metadata from %Ln peer(s) (%1% done)</source>
+        <translation>
+            <numerusform>Загрузка метаданных от %Ln участника (%1% завершено)</numerusform>
+            <numerusform>Загрузка метаданных от %Ln участников (%1% завершено)</numerusform>
+            <numerusform>Загрузка метаданных от %Ln участников (%1% завершено)</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <location line="+11"/>
         <source>Downloading from %1 of %Ln connected peer(s)</source>
         <extracomment>First part of phrase &quot;Downloading from ... of ... connected peer(s) and ... web seed(s)&quot;</extracomment>
-        <translation type="unfinished">
+        <translation>
             <numerusform>Приём от %1 из %Ln подключённого узла</numerusform>
             <numerusform>Приём от %1 из %Ln подключённых узлов</numerusform>
             <numerusform>Приём от %1 из %Ln подключённых узлов</numerusform>
@@ -2244,37 +2258,23 @@ To add another primary URL, add it after a blank line.</source>
         <location line="+6"/>
         <source> and %Ln web seed(s)</source>
         <extracomment>Second (optional) part of phrase &quot;Downloading from ... of ... connected peer(s) and ... web seed(s)&quot;; notice that leading space (before &quot;and&quot;) is included here</extracomment>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform> и %Ln веб-раздачи</numerusform>
+            <numerusform> и %Ln веб-раздач</numerusform>
+            <numerusform> и %Ln веб-раздач</numerusform>
         </translation>
     </message>
     <message numerus="yes">
-        <location line="+6"/>
-        <source>Seeding to %Ln peer(s)</source>
-        <translation type="unfinished">
-            <numerusform>Раздача к %Ln узлу</numerusform>
-            <numerusform>Раздача к %Ln узлам</numerusform>
-            <numerusform>Раздача к %Ln узлам</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <location line="+2"/>
+        <location line="+8"/>
         <source>Seeding to %1 of %Ln connected peer(s)</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>Раздача к %1 из %Ln подключённого узла</numerusform>
             <numerusform>Раздача к %1 из %Ln подключённых узлов</numerusform>
             <numerusform>Раздача к %1 из %Ln подключённых узлов</numerusform>
         </translation>
     </message>
     <message>
-        <location line="+13"/>
-        <source> - </source>
-        <translation> - </translation>
-    </message>
-    <message>
-        <location line="-8"/>
+        <location line="+5"/>
         <source>Error</source>
         <translation>Ошибка</translation>
     </message>
@@ -2401,7 +2401,7 @@ To add another primary URL, add it after a blank line.</source>
     <message numerus="yes">
         <location line="-5"/>
         <source>Remove %Ln torrent(s)?</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>Удалить %Ln торрент?</numerusform>
             <numerusform>Удалить %Ln торрента?</numerusform>
             <numerusform>Удалить %Ln торрентов?</numerusform>
@@ -2410,7 +2410,7 @@ To add another primary URL, add it after a blank line.</source>
     <message numerus="yes">
         <location line="+6"/>
         <source>Delete these %Ln torrent(s)&apos; downloaded files?</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>Удалить загруженные файлы этого %Ln торрента?</numerusform>
             <numerusform>Удалить загруженные файлы этих %Ln торрентов?</numerusform>
             <numerusform>Удалить загруженные файлы этих %Ln торрентов?</numerusform>
@@ -2517,10 +2517,10 @@ To add another primary URL, add it after a blank line.</source>
         <location filename="../tracker-delegate.cc" line="+162"/>
         <source>Got a list of%1 %Ln peer(s)%2 %3 ago</source>
         <extracomment>%1 and %2 are replaced with HTML markup, %3 is duration</extracomment>
-        <translation type="unfinished">
-            <numerusform>Получен список из%1 %Ln участника%2 %3 тому назад</numerusform>
-            <numerusform>Получен список из%1 %Ln участников%2 %3 тому назад</numerusform>
-            <numerusform>Получен список из%1 %Ln участников%2 %3 тому назад</numerusform>
+        <translation>
+            <numerusform>Получен список от%1 %Ln участника%2 %3 тому назад</numerusform>
+            <numerusform>Получен список от%1 %Ln участников%2 %3 тому назад</numerusform>
+            <numerusform>Получен список от%1 %Ln участников%2 %3 тому назад</numerusform>
         </translation>
     </message>
     <message>
@@ -2558,10 +2558,10 @@ To add another primary URL, add it after a blank line.</source>
         <translation>Запрашиваем дополнительных узлов... &lt;small&gt;%1&lt;/small&gt;</translation>
     </message>
     <message numerus="yes">
-        <location line="+15"/>
+        <location line="+17"/>
         <source>Tracker had%1 %Ln seeder(s)%2</source>
         <extracomment>First part of phrase &quot;Tracker had ... seeder(s) and ... leecher(s) ... ago&quot;; %1 and %2 are replaced with HTML markup</extracomment>
-        <translation type="unfinished">
+        <translation>
             <numerusform>На трекере был%1 %Ln раздающий%2</numerusform>
             <numerusform>На трекере было%1 %Ln раздающих%2</numerusform>
             <numerusform>На трекере было%1 %Ln раздающих%2</numerusform>
@@ -2571,7 +2571,7 @@ To add another primary URL, add it after a blank line.</source>
         <location line="+6"/>
         <source> and%1 %Ln leecher(s)%2 %3 ago</source>
         <extracomment>Second part of phrase &quot;Tracker had ... seeder(s) and ... leecher(s) ... ago&quot;; %1 and %2 are replaced with HTML markup, %3 is duration; notice that leading space (before &quot;and&quot;) is included here</extracomment>
-        <translation type="unfinished">
+        <translation>
             <numerusform> и%1 %Ln принимающий%2 %3 тому назад</numerusform>
             <numerusform> и%1 %Ln принимающих%2 %3 тому назад</numerusform>
             <numerusform> и%1 %Ln принимающих%2 %3 тому назад</numerusform>
@@ -2579,6 +2579,12 @@ To add another primary URL, add it after a blank line.</source>
     </message>
     <message>
         <location line="+8"/>
+        <source>Tracker had %1no information%2 on peer counts %3 ago</source>
+        <extracomment>%1 and %2 are replaced with HTML markup, %3 is duration</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+9"/>
         <source>Got a scrape error %1&quot;%2&quot;%3 %4 ago</source>
         <extracomment>%1 and %3 are replaced with HTML markup, %2 is error message, %4 is duration</extracomment>
         <translation>Получена ошибка при запросе к трекеру %1&quot;%2&quot;%3 %4 тому назад</translation>

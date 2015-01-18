@@ -1555,15 +1555,7 @@ Para agregar otro URL primario, agréguelo después de una línea en blanco.</tr
         <translation>uTP es una herramienta para reducir la congestión en redes.</translation>
     </message>
     <message numerus="yes">
-        <location line="+34"/>
-        <source>&lt;b&gt;Update succeeded!&lt;/b&gt;&lt;p&gt;Blocklist now has %Ln rule(s).</source>
-        <translation type="unfinished">
-            <numerusform>&lt;b&gt;¡Actualización exitosa!&lt;/b&gt;&lt;p&gt;La lista de bloqueos tiene ahora %Ln regla.</numerusform>
-            <numerusform>&lt;b&gt;¡Actualización exitosa!&lt;/b&gt;&lt;p&gt;La lista de bloqueos tiene ahora %Ln reglas.</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <location line="+128"/>
+        <location line="+162"/>
         <source> minute(s)</source>
         <extracomment>Spin box suffix, &quot;Stop seeding if idle for: [ 5 minutes ]&quot; (includes leading space after the number, if needed)</extracomment>
         <translation>
@@ -1628,7 +1620,7 @@ Para agregar otro URL primario, agréguelo después de una línea en blanco.</tr
     <message numerus="yes">
         <location line="+61"/>
         <source>&lt;i&gt;Blocklist contains %Ln rule(s)&lt;/i&gt;</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>&lt;i&gt;Lista de bloqueos contiene %Ln regla&lt;/i&gt;</numerusform>
             <numerusform>&lt;i&gt;Lista de bloqueos contiene %Ln reglas&lt;/i&gt;</numerusform>
         </translation>
@@ -1653,8 +1645,16 @@ Para agregar otro URL primario, agréguelo después de una línea en blanco.</tr
         <source>Maximum peers &amp;overall:</source>
         <translation>Máximo número de compañeros &amp;global:</translation>
     </message>
+    <message numerus="yes">
+        <location line="+41"/>
+        <source>&lt;b&gt;Update succeeded!&lt;/b&gt;&lt;p&gt;Blocklist now has %Ln rule(s).</source>
+        <translation>
+            <numerusform>&lt;b&gt;¡Actualización exitosa!&lt;/b&gt;&lt;p&gt;La lista de bloqueos tiene ahora %Ln regla.</numerusform>
+            <numerusform>&lt;b&gt;¡Actualización exitosa!&lt;/b&gt;&lt;p&gt;La lista de bloqueos tiene ahora %Ln reglas.</numerusform>
+        </translation>
+    </message>
     <message>
-        <location line="+50"/>
+        <location line="+9"/>
         <source>&lt;b&gt;Update Blocklist&lt;/b&gt;&lt;p&gt;Getting new blocklist...</source>
         <translation>&lt;b&gt;Actualizar Lista de bloqueos&lt;/b&gt;&lt;p&gt;Obteniendo nueva lista...</translation>
     </message>
@@ -2183,13 +2183,13 @@ Para agregar otro URL primario, agréguelo después de una línea en blanco.</tr
         <location line="+14"/>
         <source> - %1 left</source>
         <extracomment>Second (optional) part of torrent progress string; %1 is duration; notice that leading space (before the dash) is included here</extracomment>
-        <translation type="unfinished"> - falta %1</translation>
+        <translation> - falta %1</translation>
     </message>
     <message>
         <location line="+4"/>
         <source> - Remaining time unknown</source>
         <extracomment>Second (optional) part of torrent progress string; notice that leading space (before the dash) is included here</extracomment>
-        <translation type="unfinished"> - Tiempo faltante desconocido</translation>
+        <translation> - Tiempo faltante desconocido</translation>
     </message>
     <message>
         <location line="+41"/>
@@ -2197,27 +2197,40 @@ Para agregar otro URL primario, agréguelo después de una línea en blanco.</tr
         <translation>Proporción: %1</translation>
     </message>
     <message numerus="yes">
-        <location line="+33"/>
+        <location line="+41"/>
+        <source>Downloading from %Ln peer(s)</source>
+        <extracomment>First part of phrase &quot;Downloading from ... peer(s) and ... web seed(s)&quot;</extracomment>
+        <translation>
+            <numerusform>Descargando desde %Ln compañero</numerusform>
+            <numerusform>Descargando desde %Ln compañeros</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <location line="+15"/>
+        <source>Seeding to %Ln peer(s)</source>
+        <translation>
+            <numerusform>Compartiendo a %Ln compañero</numerusform>
+            <numerusform>Compartiendo a %Ln compañeros</numerusform>
+        </translation>
+    </message>
+    <message>
+        <location line="+15"/>
+        <source> - </source>
+        <translation> - </translation>
+    </message>
+    <message numerus="yes">
+        <location line="-38"/>
         <source>Downloading metadata from %Ln peer(s) (%1% done)</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>Descargando metadata desde %Ln compañero (%1% obtenido)</numerusform>
             <numerusform>Descargando metadata desde %Ln compañeros (%1% obtenido)</numerusform>
         </translation>
     </message>
     <message numerus="yes">
-        <location line="+8"/>
-        <source>Downloading from %Ln peer(s)</source>
-        <extracomment>First part of phrase &quot;Downloading from ... peer(s) and ... web seed(s)&quot;</extracomment>
-        <translation type="unfinished">
-            <numerusform>Descargando desde %1 compañero</numerusform>
-            <numerusform>Descargando desde %1 compañeros</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <location line="+3"/>
+        <location line="+11"/>
         <source>Downloading from %1 of %Ln connected peer(s)</source>
         <extracomment>First part of phrase &quot;Downloading from ... of ... connected peer(s) and ... web seed(s)&quot;</extracomment>
-        <translation type="unfinished">
+        <translation>
             <numerusform>Descargando desde %1 de %Ln compañero conectado</numerusform>
             <numerusform>Descargando desde %1 de %Ln compañeros conectados</numerusform>
         </translation>
@@ -2226,34 +2239,21 @@ Para agregar otro URL primario, agréguelo después de una línea en blanco.</tr
         <location line="+6"/>
         <source> and %Ln web seed(s)</source>
         <extracomment>Second (optional) part of phrase &quot;Downloading from ... of ... connected peer(s) and ... web seed(s)&quot;; notice that leading space (before &quot;and&quot;) is included here</extracomment>
-        <translation type="unfinished">
-            <numerusform>y %n web seed</numerusform>
-            <numerusform>y %n web seeds</numerusform>
+        <translation>
+            <numerusform> y %Ln web seed</numerusform>
+            <numerusform> y %Ln web seeds</numerusform>
         </translation>
     </message>
     <message numerus="yes">
-        <location line="+6"/>
-        <source>Seeding to %Ln peer(s)</source>
-        <translation type="unfinished">
-            <numerusform>Compartiendo a %1 compañero</numerusform>
-            <numerusform>Compartiendo a %1 compañeros</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <location line="+2"/>
+        <location line="+8"/>
         <source>Seeding to %1 of %Ln connected peer(s)</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>Compartiendo a %1 de %Ln compañero conectado</numerusform>
             <numerusform>Compartiendo a %1 de %Ln compañeros conectados</numerusform>
         </translation>
     </message>
     <message>
-        <location line="+13"/>
-        <source> - </source>
-        <translation> - </translation>
-    </message>
-    <message>
-        <location line="-8"/>
+        <location line="+5"/>
         <source>Error</source>
         <translation>Error</translation>
     </message>
@@ -2380,7 +2380,7 @@ Para agregar otro URL primario, agréguelo después de una línea en blanco.</tr
     <message numerus="yes">
         <location line="-5"/>
         <source>Remove %Ln torrent(s)?</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>¿Remover %Ln torrent?</numerusform>
             <numerusform>¿Remover %Ln torrents?</numerusform>
         </translation>
@@ -2388,7 +2388,7 @@ Para agregar otro URL primario, agréguelo después de una línea en blanco.</tr
     <message numerus="yes">
         <location line="+6"/>
         <source>Delete these %Ln torrent(s)&apos; downloaded files?</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>¿Borrar archivos descargados de estos %Ln torrent?</numerusform>
             <numerusform>¿Borrar archivos descargados de estos %Ln torrents?</numerusform>
         </translation>
@@ -2494,7 +2494,7 @@ Para agregar otro URL primario, agréguelo después de una línea en blanco.</tr
         <location filename="../tracker-delegate.cc" line="+162"/>
         <source>Got a list of%1 %Ln peer(s)%2 %3 ago</source>
         <extracomment>%1 and %2 are replaced with HTML markup, %3 is duration</extracomment>
-        <translation type="unfinished">
+        <translation>
             <numerusform>Recibimos una lista de%1 %Ln compañero%2 hace %3</numerusform>
             <numerusform>Recibimos una lista de%1 %Ln compañeros%2 hace %3</numerusform>
         </translation>
@@ -2509,7 +2509,7 @@ Para agregar otro URL primario, agréguelo después de una línea en blanco.</tr
         <location line="+8"/>
         <source>Got an error %1&quot;%2&quot;%3 %4 ago</source>
         <extracomment>%1 and %3 are replaced with HTML markup, %2 is error message, %4 is duration</extracomment>
-        <translation>Obtuvimos un error %1&quot;%2&quot; hace %3 %4</translation>
+        <translation>Obtuvimos un error %1&quot;%2&quot;%3 hace %4</translation>
     </message>
     <message>
         <location line="+12"/>
@@ -2534,28 +2534,34 @@ Para agregar otro URL primario, agréguelo después de una línea en blanco.</tr
         <translation>Solicitando más compañeros ahora... &lt;small&gt;%1&lt;/small&gt;</translation>
     </message>
     <message numerus="yes">
-        <location line="+15"/>
+        <location line="+17"/>
         <source>Tracker had%1 %Ln seeder(s)%2</source>
         <extracomment>First part of phrase &quot;Tracker had ... seeder(s) and ... leecher(s) ... ago&quot;; %1 and %2 are replaced with HTML markup</extracomment>
-        <translation type="unfinished">
+        <translation>
             <numerusform>El seguidor tenía%1 %Ln compartiendo%2</numerusform>
-            <numerusform>El seguidor tenía%1 %Ln compartiendo%2</numerusform>
+            <numerusform>El seguidor tenía%1 %Ln compartiendos%2</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location line="+6"/>
         <source> and%1 %Ln leecher(s)%2 %3 ago</source>
         <extracomment>Second part of phrase &quot;Tracker had ... seeder(s) and ... leecher(s) ... ago&quot;; %1 and %2 are replaced with HTML markup, %3 is duration; notice that leading space (before &quot;and&quot;) is included here</extracomment>
-        <translation type="unfinished">
-            <numerusform>y%1 %Ln descargando%2 hace %3</numerusform>
-            <numerusform>y%1 %Ln descargando%2 hace %3</numerusform>
+        <translation>
+            <numerusform> y%1 %Ln descargando%2 hace %3</numerusform>
+            <numerusform> y%1 %Ln descargandos%2 hace %3</numerusform>
         </translation>
     </message>
     <message>
         <location line="+8"/>
+        <source>Tracker had %1no information%2 on peer counts %3 ago</source>
+        <extracomment>%1 and %2 are replaced with HTML markup, %3 is duration</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+9"/>
         <source>Got a scrape error %1&quot;%2&quot;%3 %4 ago</source>
         <extracomment>%1 and %3 are replaced with HTML markup, %2 is error message, %4 is duration</extracomment>
-        <translation>Obtuvimos un error de barrido&apos; %1&quot;%2&quot; hace %3 %4</translation>
+        <translation>Obtuvimos un error de barrido&apos; %1&quot;%2&quot;%3 hace %4</translation>
     </message>
     <message>
         <location line="+18"/>

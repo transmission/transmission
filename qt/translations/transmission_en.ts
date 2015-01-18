@@ -2386,7 +2386,7 @@ To add another primary URL, add it after a blank line.</source>
         <location line="+6"/>
         <source>Delete these %Ln torrent(s)&apos; downloaded files?</source>
         <translation>
-            <numerusform>Delete this %Ln torrent&apos; downloaded files?</numerusform>
+            <numerusform>Delete this %Ln torrent&apos;s downloaded files?</numerusform>
             <numerusform>Delete these %Ln torrents&apos; downloaded files?</numerusform>
         </translation>
     </message>
@@ -2531,7 +2531,7 @@ To add another primary URL, add it after a blank line.</source>
         <translation type="unfinished"></translation>
     </message>
     <message numerus="yes">
-        <location line="+15"/>
+        <location line="+17"/>
         <source>Tracker had%1 %Ln seeder(s)%2</source>
         <extracomment>First part of phrase &quot;Tracker had ... seeder(s) and ... leecher(s) ... ago&quot;; %1 and %2 are replaced with HTML markup</extracomment>
         <translation>
@@ -2550,6 +2550,12 @@ To add another primary URL, add it after a blank line.</source>
     </message>
     <message>
         <location line="+8"/>
+        <source>Tracker had %1no information%2 on peer counts %3 ago</source>
+        <extracomment>%1 and %2 are replaced with HTML markup, %3 is duration</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+9"/>
         <source>Got a scrape error %1&quot;%2&quot;%3 %4 ago</source>
         <extracomment>%1 and %3 are replaced with HTML markup, %2 is error message, %4 is duration</extracomment>
         <translation type="unfinished"></translation>

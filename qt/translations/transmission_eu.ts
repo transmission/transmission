@@ -1555,15 +1555,7 @@ Beste lehen URL bat gehitzeko, gehitu hura lerro huts baten ondoren.</translatio
         <translation>uTP sare betekada murrizteko tresna bat da.</translation>
     </message>
     <message numerus="yes">
-        <location line="+34"/>
-        <source>&lt;b&gt;Update succeeded!&lt;/b&gt;&lt;p&gt;Blocklist now has %Ln rule(s).</source>
-        <translation>
-            <numerusform>&lt;b&gt;Eguneraketa eginda!&lt;/b&gt;&lt;p&gt;Blokeo-zerrendak orain %Ln arau ditu.</numerusform>
-            <numerusform>&lt;b&gt;Eguneraketa eginda!&lt;/b&gt;&lt;p&gt;Blokeo-zerrendak orain %Ln arau ditu.</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <location line="+128"/>
+        <location line="+162"/>
         <source> minute(s)</source>
         <extracomment>Spin box suffix, &quot;Stop seeding if idle for: [ 5 minutes ]&quot; (includes leading space after the number, if needed)</extracomment>
         <translation>
@@ -1653,8 +1645,16 @@ Beste lehen URL bat gehitzeko, gehitu hura lerro huts baten ondoren.</translatio
         <source>Maximum peers &amp;overall:</source>
         <translation>Gehinezko hartzaile &amp;orotara:</translation>
     </message>
+    <message numerus="yes">
+        <location line="+41"/>
+        <source>&lt;b&gt;Update succeeded!&lt;/b&gt;&lt;p&gt;Blocklist now has %Ln rule(s).</source>
+        <translation>
+            <numerusform>&lt;b&gt;Eguneraketa eginda!&lt;/b&gt;&lt;p&gt;Blokeo-zerrendak orain %Ln arau ditu.</numerusform>
+            <numerusform>&lt;b&gt;Eguneraketa eginda!&lt;/b&gt;&lt;p&gt;Blokeo-zerrendak orain %Ln arau ditu.</numerusform>
+        </translation>
+    </message>
     <message>
-        <location line="+50"/>
+        <location line="+9"/>
         <source>&lt;b&gt;Update Blocklist&lt;/b&gt;&lt;p&gt;Getting new blocklist...</source>
         <translation>&lt;b&gt;Eguneratu Blokeo-zerrenda&lt;/b&gt;&lt;p&gt;Blokeo-zerrenda berria lortzen...</translation>
     </message>
@@ -2183,41 +2183,54 @@ Beste lehen URL bat gehitzeko, gehitu hura lerro huts baten ondoren.</translatio
         <location line="+14"/>
         <source> - %1 left</source>
         <extracomment>Second (optional) part of torrent progress string; %1 is duration; notice that leading space (before the dash) is included here</extracomment>
-        <translation type="unfinished"> - %1 gelditzen d(ir)a</translation>
+        <translation> - %1 gelditzen d(ir)a</translation>
     </message>
     <message>
         <location line="+4"/>
         <source> - Remaining time unknown</source>
         <extracomment>Second (optional) part of torrent progress string; notice that leading space (before the dash) is included here</extracomment>
-        <translation type="unfinished"> - Gelditzen den denbora ezezaguna</translation>
+        <translation> - Gelditzen den denbora ezezaguna</translation>
     </message>
     <message>
         <location line="+41"/>
         <source>Ratio: %1</source>
-        <translation type="unfinished">Maila: %1</translation>
+        <translation>Maila: %1</translation>
     </message>
     <message numerus="yes">
-        <location line="+33"/>
-        <source>Downloading metadata from %Ln peer(s) (%1% done)</source>
-        <translation type="unfinished">
-            <numerusform>Metadatuak jeisten %n hartzailetik (%1% eginda)</numerusform>
-            <numerusform>Metadatuak jeisten %n hartzailetik (%1% eginda)</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <location line="+8"/>
+        <location line="+41"/>
         <source>Downloading from %Ln peer(s)</source>
         <extracomment>First part of phrase &quot;Downloading from ... peer(s) and ... web seed(s)&quot;</extracomment>
-        <translation type="unfinished">
+        <translation>
             <numerusform>Jeisten %1 --&gt; %Ln elkarketaturiko hartzailetik</numerusform>
             <numerusform>Jeisten %1 --&gt; %Ln elkarketaturiko hartzailetik</numerusform>
         </translation>
     </message>
     <message numerus="yes">
-        <location line="+3"/>
+        <location line="+15"/>
+        <source>Seeding to %Ln peer(s)</source>
+        <translation>
+            <numerusform>%Ln hartzailera emaritzen</numerusform>
+            <numerusform>%Ln hartzailera emaritzen</numerusform>
+        </translation>
+    </message>
+    <message>
+        <location line="+15"/>
+        <source> - </source>
+        <translation> - </translation>
+    </message>
+    <message numerus="yes">
+        <location line="-38"/>
+        <source>Downloading metadata from %Ln peer(s) (%1% done)</source>
+        <translation>
+            <numerusform>Metadatuak jeisten %Ln hartzailetik (%1% eginda)</numerusform>
+            <numerusform>Metadatuak jeisten %Ln hartzailetik (%1% eginda)</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <location line="+11"/>
         <source>Downloading from %1 of %Ln connected peer(s)</source>
         <extracomment>First part of phrase &quot;Downloading from ... of ... connected peer(s) and ... web seed(s)&quot;</extracomment>
-        <translation type="unfinished">
+        <translation>
             <numerusform>Jeisten %1 --&gt; %Ln elkarketaturiko hartzailetik</numerusform>
             <numerusform>Jeisten %1 --&gt; %Ln elkarketaturiko hartzailetik</numerusform>
         </translation>
@@ -2226,34 +2239,21 @@ Beste lehen URL bat gehitzeko, gehitu hura lerro huts baten ondoren.</translatio
         <location line="+6"/>
         <source> and %Ln web seed(s)</source>
         <extracomment>Second (optional) part of phrase &quot;Downloading from ... of ... connected peer(s) and ... web seed(s)&quot;; notice that leading space (before &quot;and&quot;) is included here</extracomment>
-        <translation type="unfinished">
+        <translation>
             <numerusform> eta %Ln web emaritza</numerusform>
             <numerusform> eta %Ln web emaritza</numerusform>
         </translation>
     </message>
     <message numerus="yes">
-        <location line="+6"/>
-        <source>Seeding to %Ln peer(s)</source>
-        <translation type="unfinished">
-            <numerusform>%Ln hartzailera emaritzen</numerusform>
-            <numerusform>%Ln hartzailera emaritzen</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <location line="+2"/>
+        <location line="+8"/>
         <source>Seeding to %1 of %Ln connected peer(s)</source>
-        <translation type="unfinished">
-            <numerusform>%1 -&gt; %Ln elkarturiko hartzailera emaritzen</numerusform>
-            <numerusform>%1 -&gt; %Ln elkarturiko hartzailera emaritzen</numerusform>
+        <translation>
+            <numerusform>%1 --&gt; %Ln elkarturiko hartzailera emaritzen</numerusform>
+            <numerusform>%1 --&gt; %Ln elkarturiko hartzailera emaritzen</numerusform>
         </translation>
     </message>
     <message>
-        <location line="+13"/>
-        <source> - </source>
-        <translation> - </translation>
-    </message>
-    <message>
-        <location line="-8"/>
+        <location line="+5"/>
         <source>Error</source>
         <translation>Akatsa</translation>
     </message>
@@ -2380,7 +2380,7 @@ Beste lehen URL bat gehitzeko, gehitu hura lerro huts baten ondoren.</translatio
     <message numerus="yes">
         <location line="-5"/>
         <source>Remove %Ln torrent(s)?</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>Kendu %Ln torrent?</numerusform>
             <numerusform>Kendu %Ln torrent?</numerusform>
         </translation>
@@ -2388,7 +2388,7 @@ Beste lehen URL bat gehitzeko, gehitu hura lerro huts baten ondoren.</translatio
     <message numerus="yes">
         <location line="+6"/>
         <source>Delete these %Ln torrent(s)&apos; downloaded files?</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>Ezabatu jeitsitako %Ln torrent hauen agiriak?</numerusform>
             <numerusform>Ezabatu jeitsitako %Ln torrent hauen agiriak?</numerusform>
         </translation>
@@ -2494,7 +2494,7 @@ Beste lehen URL bat gehitzeko, gehitu hura lerro huts baten ondoren.</translatio
         <location filename="../tracker-delegate.cc" line="+162"/>
         <source>Got a list of%1 %Ln peer(s)%2 %3 ago</source>
         <extracomment>%1 and %2 are replaced with HTML markup, %3 is duration</extracomment>
-        <translation type="unfinished">
+        <translation>
             <numerusform>Zerrenda:%1 %Ln hartzaile%2 %3</numerusform>
             <numerusform>Zerrenda:%1 %Ln hartzaile%2 %3</numerusform>
         </translation>
@@ -2534,10 +2534,10 @@ Beste lehen URL bat gehitzeko, gehitu hura lerro huts baten ondoren.</translatio
         <translation>Hartzaile gehiagogaitik galdetzen orain... &lt;small&gt;%1&lt;/small&gt;</translation>
     </message>
     <message numerus="yes">
-        <location line="+15"/>
+        <location line="+17"/>
         <source>Tracker had%1 %Ln seeder(s)%2</source>
         <extracomment>First part of phrase &quot;Tracker had ... seeder(s) and ... leecher(s) ... ago&quot;; %1 and %2 are replaced with HTML markup</extracomment>
-        <translation type="unfinished">
+        <translation>
             <numerusform>Aztarnariak du%1 %Ln emale%2</numerusform>
             <numerusform>Aztarnariak du%1 %Ln emale%2</numerusform>
         </translation>
@@ -2546,13 +2546,19 @@ Beste lehen URL bat gehitzeko, gehitu hura lerro huts baten ondoren.</translatio
         <location line="+6"/>
         <source> and%1 %Ln leecher(s)%2 %3 ago</source>
         <extracomment>Second part of phrase &quot;Tracker had ... seeder(s) and ... leecher(s) ... ago&quot;; %1 and %2 are replaced with HTML markup, %3 is duration; notice that leading space (before &quot;and&quot;) is included here</extracomment>
-        <translation type="unfinished">
+        <translation>
             <numerusform> eta%1 %Ln izain%2 %3</numerusform>
             <numerusform> eta%1 %Ln izain%2 %3</numerusform>
         </translation>
     </message>
     <message>
         <location line="+8"/>
+        <source>Tracker had %1no information%2 on peer counts %3 ago</source>
+        <extracomment>%1 and %2 are replaced with HTML markup, %3 is duration</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+9"/>
         <source>Got a scrape error %1&quot;%2&quot;%3 %4 ago</source>
         <extracomment>%1 and %3 are replaced with HTML markup, %2 is error message, %4 is duration</extracomment>
         <translation>Zuriketa akatsa: %1&quot;%2&quot;%3 %4</translation>

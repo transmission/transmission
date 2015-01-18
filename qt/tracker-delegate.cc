@@ -221,18 +221,29 @@ TrackerDelegate::getText (const TrackerInfo& inf) const
               const QString tstr (timeToStringRounded (now - inf.st.lastScrapeTime));
               if (inf.st.lastScrapeSucceeded)
                 {
-                  //: First part of phrase "Tracker had ... seeder(s) and ... leecher(s) ... ago";
-                  //: %1 and %2 are replaced with HTML markup
-                  str += tr ("Tracker had%1 %Ln seeder(s)%2", 0, inf.st.seederCount)
-                         .arg (success_markup_begin)
-                         .arg (success_markup_end);
-                  //: Second part of phrase "Tracker had ... seeder(s) and ... leecher(s) ... ago";
-                  //: %1 and %2 are replaced with HTML markup, %3 is duration;
-                  //: notice that leading space (before "and") is included here
-                  str += tr (" and%1 %Ln leecher(s)%2 %3 ago", 0, inf.st.leecherCount)
-                         .arg (success_markup_begin)
-                         .arg (success_markup_end)
-                         .arg (tstr);
+                  if (inf.st.seederCount >= 0 && inf.st.leecherCount >= 0)
+                    {
+                      //: First part of phrase "Tracker had ... seeder(s) and ... leecher(s) ... ago";
+                      //: %1 and %2 are replaced with HTML markup
+                      str += tr ("Tracker had%1 %Ln seeder(s)%2", 0, inf.st.seederCount)
+                             .arg (success_markup_begin)
+                             .arg (success_markup_end);
+                      //: Second part of phrase "Tracker had ... seeder(s) and ... leecher(s) ... ago";
+                      //: %1 and %2 are replaced with HTML markup, %3 is duration;
+                      //: notice that leading space (before "and") is included here
+                      str += tr (" and%1 %Ln leecher(s)%2 %3 ago", 0, inf.st.leecherCount)
+                             .arg (success_markup_begin)
+                             .arg (success_markup_end)
+                             .arg (tstr);
+                    }
+                  else
+                    {
+                      //: %1 and %2 are replaced with HTML markup, %3 is duration
+                      str += tr ("Tracker had %1no information%2 on peer counts %3 ago")
+                             .arg (success_markup_begin)
+                             .arg (success_markup_end)
+                             .arg (tstr);
+                    }
                 }
               else
                 {
