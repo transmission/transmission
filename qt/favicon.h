@@ -26,6 +26,7 @@ class Favicons: public QObject
   public:
 
     static QString getHost( const QUrl& url );
+    static QSize getIconSize ();
 
   public:
 

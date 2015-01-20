@@ -524,6 +524,9 @@
       <layout class="QGridLayout" name="trackersTabLayout">
        <item row="0" column="0" rowspan="4">
         <widget class="QListView" name="trackersView">
+         <property name="horizontalScrollBarPolicy">
+          <enum>Qt::ScrollBarAlwaysOff</enum>
+         </property>
          <property name="alternatingRowColors">
           <bool>true</bool>
          </property>

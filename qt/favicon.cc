@@ -88,16 +88,17 @@ Favicons::getHost (const QUrl& url)
   return host;
 }
 
+QSize
+Favicons::getIconSize ()
+{
+  return QSize (16, 16);
+}
+
 QPixmap
 Favicons::find (const QUrl& url)
 {
   return findFromHost (getHost (url));
 }
-
-namespace
-{
-  const QSize rightSize (16, 16);
-};
 
 QPixmap
 Favicons::findFromHost (const QString& host)
@@ -105,6 +106,7 @@ Favicons::findFromHost (const QString& host)
   ensureCacheDirHasBeenScanned ();
 
   const QPixmap pixmap = myPixmaps[host];
+  const QSize rightSize = getIconSize ();
   return pixmap.isNull () || pixmap.size () == rightSize ? pixmap : pixmap.scaled (rightSize);
 }
 

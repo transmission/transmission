@@ -9,6 +9,8 @@
 
 #include <iostream>
 
+#include <QAbstractTextDocumentLayout>
+#include <QApplication>
 #include <QPainter>
 #include <QPixmap>
 #include <QTextDocument>
@@ -21,6 +23,7 @@
 #include "torrent.h"
 #include "tracker-delegate.h"
 #include "tracker-model.h"
+#include "utils.h"
 
 /***
 ****
@@ -29,7 +32,55 @@
 namespace
 {
   const int mySpacing = 6;
-  const QSize myMargin (10, 6);
+  const QSize myMargin (10, 10);
+
+  class ItemLayout
+  {
+    private:
+      QTextDocument myTextDocument;
+
+    public:
+      QRect iconRect;
+      QRect textRect;
+
+    public:
+      ItemLayout(const QString& text, bool suppressColors, Qt::LayoutDirection direction,
+                 const QPoint& topLeft, int width);
+
+      QSize size () const
+      {
+        return (iconRect | textRect).size ();
+      }
+
+      QAbstractTextDocumentLayout * textLayout () const
+      {
+        return myTextDocument.documentLayout ();
+      }
+  };
+
+  ItemLayout::ItemLayout(const QString& text, bool suppressColors, Qt::LayoutDirection direction,
+                         const QPoint& topLeft, int width)
+  {
+    const QStyle * style (qApp->style ());
+    const QSize iconSize = Favicons::getIconSize ();
+
+    QRect baseRect (topLeft, QSize (width, 0));
+
+    iconRect = style->alignedRect (direction, Qt::AlignLeft | Qt::AlignTop, iconSize, baseRect);
+    Utils::narrowRect (baseRect, iconSize.width () + mySpacing, 0, direction);
+
+    myTextDocument.setDocumentMargin (0);
+    myTextDocument.setTextWidth (baseRect.width ());
+    QTextOption textOption;
+    textOption.setTextDirection (direction);
+    if (suppressColors)
+      textOption.setFlags (QTextOption::SuppressColors);
+    myTextDocument.setDefaultTextOption (textOption);
+    myTextDocument.setHtml (text);
+
+    textRect = baseRect;
+    textRect.setSize (myTextDocument.size ().toSize ());
+  }
 }
 
 QSize
@@ -48,17 +99,8 @@ QSize
 TrackerDelegate::sizeHint (const QStyleOptionViewItem & option,
                            const TrackerInfo          & info) const
 {
-  Q_UNUSED (option);
-
-  QPixmap favicon = info.st.getFavicon ();
-
-  const QString text = TrackerDelegate::getText(info);
-  QTextDocument textDoc;
-  textDoc.setHtml (text);
-  const QSize textSize = textDoc.size().toSize();
-
-  return QSize (myMargin.width() + favicon.width() + mySpacing + textSize.width() + myMargin.width(),
-                myMargin.height() + qMax<int> (favicon.height(), textSize.height()) + myMargin.height());
+  const ItemLayout layout (getText (info), true, option.direction, QPoint (0, 0), option.rect.width () - myMargin.width () * 2);
+  return layout.size () + myMargin * 2;
 }
 
 QSize
@@ -88,23 +130,22 @@ TrackerDelegate::drawTracker (QPainter                    * painter,
                               const QStyleOptionViewItem  & option,
                               const TrackerInfo           & inf) const
 {
+  const bool isItemSelected ((option.state & QStyle::State_Selected) != 0);
+
+  QIcon trackerIcon (inf.st.getFavicon());
+
+  const QRect contentRect (option.rect.adjusted (myMargin.width (), myMargin.height (), -myMargin.width (), -myMargin.height ()));
+  const ItemLayout layout (getText (inf), isItemSelected, option.direction, contentRect.topLeft (), contentRect.width ());
+
   painter->save();
 
-  QPixmap icon = inf.st.getFavicon();
-  QRect iconArea (option.rect.x() + myMargin.width(),
-                  option.rect.y() + myMargin.height(),
-                  icon.width(),
-                  icon.height());
-  painter->drawPixmap (iconArea.x(), iconArea.y()+4, icon);
+  trackerIcon.paint (painter, layout.iconRect, Qt::AlignCenter, isItemSelected ? QIcon::Selected : QIcon::Normal, QIcon::On);
 
-  const int textWidth = option.rect.width() - myMargin.width()*2 - mySpacing - icon.width();
-  const int textX = myMargin.width() + icon.width() + mySpacing;
-  const QString text = getText (inf);
-  QTextDocument textDoc;
-  textDoc.setHtml (text);
-  const QRect textRect (textX, iconArea.y(), textWidth, option.rect.height() - myMargin.height()*2);
-  painter->translate (textRect.topLeft());
-  textDoc.drawContents (painter, textRect.translated (-textRect.topLeft()));
+  QAbstractTextDocumentLayout::PaintContext paintContext;
+  paintContext.clip = layout.textRect.translated (-layout.textRect.topLeft ());
+  paintContext.palette.setColor (QPalette::Text, option.palette.color (isItemSelected ? QPalette::HighlightedText : QPalette::Text));
+  painter->translate (layout.textRect.topLeft());
+  layout.textLayout ()->draw (painter, paintContext);
 
   painter->restore();
 }
