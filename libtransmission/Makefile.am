@@ -31,7 +31,6 @@ libtransmission_a_SOURCES = \
   crypto.c \
   crypto-utils.c \
   crypto-utils-fallback.c \
-  crypto-utils-@CRYPTO_PKG@.c \
   error.c \
   fdlimit.c \
   file.c \
@@ -81,6 +80,16 @@ if WIN32
 libtransmission_a_SOURCES += file-win32.c
 else
 libtransmission_a_SOURCES += file-posix.c
+endif
+
+if CRYPTO_USE_OPENSSL
+libtransmission_a_SOURCES += crypto-utils-openssl.c
+endif
+if CRYPTO_USE_CYASSL
+libtransmission_a_SOURCES += crypto-utils-cyassl.c
+endif
+if CRYPTO_USE_POLARSSL
+libtransmission_a_SOURCES += crypto-utils-polarssl.c
 endif
 
 noinst_HEADERS = \
