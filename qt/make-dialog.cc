@@ -17,6 +17,7 @@
 #include <libtransmission/makemeta.h>
 #include <libtransmission/utils.h>
 
+#include "column-resizer.h"
 #include "formatter.h"
 #include "make-dialog.h"
 #include "session.h"
@@ -220,13 +221,18 @@ MakeDialog::MakeDialog (Session& session, QWidget * parent):
 {
   ui.setupUi (this);
 
-  resize (minimumSizeHint ());
-
   ui.destinationButton->setMode (TrPathButton::DirectoryMode);
   ui.destinationButton->setPath (QDir::homePath ());
 
   ui.sourceFolderButton->setMode (TrPathButton::DirectoryMode);
   ui.sourceFileButton->setMode (TrPathButton::FileMode);
+
+  ColumnResizer * cr (new ColumnResizer (this));
+  cr->addLayout (ui.filesSectionLayout);
+  cr->addLayout (ui.propertiesSectionLayout);
+  cr->update ();
+
+  resize (minimumSizeHint ());
 
   connect (ui.sourceFolderRadio, SIGNAL (toggled (bool)), this, SLOT (onSourceChanged ()));
   connect (ui.sourceFolderButton, SIGNAL (pathChanged (QString)), this, SLOT (onSourceChanged ()));

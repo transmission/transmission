@@ -28,6 +28,7 @@ set(${PROJECT_NAME}_SOURCES
     about.cc
     add-data.cc
     app.cc
+    column-resizer.cc
     dbus-adaptor.cc
     details.cc
     favicon.cc
@@ -67,6 +68,7 @@ set(${PROJECT_NAME}_HEADERS
     about.h
     add-data.h
     app.h
+    column-resizer.h
     dbus-adaptor.h
     details.h
     favicon.h

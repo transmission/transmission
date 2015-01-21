@@ -32,6 +32,7 @@
 #include <libtransmission/transmission.h>
 #include <libtransmission/utils.h> // tr_getRatio ()
 
+#include "column-resizer.h"
 #include "details.h"
 #include "file-tree.h"
 #include "formatter.h"
@@ -959,6 +960,11 @@ Details::initInfoTab ()
 {
   const int h = QFontMetrics (ui.commentBrowser->font ()).lineSpacing () * 4;
   ui.commentBrowser->setFixedHeight (h);
+
+  ColumnResizer * cr (new ColumnResizer (this));
+  cr->addLayout (ui.activitySectionLayout);
+  cr->addLayout (ui.detailsSectionLayout);
+  cr->update ();
 }
 
 /***
@@ -1176,6 +1182,13 @@ Details::initOptionsTab ()
   ui.idleCombo->addItem (tr ("Use Global Settings"),         TR_IDLELIMIT_GLOBAL);
   ui.idleCombo->addItem (tr ("Seed regardless of activity"), TR_IDLELIMIT_UNLIMITED);
   ui.idleCombo->addItem (tr ("Stop seeding if idle for:"),   TR_IDLELIMIT_SINGLE);
+
+  ColumnResizer * cr (new ColumnResizer (this));
+  cr->addLayout (ui.speedSectionLayout);
+  cr->addLayout (ui.seedingLimitsSectionRatioLayout);
+  cr->addLayout (ui.seedingLimitsSectionIdleLayout);
+  cr->addLayout (ui.peerConnectionsSectionLayout);
+  cr->update ();
 
   connect (ui.sessionLimitCheck, SIGNAL (clicked (bool)), SLOT (onHonorsSessionLimitsToggled (bool)));
   connect (ui.singleDownCheck, SIGNAL (clicked (bool)), SLOT (onDownloadLimitedToggled (bool)));

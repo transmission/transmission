@@ -9,6 +9,7 @@
 
 #include <QTimer>
 
+#include "column-resizer.h"
 #include "formatter.h"
 #include "session.h"
 #include "stats-dialog.h"
@@ -24,6 +25,11 @@ StatsDialog::StatsDialog (Session& session, QWidget * parent):
   myTimer (new QTimer (this))
 {
   ui.setupUi (this);
+
+  ColumnResizer * cr (new ColumnResizer (this));
+  cr->addLayout (ui.currentSessionSectionLayout);
+  cr->addLayout (ui.totalSectionLayout);
+  cr->update ();
 
   myTimer->setSingleShot (false);
   connect (myTimer, SIGNAL (timeout ()), &mySession, SLOT (refreshSessionStats ()));

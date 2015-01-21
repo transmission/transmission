@@ -63,6 +63,7 @@ win32|macx:RESOURCES += icons/Faenza/Faenza.qrc
 SOURCES += about.cc \
            add-data.cc \
            app.cc \
+           column-resizer.cc \
            dbus-adaptor.cc \
            details.cc \
            favicon.cc \

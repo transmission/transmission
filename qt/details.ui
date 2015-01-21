@@ -7,27 +7,11 @@
     <x>0</x>
     <y>0</y>
     <width>505</width>
-    <height>579</height>
+    <height>581</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Torrent Properties</string>
-  </property>
-  <property name="styleSheet">
-   <string notr="true">[tr-style~=&quot;form-section&quot;]
-{
-  font-weight: bold;
-  margin-top: 12px;
-  margin-bottom: 1px;
-}
-[tr-style~=&quot;form-section&quot;][tr-style~=&quot;first&quot;]
-{
-  margin-top: 0;
-}
-[tr-style~=&quot;form-label&quot;]
-{
-  margin-left: 18px;
-}</string>
   </property>
   <layout class="QVBoxLayout" name="dialogLayout">
    <item>
@@ -39,452 +23,437 @@
       <attribute name="title">
        <string>Information</string>
       </attribute>
-      <layout class="QGridLayout" name="infoTabLayout" rowstretch="0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1" columnstretch="0,1">
-       <item row="0" column="0" colspan="2">
+      <layout class="QVBoxLayout" name="infoTabLayout">
+       <item>
         <widget class="QLabel" name="activitySectionLabel">
+         <property name="styleSheet">
+          <string notr="true">font-weight:bold</string>
+         </property>
          <property name="text">
           <string>Activity</string>
          </property>
-         <property name="tr-style" stdset="0">
-          <string notr="true">form-section first</string>
-         </property>
         </widget>
        </item>
-       <item row="1" column="0">
-        <widget class="QLabel" name="haveLabel">
-         <property name="text">
-          <string>Have:</string>
+       <item>
+        <layout class="QGridLayout" name="activitySectionLayout" columnstretch="0,1">
+         <property name="leftMargin">
+          <number>18</number>
          </property>
-         <property name="tr-style" stdset="0">
-          <string notr="true">form-label</string>
-         </property>
-        </widget>
+         <item row="0" column="0">
+          <widget class="QLabel" name="haveLabel">
+           <property name="text">
+            <string>Have:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="SqueezeLabel" name="haveValueLabel">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Ignored" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="text">
+            <string notr="true">...</string>
+           </property>
+           <property name="textFormat">
+            <enum>Qt::PlainText</enum>
+           </property>
+           <property name="textInteractionFlags">
+            <set>Qt::NoTextInteraction</set>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0">
+          <widget class="QLabel" name="availabilityLabel">
+           <property name="text">
+            <string>Availability:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <widget class="SqueezeLabel" name="availabilityValueLabel">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Ignored" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="text">
+            <string notr="true">...</string>
+           </property>
+           <property name="textFormat">
+            <enum>Qt::PlainText</enum>
+           </property>
+           <property name="textInteractionFlags">
+            <set>Qt::NoTextInteraction</set>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="0">
+          <widget class="QLabel" name="uploadedLabel">
+           <property name="text">
+            <string>Uploaded:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="1">
+          <widget class="SqueezeLabel" name="uploadedValueLabel">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Ignored" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="text">
+            <string notr="true">...</string>
+           </property>
+           <property name="textFormat">
+            <enum>Qt::PlainText</enum>
+           </property>
+           <property name="textInteractionFlags">
+            <set>Qt::NoTextInteraction</set>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="0">
+          <widget class="QLabel" name="downloadedLabel">
+           <property name="text">
+            <string>Downloaded:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="1">
+          <widget class="SqueezeLabel" name="downloadedValueLabel">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Ignored" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="text">
+            <string notr="true">...</string>
+           </property>
+           <property name="textFormat">
+            <enum>Qt::PlainText</enum>
+           </property>
+           <property name="textInteractionFlags">
+            <set>Qt::NoTextInteraction</set>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="0">
+          <widget class="QLabel" name="stateLabel">
+           <property name="text">
+            <string>State:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="1">
+          <widget class="SqueezeLabel" name="stateValueLabel">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Ignored" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="text">
+            <string notr="true">...</string>
+           </property>
+           <property name="textFormat">
+            <enum>Qt::PlainText</enum>
+           </property>
+           <property name="textInteractionFlags">
+            <set>Qt::NoTextInteraction</set>
+           </property>
+          </widget>
+         </item>
+         <item row="5" column="0">
+          <widget class="QLabel" name="runningTimeLabel">
+           <property name="text">
+            <string>Running time:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="5" column="1">
+          <widget class="SqueezeLabel" name="runningTimeValueLabel">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Ignored" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="text">
+            <string notr="true">...</string>
+           </property>
+           <property name="textFormat">
+            <enum>Qt::PlainText</enum>
+           </property>
+           <property name="textInteractionFlags">
+            <set>Qt::NoTextInteraction</set>
+           </property>
+          </widget>
+         </item>
+         <item row="6" column="0">
+          <widget class="QLabel" name="remainingTimeLabel">
+           <property name="text">
+            <string>Remaining time:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="6" column="1">
+          <widget class="SqueezeLabel" name="remainingTimeValueLabel">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Ignored" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="text">
+            <string notr="true">...</string>
+           </property>
+           <property name="textFormat">
+            <enum>Qt::PlainText</enum>
+           </property>
+           <property name="textInteractionFlags">
+            <set>Qt::NoTextInteraction</set>
+           </property>
+          </widget>
+         </item>
+         <item row="7" column="0">
+          <widget class="QLabel" name="lastActivityLabel">
+           <property name="text">
+            <string>Last activity:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="7" column="1">
+          <widget class="SqueezeLabel" name="lastActivityValueLabel">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Ignored" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="text">
+            <string notr="true">...</string>
+           </property>
+           <property name="textFormat">
+            <enum>Qt::PlainText</enum>
+           </property>
+           <property name="textInteractionFlags">
+            <set>Qt::NoTextInteraction</set>
+           </property>
+          </widget>
+         </item>
+         <item row="8" column="0">
+          <widget class="QLabel" name="errorLabel">
+           <property name="text">
+            <string>Error:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="8" column="1">
+          <widget class="SqueezeLabel" name="errorValueLabel">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Ignored" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="text">
+            <string notr="true">...</string>
+           </property>
+           <property name="textFormat">
+            <enum>Qt::PlainText</enum>
+           </property>
+           <property name="textInteractionFlags">
+            <set>Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </item>
-       <item row="1" column="1">
-        <widget class="SqueezeLabel" name="haveValueLabel">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Ignored" vsizetype="Preferred">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
+       <item>
+        <spacer name="detailsSectionSpacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
          </property>
-         <property name="text">
-          <string notr="true">...</string>
+         <property name="sizeType">
+          <enum>QSizePolicy::Fixed</enum>
          </property>
-         <property name="textFormat">
-          <enum>Qt::PlainText</enum>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>1</width>
+           <height>10</height>
+          </size>
          </property>
-         <property name="textInteractionFlags">
-          <set>Qt::NoTextInteraction</set>
-         </property>
-        </widget>
+        </spacer>
        </item>
-       <item row="2" column="0">
-        <widget class="QLabel" name="availabilityLabel">
-         <property name="text">
-          <string>Availability:</string>
-         </property>
-         <property name="tr-style" stdset="0">
-          <string notr="true">form-label</string>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="1">
-        <widget class="SqueezeLabel" name="availabilityValueLabel">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Ignored" vsizetype="Preferred">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="text">
-          <string notr="true">...</string>
-         </property>
-         <property name="textFormat">
-          <enum>Qt::PlainText</enum>
-         </property>
-         <property name="textInteractionFlags">
-          <set>Qt::NoTextInteraction</set>
-         </property>
-        </widget>
-       </item>
-       <item row="3" column="0">
-        <widget class="QLabel" name="uploadedLabel">
-         <property name="text">
-          <string>Uploaded:</string>
-         </property>
-         <property name="tr-style" stdset="0">
-          <string notr="true">form-label</string>
-         </property>
-        </widget>
-       </item>
-       <item row="3" column="1">
-        <widget class="SqueezeLabel" name="uploadedValueLabel">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Ignored" vsizetype="Preferred">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="text">
-          <string notr="true">...</string>
-         </property>
-         <property name="textFormat">
-          <enum>Qt::PlainText</enum>
-         </property>
-         <property name="textInteractionFlags">
-          <set>Qt::NoTextInteraction</set>
-         </property>
-        </widget>
-       </item>
-       <item row="4" column="0">
-        <widget class="QLabel" name="downloadedLabel">
-         <property name="text">
-          <string>Downloaded:</string>
-         </property>
-         <property name="tr-style" stdset="0">
-          <string notr="true">form-label</string>
-         </property>
-        </widget>
-       </item>
-       <item row="4" column="1">
-        <widget class="SqueezeLabel" name="downloadedValueLabel">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Ignored" vsizetype="Preferred">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="text">
-          <string notr="true">...</string>
-         </property>
-         <property name="textFormat">
-          <enum>Qt::PlainText</enum>
-         </property>
-         <property name="textInteractionFlags">
-          <set>Qt::NoTextInteraction</set>
-         </property>
-        </widget>
-       </item>
-       <item row="5" column="0">
-        <widget class="QLabel" name="stateLabel">
-         <property name="text">
-          <string>State:</string>
-         </property>
-         <property name="tr-style" stdset="0">
-          <string notr="true">form-label</string>
-         </property>
-        </widget>
-       </item>
-       <item row="5" column="1">
-        <widget class="SqueezeLabel" name="stateValueLabel">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Ignored" vsizetype="Preferred">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="text">
-          <string notr="true">...</string>
-         </property>
-         <property name="textFormat">
-          <enum>Qt::PlainText</enum>
-         </property>
-         <property name="textInteractionFlags">
-          <set>Qt::NoTextInteraction</set>
-         </property>
-        </widget>
-       </item>
-       <item row="6" column="0">
-        <widget class="QLabel" name="runningTimeLabel">
-         <property name="text">
-          <string>Running time:</string>
-         </property>
-         <property name="tr-style" stdset="0">
-          <string notr="true">form-label</string>
-         </property>
-        </widget>
-       </item>
-       <item row="6" column="1">
-        <widget class="SqueezeLabel" name="runningTimeValueLabel">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Ignored" vsizetype="Preferred">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="text">
-          <string notr="true">...</string>
-         </property>
-         <property name="textFormat">
-          <enum>Qt::PlainText</enum>
-         </property>
-         <property name="textInteractionFlags">
-          <set>Qt::NoTextInteraction</set>
-         </property>
-        </widget>
-       </item>
-       <item row="7" column="0">
-        <widget class="QLabel" name="remainingTimeLabel">
-         <property name="text">
-          <string>Remaining time:</string>
-         </property>
-         <property name="tr-style" stdset="0">
-          <string notr="true">form-label</string>
-         </property>
-        </widget>
-       </item>
-       <item row="7" column="1">
-        <widget class="SqueezeLabel" name="remainingTimeValueLabel">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Ignored" vsizetype="Preferred">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="text">
-          <string notr="true">...</string>
-         </property>
-         <property name="textFormat">
-          <enum>Qt::PlainText</enum>
-         </property>
-         <property name="textInteractionFlags">
-          <set>Qt::NoTextInteraction</set>
-         </property>
-        </widget>
-       </item>
-       <item row="8" column="0">
-        <widget class="QLabel" name="lastActivityLabel">
-         <property name="text">
-          <string>Last activity:</string>
-         </property>
-         <property name="tr-style" stdset="0">
-          <string notr="true">form-label</string>
-         </property>
-        </widget>
-       </item>
-       <item row="8" column="1">
-        <widget class="SqueezeLabel" name="lastActivityValueLabel">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Ignored" vsizetype="Preferred">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="text">
-          <string notr="true">...</string>
-         </property>
-         <property name="textFormat">
-          <enum>Qt::PlainText</enum>
-         </property>
-         <property name="textInteractionFlags">
-          <set>Qt::NoTextInteraction</set>
-         </property>
-        </widget>
-       </item>
-       <item row="9" column="0">
-        <widget class="QLabel" name="errorLabel">
-         <property name="text">
-          <string>Error:</string>
-         </property>
-         <property name="tr-style" stdset="0">
-          <string notr="true">form-label</string>
-         </property>
-        </widget>
-       </item>
-       <item row="9" column="1">
-        <widget class="SqueezeLabel" name="errorValueLabel">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Ignored" vsizetype="Preferred">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="text">
-          <string notr="true">...</string>
-         </property>
-         <property name="textFormat">
-          <enum>Qt::PlainText</enum>
-         </property>
-         <property name="textInteractionFlags">
-          <set>Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>
-         </property>
-        </widget>
-       </item>
-       <item row="10" column="0" colspan="2">
+       <item>
         <widget class="QLabel" name="detailsSectionLabel">
+         <property name="styleSheet">
+          <string notr="true">font-weight:bold</string>
+         </property>
          <property name="text">
           <string>Details</string>
          </property>
-         <property name="tr-style" stdset="0">
-          <string notr="true">form-section</string>
-         </property>
         </widget>
        </item>
-       <item row="11" column="0">
-        <widget class="QLabel" name="sizeLabel">
-         <property name="text">
-          <string>Size:</string>
+       <item>
+        <layout class="QGridLayout" name="detailsSectionLayout" columnstretch="0,1">
+         <property name="leftMargin">
+          <number>18</number>
          </property>
-         <property name="tr-style" stdset="0">
-          <string notr="true">form-label</string>
-         </property>
-        </widget>
-       </item>
-       <item row="11" column="1">
-        <widget class="SqueezeLabel" name="sizeValueLabel">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Ignored" vsizetype="Preferred">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="text">
-          <string notr="true">...</string>
-         </property>
-         <property name="textFormat">
-          <enum>Qt::PlainText</enum>
-         </property>
-         <property name="textInteractionFlags">
-          <set>Qt::NoTextInteraction</set>
-         </property>
-        </widget>
-       </item>
-       <item row="12" column="0">
-        <widget class="QLabel" name="locationLabel">
-         <property name="text">
-          <string>Location:</string>
-         </property>
-         <property name="tr-style" stdset="0">
-          <string notr="true">form-label</string>
-         </property>
-        </widget>
-       </item>
-       <item row="12" column="1">
-        <widget class="SqueezeLabel" name="locationValueLabel">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Ignored" vsizetype="Preferred">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="text">
-          <string notr="true">...</string>
-         </property>
-         <property name="textFormat">
-          <enum>Qt::PlainText</enum>
-         </property>
-         <property name="textInteractionFlags">
-          <set>Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>
-         </property>
-        </widget>
-       </item>
-       <item row="13" column="0">
-        <widget class="QLabel" name="hashLabel">
-         <property name="text">
-          <string>Hash:</string>
-         </property>
-         <property name="tr-style" stdset="0">
-          <string notr="true">form-label</string>
-         </property>
-        </widget>
-       </item>
-       <item row="13" column="1">
-        <widget class="SqueezeLabel" name="hashValueLabel">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Ignored" vsizetype="Preferred">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="text">
-          <string notr="true">...</string>
-         </property>
-         <property name="textFormat">
-          <enum>Qt::PlainText</enum>
-         </property>
-         <property name="textInteractionFlags">
-          <set>Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>
-         </property>
-        </widget>
-       </item>
-       <item row="14" column="0">
-        <widget class="QLabel" name="privacyLabel">
-         <property name="text">
-          <string>Privacy:</string>
-         </property>
-         <property name="tr-style" stdset="0">
-          <string notr="true">form-label</string>
-         </property>
-        </widget>
-       </item>
-       <item row="14" column="1">
-        <widget class="SqueezeLabel" name="privacyValueLabel">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Ignored" vsizetype="Preferred">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="text">
-          <string notr="true">...</string>
-         </property>
-         <property name="textFormat">
-          <enum>Qt::PlainText</enum>
-         </property>
-         <property name="textInteractionFlags">
-          <set>Qt::NoTextInteraction</set>
-         </property>
-        </widget>
-       </item>
-       <item row="15" column="0">
-        <widget class="QLabel" name="originLabel">
-         <property name="text">
-          <string>Origin:</string>
-         </property>
-         <property name="tr-style" stdset="0">
-          <string notr="true">form-label</string>
-         </property>
-        </widget>
-       </item>
-       <item row="15" column="1">
-        <widget class="SqueezeLabel" name="originValueLabel">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Ignored" vsizetype="Preferred">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="text">
-          <string notr="true">...</string>
-         </property>
-         <property name="textFormat">
-          <enum>Qt::PlainText</enum>
-         </property>
-         <property name="textInteractionFlags">
-          <set>Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>
-         </property>
-        </widget>
-       </item>
-       <item row="16" column="0">
-        <widget class="QLabel" name="commentLabel">
-         <property name="text">
-          <string>Comment:</string>
-         </property>
-         <property name="buddy">
-          <cstring>commentBrowser</cstring>
-         </property>
-         <property name="tr-style" stdset="0">
-          <string notr="true">form-label</string>
-         </property>
-        </widget>
-       </item>
-       <item row="16" column="1">
-        <widget class="QTextBrowser" name="commentBrowser">
-         <property name="textInteractionFlags">
-          <set>Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>
-         </property>
-        </widget>
+         <item row="0" column="1">
+          <widget class="SqueezeLabel" name="sizeValueLabel">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Ignored" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="text">
+            <string notr="true">...</string>
+           </property>
+           <property name="textFormat">
+            <enum>Qt::PlainText</enum>
+           </property>
+           <property name="textInteractionFlags">
+            <set>Qt::NoTextInteraction</set>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <widget class="SqueezeLabel" name="locationValueLabel">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Ignored" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="text">
+            <string notr="true">...</string>
+           </property>
+           <property name="textFormat">
+            <enum>Qt::PlainText</enum>
+           </property>
+           <property name="textInteractionFlags">
+            <set>Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="0">
+          <widget class="QLabel" name="hashLabel">
+           <property name="text">
+            <string>Hash:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="0">
+          <widget class="QLabel" name="privacyLabel">
+           <property name="text">
+            <string>Privacy:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="0">
+          <widget class="QLabel" name="originLabel">
+           <property name="text">
+            <string>Origin:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="1">
+          <widget class="SqueezeLabel" name="originValueLabel">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Ignored" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="text">
+            <string notr="true">...</string>
+           </property>
+           <property name="textFormat">
+            <enum>Qt::PlainText</enum>
+           </property>
+           <property name="textInteractionFlags">
+            <set>Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="1">
+          <widget class="SqueezeLabel" name="privacyValueLabel">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Ignored" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="text">
+            <string notr="true">...</string>
+           </property>
+           <property name="textFormat">
+            <enum>Qt::PlainText</enum>
+           </property>
+           <property name="textInteractionFlags">
+            <set>Qt::NoTextInteraction</set>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="0">
+          <widget class="QLabel" name="sizeLabel">
+           <property name="text">
+            <string>Size:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0">
+          <widget class="QLabel" name="locationLabel">
+           <property name="text">
+            <string>Location:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="1">
+          <widget class="SqueezeLabel" name="hashValueLabel">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Ignored" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="text">
+            <string notr="true">...</string>
+           </property>
+           <property name="textFormat">
+            <enum>Qt::PlainText</enum>
+           </property>
+           <property name="textInteractionFlags">
+            <set>Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>
+           </property>
+          </widget>
+         </item>
+         <item row="5" column="0">
+          <widget class="QLabel" name="commentLabel">
+           <property name="text">
+            <string>Comment:</string>
+           </property>
+           <property name="buddy">
+            <cstring>commentBrowser</cstring>
+           </property>
+          </widget>
+         </item>
+         <item row="5" column="1">
+          <widget class="QTextBrowser" name="commentBrowser">
+           <property name="textInteractionFlags">
+            <set>Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </item>
       </layout>
      </widget>
@@ -608,118 +577,129 @@
       <attribute name="title">
        <string>Options</string>
       </attribute>
-      <layout class="QGridLayout" name="optionsTabLayout" columnstretch="0,1">
-       <item row="0" column="0" colspan="2">
+      <layout class="QVBoxLayout" name="optionsTabLayout">
+       <item>
         <widget class="QLabel" name="speedSectionLabel">
+         <property name="styleSheet">
+          <string notr="true">font-weight:bold</string>
+         </property>
          <property name="text">
           <string>Speed</string>
          </property>
-         <property name="tr-style" stdset="0">
-          <string notr="true">form-section first</string>
-         </property>
         </widget>
        </item>
-       <item row="1" column="0" colspan="2">
-        <widget class="QCheckBox" name="sessionLimitCheck">
-         <property name="text">
-          <string>Honor global &amp;limits</string>
+       <item>
+        <layout class="QGridLayout" name="speedSectionLayout" columnstretch="0,1">
+         <property name="leftMargin">
+          <number>18</number>
          </property>
-         <property name="tr-style" stdset="0">
-          <string notr="true">form-label</string>
-         </property>
-        </widget>
+         <item row="0" column="0" colspan="2">
+          <widget class="QCheckBox" name="sessionLimitCheck">
+           <property name="text">
+            <string>Honor global &amp;limits</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0">
+          <widget class="QCheckBox" name="singleDownCheck">
+           <property name="text">
+            <string>Limit &amp;download speed:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <widget class="QSpinBox" name="singleDownSpin">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="maximum">
+            <number>999999999</number>
+           </property>
+           <property name="singleStep">
+            <number>5</number>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="0">
+          <widget class="QCheckBox" name="singleUpCheck">
+           <property name="text">
+            <string>Limit &amp;upload speed:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="1">
+          <widget class="QSpinBox" name="singleUpSpin">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="maximum">
+            <number>999999999</number>
+           </property>
+           <property name="singleStep">
+            <number>5</number>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="0">
+          <widget class="QLabel" name="bandwidthPriorityLabel">
+           <property name="text">
+            <string>Torrent &amp;priority:</string>
+           </property>
+           <property name="buddy">
+            <cstring>bandwidthPriorityCombo</cstring>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="1">
+          <widget class="QComboBox" name="bandwidthPriorityCombo"/>
+         </item>
+        </layout>
        </item>
-       <item row="2" column="0">
-        <widget class="QCheckBox" name="singleDownCheck">
-         <property name="text">
-          <string>Limit &amp;download speed:</string>
+       <item>
+        <spacer name="seedingLimitsSectionSpacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
          </property>
-         <property name="tr-style" stdset="0">
-          <string notr="true">form-label</string>
+         <property name="sizeType">
+          <enum>QSizePolicy::Fixed</enum>
          </property>
-        </widget>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>1</width>
+           <height>10</height>
+          </size>
+         </property>
+        </spacer>
        </item>
-       <item row="2" column="1">
-        <widget class="QSpinBox" name="singleDownSpin">
-         <property name="enabled">
-          <bool>false</bool>
-         </property>
-         <property name="maximum">
-          <number>999999999</number>
-         </property>
-         <property name="singleStep">
-          <number>5</number>
-         </property>
-        </widget>
-       </item>
-       <item row="3" column="0">
-        <widget class="QCheckBox" name="singleUpCheck">
-         <property name="text">
-          <string>Limit &amp;upload speed:</string>
-         </property>
-         <property name="tr-style" stdset="0">
-          <string notr="true">form-label</string>
-         </property>
-        </widget>
-       </item>
-       <item row="3" column="1">
-        <widget class="QSpinBox" name="singleUpSpin">
-         <property name="enabled">
-          <bool>false</bool>
-         </property>
-         <property name="maximum">
-          <number>999999999</number>
-         </property>
-         <property name="singleStep">
-          <number>5</number>
-         </property>
-        </widget>
-       </item>
-       <item row="4" column="0">
-        <widget class="QLabel" name="bandwidthPriorityLabel">
-         <property name="text">
-          <string>Torrent &amp;priority:</string>
-         </property>
-         <property name="buddy">
-          <cstring>bandwidthPriorityCombo</cstring>
-         </property>
-         <property name="tr-style" stdset="0">
-          <string notr="true">form-label</string>
-         </property>
-        </widget>
-       </item>
-       <item row="4" column="1">
-        <widget class="QComboBox" name="bandwidthPriorityCombo"/>
-       </item>
-       <item row="5" column="0" colspan="2">
+       <item>
         <widget class="QLabel" name="seedingLimitsSectionLabel">
+         <property name="styleSheet">
+          <string notr="true">font-weight:bold</string>
+         </property>
          <property name="text">
           <string>Seeding Limits</string>
          </property>
-         <property name="tr-style" stdset="0">
-          <string notr="true">form-section</string>
-         </property>
         </widget>
        </item>
-       <item row="6" column="0">
-        <widget class="QLabel" name="ratioLabel">
-         <property name="text">
-          <string>&amp;Ratio:</string>
+       <item>
+        <layout class="QGridLayout" name="seedingLimitsSectionRatioLayout" columnstretch="0,1,0">
+         <property name="leftMargin">
+          <number>18</number>
          </property>
-         <property name="buddy">
-          <cstring>ratioCombo</cstring>
-         </property>
-         <property name="tr-style" stdset="0">
-          <string notr="true">form-label</string>
-         </property>
-        </widget>
-       </item>
-       <item row="6" column="1">
-        <layout class="QHBoxLayout" name="ratioValueLayout">
-         <item>
+         <item row="0" column="0">
+          <widget class="QLabel" name="ratioLabel">
+           <property name="text">
+            <string>&amp;Ratio:</string>
+           </property>
+           <property name="buddy">
+            <cstring>ratioCombo</cstring>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
           <widget class="QComboBox" name="ratioCombo"/>
          </item>
-         <item>
+         <item row="0" column="2">
           <widget class="QDoubleSpinBox" name="ratioSpin">
            <property name="minimum">
             <double>0.500000000000000</double>
@@ -731,25 +711,25 @@
          </item>
         </layout>
        </item>
-       <item row="7" column="0">
-        <widget class="QLabel" name="idleLabel">
-         <property name="text">
-          <string>&amp;Idle:</string>
+       <item>
+        <layout class="QGridLayout" name="seedingLimitsSectionIdleLayout" columnstretch="0,1,0">
+         <property name="leftMargin">
+          <number>18</number>
          </property>
-         <property name="buddy">
-          <cstring>idleCombo</cstring>
-         </property>
-         <property name="tr-style" stdset="0">
-          <string notr="true">form-label</string>
-         </property>
-        </widget>
-       </item>
-       <item row="7" column="1">
-        <layout class="QHBoxLayout" name="idleValueLayout">
-         <item>
+         <item row="0" column="0">
+          <widget class="QLabel" name="idleLabel">
+           <property name="text">
+            <string>&amp;Idle:</string>
+           </property>
+           <property name="buddy">
+            <cstring>idleCombo</cstring>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
           <widget class="QComboBox" name="idleCombo"/>
          </item>
-         <item>
+         <item row="0" column="2">
           <widget class="QSpinBox" name="idleSpin">
            <property name="suffix">
             <string notr="true"> minute(s)</string>
@@ -767,43 +747,63 @@
          </item>
         </layout>
        </item>
-       <item row="8" column="0" colspan="2">
+       <item>
+        <spacer name="peerConnectionsSectionSpacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeType">
+          <enum>QSizePolicy::Fixed</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>1</width>
+           <height>10</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
         <widget class="QLabel" name="peerConnectionsSectionLabel">
+         <property name="styleSheet">
+          <string notr="true">font-weight:bold</string>
+         </property>
          <property name="text">
           <string>Peer Connections</string>
          </property>
-         <property name="tr-style" stdset="0">
-          <string notr="true">form-section</string>
-         </property>
         </widget>
        </item>
-       <item row="9" column="0">
-        <widget class="QLabel" name="peerLimitLabel">
-         <property name="text">
-          <string>&amp;Maximum peers:</string>
+       <item>
+        <layout class="QGridLayout" name="peerConnectionsSectionLayout" columnstretch="0,1">
+         <property name="leftMargin">
+          <number>18</number>
          </property>
-         <property name="buddy">
-          <cstring>peerLimitSpin</cstring>
-         </property>
-         <property name="tr-style" stdset="0">
-          <string notr="true">form-label</string>
-         </property>
-        </widget>
+         <item row="0" column="0">
+          <widget class="QLabel" name="peerLimitLabel">
+           <property name="text">
+            <string>&amp;Maximum peers:</string>
+           </property>
+           <property name="buddy">
+            <cstring>peerLimitSpin</cstring>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="QSpinBox" name="peerLimitSpin">
+           <property name="minimum">
+            <number>1</number>
+           </property>
+           <property name="maximum">
+            <number>300</number>
+           </property>
+           <property name="singleStep">
+            <number>5</number>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </item>
-       <item row="9" column="1">
-        <widget class="QSpinBox" name="peerLimitSpin">
-         <property name="minimum">
-          <number>1</number>
-         </property>
-         <property name="maximum">
-          <number>300</number>
-         </property>
-         <property name="singleStep">
-          <number>5</number>
-         </property>
-        </widget>
-       </item>
-       <item row="10" column="0" colspan="2">
+       <item>
         <spacer name="optionsTabBottomSpacer">
          <property name="orientation">
           <enum>Qt::Vertical</enum>
@@ -844,34 +844,6 @@
    <header>file-tree.h</header>
   </customwidget>
  </customwidgets>
- <tabstops>
-  <tabstop>tabs</tabstop>
-  <tabstop>errorValueLabel</tabstop>
-  <tabstop>locationValueLabel</tabstop>
-  <tabstop>hashValueLabel</tabstop>
-  <tabstop>originValueLabel</tabstop>
-  <tabstop>commentBrowser</tabstop>
-  <tabstop>peersView</tabstop>
-  <tabstop>trackersView</tabstop>
-  <tabstop>addTrackerButton</tabstop>
-  <tabstop>editTrackerButton</tabstop>
-  <tabstop>removeTrackerButton</tabstop>
-  <tabstop>showTrackerScrapesCheck</tabstop>
-  <tabstop>showBackupTrackersCheck</tabstop>
-  <tabstop>filesView</tabstop>
-  <tabstop>sessionLimitCheck</tabstop>
-  <tabstop>singleDownCheck</tabstop>
-  <tabstop>singleDownSpin</tabstop>
-  <tabstop>singleUpCheck</tabstop>
-  <tabstop>singleUpSpin</tabstop>
-  <tabstop>bandwidthPriorityCombo</tabstop>
-  <tabstop>ratioCombo</tabstop>
-  <tabstop>ratioSpin</tabstop>
-  <tabstop>idleCombo</tabstop>
-  <tabstop>idleSpin</tabstop>
-  <tabstop>peerLimitSpin</tabstop>
-  <tabstop>dialogButtons</tabstop>
- </tabstops>
  <resources/>
  <connections>
   <connection>
