@@ -175,7 +175,7 @@
    isPrivate                   | boolean                     | tr_torrent
    isStalled                   | boolean                     | tr_stat
    leftUntilDone               | number                      | tr_stat
-   magnetLink                  | number                      | n/a
+   magnetLink                  | string                      | n/a
    manualAnnounceTime          | number                      | tr_stat
    maxConnectedPeers           | number                      | tr_torrent
    metadataPercentComplete     | double                      | tr_stat
