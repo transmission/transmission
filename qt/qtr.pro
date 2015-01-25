@@ -55,6 +55,7 @@ FORMS += about.ui \
          make-dialog.ui \
          make-progress-dialog.ui \
          options.ui \
+         prefs-dialog.ui \
          relocate.ui \
          session-dialog.ui \
          stats-dialog.ui

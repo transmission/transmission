@@ -82,7 +82,7 @@ TrMainWindow::getStockIcon (const QString& name, int fallback)
 TrMainWindow::TrMainWindow (Session& session, Prefs& prefs, TorrentModel& model, bool minimized):
   myLastFullUpdateTime (0),
   mySessionDialog (new SessionDialog (session, prefs, this)),
-  myPrefsDialog (0),
+  myPrefsDialog (),
   myAboutDialog (new AboutDialog (this)),
   myStatsDialog (new StatsDialog (session, this)),
   myDetailsDialog (0),
@@ -514,21 +514,19 @@ TrMainWindow::hideEvent (QHideEvent * event)
 ****/
 
 void
-TrMainWindow::onPrefsDestroyed ()
-{
-  myPrefsDialog = 0;
-}
-
-void
 TrMainWindow::openPreferences ()
 {
-  if (myPrefsDialog == 0)
+  if (myPrefsDialog.isNull ())
     {
       myPrefsDialog = new PrefsDialog (mySession, myPrefs, this);
-      connect (myPrefsDialog, SIGNAL (destroyed (QObject*)), this, SLOT (onPrefsDestroyed ()));
+      myPrefsDialog->setAttribute (Qt::WA_DeleteOnClose);
+      myPrefsDialog->show ();
     }
-
-  myPrefsDialog->show ();
+  else
+    {
+      myPrefsDialog->raise ();
+      myPrefsDialog->activateWindow ();
+    }
 }
 
 void

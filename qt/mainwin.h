@@ -15,6 +15,7 @@
 #include <QIcon>
 #include <QMainWindow>
 #include <QMap>
+#include <QPointer>
 #include <QPushButton>
 #include <QSet>
 #include <QSystemTrayIcon>
@@ -57,7 +58,7 @@ class TrMainWindow: public QMainWindow
   private:
     time_t myLastFullUpdateTime;
     QDialog * mySessionDialog;
-    QDialog * myPrefsDialog;
+    QPointer<QDialog> myPrefsDialog;
     QDialog * myAboutDialog;
     QDialog * myStatsDialog;
     Details * myDetailsDialog;
@@ -91,7 +92,6 @@ class TrMainWindow: public QMainWindow
     QWidgetList myHidden;
 
   private slots:
-    void onPrefsDestroyed ();
     void openPreferences ();
     void onDetailsDestroyed ();
     void showTotalRatio ();

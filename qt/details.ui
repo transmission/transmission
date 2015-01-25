@@ -19,6 +19,12 @@
      <property name="currentIndex">
       <number>0</number>
      </property>
+     <property name="elideMode">
+      <enum>Qt::ElideNone</enum>
+     </property>
+     <property name="usesScrollButtons">
+      <bool>false</bool>
+     </property>
      <widget class="QWidget" name="infoTab">
       <attribute name="title">
        <string>Information</string>
@@ -701,11 +707,11 @@
          </item>
          <item row="0" column="2">
           <widget class="QDoubleSpinBox" name="ratioSpin">
-           <property name="minimum">
-            <double>0.500000000000000</double>
-           </property>
            <property name="maximum">
             <double>999999999.000000000000000</double>
+           </property>
+           <property name="singleStep">
+            <double>0.500000000000000</double>
            </property>
           </widget>
          </item>

@@ -113,6 +113,7 @@ tr_qt_wrap_ui(${PROJECT_NAME}_UI_SOURCES
     make-dialog.ui
     make-progress-dialog.ui
     options.ui
+    prefs-dialog.ui
     relocate.ui
     session-dialog.ui
     stats-dialog.ui
