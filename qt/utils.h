@@ -28,7 +28,6 @@ class Utils: public QObject
     virtual ~Utils () {}
 
   public:
-    static QString remoteFileChooser (QWidget * parent, const QString& title, const QString& myPath, bool dir, bool local);
     static QIcon guessMimeIcon (const QString& filename);
     // Test if string is UTF-8 or not
     static bool isValidUtf8  (const char *s);

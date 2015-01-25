@@ -33,6 +33,8 @@ class TrPathButton: public QToolButton
     void setPath (const QString& path);
     const QString& path () const;
 
+    virtual QSize sizeHint () const;
+
   signals:
     void pathChanged (const QString& path);
 

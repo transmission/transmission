@@ -45,15 +45,11 @@ class PrefsDialog: public QDialog
     void spinBoxEditingFinished ();
     void timeEditingFinished ();
     void lineEditingFinished ();
+    void pathChanged (const QString& path);
     void refreshPref (int key);
     void encryptionEdited (int);
     void altSpeedDaysEdited (int);
     void sessionUpdated ();
-    void onWatchClicked ();
-    void onScriptClicked ();
-    void onIncompleteClicked ();
-    void onDestinationClicked ();
-    void onLocationSelected (const QString&, int key);
     void onPortTested (bool);
     void onPortTest ();
     void onIdleLimitChanged ();

@@ -76,6 +76,13 @@ TrPathButton::path () const
   return myPath;
 }
 
+QSize
+TrPathButton::sizeHint () const
+{
+  const QSize sh (QToolButton::sizeHint ());
+  return QSize (qMin (sh.width (), 150), sh.height ());
+}
+
 void
 TrPathButton::paintEvent (QPaintEvent * /*event*/)
 {

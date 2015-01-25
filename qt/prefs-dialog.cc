@@ -126,6 +126,8 @@ PrefsDialog::updateWidgetValue (QWidget * widget, int prefKey)
     w->setTime (QTime ().addSecs (myPrefs.getInt(prefKey) * 60));
   else if (auto w = qobject_cast<QLineEdit*> (widget))
     w->setText (myPrefs.getString (prefKey));
+  else if (auto w = qobject_cast<TrPathButton*> (widget))
+    w->setPath (myPrefs.getString (prefKey));
   else
     return false;
 
@@ -145,6 +147,8 @@ PrefsDialog::linkWidgetToPref (QWidget * widget, int prefKey)
     connect (widget, SIGNAL (editingFinished ()), SLOT (timeEditingFinished ()));
   else if (widget->inherits ("QLineEdit"))
     connect (widget, SIGNAL (editingFinished ()), SLOT (lineEditingFinished ()));
+  else if (widget->inherits ("TrPathButton"))
+    connect (widget, SIGNAL (pathChanged (QString)), SLOT (pathChanged (QString)));
   else if (widget->inherits ("QAbstractSpinBox"))
     connect (widget, SIGNAL (editingFinished ()), SLOT (spinBoxEditingFinished ()));
 }
@@ -183,6 +187,13 @@ PrefsDialog::lineEditingFinished ()
       if (e->isModified ())
         setPref (getPrefKey (e), e->text());
     }
+}
+
+void
+PrefsDialog::pathChanged (const QString& path)
+{
+  if (auto b = qobject_cast<const TrPathButton*> (sender ()))
+    setPref(getPrefKey (b), path);
 }
 
 /***
@@ -421,56 +432,6 @@ PrefsDialog::initPrivacyTab ()
 ***/
 
 void
-PrefsDialog::onScriptClicked ()
-{
-  const QString title = tr ("Select \"Torrent Done\" Script");
-  const QString myPath = myPrefs.getString (Prefs::SCRIPT_TORRENT_DONE_FILENAME);
-  const QString path = Utils::remoteFileChooser (this, title, myPath, false, mySession.isServer());
-
-  if (!path.isEmpty())
-    onLocationSelected (path, Prefs::SCRIPT_TORRENT_DONE_FILENAME);
-}
-
-void
-PrefsDialog::onIncompleteClicked ()
-{
-  const QString title = tr ("Select Incomplete Directory");
-  const QString myPath = myPrefs.getString (Prefs::INCOMPLETE_DIR);
-  const QString path = Utils::remoteFileChooser (this, title, myPath, true, mySession.isServer());
-
-  if (!path.isEmpty())
-    onLocationSelected (path, Prefs::INCOMPLETE_DIR);
-}
-
-void
-PrefsDialog::onWatchClicked ()
-{
-  const QString title = tr ("Select Watch Directory");
-  const QString myPath = myPrefs.getString (Prefs::DIR_WATCH);
-  const QString path = Utils::remoteFileChooser (this, title, myPath, true, true);
-
-  if (!path.isEmpty())
-    onLocationSelected (path, Prefs::DIR_WATCH);
-}
-
-void
-PrefsDialog::onDestinationClicked ()
-{
-  const QString title = tr ("Select Destination");
-  const QString myPath = myPrefs.getString (Prefs::DOWNLOAD_DIR);
-  const QString path = Utils::remoteFileChooser (this, title, myPath, true, mySession.isServer());
-
-  if (!path.isEmpty())
-    onLocationSelected (path, Prefs::DOWNLOAD_DIR);
-}
-
-void
-PrefsDialog::onLocationSelected (const QString& path, int key)
-{
-  setPref (key, path);
-}
-
-void
 PrefsDialog::onIdleLimitChanged ()
 {
   //: Spin box suffix, "Stop seeding if idle for: [ 5 minutes ]" (includes leading space after the number, if needed)
@@ -504,32 +465,56 @@ PrefsDialog::onQueueStalledMinutesChanged ()
 void
 PrefsDialog::initDownloadingTab ()
 {
-  const QSize iconSize (QSize (1, 1) * style ()->pixelMetric (QStyle::PM_SmallIconSize));
-  const QFileIconProvider iconProvider;
-  const QIcon folderIcon = iconProvider.icon (QFileIconProvider::Folder);
-  const QIcon fileIcon = iconProvider.icon (QFileIconProvider::File);
+  if (mySession.isLocal ())
+    {
+      ui.watchDirStack->setCurrentWidget (ui.watchDirButton);
+      ui.downloadDirStack->setCurrentWidget (ui.downloadDirButton);
+      ui.incompleteDirStack->setCurrentWidget (ui.incompleteDirButton);
+      ui.completionScriptStack->setCurrentWidget (ui.completionScriptButton);
 
-  ui.watchDirButton->setIcon (folderIcon);
-  ui.watchDirButton->setIconSize (iconSize);
-  ui.downloadDirButton->setIcon (folderIcon);
-  ui.downloadDirButton->setIconSize (iconSize);
-  ui.incompleteDirButton->setIcon (folderIcon);
-  ui.incompleteDirButton->setIconSize (iconSize);
-  ui.completionScriptButton->setIcon (fileIcon);
-  ui.completionScriptButton->setIconSize (iconSize);
+      ui.watchDirButton->setMode (TrPathButton::DirectoryMode);
+      ui.downloadDirButton->setMode (TrPathButton::DirectoryMode);
+      ui.incompleteDirButton->setMode (TrPathButton::DirectoryMode);
+      ui.completionScriptButton->setMode (TrPathButton::FileMode);
+
+      ui.watchDirButton->setTitle (tr ("Select Watch Directory"));
+      ui.downloadDirButton->setTitle (tr ("Select Destination"));
+      ui.incompleteDirButton->setTitle (tr ("Select Incomplete Directory"));
+      ui.completionScriptButton->setTitle (tr ("Select \"Torrent Done\" Script"));
+    }
+  else
+    {
+      ui.watchDirStack->setCurrentWidget (ui.watchDirEdit);
+      ui.downloadDirStack->setCurrentWidget (ui.downloadDirEdit);
+      ui.incompleteDirStack->setCurrentWidget (ui.incompleteDirEdit);
+      ui.completionScriptStack->setCurrentWidget (ui.completionScriptEdit);
+    }
+
+  ui.watchDirStack->setFixedHeight (ui.watchDirStack->currentWidget ()->sizeHint ().height ());
+  ui.downloadDirStack->setFixedHeight (ui.downloadDirStack->currentWidget ()->sizeHint ().height ());
+  ui.incompleteDirStack->setFixedHeight (ui.incompleteDirStack->currentWidget ()->sizeHint ().height ());
+  ui.completionScriptStack->setFixedHeight (ui.completionScriptStack->currentWidget ()->sizeHint ().height ());
+
+  ui.watchDirStack->setMinimumWidth (200);
+
+  ui.downloadDirLabel->setBuddy (ui.downloadDirStack->currentWidget ());
 
   ui.downloadDirFreeSpaceLabel->setSession (mySession);
   ui.downloadDirFreeSpaceLabel->setPath (myPrefs.getString (Prefs::DOWNLOAD_DIR));
 
   linkWidgetToPref (ui.watchDirCheck, Prefs::DIR_WATCH_ENABLED);
+  linkWidgetToPref (ui.watchDirStack->currentWidget (), Prefs::DIR_WATCH);
   linkWidgetToPref (ui.showTorrentOptionsDialogCheck, Prefs::OPTIONS_PROMPT);
   linkWidgetToPref (ui.startAddedTorrentsCheck, Prefs::START);
   linkWidgetToPref (ui.trashTorrentFileCheck, Prefs::TRASH_ORIGINAL);
+  linkWidgetToPref (ui.downloadDirStack->currentWidget (), Prefs::DOWNLOAD_DIR);
   linkWidgetToPref (ui.downloadQueueSizeSpin, Prefs::DOWNLOAD_QUEUE_SIZE);
   linkWidgetToPref (ui.queueStalledMinutesSpin, Prefs::QUEUE_STALLED_MINUTES);
   linkWidgetToPref (ui.renamePartialFilesCheck, Prefs::RENAME_PARTIAL_FILES);
   linkWidgetToPref (ui.incompleteDirCheck, Prefs::INCOMPLETE_DIR_ENABLED);
+  linkWidgetToPref (ui.incompleteDirStack->currentWidget (), Prefs::INCOMPLETE_DIR);
   linkWidgetToPref (ui.completionScriptCheck, Prefs::SCRIPT_TORRENT_DONE_ENABLED);
+  linkWidgetToPref (ui.completionScriptStack->currentWidget (), Prefs::SCRIPT_TORRENT_DONE_FILENAME);
 
   ColumnResizer * cr (new ColumnResizer (this));
   cr->addLayout (ui.addingSectionLayout);
@@ -537,10 +522,6 @@ PrefsDialog::initDownloadingTab ()
   cr->addLayout (ui.incompleteSectionLayout);
   cr->update ();
 
-  connect (ui.watchDirButton, SIGNAL (clicked ()), SLOT (onWatchClicked ()));
-  connect (ui.downloadDirButton, SIGNAL (clicked ()), SLOT (onDestinationClicked ()));
-  connect (ui.incompleteDirButton, SIGNAL (clicked ()), SLOT (onIncompleteClicked ()));
-  connect (ui.completionScriptButton, SIGNAL (clicked ()), SLOT (onScriptClicked ()));
   connect (ui.queueStalledMinutesSpin, SIGNAL (valueChanged (int)), SLOT (onQueueStalledMinutesChanged ()));
 
   onQueueStalledMinutesChanged ();

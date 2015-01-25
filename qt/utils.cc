@@ -44,26 +44,6 @@
 extern QPixmap qt_pixmapFromWinHICON(HICON icon);
 #endif
 
-QString
-Utils::remoteFileChooser (QWidget * parent, const QString& title, const QString& myPath, bool dir, bool local)
-{
-  QString path;
-
-  if (local)
-    {
-      if (dir)
-        path = QFileDialog::getExistingDirectory (parent, title, myPath);
-      else
-        path = QFileDialog::getOpenFileName (parent, title, myPath);
-    }
-  else
-    {
-      path = QInputDialog::getText (parent, title, tr ("Enter a location:"), QLineEdit::Normal, myPath, NULL);
-    }
-
-  return path;
-}
-
 void
 Utils::toStderr (const QString& str)
 {

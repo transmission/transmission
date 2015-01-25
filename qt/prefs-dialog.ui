@@ -284,16 +284,15 @@
           </widget>
          </item>
          <item row="0" column="1">
-          <widget class="QToolButton" name="watchDirButton">
+          <widget class="QStackedWidget" name="watchDirStack">
            <property name="sizePolicy">
-            <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
              <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
            </property>
-           <property name="toolButtonStyle">
-            <enum>Qt::ToolButtonTextBesideIcon</enum>
-           </property>
+           <widget class="TrPathButton" name="watchDirButton"/>
+           <widget class="QLineEdit" name="watchDirEdit"/>
           </widget>
          </item>
          <item row="1" column="0" colspan="2">
@@ -322,22 +321,18 @@
            <property name="text">
             <string>Save to &amp;Location:</string>
            </property>
-           <property name="buddy">
-            <cstring>downloadDirButton</cstring>
-           </property>
           </widget>
          </item>
          <item row="4" column="1">
-          <widget class="QToolButton" name="downloadDirButton">
+          <widget class="QStackedWidget" name="downloadDirStack">
            <property name="sizePolicy">
-            <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
              <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
            </property>
-           <property name="toolButtonStyle">
-            <enum>Qt::ToolButtonTextBesideIcon</enum>
-           </property>
+           <widget class="TrPathButton" name="downloadDirButton"/>
+           <widget class="QLineEdit" name="downloadDirEdit"/>
           </widget>
          </item>
          <item row="5" column="1">
@@ -394,7 +389,14 @@
           </widget>
          </item>
          <item row="0" column="1">
-          <widget class="QSpinBox" name="downloadQueueSizeSpin"/>
+          <widget class="QSpinBox" name="downloadQueueSizeSpin">
+           <property name="minimum">
+            <number>1</number>
+           </property>
+           <property name="maximum">
+            <number>999999999</number>
+           </property>
+          </widget>
          </item>
          <item row="1" column="0">
           <widget class="QLabel" name="queueStalledMinutesLabel">
@@ -410,6 +412,15 @@
           <widget class="QSpinBox" name="queueStalledMinutesSpin">
            <property name="suffix">
             <string notr="true"> minute(s) ago</string>
+           </property>
+           <property name="minimum">
+            <number>1</number>
+           </property>
+           <property name="maximum">
+            <number>9999</number>
+           </property>
+           <property name="singleStep">
+            <number>5</number>
            </property>
           </widget>
          </item>
@@ -464,16 +475,15 @@
           </widget>
          </item>
          <item row="1" column="1">
-          <widget class="QToolButton" name="incompleteDirButton">
+          <widget class="QStackedWidget" name="incompleteDirStack">
            <property name="sizePolicy">
-            <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
              <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
            </property>
-           <property name="toolButtonStyle">
-            <enum>Qt::ToolButtonTextBesideIcon</enum>
-           </property>
+           <widget class="TrPathButton" name="incompleteDirButton"/>
+           <widget class="QLineEdit" name="incompleteDirEdit"/>
           </widget>
          </item>
          <item row="2" column="0">
@@ -487,16 +497,15 @@
           </widget>
          </item>
          <item row="2" column="1">
-          <widget class="QToolButton" name="completionScriptButton">
+          <widget class="QStackedWidget" name="completionScriptStack">
            <property name="sizePolicy">
-            <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
              <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
            </property>
-           <property name="toolButtonStyle">
-            <enum>Qt::ToolButtonTextBesideIcon</enum>
-           </property>
+           <widget class="TrPathButton" name="completionScriptButton"/>
+           <widget class="QLineEdit" name="completionScriptEdit"/>
           </widget>
          </item>
         </layout>
@@ -1220,6 +1229,11 @@
  </widget>
  <customwidgets>
   <customwidget>
+   <class>TrPathButton</class>
+   <extends>QToolButton</extends>
+   <header>path-button.h</header>
+  </customwidget>
+  <customwidget>
    <class>FreespaceLabel</class>
    <extends>QLabel</extends>
    <header>freespace-label.h</header>
@@ -1312,7 +1326,7 @@
   <connection>
    <sender>watchDirCheck</sender>
    <signal>toggled(bool)</signal>
-   <receiver>watchDirButton</receiver>
+   <receiver>watchDirStack</receiver>
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
@@ -1328,7 +1342,7 @@
   <connection>
    <sender>incompleteDirCheck</sender>
    <signal>toggled(bool)</signal>
-   <receiver>incompleteDirButton</receiver>
+   <receiver>incompleteDirStack</receiver>
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
@@ -1344,7 +1358,7 @@
   <connection>
    <sender>completionScriptCheck</sender>
    <signal>toggled(bool)</signal>
-   <receiver>completionScriptButton</receiver>
+   <receiver>completionScriptStack</receiver>
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
