@@ -132,13 +132,20 @@
          <property name="leftMargin">
           <number>18</number>
          </property>
-         <item row="2" column="0">
-          <widget class="QLabel" name="altDownloadSpeedLimitLabel">
+         <item row="0" column="0" colspan="2">
+          <widget class="QLabel" name="altSpeedLimitsSectionDescriptionLabel">
            <property name="text">
-            <string>Do&amp;wnload:</string>
+            <string>&lt;small&gt;Override normal speed limits manually or at scheduled times&lt;/small&gt;</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0">
+          <widget class="QLabel" name="altUploadSpeedLimitLabel">
+           <property name="text">
+            <string>U&amp;pload:</string>
            </property>
            <property name="buddy">
-            <cstring>altDownloadSpeedLimitSpin</cstring>
+            <cstring>altUploadSpeedLimitSpin</cstring>
            </property>
           </widget>
          </item>
@@ -152,10 +159,13 @@
            </property>
           </widget>
          </item>
-         <item row="0" column="0" colspan="2">
-          <widget class="QLabel" name="altSpeedLimitsSectionDescriptionLabel">
+         <item row="2" column="0">
+          <widget class="QLabel" name="altDownloadSpeedLimitLabel">
            <property name="text">
-            <string>&lt;small&gt;Override normal speed limits manually or at scheduled times&lt;/small&gt;</string>
+            <string>Do&amp;wnload:</string>
+           </property>
+           <property name="buddy">
+            <cstring>altDownloadSpeedLimitSpin</cstring>
            </property>
           </widget>
          </item>
@@ -166,6 +176,16 @@
            </property>
            <property name="singleStep">
             <number>5</number>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="0">
+          <widget class="QCheckBox" name="altSpeedLimitScheduleCheck">
+           <property name="text">
+            <string>&amp;Scheduled times:</string>
+           </property>
+           <property name="checked">
+            <bool>true</bool>
            </property>
           </widget>
          </item>
@@ -202,26 +222,6 @@
             </widget>
            </item>
           </layout>
-         </item>
-         <item row="1" column="0">
-          <widget class="QLabel" name="altUploadSpeedLimitLabel">
-           <property name="text">
-            <string>U&amp;pload:</string>
-           </property>
-           <property name="buddy">
-            <cstring>altUploadSpeedLimitSpin</cstring>
-           </property>
-          </widget>
-         </item>
-         <item row="3" column="0">
-          <widget class="QCheckBox" name="altSpeedLimitScheduleCheck">
-           <property name="text">
-            <string>&amp;Scheduled times:</string>
-           </property>
-           <property name="checked">
-            <bool>true</bool>
-           </property>
-          </widget>
          </item>
          <item row="4" column="0">
           <widget class="QLabel" name="altSpeedLimitDaysLabel">
@@ -273,20 +273,6 @@
          <property name="leftMargin">
           <number>18</number>
          </property>
-         <item row="1" column="0" colspan="2">
-          <widget class="QCheckBox" name="showTorrentOptionsDialogCheck">
-           <property name="text">
-            <string>Show the Torrent Options &amp;dialog</string>
-           </property>
-          </widget>
-         </item>
-         <item row="3" column="0" colspan="2">
-          <widget class="QCheckBox" name="trashTorrentFileCheck">
-           <property name="text">
-            <string>Mo&amp;ve the .torrent file to the trash</string>
-           </property>
-          </widget>
-         </item>
          <item row="0" column="0">
           <widget class="QCheckBox" name="watchDirCheck">
            <property name="text">
@@ -297,10 +283,37 @@
            </property>
           </widget>
          </item>
+         <item row="0" column="1">
+          <widget class="QToolButton" name="watchDirButton">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="toolButtonStyle">
+            <enum>Qt::ToolButtonTextBesideIcon</enum>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0" colspan="2">
+          <widget class="QCheckBox" name="showTorrentOptionsDialogCheck">
+           <property name="text">
+            <string>Show the Torrent Options &amp;dialog</string>
+           </property>
+          </widget>
+         </item>
          <item row="2" column="0" colspan="2">
           <widget class="QCheckBox" name="startAddedTorrentsCheck">
            <property name="text">
             <string>&amp;Start added torrents</string>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="0" colspan="2">
+          <widget class="QCheckBox" name="trashTorrentFileCheck">
+           <property name="text">
+            <string>Mo&amp;ve the .torrent file to the trash</string>
            </property>
           </widget>
          </item>
@@ -316,19 +329,6 @@
          </item>
          <item row="4" column="1">
           <widget class="QToolButton" name="downloadDirButton">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="toolButtonStyle">
-            <enum>Qt::ToolButtonTextBesideIcon</enum>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="1">
-          <widget class="QToolButton" name="watchDirButton">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
              <horstretch>0</horstretch>
@@ -453,6 +453,16 @@
            </property>
           </widget>
          </item>
+         <item row="1" column="0">
+          <widget class="QCheckBox" name="incompleteDirCheck">
+           <property name="text">
+            <string>Keep &amp;incomplete files in:</string>
+           </property>
+           <property name="checked">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
          <item row="1" column="1">
           <widget class="QToolButton" name="incompleteDirButton">
            <property name="sizePolicy">
@@ -463,16 +473,6 @@
            </property>
            <property name="toolButtonStyle">
             <enum>Qt::ToolButtonTextBesideIcon</enum>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="0">
-          <widget class="QCheckBox" name="incompleteDirCheck">
-           <property name="text">
-            <string>Keep &amp;incomplete files in:</string>
-           </property>
-           <property name="checked">
-            <bool>true</bool>
            </property>
           </widget>
          </item>
@@ -665,8 +665,25 @@
          <property name="leftMargin">
           <number>18</number>
          </property>
+         <item row="0" column="0">
+          <widget class="QCheckBox" name="blocklistCheck">
+           <property name="text">
+            <string>Enable &amp;blocklist:</string>
+           </property>
+           <property name="checked">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
          <item row="0" column="1" colspan="2">
           <widget class="QLineEdit" name="blocklistEdit"/>
+         </item>
+         <item row="1" column="0" colspan="2">
+          <widget class="QLabel" name="blocklistStatusLabel">
+           <property name="text">
+            <string notr="true">...</string>
+           </property>
+          </widget>
          </item>
          <item row="1" column="2">
           <widget class="QPushButton" name="updateBlocklistButton">
@@ -678,27 +695,10 @@
            </property>
           </widget>
          </item>
-         <item row="0" column="0">
-          <widget class="QCheckBox" name="blocklistCheck">
-           <property name="text">
-            <string>Enable &amp;blocklist:</string>
-           </property>
-           <property name="checked">
-            <bool>true</bool>
-           </property>
-          </widget>
-         </item>
          <item row="2" column="0" colspan="3">
           <widget class="QCheckBox" name="autoUpdateBlocklistCheck">
            <property name="text">
             <string>Enable &amp;automatic updates</string>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="0" colspan="2">
-          <widget class="QLabel" name="blocklistStatusLabel">
-           <property name="text">
-            <string notr="true">...</string>
            </property>
           </widget>
          </item>
@@ -739,23 +739,6 @@
          <property name="leftMargin">
           <number>18</number>
          </property>
-         <item row="1" column="2">
-          <widget class="QPushButton" name="testPeerPortButton">
-           <property name="text">
-            <string>Te&amp;st Port</string>
-           </property>
-           <property name="autoDefault">
-            <bool>false</bool>
-           </property>
-          </widget>
-         </item>
-         <item row="2" column="0" colspan="3">
-          <widget class="QCheckBox" name="randomPeerPortCheck">
-           <property name="text">
-            <string>Pick a &amp;random port every time Transmission is started</string>
-           </property>
-          </widget>
-         </item>
          <item row="0" column="0">
           <widget class="QLabel" name="peerPortLabel">
            <property name="text">
@@ -780,6 +763,23 @@
           <widget class="QLabel" name="peerPortStatusLabel">
            <property name="text">
             <string>Status unknown</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="2">
+          <widget class="QPushButton" name="testPeerPortButton">
+           <property name="text">
+            <string>Te&amp;st Port</string>
+           </property>
+           <property name="autoDefault">
+            <bool>false</bool>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="0" colspan="3">
+          <widget class="QCheckBox" name="randomPeerPortCheck">
+           <property name="text">
+            <string>Pick a &amp;random port every time Transmission is started</string>
            </property>
           </widget>
          </item>
@@ -1084,20 +1084,10 @@
          <property name="leftMargin">
           <number>18</number>
          </property>
-         <item row="3" column="0">
-          <widget class="QLabel" name="rpcUsernameLabel">
+         <item row="0" column="0" colspan="2">
+          <widget class="QCheckBox" name="enableRpcCheck">
            <property name="text">
-            <string>&amp;Username:</string>
-           </property>
-           <property name="buddy">
-            <cstring>rpcUsernameEdit</cstring>
-           </property>
-          </widget>
-         </item>
-         <item row="5" column="0" colspan="3">
-          <widget class="QCheckBox" name="enableRpcWhitelistCheck">
-           <property name="text">
-            <string>Only allow these IP a&amp;ddresses:</string>
+            <string>Allow &amp;remote access</string>
            </property>
            <property name="checked">
             <bool>true</bool>
@@ -1111,6 +1101,16 @@
            </property>
            <property name="autoDefault">
             <bool>false</bool>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0">
+          <widget class="QLabel" name="rpcPortLabel">
+           <property name="text">
+            <string>HTTP &amp;port:</string>
+           </property>
+           <property name="buddy">
+            <cstring>rpcPortSpin</cstring>
            </property>
           </widget>
          </item>
@@ -1134,6 +1134,19 @@
            </property>
           </widget>
          </item>
+         <item row="3" column="0">
+          <widget class="QLabel" name="rpcUsernameLabel">
+           <property name="text">
+            <string>&amp;Username:</string>
+           </property>
+           <property name="buddy">
+            <cstring>rpcUsernameEdit</cstring>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="1" colspan="2">
+          <widget class="QLineEdit" name="rpcUsernameEdit"/>
+         </item>
          <item row="4" column="0">
           <widget class="QLabel" name="rpcPasswordLabel">
            <property name="text">
@@ -1144,19 +1157,6 @@
            </property>
           </widget>
          </item>
-         <item row="0" column="0" colspan="2">
-          <widget class="QCheckBox" name="enableRpcCheck">
-           <property name="text">
-            <string>Allow &amp;remote access</string>
-           </property>
-           <property name="checked">
-            <bool>true</bool>
-           </property>
-          </widget>
-         </item>
-         <item row="3" column="1" colspan="2">
-          <widget class="QLineEdit" name="rpcUsernameEdit"/>
-         </item>
          <item row="4" column="1" colspan="2">
           <widget class="QLineEdit" name="rpcPasswordEdit">
            <property name="echoMode">
@@ -1164,13 +1164,13 @@
            </property>
           </widget>
          </item>
-         <item row="1" column="0">
-          <widget class="QLabel" name="rpcPortLabel">
+         <item row="5" column="0" colspan="3">
+          <widget class="QCheckBox" name="enableRpcWhitelistCheck">
            <property name="text">
-            <string>HTTP &amp;port:</string>
+            <string>Only allow these IP a&amp;ddresses:</string>
            </property>
-           <property name="buddy">
-            <cstring>rpcPortSpin</cstring>
+           <property name="checked">
+            <bool>true</bool>
            </property>
           </widget>
          </item>
