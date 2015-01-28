@@ -25,7 +25,6 @@ extern "C"
   struct tr_variant;
 }
 
-#include <QDebug>
 class Prefs: public QObject
 {
     Q_OBJECT
@@ -176,7 +175,6 @@ class Prefs: public QObject
       const QVariant tmp = QVariant::fromValue (value);
       if (v.isNull() || (v!=tmp))
         {
-          qDebug () << key << ":" << v << "->" << tmp;
           v = tmp;
           emit changed (key);
         }
