@@ -125,8 +125,8 @@ Prefs::PrefItem Prefs::myItems[] =
 ****
 ***/
 
-Prefs::Prefs (const char * configDir):
-  myConfigDir (QString::fromUtf8 (configDir))
+Prefs::Prefs (const QString& configDir):
+  myConfigDir (configDir)
 {
   assert (sizeof(myItems) / sizeof(myItems[0]) == PREFS_COUNT);
 
@@ -142,7 +142,7 @@ Prefs::Prefs (const char * configDir):
   tr_variant top;
   tr_variantInitDict (&top, 0);
   initDefaults (&top);
-  tr_sessionLoadSettings (&top, configDir, NULL);
+  tr_sessionLoadSettings (&top, myConfigDir.toUtf8 ().constData (), NULL);
 
   for (int i=0; i<PREFS_COUNT; ++i)
     {

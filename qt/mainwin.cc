@@ -890,10 +890,10 @@ TrMainWindow::reannounceSelected ()
 ***
 **/
 
-void TrMainWindow::showTotalRatio () { myPrefs.set (Prefs::STATUSBAR_STATS, "total-ratio"); }
-void TrMainWindow::showTotalTransfer () { myPrefs.set (Prefs::STATUSBAR_STATS, "total-transfer"); }
-void TrMainWindow::showSessionRatio () { myPrefs.set (Prefs::STATUSBAR_STATS, "session-ratio"); }
-void TrMainWindow::showSessionTransfer () { myPrefs.set (Prefs::STATUSBAR_STATS, "session-transfer"); }
+void TrMainWindow::showTotalRatio () { myPrefs.set (Prefs::STATUSBAR_STATS, QString::fromLatin1 ("total-ratio")); }
+void TrMainWindow::showTotalTransfer () { myPrefs.set (Prefs::STATUSBAR_STATS, QString::fromLatin1 ("total-transfer")); }
+void TrMainWindow::showSessionRatio () { myPrefs.set (Prefs::STATUSBAR_STATS, QString::fromLatin1 ("session-ratio")); }
+void TrMainWindow::showSessionTransfer () { myPrefs.set (Prefs::STATUSBAR_STATS, QString::fromLatin1 ("session-transfer")); }
 
 /**
 ***

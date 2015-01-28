@@ -41,9 +41,6 @@ class Utils: public QObject
       rect.adjust (dx1, 0, -dx2, 0);
     }
 
-    // meh
-    static void toStderr (const QString& qstr);
-
     ///
     /// URLs
     ///

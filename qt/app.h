@@ -67,6 +67,8 @@ class MyApp: public QApplication
 
   private:
     void maybeUpdateBlocklist ();
+
+    void quitLater ();
 };
 
 #undef qApp

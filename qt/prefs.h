@@ -25,6 +25,7 @@ extern "C"
   struct tr_variant;
 }
 
+#include <QDebug>
 class Prefs: public QObject
 {
     Q_OBJECT
@@ -144,9 +145,11 @@ class Prefs: public QObject
 
   private:
     QSet<int> myTemporaryPrefs;
-    QString myConfigDir;
+    QString const myConfigDir;
     mutable QVariant myValues[PREFS_COUNT];
     void initDefaults (tr_variant *);
+
+    void set (int key, const char * value);
 
   public:
     bool isCore (int key) const { return FIRST_CORE_PREF<=key && key<=LAST_CORE_PREF; }
@@ -156,7 +159,7 @@ class Prefs: public QObject
     int type (int i) const { return myItems[i].type; }
     const QVariant& variant (int i) const { return myValues[i]; }
 
-    Prefs (const char * configDir);
+    Prefs (const QString& configDir);
     ~Prefs ();
 
     int getInt (int key) const;
@@ -167,14 +170,13 @@ class Prefs: public QObject
 
     template<typename T> T get (int key) const { return myValues[key].value<T>(); }
 
-    void set (int key, const char * value) { set (key, QString::fromUtf8 (value)); }
-
     template<typename T> void set (int key, const T& value)
     {
       QVariant& v (myValues[key]);
       const QVariant tmp = QVariant::fromValue (value);
       if (v.isNull() || (v!=tmp))
         {
+          qDebug () << key << ":" << v << "->" << tmp;
           v = tmp;
           emit changed (key);
         }

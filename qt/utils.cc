@@ -7,8 +7,6 @@
  * $Id$
  */
 
-#include <iostream>
-
 #ifdef _WIN32
  #include <windows.h>
  #include <shellapi.h>
@@ -43,12 +41,6 @@
 // Should be in QtWinExtras soon, but for now let's import it manually
 extern QPixmap qt_pixmapFromWinHICON(HICON icon);
 #endif
-
-void
-Utils::toStderr (const QString& str)
-{
-  std::cerr << qPrintable(str) << std::endl;
-}
 
 #ifdef _WIN32
 namespace

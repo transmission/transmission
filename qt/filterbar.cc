@@ -623,7 +623,7 @@ FilterBar::refreshPref (int key)
             {
               const bool isBootstrapping = myTrackerModel->rowCount () <= 2;
               if (!isBootstrapping)
-                myPrefs.set (key, "");
+                myPrefs.set (key, QString ());
             }
           break;
         }

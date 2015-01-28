@@ -36,7 +36,6 @@
 #include "session.h"
 #include "session-dialog.h"
 #include "torrent-model.h"
-#include "utils.h"
 #include "watchdir.h"
 
 namespace
@@ -64,13 +63,6 @@ namespace
   {
     return "Usage:\n"
            "  transmission [OPTIONS...] [torrent files]";
-  }
-
-  void
-  showUsage ()
-  {
-    tr_getopt_usage (MY_READABLE_NAME, getUsage (), opts);
-    exit (0);
   }
 
   enum
@@ -151,25 +143,34 @@ MyApp::MyApp (int& argc, char ** argv):
   int c;
   bool minimized = false;
   const char * optarg;
-  const char * host = 0;
-  const char * port = 0;
-  const char * username = 0;
-  const char * password = 0;
-  const char * configDir = 0;
+  QString host;
+  QString port;
+  QString username;
+  QString password;
+  QString configDir;
   QStringList filenames;
   while ((c = tr_getopt (getUsage(), argc, const_cast<const char**> (argv), opts, &optarg)))
     {
       switch (c)
         {
-          case 'g': configDir = optarg; break;
-          case 'p': port = optarg; break;
-          case 'r': host = optarg; break;
-          case 'u': username = optarg; break;
-          case 'w': password = optarg; break;
+          case 'g': configDir = QString::fromUtf8 (optarg); break;
+          case 'p': port = QString::fromUtf8 (optarg); break;
+          case 'r': host = QString::fromUtf8 (optarg); break;
+          case 'u': username = QString::fromUtf8 (optarg); break;
+          case 'w': password = QString::fromUtf8 (optarg); break;
           case 'm': minimized = true; break;
-          case 'v': std::cerr << MY_READABLE_NAME << ' ' << LONG_VERSION_STRING << std::endl; ::exit (0); break;
-          case TR_OPT_ERR: Utils::toStderr (QObject::tr ("Invalid option")); showUsage (); break;
-          default:         filenames.append (optarg); break;
+          case 'v':
+            std::cerr << MY_READABLE_NAME << ' ' << LONG_VERSION_STRING << std::endl;
+            quitLater ();
+            return;
+          case TR_OPT_ERR:
+            std::cerr << qPrintable(QObject::tr ("Invalid option")) << std::endl;
+            tr_getopt_usage (MY_READABLE_NAME, getUsage (), opts);
+            quitLater ();
+            return;
+          default:
+            filenames.append (QString::fromUtf8 (optarg));
+            break;
         }
     }
 
@@ -206,14 +207,14 @@ MyApp::MyApp (int& argc, char ** argv):
 
     if (delegated)
       {
-        QTimer::singleShot (0, this, SLOT (quit ()));
+        quitLater ();
         return;
       }
   }
 
   // set the fallback config dir
-  if (configDir == 0)
-    configDir = tr_getDefaultConfigDir ("transmission");
+  if (configDir.isNull ())
+    configDir = QString::fromUtf8 (tr_getDefaultConfigDir ("transmission"));
 
   // ensure our config directory exists
   QDir dir (configDir);
@@ -221,19 +222,19 @@ MyApp::MyApp (int& argc, char ** argv):
     dir.mkpath (configDir);
 
   // is this the first time we've run transmission?
-  const bool firstTime = !QFile (QDir (configDir).absoluteFilePath ("settings.json")).exists ();
+  const bool firstTime = !dir.exists ("settings.json");
 
   // initialize the prefs
   myPrefs = new Prefs (configDir);
-  if (host != 0)
+  if (!host.isNull ())
     myPrefs->set (Prefs::SESSION_REMOTE_HOST, host);
-  if (port != 0)
-    myPrefs->set (Prefs::SESSION_REMOTE_PORT, port);
-  if (username != 0)
+  if (!port.isNull ())
+    myPrefs->set (Prefs::SESSION_REMOTE_PORT, port.toUInt ());
+  if (!username.isNull ())
     myPrefs->set (Prefs::SESSION_REMOTE_USERNAME, username);
-  if (password != 0)
+  if (!password.isNull ())
     myPrefs->set (Prefs::SESSION_REMOTE_PASSWORD, password);
-  if ((host != 0) || (port != 0) || (username != 0) || (password != 0))
+  if (!host.isNull () || !port.isNull () || !username.isNull () || !password.isNull ())
     myPrefs->set (Prefs::SESSION_IS_REMOTE, true);
   if (myPrefs->getBool (Prefs::START_MINIMIZED))
     minimized = true;
@@ -329,6 +330,12 @@ MyApp::MyApp (int& argc, char ** argv):
       if (!bus.registerObject (DBUS_OBJECT_PATH, this))
         std::cerr << "couldn't register " << qPrintable (DBUS_OBJECT_PATH) << std::endl;
     }
+}
+
+void
+MyApp::quitLater ()
+{
+  QTimer::singleShot (0, this, SLOT (quit ()));
 }
 
 /* these functions are for popping up desktop notifications */

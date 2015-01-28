@@ -274,12 +274,12 @@ Session::updatePref (int key)
 ****
 ***/
 
-Session::Session (const char * configDir, Prefs& prefs):
+Session::Session (const QString& configDir, Prefs& prefs):
   nextUniqueTag (FIRST_UNIQUE_TAG),
   myBlocklistSize (-1),
   myPrefs (prefs),
   mySession (0),
-  myConfigDir (QString::fromUtf8 (configDir))
+  myConfigDir (configDir)
 {
   myStats.ratio = TR_RATIO_NA;
   myStats.uploadedBytes = 0;
@@ -830,13 +830,13 @@ Session::updateInfo (tr_variant * d)
   /* Use the C API to get settings that, for security reasons, aren't supported by RPC */
   if (mySession != 0)
     {
-      myPrefs.set (Prefs::RPC_ENABLED,           tr_sessionIsRPCEnabled          (mySession));
-      myPrefs.set (Prefs::RPC_AUTH_REQUIRED,     tr_sessionIsRPCPasswordEnabled  (mySession));
-      myPrefs.set (Prefs::RPC_PASSWORD,          tr_sessionGetRPCPassword        (mySession));
-      myPrefs.set (Prefs::RPC_PORT,              tr_sessionGetRPCPort            (mySession));
-      myPrefs.set (Prefs::RPC_USERNAME,          tr_sessionGetRPCUsername        (mySession));
+      myPrefs.set (Prefs::RPC_ENABLED,           tr_sessionIsRPCEnabled (mySession));
+      myPrefs.set (Prefs::RPC_AUTH_REQUIRED,     tr_sessionIsRPCPasswordEnabled (mySession));
+      myPrefs.set (Prefs::RPC_PASSWORD,          QString::fromUtf8 (tr_sessionGetRPCPassword (mySession)));
+      myPrefs.set (Prefs::RPC_PORT,              tr_sessionGetRPCPort (mySession));
+      myPrefs.set (Prefs::RPC_USERNAME,          QString::fromUtf8 (tr_sessionGetRPCUsername (mySession)));
       myPrefs.set (Prefs::RPC_WHITELIST_ENABLED, tr_sessionGetRPCWhitelistEnabled (mySession));
-      myPrefs.set (Prefs::RPC_WHITELIST,         tr_sessionGetRPCWhitelist       (mySession));
+      myPrefs.set (Prefs::RPC_WHITELIST,         QString::fromUtf8 (tr_sessionGetRPCWhitelist (mySession)));
     }
 
   if (tr_variantDictFindInt (d, TR_KEY_blocklist_size, &i) && i!=blocklistSize ())

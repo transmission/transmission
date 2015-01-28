@@ -51,7 +51,7 @@ class Session: public QObject
     Q_OBJECT
 
   public:
-    Session (const char * configDir, Prefs& prefs);
+    Session (const QString& configDir, Prefs& prefs);
     ~Session ();
 
   public:
@@ -158,7 +158,7 @@ class Session: public QObject
     int64_t myBlocklistSize;
     Prefs& myPrefs;
     tr_session * mySession;
-    QString myConfigDir;
+    QString const myConfigDir;
     QStringList myIdleJSON;
     tr_session_stats myStats;
     tr_session_stats myCumulativeStats;
