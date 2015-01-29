@@ -50,7 +50,7 @@ namespace
   {
     QString const pixmapCacheKey = QLatin1String ("tr_file_ext_")
                                  + QString::number (iconSize)
-                                 + "_"
+                                 + QLatin1Char ('_')
                                  + fileInfo.suffix ();
 
     QPixmap pixmap;
@@ -83,7 +83,6 @@ namespace
 } // namespace
 #endif
 
-#include <QDebug>
 QIcon
 Utils::guessMimeIcon (const QString& filename)
 {

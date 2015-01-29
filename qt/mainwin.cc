@@ -563,7 +563,7 @@ TrMainWindow::setLocation ()
 static
 void openSelect (const QString& path)
 {
-  const QString explorer = "explorer";
+  const QString explorer = QLatin1String ("explorer");
   QString param;
   if (!QFileInfo (path).isDir ())
     param = QLatin1String ("/select,");
