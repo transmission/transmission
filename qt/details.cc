@@ -173,7 +173,7 @@ Details::getStockIcon (const QString& freedesktop_name, int fallback)
 
 Details::Details (Session       & session,
                   Prefs         & prefs,
-                  TorrentModel  & model,
+                  const TorrentModel& model,
                   QWidget       * parent):
   QDialog (parent, Qt::Dialog),
   mySession (session),

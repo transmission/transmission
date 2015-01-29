@@ -182,7 +182,7 @@ class Torrent: public QObject
     };
 
   public:
-    Torrent (Prefs&, int id);
+    Torrent (const Prefs&, int id);
     virtual ~Torrent ();
 
   signals:
@@ -341,7 +341,7 @@ class Torrent: public QObject
     QIcon getMimeTypeIcon () const { return getIcon (MIME_ICON); }
 
   private:
-    Prefs& myPrefs;
+    const Prefs& myPrefs;
     FileList myFiles;
 };
 

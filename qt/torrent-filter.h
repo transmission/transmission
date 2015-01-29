@@ -26,7 +26,7 @@ class TorrentFilter: public QSortFilterProxyModel
     Q_OBJECT
 
   public:
-    TorrentFilter (Prefs& prefs);
+    TorrentFilter (const Prefs& prefs);
     virtual ~TorrentFilter ();
 
   public:
@@ -48,7 +48,7 @@ class TorrentFilter: public QSortFilterProxyModel
     void countTorrentsPerMode (int * setmeCounts) const;
 
   private:
-    Prefs& myPrefs;
+    const Prefs& myPrefs;
 };
 
 #endif

@@ -40,7 +40,7 @@ class Details: public QDialog
     void onTimer ();
 
   public:
-    Details (Session&, Prefs&, TorrentModel&, QWidget * parent = 0);
+    Details (Session&, Prefs&, const TorrentModel&, QWidget * parent = 0);
     ~Details ();
     void setIds (const QSet<int>& ids);
     virtual QSize sizeHint () const { return QSize (440, 460); }
@@ -60,7 +60,7 @@ class Details: public QDialog
   private:
     Session& mySession;
     Prefs& myPrefs;
-    TorrentModel& myModel;
+    const TorrentModel& myModel;
     QSet<int> myIds;
     QTimer myTimer;
     bool myChangedTorrents;

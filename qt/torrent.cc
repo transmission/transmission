@@ -29,7 +29,7 @@
 #include "utils.h"
 
 
-Torrent::Torrent (Prefs& prefs, int id):
+Torrent::Torrent (const Prefs& prefs, int id):
   magnetTorrent (false),
   myPrefs (prefs)
 {

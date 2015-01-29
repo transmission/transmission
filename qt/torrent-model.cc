@@ -80,7 +80,7 @@ TorrentModel::addTorrent (Torrent * t)
   myTorrents.append (t);
 }
 
-TorrentModel::TorrentModel (Prefs& prefs):
+TorrentModel::TorrentModel (const Prefs& prefs):
   myPrefs (prefs)
 {
 }

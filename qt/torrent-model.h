@@ -36,7 +36,7 @@ class TorrentModel: public QAbstractListModel
     id_to_row_t myIdToRow;
     id_to_torrent_t myIdToTorrent;
     torrents_t myTorrents;
-    Prefs& myPrefs;
+    const Prefs& myPrefs;
 
   public:
     void clear ();
@@ -71,7 +71,7 @@ class TorrentModel: public QAbstractListModel
     void onTorrentChanged (int propertyId);
 
   public:
-    TorrentModel (Prefs& prefs);
+    TorrentModel (const Prefs& prefs);
     virtual ~TorrentModel ();
 };
 

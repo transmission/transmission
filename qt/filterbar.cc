@@ -536,7 +536,7 @@ FilterBar::createTrackerCombo (QStandardItemModel * model)
 *****
 ****/
 
-FilterBar::FilterBar (Prefs& prefs, TorrentModel& torrents, TorrentFilter& filter, QWidget * parent):
+FilterBar::FilterBar (Prefs& prefs, const TorrentModel& torrents, const TorrentFilter& filter, QWidget * parent):
   QWidget (parent),
   myPrefs (prefs),
   myTorrents (torrents),

@@ -18,7 +18,7 @@
 #include "torrent-model.h"
 #include "utils.h"
 
-TorrentFilter::TorrentFilter (Prefs& prefs):
+TorrentFilter::TorrentFilter (const Prefs& prefs):
   myPrefs (prefs)
 {
   // listen for changes to the preferences to know when to refilter / resort

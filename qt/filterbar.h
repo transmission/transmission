@@ -86,7 +86,7 @@ class FilterBar: public QWidget
     Q_OBJECT
 
   public:
-    FilterBar (Prefs& prefs, TorrentModel& torrents, TorrentFilter& filter, QWidget * parent = 0);
+    FilterBar (Prefs& prefs, const TorrentModel& torrents, const TorrentFilter& filter, QWidget * parent = 0);
     ~FilterBar ();
 
   private:
@@ -98,8 +98,8 @@ class FilterBar: public QWidget
 
   private:
     Prefs& myPrefs;
-    TorrentModel& myTorrents;
-    TorrentFilter& myFilter;
+    const TorrentModel& myTorrents;
+    const TorrentFilter& myFilter;
     FilterBarComboBox * myActivityCombo;
     FilterBarComboBox * myTrackerCombo;
     QLabel * myCountLabel;
