@@ -51,7 +51,7 @@ HIG::addSectionTitle (const QString& title)
 {
   QLabel * label = new QLabel (this);
   label->setText (title);
-  label->setStyleSheet ("font: bold");
+  label->setStyleSheet (QLatin1String ("font: bold"));
   label->setAlignment (Qt::AlignLeft|Qt::AlignVCenter);
   addSectionTitle (label);
 }

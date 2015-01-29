@@ -41,7 +41,7 @@ class FileTreeItem: public QObject
 
     virtual ~FileTreeItem();
 
-    FileTreeItem (const QString& name="", int fileIndex=-1, uint64_t size=0):
+    FileTreeItem (const QString& name=QString (), int fileIndex=-1, uint64_t size=0):
       myFileIndex (fileIndex),
       myParent (0),
       myName (name),

@@ -246,7 +246,7 @@ Torrent::setString (int i, const char * value)
   assert (0<=i && i<PROPERTY_COUNT);
   assert (myProperties[i].type == QVariant::String);
 
-  if (myValues[i].isNull() || myValues[i].toString()!=value)
+  if (myValues[i].isNull() || myValues[i].toString() != QString::fromUtf8 (value))
     {
       myValues[i].setValue (QString::fromUtf8 (value));
       changed = true;

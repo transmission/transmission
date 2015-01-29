@@ -106,18 +106,18 @@ MyApp::MyApp (int& argc, char ** argv):
   if (loadTranslation (qtTranslator, QLatin1String ("qt"), localeName, QStringList ()
         << QLibraryInfo::location (QLibraryInfo::TranslationsPath)
 #ifdef TRANSLATIONS_DIR
-        << TRANSLATIONS_DIR
+        << QString::fromUtf8 (TRANSLATIONS_DIR)
 #endif
-        << (applicationDirPath () + "/translations")
+        << (applicationDirPath () + QLatin1String ("/translations"))
       ))
     installTranslator (&qtTranslator);
 
   // install the transmission translator
   if (loadTranslation (appTranslator, MY_CONFIG_NAME, localeName, QStringList ()
 #ifdef TRANSLATIONS_DIR
-        << TRANSLATIONS_DIR
+        << QString::fromUtf8 (TRANSLATIONS_DIR)
 #endif
-        << (applicationDirPath () + "/translations")
+        << (applicationDirPath () + QLatin1String ("/translations"))
       ))
     installTranslator (&appTranslator);
 
@@ -125,17 +125,17 @@ MyApp::MyApp (int& argc, char ** argv):
 
 #if defined (_WIN32) || defined (__APPLE__)
   if (QIcon::themeName ().isEmpty ())
-    QIcon::setThemeName ("Faenza");
+    QIcon::setThemeName (QLatin1String ("Faenza"));
 #endif
 
   // set the default icon
-  QIcon icon = QIcon::fromTheme ("transmission");
+  QIcon icon = QIcon::fromTheme (QLatin1String ("transmission"));
   if (icon.isNull ())
     {
       QList<int> sizes;
       sizes << 16 << 22 << 24 << 32 << 48 << 64 << 72 << 96 << 128 << 192 << 256;
       foreach (int size, sizes)
-        icon.addPixmap (QPixmap (QString::fromUtf8 (":/icons/transmission-%1.png").arg (size)));
+        icon.addPixmap (QPixmap (QString::fromLatin1 (":/icons/transmission-%1.png").arg (size)));
     }
   setWindowIcon (icon);
 
@@ -192,8 +192,8 @@ MyApp::MyApp (int& argc, char ** argv):
           {
             case AddData::URL:      arguments.push_back (a.url.toString ()); break;
             case AddData::MAGNET:   arguments.push_back (a.magnet); break;
-            case AddData::FILENAME: arguments.push_back (a.toBase64 ().constData ()); break;
-            case AddData::METAINFO: arguments.push_back (a.toBase64 ().constData ()); break;
+            case AddData::FILENAME: arguments.push_back (QString::fromLatin1 (a.toBase64 ())); break;
+            case AddData::METAINFO: arguments.push_back (QString::fromLatin1 (a.toBase64 ())); break;
             default:                break;
           }
         request.setArguments (arguments);
@@ -222,7 +222,7 @@ MyApp::MyApp (int& argc, char ** argv):
     dir.mkpath (configDir);
 
   // is this the first time we've run transmission?
-  const bool firstTime = !dir.exists ("settings.json");
+  const bool firstTime = !dir.exists (QLatin1String ("settings.json"));
 
   // initialize the prefs
   myPrefs = new Prefs (configDir);

@@ -286,7 +286,7 @@ FilterBarLineEdit::FilterBarLineEdit (QWidget * parent):
   myClearButton (nullptr)
 {
 #if QT_VERSION < QT_VERSION_CHECK(5, 2, 0)
-  const QIcon icon = QIcon::fromTheme ("edit-clear", style ()->standardIcon (QStyle::SP_DialogCloseButton));
+  const QIcon icon = QIcon::fromTheme (QLatin1String ("edit-clear"), style ()->standardIcon (QStyle::SP_DialogCloseButton));
   const int iconSize = style ()->pixelMetric (QStyle::PM_SmallIconSize);
 
   myClearButton = new QToolButton (this);
@@ -363,31 +363,31 @@ FilterBar::createActivityCombo ()
   model->appendRow (new QStandardItem); // separator
   delegate->setSeparator (model, model->index (1, 0));
 
-  row = new QStandardItem (QIcon::fromTheme ("system-run"), tr ("Active"));
+  row = new QStandardItem (QIcon::fromTheme (QLatin1String ("system-run")), tr ("Active"));
   row->setData (FilterMode::SHOW_ACTIVE, ActivityRole);
   model->appendRow (row);
 
-  row = new QStandardItem (QIcon::fromTheme ("go-down"), tr ("Downloading"));
+  row = new QStandardItem (QIcon::fromTheme (QLatin1String ("go-down")), tr ("Downloading"));
   row->setData (FilterMode::SHOW_DOWNLOADING, ActivityRole);
   model->appendRow (row);
 
-  row = new QStandardItem (QIcon::fromTheme ("go-up"), tr ("Seeding"));
+  row = new QStandardItem (QIcon::fromTheme (QLatin1String ("go-up")), tr ("Seeding"));
   row->setData (FilterMode::SHOW_SEEDING, ActivityRole);
   model->appendRow (row);
 
-  row = new QStandardItem (QIcon::fromTheme ("media-playback-pause"), tr ("Paused"));
+  row = new QStandardItem (QIcon::fromTheme (QLatin1String ("media-playback-pause")), tr ("Paused"));
   row->setData (FilterMode::SHOW_PAUSED, ActivityRole);
   model->appendRow (row);
 
-  row = new QStandardItem (QIcon::fromTheme ("dialog-ok"), tr ("Finished"));
+  row = new QStandardItem (QIcon::fromTheme (QLatin1String ("dialog-ok")), tr ("Finished"));
   row->setData (FilterMode::SHOW_FINISHED, ActivityRole);
   model->appendRow (row);
 
-  row = new QStandardItem (QIcon::fromTheme ("view-refresh"), tr ("Verifying"));
+  row = new QStandardItem (QIcon::fromTheme (QLatin1String ("view-refresh")), tr ("Verifying"));
   row->setData (FilterMode::SHOW_VERIFYING, ActivityRole);
   model->appendRow (row);
 
-  row = new QStandardItem (QIcon::fromTheme ("process-stop"), tr ("Error"));
+  row = new QStandardItem (QIcon::fromTheme (QLatin1String ("process-stop")), tr ("Error"));
   row->setData (FilterMode::SHOW_ERROR, ActivityRole);
   model->appendRow (row);
 
@@ -407,7 +407,7 @@ namespace
   {
     // get the readable name...
     QString name = host;
-    const int pos = name.lastIndexOf ('.');
+    const int pos = name.lastIndexOf (QLatin1Char ('.'));
     if (pos >= 0)
       name.truncate (pos);
     if (!name.isEmpty ())
@@ -517,7 +517,7 @@ FilterBar::createTrackerCombo (QStandardItemModel * model)
   c->setItemDelegate (delegate);
 
   QStandardItem * row = new QStandardItem (tr ("All"));
-  row->setData ("", TrackerRole);
+  row->setData (QString (), TrackerRole);
   const int count = myTorrents.rowCount ();
   row->setData (count, TorrentCountRole);
   row->setData (getCountString (count), TorrentCountStringRole);
@@ -644,14 +644,14 @@ FilterBar::onTrackerIndexChanged (int i)
     {
       QString str;
       const bool isTracker = !myTrackerCombo->itemData (i,TrackerRole).toString ().isEmpty ();
-      if (!isTracker) // show all
+      if (!isTracker)
         {
-          str = "";
+          // show all
         }
       else
         {
           str = myTrackerCombo->itemData (i,TrackerRole).toString ();
-          const int pos = str.lastIndexOf ('.');
+          const int pos = str.lastIndexOf (QLatin1Char ('.'));
           if (pos >= 0)
             str.truncate (pos+1);
         }

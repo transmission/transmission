@@ -438,7 +438,7 @@ OptionsDialog::onTimeout ()
       if (!have) // everything failed
         {
           // did the user accidentally specify the child directory instead of the parent?
-          const QStringList tokens = QString::fromUtf8 (file->name).split ('/');
+          const QStringList tokens = QString::fromUtf8 (file->name).split (QLatin1Char ('/'));
           if (!tokens.empty () && myLocalDestination.dirName () == tokens.at (0))
             {
               // move up one directory and try again

@@ -22,7 +22,7 @@ LicenseDialog::LicenseDialog (QWidget * parent):
 
   QPlainTextEdit * t = new QPlainTextEdit (this);
   t->setReadOnly (true);
-  t->setPlainText (
+  t->setPlainText (QLatin1String (
     "Copyright 2005-2014. All code is copyrighted by the respective authors.\n"
     "\n"
     "Transmission can be redistributed and/or modified under the terms of the "
@@ -35,7 +35,7 @@ LicenseDialog::LicenseDialog (QWidget * parent):
     "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n"
     "\n"
     "Some of Transmission's source files have more permissive licenses. "
-    "Those files may, of course, be used on their own under their own terms.\n");
+    "Those files may, of course, be used on their own under their own terms.\n"));
   v->addWidget (t);
 
   QDialogButtonBox * box = new QDialogButtonBox;

@@ -164,6 +164,7 @@ include_directories(
 
 add_definitions(
     "-DTRANSLATIONS_DIR=\"${CMAKE_INSTALL_FULL_DATADIR}/${TR_NAME}/translations\""
+    -DQT_NO_CAST_FROM_ASCII
 )
 
 add_executable(${TR_NAME}-qt WIN32

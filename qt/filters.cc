@@ -11,14 +11,14 @@
 
 const QString FilterMode::names[NUM_MODES] =
 {
-  "show-all",
-  "show-active",
-  "show-downloading",
-  "show-seeding",
-  "show-paused",
-  "show-finished",
-  "show-verifying",
-  "show-error",
+  QLatin1String ("show-all"),
+  QLatin1String ("show-active"),
+  QLatin1String ("show-downloading"),
+  QLatin1String ("show-seeding"),
+  QLatin1String ("show-paused"),
+  QLatin1String ("show-finished"),
+  QLatin1String ("show-verifying"),
+  QLatin1String ("show-error")
 };
 
 int
@@ -33,16 +33,16 @@ FilterMode::modeFromName (const QString& name)
 
 const QString SortMode::names[NUM_MODES] =
 {
-  "sort-by-activity",
-  "sort-by-age",
-  "sort-by-eta",
-  "sort-by-name",
-  "sort-by-progress",
-  "sort-by-queue"
-  "sort-by-ratio",
-  "sort-by-size",
-  "sort-by-state",
-  "sort-by-id"
+  QLatin1String ("sort-by-activity"),
+  QLatin1String ("sort-by-age"),
+  QLatin1String ("sort-by-eta"),
+  QLatin1String ("sort-by-name"),
+  QLatin1String ("sort-by-progress"),
+  QLatin1String ("sort-by-queue"),
+  QLatin1String ("sort-by-ratio"),
+  QLatin1String ("sort-by-size"),
+  QLatin1String ("sort-by-state"),
+  QLatin1String ("sort-by-id")
 };
 
 int

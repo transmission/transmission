@@ -162,12 +162,12 @@ Prefs::Prefs (const QString& configDir):
 
           case TrTypes::SortModeType:
             if (tr_variantGetStr (b, &str, NULL))
-              myValues[i] = QVariant::fromValue (SortMode (str));
+              myValues[i] = QVariant::fromValue (SortMode (QString::fromUtf8 (str)));
             break;
 
           case TrTypes::FilterModeType:
             if (tr_variantGetStr (b, &str, NULL))
-              myValues[i] = QVariant::fromValue (FilterMode (str));
+              myValues[i] = QVariant::fromValue (FilterMode (QString::fromUtf8 (str)));
             break;
 
           case QVariant::String:
@@ -257,7 +257,7 @@ Prefs::~Prefs ()
 
   // update settings.json with our settings
   tr_variant file_settings;
-  const QFile file (QDir(myConfigDir).absoluteFilePath("settings.json"));
+  const QFile file (QDir(myConfigDir).absoluteFilePath(QLatin1String ("settings.json")));
   if (tr_variantFromFile (&file_settings, TR_VARIANT_FMT_JSON, file.fileName().toUtf8().constData()))
     tr_variantInitDict (&file_settings, PREFS_COUNT);
   tr_variantMergeDicts (&file_settings, &current_settings);

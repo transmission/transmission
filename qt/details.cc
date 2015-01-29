@@ -869,19 +869,19 @@ Details::refresh ()
 
       foreach (const Peer& peer, peers)
         {
-          const QString key = idStr + ":" + peer.address;
+          const QString key = idStr + QLatin1Char (':') + peer.address;
           PeerItem * item = static_cast<PeerItem*> (myPeers.value (key, 0));
 
           if (item == 0) // new peer has connected
             {
-              static const QIcon myEncryptionIcon (":/icons/encrypted.png");
+              static const QIcon myEncryptionIcon (QLatin1String (":/icons/encrypted.png"));
               static const QIcon myEmptyIcon;
               item = new PeerItem (peer);
               item->setTextAlignment (COL_UP, Qt::AlignRight|Qt::AlignVCenter);
               item->setTextAlignment (COL_DOWN, Qt::AlignRight|Qt::AlignVCenter);
               item->setTextAlignment (COL_PERCENT, Qt::AlignRight|Qt::AlignVCenter);
               item->setIcon (COL_LOCK, peer.isEncrypted ? myEncryptionIcon : myEmptyIcon);
-              item->setToolTip (COL_LOCK, peer.isEncrypted ? tr ("Encrypted connection") : "");
+              item->setToolTip (COL_LOCK, peer.isEncrypted ? tr ("Encrypted connection") : QString ());
               item->setText (COL_ADDRESS, peer.address);
               item->setText (COL_CLIENT, peer.clientName);
               newItems << item;
@@ -918,9 +918,9 @@ Details::refresh ()
           if (!codeTip.isEmpty ())
             codeTip.resize (codeTip.size ()-1); // eat the trailing linefeed
 
-          item->setText (COL_UP, peer.rateToPeer.isZero () ? "" : Formatter::speedToString (peer.rateToPeer));
-          item->setText (COL_DOWN, peer.rateToClient.isZero () ? "" : Formatter::speedToString (peer.rateToClient));
-          item->setText (COL_PERCENT, peer.progress > 0 ? QString::fromLatin1 ("%1%").arg ( (int) (peer.progress * 100.0)) : "");
+          item->setText (COL_UP, peer.rateToPeer.isZero () ? QString () : Formatter::speedToString (peer.rateToPeer));
+          item->setText (COL_DOWN, peer.rateToClient.isZero () ? QString () : Formatter::speedToString (peer.rateToClient));
+          item->setText (COL_PERCENT, peer.progress > 0 ? QString::fromLatin1 ("%1%").arg ( (int) (peer.progress * 100.0)) : QString ());
           item->setText (COL_STATUS, code);
           item->setToolTip (COL_STATUS, codeTip);
 
@@ -1219,9 +1219,9 @@ Details::initTrackerTab ()
   ui.trackersView->setModel (myTrackerFilter);
   ui.trackersView->setItemDelegate (myTrackerDelegate);
 
-  ui.addTrackerButton->setIcon (getStockIcon ("list-add", QStyle::SP_DialogOpenButton));
-  ui.editTrackerButton->setIcon (getStockIcon ("document-properties", QStyle::SP_DesktopIcon));
-  ui.removeTrackerButton->setIcon (getStockIcon ("list-remove", QStyle::SP_TrashIcon));
+  ui.addTrackerButton->setIcon (getStockIcon (QLatin1String ("list-add"), QStyle::SP_DialogOpenButton));
+  ui.editTrackerButton->setIcon (getStockIcon (QLatin1String ("document-properties"), QStyle::SP_DesktopIcon));
+  ui.removeTrackerButton->setIcon (getStockIcon (QLatin1String ("list-remove"), QStyle::SP_TrashIcon));
 
   ui.showTrackerScrapesCheck->setChecked (myPrefs.getBool (Prefs::SHOW_TRACKER_SCRAPES));
   ui.showBackupTrackersCheck->setChecked (myPrefs.getBool (Prefs::SHOW_BACKUP_TRACKERS));
@@ -1251,11 +1251,11 @@ Details::initPeersTab ()
   ui.peersView->sortByColumn (COL_ADDRESS, Qt::AscendingOrder);
 
   ui.peersView->setColumnWidth (COL_LOCK, 20);
-  ui.peersView->setColumnWidth (COL_UP, measureViewItem (ui.peersView, "1024 MiB/s"));
-  ui.peersView->setColumnWidth (COL_DOWN, measureViewItem (ui.peersView, "1024 MiB/s"));
-  ui.peersView->setColumnWidth (COL_PERCENT, measureViewItem (ui.peersView, "100%"));
-  ui.peersView->setColumnWidth (COL_STATUS, measureViewItem (ui.peersView, "ODUK?EXI"));
-  ui.peersView->setColumnWidth (COL_ADDRESS, measureViewItem (ui.peersView, "888.888.888.888"));
+  ui.peersView->setColumnWidth (COL_UP, measureViewItem (ui.peersView, QLatin1String ("1024 MiB/s")));
+  ui.peersView->setColumnWidth (COL_DOWN, measureViewItem (ui.peersView, QLatin1String ("1024 MiB/s")));
+  ui.peersView->setColumnWidth (COL_PERCENT, measureViewItem (ui.peersView, QLatin1String ("100%")));
+  ui.peersView->setColumnWidth (COL_STATUS, measureViewItem (ui.peersView, QLatin1String ("ODUK?EXI")));
+  ui.peersView->setColumnWidth (COL_ADDRESS, measureViewItem (ui.peersView, QLatin1String ("888.888.888.888")));
 }
 
 /***
@@ -1321,7 +1321,7 @@ Details::onOpenRequested (const QString& path)
       if (tor == NULL)
         continue;
 
-      const QString localFilePath = tor->getPath () + "/" + path;
+      const QString localFilePath = tor->getPath () + QLatin1Char ('/') + path;
       if (!QFile::exists (localFilePath))
         continue;
 

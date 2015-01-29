@@ -91,7 +91,7 @@ FreespaceLabel::onSessionExecuted (int64_t tag, const QString& result, tr_varian
   if (bytes >= 0)
     setText (tr("%1 free").arg(Formatter::sizeToString (bytes)));
   else
-    setText ("");
+    setText (QString ());
 
   // update the tooltip
   size_t len = 0;

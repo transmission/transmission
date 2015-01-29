@@ -132,7 +132,7 @@ MakeDialog::makeTorrent ()
   // get the tiers
   int tier = 0;
   QVector<tr_tracker_info> trackers;
-  foreach (QString line, ui.trackersEdit->toPlainText ().split ("\n"))
+  foreach (QString line, ui.trackersEdit->toPlainText ().split (QLatin1Char ('\n')))
     {
       line = line.trimmed ();
       if (line.isEmpty ())
@@ -150,7 +150,7 @@ MakeDialog::makeTorrent ()
 
   // the file to create
   const QString path = QString::fromUtf8 (myBuilder->top);
-  const QString torrentName = QFileInfo (path).completeBaseName () + ".torrent";
+  const QString torrentName = QFileInfo (path).completeBaseName () + QLatin1String (".torrent");
   const QString target = QDir (ui.destinationButton->path ()).filePath (torrentName);
 
   // comment

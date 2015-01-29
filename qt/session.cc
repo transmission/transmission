@@ -81,7 +81,7 @@ FileAdded::executed (int64_t tag, const QString& result, tr_variant * arguments)
   if (tag != myTag)
     return;
 
-  if (result == "success")
+  if (result == QLatin1String ("success"))
     {
       tr_variant * dup;
       const char * str;
@@ -218,13 +218,13 @@ Session::updatePref (int key)
           switch (i)
             {
               case 0:
-                sessionSet (myPrefs.getKey (key), "tolerated");
+                sessionSet (myPrefs.getKey (key), QLatin1String ("tolerated"));
                 break;
               case 1:
-                sessionSet (myPrefs.getKey (key), "preferred");
+                sessionSet (myPrefs.getKey (key), QLatin1String ("preferred"));
                 break;
               case 2:
-                sessionSet (myPrefs.getKey (key), "required");
+                sessionSet (myPrefs.getKey (key), QLatin1String ("required"));
                 break;
             }
           break;
@@ -334,10 +334,10 @@ Session::start ()
   if (myPrefs.get<bool> (Prefs::SESSION_IS_REMOTE))
     {
       QUrl url;
-      url.setScheme ("http");
+      url.setScheme (QLatin1String ("http"));
       url.setHost (myPrefs.get<QString> (Prefs::SESSION_REMOTE_HOST));
       url.setPort (myPrefs.get<int> (Prefs::SESSION_REMOTE_PORT));
-      url.setPath ("/transmission/rpc");
+      url.setPath (QLatin1String ("/transmission/rpc"));
       if (myPrefs.get<bool> (Prefs::SESSION_REMOTE_AUTH))
         {
           url.setUserName (myPrefs.get<QString> (Prefs::SESSION_REMOTE_USERNAME));
@@ -660,7 +660,7 @@ Session::responseReceived (int64_t tag, const QString& result, tr_variant * args
               tr_variantDictFindStr (args, TR_KEY_path, &path, 0);
               tr_variantDictFindStr (args, TR_KEY_name, &name, 0);
               const QString title = tr ("Error Renaming Path");
-              const QString text = tr ("<p><b>Unable to rename \"%1\" as \"%2\": %3.</b></p> <p>Please correct the errors and try again.</p>").arg (path).arg (name).arg (result);
+              const QString text = tr ("<p><b>Unable to rename \"%1\" as \"%2\": %3.</b></p> <p>Please correct the errors and try again.</p>").arg (QString::fromUtf8 (path)).arg (QString::fromUtf8 (name)).arg (result);
               QMessageBox * d = new QMessageBox (QMessageBox::Information, title, text,
                                                  QMessageBox::Close,
                                                  qApp->activeWindow ());
@@ -698,7 +698,7 @@ Session::responseReceived (int64_t tag, const QString& result, tr_variant * args
               && tr_variantDictFindList (args, TR_KEY_torrents, &torrents)
               && ( (child = tr_variantListChild (torrents, 0)))
               && tr_variantDictFindStr (child, TR_KEY_magnetLink, &str, NULL))
-            qApp->clipboard ()->setText (str);
+            qApp->clipboard ()->setText (QString::fromUtf8 (str));
           break;
         }
 
@@ -842,8 +842,8 @@ Session::updateInfo (tr_variant * d)
   if (tr_variantDictFindInt (d, TR_KEY_blocklist_size, &i) && i!=blocklistSize ())
     setBlocklistSize (i);
 
-  if (tr_variantDictFindStr (d, TR_KEY_version, &str, NULL) && (mySessionVersion != str))
-    mySessionVersion = str;
+  if (tr_variantDictFindStr (d, TR_KEY_version, &str, NULL) && (mySessionVersion != QString::fromUtf8 (str)))
+    mySessionVersion = QString::fromUtf8 (str);
 
   //std::cerr << "Session::updateInfo end" << std::endl;
   connect (&myPrefs, SIGNAL (changed (int)), this, SLOT (updatePref (int)));
@@ -978,12 +978,12 @@ Session::launchWebInterface ()
   if (!mySession) // remote session
     {
       url = myRpc.url ();
-      url.setPath ("/transmission/web/");
+      url.setPath (QLatin1String ("/transmission/web/"));
     }
   else // local session
     {
-      url.setScheme ("http");
-      url.setHost ("localhost");
+      url.setScheme (QLatin1String ("http"));
+      url.setHost (QLatin1String ("localhost"));
       url.setPort (myPrefs.getInt (Prefs::RPC_PORT));
     }
 

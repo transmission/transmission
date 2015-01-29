@@ -19,6 +19,9 @@ greaterThan(QT_MAJOR_VERSION, 4) {
     QT += widgets
 }
 
+DEFINES += QT_NO_CAST_FROM_ASCII
+win32:DEFINES += QT_DBUS
+
 TRANSMISSION_TOP = ..
 
 include(config.pri)
@@ -32,7 +35,6 @@ LIBS += $${LIBB64_LIBS}
 LIBS += $${LIBUPNP_LIBS}
 LIBS += $${LIBNATPMP_LIBS}
 unix: LIBS += -L$${EVENT_TOP}/lib -lz -lrt
-win32:DEFINES += QT_DBUS
 win32:LIBS += -levent-2.0 -lws2_32 -lintl
 win32:LIBS += -lidn -liconv -lwldap32 -liphlpapi
 

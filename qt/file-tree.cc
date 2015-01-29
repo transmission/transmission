@@ -139,7 +139,7 @@ FileTreeItem::data (int column, int role) const
            break;
 
          case COL_SIZE:
-           value.setValue (sizeString() + "  ");
+           value.setValue (sizeString() + QLatin1String ("  "));
            break;
 
          case COL_PROGRESS:
@@ -395,7 +395,7 @@ FileTreeItem::path () const
       if (itemPath.isEmpty())
         itemPath = item->name();
       else
-        itemPath = item->name() + "/" + itemPath;
+        itemPath = item->name() + QLatin1Char ('/') + itemPath;
       item = item->parent ();
     }
 
@@ -966,10 +966,10 @@ FileTreeView::eventFilter (QObject * o, QEvent * event)
 
           QString header;
           if (column == COL_SIZE)
-            header = "999.9 KiB";
+            header = QLatin1String ("999.9 KiB");
           else
             header = myModel.headerData (column, Qt::Horizontal).toString();
-          header += "    ";
+          header += QLatin1String ("    ");
           const int width = fontMetrics.size (0, header).width();
           setColumnWidth (column, width);
             left -= width;
