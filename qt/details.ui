@@ -473,6 +473,9 @@
          <property name="alternatingRowColors">
           <bool>true</bool>
          </property>
+         <property name="verticalScrollMode">
+          <enum>QAbstractItemView::ScrollPerPixel</enum>
+         </property>
          <property name="rootIsDecorated">
           <bool>false</bool>
          </property>
@@ -507,6 +510,9 @@
          </property>
          <property name="selectionMode">
           <enum>QAbstractItemView::ExtendedSelection</enum>
+         </property>
+         <property name="verticalScrollMode">
+          <enum>QAbstractItemView::ScrollPerPixel</enum>
          </property>
         </widget>
        </item>
@@ -575,7 +581,11 @@
       </attribute>
       <layout class="QVBoxLayout" name="filesTabLayout">
        <item>
-        <widget class="FileTreeView" name="filesView"/>
+        <widget class="FileTreeView" name="filesView">
+         <property name="verticalScrollMode">
+          <enum>QAbstractItemView::ScrollPerPixel</enum>
+         </property>
+        </widget>
        </item>
       </layout>
      </widget>
