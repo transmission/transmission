@@ -53,6 +53,7 @@ typedef struct
     GtkLabel* stats_lb;
     GtkWidget* alt_speed_image;
     GtkWidget* alt_speed_button;
+    GtkWidget* start_stop_button;
     GtkWidget* options_menu;
     GtkTreeSelection* selection;
     GtkCellRenderer* renderer;
@@ -377,15 +378,15 @@ void on_start_all_torrents_toggled(GtkToggleButton* button, gpointer vp)
     if (active)
     {
         action = g_action_map_lookup_action(G_ACTION_MAP(win), "start-all-torrents");
-        gtk_button_set_image(GTK_BUTTON(button), gtk_image_new_from_icon_name("media-playback-pause-symbolic", GTK_ICON_SIZE_MENU));
+        gtk_button_set_image(GTK_BUTTON(button),
+        gtk_image_new_from_icon_name("media-playback-pause-symbolic", GTK_ICON_SIZE_MENU));
     }
     else
     {
         action = g_action_map_lookup_action(G_ACTION_MAP(win), "pause-all-torrents");
-        gtk_button_set_image(GTK_BUTTON(button), gtk_image_new_from_icon_name("media-playback-start-symbolic", GTK_ICON_SIZE_MENU));
+        gtk_button_set_image(GTK_BUTTON(button),
+        gtk_image_new_from_icon_name("media-playback-start-symbolic", GTK_ICON_SIZE_MENU));
     }
-
-    g_action_activate(action, NULL);
 }
 
 /***
@@ -406,21 +407,12 @@ GtkWidget* gtr_status_bar_new(PrivateData *p)
             "padding: 0 3px 0 3px;\n"
         "}\n"
         "GtkBox.status-bar GtkButton {\n"
-            "border-image: 0;\n"
-            "border-style: outset;\n"
-            "border-width: 0px 1px;\n"
-            "border-color: rgba(80,80,80,1.0);\n"
+            "box-shadow: none;\n"
             "border-radius: 0px;\n"
-            "padding: 0px;\n"
-        "}\n"
-        "GtkBox.status-bar GtkButton:first-child {\n"
-            "border-width: 0px 1px 0px 0px;\n"
-        "}\n"
-        "GtkBox.status-bar GtkButton:last-child {\n"
-            "border-width: 0px 0px 0px 1px;\n"
-        "}\n"
-        "GtkBox.status-bar GtkLabel {"
-            "font-size: 9px;\n"
+            "border-top-width: 0px;\n"
+            "border-bottom-width: 0px;\n"
+            "padding: 4px;\n"
+            "outline: none;\n"
         "}";
 
     box_wrapper = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
@@ -486,6 +478,16 @@ GtkWidget* gtr_status_bar_new(PrivateData *p)
     gtk_box_pack_end(GTK_BOX(box_wrapper), w, FALSE, FALSE, 0);
 
     return box_wrapper;
+}
+
+gboolean gtr_window_is_paused(TrCore* core)
+{
+    size_t const active_count = gtr_core_get_active_torrent_count(core);
+    size_t const total_count = gtr_core_get_torrent_count(core);
+
+    // printf("total_count = %d, active_count = %d\n", total_count, active_count);
+
+    return active_count < total_count || active_count == 0;
 }
 
 GtkWidget* gtr_window_new(GtkApplication* app, TrCore* core)
@@ -559,20 +561,21 @@ GtkWidget* gtr_window_new(GtkApplication* app, TrCore* core)
     gtk_style_context_add_class(gtk_widget_get_style_context(tbox), GTK_STYLE_CLASS_RAISED);
     gtk_style_context_add_class(gtk_widget_get_style_context(tbox), GTK_STYLE_CLASS_LINKED);
 
-    button = gtk_toggle_button_new();
-    image = gtk_image_new_from_icon_name("media-playback-pause-symbolic", GTK_ICON_SIZE_MENU);
-    gtk_button_set_image(GTK_BUTTON(button), image);
+    /* start/stop all torrents */
+
+    button = p->start_stop_button = gtk_toggle_button_new();
     g_signal_connect(button, "toggled", G_CALLBACK(on_start_all_torrents_toggled), self);
     gtk_header_bar_pack_start(GTK_HEADER_BAR(toolbar), button);
 
     /* gear */
 
     button = gtk_menu_button_new();
-    image = gtk_image_new_from_icon_name("emblem-system-symbolic", GTK_ICON_SIZE_MENU);
+    image = gtk_image_new_from_icon_name("open-menu-symbolic", GTK_ICON_SIZE_MENU);
     gtk_container_add(GTK_CONTAINER(button), image);
     gtk_header_bar_pack_end(GTK_HEADER_BAR(toolbar), button);
     model = gtr_action_get_menu_model("main-window-popup");
     gtk_menu_button_set_menu_model(GTK_MENU_BUTTON(button), model);
+    gtk_menu_button_set_use_popover(GTK_MENU_BUTTON(button), FALSE);
 
     button = gtk_toggle_button_new();
     image = gtk_image_new_from_icon_name("edit-find-symbolic", GTK_ICON_SIZE_MENU);
@@ -732,6 +735,30 @@ static void updateSpeeds(PrivateData* p)
     }
 }
 
+static void updateStartStop(PrivateData* p)
+{
+    GtkWidget* image = NULL;
+    TrCore* core = p->core;
+    GtkWidget* button = p->start_stop_button;
+
+    if (gtr_window_is_paused(core))
+    {
+        image = gtk_image_new_from_icon_name("media-playback-start-symbolic", GTK_ICON_SIZE_MENU);
+        gtk_widget_set_tooltip_text(GTK_WIDGET(button), "Start all torrents");
+        gtk_actionable_set_action_name(GTK_ACTIONABLE(button), "win.start-all-torrents");
+        gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(button), FALSE);
+    }
+    else
+    {
+        image = gtk_image_new_from_icon_name("media-playback-pause-symbolic", GTK_ICON_SIZE_MENU);
+        gtk_widget_set_tooltip_text(GTK_WIDGET(button), "Pause all torrents");
+        gtk_actionable_set_action_name(GTK_ACTIONABLE(button), "win.pause-all-torrents");
+        gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(button), TRUE);
+    }
+
+    gtk_button_set_image(GTK_BUTTON(button), image);
+}
+
 void gtr_window_refresh(GtkWindow* self)
 {
     PrivateData* p = get_private_data(self);
@@ -740,6 +767,7 @@ void gtr_window_refresh(GtkWindow* self)
     {
         updateSpeeds(p);
         updateStats(p);
+        updateStartStop(p);
     }
 }
 
