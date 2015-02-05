@@ -111,7 +111,10 @@ static void tr_limit_popover_init(TrLimitPopover* popover)
     gtk_grid_attach(GTK_GRID(popover), w, 1, 1, 1, 1);
 
     w = priv->download_limit_entry = gtk_spin_button_new_with_range(0, INT_MAX, 5);
-    gtk_entry_set_width_chars(GTK_ENTRY(w), 1);
+    gtk_entry_set_width_chars(GTK_ENTRY(w), 4);
+    gtk_entry_set_max_width_chars(GTK_ENTRY(w), 4);
+    gtk_widget_set_hexpand(GTK_WIDGET(w), FALSE);
+    gtk_widget_set_halign(GTK_WIDGET(w), GTK_ALIGN_START);
     g_signal_connect(GTK_ENTRY(w), "activate", G_CALLBACK(on_entry_activate), popover);
     gtk_grid_attach(GTK_GRID(popover), w, 2, 1, 1, 1);
     gtk_grid_attach(GTK_GRID(popover), gtk_label_new("KB/s"), 3, 1, 1, 1);
@@ -121,7 +124,10 @@ static void tr_limit_popover_init(TrLimitPopover* popover)
     gtk_grid_attach(GTK_GRID(popover), w, 1, 2, 1, 1);
 
     w = priv->upload_limit_entry = gtk_spin_button_new_with_range(0, INT_MAX, 5);
-    gtk_entry_set_width_chars(GTK_ENTRY(w), 1);
+    gtk_entry_set_width_chars(GTK_ENTRY(w), 4);
+    gtk_entry_set_max_width_chars(GTK_ENTRY(w), 4);
+    gtk_widget_set_hexpand(GTK_WIDGET(w), FALSE);
+    gtk_widget_set_halign(GTK_WIDGET(w), GTK_ALIGN_START);
     g_signal_connect(GTK_ENTRY(w), "activate", G_CALLBACK(on_entry_activate), popover);
     gtk_grid_attach(GTK_GRID(popover), w, 2, 2, 1, 1);
     gtk_grid_attach(GTK_GRID(popover), gtk_label_new("KB/s"), 3, 2, 1, 1);
@@ -131,7 +137,10 @@ static void tr_limit_popover_init(TrLimitPopover* popover)
     gtk_grid_attach(GTK_GRID(popover), w, 1, 3, 1, 1);
 
     w = priv->ratio_limit_entry = gtk_spin_button_new_with_range(0, 1000, .05);
-    gtk_entry_set_width_chars(GTK_ENTRY(w), 1);
+    gtk_entry_set_width_chars(GTK_ENTRY(w), 4);
+    gtk_entry_set_max_width_chars(GTK_ENTRY(w), 4);
+    gtk_widget_set_hexpand(GTK_WIDGET(w), FALSE);
+    gtk_widget_set_halign(GTK_WIDGET(w), GTK_ALIGN_START);
     g_signal_connect(GTK_ENTRY(w), "activate", G_CALLBACK(on_entry_activate), popover);
     gtk_grid_attach(GTK_GRID(popover), w, 2, 3, 1, 1);
 }
