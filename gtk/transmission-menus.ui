@@ -4,19 +4,9 @@
 
     <section>
       <item>
-        <attribute name="label" translatable="yes">_Open</attribute>
-        <attribute name="action">win.open-torrent</attribute>
-        <attribute name="accel">&lt;Primary&gt;o</attribute>
-      </item>
-      <item>
         <attribute name="label" translatable="yes">Open _URL…</attribute>
         <attribute name="action">win.open-torrent-from-url</attribute>
         <attribute name="accel">&lt;Primary&gt;u</attribute>
-      </item>
-      <item>
-        <attribute name="label" translatable="yes">_New…</attribute>
-        <attribute name="action">win.new-torrent</attribute>
-        <attribute name="accel">&lt;Primary&gt;n</attribute>
       </item>
     </section>
 
@@ -166,6 +156,7 @@
         <attribute name="action">win.open-torrent-folder</attribute>
       </item>
     </section>
+
     <section>
       <submenu>
         <attribute name="label" translatable="yes">_Sort Torrents By</attribute>
@@ -224,6 +215,7 @@
         </section>
       </submenu>
     </section>
+
     <section>
       <item>
         <attribute name="label" translatable="yes">_Start</attribute>
