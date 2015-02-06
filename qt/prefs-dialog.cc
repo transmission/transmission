@@ -123,7 +123,7 @@ PrefsDialog::updateWidgetValue (QWidget * widget, int prefKey)
   else if (auto w = qobject_cast<QDoubleSpinBox*> (widget))
     w->setValue (myPrefs.getDouble (prefKey));
   else if (auto w = qobject_cast<QTimeEdit*> (widget))
-    w->setTime (QTime ().addSecs (myPrefs.getInt(prefKey) * 60));
+    w->setTime (QTime (0, 0).addSecs (myPrefs.getInt(prefKey) * 60));
   else if (auto w = qobject_cast<QLineEdit*> (widget))
     w->setText (myPrefs.getString (prefKey));
   else if (auto w = qobject_cast<TrPathButton*> (widget))
@@ -176,7 +176,7 @@ void
 PrefsDialog::timeEditingFinished ()
 {
   if (auto e = qobject_cast<const QTimeEdit*> (sender ()))
-    setPref(getPrefKey (e), QTime ().secsTo (e->time()) / 60);
+    setPref(getPrefKey (e), QTime (0, 0).secsTo (e->time()) / 60);
 }
 
 void
