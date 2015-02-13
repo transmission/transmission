@@ -30,7 +30,7 @@ enum
 #define DEFAULT_BAR_HEIGHT 12
 #define SMALL_SCALE 0.9
 #define COMPACT_ICON_SIZE GTK_ICON_SIZE_MENU
-#define FULL_ICON_SIZE GTK_ICON_SIZE_DND
+#define FULL_ICON_SIZE GTK_ICON_SIZE_DIALOG
 
 /***
 ****
@@ -709,13 +709,13 @@ static void render_full(TorrentCellRenderer* cell, GtrDrawable* window, GtkWidge
     fill_area.height -= ypad * 2;
 
     /* icon */
-    icon_area.x = fill_area.x;
+    icon_area.x = fill_area.x + GUI_PAD;
     icon_area.y = fill_area.y + (fill_area.height - icon_area.height) / 2;
 
     /* name */
-    name_area.x = icon_area.x + icon_area.width + GUI_PAD;
+    name_area.x = icon_area.x + icon_area.width + 2 * GUI_PAD;
     name_area.y = fill_area.y;
-    name_area.width = fill_area.width - GUI_PAD - icon_area.width - GUI_PAD_SMALL;
+    name_area.width = fill_area.width - 4 * GUI_PAD - icon_area.width - GUI_PAD_SMALL;
 
     /* prog */
     prog_area.x = name_area.x;
