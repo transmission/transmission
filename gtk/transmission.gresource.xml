@@ -2,7 +2,6 @@
 <gresources>
   <gresource prefix="/com/transmissionbt/transmission">
     <file>transmission-menus.ui</file>
-    <file>tr-status-menu-button.ui</file>
     <file>icons/scalable/actions/statistics-symbolic.svg</file>
     <file>icons/scalable/actions/alternative-speed-on-symbolic.svg</file>
     <file>icons/scalable/actions/alternative-speed-off-symbolic.svg</file>
@@ -11,5 +10,6 @@
     <file>icons/48x48/apps/transmission.png</file>
     <file>icons/256x256/apps/transmission.png</file>
     <file>icons/scalable/apps/transmission.svg</file>
+    <file>css/transmission.scss</file>
   </gresource>
 </gresources>

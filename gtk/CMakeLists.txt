@@ -35,6 +35,7 @@ add_custom_command(
         --c-name transmission
         transmission.gresource.xml
     DEPENDS
+        css/transmission.scss
         icons/scalable/actions/alternative-speed-off-symbolic.svg
         icons/scalable/actions/alternative-speed-on-symbolic.svg
         icons/scalable/actions/statistics-symbolic.svg
@@ -43,7 +44,6 @@ add_custom_command(
         icons/48x48/apps/transmission.png
         icons/256x256/apps/transmission.png
         icons/scalable/apps/transmission.svg
-        tr-status-menu-button.ui
         transmission.gresource.xml
         transmission-menus.ui
     WORKING_DIRECTORY
@@ -92,7 +92,6 @@ set(${PROJECT_NAME}_SOURCES
     tr-icon.c
     tr-limit-popover.c
     tr-prefs.c
-    tr-status-menu-button.c
     tr-window.c
     util.c
     ${CMAKE_CURRENT_BINARY_DIR}/transmission-resources.c
@@ -119,7 +118,6 @@ set(${PROJECT_NAME}_HEADERS
     tr-icon.h
     tr-limit-popover.h
     tr-prefs.h
-    tr-status-menu-button.h
     tr-window.h
     util.h
     ${CMAKE_CURRENT_BINARY_DIR}/transmission-resources.h

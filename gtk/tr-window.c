@@ -35,7 +35,6 @@
 #include "torrent-cell-renderer.h"
 #include "tr-limit-popover.h"
 #include "tr-prefs.h"
-#include "tr-status-menu-button.h"
 #include "tr-window.h"
 #include "util.h"
 
@@ -397,33 +396,14 @@ GtkWidget* gtr_status_bar_new(PrivateData *p)
     GtkWidget* box;
     GtkWidget* pop;
     GtkWidget* box_wrapper;
-    GtkCssProvider* css_provider;
-    char const* style =
-        "GtkBox.status-bar {\n"
-            "padding: 0 3px 0 3px;\n"
-        "}\n"
-        "GtkBox.status-bar GtkButton {\n"
-            "box-shadow: none;\n"
-            "border-radius: 0px;\n"
-            "border-top-width: 0px;\n"
-            "border-bottom-width: 0px;\n"
-            "padding: 4px;\n"
-            "outline: none;\n"
-        "}";
 
     box_wrapper = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
 
     gtk_style_context_add_class(gtk_widget_get_style_context(box_wrapper), "status-bar");
 
-    css_provider = gtk_css_provider_new();
-    gtk_css_provider_load_from_data(css_provider, style, strlen(style), NULL);
-    gtk_style_context_add_provider_for_screen(gdk_screen_get_default(), GTK_STYLE_PROVIDER(css_provider),
-        GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
-
     w = gtk_menu_button_new();
     gtk_button_set_image(GTK_BUTTON(w), gtk_image_new_from_icon_name("network-transmit-receive-symbolic",
         GTK_ICON_SIZE_SMALL_TOOLBAR));
-    gtk_button_set_relief(GTK_BUTTON(w), GTK_RELIEF_NONE);
 
     pop = gtk_popover_new(w);
 
@@ -443,7 +423,6 @@ GtkWidget* gtr_status_bar_new(PrivateData *p)
     p->alt_speed_image = gtk_image_new();
     w = p->alt_speed_button = gtk_toggle_button_new();
     gtk_button_set_image(GTK_BUTTON(w), p->alt_speed_image);
-    gtk_button_set_relief(GTK_BUTTON(w), GTK_RELIEF_NONE);
     g_signal_connect(w, "toggled", G_CALLBACK(alt_speed_toggled_cb), p);
     gtk_box_pack_start(GTK_BOX(box_wrapper), w, FALSE, FALSE, 0);
 
@@ -487,9 +466,39 @@ gboolean gtr_window_is_paused(TrCore* core)
     return active_count < total_count || active_count == 0;
 }
 
+static void load_css_from_resource(gchar const* resource_path)
+{
+    GError* error = NULL;
+    GFile* css_file;
+    GtkCssProvider* provider;
+
+    css_file = g_file_new_for_uri(resource_path);
+
+    if (!g_file_query_exists(css_file, NULL))
+    {
+        g_object_unref(css_file);
+        return;
+    }
+
+    provider = gtk_css_provider_new();
+
+    if (gtk_css_provider_load_from_file(provider, css_file, &error))
+    {
+        gtk_style_context_add_provider_for_screen(gdk_screen_get_default(), GTK_STYLE_PROVIDER(provider),
+            GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
+        g_object_unref(provider);
+    }
+    else
+    {
+        g_warning("Could not load css provider: %s", error->message);
+        g_error_free(error);
+    }
+
+    g_object_unref(css_file);
+}
+
 GtkWidget* gtr_window_new(GtkApplication* app, TrCore* core)
 {
-    char const* style;
     PrivateData* p;
     GtkWidget* toolbar;
     GtkWidget* filter;
@@ -502,7 +511,6 @@ GtkWidget* gtr_window_new(GtkApplication* app, TrCore* core)
     GtkWidget* button;
     GtkWidget* image;
     GtkWindow* win;
-    GtkCssProvider* css_provider;
     GMenuModel* model;
 
     p = g_new0(PrivateData, 1);
@@ -522,13 +530,7 @@ GtkWidget* gtr_window_new(GtkApplication* app, TrCore* core)
         gtk_window_maximize(win);
     }
 
-    /* Add style provider to the window. */
-    /* Please move it to separate .css file if you’re adding more styles here. */
-    style = ".tr-workarea {border-width: 0px 0px 1px 0px; border-style: solid; border-radius: 0;}";
-    css_provider = gtk_css_provider_new();
-    gtk_css_provider_load_from_data(css_provider, style, strlen(style), NULL);
-    gtk_style_context_add_provider_for_screen(gdk_screen_get_default(), GTK_STYLE_PROVIDER(css_provider),
-        GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
+    load_css_from_resource("resource:///com/transmissionbt/transmission/css/transmission.scss");
 
     /* window's main container */
     vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);

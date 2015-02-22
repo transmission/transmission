@@ -15,18 +15,6 @@
 
     <section>
       <item>
-        <attribute name="label" translatable="yes">_Compact View</attribute>
-        <attribute name="action">win.compact-view</attribute>
-        <attribute name="accel">&lt;Alt&gt;c</attribute>
-      </item>
-      <item>
-          <attribute name="label" translatable="yes">_Statusbar</attribute>
-          <attribute name="action">win.show-statusbar</attribute>
-      </item>
-    </section>
-
-    <section>
-      <item>
         <attribute name="label" translatable="yes">_Preferences</attribute>
         <attribute name="action">win.preferences</attribute>
       </item>
@@ -293,6 +281,17 @@
           </item>
         </section>
       </submenu>
+    </section>
+
+    <section>
+      <item>
+        <attribute name="label" translatable="yes">_Compact View</attribute>
+        <attribute name="action">win.compact-view</attribute>
+      </item>
+      <item>
+          <attribute name="label" translatable="yes">_Status Bar</attribute>
+          <attribute name="action">win.show-statusbar</attribute>
+      </item>
     </section>
 
   </menu>

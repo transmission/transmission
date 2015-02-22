@@ -1,0 +1,24 @@
+.tr-workarea {
+    border: none;
+}
+
+.status-bar {
+    border-top: 1px solid @borders;
+}
+
+.status-bar GtkButton {
+    box-shadow: none;
+    border-radius: 0px;
+    border-bottom-width: 0px;
+    outline: none;
+    padding: 4px;
+}
+
+.status-bar GtkButton:first-child {
+    border-right: none;
+    border-left: none;
+}
+
+.status-bar GtkButton:last-child {
+    border-right: none;
+}
