@@ -53,7 +53,6 @@ typedef struct
     GtkLabel* stats_lb;
     GtkWidget* alt_speed_image;
     GtkWidget* alt_speed_button;
-    GtkWidget* start_stop_button;
     GtkWidget* options_menu;
     GtkTreeSelection* selection;
     GtkCellRenderer* renderer;
@@ -79,14 +78,11 @@ static void on_popup_menu(GtkWidget* self UNUSED, GdkEventButton* event)
 {
     static GtkWidget* menu = NULL;
 
-    if (menu == NULL)
-    {
-        GMenuModel* model = gtr_action_get_menu_model("main-window-popup");
-        menu = gtk_menu_new_from_model(model);
-        gtk_menu_attach_to_widget(GTK_MENU(menu), self, NULL);
+    GMenuModel* model = gtr_action_get_menu_model("torrent-options-popup");
+    menu = gtk_menu_new_from_model(model);
+    gtk_menu_attach_to_widget(GTK_MENU(menu), self, NULL);
 
-        g_object_unref(model);
-    }
+    g_object_unref(model);
 
     gtk_menu_popup(GTK_MENU(menu), NULL, NULL, NULL, NULL, event != NULL ? event->button : 0, event != NULL ? event->time : 0);
 }
@@ -545,30 +541,36 @@ GtkWidget* gtr_window_new(GtkApplication* app, TrCore* core)
     gtk_header_bar_set_subtitle(GTK_HEADER_BAR(toolbar), "All Torrents");
     gtk_window_set_titlebar(GTK_WINDOW(win), toolbar);
 
-    /* new torrent actions */
+    /* selected torrent actions */
 
     tbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
-
-    button = gtk_button_new_from_icon_name("document-new-symbolic", GTK_ICON_SIZE_MENU);
-    gtk_actionable_set_action_name(GTK_ACTIONABLE(button), "win.new-torrent");
-    gtk_box_pack_start(GTK_BOX(tbox), button, TRUE, TRUE, 0);
-
-    button = gtk_button_new_from_icon_name("document-open-symbolic", GTK_ICON_SIZE_MENU);
-    gtk_actionable_set_action_name(GTK_ACTIONABLE(button), "win.open-torrent");
-    gtk_box_pack_start(GTK_BOX(tbox), button, TRUE, TRUE, 0);
-
-    gtk_header_bar_pack_start(GTK_HEADER_BAR(toolbar), tbox);
 
     gtk_style_context_add_class(gtk_widget_get_style_context(tbox), GTK_STYLE_CLASS_RAISED);
     gtk_style_context_add_class(gtk_widget_get_style_context(tbox), GTK_STYLE_CLASS_LINKED);
 
-    /* start/stop all torrents */
+    button = gtk_button_new_from_icon_name("media-playback-start-symbolic", GTK_ICON_SIZE_MENU);
+    gtk_actionable_set_action_name(GTK_ACTIONABLE(button), "win.torrent-start");
+    gtk_box_pack_start(GTK_BOX(tbox), button, TRUE, TRUE, FALSE);
 
-    button = p->start_stop_button = gtk_toggle_button_new();
-    g_signal_connect(button, "toggled", G_CALLBACK(on_start_all_torrents_toggled), self);
+    button = gtk_button_new_from_icon_name("media-playback-pause-symbolic", GTK_ICON_SIZE_MENU);
+    gtk_actionable_set_action_name(GTK_ACTIONABLE(button), "win.torrent-stop");
+    gtk_box_pack_start(GTK_BOX(tbox), button, TRUE, TRUE, FALSE);
+
+    gtk_header_bar_pack_start(GTK_HEADER_BAR(toolbar), tbox);
+
+    button = gtk_button_new_from_icon_name("user-trash-symbolic", GTK_ICON_SIZE_MENU);
+    gtk_actionable_set_action_name(GTK_ACTIONABLE(button), "win.remove-torrent");
     gtk_header_bar_pack_start(GTK_HEADER_BAR(toolbar), button);
 
     /* gear */
+
+    button = gtk_menu_button_new();
+    image = gtk_image_new_from_icon_name("view-more-symbolic", GTK_ICON_SIZE_MENU);
+    gtk_container_add(GTK_CONTAINER(button), image);
+    gtk_header_bar_pack_end(GTK_HEADER_BAR(toolbar), button);
+    model = gtr_action_get_menu_model("torrent-options-popup");
+    gtk_menu_button_set_menu_model(GTK_MENU_BUTTON(button), model);
+    gtk_menu_button_set_use_popover(GTK_MENU_BUTTON(button), FALSE);
 
     button = gtk_menu_button_new();
     image = gtk_image_new_from_icon_name("open-menu-symbolic", GTK_ICON_SIZE_MENU);
@@ -736,30 +738,6 @@ static void updateSpeeds(PrivateData* p)
     }
 }
 
-static void updateStartStop(PrivateData* p)
-{
-    GtkWidget* image = NULL;
-    TrCore* core = p->core;
-    GtkWidget* button = p->start_stop_button;
-
-    if (gtr_window_is_paused(core))
-    {
-        image = gtk_image_new_from_icon_name("media-playback-start-symbolic", GTK_ICON_SIZE_MENU);
-        gtk_widget_set_tooltip_text(GTK_WIDGET(button), "Start all torrents");
-        gtk_actionable_set_action_name(GTK_ACTIONABLE(button), "win.start-all-torrents");
-        gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(button), FALSE);
-    }
-    else
-    {
-        image = gtk_image_new_from_icon_name("media-playback-pause-symbolic", GTK_ICON_SIZE_MENU);
-        gtk_widget_set_tooltip_text(GTK_WIDGET(button), "Pause all torrents");
-        gtk_actionable_set_action_name(GTK_ACTIONABLE(button), "win.pause-all-torrents");
-        gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(button), TRUE);
-    }
-
-    gtk_button_set_image(GTK_BUTTON(button), image);
-}
-
 void gtr_window_refresh(GtkWindow* self)
 {
     PrivateData* p = get_private_data(self);
@@ -768,7 +746,6 @@ void gtr_window_refresh(GtkWindow* self)
     {
         updateSpeeds(p);
         updateStats(p);
-        updateStartStop(p);
     }
 }
 

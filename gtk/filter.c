@@ -210,7 +210,29 @@ static void selection_changed_cb(GtkButton* button, gpointer vdata)
         if (GTK_WIDGET(button) == data->filters[i].widget)
         {
             data->active_activity_type = data->filters[i].type;
-            g_snprintf(bar_title, sizeof(bar_title), _("%s torrents"), data->filters[i].name);
+
+            switch (data->active_activity_type)
+            {
+            case ACTIVITY_FILTER_ALL:
+                g_snprintf(bar_title, sizeof(bar_title), _("All torrents"));
+                break;
+
+            case ACTIVITY_FILTER_DOWNLOADING:
+                g_snprintf(bar_title, sizeof(bar_title), _("Torrents downloading"));
+                break;
+
+            case ACTIVITY_FILTER_SEEDING:
+                g_snprintf(bar_title, sizeof(bar_title), _("Torrents seeding"));
+                break;
+
+            case ACTIVITY_FILTER_ACTIVE:
+                g_snprintf(bar_title, sizeof(bar_title), _("Active torrents"));
+                break;
+
+            default:
+                break;
+            }
+
             gtk_header_bar_set_subtitle(GTK_HEADER_BAR(data->header_bar), bar_title);
         }
     }

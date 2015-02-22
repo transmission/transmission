@@ -4,9 +4,12 @@
 
     <section>
       <item>
-        <attribute name="label" translatable="yes">Open _URL…</attribute>
-        <attribute name="action">win.open-torrent-from-url</attribute>
-        <attribute name="accel">&lt;Primary&gt;u</attribute>
+        <attribute name="label" translatable="yes">_Start All</attribute>
+        <attribute name="action">win.start-all-torrents</attribute>
+      </item>
+      <item>
+        <attribute name="label" translatable="yes">_Pause All</attribute>
+        <attribute name="action">win.pause-all-torrents</attribute>
       </item>
     </section>
 
@@ -19,21 +22,13 @@
       <item>
           <attribute name="label" translatable="yes">_Statusbar</attribute>
           <attribute name="action">win.show-statusbar</attribute>
-        </item>
-      <item>
-        <attribute name="label" translatable="yes">_Preferences</attribute>
-        <attribute name="action">win.preferences</attribute>
       </item>
     </section>
 
     <section>
       <item>
-        <attribute name="label" translatable="yes">_Start All</attribute>
-        <attribute name="action">win.start-all-torrents</attribute>
-      </item>
-      <item>
-        <attribute name="label" translatable="yes">_Pause All</attribute>
-        <attribute name="action">win.pause-all-torrents</attribute>
+        <attribute name="label" translatable="yes">_Preferences</attribute>
+        <attribute name="action">win.preferences</attribute>
       </item>
     </section>
 
@@ -46,24 +41,22 @@
         <attribute name="label" translatable="yes">_Statistics</attribute>
         <attribute name="action">win.show-stats</attribute>
       </item>
-    </section>
       <item>
         <attribute name="label" translatable="yes">_Donate</attribute>
         <attribute name="action">win.donate</attribute>
       </item>
+    </section>
+
     <section>
+      <item>
+        <attribute name="label" translatable="yes">_Help</attribute>
+        <attribute name="action">win.help</attribute>
+        <attribute name="accel">F1</attribute>
+      </item>
       <item>
         <attribute name="label" translatable="yes">_About</attribute>
         <attribute name="action">win.show-about-dialog</attribute>
       </item>
-      <item>
-        <attribute name="label" translatable="yes">_Contents</attribute>
-        <attribute name="action">win.help</attribute>
-        <attribute name="accel">F1</attribute>
-      </item>
-    </section>
-
-    <section>
       <item>
         <attribute name="label" translatable="yes">_Quit</attribute>
         <attribute name="action">win.quit</attribute>
@@ -131,7 +124,104 @@
 
   </menu>
 
+  <menu id="torrent-options-popup">
+
+    <section>
+      <item>
+        <attribute name="label" translatable="yes">Torrent Properties</attribute>
+        <attribute name="action">win.show-torrent-properties</attribute>
+      </item>
+      <item>
+        <attribute name="label" translatable="yes">Open Fold_er</attribute>
+        <attribute name="action">win.open-torrent-folder</attribute>
+      </item>
+    </section>
+
+    <section>
+      <item>
+        <attribute name="label" translatable="yes">_Start</attribute>
+        <attribute name="action">win.torrent-start</attribute>
+      </item>
+      <item>
+        <attribute name="label" translatable="yes">Start _Now</attribute>
+        <attribute name="action">win.torrent-start-now</attribute>
+      </item>
+      <item>
+        <attribute name="label" translatable="yes">Ask Tracker for _More Peers</attribute>
+        <attribute name="action">win.torrent-reannounce</attribute>
+      </item>
+      <submenu>
+        <attribute name="label" translatable="yes">_Queue</attribute>
+        <section>
+          <item>
+            <attribute name="label" translatable="yes">Move to _Top</attribute>
+            <attribute name="action">win.queue-move-top</attribute>
+          </item>
+          <item>
+            <attribute name="label" translatable="yes">Move _Up</attribute>
+            <attribute name="action">win.queue-move-up</attribute>
+          </item>
+          <item>
+            <attribute name="label" translatable="yes">Move _Down</attribute>
+            <attribute name="action">win.queue-move-down</attribute>
+          </item>
+          <item>
+            <attribute name="label" translatable="yes">Move to _Bottom</attribute>
+            <attribute name="action">win.queue-move-bottom</attribute>
+          </item>
+        </section>
+      </submenu>
+      <item>
+        <attribute name="label" translatable="yes">_Pause</attribute>
+        <attribute name="action">win.torrent-stop</attribute>
+      </item>
+    </section>
+
+    <section>
+      <item>
+        <attribute name="label" translatable="yes">Set _Location…</attribute>
+        <attribute name="action">win.relocate-torrent</attribute>
+      </item>
+      <item>
+        <attribute name="label" translatable="yes">_Verify Local Data</attribute>
+        <attribute name="action">win.torrent-verify</attribute>
+      </item>
+      <item>
+        <attribute name="label" translatable="yes">Copy _Magnet Link to Clipboard</attribute>
+        <attribute name="action">win.copy-magnet-link-to-clipboard</attribute>
+      </item>
+    </section>
+    <section>
+      <item>
+        <attribute name="label" translatable="yes">_Remove</attribute>
+        <attribute name="action">win.remove-torrent</attribute>
+      </item>
+      <item>
+        <attribute name="label" translatable="yes">_Delete Files and Remove</attribute>
+        <attribute name="action">win.delete-torrent</attribute>
+      </item>
+    </section>
+
+  </menu>
+
   <menu id="main-window-popup">
+
+    <section>
+      <item>
+        <attribute name="label" translatable="yes">_New Torrent</attribute>
+        <attribute name="action">win.new-torrent</attribute>
+      </item>
+    </section>
+    <section>
+      <item>
+        <attribute name="label" translatable="yes">_Open</attribute>
+        <attribute name="action">win.open-torrent</attribute>
+      </item>
+      <item>
+        <attribute name="label" translatable="yes">Open _URL…</attribute>
+        <attribute name="action">win.open-torrent-from-url</attribute>
+      </item>
+    </section>
 
     <section>
       <item>
@@ -143,17 +233,6 @@
         <attribute name="label" translatable="yes">Dese_lect All</attribute>
         <attribute name="action">win.deselect-all</attribute>
         <attribute name="accel">&lt;Shift&gt;&lt;Primary&gt;a</attribute>
-      </item>
-    </section>
-
-    <section>
-      <item>
-        <attribute name="label" translatable="yes">Torrent Properties</attribute>
-        <attribute name="action">win.show-torrent-properties</attribute>
-      </item>
-      <item>
-        <attribute name="label" translatable="yes">Open Fold_er</attribute>
-        <attribute name="action">win.open-torrent-folder</attribute>
       </item>
     </section>
 
@@ -214,70 +293,6 @@
           </item>
         </section>
       </submenu>
-    </section>
-
-    <section>
-      <item>
-        <attribute name="label" translatable="yes">_Start</attribute>
-        <attribute name="action">win.torrent-start</attribute>
-      </item>
-      <item>
-        <attribute name="label" translatable="yes">Start _Now</attribute>
-        <attribute name="action">win.torrent-start-now</attribute>
-      </item>
-      <item>
-        <attribute name="label" translatable="yes">Ask Tracker for _More Peers</attribute>
-        <attribute name="action">win.torrent-reannounce</attribute>
-      </item>
-      <submenu>
-        <attribute name="label" translatable="yes">_Queue</attribute>
-        <section>
-          <item>
-            <attribute name="label" translatable="yes">Move to _Top</attribute>
-            <attribute name="action">win.queue-move-top</attribute>
-          </item>
-          <item>
-            <attribute name="label" translatable="yes">Move _Up</attribute>
-            <attribute name="action">win.queue-move-up</attribute>
-          </item>
-          <item>
-            <attribute name="label" translatable="yes">Move _Down</attribute>
-            <attribute name="action">win.queue-move-down</attribute>
-          </item>
-          <item>
-            <attribute name="label" translatable="yes">Move to _Bottom</attribute>
-            <attribute name="action">win.queue-move-bottom</attribute>
-          </item>
-        </section>
-      </submenu>
-      <item>
-        <attribute name="label" translatable="yes">_Pause</attribute>
-        <attribute name="action">win.torrent-stop</attribute>
-      </item>
-    </section>
-    <section>
-      <item>
-        <attribute name="label" translatable="yes">Set _Location…</attribute>
-        <attribute name="action">win.relocate-torrent</attribute>
-      </item>
-      <item>
-        <attribute name="label" translatable="yes">_Verify Local Data</attribute>
-        <attribute name="action">win.torrent-verify</attribute>
-      </item>
-      <item>
-        <attribute name="label" translatable="yes">Copy _Magnet Link to Clipboard</attribute>
-        <attribute name="action">win.copy-magnet-link-to-clipboard</attribute>
-      </item>
-    </section>
-    <section>
-      <item>
-        <attribute name="label" translatable="yes">_Remove</attribute>
-        <attribute name="action">win.remove-torrent</attribute>
-      </item>
-      <item>
-        <attribute name="label" translatable="yes">_Delete Files and Remove</attribute>
-        <attribute name="action">win.delete-torrent</attribute>
-      </item>
     </section>
 
   </menu>
