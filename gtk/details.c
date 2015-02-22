@@ -1298,7 +1298,7 @@ enum
     PEER_COL_REQS_CANCELLED_BY_CLIENT_COUNT_STRING,
     PEER_COL_REQS_CANCELLED_BY_PEER_COUNT_INT,
     PEER_COL_REQS_CANCELLED_BY_PEER_COUNT_STRING,
-    PEER_COL_ENCRYPTION_STOCK_ID,
+    PEER_COL_ENCRYPTION_ICON_NAME,
     PEER_COL_FLAGS,
     PEER_COL_TORRENT_NAME,
     N_PEER_COLS
@@ -1412,7 +1412,7 @@ static void initPeerRow(GtkListStore* store, GtkTreeIter* iter, char const* key,
         PEER_COL_ADDRESS, peer->addr,
         PEER_COL_ADDRESS_COLLATED, collated_name,
         PEER_COL_CLIENT, client,
-        PEER_COL_ENCRYPTION_STOCK_ID, peer->isEncrypted ? "transmission-lock" : NULL,
+        PEER_COL_ENCRYPTION_ICON_NAME, peer->isEncrypted ? "channel-secure-symbolic" : NULL,
         PEER_COL_KEY, key,
         PEER_COL_TORRENT_NAME, torrentName,
         -1);
@@ -1846,7 +1846,7 @@ static void setPeerViewColumns(GtkTreeView* peer_view)
     bool const more = gtr_pref_flag_get(TR_KEY_show_extra_peer_details);
 
     n = 0;
-    view_columns[n++] = PEER_COL_ENCRYPTION_STOCK_ID;
+    view_columns[n++] = PEER_COL_ENCRYPTION_ICON_NAME;
     view_columns[n++] = PEER_COL_UPLOAD_RATE_STRING;
 
     if (more)
@@ -1916,10 +1916,10 @@ static void setPeerViewColumns(GtkTreeView* peer_view)
             c = gtk_tree_view_column_new_with_attributes(t, r, "value", PEER_COL_PROGRESS, NULL);
             break;
 
-        case PEER_COL_ENCRYPTION_STOCK_ID:
+        case PEER_COL_ENCRYPTION_ICON_NAME:
             r = gtk_cell_renderer_pixbuf_new();
             g_object_set(r, "xalign", (gfloat)0.0, "yalign", (gfloat)0.5, NULL);
-            c = gtk_tree_view_column_new_with_attributes(t, r, "stock-id", PEER_COL_ENCRYPTION_STOCK_ID, NULL);
+            c = gtk_tree_view_column_new_with_attributes(t, r, "icon-name", PEER_COL_ENCRYPTION_ICON_NAME, NULL);
             gtk_tree_view_column_set_sizing(c, GTK_TREE_VIEW_COLUMN_FIXED);
             gtk_tree_view_column_set_fixed_width(c, 20);
             break;

@@ -997,7 +997,7 @@ static GtkWidget* speedPage(GObject* core)
     gtk_misc_set_alignment(GTK_MISC(w), 0.0f, 0.5f);
     gtk_label_set_use_markup(GTK_LABEL(w), TRUE);
     gtk_box_pack_start(GTK_BOX(h), w, FALSE, FALSE, 0);
-    w = gtk_image_new_from_icon_name("alt-speed-on", GTK_ICON_SIZE_SMALL_TOOLBAR);
+    w = gtk_image_new_from_icon_name("alternative-speed-on-symbolic", GTK_ICON_SIZE_SMALL_TOOLBAR);
     gtk_box_pack_start(GTK_BOX(h), w, FALSE, FALSE, 0);
     hig_workarea_add_section_title_widget(t, &row, h);
 

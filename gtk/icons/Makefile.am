@@ -5,28 +5,23 @@ public_icons_themes = \
 	$(NULL)
 
 public_icons = \
-	hicolor_apps_16x16_transmission.png \
-	hicolor_apps_22x22_transmission.png \
-	hicolor_apps_24x24_transmission.png \
-	hicolor_apps_32x32_transmission.png \
-	hicolor_apps_48x48_transmission.png \
-	hicolor_apps_256x256_transmission.png \
-	hicolor_apps_scalable_transmission.svg \
+	16x16/apps/transmission.png \
+	22x22/apps/transmission.png \
+	24x24/apps/transmission.png \
+	32x32/apps/transmission.png \
+	48x48/apps/transmission.png \
+	256x256/apps/transmission.png \
+	scalable/apps/transmission.svg \
 	$(NULL)
 
 private_icons = \
 	$(NULL)
 
 noinst_DATA = \
-	lock.png \
-	ratio.png \
-	turtle-blue.png \
-	turtle-grey.png \
-	utilities.png \
-	hicolor_apps_16x16_transmission.svg \
-	hicolor_apps_22x22_transmission.svg \
-	hicolor_apps_32x32_transmission.svg \
-	transmission.svg \
+	scalable/actions/alternative-speed-off-symbolic.svg \
+	scalable/actions/alternative-speed-on-symbolic.svg \
+	scalable/actions/statistics-symbolic.svg \
+	source.svg \
 	$(NULL)
 
 EXTRA_DIST = \
@@ -54,36 +49,26 @@ update-icon-cache:
 
 install-icons:
 	for icon in $(public_icons); do \
-		THEME=`echo $$icon | cut -d_ -f1`; \
-		CONTEXT=`echo $$icon | cut -d_ -f2`; \
-		SIZE=`echo $$icon | cut -d_ -f3`; \
-		ICONFILE=`echo $$icon | cut -d_ -f4`; \
-		mkdir -p $(DESTDIR)$(datadir)/icons/$$THEME/$$SIZE/$$CONTEXT; \
-		$(INSTALL_DATA) $(srcdir)/$$icon $(DESTDIR)$(datadir)/icons/$$THEME/$$SIZE/$$CONTEXT/$$ICONFILE; \
+		THEME="hicolor"; \
+		ICONDIR=`dirname $$icon` \
+		mkdir -p $(DESTDIR)$(datadir)/icons/$$THEME/$$ICONDIR; \
+		$(INSTALL_DATA) $(srcdir)/$$icon $(DESTDIR)$(datadir)/icons/$$THEME/$$icon; \
 	done; \
 	for icon in $(private_icons); do \
-		THEME=`echo $$icon | cut -d_ -f1`; \
-		CONTEXT=`echo $$icon | cut -d_ -f2`; \
-		SIZE=`echo $$icon | cut -d_ -f3`; \
-		ICONFILE=`echo $$icon | cut -d_ -f4`; \
-		mkdir -p $(DESTDIR)$(pkgdatadir)/icons/$$THEME/$$SIZE/$$CONTEXT; \
-		$(INSTALL_DATA) $(srcdir)/$$icon $(DESTDIR)$(pkgdatadir)/icons/$$THEME/$$SIZE/$$CONTEXT/$$ICONFILE; \
+		THEME="hicolor"; \
+		ICONDIR=`dirname $$icon` \
+		mkdir -p $(DESTDIR)$(pkgdatadir)/icons/$$THEME/$$ICONDIR; \
+		$(INSTALL_DATA) $(srcdir)/$$icon $(DESTDIR)$(pkgdatadir)/icons/$$THEME/$$icon; \
 	done
 
 uninstall-icons:
 	-for icon in $(public_icons); do \
-		THEME=`echo $$icon | cut -d_ -f1`; \
-		CONTEXT=`echo $$icon | cut -d_ -f2`; \
-		SIZE=`echo $$icon | cut -d_ -f3`; \
-		ICONFILE=`echo $$icon | cut -d_ -f4`; \
-		rm -f $(DESTDIR)$(datadir)/icons/$$THEME/$$SIZE/$$CONTEXT/$$ICONFILE; \
+		THEME="hicolor"; \
+		rm -f $(DESTDIR)$(datadir)/icons/$$THEME/$$icon; \
 	done; \
 	for icon in $(private_icons); do \
-		THEME=`echo $$icon | cut -d_ -f1`; \
-		CONTEXT=`echo $$icon | cut -d_ -f2`; \
-		SIZE=`echo $$icon | cut -d_ -f3`; \
-		ICONFILE=`echo $$icon | cut -d_ -f4`; \
-		rm -f $(DESTDIR)$(pkgdatadir)/icons/$$THEME/$$SIZE/$$CONTEXT/$$ICONFILE; \
+		THEME="hicolor"; \
+		rm -f $(DESTDIR)$(pkgdatadir)/icons/$$THEME/$$icon; \
 	done
 
 install-data-local: install-icons update-icon-cache

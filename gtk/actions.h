@@ -11,10 +11,6 @@
 #include <gtk/gtk.h>
 #include "tr-core.h"
 
-#define WINDOW_ICON "transmission-main-window-icon"
-#define TRAY_ICON "transmission-tray-icon"
-#define NOTIFICATION_ICON "transmission-notification-icon"
-
 void gtr_actions_init(GtkApplication* app, gpointer callback_user_data);
 void gtr_actions_add_to_map(GActionMap* map, gpointer callback_user_data);
 void gtr_actions_set_core(TrCore* core);

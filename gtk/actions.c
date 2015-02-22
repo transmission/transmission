@@ -230,20 +230,17 @@ typedef struct
 }
 BuiltinIconInfo;
 
+/*
 static BuiltinIconInfo const my_fallback_icons[] =
 {
-    { "logo-48", WINDOW_ICON },
-    { "logo-24", TRAY_ICON },
-    { "logo-48", NOTIFICATION_ICON },
     { "lock", "transmission-lock" },
-    { "utilities", "utilities" },
-    { "turtle-blue", "alt-speed-on" },
-    { "turtle-grey", "alt-speed-off" },
-    { "ratio", "ratio" }
+    { "utilities", "utilities" }
 };
+*/
 
 static void register_my_icons(void)
 {
+    /*
     GtkIconTheme* theme = gtk_icon_theme_get_default();
 
     for (size_t i = 0; i < G_N_ELEMENTS(my_fallback_icons); ++i)
@@ -271,6 +268,9 @@ static void register_my_icons(void)
             }
         }
     }
+    */
+
+    gtk_icon_theme_add_resource_path(gtk_icon_theme_get_default(), "/com/transmissionbt/transmission/icons");
 }
 
 void gtr_actions_set_core(TrCore* core)

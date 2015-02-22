@@ -35,13 +35,14 @@ add_custom_command(
         --c-name transmission
         transmission.gresource.xml
     DEPENDS
-        icons/hicolor_apps_24x24_transmission.png
-        icons/hicolor_apps_48x48_transmission.png
-        icons/lock.png
-        icons/ratio.png
-        icons/turtle-blue.png
-        icons/turtle-grey.png
-        icons/utilities.png
+        icons/scalable/actions/alternative-speed-off-symbolic.svg
+        icons/scalable/actions/alternative-speed-on-symbolic.svg
+        icons/scalable/actions/statistics-symbolic.svg
+        icons/22x22/apps/transmission.png
+        icons/24x24/apps/transmission.png
+        icons/48x48/apps/transmission.png
+        icons/256x256/apps/transmission.png
+        icons/scalable/apps/transmission.svg
         tr-status-menu-button.ui
         transmission.gresource.xml
         transmission-menus.ui
@@ -181,20 +182,17 @@ endif()
 install(TARGETS ${TR_NAME}-gtk DESTINATION ${CMAKE_INSTALL_BINDIR})
 
 set(${PROJECT_NAME}_PUBLIC_ICONS
-    hicolor_apps_16x16_transmission.png
-    hicolor_apps_22x22_transmission.png
-    hicolor_apps_24x24_transmission.png
-    hicolor_apps_32x32_transmission.png
-    hicolor_apps_48x48_transmission.png
-    hicolor_apps_256x256_transmission.png
-    hicolor_apps_scalable_transmission.svg
+    16x16/apps/transmission.png
+    22x22/apps/transmission.png
+    24x24/apps/transmission.png
+    32x32/apps/transmission.png
+    48x48/apps/transmission.png
+    256x256/apps/transmission.png
+    scalable/apps/transmission.svg
 )
 
-set(ICON_NAME_REGEX "^([^_]+)_([^_]+)_([^_]+)_(.+)$")
 foreach(ICON ${${PROJECT_NAME}_PUBLIC_ICONS})
-    string(REGEX REPLACE ${ICON_NAME_REGEX} "\\1/\\3/\\2" ICON_DIR ${ICON})
-    string(REGEX REPLACE ${ICON_NAME_REGEX} "\\4" ICON_NAME ${ICON})
-    install(FILES icons/${ICON} DESTINATION ${CMAKE_INSTALL_DATADIR}/icons/${ICON_DIR}/ RENAME ${ICON_NAME})
+    install(FILES icons/${ICON} DESTINATION ${CMAKE_INSTALL_DATADIR}/icons/hicolor/${ICON})
 endforeach()
 
 if(INSTALL_DOC)
