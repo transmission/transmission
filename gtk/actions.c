@@ -209,7 +209,7 @@ static void update_entry_states(GActionEntry* entries, int n_entries)
             {
                 len = 0;
             }
-            else if (len == TR_BAD_SIZE)
+            else
             {
                 len = strlen(entry->name);
             }
