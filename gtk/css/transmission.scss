@@ -22,3 +22,13 @@
 .status-bar GtkButton:last-child {
     border-right: none;
 }
+
+GtkRevealer GtkToolbar {
+    border-bottom: 1px outset @borders;
+    padding-left: 7px;
+    padding-right: 7px;
+}
+
+GtkRevealer GtkButton {
+    outline: none;
+}
