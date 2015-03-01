@@ -716,6 +716,11 @@ static void app_setup(GtkWindow* wind, struct cbdata* cbdata)
     /* set up the icon */
     on_prefs_changed(cbdata->core, TR_KEY_show_notification_area_icon, cbdata);
 
+    /* set up toggle prefs */
+    on_prefs_changed(cbdata->core, TR_KEY_speed_limit_down_enabled, cbdata);
+    on_prefs_changed(cbdata->core, TR_KEY_speed_limit_up_enabled, cbdata);
+    on_prefs_changed(cbdata->core, TR_KEY_ratio_limit_enabled, cbdata);
+
     /* start model update timer */
     cbdata->timer = gdk_threads_add_timeout_seconds(MAIN_WINDOW_REFRESH_INTERVAL_SECONDS, update_model_loop, cbdata);
     update_model_once(cbdata);
@@ -1143,24 +1148,36 @@ static void on_prefs_changed(TrCore* core UNUSED, tr_quark const key, gpointer d
         }
 
     case TR_KEY_speed_limit_down_enabled:
-        tr_sessionLimitSpeed(tr, TR_DOWN, gtr_pref_flag_get(key));
-        break;
+        {
+            bool const enabled = gtr_pref_flag_get(key);
+            gtr_action_set_toggled(tr_quark_get_string(key, NULL), enabled);
+            tr_sessionLimitSpeed(tr, TR_DOWN, enabled);
+            break;
+        }
 
     case TR_KEY_speed_limit_down:
         tr_sessionSetSpeedLimit_KBps(tr, TR_DOWN, gtr_pref_int_get(key));
         break;
 
     case TR_KEY_speed_limit_up_enabled:
-        tr_sessionLimitSpeed(tr, TR_UP, gtr_pref_flag_get(key));
-        break;
+        {
+            bool const enabled = gtr_pref_flag_get(key);
+            gtr_action_set_toggled(tr_quark_get_string(key, NULL), enabled);
+            tr_sessionLimitSpeed(tr, TR_UP, gtr_pref_flag_get(key));
+            break;
+        }
 
     case TR_KEY_speed_limit_up:
         tr_sessionSetSpeedLimit_KBps(tr, TR_UP, gtr_pref_int_get(key));
         break;
 
     case TR_KEY_ratio_limit_enabled:
-        tr_sessionSetRatioLimited(tr, gtr_pref_flag_get(key));
-        break;
+        {
+            bool const enabled = gtr_pref_flag_get(key);
+            gtr_action_set_toggled(tr_quark_get_string(key, NULL), enabled);
+            tr_sessionSetRatioLimited(tr, gtr_pref_flag_get(key));
+            break;
+        }
 
     case TR_KEY_ratio_limit:
         tr_sessionSetRatioLimit(tr, gtr_pref_double_get(key));

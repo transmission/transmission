@@ -207,21 +207,6 @@ static void prefsChanged(TrCore* core UNUSED, tr_quark const key, gpointer wind)
         tr_limit_popover_set_ratio_limit(TR_LIMIT_POPOVER(p->limit_popover), ratio);
         break;
 
-    case TR_KEY_speed_limit_up_enabled:
-        isEnabled = gtr_pref_flag_get(key);
-        tr_limit_popover_set_speed_limit_up_enabled(TR_LIMIT_POPOVER(p->limit_popover), isEnabled);
-        break;
-
-    case TR_KEY_speed_limit_down_enabled:
-        isEnabled = gtr_pref_flag_get(key);
-        tr_limit_popover_set_speed_limit_down_enabled(TR_LIMIT_POPOVER(p->limit_popover), isEnabled);
-        break;
-
-    case TR_KEY_ratio_limit_enabled:
-        isEnabled = gtr_pref_flag_get(key);
-        tr_limit_popover_set_ratio_limit_enabled(TR_LIMIT_POPOVER(p->limit_popover), isEnabled);
-        break;
-
     case TR_KEY_alt_speed_enabled:
     case TR_KEY_alt_speed_up:
     case TR_KEY_alt_speed_down:
