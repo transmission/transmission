@@ -223,56 +223,6 @@ static void update_entry_states(GActionEntry* entries, int n_entries)
     }
 }
 
-typedef struct
-{
-    char const* filename;
-    char const* name;
-}
-BuiltinIconInfo;
-
-/*
-static BuiltinIconInfo const my_fallback_icons[] =
-{
-    { "lock", "transmission-lock" },
-    { "utilities", "utilities" }
-};
-*/
-
-static void register_my_icons(void)
-{
-    /*
-    GtkIconTheme* theme = gtk_icon_theme_get_default();
-
-    for (size_t i = 0; i < G_N_ELEMENTS(my_fallback_icons); ++i)
-    {
-        char const* name = my_fallback_icons[i].name;
-
-        if (!gtk_icon_theme_has_icon(theme, name))
-        {
-            GdkPixbuf* p;
-            gchar* resource_path = g_strdup_printf(TR_RESOURCE_PATH "icons/%s.png", my_fallback_icons[i].filename);
-
-            p = gdk_pixbuf_new_from_resource(resource_path, NULL);
-
-            g_free(resource_path);
-
-            if (p != NULL)
-            {
-                int width;
-
-                width = gdk_pixbuf_get_width(p);
-
-                gtk_icon_theme_add_builtin_icon(name, width, p);
-
-                g_object_unref(p);
-            }
-        }
-    }
-    */
-
-    gtk_icon_theme_add_resource_path(gtk_icon_theme_get_default(), "/com/transmissionbt/transmission/icons");
-}
-
 void gtr_actions_set_core(TrCore* core)
 {
     myCore = core;
@@ -281,7 +231,6 @@ void gtr_actions_set_core(TrCore* core)
 void gtr_actions_init(GtkApplication* app, gpointer callback_user_data UNUSED)
 {
     gtk_application_set_app_menu(app, gtr_action_get_menu_model("menubar"));
-    register_my_icons();
 }
 
 void gtr_actions_add_to_map(GActionMap* map, gpointer callback_user_data)
