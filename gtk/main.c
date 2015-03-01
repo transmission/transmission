@@ -932,7 +932,6 @@ static void on_app_exit(gpointer vdata)
 {
     GtkWidget* r;
     GtkWidget* p;
-    GtkWidget* b;
     GtkWidget* w;
     GtkWidget* c;
     struct cbdata* cbdata = vdata;
@@ -962,7 +961,9 @@ static void on_app_exit(gpointer vdata)
     c = GTK_WIDGET(cbdata->wind);
     gtk_container_remove(GTK_CONTAINER(c), gtk_bin_get_child(GTK_BIN(c)));
 
-    r = gtk_alignment_new(0.5, 0.5, 0.01, 0.01);
+    r = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
+    gtk_widget_set_halign(r, GTK_ALIGN_CENTER);
+    gtk_widget_set_valign(r, GTK_ALIGN_CENTER);
     gtk_container_add(GTK_CONTAINER(c), r);
 
     p = gtk_grid_new();
@@ -974,18 +975,20 @@ static void on_app_exit(gpointer vdata)
 
     w = gtk_label_new(NULL);
     gtk_label_set_markup(GTK_LABEL(w), _("<b>Closing Connections</b>"));
-    gtk_misc_set_alignment(GTK_MISC(w), 0.0, 0.5);
+    gtk_widget_set_halign(w, GTK_ALIGN_START);
+    gtk_widget_set_valign(w, GTK_ALIGN_CENTER);
     gtk_grid_attach(GTK_GRID(p), w, 1, 0, 1, 1);
 
     w = gtk_label_new(_("Sending upload/download totals to tracker…"));
-    gtk_misc_set_alignment(GTK_MISC(w), 0.0, 0.5);
+    gtk_widget_set_halign(w, GTK_ALIGN_START);
+    gtk_widget_set_valign(w, GTK_ALIGN_CENTER);
     gtk_grid_attach(GTK_GRID(p), w, 1, 1, 1, 1);
 
-    b = gtk_alignment_new(0.0, 1.0, 0.01, 0.01);
     w = gtk_button_new_with_mnemonic(_("_Quit Now"));
+    gtk_widget_set_halign(w, GTK_ALIGN_START);
+    gtk_widget_set_margin_top(w, 8);
     g_signal_connect(w, "clicked", G_CALLBACK(exit_now_cb), NULL);
-    gtk_container_add(GTK_CONTAINER(b), w);
-    gtk_grid_attach(GTK_GRID(p), b, 1, 2, 1, 1);
+    gtk_grid_attach(GTK_GRID(p), w, 1, 2, 1, 1);
 
     gtk_widget_show_all(r);
     gtk_widget_grab_focus(w);

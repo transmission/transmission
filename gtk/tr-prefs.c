@@ -280,7 +280,8 @@ static GtkWidget* downloadingPage(GObject* core, struct prefs_dialog_data* data)
     hig_workarea_add_row(t, &row, _("Save to _Location:"), w, NULL);
 
     l = data->freespace_label = gtr_freespace_label_new(TR_CORE(core), NULL);
-    gtk_misc_set_alignment(GTK_MISC(l), 1.0f, 0.5f);
+    gtk_widget_set_halign(l, GTK_ALIGN_END);
+    gtk_widget_set_valign(l, GTK_ALIGN_CENTER);
     hig_workarea_add_wide_control(t, &row, l);
 
     hig_workarea_add_section_divider(t, &row);
@@ -526,7 +527,8 @@ static GtkWidget* privacyPage(GObject* core)
     target_cb(b, e);
 
     w = gtk_label_new("");
-    gtk_misc_set_alignment(GTK_MISC(w), 0.0f, 0.5f);
+    gtk_widget_set_halign(w, GTK_ALIGN_START);
+    gtk_widget_set_valign(w, GTK_ALIGN_CENTER);
     updateBlocklistText(w, TR_CORE(core));
     data->label = w;
     h = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, GUI_PAD_BIG);
@@ -834,8 +836,8 @@ static GtkWidget* remotePage(GObject* core)
 
         s = _("Addresses:");
         w = hig_workarea_add_row(t, &row, s, w, NULL);
-        gtk_misc_set_alignment(GTK_MISC(w), 0.0f, 0.0f);
-        gtk_misc_set_padding(GTK_MISC(w), 0, GUI_PAD);
+        gtk_widget_set_halign(w, GTK_ALIGN_START);
+        gtk_widget_set_valign(w, GTK_ALIGN_CENTER);
         page->whitelist_widgets = g_slist_prepend(page->whitelist_widgets, w);
 
         h = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, GUI_PAD);
@@ -849,7 +851,7 @@ static GtkWidget* remotePage(GObject* core)
         g_signal_connect(w, "clicked", G_CALLBACK(onAddWhitelistClicked), page);
         gtk_box_pack_start(GTK_BOX(h), w, TRUE, TRUE, 0);
         w = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
-        gtk_box_pack_start(GTK_BOX(w), gtk_alignment_new(0, 0, 0, 0), TRUE, TRUE, 0);
+        gtk_box_pack_start(GTK_BOX(w), gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0), TRUE, TRUE, 0);
         gtk_box_pack_start(GTK_BOX(w), h, FALSE, FALSE, 0);
         hig_workarea_add_wide_control(t, &row, w);
     }
@@ -994,7 +996,8 @@ static GtkWidget* speedPage(GObject* core)
     h = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, GUI_PAD);
     g_snprintf(buf, sizeof(buf), "<b>%s</b>", _("Alternative Speed Limits"));
     w = gtk_label_new(buf);
-    gtk_misc_set_alignment(GTK_MISC(w), 0.0f, 0.5f);
+    gtk_widget_set_halign(w, GTK_ALIGN_START);
+    gtk_widget_set_valign(w, GTK_ALIGN_CENTER);
     gtk_label_set_use_markup(GTK_LABEL(w), TRUE);
     gtk_box_pack_start(GTK_BOX(h), w, FALSE, FALSE, 0);
     w = gtk_image_new_from_icon_name("alternative-speed-on-symbolic", GTK_ICON_SIZE_SMALL_TOOLBAR);
@@ -1005,7 +1008,8 @@ static GtkWidget* speedPage(GObject* core)
     g_snprintf(buf, sizeof(buf), "<small>%s</small>", s);
     w = gtk_label_new(buf);
     gtk_label_set_use_markup(GTK_LABEL(w), TRUE);
-    gtk_misc_set_alignment(GTK_MISC(w), 0.0f, 0.5f);
+    gtk_widget_set_halign(w, GTK_ALIGN_START);
+    gtk_widget_set_valign(w, GTK_ALIGN_CENTER);
     hig_workarea_add_wide_control(t, &row, w);
 
     g_snprintf(buf, sizeof(buf), _("U_pload (%s):"), _(speed_K_str));
@@ -1137,7 +1141,8 @@ static GtkWidget* networkPage(GObject* core)
 
     h = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, GUI_PAD_BIG);
     l = data->portLabel = gtk_label_new(_("Status unknown"));
-    gtk_misc_set_alignment(GTK_MISC(l), 0.0f, 0.5f);
+    gtk_widget_set_halign(l, GTK_ALIGN_START);
+    gtk_widget_set_valign(l, GTK_ALIGN_CENTER);
     gtk_box_pack_start(GTK_BOX(h), l, TRUE, TRUE, 0);
     w = data->portButton = gtk_button_new_with_mnemonic(_("Te_st Port"));
     gtk_box_pack_end(GTK_BOX(h), w, FALSE, FALSE, 0);
