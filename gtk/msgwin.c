@@ -521,7 +521,6 @@ GtkWidget* gtr_message_log_window_new(GtkWindow* parent, TrCore* core)
     g_object_unref(data->sort);
     g_signal_connect(view, "button-release-event", G_CALLBACK(on_tree_view_button_released), NULL);
     data->view = GTK_TREE_VIEW(view);
-    gtk_tree_view_set_rules_hint(data->view, TRUE);
     appendColumn(data->view, COL_SEQUENCE);
     appendColumn(data->view, COL_NAME);
     appendColumn(data->view, COL_MESSAGE);

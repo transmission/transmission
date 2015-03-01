@@ -925,7 +925,6 @@ GtkWidget* gtr_file_list_new(TrCore* core, int torrentId)
     /* create the view */
     view = gtk_tree_view_new();
     tree_view = GTK_TREE_VIEW(view);
-    gtk_tree_view_set_rules_hint(tree_view, TRUE);
     gtk_container_set_border_width(GTK_CONTAINER(view), GUI_PAD_BIG);
     g_signal_connect(view, "button-press-event", G_CALLBACK(onViewButtonPressed), data);
     g_signal_connect(view, "row_activated", G_CALLBACK(onRowActivated), data);

@@ -136,7 +136,6 @@ static GtkWidget* makeview(PrivateData* p)
     gtk_tree_view_append_column(tree_view, col);
     g_object_set(r, "xpad", GUI_PAD_SMALL, "ypad", GUI_PAD_SMALL, NULL);
 
-    gtk_tree_view_set_rules_hint(tree_view, TRUE);
     sel = gtk_tree_view_get_selection(tree_view);
     gtk_tree_selection_set_mode(GTK_TREE_SELECTION(sel), GTK_SELECTION_MULTIPLE);
 

@@ -2029,7 +2029,6 @@ static GtkWidget* peer_page_new(struct DetailsImpl* di)
     store = di->webseed_store = webseed_model_new();
     v = gtk_tree_view_new_with_model(GTK_TREE_MODEL(store));
     g_signal_connect(v, "button-release-event", G_CALLBACK(on_tree_view_button_released), NULL);
-    gtk_tree_view_set_rules_hint(GTK_TREE_VIEW(v), TRUE);
     g_object_unref(store);
 
     str = getWebseedColumnNames(WEBSEED_COL_URL);
@@ -2805,7 +2804,6 @@ static GtkWidget* tracker_page_new(struct DetailsImpl* di)
     gtk_tree_view_set_headers_visible(GTK_TREE_VIEW(v), FALSE);
     g_signal_connect(v, "button-press-event", G_CALLBACK(on_tree_view_button_pressed), NULL);
     g_signal_connect(v, "button-release-event", G_CALLBACK(on_tree_view_button_released), NULL);
-    gtk_tree_view_set_rules_hint(GTK_TREE_VIEW(v), TRUE);
 
     sel = gtk_tree_view_get_selection(GTK_TREE_VIEW(v));
     g_signal_connect(sel, "changed", G_CALLBACK(on_tracker_list_selection_changed), di);
