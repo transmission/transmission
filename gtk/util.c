@@ -569,6 +569,7 @@ void gtr_widget_set_visible(GtkWidget* w, gboolean b)
 void gtr_dialog_set_content(GtkDialog* dialog, GtkWidget* content)
 {
     GtkWidget* vbox = gtk_dialog_get_content_area(dialog);
+    gtk_container_set_border_width(GTK_CONTAINER(vbox), 0);
     gtk_box_pack_start(GTK_BOX(vbox), content, TRUE, TRUE, 0);
     gtk_widget_show_all(content);
 }
