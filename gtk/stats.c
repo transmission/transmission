@@ -120,8 +120,8 @@ GtkWidget* gtr_stats_dialog_new(GtkWindow* parent, TrCore* core)
     guint row = 0;
     struct stat_ui* ui = g_new0(struct stat_ui, 1);
 
-    d = gtk_dialog_new_with_buttons(_("Statistics"), parent, GTK_DIALOG_DESTROY_WITH_PARENT, _("_Reset"), TR_RESPONSE_RESET,
-        _("Cl_ose"), GTK_RESPONSE_CLOSE, NULL);
+    d = gtk_dialog_new_with_buttons(_("Statistics"), parent, GTK_DIALOG_USE_HEADER_BAR | GTK_DIALOG_DESTROY_WITH_PARENT,
+        _("_Reset"), TR_RESPONSE_RESET, _("Cl_ose"), GTK_RESPONSE_CLOSE, NULL);
     gtk_dialog_set_default_response(GTK_DIALOG(d), GTK_RESPONSE_CLOSE);
     t = hig_workarea_create();
     ui->core = core;
