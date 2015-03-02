@@ -2602,13 +2602,13 @@ static void on_edit_trackers(GtkButton* button, gpointer data)
 
         g_string_truncate(gstr, 0);
         g_string_append_printf(gstr, _("%s - Edit Trackers"), tr_torrentName(tor));
-        d = gtk_dialog_new_with_buttons(gstr->str, win, GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT, _("_Cancel"),
-            GTK_RESPONSE_CANCEL, _("_Save"), GTK_RESPONSE_ACCEPT, NULL);
+        d = gtk_dialog_new_with_buttons(gstr->str, win, GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT |
+            GTK_DIALOG_USE_HEADER_BAR, _("_Cancel"), GTK_RESPONSE_CANCEL, _("_Save"), GTK_RESPONSE_ACCEPT, NULL);
+        gtk_dialog_set_default_response(GTK_DIALOG(d), GTK_RESPONSE_ACCEPT);
         g_signal_connect(d, "response", G_CALLBACK(on_edit_trackers_response), data);
 
         row = 0;
         t = hig_workarea_create();
-        hig_workarea_add_section_title(t, &row, _("Tracker Announce URLs"));
 
         l = gtk_label_new(NULL);
         gtk_label_set_markup(GTK_LABEL(l), _("To add a backup URL, add it on the line after the primary URL.\n"
@@ -2713,13 +2713,13 @@ static void on_tracker_list_add_button_clicked(GtkButton* button UNUSED, gpointe
 
         g_string_truncate(gstr, 0);
         g_string_append_printf(gstr, _("%s - Add Tracker"), tr_torrentName(tor));
-        w = gtk_dialog_new_with_buttons(gstr->str, GTK_WINDOW(di->dialog), GTK_DIALOG_DESTROY_WITH_PARENT, _("_Cancel"),
-            GTK_RESPONSE_CANCEL, _("_Add"), GTK_RESPONSE_ACCEPT, NULL);
+        w = gtk_dialog_new_with_buttons(gstr->str, GTK_WINDOW(di->dialog), GTK_DIALOG_DESTROY_WITH_PARENT |
+            GTK_DIALOG_USE_HEADER_BAR, _("_Cancel"), GTK_RESPONSE_CANCEL, _("_Add"), GTK_RESPONSE_ACCEPT, NULL);
+        gtk_dialog_set_default_response(GTK_DIALOG(w), GTK_RESPONSE_ACCEPT);
         g_signal_connect(w, "response", G_CALLBACK(on_add_tracker_response), gdi);
 
         row = 0;
         t = hig_workarea_create();
-        hig_workarea_add_section_title(t, &row, _("Tracker"));
         e = gtk_entry_new();
         gtk_widget_set_size_request(e, 400, -1);
         gtr_paste_clipboard_url_into_entry(e);
@@ -2932,15 +2932,15 @@ GtkWidget* gtr_torrent_details_dialog_new(GtkWindow* parent, TrCore* core)
     /* create the dialog */
     di->core = core;
     di->gstr = g_string_new(NULL);
-    d = gtk_dialog_new_with_buttons(NULL, parent, 0, _("Cl_ose"), GTK_RESPONSE_CLOSE, NULL);
+    d = gtk_dialog_new_with_buttons(NULL, parent, GTK_DIALOG_USE_HEADER_BAR, _("Cl_ose"), GTK_RESPONSE_CLOSE, NULL);
+    gtk_dialog_set_default_response(GTK_DIALOG(d), GTK_RESPONSE_CLOSE);
     di->dialog = d;
     gtk_window_set_role(GTK_WINDOW(d), "tr-info");
     g_signal_connect_swapped(d, "response", G_CALLBACK(gtk_widget_destroy), d);
-    gtk_container_set_border_width(GTK_CONTAINER(d), GUI_PAD);
     g_object_set_qdata_full(G_OBJECT(d), DETAILS_KEY, di, details_free);
 
     n = gtk_notebook_new();
-    gtk_container_set_border_width(GTK_CONTAINER(n), GUI_PAD);
+    gtk_notebook_set_show_border(GTK_NOTEBOOK(n), FALSE);
 
     w = info_page_new(di);
     l = gtk_label_new(_("Information"));
