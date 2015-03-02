@@ -180,8 +180,10 @@ static void makeProgressDialog(GtkWidget* parent, MakeMetaUI* ui)
     GtkWidget* v;
     GtkWidget* fr;
 
-    d = gtk_dialog_new_with_buttons(_("New Torrent"), GTK_WINDOW(parent), GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT,
-        _("_Cancel"), GTK_RESPONSE_CANCEL, _("Cl_ose"), GTK_RESPONSE_CLOSE, _("_Add"), GTK_RESPONSE_ACCEPT, NULL);
+    d = gtk_dialog_new_with_buttons(_("New Torrent"), GTK_WINDOW(parent), GTK_DIALOG_MODAL | GTK_DIALOG_USE_HEADER_BAR |
+        GTK_DIALOG_DESTROY_WITH_PARENT, _("_Cancel"), GTK_RESPONSE_CANCEL, _("Cl_ose"), GTK_RESPONSE_CLOSE, _("_Add"),
+        GTK_RESPONSE_ACCEPT, NULL);
+    gtk_dialog_set_default_response(GTK_DIALOG(d), GTK_RESPONSE_ACCEPT);
     ui->progress_dialog = d;
     g_signal_connect(d, "response", G_CALLBACK(onProgressDialogResponse), ui);
 
@@ -431,8 +433,9 @@ GtkWidget* gtr_torrent_creation_dialog_new(GtkWindow* parent, TrCore* core)
 
     ui->core = core;
 
-    d = gtk_dialog_new_with_buttons(_("New Torrent"), parent, GTK_DIALOG_DESTROY_WITH_PARENT, _("Cl_ose"), GTK_RESPONSE_CLOSE,
-        _("_New"), GTK_RESPONSE_ACCEPT, NULL);
+    d = gtk_dialog_new_with_buttons(_("New Torrent"), parent, GTK_DIALOG_USE_HEADER_BAR |GTK_DIALOG_DESTROY_WITH_PARENT,
+        _("Cl_ose"), GTK_RESPONSE_CLOSE, _("_New"), GTK_RESPONSE_ACCEPT, NULL);
+    gtk_dialog_set_default_response(GTK_DIALOG(d), GTK_RESPONSE_ACCEPT);
     ui->dialog = d;
     g_signal_connect(d, "response", G_CALLBACK(onResponse), ui);
     g_object_set_data_full(G_OBJECT(d), "ui", ui, freeMetaUI);
