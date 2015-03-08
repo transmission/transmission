@@ -377,6 +377,7 @@ set(NEEDED_FUNCTIONS
     htonll
     iconv_open
     localtime_r
+    lseek64
     memmem
     mkdtemp
     ntohll

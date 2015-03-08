@@ -320,7 +320,7 @@ tr_buildPath (const char *first_element, ...)
   *pch++ = '\0';
 
   /* sanity checks & return */
-  assert (pch - buf == (off_t)bufLen);
+  assert (pch - buf == (ptrdiff_t)bufLen);
   return buf;
 }
 

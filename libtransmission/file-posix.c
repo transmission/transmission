@@ -8,14 +8,10 @@
  */
 
 #if defined (HAVE_MKDTEMP) && (!defined (_XOPEN_SOURCE) || _XOPEN_SOURCE < 700)
- #ifdef _XOPEN_SOURCE
-  #undef _XOPEN_SOURCE
- #endif
+ #undef _XOPEN_SOURCE
  #define _XOPEN_SOURCE 700
 #elif (defined (HAVE_POSIX_FADVISE) || defined (HAVE_POSIX_FALLOCATE)) && (!defined (_XOPEN_SOURCE) || _XOPEN_SOURCE < 600)
- #ifdef _XOPEN_SOURCE
-  #undef _XOPEN_SOURCE
- #endif
+ #undef _XOPEN_SOURCE
  #define _XOPEN_SOURCE 600
 #endif
 
@@ -25,6 +21,10 @@
 
 #if defined (__APPLE__) && !defined (_DARWIN_C_SOURCE)
  #define _DARWIN_C_SOURCE
+#endif
+
+#if !defined (_LARGEFILE64_SOURCE)
+ #define _LARGEFILE64_SOURCE
 #endif
 
 #include <assert.h>
@@ -66,6 +66,14 @@
 
 #ifndef PATH_MAX
  #define PATH_MAX 4096
+#endif
+
+#ifdef HAVE_LSEEK64
+ #define tr_off_t off64_t
+ #define tr_lseek lseek64
+#else
+ #define tr_off_t off_t
+ #define tr_lseek lseek
 #endif
 
 /* don't use pread/pwrite on old versions of uClibc because they're buggy.
@@ -534,7 +542,7 @@ tr_sys_file_seek (tr_sys_file_t       handle,
                   tr_error         ** error)
 {
   bool ret = false;
-  off_t my_new_offset;
+  tr_off_t my_new_offset;
 
   TR_STATIC_ASSERT (TR_SEEK_SET == SEEK_SET, "values should match");
   TR_STATIC_ASSERT (TR_SEEK_CUR == SEEK_CUR, "values should match");
@@ -545,9 +553,9 @@ tr_sys_file_seek (tr_sys_file_t       handle,
   assert (handle != TR_BAD_SYS_FILE);
   assert (origin == TR_SEEK_SET || origin == TR_SEEK_CUR || origin == TR_SEEK_END);
 
-  my_new_offset = lseek (handle, offset, origin);
+  my_new_offset = tr_lseek (handle, offset, origin);
 
-  if (my_new_offset != (off_t)-1)
+  if (my_new_offset != -1)
     {
       if (new_offset != NULL)
         *new_offset = my_new_offset;
@@ -616,7 +624,7 @@ tr_sys_file_read_at (tr_sys_file_t    handle,
 
 #else
 
-  if (lseek (handle, offset, SEEK_SET) != -1)
+  if (tr_lseek (handle, offset, SEEK_SET) != -1)
     my_bytes_read = read (handle, buffer, size);
   else
     my_bytes_read = -1;
@@ -692,7 +700,7 @@ tr_sys_file_write_at (tr_sys_file_t    handle,
 
 #else
 
-  if (lseek (handle, offset, SEEK_SET) != -1)
+  if (tr_lseek (handle, offset, SEEK_SET) != -1)
     my_bytes_written = write (handle, buffer, size);
   else
     my_bytes_written = -1;
