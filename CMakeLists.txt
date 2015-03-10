@@ -351,6 +351,8 @@ if(CMAKE_C_COMPILER_ID STREQUAL "GNU" OR CMAKE_C_COMPILER_ID STREQUAL "Clang")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${NEEDED_CXX_COMPILER_FLAGS_STRING}")
 endif()
 
+include(LargeFileSupport)
+
 set(NEEDED_HEADERS
     stdbool.h
     sys/statvfs.h
@@ -377,7 +379,6 @@ set(NEEDED_FUNCTIONS
     htonll
     iconv_open
     localtime_r
-    lseek64
     memmem
     mkdtemp
     ntohll
