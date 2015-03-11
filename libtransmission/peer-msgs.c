@@ -703,8 +703,10 @@ tr_peerMsgsCalculateActive (const tr_peerMsgs * msgs, tr_direction direction)
       is_active = tr_peerMsgsIsPeerInterested (msgs)
               && !tr_peerMsgsIsPeerChoked (msgs);
 
+      /* FIXME: https://trac.transmissionbt.com/ticket/5505
       if (is_active)
         assert (!tr_peerIsSeed (&msgs->peer));
+      */
     }
   else /* TR_PEER_TO_CLIENT */
     {
