@@ -1,5 +1,4 @@
 diff --git a/src/cencode.c b/src/cencode.c
-index 03ba5b6..de3902f 100644
 --- a/src/cencode.c
 +++ b/src/cencode.c
 @@ -7,7 +7,9 @@ For details, see http://sourceforge.net/projects/libb64
