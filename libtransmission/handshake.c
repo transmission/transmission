@@ -62,26 +62,26 @@ enum
 
 
 #ifdef ENABLE_LTEP
- #define HANDSHAKE_HAS_LTEP(bits)(((bits)[5] & 0x10) ? 1 : 0)
+ #define HANDSHAKE_HAS_LTEP(bits)(((bits)[5] & 0x10) != 0)
  #define HANDSHAKE_SET_LTEP(bits)((bits)[5] |= 0x10)
 #else
- #define HANDSHAKE_HAS_LTEP(bits)(0)
+ #define HANDSHAKE_HAS_LTEP(bits)(false)
  #define HANDSHAKE_SET_LTEP(bits)((void)0)
 #endif
 
 #ifdef ENABLE_FAST
- #define HANDSHAKE_HAS_FASTEXT(bits)(((bits)[7] & 0x04) ? 1 : 0)
+ #define HANDSHAKE_HAS_FASTEXT(bits)(((bits)[7] & 0x04) != 0)
  #define HANDSHAKE_SET_FASTEXT(bits)((bits)[7] |= 0x04)
 #else
- #define HANDSHAKE_HAS_FASTEXT(bits)(0)
+ #define HANDSHAKE_HAS_FASTEXT(bits)(false)
  #define HANDSHAKE_SET_FASTEXT(bits)((void)0)
 #endif
 
 #ifdef ENABLE_DHT
- #define HANDSHAKE_HAS_DHT(bits)(((bits)[7] & 0x01) ? 1 : 0)
+ #define HANDSHAKE_HAS_DHT(bits)(((bits)[7] & 0x01) != 0)
  #define HANDSHAKE_SET_DHT(bits)((bits)[7] |= 0x01)
 #else
- #define HANDSHAKE_HAS_DHT(bits)(0)
+ #define HANDSHAKE_HAS_DHT(bits)(false)
  #define HANDSHAKE_SET_DHT(bits)((void)0)
 #endif
 
@@ -91,7 +91,31 @@ enum
 #define HANDSHAKE_GET_EXTPREF(reserved)    ((reserved)[5] & 0x03)
 #define HANDSHAKE_SET_EXTPREF(reserved, val)((reserved)[5] |= 0x03 & (val))
 
-typedef uint8_t handshake_state_t;
+/**
+***
+**/
+
+typedef enum
+{
+  /* incoming */
+  AWAITING_HANDSHAKE,
+  AWAITING_PEER_ID,
+  AWAITING_YA,
+  AWAITING_PAD_A,
+  AWAITING_CRYPTO_PROVIDE,
+  AWAITING_PAD_C,
+  AWAITING_IA,
+  AWAITING_PAYLOAD_STREAM,
+
+  /* outgoing */
+  AWAITING_YB,
+  AWAITING_VC,
+  AWAITING_CRYPTO_SELECT,
+  AWAITING_PAD_D,
+
+  N_STATES
+}
+handshake_state_t;
 
 struct tr_handshake
 {
@@ -112,31 +136,6 @@ struct tr_handshake
   handshakeDoneCB       doneCB;
   void *                doneUserData;
   struct event        * timeout_timer;
-};
-
-/**
-***
-**/
-
-enum
-{
-  /* incoming */
-  AWAITING_HANDSHAKE,
-  AWAITING_PEER_ID,
-  AWAITING_YA,
-  AWAITING_PAD_A,
-  AWAITING_CRYPTO_PROVIDE,
-  AWAITING_PAD_C,
-  AWAITING_IA,
-  AWAITING_PAYLOAD_STREAM,
-
-  /* outgoing */
-  AWAITING_YB,
-  AWAITING_VC,
-  AWAITING_CRYPTO_SELECT,
-  AWAITING_PAD_D,
-
-  N_STATES
 };
 
 /**
@@ -229,18 +228,19 @@ buildHandshakeMessage (tr_handshake * handshake, uint8_t * buf)
   return success;
 }
 
-static int tr_handshakeDone (tr_handshake * handshake,
-                             bool           isConnected);
+static ReadState tr_handshakeDone (tr_handshake * handshake,
+                                   bool           isConnected);
 
-enum
+typedef enum
 {
   HANDSHAKE_OK,
   HANDSHAKE_ENCRYPTION_WRONG,
   HANDSHAKE_BAD_TORRENT,
   HANDSHAKE_PEER_IS_SELF,
-};
+}
+handshake_parse_err_t;
 
-static int
+static handshake_parse_err_t
 parseHandshake (tr_handshake *    handshake,
                 struct evbuffer * inbuf)
 {
@@ -254,7 +254,7 @@ parseHandshake (tr_handshake *    handshake,
           HANDSHAKE_SIZE, evbuffer_get_length (inbuf));
 
   if (evbuffer_get_length (inbuf) < HANDSHAKE_SIZE)
-    return READ_LATER;
+    return HANDSHAKE_ENCRYPTION_WRONG;
 
   /* confirm the protocol */
   tr_peerIoReadBytes (handshake->io, inbuf, name, HANDSHAKE_NAME_LEN);
@@ -392,10 +392,10 @@ computeRequestHash (const tr_handshake * handshake,
   tr_cryptoSecretKeySha1 (handshake->crypto, name, 4, NULL, 0, hash);
 }
 
-static int
+static ReadState
 readYb (tr_handshake * handshake, struct evbuffer * inbuf)
 {
-  int isEncrypted;
+  bool isEncrypted;
   uint8_t yb[KEY_LEN];
   struct evbuffer * outbuf;
   size_t needlen = HANDSHAKE_NAME_LEN;
@@ -403,7 +403,7 @@ readYb (tr_handshake * handshake, struct evbuffer * inbuf)
   if (evbuffer_get_length (inbuf) < needlen)
     return READ_LATER;
 
-  isEncrypted = memcmp (evbuffer_pullup (inbuf, HANDSHAKE_NAME_LEN), HANDSHAKE_NAME, HANDSHAKE_NAME_LEN);
+  isEncrypted = memcmp (evbuffer_pullup (inbuf, HANDSHAKE_NAME_LEN), HANDSHAKE_NAME, HANDSHAKE_NAME_LEN) != 0;
   if (isEncrypted)
     {
       needlen = KEY_LEN;
@@ -492,7 +492,7 @@ readYb (tr_handshake * handshake, struct evbuffer * inbuf)
   return READ_LATER;
 }
 
-static int
+static ReadState
 readVC (tr_handshake    * handshake,
         struct evbuffer * inbuf)
 {
@@ -526,7 +526,7 @@ readVC (tr_handshake    * handshake,
   return READ_NOW;
 }
 
-static int
+static ReadState
 readCryptoSelect (tr_handshake    * handshake,
                   struct evbuffer * inbuf)
 {
@@ -561,7 +561,7 @@ readCryptoSelect (tr_handshake    * handshake,
   return READ_NOW;
 }
 
-static int
+static ReadState
 readPadD (tr_handshake    * handshake,
           struct evbuffer * inbuf)
 {
@@ -586,7 +586,7 @@ readPadD (tr_handshake    * handshake,
 ****
 ***/
 
-static int
+static ReadState
 readHandshake (tr_handshake    * handshake,
                struct evbuffer * inbuf)
 {
@@ -699,7 +699,7 @@ readHandshake (tr_handshake    * handshake,
   return READ_NOW;
 }
 
-static int
+static ReadState
 readPeerId (tr_handshake    * handshake,
             struct evbuffer * inbuf)
 {
@@ -726,7 +726,7 @@ readPeerId (tr_handshake    * handshake,
   return tr_handshakeDone (handshake, !connected_to_self);
 }
 
-static int
+static ReadState
 readYa (tr_handshake    * handshake,
         struct evbuffer * inbuf)
 {
@@ -760,7 +760,7 @@ readYa (tr_handshake    * handshake,
   return READ_NOW;
 }
 
-static int
+static ReadState
 readPadA (tr_handshake * handshake, struct evbuffer * inbuf)
 {
   /* resynchronizing on HASH ('req1',S) */
@@ -782,7 +782,7 @@ readPadA (tr_handshake * handshake, struct evbuffer * inbuf)
     }
 }
 
-static int
+static ReadState
 readCryptoProvide (tr_handshake    * handshake,
                    struct evbuffer * inbuf)
 {
@@ -852,7 +852,7 @@ readCryptoProvide (tr_handshake    * handshake,
   return READ_NOW;
 }
 
-static int
+static ReadState
 readPadC (tr_handshake    * handshake,
           struct evbuffer * inbuf)
 {
@@ -876,7 +876,7 @@ readPadC (tr_handshake    * handshake,
   return READ_NOW;
 }
 
-static int
+static ReadState
 readIA (tr_handshake    * handshake,
         struct evbuffer * inbuf)
 {
@@ -954,11 +954,11 @@ readIA (tr_handshake    * handshake,
   return READ_NOW;
 }
 
-static int
+static ReadState
 readPayloadStream (tr_handshake    * handshake,
                    struct evbuffer * inbuf)
 {
-  int i;
+  handshake_parse_err_t i;
   const size_t needlen = HANDSHAKE_SIZE;
 
   dbgmsg (handshake, "reading payload stream... have %"TR_PRIuSIZE", need %"TR_PRIuSIZE,
@@ -1093,7 +1093,7 @@ tr_handshakeFree (tr_handshake * handshake)
   tr_free (handshake);
 }
 
-static int
+static ReadState
 tr_handshakeDone (tr_handshake * handshake, bool isOK)
 {
   bool success;

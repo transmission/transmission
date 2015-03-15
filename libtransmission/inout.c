@@ -292,7 +292,7 @@ recalculateHash (tr_torrent * tor, tr_piece_index_t pieceIndex, uint8_t * setme)
 
   while (bytesLeft)
     {
-      const int len = MIN (bytesLeft, buflen);
+      const size_t len = MIN (bytesLeft, buflen);
       success = !tr_cacheReadBlock (tor->session->cache, tor, pieceIndex, offset, len, buffer);
       if (!success)
         break;

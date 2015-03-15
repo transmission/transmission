@@ -120,7 +120,7 @@ initRC4 (tr_crypto    * crypto,
 void
 tr_cryptoDecryptInit (tr_crypto * crypto)
 {
-  unsigned char discard[1024];
+  uint8_t discard[1024];
   const char * txt = crypto->isIncoming ? "keyA" : "keyB";
 
   initRC4 (crypto, &crypto->dec_key, txt);
@@ -147,7 +147,7 @@ tr_cryptoDecrypt (tr_crypto  * crypto,
 void
 tr_cryptoEncryptInit (tr_crypto * crypto)
 {
-  unsigned char discard[1024];
+  uint8_t discard[1024];
   const char * txt = crypto->isIncoming ? "keyB" : "keyA";
 
   initRC4 (crypto, &crypto->enc_key, txt);

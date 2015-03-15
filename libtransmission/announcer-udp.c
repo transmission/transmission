@@ -123,7 +123,7 @@ typedef enum
 tau_action_t;
 
 static bool
-is_tau_response_message (int action, int msglen)
+is_tau_response_message (tau_action_t action, size_t msglen)
 {
     if (action == TAU_ACTION_CONNECT) return msglen == 16;
     if (action == TAU_ACTION_ANNOUNCE) return msglen >= 20;

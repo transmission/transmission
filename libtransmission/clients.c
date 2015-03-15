@@ -26,15 +26,15 @@ charint (uint8_t ch)
     return 0;
 }
 
-static int
+static bool
 getShadowInt (uint8_t ch, int * setme)
 {
     const char * str = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz.-";
     const char * pch = strchr (str, ch);
     if (!pch)
-        return 0;
+        return false;
     *setme = pch - str;
-    return 1;
+    return true;
 }
 
 static int
@@ -97,7 +97,7 @@ mainline_style (char * buf, size_t buflen, const char * name, const uint8_t * id
         tr_snprintf (buf, buflen, "%s %c.%c%c.%c", name, id[1], id[3], id[4], id[6]);
 }
 
-static int
+static bool
 isMainlineStyle (const uint8_t * peer_id)
 {
     /**
@@ -110,7 +110,7 @@ isMainlineStyle (const uint8_t * peer_id)
         && (peer_id[4]=='-' || peer_id[5]=='-');
 }
 
-static int
+static bool
 decodeBitCometClient (char * buf, size_t buflen, const uint8_t * id)
 {
     int is_bitlord;

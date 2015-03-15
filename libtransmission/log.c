@@ -139,7 +139,7 @@ tr_logFreeQueue (tr_log_message * list)
 **/
 
 char*
-tr_logGetTimeStr (char * buf, int buflen)
+tr_logGetTimeStr (char * buf, size_t buflen)
 {
   char tmp[64];
   struct tm now_tm;

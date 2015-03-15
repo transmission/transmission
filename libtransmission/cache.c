@@ -72,7 +72,7 @@ struct run_info
   time_t last_block_time;
   bool is_multi_piece;
   bool is_piece_done;
-  unsigned len;
+  unsigned int len;
 };
 
 

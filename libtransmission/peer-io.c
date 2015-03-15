@@ -1177,7 +1177,7 @@ tr_peerIoReadBytes (tr_peerIo * io, struct evbuffer * inbuf, void * bytes, size_
             break;
 
         default:
-            assert (0);
+            assert (false);
     }
 }
 

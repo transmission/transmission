@@ -121,7 +121,7 @@ void tr_logAddDeep (const char * file,
                     ...) TR_GNUC_PRINTF (4, 5) TR_GNUC_NONNULL (1,4);
 
 /** @brief set the buffer with the current time formatted for deep logging. */
-char* tr_logGetTimeStr (char * buf, int buflen) TR_GNUC_NONNULL (1);
+char* tr_logGetTimeStr (char * buf, size_t buflen) TR_GNUC_NONNULL (1);
 
 #ifdef __cplusplus
 }
