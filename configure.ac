@@ -137,10 +137,13 @@ AS_IF([test "x$want_crypto" = "xauto" -o "x$want_crypto" = "xopenssl"], [
     )
 ])
 AS_IF([test "x$want_crypto" = "xauto" -o "x$want_crypto" = "xcyassl"], [
-    PKG_CHECK_MODULES(CYASSL, [cyassl >= $CYASSL_MINIMUM],
-        [want_crypto="cyassl"; CRYPTO_PKG="cyassl"; CRYPTO_CFLAGS="$CYASSL_CFLAGS"; CRYPTO_LIBS="$CYASSL_LIBS"],
-        [AS_IF([test "x$want_crypto" = "xcyassl"],
-            [AC_MSG_ERROR([CyaSSL support requested, but library not found.])]
+    PKG_CHECK_MODULES(WOLFSSL, [wolfssl >= $CYASSL_MINIMUM],
+        [want_crypto="cyassl"; CRYPTO_PKG="cyassl"; CRYPTO_CFLAGS="$WOLFSSL_CFLAGS"; CRYPTO_LIBS="$WOLFSSL_LIBS"],
+        [PKG_CHECK_MODULES(CYASSL, [cyassl >= $CYASSL_MINIMUM],
+            [want_crypto="cyassl"; CRYPTO_PKG="cyassl"; CRYPTO_CFLAGS="$CYASSL_CFLAGS"; CRYPTO_LIBS="$CYASSL_LIBS"],
+            [AS_IF([test "x$want_crypto" = "xcyassl"],
+                [AC_MSG_ERROR([CyaSSL support requested, but library not found.])]
+            )]
         )]
     )
 ])
