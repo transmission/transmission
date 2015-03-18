@@ -73,8 +73,8 @@ enum {
 };
 static struct event * upkeep_timer = NULL;
 
-static int lpd_socket; /**<separate multicast receive socket */
-static int lpd_socket2; /**<and multicast send socket */
+static tr_socket_t lpd_socket; /**<separate multicast receive socket */
+static tr_socket_t lpd_socket2; /**<and multicast send socket */
 static struct event * lpd_event = NULL;
 static tr_port lpd_port;
 
@@ -285,7 +285,7 @@ int tr_lpdInit (tr_session* ss, tr_address* tr_addr UNUSED)
     /* setup datagram socket (receive) */
     {
         lpd_socket = socket (PF_INET, SOCK_DGRAM, 0);
-        if (lpd_socket < 0)
+        if (lpd_socket == TR_BAD_SOCKET)
             goto fail;
 
         if (evutil_make_socket_nonblocking (lpd_socket) < 0)
@@ -324,7 +324,7 @@ int tr_lpdInit (tr_session* ss, tr_address* tr_addr UNUSED)
         const unsigned char scope = lpd_announceScope;
 
         lpd_socket2 = socket (PF_INET, SOCK_DGRAM, 0);
-        if (lpd_socket2 < 0)
+        if (lpd_socket2 == TR_BAD_SOCKET)
             goto fail;
 
         if (evutil_make_socket_nonblocking (lpd_socket2) < 0)
@@ -360,7 +360,7 @@ int tr_lpdInit (tr_session* ss, tr_address* tr_addr UNUSED)
         const int save = errno;
         evutil_closesocket (lpd_socket);
         evutil_closesocket (lpd_socket2);
-        lpd_socket = lpd_socket2 = -1;
+        lpd_socket = lpd_socket2 = TR_BAD_SOCKET;
         session = NULL;
         tr_logAddNamedDbg ("LPD", "LPD initialisation failed (errno = %d)", save);
         errno = save;

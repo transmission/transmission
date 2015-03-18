@@ -53,16 +53,16 @@ tau_sendto (tr_session * session,
             struct evutil_addrinfo * ai, tr_port port,
             const void * buf, size_t buflen)
 {
-    int sockfd;
+    tr_socket_t sockfd;
 
     if (ai->ai_addr->sa_family == AF_INET)
         sockfd = session->udp_socket;
     else if (ai->ai_addr->sa_family == AF_INET6)
         sockfd = session->udp6_socket;
     else
-        sockfd = -1;
+        sockfd = TR_BAD_SOCKET;
 
-    if (sockfd < 0) {
+    if (sockfd == TR_BAD_SOCKET) {
         errno = EAFNOSUPPORT;
         return -1;
     }

@@ -80,14 +80,17 @@ void tr_fdTorrentClose (tr_session * session, int torrentId);
 /***********************************************************************
  * Sockets
  **********************************************************************/
-int      tr_fdSocketCreate (tr_session * session, int domain, int type);
+tr_socket_t tr_fdSocketCreate (tr_session  * session,
+                               int           domain,
+                               int           type);
 
-int      tr_fdSocketAccept (tr_session  * session,
-                            int           listening_sockfd,
-                            tr_address  * addr,
-                            tr_port     * port);
+tr_socket_t tr_fdSocketAccept (tr_session  * session,
+                               tr_socket_t   listening_sockfd,
+                               tr_address  * addr,
+                               tr_port     * port);
 
-void     tr_fdSocketClose (tr_session * session, int s);
+void        tr_fdSocketClose  (tr_session  * session,
+                               tr_socket_t   s);
 
 /***********************************************************************
  * tr_fdClose

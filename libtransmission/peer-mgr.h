@@ -107,7 +107,7 @@ void         tr_peerMgrRebuildRequests      (tr_torrent          * torrent);
 void         tr_peerMgrAddIncoming          (tr_peerMgr          * manager,
                                              tr_address          * addr,
                                              tr_port               port,
-                                             int                   socket,
+                                             tr_socket_t           socket,
                                              struct UTPSocket    * utp_socket);
 
 tr_pex *     tr_peerMgrCompactToPex         (const void          * compact,

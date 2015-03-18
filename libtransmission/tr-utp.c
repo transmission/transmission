@@ -121,7 +121,7 @@ incoming (void *closure, struct UTPSocket *s)
         return;
     }
 
-    tr_peerMgrAddIncoming (ss->peerMgr, &addr, port, -1, s);
+    tr_peerMgrAddIncoming (ss->peerMgr, &addr, port, TR_BAD_SOCKET, s);
 }
 
 void
@@ -130,9 +130,9 @@ tr_utpSendTo (void *closure, const unsigned char *buf, size_t buflen,
 {
     tr_session *ss = closure;
 
-    if (to->sa_family == AF_INET && ss->udp_socket)
+    if (to->sa_family == AF_INET && ss->udp_socket != TR_BAD_SOCKET)
         sendto (ss->udp_socket, (const void *) buf, buflen, 0, to, tolen);
-    else if (to->sa_family == AF_INET6 && ss->udp_socket)
+    else if (to->sa_family == AF_INET6 && ss->udp6_socket != TR_BAD_SOCKET)
         sendto (ss->udp6_socket, (const void *) buf, buflen, 0, to, tolen);
 }
 

@@ -35,8 +35,10 @@
 
 #ifdef _WIN32
 
+typedef SOCKET tr_pipe_end_t;
+
 static int
-pgpipe (int handles[2])
+pgpipe (tr_pipe_end_t handles[2])
 {
     SOCKET s;
     struct sockaddr_in serv_addr;
@@ -98,7 +100,9 @@ pgpipe (int handles[2])
 }
 
 static int
-piperead (int s, char *buf, int len)
+piperead (tr_pipe_end_t   s,
+          void          * buf,
+          int             len)
 {
     int ret = recv (s, buf, len, 0);
 
@@ -126,6 +130,7 @@ piperead (int s, char *buf, int len)
 #define pipewrite(a,b,c) send (a, (char*)b,c,0)
 
 #else
+typedef int tr_pipe_end_t;
 #define piperead(a,b,c) read (a,b,c)
 #define pipewrite(a,b,c) write (a,b,c)
 #endif
@@ -137,7 +142,7 @@ piperead (int s, char *buf, int len)
 typedef struct tr_event_handle
 {
     uint8_t      die;
-    int          fds[2];
+    tr_pipe_end_t fds[2];
     tr_lock *    lock;
     tr_session *  session;
     tr_thread *  thread;
@@ -314,7 +319,7 @@ tr_runInEventThread (tr_session * session,
     }
   else
     {
-      int fd;
+      tr_pipe_end_t fd;
       char ch;
       ssize_t res_1;
       ssize_t res_2;

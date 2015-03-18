@@ -86,7 +86,7 @@ typedef struct tr_peerIo
     bool                  isSeed;
 
     tr_port               port;
-    int                   socket;
+    tr_socket_t           socket;
     struct UTPSocket    * utp_socket;
 
     int                   refCount;
@@ -132,7 +132,7 @@ tr_peerIo*  tr_peerIoNewIncoming (tr_session              * session,
                                   struct tr_bandwidth     * parent,
                                   const struct tr_address * addr,
                                   tr_port                   port,
-                                  int                       socket,
+                                  tr_socket_t               socket,
                                   struct UTPSocket *        utp_socket);
 
 void tr_peerIoRefImpl            (const char              * file,

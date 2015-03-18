@@ -2055,7 +2055,7 @@ void
 tr_peerMgrAddIncoming (tr_peerMgr       * manager,
                        tr_address       * addr,
                        tr_port            port,
-                       int                socket,
+                       tr_socket_t        socket,
                        struct UTPSocket * utp_socket)
 {
   tr_session * session;
@@ -2068,14 +2068,14 @@ tr_peerMgrAddIncoming (tr_peerMgr       * manager,
   if (tr_sessionIsAddressBlocked (session, addr))
     {
       tr_logAddDebug ("Banned IP address \"%s\" tried to connect to us", tr_address_to_string (addr));
-      if (socket >= 0)
+      if (socket != TR_BAD_SOCKET)
         tr_netClose (session, socket);
       else
         UTP_Close (utp_socket);
     }
   else if (getExistingHandshake (&manager->incomingHandshakes, addr))
     {
-      if (socket >= 0)
+      if (socket != TR_BAD_SOCKET)
         tr_netClose (session, socket);
       else
         UTP_Close (utp_socket);

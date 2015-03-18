@@ -142,7 +142,7 @@ tr_sessionSetEncryption (tr_session          * session,
 
 struct tr_bindinfo
 {
-  int socket;
+  tr_socket_t socket;
   tr_address addr;
   struct event * ev;
 };
@@ -151,7 +151,7 @@ struct tr_bindinfo
 static void
 close_bindinfo (struct tr_bindinfo * b)
 {
-  if ((b != NULL) && (b->socket >=0))
+  if ((b != NULL) && (b->socket != TR_BAD_SOCKET))
     {
       event_free (b->ev);
       b->ev = NULL;
@@ -181,15 +181,15 @@ free_incoming_peer_port (tr_session * session)
 static void
 accept_incoming_peer (evutil_socket_t fd, short what UNUSED, void * vsession)
 {
-  int clientSocket;
+  tr_socket_t clientSocket;
   tr_port clientPort;
   tr_address clientAddr;
   tr_session * session = vsession;
 
   clientSocket = tr_netAccept (session, fd, &clientAddr, &clientPort);
-  if (clientSocket > 0)
+  if (clientSocket != TR_BAD_SOCKET)
     {
-      tr_logAddDeep (__FILE__, __LINE__, NULL, "new incoming connection %d (%s)",
+      tr_logAddDeep (__FILE__, __LINE__, NULL, "new incoming connection %"TR_PRI_SOCK" (%s)",
                        clientSocket, tr_peerIoAddrStr (&clientAddr, clientPort));
       tr_peerMgrAddIncoming (session->peerMgr, &clientAddr, clientPort,
                              clientSocket, NULL);
@@ -204,7 +204,7 @@ open_incoming_peer_port (tr_session * session)
   /* bind an ipv4 port to listen for incoming peers... */
   b = session->public_ipv4;
   b->socket = tr_netBindTCP (&b->addr, session->private_peer_port, false);
-  if (b->socket >= 0)
+  if (b->socket != TR_BAD_SOCKET)
     {
       b->ev = event_new (session->event_base, b->socket, EV_READ | EV_PERSIST, accept_incoming_peer, session);
       event_add (b->ev, NULL);
@@ -215,7 +215,7 @@ open_incoming_peer_port (tr_session * session)
     {
       b = session->public_ipv6;
       b->socket = tr_netBindTCP (&b->addr, session->private_peer_port, false);
-      if (b->socket >= 0)
+      if (b->socket != TR_BAD_SOCKET)
         {
           b->ev = event_new (session->event_base, b->socket, EV_READ | EV_PERSIST, accept_incoming_peer, session);
           event_add (b->ev, NULL);
@@ -594,8 +594,8 @@ tr_sessionInit (const char  * tag,
 
   /* initialize the bare skeleton of the session object */
   session = tr_new0 (tr_session, 1);
-  session->udp_socket = -1;
-  session->udp6_socket = -1;
+  session->udp_socket = TR_BAD_SOCKET;
+  session->udp6_socket = TR_BAD_SOCKET;
   session->lock = tr_lockNew ();
   session->cache = tr_cacheNew (1024*1024*2);
   session->tag = tr_strdup (tag);
@@ -854,13 +854,13 @@ sessionSetImpl (void * vdata)
   tr_variantDictFindStr (settings, TR_KEY_bind_address_ipv4, &str, NULL);
   if (!tr_address_from_string (&b.addr, str) || (b.addr.type != TR_AF_INET))
     b.addr = tr_inaddr_any;
-  b.socket = -1;
+  b.socket = TR_BAD_SOCKET;
   session->public_ipv4 = tr_memdup (&b, sizeof (struct tr_bindinfo));
 
   tr_variantDictFindStr (settings, TR_KEY_bind_address_ipv6, &str, NULL);
   if (!tr_address_from_string (&b.addr, str) || (b.addr.type != TR_AF_INET6))
     b.addr = tr_in6addr_any;
-  b.socket = -1;
+  b.socket = TR_BAD_SOCKET;
   session->public_ipv6 = tr_memdup (&b, sizeof (struct tr_bindinfo));
 
   /* incoming peer port */

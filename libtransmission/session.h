@@ -26,6 +26,7 @@
 
 #include "bandwidth.h"
 #include "bitfield.h"
+#include "net.h"
 #include "utils.h"
 #include "variant.h"
 
@@ -150,8 +151,8 @@ struct tr_session
 
     /* The UDP sockets used for the DHT and uTP. */
     tr_port                      udp_port;
-    int                          udp_socket;
-    int                          udp6_socket;
+    tr_socket_t                  udp_socket;
+    tr_socket_t                  udp6_socket;
     unsigned char *              udp6_bound;
     struct event                 *udp_event;
     struct event                 *udp6_event;

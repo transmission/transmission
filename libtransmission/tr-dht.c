@@ -285,11 +285,11 @@ tr_dhtInit (tr_session *ss)
         have_id = tr_variantDictFindRaw (&benc, TR_KEY_id, &raw, &len);
         if (have_id && len==20)
             memcpy (myid, raw, len);
-        if (ss->udp_socket >= 0 &&
+        if (ss->udp_socket != TR_BAD_SOCKET &&
             tr_variantDictFindRaw (&benc, TR_KEY_nodes, &raw, &len) && ! (len%6)) {
                 nodes = tr_memdup (raw, len);
         }
-        if (ss->udp6_socket > 0 &&
+        if (ss->udp6_socket != TR_BAD_SOCKET &&
             tr_variantDictFindRaw (&benc, TR_KEY_nodes6, &raw, &len6) && ! (len6%18)) {
             nodes6 = tr_memdup (raw, len6);
         }
@@ -435,8 +435,8 @@ tr_dhtStatus (tr_session * session, int af, int * nodes_return)
     struct getstatus_closure closure = { af, -1, -1 };
 
     if (!tr_dhtEnabled (session) ||
-      (af == AF_INET && session->udp_socket < 0) ||
-      (af == AF_INET6 && session->udp6_socket < 0)) {
+      (af == AF_INET && session->udp_socket == TR_BAD_SOCKET) ||
+      (af == AF_INET6 && session->udp6_socket == TR_BAD_SOCKET)) {
         if (nodes_return)
             *nodes_return = 0;
         return TR_DHT_STOPPED;

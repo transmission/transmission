@@ -503,10 +503,12 @@ tr_fdFileCheckout (tr_session             * session,
 ****
 ***/
 
-int
-tr_fdSocketCreate (tr_session * session, int domain, int type)
+tr_socket_t
+tr_fdSocketCreate (tr_session * session,
+                   int          domain,
+                   int          type)
 {
-  int s = -1;
+  tr_socket_t s = TR_BAD_SOCKET;
   struct tr_fdInfo * gFd;
   assert (tr_isSession (session));
 
@@ -514,16 +516,16 @@ tr_fdSocketCreate (tr_session * session, int domain, int type)
   gFd = session->fdInfo;
 
   if (gFd->peerCount < session->peerLimit)
-    if ((s = socket (domain, type, 0)) < 0)
+    if ((s = socket (domain, type, 0)) == TR_BAD_SOCKET)
       if (sockerrno != EAFNOSUPPORT)
         tr_logAddError (_("Couldn't create socket: %s"), tr_strerror (sockerrno));
 
-  if (s > -1)
+  if (s != TR_BAD_SOCKET)
     ++gFd->peerCount;
 
   assert (gFd->peerCount >= 0);
 
-  if (s >= 0)
+  if (s != TR_BAD_SOCKET)
     {
       static bool buf_logged = false;
       if (!buf_logged)
@@ -541,10 +543,13 @@ tr_fdSocketCreate (tr_session * session, int domain, int type)
   return s;
 }
 
-int
-tr_fdSocketAccept (tr_session * s, int sockfd, tr_address * addr, tr_port * port)
+tr_socket_t
+tr_fdSocketAccept (tr_session  * s,
+                   tr_socket_t   sockfd,
+                   tr_address  * addr,
+                   tr_port     * port)
 {
-  int fd;
+  tr_socket_t fd;
   socklen_t len;
   struct tr_fdInfo * gFd;
   struct sockaddr_storage sock;
@@ -559,17 +564,17 @@ tr_fdSocketAccept (tr_session * s, int sockfd, tr_address * addr, tr_port * port
   len = sizeof (struct sockaddr_storage);
   fd = accept (sockfd, (struct sockaddr *) &sock, &len);
 
-  if (fd >= 0)
+  if (fd != TR_BAD_SOCKET)
     {
       if ((gFd->peerCount < s->peerLimit)
           && tr_address_from_sockaddr_storage (addr, port, &sock))
         {
           ++gFd->peerCount;
         }
-        else
+      else
         {
           tr_netCloseSocket (fd);
-          fd = -1;
+          fd = TR_BAD_SOCKET;
         }
     }
 
@@ -577,7 +582,8 @@ tr_fdSocketAccept (tr_session * s, int sockfd, tr_address * addr, tr_port * port
 }
 
 void
-tr_fdSocketClose (tr_session * session, int fd)
+tr_fdSocketClose (tr_session  * session,
+                  tr_socket_t   fd)
 {
   assert (tr_isSession (session));
 
@@ -585,7 +591,7 @@ tr_fdSocketClose (tr_session * session, int fd)
     {
       struct tr_fdInfo * gFd = session->fdInfo;
 
-      if (fd >= 0)
+      if (fd != TR_BAD_SOCKET)
         {
           tr_netCloseSocket (fd);
           --gFd->peerCount;
