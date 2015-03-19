@@ -35,6 +35,8 @@
 #ifdef _WIN32
   #include <inttypes.h>
   #include <ws2tcpip.h>
+  #undef gai_strerror
+  #define gai_strerror gai_strerrorA
 #else
   #include <sys/time.h>
   #include <sys/types.h>

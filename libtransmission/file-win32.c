@@ -52,7 +52,7 @@ set_system_error (tr_error ** error,
     }
   else
     {
-      tr_error_set (error, code, "Unknown error: 0x%08x", code);
+      tr_error_set (error, code, "Unknown error: 0x%08lx", code);
     }
 }
 

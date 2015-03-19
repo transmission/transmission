@@ -87,7 +87,7 @@ extern "C" {
 #elif __has_feature (c_static_assert) || __has_extension (c_static_assert)
  #define TR_STATIC_ASSERT _Static_assert
 #else
- #define TR_STATIC_ASSERT(x, msg) { const char static_check[((x) ? 1 : -1)] UNUSED; }
+ #define TR_STATIC_ASSERT(x, msg) { typedef char __tr_static_check__[(x) ? 1 : -1] UNUSED; }
 #endif
 
 

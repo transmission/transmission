@@ -235,7 +235,7 @@ watchdir_update_impl (dtr_watchdir * w)
 ***/
 
 dtr_watchdir*
-dtr_watchdir_new (tr_session * session, const char * dir, dtr_watchdir_callback * callback)
+dtr_watchdir_new (tr_session * session, const char * dir, dtr_watchdir_callback callback)
 {
     dtr_watchdir * w = tr_new0 (dtr_watchdir, 1);
 
