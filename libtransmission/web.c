@@ -348,6 +348,8 @@ tr_select (int nfds,
            struct timeval  * t)
 {
 #ifdef _WIN32
+  (void) nfds;
+
   if (!r_fd_set->fd_count && !w_fd_set->fd_count && !c_fd_set->fd_count)
     {
       const long int msec = t->tv_sec*1000 + t->tv_usec/1000;

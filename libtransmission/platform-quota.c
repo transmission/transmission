@@ -359,6 +359,11 @@ tr_getQuotaFreeSpace (const struct tr_device_info * info)
     {
       ret = getquota (info->device);
     }
+
+#else /* _WIN32 */
+
+  (void) info;
+
 #endif /* _WIN32 */
 
   return ret;

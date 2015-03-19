@@ -67,7 +67,9 @@
 #define SPEED_T_STR "TB/s"
 
 static bool paused = false;
+#ifdef SIGHUP
 static bool seenHUP = false;
+#endif
 static const char *logfileName = NULL;
 static tr_sys_file_t logfile = TR_BAD_SYS_FILE;
 static tr_session * mySession = NULL;
@@ -262,7 +264,12 @@ tr_daemon (int nochdir, int noclose)
     return 0;
 
 #else /* USE_NO_DAEMON */
+
+    (void) nochdir;
+    (void) noclose;
+
     return 0;
+
 #endif
 }
 
@@ -364,6 +371,8 @@ printMessage (tr_sys_file_t logfile, int level, const char * name, const char * 
         else
             syslog (priority, "%s (%s:%d)", message, file, line);
     }
+#else
+    (void) level;
 #endif
 }
 

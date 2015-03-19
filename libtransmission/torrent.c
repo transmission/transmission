@@ -2115,7 +2115,7 @@ torrentCallScript (const tr_torrent * tor, const char * script)
       tr_logAddTorInfo (tor, "Calling script \"%s\"", script);
 
 #ifdef _WIN32
-      if (_spawnvpe (_P_NOWAIT, script, (const char*)cmd, env) == -1)
+      if (_spawnvpe (_P_NOWAIT, script, (const char* const*)cmd, (const char* const*)env) == -1)
         tr_logAddTorErr (tor, "error executing script \"%s\": %s", cmd[0], tr_strerror (errno));
 #else
       signal (SIGCHLD, onSigCHLD);
