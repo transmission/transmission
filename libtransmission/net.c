@@ -241,7 +241,7 @@ tr_netOpenPeerSocket (tr_session        * session,
     assert (tr_address_is_valid (addr));
 
     if (!tr_address_is_valid_for_peers (addr, port))
-        return -EINVAL;
+        return TR_BAD_SOCKET; /* -EINVAL */
 
     s = tr_fdSocketCreate (session, domains[addr->type], SOCK_STREAM);
     if (s == TR_BAD_SOCKET)
@@ -350,6 +350,7 @@ tr_netBindTCPImpl (const tr_address * addr,
         if (setsockopt (fd, IPPROTO_IPV6, IPV6_V6ONLY, (const void *) &optval, sizeof (optval)) == -1)
             if (sockerrno != ENOPROTOOPT) { /* if the kernel doesn't support it, ignore it */
                 *errOut = sockerrno;
+                tr_netCloseSocket (fd);
                 return TR_BAD_SOCKET;
             }
 #endif
