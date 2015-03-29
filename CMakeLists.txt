@@ -270,7 +270,8 @@ tr_add_external_auto_library(DHT dht
 if(ENABLE_UTP)
     tr_add_external_auto_library(UTP utp
         PATCH_COMMAND "${CMAKE_COMMAND}" -E copy "${THIRD_PARTY_DIR}/utp.cmake" "<SOURCE_DIR>/CMakeLists.txt"
-              COMMAND "${CMAKE_COMMAND}" -E copy "${THIRD_PARTY_DIR}/utp_config.h" "<SOURCE_DIR>/utp_config.h")
+              COMMAND "${CMAKE_COMMAND}" -E copy "${THIRD_PARTY_DIR}/utp_config.h" "<SOURCE_DIR>/utp_config.h"
+              COMMAND "${CMAKE_COMMAND}" -E chdir "<SOURCE_DIR>" patch -p1 --binary -i "${THIRD_PARTY_DIR}/utp-01-ticket-5002.patch")
 endif()
 
 tr_add_external_auto_library(B64 b64
