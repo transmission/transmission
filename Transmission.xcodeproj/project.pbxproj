@@ -472,6 +472,7 @@
 		C1639A791A55F56600E42033 /* cencode.c in Sources */ = {isa = PBXBuildFile; fileRef = C1639A771A55F56600E42033 /* cencode.c */; };
 		C1639A7C1A55F57200E42033 /* cdecode.h in Headers */ = {isa = PBXBuildFile; fileRef = C1639A7A1A55F57200E42033 /* cdecode.h */; };
 		C1639A7D1A55F57200E42033 /* cencode.h in Headers */ = {isa = PBXBuildFile; fileRef = C1639A7B1A55F57200E42033 /* cencode.h */; };
+		C1F690FD1AD0627500D95CF0 /* daemon-posix.c in Sources */ = {isa = PBXBuildFile; fileRef = C1F690FC1AD0627500D95CF0 /* daemon-posix.c */; };
 		D4AF3B2F0C41F7A500D46B6B /* list.c in Sources */ = {isa = PBXBuildFile; fileRef = D4AF3B2D0C41F7A500D46B6B /* list.c */; };
 		D4AF3B300C41F7A600D46B6B /* list.h in Headers */ = {isa = PBXBuildFile; fileRef = D4AF3B2E0C41F7A500D46B6B /* list.h */; };
 		E138A9780C04D88F00C5426C /* ProgressGradients.m in Sources */ = {isa = PBXBuildFile; fileRef = E138A9760C04D88F00C5426C /* ProgressGradients.m */; };
@@ -1227,6 +1228,8 @@
 		C1639A771A55F56600E42033 /* cencode.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = cencode.c; path = "third-party/libb64/cencode.c"; sourceTree = "<group>"; };
 		C1639A7A1A55F57200E42033 /* cdecode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = cdecode.h; path = "third-party/libb64/b64/cdecode.h"; sourceTree = "<group>"; };
 		C1639A7B1A55F57200E42033 /* cencode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = cencode.h; path = "third-party/libb64/b64/cencode.h"; sourceTree = "<group>"; };
+		C1F690FC1AD0627500D95CF0 /* daemon-posix.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "daemon-posix.c"; path = "daemon/daemon-posix.c"; sourceTree = "<group>"; };
+		C1F690FE1AD0628400D95CF0 /* daemon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = daemon.h; path = daemon/daemon.h; sourceTree = "<group>"; };
 		D4AF3B2D0C41F7A500D46B6B /* list.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = list.c; path = libtransmission/list.c; sourceTree = "<group>"; };
 		D4AF3B2E0C41F7A500D46B6B /* list.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = list.h; path = libtransmission/list.h; sourceTree = "<group>"; };
 		E138A9750C04D88F00C5426C /* ProgressGradients.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ProgressGradients.h; path = macosx/ProgressGradients.h; sourceTree = "<group>"; };
@@ -2006,6 +2009,8 @@
 			isa = PBXGroup;
 			children = (
 				BEFC1C0E0C07756200B0BB3C /* daemon.c */,
+				C1F690FE1AD0628400D95CF0 /* daemon.h */,
+				C1F690FC1AD0627500D95CF0 /* daemon-posix.c */,
 				BEFC1C140C07756200B0BB3C /* remote.c */,
 				A2D597280F5AE49E0001AB3C /* watch.c */,
 				A2D597290F5AE49E0001AB3C /* watch.h */,
@@ -2977,6 +2982,7 @@
 			files = (
 				BEFC1C1A0C07756200B0BB3C /* daemon.c in Sources */,
 				A2D5972A0F5AE49E0001AB3C /* watch.c in Sources */,
+				C1F690FD1AD0627500D95CF0 /* daemon-posix.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -99,7 +99,7 @@ create_signal_pipe (tr_error ** error)
 }
 
 static void
-destroy_signal_pipe ()
+destroy_signal_pipe (void)
 {
   close (signal_pipe[0]);
   close (signal_pipe[1]);

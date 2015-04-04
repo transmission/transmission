@@ -35,7 +35,14 @@ LDADD = \
     ${LIBM}
 
 noinst_HEADERS = \
+    daemon.h
     watch.h
 
 transmission_daemon_SOURCES = daemon.c watch.c
 transmission_remote_SOURCES = remote.c
+
+if WIN32
+transmission_daemon_SOURCES += daemon-win32.c
+else
+transmission_daemon_SOURCES += daemon-posix.c
+endif
