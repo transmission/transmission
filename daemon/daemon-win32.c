@@ -130,7 +130,9 @@ static void
 stop_service (void)
 {
   if (service_stop_thread != NULL)
-    return;
+    {
+      return;
+    }
 
   const DWORD wait_time = 30 * 1000;
 

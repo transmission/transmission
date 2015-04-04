@@ -35,7 +35,7 @@ LDADD = \
     ${LIBM}
 
 noinst_HEADERS = \
-    daemon.h
+    daemon.h \
     watch.h
 
 transmission_daemon_SOURCES = daemon.c watch.c
