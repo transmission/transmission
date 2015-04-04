@@ -9,9 +9,8 @@
 
 #include <errno.h>
 #include <stdio.h> /* printf */
-#include <stdlib.h> /* exit, atoi */
+#include <stdlib.h> /* atoi */
 
-#include <signal.h>
 #ifdef HAVE_SYSLOG
 #include <syslog.h>
 #endif
@@ -19,8 +18,7 @@
 #ifdef _WIN32
  #include <process.h> /* getpid */
 #else
- #include <fcntl.h> /* open */
- #include <unistd.h> /* daemon */
+ #include <unistd.h> /* getpid */
 #endif
 
 #include <event2/buffer.h>
@@ -42,6 +40,7 @@
  static void sd_notifyf (int status UNUSED, const char * fmt UNUSED, ...) { }
 #endif
 
+#include "daemon.h"
 #include "watch.h"
 
 #define MY_NAME "transmission-daemon"
@@ -66,10 +65,7 @@
 #define SPEED_G_STR "GB/s"
 #define SPEED_T_STR "TB/s"
 
-static bool paused = false;
-#ifdef SIGHUP
 static bool seenHUP = false;
-#endif
 static const char *logfileName = NULL;
 static tr_sys_file_t logfile = TR_BAD_SYS_FILE;
 static tr_session * mySession = NULL;
@@ -142,13 +138,6 @@ static const struct tr_option options[] =
     { 0, NULL, NULL, NULL, 0, NULL }
 };
 
-static void
-showUsage (void)
-{
-    tr_getopt_usage (MY_NAME, getUsage (), options);
-    exit (0);
-}
-
 static bool
 reopen_log_file (const char *filename)
 {
@@ -171,106 +160,6 @@ reopen_log_file (const char *filename)
         tr_sys_file_close (old_log_file, NULL);
 
     return true;
-}
-
-static void
-gotsig (int sig)
-{
-    switch (sig)
-    {
-#ifdef SIGHUP
-        case SIGHUP:
-        {
-            if (!mySession)
-            {
-                tr_logAddInfo ("Deferring reload until session is fully started.");
-                seenHUP = true;
-            }
-            else
-            {
-                tr_variant settings;
-                const char * configDir;
-
-                /* reopen the logfile to allow for log rotation */
-                if (logfileName != NULL)
-                {
-                    reopen_log_file (logfileName);
-                }
-
-                configDir = tr_sessionGetConfigDir (mySession);
-                tr_logAddInfo ("Reloading settings from \"%s\"", configDir);
-                tr_variantInitDict (&settings, 0);
-                tr_variantDictAddBool (&settings, TR_KEY_rpc_enabled, true);
-                tr_sessionLoadSettings (&settings, configDir, MY_NAME);
-                tr_sessionSet (mySession, &settings);
-                tr_variantFree (&settings);
-                tr_sessionReloadBlocklists (mySession);
-            }
-            break;
-        }
-#endif
-
-        default:
-            tr_logAddError ("Unexpected signal (%d) in daemon, closing.", sig);
-            /* no break */
-
-        case SIGINT:
-        case SIGTERM:
-            event_base_loopexit(ev_base, NULL);
-            break;
-    }
-}
-
-#if defined (_WIN32)
- #define USE_NO_DAEMON
-#elif !defined (HAVE_DAEMON) || defined (__UCLIBC__)
- #define USE_TR_DAEMON
-#else
- #define USE_OS_DAEMON
-#endif
-
-static int
-tr_daemon (int nochdir, int noclose)
-{
-#if defined (USE_OS_DAEMON)
-
-    return daemon (nochdir, noclose);
-
-#elif defined (USE_TR_DAEMON)
-
-    /* this is loosely based off of glibc's daemon () implementation
-     * http://sourceware.org/git/?p=glibc.git;a=blob_plain;f=misc/daemon.c */
-
-    switch (fork ()) {
-        case -1: return -1;
-        case 0: break;
-        default: _exit (0);
-    }
-
-    if (setsid () == -1)
-        return -1;
-
-    if (!nochdir)
-        chdir ("/");
-
-    if (!noclose) {
-        int fd = open ("/dev/null", O_RDWR, 0);
-        dup2 (fd, STDIN_FILENO);
-        dup2 (fd, STDOUT_FILENO);
-        dup2 (fd, STDERR_FILENO);
-        close (fd);
-    }
-
-    return 0;
-
-#else /* USE_NO_DAEMON */
-
-    (void) nochdir;
-    (void) noclose;
-
-    return 0;
-
-#endif
 }
 
 static const char*
@@ -424,164 +313,184 @@ on_rpc_callback (tr_session            * session UNUSED,
     return TR_RPC_OK;
 }
 
-int
-main (int argc, char ** argv)
+static bool
+parse_args (int           argc,
+            const char ** argv,
+            tr_variant  * settings,
+            bool        * paused,
+            bool        * dump_settings,
+            bool        * foreground,
+            int         * exit_code)
 {
     int c;
     const char * optarg;
-    tr_variant settings;
+
+    *paused = false;
+    *dump_settings = false;
+    *foreground = false;
+
+    tr_optind = 1;
+    while ((c = tr_getopt (getUsage (), argc, argv, options, &optarg))) {
+        switch (c) {
+            case 'a': tr_variantDictAddStr  (settings, TR_KEY_rpc_whitelist, optarg);
+                      tr_variantDictAddBool (settings, TR_KEY_rpc_whitelist_enabled, true);
+                      break;
+            case 'b': tr_variantDictAddBool (settings, TR_KEY_blocklist_enabled, true);
+                      break;
+            case 'B': tr_variantDictAddBool (settings, TR_KEY_blocklist_enabled, false);
+                      break;
+            case 'c': tr_variantDictAddStr  (settings, TR_KEY_watch_dir, optarg);
+                      tr_variantDictAddBool (settings, TR_KEY_watch_dir_enabled, true);
+                      break;
+            case 'C': tr_variantDictAddBool (settings, TR_KEY_watch_dir_enabled, false);
+                      break;
+            case 941: tr_variantDictAddStr  (settings, TR_KEY_incomplete_dir, optarg);
+                      tr_variantDictAddBool (settings, TR_KEY_incomplete_dir_enabled, true);
+                      break;
+            case 942: tr_variantDictAddBool (settings, TR_KEY_incomplete_dir_enabled, false);
+                      break;
+            case 'd': *dump_settings = true;
+                      break;
+            case 'e': if (reopen_log_file (optarg))
+                          logfileName = optarg;
+                      break;
+            case 'f': *foreground = true;
+                      break;
+            case 'g': /* handled above */
+                      break;
+            case 'V': /* version */
+                      fprintf (stderr, "%s %s\n", MY_NAME, LONG_VERSION_STRING);
+                      *exit_code = 0;
+                      return false;
+            case 'o': tr_variantDictAddBool (settings, TR_KEY_dht_enabled, true);
+                      break;
+            case 'O': tr_variantDictAddBool (settings, TR_KEY_dht_enabled, false);
+                      break;
+            case 'p': tr_variantDictAddInt (settings, TR_KEY_rpc_port, atoi (optarg));
+                      break;
+            case 't': tr_variantDictAddBool (settings, TR_KEY_rpc_authentication_required, true);
+                      break;
+            case 'T': tr_variantDictAddBool (settings, TR_KEY_rpc_authentication_required, false);
+                      break;
+            case 'u': tr_variantDictAddStr (settings, TR_KEY_rpc_username, optarg);
+                      break;
+            case 'v': tr_variantDictAddStr (settings, TR_KEY_rpc_password, optarg);
+                      break;
+            case 'w': tr_variantDictAddStr (settings, TR_KEY_download_dir, optarg);
+                      break;
+            case 'P': tr_variantDictAddInt (settings, TR_KEY_peer_port, atoi (optarg));
+                      break;
+            case 'm': tr_variantDictAddBool (settings, TR_KEY_port_forwarding_enabled, true);
+                      break;
+            case 'M': tr_variantDictAddBool (settings, TR_KEY_port_forwarding_enabled, false);
+                      break;
+            case 'L': tr_variantDictAddInt (settings, TR_KEY_peer_limit_global, atoi (optarg));
+                      break;
+            case 'l': tr_variantDictAddInt (settings, TR_KEY_peer_limit_per_torrent, atoi (optarg));
+                      break;
+            case 800: *paused = true;
+                      break;
+            case 910: tr_variantDictAddInt (settings, TR_KEY_encryption, TR_ENCRYPTION_REQUIRED);
+                      break;
+            case 911: tr_variantDictAddInt (settings, TR_KEY_encryption, TR_ENCRYPTION_PREFERRED);
+                      break;
+            case 912: tr_variantDictAddInt (settings, TR_KEY_encryption, TR_CLEAR_PREFERRED);
+                      break;
+            case 'i': tr_variantDictAddStr (settings, TR_KEY_bind_address_ipv4, optarg);
+                      break;
+            case 'I': tr_variantDictAddStr (settings, TR_KEY_bind_address_ipv6, optarg);
+                      break;
+            case 'r': tr_variantDictAddStr (settings, TR_KEY_rpc_bind_address, optarg);
+                      break;
+            case 953: tr_variantDictAddReal (settings, TR_KEY_ratio_limit, atof (optarg));
+                      tr_variantDictAddBool (settings, TR_KEY_ratio_limit_enabled, true);
+                      break;
+            case 954: tr_variantDictAddBool (settings, TR_KEY_ratio_limit_enabled, false);
+                      break;
+            case 'x': tr_variantDictAddStr (settings, key_pidfile, optarg);
+                      break;
+            case 'y': tr_variantDictAddBool (settings, TR_KEY_lpd_enabled, true);
+                      break;
+            case 'Y': tr_variantDictAddBool (settings, TR_KEY_lpd_enabled, false);
+                      break;
+            case 810: tr_variantDictAddInt (settings,  TR_KEY_message_level, TR_LOG_ERROR);
+                      break;
+            case 811: tr_variantDictAddInt (settings,  TR_KEY_message_level, TR_LOG_INFO);
+                      break;
+            case 812: tr_variantDictAddInt (settings,  TR_KEY_message_level, TR_LOG_DEBUG);
+                      break;
+            case 830: tr_variantDictAddBool (settings, TR_KEY_utp_enabled, true);
+                      break;
+            case 831: tr_variantDictAddBool (settings, TR_KEY_utp_enabled, false);
+                      break;
+            default:  tr_getopt_usage (MY_NAME, getUsage (), options);
+                      *exit_code = 0;
+                      return false;
+        }
+    }
+
+    return true;
+}
+
+struct daemon_data
+{
+  tr_variant   settings;
+  const char * configDir;
+  bool         paused;
+};
+
+static void
+daemon_reconfigure (void * arg UNUSED)
+{
+    if (!mySession)
+    {
+        tr_logAddInfo ("Deferring reload until session is fully started.");
+        seenHUP = true;
+    }
+    else
+    {
+        tr_variant settings;
+        const char * configDir;
+
+        /* reopen the logfile to allow for log rotation */
+        if (logfileName != NULL)
+            reopen_log_file (logfileName);
+
+        configDir = tr_sessionGetConfigDir (mySession);
+        tr_logAddInfo ("Reloading settings from \"%s\"", configDir);
+        tr_variantInitDict (&settings, 0);
+        tr_variantDictAddBool (&settings, TR_KEY_rpc_enabled, true);
+        tr_sessionLoadSettings (&settings, configDir, MY_NAME);
+        tr_sessionSet (mySession, &settings);
+        tr_variantFree (&settings);
+        tr_sessionReloadBlocklists (mySession);
+    }
+}
+
+static void
+daemon_stop (void * arg UNUSED)
+{
+    event_base_loopexit (ev_base, NULL);
+}
+
+static int
+daemon_start (void * raw_arg,
+              bool   foreground)
+{
     bool boolVal;
-    bool loaded;
-    bool foreground = false;
-    bool dumpSettings = false;
-    const char * configDir = NULL;
     const char * pid_filename;
     dtr_watchdir * watchdir = NULL;
     bool pidfile_created = false;
     tr_session * session = NULL;
     struct event *status_ev;
 
-#ifdef _WIN32
-    tr_win32_make_args_utf8 (&argc, &argv);
+    struct daemon_data * const arg = raw_arg;
+    tr_variant * const settings = &arg->settings;
+    const char * const configDir = arg->configDir;
+
+#ifndef HAVE_SYSLOG
+    (void) foreground;
 #endif
-
-    key_pidfile = tr_quark_new ("pidfile",  7);
-
-    signal (SIGINT, gotsig);
-    signal (SIGTERM, gotsig);
-#ifdef SIGHUP
-    signal (SIGHUP, gotsig);
-#endif
-
-    /* load settings from defaults + config file */
-    tr_variantInitDict (&settings, 0);
-    tr_variantDictAddBool (&settings, TR_KEY_rpc_enabled, true);
-    configDir = getConfigDir (argc, (const char**)argv);
-    loaded = tr_sessionLoadSettings (&settings, configDir, MY_NAME);
-
-    /* overwrite settings from the comamndline */
-    tr_optind = 1;
-    while ((c = tr_getopt (getUsage (), argc, (const char**)argv, options, &optarg))) {
-        switch (c) {
-            case 'a': tr_variantDictAddStr  (&settings, TR_KEY_rpc_whitelist, optarg);
-                      tr_variantDictAddBool (&settings, TR_KEY_rpc_whitelist_enabled, true);
-                      break;
-            case 'b': tr_variantDictAddBool (&settings, TR_KEY_blocklist_enabled, true);
-                      break;
-            case 'B': tr_variantDictAddBool (&settings, TR_KEY_blocklist_enabled, false);
-                      break;
-            case 'c': tr_variantDictAddStr  (&settings, TR_KEY_watch_dir, optarg);
-                      tr_variantDictAddBool (&settings, TR_KEY_watch_dir_enabled, true);
-                      break;
-            case 'C': tr_variantDictAddBool (&settings, TR_KEY_watch_dir_enabled, false);
-                      break;
-            case 941: tr_variantDictAddStr  (&settings, TR_KEY_incomplete_dir, optarg);
-                      tr_variantDictAddBool (&settings, TR_KEY_incomplete_dir_enabled, true);
-                      break;
-            case 942: tr_variantDictAddBool (&settings, TR_KEY_incomplete_dir_enabled, false);
-                      break;
-            case 'd': dumpSettings = true;
-                      break;
-            case 'e': if (reopen_log_file (optarg))
-                          logfileName = optarg;
-                      break;
-            case 'f': foreground = true;
-                      break;
-            case 'g': /* handled above */
-                      break;
-            case 'V': /* version */
-                      fprintf (stderr, "%s %s\n", MY_NAME, LONG_VERSION_STRING);
-                      exit (0);
-            case 'o': tr_variantDictAddBool (&settings, TR_KEY_dht_enabled, true);
-                      break;
-            case 'O': tr_variantDictAddBool (&settings, TR_KEY_dht_enabled, false);
-                      break;
-            case 'p': tr_variantDictAddInt (&settings, TR_KEY_rpc_port, atoi (optarg));
-                      break;
-            case 't': tr_variantDictAddBool (&settings, TR_KEY_rpc_authentication_required, true);
-                      break;
-            case 'T': tr_variantDictAddBool (&settings, TR_KEY_rpc_authentication_required, false);
-                      break;
-            case 'u': tr_variantDictAddStr (&settings, TR_KEY_rpc_username, optarg);
-                      break;
-            case 'v': tr_variantDictAddStr (&settings, TR_KEY_rpc_password, optarg);
-                      break;
-            case 'w': tr_variantDictAddStr (&settings, TR_KEY_download_dir, optarg);
-                      break;
-            case 'P': tr_variantDictAddInt (&settings, TR_KEY_peer_port, atoi (optarg));
-                      break;
-            case 'm': tr_variantDictAddBool (&settings, TR_KEY_port_forwarding_enabled, true);
-                      break;
-            case 'M': tr_variantDictAddBool (&settings, TR_KEY_port_forwarding_enabled, false);
-                      break;
-            case 'L': tr_variantDictAddInt (&settings, TR_KEY_peer_limit_global, atoi (optarg));
-                      break;
-            case 'l': tr_variantDictAddInt (&settings, TR_KEY_peer_limit_per_torrent, atoi (optarg));
-                      break;
-            case 800: paused = true;
-                      break;
-            case 910: tr_variantDictAddInt (&settings, TR_KEY_encryption, TR_ENCRYPTION_REQUIRED);
-                      break;
-            case 911: tr_variantDictAddInt (&settings, TR_KEY_encryption, TR_ENCRYPTION_PREFERRED);
-                      break;
-            case 912: tr_variantDictAddInt (&settings, TR_KEY_encryption, TR_CLEAR_PREFERRED);
-                      break;
-            case 'i': tr_variantDictAddStr (&settings, TR_KEY_bind_address_ipv4, optarg);
-                      break;
-            case 'I': tr_variantDictAddStr (&settings, TR_KEY_bind_address_ipv6, optarg);
-                      break;
-            case 'r': tr_variantDictAddStr (&settings, TR_KEY_rpc_bind_address, optarg);
-                      break;
-            case 953: tr_variantDictAddReal (&settings, TR_KEY_ratio_limit, atof (optarg));
-                      tr_variantDictAddBool (&settings, TR_KEY_ratio_limit_enabled, true);
-                      break;
-            case 954: tr_variantDictAddBool (&settings, TR_KEY_ratio_limit_enabled, false);
-                      break;
-            case 'x': tr_variantDictAddStr (&settings, key_pidfile, optarg);
-                      break;
-            case 'y': tr_variantDictAddBool (&settings, TR_KEY_lpd_enabled, true);
-                      break;
-            case 'Y': tr_variantDictAddBool (&settings, TR_KEY_lpd_enabled, false);
-                      break;
-            case 810: tr_variantDictAddInt (&settings,  TR_KEY_message_level, TR_LOG_ERROR);
-                      break;
-            case 811: tr_variantDictAddInt (&settings,  TR_KEY_message_level, TR_LOG_INFO);
-                      break;
-            case 812: tr_variantDictAddInt (&settings,  TR_KEY_message_level, TR_LOG_DEBUG);
-                      break;
-            case 830: tr_variantDictAddBool (&settings, TR_KEY_utp_enabled, true);
-                      break;
-            case 831: tr_variantDictAddBool (&settings, TR_KEY_utp_enabled, false);
-                      break;
-            default:  showUsage ();
-                      break;
-        }
-    }
-
-    if (foreground && logfile == TR_BAD_SYS_FILE)
-        logfile = tr_sys_file_get_std (TR_STD_SYS_FILE_ERR, NULL);
-
-    if (!loaded)
-    {
-        printMessage (logfile, TR_LOG_ERROR, MY_NAME, "Error loading config file -- exiting.", __FILE__, __LINE__);
-        return -1;
-    }
-
-    if (dumpSettings)
-    {
-        char * str = tr_variantToStr (&settings, TR_VARIANT_FMT_JSON, NULL);
-        fprintf (stderr, "%s", str);
-        tr_free (str);
-        return 0;
-    }
-
-    if (!foreground && tr_daemon (true, false) < 0)
-    {
-        char buf[256];
-        tr_snprintf (buf, sizeof (buf), "Failed to daemonize: %s", tr_strerror (errno));
-        printMessage (logfile, TR_LOG_ERROR, MY_NAME, buf, __FILE__, __LINE__);
-        exit (1);
-    }
 
     sd_notifyf (0, "MAINPID=%d\n", (int)getpid());
 
@@ -592,20 +501,20 @@ main (int argc, char ** argv)
         char buf[256];
         tr_snprintf(buf, sizeof(buf), "Failed to init daemon event state: %s", tr_strerror(errno));
         printMessage (logfile, TR_LOG_ERROR, MY_NAME, buf, __FILE__, __LINE__);
-        exit (1);
+        return 1;
     }
 
     /* start the session */
     tr_formatter_mem_init (MEM_K, MEM_K_STR, MEM_M_STR, MEM_G_STR, MEM_T_STR);
     tr_formatter_size_init (DISK_K, DISK_K_STR, DISK_M_STR, DISK_G_STR, DISK_T_STR);
     tr_formatter_speed_init (SPEED_K, SPEED_K_STR, SPEED_M_STR, SPEED_G_STR, SPEED_T_STR);
-    session = tr_sessionInit ("daemon", configDir, true, &settings);
+    session = tr_sessionInit ("daemon", configDir, true, settings);
     tr_sessionSetRPCCallback (session, on_rpc_callback, NULL);
     tr_logAddNamedInfo (NULL, "Using settings from \"%s\"", configDir);
-    tr_sessionSaveSettings (session, configDir, &settings);
+    tr_sessionSaveSettings (session, configDir, settings);
 
     pid_filename = NULL;
-    tr_variantDictFindStr (&settings, key_pidfile, &pid_filename, NULL);
+    tr_variantDictFindStr (settings, key_pidfile, &pid_filename, NULL);
     if (pid_filename && *pid_filename)
     {
         tr_error * error = NULL;
@@ -626,24 +535,22 @@ main (int argc, char ** argv)
         }
     }
 
-    if (tr_variantDictFindBool (&settings, TR_KEY_rpc_authentication_required, &boolVal) && boolVal)
+    if (tr_variantDictFindBool (settings, TR_KEY_rpc_authentication_required, &boolVal) && boolVal)
         tr_logAddNamedInfo (MY_NAME, "requiring authentication");
 
     mySession = session;
 
-#ifdef SIGHUP
     /* If we got a SIGHUP during startup, process that now. */
     if (seenHUP)
-        gotsig (SIGHUP);
-#endif
+        daemon_reconfigure (arg);
 
     /* maybe add a watchdir */
     {
         const char * dir;
 
-        if (tr_variantDictFindBool (&settings, TR_KEY_watch_dir_enabled, &boolVal)
+        if (tr_variantDictFindBool (settings, TR_KEY_watch_dir_enabled, &boolVal)
             && boolVal
-            && tr_variantDictFindStr (&settings, TR_KEY_watch_dir, &dir, NULL)
+            && tr_variantDictFindStr (settings, TR_KEY_watch_dir, &dir, NULL)
             && dir
             && *dir)
         {
@@ -656,7 +563,7 @@ main (int argc, char ** argv)
     {
         tr_torrent ** torrents;
         tr_ctor * ctor = tr_ctorNew (mySession);
-        if (paused)
+        if (arg->paused)
             tr_ctorSetPaused (ctor, TR_FORCE, true);
         torrents = tr_sessionLoadTorrents (mySession, ctor, NULL);
         tr_free (torrents);
@@ -704,7 +611,7 @@ cleanup:
     }
     event_base_free(ev_base);
 
-    tr_sessionSaveSettings (mySession, configDir, &settings);
+    tr_sessionSaveSettings (mySession, configDir, settings);
     dtr_watchdir_free (watchdir);
     tr_sessionClose (mySession);
     pumpLogMessages (logfile);
@@ -722,7 +629,75 @@ cleanup:
     /* cleanup */
     if (pidfile_created)
         tr_sys_path_remove (pid_filename, NULL);
-    tr_variantFree (&settings);
+
     sd_notify (0, "STATUS=\n");
+
     return 0;
+}
+
+int
+main (int     argc,
+      char ** argv)
+{
+    const dtr_callbacks cb =
+    {
+        .on_start       = &daemon_start,
+        .on_stop        = &daemon_stop,
+        .on_reconfigure = &daemon_reconfigure,
+    };
+
+    int ret;
+    bool loaded, dumpSettings, foreground;
+    tr_error * error = NULL;
+
+    struct daemon_data arg;
+    tr_variant * const settings = &arg.settings;
+    const char ** const configDir = &arg.configDir;
+
+#ifdef _WIN32
+    tr_win32_make_args_utf8 (&argc, &argv);
+#endif
+
+    key_pidfile = tr_quark_new ("pidfile",  7);
+
+    /* load settings from defaults + config file */
+    tr_variantInitDict (settings, 0);
+    tr_variantDictAddBool (settings, TR_KEY_rpc_enabled, true);
+    *configDir = getConfigDir (argc, (const char**)argv);
+    loaded = tr_sessionLoadSettings (settings, *configDir, MY_NAME);
+
+    /* overwrite settings from the comamndline */
+    if (!parse_args (argc, (const char**) argv, settings, &arg.paused, &dumpSettings, &foreground, &ret))
+        goto cleanup;
+
+    if (foreground && logfile == TR_BAD_SYS_FILE)
+        logfile = tr_sys_file_get_std (TR_STD_SYS_FILE_ERR, NULL);
+
+    if (!loaded)
+    {
+        printMessage (logfile, TR_LOG_ERROR, MY_NAME, "Error loading config file -- exiting.", __FILE__, __LINE__);
+        ret = 1;
+        goto cleanup;
+    }
+
+    if (dumpSettings)
+    {
+        char * str = tr_variantToStr (settings, TR_VARIANT_FMT_JSON, NULL);
+        fprintf (stderr, "%s", str);
+        tr_free (str);
+        goto cleanup;
+    }
+
+    if (!dtr_daemon (&cb, &arg, foreground, &ret, &error))
+    {
+        char buf[256];
+        tr_snprintf (buf, sizeof (buf), "Failed to daemonize: %s", error->message);
+        printMessage (logfile, TR_LOG_ERROR, MY_NAME, buf, __FILE__, __LINE__);
+        tr_error_free (error);
+    }
+
+cleanup:
+    tr_variantFree (settings);
+
+    return ret;
 }

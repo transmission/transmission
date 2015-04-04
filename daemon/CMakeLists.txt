@@ -18,11 +18,23 @@ include_directories(
     ${EVENT2_INCLUDE_DIRS}
 )
 
-add_executable(${TR_NAME}-daemon
+set(${PROJECT_NAME}_SOURCES
     daemon.c
     watch.c
+)
+
+if(WIN32)
+    list(APPEND ${PROJECT_NAME}_SOURCES daemon-win32.c)
+else()
+    list(APPEND ${PROJECT_NAME}_SOURCES daemon-posix.c)
+endif()
+
+set(${PROJECT_NAME}_HEADERS
+    daemon.h
     watch.h
 )
+
+add_executable(${TR_NAME}-daemon ${${PROJECT_NAME}_SOURCES} ${${PROJECT_NAME}_HEADERS})
 
 set_target_properties(${TR_NAME}-daemon PROPERTIES
     COMPILE_FLAGS "${SYSTEMD_DAEMON_CFLAGS}"
