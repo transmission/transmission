@@ -264,7 +264,7 @@ static tr_option opts[] =
     { 'O', "no-dht",                 "Disable distributed hash tables (DHT)", "O", 0, NULL },
     { 'p', "port",                   "Port for incoming peers (Default: " TR_DEFAULT_PEER_PORT_STR ")", "p", 1, "<port>" },
     { 962, "port-test",              "Port testing", "pt", 0, NULL },
-    { 'P', "random-port",            "Random port for incomping peers", "P", 0, NULL },
+    { 'P', "random-port",            "Random port for incoming peers", "P", 0, NULL },
     { 900, "priority-high",          "Try to download these file(s) first", "ph", 1, "<files>" },
     { 901, "priority-normal",        "Try to download these file(s) normally", "pn", 1, "<files>" },
     { 902, "priority-low",           "Try to download these file(s) last", "pl", 1, "<files>" },
