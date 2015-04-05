@@ -330,10 +330,11 @@ tr_getDefaultConfigDir (const char * appname)
           find_directory (B_USER_SETTINGS_DIRECTORY, -1, true, buf, sizeof (buf));
           s = tr_buildPath (buf, appname, NULL);
 #else
-          if ((s = tr_env_get_string ("XDG_CONFIG_HOME", NULL)))
+          char * const xdg_config_home = tr_env_get_string ("XDG_CONFIG_HOME", NULL);
+          if (xdg_config_home != NULL)
             {
-              s = tr_buildPath (s, appname, NULL);
-              tr_free (s);
+              s = tr_buildPath (xdg_config_home, appname, NULL);
+              tr_free (xdg_config_home);
             }
           else
             {
