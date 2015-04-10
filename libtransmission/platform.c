@@ -23,7 +23,7 @@
 #ifdef _WIN32
  #include <process.h> /* _beginthreadex (), _endthreadex () */
  #include <windows.h>
- #include <shlobj.h> /* for CSIDL_APPDATA, CSIDL_MYDOCUMENTS */
+ #include <shlobj.h> /* SHGetKnownFolderPath (), FOLDERID_... */
 #else
 #include <unistd.h> /* getuid() */
  #ifdef BUILD_MAC_CLIENT
@@ -225,12 +225,19 @@ tr_lockUnlock (tr_lock * l)
 #ifdef _WIN32
 
 static char *
-win32_get_special_folder (int folder_id)
+win32_get_known_folder (REFKNOWNFOLDERID folder_id)
 {
-  wchar_t path[MAX_PATH]; /* SHGetFolderPath () requires MAX_PATH */
-  *path = L'\0';
-  SHGetFolderPathW (NULL, folder_id, NULL, 0, path);
-  return tr_win32_native_to_utf8 (path, -1);
+  char * ret = NULL;
+  PWSTR path;
+
+  if (SHGetKnownFolderPath (folder_id, KF_FLAG_DONT_UNEXPAND | KF_FLAG_DONT_VERIFY,
+                            NULL, &path) == S_OK)
+    {
+      ret = tr_win32_native_to_utf8 (path, -1);
+      CoTaskMemFree (path);
+    }
+
+  return ret;
 }
 
 #endif
@@ -247,7 +254,7 @@ getHomeDir (void)
       if (!home)
         {
 #ifdef _WIN32
-          home = win32_get_special_folder (CSIDL_PERSONAL);
+          home = win32_get_known_folder (&FOLDERID_Profile);
 #else
           struct passwd * pw = getpwuid (getuid ());
           if (pw)
@@ -322,7 +329,7 @@ tr_getDefaultConfigDir (const char * appname)
 #ifdef __APPLE__
           s = tr_buildPath (getHomeDir (), "Library", "Application Support", appname, NULL);
 #elif defined (_WIN32)
-          char * appdata = win32_get_special_folder (CSIDL_APPDATA);
+          char * appdata = win32_get_known_folder (&FOLDERID_LocalAppData);
           s = tr_buildPath (appdata, appname, NULL);
           tr_free (appdata);
 #elif defined (__HAIKU__)
@@ -391,6 +398,11 @@ tr_getDefaultDownloadDir (void)
                 }
             }
         }
+
+#ifdef _WIN32
+      if (user_dir == NULL)
+        user_dir = win32_get_known_folder (&FOLDERID_Downloads);
+#endif
 
       if (user_dir == NULL)
 #ifdef __HAIKU__
@@ -471,21 +483,16 @@ tr_getWebClientDir (const tr_session * session UNUSED)
           /* Generally, Web interface should be stored in a Web subdir of
            * calling executable dir. */
 
-          if (s == NULL) /* check personal AppData/Transmission/Web */
+          static REFKNOWNFOLDERID known_folder_ids[] =
             {
-              char * dir = win32_get_special_folder (CSIDL_COMMON_APPDATA);
-              s = tr_buildPath (dir, "Transmission", "Web", NULL);
-              tr_free (dir);
-              if (!isWebClientDir (s))
-                {
-                  tr_free (s);
-                  s = NULL;
-                }
-            }
+              &FOLDERID_LocalAppData,
+              &FOLDERID_RoamingAppData,
+              &FOLDERID_ProgramData
+            };
 
-          if (s == NULL) /* check personal AppData */
+          for (size_t i = 0; s == NULL && i < ARRAYSIZE (known_folder_ids); ++i)
             {
-              char * dir = win32_get_special_folder (CSIDL_APPDATA);
+              char * dir = win32_get_known_folder (known_folder_ids[i]);
               s = tr_buildPath (dir, "Transmission", "Web", NULL);
               tr_free (dir);
               if (!isWebClientDir (s))
