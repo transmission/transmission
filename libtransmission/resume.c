@@ -11,6 +11,7 @@
 
 #include "transmission.h"
 #include "completion.h"
+#include "error.h"
 #include "file.h"
 #include "log.h"
 #include "metainfo.h" /* tr_metainfoGetBasename () */
@@ -706,14 +707,16 @@ loadFromFile (tr_torrent * tor, uint64_t fieldsToLoad)
   bool boolVal;
   uint64_t fieldsLoaded = 0;
   const bool wasDirty = tor->isDirty;
+  tr_error * error = NULL;
 
   assert (tr_isTorrent (tor));
 
   filename = getResumeFilename (tor);
 
-  if (tr_variantFromFile (&top, TR_VARIANT_FMT_BENC, filename))
+  if (!tr_variantFromFile (&top, TR_VARIANT_FMT_BENC, filename, &error))
     {
-      tr_logAddTorDbg (tor, "Couldn't read \"%s\"", filename);
+      tr_logAddTorDbg (tor, "Couldn't read \"%s\": %s", filename, error->message);
+      tr_error_free (error);
 
       tr_free (filename);
       return fieldsLoaded;

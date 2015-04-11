@@ -1218,27 +1218,28 @@ tr_variantToFile (const tr_variant  * v,
 ****
 ***/
 
-int
+bool
 tr_variantFromFile (tr_variant      * setme,
                     tr_variant_fmt    fmt,
-                    const char      * filename)
+                    const char      * filename,
+                    tr_error       ** error)
 {
-  int err;
-  size_t buflen;
+  bool ret = false;
   uint8_t * buf;
-  const int old_errno = errno;
+  size_t buflen;
 
-  errno = 0;
-  buf = tr_loadFile (filename, &buflen);
+  buf = tr_loadFile (filename, &buflen, error);
+  if (buf != NULL)
+    {
+      if (tr_variantFromBuf (setme, fmt, buf, buflen, filename, NULL) == 0)
+        ret = true;
+      else
+        tr_error_set_literal (error, 0, _("Unable to parse file content"));
 
-  if (errno)
-    err = errno;
-  else
-    err = tr_variantFromBuf (setme, fmt, buf, buflen, filename, NULL);
+      tr_free (buf);
+    }
 
-  tr_free (buf);
-  errno = old_errno;
-  return err;
+  return ret;
 }
 
 int

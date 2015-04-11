@@ -281,7 +281,7 @@ tr_dhtInit (tr_session *ss)
         dht_debug = stderr;
 
     dat_file = tr_buildPath (ss->configDir, "dht.dat", NULL);
-    rc = tr_variantFromFile (&benc, TR_VARIANT_FMT_BENC, dat_file);
+    rc = tr_variantFromFile (&benc, TR_VARIANT_FMT_BENC, dat_file, NULL) ? 0 : -1;
     tr_free (dat_file);
     if (rc == 0) {
         have_id = tr_variantDictFindRaw (&benc, TR_KEY_id, &raw, &len);

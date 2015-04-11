@@ -14,17 +14,22 @@
 
 #include <windows.h>
 
+#define TR_ERROR_IS_ENOENT(code) ((code) == ERROR_FILE_NOT_FOUND || \
+                                  (code) == ERROR_PATH_NOT_FOUND)
 #define TR_ERROR_IS_ENOSPC(code) ((code) == ERROR_DISK_FULL)
 
 #define TR_ERROR_EINVAL ERROR_INVALID_PARAMETER
+#define TR_ERROR_EISDIR ERROR_DIRECTORY_NOT_SUPPORTED
 
 #else /* _WIN32 */
 
 #include <errno.h>
 
+#define TR_ERROR_IS_ENOENT(code) ((code) == ENOENT)
 #define TR_ERROR_IS_ENOSPC(code) ((code) == ENOSPC)
 
 #define TR_ERROR_EINVAL EINVAL
+#define TR_ERROR_EISDIR EISDIR
 
 #endif /* _WIN32 */
 

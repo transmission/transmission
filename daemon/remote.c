@@ -532,7 +532,7 @@ getEncodedMetainfo (const char * filename)
 {
     size_t    len = 0;
     char *    b64 = NULL;
-    uint8_t * buf = tr_loadFile (filename, &len);
+    uint8_t * buf = tr_loadFile (filename, &len, NULL);
 
     if (buf)
     {

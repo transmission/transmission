@@ -135,7 +135,7 @@ tr_ctorSetMetainfoFromFile (tr_ctor *    ctor,
     size_t    len;
     int       err;
 
-    metainfo = tr_loadFile (filename, &len);
+    metainfo = tr_loadFile (filename, &len, NULL);
     if (metainfo && len)
         err = tr_ctorSetMetainfo (ctor, metainfo, len);
     else

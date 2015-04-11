@@ -32,6 +32,8 @@
 #include "blocklist.h"
 #include "cache.h"
 #include "crypto-utils.h"
+#include "error.h"
+#include "error-types.h"
 #include "fdlimit.h"
 #include "file.h"
 #include "list.h"
@@ -456,12 +458,12 @@ tr_sessionGetSettings (tr_session * s, tr_variant * d)
 bool
 tr_sessionLoadSettings (tr_variant * dict, const char * configDir, const char * appName)
 {
-  int err = 0;
   char * filename;
   tr_variant fileSettings;
   tr_variant sessionDefaults;
   tr_variant tmp;
-  bool success = false;
+  bool success;
+  tr_error * error = NULL;
 
   assert (tr_variantIsDict (dict));
 
@@ -480,17 +482,21 @@ tr_sessionLoadSettings (tr_variant * dict, const char * configDir, const char * 
 
   /* file settings override the defaults */
   filename = tr_buildPath (configDir, "settings.json", NULL);
-  err = tr_variantFromFile (&fileSettings, TR_VARIANT_FMT_JSON, filename);
-  if (!err)
+  if (tr_variantFromFile (&fileSettings, TR_VARIANT_FMT_JSON, filename, &error))
     {
       tr_variantMergeDicts (dict, &fileSettings);
       tr_variantFree (&fileSettings);
+      success = true;
+    }
+  else
+    {
+      success = TR_ERROR_IS_ENOENT (error->code);
+      tr_error_free (error);
     }
 
   /* cleanup */
   tr_variantFree (&sessionDefaults);
   tr_free (filename);
-  success = (err==0) || (err==ENOENT);
   return success;
 }
 
@@ -509,8 +515,7 @@ tr_sessionSaveSettings (tr_session       * session,
   /* the existing file settings are the fallback values */
   {
     tr_variant fileSettings;
-    const int err = tr_variantFromFile (&fileSettings, TR_VARIANT_FMT_JSON, filename);
-    if (!err)
+    if (tr_variantFromFile (&fileSettings, TR_VARIANT_FMT_JSON, filename, NULL))
       {
         tr_variantMergeDicts (&settings, &fileSettings);
         tr_variantFree (&fileSettings);

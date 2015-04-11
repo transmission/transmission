@@ -132,8 +132,9 @@ bool tr_wildmat (const char * text, const char * pattern) TR_GNUC_NONNULL (1,2);
  * @brief Loads a file and returns its contents.
  * On failure, NULL is returned and errno is set.
  */
-uint8_t* tr_loadFile (const char * filename, size_t * size) TR_GNUC_MALLOC
-                                                             TR_GNUC_NONNULL (1);
+uint8_t * tr_loadFile (const char  * filename,
+                       size_t      * size,
+                       tr_error   ** error) TR_GNUC_MALLOC TR_GNUC_NONNULL (1);
 
 
 /** @brief build a filename from a series of elements using the

@@ -106,7 +106,7 @@ findInfoDictOffset (const tr_torrent * tor)
   int offset = 0;
 
   /* load the file, and find the info dict's offset inside the file */
-  if ((fileContents = tr_loadFile (tor->info.torrent, &fileLen)))
+  if ((fileContents = tr_loadFile (tor->info.torrent, &fileLen, NULL)))
     {
       tr_variant top;
 
@@ -253,7 +253,7 @@ tr_torrentSetMetadataPiece (tr_torrent  * tor, int piece, const void  * data, in
               tr_variant newMetainfo;
               char * path = tr_strdup (tor->info.torrent);
 
-              if (!tr_variantFromFile (&newMetainfo, TR_VARIANT_FMT_BENC, path))
+              if (tr_variantFromFile (&newMetainfo, TR_VARIANT_FMT_BENC, path, NULL))
                 {
                   bool hasInfo;
                   tr_info info;

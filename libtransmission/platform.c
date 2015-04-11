@@ -375,7 +375,7 @@ tr_getDefaultDownloadDir (void)
       tr_free (config_home);
 
       /* read in user-dirs.dirs and look for the download dir entry */
-      content = (char *) tr_loadFile (config_file, &content_len);
+      content = (char *) tr_loadFile (config_file, &content_len, NULL);
       if (content && content_len>0)
         {
           const char * key = "XDG_DOWNLOAD_DIR=\"";

@@ -19,6 +19,8 @@ extern "C" {
 
 struct evbuffer;
 
+struct tr_error;
+
 /**
  * @addtogroup tr_variant Variant
  *
@@ -120,9 +122,10 @@ struct evbuffer * tr_variantToBuf (const tr_variant * variant,
                                    tr_variant_fmt     fmt);
 
 /* TR_VARIANT_FMT_JSON_LEAN and TR_VARIANT_FMT_JSON are equivalent here. */
-int tr_variantFromFile (tr_variant      * setme,
-                        tr_variant_fmt    fmt,
-                        const char      * filename);
+bool tr_variantFromFile (tr_variant       * setme,
+                         tr_variant_fmt     fmt,
+                         const char       * filename,
+                         struct tr_error ** error);
 
 /* TR_VARIANT_FMT_JSON_LEAN and TR_VARIANT_FMT_JSON are equivalent here. */
 int tr_variantFromBuf (tr_variant     * setme,

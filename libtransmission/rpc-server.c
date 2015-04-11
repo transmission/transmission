@@ -429,27 +429,27 @@ serve_file (struct evhttp_request  * req,
     {
       void * file;
       size_t file_len;
-      struct evbuffer * content;
-      const int error = errno;
+      tr_error * error = NULL;
 
-      errno = 0;
       file_len = 0;
-      file = tr_loadFile (filename, &file_len);
-      content = evbuffer_new ();
-      evbuffer_add_reference (content, file, file_len, evbuffer_ref_cleanup_tr_free, file);
+      file = tr_loadFile (filename, &file_len, &error);
 
-      if (errno)
+      if (file == NULL)
         {
-          char * tmp = tr_strdup_printf ("%s (%s)", filename, tr_strerror (errno));
+          char * tmp = tr_strdup_printf ("%s (%s)", filename, error->message);
           send_simple_response (req, HTTP_NOTFOUND, tmp);
           tr_free (tmp);
+          tr_error_free (error);
         }
       else
         {
+          struct evbuffer * content;
           struct evbuffer * out;
           const time_t now = tr_time ();
 
-          errno = error;
+          content = evbuffer_new ();
+          evbuffer_add_reference (content, file, file_len, evbuffer_ref_cleanup_tr_free, file);
+
           out = evbuffer_new ();
           evhttp_add_header (req->output_headers, "Content-Type", mimetype_guess (filename));
           add_time_header (req->output_headers, "Date", now);
@@ -458,9 +458,8 @@ serve_file (struct evhttp_request  * req,
           evhttp_send_reply (req, HTTP_OK, "OK", out);
 
           evbuffer_free (out);
+          evbuffer_free (content);
         }
-
-      evbuffer_free (content);
     }
 }
 

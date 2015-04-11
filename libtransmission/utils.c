@@ -213,29 +213,28 @@ tr_timerAddMsec (struct event * timer, int msec)
 **/
 
 uint8_t *
-tr_loadFile (const char * path,
-             size_t     * size)
+tr_loadFile (const char  * path,
+             size_t      * size,
+             tr_error   ** error)
 {
   uint8_t * buf;
   tr_sys_path_info info;
   tr_sys_file_t fd;
-  tr_error * error = NULL;
+  tr_error * my_error = NULL;
   const char * const err_fmt = _("Couldn't read \"%1$s\": %2$s");
 
   /* try to stat the file */
-  if (!tr_sys_path_get_info (path, 0, &info, &error))
+  if (!tr_sys_path_get_info (path, 0, &info, &my_error))
     {
-      const int err = error->code;
-      tr_logAddDebug (err_fmt, path, error->message);
-      tr_error_free (error);
-      errno = err;
+      tr_logAddDebug (err_fmt, path, my_error->message);
+      tr_error_propagate (error, &my_error);
       return NULL;
     }
 
   if (info.type != TR_SYS_PATH_IS_FILE)
     {
       tr_logAddError (err_fmt, path, _("Not a regular file"));
-      errno = EISDIR;
+      tr_error_set_literal (error, TR_ERROR_EISDIR, _("Not a regular file"));
       return NULL;
     }
 
@@ -244,32 +243,22 @@ tr_loadFile (const char * path,
     assert (info.size <= SIZE_MAX);
 
   /* Load the torrent file into our buffer */
-  fd = tr_sys_file_open (path, TR_SYS_FILE_READ | TR_SYS_FILE_SEQUENTIAL, 0, &error);
+  fd = tr_sys_file_open (path, TR_SYS_FILE_READ | TR_SYS_FILE_SEQUENTIAL, 0, &my_error);
   if (fd == TR_BAD_SYS_FILE)
     {
-      const int err = error->code;
-      tr_logAddError (err_fmt, path, error->message);
-      tr_error_free (error);
-      errno = err;
+      tr_logAddError (err_fmt, path, my_error->message);
+      tr_error_propagate (error, &my_error);
       return NULL;
     }
+
   buf = tr_malloc (info.size + 1);
-  if (!buf)
+
+  if (!tr_sys_file_read (fd, buf, info.size, NULL, &my_error))
     {
-      const int err = errno;
-      tr_logAddError (err_fmt, path, _("Memory allocation failed"));
-      tr_sys_file_close (fd, NULL);
-      errno = err;
-      return NULL;
-    }
-  if (!tr_sys_file_read (fd, buf, info.size, NULL, &error))
-    {
-      const int err = error->code;
-      tr_logAddError (err_fmt, path, error->message);
+      tr_logAddError (err_fmt, path, my_error->message);
       tr_sys_file_close (fd, NULL);
       free (buf);
-      tr_error_free (error);
-      errno = err;
+      tr_error_propagate (error, &my_error);
       return NULL;
     }
 

@@ -53,9 +53,10 @@ testFileExistsAndConsistsOfThisString (const tr_torrent * tor, tr_file_index_t f
 
       assert (tr_sys_path_exists (path, NULL));
 
-      contents = tr_loadFile (path, &contents_len);
+      contents = tr_loadFile (path, &contents_len, NULL);
 
-      success = (str_len == contents_len)
+      success = contents != NULL
+             && (str_len == contents_len)
              && (!memcmp (contents, str, contents_len));
 
       tr_free (contents);

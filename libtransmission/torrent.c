@@ -2660,7 +2660,7 @@ tr_torrentSetAnnounceList (tr_torrent             * tor,
       ok = false;
 
   /* save to the .torrent file */
-  if (ok && !tr_variantFromFile (&metainfo, TR_VARIANT_FMT_BENC, tor->info.torrent))
+  if (ok && tr_variantFromFile (&metainfo, TR_VARIANT_FMT_BENC, tor->info.torrent, NULL))
     {
       bool hasInfo;
       tr_info tmpInfo;

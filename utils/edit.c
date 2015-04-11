@@ -14,6 +14,7 @@
 #include <event2/buffer.h>
 
 #include <libtransmission/transmission.h>
+#include <libtransmission/error.h>
 #include <libtransmission/tr-getopt.h>
 #include <libtransmission/utils.h>
 #include <libtransmission/variant.h>
@@ -328,12 +329,14 @@ main (int argc, char * argv[])
       tr_variant top;
       bool changed = false;
       const char * filename = files[i];
+      tr_error * error = NULL;
 
       printf ("%s\n", filename);
 
-      if (tr_variantFromFile (&top, TR_VARIANT_FMT_BENC, filename))
+      if (!tr_variantFromFile (&top, TR_VARIANT_FMT_BENC, filename, &error))
         {
-          printf ("\tError reading file\n");
+          printf ("\tError reading file: %s\n", error->message);
+          tr_error_free (error);
           continue;
         }
 

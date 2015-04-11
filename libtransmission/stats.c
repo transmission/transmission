@@ -50,13 +50,13 @@ loadCumulativeStats (const tr_session * session, tr_session_stats * setme)
   bool loaded = false;
 
   filename = getFilename (session);
-  loaded = !tr_variantFromFile (&top, TR_VARIANT_FMT_JSON, filename);
+  loaded = tr_variantFromFile (&top, TR_VARIANT_FMT_JSON, filename, NULL);
   tr_free (filename);
 
   if (!loaded)
     {
       filename = getOldFilename (session);
-      loaded = !tr_variantFromFile (&top, TR_VARIANT_FMT_BENC, filename);
+      loaded = tr_variantFromFile (&top, TR_VARIANT_FMT_BENC, filename, NULL);
       tr_free (filename);
     }
 

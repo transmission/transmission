@@ -287,7 +287,7 @@ main (int argc, char ** argv)
 
   ctor = tr_ctorNew (h);
 
-  fileContents = tr_loadFile (torrentPath, &fileLength);
+  fileContents = tr_loadFile (torrentPath, &fileLength, NULL);
   tr_ctorSetPaused (ctor, TR_FORCE, false);
   if (fileContents != NULL)
     {
