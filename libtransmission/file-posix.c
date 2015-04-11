@@ -42,6 +42,7 @@
 #endif
 
 #include "transmission.h"
+#include "error.h"
 #include "file.h"
 #include "log.h"
 #include "platform.h"

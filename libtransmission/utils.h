@@ -15,8 +15,6 @@
 #include <stddef.h> /* size_t */
 #include <time.h> /* time_t */
 
-#include "error.h"
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -24,6 +22,12 @@ extern "C" {
 /***
 ****
 ***/
+
+struct evbuffer;
+struct event;
+struct timeval;
+
+struct tr_error;
 
 /**
  * @addtogroup utils Utilities
@@ -132,9 +136,9 @@ bool tr_wildmat (const char * text, const char * pattern) TR_GNUC_NONNULL (1,2);
  * @brief Loads a file and returns its contents.
  * On failure, NULL is returned and errno is set.
  */
-uint8_t * tr_loadFile (const char  * filename,
-                       size_t      * size,
-                       tr_error   ** error) TR_GNUC_MALLOC TR_GNUC_NONNULL (1);
+uint8_t * tr_loadFile (const char       * filename,
+                       size_t           * size,
+                       struct tr_error ** error) TR_GNUC_MALLOC TR_GNUC_NONNULL (1);
 
 
 /** @brief build a filename from a series of elements using the
@@ -147,9 +151,6 @@ char* tr_buildPath (const char * first_element, ...) TR_GNUC_NULL_TERMINATED
  * @return zero or positive integer on success, -1 in case of error.
  */
 int64_t tr_getDirFreeSpace (const char * path);
-
-
-struct event;
 
 /**
  * @brief Convenience wrapper around timer_add () to have a timer wake up in a number of seconds and microseconds
@@ -261,10 +262,6 @@ char* tr_strdup (const void * in);
  * @brief like strcmp () but gracefully handles NULL strings
  */
 int tr_strcmp0 (const char * str1, const char * str2);
-
-
-
-struct evbuffer;
 
 char* evbuffer_free_to_str (struct evbuffer * buf);
 
@@ -390,8 +387,6 @@ char* tr_strratio (char * buf, size_t buflen, double ratio, const char * infinit
 /** @brief Portability wrapper for localtime_r () that uses the system implementation if available */
 struct tm * tr_localtime_r (const time_t *_clock, struct tm *_result);
 
-struct timeval;
-
 /** @brief Portability wrapper for gettimeofday (), with tz argument dropped */
 int tr_gettimeofday (struct timeval * tv);
 
@@ -400,8 +395,9 @@ int tr_gettimeofday (struct timeval * tv);
  * @brief move a file
  * @return `True` on success, `false` otherwise (with `error` set accordingly).
  */
-bool tr_moveFile (const char * oldpath, const char * newpath,
-                  tr_error ** error) TR_GNUC_NONNULL (1,2);
+bool tr_moveFile (const char       * oldpath,
+                  const char       * newpath,
+                  struct tr_error ** error) TR_GNUC_NONNULL (1,2);
 
 /** @brief convenience function to remove an item from an array */
 void tr_removeElementFromArray (void         * array,

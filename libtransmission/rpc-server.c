@@ -21,6 +21,7 @@
 #include "transmission.h"
 #include "crypto.h" /* tr_ssha1_matches () */
 #include "crypto-utils.h" /* tr_rand_buffer () */
+#include "error.h"
 #include "fdlimit.h"
 #include "list.h"
 #include "log.h"

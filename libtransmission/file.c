@@ -11,6 +11,7 @@
 #include <string.h> /* strlen () */
 
 #include "transmission.h"
+#include "error.h"
 #include "file.h"
 #include "utils.h"
 

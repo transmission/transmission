@@ -15,6 +15,7 @@
 
 #include "transmission.h"
 #include "crypto-utils.h" /* tr_rand_int () */
+#include "error.h"
 #include "file.h"
 #include "utils.h"
 
