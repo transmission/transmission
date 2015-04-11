@@ -14,6 +14,11 @@
 
 #include <windows.h>
 
+/* MinGW :( */
+#ifndef ERROR_DIRECTORY_NOT_SUPPORTED
+ #define ERROR_DIRECTORY_NOT_SUPPORTED 336
+#endif
+
 #define TR_ERROR_IS_ENOENT(code) ((code) == ERROR_FILE_NOT_FOUND || \
                                   (code) == ERROR_PATH_NOT_FOUND)
 #define TR_ERROR_IS_ENOSPC(code) ((code) == ERROR_DISK_FULL)
