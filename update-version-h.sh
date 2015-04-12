@@ -20,9 +20,13 @@ peer_id_prefix=`grep m4_define configure.ac | sed "s/[][)(]/,/g" | grep peer_id_
 major_version=`echo ${user_agent_prefix} | awk -F . '{print $1}'`
 minor_version=`echo ${user_agent_prefix} | awk -F . '{print $2 + 0}'`
 
-# If this is a svn tree, and svnversion is available in PATH, use it to
-# grab the version.
-if [ -d ".svn" ] && type svnversion >/dev/null 2>&1; then
+if [ -n "$JENKINS_URL" -a -n "$SVN_REVISION" ]; then
+    # Jenkins automated build, use the set environment variables to avoid
+    # version mismatches between java's svn and command line's svn
+    svn_revision=$SVN_REVISION
+elif [ -d ".svn" ] && type svnversion >/dev/null 2>&1; then
+    # If this is a svn tree, and svnversion is available in PATH, use it to
+    # grab the version.
     svn_revision=`svnversion -n . | cut -d: -f1 | cut -dM -f1 | cut -dS -f1`
 else
     # Give up and check the source files
