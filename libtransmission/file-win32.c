@@ -122,7 +122,7 @@ open_file (const char  * path,
   wide_path = tr_win32_utf8_to_native (path, -1);
 
   if (wide_path != NULL)
-    ret = CreateFileW (wide_path, access, FILE_SHARE_READ | FILE_SHARE_WRITE,
+    ret = CreateFileW (wide_path, access, FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
                        NULL, disposition, flags, NULL);
 
   if (ret == TR_BAD_SYS_FILE)
