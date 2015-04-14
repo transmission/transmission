@@ -104,6 +104,8 @@ macro(tr_add_external_auto_library ID LIBNAME)
                 "-DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR>"
         )
 
+        set_property(TARGET ${${ID}_UPSTREAM_TARGET} PROPERTY FOLDER "ThirdParty")
+
         set(${ID}_INCLUDE_DIR "${${ID}_PREFIX}/include" CACHE INTERNAL "")
         set(${ID}_LIBRARY "${${ID}_PREFIX}/lib/${CMAKE_STATIC_LIBRARY_PREFIX}${LIBNAME}${CMAKE_STATIC_LIBRARY_SUFFIX}" CACHE INTERNAL "")
 
@@ -118,4 +120,21 @@ function(tr_append_target_property TGT PROP VAL)
         set(VAL "${OVAL} ${VAL}")
     endif()
     set_target_properties(${TGT} PROPERTIES ${PROP} "${VAL}")
+endfunction()
+
+function(tr_win32_app_info OVAR DESCR INTNAME ORIGFNAME)
+    if(NOT WIN32)
+        return()
+    endif()
+
+    set(TR_FILE_DESCRIPTION "${DESCR}")
+    set(TR_INTERNAL_NAME "${INTNAME}")
+    set(TR_ORIGINAL_FILENAME "${ORIGFNAME}")
+    if(ARGN)
+        set(TR_MAIN_ICON "${ARGN}")
+    endif()
+
+    configure_file("${CMAKE_SOURCE_DIR}/cmake/Transmission.rc.in" "${INTNAME}.rc")
+
+    set(${OVAR} "${CMAKE_CURRENT_BINARY_DIR}/${INTNAME}.rc" PARENT_SCOPE)
 endfunction()

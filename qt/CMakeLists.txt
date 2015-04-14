@@ -167,12 +167,19 @@ add_definitions(
     -DQT_NO_CAST_FROM_ASCII
 )
 
+tr_win32_app_info(${PROJECT_NAME}_WIN32_RC_FILE
+    "Transmission Qt Client"
+    "transmission-qt"
+    "transmission-qt.exe"
+    "qtr.ico")
+
 add_executable(${TR_NAME}-qt WIN32
     ${${PROJECT_NAME}_SOURCES}
     ${${PROJECT_NAME}_UI_SOURCES}
     ${${PROJECT_NAME}_QRC_SOURCES}
     ${${PROJECT_NAME}_HEADERS}
     ${${PROJECT_NAME}_QM_FILES}
+    ${${PROJECT_NAME}_WIN32_RC_FILE}
 )
 
 target_link_libraries(${TR_NAME}-qt

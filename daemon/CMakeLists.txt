@@ -34,7 +34,15 @@ set(${PROJECT_NAME}_HEADERS
     watch.h
 )
 
-add_executable(${TR_NAME}-daemon ${${PROJECT_NAME}_SOURCES} ${${PROJECT_NAME}_HEADERS})
+tr_win32_app_info(${PROJECT_NAME}_WIN32_RC_FILE
+    "Transmission Daemon"
+    "${TR_NAME}-daemon"
+    "${TR_NAME}-daemon.exe")
+
+add_executable(${TR_NAME}-daemon
+    ${${PROJECT_NAME}_SOURCES}
+    ${${PROJECT_NAME}_HEADERS}
+    ${${PROJECT_NAME}_WIN32_RC_FILE})
 
 set_target_properties(${TR_NAME}-daemon PROPERTIES
     COMPILE_FLAGS "${SYSTEMD_DAEMON_CFLAGS}"
@@ -46,7 +54,12 @@ target_link_libraries(${TR_NAME}-daemon
     ${EVENT2_LIBRARIES}
 )
 
-add_executable(${TR_NAME}-remote remote.c)
+tr_win32_app_info(${PROJECT_NAME}_remote_WIN32_RC_FILE
+    "Transmission Utility ('remote')"
+    "${TR_NAME}-remote"
+    "${TR_NAME}-remote.exe")
+
+add_executable(${TR_NAME}-remote remote.c ${${PROJECT_NAME}_remote_WIN32_RC_FILE})
 
 target_link_libraries(${TR_NAME}-remote
     ${TR_NAME}

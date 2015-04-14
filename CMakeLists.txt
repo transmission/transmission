@@ -92,6 +92,8 @@ if("${TR_SCM_REVISION}" STREQUAL "")
     set(TR_SCM_REVISION 0)
 endif()
 
+set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+
 set(CURL_MINIMUM            7.15.4)
 set(EVENT2_MINIMUM          2.0.10)
 set(OPENSSL_MINIMUM         0.9.4)

@@ -3,7 +3,12 @@ project(trutils)
 include_directories(${CMAKE_SOURCE_DIR})
 
 foreach(P create edit show)
-    add_executable(${TR_NAME}-${P} ${P}.c)
+    tr_win32_app_info(${PROJECT_NAME}_${P}_WIN32_RC_FILE
+        "Transmission Utility ('${P}')"
+        "${TR_NAME}-${P}"
+        "${TR_NAME}-${P}.exe")
+
+    add_executable(${TR_NAME}-${P} ${P}.c ${${PROJECT_NAME}_${P}_WIN32_RC_FILE})
     include_directories(${TR_NAME}-${P} ${EVENT2_INCLUDE_DIRS} ${CURL_INCLUDE_DIRS})
     target_link_libraries(${TR_NAME}-${P} ${TR_NAME})
 

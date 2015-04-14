@@ -224,6 +224,7 @@ if(ENABLE_TESTS)
     )
 
     target_link_libraries(${TR_NAME}-test ${TR_NAME})
+    set_property(TARGET ${TR_NAME}-test PROPERTY FOLDER "UnitTests")
 
     set(crypto-test_ADD_SOURCES crypto-test-ref.h)
 
@@ -232,6 +233,7 @@ if(ENABLE_TESTS)
         add_executable(${TP} ${T}-test.c ${${T}-test_ADD_SOURCES})
         target_link_libraries(${TP} ${TR_NAME} ${TR_NAME}-test)
         add_test(${T} ${TP})
+        set_property(TARGET ${TP} PROPERTY FOLDER "UnitTests")
     endforeach()
 endif()
 
