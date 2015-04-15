@@ -8,6 +8,7 @@
  */
 
 #include <QApplication>
+#include <QDir>
 #include <QFileDialog>
 #include <QFileIconProvider>
 #include <QFileInfo>
@@ -63,7 +64,7 @@ TrPathButton::setPath (const QString& path)
   if (myPath == path)
     return;
 
-  myPath = Utils::removeTrailingDirSeparator (path);
+  myPath = QDir::toNativeSeparators (Utils::removeTrailingDirSeparator (path));
 
   updateAppearance ();
 
@@ -114,7 +115,20 @@ TrPathButton::onClicked ()
     dialog->setOption (QFileDialog::ShowDirsOnly);
   if (!myNameFilter.isEmpty ())
     dialog->setNameFilter (myNameFilter);
-  dialog->selectFile (myPath);
+
+  const QFileInfo pathInfo (myPath);
+  if (!myPath.isEmpty () && pathInfo.exists ())
+    {
+      if (pathInfo.isDir ())
+        {
+          dialog->setDirectory (pathInfo.absoluteFilePath ());
+        }
+      else
+        {
+          dialog->setDirectory (pathInfo.absolutePath ());
+          dialog->selectFile (pathInfo.fileName ());
+        }
+    }
 
   connect (dialog, SIGNAL (fileSelected (QString)), this, SLOT (onFileSelected (QString)));
 

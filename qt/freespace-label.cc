@@ -7,6 +7,8 @@
  * $Id$
  */
 
+#include <QDir>
+
 #include <libtransmission/transmission.h>
 #include <libtransmission/variant.h>
 
@@ -98,7 +100,7 @@ FreespaceLabel::onSessionExecuted (int64_t tag, const QString& result, tr_varian
   const char * path = 0;
   tr_variantDictFindStr (arguments, TR_KEY_path, &path, &len);
   str = QString::fromUtf8 (path, len);
-  setToolTip (str);
+  setToolTip (QDir::toNativeSeparators (str));
 
   myTimer.start ();
 }
