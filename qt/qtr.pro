@@ -49,7 +49,8 @@ TRANSLATIONS += translations/transmission_en.ts \
                 translations/transmission_lt.ts \
                 translations/transmission_pt_BR.ts \
                 translations/transmission_ru.ts \
-                translations/transmission_uk.ts
+                translations/transmission_uk.ts \
+                translations/transmission_zh_CN.ts
 
 FORMS += about.ui \
          details.ui \

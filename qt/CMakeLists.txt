@@ -137,6 +137,7 @@ set(${PROJECT_NAME}_LINGUAS
     pt_BR
     ru
     uk
+    zh_CN
 )
 
 if(ENABLE_NLS)
