@@ -103,13 +103,13 @@ WatchDir::watcherActivated (const QString& path)
 
   // get the list of files currently in the watch directory
   QSet<QString> files;
-  foreach (QString str, dir.entryList (QDir::Readable|QDir::Files))
+  for (const QString& str: dir.entryList (QDir::Readable|QDir::Files))
     files.insert (str);
 
   // try to add any new files which end in .torrent
   const QSet<QString> newFiles (files - myWatchDirFiles);
   const QString torrentSuffix = QString::fromUtf8 (".torrent");
-  foreach (QString name, newFiles)
+  for (const QString& name: newFiles)
     {
       if (name.endsWith (torrentSuffix, Qt::CaseInsensitive))
         {
@@ -147,6 +147,6 @@ WatchDir::rescanAllWatchedDirectories ()
   if (myWatcher == nullptr)
     return;
 
-  foreach (const QString& path, myWatcher->directories ())
+  for (const QString& path: myWatcher->directories ())
     watcherActivated (path);
 }

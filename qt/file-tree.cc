@@ -175,7 +175,7 @@ FileTreeItem::getSubtreeWantedSize (uint64_t& have, uint64_t& total) const
       total += myTotalSize;
     }
 
-  foreach(const FileTreeItem * i, myChildren)
+  for (const FileTreeItem * const i: myChildren)
     i->getSubtreeWantedSize(have, total);
 }
 
@@ -302,7 +302,7 @@ FileTreeItem::priority () const
         }
     }
 
-  foreach (const FileTreeItem * child, myChildren)
+  for (const FileTreeItem * const child: myChildren)
     i |= child->priority();
 
   return i;
@@ -319,7 +319,7 @@ FileTreeItem::setSubtreePriority (int i, QSet<int>& ids)
         ids.insert (myFileIndex);
     }
 
-  foreach (FileTreeItem * child, myChildren)
+  for (FileTreeItem * const child: myChildren)
     child->setSubtreePriority (i, ids);
 }
 
@@ -345,7 +345,7 @@ FileTreeItem::isSubtreeWanted () const
     return myIsWanted ? Qt::Checked : Qt::Unchecked;
 
   int wanted(-1);
-  foreach (const FileTreeItem * child, myChildren)
+  for (const FileTreeItem * const child: myChildren)
     {
       const int childWanted = child->isSubtreeWanted();
 
@@ -373,7 +373,7 @@ FileTreeItem::setSubtreeWanted (bool b, QSet<int>& ids)
         ids.insert(myFileIndex);
     }
 
-  foreach (FileTreeItem * child, myChildren)
+  for (FileTreeItem * const child: myChildren)
     child->setSubtreeWanted (b, ids);
 }
 
@@ -985,13 +985,13 @@ FileTreeView::eventFilter (QObject * o, QEvent * event)
       switch (static_cast<QKeyEvent*> (event)->key ())
         {
         case Qt::Key_Space:
-          foreach (const QModelIndex& i, selectionModel ()->selectedRows (COL_WANTED))
+          for (const QModelIndex& i: selectionModel ()->selectedRows (COL_WANTED))
             clicked (i);
           break;
 
         case Qt::Key_Enter:
         case Qt::Key_Return:
-          foreach (const QModelIndex& i, selectionModel ()->selectedRows (COL_PRIORITY))
+          for (const QModelIndex& i: selectionModel ()->selectedRows (COL_PRIORITY))
             clicked (i);
           break;
         }
@@ -1003,11 +1003,11 @@ FileTreeView::eventFilter (QObject * o, QEvent * event)
 void
 FileTreeView::update (const FileList& files, bool updateFields)
 {
-  foreach (const TrFile file, files)
+  for (const TrFile& file: files)
     {
       QList<QModelIndex> added;
       myModel.addFile (file.index, file.filename, file.wanted, file.priority, file.size, file.have, added, updateFields);
-      foreach (QModelIndex i, added)
+      for (const QModelIndex& i: added)
         expand (myProxy->mapFromSource(i));
     }
 }

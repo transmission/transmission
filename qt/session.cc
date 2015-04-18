@@ -66,7 +66,7 @@ namespace
   addList (tr_variant * list, const KeyList& keys)
   {
     tr_variantListReserve (list, keys.size ());
-    foreach (tr_quark key, keys)
+    for (const tr_quark key: keys)
       tr_variantListAddQuark (list, key);
   }
 }
@@ -390,7 +390,7 @@ namespace
     if (!ids.isEmpty ())
       {
         tr_variant * idList (tr_variantDictAddList (args, TR_KEY_ids, ids.size ()));
-        foreach (int i, ids)
+        for (const int i: ids)
           tr_variantListAddInt (idList, i);
       }
   }
@@ -436,7 +436,7 @@ Session::torrentSet (const QSet<int>& ids, const tr_quark key, const QStringList
   tr_variantInitDict (&args, 2);
   addOptionalIds (&args, ids);
   tr_variant * list (tr_variantDictAddList (&args, key, value.size ()));
-  foreach (const QString& str, value)
+  for (const QString& str: value)
     tr_variantListAddStr (list, str.toUtf8 ().constData ());
 
   exec(TR_KEY_torrent_set, &args);
@@ -449,7 +449,7 @@ Session::torrentSet (const QSet<int>& ids, const tr_quark key, const QList<int>&
   tr_variantInitDict (&args, 2);
   addOptionalIds (&args, ids);
   tr_variant * list (tr_variantDictAddList (&args, key, value.size ()));
-  foreach (int i, value)
+  for (const int i: value)
     tr_variantListAddInt (list, i);
 
   exec (TR_KEY_torrent_set, &args);

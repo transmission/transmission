@@ -77,7 +77,7 @@ namespace
                    const QStringList& searchDirectories)
   {
     const QString filename = name + QLatin1Char ('_') + localeName;
-    foreach (const QString& directory, searchDirectories)
+    for (const QString& directory: searchDirectories)
     {
       if (translator.load (filename, directory))
         return true;
@@ -134,7 +134,7 @@ MyApp::MyApp (int& argc, char ** argv):
     {
       QList<int> sizes;
       sizes << 16 << 22 << 24 << 32 << 48 << 64 << 72 << 96 << 128 << 192 << 256;
-      foreach (int size, sizes)
+      for (const int size: sizes)
         icon.addPixmap (QPixmap (QString::fromLatin1 (":/icons/transmission-%1.png").arg (size)));
     }
   setWindowIcon (icon);
@@ -180,14 +180,14 @@ MyApp::MyApp (int& argc, char ** argv):
   if (bus.isConnected ())
   {
     bool delegated = false;
-    for (int i=0, n=filenames.size (); i<n; ++i)
+    for (const QString& filename: filenames)
       {
         QDBusMessage request = QDBusMessage::createMethodCall (DBUS_SERVICE,
                                                                DBUS_OBJECT_PATH,
                                                                DBUS_INTERFACE,
                                                                QString::fromUtf8 ("AddMetainfo"));
         QList<QVariant> arguments;
-        AddData a (filenames[i]);
+        AddData a (filename);
         switch (a.type)
           {
             case AddData::URL:      arguments.push_back (a.url.toString ()); break;
@@ -267,7 +267,7 @@ MyApp::MyApp (int& argc, char ** argv):
   // init from preferences
   QList<int> initKeys;
   initKeys << Prefs::DIR_WATCH;
-  foreach (int key, initKeys)
+  for (const int key: initKeys)
     refreshPref (key);
   connect (myPrefs, SIGNAL (changed (int)), this, SLOT (refreshPref (const int)));
 
@@ -318,8 +318,8 @@ MyApp::MyApp (int& argc, char ** argv):
       dialog->show ();
     }
 
-  for (QStringList::const_iterator it=filenames.begin (), end=filenames.end (); it!=end; ++it)
-    addTorrent (*it);
+  for (const QString& filename: filenames)
+    addTorrent (filename);
 
   // register as the dbus handler for Transmission
   if (bus.isConnected ())
@@ -346,7 +346,7 @@ MyApp::onTorrentsAdded (const QSet<int>& torrents)
   if (!myPrefs->getBool (Prefs::SHOW_NOTIFICATION_ON_ADD))
     return;
 
-  foreach (int id, torrents)
+  for (const int id: torrents)
     {
       Torrent * tor = myModel->getTorrentFromId (id);
 

@@ -260,7 +260,7 @@ TrMainWindow::TrMainWindow (Session& session, Prefs& prefs, TorrentModel& model,
            << Prefs::USPEED_ENABLED
            << Prefs::RATIO
            << Prefs::RATIO_ENABLED;
-  foreach (int key, initKeys)
+  for (const int key: initKeys)
     refreshPref (key);
 
   connect (&mySession, SIGNAL (sourceChanged ()), this, SLOT (onSessionSourceChanged ()));
@@ -381,7 +381,7 @@ TrMainWindow::createOptionsMenu ()
     g->addAction (a);
     connect (a, SIGNAL (triggered (bool)), this, SLOT (onSetPrefs (bool)));
     sub->addSeparator ();
-    foreach (int i, stockSpeeds)
+    for (const int i: stockSpeeds)
       {
         a = sub->addAction (Formatter::speedToString (Speed::fromKBps (i)));
         a->setProperty (PREF_VARIANTS_KEY, QVariantList () << Prefs::DSPEED << i << Prefs::DSPEED_ENABLED << true);
@@ -403,7 +403,7 @@ TrMainWindow::createOptionsMenu ()
     g->addAction (a);
     connect (a, SIGNAL (triggered (bool)), this, SLOT (onSetPrefs (bool)));
     sub->addSeparator ();
-    foreach (int i, stockSpeeds)
+    for (const int i: stockSpeeds)
       {
         a = sub->addAction (Formatter::speedToString (Speed::fromKBps (i)));
         a->setProperty (PREF_VARIANTS_KEY, QVariantList () << Prefs::USPEED << i << Prefs::USPEED_ENABLED << true);
@@ -426,7 +426,7 @@ TrMainWindow::createOptionsMenu ()
     g->addAction (a);
     connect (a, SIGNAL (triggered (bool)), this, SLOT (onSetPrefs (bool)));
     sub->addSeparator ();
-    foreach (double i, stockRatios)
+    for (const double i: stockRatios)
       {
         a = sub->addAction (Formatter::ratioToString (i));
         a->setProperty (PREF_VARIANTS_KEY, QVariantList () << Prefs::RATIO << i << Prefs::RATIO_ENABLED << true);
@@ -811,7 +811,7 @@ TrMainWindow::getSelectedTorrents () const
 {
   QSet<int> ids;
 
-  foreach (QModelIndex index, ui.listView->selectionModel ()->selectedRows ())
+  for (const QModelIndex& index: ui.listView->selectionModel ()->selectedRows ())
     {
       const Torrent * tor (index.data (TorrentModel::TorrentRole).value<const Torrent*> ());
       ids.insert (tor->id ());
@@ -1164,7 +1164,7 @@ TrMainWindow::addTorrents (const QStringList& filenames)
         showOptions = b->isChecked ();
     }
 
-  foreach (const QString& filename, filenames)
+  for (const QString& filename: filenames)
     addTorrent (filename, showOptions);
 }
 
@@ -1194,7 +1194,7 @@ TrMainWindow::removeTorrents (const bool deleteFiles)
   int connected  = 0;
   int count;
 
-  foreach (QModelIndex index, ui.listView->selectionModel ()->selectedRows ())
+  for (const QModelIndex& index: ui.listView->selectionModel ()->selectedRows ())
     {
       const Torrent * tor (index.data (TorrentModel::TorrentRole).value<const Torrent*> ());
       ids.insert (tor->id ());
@@ -1408,11 +1408,11 @@ TrMainWindow::dropEvent (QDropEvent * event)
     }
   else if (event->mimeData()->hasUrls())
     {
-      foreach (QUrl url, event->mimeData()->urls())
+      for (const QUrl& url: event->mimeData()->urls())
         list.append(url.toLocalFile());
     }
 
-  foreach (QString entry, list)
+  for (const QString& entry: list)
     {
       QString key = entry.trimmed();
 

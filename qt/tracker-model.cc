@@ -81,13 +81,13 @@ TrackerModel::refresh (const TorrentModel& torrentModel, const QSet<int>& ids)
 {
   // build a list of the TrackerInfos
   QVector<TrackerInfo> trackers;
-  foreach (int id, ids)
+  for (const int id: ids)
     {
       const Torrent * tor = torrentModel.getTorrentFromId (id);
       if (tor != 0)
         {
           const TrackerStatsList trackerList = tor->trackerStats ();
-          foreach (const TrackerStat& st, trackerList)
+          for (const TrackerStat& st: trackerList)
             {
               TrackerInfo trackerInfo;
               trackerInfo.st = st;

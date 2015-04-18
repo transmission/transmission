@@ -442,12 +442,12 @@ FilterBar::refreshTrackers ()
         break;
       const Torrent * tor = index.data (TorrentModel::TorrentRole).value<const Torrent*> ();
       QSet<QString> torrentNames;
-      foreach (QString host, tor->hosts ())
+      for (const QString& host: tor->hosts ())
         {
           newHosts.insert (host);
           torrentNames.insert (readableHostName (host));
         }
-      foreach (QString name, torrentNames)
+      for (const QString& name: torrentNames)
         ++torrentsPerHost[name];
     }
 
@@ -456,7 +456,7 @@ FilterBar::refreshTrackers ()
   myTrackerModel->setData (myTrackerModel->index (0,0), getCountString (myTorrents.rowCount ()), TorrentCountStringRole);
 
   // rows to update
-  foreach (QString host, oldHosts & newHosts)
+  for (const QString& host: oldHosts & newHosts)
     {
       const QString name = readableHostName (host);
       QStandardItem * row = myTrackerModel->findItems (name).front ();
@@ -467,7 +467,7 @@ FilterBar::refreshTrackers ()
     }
 
   // rows to remove
-  foreach (QString host, oldHosts - newHosts)
+  for (const QString& host: oldHosts - newHosts)
     {
       const QString name = readableHostName (host);
       QStandardItem * item = myTrackerModel->findItems (name).front ();
@@ -477,7 +477,7 @@ FilterBar::refreshTrackers ()
 
   // rows to add
   bool anyAdded = false;
-  foreach (QString host, newHosts - oldHosts)
+  for (const QString& host: newHosts - oldHosts)
     {
       const QString name = readableHostName (host);
 
@@ -583,7 +583,7 @@ FilterBar::FilterBar (Prefs& prefs, const TorrentModel& torrents, const TorrentF
   QList<int> initKeys;
   initKeys << Prefs::FILTER_MODE
            << Prefs::FILTER_TRACKERS;
-  foreach (int key, initKeys)
+  for (const int key: initKeys)
       refreshPref (key);
 }
 

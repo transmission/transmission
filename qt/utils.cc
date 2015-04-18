@@ -125,39 +125,39 @@ Utils::guessMimeIcon (const QString& filename)
       const char * doc_types[] = {
         "abw", "csv", "doc", "dvi", "htm", "html", "ini", "log", "odp",
         "ods", "odt", "pdf", "ppt", "ps",  "rtf", "tex", "txt", "xml" };
-      for (int i=0, n=sizeof(doc_types)/sizeof(doc_types[0]); i<n; ++i)
-        suffixes[DOCUMENT] << QString::fromLatin1(doc_types[i]);
+      for (const char * t: doc_types)
+        suffixes[DOCUMENT] << QString::fromLatin1(t);
       fileIcons[DOCUMENT] = QIcon::fromTheme (QString::fromLatin1("text-x-generic"), fallback);
 
       const char * pic_types[] = {
         "bmp", "gif", "jpg", "jpeg", "pcx", "png", "psd", "ras", "tga", "tiff" };
-      for (int i=0, n=sizeof(pic_types)/sizeof(pic_types[0]); i<n; ++i)
-        suffixes[PICTURE] << QString::fromLatin1(pic_types[i]);
+      for (const char * t: pic_types)
+        suffixes[PICTURE] << QString::fromLatin1(t);
       fileIcons[PICTURE]  = QIcon::fromTheme (QString::fromLatin1("image-x-generic"), fallback);
 
       const char * vid_types[] = {
         "3gp", "asf", "avi", "mkv", "mov", "mpeg", "mpg", "mp4",
         "ogm", "ogv", "qt", "rm", "wmv" };
-      for (int i=0, n=sizeof(vid_types)/sizeof(vid_types[0]); i<n; ++i)
-        suffixes[VIDEO] << QString::fromLatin1(vid_types[i]);
+      for (const char * t: vid_types)
+        suffixes[VIDEO] << QString::fromLatin1(t);
       fileIcons[VIDEO] = QIcon::fromTheme (QString::fromLatin1("video-x-generic"), fallback);
 
       const char * arc_types[] = {
         "7z", "ace", "bz2", "cbz", "gz", "gzip", "lzma", "rar", "sft", "tar", "zip" };
-      for (int i=0, n=sizeof(arc_types)/sizeof(arc_types[0]); i<n; ++i)
-        suffixes[ARCHIVE] << QString::fromLatin1(arc_types[i]);
+      for (const char * t: arc_types)
+        suffixes[ARCHIVE] << QString::fromLatin1(t);
       fileIcons[ARCHIVE]  = QIcon::fromTheme (QString::fromLatin1("package-x-generic"), fallback);
 
       const char * aud_types[] = {
         "aac", "ac3", "aiff", "ape", "au", "flac", "m3u", "m4a", "mid", "midi", "mp2",
         "mp3", "mpc", "nsf", "oga", "ogg", "ra", "ram", "shn", "voc", "wav", "wma" };
-      for (int i=0, n=sizeof(aud_types)/sizeof(aud_types[0]); i<n; ++i)
-        suffixes[AUDIO] << QString::fromLatin1(aud_types[i]);
+      for (const char * t: aud_types)
+        suffixes[AUDIO] << QString::fromLatin1(t);
       fileIcons[AUDIO] = QIcon::fromTheme (QString::fromLatin1("audio-x-generic"), fallback);
 
       const char * exe_types[] = { "bat", "cmd", "com", "exe" };
-      for (int i=0, n=sizeof(exe_types)/sizeof(exe_types[0]); i<n; ++i)
-        suffixes[APP] << QString::fromLatin1(exe_types[i]);
+      for (const char * t: exe_types)
+        suffixes[APP] << QString::fromLatin1(t);
       fileIcons[APP] = QIcon::fromTheme (QString::fromLatin1("application-x-executable"), fallback);
     }
 

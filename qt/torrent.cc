@@ -357,7 +357,7 @@ Torrent::getSeedRatio (double& ratio) const
 bool
 Torrent::hasFileSubstring (const QString& substr) const
 {
-  foreach (const TrFile file, myFiles)
+  for (const TrFile& file: myFiles)
     if (file.filename.contains (substr, Qt::CaseInsensitive))
       return true;
 
@@ -367,7 +367,7 @@ Torrent::hasFileSubstring (const QString& substr) const
 bool
 Torrent::hasTrackerSubstring (const QString& substr) const
 {
-  foreach (QString s, myValues[TRACKERS].toStringList())
+  for (const QString& s: myValues[TRACKERS].toStringList())
     if (s.contains (substr, Qt::CaseInsensitive))
       return true;
 
@@ -613,7 +613,7 @@ Torrent::update (tr_variant * d)
       if (myValues[TRACKERS] != list)
         {
           QStringList hosts;
-          foreach (QString tracker, list)
+          for (const QString& tracker: list)
             {
               const QString host = Favicons::getHost (QUrl (tracker));
               if (!host.isEmpty())

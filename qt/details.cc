@@ -198,7 +198,7 @@ Details::Details (Session       & session,
   QList<int> initKeys;
   initKeys << Prefs::SHOW_TRACKER_SCRAPES
            << Prefs::SHOW_BACKUP_TRACKERS;
-  foreach (int key, initKeys)
+  for (const int key: initKeys)
     refreshPref (key);
 
   connect (&myTimer, SIGNAL (timeout ()), this, SLOT (onTimer ()));
@@ -225,7 +225,7 @@ Details::setIds (const QSet<int>& ids)
   myChangedTorrents = true;
 
   // stop listening to the old torrents
-  foreach (int id, myIds)
+  for (const int id: myIds)
     {
       const Torrent * tor = myModel.getTorrentFromId (id);
       if (tor)
@@ -237,7 +237,7 @@ Details::setIds (const QSet<int>& ids)
   myTrackerModel->refresh (myModel, myIds);
 
   // listen to the new torrents
-  foreach (int id, myIds)
+  for (const int id: myIds)
     {
       const Torrent * tor = myModel.getTorrentFromId (id);
       if (tor)
@@ -305,7 +305,7 @@ Details::getNewData ()
   if (!myIds.empty ())
     {
       QSet<int> infos;
-      foreach (int id, myIds)
+      for (const int id: myIds)
         {
           const Torrent * tor = myModel.getTorrentFromId (id);
           if (tor->isMagnet ())
@@ -375,7 +375,7 @@ Details::refresh ()
   const QString unknown = tr ("Unknown");
 
   // build a list of torrents
-  foreach (int id, myIds)
+  for (const int id: myIds)
     {
       const Torrent * tor = myModel.getTorrentFromId (id);
       if (tor)
@@ -397,7 +397,7 @@ Details::refresh ()
       bool allPaused = true;
       bool allFinished = true;
       const tr_torrent_activity baseline = torrents[0]->getActivity ();
-      foreach (const Torrent * t, torrents)
+      for (const Torrent * const t: torrents)
         {
           const tr_torrent_activity activity = t->getActivity ();
           if (activity != baseline)
@@ -435,7 +435,7 @@ Details::refresh ()
       int64_t haveUnverified = 0;
       int64_t verifiedPieces = 0;
 
-      foreach (const Torrent * t, torrents)
+      for (const Torrent * const t: torrents)
         {
           if (t->hasMetadata ())
             {
@@ -506,7 +506,7 @@ Details::refresh ()
     {
       uint64_t d = 0;
       uint64_t f = 0;
-      foreach (const Torrent * t, torrents)
+      for (const Torrent * const t: torrents)
         {
           d += t->downloadedEver ();
           f += t->failedEver ();
@@ -529,7 +529,7 @@ Details::refresh ()
     {
       uint64_t u = 0;
       uint64_t d = 0;
-      foreach (const Torrent * t, torrents)
+      for (const Torrent * const t: torrents)
         {
           u += t->uploadedEver ();
           d += t->downloadedEver ();
@@ -551,7 +551,7 @@ Details::refresh ()
     {
       bool allPaused = true;
       QDateTime baseline = torrents[0]->lastStarted ();
-      foreach (const Torrent * t, torrents)
+      for (const Torrent * const t: torrents)
         {
           if (baseline != t->lastStarted ())
             baseline = QDateTime ();
@@ -578,7 +578,7 @@ Details::refresh ()
   else
     {
       int baseline = torrents[0]->getETA ();
-      foreach (const Torrent * t, torrents)
+      for (const Torrent * const t: torrents)
         {
           if (baseline != t->getETA ())
             {
@@ -606,7 +606,7 @@ Details::refresh ()
   else
     {
       QDateTime latest = torrents[0]->lastActivity ();
-      foreach (const Torrent * t, torrents)
+      for (const Torrent * const t: torrents)
         {
           const QDateTime dt = t->lastActivity ();
           if (latest < dt)
@@ -631,7 +631,7 @@ Details::refresh ()
   else
     {
       string = torrents[0]->getError ();
-      foreach (const Torrent * t, torrents)
+      for (const Torrent * const t: torrents)
         {
           if (string != t->getError ())
             {
@@ -659,7 +659,7 @@ Details::refresh ()
       int pieces = 0;
       uint64_t size = 0;
       uint32_t pieceSize = torrents[0]->pieceSize ();
-      foreach (const Torrent * t, torrents)
+      for (const Torrent * const t: torrents)
         {
           pieces += t->pieceCount ();
           size += t->totalSize ();
@@ -684,7 +684,7 @@ Details::refresh ()
   if (!torrents.empty ())
     {
       string = torrents[0]->hashString ();
-      foreach (const Torrent * t, torrents)
+      for (const Torrent * const t: torrents)
         {
           if (string != t->hashString ())
             {
@@ -702,7 +702,7 @@ Details::refresh ()
       bool b = torrents[0]->isPrivate ();
       string = b ? tr ("Private to this tracker -- DHT and PEX disabled")
                  : tr ("Public torrent");
-      foreach (const Torrent * t, torrents)
+      for (const Torrent * const t: torrents)
         {
           if (b != t->isPrivate ())
             {
@@ -719,7 +719,7 @@ Details::refresh ()
   if (!torrents.empty ())
     {
       string = torrents[0]->comment ();
-      foreach (const Torrent * t, torrents)
+      for (const Torrent * const t: torrents)
         {
           if (string != t->comment ())
             {
@@ -742,7 +742,7 @@ Details::refresh ()
       bool mixed_creator=false, mixed_date=false;
       const QString creator = torrents[0]->creator ();
       const QString date = torrents[0]->dateCreated ().toString ();
-      foreach (const Torrent * t, torrents)
+      for (const Torrent * const t: torrents)
         {
           mixed_creator |= (creator != t->creator ());
           mixed_date |= (date != t->dateCreated ().toString ());
@@ -766,7 +766,7 @@ Details::refresh ()
   if (!torrents.empty ())
     {
       string = torrents[0]->getPath ();
-      foreach (const Torrent * t, torrents)
+      for (const Torrent * const t: torrents)
         {
           if (string != t->getPath ())
             {
@@ -788,65 +788,64 @@ Details::refresh ()
       bool uniform;
       bool baselineFlag;
       int baselineInt;
-      const Torrent * tor;
-      const Torrent * baseline = *torrents.begin ();
+      const Torrent& baseline = *torrents.front ();
 
       // mySessionLimitCheck
       uniform = true;
-      baselineFlag = baseline->honorsSessionLimits ();
-      foreach (tor, torrents) if (baselineFlag != tor->honorsSessionLimits ()) { uniform = false; break; }
+      baselineFlag = baseline.honorsSessionLimits ();
+      for (const Torrent * const tor: torrents) if (baselineFlag != tor->honorsSessionLimits ()) { uniform = false; break; }
       ui.sessionLimitCheck->setChecked (uniform && baselineFlag);
 
       // mySingleDownCheck
       uniform = true;
-      baselineFlag = baseline->downloadIsLimited ();
-      foreach (tor, torrents) if (baselineFlag != tor->downloadIsLimited ()) { uniform = false; break; }
+      baselineFlag = baseline.downloadIsLimited ();
+      for (const Torrent * const tor: torrents) if (baselineFlag != tor->downloadIsLimited ()) { uniform = false; break; }
       ui.singleDownCheck->setChecked (uniform && baselineFlag);
 
       // mySingleUpCheck
       uniform = true;
-      baselineFlag = baseline->uploadIsLimited ();
-      foreach (tor, torrents) if (baselineFlag != tor->uploadIsLimited ()) { uniform = false; break; }
+      baselineFlag = baseline.uploadIsLimited ();
+      for (const Torrent * const tor: torrents) if (baselineFlag != tor->uploadIsLimited ()) { uniform = false; break; }
       ui.singleUpCheck->setChecked (uniform && baselineFlag);
 
       // myBandwidthPriorityCombo
       uniform = true;
-      baselineInt = baseline->getBandwidthPriority ();
-      foreach (tor, torrents) if (baselineInt != tor->getBandwidthPriority ()) { uniform = false; break; }
+      baselineInt = baseline.getBandwidthPriority ();
+      for (const Torrent * const tor: torrents) if (baselineInt != tor->getBandwidthPriority ()) { uniform = false; break; }
       if (uniform)
         i = ui.bandwidthPriorityCombo->findData (baselineInt);
       else
         i = -1;
       setIfIdle (ui.bandwidthPriorityCombo, i);
 
-      setIfIdle (ui.singleDownSpin, int (tor->downloadLimit ().KBps ()));
-      setIfIdle (ui.singleUpSpin, int (tor->uploadLimit ().KBps ()));
-      setIfIdle (ui.peerLimitSpin, tor->peerLimit ());
+      setIfIdle (ui.singleDownSpin, int (baseline.downloadLimit ().KBps ()));
+      setIfIdle (ui.singleUpSpin, int (baseline.uploadLimit ().KBps ()));
+      setIfIdle (ui.peerLimitSpin, baseline.peerLimit ());
     }
 
   if (!torrents.empty ())
     {
-      const Torrent * tor;
+      const Torrent& baseline = *torrents.front ();
 
       // ratio
       bool uniform = true;
-      int baselineInt = torrents[0]->seedRatioMode ();
-      foreach (tor, torrents) if (baselineInt != tor->seedRatioMode ()) { uniform = false; break; }
+      int baselineInt = baseline.seedRatioMode ();
+      for (const Torrent * const tor: torrents) if (baselineInt != tor->seedRatioMode ()) { uniform = false; break; }
 
       setIfIdle (ui.ratioCombo, uniform ? ui.ratioCombo->findData (baselineInt) : -1);
       ui.ratioSpin->setVisible (uniform && (baselineInt == TR_RATIOLIMIT_SINGLE));
 
-      setIfIdle (ui.ratioSpin, tor->seedRatioLimit ());
+      setIfIdle (ui.ratioSpin, baseline.seedRatioLimit ());
 
       // idle
       uniform = true;
-      baselineInt = torrents[0]->seedIdleMode ();
-      foreach (tor, torrents) if (baselineInt != tor->seedIdleMode ()) { uniform = false; break; }
+      baselineInt = baseline.seedIdleMode ();
+      for (const Torrent * const tor: torrents) if (baselineInt != tor->seedIdleMode ()) { uniform = false; break; }
 
       setIfIdle (ui.idleCombo, uniform ? ui.idleCombo->findData (baselineInt) : -1);
       ui.idleSpin->setVisible (uniform && (baselineInt == TR_RATIOLIMIT_SINGLE));
 
-      setIfIdle (ui.idleSpin, tor->seedIdleLimit ());
+      setIfIdle (ui.idleSpin, baseline.seedIdleLimit ());
       onIdleLimitChanged ();
     }
 
@@ -862,12 +861,12 @@ Details::refresh ()
 
   QMap<QString,QTreeWidgetItem*> peers2;
   QList<QTreeWidgetItem*> newItems;
-  foreach (const Torrent * t, torrents)
+  for (const Torrent * const t: torrents)
     {
       const QString idStr (QString::number (t->id ()));
       PeerList peers = t->peers ();
 
-      foreach (const Peer& peer, peers)
+      for (const Peer& peer: peers)
         {
           const QString key = idStr + QLatin1Char (':') + peer.address;
           PeerItem * item = static_cast<PeerItem*> (myPeers.value (key, 0));
@@ -892,7 +891,7 @@ Details::refresh ()
           item->refresh (peer);
 
           QString codeTip;
-          foreach (QChar ch, code)
+          for (const QChar ch: code)
             {
               QString txt;
               switch (ch.unicode ())
@@ -929,7 +928,7 @@ Details::refresh ()
     }
 
   ui.peersView->addTopLevelItems (newItems);
-  foreach (QString key, myPeers.keys ())
+  for (const QString& key: myPeers.keys ())
     {
       if (!peers2.contains (key)) // old peer has disconnected
         {
@@ -1078,7 +1077,7 @@ Details::onAddTrackerClicked ()
     {
       QSet<int> ids;
 
-      foreach (int id, myIds)
+      for (const int id: myIds)
         if (myTrackerModel->find (id,url) == -1)
           ids.insert (id);
 
@@ -1139,14 +1138,14 @@ Details::onRemoveTrackerClicked ()
   QItemSelectionModel * selectionModel = ui.trackersView->selectionModel ();
   QModelIndexList selectedRows = selectionModel->selectedRows ();
   QMap<int,int> torrentId_to_trackerIds;
-  foreach (QModelIndex i, selectedRows)
+  for (const QModelIndex& i: selectedRows)
     {
       const TrackerInfo inf = ui.trackersView->model ()->data (i, TrackerModel::TrackerRole).value<TrackerInfo> ();
       torrentId_to_trackerIds.insertMulti (inf.torrentId, inf.st.id);
     }
 
   // batch all of a tracker's torrents into one command
-  foreach (int id, torrentId_to_trackerIds.uniqueKeys ())
+  for (const int id: torrentId_to_trackerIds.uniqueKeys ())
     {
       QSet<int> ids;
       ids << id;
@@ -1315,7 +1314,7 @@ Details::onOpenRequested (const QString& path)
   if (!mySession.isLocal ())
     return;
 
-  foreach (const int id, myIds)
+  for (const int id: myIds)
     {
       const Torrent * const tor = myModel.getTorrentFromId (id);
       if (tor == NULL)

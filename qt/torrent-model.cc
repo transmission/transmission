@@ -23,7 +23,7 @@ TorrentModel::clear ()
 
   myIdToRow.clear ();
   myIdToTorrent.clear ();
-  foreach (Torrent * tor, myTorrents) delete tor;
+  qDeleteAll (myTorrents);
   myTorrents.clear ();
 
   endResetModel ();
@@ -189,7 +189,7 @@ TorrentModel::updateTorrents (tr_variant * torrents, bool isCompleteList)
 
       beginInsertRows (QModelIndex(), oldCount, newCount - 1);
 
-      foreach (Torrent * tor, newTorrents)
+      for (Torrent * const tor: newTorrents)
         {
           addTorrent (tor);
           addIds.insert (tor->id ());
@@ -205,7 +205,7 @@ TorrentModel::updateTorrents (tr_variant * torrents, bool isCompleteList)
     {
       QSet<int> removedIds (oldIds);
       removedIds -= newIds;
-      foreach (int id, removedIds)
+      for (const int id: removedIds)
         removeTorrent (id);
     }
 }
@@ -220,7 +220,7 @@ TorrentModel::removeTorrent (int id)
 
       beginRemoveRows (QModelIndex(), row, row);
       // make the myIdToRow map consistent with list view/model
-      for (QMap<int,int>::iterator i = myIdToRow.begin(); i != myIdToRow.end(); ++i)
+      for (auto i = myIdToRow.begin(); i != myIdToRow.end(); ++i)
         if (i.value() > row)
           --i.value();
       myIdToRow.remove (id);
@@ -241,7 +241,7 @@ TorrentModel::getTransferSpeed (Speed   & uploadSpeed,
   Speed upSpeed, downSpeed;
   size_t upCount=0, downCount=0;
 
-  foreach (const Torrent * const tor, myTorrents)
+  for (const Torrent * const tor: myTorrents)
     {
       upSpeed += tor->uploadSpeed ();
       upCount += tor->peersWeAreUploadingTo ();
@@ -262,7 +262,7 @@ TorrentModel::getIds () const
   QSet<int> ids;
 
   ids.reserve (myTorrents.size());
-  foreach (const Torrent * tor, myTorrents)
+  for (const Torrent * const tor: myTorrents)
     ids.insert (tor->id());
 
   return ids;
@@ -271,7 +271,7 @@ TorrentModel::getIds () const
 bool
 TorrentModel::hasTorrent (const QString& hashString) const
 {
-  foreach (const Torrent * tor, myTorrents)
+  for (const Torrent * const tor: myTorrents)
     if (tor->hashString () == hashString)
       return true;
 

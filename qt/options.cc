@@ -214,14 +214,14 @@ OptionsDialog::reload ()
 void
 OptionsDialog::onPriorityChanged (const QSet<int>& fileIndices, int priority)
 {
-  foreach (int i, fileIndices)
+  for (const int i: fileIndices)
     myPriorities[i] = priority;
 }
 
 void
 OptionsDialog::onWantedChanged (const QSet<int>& fileIndices, bool isWanted)
 {
-  foreach (int i, fileIndices)
+  for (const int i: fileIndices)
     myWanted[i] = isWanted;
 }
 
@@ -334,8 +334,8 @@ OptionsDialog::clearVerify ()
   myVerifyPiecePos = 0;
   myVerifyTimer.stop ();
 
-  for (int i = 0, n = myFiles.size (); i < n; ++i)
-    myFiles[i].have = 0;
+  for (TrFile& f: myFiles)
+    f.have = 0;
 
   ui.filesView->update (myFiles);
 }
@@ -432,7 +432,7 @@ OptionsDialog::onTimeout ()
   if (done)
     {
       uint64_t have = 0;
-      foreach (const TrFile& f, myFiles)
+      for (const TrFile& f: myFiles)
         have += f.have;
 
       if (!have) // everything failed

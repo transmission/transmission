@@ -560,14 +560,14 @@ PrefsDialog::PrefsDialog (Session& session, Prefs& prefs, QWidget * parent):
        << Prefs::INCOMPLETE_DIR
        << Prefs::INCOMPLETE_DIR_ENABLED
        << Prefs::SCRIPT_TORRENT_DONE_FILENAME;
-  foreach (int key, keys)
+  for (const int key: keys)
     refreshPref (key);
 
   // if it's a remote session, disable the preferences
   // that don't work in remote sessions
   if (!myIsServer)
     {
-      foreach (QWidget * w, myUnsupportedWhenRemote)
+      for (QWidget * const w: myUnsupportedWhenRemote)
         {
           w->setToolTip (tr ("Not supported by remote sessions"));
           w->setEnabled (false);
@@ -617,11 +617,11 @@ PrefsDialog::refreshPref (int key)
           const bool enabled (myPrefs.getBool (Prefs::RPC_ENABLED));
           const bool whitelist (myPrefs.getBool (Prefs::RPC_WHITELIST_ENABLED));
           const bool auth (myPrefs.getBool (Prefs::RPC_AUTH_REQUIRED));
-          foreach (QWidget * w, myWebWhitelistWidgets)
+          for (QWidget * const w: myWebWhitelistWidgets)
             w->setEnabled (enabled && whitelist);
-          foreach (QWidget * w, myWebAuthWidgets)
+          for (QWidget * const w: myWebAuthWidgets)
             w->setEnabled (enabled && auth);
-          foreach (QWidget * w, myWebWidgets)
+          for (QWidget * const w: myWebWidgets)
             w->setEnabled (enabled);
           break;
         }
@@ -629,7 +629,7 @@ PrefsDialog::refreshPref (int key)
       case Prefs::ALT_SPEED_LIMIT_TIME_ENABLED:
         {
           const bool enabled = myPrefs.getBool (key);
-          foreach (QWidget * w, mySchedWidgets)
+          for (QWidget * const w: mySchedWidgets)
             w->setEnabled (enabled);
           break;
         }
@@ -637,7 +637,7 @@ PrefsDialog::refreshPref (int key)
       case Prefs::BLOCKLIST_ENABLED:
         {
           const bool enabled = myPrefs.getBool (key);
-          foreach (QWidget * w, myBlockWidgets)
+          for (QWidget * const w: myBlockWidgets)
             w->setEnabled (enabled);
           break;
         }

@@ -54,7 +54,7 @@ class Utils: public QObject
     {
       if (s.length() != 40)
         return false;
-      foreach (QChar ch, s) if (!isxdigit (ch.unicode())) return false;
+      for (const QChar ch: s) if (!isxdigit (ch.unicode())) return false;
       return true;
     }
 

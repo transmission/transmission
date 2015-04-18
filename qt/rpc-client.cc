@@ -137,7 +137,7 @@ RpcClient::sendRequest (const QByteArray& json)
 
 #ifdef DEBUG_HTTP
       std::cerr << "sending " << "POST " << qPrintable (myUrl.path ()) << std::endl;
-      foreach (const QByteArray& b, request.rawHeaderList ())
+      for (const QByteArray& b: request.rawHeaderList ())
         std::cerr << b.constData ()
                   << ": "
                   << request.rawHeader (b).constData ()
@@ -182,7 +182,7 @@ RpcClient::onFinished (QNetworkReply * reply)
 {
 #ifdef DEBUG_HTTP
   std::cerr << "http response header: " << std::endl;
-  foreach (const QByteArray& b, reply->rawHeaderList ())
+  for (const QByteArray& b: reply->rawHeaderList ())
     std::cerr << b.constData ()
               << ": "
               << reply->rawHeader (b).constData ()

@@ -40,7 +40,7 @@ RelocateDialog::RelocateDialog (Session            & session,
   ui.setupUi (this);
 
   QString path;
-  foreach (int id, myIds)
+  for (const int id: myIds)
     {
       const Torrent * tor = model.getTorrentFromId (id);
 
