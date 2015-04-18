@@ -16,7 +16,7 @@
 namespace
 {
   int
-  itemColumnSpan (const QGridLayout * layout, const QLayoutItem * item)
+  itemColumnSpan (QGridLayout * layout, const QLayoutItem * item)
   {
     for (int i = 0, count = layout->count (); i < count; ++i)
       {
@@ -60,7 +60,7 @@ void
 ColumnResizer::update ()
 {
   int maxWidth = 0;
-  for (const QGridLayout * const layout: myLayouts)
+  for (QGridLayout * const layout: myLayouts)
     {
       for (int i = 0, count = layout->rowCount (); i < count; ++i)
         {
