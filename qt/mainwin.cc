@@ -1048,16 +1048,20 @@ TrMainWindow::refreshPref (int key)
         break;
 
       case Prefs::COMPACT_VIEW: {
+#if QT_VERSION < QT_VERSION_CHECK(5, 4, 0) // QTBUG-33537
             QItemSelectionModel * selectionModel (ui.listView->selectionModel ());
             const QItemSelection selection (selectionModel->selection ());
             const QModelIndex currentIndex (selectionModel->currentIndex ());
+#endif
             b = myPrefs.getBool (key);
             ui.action_CompactView->setChecked (b);
             ui.listView->setItemDelegate (b ? myTorrentDelegateMin : myTorrentDelegate);
+#if QT_VERSION < QT_VERSION_CHECK(5, 4, 0) // QTBUG-33537
             selectionModel->clear ();
             ui.listView->reset (); // force the rows to resize
             selectionModel->select (selection, QItemSelectionModel::Select);
             selectionModel->setCurrentIndex (currentIndex, QItemSelectionModel::NoUpdate);
+#endif
             break;
         }
 
