@@ -107,7 +107,7 @@ set(LIBAPPINDICATOR_MINIMUM 0.4.90)
 
 tr_github_upstream(EVENT2    libevent/libevent  c51b159cff 7be95856a39714dfd2218cb56415c990)
 tr_github_upstream(NATPMP    miniupnp/libnatpmp 31ebda6226 7e8deb00a98220622a6f2aeb98b8921b)
-tr_github_upstream(MINIUPNPC miniupnp/miniupnp  c490b42547 f9b7a4715bcd5034abae866e31102888)
+tr_github_upstream(MINIUPNPC miniupnp/miniupnp  5de2bcb561 bdc5b64b9b8401d3524c50b9ec8173c1)
 tr_github_upstream(DHT       jech/dht           bf62643a95 0a2a2abe447d8a73f0084c1bc837e566)
 tr_github_upstream(UTP       bittorrent/libutp  7c4f19abdf 8b92aa05abec5f6675cdde6477cd6f51)
 tr_github_upstream(B64       mikedld/libb64     c1e3323498 10128cb30ad768d2c4caf627e0f69db3)
@@ -263,7 +263,7 @@ set(MINIUPNPC_DEFINITIONS -DSYSTEM_MINIUPNP)
 if(NOT USE_SYSTEM_MINIUPNPC)
     list(APPEND MINIUPNPC_DEFINITIONS -DMINIUPNP_STATICLIB)
     set(MINIUPNPC_VERSION 1.9)
-    set(MINIUPNPC_API_VERSION 10)
+    set(MINIUPNPC_API_VERSION 12)
 endif()
 
 tr_add_external_auto_library(DHT dht
