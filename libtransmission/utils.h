@@ -196,6 +196,25 @@ char    * tr_win32_format_message    (uint32_t        code);
 void      tr_win32_make_args_utf8    (int    * argc,
                                       char *** argv);
 
+int       tr_main_win32              (int     argc,
+                                      char ** argv,
+                                      int   (*real_main) (int, char **));
+
+#define tr_main(...) \
+  static tr_main_win32_impl (__VA_ARGS__); \
+  int \
+  main (int    argc, \
+        char * argv[]) \
+  { \
+    return tr_main_win32 (argc, argv, &tr_main_win32_impl); \
+  } \
+  static int \
+  tr_main_win32_impl (__VA_ARGS__)
+
+#else
+
+#define tr_main main
+
 #endif
 
 /***

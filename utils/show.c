@@ -283,15 +283,12 @@ doScrape (const tr_info * inf)
 }
 
 int
-main (int argc, char * argv[])
+tr_main (int    argc,
+         char * argv[])
 {
   int err;
   tr_info inf;
   tr_ctor * ctor;
-
-#ifdef _WIN32
-  tr_win32_make_args_utf8 (&argc, &argv);
-#endif
 
   tr_logSetLevel (TR_LOG_ERROR);
   tr_formatter_mem_init (MEM_K, MEM_K_STR, MEM_M_STR, MEM_G_STR, MEM_T_STR);

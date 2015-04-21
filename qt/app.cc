@@ -574,12 +574,9 @@ MyApp::notifyApp (const QString& title, const QString& body) const
 ***/
 
 int
-main (int argc, char * argv[])
+tr_main (int    argc,
+         char * argv[])
 {
-#ifdef _WIN32
-  tr_win32_make_args_utf8 (&argc, &argv);
-#endif
-
   MyApp app (argc, argv);
   return app.exec ();
 }

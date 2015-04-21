@@ -1184,6 +1184,17 @@ tr_win32_make_args_utf8 (int    * argc,
   LocalFree (my_wide_argv);
 }
 
+int
+tr_main_win32 (int     argc,
+               char ** argv,
+               int   (*real_main) (int, char **))
+{
+  tr_win32_make_args_utf8 (&argc, &argv);
+  SetConsoleCP (CP_UTF8);
+  SetConsoleOutputCP (CP_UTF8);
+  return real_main (argc, argv);
+}
+
 #endif
 
 /***

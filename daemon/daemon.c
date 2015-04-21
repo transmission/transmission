@@ -636,8 +636,8 @@ cleanup:
 }
 
 int
-main (int     argc,
-      char ** argv)
+tr_main (int    argc,
+         char * argv[])
 {
     const dtr_callbacks cb =
     {
@@ -653,10 +653,6 @@ main (int     argc,
     struct daemon_data arg;
     tr_variant * const settings = &arg.settings;
     const char ** const configDir = &arg.configDir;
-
-#ifdef _WIN32
-    tr_win32_make_args_utf8 (&argc, &argv);
-#endif
 
     key_pidfile = tr_quark_new ("pidfile",  7);
 

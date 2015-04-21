@@ -126,14 +126,11 @@ tr_getcwd (void)
 }
 
 int
-main (int argc, char * argv[])
+tr_main (int    argc,
+         char * argv[])
 {
   char * out2 = NULL;
   tr_metainfo_builder * b = NULL;
-
-#ifdef _WIN32
-  tr_win32_make_args_utf8 (&argc, &argv);
-#endif
 
   tr_logSetLevel (TR_LOG_ERROR);
   tr_formatter_mem_init (MEM_K, MEM_K_STR, MEM_M_STR, MEM_G_STR, MEM_T_STR);
