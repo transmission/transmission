@@ -201,15 +201,15 @@ int       tr_main_win32              (int     argc,
                                       int   (*real_main) (int, char **));
 
 #define tr_main(...) \
-  static tr_main_win32_impl (__VA_ARGS__); \
+  main_impl (__VA_ARGS__); \
   int \
   main (int    argc, \
         char * argv[]) \
   { \
-    return tr_main_win32 (argc, argv, &tr_main_win32_impl); \
+    return tr_main_win32 (argc, argv, &main_impl); \
   } \
-  static int \
-  tr_main_win32_impl (__VA_ARGS__)
+  int \
+  main_impl (__VA_ARGS__)
 
 #else
 
