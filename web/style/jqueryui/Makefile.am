@@ -1,4 +1,4 @@
 SUBDIRS = images 
 
 datadir = ${datarootdir}/${PACKAGE_NAME}/${subdir}
-dist_data_DATA = jqueryui-1.8.16.css
+dist_data_DATA = jquery-ui.min.css
