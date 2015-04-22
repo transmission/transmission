@@ -748,14 +748,17 @@ Details::refresh ()
           mixed_date |= (date != t->dateCreated ().toString ());
         }
 
-      if (mixed_creator && mixed_date)
+      const bool empty_creator = creator.isEmpty ();
+      const bool empty_date = date.isEmpty ();
+
+      if (mixed_creator || mixed_date)
         string = mixed;
-      else if (mixed_date && !creator.isEmpty ())
-        string = tr ("Created by %1").arg (creator);
-      else if (mixed_creator && !date.isEmpty ())
-        string = tr ("Created on %1").arg (date);
-      else if (creator.isEmpty () && date.isEmpty ())
+      else if (empty_creator && empty_date)
         string = tr ("N/A");
+      else if (empty_date && !empty_creator)
+        string = tr ("Created by %1").arg (creator);
+      else if (empty_creator && !empty_date)
+        string = tr ("Created on %1").arg (date);
       else
         string = tr ("Created by %1 on %2").arg (creator).arg (date);
     }

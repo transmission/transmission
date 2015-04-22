@@ -690,15 +690,22 @@ refreshInfo (struct DetailsImpl * di, tr_torrent ** torrents, int n)
           mixed_date |= (date != infos[i]->dateCreated);
         }
 
-      if (mixed_date && mixed_creator)
+      const gboolean empty_creator = !*creator;
+      const gboolean empty_date = date == 0;
+
+      if (mixed_date || mixed_creator)
         {
           str = mixed;
         }
+      else if (empty_date && empty_creator)
+        {
+          str = _("N/A");
+        }
       else
         {
-          if (mixed_date)
+          if (empty_date && !empty_creator)
             g_snprintf (buf, sizeof (buf), _("Created by %1$s"), creator);
-          else if (mixed_creator || !*creator)
+          else if (empty_creator && !empty_date)
             g_snprintf (buf, sizeof (buf), _("Created on %1$s"), datestr);
           else
             g_snprintf (buf, sizeof (buf), _("Created by %1$s on %2$s"), creator, datestr);
