@@ -422,13 +422,15 @@ function Inspector(controller) {
                 if(date != t.getDateCreated())
                     mixed_date = true;
             }
+            var empty_creator = !creator || !creator.length,
+                empty_date = !date;
             if(mixed_creator && mixed_date)
                 str = mixed;
-            else if(!creator.length && !date)
+            else if(empty_creator && empty_date)
                 str = unknown;
-            else if(mixed_date && creator.length)
+            else if((mixed_date || empty_date) && !empty_creator)
                 str = 'Created by ' + creator;
-            else if(mixed_creator && date)
+            else if((mixed_creator || empty_creator) && !empty_date)
                 str = 'Created on ' + (new Date(date*1000)).toDateString();
             else
                 str = 'Created by ' + creator + ' on ' + (new Date(date*1000)).toDateString();
