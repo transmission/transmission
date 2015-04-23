@@ -1034,13 +1034,17 @@ Transmission.prototype =
 			var torrent = torrents[0],
 			    header = 'Remove ' + torrent.getName() + '?',
 			    message = 'Once removed, continuing the transfer will require the torrent file. Are you sure you want to remove it?';
-			dialog.confirm(header, message, 'Remove', 'transmission.removeTorrents', torrents);
+			dialog.confirm(header, message, 'Remove', function() {
+				transmission.removeTorrents(torrents);
+			});
 		}
 		else
 		{
 			var header = 'Remove ' + torrents.length + ' transfers?',
 			    message = 'Once removed, continuing the transfers will require the torrent files. Are you sure you want to remove them?';
-			dialog.confirm(header, message, 'Remove', 'transmission.removeTorrents', torrents);
+			dialog.confirm(header, message, 'Remove', function() {
+				transmission.removeTorrents(torrents);
+			});
 		}
 	},
 
@@ -1051,13 +1055,17 @@ Transmission.prototype =
 			var torrent = torrents[0],
 			    header = 'Remove ' + torrent.getName() + ' and delete data?',
 			    message = 'All data downloaded for this torrent will be deleted. Are you sure you want to remove it?';
-			dialog.confirm(header, message, 'Remove', 'transmission.removeTorrentsAndData', torrents);
+			dialog.confirm(header, message, 'Remove', function() {
+				transmission.removeTorrentsAndData(torrents);
+			});
 		}
 		else
 		{
 			var header = 'Remove ' + torrents.length + ' transfers and delete data?',
 			    message = 'All data downloaded for these torrents will be deleted. Are you sure you want to remove them?';
-			dialog.confirm(header, message, 'Remove', 'transmission.removeTorrentsAndData', torrents);
+			dialog.confirm(header, message, 'Remove', function() {
+				transmission.removeTorrentsAndData(torrents);
+			});
 		}
 	},
 

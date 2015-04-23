@@ -62,8 +62,9 @@ TransmissionRemote.prototype =
 		dialog.confirm('Connection Failed',
 			'Could not connect to the server. You may need to reload the page to reconnect.',
 			'Details',
-			'alert(remote._error);',
-			null,
+			function() {
+				alert(remote._error);
+			},
 			'Dismiss');
 		remote._controller.togglePeriodicSessionRefresh(false);
 	},
