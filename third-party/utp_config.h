@@ -6,8 +6,7 @@
 // packet size based on rate
 
 #ifdef _MSC_VER
-#pragma warning()
-#pragma message(implement this in libtransmission)
+#pragma message("WARNING: implement this in libtransmission")
 #else
 #warning implement this in libtransmission
 #endif
