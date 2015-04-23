@@ -22,6 +22,9 @@ body {
   body a {
     outline: 0; }
 
+.hidden {
+  display: none; }
+
 /***
 ****
 ****  ABOUT DIALOG
@@ -344,6 +347,12 @@ ul.torrent_list {
   .prefs-section #alternative-speed-limits-title {
     padding-left: 18px;
     background: transparent url("images/blue-turtle.png") no-repeat; }
+  .prefs-section #alternative-speed-limits-desc {
+    font-size: smaller;
+    padding-bottom: 4px; }
+  .prefs-section #blocklist-info {
+    font-size: smaller;
+    margin-top: 3px; }
 
 /***
 ****

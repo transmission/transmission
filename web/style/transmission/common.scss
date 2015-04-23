@@ -90,6 +90,10 @@ body {
 	a { outline: 0; }
 }
 
+.hidden {
+	display: none;
+}
+
 /***
 ****
 ****  ABOUT DIALOG
@@ -464,6 +468,16 @@ ul.torrent_list
 	#alternative-speed-limits-title {
 		padding-left: 18px;
 		background: transparent url('images/blue-turtle.png') no-repeat;
+	}
+
+	#alternative-speed-limits-desc {
+		font-size: smaller;
+		padding-bottom: 4px;
+	}
+
+	#blocklist-info {
+		font-size: smaller;
+		margin-top: 3px;
 	}
 }
 
