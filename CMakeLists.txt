@@ -118,8 +118,6 @@ if(WIN32)
         set(CMAKE_${L}_FLAGS "${CMAKE_${L}_FLAGS} -DWINVER=0x0600 -D_WIN32_WINNT=0x0600")
         # Use Unicode API (although we always use W or A names explicitly)
         set(CMAKE_${L}_FLAGS "${CMAKE_${L}_FLAGS} -DUNICODE -D_UNICODE")
-        # Filter out needless definitions
-        set(CMAKE_${L}_FLAGS "${CMAKE_${L}_FLAGS} -DWIN32_LEAN_AND_MEAN -DNOMINMAX")
         # Ignore various deprecation and security warnings (at least for now)
         set(CMAKE_${L}_FLAGS "${CMAKE_${L}_FLAGS} -D_CRT_SECURE_NO_DEPRECATE -D_CRT_NONSTDC_NO_DEPRECATE -D_SCL_SECURE_NO_WARNINGS -D_WINSOCK_DEPRECATED_NO_WARNINGS")
         # Increase maximum FD_SET size
@@ -316,6 +314,13 @@ if(WITH_SYSTEMD)
 endif()
 
 include_directories(${CMAKE_BINARY_DIR})
+
+if(WIN32)
+    foreach(L C CXX)
+        # Filter out needless definitions
+        set(CMAKE_${L}_FLAGS "${CMAKE_${L}_FLAGS} -DWIN32_LEAN_AND_MEAN -DNOMINMAX")
+    endforeach()
+endif()
 
 if(CMAKE_C_COMPILER_ID STREQUAL "GNU" OR CMAKE_C_COMPILER_ID STREQUAL "Clang")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=gnu99")
