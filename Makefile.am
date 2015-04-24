@@ -47,17 +47,22 @@ EXTRA_DIST += \
   po/CMakeLists.txt \
   qt/CMakeLists.txt \
   third-party/b64-01-newline.patch \
+  third-party/b64-02-unsigned-char.patch \
   third-party/b64.cmake \
   third-party/dht.cmake \
   third-party/event2.cmake \
   third-party/natpmp.cmake \
+  third-party/utp-01-ticket-5002.patch \
   third-party/utp.cmake \
   third-party/utp_config.h \
   utils/CMakeLists.txt
 
-dist-hook:
-	rm -rf `find $(distdir)/qt -name .svn`
+if HAVE_REVISION_FILE
+  EXTRA_DIST += REVISION
+endif
 
+dist-hook:
+	find "$(distdir)/qt" "$(distdir)/cmake" -name .svn -exec rm -rf '{}' '+' -prune
 
 DISTCLEANFILES = \
   intltool-extract \

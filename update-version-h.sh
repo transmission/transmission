@@ -20,6 +20,9 @@ peer_id_prefix=`grep m4_define configure.ac | sed "s/[][)(]/,/g" | grep peer_id_
 major_version=`echo ${user_agent_prefix} | awk -F . '{print $1}'`
 minor_version=`echo ${user_agent_prefix} | awk -F . '{print $2 + 0}'`
 
+svn_revision_file=REVISION
+svn_revision_reliable=true
+
 if [ -n "$JENKINS_URL" -a -n "$SVN_REVISION" ]; then
     # Jenkins automated build, use the set environment variables to avoid
     # version mismatches between java's svn and command line's svn
@@ -28,9 +31,18 @@ elif [ -d ".svn" ] && type svnversion >/dev/null 2>&1; then
     # If this is a svn tree, and svnversion is available in PATH, use it to
     # grab the version.
     svn_revision=`svnversion -n . | cut -d: -f1 | cut -dM -f1 | cut -dS -f1`
+elif [ -f "$svn_revision_file" ]; then
+    svn_revision=`cat "$svn_revision_file"`
 else
     # Give up and check the source files
     svn_revision=`awk '/\\$Id: /{ if ($4>i) i=$4 } END {print i}' */*.cc */*.[chm] */*.po`
+    svn_revision_reliable=false
+fi
+
+if $svn_revision_reliable; then
+    [ -f "$svn_revision_file" ] && [ "`cat "$svn_revision_file"`" -eq "$svn_revision" ] || echo "$svn_revision" > "$svn_revision_file"
+else
+    rm -f "$svn_revision_file"
 fi
 
 cat > libtransmission/version.h.new << EOF

@@ -31,6 +31,7 @@ else
   fi
 fi
 AM_CONDITIONAL(TR_UNSTABLE, test "x$supported_build" = "xno")
+AM_CONDITIONAL(HAVE_REVISION_FILE, test -f REVISION)
 
 ##
 ##

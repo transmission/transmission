@@ -1,4 +1,5 @@
 /.depend
+/REVISION
 Transmission.xcodeproj/*.mode*
 Transmission.xcodeproj/*.pbxuser
 Transmission.xcodeproj/*.xcworkspace
