@@ -1625,7 +1625,8 @@ addTorrentImpl (struct tr_rpc_idle_data * data, tr_ctor * ctor)
       tr_variantListAddStr (&fields, "name");
       tr_variantListAddStr (&fields, "hashString");
       addInfo (tor, tr_variantDictAdd (data->args_out, key), &fields);
-      notify (data->session, TR_RPC_TORRENT_ADDED, tor);
+      if (result == NULL)
+        notify (data->session, TR_RPC_TORRENT_ADDED, tor);
       tr_variantFree (&fields);
       result = NULL;
     }
