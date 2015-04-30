@@ -766,7 +766,7 @@ div.torrent_footer
 
 	@include verticalGradient($statusbar-gradient-top, $statusbar-gradient-bottom);
 
-	> * {
+	> div {
 		float: left;
 		margin: 2px 4px;
 		width: 18px;
@@ -783,7 +783,7 @@ div.torrent_footer
 	$active-color-top: $selected-gradient-top;
 	$active-color-bottom: $selected-gradient-bottom;
 
-	div.main_container {
+	#settings_menu {
 		@include roundedBox(5px);
 		@include buttonImage('images/settings.png', $idle-color-top, $idle-color-bottom, $active-color-top, $active-color-bottom);
 	}
@@ -955,116 +955,13 @@ iframe#torrent_upload_frame {
 *****
 ****/
 
-.trans_menu {
-	margin: 0;
-	padding: 0;
-}
-
-.trans_menu,
-.trans_menu ul {
-	list-style: none;
-}
-
-.trans_menu ul {
-	/* place it right above the button */
-	position: relative;
-	bottom: 18px;
-
-	min-width: 210px;
-	background-color: white;
-	padding: 5px 0;
+.ui-menu-item {
 	text-align: left;
-	list-style: none;
-	-webkit-border-radius: 5px;
-	-webkit-box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+	white-space: nowrap;
 }
 
-.trans_menu ul ul {
-	min-width: 150px;
-}
-
-.trans_menu ul ul#footer_sort_menu {
-	min-width: 175px;
-}
-
-.trans_menu > * li {
-	margin: 0;
-	padding: 3px 10px 3px 20px !important;
-	color: #000;
-	cursor: default;
-	text-indent: auto !important;
-	width: inherit;
-}
-
-.trans_menu li.separator,
-.trans_menu li.separator.hover {
-	border-top: 1px solid #ddd;
-	margin: 5px 0;
-	padding: 0px;
-	background: transparent;
-}
-
-.trans_menu li span.arrow {
-	float: right;
-}
-
-.trans_menu li.hover li.hover span.arrow, .trans_menu li.hover li.hover li.hover span.selected {
-	color: white;
-}
-
-.trans_menu span.selected {
-	margin: 0 3px 0 -15px;
-	color: #666;
-	float: left;
-}
-
-.trans_menu div.outerbox {
-	display: none;
-	background: transparent;
-	border: 1px solid rgba(0,0,0,0.1);
-	-webkit-border-radius: 5px;
-}
-
-.trans_menu div.inner {
-	left: 0;
-	margin: 0;
-}
-
-.trans_menu li.main li {
-	z-index: 2;
-	min-width: 78px;
-}
-
-.trans_menu a {
-	text-decoration: none;
-	cursor: default;
-}
-
-/*--------------------------------------
- *
- * C O N T E X T   M E N U
- *
- *--------------------------------------*/
-
-div#jqContextMenu
-{
-	-webkit-border-radius: 5px;
-	border: 1px solid rgba(0,0,0,0.1);
-	-moz-user-select: none;
-	-webkit-user-select: none;
-
-	ul {
-		filter: alpha(opacity=98);
-		-moz-opacity: .98;
-		opacity: .98;
-		-webkit-box-shadow: 0 10px 25px rgba(0,0,0,0.4);
-		-webkit-border-radius: 5px;
-	}
-
-	li.separator, div#jqContextMenu li.separator:hover {
-		background: inherit !important;
-		border-top: 1px solid #ddd !important;
-		margin: 5px 0 !important;
-		padding: 0px;
-	}
+#torrent_context_menu,
+#footer_super_menu {
+	font-size: 1em;
+	z-index: 3;
 }

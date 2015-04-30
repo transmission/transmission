@@ -11,6 +11,7 @@
 		<script type="text/javascript" src="./javascript/jquery/jquery.min.js"></script>
 		<script type="text/javascript" src="./javascript/jquery/jquery-migrate.min.js"></script>
 		<script type="text/javascript" src="./javascript/jquery/jquery-ui.min.js"></script>
+		<script type="text/javascript" src="./javascript/jquery/jquery.ui-contextmenu.min.js"></script>
 		<link rel="stylesheet" href="./style/jqueryui/jquery-ui.min.css" type="text/css" media="all" />
 <!--
 		<link media="screen" href="./style/transmission/mobile.css" type= "text/css" rel="stylesheet" />
@@ -21,7 +22,6 @@
 		<link media="screen" href="./style/transmission/common.css" type="text/css" rel="stylesheet" />
 		<![endif]-->
 		<script type="text/javascript" src="./javascript/jquery/jquery.transmenu.min.js"></script>
-		<script type="text/javascript" src="./javascript/jquery/jquery.contextmenu.min.js"></script>
 		<script type="text/javascript" src="./javascript/jquery/json2.min.js"></script>
 		<script type="text/javascript" src="./javascript/common.js"></script>
 		<script type="text/javascript" src="./javascript/inspector.js"></script>
@@ -334,104 +334,102 @@
 		</div>
 
 		<div class="torrent_footer">
-			<ul id="settings_menu" title="Settings Menu">
-				<li id="button">&nbsp;
-					<ul id="footer_super_menu">
-						<li id="about-button">About</li>
-						<li class="separator"></li>
-						<li id="homepage">Transmission Homepage</li>
-						<li id="tipjar">Transmission Tip Jar</li>
-						<li class="separator"></li>
-						<li id="statistics">Statistics</li>
-						<li class="ui-helper-hidden" id="toggle_notifications">Notifcations</li>
-						<li class="separator"></li>
-						<li>Total Download Rate
-							<ul id="footer_download_rate_menu">
-								<li id="unlimited_download_rate">Unlimited</li>
-								<li id="limited_download_rate">Limit (10 kB/s)</li>
-								<li class="separator"></li>
-								<li class='download-speed'>5 kB/s</li>
-								<li class='download-speed'>10 kB/s</li>
-								<li class='download-speed'>20 kB/s</li>
-								<li class='download-speed'>30 kB/s</li>
-								<li class='download-speed'>40 kB/s</li>
-								<li class='download-speed'>50 kB/s</li>
-								<li class='download-speed'>75 kB/s</li>
-								<li class='download-speed'>100 kB/s</li>
-								<li class='download-speed'>150 kB/s</li>
-								<li class='download-speed'>200 kB/s</li>
-								<li class='download-speed'>250 kB/s</li>
-								<li class='download-speed'>500 kB/s</li>
-								<li class='download-speed'>750 kB/s</li>
-							</ul>
-						</li>
-						<li>Total Upload Rate
-							<ul id="footer_upload_rate_menu">
-								<li id="unlimited_upload_rate">Unlimited</li>
-								<li id="limited_upload_rate">Limit (10 kB/s)</li>
-								<li class="separator"></li>
-								<li class='upload-speed'>5 kB/s</li>
-								<li class='upload-speed'>10 kB/s</li>
-								<li class='upload-speed'>20 kB/s</li>
-								<li class='upload-speed'>30 kB/s</li>
-								<li class='upload-speed'>40 kB/s</li>
-								<li class='upload-speed'>50 kB/s</li>
-								<li class='upload-speed'>75 kB/s</li>
-								<li class='upload-speed'>100 kB/s</li>
-								<li class='upload-speed'>150 kB/s</li>
-								<li class='upload-speed'>200 kB/s</li>
-								<li class='upload-speed'>250 kB/s</li>
-								<li class='upload-speed'>500 kB/s</li>
-								<li class='upload-speed'>750 kB/s</li>
-							</ul>
-						</li>
-						<li class="separator"></li>
-						<li>Sort Transfers By
-							<ul id="footer_sort_menu">
-								<li class='sort-mode' id="sort_by_queue_order">Queue Order</li>
-								<li class='sort-mode' id="sort_by_activity">Activity</li>
-								<li class='sort-mode' id="sort_by_age">Age</li>
-								<li class='sort-mode' id="sort_by_name">Name</li>
-								<li class='sort-mode' id="sort_by_percent_completed">Progress</li>
-								<li class='sort-mode' id="sort_by_ratio">Ratio</li>
-								<li class='sort-mode' id="sort_by_size">Size</li>
-								<li class='sort-mode' id="sort_by_state">State</li>
-								<li class="separator"></li>
-								<li id="reverse_sort_order">Reverse Sort Order</li>
-							</ul>
-						</li>
-					</ul>
-				</li>
-			</ul>
+			<div id="settings_menu" title="Settings Menu">&nbsp;</div>
 			<div id="prefs-button" title="Edit Preferences…">&nbsp;</div>
 			<div id="turtle-button" title="Alternative Speed Limits">&nbsp;</div>
 			<div id="compact-button" title="Compact View">&nbsp;</div>
-		</div>
 
-		<div class="contextMenu" id="torrent_context_menu">
-			<ul>
-				<li id="context_pause_selected" class="disabled context_pause_selected">Pause</li>
-				<li id="context_resume_selected" class="disabled context_resume_selected">Resume</li>
-				<li id="context_resume_now_selected" class="disabled context_resume_selected">Resume Now</li>
-				<li class="separator"></li>
-				<li id="context_move_top">Move to Top</li>
-				<li id="context_move_up">Move Up</li>
-				<li id="context_move_down">Move Down</li>
-				<li id="context_move_bottom">Move to Bottom</li>
-				<li class="separator"></li>
-				<li id="context_remove">Remove From List…</li>
-				<li id="context_removedata">Trash Data and Remove From List…</li>
-				<li class="separator"></li>
-				<li id="context_verify">Verify Local Data</li>
-				<li id="context_move">Set Location…</li>
-				<li id="context_rename">Rename…</li>
-				<li class="separator"></li>
-				<li id="context_reannounce">Ask tracker for more peers</li>
-				<li class="separator"></li>
-				<li id="context_select_all">Select All</li>
-				<li id="context_deselect_all">Deselect All</li>
+			<ul class="ui-helper-hidden" id="footer_super_menu">
+				<li id="about-button">About</li>
+				<li>---</li>
+				<li id="homepage">Transmission Homepage</li>
+				<li id="tipjar">Transmission Tip Jar</li>
+				<li>---</li>
+				<li id="statistics">Statistics</li>
+				<!--
+				<li id="toggle_notifications">Notifcations</li>
+				-->
+				<li>---</li>
+				<li>Total Download Rate
+					<ul id="footer_download_rate_menu">
+						<li radio-group="download-rate" id="unlimited_download_rate"><span class='ui-icon ui-icon-bullet'></span>Unlimited</li>
+						<li radio-group="download-rate" id="limited_download_rate">Limit (10 kB/s)</li>
+						<li>---</li>
+						<li class='download-speed'>5 kB/s</li>
+						<li class='download-speed'>10 kB/s</li>
+						<li class='download-speed'>20 kB/s</li>
+						<li class='download-speed'>30 kB/s</li>
+						<li class='download-speed'>40 kB/s</li>
+						<li class='download-speed'>50 kB/s</li>
+						<li class='download-speed'>75 kB/s</li>
+						<li class='download-speed'>100 kB/s</li>
+						<li class='download-speed'>150 kB/s</li>
+						<li class='download-speed'>200 kB/s</li>
+						<li class='download-speed'>250 kB/s</li>
+						<li class='download-speed'>500 kB/s</li>
+						<li class='download-speed'>750 kB/s</li>
+					</ul>
+				</li>
+				<li>Total Upload Rate
+					<ul id="footer_upload_rate_menu">
+						<li radio-group="upload-rate" id="unlimited_upload_rate"><span class='ui-icon ui-icon-bullet'></span>Unlimited</li>
+						<li radio-group="upload-rate" id="limited_upload_rate">Limit (10 kB/s)</li>
+						<li>---</li>
+						<li class='upload-speed'>5 kB/s</li>
+						<li class='upload-speed'>10 kB/s</li>
+						<li class='upload-speed'>20 kB/s</li>
+						<li class='upload-speed'>30 kB/s</li>
+						<li class='upload-speed'>40 kB/s</li>
+						<li class='upload-speed'>50 kB/s</li>
+						<li class='upload-speed'>75 kB/s</li>
+						<li class='upload-speed'>100 kB/s</li>
+						<li class='upload-speed'>150 kB/s</li>
+						<li class='upload-speed'>200 kB/s</li>
+						<li class='upload-speed'>250 kB/s</li>
+						<li class='upload-speed'>500 kB/s</li>
+						<li class='upload-speed'>750 kB/s</li>
+					</ul>
+				</li>
+				<li>---</li>
+				<li>Sort Transfers By
+					<ul id="footer_sort_menu">
+						<li radio-group="sort-mode" id="sort_by_queue_order">Queue Order</li>
+						<li radio-group="sort-mode" id="sort_by_activity">Activity</li>
+						<li radio-group="sort-mode" id="sort_by_age">Age</li>
+						<li radio-group="sort-mode" id="sort_by_name">Name</li>
+						<li radio-group="sort-mode" id="sort_by_percent_completed">Progress</li>
+						<li radio-group="sort-mode" id="sort_by_ratio">Ratio</li>
+						<li radio-group="sort-mode" id="sort_by_size">Size</li>
+						<li radio-group="sort-mode" id="sort_by_state">State</li>
+						<li>---</li>
+						<li id="reverse_sort_order">Reverse Sort Order</li>
+					</ul>
+				</li>
 			</ul>
 		</div>
+
+		<ul class="ui-helper-hidden" id="torrent_context_menu">
+			<li data-command="pause_selected">Pause</li>
+			<li data-command="resume_selected">Resume</li>
+			<li data-command="resume_now_selected">Resume Now</li>
+			<li>---</li>
+			<li data-command="move_top">Move to Top</li>
+			<li data-command="move_up">Move Up</li>
+			<li data-command="move_down">Move Down</li>
+			<li data-command="move_bottom">Move to Bottom</li>
+			<li>---</li>
+			<li data-command="remove">Remove From List…</li>
+			<li data-command="remove_data">Trash Data and Remove From List…</li>
+			<li>---</li>
+			<li data-command="verify">Verify Local Data</li>
+			<li data-command="move">Set Location…</li>
+			<li data-command="rename">Rename…</li>
+			<li>---</li>
+			<li data-command="reannounce">Ask tracker for more peers</li>
+			<li>---</li>
+			<li data-command="select_all">Select All</li>
+			<li data-command="deselect_all">Deselect All</li>
+		</ul>
 
 		<iframe name="torrent_upload_frame" id="torrent_upload_frame" src="about:blank" ></iframe>
 	</body>

@@ -744,7 +744,7 @@ div.torrent_footer {
   background-image: -ms-linear-gradient(top, #dddddd, #bbbbbb);
   background-image: -o-linear-gradient(top, #dddddd, #bbbbbb);
   background-image: linear-gradient(top, #dddddd, #bbbbbb); }
-  div.torrent_footer > * {
+  div.torrent_footer > div {
     position: relative;
     float: left;
     margin: 2px 4px;
@@ -755,8 +755,7 @@ div.torrent_footer {
     border: 1px solid #888;
     -moz-user-select: none;
     -webkit-user-select: none; }
-  div.torrent_footer div.main_container,
-  div.torrent_footer ul#settings_menu {
+  div.torrent_footer #settings_menu {
     display: none; }
   div.torrent_footer #prefs-button {
     -moz-border-radius: 5px;
@@ -933,8 +932,13 @@ div.dialog_container a {
   margin: 10px 0 20px 150px;
   text-align: left; }
 
-div#torrent_context_menu {
-  display: none; }
+.ui-menu-item {
+  text-align: left;
+  white-space: nowrap; }
+
+#torrent_context_menu {
+  font-size: 1em;
+  z-index: 3; }
 
 iframe#torrent_upload_frame {
   display: block;

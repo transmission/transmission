@@ -694,7 +694,7 @@ div.torrent_footer
 
 	@include verticalGradient($statusbar-gradient-top, $statusbar-gradient-bottom);
 
-	> * {
+	> div {
 		position: relative;
 		float: left;
 		margin: 2px 4px;
@@ -712,8 +712,7 @@ div.torrent_footer
 	$active-color-top: $selected-gradient-top;
 	$active-color-bottom: $selected-gradient-bottom;
 
-	div.main_container,
-	ul#settings_menu {
+	#settings_menu {
 		display: none;
 	}
 
@@ -808,9 +807,14 @@ div.dialog_container a {
 }
 
 
-// no context menu in the mobile version...
-div#torrent_context_menu {
-	display: none;
+.ui-menu-item {
+  text-align: left;
+  white-space: nowrap;
+}
+
+#torrent_context_menu {
+  font-size: 1em;
+  z-index: 3;
 }
 
 iframe#torrent_upload_frame {
