@@ -625,7 +625,7 @@ gtr_window_new (GtkApplication * app, GtkUIManager * ui_mgr, TrCore * core)
   gtk_window_add_accel_group (win, gtk_ui_manager_get_accel_group (ui_mgr));
   /* Add style provider to the window. */
   /* Please move it to separate .css file if you’re adding more styles here. */
-  style = ".tr-workarea {border-width: 1px 0; border-style: solid; border-radius: 0;}";
+  style = ".tr-workarea.frame {border-left-width: 0; border-right-width: 0; border-radius: 0;}";
   css_provider = gtk_css_provider_new ();
   gtk_css_provider_load_from_data (css_provider, style,
                                    strlen (style), NULL);
