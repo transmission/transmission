@@ -559,15 +559,7 @@ GtkWidget* gtr_window_new(GtkApplication* app, TrCore* core)
     gtk_actionable_set_action_name(GTK_ACTIONABLE(button), "win.remove-torrent");
     gtk_header_bar_pack_start(GTK_HEADER_BAR(toolbar), button);
 
-    /* gear */
-
-    button = gtk_menu_button_new();
-    image = gtk_image_new_from_icon_name("view-more-symbolic", GTK_ICON_SIZE_MENU);
-    gtk_container_add(GTK_CONTAINER(button), image);
-    gtk_header_bar_pack_end(GTK_HEADER_BAR(toolbar), button);
-    model = gtr_action_get_menu_model("torrent-options-popup");
-    gtk_menu_button_set_menu_model(GTK_MENU_BUTTON(button), model);
-    gtk_menu_button_set_use_popover(GTK_MENU_BUTTON(button), FALSE);
+    /* Application menu */
 
     button = gtk_menu_button_new();
     image = gtk_image_new_from_icon_name("open-menu-symbolic", GTK_ICON_SIZE_MENU);
@@ -577,6 +569,18 @@ GtkWidget* gtr_window_new(GtkApplication* app, TrCore* core)
     gtk_menu_button_set_menu_model(GTK_MENU_BUTTON(button), model);
     gtk_menu_button_set_use_popover(GTK_MENU_BUTTON(button), FALSE);
 
+    /* Selected torrent details menu */
+
+    button = gtk_menu_button_new();
+    image = gtk_image_new_from_icon_name("view-more-symbolic", GTK_ICON_SIZE_MENU);
+    gtk_container_add(GTK_CONTAINER(button), image);
+    gtk_header_bar_pack_end(GTK_HEADER_BAR(toolbar), button);
+    model = gtr_action_get_menu_model("torrent-options-popup");
+    gtk_menu_button_set_menu_model(GTK_MENU_BUTTON(button), model);
+    gtk_menu_button_set_use_popover(GTK_MENU_BUTTON(button), FALSE);
+
+    /* Show/hide filters */
+
     button = gtk_toggle_button_new();
     image = gtk_image_new_from_icon_name("edit-find-symbolic", GTK_ICON_SIZE_MENU);
     gtk_button_set_image(GTK_BUTTON(button), image);
@@ -584,18 +588,18 @@ GtkWidget* gtr_window_new(GtkApplication* app, TrCore* core)
 
     g_signal_connect(button, "toggled", G_CALLBACK(onFilterChanged), p);
 
-    /* filter */
+    /* Filter bar */
+
     w = filter = p->filter = gtr_filter_bar_new(gtr_core_session(core), gtr_core_model(core), &p->filter_model,
         GTK_HEADER_BAR(toolbar));
     gtk_container_set_border_width(GTK_CONTAINER(w), GUI_PAD_SMALL);
 
-    /**
-    *** Statusbar
-    **/
+    /* Status Bar */
 
     status = p->status = gtr_status_bar_new(p); // gtk_grid_new();
 
-    /* workarea */
+    /* Torrent list */
+
     p->view = makeview(p);
     w = list = p->scroll = gtk_scrolled_window_new(NULL, NULL);
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(w), GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC);
