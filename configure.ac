@@ -95,7 +95,7 @@ if test "x$GCC" = "xyes" ; then
     AC_MSG_RESULT($GCC_VERSION)
     if test $GCC_VERSION_NUM -ge 304; then
         dnl these were added in 3.4
-        CFLAGS="$CFLAGS -Wextra -Wdeclaration-after-statement -Winit-self"
+        CFLAGS="$CFLAGS -Wextra -Winit-self"
     fi
     if test $GCC_VERSION_NUM -ge 403; then
         dnl these were added in 4.3
