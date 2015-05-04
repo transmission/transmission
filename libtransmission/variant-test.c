@@ -13,7 +13,7 @@
 
 #include <event2/buffer.h>
 
-#define __LIBTRANSMISSION_VARIANT_MODULE___
+#define __LIBTRANSMISSION_VARIANT_MODULE__
 #include "transmission.h"
 #include "utils.h" /* tr_free */
 #include "variant.h"

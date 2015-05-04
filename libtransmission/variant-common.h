@@ -7,7 +7,7 @@
  * $Id$
  */
 
-#ifndef __LIBTRANSMISSION_VARIANT_MODULE___
+#ifndef __LIBTRANSMISSION_VARIANT_MODULE__
  #error only libtransmission/variant-*.c should #include this header.
 #endif
 

@@ -16,7 +16,7 @@
 #include <event2/buffer.h>
 #include <event2/event.h> /* evtimer */
 
-#define __LIBTRANSMISSION_ANNOUNCER_MODULE___
+#define __LIBTRANSMISSION_ANNOUNCER_MODULE__
 
 #include "transmission.h"
 #include "announcer.h"

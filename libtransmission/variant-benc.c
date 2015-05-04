@@ -17,7 +17,7 @@
 
 #include "ConvertUTF.h"
 
-#define __LIBTRANSMISSION_VARIANT_MODULE___
+#define __LIBTRANSMISSION_VARIANT_MODULE__
 #include "transmission.h"
 #include "ptrarray.h"
 #include "utils.h" /* tr_snprintf() */

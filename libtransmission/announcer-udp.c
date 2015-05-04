@@ -7,7 +7,7 @@
  * $Id$
  */
 
-#define __LIBTRANSMISSION_ANNOUNCER_MODULE___
+#define __LIBTRANSMISSION_ANNOUNCER_MODULE__
 
 #include <errno.h> /* errno, EAFNOSUPPORT */
 #include <string.h> /* memcpy (), memset () */
