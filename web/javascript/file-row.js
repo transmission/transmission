@@ -45,11 +45,11 @@ function FileRow(torrent, depth, name, indices, even)
 	{
 		var pct = 100 * (fields.size ? (fields.have / fields.size) : 1.0),
 		    c = [ Transmission.fmt.size(fields.have),
-			  ' of ',
-			  Transmission.fmt.size(fields.size),
-			  ' (',
-			  Transmission.fmt.percentString(pct),
-			  '%)' ].join('');
+		          ' of ',
+		          Transmission.fmt.size(fields.size),
+		          ' (',
+		          Transmission.fmt.percentString(pct),
+		          '%)' ].join('');
 		setTextContent(elements.progress, c);
 	},
 	refreshImpl = function() {

@@ -90,7 +90,7 @@ Transmission.prototype =
 
 		if (this.isMenuEnabled)
 			this.createSettingsMenu();
- 
+
 		e = {};
 		e.torrent_list              = $('#torrent_list')[0];
 		e.toolbar_buttons           = $('#toolbar ul li');
@@ -606,7 +606,7 @@ Transmission.prototype =
 		clearInterval(this.sessionInterval);
 		delete this.sessionInterval;
 		if (enabled) {
-		        var callback = $.proxy(this.loadDaemonPrefs,this),
+			var callback = $.proxy(this.loadDaemonPrefs,this),
 			    msec = 8000;
 			this.sessionInterval = setInterval(callback, msec);
 		}
@@ -704,7 +704,7 @@ Transmission.prototype =
 
 			case 'tipjar':
 				window.open('http://www.transmissionbt.com/donate.php');
-				break;	
+				break;
 
 			case 'unlimited_download_rate':
 				o = {};
@@ -944,7 +944,7 @@ Transmission.prototype =
 
 			jQuery.each (fileInput[0].files, function(i,file) {
 				var reader = new FileReader();
-				reader.onload = function(e) { 
+				reader.onload = function(e) {
 					var contents = e.target.result;
 					var key = "base64,"
 					var index = contents.indexOf (key);
@@ -969,7 +969,7 @@ Transmission.prototype =
 
 			var url = $('#torrent_upload_url').val();
 			if (url != '') {
-				if (url.match(/^[0-9a-f]{40}$/i)) 
+				if (url.match(/^[0-9a-f]{40}$/i))
 					url = 'magnet:?xt=urn:btih:'+url;
 				var o = {
 					'method': 'torrent-add',
@@ -1001,9 +1001,9 @@ Transmission.prototype =
 		} else {
 			var ids = this.getTorrentIds(torrents);
 			this.remote.moveTorrents(
-				ids, 
-				$("input#torrent_path").val(), 
-				this.refreshTorrents, 
+				ids,
+				$("input#torrent_path").val(),
+				this.refreshTorrents,
 				this);
 			$('#move_container').hide();
 		}
@@ -1199,8 +1199,8 @@ Transmission.prototype =
 	updateGuiFromSession: function(o)
 	{
 		var limit, limited, e, b, text,
-                    fmt = Transmission.fmt,
-                    menu = $('#footer_super_menu');
+		    fmt = Transmission.fmt,
+		    menu = $('#footer_super_menu');
 
 		this.serverVersion = o.version;
 
@@ -1227,10 +1227,10 @@ Transmission.prototype =
 			limited = o[RPC._DownSpeedLimited];
 
 			e = menu.find('#limited_download_rate');
-                        e.html('Limit (' + fmt.speed(limit) + ')');
+			e.html('Limit (' + fmt.speed(limit) + ')');
 
-                        if (!limited)
-                        	e = menu.find('#unlimited_download_rate');
+			if (!limited)
+				e = menu.find('#unlimited_download_rate');
 			e.selectMenuItem();
 		}
 
@@ -1241,10 +1241,10 @@ Transmission.prototype =
 			limited = o[RPC._UpSpeedLimited];
 
 			e = menu.find('#limited_upload_rate');
-                        e.html('Limit (' + fmt.speed(limit) + ')');
+			e.html('Limit (' + fmt.speed(limit) + ')');
 
-                        if (!limited)
-                        	e = menu.find('#unlimited_upload_rate');
+			if (!limited)
+				e = menu.find('#unlimited_upload_rate');
 			e.selectMenuItem();
 		}
 	},
@@ -1535,8 +1535,8 @@ Transmission.prototype =
 		e = []
 		for (i=0; row=rows[i]; ++i)
 			e.push(row.getElement());
-		$(e).filter(":odd").addClass('even'); 
-		$(e).filter(":even").removeClass('even'); 
+		$(e).filter(":odd").addClass('even');
+		$(e).filter(":even").removeClass('even');
 
 		// sync gui
 		this.updateStatusbar();
@@ -1680,7 +1680,7 @@ Transmission.prototype =
 		delete this.statsInterval;
 		if (enabled) {
 			var callback = $.proxy(this.loadDaemonStats,this),
-                            msec = 5000;
+			    msec = 5000;
 			this.statsInterval = setInterval(callback, msec);
 		}
 	},

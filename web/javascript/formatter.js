@@ -279,9 +279,9 @@ Transmission.fmt = (function()
 			return [ n.toStringWithCommas(), this.ngettext(msgid,msgid_plural,n) ].join(' ');
 		},
 
-		peerStatus: function( flagStr ) 
-		{ 
-			var formattedFlags = []; 
+		peerStatus: function( flagStr )
+		{
+			var formattedFlags = [];
 			for (var i=0, flag; flag=flagStr[i]; ++i)
 			{
 				var explanation = null;
@@ -301,13 +301,13 @@ Transmission.fmt = (function()
 					case "T": explanation = "Peer is connected via uTP"; break;
 				}
 
-				if (!explanation) { 
-					formattedFlags.push(flag); 
-				} else { 
-					formattedFlags.push("<span title=\"" + flag + ': ' + explanation + "\">" + flag + "</span>"); 
-				} 
-			} 
-			return formattedFlags.join(''); 
+				if (!explanation) {
+					formattedFlags.push(flag);
+				} else {
+					formattedFlags.push("<span title=\"" + flag + ': ' + explanation + "\">" + flag + "</span>");
+				}
+			}
+			return formattedFlags.join('');
 		}
 	}
 })();

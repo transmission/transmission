@@ -28,7 +28,7 @@ $.fn.tabbedDialog = function (dialog_opts) {
 	this.find('.ui-tab-dialog-close').css({'position':'absolute','right':'0', 'top':'16px'});
 	this.find('.ui-tab-dialog-close > a').css({'float':'none','padding':'0'});
 	var tabul = this.find('ul:first');
-	this.parent().addClass('ui-tabs').prepend(tabul).draggable('option','handle',tabul); 
+	this.parent().addClass('ui-tabs').prepend(tabul).draggable('option','handle',tabul);
 	this.siblings('.ui-dialog-titlebar').remove();
 	tabul.addClass('ui-dialog-titlebar');
 }
@@ -246,7 +246,7 @@ jQuery.fn.forceNumeric = function () {
 		$(this).keydown(function (e) {
 			var key = e.which || e.keyCode;
 			return !e.shiftKey && !e.altKey && !e.ctrlKey &&
-				// numbers   
+				// numbers
 				key >= 48 && key <= 57 ||
 				// Numeric keypad
 				key >= 96 && key <= 105 ||

@@ -15,7 +15,7 @@ Dialog.prototype = {
 	 * Constructor
 	 */
 	initialize: function() {
-		
+
 		/*
 		 * Private Interface Variables
 		 */
@@ -25,7 +25,7 @@ Dialog.prototype = {
 		this._cancel_button = $('#dialog_cancel_button');
 		this._confirm_button = $('#dialog_confirm_button');
 		this._callback = null;
-		
+
 		// Observe the buttons
 		this._cancel_button.bind('click', {dialog: this}, this.onCancelClicked);
 		this._confirm_button.bind('click', {dialog: this}, this.onConfirmClicked);
@@ -108,6 +108,6 @@ Dialog.prototype = {
 			transmission.hideMobileAddressbar();
 		this._container.show();
 	}
-	
+
 
 }

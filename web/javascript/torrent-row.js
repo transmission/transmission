@@ -239,10 +239,10 @@ TorrentRendererFull.prototype =
 				      ' (', t.getPercentDoneStr(), '%)' ];
 			// append UL stats: ', uploaded 8.59 GiB (Ratio: 12.3)'
 			c.push(', uploaded ',
-			        Transmission.fmt.size(t.getUploadedEver()),
-			        ' (Ratio ',
-			        Transmission.fmt.ratioString(t.getUploadRatio()),
-			        ')');
+			       Transmission.fmt.size(t.getUploadedEver()),
+			       ' (Ratio ',
+			       Transmission.fmt.ratioString(t.getUploadRatio()),
+			       ')');
 		} else { // not done yet
 			c = [ Transmission.fmt.size(sizeWhenDone - t.getLeftUntilDone()),
 			      ' of ', Transmission.fmt.size(sizeWhenDone),
@@ -257,7 +257,7 @@ TorrentRendererFull.prototype =
 				c.push('remaining time unknown');
 			else
 				c.push(Transmission.fmt.timeInterval(t.getETA()),
-				        ' remaining');
+				       ' remaining');
 		}
 
 		return c.join('');
