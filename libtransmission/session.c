@@ -417,7 +417,7 @@ tr_sessionGetSettings (tr_session * s, tr_variant * d)
   tr_variantDictAddBool (d, TR_KEY_pex_enabled,                  s->isPexEnabled);
   tr_variantDictAddBool (d, TR_KEY_port_forwarding_enabled,      tr_sessionIsPortForwardingEnabled (s));
   tr_variantDictAddInt  (d, TR_KEY_preallocation,                s->preallocationMode);
-  tr_variantDictAddInt  (d, TR_KEY_prefetch_enabled,             s->isPrefetchEnabled);
+  tr_variantDictAddBool (d, TR_KEY_prefetch_enabled,             s->isPrefetchEnabled);
   tr_variantDictAddInt  (d, TR_KEY_peer_id_ttl_hours,            s->peer_id_ttl_hours);
   tr_variantDictAddBool (d, TR_KEY_queue_stalled_enabled,        tr_sessionGetQueueStalledEnabled (s));
   tr_variantDictAddInt  (d, TR_KEY_queue_stalled_minutes,        tr_sessionGetQueueStalledMinutes (s));
