@@ -1951,7 +1951,7 @@ fillOutputBuffer (tr_peerMsgs * msgs, time_t now)
         bool ok = false;
 
         data = tr_torrentGetMetadataPiece (msgs->torrent, piece, &dataLen);
-        if ((dataLen > 0) && (data != NULL))
+        if (data != NULL)
         {
             tr_variant tmp;
             struct evbuffer * payload;

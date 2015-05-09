@@ -2093,11 +2093,15 @@ onSigCHLD (int i UNUSED)
 static void
 torrentCallScript (const tr_torrent * tor, const char * script)
 {
-  char timeStr[128];
+  char timeStr[128], * newlinePos;
   const time_t now = tr_time ();
 
   tr_strlcpy (timeStr, ctime (&now), sizeof (timeStr));
-  *strchr (timeStr,'\n') = '\0';
+
+  /* ctime () includes '\n', but it's better to be safe */
+  newlinePos = strchr (timeStr, '\n');
+  if (newlinePos != NULL)
+    *newlinePos = '\0';
 
   if (script && *script)
     {

@@ -282,7 +282,7 @@ tr_upnpPulse (tr_upnp * handle,
         int  err_udp = -1;
         errno = 0;
 
-        if (!handle->urls.controlURL || !handle->data.first.servicetype)
+        if (!handle->urls.controlURL)
             handle->isMapped = 0;
         else
         {

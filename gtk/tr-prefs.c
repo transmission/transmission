@@ -970,11 +970,7 @@ new_time_combo (GObject * core, const tr_quark key)
     {
       char buf[128];
       GtkTreeIter iter;
-      struct tm   tm;
-      tm.tm_hour = i / 60;
-      tm.tm_min = i % 60;
-      tm.tm_sec = 0;
-      strftime (buf, sizeof (buf), "%H:%M", &tm);
+      g_snprintf (buf, sizeof (buf), "%02d:%02d", i / 60, i % 60);
       gtk_list_store_append (store, &iter);
       gtk_list_store_set (store, &iter, 0, i, 1, buf, -1);
     }

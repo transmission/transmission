@@ -500,7 +500,7 @@ handle_web_client (struct evhttp_request * req,
           char * filename = tr_strdup_printf ("%s%s%s",
                                               webClientDir,
                                               TR_PATH_DELIMITER_STR,
-                                              subpath && *subpath ? subpath : "index.html");
+                                              *subpath != '\0' ? subpath : "index.html");
           serve_file (req, server, filename);
           tr_free (filename);
         }
@@ -613,10 +613,17 @@ handle_request (struct evhttp_request * req, void * arg)
         {
           size_t plen;
           char * p = tr_base64_decode_str (auth + 6, &plen);
-          if (p && plen && ((pass = strchr (p, ':'))))
+          if (p != NULL)
             {
-              user = p;
-              *pass++ = '\0';
+              if (plen > 0 && (pass = strchr (p, ':')) != NULL)
+                {
+                  user = p;
+                  *pass++ = '\0';
+                }
+              else
+                {
+                  tr_free (p);
+                }
             }
         }
 

@@ -132,6 +132,7 @@ TorrentFilter::lessThan (const QModelIndex& left, const QModelIndex& right) cons
           val = a->compareSeedRatio (*b);
         if (!val)
           val = -compare (a->queuePosition(), b->queuePosition());
+        // fall through
 
       case SortMode::SORT_BY_RATIO:
         if (!val)

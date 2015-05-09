@@ -877,7 +877,7 @@ testForEndgame (const tr_swarm * s)
 {
   /* we consider ourselves to be in endgame if the number of bytes
      we've got requested is >= the number of bytes left to download */
-  return (s->requestCount * s->tor->blockSize)
+  return ((uint64_t) s->requestCount * s->tor->blockSize)
                >= tr_torrentGetLeftUntilDone (s->tor);
 }
 
@@ -1994,6 +1994,9 @@ myHandshakeDoneCB (tr_handshake  * handshake,
 
       ensureAtomExists (s, addr, port, 0, -1, TR_PEER_FROM_INCOMING);
       atom = getExistingAtom (s, addr);
+
+      assert (atom != NULL);
+
       atom->time = tr_time ();
       atom->piece_data_time = 0;
       atom->lastConnectionAt = tr_time ();

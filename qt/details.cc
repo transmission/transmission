@@ -112,6 +112,9 @@ class PeerItem: public QTreeWidgetItem
       const PeerItem * i = dynamic_cast<const PeerItem*> (&other);
       QTreeWidget * tw (treeWidget ());
       const int column = tw ? tw->sortColumn () : 0;
+
+      assert (i != nullptr);
+
       switch (column)
         {
           case COL_UP: return peer.rateToPeer < i->peer.rateToPeer;

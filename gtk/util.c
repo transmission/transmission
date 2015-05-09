@@ -431,20 +431,25 @@ gtr_combo_box_new_enum (const char * text_1, ...)
   GtkWidget * w;
   GtkCellRenderer * r;
   GtkListStore * store;
-  va_list vl;
   const char * text;
-  va_start (vl, text_1);
 
   store = gtk_list_store_new (2, G_TYPE_INT, G_TYPE_STRING);
 
   text = text_1;
-  if (text != NULL) do
+  if (text != NULL)
     {
-      const int val = va_arg (vl, int);
-      gtk_list_store_insert_with_values (store, NULL, INT_MAX, 0, val, 1, text, -1);
-      text = va_arg (vl, const char *);
+      va_list vl;
+
+      va_start (vl, text_1);
+      do
+        {
+          const int val = va_arg (vl, int);
+          gtk_list_store_insert_with_values (store, NULL, INT_MAX, 0, val, 1, text, -1);
+          text = va_arg (vl, const char *);
+        }
+      while (text != NULL);
+      va_end (vl);
     }
-  while (text != NULL);
 
   w = gtk_combo_box_new_with_model (GTK_TREE_MODEL (store));
   r = gtk_cell_renderer_text_new ();

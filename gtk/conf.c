@@ -172,7 +172,8 @@ gtr_pref_flag_get (const tr_quark key)
 {
   bool boolVal;
 
-  tr_variantDictFindBool (getPrefs (), key, &boolVal);
+  if (!tr_variantDictFindBool (getPrefs (), key, &boolVal))
+    boolVal = false;
 
   return boolVal != 0;
 }

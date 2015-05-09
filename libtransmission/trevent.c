@@ -284,6 +284,9 @@ tr_eventClose (tr_session * session)
 {
     assert (tr_isSession (session));
 
+    if (session->events == NULL)
+        return;
+
     session->events->die = true;
     tr_logAddDeep (__FILE__, __LINE__, NULL, "closing trevent pipe");
     tr_netCloseSocket (session->events->fds[1]);
