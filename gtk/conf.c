@@ -134,11 +134,9 @@ gtr_pref_get_all (void)
 int64_t
 gtr_pref_int_get (const tr_quark key)
 {
-  int64_t i = 0;
+  int64_t i;
 
-  tr_variantDictFindInt (getPrefs (), key, &i);
-
-  return i;
+  return tr_variantDictFindInt (getPrefs (), key, &i) ? i : 0;
 }
 
 void
@@ -150,11 +148,9 @@ gtr_pref_int_set (const tr_quark key, int64_t value)
 double
 gtr_pref_double_get (const tr_quark key)
 {
-  double d = 0.0;
+  double d;
 
-  tr_variantDictFindReal (getPrefs (), key, &d);
-
-  return d;
+  return tr_variantDictFindReal (getPrefs (), key, &d) ? d : 0.0;
 }
 
 void
@@ -172,10 +168,7 @@ gtr_pref_flag_get (const tr_quark key)
 {
   bool boolVal;
 
-  if (!tr_variantDictFindBool (getPrefs (), key, &boolVal))
-    boolVal = false;
-
-  return boolVal != 0;
+  return tr_variantDictFindBool (getPrefs (), key, &boolVal) ? boolVal : false;
 }
 
 void
@@ -191,11 +184,9 @@ gtr_pref_flag_set (const tr_quark key, gboolean value)
 const char*
 gtr_pref_string_get (const tr_quark key)
 {
-  const char * str = NULL;
+  const char * str;
 
-  tr_variantDictFindStr (getPrefs (), key, &str, NULL);
-
-  return str;
+  return tr_variantDictFindStr (getPrefs (), key, &str, NULL) ? str : NULL;
 }
 
 void

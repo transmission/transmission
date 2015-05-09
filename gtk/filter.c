@@ -182,8 +182,8 @@ tracker_filter_model_update (gpointer gstore)
   qsort (hosts->pdata, hosts->len, sizeof (char*), pstrcmp);
 
   /* update the "all" count */
-  gtk_tree_model_iter_children (model, &iter, NULL);
-  tracker_model_update_count (store, &iter, all);
+  if (gtk_tree_model_iter_children (model, &iter, NULL))
+    tracker_model_update_count (store, &iter, all);
 
   store_pos = first_tracker_pos;
   for (i=0, n=hosts->len ; ;)

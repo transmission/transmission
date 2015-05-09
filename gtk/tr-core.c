@@ -1801,10 +1801,11 @@ static void
 on_port_test_response (TrCore * core, tr_variant * response, gpointer u UNUSED)
 {
   tr_variant * args;
-  bool is_open = FALSE;
+  bool is_open;
 
-  if (tr_variantDictFindDict (response, TR_KEY_arguments, &args))
-    tr_variantDictFindBool (args, TR_KEY_port_is_open, &is_open);
+  if (!tr_variantDictFindDict (response, TR_KEY_arguments, &args) ||
+      !tr_variantDictFindBool (args, TR_KEY_port_is_open, &is_open))
+    is_open = false;
 
   core_emit_port_tested (core, is_open);
 }
@@ -1826,10 +1827,11 @@ static void
 on_blocklist_response (TrCore * core, tr_variant * response, gpointer data UNUSED)
 {
   tr_variant * args;
-  int64_t ruleCount = -1;
+  int64_t ruleCount;
 
-  if (tr_variantDictFindDict (response, TR_KEY_arguments, &args))
-    tr_variantDictFindInt (args, TR_KEY_blocklist_size, &ruleCount);
+  if (!tr_variantDictFindDict (response, TR_KEY_arguments, &args) ||
+      !tr_variantDictFindInt (args, TR_KEY_blocklist_size, &ruleCount))
+    ruleCount = -1;
 
   if (ruleCount > 0)
     gtr_pref_int_set (TR_KEY_blocklist_date, tr_time ());

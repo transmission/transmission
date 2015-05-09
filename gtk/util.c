@@ -347,10 +347,8 @@ gtr_get_help_uri (void)
 
   if (!uri)
     {
-      int major, minor;
       const char * fmt = "http://www.transmissionbt.com/help/gtk/%d.%dx";
-      sscanf (SHORT_VERSION_STRING, "%d.%d", &major, &minor);
-      uri = g_strdup_printf (fmt, major, minor / 10);
+      uri = g_strdup_printf (fmt, MAJOR_VERSION, MINOR_VERSION / 10);
     }
 
   return uri;

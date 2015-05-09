@@ -682,9 +682,10 @@ Session::responseReceived (int64_t tag, const QString& result, tr_variant * args
 
       case TAG_PORT_TEST:
         {
-          bool isOpen = false;
-          if (args != nullptr)
-            tr_variantDictFindBool (args, TR_KEY_port_is_open, &isOpen);
+          bool isOpen;
+          if (args == nullptr ||
+              !tr_variantDictFindBool (args, TR_KEY_port_is_open, &isOpen))
+            isOpen = false;
           emit portTested (isOpen);
           break;
         }

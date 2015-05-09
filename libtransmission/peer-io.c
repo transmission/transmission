@@ -397,13 +397,7 @@ maybeSetCongestionAlgorithm (tr_socket_t   socket,
                              const char  * algorithm)
 {
     if (algorithm && *algorithm)
-    {
-        const int rc = tr_netSetCongestionControl (socket, algorithm);
-
-        if (rc < 0)
-            tr_logAddNamedInfo ("Net", "Can't set congestion control algorithm '%s': %s",
-                     algorithm, tr_strerror (errno));
-    }
+        tr_netSetCongestionControl (socket, algorithm);
 }
 
 #ifdef WITH_UTP

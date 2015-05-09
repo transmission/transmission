@@ -159,7 +159,7 @@ tr_bitfieldIsValid (const tr_bitfield * b UNUSED)
 size_t
 tr_bitfieldCountTrueBits (const tr_bitfield * b)
 {
-  tr_bitfieldIsValid (b);
+  assert (tr_bitfieldIsValid (b));
 
   return b->true_count;
 }

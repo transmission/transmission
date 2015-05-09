@@ -354,12 +354,13 @@ torrentRemove (tr_session               * session,
   int i;
   int torrentCount;
   tr_rpc_callback_type type;
-  bool deleteFlag = false;
+  bool deleteFlag;
   tr_torrent ** torrents;
 
   assert (idle_data == NULL);
 
-  tr_variantDictFindBool (args_in, TR_KEY_delete_local_data, &deleteFlag);
+  if (!tr_variantDictFindBool (args_in, TR_KEY_delete_local_data, &deleteFlag))
+    deleteFlag = false;
   type = deleteFlag ? TR_RPC_TORRENT_TRASHING
                     : TR_RPC_TORRENT_REMOVING;
 
@@ -1350,11 +1351,12 @@ torrentSetLocation (tr_session               * session,
     }
   else
     {
-      bool move = false;
+      bool move;
       int i, torrentCount;
       tr_torrent ** torrents = getTorrents (session, args_in, &torrentCount);
 
-      tr_variantDictFindBool (args_in, TR_KEY_move, &move);
+      if (!tr_variantDictFindBool (args_in, TR_KEY_move, &move))
+        move = false;
 
       for (i=0; i<torrentCount; ++i)
         {

@@ -459,9 +459,8 @@ bool
 tr_sessionLoadSettings (tr_variant * dict, const char * configDir, const char * appName)
 {
   char * filename;
+  tr_variant oldDict;
   tr_variant fileSettings;
-  tr_variant sessionDefaults;
-  tr_variant tmp;
   bool success;
   tr_error * error = NULL;
 
@@ -469,12 +468,11 @@ tr_sessionLoadSettings (tr_variant * dict, const char * configDir, const char * 
 
   /* initializing the defaults: caller may have passed in some app-level defaults.
    * preserve those and use the session defaults to fill in any missing gaps. */
-  tr_variantInitDict (&sessionDefaults, 0);
-  tr_sessionGetDefaultSettings (&sessionDefaults);
-  tr_variantMergeDicts (&sessionDefaults, dict);
-  tmp = *dict;
-  *dict = sessionDefaults;
-  sessionDefaults = tmp;
+  oldDict = *dict;
+  tr_variantInitDict (dict, 0);
+  tr_sessionGetDefaultSettings (dict);
+  tr_variantMergeDicts (dict, &oldDict);
+  tr_variantFree (&oldDict);
 
   /* if caller didn't specify a config dir, use the default */
   if (!configDir || !*configDir)
@@ -495,7 +493,6 @@ tr_sessionLoadSettings (tr_variant * dict, const char * configDir, const char * 
     }
 
   /* cleanup */
-  tr_variantFree (&sessionDefaults);
   tr_free (filename);
   return success;
 }

@@ -641,9 +641,7 @@ static void event_callback (evutil_socket_t s UNUSED, short type, void* ignore U
     {
         struct sockaddr_in foreignAddr;
         int addrLen = sizeof foreignAddr;
-
-        /* be paranoid enough about zero terminating the foreign string */
-        char foreignMsg[lpd_maxDatagramLength + 1] = { 0 };
+        char foreignMsg[lpd_maxDatagramLength + 1];
 
         /* process local announcement from foreign peer */
         int res = recvfrom (lpd_socket, (void *) foreignMsg, lpd_maxDatagramLength,
@@ -660,6 +658,9 @@ static void event_callback (evutil_socket_t s UNUSED, short type, void* ignore U
                     .port = 0, /* the peer-to-peer port is yet unknown */
                     .flags = 0
                 };
+
+            /* be paranoid enough about zero terminating the foreign string */
+            foreignMsg[res] = '\0';
 
             foreignPeer.addr.addr.addr4 = foreignAddr.sin_addr;
             if (tr_lpdConsiderAnnounce (&foreignPeer, foreignMsg) != 0)
