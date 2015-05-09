@@ -93,7 +93,7 @@ verifyTorrent (tr_torrent * tor, bool * stopFlag)
               bytesThisPass = numRead;
               tr_sha1_update (sha, buffer, bytesThisPass);
 #if defined HAVE_POSIX_FADVISE && defined POSIX_FADV_DONTNEED
-              posix_fadvise (fd, filePos, bytesThisPass, POSIX_FADV_DONTNEED);
+              (void) posix_fadvise (fd, filePos, bytesThisPass, POSIX_FADV_DONTNEED);
 #endif
             }
         }

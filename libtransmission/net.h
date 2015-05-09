@@ -152,11 +152,11 @@ tr_socket_t tr_netAccept (tr_session  * session,
                           tr_address  * setme_addr,
                           tr_port     * setme_port);
 
-int  tr_netSetTOS (tr_socket_t s,
+void tr_netSetTOS (tr_socket_t s,
                    int         tos);
 
-int tr_netSetCongestionControl (tr_socket_t   s,
-                                const char  * algorithm);
+void tr_netSetCongestionControl (tr_socket_t   s,
+                                 const char  * algorithm);
 
 void tr_netClose (tr_session  * session,
                   tr_socket_t   s);
