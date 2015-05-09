@@ -137,14 +137,14 @@ set_file_for_single_pass (tr_sys_file_t handle)
 
 #ifdef HAVE_POSIX_FADVISE
 
-  posix_fadvise (handle, 0, 0, POSIX_FADV_SEQUENTIAL);
+  (void) posix_fadvise (handle, 0, 0, POSIX_FADV_SEQUENTIAL);
 
 #endif
 
 #ifdef __APPLE__
 
-  fcntl (handle, F_RDAHEAD, 1);
-  fcntl (handle, F_NOCACHE, 1);
+  (void) fcntl (handle, F_RDAHEAD, 1);
+  (void) fcntl (handle, F_NOCACHE, 1);
 
 #endif
 

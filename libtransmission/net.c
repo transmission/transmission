@@ -144,28 +144,37 @@ tr_address_compare (const tr_address * a, const tr_address * b)
  * TCP sockets
  **********************************************************************/
 
-int
+void
 tr_netSetTOS (tr_socket_t s,
               int         tos)
 {
 #ifdef IP_TOS
-    return setsockopt (s, IPPROTO_IP, IP_TOS, (const void *) &tos, sizeof (tos));
+    if (setsockopt (s, IPPROTO_IP, IP_TOS, (const void *) &tos, sizeof (tos)) != -1)
+        return;
 #else
-    return 0;
+    (void) s;
+    errno = ENOSYS;
 #endif
+
+    tr_logAddNamedInfo ("Net", "Can't set TOS '%d': %s", tos, tr_strerror (errno));
 }
 
-int
-tr_netSetCongestionControl (tr_socket_t   s UNUSED,
-                            const char  * algorithm UNUSED)
+void
+tr_netSetCongestionControl (tr_socket_t   s,
+                            const char  * algorithm)
 {
 #ifdef TCP_CONGESTION
-    return setsockopt (s, IPPROTO_TCP, TCP_CONGESTION,
-                       (const void *) algorithm, strlen (algorithm) + 1);
+    if (setsockopt (s, IPPROTO_TCP, TCP_CONGESTION,
+                    (const void *) algorithm, strlen (algorithm) + 1) != -1)
+        return;
+
 #else
+    (void) s;
     errno = ENOSYS;
-    return -1;
 #endif
+
+    tr_logAddNamedInfo ("Net", "Can't set congestion control algorithm '%s': %s",
+                        algorithm, tr_strerror (errno));
 }
 
 bool
