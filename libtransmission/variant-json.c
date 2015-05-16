@@ -547,7 +547,7 @@ jsonStringFunc (const tr_variant * val,
           case '\\': *outwalk++ = '\\'; *outwalk++ = '\\'; break;
 
           default:
-            if (isascii (*it))
+            if (isprint (*it))
               {
                 *outwalk++ = *it;
               }
