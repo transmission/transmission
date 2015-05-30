@@ -14,7 +14,7 @@
  #include <sys/wait.h> /* wait () */
  #include <unistd.h> /* fork (), execvp (), _exit () */
 #else
- #include <process.h> /* _spawnvpe () */
+ #include <windows.h> /* CreateProcess (), GetLastError () */
 #endif
 
 #include <assert.h>
@@ -2105,39 +2105,94 @@ torrentCallScript (const tr_torrent * tor, const char * script)
 
   if (script && *script)
     {
-      int i;
+      size_t i;
       char * cmd[] = { tr_strdup (script), NULL };
       char * env[] = {
         tr_strdup_printf ("TR_APP_VERSION=%s", SHORT_VERSION_STRING),
         tr_strdup_printf ("TR_TIME_LOCALTIME=%s", timeStr),
         tr_strdup_printf ("TR_TORRENT_DIR=%s", tor->currentDir),
-        tr_strdup_printf ("TR_TORRENT_ID=%d", tr_torrentId (tor)),
         tr_strdup_printf ("TR_TORRENT_HASH=%s", tor->info.hashString),
+        tr_strdup_printf ("TR_TORRENT_ID=%d", tr_torrentId (tor)),
         tr_strdup_printf ("TR_TORRENT_NAME=%s", tr_torrentName (tor)),
         NULL };
 
       tr_logAddTorInfo (tor, "Calling script \"%s\"", script);
 
+#ifndef NDEBUG
+      /* Win32 environment block strings should be sorted alphabetically */
+      for (i = 1; env[i] != NULL; ++i)
+        assert (strcmp (env[i - 1], env[i]) < 0);
+#endif
+
 #ifdef _WIN32
-      if (_spawnvpe (_P_NOWAIT, script, (const char* const*)cmd, (const char* const*)env) == -1)
-        tr_logAddTorErr (tor, "error executing script \"%s\": %s", cmd[0], tr_strerror (errno));
-#else
+
+      wchar_t * wide_script = tr_win32_utf8_to_native (script, -1);
+
+      size_t env_block_size = 0;
+      char * env_block = NULL;
+      for (i = 0; env[i] != NULL; ++i)
+        {
+          const size_t len = strlen (env[i]) + 1;
+          env_block = tr_renew (char, env_block, env_block_size + len + 1);
+          memcpy (env_block + env_block_size, env[i], len + 1);
+          env_block_size += len;
+        }
+
+      wchar_t * wide_env_block = NULL;
+      if (env_block != NULL)
+        {
+          env_block[env_block_size] = '\0';
+          wide_env_block = tr_win32_utf8_to_native (env_block, env_block_size + 1);
+          tr_free (env_block);
+        }
+
+      STARTUPINFOW si = { 0, };
+      si.cb = sizeof (si);
+      si.dwFlags = STARTF_USESHOWWINDOW;
+      si.wShowWindow = SW_HIDE;
+
+      PROCESS_INFORMATION pi;
+
+      if (CreateProcessW (wide_script, NULL, NULL, NULL, FALSE, NORMAL_PRIORITY_CLASS |
+                          CREATE_UNICODE_ENVIRONMENT | CREATE_NO_WINDOW | CREATE_DEFAULT_ERROR_MODE |
+                          DETACHED_PROCESS, wide_env_block, L"\\", &si, &pi))
+        {
+          CloseHandle (pi.hThread);
+          CloseHandle (pi.hProcess);
+        }
+      else
+        {
+          char * const message = tr_win32_format_message (GetLastError ());
+          tr_logAddTorErr (tor, "error executing script \"%s\": %s", script, message);
+          tr_free (message);
+        }
+
+      tr_free (wide_env_block);
+      tr_free (wide_script);
+
+#else /* _WIN32 */
+
       signal (SIGCHLD, onSigCHLD);
 
       if (!fork ())
         {
-          for (i=0; env[i]; ++i)
+          for (i = 0; env[i] != NULL; ++i)
             putenv (env[i]);
 
+          chdir ("/");
+
           if (execvp (script, cmd) == -1)
-            tr_logAddTorErr (tor, "error executing script \"%s\": %s", cmd[0], tr_strerror (errno));
+            tr_logAddTorErr (tor, "error executing script \"%s\": %s", script, tr_strerror (errno));
 
           _exit (0);
         }
-#endif
 
-      for (i=0; cmd[i]; ++i) tr_free (cmd[i]);
-      for (i=0; env[i]; ++i) tr_free (env[i]);
+#endif /* _WIN32 */
+
+      for (i = 0; cmd[i] != NULL; ++i)
+        tr_free (cmd[i]);
+      for (i = 0; env[i] != NULL; ++i)
+        tr_free (env[i]);
     }
 }
 
