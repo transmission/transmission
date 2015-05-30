@@ -176,10 +176,4 @@ char* tr_net_strerror (char * buf, size_t buflen, int err);
 
 const unsigned char *tr_globalIPv6 (void);
 
-#if defined (_WIN32) && !defined (QT_DLL)
-/* The QT exclusion is because something clashes whith the next include */
-#include <ws2tcpip.h> /* socklen_t */
-
-#endif
-
 #endif /* _TR_NET_H_ */
