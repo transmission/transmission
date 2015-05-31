@@ -638,7 +638,7 @@ tr_http_unescape (const char * str, int len)
   return ret;
 }
 
-static int
+static bool
 is_rfc2396_alnum (uint8_t ch)
 {
   return ('0' <= ch && ch <= '9')

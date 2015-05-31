@@ -346,6 +346,7 @@ bandwidthClamp (const tr_bandwidth  * b,
 
   return byteCount;
 }
+
 unsigned int
 tr_bandwidthClamp (const tr_bandwidth  * b,
                    tr_direction          dir,

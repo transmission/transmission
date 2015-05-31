@@ -1011,30 +1011,30 @@ void        tr_ctorSetFilesWanted (tr_ctor                * ctor,
 
 
 /** @brief Get this peer constructor's peer limit */
-int         tr_ctorGetPeerLimit (const tr_ctor * ctor,
+bool        tr_ctorGetPeerLimit (const tr_ctor * ctor,
                                  tr_ctorMode     mode,
                                  uint16_t *      setmeCount);
 
 /** @brief Get the "isPaused" flag from this peer constructor */
-int         tr_ctorGetPaused (const tr_ctor * ctor,
+bool        tr_ctorGetPaused (const tr_ctor * ctor,
                               tr_ctorMode     mode,
                               bool          * setmeIsPaused);
 
 /** @brief Get the download path from this peer constructor */
-int         tr_ctorGetDownloadDir (const tr_ctor  * ctor,
+bool        tr_ctorGetDownloadDir (const tr_ctor  * ctor,
                                    tr_ctorMode      mode,
                                    const char    ** setmeDownloadDir);
 
 /** @brief Get the incomplete directory from this peer constructor */
-int         tr_ctorGetIncompleteDir (const tr_ctor  * ctor,
+bool        tr_ctorGetIncompleteDir (const tr_ctor  * ctor,
                                      const char    ** setmeIncompleteDir);
 
 /** @brief Get the metainfo from this peer constructor */
-int         tr_ctorGetMetainfo (const tr_ctor            * ctor,
+bool        tr_ctorGetMetainfo (const tr_ctor            * ctor,
                                 const struct tr_variant ** setme);
 
 /** @brief Get the "delete .torrent file" flag from this peer constructor */
-int         tr_ctorGetDeleteSource (const tr_ctor  * ctor,
+bool        tr_ctorGetDeleteSource (const tr_ctor  * ctor,
                                     bool           * setmeDoDelete);
 
 /** @brief Get the tr_session poiner from this peer constructor */

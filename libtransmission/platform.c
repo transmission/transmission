@@ -192,7 +192,7 @@ tr_lockLock (tr_lock * l)
   ++l->depth;
 }
 
-int
+bool
 tr_lockHave (const tr_lock * l)
 {
   return (l->depth > 0) &&

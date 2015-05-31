@@ -211,7 +211,7 @@ static const char* lpd_extractHeader (const char* s, struct lpd_protocolVersion*
 *   - assemble search string "\r\nName: " and locate position
 *   - copy back value from end to next "\r\n"
 */
-static int lpd_extractParam (const char* const str, const char* const name, int n, char* const val)
+static bool lpd_extractParam (const char* const str, const char* const name, int n, char* const val)
 {
     /* configure maximum length of search string here */
     enum { maxLength = 30 };
@@ -222,14 +222,14 @@ static int lpd_extractParam (const char* const str, const char* const name, int 
     assert (val != NULL);
 
     if (strlen (name) > maxLength - strlen (CRLF ": "))
-        return 0;
+        return false;
 
     /* compose the string token to search for */
     tr_snprintf (sstr, maxLength, CRLF "%s: ", name);
 
     pos = strstr (str, sstr);
     if (pos == NULL)
-        return 0; /* search was not successful */
+        return false; /* search was not successful */
 
     {
         const char* const beg = pos + strlen (sstr);
@@ -248,7 +248,7 @@ static int lpd_extractParam (const char* const str, const char* const name, int 
     }
 
     /* we successfully returned the value string */
-    return 1;
+    return true;
 }
 
 /**
@@ -512,7 +512,7 @@ static int tr_lpdConsiderAnnounce (tr_pex* peer, const char* const msg)
 
         /* save the effort to check Host, which seems to be optional anyway */
 
-        if (lpd_extractParam (params, "Port", maxValueLen, value) == 0)
+        if (!lpd_extractParam (params, "Port", maxValueLen, value))
             return 0;
 
         /* determine announced peer port, refuse if value too large */
@@ -522,7 +522,7 @@ static int tr_lpdConsiderAnnounce (tr_pex* peer, const char* const msg)
         peer->port = htons (peerPort);
         res = -1; /* signal caller side-effect to peer->port via return != 0 */
 
-        if (lpd_extractParam (params, "Infohash", maxHashLen, hashString) == 0)
+        if (!lpd_extractParam (params, "Infohash", maxHashLen, hashString))
             return res;
 
         tor = tr_torrentFindFromHashString (session, hashString);

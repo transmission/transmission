@@ -77,7 +77,7 @@ struct bootstrap_closure {
     size_t len, len6;
 };
 
-static int
+static bool
 bootstrap_done (tr_session *session, int af)
 {
     int status;
@@ -460,7 +460,7 @@ tr_dhtPort (tr_session *ss)
     return tr_dhtEnabled (ss) ? ss->udp_port : 0;
 }
 
-int
+bool
 tr_dhtAddNode (tr_session       * ss,
                const tr_address * address,
                tr_port            port,
@@ -469,14 +469,14 @@ tr_dhtAddNode (tr_session       * ss,
     int af = address->type == TR_AF_INET ? AF_INET : AF_INET6;
 
     if (!tr_dhtEnabled (ss))
-        return 0;
+        return false;
 
     /* Since we don't want to abuse our bootstrap nodes,
      * we don't ping them if the DHT is in a good state. */
 
     if (bootstrap) {
         if (tr_dhtStatus (ss, af, NULL) >= TR_DHT_FIREWALLED)
-            return 0;
+            return false;
     }
 
     if (address->type == TR_AF_INET) {
@@ -486,7 +486,7 @@ tr_dhtAddNode (tr_session       * ss,
         memcpy (&sin.sin_addr, &address->addr.addr4, 4);
         sin.sin_port = htons (port);
         dht_ping_node ((struct sockaddr*)&sin, sizeof (sin));
-        return 1;
+        return true;
     } else if (address->type == TR_AF_INET6) {
         struct sockaddr_in6 sin6;
         memset (&sin6, 0, sizeof (sin6));
@@ -494,10 +494,10 @@ tr_dhtAddNode (tr_session       * ss,
         memcpy (&sin6.sin6_addr, &address->addr.addr6, 16);
         sin6.sin6_port = htons (port);
         dht_ping_node ((struct sockaddr*)&sin6, sizeof (sin6));
-        return 1;
+        return true;
     }
 
-    return 0;
+    return false;
 }
 
 const char *

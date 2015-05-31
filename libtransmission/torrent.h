@@ -31,7 +31,7 @@ void        tr_torrentFree (tr_torrent * tor);
 void        tr_ctorSetSave (tr_ctor * ctor,
                             bool      saveMetadataInOurTorrentsDir);
 
-int         tr_ctorGetSave (const tr_ctor * ctor);
+bool        tr_ctorGetSave (const tr_ctor * ctor);
 
 void        tr_ctorInitTorrentPriorities (const tr_ctor * ctor, tr_torrent * tor);
 

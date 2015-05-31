@@ -453,7 +453,7 @@ tr_cacheFlushFile (tr_cache * cache, tr_torrent * torrent, tr_file_index_t i)
       err = flushContiguous (cache, pos, getBlockRun (cache, pos, NULL));
     }
 
-    return err;
+  return err;
 }
 
 int

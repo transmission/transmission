@@ -289,7 +289,7 @@ gtr_torrent_options_dialog_new (GtkWindow * parent, TrCore * core, tr_ctor * cto
                                            GTK_RESPONSE_CANCEL,
                                            -1);
 
-  if (tr_ctorGetDownloadDir (ctor, TR_FORCE, &str))
+  if (!tr_ctorGetDownloadDir (ctor, TR_FORCE, &str))
     g_assert_not_reached ();
   g_assert (str);
 
@@ -375,7 +375,7 @@ gtr_torrent_options_dialog_new (GtkWindow * parent, TrCore * core, tr_ctor * cto
   /* torrent priority row */
   row++;
   w = data->run_check;
-  if (tr_ctorGetPaused (ctor, TR_FORCE, &flag))
+  if (!tr_ctorGetPaused (ctor, TR_FORCE, &flag))
     g_assert_not_reached ();
   gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (w), !flag);
   gtk_grid_attach (grid, w, 0, row, 2, 1);
@@ -383,7 +383,7 @@ gtr_torrent_options_dialog_new (GtkWindow * parent, TrCore * core, tr_ctor * cto
   /* "trash .torrent file" row */
   row++;
   w = data->trash_check;
-  if (tr_ctorGetDeleteSource (ctor, &flag))
+  if (!tr_ctorGetDeleteSource (ctor, &flag))
     g_assert_not_reached ();
   gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (w), flag);
   gtk_grid_attach (grid, w, 0, row, 2, 1);

@@ -146,8 +146,10 @@ tr_bitfieldHas (const tr_bitfield * b, size_t n)
 ****
 ***/
 
+#ifndef NDEBUG
+
 static bool
-tr_bitfieldIsValid (const tr_bitfield * b UNUSED)
+tr_bitfieldIsValid (const tr_bitfield * b)
 {
   assert (b != NULL);
   assert ((b->alloc_count == 0) == (b->bits == 0));
@@ -155,6 +157,8 @@ tr_bitfieldIsValid (const tr_bitfield * b UNUSED)
 
   return true;
 }
+
+#endif
 
 size_t
 tr_bitfieldCountTrueBits (const tr_bitfield * b)

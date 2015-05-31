@@ -42,7 +42,7 @@ bool tr_dhtEnabled (const tr_session *);
 tr_port tr_dhtPort (tr_session *);
 int tr_dhtStatus (tr_session *, int af, int * setme_nodeCount);
 const char *tr_dhtPrintableStatus (int status);
-int tr_dhtAddNode (tr_session *, const tr_address *, tr_port, bool bootstrap);
+bool tr_dhtAddNode (tr_session *, const tr_address *, tr_port, bool bootstrap);
 void tr_dhtUpkeep (tr_session *);
 void tr_dhtCallback (unsigned char *buf, int buflen,
                     struct sockaddr *from, socklen_t fromlen,

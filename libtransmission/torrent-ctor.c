@@ -258,17 +258,17 @@ tr_ctorSetDeleteSource (tr_ctor * ctor, bool deleteSource)
     ctor->isSet_delete = true;
 }
 
-int
+bool
 tr_ctorGetDeleteSource (const tr_ctor * ctor, bool * setme)
 {
-    int err = 0;
+    bool ret = true;
 
     if (!ctor->isSet_delete)
-        err = 1;
+        ret = false;
     else if (setme)
-        *setme = ctor->doDelete ? 1 : 0;
+        *setme = ctor->doDelete;
 
-    return err;
+    return ret;
 }
 
 /***
@@ -283,7 +283,7 @@ tr_ctorSetSave (tr_ctor * ctor, bool saveInOurTorrentsDir)
     ctor->saveInOurTorrentsDir = saveInOurTorrentsDir;
 }
 
-int
+bool
 tr_ctorGetSave (const tr_ctor * ctor)
 {
     return ctor && ctor->saveInOurTorrentsDir;
@@ -349,78 +349,78 @@ tr_ctorSetIncompleteDir (tr_ctor * ctor, const char * directory)
     ctor->incompleteDir = tr_strdup (directory);
 }
 
-int
+bool
 tr_ctorGetPeerLimit (const tr_ctor * ctor,
                      tr_ctorMode     mode,
                      uint16_t *      setmeCount)
 {
-    int err = 0;
+    bool ret = true;
     const struct optional_args * args = &ctor->optionalArgs[mode];
 
     if (!args->isSet_connected)
-        err = 1;
+        ret = false;
     else if (setmeCount)
         *setmeCount = args->peerLimit;
 
-    return err;
+    return ret;
 }
 
-int
+bool
 tr_ctorGetPaused (const tr_ctor * ctor, tr_ctorMode mode, bool * setmeIsPaused)
 {
-    int err = 0;
+    bool ret = true;
     const struct optional_args * args = &ctor->optionalArgs[mode];
 
     if (!args->isSet_paused)
-        err = 1;
+        ret = false;
     else if (setmeIsPaused)
         *setmeIsPaused = args->isPaused;
 
-    return err;
+    return ret;
 }
 
-int
+bool
 tr_ctorGetDownloadDir (const tr_ctor * ctor,
                        tr_ctorMode     mode,
                        const char **   setmeDownloadDir)
 {
-    int err = 0;
+    bool ret = true;
     const struct optional_args * args = &ctor->optionalArgs[mode];
 
     if (!args->isSet_downloadDir)
-        err = 1;
+        ret = false;
     else if (setmeDownloadDir)
         *setmeDownloadDir = args->downloadDir;
 
-    return err;
+    return ret;
 }
 
-int
+bool
 tr_ctorGetIncompleteDir (const tr_ctor  * ctor,
                          const char    ** setmeIncompleteDir)
 {
-    int err = 0;
+    bool ret = true;
 
     if (ctor->incompleteDir == NULL)
-        err = 1;
+        ret = false;
     else
         *setmeIncompleteDir = ctor->incompleteDir;
 
-    return err;
+    return ret;
 }
 
-int
+bool
 tr_ctorGetMetainfo (const tr_ctor *  ctor,
                     const tr_variant ** setme)
 {
-    int err = 0;
+    bool ret = true;
 
     if (!ctor->isSet_metainfo)
-        err = 1;
+        ret = false;
     else if (setme)
         *setme = &ctor->metainfo;
 
-    return err;
+    return ret;
 }
 
 tr_session*

@@ -75,7 +75,7 @@ void tr_lockLock (tr_lock *);
 void tr_lockUnlock (tr_lock *);
 
 /** @brief return nonzero if the specified lock is locked */
-int tr_lockHave (const tr_lock *);
+bool tr_lockHave (const tr_lock *);
 
 /* @} */
 

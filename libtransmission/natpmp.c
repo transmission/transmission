@@ -98,7 +98,7 @@ tr_natpmpClose (tr_natpmp * nat)
     }
 }
 
-static int
+static bool
 canSendCommand (const struct tr_natpmp * nat)
 {
     return tr_time () >= nat->command_time;

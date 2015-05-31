@@ -192,9 +192,9 @@ tr_torrentGetMetadataPiece (tr_torrent * tor, int piece, int * len)
         }
     }
 
-    assert (ret == NULL || *len > 0);
+  assert (ret == NULL || *len > 0);
 
-    return ret;
+  return ret;
 }
 
 void

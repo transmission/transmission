@@ -632,7 +632,7 @@ initFilePieces (tr_info *       info,
   file->lastPiece = getBytePiece (info, lastByte);
 }
 
-static int
+static bool
 pieceHasFile (tr_piece_index_t piece,
               const tr_file *  file)
 {
@@ -872,11 +872,11 @@ torrentInit (tr_torrent * tor, const tr_ctor * ctor)
            tor->info.hash, SHA_DIGEST_LENGTH,
            NULL);
 
-  if (!tr_ctorGetDownloadDir (ctor, TR_FORCE, &dir) ||
-    !tr_ctorGetDownloadDir (ctor, TR_FALLBACK, &dir))
-      tor->downloadDir = tr_strdup (dir);
+  if (tr_ctorGetDownloadDir (ctor, TR_FORCE, &dir) ||
+      tr_ctorGetDownloadDir (ctor, TR_FALLBACK, &dir))
+    tor->downloadDir = tr_strdup (dir);
 
-  if (tr_ctorGetIncompleteDir (ctor, &dir))
+  if (!tr_ctorGetIncompleteDir (ctor, &dir))
     dir = tr_sessionGetIncompleteDir (session);
   if (tr_sessionIsIncompleteDirEnabled (session))
     tor->incompleteDir = tr_strdup (dir);
@@ -952,7 +952,7 @@ torrentInit (tr_torrent * tor, const tr_ctor * ctor)
   if (tr_ctorGetSave (ctor))
     {
       const tr_variant * val;
-      if (!tr_ctorGetMetainfo (ctor, &val))
+      if (tr_ctorGetMetainfo (ctor, &val))
         {
           const char * path = tor->info.torrent;
           const int err = tr_variantToFile (val, TR_VARIANT_FMT_BENC, path);
@@ -996,7 +996,7 @@ torrentParseImpl (const tr_ctor  * ctor,
     setmeInfo = &tmp;
   memset (setmeInfo, 0, sizeof (tr_info));
 
-  if (tr_ctorGetMetainfo (ctor, &metainfo))
+  if (!tr_ctorGetMetainfo (ctor, &metainfo))
     return TR_PARSE_ERR;
 
   didParse = tr_metainfoParse (session, metainfo, setmeInfo,

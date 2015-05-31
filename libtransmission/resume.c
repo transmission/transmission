@@ -77,7 +77,7 @@ addPeers (tr_torrent * tor, const uint8_t * buf, int buflen)
         }
     }
 
-    return numAdded;
+  return numAdded;
 }
 
 
@@ -872,7 +872,7 @@ setFromCtor (tr_torrent * tor, uint64_t fields, const tr_ctor * ctor, int mode)
     {
       bool isPaused;
 
-      if (!tr_ctorGetPaused (ctor, mode, &isPaused))
+      if (tr_ctorGetPaused (ctor, mode, &isPaused))
         {
           tor->isRunning = !isPaused;
           ret |= TR_FR_RUN;
@@ -880,14 +880,14 @@ setFromCtor (tr_torrent * tor, uint64_t fields, const tr_ctor * ctor, int mode)
     }
 
   if (fields & TR_FR_MAX_PEERS)
-    if (!tr_ctorGetPeerLimit (ctor, mode, &tor->maxConnectedPeers))
+    if (tr_ctorGetPeerLimit (ctor, mode, &tor->maxConnectedPeers))
       ret |= TR_FR_MAX_PEERS;
 
   if (fields & TR_FR_DOWNLOAD_DIR)
     {
       const char * path;
 
-      if (!tr_ctorGetDownloadDir (ctor, mode, &path) && path && *path)
+      if (tr_ctorGetDownloadDir (ctor, mode, &path) && path && *path)
         {
           ret |= TR_FR_DOWNLOAD_DIR;
           tr_free (tor->downloadDir);

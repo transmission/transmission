@@ -1171,16 +1171,16 @@ core_add_ctor (TrCore * core, tr_ctor * ctor,
 static void
 core_apply_defaults (tr_ctor * ctor)
 {
-  if (tr_ctorGetPaused (ctor, TR_FORCE, NULL))
+  if (!tr_ctorGetPaused (ctor, TR_FORCE, NULL))
     tr_ctorSetPaused (ctor, TR_FORCE, !gtr_pref_flag_get (TR_KEY_start_added_torrents));
 
-  if (tr_ctorGetDeleteSource (ctor, NULL))
+  if (!tr_ctorGetDeleteSource (ctor, NULL))
     tr_ctorSetDeleteSource (ctor, gtr_pref_flag_get (TR_KEY_trash_original_torrent_files));
 
-  if (tr_ctorGetPeerLimit (ctor, TR_FORCE, NULL))
+  if (!tr_ctorGetPeerLimit (ctor, TR_FORCE, NULL))
     tr_ctorSetPeerLimit (ctor, TR_FORCE, gtr_pref_int_get (TR_KEY_peer_limit_per_torrent));
 
-  if (tr_ctorGetDownloadDir (ctor, TR_FORCE, NULL))
+  if (!tr_ctorGetDownloadDir (ctor, TR_FORCE, NULL))
     tr_ctorSetDownloadDir (ctor, TR_FORCE, gtr_pref_string_get (TR_KEY_download_dir));
 }
 

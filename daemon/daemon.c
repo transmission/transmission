@@ -201,11 +201,11 @@ onFileAdded (tr_session * session, const char * dir, const char * file)
         else
         {
             bool trash = false;
-            int test = tr_ctorGetDeleteSource (ctor, &trash);
+            const bool test = tr_ctorGetDeleteSource (ctor, &trash);
 
             tr_logAddInfo ("Parsing .torrent file successful \"%s\"", file);
 
-            if (!test && trash)
+            if (test && trash)
             {
                 tr_error * error = NULL;
 
