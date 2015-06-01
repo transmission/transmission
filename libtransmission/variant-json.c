@@ -428,7 +428,7 @@ jsonChildFunc (struct jsonWalk * data)
 
                   if (!isLast)
                     {
-                      evbuffer_add (data->out, ", ", data->doIndent ? 2 : 1);
+                      evbuffer_add (data->out, ",", 1);
                       jsonIndent (data);
                     }
                 }
@@ -440,7 +440,7 @@ jsonChildFunc (struct jsonWalk * data)
               const bool isLast = ++pstate->childIndex == pstate->childCount;
               if (!isLast)
                 {
-                  evbuffer_add (data->out, ", ", data->doIndent ? 2 : 1);
+                  evbuffer_add (data->out, ",", 1);
                   jsonIndent (data);
                 }
               break;
