@@ -381,7 +381,8 @@ include(LargeFileSupport)
 set(NEEDED_HEADERS
     stdbool.h
     sys/statvfs.h
-    xfs/xfs.h)
+    xfs/xfs.h
+    xlocale.h)
 
 if(ENABLE_NLS)
     list(APPEND NEEDED_HEADERS libintl.h)
@@ -416,6 +417,7 @@ set(NEEDED_FUNCTIONS
     strlcpy
     strsep
     syslog
+    uselocale
     valloc)
 
 foreach(F ${NEEDED_FUNCTIONS})

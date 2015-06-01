@@ -7,6 +7,15 @@
  * $Id$
  */
 
+#if defined (HAVE_USELOCALE) && (!defined (_XOPEN_SOURCE) || _XOPEN_SOURCE < 700)
+ #undef _XOPEN_SOURCE
+ #define _XOPEN_SOURCE 700
+#endif
+
+#if defined (HAVE_USELOCALE) && !defined (_GNU_SOURCE)
+ #define _GNU_SOURCE
+#endif
+
 #include <assert.h>
 #include <errno.h>
 #include <stdlib.h> /* strtod(), realloc(), qsort() */
@@ -17,6 +26,10 @@
 #endif
 
 #include <locale.h> /* setlocale() */
+
+#if defined (HAVE_USELOCALE) && defined (HAVE_XLOCALE_H)
+ #include <xlocale.h>
+#endif
 
 #include <event2/buffer.h>
 
@@ -33,6 +46,65 @@
 /**
 ***
 **/
+
+struct locale_context
+{
+#ifdef HAVE_USELOCALE
+  locale_t new_locale;
+  locale_t old_locale;
+#else
+#ifdef _WIN32
+  int old_thread_config;
+#endif
+  int category;
+  char old_locale[128];
+#endif
+};
+
+static void
+use_numeric_locale (struct locale_context * context,
+                    const char            * locale_name)
+{
+#ifdef HAVE_USELOCALE
+
+  context->new_locale = newlocale (LC_NUMERIC_MASK, locale_name, NULL);
+  context->old_locale = uselocale (context->new_locale);
+
+#else
+
+#ifdef _WIN32
+  context->old_thread_config = _configthreadlocale (_ENABLE_PER_THREAD_LOCALE);
+#endif
+
+  context->category = LC_NUMERIC;
+  tr_strlcpy (context->old_locale, setlocale (context->category, NULL), sizeof (context->old_locale));
+  setlocale (context->category, locale_name);
+
+#endif
+}
+
+static void
+restore_locale (struct locale_context * context)
+{
+#ifdef HAVE_USELOCALE
+
+  uselocale (context->old_locale);
+  freelocale (context->new_locale);
+
+#else
+
+  setlocale (context->category, context->old_locale);
+
+#ifdef _WIN32
+  _configthreadlocale (context->old_thread_config);
+#endif
+
+#endif
+}
+
+/***
+****
+***/
 
 static bool
 tr_variantIsContainer (const tr_variant * v)
@@ -301,14 +373,13 @@ tr_variantGetReal (const tr_variant * v, double * setme)
   if (!success && tr_variantIsString (v))
     {
       char * endptr;
-      char locale[128];
+      struct locale_context locale_ctx;
       double d;
 
       /* the json spec requires a '.' decimal point regardless of locale */
-      tr_strlcpy (locale, setlocale (LC_NUMERIC, NULL), sizeof (locale));
-      setlocale (LC_NUMERIC, "POSIX");
+      use_numeric_locale (&locale_ctx, "C");
       d  = strtod (getStr (v), &endptr);
-      setlocale (LC_NUMERIC, locale);
+      restore_locale (&locale_ctx);
 
       if ((success = (getStr (v) != endptr) && !*endptr))
         *setme = d;
@@ -1093,12 +1164,11 @@ tr_variantMergeDicts (tr_variant * target, const tr_variant * source)
 struct evbuffer *
 tr_variantToBuf (const tr_variant * v, tr_variant_fmt fmt)
 {
-  char lc_numeric[128];
+  struct locale_context locale_ctx;
   struct evbuffer * buf = evbuffer_new();
 
   /* parse with LC_NUMERIC="C" to ensure a "." decimal separator */
-  tr_strlcpy (lc_numeric, setlocale (LC_NUMERIC, NULL), sizeof (lc_numeric));
-  setlocale (LC_NUMERIC, "C");
+  use_numeric_locale (&locale_ctx, "C");
 
   evbuffer_expand (buf, 4096); /* alloc a little memory to start off with */
 
@@ -1118,7 +1188,7 @@ tr_variantToBuf (const tr_variant * v, tr_variant_fmt fmt)
     }
 
   /* restore the previous locale */
-  setlocale (LC_NUMERIC, lc_numeric);
+  restore_locale (&locale_ctx);
   return buf;
 }
 
@@ -1251,11 +1321,10 @@ tr_variantFromBuf (tr_variant      * setme,
                    const char     ** setme_end)
 {
   int err;
-  char lc_numeric[128];
+  struct locale_context locale_ctx;
 
   /* parse with LC_NUMERIC="C" to ensure a "." decimal separator */
-  tr_strlcpy (lc_numeric, setlocale (LC_NUMERIC, NULL), sizeof (lc_numeric));
-  setlocale (LC_NUMERIC, "C");
+  use_numeric_locale (&locale_ctx, "C");
 
   switch (fmt)
     {
@@ -1270,6 +1339,6 @@ tr_variantFromBuf (tr_variant      * setme,
     }
 
   /* restore the previous locale */
-  setlocale (LC_NUMERIC, lc_numeric);
+  restore_locale (&locale_ctx);
   return err;
 }
