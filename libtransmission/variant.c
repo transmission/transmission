@@ -53,11 +53,11 @@ struct locale_context
   locale_t new_locale;
   locale_t old_locale;
 #else
-#ifdef _WIN32
-  int old_thread_config;
+#if defined (HAVE__CONFIGTHREADLOCALE) && defined (_ENABLE_PER_THREAD_LOCALE)
+  int      old_thread_config;
 #endif
-  int category;
-  char old_locale[128];
+  int      category;
+  char     old_locale[128];
 #endif
 };
 
@@ -72,7 +72,7 @@ use_numeric_locale (struct locale_context * context,
 
 #else
 
-#ifdef _WIN32
+#if defined (HAVE__CONFIGTHREADLOCALE) && defined (_ENABLE_PER_THREAD_LOCALE)
   context->old_thread_config = _configthreadlocale (_ENABLE_PER_THREAD_LOCALE);
 #endif
 
@@ -95,7 +95,7 @@ restore_locale (struct locale_context * context)
 
   setlocale (context->category, context->old_locale);
 
-#ifdef _WIN32
+#if defined (HAVE__CONFIGTHREADLOCALE) && defined (_ENABLE_PER_THREAD_LOCALE)
   _configthreadlocale (context->old_thread_config);
 #endif
 

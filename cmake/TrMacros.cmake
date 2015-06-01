@@ -65,7 +65,7 @@ endmacro()
 function(tr_make_id INPUT OVAR)
     string(TOUPPER "${INPUT}" ID)
     string(REGEX REPLACE "[^A-Z0-9]+" "_" ID "${ID}")
-    string(REGEX REPLACE "^_+|_+$" "" ID "${ID}")
+    # string(REGEX REPLACE "^_+|_+$" "" ID "${ID}")
     set(${OVAR} "${ID}" PARENT_SCOPE)
 endfunction()
 

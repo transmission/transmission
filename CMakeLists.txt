@@ -397,6 +397,7 @@ foreach(H ${NEEDED_HEADERS})
 endforeach()
 
 set(NEEDED_FUNCTIONS
+    _configthreadlocale
     canonicalize_file_name
     daemon
     fallocate64
