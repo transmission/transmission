@@ -693,3 +693,12 @@ dht_random_bytes (void * buf, size_t size)
     tr_rand_buffer (buf, size);
     return size;
 }
+
+#if defined (_WIN32) && !defined (__MINGW32__)
+int
+dht_gettimeofday (struct timeval * tv, struct timezone * tz)
+{
+  assert (tz == NULL);
+  return tr_gettimeofday (tv);
+}
+#endif
