@@ -52,55 +52,61 @@ TRANSLATIONS += translations/transmission_en.ts \
                 translations/transmission_uk.ts \
                 translations/transmission_zh_CN.ts
 
-FORMS += about.ui \
-         details.ui \
-         mainwin.ui \
-         make-dialog.ui \
-         make-progress-dialog.ui \
-         options.ui \
-         prefs-dialog.ui \
-         relocate.ui \
-         session-dialog.ui \
-         stats-dialog.ui
+FORMS += AboutDialog.ui \
+         DetailsDialog.ui \
+         MainWindow.ui \
+         MakeDialog.ui \
+         MakeProgressDialog.ui \
+         OptionsDialog.ui \
+         PrefsDialog.ui \
+         RelocateDialog.ui \
+         SessionDialog.ui \
+         StatsDialog.ui
 RESOURCES += application.qrc
 win32|macx:RESOURCES += icons/Faenza/Faenza.qrc
-SOURCES += about.cc \
-           add-data.cc \
-           app.cc \
-           column-resizer.cc \
-           dbus-adaptor.cc \
-           details.cc \
-           favicon.cc \
-           file-tree.cc \
-           filterbar.cc \
-           filters.cc \
-           freespace-label.cc \
-           formatter.cc \
-           hig.cc \
-           license.cc \
-           mainwin.cc \
-           make-dialog.cc \
-           options.cc \
-           path-button.cc \
-           prefs.cc \
-           prefs-dialog.cc \
-           relocate.cc \
-           rpc-client.cc \
-           session.cc \
-           session-dialog.cc \
-           squeezelabel.cc \
-           stats-dialog.cc \
-           torrent.cc torrent-delegate.cc \
-           torrent-delegate-min.cc \
-           torrent-filter.cc \
-           torrent-model.cc \
-           tracker-delegate.cc \
-           tracker-model.cc \
-           tracker-model-filter.cc \
-           tricontoolbutton.cc \
-           utils.cc \
-           watchdir.cc
+SOURCES += AboutDialog.cc \
+           AddData.cc \
+           Application.cc \
+           ColumnResizer.cc \
+           DBusAdaptor.cc \
+           DetailsDialog.cc \
+           FaviconCache.cc \
+           FileTreeDelegate.cc \
+           FileTreeItem.cc \
+           FileTreeModel.cc \
+           FileTreeView.cc \
+           FilterBar.cc \
+           FilterBarComboBox.cc \
+           FilterBarComboBoxDelegate.cc \
+           FilterBarLineEdit.cc \
+           Filters.cc \
+           Formatter.cc \
+           FreeSpaceLabel.cc \
+           IconToolButton.cc \
+           LicenseDialog.cc \
+           MainWindow.cc \
+           MakeDialog.cc \
+           OptionsDialog.cc \
+           PathButton.cc \
+           Prefs.cc \
+           PrefsDialog.cc \
+           RelocateDialog.cc \
+           RpcClient.cc \
+           Session.cc \
+           SessionDialog.cc \
+           SqueezeLabel.cc \
+           StatsDialog.cc \
+           Torrent.cc \
+           TorrentDelegate.cc \
+           TorrentDelegateMin.cc \
+           TorrentFilter.cc \
+           TorrentModel.cc \
+           TrackerDelegate.cc \
+           TrackerModel.cc \
+           TrackerModelFilter.cc \
+           Utils.cc \
+           WatchDir.cc
 HEADERS += $$replace(SOURCES, .cc, .h)
-HEADERS += speed.h types.h
+HEADERS += CustomVariantType.h Speed.h
 
 win32:RC_FILE = qtr.rc

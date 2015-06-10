@@ -1,0 +1,1375 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>PrefsDialog</class>
+ <widget class="QDialog" name="PrefsDialog">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>545</width>
+    <height>547</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Transmission Preferences</string>
+  </property>
+  <layout class="QVBoxLayout" name="dialogLayout">
+   <item>
+    <widget class="QTabWidget" name="tabs">
+     <property name="currentIndex">
+      <number>0</number>
+     </property>
+     <property name="elideMode">
+      <enum>Qt::ElideNone</enum>
+     </property>
+     <property name="usesScrollButtons">
+      <bool>false</bool>
+     </property>
+     <widget class="QWidget" name="speedTab">
+      <attribute name="title">
+       <string>Speed</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="speedTabLayout">
+       <item>
+        <widget class="QLabel" name="speedLimitsSectionLabel">
+         <property name="styleSheet">
+          <string notr="true">font-weight:bold</string>
+         </property>
+         <property name="text">
+          <string>Speed Limits</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <layout class="QGridLayout" name="speedLimitsSectionLayout" columnstretch="0,1">
+         <property name="leftMargin">
+          <number>18</number>
+         </property>
+         <item row="0" column="0">
+          <widget class="QCheckBox" name="uploadSpeedLimitCheck">
+           <property name="text">
+            <string>&amp;Upload:</string>
+           </property>
+           <property name="checked">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="QSpinBox" name="uploadSpeedLimitSpin">
+           <property name="maximum">
+            <number>999999999</number>
+           </property>
+           <property name="singleStep">
+            <number>5</number>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0">
+          <widget class="QCheckBox" name="downloadSpeedLimitCheck">
+           <property name="text">
+            <string>&amp;Download:</string>
+           </property>
+           <property name="checked">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <widget class="QSpinBox" name="downloadSpeedLimitSpin">
+           <property name="maximum">
+            <number>999999999</number>
+           </property>
+           <property name="singleStep">
+            <number>5</number>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <spacer name="altSpeedLimitsSectionSpacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeType">
+          <enum>QSizePolicy::Fixed</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>1</width>
+           <height>10</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="altSpeedLimitsSectionTitleLayout" stretch="0,1">
+         <property name="spacing">
+          <number>2</number>
+         </property>
+         <item>
+          <widget class="QLabel" name="altSpeedLimitsSectionIconLabel">
+           <property name="pixmap">
+            <pixmap resource="application.qrc">:/icons/alt-limit-off.png</pixmap>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="altSpeedLimitsSectionLabel">
+           <property name="styleSheet">
+            <string notr="true">font-weight:bold</string>
+           </property>
+           <property name="text">
+            <string>Alternative Speed Limits</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QGridLayout" name="altSpeedLimitsSectionLayout" columnstretch="0,1">
+         <property name="leftMargin">
+          <number>18</number>
+         </property>
+         <item row="0" column="0" colspan="2">
+          <widget class="QLabel" name="altSpeedLimitsSectionDescriptionLabel">
+           <property name="text">
+            <string>&lt;small&gt;Override normal speed limits manually or at scheduled times&lt;/small&gt;</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0">
+          <widget class="QLabel" name="altUploadSpeedLimitLabel">
+           <property name="text">
+            <string>U&amp;pload:</string>
+           </property>
+           <property name="buddy">
+            <cstring>altUploadSpeedLimitSpin</cstring>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <widget class="QSpinBox" name="altUploadSpeedLimitSpin">
+           <property name="maximum">
+            <number>999999999</number>
+           </property>
+           <property name="singleStep">
+            <number>5</number>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="0">
+          <widget class="QLabel" name="altDownloadSpeedLimitLabel">
+           <property name="text">
+            <string>Do&amp;wnload:</string>
+           </property>
+           <property name="buddy">
+            <cstring>altDownloadSpeedLimitSpin</cstring>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="1">
+          <widget class="QSpinBox" name="altDownloadSpeedLimitSpin">
+           <property name="maximum">
+            <number>999999999</number>
+           </property>
+           <property name="singleStep">
+            <number>5</number>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="0">
+          <widget class="QCheckBox" name="altSpeedLimitScheduleCheck">
+           <property name="text">
+            <string>&amp;Scheduled times:</string>
+           </property>
+           <property name="checked">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="1">
+          <layout class="QHBoxLayout" name="altSpeedLimitScheduleLayout">
+           <item>
+            <widget class="QTimeEdit" name="altSpeedLimitStartTimeEdit">
+             <property name="displayFormat">
+              <string notr="true">hh:mm</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="altSpeedLimitToLabel">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="text">
+              <string>&amp;to</string>
+             </property>
+             <property name="buddy">
+              <cstring>altSpeedLimitEndTimeEdit</cstring>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QTimeEdit" name="altSpeedLimitEndTimeEdit">
+             <property name="displayFormat">
+              <string notr="true">hh:mm</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item row="4" column="0">
+          <widget class="QLabel" name="altSpeedLimitDaysLabel">
+           <property name="text">
+            <string>&amp;On days:</string>
+           </property>
+           <property name="buddy">
+            <cstring>altSpeedLimitDaysCombo</cstring>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="1">
+          <widget class="QComboBox" name="altSpeedLimitDaysCombo"/>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <spacer name="speedTabBottomSpacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>1</width>
+           <height>1</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="downloadingTab">
+      <attribute name="title">
+       <string>Downloading</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="downloadingTabLayout">
+       <item>
+        <widget class="QLabel" name="addingSectionLabel">
+         <property name="styleSheet">
+          <string notr="true">font-weight:bold</string>
+         </property>
+         <property name="text">
+          <string>Adding</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <layout class="QGridLayout" name="addingSectionLayout" columnstretch="0,1">
+         <property name="leftMargin">
+          <number>18</number>
+         </property>
+         <item row="0" column="0">
+          <widget class="QCheckBox" name="watchDirCheck">
+           <property name="text">
+            <string>Automatically add .torrent files &amp;from:</string>
+           </property>
+           <property name="checked">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="QStackedWidget" name="watchDirStack">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <widget class="PathButton" name="watchDirButton"/>
+           <widget class="QLineEdit" name="watchDirEdit"/>
+          </widget>
+         </item>
+         <item row="1" column="0" colspan="2">
+          <widget class="QCheckBox" name="showTorrentOptionsDialogCheck">
+           <property name="text">
+            <string>Show the Torrent Options &amp;dialog</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="0" colspan="2">
+          <widget class="QCheckBox" name="startAddedTorrentsCheck">
+           <property name="text">
+            <string>&amp;Start added torrents</string>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="0" colspan="2">
+          <widget class="QCheckBox" name="trashTorrentFileCheck">
+           <property name="text">
+            <string>Mo&amp;ve the .torrent file to the trash</string>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="0">
+          <widget class="QLabel" name="downloadDirLabel">
+           <property name="text">
+            <string>Save to &amp;Location:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="1">
+          <widget class="QStackedWidget" name="downloadDirStack">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <widget class="PathButton" name="downloadDirButton"/>
+           <widget class="QLineEdit" name="downloadDirEdit"/>
+          </widget>
+         </item>
+         <item row="5" column="1">
+          <widget class="FreeSpaceLabel" name="downloadDirFreeSpaceLabel">
+           <property name="text">
+            <string notr="true">...</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <spacer name="downloadQueueSectionSpacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeType">
+          <enum>QSizePolicy::Fixed</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>1</width>
+           <height>10</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <widget class="QLabel" name="downloadQueueSectionLabel">
+         <property name="styleSheet">
+          <string notr="true">font-weight:bold</string>
+         </property>
+         <property name="text">
+          <string>Download Queue</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <layout class="QGridLayout" name="downloadQueueSectionLayout" columnstretch="0,1">
+         <property name="leftMargin">
+          <number>18</number>
+         </property>
+         <item row="0" column="0">
+          <widget class="QLabel" name="downloadQueueSizeLabel">
+           <property name="text">
+            <string>Ma&amp;ximum active downloads:</string>
+           </property>
+           <property name="buddy">
+            <cstring>downloadQueueSizeSpin</cstring>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="QSpinBox" name="downloadQueueSizeSpin">
+           <property name="minimum">
+            <number>1</number>
+           </property>
+           <property name="maximum">
+            <number>999999999</number>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0">
+          <widget class="QLabel" name="queueStalledMinutesLabel">
+           <property name="text">
+            <string extracomment="Please keep this phrase as short as possible, it's curently the longest and influences dialog width">Download is i&amp;nactive if data sharing stopped:</string>
+           </property>
+           <property name="buddy">
+            <cstring>queueStalledMinutesSpin</cstring>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <widget class="QSpinBox" name="queueStalledMinutesSpin">
+           <property name="suffix">
+            <string notr="true"> minute(s) ago</string>
+           </property>
+           <property name="minimum">
+            <number>1</number>
+           </property>
+           <property name="maximum">
+            <number>9999</number>
+           </property>
+           <property name="singleStep">
+            <number>5</number>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <spacer name="incompleteSectionSpacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeType">
+          <enum>QSizePolicy::Fixed</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>1</width>
+           <height>10</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <widget class="QLabel" name="incompleteSectionLabel">
+         <property name="styleSheet">
+          <string notr="true">font-weight:bold</string>
+         </property>
+         <property name="text">
+          <string>Incomplete</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <layout class="QGridLayout" name="incompleteSectionLayout" columnstretch="0,1">
+         <property name="leftMargin">
+          <number>18</number>
+         </property>
+         <item row="0" column="0" colspan="2">
+          <widget class="QCheckBox" name="renamePartialFilesCheck">
+           <property name="text">
+            <string>Append &quot;.&amp;part&quot; to incomplete files' names</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0">
+          <widget class="QCheckBox" name="incompleteDirCheck">
+           <property name="text">
+            <string>Keep &amp;incomplete files in:</string>
+           </property>
+           <property name="checked">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <widget class="QStackedWidget" name="incompleteDirStack">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <widget class="PathButton" name="incompleteDirButton"/>
+           <widget class="QLineEdit" name="incompleteDirEdit"/>
+          </widget>
+         </item>
+         <item row="2" column="0">
+          <widget class="QCheckBox" name="completionScriptCheck">
+           <property name="text">
+            <string>Call scrip&amp;t when torrent is completed:</string>
+           </property>
+           <property name="checked">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="1">
+          <widget class="QStackedWidget" name="completionScriptStack">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <widget class="PathButton" name="completionScriptButton"/>
+           <widget class="QLineEdit" name="completionScriptEdit"/>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <spacer name="downloadingTabBottomSpacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>1</width>
+           <height>1</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="seedingTab">
+      <attribute name="title">
+       <string>Seeding</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="seedingTabLayout">
+       <item>
+        <widget class="QLabel" name="limitsSectionLabel">
+         <property name="styleSheet">
+          <string notr="true">font-weight:bold</string>
+         </property>
+         <property name="text">
+          <string>Limits</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <layout class="QGridLayout" name="limitsSectionLayout" columnstretch="0,1">
+         <property name="leftMargin">
+          <number>18</number>
+         </property>
+         <item row="0" column="0">
+          <widget class="QCheckBox" name="ratioLimitCheck">
+           <property name="text">
+            <string>Stop seeding at &amp;ratio:</string>
+           </property>
+           <property name="checked">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="QDoubleSpinBox" name="ratioLimitSpin">
+           <property name="maximum">
+            <double>999999999.000000000000000</double>
+           </property>
+           <property name="singleStep">
+            <double>0.500000000000000</double>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0">
+          <widget class="QCheckBox" name="idleLimitCheck">
+           <property name="text">
+            <string>Stop seedi&amp;ng if idle for:</string>
+           </property>
+           <property name="checked">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <widget class="QSpinBox" name="idleLimitSpin">
+           <property name="suffix">
+            <string notr="true"> minute(s)</string>
+           </property>
+           <property name="minimum">
+            <number>1</number>
+           </property>
+           <property name="maximum">
+            <number>9999</number>
+           </property>
+           <property name="singleStep">
+            <number>5</number>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <spacer name="seedingTabBottomSpacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>1</width>
+           <height>1</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="privacyTab">
+      <attribute name="title">
+       <string>Privacy</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="privacyTabLayout">
+       <item>
+        <widget class="QLabel" name="encryptionSectionLabel">
+         <property name="styleSheet">
+          <string notr="true">font-weight:bold</string>
+         </property>
+         <property name="text">
+          <string>Encryption</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <layout class="QGridLayout" name="encryptionSectionLayout" columnstretch="0,1">
+         <property name="leftMargin">
+          <number>18</number>
+         </property>
+         <item row="0" column="0">
+          <widget class="QLabel" name="encryptionModeLabel">
+           <property name="text">
+            <string>&amp;Encryption mode:</string>
+           </property>
+           <property name="buddy">
+            <cstring>encryptionModeCombo</cstring>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="QComboBox" name="encryptionModeCombo"/>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <spacer name="blocklistSectionSpacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeType">
+          <enum>QSizePolicy::Fixed</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>1</width>
+           <height>10</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <widget class="QLabel" name="blocklistSectionLabel">
+         <property name="styleSheet">
+          <string notr="true">font-weight:bold</string>
+         </property>
+         <property name="text">
+          <string>Blocklist</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <layout class="QGridLayout" name="blocklistSectionLayout" columnstretch="0,1,0">
+         <property name="leftMargin">
+          <number>18</number>
+         </property>
+         <item row="0" column="0">
+          <widget class="QCheckBox" name="blocklistCheck">
+           <property name="text">
+            <string>Enable &amp;blocklist:</string>
+           </property>
+           <property name="checked">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1" colspan="2">
+          <widget class="QLineEdit" name="blocklistEdit"/>
+         </item>
+         <item row="1" column="0" colspan="2">
+          <widget class="QLabel" name="blocklistStatusLabel">
+           <property name="text">
+            <string notr="true">...</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="2">
+          <widget class="QPushButton" name="updateBlocklistButton">
+           <property name="text">
+            <string>&amp;Update</string>
+           </property>
+           <property name="autoDefault">
+            <bool>false</bool>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="0" colspan="3">
+          <widget class="QCheckBox" name="autoUpdateBlocklistCheck">
+           <property name="text">
+            <string>Enable &amp;automatic updates</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <spacer name="privacyTabBottomSpacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>1</width>
+           <height>1</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="networkTab">
+      <attribute name="title">
+       <string>Network</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="networkTabLayout">
+       <item>
+        <widget class="QLabel" name="incomingPeersSectionLabel">
+         <property name="styleSheet">
+          <string notr="true">font-weight:bold</string>
+         </property>
+         <property name="text">
+          <string>Incoming Peers</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <layout class="QGridLayout" name="incomingPeersSectionLayout" columnstretch="0,1,0">
+         <property name="leftMargin">
+          <number>18</number>
+         </property>
+         <item row="0" column="0">
+          <widget class="QLabel" name="peerPortLabel">
+           <property name="text">
+            <string>&amp;Port for incoming connections:</string>
+           </property>
+           <property name="buddy">
+            <cstring>peerPortSpin</cstring>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1" colspan="2">
+          <widget class="QSpinBox" name="peerPortSpin">
+           <property name="minimum">
+            <number>1</number>
+           </property>
+           <property name="maximum">
+            <number>65535</number>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <widget class="QLabel" name="peerPortStatusLabel">
+           <property name="text">
+            <string>Status unknown</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="2">
+          <widget class="QPushButton" name="testPeerPortButton">
+           <property name="text">
+            <string>Te&amp;st Port</string>
+           </property>
+           <property name="autoDefault">
+            <bool>false</bool>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="0" colspan="3">
+          <widget class="QCheckBox" name="randomPeerPortCheck">
+           <property name="text">
+            <string>Pick a &amp;random port every time Transmission is started</string>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="0" colspan="3">
+          <widget class="QCheckBox" name="enablePortForwardingCheck">
+           <property name="text">
+            <string>Use UPnP or NAT-PMP port &amp;forwarding from my router</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <spacer name="peerLimitsSectionSpacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeType">
+          <enum>QSizePolicy::Fixed</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>1</width>
+           <height>10</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <widget class="QLabel" name="peerLimitsSectionLabel">
+         <property name="styleSheet">
+          <string notr="true">font-weight:bold</string>
+         </property>
+         <property name="text">
+          <string>Peer Limits</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <layout class="QGridLayout" name="peerLimitsSectionLayout" columnstretch="0,1">
+         <property name="leftMargin">
+          <number>18</number>
+         </property>
+         <item row="0" column="0">
+          <widget class="QLabel" name="torrentPeerLimitLabel">
+           <property name="text">
+            <string>Maximum peers per &amp;torrent:</string>
+           </property>
+           <property name="buddy">
+            <cstring>torrentPeerLimitSpin</cstring>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="QSpinBox" name="torrentPeerLimitSpin">
+           <property name="minimum">
+            <number>1</number>
+           </property>
+           <property name="maximum">
+            <number>1024</number>
+           </property>
+           <property name="singleStep">
+            <number>5</number>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0">
+          <widget class="QLabel" name="globalPeerLimitLabel">
+           <property name="text">
+            <string>Maximum peers &amp;overall:</string>
+           </property>
+           <property name="buddy">
+            <cstring>globalPeerLimitSpin</cstring>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <widget class="QSpinBox" name="globalPeerLimitSpin">
+           <property name="minimum">
+            <number>1</number>
+           </property>
+           <property name="maximum">
+            <number>1024</number>
+           </property>
+           <property name="singleStep">
+            <number>5</number>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <spacer name="optionsSectionSpacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeType">
+          <enum>QSizePolicy::Fixed</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>1</width>
+           <height>10</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <widget class="QLabel" name="optionsSectionLabel">
+         <property name="styleSheet">
+          <string notr="true">font-weight:bold</string>
+         </property>
+         <property name="text">
+          <string>Options</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <layout class="QVBoxLayout" name="optionsSectionLayout">
+         <property name="leftMargin">
+          <number>18</number>
+         </property>
+         <item>
+          <widget class="QCheckBox" name="enableUtpCheck">
+           <property name="toolTip">
+            <string>uTP is a tool for reducing network congestion.</string>
+           </property>
+           <property name="text">
+            <string>Enable &amp;uTP for peer connections</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QCheckBox" name="enablePexCheck">
+           <property name="toolTip">
+            <string>PEX is a tool for exchanging peer lists with the peers you're connected to.</string>
+           </property>
+           <property name="text">
+            <string>Use PE&amp;X to find more peers</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QCheckBox" name="enableDhtCheck">
+           <property name="toolTip">
+            <string>DHT is a tool for finding peers without a tracker.</string>
+           </property>
+           <property name="text">
+            <string>Use &amp;DHT to find more peers</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QCheckBox" name="enableLpdCheck">
+           <property name="toolTip">
+            <string>LPD is a tool for finding peers on your local network.</string>
+           </property>
+           <property name="text">
+            <string>Use &amp;Local Peer Discovery to find more peers</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <spacer name="networkTabBottomSpacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>1</width>
+           <height>1</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="desktopTab">
+      <attribute name="title">
+       <string>Desktop</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="desktopTabLayout">
+       <item>
+        <widget class="QLabel" name="desktopSectionLabel">
+         <property name="styleSheet">
+          <string notr="true">font-weight:bold</string>
+         </property>
+         <property name="text">
+          <string>Desktop</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <layout class="QVBoxLayout" name="desktopSectionLayout">
+         <property name="leftMargin">
+          <number>18</number>
+         </property>
+         <item>
+          <widget class="QCheckBox" name="showTrayIconCheck">
+           <property name="text">
+            <string>Show Transmission icon in the &amp;notification area</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QCheckBox" name="startMinimizedCheck">
+           <property name="text">
+            <string>Start &amp;minimized in notification area</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <spacer name="notificationSectionSpacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeType">
+          <enum>QSizePolicy::Fixed</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>1</width>
+           <height>10</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <widget class="QLabel" name="notificationSectionLabel">
+         <property name="styleSheet">
+          <string notr="true">font-weight:bold</string>
+         </property>
+         <property name="text">
+          <string>Notification</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <layout class="QVBoxLayout" name="notificationSectionLayout">
+         <property name="leftMargin">
+          <number>18</number>
+         </property>
+         <item>
+          <widget class="QCheckBox" name="notifyOnTorrentAddedCheck">
+           <property name="text">
+            <string>Show a notification when torrents are a&amp;dded</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QCheckBox" name="notifyOnTorrentCompletedCheck">
+           <property name="text">
+            <string>Show a notification when torrents &amp;finish</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QCheckBox" name="playSoundOnTorrentCompletedCheck">
+           <property name="text">
+            <string>Play a &amp;sound when torrents finish</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <spacer name="desktopTabBottomSpacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>1</width>
+           <height>1</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="remoteTab">
+      <attribute name="title">
+       <string>Remote</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="remoteTabLayout">
+       <item>
+        <widget class="QLabel" name="remoteControlSectionLabel">
+         <property name="styleSheet">
+          <string notr="true">font-weight:bold</string>
+         </property>
+         <property name="text">
+          <string>Remote Control</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <layout class="QGridLayout" name="remoteControlSectionLayout" columnstretch="0,1,0">
+         <property name="leftMargin">
+          <number>18</number>
+         </property>
+         <item row="0" column="0" colspan="2">
+          <widget class="QCheckBox" name="enableRpcCheck">
+           <property name="text">
+            <string>Allow &amp;remote access</string>
+           </property>
+           <property name="checked">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="2">
+          <widget class="QPushButton" name="openWebClientButton">
+           <property name="text">
+            <string>&amp;Open web client</string>
+           </property>
+           <property name="autoDefault">
+            <bool>false</bool>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0">
+          <widget class="QLabel" name="rpcPortLabel">
+           <property name="text">
+            <string>HTTP &amp;port:</string>
+           </property>
+           <property name="buddy">
+            <cstring>rpcPortSpin</cstring>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1" colspan="2">
+          <widget class="QSpinBox" name="rpcPortSpin">
+           <property name="minimum">
+            <number>1</number>
+           </property>
+           <property name="maximum">
+            <number>65535</number>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="0" colspan="3">
+          <widget class="QCheckBox" name="requireRpcAuthCheck">
+           <property name="text">
+            <string>Use &amp;authentication</string>
+           </property>
+           <property name="checked">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="0">
+          <widget class="QLabel" name="rpcUsernameLabel">
+           <property name="text">
+            <string>&amp;Username:</string>
+           </property>
+           <property name="buddy">
+            <cstring>rpcUsernameEdit</cstring>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="1" colspan="2">
+          <widget class="QLineEdit" name="rpcUsernameEdit"/>
+         </item>
+         <item row="4" column="0">
+          <widget class="QLabel" name="rpcPasswordLabel">
+           <property name="text">
+            <string>Pass&amp;word:</string>
+           </property>
+           <property name="buddy">
+            <cstring>rpcPasswordEdit</cstring>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="1" colspan="2">
+          <widget class="QLineEdit" name="rpcPasswordEdit">
+           <property name="echoMode">
+            <enum>QLineEdit::Password</enum>
+           </property>
+          </widget>
+         </item>
+         <item row="5" column="0" colspan="3">
+          <widget class="QCheckBox" name="enableRpcWhitelistCheck">
+           <property name="text">
+            <string>Only allow these IP a&amp;ddresses:</string>
+           </property>
+           <property name="checked">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item row="6" column="0">
+          <widget class="QLabel" name="rpcWhitelistLabel">
+           <property name="text">
+            <string>Addresses:</string>
+           </property>
+           <property name="buddy">
+            <cstring>rpcWhitelistEdit</cstring>
+           </property>
+          </widget>
+         </item>
+         <item row="6" column="1" colspan="2">
+          <widget class="QLineEdit" name="rpcWhitelistEdit"/>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <spacer name="remoteTabBottomSpacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>1</width>
+           <height>1</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </widget>
+    </widget>
+   </item>
+   <item>
+    <widget class="QDialogButtonBox" name="dialogButtons">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="standardButtons">
+      <set>QDialogButtonBox::Close</set>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>PathButton</class>
+   <extends>QToolButton</extends>
+   <header>PathButton.h</header>
+  </customwidget>
+  <customwidget>
+   <class>FreeSpaceLabel</class>
+   <extends>QLabel</extends>
+   <header>FreeSpaceLabel.h</header>
+  </customwidget>
+ </customwidgets>
+ <resources>
+  <include location="application.qrc"/>
+ </resources>
+ <connections>
+  <connection>
+   <sender>dialogButtons</sender>
+   <signal>rejected()</signal>
+   <receiver>PrefsDialog</receiver>
+   <slot>reject()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>316</x>
+     <y>260</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>286</x>
+     <y>274</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>uploadSpeedLimitCheck</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>uploadSpeedLimitSpin</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>94</x>
+     <y>79</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>323</x>
+     <y>79</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>downloadSpeedLimitCheck</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>downloadSpeedLimitSpin</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>94</x>
+     <y>113</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>323</x>
+     <y>113</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>ratioLimitCheck</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>ratioLimitSpin</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>129</x>
+     <y>79</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>359</x>
+     <y>79</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>idleLimitCheck</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>idleLimitSpin</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>129</x>
+     <y>113</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>359</x>
+     <y>113</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>watchDirCheck</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>watchDirStack</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>167</x>
+     <y>80</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>392</x>
+     <y>80</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>incompleteDirCheck</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>incompleteDirStack</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>169</x>
+     <y>411</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>395</x>
+     <y>411</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>completionScriptCheck</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>completionScriptStack</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>169</x>
+     <y>447</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>395</x>
+     <y>447</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>

@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>RelocateDialog</class>
+ <widget class="QDialog" name="RelocateDialog">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>333</width>
+    <height>155</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Set Torrent Location</string>
+  </property>
+  <layout class="QVBoxLayout" name="dialogLayout">
+   <property name="sizeConstraint">
+    <enum>QLayout::SetFixedSize</enum>
+   </property>
+   <item>
+    <widget class="QLabel" name="setLocationSectionLabel">
+     <property name="styleSheet">
+      <string notr="true">font-weight:bold</string>
+     </property>
+     <property name="text">
+      <string>Set Location</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <layout class="QGridLayout" name="setLocationSectionLayout" columnstretch="0,1">
+     <property name="leftMargin">
+      <number>18</number>
+     </property>
+     <item row="0" column="0">
+      <widget class="QLabel" name="newLocationLabel">
+       <property name="text">
+        <string>New &amp;location:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="QStackedWidget" name="newLocationStack">
+       <widget class="PathButton" name="newLocationButton"/>
+       <widget class="QLineEdit" name="newLocationEdit"/>
+      </widget>
+     </item>
+     <item row="1" column="0" colspan="2">
+      <widget class="QRadioButton" name="moveDataRadio">
+       <property name="text">
+        <string>&amp;Move from the current folder</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="0" colspan="2">
+      <widget class="QRadioButton" name="findDataRadio">
+       <property name="text">
+        <string>Local data is &amp;already there</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QDialogButtonBox" name="dialogButtons">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="standardButtons">
+      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>PathButton</class>
+   <extends>QToolButton</extends>
+   <header>PathButton.h</header>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>

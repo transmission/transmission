@@ -1,0 +1,239 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MakeDialog</class>
+ <widget class="QDialog" name="MakeDialog">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>566</width>
+    <height>426</height>
+   </rect>
+  </property>
+  <property name="acceptDrops">
+   <bool>true</bool>
+  </property>
+  <property name="windowTitle">
+   <string>New Torrent</string>
+  </property>
+  <layout class="QVBoxLayout" name="dialogLayout">
+   <item>
+    <widget class="QLabel" name="filesSectionLabel">
+     <property name="styleSheet">
+      <string notr="true">font-weight:bold</string>
+     </property>
+     <property name="text">
+      <string>Files</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <layout class="QGridLayout" name="filesSectionLayout" columnstretch="0,1">
+     <property name="leftMargin">
+      <number>18</number>
+     </property>
+     <item row="0" column="0">
+      <widget class="QLabel" name="destinationLabel">
+       <property name="text">
+        <string>Sa&amp;ve to:</string>
+       </property>
+       <property name="buddy">
+        <cstring>destinationButton</cstring>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="PathButton" name="destinationButton"/>
+     </item>
+     <item row="1" column="0">
+      <widget class="QRadioButton" name="sourceFolderRadio">
+       <property name="text">
+        <string>Source f&amp;older:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="PathButton" name="sourceFolderButton">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="0">
+      <widget class="QRadioButton" name="sourceFileRadio">
+       <property name="text">
+        <string>Source &amp;file:</string>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="1">
+      <widget class="PathButton" name="sourceFileButton"/>
+     </item>
+     <item row="3" column="1">
+      <widget class="QLabel" name="sourceSizeLabel">
+       <property name="text">
+        <string notr="true">...</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <spacer name="propertiesSectionSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeType">
+      <enum>QSizePolicy::Fixed</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>1</width>
+       <height>10</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item>
+    <widget class="QLabel" name="propertiesSectionLabel">
+     <property name="styleSheet">
+      <string notr="true">font-weight:bold</string>
+     </property>
+     <property name="text">
+      <string>Properties</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <layout class="QGridLayout" name="propertiesSectionLayout" columnstretch="0,1">
+     <property name="leftMargin">
+      <number>18</number>
+     </property>
+     <item row="0" column="0">
+      <widget class="QLabel" name="trackersLabel">
+       <property name="text">
+        <string>&amp;Trackers:</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+       </property>
+       <property name="buddy">
+        <cstring>trackersEdit</cstring>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="QPlainTextEdit" name="trackersEdit">
+       <property name="tabChangesFocus">
+        <bool>true</bool>
+       </property>
+       <property name="lineWrapMode">
+        <enum>QPlainTextEdit::NoWrap</enum>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="QLabel" name="trackersDescriptionLabel">
+       <property name="text">
+        <string>To add a backup URL, add it on the line after the primary URL.
+To add another primary URL, add it after a blank line.</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="0">
+      <widget class="QCheckBox" name="commentCheck">
+       <property name="text">
+        <string>Co&amp;mment:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="1">
+      <widget class="QLineEdit" name="commentEdit">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="0" colspan="2">
+      <widget class="QCheckBox" name="privateCheck">
+       <property name="text">
+        <string>&amp;Private torrent</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QDialogButtonBox" name="dialogButtons">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="standardButtons">
+      <set>QDialogButtonBox::Close|QDialogButtonBox::Ok</set>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>PathButton</class>
+   <extends>QToolButton</extends>
+   <header>PathButton.h</header>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>commentCheck</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>commentEdit</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>76</x>
+     <y>333</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>360</x>
+     <y>333</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>sourceFolderRadio</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>sourceFolderButton</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>72</x>
+     <y>83</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>360</x>
+     <y>82</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>sourceFileRadio</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>sourceFileButton</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>72</x>
+     <y>119</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>360</x>
+     <y>118</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>

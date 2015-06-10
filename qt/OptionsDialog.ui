@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>OptionsDialog</class>
+ <widget class="QDialog" name="OptionsDialog">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>418</width>
+    <height>379</height>
+   </rect>
+  </property>
+  <layout class="QGridLayout" name="dialogLayout">
+   <item row="0" column="0">
+    <widget class="QLabel" name="sourceLabel">
+     <property name="text">
+      <string>&amp;Source:</string>
+     </property>
+     <property name="buddy">
+      <cstring>sourceButton</cstring>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="1">
+    <widget class="QStackedWidget" name="sourceStack">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <widget class="PathButton" name="sourceButton"/>
+     <widget class="QLineEdit" name="sourceEdit"/>
+    </widget>
+   </item>
+   <item row="1" column="0">
+    <widget class="QLabel" name="destinationLabel">
+     <property name="text">
+      <string>&amp;Destination folder:</string>
+     </property>
+     <property name="buddy">
+      <cstring>destinationButton</cstring>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="1">
+    <widget class="QStackedWidget" name="destinationStack">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <widget class="PathButton" name="destinationButton"/>
+     <widget class="QLineEdit" name="destinationEdit"/>
+    </widget>
+   </item>
+   <item row="2" column="1">
+    <widget class="FreeSpaceLabel" name="freeSpaceLabel">
+     <property name="text">
+      <string notr="true">...</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="0" colspan="2">
+    <widget class="FileTreeView" name="filesView"/>
+   </item>
+   <item row="4" column="0">
+    <widget class="QLabel" name="priorityLabel">
+     <property name="text">
+      <string>&amp;Priority:</string>
+     </property>
+     <property name="buddy">
+      <cstring>priorityCombo</cstring>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="1">
+    <widget class="QComboBox" name="priorityCombo"/>
+   </item>
+   <item row="5" column="0" colspan="2">
+    <widget class="QCheckBox" name="startCheck">
+     <property name="text">
+      <string>S&amp;tart when added</string>
+     </property>
+    </widget>
+   </item>
+   <item row="6" column="0" colspan="2">
+    <widget class="QCheckBox" name="trashCheck">
+     <property name="text">
+      <string>Mo&amp;ve .torrent file to the trash</string>
+     </property>
+    </widget>
+   </item>
+   <item row="7" column="0" colspan="2">
+    <widget class="QDialogButtonBox" name="dialogButtons">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="standardButtons">
+      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Open</set>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>FileTreeView</class>
+   <extends>QTreeView</extends>
+   <header>FileTreeView.h</header>
+  </customwidget>
+  <customwidget>
+   <class>FreeSpaceLabel</class>
+   <extends>QLabel</extends>
+   <header>FreeSpaceLabel.h</header>
+  </customwidget>
+  <customwidget>
+   <class>PathButton</class>
+   <extends>QToolButton</extends>
+   <header>PathButton.h</header>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>
