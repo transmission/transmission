@@ -47,6 +47,7 @@ TRANSLATIONS += translations/transmission_en.ts \
                 translations/transmission_hu.ts \
                 translations/transmission_kk.ts \
                 translations/transmission_lt.ts \
+                translations/transmission_pl_PL.ts \
                 translations/transmission_pt_BR.ts \
                 translations/transmission_ru.ts \
                 translations/transmission_uk.ts \
